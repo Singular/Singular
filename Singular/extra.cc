@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.34 1998-04-07 18:35:21 obachman Exp $ */
+/* $Id: extra.cc,v 1.35 1998-04-14 07:06:26 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -599,19 +599,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
         }
         res->rtyp=POLY_CMD;
         res->data=(void *)fglmNewLinearCombination((ideal)h->next->Data(),(poly)h->next->next->Data());
-        return FALSE;
-      }
-      else
-        WerrorS("ideal expected");
-    }
-    else
-/*==================== finduni =============================*/
-    if(strcmp((char*)(h->Data()),"finduni")==0)
-    {
-      if ((h->next!=NULL) &&(h->next->Typ()==IDEAL_CMD))
-      {
-        res->rtyp=IDEAL_CMD;
-        res->data=(void *)FindUnivariateWrapper((ideal)h->next->Data());
         return FALSE;
       }
       else
