@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.47 1999-09-13 07:46:30 pfister Exp $
+// $Id: primdec.lib,v 1.48 1999-10-14 11:03:02 pfister Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                               //
 // algorithms for primary decomposition based on                             //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                            //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.47 1999-09-13 07:46:30 pfister Exp $";
+version="$Id: primdec.lib,v 1.48 1999-10-14 11:03:02 pfister Exp $";
 info="
 LIBRARY: primdec.lib:   PROCEDURES FOR PRIMARY DECOMPOSITION
 AUTHORS:  Gerhard Pfister, email: pfister@mathematik.uni-kl.de (GTZ)
@@ -1871,7 +1871,7 @@ EXAMPLE: example decomp; shows an example
   }
   else
   {
-     ideal @j=std(fetch(@P,i));
+     ideal @j=groebner(fetch(@P,i));
   }
   option(noredSB);
   if(seri==1)
@@ -2029,7 +2029,7 @@ EXAMPLE: example decomp; shows an example
   }
   else
   {
-    ideal jwork=std(imap(gnir,@j));
+    ideal jwork=groebner(imap(gnir,@j));
   }
   list hquprimary;
   poly @p,@q;
@@ -2066,7 +2066,7 @@ EXAMPLE: example decomp; shows an example
         }
         else
         {
-          ideal @j=std(phi(@j));
+          ideal @j=groebner(phi(@j));
         }
         ideal ser=phi(ser);
 
@@ -2235,7 +2235,7 @@ EXAMPLE: example decomp; shows an example
              @q=@q*fac[lauf];
            }
         }
-        jwork=std(jwork,@q);
+        jwork=groebner(jwork,@q);
         keepdi=dim(jwork);
         if(keepdi<di)
         {
@@ -2333,7 +2333,7 @@ EXAMPLE: example decomp; shows an example
               }
               else
               {
-                ideal @j=std(phi(jkeep));
+                ideal @j=groebner(phi(jkeep));
               }
               ideal ser=phi(ser);
            }
@@ -2671,7 +2671,7 @@ proc radicalKL (list m,ideal ser,list #)
          }
          else
          {
-           ideal @j=std(phi(@j));
+           ideal @j=groebner(phi(@j));
          }
       }
       if((deg(@j[1])==0)||(dim(@j)<jdim))
