@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.40 2002-02-14 15:08:52 Singular Exp $ */
+/* $Id: cntrlc.cc,v 1.41 2004-08-13 10:39:13 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -506,6 +506,9 @@ static void debug (int method)
         fprintf (stderr, "stack_trace\n");
         stack_trace (args);
         break;
+      default:
+        // should not be reached:
+        exit(1);
     }
   }
   else if (pid == -1)
