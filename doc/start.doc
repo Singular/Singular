@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.24 1998-05-27 07:05:48 wichmann Exp $
+@comment $Id: start.doc,v 1.25 1998-06-02 12:52:13 wichmann Exp $
 @comment this file contains the "Introduction" chapter.
 
 @c The following directives are necessary for proper compilation
@@ -208,13 +208,13 @@ keys are denoted using typewriter:
 @section Getting started
 @cindex Getting started
 
-@sc{Singular} is a special purpose System for polynomial
+@sc{Singular} is a special purpose system for polynomial
 computations. Hence, the most powerful computations in @sc{Singular}
 require the prior definition of a ring. Most important rings are
 polynomial rings over a field, localizations hereof, or quotient rings of 
 such rings modulo an ideal. However, some simple computations with
 integers (machine integers of limited size) and manipulations of strings 
-is available without a ring.
+are available without a ring.
 
 @menu
 * First steps::                 
@@ -285,24 +285,24 @@ maintains a history of the last inputs, which may be accessed by
 @code{CTRL-P} (previous) and @code{CTRL-N} (next) or the arrows on the
 keyboard.
 
-The whole manual is online available with the command @code{help;}
-Explanation on single topics, e.g., on @code{intmat} which defines a
-matrix of integers are obtained by
+The whole manual is online available with the command @code{help;} .
+Explanation on single topics, e.g., on @code{intmat}, which defines a
+matrix of integers, are obtained by
 
 @example
 help intmat;
 @end example  
 
-@noindent This shows the text from @ref{intmat} in the printed maual. 
+@noindent This shows the text from @ref{intmat}, in the printed maual. 
 
-Next, a
+Next, we define a
 @tex
 $3 \times 3$
 @end tex
 @ifinfo
 3 x 3
 @end ifinfo
-matrix of integers is defined and initialized with some values, row-wise 
+matrix of integers and initialize it with some values, row-wise 
 from left to right:
 
 @example
@@ -313,32 +313,53 @@ intmat m[3][3] = 1,2,3,4,5,6,7,8,9;
 square brackets @code{[} and @code{]}.
 
 @example
-m[2,2]=0;
+m[1,2]=0;
 m;
-@expansion{} 1, 2, 3,
-@expansion{} 4, 0, 6,
-@expansion{} 5, 6, 7
+@expansion{} 1,0,3,
+@expansion{} 4,5,6,
+@expansion{} 7,8,9
 @end example  
 
-To calculate the fourth power of this integer matrix, use a @code{for} loop.
-The curly brackets (@code{@{} and @code{@}}) denote the beginning
-resp.@: end of a block.
+To calculate the trace of this matrix, we use a @code{for} loop. The
+curly brackets (@code{@{} and @code{@}}) denote the beginning resp.@:
+end of a block. If you define a variable without giving an initial
+value, as the variable @code{tr} in the example below, @sc{Singular}
+assigns a default value for the specific type. In this case, the default
+value for integers is @code{0}. Note, that the integer variable @code{j}
+is defined above.
 
 @example
-intmat mm = m;
-for (j = 1; j <= 3; j++)
-@{ 
-    mm = mm * m; 
-@}
-mm;
-@expansion{} 6380,5848,9276,
-@expansion{} 10688,10008,15528,
-@expansion{} 22316,20368,32460 
-@end example  
+int tr;
+for ( j=1; j <= 3; j++ ) @{ tr=tr + m[j,j]; @}
+tr;
+@expansion{} 15
+@end example
 
-@noindent Note that the entries are machine integers and a higher power
-may result in an integer overflow. For big numbers use a ring with
-characteristic 0.
+Variables of type string can also be defined and used without a ring
+being active. Strings are delimited by @code{"} (double quotes). They
+may be used to comment the output of a computation or to give it a nice
+format. If a string contains valid @sc{Singular} commands, it can be
+executed using the function @code{execute}. The result is the same as if
+the commands would have been written on the command line. This feature
+is especially useful to define new rings inside procedures.
+
+@example
+"example for strings:";
+@expansion{} example for strings:
+string s="The element of m ";
+s = s + "at position [3,2] is:";  // concatenation
+s , m[2,3] , ".";
+@expansion{} The element of m at position [3,2] is: 6 .
+s="m[2,1]=0; m;";
+execute(s);
+@expansion{} 1,0,3,
+@expansion{} 0,5,6,
+@expansion{} 7,8,9
+@end example
+
+This example shows that expressions can be separated by @code{,} (comma)
+giving a list of expressions. @sc{Singular} evaluates each expression in
+this list and prints all results separated by spaces.
 
 @c ------------------------------------------------------------------
 @node Rings and standard bases, Procedures and libraries, First steps, Getting started
@@ -352,14 +373,39 @@ vectors, a ring has to be defined first.
 ring r = 0,(x,y,z),dp;
 @end example   
 
-@noindent This declares a polynomial ring called @code{r} in
-characteristic zero and ring variables @code{x}, @code{y}, @code{z}. The
-@code{dp} at the end determines the monomial ordering and hence
-influences the standard resp.@: Groebner basis calculation. The @code{p}
-stands for polynomial, whereas @code{s} means series. (@pxref{Monomial
-orderings} for a detailed discussion.) 
+The definition of a ring consists of three parts: the first part
+determines the characteristic of the ground field, the second part
+determines the names of the ring variables, and the third part
+determines the monomial ordering to be used. So the example above
+declares a polynomial ring called @code{r} with a ground field of
+characteristic @math{0} (i.e., the rational numbers) and ring variables
+called @code{x}, @code{y}, and @code{z}. The @code{dp} at the end means,
+that the degree reverse lexicographical ordering should be used.
 
-Define some polynomials:
+Another valid characteristic would be, for example, a prime number less
+or equal to @math{32003}. The name of the ring variables may be any
+valid @sc{Singular} name. Even indexed names are allowed, so
+@code{x(1..10)} specifies the ring variables @code{x(1)}, @dots{},
+@code{x(10)}. @sc{Singular} offers the possibility to calculate with any 
+monomial ordering, some orderings are predefined with special names like 
+@code{dp} in the example above. Another important example is the
+lexicographical ordering called @code{lp}. 
+
+The concept of rings in @sc{Singular} is discussed in detail in
+@ref{Rings and orderings}.
+
+Defining a ring makes this ring the current basering and once a basering
+is active, we can define polynomials. A monomial, say
+@tex
+$x^3$
+@end tex
+@iftex
+x^3
+@end iftex
+may be entered in two ways: Either using the power operator @code{^},
+saying @code{x^3}, or in short-hand notation without operator, saying
+@code{x3}. Note, that the short-hand notation is forbidden if the name
+of the ring variable consists of more than one character.
 
 @example
 poly f =  x3+y3+(x-y)*x2y2+z2;
@@ -396,11 +442,11 @@ J;
 @noindent Since the result is not zero, the point @code{(1,2,0)} does
 not lye on the variety @code{V(f,g)}.
 
-Another question is, to decide wether some function vanishes on a
+Another question is to decide wether some function vanishes on a
 variety, or in algebraic terms if a polynomial is contained in a given
-ideal.  This needs a standard basis calculation either with the command
-@code{std} or with the command @code{groebner}, then reduce the
-polynomial with respect to the standard basis.
+ideal. For this we calculate a standard basis using the command
+@code{groebner} and afterwards reduce the polynomial with respect to
+this standard basis.
 
 @example
 ideal sI = groebner(f);
@@ -408,15 +454,11 @@ reduce(g,sI);
 @expansion{} 0
 @end example
 
-@noindent As the result is @code{0} the polynom @code{f} belongs to the
+@noindent As the result is @code{0} the polynomial @code{f} belongs to the
 ideal defined by @code{g}.
 
-Note that @code{std} is the usual standard basis command. The command
-@code{groebner} tries to find, by some heuristics, the fastest method
-to compute a standard basis.
-
 The command @code{kbase} calculates a basis of the polynomial ring
-modulo an ideal. As an example calculate the Milnor number of a hyper
+modulo an ideal. As an example we calculate the Milnor number of a hyper
 surface singularity in the global and local case. This is the vector
 space dimension of the polynomial ring modulo the Jacobian ideal in the
 global case resp.@: of the power series ring modulo the Jacobian ideal.
@@ -425,18 +467,23 @@ The Jacobian ideal is obtained with the command @code{jacob}.
 
 @example
 ideal J = jacob(f);
+@expansion{} // ** redefining J **
 J;
 @expansion{} J[1]=3x2y2-2xy3+3x2
 @expansion{} J[2]=2x3y-3x2y2+3y2
 @expansion{} J[3]=2z
 @end example
 
-To get a representing set of the quotient vectorspace 
-a standard basis has to be calculated first and then the function
-@code{kbase} has to be applied.
+@noindent @sc{Singular} prints the line @code{// ** redefining J
+**}. That means, that we previously have defined a variable with name
+@code{J} of type ideal (see above). 
+
+To get a representing set of the quotient vectorspace first we
+calculate a standard basis, then we apply the function @code{kbase} to
+this standard basis.
 
 @example
-J = std(J);
+J = groebner(J);
 ideal K = kbase(J);
 K;
 @expansion{} K[1]=y4
@@ -465,7 +512,7 @@ As in @sc{Singular} the functions may take directly the input from
 earlier calculations, all may be written together in one single statement.
 
 @example
-size(kbase(std(jacob(f))));
+size(kbase(groebner(jacob(f))));
 @expansion{} 12
 @end example
 
@@ -474,7 +521,7 @@ only in the resulting dimension we may even use the command @code{vdim}
 and write:
 
 @example
-vdim(std(jacob(f)));
+vdim(groebner(jacob(f)));
 @expansion{} 12
 @end example
 
@@ -495,7 +542,7 @@ Define the following procedure called @code{Milnor}
 @example
 proc Milnor(poly h)
 @{
- return(vdim(std(jacob(h))));
+ return(vdim(groebner(jacob(h))));
 @}
 @end example
 
@@ -509,11 +556,12 @@ Milnor(f);
 With @sc{Singular} come several libraries, a collection of useful
 procedures based on the kernel commands, which extend the functionality
 of @sc{Singular}. The command @code{help "all.lib";} lists all libraries
-together with a one-line explanation. The command @code{help}
-library_name@code{;} lists all procedures of the library, @code{help}
-proc_name@code{;} shows an explanation of the procedure after the
-library has been loaded. The command @code{LIB "all.lib";} loads all
-libraries. 
+together with a one-line explanation.  
+@c The command @code{help}
+@c library_name@code{;} lists all procedures of the library, @code{help}
+@c proc_name@code{;} shows an explanation of the procedure after the
+@c library has been loaded. The command @code{LIB "all.lib";} loads all
+@c libraries.
 
 One of these libraries is @code{sing.lib} which contains already a
 procedure called @code{milnor} to calculate the Milnor number not only
@@ -670,7 +718,7 @@ in the following way
 
 @example
 option(redSB);
-std(minor(H,1));
+groebner(minor(H,1));
 @expansion{} _[1]=1
 @end example
 
