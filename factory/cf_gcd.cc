@@ -1,8 +1,13 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_gcd.cc,v 1.3 1996-06-18 12:22:54 stobbe Exp $
+// $Id: cf_gcd.cc,v 1.4 1996-07-08 08:21:10 stobbe Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1996/06/18 12:22:54  stobbe
+"gcd_poly_univar0: now uses getSmallPrimes (due to changes in the handling
+                  of prime numbers in cf_primes.
+"
+
 Revision 1.2  1996/06/13 08:18:34  stobbe
 "balance: Now balaces polynomials even if the coefficient sizes are higher
          than the bound.
@@ -30,6 +35,8 @@ Initial revision
 #include "cf_reval.h"
 #include "cf_primes.h"
 #include "cf_chinese.h"
+#include "cf_map.h"
+#include "fac_util.h"
 #include "templates/functions.h"
 
 static CanonicalForm gcd_poly( const CanonicalForm & f, const CanonicalForm& g, bool modularflag );
@@ -50,24 +57,38 @@ isqrt ( int a )
     return x1;
 }
 
-static bool
-gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g )
+bool
+gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap )
 {
     int count = 0;
     // assume polys have same level;
     CFRandom * sample = CFRandomFactory::generate();
-    REvaluation e( 2, f.level(), *sample );
+    REvaluation e( 2, tmax( f.level(), g.level() ), *sample );
     delete sample;
-    CanonicalForm lcf = swapvar( LC( f ), Variable(1), f.mvar() );
-    CanonicalForm lcg = swapvar( LC( g ), Variable(1), f.mvar() );
+    CanonicalForm lcf, lcg;
+    if ( swap ) {
+	lcf = swapvar( LC( f ), Variable(1), f.mvar() );
+	lcg = swapvar( LC( g ), Variable(1), f.mvar() );
+    }
+    else {
+	lcf = LC( f, Variable(1) );
+	lcg = LC( g, Variable(1) );
+    }
     while ( ( e( lcf ).isZero() || e( lcg ).isZero() ) && count < 100 ) {
 	e.nextpoint();
 	count++;
     }
     if ( count == 100 )
 	return false;
-    CanonicalForm F=swapvar( f, Variable(1), f.mvar() );
-    CanonicalForm G=swapvar( g, Variable(1), g.mvar() );
+    CanonicalForm F, G;
+    if ( swap ) {
+	F=swapvar( f, Variable(1), f.mvar() );
+	G=swapvar( g, Variable(1), g.mvar() );
+    }
+    else {
+	F = f;
+	G = g;
+    }
     if ( e(F).taildegree() > 0 && e(G).taildegree() > 0 )
 	return false;
     return gcd( e( F ), e( G ) ).degree() < 1;
@@ -290,7 +311,7 @@ gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primiti
 	}
 	if ( i >= 0 ) {
 	    // now balance D mod q
-	    D = pp( balance( cg * D, q ) );
+	    D = pp( balance( D, q ) );
 	    if ( divides( D, f ) && divides( D, g ) )
 		return D * c;
 	    else
@@ -299,12 +320,13 @@ gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primiti
 	else {
 	    return gcd_poly( F, G, false );
 	}
+	cerr << "another try ..." << endl;
     }
 }
 
 
 static CanonicalForm
-gcd_poly( const CanonicalForm & f, const CanonicalForm& g, bool modularflag )
+gcd_poly1( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
 {
     CanonicalForm C, Ci, Ci1, Hi, bi, pi, pi1, pi2;
     int delta;
@@ -324,7 +346,7 @@ gcd_poly( const CanonicalForm & f, const CanonicalForm& g, bool modularflag )
 	    return gcd_poly_univar0( pi, pi1, true ) * C;
     }
     else
-	if ( gcd_test_one( pi1, pi ) )
+	if ( gcd_test_one( pi1, pi, true ) )
 	    return C;
     delta = degree( pi, v ) - degree( pi1, v );
     Hi = power( LC( pi1, v ), delta );
@@ -352,6 +374,20 @@ gcd_poly( const CanonicalForm & f, const CanonicalForm& g, bool modularflag )
     }
 }
 
+
+static CanonicalForm
+gcd_poly( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
+{
+    if ( isOn( SW_USE_EZGCD ) && ! ( f.isUnivariate() && g.isUnivariate() ) ) {
+	CFMap M, N;
+	compress( f, g, M, N );
+	return N( ezgcd( M(f), M(g) ) );
+    }
+    else {
+	return gcd_poly1( f, g, modularflag );
+    }
+}
+    
 
 static CanonicalForm
 cf_content ( const CanonicalForm & f, const CanonicalForm & g )
