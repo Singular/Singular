@@ -1,8 +1,28 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_univar.cc,v 1.7 1997-04-22 15:40:32 schmidt Exp $
+// $Id: fac_univar.cc,v 1.8 1997-04-30 12:52:18 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.7  1997/04/22 15:40:32  schmidt
+o some spurious preprocessr directives removed
+o #define MAX_FP_FAC changed to a const max_fp_fac
+o calls to hprint() changed to calls of a macro named
+  DEBOUTHPRINT()
+o initHG(): warning added because of some strange error in
+  the internals of factory.  we will wait for some example
+  to search for the error.
+o kBound(), UnivariatequadraticLift(): added cast to double
+  in the calculation of the bound.  at least one compiler
+  subjects an ambiguity at this point.
+o ZFactorizeUnivariate():
+  - spurious variable CFFList G removed
+  - sequence 'if ( D != 0 ) delete D;' changed to 'delete
+    D;'
+  - warning added because of some strange error in the
+    internals of factory.  we will wait for some example
+    to search for the error.
+o calls to macro DEBOUTLN changed to new calling syntax
+
 Revision 1.6  1997/04/08 10:33:19  schmidt
 #include <config.h> added
 
@@ -135,10 +155,10 @@ initHG ( int * a, const CFFList & F )
     for ( i = F; i.hasItem(); i++ )
 	if ( (k = i.getItem().factor().degree()) < n )
 	    if ( k == -1 ) {
-		WARN( k == -1, "there occured an error.  factory was not able to factorize\n"
-		      "correctly mod p.  Please send the example which caused\n"
-		      "this error to the authors.  Nonetheless we will go on with the\n"
-		      "calculations hoping the result will be correct.  Thank you." );
+		STICKYWARN( k == -1, "there occured an error.  factory was not able to factorize\n"
+			    "correctly mod p.  Please send the example which caused\n"
+			    "this error to the authors.  Nonetheless we will go on with the\n"
+			    "calculations hoping the result will be correct.  Thank you." );
 	    }
 	    else if ( k != 0 )
 		a[k] = 1;
@@ -152,10 +172,10 @@ initHG ( int * a, const Array<CanonicalForm> & F )
     for ( i = 1; i < m; i++ )
 	if ( (k = F[i].degree()) < n )
 	    if ( k == -1 ) {
-		WARN( k == -1, "there occured an error.  factory was not able to factorize\n"
-		      "correctly mod p.  Please send the example which caused\n"
-		      "this error to the authors.  Nonetheless we will go on with the\n"
-		      "calculations hoping the result will be correct.  Thank you." );
+		STICKYWARN( k == -1, "there occured an error.  factory was not able to factorize\n"
+			    "correctly mod p.  Please send the example which caused\n"
+			    "this error to the authors.  Nonetheless we will go on with the\n"
+			    "calculations hoping the result will be correct.  Thank you." );
 	    }
 	    else if ( k != 0 )
 		a[k] = 1;
@@ -439,10 +459,10 @@ ZFactorizeUnivariate( const CanonicalForm& ff, bool issqrfree )
 	TIMING_END_AND_PRINT(fac_choosePrimes, "time to choose the primes: ");
 	if ( ! ok ) {
 	    DEBOUTLN( cerr, "warning: no good prime found to factorize " << f );
-	    WARN( ok, "there occured an error.  We went out of primes p\n"
-		  "to factorize mod p.  Please send the example which caused\n"
-		  "this error to the authors.  Nonetheless we will go on with the\n"
-		  "calculations hoping the result will be correct.  Thank you.");
+	    STICKYWARN( ok, "there occured an error.  We went out of primes p\n"
+			"to factorize mod p.  Please send the example which caused\n"
+			"this error to the authors.  Nonetheless we will go on with the\n"
+			"calculations hoping the result will be correct.  Thank you.");
 	    ZF.append( CFFactor( f, exp ) );
 	    continue;
 	}
