@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: csutil.cc,v 1.7 2002-08-19 11:11:31 Singular Exp $";
+static char * rcsid = "$Id: csutil.cc,v 1.8 2002-10-24 17:22:22 Singular Exp $";
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -13,7 +13,7 @@ static char * rcsid = "$Id: csutil.cc,v 1.7 2002-08-19 11:11:31 Singular Exp $";
 #include <homogfactor.h>
 // Charset - Includes
 #include "csutil.h"
-//extern void out_cf(char *s1,const CanonicalForm &f,char *s2);
+extern void out_cf(char *s1,const CanonicalForm &f,char *s2);
 extern CanonicalForm alg_lc(const CanonicalForm &f);
 extern int hasAlgVar(const CanonicalForm &f);
 
@@ -659,7 +659,7 @@ static CanonicalForm alg_lc(const CanonicalForm &f, const CFList as)
   for(CFListIterator i=as; i.hasItem(); i++)
   {
     if (f.mvar()==i.getItem().mvar()) return f;
-  }  
+  }
   if (f.level()>0)
   {
     return alg_lc(f.LC(),as);
@@ -671,19 +671,32 @@ static CanonicalForm alg_lc(const CanonicalForm &f, const CFList as)
 CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
                       const CFList &as)
 {
-  //out_cf("alg_gcd(",fff," , ");
-  //out_cf("",ggg,")\n");
   CanonicalForm f=fff;
   CanonicalForm g=ggg;
+  f=Prem(f,as);
+  g=Prem(g,as);
+  if ( f.isZero() )
+  {
+    if ( g.lc().sign() < 0 ) return -g;
+    else                     return g;
+  }
+  else  if ( g.isZero() )
+  {
+    if ( f.lc().sign() < 0 ) return -f;
+    else                     return f;
+  }
+  //out_cf("alg_gcd(",fff," , ");
+  //out_cf("",ggg,")\n");
   CanonicalForm res;
   // does as appear in f and g ?
   bool has_alg_var=false;
   for ( CFListIterator j=as;j.hasItem(); j++ )
   {
     Variable v=j.getItem().mvar();
-    if (hasVar(f,v)) {has_alg_var=true; break;}
-    if (hasVar(g,v)) {has_alg_var=true; break;}
-  }  
+    if (hasVar(f,v)) {has_alg_var=true; /*break;*/}
+    if (hasVar(g,v)) {has_alg_var=true; /*break;*/}
+    //out_cf("as:",j.getItem(),"\n");
+  }
   if (!has_alg_var)
   {
     if ((hasAlgVar(f))
@@ -697,22 +710,27 @@ CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
     else
       res=gcd(f,g);
     //out_cf("gcd=",res,"\n");
+    //out_cf("of f=",fff," , ");
+    //out_cf("and g=",ggg,"\n");
+
     return res;
-  }  
+  }
 
   int mvf=f.level();
   int mvg=g.level();
   if (mvg > mvf)
-  { 
+  {
     CanonicalForm tmp=f; f=g; g=tmp;
     int tmp2=mvf; mvf=mvg; mvg=tmp2;
-  }  
+  }
   if (g.inBaseDomain() || f.inBaseDomain())
   {
     //printf("const\n");
+    //out_cf("of f=",fff," , ");
+    //out_cf("and g=",ggg,"\n");
     return CanonicalForm(1);
-  }  
-  
+  }
+
   // gcd of all coefficients:
   CFIterator i=f;
   CanonicalForm c_gcd=i.coeff(); i++;
@@ -727,8 +745,11 @@ CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
   {
     res=alg_gcd(g,c_gcd,as);
     //out_cf("alg_gcd1=",res,"\n");
+    //out_cf("of f=",fff," , ");
+    //out_cf("and g=",ggg,"\n");
     return res;
   }
+  // now: mvf==mvg, f.level()==g.level()
   if (!c_gcd.inBaseDomain())
   {
     i=g;
@@ -738,37 +759,60 @@ CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
       if (c_gcd.inBaseDomain()) break;
       i++;
     }
-  }  
+  }
 
   f/=c_gcd;
   g/=c_gcd;
 
-  CanonicalForm r=1;
   CFList gg;
-  while (!(r.isZero()))
+  CanonicalForm r=1;
+  while (1)
   {
     //printf("f.mvar=%d, g.mvar=%d\n",f.level(),g.level());
     gg=as;
-    gg.append(g);
+    if (!g.inCoeffDomain()) gg.append(g);
     //out_cf("Prem(",f," , ");
     //out_cf("",g,")\n");
-    if (g.inCoeffDomain()) r=0;
+    if (g.inCoeffDomain()|| g.isZero())
+    {
+      //printf("in coeff domain:");
+      if (g.isZero()) { //printf("0\n");
+        i=f;
+        CanonicalForm f_gcd=i.coeff(); i++;
+        while( i.hasTerms())
+        {
+          f_gcd=alg_gcd(i.coeff(),f_gcd,as);
+          if (f_gcd.inBaseDomain()) break;
+          i++;
+        }  
+        f/=f_gcd;  
+        return f*c_gcd;
+      }
+      else { //printf("c\n"); 
+	return c_gcd;}
+    }  
     else if (g.level()==f.level()) r=Prem(f,gg);
     else
     {
+      //printf("diff. level: %d, %d\n", f.level(), g.level());
       // g and f have different levels
-      return c_gcd;	
+      //out_cf("c_gcd=",c_gcd,"\n");
+    //out_cf("of f=",fff," , ");
+    //out_cf("and g=",ggg,"\n");
+      return c_gcd;
     }
     //out_cf("->",r,"\n");
     f=g;
     g=r;
   }
-  if (degree(f,Variable(mvg))==0) 
+  if (degree(f,Variable(mvg))==0)
   {
   // remark: mvf == mvg == f.level() ==g.level()
     //out_cf("c_gcd=",c_gcd,"\n");
+    //out_cf("of f=",fff," , ");
+    //out_cf("and g=",ggg,"\n");
     return c_gcd;
-  }  
+  }
   //out_cf("f=",f,"\n");
   i=f;
   CanonicalForm k=i.coeff(); i++;
@@ -780,18 +824,29 @@ CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
     //out_cf("k=",k,"\n");
     i++;
   }
+  //out_cf("end-k=",k,"\n");
   f/=k;
+  //out_cf("f/k=",f,"\n");
   res=c_gcd*f;
   CanonicalForm r_lc=alg_lc(res);
   res/=r_lc;
   //CanonicalForm r_lc=alg_lc(res,as);
   //res/=r_lc;
   //out_cf("alg_gcd2=",res,"\n");
-  return res;
+  //  out_cf("of f=",fff," , ");
+  //  out_cf("and g=",ggg,"\n");
+  //return res;
+  //if (res.level()<fff.level() && res.level() < ggg.level())
+  //  return alg_gcd(alg_gcd(fff,res,as),ggg,as);
+  //else
+    return res;
 }
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.7  2002/08/19 11:11:31  Singular
+* hannes/pfister: alg_gcd etc.
+
 Revision 1.6  2002/01/21 09:11:07  Singular
 * hannes: handle empty set in removecontent
 

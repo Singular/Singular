@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: alg_factor.cc,v 1.10 2002-08-19 11:11:29 Singular Exp $";
+static char * rcsid = "$Id: alg_factor.cc,v 1.11 2002-10-24 17:22:21 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -19,7 +19,7 @@ static char * rcsid = "$Id: alg_factor.cc,v 1.10 2002-08-19 11:11:29 Singular Ex
 // some CC's need this:
 #include "alg_factor.h"
 
-//void out_cf(char *s1,const CanonicalForm &f,char *s2);
+void out_cf(char *s1,const CanonicalForm &f,char *s2);
 
 #ifdef ALGFACTORDEBUG
 #  define DEBUGOUTPUT
@@ -197,13 +197,13 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
       // ...but it should go away soon!!!!
       Variable X;
       if (getAlgVar(R,X))
-      { 
+      {
         if (R.isUnivariate())
-	  testlist=factorize( R, X );
-	else  
+          testlist=factorize( R, X );
+        else
           testlist= Factorize(R, X, 0);
       }
-      else 
+      else
         testlist= Factorize(R);
       DEBOUTLN(cout, "testlist= ", testlist);
       testlist.removeFirst();
@@ -368,7 +368,7 @@ CanonicalForm alg_lc(const CanonicalForm &f)
   {
     return alg_lc(f.LC());
   }
-}  
+}
 
 // the heart of the algorithm: the one from Trager
 static CFFList
@@ -399,16 +399,21 @@ alg_factor( const CanonicalForm & f, const CFList & Astar, const Variable & vmin
     // factorize R over alg.extension with X
 //cout << "alg: "<< X << " mipo=" << getMipo(X,Variable('X')) <<endl;
     if (R.isUnivariate())
+    {
+      DEBOUTLN(cout, "alg_factor: factorize( ", R);
       Factorlist =  factorize( R, X );
+    }
     else
     {
       #if 1
       Variable XX;
       CanonicalForm mipo=getMipo(X,XX);
       CFList as(mipo);
+      DEBOUTLN(cout, "alg_factor: newfactoras( ", R);
       Factorlist = newfactoras(R, as , 1);
       #else
       // factor R over k
+      DEBOUTLN(cout, "alg_factor: Factorize( ", R);
       Factorlist = Factorize(R);
       #endif
     }
@@ -416,6 +421,7 @@ alg_factor( const CanonicalForm & f, const CFList & Astar, const Variable & vmin
   else
   {
     // factor R over k
+    DEBOUTLN(cout, "alg_factor: Factorize( ", R);
     Factorlist = Factorize(R);
   }
   On(SW_RATIONAL);
@@ -443,15 +449,15 @@ alg_factor( const CanonicalForm & f, const CFList & Astar, const Variable & vmin
       if (degree(i.getItem().factor()) > 0 ){
         // undo linear transformation!!!! and then gcd!
         //cout << "algcd(" << g << "," << fnew << ",as" << as << ")" << endl;
-	//out_cf("algcd g=",g,"\n");
-	//out_cf("algcd fnew=",fnew,"\n");
+        //out_cf("algcd g=",g,"\n");
+        //out_cf("algcd fnew=",fnew,"\n");
         //h= algcd(g,fnew, as, oldord);
-	//if (as.length() >1)
+        //if (as.length() >1)
         //  h= algcd(g,fnew, as, oldord);
-	//else
-	  h=alg_gcd(g,fnew,as);
-	//out_cf(" -> algcd=",algcd(g,fnew, as, oldord),"\n");
-	//out_cf(" -> alg_gcd=",alg_gcd(g,fnew,as),"\n");
+        //else
+          h=alg_gcd(g,fnew,as);
+        //out_cf(" -> algcd=",algcd(g,fnew, as, oldord),"\n");
+        //out_cf(" -> alg_gcd=",alg_gcd(g,fnew,as),"\n");
         //cout << "algcd result:" << h << endl;
         DEBOUTLN(cout, "  alg_factor: h= ", h);
         DEBOUTLN(cout, "  alg_factor: oldord= ", oldord);
@@ -646,12 +652,12 @@ newfactoras( const CanonicalForm & f, const CFList & as, int success){
   //cout << "algcd(" << f << "," << f.deriv() << " as:" << Astar <<endl;
   //CanonicalForm Fgcd= algcd(f,f.deriv(),Astar,gcdord);
   CanonicalForm Fgcd;
-	//if (Astar.length() >1)
+        //if (Astar.length() >1)
         //  Fgcd= algcd(f,f.deriv(),Astar,gcdord);
-	//else
-	  Fgcd= alg_gcd(f,f.deriv(),Astar);
-	//out_cf("algcd:",algcd(f,f.deriv(),Astar,gcdord),"\n");
-	//out_cf("alg_gcd:",alg_gcd(f,f.deriv(),Astar),"\n");
+        //else
+          Fgcd= alg_gcd(f,f.deriv(),Astar);
+        //out_cf("algcd:",algcd(f,f.deriv(),Astar,gcdord),"\n");
+        //out_cf("alg_gcd:",alg_gcd(f,f.deriv(),Astar),"\n");
  // cout << "algcd result:"  << Fgcd << endl;
   if ( Fgcd == 0 ) DEBOUTMSG(cerr, "WARNING: p'th root ?");
   if ( degree(Fgcd, f.mvar()) > 0 ){
@@ -737,6 +743,9 @@ newcfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.10  2002/08/19 11:11:29  Singular
+* hannes/pfister: alg_gcd etc.
+
 Revision 1.9  2002/07/30 15:16:19  Singular
 *hannes: fix for alg. extension
 
