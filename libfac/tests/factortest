@@ -11,104 +11,104 @@ else
 endif
 $ECHO "\n\ntesting univariate factorization:\c"
 $ECHO "\nf1  \c" 
-../test < f1  
+../test < factor/f1  
 $ECHO "\nf2  \c"
-../test < f2
+../test < factor/f2
 $ECHO "\nf3  \c"
-../test < f3
+../test < factor/f3
 
 $ECHO "\n\ntesting multivariate factorization:"
 $ECHO "\nf4  \c"
-../test < f4
+../test < factor/f4
 $ECHO "\nf5  \c"
-../test < f5
+../test < factor/f5
 $ECHO "\nf6  \c"
-../test < f6
+../test < factor/f6
 $ECHO "\nf7  \c"
-../test < f7
+../test < factor/f7
 $ECHO "\nf8  \c"
-../test < f8
+../test < factor/f8
 $ECHO "\nf9  \c"
-../test < f9
+../test < factor/f9
 $ECHO "\nf10 \c"
-../test < f10
+../test < factor/f10
 #$ECHO "\nf11 \c"
-#../test < f11
+#../test < factor/f11
 $ECHO "\nf12 \c"
-../test < f12
+../test < factor/f12
 $ECHO "\nf12 \c"
-../test < f13
+../test < factor/f13
 $ECHO "\nf14 \c"
-../test < f14
+../test < factor/f14
 $ECHO "\nf15 \c"
-../test < f15
+../test < factor/f15
 $ECHO "\nf16  -- skipping; takes long time.  See the Long-time section!\c"
 $ECHO "\nf17 \c"
-../test < f17
+../test < factor/f17
 $ECHO "\nf18 \c"
-../test < f18
+../test < factor/f18
 $ECHO "\nf19 \c"
-../test < f19
+../test < factor/f19
 $ECHO "\nf20 \c"
-../test < f20
+../test < factor/f20
 $ECHO "\nf21 \c"
-../test < f21
+../test < factor/f21
 $ECHO "\nf21a \c"
-../test < f21a
+../test < factor/f21a
 $ECHO "\nf22 \c"
-../test < f22
+../test < factor/f22
 $ECHO "\nf23 \c"
-../test < f23
+../test < factor/f23
 $ECHO "\nf24 -- skipping; takes long time.  See the Long-time section!\c"
 $ECHO "\nf25 -- skipping; takes long time.  See the Long-time section!\c"
 $ECHO "\nf26 -- skipping; takes long time.  See the Long-time section!\c"
 $ECHO "\nf27 \c"
-../test < f27
+../test < factor/f27
 $ECHO "\nf28 -- skipping; takes long time.  See the Long-time section!\c"
 $ECHO "\nf29 -- Test suite not available.\c"
-#../test < f29
+#../test < factor/f29
 $ECHO "\nf30 -- Test suite not available.\c"
-#../test < f30
+#../test < factor/f30
 $ECHO "\nf31 -- Test suite not available.\c"
-#../test < f31
+#../test < factor/f31
 $ECHO "\nf32 \c"
-../test < f32
+../test < factor/f32
 $ECHO "\nf33 \c"
-../test < f33
+../test < factor/f33
 $ECHO "\nf34 \c"
-../test < f34
+../test < factor/f34
 $ECHO "\nf35 -- skipping; takes long time.  See the Long-time section!\c"
 $ECHO "\nf36 \c"
-../test < f36
+../test < factor/f36
 $ECHO "\nf37 \c"
-../test < f37
+../test < factor/f37
 $ECHO "\nf38 \c"
-../test < f38
+../test < factor/f38
 $ECHO "\n"
 $ECHO "Tests from Gerhard Pfister:"
 $ECHO "p1   -- skipping; takes long time.  See the Long-time section!\c"
 $ECHO "\np2 \c"
-../test < p2
+../test < factor/p2
 $ECHO "\np3 \c"
-../test < p3
+../test < factor/p3
 $ECHO "\np4 \c"
-../test < p4
+../test < factor/p4
 $ECHO "\np5 \c"
-../test < p5.3
+../test < factor/p5.3
 
 $ECHO "\n"  
 # need-extensions section:
 $ECHO "\n Need-extensions section!\n"
 $ECHO "\nf39 \c"
-../test < f39
+../test < factor/f39
 $ECHO "\nf40 \c"
-../test < f40
+../test < factor/f40
 $ECHO "\nf41 \c"
-../test < f41
+../test < factor/f41
 $ECHO "\nf42 \c"
-../test < f42
+../test < factor/f42
 $ECHO "\nf43 \c"
-../test < f43
+../test < factor/f43
 
 
 $ECHO "\n"
