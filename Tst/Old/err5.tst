@@ -6,7 +6,8 @@ matrix m[2][4]= x(1), x(2), x(3), x(4), x(2), x(3), x(4), x(5);
 ideal j = minor(m, 2);
 ideal i = std(j);
 
-mres(i, 2, ires);
+list ires=mres(i, 2);
+def ires(1),ires(2)=ires[1],ires[2];
 matrix jaco = jacob(ires(1));
 qring s = i;
 s;
@@ -14,7 +15,8 @@ matrix mat = matrix(fetch(r,ires(2)));
 matrix imat = transpose(mat);
 matrix jac = fetch(r, jaco);
 
-res(module(imat),3,imatres);
+list imatres=nres(module(imat),3);
+def imatres(1..3)=imatres[1..3];
 
 matrix T = lift(imatres(2), module(jac));
 

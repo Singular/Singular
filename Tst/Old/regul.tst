@@ -21,7 +21,7 @@ ideal I = v-r9, w-r7st, x-r3s2t4, y-r9-s3t6, z-s6r3;
 //
 ideal J = eliminate( I, rst);
 J = std(J);
-list R1=res(J,0);
+list R1=nres(J,0);
 print( R1);
 regularity( R1);
 $;
