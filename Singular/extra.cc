@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.62 1998-06-18 13:35:50 obachman Exp $ */
+/* $Id: extra.cc,v 1.63 1998-07-03 13:02:27 pohl Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -277,6 +277,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     #endif
     #endif
 /*==================== Singular ==================================*/
+#ifndef __MWERKS__
     if (strcmp((char*)(h->data), "Singular") == 0)
     {
       res->rtyp=STRING_CMD;
@@ -288,6 +289,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
+#endif
 /*==================== options ==================================*/
     if (strstr((char*)(h->data), "--") == (char*)(h->data))
     {
