@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.178 2002-01-19 20:04:31 obachman Exp $ */
+/* $Id: ring.cc,v 1.179 2002-01-20 10:01:48 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2656,10 +2656,14 @@ ring rModifyRing_Wp(ring r, int* weights)
 }
 
 // construct lp ring
-ring rModifyRing_Simple(ring r, BOOLEAN ommit_degree, BOOLEAN ommit_comp, unsigned long exp_limit)
+ring rModifyRing_Simple(ring r, BOOLEAN ommit_degree, BOOLEAN ommit_comp, unsigned long exp_limit, BOOLEAN &simple)
 {
+  simple=TRUE;
   if (!rHasSimpleOrder(r))
+  {
     WarnS("Hannes: you still need to implement this");
+    // simple=FALSE; // sorting needed
+  }  
   return rModifyRing(r, ommit_degree, ommit_comp, exp_limit);
 }
 

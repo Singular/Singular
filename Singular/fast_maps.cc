@@ -6,7 +6,7 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id: fast_maps.cc,v 1.26 2002-01-19 20:55:17 obachman Exp $
+ *  Version: $Id: fast_maps.cc,v 1.27 2002-01-20 10:01:48 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>
@@ -274,7 +274,7 @@ void maMap_CreatePolyIdeal(ideal map_id, ring map_r, ring src_r, ring dest_r,
 
 void maMap_CreateRings(ideal map_id, ring map_r, 
                        ideal image_id, ring image_r, 
-                       ring &src_r, ring &dest_r)
+                       ring &src_r, ring &dest_r, BOOLEAN &simple)
 {
 #if HAVE_SRC_R > 0
   int* weights = (int*) omAlloc0(map_r->N*sizeof(int));
@@ -295,7 +295,7 @@ void maMap_CreateRings(ideal map_id, ring map_r,
   if (maxExp <=  1) maxExp = 2;
   else if (maxExp > (Exponent_t) image_r->bitmask) 
     maxExp = (Exponent_t) image_r->bitmask;
-  dest_r = rModifyRing_Simple(image_r, TRUE, TRUE, maxExp);
+  dest_r = rModifyRing_Simple(image_r, TRUE, TRUE, maxExp,  simple);
 #else
   dest_r = image_r;
 #endif
@@ -348,11 +348,12 @@ ideal fast_map(ideal map_id, ring map_r, ideal image_id, ring image_r)
   ring src_r, dest_r;
   ideal dest_id, res_id;
   int length = 0;
+  BOOLEAN no_sort;
 
   // construct rings we work in: 
   // src_r: Wp with Weights set to length of poly in image_id
   // dest_r: Simple ring without degree ordering and short exponents
-  maMap_CreateRings(map_id, map_r, image_id, image_r, src_r, dest_r);
+  maMap_CreateRings(map_id, map_r, image_id, image_r, src_r, dest_r, no_sort);
   
   // construct dest_id
   if (dest_r != image_r)
@@ -393,7 +394,10 @@ ideal fast_map(ideal map_id, ring map_r, ideal image_id, ring image_r)
   ideal res_image_id;
   if (dest_r != image_r)
   {
-    res_image_id = idrShallowCopyR(res_dest_id, dest_r, image_r);
+    if (no_sort)
+      res_image_id = idrShallowCopyR_NoSort(res_dest_id, dest_r, image_r);
+    else  
+      res_image_id = idrShallowCopyR(res_dest_id, dest_r, image_r);
     id_ShallowDelete(&res_dest_id, dest_r);
   }
   else

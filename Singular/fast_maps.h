@@ -7,7 +7,7 @@
  *  Author:  obachman (Olaf Bachmann), hannes (Hannes Schoenemann),
  *           bricken (Michael Brickenstein) 
  *  Created: 01/02
- *  Version: $Id: fast_maps.h,v 1.15 2002-01-19 20:04:09 bricken Exp $
+ *  Version: $Id: fast_maps.h,v 1.16 2002-01-20 10:01:48 Singular Exp $
  *******************************************************************/
 
 /*******************************************************************************
@@ -94,7 +94,7 @@ void maMap_CreatePolyIdeal(ideal map_id, ring map_r,
 //         dest_r: where we do our computations
 void maMap_CreateRings(ideal map_id, ring map_r, 
                        ideal image_id, ring image_r, 
-                       ring &src_r, ring &dest_r);
+                       ring &src_r, ring &dest_r, BOOLEAN &no_sort);
 
 // collects tthe results into an ideal and destroys maideal
 ideal maIdeal_2_Ideal(maideal ideal, ring dest_r);

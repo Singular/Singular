@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.70 2002-01-19 17:11:43 obachman Exp $ */
+/* $Id: ring.h,v 1.71 2002-01-20 10:01:50 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -267,7 +267,7 @@ void rKillModifiedRing(ring r);
 // also frees weights
 void rKillModified_Wp_Ring(ring r);
 
-ring rModifyRing_Simple(ring r, BOOLEAN omit_degree, BOOLEAN omit_comp, unsigned long exp_limit);
+ring rModifyRing_Simple(ring r, BOOLEAN omit_degree, BOOLEAN omit_comp, unsigned long exp_limit, BOOLEAN &simple);
 void rKillModifiedRing_Simple(ring r);
 
 void rDebugPrint(ring r);
