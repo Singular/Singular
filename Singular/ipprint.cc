@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipprint.cc,v 1.16 2000-02-03 12:29:22 siebert Exp $ */
+/* $Id: ipprint.cc,v 1.17 2000-02-10 14:05:43 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: printing
 */
@@ -136,9 +136,9 @@ static void ipPrint_MA0(matrix m, const char *name)
             l[j]=strlen(s[i*MATCOLS(m)+j]);
             if (l[j]>vl)
             {
-#ifdef TEST
-              PrintS("pagewidth too small in print(matrix)\n");
-#endif
+//#ifdef TEST
+//              PrintS("pagewidth too small in print(matrix)\n");
+//#endif
               vl=l[j]; /* make large names fit*/
             }
             i=MATROWS(m);
