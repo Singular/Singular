@@ -17,7 +17,7 @@
 
 #define FULLREDUCTIONS
 #define HEAD_BIN
-//#define HOMOGENEOUS_EXAMPLE
+#define HOMOGENEOUS_EXAMPLE
 //#define QUICK_SPOLY_TEST
 //#define DIAGONAL_GOING
 //#define RANDOM_WALK
@@ -70,6 +70,7 @@ struct calc_dat
   int misses_series;
 };
 bool find_next_pair(calc_dat* c);
+void shorten_tails(calc_dat* c, poly monom);
 void replace_pair(int & i, int & j, calc_dat* c);
 void initial_data(calc_dat* c);
 void add_to_basis(poly h, calc_dat* c);
@@ -717,6 +718,10 @@ void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c)
       i++;
     }
   }
+  if (c->lengths[c->n-1]==1)
+   shorten_tails(c,c->S->m[c->n-1]);
+    //you should really update c->lengths, c->strat->lenS, and the oder of polys in strat if you sort after lengths
+
   //for(i=c->strat->sl; i>0;i--)
   //  if(c->strat->lenS[i]<c->strat->lenS[i-1]) printf("fehler bei %d\n",i);
 }
@@ -978,3 +983,27 @@ int pMinDeg3(poly f){
 }
 
 
+void shorten_tails(calc_dat* c, poly monom){
+  PrintS("ENTER");
+  for(int i=0;i<c->n;i++){
+    //enter tail
+    if (c->rep[i]!=i) continue;
+    if (c->S->m[i]==NULL) continue;
+    poly tail=c->S->m[i]->next;
+    poly prev=c->S->m[i];
+    while((tail!=NULL)&& (pLmCmp(tail, monom)>=0)){
+      if (p_LmDivisibleBy(monom,tail,c->r)){
+
+	
+	prev->next=tail->next;
+	tail->next=NULL;
+	p_Delete(& tail,c->r);
+	tail=prev;
+	PrintS("Shortened");
+      }
+
+      prev=tail;
+      tail=tail->next;
+    }
+  }
+}
