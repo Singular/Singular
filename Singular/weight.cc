@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: weight.cc,v 1.8 1998-06-12 18:11:02 Singular Exp $ */
+/* $Id: weight.cc,v 1.9 1998-06-13 14:20:07 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -24,6 +24,12 @@
 
 pFDegProc pFDegOld;
 pLDegProc pLDegOld;
+#ifdef ALIGN_8
+#define wDouble(A) ((double *)A)
+#else
+extern "C" double * wDouble(void *adr);
+#endif
+
 #ifndef __MWERKS__
 extern "C" double (*wFunctional)(int *degw, int *lpol, int npol,
        double *rel, double wx);
@@ -31,7 +37,6 @@ extern "C" double wFunctionalMora(int *degw, int *lpol, int npol,
        double *rel, double wx);
 extern "C" double wFunctionalBuch(int *degw, int *lpol, int npol,
        double *rel, double wx);
-extern "C" double * wDouble(void *adr);
 extern "C" void wAdd(int *A, int mons, int kn, int xx);
 extern "C" void wNorm(int *degw, int *lpol, int npol, double *rel);
 extern "C" void wFirstSearch(int *A, int *x, int mons,
@@ -42,16 +47,6 @@ extern "C" void wGcd(int *x, int n);
 extern double wNsqr;
 #else
 short * ecartWeights=NULL;
-
-#ifdef ALIGN_8
-#define wDouble(A) ((double *)A)
-#else
-static double * wDouble(void *adr)
-{
-  long i = (long)adr;
-  return (double *)((i+7)&(~7));
-}
-#endif
 
 double wNsqr;
 double (*wFunctional)(int *degw, int *lpol, int npol,
