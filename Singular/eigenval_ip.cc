@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: eigenval_ip.cc,v 1.1 2004-03-04 10:06:50 Singular Exp $ */
+/* $Id: eigenval_ip.cc,v 1.2 2004-04-30 09:58:19 Singular Exp $ */
 /*
 * ABSTRACT: eigenvalues of constant square matrices
 */
@@ -180,6 +180,11 @@ lists evEigenvals(matrix M)
 
       intvec *m0;
       ideal e0=singclap_factorize(mpDetBareiss(M0),&m0,2);
+      if (e0==NULL)
+      {
+        l->Init(0);
+        return(l);
+      }
 
       for(int i=0;i<IDELEMS(e0);i++)
       {
