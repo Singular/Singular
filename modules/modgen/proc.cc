@@ -1,5 +1,5 @@
 /*
- * $Id: proc.cc,v 1.18 2002-07-01 12:31:33 anne Exp $
+ * $Id: proc.cc,v 1.19 2002-07-03 12:42:51 anne Exp $
  */
 
 #include <stdio.h>
@@ -51,8 +51,9 @@ void setup_proc(
         }
   
         /* write call to add procname to list */
-        fprintf(module->modfp, "  iiAddCproc(\"%s\",\"%s\",%s, mod_%s);\n",
-                module->name, proc->procname, 
+        fprintf(module->modfp, 
+	        "  iiAddCproc(currPack->libname,\"%s\",%s, mod_%s);\n",
+                proc->procname, 
                 proc->is_static ? "TRUE" : "FALSE",
                 proc->procname);
         modlineno+=1;
@@ -66,9 +67,8 @@ void setup_proc(
         break;
         
       case LANG_SINGULAR:
-        fprintf(module->modfp,"#if 0\n");
         fprintf(module->modfp,
-                "  h = add_singular_proc(\"%s\", %d, %ld, %ld, %s);\n",
+                "  h = add_singular_proc(binfp,\"%s\", %d, %ld, %ld, %s);\n",
                 proc->procname, proc->lineno,
                 proc->sing_start, proc->sing_end,
                 proc->is_static ? "TRUE" : "FALSE");
@@ -76,7 +76,6 @@ void setup_proc(
         break;
   }
   
-  //  printf(" done\n");
 }
 
 /*========================================================================*/
@@ -262,6 +261,7 @@ void write_function_return(
   write_procedure_return(module, pi, module->fmtfp);
 }
 
+/*========================================================================*/
 void write_function_singularcmd(
   moddefv module,
   procdefv pi,
@@ -357,6 +357,7 @@ void write_finish_functions(
   procdefv proc
 )
 {
+  fprintf(module->modfp, "  fclose(binfp);\n");
   fprintf(module->modfp, "  return 0;\n}\n\n");
   fflush(module->modfp);
   modlineno+=3;
@@ -480,15 +481,6 @@ void write_procedure_return(
 /*========================================================================*/
 
 /*========================================================================*/
-/*
-    if(pi->param[0].typ==SELF_CMD) {
-      if(pi->c_code != NULL) fprintf(fp, "%s\n", pi->c_code);
-  
-      fprintf(fp, "  return(%s(res,h));\n", pi->funcname);
-      fprintf(fp, "}\n\n");
-    }
-    else {
-*/
 
 void write_function_errorhandling(
   moddefv module,
@@ -518,12 +510,6 @@ void write_function_errorhandling(
         break;
       case LANG_SINGULAR:
         fprintf(module->binfp, "}\n// end of procedure %s\n\n", pi->procname);
-        fprintf(module->modfp, "  if( h != NULL) {\n");
-        fprintf(module->modfp, "    IDPROC(h)->data.s.body_end = %ld;\n",
-                ftell(module->binfp));
-        fprintf(module->modfp, "    IDPROC(h)->data.s.proc_end = %ld;\n",
-                ftell(module->binfp));
-        fprintf(module->modfp, "  }\n");
         break;
   }
 }
@@ -568,27 +554,55 @@ int write_singular_procedures(
   if(module->binfp==NULL) {
     char filename[512];
 
-    //filename = (char *)malloc(strlen(module->name)+5+4);
-    //sprintf(filename, "tmp/%s.bin", module->name);
-    strcpy(filename, build_filename(module, module->name, 3));
+    strcpy(filename, build_filename(module, module->targetname, 3));
 
     if( (module->binfp = fopen(filename, "w")) == NULL) {
-      //free(filename);
       return -1;
     }
     if(trace)printf("Creating %s, ", filename);fflush(stdout);
-
-    //free(filename);
   }
   
   /* */
   fprintf(module->binfp, "// line %d \"%s\"\n", proc->lineno,
           module->filename);
   fprintf(module->binfp, "// proc %s\n", proc->procname);
+  fflush(module->binfp);
   proc->sing_start = ftell(module->binfp);
   
   return 0;
 }
+
+/*========================================================================*/
+int write_helpfile_help(
+  moddefv module,
+  procdefv proc
+  )
+{
+  if(module->docfp==NULL) {
+    char filename[512];
+
+    strcpy(filename, build_filename(module, module->targetname, 4));
+    if( (module->docfp = fopen(filename, "w")) == NULL) {
+      return -1;
+    }
+    if(trace)printf("Creating %s, ", filename);fflush(stdout);
+    fprintf(module->docfp, "$library = \"%s.so\";\n", module->targetname);
+    fprintf(module->docfp, "$version = \"%s\";\n", module->version);
+    fprintf(module->docfp, "$category = <<EOT;\n");
+    fprintf(module->docfp, "%s\nEOT\n",module->category);
+    fprintf(module->docfp, "$info = <<EOT;\n");
+    fprintf(module->docfp, "%s\nEOT\n",module->info);
+  }
+
+  /* */
+  fprintf(module->docfp, "push(@procs, \"%s\");\n",proc->procname);
+  fprintf(module->docfp, "$help{\"%s\"} = << EOT;\n",proc->procname);
+  fprintf(module->docfp, "%s\nEOT\n",proc->help_string);
+  fprintf(module->docfp, "$example{\"%s\"} = << EOT;\n",proc->procname);
+  fprintf(module->docfp, "%s\nEOT\n\n",proc->example_string);
+
+  return 0;
+}  
 
 /*========================================================================*/
 void write_singular_parameter(
@@ -604,10 +618,13 @@ void write_singular_parameter(
 /*========================================================================*/
 void write_singular_end(
   moddefv module,
+  procdefv proc,
   int lineno
   )
 {
-  fprintf(module->modfp, "#endif\n");
+  fprintf(module->binfp, "%s.so\n",module->targetname);
+  fflush(module->binfp);
+  proc->sing_end = ftell(module->binfp); 
 }
 
 /*========================================================================*/
@@ -623,7 +640,8 @@ void write_codeline(
         if(lineno>=0)
           fprintf(module->binfp, "// #line %d \"%s\"\n",
 					  lineno, module->filename);
-        fprintf(module->binfp, "%s", line); break;
+        fprintf(module->binfp,"%s",line);
+	break;
 
       case LANG_C: 
         write_function_header(module, proc);

@@ -1,5 +1,5 @@
 /*
- * $Id: grammar.y,v 1.18 2002-07-01 12:31:32 anne Exp $
+ * $Id: grammar.y,v 1.19 2002-07-03 12:42:49 anne Exp $
  */
 
 %{
@@ -329,39 +329,38 @@ sect3end: SECT3END
 procdefsg: procdeclsg proccode
         {
           if(debug>2)printf("SG-PROCDEF:\n");
-          write_singular_end(&module_def, yylineno);
+          write_singular_end(&module_def, &procedure_decl, yylineno);
+	  setup_proc(&module_def, &procedure_decl);
+	  write_helpfile_help(&module_def, &procedure_decl);
         }
-        | procdecl proccode procdeclexample
+        | procdeclsg proccode procdeclexample
         {
           if(debug>2)printf("SG-PROCDEF mit example:\n");
           fflush(module_def.fmtfp);
-          write_singular_end(&module_def, yylineno);
+          write_singular_end(&module_def, &procedure_decl, yylineno);
+          setup_proc(&module_def, &procedure_decl);
+	  write_helpfile_help(&module_def, &procedure_decl);
         }
 ;
 
 procdeclsg: procdeclsg2 '{'
         {
-          setup_proc(&module_def, &procedure_decl);
         }
         | procdeclsg2 procdeclhelp '{'
         {
-          setup_proc(&module_def, &procedure_decl);
         }
         ;
 
 procdeclsg2: procdecl1 '(' sgtypelist ')'
          {
-           write_singular_parameter(&module_def, yylineno, "list", "#");
            procedure_decl.lineno_other = yylineno;
          }
         | procdecl1
          {
-           write_singular_parameter(&module_def, yylineno, "list", "#");
            procedure_decl.lineno_other = yylineno;
          }
         | procdecl1 '(' ')'
          {
-           write_singular_parameter(&module_def, yylineno, "list", "#");
            procedure_decl.lineno_other = yylineno;
          }
         ;
@@ -385,10 +384,12 @@ procdecl1: PROCDECLTOK NAME
 procdef: procdecl proccode
         {
           if(debug>2)printf("PROCDEF:\n");
+	  write_helpfile_help(&module_def, &procedure_decl);
         }
         | procdecl proccode procdeclexample
         {
           if(debug>2)printf("PROCDEF mit example:\n");
+	  write_helpfile_help(&module_def, &procedure_decl);
           fflush(module_def.fmtfp);
         }
         ;

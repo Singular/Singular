@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.16 2002-07-01 12:31:33 anne Exp $ */
+/* $Id: misc.cc,v 1.17 2002-07-03 12:42:50 anne Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -226,10 +226,11 @@ struct valid_vars_def {
   void (*write_cmd)(moddefv module, var_token type = VAR_NONE,
                     idtyp t, void *arg1 = NULL, void *arg2 = NULL);
 } valid_vars[] = {
-  { "help",         VAR_STRING,  VAR_HELP,    write_main_variable },
-  { "info",         VAR_STRING,  VAR_INFO,    write_main_variable },
-  { "package",      VAR_STRING,  VAR_MODULE,  0 },
-  { "version",      VAR_STRING,  VAR_VERSION, write_main_variable },
+  { "help",         VAR_STRING,  VAR_HELP,     write_main_variable },
+  { "info",         VAR_STRING,  VAR_INFO,     write_main_variable },
+  { "package",      VAR_STRING,  VAR_MODULE,   0 },
+  { "version",      VAR_STRING,  VAR_VERSION,  write_main_variable },
+  { "category",	    VAR_STRING,  VAR_CATEGORY, write_main_variable },
   { NULL,           VAR_UNKNOWN, VAR_NONE, 0 }
 };
 
@@ -497,9 +498,7 @@ void  mod_write_header(FILE *fp, char *module, char what)
     write_enter_id(fp);
     fprintf(fp, "\n");    modlineno+=1;
     fprintf(fp, "#line %d \"%s.cc\"\n", modlineno++, module);
-/* Laden von SINGULAR proceduren innerhalb eines moduls derzeit nicht vorgesehen
-*    write_add_singular_proc(fp);
-*/
+    write_add_singular_proc(fp);
     fprintf(fp, "\n");
     
     fprintf(fp, "void fill_help_package();\n");

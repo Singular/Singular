@@ -162,6 +162,8 @@ main( int argc, char *argv[] )
   //mod_create_makefile(&module_def);
   if(module_def.fmtfp   != NULL) fclose(module_def.fmtfp);
   if(module_def.modfp   != NULL) fclose(module_def.modfp);
-  if(module_def.modfp_h != NULL) fclose(module_def.modfp_h);
   if(module_def.binfp   != NULL) fclose(module_def.binfp);
+  if(module_def.modfp_h != NULL) fclose(module_def.modfp_h);
+  if(module_def.docfp   != NULL) fclose(module_def.docfp);
+  return 0;
 }

@@ -1,5 +1,5 @@
 /*
- *  $Id: modgen.h,v 1.14 2002-07-01 12:31:33 anne Exp $
+ *  $Id: modgen.h,v 1.15 2002-07-03 12:42:50 anne Exp $
  *
  */
 
@@ -86,14 +86,16 @@ class moddef {
   FILE * fmtfp3;          /* temporary file */
   FILE * binfp;           /* include singular procedures are stored
                              in an extra file */
+  FILE * docfp;		  /* help/example is stored in this file 
+                             for building the reference manual */
   char * filename;        /* inputfile to parse */
   char * name;            /* name of the module directory*/
   char * targetname;      /* name of dynamic module + package */
   unsigned int major, minor, level;
   char * version;
+  char * category;
   char * revision;
   char * info;
-  char * helpfile;
   char * c_code;
   procdefv procs;
   int      proccnt;
@@ -121,7 +123,7 @@ typedef enum { CMDT_SINGLE, CMDT_0, CMDT_ANY, CMDT_EQ
 
 
 typedef enum { VAR_NONE, VAR_MODULE, VAR_HELP, VAR_INFO, VAR_VERSION,
-               VAR_TYPECHECK, VAR_RETURN, VAR_FUNCTION
+               VAR_TYPECHECK, VAR_RETURN, VAR_FUNCTION, VAR_CATEGORY
 } var_token;
 
 /*
@@ -194,7 +196,8 @@ extern void write_example(moddefv module, procdefv pi);
 extern int  write_singular_procedures(moddefv module, procdefv proc);
 extern void write_singular_parameter(moddefv module,int lineno,
                                      char *typname, char *varname);
-extern void write_singular_end(moddefv module,int lineno);
+extern void write_singular_end(moddefv module, procdefv proc,int lineno);
+extern int write_helpfile_help(moddefv module, procdefv proc);
 
 extern void write_codeline(moddefv module, procdefv proc,
                            char *line, int lineno = -1);

@@ -1,5 +1,5 @@
 /*
- * $Id: utils.cc,v 1.11 2001-05-23 20:11:49 anne Exp $
+ * $Id: utils.cc,v 1.12 2002-07-03 12:42:51 anne Exp $
  */
 
 #include <stdio.h>
@@ -109,6 +109,9 @@ char *build_filename(
         case 3:
           snprintf(p, sizeof(p), "%s/%s.bin", module->name, text);
           break;
+        case 4:
+	  snprintf(p, sizeof(p), "%s/%s.pl", module->name, text);
+	  break;
         default:
           snprintf(p, sizeof(p), "%s/%s", module->name, text); 
           break;

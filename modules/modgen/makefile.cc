@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: makefile.cc,v 1.11 2002-07-01 12:31:33 anne Exp $ */
+/* $Id: makefile.cc,v 1.12 2002-07-03 12:42:50 anne Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -116,7 +116,8 @@ void build_clean_section(
   fprintf(fp, "\trm -f *.o *.og *.lo *.so* *.sl *.la *~ core\n\n");
   
   fprintf(fp, "distclean: clean\n");
-  fprintf(fp, "\trm -f %s.cc %s.h Makefile\n\n", module->name, module->name);
+  fprintf(fp, "\trm -f %s.cc %s.h Makefile *.bin *.pl\n\n", 
+               module->name, module->name);
 }
 
 /*========================================================================*/
@@ -129,6 +130,8 @@ void build_install_section(
   fprintf(fp, "\t${MKINSTALLDIRS} ${instdir}\n");
   fprintf(fp, "\t${MKINSTALLDIRS} ${instdir}/modules\n");
   fprintf(fp, "\t${INSTALL_PROGRAM} %s.so ${instdir}/modules/%s.so\n",
+          module->targetname, module->targetname);
+  fprintf(fp, "\t${INSTALL_PROGRAM} %s.bin ${instdir}/modules/%s.bin\n",
           module->targetname, module->targetname);
 }
 
