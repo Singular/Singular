@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.78 2001-08-27 14:46:49 Singular Exp $
+// $Id: clapsing.cc,v 1.79 2002-01-20 09:20:19 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -22,6 +22,8 @@
 #include "clapconv.h"
 #ifdef HAVE_LIBFAC_P
 #include <factor.h>
+CanonicalForm algcd(const CanonicalForm & F, const CanonicalForm & g, const CFList & as, const Varlist & order);
+
 #endif
 #include "ring.h"
 
@@ -205,6 +207,8 @@ poly singclap_gcd ( poly f, poly g )
   else         return pCopy(f); // g==0 => gcd=f (but do a pCleardenom)
   if (f==NULL) return pCopy(g); // f==0 => gcd=g (but do a pCleardenom)
 
+  if (pIsConstant(f) || pIsConstant(g)) return pOne();
+
   // for now there is only the possibility to handle polynomials over
   // Q and Fp ...
   if (( nGetChar() == 0 || nGetChar() > 1 )
@@ -225,7 +229,14 @@ poly singclap_gcd ( poly f, poly g )
     {
       if ( nGetChar()==1 ) /* Q(a) */
       {
-        WerrorS( feNotImplemented );
+      //  WerrorS( feNotImplemented );
+        CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
+	Varlist ord;
+	ord.append(mipo.mvar()); 
+	CFList as(mipo);
+	Variable a=rootOf(mipo);
+	CanonicalForm F( convSingAPClapAP( f,a ) ), G( convSingAPClapAP( g,a ) );
+	res= convClapAPSingAP( algcd( F, G, as, ord) );
       }
       else
       {
@@ -1045,11 +1056,13 @@ char* singclap_neworder ( ideal I)
   int cnt=pVariables+offs;
   loop
   {
+    BOOLEAN done=TRUE;
     i=Li.getItem()-1;
     mark[i]=1;
     if (i<offs)
     {
-      StringAppendS(currRing->parameter[i]);
+      done=FALSE;
+      //StringAppendS(currRing->parameter[i]);
     }
     else
     {
@@ -1058,16 +1071,18 @@ char* singclap_neworder ( ideal I)
     Li++;
     cnt--;
     if(cnt==0) break;
-    StringAppendS(",");
+    if (done) StringAppendS(",");
     if(! Li.hasItem()) break;
   }
   for(i=0;i<pVariables+offs;i++)
   {
+    BOOLEAN done=TRUE;
     if(mark[i]==0)
     {
       if (i<offs)
       {
-        StringAppendS(currRing->parameter[i]);
+        done=FALSE;
+        //StringAppendS(currRing->parameter[i]);
       }
       else
       {
@@ -1075,10 +1090,12 @@ char* singclap_neworder ( ideal I)
       }
       cnt--;
       if(cnt==0) break;
-      StringAppendS(",");
+      if (done) StringAppendS(",");
     }
   }
-  return omStrDup(StringAppendS(""));
+  char * s=omStrDup(StringAppendS(""));
+  if (s[strlen(s)-1]==',') s[strlen(s)-1]='\0';
+  return s;
 #else
   return NULL;
 #endif
