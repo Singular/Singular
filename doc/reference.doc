@@ -1,17 +1,28 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.8 1998-04-27 16:39:54 Singular Exp $
+@comment $Id: reference.doc,v 1.9 1998-04-28 12:49:29 schmidt Exp $
 @comment this file contains the reference part of the manual
+
+@c The following directives are necessary for proper compilation
+@c with emacs (C-c C-e C-b).
+@c @setfilename reference.info
+@c @node Top, Functions and variables
+@c @menu
+@c * Functions and variables::     
+@c @end menu
+@c @node Functions and variables, Tricks and pitfalls, Data types, Top
+@c @chapter Functions and variables
+
+
 @c ---------------------------------------
-@c @node Functions, Control structures, Declaration commands, Commands
 @menu
-* Functions::
-* Control structures::
-* Proc commands::
-* Other commands::
-* System variables::
+* Functions::                   
+* Control structures::          
+* System variables::            
 @end menu
 
-@node Functions, Control structures, Commands, Commands
+
+@c ---------------------------------------
+@node Functions, Control structures, Functions and variables, Functions and variables
 @section Functions
 @cindex Functions
 
@@ -25,102 +36,218 @@ If no target is specified, the result is printed.
 @*List of all supported functions.
 @end ifinfo
 @menu
-* bareiss::
-* betti::
-* char::
-* char_series::
-* charstr::
-* cleardenom::
-* coef::
-* coeffs::
-* contract::
-* defined::
-* deg::
-* delete::
-* det::
-* diff::
-* dim::
-* eliminate::
-* extgcd::
-* facstd::
-* factorize::
-* fetch::
-* fglm::
-* find::
-* finduni::
-* freemodule::
-* gcd::
-* gen::
-* hilb::
-* homog::
-* imap::
-* indepSet::
-* insert::
-* interred::
-* intersect::
-* jacob::
-* jet::
-* kbase::
-* koszul::
-* lead::
-* leadcoef::
-* leadexp::
-* lift::
-* liftstd::
-* maxideal::
-* memory::
-* minbase::
-* minor::
-* minres::
-* modulo::
-* mres::
-* mstd::
-* mult::
-* nameof::
-* names::
-* ncols::
-* nrows::
-* npars::
-* nvars::
-* ord::
-* ordstr::
-* par::
-* pardeg::
-* parstr::
-* preimage::
-* prime::
-* prune::
-* qhweight::
-* quotient::
-* random::
-* read::
-* reduce::
-* regularity::
-* res::
-* reservedName::
-* resultant::::
-* rvar::
-* simplify::
-* size::
-* sortvec::
-* sres::
-* status::
-* std::
-* stdfglm::
-* stdhilbert::
-* subst::
-* syz::
-* trace::
-* transpose::
-* typeof::
-* var::
-* varstr::
-* vdim::
-* wedge::
-* weight::
+* attrib::                      
+* bareiss::                     
+* betti::                       
+* char::                        
+* char_series::                 
+* charstr::                     
+* cleardenom::                  
+* close::                       
+* coef::                        
+* coeffs::                      
+* contract::                    
+* dbprint::                     
+* defined::                     
+* deg::                         
+* degree::                      
+* delete::                      
+* det::                         
+* diff::                        
+* dim::                         
+* dump::                        
+* eliminate::                   
+* eval::                        
+* execute::                     
+* extgcd::                      
+* facstd::                      
+* factorize::                   
+* fetch::                       
+* fglm::                        
+* filecmd::                     
+* find::                        
+* finduni::                     
+* freemodule::                  
+* gcd::                         
+* gen::                         
+* getdump::                     
+* help::                        
+* hilb::                        
+* homog::                       
+* imap::                        
+* indepSet::                    
+* insert::                      
+* interred::                    
+* intersect::                   
+* jacob::                       
+* jet::                         
+* kbase::                       
+* kill::                        
+* killattrib::                  
+* koszul::                      
+* lead::                        
+* leadcoef::                    
+* leadexp::                     
+* LIB::                         
+* lift::                        
+* liftstd::                     
+* listvar::                     
+* maxideal::                    
+* memory::                      
+* minbase::                     
+* minor::                       
+* minres::                      
+* modulo::                      
+* monitor::                     
+* mres::                        
+* mstd::                        
+* mult::                        
+* nameof::                      
+* names::                       
+* ncols::                       
+* npars::                       
+* nrows::                       
+* nvars::                       
+* open::                        
+* option::                      
+* ord::                         
+* ordstr::                      
+* par::                         
+* pardeg::                      
+* parstr::                      
+* pause::                       
+* preimage::                    
+* prime::                       
+* print::                       
+* prune::                       
+* qhweight::                    
+* quote::                       
+* quotient::                    
+* random::                      
+* read::                        
+* reduce::                      
+* regularity::                  
+* res::                         
+* reservedName::                
+* resultant::                   
+* rvar::                        
+* setring::                     
+* simplify::                    
+* size::                        
+* sortvec::                     
+* sres::                        
+* status::                      
+* std::                         
+* stdfglm::                     
+* stdhilbert::                  
+* subst::                       
+* system::                      
+* syz::                         
+* trace::                       
+* transpose::                   
+* type::                        
+* typeof::                      
+* var::                         
+* varstr::                      
+* vdim::                        
+* wedge::                       
+* weight::                      
+* write::                       
 @end menu
 @c ---------------------------------------
-@node bareiss, betti, Functions, Functions
+@node attrib, bareiss, Functions, Functions
+@subsection attrib
+@cindex attrib
+@table @code
+@item @strong{Syntax:}
+@code{attrib (} name @code{)}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+display the attribute list of the @emph{name}
+@item @strong{Example:}
+@example
+@c example
+  ring r=0,(x,y,z),dp;
+  ideal I=std(maxideal(2));
+  attrib(I);
+@c example
+@end example
+@item @strong{Syntax:}
+@code{attrib (} name @code{,} string_expression @code{)}
+@item @strong{Type:}
+any
+@item @strong{Purpose:}
+return the value of the attribute @emph{string_expression} of the @emph{name}.
+If the attribut is not defined for this variable, return the empty string.
+@item @strong{Example:}
+@example
+@c example
+  ring r=0,(x,y,z),dp;
+  ideal I=std(maxideal(2));
+  attrib(I,"isSB");
+  // although maxideal(2) is a standard basis,
+  // Singular does not know it:
+  attrib(maxideal(2), "isSB");
+@c example
+@end example
+@item @strong{Syntax:}
+@code{attrib (} name@code{,} string_expression@code{,} expression @code{)}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+sets the attribute @emph{string_expression} of the @emph{name}
+to the value @emph{expression}
+@item @strong{Example:}
+@example
+@c example
+  ring r=0,(x,y,z),dp;
+  ideal I=std(maxideal(2));
+  vdim(I);
+  attrib(I,"isSB",0);  // the standard basis attribute is set to 0
+  vdim(I);
+@c example
+@end example
+@item @strong{Remark:}
+An attribute may be described by any string_expression, but some are reserved.
+Only the reserved attributes are used by the kernel of @sc{Singular}.
+@sp 1
+@item @strong{Reserved attributes:}
+(not all are used at the moment)
+@table @asis
+@item @code{isSB}
+standard basis - set by @code{std}, used by @code{lift}, @code{dim},
+@code{degree}, @code{mult}, @code{hilb}, @code{vdim}, @code{kbase}
+@item @code{isHomog}
+the weight vector for homogeneous or quasihomogeneous ideals/modules
+@item @code{isCI}
+complete intersection
+@item @code{isCM}
+Cohen-Macaulay  module
+@item @code{withSB}
+value of type ideal/module is std
+@item @code{withHilb}
+value of type intvec is hilb(_,1) (see @ref{hilb})
+@item @code{withRes}
+value of type list is a free resolution
+@item @code{withDim}
+value of type int is the dimension (see @ref{dim})
+@item @code{withMult}
+value of type int is the multiplicity (see @ref{mult})
+@c @item @code{D}
+@c object is an differential operator, if set to 1;
+@c @*object is in a module, if set to 0
+@c @*only valid in a dring (see @ref{dring}).
+@end table
+@end table
+@c @menu
+@c * Expressions::
+@c @end menu
+@c @iftex
+@c See @ref{Expressions}.
+@c @end iftex
+@c ---------------------------------------
+@node bareiss, betti, attrib, Functions
 @subsection bareiss
 @cindex bareiss
 
@@ -367,7 +494,7 @@ returns the description of the coefficient field of a ring
 See @ref{ring}; @ref{char}; @ref{ordstr}; @ref{varstr}.
 @end iftex
 @c ---------------------------------------
-@node cleardenom, coef, charstr, Functions
+@node cleardenom, close, charstr, Functions
 @subsection cleardenom
 @cindex cleardenom
 
@@ -397,7 +524,34 @@ all denominators from its coefficients and then divide it by its content.
 @c See @ref{poly expressions}.
 @c @end iftex
 @c ---------------------------------------
-@node coef, coeffs, cleardenom, Functions
+@node close, coef, cleardenom, Functions
+@subsection close
+@cindex close
+@table @code
+@item @strong{Syntax:}
+@code{close (} link_expression @code{)}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+close a link
+@item @strong{Example:}
+@example
+  LIB "general.lib";
+  link l="MPtcp:launch";
+  open(l); // start Singular "server" on localhost in batchmode
+  close(l); // shut down Singular server
+@end example
+@end table
+@menu
+* link::
+* link::
+* open::
+@end menu
+@iftex
+See @ref{link}, @ref{link}; @ref{open}.
+@end iftex
+@c ---------------------------------------
+@node coef, coeffs, close, Functions
 @subsection coef
 @cindex coef
 
@@ -514,7 +668,7 @@ _[i,j] = z^0*M[(i-1)*d+1,j] + z^1*M[(i-1)*d+2,j] + ... + z^(d-1)*M[i*d,j]
 See @ref{poly expressions}; @ref{coef}.
 @end iftex
 @c ---------------------------------------
-@node contract, defined, coeffs, Functions
+@node contract, dbprint, coeffs, Functions
 @subsection contract
 @cindex contract
 
@@ -555,7 +709,51 @@ where A and B are the multiexponents of the ring variables represented by x.
 See @ref{diff}; @ref{ideal expressions}.
 @end iftex
 @c ---------------------------------------
-@node defined, deg, contract, Functions
+@node dbprint, defined, contract, Functions
+@subsection dbprint
+@cindex dbprint
+@table @code
+@item @strong{Syntax:}
+@code{dbprint (} int_expression@code{,} expression_list @code{)}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+debug print of a list of expressions.
+The print command is applied to each expression
+if int_expression is positive.
+@code{dbprint} may also be used in procedures
+in order to print results subject to certain
+conditions.
+@item @strong{Syntax:}
+@code{dbprint (} expression@code{)}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+debug print of an expressions.
+The print command is applied to the expression
+if @code{printlevel>voice}.
+@item @strong{Example:}
+@example
+@c example
+  int debug=0;
+  intvec i=1,2,3;
+  dbprint(debug,i);
+  debug=1;
+  dbprint(debug,i);
+@c example
+@end example
+@end table
+@menu
+* print::
+* voice::
+* printlevel::
+* Debugging tools::
+@end menu
+@iftex
+See @ref{print}; @ref{voice}; @ref{printlevel}; @ref{Debugging tools}.
+@end iftex
+@c ---------------------------------------
+@node defined, deg, dbprint, Functions
 @subsection defined
 @cindex defined
 
@@ -588,7 +786,7 @@ Local objects may be identified by @code{if (defined(..)==voice) ..}.
 See @ref{voice}.
 @end iftex
 @c ---------------------------------------
-@node deg, delete, defined, Functions
+@node deg, degree, defined, Functions
 @subsection deg
 @cindex deg
 
@@ -627,7 +825,50 @@ the terms of a polynomial or a vector;
 See @ref{ord}; @ref{poly expressions}; @ref{vector expressions}.
 @end iftex
 @c ---------------------------------------
-@node delete, det, deg, Functions
+@node degree, delete, deg, Functions
+@subsection degree
+@cindex degree
+@table @code
+@item @strong{Syntax:}
+@code{degree (} ideal_expression @code{)}
+@*@code{degree (} module_expression @code{)}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+compute the (Krull) dimension, codimension and the multiplicity
+of the ideal/module generated by the leading monomials of the input and
+print it.   This is equal to the dimension, codimension and multiplicity
+of the ideal/module if the input is a standard basis with respect to a
+degree ordering.
+@item @strong{Example:}
+@example
+  ring r3=32003,(x,y,z),ds;
+  int a =11;
+  int b =10;
+  int c =3;
+  int t =1;
+  poly f =x^a+y^b+z^(3*c)+x^(c+2)*y^(c-1)+x^(c-1)*y^(c-1)*z3
+    +x^(c-2)*y^c*(y2+t*x)^2;
+  ideal i= jacob(f);
+  ideal i0=std(i);
+  degree(i0);
+  @expansion{} //codimension 3
+  @expansion{} //dimension 0
+  @expansion{} //multiplicity 314
+@end example
+@end table
+@menu
+* ideal::
+* std::
+* dim::
+* vdim::
+* mult::
+@end menu
+@iftex
+See @ref{ideal}; @ref{std}; @ref{dim}; @ref{vdim}; @ref{mult}.
+@end iftex
+@c ---------------------------------------
+@node delete, det, degree, Functions
 @subsection delete
 @cindex delete
 
@@ -741,7 +982,7 @@ See @ref{poly expressions};
 @ref{var};
 @end iftex
 @c ---------------------------------------
-@node dim, eliminate, diff, Functions
+@node dim, dump, diff, Functions
 @subsection dim
 @cindex dim
 
@@ -779,7 +1020,40 @@ module is the dimension of its annihilator ideal.
 See @ref{ideal}; @ref{std}; @ref{degree}; @ref{vdim}; @ref{mult}.
 @end iftex
 @c ---------------------------------------
-@node eliminate, extgcd, dim, Functions
+@node dump, eliminate, dim, Functions
+@subsection dump
+@cindex dump
+@table @code
+@item @strong{Syntax:}
+@code{dump (} link @code{);}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+Dumps (i.e. write in one "message" or "block") the state of the Singular
+session (i.e., all defined variables and their values) to the specified
+link (which must be either an Ascii or MP link). 
+@item @strong{Example:}
+@example
+@c example
+  int i=3;
+  dump("");
+@c example
+@end example
+@item @strong{Restrictions:}
+For Ascii links, integer matricies contained in lists are  dumped as
+integer list elements (and not as integer matricies). Furthermore, links
+themselfes are not dumped.
+@end table
+@menu
+* link::
+* getdump::
+* write::
+@end menu
+@iftex
+See @ref{link}, @ref{getdump}, @ref{write}, .
+@end iftex
+@c ---------------------------------------
+@node eliminate, eval, dump, Functions
 @subsection eliminate
 @cindex eliminate
 
@@ -829,7 +1103,77 @@ See @ref{ideal}; @ref{module}; @ref{std}; @ref{hilb};
 @ref{module expressions}.
 @end iftex
 @c ---------------------------------------
-@node extgcd, facstd, eliminate, Functions
+@node eval, execute, eliminate, Functions
+@subsection eval
+@cindex eval
+@table @code
+@item @strong{Syntax:}
+@code{eval (} expression @code{)}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+evaluate (quoted) expressions. Within a quoted expression, the
+quote can be "undone" by an @code{eval} (i.e., each eval "undoes" the
+effect of exactly one quoter). Used with @code{quote} and @code{write}.
+@item @strong{Example:}
+@example
+@c @c example
+  link l="MPfile:w example.mp";
+  ring r=0,(x,y,z),ds;
+  ideal i=maxideal(3);
+  ideal j=x7,x2,z;
+  // compute i+j before writing, but not std
+  // this writes 'std(ideal(x3,...,z))'
+  write (l, quote(std(eval(i+j))));
+  option(prot);
+  close(l);
+  // now read it in again and evaluate
+  // read(l) forces to compute 'std(ideal(x3,...,z))'
+  read(l);
+  close(l);
+@c @c example
+@end example
+@end table
+@menu
+* quote::
+* write::
+@end menu
+@iftex
+See @ref{quote}; @ref{write}.
+@end iftex
+@c ---------------------------------------
+@node execute, extgcd, eval, Functions
+@subsection execute
+@cindex execute
+@table @code
+@item @strong{Syntax:}
+execute string_expression
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+execute a string containing a sequence of @sc{Singular} commands.
+@*@strong{Note:} The string will be inserted into your input
+stream at the next line break, @emph{NOT} after the @code{;} !  Hence, execute
+should be the only command on a line.   execute should be avoided in
+procedures whenever possible since it may give rise to name conflicts.
+Moreover, such procedures cannot be precompiled (something
+@sc{Singular} will provide in the future).
+@item @strong{Example:}
+@example
+@c example
+  ring r=32003,(x,y,z),dp;
+  ideal i=x+y,z3+22y;
+  write(">save_i",i);
+  ring r0=0,(x,y,z),Dp;
+  string s="ideal k="+read("save_i")+";";
+  s;
+  execute s; // define the ideal k
+  k;
+@c example
+@end example
+@end table
+@c ---------------------------------------
+@node extgcd, facstd, execute, Functions
 @subsection extgcd
 @cindex extgcd
 
@@ -1002,7 +1346,7 @@ See @ref{ring}; @ref{qring};
 @ref{imap}.
 @end iftex
 @c ---------------------------------------
-@node fglm, find, fetch, Functions
+@node fglm, filecmd, fetch, Functions
 @subsection fglm
 @cindex fglm
 
@@ -1045,7 +1389,24 @@ See @ref{ring}; @ref{qring};
 @ref{std}; @ref{option}; @ref{vdim}.
 @end iftex
 @c ---------------------------------------
-@node find, finduni, fglm, Functions
+@node filecmd, find, fglm, Functions
+@subsection Input from files
+@cindex filecmd
+@cindex <
+@table @code
+@item @strong{Syntax:}
+@code{< "}@file{filename}@code{";}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+input will come from new file @file{filename}
+@item @strong{Example:}
+@example
+  < "lib"; //read in the file lib
+@end example
+@end table
+@c ---------------------------------------
+@node find, finduni, filecmd, Functions
 @subsection find
 @cindex find
 @table @code
@@ -1172,7 +1533,7 @@ See @ref{extgcd};
 @ref{poly expressions}
 @end iftex
 @c ----------------------------------------
-@node gen, hilb, gcd, Functions
+@node gen, getdump, gcd, Functions
 @subsection gen
 @cindex gen
 
@@ -1204,7 +1565,66 @@ return the i-th free generator of a free module
 See @ref{int expressions}; @ref{vector}.
 @end iftex
 @c ---------------------------------------
-@node hilb, homog, gen, Functions
+@node getdump, help, gen, Functions
+@subsection getdump
+@cindex getdump
+@table @code
+@item @strong{Syntax:}
+@code{getdump (} link @code{);}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+reads the contents of the entire file/link and restores all variables
+from it. For Ascii links, @code{getdump} is equivalent to a
+@code{execute read (} link @code{);} command. For MP links,
+@code{getdump} should only be used on data which was previously
+@code{dump}'ed. 
+@item @strong{Example:}
+@example
+@c example
+  int i=3;
+  dump(":w example.txt");
+  kill i;
+  getdump("example.txt");
+  i;
+@c example
+@end example
+@item @strong{Restrictions:} 
+@code{getdump} is not supported fro DBM links, or for a link connecting
+to @code{stdin} (standard input).
+@end table
+@menu
+* link::
+* dump::
+* read::
+@end menu
+@iftex
+See @ref{link}, @ref{dump}, @ref{read}.
+@end iftex
+@c ---------------------------------------
+@node help, hilb, getdump, Functions
+@subsection help
+@cindex help
+@table @code
+@item @strong{Syntax:}
+@code{help;}
+@*@code{help} command_name @code{;}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+provide help information, using the texinfo facility
+@*to get help about help, press @code{?}
+@cindex ?
+@item @strong{Note:}
+@code{?} may be used instead of @code{help}.
+@item @strong{Example:}
+@example
+  help ring;
+  help;
+@end example
+@end table
+@c ---------------------------------------
+@node hilb, homog, help, Functions
 @subsection hilb
 @cindex hilb
 @table @code
@@ -1686,7 +2106,7 @@ See @ref{poly expressions}; @ref{vector expressions};
 @ref{intvec expressions}.
 @end iftex
 @c ---------------------------------------
-@node kbase, koszul, jet, Functions
+@node kbase, kill, jet, Functions
 @subsection kbase
 @cindex kbase
 @table @code
@@ -1720,7 +2140,61 @@ used and the result may have no meaning.
 See @ref{ideal expressions}; @ref{module expressions}; @ref{vdim}.
 @end iftex
 @c ---------------------------------------
-@node koszul, lead, kbase, Functions
+@node kill, killattrib, kbase, Functions
+@subsection kill
+@cindex kill
+@table @code
+@item @strong{Syntax:}
+@code{kill} name@code{;}
+@*@code{kill} list_of_names @code{;}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+delete variables
+@item @strong{Example:}
+@example
+@c example
+  int i=3;
+  ring r= 0,x,dp;
+  poly p;
+  listvar();
+  kill i,r;
+  i;
+  listvar();
+@c example
+@end example
+@end table
+@c ---------------------------------------
+@node killattrib, koszul, kill, Functions
+@subsection killattrib
+@cindex killattrib
+@table @code
+@item @strong{Syntax:}
+@code{killattrib (} name@code{,} string_expression @code{);}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+delete the attribute given as the second argument
+@item @strong{Example:}
+@example
+@c example
+  ring r= 32003,(x,y),lp;
+  ideal i=maxideal(1);
+  attrib(i,"isSB",1);
+  attrib(i);
+  killattrib(i,"isSB");
+  attrib(i);
+@c example
+@end example
+@end table
+@menu
+* attrib::
+@end menu
+@iftex
+See @ref{attrib}.
+@end iftex
+@c ---------------------------------------
+@node koszul, lead, killattrib, Functions
 @subsection koszul
 @cindex koszul
 @table @code
@@ -1837,7 +2311,7 @@ See @ref{poly expressions};
 @ref{vector expressions}.
 @end iftex
 @c -------------------------------------------------
-@node leadexp, lift, leadcoef, Functions
+@node leadexp, LIB, leadcoef, Functions
 @subsection leadexp
 @cindex leadexp
 @table @code
@@ -1867,8 +2341,44 @@ returns the exponent vector of the leading monomial of a polynomial or a vector
 See @ref{poly expressions};
 @ref{vector expressions}.
 @end iftex
+@c ---------------------------------------
+@node LIB, lift, leadexp, Functions
+@subsection LIB
+@cindex LIB
+@table @code
+@item @strong{Syntax:}
+@code{LIB} string_expression@code{;}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+read a library of procedures (proc) from a file. If the given
+filename does not start with @kbd{.} or @kbd{/}, the following directories ares
+searched for the file: the current directory,
+the directories given in the environment variable
+@code{SINGULARPATH}@footnote{@code{SPATH} on MS-DOS},
+@code{usr/local/share/Singular}
+Only a directory of the library is loaded, the body of the proc
+is read during the first call of this proc. This minimizes
+the memory consumption of unused procedures.
+@item @strong{Example:}
+@example
+  LIB "lib"; // the names of the procedures in the
+             // file lib are now known to @sc{Singular}
+@end example
+@end table
+@menu
+* LIB in a library::
+* string expressions::
+* proc::
+* procedures and Libraries::
+* SINGULAR libraries:: all standard libraries.
+@end menu
+@iftex
+See @ref{LIB in a library}; @ref{proc}; @ref{procedures and Libraries};
+@ref{string expressions}; @ref{SINGULAR libraries}.
+@end iftex
 @c -------------------------------------------------
-@node lift, liftstd, leadexp, Functions
+@node lift, liftstd, LIB, Functions
 @subsection lift
 @cindex lift
 @table @code
@@ -1907,7 +2417,7 @@ See @ref{ideal expressions};
 @ref{module expressions}.
 @end iftex
 @c -----------------------------------------
-@node liftstd, maxideal, lift, Functions
+@node liftstd, listvar, lift, Functions
 @subsection liftstd
 @cindex liftstd
 @table @code
@@ -1947,7 +2457,73 @@ and @code{sm=ideal(matrix(m)*T)} respectivly @code{sm=module(matrix(m)*T)}.
 See @ref{ideal}; @ref{ring}; @ref{option}; @ref{std}; @ref{matrix}.
 @end iftex
 @c ---------------------------------------
-@node maxideal, memory, liftstd, Functions
+@node listvar, maxideal, liftstd, Functions
+@subsection listvar
+@cindex listvar
+@table @code
+@item @strong{Syntax:}
+@code{listvar();}
+@*@code{listvar(} type_name @code{);}
+@*@code{listvar(} ring_name @code{);}
+@*@code{listvar(} name @code{);}
+@*@code{listvar( all );}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+list all (user-)defined names:
+@*@code{listvar()}: all reachable names except procedures
+@*@code{listvar(}type_name@code{)}: all reachable names of the given type
+@*@code{listvar(}ring_name@code{)}: all names which belong to the given ring
+@*@code{listvar(} name @code{)}: the object with the given name
+@*@code{listvar(all)}: all names except procedures
+@*the actual base ring is marked with an @code{*}
+@item @strong{Example:}
+@example
+  proc t1 @{ @}
+  proc t2 @{ @}
+  ring s;
+  poly ss;
+  ring r;
+  poly f=x+y+z;
+  int i=7;
+  ideal I=f,x,y;
+@end example
+@example
+  listvar(all);
+  @expansion{} // i               int 7
+  @expansion{} // r               *ring
+  @expansion{} //     I               ideal, 3 generators
+  @expansion{} //     f               poly x+y+..., 3 monomials
+  @expansion{} // s               ring
+  @expansion{} //     ss              poly
+@end example
+@example
+  listvar();
+  @expansion{} // i               int 7
+  @expansion{} // r               *ring
+  @expansion{} //     I               ideal, 3 generators
+  @expansion{} //     f               poly x+y+..., 3 monomials
+  @expansion{} // s               ring
+@end example
+@example
+  listvar(r);
+  @expansion{} // I               ideal, 3 generators
+  @expansion{} // f               poly x+y+..., 3 monomials
+  listvar(ring);
+  @expansion{} // r               *ring
+  listvar(poly);
+  @expansion{} // f               poly x+y+..., 3 monomials
+  listvar(I);
+  @expansion{} // I               ideal, 3 generators
+  listvar(proc);
+  @expansion{} // t2              proc
+  @expansion{} // t1              proc
+  listvar(t1);
+  @expansion{} // t1              proc
+@end example
+@end table
+@c ---------------------------------------
+@node maxideal, memory, listvar, Functions
 @subsection maxideal
 @cindex maxideal
 @table @code
@@ -2087,7 +2663,7 @@ given by the list argument.
 See @ref{res}; @ref{mres}; @ref{sres}.
 @end iftex
 @c --------------------------------------
-@node modulo, mult, minres, Functions
+@node modulo, monitor, minres, Functions
 @subsection modulo
 @cindex modulo
 @table @code
@@ -2148,47 +2724,37 @@ $h_1/(h_1 \cap h_2)\ \leftarrow\  R^k\ \buildrel{M}\over{\leftarrow}\ R^l$
 See @ref{syz}.
 @end iftex
 @c ---------------------------------------
-@node mult, mres, modulo, Functions
-@subsection mult
-@cindex mult
+@node monitor, mres, modulo, Functions
+@subsection monitor
+@cindex monitor
 @table @code
 @item @strong{Syntax:}
-@code{mult (} ideal_expression @code{)}
-@*@code{mult (} module_expression @code{)}
+@code{monitor (} string_expression @code{)}
+@*@code{monitor (} string_expression@code{,} string_expression @code{)}
 @item @strong{Type:}
-int
+none
 @item @strong{Purpose:}
-compute the degree of the monomial ideal/module generated by
-the leading monomials of the input.
-@*If the input is a standard basis of a homogeneous ideal
-then it returns the degree of this ideal.
-@*If the input is a standard basis of an ideal in a (local)
-ring with respect to a local degree ordering
-then it returns the multiplicity of the ideal (in the sense of Samuel,
-with respect to the maximal ideal).
+start/stop recording all user input and/or program output into a file
+The second argument describe what to log: @code{"i"} means input,
+@code{"o"} means output, @code{"io"} for both.
+@*The default for the second argument is @code{"i"}.
+@*Each @code{monitor} command closes the old monitor file
+and opens the file given by the first string expression.
+@*@code{monitor ("")} turns off recording.
 @item @strong{Example:}
 @example
 @c example
-  ring r= 32003,(x,y),ds;
-  poly f = (x^3+y^5)^2+x^2*y^7;
-  ideal i = std(jacob(f));
-  mult(i);
-  mult(std(f));
+  monitor("doe.tmp");
+  ring r;
+  poly f=x+y+z;
+  int i=7;
+  ideal I=f,x,y;
+  monitor("");
 @c example
 @end example
 @end table
-@menu
-* ideal::
-* std::
-* dim::
-* degree::
-* vdim::
-@end menu
-@iftex
-See @ref{ideal}; @ref{std}; @ref{degree}; @ref{vdim}; @ref{dim}.
-@end iftex
 @c ---------------------------------------
-@node  mres, mstd, mult, Functions
+@node  mres, mstd, monitor, Functions
 @subsection mres
 @cindex mres
 @table @code
@@ -2269,7 +2835,7 @@ See @ref{ideal expressions}; @ref{module expressions};
 @ref{res}; @ref{sres}.
 @end iftex
 @c ---------------------------------------
-@node  mstd, nameof, mres, Functions
+@node  mstd, mult, mres, Functions
 @subsection mstd
 @cindex mstd
 @table @code
@@ -2302,7 +2868,47 @@ See @ref{ideal expressions};
 @ref{std}; @ref{minbase}.
 @end iftex
 @c ---------------------------------------
-@node nameof, names, mstd, Functions
+@node mult, nameof, mstd, Functions
+@subsection mult
+@cindex mult
+@table @code
+@item @strong{Syntax:}
+@code{mult (} ideal_expression @code{)}
+@*@code{mult (} module_expression @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+compute the degree of the monomial ideal/module generated by
+the leading monomials of the input.
+@*If the input is a standard basis of a homogeneous ideal
+then it returns the degree of this ideal.
+@*If the input is a standard basis of an ideal in a (local)
+ring with respect to a local degree ordering
+then it returns the multiplicity of the ideal (in the sense of Samuel,
+with respect to the maximal ideal).
+@item @strong{Example:}
+@example
+@c example
+  ring r= 32003,(x,y),ds;
+  poly f = (x^3+y^5)^2+x^2*y^7;
+  ideal i = std(jacob(f));
+  mult(i);
+  mult(std(f));
+@c example
+@end example
+@end table
+@menu
+* ideal::
+* std::
+* dim::
+* degree::
+* vdim::
+@end menu
+@iftex
+See @ref{ideal}; @ref{std}; @ref{degree}; @ref{vdim}; @ref{dim}.
+@end iftex
+@c ---------------------------------------
+@node nameof, names, mult, Functions
 @subsection nameof
 @cindex nameof
 @table @code
@@ -2465,7 +3071,7 @@ vector lives (the index of the last non-zero component)
 See @ref{matrix}; @ref{module}; @ref{vector}; @ref{ncols}.
 @end iftex
 @c ---------------------------------------
-@node nvars, ord, nrows, Functions
+@node nvars, open, nrows, Functions
 @subsection nvars
 @cindex nvars
 @table @code
@@ -2490,7 +3096,152 @@ return the numbers of variables of a ring
 See @ref{ring}.
 @end iftex
 @c ---------------------------------------
-@node ord, ordstr, nvars, Functions
+@node open, option, nvars, Functions
+@subsection open
+@cindex open
+@table @code
+@item @strong{Syntax:}
+open ( link_expression )
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+open a link
+@item @strong{Example:}
+@example
+  LIB "general.lib";
+  link l="MPtcp:launch";
+  open(l); // start Singular "server" on localhost in batchmode
+  close(l); // shut down Singular server
+@end example
+@end table
+@menu
+* link::
+* link::
+* close::
+@end menu
+@iftex
+See @ref{link}, @ref{link}; @ref{close}.
+@end iftex
+@c ---------------------------------------
+@node option, ord, open, Functions
+@subsection option
+@cindex option
+@table @code
+@item @strong{Syntax:}
+@code{option ();}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+list all defined options
+@item @strong{Syntax:}
+@code{option (} option_name @code{);}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+set an option
+@*To disable an option, use the prefix @code{no}.
+@item @strong{Syntax:}
+@code{option ( get );}
+@item @strong{Type:}
+intvec
+@item @strong{Purpose:}
+dump the state of all options to an intvec
+@item @strong{Syntax:}
+@code{option ( set,} int_expression @code{);}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+restores the state of all options from an intvec (produced by @code{option(get)})
+@sp 1
+@item @strong{Values:}
+@table @asis
+@item @code{none}
+reset all options to the default
+@item @code{returnSB}
+the functions @code{syz},@code{intersect},@code{quotient},@code{modulo} return a standard base instead
+of a generating set.  This option should not be used for @code{lift}.
+@item @code{fastHC}
+try to find HC (highest corner of the staircase) as fast as possible
+during a standard basis computation (only used for local orderings)
+@item @code{interrupt}
+allow fast interruption of standard basis computation
+@item @code{intStrategy}
+avoid divisions (of coefficients) during standard basis computations
+@item @code{minRes}
+special (additional) minimizing during computations (res,mres),
+@*assumes homogeneous case and degree-compatible ordering
+@item @code{morePairs}
+create addditional (useless) pairs to speed up computation in some cases
+@item @code{notRegularity}
+disable the regularity bound for res/mres (see @ref{regularity})
+@item @code{notSugar}
+disable the sugar strategy
+@item @code{prot}
+protocol showing progress during standard basis computation
+@item @code{redSB}
+compute reduced standard basis
+@item @code{redTail}
+reduction of the tails of polynomials during standard basis computations
+@item @code{sugarCrit}
+use criteria similar to the homogeneous case to keep more useless pairs
+@item @code{weightM}
+automatically compute suitable weights for the weighted ecart and the
+weighted sugar method
+@item The following options have to be set without the option command:
+@item @code{multBound}
+a multiplicity bound is set (see @ref{multBound})
+@item @code{degBound}
+a degree bound is set (see @ref{degBound})
+@item @code{Imap}
+show the mapping of variables with the imap command
+@item @code{loadLib}
+show loading of libraries (default)
+@item @code{debugLib}
+warn about syntax errors during loading of libraries
+@item @code{loadProc}
+show loading of procedures from libraries
+@item @code{mem}
+show memory usage in square brackets
+@item @code{prompt}
+show prompt (@code{>} resp. @code{.}) if ready for input (default)
+@item @code{reading}
+show the number of characters read from a file
+@item @code{redefine}
+warn about variable redefinitions (default)
+@item @code{usage}
+show correct usage in error messages (default)
+@end table
+@item @strong{Example:}
+@example
+@c example
+  option(prot);
+  option();
+  option(notSugar);
+  option();
+  option(noprot);
+  option();
+  option(none);
+  option();
+  ring r=0,x,dp;
+  degBound=22;
+  option();
+  intvec i=option(get);i;
+  option(none);
+  option(set,i);
+  option();
+@c example
+@end example
+@end table
+@menu
+* degBound::
+* multBound::
+* std::
+@end menu
+@iftex
+See @ref{degBound}; @ref{multBound}; @ref{std}.
+@end iftex
+@c ---------------------------------------
+@node ord, ordstr, option, Functions
 @subsection ord
 @cindex ord
 @table @code
@@ -2607,7 +3358,7 @@ return the degree of a number considered as a polynomial in the ring parameters
 See @ref{ring}; @ref{var}.
 @end iftex
 @c ---------------------------------------
-@node parstr, preimage, pardeg, Functions
+@node parstr, pause, pardeg, Functions
 @subsection parstr
 @cindex parstr
 @table @code
@@ -2644,7 +3395,27 @@ See @ref{ring};
 @ref{ordstr}.
 @end iftex
 @c ---------------------------------------
-@node preimage, prime, parstr, Functions
+@node pause, preimage, parstr, Functions
+@subsection pause
+@cindex pause
+@table @code
+@item @strong{Syntax:}
+@code{pause;}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+pause the execution of a procedure until the return key is pressed
+@item @strong{Example:}
+@example
+  // the procedure will continue if return is pressed:
+  "press the return key to continue"; pause;
+  @expansion{} press the return key to continue
+  @expansion{} pause>
+
+@end example
+@end table
+@c ---------------------------------------
+@node preimage, prime, pause, Functions
 @subsection preimage
 @cindex preimage
 
@@ -2682,7 +3453,7 @@ and the ideal has to be an ideal in the given ring.
 See @ref{map}; @ref{ring}.
 @end iftex
 @c ---------------------------------------
-@node prime, prune, preimage, Functions
+@node prime, print, preimage, Functions
 @subsection prime
 @cindex prime
 @table @code
@@ -2708,7 +3479,61 @@ return the largest prime smaller or equal to the argument;
 See @ref{int expressions}.
 @end iftex
 @c ---------------------------------------
-@node prune, qhweight, prime, Functions
+@node print, prune, prime, Functions
+@subsection print
+@cindex print
+@table @code
+@item @strong{Syntax:}
+@code{print (} expression @code{);}
+@*@code{print (} expression@code{,} format_string @code{);}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+pretty print of expressions, especially useful for matrices, modules
+and vectors
+@*The second form uses a string to determine the format.
+@*At the moment only the "betti" format is used:
+@table @code
+@item "betti"
+displays the graded Betti numbers of
+@tex
+$R^n/M$, if $R$ denotes the basering and if $M$ is a homogeneous submodule of $R^n$:
+@end tex
+@ifinfo
+R^n/M, if R denotes the basering and if M is a homogeneous submodule of R^n:
+@end ifinfo
+@*The entry d at (i,j) is the minimal number of generators in degree i+j of
+the j-th syzygy module of
+@tex
+$R^n/M$ (the 0-th (resp.1-st) syzygy module of $R^n/M$ is $R^n$ (resp. $M$))
+@end tex
+@ifinfo
+R^n/M (the 0-th (resp.1-st) syzygy module of R^n/M is R^n (resp. M))
+@end ifinfo
+@end table
+@item @strong{Example:}
+@example
+@c example
+  ring r=0,(x,y,z),dp;
+  module m=[1,y],[0,x+z];
+  m;
+  print(m);  // the columns generate m
+  intmat M=betti(mres(m,0));
+  print(M,"betti");
+@c example
+@end example
+@end table
+@menu
+* dbprint::
+* short::
+* type::
+* betti::
+@end menu
+@iftex
+See @ref{dbprint}; @ref{short}; @ref{type}; @ref{betti}.
+@end iftex
+@c ---------------------------------------
+@node prune, qhweight, print, Functions
 @subsection prune
 @cindex prune
 @table @code
@@ -2736,7 +3561,7 @@ corresponding factor modules are isomorphic
 See @ref{module expressions}.
 @end iftex
 @c ---------------------------------------
-@node qhweight, quotient, prune, Functions
+@node qhweight, quote, prune, Functions
 @subsection qhweight
 @cindex qhweight
 @table @code
@@ -2765,7 +3590,42 @@ If the input is not weighted homogeneous, an intvec of zeroes will be returned.
 See @ref{ideal expressions}; @ref{intvec expressions}; @ref{weight}.
 @end iftex
 @c ---------------------------------------
-@node quotient, random, qhweight, Functions
+@node quote, quotient, qhweight, Functions
+@subsection quote
+@cindex quote
+@table @code
+@item @strong{Syntax:}
+@code{quote (} expression @code{)}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+prevent expresions from evaluation. Within a quoted expression, the
+quote can be "undone" by an @code{eval} (i.e., each eval "undoes" the
+effect of exactly one quoter). Used with @code{write}.
+@item @strong{Example:}
+@example
+  link l="MPfile:w example.mp";
+  ring r=0,(x,y,z),ds;
+  ideal i=maxideal(3);
+  ideal j=x7,x2,z;
+  // compute i+j before writing, but not std
+  write (l, quote(std(eval(i+j))));
+  option(prot);
+  close(l);
+  // now read it in again and evaluate:
+  read(l);
+  close(l);
+@end example
+@end table
+@menu
+* write::
+* eval::
+@end menu
+@iftex
+See @ref{write}; @ref{eval}.
+@end iftex
+@c ---------------------------------------
+@node quotient, random, quote, Functions
 @subsection quotient
 @cindex quotient
 @table @code
@@ -3154,7 +4014,7 @@ to the variable given as the third argument
 See @ref{poly expressions} @ref{ring}.
 @end iftex
 @c ---------------------------------------
-@node rvar, simplify, resultant, Functions
+@node rvar, setring, resultant, Functions
 @subsection rvar
 @cindex rvar
 @table @code
@@ -3188,7 +4048,40 @@ or if the string is the name of a ring variable of the base ring.
 See @ref{ring}; @ref{var}; @ref{varstr}.
 @end iftex
 @c ---------------------------------------
-@node simplify, size, rvar, Functions
+@node setring, simplify, rvar, Functions
+@subsection setring
+@cindex setring
+@table @code
+@item @strong{Syntax:}
+@code{setring} ring_name@code{;}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+change the base ring to another (already defined) ring
+@item @strong{Example:}
+@example
+@c @c example
+  ring r1=0,(x,y),lp;
+  // the base ring is r1
+  ring r2=32003,(a(1..8)),ds;
+  // the base ring is r2
+  setring r1;
+  // the base ring is again r1
+@c @c example
+@end example
+@item @strong{Use in proc:}
+All changes of the base ring by a definition
+of a new ring or a setring command in a proc are local to this proc.
+@end table
+@menu
+* ring::
+* keepring::
+@end menu
+@iftex
+See @ref{ring}; @ref{keepring}.
+@end iftex
+@c ---------------------------------------
+@node simplify, size, setring, Functions
 @subsection simplify
 @cindex simplify
 @table @code
@@ -3616,7 +4509,7 @@ See @ref{ideal}; @ref{ring}; @ref{option}; @ref{facstd}; @ref{mstd};
 @ref{std}; @ref{stdfglm}.
 @end iftex
 @c ---------------------------------------
-@node subst, syz, stdhilbert, Functions
+@node subst, system, stdhilbert, Functions
 @subsection subst
 @cindex subst
 @table @code
@@ -3651,8 +4544,66 @@ substitutes the ringvariable by the monomial (a polynomial of length <=1)
 See @ref{poly expressions}; @ref{vector expressions};
 @ref{ideal expressions}; @ref{module expressions}.
 @end iftex
+@c ---------------------------------------
+@node  system, syz, subst, Functions
+@subsection system
+@cindex system
+@table @code
+@item @strong{Syntax:}
+@code{system (} expression_list @code{)}
+@sp 1
+the first expression must be of type string and selects the desired function.
+@item @strong{Type:}
+depends on the desired function, may be none
+@item @strong{Purpose:}
+interface to internal data and the operating system
+@*Not all functions will work on every platform.
+@item @strong{functions}
+@code{system("sh"},string_expression @code{)} is the shell escape,
+  returns the return code of the shell@*
+@code{system("pid")} return the process number (for creating unique names)@*
+@code{system("getenv",}string_expression@code{)}
+  return shell environment variable given as the second argument@*
+@code{system("tty")} reset the terminal@*
+@code{system("version")} return the version number of  @sc{Singular}
+(type int)@*
+@code{system("random"},int_expression @code{)} reset the random generator to the given value@*
+@c @code{system("writemat"},file_name,matrix_expression@code{)} append a matrix
+@c in the Macaulay format to the file.@*
+@code{system("gen")} return the generating element of the multiplicative
+group of Z/p\@{0@} (as int) where p is the characteristic of the basering@*
+@code{system("HC")} return the order of the highest corner of the last @code{std}
+computation or 0.
+@item @strong{Example for UNIX:}
+@example
+  // a listing of the current directory:
+  system("sh","ls");
+  // execute a shell, return to Singular with exit
+  system("sh","sh");
+  string unique_name="/tmp/xx"+string(system("pid"));
+  unique_name;
+  @expansion{} /tmp/xx4711
+  system("getenv","PATH");
+  @expansion{} /bin:/usr/bin:/usr/local/bin
+@end example
+@item @strong{Example for MSDOS:}
+@example
+  // a listing of the current directory:
+  system("sh","dir");
+  // execute a shell, return to Singular with exit:
+  system("sh","command");
+  string unique_name="/tmp/xx"+string(system("pid"));
+  unique_name;
+  @expansion{} /tmp/xx0
+@end example
+@end table
+@c @menu
+@c @end menu
+@iftex
+@c See @ref{}; @ref{}; @ref{}; @ref{}; @ref{}.
+@end iftex
 @c -------------------------------------------------
-@node syz, transpose, subst, Functions
+@node syz, trace, system, Functions
 @subsection syz
 @cindex syz
 @table @code
@@ -3681,35 +4632,7 @@ of the ideal/module
 See @ref{ideal expressions}; @ref{module expressions}.
 @end iftex
 @c ---------------------------------------
-@node transpose, trace, syz, Functions
-@subsection transpose
-@cindex transpose
-@table @code
-@item @strong{Syntax:}
-@code{transpose (} matrix_expression @code{)}
-@*@code{transpose (} intmat_expression @code{)}
-@item @strong{Type:}
-type of the argument
-@item @strong{Purpose:}
-transpose a matrix
-@item @strong{Example:}
-@example
-@c example
-  ring R=0,x,dp;
-  matrix m[2][3]=1,2,3,4,5,6;
-  print(m);
-  print(transpose(m));
-@c example
-@end example
-@end table
-@menu
-* matrix expressions::
-@end menu
-@iftex
-See @ref{matrix expressions}.
-@end iftex
-@c ---------------------------------------
-@node trace, typeof, transpose, Functions
+@node trace, transpose, syz, Functions
 @subsection trace
 @cindex trace
 @table @code
@@ -3741,7 +4664,62 @@ See @ref{matrix expressions};
 @ref{intmat expressions}.
 @end iftex
 @c ---------------------------------------
-@node typeof, var, trace, Functions
+@node transpose, type, trace, Functions
+@subsection transpose
+@cindex transpose
+@table @code
+@item @strong{Syntax:}
+@code{transpose (} matrix_expression @code{)}
+@*@code{transpose (} intmat_expression @code{)}
+@item @strong{Type:}
+type of the argument
+@item @strong{Purpose:}
+transpose a matrix
+@item @strong{Example:}
+@example
+@c example
+  ring R=0,x,dp;
+  matrix m[2][3]=1,2,3,4,5,6;
+  print(m);
+  print(transpose(m));
+@c example
+@end example
+@end table
+@menu
+* matrix expressions::
+@end menu
+@iftex
+See @ref{matrix expressions}.
+@end iftex
+@c ---------------------------------------
+@node type, typeof, transpose, Functions
+@subsection type
+@cindex type
+@table @code
+@item @strong{Syntax:}
+@code{type} name@code{;}
+@*expression;
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+list the [name, level, type and] value of a variable
+@item @strong{Example:}
+@example
+@c example
+  int i=3;
+  i;
+  type i;
+@c example
+@end example
+@end table
+@menu
+* Expressions::
+@end menu
+@iftex
+See @ref{Expressions}.
+@end iftex
+@c ---------------------------------------
+@node typeof, var, type, Functions
 @subsection typeof
 @cindex typeof
 @table @code
@@ -3927,7 +4905,7 @@ compute the n-th exterior power of matrix for a given integer n
 See @ref{matrix}; @ref{minor}; @ref{int expressions}.
 @end iftex
 @c ---------------------------------------
-@node weight, , wedge, Functions
+@node weight, write, wedge, Functions
 @subsection weight
 @cindex weight
 @table @code
@@ -3966,19 +4944,82 @@ which the input is weighted homogeneous is found
 See @ref{ideal expressions}; @ref{intvec expressions}; @ref{qhweight}.
 @end iftex
 @c ---------------------------------------
-@node Control structures, Proc commands, Functions, Commands
+@node  write,  , weight, Functions
+@subsection write
+@cindex write
+@table @code
+@item @strong{Syntax:}
+@code{write (} link@code{,} expression_list @code{);}
+@*@code{write} ( link , key , value ) // DBM links, only
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+Write data to a link. 
+@*If the link is of type @code{Ascii}, all expressions are converted to
+strings  (and separated by a newline character) before they are
+written (as a consequence, only such values which can be converted to a
+string can be written to an  @code{Ascii} link). 
+@*For MP links,
+ring-dependent expressions are written together with a ring
+description. To prevent an evaluation of the expression before it is
+written, the @code{quote} command (possibly together with @code{eval})
+can be used. A @code{write} blocks (i.e. does not return), as long as a
+MPtcp link is nor ready for writing. 
+@*For DBM links, @code{write} inserts (key, value) into the
+data base.
+@item @strong{Example:}
+@example
+  //write the lines with the values of the variables f and i
+  //then the value of m+a into the file "outfile"
+  write(":w outfile",f,i,m+a);
+  string filename=":a outfile";
+  //now append the string "that was f,i,m+a" (without the quotes)
+  // at the end of the file "outfile"
+  write(filename,"that was f,i,m+a");
+  // saving and retrieving data:
+  ring r=32003,(x,y,z),dp;
+  ideal i=x+y,z3+22y;
+  write(":w save_i",i);// this writes x+y,z3+22y to the file save_i
+
+  ring r=32003,(x,y,z),dp;
+  string s=read("save_i");  //creates the string x+y,z3+22y
+  execute "ideal k="+s+";"; // this defines an ideal k which@*
+                            // is equal to i.
+@end example
+@end table
+@menu
+* read::
+* link::
+* Expressions::
+* expression list::
+* quote::
+* eval::
+* dump::
+@end menu
+@iftex
+See @ref{read}, @ref{link}, @ref{Expressions}; @ref{expression list};
+@ref{quote}; @ref{eval}; @ref{dump}.
+@end iftex
+
+
+@c ---------------------------------------
+@node Control structures, System variables, Functions, Functions and variables
 @section Control structures
 @cindex Control structures
 @ifinfo
 @*List of all supported control structures.
 @end ifinfo
 @menu
-* if::
-* else::
-* while::
-* break::
-* for::
-* continue::
+* break::                       
+* continue::                    
+* else::                        
+* export::                      
+* for::                         
+* if::                          
+* keepring::                    
+* quit::                        
+* return::                      
+* while::                       
 @end menu
 @c ---------------------------------------
 @node break, continue, Control structures, Control structures
@@ -4044,7 +5085,7 @@ Unlike the C-construct it @strong{does not execute the increment statement}
 See @ref{block}; @ref{block}.
 @end iftex
 @c ---------------------------------------
-@node else, for, continue, Control structures
+@node else, export, continue, Control structures
 @subsection else
 @table @code
 @item @strong{Syntax:}
@@ -4074,7 +5115,31 @@ conditional execution of a block, only valid after an `if`
 See @ref{if}; @ref{block}.
 @end iftex
 @c ---------------------------------------
-@node for, if, else, Control structures
+@node export, for, else, Control structures
+@subsection export
+@cindex export
+@table @code
+@item @strong{Syntax:}
+@code{export} name@code{;}
+@*@code{export} list_of_names @code{;}
+@item @strong{Purpose:}
+convert a local variable to a global one
+@item @strong{Example:}
+@example
+  proc p1
+  @{
+    int i,j;
+    intmat m;
+    export i,j,m;
+  @}
+  p1();listvar();
+  @expansion{} // m                    [0]  intmat 1 x 1
+  @expansion{} // j                    [0]  int 0
+  @expansion{} // i                    [0]  int 0
+@end example
+@end table
+@c ---------------------------------------
+@node for, if, export, Control structures
 @subsection for
 @cindex for
 @table @code
@@ -4111,7 +5176,7 @@ See @ref{block}; @ref{boolean expressions}; @ref{while}; @ref{if};
 @ref{break}; @ref{continue}.
 @end iftex
 @c ---------------------------------------
-@node if, while, for, Control structures
+@node if, keepring, for, Control structures
 @subsection if
 @cindex if
 @cindex else
@@ -4147,7 +5212,81 @@ conditional execution of a block
 See @ref{block}; @ref{boolean expressions}.
 @end iftex
 @c ---------------------------------------
-@node while, ,if ,Control structures
+@node keepring, quit, if, Control structures
+@subsection keepring
+@cindex keepring
+@table @code
+@item @strong{Syntax:}
+@code{keepring} name@code{;}
+@item @strong{Purpose:}
+change the base ring to another (already defined) ring
+in the next (upper) level; can only be used in procedures
+@item @strong{Example:}
+@example
+  proc P1
+  @{
+    ring r=0,x,dp;
+    keepring r;
+  @}
+  ring r1= 0,y,dp;
+  P1();
+  nameof(basering);
+  @expansion{} r
+@end example
+@end table
+@c ---------------------------------------
+@node quit, return, keepring, Control structures
+@subsection quit
+@cindex quit
+@table @code
+@item @strong{Syntax:}
+@code{quit;}
+@item @strong{Purpose:}
+quit @sc{Singular},
+works also from inside a proc or from an interrupt
+@item @strong{Example:}
+  quit;
+@end table
+@c ---------------------------------------
+@node return, while, quit, Control structures
+@subsection return
+@cindex return
+@table @code
+@item @strong{Syntax:}
+@code{return (} expression_list @code{);}
+@*@code{return ( );}
+@item @strong{Type:}
+any
+@item @strong{Purpose:}
+return the result(s) of a procedure
+@*should only be used in a procedure
+@item @strong{Example:}
+@example
+  proc p2
+  @{
+    int i,j;
+    for(i=1;i<=10;i++)
+    @{
+      j=j+i;
+    @}
+    return(j);
+  @}
+  // other examples:
+  return ( 0 );
+  return("NIL");
+  return(m);
+  return(i(1..5));
+@end example
+@end table
+@menu
+* Expressions::
+* proc::
+@end menu
+@iftex
+See @ref{Expressions}; @ref{proc}.
+@end iftex
+@c ---------------------------------------
+@node while,  , return, Control structures
 @subsection while
 @cindex while
 @table @code
@@ -4183,1126 +5322,63 @@ repetitive, conditional execution of block
 @iftex
 See @ref{block}; @ref{boolean expressions}; @ref{break}.
 @end iftex
-@c ----------------------------------------
-@node Proc commands, Other commands, Control structures, Commands
-@section Proc commands
-@cindex Proc commands
-@menu
-* exit::
-* export::
-* keepring::
-* return::
-@end menu
-@tex
-See @ref{proc commands}.
-@end tex
+
 
 @c ---------------------------------------
-@c @node exit, export, Proc commands, Proc commands
-@iftex
-@subsection exit
-@cindex exit
-@cindex quit
-@table @code
-@item @strong{Syntax:}
-@code{exit;}
-@*@code{quit;}
-@item @strong{Purpose:}
-quit @sc{Singular},
-works also from inside a proc or from an interrupt
-@c @item @strong{Example:}
-@c  quit;
-@end table
-@c @iftex
-@c See @ref{Expressions}.
-@c @end iftex
-@c ---------------------------------------
-@c @node export, keepring, exit, Proc commands
-@subsection export
-@cindex export
-@table @code
-@item @strong{Syntax:}
-@code{export} name@code{;}
-@*@code{export} list_of_names @code{;}
-@item @strong{Purpose:}
-convert a local variable to a global one
-@item @strong{Example:}
-@example
-  proc p1
-  @{
-    int i,j;
-    intmat m;
-    export i,j,m;
-  @}
-  p1();listvar();
-  @expansion{} // m                    [0]  intmat 1 x 1
-  @expansion{} // j                    [0]  int 0
-  @expansion{} // i                    [0]  int 0
-@end example
-@c  quit;
-@end table
-@c @iftex
-@c See @ref{Expressions}.
-@c @end iftex
-@c ---------------------------------------
-@c @node keepring, return, export, Proc commands
-@subsection keepring
-@cindex keepring
-@table @code
-@item @strong{Syntax:}
-@code{keepring} name@code{;}
-@item @strong{Purpose:}
-change the base ring to another (already defined) ring
-in the next (upper) level; can only be used in procedures
-@item @strong{Example:}
-@example
-  proc P1
-  @{
-    ring r=0,x,dp;
-    keepring r;
-  @}
-  ring r1= 0,y,dp;
-  P1();
-  nameof(basering);
-  @expansion{} r
-@end example
-@end table
-@c ---------------------------------------
-@c @node return, , keepring, Proc commands
-@subsection return
-@cindex return
-@table @code
-@item @strong{Syntax:}
-@code{return (} expression_list @code{);}
-@*@code{return ( );}
-@item @strong{Type:}
-any
-@item @strong{Purpose:}
-return the result(s) of a procedure
-@*should only be used in a procedure
-@item @strong{Example:}
-@example
-  proc p2
-  @{
-    int i,j;
-    for(i=1;i<=10;i++)
-    @{
-      j=j+i;
-    @}
-    return(j);
-  @}
-  // other examples:
-  return ( 0 );
-  return("NIL");
-  return(m);
-  return(i(1..5));
-@end example
-@end table
-@c @iftex
-See @ref{Expressions}; @ref{proc}.
-@c @end iftex
-@menu
-* Expressions::
-* proc::
-@end menu
-@end iftex
-
-@c ---------------------------------------
-@node Other commands, System variables, Proc commands, Commands
-@section Other commands
-@cindex Other commands
-@ifinfo
-@*List of other supported commands.
-@end ifinfo
-@menu
-* attrib::
-* close::
-* dbprint::
-* degree::
-* dump::
-* eval::
-* execute::
-* filecmd::
-* getdump::
-* help::
-* kill::
-* killattrib::
-* LIB::
-* listvar::
-* monitor::
-* open::
-* option::
-* pause::
-* print::
-* quote::
-* setring::
-* system::
-* type::
-* write::
-@end menu
-@c ---------------------------------------
-@node attrib, close, Other commands, Other commands
-@subsection attrib
-@cindex attrib
-@table @code
-@item @strong{Syntax:}
-@code{attrib (} name @code{)}
-@item @strong{Purpose:}
-display the attribute list of the @emph{name}
-@item @strong{Example:}
-@example
-@c example
-  ring r=0,(x,y,z),dp;
-  ideal I=std(maxideal(2));
-  attrib(I);
-@c example
-@end example
-@item @strong{Syntax:}
-@code{attrib (} name @code{,} string_expression @code{)}
-@item @strong{Type:}
-any
-@item @strong{Purpose:}
-return the value of the attribute @emph{string_expression} of the @emph{name}.
-If the attribut is not defined for this variable, return the empty string.
-@item @strong{Example:}
-@example
-@c example
-  ring r=0,(x,y,z),dp;
-  ideal I=std(maxideal(2));
-  attrib(I,"isSB");
-  // although maxideal(2) is a standard basis,
-  // Singular does not know it:
-  attrib(maxideal(2), "isSB");
-@c example
-@end example
-@item @strong{Syntax:}
-@code{attrib (} name@code{,} string_expression@code{,} expression @code{)}
-@item @strong{Purpose:}
-sets the attribute @emph{string_expression} of the @emph{name}
-to the value @emph{expression}
-@item @strong{Example:}
-@example
-@c example
-  ring r=0,(x,y,z),dp;
-  ideal I=std(maxideal(2));
-  vdim(I);
-  attrib(I,"isSB",0);  // the standard basis attribute is set to 0
-  vdim(I);
-@c example
-@end example
-@item @strong{Remark:}
-An attribute may be described by any string_expression, but some are reserved.
-Only the reserved attributes are used by the kernel of @sc{Singular}.
-@sp 1
-@item @strong{Reserved attributes:}
-(not all are used at the moment)
-@table @asis
-@item @code{isSB}
-standard basis - set by @code{std}, used by @code{lift}, @code{dim},
-@code{degree}, @code{mult}, @code{hilb}, @code{vdim}, @code{kbase}
-@item @code{isHomog}
-the weight vector for homogeneous or quasihomogeneous ideals/modules
-@item @code{isCI}
-complete intersection
-@item @code{isCM}
-Cohen-Macaulay  module
-@item @code{withSB}
-value of type ideal/module is std
-@item @code{withHilb}
-value of type intvec is hilb(_,1) (see @ref{hilb})
-@item @code{withRes}
-value of type list is a free resolution
-@item @code{withDim}
-value of type int is the dimension (see @ref{dim})
-@item @code{withMult}
-value of type int is the multiplicity (see @ref{mult})
-@c @item @code{D}
-@c object is an differential operator, if set to 1;
-@c @*object is in a module, if set to 0
-@c @*only valid in a dring (see @ref{dring}).
-@end table
-@end table
-@c @menu
-@c * Expressions::
-@c @end menu
-@c @iftex
-@c See @ref{Expressions}.
-@c @end iftex
-@c ---------------------------------------
-@node close, dbprint, attrib , Other commands
-@subsection close
-@cindex close
-@table @code
-@item @strong{Syntax:}
-@code{close (} link_expression @code{)}
-@item @strong{Purpose:}
-close a link
-@item @strong{Example:}
-@example
-  LIB "general.lib";
-  link l="MPtcp:launch";
-  open(l); // start Singular "server" on localhost in batchmode
-  close(l); // shut down Singular server
-@end example
-@end table
-@menu
-* link::
-* link::
-* open::
-@end menu
-@iftex
-See @ref{link}, @ref{link}; @ref{open}.
-@end iftex
-@c ---------------------------------------
-@node dbprint, degree, close, Other commands
-@subsection dbprint
-@cindex dbprint
-@table @code
-@item @strong{Syntax:}
-@code{dbprint (} int_expression@code{,} expression_list @code{)}
-@item @strong{Purpose:}
-debug print of a list of expressions.
-The print command is applied to each expression
-if int_expression is positive.
-@code{dbprint} may also be used in procedures
-in order to print results subject to certain
-conditions.
-@item @strong{Syntax:}
-@code{dbprint (} expression@code{)}
-@item @strong{Purpose:}
-debug print of an expressions.
-The print command is applied to the expression
-if @code{printlevel>voice}.
-@item @strong{Example:}
-@example
-@c example
-  int debug=0;
-  intvec i=1,2,3;
-  dbprint(debug,i);
-  debug=1;
-  dbprint(debug,i);
-@c example
-@end example
-@end table
-@menu
-* print::
-* voice::
-* printlevel::
-* Debugging tools::
-@end menu
-@iftex
-See @ref{print}; @ref{voice}; @ref{printlevel}; @ref{Debugging tools}.
-@end iftex
-@c ---------------------------------------
-@node degree, dump, dbprint, Other commands
-@subsection degree
-@cindex degree
-@table @code
-@item @strong{Syntax:}
-@code{degree (} ideal_expression @code{)}
-@*@code{degree (} module_expression @code{)}
-@item @strong{Purpose:}
-compute the (Krull) dimension, codimension and the multiplicity
-of the ideal/module generated by the leading monomials of the input and
-print it.   This is equal to the dimension, codimension and multiplicity
-of the ideal/module if the input is a standard basis with respect to a
-degree ordering.
-@item @strong{Example:}
-@example
-  ring r3=32003,(x,y,z),ds;
-  int a =11;
-  int b =10;
-  int c =3;
-  int t =1;
-  poly f =x^a+y^b+z^(3*c)+x^(c+2)*y^(c-1)+x^(c-1)*y^(c-1)*z3
-    +x^(c-2)*y^c*(y2+t*x)^2;
-  ideal i= jacob(f);
-  ideal i0=std(i);
-  degree(i0);
-  @expansion{} //codimension 3
-  @expansion{} //dimension 0
-  @expansion{} //multiplicity 314
-@end example
-@end table
-@menu
-* ideal::
-* std::
-* dim::
-* vdim::
-* mult::
-@end menu
-@iftex
-See @ref{ideal}; @ref{std}; @ref{dim}; @ref{vdim}; @ref{mult}.
-@end iftex
-@c ---------------------------------------
-@node dump, eval, degree, Other commands
-@subsection dump
-@cindex dump
-@table @code
-@item @strong{Syntax:}
-@code{dump (} link @code{);}
-@item @strong{Purpose:}
-Dumps (i.e. write in one "message" or "block") the state of the Singular
-session (i.e., all defined variables and their values) to the specified
-link (which must be either an Ascii or MP link).
-@item @strong{Example:}
-@example
-@c example
-  int i=3;
-  dump("");
-@c example
-@end example
-@item @strong{Restrictions:}
-For Ascii links, integer matricies contained in lists are  dumped as
-integer list elements (and not as integer matricies). Furthermore, links
-themselfes are not dumped.
-@end table
-@menu
-* link::
-* getdump::
-* write::
-@end menu
-@iftex
-See @ref{link}, @ref{getdump}, @ref{write}, .
-@end iftex
-@c ---------------------------------------
-@node eval, execute, dump, Other commands
-@subsection eval
-@cindex eval
-@table @code
-@item @strong{Syntax:}
-@code{eval (} expression @code{)}
-@item @strong{Purpose:}
-evaluate (quoted) expressions. Within a quoted expression, the
-quote can be "undone" by an @code{eval} (i.e., each eval "undoes" the
-effect of exactly one quoter). Used with @code{quote} and @code{write}.
-@item @strong{Example:}
-@example
-@c @c example
-  link l="MPfile:w example.mp";
-  ring r=0,(x,y,z),ds;
-  ideal i=maxideal(3);
-  ideal j=x7,x2,z;
-  // compute i+j before writing, but not std
-  // this writes 'std(ideal(x3,...,z))'
-  write (l, quote(std(eval(i+j))));
-  option(prot);
-  close(l);
-  // now read it in again and evaluate
-  // read(l) forces to compute 'std(ideal(x3,...,z))'
-  read(l);
-  close(l);
-@c @c example
-@end example
-@end table
-@menu
-* quote::
-* write::
-@end menu
-@iftex
-See @ref{quote}; @ref{write}.
-@end iftex
-@c ---------------------------------------
-@node execute, filecmd, eval, Other commands
-@subsection execute
-@cindex execute
-@table @code
-@item @strong{Syntax:}
-execute string_expression
-@item @strong{Purpose:}
-execute a string containing a sequence of @sc{Singular} commands.
-@*@strong{Note:} The string will be inserted into your input
-stream at the next line break, @emph{NOT} after the @code{;} !  Hence, execute
-should be the only command on a line.   execute should be avoided in
-procedures whenever possible since it may give rise to name conflicts.
-Moreover, such procedures cannot be precompiled (something
-@sc{Singular} will provide in the future).
-@item @strong{Example:}
-@example
-@c example
-  ring r=32003,(x,y,z),dp;
-  ideal i=x+y,z3+22y;
-  write(">save_i",i);
-  ring r0=0,(x,y,z),Dp;
-  string s="ideal k="+read("save_i")+";";
-  s;
-  execute s; // define the ideal k
-  k;
-@c example
-@end example
-@end table
-@c ---------------------------------------
-@node filecmd, getdump, execute, Other commands
-@subsection Input from files
-@cindex filecmd
-@cindex <
-@table @code
-@item @strong{Syntax:}
-@code{< "}@file{filename}@code{";}
-@item @strong{Purpose:}
-input will come from new file @file{filename}
-@item @strong{Example:}
-@example
-  < "lib"; //read in the file lib
-@end example
-@end table
-@c ---------------------------------------
-@node getdump, help, filecmd, Other commands
-@subsection getdump
-@cindex getdump
-@table @code
-@item @strong{Syntax:}
-@code{getdump (} link @code{);}
-@item @strong{Purpose:}
-reads the contents of the entire file/link and restores all variables
-from it. For Ascii links, @code{getdump} is equivalent to a
-@code{execute read (} link @code{);} command. For MP links,
-@code{getdump} should only be used on data which was previously
-@code{dump}'ed.
-@item @strong{Example:}
-@example
-@c example
-  int i=3;
-  dump(":w example.txt");
-  kill i;
-  getdump("example.txt");
-  i;
-@c example
-@end example
-@item @strong{Restrictions:}
-@code{getdump} is not supported fro DBM links, or for a link connecting
-to @code{stdin} (standard input).
-@end table
-@menu
-* link::
-* dump::
-* read::
-@end menu
-@iftex
-See @ref{link}, @ref{dump}, @ref{read}.
-@end iftex
-@c ---------------------------------------
-@node help, kill, getdump, Other commands
-@subsection help
-@cindex help
-@table @code
-@item @strong{Syntax:}
-@code{help;}
-@*@code{help} command_name @code{;}
-@item @strong{Purpose:}
-provide help information, using the texinfo facility
-@*to get help about help, press @code{?}
-@cindex ?
-@item @strong{Note:}
-@code{?} may be used instead of @code{help}.
-@item @strong{Example:}
-@example
-  help ring;
-  help;
-@end example
-@end table
-@c ---------------------------------------
-@node kill, killattrib, help, Other commands
-@subsection kill
-@cindex kill
-@table @code
-@item @strong{Syntax:}
-@code{kill} name@code{;}
-@*@code{kill} list_of_names @code{;}
-@item @strong{Purpose:}
-delete variables
-@item @strong{Example:}
-@example
-@c example
-  int i=3;
-  ring r= 0,x,dp;
-  poly p;
-  listvar();
-  kill i,r;
-  i;
-  listvar();
-@c example
-@end example
-@end table
-@c ---------------------------------------
-@node killattrib, LIB, kill, Other commands
-@subsection killattrib
-@cindex killattrib
-@table @code
-@item @strong{Syntax:}
-@code{killattrib (} name@code{,} string_expression @code{);}
-@item @strong{Purpose:}
-delete the attribute given as the second argument
-@item @strong{Example:}
-@example
-@c example
-  ring r= 32003,(x,y),lp;
-  ideal i=maxideal(1);
-  attrib(i,"isSB",1);
-  attrib(i);
-  killattrib(i,"isSB");
-  attrib(i);
-@c example
-@end example
-@end table
-@menu
-* attrib::
-@end menu
-@iftex
-See @ref{attrib}.
-@end iftex
-@c ---------------------------------------
-@node LIB, listvar, killattrib, Other commands
-@subsection LIB
-@cindex LIB
-@table @code
-@item @strong{Syntax:}
-@code{LIB} string_expression@code{;}
-@item @strong{Purpose:}
-read a library of procedures (proc) from a file. If the given
-filename does not start with @kbd{.} or @kbd{/}, the following directories ares
-searched for the file: the current directory,
-the directories given in the environment variable
-@code{SINGULARPATH}@footnote{@code{SPATH} on MS-DOS},
-@code{usr/local/share/Singular}
-Only a directory of the library is loaded, the body of the proc
-is read during the first call of this proc. This minimizes
-the memory consumption of unused procedures.
-@item @strong{Example:}
-@example
-  LIB "lib"; // the names of the procedures in the
-             // file lib are now known to @sc{Singular}
-@end example
-@end table
-@menu
-* LIB in a library::
-* string expressions::
-* proc::
-* procedures and Libraries::
-* SINGULAR libraries:: all standard libraries.
-@end menu
-@iftex
-See @ref{LIB in a library}; @ref{proc}; @ref{procedures and Libraries};
-@ref{string expressions}; @ref{SINGULAR libraries}.
-@end iftex
-@c ---------------------------------------
-@node listvar, monitor, LIB, Other commands
-@subsection listvar
-@cindex listvar
-@table @code
-@item @strong{Syntax:}
-@code{listvar();}
-@*@code{listvar(} type_name @code{);}
-@*@code{listvar(} ring_name @code{);}
-@*@code{listvar(} name @code{);}
-@*@code{listvar( all );}
-@item @strong{Purpose:}
-list all (user-)defined names:
-@*@code{listvar()}: all reachable names except procedures
-@*@code{listvar(}type_name@code{)}: all reachable names of the given type
-@*@code{listvar(}ring_name@code{)}: all names which belong to the given ring
-@*@code{listvar(} name @code{)}: the object with the given name
-@*@code{listvar(all)}: all names except procedures
-@*the actual base ring is marked with an @code{*}
-@item @strong{Example:}
-@example
-  proc t1 @{ @}
-  proc t2 @{ @}
-  ring s;
-  poly ss;
-  ring r;
-  poly f=x+y+z;
-  int i=7;
-  ideal I=f,x,y;
-@end example
-@example
-  listvar(all);
-  @expansion{} // i               int 7
-  @expansion{} // r               *ring
-  @expansion{} //     I               ideal, 3 generators
-  @expansion{} //     f               poly x+y+..., 3 monomials
-  @expansion{} // s               ring
-  @expansion{} //     ss              poly
-@end example
-@example
-  listvar();
-  @expansion{} // i               int 7
-  @expansion{} // r               *ring
-  @expansion{} //     I               ideal, 3 generators
-  @expansion{} //     f               poly x+y+..., 3 monomials
-  @expansion{} // s               ring
-@end example
-@example
-  listvar(r);
-  @expansion{} // I               ideal, 3 generators
-  @expansion{} // f               poly x+y+..., 3 monomials
-  listvar(ring);
-  @expansion{} // r               *ring
-  listvar(poly);
-  @expansion{} // f               poly x+y+..., 3 monomials
-  listvar(I);
-  @expansion{} // I               ideal, 3 generators
-  listvar(proc);
-  @expansion{} // t2              proc
-  @expansion{} // t1              proc
-  listvar(t1);
-  @expansion{} // t1              proc
-@end example
-@end table
-@c ---------------------------------------
-@node monitor, open, listvar, Other commands
-@subsection monitor
-@cindex monitor
-@table @code
-@item @strong{Syntax:}
-@code{monitor (} string_expression @code{)}
-@*@code{monitor (} string_expression@code{,} string_expression @code{)}
-@item @strong{Purpose:}
-start/stop recording all user input and/or program output into a file
-The second argument describe what to log: @code{"i"} means input,
-@code{"o"} means output, @code{"io"} for both.
-@*The default for the second argument is @code{"i"}.
-@*Each @code{monitor} command closes the old monitor file
-and opens the file given by the first string expression.
-@*@code{monitor ("")} turns off recording.
-@item @strong{Example:}
-@example
-@c example
-  monitor("doe.tmp");
-  ring r;
-  poly f=x+y+z;
-  int i=7;
-  ideal I=f,x,y;
-  monitor("");
-@c example
-@end example
-@end table
-@c ---------------------------------------
-@node open, option, monitor, Other commands
-@subsection open
-@cindex open
-@table @code
-@item @strong{Syntax:}
-open ( link_expression )
-@item @strong{Purpose:}
-open a link
-@item @strong{Example:}
-@example
-  LIB "general.lib";
-  link l="MPtcp:launch";
-  open(l); // start Singular "server" on localhost in batchmode
-  close(l); // shut down Singular server
-@end example
-@end table
-@menu
-* link::
-* link::
-* close::
-@end menu
-@iftex
-See @ref{link}, @ref{link}; @ref{close}.
-@end iftex
-@c ---------------------------------------
-@node option, pause, open, Other commands
-@subsection option
-@cindex option
-@table @code
-@item @strong{Syntax:}
-@code{option ();}
-@item @strong{Purpose:}
-list all defined options
-@item @strong{Syntax:}
-@code{option (} option_name @code{);}
-@item @strong{Purpose:}
-set an option
-@*To disable an option, use the prefix @code{no}.
-@item @strong{Syntax:}
-@code{option ( get );}
-@item @strong{Purpose:}
-dump the state of all options to an intvec
-@item @strong{Syntax:}
-@code{option ( set,} int_expression @code{);}
-@item @strong{Purpose:}
-restores the state of all options from an intvec (produced by @code{option(get)})
-@sp 1
-@item @strong{Values:}
-@table @asis
-@item @code{none}
-reset all options to the default
-@item @code{returnSB}
-the functions @code{syz},@code{intersect},@code{quotient},@code{modulo} return a standard base instead
-of a generating set.  This option should not be used for @code{lift}.
-@item @code{fastHC}
-try to find HC (highest corner of the staircase) as fast as possible
-during a standard basis computation (only used for local orderings)
-@item @code{interrupt}
-allow fast interruption of standard basis computation
-@item @code{intStrategy}
-avoid divisions (of coefficients) during standard basis computations
-@item @code{minRes}
-special (additional) minimizing during computations (res,mres),
-@*assumes homogeneous case and degree-compatible ordering
-@item @code{morePairs}
-create addditional (useless) pairs to speed up computation in some cases
-@item @code{notRegularity}
-disable the regularity bound for res/mres (see @ref{regularity})
-@item @code{notSugar}
-disable the sugar strategy
-@item @code{prot}
-protocol showing progress during standard basis computation
-@item @code{redSB}
-compute reduced standard basis
-@item @code{redTail}
-reduction of the tails of polynomials during standard basis computations
-@item @code{sugarCrit}
-use criteria similar to the homogeneous case to keep more useless pairs
-@item @code{weightM}
-automatically compute suitable weights for the weighted ecart and the
-weighted sugar method
-@item The following options have to be set without the option command:
-@item @code{multBound}
-a multiplicity bound is set (see @ref{multBound})
-@item @code{degBound}
-a degree bound is set (see @ref{degBound})
-@item @code{Imap}
-show the mapping of variables with the imap command
-@item @code{loadLib}
-show loading of libraries (default)
-@item @code{debugLib}
-warn about syntax errors during loading of libraries
-@item @code{loadProc}
-show loading of procedures from libraries
-@item @code{mem}
-show memory usage in square brackets
-@item @code{prompt}
-show prompt (@code{>} resp. @code{.}) if ready for input (default)
-@item @code{reading}
-show the number of characters read from a file
-@item @code{redefine}
-warn about variable redefinitions (default)
-@item @code{usage}
-show correct usage in error messages (default)
-@end table
-@item @strong{Example:}
-@example
-@c example
-  option(prot);
-  option();
-  option(notSugar);
-  option();
-  option(noprot);
-  option();
-  option(none);
-  option();
-  ring r=0,x,dp;
-  degBound=22;
-  option();
-  intvec i=option(get);i;
-  option(none);
-  option(set,i);
-  option();
-@c example
-@end example
-@end table
-@menu
-* degBound::
-* multBound::
-* std::
-@end menu
-@iftex
-See @ref{degBound}; @ref{multBound}; @ref{std}.
-@end iftex
-@c ---------------------------------------
-@node pause, print, option, Other commands
-@subsection pause
-@cindex pause
-@table @code
-@item @strong{Syntax:}
-@code{pause;}
-@item @strong{Purpose:}
-pause the execution of a procedure until the return key is pressed
-@item @strong{Example:}
-@example
-  // the procedure will continue if return is pressed:
-  "press the return key to continue"; pause;
-  @expansion{} press the return key to continue
-  @expansion{} pause>
-
-@end example
-@end table
-@c ---------------------------------------
-@node print, quote, pause, Other commands
-@subsection print
-@cindex print
-@table @code
-@item @strong{Syntax:}
-@code{print (} expression @code{);}
-@*@code{print (} expression@code{,} format_string @code{);}
-@item @strong{Purpose:}
-pretty print of expressions, especially useful for matrices, modules
-and vectors
-@*The second form uses a string to determine the format.
-@*At the moment only the "betti" format is used:
-@table @code
-@item "betti"
-displays the graded Betti numbers of
-@tex
-$R^n/M$, if $R$ denotes the basering and if $M$ is a homogeneous submodule of $R^n$:
-@end tex
-@ifinfo
-R^n/M, if R denotes the basering and if M is a homogeneous submodule of R^n:
-@end ifinfo
-@*The entry d at (i,j) is the minimal number of generators in degree i+j of
-the j-th syzygy module of
-@tex
-$R^n/M$ (the 0-th (resp.1-st) syzygy module of $R^n/M$ is $R^n$ (resp. $M$))
-@end tex
-@ifinfo
-R^n/M (the 0-th (resp.1-st) syzygy module of R^n/M is R^n (resp. M))
-@end ifinfo
-@end table
-@item @strong{Example:}
-@example
-@c example
-  ring r=0,(x,y,z),dp;
-  module m=[1,y],[0,x+z];
-  m;
-  print(m);  // the columns generate m
-  intmat M=betti(mres(m,0));
-  print(M,"betti");
-@c example
-@end example
-@end table
-@menu
-* dbprint::
-* short::
-* type::
-* betti::
-@end menu
-@iftex
-See @ref{dbprint}; @ref{short}; @ref{type}; @ref{betti}.
-@end iftex
-@c ---------------------------------------
-@node quote, setring, print, Other commands
-@subsection quote
-@cindex quote
-@table @code
-@item @strong{Syntax:}
-@code{quote (} expression @code{)}
-@item @strong{Purpose:}
-prevent expresions from evaluation. Within a quoted expression, the
-quote can be "undone" by an @code{eval} (i.e., each eval "undoes" the
-effect of exactly one quoter). Used with @code{write}.
-@item @strong{Example:}
-@example
-  link l="MPfile:w example.mp";
-  ring r=0,(x,y,z),ds;
-  ideal i=maxideal(3);
-  ideal j=x7,x2,z;
-  // compute i+j before writing, but not std
-  write (l, quote(std(eval(i+j))));
-  option(prot);
-  close(l);
-  // now read it in again and evaluate:
-  read(l);
-  close(l);
-@end example
-@end table
-@menu
-* write::
-* eval::
-@end menu
-@iftex
-See @ref{write}; @ref{eval}.
-@end iftex
-@c ---------------------------------------
-@node setring, system, quote, Other commands
-@subsection setring
-@cindex setring
-@table @code
-@item @strong{Syntax:}
-@code{setring} ring_name@code{;}
-@item @strong{Purpose:}
-change the base ring to another (already defined) ring
-@item @strong{Example:}
-@example
-@c @c example
-  ring r1=0,(x,y),lp;
-  // the base ring is r1
-  ring r2=32003,(a(1..8)),ds;
-  // the base ring is r2
-  setring r1;
-  // the base ring is again r1
-@c @c example
-@end example
-@item @strong{Use in proc:}
-All changes of the base ring by a definition
-of a new ring or a setring command in a proc are local to this proc.
-@end table
-@menu
-* ring::
-* keepring::
-@end menu
-@iftex
-See @ref{ring}; @ref{keepring}.
-@end iftex
-@c ---------------------------------------
-@node  system, type, setring, Other commands
-@subsection system
-@cindex system
-@table @code
-@item @strong{Syntax:}
-@code{system (} expression_list @code{)}
-@sp 1
-the first expression must be of type string and selects the desired function.
-@*@code{system} may return a result
-@item @strong{Purpose:}
-interface to internal data and the operating system
-@*Not all functions will work on every platform.
-@item @strong{functions}
-@code{system("sh"},string_expression @code{)} is the shell escape,
-  returns the return code of the shell@*
-@code{system("pid")} return the process number (for creating unique names)@*
-@code{system("getenv",}string_expression@code{)}
-  return shell environment variable given as the second argument@*
-@code{system("tty")} reset the terminal@*
-@code{system("version")} return the version number of  @sc{Singular}
-(type int)@*
-@code{system("random"},int_expression @code{)} reset the random generator to the given value@*
-@c @code{system("writemat"},file_name,matrix_expression@code{)} append a matrix
-@c in the Macaulay format to the file.@*
-@code{system("gen")} return the generating element of the multiplicative
-group of Z/p\@{0@} (as int) where p is the characteristic of the basering@*
-@code{system("HC")} return the order of the highest corner of the last @code{std}
-computation or 0.
-@item @strong{Example for UNIX:}
-@example
-  // a listing of the current directory:
-  system("sh","ls");
-  // execute a shell, return to Singular with exit
-  system("sh","sh");
-  string unique_name="/tmp/xx"+string(system("pid"));
-  unique_name;
-  @expansion{} /tmp/xx4711
-  system("getenv","PATH");
-  @expansion{} /bin:/usr/bin:/usr/local/bin
-@end example
-@item @strong{Example for MSDOS:}
-@example
-  // a listing of the current directory:
-  system("sh","dir");
-  // execute a shell, return to Singular with exit:
-  system("sh","command");
-  string unique_name="/tmp/xx"+string(system("pid"));
-  unique_name;
-  @expansion{} /tmp/xx0
-@end example
-@end table
-@c @menu
-@c @end menu
-@iftex
-@c See @ref{}; @ref{}; @ref{}; @ref{}; @ref{}.
-@end iftex
-@c ---------------------------------------
-@node type, write, system, Other commands
-@subsection type
-@cindex type
-@table @code
-@item @strong{Syntax:}
-@code{type} name@code{;}
-@*expression;
-@item @strong{Purpose:}
-list the [name, level, type and] value of a variable
-@item @strong{Example:}
-@example
-@c example
-  int i=3;
-  i;
-  type i;
-@c example
-@end example
-@end table
-@menu
-* Expressions::
-@end menu
-@iftex
-See @ref{Expressions}.
-@end iftex
-@c ---------------------------------------
-@node  write, ,type, Other commands
-@subsection write
-@cindex write
-@table @code
-@item @strong{Syntax:}
-@code{write (} link@code{,} expression_list @code{);}
-@*@code{write} ( link , key , value ) // DBM links, only
-@item @strong{Purpose:}
-Write data to a link.
-@*If the link is of type @code{Ascii}, all expressions are converted to
-strings  (and separated by a newline character) before they are
-written (as a consequence, only such values which can be converted to a
-string can be written to an  @code{Ascii} link).
-@*For MP links,
-ring-dependent expressions are written together with a ring
-description. To prevent an evaluation of the expression before it is
-written, the @code{quote} command (possibly together with @code{eval})
-can be used. A @code{write} blocks (i.e. does not return), as long as a
-MPtcp link is nor ready for writing.
-@*For DBM links, @code{write} inserts (key, value) into the
-data base.
-@item @strong{Example:}
-@example
-  //write the lines with the values of the variables f and i
-  //then the value of m+a into the file "outfile"
-  write(":w outfile",f,i,m+a);
-  string filename=":a outfile";
-  //now append the string "that was f,i,m+a" (without the quotes)
-  // at the end of the file "outfile"
-  write(filename,"that was f,i,m+a");
-  // saving and retrieving data:
-  ring r=32003,(x,y,z),dp;
-  ideal i=x+y,z3+22y;
-  write(":w save_i",i);// this writes x+y,z3+22y to the file save_i
-
-  ring r=32003,(x,y,z),dp;
-  string s=read("save_i");  //creates the string x+y,z3+22y
-  execute "ideal k="+s+";"; // this defines an ideal k which@*
-                            // is equal to i.
-@end example
-@end table
-@menu
-* read::
-* link::
-* Expressions::
-* expression list::
-* quote::
-* eval::
-* dump::
-@end menu
-@iftex
-See @ref{read}, @ref{link}, @ref{Expressions}; @ref{expression list};
-@ref{quote}; @ref{eval}; @ref{dump}.
-@end iftex
-@c ---------------------------------------
-@node System variables, , Other commands, Commands
+@node System variables,  , Control structures, Functions and variables
 @section System variables
 @cindex System variables
 @ifinfo
 @*List of all system variables.
 @end ifinfo
 @menu
-* degBound::
-* echo::
-* minpoly::
-* multBound::
-* noether::
-* printlevel::
-* short::
-* timer::
-* TRACE var::
-* voice::
+* degBound::                    
+* echo::                        
+* minpoly::                     
+* multBound::                   
+* noether::                     
+* printlevel::                  
+* short::                       
+* timer::                       
+* TRACE var::                   
+* voice::                       
 @end menu
-@c -----------------------------------------------------
+@c ---------------------------------------
+@c @node alternating, degBound, System variables, System variables
+@c @subsection alternating
+@c @cindex alternating
+@c @table @code
+@c @item @strong{Syntax:}
+@c @code{alternating =} int_expression@code{;}
+@c @*int_variable @code{= alternating;}
+@c @item @strong{Purpose:}
+@c describes the position of the first alternating variable in the current
+@c base ring, thus creating the tensor
+@c product of a polynomial ring with an exterior algebra.
+@c @*Remark: Setting @code{alternating=1;} defines the exterior algebra.
+@c @item @strong{Note:}
+@c These algebras are only available in those versions of
+@c @sc{Singular} which are compiled with the SRING option.
+@c The SRING version is
+@c significantly slower for usual (commutative) ring operations.
+@c @item @strong{Example:}
+@c @example
+@c   // define the exterior algebra in 3 variables x, y, z
+@c   ring r=0,(x,y,z),dp;
+@c   alternating=1;
+@c   y*x;
+@c   @expansion{} -1*xy
+@c @end example
+@c @end table
+@c @menu
+@c @strong{See:}
+@c * int expressions::
+@c * ring::
+@c @end menu
+@c @iftex
+@c See @ref{ring}; @ref{int expressions}.
+@c @end iftex
+@c @c -----------------------------------------------------
 @node degBound, echo, System variables, System variables
 @subsection degBound
 @cindex degBound
@@ -5585,7 +5661,7 @@ in this line is suspended until the user presses @code{<RETURN>}
 See @ref{int expressions}.
 @end iftex
 @c ---------------------------------------
-@node voice, ,TRACE var, System variables
+@node voice,  , TRACE var, System variables
 @subsection voice
 @cindex voice
 
