@@ -11,7 +11,7 @@ SHELL		= /bin/sh
 ##
 SINGULAR_VERSION	= @SINGULAR_VERSION@
 SINGULAR		= @SINGULAR@
-SINGUNAME		= @SINGUNAME@
+SINGUNAME		= @SINGUNAME@  
 
 ## 
 ## various paths
@@ -48,7 +48,7 @@ CFLAGS		= @CFLAGS@ ${PIPE}
 CXXFLAGS	= @CXXFLAGS@ ${PIPE} 
 CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@
 CPPFLAGS	= -I${srcdir} @CPPFLAGS@
-DEFS		= @DEFS@ -DNDEBUG
+DEFS		= -DNDEBUG -D@SING_UNAME@
 LDFLAGS		= @LDFLAGS@
 LD_DYN_FLAGS	= @LD_DYN_FLAGS@
 STATIC_LDFLAGS	= @STATIC_LDFLAGS@
@@ -184,7 +184,7 @@ iparith.inc mpsr_Tok.inc: gmalloc.o iparith.cc ipconv.cc tok.h mpsr_Tok.cc gramm
 
 
 mmtables.inc: mmtables.c mmprivate.h mod2.h
-	${CXX} ${CXXFLAGS}  ${CPPFLAGS} ${DEFS} \
+	${CXX} ${CXXFLAGS}  ${CPPFLAGS}\
 	       -DGENERATE_INDEX_TABLE -DHAVE_INDEX_TABLE mmtables.c -o mmtables
 	./mmtables > mmtables.inc
 	rm -f mmtables mmtables.exe
@@ -325,7 +325,7 @@ CCM		= gcc -MM
 CFLAGSG		= -g -Wall -Wno-unused ${PIPE} 
 CXXFLAGSG	= -g -Wall -Wno-unused ${PIPE} 
 CXXTEMPLFLAGSG	= -fno-implicit-templates
-DEFSG		= @DEFS@ 
+DEFSG		= -D@SING_UNAME@
 
 ##
 ## .og files for having -O and -g object versions available at the same time
@@ -391,13 +391,13 @@ CXXP		= gcc
 CFLAGSP		= -pg -O3 ${PIPE}  
 CXXFLAGSP	= -pg -O3 ${PIPE} 
 CXXTEMPLFLAGSP	= -fno-implicit-templates
-DEFSP		= @DEFS@ -DNDEBUG -DDO_PROFILE
+DEFSP		= -DNDEBUG -DDO_PROFILE -D@SING_UNAME@
 LDFLAGSP	= -static @LDFLAGS@
 
 CFLAGSB		= -g -O3 ${PIPE}  
 CXXFLAGSB	= -g -O3 ${PIPE} 
 CXXTEMPLFLAGSB	= -fno-implicit-templates
-DEFSB		= @DEFS@ -DNDEBUG 
+DEFSB		= -DNDEBUG -D@SING_UNAME@
 LDFLAGSB	= -static @LDFLAGS@
 # bprof object  file to link with
 BPROFOBJ	= /usr/local/lib/bmon.o
