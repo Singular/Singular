@@ -1,4 +1,5 @@
 		       Singular version <x.y.z>
+	    http://www.mathematik.uni-kl.de/~zca/Singular
 		     University of Kaiserslautern
      Department of Mathematics        Centre for Computer Algebra
 	  Authors: G.-M. Greuel, G. Pfister, H. Schoenemann
@@ -63,7 +64,7 @@ Here are the highlights:
  
  * Commands `groebner' and `res':
    Considerably faster Groebner (resp. standard) bases and resolution
-   computations due to better internal implementation techniques and due to
+   computations due to improved internal implementation techniques and due to
    heuristically chosen algorithms: 
     Groebner bases: Hilbert-driven and FGLM-based standard bases computations
     Resolutions   : Standard-bases, Schreyer's, and  La Scala methods
@@ -84,7 +85,7 @@ Here are the highlights:
    (info, html, ps).
 
  * Countless minor improvements (e.g., command-line arguments,
-   easier installation,  library handling, new commands and
+   easier installation,  library handling, various new commands and
    implemented algorithms).
 
 ACKNOWLEDGMENTS:

@@ -38,6 +38,22 @@ file. To install Singular, follow the instructions found in the
 INSTALL which you can find at ./Singular/INSTALL after unpacking the
 Singular executables.
 
+The directory `./Singular/doc/<x.y.z>/' contains the following files:
+
+  singular.dvi	dvi file of Singular manual
+  singular.ps   printable PostScript file of Singular manual
+  singular.hlp  Info file of Singular manual -- DO NOT DELETE OR MOVE
+  usercard.dvi  Quick reference card of Singular in dvi format
+  usercard.ps   Quick reference card of Singular in PostScript format
+
+and the directory `./Singular/html/<x.y.z>/' contains the complete
+Singular manual in html format, where the top-level file is
+`./Singular/html/<x.y.z>/index.html'.
+
+You may delete all these documentation files, EXCEPT the file
+`./Singular/doc/<x.y.z>/singular.hlp'  (otherwise, the on-line help
+will not work).
+
 
 More information about Singular: Comments, Questions, Bug Reports
 =================================================================

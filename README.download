@@ -13,7 +13,7 @@ Singular-1.2.0-share.tar.gz
         -- shared data of newest Singular distribution for Unix platforms
 Singular-1.2.0-<uname description>.tar.gz  
         -- newest Singular executables for Unix platforms
-Singular-1.2.0-ix86-Win.zip
+Singular-1-2-0-ix86-Win.zip
         -- complete Singular distribution for Windows 95/NT 
 Singular-1.2.0.ppc.sea.hqx.gz
         -- complete Singular distribution for Macintosh PowerPC
@@ -51,12 +51,26 @@ detailed information on how to install Singular.
 
 To download Singular for Windows 95/NT 
 ======================================
+If you have a Windows unzip utility program (like WinZip) installed
+on your system then simply double-click on the file
+`Singular-<x-y-z>-ix86-Win.zip' and extract the content of the archive 
+at a directory in which you usually install 3rd-party software.
 
+Otherwise, download the file `unzip.exe' from
+   ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils 
+start an MS-DOS terminal, move the Singular archive and unzip program to
+a place in which you usually install 3rd-party software and extract
+(unpack) the archive with the command:
+  unzip Singular-<x-y-z>-ix86-Win.zip
 
+After extraction, follwo the instructions in the `./Singular/INSTALL'
+file contained in the archive.
 
 To download Singular for the Macintosh:
 =======================================
-TBC
+Sorry, the Macintosh distribution is not yet ready. However, it will
+available at July 1, at the latest.
+
 
 More information about Singular: Comments, Questions, Bug Reports
 =================================================================
