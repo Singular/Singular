@@ -72,6 +72,8 @@
 #undef HAVE_GETCWD
 /* Define if you have the getwd function.  */
 #undef HAVE_GETWD
+/* Define if you have sbrk */
+#undef HAVE_SBRK
 /* Define sizeof(char) */
 #define SIZEOF_CHAR 1
 /* Define sizeof(short) */

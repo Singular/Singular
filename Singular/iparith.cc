@@ -2494,6 +2494,11 @@ static BOOLEAN jjMEMORY(leftv res, leftv v)
   case 1:
     res->data = (char *)mmMemReal();
     break;
+#ifdef HAVE_SBRK
+      case 2:
+        res->data = (char *)mmMemPhysical();
+        break;
+#endif        
   default:
 #ifdef MM_STAT
     mmStat((int)v->Data());

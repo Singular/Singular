@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmemory.h,v 1.7 1998-04-27 09:37:31 pohl Exp $ */
+/* $Id: mmemory.h,v 1.8 1998-04-28 08:39:40 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -45,6 +45,9 @@ void mmSpecializeBlock( size_t );
 
 int mmMemReal( void );
 int mmMemUsed( void );
+#ifdef HAVE_SBRK
+int mmMemPhysical( void );
+#endif  
 
 #define mstrdup mmStrdup
 /* char * mstrdup(char *s); */

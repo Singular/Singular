@@ -1,3 +1,10 @@
+1998-04-28  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+	* kstd2.cc (redHomog): Some more ouput for KDEBUG && TEST_OPT_DEBUG
+
+	* mminit.cc: introduced memory(2) which measures physical memory
+	consumption using the system call sbrk (this never lies!) 
+
 Mon Apr 27 18:07:21 MET DST 1998 hannes
 	* use ReAlloc for enlargeT, enlargeL  (kutil.cc)
 Mon Apr 27 16:45:41 MET DST 1998 hannes

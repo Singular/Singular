@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.17 1998-04-23 09:52:10 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.18 1998-04-28 08:39:40 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -193,6 +193,10 @@ static void redSyz (LObject* h,kStrategy strat)
 *  reduction procedure for the homogeneous case
 *  and the case of a degree-ordering
 */
+#ifdef KDEBUG
+static reductions = 0;
+#endif
+
 static void redHomog (LObject* h,kStrategy strat)
 {
   if (strat->tl<0)
@@ -221,9 +225,10 @@ static void redHomog (LObject* h,kStrategy strat)
         if (pDivisibleBy1(strat->S[j],(*h).p))
         {
 #ifdef KDEBUG
+          reductions++;
           if (TEST_OPT_DEBUG)
           {
-            PrintS("+\nwith ");
+            Print("+\n%d:with ", reductions);
             wrp(strat->S[j]);
           }
 #endif
@@ -266,9 +271,10 @@ static void redHomog (LObject* h,kStrategy strat)
         if (pDivisibleBy2(strat->S[j],(*h).p))
         {
 #ifdef KDEBUG
+          reductions++;
           if (TEST_OPT_DEBUG)
           {
-            PrintS("+\nwith ");
+            Print("+\n%d:with ",reductions);
             wrp(strat->S[j]);
           }
 #endif
@@ -287,6 +293,14 @@ static void redHomog (LObject* h,kStrategy strat)
 #endif
             return;
           }
+#ifdef KDEBUG
+          if (TEST_OPT_DEBUG) 
+          {
+            Print(" to %d:", pLength((*h).p));
+            wrp((*h).p);
+            PrintS("\n");
+          }
+#endif
           j = 0;
         }
         else
