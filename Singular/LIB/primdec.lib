@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.86 2001-01-09 13:22:57 pfister Exp $";
+version="$Id: primdec.lib,v 1.87 2001-01-09 13:28:11 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -4600,7 +4600,7 @@ example
    equidimMaxEHV(i);
 }
 
-static proc testPrimary(list pr, ideal k)
+proc testPrimary(list pr, ideal k)
 "USAGE:   testPrimary(pr,k); pr a list, result of primdecGTZ(k) or primdecSY(k)
 RETURN:  int, 1 if intersection of the primary ideals in pr is k, 0 if not
 EXAMPLE: example testPrimary; shows an example
