@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.23 1998-05-05 13:46:37 krueger Exp $ */
+/* $Id: iplib.cc,v 1.24 1998-05-09 14:34:29 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -139,12 +139,17 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
   fseek(fp, pi->data.s.proc_start, SEEK_SET);
   if(part==0)
   { // load help string
-    procbuflen = pi->data.s.body_start - pi->data.s.proc_start;
+    long head = pi->data.s.def_end - pi->data.s.proc_start;
+    procbuflen = pi->data.s.help_end - pi->data.s.help_start;
     //Print("Help=%ld-%ld=%d\n", pi->data.s.body_start,
     //    pi->data.s.proc_start, procbuflen);
-    s = (char *)AllocL(procbuflen);
-    myfread(s, procbuflen, 1, fp);
-    s[procbuflen] = '\0';
+    s = (char *)AllocL(procbuflen+head+2);
+    myfread(s, head, 1, fp);
+    s[head] = '\n';
+    fseek(fp, pi->data.s.help_start, SEEK_SET);
+    myfread(s+head+1, procbuflen, 1, fp);
+    s[procbuflen+head+1] = '\n';
+    s[procbuflen+head+2] = '\0';
     return(s);
   }
   if(part==1)
@@ -717,6 +722,7 @@ procinfo *iiInitSingularProcinfo(procinfov pi, char *libname, char *procname,
   pi->is_static = pstatic;
   pi->data.s.proc_start = pos;
   pi->data.s.help_start = 0L;
+  pi->data.s.help_end   = 0L;
   pi->data.s.body_start = 0L;
   pi->data.s.body_end   = 0L;
   pi->data.s.example_start = 0L;

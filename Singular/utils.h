@@ -20,6 +20,7 @@ public:
   long   proc_start;       // position where proc is starting
   long   def_end;          // position where proc header is ending
   long   help_start;       // position where help is starting
+  long   help_end;         // position where help is starting
   long   body_start;       // position where proc-body is starting
   long   body_end;         // position where proc-body is ending
   long   example_start;    // position where example is starting

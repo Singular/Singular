@@ -16,29 +16,33 @@ void main_init(int argc, char *argv[])
   char c, *file=NULL;
 
   while((c=getopt(argc, argv, "d:sf:"))>=0) {
-    
     switch(c)
       {
       case 'd':
 	lpverbose = 1;
-	sscanf(optarg, "%d", &lpverbose);
+	if(isdigit(argv[optind-1][0])) sscanf(optarg, "%d", &lpverbose);
+	else optind--;
 	break;
       case 'f': file = argv[optind-1];
-	//	printf("opening:%d %s\n", optind, file);
 	break;
       case 's':
 	check++;
 	break;
       case -1 : printf("no such option:%s\n", argv[optind]);
 	break;
-      default: printf("no such option.%x, %s\n", c&0xff, argv[optind]);
+      default: printf("no such option.%x, %c %s\n", c&0xff, c, argv[optind]);
       }
   }
-
-  if(file!=NULL)
+  if(file!=NULL) {
     yylpin = fopen( file, "rb" );
-  else
-    yylpin = stdin;
+    printf("Checking library '%s'\n", file);
+  } else {
+    while(argc>optind && yylpin==NULL) {
+      yylpin = fopen( argv[optind], "rb" );
+      if(yylpin!=NULL) printf("Checking library '%s'\n", argv[optind]);
+      else optind++;
+    }
+  }
 }
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
@@ -100,6 +104,7 @@ printpi(procinfov pi)
   if(pi->data.s.body_end==0) 
     pi->data.s.body_end = pi->data.s.proc_end;
 
+  if(lpverbose) printf("//     ");
   printf( "%c %-15s  %20s ", pi->is_static ? 'l' : 'g', pi->libname,
 	  pi->procname);
   printf("line %4d,%5ld-%-5ld  %4d,%5ld-%-5ld  %4d,%5ld-%-5ld\n",

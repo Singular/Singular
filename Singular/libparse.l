@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.20 1998-05-07 08:20:32 krueger Exp $ */
+/* $Id: libparse.l,v 1.21 1998-05-09 14:34:31 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -132,7 +132,10 @@ extern libstackv library_stack;
 #  define SET_DEF_END(mode, pi, p) \
      if ( mode == LOAD_LIB) pi->data.s.def_end = p;
 #  define SET_HELP_START(mode, pi, p) \
-     if ( mode == LOAD_LIB) pi->data.s.help_start = p; \
+     if ( mode == LOAD_LIB) pi->data.s.help_start = p;
+
+#  define SET_HELP_END(mode, pi, p) \
+     if ( mode == LOAD_LIB) pi->data.s.help_end = p;
 
 #  define SET_BODY_START(mode, pi, l, p) \
      if ( mode == LOAD_LIB) { \
@@ -288,8 +291,8 @@ static     { p_static=TRUE; }
                if(lpverbose) {
                   printf("// PROCEDURE '%s' status: %s, ", proc,
                       p_static ? "local" : "global");
-                  printf("starting at line %d,%d: (%d).\n", 
-                      yylplineno, current_pos(0), brace1);
+                  printf("starting at line %d,%d: definition end: %d (%d).\n", 
+                      yylplineno, current_pos(0), pi->data.s.def_end, brace1);
                }
 #endif
                p_static=FALSE;
@@ -490,10 +493,14 @@ LIB[ \t]+"\"" { quote++;
 
 <poldhelp>{escbrack} { }
 <poldhelp>"{" {
+                SET_HELP_END(mode, pi, current_pos(0));
                 brace1++; BEGIN(pbody);
-                if(lpverbose)
+                if(lpverbose) {
+                   printf("//     HELP from %d to %d\n", 
+                       pi->data.s.help_start, pi->data.s.help_end);
                    printf("//     BODY at line %d,%d (%d)\n", yylplineno,
                        current_pos(0), brace1);
+                }
 #if YYLPDEBUG > 1
                 printf("BEGIN(pbody){=%d, (=%d, [=%d\n", brace1, brace2, brace3);
 #endif
@@ -513,9 +520,12 @@ LIB[ \t]+"\"" { quote++;
 <phelp>{tos} {}
 <phelp>"{" {
              brace1++; BEGIN(pbody);
-             if(lpverbose)
+             if(lpverbose) {
+                printf("//     HELP from %d to %d\n", 
+                    pi->data.s.help_start, pi->data.s.help_end);
                 printf("//     BODY at line %d,%d (%d)\n", yylplineno,
                     current_pos(0), brace1);
+             }
 #if YYLPDEBUG > 1
              printf("BEGIN(pbody){=%d, (=%d, [=%d\n", brace1, brace2, brace3);
 #endif
@@ -595,6 +605,8 @@ LIB[ \t]+"\"" { quote++;
 <string>"\""             { quote--;
                            copy_string(mode);
                            last_cmd = LP_NONE;
+                           if(old_state==phelp)
+                              SET_HELP_END(mode, pi, current_pos(0));
                            BEGIN(old_state); /* printf("%s", yytext); */
                          }
 <string>(\\\\)|(\\\")    { }
@@ -758,6 +770,11 @@ main( int argc, char *argv[] )
 {
   lib_style_types lib_style;
   main_init(argc, argv);
+  if(yyin == NULL) {
+    printf("No library found to parse.\n");
+    exit(1);
+  }
+  
   if(lpverbose)printf("Verbose level=%d\n", lpverbose);
   if(check)printf("Reporting most possible annomalies.\n");
   if(lpverbose||check)printf("\n");
