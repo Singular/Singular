@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_ops.cc,v 1.8 1997-09-29 16:07:28 schmidt Exp $ */
+/* $Id: cf_ops.cc,v 1.9 2003-02-18 13:02:23 Singular Exp $ */
 
 //{{{ docu
 //
@@ -262,7 +262,7 @@ replacevar_between ( const CanonicalForm & f )
 CanonicalForm
 replacevar ( const CanonicalForm & f, const Variable & x1, const Variable & x2 )
 {
-    ASSERT( x2.level() > 0, "cannot replace with algebraic variable" );
+    //ASSERT( x2.level() > 0, "cannot replace with algebraic variable" );
     if ( f.inBaseDomain() || x1 == x2 || ( x1 > f.mvar() ) )
 	return f;
     else {
