@@ -135,6 +135,8 @@ TMPDIR		= ${TMP_DIR}/singdist
 
 LN_S		= @LN_S@
 MKINSTALLDIRS 	= ./mkinstalldirs
+BINDIST_NAME	= Singular-${S_VERSION}-${SINGUNAME}
+SHAREDIST_NAME  = Singular-${S_VERSION}-share
 
 
 install-dist: install-bindist install-sharedist
@@ -151,25 +153,31 @@ install-sharedist: ${SINGULAR}
 	  (cd $${DIR}; ${MAKE} install-sharedist install_prefix=${install_prefix}); \
 	done
 
-install-local-dist: install-dist
-	${MKINSTALLDIRS} ${localdir}/bin
-	${LN_S} ${install_prefix}/${SINGUNAME}/Singular ${localdir}/bin/Singular-${S_VERSION}
+dist: ${SHAREDIST_NAME}.tgz  ${BINDIST_NAME}.tgz 
 
-dist: sharedist bindist
-
-sharedist:
+sharedist ${SHAREDIST_NAME}.tgz:
 	if test -e ${TMPDIR}; then rm -rf ${TMPDIR}; fi
 	${MAKE} install-sharedist localdir=${TMPDIR}
-	cd ${TMPDIR}; tar czf Singular-${S_VERSION}-share.tgz Singular
-	mv ${TMPDIR}/Singular-${S_VERSION}-share.tgz .
+	cd ${TMPDIR}; tar czf ${SHAREDIST_NAME}.tgz Singular
+	mv ${TMPDIR}/${SHAREDIST_NAME}.tgz .
 	rm -rf ${TMPDIR}
 
-bindist: 
+bindist ${BINDIST_NAME}.tgz: 
 	if test -e ${TMPDIR}; then rm -fr ${TMPDIR}; fi
 	${MAKE} install-bindist localdir=${TMPDIR}
-	cd ${TMPDIR}; tar czf Singular-${S_VERSION}-${SINGUNAME}.tgz Singular
-	mv ${TMPDIR}/Singular-${S_VERSION}-${SINGUNAME}.tgz .
+	cd ${TMPDIR}; tar czf ${BINDIST_NAME}.tgz  Singular
+	mv ${TMPDIR}/Singular-${S_VERSION}-${SINGUNAME}.tgz . .
 	rm -rf ${TMPDIR}
+
+install-local-dist: ${SHAREDIST_NAME}.tgz ${BINDIST_NAME}.tgz
+	cp ${SHAREDIST_NAME}.tgz ${BINDIST_NAME}.tgz ${localdir}
+	cd ${localdir}; tar xzf ${SHAREDIST_NAME}.tgz; tar xzf ${BINDIST_NAME}.tgz
+	rm -rf ${localdir}/${SHAREDIST_NAME}.tgz ${localdir}/${BINDIST_NAME}.tgz
+	${MKINSTALLDIRS} ${localdir}/bin
+	${LN_S} ${localdir}/Singular/${S_VERSION}/${SINGUNAME}/Singular ${localdir}/bin/Singular-${S_VERSION}
+	${LN_S} ${localdir}/Singular/${S_VERSION}/${SINGUNAME}/ESingular ${localdir}/bin/ESingular-${S_VERSION}
+
+
 
 BINDIR_NAME	= Singular/${S_VERSION}/${SINGUNAME}
 LIBDIR_NAME 	= Singular/${S_VERSION}/LIB
@@ -179,8 +187,6 @@ HTMLDIR_NAME	= Singular/${S_VERSION}/html
 INFODIR_NAME	= Singular/${S_VERSION}/info
 EMACSDIR_NAME	= Singular/${S_VERSION}/emacs
 
-BINDIST_NAME	= Singular-${S_VERSION}-${SINGUNAME}
-SHAREDIST_NAME  = Singular-${S_VERSION}-share
 ZIP		= zip
 
 test_t:
