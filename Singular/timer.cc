@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: timer.cc,v 1.11 1998-10-15 14:13:22 Singular Exp $ */
+/* $Id: timer.cc,v 1.12 1999-03-04 09:14:50 Singular Exp $ */
 
 /*
 *  ABSTRACT - get the computing time
@@ -93,14 +93,14 @@ static struct tms t_rec;
 int initTimer()
 {
   times(&t_rec);
-  siStartTime = t_rec.tms_utime;
+  siStartTime = t_rec.tms_utime+t_rec.tms_stime;
   return (int)time(NULL);
 }
 
 void startTimer()
 {
   times(&t_rec);
-  startl = t_rec.tms_utime;
+  startl = t_rec.tms_utime+t_rec.tms_stime;
 }
 
 /*2
@@ -111,7 +111,7 @@ int getTimer()
   clock_t curr;
 
   times(&t_rec);
-  curr = t_rec.tms_utime - siStartTime;
+  curr = t_rec.tms_utime+t_rec.tms_stime - siStartTime;
 
   double f =  ((double)curr) * timer_resolution / (double)HZ;
   return (int)(f+0.5);
@@ -126,7 +126,7 @@ void writeTime(void* v)
   clock_t curr;
 
   times(&t_rec);
-  curr = t_rec.tms_utime - startl;
+  curr = t_rec.tms_utime+t_rec.tms_stime - startl;
 
   double f =  ((double)curr) / (double)HZ;
   if (f > mintime)
