@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.127 1999-07-23 13:07:06 obachman Exp $
+@comment $Id: reference.doc,v 1.128 1999-07-23 13:28:38 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -248,7 +248,7 @@ considerably speed up computations.
 @table @code
 @item isSB
 the standard basis property is set by all commands computing a standard
-basis like 
+basis like
 @code{groebner}, @code{std}, @code{stdhilb} etc.; used by @code{lift}, @code{dim},
 @code{degree}, @code{mult}, @code{hilb}, @code{vdim}, @code{kbase}
 @item isHomog
@@ -2181,7 +2181,7 @@ $\{g_1,...,g_{i-1},g_{i+1},...,g_s\}$
 @end tex
 @item
 in the case of a local or mixed ordering (localization of polynomial ring):
-@*if, for any 
+@*if, for any
 @ifinfo
 i<>j, L(gi) | L(gj)
 @end ifinfo
@@ -2361,7 +2361,7 @@ the same as the input type of the first argument
 @item @strong{Purpose:}
 @*with one argument:
 computes a vector space basis (consisting of monomials)
-of the quotient ring by the ideal, 
+of the quotient ring by the ideal,
 resp.@: of a free module by the module, in case this is finite dimensional
 and if the input is a standard basis with respect to the ring ordering.
 If the input is no standard basis, the leading terms of the input are
@@ -2725,7 +2725,7 @@ algorithms for modules which are, resp.@: are not, represented by a
 standard basis.
 @* Tha is, if  @code{m} the
 module (or ideal), @code{sm} is the submodule (or ideal), and @code{T}
-the transformation matrix returned by 
+the transformation matrix returned by
 lift then @code{matrix(sm)=matrix(m)*T}
 and @code{sm=module(matrix(m)*T)} (or @code{sm=ideal(matrix(m)*T)}).
 Gives a warning if @code{sm} is not a submodule.
@@ -2765,7 +2765,7 @@ matrix from the given ideal, resp.@: module, to the standard basis.
 @*That is, if @code{m} is the ideal or module, @code{sm} the standard
 basis returned by @code{liftstd}, and @code{T} the transformation matrix
 then @code{matrix(sm)=matrix(m)*T} and @code{sm=ideal(matrix(m)*T)},
-resp. @code{sm=module(matrix(m)*T)}. 
+resp. @code{sm=module(matrix(m)*T)}.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -3029,7 +3029,7 @@ See
 the same as the type of the argument
 @item @strong{Purpose:}
 returns a minimal set of generators of an ideal, resp.@: module, if the
-input is 
+input is
 either homogeneous or if the ordering is local.
 @item @strong{Example:}
 @smallexample
@@ -4382,7 +4382,7 @@ intmat
 @item @strong{Purpose:}
 returns a random intmat of size rows x cols with entries between
 -max_integer and +max_integer (inclusively).
-@item @strong{Note:} 
+@item @strong{Note:}
 The random generator can be set to a startvalue with
 the function @code{system} by a commandline option.
 @item @strong{Example:}
@@ -5858,7 +5858,7 @@ See @ref{if}; @ref{boolean expressions}; @ref{Control structures}.
 @*@code{export} list_of_names @code{;}
 @item @strong{Purpose:}
 converts a local variable of a procedure to a global one.
-@item @strong{Note:} 
+@item @strong{Note:}
 Objects defined in a ring are not automatically exported
 when exporting the ring (use @code{keepring} instead).
 @item @strong{Example:}
@@ -5879,18 +5879,19 @@ listvar();
 @expansion{} // m                    [0]  intmat 1 x 1
 @expansion{} // i                    [0]  int 0
 @end smallexample
+@end ifclear
 @end table
 
 @ifset namespaces
 @c ref
-See 
+See
 @ref{exportto}; @ref{keepring}.
 @c ref
 @end ifset
 @ifclear namespaces
 
 @c ref
-See 
+See
 @ref{keepring}.
 @c ref
 @end ifclear
@@ -5909,7 +5910,7 @@ converts a local variable of a procedure to a global one.
 package_name can be @code{Current}, @code{Up}, @code{Top} or any other
 identifier of type package.
 
-@item @strong{Note:} 
+@item @strong{Note:}
 Objects defined in a ring are not automatically exported
 when exporting the ring (use @code{keepring} instead).
 @item @strong{Example:}
