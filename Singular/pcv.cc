@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.13 1998-12-14 12:22:56 mschulze Exp $ */
+/* $Id: pcv.cc,v 1.14 1998-12-15 12:31:49 mschulze Exp $ */
 /*
 * ABSTRACT: conversion between polys and coeff vectors
 */
@@ -13,6 +13,7 @@
 #include "polys.h"
 #include "lists.h"
 #include "matpol.h"
+#include "febase.h"
 #include "pcv.h"
 
 static int pcvMaxDegree;
@@ -63,7 +64,7 @@ BOOLEAN pcvMinDeg(leftv res,leftv h)
     if(h->Typ()==POLY_CMD)
     {
       res->rtyp=INT_CMD;
-      res->data=pcvMinDeg((poly)h->Data());
+      res->data=(void*)pcvMinDeg((poly)h->Data());
       return FALSE;
     }
   }
@@ -78,7 +79,7 @@ BOOLEAN pcvMaxDeg(leftv res,leftv h)
     if(h->Typ()==POLY_CMD)
     {
       res->rtyp=INT_CMD;
-      res->data=pcvMaxDeg((poly)h->Data());
+      res->data=(void*)pcvMaxDeg((poly)h->Data());
       return FALSE;
     }
   }
@@ -91,9 +92,9 @@ void pcvInit(int d)
   if(d<0) d=0;
   pcvMaxDegree=d;
   pcvTableSize=pVariables*pcvMaxDegree*sizeof(unsigned);
-  pcvTable=Alloc0(pcvTableSize);
+  pcvTable=(unsigned*)Alloc0(pcvTableSize);
   pcvIndexSize=pVariables*sizeof(unsigned*);
-  pcvIndex=Alloc(pcvIndexSize);
+  pcvIndex=(unsigned**)Alloc(pcvIndexSize);
   for(int i=0;i<pVariables;i++)
     pcvIndex[i]=pcvTable+i*pcvMaxDegree;
   for(int i=0;i<pcvMaxDegree;i++)
@@ -310,7 +311,7 @@ BOOLEAN pcvDim(leftv res,leftv h)
       {
         int d1=(int)h->Data();
         res->rtyp=INT_CMD;
-        res->data=pcvDim(d0,d1);
+        res->data=(void*)pcvDim(d0,d1);
         return FALSE;
       }
     }
