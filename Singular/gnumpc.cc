@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.cc,v 1.1 1999-05-11 15:42:38 Singular Exp $ */
+/* $Id: gnumpc.cc,v 1.2 1999-06-23 08:26:04 wenk Exp $ */
 /*
 * ABSTRACT: computations with GMP complex floating-point numbers
 *
@@ -67,7 +67,7 @@ BOOLEAN ngcSetMap(int c, char ** par, int nop, number minpol)
 
 number   ngcPar(int i)
 {
-  complex* n= new complex( (long)0, (long)1 );
+  gmp_complex* n= new gmp_complex( (long)0, (long)1 );
   return (number)n;
 }
 
@@ -81,10 +81,10 @@ void ngcNew (number * r)
 */
 number ngcInit (int i)
 {
-  complex* n= NULL;
+  gmp_complex* n= NULL;
   if ( i != 0 )
   {
-    n= new complex( (long)i, (long)0 );
+    n= new gmp_complex( (long)i, (long)0 );
   }
   return (number)n;
 }
@@ -95,7 +95,7 @@ number ngcInit (int i)
 int ngcInt(number &i)
 {
   if ( i == NULL ) return 0;
-  return (int)((complex*)i)->real();
+  return (int)((gmp_complex*)i)->real();
 }
 
 /*2
@@ -108,7 +108,7 @@ void ngcDelete (number * a)
 #endif
 {
   if ( *a != NULL ) {
-    delete *(complex**)a;
+    delete *(gmp_complex**)a;
     *a=NULL;
   }
 }
@@ -118,10 +118,10 @@ void ngcDelete (number * a)
 */
 number ngcCopy(number a)
 {
-  complex* b= NULL;
+  gmp_complex* b= NULL;
   if ( a !=  NULL )
   {
-    b= new complex( *(complex*)a );
+    b= new gmp_complex( *(gmp_complex*)a );
   }
   return (number)b;
 }
@@ -142,14 +142,14 @@ number ngcNeg (number a)
 */
 number ngcInvers(number a)
 {
-  complex* r= NULL;
-  if ( (a==NULL) /*|| ((complex*)a)->isZero()*/ )
+  gmp_complex* r= NULL;
+  if ( (a==NULL) /*|| ((gmp_complex*)a)->isZero()*/ )
   {
     WerrorS("div. 1/0");
   }
   else
   {
-    r= new complex( (complex)1 / (*(complex*)a) );
+    r= new gmp_complex( (gmp_complex)1 / (*(gmp_complex*)a) );
   }
   return (number)r;
 }
@@ -159,22 +159,22 @@ number ngcInvers(number a)
 */
 number ngcAdd (number a, number b)
 {
-  complex* r= NULL;
+  gmp_complex* r= NULL;
   if ( a==NULL && b==NULL )
   {
     return NULL;
   }
   else if ( a == NULL )
   {
-    r= new complex( *(complex*)b );
+    r= new gmp_complex( *(gmp_complex*)b );
   }
   else if ( b == NULL )
   {
-    r= new complex( *(complex*)a );
+    r= new gmp_complex( *(gmp_complex*)a );
   }
   else
   {
-    r= new complex( (*(complex*)a) + (*(complex*)b) );
+    r= new gmp_complex( (*(gmp_complex*)a) + (*(gmp_complex*)b) );
   }
   return (number)r;
 }
@@ -184,23 +184,23 @@ number ngcAdd (number a, number b)
 */
 number ngcSub (number a, number b)
 {
-  complex* r= NULL;
+  gmp_complex* r= NULL;
   if ( a==NULL && b==NULL )
   {
     return NULL;
   }
   else if ( a == NULL )
   {
-    r= new complex( (*(complex*)b) );
-    r= (complex *)ngcNeg((number)r);
+    r= new gmp_complex( (*(gmp_complex*)b) );
+    r= (gmp_complex *)ngcNeg((number)r);
   }
   else if ( b == NULL )
   {
-    r= new complex( *(complex*)a );
+    r= new gmp_complex( *(gmp_complex*)a );
   }
   else
   {
-    r= new complex( (*(complex*)a) - (*(complex*)b) );
+    r= new gmp_complex( (*(gmp_complex*)a) - (*(gmp_complex*)b) );
   }
   return (number)r;
 }
@@ -210,14 +210,14 @@ number ngcSub (number a, number b)
 */
 number ngcMult (number a, number b)
 {
-  complex* r= NULL;
+  gmp_complex* r= NULL;
   if ( a==NULL || b==NULL )
   {
     return NULL;
   }
   else
   {
-    r= new complex( (*(complex*)a) * (*(complex*)b) );
+    r= new gmp_complex( (*(gmp_complex*)a) * (*(gmp_complex*)b) );
   }
   return (number)r;
 }
@@ -238,7 +238,7 @@ number ngcDiv (number a, number b)
     // 0/b = 0
     return NULL;
   }
-  complex* r= new complex( (*(complex*)a) / (*(complex*)b) );
+  gmp_complex* r= new gmp_complex( (*(gmp_complex*)a) / (*(gmp_complex*)b) );
   return (number)r;
 }
 
@@ -249,29 +249,29 @@ void ngcPower ( number x, int exp, number * u )
 {
   if ( exp == 0 )
   {
-    *(complex*)u= 1.0;
+    *(gmp_complex*)u= (gmp_complex)1.0;
     return;
   }
   if ( exp == 1 )
   {
     if ( x == NULL )
     {
-      *(complex*)u= 0.0;
+      *(gmp_complex*)u= (gmp_complex)0.0;
     }
     else
     {
-      *(complex*)u= *(complex*)x;
+      *(gmp_complex*)u= *(gmp_complex*)x;
     }
     return;
   }
   ngcPower(x,exp-1,u);
-  *(complex*)u*= *(complex*)x;
+  *(gmp_complex*)u*= *(gmp_complex*)x;
 }
 
 BOOLEAN ngcIsZero (number a)
 {
   if ( a == NULL ) return TRUE;
-  return ( ((complex*)a)->real().isZero() && ((complex*)a)->imag().isZero());
+  return ( ((gmp_complex*)a)->real().isZero() && ((gmp_complex*)a)->imag().isZero());
 }
 
 /*2
@@ -289,11 +289,11 @@ BOOLEAN ngcGreater (number a, number b)
 {
   if ( a==NULL )
   {
-    return (((complex*)b)->real().sign() < 0);
+    return (((gmp_complex*)b)->real().sign() < 0);
   }
   if ( b==NULL )
   {
-    return (((complex*)a)->real().sign() < 0);
+    return (((gmp_complex*)a)->real().sign() < 0);
   }
   return FALSE;
 }
@@ -311,7 +311,7 @@ BOOLEAN ngcEqual (number a, number b)
   {
     return FALSE;
   }
-  return ( (*(complex*)a) == (*(complex*)b) );
+  return ( (*(gmp_complex*)a) == (*(gmp_complex*)b) );
 }
 
 /*2
@@ -320,7 +320,7 @@ BOOLEAN ngcEqual (number a, number b)
 BOOLEAN ngcIsOne (number a)
 {
   if ( a == NULL ) return FALSE;
-  return (((complex*)a)->real().isOne() && ((complex*)a)->imag().isZero());
+  return (((gmp_complex*)a)->real().isOne() && ((gmp_complex*)a)->imag().isZero());
 }
 
 /*2
@@ -329,7 +329,7 @@ BOOLEAN ngcIsOne (number a)
 BOOLEAN ngcIsMOne (number a)
 {
   if ( a == NULL ) return FALSE;
-  return (((complex*)a)->real().isMOne() && ((complex*)a)->imag().isZero());
+  return (((gmp_complex*)a)->real().isMOne() && ((gmp_complex*)a)->imag().isZero());
 }
 
 /*2
@@ -342,14 +342,14 @@ char * ngcRead (char * s, number * a)
   {
     gmp_float *re=NULL;
     s=ngfRead(s,(number *)&re);
-    complex *aa=new complex(*re);
+    gmp_complex *aa=new gmp_complex(*re);
     *a=(number)aa;
     delete re;
   }
   else if (strncmp(s,currRing->parameter[0],strlen(currRing->parameter[0]))==0)
   {
     s+=strlen(currRing->parameter[0]);
-    complex *aa=new complex((long)0,(long)1);
+    gmp_complex *aa=new gmp_complex((long)0,(long)1);
     *a=(number)aa;
   }
   return s;
@@ -365,9 +365,10 @@ void ngcWrite (number &a)
   else
   {
     char *out;
-    out= complexToStr(*(complex*)a,gmp_output_digits);
+    out= complexToStr(*(gmp_complex*)a,gmp_output_digits);
     StringAppend(out);
-    Free((ADDRESS)out, (strlen(out)+1)* sizeof(char) );
+    //    Free((ADDRESS)out, (strlen(out)+1)* sizeof(char) );
+    FreeL( (ADDRESS)out );
   }
 }
 
