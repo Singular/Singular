@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.28 1998-07-21 15:56:42 Singular Exp $ */
+/* $Id: ring.cc,v 1.29 1998-07-22 07:51:00 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -181,15 +181,7 @@ void rSetHdl(idhdl h, BOOLEAN complete)
       }
     }
   }
-  #ifdef HAVE_TCL
-  else
-  {
-    if (tclmode)
-    {
-      PrintTCLS('R',"");
-    }
-  }
-  #endif
+
 }
 
 idhdl rDefault(char *s)
@@ -1632,6 +1624,7 @@ ring rCopy(ring r)
   ring res=(ring)Alloc(sizeof(ip_sring));
 
   memcpy4(res,r,sizeof(ip_sring));
+  res->ref=1;
   if (r->parameter!=NULL)
   {
     res->minpoly=nCopy(r->minpoly);
