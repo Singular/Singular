@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.33 1999-07-19 12:06:08 obachman Exp $ */
+/* $Id: libparse.l,v 1.34 1999-07-21 11:41:16 obachman Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -258,9 +258,15 @@ eqnl           ([ \t\n]*+=[ \t\n]*)
                  printf("$version = \"");
                  while (*c != '\0')
                  {
-                    if (*c  == '$' || *c  == '@' || *c == '\\') putchar('\\');
-                    putchar(*c);
-                    c++;
+                    if (*c  == '$' || *c  == '@') putchar('\\');
+                    if (*c != '\r') putchar(*c);
+                    if (*c  == '\\') 
+                    {
+                      c++;
+                      if (*c != '"') putchar('\\');
+                    }
+                    else
+                      c++;
                  }
                  printf("\";\n");
                }

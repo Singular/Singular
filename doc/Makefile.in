@@ -33,16 +33,25 @@ TEXI2DVI	= @TEXI2DVI@
 TEXINDEX	= @TEXINDEX@
 TEXI2HTML	= @TEXI2HTML@
 DVIPS		= dvips
-IMAGES_UU	:= $(wildcard images/*.uu)
 
 # d2t stuff
 SINGULAR	= @SINGULAR@
+SINGULAR_LIB_DIR= ../Singular/LIB
 LIBPARSE	= ${bindir}/libparse
 D2T_SUBDIR      = ./d2t_singular
 DOC2TEX		= ./doc2tex.pl -subdir ${D2T_SUBDIR} -Singular ${SINGULAR} \
 			-libparse ${LIBPARSE} -I ../Singular/LIB 
+
+# t2h stuff
 TMP_DIR		= @TMP_DIR@
-TEXI2HTML_OPTS  = @TEXI2HTML_OPTS@ -l2h_tmp ${TMP_DIR} 
+HTML_SUBDIR     = html
+TEXI2HTML_INIT  = t2h_singular.init
+TEXI2HTML_OPTS  = -init_file ${TEXI2HTML_INIT} @TEXI2HTML_OPTS@ \
+	          -short_extn -l2h_tmp ${TMP_DIR}  -subdir ${HTML_SUBDIR}
+HTML_MANUAL_PREFIX = sing
+HTML_TUTOR_PREFIX  = tut
+HTML_MANUAL_TOP    = index.htm
+HTML_TUTOR_TOP     = tutor.htm
 ##
 ## End configuration dependend stuff
 #################################################################
@@ -57,10 +66,10 @@ MANUAL_FILES	= ${TEX_FILES} ${DOC2TEX_FILES}
 TUTOR_FILES	= \
 		tutor.tex examples.tex start.tex copyright.tex
 
+IMAGES_UU	:= $(wildcard images/*.uu)
 IMAGES     := $(IMAGES_UU:images/%.uu=%)
 IMAGES_SRC := $(IMAGES:%=images/%)
-IMAGES_HTML := $(IMAGES:%=html/%)
-IMAGES_TUTOR :=  $(IMAGES:%=html_tutor/%)
+IMAGES_HTML := $(IMAGES:%=${HTML_SUBDIR}/%)
 
 # prepend bindir to path so that programs from there are taken first
 export PATH := "${bindir}:${PATH}"
@@ -100,23 +109,16 @@ usercard.ps: usercard.dvi
 	${DVIPS} $< -o $@
 
 # html stuff
-html: html/index.htm ${IMAGES_HTML}
-html/index.htm: t2h_singular.init t2h.init singular.tex singular.hlp ${TEXI2HTML}
-	${PERL5} ${TEXI2HTML} -init_file t2h_singular.init ${TEXI2HTML_OPTS} -subdir html singular.tex
+html: ${HTML_SUBDIR}/${HTML_MANUAL_TOP} ${IMAGES_HTML}
+${HTML_SUBDIR}/${HTML_MANUAL_TOP}: ${TEXI2HTML_INIT} ${TEXI2HTML} singular.tex
+	${PERL5} ${TEXI2HTML} ${TEXI2HTML_OPTS} -prefix ${HTML_MANUAL_PREFIX} \
+        -top_file ${HTML_MANUAL_TOP} singular.tex
 
 # html stuff
-html_tutor: ${TUTOR_FILES} ${IMAGES_TUTOR}
-	test -d html_tutor || mkdir html_tutor
-	cd html_tutor && ${PERL5} ${TEXI2HTML} ${TEXI2HTML_OPTS} ../tutor.tex
-	test -d html || mkdir html
-	test -d html/images || mkdir html/images
-	for img in ${IMAGES}; \
-	do \
-		echo uudecode images/$${img}.uu; \
-		uudecode images/$${img}.uu; \
-	done
-	test -e html_tutor/images || (cd html_tutor; ln -s ../html/images images)
-	touch html_tutor
+html_tutor: ${HTML_SUBDIR}/${HTML_TUTOR_TOP} ${IMAGES_HTML}
+${HTML_SUBDIR}/${HTML_TUTOR_TOP}: ${TEXI2HTML_INIT} ${TEXI2HTML} tutor.tex
+	${PERL5} ${TEXI2HTML} ${TEXI2HTML_OPTS} -prefix ${HTML_TUTOR_PREFIX} \
+        -top_file ${HTML_TUTOR_TOP} tutor.tex
 
 # how to create the texinfo files
 manual.tex:  ${MANUAL_FILES} doc2tex.pl ${SINGULAR} ${LIBPARSE} singular.doc
@@ -127,6 +129,9 @@ singular.tex: ${MANUAL_FILES} doc2tex.pl ${SINGULAR} ${LIBPARSE} singular.doc
 
 %.tex: %.doc doc2tex.pl ${SINGULAR} ${LIBPARSE}
 	${PERL5} ${DOC2TEX} $*
+
+singular.idx: singular.hlp ${D2T_SUBDIR}/idx.db ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx
+	doc2idx.pl singular.hlp ${D2T_SUBDIR}/idx.db ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx
 
 # targets which produce stand-alone documents
 COPYING: copyright.tex

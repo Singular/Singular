@@ -19,15 +19,6 @@ $T2H_EXPAND = "tex";
 # if set, creates one html file per node
 $T2H_SPLIT = 'node';
 
-# if set, puts html files into current directory, overwrites settings of
-# $T2H_SUBDIR
-$T2H_NO_SUBDIR = 0;
-
-# -short_extn
-# If this is set all HTML file will have extension ".htm" instead of
-# ".html". This is helpful when shipping the document to PC systems.
-$T2H_SHORTEXTN = 1;
-
 #if set cross-references are given without section numbers
 $T2H_SHORT_REF = 1;
 

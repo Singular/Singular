@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.41 1999-07-09 14:12:51 obachman Exp $
+@comment $Id: math.doc,v 1.42 1999-07-21 11:41:23 obachman Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -228,7 +228,7 @@ Let $0 \rightarrow\ \bigoplus_a K[\underline{x}]e_{a,n}\ \rightarrow\ \dots
   I\ \rightarrow\ 0$
 be a minimal resolution of $I$ considered with homogeneous maps of degree 0.
 Then, the {\bf regularity} of $I$ is the smallest number $s$ with the
-property \hbox{deg($e_{a,i}) \leq s+i$} for all $i$.
+property \hbox{deg($e_{a,i}$)$ \leq s+i$} for all $i$.
 @end tex
 @c ---------------------------------------------------------------------------
 @node Characteristic sets, References, Syzygies and resolutions, Mathematical background

@@ -147,15 +147,22 @@ pi_clear(procinfov pi)
 static void PrintOut(FILE *fd, int pos_start, int pos_end)
 {
   if (pos_start <= 0 || pos_end - pos_start <= 4) return;
-  char c;
+  char c = 0;
   
   fseek(fd, pos_start, SEEK_SET);
   while (pos_start++ <= pos_end) 
   {
-    c = fgetc(fd);
-    if (c == '@' || c == '$' || c == '\\') putchar('\\');
+    if (c == '\\')
+    {
+      c = fgetc(fd);
+      if (c != '"') putchar('\\');
+    }
+    else
+      c = fgetc(fd);
+    if (c == '@' || c == '$') putchar('\\');
     if (c != '\r') putchar(c);
   }
+  if (c == '\\') putchar('\\');
 }
 
 

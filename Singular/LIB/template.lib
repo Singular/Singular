@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////
 // version string automatically expanded by CVS
-version="$Id: template.lib,v 1.1 1999-07-19 10:32:47 obachman Exp $";
+version="$Id: template.lib,v 1.2 1999-07-21 11:41:18 obachman Exp $";
 // summary descriptionof the library
 info="
 LIBRARY:   template.lib  A TEMPLATE FOR A SINGULAR LIBRARY
@@ -52,7 +52,8 @@ more cumbersome to write.
 @end table
 @c use @c ref contstuct for references
 @c ref
-mdouble, msum, Typesetting of help strings
+@strong{See also:}
+@ref{mdouble}, @ref{msum}, @ref{Typesetting of help strings}
 @c ref
 "
 {

@@ -109,19 +109,19 @@ fi
 
 # expand bindir
 if test "x$bindir" = 'x${exec_prefix}/bin'; then
-  bindir="${exec_prefix}/"
+  bindir="${exec_prefix}"
   ac_configure_args="$ac_configure_args --bindir=${bindir}"
 fi
 
 # expand libdir
 if test "x$libdir" = 'x${exec_prefix}/lib'; then
-  libdir="${exec_prefix}/lib/"
+  libdir="${exec_prefix}/lib"
   ac_configure_args="$ac_configure_args --libdir=${libdir}"
 fi
 
 # expand includedir
 if test "x$includedir" = 'x${prefix}/include'; then
-  includedir="${exec_prefix}/include/"
+  includedir="${exec_prefix}/include"
   ac_configure_args="$ac_configure_args --includedir=${includedir}"
 fi
 

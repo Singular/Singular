@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.38 1999-07-15 17:06:12 obachman Exp $
+@comment $Id: start.doc,v 1.39 1999-07-21 11:41:24 obachman Exp $
 @comment this file contains the "Introduction" chapter.
 @c * wichmann: + added changes by GMG.
 
@@ -851,12 +851,7 @@ Using global and local orderings as above is a convenient way to check
 whether a variety has singularities outside the origin.
 
 The command @code{jacob} applied twice gives the Hessian of @code{f}, a
-@tex
-$3\times3$-matrix.
-@end tex
-@ifinfo
-3 x 3 - matrix.
-@end ifinfo
+3x3 - matrix.
 
 @smallexample
 matrix H = jacob(jacob(f));
