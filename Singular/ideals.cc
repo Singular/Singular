@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.113 2000-11-08 15:34:55 obachman Exp $ */
+/* $Id: ideals.cc,v 1.114 2000-11-14 16:04:52 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -599,19 +599,22 @@ long idRankFreeModule (ideal s, ring lmRing, ring tailRing)
   if (s!=NULL)
   {
     int  j=0;
-    int  l=IDELEMS(s);
-    poly *p=s->m;
-    int  k;
 
-    for (; l != 0; l--)
+    if (rRing_has_Comp(tailRing) && rRing_has_Comp(lmRing))
     {
-      if (*p!=NULL)
+      int  l=IDELEMS(s);
+      poly *p=s->m;
+      int  k;
+      for (; l != 0; l--)
       {
-        pp_Test(*p, lmRing, tailRing);
-        k = p_MaxComp(*p, lmRing, tailRing);
-        if (k>j) j = k;
+        if (*p!=NULL)
+        {
+          pp_Test(*p, lmRing, tailRing);
+          k = p_MaxComp(*p, lmRing, tailRing);
+          if (k>j) j = k;
+        }
+        p++;
       }
-      p++;
     }
     return j;
   }
@@ -3032,6 +3035,9 @@ ideal idModulo (ideal h2,ideal h1)
     rChangeCurrRing(orig_ring,TRUE);
     s_temp1 = idrMoveR_NoSort(s_temp1, syz_ring);
     rKill(syz_ring);
+    // Hmm ... here seems to be a memory leak
+    // However, simply deleting it causes memory trouble
+    // idDelete(&s_temp);
   }
   else
   {

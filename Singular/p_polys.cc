@@ -6,7 +6,7 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_polys.cc,v 1.8 2000-11-09 16:32:53 obachman Exp $
+ *  Version: $Id: p_polys.cc,v 1.9 2000-11-14 16:04:59 obachman Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -187,8 +187,7 @@ long pTotaldegree(poly p, ring r)
   return (long) p_ExpVectorQuerSum(p, r);
 }
 
-
-// pWTotalDegree for weighted orderings which cover all variables
+// pWTotalDegree for weighted orderings 
 // whose first block covers all variables
 long pWFirstTotalDegree(poly p, ring r)
 {
@@ -309,38 +308,6 @@ long pLDeg0(poly p,int *l, ring r)
 * and the degree of the monomial with maximal degree: the last one
 * but search in all components before syzcomp
 */
-#if 0
-long pLDeg0c(poly p,int *l, ring r)
-{
-  p_CheckPolyRing(p, r);
-  long o=pFDeg(p, r);
-  int ll=1;
-
-  if (! rIsSyzIndexRing(r))
-  {
-    while ((p=pNext(p))!=NULL)
-    {
-      o=pFDeg(p, r);
-      ll++;
-    }
-  }
-  else
-  {
-    int curr_limit = rGetCurrSyzLimit(r);
-    while ((p=pNext(p))!=NULL)
-    {
-      if (p_GetComp(p, r)<=curr_limit/*syzComp*/)
-      {
-        o=pFDeg(p, r);
-        ll++;
-      }
-      else break;
-    }
-  }
-  *l=ll;
-  return o;
-}
-#else
 long pLDeg0c(poly p,int *l, ring r)
 {
   p_CheckPolyRing(p, r);
@@ -372,7 +339,6 @@ long pLDeg0c(poly p,int *l, ring r)
   *l=ll;
   return o;
 }
-#endif
 
 /*2
 * compute the length of a polynomial (in l)
@@ -545,4 +511,24 @@ unsigned long p_GetMaxExpL(poly p, ring r, unsigned long l_max)
 }
 
 
+
     
+/***************************************************************
+ *
+ * Misc things
+ *
+ ***************************************************************/
+// returns TRUE, if all monoms have the same component
+BOOLEAN p_OneComp(poly p, ring r)
+{
+  if(p!=NULL)
+  {
+    long i = p_GetComp(p, r);
+    while (pNext(p)!=NULL)
+    {
+      pIter(p);
+      if(i != p_GetComp(p, r)) return FALSE;
+    }
+  }
+  return TRUE;
+}

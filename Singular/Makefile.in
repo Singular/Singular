@@ -488,7 +488,7 @@ installg: Singularg
 
 ESingularg: fegetopt.og feResource.cc mod2.h feOpt.cc version.h emacs.cc \
            feOptES.inc mmalloc.og
-	${CXXG} -DESINGULAR -g ${DEFSG} -o ESingularg emacs.cc fegetopt.og ${LDFLAGS} ${LIBS} mmalloc.og
+	${CXXG} ${CXXFLAGSG} ${CPPFLAGS} -DESINGULAR -g ${DEFSG} -o ESingularg emacs.cc fegetopt.og ${LDFLAGS} ${LIBS} -lomalloc mmalloc.og
 
 ##
 ## compiler and linker options for profile version

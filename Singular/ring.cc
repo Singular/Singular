@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.139 2000-11-09 16:32:54 obachman Exp $ */
+/* $Id: ring.cc,v 1.140 2000-11-14 16:05:01 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1888,7 +1888,7 @@ rOrderType_t rGetOrderType(ring r)
 BOOLEAN rHasSimpleOrder(ring r)
 {
   if (r->order[0] == ringorder_unspec) return TRUE;
-  int blocks = rBlocks(r);
+  int blocks = rBlocks(r) - 1;
   assume(blocks >= 1);
   if (blocks == 1) return TRUE;
   if (blocks > 2)  return FALSE;
@@ -1918,12 +1918,25 @@ BOOLEAN rOrder_is_DegOrdering(rRingOrder_t order)
       case ringorder_Dp:
       case ringorder_ds:
       case ringorder_Ds:
-#if 1
       case ringorder_Ws:
       case ringorder_Wp:
       case ringorder_ws:
       case ringorder_wp:
-#endif
+        return TRUE;
+
+      default:
+        return FALSE;
+  }
+}
+
+BOOLEAN rOrder_is_WeightedOrdering(rRingOrder_t order)
+{
+  switch(order)
+  {
+      case ringorder_Ws:
+      case ringorder_Wp:
+      case ringorder_ws:
+      case ringorder_wp:
         return TRUE;
 
       default:
@@ -1941,18 +1954,28 @@ BOOLEAN rOrd_is_Totaldegree_Ordering(ring r =currRing)
            rOrder_is_DegOrdering(( rRingOrder_t)r->order[1])));
 }
 
-BOOLEAN rIsPolyVar(int v)
+// return TRUE if p->exp[r->pOrdIndex] holds a weighted degree of p */
+BOOLEAN rOrd_is_WeightedDegree_Ordering(ring r =currRing)
+{
+  // Hmm.... what about Syz orderings?
+  return (r->N > 1 &&
+          rHasSimpleOrder(r) &&
+          (rOrder_is_WeightedOrdering((rRingOrder_t)r->order[0]) ||
+           rOrder_is_WeightedOrdering(( rRingOrder_t)r->order[1])));
+}
+
+BOOLEAN rIsPolyVar(int v, ring r)
 {
   int  i=0;
-  while(currRing->order[i]!=0)
+  while(r->order[i]!=0)
   {
-    if((currRing->block0[i]<=v)
-    && (currRing->block1[i]>=v))
+    if((r->block0[i]<=v)
+    && (r->block1[i]>=v))
     {
-      switch(currRing->order[i])
+      switch(r->order[i])
       {
         case ringorder_a:
-          return (currRing->wvhdl[i][v-currRing->block0[i]]>0);
+          return (r->wvhdl[i][v-r->block0[i]]>0);
         case ringorder_M:
           return 2; /*don't know*/
         case ringorder_lp:
@@ -2506,10 +2529,18 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
   res->bitmask=exp_limit;
   rComplete(res, 1);
 
-  // adjust res->pFDeg: if it was changed gloabbly, then
+  // adjust res->pFDeg: if it was changed globaly, then
   // it must also be changed for new ring
   if (pFDeg != r->pFDeg)
     res->pFDeg = pFDeg;
+  else if (r->pFDeg != res->pFDeg && 
+           rOrd_is_WeightedDegree_Ordering(r))
+    // still might need adjustment
+  {
+    res->firstwv = r->firstwv;
+    res->firstBlockEnds = r->firstBlockEnds;
+    res->pFDeg = pWFirstTotalDegree;
+  }
 
   // set syzcomp
   if (res->typ != NULL && res->typ[0].ord_typ == ro_syz)
@@ -2663,7 +2694,7 @@ static void rSetDegStuff(ring r)
     }
     if (order[0] == ringorder_wp || order[0] == ringorder_Wp ||
         order[0] == ringorder_ws || order[0] == ringorder_Ws)
-      r->pFDeg = pWTotaldegree;
+      r->pFDeg = pWFirstTotalDegree;
     r->firstBlockEnds=block1[0];
     r->firstwv = wvhdl[0];
   }
@@ -2688,7 +2719,7 @@ static void rSetDegStuff(ring r)
     r->firstwv = wvhdl[1];
     if (order[1] == ringorder_wp || order[1] == ringorder_Wp ||
         order[1] == ringorder_ws || order[1] == ringorder_Ws)
-      r->pFDeg = pWTotaldegree;
+      r->pFDeg = pWFirstTotalDegree;
   }
   /*------- more than one block ----------------------*/
   else

@@ -7,7 +7,7 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: p_polys.h,v 1.13 2000-11-08 15:34:59 obachman Exp $
+ *  Version: $Id: p_polys.h,v 1.14 2000-11-14 16:05:00 obachman Exp $
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -211,6 +211,8 @@ PINLINE2 unsigned long p_GetTotalDegree(const unsigned long l, const ring r);
 // return the total degree of the long var l containing number_of_exp exponents
 PINLINE2 unsigned long p_GetTotalDegree(const unsigned long l, const ring r, const int number_of_exps);
 
+// return TRUE if all monoms have the same component
+BOOLEAN   p_OneComp(poly p, ring r);
 /***************************************************************
  *
  * Copying/Deletion of polys: args may be NULL

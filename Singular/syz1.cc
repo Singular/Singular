@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.67 2000-10-30 13:40:28 obachman Exp $ */
+/* $Id: syz1.cc,v 1.68 2000-11-14 16:05:02 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -2209,6 +2209,7 @@ lists syConvRes(syStrategy syzstr,BOOLEAN toDel)
     }
   }
   lists li = liMakeResolv(trueres,syzstr->length,syzstr->list_length,typ0,w);
+  if (w != NULL) omFreeSize(w, (syzstr->length)*sizeof(intvec*));
   if (toDel) syKillComputation(syzstr);
   return li;
 }
@@ -2467,6 +2468,7 @@ void syKillEmptyEntres(resolvente res,int length)
           }
         }
       }
+      delete changes;
     }
   }
 }

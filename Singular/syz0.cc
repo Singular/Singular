@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.33 2000-10-23 12:02:21 obachman Exp $ */
+/* $Id: syz0.cc,v 1.34 2000-11-14 16:05:02 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -954,7 +954,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
   else
     syzIndex = 0;
   syReOrderResolventFB(res,*length,syzIndex+1);
-  if (/*ringOrderChanged:*/ origR!=syRing)
+  if (/*ringOrderChanged:*/ origR!=syRing && syRing != NULL)
   {
     rChangeCurrRing(origR, TRUE);
     // Thomas: Here I assume that all (!) polys of res live in tmpR
@@ -971,6 +971,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
     }
     j = 0;
     while (currRing->order[j]!=0) j++;
+    rKill(syRing);
   }
   else
   {

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.h,v 1.15 2000-10-30 13:40:18 obachman Exp $ */
+/* $Id: kstd1.h,v 1.16 2000-11-14 16:04:55 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -53,17 +53,17 @@ extern intvec * kModW;
 /* options:
 0 prot
 1 redSB
-2 Gebauer/Moeller
+2 Gebauer/Moeller: obachman 10/00: replaced by notBucket
 3 notSugar
 4 interrupt
 5 sugarCrit
 6 teach
-7 cancel unit
-8 morePairs
+7 cancel unit: obachman 11/00 tossed
+8 morepairs: obachman 11/00: tossed
 9 return SB (syz,quotient,intersect)
 10 fastHC
 11-19 sort in L/T
-20 redBest
+20 redBest: obachman 11/00 tossed
 21 keep local variable with keepring of a loacal ring
 22 staircaseBound: in NF create a HC x1^degBound+1
 23 multBound

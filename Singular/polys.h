@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.44 2000-10-30 13:40:25 obachman Exp $ */
+/* $Id: polys.h,v 1.45 2000-11-14 16:05:00 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing
@@ -296,7 +296,7 @@ poly      pDiffOp(poly a, poly b,BOOLEAN multiply);
 #define   pMinComp(p)   p_MinComp(p, currRing)
 int pMaxCompProc(poly p);
 
-BOOLEAN   pOneComp(poly p);
+#define   pOneComp(p)       p_OneComp(p, currRing) 
 #define   pSetCompP(a,i)    p_SetCompP(a, i, currRing)
 
 // let's inline those, so that we can call them from the debugger

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: intvec.cc,v 1.20 2000-10-26 07:19:17 pohl Exp $ */
+/* $Id: intvec.cc,v 1.21 2000-11-14 16:04:53 obachman Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -417,6 +417,7 @@ intvec * ivSolveKern(intvec *imat, int dimtr)
   else
     res = ivTranp(kern);
   delete kern;
+  delete perm;
   return res;
 }
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: emacs.cc,v 1.18 2000-09-14 15:06:33 obachman Exp $ */
+/* $Id: emacs.cc,v 1.19 2000-11-14 16:04:51 obachman Exp $ */
 /*
 * ABSTRACT: Esingular main file
 */
@@ -48,7 +48,7 @@ void error(const char *fmt, ...)
 {
   va_list ap;
   va_start(ap, fmt);
-  fprintf(stderr, fmt, ap);
+  vfprintf(stderr, fmt, ap);
 }
 #else
 void error(char* fmt, ...)
@@ -83,11 +83,6 @@ Version: " S_UNAME S_VERSION1 " (%lu) " __DATE__ __TIME__,
 
 }
 
-void assume_violation(char* file, int line)
-{
-  error( "Internal assume violation: file %s line %d\n", file, line);
-}
-   
 #include "feResource.cc"
 #include "feOpt.cc"
 
@@ -221,8 +216,8 @@ int main(int argc, char** argv)
   }
 #else  
   // make sure  emacs, singular, emacs_dir, emacs_load are set
-  if (emacs == NULL) emacs = feResource("emacs", 0);
   if (emacs == NULL) emacs = feResource("xemacs", 0);
+  if (emacs == NULL) emacs = feResource("emacs", 0);
   if (emacs == NULL)
   {
     error( "Error: Can't find emacs or xemacs executable. \n Expected it at %s or %s\n Specify alternative with --emacs option,\n or set ESINGULAR_EMACS environment variable.\n", 

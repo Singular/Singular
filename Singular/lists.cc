@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.cc,v 1.22 2000-08-14 12:56:34 obachman Exp $ */
+/* $Id: lists.cc,v 1.23 2000-11-14 16:04:58 obachman Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -329,7 +329,7 @@ resolvente liFindRes(lists L, int * len, int *typ0,intvec *** weights)
       break;
     }
     r[i]=(ideal)L->m[i].data;
-    tw=(intvec*)atGet((idhdl)&L->m[i],omStrDup("isHomog"));
+    tw=(intvec*)atGet((idhdl)&L->m[i],"isHomog");
     if (tw!=NULL)
     {
       w[i]=ivCopy(tw);

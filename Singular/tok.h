@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id: tok.h,v 1.44 2000-09-25 12:26:36 obachman Exp $ */
+/* $Id: tok.h,v 1.45 2000-11-14 16:05:03 obachman Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -185,11 +185,8 @@ enum {
 #define OPT_INTERRUPT      4
 #define OPT_SUGARCRIT      5
 #define OPT_DEBUG          6
-#define OPT_CANCELUNIT     7
-#define OPT_MOREPAIRS      8
 #define OPT_RETURN_SB      9
 #define OPT_FASTHC        10
-#define OPT_REDBEST       20
 #define OPT_KEEPVARS      21
 #define OPT_STAIRCASEBOUND 22
 #define OPT_MULTBOUND     23
@@ -207,11 +204,8 @@ enum {
 #define TEST_OPT_NOT_SUGAR         BTEST1(OPT_NOT_SUGAR)
 #define TEST_OPT_SUGARCRIT         BTEST1(OPT_SUGARCRIT)
 #define TEST_OPT_DEBUG             BTEST1(OPT_DEBUG)
-#define TEST_OPT_MOREPAIRS         BTEST1(OPT_MOREPAIRS)
 #define TEST_OPT_FASTHC            BTEST1(OPT_FASTHC)
-#define TEST_OPT_REDBEST           BTEST1(OPT_REDBEST)
 #define TEST_OPT_INTSTRATEGY       BTEST1(OPT_INTSTRATEGY)
-#define TEST_OPT_CANCELUNIT        BTEST1(OPT_CANCELUNIT)
 #define TEST_OPT_RETURN_SB         BTEST1(OPT_RETURN_SB)
 #define TEST_OPT_KEEPVARS          BTEST1(OPT_KEEPVARS)
 #define TEST_OPT_DEGBOUND          BTEST1(OPT_DEGBOUND)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.44 2000-10-19 15:00:16 obachman Exp $ */
+/* $Id: longalg.cc,v 1.45 2000-11-14 16:04:58 obachman Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1065,7 +1065,8 @@ static alg napGcd(alg a, alg b)
     g->e[0] = napExp(a, b);
     return g;
   }
-  x = (alg)omAlloc0(napMonomSize);
+  // Hmm ... this is a memory leak
+  // x = (alg)omAlloc0(napMonomSize);
   g=a;
   h=b;
   if (!naIsChar0) x = napInit(1);

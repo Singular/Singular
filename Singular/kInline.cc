@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.14 2000-11-08 15:34:56 obachman Exp $
+ *  Version: $Id: kInline.cc,v 1.15 2000-11-14 16:04:53 obachman Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -177,6 +177,26 @@ KINLINE void sTObject::Clear()
 {
   p = NULL;
   t_p = NULL;
+  ecart = 0;
+  length = 0;
+  pLength = 0;
+}
+
+KINLINE void sTObject::Copy()
+{
+  if (t_p != NULL)
+  {
+    t_p = p_Copy(t_p, tailRing);
+    if (p != NULL)
+    {
+      p = p_Head(p, currRing);
+      if (pNext(t_p) != NULL) pNext(p) = pNext(t_p);
+    }
+  }
+  else
+  {
+    p = p_Copy(p, currRing, tailRing);
+  }
 }
 
 KINLINE poly sTObject::GetLmCurrRing()
@@ -223,6 +243,11 @@ KINLINE void sTObject::GetLm(poly &p_r, ring &r_r) const
     p_r = p;
     r_r = currRing;
   }
+}
+
+KINLINE BOOLEAN sTObject::IsNull() const
+{
+  return (p == NULL && t_p == NULL);
 }
 
 KINLINE int sTObject::GetpLength()
@@ -320,10 +345,22 @@ sTObject::ShallowCopyDelete(ring new_tailRing, omBin new_tailBin,
   tailRing = new_tailRing;
 }
   
-KINLINE int sTObject::pFDeg()
+KINLINE long sTObject::pFDeg() const
 {
   if (p != NULL) return ::pFDeg(p, currRing);
   return tailRing->pFDeg(t_p, tailRing);
+}
+
+KINLINE long sTObject::pLDeg()
+{
+  return ::pLDeg(GetLmTailRing(), &length, tailRing);
+}
+
+KINLINE long sTObject::SetLengthEcartReturnLDeg()
+{
+  long d = this->pLDeg();
+  ecart = d - this->pFDeg();
+  return d;
 }
 
 extern void pCleardenom(poly p);
@@ -353,6 +390,12 @@ KINLINE void  sTObject::pNorm()
  *
  ***************************************************************/
 // Initialization
+KINLINE void sLObject::Clear()
+{
+  sTObject::Clear();
+  sev = 0;
+}
+
 KINLINE void sLObject::Init(ring r)
 {
   memset(this, 0, sizeof(sLObject));

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.44 2000-10-23 12:02:12 obachman Exp $ */
+/* $Id: ipid.cc,v 1.45 2000-11-14 16:04:53 obachman Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -284,12 +284,16 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
       IDSTRING(h) = (char *)omAlloc0(len);
     }
     // additional settings:--------------------------------------
+#if 0
+    // this leads to a memory leak
     if (t == QRING_CMD)
     {
-      IDRING(h)=rCopy(currRing);
+      // IDRING(h)=rCopy(currRing);
       /* QRING_CMD is ring dep => currRing !=NULL */
     }
-    else if (t == PROC_CMD)
+    else 
+#endif
+      if (t == PROC_CMD)
     {
       IDPROC(h)->language=LANG_NONE;
     }
@@ -490,8 +494,9 @@ void killhdl(idhdl h, idhdl * ih)
     idhdl savecurrRingHdl = currRingHdl;
     ring  savecurrRing = currRing;
     // any objects defined for this ring ?
-    if (((IDTYP(h)==RING_CMD) && (IDRING(h)->ref<=0))
-    &&  (IDRING(h)->idroot!=NULL))
+    // Hmm ... why onlyt for rings and not for qrings??
+    // if (((IDTYP(h)==RING_CMD) && (IDRING(h)->ref<=0))
+    if ((IDRING(h)->ref<=0)  &&  (IDRING(h)->idroot!=NULL))
     {
       idhdl * hd = &IDRING(h)->idroot;
       idhdl  hdh = IDNEXT(*hd);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.91 2000-09-18 09:18:55 obachman Exp $ */
+/* $Id: febase.cc,v 1.92 2000-11-14 16:04:51 obachman Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -216,6 +216,7 @@ char * StringAppend(char *fmt, ...)
     int l=s-feBuffer;
     feBuffer=(char *)omReallocSize((ADDRESS)feBuffer,feBufferLength,
                                                      more);
+    omMarkAsStaticAddr(feBuffer);
     feBufferLength=more;
     s=feBuffer+l;
 #ifndef BSD_SPRINTF

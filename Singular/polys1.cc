@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.52 2000-11-08 15:34:59 obachman Exp $ */
+/* $Id: polys1.cc,v 1.53 2000-11-14 16:05:00 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -490,22 +490,6 @@ void pSplit(poly p, poly *h)
 }
 
 
-/*2
-* returns TRUE, if all monoms have the same component
-*/
-BOOLEAN pOneComp(poly p)
-{
-  if(p!=NULL)
-  {
-    int i = pGetComp(p);
-    while (pNext(p)!=NULL)
-    {
-      pIter(p);
-      if(i != pGetComp(p)) return FALSE;
-    }
-  }
-  return TRUE;
-}
 
 int pMaxCompProc(poly p)
 {
@@ -758,8 +742,8 @@ void pCleardenom(poly ph)
           }
         }
       }
-      if (h!=NULL) nDelete(&h);
     }
+    if (h!=NULL) nDelete(&h);
     pContent(ph);
   }
 }

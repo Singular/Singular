@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.54 2000-10-23 12:02:20 obachman Exp $ */
+/* $Id: ring.h,v 1.55 2000-11-14 16:05:02 obachman Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -225,7 +225,8 @@ BOOLEAN rHasSimpleLexOrder(ring r);
 // return TRUE if p->exp[r->pOrdIndex] holds total degree of p */
 BOOLEAN rOrd_is_Totaldegree_Ordering(ring r =currRing);
 rOrderType_t    rGetOrderType(ring r);
-BOOLEAN rIsPolyVar(int i); /* returns TRUE if var(i) belongs to p-block */
+/* returns TRUE if var(i) belongs to p-block */
+BOOLEAN rIsPolyVar(int i, ring r = currRing); 
 
 #ifdef RDEBUG
 #define rTest(r)    rDBTest(r, __FILE__, __LINE__)

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.42 2000-11-08 15:34:59 obachman Exp $ */
+/* $Id: kutil.h,v 1.43 2000-11-14 16:04:57 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -59,6 +59,8 @@ public:
   KINLINE void Delete();
   // Sets polys to NULL
   KINLINE void Clear();
+  // makes a copy of the poly of T
+  KINLINE void Copy();
   
   // ring-dependent Lm access: these might result in allocation of monomials
   KINLINE poly GetLmCurrRing();
@@ -67,6 +69,7 @@ public:
   // this returns Lm and ring r (preferably from tailRing), but does not
   // allocate a new poly
   KINLINE void GetLm(poly &p, ring &r) const;
+  KINLINE BOOLEAN IsNull() const;
 
   KINLINE int GetpLength();
 
@@ -77,8 +80,10 @@ public:
   KINLINE void LmDeleteAndIter();
 
   // deg stuff
-  KINLINE int pFDeg();
-
+  KINLINE long pFDeg() const;
+  KINLINE long pLDeg();
+  KINLINE long SetLengthEcartReturnLDeg();
+  
   // arithmetic
   KINLINE void Mult_nn(number n);
   KINLINE void ShallowCopyDelete(ring new_tailRing, omBin new_tailBin,
@@ -110,6 +115,8 @@ public:
   KINLINE sLObject(ring tailRing = currRing);
   KINLINE sLObject(poly p, ring tailRing = currRing);
   KINLINE sLObject(poly p, ring c_r, ring tailRing);
+
+  KINLINE void Clear();
 
   // Iterations
   KINLINE void LmDeleteAndIter();
@@ -176,6 +183,8 @@ public:
   leftv kIdeal;
   intvec * kModW;
   intvec * kHomW;
+  // procedure for ShalloCopy from tailRing  to currRing
+  pShallowCopyDeleteProc p_shallow_copy_delete;
   BOOLEAN *pairtest;/*used for enterOnePair*/
   int cp,c3;
   int sl,mu;
@@ -284,6 +293,16 @@ BOOLEAN newHEdge(polyset S, int ak,kStrategy strat);
 // returns index of p in TSet, or -1 if not found
 int kFindInT(poly p, TSet T, int tlength);
 
+// return -1 if no divisor is found
+//        number of first divisor, otherwise
+int kFindDivisibleByInT(const TSet &T, const unsigned long* sevT, 
+                        const int tl, const LObject* L);
+// same with S
+int kFindDivisibleByInS(const polyset &S, const unsigned long* sev, 
+                        const int sl, LObject* L);
+
+
+
 /***************************************************************
  *
  * stuff to be inlined
@@ -351,21 +370,30 @@ void initBba(ideal F,kStrategy strat);
 // Changes: PR
 // Const:   PW
 // If coef != NULL, then *coef is a/gcd(a,b), where a = LC(PR), b = LC(PW)
-BOOLEAN ksReducePoly(LObject* PR,
-                     TObject* PW,
-                     poly spNoether = NULL,
-                     number *coef = NULL, 
-                     kStrategy strat = NULL);
+// If strat != NULL, tailRing is changed if reduction would violate exp bound 
+// of tailRing
+// Returns: 0 everything ok, no tailRing change
+//          1 tailRing has successfully changed (strat != NULL)
+//          2 no reduction performed, tailRing needs to be changed first
+//            (strat == NULL)
+//         -1 tailRing change could not be performed due to exceeding exp
+//            bound of currRing
+int ksReducePoly(LObject* PR,
+                 TObject* PW,
+                 poly spNoether = NULL,
+                 number *coef = NULL, 
+                 kStrategy strat = NULL);
 
 // Reduces PR at Current->next with PW
 // Assumes PR != NULL, Current contained in PR
 //         Current->next != NULL, LM(PW) devides LM(Current->next)
 // Changes: PR
 // Const:   PW
-BOOLEAN ksReducePolyTail(LObject* PR,
-                         TObject* PW,
-                         poly Current,
-                         poly spNoether = NULL);
+// Return: see ksReducePoly 
+int ksReducePolyTail(LObject* PR,
+                     TObject* PW,
+                     poly Current,
+                     poly spNoether = NULL);
 
 // Creates S-Poly of Pair
 // Const:   Pair->p1, Pair->p2

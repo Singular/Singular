@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.60 2000-11-06 14:47:34 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.61 2000-11-14 16:04:54 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -33,7 +33,6 @@ BITSET kOptions=Sy_bit(OPT_PROT)           /*  0 */
                 |Sy_bit(OPT_NOT_SUGAR)     /*  3 */
                 |Sy_bit(OPT_INTERRUPT)     /*  4 */
                 |Sy_bit(OPT_SUGARCRIT)     /*  5 */
-                |Sy_bit(OPT_MOREPAIRS)     /*  8 */
                 |Sy_bit(OPT_FASTHC)        /* 10 */
                 |Sy_bit(OPT_KEEPVARS)      /* 21 */
                 |Sy_bit(OPT_INTSTRATEGY)   /* 26 */
@@ -44,13 +43,13 @@ BITSET kOptions=Sy_bit(OPT_PROT)           /*  0 */
 /* the list of all options which may be used by option and test */
 BITSET validOpts=Sy_bit(0)
                 |Sy_bit(1)
-                |Sy_bit(2)
+                |Sy_bit(2) // obachman 10/00: replaced by notBucket
                 |Sy_bit(3)
                 |Sy_bit(4)
                 |Sy_bit(5)
                 |Sy_bit(6)
-                |Sy_bit(7)
-                |Sy_bit(8)
+//                |Sy_bit(7) obachman 11/00 tossed
+//                |Sy_bit(8) obachman 11/00 tossed
                 |Sy_bit(9)
                 |Sy_bit(10)
                 |Sy_bit(11)
@@ -62,7 +61,7 @@ BITSET validOpts=Sy_bit(0)
                 |Sy_bit(17)
                 |Sy_bit(18)
                 |Sy_bit(19)
-                |Sy_bit(20)
+//                |Sy_bit(20) obachman 11/00 tossed
                 |Sy_bit(21)
                 |Sy_bit(22)
                 /*|Sy_bit(23)*/
@@ -110,161 +109,54 @@ void deleteHCs (TObject* p,kStrategy strat)
 }
 
 
-void doRed (LObject* h,poly* with,BOOLEAN intoT,kStrategy strat)
+static int doRed (LObject* h, TObject* with,BOOLEAN intoT,kStrategy strat)
 {
   poly hp;
-#ifdef KDEBUG
-  pTest((*h).p);
-  //pTest(*with);
+  int ret;
+#if KDEBUG > 0
+  kTest_L(h);
+  KTest_T(with);
 #endif
+  // Hmmm ... why do we do this -- polys from T should already be normalized
   if (!TEST_OPT_INTSTRATEGY)
-    pNorm(*with);
+    with->pNorm();
+#ifdef KDEBUG
   if (TEST_OPT_DEBUG)
   {
-    PrintS("reduce ");wrp((*h).p); PrintS(" with ");wrp(*with);PrintLn();
+    PrintS("reduce ");h->wrp();PrintS(" with ");with->wrp();PrintLn();
   }
+#endif
   if (intoT)
   {
-    hp = ksOldSpolyRedNew(*with,(*h).p,strat->kNoether);
+    // need to do it exacly like this: otherwise 
+    // we might get errors
+    LObject L= *h;
+    L.Copy();
+    ret = ksReducePoly(&L, with, strat->kNoether, NULL, strat);
+    if (ret)
+    {
+      if (ret < 0) return ret;
+      if (h->tailRing != strat->tailRing)
+        h->ShallowCopyDelete(strat->tailRing, 
+                             pGetShallowCopyDeleteProc(h->tailRing,
+                                                       strat->tailRing));
+    }
+    h->CanonicalizeP();
     enterT(*h,strat);
-    (*h).p = hp;
+    *h = L;
   }
   else
-  {
-    (*h).p = ksOldSpolyRed(*with,(*h).p,strat->kNoether);
-  }
+    ret = ksReducePoly(h, with, strat->kNoether, NULL, strat);
+#ifdef KDEBUG
   if (TEST_OPT_DEBUG)
   {
-    PrintS("to ");wrp((*h).p);PrintLn();
+    PrintS("to ");h->wrp();PrintLn();
   }
+#endif
+  return ret;
 }
 
-/*2
-* reduces h with elements from T choosing first possible
-* element in T with respect to the given ecart
-* requires thar T is sorted by ecart
-*/
-int redEcart19 (LObject* h,kStrategy strat)
-{
-  int i,at,reddeg,d;
-  int j = 0;
-  int pass = 0;
-  unsigned long not_sev;
-  h->sev = pGetShortExpVector(h->p);
-  not_sev = ~ h->sev;
-
-  if (TEST_OPT_CANCELUNIT) cancelunit(h);
-  d = pFDeg((*h).p)+(*h).ecart;
-  reddeg = strat->LazyDegree+d;
-  loop
-  {
-    if (j > strat->tl)
-    {
-      return 1;
-    }
-    if (pLmShortDivisibleBy(strat->T[j].p, strat->sevT[j], (*h).p, not_sev))
-    {
-      //if (strat->interpt) test_int_std(strat->kIdeal);
-      /*- compute the s-polynomial -*/
-      if (strat->T[j].ecart > (*h).ecart)
-      {
-        /*
-        * It is not possible to reduce h with smaller ecart;
-        * if possible h goes to the lazy-set L,i.e
-        * if its position in L would be not the last one
-        */
-        strat->fromT = TRUE;
-        if (strat->Ll >= 0) /*- L is not empty -*/
-        {
-          at = strat->posInL(strat->L,strat->Ll,(*h),strat);
-          if (at <= strat->Ll)
-          {
-            /*- h will not become the next element to reduce -*/
-            enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
-            if (TEST_OPT_DEBUG) Print(" ecart too big; -> L%d\n",at);
-            (*h).p = NULL;
-            strat->fromT = FALSE;
-            return -1;
-          }
-        }
-        /*put the polynomial also in the pair set*/
-        if (TEST_OPT_MOREPAIRS)
-        {
-          if (!TEST_OPT_INTSTRATEGY)
-            pNorm((*h).p);
-          enterpairs((*h).p,strat->sl,(*h).ecart,0,strat);
-        }
-      }
-      doRed(h,&strat->T[j].p,strat->fromT,strat);
-      strat->fromT=FALSE;
-      if ((*h).p == NULL)
-      {
-        if (h->lcm!=NULL) pLmFree((*h).lcm);
-        return 0;
-      }
-      h->sev = pGetShortExpVector(h->p);
-      not_sev = ~ h->sev;
-      /*computes the ecart*/
-      if (strat->honey)
-      {
-        if (strat->T[j].ecart <= (*h).ecart)
-          (*h).ecart = d-pFDeg((*h).p);
-        else
-          (*h).ecart = d-pFDeg((*h).p)+strat->T[j].ecart-(*h).ecart;
-        (*h).length = pLength((*h).p);
-      }
-      else
-        (*h).ecart = pLDeg((*h).p,&((*h).length))-pFDeg((*h).p);
-      if (TEST_OPT_CANCELUNIT) cancelunit(h);
-      if ((strat->syzComp!=0) && !strat->honey)
-      {
-        if ((strat->syzComp>0) && (pMinComp((*h).p) > strat->syzComp))
-        {
-          if (TEST_OPT_DEBUG) PrintS(" > syzComp\n");
-          return -2;
-        }
-      }
-      /*- try to reduce the s-polynomial -*/
-      pass++;
-      d = pFDeg((*h).p)+(*h).ecart;
-      /*
-      *test whether the polynomial should go to the lazyset L
-      *-if the degree jumps
-      *-if the number of pre-defined reductions jumps
-      */
-      if ((strat->Ll >= 0) &&  ((d >= reddeg) || (pass > strat->LazyPass)))
-      {
-        at = strat->posInL(strat->L,strat->Ll,*h,strat);
-        if (at <= strat->Ll)
-        {
-          /*test if h is already standardbasis element*/
-          i=strat->sl+1;
-          do
-          {
-            i--;
-            if (i<0) return 1;
-          } while (!pLmShortDivisibleBy(strat->S[i], strat->sevS[i],
-                                      (*h).p, not_sev));
-          enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
-          if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
-          (*h).p = NULL;
-          return -1;
-        }
-      }
-      else if ((TEST_OPT_PROT) && (strat->Ll < 0) && (d >= reddeg))
-      {
-        reddeg = d+1;
-        Print(".%d",d);mflush();
-      }
-      j = 0;
-    }
-    else
-    {
-      j++;
-    }
-  }
-}
-
+#if 1
 /*2
 * reduces h with elements from T choosing first possible
 * element in T with respect to the given ecart
@@ -272,12 +164,11 @@ int redEcart19 (LObject* h,kStrategy strat)
 int redEcart (LObject* h,kStrategy strat)
 {
   poly pi;
-  int i,at,reddeg,d,ei,li;
+  int i,at,reddeg,d,ei,li,ii;
   int j = 0;
   int pass = 0;
   unsigned long not_sev;
 
-  if (TEST_OPT_CANCELUNIT) cancelunit(h);
   d = pFDeg((*h).p)+(*h).ecart;
   reddeg = strat->LazyDegree+d;
   h->sev = pGetShortExpVector(h->p);
@@ -295,6 +186,7 @@ int redEcart (LObject* h,kStrategy strat)
       pi = strat->T[j].p;
       ei = strat->T[j].ecart;
       li = strat->T[j].length;
+      ii = j;
       /*
       * the polynomial to reduce with (up to the moment) is;
       * pi with ecart ei and length li
@@ -318,6 +210,7 @@ int redEcart (LObject* h,kStrategy strat)
           pi = strat->T[i].p;
           ei = strat->T[i].ecart;
           li = strat->T[i].length;
+          ii = i;
         }
       }
       /*
@@ -344,15 +237,8 @@ int redEcart (LObject* h,kStrategy strat)
             return -1;
           }
         }
-        /*put the polynomial also in the pair set*/
-        if (TEST_OPT_MOREPAIRS)
-        {
-          if (!TEST_OPT_INTSTRATEGY)
-            pNorm((*h).p);
-          enterpairs((*h).p,strat->sl,(*h).ecart,0,strat);
-        }
       }
-      doRed(h,&pi,strat->fromT,strat);
+      doRed(h,&(strat->T[ii]),strat->fromT,strat);
       strat->fromT=FALSE;
       if ((*h).p == NULL)
       {
@@ -373,7 +259,6 @@ int redEcart (LObject* h,kStrategy strat)
       }
       else
         (*h).ecart = pLDeg((*h).p,&((*h).length))-pFDeg((*h).p);
-      if (TEST_OPT_CANCELUNIT) cancelunit(h);
       if (strat->syzComp!=0)
       {
         if ((strat->syzComp>0) && (pMinComp((*h).p) > strat->syzComp))
@@ -423,6 +308,147 @@ int redEcart (LObject* h,kStrategy strat)
     }
   }
 }
+#else
+
+int redEcart (LObject* h,kStrategy strat)
+{
+  poly pi;
+  int i,at,reddeg,d,ei,li,ii;
+  int j = 0;
+  int pass = 0;
+
+  d = h->pFDeg()+ h->ecart;
+  reddeg = strat->LazyDegree+d;
+  h->SetShortExpVector();
+  while (1)
+  {
+    j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
+    if (j < 0)
+      return 1;
+
+    ei = strat->T[j].ecart;
+    ii = j;
+
+    if (ei > h->ecart && ii < strat->tl)
+    {
+      li = strat->T[j].length;
+      // the polynomial to reduce with (up to the moment) is;
+      // pi with ecart ei and length li
+      // look for one with smaller ecart
+      i = j;
+      while (1)
+      {
+        /*- takes the first possible with respect to ecart -*/
+        i++;
+        i = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h, i);
+        if (i < 0) break;
+        if (strat->T[i].ecart < ei || (strat->T[i].ecart == ei &&
+                                       strat->T[i].length < li))
+        {
+          // the polynomial to reduce with is now
+          ii = i;
+          ei = strat->T[i].ecart;
+          if (ei <= h->ecart) break;
+          li = strat->T[i].length;
+        }
+      }
+    }
+    
+    // end of search: have to reduce with pi
+    if (ei > h->ecart)
+    {
+      // It is not possible to reduce h with smaller ecart;
+      // if possible h goes to the lazy-set L,i.e
+      // if its position in L would be not the last one
+      strat->fromT = TRUE;
+      if (strat->Ll >= 0) /*- L is not empty -*/
+      {
+        h->SetLmCurrentRing();
+        at = strat->posInL(strat->L,strat->Ll,(*h),strat);
+        if (at <= strat->Ll)
+        {
+          /*- h will not become the next element to reduce -*/
+          enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+#ifdef KDEBUG
+          if (TEST_OPT_DEBUG) Print(" ecart too big; -> L%d\n",at);
+#endif
+          h->Clear();
+          strat->fromT = FALSE;
+          return -1;
+        }
+      }
+    }
+        
+    // now we fiannly can reduce
+    doRed(h,&(strat->T[ii]),strat->fromT,strat);
+    strat->fromT=FALSE;
+
+    // are we done ???
+    if (h->IsNull())
+    {
+      if (h->lcm!=NULL) pLmFree((*h).lcm);
+      h->Clear();
+      return 0;
+    }
+
+    // NO!
+    h->SetShortExpVector();
+    /*computes the ecart*/
+    if (strat->honey)
+    {
+      if (ei <= (*h).ecart)
+        (*h).ecart = d-pFDeg((*h).p);
+      else
+        (*h).ecart = d-pFDeg((*h).p)+ei-(*h).ecart;
+      pLDeg((*h).p,&((*h).length));
+      //(*h).length = pLength((*h).p);
+    }
+    else
+      (*h).ecart = pLDeg((*h).p,&((*h).length))-pFDeg((*h).p);
+    if (strat->syzComp!=0)
+    {
+      if ((strat->syzComp>0) && (pMinComp((*h).p) > strat->syzComp))
+      {
+        if (TEST_OPT_DEBUG) PrintS(" > syzComp\n");
+        return -2;
+      }
+
+    }
+    /*- try to reduce the s-polynomial -*/
+    pass++;
+    d = pFDeg((*h).p)+(*h).ecart;
+    /*
+     *test whether the polynomial should go to the lazyset L
+     *-if the degree jumps
+     *-if the number of pre-defined reductions jumps
+     */
+    if ((strat->Ll >= 0)
+        && ((d >= reddeg) || (pass > strat->LazyPass)))
+    {
+      at = strat->posInL(strat->L,strat->Ll,*h,strat);
+      if (at <= strat->Ll)
+      {
+        i=strat->sl+1;
+        do
+        {
+          i--;
+          if (i<0) return 1;
+        } while (!pLmShortDivisibleBy(strat->S[i], strat->sevS[i],
+                                      (*h).p, not_sev));
+        enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+        if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
+        (*h).p = NULL;
+        return -1;
+      }
+    }
+    else if ((TEST_OPT_PROT) && (strat->Ll < 0) && (d >= reddeg))
+    {
+      Print(".%d",d);mflush();
+      reddeg = d+1;
+    }
+  }
+}
+#endif
 
 /*2
 *reduces h with elements from T choosing  the first possible
@@ -430,92 +456,87 @@ int redEcart (LObject* h,kStrategy strat)
 */
 int redFirst (LObject* h,kStrategy strat)
 {
-  int at,reddeg,d,i;
+  if (h->IsNull()) return 0;
+  
+  int at, reddeg,d;
   int pass = 0;
   int j = 0;
 
-  if (h->p == NULL) return 0;
-  if (TEST_OPT_CANCELUNIT) cancelunit(h);
-  d = pFDeg((*h).p)+(*h).ecart;
-  reddeg = strat->LazyDegree+d;
-  unsigned long not_sev;
-  h->sev = pGetShortExpVector(h->p);
-  not_sev = ~ h->sev;
-  loop
+  if (! strat->homog)
   {
-    if (j > strat->tl)
-    {
-      assume(h->sev == pGetShortExpVector(h->p));
+    d = h->pFDeg() + h->ecart;
+    reddeg = strat->LazyDegree+d;
+  }
+  h->SetShortExpVector();
+  while (1)
+  {
+    j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
+    if (j < 0)
       return 1;
-    }
-    if (pLmShortDivisibleBy(strat->T[j].p, strat->sevT[j], (*h).p, not_sev))
+
+    if (!TEST_OPT_INTSTRATEGY)
+      strat->T[j].pNorm();
+#ifdef KDEBUG
+    if (TEST_OPT_DEBUG)
     {
-      //if (strat->interpt) test_int_std(strat->kIdeal);
-      /*
-      * the polynomial to reduce with is;
-      * T[j].p
-      */
-      if (!TEST_OPT_INTSTRATEGY)
-        pNorm(strat->T[j].p);
-      if (TEST_OPT_DEBUG)
+      PrintS("reduce ");
+      h->wrp();
+      PrintS(" with ");
+      strat->T[j].wrp();
+    }
+#endif
+    ksReducePoly(h, &(strat->T[j]), strat->kNoether, NULL, strat);
+#ifdef KDEBUG
+    if (TEST_OPT_DEBUG)
+    {
+      PrintS(" to ");
+      wrp(h->p);
+      PrintLn();
+    }
+#endif
+    if (h->IsNull())
+    {
+      if (h->lcm!=NULL) pLmFree((*h).lcm);
+      h->Clear();
+      return 0;
+    }
+    h->SetShortExpVector();
+    
+    if ((strat->syzComp!=0) && !strat->honey)
+    {
+      if ((strat->syzComp>0) && 
+          (p_MinComp(h->GetLmTailRing(), h->tailRing) > strat->syzComp))
       {
-        PrintS("reduce ");
-        wrp(h->p);
-        PrintS(" with ");
-        wrp(strat->T[j].p);
+#ifdef KDEBUG
+        if (TEST_OPT_DEBUG) PrintS(" > syzComp\n");
+#endif
+        return -2;
       }
-      (*h).p = ksOldSpolyRed(strat->T[j].p,(*h).p,strat->kNoether);
-      if (TEST_OPT_DEBUG)
-      {
-        PrintS(" to ");
-        wrp(h->p);
-        PrintLn();
-      }
-      if ((*h).p == NULL)
-      {
-        if (h->lcm!=NULL) pLmFree((*h).lcm);
-        h->sev = 0;
-        return 0;
-      }
-      h->sev = pGetShortExpVector(h->p);
-      not_sev = ~ h->sev;
-      if (TEST_OPT_CANCELUNIT) cancelunit(h);
-      /*computes the ecart*/
-      d = pLDeg((*h).p,&((*h).length));
-      (*h).ecart = d-pFDeg((*h).p);
-      if ((strat->syzComp!=0) && !strat->honey)
-      {
-        if ((strat->syzComp>0) && (pMinComp((*h).p) > strat->syzComp))
-        {
-          if (TEST_OPT_DEBUG) PrintS(" > syzComp\n");
-          return -2;
-        }
-      }
+    }
+    if (!strat->homog)
+    {
+      d = h->SetLengthEcartReturnLDeg();
       /*- try to reduce the s-polynomial -*/
       pass++;
       /*
-      *test whether the polynomial should go to the lazyset L
-      *-if the degree jumps
-      *-if the number of pre-defined reductions jumps
-      */
+       *test whether the polynomial should go to the lazyset L
+       *-if the degree jumps
+       *-if the number of pre-defined reductions jumps
+       */
       if ((strat->Ll >= 0)
-      && ((d >= reddeg) || (pass > strat->LazyPass))
-      && !strat->homog)
+          && ((d >= reddeg) || (pass > strat->LazyPass)))
       {
+        h->SetLmCurrRing();
         at = strat->posInL(strat->L,strat->Ll,*h,strat);
         if (at <= strat->Ll)
         {
-          i=strat->sl+1;
-          do
-          {
-            i--;
-            if (i<0) return 1;
-          } while (!pLmShortDivisibleBy(strat->S[i],strat->sevS[i],
-                                      (*h).p, not_sev));
+          if (kFindDivisibleByInS(strat->S, strat->sevS, strat->sl, h) < 0)
+            return 1;
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+#ifdef KDEBUG
           if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
-          (*h).p = NULL;
-          h->sev = 0;
+#endif
+          h->Clear();
           return 0;
         }
       }
@@ -524,167 +545,6 @@ int redFirst (LObject* h,kStrategy strat)
         reddeg = d+1;
         Print(".%d",d);mflush();
       }
-      j = 0;
-    }
-    else
-    {
-      j++;
-    }
-  }
-}
-
-/*2
-* reduces h with elements from T choosing the best possible
-* element in t with respect to the ecart and length
-*/
-int redMoraBest (LObject* h,kStrategy strat)
-{
-  poly pi;
-  int reddeg,d,ei,li,i,at;
-  int j = 0;
-  int pass = 0;
-
-  if (TEST_OPT_CANCELUNIT) cancelunit(h);
-  d = pFDeg((*h).p)+(*h).ecart;
-  reddeg = strat->LazyDegree+d;
-  unsigned long not_sev;
-  h->sev = pGetShortExpVector(h->p);
-  not_sev = ~ h->sev;
-  loop
-  {
-    if (j > strat->tl)
-    {
-      return 1;
-    }
-    if (pLmShortDivisibleBy(strat->T[j].p, strat->sevT[j], (*h).p, not_sev))
-    {
-      //if (strat->interpt) test_int_std(strat->kIdeal);
-      /*- compute the s-polynomial -*/
-      pi = strat->T[j].p;
-      ei = strat->T[j].ecart;
-      li = strat->T[j].length;
-      /*
-      * the polynomial to reduce with (up to the moment) is;
-      * pi with ecart ei and length li
-      */
-      i = j;
-      loop
-      {
-        /*- takes the best possible with respect to ecart and length -*/
-        i++;
-        if (i > strat->tl) break;
-        if (((strat->T[i].ecart < ei)
-          || ((strat->T[i].ecart == ei)
-        && (strat->T[i].length < li)))
-            && pLmShortDivisibleBy(strat->T[i].p, strat->sevT[i],
-                                 (*h).p, not_sev))
-        {
-          /*
-          * the polynomial to reduce with is now:
-          */
-          pi = strat->T[i].p;
-          ei = strat->T[i].ecart;
-          li = strat->T[i].length;
-        }
-      }
-      /*
-      * end of search: best is pi
-      */
-      if ((ei > (*h).ecart) && (!strat->kHEdgeFound))
-      {
-        /*
-        * It is not possible to reduce h with smaller ecart;
-        * if possible h goes to the lazy-set L,i.e
-        * if its position in L would be not the last one
-        */
-        strat->fromT = TRUE;
-        if (strat->Ll >= 0) /*- L is not empty -*/
-        {
-          at = strat->posInL(strat->L,strat->Ll,(*h),strat);
-          if (at <= strat->Ll)
-          {
-            /*- h will not become the next element to reduce -*/
-            enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
-            if (TEST_OPT_DEBUG) Print(" ecart too big; -> L%d\n",at);
-            (*h).p = NULL;
-            strat->fromT = FALSE;
-            return -1;
-          }
-        }
-        /*put the polynomial also in the pair set*/
-        if (TEST_OPT_MOREPAIRS)
-        {
-          if (!TEST_OPT_INTSTRATEGY)
-            pNorm((*h).p);
-          enterpairs((*h).p,strat->sl,(*h).ecart,0,strat);
-        }
-      }
-      doRed(h,&pi,strat->fromT,strat);
-      strat->fromT=FALSE;
-      if ((*h).p == NULL)
-      {
-        if (h->lcm!=NULL) pLmFree((*h).lcm);
-        return 0;
-      }
-      h->sev = pGetShortExpVector(h->p);
-      not_sev = ~ h->sev;
-      /*computes the ecart*/
-      if (strat->honey)
-      {
-        if (ei <= (*h).ecart)
-          (*h).ecart = d-pFDeg((*h).p);
-        else
-          (*h).ecart = d-pFDeg((*h).p)+ei-(*h).ecart;
-        (*h).length = pLength((*h).p);
-      }
-      else
-        (*h).ecart = pLDeg((*h).p,&((*h).length))-pFDeg((*h).p);
-      if (TEST_OPT_CANCELUNIT) cancelunit(h);
-      if ((strat->syzComp!=0) && !strat->honey)
-      {
-        if ((strat->syzComp>0) && (pMinComp((*h).p) > strat->syzComp))
-        {
-          if (TEST_OPT_DEBUG) PrintS(" > syzComp\n");
-          return -2;
-        }
-      }
-      /*- try to reduce the s-polynomial -*/
-      pass++;
-      d = pFDeg((*h).p)+(*h).ecart;
-      /*
-      *test whether the polynomial should go to the lazyset L
-      *-if the degree jumps
-      *-if the number of pre-defined reductions jumps
-      */
-      if ((strat->Ll >= 0)
-      && ((d >= reddeg) || (pass > strat->LazyPass)))
-      {
-        at = strat->posInL(strat->L,strat->Ll,*h,strat);
-        if (at <= strat->Ll)
-        {
-          i=strat->sl+1;
-          do
-          {
-            i--;
-            if (i<0) return 1;
-          } while (!pLmShortDivisibleBy(strat->S[i],strat->sevS[i],
-                                      (*h).p, not_sev));
-          enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
-          if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
-          (*h).p = NULL;
-          return -1;
-        }
-      }
-      else if ((TEST_OPT_PROT) && (strat->Ll < 0) && (d >= reddeg))
-      {
-        reddeg = d+1;
-        Print(".%d",d);mflush();
-      }
-      j = 0;
-    }
-    else
-    {
-      j++;
     }
   }
 }
@@ -723,6 +583,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
       poly pi = strat->T[j].p;
       int ei = strat->T[j].ecart;
       int li = strat->T[j].length;
+      int ii = j;
       /*
       * the polynomial to reduce with (up to the moment) is;
       * pi with ecart ei and length li
@@ -745,6 +606,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
           pi = strat->T[j].p;
           ei = strat->T[j].ecart;
           li = strat->T[j].length;
+          ii = j;
         }
       }
       /*
@@ -760,24 +622,20 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
       {
         /*
         * It is not possible to reduce h with smaller ecart;
-        * we have to reduce with bad ecart: H has t enter in T
+        * we have to reduce with bad ecart: H has to enter in T
         */
-        doRed(&H,&pi,TRUE,strat);
+        doRed(&H,&(strat->T[ii]),TRUE,strat);
         if (H.p == NULL)
-        {
           return NULL;
-        }
       }
       else
       {
         /*
         * we reduce with good ecart, h need not to be put to T
         */
-        doRed(&H,&pi,FALSE,strat);
+        doRed(&H,&(strat->T[ii]),FALSE,strat);
         if (H.p == NULL)
-        {
           return NULL;
-        }
       }
       /*- try to reduce the s-polynomial -*/
       o = pFDeg(H.p);
@@ -1171,12 +1029,8 @@ void initMora(ideal F,kStrategy strat)
   strat->kHEdgeFound = ppNoether != NULL;
   if ( strat->kHEdgeFound )
      strat->kNoether = pCopy(ppNoether);
-  if (TEST_OPT_REDBEST)
-    strat->red = redMoraBest;/*- look for the best in T -*/
   else if (strat->kHEdgeFound || strat->homog)
     strat->red = redFirst;  /*take the first possible in T*/
-  else if (BTEST1(19))
-    strat->red = redEcart19;/*take the first possible in T, rquires T sorted by ecart*/
   else
     strat->red = redEcart;/*take the first possible in under ecart-restriction*/
   if (strat->kHEdgeFound)
@@ -1469,6 +1323,10 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   omFreeSize((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
   omFreeSize((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
   omFreeSize((ADDRESS)strat->NotUsedAxis,(pVariables+1)*sizeof(BOOLEAN));
+  omfree(strat->sevT);
+  omfree(strat->S_2_R);
+  omfree(strat->R);
+  
   if ((Q!=NULL)&&(strat->fromQ!=NULL))
   {
     i=((IDELEMS(Q)+IDELEMS(F)+15)/16)*16;
@@ -1582,6 +1440,9 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   omFreeSize((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
   omFreeSize((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
   omFreeSize((ADDRESS)strat->NotUsedAxis,(pVariables+1)*sizeof(BOOLEAN));
+  omfree(strat->sevT);
+  omfree(strat->S_2_R);
+  omfree(strat->R);
   if ((Q!=NULL)&&(strat->fromQ!=NULL))
   {
     i=((IDELEMS(Q)+IDELEMS(F)+15)/16)*16;
@@ -1923,6 +1784,10 @@ ideal kInterRed (ideal F, ideal Q)
   omFreeSize((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
   omFreeSize((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
   omFreeSize((ADDRESS)strat->NotUsedAxis,(pVariables+1)*sizeof(BOOLEAN));
+  omfree(strat->sevT);
+  omfree(strat->S_2_R);
+  omfree(strat->R);
+  
   if (strat->fromQ)
   {
     for (j=0;j<IDELEMS(strat->Shdl);j++)

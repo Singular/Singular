@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.76 2000-11-09 16:32:51 obachman Exp $ */
+/* $Id: kutil.cc,v 1.77 2000-11-14 16:04:56 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -117,37 +117,42 @@ void deleteHC(poly* p, int* e, int* l,kStrategy strat)
 /*2
 *tests if p.p=monomial*unit and cancels the unit
 */
-void cancelunit (LObject* p)
+void cancelunit (LObject* L)
 {
   int  i;
   poly h;
+  ring r = L->tailRing;
+  poly p = L->GetLmTailRing();
 
-  if(pIsVector((*p).p))
+  if(p_GetComp(p, r) != 0 && !p_OneComp(p, r)) return;
+
+  if (L->ecart != 0)
   {
-    if(!pOneComp((*p).p)) return;
-  }
-  if ((*p).ecart != 0)
-  {
-    for(i=1;i<=pVariables;i++)
+    for(i=1;i<=r->N;i++)
     {
-      if ((pGetExp((*p).p,1)>0) && (rIsPolyVar(i)==TRUE)) return;
+      if ((p_GetExp(p,i,r)>0) && (rIsPolyVar(i, r)==TRUE)) return;
     }
-    h = pNext(((*p).p));
+    h = pNext(p);
     loop
     {
       if (h==NULL)
       {
-        pDelete(&(pNext((*p).p)));
-        (*p).ecart = 0;
-        (*p).length = 1;
+        p_Delete(&pNext(p), r);
+        L->ecart = 0;
+        L->length = 1;
+        L->pLength = 1;
+        if (L->t_p != NULL && pNext(L->t_p) != NULL)
+          pNext(L->t_p) = NULL;
+        if (L->p != NULL && pNext(L->p) != NULL)
+          pNext(L->p) = NULL;
         return;
       }
       i = 0;
       loop
       {
         i++;
-        if (pGetExp((*p).p,i) > pGetExp(h,i)) return ;
-        if (i == pVariables) break;
+        if (p_GetExp(p,i,r) > p_GetExp(h,i,r)) return ;
+        if (i == r->N) break;
       }
       pIter(h);
     }
@@ -238,7 +243,7 @@ void cleanT (kStrategy strat)
     (strat->tailRing != currRing ? 
      pGetShallowCopyDeleteProc(strat->tailRing, currRing) :
      NULL);
-    
+
   for (j=0; j<=strat->tl; j++)
   {
     p = strat->T[j].p;
@@ -477,11 +482,13 @@ BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
     ring r;
     poly p;
     L->GetLm(p, r);
+#if 0
     if (L->sev != 0 && p_GetShortExpVector(p, r) != L->sev)
     {
       return dReportError("L[%d] wrong sev: has %o, specified to have %o",
                           lpos, p_GetShortExpVector(p, r), L->sev);
     }
+#endif
   }
   r_assume(L->max == NULL);
   if (L->p1 == NULL)
@@ -2592,7 +2599,7 @@ poly redtailBba (LObject* L, int pos, kStrategy strat)
       With = kFindDivisibleByInS(strat, pos, &Ln, &With_s);
       if (With == NULL) break;
       strat->redTailChange=TRUE;
-      if (! ksReducePolyTail(L, With, h, strat->kNoether))
+      if (ksReducePolyTail(L, With, h, strat->kNoether))
       {
         // reducing the tail would violate the exp bound
         if (kStratChangeTailRing(strat, L))
@@ -3907,6 +3914,8 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
   
   strat->tailRing = new_tailRing;
   strat->tailBin = new_tailBin;
+  strat->p_shallow_copy_delete 
+    = pGetShallowCopyDeleteProc(currRing, new_tailRing);
   kTest_TS(strat);
   if (TEST_OPT_PROT)
     PrintS("]");
@@ -3923,7 +3932,7 @@ void kStratInitChangeTailRing(kStrategy strat)
   assume(strat->tailRing == currRing);
 
   // for the time being, let's not do anything for syzComp and minim
-  if (strat->minim > 0 || strat->syzComp) return;
+  // if (strat->syzComp) return;
   
   for (i=0; i<= strat->Ll; i++)
   {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.18 2000-11-08 15:34:57 obachman Exp $ */
+/* $Id: kspoly.cc,v 1.19 2000-11-14 16:04:53 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -28,12 +28,13 @@
  * Assumes PR != NULL, PW != NULL, Lm(PR) divides Lm(PW)
  * 
  ***************************************************************/
-BOOLEAN ksReducePoly(LObject* PR,
-                     TObject* PW,
-                     poly spNoether,
-                     number *coef,
-                     kStrategy strat)
+int ksReducePoly(LObject* PR,
+                 TObject* PW,
+                 poly spNoether,
+                 number *coef,
+                 kStrategy strat)
 {
+  int ret = 0;
   ring tailRing = PR->tailRing;
   kTest_L(PR);
   kTest_T(PW);
@@ -56,7 +57,7 @@ BOOLEAN ksReducePoly(LObject* PR,
   {
     PR->LmDeleteAndIter();
     if (coef != NULL) *coef = n_Init(1, tailRing);
-    return TRUE;
+    return 0;
   }
 
   p_ExpVectorSub(lm, p2, tailRing);
@@ -68,14 +69,15 @@ BOOLEAN ksReducePoly(LObject* PR,
     {
       // undo changes of lm
       p_ExpVectorAdd(lm, p2, tailRing);
-      if (strat == NULL) return FALSE;
-      if (! kStratChangeTailRing(strat, PR, PW)) return FALSE;
+      if (strat == NULL) return 2;
+      if (! kStratChangeTailRing(strat, PR, PW)) return -1;
       tailRing = strat->tailRing;
       p1 = PR->GetLmTailRing();
       p2 = PW->GetLmTailRing();
       t2 = pNext(p2);
       lm = p1;
       p_ExpVectorSub(lm, p2, tailRing);
+      ret = 1;
     }
   }
 
@@ -102,7 +104,7 @@ BOOLEAN ksReducePoly(LObject* PR,
                             (PR->bucket != NULL ? PW->GetpLength() - 1 : 0), 
                             spNoether);
   PR->LmDeleteAndIter();
-  return TRUE;
+  return ret;
 }
 
 /***************************************************************
@@ -188,7 +190,7 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
 //         Current->next != NULL, LM(PW) devides LM(Current->next)
 // Changes: PR
 // Const:   PW
-BOOLEAN ksReducePolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
+int ksReducePolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
 {
   BOOLEAN ret;
   poly Lp =     PR->GetLmCurrRing();
@@ -207,7 +209,7 @@ BOOLEAN ksReducePolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
 
   ret = ksReducePoly(&Red, &With, spNoether, &coef);
   
-  if (ret)
+  if (!ret)
   {
     if (! n_IsOne(coef, currRing))
     {
@@ -251,6 +253,7 @@ int ksCheckCoeff(number *a, number *b)
   number an = *a, bn = *b;
   nTest(an);
   nTest(bn);
+
   number cn = nGcd(an, bn);
 
   if(nIsOne(cn))
