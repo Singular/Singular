@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.86 1998-12-18 14:03:00 mschulze Exp $ */
+/* $Id: extra.cc,v 1.87 1999-01-19 13:42:30 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -63,8 +63,10 @@
 #endif
 
 #include "silink.h"
+#ifdef HAVE_MPSR
 #include "mpsr.h"
 #include "MPT_GP.h"
+#endif
 
 /*
  *   New function/system-calls that will be included as dynamic module
@@ -860,6 +862,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     else
 #endif
 /*==================== gp =================*/
+#ifdef HAVE_MPSR
      if (strcmp(sys_cmd, "gp") == 0)
     {
       if (h->Typ() != LINK_CMD)
@@ -900,6 +903,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
+#endif
 /*==================== print all option values =================*/
 #ifndef NDEBUG
     if (strcmp(sys_cmd, "options") == 0)
