@@ -1,8 +1,8 @@
-// $Id: finvar.lib,v 1.21 1999-08-27 14:14:21 Singular Exp $
+// $Id: finvar.lib,v 1.22 1999-08-31 12:38:56 Singular Exp $
 // author: Agnes Eileen Heydtmann, email:agnes@math.uni-sb.de
 // last change: 98/11/05
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.21 1999-08-27 14:14:21 Singular Exp $"
+version="$Id: finvar.lib,v 1.22 1999-08-31 12:38:56 Singular Exp $"
 info="
 LIBRARY:  finvar.lib       LIBRARY TO CALCULATE INVARIANT RINGS & MORE
 AUTHOR: Agnes E. Heydtmann, email: agnes@math.uni-sb.de
@@ -2760,7 +2760,7 @@ EXAMPLE: example primary_charp_without; shows an example
   }
 }
 example
-{ "EXAMPLE:" echo=2;
+{ "EXAMPLE:"; echo=2;
          ring R=2,(x,y,z),dp;
          matrix A[3][3]=0,1,0,-1,0,0,0,0,-1;
          matrix P=primary_charp_without(A);
@@ -5104,6 +5104,10 @@ EXAMPLE: example secondary_not_cohen_macaulay; shows an example
     B=f(trivialS)-trivialS;            // these relations should be 0 -
     M(1)[i,1..k]=B[1..k];              // we will look for the syzygies of M(1)
   }
+  //intvec save_opts=option(get);
+  //option(returnSB,redSB);
+  //module M(2)=syz(M(1));               // nres(M(1),2)[2];
+  //option(set,save_opts);
   module M(2)=nres(M(1),2)[2];
   int m=ncols(M(2));                   // number of generators of the module
                                        // M(2) -

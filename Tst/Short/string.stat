@@ -1,11 +1,11 @@
 Status Output of tst_status.out
-init >> USER    :siebert
-init >> HOSTNAME:leda
-init >> uname -a:Linux leda 2.0.35 #1 Tue Jan 26 13:04:41 MET 1999 i586 unknown
-init >> date    :Thu Aug 26 14:46:53 MEST 1999
+init >> USER    :hannes
+init >> HOSTNAME:nepomuck.mathematik.uni-kl.de
+init >> uname -a:Linux nepomuck.mathematik.uni-kl.de 2.0.33 #1 Wed Jan 21 18:50:57 MET 1998 i686 unknown
+init >> date    :Tue Aug 31 10:03:30 MET DST 1999
 init >> version :1304
 init >> ticks   :100
-1 >> tst_memory_0 :: leda:288224
-1 >> tst_memory_1 :: leda:352080
-1 >> tst_memory_2 :: leda:294912
-1 >> tst_timer_1 :: leda:34
+1 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:287888
+1 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:352080
+1 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:274432
+1 >> tst_timer_1 :: nepomuck.mathematik.uni-kl.de:35

@@ -1,10 +1,10 @@
-// $Id: poly.lib,v 1.16 1999-07-06 15:32:55 Singular Exp $
+// $Id: poly.lib,v 1.17 1999-08-31 12:39:00 Singular Exp $
 //system("random",787422842);
 //(GMG, last modified 22.06.96)
 //(obachman: 17.12.97 -- added katsura)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: poly.lib,v 1.16 1999-07-06 15:32:55 Singular Exp $";
+version="$Id: poly.lib,v 1.17 1999-08-31 12:39:00 Singular Exp $";
 info="
 LIBRARY:  poly.lib      PROCEDURES FOR MANIPULATING POLYS, IDEALS, MODULES
 
@@ -146,7 +146,7 @@ EXAMPLE: example freerank; shows examples
 {
   int rk;
   def M = simplify(#[1],10);
-  list mre = mres(M,2);
+  resolution mre = res(M,2);
   intmat B = betti(mre);
   if ( ncols(B)>1 ) { rk = -1; }
   else { rk = sum(B[1..nrows(B),1]); }
