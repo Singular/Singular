@@ -1,3 +1,8 @@
+Mon Feb  2 11:59:36 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* runfex (runConfiguration): new global variable.  `runfex'
+	  supports different configurations.
+
 Thu Jan 22 10:46:03 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* bgcd.m4, bgcdext.m4: new files
