@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.33 1998-05-12 13:41:50 obachman Exp $
+@comment $Id: types.doc,v 1.34 1998-05-12 14:43:22 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -2669,6 +2669,8 @@ from the string.
 @table @asis
 @item @code{nameof}
 name of an object (see @ref{nameof})
+@item @code{option}
+lists all defined options (see @ref{option})
 @item @code{read}
 read a file (see @ref{read})
 @item @code{size}

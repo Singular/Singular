@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.38 1998-05-12 13:30:46 anne Exp $
+@comment $Id: reference.doc,v 1.39 1998-05-12 14:43:21 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -3203,12 +3203,12 @@ See @ref{link}, @ref{link}; @ref{close}.
 @item @strong{Syntax:}
 @code{option ();}
 @item @strong{Type:}
-none
+string
 @item @strong{Purpose:}
 lists all defined options.
 @*
 @item @strong{Syntax:}
-@code{option (} option_name @code{);}
+@code{option (} option_name @code{)}
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
