@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.97 2002-06-03 12:13:42 Singular Exp $ */
+/* $Id: grammar.y,v 1.98 2002-06-18 13:44:38 anne Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -1438,7 +1438,7 @@ typecmd:
             }
             #endif
             $1.Print(&sLastPrinted);
-            $1.CleanUp();
+            $1.CleanUp(currRing);
             if (errorreported) YYERROR;
           }
         ;
