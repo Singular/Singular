@@ -66,6 +66,18 @@ list d=
 "U_{12}","x,y,z","ls","x3+y3+z4";
 
 
+proc tst_gaussm(poly f)
+{
+  basering;
+  f;
+  print(monodromy(f));
+  list l=vfiltration(f);
+  l;
+  vfiltjacalg(l);
+  gamma(l);
+}
+
+
 string s;
 int i,t;
 for(i=1;i<=size(d);i=i+4)
