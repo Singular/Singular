@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.52 2001-08-27 14:46:58 Singular Exp $ */
+/* $Id: febase.h,v 1.53 2002-11-26 13:34:21 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -266,7 +266,7 @@ class Voice
 
 extern Voice  *currentVoice;
 
-Voice * feInitStdin();
+Voice * feInitStdin(Voice *pp);
 
 /* feread.cc: */
 
