@@ -28,6 +28,7 @@
 #define MP_AnnotPolyDefRel              5
 #define MP_AnnotPolyIrreducible         6
 #define MP_AnnotPolyWeights             8
+#define MP_AnnotPolyModuleRank          9
 
 /***************************************************************************
  *
