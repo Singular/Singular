@@ -1,4 +1,4 @@
-// $Id: tst.lib,v 1.1 1998-02-13 15:49:03 obachman Exp $
+// $Id: tst.lib,v 1.2 1998-02-16 13:23:25 obachman Exp $
 //(obachman, last modified 2/13/98)
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -131,7 +131,7 @@ RETURN:  none; writes some identification data to stdout;
 EXAMPLE: example tst_init; shows example
 {
   tst_ignore("USER    : " + system("getenv", "USER"));
-  tst_ignore("HOSTNAME: " + system("getenv", "HOSTNAME"));
+  tst_ignore("HOSTNAME: " + system("getenv", "HOST"));
   tst_ignore("uname -a: " + tst_system("uname -a"));
   tst_ignore("date    : " + tst_system("date"));
   tst_ignore("version : " + string(system("version")));
