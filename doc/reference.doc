@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.218 2003-04-16 11:55:57 Singular Exp $
+@comment $Id: reference.doc,v 1.219 2003-07-03 08:26:03 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1881,21 +1881,24 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{gcd (} int_expression@code{,} int_expression @code{)}
+@*@code{gcd (} number_expression@code{,} number_expression @code{)}
 @*@code{gcd (} poly_expression@code{,} poly_expression @code{)}
 @item @strong{Type:}
 the same as the type of the arguments
 @item @strong{Purpose:}
 computes the greatest common divisor.
 @item @strong{Note:}
-Not implemented for the coefficient fields real, finite fields of
-type @code{(p^n,a)}, and algebraic extensions over the rational
-numbers.
+Not implemented for the coefficient fields real and finite fields of
+type @code{(p^n,a)}.
+@*The gcd of two numbers is their gcd as integer numbers or polynomials,
+otherwise it is not defined.
 @item @strong{Example:}
 @smallexample
 @c example
   gcd(2,3);
   ring r=0,(x,y,z),lp;
   gcd(3x2*(x+y),9x*(y2-x2));
+  gcd(number(6472674604870),number(878646537247372));
 @c example
 @end smallexample
 @end table
