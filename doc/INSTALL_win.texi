@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_win.texi,v 1.3 2000-05-25 16:59:26 obachman Exp $
+@comment $Id: INSTALL_win.texi,v 1.4 2000-05-30 07:38:39 obachman Exp $
 @c FILE:    INSTALL.texi
 @c PURPOSE: Installation instructions for Singular on MSWindows
 @c          This file is displayed during installation and copied to
@@ -14,7 +14,7 @@
 @end ifclear
 
 To install @sc{Singular} on a PC running Windows 95/98/NT/2K, you need
-to download one of the following three archives:
+to download @emph{one} of the following three archive files:
 
 @table @code
 @item Singular-@value{VERSION}-Compact. exe
@@ -52,10 +52,15 @@ with the subject line (or, mail body) @code{register}.
 
 @enumerate
 @item
-If you have Cygwin with version before 1.0 already installed on your
+If you have Cygwin B19 or B20 installed on your
 system, then uninstall it. Especially make sure that you delete the
-@code{/} and 
-@code{/bin} mount points.
+@code{/} and @code{/bin} mount points (i.e., execute the commands @code{umount
+/} and @code{umount /bin} before deleting the installed Cygwin
+programs).
+@item 
+If you have Cygwin version 1.0 or higher installed on your system, you
+should either delete it, or, do not install the Cygwin component contained
+in the @sc{Singular} installation archives.
 @item 
 If you are running Windows NT/2000, make sure that you are logged on as
 @code{Administrator}.
@@ -66,8 +71,8 @@ Execute the self-extracting archive (e.g., double-click on it) and
 When asked for the installation folder, you should simply choose a drive
 (you may choose a subfolder, but this is not as convenient as a drive).
 @strong{Important:} If you have Cygwin already installed on your system, 
-make sure that the folder you choose is mounted to the root of you
-(cygwin) file system.
+make sure that the folder you choose is mounted to the root of your
+(Cygwin) file system.
 @* Among others, the folowing subfolders will be created:
 @itemize @code
 @item bin
