@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmheap.h,v 1.5 1999-01-26 14:41:40 obachman Exp $ */
+/* $Id: mmheap.h,v 1.6 1999-06-07 17:48:27 Singular Exp $ */
 #include <stdlib.h>
 #include "mod2.h"
 #include "structs.h"
@@ -152,7 +152,7 @@ do                                                          \
   register memHeap _heap = heap;                            \
   if ((_heap)->current == NULL) mmAllocNewHeapPage(_heap);  \
   mmIncrHeapPageCounterOfAddr((_heap)->current);            \
-  ((void*) (what)) = (_heap)->current;                      \
+  (what) = (void *)(_heap)->current;                        \
   (_heap)->current =  *((void**)(_heap)->current);          \
 }                                                           \
 while (0)
