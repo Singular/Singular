@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.48 1998-05-18 16:12:14 obachman Exp $ */
+/* $Id: extra.cc,v 1.49 1998-05-20 07:52:23 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -356,6 +356,14 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     }
     else
 #endif
+/*==================== contributors =============================*/ 
+   if(strcmp((char*)(h->Data()),"contributors") == 0)
+   {
+     res->rtyp=STRING_CMD;
+     res->data=(void *)
+       "Olaf Bachmann, Hubert Grassmann, Kai Krueger, Wolfgang Neumann, Thomas Nuessler, Wilfried Pohl, Thomas Siebert, Ruediger Stobbe, Tim Wichmann";
+     return FALSE;
+   }
 #ifdef HAVE_EXTENDED_SYSTEM
 // You can put your own system calls here
 /*==================== LaScala ==================================*/

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.42 1998-05-18 19:21:07 obachman Exp $ */
+/* $Id: tesths.cc,v 1.43 1998-05-20 07:52:24 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -466,28 +466,12 @@ int main(          /* main entry to Singular */
   if (BVERBOSE(0) && !feBatch)
   {
     printf(
-#if 0
-"      SINGULAR : a Computer Algebra System              /\n"
-" a Computer Algebra System for polynomial computations        /   %s\n"
-"                                                     0<\n"
-"  by: G.-M. Greuel, G. Pfister, H. Schoenemann         \\   %s\n"
-#endif
 "                     SINGULAR                             /\n"
 " a Computer Algebra System for Polynomial Computations   /   %s\n"
 "                                                       0<\n"
 "  by: G.-M. Greuel, G. Pfister, H. Schoenemann           \\   %s\n"
 "FB Mathematik der Universitaet, D-67653 Kaiserslautern    \\\n"
-#if 0
-"contributions: O.Bachmann,W.Decker,H.Grassmann,B.Martin,M.Messollen,W.Neumann,\n"
-"\tW.Pohl,T.Siebert,R.Stobbe,T.Wichmann\n"
-"e-mail: singular@mathematik.uni-kl.de\n", S_VERSION1,S_VERSION2);
-#endif
 , S_VERSION1,S_VERSION2);
-#if 0
-    printf("%s  %s  (%d)",S_VERSION1,S_VERSION2, SINGULAR_VERSION_ID);
-    printf("\nPlease note:  every command must end with a semicolon \";"
-           "\"\n(e.g., help; help command; help General syntax; help ring; quit;)\n");
-#endif
   }
   else
   if (!feBatch)
