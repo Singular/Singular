@@ -119,8 +119,8 @@ else
 # Here is an ugly fix for a bug in cygwin
 # '[ test -f $src ]' evaluates to true, even if only $src.exe exists
 # However 'cp $src $dst' can  not find $src, if only $src.exe exists
-	if test -f "$src.exe" && -x "$src.exe"; then
-		$src="$src.exe"
+	if test -f "$src.exe" && test -x "$src.exe"; then
+		src="$src.exe"
 		true
 	elif [ -f $src -o -d $src ]
 	then
@@ -195,7 +195,6 @@ then
 else
 
 # If we're going to rename the final executable, determine the name now.
-	echo $dst
 
 	if [ x"$transformarg" = x ] 
 	then
@@ -205,7 +204,6 @@ else
 		dstfile=`basename $dst $transformbasename | 
 			sed $transformarg`$transformbasename
 	fi
-	echo $dstfile
 
 # don't allow the sed command to completely eliminate the filename
 

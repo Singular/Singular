@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.54 1998-06-16 11:03:57 obachman Exp $ */
+/* $Id: febase.cc,v 1.55 1998-06-16 17:34:44 pohl Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -130,7 +130,7 @@ BOOLEAN tclmode=FALSE;
  *****************************************************************/
 
 // Define to chatter about path stuff
-/* #define PATH_DEBUG */
+#define PATH_DEBUG
 static char* feArgv0 = NULL;
 static char* feExpandedExecutable = NULL;
 static char* feBinDir = NULL;
@@ -268,7 +268,7 @@ static char* feGetInfoFile(const char* bindir)
 {
   char* hlpfile = (char*) AllocL(max((bindir != NULL ? strlen(bindir) : 0),
                                      strlen(SINGULAR_ROOT_DIR))
-                                  + 30);
+                                  + 50);
 
 #ifdef PATH_DEBUG
   Print("Search for singular.hlp\n");
@@ -279,58 +279,58 @@ static char* feGetInfoFile(const char* bindir)
     // bindir/../doc/singular.hlp
     sprintf(hlpfile,"%s/../doc/singular.hlp", bindir);
 #ifdef PATH_DEBUG
-    Print("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
+    Print("trying %s -- %s\n", hlpfile, ( access(CleanUpName(hlpfile), R_OK) ? "no" : "yes"));
 #endif
-    if (! access(hlpfile, R_OK)) return feFixFileName(hlpfile);
+    if (! access(CleanUpName(hlpfile), R_OK)) return feFixFileName(hlpfile);
 
     // bindir/../info/singular.hlp
     sprintf(hlpfile,"%s/../info/singular.hlp", bindir);
 #ifdef PATH_DEBUG
-    Print("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
+    Print("trying %s -- %s\n", hlpfile, ( access(CleanUpName(hlpfile), R_OK) ? "no" : "yes"));
 #endif
-    if (! access(hlpfile, R_OK)) return feFixFileName(hlpfile);
+    if (! access(CleanUpName(hlpfile), R_OK)) return feFixFileName(hlpfile);
 
     // bindir/../../Singular/doc/$version/singular.hlp
     sprintf(hlpfile,"%s/../../Singular/doc/%s/singular.hlp",bindir,S_VERSION1);
 #ifdef PATH_DEBUG
-    Print("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
+    Print("trying %s -- %s\n", hlpfile, ( access(CleanUpName(hlpfile), R_OK) ? "no" : "yes"));
 #endif
-    if (! access(hlpfile, R_OK)) return feFixFileName(hlpfile);
+    if (! access(CleanUpName(hlpfile), R_OK)) return feFixFileName(hlpfile);
 
     // bindir/../../Singular/doc/singular.hlp
     sprintf(hlpfile,"%s/../../Singular/doc/singular.hlp", bindir);
 #ifdef PATH_DEBUG
-    Print("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
+    Print("trying %s -- %s\n", hlpfile, ( access(CleanUpName(hlpfile), R_OK) ? "no" : "yes"));
 #endif
-    if (! access(hlpfile, R_OK)) return feFixFileName(hlpfile);
+    if (! access(CleanUpName(hlpfile), R_OK)) return feFixFileName(hlpfile);
 
     // bindir/../../info/singular.hlp
     sprintf(hlpfile,"%s/../../info/singular.hlp", bindir);
 #ifdef PATH_DEBUG
-    Print("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
+    Print("trying %s -- %s\n", hlpfile, ( access(CleanUpName(hlpfile), R_OK) ? "no" : "yes"));
 #endif
-    if (! access(hlpfile, R_OK)) return feFixFileName(hlpfile);
+    if (! access(CleanUpName(hlpfile), R_OK)) return feFixFileName(hlpfile);
 
     // ROOTDIR/Singular/doc/$version/singular.hlp
     sprintf(hlpfile,"%s/Singular/doc/%s/singular.hlp", SINGULAR_ROOT_DIR, S_VERSION1);
 #ifdef PATH_DEBUG
-    Print("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
+    Print("trying %s -- %s\n", hlpfile, ( access(CleanUpName(hlpfile), R_OK) ? "no" : "yes"));
 #endif
-    if (! access(hlpfile, R_OK)) return feFixFileName(hlpfile);
+    if (! access(CleanUpName(hlpfile), R_OK)) return feFixFileName(hlpfile);
 
     // ROOTDIR/Singular/doc/singular.hlp
     sprintf(hlpfile,"%s/Singular/doc/singular.hlp", SINGULAR_ROOT_DIR);
 #ifdef PATH_DEBUG
-    Print("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
+    Print("trying %s -- %s\n", hlpfile, ( access(CleanUpName(hlpfile), R_OK) ? "no" : "yes"));
 #endif
-    if (! access(hlpfile, R_OK)) return feFixFileName(hlpfile);
+    if (! access(CleanUpName(hlpfile), R_OK)) return feFixFileName(hlpfile);
 
     // ROOTDIR/info/singular.hlp
     sprintf(hlpfile,"%s/info/singular.hlp", SINGULAR_ROOT_DIR);
  #ifdef PATH_DEBUG
-    Print("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
+    Print("trying %s -- %s\n", hlpfile, ( access(CleanUpName(hlpfile), R_OK) ? "no" : "yes"));
 #endif
-   if (! access(hlpfile, R_OK)) return feFixFileName(hlpfile);
+   if (! access(CleanUpName(hlpfile) , R_OK)) return feFixFileName(hlpfile);
   }
 
   // still here? Try all dirs in the search path

@@ -198,15 +198,15 @@ windist: ${SHAREDISTNAME}.tar.gz ${SINGULAR}
 	${INSTALL} ${SH_PROGRAM} ${WIN_BINDIR}
 	${INSTALL} ${INFO_PROGRAM} ${WIN_BINDIR}
 	${INSTALL} ${CYGWIN_DLL} ${WIN_BINDIR}
-	cp  ${SHAREDIST_NAME}.tar.gz ${TMPDIR}
-	cd ${TMPDIR}; gunzip ${SHAREDIST_NAME}.tar.gz; \
-                      tar xf ${SHAREDIST_NAME}.tar
+	cp  ${SHAREDISTNAME}.tar.gz ${TMPDIR}
+	cd ${TMPDIR}; gunzip ${SHAREDISTNAME}.tar.gz; \
+                      tar xf ${SHAREDISTNAME}.tar
 	rm -rf ${TMPDIR}/info ${TMPDIR}/Singular/README.share
 	cp INSTALL.win	${TMPDIR}/Singular/INSTALL
 	cp README.win	${TMPDIR}/Singular/README
 	cd ${TMPDIR}; \
-           ${ZIP} -r Singular-${SINGULAR_DOS_VERSION}-${SINGUNAME} Singular 
-	cp ${TMPDIR}/Singular-${SINGULAR_DOS_VERSION}-${SINGUNAME}.zip .
+           ${ZIP} -r sing Singular 
+	cp ${TMPDIR}/sing.zip Singular-${SINGULAR_VERSION}-${SINGUNAME}.zip .
 #	rm -rf ${TMPDIR}
 
 
