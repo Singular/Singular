@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: pdata.doc,v 1.19 2000-10-04 13:13:27 obachman Exp $
+@comment $Id: pdata.doc,v 1.20 2000-12-18 11:59:18 obachman Exp $
 @comment this file contains the "Polynomial data" appendix.
 
 @c The following directives are necessary for proper compilation
@@ -506,6 +506,18 @@ x^a < x^b  <==> there is an i,  1 <= i <= n :
 $x^\alpha < x^\beta  \Leftrightarrow  \exists\; 1 \le i \le n :
 \alpha_1 = \beta_1, \ldots, \alpha_{i-1} = \beta_{i-1}, \alpha_i <
 \beta_i$.
+@end tex
+@item rp:
+reverse lexicographical ordering:
+@*
+@ifinfo
+x^a < x^b  <==> there is an i,  1 <= i <= n :
+@*     a_n = b_n, @dots{}, a_(i+1) = b_(i+1), a_i > b_i.
+@end ifinfo
+@tex
+$x^\alpha < x^\beta  \Leftrightarrow  \exists\; 1 \le i \le n :
+\alpha_n = \beta_n,
+    \ldots, \alpha_{i+1} = \beta_{i+1}, \alpha_i > \beta_i.$
 @end tex
 @item dp:
 degree reverse lexicographical ordering:
