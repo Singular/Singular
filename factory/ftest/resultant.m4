@@ -1,9 +1,10 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: resultant.m4,v 1.2 1997-09-24 07:36:33 schmidt Exp $ */
+/* $Id: resultant.m4,v 1.3 1997-09-29 13:02:02 schmidt Exp $ */
 
 ftestSetNameOfGame( resultant,
         `"Usage: resultant [<options>] [<envSpec>] <f> <g> <x>\n"
-        "  calculates resultant( f, g, x ).\n"' )
+        "  calculates resultant of canonical forms f and g with\n"
+        "  respect to variable x.\n"' )
 
 //{{{ docu
 //
