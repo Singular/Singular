@@ -1,16 +1,16 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.27 1998-05-06 12:33:22 wichmann Exp $
+@comment $Id: reference.doc,v 1.28 1998-05-06 12:52:47 schmidt Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
 @c with emacs (C-c C-e C-b).
-@setfilename reference.info
-@node Top, Functions and variables
-@menu
-* Functions and variables::
-@end menu
-@node Functions and variables, Tricks and pitfalls, Data types, Top
-@chapter Functions and variables
+@c @setfilename reference.info
+@c @node Top, Functions and variables
+@c @menu
+@c * Functions and variables::
+@c @end menu
+@c @node Functions and variables, Tricks and pitfalls, Data types, Top
+@c @chapter Functions and variables
 
 
 @c ---------------------------------------
