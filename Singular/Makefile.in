@@ -245,7 +245,7 @@ clean:
 	cd ${docdir}; ${MAKE} clean
 
 distclean: clean
-	-rm -rf depend *.inc ${DIST_NAME} ${testdir}/out stamp-h
+	-rm -rf depend iparith.inc mpsr_Tok.inc ${DIST_NAME} ${testdir}/out stamp-h
 	-rm mod2.h Makefile TAGS* config.status config.cache config.log
 	cd ${docdir}; ${MAKE} distclean
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.10 1997-05-18 11:13:13 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.11 1997-06-20 13:15:56 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -646,7 +646,7 @@ int iiRegularity(lists L)
   dummy=syBetti(r,len,&reg);
   Free((ADDRESS)r,len*sizeof(ideal));
   delete dummy;
-  return reg-1;
+  return reg;
 }
 
 BOOLEAN iiDebugMarker=TRUE;
