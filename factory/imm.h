@@ -1,15 +1,20 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: imm.h,v 1.1 1997-03-27 10:00:31 schmidt Exp $
+// $Id: imm.h,v 1.2 1997-04-18 15:15:28 schmidt Exp $
 
 #ifndef INCL_IMMEDIATE_H
 #define INCL_IMMEDIATE_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1997/03/27 10:00:31  schmidt
+stream-io wrapped by NOSTREAMIO
+
 Revision 1.0  1996/05/17 10:59:41  stobbe
 Initial revision
 
 */
+
+#include <config.h>
 
 #ifndef NOSTREAMIO
 #include <iostream.h>
@@ -18,7 +23,6 @@ Initial revision
 #include "assert.h"
 
 #include "cf_defs.h"
-
 #include "cf_globals.h"
 #include "ffops.h"
 #include "gfops.h"
@@ -34,8 +38,6 @@ const int MINIMMEDIATE = -268435454; // -2^28-2
 const int MAXIMMEDIATE = 268435454;  // 2^28-2
 const long long int MINIMMEDIATELL = -268435454LL;
 const long long int MAXIMMEDIATELL = 268435454LL;
-
-class InternalCF;
 
 #ifdef HAS_ARITHMETIC_SHIFT
 
@@ -341,8 +343,11 @@ inline int imm_intval ( const InternalCF* const op )
 	else
 	    return imm2int( op );
     else  if ( is_imm( op ) == GFMARK ) {
-	ASSERT( 0, "not yet implemented" );
-	return 0;
+	ASSERT( gf_isff( imm2int( op ) ), "invalid conversion" );
+	if ( cf_glob_switches.isOn( SW_SYMMETRIC_FF ) )
+	    return ff_symmetric( gf_gf2ff( imm2int( op ) ) );
+	else
+	    return gf_gf2ff( imm2int( op ) );
     }
     else
 	return imm2int( op );
@@ -367,6 +372,5 @@ inline int imm_sign ( const InternalCF * const op )
     else
 	return -1;
 }
-
 
 #endif
