@@ -1,0 +1,6 @@
+Makefile *.dd *.d depend 
+LLL change_cost gen_test solve_IP toric_ideal
+.gdbinit grammar.h *.sv config.log config.status stamp-h
+*.soa *.oa
+*.sop *.op
+*.dl_o*
