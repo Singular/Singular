@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: fereadl.c,v 1.4 1999-11-16 10:52:40 hannes Exp $ */
+/* $Id: fereadl.c,v 1.5 1999-11-18 16:26:59 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -22,7 +22,9 @@
  #ifdef MSDOS
   #include <pc.h>
  #else
-  #ifdef HAVE_TERMCAP_H
+  #ifdef HAVE_TERM_H
+  #include <term.h>
+  #elif HAVE_TERMCAP_H
   #include <termcap.h>
   #elif HAVE_TERMIOS_H
   #include <termios.h>
