@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmemory.h,v 1.22 1999-09-27 14:36:35 obachman Exp $ */
+/* $Id: mmemory.h,v 1.23 1999-09-30 14:09:38 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -133,6 +133,12 @@ int mmTestHeaps();
 
 void mmPrintUsedList();
 void mmMarkInitDBMCB();
+void mmMarkCurrentUsageState();
+void mmMarkCurrentUsageStart();
+void mmMarkCurrentUsageStop();
+void mmPrintUnMarkedBlocks();
+void mmStartReferenceWatch();
+void mmStopReferenceWatch();
 void mmTestList (int all);
 
 #else

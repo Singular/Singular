@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmcheck.c,v 1.8 1999-09-29 17:03:35 obachman Exp $ */
+/* $Id: mmcheck.c,v 1.9 1999-09-30 14:09:37 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -34,6 +34,9 @@ void * mm_minAddr = NULL;
 
 /* int mm_MDEBUG = MDEBUG; */
 int mm_MDEBUG = 0;
+
+int mm_markCurrentUsage = 0;
+int mm_referenceWatch = 0;
 
 /**********************************************************************
  *
@@ -116,7 +119,7 @@ void mmDBInitNewHeapPage(memHeap heap)
 static int mmPrintDBMCB ( DBMCB * what, char* msg , int given_size)
 {
   (void)fprintf( stderr, "warning: %s\n", msg );
-  (void)fprintf( stderr, "block %lx allocated in: %s:%d",
+  (void)fprintf( stderr, "block %p allocated in: %s:%d",
                  (long)&(what->data),
                  what->allocated_fname, what->freed_lineno );
 #ifdef MTRACK
@@ -125,10 +128,10 @@ static int mmPrintDBMCB ( DBMCB * what, char* msg , int given_size)
 
   if ((what->flags & MM_FREEFLAG) && what->freed_fname != NULL)
   {
-    (void)fprintf( stderr, " freed in: %s:%d",
+    (void)fprintf( stderr, "freed in: %s:%d",
                    what->freed_fname, what->freed_lineno );
 #ifdef MTRACK
-    mmDBPrintThisStack(what, MM_PRINT_ALL_STACK, 0);
+    mmDBPrintThisStack(what, MM_PRINT_ALL_STACK, 1);
 #endif
   }
 #ifndef MTRACK
@@ -190,9 +193,20 @@ void mmFillDBMCB(DBMCB* what, size_t size, memHeap heap,
     what->allocated_lineno = lineno;
   }
   
-  what->flags = flags;
-  what->init = 0;
-
+  if (flags == MM_FREEFLAG)
+  {
+    what->flags &= ~ MM_USEDFLAG;
+    what->flags |= MM_FREEFLAG;
+    what->flags &= ~ MM_CURRENTLY_USEDFLAG;
+  }
+  else if (flags == MM_USEDFLAG)
+  {
+    what->flags &= ~ MM_FREEFLAG;
+    what->flags |= MM_USEDFLAG;
+    if (mm_markCurrentUsage == 1)
+      what->flags |= MM_CURRENTLY_USEDFLAG;
+  }
+  
   if (flags & MM_FREEFLAG)
     memset(addr, MM_FREE_PATTERN, size);
 
@@ -205,7 +219,7 @@ void mmMarkInitDBMCB()
   DBMCB * what=mm_theDBused.next;
   while (what != NULL)
   {
-    what->init = 1;
+    what->flags |= MM_INITFLAG;
     what = what->next;
   }
 }
@@ -328,9 +342,28 @@ static int mmCheckSingleDBMCB ( DBMCB * what, int size , int flags)
   #endif
 
   if ( ( what->flags & flags ) != flags )
-    return mmPrintDBMCB( what, "flags", 0 );
+  {
+    if (flags & MM_USEDFLAG)
+    {
+//      mmRemoveFromCurrentHeap(what->heap, what);
+//      mmMoveDBMCB(&mm_theDBfree, &mm_theDBused, what);
+      what->flags |= MM_USEDFLAG;
+      return mmPrintDBMCB( what, "block has been freed but still in use (fixed)", 0 );
+    }
+    return mmPrintDBMCB(what, "block still in use but should be free", 0);
+  }
 
-
+  if (mm_referenceWatch)
+  {
+    if (what->flags & MM_REFERENCEFLAG)
+    {
+//      mm_referenceWatch = 0;
+      return mmPrintDBMCB(what, "reference", 0);
+    }
+    else
+      what->flags |= MM_REFERENCEFLAG;
+  }
+      
   if ( what->size != size )
     return mmPrintDBMCB( what, "size", size );
 
@@ -560,6 +593,62 @@ BOOLEAN mmDBTest( const void* adr, const char * fname, const int lineno )
     return mmDBTestBlock( adr,l, fname, lineno );
   }
   return TRUE;
+}
+
+/**********************************************************************
+ *
+ * Routines fro marking
+ *
+ **********************************************************************/
+void mmMarkCurrentUsageState()
+{
+  DBMCB* what = mm_theDBused.next;
+  mm_markCurrentUsage = -1;
+  while (what != NULL)
+  {
+    what->flags |= MM_CURRENTLY_USEDFLAG;
+    what = what->next;
+  }
+}
+
+void mmMarkCurrentUsageStart()
+{
+  mm_markCurrentUsage = 1;
+}
+
+void mmMarkCurrentUsageStop()
+{
+  mm_markCurrentUsage = 0;
+}
+
+void mmPrintUnMarkedBlocks()
+{
+  DBMCB* what = mm_theDBused.next;
+  while (what != NULL)
+  {
+    if (! (what->flags & MM_CURRENTLY_USEDFLAG))
+    {
+      mmPrintDBMCB(what, "unused", 0);
+      what->flags |= MM_CURRENTLY_USEDFLAG;
+    }
+    what = what->next;
+  }
+}
+
+void mmStartReferenceWatch()
+{
+  DBMCB* what = mm_theDBused.next;
+  mm_referenceWatch = 1;
+  while (what != NULL)
+  {
+    what->flags &= ~ MM_REFERENCEFLAG;
+    what = what->next;
+  }
+}
+
+void mmStopReferenceWatch()
+{
+  mm_referenceWatch = 0;
 }
 
 #endif /* MDEBUG */

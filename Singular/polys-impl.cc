@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.25 1999-09-29 11:47:47 obachman Exp $ */
+/* $Id: polys-impl.cc,v 1.26 1999-09-30 14:09:39 obachman Exp $ */
 
 /***************************************************************
  *
@@ -919,16 +919,27 @@ void pDBMonAdd(poly p1, poly p2, poly p3, char* f, int l)
   }
   if (p2 == p1 || p3 == p1)
   {
-    Warn("Error in pMonAdd: Destination equals source in %s:%d\n", f, l);
+    Warn("Error in pMonAdd: Destination equals source in %s:%d", f, l);
   }
-  poly ptemp = pNew();
-  __pMonAdd(ptemp, p2, p3);
+  __pMonAdd(p1, p2, p3);
 
-  pCopy2(p1, p2);
-  pDBMonAddOn(p1, p3, f, l);
+  
+  poly ptemp = pInit();
+  for (int i=1; i<=pVariables; i++)
+  {
+    pSetExp(ptemp, i, pGetExp(p2, i) + pGetExp(p3, i));
+    if (pGetExp(ptemp, i) != pGetExp(p1, i))
+    {
+      Warn("Error in pMonAdd: %th exponent: %d != (%d == %d + %d)",
+           i, pGetExp(p1, i), pGetExp(ptemp, i), pGetExp(p2, i), 
+           pGetExp(p3, i));
+    }
+  }
+  pSetComp(ptemp, pGetComp(p2) + pGetComp(p3));
+  pSetm(ptemp);
 
   if (! pEqual(ptemp, p1))
-    Warn("Error in pCopyMonAddOn in %s:%d\n", f, l);
+    Warn("Error in pMonAdd in %s:%d", f, l);
   pFree1(ptemp);
 }
 

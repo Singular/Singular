@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.22 1999-09-24 12:24:15 Singular Exp $ */
+/* $Id: longrat.cc,v 1.23 1999-09-30 14:09:37 obachman Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -1827,9 +1827,9 @@ void nlPower (number x,int exp,number * u)
 
 BOOLEAN nlIsZero (number a)
 {
-#ifdef LDEBUG
-  nlTest(a);
-#endif
+// #ifdef LDEBUG
+//   nlTest(a);
+// #endif
   //if (a==INT_TO_SR(0)) return TRUE;
   //if (SR_HDL(a) & SR_INT) return FALSE;
   //number aa=nlCopy(a);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: pProcs.cc,v 1.2 1999-09-29 17:03:36 obachman Exp $ */
+/* $Id: pProcs.cc,v 1.3 1999-09-30 14:09:39 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for primitive poly arithmetic
 */
@@ -11,7 +11,6 @@
 #include "polys-comp.h"
 #include "pProcs.h"
 #include "numbers.h"
-
 
 // Define to us COMP_MACROS
 #define HAVE_COMP_MACROS
@@ -32,7 +31,6 @@ do                                              \
   FreeHeap(__p, heap);                          \
 }                                               \
 while(0)
-
 /***************************************************************
  *
  * General:  p_Mult_n which always works
@@ -50,7 +48,7 @@ poly p_Mult_n_General(poly p, number n)
   {
     number nc = pGetCoeff(p);
     pSetCoeff0(p, nMult(n, nc));
-    nDelete(&nc);
+//    nDelete(&nc);
     pIter(p);
   }
   return q;
@@ -151,6 +149,7 @@ poly p_Add_q_General(poly p, poly q, int *lp, int lq,
   return pNext(&rp);
 }
 
+
 /***************************************************************
  *
  * General: p_Mult_m which always works
@@ -161,7 +160,6 @@ poly p_Add_q_General(poly p, poly q, int *lp, int lq,
  * Const: p, m
  *
  ***************************************************************/
-  
 poly  p_Mult_m_General(poly p,
                        poly m, 
                        poly spNoether,
@@ -169,11 +167,11 @@ poly  p_Mult_m_General(poly p,
 {
   assume(heap != NULL && heap != MM_UNKNOWN_HEAP);
   assume(pHeapTest(p, MM_UNKNOWN_HEAP));
-//  assume(pHeapTest(m, MM_UNKNOWN_HEAP));
+  assume(pHeapTest(m, MM_UNKNOWN_HEAP));
   
   if (p == NULL) return NULL;
   spolyrec rp;
-  poly q = &rp;
+  poly q = &rp, r;
   number ln = pGetCoeff(m);
 
   if (spNoether == NULL)
@@ -182,7 +180,6 @@ poly  p_Mult_m_General(poly p,
     {
       AllocHeap(pNext(q), heap);
       q = pNext(q);
-
       pSetCoeff0(q, nMult(ln, pGetCoeff(p)));
     
       assume(pGetComp(m) == 0 || pGetComp(p) == 0);
@@ -233,10 +230,17 @@ poly p_Minus_m_Mult_q_General (poly p,
                                int *lp,  int lq,
                                memHeap heap)
 {
+#ifdef TRACK_MEMORY
+  mmMarkCurrentUsageState();
+  poly ptemp = pCopy(p);
+  pDelete(&p);
+  p = ptemp;
+#endif  
   assume(heap != NULL && heap != MM_UNKNOWN_HEAP);
   assume(pHeapTest(p, heap));
-//  assume(pHeapTest(m, MM_UNKNOWN_HEAP));
   assume(pHeapTest(q, MM_UNKNOWN_HEAP));
+  assume(pNext(m) == NULL || (! (pNext(m) = NULL)));
+  assume(pHeapTest(m, MM_UNKNOWN_HEAP));
   assume(lp == NULL || (pLength(p) == *lp && pLength(q) == lq));
 
   // we are done if q == NULL || m == NULL
@@ -324,6 +328,9 @@ poly p_Minus_m_Mult_q_General (poly p,
     }
  
  Finish: // q or p is NULL: Clean-up time
+
+    pNext(a) = NULL;
+    
    if (q == NULL) // append rest of p to result
      pNext(a) = p;
    else  // append (- m*q) to result
@@ -335,11 +342,20 @@ poly p_Minus_m_Mult_q_General (poly p,
    
    nDelete(&tneg);
    if (qm != NULL) FreeHeap(qm, heap);
+   if (lp != NULL) *lp = l;
    
    assume(pHeapTest(pNext(&rp), heap));
    assume(lp == NULL || pLength(pNext(&rp)) == l);
    
-   if (lp != NULL) *lp = l;
-   return pNext(&rp);
+#ifdef TRACK_MEMORY
+   mmMarkCurrentUsageStart();
+   ptemp = pCopy(rp.next);
+   pDelete(&(rp.next));
+   rp.next = ptemp;
+   mmMarkCurrentUsageStop();
+   mmPrintUnMarkedBlocks();
+#endif
+   
+  return pNext(&rp);
 } 
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.37 1999-09-29 10:59:31 obachman Exp $ */
+/* $Id: kutil.cc,v 1.38 1999-09-30 14:09:36 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -179,9 +179,11 @@ void cleanT (kStrategy strat)
       }
       if (p == strat->S[i])
       {
+#if 0
         if (strat->T[j].heap != NULL)
           strat->S[i]
             = pShallowCopyDelete(mm_specHeap, &p, strat->T[j].heap);
+#endif
         break;
       }
     }
@@ -254,7 +256,15 @@ BOOLEAN K_Test_L(char *f , int l, LObject *L,
 {
   BOOLEAN ret = TRUE;
   
-  if (testp) ret &= pDBTest(L->p, L->heap, f, l);
+  if (testp) 
+  {
+    if (! pDBTest(L->p, L->heap, f, l))
+    {
+      Print("for L->p\n");
+      ret = FALSE;
+    }
+  }
+  
   if (L->pLength != 0 && L->pLength != pLength(L->p))
   {
     Print("L[%d] length error: has %d, specified to have %d\n",
@@ -288,15 +298,40 @@ BOOLEAN K_Test_L(char *f , int l, LObject *L,
   return ret;
 }
 
-BOOLEAN K_Test (char *f, int l, kStrategy strat)
+BOOLEAN K_Test (char *f, int l, kStrategy strat, int pref)
 {
   int i;
   BOOLEAN ret;
   // test P
+  // test T
+  if (strat->T != NULL)
+  {
+#ifdef MDEBUG
+    mmStartReferenceWatch();
+#endif
+    for (i=0; i<=strat->tl; i++)
+    {
+      if (K_Test_T(f, l, &(strat->T[i]), i) == FALSE)
+      {
+        ret = FALSE;
+      }
+    }
+#ifdef MDEBUG
+    if (! pref) mmStopReferenceWatch();
+#endif
+  }
   ret = K_Test_L(f, l, &(strat->P),
                  (strat->P.p != NULL && pNext(strat->P.p) != strat->tail),
                  -1, strat->T, strat->tl+1);
 
+#ifdef MDEBUG
+  if (pref) mmStopReferenceWatch();
+#endif
+  if (ret == FALSE)
+  {
+    Print("for strat->P\n");
+  }
+  
   // test L
   if (strat->L != NULL)
   {
@@ -307,26 +342,23 @@ BOOLEAN K_Test (char *f, int l, kStrategy strat)
         Print("L[%d].p is NULL\n", i);
         ret = FALSE;
       }
-      ret &= K_Test_L(f, l, &(strat->L[i]), 
-                      (pNext(strat->L[i].p) != strat->tail), i,
-                      strat->T, strat->tl + 1);
+      if (K_Test_L(f, l, &(strat->L[i]), 
+                   (pNext(strat->L[i].p) != strat->tail), i,
+                   strat->T, strat->tl + 1) == FALSE)
+      {
+        Print("for strat->L[%d]\n", i);
+        ret = FALSE;
+      }
     }
   }
 
-  // test T
-  if (strat->T != NULL)
-  {
-    for (i=0; i<=strat->tl; i++)
-    {
-      ret &= K_Test_T(f, l, &(strat->T[i]), i);
-    }
-  }
   return ret;
 }
 
 BOOLEAN K_Test_T(char* f, int l, TObject * T, int i)
 {
   BOOLEAN ret = pDBTest(T->p, T->heap, f, l);
+  if (ret == FALSE) Print("for T[%d]\n", i);
   if (T->pLength != 0 &&
       T->pLength != pLength(T->p))
   {
@@ -2231,6 +2263,7 @@ poly redtailBba (poly p, int pos, kStrategy strat)
       if (pDivisibleBy(strat->S[j], hn))
       {
         strat->redTailChange=TRUE;
+        assume(p != strat->S[j]);
         ksOldSpolyTail(strat->S[j], p, h, strat->kNoether);
         hn = pNext(h);
         if (hn == NULL)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmisc.c,v 1.12 1999-09-29 17:03:35 obachman Exp $ */
+/* $Id: mmisc.c,v 1.13 1999-09-30 14:09:38 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -162,7 +162,7 @@ void mmTestList (int all)
   fprintf(stderr,"list of used blocks:\n");
   while (what!=NULL)
   {
-    if ((all & MM_PRINT_ALL_ADDR) || what->init == 0)
+    if ((all & MM_PRINT_ALL_ADDR) || ! (what->flags & MM_INITFLAG))
     {
       fprintf( stderr, "%d bytes at %p allocated in: %s:%d",
                (int)what->size, what, what->allocated_fname, what->allocated_lineno);

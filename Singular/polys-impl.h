@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.35 1999-09-29 10:59:36 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.36 1999-09-30 14:09:40 obachman Exp $ */
 
 /***************************************************************
  *
@@ -370,9 +370,6 @@ inline void __pMonAdd(poly p1, poly p2, poly p3)
   const unsigned long* s2 = &(p2->exp.l[0]);
   const unsigned long* s3 = &(p3->exp.l[0]);
   const unsigned long* const ub = s3 + currRing->ExpLSize;
-
-  p1->next = p2->next;
-  p1->coef = p2->coef;
 
   for (;;)
   {

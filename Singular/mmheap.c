@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmheap.c,v 1.9 1999-07-05 14:13:16 Singular Exp $ */
+/* $Id: mmheap.c,v 1.10 1999-09-30 14:09:38 obachman Exp $ */
 
 #include "mod2.h"
 
@@ -109,6 +109,11 @@ void mmMergeHeap(memHeap into, memHeap what)
   what->current = NULL;
 
   mmCheckHeap(into);
+}
+
+void mmRemoveFromCurrentHeap(memHeap heap, void* addr)
+{
+  heap->current = mmRemoveFromList((void*) heap->current, addr);
 }
 
 #ifdef HAVE_PAGE_ALIGNMENT
@@ -339,19 +344,7 @@ void * mmDebugAllocHeap(memHeap heap, const char* fn, int l)
 
   if (mm_HEAP_DEBUG > 1 && ! mmDebugCheckHeap(heap, fn, l))
     return NULL;
-#if 0  
   _mmAllocHeap(res, heap);
-#else
-  {
-    register memHeap _heap =   heap ; 
-    if ((_heap)->current == ((void *)0) ) mmAllocNewHeapPage(_heap); 
-    do { register memHeapPage page = (memHeapPage) ((void*) ((long) (   (_heap)->current   ) & ~(SIZE_OF_SYSTEM_PAGE  -1)))  ; 
-    (page->counter)++; } while (0) ; 
-    ((void*) ( res )) = (_heap)->current; 
-    (_heap)->current =  *((void**)(_heap)->current); 
-  }
-#endif  
-
 
   mmDebugCheckSingleHeapAddr(res, heap, fn, l);
   

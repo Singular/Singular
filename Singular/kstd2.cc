@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.31 1999-09-29 17:03:33 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.32 1999-09-30 14:09:35 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -363,9 +363,8 @@ static void redHomog (LObject* h,kStrategy strat)
     }
 
     // now we found one which is divisible
-    ksReducePoly(h, &(strat->T[j]),
-                 strat->kNoether);
-    kTest(strat);
+    ksReducePoly(h, &(strat->T[j]), strat->kNoether);
+
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
@@ -899,14 +898,14 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     //test_int_std(strat->kIdeal);
     if (strat->Ll== 0) strat->interpt=TRUE;
     if (TEST_OPT_DEGBOUND
-    && ((strat->honey && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p)>Kstd1_deg))
-       || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p)>Kstd1_deg))))
+        && ((strat->honey && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p)>Kstd1_deg))
+            || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p)>Kstd1_deg))))
     {
       /*
-      *stops computation if
-      * 24 IN test and the degree +ecart of L[strat->Ll] is bigger then
-      *a predefined number Kstd1_deg
-      */
+       *stops computation if
+       * 24 IN test and the degree +ecart of L[strat->Ll] is bigger then
+       *a predefined number Kstd1_deg
+       */
       while (strat->Ll >= 0) deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
       break;
     }
@@ -924,74 +923,74 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     }
     if((strat->P.p1==NULL) && (strat->minim>0))
       strat->P.p2=pCopy(strat->P.p);
+    if (strat->honey)
     {
-      if (strat->honey)
-      {
-        if (TEST_OPT_PROT) message(strat->P.ecart+pFDeg(strat->P.p),&olddeg,&reduc,strat);
-      }
-      else
-      {
-        if (TEST_OPT_PROT) message(pFDeg(strat->P.p),&olddeg,&reduc,strat);
-      }
-      /* reduction of the element choosen from L */
-      strat->red(&strat->P,strat);
-      pTest(strat->P.p);
+      if (TEST_OPT_PROT) message(strat->P.ecart+pFDeg(strat->P.p),&olddeg,&reduc,strat);
     }
-    kTest_TS(strat);
+    else
+    {
+      if (TEST_OPT_PROT) message(pFDeg(strat->P.p),&olddeg,&reduc,strat);
+    }
+    /* reduction of the element choosen from L */
+    kTest_Pref(strat);
+    strat->red(&strat->P,strat);
     if (strat->P.p != NULL)
     {
-          /* statistic */
-          if (TEST_OPT_PROT) PrintS("s");
-          /* enter P.p into s and L */
+      kTest(strat);
+      /* statistic */
+      if (TEST_OPT_PROT) PrintS("s");
+      /* enter P.p into s and L */
+      {
+        int pos=posInS(strat->S,strat->sl,strat->P.p);
+        {
+          if (TEST_OPT_INTSTRATEGY)
           {
-            int pos=posInS(strat->S,strat->sl,strat->P.p);
+            if ((!TEST_OPT_MINRES)||(strat->syzComp==0)||(!strat->homog))
             {
-              if (TEST_OPT_INTSTRATEGY)
-              {
-                if ((!TEST_OPT_MINRES)||(strat->syzComp==0)||(!strat->homog))
-                {
-                  strat->P.p = redtailBba(strat->P.p,pos-1,strat);
-                  //if (strat->redTailChange)
-                    pCleardenom(strat->P.p);
-                }
-              }
-              else
-              {
-                pNorm(strat->P.p);
-                if ((!TEST_OPT_MINRES)||(strat->syzComp==0)||(!strat->homog))
-                {
-                  strat->P.p = redtailBba(strat->P.p,pos-1,strat);
-                }
-              }
-              if (TEST_OPT_DEBUG)
-              {
-                PrintS("new s:");
-                wrp(strat->P.p);
-                PrintLn();
-              }
-              if((strat->P.p1==NULL) && (strat->minim>0))
-              {
-                if (strat->minim==1)
-                {
-                  strat->M->m[minimcnt]=pCopy(strat->P.p);
-                  pDelete(&strat->P.p2);
-                }
-                else
-                {
-                  strat->M->m[minimcnt]=strat->P.p2;
-                  strat->P.p2=NULL;
-                }
-                minimcnt++;
-              }
-              enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat);
-              if (strat->sl==-1) pos=0;
-              else pos=posInS(strat->S,strat->sl,strat->P.p);
-              strat->enterS(strat->P,pos,strat);
+              strat->P.p = redtailBba(strat->P.p,pos-1,strat);
+              //if (strat->redTailChange)
+              pCleardenom(strat->P.p);
             }
-            if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
           }
-          if (strat->P.lcm!=NULL) pFree1(strat->P.lcm);
+          else
+          {
+            pNorm(strat->P.p);
+            if ((!TEST_OPT_MINRES)||(strat->syzComp==0)||(!strat->homog))
+            {
+              strat->P.p = redtailBba(strat->P.p,pos-1,strat);
+              kTest(strat);
+            }
+          }
+          if (TEST_OPT_DEBUG)
+          {
+            PrintS("new s:");
+            wrp(strat->P.p);
+            PrintLn();
+          }
+          if((strat->P.p1==NULL) && (strat->minim>0))
+          {
+            if (strat->minim==1)
+            {
+              strat->M->m[minimcnt]=pCopy(strat->P.p);
+              pDelete(&strat->P.p2);
+            }
+            else
+            {
+              strat->M->m[minimcnt]=strat->P.p2;
+              strat->P.p2=NULL;
+            }
+            minimcnt++;
+          }
+          enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat);
+          if (strat->sl==-1) pos=0;
+          else pos=posInS(strat->S,strat->sl,strat->P.p);
+          strat->enterS(strat->P,pos,strat);
+        }
+        if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
+      }
+      if (strat->P.lcm!=NULL) pFree1(strat->P.lcm);
       if (strat->sl>srmax) srmax = strat->sl;
+      kTest(strat);
     }
 #ifdef KDEBUG
     strat->P.lcm=NULL;

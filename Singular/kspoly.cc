@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.1 1999-09-29 10:59:29 obachman Exp $ */
+/* $Id: kspoly.cc,v 1.2 1999-09-30 14:09:34 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -18,6 +18,7 @@
 #undef assume
 #define assume(x) 
 #endif
+
 
 /***************************************************************
  *
@@ -37,7 +38,6 @@ void ksReducePoly(LObject* PR,
   poly p2 = PW->p;
   assume(p2 != NULL && p1 != NULL && pDivisibleBy(p2,  p1));
   poly a2 = pNext(p2), lm = p1;
-  
 
   p1 = pNext(p1);
   pNext(lm) = NULL;
@@ -150,7 +150,6 @@ void ksCreateSpoly(LObject* Pair,
   // get m2 * a2
   a2 = p_Mult_m(a2, m2, spNoether);
 
-  int l2;
   // and, finally, the spoly
   Pair->p = p_Minus_m_Mult_q(a2, m1, a1, spNoether);
   
@@ -169,7 +168,6 @@ void ksCreateSpoly(LObject* Pair,
       pSetCompP(p2,0);
     }
   }
-  
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -457,6 +455,21 @@ poly ksOldCreateSpoly(poly p1, poly p2, poly spNoether)
   return L.p;
 }
 
+#if 0
+void ksOldSpolyTail(poly p1, poly q, poly q2, poly spNoether)
+{
+  LObject L;
+  TObject T;
+
+  L.p = q;
+  T.p = p1;
+  
+  ksSpolyTail(&L, &T, q2, spNoether);
+  return;
+}
+
+
+#else
   
 /*2
 * reduction of tail(q) with p1
@@ -490,7 +503,6 @@ void ksOldSpolyTail(poly p1, poly q, poly q2, poly spNoether)
   {
     m = pHead0(p2);
     pSetCoeff0(m,bn);
-    a2 = pCopy(a2);
   }
   if ((ct == 0) || (ct == 2))
   {
@@ -528,7 +540,7 @@ void ksOldSpolyTail(poly p1, poly q, poly q2, poly spNoether)
   }
 }
 
-          
+#endif          
 
   
   

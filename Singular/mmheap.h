@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmheap.h,v 1.10 1999-09-29 10:59:33 obachman Exp $ */
+/* $Id: mmheap.h,v 1.11 1999-09-30 14:09:38 obachman Exp $ */
 #include <stdlib.h>
 #include "mod2.h"
 #include "structs.h"
@@ -49,6 +49,10 @@ extern void mmCleanHeap(memHeap heap);
 
 /* Merges what is free in Heap "what" into free list of heap "into" */
 void mmMergeHeap(memHeap into, memHeap what);
+
+/* Removes addr from free list of heap, provided it finds it there */
+void mmRemoveFromCurrentHeap(memHeap heap, void* addr);
+  
 
 /*****************************************************************
  *
@@ -177,7 +181,7 @@ do                                                          \
 {                                                           \
   register memHeap _heap = heap;                            \
   if ((_heap)->current == NULL) mmAllocNewHeapPage(_heap);  \
-  (what) = (void *)((_heap)->current);                      \
+  (void*) (what) = (void *)((_heap)->current);              \
   (_heap)->current =  *((void**)(_heap)->current);          \
 }                                                           \
 while (0)

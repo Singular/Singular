@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmprivate.h,v 1.11 1999-09-29 17:03:36 obachman Exp $ */
+/* $Id: mmprivate.h,v 1.12 1999-09-30 14:09:39 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -39,7 +39,6 @@ typedef struct DBMCB
   unsigned long bt_allocated_stack[BT_MAXSTACK];
   unsigned long bt_freed_stack[BT_MAXSTACK];
 #endif
-  int init;
   size_t size;
   int allocated_lineno;
   int freed_lineno;
@@ -64,8 +63,11 @@ extern DBMCB mm_theDBfree;
 extern void * mm_maxAddr;
 extern void * mm_minAddr;
 
+#define MM_INITFLAG 2
 #define MM_FREEFLAG 4
 #define MM_USEDFLAG 8
+#define MM_CURRENTLY_USEDFLAG 16
+#define MM_REFERENCEFLAG 32
 
 void mmPrintFL( const char* fname, const int lineno );
 void mmDBInitNewHeapPage(memHeap heap);
