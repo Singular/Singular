@@ -1477,8 +1477,10 @@ static void go_on (calc_dat* c){
 	    }
 	}
     }
-  for(z2=0;c->expandS[z2];z2++)
+  for(z2=0;c->expandS[z2]!=NULL;z2++){
     add_to_reductors(c,c->expandS[z2],pLength(c->expandS[z2]));
+    // PrintS("E");
+  }
   omfree(c->modifiedS);
   c->modifiedS=NULL;
   omfree(c->expandS);
@@ -2679,6 +2681,7 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c)
 	int i;
 	for(i=0;c->expandS[i];i++);
 	c->expandS=(poly*) omrealloc(c->expandS,(i+2)*sizeof(poly));
+	c->expandS[i]=erg.expand;
 	c->expandS[i+1]=NULL;
       }
       //      add_to_reductors(c,erg.expand,erg.expand_length);
