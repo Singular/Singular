@@ -1,9 +1,9 @@
-// $Id: poly.lib,v 1.23 2000-01-10 16:40:41 obachman Exp $
+// $Id: poly.lib,v 1.24 2000-01-12 10:35:01 obachman Exp $
 //(GMG, last modified 22.06.96)
 //(obachman: 17.12.97 -- added katsura)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: poly.lib,v 1.23 2000-01-10 16:40:41 obachman Exp $";
+version="$Id: poly.lib,v 1.24 2000-01-12 10:35:01 obachman Exp $";
 info="
 LIBRARY:  poly.lib      PROCEDURES FOR MANIPULATING POLYS, IDEALS, MODULES
 
@@ -683,22 +683,16 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
+
 proc numerator(number n)
-"USAGE: numerator(n); n number
-RETURN: number, the numerator of n
+"USAGE:    numerator(n); n number
+RETURN:   number, the numerator of n
 SEE ALSO: denominator, content, cleardenom
-EXAMPLE: example numerator; shows an example
+EXAMPLE:  example numerator; shows an example
 "
 {
-  poly p = n*var(1) + 1;
-  p = cleardenom(p);
-  
-  if (lead(var(1) + 1) == 1)
-  {
-    p = p - lead(p);
-  }
-  
-  return (leadcoef(p));
+  poly p = cleardenom(n+var(1));
+  return (coeffs(p,var(1))[1,1]);
 }
 example
 {
@@ -708,24 +702,15 @@ example
   numerator(n);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
 proc denominator(number n)
-"USAGE: denominator(n); n number
-RETURN: number, the denominator of n
-SEE ALSO: numerator, content, cleardenom
-EXAMPLE: example denominator; shows an example
+"USAGE:    denominator(n); n number
+RETURN:   number, the denominator of n
+SEE ALSO: denominator, content, cleardenom
+EXAMPLE:  example denominator; shows an example
 "
 {
-  poly p = n*var(1) + 1;
-  p = cleardenom(p);
-  
-  if (lead(var(1) + 1) != 1)
-  {
-    p = p - lead(p);
-  }
-  
-  return (leadcoef(p));
+  poly p = cleardenom(n+var(1));
+  return (coeffs(p,var(1))[2,1]);
 }
 example
 {
@@ -734,7 +719,6 @@ example
   number n = 3/2;
   denominator(n);
 }
-
 
 
   
