@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.69 2000-11-30 16:46:09 Singular Exp $ */
+/* $Id: polys.cc,v 1.70 2000-12-01 14:07:49 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -147,10 +147,10 @@ char * p_Read(char *st, poly &rc, ring r)
   if (s==st)
   /* i.e. it does not start with a coeff: test if it is a ringvar*/
   {
-    j = rIsRingVar(s);
+    j = r_IsRingVar(s,r);
     if (j >= 0)
     {
-      pIncrExp(rc,1+j);
+      p_IncrExp(rc,1+j,r);
       while (*s!='\0') s++;
       goto done;
     }
@@ -894,5 +894,3 @@ BOOLEAN pCompareChain (poly p,poly p1,poly p2,poly lcm)
   }
   return FALSE;
 }
-
-
