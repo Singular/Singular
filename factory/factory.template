@@ -1,28 +1,42 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: factory.template,v 1.7 1997-06-20 10:45:17 schmidt Exp $ */
+/* $Id: factory.template,v 1.8 1997-06-23 11:05:35 schmidt Exp $ */
 
 #ifndef INCL_FACTORY_H
 #define INCL_FACTORY_H
+
+//{{{ docu
+//
+// factory.template - template to generate factory.h.
+//
+// factory.h is the user interface to factory.  Created
+// automatically by makeheader, it collects all important
+// declarations from all important factory header files into one
+// overall header file leaving out all boring factory internal
+// stuff.  See ./bin/makeheader for an explanation of the syntax
+// of this file.
+//
+// Note: In this file the order of 'includes' matters (since this
+// are not real includes)!  In general, files at the end depend
+// on files at the beginning.
+//
+//}}}
 
 #include <factoryconf.h>
 
 #ifndef NOSTREAMIO
 #include <iostream.h>
-#endif /* NOSTREAMIO */
+#endif /* ! NOSTREAMIO */
 
 #ifdef SINGULAR
 extern "C" {
 #include <gmp.h>
 }
-#endif
+#endif /* SINGULAR */
 
 #include <templates/ftmpl_array.h>
 #include <templates/ftmpl_factor.h>
 #include <templates/ftmpl_list.h>
 #include <templates/ftmpl_matrix.h>
-
-// note that in this file the order of 'includes' matters!
-// in general, files at the end depend on file at the beginning.
 
 /*MAKEHEADER PUBLIC ONLY*/
 #include "cf_globals.h"
@@ -70,11 +84,13 @@ extern "C" {
 #include "cf_reval.h"
 
 #ifdef SINGULAR
+
 /*MAKEHEADER PUBLIC ONLY*/
 #include "gfops.h"
 
 /*MAKEHEADER PUBLIC ONLY*/
 #include "singext.h"
-#endif
+
+#endif /* SINGULAR */
 
 #endif /* ! INCL_FACTORY_H */
