@@ -29,6 +29,9 @@ ac_help="$ac_help
      libfac               char set and modp poly factorization library"
 ac_help="$ac_help
 \
+     sgroup               numerical semigroup computations"
+ac_help="$ac_help
+\
      Singular             CAS for commutative algebra"
 ac_help="$ac_help
 \
@@ -691,7 +694,7 @@ else
   yes;
 #endif
 EOF
-if { ac_try='${CC-cc} -E conftest.c'; { (eval echo configure:695: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
+if { ac_try='${CC-cc} -E conftest.c'; { (eval echo configure:698: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
   ac_cv_prog_gcc=yes
 else
   ac_cv_prog_gcc=no
@@ -743,13 +746,13 @@ else
   # On the NeXT, cc -E runs the code through the compiler's parser,
   # not just through cpp.
   cat > conftest.$ac_ext <<EOF
-#line 747 "configure"
+#line 750 "configure"
 #include "confdefs.h"
 #include <assert.h>
 Syntax Error
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:753: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:756: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out`
 if test -z "$ac_err"; then
   :
@@ -758,13 +761,13 @@ else
   rm -rf conftest*
   CPP="${CC-cc} -E -traditional-cpp"
   cat > conftest.$ac_ext <<EOF
-#line 762 "configure"
+#line 765 "configure"
 #include "confdefs.h"
 #include <assert.h>
 Syntax Error
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:768: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:771: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out`
 if test -z "$ac_err"; then
   :
@@ -786,7 +789,7 @@ echo "$ac_t""$CPP" 1>&6
 
 echo $ac_n "checking for AIX""... $ac_c" 1>&6
 cat > conftest.$ac_ext <<EOF
-#line 790 "configure"
+#line 793 "configure"
 #include "confdefs.h"
 #ifdef _AIX
   yes
@@ -846,7 +849,7 @@ if eval "test \"`echo '$''{'ac_cv_is_aix'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 850 "configure"
+#line 853 "configure"
 #include "confdefs.h"
 #ifdef _AIX
     yes
@@ -880,7 +883,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lm  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 884 "configure"
+#line 887 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 char atof();
@@ -890,7 +893,7 @@ int t() {
 atof()
 ; return 0; }
 EOF
-if { (eval echo configure:894: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
+if { (eval echo configure:897: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -922,7 +925,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lgmp  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 926 "configure"
+#line 929 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 char mpq_init();
@@ -932,7 +935,7 @@ int t() {
 mpq_init()
 ; return 0; }
 EOF
-if { (eval echo configure:936: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
+if { (eval echo configure:939: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -964,7 +967,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lsmallgmp  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 968 "configure"
+#line 971 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 char mpz_init();
@@ -974,7 +977,7 @@ int t() {
 mpz_init()
 ; return 0; }
 EOF
-if { (eval echo configure:978: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
+if { (eval echo configure:981: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1006,7 +1009,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lMP  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1010 "configure"
+#line 1013 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 char IMP_PutGmpInt();
@@ -1016,7 +1019,7 @@ int t() {
 IMP_PutGmpInt()
 ; return 0; }
 EOF
-if { (eval echo configure:1020: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
+if { (eval echo configure:1023: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1048,7 +1051,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lMPT  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1052 "configure"
+#line 1055 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 char MPT_GetTree();
@@ -1058,7 +1061,7 @@ int t() {
 MPT_GetTree()
 ; return 0; }
 EOF
-if { (eval echo configure:1062: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
+if { (eval echo configure:1065: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1090,7 +1093,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lsingcf  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1094 "configure"
+#line 1097 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 char atof();
@@ -1100,7 +1103,7 @@ int t() {
 atof()
 ; return 0; }
 EOF
-if { (eval echo configure:1104: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
+if { (eval echo configure:1107: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1132,7 +1135,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lsingfac  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1136 "configure"
+#line 1139 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 char atof();
@@ -1142,7 +1145,7 @@ int t() {
 atof()
 ; return 0; }
 EOF
-if { (eval echo configure:1146: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
+if { (eval echo configure:1149: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1175,12 +1178,12 @@ if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1179 "configure"
+#line 1182 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1184: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1187: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -1256,6 +1259,12 @@ fi
 # Check whether --enable-libfac or --disable-libfac was given.
 if test "${enable_libfac+set}" = set; then
   enableval="$enable_libfac"
+  :
+fi
+
+# Check whether --enable-sgroup or --disable-sgroup was given.
+if test "${enable_sgroup+set}" = set; then
+  enableval="$enable_sgroup"
   :
 fi
 
@@ -1404,6 +1413,38 @@ else
   fi
   enable_libfac=no
   ac_configure_args="$ac_configure_args --disable-libfac"
+fi
+
+echo $ac_n "checking whether to configure and build sgroup""... $ac_c" 1>&6
+if test "$enable_sgroup" != no; then
+    enable_sgroup=yes
+fi
+
+if test "$enable_sgroup" = yes && test -d sgroup; then
+  if test "$ac_will_have_gmp" = yes  || test "$ac_gmp_ok" = yes; then
+    if test "$enable_MP" != no || test "$ac_MP_ok" = yes; then
+      echo "$ac_t""yes" 1>&6
+      CONFIG_SUBDIRS="$CONFIG_SUBDIRS sgroup"
+      ac_configure_args="$ac_configure_args --enable-sgroup"
+    else
+      echo "$ac_t""no" 1>&6
+      echo "configure: warning: Can not build sgroup without having MP" 1>&2
+      enable_sgroup=no
+      ac_configure_args="$ac_configure_args --disable-sgroup"
+    fi
+  else
+    echo "$ac_t""no" 1>&6
+    echo "configure: warning: Can not build sgroup without having gmp" 1>&2
+    enable_sgroup=no
+    ac_configure_args="$ac_configure_args --disable-sgroup"
+  fi
+else
+  echo "$ac_t""no" 1>&6
+  if  test "$enable_sgroup" = yes && test ! -d sgroup; then
+    echo "configure: warning: Did not find sgroup subdirectory" 1>&2
+  fi
+  enable_sgroup=no
+  ac_configure_args="$ac_configure_args --disable-sgroup"
 fi
 
 echo $ac_n "checking whether to configure and build Singular""... $ac_c" 1>&6
