@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.12 1998-10-21 10:25:31 krueger Exp $ */
+/* $Id: ipconv.cc,v 1.13 1998-11-04 18:28:02 Singular Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -28,6 +28,8 @@ struct sConvertTypes
   int o_typ;
   iiConvertProc p;
 };
+
+// all of these static conversion routines work destructive on their input
 
 static void * iiI2P(void *data)
 {
@@ -87,6 +89,7 @@ static void * iiV2Ma(void *data)
   MATCOLS(m)=MATROWS(m);
   MATROWS(m)=h;
   m->rank=h;
+  pDelete((poly *)&data);
   return (void *)m;
 }
 
@@ -134,6 +137,7 @@ static void * iiIm2Ma(void *data)
       MATELEM(m, i, j) = pISet(IMATELEM(*iv, i, j));
     }
   }
+  delete iv;
   return (void *)m;
 }
 
@@ -145,6 +149,10 @@ static void * iiN2P(void *data)
     p=pOne();
     pSetCoeff(p,(number)data);
   }
+  else
+  {
+    nDelete((number *)&data);
+  }  
   return (void *)p;
 }
 
@@ -157,6 +165,10 @@ static void * iiN2Ma(void *data)
     pSetCoeff(p,(number)data);
     I->m[0]=p;
   }
+  else
+  {
+    nDelete((number *)&data);
+  }  
   return (void *)I;
 }
 
@@ -164,6 +176,7 @@ static void * iiS2Link(void *data)
 {
   si_link l=(si_link)Alloc0(sizeof(ip_link));
   slInit(l, (char *) data);
+  FreeL((ADDRESS)data);
   return (void *)l;
 }
 
