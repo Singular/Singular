@@ -1,7 +1,7 @@
 //GMG, last modified 18.6.99
 //anne, added deleteSublist and watchdog 12.12.2000
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: general.lib,v 1.37 2001-01-11 12:04:17 pfister Exp $";
+version="$Id: general.lib,v 1.38 2001-01-16 13:03:54 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type
@@ -418,8 +418,8 @@ RETURN:  killall(); kills all user-defined variables except loaded procedures,
            of type \"type_name\"
 @*       - killall(\"not\", \"type_name\"); kills all user-defined variables,
            except those of type \"type_name\" and except loaded procedures
-@*       - killall(\"not\", \"name_1\", \"name_2\", ...); 
-           kills all user-defined variables, except those of name \"name_i\" 
+@*       - killall(\"not\", \"name_1\", \"name_2\", ...);
+           kills all user-defined variables, except those of name \"name_i\"
            and except loaded procedures
 NOTE:    killall should never be used inside a procedure
 EXAMPLE: example killall; shows an example AND KILLS ALL YOUR VARIABLES
@@ -434,13 +434,13 @@ EXAMPLE: example killall; shows an example AND KILLS ALL YOUR VARIABLES
       ERROR("Need string as " + string(@joni) + "th argument");
     }
   }
-  
+
   // kills all user-defined variables but not loaded procedures
   if( size(#)==0 )
   {
     for ( @joni=size(@marie); @joni>0; @joni-- )
     {
-      if( @marie[@joni]!="LIB" and typeof(`@marie[@joni]`)!="proc" ) 
+      if( @marie[@joni]!="LIB" and typeof(`@marie[@joni]`)!="proc" )
       { kill `@marie[@joni]`; }
     }
   }
@@ -454,25 +454,25 @@ EXAMPLE: example killall; shows an example AND KILLS ALL YOUR VARIABLES
       {
         for ( @joni=size(@marie); @joni>0; @joni-- )
         {
-          if((@marie[@joni]!="killall") and (@marie[@joni]=="LIB" or 
+          if((@marie[@joni]!="killall") and (@marie[@joni]=="LIB" or
                                        typeof(`@marie[@joni]`)=="proc"))
           { kill `@marie[@joni]`; }
         }
       }
       else
-      {  
+      {
         // other types
         for ( @joni=size(@marie); @joni>2; @joni-- )
         {
-          if(typeof(`@marie[@joni]`)==#[1] and @marie[@joni]!="LIB" 
-             and typeof(`@marie[@joni]`)!="proc") 
+          if(typeof(`@marie[@joni]`)==#[1] and @marie[@joni]!="LIB"
+             and typeof(`@marie[@joni]`)!="proc")
           { kill `@marie[@joni]`; }
         }
       }
     }
     else
     {
-      // kills all user-defined variables whose name or type is not #i 
+      // kills all user-defined variables whose name or type is not #i
       for ( @joni=size(@marie); @joni>2; @joni-- )
       {
         if ( @marie[@joni] != "LIB" && typeof(`@marie[@joni]`) != "proc")
@@ -653,7 +653,7 @@ proc product (id, list #)
 "USAGE:    product(id[,v]); id ideal/vector/module/matrix/intvec/intmat/list,
           v intvec  (default: v=1..number of entries of id)
 ASSUME:   list members can be multiplied.
-RETURN:   The product of all entries of id [with index given by v] of type 
+RETURN:   The product of all entries of id [with index given by v] of type
           depending on the entries of id.
 NOTE:     If id is not a list, id is treated as a list of polys resp. integers.
           A module m is identified with the corresponding matrix M (columns
@@ -662,14 +662,14 @@ NOTE:     If id is not a list, id is treated as a list of polys resp. integers.
           result will be 1 (of type int).
 EXAMPLE:  example product; shows an example
 "
-{  
+{
 //-------------------- initialization and special feature ---------------------
    int n,j,tt;
-   string ty;		                              //will become type of id
+   string ty;                                //will become type of id
    list l;
 
 // We wish to allow something like product(x(1..10)) if x(1),...,x(10) are
-// variables. x(1..10) is a list of polys and enters the procedure with 
+// variables. x(1..10) is a list of polys and enters the procedure with
 // id=x(1) and # a list with 9 polys, #[1]= x(2),...,#[9]= x(10). Hence, in
 // this case # is never empty. If an additional intvec v is given,
 // it is added to #, so we have to separate it first and make
@@ -677,10 +677,10 @@ EXAMPLE:  example product; shows an example
 
    int s = size(#);
    if( s!=0 )
-   {  if ( typeof(#[s])=="intvec" or typeof(#[s])=="int")   
-      {  
+   {  if ( typeof(#[s])=="intvec" or typeof(#[s])=="int")
+      {
          intvec v = #[s];
-         tt=1; 
+         tt=1;
          s=s-1;
          if ( s>0 ) { # = #[1..s]; }
       }
@@ -694,9 +694,9 @@ EXAMPLE:  example product; shows an example
       n = size(id);
    }
    else
-   { 
+   {
       ty = typeof(id);
-      if( ty == "list" ) 
+      if( ty == "list" )
       { n = size(id); }
    }
 //------------------------------ reduce to 3 cases ---------------------------
@@ -715,17 +715,17 @@ EXAMPLE:  example product; shows an example
       intvec i = S[1..nrows(S),1..ncols(S)];
       kill id;
       intvec id = i;                                  //case: id = intvec
-      n = size(id); 
+      n = size(id);
    }
 //--------------- consider intvec v and empty product  -----------------------
-   if( tt!=0 ) 
+   if( tt!=0 )
    {
       for (j=1; j<=size(v); j++)
       {
          if ( v[j] <= 0 or v[j] > n )                 //v outside range of id
-         { 
+         {
             return(1);                                //empty product is 1
-         }                               
+         }
       }
       id = id[v];                                     //consider part of id
    }                                                  //corresponding to v
@@ -738,7 +738,7 @@ EXAMPLE:  example product; shows an example
       }
    }
 //-------------------------- finally, multiply objects  -----------------------
-   n = size(id); 
+   n = size(id);
    def f(1) = id[1];
    for( j=2; j<=n; j=j+1 ) { def f(j)=f(j-1)*id[j]; }
    return(f(n));
@@ -884,7 +884,7 @@ example
    ring r0 = 0,(x,y,z,t),lp;
    ideal i = x3,z3,xyz;
    sort(i);            //sorts using lex ordering, smaller polys come first
- 
+
    sort(i,3..1);
 
    sort(i,"ls")[1];     //sort w.r.t. negative lex ordering
@@ -899,7 +899,7 @@ proc sum (id, list #)
 "USAGE:    sum(id[,v]); id ideal/vector/module/matrix/intvec/intmat/list,
           v intvec  (default: v=1..number of entries of id)
 ASSUME:   list members can be added.
-RETURN:   The sum of all entries of id [with index given by v] of type 
+RETURN:   The sum of all entries of id [with index given by v] of type
           depending on the entries of id.
 NOTE:     If id is not a list, id is treated as a list of polys resp. integers.
           A module m is identified with the corresponding matrix M (columns
@@ -915,7 +915,7 @@ EXAMPLE:  example sum; shows an example
    list l;
 
 // We wish to allow something like sum(x(1..10)) if x(1),...,x(10) are
-// variables. x(1..10) is a list of polys and enters the procedure with 
+// variables. x(1..10) is a list of polys and enters the procedure with
 // id=x(1) and # a list with 9 polys, #[1]= x(2),...,#[9]= x(10). Hence, in
 // this case # is never empty. If an additional intvec v is given,
 // it is added to #, so we have to separate it first and make
@@ -925,7 +925,7 @@ EXAMPLE:  example sum; shows an example
    if( s!=0 )
    {  if ( typeof(#[s])=="intvec" or typeof(#[s])=="int")
       {  intvec v = #[s];
-         tt=1; 
+         tt=1;
          s=s-1;
          if ( s>0 ) { # = #[1..s]; }
       }
@@ -938,7 +938,7 @@ EXAMPLE:  example sum; shows an example
       ty = "list";
    }
    else
-   { 
+   {
       ty = typeof(id);
    }
 //------------------------------ reduce to 3 cases ---------------------------
@@ -958,20 +958,20 @@ EXAMPLE:  example sum; shows an example
       intvec id = i;                                 //case: id = intvec
    }
 //------------------- consider intvec v and empty sum  -----------------------
-   if( tt!=0 ) 
+   if( tt!=0 )
    {
       for (j=1; j<=size(v); j++)
       {
          if ( v[j] <= 0 or v[j] > size(id) )         //v outside range of id
-         { 
+         {
             return(0);                               //empty sum is 0
-         }                               
+         }
       }
       id = id[v];                                    //consider part of id
    }                                                 //corresponding to v
 
 //-------------------------- finally, add objects  ---------------------------
-   n = size(id); 
+   n = size(id);
    def f(1) = id[1];
    for( j=2; j<=n; j=j+1 ) { def f(j)=f(j-1)+id[j]; }
    return(f(n));   int n,j,tt;
@@ -1054,8 +1054,8 @@ RETURN:  Result of cmd, if the result can be computed in i seconds.
          Otherwise the computation is interrupted after i seconds,
          the string "Killed" is returned and the global variable
          'watchdog_interrupt' is defined.
-NOTE:    * the MP package must be enabled 
-         * the current basering should not be watchdog_rneu, since 
+NOTE:    * the MP package must be enabled
+         * the current basering should not be watchdog_rneu, since
            watchdog_rneu will be killed
          * if there are variable names of the structure x(i) all
            polynomials have to be put into eval(...) in order to be
@@ -1076,7 +1076,7 @@ EXAMPLE: example watchdog; shows an example
     {
       int j=10;
       int k=999999;
-// fork, get the pid of the child and send it the command   
+// fork, get the pid of the child and send it the command
       link l_fork="MPtcp:fork";
       open(l_fork);
       write(l_fork,quote(system("pid")));
@@ -1137,7 +1137,7 @@ EXAMPLE: example watchdog; shows an example
       ERROR("First argument of watchdog has to be a positive integer.");
     }
     ERROR("MP-support is not enabled in this version of Singular.");
-  } 
+  }
 }
 example
 { "EXAMPLE:"; echo=2;
