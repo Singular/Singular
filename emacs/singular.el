@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.26 1998-08-14 06:57:23 wichmann Exp $
+;; $Id: singular.el,v 1.27 1999-07-02 13:45:24 obachman Exp $
 
 ;;; Commentary:
 
@@ -214,6 +214,14 @@ NOT READY [should be rewritten completely.  Interface should stay the same.]!"
 ;	       "number" "poly" "proc" "qring" "resolution" 
 ;	       "ring" "string" "vector"))
 
+(defvar singular-font-lock-keywords-0
+  '(
+    ("^\\(> \\|. \\)" . font-lock-singular-prompt-face)
+    ("^   [\\?].*" 0 font-lock-singular-error-face t)
+    ("^// \\(\\*\\*.*\\)" 1 font-lock-singular-warn-face t)
+    )
+  "Subdued level for highlighting in singular-(interactive)-mode")
+
 (defvar singular-font-lock-keywords-1
   '(
     ("\\<def\\|i\\(deal\\|nt\\(\\|mat\\|vec\\)\\)\\|li\\(nk\\|st\\)\\|m\\(a\\(p\\|trix\\)\\|odule\\)\\|number\\|p\\(oly\\|roc\\)\\|qring\\|r\\(esolution\\|ing\\)\\|string\\|vector\\>" . font-lock-type-face)
@@ -232,13 +240,13 @@ NOT READY [should be rewritten completely.  Interface should stay the same.]!"
      ))
   "Gaudy level for highlihgting in singular-(interactive)-mode") 
 
-(defvar singular-font-lock-keywords singular-font-lock-keywords-1
+(defvar singular-font-lock-keywords singular-font-lock-keywords-0
   "Default highlighting for singular-(interactive)-mode")
 
 (defvar singular-font-lock-defaults 
   '((singular-font-lock-keywords
-     singular-font-lock-keywords-1
-     singular-font-lock-keywords-2)
+     singular-font-lock-keywords-0
+     singular-font-lock-keywords-0)
     nil                   ;; KEYWORDS-ONLY 
     nil                   ;; CASE-FOLD (ignore case when non-nil)
     ((?_ . "w"))          ;; SYNTAX-ALIST
@@ -276,6 +284,7 @@ NOT READY [should be rewritten completely.  Interface should stay the same.]!"
   (define-key singular-interactive-mode-map "\C-c\C-f" 'singular-load-file)
   (define-key singular-interactive-mode-map "\C-c\C-l" 'singular-load-library)
   (define-key singular-interactive-mode-map "\C-c\C-d" 'singular-demo-load)
+  (define-key singular-interactive-mode-map "\C-c\C-c\C-d" 'singular-demo-exit)
   (define-key singular-interactive-mode-map "\C-c\C-t" 'singular-toggle-truncate-lines)
   (define-key singular-interactive-mode-map "\C-c$" 'singular-exit-singular)
   (define-key singular-interactive-mode-map "\C-cfl" 'singular-fold-last-output)
@@ -1472,7 +1481,7 @@ Moves point to end of buffer and inserts contents of DEMO-FILE there."
 
   ;; check for running demo
   (and singular-demo-mode
-       (error "Another demo is already running"))
+       (singular-demo-exit))
 
   (let ((old-point-min (point-min)))
     (unwind-protect
@@ -2136,7 +2145,7 @@ Type \\[describe-mode] in the Singular buffer for a list of commands."
 
     ;; pop to buffer
     (singular-debug 'interactive (message "Calling `pop-to-buffer'"))
-    (pop-to-buffer buffer)))
+    (pop-to-buffer buffer t)))
 
 ;; for convenience only
 (defalias 'Singular 'singular)
