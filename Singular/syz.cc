@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.16 1999-08-17 13:06:02 siebert Exp $ */
+/* $Id: syz.cc,v 1.17 1999-08-19 11:54:02 siebert Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -837,9 +837,10 @@ void syDetect(ideal id,int index,int rsmin, BOOLEAN homog,
 * and the regularity
 */
 intvec * syBetti(resolvente res,int length, int * regularity,
-                 intvec* weights)
+                 intvec* weights,BOOLEAN tomin)
 {
-  int i,j=0,k=0,l,rows,cols;
+  //tomin = FALSE;
+  int i,j=0,k=0,l,rows,cols,mr;
   int *temp1,*temp2,*temp3;/*used to compute degrees*/
   int *tocancel; /*(BOOLEAN)tocancel[i]=element is superfluous*/
 
@@ -877,6 +878,7 @@ intvec * syBetti(resolvente res,int length, int * regularity,
   temp1 = (int*)Alloc0((l+1)*sizeof(int));
   temp2 = (int*)Alloc((l+1)*sizeof(int));
   rows = 1;
+  mr = 1;
   cols++;
   for (i=0;i<cols-1;i++)
   {
@@ -896,6 +898,7 @@ intvec * syBetti(resolvente res,int length, int * regularity,
         }
         temp2[j+1] = pFDeg(res[i]->m[j])+temp1[pGetComp(res[i]->m[j])];
         if (temp2[j+1]-i>rows) rows = temp2[j+1]-i;
+        if (temp2[j+1]-i<mr) mr = temp2[j+1]-i;
       }
     }
     if ((i==0) && (weights!=NULL)) pSetModDeg(NULL);
@@ -903,15 +906,19 @@ intvec * syBetti(resolvente res,int length, int * regularity,
     temp1 = temp2;
     temp2 = temp3;
   }
+  mr--;
   /*------ computation betti numbers --------------*/
+  rows -= mr;
   result = new intvec(rows,cols,0);
-  (*result)[0] = /*idRankFreeModule(res[0])*/ rkl;
-  if ((!idIs0(res[0])) && ((*result)[0]==0)) (*result)[0] = 1;
+  (*result)[(-mr)*cols] = /*idRankFreeModule(res[0])*/ rkl;
+  if ((!idIs0(res[0])) && ((*result)[(-mr)*cols]==0)) 
+    (*result)[(-mr)*cols] = 1;
   tocancel = (int*)Alloc0((rows+1)*sizeof(int));
   memset(temp2,0,l*sizeof(int));
   memset(temp1,0,(l+1)*sizeof(int));
-  syDetect(res[0],0,TRUE,temp2,tocancel);
-  (*result)[0] -= tocancel[0];
+  if (tomin)
+    syDetect(res[0],0,TRUE,temp2,tocancel);
+  (*result)[(-mr)*cols] -= tocancel[0];
   for (i=0;i<cols-1;i++)
   {
     if ((i==0) && (weights!=NULL)) pSetModDeg(weights);
@@ -922,23 +929,27 @@ intvec * syBetti(resolvente res,int length, int * regularity,
       {
         temp2[j+1] = pFDeg(res[i]->m[j])+temp1[pGetComp(res[i]->m[j])];
         //(*result)[i+1+(temp2[j+1]-i-1)*cols]++;
-        if (temp2[j+1]>i) IMATELEM((*result),temp2[j+1]-i,i+2)++;
+        //if (temp2[j+1]>i) IMATELEM((*result),temp2[j+1]-i-mr,i+2)++;
+        IMATELEM((*result),temp2[j+1]-i-mr,i+2)++;
       }
     }
   /*------ computation betti numbers, if res not minimal --------------*/
-    for (j=0;j<rows-1;j++)
+    if (tomin)
     {
-      //(*result)[i+1+j*cols] -= tocancel[j+1];
-      IMATELEM((*result),j+1,i+2) -= tocancel[j+1];
-    }
-    if ((i<length-1) && (res[i+1]!=NULL))
-    {
-      memset(tocancel,0,(rows+1)*sizeof(int));
-      syDetect(res[i+1],i+1,TRUE,temp2,tocancel);
-      for (j=0;j<rows;j++)
+      for (j=0;j<rows-1;j++)
       {
-        //(*result)[i+1+j*cols] -= tocancel[j];
-        IMATELEM((*result),j+1,i+2) -= tocancel[j];
+        //(*result)[i+1+j*cols] -= tocancel[j+1];
+        IMATELEM((*result),j+1,i+2) -= tocancel[j+1];
+      }
+      if ((i<length-1) && (res[i+1]!=NULL))
+      {
+        memset(tocancel,0,(rows+1)*sizeof(int));
+        syDetect(res[i+1],i+1,TRUE,temp2,tocancel);
+        for (j=0;j<rows;j++)
+        {
+          //(*result)[i+1+j*cols] -= tocancel[j];
+          IMATELEM((*result),j+1,i+2) -= tocancel[j];
+        }
       }
     }
     temp3 = temp1;
@@ -961,8 +972,8 @@ intvec * syBetti(resolvente res,int length, int * regularity,
   {
     if ((*result)[i] != 0)
     {
-      j = i/cols;
-      if (i>k+j*cols) k = i-j*cols;
+      if (i/cols>j) j = i/cols;
+      if (i>k+(i/cols)*cols) k = i-(i/cols)*cols;
     }
   }
   intvec * exactresult=new intvec(j+1,k+1,0);
