@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.20 1998-08-06 13:38:09 wichmann Exp $
+;; $Id: singular.el,v 1.21 1998-08-07 06:25:55 wichmann Exp $
 
 ;;; Commentary:
 
@@ -172,17 +172,29 @@ NOT READY [should be rewritten completely.  Interface should stay the same.]!"
 
 ;; Additional faces for font locking
 (make-face 'font-lock-singular-error-face)
-(set-face-foreground 'font-lock-singular-error-face "Red")
+(cond 
+ ;; XEmacs
+ ((eq singular-emacs-flavor 'xemacs)
+  (set-face-foreground 'font-lock-singular-error-face "Red"
+		       'global nil 'append)))
 (defvar font-lock-singular-error-face 'font-lock-singular-error-face
   "NOT READY [docu]")
 
 (make-face 'font-lock-singular-warn-face)
-(set-face-foreground 'font-lock-singular-warn-face "Orange")
+(cond
+ ;; XEmacs
+ ((eq singular-emacs-flavor 'xemacs)
+  (set-face-foreground 'font-lock-singular-warn-face "Orange" 
+		       'global nil 'append)))
 (defvar font-lock-singular-warn-face 'font-lock-singular-warn-face
   "NOT READY [docu]")
 
 (make-face 'font-lock-singular-prompt-face)
-(set-face-foreground 'font-lock-singular-prompt-face "Gray50")
+(cond
+ ;; XEmacs
+ ((eq singular-emacs-flavor 'xemacs)
+  (set-face-foreground 'font-lock-singular-prompt-face "Gray50"
+		       'global nil 'append)))
 (defvar font-lock-singular-warn-face 'font-lock-singular-prompt-face
   "NOT READY [docu]")
 ;;}}}
@@ -251,12 +263,30 @@ NOT READY [should be rewritten completely.  Interface should stay the same.]!"
     (set-keymap-parents singular-interactive-mode-map (list comint-mode-map))
     (set-keymap-name singular-interactive-mode-map
 		     'singular-interactive-mode-map)))
-  (define-key singular-interactive-mode-map "\C-m" 'singular-send-or-copy-input))
+  (define-key singular-interactive-mode-map "\C-m" 'singular-send-or-copy-input)
+  (define-key singular-interactive-mode-map "\C-c\C-f" 'singular-load-file)
+  (define-key singular-interactive-mode-map "\C-c\C-l" 'singular-load-library)
+  (define-key singular-interactive-mode-map "\C-c\C-d" 'singular-demo-load)
+  (define-key singular-interactive-mode-map "\C-c\C-t" 'singular-toggle-truncate-lines)
+  (define-key singular-interactive-mode-map "\C-c$" 'singular-exit-singular)
+  (define-key singular-interactive-mode-map "\C-cfl" 'singular-fold-last-output)
+  (define-key singular-interactive-mode-map "\C-cfa" 'singular-fold-all-output)
+  (define-key singular-interactive-mode-map "\C-cfp" 'singular-fold-at-point)
+  (define-key singular-interactive-mode-map "\C-cul" 'singular-unfold-last-output)
+  (define-key singular-interactive-mode-map "\C-cua" 'singular-unfold-all-output)
+  (define-key singular-interactive-mode-map "\C-cup" 'singular-unfold-at-point))
 
 (defvar singular-interactive-mode-menu-1 nil
   "NOT READY [docu]")
 
 (defvar singular-interactive-mode-menu-2 nil
+  "NOT READY [docu]")
+
+(defvar singular-start-menu-definition
+  '("Singular"
+    ["start default" singular t]
+    ["start..." singular-other t]
+    ["exit" singular-exit-singular t])
   "NOT READY [docu]")
 
 (if singular-interactive-mode-menu-1
@@ -267,10 +297,7 @@ NOT READY [should be rewritten completely.  Interface should stay the same.]!"
     (easy-menu-define
      singular-interactive-mode-menu-1
      singular-interactive-mode-map ""
-     '("Singular"
-       ["start default" singular-other t]
-       ["start" singular t]
-       ["exit" singular-exit-singular t])))))
+     singular-start-menu-definition))))
 
 (if singular-interactive-mode-menu-2
     ()
@@ -284,33 +311,43 @@ NOT READY [should be rewritten completely.  Interface should stay the same.]!"
        ["load file..." singular-load-file t]
        ("load library"
 	["all.lib" (singular-load-library "all.lib" t) t]
-	["general.lib" (singular-load-library "general.lib" t) t]
-	["matrix.lib" (singular-load-library "matrix.lib" t) t]
-	["sing.lib" (singular-load-library "sing.lib" t) t]
-	["elim.lib" (singular-load-library "elim.lib" t) t]
-	["inout.lib" (singular-load-library "inout.lib" t) t]
-	["random.lib" (singular-load-library "random.lib" t) t]
+	["classify.lib" (singular-load-library "classify.lib" t) t]
 	["deform.lib" (singular-load-library "deform.lib" t) t]
-	["homolg.lib" (singular-load-library "homolog.lib" t) t]
+	["elim.lib" (singular-load-library "elim.lib" t) t]
+	["finvar.lib" (singular-load-library "finvar.lib" t) t]
+	["general.lib" (singular-load-library "general.lib" t) t]
+	["graphics.lib" (singular-load-library "graphics.lib" t) t]
+	["hnoether.lib" (singular-load-library "hnoether.lib" t) t]
+	["homolog.lib" (singular-load-library "homolog.lib" t) t]
+	["inout.lib" (singular-load-library "inout.lib" t) t]
+	["invar.lib" (singular-load-library "invar.lib" t) t]
+	["latex.lib" (singular-load-library "latex.lib" t) t]
+	["matrix.lib" (singular-load-library "matrix.lib" t) t]
+	["normal.lib" (singular-load-library "normal.lib" t) t]
 	["poly.lib" (singular-load-library "poly.lib" t) t]
-	["factor.lib" (singular-load-library "factor.lib" t) t]
+	["presolve.lib" (singular-load-library "presolve.lib" t) t]
+	["primdec.lib" (singular-load-library "primdec.lib" t) t]
+	["primitiv.lib" (singular-load-library "primitiv.lib" t) t]
+	["random.lib" (singular-load-library "random.lib" t) t]
 	["ring.lib" (singular-load-library "ring.lib" t) t]
-	["primdec.lib" (singular-load-library "primdex.lib" t) t]
+	["sing.lib" (singular-load-library "sing.lib" t) t]
+	["standard.lib" (singular-load-library "standard.lib" t) t]
 	"---"
 	["other..." singular-load-library t])
        "---"
        ["load demo" singular-demo-load (not singular-demo-mode)]
        ["exit demo" singular-demo-exit singular-demo-mode]
        "---"
-       ["truncate lines" (setq truncate-lines (not truncate-lines))
+       ["truncate lines" singular-toggle-truncate-lines
 	:style toggle :selected truncate-lines]
        "---"
-       ["fold last output" (singular-do-folding 'last) t]
-       ["fold all output" (singular-do-folding 'all) t]
-       ["fold at point" (singular-do-folding 'at-point) t]
-       ["unfold last output" (singular-do-folding 'last 'unfold) t]
-       ["unfold all output" (singular-do-folding 'all 'unfold) t]
-       ["unfold at point" (singular-do-folding 'at-point 'unfold) t]
+       ["fold last output" singular-fold-last-output t]
+       ["fold all output" singular-fold-all-output t]
+       ["fold at point" singular-fold-at-point t]
+       "---"
+       ["unfold last output" singular-unfold-last-output t]
+       ["unfold all output" singular-unfold-all-output t]
+       ["unfold at point" singular-unfold-at-point t]
        )))))
 
 ;; NOT READY
@@ -323,10 +360,7 @@ NOT READY [should be rewritten completely.  Interface should stay the same.]!"
      ;; XEmacs
      ((eq singular-emacs-flavor 'xemacs)
       (add-submenu nil 
-		   '("Singular"
-		     ["start default" singular-other t]
-		     ["start" singular t]
-		     ["exit" singular-exit-singular t])))))
+		   singular-start-menu-definition))))
 
 ;;{{{ Syntax table
 (defvar singular-interactive-mode-syntax-table nil
@@ -404,7 +438,7 @@ VALUE."
   (interactive "fLoad file: ")
   (let* ((filename (if noexpand file (expand-file-name file)))
 	 (string (concat "< \"" filename "\";"))
-	 (process (get-buffer-process (current-buffer))))
+	 (process (singular-process)))
     (singular-input-filter process string)
     (singular-send-string process string)))
 
@@ -413,48 +447,22 @@ VALUE."
   (interactive "fLoad Library: ")
   (let* ((filename (if noexpand file (expand-file-name file)))
 	 (string (concat "LIB \"" filename "\";"))
-	 (process (get-buffer-process (current-buffer))))
+	 (process (singular-process)))
     (singular-input-filter process string)
     (singular-send-string process string)))
 
-(defun singular-exit-singular 
+(defun singular-exit-singular ()
   "NOT READY [docu]"
   (interactive)
   (let ((string "quit;")
-	(process (get-buffer-process (current-buffer))))
+	(process (singular-process)))
     (singular-input-filter process string)
     (singular-send-string process string)))
 
-(defun singular-do-folding (where &optional unfold)
-  "NOT READY [docu]
-WHERE= 'last or 'all --> just output sections
-WHERE= 'at-point --> whatever is at point"
-  (let (which)
-    (cond 
-     ((eq where 'last)
-      (setq which (list (singular-latest-output-section t))))
-     ((eq where 'at-point)
-      (setq which (list (singular-section-at (point)))))
-     ((eq where 'all)
-      (setq which (singular-section-in (point-min) (point-max)))
-
-      ;; just use the output sections:
-      (let (newwhich)
-	(while which
-	  (if (eq (singular-section-type (car which)) 'output)
-	      (setq newwhich (append (list (car which)) newwhich)))
-	  (setq which (cdr which)))
-	(setq which newwhich)))
-
-     (t 
-      (singular-debug 'interactive
-		      (message "singular-do-folding: wrong argument"))))
-    (while which
-      (let* ((current (car which))
-	    (is-folded (singular-section-foldedp current)))
-	(and (if unfold is-folded (not is-folded))
-	     (singular-fold-section current)))
-      (setq which (cdr which)))))
+(defun singular-toggle-truncate-lines ()
+  "Toggle truncate-lines."
+  (interactive)
+  (setq truncate-lines (not truncate-lines)))
 ;;}}}
 
 ;;{{{ Customizing variables of comint
@@ -1184,6 +1192,71 @@ Unfolds folded sections and folds unfolded sections."
       (narrow-to-region old-point-min old-point-max)
       (set-marker old-point-max nil))
     (if (interactive-p) (goto-char (max start (point-min))))))
+
+(defun singular-do-folding (where &optional unfold)
+  "NOT READY [docu]
+WHERE= 'last or 'all --> just output sections
+WHERE= 'at-point --> whatever is at point"
+  (let (which)
+    (cond 
+     ((eq where 'last)
+      (setq which (list (singular-latest-output-section t))))
+     ((eq where 'at-point)
+      (setq which (list (singular-section-at (point)))))
+     ((eq where 'all)
+      (setq which (singular-section-in (point-min) (point-max)))
+
+      ;; just use the output sections:
+      (let (newwhich)
+	(while which
+	  (if (eq (singular-section-type (car which)) 'output)
+	      (setq newwhich (append (list (car which)) newwhich)))
+	  (setq which (cdr which)))
+	(setq which newwhich)))
+
+     (t 
+      (singular-debug 'interactive
+		      (message "singular-do-folding: wrong argument"))))
+    (while which
+      (let* ((current (car which))
+	    (is-folded (singular-section-foldedp current)))
+	(and (if unfold is-folded (not is-folded))
+	     (singular-fold-section current)))
+      (setq which (cdr which)))))
+
+(defun singular-fold-last-output ()
+  "Fold last output section.
+If it is already folded, do nothing."
+  (interactive)
+  (singular-do-folding 'last))
+
+(defun singular-fold-all-output ()
+  "Fold all output sections."
+  (interactive) 
+  (singular-do-folding 'all))
+
+(defun singular-fold-at-point
+  "Fold section at point (input or output section).
+If it is already folded, do nothing."
+  (interactive) 
+  (singular-do-folding 'at-point))
+
+(defun singular-unfold-last-output ()
+  "Unfold last output section.
+If it is already unfolded, do nothing."
+  (interactive)
+  (singular-do-folding 'last 'unfold))
+
+(defun singular-unfold-all-output ()
+  "Unfold all output section."
+  (interactive)
+  (singular-do-folding 'all 'unfold))
+
+(defun singular-unfold-at-point ()
+  "Unfold section at point (input or output section).
+If it is already unfolded, do nothing."
+  (interactive)
+  (singular-do-folding 'at-point 'unfold))
 ;;}}}
 
 ;;{{{ Input and output filters
@@ -1319,6 +1392,7 @@ new state of Singular demo mode."
 	  singular-demo-mode t)
     (if singular-demo-command-on-enter
 	(send-string (singular-process) singular-demo-command-on-enter))
+    (message "Singular demo mode now active")
     (force-mode-line-update))
 
    ;; leave demo mode
