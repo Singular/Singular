@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.21 2003-08-28 14:13:12 Singular Exp $ */
+/* $Id: cf_factor.cc,v 1.22 2004-01-19 11:27:46 Singular Exp $ */
 
 //{{{ docu
 //
@@ -206,23 +206,44 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
       if (getCharacteristic()!=2)
       {
         // set remainder
+        #ifdef NTL_ZZ
         ZZ r;
         r=getCharacteristic();
         ZZ_pContext ccc(r);
+        #else
+        zz_pContext ccc(getCharacteristic());
+        #endif
         ccc.restore();
+        #ifdef NTL_ZZ
         ZZ_p::init(r);
+        #else
+        zz_p::init(getCharacteristic());
+        #endif
         // convert to NTL
+        #ifdef NTL_ZZ
         ZZ_pX f1=convertFacCF2NTLZZpX(f);
         ZZ_p leadcoeff = LeadCoeff(f1);
+        #else
+        zz_pX f1=convertFacCF2NTLzzpX(f);
+        zz_p leadcoeff = LeadCoeff(f1);
+        #endif
         //make monic
         f1=f1 / LeadCoeff(f1);
 
         // factorize
+        #ifdef NTL_ZZ
         vec_pair_ZZ_pX_long factors;
+        #else
+        vec_pair_zz_pX_long factors;
+        #endif
         CanZass(factors,f1);
 
         // convert back to factory
+        #ifdef NTL_ZZ
         F=convertNTLvec_pair_ZZpX_long2FacCFFList(factors,leadcoeff,f.mvar());
+        #else
+        F=convertNTLvec_pair_zzpX_long2FacCFFList(factors,leadcoeff,f.mvar());
+        #endif
         //test_cff(F,f);
       }
       else
