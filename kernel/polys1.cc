@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.3 2004-03-25 21:16:47 levandov Exp $ */
+/* $Id: polys1.cc,v 1.4 2004-04-23 14:04:42 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -27,6 +27,7 @@
 #include "clapsing.h"
 #endif
 
+#define SR_HDL(A) ((long)A)
 /*-------- several access procedures to monomials -------------------- */
 /*
 * the module weights for std
@@ -479,6 +480,8 @@ void pEnlargeSet(polyset *p, int l, int increment)
   *p=h;
 }
 
+number pInitContent(poly ph);
+
 void pContent(poly ph)
 {
   number h,d;
@@ -493,8 +496,16 @@ void pContent(poly ph)
   {
     nNormalize(pGetCoeff(ph));
     if(!nGreaterZero(pGetCoeff(ph))) ph = pNeg(ph);
-    h=nCopy(pGetCoeff(ph));
-    p = pNext(ph);
+    if (rField_is_Q())
+    {
+      h=pInitContent(ph);
+      p=ph;
+    }
+    else
+    {
+      h=nCopy(pGetCoeff(ph));
+      p = pNext(ph);
+    }
     while (p!=NULL)
     {
       nNormalize(pGetCoeff(p));
@@ -537,6 +548,145 @@ void pContent(poly ph)
 #endif
   }
 }
+void pSimpleContent(poly ph,int smax)
+{
+  if(TEST_OPT_CONTENTSB) return;
+  if (ph==NULL) return;
+  if (pNext(ph)==NULL)
+  {
+    pSetCoeff(ph,nInit(1));
+    return;
+  }
+  if ((pNext(pNext(ph))==NULL)||(!rField_is_Q()))
+  {
+    return;
+  }
+  number d=pInitContent(ph);
+  if (nlSize(d)<=smax)
+  {
+    //if (TEST_OPT_PROT) PrintS("G");
+    return;
+  }
+  poly p=ph;
+  number h=d;
+  if (smax==1) smax=2;
+  while (p!=NULL)
+  {
+#if 0
+    d=nlGcd(h,pGetCoeff(p),currRing);
+    nlDelete(&h,currRing);
+    h = d;
+#else
+    nlInpGcd(h,pGetCoeff(p),currRing);
+#endif
+    if(nlSize(h)<smax)
+    {
+      //if (TEST_OPT_PROT) PrintS("g");
+      return;
+    }
+    pIter(p);
+  }
+  p = ph;
+  if (!nlGreaterZero(pGetCoeff(p))) h=nlNeg(h);
+  if(nlIsOne(h)) return;
+  //if (TEST_OPT_PROT) PrintS("c");
+  while (p!=NULL)
+  {
+#if 1
+    d = nlIntDiv(pGetCoeff(p),h);
+    pSetCoeff(p,d);
+#else
+    nlInpIntDiv(pGetCoeff(p),h,currRing);
+#endif
+    pIter(p);
+  }
+  nlDelete(&h,currRing);
+}
+
+number pInitContent(poly ph)
+#if 0
+{
+  assume(!TEST_OPT_CONTENTSB);
+  assume(ph!=NULL);
+  assume(pNext(ph)!=NULL);
+  assume(rField_is_Q());
+  if (pNext(pNext(ph))==NULL)
+  {
+    return nlGetNom(pGetCoeff(pNext(ph)),currRing);
+  }
+  poly p=ph;
+  number n1=nlGetNom(pGetCoeff(p),currRing);
+  pIter(p);
+  number n2=nlGetNom(pGetCoeff(p),currRing);
+  pIter(p);
+  number d;
+  number t;
+  loop
+  {
+    nlNormalize(pGetCoeff(p));
+    t=nlGetNom(pGetCoeff(p),currRing);
+    if (nlGreaterZero(t))
+      d=nlAdd(n1,t);
+    else
+      d=nlSub(n1,t);
+    nlDelete(&t,currRing);
+    nlDelete(&n1,currRing);
+    n1=d;
+    pIter(p);
+    if (p==NULL) break;
+    nlNormalize(pGetCoeff(p));
+    t=nlGetNom(pGetCoeff(p),currRing);
+    if (nlGreaterZero(t))
+      d=nlAdd(n2,t);
+    else
+      d=nlSub(n2,t);
+    nlDelete(&t,currRing);
+    nlDelete(&n2,currRing);
+    n2=d;
+    pIter(p);
+    if (p==NULL) break;
+  }
+  d=nlGcd(n1,n2,currRing);
+  nlDelete(&n1,currRing);
+  nlDelete(&n2,currRing);
+  return d;
+}
+#else
+{
+  number d=pGetCoeff(ph);
+  if(SR_HDL(d)&SR_INT) return d;
+  int s=mpz_size1(&d->z);
+  int s2=-1;
+  number d2;
+  loop
+  {
+    pIter(ph);
+    if(ph==NULL)
+    {
+      if (s2==-1) return nlCopy(d);
+      break;
+    }
+    if (SR_HDL(pGetCoeff(ph))&SR_INT)
+    {
+      s2=s;
+      d2=d;
+      s=0;
+      d=pGetCoeff(ph);
+      if (s2==0) break;
+    }
+    else
+    if (mpz_size1(&(pGetCoeff(ph)->z))<=s)
+    {
+      s2=s;
+      d2=d;
+      d=pGetCoeff(ph);
+      s=mpz_size1(&d->z);
+    }
+  }
+  return nlGcd(d,d2,currRing);
+}
+#endif
+
 
 //void pContent(poly ph)
 //{
@@ -651,10 +801,10 @@ void p_Content(poly ph, ring r)
     }
     n_Delete(&h,r);
 #ifdef HAVE_FACTORY
-    //if ( (nGetChar() == 1) || (nGetChar() < 0) ) /* Q[a],Q(a),Zp[a],Z/p(a) */
+    //if ( (n_GetChar(r) == 1) || (n_GetChar(r) < 0) ) /* Q[a],Q(a),Zp[a],Z/p(a) */
     //{
     //  singclap_divide_content(ph);
-    //  if(!nGreaterZero(pGetCoeff(ph))) ph = pNeg(ph);
+    //  if(!n_GreaterZero(pGetCoeff(ph),r)) ph = p_Neg(ph,r);
     //}
 #endif
   }
@@ -674,7 +824,7 @@ void pCleardenom(poly ph)
       if (!nIsOne(n))
       {
         number nn=nMult(pGetCoeff(p),n);
-	nNormalize(nn);
+        nNormalize(nn);
         pSetCoeff(p,nn);
       }
       nDelete(&n);
