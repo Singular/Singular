@@ -1,5 +1,7 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
+;; $Id: singular.el,v 1.3 1998-07-22 15:09:34 schmidt Exp $
+
 ;;; Commentary:
 
 
@@ -55,33 +57,92 @@ The buffer name is the process name with surrounding `*'."
 ;;}}}
   
 ;;{{{ Customization Variables of comint
+
+;; Note:
+;;
+;; In contrast to the variables from comint.el, all the variables
+;; below are global variables.  It would not make any sense to make
+;; them buffer-local since
+;; o they are read only when Singular interactive mode comes up;
+;; o since they are Singular-dependent and not user-dependent, i.e.,
+;;   the user would not mind to change them.
+;;
+;; For the same reasons these variables are not marked as
+;; "customizable" by a leading `*'.
+
 (defvar singular-prompt-regexp "^> "
   "Regexp to match prompt patterns in Singular.
 Should not match the continuation prompt \(`.'), only the regular
-prompt \(`>').")
+prompt \(`>').
+
+This variable is used to initialize `comint-prompt-regexp' when
+Singular interactive mode starts up.")
 
 (defvar singular-delimiter-argument-list '(?= ?\( ?\) ?, ?;)
   "List of characters to recognize as separate arguments.
+
 This variable is used to initialize `comint-delimiter-argument-list'
 when Singular interactive mode starts up.")
 
 (defvar singular-input-ignoredups t
-  "*If non-nil, don't add input matching the last on the input ring.
+  "If non-nil, don't add input matching the last on the input ring.
+
 This variable is used to initialize `comint-input-ignoredups' when
 Singular interactive mode starts up.")
 
 (defvar singular-buffer-maximum-size 2048
-  "*The maximum size in lines for Singular buffers.
+  "The maximum size in lines for Singular buffers.
+
 This variable is used to initialize `comint-buffer-maximum-size' when
 Singular interactive mode starts up.")
 
 (defvar singular-input-ring-size 64
   "Size of input history ring.
+
 This variable is used to initialize `comint-input-ring-size' when
+Singular interactive mode starts up.")
+
+(defvar singular-history-filter-regexp "\\`\\(..?\\|\\s *\\)\\'"
+  "Regular expression to filter strings *not* to insert in the history.
+By default, input consisting of less than three characters and input
+consisting of white-space only is not added to the history.")
+
+(defvar singular-history-filter
+  (function (lambda (string)
+	      (not (string-match singular-history-filter-regexp string))))
+  "Predicate for filtering additions to input history.
+
+This variable is used to initialize `comint-input-filter' when
 Singular interactive mode starts up.")
 ;;}}}
 
 ;;{{{ Singular Interactive Mode
+
+;; Note:
+;;
+;; In contrast to shell.el, `singular' does not run
+;; `singular-interactive-mode' every time a new Singular process is
+;; started, but only when a new buffer is created.  This behaviour seems
+;; more intuitive w.r.t. local variables and hooks.  So far so good.
+;;
+;; But there is a slight problem: `make-comint' runs `comint-mode'
+;; every time it creates a new process and overwrites a few but
+;; important major-mode related variables.  Another consequence of
+;; `comint-mode' being run more than once is that buffer-local
+;; variables that are not declared to be permanent local are killed by
+;; `comint-mode'.  Last not least, there is allmost no difference
+;; between the `comint-mode-hook' and the `comint-exec-hook' since
+;; both are run every time Singular starts up.
+;;
+;; The best solution seemed to define an advice to `comint-mode' which
+;; inhibits its execution if `singular-interactive-mode' is already
+;; up.
+
+(defadvice comint-mode (around singular-interactive-mode activate)
+  "Do not run `comint-mode' if `singular-interactive-mode' is already up."
+  (if (not (eq major-mode 'singular-interactive-mode))
+      ad-do-it))
+  
 (defun singular-interactive-mode ()
   "Major mode for interacting with Singular.
 
@@ -95,15 +156,22 @@ Singular buffers are automatically limited in length \(by default, to
 up or by setting `comint-buffer-maximum-size' while Singular
 interactive mode is running.
 
+\\{singular-interactive-mode-map}
+Customization: Entry to this mode runs the hooks on `comint-mode-hook'
+and `singular-interactive-mode-hook' \(in that order).  Before each
+input, the hooks on `comint-input-filter-functions' are run.  After
+each Singular output, the hooks on `comint-output-filter-functions'
+are run.
+
 NOT READY [much more to come.  See shell.el.]!"
   (interactive)
-  ;; we do not run `comint-mode' because `make-comint' should
-  ;; have run it already
-  ;; (comint-mode)
 
-  ;; miscellaneous
+  ;; run comint mode and do basic mode setup.  The `let' around
+  ;; `comint-mode' ensures that `comint-mode' really will be run.  See
+  ;; the above advice.
+  (let (major-mode) (comint-mode))
   (setq major-mode 'singular-interactive-mode)
-  (setq mode-name "Singular Interactive")
+  (setq mode-name "Singular Interaction")
   (use-local-map singular-interactive-mode-map)
 
   ;; customize comint for Singular
@@ -113,9 +181,9 @@ NOT READY [much more to come.  See shell.el.]!"
   (make-local-variable 'comint-buffer-maximum-size)
   (setq comint-buffer-maximum-size singular-buffer-maximum-size)
   (setq comint-input-ring-size singular-input-ring-size)
-  (or (memq 'comint-truncate-buffer comint-output-filter-functions)
-      (setq comint-output-filter-functions
-	    (cons 'comint-truncate-buffer comint-output-filter-functions)))
+  (setq comint-input-filter singular-history-filter)
+  (add-hook 'comint-output-filter-functions
+	    'comint-truncate-buffer nil t)
 
   ;; get name of history file (if any)
   (setq comint-input-ring-file-name (getenv "SINGULARHIST"))
@@ -124,8 +192,7 @@ NOT READY [much more to come.  See shell.el.]!"
 	  (equal (file-truename comint-input-ring-file-name) "/dev/null"))
       (setq comint-input-ring-file-name nil))
 
-  (run-hooks 'singular-interactive-mode-hook)
-  (comint-read-input-ring t))
+  (run-hooks 'singular-interactive-mode-hook))
 ;;}}}
 
 ;;{{{ Starting Singular
@@ -168,15 +235,18 @@ process buffer is still alive."
 
 NOT READY [arguments, default values, and interactive use]!
 
-If buffer exists but Singular is not running, start new Singular.
-If buffer exists and Singular is running, just switch to buffer.
+If buffer exists but Singular is not running, starts new Singular.
+If buffer exists and Singular is running, just switches to buffer.
 If a file `~/.emacs_singularrc' exists, it is given as initial input.
 Note that this may lose due to a timing error if Singular discards
 input when it starts up.
 
-The buffer is put in Singular interactive mode, giving commands for
-sending input and handling ouput of Singular.  See
+If a new buffer is created it is put in Singular interactive mode,
+giving commands for sending input and handling ouput of Singular.  See
 `singular-interactive-mode'.
+
+Every time `singular' starts a new Singular process it runs the hooks
+on `comint-exec-hook' and `singular-exec-hook' \(in that order).
 
 Type \\[describe-mode] in the Singular buffer for a list of commands."
   ;; handle interactive calls
@@ -192,18 +262,34 @@ Type \\[describe-mode] in the Singular buffer for a list of commands."
 	 (singular-switches (or singular-switches
 				singular-default-switches))
 
-	 ;; buffer associated with Singular
-	 (buffer (singular-process-name-to-buffer-name singular-name)))
-    (or (comint-check-proc buffer)
-	(save-excursion
+	 ;; buffer associated with Singular, nil if there is none
+	 (buffer-name (singular-process-name-to-buffer-name singular-name))
+	 (buffer (get-buffer buffer-name)))
+
+    ;; create new buffer if there has been none and call
+    ;; `singular-interactive-mode'
+    (if (not buffer)
+	(progn
+	  (singular-debug 'interactive (message "Creating new buffer"))
+	  (setq buffer (get-buffer-create buffer-name))
+	  (set-buffer buffer)
+	  (singular-debug 'interactive (message "Calling `singular-interactive-mode'"))
+	  (singular-interactive-mode)))
+
+    ;; create new process if there has been none
+    (if (not (comint-check-proc buffer))
+	(progn
 	  (singular-debug 'interactive (message "Starting new Singular"))
 	  (setq buffer (apply 'make-comint singular-name singular-executable
 			      (if (file-exists-p singular-start-file) singular-start-file)
 			      singular-switches))
 	  (set-process-sentinel (get-buffer-process buffer) 'singular-exit-sentinel)
 	  (set-buffer buffer)
-	  (singular-debug 'interactive (message "Calling `singular-interactive-mode'"))
-	  (singular-interactive-mode)))
+	  (singular-debug 'interactive (message "Reading input ring"))
+	  (comint-read-input-ring t)
+	  (run-hooks 'singular-exec-hook)))
+
+    ;; pop to buffer
     (singular-debug 'interactive (message "Calling `pop-to-buffer'"))
     (pop-to-buffer buffer)))
 
