@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.12 1998-04-23 18:52:56 Singular Exp $ */
+/* $Id: matpol.cc,v 1.13 1998-05-19 17:11:07 pohl Exp $ */
 
 /*
 * ABSTRACT:
@@ -13,6 +13,7 @@
 
 #include "mod2.h"
 #include "tok.h"
+#include "lists.h"
 #include "polys.h"
 #include "mmemory.h"
 #include "febase.h"
@@ -340,14 +341,14 @@ class mp_permmatrix
 *  caller of 'Bareiss' algorithm
 *  return an list of ...
 */
-matrix mpBareiss (matrix a, BOOLEAN sw)
+lists mpBareiss (matrix a, BOOLEAN sw)
 {
   poly div;
   matrix c = mpCopy(a);
   mp_permmatrix *Bareiss = new mp_permmatrix(c);
   row_col_weight w(Bareiss->mpGetRdim(), Bareiss->mpGetCdim());
   intvec *v = new intvec(Bareiss->mpGetCdim());
-//  lists res=(lists)Alloc(sizeof(slists));
+  lists res=(lists)Alloc(sizeof(slists));
 
   if (sw) WarnS(feNotImplemented);
   /* Bareiss */
@@ -362,16 +363,13 @@ matrix mpBareiss (matrix a, BOOLEAN sw)
   Bareiss->mpColReorder();
   Bareiss->mpSaveArray();
   delete Bareiss;
-/*
+
   res->Init(2);
   res->m[0].rtyp=MATRIX_CMD;
   res->m[0].data=(void *)c;
   res->m[1].rtyp=INTVEC_CMD;
   res->m[1].data=(void *)v;
   return res;
-*/
-  delete v;
-  return c;
 }
 
 /*2
@@ -1193,7 +1191,7 @@ void mp_permmatrix::mpToIntvec(intvec *v)
   int i;
 
   for (i=v->rows()-1; i>=0; i--)
-    (*v)[i] = qcol[i]; 
+    (*v)[i] = qcol[i]+1; 
 }
 
 void mp_permmatrix::mpRowReorder()
