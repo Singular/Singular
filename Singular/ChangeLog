@@ -1,7 +1,11 @@
+Tue Feb 17 18:43:11 MET 1998 hannes
+	* added additional factorization check after redTail
+	  (kstdfac.cc)
+
 1998-02-17  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
 	* longalg.cc (napWrite): made it globally available to support
-	FACTORY_DEBUG_OUT 
+	FACTORY_DEBUG_OUT
 
 	* clapsing.cc (singclap_algdividecontent): inserted
 	FACTORY_DEBUG_OUT

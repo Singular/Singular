@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.10 1997-12-03 16:58:47 obachman Exp $ */
+/* $Id: kstdfac.cc,v 1.11 1998-02-17 17:53:01 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -27,12 +27,11 @@
 #endif
 #include "lists.h"
 #include "ideals.h"
-#include "timer.h"
-#include "kstdfac.h"
 #ifdef COMP_FAST
 #include "spSpolyLoop.h"
 #endif
-
+#include "timer.h"
+#include "kstdfac.h"
 
 #ifdef HAVE_FACTORY
 /*3
@@ -494,6 +493,50 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
       }
       if (strat->P.lcm!=NULL) pFree1(strat->P.lcm);
       int i;
+      for(i=0;i<IDELEMS(fac);i++)
+      {
+        int pos;
+        if (strat->sl==-1) pos=0;
+        else pos=posInS(strat->S,strat->sl,fac->m[i]);
+        if (TEST_OPT_INTSTRATEGY)
+        {
+          if (!TEST_OPT_MINRES||(strat->syzComp==0)||(!strat->homog))
+          {
+            fac->m[i] = redtailBba(fac->m[i],pos-1,strat);
+            pCleardenom(fac->m[i]);
+          }
+        }
+        else
+        {
+          pNorm(fac->m[i]);
+          if (!TEST_OPT_MINRES||(strat->syzComp==0)||(!strat->homog))
+          {
+            fac->m[i] = redtailBba(fac->m[i],pos-1,strat);
+          }
+        }
+        facdeg=pFDeg(fac->m[i]);
+        ideal fac2=singclap_factorize(fac->m[i],NULL,1);
+#ifndef HAVE_LIBFAC_P 
+        if ((fac2!=NULL)&&(IDELEMS(fac2)>1)&&(facdeg!=pFDeg(fac2->m[0])))
+#else
+        if ((IDELEMS(fac2)>1)&&(facdeg!=pFDeg(fac2->m[0])))
+#endif
+        {
+          if (TEST_OPT_DEBUG)
+          {
+            wrp(fac->m[i]);
+            Print("-> %d factors, again\n",IDELEMS(fac2));
+            //jjPRINT_MA0((matrix)fac2,"");
+          }
+          pDelete(&(fac->m[i]));
+          fac->m[i]=fac2->m[0];
+          pEnlargeSet(&(fac->m),IDELEMS(fac),IDELEMS(fac2)-1);
+          memcpy(fac->m+IDELEMS(fac),&(fac2->m[1]),(IDELEMS(fac2)-1)*sizeof(poly
+));
+          IDELEMS(fac)+=(IDELEMS(fac2)-1);
+         }
+      }
+
       for(i=IDELEMS(fac)-1;i>=0;i--)
       {
         kStrategy n=strat;
@@ -512,22 +555,23 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
         int pos;
         if (n->sl==-1) pos=0;
         else pos=posInS(n->S,n->sl,n->P.p);
-        if (TEST_OPT_INTSTRATEGY)
-        {
-          if (!TEST_OPT_MINRES||(n->syzComp==0)||(!n->homog))
-          {
-            n->P.p = redtailBba(n->P.p,pos-1,n);
-            pCleardenom(n->P.p);
-          }
-        }
-        else
-        {
-          pNorm(n->P.p);
-          if (!TEST_OPT_MINRES||(n->syzComp==0)||(!n->homog))
-          {
-            n->P.p = redtailBba(n->P.p,pos-1,n);
-          }
-        }
+        // we have already reduced all elements from fac....
+	//if (TEST_OPT_INTSTRATEGY)
+        //{
+        //  if (!TEST_OPT_MINRES||(n->syzComp==0)||(!n->homog))
+        //  {
+        //    n->P.p = redtailBba(n->P.p,pos-1,n);
+        //    pCleardenom(n->P.p);
+        //  }
+        //}
+        //else
+        //{
+        //  pNorm(n->P.p);
+        //  if (!TEST_OPT_MINRES||(n->syzComp==0)||(!n->homog))
+        //  {
+        //    n->P.p = redtailBba(n->P.p,pos-1,n);
+        //  }
+        //}
         if (TEST_OPT_DEBUG)
         {
           PrintS("new s:");
