@@ -1,9 +1,9 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: gengftables.cc,v 1.1 1997-06-19 12:40:00 schmidt Exp $ */
+/* $Id: gengftables.cc,v 1.2 1997-10-23 13:25:52 schmidt Exp $ */
 
 //{{{ docu
 //
-// gengftables.cc - generate addition tables used by factory
+// gengftables.cc - generate addition tables used by Factory
 //   to calculate in GF(q).
 //
 // Note: This may take quite a while ...
@@ -57,7 +57,7 @@ isIrreducible ( const CanonicalForm & f )
 }
 //}}}
 
-//{{{ int exponent( const CanonicalForm & f, int q )
+//{{{ int exponent ( const CanonicalForm & f, int q )
 //{{{ docu
 //
 // exponent() - return e > 0 such that x^e == 1 mod f.
@@ -66,7 +66,7 @@ isIrreducible ( const CanonicalForm & f )
 //
 //}}}
 int
-exponent( const CanonicalForm & f, int q )
+exponent ( const CanonicalForm & f, int q )
 {
     Variable x = f.mvar();
     int e = 1;
@@ -138,7 +138,7 @@ findGenRec ( int d, int n, int q,
 }
 //}}}
 
-//{{{ CanonicalForm findGen( int d, int q )
+//{{{ CanonicalForm findGen ( int d, int q )
 //{{{ docu
 //
 // findGen() - find and return a generator of GF(q).
@@ -148,7 +148,7 @@ findGenRec ( int d, int n, int q,
 //
 //}}}
 CanonicalForm
-findGen( int d, int q )
+findGen ( int d, int q )
 {
     Variable x( 1 );
     CanonicalForm result;
@@ -163,7 +163,7 @@ findGen( int d, int q )
 }
 //}}}
 
-//{{{ void printTable( int d, int q, CanonicalForm mipo )
+//{{{ void printTable ( int d, int q, CanonicalForm mipo )
 //{{{ docu
 //
 // printTable - print +1 table of field GF(q).
@@ -176,7 +176,7 @@ findGen( int d, int q )
 //
 //}}}
 void
-printTable( int d, int q, CanonicalForm mipo )
+printTable ( int d, int q, CanonicalForm mipo )
 {
     int i, p = getCharacteristic();
 
