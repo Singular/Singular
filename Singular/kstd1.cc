@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.7 1997-06-09 12:21:24 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.8 1997-08-01 10:53:07 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -107,6 +107,7 @@ void doRed (LObject* h,poly* with,BOOLEAN intoT,kStrategy strat)
   {
     (*h).p = spSpolyRed(*with,(*h).p,strat->kNoether);
   }
+  pTest((*h).p);
 }
 
 /*2
@@ -246,11 +247,14 @@ void redEcart (LObject* h,kStrategy strat)
   int j = 0;
   int pass = 0;
 
+  pTest(h->p);
   if (TEST_OPT_CANCELUNIT) cancelunit(h);
   d = pFDeg((*h).p)+(*h).ecart;
   reddeg = strat->LazyDegree+d;
+  pTest(h->p);
   loop
   {
+    pTest(h->p);
     if (j > strat->tl)
     {
       if (TEST_OPT_DEBUG) PrintLn();
@@ -331,6 +335,7 @@ void redEcart (LObject* h,kStrategy strat)
         wrp(pi);
       }
       doRed(h,&pi,strat->fromT,strat);
+      pTest(h->p);
       strat->fromT=FALSE;
       if (TEST_OPT_DEBUG)
       {

@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmzero.cc,v 1.4 1997-03-27 20:23:38 obachman Exp $
+// $Id: fglmzero.cc,v 1.5 1997-08-01 10:53:06 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -14,10 +14,11 @@
 *   groebner basis for the ideal in the destination ring.
 */
 
+#include "mod2.h"
+
 #ifndef NOSTREAMIO
 #include <iostream.h>
 #endif
-#include "mod2.h"
 
 #ifdef HAVE_FGLM
 #include "tok.h"

@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.cc,v 1.8 1997-03-29 09:49:21 Singular Exp $ 
+// $Id: fglm.cc,v 1.9 1997-08-01 10:53:05 Singular Exp $ 
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -14,10 +14,11 @@
 *   not implemented ).
 */
 
+#include "mod2.h"
+
 #ifndef NOSTREAMIO
 #include <iostream.h>
 #endif
-#include "mod2.h"
 
 #ifdef HAVE_FGLM
 #include "tok.h"

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: spolys0.cc,v 1.3 1997-04-02 15:07:54 Singular Exp $ */
+/* $Id: spolys0.cc,v 1.4 1997-08-01 10:53:08 Singular Exp $ */
 
 /*
 * ABSTRACT - s-polynomials and reduction in general
@@ -554,6 +554,8 @@ poly spGSpolyRedNew(poly p1, poly p2,poly spNoether)
   {
     a2 = pCopy(a2);
   }
+  pTest(a2);
+  pTest(p2);
   nDelete(&an);
   BOOLEAN reset_vec=FALSE;
   if (pGetComp(p1) != pGetComp(p2))
@@ -574,12 +576,16 @@ poly spGSpolyRedNew(poly p1, poly p2,poly spNoether)
     spGSpolyLoop1(a1, a2, m,spNoether);
   }
   a2 = pNext(m);
+  pTest(a2);
+  pTest(p2);
   if (reset_vec)
   {
     spModuleToPoly(a1);
   }
   nDelete(&bn);
   pFree1(m);
+  pTest(a2);
+  pTest(p2);
   return a2;
 }
 
