@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.15 2002-09-26 09:55:10 anne Exp $ */
+/* $Id: scanner.l,v 1.16 2003-06-09 09:45:14 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -10,7 +10,8 @@
 
 #include "modgen.h"
 #include "stype.h"
-#include "grammar.h"
+#include "../../Singular/grammar.h"
+#include "mod_grammar.h"
 
 #define DEBUG 3
  

@@ -14,6 +14,22 @@ includedir	= @includedir@
 MOD_DEST	= ./include
 INC_SRC		= $(topsrcdir)/Singular
 
+##
+## various programs
+##
+@SET_MAKE@
+CC		= @CC@
+LD              = @LD@
+CXX		= @CXX@
+LEX		= @LEX@
+PERL		= @PERL@
+BISON		= bison
+INSTALL		= @INSTALL@
+INSTALL_PROGRAM	= @INSTALL_PROGRAM@ 
+INSTALL_DATA	= @INSTALL_DATA@
+MKINSTALLDIRS   = ./mkinstalldirs
+LN_S		= @LN_S@
+
 SINGUNAME	= @SINGUNAME@
 SING_UNAME	= @SING_UNAME@
 SINGULAR_VERSION = @SINGULAR_VERSION@
@@ -27,24 +43,55 @@ INSTALL         = $(topsrcdir)/Singular/install-sh -c
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_DATA    = ${INSTALL} -m 644
 MODGEN		= $(bindir)/modgen
-BISON		= bison
 
-CFLAGS	+= -g -I${includedir} -I../include -I../../Singular -DNDEBUG -DMODULE_GENERATOR \
+##
+## compiler and linker options
+##
+CFLAGS	+= --no-rtti --no-exceptions -O3 -w -fomit-frame-pointer -pipe -fno-implicit-templates \
+	-g -I${includedir} -I../include -I../../Singular -DNDEBUG -DMODULE_GENERATOR \
 	-D${SING_UNAME}
 LIBS	+= -L/usr/local/lib -lgmp
 
-OBJS	= main.o grammar.o scanner.o misc.o makefile.o utils.o \
+OBJS	= main.o mod_grammar.o scanner.o misc.o makefile.o utils.o \
 	creat_top.o proc.o proc_setup.o
 
+############################################################
+###
+###
+############################################################
 all	= modgen
 
+modgen: pathnames.h ${OBJS} modgen.h decl.inc typmap.h stype.h
+	$(LD) -o $@ ${CFLAGS} ${OBJS} ${LIBS}
+
+install: modgen
+	${MKINSTALLDIRS} ${bindir}
+	${INSTALL_PROGRAM} modgen ${bindir}/modgen-${SINGULAR_VERSION}
+	rm -f ${bindir}/modgen
+	cd ${bindir}; ${LN_S} modgen-${SINGULAR_VERSION} modgen;\
+	if test ! -x ${MODGEN}; then \
+		${LN_S} modgen-${SINGULAR_VERSION} ${MODGEN};\
+	fi
+
+############################################################
+###
+###
+############################################################
+.SUFFIXES: .o .so .dll .lo .y
+
 .cc.o:
-	gcc -c ${CFLAGS} $<
+	$(CXX) -c ${CFLAGS} $<
 
 .c.o:
-	gcc -c ${CFLAGS} $<
+	$(CC) -c ${CFLAGS} $<
 
-all: modgen
+.y.cc:
+	@if test "x${BISON}" = x; then \
+		echo Error: no bison given, could not rebuilt mod_grammar.cc;\
+                exit 1; \
+	fi
+	${BISON} -v -d -t -o mod_grammar.cc $<
+	mv mod_grammar.hh mod_grammar.h
 
 pathnames.h:
 	echo "/*" > pathnames.h
@@ -56,31 +103,24 @@ pathnames.h:
 	echo "#define PREFIX	\"$(prefix)\"" >> pathnames.h
 	echo "#define EXEC_PREFIX	\"$(exec_prefix)\"" >> pathnames.h
 
-modgen: ${OBJS} modgen.h decl.inc typmap.h pathnames.h stype.h
-	gcc -o $@ ${CFLAGS} ${OBJS} ${LIBS}
+scanner.cc: scanner.l mod_grammar.h modgen.h
+	$(LEX) -oscanner.cc scanner.l
 
-scanner.cc: scanner.l grammar.h modgen.h
-	flex -oscanner.cc scanner.l
+#	$(LEX) -Pyymod -oscanner.cc scanner.l
 
-#	flex -Pyymod -oscanner.cc scanner.l
-
+############################################################
+###
+###
+############################################################
 clean:
 	rm -f scanner.cc *.o core modgen
+	rm -f mod_grammar.cc mod_grammar.h decl.inc 
 	rm -f pathnames.h
 
 distclean: clean
 	rm -f a.out *~ 
-	rm -f grammar.cc grammar.h decl.inc 
+	rm -f mod_grammar.cc mod_grammar.h decl.inc 
 #	rm -f Makefile
-
-install: modgen
-	${MKINSTALLDIRS} ${bindir}
-	${INSTALL_PROGRAM} modgen ${bindir}/modgen-${SINGULAR_VERSION}
-	rm -f ${bindir}/modgen
-	cd ${bindir}; ${LN_S} modgen-${SINGULAR_VERSION} modgen;\
-	if test ! -x ${MODGEN}; then \
-		${LN_S} modgen-${SINGULAR_VERSION} ${MODGEN};\
-	fi
 
 
 #
@@ -103,16 +143,12 @@ decl.inc: ../../Singular/grammar.h ../../Singular/tok.h
 	-grep "^  [A-Z_]*," ../../Singular/tok.h | sed "s/,//g" | awk \
 		'{print "\tcase "$$1": strcpy(name,\""$$1"\"); break;"}'>>$@
 
-.y.cc:
-	@if test "x${BISON}" = x; then \
-		echo Error: no bison given, could not rebuilt grammar.cc;\
-                exit 1; \
-	fi
-	${BISON} -v -d -t -o grammar.cc $<
-	mv grammar.cc.h grammar.h
-
+############################################################
+###
+###
+############################################################
 makefile.cc:	pathnames.h
 misc.cc:	modgen.h decl.inc
 utils.cc:	modgen.h
-grammar.cc:	grammar.y
-grammar.h:	grammar.y
+mod_grammar.cc:	mod_grammar.y
+mod_grammar.h:	mod_grammar.y

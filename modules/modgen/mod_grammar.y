@@ -1,5 +1,5 @@
 /*
- * $Id: grammar.y,v 1.20 2002-09-26 09:55:10 anne Exp $
+ * $Id: mod_grammar.y,v 1.1 2003-06-09 09:49:21 krueger Exp $
  */
 
 %{
@@ -148,7 +148,7 @@ initmod:
           free($1);
           write_mod_init(&module_def, module_def.fmtfp);
 	  initdone = 1;
-        }
+        };
 
 sect1: expr ';'
        | sect1 expr ';'
