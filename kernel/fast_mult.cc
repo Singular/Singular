@@ -484,7 +484,7 @@ static void MC_iterate(poly f, int n, ring r, int f_len,number* facult, int* exp
     poly zw_l=NULL;
     for(i=0;i<=n-sum;i++){
       exp[pos]=i;
-      number new_coef=n_IntDiv(coef,facult[i],r);
+      number new_coef=n_Init(1,r);//=n_IntDiv(coef,facult[i],r);
       poly zw_real=NULL;
       MC_iterate(f, n, r, f_len,facult, exp,f_terms,erg_bucket,pos+1,sum+i,new_coef,zw_real,tmp,term_pot);
       if (pos==f_len-2){
@@ -504,7 +504,7 @@ static void MC_iterate(poly f, int n, ring r, int f_len,number* facult, int* exp
   if(pos==f_len-1){
     i=n-sum;
     exp[pos]=i;
-    number new_coef=n_IntDiv(coef,facult[i],r);
+    number new_coef=n_Init(1,r);//n_IntDiv(coef,facult[i],r);
     buildTermAndAdd(n,facult,f_terms,exp,f_len,erg_bucket,r, new_coef,zw, tmp,term_pot);
     // n_Delete(& new_coef,r);
   }
