@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: imm.h,v 1.4 1997-06-30 15:57:50 schmidt Exp $ */
+/* $Id: imm.h,v 1.5 1997-09-10 14:30:25 schmidt Exp $ */
 
 #ifndef INCL_IMM_H
 #define INCL_IMM_H
@@ -348,12 +348,15 @@ inline int imm_intval ( const InternalCF* const op )
 	return imm2int( op );
 }
 
-inline int imm_sign ( const InternalCF * const op )
+//{{{ inline int imm_sign ( const InternalCF * const op )
+// docu: see CanonicalForm::sign()
+inline int
+imm_sign ( const InternalCF * const op )
 {
-    if ( imm2int( op ) == 0 )
-	return 0;
-    else  if ( is_imm( op ) == FFMARK )
-	if ( cf_glob_switches.isOn( SW_SYMMETRIC_FF ) )
+    if ( is_imm( op ) == FFMARK )
+	if ( imm2int( op ) == 0 )
+	    return 0;
+	else  if ( cf_glob_switches.isOn( SW_SYMMETRIC_FF ) )
 	    if ( ff_symmetric( imm2int( op ) ) > 0 )
 		return 1;
 	    else
@@ -362,10 +365,13 @@ inline int imm_sign ( const InternalCF * const op )
 	    return 1;
     else  if ( is_imm( op ) == GFMARK )
 	return gf_sign( imm2int( op ) );
+    else  if ( imm2int( op ) = 0 )
+	return 0;
     else  if ( imm2int( op ) > 0 )
 	return 1;
     else
 	return -1;
 }
+//}}}
 
 #endif /* ! INCL_IMM_H */
