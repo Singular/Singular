@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.91 1998-07-14 16:26:20 Singular Exp $
+@comment $Id: reference.doc,v 1.92 1998-07-23 11:08:24 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1919,11 +1919,13 @@ number, poly, vector, ideal, module, matrix or list
 (the same type as the second argument)
 @item @strong{Purpose:}
 identity map on common subrings.  @code{imap} is the map between rings,
-and qrings with the same ground coefficient field which is the identity on
-variables and parameters of the same name and 0 otherwise. Useful for
-mapping from a homogenizing ring to the original ring or for mappings
-from/to rings with/without parameters. Compared with
-@code{fetch}. @code{imap} is more general, but less efficient.
+and qrings with the compatible ground coefficient field which is the identity on
+variables and parameters of the same name and 0 otherwise.
+(See @ref{mpa} for a description of possible mapping between
+different ground fields).
+Useful for mapping from a homogenizing ring to the original ring or
+for mappings from/to rings with/without parameters. Compared with
+@code{fetch}, @code{imap} is more general, but less efficient.
 @item @strong{Example:}
 @example
 @c example
