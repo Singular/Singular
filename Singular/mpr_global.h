@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_global.h,v 1.9 1999-12-02 23:03:50 wenk Exp $ */
+/* $Id: mpr_global.h,v 1.10 2000-01-10 18:59:34 wenk Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants -
@@ -52,7 +52,7 @@ typedef double mprfloat;
 #define mprPROTNnl(msg,nval)
 #endif
 
-#ifdef mprDEBUG_STICKY
+#if defined(mprDEBUG_STICKY) && defined(HAVE_FACTORY)
 // call 'option(prot);' to get status informations
 #define mprSTICKYPROT(msg) if (BTEST1(OPT_PROT)) Print(msg)
 #define mprSTICKYPROT2(msg,arg) if (BTEST1(OPT_PROT)) Print(msg,arg)

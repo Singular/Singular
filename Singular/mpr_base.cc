@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.16 1999-12-02 23:03:49 wenk Exp $ */
+/* $Id: mpr_base.cc,v 1.17 2000-01-10 18:59:34 wenk Exp $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -27,8 +27,6 @@
 #include "longalg.h"
 #ifdef HAVE_FACTORY
 #include "clapsing.h"
-#else
-#include "matpol.h"
 #endif
 #include "sparsmat.h"
 
@@ -2525,7 +2523,11 @@ const number resMatrixDense::getDetAt( const number* evpoint )
   mprSTICKYPROT(ST__DET);
 
   // evaluate determinant of matrix m using factory singclap_det
+#ifdef HAVE_FACTORY
   poly res= singclap_det( m );
+#else
+  poly res= NULL;
+#endif
 
   // avoid errors for det==0
   number numres;
@@ -2585,7 +2587,11 @@ const number resMatrixDense::getSubDet()
     j++;
   }
 
+#ifdef HAVE_FACTORY
   poly res= singclap_det( mat );
+#else
+  poly res= NULL;
+#endif
 
   number numres;
   if ( res && pGetCoeff( res ) )
@@ -2654,8 +2660,10 @@ uResultant::uResultant( const ideal _gls, const resMatType _rmt, BOOLEAN extIdea
     resMat= new resMatrixSparse( gls );
     break;
   case denseResMat:
+#ifdef HAVE_FACTORY
     resMat= new resMatrixDense( gls );
     break;
+#endif
   default:
     WerrorS("uResultant::uResultant: Unknown resultant matrix type choosen!");
   }
