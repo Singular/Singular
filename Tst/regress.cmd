@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.35 2000-12-05 14:26:27 obachman Exp $
+# $Id: regress.cmd,v 1.36 2000-12-14 08:29:07 obachman Exp $
 # FILE:    regress.cmd
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -197,14 +197,7 @@ sub Diff
   &mysystem("$cat $root.new.res | $tr -d '\\013' | $sed $sed_scripts > $root.new.res.cleaned");
 
   # doo the diff call
-  if ($verbosity > 0 && ! $WINNT)
-  {
-    $exit_status = &mysystem("$diff -w -b $root.res.cleaned $root.new.res.cleaned | $tee $root.diff");
-  }
-  else
-  {
-    $exit_status = &mysystem("$diff -w -b $root.res.cleaned $root.new.res.cleaned > $root.diff 2>&1");
-  }
+  $exit_status = &mysystem("$diff -w -b $root.res.cleaned $root.new.res.cleaned > $root.diff 2>&1");
 
   # clean up time
   &mysystem("$rm -f $root.res.cleaned $root.new.res.cleaned");
@@ -465,6 +458,11 @@ sub tst_check
         $exit_status = &Diff($root);
         if ($exit_status)
         {
+	  unless ($verbosity == 0)
+	  {
+	    print "\n";
+	    mysystem("$cat $root.diff");
+	  }
           $error_cause = "Differences in res files";
         }
         else
@@ -495,7 +493,13 @@ sub tst_check
   # complain even if verbosity == 0
   if ($exit_status)
   {
-    print (STDERR "!!! $root : $error_cause\n");
+    if (! -e "$root.diff")
+    {
+      open (DIFF_FILE, ">$root.diff");
+      print DIFF_FILE "!!! $root : $error_cause\n";
+      print "\n";
+    }
+    print STDERR "!!! $root : $error_cause\n";
   }
   else
   {
@@ -530,7 +534,7 @@ sub tst_check
     }
   }
   # und tschuess
-  unless ($verbosity == 0)
+  unless ($verbosity == 0 || $exit_status)
   {
     if ($verbosity > 1 || $timings_only)
     {
@@ -542,7 +546,7 @@ sub tst_check
     }
     print " \n";
   }
-  $total_checks_pass++ unless $exit_code;
+  $total_checks_pass++ unless $exit_status;
   return ($exit_status);
 }
 
