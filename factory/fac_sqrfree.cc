@@ -1,12 +1,19 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_sqrfree.cc,v 1.3 1996-12-05 18:24:55 schmidt Exp $
+// $Id: fac_sqrfree.cc,v 1.4 1997-04-08 10:32:03 schmidt Exp $
+
+#include <config.h>
 
 #include "assert.h"
+
 #include "cf_defs.h"
 #include "canonicalform.h"
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1996/12/05 18:24:55  schmidt
+``Unconditional'' check-in.
+Now it is my turn to develop factory.
+
 Revision 1.2  1996/06/26 13:15:28  stobbe
 "sqrFreeZ: Now handles the sign of the argument right.
 "

@@ -1,8 +1,12 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_multivar.cc,v 1.3 1997-03-27 09:47:17 schmidt Exp $
+// $Id: fac_multivar.cc,v 1.4 1997-04-08 10:30:59 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1997/03/27 09:47:17  schmidt
+debug output rewritten
+some spurious preprocessor directives removed
+
 Revision 1.2  1996/12/05 18:24:54  schmidt
 ``Unconditional'' check-in.
 Now it is my turn to develop factory.
@@ -15,12 +19,13 @@ Initial revision
 
 */
 
+#include <config.h>
+
 #include "assert.h"
 #include "debug.h"
 #include "timing.h"
 
 #include "cf_defs.h"
-
 #include "fac_multivar.h"
 #include "fac_univar.h"
 #include "cf_reval.h"

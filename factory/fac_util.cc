@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_util.cc,v 1.4 1997-03-27 09:56:58 schmidt Exp $
+// $Id: fac_util.cc,v 1.5 1997-04-08 10:37:42 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.4  1997/03/27 09:56:58  schmidt
+error check changed to ASSERT
+
 Revision 1.3  1996/07/16 12:26:05  stobbe
 "New functions prod, crossprod ans sum for CFArrays, since these functions
 are no longer contained in the template specification of Array.
@@ -22,10 +25,11 @@ Initial revision
 
 */
 
+#include <config.h>
+
 #include "assert.h"
 
 #include "cf_defs.h"
-
 #include "canonicalform.h"
 #include "cf_iter.h"
 #include "fac_util.h"

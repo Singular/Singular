@@ -1,8 +1,13 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_univar.cc,v 1.5 1997-03-27 09:54:41 schmidt Exp $
+// $Id: fac_univar.cc,v 1.6 1997-04-08 10:33:19 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.5  1997/03/27 09:54:41  schmidt
+timing output changed to TIMING
+debug output rewritten
+debug output changed to DEBOUT
+
 Revision 1.4  1996/07/12 08:37:20  stobbe
 "ZFactorizeUnivariate: now handles constants of the squarefree decomposition
 "
@@ -25,6 +30,8 @@ Initial revision
 
 */
 
+#include <config.h>
+
 #include <math.h>
 
 #include "assert.h"
@@ -32,7 +39,6 @@ Initial revision
 #include "timing.h"
 
 #include "cf_defs.h"
-
 #include "fac_util.h"
 #include "fac_univar.h"
 #include "fac_cantzass.h"
