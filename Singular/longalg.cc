@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.32 1999-04-23 15:22:25 Singular Exp $ */
+/* $Id: longalg.cc,v 1.33 1999-06-21 16:46:36 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -2536,6 +2536,19 @@ poly naPermNumber(number z, int * par_perm, int P)
   return res;
 }
 
+number   naGetDenom(number n)
+{
+  lnumber x=(lnumber)n;
+  if (x->n!=NULL)
+  {
+    lnumber r=(lnumber)Alloc0(sizeof(rnumber));
+    r->z=napCopy(naGetDenom0(x));
+    r->s = 2;
+    return (number)r;
+  }
+  return naInit(1);
+}
+
 #ifdef LDEBUG
 BOOLEAN naDBTest(number a, char *f,int l)
 {
@@ -2577,7 +2590,7 @@ BOOLEAN naDBTest(number a, char *f,int l)
 #endif
     p = p->ne;
   }
-  p = x->n;
+  p = naGetDenom0(x);
   while(p!=NULL)
   {
     if (naIsChar0 && !(nlDBTest(p->ko,f,l)))

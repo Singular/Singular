@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.13 1999-05-31 12:08:04 obachman Exp $ */
+/* $Id: numbers.cc,v 1.14 1999-06-21 16:46:39 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -49,9 +49,10 @@ BOOLEAN (*nIsZero)(number a);
 BOOLEAN (*nIsOne)(number a);
 BOOLEAN (*nIsMOne)(number a);
 BOOLEAN (*nGreaterZero)(number a);
-void   (*nWrite)(number &a);
-char * (*nRead)(char *s,number *a);
-void   (*nPower)(number a, int i, number * result);
+void    (*nWrite)(number &a);
+char *  (*nRead)(char *s,number *a);
+void    (*nPower)(number a, int i, number * result);
+number  (*nGetDenom)(number n);
 numberfunc nGcd,nLcm;
 BOOLEAN (*nSetMap)(int c,char **par, int nop, number minpol);
 number (*nMap)(number from);
@@ -85,6 +86,8 @@ number ndGcd(number a, number b) { return nInit(1); }
 
 number ndIntMod(number a, number b) { return nInit(0); }
 
+number ndGetDenom(number n) { return nInit(1); }
+
 int    nGetChar() { return nChar; }
 
 int ndSize(number a) {return (int)nIsZero(a)==FALSE; }
@@ -107,6 +110,8 @@ void nSetChar(ring r, BOOLEAN complete)
     nPar   = ndPar;
     nParDeg= ndParDeg;
     nSize  = ndSize;
+    nGetDenom = ndGetDenom;
+    nName = ndName;
   }
   //Print("n:c=%d compl=%d param=%d\n",c,complete,r->parameter);
   //if ((c == 1) || (c< (-1)))
@@ -152,6 +157,7 @@ void nSetChar(ring r, BOOLEAN complete)
       nSetMap = naSetMap;
       nName= naName;
       nSize  = naSize;
+      nGetDenom = naGetDenom;
 #ifdef LDEBUG
       nDBTest=naDBTest;
 #endif
@@ -194,8 +200,8 @@ void nSetChar(ring r, BOOLEAN complete)
       nGcd  = nlGcd;
       nLcm  = nlLcm;
       nSetMap = nlSetMap;
-      nName= ndName;
       nSize  = nlSize;
+      nGetDenom = nlGetDenom;
 #ifdef LDEBUG
       nDBTest=nlDBTest;
 #endif
@@ -239,7 +245,7 @@ void nSetChar(ring r, BOOLEAN complete)
       nGcd  = ndGcd;
       nLcm  = ndGcd; /* tricky, isn't it ?*/
       nSetMap = npSetMap;
-      nName= ndName;
+      /* nName= ndName; */
       /*nSize  = ndSize;*/
 #ifdef LDEBUG
       nDBTest=npDBTest;
@@ -332,7 +338,7 @@ void nSetChar(ring r, BOOLEAN complete)
       nGcd  = ndGcd;
       nLcm  = ndGcd; /* tricky, isn't it ?*/
       nSetMap=nrSetMap;
-      nName=ndName;
+      /* nName= ndName; */
       /*nSize  = ndSize;*/
 #ifdef LDEBUG
       nDBTest=nrDBTest;
@@ -377,7 +383,7 @@ void nSetChar(ring r, BOOLEAN complete)
       nGcd  = ndGcd;
       nLcm  = ndGcd; /* tricky, isn't it ?*/
       nSetMap=ngfSetMap;
-      nName=ndName;
+      /* nName= ndName; */
       /*nSize  = ndSize;*/
 #ifdef LDEBUG
       nDBTest=ngfDBTest;
@@ -421,7 +427,6 @@ void nSetChar(ring r, BOOLEAN complete)
       nGcd  = ndGcd;
       nLcm  = ndGcd; /* tricky, isn't it ?*/
       nSetMap=ngcSetMap;
-      nName=ndName;
       nPar=ngcPar;
       /*nSize  = ndSize;*/
 #ifdef LDEBUG

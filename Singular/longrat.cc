@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.18 1999-04-29 11:38:49 Singular Exp $ */
+/* $Id: longrat.cc,v 1.19 1999-06-21 16:46:38 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -2099,4 +2099,18 @@ int nlModP(number n, int p)
     return (int)npDiv((number)iz,(number)in);
   }
   return iz;
+}
+
+number   nlGetDenom(number n)
+{
+  if (!(SR_HDL(n) & SR_INT))
+  {
+    if (n->s!=3)
+    {
+      number r=nlRInit(1);
+      mpz_set(&r->z,&n->n);
+      return r;
+    }
+  }
+  return nlInit(1);
 }

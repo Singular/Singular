@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: algmap.cc,v 1.11 1998-09-22 14:09:00 Singular Exp $ */
+/* $Id: algmap.cc,v 1.12 1999-06-21 16:46:35 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials from rings with
 * 'alg' numbers
@@ -27,12 +27,12 @@ static poly maLongalg1Fetch(poly res, poly p0, ring r0, int n,
   poly q0, q1 = NULL;
   int i, j, m = r0->N;
 
-  if (naGetDenom(pGetCoeff(p0)) != NULL)
+  if (naGetDenom0(pGetCoeff(p0)) != NULL)
   {
     *nom = TRUE;
     return res;
   }
-  a0 = naGetNom(pGetCoeff(p0));
+  a0 = naGetNom0(pGetCoeff(p0));
   do
   {
     q0 = pInit();
@@ -40,7 +40,7 @@ static poly maLongalg1Fetch(poly res, poly p0, ring r0, int n,
     if (t!=0)
     {
       pGetCoeff(q0) = (number)Alloc0(sizeof(rnumber));
-      b0 = naGetNom(pGetCoeff(q0)) = napNew();
+      b0 = naGetNom0(pGetCoeff(q0)) = napNew();
       napGetCoeff(b0) = nacCopy(napGetCoeff(a0));
       for (i=1; i<=t; i++)
       {
@@ -79,12 +79,12 @@ static poly maLongalg2Fetch(poly res, poly p0, ring r0, int n, int s,
 
   if (s!=0)
   {
-    if (naGetDenom(pGetCoeff(p0)) != NULL)
+    if (naGetDenom0(pGetCoeff(p0)) != NULL)
     {
       *nom = TRUE;
       return res;
     }
-    a0 = naGetNom(pGetCoeff(p0));
+    a0 = naGetNom0(pGetCoeff(p0));
   }
   q0 = pInit();
   pSetComp(q0,pRingGetComp(r0, p0));
@@ -116,7 +116,7 @@ static poly maLongalg2Fetch(poly res, poly p0, ring r0, int n, int s,
     }
     if (s==0)
     {
-      naGetNom(pGetCoeff(q0)) = b0;
+      naGetNom0(pGetCoeff(q0)) = b0;
       return pAdd(res, q0);
     }
     b1 = napAdd(b1, b0);
@@ -125,7 +125,7 @@ static poly maLongalg2Fetch(poly res, poly p0, ring r0, int n, int s,
   while (a0 != NULL);
   if (pGetCoeff(q0)==NULL)
     pGetCoeff(q0) = (number)Alloc0(sizeof(rnumber));
-  naGetNom(pGetCoeff(q0)) = b1;
+  naGetNom0(pGetCoeff(q0)) = b1;
   return pAdd(res, q0);
 }
 
@@ -211,7 +211,7 @@ static poly maLongalgMap(poly res, ring r, poly p0, int s, int t,
       nNew(&cc);
       b0 = napNew();
       napGetCoeff(b0) = pGetCoeff(p0);
-      naGetNom(cc) = b0;
+      naGetNom0(cc) = b0;
       pMultN(monpart,cc);
       napGetCoeff(b0) = NULL;
       nDelete(&cc);
@@ -223,7 +223,7 @@ static poly maLongalgMap(poly res, ring r, poly p0, int s, int t,
     pSetCompP(monpart, pRingGetComp(r, p0));
     return pAdd(res, monpart);
   }
-  if (naGetDenom(pGetCoeff(p0)) != NULL)
+  if (naGetDenom0(pGetCoeff(p0)) != NULL)
   {
     *nom = TRUE;
     WerrorS("denominator in algnumber");
@@ -231,14 +231,14 @@ static poly maLongalgMap(poly res, ring r, poly p0, int s, int t,
     pDelete(&res);
     return NULL;
   }
-  a0 = naGetNom(pGetCoeff(p0));
+  a0 = naGetNom0(pGetCoeff(p0));
   do
   {
     q = pInit();
     if (t!=0)
     {
       pGetCoeff(q) = (number)Alloc0(sizeof(rnumber));
-      b0 = naGetNom(pGetCoeff(q)) = napNew();
+      b0 = naGetNom0(pGetCoeff(q)) = napNew();
       napGetCoeff(b0) = nacCopy(napGetCoeff(a0));
     }
     else

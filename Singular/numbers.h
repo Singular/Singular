@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.6 1999-04-29 11:38:54 Singular Exp $ */
+/* $Id: numbers.h,v 1.7 1999-06-21 16:46:40 Singular Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
@@ -38,6 +38,7 @@ extern BOOLEAN (*nGreater)(number a,number b),
                (*nIsMOne)(number a),
                (*nGreaterZero)(number a);
 extern void    (*nPower)(number a, int i, number * result);
+extern number  (*nGetDenom)(number n);
 extern numberfunc nGcd, nLcm;
 
 extern number nNULL; /* the 0 as constant */

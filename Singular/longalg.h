@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.7 1999-01-21 15:00:07 Singular Exp $ */
+/* $Id: longalg.h,v 1.8 1999-06-21 16:46:37 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -98,12 +98,13 @@ poly naPermNumber(number z, int * par_perm, int P);
 #define napGetExp(p,i) (p->e[(i)-1])
 #define napNew() ((alg)Alloc0(napMonomSize))
 #define nanumber lnumber
-#define naGetNom(na)  (((nanumber)(na))->z)
-#define naGetDenom(na)  (((nanumber)(na))->n)
+#define naGetNom0(na)  (((nanumber)(na))->z)
+#define naGetDenom0(na)  (((nanumber)(na))->n)
 extern number   (*nacCopy)(number a);
 extern BOOLEAN  (*nacIsZero)(number a);
 extern number   (*nacInit)(int i);
 extern void     (*nacNormalize)(number &a);
 extern void napWrite(alg l);
+extern number   naGetDenom(number n);
 #endif
 
