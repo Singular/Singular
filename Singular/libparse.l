@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.14 1998-04-28 14:26:29 krueger Exp $ */
+/* $Id: libparse.l,v 1.15 1998-04-28 15:51:47 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -568,13 +568,6 @@ int libread(FILE* f, char* buf, int max_size)
   rc  = myfread( buf, 1, max_size, f );
 #if YYLPDEBUG >2
   printf("fread: %d of %d\n", rc, max_size);
-#endif
-#ifdef macintosh
-  char *p = buf, *q;
-  while( (q = strchr(p, '\r')) != NULL) {
-    *q = '\n';
-    p = q;
-  }
 #endif
   yylp_buffer_start = buf;
   return rc;
