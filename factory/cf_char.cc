@@ -1,8 +1,12 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_char.cc,v 1.3 1996-06-24 11:25:45 stobbe Exp $
+// $Id: cf_char.cc,v 1.4 1996-07-08 08:12:23 stobbe Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1996/06/24 11:25:45  stobbe
+"setCharacteristic: minor bug fix, index correction
+"
+
 Revision 1.2  1996/06/18 12:09:43  stobbe
 "setCharacteristic: changed the setting of ff_big.
 "
@@ -22,6 +26,7 @@ Initial revision
 #include "imm.h"
 #include "int_pp.h"
 #include "cf_primes.h"
+#include "cf_binom.h"
 
 static int theCharacteristic = 0;
 static int theDegree = 1;
@@ -46,6 +51,7 @@ void setCharacteristic( int c )
 	theCharacteristic = c;
 	ff_big = c > cf_getSmallPrime( cf_getNumSmallPrimes()-1 );
 	ff_setprime( c );
+	resetFPT();
     }
 }
 
