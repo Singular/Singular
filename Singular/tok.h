@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: token for interpreter, as types; general macros
 */
-/* $Id: tok.h,v 1.23 1999-03-16 15:33:16 Singular Exp $ */
+/* $Id: tok.h,v 1.24 1999-06-28 12:48:17 wenk Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -74,12 +74,14 @@ enum {
   INTVEC_CMD,
   IS_RINGVAR,
   KILLATTR_CMD,
+  LAGSOLVE_CMD,
   LINK_CMD,
   LIST_CMD,
   LOAD_CMD,
   LRES_CMD,
   MEMORY_CMD,
   MONITOR_CMD,
+  MPRES_CMD,
   MSTD_CMD,
   NAMEOF_CMD,
   NAMES_CMD,
@@ -109,6 +111,8 @@ enum {
   TRACE_CMD,
   TYPEOF_CMD,
   UNLOAD_CMD,
+  URSOLVE_CMD,
+  VANDER_CMD,
   VARSTR_CMD,
   WRITE_CMD,
   /* start system var section: VECHO */

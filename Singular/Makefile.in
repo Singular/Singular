@@ -81,8 +81,9 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     tesths.cc timer.cc weight.cc \
     mpsr_Put.cc mpsr_PutPoly.cc mpsr_Tok.cc mpsr_GetPoly.cc \
     mpsr_Get.cc mpsr_GetMisc.cc mpsr_Error.cc \
-    ndbm.cc spSpolyLoop.cc libparse.cc mod_raw.cc \
-    pcv.cc kbuckets.cc kbPolyProcs.cc
+    ndbm.cc spSpolyLoop.cc libparse.cc mod_raw.cc\
+	pcv.cc kbuckets.cc kbPolyProcs.cc \
+    mpr_inout.cc mpr_base.cc mpr_numeric.cc
 
 CSOURCES=gmalloc.c mmalloc.c mmheap.c mmpage.c mmcheck.c  mmisc.c mmtables.c \
     mmbt.c weight0.c find_exec.c getopt.c fereadl.c page.c
@@ -102,7 +103,8 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	kstdfac.h mpsr_Get.h spolys.h \
 	kutil.h mpsr_Put.h spolys0.h sing_dld.h\
 	ndbm.h spSpolyLoop.h polys-impl.h polys-comp.h getopt.h libparse.h \
-	pcv.h mod_raw.h kbuckets.h kbPolyProcs.h
+	pcv.h mod_raw.h kbuckets.h kbPolyProcs.h \
+	mpr_global.h mpr_inout.h mpr_base.h mpr_numeric.h	
 
 INCS=febase.inc polys.inc iparith.inc mpsr_Tok.inc spSpolyLoop.inc
 
@@ -130,7 +132,8 @@ OBJS=grammar.o scanner.o matpol.o binom.o mpr_complex.o gnumpfl.o gnumpc.o \
      mpsr_Error.o mpsr_Put.o mpsr_PutPoly.o mpsr_GetPoly.o \
      mpsr_Get.o mpsr_GetMisc.o ndbm.o spSpolyLoop.o libparse.o \
      find_exec.o getopt.o fereadl.o  mod_raw.o sdb.o \
-     pcv.o kbuckets.o kbPolyProcs.o
+	pcv.o kbuckets.o kbPolyProcs.o \
+     mpr_inout.o mpr_base.o mpr_numeric.o
 
 ##
 ## Build Targets
@@ -355,6 +358,7 @@ OBJG1=	grammar.og scanner.og matpol.og binom.og gnumpfl.og mpr_complex.og \
      mpsr_Error.og mpsr_Put.og mpsr_PutPoly.og mpsr_GetPoly.og \
      mpsr_Get.og mpsr_GetMisc.og \
      ndbm.og spSpolyLoop.og libparse.og  mod_raw.og \
+     mpr_inout.og mpr_base.og mpr_numeric.og \
      pcv.og kbuckets.og kbPolyProcs.og
 
 OBJG2= mmalloc.og mmheap.og mmpage.og mmcheck.og mmbt.og page.og \
@@ -431,7 +435,8 @@ OBJP1=	grammar.op scanner.op matpol.op binom.op gnumpfl.op mpr_complex.op \
      mpsr_Error.op mpsr_Put.op mpsr_PutPoly.op mpsr_GetPoly.op \
      mpsr_Get.op mpsr_GetMisc.op \
      ndbm.op spSpolyLoop.op libparse.op  mod_raw.op \
-     pcv.op kbuckets.op kbPolyProcs.op
+     mpr_inout.op mpr_base.op mpr_numeric.op \
+     pcv.op kbuckets.op kbPolyProcs.op 
 
 OBJP2= mmalloc.op mmheap.op mmpage.op mmcheck.op mmbt.op page.op \
      mmisc.op mmtables.op weight0.op find_exec.op getopt.op fereadl.op

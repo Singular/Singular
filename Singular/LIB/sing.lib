@@ -1,9 +1,10 @@
-// $Id: sing.lib,v 1.13 1998-06-02 10:21:19 Singular Exp $
+
+// $Id: sing.lib,v 1.14 1999-06-28 12:48:18 wenk Exp $
 //system("random",787422842);
 //(GMG/BM, last modified 26.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: sing.lib,v 1.13 1998-06-02 10:21:19 Singular Exp $";
+version="$Id: sing.lib,v 1.14 1999-06-28 12:48:18 wenk Exp $";
 info="
 LIBRARY:  sing.lib      PROCEDURES FOR SINGULARITIES
 

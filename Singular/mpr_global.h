@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_global.h,v 1.2 1999-06-24 07:46:51 wenk Exp $ */
+/* $Id: mpr_global.h,v 1.3 1999-06-28 12:48:14 wenk Exp $ */
 
 /* 
 * ABSTRACT - multipolynomial resultants - 

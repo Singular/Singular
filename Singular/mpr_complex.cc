@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.6 1999-06-26 16:40:42 Singular Exp $ */
+/* $Id: mpr_complex.cc,v 1.7 1999-06-28 12:48:12 wenk Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -237,9 +237,9 @@ gmp_float numberToFloat( number num )
     r= *(gmp_float*)num;
   } else if ( rField_is_R() ) {
     // Add some code here :-)
-    Werror("Wrong field!");
+    Werror("Ground field not implemented!");
   } else {
-    Werror("Wrong field!");
+    Werror("Ground field not implemented!");
   }
 
   return r;

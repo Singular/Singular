@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.h,v 1.4 1999-06-24 07:46:51 wenk Exp $ */
+/* $Id: mpr_complex.h,v 1.5 1999-06-28 12:48:13 wenk Exp $ */
 
 /* 
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -116,15 +116,19 @@ public:
   inline operator int() const;
 
 public:
-  static void setPrecision( const unsigned long int prec ) 
-    { gmp_default_prec_bits= prec; }
-  static void setEqualBits( const unsigned long int prec )
-    { gmp_needequal_bits= prec; }
+  static void setPrecision( const unsigned long int prec ) { 
+    gmp_default_prec_bits= prec; 
+  }
+  static void setEqualBits( const unsigned long int prec ) { 
+    gmp_needequal_bits= prec; 
+  }
 
-  static const unsigned long int getPrecision() 
-    { return gmp_default_prec_bits; }
-  static const unsigned long int getEqualBits() 
-    { return gmp_needequal_bits; }
+  static const unsigned long int getPrecision() { 
+    return gmp_default_prec_bits; 
+  }
+  static const unsigned long int getEqualBits() { 
+    return gmp_needequal_bits; 
+  }
 
 private:
   static unsigned long int gmp_default_prec_bits;
@@ -249,6 +253,7 @@ inline const mpf_t *gmp_float::mpfp() const
 gmp_float abs( const gmp_float & );
 gmp_float sqrt( const gmp_float & );
 gmp_float hypot( const gmp_float &, const gmp_float & );
+//gmp_float pow( const gmp_float &, int & );
 
 // simulated functions using double functions
 gmp_float sin( const gmp_float & );
