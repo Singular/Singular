@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.17 1998-09-29 12:00:54 Singular Exp $ */
+/* $Id: ffields.cc,v 1.18 1998-10-15 11:45:54 obachman Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -626,7 +626,11 @@ void nfSetChar(int c, char **param)
     if (c>1) nfCharQ = c;
     else     nfCharQ = -c;
     char buf[100];
+#ifdef macintosh
+    sprintf(buf,"gftables:%d",nfCharQ);
+#else
     sprintf(buf,"gftables/%d",nfCharQ);
+#endif
     FILE * fp = feFopen(buf,"r",NULL,TRUE);
     if (fp==NULL)
     {

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.22 1998-07-10 17:03:42 Singular Exp $ */
+/* $Id: febase.h,v 1.23 1998-10-15 11:45:53 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -46,6 +46,9 @@ extern BOOLEAN errorreported;
 extern BOOLEAN fe_use_fgets;
 extern BOOLEAN feBatch;
 extern BOOLEAN feProt;
+extern BOOLEAN feWarn;
+extern BOOLEAN feOut;
+
 
 #define PROT_NONE 0
 #define PROT_I    1

@@ -1,7 +1,7 @@
-// $Id: standard.lib,v 1.25 1998-06-19 08:01:51 Singular Exp $
+// $Id: standard.lib,v 1.26 1998-10-15 11:46:10 obachman Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.25 1998-06-19 08:01:51 Singular Exp $";
+version="$Id: standard.lib,v 1.26 1998-10-15 11:46:10 obachman Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
@@ -333,8 +333,8 @@ EXAMPLE: example groebner; shows an example"
     if (p_opt)
     {
       "std with hilb in basering";
-      i = std(i, hi);
     }
+    i = std(i, hi);
   }
   else
   {

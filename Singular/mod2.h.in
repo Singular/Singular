@@ -199,7 +199,7 @@
 #define MAX_EXPONENT 0x7f
 #elif SIZEOF_EXPONENT == 2
 #define MAX_EXPONENT 0x7fff
-#else // SIZEOF_EXPONENT == 4
+#else /* SIZEOF_EXPONENT == 4 */
 #define MAX_EXPONENT 0x7fffffff
 #endif
 

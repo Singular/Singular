@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.18 1998-08-24 14:39:08 obachman Exp $ */
+/* $Id: mpsr_Get.cc,v 1.19 1998-10-15 11:46:03 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -45,15 +45,16 @@ static mpsr_Status_t GetIntMatLeftv(MP_Link_pt link, MPT_Node_pt node,
 static mpsr_Status_t GetRingLeftv(MP_Link_pt link, MPT_Node_pt node,
                                 mpsr_leftv mlv);
 static mpsr_Status_t GetPolyLeftv(MP_Link_pt link, MPT_Node_pt node,
-                                mpsr_leftv mlv);
+                                mpsr_leftv mlv, BOOLEAN IsUnOrdered);
 static mpsr_Status_t GetPolyVectorLeftv(MP_Link_pt link, MPT_Node_pt node,
-                                      mpsr_leftv mlv);
+                                        mpsr_leftv mlv,
+                                        BOOLEAN IsUnOrdered = FALSE);
 static mpsr_Status_t GetIdealLeftv(MP_Link_pt link, MPT_Node_pt node,
-                                 mpsr_leftv mlv);
+                                 mpsr_leftv mlv, BOOLEAN IsUnOrdered = FALSE);
 static mpsr_Status_t GetModuleLeftv(MP_Link_pt link, MPT_Node_pt node,
-                                  mpsr_leftv mlv);
+                                  mpsr_leftv mlv, BOOLEAN IsUnOrdered = FALSE);
 static mpsr_Status_t GetMatrixLeftv(MP_Link_pt link, MPT_Node_pt node,
-                                  mpsr_leftv mlv);
+                                  mpsr_leftv mlv, BOOLEAN IsUnOrdered = FALSE);
 static mpsr_Status_t GetMapLeftv(MP_Link_pt link, MPT_Node_pt node,
                                mpsr_leftv mlv);
 static mpsr_Status_t GetCopCommandLeftv(MP_Link_pt link, MPT_Node_pt node,
@@ -88,15 +89,15 @@ inline BOOLEAN IsIntMatNode(MPT_Node_pt node)
                                    MP_ProtoDict, MP_CmtProtoIMP_Sint32);
 }
 
-inline BOOLEAN IsRingNode(MPT_Node_pt node, ring &r)
+inline BOOLEAN IsRingNode(MPT_Node_pt node, ring &r, BOOLEAN &IsUnOrdered)
 {
   BOOLEAN mv;
   return
     NodeCheck(node, MP_PolyDict, MP_CopPolyRing) &&
-    mpsr_GetRingAnnots(node, r, mv) == MP_Success;
+    mpsr_GetRingAnnots(node, r, mv, IsUnOrdered) == MP_Success;
 }
 
-inline BOOLEAN IsPolyNode(MPT_Node_pt node, ring &r)
+inline BOOLEAN IsPolyNode(MPT_Node_pt node, ring &r, BOOLEAN &IsUnOrdered)
 {
   BOOLEAN mv;
   
@@ -104,10 +105,11 @@ inline BOOLEAN IsPolyNode(MPT_Node_pt node, ring &r)
   return
     NodeCheck(node, MP_PolyDict, MP_CopPolyDenseDistPoly) &&
     MPT_FindAnnot(node, MP_PolyDict, MP_AnnotPolyModuleVector) == NULL &&
-    mpsr_GetRingAnnots(node, r, mv) == MP_Success;
+    mpsr_GetRingAnnots(node, r, mv, IsUnOrdered) == MP_Success;
 }
 
-inline BOOLEAN IsPolyVectorNode(MPT_Node_pt node, ring &r)
+inline BOOLEAN IsPolyVectorNode(MPT_Node_pt node, ring &r, 
+                                BOOLEAN &IsUnOrdered)
 {
   BOOLEAN mv;
   
@@ -115,10 +117,11 @@ inline BOOLEAN IsPolyVectorNode(MPT_Node_pt node, ring &r)
   return
     NodeCheck(node, MP_PolyDict, MP_CopPolyDenseDistPoly) &&
     MPT_FindAnnot(node, MP_PolyDict, MP_AnnotPolyModuleVector) != NULL &&
-    mpsr_GetRingAnnots(node, r, mv) == MP_Success;
+    mpsr_GetRingAnnots(node, r, mv, IsUnOrdered) == MP_Success;
 }
 
-inline BOOLEAN IsIdealNode(MPT_Node_pt node, ring &r)
+inline BOOLEAN IsIdealNode(MPT_Node_pt node, ring &r, 
+                           BOOLEAN &IsUnOrdered)
 {
   fr(NodeCheck(node, MP_PolyDict, MP_CopPolyIdeal));
   MPT_Tree_pt tree = MPT_GetProtoTypespec(node);
@@ -127,10 +130,10 @@ inline BOOLEAN IsIdealNode(MPT_Node_pt node, ring &r)
   return
     node->type == MP_CommonMetaOperatorType &&
     node->numchild == 0 &&
-    IsPolyNode(node, r);
+    IsPolyNode(node, r, IsUnOrdered);
 }
 
-inline BOOLEAN IsModuleNode(MPT_Node_pt node, ring &r)
+inline BOOLEAN IsModuleNode(MPT_Node_pt node, ring &r, BOOLEAN &IsUnOrdered)
 {
   fr(NodeCheck(node, MP_PolyDict, MP_CopPolyModule));
   MPT_Tree_pt tree = MPT_GetProtoTypespec(node);
@@ -139,10 +142,10 @@ inline BOOLEAN IsModuleNode(MPT_Node_pt node, ring &r)
   return
     node->type == MP_CommonMetaOperatorType &&
     node->numchild == 0 &&
-    IsPolyVectorNode(node, r);
+    IsPolyVectorNode(node, r, IsUnOrdered);
 }
 
-inline BOOLEAN IsMatrixNode(MPT_Node_pt node, ring &r)
+inline BOOLEAN IsMatrixNode(MPT_Node_pt node, ring &r, BOOLEAN &IsUnOrdered)
 {
   fr(NodeCheck(node, MP_MatrixDict, MP_CopMatrixDenseMatrix));
   MPT_Tree_pt tree = MPT_GetProtoTypespec(node);
@@ -151,7 +154,7 @@ inline BOOLEAN IsMatrixNode(MPT_Node_pt node, ring &r)
   return
     node->type == MP_CommonMetaOperatorType &&
     node->numchild == 0 &&
-    IsPolyNode(node, r);
+    IsPolyNode(node, r, IsUnOrdered);
 }
 
 inline BOOLEAN IsQuitNode(MPT_Node_pt node)
@@ -324,14 +327,15 @@ mpsr_Status_t mpsr_GetMsg(MP_Link_pt link, leftv &lv)
   {
     // Now mlv is our leftv -- check whether r has an ordering set
     if (mlv.r != NULL && mlv.r->order[0] == ringorder_unspec)
-    {
-      ring r = rCopy(mlv.r);
-      r->order[0] = ringorder_lp;
-      mpsr_rSetOrdSgn(r);
-      mpsr_MapLeftv(mlv.lv, mlv.r, r);
-      rKill(mlv.r);
-      mlv.r = r;
+    { 
+        ring r = rCopy(mlv.r);
+        r->order[0] = ringorder_lp;
+        mpsr_rSetOrdSgn(r);
+        mpsr_MapLeftv(mlv.lv, mlv.r, r);
+        rKill(mlv.r);
+        mlv.r = r;
     }
+      
     mpsr_SetCurrRingHdl(mlv.r);
 
     lv = mlv.lv;
@@ -405,12 +409,13 @@ mpsr_Status_t mpsr_GetLeftv(MP_Link_pt link, mpsr_leftv mlv, short quote)
  *
  ***************************************************************/
 mpsr_Status_t mpsr_GetCommonOperatorLeftv(MP_Link_pt link,
-                                        MPT_Node_pt node,
-                                        mpsr_leftv mlv,
-                                        short quote)
+                                          MPT_Node_pt node,
+                                          mpsr_leftv mlv,
+                                          short quote)
 {
   mpsr_assume(node->type == MP_CommonOperatorType);
-
+  BOOLEAN IsUnOrdered;
+  
   // Check for Singular data types
   // IntVec
   if (IsIntVecNode(node))
@@ -419,23 +424,23 @@ mpsr_Status_t mpsr_GetCommonOperatorLeftv(MP_Link_pt link,
   else if (IsIntMatNode(node))
     return GetIntMatLeftv(link, node, mlv);
   // Ring
-  else if (IsRingNode(node, mlv->r))
+  else if (IsRingNode(node, mlv->r, IsUnOrdered))
     return GetRingLeftv(link, node, mlv);
   // Poly 
-  else if (IsPolyNode(node, mlv->r))
-    return GetPolyLeftv(link, node, mlv);
+  else if (IsPolyNode(node, mlv->r, IsUnOrdered))
+    return GetPolyLeftv(link, node, mlv, IsUnOrdered);
   // PolyVector
-  else if (IsPolyVectorNode(node, mlv->r))
-    return GetPolyVectorLeftv(link, node, mlv);
+  else if (IsPolyVectorNode(node, mlv->r, IsUnOrdered))
+    return GetPolyVectorLeftv(link, node, mlv, IsUnOrdered);
   // Ideal
-  else if (IsIdealNode(node, mlv->r))
-    return GetIdealLeftv(link, node, mlv);
+  else if (IsIdealNode(node, mlv->r, IsUnOrdered))
+    return GetIdealLeftv(link, node, mlv, IsUnOrdered);
   // Module
-  else if (IsModuleNode(node, mlv->r))
-    return GetModuleLeftv(link, node, mlv);
+  else if (IsModuleNode(node, mlv->r, IsUnOrdered))
+    return GetModuleLeftv(link, node, mlv, IsUnOrdered);
   // Matrix
-  else if (IsMatrixNode(node, mlv->r))
-    return GetMatrixLeftv(link, node, mlv);
+  else if (IsMatrixNode(node, mlv->r, IsUnOrdered))
+    return GetMatrixLeftv(link, node, mlv, IsUnOrdered);
   else if (IsQuitNode(node))
     return GetQuitLeftv(mlv);
   // Map 
@@ -548,31 +553,35 @@ static mpsr_Status_t GetRingLeftv(MP_Link_pt link, MPT_Node_pt node,
 }
 
 static mpsr_Status_t GetPolyLeftv(MP_Link_pt link, MPT_Node_pt node,
-                                mpsr_leftv mlv)
+                                  mpsr_leftv mlv, BOOLEAN IsUnOrdered)
 {
   poly p;
 
   mpsr_assume(mlv->r != NULL);
   
   failr(mpsr_GetPoly(link, p, node->numchild, mlv->r));
+  if (IsUnOrdered) p = pOrdPolyMerge(p);
+  pTest(p);
   mlv->lv = mpsr_InitLeftv(POLY_CMD, (void *) p);
   return mpsr_Success;
 }
 
 static mpsr_Status_t GetPolyVectorLeftv(MP_Link_pt link, MPT_Node_pt node,
-                                      mpsr_leftv mlv)
+                                      mpsr_leftv mlv, BOOLEAN IsUnOrdered)
 {
   poly p;
 
   mpsr_assume(mlv->r != NULL);
   
   failr(mpsr_GetPolyVector(link, p, node->numchild, mlv->r));
+  if (IsUnOrdered) p = pOrdPolyMerge(p);
+  pTest(p);
   mlv->lv = mpsr_InitLeftv(VECTOR_CMD, (void *) p);
   return mpsr_Success;
 }
 
 static mpsr_Status_t GetIdealLeftv(MP_Link_pt link, MPT_Node_pt node,
-                                 mpsr_leftv mlv)
+                                 mpsr_leftv mlv, BOOLEAN IsUnOrdered)
 {
   MP_NumChild_t nc = node->numchild, i;
   ring r = mlv->r;
@@ -584,14 +593,15 @@ static mpsr_Status_t GetIdealLeftv(MP_Link_pt link, MPT_Node_pt node,
   {
     mp_failr(IMP_GetUint32(link, &nmon));
     failr(mpsr_GetPoly(link, id->m[i], nmon, r));
+    if (IsUnOrdered) id->m[i] = pOrdPolyMerge(id->m[i]);
   }
-  
+  idTest(id);
   mlv->lv = mpsr_InitLeftv(IDEAL_CMD, (void *) id);
   return mpsr_Success;
 }
 
 static mpsr_Status_t GetModuleLeftv(MP_Link_pt link, MPT_Node_pt node,
-                                  mpsr_leftv mlv)
+                                  mpsr_leftv mlv, BOOLEAN IsUnOrdered)
 {
   MP_NumChild_t nc = node->numchild, i;
   ring r = mlv->r;
@@ -610,16 +620,17 @@ static mpsr_Status_t GetModuleLeftv(MP_Link_pt link, MPT_Node_pt node,
   {
     mp_failr(IMP_GetUint32(link, &nmon));
     failr(mpsr_GetPolyVector(link, id->m[i], nmon, r));
+    if (IsUnOrdered) id->m[i] = pOrdPolyMerge(id->m[i]);
   }
   if (rank == 1)
     id->rank = idRankFreeModule(id);
-
+  idTest(id);
   mlv->lv = mpsr_InitLeftv(MODUL_CMD, (void *) id);
   return mpsr_Success;
 }
 
 static mpsr_Status_t GetMatrixLeftv(MP_Link_pt link, MPT_Node_pt node,
-                                  mpsr_leftv mlv)
+                                  mpsr_leftv mlv, BOOLEAN IsUnOrdered)
 {
   MP_NumChild_t nc = node->numchild, row = nc, col = 1, i;
   matrix mp;
@@ -647,6 +658,7 @@ static mpsr_Status_t GetMatrixLeftv(MP_Link_pt link, MPT_Node_pt node,
   {
     mp_failr(IMP_GetUint32(link, &nmon));
     failr(mpsr_GetPoly(link, mp->m[i], nmon, mlv->r));
+    if (IsUnOrdered) mp->m[i] = pOrdPolyMerge(mp->m[i]);
   }
 
   mlv->lv = mpsr_InitLeftv(MATRIX_CMD, (void *) mp);
@@ -820,13 +832,14 @@ MPT_Status_t mpsr_GetExternalData(MP_Link_pt link,
   {
     mpsr_sleftv mlv;
     mpsr_Status_t status;
+    BOOLEAN IsUnOrdered;
 
     // we would like to get polys and ideals directly
-    if (IsPolyNode(node, mlv.r))
-      status = GetPolyLeftv(link, node, &mlv);
+    if (IsPolyNode(node, mlv.r, IsUnOrdered))
+      status = GetPolyLeftv(link, node, &mlv, IsUnOrdered);
     // Ideal
-    else if (IsIdealNode(node, mlv.r))
-      status = GetIdealLeftv(link, node, &mlv);
+    else if (IsIdealNode(node, mlv.r, IsUnOrdered))
+      status = GetIdealLeftv(link, node, &mlv, IsUnOrdered);
     else
       return MPT_NotExternalData;
 

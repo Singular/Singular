@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.23 1998-08-05 14:09:45 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.24 1998-10-15 11:46:06 obachman Exp $ */
 
 /***************************************************************
  *
@@ -120,10 +120,10 @@ extern int pVarCompIndex;
 #define _pHasReverseExp    (pVarOffset > (SIZEOF_LONG / SIZEOF_EXPONENT) - 1)
 
 #define _pExpIndex(i)                                   \
-  (pVarOffset > (SIZEOF_LONG / SIZEOF_EXPONENT) - 1 ?   \
+  (pVarOffset > (SIZEOF_LONG / SIZEOF_EXPONENT) - 1?   \
    pVarOffset - (i) : pVarOffset + (i))
 #define _pRingExpIndex(r, i)                                \
-  ((r)->VarOffset > (SIZEOF_LONG / SIZEOF_EXPONENT) - 1 ?   \
+  ((r)->VarOffset > (SIZEOF_LONG / SIZEOF_EXPONENT) - 1?   \
    (r)->VarOffset - (i) : (r)->VarOffset + (i))
 
 #define _pCompIndex          0

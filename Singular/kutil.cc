@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.29 1998-09-24 17:13:10 Singular Exp $ */
+/* $Id: kutil.cc,v 1.30 1998-10-15 11:45:57 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -747,7 +747,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
   // spSpolyShortBba will not work for SDRING
   if (pSDRING)
   {
-    Lp.p=spSpolyCreate(strat->S[i],p,strat->kNoether);
+    Lp.p=spSpolyCreate(strat->S[i],p,strat->kNoether,strat->spSpolyLoop);
     if (Lp.p!=NULL)
       pDelete(&pNext(Lp.p));
   }
@@ -863,7 +863,7 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat)
   // spSpolyShortBba will not work for SDRING
   if (pSDRING)
   {
-    Lp.p=spSpolyCreate(strat->S[i],p,strat->kNoether);
+    Lp.p=spSpolyCreate(strat->S[i],p,strat->kNoether,strat->spSpolyLoop);
     if (Lp.p!=NULL)
       pDelete(&pNext(Lp.p));
   }

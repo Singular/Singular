@@ -791,7 +791,11 @@ char * versionString()
               StringAppendS("mac_order,");
 #endif
 #ifndef __OPTIMIZE__
+#ifdef __MWERKS__
+              StringAppend(" Codewarrior 2.0,");
+#else
               StringAppend("-g,");
+#endif
 #endif
               StringAppend("random=%d\n",siRandomStart);
 #ifndef __MWERKS__

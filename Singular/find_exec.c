@@ -116,9 +116,9 @@ char * find_executable_link (const char *name)
 #endif
         }
 
-        strcat (tbuf, "/");
+        if (tbuf[strlen(tbuf)-1] != '/') strcat(tbuf, "/");
         strcat (tbuf, name);
-
+        
         /* If we can execute the named file, then return it. */
         if (! access (tbuf, X_OK))
         {

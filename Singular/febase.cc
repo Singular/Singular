@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.67 1998-09-01 15:10:15 Singular Exp $ */
+/* $Id: febase.cc,v 1.68 1998-10-15 11:45:53 obachman Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -67,9 +67,16 @@ BITSET  verbose = 1
 /*                  | Sy_bit(V_DEBUG_MEM) */
 ;}
 BOOLEAN errorreported = FALSE;
-BOOLEAN feBatch=FALSE;
+BOOLEAN feBatch = FALSE;
 char *  feErrors=NULL;
 int     feErrorsLen=0;
+BOOLEAN feWarn = TRUE;
+BOOLEAN feOut = TRUE;
+
+#ifdef macintosh
+static  int lines = 0;
+static  int cols = 0;
+#endif
 
 const char feNotImplemented[]="not implemented";
 
@@ -644,7 +651,10 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror)
     return f;
   }
   char *res;
-  int idat=strlen(SINGULAR_DATADIR),ipath=strlen(path);
+  int idat=strlen(SINGULAR_DATADIR),
+      ilib=strlen(VERSION_DIR),
+      ipath=strlen(path);
+  int ialloc = idat+ilib+ipath+1;
   char *env=getenv("SINGULARPATH");
   int ienv=0, ii=0;
   if (env!=NULL)
@@ -659,7 +669,7 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror)
       Werror("cannot open `%s`",path);
     return f;
   }
-  res=(char*) AllocL(ii+ipath+1);
+  res=(char*) AllocL(ialloc);
   if (ienv!=0)
   {
     memcpy(res,env,ienv);
@@ -670,6 +680,15 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror)
   if ((f==NULL)&&(idat!=0))
   {
     memcpy(res,SINGULAR_DATADIR,idat);
+    memcpy(res+idat,path,ipath);
+    res[idat+ipath]='\0';
+    f=myfopen(res,mode);
+  }
+  if ((f==NULL)&&(idat!=0))
+  {
+    memcpy(res,SINGULAR_DATADIR,idat);
+    memcpy(res+idat,VERSION_DIR,ilib);
+    idat += ilib;
     memcpy(res+idat,path,ipath);
     res[idat+ipath]='\0';
     f=myfopen(res,mode);
@@ -852,18 +871,18 @@ void WerrorS(const char *s)
     {
       feErrors=(char *)Alloc(256);
       feErrorsLen=256;
-      strcpy(feErrors,(char *)s);
+      *feErrors = '\0';
     }
     else
     {
-      if (((int)(strlen((char *)s)+strlen(feErrors)))>=feErrorsLen)
+      if (((int)(strlen((char *)s)+ 20 +strlen(feErrors)))>=feErrorsLen)
       {
         feErrors=(char *)ReAlloc(feErrors,feErrorsLen,feErrorsLen+256);
         feErrorsLen+=256;
       }
-      strcat(feErrors,(char *)s);
     }
-    strcat(feErrors,"\n");
+    strcat(feErrors, "Singular error: ");
+    strcat(feErrors, (char *)s);
   }
   else
 #endif
@@ -916,9 +935,7 @@ void WarnS(const char *s)
   }
   else
 #endif
-#ifdef HAVE_MPSR
-  if (!feBatch) /* ignore warnings in febatch-mode */
-#endif
+  if (feWarn) /* ignore warnings in when optin --no-warn was given */
   {
     fwrite(warn_str,1,6,stdout);
     fwrite(s,1,strlen(s),stdout);
@@ -979,30 +996,33 @@ void mwrite(uchar c)
 
 void PrintS(char *s)
 {
-#ifdef macintosh
-  char c;
-  while ('\0' != (c = *s++))
+  if (feOut) /* do not print when option --no-out was given */
   {
-    mwrite(c);
-  }
+    
+#ifdef macintosh
+    char c;
+    while ('\0' != (c = *s++))
+    {
+      mwrite(c);
+    }
 #else
 #ifdef HAVE_TCL
-  if (tclmode)
-  {
-    PrintTCLS('N',s);
-  }
-  else
-#endif
-  {
-    int i=strlen(s);
-    fwrite(s,1,i,stdout);
-    fflush(stdout);
-    if (feProt&PROT_O)
+    if (tclmode)
     {
-      fwrite(s,1,i,feProtFile);
+      PrintTCLS('N',s);
     }
-  }
+    else
 #endif
+    {
+      fwrite(s,1,strlen(s),stdout);
+      fflush(stdout);
+      if (feProt&PROT_O)
+      {
+        fwrite(s,1,strlen(s),feProtFile);
+      }
+    }
+#endif
+  }
 }
 
 void PrintLn()
@@ -1012,45 +1032,48 @@ void PrintLn()
 
 void Print(char *fmt, ...)
 {
-  va_list ap;
-  va_start(ap, fmt);
+  if (feOut)
+  {
+    va_list ap;
+    va_start(ap, fmt);
 #ifdef HAVE_TCL
-  if(tclmode)
+    if(tclmode)
 #endif
 #if (defined(HAVE_TCL) || defined(macintosh))
-  {
-    char *s=(char *)Alloc(strlen(fmt)+256);
-    vsprintf(s,fmt, ap);
+    {
+      char *s=(char *)Alloc(strlen(fmt)+256);
+      vsprintf(s,fmt, ap);
 #ifdef HAVE_TCL
-    PrintTCLS('N',s);
+      PrintTCLS('N',s);
 #endif
 #ifdef macintosh
-  char c;
-  while ('\0' != (c = *s++))
-  {
-    mwrite(c);
-  }
-  if (feProt&PROT_O)
-  {
-    vfprintf(feProtFile,fmt,ap);
-  }
+      char c;
+      while ('\0' != (c = *s++))
+      {
+        mwrite(c);
+      }
+      if (feProt&PROT_O)
+      {
+        vfprintf(feProtFile,fmt,ap);
+      }
 #endif
-  }
+    }
 #endif
 #if !defined(macintosh) || defined(HAVE_TCL)
 #ifdef HAVE_TCL
-  else
+    else
 #endif
-  {
-    vfprintf(stdout, fmt, ap);
-    fflush(stdout);
-    if (feProt&PROT_O)
     {
-      vfprintf(feProtFile,fmt,ap);
+      vfprintf(stdout, fmt, ap);
+      fflush(stdout);
+      if (feProt&PROT_O)
+      {
+        vfprintf(feProtFile,fmt,ap);
+      }
     }
-  }
 #endif
-  va_end(ap);
+    va_end(ap);
+  }
 }
 
 void fePause()

@@ -4,8 +4,10 @@
 #include <ctype.h>
 #include "getopt.h"
 #include "utils.h"
+#ifdef __MWERKS__
 #define __GNU_LIBRARY__
 #include "getopt.h"
+#endif
 
 extern FILE *yylpin;
 extern char *optarg;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mminit.cc,v 1.12 1998-05-27 17:14:09 Singular Exp $ */
+/* $Id: mminit.cc,v 1.13 1998-10-15 11:46:00 obachman Exp $ */
 /*
 * ABSTRACT: init of memory management
 */
@@ -12,7 +12,11 @@
 #include <string.h>
 #define __USE_MISC
 #include <unistd.h>
+#ifdef macintosh
+#include <types.h>
+#else
 #include <sys/types.h>
+#endif
 #include "mod2.h"
 #include "mmemory.h"
 #include "mmprivat.h"
@@ -134,7 +138,6 @@ void operator delete ( void* block )
 #endif
 }
 
-#ifndef HAVE_SMALLGMP
 #ifdef MDEBUG
 void * mgAllocBlock( size_t t)
 {
@@ -149,7 +152,6 @@ void * mgReallocBlock( void* a, size_t t1, size_t t2)
   return mmDBReallocBlock(a,t1,t2,"gmp",0);
 }
 #endif
-#endif
 
 #ifdef HAVE_SBRK
 #include <unistd.h>
@@ -161,7 +163,6 @@ static int mmIsInitialized=mmInit();
 
 int mmInit( void )
 {
-#ifndef HAVE_SMALLGMP
   if(mmIsInitialized==0)
   {
 #ifndef MDEBUG
@@ -170,7 +171,6 @@ int mmInit( void )
     mp_set_memory_functions(mgAllocBlock,mgReallocBlock,mgFreeBlock);
 #endif
   }
-#endif
   mmIsInitialized=1;
   return 1;
 }

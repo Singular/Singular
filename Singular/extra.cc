@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.67 1998-09-08 07:51:38 Singular Exp $ */
+/* $Id: extra.cc,v 1.68 1998-10-15 11:45:51 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -29,8 +29,8 @@
 #include <sys/times.h>
 #endif
 
-#include <unistd.h>
 #endif
+#include <unistd.h>
 
 #include "tok.h"
 #include "ipid.h"

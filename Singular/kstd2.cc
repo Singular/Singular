@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.21 1998-10-08 13:12:55 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.22 1998-10-15 11:45:56 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -792,7 +792,7 @@ static void redBest (LObject*  h,kStrategy strat)
       // spSpolyShortBba will not work in the SRING case
       if (pSDRING)
       {
-        p=spSpolyCreate(strat->T[j].p,(*h).p,strat->kNoether);
+        p=spSpolyCreate(strat->T[j].p,(*h).p,strat->kNoether,strat->spSpolyLoop);
         if (p!=NULL) pDelete(&pNext(p));
       }
       else
@@ -816,7 +816,7 @@ static void redBest (LObject*  h,kStrategy strat)
               // spSpolyShortBba will not work in the SRING case
               if (pSDRING)
               {
-                ph=spSpolyCreate(strat->T[j].p,(*h).p,strat->kNoether);
+                ph=spSpolyCreate(strat->T[j].p,(*h).p,strat->kNoether,strat->spSpolyLoop);
                 if (ph!=NULL) pDelete(&pNext(ph));
               }
               else

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.52 1998-09-22 14:09:05 Singular Exp $ */
+/* $Id: tesths.cc,v 1.53 1998-10-15 11:46:08 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -52,6 +52,8 @@
 #define LON_TCLMODE         "tclmode"
 #define LON_MP_PORT         "MPport"
 #define LON_MP_HOST         "MPhost"
+#define LON_NO_WARN         "no-warn"
+#define LON_NO_OUT          "no-out"
 // undocumented options
 #ifdef HAVE_MPSR
 #define LON_MP_TRANSP       "MPtransp"
@@ -77,6 +79,8 @@ static struct option longopts[] =
 #endif
   {LON_NO_STDLIB,         0,  0,  LONG_OPTION_RETURN},
   {LON_NO_RC,             0,  0,  LONG_OPTION_RETURN},
+  {LON_NO_WARN,           0,  0,  LONG_OPTION_RETURN},
+  {LON_NO_OUT,           0,  0,  LONG_OPTION_RETURN},
   {LON_MIN_TIME,          1,  0,  LONG_OPTION_RETURN},
 #ifdef HAVE_MPSR
   {LON_MP_PORT,           1,  0,  LONG_OPTION_RETURN},
@@ -110,7 +114,7 @@ static struct sing_option sing_longopts[] =
   {LON_BATCH,       0,          "Run in MP batch mode",                                 0},
 #endif
   {LON_HELP,        0,          "Print help message and exit",                          0},
-  {LON_QUIET,       0,          "Do not print start-up banner and warnings",            0},
+  {LON_QUIET,       0,          "Do not print start-up banner and library load messages",            0},
   {LON_NO_TTY,      0,          "Do not redefine the terminal characteristics",         0},
   {LON_VERSION,     0,          "Print extended version and configuration info",        0},
 #ifdef HAVE_TCL
@@ -122,6 +126,8 @@ static struct sing_option sing_longopts[] =
   {LON_USER_OPTION, "STRING",   "Return STRING on `system(\"--user-option\")'",         ""},
   {LON_NO_STDLIB,   0,          "Do not load `standard.lib' on start-up",               0},
   {LON_NO_RC,       0,          "Do not execute `.singularrc' file on start-up",        0},
+  {LON_NO_WARN,     0,          "Do not display warning messages",        0},
+  {LON_NO_OUT,      0,          "Suppress all output",        0},
   {LON_MIN_TIME,    "SECS",     "Do not display times smaller than SECS (in seconds)",  "0.5"},
 #ifdef HAVE_MPSR
   {LON_MP_PORT,     "PORT",     "Use PORT number for MP conections",                    ""},
@@ -411,6 +417,16 @@ int main(          /* main entry to Singular */
           {
             load_rc = FALSE;
             mainSetSingOptionValue(LON_NO_RC, (char*) 1);
+          }
+          else if (strcmp(longopts[option_index].name, LON_NO_WARN) == 0)
+          {
+            feWarn = FALSE;
+            mainSetSingOptionValue(LON_NO_WARN, (char*) 1);
+          }
+          else if (strcmp(longopts[option_index].name, LON_NO_OUT) == 0)
+          {
+            feOut = FALSE;
+            mainSetSingOptionValue(LON_NO_OUT, (char*) 1);
           }
           else if (strcmp(longopts[option_index].name, LON_MIN_TIME) == 0)
           {

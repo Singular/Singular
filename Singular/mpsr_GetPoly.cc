@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.17 1998-05-25 21:17:16 obachman Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.18 1998-10-15 11:46:04 obachman Exp $ */
 
 /***************************************************************
  *
@@ -80,7 +80,8 @@ static mpsr_Status_t GetAlgNumber(MP_Link_pt link, number *a);
 static mpsr_Status_t GetVarNumberAnnot(MPT_Node_pt node, ring r, BOOLEAN mv);
 static mpsr_Status_t GetProtoTypeAnnot(MPT_Node_pt node, ring r, BOOLEAN mv,
                                      ring &subring);
-static mpsr_Status_t GetOrderingAnnot(MPT_Node_pt node, ring r, BOOLEAN mv);
+static mpsr_Status_t GetOrderingAnnot(MPT_Node_pt node, ring r, BOOLEAN mv,
+                                      BOOLEAN &IsUnOrdered);
 static mpsr_Status_t GetSimpleOrdering(MPT_Node_pt node, ring r, short i);
 static mpsr_Status_t GetVarNamesAnnot(MPT_Node_pt node, ring r);
 static mpsr_Status_t GetDefRelsAnnot(MPT_Node_pt node, ring r);
@@ -436,7 +437,6 @@ mpsr_Status_t mpsr_GetPoly(MP_Link_pt link, poly &p, MP_Uint32_t nmon,
 
   pp->next = NULL;
 
-  pTest(p);
   return mpsr_Success;
 }
 
@@ -502,7 +502,6 @@ mpsr_Status_t mpsr_GetPolyVector(MP_Link_pt link, poly &p, MP_Uint32_t nmon,
   }
   pp->next = NULL;
 
-  pTest(p);
   return mpsr_Success;
 }
 
@@ -522,7 +521,8 @@ while (0)
 // MP_Succcess, if annots of node can be used to construct a
 // Singular ring (in which case r is the respective ring) or,
 // MP_Failure, if not
-mpsr_Status_t mpsr_GetRingAnnots(MPT_Node_pt node, ring &r, BOOLEAN &mv)
+mpsr_Status_t mpsr_GetRingAnnots(MPT_Node_pt node, ring &r, 
+                                 BOOLEAN &mv, BOOLEAN &IsUnOrdered)
 {
   sip_sring r1, *subring;
   poly minpoly = NULL;
@@ -549,7 +549,7 @@ mpsr_Status_t mpsr_GetRingAnnots(MPT_Node_pt node, ring &r, BOOLEAN &mv)
   if (GetVarNamesAnnot(node, r) != mpsr_Success)
     Warn("GetVarNamesAnnot: using default variable names");
 
-  if (GetOrderingAnnot(node,r, mv) != mpsr_Success)
+  if (GetOrderingAnnot(node,r, mv, IsUnOrdered) != mpsr_Success)
     Warn("GetOrderingAnnot: using unspec ordering");
 
   if (GetDefRelsAnnot(node, r) != mpsr_Success)
@@ -594,7 +594,7 @@ static mpsr_Status_t GetVarNumberAnnot(MPT_Node_pt node, ring r, BOOLEAN mv)
 
           
 static mpsr_Status_t GetProtoTypeAnnot(MPT_Node_pt node, ring r, BOOLEAN mv,
-                                     ring &subring)
+                                       ring &subring)
 {
   MPT_Annot_pt annot = NULL;
   MPT_Tree_pt  val;
@@ -693,7 +693,7 @@ static mpsr_Status_t GetProtoTypeAnnot(MPT_Node_pt node, ring r, BOOLEAN mv,
   else
   {
     // alg numbers
-    BOOLEAN mv2;
+    BOOLEAN mv2, IsUnOrdered;
     int i;
 
     // DDP Frac Node check
@@ -707,12 +707,13 @@ static mpsr_Status_t GetProtoTypeAnnot(MPT_Node_pt node, ring r, BOOLEAN mv,
                      MP_CopPolyDenseDistPoly) &&
            node->numchild == 0);
     // GetRingAnnots
-    failr(mpsr_GetRingAnnots(node, subring, mv2));
+    failr(mpsr_GetRingAnnots(node, subring, mv2, IsUnOrdered));
     // Check whether the ring can be "coerced" to an algebraic number
     falser(subring->ch >= 0 &&
            subring->order[0] == ringorder_lp &&
            subring->order[2] == 0 &&
-           mv2 == FALSE);
+           mv2 == FALSE &&
+           IsUnOrdered == FALSE);
 
     // Now do the coercion
     r->ch = (subring->ch == 0 ? 1 : - (subring->ch));
@@ -779,12 +780,21 @@ static mpsr_Status_t GetVarNamesAnnot(MPT_Node_pt node, ring r)
   else return mpsr_Success;
 }
 
-static mpsr_Status_t GetOrderingAnnot(MPT_Node_pt node, ring r, BOOLEAN mv)
+static mpsr_Status_t GetOrderingAnnot(MPT_Node_pt node, ring r, 
+                                      BOOLEAN mv, BOOLEAN &IsUnOrdered)
 {
-  MPT_Annot_pt annot = MPT_FindAnnot(node, MP_PolyDict, MP_AnnotPolyOrdering);
+  MPT_Annot_pt annot = MPT_FindAnnot(node, MP_PolyDict,MP_AnnotPolyOrdering);
   mpsr_Status_t status = mpsr_Success;
 
-  if (annot == NULL || annot->value == NULL) status = mpsr_Failure;
+  IsUnOrdered = FALSE;
+  if (annot == NULL || annot->value == NULL) 
+  {
+    annot = MPT_FindAnnot(node, MP_PolyDict, MP_AnnotShouldHavePolyOrdering);
+    if (annot == NULL || annot->value == NULL)
+      status = mpsr_Failure;
+    else
+      IsUnOrdered = TRUE;
+  }
 
   if (status == mpsr_Success) node =  annot->value->node;
 
@@ -868,7 +878,10 @@ static mpsr_Status_t GetOrderingAnnot(MPT_Node_pt node, ring r, BOOLEAN mv)
     status = GetSimpleOrdering(node, r, 0);
   }
   else
+  {
+    IsUnOrdered = FALSE;
     r->order[0] = ringorder_unspec;
+  }
   
   return mpsr_rSetOrdSgn(r);
 }

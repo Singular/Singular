@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_mp.cc,v 1.20 1998-10-14 10:18:56 obachman Exp $ */
+/* $Id: sing_mp.cc,v 1.21 1998-10-15 11:46:06 obachman Exp $ */
 
 /*
 * ABSTRACT: interface to MP links
@@ -27,8 +27,6 @@ static int Batch_ReadEval(si_link silink);
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 1024
 #endif
-
-#define MPSR_DEBUG
 
 #ifdef MPSR_DEBUG
 #define MP_SET_LINK_OPTIONS(link) \
@@ -469,13 +467,13 @@ int Batch_ReadEval(si_link silink)
   // the main read-eval-write loop
   while(1)
   {
+    errorreported = FALSE;
     v = slRead(silink, v);
-    if (feErrors != NULL)
+    if (feErrors != NULL && *feErrors != '\0')
     {
       if (v != NULL) v->CleanUp();
       v = mpsr_InitLeftv(STRING_CMD, (void *) mstrdup(feErrors));
-      Free(feErrors, feErrorsLen);
-      feErrors = NULL;
+      *feErrors = '\0';
     }
 
     // no need to evaluate -- it is done in the read
