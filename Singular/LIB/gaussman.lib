@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.29 2001-01-23 16:10:23 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.30 2001-02-02 16:38:28 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -78,65 +78,6 @@ static proc maxorddif(matrix H)
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc invunit(poly u,int n)
-{
-  dbprint(printlevel-voice+2,"//gaussman::invunit");
-  if(ord(u)>0)
-  {
-    ERROR("no unit");
-  }
-  poly u0=jet(u,0);
-  u=jet(1-u/u0,n);
-  poly w=u;
-  poly v=1+u;
-  for(int i=n div ord(u);i>1;i--)
-  {
-    w=jet(w*u,n);
-    v=v+w;
-  }
-  v=jet(v,n)/u0;
-  return(v);
-}
-///////////////////////////////////////////////////////////////////////////////
-
-static proc expand(matrix M,matrix U,int n)
-{
-  dbprint(printlevel-voice+2,"//gaussman::expand");
-  for(int i=ncols(U);i>=1;i--)
-  {
-    U[i,i]=invunit(U[i,i],n-ord(M[i]));
-  }
-  return(jet(M*U,n));
-}
-///////////////////////////////////////////////////////////////////////////////
-
-static proc rednf(module M,module N,list #)
-{
-  matrix U=freemodule(ncols(M));
-  if(size(#)>0)
-  {
-    U=#[1];
-  }
-  for(int i=ncols(M);i>=1;i--)
-  {
-    M[i]=M[i]/lead(U[i,i]);
-    U[i,i]=U[i,i]/lead(U[i,i]);
-  }
-  N=std(N);
-  module M0=matrix(0,nrows(M),ncols(M));
-  dbprint(printlevel-voice+2,"//gaussman::rednf: reduce");
-  module M1=reduce(M,N);
-  while(size(M1)>0)
-  {
-    M0=matrix(M0)+matrix(lead(M1));
-    M=matrix(M)-matrix(lead(M1))*U;
-    dbprint(printlevel-voice+2,"//gaussman::rednf: reduce");
-    M1=reduce(M,N);
-  }
-  return(M0);
-}
-///////////////////////////////////////////////////////////////////////////////
-
 proc monodromy(poly f,list #)
 "USAGE:    monodromy(f[,mode]); poly f, int mode
 ASSUME:   basering has local ordering, f has isolated singularity at 0
@@ -204,7 +145,7 @@ EXAMPLE:  example monodromy; shows an example
     dbprint(printlevel-voice+2,"//gaussman::monodromy: k="+string(k));
 
     dbprint(printlevel-voice+2,"//gaussman::monodromy: compute C");
-    C=coeffs(rednf(w,sJ,U),m);
+    C=coeffs(system("rednf",sJ,w,U),m);
     A0=A0+C*var(1)^k;
 
     if(sdH>0)
@@ -236,7 +177,7 @@ EXAMPLE:  example monodromy; shows an example
       dbprint(printlevel-voice+2,
         "//gaussman::monodromy: compute A on saturation");
       l=division(H*var(1),A0*H+var(1)^2*diff(matrix(H),var(1)));
-      A=expand(l[1],l[2],N-1);
+      A=system("series",N-1,module(l[1]),l[2]);
       if(mide==0)
       {
         dbprint(printlevel-voice+2,
@@ -456,7 +397,7 @@ EXAMPLE:  example vfiltration; shows an example
     dbprint(printlevel-voice+2,"//gaussman::vfiltration: k="+string(k));
 
     dbprint(printlevel-voice+2,"//gaussman::vfiltration: compute C");
-    C=coeffs(rednf(w,sJ,U),m);
+    C=coeffs(system("rednf",sJ,w,U),m);
     A=A+C*var(1)^k;
 
     if(sdH>0)
@@ -521,7 +462,7 @@ EXAMPLE:  example vfiltration; shows an example
   dbprint(printlevel-voice+2,
     "//gaussman::vfiltration: transform H0 to saturation");
   l=division(H,H0);
-  H0=expand(l[1],l[2],N-1);
+  H0=system("series",N-1,module(l[1]),l[2]);
 
   dbprint(printlevel-voice+2,
     "//gaussman::vfiltration: compute H0 as vector space V0");
@@ -556,7 +497,7 @@ EXAMPLE:  example vfiltration; shows an example
   dbprint(printlevel-voice+2,
     "//gaussman::vfiltration: compute A on saturation");
   l=division(H*var(1),A*H+var(1)^2*diff(matrix(H),var(1)));
-  A=expand(l[1],l[2],N-1);
+  A=system("series",N-1,module(l[1]),l[2]);
 
   dbprint(printlevel-voice+2,"//gaussman::vfiltration: compute matrix M of A");
   matrix M[mu*N][mu*N];
@@ -796,7 +737,7 @@ EXAMPLE: example vfiltjacalg; shows an example
   list M;
   for(i=ncols(m);i>=1;i--)
   {
-    M[i]=lift(V,coeffs(rednf(m[i]*m,sJ),m)*V);
+    M[i]=lift(V,coeffs(system("rednf",sJ,m[i]*m),m)*V);
   }
 
   int i0,j0,i1,j1;
