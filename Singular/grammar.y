@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.6 1997-04-09 12:19:43 Singular Exp $ */
+/* $Id: grammar.y,v 1.7 1997-04-10 16:34:42 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -777,7 +777,15 @@ expr_arithmetic:
 
 left_value:
         declare_ip_variable cmdeq  { $$ = $1; }
-        | exprlist '=' { $$ = $1; }
+        | exprlist '=' 
+          { 
+            if ($1.rtyp==0)
+            { 
+              Werror("`%s` is undefined",$1.Name()); 
+              YYERROR; 
+            }
+            $$ = $1; 
+          }
         ;
 
 
