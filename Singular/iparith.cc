@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.234 2000-11-21 15:33:11 Singular Exp $ */
+/* $Id: iparith.cc,v 1.235 2000-11-27 11:48:57 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1063,10 +1063,15 @@ static BOOLEAN jjDIV_P(leftv res, leftv u, leftv v)
     WerrorS(ii_div_by_0);
     return TRUE;
   }
+  poly p=(poly)(u->Data());
+  if (p==NULL)
+  {
+    res->data=NULL;
+    return FALSE;
+  }
   if (pNext(q)!=NULL)
   {
 #ifdef HAVE_FACTORY
-    poly p=(poly)(u->Data());
     if(pGetComp(p)==0)
     {
       res->data=(void*)(singclap_pdivide(p /*(poly)(u->Data())*/ ,
@@ -1076,10 +1081,10 @@ static BOOLEAN jjDIV_P(leftv res, leftv u, leftv v)
     {
       int comps=pMaxComp(p);
       ideal I=idInit(comps,1);
-      p=(poly)(u->CopyD());
+      p=pCopy(p);
       poly h;
       int i;
-      // conversio to a list of polys:
+      // conversion to a list of polys:
       while (p!=NULL)
       {
         i=pGetComp(p)-1;
@@ -1111,7 +1116,7 @@ static BOOLEAN jjDIV_P(leftv res, leftv u, leftv v)
   }
   else
   {
-    res->data = (char *)pDivideM((poly)u->CopyD(POLY_CMD),pHead(q));
+    res->data = (char *)pDivideM((pCopy(p),pHead(q));
   }
   return FALSE;
 }
@@ -4330,9 +4335,9 @@ static BOOLEAN jjSUBST_Par_N(leftv res, leftv u, leftv v,leftv w)
   ideal G=idMaxIdeal(1);
   ideal F=idInit(r,1);
   int par=-1;
-  for(i=0;i<r;i++)
+  for(i=1;i<=r;i++)
   {
-    if (a->z->e[i]!=0) { par=i; break;}
+    if (napGetExp(a->z,i)!=0) { par=i; break;}
   }
   for(i=0;i<r;i++)
   {
