@@ -1,4 +1,4 @@
-/* $Id: NTLconvert.cc,v 1.10 2003-04-09 08:01:22 Singular Exp $ */
+/* $Id: NTLconvert.cc,v 1.11 2003-08-28 11:54:31 Singular Exp $ */
 #include <config.h>
 
 #include "cf_gmp.h"
@@ -842,7 +842,34 @@ CFFList convertNTLvec_pair_GF2EX_long2FacCFFList(vec_pair_GF2EX_long e,GF2E mult
 ////////////////////////////////////////////////////
 // CanonicalForm in Z_2(a)[X] to NTL GF2EX        //
 ////////////////////////////////////////////////////
-GF2EX convertFacCF2NTLGF2EX(CanonicalForm f,ZZ_pX mipo) {}
+GF2EX convertFacCF2NTLGF2EX(CanonicalForm f,GF2X mipo)
+{
+  GF2E::init(mipo);
+  GF2EX result;
+  CFIterator i;
+  i=f;
+
+  int j=0;
+  int NTLcurrentExp=i.exp();
+  int largestExp=i.exp();
+  int k;
+
+  result.SetMaxLength(largestExp+1);
+  for(;i.hasTerms();i++)
+  {
+    for(k=NTLcurrentExp;k>i.exp();k--) SetCoeff(result,k,0);
+    NTLcurrentExp=i.exp();
+    CanonicalForm c=i.coeff();
+    GF2X cc=convertFacCF2NTLGF2X(c);
+    //ZZ_pE ccc;
+    //conv(ccc,cc);
+    SetCoeff(result,NTLcurrentExp,to_GF2E(cc));
+    NTLcurrentExp--;
+  }
+  for(k=NTLcurrentExp;k>=0;k--) SetCoeff(result,k,0);
+  result.normalize();
+  return result;
+}
 ////////////////////////////////////////////////////
 // CanonicalForm in Z_p(a)[X] to NTL ZZ_pEX       //
 ////////////////////////////////////////////////////

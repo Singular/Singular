@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.19 2003-02-14 15:53:27 Singular Exp $ */
+/* $Id: cf_factor.cc,v 1.20 2003-08-28 11:54:32 Singular Exp $ */
 
 //{{{ docu
 //
@@ -372,7 +372,7 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
   ASSERT( getCharacteristic() > 0, "char 0 factorization not implemented" );
   #ifdef HAVE_NTL
   //if  (isOn(SW_USE_NTL))
-  if (isOn(SW_USE_NTL) && (isPurePoly(f,alpha)))
+  if (isOn(SW_USE_NTL) /*&& (isPurePoly(f,alpha))*/)
   {
     //USE NTL
     if (getCharacteristic()!=2)
@@ -409,6 +409,11 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
       // special case : GF2
 
       // remainder is two ==> nothing to do
+      // set remainder
+      ZZ r;
+      r=getCharacteristic();
+      ZZ_pContext ccc(r);
+      ccc.restore();
 
       // set minimal polynomial in NTL using the optimized conversion routines for characteristic 2
       GF2X minPo=convertFacCF2NTLGF2X(getMipo(alpha,f.mvar()));
@@ -416,17 +421,27 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
       c.restore();
 
       // convert to NTL again using the faster conversion routines
-      GF2X f_tmp=convertFacCF2NTLGF2X(f);
-      GF2EX f1=to_GF2EX(f_tmp);
+      GF2EX f1;
+      if (isPurePoly(f))
+      {
+        GF2X f_tmp=convertFacCF2NTLGF2X(f);
+        f1=to_GF2EX(f_tmp);
+      }
+      else
+      {
+        f1=convertFacCF2NTLGF2EX(f,minPo);
+      }
 
-      // no make monic necessary in GF2
+      // make monic (in Z/2(a))
+      GF2E f1_coef=LeadCoeff(f1);
+      MakeMonic(f1);
 
       // factorize using NTL
       vec_pair_GF2EX_long factors;
       CanZass(factors,f1);
 
       // return converted result
-      F=convertNTLvec_pair_GF2EX_long2FacCFFList(factors,LeadCoeff(f1),f.mvar(),alpha);
+      F=convertNTLvec_pair_GF2EX_long2FacCFFList(factors,f1_coef,f.mvar(),alpha);
     }
 
   }
