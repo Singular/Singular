@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.13 1998-06-12 06:30:17 obachman Exp $
+# $Id: regress.cmd,v 1.14 1998-06-12 09:08:31 obachman Exp $
 # FILE:    regress.cmd 
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -43,7 +43,7 @@ if ( (! (-e $singular)) || (! (-x $singular)))
   $singular = $curr_dir."/../Singular";
 }
 # sed scripts which are applied to res files before they are diff'ed
-$sed_scripts = "-e '/^\\/\\/.*used time:/d' -e '/^\\/\\/.*ignore:/d' -e '/error occured in/d'";
+$sed_scripts = "-e '/^\\/\\/.*used time:/d' -e '/^\\/\\/.*ignore:/d' -e '/error occurred in/d'";
 
 
 #################################################################
