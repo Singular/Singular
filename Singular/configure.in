@@ -394,10 +394,9 @@ AC_ARG_WITH(
 AC_ARG_WITH(apint,
   [  --with-apint=PACKAGE    use PACKAGE for arbitary integer arithmetic])
 AC_ARG_WITH(
-  exp_type,
-  [  --with-exp_type=TYPE    uses TYPE as type of exponents in polynomials
-                             -- default type is short
-			     -- possible other types are char and int])
+  plural,
+  [  --with-plural           do compile with Plural support])
+
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl check for packages we need
 dnl for gmp, MP, factory and libfac, we built them in, even if the libs
@@ -714,6 +713,14 @@ if test "$with_dl" != yes; then
   AC_MSG_RESULT(no)
 else
   AC_DEFINE(HAVE_DYNAMIC_LOADING)
+  AC_MSG_RESULT(yes)
+fi
+
+AC_MSG_CHECKING(whether to have Plural)
+if test "$with_plural" != yes; then
+  AC_MSG_RESULT(no)
+else
+  AC_DEFINE(HAVE_PLURAL)
   AC_MSG_RESULT(yes)
 fi
 

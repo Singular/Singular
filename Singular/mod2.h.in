@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.92 2000-10-19 15:00:17 obachman Exp $
+ *  Version: $Id: mod2.h.in,v 1.93 2000-10-30 13:50:25 obachman Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -133,6 +133,12 @@
 #define S_UNAME ""
 /* Absolute pathname of root directory of Singular source */
 #define S_ROOT_DIR ""
+/* Define to use new namespaces techniks */
+#undef HAVE_NAMESPACES
+/* Define to enable dynamic module code */
+#undef HAVE_DYNAMIC_LOADING
+/* Define to enable plural */
+#undef HAVE_PLURAL
 
 /*******************************************************************
  * Defines which are not set by configure
@@ -168,11 +174,6 @@
  */
 #undef USE_IILOCALRING
 
-/* Define to use new namespaces techniks */
-#undef HAVE_NAMESPACES
-
-/* Define to enable dynamic module code */
-#undef HAVE_DYNAMIC_LOADING
 
 /* Define to use scanner when loading libraries */
 #define HAVE_LIBPARSER
