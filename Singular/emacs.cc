@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: emacs.cc,v 1.3 1999-08-25 20:34:39 wichmann Exp $ */
+/* $Id: emacs.cc,v 1.4 1999-08-26 09:58:27 obachman Exp $ */
 /*
 * ABSTRACT: Esingular main file
 */
@@ -45,10 +45,10 @@
 #define feReportBug(s) fePrintReportBug(s, __FILE__, __LINE__)
 void fePrintReportBug(char* msg, char* file, int line)
 {
-  WarnS("YOU HAVE FOUND A BUG IN SINGULAR.");
-  WarnS("Please, email the following output to singular@mathematik.uni-kl.de");
-  Warn("Bug occured at %s:%d", file, line);
-  Warn("Message: %s", msg);
+  WarnS("YOU HAVE FOUND A BUG IN SINGULAR. ");
+  WarnS("Please, email the following output to singular@mathematik.uni-kl.de ");
+  Warn("Bug occured at %s:%d ", file, line);
+  Warn("Message: %s ", msg);
   Warn("Version: " S_UNAME S_VERSION1 " (%d) " __DATE__ __TIME__,
        SINGULAR_VERSION_ID);
 }
@@ -91,6 +91,7 @@ int main(int argc, char** argv)
           exit(0);
           
         case '?':
+        case ':':
           mainUsage(argv[0]);
           exit(1);
 
@@ -115,12 +116,19 @@ int main(int argc, char** argv)
           {
             no_emacs_call = 1;
           }
-          break;
-          
-        default:
-          feReportBug("Parsing of Cmd-line options");
+          else
+          {
+            break;
+          }
+          // delete options from option-list
+          if (optind > 2 && *argv[optind-1] != '-' && 
+              optarg != NULL && longopts[option_index].has_arg)
+          {
+            argv[optind-2] = NULL;
+          }
+          argv[optind-1] = NULL;
     }
-  }
+  } 
   
   // make sure  emacs, singular, emacs_dir, emacs_load are set
   if (emacs == NULL) emacs = feResource("emacs", 0);
@@ -182,14 +190,7 @@ int main(int argc, char** argv)
   int i, length = 0;
   for (i=1; i<argc; i++)
   {
-    if (strstr(argv[i], "--"LON_EMACS) != argv[i] &&
-        strstr(argv[i], "--"LON_SINGULAR) != argv[i] &&
-        strstr(argv[i], "--"LON_EMACS_DIR) != argv[i] &&
-        strstr(argv[i], "--"LON_EMACS_LOAD) != argv[i] &&
-        strstr(argv[i], "--"LON_NO_EMACS_CALL) != argv[i])
-    {
-      length += strlen(argv[i]) + 3;
-    }
+    if (argv[i] != NULL) length += strlen(argv[i]) + 3;
   }
   
   char* syscall = (char*) AllocL(strlen(emacs) + 
@@ -210,11 +211,7 @@ int main(int argc, char** argv)
 
   for (i=1; i<argc; i++)
   {
-    if (strstr(argv[i], "--"LON_EMACS) != argv[i] &&
-        strstr(argv[i], "--"LON_SINGULAR) != argv[i] &&
-        strstr(argv[i], "--"LON_EMACS_DIR) != argv[i] &&
-        strstr(argv[i], "--"LON_EMACS_LOAD) != argv[i] &&
-        strstr(argv[i], "--"LON_NO_EMACS_CALL) != argv[i])
+    if (argv[i] != NULL)
     {
       strcat(syscall, "\"");
       strcat(syscall, argv[i]);
