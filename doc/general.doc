@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.77 1998-05-15 12:18:14 wichmann Exp $
+@comment $Id: general.doc,v 1.78 1998-05-18 14:51:38 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -819,8 +819,8 @@ and the options, see @ref{option})
 (i.e. lexicographical, ...) via @code{std} w.r.t. a "simple" ordering and
 @code{fglm}
 @*The given ideal must be zero-dimensional.
-@item stdhilbert
-@ref{stdhilbert}@*
+@item stdhilb
+@ref{stdhilb}@*
 computes the Groebner basis in a ring with a "difficult" ordering
 (i.e. lexicographical, ...) via @code{std} w.r.t. a "simple" ordering and
 a @code{std} computation guided by the hilbert series

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.16 1998-05-16 18:27:22 gorzel Exp $
+@comment $Id: examples.doc,v 1.17 1998-05-18 14:51:37 Singular Exp $
 @comment this file contains the examples
 
 @ifinfo
@@ -1527,12 +1527,12 @@ Then we compute a standard basis of this ideal and some numerical information.
 
 Compute Groebner basis in lexicographical ordering
 by using FGLM algorithm (@code{stdfglm)} and Hilbert driven
-Groebner (@code{stdhilbert}).
+Groebner (@code{stdhilb}).
 
 The command @code{stdfglm} works only for zero dimensional ideals.
 
 For the ideal below, @code{stdfglm} is more than 100 times
-and @code{stdhilbert} about 10 times faster than std.
+and @code{stdhilb} about 10 times faster than std.
 
 @example
 @c example
@@ -1544,7 +1544,7 @@ and @code{stdhilbert} about 10 times faster than std.
   timer-t;
   size(j1);   // size (no. of polys) in computed GB
   t=timer;
-  ideal j2=stdhilbert(i);
+  ideal j2=stdhilb(i);
   timer-t;
   size(j2);   // size (no. of polys) in computed GB
   // usual Groebner basis computation for lex ordering
@@ -1858,7 +1858,7 @@ paralellize computations.
 
 To compute a standard base for a zero-dimensional ideal in the
 lexicographical ordering, one of the two powerful routines
-@code{stdhilbert} (see @ref{stdhilbert}) and @code{stdfglm} (see
+@code{stdhilb} (see @ref{stdhilb}) and @code{stdfglm} (see
 @ref{stdfglm}) should be used. However, one can not a priory predict
 which one the two commands is faster. This very much depends on the
 (input) example. Therefore, we use MPtcp links to let the two commands
@@ -1885,7 +1885,7 @@ write(l_hilb, quote(system("pid")));                    // 2.
 write(l_fglm, quote(system("pid")));        
 int pid_hilb,pid_fglm = read(l_hilb),read(l_fglm); 
 
-write(l_hilb, quote(stdhilbert(i)));                    // 3.
+write(l_hilb, quote(stdhilb(i)));                       // 3.
 write(l_fglm, quote(stdfglm(eval(i)))); 
 
 while (status(l_hilb, "read", "not ready") &&           // 4.
@@ -1893,7 +1893,7 @@ while (status(l_hilb, "read", "not ready") &&           // 4.
 
 if (status(l_hilb, "read", "ready"))
 {
-  "stdhilbert won !!!!"; size(read(l_hilb));
+  "stdhilb won !!!!"; size(read(l_hilb));
   close(l_hilb); pid_fglm = system("sh","kill "+string(pid_fglm));
 }
 else                                                    // 5.

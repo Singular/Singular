@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.53 1998-05-18 14:17:35 schmidt Exp $
+@comment $Id: reference.doc,v 1.54 1998-05-18 14:51:40 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -151,7 +151,7 @@ the brackets are optional. In the syntax of the commands @code{help} and
 * status::
 * std::
 * stdfglm::
-* stdhilbert::
+* stdhilb::
 * subst::
 * system::
 * syz::
@@ -4680,7 +4680,7 @@ the leading terms generate the leading ideal resp. module.
 second argument as Hilbert series
 (result of @code{hilb(i,1)}, see @ref{hilb}),
 if the ideal resp. module is homogeneous,
-(Hilbert driven standard basis computation,@ref{stdhilbert}).
+(Hilbert driven standard basis computation,@ref{stdhilb}).
 @item @strong{Example:}
 @example
 @c example
@@ -4694,22 +4694,19 @@ if the ideal resp. module is homogeneous,
 @c example
 @end example
 @end table
-@menu
-* ideal::
-* ring::
-* option::        Sets certain strategies.
-* hilb::
-* facstd::
-* mstd::
-* stdfglm::
-* stdhilbert::
-@end menu
+@c ref
 @iftex
-See @ref{ideal}; @ref{ring}; @ref{option}; @ref{facstd}; @ref{mstd};
-@ref{stdfglm}; @ref{stdhilbert}.
-@end iftex
+See
+@ref{ideal};
+@ref{ring};
+@ref{option};
+@ref{facstd};
+@ref{mstd};
+@ref{stdfglm};
+@ref{stdhilb}.
+@c ref
 @c ---------------------------------------
-@node stdfglm, stdhilbert, std, Functions
+@node stdfglm, stdhilb, std, Functions
 @subsection stdfglm
 @cindex stdfglm
 @table @code
@@ -4741,28 +4738,24 @@ ideal
 @c example
 @end example
 @end table
-@menu
-* ideal::
-* ring::
-* option::        Sets certain strategies.
-* hilb::
-* facstd::
-* mstd::
-* std::
-* stdhilbert::
-@end menu
-@iftex
-See @ref{ideal}; @ref{ring}; @ref{option}; @ref{facstd}; @ref{mstd};
-@ref{std}; @ref{stdhilbert}.
-@end iftex
+@c ref
+See
+@ref{ideal};
+@ref{ring};
+@ref{option};
+@ref{facstd};
+@ref{mstd};
+@ref{std};
+@ref{stdhilb}.
+@c ref
 @c ---------------------------------------
-@node stdhilbert, subst, stdfglm, Functions
-@subsection stdhilbert
-@cindex stdhilbert
+@node stdhilb, subst, stdfglm, Functions
+@subsection stdhilb
+@cindex stdhilb
 @table @code
 @item @strong{Syntax:}
-@code{stdhilbert (} ideal_expression @code{)}
-@*@code{stdhilbert (} ideal_expression@code{,} intvec_expression @code{)}
+@code{stdhilb (} ideal_expression @code{)}
+@*@code{stdhilb (} ideal_expression@code{,} intvec_expression @code{)}
 @item @strong{Type:}
 ideal
 @item @strong{Purpose:}
@@ -4778,10 +4771,10 @@ second argument as Hilbert series
 @c example
   ring  r = 0,(x,y,z),lp;
   ideal i = y3+x2, x2y+x2, x3-x2, z4-x2-y;
-  ideal i1= stdhilbert(i); i1;
+  ideal i1= stdhilb(i); i1;
   // is in this case equivalent to:
   intvec v=1,0,0,-3,0,1,0,3,-1,-1;
-  ideal i2=stdhilbert(i,v);
+  ideal i2=stdhilb(i,v);
 @c example
 @end example
 @end table
@@ -4800,7 +4793,7 @@ See @ref{ideal}; @ref{ring}; @ref{option}; @ref{facstd}; @ref{mstd};
 @ref{std}; @ref{stdfglm}.
 @end iftex
 @c ---------------------------------------
-@node subst, system, stdhilbert, Functions
+@node subst, system, stdhilb, Functions
 @subsection subst
 @cindex subst
 @table @code
