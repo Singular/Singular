@@ -209,7 +209,7 @@ if test "$with_MP" != no; then
     AC_MSG_WARN(building without MP: can not use MP without gmp)
   else
     if test "$ac_cv_lib_gmp_mpz_init"=yes; then
-      AC_CHECK_LIB(MP, MP_OpenLink)
+      AC_CHECK_LIB(MP, IMP_PutGmpInt)
       AC_CHECK_LIB(MPT, MPT_GetTree)
     fi
     AC_CHECK_HEADERS(MP.h MPT.h)
