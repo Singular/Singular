@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: spolys0.h,v 1.4 1997-12-03 16:59:05 obachman Exp $ */
+/* $Id: spolys0.h,v 1.5 1997-12-17 15:11:48 pohl Exp $ */
 /*
 * ABSTRACT: s-polynomials, internal header
 */
@@ -58,8 +58,6 @@ poly spGSpolyRedNew(poly p1, poly p2,poly spNoether,
 poly spGSpolyCreate(poly p1, poly p2,poly spNoether);
 
 /* short s-polynomial for ordering in Bba and Mora */
-void spShort1(poly b, poly a, poly m);
-void spShort2(poly b, poly a, poly m);
 poly spGSpolyShortBba(poly p1, poly p2);
 //poly spGSpolyShortMora(poly p1, poly p2, int *ecart);
 extern void spMultCopyX(poly p, poly m, poly n, number exp, poly spNoether);

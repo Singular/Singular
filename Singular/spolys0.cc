@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: spolys0.cc,v 1.7 1997-12-15 22:46:41 obachman Exp $ */
+/* $Id: spolys0.cc,v 1.8 1997-12-17 15:12:24 pohl Exp $ */
 
 /*
 * ABSTRACT - s-polynomials and reduction in general
@@ -619,8 +619,8 @@ poly spGSpolyCreate(poly p1, poly p2,poly spNoether)
       pSetCompP(p2,pGetComp(p1));
     }
   }
-  b = pInit();
-  m = pInit();
+  b = pNew();
+  m = pNew();
   for (int i = pVariables; i; i--)
   {
     x = pGetExp(p1,i) - pGetExp(p2,i);
@@ -680,192 +680,168 @@ poly spGSpolyCreate(poly p1, poly p2,poly spNoether)
   return a2;
 }
 
-void spShort1(poly b, poly a, poly m)
-{
-  for(int i=pVariables; i; i--)
-  {
-    if(pGetExp(m,i)<0)
-    {
-      pSetExp(b,i,pGetExp(a,i));
-    }
-  }
-  pFree1(m);
-  pSetm(b);
-}
-
-void spShort2(poly b, poly a, poly m)
-{
-  Exponent_t x;
-  pSetComp(b,pGetComp(a));
-  for(int i=pVariables; i; i--)
-  {
-    if(pGetExp(m,i)<0)
-      x = pGetExp(a,i)-pGetExp(m,i);
-    else
-      x = pGetExp(a,i);
-    pSetExp(b,i,x);
-  }
-  pFree1(m);
-  pSetm(b);
-}
-
 /*2
 * creates the leading term of the S-polynomial of p1 and p2
 * do not destroy p1 and p2
 * remarks:
 *   1. the coefficient is 0 (nNew)
-*   2. in a first step the monomials from p1 are
-*      multiplied with L(p2-p1), hence the multiplication
-*      must be additive and further the transformation
-*      spShort1 and spShort2 are needed
+*   2. pNext is undefined
 */
+static void bbb() { int i=0; }
 poly spGSpolyShortBba(poly p1, poly p2)
 {
   poly a1 = pNext(p1), a2 = pNext(p2);
-  poly m,b;
-  number ta,tb,t;
-  int c;
-  int co=0;
-  if (pGetComp(p1)!=pGetComp(p2))
-  {
-    if (pGetComp(p1)==0)
-    {
-      co=1;
-      pSetCompP(p1,pGetComp(p2));
-    }
-    else
-    {
-      co=2;
-      pSetCompP(p2,pGetComp(p1));
-    }
-  }
-  b = pNew();
-  m = pNew();
-  pSetComp(b,pGetComp(p1));
-  spMemcpy(m,p2);
-  spMonSub(m,p1);
-  if(a1!=NULL)
-  {
-    spMemcpy(b,a1);
-    spMonAdd(b,m);
-    if(a2==NULL)
-    {
-      spShort1(b,a1,m);
-      nNew(&(pGetCoeff(b)));
-      if (co==1) spModuleToPoly(p1);
-      else if (co==2) spModuleToPoly(p2);
-      return b;
-    }
-  }
-  else
+  Exponent_t c1=pGetComp(p1),c2=pGetComp(p2);
+  Exponent_t c;
+  poly m1,m2;
+  number t1,t2;
+  int cm,i;
+  BOOLEAN equal;
+
+  if (a1==NULL)
   {
     if(a2!=NULL)
     {
-      spShort2(b,a2,m);
-      nNew(&(pGetCoeff(b)));
-      if (co==1) spModuleToPoly(p1);
-      else if (co==2) spModuleToPoly(p2);
-      return b;
+      m2=pNew();
+x2:
+      for (i = pVariables; i; i--)
+      {
+        c = pGetExpDiff(p1, p2,i);
+        if (c>0)
+        {
+          pSetExp(m2,i,(c+pGetExp(a2,i)));
+        }
+        else
+        {
+          pSetExp(m2,i,pGetExp(a2,i));
+        }
+      }
+      if ((c1==c2)||(c2!=0))
+      {
+        pSetComp(m2,pGetComp(a2));
+      }
+      else
+      {
+        pSetComp(m2,c1);
+      }
+      pSetm(m2);
+      nNew(&(pGetCoeff(m2)));
+      return m2;
+    }
+    else
+      return NULL;
+  }
+  if (a2==NULL)
+  {
+    m1=pNew();
+x1:
+    for (i = pVariables; i; i--)
+    {
+      c = pGetExpDiff(p2, p1,i);
+      if (c>0)
+      {
+        pSetExp(m1,i,(c+pGetExp(a1,i)));
+      }
+      else
+      {
+        pSetExp(m1,i,pGetExp(a1,i));
+      }
+    }
+    if ((c1==c2)||(c1!=0))
+    {
+      pSetComp(m1,pGetComp(a1));
     }
     else
     {
-      pFree1(m);
-      pFree1(b);
-      if (co==1) spModuleToPoly(p1);
-      else if (co==2) spModuleToPoly(p2);
-      return NULL;
+      pSetComp(m1,c2);
     }
+    pSetm(m1);
+    nNew(&(pGetCoeff(m1)));
+    return m1;
   }
+  m1 = pNew();
+  m2 = pNew();
   loop
   {
-// here is one of the few places where monom comparisons can be called with
-// negative exponents -- the new monom comparison routines suppose
-// that the exponents are positive. Therefore, we need to use the
-// original routines. Will not result in a big performance loss, since
-// the monom comparison is called very seldoom from here.
-    c = t_pComp0(b,a2);
-    if (c == 1)
+    for (i = pVariables; i; i--)
     {
-      spShort1(b,a1,m);
-      nNew(&(pGetCoeff(b)));
-      break;
+      c = pGetExpDiff(p1, p2,i);
+      if (c > 0)
+      {
+        pSetExp(m2,i,(c+pGetExp(a2,i)));
+        pSetExp(m1,i,pGetExp(a1,i));
+      }
+      else
+      {
+        pSetExp(m1,i,(pGetExp(a1,i)-c));
+        pSetExp(m2,i,pGetExp(a2,i));
+      }
     }
-    else if (c == -1)
+    if(c1==c2)
     {
-      spShort2(b,a2,m);
-      nNew(&(pGetCoeff(b)));
-      break;
+      pSetComp(m1,pGetComp(a1));
+      pSetComp(m2,pGetComp(a2));
     }
     else
     {
-      if (nIsOne(pGetCoeff(p1)))
+      if(c1!=0)
       {
-        if (nIsOne(pGetCoeff(p2)))
-          t = nSub(pGetCoeff(a2), pGetCoeff(a1));
-        else
-        {
-          ta = nMult(pGetCoeff(a1), pGetCoeff(p2));
-          t = nSub(ta, pGetCoeff(a2));
-          nDelete(&ta);
-        }
+        pSetComp(m1,pGetComp(a1));
+        pSetComp(m2,c1);
       }
       else
       {
-        if (nIsOne(pGetCoeff(p2)))
-        {
-          ta = nMult(pGetCoeff(a2), pGetCoeff(p1));
-          t = nSub(ta, pGetCoeff(a1));
-        }
-        else
-        {
-          ta = nMult(pGetCoeff(a1), pGetCoeff(p2));
-          tb = nMult(pGetCoeff(a2), pGetCoeff(p1));
-          t = nSub(ta, tb);
-          nDelete(&tb);
-        }
-        nDelete(&ta);
-      }
-      if (!nIsZero(t))
-      {
-        nDelete(&t);
-        spShort1(b,a1,m);
-        nNew(&(pGetCoeff(b)));
-        break;
-      }
-      nDelete(&t);
-      pIter(a2);
-      pIter(a1);
-      if(a1!=NULL)
-      {
-        spMemcpy(b,a1);
-        spMonAdd(b,m);
-        if(a2==NULL)
-        {
-          spShort1(b,a1,m);
-          nNew(&(pGetCoeff(b)));
-          break;
-        }
-      }
-      else
-      {
-        if(a2!=NULL)
-        {
-          spShort2(b,a2,m);
-          nNew(&(pGetCoeff(b)));
-          break;
-        }
-        else
-        {
-          pFree1(m);
-          pFree1(b);
-          b= NULL; break;
-        }
+        pSetComp(m2,pGetComp(a2));
+        pSetComp(m1,c2);
       }
     }
+    pSetm(m1);
+    pSetm(m2);
+    cm = t_pComp0(m1, m2);
+    if (cm!=0)
+    {
+      if(cm==1)
+      {
+        pFree1(m2);
+        nNew(&(pGetCoeff(m1)));
+        return m1;
+      }
+      else
+      {
+        pFree1(m1);
+        nNew(&(pGetCoeff(m2)));
+        return m2;
+      }
+    }
+    t1 = nMult(pGetCoeff(a2),pGetCoeff(p1));
+    t2 = nMult(pGetCoeff(a1),pGetCoeff(p2));
+    equal = nEqual(t1,t2);
+    nDelete(&t2);
+    nDelete(&t1);
+    if (!equal)
+    {
+      pFree1(m2);
+      nNew(&(pGetCoeff(m1)));
+      return m1;
+    }
+    pIter(a1);
+    pIter(a2);
+    if (a2==NULL)
+    {
+      pFree1(m2);
+      if (a1==NULL)
+      {
+        pFree1(m1);
+        return NULL;
+      }
+      goto x1;
+    }
+    if (a1==NULL)
+    {
+      pFree1(m1);
+      goto x2;
+    }
   }
-  if (co==1) spModuleToPoly(p1);
-  else if (co==2) spModuleToPoly(p2);
-  return b;
 }
 
 /*2
