@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.15 2003-02-14 15:51:15 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.16 2003-05-28 11:52:52 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -57,7 +57,14 @@ CFFList factorize2 ( const CanonicalForm & f,
                      const Variable & alpha, const CanonicalForm & mipo )
 {
   if (alpha.level() <0)
-    return factorize(f,alpha);
+  {
+    if (f.isUnivariate())
+      return factorize(f,alpha);
+    else
+    {
+      return Factorize(f,mipo);
+    }
+  }  
   else
   {
     bool repl=(f.mvar() != alpha);
@@ -1069,6 +1076,11 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.15  2003/02/14 15:51:15  Singular
+* hannes: bugfix
+          could not factorize x2+xy+y2 in Fp(a)[x,y], a2+a+1=0
+	  (factorize2 does nor sanity checks)
+
 Revision 1.14  2002/08/19 11:11:32  Singular
 * hannes/pfister: alg_gcd etc.
 

@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: csutil.cc,v 1.8 2002-10-24 17:22:22 Singular Exp $";
+static char * rcsid = "$Id: csutil.cc,v 1.9 2003-05-28 11:52:52 Singular Exp $";
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -204,10 +204,21 @@ CanonicalForm
 divide( const CanonicalForm & ff, const CanonicalForm & f, const CFList & as){
   CanonicalForm r,m,q;
 
-  r= Sprem(ff,f,m,q);
+  //out_cf("divide f=",ff,"\n");
+  //out_cf("divide g=",f,"\n");
+  if (f.inCoeffDomain())
+  {
+    bool b=false;	  
+    if (!isOn(SW_RATIONAL)) { b=true;On(SW_RATIONAL); }
+    q=ff/f;
+    if (b) Off(SW_RATIONAL);
+  }  
+  else
+    r= Sprem(ff,f,m,q); //result in q, ignore r,m
   //cout << "r= " << r << "  , m= " << m << "  , q= " << q << endl;
   r= Prem(q,as);
   //cout << "r= " << r << endl;
+  //out_cf(" ->",r,"\n");
   return r;
 }
 
@@ -761,8 +772,13 @@ CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
     }
   }
 
-  f/=c_gcd;
-  g/=c_gcd;
+  //f/=c_gcd;
+  //g/=c_gcd;
+  if (!c_gcd.isOne())
+  {	  
+    f=divide(f,c_gcd,as);
+    g=divide(g,c_gcd,as);
+  }
 
   CFList gg;
   CanonicalForm r=1;
@@ -785,8 +801,20 @@ CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
           if (f_gcd.inBaseDomain()) break;
           i++;
         }  
-        f/=f_gcd;  
-        return f*c_gcd;
+	//out_cf("g=0 -> f:",f,"\n");
+	//out_cf("f_gcd:",f_gcd,"\n");
+	//out_cf("c_gcd:",c_gcd,"\n");
+        //f/=f_gcd;  
+	f=divide(f,f_gcd,as);
+	//out_cf("f/f_gcd:",f,"\n");
+	f*=c_gcd;
+	//out_cf("f*c_gcd:",f,"\n");
+        CanonicalForm r_lc=alg_lc(f);
+	//out_cf("r_lc:",r_lc,"\n");
+	//f/=r_lc;
+	f=divide(f,r_lc,as);
+	//out_cf(" -> gcd:",f,"\n");
+        return f;
       }
       else { //printf("c\n"); 
 	return c_gcd;}
@@ -844,6 +872,9 @@ CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.8  2002/10/24 17:22:22  Singular
+* hannes: factoring in alg.ext., alg_gcd, NTL stuff
+
 Revision 1.7  2002/08/19 11:11:31  Singular
 * hannes/pfister: alg_gcd etc.
 
