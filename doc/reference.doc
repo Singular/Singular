@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.154 1999-10-14 14:42:21 obachman Exp $
+@comment $Id: reference.doc,v 1.155 1999-10-19 12:45:15 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -96,6 +96,7 @@ brackets are allowed.
 * highcorner::
 * hilb::
 * homog::
+* hres::
 * imap::
 * indepSet::
 * insert::
@@ -454,6 +455,7 @@ $$
 
 @c ref
 See
+@ref{hres};
 @ref{lres};
 @ref{mres};
 @ref{print};
@@ -2027,7 +2029,7 @@ See
 @ref{std}.
 @c ref
 @c ---------------------------------------
-@node homog, imap, hilb, Functions
+@node homog, hres, hilb, Functions
 @subsection homog
 @cindex homog
 
@@ -2072,6 +2074,91 @@ See
 @ref{ideal};
 @ref{module}.
 @c ref
+@c ---------------------------------------
+@node hres, imap, homog, Functions
+@subsection hres
+@cindex hres
+@cindex resolution, hilbert-driven
+@table @code
+@item @strong{Syntax:}
+@code{hres (} ideal_expression@code{,} int_expression @code{)}
+@item @strong{Type:}
+resolution
+@item @strong{Purpose:}
+computes a free resolution of an ideal using Hilbert-driven algorithm.
+
+The ideal_expression has to be homogeneous.
+
+More precisely, let M  be a cyclic module and
+@tex
+$A_1=$matrix$(M)$.
+@end tex
+@ifinfo
+A1=matrix(M).
+@end ifinfo
+Then A1 is an ideal in the basering R and @code{hres}
+computes a minimal free resolution of
+@ifinfo
+M1=coker(A1)
+@*...--> F2 --A2-> F1 --A1-> R-->M1-->0.
+@end ifinfo
+@tex
+$M_1=coker(A_1)$
+$$...\longrightarrow F_2 \buildrel{A_2}\over{\longrightarrow} F_1 \buildrel{A_1}\over{\longrightarrow} F_0\longrightarrow M_1\longrightarrow 0.$$
+@end tex
+The computation stops after k steps, if the int expression k
+is not zero, and returns a list of modules
+@tex
+$M_i={\tt module}(A_i)$, i=1..k.
+@end tex
+@ifinfo
+Mi=module(Ai), i=1..k.
+@end ifinfo
+
+If k=0, @code{hres(M,0)} returns a list of n modules where n is the
+number of variables of the basering.
+
+Let @code{list L=hres(M,0);} then @code{L[1]} generates M,
+@code{L[2]} generates
+the first syzygy
+module of @code{L[1]}, etc.
+( @code{L[i]}
+@tex
+$=M_i$
+@end tex
+@ifinfo
+=M_i
+@end ifinfo
+) in the notation from above).
+@item @strong{Note:}
+To access the elements of a resolution, it has to be assigned to a list,
+which also completes computations and may therefore take some time.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=0,(x,y,z),dp;
+  ideal i=xz,yz,x^3-y^3;
+  def l=hres(i,0);
+  print(betti(l),"betti");// input to betti may be of type resolution
+  list ll=l;
+  l[2];                   // elements can only be accessed in the list
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{betti};
+@ref{ideal};
+@ref{int};
+@ref{minres};
+@ref{module};
+@ref{mres};
+@ref{res};
+@ref{lres};
+@ref{sres}.
+@c ref
+
+
 @c ---------------------------------------
 @node imap, indepSet, homog, Functions
 @subsection imap
@@ -2994,6 +3081,8 @@ See
 @node lres, maxideal, listvar, Functions
 @subsection lres
 @cindex lres
+@cindex resolution, La Scala's method
+
 @table @code
 @item @strong{Syntax:}
 @code{lres (} ideal_expression@code{,} int_expression @code{)}
@@ -3069,6 +3158,7 @@ See
 @ref{module};
 @ref{mres};
 @ref{res};
+@ref{hres};
 @ref{sres}.
 @c ref
 @c ---------------------------------------
@@ -3464,6 +3554,7 @@ which also completes computations and may therefore take time.
 @c ref
 See
 @ref{ideal};
+@ref{hres};
 @ref{lres};
 @ref{module};
 @ref{res};
@@ -3765,6 +3856,7 @@ $=M_i$
 See
 @ref{ideal};
 @ref{lres};
+@ref{hres};
 @ref{module};
 @ref{mres};
 @ref{res};
@@ -5138,6 +5230,7 @@ See
 @ref{ideal};
 @ref{int};
 @ref{lres};
+@ref{hres};
 @ref{minres};
 @ref{module};
 @ref{mres};
@@ -5520,6 +5613,7 @@ generators) of the ideal, resp.@: module.
 See
 @ref{ideal};
 @ref{lres};
+@ref{hres};
 @ref{module};
 @ref{mres};
 @ref{nres};

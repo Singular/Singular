@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.152 1999-10-14 14:42:16 obachman Exp $
+@comment $Id: general.doc,v 1.153 1999-10-19 12:45:13 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -455,12 +455,20 @@ system}, for more info.
 
 @item @code{--browser=VAL}
 @cindex --browser
+@cindex browser, command line option
 Use @code{VAL} as browser for the @sc{Singular} online manual.
 @*@code{VAL} may be one of @code{netscape}, @code{xinfo},
 @code{tkinfo}, @code{info}, @code{builtin}, or @code{emacs}. Depending
 on your platform and local
 installation, only some browsers might be available. The default browser
 is @code{netscape}. @xref{The online help system}, for more info.
+
+@item @code{--allow-net}
+@cindex --allow-net
+@cindex allow-net, command line option
+Allow the @code{netscape} help browser to fetch the HTML pages from the
+@sc{Singular} homepage, if HTML pages are not found locally. 
+@xref{The online help system}.
 
 @item @code{--no-rc}
 @cindex --no-rc
@@ -586,6 +594,7 @@ if an option was not given), can be checked with the command
 @c example
   system("--quiet");    // if ``quiet'' 1, otherwise 0
   system("--min-time"); // minimal reported time
+  system("--random");   // seed of the random generator
 @c example
 @end smallexample
 
@@ -593,7 +602,8 @@ Furthermore, the value of options (e.g., @code{--browser}) can be
 re-set while @sc{Singular} is running with the command 
 @code{system("}--long_option_name_string @code{",}expression@code{)}. @xref{system}.
 @smallexample
-  system("--browser", "builtin");  // sets browser to 'buildin'
+  system("--browser", "builtin");  // sets browser to 'builtin'
+  system("--ticks-per-sec", 100);  // sets timer resolution to 100
 @end smallexample
 
 
@@ -629,8 +639,12 @@ executes the files @code{file1}, @code{file2} @dots{}  (given on the command
 line) in that order.
 @end enumerate
 
+See @ref{LIB} for the directories in which @sc{Singular} searches for its
+library files.
+
 @strong{Note:} @code{.singularrc} file(s) are an approriate place for
 setting some default values of (command-line) options. 
+
 
 For example, a system administrator might remove the locally installed
 HTML version of the manual and put a @code{.singularrc} file
