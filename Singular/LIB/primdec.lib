@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.43 1999-08-03 11:43:09 obachman Exp $
+// $Id: primdec.lib,v 1.44 1999-08-03 13:01:02 obachman Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                               //
 // algorithms for primary decomposition based on                             //
@@ -10,29 +10,28 @@
 // written by Wolfram Decker and Hans Schoenemann                            //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.43 1999-08-03 11:43:09 obachman Exp $";
+version="$Id: primdec.lib,v 1.44 1999-08-03 13:01:02 obachman Exp $";
 info="
 LIBRARY: primdec.lib:   PROCEDURES FOR PRIMARY DECOMPOSITION
 AUTHORS:  Gerhard Pfister, email: pfister@mathematik.uni-kl.de (GTZ)
           Wolfram Decker, email: decker@math.uni-sb.de         (SY)
           Hans Schoenemann, email: hannes@mathematik.uni-kl.de (SY)
-          last change: 99/07/23
 
 PROCEDURES:
-  primdecGTZ(I);   complete primary decomposition via Gianni,Trager,Zacharias
-  primdecSY(I);    complete primary decomposition via Shimoyama-Yokoyama
-  minAssGTZ(I);    the minimal associated primes via Gianni,Trager,Zacharias
-  minAssChar(I);   the minimal associated primes using characteristic sets
-  testPrimary(..); tests the result of the primary decomposition
-  radical(I);      computes the radical of the ideal I
-  equiRadical(I);  the radical of the equidimensional part of the ideal I
-  prepareAss(I);   list of radicals of the equidimensional components of I
+  primdecGTZ(I);    complete primary decomposition via Gianni,Trager,Zacharias
+  primdecSY(I...);  complete primary decomposition via Shimoyama-Yokoyama
+  minAssGTZ(I);     the minimal associated primes via Gianni,Trager,Zacharias
+  minAssChar(I...); the minimal associated primes using characteristic sets
+  testPrimary(L,k); tests the result of the primary decomposition
+  radical(I);       computes the radical of the ideal I
+  equiRadical(I);   the radical of the equidimensional part of the ideal I
+  prepareAss(I);    list of radicals of the equidimensional components of I
 
 REMARK:
- These procedures are implemented to be used in characteristic 0.
- They work also in positive characteristic >> 0.
- In small characteristic primdecGTZ, minAssGTZ, radical and equiRadical may not
- terminate and primdecSY and minAssChar may not give a complete decomposition.
+These procedures are implemented to be used in characteristic 0.
+They work also in positive characteristic >> 0.
+In small characteristic primdecGTZ, minAssGTZ, radical and equiRadical may not
+terminate and primdecSY and minAssChar may not give a complete decomposition.
 ";
 
 LIB "general.lib";
@@ -551,7 +550,7 @@ proc splitPrimary(list l,ideal ser,int @wr,list sact)
             {
                for(k=2;k<=r;k++)
                {
-              keepprime[size(l)/2+k-1]=interred(keepprime[i]+ideal(act[1][k]));
+                  keepprime[size(l)/2+k-1]=interred(keepprime[i]+ideal(act[1][k]));
                }
                keepprime[i]=interred(keepprime[i]+ideal(act[1][1]));
                for(k=1;k<=r;k++)
@@ -874,7 +873,7 @@ EXAMPLE: example zero_decomp; shows an example
              {
                 if(lead(primary[2*@k-1][@n])/var(zz)!=0)
                 {
-                jmap1[zz]=-1/leadcoef(primary[2*@k-1][@n])*primary[2*@k-1][@n]
+                   jmap1[zz]=-1/leadcoef(primary[2*@k-1][@n])*primary[2*@k-1][@n]
                    +2/leadcoef(primary[2*@k-1][@n])*lead(primary[2*@k-1][@n]);
                     jmap2[zz]=primary[2*@k-1][@n];
                     @qht[@n]=var(zz);
@@ -1581,7 +1580,44 @@ EXAMPLE: example minAssPrimes; shows an example
     option(noredSB);
    int j,k,odim,ndim,count;
    attrib(@pr[1],"isSB",1);
-  
+   if(#[1]==77)
+   {
+     odim=dim(@pr[1]);
+     count=1;
+     intvec pos;
+     pos[size(@pr)]=0;
+     for(j=2;j<=size(@pr);j++)
+     {
+        attrib(@pr[j],"isSB",1);
+        ndim=dim(@pr[j]);
+        if(ndim>odim)
+        {
+           for(k=count;k<=j-1;k++)
+           {
+              pos[k]=1;
+           }
+           count=j;
+           odim=ndim;
+        }
+        if(ndim<odim)
+        {
+           pos[j]=1;
+        }
+     }
+     for(j=1;j<=size(@pr);j++)
+     {
+        if(pos[j]!=1)
+        {
+            @res[j]=decomp(@pr[j],2);
+        }
+        else
+        {
+           @res[j]=empty;
+        }
+     }
+   }
+   else
+   {
      ser=ideal(1);
      for(j=1;j<=size(@pr);j++)
      {
@@ -1594,6 +1630,7 @@ EXAMPLE: example minAssPrimes; shows an example
 //          ser=intersect(ser,@res[j][k]);
 //       }
      }
+   }
 
    @res=union(@res);
    setring @P;
@@ -3992,7 +4029,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc primdecSY(ideal i)
+proc primdecSY(ideal i, list #))
 "USAGE:   primdecSY(i); i ideal, c int
          if c=0, the given ordering of the variables is used.
          if c=1, minAssChar tries to use an optimal ordering,
@@ -4047,6 +4084,7 @@ proc minAssChar(ideal i, list #)
          if c=0, the given ordering of the variables is used.
          Otherwise, the system tries to find an optimal ordering,
          which in some cases may considerably speed up the algorithm
+RETURN:  list = the minimal associated prime ideals of i
 NOTE:    implemented for characteristic 0, works also in char k >> 0,
          the result may be not compltely decomposed in small characteristic
 EXAMPLE: example minAssChar; shows an example
@@ -4070,8 +4108,8 @@ example
 proc equiRadical(ideal i)
 "USAGE:   equiRadical(i); i ideal
 RETURN:  ideal, intersection of associated primes of i of maximal  dimension 
-NOTE:    designed for characteristic 0, works also in char k > 0 if it termi-
-         nates, may result in an infinite loop in small characteristic
+NOTE:    designed for characteristic 0, works also in char k > 0 if it 
+         terminates, may result in an infinite loop in small characteristic
 EXAMPLE: example equiRadical; shows an example
 "
 {
