@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.183 2002-02-06 13:10:30 Singular Exp $ */
+/* $Id: ring.cc,v 1.184 2002-02-06 13:55:46 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3969,12 +3969,10 @@ lists rDecompose(ring r)
     LLL->Init(2);
     LLL->m[0].rtyp=STRING_CMD;
     LLL->m[0].data=(void *)omStrDup(rSimpleOrdStr(r->order[i]));
-    LLL->m[1].rtyp=INTVEC_CMD;
-    j=r->block1[i]-r->block0[i];
-    iv=new intvec(j+1);
-    LLL->m[1].data=(void *)iv;
     if (r->block1[i]-r->block0[i] >=0 )
     {
+      j=r->block1[i]-r->block0[i];
+      iv=new intvec(j+1);
       if ((r->wvhdl!=NULL) && (r->wvhdl[i]!=NULL))
       {
         for(;j>=0; j--) (*iv)[j]=r->wvhdl[i][j];
@@ -3991,6 +3989,12 @@ lists rDecompose(ring r)
         default: /* do nothing */;
       }
     }
+    else
+    {
+      iv=new intvec(1);
+    }
+    LLL->m[1].rtyp=INTVEC_CMD;
+    LLL->m[1].data=(void *)iv;
     LL->m[i].data=(void *)LLL;
   }
   L->m[2].rtyp=LIST_CMD;
@@ -4110,7 +4114,7 @@ ring rCompose(lists  L)
         iv=new intvec((int)vv->m[1].Data(),(int)vv->m[1].Data());
       else
         iv=ivCopy((intvec*)vv->m[1].Data()); //assume INTVEC
-      R->block1[j]=R->block0[j]+iv->length()-1;
+      R->block1[j]=max(R->block0[j],R->block0[j]+iv->length()-1);
       int i;
       switch (R->order[j])
       {
