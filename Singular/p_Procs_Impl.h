@@ -6,7 +6,7 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Impl.h,v 1.2 2000-12-12 08:44:50 obachman Exp $
+ *  Version: $Id: p_Procs_Impl.h,v 1.3 2000-12-20 17:18:52 obachman Exp $
  *******************************************************************/
 #ifndef P_PROCS_IMPL_H
 #define P_PROCS_IMPL_H
@@ -386,6 +386,21 @@ static inline p_Ord ZeroOrd_2_NonZeroOrd(p_Ord ord, int strict)
  * choosen
  * 
  *******************************************************************/
+#ifdef p_Procs_Static
+static inline void StaticKernelFilter(p_Field &field, p_Length &length, 
+                                      p_Ord &ord, const p_Proc proc)
+{
+  // simply exclude some things
+  if ((proc == pp_Mult_mm_Noether_Proc || proc == p_kBucketSetLm_Proc) &&
+      (field != FieldZp))
+  {
+    field = FieldGeneral;
+    length = LengthGeneral;
+    ord = OrdGeneral;
+  }
+}
+#endif
+
 static inline void FastP_ProcsFilter(p_Field &field, p_Length &length, p_Ord &ord, const p_Proc proc)
 {
   if (HAVE_FAST_P_PROCS >= 5) return;
@@ -512,6 +527,9 @@ static inline void FastProcFilter(p_Proc proc, p_Field &field,
   FastLengthFilter(length);
   FastFieldFilter(field);
   FastP_ProcsFilter(field, length, ord, proc);
+#ifdef p_Procs_Static
+  StaticKernelFilter(field, length, ord, proc);
+#endif
 }
 
 // returns 1 if combination of field/length/ord is invalid

@@ -6,7 +6,7 @@
  *  Purpose: Configuration for static p_Procs
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Static.h,v 1.2 2000-12-12 08:44:51 obachman Exp $
+ *  Version: $Id: p_Procs_Static.h,v 1.3 2000-12-20 17:18:53 obachman Exp $
  *******************************************************************/
 
 #ifndef P_PROCS_STATIC_H
@@ -19,14 +19,14 @@
 //   3 -- plus FieldQ_Length*_Ord*
 //   4 -- plus FieldGeneral_Length*_OrdGeneral procs
 //   5 -- all Field*_Length*_Ord* procs
-#define HAVE_FAST_P_PROCS 2
+#define HAVE_FAST_P_PROCS 3
 
 // Set HAVE_FAST_FIELD to:
 //   0 -- only FieldGeneral
 //   1 -- special cases for FieldZp
 //   2 -- plus special cases for FieldQ
 //   nothing else is implemented, yet
-#define HAVE_FAST_FIELD 1
+#define HAVE_FAST_FIELD 2
 
 // Set HAVE_FAST_LENGTH to:
 //   0 -- only LengthGeneral
@@ -49,4 +49,6 @@
 //  1 -- only ZeroOrds for OrdPosNomogPosZero, OrdNomogPosZero, OrdPomogNegZero
 //  2 -- ZeroOrds for all
 #define HAVE_FAST_ZERO_ORD 1
+
+// on top of all this, see the StaticKernelFilter in p_Procs_Impl.h
 #endif
