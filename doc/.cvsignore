@@ -1,4 +1,5 @@
 Makefile
+doc2tex
 examples.tex
 general.tex
 types.tex
@@ -10,7 +11,6 @@ example.mp
 example.pag
 example.dir
 *.tmp
-*.lib
 *.tst
 *.ps
 *.log
