@@ -1,11 +1,11 @@
 Status Output of tst_status.out
-init >> USER    :mschulze
+init >> USER    :obachman
 init >> HOSTNAME:urmel
 init >> uname -a:HP-UX urmel A.09.01 A 9000/735 2007379207 two-user license
-init >> date    :Thu Dec 17 15:15:46 MET 1998
+init >> date    :Mon Dec 21 13:22:55 MEZ 1998
 init >> version :1301
 init >> ticks   :100
-1 >> tst_memory_0 :: urmel:171389
-1 >> tst_memory_1 :: urmel:458197
+1 >> tst_memory_0 :: urmel:172299
+1 >> tst_memory_1 :: urmel:450031
 1 >> tst_memory_2 :: urmel:512000
-1 >> tst_timer_1 :: urmel:337
+1 >> tst_timer_1 :: urmel:348
