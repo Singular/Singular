@@ -1264,6 +1264,7 @@ static void go_on (calc_dat* c){
     int len=pLength(h);
     buf[i].p=h;
     buf[i].sev=pGetShortExpVector(h);
+    buf[i].sum=NULL;
     buf[i].bucket = kBucketCreate(currRing);
     kBucketInit(buf[i].bucket,buf[i].p,len);
     i++;
@@ -1542,10 +1543,8 @@ static int poly_crit(const void* ap1, const void* ap2){
 }
 ideal t_rep_gb(ring r,ideal arg_I){
    Print("Idelems %i \n----------\n",IDELEMS(arg_I));
-  ideal I_temp=idCopy(arg_I); //kInterRed(arg_I);
-  ideal I=idCompactify(I_temp);
+  ideal I=idCompactify(arg_I);
   qsort(I->m,IDELEMS(I),sizeof(poly),poly_crit);
-  idDelete(&I_temp);
   Print("Idelems %i \n----------\n",IDELEMS(I));
   calc_dat* c=(calc_dat*) omalloc(sizeof(calc_dat));
   c->r=currRing;
@@ -1554,7 +1553,7 @@ ideal t_rep_gb(ring r,ideal arg_I){
 
   while(c->pair_top>=0)
     go_on(c);
-   omfree(c->rep);
+
   for(int z=0;z<c->n;z++){
     omfree(c->states[z]);
   }
@@ -1574,8 +1573,38 @@ ideal t_rep_gb(ring r,ideal arg_I){
   omfree(c->apairs);
   printf("calculated %d NFs\n",c->normal_forms);
   printf("applied %i product crit, %i extended_product crit \n", c->easy_product_crit, c->extended_product_crit);
-  I=c->S;
+  int deleted_form_c_s=0;
+
+  for(i=0;i<c->n;i++){
+    if (c->rep[i]!=i){
+      for(int j=0;j<=c->strat->sl;j++){
+	if(c->strat->S[j]==c->S->m[i]){
+	  c->strat->S[j]=NULL;
+	  break;
+	}
+      }
+      PrintS("R_delete");
+      pDelete(&c->S->m[i]);
+    }
+  }
+  for(i=0;i<=c->strat->sl;i++){
+    if (!c->strat->S[i]) continue;
+    BOOLEAN found=FALSE;
+    for(int j=0;j<c->n;j++){
+      if (c->S->m[j]==c->strat->S[i]){
+	found=TRUE;
+	break;
+      }
+    }
+    if(!found) pDelete(&c->strat->S[i]);
+  }
+  omfree(c->rep);
+    I=c->S;
   IDELEMS(I)=c->n;
+
+  idSkipZeroes(c->S);
+  
+
   omfree(c);
 
   return(I);
@@ -2315,4 +2344,53 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c)
       add_to_reductors(c,erg.expand,erg.expand_length);
   }
   return;
+}
+void red_object::flatten(){
+  if (sum!=NULL)
+  {
+
+ 
+    if(kBucketGetLm(sum->ac->bucket)!=NULL){
+      number mult_my=n_Mult(sum->c_my,sum->ac->multiplied,currRing);
+      poly add_this;
+      if(!nIsOne(mult_my))
+	kBucket_Mult_n(bucket,mult_my);
+      int len;
+      poly clear_into;
+      kBucketClear(sum->ac->bucket,&clear_into,&len);
+      if(sum->ac->counter>1){
+	add_this=pCopy(clear_into);
+	kBucketInit(bucket,clear_into,len);
+      }
+      else
+	add_this=clear_into;
+      pMult_nn(add_this, sum->c_ac);
+      nDelete(&sum->c_ac);
+      nDelete(&sum->c_my);
+      nDelete(&mult_my);
+      delete sum;
+      kBucket_Add_q(bucket,add_this, &len);
+      sum->ac->decrease_counter();
+      
+    }
+  }
+}
+void red_object::validate(){
+  if(sum!=NULL)
+  {
+    poly lm=kBucketGetLm(bucket);
+    poly lm_ac=kBucketGetLm(sum->ac->bucket);
+    if ((lm_ac==NULL)||((lm!=NULL) && (pLmCmp(lm,lm_ac)!=-1))){
+      flatten();
+      p=kBucketGetLm(bucket);
+    } 
+    else
+    {
+      p=lm_ac;
+    }
+    
+  }
+  else
+    p=kBucketGetLm(bucket);
+
 }

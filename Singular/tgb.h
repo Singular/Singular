@@ -28,15 +28,39 @@
 //#define QUICK_SPOLY_TEST
 
 
+class reduction_accumulator{
+ public:
+  number multiplied;
+  kBucket_pt bucket;
+  int counter;
+  void decrease_counter(){
+    if((--counter)==0)
+      {
+	nDelete(&multiplied);
+	kBucketDeleteAndDestroy(&bucket);
+	delete this; //self destruction
+      }
+  }
+  
+};
+struct formal_sum_descriptor{
+  number c_my;
+  number c_ac;
+  reduction_accumulator* ac;
+};
 struct int_pair_node{
   int_pair_node* next;
   int a;
   int b;
 };
-struct red_object{
+class red_object{
+ public:
   kBucket_pt bucket;
   poly p;
+  formal_sum_descriptor* sum;
   unsigned long sev;
+  void flatten();
+  void validate();
 };
 struct sorted_pair_node{
   //criterium, which is stable 0. small lcm 1. small i 2. small j
