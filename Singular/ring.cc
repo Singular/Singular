@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.182 2002-02-05 09:32:21 Singular Exp $ */
+/* $Id: ring.cc,v 1.183 2002-02-06 13:10:30 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3928,11 +3928,12 @@ lists rDecompose(ring r)
 {
   // 0: char/ cf - ring
   // 1: list (var)
-  // 3: list (ord)
-  // 4: qideal
+  // 2: list (ord)
+  // 3: qideal
   lists L=(lists)omAlloc0Bin(slists_bin);
   L->Init(4);
   // ----------------------------------------
+  // 0: char/ cf - ring
   #if 0 /* TODO */
   if (rIsExtension(r))
     rDecomposeCF(&(L->m[0]),r);
@@ -3943,9 +3944,8 @@ lists rDecompose(ring r)
     L->m[0].data=(void *)r->ch;
   }
   // ----------------------------------------
+  // 1: list (var)
   lists LL=(lists)omAlloc0Bin(slists_bin);
-  L->m[1].rtyp=LIST_CMD;
-  L->m[1].data=(void *)LL;
   LL->Init(r->N);
   int i;
   for(i=0; i<r->N; i++)
@@ -3953,10 +3953,11 @@ lists rDecompose(ring r)
     LL->m[i].rtyp=STRING_CMD;
     LL->m[i].data=(void *)omStrDup(r->names[i]);
   }
+  L->m[1].rtyp=LIST_CMD;
+  L->m[1].data=(void *)LL;
   // ----------------------------------------
+  // 2: list (ord)
   LL=(lists)omAlloc0Bin(slists_bin);
-  L->m[2].rtyp=LIST_CMD;
-  L->m[2].data=(void *)LL;
   LL->Init((i=rBlocks(r)-1));
   lists LLL;
   for(; i>=0; i--)
@@ -3992,12 +3993,16 @@ lists rDecompose(ring r)
     }
     LL->m[i].data=(void *)LLL;
   }
+  L->m[2].rtyp=LIST_CMD;
+  L->m[2].data=(void *)LL;
   // ----------------------------------------
+  // 3: qideal
   L->m[3].rtyp=IDEAL_CMD;
   if (r->qideal==NULL)
     L->m[3].data=(void *)idInit(1,1);
   else
     L->m[3].data=(void *)idCopy(r->qideal);
+  // ----------------------------------------
   return L;
 }
 
