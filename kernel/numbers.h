@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.2 2004-10-11 08:50:10 Singular Exp $ */
+/* $Id: numbers.h,v 1.3 2005-02-23 17:25:09 Singular Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
@@ -28,6 +28,7 @@
 #define n_Gcd(a, b, r)        (r)->cf->nGcd(a,b,r)
 #define n_IntDiv(a, b, r)     (r)->cf->nIntDiv(a,b)
 #define n_InpMult(a, b, r)    (r)->cf->nInpMult(a,b,r)
+#define n_Power(a, b, res, r) (r)->cf->nPower(a,b,res)
 
 /* variables */
 extern short fftable[];
