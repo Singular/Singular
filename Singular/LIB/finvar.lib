@@ -2,43 +2,44 @@
 7/03 15:32:03 Singular Exp $
 ////////////////////////////////////////////////////////////////////////////////
 
-LIBRARY:  finvar.lib         LIBRARY TO CALCULATE INVARIANT RINGS & MORE
-                             (c) Agnes Eileen Heydtmann,
-                             send bugs and comments to agnes@math.uni-sb.de
+LIBRARY:  finvar.lib       LIBRARY TO CALCULATE INVARIANT RINGS & MORE
+                           (c) Agnes Eileen Heydtmann,
+                           send bugs and comments to agnes@math.uni-sb.de
 
- cyclotomic                                cyclotomic polynomial
- group_reynolds                            finite group and Reynolds operator
- molien                                    Molien series
- reynolds_molien                           Reynolds operator and Molien series
- partial_molien                            partial expansion of Molien series
- evaluate_reynolds                         image under the Reynolds operator
- invariant_basis                           basis of homogeneous invariants
- invariant_basis_reynolds                  basis of homogeneous invariants
- primary_char0                             primary invariants
- primary_charp                             primary invariants
- primary_char0_no_molien                   primary invariants
- primary_charp_no_molien                   primary invariants
- primary_charp_without                     primary invariants
- primary_invariants                        primary invariants
- primary_char0_random                      primary invariants
- primary_charp_random                      primary invariants
- primary_char0_no_molien_random            primary invariants
- primary_charp_no_molien_random            primary invariants
- primary_charp_without_random              primary invariants
- primary_invariants_random                 primary invariants
- power_products                            exponents for power products
- secondary_char0                           secondary invariants
- secondary_charp                           secondary invariants
- secondary_no_molien                       secondary invariants
- secondary_with_irreducible_ones_no_molien secondary invariants
- secondary_not_cohen_macaulay              secondary invariants
- invariant_ring                            primary and secondary invariants
- invariant_ring_random                     primary and secondary invariants
- algebra_containment                       answers query of algebra containment
- module_containment                        answers query of module containment
- orbit_variety                             ideal of the orbit variety
- relative_orbit_variety                    ideal of a relative orbit variety
- image_of_variety                          ideal of the image of a variety
+  cyclotomic(...)                        cyclotomic polynomial
+  group_reynolds(...)                    finite group and Reynolds operator
+  molien(...)                            Molien series
+  reynolds_molien(...)                   Reynolds operator and Molien series
+  partial_molien(...)                    partial expansion of Molien series
+  evaluate_reynolds(...)                 image under the Reynolds operator
+  invariant_basis(...)                   basis of homogeneous invariants
+  invariant_basis_reynolds(...)          basis of homogeneous invariants
+  primary_char0(...)                     primary invariants
+  primary_charp(...)                     primary invariants
+  primary_char0_no_molien(...)           primary invariants
+  primary_charp_no_molien(...)           primary invariants
+  primary_charp_without(...)             primary invariants
+  primary_invariants(...)                primary invariants
+  primary_char0_random(...)              primary invariants
+  primary_charp_random(...)              primary invariants
+  primary_char0_no_molien_random(...)    primary invariants
+  primary_charp_no_molien_random(...)    primary invariants
+  primary_charp_without_random(...)      primary invariants
+  primary_invariants_random(...)         primary invariants
+  power_products(...)                    exponents for power products
+  secondary_char0(...)                   secondary invariants
+  secondary_charp(...)                   secondary invariants
+  secondary_no_molien(...)               secondary invariants
+  secondary_with_irreducible_ones_no_molien(...)
+                                         secondary invariants
+  secondary_not_cohen_macaulay(...)      secondary invariants
+  invariant_ring(...)                    primary and secondary invariants
+  invariant_ring_random(...)             primary and secondary invariants
+  algebra_containment(...)               answers query of algebra containment
+  module_containment(...)                answers query of module containment
+  orbit_variety(...)                     ideal of the orbit variety
+  relative_orbit_variety(...)            ideal of a relative orbit variety
+  image_of_variety(...)                  ideal of the image of a variety
 
 ////////////////////////////////////////////////////////////////////////////////
 LIB "matrix.lib";

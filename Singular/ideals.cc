@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.13 1997-12-05 17:44:54 Singular Exp $ */
+/* $Id: ideals.cc,v 1.14 1997-12-12 16:55:21 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2528,16 +2528,15 @@ ideal  idSubst(ideal id, int n, poly e)
 
 BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
 {
+  if (w!=NULL) *w=NULL;
+  if ((Q!=NULL) && (!idHomIdeal(Q,NULL))) return FALSE;
+  if (idIs0(m)) return TRUE;
+
   int i,j,cmax=2,order=0,ord,* diff,* iscom,diffmin=32000;
   poly p=NULL;
   int length=IDELEMS(m);
   polyset P=m->m;
-  polyset F;
-
-  if (w!=NULL) *w=NULL;
-  if ((Q!=NULL) && (!idHomIdeal(Q,NULL))) return FALSE;
-  if (idIs0(m)) return TRUE;
-  F=(polyset)Alloc(length*sizeof(poly));
+  polyset F=(polyset)Alloc(length*sizeof(poly));
   for (i=length-1;i>=0;i--)
   {
     p=F[i]=P[i];
@@ -2567,11 +2566,11 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
         if (i>=length) break;
         p = F[i];
       }
-      //if (pLexOrder)
-      //  order=pTotaldegree(p);
-      //else
+      if (pLexOrder)
+        order=pTotaldegree(p);
+      else
       //  order = p->order;
-      order = pFDeg(p);
+        order = pFDeg(p);
       order += diff[pGetComp(p)];
       p = F[i];
 //Print("Actual p=F[%d]: ",i);pWrite(p);

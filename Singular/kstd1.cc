@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.11 1997-12-03 16:58:46 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.12 1997-12-12 16:55:23 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1509,7 +1509,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           {
             strat->initEcart(&strat->P);
           }
-          if TEST_OPT_INTSTRATEGY
+          if (TEST_OPT_INTSTRATEGY)
           {
             //pContent(strat->P.p);
             pCleardenom(strat->P.p);// also does a pContent
@@ -1746,7 +1746,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   strat->sl = -1;
   /*- init local data struct.-------------------------- -*/
   /*Shdl=*/initS(F,Q,strat);
-  if (TEST_OPT_INTSTRATEGY&&(lazyReduce==0))
+  if (TEST_OPT_INTSTRATEGY && (lazyReduce==0))
   {
     for (i=strat->sl; i>=0; i--)
       pNorm(strat->S[i]);
