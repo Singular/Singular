@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.35 1998-05-20 09:17:56 schmidt Exp $
+@comment $Id: singular.doc,v 1.36 1998-05-20 10:13:02 wichmann Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -140,7 +140,9 @@ from -2147483647 to 2147483647
 the length of an identifier is unlimited but @code{listvar}
 displays only the first 20 characters
 @c @item
-@c the interpretation of text between a closing @code{@}} and the end of the line is undefined. (Therefore do not put anything but spaces between @code{@}} and the end of the line.)
+@c the interpretation of text between a closing @code{@}} and the end of
+@c the line is undefined. (Therefore do not put anything but spaces between
+@c @code{@}} and the end of the line.) 
 @end itemize
 
 @c -------------------------------------------------------------------------
@@ -166,12 +168,19 @@ differences. Most notably:
 @heading No rvalue of increments and assignments
 @cindex rvalue
 
-The increment @code{++} (resp. decrement operator @code{--}) has no
+The increment @code{++} (resp.@: decrement operator @code{--}) has no
 rvalue, i.e. can not be used on the right-hand sides of 
 assignments. So, instead of 
-@*@code{j = i++;  // WRONG!!!}
-@*(which results in an error), it must be written
-@*@code{i++; j = i;}
+
+@example
+j = i++;  // WRONG!!!
+@end example
+
+@noindent (which results in an error), it must be written
+
+@example
+i++; j = i;
+@end example
 
 Likewise, an assignment expression does not have a result, i.e., does
 not have an rvalue.  Therefore, compound assignments like @code{i = j =
@@ -190,10 +199,14 @@ logical expressions @code{(a || b)} is evaluated by first evaluating
 @code{a} @emph{and} @code{b}, even though the value of @code{b} has no
 influence on the value of @code{(a || b)}, if @code{a} evaluates to
 @i{true}. Therefore, the following results in a syntax error
+
 @example
 if (defined(i) && i > 0) @{@} // WRONG!!!
 @end example
-if the variable @code{i} is undefined and must be written intead as
+
+@noindent if the variable @code{i} is undefined. This must be written
+instead as 
+
 @example
 if (defined(i)) 
 @{ 
@@ -209,18 +222,21 @@ languages). For example, in these other languages, the value of @code{(1
 However, there are several short work-arounds for this problem:
 @enumerate
 @item 
-If a variable (say, @code{i}) is only to be used as a boolean flag (say,
-1 and 0), then define (value is true) and undefine (value is false)
-@code{i} instead of assigning a value. Using this scheme, it is
-sufficient to simply write
+If a variable (say, @code{i}) is only to be used as a boolean flag, then
+define (value is true) and undefine (value is false) @code{i} instead of
+assigning a value. Using this scheme, it is sufficient to simply write
+
 @example
 if (defined(i))
 @end example
-in order to check whether @code{i} is true.
+
+in order to check whether @code{i} is true. Use the command @code{kill}
+to undefine a variable (@pxref{kill}).
 @item 
 If a variable  can have more than two values, then
 define it, if necessary, before it is used for the first time.
 For example, if the following is used within a procedure
+
 @example
 if (! defined(DEBUG)) @{ int DEBUG = 1;@}
 @dots{}
@@ -228,6 +244,7 @@ if (DEBUG == 3)  @{@dots{}@}
 if (DEBUG == 2)  @{@dots{}@}
 @dots{}
 @end example
+
 then a user of this procedure does not need to care about the existence
 of the @code{DEBUG} variable -- this remains hidden from the
 user. However, if @code{DEBUG} exists globally, then its local default
@@ -242,6 +259,7 @@ value is overwritten by its global one.
 
 @sc{Singular} does not offer a @code{case} (or, @code{switch})
 statement. However, it can be imitated in the following way:
+
 @example
 while (1)
 @{
@@ -262,12 +280,15 @@ In @sc{Singular}, a comma separates list elements and the value of a comma
 expression is a list.
 Hence, commas can not be used to combine several expressions into
 a single expression. For example, instead of writing
+
 @example
-for (i=1, j=5; i<j; i++, j++) @{@dots{}@} // WRONG!!!!!! 
+for (i=1, j=5; i<5 || j<10; i++, j++) @{@dots{}@} // WRONG!!!!!! 
 @end example
-one has to write
+
+@noindent one has to write
+
 @example
-for (i,j = 1,5; i<j; i++, j++) @{@dots{}@}
+for (i,j = 1,5; i<5 || j<10; i++, j++) @{@dots{}@}
 @end example
 
 @c ---------------------------------------
@@ -282,24 +303,27 @@ single statement. Similarly, in the return statement a procedure round
 brackets (i.e. "@code{()}") @strong{must always} be used to enclose the
 return value.
 For example,
+
 @example
 if (i == 1) return i;    // WRONG!!!!!
 @end example
-results in a errors. Instead, it must be written as
+
+@noindent results in a errors. Instead, it must be written as
+
 @example
 if (i == 1) @{ return (i); @} 
 @end example
-
 
 @c ---------------------------------------
 @node  Behaviour of continue, Return type of procedures, Usage of brackets, Major differences to the C programming language
 @heading Behaviour of continue
 @cindex continue 
-@sc{Singular}'s @code{continue} construct is only valid inside the body of
-the @code{for} construct. It skips the rest of the loop-body and jumps
-to the beginning of the block. Unlike the C-construct @sc{Singular}'s
-@code{continue} @strong{does not execute the increment statement}. For
-example,
+@sc{Singular}'s @code{continue} construct is only valid inside the body
+of a @code{for} or @code{while} construct. It skips the rest of the
+loop-body and jumps to the beginning of the block. Unlike the
+C-construct @sc{Singular}'s @code{continue} @strong{does not execute the
+increment statement}. For example,
+
 @example
 for (int i = 1 ; i<=10; i=i+1)
 @{
@@ -323,9 +347,10 @@ Although the @sc{Singular} language is a strongly typed programming
 language, the type of the 
 return value of a procedure does not need to be specified. As a
 consequence, the return type of a procedure may vary, i.e., may, for
-example, depend on the input. However, the retun value
+example, depend on the input. However, the return value
 of such a procedures may then only be assigned to a variable of type
 @code{def}. 
+
 @example
 @c example
 proc type_return (int i) 
@@ -340,9 +365,9 @@ typeof(t1); typeof(t2);
 @end example
 
 Furthermore, it is mandatory to assign the return value of a procedure
-to a variable of type def, if a procedure changes the currint ring using 
-the @code{keepring} command (@ref{keepring}) and returns a
-ring-dependent value (like a polynom or module).
+to a variable of type def, if a procedure changes the current ring using 
+the @code{keepring} command (@pxref{keepring}) and returns a
+ring-dependent value (like a polynomial or module).
 
 @example
 @c example
@@ -361,6 +386,7 @@ typeof(p);
 
 On the other hand, more than one value can be returned by a single
 @code{return} statement. For example,
+
 @example
 proc tworeturn () @{ return (1,2); @}
 int i,j = tworeturn();
@@ -425,16 +451,16 @@ ideal).
 @cindex ideals
 @cindex siz
 
-@code{size} counts the non-zero entries of an ideal (resp. module). Use
-@code{ncols} to determine the actual number of entries in the ideal
-(resp. module).
+@code{size} counts the non-zero entries of an ideal (resp.@:
+module). Use @code{ncols} to determine the actual number of entries in
+the ideal (resp.@: module).
 
 @item computations in qrings
 
-@sc{Singular} computes in a quotiemt rings as long as possible with the
+@sc{Singular} computes in a quotient rings as long as possible with the
 given representative of a polynomial, say, @code{p}.  I.e., it usually
 does not reduce @code{p} w.r.t. the quotient ideal.  This is only done
-during standard bases computations or by an explicite reduction using
+during standard bases computations or by an explicit reduction using
 the command @code{reduce(p, std(0))} (@pxref{reduce}).
 
 @item substring selection 
@@ -444,6 +470,7 @@ substring. An @code{intvec} in square brackets after a string selects
 the respective single characters of the string and returns them as an
 expression list of two strings.
 In particular,
+
 @example
 @c example
   string s = "hello";
@@ -492,7 +519,7 @@ xy; // "xy" is one identifier and resolved to monom xy
 @end example
 
 For these reasons, we strongly disrecommend the usage of variables which 
-have the same name(s) as ring variables
+have the same name(s) as ring variables.
 
 @c ----------------------------------------------------------------------------
 @node Examples, Polynomial data, Tricks and pitfalls, Top
