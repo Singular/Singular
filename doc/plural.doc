@@ -183,6 +183,7 @@ Use the @code{LIB} command for loading of single libraries.
 
 @menu
 * center_lib::
+* ncall_lib::
 * ncalg_lib::
 * ncdecomp_lib::               
 * nctools_lib::
@@ -191,15 +192,24 @@ Use the @code{LIB} command for loading of single libraries.
 @end menu
 
 @c ----------------------------------------------------------
-@node center_lib, ncalg_lib, PLURAL libraries, PLURAL libraries
+@node center_lib, ncall_lib, PLURAL libraries, PLURAL libraries
 @section center_lib
 
 @c lib center.lib
 
-@c ----------------------------------------------------------
 
 @c ----------------------------------------------------------
-@node ncalg_lib, ncdecomp_lib, center_lib, PLURAL libraries
+@node ncall_lib, ncalg_lib, center_lib, PLURAL libraries
+@section ncall_lib
+
+The library @code{ncall.lib} provides a convenient way to load all 
+libraries, featuring non-commutative algorithms of the SINGULAR:PLURAL distribution.
+
+
+@c lib ncall.lib
+
+@c ----------------------------------------------------------
+@node ncalg_lib, ncdecomp_lib, ncall_lib, PLURAL libraries
 @section ncalg_lib
 
 @c lib ncalg.lib

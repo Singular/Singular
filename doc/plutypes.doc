@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plutypes.doc,v 1.21 2004-08-05 18:14:04 levandov Exp $
+@comment $Id: plutypes.doc,v 1.22 2004-08-12 16:58:22 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -1173,34 +1173,52 @@ In order to create the non-commutative extention, see @ref{ncalgebra}.
 @item @code{+}
 construct an algebra 
 @ifinfo
-A\otimes_k B
+C = A\otimes_k B
 @end ifinfo
 @tex
-$A\otimes_{\bf{K} } B$
+$C = A\otimes_{\bf{K} } B$
 @end tex 
 for two
 @ifinfo 
-G-algebras 
+G-algebras. 
 @end ifinfo
 @tex
-$G$-algebras
+$G$-algebras.
 @end tex
 
+Let
 @ifinfo
  A=k1<x_1,...,x_n | @{x_j x_i=c^1_@{ij@}x_i x_j + d^1_@{ij @} @}, 1 =<i <j =< n >,
  and
- B=k2<y_1,...,y_m | @{y_j y_i=c^2_@{ij@}y_i y_j + d^2_@{ij @} @}, 1 =<i <j =< m >.
-
+ B=k2<y_1,...,y_m | @{y_j y_i=c^2_@{ij@}y_i y_j + d^2_@{ij @} @}, 1 =<i <j =< m >
 @end ifinfo
 
 @tex 
 $A= k_1 \langle x_1, \ldots ,x_n \mid$ 
 $\{ x_j x_i=c^1_{ij} \cdot x_i x_j + d^1_{ij}\}, 1 \leq i <j \leq n \rangle$,
 and
-$B= k_2 \langle y_1, \ldots ,y_m \mid
-\{ y_j y_i=c^2_{ij} \cdot y_i y_j + d^2_{ij}\}, 1 \leq i <j \leq m \rangle$.
+$B= k_2 \langle y_1, \ldots ,y_m \mid$
+$\{ y_j y_i=c^2_{ij} \cdot y_i y_j + d^2_{ij}\}, 1 \leq i <j \leq m \rangle$
 @end tex
+
+be two G-algebras, then C is defined to be the algebra
+
+@ifinfo
+C = K<x_1,...,x_n, y_1,...,y_m |
+@{x_j x_i=c^1_@{ij@}x_i x_j + d^1_@{ij @}, 1 =<i <j =< n @},
+@{y_j y_i=c^2_@{ij@}y_i y_j + d^2_@{ij @}, 1 =<i <j =< m @},
+@{y_j x_i = x_i y_j, 1 <= j <= m, 1 <= i <= n @}>
+@end ifinfo
+
+@tex 
+$C = K \langle x_1, \ldots ,x_n, y_1, \ldots ,y_m \mid$
+$\{ x_j x_i=c^1_{ij} \cdot x_i x_j + d^1_{ij}, 1 \leq i <j \leq n\}$,
+$\{ y_j y_i=c^2_{ij} \cdot y_i y_j + d^2_{ij}, 1 \leq i <j \leq m\}$,
+$\{ y_j x_i = x_i y_j, 1 \leq j \leq m, 1 \leq i \leq n\}  \rangle$.
+@end tex
+
 @end table
+
 
 Concerning the ground fields @math{k_1} and @math{k_2} take the
 following guide lines into consideration:
@@ -1215,10 +1233,13 @@ following guide lines into consideration:
 @strong{Example:}
 @smallexample
 @c example
-ring R1=0,(x,y),dp;
-ring R2=32003,(a,b),dp;
-def R=R1+R2;
-R;
+LIB "ncalg.lib";
+def a = sl2();       // U(sl_2) in e,f,h presentation
+ring W = 0,(x,d),dp;
+Weyl();              // 1st Weyl algebra in x,d
+def S = a+W;
+setring S;
+S;
 @c example
 @end smallexample
 

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: pluconventions.doc,v 1.6 2004-08-05 18:14:03 levandov Exp $
+@comment $Id: pluconventions.doc,v 1.7 2004-08-12 16:58:19 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -35,6 +35,16 @@
 
 @c ----------------------------------------------- 
 @table @strong
+
+@item relations on algebra
+@itemize 
+@sc{Plural} @strong{can not} compute in free algebra or in its
+general factor algebras. One can only input and work with 
+G-algebras (see @ref{G-algebras}), which relations are of the special form
+but still general enough to handle many important algebras. See
+@ref{PLURAL libraries} for pre-defined definitions for many of them.
+@end itemize
+
 @item *-multiplication  @value{PSUFFIX}
 @itemize 
 
