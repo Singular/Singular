@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: ftmpl_array.cc,v 1.2 1997-03-27 10:28:51 schmidt Exp $
+// $Id: ftmpl_array.cc,v 1.3 1997-04-15 09:56:36 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.2  1997/03/27 10:28:51  schmidt
+error check changed to ASSERT
+
 Revision 1.1  1996/07/16 12:24:56  stobbe
 "operators += and *= deleted sincethey are not needed in an general
 array class als well as the functions sum, prod, crossprod.
@@ -13,7 +16,11 @@ Initial revision
 
 */
 
-#include <templates/assert.h>
+/*MAKEHEADER*/
+#include "templates/config.h"
+
+/*MAKEHEADER*/
+#include "templates/assert.h"
 
 #include <templates/array.h>
 
