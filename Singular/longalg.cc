@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.46 2000-11-16 16:56:20 Singular Exp $ */
+/* $Id: longalg.cc,v 1.47 2000-11-16 17:55:25 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -78,7 +78,7 @@ static number nadGcd( number a, number b) { return nacInit(1); }
 /*2
 *  sets the appropriate operators
 */
-void naSetChar(int i, BOOLEAN complete, char ** param, int pars)
+void naSetChar(int i, BOOLEAN complete, char ** param, int pars, ring r)
 {
   if (naI!=NULL)
   {
@@ -135,7 +135,7 @@ void naSetChar(int i, BOOLEAN complete, char ** param, int pars)
 #endif
     if (complete)
     {
-      npSetChar(-i, currRing->algring); // to be changes HS
+      npSetChar(-i, r->algring); // to be changes HS
       nacInit        = npInit;
       nacInt         = npInt;
       nacCopy        = ndCopy;

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.14 2000-09-12 16:01:01 obachman Exp $ */
+/* $Id: longalg.h,v 1.15 2000-11-16 17:55:25 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -37,7 +37,7 @@ extern alg naMinimalPoly;
 extern char **naParNames;
 extern int napMonomSize;
 
-void naSetChar(int p, BOOLEAN complete, char ** param, int pars);
+void naSetChar(int p, BOOLEAN complete, char ** param, int pars, ring r);
 #ifdef LDEBUG
 void    naDBDelete (number *p,char *f, int l);
 #define naDelete(A) naDBDelete(A,__FILE__,__LINE__)

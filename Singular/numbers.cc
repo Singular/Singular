@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.23 2000-11-16 16:52:02 Singular Exp $ */
+/* $Id: numbers.cc,v 1.24 2000-11-16 17:55:25 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -114,7 +114,7 @@ void nSetChar(ring r, BOOLEAN complete)
   }
   if (rField_is_Extension(r))
   {
-    naSetChar(c,complete,r->parameter,rPar(r));
+    naSetChar(c,complete,r->parameter,rPar(r), r);
 #ifdef LDEBUG
     nDBDelete= naDBDelete;
 #else
@@ -484,7 +484,7 @@ void nInitChar(ring r)
   r->cf->nName =  ndName;
   if (rField_is_Extension(r))
   {
-    //naSetChar(c,TRUE,r->parameter,rPar(r));
+    //naSetChar(c,TRUE,r->parameter,rPar(r), r);
 #ifdef LDEBUG
     r->cf->nDBDelete = naDBDelete;
 #else
