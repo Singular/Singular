@@ -473,7 +473,7 @@ void singular_example(char *str)
   if ((h!=NULL) && (IDTYP(h)==PROC_CMD))
   {
     char *lib=iiGetLibName(IDPROC(h));
-    if((lib!=NULL)&&(*lib=='\0'))
+    if((lib!=NULL)&&(*lib!='\0'))
     {
       Print("// proc %s from lib %s\n",s,lib);
       s=iiGetLibProcBuffer(IDPROC(h), 2);
