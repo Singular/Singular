@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.41 1998-04-27 12:34:11 obachman Exp $ */
+/* $Id: extra.cc,v 1.42 1998-04-27 15:00:50 krueger Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -65,6 +65,10 @@
 #include "silink.h"
 #include "mpsr.h"
 
+#ifdef HAVE_DYNAMIC_LOADING
+#include <dlfcn.h>
+#endif /* HAVE_DYNAMIC_LOADING */
+
 // see clapsing.cc for a description of the `FACTORY_*' options
 
 #ifdef FACTORY_GCD_STAT
@@ -79,6 +83,8 @@ TIMING_DEFINE_PRINTPROTO( algContentTimer );
 TIMING_DEFINE_PRINTPROTO( algLcmTimer );
 #endif
 
+void piShowProcList();
+
 //void emStart();
 /*2
 *  the "system" command
@@ -90,7 +96,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
 /*==================== lib ==================================*/
     if(strcmp((char*)(h->Data()),"LIB")==0)
     {
+#ifdef HAVE_NAMESPACES
+      idhdl hh=namespaceroot->get((char*)h->next->Data(),0);
+#else /* HAVE_NAMESPACES */
       idhdl hh=idroot->get((char*)h->next->Data(),0);
+#endif /* HAVE_NAMESPACES */
       if ((hh!=NULL)&&(IDTYP(hh)==PROC_CMD))
       {
         res->rtyp=STRING_CMD;
@@ -102,10 +112,41 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
         Warn("`%s` not found",(char*)h->next->Data());
     }
     else
+#ifdef HAVE_NAMESPACES
+/*==================== nspush ===================================*/
+    if(strcmp((char*)(h->Data()),"nspush")==0)
+    {
+      idhdl hh=namespaceroot->get((char*)h->next->Data(),0, TRUE);
+      if ((hh!=NULL)&&(IDTYP(hh)==PACKAGE_CMD))
+      {
+	namespaceroot = namespaceroot->push(IDPACKAGE(hh), IDID(hh));
+	return FALSE;
+      } else
+        Warn("package `%s` not found",(char*)h->next->Data());
+    }
+    else
+/*==================== nspop ====================================*/
+    if(strcmp((char*)(h->Data()),"nspop")==0)
+    {
+      namespaceroot->pop();
+      return FALSE;
+    }
+    else
+/*==================== nsstack ===================================*/
+    if(strcmp((char*)(h->Data()),"nsstack")==0)
+    {
+      namehdl nshdl = namespaceroot;
+      for( ; nshdl->isroot != TRUE; nshdl = nshdl->next) {
+	Print("NSstack: %s:%d\n", nshdl->name, nshdl->lev);
+      }
+      Print("NSstack: %s:%d\n", nshdl->name, nshdl->lev);
+      return FALSE;
+    }
+    else
+#endif /* HAVE_NAMESPACES */
 /*==================== proclist =================================*/
     if(strcmp((char*)(h->Data()),"proclist")==0)
     {
-      void piShowProcList();
       //res->rtyp=STRING_CMD;
       //res->data=(void *)mstrdup("");
       piShowProcList();
@@ -120,6 +161,36 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
+#ifdef HAVE_DYNAMIC_LOADING
+/*==================== load ==================================*/
+    if(strcmp((char*)(h->Data()),"load")==0)
+    {
+      if ((h->next!=NULL) && (h->next->Typ()==STRING_CMD)) {
+	int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
+		       BOOLEAN(*func)(leftv res, leftv v));
+        int (*fktn)(int(*iiAddCproc)(char *libname, char *procname,
+				     BOOLEAN pstatic,
+				     BOOLEAN(*func)(leftv res, leftv v)));
+        void *vp;
+        res->rtyp=STRING_CMD;
+
+        fprintf(stderr, "Loading %s\n", h->next->Data());
+        res->data=(void *)mstrdup("");
+        if((vp=dlopen(h->next->Data(),RTLD_LAZY))==(void *)NULL) {
+          WerrorS("dlopen failed");
+          Werror("%s not found", h->next->Data());
+        } else {
+          fktn = dlsym(vp, "mod_init");
+          if( fktn!= NULL) (*fktn)(iiAddCproc);
+          else Werror("mod_init: %s\n", dlerror());
+          piShowProcList();
+        }
+        return FALSE;
+      }
+      else WerrorS("string expected");
+    }
+    else
+#endif /* HAVE_DYNAMIC_LOADING */
 /*==================== gen ==================================*/
     if(strcmp((char*)(h->Data()),"gen")==0)
     {
