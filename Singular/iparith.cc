@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.148 1999-05-19 11:41:48 Singular Exp $ */
+/* $Id: iparith.cc,v 1.149 1999-06-04 13:07:30 pohl Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2462,6 +2462,13 @@ static BOOLEAN jjDET_I(leftv res, leftv v)
   }
   return FALSE;
 }
+static BOOLEAN jjDET_S(leftv res, leftv v)
+{
+  ideal I=(ideal)v->Data();
+  poly p=smCallDet(I);
+  res->data = (char *)p;
+  return FALSE;
+}
 #endif
 static BOOLEAN jjDIM(leftv res, leftv v)
 {
@@ -3391,6 +3398,7 @@ struct sValCmd1 dArith1[]=
 #ifdef HAVE_FACTORY
 ,{jjDET_I,      DET_CMD,         INT_CMD,        INTMAT_CMD }
 ,{jjDET,        DET_CMD,         POLY_CMD,       MATRIX_CMD }
+,{jjDET_S,      DET_CMD,         POLY_CMD,       MODUL_CMD }
 #else
 ,{jjWRONG,      DET_CMD,         INT_CMD,        INTMAT_CMD }
 ,{jjmpDetBareiss,DET_CMD,        XS(POLY_CMD),   MATRIX_CMD }
