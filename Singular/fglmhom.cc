@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmhom.cc,v 1.2 1997-10-06 12:19:11 obachman Exp $
+// $Id: fglmhom.cc,v 1.3 1997-10-18 11:03:26 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -28,27 +28,17 @@
 #include "mmemory.h"
 #include "fglm.h"
 #include "fglmvec.h"
+#include "fglmgauss.h"
 #include "intvec.h"
+#include "kstd1.h"
 #include "stairc.h"  // -> hHStdSeries, hFirstSeries usw.
 #include <templates/list.h>
 
-#define PROT(msg)
+#define PROT(msg) if (BTEST1(OPT_PROT)) Print(msg)
 #define STICKYPROT(msg) if (BTEST1(OPT_PROT)) Print(msg)
-#define PROT2(msg,arg)
+#define PROT2(msg,arg) if (BTEST1(OPT_PROT)) Print(msg,arg)
 #define STICKYPROT2(msg,arg) if (BTEST1(OPT_PROT)) Print(msg,arg)
 #define fglmASSERT(ignore1,ignore2)
-
-
-struct homogElem
-{
-    poly mon;
-//    fglmVector v;
-    int basis;
-    BOOLEAN inDest;
-    homogElem( poly m, int b, BOOLEAN ind ) : mon(m), 
-//v(), 
-	basis(b), inDest(ind) {}
-};
 
 struct doublepoly
 {
@@ -56,15 +46,38 @@ struct doublepoly
     poly dm;
 };
 
+class homogElem
+{
+public:
+    doublepoly mon;
+    fglmVector v;
+    fglmVector dv;
+    int basis;
+    int destbasis;
+    BOOLEAN inDest;
+    homogElem() : v(), dv(), basis(0), destbasis(0), inDest(FALSE) {}
+    homogElem( poly m, int b, BOOLEAN ind ) :
+	basis(b), inDest(ind) 
+    {
+	mon.dm= m;
+	mon.sm= NULL;
+    }
+};
+
 struct homogData 
 {
+    ideal sourceIdeal;
     doublepoly * sourceHeads;
     int numSourceHeads;
     ideal destIdeal;
     int numDestPolys;
     homogElem * monlist;
+    int monlistmax;
+    int monlistblock;
     int numMonoms;
     int basisSize;
+    int overall;  // nur zum testen.
+    int numberofdestbasismonoms;
 //     homogData() : sourceHeads(NULL), numSourceHeads(0), monlist(NULL), 
 // 	numMonoms(0), basisSize(0) {}
 };
@@ -110,6 +123,7 @@ generateMonoms( poly m, int var, int deg, homogData * dat )
 	poly mon = pCopy( m );
 	pSetExp( mon, var, deg );
 	pSetm( mon );
+	++dat->overall;
 	int i;
 	for ( i= dat->numSourceHeads - 1; (i >= 0) && (inSource==FALSE); i-- ) {
 	    if ( pDivisibleBy( dat->sourceHeads[i].dm, mon ) ) {
@@ -123,15 +137,24 @@ generateMonoms( poly m, int var, int deg, homogData * dat )
 	}
 	if ( (!inSource) || (!inDest) ) {
 	    int basis = 0;
-	    if ( !inSource ) basis= ++(dat->basisSize);
+	    if ( !inSource )
+		basis= ++(dat->basisSize);
+	    if ( !inDest ) 
+		++dat->numberofdestbasismonoms;
+	    if ( dat->numMonoms == dat->monlistmax ) {
+		dat->monlist= (homogElem * )ReAlloc( dat->monlist, (dat->monlistmax)*sizeof( homogElem ), (dat->monlistmax+dat->monlistblock) * sizeof( homogElem ) );
+		int k;
+		for ( k= dat->monlistmax; k < (dat->monlistmax+dat->monlistblock); k++ ) 
+		    dat->monlist[k].homogElem();
+		dat->monlistmax+= dat->monlistblock;
+	    }
 	    dat->monlist[dat->numMonoms]= homogElem( mon, basis, inDest );
 	    dat->numMonoms++;
-	    PROT2( " %s", pString(mon) );
-	    if ( inSource ) PROT( "(s)" );
-	    if ( inDest ) PROT( "(d)" );
+	    if ( inSource && ! inDest ) PROT( "\\" );
+	    if ( ! inSource && inDest ) PROT( "/" );
+	    if ( ! inSource && ! inDest ) PROT( "." );
 	}
 	else {
-	    PROT2( "{%s}", pString(mon) );
 	    pDelete( & mon );
 	}
 	return;
@@ -149,26 +172,129 @@ generateMonoms( poly m, int var, int deg, homogData * dat )
     return;
 }
 
+void
+mapMonoms( ring oldRing, homogData & dat ) 
+{
+    int * vperm = (int *)Alloc( (currRing->N + 1)*sizeof(int) );
+    maFindPerm( oldRing->names, oldRing->N, NULL, 0, currRing->names, currRing->N, NULL, 0, vperm, NULL );
+    nSetMap( oldRing->ch, oldRing->parameter, oldRing->P, oldRing->minpoly );
+    int s;
+    for ( s= dat.numMonoms - 1; s >= 0; s-- ) {
+	dat.monlist[s].mon.sm= pPermPoly( dat.monlist[s].mon.dm, vperm, currRing->N, NULL, 0 );
+    }
+}
+
+void
+getVectorRep( homogData & dat ) 
+{
+    // Calculate the NormalForms
+    int s;
+    for ( s= 0;  s < dat.numMonoms; s++ ) {
+	if ( dat.monlist[s].inDest == FALSE ) {
+	    fglmVector v;
+	    if ( dat.monlist[s].basis == 0 ) {
+		v= fglmVector( dat.basisSize );
+		// now the monom is in L(source)
+		PROT( "(" );
+		poly nf = kNF( dat.sourceIdeal, NULL, dat.monlist[s].mon.sm );
+		PROT( ")" );
+		poly temp = nf;
+		while (temp != NULL ) {
+		    int t;
+		    for ( t= dat.numMonoms - 1; t >= 0; t-- ) {
+			if ( dat.monlist[t].basis > 0 ) {
+			    if ( pEqual( dat.monlist[t].mon.sm, temp ) ) {
+				number coeff= nCopy( pGetCoeff( temp ) );
+				v.setelem( dat.monlist[t].basis, coeff );
+			    }
+			}
+		    }
+		    temp= pIter(temp);
+		}
+		pDelete( & nf );
+	    }
+	    else {
+		PROT( "." );
+		v= fglmVector( dat.basisSize, dat.monlist[s].basis );
+	    }
+	    dat.monlist[s].v= v;
+	}
+    }
+}
+
+void
+remapVectors( ring oldring, homogData & dat ) 
+{
+    nSetMap( oldring->ch, oldring->parameter, oldring->P, oldring->minpoly );
+    int s;
+    for ( s= dat.numMonoms - 1; s >= 0; s-- ) {
+	if ( dat.monlist[s].inDest == FALSE ) {
+	    int k;
+	    fglmVector newv( dat.basisSize );
+	    for ( k= dat.basisSize; k > 0; k-- ){
+		number newnum= nMap( dat.monlist[s].v.getelem( k ) );
+		newv.setelem( k, newnum );
+	    }
+	    dat.monlist[s].dv= newv;
+	}
+    }
+}
+
+void
+gaussreduce( homogData & dat, int maxnum, int BS ) 
+{
+    int s;
+    int found= 0;
+
+    int destbasisSize = 0;
+    gaussReducer gauss( dat.basisSize );
+    
+    for ( s= 0; (s < dat.numMonoms) && (found < maxnum); s++ ) {
+	if ( dat.monlist[s].inDest == FALSE ) {
+	    if ( gauss.reduce( dat.monlist[s].dv ) == FALSE ) {
+		destbasisSize++;
+		dat.monlist[s].destbasis= destbasisSize;
+		gauss.store();
+		PROT( "." );
+	    }
+	    else {
+		fglmVector p= gauss.getDependence();
+		poly result = pCopy( dat.monlist[s].mon.dm );
+		pSetCoeff( result, nCopy( p.getconstelem( p.size() ) ) );
+		int l = 0;
+		int k;
+		for ( k= 1; k < p.size(); k++ ) {
+		    if ( ! p.elemIsZero( k ) ) {
+			while ( dat.monlist[l].destbasis != k ) 
+			    l++;
+			poly temp = pCopy( dat.monlist[l].mon.dm );
+			pSetCoeff( temp, nCopy( p.getconstelem( k ) ) );
+			result= pAdd( result, temp );
+		    }
+		}
+		if ( ! nGreaterZero( pGetCoeff( result ) ) ) result= pNeg( result );
+//		PROT2( "(%s)", pString( result ) );
+		PROT( "+" );
+		found++;
+		(dat.destIdeal->m)[dat.numDestPolys]= result;
+		dat.numDestPolys++;
+		if ( IDELEMS(dat.destIdeal) == dat.numDestPolys ) {
+		    pEnlargeSet( & dat.destIdeal->m, IDELEMS( dat.destIdeal ), BS );
+		    IDELEMS( dat.destIdeal )+= BS;
+		}
+		
+	    }
+		
+	}
+    }
+    PROT2( "(%i", s );
+    PROT2( "/%i)", dat.numberofdestbasismonoms );
+}
+
+
 BOOLEAN
 fglmhomog( idhdl sourceRingHdl, ideal sourceIdeal, idhdl destRingHdl, ideal & destIdeal )
-//homogfglm( idhdl sRingHdl, ideal sIdeal, idhdl dRingHdl, int * varperm, int * parperm )
 {
-//-> oldversion
-//     int deg = 0;
-//     int numelems = 0;
-//     int groebnerBS = 16;
-//     List<hdestElem> monlist;
-//     rSetHdl( sourceRingHdl, TRUE );
-//     intvec * sourcehilb = hHstdSeries( sourceIdeal, NULL, currQuotient );
-//     rSetHdl( destRingHdl, TRUE );
-//     ideal destIdeal = idInit( groebnerBS, 1 );
-//     numelems= hfglmNextdegree( sourcehilb, destIdeal, deg );
-//     Print( "**Next Step: numelems %i in degree %i\n", numelems, deg );
-
-//     monomsOfDegree( deg, monlist );
-//     Print( "number: %i\n", monlist.length() );
-//     return destIdeal;
-//<-
 #define groebnerBS 16
     int numGBelems;
     int deg = 0;
@@ -181,6 +307,7 @@ fglmhomog( idhdl sourceRingHdl, ideal sourceIdeal, idhdl destRingHdl, ideal & de
 
     intvec * hilb = hHstdSeries( sourceIdeal, NULL, currQuotient ); 
     int s;
+    dat.sourceIdeal= sourceIdeal;
     dat.sourceHeads= (doublepoly *)Alloc( IDELEMS( sourceIdeal ) * sizeof( doublepoly ) );
     for ( s= IDELEMS( sourceIdeal ) - 1; s >= 0; s-- ) {
 	dat.sourceHeads[s].sm= pHead( (sourceIdeal->m)[s] );
@@ -196,140 +323,69 @@ fglmhomog( idhdl sourceRingHdl, ideal sourceIdeal, idhdl destRingHdl, ideal & de
     for ( s= IDELEMS( sourceIdeal ) - 1; s >= 0; s-- ) {
 	dat.sourceHeads[s].dm= pPermPoly( dat.sourceHeads[s].sm, vperm, sourceRing->N, NULL, 0 );
     }
-    PROT( "sourceHeads: " );
-    for ( s= dat.numSourceHeads - 1; s >= 0; s-- ) {
-	PROT2( "%s ", pString(dat.sourceHeads[s].dm) );
-    }
-    PROT( "\n" );
 
-    dat.destIdeal= idInit( 0, 1 );
+    dat.destIdeal= idInit( groebnerBS, 1 );
     dat.numDestPolys= 0;
-//     dat.destIdeal = idInit( groebnerBS, 1 );
 
-    if ( (numGBelems= hfglmNextdegree( hilb, dat.destIdeal, deg )) != 0 ) {
+    while ( (numGBelems= hfglmNextdegree( hilb, dat.destIdeal, deg )) != 0 ) {
 	int num = 0;  // the number of monoms of degree deg
-	PROT2( "[deg= %i >", deg );
-	dat.monlist= (homogElem *)Alloc( 100*sizeof( homogElem ) );
+	PROT2( "deg= %i ", deg );
+	PROT2( "num= %i\ngen>", numGBelems );
+	dat.monlistblock= 512;
+	dat.monlistmax= dat.monlistblock;
+	dat.monlist= (homogElem *)Alloc( dat.monlistmax*sizeof( homogElem ) );
+	int j;
+	for ( j= dat.monlistmax - 1; j >= 0; j-- ) dat.monlist[j].homogElem();
 	dat.numMonoms= 0;
+	dat.basisSize= 0;
+	dat.overall= 0;
+	dat.numberofdestbasismonoms= 0;
+	
 	poly start= pOne();
 	generateMonoms( start, 1, deg, &dat );
 	pDelete( & start );
-	Free( (ADDRESS)dat.monlist, 100*sizeof( homogElem ) );
-	PROT( " < " );
-    }
-//     while ( (numGBelems= nextdegree( hilb, dIdeal, deg )) != 0 ) {
-// 	int num = 0;  // the number of monoms of degree deg
-// 	PROT2( "[deg= %i", deg );
-// 	PROT( " >" );
-// 	poly start= pOne();
-// 	generateMonoms( pOne, 1, deg, &dat );
-// 	pDelete( & start );
-//     }
-    
-	// Calculate 
-// 	hsourceElem * sourcelist = degmon( deg, num, dIdeal );
-	// check if monoms are already in dIdeal:
-// 	int k;
-// 	for ( k= num; k > 0; k-- ) {
-// 	    sourcelist[k].inIdeal= isinIdeal( sourcelist[k].m, dIdeal );
-// 	}
-// 	getVectorRep( sRingHdl, sIdeal, varperm, parperm, sourcelist );
-// 	k= 1;
-// 	while ( (k <= num) && (numGBelems > 0) ) {
-	    
 
-// 	Free( (ADDRESS)hsourceElem, num );
-//     destIdeal= idInit(0,0);
+	PROT2( "(%i/", dat.basisSize );
+	PROT2( "%i)\nvec>", dat.overall );
+	// switch to sourceRing and map monoms
+	rSetHdl( sourceRingHdl, TRUE );
+	mapMonoms( destRing, dat );
+	getVectorRep( dat );
+	
+	// switch to destination Ring and remap the vectors
+	rSetHdl( destRingHdl, TRUE );
+	remapVectors( sourceRing, dat );
+	
+	PROT( "<\nred>" );
+	// now do gaussian reduction
+	gaussreduce( dat, numGBelems, groebnerBS );
+
+	Free( (ADDRESS)dat.monlist, dat.monlistmax*sizeof( homogElem ) );
+	PROT( "<\n" );
+    }
     PROT( "\n" );
+    destIdeal= dat.destIdeal;
+    idSkipZeroes( destIdeal );
     return TRUE;
-//    return idInit(0,0);
 }
 
+ideal
+fglmhomProc(leftv first, leftv second)
+{
+    idhdl dest= currRingHdl;
+    ideal result;
+    // in den durch das erste Argument angegeben Ring schalten:
+    rSetHdl( (idhdl)first->data, TRUE );
+    idhdl ih= currRing->idroot->get( second->name, myynest );
+    ASSERT( ih!=NULL, "Error: Can't find ideal in ring");
+    rSetHdl( dest, TRUE );
 
+    ideal i= IDIDEAL(ih);
+    fglmhomog( (idhdl)first->data, i, dest, result );
 
+    return( result );
+}
 
-
-// //-> enum HomogFglmState
-// //     enumeration to handle the various errors to occour.
-// enum HomogFglmState{ 
-//     HomogFglmOk, 
-//     HomogFglmHasOne, 
-//     HomogFglmNoIdeal,
-//     HomogFglmNotReduced,
-//     HomogFglmNotZeroDim, 
-//     HomogFglmIncompatibleRings
-// };
-// //<-
-
-// //-> BOOLEAN homogfglmProc( leftv result, leftv first, leftv second )
-// //     the main function for the fglm-Algorithm. 
-// //     Checks the input-data, calls CalculateFunctionals, handles change
-// //     of ring-vars and finaly calls GroebnerViaFunctionals.
-// //     returns the new groebnerbasis or 0 if an error occoured.
-// BOOLEAN
-// homogfglmProc( leftv result, leftv first, leftv second ) 
-// {
-//     HomogFglmState state = HomogFglmOk;
-//     idhdl destRingHdl = currRingHdl;
-//     ring destRing = currRing;
-//     int destChar= nGetChar();
-//     rSetHdl( (idhdl)first->data, TRUE );
-//     idhdl sourceRingHdl = currRingHdl;
-//     ideal sourceIdeal;
-
-//     idhdl ih = currRing->idroot->get( second->name, myynest );
-//     if ( ih == NULL ) state= HomogFglmNoIdeal;
-    
-//     //. check if rings are compatible: (i.e. same Characteristic and same var-names)
-//     if ( nGetChar() != destChar ) state= HomogFglmIncompatibleRings;
-//     else {
-// 	if ( currRing->N == destRing->N ) {
-// // 	    maFindPerm( currRing->names, pVariables, NULL, destRing->names, pVariables, NULL, perm, NULL );
-// // 	    for ( int k = 1; state == HomogFglmOk && k <= pVariables; k++ ) 
-// // 		if ( perm[k] <= 0 ) state= HomogFglmIncompatibleRings;
-// 	} else state= HomogFglmIncompatibleRings;
-//     }
-//     ideal destIdeal;
-//     //. In den Zielring schalten und die neue Basis ausrechnen:
-//     rSetHdl( destRingHdl, TRUE );
-//     switch (state) {
-// 	case HomogFglmOk:
-// 	    sourceIdeal= IDIDEAL( ih );
-// 	    assumeStdFlag( (leftv)ih );
-// 	    destIdeal= homogfglm( sourceRingHdl, sourceIdeal, destRingHdl, NULL, NULL );
-// 	    break;
-// 	case HomogFglmHasOne:
-// 	    destIdeal= idInit(1,1);
-// 	    (destIdeal->m)[0]= pOne();
-// 	    break;
-// 	case HomogFglmIncompatibleRings:
-// 	    Werror( "ring %s and current ring are incompatible", first->name );
-// 	    destIdeal= idInit(0,0);
-// 	    break;
-// 	case HomogFglmNoIdeal:
-// 	    Werror( "Can't find ideal %s in ring %s", second->name, first->name );
-// 	    destIdeal= idInit(0,0);
-// 	    break;
-// 	case HomogFglmNotZeroDim:
-// 	    Werror( "The ideal %s has to be 0-dimensional", second->name );
-// 	    destIdeal= idInit(0,0);
-// 	    break;
-// 	case HomogFglmNotReduced:
-// 	    Werror( "The ideal %s has to be reduced", second->name );
-// 	    destIdeal= idInit(0,0);
-// 	    break;
-// 	default:
-// 	    destIdeal= idInit(1,1);
-//     }
-//     result->rtyp = IDEAL_CMD;
-//     result->data= (void *)destIdeal;
-//     setFlag( result, FLAG_STD );
-//     if ( state == HomogFglmOk )
-// 	return FALSE;
-//     else
-// 	return TRUE;
-// }
-// //<-
 #endif
 
 // Questions:
