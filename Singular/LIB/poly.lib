@@ -1,9 +1,9 @@
-// $Id: poly.lib,v 1.20 1999-12-21 11:58:36 Singular Exp $
+// $Id: poly.lib,v 1.21 2000-01-10 16:24:29 obachman Exp $
 //(GMG, last modified 22.06.96)
 //(obachman: 17.12.97 -- added katsura)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: poly.lib,v 1.20 1999-12-21 11:58:36 Singular Exp $";
+version="$Id: poly.lib,v 1.21 2000-01-10 16:24:29 obachman Exp $";
 info="
 LIBRARY:  poly.lib      PROCEDURES FOR MANIPULATING POLYS, IDEALS, MODULES
 
@@ -679,4 +679,60 @@ example
    vector v=[3x2+18xy-27xyz,15x2+12y4,3];
    content(v);
 }
+///////////////////////////////////////////////////////////////////////////////
 
+proc numerator(number n)
+"USAGE: numerator(n); n number
+RETURN: number, the numerator of n
+SEE ALSO: denominator, content, cleardenom
+EXAMPLE: example numerator; shows an example
+"
+{
+  poly p = n*var(1) + 1;
+  p = cleardenom(p);
+  
+  if (lead(var(1) + 1) == 1)
+  {
+    p = p - lead(p);
+  }
+  
+  return (leadcoef(p));
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,x, dp;
+  number n = 3/2;
+  numerator(n);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc denominator(number n)
+"USAGE: denominator(n); n number
+RETURN: number, the denominator of n
+SEE ALSO: denominator, content, cleardenom
+EXAMPLE: example denominator; shows an example
+"
+{
+  poly p = n*var(1) + 1;
+  p = cleardenom(p);
+  
+  if (lead(var(1) + 1) != 1)
+  {
+    p = p - lead(p);
+  }
+  
+  return (leadcoef(p));
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,x, dp;
+  number n = 3/2;
+  denominator(n);
+}
+
+
+
+  
