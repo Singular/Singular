@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: units.cc,v 1.1 2001-02-01 13:20:06 mschulze Exp $ */
+/* $Id: units.cc,v 1.2 2001-02-01 15:14:21 mschulze Exp $ */
 /*
 * ABSTRACT: procedures to compute with units
 */
@@ -36,38 +36,41 @@ BOOLEAN isunit(matrix U)
 
 BOOLEAN invunit(leftv res,leftv h)
 {
-  if(h!=NULL&&h->Typ()==POLY_CMD)
+  if(h!=NULL)
   {
-    poly u=(poly)h->Data();
-    if(!isunit(u))
+    if(h->Typ()==POLY_CMD)
     {
-      WerrorS("unit expected");
-      return TRUE;
+      poly u=(poly)h->Data();
+      if(!isunit(u))
+      {
+        WerrorS("unit expected");
+        return TRUE;
+      }
+      h=h->next;
+      if(h!=NULL&&h->Typ()==INT_CMD)
+      {
+        int n=(int)h->Data();
+        res->rtyp=POLY_CMD;
+        res->data=(void*)invunit(pCopy(u),n);
+        return FALSE;
+      }
     }
-    h=h->next;
-    if(h&&h->Typ()==INT_CMD)
+    if(h->Typ()==MATRIX_CMD)
     {
-      int n=(int)h->Data();
-      res->rtyp=POLY_CMD;
-      res->data=(void*)invunit(pCopy(u),n);
-      return FALSE;
-    }
-  }
-  if(h!=NULL&&h->Typ()==MATRIX_CMD)
-  {
-    matrix U=(matrix)h->Data();
-    if(!isunit(U))
-    {
-      WerrorS("diagonal matrix of units expected");
-      return TRUE;
-    }
-    h=h->next;
-    if(h&&h->Typ()==INT_CMD)
-    {
-      int n=(int)h->Data();
-      res->rtyp=MATRIX_CMD;
-      res->data=(void*)invunit(mpCopy(U),n);
-      return FALSE;
+      matrix U=(matrix)h->Data();
+      if(!isunit(U))
+      {
+        WerrorS("diagonal matrix of units expected");
+        return TRUE;
+      }
+      h=h->next;
+      if(h!=NULL&&h->Typ()==INT_CMD)
+      {
+        int n=(int)h->Data();
+        res->rtyp=MATRIX_CMD;
+        res->data=(void*)invunit(mpCopy(U),n);
+        return FALSE;
+      }
     }
   }
   WerrorS("[<poly>|<matrix>],<int> expected");
@@ -114,54 +117,57 @@ matrix invunit(matrix U,int n)
 
 BOOLEAN series(leftv res,leftv h)
 {
-  if(h!=NULL&&(h->Typ()==POLY_CMD||h->Typ()==VECTOR_CMD))
+  if(h!=NULL)
   {
-    int typ=h->Typ();
-    poly p=(poly)h->Data();
-    h=h->next;
-    if(h&&h->Typ()==POLY_CMD)
+    if(h->Typ()==POLY_CMD||h->Typ()==VECTOR_CMD)
     {
-      poly u=(poly)h->Data();
-      if(!isunit(u))
-      {
-        WerrorS("unit expected");
-        return TRUE;
-      }
+      int typ=h->Typ();
+      poly p=(poly)h->Data();
       h=h->next;
-      if(h&&h->Typ()==INT_CMD)
+      if(h!=NULL&&h->Typ()==POLY_CMD)
       {
-        int n=(int)h->Data();
-        res->rtyp=typ;
-        res->data=(void*)series(pCopy(p),pCopy(u),n);
-        return FALSE;
+        poly u=(poly)h->Data();
+        if(!isunit(u))
+        {
+          WerrorS("unit expected");
+          return TRUE;
+        }
+        h=h->next;
+        if(h!=NULL&&h->Typ()==INT_CMD)
+        {
+          int n=(int)h->Data();
+          res->rtyp=typ;
+          res->data=(void*)series(pCopy(p),pCopy(u),n);
+          return FALSE;
+        }
       }
     }
-  }
-  if(h!=NULL&&(h->Typ()==IDEAL_CMD||h->Typ()==MODUL_CMD))
-  {
-    int typ=h->Typ();
-    ideal M=(ideal)h->Data();
-    h=h->next;
-    if(h&&h->Typ()==MATRIX_CMD)
+    if(h->Typ()==IDEAL_CMD||h->Typ()==MODUL_CMD)
     {
-      matrix U=(matrix)h->Data();
-      if(!isunit(U))
-      {
-        WerrorS("diagonal matrix of units expected");
-        return TRUE;
-      }
-      if(IDELEMS(M)!=MATROWS(U))
-      {
-        WerrorS("matrix size not compatible");
-        return TRUE;
-      }
+      int typ=h->Typ();
+      ideal M=(ideal)h->Data();
       h=h->next;
-      if(h&&h->Typ()==INT_CMD)
+      if(h!=NULL&&h->Typ()==MATRIX_CMD)
       {
-        int n=(int)h->Data();
-        res->rtyp=typ;
-        res->data=(void*)series(idCopy(M),mpCopy(U),n);
-        return FALSE;
+        matrix U=(matrix)h->Data();
+        if(!isunit(U))
+        {
+          WerrorS("diagonal matrix of units expected");
+          return TRUE;
+        }
+        if(IDELEMS(M)!=MATROWS(U))
+        {
+          WerrorS("incompatible matrix size");
+          return TRUE;
+        }
+        h=h->next;
+        if(h!=NULL&&h->Typ()==INT_CMD)
+        {
+          int n=(int)h->Data();
+          res->rtyp=typ;
+          res->data=(void*)series(idCopy(M),mpCopy(U),n);
+          return FALSE;
+        }
       }
     }
   }
@@ -186,36 +192,69 @@ ideal series(ideal M,matrix U,int n)
 
 BOOLEAN rednf(leftv res,leftv h)
 {
-  if(h!=NULL&&(h->Typ()==IDEAL_CMD||h->Typ()==MODUL_CMD))
+  if(h!=NULL)
   {
-    int typ=h->Typ();
-    ideal N=(ideal)h->Data();
-    h=h->next;
-    if(h&&h->Typ()==typ)
+    if(h->Typ()==IDEAL_CMD||h->Typ()==MODUL_CMD)
     {
-      ideal M=(ideal)h->Data();
+      int typ=h->Typ();
+      ideal N=(ideal)h->Data();
       h=h->next;
-      matrix U;
-      if(h&&h->Typ()==MATRIX_CMD)
+      if(h!=NULL&&h->Typ()==typ)
       {
-        U=(matrix)h->Data();
-        if(!isunit(U))
+        ideal M=(ideal)h->Data();
+        h=h->next;
+        if(h==NULL)
         {
-          WerrorS("diagonal matrix of units expected");
-          return TRUE;
+          res->rtyp=typ;
+          res->data=(void*)rednf(idCopy(N),idCopy(M));
+          return FALSE;
         }
-        if(IDELEMS(M)!=MATROWS(U))
+        if(h->Typ()==MATRIX_CMD)
         {
-          WerrorS("matrix size not compatible");
-          return TRUE;
+          matrix U=(matrix)h->Data();
+          if(!isunit(U))
+          {
+            WerrorS("diagonal matrix of units expected");
+            return TRUE;
+          }
+          if(IDELEMS(M)!=MATROWS(U))
+          {
+            WerrorS("incompatible matrix size");
+            return TRUE;
+          }
+          res->rtyp=typ;
+          res->data=(void*)rednf(idCopy(N),idCopy(M),mpCopy(U));
+          return FALSE;
         }
       }
-      res->rtyp=typ;
-      res->data=(void*)rednf(idCopy(N),idCopy(M),mpCopy(U));
-      return FALSE;
+      if(typ==IDEAL_CMD&&h->Typ()==POLY_CMD||
+         typ==MODUL_CMD&&h->Typ()==VECTOR_CMD)
+      {
+        typ=h->Typ();
+        poly p=(poly)h->Data();
+        h=h->next;
+        if(h==NULL)
+        {
+          res->rtyp=typ;
+          res->data=(void*)rednf(idCopy(N),pCopy(p));
+          return FALSE;
+        }
+        if(h->Typ()==POLY_CMD)
+        {
+          poly u=(poly)h->Data();
+          if(!isunit(u))
+          {
+            WerrorS("unit expected");
+            return TRUE;
+          }
+          res->rtyp=typ;
+          res->data=(void*)rednf(idCopy(N),pCopy(p),pCopy(u));
+          return FALSE;
+	}
+      }
     }
   }
-  WerrorS("<ideal>,<ideal>[,<matrix>] expected");
+  WerrorS("<ideal>,[<ideal>|<poly>][,<matrix>] expected");
   return TRUE;
 }
 
@@ -255,4 +294,23 @@ ideal rednf(ideal N,ideal M,matrix U=NULL)
   if(U0!=NULL)
     idDelete((ideal*)&U0);
   return M0;
+}
+
+poly rednf(ideal N,poly p,poly u=NULL)
+{
+  ideal M=idInit(1,pGetComp(p));
+  M->m[0]=p;
+  ideal M0;
+  if(u==NULL)
+    M0=rednf(N,M);
+  else
+  {
+    matrix U=mpInitI(1,1,NULL);
+    MATELEM(U,1,1)=u;
+    M0=rednf(N,M,U);
+  }
+  poly p0=M0->m[0];
+  M0->m[0]=NULL;
+  idDelete(&M0);
+  return p0;
 }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: units.h,v 1.1 2001-02-01 13:11:15 mschulze Exp $ */
+/* $Id: units.h,v 1.2 2001-02-01 15:14:21 mschulze Exp $ */
 /*
 * ABSTRACT: procedures to compute with units
 */
@@ -17,5 +17,6 @@ poly series(poly p,poly u,int n);
 ideal series(ideal M,matrix U,int n);
 BOOLEAN rednf(leftv res,leftv h);
 ideal rednf(ideal N,ideal M,matrix U=NULL);
+poly rednf(ideal N,poly p,poly u=NULL);
 
 #endif
