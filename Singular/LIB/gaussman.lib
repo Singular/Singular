@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.39 2001-05-25 09:38:10 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.40 2001-05-25 18:40:19 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -39,6 +39,70 @@ LIB "linalg.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 
+static proc stdtrans(ideal I)
+{
+  def @R=basering;
+
+  string s=ordstr(@R);
+  int j=find(s,",C");
+  if(j==0)
+  {
+    j=find(s,"C,");
+  }
+  if(j==0)
+  {
+    j=find(s,",c");
+  }
+  if(j==0)
+  {
+    j=find(s,"c,");
+  }
+  if(j>0)
+  {
+    s[j..j+1]="  ";
+  }
+
+  s="ring @S="+charstr(@R)+",(@t,"+varstr(@R)+"),(c,dp,"+s+");";
+  execute(s);
+
+  ideal I=homog(imap(@R,I),@t);
+  module M=transpose(transpose(I)+freemodule(ncols(I)));
+  M=std(M);
+
+  setring(@R);
+  s="map h=@S,1,"+varstr(@R)+";";
+  execute(s);
+
+  module M=h(M);
+
+  for(int i=ncols(M);i>=1;i--)
+  {
+    for(j=ncols(M);j>=1;j--)
+    {
+      if(M[i][1]==0)
+      {
+        M[i]=0;
+      }
+      if(i!=j&&M[j][1]!=0)
+      {
+        if(lead(M[i][1])/lead(M[j][1])!=0)
+        {
+          M[i]=0;
+        }
+      }
+    }
+  }
+
+  M=transpose(simplify(M,2));
+  I=M[1];
+  attrib(I,"isSB",1);
+  M=M[2..ncols(M)];
+  module U=transpose(M);
+
+  return(list(I,U));
+}
+///////////////////////////////////////////////////////////////////////////////
+
 proc gms(poly t,string s)
 "USAGE:    gms(f,s); poly f, string s;
 ASSUME:   basering has characteristic 0 and local degree ordering,
@@ -63,12 +127,12 @@ KEYWORDS: singularities; Gauss-Manin connection
 EXAMPLE:  example gms; shows examples
 "
 {
-  def R=basering;
-  if(charstr(R)!="0")
+  def @R=basering;
+  if(charstr(@R)!="0")
   {
     ERROR("characteristic 0 expected");
   }
-  for(int i=nvars(R);i>=1;i--)
+  for(int i=nvars(@R);i>=1;i--)
   {
     if(var(i)>1)
     {
@@ -77,7 +141,7 @@ EXAMPLE:  example gms; shows examples
   }
 
   int @wmax;
-  for(i=nvars(R);i>=1;i--)
+  for(i=nvars(@R);i>=1;i--)
   {
     if(deg(var(i))>@wmax)
     {
@@ -86,7 +150,8 @@ EXAMPLE:  example gms; shows examples
   }
 
   ideal dt=jacob(t);
-  ideal g=std(dt);
+  list l=stdtrans(dt);
+  ideal g=l[1];
   if(vdim(g)<=0)
   {
     if(vdim(g)==0)
@@ -98,22 +163,18 @@ EXAMPLE:  example gms; shows examples
       ERROR("isolated singularity at 0 expected");
     }
   }  
-
-  list l=division(dt,g);
-  matrix a=l[1];
-  g=matrix(g)*l[2];
-  attrib(g,"isSB",1);
+  matrix a=l[2];
   ideal m=kbase(g);
 
-  string G="ring @G="+string(charstr(R))+",("+s+","+varstr(R)+
-    "),(ws("+string(deg(highcorner(g))+@wmax)+"),",ordstr(R),");";
+  string G="ring @G="+string(charstr(@R))+",("+s+","+varstr(@R)+
+    "),(ws("+string(deg(highcorner(g))+@wmax)+"),",ordstr(@R),");";
   execute(G);
 
-  poly @t=imap(R,t);
-  ideal @dt=imap(R,dt);
-  ideal @g=imap(R,g);
-  matrix @a=imap(R,a);
-  ideal @m=imap(R,m);
+  poly @t=imap(@R,t);
+  ideal @dt=imap(@R,dt);
+  ideal @g=imap(@R,g);
+  matrix @a=imap(@R,a);
+  ideal @m=imap(@R,m);
 
   attrib(@g,"isSB",1);
   export @t,@dt,@g,@a,@m,@wmax;
@@ -357,11 +418,11 @@ EXAMPLE:  example monodromy; shows examples
     }
   }
 
-  def R=basering;
+  def @R=basering;
   def G=gms(f,"s");
   setring G;
 
-  int n=nvars(R)-1;
+  int n=nvars(@R)-1;
   int mu,modm=ncols(@m),maxorddif(@m);
   ideal w=@t*@m;
   list l;
@@ -376,7 +437,6 @@ EXAMPLE:  example monodromy; shows examples
   {
     k++;
     dbprint(printlevel-voice+2,"//gaussman::monodromy: k="+string(k));
-
     dbprint(printlevel-voice+2,"//gaussman::monodromy: compute C");
     if(opt==0)
     {
@@ -404,6 +464,8 @@ EXAMPLE:  example monodromy; shows examples
     "//gaussman::monodromy: compute basis of saturation");
   H=minbase(H0);
   int modH=maxorddif(H)/deg(s);
+  dbprint(printlevel-voice+2,"//gaussman::monodromy: k="+string(modH+1));
+  dbprint(printlevel-voice+2,"//gaussman::monodromy: compute C");
   if(opt==0)
   {
     l=gmscoeffs(w,modH+1,modH+1);
@@ -431,7 +493,7 @@ EXAMPLE:  example monodromy; shows examples
 
   if(opt==0)
   {
-    setring(R);
+    setring(@R);
     ideal e=imap(G,e);
     return(e);
   }
@@ -440,6 +502,9 @@ EXAMPLE:  example monodromy; shows examples
 
   if(mide>0)
   {
+    dbprint(printlevel-voice+2,
+      "//gaussman::monodromy: k="+string(modH+1+mide));
+    dbprint(printlevel-voice+2,"//gaussman::monodromy: compute C");
     l=gmscoeffs(w,modH+1+mide,modH+1+mide);
     C,w=l[1..2];
     A0=A0+C;
@@ -521,7 +586,7 @@ EXAMPLE:  example monodromy; shows examples
   }
   A=jet(A,0);
 
-  setring(R);
+  setring(@R);
   matrix A=imap(G,A);
   return(A);
 }
@@ -568,11 +633,11 @@ EXAMPLE:  example vfiltration; shows examples
     }
   }
 
-  def R=basering;
+  def @R=basering;
   def G=gms(f,"s");
   setring G;
 
-  int n=nvars(R)-1;
+  int n=nvars(@R)-1;
   int mu,modm=ncols(@m),maxorddif(@m);
   ideal w=@t*@m;
   list l;
@@ -588,7 +653,6 @@ EXAMPLE:  example vfiltration; shows examples
   {
     k++;
     dbprint(printlevel-voice+2,"//gaussman::vfiltration: k="+string(k));
-
     dbprint(printlevel-voice+2,"//gaussman::vfiltration: compute C");
     l=gmscoeffs(w,k);
     C,w=l[1..2];
@@ -609,6 +673,8 @@ EXAMPLE:  example vfiltration; shows examples
     "//gaussman::vfiltration: compute basis of saturation");
   H=minbase(H0);
   int modH=maxorddif(H)/deg(s);
+  dbprint(printlevel-voice+2,"//gaussman::monodromy: k="+string(N+modH));
+  dbprint(printlevel-voice+2,"//gaussman::monodromy: compute C");
   l=gmscoeffs(w,N+modH,N+modH);
   C,w=l[1..2];
   A=A+C;
@@ -779,7 +845,7 @@ EXAMPLE:  example vfiltration; shows examples
       j--;
     }
 
-    setring(R);
+    setring(@R);
     ideal a=imap(G,a);
     return(list(a,d));
   }
@@ -845,7 +911,7 @@ EXAMPLE:  example vfiltration; shows examples
     v[k]=interred(v[k]);
     d[k]=size(v[k]);
 
-    setring(R);
+    setring(@R);
     ideal a=imap(G,a);
     list v=imap(G,v);
     ideal m=imap(G,@m);
