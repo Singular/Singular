@@ -1,5 +1,5 @@
 #! /home/schmidt/bin/bash
-# $Id: runfex,v 1.3 1998-01-30 14:12:57 schmidt Exp $
+# $Id: runfex,v 1.4 1998-01-30 15:23:43 schmidt Exp $
 
 #{{{ docu
 #
@@ -379,7 +379,7 @@ example()
 
     # check for debug mode
     if [ -n "$debugMode" ]; then
-	runAlgorithm "$algorithm" -oas "$@"
+	runAlgorithm "$algorithm" -oa "$@"
 	return
     fi
 
