@@ -16,7 +16,7 @@
 
 #ifndef DO_DEEP_PROFILE
 // undefine to disable fast spoly loops
-#define FAST_SPOLY_LOOP 
+// #define FAST_SPOLY_LOOP 
 #endif
 
 /***************************************************************

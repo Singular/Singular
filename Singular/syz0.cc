@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.19 1999-09-27 14:04:39 obachman Exp $ */
+/* $Id: syz0.cc,v 1.20 1999-09-27 15:32:56 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -593,7 +593,7 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
           toRed = sySpecNormalize(q,mW, NULL);
           pDelete(&multWith);
         }
-        kBucketInit(sy0buck,toRed,-1,&sy0pProcs);
+        kBucketInit(sy0buck,toRed,-1);
         toRed = kBucketGetLm(sy0buck);
         isNotReduced = TRUE;
         while (toRed!=NULL)
@@ -626,7 +626,7 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
               printf("toRed in Pair[%d, %d]:", j, k);
               pWrite(toRed);
 #endif
-              kBucketInit(sy0buck,toRed,-1,&sy0pProcs);
+              kBucketInit(sy0buck,toRed,-1);
               toRed = kBucketGetLm(sy0buck);
               isNotReduced = FALSE;
             }

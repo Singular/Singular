@@ -88,7 +88,6 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     GMPrat.cc multicnt.cc npolygon.cc semic.cc spectrum.cc splist.cc \
     ndbm.cc spSpolyLoop.cc libparse.cc mod_raw.cc\
     pcv.cc kbuckets.cc kbPolyProcs.cc \
-    cPoly.cc cInternalPoly.cc \
     mpr_inout.cc mpr_base.cc mpr_numeric.cc
 # normal C source files
 CSOURCES=mmalloc.c mmheap.c mmpage.c mmcheck.c  mmisc.c mmtables.c \
@@ -386,25 +385,6 @@ DEFSG		= -D@SING_UNAME@ @DEFS@
 ## .og files for having -O and -g object versions available at the same time
 ##
 
-OBJG1=	grammar.og scanner.og matpol.og binom.og gnumpfl.og mpr_complex.og \
-     febase.og feread.og fehelp.og feResource.og timer.og intvec.og attrib.og lists.og \
-     gnumpc.og longrat.og longrat0.og misc.og ring.og numbers.og maps.og\
-     hilb.og comm.og kstd1.og kstd2.og kutil.og khstd.og kstdfac.og modulop.og \
-     spolys.og ideals.og subexpr.og hdegree.og hutil.og ffields.og shortfl.og \
-     longalg.og spolys0.og syz.og syz0.og syz1.og weight.og \
-     ipid.og ipshell.og iplib.og ipassign.og ipconv.og ipprint.og\
-     polys.og polys0.og polys1.og polys-impl.og extra.og\
-     mminit.og sing_dld.og sing_dbm.og silink.og sparsmat.og\
-     sing_mp.og fglm.og fglmzero.og fglmvec.og fglmgauss.og fglmhom.og\
-     algmap.og clapconv.og  clapmem.og clapsing.og cntrlc.og  sdb.og\
-     mpsr_Error.og mpsr_Put.og mpsr_PutPoly.og mpsr_GetPoly.og \
-     mpsr_Get.og mpsr_GetMisc.og \
-     ndbm.og spSpolyLoop.og libparse.og  mod_raw.og \
-     GMPrat.og multicnt.og npolygon.og semic.og spectrum.og splist.og \
-     mpr_inout.og mpr_base.og mpr_numeric.og \
-     pcv.og walk.og kbuckets.og kbPolyProcs.og \
-     cPoly.og cInternalPoly.og
-
 OBJG1 := $(CXXSOURCES:.cc=.og) 
 OBJG2 := $(CSOURCES:.c=.og) 
 
@@ -482,7 +462,7 @@ OBJP1=	grammar.op scanner.op matpol.op binom.op gnumpfl.op mpr_complex.op \
      ndbm.op spSpolyLoop.op libparse.op  mod_raw.op \
      mpr_inout.op mpr_base.op mpr_numeric.op \
      GMPrat.op multicnt.op npolygon.op semic.op spectrum.op splist.op \
-     pcv.op walk.op kbuckets.op kbPolyProcs.op
+     pcv.op kbuckets.op kbPolyProcs.op
 
 OBJP2= mmalloc.op mmheap.op mmpage.op mmcheck.op mmbt.op page.op \
      mmisc.op mmtables.op weight0.op find_exec.op getopt.op fereadl.op
@@ -508,7 +488,7 @@ OBJB1=	grammar.ob scanner.ob matpol.ob binom.ob\
      mpsr_Error.ob mpsr_Put.ob mpsr_PutPoly.ob mpsr_GetPoly.ob \
      mpsr_Get.ob mpsr_GetMisc.ob \
      ndbm.ob spSpolyLoop.ob libparse.ob mod-${SINGUNAME}.ob \
-     pcv.ob walk.ob kbuckets.ob kbPolyProcs.ob
+     pcv.ob kbuckets.ob kbPolyProcs.ob
 
 OBJB2= mmalloc.ob mmheap.ob mmpage.ob mmcheck.ob mmbt.ob page.ob\
      mmisc.ob mmtables.ob weight0.ob find_exec.ob getopt.ob fereadl.ob

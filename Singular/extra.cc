@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.106 1999-09-27 14:52:13 obachman Exp $ */
+/* $Id: extra.cc,v 1.107 1999-09-27 15:32:54 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1097,6 +1097,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
+#ifdef HAVE_WALK
 /*==================== walk stuff =================*/
     if (strcmp(sys_cmd, "walkNextWeight") == 0)
     {
@@ -1141,6 +1142,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
+#endif
 /*==================== Error =================*/
       Werror( "system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.48 1999-09-16 12:33:57 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.49 1999-09-27 15:32:55 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -190,7 +190,7 @@ static void list1(char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
     case RING_CMD:
 #ifdef RDEBUG
                    if (traceit &TRACE_SHOW_RINGS)
-                     Print(" <%d>",IDRING(h)->no);
+                     Print(" <%x>",IDRING(h));
 #endif
                    break;
     /*default:     break;*/

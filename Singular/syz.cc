@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.21 1999-09-27 15:00:30 obachman Exp $ */
+/* $Id: syz.cc,v 1.22 1999-09-27 15:32:56 obachman Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -724,7 +724,7 @@ resolvente syMinRes(ideal arg, int maxlength, int * length, BOOLEAN minim)
 
 int syDetect(ideal id,int index,BOOLEAN homog,int * degrees,int * tocancel)
 {
-  int i, j, k, ModComp,subFromRank=0;
+  int i, j, k, ModComp,subFromRank=0, lu;
   poly p, q, qq, Unit1, Unit2;
   ideal temp;
 
