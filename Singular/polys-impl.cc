@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.45 2000-08-22 09:03:20 Singular Exp $ */
+/* $Id: polys-impl.cc,v 1.46 2000-08-24 14:28:55 Singular Exp $ */
 
 /***************************************************************
  *
@@ -530,7 +530,7 @@ void pDBMonSubFrom(poly p1, poly p2, char* f, int l)
   pFree1(ptemp);
 }
 
-void pDBMonAdd(poly p1, poly p2, poly p3, ring r, char* f, int l)
+void prDBMonAdd(poly p1, poly p2, poly p3, ring r, char* f, int l)
 {
   if (r == currRing)
   {

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.48 2000-08-24 14:24:51 Singular Exp $ */
+/* $Id: polys-impl.h,v 1.49 2000-08-24 14:28:55 Singular Exp $ */
 
 /***************************************************************
  *
@@ -401,7 +401,7 @@ inline void __pMonSubFrom(poly p1, poly p2)
 
 // Makes p1 a copy of p2 and adds on exponents of p3
 #if defined(PDEBUG) && PDEBUG > 1
-#define _prMonAdd(p1, p2, p3, r)  pDBMonAdd(p1, p2, p3, r, __FILE__, __LINE__)
+#define _prMonAdd(p1, p2, p3, r)  prDBMonAdd(p1, p2, p3, r, __FILE__, __LINE__)
 extern  void prDBMonAdd(poly p1, poly p2, poly p3, ring r, char* f, int l);
 inline void __prMonAdd(poly p1, poly p2, poly p3, ring r)
 #else
