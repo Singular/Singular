@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.cc,v 1.1 1999-09-20 18:03:45 obachman Exp $ */
+/* $Id: feOpt.cc,v 1.2 1999-09-21 12:03:06 obachman Exp $ */
 /*
 * ABSTRACT: Implementation of option buisness
 */
@@ -139,10 +139,10 @@ struct fe_option feOptSpec[] =
   "SECS",     "Do not display times smaller than SECS (in seconds)",   feOptString, "0.5",  0}, 
 
 #ifdef HAVE_MPSR
-  {"mp-port",           required_argument,  0,  LONG_OPTION_RETURN,
+  {"MPport",           required_argument,  0,  LONG_OPTION_RETURN,
    "PORT",     "Use PORT number for MP conections",                    feOptString,    0,      0},
 
-  {"mp-host",           required_argument,  0,  LONG_OPTION_RETURN,
+  {"MPhost",           required_argument,  0,  LONG_OPTION_RETURN,
    "HOST",     "Use HOST for MP connections",                          feOptString,    0,   0},
 #endif
 
@@ -151,10 +151,10 @@ struct fe_option feOptSpec[] =
 
 // undocumented options
 #ifdef HAVE_MPSR
-  {"mp-transp",         required_argument,  0,  LONG_OPTION_RETURN,
+  {"MPtransp",         required_argument,  0,  LONG_OPTION_RETURN,
    "TRANSP",    "// Use TRANSP for MP connections",                     feOptString,    0,   0},
    
-  {"mp-mode",           required_argument,  0,  LONG_OPTION_RETURN,
+  {"MPmode",           required_argument,  0,  LONG_OPTION_RETURN,
    "MODE",      "// Use MODE for MP connections",                       feOptString,    0,   0},
 #endif
     

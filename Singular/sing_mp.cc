@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_mp.cc,v 1.27 1999-09-20 18:03:50 obachman Exp $ */
+/* $Id: sing_mp.cc,v 1.28 1999-09-21 12:03:07 obachman Exp $ */
 
 /*
 * ABSTRACT: interface to MP links
@@ -173,8 +173,8 @@ static MP_Link_pt slOpenMPConnect(int n_argc, char **n_argv)
   char *port = IMP_GetCmdlineArg(n_argc, n_argv, "--MPport");
   char *host = IMP_GetCmdlineArg(n_argc, n_argv, "--MPhost");
 
-  if (port == NULL) port = (char*) feOptValue(FE_OPT_MP_PORT);
-  if (host == NULL) host = (char*) feOptValue(FE_OPT_MP_HOST);
+  if (port == NULL) port = (char*) feOptValue(FE_OPT_MPPORT);
+  if (host == NULL) host = (char*) feOptValue(FE_OPT_MPHOST);
 
   if (port != NULL)
     argv[5] = port;
@@ -192,7 +192,7 @@ static MP_Link_pt slOpenMPListen(int n_argc, char **n_argv)
                   "--MPport", "1025"};
   char *port = IMP_GetCmdlineArg(n_argc, n_argv, "--MPport");
 
-  if (port == NULL) port = (char*) feOptValue(FE_OPT_MP_HOST);
+  if (port == NULL) port = (char*) feOptValue(FE_OPT_MPHOST);
 
   if (port != NULL) argv[5] = port;
 

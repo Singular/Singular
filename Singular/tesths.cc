@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.71 1999-09-20 20:00:35 obachman Exp $ */
+/* $Id: tesths.cc,v 1.72 1999-09-21 12:03:07 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -207,8 +207,8 @@ int main(          /* main entry to Singular */
   {
 #ifdef HAVE_MPSR
     extern int Batch_do(const char* port, const char* host);
-    return Batch_do((char*) feOptValue(FE_OPT_MP_PORT),
-                    (char*) feOptValue(FE_OPT_MP_HOST));
+    return Batch_do((char*) feOptValue(FE_OPT_MPPORT),
+                    (char*) feOptValue(FE_OPT_MPHOST));
 #else
     assume(0);
 #endif
