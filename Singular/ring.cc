@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.97 2000-02-07 17:22:07 Singular Exp $ */
+/* $Id: ring.cc,v 1.98 2000-03-20 13:41:45 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3535,7 +3535,7 @@ void rSetSyzComp(int k)
     int i;
     if (currRing->typ[0].data.syz.limit == 0)
     {
-      currRing->typ[0].data.syz.syz_index = (int*) Alloc((k+1)*sizeof(int));
+      currRing->typ[0].data.syz.syz_index = (int*) Alloc0((k+1)*sizeof(int));
       currRing->typ[0].data.syz.syz_index[0] = 0;
       currRing->typ[0].data.syz.curr_index = 1;
     }
