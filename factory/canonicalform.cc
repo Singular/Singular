@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.27 1998-06-29 14:37:16 schmidt Exp $ */
+/* $Id: canonicalform.cc,v 1.28 1999-07-08 07:50:51 Singular Exp $ */
 
 #include <config.h>
 
@@ -1410,7 +1410,7 @@ bgcd ( const CanonicalForm & f, const CanonicalForm & g )
 	} else
 	    // we do not go for maximal speed for these stupid
 	    // special cases
-	    return CanonicalForm( f.isZero() && g.isZero ? 0 : 1 );
+	    return CanonicalForm( f.isZero() && g.isZero() ? 0 : 1 );
     }
     else if ( what )
 	return f.value->bgcdcoeff( g.value );
