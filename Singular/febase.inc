@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.inc,v 1.28 1999-11-15 17:19:57 obachman Exp $ */
+/* $Id: febase.inc,v 1.29 2000-02-14 17:00:10 Singular Exp $ */
 /*
 * ABSTRACT: handling of 'voices'
 */
@@ -368,7 +368,7 @@ static void feShowPrompt(void)
 */
 static int fePrintEcho(char *anf, char *b)
 {
-  char *ss=strchr(anf,'\n');
+  char *ss=strrchr(anf,'\n');
   int len_s;
   if (ss==NULL)
   {

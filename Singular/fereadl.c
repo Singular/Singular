@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: fereadl.c,v 1.11 2000-02-14 14:10:54 Singular Exp $ */
+/* $Id: fereadl.c,v 1.12 2000-02-14 17:00:11 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -82,6 +82,7 @@ short   fe_hist_pos;
 short   fe_is_raw_tty=0;
 int     fe_cursor_pos; /* 0..colmax-1*/
 int     fe_cursor_line; /* 0..pagelength-1*/
+int     mlinestart;
 
 #ifndef MSDOS
   #ifndef HAVE_ATEXIT
@@ -334,7 +335,7 @@ static void fe_ctrl_k(char *s,int i)
 static void fe_ctrl_u(char *s,int *i)
 {
   fe_ctrl_k(s,*i);
-  while((*i)>0)
+  while((*i)>mlinestart)
   {
     (*i)--;
     fputc('\b',fe_echo);
@@ -486,6 +487,7 @@ char * fe_fgets_stdin_fe(char *pr,char *s, int size)
       char c;
     #endif
     int i=0;
+    mlinestart=0;
 
     if (fe_is_raw_tty==0)
     {
@@ -505,16 +507,23 @@ char * fe_fgets_stdin_fe(char *pr,char *s, int size)
         case feCTRL('M'):
         case feCTRL('J'):
         {
-          fe_add_hist(s);
           i=strlen(s);
-          if (i<size-1) s[i]='\n';
           fputc('\n',fe_echo);
-          if (!fe_getchar_stat())
+          if ((!fe_getchar_stat()) || (i>=size-1))
           {
+            fe_add_hist(s);
+            if (i<size-1) s[i]='\n';
             fflush(fe_echo);
             fe_temp_reset();
             return s;
           }
+          /*if (i<size-1)*/ s[i]='\n';
+          i++;
+          mlinestart=i;
+          fe_cursor_pos=0;
+          if(fe_cursor_line!=(pagelength-1))
+            fe_cursor_line++;
+          change=1;
           break;
         }
         #ifdef MSDOS
@@ -523,14 +532,14 @@ char * fe_fgets_stdin_fe(char *pr,char *s, int size)
         case feCTRL('H'):
         case 127:       /*delete the character left of the cursor*/
         {
-          if (i==0) break;
+          if (i==mlinestart) break;
           i--;
           fe_cursor_pos--;
           if(fe_cursor_pos<0)
           {
             fe_cursor_line--;
             fe_cursor_pos=colmax-1;
-            fe_set_cursor(s,i);
+            fe_set_cursor(s,i-mlinestart);
           }
           else
           {
@@ -614,7 +623,7 @@ char * fe_fgets_stdin_fe(char *pr,char *s, int size)
         }
         case feCTRL('B'): /* move the cursor backward one character */
         {
-          if (i>0)
+          if (i>mlinestart)
           {
             i--;
             fputc('\b',fe_echo);
@@ -648,6 +657,7 @@ char * fe_fgets_stdin_fe(char *pr,char *s, int size)
           fe_ctrl_u(s,&i);
           fe_cursor_pos=strlen(pr);
           memset(s,0,size);
+          mlinestart=0;
           change=1;
           break;
         }
