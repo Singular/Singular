@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_util.cc,v 1.12 1997-11-21 10:40:16 schmidt Exp $ */
+/* $Id: ftest_util.cc,v 1.13 1997-11-21 11:37:21 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -69,8 +69,10 @@ struct ftestEnvT
 //
 // ftestCircle: set by ftestGetOpts() from commandline, read by
 //   main().  Number of test circles.
-// ftestAlarm: set by ftestGetOpts() from acommandline, read by
+// ftestAlarm: set by ftestGetOpts() from commandline, read by
 //   main().
+// ftestCheckFlag: set by ftestGetOpts() from commandline, read by
+//   main().  False iff checks should not be executed.
 // ftestPrintFlag: set by ftestParseOutputType() from
 //   commandline, read by ftestPrintResult().  True iff there was
 //   some output type specifier on commandline.
@@ -82,6 +84,7 @@ struct ftestEnvT
 int ftestCircle = 1;
 int ftestAlarm = 0;
 
+int ftestCheckFlag = 1;
 int ftestPrintFlag = 0;
 int ftestPrintResultFlag = 0;
 //}}}
@@ -786,11 +789,12 @@ ftestGetOpts ( const int argc, char ** argv, int & optind )
 	ftestCircle = (int)strtol( envString, 0, 0 );
 
     // parse options
-    while ( (optionChar = getopt( argc, argv, "a:o:c:" )) != -1 ) {
+    while ( (optionChar = getopt( argc, argv, "a:o:c:t" )) != -1 ) {
 	switch ( optionChar ) {
 	case 'a': ftestAlarm = (int)strtol( optarg, 0, 0 ); break;
 	case 'c': ftestCircle = (int)strtol( optarg, 0, 0 ); break;
 	case 'o': outputType = optarg; break;
+	case 't': ftestCheckFlag = false; break;
 	default: ftestError( CommandlineError, 0 );
 	}
     }
