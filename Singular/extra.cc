@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.52 1998-06-03 14:25:39 pohl Exp $ */
+/* $Id: extra.cc,v 1.53 1998-06-08 11:09:39 krueger Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -50,7 +50,7 @@
 #include "polys.h"
 
 // Define to enable many more system commands
-// #define HAVE_EXTENDED_SYSTEM
+//#define HAVE_EXTENDED_SYSTEM
 
 #ifdef STDTRACE
 //#include "comm.h"
@@ -85,6 +85,8 @@ TIMING_DEFINE_PRINTPROTO( algLcmTimer );
 #endif
 
 void piShowProcList();
+static BOOLEAN EXTENDED_SYSTEM(leftv res, leftv h);
+
 
 //void emStart();
 /*2
@@ -359,8 +361,29 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
        "Olaf Bachmann, Hubert Grassmann, Kai Krueger, Wolfgang Neumann, Thomas Nuessler, Wilfred Pohl, Thomas Siebert, Ruediger Stobbe, Tim Wichmann";
      return FALSE;
    }
+   else
+   {
+#ifdef HAVE_EXTENDED_SYSTEM
+/*================= Extended system call ========================*/
+     return(EXTENDED_SYSTEM(res, h));
+#else
+     WerrorS( feNotImplemented );
+#endif
+   } 
+  } /* typ==string */
+  return TRUE;
+}
+
+  
+
 #ifdef HAVE_EXTENDED_SYSTEM
 // You can put your own system calls here
+#include "fglmcomb.cc"
+#include "fglm.h"
+static BOOLEAN EXTENDED_SYSTEM(leftv res, leftv h)
+{
+  if(h->Typ() == STRING_CMD)
+  {
 /*==================== LaScala ==================================*/
     if(strcmp((char*)(h->Data()),"LaScala")==0)
     {
@@ -592,8 +615,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
 /*==================== fastcomb =============================*/
     if(strcmp((char*)(h->Data()),"fastcomb")==0)
     {
-#include "fglmcomb.cc"
-#include "fglm.h"
       if ((h->next!=NULL) &&(h->next->Typ()==IDEAL_CMD))
       {
         int i=0;
@@ -615,8 +636,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
 /*==================== comb =============================*/
     if(strcmp((char*)(h->Data()),"comb")==0)
     {
-#include "fglmcomb.cc"
-#include "fglm.h"
       if ((h->next!=NULL) &&(h->next->Typ()==IDEAL_CMD))
       {
         int i=0;
@@ -798,9 +817,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     }
     else
 #endif
-#endif // HAVE_EXTENDED_SYSTEM
-/*============================================================*/
       WerrorS( feNotImplemented );
   }
   return TRUE;
 }
+#endif // HAVE_EXTENDED_SYSTEM
+/*============================================================*/
