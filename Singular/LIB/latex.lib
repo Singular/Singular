@@ -1,5 +1,5 @@
-e///////////////////////////////////////////////////////////////////////////////
-version="$Id: latex.lib,v 1.16 2001-02-07 13:47:50 Singular Exp $";
+///////////////////////////////////////////////////////////////////////////////
+version="$Id: latex.lib,v 1.17 2001-02-08 16:34:08 lossen Exp $";
 //category="Visualization";
 info="
 LIBRARY: latex.lib    Typesetting of Singular-Objects in LaTeX2e
@@ -24,12 +24,12 @@ PROCEDURES:
 GLOBAL VARIABLES:
   TeXwidth, TeXnofrac, TeXbrack, TeXproj, TeXaligned, TeXreplace, NoDollars
   are used to control the typesetting.
-  Call @code{example texdemo;} to become familiar with the features of
+  Call @code{example texdemo;} to become familiar with the features of 
   @code{latex.lib}.
 @format
   @code{TeXwidth} (int) -1, 0, 1..9, >9:  controls breaking of long polynomials
   @code{TeXnofrac} (int) flag:  write 1/2 instead of \\frac@{1@}@{2@}
-  @code{TeXbrack} (string) \"@{\", \"(\", \"<\", \"|\", empty string:
+  @code{TeXbrack} (string) \"@{\", \"(\", \"<\", \"|\", empty string: 
                                    controls brackets around ideals and matrices
   @code{TeXproj} (int) flag:  write \":\" instead of \",\" in vectors
   @code{TeXaligned} (int) flag:  write maps (and ideals) aligned
@@ -130,7 +130,7 @@ example
   opentex("exp001");              // open latex2e document
   texobj("exp001","An ideal ",I);
   closetex("exp001");
-  tex("exp001");
+  tex("exp001"); 
   echo=0;
   pause("the created files will be deleted after pressing <RETURN>");
   system("sh","rm exp001.*");
@@ -283,9 +283,9 @@ NOTE:    this proc may take some time.
 
 proc texfactorize(string fname, poly f, list #)
 "USAGE:   texfactorize(fname,f); fname string, f poly
-RETURN:  if @code{fname=\"\"}: string, f as a product of its irreducible
+RETURN:  if @code{fname=\"\"}: string, f as a product of its irreducible 
          factors@*
-         otherwise: append this string to the file @code{<fname>}, and
+         otherwise: append this string to the file @code{<fname>}, and 
          return nothing.
 NOTE:    preceeding \">>\" are deleted and suffix \".tex\" (if not given)
          is added to @code{fname}.
@@ -368,11 +368,11 @@ static proc rp(string s)
 
 proc texmap(string fname, def m, def @r1, def @r2, list #)
 "USAGE:   texmap(fname,m,@r1,@r2); fname string, m string/map, @r1,@r2 rings
-RETURN:  if @code{fname=\"\"}: string, the map m from @r1 to @r2 (preceeded
+RETURN:  if @code{fname=\"\"}: string, the map m from @r1 to @r2 (preceeded 
          by its name if m = string) in TeX-typesetting;@*
-         otherwise: append this string to the file @code{<fname>}, and
+         otherwise: append this string to the file @code{<fname>}, and 
          return nothing.
-NOTE:    preceeding \">>\" are deleted in @code{fname}, and suffix \".tex\"
+NOTE:    preceeding \">>\" are deleted in @code{fname}, and suffix \".tex\" 
          (if not given) is added to @code{fname}.
          If m is a string then it has to be the name of an existing map
          from @r1 to @r2.
@@ -560,8 +560,8 @@ static proc manipul(string s)
   else { st = st + "_{" + s[anf,i-anf] + "}";}
   n = n+5*(i-anf);
   anf =i;            // the next text in ( , ) as exponent
-  if (op)
-  {
+  if (op) 
+  { 
     if (s[i]== ","){anf = anf+1;}
     while(s[i] !=")"){ i++;}
     if (i<>anf)
@@ -579,22 +579,22 @@ static proc manipul(string s)
 proc texname(string fname, string s)
 "USAGE:   texname(fname,s);  fname,s  strings
 RETURN:  if @code{fname=\"\"}: string, the transformed string s, where the
-         following rules apply:
-@example
+         following rules apply: 
+@example 
       s' + \"~\"             -->  \"\\tilde@{\"+ s' +\"@}\"
-     \"_\" + int             -->       \"_@{\" + int +\"@}\"
+     \"_\" + int             -->       \"_@{\" + int +\"@}\" 
   \"[\" + s' + \"]\"           -->      \"_@{\" + s' + \"@}\"
-   \"A..Z\" + int            --> \"A..Z\" + \"^@{\" + int + \"@}\"
+   \"A..Z\" + int            --> \"A..Z\" + \"^@{\" + int + \"@}\"    
    \"a..z\" + int            --> \"a..z\" + \"_@{\" + int + \"@}\"
 \"(\" + int + \",\" + s' + \")\" --> \"_@{\"+ int +\"@}\" + \"^@{\" + s'+\"@}\"
 @end example
          Anyhow, strings which begin with a @code{\"@{\"} are only changed
-         by deleting the first and last character (intended to remove the
+         by deleting the first and last character (intended to remove the 
          surrounding curly brackets).
 
-         if @code{fname!=\"\"}: append the transformed string s to the file
+         if @code{fname!=\"\"}: append the transformed string s to the file 
          @code{<fname>}, and return nothing.
-NOTE:    preceeding \">>\" are deleted in @code{fname}, and suffix \".tex\"
+NOTE:    preceeding \">>\" are deleted in @code{fname}, and suffix \".tex\" 
          (if not given) is added to @code{fname}.
 EXAMPLE: example texname; shows an example
 "
@@ -602,12 +602,12 @@ EXAMPLE: example texname; shows an example
   string st, extr;
   st=manipul(s);
   if (size(fname))
-  {
+  { 
     int i=1;
     while (fname[i]==">"){i++;}
     fname = fname[i,size(fname)-i+1];
     if (size(fname)>=4)            // check if filename is ending with ".tex"
-    {
+    { 
       if(fname[size(fname)-3,4]!=".tex") {fname = fname +".tex"; }
     }
     else {fname = fname + ".tex";}
@@ -633,7 +633,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc absterm(poly f)
-{
+{ 
   int k;
   for (k=1; k<=nvars(basering); k++)
   { f = subst(f,var(k),0); }
@@ -643,10 +643,10 @@ static proc absterm(poly f)
 
 proc texobj(string fname, list #)
 "USAGE:   texobj(fname,l); fname string, l list
-RETURN:  if @code{fname=\"\"}: string, the objects in LaTeX-typesetting;@*
-         otherwise: append this string to the file @code{<fname>}, and
+RETURN:  if @code{fname=\"\"}: string, the entries of l in LaTeX-typesetting;@*
+         otherwise: append this string to the file @code{<fname>}, and 
          return nothing.
-NOTE:    preceeding \">>\" are deleted in @code{fname}, and suffix \".tex\"
+NOTE:    preceeding \">>\" are deleted in @code{fname}, and suffix \".tex\" 
          (if not given) is added to @code{fname}.
 EXAMPLE: example texobj; shows an example
 "
@@ -686,13 +686,13 @@ EXAMPLE: example texobj; shows an example
    if (typeof(obj) == "string")
    { if (defined(`obj`))
      { if (typeof(`obj`)=="ideal")
-       {
-         Iname = obj; def e = `obj`;  //convert to correct type ideal
+       { 
+         Iname = obj; def e = `obj`;     //convert to correct type ideal
          kill obj; def obj = e; kill e;
        }
-       else {s = s + "\\text{" + obj + "\}" + newline;}
+       else {s = s + obj + newline;}
      }
-    else {s = s + "\\text{" + obj + "\}" + newline;}
+    else {s = s + obj + newline;}
    }
    if (typeof(obj) == "int") { s = s + "  " + string(obj) + "  ";}
 
@@ -899,7 +899,7 @@ EXAMPLE: example texobj; shows an example
  else {return(s);}
 }
 example
-{
+{ 
    echo=0;
    // -------- prepare for example ---------
    if (defined(TeXaligned)) {int Teali=TeXaligned; kill TeXaligned;}
@@ -941,11 +941,11 @@ example
 proc texproc(string fname,string pname)
 "USAGE:   texproc(fname,pname); fname,pname strings
 ASSUME:  @code{`pname`} is a procedure.
-RETURN:  if @code{fname=\"\"}: string, the proc @code{`pname`} in a verbatim
+RETURN:  if @code{fname=\"\"}: string, the proc @code{`pname`} in a verbatim 
          environment in LaTeX-typesetting;@*
-         otherwise: append this string to the file @code{<fname>}, and
+         otherwise: append this string to the file @code{<fname>}, and 
          return nothing.
-NOTE:    preceeding \">>\" are deleted in @code{fname}, and suffix \".tex\"
+NOTE:    preceeding \">>\" are deleted in @code{fname}, and suffix \".tex\" 
          (if not given) is added to @code{fname}.@*
          @code{texproc} cannot be applied to itself correctly.
 EXAMPLE: example texproc; shows an example
@@ -1043,7 +1043,7 @@ static proc tvar(intvec v)
 proc texring(string fname, def r, list #)
 "USAGE:   texring(fname, r[,L]); fname string, r ring, L list
 RETURN:  if @code{fname=\"\"}: string, the ring in TeX-typesetting;@*
-         otherwise: append this string to the file @code{<fname>} and
+         otherwise: append this string to the file @code{<fname>} and 
          return nothing.
 NOTE:    preceeding \">>\" are deleted and suffix \".tex\" (if not given)
          is added to @code{fname}.@*
@@ -1176,7 +1176,7 @@ example
   texring("",ralg);
   texring("",ralg,"mipo");
   //
-  ring r49=(49,a),x,dp;                // Galois field
+  ring r49=(49,a),x,dp;                // Galois field  
   texring("",r49);
   //
   setring r0;                          // quotient ring
@@ -1199,9 +1199,9 @@ example
 
 proc rmx(string fname)
 "USAGE:   rmx(fname); fname string
-RETURN:  nothing; removes the @code{.log} and @code{.aux} files associated to
+RETURN:  nothing; removes the @code{.log} and @code{.aux} files associated to 
          the LaTeX file <fname>.@*
-NOTE:    If @code{fname} ends by @code{\".dvi\"} or @code{\".tex\"}, the
+NOTE:    If @code{fname} ends by @code{\".dvi\"} or @code{\".tex\"}, the 
          @code{.dvi} or @code{.tex} file will be deleted, too.
 EXAMPLE: example rmx; shows an example
 "
@@ -1285,7 +1285,7 @@ EXAMPLE: example xdvi; shows an example
 example
 { "EXAMPLE:"; echo = 2;
   intmat m[3][4] = 9,2,4,5,2,5,-2,4,-6,10,-1,2,7;
-  opentex("exp001");
+  opentex("exp001"); 
   texobj("exp001","An intmat:  ",m);
   closetex("exp001");
   tex("exp001");
@@ -1299,7 +1299,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc parsr(string s)                     // parse real
-{
+{ 
   string t;
   if (s=="      Inf") { return("\\infty",3);}
   if (s=="     -Inf") { return("\\-infty",6);}
@@ -1311,24 +1311,24 @@ static proc parsr(string s)                     // parse real
     if (size(t)>1) {return(s[1,5]+"*10^{"+t+"}",21+2*size(t));}
     else {return(s[1,5]+"*10^"+t,23);}
   }
-  else
+  else 
   {
     return(s[1,5],12);
   }
 }
 
-static proc parsg(string s)                  // parse Galoisfield
-{
+static proc parsg(string s)                  // parse Galois field
+{ 
   int i,j = 1,1;
   string t;
   if (short)
-  {
+  { 
     t =s[1];
     if(size(s)>1) {return(t+"^{" + s[2,size(s)-1] + "}",3+2*(size(s)-1));}
     else{return(t,5);}
   }
   else
-  {
+  { 
     return(parselong(s+"!"));
   }
 }
@@ -1337,9 +1337,9 @@ static proc parsg(string s)                  // parse Galoisfield
 proc texpoly(string fname,def p,list #)
 "USAGE:   texpoly(fname,p); fname string, p poly
 RETURN:  if @code{fname=\"\"}: string, the poly p in LaTeX-typesetting;@*
-         otherwise: append this string to the file @code{<fname>}, and
+         otherwise: append this string to the file @code{<fname>}, and 
          return nothing.
-NOTE:    preceeding \">>\" are deleted in @code{fname}, and suffix \".tex\"
+NOTE:    preceeding \">>\" are deleted in @code{fname}, and suffix \".tex\" 
          (if not given) is added to @code{fname}.
 EXAMPLE: example texpoly; shows an example
 "
@@ -1836,21 +1836,17 @@ static proc part0(string fname)
 
 write(fname,"\\newcommand{\\Line}{\\rule{\\textwidth}{0.25mm}\\\\[5mm]}");
 
-   write(fname,"\\centerline{\\large \\bf Demo file for latex.lib 2.0.0}");
+   write(fname,"\\centerline{\\large \\bf Demo file for latex.lib 2.0}");
    write(fname,"\\vspace{1cm}");
 
 //--
 
  write(fname,"\\section{Introduction}");
  write(fname,"The procedures in \\verb|latex.lib| translate the output of
- Singular in \\LaTeX \\ text.
- Most of the examples in this document are generated
- randomly by Singular itself and passed through the procs from
- \\verb|latex.lib|. Consequently,
- every document does not show merely how the \\verb|latex.lib| works
- but looks differently in large parts."+"\\\\" +  nl);
+ {\\sc Singular} into \\LaTeX \\ text.
+ This document illustrates the functionality of the library."+"\\\\" +  nl);
  write(fname,"\\begin{tabular}{ll}" + nl +
-"LIBRARY: {\\tt latex.lib} &   PROCEDURES FOR TYPESETTING SINGULAR" +
+"LIBRARY: {\\tt latex.lib} &   PROCEDURES FOR TYPESETTING SINGULAR" + 
 "\\\\" +  nl +
 " & OBJECTS IN LATEX2E"+
 "\\\\" +  nl +
@@ -1862,11 +1858,11 @@ write(fname,"\\newcommand{\\Line}{\\rule{\\textwidth}{0.25mm}\\\\[5mm]}");
 "\\\\" +  nl +
 "{\\tt  texdemo([n]);} & produces a file explaining the features of this lib"+
 "\\\\" +  nl +
-"{\\tt  texfactorize(fnm,f);} & creates string in \\LaTeX-format for
+"{\\tt  texfactorize(fnm,f);} & creates string in \\LaTeX-format for 
 factors of poly f"+ "\\\\" +  nl +
 "{\\tt  texmap(fnm,m,r1,r2);} & creates string in \\LaTeX-format for
 map m:r1$\\rightarrow$r2"+ "\\\\" +  nl +
-"{\\tt  texname(fnm,s);} &      creates string in \\LaTeX-format for
+"{\\tt  texname(fnm,s);} &      creates string in \\LaTeX-format for 
 identifier"+ "\\\\" +  nl +
 "{\\tt  texobj(l);} &           creates string in \\LaTeX-format for
 any (basic) type"+ "\\\\" +  nl +
@@ -1874,7 +1870,7 @@ any (basic) type"+ "\\\\" +  nl +
 "\\\\" +  nl +
 "{\\tt  texproc(fnm,p);} &      creates string in \\LaTeX-format of
 text from proc p"+ "\\\\" +  nl +
-"{\\tt  texring(fnm,r[,l]);} &  creates string in \\LaTeX-lformat for
+"{\\tt  texring(fnm,r[,l]);} &  creates string in \\LaTeX-lformat for 
 ring/qring"+ "\\\\" +  nl +
 "{\\tt  rmx(s);} &              removes .aux and .log files of \\LaTeX-files"+
 "\\\\" +  nl +
@@ -1884,7 +1880,7 @@ ring/qring"+ "\\\\" +  nl +
 "(parameters in square brackets {\\tt [ ]} are optional)"+
 "\\\\" +  nl2 + "\\vspace{0.2cm}" + nl2 +
 "The global variables {\\tt TeXwidth}, {\\tt TeXnofrac}, {\\tt
- TeXbrack}, {\\tt TeXproj}, {\\tt TeXaligned}, {\\tt TeXreplace}, {\\tt
+ TeXbrack}, {\\tt TeXproj}, {\\tt TeXaligned}, {\\tt TeXreplace}, {\\tt 
  NoDollars} are used to control the typesetting: "
 );
 
@@ -1902,19 +1898,26 @@ bv +
 
 " +
 ev);
-write(fname,"A flag means that a variable with the indicated
-name has to be defined. Usually it is from type \\verb|int|.");
+write(fname,"Notice that none of these global variables are defined when
+loading \\verb|latex.lib|. A flag variable is set as soon as it is defined.");
+ 
 
 //% The procs and
 //% the global variables
 
 //----------------------- opentex -----------------------------
    write(fname,"\\section{Opening a \\LaTeX\\ file}");
-   write(fname,"All starts by defining a variable " + nl
-                + bv + "> string fname = \"" + fname + "\";" + nl +
-                "> texopen(fname);" + ev + nl);
- write(fname,"This variable \\verb|fname| has to be given as first argument to
- all procedures in \\verb|latex.lib|");
+   write(fname,"In order to create a \\LaTeX\\ document and write a standard
+header into it, use the following command."+ 
+bv+
+"> string fname = \"" + fname + "\";" + nl +
+"> texopen(fname);" + 
+ev + nl);
+
+write(fname,"The variable \\verb|fname| is always the first argument when
+calling one of the procedures of \\verb|latex.lib|. If this string is the
+empty string, then the output in not written into a file but displayed on
+the screen.");
 
  //% opentex, defaulted to latex, possibly extension are ... and
  //% ``own''
@@ -1930,7 +1933,7 @@ int TeXwidth = 100; export TeXwidth;
 
 
 static proc part1(string fname)
-{
+{ 
 
   int st = defined(texdemopart);
   string nl = newline;
@@ -1948,12 +1951,12 @@ static proc part1(string fname)
 //"Continuing part1 of " + fname + nl;
 
 write(fname,
-"\\section{Rings and polynomials}"+nl2);
+"\\section{Rings, polynomials and ideals}"+nl2);
 
 // -1a------ a ring in char 0, short varnames and poly. ordering ----------
 write(fname,
-" A ring in characteristic 0 with short names of variables and polynomial ordering.
-" +nl);
+" A ring in characteristic 0 with short names of variables and polynomial 
+ordering." +nl);
  ring r0=0,(x,y,z),dp;
  poly g=-x2y+2y13z+1;
 write(fname,
@@ -1961,14 +1964,14 @@ bv +
 "> ring r0=0,(x,y,z),dp;" +nl+
 "> texring(fname,r0);" +
 ev);
-  texring(fname,r0);
+  texring(fname,r0);              
   write(fname,nl2);
 write(fname,
 bv +
-"> poly g=-x2y+2y13z+1; g;" + nl +
+"> poly g=-x2y+2y13z+1;  g;" + nl +
 "> texpoly(fname,g);" +nl +
 ev);
-  texpoly(fname,g);
+  texpoly(fname,g); 
   write(fname,"\\\\"+nl2);
 
 // write(fname,"\\Line");
@@ -1982,87 +1985,105 @@ bv +
 "> texpoly(fname,g/280);" +nl +
 ev
 );
-  texpoly(fname,g/280);
+  texpoly(fname,g/280);              
   kill r0;
-
+  
 write(fname,"\\\\"+nl2);
 write(fname,"\\Line");
 // -2-------- a ring in char 7, indexed varnames and series ordering ----------
 write(fname,
-" A ring in characteristic 7 with indexed names of variables and local
+" A ring in characteristic 7 with indexed names of variables and local 
 ordering." +nl);
  ring r1=7,(x1,x2,x3,x4),Ds;
- poly g=-2*x1+x4-1;
+ poly g=-2*x1+x4-1; 
 write(fname,
 bv +
-"> ring r1=7,(x1,x2,x3,x4),Ds;" +nl +
+"> ring r1=7,(x1,x2,x3,x4),Ds;" +nl +                
 "> texring(fname,r1);" +nl +
 ev);
-texring(fname,r1);
+texring(fname,r1);             
 write(fname,lb);
 
 write(fname, bv +
-"> poly g=-2*x1+x4-1;  g;" +nl +
+"> poly g=-2*x1+x4-1;  g;" +nl +                
 "> texpoly(fname,g);" +nl +
 ev);
 
   texpoly(fname,g);
-
+  
 write(fname,lb);
 write(fname,"\\Line");
 
 // -3-------- a ring in char 0, indexed varnames and local ordering ----------
 write(fname,
-" A ring in characteristic 0 with indexed names of variables and local
+" A ring in characteristic 0 with indexed names of variables and local 
 ordering.
 " +nl);
  ring r2=0,(x(1..5),y(1..2)),(ds(5),ls(2));
- poly g = -y(1)*x(5) +y(1)*x(2);
+ poly g=-y(1)^3*x(5) +y(1)*x(2);
 write(fname,
 bv +
-"> ring r2=0,(x(1..5),y(1..2)),(ds(5),dp(2));  texring(fname,r2);
-> poly g = -y(1)*x(5) +y(1)*x(2); g;          texpoly(fname,g);"  +nl +
- string(g) + nl +
+"> ring r2=0,(x(1..5),y(1..2)),(ds(5),ls(2));" + nl +
+"> texring(fname,r2);" +nl +
+ev);
+  texring(fname,r2);             
+
+write(fname,
+bv +
+"> poly g=-y(1)^3*x(5)+y(1)*x(2);  g;" +nl+
+ string(g) + nl +          
+"> texpoly(fname,g);"  +nl +
 ev
 );
-  texring(fname,r2);             write(fname,lb);
-  texpoly(fname,g);              write(fname,lb);
-
+  texpoly(fname,g);              
+  write(fname,lb);
+  
 write(fname,"\\Line");
 
 // -4-------- a ring in char 0, indexed varnames and weighted ordering ------
 write(fname,
-" A ring in characteristic 0 with indexed names of variables and weighted  ordering.
-" +nl);
+" A ring in characteristic 0 with indexed names of variables and weighted
+ ordering." +nl);
  ring r3=0,(x_1,x_2,x_3),wp(3,2,1);
- poly g = -x_1*x_2 + 2*x_2*x_3 + x_1*x_3;
+ poly g=-x_1*x_2+2*x_2*x_3+x_1*x_3;
 write(fname,
 bv +
-"> ring r3=0,(x_1,x_2,x_3),wp(3,2,1);          texring(fname,r3);
-> poly g = -x_1*x_2 + 2*x_2*x_3 + x_1*x_3; g; texpoly(fname,g);"  +nl +
+"> ring r3=0,(x_1,x_2,x_3),wp(3,2,1);" +nl+
+"> texring(fname,r3);" +nl +
+ev);
+  texring(fname,r3);
+write(fname,
+bv +
+"> poly g=-x_1*x_2+2*x_2*x_3+x_1*x_3;  g;" +nl+
   string(g) + nl +
+"> texpoly(fname,g);"  +nl +
 ev
 );
-  texring(fname,r3);             write(fname,lb);
-  texpoly(fname,g);              write(fname,lb);
-
+  texpoly(fname,g); write(fname,lb);
+  
 write(fname,"\\Line");
 
 // -5-------- a ring with real coeff and matrix ordering -------------------
 write(fname,
 " A ring with real coefficients and matrix ordering.
 " +nl);
- ring rr =real,(x,y),M(1,2,3,4);
- poly g = -1.2e-10*x + y +1;
+ ring rr=real,(x,y),M(1,2,3,4);
+ poly g =-1.2e-10*x2+y+1;
 write(fname,
 bv +
-"> ring rr =real,(x,y),M(1,2,3,4);             texring(fname,rr);
-> poly g = -1.2e-10*x + y +1; g;              texpoly(fname,g);" +nl +
- string(g) + nl +
-ev
-);
-  texring(fname,rr);             write(fname,lb);
-  texpoly(fname,g);              write(fname,lb);
+"> ring rr=real,(x,y),M(1,2,3,4);"+nl+
+"> texring(fname,rr);"+nl+
+ev);
+  texring(fname,rr);
+
+write(fname,
+bv +
+"> poly g=-1.2e-10*x2+y+1;  g;"+nl+
+  string(g) + nl +
+"> texpoly(fname,g);" +nl +
+ev);
+  texpoly(fname,g);  write(fname,lb);
+
 write(fname,"\\Line");
 
 // -6a-------- a ring in char 0, and indexed parameters --------- ----------
@@ -2070,34 +2091,43 @@ write(fname,
 " A ring in characteristic 0 and indexed parameters.
 " +nl);
  ring r0t=(0,s,t),(x,y),dp;
- poly g = 8*(-s+2t)/(st+t3)*x + t2*x -1;
+ poly g=8*(-s+2t)/(st+t3)*x+t2*x-1;
 write(fname,
 bv +
-"> ring r0t=(0,s,t),(x,y),dp;                  texring(fname,r0t);
-> poly g = 8*(-s+2t)/(st+t3)*x + t2*x -1; g;  texpoly(fname,g);" +nl +
- string(g) + nl +
-ev
-);
-  texring(fname,r0t);            write(fname,lb);
-  texpoly(fname,g);              write(fname,lb);
+"> ring r0t=(0,s,t),(x,y),dp;" +nl +
+"> texring(fname,r0t);" +nl +
+ev);
+ texring(fname,r0t);
+write(fname, 
+bv +
+"> poly g=8*(-s+2t)/(st+t3)*x+t2*x-1;  g;"+nl+
+  string(g) +nl +
+"> texpoly(fname,g);" +nl +
+ev);
+  texpoly(fname,g); write(fname,lb);
 write(fname,"\\Line");
-
 
 // -6b------- a ring in char 11003, and indexed parameters --------- ----------
 write(fname,
 " A ring in characteristic 11 and indexed parameters.
 " +nl);
  ring rt=(11003,t1,t2,t3),(X,Y),dp;
- poly g = 8*(-t1+t2)/(t1+t3)*X + t2*Y -1;
+ poly g=8*(-t1+t2)/(t1+t3)*X+t2*Y-1;
 write(fname,
 bv +
-"> ring rt=(11003,t1,t2,t3),(X,Y),dp;             texring(fname,rt);
-> poly g = 8*(-t1+t2)/(t1+t3)*X+t2*Y-1;  g;  texpoly(fname,g);" +nl +
- string(g) + nl +
-ev
-);
-  texring(fname,rt);             write(fname,lb);
-  texpoly(fname,g);              write(fname,lb);
+"> ring rt=(11003,t1,t2,t3),(X,Y),dp;" +nl +
+"> texring(fname,rt);" +nl+
+ev);
+  texring(fname,rt);
+
+write(fname,
+bv +
+"> poly g=8*(-t1+t2)/(t1+t3)*X+t2*Y-1;  g;" + nl+
+ string(g) +nl +
+"> texpoly(fname,g);" +nl +
+ev);
+  texpoly(fname,g); write(fname,lb);
+
 write(fname,"\\Line");
 
 // -7-------- a ring over an algebraic extension in char 7 ---------------
@@ -2111,31 +2141,44 @@ write(fname,
 
 write(fname,
 bv +
-"> ring ralg = (7,a),x,dp;
-> minpoly = a2-a+3;                           texring(fname,ralg);
-> poly g = -(2a13+a)*x2+a2*x-a+1; g;    texpoly(fname,g);" +nl +
- string(g) + nl +
+"> ring ralg=(7,a),x,dp;" +nl +
+"> minpoly=a2-a+3;" +nl +
+"> texring(fname,ralg);" +nl+
+ev);
+ texring(fname,ralg);
+
+write(fname,
+bv +
+"> poly g=-(2a13+a)*x2+a2*x-a+1;  g;"+nl+
+ string(g) +nl +
+"> texpoly(fname,g);" +nl +
 ev
 );
-  texring(fname,ralg);           write(fname,lb);
-  texpoly(fname,g);              write(fname,lb);
+  texpoly(fname,g); write(fname,lb);
+
 write(fname,"\\Line");
 
 // -8-------- the same ring a in 7 ralg, defined with gftables -- F_49 -------
 write(fname,
 " A ring defined with \\verb|gftables|, the same as \\verb|ralg| before, but
-with primitive element in the Galoisfield $\\F_{49}$." +nl);
+with primitive element in the Galois field $\\F_{49}$." +nl);
  ring r49 =(49,a),x,dp;
- poly g = -(2a13+a)*x2+a2*x-a+1;
+ poly g=-(2a13+a)*x2+a2*x-a+1;
 write(fname,
 bv +
-"> ring r49 =(49,a),x,dp;                     texring(fname,r49);
-> poly g = -(2a13+a)*x2+a2*x-a+1;  g;    texpoly(fname,g);" +nl +
- string(g) + nl +
-ev
-);
-  texring(fname,r49);            write(fname,lb);
-  texpoly(fname,g);              write(fname,lb);
+"> ring r49 =(49,a),x,dp;" +nl+
+"> texring(fname,r49);" +nl+
+ev);
+ texring(fname,r49);
+
+write(fname,
+bv + 
+"> poly g=-(2a13+a)*x2+a2*x-a+1;  g;" +nl+
+ string(g) +nl +
+"> texpoly(fname,g);" +nl +
+ev);
+  texpoly(fname,g); write(fname,lb);
+
 write(fname,"\\Line");
 
 // -9-------- a ring over the Gaussian numbers  ----------
@@ -2143,23 +2186,30 @@ write(fname,
 " A ring over the Gaussian numbers.
 " +nl);
  ring ri=(0,i),(x,y,z),ls;
- minpoly = i2 +1;
- poly g = -(i+1)*x +2i2y2 +i +x;
+ minpoly=i2+1;
+ poly g=-(i+1)*x+2i2y2+i+x;
 write(fname,
 bv +
-"> ring ri=(0,i),(x,y,z),ls;
-> minpoly=i2+1;                          texring(fname,ri);
-> poly g=-(i+1)*x+2i2y2+i+x; g;          texpoly(fname,g);" +nl +
- string(g) + nl +
+"> ring ri=(0,i),(x,y,z),ls;" +nl +
+"> minpoly=i2+1;" +nl +
+"> texring(fname,ri);" +nl+
+ev);
+ texring(fname,ri);
+
+write(fname,
+bv + 
+"> poly g=-(i+1)*x+2i2y2+i+x;  g;" +nl+
+ string(g) +nl +
+"> texpoly(fname,g);" +nl +
 ev
 );
-  texring(fname,ri);              write(fname,lb);
-  texpoly(fname,g);              write(fname,lb);
+  texpoly(fname,g); write(fname,lb);
+
 write(fname,"\\Line");
 
 // -10--------- a quotient ring performed from  ----------
 write(fname,
-" A quotient ring performed from \\verb|r0|
+" A quotient ring performed of \\verb|r0| by an ideal
 " +nl);
  ring r0=0,(x,y,z),dp;
  ideal I = x2-y,y+z2, xy;
@@ -2168,15 +2218,16 @@ string sI = string(I);
  qring qr = I;
 write(fname,
 bv +
-"> setring r0;
-> ideal I = x2-y,y+z2, xy;
-> I = std(I);
-> string(I);" + nl +
+"> setring r0;" +nl +
+"> ideal I=x2-y,y+z2, xy;" +nl +
+"> I=std(I);" +nl +
+"> string(I);" + nl +
 splt(sI) + nl +
-"> qring qr = I;                   texring(fname,qr);" +
+"> qring qr=I;"+ nl+
+"> texring(fname,qr);" +
 ev
 );
-  texring(fname,qr);              write(fname,lb);
+  texring(fname,qr); write(fname,lb);
 
 write(fname,"\\Line");
 
@@ -2184,17 +2235,16 @@ write(fname,"\\Line");
 
 write(fname,"\\subsection{Features for rings}");
 
-write(fname,"The printed form of the ring may be modified in a great variety");
+write(fname,
+"In many cases it might be convenient to change the standard typesetting
+of rings. This can be done by passing additional arguments to \\verb|texring|."
++nl);
 
 // changing the brackets
 
-write(fname,"If the displayed  and defaulted brackets for the ring are not
-the rigth one,
-correct brackets may be passed over to \\verb|texring|",nl,
-"Predefined and accepted brackets are \\verb|\"\{\"|,
-\\verb|\"\{\{\"|,\\verb|\"[\"|,\\verb|\"[[\"|,\\verb|\"<\"|,
-\\verb|\"<<\"|.");
-
+write(fname,nl,"In order to change the displayed brackets one has to give
+the desired ones as additional argument (accepted brackets are: \\verb|\"\{\"|,
+\\verb|\"\{\{\"|,\\verb|\"[\"|,\\verb|\"[[\"|,\\verb|\"<\"|,\\verb|\"<<\"|).");
 
 write(fname,
 bv +
@@ -2212,58 +2262,55 @@ ev
 
 texring(fname,r2,"[");
 
-write(fname,nl2);
+write(fname,nl+"\\vspace{0.2cm}" + nl2);
 
-write(fname,nl2,"The brackets around the ideal in a quotientring can be
-changed  with the global variable \\verb|TeXbrack| (see the section
-{\\tt ideal}).",nl);
+write(fname,"The brackets around the ideal in a quotient ring can be
+changed by setting  the global variable \\verb|TeXbrack| (see section
+{\\tt Ideals}).",nl);
 
 
 write(fname,
 bv +
-"> string TeXbrack = \"<\";
-> texring(fname,qr);
-> kill TeXbrack;" + nl +
+"> string TeXbrack = \"<\";" +nl +
+"> texring(fname,qr);" +nl +
 ev
 );
 
-string TeXbrack = "<"; export TeXbrack;
-texring(fname,qr);
-kill TeXbrack;
+  string TeXbrack = "<"; export TeXbrack;
+  texring(fname,qr);
+  kill TeXbrack;
+
+write(fname,
+bv +
+"> kill TeXbrack;" + nl +
+ev);
+
 
 write(fname,nl2,"\\Line");
 
-// changing the coeffield
+// changing the ground field
 // -------------------------------------------------
-write(fname,"If the ground field in characteristic 0 should be written as
-$\\C$  instead of $\\Q$ use this as additonal argument.",nl);
 
+write(fname,
+"It is possible to display a ground field different from the
+actual one by passing any letter in \\LaTeX \\ notation as additional
+argument.  Predefined values are \\verb|\"\\\\C\"|, \\verb|\"\\\\R\"|, 
+\\verb|\"k\"|, \\verb|\"K\"| and \\verb|\"R\"|."+nl+
+"If for example a ground field of characteristic 0 should be written as
+$\\C$ instead of $\\Q$ use this as additonal argument.",nl);
 
 write(fname,
 bv +
 "> texring(fname,r3,\"\\\\C\");" + nl +
-ev
-);
+ev);
 
 texring(fname,r3,"\\C");
-write(fname,nl2);
+write(fname,nl+ "\\vspace{0.2cm}" + nl2);
 
-write(fname,nl2, "naechster abschnitt stimmt nicht"+lb,nl2);
-
-write(fname,"Predefined and accepted values here are
-\\verb|\"\\\\C\"|, \\verb|\"\\\\R\"|,
- \\verb|\"\\\\C\"|, \\verb|\"k\"|, \\verb|\"K\"|, \\verb|\"R\"|.");
-write(fname,"The latter are useful to print a ring whose field of
-coefficients is defined by an algebraic extension. Now the parameters
-will be omitted completely.
-");
-write(fname,"The user may specify then the field in more detail."+lb,nl2);
-
-write(fname,"Any correct letter in \\LaTeX \\ notation may be used to describe
-the field of coefficients. If the letter is k, K or R it  forces
-\\verb|texring| not to print the parameters. This will be useful for a
-ring described by an algebraic extension",nl2);
-
+write(fname,"The values \\verb|\"k\"|, \\verb|\"K\"|, \\verb|\"R\"| play a
+ special role when the ground field is an algebraic extension. In this case
+the parameters will be omitted.");
+ 
 write(fname,
 bv +
 "> texring(fname,ralg,\"k\");" + nl +
@@ -2271,12 +2318,11 @@ ev
 );
 
 texring(fname, ralg,"k");
+write(fname,nl+"\\vspace{0.2cm}" + nl2);
 
-// texobj(fname,"with k = ");
+write(fname,"If an algebraic extension should be displayed together with
+its minimal polynomial the optional parameter \\verb|mipo| has to be used.");
 
-write(fname,nl2,
-"The algebraic extension is diplayed with the optional paramater
-\\verb|mipo|");
 write(fname,
 bv +
 "> texring(fname,ralg,\"mipo\");" + nl +
@@ -2284,30 +2330,36 @@ ev
 );
 
 texring(fname, ralg,"mipo");
-
-
 write(fname,nl,"\\Line");
+
 // displaying only certain vars
 
-write(fname,"By default all variables of a ring will be typed. It is possible
-to print only certain variables filled up with $\\ldots$ between them. Define
-therefore an \\verb|intvec| with the marked places.");
+write(fname,"By default all variables of a ring will be displayed. It is
+possible to print only certain variables with $\\ldots$ between
+them. The positions of the variables which should be displayed have to be
+passed to \\verb|texring| as an \\verb|intvec|.");
 
 write(fname,
 bv +
-"> intvec v = 5,6;
-> texring(fname,r2,v);
-> kill v;" + nl +
+"> intvec v=5,6;
+> texring(fname,r2,v);" +nl +
 ev
 );
 
-intvec v = 5,6;
-texring(fname,r2,v);
-kill v;
+  intvec v = 5,6;
+  texring(fname,r2,v);
+  kill v;
 
-write(fname,nl2,"The first and last variable
-will be printed always, to print only these it is sufficient to give a 1 as
-third argument.");
+write(fname,
+bv +
+"> kill v;" + nl +
+ev
+);
+
+write(fname,nl+ "\\vspace{0.2cm}" + nl2);
+ 
+write(fname,"The first and the last variable will always be printed.
+In order to print only these it is sufficient to give a 1 as third argument.");
 
 write(fname,
 bv +
@@ -2316,13 +2368,12 @@ ev
 );
 texring(fname,r1,1);
 
+write(fname,nl2,"\\Line");
 
-write(fname,nl2,"\\Line",nl);
+// invariant ring under a group action
 
-// passing over additional information
-
-write(fname,"If you want to mark a ring as the invariantring under a group,
-additional informations starting with \\verb|^| may be added.",nl2);
+write(fname,"If you want for example to display a ring as the invariant ring
+under a group, additional information starting with \\verb|^| may be added.");
 
 write(fname,
 bv +
@@ -2331,18 +2382,21 @@ ev
 );
 
 texring(fname, r0,"^G");
+write(fname,nl2,"\\Line");
 
-write(fname,nl2,"All these arguments may be passed over in any order as
-optional arguments, but it may give a rather nonsense result if too much of
-them  are used at the same time",nl);
+// passing several optional arguments at once
+
+write(fname,"It is also possible to pass several of the arguments described
+above at once (in any order).");
+ 
 
 write(fname,
 bv +
-"> texring(fname,r3,\"\\\\R\",1,\"{{\",\"^G\");" + nl +
+"> texring(fname,r3,\"\\\\R\",\"{{\",\"^G\");" + nl +
 ev
 );
 
-texring(fname, r3,"\\R",1,"{{","^G");
+texring(fname, r3,"\\R","{{","^G");
 write(fname,nl2);
 //"end part 1" + nl;
 }
@@ -2352,7 +2406,7 @@ write(fname,nl2);
 
 
 static proc part2(string fname)
-{
+{ 
 
   int st = defined(texdemopart);
   string nl = newline;
@@ -2372,25 +2426,23 @@ static proc part2(string fname)
 //-------------------- texfactorize ------------------------------
 write(fname,"\\subsection{Factorized polynomials}");
 
-write(fname,"The command \\verb|texfactorize| calls internally the Singular
-command \\verb|factorize| and returns the product of the irreducible factors.
-at the present it is not possible to pass the optional arguments of
-\\verb|factorize| through \\verb|texfactorize|."+lb);
+write(fname,"The command \\verb|texfactorize| calls internally the 
+{\\sc Singular} command \\verb|factorize| and returns the product of the 
+irreducible factors. Note that, at the moment, it is not possible to pass 
+any optional arguments for \\verb|factorize| through \\verb|texfactorize|.");
 
   ring r0=0,(x,y,z),dp;
-  poly h = (x+1+y)^2*x3y*(2x-2y)*y12;
+  poly h=(x+1+y)^2*x3y*(2x-2y)*y12;
 
 write(fname,
 bv +
-"> setring r0;
-> poly h = (x+1+y)^2*x3y*(2x-2y)*y12;
-> h;
-> " + splt(string(h)) + nl +
-"> texfactorize(fname,h);
-" +
+"> setring r0;"+nl+
+"> poly h=(x+1+y)^2*x3y*(2x-2y)*y12;"+nl+
+"> h;" +nl+
+ splt(string(h)) + nl +
+"> texfactorize(fname,h);" +
 ev);
-
-  texfactorize(fname,h);
+texfactorize(fname,h);
 
 //  setring ralg;
   ring ralg = (7,a),x,dp;
@@ -2399,43 +2451,31 @@ ev);
 
 write(fname,
 bv +
-"> setring ralg;
-> poly h=(a24x5+x3)*a2x6*(x+1)^2;
-> h;
-> " + splt(string(h)) + nl +
-"> texfactorize(fname,h);
-" + nl +
+"> setring ralg;"+nl+
+"> poly h=(a24x5+x3)*a2x6*(x+1)^2;" +nl+
+"> h;"+ nl +
+ splt(string(h)) + nl +
+"> texfactorize(fname,h);"+ nl +
 ev);
-
-  texfactorize(fname,h);
-
-//write(fname,nl2, If \\verb|texfactorize| is called by the name of the
-// polynom, the result is the following" + lb,nl);
-
-// write(fname,nl2, "Noch nicht implemtiert" + lb,nl2);
-
-//write(fname,"\\subsection{Hilbertpolynomials}");
+texfactorize(fname,h);
 
 //--------------------- features for polynomials -----------------
 write(fname,"\\subsection{Features for polynomials}");
 
-write(fname,"very long variables will be set correctly too. Furthermore,
-but we cannot demonstrate it here,
-the Laurentpolynomials with negative exponents will be translated."+ lb);
-
 // TeXreplace
 // ---------------------------------------------
-write(fname,"The global variable \\verb|TeXreplace| must be a list
-whose entries are twoelemented lists again; wherby the first entry is the
-word which should be replaced and second is the replacing word."  +
-"This is may be applied to replace names of variables, but holds  also
-for texname and texmap" + lb +
-"It is most useful to write the greece letters correctly. Notice that it
-is necesarry to write
-a double backslash \\verb|\\\\\ | at the beginning of
-a \\TeX \\ symbol." + lb);
+write(fname,"By setting the global variable \\verb|TeXreplace| it is possible
+to define rules for replacing strings or variable names. 
+\\verb|TeXreplace| has to be a list of twoelemented lists where the first
+entry is the text which should be replaced by the second entry.
+This may be applied to replace names of variables, but is also used 
+when calling \\verb|texname| or \\verb|texmap|. Note that it
+is necessary to write a double backslash \\verb|\\\\\| at the beginning of
+a \\TeX \\ symbol." + lb+nl);
 
-write(fname,"Usually we write $\\xi$ for the primitive element:"+ lb);
+write(fname,"Let us denote the primitive element of an algebraic extension
+by $\\xi$.");
+
 list TeXreplace; export TeXreplace;
 TeXreplace[1] = list("a","\\xi");
 // setring r49;
@@ -2443,17 +2483,17 @@ TeXreplace[1] = list("a","\\xi");
   poly g=-(2a13 +a)*x2+a2*x-a+1;
 write(fname,
 bv +
-"> list TeXreplace;
-> TeXreplace[1] = list(\"a\",\"\\\\xi\");
-> setring r49;
-> texpoly(fname,g);
-" + nl +
+"> list TeXreplace;" +nl +
+"> TeXreplace[1]=list(\"a\",\"\\\\xi\");" +nl+
+"> setring r49;" +nl+
+"> texpoly(fname,g);"+ nl +
 ev);
 
 texpoly(fname,g);
 
-write(fname,nl2,"Let us write $\\lambda$ and $\\mu$ for deforming parameters"
- +lb);
+write(fname,nl+ "\\vspace{0.2cm}" + nl2);
+write(fname,"Now let us write $\\lambda$ and $\\mu$ for deformation
+parameters.");
 TeXreplace[2]= list("s","\\lambda");
 TeXreplace[3]= list("t","\\mu");
 // setring(r0t);
@@ -2461,39 +2501,21 @@ TeXreplace[3]= list("t","\\mu");
   poly g=8*(-s+2t)/(st+t3)*x+t2*x-1;
 write(fname,
 bv +
-"> TeXreplace[2]= list(\"s\",\"\\\\lambda\");
-> TeXreplace[3]= list(\"t\",\"\\\\mu\");
-> setring(r0t);
-> texpoly(fname,g);
-" + nl +
-ev);
-
-texpoly(fname,g);
-
-write(fname,nl2,"let us write $\\tilde{y}$ for $x$" + lb);
-
-TeXreplace[4] = list("x","\\tilde{y}");
-
-// setring r1;
-  ring r1=7,(x1,x2,x3,x4),Ds;
-  poly g=-2*x1+x4-1;
-
-write(fname,
-bv +
-"> TeXreplace[4] = list(\"x\",\"\\\\tilde{y}\");
-> setring r1;
-> texpoly(fname,g);
-> kill TeXreplace;
-" + nl +
+"> TeXreplace[2]=list(\"s\",\"\\\\lambda\");"+nl+
+"> TeXreplace[3]=list(\"t\",\"\\\\mu\");"+nl+
+"> setring(r0t);"+nl+
+"> texpoly(fname,g);"+ nl +
 ev);
 texpoly(fname,g);
+
 kill TeXreplace;
-
-write(fname,"If \\verb|TeXreplace| is defined, the translation into \\TeX  code
-runs significantly slower, because every polynomial will be compiled in the
-\\verb|non short| mode."+ lb );
+write(fname,nl+ "\\vspace{0.4cm}" + nl2);
+write(fname,nl2+"Note that, if \\verb|TeXreplace| is defined, the translation
+into \\LaTeX  code runs significantly slower, because every polynomial will be
+compiled in the \\verb|non short| mode."+ lb );
 
 write(fname,nl,"\\Line");
+
 //linebreaking   TeXwdith
 //-----------------------------------------------------------------------
 write(fname,"The global variable \\verb|TeXwidth| controls the wrapping of
@@ -2504,92 +2526,74 @@ write(fname,
 "\\text{TeXwidth} = ",
 "\\begin{cases} ",
 " -1 & \\text{no linebreaking} \\\\ ",
-"  0 & \\text{print the polynom as equation} f=0 \\\\ ",
-" 1,\\ldots,5 & \\text{ the first n termes followed by the sign of the next
+"  0 & \\text{print the polynomial as equation } f=0 \\\\ ",
+" 1,\\dots,9 & \\text{the first n terms followed by the sign of the next
 term} \\\\ ",
-" > 5 & \\text{wrapping after n letters corresponding x} ",
+" > 9 & \\text{line break after terms of length n (see below)} ",
 "\\end{cases}",
 "\\]",nl);
 
-write(fname,"Notice that two letters like x counts as three subscripts or
-exponents",nl);
+write(fname,"Note that the size of terms is calculated with certain 
+multiplicities.",nl);
 
-write(fname,nl,"\\Line",nl);
 //----------------------------------------------------------
-
-write(fname,"\\verb|TeXwidth| is the only global variable which will be defined
-automatically from Singular. Its default value is -1
-i.e., wrapping is set off."+ lb);
 
 write(fname,"\\begin{itemize}",nl);
 write(fname,"\\item",nl);
 
-write(fname,"Up to now the value is " + string(TeXwidth)+".");
-
 write(fname,
 bv +
-"> TeXwidth;
-" + nl +
-string(TeXwidth) +
+"> TeXwidth=-1;"+nl+
+"> setring r0;"+nl+
+"> poly f=g^2;"+nl+
+"> texpoly(fname,f);" + nl +
 ev);
 
-
-write(fname,
-bv +
-"> setring r0;
-> poly f = g^2;
-> texpoly(fname,f);
-" + nl +
-ev);
-
-  setring r0;
+  setring r0; 
   poly g=-x2y+2y13z+1;
-  poly f = g^2;
+  poly f=g^2;
   texpoly(fname,f);
 
 write(fname,"\\item",nl);
 
 write(fname,
 bv +
-"> TeXwidth =0;
-> texpoly(fname,g);
-" + nl +
+"> TeXwidth=0;"+nl+
+"> texpoly(fname,f);"+nl+
 ev);
 TeXwidth = 0;
-texpoly(fname,g);
-
-write(fname,"\\item",nl);
-
-write(fname,
-bv +
-"> TeXwidth = 2;
-> texpoly(fname,f);
-" + nl +
-ev);
-TeXwidth = 2;
 texpoly(fname,f);
+
 write(fname,"\\item",nl);
 
 write(fname,
 bv +
-"> TeXwidth = 60;
-> texobj(fname,f);
-" + nl +
+"> TeXwidth=2;"+nl+
+"> texpoly(fname,f);"+nl+
 ev);
-TeXwidth = 60;
-texobj(fname,f);
+TeXwidth=2;
+texpoly(fname,f);
+
+write(fname,"\\item",nl);
+
+write(fname,
+bv +
+"> TeXwidth=20;"+nl+
+"> texpoly(fname,f);"+nl+
+ev);
+TeXwidth=20;
+texpoly(fname,f);
+TeXwidth=-1;
 
 write(fname,"\\end{itemize}",nl);
 
-write(fname,nl2,"\\Line",nl);
+write(fname,nl2,"\\Line");
 
-write(fname,"As seen there are two possibilities to tex a polynomial. The
-command \\verb|texpoly| is the most basic one and sets the polynomials in
-textmode. Notice that it counts the length of the terms convenientely." + lb +
-" The command \\verb|texobj| is the most general one, if a polynomial
-will be texed with this command, it will be written in display mode and
-the length of the terms will be counted appropriately ." + lb,nl2,
-"Let us compare the output for \\verb|texpoly| and \\verb|texobj|."+lb);
+write(fname,"There are two possibilities to convert a polynomial into 
+\\LaTeX \\ code: either by using \\verb|texpoly| or by calling \\verb|texobj|.
+The difference is that \\verb|texpoly| puts the polynomial in textmode
+while \\verb|texobj| uses the display mode."+nl+
+"The following examples show the different outputs:");
 
 write(fname,
 bv +
@@ -2598,11 +2602,10 @@ bv +
 ev);
 
 // setring r3;
+  
   ring r3=0,(x_1,x_2,x_3),wp(3,2,1);
-  poly g = -x_1*x_2 + 2*x_2*x_3 + x_1*x_3;
+  poly g=-x_1*x_2+2*x_2*x_3+x_1*x_3;
   texpoly(fname,g/180);
-
-write(fname,nl2, "Now the same again with \\verb|texobj| "+ lb,nl);
 
 write(fname,
 bv +
@@ -2612,34 +2615,32 @@ ev);
 
 texobj(fname,g/180);
 
-write(fname,"Some explanation how it works: if \\verb|texobj| is called for
-a polynomial, then it defines a global variable \\verb|TeXdisp| which forces
-\\verb|texpoly| to count fraction with space corresponding
-the displaymode."+lb,nl2);
-
-
-
+//write(fname,"Some explanation how it works: if \\verb|texobj| is called for
+//a polynomial, then it defines a global variable \\verb|TeXdisp| which forces
+//\\verb|texpoly| to count fraction with space corresponding
+//the displaymode."+lb,nl2);
 //---------------------texobj for ideal ---------------
-write(fname,"\\section{ideal}");
-write(fname,"Ideal will just be printed as they are");
+
+write(fname,"\\subsection{Ideals}");
+write(fname,"By default, ideals are displayed as column vectors.");
 
   ring r;
-  ideal I = 3xz5+x2y3-3z,7xz5+y3z+x-z,-xyz2+4yz+2x;
+  ideal I=3xz5+x2y3-3z,7xz5+y3z+x-z,-xyz2+4yz+2x;
 
 write(fname,
 bv +
-"> ring r;   // the default one
-> ideal I = 3xz5+x2y3-3z,7xz5+y3z+x-z,-xyz2+4yz+2x;
-> texobj(fname,I);" + nl +
-ev + nl);
+"> ring r;   // the default ring"+nl+
+"> ideal I=3xz5+x2y3-3z,7xz5+y3z+x-z,-xyz2+4yz+2x;"+nl+
+"> texobj(fname,I);" + nl +
+ev);
 
 texobj(fname,I);
 
-write(fname,"\\subsection{Features for ideals}");
+write(fname,"\\Line");
 //----------------------------------------------------------------------
-write(fname," With setting of \\verb|TeXaligned| the ideal will be set in
-line ");
-
+write(fname,"If the global variable \\verb|Texaligned| is set then the ideal
+is displayed as a row vector.");
+ 
 write(fname,
 bv +
 "> int TeXaligned;
@@ -2651,105 +2652,88 @@ texobj(fname,I);
 
 write(fname,"\\Line");
 //----------------------------------------------------------------------
-write(fname,"If other brackets are prefered, just set them");
+write(fname,"By setting the global variable \\verb|TeXbrack| it is possible
+to change the brackets.");
 
 write(fname,
 bv +
-"> string TeXbrack = \"<\";
-> texobj(fname,I);
-> kill TeXbrack, TeXaligned;" + nl +
+"> string TeXbrack=\"<\";"+nl+
+"> texobj(fname,I);"+nl+
 ev);
 
-
-string TeXbrack = "<";  export TeXbrack;
+string TeXbrack="<";  export TeXbrack;
 texobj(fname,I);
+
+write(fname,
+bv +
+"> kill TeXbrack, TeXaligned;" + nl +
+ev);
+
 kill TeXbrack,TeXaligned;
 write(fname,"\\Line");
 //----------------------------------------------------------------------
 write(fname,
-" If \\verb|TeXwidth| is set 0, an ideal will be set as an equation system
-" +nl);
-
+" If \\verb|TeXwidth| is 0, an ideal is displayed as a system of
+equations.");
 
 // ------------- a linear equation system
 
-  ring r5 = 0,x(1..5),dp;
+  ring r5=0,x(1..5),dp;
   ideal I=-x(1)+2*x(3)+x(5), x(2)-x(4)+2*x(5)-1, 8*x(1)+x(4)+2;
-  TeXwidth = 0;
+  TeXwidth=0;
 
 write(fname,
 bv +
-"> ring r5=0,x(1..5),dp ;
-> ideal I=-x(1)+2*x(3)+x(5), x(2)-x(4)+2*x(5)-1, 8*x(1)+x(4)+2;
-> string(I);" + nl +
-splt(string(I)) + nl2 +
-"> TeXwidth = 0;
-> texobj(fname,I);" +
-//> TeXwidth = 0;" +
-ev
-);
+"> ring r5=0,x(1..5),dp;"+nl+
+"> ideal I=-x(1)+2*x(3)+x(5), x(2)-x(4)+2*x(5)-1, 8*x(1)+x(4)+2;"+nl+
+"> TeXwidth=0;"+nl+
+"> texobj(fname,I);" +nl+
+ev);
 
   texobj(fname,I);
 
   setring r;
-  ideal J;
-  J[1] = 4x4y21+z25y7-y2;
-  J[2] = x3+y2;
-  J[3] = 5x22y6z17+4x13;
-  J[4] = y2-z4;
-  J[5] = 2x12z17+4y13;
+  ideal J=4x4y21+z25y7-y2,x3+y2,y2-z4;
 
 write(fname,
 bv +
-"> setring r;
-> J[1] = 4x4y21+z25y7-y2;
-> J[2] = x3+y2;
-> J[3] = 5x22y6z17+4x13;
-> J[4] = y2-z4;
-> J[5] = 2x12z17+4y13;
-> string(J);
-" + nl + string(J) +
+"> setring r;"+nl+
+"> ideal J=4x4y21+z25y7-y2,x3+y2,y2-z4;"+nl+
+"> texobj(fname,J);" +nl+
 ev
 );
-
-write(fname,
-bv +
-"> texobj(fname,J);" +
-ev
-);
-
   texobj(fname,J);
 
 write(fname,"\\Line");
 //-----------------------------------------------------------------------
-write(fname,"Call the ideal by its name and it will be printed as follows");
+write(fname,"Call the ideal by its name and it is printed as follows");
+
 write(fname,
 bv +
 "> setring r;
-> ideal I = 3xz5+x2y3-3z,7xz5+y3z+x-z,-xyz2+4yz+2x;
+> ideal I=3xz5+x2y3-3z,7xz5+y3z+x-z,-xyz2+4yz+2x;
 > texobj(fname,\"I\");" + nl +
 ev);
 
-  setring r;
-  texobj(fname,"I");
-
-  kill r;
+ setring r; export(I);
+ texobj(fname,"I");
+ kill I,r;
 //" end part 2 " + nl;
 }
 
 /////////////////////////////  PART3 //////////////////////////////////////////
 
 static proc part3(string fname)
-{
-  int st = defined(texdemopart);
-  string nl = newline;
-  string nl2 = newline + newline;
-  string lb = "\\\\";
-  string bv = "\\begin{verbatim}" + newline ;
-  string ev = "\\end{verbatim}" ;
+{ 
+  int st=defined(texdemopart);
+  string nl=newline;
+  string nl2=newline + newline;
+  string lb="\\\\";
+  string bv="\\begin{verbatim}" + newline ;
+  string ev="\\end{verbatim}" ;
 
   if (not(st) or st>=3)
-  {
+  { 
     print(" Call part2 first");
     return();
   }
@@ -2759,153 +2743,152 @@ static proc part3(string fname)
 // " : map,matrices,vectors,intvec,intmats,proc";
 
 //---------------------- texmap ------------------------------
-write(fname,"\\section{maps}");
-write(fname,bv +
-"> ring r4=0,(x,y,z),dp;
-> ring r5=0,(u,v),dp;
-> map phi = r1,u2,uv -v,v2;
-> texmap(fname,phi,r4,r5,\"\\\\C\");" + nl +
-ev );
-
+write(fname,"\\section{Typeseting maps between rings}");
+write(fname,"By default, maps are displayed in the following way:");
+ 
+write(fname,
+bv +
+"> ring r4=0,(x,y,z),dp;"+nl+
+"> ring r5=0,(u,v),dp;"+nl+
+"> map phi=r1,u2,uv -v,v2;"+nl+
+"> texmap(fname,phi,r4,r5);" + nl +
+ev);
+ 
   ring @r4_h=0,(x,y,z),dp;
   if(system("with","Namespaces")) { exportto(Current, @r4_h); }
   else { export @r4_h; }
   ring r5=0,(u,v),dp;
-  map @phi_h =@r4_h,u2,uv -v,v2;  export @phi_h;
-  texmap(fname,@phi_h,@r4_h,r5,"\\C");
+  map @phi_h=@r4_h,u2,uv -v,v2;  export @phi_h;
+  texmap(fname,@phi_h,@r4_h,r5);
 
-
-write(fname,"\\subsection{Features for maps}");
+write(fname,"\\Line");
 //--------------------------------------------------------------------
 
-
-write(fname,"\\begin{itemize}",nl);
-
-write(fname,"\\item",nl);
-
-write(fname,"If the map will be called by its name \\verb|texmap| can in
-combination with \\verb|TeXreplace| print the name of the map." + lb ,nl);
-
-write(fname,bv +
-"> list TeXreplace;
-> TeXreplace[1] = list(\"phi\",\"\\\\phi\");
-> texmap(fname,\"phi\",r4,r5);" + nl +
-ev);
-
-  list TeXreplace;
-  TeXreplace[1] = list("@phi_h","\\phi");
-  export TeXreplace;
-  texmap(fname,"@phi_h",@r4_h,r5);
-
-write(fname,"\\item",nl);
-
-write(fname,"With \\verb|TeXaligned| the map will be printed in a line"+lb,nl);
-
-write(fname,bv +
-"> int TeXaligned;
-> texmap(fname,phi,r4,r5,\"\\\\C\");" + nl +
+write(fname,"If the global variable \\verb|TeXaligned| is set, then the
+map is displayed in one line.");
+ 
+write(fname,
+bv +
+"> int TeXaligned;"+nl+
+"> texmap(fname,phi,r4,r5,\"\\\\C\");" + nl +
 ev );
 
   int TeXaligned; export TeXaligned;
   texmap(fname,@phi_h,@r4_h,r5,"\\C");
 
-write(fname,"\\item",nl);
+write(fname,nl+"\\Line");
+//--------------------------------------------------------------------
 
-write(fname,nl2,"The addtional arguments for \\verb|rings| may be passed over
-in \\verb|texmap|.",nl);
+write(fname,"It is possible to pass the same additional arguments to
+\\verb|texmap| as to \\verb|texring| (see section {\\tt Rings}). This can
+be done by calling \\verb|texmap| with two lists as additional parameters,
+where the first list contains the optional parameters for the source and
+the second one contains the parameters for the domain. Note that if only one
+list is present then it is applied to both of the rings.");
+ 
+write(fname,
+bv +
+"> texmap(fname,phi,r4,r5,\"\\\\C\",\"{\");" + nl +
+ev );
+  texmap(fname,@phi_h,@r4_h,r5,"\\C","{");
 
-write(fname,"In the following form the arguments are valid for both
-\\verb|rings|.",nl);
+write(fname,nl+ "\\vspace{0.2cm}" + nl);
+write(fname,"The next example shows how to format the two rings in different
+ways.");
 
-write(fname,bv +
-">  texmap(fname,\"phi\",r4,r5,\"\\\\C\",\"{\",1); " + nl +
+write(fname,
+bv +
+"> texmap(fname,phi,r4,r5,list(),list(\"{\"));"+nl+
 ev );
 
-  texmap(fname,"@phi_h",@r4_h,r5,"\\C","{",1);
+ texmap(fname,@phi_h,@r4_h,r5,list(),list("{")); 
 
-write(fname,"\\\\",nl2,"If they are enclosed in \\verb|list( )| the arguments
- may specialized in ",nl);
+write(fname,nl+"\\Line");
+//--------------------------------------------------------------------
 
-write(fname,bv +
-"> intvec v = 2;",
-"> texmap(fname,\"phi\",r4,r5,list(),list(v,\"{\"));",
-"> kill v,r4,r5,TeXreplace,TeXaligned;" + nl +
-ev );
+write(fname,"If the map is called by its name then \\verb|texmap| displays,
+in addition, also the name of the map.");
 
- intvec v = 2;
- texmap(fname,"@phi_h",@r4_h,r5,list(),list(v,"{"));
+write(fname,
+bv +
+"> list TeXreplace;" +nl+
+"> TeXreplace[1]=list(\"phi\",\"\\\\phi\")" +nl+
+"> texmap(fname,\"phi\",r4,r5);" + nl +
+ev);
 
- kill v,@phi_h,@r4_h,r5,TeXreplace,TeXaligned;
+  list TeXreplace;
+  TeXreplace[1]=list("@phi_h","\\phi");
+  export TeXreplace;
+  texmap(fname,"@phi_h",@r4_h,r5);
+  kill @phi_h,@r4_h,r5,TeXreplace,TeXaligned;
 
-write(fname,"\\end{itemize}",nl);
+
+write(fname,
+bv +
+"> kill phi,r4,r5,TeXreplace,TeXaligned;" + nl +
+ev);
+
 
 //% the texobj part
-write(fname,"\\section{basic, composed  data}");
+write(fname,"\\section{Typesetting composed data structures}");
 //=======================================================================
 
-write(fname, "Now we present the most general procedure \\verb|texobj| to
-translate composed Singularobjects into \\LaTeX \\ code"+lb,nl);
-
-write(fname,"\\section{matrices and vectors}");
+write(fname, "Complex data structures such as matrices, vectors or modules
+can be displayed by using the procedure \\verb|texobj|.");
+ 
+write(fname,"\\subsection{Matrices and vectors}");
 //=======================================================================
 
-write(fname,bv +
+write(fname,"The following example shows how to typeset the hessian of a
+polynomial."+
+bv +
 "> ring r;",
-"> poly h = 2xy3-x2z+x4z7 + y4z2;",
-"> matrix H = jacob(jacob(h));",
+"> poly h=2xy3-x2z+x4z7+y4z2;",
+"> matrix H=jacob(jacob(h));",
 "> texobj(fname,H);",
 ev );
 
 ring r;
-poly h = 2xy3-x2z+x4z7 + y4z2;
-matrix H = jacob(jacob(h));
+poly h=2xy3-x2z+x4z7+y4z2;
+matrix H=jacob(jacob(h));
 
 texobj(fname,H);
 
-// probiere auch V = 0 bei texobj aus
-matrix M = H;
+write(fname,"By default, \\verb|vectors| are written as row vectors:");
 
-write(fname,"A \\verb|vector| will be set as one column:"+lb ,nl);
+vector V = H[2];
 
-// Das geht nicht ?
-vector V = M[2];
-
-vector W= [x,y,0,z];
-
-write(fname,bv +
-"> matrix M = H;",
-"> vector V = M[2];",
-"> vector W= [x,y,0,z];",
+write(fname,
+bv +
+"> vector V=H[2];",
 "> texobj(fname,V);",
 ev );
 
 texobj(fname,V);
 
-write(fname,bv +
-"> texobj(fname,W);",
-ev );
-
-texobj(fname,W);
-
-write(fname,"To turn it just the cast \\verb|matrix| here"+ lb,nl);
-write(fname,bv +
+write(fname,nl2+"\\vspace{0.2cm}"+nl);
+write(fname,"In order to transpose it, it has to be converted into a
+matrix.");
+write(fname,
+bv +
 "> texobj(fname,matrix(V));",
 ev );
 
 texobj(fname,matrix(V));
 
-write(fname,"\\subsection{Features for matrices and vectors}");
+write(fname,nl+"\\Line");
 //------------------------------------------------------------------------
 
-write(fname,"All the features for \\verb|poly| and the features for
-\\verb|intmat| or \\verb|intvec| hold here, too.");
-
-write(fname,"Display only the jet of the Hessian");
+write(fname,"All the features for typesetting polynomials work also for
+matrices or vectors with polynomial entries.");
+write(fname,nl+ "\\vspace{0.2cm}" + nl);
+write(fname,"By setting the global variable \\verb|TeXwidth| it is possible
+to display only the first terms of the polynomials.");
 
 write(fname,bv +
-"> TeXwidth = 1;",
+"> TeXwidth=1;",
 "> texobj(fname,H);",
-"> TeXwidth = -1;",
+"> TeXwidth=-1;",
 ev );
 
 TeXwidth = 1;
@@ -2914,11 +2897,13 @@ TeXwidth = -1;
 
 write(fname,nl,"\\Line");
 //------------------------------------------------------------------------
-write(fname,"Set rational numbers as you like"+lb,nl);
+write(fname,"The flag variable \\verb|TeXnofrac| controls the typesetting
+of fractions.");
 
-write(fname,bv +
-"> ring R0 = 0,x,dp;",
-"> matrix M[2][3] = 1/2, 0, 1/2, 0, 1/3, 2/3;",
+write(fname,
+bv +
+"> ring R0=0,x,dp;",
+"> matrix M[2][3]=1/2, 0, 1/2, 0, 1/3, 2/3;",
 "> texobj(fname,M);",
 ev);
 
@@ -2930,36 +2915,45 @@ texobj(fname,M);
 write(fname,bv +
 "> int TeXnofrac;",
 "> texobj(fname,M);",
-"> kill TeXnofrac;",
 ev );
 
-int TeXnofrac; export TeXnofrac;
-texobj(fname,M);
-kill TeXnofrac;
+  int TeXnofrac; export TeXnofrac;
+  texobj(fname,M);
+  kill TeXnofrac;
+
+write(fname,bv +
+"> kill TeXnofrac;",
+ev );
 
 write(fname,nl,"\\Line");
 //------------------------------------------------------------------------
 
-write(fname,nl,"Print a vector with homogenous coordinates ");
+write(fname,"Printing a vector with homogeneous coordinates can be done by
+setting \\verb|TeXproj|.");
 write(fname,bv +
 "> setring r;",
 "> int TeXproj;",
 "> texobj(fname,V);",
-"> kill TeXproj;",
 ev );
 
-  setring r;
-  ideal I = 3xz5+x2y3-3z,7xz5+y3z+x-z,-xyz2+4yz+2x;
+  setring r;  
+  ideal I=3xz5+x2y3-3z,7xz5+y3z+x-z,-xyz2+4yz+2x;
   int TeXproj; export TeXproj;
-
+  
   texobj(fname,V);
   kill TeXproj;
 
-write(fname,"\\section{modules}",nl2);
+write(fname,
+bv +
+"> kill TeXproj;"+nl+
+ev);
+ 
+write(fname,"\\subsection{Modules}",nl2);
 
-write(fname,bv +
+write(fname,"By default, modules are displayed in the following way:"+
+bv +
 "> setring r;",
-"> module md = module(H);",
+"> module md=module(H);",
 "> texobj(fname,md);",
 ev );
 
@@ -2967,84 +2961,66 @@ setring r;
 module md = module(H);
 texobj(fname,md);
 
-write(fname,"\\subsection{Features for modules}");
+write(fname,nl,"\\Line");
+//------------------------------------------------------------------------
 
-write(fname,"Set a module aligned",nl2);
+write(fname,"In order to write the generators of a module aligned, the flag
+variable \\verb|TeXaligned| has to be defined.",nl2);
 
 write(fname,bv +
 "> int TeXaligned;",
 "> texobj(fname,md);",
-"> kill TeXaligned;",
 ev );
 
 int TeXaligned; export TeXaligned;
 texobj(fname,md);
 kill TeXaligned;
-
-
-//----------------------------------------------------------------
-write(fname,"\\section{intvec and intmat}");
-
-write(fname,"Despite of the fact that a \\verb|intvec| is in Singular a column
-vector, the \\verb|tex.lib| sets it as a row vector ust as Singular displays it
-");
-intvec v = 1..4;
-write(fname,
-bv +
-"> intvec v = 1..4;
-> v;" + nl +
-string(v) + nl +
-"> nrows(v);" + nl +
-string(nrows(v)) + nl +
-"texobj(fname,v);" + nl2 +
+write(fname,bv +
+"> kill TeXaligned;",
 ev );
 
-texobj(fname,v);
+//----------------------------------------------------------------
+write(fname,"\\subsection{Integer matrices and vectors}");
 
-
-intmat m[3][4] = -1,3,5,2,-2,8,6,0,2,5,8,7;
+write(fname,"Integer matrices are displayed in the following way.");
+ 
+intmat m[3][4]=-1,3,5,2,-2,8,6,0,2,5,8,7;
 
 write(fname,
 bv +
-"> intmat m[3][4] = -1,3,5,2,-2,8,6,0,2,5,8,7;" + nl +
+"> intmat m[3][4]=-1,3,5,2,-2,8,6,0,2,5,8,7;" + nl +
 "> m;" + nl +
 string(m) + nl +
 "> texobj(fname,m);" + nl2 +
 ev );
 
 texobj(fname,m);
-
-//-----------------------------------------------------------------
-write(fname,"\\subsection{Features for intvec and intmat}");
-
-write(fname,"If the \\verb|intvec| should represent homogemous coordinates
-set \\verb|TeXproc|.");
+write(fname,nl+ "\\vspace{0.2cm}" + nl);
+write(fname,"Integer vectors are displayed as row vectors.");
+intvec v = 1..4;
 write(fname,
 bv +
-"> int TeXproj;" + nl +
-"> texobj(fname,v);" + nl +
-"> kill TeXproj;" + nl2 +
+"> intvec v=1..4;"+nl+
+"> v;" + nl +
+string(v) + nl +
+"> texobj(fname,v);"+nl+
 ev );
 
-int TeXproj; export TeXproj;
 texobj(fname,v);
-kill TeXproj;
 
-write(fname,nl2);
-
-//-----------------------------------------------
-write(fname,"\\Line");
-write(fname,"For writing an \\verb|intvec| as row vector as it is use the
-cast \\verb|intmat|");
-
-write(fname,
+write(fname,nl+ "\\vspace{0.2cm}" + nl);
+write(fname,"To typeset the transposed vector, it has to be converted into
+an integer matrix."+
 bv +
 "> texobj(fname,intmat(v));" + nl2 +
 ev );
 
 texobj(fname,intmat(v));
 
-write(fname,
+write(fname,nl+ "\\vspace{0.2cm}" + nl);
+
+write(fname,"The following example shows how to typeset the multiplication of
+a matrix with a vector."+
 bv +
 "> texobj(fname,intmat(m*v),\"=\",m,\"*\",intmat(v));" + nl2 +
 ev );
@@ -3054,19 +3030,19 @@ texobj(fname,intmat(m*v),"=",m,"*",intmat(v));
 //-----------------------------------------------------------------
 write(fname,"\\Line");
 
-write(fname,"The brackets of a \\verb|intmat| can be set with \\verb|TeXproj|
-as usual");
+write(fname,"Of course, the brackets of a \\verb|intmat| can be changed
+by setting \\verb|TeXbrack|.");
 
 write(fname,
 bv +
-"> intmat mat[3][3] = 1,2,3,4,5,6,7,8,9;" + nl +
-"> string TeXbrack = \"|\";" + nl +
-"> texobj(fname,mat,\"=\",det(mat)); " + nl2 +
+"> intmat mat[3][3]=1,2,3,4,5,6,7,8,9;" + nl +
+"> string TeXbrack=\"|\";" + nl +
+"> texobj(fname,mat,\" = \",det(mat)); " + nl2 +
 ev );
 
 intmat mat[3][3] = 1,2,3,4,5,6,7,8,9;
 string TeXbrack = "|"; export TeXbrack;
-texobj(fname,mat,"=",det(mat));
+texobj(fname,mat," = ",det(mat));
 kill TeXbrack;
 
 //----------------------------------texname-------------------
@@ -3088,23 +3064,27 @@ kill TeXbrack;
     {
       "// not an isolated singularity";
     }
-    return(m_nr);
+    return(m_nr); 
   }
   export(milnor_number);
 
-
-write(fname,"\\section{procs}");
-write(fname,"Finally, here is a way to typeset procedures in \\LaTeX :");
-
-  texproc(fname,"milnor_number");
+write(fname,"\\section{Typesetting procedures}");
+write(fname,"The following procedure allows to include the source code
+of procedures into a \\LaTeX document.");
+write(fname, 
+bv +
+"> texproc(fname,\"milnor\_number\");" +nl+
+ev);
+ 
+ texproc(fname,"milnor_number");
 
   kill(milnor_number);
-
+ 
 // ------------------------------ closing the tex file -------------------
 write(fname,"\\section{Closing the \\LaTeX\\ file}");
-write(fname,"The file will be closed by \\verb|closetex(fname);|. It should
-contain now purely correct \\LaTeX code and may be compiled with " +
-"\\verb|tex(fname)| and displayed with \\verb|xdvi(fname)|");
+write(fname,"To close the file use \\verb|closetex(fname);|. It should now
+contain pure \\LaTeX \\ code and may be compiled with " +
+"\\verb|tex(fname)| and displayed with \\verb|xdvi(fname)|.");
 
 // write(fname,"\\section{Remarks}");
 closetex(fname);
