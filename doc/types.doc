@@ -1,38 +1,39 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.7 1998-04-27 14:50:37 krueger Exp $
+@comment $Id: types.doc,v 1.8 1998-04-27 15:06:59 Singular Exp $
 @comment this file contains the type definitions
 @menu
-* boolean::
-* ideal::
-* int::
-* intmat::
-* intvec::
-* link::
-* map::
-* matrix::
-* module::
-* number::
-* poly::
-* proc::
-* ring::
-* string::
-* Untyped expressions::
-* vector::
+* boolean::                     
+* ideal::                       
+* int::                         
+* intmat::                      
+* intvec::                      
+* link::                        
+* list::                        
+* map::                         
+* matrix::                      
+* module::                      
+* number::                      
+* poly::                        
+* proc::                        
+* ring::                        
+* string::                      
+* Untyped expressions::         
+* vector::                      
 @end menu
 
 @c ---------------------------------------
 @node boolean, ideal, Data types, Data types
 @section boolean
 @cindex boolean
-@menu
-* boolean declarations::
-* boolean expressions::
-* boolean operations::
-* boolean related functions::
-@end menu
-
 @c --> section boolean
 @c ------------------------------
+@menu
+* boolean declarations::        
+* boolean expressions::         
+* boolean operations::          
+* boolean related functions::   
+@end menu
+
 @node boolean declarations, boolean expressions, boolean, boolean
 @subsection boolean declarations
 @cindex boolean declarations
@@ -137,13 +138,19 @@ example, determine the @code{(1 || a)} without evaluating @code{a}.
 @c <--
 
 @c ---------------------------------------
-@c @node ideal, int, Data types, Data types
 @node ideal, int, boolean, Data types
 @section ideal
 @cindex ideal
 
 @c --> section ideal
 @c ------------------------------
+@menu
+* ideal declarations::          
+* ideal expressions::           
+* ideal operations::            
+* ideal related functions::     
+@end menu
+
 @node ideal declarations, ideal expressions, ideal, ideal
 @subsection ideal declarations
 @cindex ideal declarations
@@ -350,13 +357,19 @@ Brackets may be used to access elements of ideals:
 @c <--
 
 @c ---------------------------------------
-@c @node int, intmat, Data types, Data types
 @node int, intmat, ideal, Data types
 @section int
 @cindex int
 
 @c --> section int
 @c ------------------------------
+@menu
+* int declarations::            
+* int expressions::             
+* int operations::              
+* int related functions::       
+@end menu
+
 @node int declarations, int expressions, int, int
 @subsection int declarations
 @cindex int declarations
@@ -559,12 +572,19 @@ module (see @ref{vdim})
 @c <--
 
 @c ---------------------------------------
-@node intmat, intvec, Data types, Data types
+@node intmat, intvec, int, Data types
 @section intmat
 @cindex intmat
 
 @c --> section intmat
 @c ------------------------------
+@menu
+* intmat declarations::         
+* intmat expressions::          
+* intmat operations::           
+* intmat related functions::    
+@end menu
+
 @node intmat declarations, intmat expressions, intmat, intmat
 @subsection intmat declarations
 @cindex intmat declarations
@@ -676,12 +696,19 @@ trace of an intmat (see @ref{trace})
 @c <--
 
 @c ---------------------------------------
-@node intvec, link, Data types, Data types
+@node intvec, link, intmat, Data types
 @section intvec
 @cindex intvec
 
 @c --> section intvec
 @c ------------------------------
+@menu
+* intvec declarations::         
+* intvec expressions::          
+* intvec operations::           
+* intvec related functions::    
+@end menu
+
 @node intvec declarations, intvec expressions, intvec, intvec
 @subsection intvec declarations
 @cindex intvec declarations
@@ -812,12 +839,19 @@ returns weights for the weigted ecart method (see @ref{weight})
 @c <--
 
 @c ---------------------------------------
-@node link, list, Data types, Data types
+@node link, list, intvec, Data types
 @section link
 @cindex link
 
 @c --> section link
 @c ------------------------------
+@menu
+* link declarations::           
+* link expressions::            
+* link operations::             
+* link related functions::      
+@end menu
+
 @node link declarations, link expressions, link, link
 @subsection link declarations
 @cindex link declarations
@@ -839,12 +873,19 @@ returns weights for the weigted ecart method (see @ref{weight})
 @c <--
 
 @c ---------------------------------------
-@node list, map, Data types, Data types
+@node list, map, link, Data types
 @section list
 @cindex list
 
 @c --> section list
 @c ------------------------------
+@menu
+* list declarations::           
+* list expressions::            
+* list operations::             
+* list related functions::      
+@end menu
+
 @node list declarations, list expressions, list, list
 @subsection list declarations
 @cindex list declarations
@@ -976,12 +1017,19 @@ Brackets may be used to access elements of lists:
 @c <--
 
 @c ---------------------------------------
-@node map, matrix, Data types, Data types
+@node map, matrix, list, Data types
 @section map
 @cindex map
 
 @c --> section map
 @c ------------------------------
+@menu
+* map declarations::            
+* map expressions::             
+* map operations::              
+* map related functions::       
+@end menu
+
 @node map declarations, map expressions, map, map
 @subsection map declarations
 @cindex map declarations
@@ -1003,12 +1051,19 @@ Brackets may be used to access elements of lists:
 @c <--
 
 @c ---------------------------------------
-@node matrix, module, Data types, Data types
+@node matrix, module, map, Data types
 @section matrix 
 @cindex matrix
 
 @c --> section matrix
 @c ------------------------------
+@menu
+* matrix declarations::         
+* matrix expressions::          
+* matrix operations::           
+* matrix related functions::    
+@end menu
+
 @node matrix declarations, matrix expressions, matrix, matrix
 @subsection matrix declarations
 @cindex matrix declarations
@@ -1165,12 +1220,19 @@ Brackets may be used to access elements of matrices:
 @c <--
 
 @c ---------------------------------------
-@node module, number, Data types, Data types
+@node module, number, matrix, Data types
 @section module 
 @cindex module
 
 @c --> section module
 @c ------------------------------
+@menu
+* module declarations::         
+* module expressions::          
+* module operations::           
+* module related functions::    
+@end menu
+
 @node module declarations, module expressions, module, module
 @subsection module declarations
 @cindex module declarations
@@ -1386,12 +1448,19 @@ vector space dimension of free module over the basering modulo module (see @ref{
 @c <--
 
 @c ---------------------------------------
-@node number, poly, Data types, Data types
+@node number, poly, module, Data types
 @section number 
 @cindex number
 
 @c --> section number
 @c ------------------------------
+@menu
+* number declarations::         
+* number expressions::          
+* number operations::           
+* number related functions::    
+@end menu
+
 @node number declarations, number expressions, number, number
 @subsection number declarations
 @cindex number declarations
@@ -1516,12 +1585,19 @@ coefficient of the leading term (see @ref{leadcoef})
 @c <--
 
 @c ---------------------------------------
-@node poly, proc, Data types, Data types
+@node poly, proc, number, Data types
 @section poly 
 @cindex poly
 
 @c --> section poly
 @c ------------------------------
+@menu
+* poly declarations::           
+* poly expressions::            
+* poly operations::             
+* poly related functions::      
+@end menu
+
 @node poly declarations, poly expressions, poly, poly
 @subsection poly declarations
 @cindex poly declarations
@@ -1704,12 +1780,19 @@ Brackets may be used to access elements of ideals and matrices:
 @c <--
 
 @c ---------------------------------------
-@node proc, ring, Data types, Data types
+@node proc, ring, poly, Data types
 @section proc 
 @cindex proc
 
 @c --> section proc
 @c ------------------------------
+@menu
+* proc declarations::           
+* proc expressions::            
+* proc operations::             
+* proc related functions::      
+@end menu
+
 @node proc declarations, proc expressions, proc, proc
 @subsection proc declarations
 @cindex proc declarations
@@ -1731,12 +1814,19 @@ Brackets may be used to access elements of ideals and matrices:
 @c <--
 
 @c ---------------------------------------
-@node ring, string, Data types, Data types
+@node ring, string, proc, Data types
 @section ring 
 @cindex ring
 
 @c --> section ring
 @c ------------------------------
+@menu
+* ring declarations::           
+* ring expressions::            
+* ring operations::             
+* ring related functions::      
+@end menu
+
 @node ring declarations, ring expressions, ring, ring
 @subsection ring declarations
 @cindex ring declarations
@@ -1758,12 +1848,19 @@ Brackets may be used to access elements of ideals and matrices:
 @c <--
 
 @c ---------------------------------------
-@node string, Untyped expressions, Data types, Data types
+@node string, Untyped expressions, ring, Data types
 @section string 
 @cindex string
 
 @c --> section string
 @c ------------------------------
+@menu
+* string declarations::         
+* string expressions::          
+* string operations::           
+* string related functions::    
+@end menu
+
 @node string declarations, string expressions, string, string
 @subsection string declarations
 @cindex string declarations
@@ -1934,12 +2031,19 @@ from the string.
 @c <--
 
 @c ---------------------------------------
-@node Untyped expressions, vector, Data types, Data types
+@node Untyped expressions, vector, string, Data types
 @section Untyped expressions 
 @cindex Untyped expressions
 
 @c --> section Untyped expressions
 @c ------------------------------
+@menu
+* Untyped expressions declarations::  
+* Untyped expressions expressions::  
+* Untyped expressions operations::  
+* Untyped expressions related functions::  
+@end menu
+
 @node Untyped expressions declarations, Untyped expressions expressions, Untyped expressions, Untyped expressions
 @subsection Untyped expressions declarations
 @cindex Untyped expressions declarations
@@ -1961,12 +2065,19 @@ from the string.
 @c <--
 
 @c ---------------------------------------
-@node vector, , Data types, Data types
+@node vector,  , Untyped expressions, Data types
 @section vector 
 @cindex vector
 
 @c --> section vector
 @c ------------------------------
+@menu
+* vector declarations::         
+* vector expressions::          
+* vector operations::           
+* vector related functions::    
+@end menu
+
 @node vector declarations, vector expressions, vector, vector
 @subsection vector declarations
 @cindex vector declarations
