@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.209 2004-08-14 20:31:56 levandov Exp $ */
+/* $Id: extra.cc,v 1.210 2004-09-07 12:56:41 bricken Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -75,7 +75,7 @@
 #endif
 
 // for tests of t-rep-GB
-#include "tgb.cc"
+#include "tgb.h"
 
 // Define to enable many more system commands
 #ifndef MAKE_DISTRIBUTION

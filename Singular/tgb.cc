@@ -84,7 +84,9 @@ int kSBucketLength(kBucket* b)
   return s*c;
 }
 #endif
-
+static void finalize_reduction_step(reduction_step* r){
+  delete r;
+}
 static int LObject_better_gen(const void* ap, const void* bp)
 {
   LObject* a=*(LObject**)ap;

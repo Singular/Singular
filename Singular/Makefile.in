@@ -109,6 +109,7 @@ CXXSOURCES=grammar.cc scanner.cc attrib.cc \
     janet.cc wrapper.cc\
     libparse.cc sing_win.cc\
     gms.cc pcv.cc maps_ip.cc\
+    tgb.cc\
     pShallowCopyDelete.cc fast_maps.cc cntrlc.cc misc.cc
 
 # stuff for MP

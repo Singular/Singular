@@ -17,6 +17,7 @@
 #include "kInline.cc"
 #include "kstd1.h"
 #include "kbuckets.h"
+#include "tok.h"
 #define TGB_DEBUG
 #define FULLREDUCTIONS
 #define HANS_IDEA
@@ -226,7 +227,6 @@ struct find_erg{
 };
 
 static void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c);
-void finalize_reduction_step(reduction_step* r){
-  delete r;
-}
+static void finalize_reduction_step(reduction_step* r);
+
 #endif
