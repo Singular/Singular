@@ -127,7 +127,7 @@ if test "${GXX}" = yes; then
   else
     CXXNOOPTFLAGS=$CXXFLAGS
   fi
-  STATIC_LDFLAGS="-Xlinker -Bstatic"
+  STATIC_LDFLAGS="-static"
 else
   CXXTEMPFLAGS=""
   CXXNOOPTFLAGS=$CXXFLAGS
