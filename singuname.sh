@@ -103,6 +103,10 @@ then
     then
         echo ${prefix}-Linux
         exit 0
+    elif (echo $uname_a | $egrep "OSF1" > $devnull)
+    then
+        echo ${prefix}-OSF1
+        exit 0
     else
         echo ${prefix}-Unknown
         exit 1
