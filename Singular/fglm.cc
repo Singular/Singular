@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.cc,v 1.19 1999-11-15 17:19:59 obachman Exp $
+// $Id: fglm.cc,v 1.20 1999-11-24 12:29:38 wichmann Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -40,7 +40,10 @@ enum FglmState{
     FglmNoIdeal,
     FglmNotReduced,
     FglmNotZeroDim,
-    FglmIncompatibleRings
+    FglmIncompatibleRings,
+    // for fglmquot:
+    FglmPolyIsOne,
+    FglmPolyIsZero
 };
 
 // Has to be called, if currQuotient != NULL. ( i.e. qring-case )
@@ -319,6 +322,70 @@ fglmProc( leftv result, leftv first, leftv second )
     setFlag( result, FLAG_STD );
     return (state != FglmOk);
 }
+
+// fglmQuotProc: Calculate I:f with FGLM methods.
+// Checks the input-data, and calls fglmquot (see fglmzero.cc).
+// Returns the new groebnerbasis if I:f or 0 if an error occoured.
+BOOLEAN
+fglmQuotProc( leftv result, leftv first, leftv second )
+{
+    FglmState state = FglmOk;
+
+    //    STICKYPROT("quotstart\n");
+    ideal sourceIdeal = IDIDEAL( (idhdl)first->data );
+    poly quot = (poly)second->Data();
+    ideal destIdeal = NULL;
+
+    state = fglmIdealcheck( sourceIdeal );
+    if ( state == FglmOk ) {
+      if ( quot == NULL ) state= FglmPolyIsZero;
+      else if ( pIsConstant( quot ) ) state= FglmPolyIsOne;
+    }
+    
+    if ( state == FglmOk ) {
+      assumeStdFlag( first );
+      if ( fglmquot( sourceIdeal, quot, destIdeal ) == FALSE )
+        state= FglmNotReduced;
+    }
+
+    switch (state) {
+        case FglmOk:
+            break;
+        case FglmHasOne:
+            destIdeal= idInit(1,1);
+            (destIdeal->m)[0]= pOne();
+            state= FglmOk;
+            break;
+        case FglmNotZeroDim:
+            Werror( "The ideal %s has to be 0-dimensional", first->Name() );
+            destIdeal= idInit(0,0);
+            break;
+        case FglmNotReduced:
+            Werror( "The poly %s has to be reduced", second->Name() );
+            destIdeal= idInit(0,0);
+            break;
+        case FglmPolyIsOne:
+	    int k;
+     	    destIdeal= idInit( IDELEMS(sourceIdeal), 1 );
+	    for ( k= IDELEMS( sourceIdeal )-1; k >=0; k-- )
+	      (destIdeal->m)[k]= pCopy( (sourceIdeal->m)[k] );
+            state= FglmOk;
+            break;
+        case FglmPolyIsZero:
+     	    destIdeal= idInit(1,1);
+            (destIdeal->m)[0]= pOne();
+            state= FglmOk;
+            break;
+        default:
+            destIdeal= idInit(1,1);
+    }
+
+    result->rtyp = IDEAL_CMD;
+    result->data= (void *)destIdeal;
+    setFlag( result, FLAG_STD );
+    // STICKYPROT("quotend\n");
+    return (state != FglmOk);
+} // fglmQuotProt
 
 // The main function for finduni().
 // Checks the input-data, and calls FindUnivariateWrapper (see fglmzero.cc).

@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.h,v 1.11 1999-11-15 17:20:00 obachman Exp $
+// $Id: fglm.h,v 1.12 1999-11-24 12:29:37 wichmann Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -68,14 +68,28 @@ public:
 BOOLEAN
 fglmzero( idhdl sourceRingHdl, ideal & sourceIdeal, idhdl destRingHdl, ideal & destideal, BOOLEAN switchBack = TRUE, BOOLEAN deleteIdeal = FALSE );
 
+BOOLEAN
+fglmquot( ideal sourceIdeal, poly quot, ideal & destIdeal );
+
 // fglmproc(...):
-// The procedure which has to be called from the interpreter.
+// The procedure which has to be called from the interpreter for fglm.
 // first is the sourceRing, second is the given ideal in sourceRing.
 // Returns the groebnerbasis of the sourceIdeal in the currentRing.
 // Checks, if the ideal is really a reduced groebner basis of a
 // 0-dimensional Ideal. Returns TRUE if an error occoured.
 BOOLEAN
 fglmProc( leftv result, leftv first, leftv second );
+
+// fglmquotproc(...):
+// The procedure which has to be called from the interpreter for fglmquot.
+// first is the ideal I, second is the polynomial q. The polynomial must
+// be reduced with respect to I.
+// Returns the groebnerbasis of I:q in the currentRing.
+// Checks, if the ideal is really a reduced groebner basis of a
+// 0-dimensional Ideal and if q is really reduced.
+//  Returns TRUE if an error occoured.
+BOOLEAN
+fglmQuotProc( leftv result, leftv first, leftv second );
 
 // FindUnivariatePolys (test)
 BOOLEAN

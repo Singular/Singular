@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmzero.cc,v 1.26 1999-11-15 17:20:03 obachman Exp $
+// $Id: fglmzero.cc,v 1.27 1999-11-24 12:29:37 wichmann Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -30,6 +30,7 @@
 #include "febase.h"
 #include "maps.h"
 #include "mmemory.h"
+#include "kstd1.h" // for kNF (see fglmquot)
 #include "fglm.h"
 #include "fglmvec.h"
 #include "fglmgauss.h"
@@ -539,7 +540,7 @@ fglmSdata::getVectorRep( const poly p )
             else {
                 // This is the place where we can detect if the sourceIdeal
                 // is not reduced. In this case m is not in basis[]. Since basis[]
-                // is ordered this is then and only then the case, if basis[i]<m
+                // is ordered this is the case, if and only if basis[i]<m
                 // and basis[j]>m for all j>i
                 _state= FALSE;
                 return temp;
@@ -583,21 +584,10 @@ fglmSdata::getBorderDiv( const poly m, int & var ) const
     return fglmVector();
 }
 
-//     Calculates the defining Functionals for the ideal "theIdeal" and
-//     returns them in "l".
-//     The ideal has to be zero-dimensional and reduced and has to be a
-//     real subset of the polynomal ring.
-//     In any case it has to be zero-dimensional and minimal (check this
-//      via fglmIdealcheck). Any minimal but not reduced ideal is detected.
-//      In this case it returns FglmNotReduced.
-//     If the base domain is Q, the leading coefficients of the polys
-//     have to be in Z.
-//     returns TRUE if the result is valid, FALSE if theIdeal
-//      is not reduced.
-static BOOLEAN
-CalculateFunctionals( const ideal & theIdeal, idealFunctionals & l )
+void
+internalCalculateFunctionals( const ideal & theIdeal, idealFunctionals & l,
+			      fglmSdata & data )
 {
-    fglmSdata data( theIdeal );
 
     // insert pOne() into basis and update the workingList:
     poly one = pOne();
@@ -642,6 +632,38 @@ CalculateFunctionals( const ideal & theIdeal, idealFunctionals & l )
     } //. while ( data.candidatesLeft() == TRUE )
     l.endofConstruction();
     STICKYPROT2( "\nvdim= %i\n", data.getBasisSize() );
+    return;
+}
+
+//     Calculates the defining Functionals for the ideal "theIdeal" and
+//     returns them in "l".
+//     The ideal has to be zero-dimensional and reduced and has to be a
+//     real subset of the polynomal ring.
+//     In any case it has to be zero-dimensional and minimal (check this
+//      via fglmIdealcheck). Any minimal but not reduced ideal is detected.
+//      In this case it returns FglmNotReduced.
+//     If the base domain is Q, the leading coefficients of the polys
+//     have to be in Z.
+//     returns TRUE if the result is valid, FALSE if theIdeal
+//      is not reduced.
+static BOOLEAN
+CalculateFunctionals( const ideal & theIdeal, idealFunctionals & l )
+{
+    fglmSdata data( theIdeal );
+    internalCalculateFunctionals( theIdeal, l, data );
+    return ( data.state() );
+}
+
+static BOOLEAN
+CalculateFunctionals( const ideal & theIdeal, idealFunctionals & l,
+		      poly & p, fglmVector & v )
+{
+    fglmSdata data( theIdeal );
+    internalCalculateFunctionals( theIdeal, l, data );
+    //    STICKYPROT("Calculating vector rep\n");
+    v = data.getVectorRep( p );
+    // if ( v.isZero() ) 
+    //   STICKYPROT("vectorrep is 0\n");
     return ( data.state() );
 }
 
@@ -764,19 +786,23 @@ fglmDdata::fglmDdata( int dimension )
 
 fglmDdata::~fglmDdata()
 {
-    fglmASSERT( dimen == basisSize, "Es wurden nicht alle BasisElemente gefunden!" );
+  // STICKYPROT2("dimen= %i", dimen);
+  // STICKYPROT2("basisSize= %i", basisSize);
+  //    fglmASSERT( dimen == basisSize, "Es wurden nicht alle BasisElemente gefunden!" );
     int k;
 #ifndef HAVE_EXPLICIT_CONSTR
     delete [] gauss;
 #else
-    for ( k= dimen; k > 0; k-- )
+    // use basisSize instead of dimen because of fglmquot!
+    for ( k= basisSize; k > 0; k-- )
         gauss[k].~oldGaussElem();
     Free( (ADDRESS)gauss, (dimen+1)*sizeof( oldGaussElem ) );
 #endif
     Free( (ADDRESS)isPivot, (dimen+1)*sizeof( BOOLEAN ) );
     Free( (ADDRESS)perm, (dimen+1)*sizeof( int ) );
+    // use basisSize instead of dimen because of fglmquot!
     //. Remember: There is no poly in basis[0], thus k > 0
-    for ( k= dimen; k > 0; k-- )
+    for ( k= basisSize; k > 0; k-- )
         pDelete1( basis + k );
     Free( (ADDRESS)basis, (dimen+1)*sizeof( poly ) );
 }
@@ -974,18 +1000,32 @@ fglmDdata::gaussreduce( fglmVector & v, fglmVector & p, number & pdenom )
 }
 
 static ideal
-GroebnerViaFunctionals( const idealFunctionals & l )
-// Calculates the groebnerBasis for the ideal which is defined by l.
+GroebnerViaFunctionals( const idealFunctionals & l,
+			fglmVector iv = fglmVector() )
+// If iv is zero, calculates the groebnerBasis for the ideal which is
+// defined by l.
+// If iv is not zero, then the groebnerBasis if i:p is calculated where
+// i is defined by l and iv is the vector-representation of nf(p) wrt. i
 // The dimension of l has to be finite.
 // The result is in reduced form.
 {
     fglmDdata data( l.dimen() );
 
-    // insert pOne() and update workinglist:
+    // insert pOne() and update workinglist according to iv:
+    fglmVector initv;
+    if ( iv.isZero() ) {
+      // STICKYPROT("initv is zero\n");
+      initv = fglmVector( l.dimen(), 1 );
+    }
+    else {
+      // STICKYPROT("initv is not zero\n");
+      initv = iv;
+    }
+      
     poly one = pOne();
-    data.updateCandidates( one, fglmVector(l.dimen(), 1) );
+    data.updateCandidates( one, initv );
     number nOne = nInit( 1 );
-    data.newBasisElem( one, fglmVector( l.dimen(), 1 ), fglmVector( 1, 1 ), nOne );
+    data.newBasisElem( one, initv, fglmVector( 1, 1 ), nOne );
     STICKYPROT( "." );
     while ( data.candidatesLeft() == TRUE ) {
         fglmDelem candidate = data.nextCandidate();
@@ -1108,6 +1148,24 @@ fglmzero( idhdl sourceRingHdl, ideal & sourceIdeal, idhdl destRingHdl, ideal & d
     }
     if ( (switchBack == TRUE) && (currRingHdl != initialRingHdl) )
         rSetHdl( initialRingHdl, TRUE );
+    return fglmok;
+}
+
+BOOLEAN
+fglmquot( ideal sourceIdeal, poly quot, ideal & destIdeal)
+{
+    BOOLEAN fglmok;
+    fglmVector v;
+
+    idealFunctionals L( 100, pVariables );
+    // STICKYPROT("calculating normal form\n");
+    // poly p = kNF( sourceIdeal, currRing->qideal, quot );
+    // STICKYPROT("calculating functionals\n");
+    fglmok = CalculateFunctionals( sourceIdeal, L, quot, v );
+    if ( fglmok == TRUE ) {
+      // STICKYPROT("calculating groebner basis\n");
+        destIdeal= GroebnerViaFunctionals( L, v );
+    }
     return fglmok;
 }
 
