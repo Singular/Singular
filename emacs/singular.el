@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.25 1998-08-07 14:56:27 wichmann Exp $
+;; $Id: singular.el,v 1.26 1998-08-14 06:57:23 wichmann Exp $
 
 ;;; Commentary:
 
@@ -172,31 +172,40 @@ NOT READY [should be rewritten completely.  Interface should stay the same.]!"
 
 ;; Additional faces for font locking
 (make-face 'font-lock-singular-error-face)
+
+(defvar font-lock-singular-error-face 'font-lock-singular-error-face
+  "Additional font-lock face for singular errors.")
+
 (cond 
  ;; XEmacs
  ((eq singular-emacs-flavor 'xemacs)
+  ;; That 'append avoids to overwrite the face if it is already set
   (set-face-foreground 'font-lock-singular-error-face "Red"
 		       'global nil 'append)))
-(defvar font-lock-singular-error-face 'font-lock-singular-error-face
-  "NOT READY [docu]")
 
 (make-face 'font-lock-singular-warn-face)
+
+(defvar font-lock-singular-warn-face 'font-lock-singular-warn-face
+  "Additional font-lock face for singular warnings.")
+
 (cond
  ;; XEmacs
  ((eq singular-emacs-flavor 'xemacs)
+  ;; That 'append avoids to overwrite the face if it is already set
   (set-face-foreground 'font-lock-singular-warn-face "Orange" 
 		       'global nil 'append)))
-(defvar font-lock-singular-warn-face 'font-lock-singular-warn-face
-  "NOT READY [docu]")
 
 (make-face 'font-lock-singular-prompt-face)
+
+(defvar font-lock-singular-warn-face 'font-lock-singular-prompt-face
+  "Addition font-lock face for the singular prompt.")
+
 (cond
  ;; XEmacs
  ((eq singular-emacs-flavor 'xemacs)
+  ;; That 'append avoids to overwrite the face if it is already set
   (set-face-foreground 'font-lock-singular-prompt-face "Gray50"
 		       'global nil 'append)))
-(defvar font-lock-singular-warn-face 'font-lock-singular-prompt-face
-  "NOT READY [docu]")
 ;;}}}
 
 ;;{{{ Font-locking
@@ -434,7 +443,9 @@ VALUE."
   (process-mark (get-buffer-process (current-buffer))))
 
 (defun singular-load-file (file &optional noexpand)
-  "docu NOT READY"
+  "Read a file in Singular (via '< \"FILE\";').
+If optional argument NOEXPAND is nil, FILE is expanded using
+`expand-file-name'."
   (interactive "fLoad file: ")
   (let* ((filename (if noexpand file (expand-file-name file)))
 	 (string (concat "< \"" filename "\";"))
@@ -443,7 +454,9 @@ VALUE."
     (singular-send-string process string)))
 
 (defun singular-load-library (file &optional noexpand)
-  "docu NOT READY"
+  "Read a Singular library (via 'LIB \"FILE\";').
+If optional argument NOEXPAND is nil, FILE is expanded using
+`expand-file-name'."
   (interactive "fLoad Library: ")
   (let* ((filename (if noexpand file (expand-file-name file)))
 	 (string (concat "LIB \"" filename "\";"))
@@ -452,7 +465,8 @@ VALUE."
     (singular-send-string process string)))
 
 (defun singular-exit-singular ()
-  "NOT READY [docu]"
+  "Exit Singular and kill Singular buffer.
+Sends string \"quit;\" to Singular process."
   (interactive)
   (let ((string "quit;")
 	(process (singular-process)))
@@ -460,10 +474,13 @@ VALUE."
     (singular-send-string process string))
   (kill-buffer (current-buffer)))
 
+;; The function `singular-toggle-truncate-lines' is obsolete in XEmacs
+;; but not in Emacs. So define it anyway.
 (defun singular-toggle-truncate-lines ()
   "Toggle truncate-lines."
   (interactive)
-  (setq truncate-lines (not truncate-lines)))
+  (setq truncate-lines (not truncate-lines))
+  (recenter))
 ;;}}}
 
 ;;{{{ Customizing variables of comint
@@ -1195,15 +1212,20 @@ Unfolds folded sections and folds unfolded sections."
     (if (interactive-p) (goto-char (max start (point-min))))))
 
 (defun singular-do-folding (where &optional unfold)
-  "NOT READY [docu]
-WHERE= 'last or 'all --> just output sections
-WHERE= 'at-point --> whatever is at point"
+  "Fold or unfold certain sections.
+WHERE may be 'last, 'all, or 'at-point. If WHERE equals 'last or 
+'all, only output sections are affected. If WHERE equals 'at-point,
+the section at point is affected (input or output).
+If optional argument UNFOLD is non-nil, then unfold section instead
+of folding it."
   (let (which)
     (cond 
      ((eq where 'last)
       (setq which (list (singular-latest-output-section t))))
+
      ((eq where 'at-point)
       (setq which (list (singular-section-at (point)))))
+
      ((eq where 'all)
       (setq which (singular-section-in (point-min) (point-max)))
 
@@ -1864,6 +1886,8 @@ NOT READY [much more to come.  See shell.el.]!"
   (comint-mode)
   (setq major-mode 'singular-interactive-mode)
   (setq mode-name "Singular Interaction")
+
+  ;; key bindings, syntax tables and menus
   (use-local-map singular-interactive-mode-map)
   (set-syntax-table singular-interactive-mode-syntax-table)
   (cond
@@ -1871,6 +1895,7 @@ NOT READY [much more to come.  See shell.el.]!"
    ((eq singular-emacs-flavor 'xemacs)
     (easy-menu-add singular-interactive-mode-menu-1)
     (easy-menu-add singular-interactive-mode-menu-2)))
+
   (setq comment-start "// ")
   (setq comment-start-skip "// *")
   (setq comment-end "")
@@ -2016,6 +2041,13 @@ Returns BUFFER."
 	    (singular-output-filter-init (point))
 	    (singular-simple-sec-init (point))
 
+	    ;; NOT READY: SINGULAR-LOGO
+;	    (cond 
+;	     ((eq singular-emacs-flavor 'xemacs)
+;	      (set-extent-begin-glyph (make-extent (point-min) (point-min)) 
+;				      singular-logo)
+;	      (insert "\n")))
+
 	    ;; feed process with start file and read input ring.  Take
 	    ;; care about the undo information.
 	    (if start-file
@@ -2036,6 +2068,14 @@ Returns BUFFER."
 	  buffer)
       ;; this code is unwide-protected
       (set-buffer old-buffer))))
+
+;; NOT READY: SINGULAR-LOGO
+;(cond
+; ((eq singular-emacs-flavor 'xemacs)
+;  (defvar singular-logo (make-glyph))
+;  (set-glyph-image singular-logo
+;		   (concat "~/" "singlogo.xpm")
+;		   'global 'x)))
 
 ;; Note:
 ;;
@@ -2083,6 +2123,7 @@ Type \\[describe-mode] in the Singular buffer for a list of commands."
 	  (singular-debug 'interactive (message "Creating new buffer"))
 	  (setq buffer (get-buffer-create buffer-name))
 	  (set-buffer buffer)
+
 	  (singular-debug 'interactive (message "Calling `singular-interactive-mode'"))
 	  (singular-interactive-mode)))
 
@@ -2101,12 +2142,16 @@ Type \\[describe-mode] in the Singular buffer for a list of commands."
 (defalias 'Singular 'singular)
 
 (defun singular-generate-new-buffer-name (name)
-  "NOT READY [docu]
-name: should be without stars.
-Try to create a buffer named *name*.
-If fails, try to create buffer named *name<number>*
-Return buffer name with stars at start/end"
-  (let ((new-name (singular-process-name-to-buffer-name name))
+  "Generate a unique buffer name for a singular interactive buffer.
+The string NAME is the desired name for the singular interactive 
+buffer, without surrounding stars.
+The string returned is surrounded by stars.
+
+If no buffer with name \"*NAME*\" exists, return \"*NAME*\".
+Otherwise check for buffer called \"*NAME<n>*\" where n is a 
+increasing number and return \"*NAME<n>*\" if no such buffer
+exists."
+  (let ((new-name (singular-process-name-to-buffer-name name)) 
 	(count 2))
     (while (get-buffer new-name)
       (setq new-name (singular-process-name-to-buffer-name
@@ -2115,7 +2160,11 @@ Return buffer name with stars at start/end"
     new-name))
   
 (defun singular-other (file) 
-  "NOT READY [docu]"
+  "Start a new Singular, different to the default Singular.
+FILE is a Singular executable.
+
+Asks in the minibuffer for a buffer-name and for Singular options.
+Calls `singular' with the appropriate arguments."
   (interactive "fSingular executable: ")
   ;; NOT READY [code]
   (let ((name (singular-generate-new-buffer-name 
@@ -2124,7 +2173,19 @@ Return buffer name with stars at start/end"
 	temp)
 
     ;; Read buffer name from minibuffer at strip surrounding stars
-    (setq name (read-from-minibuffer "Singular buffer name: " name))
+    ;; NOT READY: This code is not very beautyful.
+    (let ((buffer-exists t)
+	  (new-name name))
+      (while buffer-exists
+	(setq new-name (read-from-minibuffer "Singular buffer name: " name))
+	(if (get-buffer new-name)
+	    (progn 
+	      (message "This buffer already exists.")
+	      (sleep-for 1))
+	  (setq buffer-exists nil)
+	  (setq name new-name))))
+	
+    
     (if (string-match "^\\*\\(.*\\)\\*$" name)
 	(setq name (substring name (match-beginning 1) (match-end 1))))
 
