@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.49 1998-05-15 11:42:08 obachman Exp $
+@comment $Id: reference.doc,v 1.50 1998-05-15 12:09:46 wichmann Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -353,6 +353,39 @@ of the graded Betti numbers.)
 @c example
 @end example
 @end table
+
+Hence
+@itemize @bullet
+@item the 0th syzygy module of r/j (which is j) has 1 generator in
+degree 0 (which is 1)
+
+@item the 1st syzygy module (which is j) has 4
+generators (one in degree 2 and three in degree 3)
+
+@item the 2nd syzygy
+module has 4 generators (all in degree 4)
+
+@item the 3rd syzygy module has
+1 generator in degree 5 
+@end itemize
+
+where the generators are the columns of the
+shown matrix and degrees are assigned such that the corresponding maps
+have degree 0 as is shown in the resolution below:
+@tex
+$$
+0 \longleftarrow r/j \longleftarrow r(1)
+\buildrel{T[1]}\over{\longleftarrow} r(2) \oplus r^3(3)
+\buildrel{T[2]}\over{\longleftarrow} r^4(4)
+\buildrel{T[3]}\over{\longleftarrow} r(5)
+\longleftarrow 0 \quad .
+$$
+@end tex
+@ifinfo
+@*                     T[1]                T[2]           T[3]
+@*0 <-- r/j <-- r(1) <------ r(2)+r^3(3) <------ r^4(4) <------ r(5) <-- 0 .
+@end ifinfo
+
 @menu
 * res::
 * lres::
@@ -1134,10 +1167,10 @@ eliminates variables occurring as factors of the second argument from an
 ideal resp. module by intersection with the subring not containing these variables.
 @*@code{eliminate} does not need a special ordering nor a standard basis as input.
 
-@*Since elimination is expensive, it might be useful,
-first to compute the Hilbert function of the ideal (first argument)
-with a fast ordering (e.g. dp). Then make use of it to speed up
-the computation: a Hilbert-driven elimination uses the intvec
+@*Since elimination is expensive, it might be useful if the input is
+homogeneous, first to compute the Hilbert function of the ideal (first
+argument) with a fast ordering (e.g. dp). Then make use of it to speed
+up the computation: a Hilbert-driven elimination uses the intvec
 provided as the third argument.
 @item @strong{Example:}
 @example
@@ -1384,15 +1417,14 @@ See @ref{poly expressions}
 number, poly, vector, ideal, module, matrix or list
 (the same type as the second argument)
 @item @strong{Purpose:}
-maps objects between "almost identical" rings.
-@code{fetch} is the
-identity map between rings and qrings with the same
-coefficient field and the same number of variables (but possibly with
-different orderings), the i-th variable of the source ring is mapped to
-the i-th variable of the basering.
-This offers a convenient way to change variable names or orderings or to 
-map objects from a
-ring to a quotient ring of that ring or vice versa.
+maps objects between "almost identical" rings.  @code{fetch} is the
+identity map between rings and qrings with the same coefficient field
+and the same number of variables (but possibly with different
+orderings), the i-th variable of the source ring is mapped to the i-th
+variable of the basering.  This offers a convenient way to change
+variable names or orderings, or to map objects from a ring to a quotient
+ring of that ring or vice versa. Compare with @code{imap} where the
+variable names are preserved.
 @item @strong{Example:}
 @example
 @c example
@@ -1654,7 +1686,7 @@ returns the i-th free generator of a free module.
 @end example
 @end table
 @c ref
-See @ref{free module}; @ref{int expressions}; @ref{vector}.
+See @ref{freemodule}; @ref{int expressions}; @ref{vector}.
 @c ref
 @c ---------------------------------------
 @node getdump, help, gen, Functions
@@ -5482,12 +5514,14 @@ the procedure ended without making the ring global.
 @node quit, return, keepring, Control structures
 @subsection quit
 @cindex quit
+@cindex exit
 @table @code
 @item @strong{Syntax:}
 @code{quit;}
 @item @strong{Purpose:}
 quits @sc{Singular},
-works also from inside a procedure or from an interrupt.
+works also from inside a procedure. The commands @code{quit} and
+@code{exit} are synonymous.
 @item @strong{Example:}
   quit;
 @end table
