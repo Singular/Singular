@@ -1,9 +1,9 @@
-// $Id: hnoether.lib,v 1.5 1998-04-23 13:23:23 obachman Exp $
+// $Id: hnoether.lib,v 1.6 1998-05-05 11:55:27 krueger Exp $
 // author:  Martin Lamm,  email: lamm@mathematik.uni-kl.de
 // last change:           26.03.98
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: hnoether.lib,v 1.5 1998-04-23 13:23:23 obachman Exp $";
+version="$Id: hnoether.lib,v 1.6 1998-05-05 11:55:27 krueger Exp $";
 info="
 LIBRARY:  hnoether.lib   PROCEDURES FOR THE HAMBURGER-NOETHER-DEVELOPMENT
 
@@ -53,13 +53,14 @@ LIB "primitiv.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc getnm (poly f)
-USAGE:   getnm(f); f polynomial in x,y
+"USAGE:   getnm(f); f polynomial in x,y
 ASSUME:  basering = ...,(x,y),ls;  or ds
 RETURN:  intvec(n,m) : (0,n) is the intersection point of the Newton
          polygon of f with the y-axis, n=-1 if it doesn't exist
          (m,0) is its intersection point with the x-axis,
          m=-1 if this point doesn't exist
 EXAMPLE: example getnm; shows an example
+"
 {
  // wir gehen davon aus, dass die Prozedur von develop aufgerufen wurde, also
  // die Ringordnung ist ls (ds ginge auch)
@@ -74,28 +75,32 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc leit (poly f, int n, int m)
-// leit(poly f, int n, int m) returns all monomials on the line
+"// leit(poly f, int n, int m) returns all monomials on the line
 // from (0,n) to (m,0) in the Newton diagram
+"
 {
  return(jet(f,m*n,intvec(n,m))-jet(f,m*n-1,intvec(n,m)))
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc testreducible (poly f, int n, int m)
-// testreducible(poly f,int n,int m) returns true if there are points in the
+"// testreducible(poly f,int n,int m) returns true if there are points in the
 // Newton diagram below the line (0,n)-(m,0)
+"
 {
  return(size(jet(f,m*n-1,intvec(n,m))) != 0)
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc T_Transform (poly f, int Q, int N) 
-// returns f(y,xy^Q)/y^NQ
+"// returns f(y,xy^Q)/y^NQ
+"
 {
  map T = basering,y,x*y^Q;
  return(T(f)/y^(N*Q));
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc T1_Transform (poly f, number d, int M) 
-// returns f(x,y+d*x^M)
+"// returns f(x,y+d*x^M)
+"
 {
  map T1 = basering,x,y+d*x^M;
  return(T1(f));
@@ -103,8 +108,9 @@ proc T1_Transform (poly f, number d, int M)
 ///////////////////////////////////////////////////////////////////////////////
 
 proc T2_Transform (poly f, number d, int M, int N)
-USAGE: T2_Transform(f,d,M,N); f poly, d number; M,N int
+"USAGE: T2_Transform(f,d,M,N); f poly, d number; M,N int
 RETURN: list: poly T2(f,d',M,N), number d' in \{ d, 1/d \}
+"
 {
  //---------------------- compute gcd and extgcd of N,M -----------------------
   int ggt=gcd(M,N);
@@ -144,10 +150,10 @@ RETURN: list: poly T2(f,d',M,N), number d' in \{ d, 1/d \}
 ///////////////////////////////////////////////////////////////////////////////
 
 proc koeff (poly f, int I, int J)
-USAGE:  koeff(f,I,J); f polynomial in x and y, I,J integers
+"USAGE:  koeff(f,I,J); f polynomial in x and y, I,J integers
 RETURN: if f = sum(a(i,j)*x^i*y^j), then koeff(f,I,J)= a(I,J) (of type number)
 EXAMPLE: example koeff;  shows an example
-{
+"{
   matrix mat = coeffs(coeffs(f,y)[J+1,1],x);
   if (size(mat) <= I) { return(0);} 
   else { return(leadcoef(mat[I+1,1]));}
@@ -160,13 +166,13 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc squarefree (poly f)
-USAGE:  squarefree(f); f poly in x and y
+"USAGE:  squarefree(f); f poly in x and y
 RETURN: a squarefree divisor of f
         Normally the return value is a greatest squarefree divisor, but there
         is an exception: factors with a p-th root, p the ring characteristic,
         are lost.
 EXAMPLE: example squarefree; shows some examples.
-{
+"{
  // es gibt noch ein Problem: syz gibt manchmal in Koerpererweiterung (p,a)
  // nicht f/g zurueck, obwohl die Division aufgeht ... In dem Fall ist die
  // Rueckgabe evtl. nicht quadratfrei! Bsp.: squarefree((1/a*x3+y7)^3);
@@ -260,7 +266,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc allsquarefree (poly f, poly l)
-USAGE : allsquarefree(f,l);  poly f,l
+"USAGE : allsquarefree(f,l);  poly f,l
         l is the squarefree divisor of f you get by l=squarefree(f);
 RETURN: the squarefree divisor of f consisting of all irreducible factors of f
 NOTE  : * this proc uses factorize to get the missing factors of f not in l and
@@ -269,7 +275,7 @@ NOTE  : * this proc uses factorize to get the missing factors of f not in l and
         * this proc uses polynomial division of factory (which still has a bug
          at the moment: it can return nonsense, if the basering has parameters)
 EXAMPLE: example allsquarefree;  shows an example
-{
+"{
  //---------- eliminiere bereits mit squarefree gefundene Faktoren ------------
  poly g=l;                            // g = gcd(f,l);
  while (deg(g)!=0) {
@@ -302,14 +308,14 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc polytest(poly f)
-USAGE : polytest(f); f poly in x and y
+"USAGE : polytest(f); f poly in x and y
 RETURN: a monomial of f with |coefficient| > 16001
           or exponent divisible by 32003, if there is one
         0 else (in this case computing a squarefree divisor
                 in characteristic 32003 could make sense)
 NOTE:   this procedure is only useful in characteristic zero, because otherwise
         there is no appropriate ordering of the leading coefficients
-{
+"{
  poly verbrecher=0;
  intvec leitexp;
  for (; (f<>0) and (verbrecher==0); f=f-lead(f)) {
@@ -326,7 +332,7 @@ NOTE:   this procedure is only useful in characteristic zero, because otherwise
 
 
 proc develop
-USAGE:   develop(f [,n]); f polynomial in two variables, n integer
+"USAGE:   develop(f [,n]); f polynomial in two variables, n integer
 ASSUME:  f irreducible as a power series (for reducible f use reddevelop)
 RETURN:  Hamburger-Noether development of f, in form of a list:
          [1]: Hamburger-Noether matrix
@@ -359,11 +365,11 @@ NOTE:    If the optional parameter n is given, the HN-matrix will have at least
          parametrization.
 
          For time critical computations it is recommended to use
-         "ring ...,(x,y),ls" as basering - it increases the algorithm's speed.
+         \"ring ...,(x,y),ls\" as basering - it increases the algorithm's speed.
 
 EXAMPLES: example develop; shows an example
           example param;   shows an example for using the 2nd parameter
-{
+"{
  //--------- Abfangen unzulaessiger Ringe: 1) nur eine Unbestimmte ------------
  poly f=#[1];
  if (size(#) > 1) {int maxspalte=#[2];}
@@ -728,7 +734,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc param
-USAGE:  param(l) takes the output of develop(f)
+"USAGE:  param(l) takes the output of develop(f)
         (list l (matrix m, intvec v, int s[,poly g]))
         and gives a parametrisation for f; the first variable of the active
         ring is chosen as indefinite. If the ring contains more than
@@ -740,7 +746,7 @@ RETURN: ideal of two polynomials: if the HNE was finite, f(param[1],param[2])
 EXAMPLE: example param;      shows an example
          example develop;   shows another example
 
-{
+"{
  //-------------------------- Initialisierungen -------------------------------
  matrix m=#[1];
  intvec v=#[2];
@@ -837,7 +843,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc invariants
-USAGE:  invariants(l) takes the output of develop(f)
+"USAGE:  invariants(l) takes the output of develop(f)
         (list l (matrix m, intvec v, int s[,poly g]))
         and computes some invariants:
 RETURN:  a list, if l contains a valid HNE:
@@ -847,7 +853,7 @@ RETURN:  a list, if l contains a valid HNE:
     - invariants(l)[5]: intvec         (sequence of multiplicities)
          an empty list, if an error occurred in the procedure develop
 EXAMPLE: example invariants; shows an example
-{
+"{
  //-------------------------- Initialisierungen -------------------------------
  matrix m=#[1];
  intvec v=#[2];
@@ -929,7 +935,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc displayInvariants
-USAGE:   displayInvariants(l); takes the output both of
+"USAGE:   displayInvariants(l); takes the output both of
          develop(f) and reddevelop(f)
           ( list l (matrix m, intvec v, int s[,poly g])
             or list of lists in the form l            )
@@ -937,7 +943,7 @@ DISPLAY: invariants of the corresponding branch, resp. of all branches,
          in a better readable form
 RETURN:  nothing
 EXAMPLE: example displayInvariants;  shows an example
-{
+"{
  int i,j,k,mul;
  string Ausgabe;
  list ergebnis;
@@ -1014,12 +1020,12 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc multiplicities
-USAGE:   multiplicities(l) takes the output of develop(f)
+"USAGE:   multiplicities(l) takes the output of develop(f)
          (list l (matrix m, intvec v, int s[,poly g]))
 RETURN:  intvec of the different multiplicities that occur during the succes-
          sive blowing up of the curve corresponding to f
 EXAMPLE: example multiplicities;  shows an example
-{
+"{
  matrix m=#[1];
  intvec v=#[2];
  int switch=#[3];
@@ -1053,11 +1059,11 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc puiseux2generators (intvec m, intvec n)
-USAGE:   puiseux2generators (m,n);
+"USAGE:   puiseux2generators (m,n);
          m,n intvecs with 1st resp. 2nd components of puiseux pairs
 RETURN:  intvec of the generators of the semigroup of values
 EXAMPLE: example puiseux2generators;  shows an example
-{
+"{
  intvec beta;
  int q=1;
  //------------ glatte Kurve (eigentl. waeren m,n leer): ----------------------
@@ -1080,10 +1086,11 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc generators
-USAGE:   generators(l); takes the output of develop(f)
+"USAGE:   generators(l); takes the output of develop(f)
          (list l (matrix m, intvec v, int s[,poly g]))
 RETURN:  intvec of the generators of the semigroup of values
 EXAMPLE: example generators;  shows an example
+"
 {
  list inv=invariants(#);
  return(puiseux2generators(inv[2..3]));
@@ -1099,12 +1106,13 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc intersection (list hn1, list hn2)
-USAGE:   intersection(hne1,hne2);
+"USAGE:   intersection(hne1,hne2);
          hne1,hne2 two lists representing a HNE (normally two entries out of
          the output of reddevelop), i.e. list(matrix,intvec,int[,poly])
 RETURN:  intersection multiplicity of the branches corresponding to hne1 & hne2
          (of type int)
 EXAMPLE: example intersection;  shows an example
+"
 {
  //------------------ `intersect' ist schon reserviert ... --------------------
  int i,j,s,sum,schnitt,unterschied;
@@ -1215,7 +1223,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc displayHNE(list ldev,list #)
-USAGE:   displayHNE(ldev,[,n]); ldev=list
+"USAGE:   displayHNE(ldev,[,n]); ldev=list
          (output list of develop(f) or reddevelop(f)), n=int
 RETURN:  - if only one argument is given, no return value, but
          display an ideal HNE of the following form:
@@ -1238,6 +1246,7 @@ RETURN:  - if only one argument is given, no return value, but
      of all branches of f in the form described above.
      The optional parameter is then ignored.
 EXAMPLE: example displayHNE; shows an example
+"
 {
  if ((typeof(ldev[1])=="list") || (typeof(ldev[1])=="none")) {
    for (int i=1; i<=size(ldev); i++) {
@@ -1312,11 +1321,12 @@ example
 
 
 proc newtonhoehne (poly f)
-USAGE:   newtonhoehne(f);   f poly
+"USAGE:   newtonhoehne(f);   f poly
 ASSUME:  basering = ...,(x,y),ds  or ls
 RETURN:  list of intvec(x,y) of coordinates of the newtonpolygon of f
 NOTE:    This proc is only available in versions of Singular that know the
-         command  system("newton",f);  f poly
+         command  system(\"newton\",f);  f poly
+"
 {
  intvec nm = getnm(f);
  if ((nm[1]>0) && (nm[2]>0)) { f=jet(f,nm[1]*nm[2],nm); }
@@ -1328,12 +1338,13 @@ NOTE:    This proc is only available in versions of Singular that know the
 ///////////////////////////////////////////////////////////////////////////////
 
 proc newtonpoly (poly f)
-USAGE:   newtonpoly(f);   f poly
+"USAGE:   newtonpoly(f);   f poly
 RETURN:  list of intvec(x,y) of coordinates of the newtonpolygon of f
 NOTE: There are many assumptions: (to improve speed)
       - The basering must be ...,(x,y),ls
       - f(x,0) != 0 != f(0,y), f(0,0) = 0
 EXAMPLE: example newtonpoly;  shows an example
+"
 {
  intvec A=(0,ord(subst(f,x,0)));
  intvec B=(ord(subst(f,y,0)),0);
@@ -1390,10 +1401,11 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc charPoly(poly f, int M, int N)
-USAGE:  charPoly(f,M,N);  f poly in x,y,  M,N int: length and height
+"USAGE:  charPoly(f,M,N);  f poly in x,y,  M,N int: length and height
                           of newtonpolygon of f, which has to be only one line
 RETURN:  the characteristic polynomial of f
 EXAMPLE: example charPoly;  shows an example
+"
 {
  poly charp;
  int Np=N/ gcd(M,N);
@@ -1411,10 +1423,11 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc find_in_list(list L,int p)
-USAGE:  find_in_list(L,p); L: list of intvec(x,y)
+"USAGE:  find_in_list(L,p); L: list of intvec(x,y)
         (sorted in y: L[1][2]>=L[2][2]), int p >= 0
 RETURN: int i: L[i][2]=p if existent; otherwise i with L[i][2]<p if existent;
         otherwise i = size(L)+1;
+"
 {
  int i;
  L[size(L)+1]=intvec(0,-1);          // falls p nicht in L[.][2] vorkommt
@@ -1423,7 +1436,7 @@ RETURN: int i: L[i][2]=p if existent; otherwise i with L[i][2]<p if existent;
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc set_list
-USAGE: set_list(L,v,l); L list, v intvec, l element of L (arbitrary type)
+"USAGE: set_list(L,v,l); L list, v intvec, l element of L (arbitrary type)
 RETURN: L with L[v[1]][v[2]][...][v[n]] set to l
 WARNING: Make sure there is no conflict of types!
          size(v) must be bigger than 1! (i.e. v must NOT be simply an integer)
@@ -1431,6 +1444,7 @@ EXAMPLE:                 L=set_list(L,intvec(a,b,c),q);
          does exactly what you would expect when typing
                          L[a][b][c]=q;
          (but the last command will only produce an error message)
+"
 {
  list L=#[1];
  intvec v=#[2];
@@ -1450,9 +1464,10 @@ EXAMPLE:                 L=set_list(L,intvec(a,b,c),q);
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc get_last_divisor(int M, int N)
-USAGE:   get_last_divisor(M,N); int M,N
+"USAGE:   get_last_divisor(M,N); int M,N
 RETURN:  int Q: M=q1*N+r1, N=q2*r1+r2, ..., ri=Q*r(i+1) (Euclidean alg.)
 EXAMPLE: example get_last_divisor; shows an example
+"
 {
  int R=M%N; int Q=M / N;
  while (R!=0) {M=N; N=R; R=M%N; Q=M / N;}
@@ -1465,12 +1480,13 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc redleit (poly f,intvec S, intvec E)
-USAGE:   redleit(f,S,E); f poly,
+"USAGE:   redleit(f,S,E); f poly,
          S,E intvec(x,y): two different points on a line in the newtonpolygon
          of f (e.g. the starting and the ending point)
 RETURN:  poly g: all monomials of f which lay on that line
 NOTE:    It is not checked whether S and E really belong to the newtonpolygon!
 EXAMPLE: example redleit;  shows an example
+"
 {
  if (E[1]<S[1]) { intvec H=E; E=S; S=H; } // S,E verkehrt herum eingegeben
  return(jet(f,E[1]*S[2]-E[2]*S[1],intvec(S[2]-E[2],E[1]-S[1])));
@@ -1484,7 +1500,7 @@ example
 
 
 proc extdevelop (list l, int Exaktheit)
-USAGE:   extdevelop(l,n);  list l (matrix m, intvec v, int s, poly g), int n
+"USAGE:   extdevelop(l,n);  list l (matrix m, intvec v, int s, poly g), int n
          takes the output l of develop(f) ( or extdevelop(L,n),
          or one entry of the output of reddevelop(f))  and
 RETURN:  an extension of the Hamburger-Noether development of f in the form
@@ -1495,6 +1511,7 @@ RETURN:  an extension of the Hamburger-Noether development of f in the form
          (in most cases) will produce the same result as develop(f,n).
          Type  help develop;  for more details
 EXAMPLE: example extdevelop;  shows an example
+"
 {
  //------------ Initialisierungen und Abfangen unzulaessiger Aufrufe ----------
  matrix m=l[1];
@@ -1642,7 +1659,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc stripHNE (list l)
-USAGE:   stripHNE(l);    takes the output both of develop(f) and reddevelop(f)
+"USAGE:   stripHNE(l);    takes the output both of develop(f) and reddevelop(f)
            ( list l (matrix m, intvec v, int s[,poly g])
              or list of lists in the form l            )
 RETURN:  a list in the same format as l, but all polynomials g are set to zero
@@ -1652,6 +1669,7 @@ NOTE:    The purpose of this procedure is to remove huge amounts of data
          parametrizations etc. with the stripped HNE(s), but it is not possible
          to use extdevelop with them.
 EXAMPLE: example stripHNE;  shows an example
+"
 {
  list h;
  if (typeof(l[1])=="matrix") { l[4]=poly(0); }
@@ -1674,10 +1692,11 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc extractHNEs(list HNEs, int transvers)
-USAGE:  extractHNEs(HNEs,transvers);  list HNEs (output from HN),
+"USAGE:  extractHNEs(HNEs,transvers);  list HNEs (output from HN),
         int transvers: 1 if x,y were exchanged, 0 else
 RETURN: list of Hamburger-Noether-Extensions in the form of reddevelop
 NOTE:   This procedure is only for internal purpose; examples don't make sense
+"
 {
  int i,maxspalte,hspalte,hnezaehler;
  list HNEaktu,Ergebnis;
@@ -1709,10 +1728,11 @@ NOTE:   This procedure is only for internal purpose; examples don't make sense
 ///////////////////////////////////////////////////////////////////////////////
 
 proc factorfirst(poly f, int M, int N)
-USAGE : factorfirst(f,M,N); f poly, M,N int
+"USAGE : factorfirst(f,M,N); f poly, M,N int
 RETURN: number d: f=c*(y^(N/e) - d*x^(M/e))^e with e=gcd(M,N), number c fitting
         0 if d does not exist
 EXAMPLE: example factorfirst;  shows an example
+"
 {
  number c = koeff(f,0,N);
  number delta;
@@ -1758,7 +1778,7 @@ example
 
 
 proc reddevelop (poly f)
-USAGE:   reddevelop(f); f poly
+"USAGE:   reddevelop(f); f poly
 RETURN:  Hamburger-Noether development of f :
          A list of lists in the form of develop(f); each entry contains the 
          data for one of the branches of f.
@@ -1767,6 +1787,7 @@ NOTE:    as the Hamburger-Noether development of a reducible curve normally
          exists only in a ring extension, reddevelop automatically changes
          the basering to  ring HNEring=...,(x,y),ls; !
 EXAMPLE: example reddevelop;  shows an example
+"
 {
  def altring = basering;
  int p = char(basering);                 // Ringcharakteristik
@@ -2091,9 +2112,10 @@ example
   }
 }
 ///////////////////////////////////////////////////////////////////////////////
-
+static
 proc HN (poly f,int grenze, int Aufruf_Ebene)
-NOTE: This procedure is only for internal use, it is called via reddevelop
+"NOTE: This procedure is only for internal use, it is called via reddevelop
+"
 {
  //---------- Variablendefinitionen fuer den unverzweigten Teil: --------------
  if (defined(Protokoll)) {"procedure HN",Aufruf_Ebene;}
@@ -2542,8 +2564,10 @@ NOTE: This procedure is only for internal use, it is called via reddevelop
 }
 ///////////////////////////////////////////////////////////////////////////////
 
+static
 proc constructHNEs (list HNEs,int hnezaehler,list aneu,list azeilen,int zeile,ideal deltais,int Q,int j)
-NOTE: This procedure is only for internal use, it is called via HN
+"NOTE: This procedure is only for internal use, it is called via HN
+"
 {
   int zaehler,zl;
   ideal hilfid;
@@ -2573,7 +2597,7 @@ NOTE: This procedure is only for internal use, it is called via HN
 ///////////////////////////////////////////////////////////////////////////////
 
 proc extrafactor (poly leitf, int M, int N)
-USAGE:   factors,flag=extrafactor(f,M,N);
+"USAGE:   factors,flag=extrafactor(f,M,N);
          list factors, int flag,M,N, poly f in x,y
 ASSUME:  basering is (0,a),(x,y),ds or ls
          Newtonpolygon of f is one side with height N, length M
@@ -2586,6 +2610,7 @@ NOTE:    This procedure is designed to make reddevelop able to compute some
          special cases that need a ring extension in char 0.
          It becomes obsolete as soon as factorize works also in such rings.
 EXAMPLE: example extrafactor;  shows an example
+"
 {
  list faktoren;
 

@@ -1,5 +1,5 @@
 // 
-version="$Id: fastsolv.lib,v 1.2 1998-04-03 22:47:01 krueger Exp $";
+version="$Id: fastsolv.lib,v 1.3 1998-05-05 11:55:24 krueger Exp $";
 info="";
 
 // ====================================================================
@@ -8,14 +8,14 @@ info="";
 // ====================================================================
 
 proc Tsimplify
-USAGE:    simplify(id,n);  id ideal, n integer
+"USAGE:    simplify(id,n);  id ideal, n integer
 RETURNS:  list of two ideals the first containing the simplified
           elements, the second the variables which already have
           been eliminated
 ASSUME:   basering has ordering dp, the elimination of the variables
           n+1,... is not supported
 EXAMPLE:  example simplify; shows an example
-
+"
 {
   def bsr=basering;
   int @n, @m, @k;
@@ -87,13 +87,13 @@ example
 
 
 proc simplifyInBadRings
-USAGE:    simplify(id,n);  id ideal, n product of the variables
+"USAGE:    simplify(id,n);  id ideal, n product of the variables
           to be eliminated later
 RETURNS:  list of two ideals the first containing the simplified
           elements, the second the variables which already have
           been eliminated
 EXAMPLE:  example simplify; shows an example
-
+"
 {
   int @i,@j;
   string @es=",(";
@@ -143,13 +143,13 @@ example
 
 
 proc fastElim
-USAGE:    fastelim(id,v);  id ideal, v Product of variables to
+"USAGE:    fastelim(id,v);  id ideal, v Product of variables to
           be eliminated.
 RETURNS:  list of two ideals the first containing the simplified
           elements, the second the variables which already have
           been eliminated
 EXAMPLE:  example fastElim; shows an example.
-{
+"{
    string @oldgnir = nameof(basering);  // Namen des alten Baserings merken
    string @varnames;
    int @i;
@@ -274,7 +274,7 @@ proc sort1
 
 
 proc valvars
-
+"
 USAGE:    valvars(id, [n1, [m, [n2]]]); id (poly|ideal|vector|module);
                                         m monom; n1,n2 int
 RETURNS:  an intvec describing the permutation such that the permuted
@@ -288,7 +288,7 @@ RETURNS:  an intvec describing the permutation such that the permuted
           of y or both are equal and the coefficient of x to this power
           contains more monomials than that of y.
 EXAMPLE:  example valvars; shows an example
-
+"
 {
   int     @order1, @order2,     // order of vars not to elim resp. to elim
           @i1,                  // runs through all variables

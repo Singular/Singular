@@ -1,4 +1,4 @@
-// $Id: invar.lib,v 1.5 1998-04-03 22:47:07 krueger Exp $
+// $Id: invar.lib,v 1.6 1998-05-05 11:55:30 krueger Exp $
 ///////////////////////////////////////////////////////
 // invar.lib
 // algorithm for computing the ring of invariants under
@@ -6,7 +6,7 @@
 // written by Gerhard Pfister
 //////////////////////////////////////////////////////
 
-version="$Id: invar.lib,v 1.5 1998-04-03 22:47:07 krueger Exp $";
+version="$Id: invar.lib,v 1.6 1998-05-05 11:55:30 krueger Exp $";
 info="
 LIBRARY: invar.lib PROCEDURES FOR COMPUTING INVARIANTS OF (C,+)-ACTIONS
 
@@ -62,11 +62,12 @@ example
 
 
 proc der (matrix m, poly f)
-USAGE:   der(m,f);  m matrix, f poly
+"USAGE:   der(m,f);  m matrix, f poly
 RETURN:  poly= application of the vectorfield m befined by the matrix m 
          (m[i,1] are the coefficients of d/dx(i)) to f
 NOTE:    
 EXAMPLE: example der; shows an example
+"
 {
   matrix mh=matrix(jacob(f))*m;
   return(mh[1,1]);
@@ -87,10 +88,11 @@ example
 
 
 proc actionIsProper(matrix m)
-USAGE:   actionIsProper(m); m matrix
+"USAGE:   actionIsProper(m); m matrix
 RETURN:  int= 1 if is proper, 0 else
 NOTE:    
 EXAMPLE: example actionIsProper; shows an example
+"
 {
   int i;
   ideal id=maxideal(1);
@@ -145,13 +147,14 @@ example
 
 
 proc reduction(poly p, ideal dom, list #)
-USAGE:   reduction(p,dom,q); p poly, dom ideal, q (optional) monomial
+"USAGE:   reduction(p,dom,q); p poly, dom ideal, q (optional) monomial
 RETURN:  poly= (p-H(f1,...,fr))/q^a, if Lt(p)=H(Lt(f1),...,Lt(fr)) for 
                some polynomial H in r variables over the base field,
                a maximal such that q^a devides p-H(f1,...,fr),
                dom =(f1,...,fr)
 NOTE:    
 EXAMPLE: example reduction; shows an example
+"
 {
   int i;
   int z=size(dom);
@@ -220,12 +223,13 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc completeReduction(poly p, ideal dom, list #)
-USAGE:   completeReduction(p,dom,q); p poly, dom ideal, 
+"USAGE:   completeReduction(p,dom,q); p poly, dom ideal, 
                                      q (optional) monomial
 RETURN:  poly= the polynomial p reduced with dom via the procedure
                reduction as long as possible
 NOTE:    
 EXAMPLE: example completeReduction; shows an example
+"
 {
   poly p1=p;
   poly p2=reduction(p,dom,#);
@@ -247,12 +251,13 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc inSubring(poly p, ideal dom)
-USAGE:   inSubring(p,dom); p poly, dom ideal
+"USAGE:   inSubring(p,dom); p poly, dom ideal
 RETURN:  list= 1,string(@(0)-h(@(1),...,@(size(dom)))) :if p = h(dom[1],...,dom[size(dom)])
               0,string(h(@(0),...,@(size(dom)))) :if there is only a nonlinear relation
               h(p,dom[1],...,dom[size(dom)])=0.
 NOTE:    
 EXAMPLE: example inSubring; shows an example
+"
 {
   int z=size(dom);
   int i;
@@ -308,7 +313,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc localInvar(matrix m, poly p, poly q, poly h)
-USAGE:   localInvar(m,p,q,h); m matrix, p,q,h poly
+"USAGE:   localInvar(m,p,q,h); m matrix, p,q,h poly
 RETURN:  poly= the invariant of the vectorfield m=Sum m[i,1]*d/dx(i) with respect
                to p,q,h, i.e.
                Sum (-1)^v*(1/v!)*m^v(p)*(q/m(q))^v)*m(q)^N, m^N(q)=0, m^(N-1)(q)<>0
@@ -316,6 +321,7 @@ RETURN:  poly= the invariant of the vectorfield m=Sum m[i,1]*d/dx(i) with respec
                the sum above is divided by h as much as possible
 NOTE:    
 EXAMPLE: example localInvar; shows an example
+"
 {
   if ((der(m,h) !=0) || (der(m,der(m,q)) !=0))
   {
@@ -359,7 +365,7 @@ example
 
 
 proc furtherInvar(matrix m, ideal id, ideal karl, poly q)
-USAGE:   furtherInvar(m,id,karl,q); m matrix, id,karl ideal,q poly
+"USAGE:   furtherInvar(m,id,karl,q); m matrix, id,karl ideal,q poly
 RETURN:  ideal= further invariants of the vectorfield m=Sum m[i,1]*d/dx(i) with respect
                to id,p,q, i.e.
                the ideal id contains invariants of m and we are looking for elements
@@ -370,6 +376,7 @@ RETURN:  ideal= further invariants of the vectorfield m=Sum m[i,1]*d/dx(i) with 
                the ideal karl contains all invariants computed yet
 NOTE:    
 EXAMPLE: example furtherInvar; shows an example
+"
 {
   int i;
   ideal null;
@@ -452,11 +459,12 @@ example
 
 
 proc invariantRing(matrix m, poly p, poly q,list #)
-USAGE:   invariantRing(m,p,q); m matrix, p,q poly
+"USAGE:   invariantRing(m,p,q); m matrix, p,q poly
 RETURN:  ideal= the invariants of the vectorfield m=Sum m[i,1]*d/dx(i) 
                 p,q variables with m(p)=q invariant
 NOTE:
 EXAMPLE: example furtherInvar; shows an example
+"
 {
   ideal j;
   int i,it;

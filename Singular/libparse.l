@@ -2,15 +2,16 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.16 1998-04-29 11:25:19 krueger Exp $ */
+/* $Id: libparse.l,v 1.17 1998-05-05 11:55:17 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
 #ifdef STANDALONE_PARSER
 #  include "utils.h"
+#  include <getopt.h>
 #  define HAVE_LIBPARSER
-//#  define YYLPDEBUG 3
+#  define YYLPDEBUG 1
 #else
 #  include "mod2.h"
 #  include "subexpr.h"
@@ -49,6 +50,11 @@ long string_start;
 
 char *yylp_buffer_start;
 int yylplineno = 1;
+int lpverbose = 0, check = 0;
+int found_info=0,
+    found_version=0,
+    found_oldhelp = 0,
+    found_proc_in_proc = 0;
 
 char *yylp_errlist[]= {
    "",
@@ -111,6 +117,8 @@ pi_clear(procinfov pi);
 extern "C" {
   int yylpwrap();
 }
+void main_init(int argc, char *argv[]);
+void main_result(char *libname);
 #  else /* STANDALONE_PARSER */
 idhdl h0;
 #    define pi IDPROC(h0)
@@ -179,18 +187,31 @@ extern libstackv library_stack;
 digit          [0-9]
 letter         [@a-zA-Z\']
 name           ({letter}({letter}*{digit}*_*)*|_)
+varname        ({letter}({letter}*{digit}*_*\(\))*|_|#)
 letters        ({letter}|{digit}|[_./#%^*:,])
 string         ({letters}*)
 comment        [\/][\/]
 dolar          [$]
-symbols        [~!@#$%^&*()_+-={}\\\|\[\];:,<.>/\?\' \n\~\`\r]
-aletters       ({letter}|{digit}|{symbols}|{dolar}|{escquote})
+nls            [\n\r]
+symbols        [~!@#$%^&*()_+-=\\\|\[\];:,<.>/\?\' \t\~\`]
+asymbols       ({symbols}|[{}])
+bsymbols       ({symbols}|{escbrack}|[}])
+aletters       ({letter}|{digit}|{asymbols}|{dolar}|{escquote}|{nls})
+bletters       ({letter}|{digit}|{bsymbols}|{dolar}|{quote}|{nls})
+cletters       ({letter}|{digit}|{asymbols}|{dolar}|{quote})
 strings        ({aletters}*)
+escstrings     ({bletters}*)
+fstring        ({cletters}*)
+param          ({name}+{tos}+{varname})
+parameters     ({param}(,{param})*)
+paramlist      ("("{parameters}")")
 quote          [\"]
 escquote       (\\\")
-taborspace     [ \t]
-tos            ({taborspace}*)
-eq             (=|{tos}+=|=+{tos}|{tos}+=+{tos})
+escbrack       (\\\{)
+tnl            ([ \t\n]*)
+eos            ({quote}+{tnl}+"{")
+tos            ([ \t]*)
+eq             ([ \t]*+=[ \t]*)
 
 /* %start START */
 
@@ -199,6 +220,8 @@ eq             (=|{tos}+=|=+{tos}|{tos}+=+{tos})
 %x libcmd
 %x pdef
 %x phead
+%x poldhelp
+%x phelp
 %x pbody
 %x pstr
 %x pexample
@@ -211,12 +234,14 @@ eq             (=|{tos}+=|=+{tos}|{tos}+=+{tos})
 \/\/*      { old_state = YYSTATE; BEGIN(comment); }
 
 info=+"\"" { old_state = YYSTATE; quote++; BEGIN(string);
+             found_info++;
              string_start = current_pos(yyleng);
              *lib_style = NEW_LIBSTYLE;
              last_cmd = LP_INFO;
            }
 
 (version+{eq}+{quote}+{strings}+{quote}) {
+             found_version++;
              if ( mode != GET_INFO ) {
                make_version(yytext,1);
 #ifdef STANDALONE_PARSER
@@ -233,7 +258,8 @@ static     { p_static=TRUE; }
 (proc[ \t]+{name})|([ \t]proc[ \t]+{name}) {
              char proc[256];
              BEGIN(pdef);
-#if YYLPDEBUG > 0
+             found_proc_in_proc = 0;
+#if YYLPDEBUG > 1
              printf("Newlib:%s\n", newlib);
 #endif
 #ifdef STANDALONE_PARSER
@@ -260,7 +286,7 @@ static     { p_static=TRUE; }
 #endif STANDALONE_PARSER
                SET_DEF_END(mode, pi, current_pos(yyleng+1));
 #if YYLPDEBUG
-               printf("PROC %d at %d/%d: (%d) %s\n", p_static,
+               if(lpverbose>1) printf("PROC %d at %d/%d: (%d) %s\n", p_static,
                       yylplineno, current_pos(0), brace1, yytext);
 #endif
                p_static=FALSE;
@@ -272,7 +298,7 @@ example    {
              BEGIN(pexample);
              SET_EXAMPLE_START(mode, pi, yylplineno, current_pos(0));
 #if YYLPDEBUG
-             printf("EXAMPLE at %d/%d (%d)\n", yylplineno,
+             if(lpverbose>1) printf("EXAMPLE at %d/%d (%d)\n", yylplineno,
                     current_pos(0), brace1);
 #endif
            }
@@ -289,7 +315,7 @@ LIB[ \t]+"\"" { quote++;
 #endif
            }
 <header>(^{comment}+[^\n]*) {
-#if YYLPDEBUG > 1
+#if YYLPDEBUG
              printf("+(cmt)HEAD:%s\n", yytext);
 #endif
            }
@@ -320,6 +346,7 @@ LIB[ \t]+"\"" { quote++;
              printf(" HEAD:%s\n", yytext);
 #endif
              //print_version(mode, libfile);
+             yyless(0);
              BEGIN(help);
            }
 <help>(^{comment}+[^\n]*)  {
@@ -350,7 +377,13 @@ LIB[ \t]+"\"" { quote++;
            }
 
 <help>\n { yylplineno++; }
+<help>({tos}|{comment}+{fstring}) { 
+#if YYLPDEBUG
+             if(lpverbose>2) printf("--->%s<---\n", yytext);
+#endif
+           }
 <help>.    {
+             found_oldhelp=1;
 #if YYLPDEBUG > 1
              printf("-HELP:%s\n", yytext);
 #endif
@@ -365,7 +398,7 @@ LIB[ \t]+"\"" { quote++;
            }
 #endif /* STANDALONE_PARSER */
 #if YYLPDEBUG
-             printf("LIB:'%s'\n", yytext);
+             if(lpverbose>1) printf("LIB:'%s'\n", yytext);
 #endif
              BEGIN(INITIAL);
            }
@@ -373,28 +406,27 @@ LIB[ \t]+"\"" { quote++;
 <pdef>[ \t] { }
 <pdef>\(   {
              brace2++;
-#if YYLPDEBUG
+#if YYLPDEBUG > 1
              printf("%s", yytext);
 #endif
            }
 <pdef>\)   {
              brace2--;
-#if YYLPDEBUG
+#if YYLPDEBUG > 1
              printf(">%s<\n", yytext);
              printf("{=%d, (=%d, [=%d\n", brace1, brace2, brace3);
 #endif
              if(brace2<=0) {
-#if YYLPDEBUG
+#if YYLPDEBUG > 1
                printf("BEGIN(phead){=%d, (=%d, [=%d\n", brace1, brace2, brace3);
 #endif
                SET_DEF_END(mode, pi, current_pos(yyleng));
-               SET_HELP_START(mode, pi, current_pos(yyleng));
                BEGIN(phead);
              }
            }
 <pdef>"{"  {
              if(brace2>0) {
-#if YYLPDEBUG
+#if YYLPDEBUG > 1
                printf("{=%d, (=%d, [=%d\n", brace1, brace2, brace3);
 #endif
                yylp_errno = YYLP_DEF_BR2;
@@ -406,46 +438,108 @@ LIB[ \t]+"\"" { quote++;
            }
 <pdef>\n { yylplineno++;
               if(brace2<=0) {
-#if YYLPDEBUG
+#if YYLPDEBUG > 1
                 printf("BEGIN(phead-2){=%d, (=%d, [=%d\n", brace1, brace2, brace3);
 #endif
-                SET_HELP_START(mode, pi, current_pos(0));
                 BEGIN(phead);
               }
             }
 <pdef>.    {
              if(brace2<=0) {
-               SET_HELP_START(mode, pi, current_pos(0));
                BEGIN(phead);
+               yyless(0);
              }
            }
 
-<phead>"\\{"             { }
-<phead>"{"               {
-                           brace1++; BEGIN(pbody);
+<phead>({tnl}+{quote}+{strings}+{escquote}+{tnl}+"{") {
 #if YYLPDEBUG
-                           printf("BEGIN(pbody){=%d, (=%d, [=%d\n", brace1, brace2, brace3);
+              if(lpverbose>2)printf("0-Len=%d;\n", yyleng);
 #endif
-                           SET_BODY_START(mode, pi, yylplineno, current_pos(0));
+              if(check) {
+                printf("Procedure %s (line %d) has OLD-STYLE-HELP!\n",
+                       pi->procname, pi->data.s.proc_lineno);
+              }
+              SET_HELP_START(mode, pi, current_pos(0));
+              BEGIN(poldhelp); 
+              yyless(0);
+           }
+<phead>({tnl}+{quote}+{strings}+{eos}) {
 #if YYLPDEBUG
-                           printf("BODY at %d/%d", yylplineno, current_pos(0));
+              if(lpverbose>2)printf("1-Len=%d;\n", yyleng);
 #endif
-                         }
-<phead>\n             { yylplineno++; }
-<phead>.                 { }
+              BEGIN(phelp);
+              yyless(0);
+           }
+<phead>{escstrings}+"{" {
+              if(check && yyleng>2) {
+                printf("Procedure %s (line %d) has OLD-STYLE-HELP!\n",
+                       pi->procname, pi->data.s.proc_lineno);
+              }
+#if YYLPDEBUG
+              if(lpverbose>2 && yyleng>2) 
+                 printf("2-Len=%d, %s;\n", yyleng, pi->procname);
+#endif
+              SET_HELP_START(mode, pi, current_pos(0));
+              BEGIN(poldhelp);
+              yyless(0);
+           }
+<phead>.   { printf("[%s]", yytext); }
+
+<poldhelp>{escbrack} { }
+<poldhelp>"{" {
+                brace1++; BEGIN(pbody);
+#if YYLPDEBUG > 1
+                printf("BEGIN(pbody){=%d, (=%d, [=%d\n", brace1, brace2, brace3);
+#endif
+                SET_BODY_START(mode, pi, yylplineno, current_pos(0));
+#if YYLPDEBUG > 1
+                printf("BODY at %d/%d", yylplineno, current_pos(0));
+#endif
+              }
+<poldhelp>\n  { yylplineno++; }
+<poldhelp>.   { }
+
+<phelp>{quote} {
+             old_state = YYSTATE;
+             BEGIN(string);
+             SET_HELP_START(mode, pi, current_pos(1));
+           }
+<phelp>{tos} {}
+<phelp>"{" {
+             brace1++; BEGIN(pbody);
+#if YYLPDEBUG > 1
+             printf("BEGIN(pbody){=%d, (=%d, [=%d\n", brace1, brace2, brace3);
+#endif
+             SET_BODY_START(mode, pi, yylplineno, current_pos(0));
+#if YYLPDEBUG > 1
+             printf("BODY at %d/%d", yylplineno, current_pos(0));
+#endif
+           }
+<phelp>\n  { yylplineno++; }
 
 <pbody>({comment}[^\n]*) { }
-<pbody>"\""              { quote++; old_state = YYSTATE;
-                           BEGIN(string); /* printf("%s", yytext); */
-                         }
-<pbody>"{"               {
-                           brace1++;
-#if YYLPDEBUG
-                           printf("line: %d, (%d)%s\n", yylplineno, brace1, yytext);
+<pbody>{quote} { quote++; old_state = YYSTATE;
+                 BEGIN(string); /* printf("%s", yytext); */
+               }
+
+<pbody>proc+{tos}+{name}+{tnl}+{paramlist}+{tnl}+"{" { 
+             if(check) printf("*** found 2 proc whithin procedure '%s'.\n",
+                          pi->procname);
+             yyless(yyleng-1);
+           }
+<pbody>proc+{tos}+{name}+{tnl}+"{" { 
+             if(check) printf("*** found 1 proc whithin procedure '%s'.\n",
+                          pi->procname);
+             yyless(yyleng-1);
+           }
+<pbody>"{"     {
+                 brace1++;
+#if YYLPDEBUG > 1
+                 printf("line: %d, (%d)%s\n", yylplineno, brace1, yytext);
 #endif
-                         }
+                }
 <pbody>"}"               {
-#if YYLPDEBUG
+#if YYLPDEBUG > 1
                            printf("line: %d, (%d)%s\n", yylplineno, brace1, yytext);
 #endif
                            brace1--;
@@ -460,7 +554,7 @@ LIB[ \t]+"\"" { quote++;
                            if(brace1<=0) {
                              SET_BODY_END(mode, pi, current_pos(yyleng));
                              SET_PROC_END(mode, pi, current_pos(yyleng));
-#if YYLPDEBUG
+#if YYLPDEBUG > 1
                              printf("-%d\n", current_pos(0));
 #endif
                              BEGIN(INITIAL);
@@ -544,14 +638,14 @@ LIB[ \t]+"\"" { quote++;
 \n                       { yylplineno++; }
 \r                       { }
 ;                        { p_static = FALSE;
-#if YYLPDEBUG
+#if YYLPDEBUG > 1
                             printf("%s", yytext);
 #endif
                          }
 .                        { p_static = FALSE;
                            yylp_errno = YYLP_BAD_CHAR;
                            printf("[%d]", *yytext);
-#if YYLPDEBUG
+#if YYLPDEBUG > 1
                            printf("[%s]", yytext);
 #endif
                            return(1);
@@ -611,7 +705,10 @@ void make_version(char *p,int what)
   strcat(libnamebuf,",");
   strcat(libnamebuf,date);
   strcat(libnamebuf,")");
-//  printf("ID=(%d)%s; \n", what, p);
+  if(what && strcmp(libnamebuf, "(?.?,?)")==0) {
+    sscanf(p,"%*[^\"]\"%[^\"]\"",libnamebuf);
+  }
+  //printf("ID=(%d)%s; \n", what, p);
 }
 
 void copy_string(lp_modes mode)
@@ -651,11 +748,10 @@ void print_version(lp_modes mode, char *p)
 main( int argc, char *argv[] )
 {
   lib_style_types lib_style;
-  ++argv, --argc;  /* skip over program name */
-  if ( argc > 0 )
-     yyin = myfopen( argv[0], "rb" );
-  else
-     yyin = stdin;
+  main_init(argc, argv);
+  if(lpverbose)printf("Verbose level=%d\n", lpverbose);
+  if(check)printf("Reporting most possible annomalies.\n");
+  if(lpverbose||check)printf("\n");
 
   printf( "  %-15s  %20s      %s,%s    %s,%s     %s,%s\n", "Library",
           "function", "line", "start-eod", "line", "body-eob",
@@ -667,6 +763,7 @@ main( int argc, char *argv[] )
     printf("\n");
   }
   else if(pi!=NULL) printpi(pi);
+  main_result(argv[0]);
 }
 
 #  endif /* STANDALONE_PARSER */

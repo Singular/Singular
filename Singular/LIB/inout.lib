@@ -1,9 +1,9 @@
-// $Id: inout.lib,v 1.4 1998-04-03 22:47:06 krueger Exp $
+// $Id: inout.lib,v 1.5 1998-05-05 11:55:29 krueger Exp $
 // system("random",787422842);
 // (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: inout.lib,v 1.4 1998-04-03 22:47:06 krueger Exp $";
+version="$Id: inout.lib,v 1.5 1998-05-05 11:55:29 krueger Exp $";
 info="
 LIBRARY:  inout.lib     PROCEDURES FOR MANIPULATING IN- AND OUTPUT
 
@@ -23,12 +23,13 @@ LIBRARY:  inout.lib     PROCEDURES FOR MANIPULATING IN- AND OUTPUT
 ///////////////////////////////////////////////////////////////////////////////
 
 proc allprint (list #)
-USAGE:   allprint(L);  L list
+"USAGE:   allprint(L);  L list
 CREATE:  display L[1], L[2], ... if an integer with name ALLprint is defined,
-         makes "pause",   if ALLprint > 0
+         makes \"pause\",   if ALLprint > 0
          listvar(matrix), if ALLprint = 2
 RETURN:  no return value
 EXAMPLE: example allprint; shows an example
+"
 {
    if( defined(ALLprint) )
    {
@@ -50,7 +51,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc dbpri (int n ,list #)
-USAGE:   dbpri(n,L);  n integer, L list
+"USAGE:   dbpri(n,L);  n integer, L list
 CREATE:  display L[1], L[2], ... if an integer with name printlevel is defined
          and if n<=printlevel, set printlevel to 0 if it is not defined
 RETURN:  no return value
@@ -58,6 +59,7 @@ NOTE:    this is uesful to control the printing of comments or partial results
          in a procedure, e.g. for debugging a procedure.
          It is similair but not the same as the internal function dbprint
 EXAMPLE: example dbpri; shows an example
+"
 {
    int i;
    if( defined(printlevel)==0 ) { int printlevel; export printlevel; }
@@ -76,13 +78,14 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc lprint
-USAGE:   lprint(id[,n]);  id poly/ideal/vector/module/matrix, n integer
+"USAGE:   lprint(id[,n]);  id poly/ideal/vector/module/matrix, n integer
 RETURN:  string of id in a format fitting into lines of size n; if only one
          argument is present, n = pagewidth
 NOTE:    id is printed columnwise, each column separated by a blank line;
          hence lprint(transpose(id)); displays a matrix id in a format which
          can be used as input to reproduce id
 EXAMPLE: example lprint; shows an example
+"
 {
    if (size(#)==1) { int n = pagewidth-3; }
    else {int n = #[2]-3; }
@@ -141,11 +144,12 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc pmat (matrix m, list #)
-USAGE:   pmat(M,[n]);  M matrix, n integer
+"USAGE:   pmat(M,[n]);  M matrix, n integer
 CREATE:  display M in array format if it fits into pagewidth, no return value;
          if n is given, only the first n characters of each colum are shown
 RETURN:  no return value
 EXAMPLE: example pmat; shows an example
+"
 {
 //------------- main case: input is a matrix, no second argument---------------
    if ( size(#)==0)
@@ -211,7 +215,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc rMacaulay
-USAGE:   rMacaulay(s[,n]);  s string, n integer
+"USAGE:   rMacaulay(s[,n]);  s string, n integer
 RETURN:  a string which should be readable by Singular if s is a string read
          by Singular from a file which was produced by Macaulay_1 (='Macaulay
          classic'). If a second argument is present the first n lines of the
@@ -220,6 +224,7 @@ RETURN:  a string which should be readable by Singular if s is a string read
 NOTE:    This does not always work with 'cut and paste' since, coming
          from the screen, the character \ is treated differently
 EXAMPLE: example rMacaulay; shows an example
+"
 {
    int n;
    if( size(#)==2 ) { n=#[2]; }
@@ -334,7 +339,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc show (id, list #)
-USAGE:   show(id);   id any object of basering or of type ring/qring
+"USAGE:   show(id);   id any object of basering or of type ring/qring
          show(R,s);  R=ring, s=string (s = name of an object belonging to R)
 DISPLAY: display id/s in a compact format together with some information
 RETURN:  no return value
@@ -344,6 +349,7 @@ NOTE:    objects of type string, int, intvec, intmat belong to any ring.
          id may be of type list but the list must not contain a ring
 CAUTION: show(R,s) does not work inside a procedure
 EXAMPLE: example show; shows an example
+"
 {
 //------------- use funny names in order to avoid name conflicts --------------
    int @li@, @ii;
@@ -514,14 +520,15 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc showrecursive (id,poly p,list #)
-USAGE:   showrecursive(id,p[ord]); id=any object of basering, p=product of
+"USAGE:   showrecursive(id,p[ord]); id=any object of basering, p=product of
          variables and ord=string (any allowed ordstr)
 DISPLAY: display 'id' in a recursive format as a polynomial in the variables
          occuring in p with coefficients in the remaining variables. Do this
          by mapping in a ring with parameters [and ordering 'ord', if a 3rd
-         argument is present (default: ord="dp")] and applying procedure 'show'
+         argument is present (default: ord=\"dp\")] and applying procedure 'show'
 RETURN:  no return value
 EXAMPLE: example showrecursive; shows an example
+"
 {
    def P = basering;
    int ii;
@@ -557,11 +564,12 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc split (string s, list #)
-USAGE:    split(s[,n]); s string, n integer
+"USAGE:    split(s[,n]); s string, n integer
 RETURN:   same string, split into lines of length n separated by \
           (default: n=pagewidth)
 NOTE:     may be used in connection with lprint
 EXAMPLE:  example split; shows an example
+"
 {
    string line,re; int p,l;
    if( size(#)==0 ) { int n=pagewidth; }
@@ -595,9 +603,10 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc tab (int n)
-USAGE:   tab(n);  n integer
+"USAGE:   tab(n);  n integer
 RETURN:  string of n space tabs
 EXAMPLE: example tab; shows an example
+"
 {
    if( n==0 ) { return(""); }
    string s=" ";
@@ -611,20 +620,21 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc writelist (string fil, string nam, list L)
-USAGE:   writelist(fil,nam,L);  fil,nam=strings (file-name, list-name), L=list
+"USAGE:   writelist(fil,nam,L);  fil,nam=strings (file-name, list-name), L=list
 CREATE:  a file with name `fil`, write the content of the list L into it and
          call the list `nam`.
 RETURN:  no return value
 NOTE:    The syntax of writelist uses and is similar to the syntax of the
          write command of Singular which does not manage lists properly.
-         If, say, (fil,nam) = ("listfile","L1"),  writelist creates (resp.
+         If, say, (fil,nam) = (\"listfile\",\"L1\"),  writelist creates (resp.
          appends if listfile exists) a file with name listfile and stores
          there the list L under the name L1. The Singular command
-         execute(read("listfile")); assignes the content of L (stored in
+         execute(read(\"listfile\")); assignes the content of L (stored in
          listfile) to a list L1.
-         On a UNIX system, overwrite an existing file if fil=">...", resp.
-         append if fil=">>...".
+         On a UNIX system, overwrite an existing file if fil=\">...\", resp.
+         append if fil=\">>...\".
 EXAMPLE: example writelist; shows an example
+"
 {
    int i;
    write(fil,"list "+nam+";");

@@ -1,9 +1,9 @@
-// $Id: random.lib,v 1.4 1998-04-03 22:47:12 krueger Exp $
+// $Id: random.lib,v 1.5 1998-05-05 11:55:36 krueger Exp $
 //system("random",787422842);
 //(GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: random.lib,v 1.4 1998-04-03 22:47:12 krueger Exp $";
+version="$Id: random.lib,v 1.5 1998-05-05 11:55:36 krueger Exp $";
 info="
 LIBRARY:  random.lib    PROCEDURES OF RANDOM MATRIX AND POLY OPERATIONS
 
@@ -22,12 +22,13 @@ LIB "general.lib";
 ////////////////////////////////////////////////////////////////////////////////
 
 proc genericid (id, list #)
-USAGE:   genericid(id,[,p,b]);  id ideal/module, k,p,b integers
+"USAGE:   genericid(id,[,p,b]);  id ideal/module, k,p,b integers
 RETURN:  system of generators of id which are generic, sparse, triagonal linear
          combinations of given generators with coefficients in [1,b] and
          sparsety p percent, bigger p being sparser (default: p=75, b=30000)
 NOTE:    For performance reasons try small bound b in characteristic 0
 EXAMPLE: example genericid; shows an example
+"
 {
 //----------------------------- set defaults ----------------------------------
    if( size(#)>=2 ) { int p=#[1]; int b=#[2]; }
@@ -49,12 +50,13 @@ example
 ////////////////////////////////////////////////////////////////////////////////
 
 proc randomid (id, list #)
-USAGE:   randomid(id,[k,b]);  id ideal/module, b,k integers
+"USAGE:   randomid(id,[k,b]);  id ideal/module, b,k integers
 RETURN:  ideal/module having k generators which are random linear combinations
          of generators of id with coefficients in the interval [-b,b]
          (default: b=30000, k=size(id))
 NOTE:    For performance reasons try small bound b in characteristic 0
 EXAMPLE: example randomid; shows an example
+"
 {
 //----------------------------- set defaults ----------------------------------
    if( size(#)>=2 ) { int k=#[1]; int b=#[2]; }
@@ -75,12 +77,13 @@ example
 ////////////////////////////////////////////////////////////////////////////////
 
 proc randommat (int n, int m, list #)
-USAGE:   randommat(n,m[,id,b]);  n,m,b integers, id ideal
+"USAGE:   randommat(n,m[,id,b]);  n,m,b integers, id ideal
 RETURN:  nxm matrix, entries are random linear combinations of elements
          of id and coefficients in [-b,b]
          [default: (id,b) = (maxideal(1),30000)]
 NOTE:    For performance reasons try small bound b in char 0
 EXAMPLE:  example randommat; shows an example
+"
 {
 //----------------------------- set defaults ----------------------------------
    if( size(#)>=2 ) { ideal id=#[1]; int b=#[2]; }
@@ -108,11 +111,12 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc sparseid (int k, int u, list #)
-USAGE:   sparseid(k,u[,o,p,b]);  k,u,o,p,b integers
+"USAGE:   sparseid(k,u[,o,p,b]);  k,u,o,p,b integers
 RETURN:  ideal having k generators in each degree d, u<=d<=o, p percent of
          terms in degree d are 0, the remaining have random coefficients
          in the interval [1,b], (default: o=u=d, p=75, b=30000)
 EXAMPLE: example sparseid; shows an example
+"
 {
 //----------------------------- set defaults ----------------------------------
    if( size(#)>=3 ) { int o=#[1]; int p=#[2]; int b=#[3]; }
@@ -137,10 +141,11 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc sparsemat (int n, int m, list #)
-USAGE:   sparsemat(n,m[,p,b]);  n,m,p,b integers
+"USAGE:   sparsemat(n,m[,p,b]);  n,m,p,b integers
 RETURN:  nxm integer matrix, p percent of the entries are 0, the remaining
          are random coefficients >=1 and <= b; [defaults: (p,b) = (75,1)]
 EXAMPLE: example sparsemat; shows an example
+"
 {
    int r,h,ii;
    int t = n*m;
@@ -183,11 +188,12 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc sparsepoly (int u, list #)
-USAGE:   sparsepoly(u[,o,p,b]);  u,o,p,b integers
+"USAGE:   sparsepoly(u[,o,p,b]);  u,o,p,b integers
 RETURN:  poly having only terms in degree d, u<=d<=o, p percent of the terms
          in degree d are 0, the remaining have random coefficients in [1,b),
          (defaults: o=u=d, p=75, b=30000)
 EXAMPLE:  example sparsepoly; shows an example
+"
 {
 //----------------------------- set defaults ----------------------------------
    if( size(#)>=3 ) { int o=#[1]; int p=#[2]; int b=#[3]; }
@@ -208,11 +214,12 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc sparsetriag (int n, int m, list #)
-USAGE:   sparsetriag(n,m[,p,b]);  n,m,p,b integers
+"USAGE:   sparsetriag(n,m[,p,b]);  n,m,p,b integers
 RETURN:  nxm lower triagonal integer matrix, diagonal entries equal to 1, about
          p percent of lower diagonal entries are 0, the remaining are random
          integers >=1 and <= b; [defaults: (p,b) = (75,1)]
 EXAMPLE: example sparsetriag; shows an example
+"
 {
    int ii,min,l,r; intmat M[n][m];
    int t=(n*(n-1)) div 2;

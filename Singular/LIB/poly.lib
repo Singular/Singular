@@ -1,10 +1,10 @@
-// $Id: poly.lib,v 1.11 1998-04-06 17:59:38 obachman Exp $
+// $Id: poly.lib,v 1.12 1998-05-05 11:55:33 krueger Exp $
 //system("random",787422842);
 //(GMG, last modified 22.06.96)
 //(obachman: 17.12.97 -- added katsura)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: poly.lib,v 1.11 1998-04-06 17:59:38 obachman Exp $";
+version="$Id: poly.lib,v 1.12 1998-05-05 11:55:33 krueger Exp $";
 info="
 LIBRARY:  poly.lib      PROCEDURES FOR MANIPULATING POLYS, IDEALS, MODULES
 
@@ -29,9 +29,10 @@ LIB "general.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc cyclic (int n)
-USAGE:   cyclic(n);  n integer
+"USAGE:   cyclic(n);  n integer
 RETURN:  ideal of cyclic n-roots from 1-st n variables of basering
 EXAMPLE: example cyclic; shows examples
+"
 {
 //----------------------------- procedure body --------------------------------
    ideal m = maxideal(1);
@@ -57,11 +58,12 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc katsura
-USAGE:	katsura([n]); n integer
+"USAGE:	katsura([n]); n integer
 RETURN: katsura(n) : n-th katsura ideal of newly created and set ring
                      (32003, x(0..n), dp)
         katsura()  : katsura ideal of basering 
 EXAMPLE: example katsura; shows examples
+"
 {
   if ( size(#) == 1 && typeof(#[1]) == "int")
   {
@@ -110,7 +112,7 @@ proc kat_var(int i, int n)
 ///////////////////////////////////////////////////////////////////////////////
 
 proc freerank
-USAGE:   freerank(M[,any]);  M=poly/ideal/vector/module/matrix
+"USAGE:   freerank(M[,any]);  M=poly/ideal/vector/module/matrix
 COMPUTE: rank of module presented by M in case it is free. By definition this
          is vdim(coker(M)/m*coker(M)) if coker(M) is free, where m = maximal
          ideal of basering and M is considered as matrix (the 0-module is
@@ -123,6 +125,7 @@ NOTE:    freerank(syz(M)); computes the rank of M if M is free (and -1 else)
          //* Zur Zeit noch ein Bug, da erste Bettizahl falsch berechnet wird:
          //betti(0) ist -1 statt 0
 EXAMPLE: example freerank; shows examples
+"
 {
   int rk;
   def M = simplify(#[1],10);
@@ -147,7 +150,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc is_homog (id)
-USAGE:   is_homog(id);  id  poly/ideal/vector/module/matrix
+"USAGE:   is_homog(id);  id  poly/ideal/vector/module/matrix
 RETURN:  integer which is 1 if input is homogeneous (resp. weighted homogeneous
          if the monomial ordering consists of one block of type ws,Ws,wp or Wp,
          assuming that all weights are positive) and 0 otherwise
@@ -156,6 +159,7 @@ NOTE:    A vector is homogeneous, if the components are homogeneous of same
          homogeneous
          //*** ergaenzen, wenn Matrizen-Spalten Gewichte haben
 EXAMPLE: example is_homog; shows examples
+"
 {
 //----------------------------- procedure body --------------------------------
    module M = module(matrix(id));
@@ -185,13 +189,14 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc is_zero
-USAGE:   is_zero(M[,any]); M=poly/ideal/vector/module/matrix
+"USAGE:   is_zero(M[,any]); M=poly/ideal/vector/module/matrix
 RETURN:  integer, 1 if coker(M)=0 resp. 0 if coker(M)!=0, where M is considered
          as matrix
          if a second argument is given, return a list:
                 L[1] = 1 if coker(M)=0 resp. 0 if coker(M)!=0
                 L[2] = dim(M)
 EXAMPLE: example is_zero; shows examples
+"
 {
   int d=dim(std(#[1]));
   int a = ( d==-1 );
@@ -210,10 +215,11 @@ example
 ////////////////////////////////////////////////////////////////////////////////
 
 proc maxcoef (f)
-USAGE:   maxcoef(f);  f  poly/ideal/vector/module/matrix
+"USAGE:   maxcoef(f);  f  poly/ideal/vector/module/matrix
 RETURN:  maximal length of coefficient of f of type int (by counting the
          length of the string of each coefficient)
 EXAMPLE: example maxcoef; shows examples
+"
 {
 //----------------------------- procedure body --------------------------------
    int max,s,ii,jj; string t;
@@ -246,7 +252,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc maxdeg (id)
-USAGE:   maxdeg(id);  id  poly/ideal/vector/module/matrix
+"USAGE:   maxdeg(id);  id  poly/ideal/vector/module/matrix
 RETURN:  int/intmat, each component equals maximal degree of monomials in the
          corresponding component of id, independent of ring ordering
          (maxdeg of each var is 1)
@@ -254,6 +260,7 @@ RETURN:  int/intmat, each component equals maximal degree of monomials in the
 NOTE:    proc maxdeg1 returns 1 integer, the absolut maximum; moreover, it has
          an option for computing weighted degrees
 EXAMPLE: example maxdeg; shows examples
+"
 {
    //-------- subprocedure to find maximal degree of given component ----------
    proc findmaxdeg
@@ -299,13 +306,14 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc maxdeg1 (id,list #)
-USAGE:   maxdeg1(id[,v]);  id=poly/ideal/vector/module/matrix, v=intvec
+"USAGE:   maxdeg1(id[,v]);  id=poly/ideal/vector/module/matrix, v=intvec
 RETURN:  integer, maximal [weighted] degree of monomials of id independent of
          ring ordering, maxdeg1 of i-th variable is v[i] (default: v=1..1).
 NOTE:    This proc returns one integer while maxdeg returns, in general,
          a matrix of integers. For one polynomial and if no intvec v is given
          maxdeg is faster
 EXAMPLE: example maxdeg1; shows examples
+"
 {
    //-------- subprocedure to find maximal degree of given component ----------
    proc findmaxdeg
@@ -380,13 +388,14 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc mindeg (id)
-USAGE:   mindeg(id);  id  poly/ideal/vector/module/matrix
+"USAGE:   mindeg(id);  id  poly/ideal/vector/module/matrix
 RETURN:  minimal degree/s of monomials of id, independent of ring ordering
          (mindeg of each variable is 1) of type int if id of type poly, else
          of type intmat.
 NOTE:    proc mindeg1 returns one integer, the absolut minimum; moreover it
          has an option for computing weighted degrees.
 EXAMPLE: example mindeg; shows examples
+"
 {
    //--------- subprocedure to find minimal degree of given component ---------
    proc findmindeg
@@ -433,13 +442,14 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc mindeg1 (id, list #)
-USAGE:   mindeg1(id[,v]);  id=poly/ideal/vector/module/matrix, v=intvec
+"USAGE:   mindeg1(id[,v]);  id=poly/ideal/vector/module/matrix, v=intvec
 RETURN:  integer, minimal [weighted] degree of monomials of id independent of
          ring ordering, mindeg1 of i-th variable is v[i] (default v=1..1).
 NOTE:    This proc returns one integer while mindeg returns, in general,
          a matrix of integers. For one polynomial and if no intvec v is given
          mindeg is faster.
 EXAMPLE: example mindeg1; shows examples
+"
 {
    //--------- subprocedure to find minimal degree of given component ---------
    proc findmindeg
@@ -513,9 +523,10 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc normalize (id)
-USAGE:   normalize(id);  id=poly/vector/ideal/module
+"USAGE:   normalize(id);  id=poly/vector/ideal/module
 RETURN:  object of same type with leading coefficient equal to 1
 EXAMPLE: example normalize; shows an example
+"
 {
    return(simplify(id,1));
 }
@@ -542,10 +553,11 @@ example
 //           generator in G.
 ////////////////////////////////////////////////////////////////////////////////
 proc rad_con (poly g,ideal I)
-  USAGE:   rad_con(<poly>,<ideal>);
+"  USAGE:   rad_con(<poly>,<ideal>);
   RETURNS: 1 (TRUE) (type <int>) if <poly> is contained in the radical of
            <ideal>, 0 (FALSE) (type <int>) otherwise
   EXAMPLE: example rad_con; shows an example
+"
 { def br=basering;
   int n=nvars(br);
   int dB=degBound;
@@ -581,10 +593,11 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc lcm (ideal i)
-USAGE:   lcm(i); i ideal
+"USAGE:   lcm(i); i ideal
 RETURN:  poly = lcm(i[1],...,i[size(i)])
 NOTE:    
 EXAMPLE: example lcm; shows an example
+"
 {
   int k,j;
    poly p,q;
@@ -635,10 +648,11 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc content(f)
-USAGE:   content(f); f polynomial/vector
+"USAGE:   content(f); f polynomial/vector
 RETURN:  number, the content (greatest common factor of coefficients)
          of the polynomial/vector f
 EXAMPLE: example content; shows an example
+"
 {
   return(leadcoef(f)/leadcoef(cleardenom(f)));
 }  

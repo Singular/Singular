@@ -1,8 +1,8 @@
-// $Id: deform.lib,v 1.9 1998-05-03 14:09:50 obachman Exp $
+// $Id: deform.lib,v 1.10 1998-05-05 11:55:22 krueger Exp $
 // author: Bernd Martin email: martin@math.tu-cottbus.de
 //(bm, last modified 4/98)   
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: deform.lib,v 1.9 1998-05-03 14:09:50 obachman Exp $";
+version="$Id: deform.lib,v 1.10 1998-05-05 11:55:22 krueger Exp $";
 info="
 LIBRARY:  deform.lib       PROCEDURES FOR COMPUTING MINIVERSAL DEFORMATION
                            by Bernd Martin (martin@math.tu-cottbus.de)
@@ -29,30 +29,31 @@ LIB "matrix.lib";
 LIB "homolog.lib";
 ///////////////////////////////////////////////////////////////////////////////
 proc versal (ideal Fo,list #)
-USAGE:   versal(Fo[,d,any]); Fo=ideal, d=int, any=list
+"USAGE:   versal(Fo[,d,any]); Fo=ideal, d=int, any=list
 COMUPTE: miniversal deformation of Fo up to degree d (default d=100),
 CREATE:  Rings (exported):
-         'my'Px = extending the basering Po by new variables given by "A,B,.." 
+         'my'Px = extending the basering Po by new variables given by \"A,B,..\" 
                   (deformation parameters), returns as basering,
                   the new variables come before the old ones,
-                  the ordering is the product between "ls" and "ord(Po)",
+                  the ordering is the product between \"ls\" and \"ord(Po)\",
          'my'Qx = Px/Fo extending Qo=Po/Fo,
          'my'So = being the embedding-ring of the versal base space,
-         'my'Ox = Px/Js extending So/Js.   (default my="")
+         'my'Ox = Px/Js extending So/Js.   (default my=\"\")
       Matrices (in Px, exported): 
          Js  = giving the versal base space (obstructions),
          Fs  = giving the versal family of Fo,
          Rs  = giving the lifting of Ro=syz(Fo).
       If d is defined (!=0), it computes up to degree d.
       If 'any' is defined and any[1] is no string, interactive version.
-      Otherwise 'any' gives predefined strings: "my","param","order","out"
-      ("my" prefix-string, "param" is a letter (e.g. "A")  for the name of
-      first parameter or (e.g. "A(") for index parameter variables, "order" 
-      ordering string for ring extension), "out" name of output-file).
+      Otherwise 'any' gives predefined strings: \"my\",\"param\",\"order\",\"out\"
+      (\"my\" prefix-string, \"param\" is a letter (e.g. \"A\")  for the name of
+      first parameter or (e.g. \"A(\") for index parameter variables, \"order\" 
+      ordering string for ring extension), \"out\" name of output-file).
 NOTE:   printlevel < 0        no output at all,
         printlevel >=0,1,2,.. informs you, what is going on;            
         this proc uses 'execute'.
 EXAMPLE:example versal; shows an example
+"
 {
 //------- prepare -------------------------------------------------------------
   string str,@param,@order,@my,@out,@degrees;
@@ -302,31 +303,32 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc mod_versal(matrix Mo, ideal I, list #)
-
+"
 USAGE:   mod_versal(Mo,I[,d,any]); I=ideal, M=module, d=int, any =list 
 COMUPTE: miniversal deformation of coker(Mo) over Qo=Po/Io, Po=basering;
 CREATE:  Ringsr (exported):
          'my'Px  = extending the basering by new variables
                    (deformation parameters),
                    the new variables come before the old ones,
-                   the ordering is the product between "my_ord" and "ord(Po)",
+                   the ordering is the product between \"my_ord\" and \"ord(Po)\",
          'my'Qx  = Px/Io extending Qo (returns as basering),
          'my'Ox  = Px/(Io+Js) ring of the versal deformation of coker(Ms),
-         'my'So  = embedding-ring of the versal base space.  (default 'my'="") 
+         'my'So  = embedding-ring of the versal base space.  (default 'my'=\"\") 
       Matrices (in Qx, exported):
          Js  = giving the versal base space (obstructions),
          Ms  = giving the versal family of Mo,
          Ls  = giving the lifting of syzygies Lo=syz(Mo), 
       If d is defined (!=0), it computes up to degree d.
       If 'any' is defined and any[1] is no string, interactive version.
-      Otherwise 'any' gives predefined strings:"my","param","order","out"
-      ("my" prefix-string, "param" is a letter (e.g. "A")  for the name of
-      first parameter or (e.g. "A(") for index parameter variables, "ord" 
-      ordering string for ringextension), "out" name of output-file).
+      Otherwise 'any' gives predefined strings:\"my\",\"param\",\"order\",\"out\"
+      (\"my\" prefix-string, \"param\" is a letter (e.g. \"A\")  for the name of
+      first parameter or (e.g. \"A(\") for index parameter variables, \"ord\" 
+      ordering string for ringextension), \"out\" name of output-file).
 NOTE:   printlevel < 0        no output at all,
         printlevel >=0,1,2,.. informs you, what is going on,             
         this proc uses 'execute'.
 EXAMPLE:example mod_versal; shows an example
+"
 {
 //------- prepare -------------------------------------------------------------
   string str,@param,@order,@my,@out,@degrees;
@@ -542,9 +544,10 @@ example
 //============================================================================= 
 ///////////////////////////////////////////////////////////////////////////////
 proc kill_rings(list #)
-USAGE: kill_rings([string]);
+"USAGE: kill_rings([string]);
 Sub-procedure: kills exported rings of 'versal' and 
                'mod_versal' with prefix 'string'
+"
 {
   string my,br;
   if (size(#)>0)     { my = #[1];}
@@ -567,8 +570,9 @@ Sub-procedure: kills exported rings of 'versal' and
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc compute_ext(matrix Mo,int p)
-
+"
 Sub-procedure: obtain Ext1 and Ext2 and other objects used by mod_versal
+"
 { 
    int    l,f0,f1,f2,f3,e1,e2,ok_ann;
    module Co,Do,ima,ex1,ex2;
@@ -623,8 +627,9 @@ Sub-procedure: obtain Ext1 and Ext2 and other objects used by mod_versal
 }
 //////////////////////////////////////////////////////////////////////////////
 proc get_rings(ideal Io,int e1,int switch, list #)
-
+"
 Sub-procedure: creating ring-extensions 
+"
 { 
    def Po = basering; 
    string my;
@@ -658,10 +663,11 @@ Sub-procedure: creating ring-extensions
   return();
 }
 //////////////////////////////////////////////////////////////////////////////
-proc get_inf_def(list #);     
-
+proc get_inf_def(list #)
+"
 Sub-procedure: compute infinitesimal family of a module and its syzygies 
                from a kbase of Ext1 and its lifts
+"
 {
   matrix Ms  = #[1];
   matrix Ls  = #[2];
@@ -683,7 +689,7 @@ Sub-procedure: compute infinitesimal family of a module and its syzygies
 } 
 //////////////////////////////////////////////////////////////////////////////
 proc lift_rel_kb (module N, module M, list #)
-
+"
 USAGE   lift_rel_kb(N,M[,kbaseM,p]);
 ASSUME  [p a monomial ] or the product of all variables
         N, M modules of same rank,
@@ -693,6 +699,7 @@ ASSUME  [p a monomial ] or the product of all variables
 RETURN  matrix A, whose j-th columnes present the coeff's of N[j] in kbaseM,
         i.e. kbaseM*A = reduce(N,std(M))
 EXAMPLE example lift_rel_kb;  shows examples
+"
 {
   poly p = product(maxideal(1));
        M = std(M);
@@ -731,7 +738,7 @@ example
 } 
 ///////////////////////////////////////////////////////////////////////////////
 proc lift_kbase (N, M)
-USAGE:   lift_kbase(N,M); N,M=poly/ideal/vector/module
+"USAGE:   lift_kbase(N,M); N,M=poly/ideal/vector/module
 RETURN:  matrix A, coefficient matrix expressing N as linear combination of
          k-basis of M. Let the k-basis have k elements and size(N)=c columns.
          Then A satisfies:
@@ -739,6 +746,7 @@ RETURN:  matrix A, coefficient matrix expressing N as linear combination of
 ASSUME:  dim(M)=0 and the monomial ordering is a well ordering or the last
          block of the ordering is c or C
 EXAMPLE: example lift_kbase; shows an example
+"
 {
   return(lift_rel_kb(N,M));
 }
@@ -759,8 +767,9 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 proc interact1 ()
-
+"
 Sub_procedure: asking for and reading your input-strings 
+"
 {
  string my = "@";
  string str,out,my_ord,my_var;
@@ -793,8 +802,9 @@ Sub_procedure: asking for and reading your input-strings
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc interact2 (matrix A, intvec col_vec, list #)
-
+"
 Sub-procedure: asking for and reading your input
+"
 {
   module B,C;
   matrix D;
@@ -824,8 +834,9 @@ Sub-procedure: asking for and reading your input
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc negative_part(intvec iv)
-
+"
 RETURNS intvec of indices of jv having negative entries (or iv, if non) 
+"
 {
    intvec jv;
    int    l,k;
@@ -840,9 +851,10 @@ RETURNS intvec of indices of jv having negative entries (or iv, if non)
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc find_ord(matrix A, intvec w_vec)
-
+"
 Sub-proc: return martix ord(a_ij) with respect to weight_vec, or
           0 if A non-qh
+"
 {
   int @r = nrows(A);
   int @c = ncols(A);
@@ -864,10 +876,11 @@ Sub-proc: return martix ord(a_ij) with respect to weight_vec, or
 }
 //////////////////////////////////////////////////////////////////////////////////
 proc homog_test(intvec w_vec, matrix Mo, matrix A)
-
+"
 Sub proc: return relative weight string of columnes of A with respect 
-          to the given w_vec and to Mo, or "" if not qh 
+          to the given w_vec and to Mo, or \"\" if not qh 
     NOTE: * means weight is not determined
+"
 {
   int k,l;
   intvec tv;
@@ -901,9 +914,10 @@ Sub proc: return relative weight string of columnes of A with respect
 }
 //////////////////////////////////////////////////////////////////////////////////
 proc homog_t(intvec d_vec, matrix Fo, matrix A)
-
+"
 Sub-procedure: Computing relative (with respect to flatten(Fo)) weight_vec 
                of columnes of A (return zero if Fo or A not qh)
+"
 {
    Fo = matrix(Fo,nrows(A),1);
    A  = concat(Fo,A);

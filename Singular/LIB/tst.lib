@@ -1,8 +1,8 @@
-// $Id: tst.lib,v 1.3 1998-04-03 22:47:15 krueger Exp $
+// $Id: tst.lib,v 1.4 1998-05-05 11:55:40 krueger Exp $
 //(obachman, last modified 2/13/98)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: tst.lib,v 1.3 1998-04-03 22:47:15 krueger Exp $";
+version="$Id: tst.lib,v 1.4 1998-05-05 11:55:40 krueger Exp $";
 info="
 LIBRARY:  tst.lib      PROCEDURES FOR RUNNING AUTOMATIC TST TESTS
 
@@ -16,9 +16,10 @@ LIBRARY:  tst.lib      PROCEDURES FOR RUNNING AUTOMATIC TST TESTS
 ///////////////////////////////////////////////////////////////////////////////
 
 proc tst_system(string s)
-USAGE:    tst_system(s); s string
-RETURN:   string which is stdout and stderr of system("sh", s)
+"USAGE:    tst_system(s); s string
+RETURN:   string which is stdout \x and stderr of system(\"sh\", s)
 EXAMPLE:  example tst_system; shows examples
+"
 {
   string tmpfile = "/tmp/tst_" + string(system("pid"));
   int errno;
@@ -38,17 +39,18 @@ example
 
   
 proc tst_ignore
-USAGE:    tst_ignore(any,[keyword], [link]) 
+"USAGE:    tst_ignore(any,[keyword], [link]) 
             any     -- valid argument to string()
-            keyword -- one of "time" or "memory"
+            keyword -- one of \"time\" or \"memory\"
             link    -- a link which can be written to 
 RETURN:   none; writes string(any) to link (or stdout, if no link given), 
-          prepending prefix "// ignore:", or "// ignore: time:", 
-          "//ignore: memory:"  if called with the respective keywords;
+          prepending prefix \"// ignore:\", or \"// ignore: time:\", 
+          \"//ignore: memory:\"  if called with the respective keywords;
           should be used in tst files to output system dependent data 
-          (like date, pathnames) and timings With the keyword "time", 
-          resp. memory usgae with the keyword "memory"
+          (like date, pathnames) { and timings With the keyword \"time\", 
+          resp. memory usage with the keyword \"memory\"
 EXAMPLE:  example tst_ignore; shows examples
+"
 {
   string s;
   string keyword = "";
@@ -129,10 +131,11 @@ example
 }
 
 proc tst_init
-USAGE:   tst_init()
+"USAGE:   tst_init()
 RETURN:  none; writes some identification data to stdout;
          should be called as first routine in a tst file
 EXAMPLE: example tst_init; shows example
+"
 {
   tst_ignore("USER    : " + system("getenv", "USER"));
   tst_ignore("HOSTNAME: " + system("getenv", "HOST"));

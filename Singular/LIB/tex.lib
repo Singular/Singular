@@ -1,10 +1,10 @@
-// $Id: tex.lib,v 1.5 1998-04-03 22:47:15 krueger Exp $   
+// $Id: tex.lib,v 1.6 1998-05-05 11:55:39 krueger Exp $   
 //
 // author : Christian Gorzel email: gorzelc@math.uni-muenster.de
 // created ....18.4.97 (lastchange 13.6.97)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: tex.lib,v 1.5 1998-04-03 22:47:15 krueger Exp $";
+version="$Id: tex.lib,v 1.6 1998-05-05 11:55:39 krueger Exp $";
 info="
 LIBRARY: tex.lib      PROCEDURES FOR TYPESET OF SINGULAROBJECTS IN TEX
                         by Christian Gorzel, send bugs and
@@ -44,12 +44,13 @@ LIBRARY: tex.lib      PROCEDURES FOR TYPESET OF SINGULAROBJECTS IN TEX
 ///////////////////////////////////////////////////////////////////////////////
 
 proc closetex(string fname, list #) 
-USAGE:   closetex(fname[,style]); fname,style = string
+"USAGE:   closetex(fname[,style]); fname,style = string
 RETURN:  nothing; writes a LaTeX2e closing line into file fname
 NOTE:    style overwrites the default setting latex2e; maybe latex,amstex,tex 
-         preceeding ">>" end ending ".tex" may miss in fname; 
+         preceeding \">>\" end ending \".tex\" may miss in fname; 
          overwriting an existing file is not possible
 EXAMPLE: example closetex; shows an example
+"
 {
   string default = "latex2e";       // may be changed appropriatly (C.G.)
   int i = 1;
@@ -80,11 +81,12 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc tex(string fname, list #)
-USAGE:   tex(fname[,style]); fname,style = string
+"USAGE:   tex(fname[,style]); fname,style = string
 RETURN:  nothing; calls latex2e for compiling the file fname
 NOTE:    style overwrites the default setting latex2e; maybe latex,amstex,tex 
-         ending ".tex" may miss in fname        
+         ending \".tex\" may miss in fname        
 EXAMPLE: example tex; shows an example
+"
 { 
   string default = "latex2e";           // may be changed appropriatly (C.G.)
   int i=1;
@@ -124,11 +126,12 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc opentex(string fname, list #)         
-USAGE:   opentex(fname[,style]); fname,style = string
+"USAGE:   opentex(fname[,style]); fname,style = string
 RETURN:  nothing; writes as LaTeX2e header into a new file fname
 NOTE:    suffix .tex may miss in fname
          style overwrites the default setting latex2e; may be latex,amstex,tex 
 EXAMPLE: example opentex; shows an example
+"
 {
   int i =1;
 
@@ -165,11 +168,12 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc texdemo(list #) 
-USAGE:   texdemo();
+"USAGE:   texdemo();
 RETURN:  nothing; generates automatically a LaTeX2e file called: texlibdemo.tex
          explaining the  features of tex.lib and its gloabl variables
 NOTE:    this proc takes some minutes         
 EXAMPLE: example texdemo; executes the generation
+"
 { int make_demo = size(#);
 
   print(" Not implemeted yet");
@@ -199,12 +203,13 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc texfactorize(string fname, poly f, list #) 
-USAGE:   opentex(fname,f); fname = string; f = poly
+"USAGE:   opentex(fname,f); fname = string; f = poly
 RETURN:  string, the poly as as product of its irreducible factors
                  in TeX-typesetting if fname == empty string;
          otherwise append this to file fname.tex; return nothing  
-NOTE:    preceeding ">>" end ending ".tex" may miss in fname 
+NOTE:    preceeding \">>\" end ending \".tex\" may miss in fname 
 EXAMPLE: example texfactorize; shows an example
+"
 {
   def @r = basering;
   list l;
@@ -271,12 +276,13 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc texmap(string fname, def m, def @r1, def @r2, list #)
-USAGE:   texmap(fname,f); fname = string; m = string/map, @r1,@r2 = ring
+"USAGE:   texmap(fname,f); fname = string; m = string/map, @r1,@r2 = ring
 RETURN:  string, the map m from @r1 to @r2 preeceded by its name if m = string
                  in TeX-typesetting if fname == empty string;
          otherwise append this to file fname.tex; return nothing  
-NOTE:    preceeding ">>" end ending ".tex" may miss in fname 
+NOTE:    preceeding \">>\" end ending \".tex\" may miss in fname 
 EXAMPLE: example texmap; shows an example
+"
 { 
   int saveDollars= defined(NoDollars);
   int TX = defined(TeXwidth);
@@ -418,11 +424,12 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc texname(string fname, string s) 
-USAGE:   texname(fname,s);  fname,s = string
-RETURN:  the string s if fname == the empty string "" ;
+"USAGE:   texname(fname,s);  fname,s = string
+RETURN:  the string s if fname == the empty string \"\" ;
          otherwise append s to file fname.tex; return nothing 
-NOTE:    preceeding ">>" end ending ".tex" may miss in fname;         
+NOTE:    preceeding \">>\" end ending \".tex\" may miss in fname;         
 EXAMPLE: example texname; shows an example
+"
 {
   string st, extr;
   int i,anf,end,op,bigch;
@@ -494,11 +501,12 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc texobj(string fname, list #)
-USAGE:   texobj(fname,l); fname = string,l = list of Singular dataypes
+"USAGE:   texobj(fname,l); fname = string,l = list of Singular dataypes
 RETURN:  string, the objects in TeX-typesetting if fname == empty string;
          otherwise append this to file fname.tex; return nothing    
-NOTE:    preceeding ">>" end ending ".tex" may miss in fname;         
+NOTE:    preceeding \">>\" end ending \".tex\" may miss in fname;         
 EXAMPLE: example texobj; shows an example
+"
 {
  int i,j,k,nr,nc,linear,Tw,Dollars;
  int ND = defined(NoDollars);
@@ -758,13 +766,14 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc texproc(string fname,string pname) 
-USAGE:   opentex(fname,pname); fname,pname = string
+"USAGE:   opentex(fname,pname); fname,pname = string
 RETURN:  string, the proc in a verbatim environment in TeX-typesetting 
                  if fname == empty string;
          otherwise append this to file fname.tex; return nothing  
-NOTE:    preceeding ">>" end ending ".tex" may miss in fname; 
+NOTE:    preceeding \">>\" end ending \".tex\" may miss in fname; 
 CAUTION: texproc cannot applied on itself correctly         
 EXAMPLE: example texproc; shows an example
+"
 {
   int i,j=1,1;
   string p,s,t;
@@ -824,13 +833,14 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc texring(string fname, def r, list #) 
-USAGE:   texring(fname, r[,l]); fname = string; r = ring;
+"USAGE:   texring(fname, r[,l]); fname = string; r = ring;
                                 l=list of strings : controls the symbol for
                                 coefficint field etc. see example texdemo(); 
 RETURN:  string, the ring in TeX-typesetting if fname == empty string;
          otherwise append this to file fname.tex; return nothing    
-NOTE:    preceeding ">>" end ending ".tex" may miss in fname;        
+NOTE:    preceeding \">>\" end ending \".tex\" may miss in fname;        
 EXAMPLE: example texring; shows an example
+"
 { 
   int i,galT,flag,mipo,nopar,Dollars,TB,TA;
   string ob,cb,cf,en,s,t,savebrack; //opening bracket, closing br, coef.field
@@ -1009,12 +1019,13 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc rmx(string fname)
-USAGE:   rmx(fname); fname = string
+"USAGE:   rmx(fname); fname = string
 RETURN:  nothing; removes .log and .aux files associated to file <fname>      
-         removes tex and xdvi file too, if suffix ".tex" or ".dvi" is given
+         removes tex and xdvi file too, if suffix \".tex\" or \".dvi\" is given
 NOTE:    if fname ends by .dvi or .tex 
          fname.dvi or fname.dvi and fname.tex will be deleted, too           
 EXAMPLE: example rmx; shows an example
+"
 {
   int i,suffix= 1,0;
 
@@ -1057,11 +1068,12 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc xdvi(string fname, list #)
-USAGE:   xdvi(fname[,style]); fname,style = string
+"USAGE:   xdvi(fname[,style]); fname,style = string
 RETURN:  nothing; displays dvi-file fname.dvi with previewer xdvi
 NOTE:    ending .dvi may miss in fname
          style overwrites the default setting xdvi
 EXAMPLE: example xdvi ; shows an example
+"
 {
   int i=1;
   string default = "xdvi";            // may be changed appropriatly (C.G.)
@@ -1330,8 +1342,9 @@ example
   parsp(s,i);
 }
 
-proc parst(string s,int sec)                // parse parameter
+proc parst(string s,int sec)"                // parse parameter
 // sec parameter to see if in parsp a fraction follows
+"
 { int i,j =1,-1;
   int b,k,jj,mz;                         // begin and end 
   int saveshort=short;

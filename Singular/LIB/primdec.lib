@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.12 1998-04-14 15:35:45 Singular Exp $
+// $Id: primdec.lib,v 1.13 1998-05-05 11:55:34 krueger Exp $
 ///////////////////////////////////////////////////////
 // primdec.lib
 // algorithms for primary decomposition based on
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann
 //////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.12 1998-04-14 15:35:45 Singular Exp $";
+version="$Id: primdec.lib,v 1.13 1998-05-05 11:55:34 krueger Exp $";
 info="
 LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION (I)
 
@@ -64,10 +64,11 @@ LIB "random.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc sat1 (ideal id, poly p)
-USAGE:   sat1(id,j);  id ideal, j polynomial
+"USAGE:   sat1(id,j);  id ideal, j polynomial
 RETURN:  saturation of id with respect to j (= union_(k=1...) of id:j^k)
 NOTE:    result is a std basis in the basering
 EXAMPLE: example sat; shows an example
+"
 {
    int @k;
    ideal inew=std(id);
@@ -88,10 +89,11 @@ EXAMPLE: example sat; shows an example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc sat2 (ideal id, ideal h)
-USAGE:   sat2(id,j);  id ideal, j polynomial
+"USAGE:   sat2(id,j);  id ideal, j polynomial
 RETURN:  saturation of id with respect to j (= union_(k=1...) of id:j^k)
 NOTE:    result is a std basis in the basering
 EXAMPLE: example sat2; shows an example
+"
 {
    int @k,@i;
    def @P= basering;
@@ -282,10 +284,11 @@ proc testFactor(list act,poly p)
 ////////////////////////////////////////////////////////////////////////////////
 
 proc factor(poly p)
-USAGE:   factor(p) p poly
+"USAGE:   factor(p) p poly
 RETURN:  list=;
 NOTE:
 EXAMPLE: example factor; shows an example
+"
 {
 
   ideal @i;
@@ -437,10 +440,11 @@ proc stdIdealsEqual( ideal k1, ideal k2)
 ////////////////////////////////////////////////////////////////////////////////
 
 proc testPrimary(list pr, ideal k)
-USAGE:   testPrimary(pr,k) pr list, k ideal;
+"USAGE:   testPrimary(pr,k) pr list, k ideal;
 RETURN:  int = 1, if the intersection of the ideals in pr is k, 0 if not
 NOTE:
 EEXAMPLE: example testPrimary ; shows an example
+"
 {
    int i;
    ideal j=pr[1];
@@ -468,10 +472,11 @@ example
 
 ////////////////////////////////////////////////////////////////////////////////
 proc printPrimary( list l, list #)
-USAGE:   printPrimary(l) l list;
+"USAGE:   printPrimary(l) l list;
 RETURN:  nothing
 NOTE:
 EXAMPLE: example printPrimary; shows an example
+"
 {
    if(size(#)>0)
    {
@@ -502,12 +507,13 @@ example
 
 
 proc randomLast(int b)
-USAGE:   randomLast
+"USAGE:   randomLast
 RETURN:  ideal = maxideal(1) but the last variable exchanged by
          a sum of it with a linear random combination of the other
          variables
 NOTE:
 EXAMPLE: example randomLast; shows an example
+"
 {
 
   ideal i=maxideal(1);
@@ -822,7 +828,7 @@ example
 ////////////////////////////////////////////////////////////////////////////////
 
 proc zero_decomp (ideal j,ideal ser,int @wr,list #)
-USAGE:   zero_decomp(j,ser,@wr); j,ser ideals, @wr=0 or 1
+"USAGE:   zero_decomp(j,ser,@wr); j,ser ideals, @wr=0 or 1
          (@wr=0 for primary decomposition, @wr=1 for computaion of associated
          primes)
 RETURN:  list = list of primary ideals and their radicals (at even positions
@@ -832,6 +838,7 @@ RETURN:  list = list of primary ideals and their radicals (at even positions
          sional then ideal(1),ideal(1) is returned
 NOTE:    Algorithm of Gianni, Traeger, Zacharias
 EXAMPLE: example zero_decomp; shows an example
+"
 {
   def   @P = basering;
   int nva = nvars(basering);
@@ -1223,10 +1230,11 @@ example
 ////////////////////////////////////////////////////////////////////////////////
 
 proc ggt (ideal i)
-USAGE:   ggt(i); i list of polynomials
+"USAGE:   ggt(i); i list of polynomials
 RETURN:  poly = ggt(i[1],...,i[size(i)])
 NOTE:
 EXAMPLE: example ggt; shows an example
+"
 {
   int k;
   poly p=i[1];
@@ -1312,10 +1320,11 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc lcmP(ideal i)
-USAGE:   lcm(i); i list of polynomials
+"USAGE:   lcm(i); i list of polynomials
 RETURN:  poly = lcm(i[1],...,i[size(i)])
 NOTE:
 EXAMPLE: example lcm; shows an example
+"
 {
   int k,j;
    poly p,q;
@@ -1365,10 +1374,11 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 proc clearSB (ideal i,list #)
-USAGE:   clearSB(i); i ideal which is SB ordered by monomial ordering
+"USAGE:   clearSB(i); i ideal which is SB ordered by monomial ordering
 RETURN:  ideal = minimal SB
 NOTE:
 EXAMPLE: example clearSB; shows an example
+"
 {
   int k,j;
   poly m;
@@ -1443,12 +1453,13 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc independSet (ideal j)
-USAGE:   independentSet(i); i ideal
+"USAGE:   independentSet(i); i ideal
 RETURN:  list = new varstring with the independent set at the end,
                 ordstring with the corresponding block ordering,
                 the integer where the independent set starts in the varstring
 NOTE:
 EXAMPLE: example independentSet; shows an example
+"
 {
    int n,k,di;
    list resu,hilf;
@@ -1510,12 +1521,13 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc maxIndependSet (ideal j)
-USAGE:   maxIndependentSet(i); i ideal
+"USAGE:   maxIndependentSet(i); i ideal
 RETURN:  list = new varstring with the maximal independent set at the end,
                 ordstring with the corresponding block ordering,
                 the integer where the independent set starts in the varstring
 NOTE:
 EXAMPLE: example maxIndependentSet; shows an example
+"
 {
    int n,k,di;
    list resu,hilf;
@@ -1577,10 +1589,11 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc prepareQuotientring (int nnp)
-USAGE:   prepareQuotientring(nnp); nnp int
+"USAGE:   prepareQuotientring(nnp); nnp int
 RETURN:  string = to define Kvar(nnp+1),...,var(nvars)[..rest ]
 NOTE:
 EXAMPLE: example independentSet; shows an example
+"
 {
   ideal @ih,@jh;
   int npar=npars(basering);
@@ -1655,11 +1668,12 @@ proc cleanPrimary(list l)
 ///////////////////////////////////////////////////////////////////////////////
 
 proc minAssPrimes(ideal i, list #)
-USAGE:   minAssPrimes(i); i ideal
+"USAGE:   minAssPrimes(i); i ideal
          minAssPrimes(i,1); i ideal  (to use also the factorizing Groebner)
 RETURN:  list = the minimal associated prime ideals of i
 NOTE:
 EXAMPLE: example minAssPrimes; shows an example
+"
 {
    #[1]=1;
    def @P=basering;
@@ -1879,13 +1893,14 @@ proc equiRadical(ideal i)
 
 ///////////////////////////////////////////////////////////////////////////////
 proc decomp(ideal i,list #)
-USAGE:   decomp(i); i ideal  (for primary decomposition)   (resp.
+"USAGE:   decomp(i); i ideal  (for primary decomposition)   (resp.
          decomp(i,1);        (for the minimal associated primes) )
 RETURN:  list = list of primary ideals and their associated primes
          (at even positions in the list)
          (resp. a list of the minimal associated primes)
 NOTE:    Algorithm of Gianni, Traeger, Zacharias
 EXAMPLE: example decomp; shows an example
+"
 {
   def  @P = basering;
   list primary,indep,ltras;
@@ -2739,13 +2754,14 @@ proc intersect1(ideal i,ideal j)
 
 ///////////////////////////////////////////////////////////////////////////////
 proc radicalKL (list m,ideal ser,list #)
-USAGE:   decomp(i); i ideal  (for primary decomposition)   (resp.
+"USAGE:   decomp(i); i ideal  (for primary decomposition)   (resp.
          decomp(i,1);        (for the minimal associated primes) )
 RETURN:  list = list of primary ideals and their associated primes
          (at even positions in the list)
          (resp. a list of the minimal associated primes)
 NOTE:    Algorithm of Gianni, Traeger, Zacharias
 EXAMPLE: example decomp; shows an example
+"
 {
    ideal i=m[2];
   //----------------------------------------------------------------

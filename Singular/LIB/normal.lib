@@ -5,7 +5,7 @@
 // written by Gert-Martin Greuel and Gerhard Pfister
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: normal.lib,v 1.4 1998-04-03 22:47:08 krueger Exp $";
+version="$Id: normal.lib,v 1.5 1998-05-05 11:55:32 krueger Exp $";
 info="
 LIBRARY: normal.lib: PROCEDURE FOR NORMALIZATION (I)
 
@@ -21,7 +21,7 @@ LIB "presolve.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc isR_HomJR (list Li)
-USAGE:   isR_HomJR (Li);  Li = list: ideal SBid, ideal J, poly p
+"USAGE:   isR_HomJR (Li);  Li = list: ideal SBid, ideal J, poly p
 COMPUTE: module Hom_R(J,R) = R:J and compare with R
 ASSUME:  R    = P/SBid,  P = basering
          SBid = standard basis of an ideal in P,
@@ -29,6 +29,7 @@ ASSUME:  R    = P/SBid,  P = basering
          p    = nonzero divisor of R
 RETURN:  1 if R = R:J, 0 if not
 EXAMPLE: example isR_HomJR;  shows an example   
+"
 {
    int n, ii;
  def P = basering;
@@ -70,11 +71,12 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc extraweight (list # )
-USAGE:   extraweight (P); P=name of an existing ring (true name, not a string)
+"USAGE:   extraweight (P); P=name of an existing ring (true name, not a string)
 RETURN:  intvec, size=nvars(P), consisting of the weights of the variables of P
 NOTE:    This is useful when enlarging P but keeping the weights of the old
          variables
 EXAMPLE: example extraweight;  shows an example   
+"
 {
    int ii,q,fi,fo,fia;
    intvec rw,nw;
@@ -151,7 +153,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc HomJJ (list Li,list #)
-USAGE:   HomJJ (Li);  Li = list: SBid,id,J,poly p
+"USAGE:   HomJJ (Li);  Li = list: SBid,id,J,poly p
 ASSUME:  R    = P/id,  P = basering, a polynomial ring, id an ideal of P,
          SBid = standard basis of id,
          J    = ideal of P containing the polynomial p,
@@ -164,6 +166,7 @@ RETURN:  a list of two objects
                endphi describes the canonical map R -> Hom_R(J,J)
          _[2]: an integer which is 1 if phi is an isomorphism, 0 if not
 EXAMPLE: example HomJJ;  shows an example   
+"
 {
 //---------- initialisation ---------------------------------------------------
 
@@ -512,7 +515,7 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 proc normal(ideal id, list #)
-USAGE:   normal(i,choose);  i ideal,choose empty or 1
+"USAGE:   normal(i,choose);  i ideal,choose empty or 1
          in case you choose 1 the factorizing Buchberger algorithm
          is not used which is sometimes more efficient
 RETURN:  a list of rings L=R1,...,Rk, in each Ri are two ideals
@@ -520,6 +523,7 @@ RETURN:  a list of rings L=R1,...,Rk, in each Ri are two ideals
          Si is a standardbasis of Mi
 NOTE:    to use the rings: def r=L[i];setring r;
 EXAMPLE: example normal; shows an example
+"
 {
    int i,j,y;
    list result,prim,keepresult;
@@ -653,12 +657,13 @@ example
 
 
 proc normalizationPrimes(ideal i,ideal ihp, list #)
-USAGE:   normalizationPrimes(i);  i prime ideal
+"USAGE:   normalizationPrimes(i);  i prime ideal
 RETURN:  a list of one ring L=R, in  R are two ideals
          S,M such that R/M is the normalization
          S is a standardbasis of M
 NOTE:    to use the ring: def r=L[1];setring r;
 EXAMPLE: example normalizationPrimes; shows an example
+"
 {
    int y;
    if(y==1)

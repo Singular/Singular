@@ -4,6 +4,53 @@
 #include <ctype.h>
 #include "utils.h"
 
+extern FILE *yylpin;
+extern char *optarg;
+extern int optind, opterr, optopt;
+extern int lpverbose, check;
+extern int found_version, found_info, found_oldhelp, found_proc_in_proc;
+warning_info = 0, warning_version = 0;
+/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+void main_init(int argc, char *argv[])
+{
+  char c, *file=NULL;
+
+  while(optind<argc) {
+    switch(c=getopt(argc, argv, "d:sf:"))
+      {
+      case 'd':
+	lpverbose = 1;
+	sscanf(optarg, "%d", &lpverbose);
+	break;
+      case 'f': file = argv[optind-1];
+	//	printf("opening:%d %s\n", optind, file);
+	break;
+      case 's':
+	check++;
+	break;
+      case -1 : printf("no such option:%s\n", argv[optind]);
+	break;
+      default: printf("no such option.%x, %s\n", c&0xff, argv[optind]);
+      }
+  }
+
+  if(file!=NULL)
+    yylpin = fopen( file, "rb" );
+  else
+    yylpin = stdin;
+}
+
+/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+void main_result(char *libname)
+{
+  if(!found_info)    printf("*** No info-string found!\n");
+  if(!found_version) printf("*** No version-string found!\n");
+  if(found_oldhelp)  printf("*** Library has stil OLD library-format.\n");
+  if(found_info && warning_info)
+    printf("*** INFO-string should come before every procedure definition.\n");
+  if(found_version && warning_version)
+    printf("*** VERSION-string should come before every procedure definition.\n");
+}
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
 procinfo *iiInitSingularProcinfo(procinfov pi, char *libname,
@@ -47,6 +94,8 @@ printpi(procinfov pi)
   char *buf, name[256];
   int len1, len2;
 
+  if(!found_info && !warning_info) warning_info++;
+  if(!found_version && !warning_version) warning_version++;
   if(pi->data.s.body_end==0) 
     pi->data.s.body_end = pi->data.s.proc_end;
 
@@ -57,6 +106,16 @@ printpi(procinfov pi)
 	 pi->data.s.body_lineno, pi->data.s.body_start, pi->data.s.body_end,
 	 pi->data.s.example_lineno, pi->data.s.example_start,
 	 pi->data.s.proc_end);
+  if(check) {
+    if(!pi->is_static && (pi->data.s.body_start-pi->data.s.def_end)<4)
+      printf("*** Procedure '%s' is global and has no help-section.\n",
+	     pi->procname);
+    if(!pi->is_static && !pi->data.s.example_start)
+      printf("*** Procedure '%s' is global and has no example-section.\n",\
+	     pi->procname);
+    if(found_proc_in_proc)
+      printf("*** found proc within procedure '%s'.\n", pi->procname);
+  }
 
 #if 0
   if( fp != NULL) { // loading body

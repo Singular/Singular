@@ -1,16 +1,19 @@
-// $Id: makedbm.lib,v 1.6 1998-04-03 23:18:16 krueger Exp $
+// $Id: makedbm.lib,v 1.7 1998-05-05 11:55:31 krueger Exp $
 //=========================================================================
 //
 // Please send bugs and comments to krueger@mathematik.uni-kl.de
 //
 //=============================================================================
 
+version="$Id: makedbm.lib,v 1.7 1998-05-05 11:55:31 krueger Exp $";
+info="
 LIBRARY:  makedbm.lib     some usefull tools needed by the Arnold-Classifier.
 
    dbm_read(l);          read all entries from a DBM-databaes pointed by l
    dbm_getnext(l);       read next entry from a DBM-databaes pointed by l
    create_sing_dbm();
    read_sing_dbm();
+";
 
 //=============================================================================
 

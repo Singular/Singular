@@ -1,8 +1,8 @@
-// $Id: homolog.lib,v 1.5 1998-04-03 22:47:06 krueger Exp $
+// $Id: homolog.lib,v 1.6 1998-05-05 11:55:28 krueger Exp $
 //(BM/GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: homolog.lib,v 1.5 1998-04-03 22:47:06 krueger Exp $";
+version="$Id: homolog.lib,v 1.6 1998-05-05 11:55:28 krueger Exp $";
 info="
 LIBRARY:  homolog.lib   PROCEDURES FOR HOMOLOGICAL ALGEBRA
 
@@ -24,7 +24,7 @@ LIB "poly.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc cup (module M,list #)
-USAGE:   cup(M,[,any,any]);  M=module
+"USAGE:   cup(M,[,any,any]);  M=module
 COMPUTE: cup-product Ext^1(M',M') x Ext^1(M',M') ---> Ext^2(M',M'),
          where M':=R^m/M, if M in R^m, R basering (i.e. M':=coker(matrix(M)))
          in case of a second argument: symmetrized cup-product
@@ -42,6 +42,7 @@ NOTE:    printlevel >=1;  shows what is going on
          printlevel >=2;  shows result in another representation
          For computing cupproduct of M itself, apply proc to syz(M)!
 EXAMPLE: example cup; shows examples
+"
 {
 //---------- initialization ---------------------------------------------------
    int    i,j,k,f0,f1,f2,f3,e1,e2;
@@ -206,7 +207,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc cupproduct (module M,N,P,int p,q,list #)
-USAGE:   cupproduct(M,N,P,p,q[,any]);  M,N,P modules, p,q integers
+"USAGE:   cupproduct(M,N,P,p,q[,any]);  M,N,P modules, p,q integers
 COMPUTE: cup-product Ext^p(M',N') x Ext^q(N',P') ---> Ext^p+q(M',P')
          where M':=R^m/M, if M in R^m, R basering (i.e. M':=coker(matrix(M)))
 ASSUME:  all Ext's  are of finite dimension
@@ -224,6 +225,7 @@ NOTE:    printlevel >=1;  shows what is going on
          printlevel >=2;  shows result in another representation
          For computing cupproduct of M,N itself, apply proc to syz(M),syz(N)!
 EXAMPLE: example cupproduct; shows examples
+"
 {
 //---------- initialization ---------------------------------------------------
    int    e1,e2,e3,i,j,k,f0,f1,f2;
@@ -412,7 +414,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc Ext_R (intvec v, module M, list #)
-USAGE:   Ext_R(v,M[,p]);  v=int/intvec , M=module, p=int
+"USAGE:   Ext_R(v,M[,p]);  v=int/intvec , M=module, p=int
 COMPUTE: A presentation of Ext^k(M',R); for k=v[1],v[2],..., M'=coker(M).
          Let ...--> F2 --> F1 --M-> F0-->M'-->0 be a free resolution of M'. If
          0 <-- F0* <-A1-- F1* <-A2-- F2* <-A3--... denotes the dual sequence,
@@ -433,6 +435,7 @@ DISPLAY: printlevel >=0: degree of Ext^k for each k  (default)
 NOTE:    In order to compute Ext^k(M,R) use the command Ext_R(k,syz(M));
          or the 2 commands: list L=mres(M,2);  Ext_R(k,L[2]);
 EXAMPLE: example Ext_R; shows examples
+"
 {
 
 // In case M is known to be a SB, set attrib(M,"isSB",1); in order to
@@ -541,7 +544,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc Ext (intvec v, module M, module N, list #)
-USAGE:   Ext(v,M,N[,any]);  v=int/intvec, M,N=modules
+"USAGE:   Ext(v,M,N[,any]);  v=int/intvec, M,N=modules
 COMPUTE: A presentation of Ext^k(M',N'); for k=v[1],v[2],... where
          M'=coker(M) and N'=coker(N). Let
          0<--M'<-- F0 <-M-- F1 <-- F2 <--...  resp. 0<--N'<-- G0 <--N- G1 be
@@ -573,6 +576,7 @@ DISPLAY: printlevel >=0: degree of Ext^k for each k  (default)
 NOTE:    In order to compute Ext^k(M,N) use the command Ext(k,syz(M),syz(N));
          or: list P=mres(M,2); list Q=mres(N,2); Ext(k,P[2],Q[2]);
 EXAMPLE: example Ext;   shows examples
+"
 {
 //---------- initialisation ---------------------------------------------------
   int k,max,ii,l,row,col;
@@ -702,7 +706,7 @@ example
 ////////////////////////////////////////////////////////////////////////////////
 
 proc Hom (module M, module N, list #)
-USAGE:   Hom(M,N,[any]);  M,N=modules
+"USAGE:   Hom(M,N,[any]);  M,N=modules
 COMPUTE: A presentation of Hom(M',N'), M'=coker(M), N'=coker(N) as follows:
          Let ...-->F1 --M-> F0-->M'-->0 and ...-->G1 --N-> G0-->N'-->0  be
          presentations of M' and N'. Consider
@@ -731,6 +735,7 @@ DISPLAY: printlevel >=0: degree of Hom  (default)
 NOTE:    DISPLAY is as described only for a direct call of 'Hom'. Calling 'Hom'
          from another proc has the same effect as decreasing printlevel by 1.
 EXAMPLE: example Hom;  shows examples
+"
 {
 //---------- initialisation ---------------------------------------------------
   int l,p;
@@ -795,7 +800,7 @@ example
 ////////////////////////////////////////////////////////////////////////////////
 
 proc homology (matrix A,matrix B,module M,module N,list #)
-USAGE:   homology(A,B,M,N);
+"USAGE:   homology(A,B,M,N);
 COMPUTE: Let M and N be submodules of R^m and R^n presenting M'=R^m/M, N'=R^n/N
          (R=basering) and let A,B matrices inducing maps R^k--A-->R^m--B-->R^n.
          Compute a presentation R^q --H-> R^m of the module
@@ -805,6 +810,7 @@ COMPUTE: Let M and N be submodules of R^m and R^n presenting M'=R^m/M, N'=R^n/N
 RETURN:  module H, a presentation of ker(B)/im(A)
 NOTE:    homology returns a free module of rank m if ker(B)=im(A)
 EXAMPLE: example homology; shows examples
+"
 {
   module ker,ima;
   ker = modulo(B,N);
@@ -830,7 +836,7 @@ example
 //////////////////////////////////////////////////////////////////////////////
 
 proc kernel (matrix A,module M,module N)
-USAGE:   kernel(A,M,N);
+"USAGE:   kernel(A,M,N);
 COMPUTE: Let M and N be submodules of R^m and R^n presenting M'=R^m/M, N'=R^n/N
          (R=basering) and let A:R^m-->R^n a matrix inducing a map A':M'-->N'.
          Compute a presentation K of ker(A') as in the commutative diagram:
@@ -844,6 +850,7 @@ COMPUTE: Let M and N be submodules of R^m and R^n presenting M'=R^m/M, N'=R^n/N
                           R^s  ---> R^p -----> R^q
 RETURN:  module K, a presentation of ker(A')
 EXAMPLE: example kernel; shows examples
+"
 {
   module M1 = modulo(A,N);
   return(modulo(M1,M));
@@ -861,10 +868,11 @@ example
 ////////////////////////////////////////////////////////////////////////////////
 
 proc kohom (matrix M, int j)
-USAGE:   kohom(A,k); A=matrix, k=integer
+"USAGE:   kohom(A,k); A=matrix, k=integer
 RETURN:  matrix Hom(R^k,A) i.e. let A be a matrix defining a map: F1 --> F2 of
          free R-modules, the matrix of Hom(R^k,F1)-->Hom(R^k,F2) is computed
 EXAMPLE: example kohom; shows an example
+"
 {
   if (j==1)
   { return(M);}
@@ -881,10 +889,11 @@ example
 /////////////////////////////////////////////////////////////////////////////////
 
 proc kontrahom (matrix M, int j)
-USAGE:   kontrahom(A,k); A=matrix, k=integer
+"USAGE:   kontrahom(A,k); A=matrix, k=integer
 RETURN:  matrix Hom(A,R^k), i.e. let A be a matrix defining a map: F1 --> F2 of
          free  R-modules, the matrix of Hom(F2,R^k)-->Hom(F1,R^k) is computed
 EXAMPLE: example kontrahom; shows an example
+"
 {
 if (j==1)
   { return(transpose(M));}

@@ -1,8 +1,8 @@
-// $Id: factor.lib,v 1.4 1998-04-03 22:47:01 krueger Exp $
+// $Id: factor.lib,v 1.5 1998-05-05 11:55:23 krueger Exp $
 //(RS)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: factor.lib,v 1.4 1998-04-03 22:47:01 krueger Exp $";
+version="$Id: factor.lib,v 1.5 1998-05-05 11:55:23 krueger Exp $";
 info="
 LIBRARY:  factor.lib    PROCEDURES FOR CALLING THE REDUCE FACTORIZER
 
@@ -13,9 +13,10 @@ LIBRARY:  factor.lib    PROCEDURES FOR CALLING THE REDUCE FACTORIZER
 ///////////////////////////////////////////////////////////////////////////////
 
 proc delete_dollar ( string s )
-USAGE:   delete_dollar(s);  s = string
+"USAGE:   delete_dollar(s);  s = string
 RETURN:  string, with '$' replaced by ' '
 EXAMPLE: example delete_dollar; shows an example 
+"
 {
    while( s[size(s)]=="$" and size(s)!=1 ) { s=s[1,size(s)-1]; }
    while( s[1]=="$" and size(s)!=1 )       { s=s[2,size(s)-1]; }
@@ -37,12 +38,13 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc reduce_factor ( poly f )
-USAGE:   reduce_factor(f);  f = poly
+"USAGE:   reduce_factor(f);  f = poly
 RETURN:  list, the factors of f
 NOTE:    due to a limitation of REDUCE, multivariate polynomials can only
          be factorized in characteristic 0
 	     This proc runs under UNIX only
 EXAMPLE: example reduce_factor; shows an example
+"
 {
   string pid = string( system( "pid" ) );
   string outname = "/tmp/singred." + pid + ".out";
