@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.80 1998-12-03 13:40:45 mschulze Exp $ */
+/* $Id: extra.cc,v 1.81 1998-12-10 16:47:23 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -403,6 +403,12 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   {
     char *sys_cmd=(char *)(h->Data());
     h=h->next;
+/*===================ring -optimierung ======================*/
+   if(strcmp(sys_cmd,"opt")==0)
+   {
+     rOptimizeOrder((ring)h->Data());
+     return FALSE;
+   }
 /*==================== pcv ==================================*/
 #ifdef HAVE_PCV
     if(strcmp(sys_cmd,"pcvOrd")==0)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.40 1998-12-03 17:58:04 Singular Exp $ */
+/* $Id: ring.cc,v 1.41 1998-12-10 16:47:25 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -679,7 +679,6 @@ void rComplete(ring r)
   r->VarCompIndex = VarCompIndex;
   r->VarLowIndex = VarLowIndex;
   r->VarHighIndex = VarHighIndex;
-  rOptimizeOrder(r);
 }
 
 /*2
@@ -1980,22 +1979,156 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
 // of the word size -- "empty exponents" (exactly #(..) ones) are
 // filled in between comp and first/last exponent -- i.e. comp and
 // first/last exponent might not be next to each other
+static void rO_TDegree(int &place, int start, int end)
+{
+  if (place&1) place++;
+  Print("word(%d,%d): total degree vars %d..%d   \t ord: 1\n",
+        place,place+1,start,end);place+=2;
+}
+static void rO_TDegree_neg(int &place, int start, int end)
+{
+  if (place&1) place++;
+  Print("word(%d,%d): total degree vars %d..%d   \t ord: -1\n",
+        place,place+1,start,end);place+=2;
+}
+static void rO_WDegree(int &place, int start, int end)
+{
+  if (place&1) place++;
+  Print("word(%d,%d): weighted degree vars %d..%d\t ord: 1\n",
+        place,place+1,start,end);place+=2;
+}
+static void rO_WDegree_neg(int &place, int start, int end)
+{
+  if (place&1) place++;
+  Print("word(%d,%d): weighted degree vars %d..%d\t\t ord: -1\n",
+        place,place+1,start,end);place+=2;
+}
+static void rO_LexVars(int &place, int start, int end, int &prev_ord)
+{
+  int k;
+  int incr=1;
+  if((prev_ord!=1) &&(place&1)) place++;
+  if (start>end)
+  {
+    incr=-1;
+  }
+  for(k=start;;k+=incr)
+  {
+    Print("(%d) var %d\t\t\t\t ord: 1\n",place,k);
+    place++;
+    if (k==end) break;
+  }
+  prev_ord=1;
+}
+static void rO_LexVars_neg(int &place, int start, int end, int &prev_ord)
+{
+  int k;
+  int incr=1;
+  if((prev_ord!=(-1)) &&(place&1)) place++;
+  if (start>end)
+  {
+    incr=-1;
+  }
+  for(k=start;;k+=incr)
+  {
+    Print("(%d) var %d\t\t\t\t ord: -1\n",place,k);
+    place++;
+    if (k==end) break;
+  }
+  prev_ord=-1;
+}
+
 void rOptimizeOrder(ring r)
 {
-#if 0
   int n=rBlocks(r)-1;
   Print("optimizing for %d blocks, %d vars\n",n,r->N);
-  int *varnum2pos=(int*)Alloc0((r->N+1)*sizeof(int));
-  if (n==2) /* minimum */
+  int i;
+  int j=0;
+  int prev_ord=0;
+  for(i=0;i<n;i++)
   {
-    Free((ADDRESS)varnum2pos,(r->N+1)*sizeof(int));
-    varnum2pos=r->VarOffset;
+    switch (r->order[i])
+    {
+      case ringorder_a:
+        rO_WDegree(j,r->block0[i],r->block1[i]);
+        break;
+      case ringorder_c:
+        rO_LexVars_neg(j, 0,0, prev_ord);
+        break;
+      case ringorder_C:
+        rO_LexVars(j, 0,0, prev_ord);
+        break;
+      case ringorder_M:
+        {
+          int k,l;
+	  k=r->block1[i]-r->block0[i]+1; // number of vars
+	  for(l=0;l<k;l++)
+	  {
+            rO_WDegree(j,r->block0[i],r->block1[i]);
+	  }
+          break;
+        }
+      case ringorder_lp:
+        rO_LexVars(j, r->block0[i],r->block1[i], prev_ord);
+        break;
+      case ringorder_ls:
+        rO_LexVars_neg(j, r->block0[i],r->block1[i], prev_ord);
+        break;
+      case ringorder_dp:
+        rO_TDegree(j,r->block0[i],r->block1[i]);
+	if (r->block1[i]!=r->block0[i])
+          rO_LexVars_neg(j, r->block1[i],r->block0[i]+1, prev_ord);
+        break;
+      case ringorder_Dp:
+        rO_TDegree(j,r->block0[i],r->block1[i]);
+	if (r->block1[i]!=r->block0[i])
+          rO_LexVars(j, r->block0[i],r->block1[i]-1, prev_ord);
+        break;
+      case ringorder_ds:
+        rO_TDegree_neg(j,r->block0[i],r->block1[i]);
+	if (r->block1[i]!=r->block0[i])
+          rO_LexVars_neg(j, r->block1[i],r->block0[i]+1, prev_ord);
+        break;
+      case ringorder_Ds:
+        rO_TDegree_neg(j,r->block0[i],r->block1[i]);
+	if (r->block1[i]!=r->block0[i])
+          rO_LexVars(j, r->block0[i],r->block1[i]-1, prev_ord);
+        break;
+      case ringorder_wp:
+        rO_WDegree(j,r->block0[i],r->block1[i]);
+	if (r->block1[i]!=r->block0[i])
+          rO_LexVars_neg(j, r->block1[i],r->block0[i]+1, prev_ord);
+        break;
+      case ringorder_Wp:
+        rO_WDegree(j,r->block0[i],r->block1[i]);
+	if (r->block1[i]!=r->block0[i])
+          rO_LexVars(j, r->block0[i],r->block1[i]-1, prev_ord);
+        break;
+      case ringorder_ws:
+        rO_WDegree_neg(j,r->block0[i],r->block1[i]);
+	if (r->block1[i]!=r->block0[i])
+          rO_LexVars_neg(j, r->block1[i],r->block0[i]+1, prev_ord);
+        prev_ord=-1;
+        break;
+      case ringorder_Ws:
+        rO_WDegree_neg(j,r->block0[i],r->block1[i]);
+	if (r->block1[i]!=r->block0[i])
+          rO_LexVars(j, r->block0[i],r->block1[i]-1, prev_ord);
+        break;
+      case ringorder_unspec:
+      case ringorder_no:
+        Print("undef. ringorder used\n");
+        break;
+    }
   }
-  else
-  {
-  }
-  for(int i=0;i<=r->N;i++)
-    Print("x(%d) at pos %d\n",i,varnum2pos[i]);
-  if (n!=2) Free((ADDRESS)varnum2pos,(r->N+1)*sizeof(int));
-#endif
+  Print("last short was:%d\n",j-1);
+  //for(i=0;i<n;i++)
+  //  Print("block %d: ord %d, start: %d, end %d\n",
+  //       i,r->order[i],r->block0[i],r->block1[i]);
+  //
+  //int *varnum2pos; //=(int*)Alloc0((r->N+1)*sizeof(int));
+  //varnum2pos=r->VarOffset;
+  //for(i=0;i<=r->N;i++)
+  //  Print("x(%d) at pos %d\n",i,varnum2pos[i]);
+  //if (n!=2) Free((ADDRESS)varnum2pos,(r->N+1)*sizeof(int));
 }
