@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.28 1999-07-15 07:03:09 wichmann Exp $
+;; $Id: singular.el,v 1.29 1999-07-19 10:25:16 obachman Exp $
 
 ;;; Commentary:
 
@@ -1903,12 +1903,12 @@ notes on input and output\" in singular.el."
 			       end t)
 	    (setq pattern (match-string 2)
 		  beg (match-beginning 2)
-		  completion-list singular-completion-help-list)
+		  completion-list singular-completion-hlp-list)
 	  (goto-char end)
 	  (skip-chars-backward "a-zA-Z0-9")
 	  (setq pattern (buffer-substring (point) end)
 		beg (point)
-		completion-list singular-completion-command-list)))
+		completion-list singular-completion-cmd-list)))
       
       (setq completion (try-completion pattern
 				       completion-list))
