@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.h,v 1.21 1999-09-17 11:42:26 Singular Exp $ */
+/* $Id: subexpr.h,v 1.22 1999-09-27 17:54:56 Singular Exp $ */
 /*
 * ABSTRACT: handling of leftv
 */
@@ -154,7 +154,7 @@ inline procinfov piCopy(procinfov pi)
   pi->ref++;
   return pi;
 }
-void piKill(procinfov l);
+BOOLEAN piKill(procinfov l);
 char *piProcinfo(procinfov pi, char *request);
 void piShowProcinfo(procinfov pi, char *txt);
 #ifdef HAVE_LIBPARSER

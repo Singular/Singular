@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.33 1999-07-06 13:35:32 Singular Exp $ */
+/* $Id: ipid.cc,v 1.34 1999-09-27 17:54:55 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -209,8 +209,7 @@ char * idrec::String()
   tmp.data=IDDATA(this);
   tmp.name=IDID(this);
   return tmp.String();
-}  
-
+}
 
 //#define KAI
 idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
@@ -478,7 +477,7 @@ void killhdl(idhdl h, idhdl * ih)
   // proc ---------------------------------------------------------------
   else if (IDTYP(h) == PROC_CMD)
   {
-    piKill(IDPROC(h));
+    if (piKill(IDPROC(h))) return;
   }
   // number -------------------------------------------------------------
   else if (IDTYP(h) == NUMBER_CMD)
@@ -721,11 +720,22 @@ void piCleanUp(procinfov pi)
   }
 }
 
-void piKill(procinfov pi)
+BOOLEAN piKill(procinfov pi)
 {
+  Voice *p=currentVoice;
+  while (p!=NULL)
+  {
+    if (p->pi==pi)
+    {
+      Warn("`%s` in use, can not be killed",pi->procname);
+      return TRUE;
+    }
+    p=p->next;
+  }
   piCleanUp(pi);
   if (pi->ref <= 0)
     Free((ADDRESS)pi, sizeof(procinfo));
+  return FALSE;
 }
 
 void paCleanUp(package pack)
