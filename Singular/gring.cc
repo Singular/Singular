@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.40 2003-06-26 19:21:47 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.41 2003-07-25 09:43:34 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -795,10 +795,10 @@ poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
     {
       for (m=1;m<=cMTsize;m++)
       {
-	out = nc_p_CopyGet(MATELEM(r->nc->MT[UPMATELEM(j,i,rN)],k,m),r);
+	out = MATELEM(r->nc->MT[UPMATELEM(j,i,rN)],k,m);
         if ( out != NULL )
         {
-          MATELEM(tmp,k,m) = nc_p_CopyPut(MATELEM(r->nc->MT[UPMATELEM(j,i,rN)],k,m),r);;
+          MATELEM(tmp,k,m) = out;/*MATELEM(r->nc->MT[UPMATELEM(j,i,rN)],k,m)*/
           //           omCheckAddr(tmp->m);
           MATELEM(r->nc->MT[UPMATELEM(j,i,rN)],k,m)=NULL;
           //           omCheckAddr(r->nc->MT[UPMATELEM(j,i,rN)]->m);
