@@ -16,10 +16,13 @@ matrix imat = transpose(mat);
 matrix jac = fetch(r, jaco);
 
 list imatres=nres(module(imat),3);
+imatres;
 def imatres(1..3)=imatres[1..3];
 
 matrix T = lift(imatres(2), module(jac));
-
+T;
+std(module(T));
+std(imatres(3));
 module P=std(module(T))+std(imatres(3));
 
 module Q=std(P);

@@ -1,4 +1,5 @@
 ;;; here are those from universal.lst which are still buggy
-syzygies ; should be ok, minor differences
-m90si_1.tst ; exchanged ls to (c, ls) --> Singularg already complains
-regul    ; result of mres, now infinite loop
+algmap   ; CORE
+m6ex     ; CORE within deform.lib -- Singularg complains first within syResolution
+m90si_1  ; CORE exchanged ls to (c, ls) --> Singularg already complains
+syzygies ; DIFF

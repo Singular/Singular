@@ -13,5 +13,4 @@ mm[2..4,2..4] = 1,1,1,1,1,1,1,1,1;     // obvious ?
 LIB "lib";                             // make formmat available
 formmat(mm);
 kill r;
-memory(0);
 LIB "tst.lib";tst_status(1);$;

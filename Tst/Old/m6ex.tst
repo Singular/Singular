@@ -31,11 +31,9 @@
   ring r1=0,(x,y,z,u,v),ds;
   matrix m[2][4]=x,y,z,u,y,z,u,v;
   ideal i=minor(m,2);                 // 2x2 minors of matrix m
-  int time=timer;
   // Def_r will be the name of the miniversal base space with
   // parameters A(1),...,A(4)
   versal(i,0,"Def_r","A(");
-  "// used time:",timer-time,"sec";   // time for miniversal
   // the miniversal deformation of V(i) is the projection from the
   // miniversal total space to the miniversal base space:
   // { (A(1..4),x,y,z,u,v) |
