@@ -2662,6 +2662,28 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
     c->to_destroy=c->to_destroy->next;
     omfree(old);
   }
+  while(c->F)
+  {
+    for(i=0;i<c->F->size;i++){
+      pDelete(&(c->F->mp[i].m));
+    }
+    omfree(c->F->mp);
+    c->F->mp=NULL;
+    mp_array_list* old=c->F;
+    c->F=c->F->next;
+    omfree(old);
+  }
+  while(c->F_minus)
+  {
+    for(i=0;i<c->F_minus->size;i++){
+      pDelete(&(c->F_minus->p[i]));
+    }
+    omfree(c->F_minus->p);
+    c->F_minus->p=NULL;
+    poly_array_list* old=c->F_minus;
+    c->F=c->F->next;
+    omfree(old);
+  }
   for(int z=0;z<c->n;z++){
     omfree(c->states[z]);
   }
