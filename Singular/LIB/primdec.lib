@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.32 1999-06-08 15:54:46 pfister Exp $
+// $Id: primdec.lib,v 1.33 1999-06-09 09:49:47 Singular Exp $
 ////////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                                //
 // algorithms for primary decomposition based on                              //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                             //
 ////////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.32 1999-06-08 15:54:46 pfister Exp $";
+version="$Id: primdec.lib,v 1.33 1999-06-09 09:49:47 Singular Exp $";
 info="
 LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION
 
@@ -28,6 +28,10 @@ LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION
   equiRadical(I);   computes the radical of the equidimensional part
                       of the ideal I
   prepareAss(I);    computes the radicals of the equidimensional parts of I
+These procedures are implemented to be used in characteristic 0.
+They work also in positive characteristic >> 0.
+In small characteristic primdecGTZ, minAssGTZ, radical and equiRadical may not
+terminate and primdecSY and minAssChar may not give a complete decomposition.
 ";
 
 LIB "general.lib";
@@ -490,9 +494,7 @@ proc primaryTest (ideal i, poly p)
       {
          "Warning: The characteristic ist too small to use";
          "the Algorithm of Gianni/Trager/Zacharias.";
-         "The result may be incomplete.";
-         "Try primdecSY";
-         "The result may be also imcomplete.";
+         "This may result in an infinte loop";
       }
       if (reduce(i[m]-t^e,prm,1) !=0)
       {
@@ -4031,6 +4033,8 @@ proc primdecGTZ(ideal i)
 RETURN:  list = list of primary ideals
                 and their associated primes
 NOTE:    Algorithm of Gianni, Traeger, Zacharias
+         designed for characteristic 0, works also in char k >> 0,
+         may result in an infinite loop in small characteristic
 EXAMPLE: example primdecGTZ; shows an example
 "
 {
@@ -4052,6 +4056,8 @@ proc primdecSY(ideal i)
 RETURN:  list = list of primary ideals
                 and their associated primes
 NOTE:    Algorithm of Shimoyama-Yokoyama
+         implemented for characteristic 0, works also in char k >> 0,
+         the result may be not compltely decomposed in small characteristic
 EXAMPLE: example primdecSY; shows an example
 "
 {
@@ -4070,7 +4076,8 @@ example
 proc minAssGTZ(ideal i)
 "USAGE:  minAssGTZ(i); i ideal
 RETURN:  list = the minimal associated prime ideals of i
-NOTE:
+NOTE:    designed for characteristic 0, works also in char k >> 0,
+         may result in an infinite loop in small characteristic
 EXAMPLE: example minAssGTZ; shows an example
 "
 {
@@ -4090,7 +4097,38 @@ example
 proc minAssChar(ideal i)
 "USAGE:  minAssChar(i); i ideal
 RETURN:  list = the minimal associated prime ideals of i
-NOTE:
+NOTE:    implemented for characteristic 0, works also in char k >> 0,
+         the result may be not compltely decomposed in small characteristic
+EXAMPLE: example primdecSY; shows an example
+"
+{
+   return(prim_dec(i,1));
+}
+example
+{ "EXAMPLE:";  echo = 2;
+   ring  r = 32003,(x,y,z),lp;
+   poly  p = z2+1;
+   poly  q = z4+2;
+   ideal i = p^2*q^3,(y-z3)^3,(x-yz+z4)^4;
+   list pr= primdecSY(i);
+   pr;
+}
+///////////////////////////////////////////////////////////////////////////////
+proc minAssGTZ(ideal i)
+"USAGE:  minAssGTZ(i); i ideal
+RETURN:  list = the minimal associated prime ideals of i
+NOTE:    designed for characteristic 0, works also in char k >> 0,
+         may result in an infinite loop in small characteristic
+EXAMPLE: example minAssGTZ; shows an example
+"
+{
+   return(minAssPrimes(i,1));
+}
+example
+{ "EXAMPLE:";  echo = 2;
+   ring  r = 32003,(x,y,z),dp;
+   poly  p = z2+1;
+   poly  q = z4+2;
 EXAMPLE: example minAssChar; shows an example
 "
 
@@ -4112,7 +4150,8 @@ proc equiRadical(ideal i)
 "USAGE:  equiRadical(i); i ideal
 RETURN:  ideal = the intersection of associated primes
          of i of dimension of i
-NOTE:
+NOTE:    designed for characteristic 0, works also in char k >> 0,
+         may result in an infinite loop in small characteristic
 EXAMPLE: example equiRadical; shows an example
 "
 {
@@ -4133,6 +4172,8 @@ proc radical(ideal i,list #)
 RETURN:  ideal = the radical of i
 NOTE:    a combination of the algorithms of Krick/Logar
          and Eisenbud/Huneke/Vasconcelos
+         designed for characteristic 0, works also in char k >> 0,
+         may result in an infinite loop in small characteristic
 EXAMPLE: example radical; shows an example
 "
 {
