@@ -109,6 +109,8 @@ static mapoly maFindBestggT(mapoly mp, mapoly & choice, mapoly & fp, mapoly & fq
     }
     else {
       fq=NULL;
+      p_LmFree(fq_p, r);
+      p_LmFree(ggT, r);
       fp=maPoly_InsertMonomial(mp, fp_p, r, NULL);
       choice->ref++;
       return choice;
