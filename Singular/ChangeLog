@@ -1,3 +1,27 @@
+Tue Feb  1 09:33:35 MET 2000 hannes: summary of changes
+* lift changed: - uses interanlly a different algorithm 
+                  (for SB and NON-SB unified)
+                - can be used with an optional 3rd argument (a matrix name),
+                  if given, the "matrix of units" will be stored in it
+* new command: division (extension of lift)
+     division(M,SM) returns a list (T,U,R) with SM*U+R=M*T
+* new monomial ordering (internal change only): 
+   use of inline function instead of a function pointer
+   (possible point for difficulties: mcompSchrB(polys.cc), pSetSchreyerOrdM
+   (polys.cc))
+* new Library: 
+   spectrum.lib: interface to Stefan Endrass' spectrum routines
+   (Stefan Endrass/H.Schoenemann)
+   (still incomplete, requires a "special" Singular)
+* new Library: 
+   CaMuReg.lib: PROCEDURES FOR COMPUTING CASTELNUOVO-MUMFORD REGULARITY
+   Authors:I.Bermejo/Ph.Gimenez/G.-M.Greuel
+   (not included in the documemtation, not included in the tests)
+* new command: hres 
+    - computes a free resolution of an ideal using Hilbert-driven algorithm
+* new commands: convhull, simplex (M.Wenk)
+  (not documented, not included in the documemtation, not included in the tests)
+  
 Fri Aug 13 13:20:01 MET DST 1999 hannes
 * made fe_fgets_stdin an function pointer instead of a macro
   ( febase.cc febase.h feread.cc misc.cc sing_mp.cc tesths.cc)
