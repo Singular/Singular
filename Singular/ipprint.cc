@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipprint.cc,v 1.19 2000-09-18 09:19:05 obachman Exp $ */
+/* $Id: ipprint.cc,v 1.20 2001-03-27 17:12:54 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: printing
 */
@@ -181,7 +181,7 @@ static void ipPrint_MA0(matrix m, const char *name)
 static BOOLEAN ipPrint_MA(leftv u)
 {
   matrix m=(matrix)u->Data();
-  ipPrint_MA0(m,u->Fullname());
+  ipPrint_MA0(m,u->Name());
   return FALSE;
 }
 
@@ -239,7 +239,7 @@ BOOLEAN jjPRINT(leftv res, leftv u)
       case MODUL_CMD:
       {
         matrix m = idModule2Matrix(idCopy((ideal) u->Data()));
-        ipPrint_MA0(m, u->Fullname());
+        ipPrint_MA0(m, u->Name());
         idDelete((ideal *) &m);
         return FALSE;
       }
