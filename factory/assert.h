@@ -1,8 +1,11 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: assert.h,v 1.3 1997-05-14 15:58:11 schmidt Exp $ */
+/* $Id: assert.h,v 1.4 1997-06-04 13:58:54 schmidt Exp $ */
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1997/05/14 15:58:11  schmidt
+o comment fix
+
 Revision 1.2  1997/03/26 16:20:48  schmidt
 NDEBUG renamed to NOASSERT
 ASSERT1 added
@@ -29,6 +32,7 @@ Initial revision
 #undef __ASSERT
 #undef __ASSERT1
 #undef STICKYASSERT
+#undef STICKYASSERT1
 #undef ASSERT
 #undef ASSERT1
 
@@ -53,6 +57,8 @@ Initial revision
  parameter1, file, line, expression ), abort(), 0 )
 #define STICKYASSERT(expression, message) \
 ((void)((expression) ? 0 : __ASSERT(#expression, message, __FILE__, __LINE__)))
+#define STICKYASSERT1(expression, message, parameter1) \
+((void)((expression) ? 0 : __ASSERT1(#expression, message, parameter1, __FILE__, __LINE__)))
 
 #define __WARN(expression, message, file, line)  \
 (fprintf( stderr, "warning: " message "\n%s:%u: failed assertion `%s'\n", \
