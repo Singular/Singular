@@ -6,7 +6,7 @@
 #include "tgb.h"
 
 
-#define LEN_VAR3
+#define LEN_VAR4
 
 #ifdef LEN_VAR1
 // erste Variante: Laenge: Anzahl der Monome
@@ -1009,7 +1009,7 @@ static int simple_posInS (kStrategy strat, poly p,int len, BOOLEAN is_char0)
   if(strat->sl==-1) return 0;
   polyset set=strat->S;
   intset setL=strat->lenS;
-//  if (is_char0) setL=strat->lenSw;
+  if (is_char0) setL=strat->lenSw;
   int length=strat->sl;
   int i;
   int an = 0;
@@ -1560,7 +1560,10 @@ static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
             must_replace_in_basis=FALSE;
             if ((obj->len_upper_bound==1)
                 ||(obj->len_upper_bound==2)
-                ||(obj->len_upper_bound<strat->lenS[j]/2))
+                ||(obj->len_upper_bound<strat->lenS[j]/2)
+		||
+		(c->is_char0 && (wlen_upper<strat->lenSw[j]/2))
+)
             {
               PrintS("e");
               sec_copy=kBucketClear(obj->P->bucket);
