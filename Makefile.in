@@ -161,6 +161,7 @@ bindist: ${SINGULAR}
 	cd ${TMPDIR}/${SINGUNAME}/bin; \
            ${LN_S} Singular-${S_VERSION} Singular
 	cp Singular/libparse ${TMPDIR}/${SINGUNAME}/bin/
+	strip ${TMPDIR}/${SINGUNAME}/bin/*
 	cp COPYING ${TMPDIR}/Singular
 	cat README.bin | sed -e "s/<x.y.z>/${S_VERSION}/" > \
                          ${TMPDIR}/Singular/README.bin
