@@ -5,7 +5,7 @@
 // written by Gert-Martin Greuel and Gerhard Pfister
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: normal.lib,v 1.9 1998-07-28 10:35:55 obachman Exp $";
+version="$Id: normal.lib,v 1.10 1998-08-26 09:56:40 obachman Exp $";
 info="
 LIBRARY: normal.lib: PROCEDURE FOR NORMALIZATION (I)
 
@@ -306,7 +306,6 @@ EXAMPLE: example HomJJ;  shows an example
 //---------- Hom(J,j) != R: create new ring and map form old ring -------------
 // the ring newR1/SBid+syzf will be isomorphic to Hom(J,J) as R-module
 
-   f = mstd(f)[2];                                   // minimizes f (partially)
    f = p,rf;          // generates pJ:J mod(p), i.e. p*Hom(J,J)/p*R as R-module
    q = size(f);
    syzf = syz(f);
