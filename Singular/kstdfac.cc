@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.12 1998-03-16 14:56:34 obachman Exp $ */
+/* $Id: kstdfac.cc,v 1.13 1998-03-23 14:07:54 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -27,9 +27,7 @@
 #endif
 #include "lists.h"
 #include "ideals.h"
-#ifdef COMP_FAST
 #include "spSpolyLoop.h"
-#endif
 #include "timer.h"
 #include "kstdfac.h"
 
@@ -177,10 +175,11 @@ kStrategy kStratCopy(kStrategy o)
   s->P=s->L[s->Ll+1];
   s->update=o->update;
   s->posInLOldFlag=o->posInLOldFlag;
-  if (o->kModW!=NULL)
-    s->kModW=ivCopy(o->kModW);
-  else
-    s->kModW=NULL;
+  s->kModW = o->kModW;
+//   if (o->kModW!=NULL)
+//     s->kModW=ivCopy(o->kModW);
+//   else
+//     s->kModW=NULL;
   s->pairtest=NULL;
   s->sl=o->sl;
   s->mu=o->mu;
@@ -207,9 +206,7 @@ kStrategy kStratCopy(kStrategy o)
   s->noTailReduction=o->noTailReduction;
   s->fromT=o->fromT;
   s->noetherSet=o->noetherSet;
-#ifdef COMP_FAST
   s->spSpolyLoop = o->spSpolyLoop;
-#endif  
   return s;
 }
 
@@ -730,7 +727,8 @@ lists stdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
   strat->LazyDegree = 1;
   if ((h==testHomog))
   {
-    if (idRankFreeModule(F)==0)
+    strat->ak = idRankFreeModule(F);
+    if (strat->ak==0)
     {
       h = (tHomog)idHomIdeal(F,Q);
       w=NULL;
@@ -743,6 +741,7 @@ lists stdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
     if ((w!=NULL) && (*w!=NULL))
     {
       kModW = *w;
+      strat->kModW = *w;
       pOldFDeg = pFDeg;
       pFDeg = kModDeg;
       toReset = TRUE;
@@ -752,9 +751,7 @@ lists stdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
   }
   strat->homog=h;
   spSet(currRing);
-#ifdef COMP_FAST
   strat->spSpolyLoop = spGetSpolyLoop(currRing, strat);
-#endif  
   initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
   initBuchMoraPos(strat);
   initBba(F,strat);
