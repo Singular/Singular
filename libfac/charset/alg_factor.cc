@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: alg_factor.cc,v 1.11 2002-10-24 17:22:21 Singular Exp $";
+static char * rcsid = "$Id: alg_factor.cc,v 1.12 2003-02-18 11:09:25 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -660,7 +660,7 @@ newfactoras( const CanonicalForm & f, const CFList & as, int success){
         //out_cf("alg_gcd:",alg_gcd(f,f.deriv(),Astar),"\n");
  // cout << "algcd result:"  << Fgcd << endl;
   if ( Fgcd == 0 ) DEBOUTMSG(cerr, "WARNING: p'th root ?");
-  if ( degree(Fgcd, f.mvar()) > 0 ){
+  if (( degree(Fgcd, f.mvar()) > 0) && (!(f.deriv().isZero())) ){
     DEBOUTLN(cout, "Nontrivial GCD found of ", f);
     CanonicalForm Ggcd= divide(f, Fgcd,Astar);
     DEBOUTLN(cout, "  split into ", Fgcd);
@@ -743,6 +743,9 @@ newcfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.11  2002/10/24 17:22:21  Singular
+* hannes: factoring in alg.ext., alg_gcd, NTL stuff
+
 Revision 1.10  2002/08/19 11:11:29  Singular
 * hannes/pfister: alg_gcd etc.
 
