@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.179 2000-02-04 14:53:11 Singular Exp $
+@comment $Id: reference.doc,v 1.180 2000-02-04 15:39:55 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5195,6 +5195,7 @@ See
 @*@code{size (} matrix_expression @code{)}
 @*@code{size (} list_expression @code{)}
 @*@code{size (} resolution @code{)}
+@*@code{size (} ring @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
@@ -5207,6 +5208,9 @@ returns the length, i.e., the number of characters, entries or elements.
 returns the number of monomials.
 @item matrix or intmat
 returns the number of entries (rows*columns).
+@item ring
+returns the number of elements in the ground field
+(for Z/p and algebraic extensions) or -1
 @end table
 @item @strong{Example:}
 @smallexample
