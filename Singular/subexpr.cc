@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.74 2001-03-23 18:27:41 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.75 2001-03-26 19:30:24 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -285,11 +285,11 @@ void sleftv::CleanUp()
     //::Print("free %x (%s)\n",name,name);
     omFree((ADDRESS)name);
   }
-  name=NULL;
-  flag=0;
+  //name=NULL;
+  //flag=0;
 #ifdef HAVE_NAMESPACES
-  packhdl = NULL;
-  req_packhdl = NULL;
+  //packhdl = NULL;
+  //req_packhdl = NULL;
 #endif /* HAVE_NAMESPACES */
   if (data!=NULL)
   {
@@ -360,7 +360,7 @@ void sleftv::CleanUp()
       case VCOLMAX:
       case VTIMER:
 #ifdef HAVE_RTIMER
-        case VRTIMER:
+      case VRTIMER:
 #endif
       case VOICE:
       case VMAXDEG:
@@ -377,7 +377,7 @@ void sleftv::CleanUp()
         ::Print("CleanUp: unknown type %d\n",rtyp);  /* DEBUG */
 #endif
     } /* end switch: (rtyp) */
-    data=NULL;
+    //data=NULL;
   }
   if (attribute!=NULL)
   {
@@ -407,7 +407,7 @@ void sleftv::CleanUp()
       case VMINPOLY:
       case LIB_CMD:
       case 0:
-        attribute=NULL;
+        //attribute=NULL;
         break;
       default:
       {
@@ -428,7 +428,7 @@ void sleftv::CleanUp()
     omFreeBin((ADDRESS)e, sSubexpr_bin);
     e=h;
   }
-  rtyp=NONE;
+  //rtyp=NONE;
   if (next!=NULL)
   {
     leftv tmp_n;
@@ -442,6 +442,7 @@ void sleftv::CleanUp()
       next=tmp_n;
     } while (next!=NULL);
   }
+  Init();
 }
 
 BOOLEAN sleftv::RingDependend()
@@ -528,7 +529,7 @@ void * slInternalCopy(leftv source, int t, void *d, Subexpr e)
 
 void sleftv::Copy(leftv source)
 {
-  memset(this,0,sizeof(*this));
+  Init();
   rtyp=source->Typ();
   void *d=source->Data();
   if(!errorreported)
@@ -1108,7 +1109,7 @@ void * sleftv::Data()
       // we evalute it, cleanup and replace this leftv by it's evalutated form
       // the evalutated form will be build in tmp
       sleftv tmp;
-      memset(&tmp,0,sizeof(tmp));
+      tmp.Init();
       tmp.rtyp=STRING_CMD;
       r=(char *)omAllocBin(size_two_bin);
       if ((index>0)&& (index<=(int)strlen((char *)d)))
@@ -1307,7 +1308,7 @@ void syMake(leftv v,char * id, idhdl packhdl)
     Print("wrong id :%s:\n",id);
   }
 #endif
-  memset(v,0,sizeof(sleftv));
+  v->Init();
 #ifdef HAVE_NAMESPACES
   v->packhdl = NULL;
   if(packhdl != NULL)
@@ -1584,7 +1585,6 @@ int sleftv::Eval()
           {
             memset(&d->arg1,0,sizeof(sleftv));
             this->CleanUp();
-            memset(this,0,sizeof(sleftv));
             rtyp=NONE;
           }
         }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.46 2000-12-06 11:03:15 Singular Exp $ */
+/* $Id: ipid.cc,v 1.47 2001-03-26 19:30:21 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -516,7 +516,6 @@ void killhdl(idhdl h, idhdl * ih)
         || ((sLastPrinted.rtyp==LIST_CMD)&&(lRingDependend((lists)sLastPrinted.data))))
         {
           sLastPrinted.CleanUp();
-          memset(&sLastPrinted,0,sizeof(sleftv));
         }
       }
       while (hdh!=NULL)
@@ -900,11 +899,14 @@ BOOLEAN paKill(package pack, BOOLEAN force_top)
         killhdl(hdh,&(pack->idroot));
       hdh = temp;
     }
-    if(checkPackage(pack)) {
+    if(checkPackage(pack))
+    {
       paCleanUp(pack);
       omFreeBin((ADDRESS)pack,  sip_package_bin);
-    } else return FALSE;
-  } else paCleanUp(pack);
+    }
+    else return FALSE;
+  }
+  else paCleanUp(pack);
   return TRUE;
 }
 #endif /* HAVE_NAMESPACES */

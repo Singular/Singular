@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.161 2001-02-21 10:08:14 Singular Exp $ */
+/* $Id: ring.cc,v 1.162 2001-03-26 19:30:23 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -127,7 +127,6 @@ void rSetHdl(idhdl h)
   if (sLastPrinted.RingDependend())
   {
     sLastPrinted.CleanUp();
-    memset(&sLastPrinted,0,sizeof(sleftv));
   }
 
    /*------------ change the global ring -----------------------*/
@@ -146,7 +145,6 @@ idhdl rDefault(char *s)
   if (sLastPrinted.RingDependend())
   {
     sLastPrinted.CleanUp();
-    memset(&sLastPrinted,0,sizeof(sleftv));
   }
 
   ring r = IDRING(tmp);
@@ -875,7 +873,6 @@ void rKill(ring r)
       if (sLastPrinted.RingDependend())
       {
         sLastPrinted.CleanUp();
-        memset(&sLastPrinted,0,sizeof(sleftv));
       }
       if ((myynest>0) && (iiRETURNEXPR[myynest].RingDependend()))
       {

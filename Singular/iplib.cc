@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.81 2001-03-26 18:11:53 Singular Exp $ */
+/* $Id: iplib.cc,v 1.82 2001-03-26 19:30:22 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -56,11 +56,9 @@ char mytolower(char c);
 */
 char * iiGetLibName(procinfov pi)
 {
-  char *res=NULL;
-
-  res = pi->libname;
-  return res;
+  return pi->libname;
 }
+
 /*2
 * given a line 'proc[ ]+{name}[ \t]*'
 * return a pointer to name and set the end of '\0'
@@ -101,8 +99,8 @@ char * iiProcArgs(char *e,BOOLEAN withParenth)
   BOOLEAN in_args;
   BOOLEAN args_found;
   char *s;
-  char *argstr=(char *)omAlloc(124);
-  int argstrlen=124;
+  char *argstr=(char *)omAlloc(127); // see ../omalloc/omTables.inc
+  int argstrlen=127;
   *argstr='\0';
   do
   {
@@ -378,16 +376,10 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
   if((ns==NULL) && (slpn!=NULL) && (slpn->packhdl != NULL)) ns=slpn->packhdl;
   if(pi->is_static)
   {
-    if(ns==NULL)
+    if((ns==NULL)
+    || (strcmp(plib, namespaceroot->name)!= 0))
     {
-      Werror("'%s::%s()' 1 is a local procedure and cannot be accessed by an user.",
-             plib, pi->procname);
-      omFree(plib);
-      return NULL;
-    }
-    if(strcmp(plib, namespaceroot->name)!= 0)
-    {
-      Werror("'%s::%s()' 2 is a local procedure and cannot be accessed by an user.",
+      Werror("'%s::%s()' is a local procedure and cannot be accessed by an user.",
              plib, pi->procname);
       omFree(plib);
       return NULL;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.64 2001-03-22 19:11:04 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.65 2001-03-26 19:30:23 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -385,7 +385,8 @@ void list_cmd(int typ, const char* what, char *prefix,BOOLEAN iterate, BOOLEAN f
   start=h;
   while (h!=NULL)
   {
-    if ((all && (IDTYP(h)!=PROC_CMD)) || (typ == IDTYP(h))
+    if ((all && (IDTYP(h)!=PROC_CMD) &&(IDTYP(h)!=PACKAGE_CMD))
+    || (typ == IDTYP(h))
     || ((IDTYP(h)==QRING_CMD) && (typ==RING_CMD)))
     {
       list1(prefix,h,start==currRingHdl, fullname);
@@ -1042,7 +1043,8 @@ BOOLEAN iiExport (leftv v, int toLev)
     }
     else
     {
-      if(iiInternalExport(v, toLev)) {
+      if(iiInternalExport(v, toLev))
+      {
         r->CleanUp();
         return TRUE;
       }
@@ -1086,7 +1088,8 @@ BOOLEAN iiExport (leftv v, int toLev, idhdl root)
           return TRUE;
         }
       }
-      if(iiInternalExport(v, toLev, root)) {
+      if(iiInternalExport(v, toLev, root))
+      {
         rv->CleanUp();
         return TRUE;
       }
