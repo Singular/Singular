@@ -11,7 +11,7 @@ To install Singular on a Macintosh (PPC or 68k), you need the file
 which you can obtain by public ftp from
       ftp://www.mathematik.uni-kl.de/pub/Math/Singular/ 
 Furthermore, you need MacOS version >= 7.5 with an installed MPW
-shell.  
+shell (see below for instructions on how to get MPW).  
 
 
 TO INSTALL SINGULAR
