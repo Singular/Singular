@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.122 1999-07-02 09:29:22 obachman Exp $
+@comment $Id: general.doc,v 1.123 1999-07-02 15:19:21 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -2313,7 +2313,7 @@ Libraries can be loaded with the @code{LIB} command:
 @code{load(} string_expression [@code{,"with"}]@code{);}
 @end ifset
 @ifclear namespaces
-@code{LIB} string_expression @code{);}
+@code{LIB} string_expression @code{;}
 @end ifclear
 @item @strong{Type:}
 none
@@ -2323,12 +2323,12 @@ not start with @kbd{.} or @kbd{/}, the following directories are
 searched for (in that order): the current directory, the directories given in
 the environment variable @code{SINGULARPATH}, some default directories
 relative to the location of the @sc{Singular} executable program, and
-finally some default absolute directories. You can view the search path
+finally some default absolute directories. (For setting environment variables
+consult the manual of your shell).
+You can view the search path
 which @sc{Singular} uses to locate its libraries, by starting up
-@sc{Singular} with the option @code{-v}
-@ifset namespaces
-, or by issuing the command @code{system("with");}
-@end ifset
+@sc{Singular} with the option @code{-v},
+or by issuing the command @code{system("with");}.
 
 Unless  @sc{Singular} is started with the @code{--no-stdlib} option, the
 library @code{standard.lib} is automatically loaded at start-up time.
