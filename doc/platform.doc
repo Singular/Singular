@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: platform.doc,v 1.12 2002-02-06 08:51:55 Singular Exp $
+@comment $Id: platform.doc,v 1.13 2004-04-22 11:38:05 Singular Exp $
 @comment this file contains Release notes and various howto's
 
 @c The following directives are necessary for proper compilation
@@ -86,10 +86,3 @@ Development version can be downloaded from
 @cindex howto, install on Macintosh
 
 For the SINGULAR version for Mac OS X refer to the Unix section.
-The SINGULAR version for Mac OS 9 is available as
-`ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Singular-@value{VERSION}-html.sea.hqx'
-(documentation) and
-`ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Singular-@value{VERSION}-ppc-MPW.sea.hqx'
-(binaries and libraries).  The file
-`ftp://www.mathematik.uni-kl.de/pub/Math/Singular/INSTALL_mac.txt'
-gives details on how to finish the installation.
