@@ -200,7 +200,7 @@ GFTABLES = $(wildcard LIB/gftables/[1-9]*)
 %.aso: %.aso.o
 	./$< > $@
 
-all:	Singular
+all:	$(SING_EXEC)
 
 Singular-static: mod2.h Makefile version.h scanner.cc gmalloc.o \
           ${ASO_OBJS} ${OBJS} \
