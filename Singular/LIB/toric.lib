@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: toric.lib,v 1.10 2001-01-16 13:48:46 Singular Exp $";
+version="$Id: toric.lib,v 1.11 2001-02-06 11:43:23 anne Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: toric.lib   Standard Basis of Toric Ideals
@@ -667,11 +667,11 @@ proc toric_ideal
         toric_ideal(A,alg,prsv); A intmat, alg string, prsv intvec
 RETURN: ideal: standard basis of the toric ideal of A
 NOTE:   These procedures return the standard basis of the toric ideal of A
-        with respect to the term ordering in the actual basering. Not all
+        with respect to the term ordering in the current basering. Not all
         term orderings are supported: The usual global term orderings may be
         used, but no block orderings combining them.
-        One may call the procedure with several different algorithms:
-        - the algorithm of Conti/Traverso using elimination (ect),
+        One may call the procedure with several different algorithms: @*
+        - the algorithm of Conti/Traverso using elimination (ect), @*
         - the algorithm of Pottier (pt),
         - an algorithm of Bigatti/La Scala/Robbiano (blr),
         - the algorithm of Hosten/Sturmfels (hs),
@@ -680,7 +680,7 @@ NOTE:   These procedures return the standard basis of the toric ideal of A
        above: ect, pt, blr, hs or du.
 
       If `alg' is chosen to be `blr' or `hs', the algorithm needs a vector
-      with positive coefficcients in the row space of A.
+      with positive coefficients in the row space of A.
       If no row of A contains only positive entries, one has to use the
       second version of toric_ideal which takes such a vector as its third
       argument.
