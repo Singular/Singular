@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.10 1998-04-22 14:29:26 krueger Exp $ */
+/* $Id: libparse.l,v 1.11 1998-04-27 10:55:55 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -50,7 +50,7 @@ long string_start;
 char *yylp_buffer_start;
 int yylplineno = 1;
 
-char *yylp_errlist[]= { 
+char *yylp_errlist[]= {
    "",
    "missing close bracket ')' for proc definition in line %d.",  /*  1 */
    "missing close bracket ')' for procbody in line %d.",         /*  2 */
@@ -155,14 +155,14 @@ extern libstackv library_stack;
 
 #  undef YY_DECL
 #  define YY_DECL int yylex(char *newlib, char *libfile, \
-				 lib_style_types *lib_style, \
-				 lp_modes mode)
+                                 lib_style_types *lib_style, \
+                                 lp_modes mode)
 
 #  undef YY_INPUT
 #  define YY_INPUT(buf,result,max_size) \
           if ( ((result = libread( (yyin), (char *) buf, max_size )) < 0 ) \
-		  && ferror( yyin ) ) \
-		YY_FATAL_ERROR( "read in flex scanner failed" );
+                  && ferror( yyin ) ) \
+                YY_FATAL_ERROR( "read in flex scanner failed" );
 
 #  define YY_USER_INIT { \
        BEGIN(header); \
@@ -173,9 +173,9 @@ extern libstackv library_stack;
      }
 
 #  if 0
-<pbody>proc[ \t]+{name}  { 
+<pbody>proc[ \t]+{name}  {
                            printf("MISSING: PROC-cmd found. ERROR!\n"); }
-<pbody>example[ \t]*\n   { 
+<pbody>example[ \t]*\n   {
                            yylplineno++;
                            printf("MISSING: EXAMPLE-cmd found. ERROR!\n"); }
 #  endif
@@ -218,7 +218,7 @@ info=+"\"" { old_state = YYSTATE; quote++; BEGIN(string);
              string_start = current_pos(yyleng);
              *lib_style = NEW_LIBSTYLE;
              last_cmd = LP_INFO;
-           } 
+           }
 
 (version=+{quote}+{strings}+{quote})|(version+{tos}+=+{quote}+{strings}+{quote})|(version+{tos}+=+{tos}+{quote}+{strings}+{quote})|(version=+{tos}+{quote}+{strings}+{quote}) {
              if ( mode != GET_INFO ) {
@@ -247,17 +247,17 @@ static     { p_static=TRUE; }
                }
                pi = (procinfo *)malloc(sizeof(procinfo));
                iiInitSingularProcinfo(pi, newlib, yytext+5, yylplineno,
-					current_pos(0), p_static);
+                                        current_pos(0), p_static);
 #else STANDALONE_PARSER
              if( mode == LOAD_LIB) {
                proc[0]='\0';
                sscanf( yytext, "%*[^p]proc %s", proc);
                if(strlen(proc)<1) sscanf( yytext, "proc %s", proc);
                h0 = enterid( mstrdup(proc), myynest, PROC_CMD,
-				   &idroot, FALSE );
+                                   &idroot, FALSE );
                if (h0!=NULL) {
                  iiInitSingularProcinfo(IDPROC(h0), newlib, proc,
-				yylplineno, current_pos(0),p_static);
+                                yylplineno, current_pos(0),p_static);
                  if (BVERBOSE(V_LOAD_PROC))
                    Warn( "     proc %s loaded", proc );
                }
@@ -265,7 +265,7 @@ static     { p_static=TRUE; }
                SET_DEF_END(mode, pi, current_pos(yyleng+1));
 #if YYLPDEBUG
                printf("PROC %d at %d/%d: (%d) %s\n", p_static,
-		      yylplineno, current_pos(0), brace1, yytext);
+                      yylplineno, current_pos(0), brace1, yytext);
 #endif
                p_static=FALSE;
 #ifndef STANDALONE_PARSER
@@ -277,7 +277,7 @@ example    {
              SET_EXAMPLE_START(mode, pi, yylplineno, current_pos(0));
 #if YYLPDEBUG
              printf("EXAMPLE at %d/%d (%d)\n", yylplineno,
-		    current_pos(0), brace1);
+                    current_pos(0), brace1);
 #endif
            }
 
@@ -286,18 +286,18 @@ LIB[ \t]+"\"" { quote++;
            }
 
 <header>({comment}+{tos}+{dolar}+Id:+{string}+[^\n]*)|({comment}+{tos}+{dolar}+Header:+{string}+[^\n]*) {
-             make_version(yytext, 0); 
+             make_version(yytext, 0);
              //print_version(mode, "");
 #if YYLPDEBUG > 1
              printf("+(id)HEAD:%s\n", yytext);
 #endif
            }
-<header>(^{comment}+[^\n]*) { 
+<header>(^{comment}+[^\n]*) {
 #if YYLPDEBUG > 1
              printf("+(cmt)HEAD:%s\n", yytext);
 #endif
            }
-<header>(^#![^\n]*) { 
+<header>(^#![^\n]*) {
 #if YYLPDEBUG > 1
              printf("-HEAD:%s\n", yytext);
 #endif
@@ -318,19 +318,19 @@ LIB[ \t]+"\"" { quote++;
              BEGIN(libcmd);
            }
 <header>\n { yylplineno++; }
-<header>.  { 
+<header>.  {
 #if YYLPDEBUG > 1
              printf(" HEAD:%s\n", yytext);
 #endif
              //print_version(mode, libfile);
              BEGIN(help);
            }
-<help>(^{comment}+[^\n]*)  { 
+<help>(^{comment}+[^\n]*)  {
 #if YYLPDEBUG > 1
              printf(" HELP:%s\n", yytext);
 #endif
              BEGIN(INITIAL); }
-<help>(^#![^\n]*) { 
+<help>(^#![^\n]*) {
 #if YYLPDEBUG > 1
              printf(" HELP:%s\n", yytext);
 #endif
@@ -352,7 +352,7 @@ LIB[ \t]+"\"" { quote++;
            }
 
 <help>\n { yylplineno++; }
-<help>.    { 
+<help>.    {
 #if YYLPDEBUG > 1
              printf("-HELP:%s\n", yytext);
 #endif
@@ -373,13 +373,13 @@ LIB[ \t]+"\"" { quote++;
            }
 
 <pdef>[ \t] { }
-<pdef>\(   { 
+<pdef>\(   {
              brace2++;
 #if YYLPDEBUG
              printf("%s", yytext);
 #endif
            }
-<pdef>\)   { 
+<pdef>\)   {
              brace2--;
 #if YYLPDEBUG
              printf(">%s<\n", yytext);
@@ -394,20 +394,20 @@ LIB[ \t]+"\"" { quote++;
                BEGIN(phead);
              }
            }
-<pdef>"{"  { 
+<pdef>"{"  {
              if(brace2>0) {
 #if YYLPDEBUG
                printf("{=%d, (=%d, [=%d\n", brace1, brace2, brace3);
 #endif
                yylp_errno = YYLP_DEF_BR2;
                return(1);
-             } else { 
+             } else {
                brace1++; BEGIN(pbody);
                SET_BODY_START(mode, pi, yylplineno, current_pos(0));
              }
            }
 <pdef>\n { yylplineno++;
-              if(brace2<=0) { 
+              if(brace2<=0) {
 #if YYLPDEBUG
                 printf("BEGIN(phead-2){=%d, (=%d, [=%d\n", brace1, brace2, brace3);
 #endif
@@ -415,8 +415,8 @@ LIB[ \t]+"\"" { quote++;
                 BEGIN(phead);
               }
             }
-<pdef>.    { 
-             if(brace2<=0) { 
+<pdef>.    {
+             if(brace2<=0) {
                SET_HELP_START(mode, pi, current_pos(0));
                BEGIN(phead);
              }
@@ -440,18 +440,18 @@ LIB[ \t]+"\"" { quote++;
 <pbody>"\""              { quote++; old_state = YYSTATE;
                            BEGIN(string); /* printf("%s", yytext); */
                          }
-<pbody>"{"               { 
+<pbody>"{"               {
                            brace1++;
 #if YYLPDEBUG
                            printf("line: %d, (%d)%s\n", yylplineno, brace1, yytext);
 #endif
                          }
-<pbody>"}"               { 
+<pbody>"}"               {
 #if YYLPDEBUG
                            printf("line: %d, (%d)%s\n", yylplineno, brace1, yytext);
 #endif
                            brace1--;
-                           if(brace2>0) { 
+                           if(brace2>0) {
                              yylp_errno = YYLP_BODY_BR2;
                              return(1);
                            }
@@ -468,20 +468,20 @@ LIB[ \t]+"\"" { quote++;
                              BEGIN(INITIAL);
                            }
                          }
-<pbody>"("               { 
+<pbody>"("               {
                            brace2++; /* printf("%s", yytext); */
                          }
-<pbody>")"               { 
+<pbody>")"               {
                            brace2--; /* printf("%s", yytext); */
-                           if(brace2<0) { 
+                           if(brace2<0) {
                              yylp_errno = YYLP_BODY_TMBR2;
                              return(1);
                            }
                          }
-<pbody>"["               { 
+<pbody>"["               {
                            brace3++; /* printf("%s", yytext); */
                          }
-<pbody>"]"               { 
+<pbody>"]"               {
                            brace3--; /* printf("%s", yytext); */
                            if(brace3<0) {
                              yylp_errno = YYLP_BODY_TMBR3;
@@ -504,10 +504,10 @@ LIB[ \t]+"\"" { quote++;
 <pexample>"\""           { quote++; old_state = YYSTATE;
                            BEGIN(string); /* printf("%s", yytext); */
                          }
-<pexample>"{"            { 
+<pexample>"{"            {
                            brace1++; /* printf("(%d)%s", brace1, yytext); */
                          }
-<pexample>"}"            { 
+<pexample>"}"            {
                            brace1--; /* printf("(%d)%s", brace1, yytext); */
                            if(brace1<=0) {
                              if(brace2>0) { yylp_errno=YYLP_EX_BR2; return(1); }
@@ -516,16 +516,16 @@ LIB[ \t]+"\"" { quote++;
                              SET_PROC_END(mode, pi, current_pos(yyleng));
                            }
                          }
-<pexample>"("            { 
+<pexample>"("            {
                            brace2++; /* printf("%s", yytext); */
                          }
-<pexample>")"            { 
+<pexample>")"            {
                            brace2--; /* printf("%s", yytext); */
                          }
-<pexample>"["            { 
+<pexample>"["            {
                            brace3++; /* printf("%s", yytext); */
                          }
-<pexample>"]"            { 
+<pexample>"]"            {
                            brace3--; /* printf("%s", yytext); */
                          }
 <pexample>\n             { yylplineno++; }
@@ -550,9 +550,9 @@ LIB[ \t]+"\"" { quote++;
                             printf("%s", yytext);
 #endif
                          }
-.                        { p_static = FALSE; 
+.                        { p_static = FALSE;
                            yylp_errno = YYLP_BAD_CHAR;
-                           printf("[%s\d]", *yytext);
+                           printf("[%d]", *yytext);
 #if YYLPDEBUG
                            printf("[%s]", yytext);
 #endif
@@ -586,7 +586,7 @@ int libread(FILE* f, char* buf, int max_size)
 }
 
 extern "C" {
-  int yylpwrap() { 
+  int yylpwrap() {
     //printf("======================= YYWRAP ====================\n");
     if(brace1>0) { yylp_errno=YYLP_MISS_BR1; }
     if(brace2>0) { yylp_errno=YYLP_MISS_BR2; }
@@ -626,11 +626,13 @@ void make_version(char *p,int what)
 void copy_string(lp_modes mode)
 {
 #  ifndef STANDALONE_PARSER
-  if((last_cmd == LP_INFO)&&(mode == GET_INFO)) {
+  if((last_cmd == LP_INFO)&&(mode == GET_INFO))
+  {
     long current_location = ftell(yylpin);
     int len = (int)(current_pos(0) - string_start);
     fseek(yylpin, string_start, SEEK_SET);
     text_buffer = (char *)AllocL(len+1);
+    text_buffer[len]='\0';
     fread(text_buffer, len, 1, yylpin);
     fseek(yylpin, current_location, SEEK_SET);
   }
@@ -665,14 +667,14 @@ main( int argc, char *argv[] )
      yyin = stdin;
 
   printf( "  %-15s  %20s      %s,%s    %s,%s     %s,%s\n", "Library",
-	  "function", "line", "start-eod", "line", "body-eob",
-	  "line", "example-eoe");
+          "function", "line", "start-eod", "line", "body-eob",
+          "line", "example-eoe");
   yylplex(argv[0], argv[0], &lib_style);
   if(yylp_errno) {
     printf("ERROR occured: [%d] ", yylp_errno);
     printf(yylp_errlist[yylp_errno], yylplineno);
     printf("\n");
-  } 
+  }
   else if(pi!=NULL) printpi(pi);
 }
 
