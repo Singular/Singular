@@ -2253,7 +2253,12 @@ static void go_on_F4 (calc_dat* c){
   //next Step, simplify all pairs
   for(i=0;i<chosen_index;i++)
   {
+    PrintS("simplifying");
+    Print("from %s",pString(chosen[i].m));
+    Print(", %s", pString(chosen[i].f));
     simplify(chosen[i],c);
+    Print("to %s",pString(chosen[i].m));
+    Print(", %s", pString(chosen[i].f));
   }
   
   //next Step remove duplicate entries
@@ -2261,7 +2266,7 @@ static void go_on_F4 (calc_dat* c){
   int pos=0;
   for(i=1;i<chosen_index;i++)
   {
-    if((!(pLmEqual(chosen[i].f,chosen[pos].f)))||(!(pLmEqual(chosen[i].m,chosen[pos].m))))
+    if((!(chosen[i].f!=chosen[pos].f))||(!(pLmEqual(chosen[i].m,chosen[pos].m))))
       chosen[++pos]=chosen[i];
     else pDelete(&(chosen[i].m));
   }
