@@ -263,7 +263,7 @@ void singular_example(char *str)
     {
       sprintf(sing_file, "%s/%s.sing", res_m, s);
       fd = feFopen(sing_file, "r");
-    }  
+    }
     if (fd != NULL)
     {
 
@@ -723,7 +723,9 @@ void listall(int showproc)
           {
             if (showproc || (IDTYP(h2)!=PROC_CMD))
             {
-              if (IDDATA(h2)==(void *)currRing) PrintS("(R)");
+              if ((IDDATA(h2)==(void *)currRing)
+              && ((IDTYP(h2)==RING_CMD)||(IDTYP(h2)==QRING_CMD)))
+                PrintS("(R)");
               else if (IDDATA(h2)==(void *)currPack) PrintS("(P)");
               else PrintS("   ");
               Print("%s::%s, typ %s level %d data %x\n",
