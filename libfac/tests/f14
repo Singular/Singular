@@ -1,4 +1,0 @@
-31991
-(x^3*y+x^3*z+z-11)*(x^2*z^2+x^2*y^2+y+90);
-#
-#leading coefficient is a sum
