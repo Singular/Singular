@@ -7,13 +7,15 @@
  *  Author:  obachman (Olaf Bachmann), hannes (Hannes Schoenemann),
  *           bricken (Michael Brickenstein) 
  *  Created: 01/02
- *  Version: $Id: fast_maps.h,v 1.8 2002-01-19 12:43:40 obachman Exp $
+ *  Version: $Id: fast_maps.h,v 1.9 2002-01-19 13:51:02 bricken Exp $
  *******************************************************************/
 
 /*******************************************************************************
 **
 *S  mapoly, macoeff . . . . . . . . . . . . definition of structs/classes
 */
+#ifndef FAST_MAPS_HEADER
+#define FAST_MAPS_HEADER
 class macoeff_s;
 class mapoly_s;
 class maideal_s;
@@ -91,7 +93,6 @@ void maMap_CreateRings(ideal map_id, ring map_r,
                        ring &src_r, ring &dest_r);
 
 ideal maIdeal_2_Ideal(maideal ideal);
-
-
+#endif
 
 
