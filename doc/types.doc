@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.17 1998-04-30 09:36:34 Singular Exp $
+@comment $Id: types.doc,v 1.18 1998-04-30 13:18:14 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -938,7 +938,7 @@ returns weights for the weigted ecart method (see @ref{weight})
 
 Links describe the communication channels of @sc{Singular}, i.e.
 something @sc{Singular} can write to and/or read from. Currently,
-@sc{Singular} supports four different link types: @ref{Ascii links},  
+@sc{Singular} supports four different link types: @ref{ASCII links},  
 @ref{MPfile links}, @ref{MPtcp links}, and @ref{DBM links}.
 
 @c ------------------------------
@@ -992,13 +992,13 @@ name_string (specifying, for example, a filename).
 must always contain the colon (":") character and may not contain space
 characters. The string before the colon denotes the type of the link and
 the string after the colon denotes its mode. If no type is specified,
-then the link type is set to @code{Ascii}, by default. If no mode is
+then the link type is set to @code{ASCII}, by default. If no mode is
 specified, then the default mode of the respective link type is used. If
 no property string is specified, then by default, the link type is set
-to @code{Ascii} and the mode is left unspecified.
+to @code{ASCII} and the mode is left unspecified.
 
 The name_string following the property_string specifies a filename for
-@code{Ascii}, @code{MPfile}, and @code{DBM} links and a network
+@code{ASCII}, @code{MPfile}, and @code{DBM} links and a network
 connection for @code{MPtcp} links.
 
 For a detailed format description of the link describing string see
@@ -1047,18 +1047,18 @@ closes and kills a link (see @ref{kill})
 @cindex ASCII links
 
 @c {{{ subsection ASCII links }}}
-Via Ascii links data that can be converted to a string can be written
+Via ASCII links data that can be converted to a string can be written
 into files for storage or communcation with other programs. The data is
-written in plain Ascii format. The output format of polynomials is done
+written in plain ASCII format. The output format of polynomials is done
 w.r.t. the value of the global variable @ref{short}. Reading
-from an Ascii links returns a string - conversion into other data is up to
+from an ASCII links returns a string - conversion into other data is up to
 the user.
 
-Ascii links provide also the possibility to read from
+ASCII links provide also the possibility to read from
 @code{stdin} / write to @code{stdout}: the empty string as filename
 denotes the terminal.
 
-An Ascii link can be used either for reading or for writing, but not for
+An ASCII link can be used either for reading or for writing, but not for
 both at the same time. A @code{close} command must be used before a
 change of i/o direction.
 
@@ -1068,7 +1068,7 @@ Types without a conversion to @code{string} cannot be written.
 @example
 @c example
   ring r=32003,(x,y,z),dp;
-  link l=":w example.txt";     // type is Ascii, mode is overwrite
+  link l=":w example.txt";     // type is ASCII, mode is overwrite
   l;
   status(l, "name");           // name is example.txt
   status(l, "open", "yes");    // link is not yet opened
@@ -1100,7 +1100,7 @@ Types without a conversion to @code{string} cannot be written.
 @c {{{ subsection MP links }}}
 MP (Multi Protocol) links give the possibility to store and communicate
 data in the binary MP format: read and write access is very fast
-compared to Ascii links. MP links can be established using files (link
+compared to ASCII links. MP links can be established using files (link
 type is @code{MPfile}) or using TCP sockets (link type is
 @code{MPtcp}). All data (including such data that can not be converted
 to a string) can be written to an MP link. For ring-dependent data, a
@@ -1131,8 +1131,8 @@ objects of type @code{poly}.
 @c {{{ subsubsection MPfile links }}}
 MPfile links provide the possibility to store data in a file using the
 binary MP format. Read and write operations are very fast compared to
-Ascii links. Therefore, for storing large amounts of data, MPfile links
-should be used, instead of Ascii links. Unlike Ascii links, data read
+ASCII links. Therefore, for storing large amounts of data, MPfile links
+should be used, instead of ASCII links. Unlike ASCII links, data read
 from MPfile links is returned as expressions one at a time, and not as a
 string containing the entire content of the file. Furthermore, ring
 dependent data is stored together with a ring description. Therefore,
@@ -2387,7 +2387,76 @@ none
 @section ring
 @cindex ring
 
-See @ref{Rings and orderings}.
+@c {{{ section ring }}}
+Rings are ... . See @ref{Rings and orderings}.
+
+@menu
+* ring declarations::           
+@end menu
+
+@node ring declarations,  , ring, ring
+@subsection ring declarations
+@cindex ring declarations
+
+@c {{{ subsection ring declarations }}}
+@table @code
+@item @strong{Syntax:}
+@code{ring} name @code{=} field@code{,}
+@code{(} names_of_ring_variables @code{),}
+@code{(} ordering @code{);}
+@item @strong{Default:}
+@code{32003,(x,y,z),(dp,C);}
+@item @strong{Purpose:}
+defines a base ring for polynomials, ideals, vectors, modules, resolutions
+and matrices and sets it as the actual basering.
+
+The coefficient field is given by either
+@enumerate
+@item 
+the characteristic (0 or a prime <= 32003)
+@item
+an expression_list of the characteristic and
+the names of  parameters
+@item
+an expression_list of the number of elements
+(a small prime characteristic p to the power of a small exponent n) and a
+name for a primitive element
+@item
+@code{real}
+@end enumerate
+
+The names of ring variables are like variable names (comma separated).
+
+The ordering is a list of blockorderings which have an order keyword and
+a weight vector or an optional size.
+
+Possible order keywords are:
+@itemize @bullet
+@item @code{lp}, @code{dp}, @code{Dp}, @code{ls}, @code{ds}, @code{Ds}, @code{M}
+with optional size parameter
+
+@item @code{wp}, @code{Wp}, @code{ws}, @code{Ws}
+with weight vector
+
+@item @code{c}, @code{C}
+for components orders
+
+@end itemize
+
+If one element of the list consists of only one entry, the parentheses may
+be omitted.
+
+@item @strong{Example: }
+@example
+@c example
+  ring r=0,(a,b,c,d),dp;
+  r;
+@c example
+@end example
+@end table
+@c {{{endfold}}}
+@c {{{endfold}}}
+
 
 @c ---------------------------------------
 @node string, vector, ring, Data types
