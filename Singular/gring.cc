@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.26 2003-03-10 13:28:25 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.27 2003-03-10 16:29:41 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -35,12 +35,10 @@ poly nc_pp_Mult_mm(poly p, const poly m, const ring r, poly &last)
 /* poly nc_p_Mult_mm(poly p, poly m, const ring r); defined below */
 poly nc_p_Minus_mm_Mult_qq(poly p, const poly m, poly q, const ring r)
 {
-  number minus1=n_Init(-1,r);
-  poly mc=p_Mult_nn(p_Copy(m,r),minus1,r);
+  poly mc=p_Neg(p_Copy(m,r),r);
   poly mmc=nc_mm_Mult_p(mc,p_Copy(q,r),r);
   p_Delete(&mc,r);
   p=p_Add_q(p,mmc,r);
-  n_Delete(&minus1,r);
   return(p);
 }
 
@@ -62,10 +60,10 @@ poly _nc_p_Mult_q(poly p, poly q, const int copy, const ring r)
     pp=p;
   }
   while (qq!=NULL)
-    {
-      res=p_Add_q(res,nc_pp_Mult_mm(pp,p_Head(qq,r),r,ghost),r);
-      qq=p_LmDeleteAndNext(qq,r);
-    }
+  {
+    res=p_Add_q(res,nc_pp_Mult_mm(pp,p_Head(qq,r),r,ghost),r);
+    qq=p_LmDeleteAndNext(qq,r);
+  }
   p_Delete(&pp,r);
   return(res);
 }
@@ -73,7 +71,7 @@ poly _nc_p_Mult_q(poly p, poly q, const int copy, const ring r)
 poly  nc_p_Mult_mm(poly p, const poly m, const ring r)
 /* p is poly, m is mono with coeff, p killed after */
 {
-  if ((p==NULL) || (m==NULL)) return(NULL);
+  if ((p==NULL) || (m==NULL)) return NULL;
   /*  if (pNext(p)==NULL) return(nc_mm_Mult_nn(p,pCopy(m),r)); */
   /* excluded  - the cycle will do it anyway - OK. */
   if (p_IsConstant(m,r)) return(p_Mult_nn(p,p_GetCoeff(m,r),r));
@@ -100,13 +98,13 @@ poly  nc_p_Mult_mm(poly p, const poly m, const ring r)
 
   while (p!=NULL)
   {
-    v=p_Head(p,r);
+    //v=p_Head(p,r);
 #ifdef PDEBUG
     p_Test(v,r);
-    p_Test(p,r);
+    //p_Test(p,r);
 #endif
 
-    expP=p_GetComp(v,r);
+    expP=p_GetComp(p,r);
     if (expP==0)
     {
       expOut=expM;
@@ -125,10 +123,10 @@ poly  nc_p_Mult_mm(poly p, const poly m, const ring r)
       }
     }
 
-    p_GetExpV(v,P,r);
-    cP=p_GetCoeff(v,r);
+    p_GetExpV(p,P,r);
+    cP=p_GetCoeff(p,r);
     cOut=n_Mult(cP,cM,r);
-    p_Delete(&v,r);
+    //p_Delete(&v,r);
     v= nc_mm_Mult_nn(P,M,r);
     v=p_Mult_nn(v,cOut,r);
     p_SetCompP(v,expOut,r);
