@@ -781,7 +781,7 @@ char * versionString()
               StringAppendS("Namespaces,");
 #endif
 #ifdef HAVE_DYNAMIC_LOADING
-              StringAppendS("DynamicLoading");
+              StringAppendS("DynamicLoading,");
 #endif
 #ifdef TEST
               StringAppendS("TESTs,");

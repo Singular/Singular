@@ -151,7 +151,9 @@ cmdnames cmds[] =
   { "example",     0, EXAMPLE_CMD ,       EXAMPLE_CMD},
   { "execute",     0, EXECUTE_CMD ,       EXECUTE_CMD},
   { "export",      0, EXPORT_CMD ,        EXPORT_CMD},
+#ifdef HAVE_NAMESPACES
   { "exportto",    0, EXPORTTO_CMD ,      CMD_M},
+#endif
   { "factorize",   0, FAC_CMD ,           CMD_12},
   { "fetch",       0, FETCH_CMD ,         CMD_2},
   { "fglm",        0, FGLM_CMD ,          CMD_2},
@@ -169,7 +171,9 @@ cmdnames cmds[] =
   { "ideal",       0, IDEAL_CMD ,         IDEAL_CMD},
   { "if",          0, IF_CMD ,            IF_CMD},
   { "imap",        0, IMAP_CMD ,          CMD_2},
+#ifdef HAVE_NAMESPACES
   { "importfrom",  0, IMPORTFROM_CMD ,    CMD_M},
+#endif
   { "indepSet",    0, INDEPSET_CMD ,      CMD_12},
   { "insert",      0, INSERT_CMD ,        CMD_23},
   { "int",         0, INT_CMD ,           ROOT_DECL},
@@ -277,7 +281,9 @@ cmdnames cmds[] =
   { "transpose",   0, TRANSPOSE_CMD ,     CMD_1},
   { "type",        0, TYPE_CMD ,          TYPE_CMD},
   { "typeof",      0, TYPEOF_CMD ,        CMD_1},
+#ifdef HAVE_NAMESPACES
   { "unload",      0, UNLOAD_CMD ,        CMD_M},
+#endif
   { "var",         0, VAR_CMD ,           CMD_1},
   { "varstr",      0, VARSTR_CMD ,        CMD_12},
   { "vdim",        0, VDIM_CMD ,          CMD_1},
@@ -2230,9 +2236,7 @@ struct sValCmd2 dArith2[]=
 ,{jjVARSTR2,   VARSTR_CMD,     STRING_CMD,     RING_CMD,   INT_CMD PROFILER}
 ,{jjVARSTR2,   VARSTR_CMD,     STRING_CMD,     QRING_CMD,  INT_CMD PROFILER}
 ,{jjWEDGE,     WEDGE_CMD,      MATRIX_CMD,     MATRIX_CMD, INT_CMD PROFILER}
-#ifdef HAVE_NAMESPACES
 ,{jjLOAD_E,    LOAD_CMD,       NONE,           STRING_CMD, STRING_CMD PROFILER}
-#endif /* HAVE_NAMESPACES */
 ,{NULL,        0,              0,              0,          0 PROFILER}
 };
 /*=================== operations with 1 arg.: static proc =================*/
@@ -3005,14 +3009,18 @@ static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
         break;
 
       case LT_SINGULAR:
+#ifdef HAVE_NAMESPACES
         result = iiLibCmd(s, autoexport);
+#else
+        result = iiLibCmd(s);
+#endif
         break;
 
       case LT_ELF:
 #ifdef HAVE_DYNAMIC_LOADING
         result = load_modules(s, libnamebuf, autoexport);
 #else /* HAVE_DYNAMIC_LOADING */
-        Print("Dynamic modules are not supported by this version of Singular");
+        Werror("Dynamic modules are not supported by this version of Singular");
 #endif /* HAVE_DYNAMIC_LOADING */
         break;
   }
@@ -3491,9 +3499,7 @@ struct sValCmd1 dArith1[]=
 ,{jjrVarStr,    VARSTR_CMD,      XS(STRING_CMD), QRING_CMD }
 ,{kWeight,      WEIGHT_CMD,      INTVEC_CMD,     IDEAL_CMD }
 ,{kWeight,      WEIGHT_CMD,      INTVEC_CMD,     MODUL_CMD }
-#ifdef HAVE_NAMESPACES
 ,{jjLOAD1,      LOAD_CMD,        NONE,           STRING_CMD }
-#endif /* HAVE_NAMESPACES */
 ,{NULL,         0,               0,              0}
 };
 #undef s

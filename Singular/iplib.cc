@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.48 1998-12-15 08:39:14 krueger Exp $ */
+/* $Id: iplib.cc,v 1.49 1998-12-15 13:20:31 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -837,6 +837,8 @@ static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
   }
   reinit_yylp();
   fclose( yylpin );
+  fp = NULL;
+  
 #ifdef HAVE_NAMESPACES
   namespaceroot->pop();
 #endif /* HAVE_NAMESPACES */
@@ -866,7 +868,7 @@ static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
 #endif
   }
 
-  fclose(fp);
+  if(fp != NULL) fclose(fp);
   return FALSE;
 }
 
