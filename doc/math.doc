@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.63 2001-01-22 12:08:46 mschulze Exp $
+@comment $Id: math.doc,v 1.64 2001-01-23 13:19:38 mschulze Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -30,7 +30,7 @@ some articles or text books (see @ref{References}).
 * Hilbert function::
 * Syzygies and resolutions::
 * Characteristic sets::
-* The Gauss-Manin connection::
+* Gauss-Manin connection::
 * Toric ideals and integer programming::
 * References::
 @end menu
@@ -328,7 +328,7 @@ deg(e(a,j)) <= s+j-1    for all j.
 @end smallexample
 @end table
 @c ---------------------------------------------------------------------------
-@node Characteristic sets, The Gauss-Manin connection, Syzygies and resolutions, Mathematical background
+@node Characteristic sets, Gauss-Manin connection, Syzygies and resolutions, Mathematical background
 @section Characteristic sets
 @cindex Characteristic sets
 
@@ -418,9 +418,9 @@ characteristic series} of the ideal (G).
 @end smallexample
 @end table
 @c ---------------------------------------------------------------------------
-@node The Gauss-Manin connection, Toric ideals and integer programming, Characteristic sets, Mathematical background
-@section The Gauss-Manin connection
-@cindex The Gauss-Manin connection
+@node Gauss-Manin connection, Toric ideals and integer programming, Characteristic sets, Mathematical background
+@section Gauss-Manin connection
+@cindex Gauss-Manin connection
 
 @c the following text contain too much math code, so there are
 @c tex and info versions of it. It end just before the introducing text
@@ -673,7 +673,7 @@ principal part, then the spectrum may be computed much faster
 using @code{spectrumnd(f,1)}.
 
 @c ---------------------------------------------------------------------------
-@node Toric ideals and integer programming, References, The Gauss-Manin connection, Mathematical background
+@node Toric ideals and integer programming, References, Gauss-Manin connection, Mathematical background
 @section Toric ideals and integer programming
 @cindex Toric ideals and integer programming
 
