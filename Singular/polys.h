@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.18 1998-12-02 13:57:41 obachman Exp $ */
+/* $Id: polys.h,v 1.19 1998-12-03 11:02:37 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
@@ -305,6 +305,8 @@ void      pNormalize(poly p);
 poly      pSubst(poly p, int n, poly e);
 poly      pJet(poly p, int m);
 poly      pJetW(poly p, int m, short * iv);
+// maximum weigthed degree of all monomials of p, w is indexed from
+// 1..pVariables
 int       pDegW(poly p, short *w);
 
 /*-----------type conversions ----------------------------*/

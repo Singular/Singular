@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.27 1998-11-19 15:02:39 krueger Exp $ */
+/* $Id: ipid.cc,v 1.28 1998-12-03 11:02:36 obachman Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -724,7 +724,7 @@ void paCleanUp(package pack)
 #endif /* HAVE_DYNAMIC_LOADING */
     }
     FreeL((ADDRESS)pack->libname);
-    memset((void *) pack, 0, sizeof(package));
+    memset((void *) pack, 0, sizeof(sip_package));
     pack->language=LANG_NONE;
   }
 }
@@ -747,7 +747,7 @@ BOOLEAN paKill(package pack, BOOLEAN force_top)
     }
     if(checkPackage(pack)) {
       paCleanUp(pack);
-      Free((ADDRESS)pack, sizeof(package));
+      Free((ADDRESS)pack, sizeof(sip_package));
     } else return FALSE;
   } else paCleanUp(pack);
   return TRUE;
