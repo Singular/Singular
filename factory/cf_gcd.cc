@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.16 1998-01-27 10:18:33 pohl Exp $ */
+/* $Id: cf_gcd.cc,v 1.17 1998-02-02 08:58:43 schmidt Exp $ */
 
 #include <config.h>
 
@@ -114,36 +114,6 @@ balance ( const CanonicalForm & f, const CanonicalForm & q )
 }
 //}}}
 
-//{{{ CanonicalForm igcd ( const CanonicalForm & f, const CanonicalForm & g )
-//{{{ docu
-//
-// igcd() - return integer gcd of f and g.
-//
-// Calculates the integer gcd of f and g using the euclidean
-// algorithm if f and g are integers and we are not calculating
-// in Q.  Returns one in all other cases.  Normalizes result.
-//
-//}}}
-CanonicalForm
-igcd ( const CanonicalForm & f, const CanonicalForm & g )
-{
-    CanonicalForm a, b, c, dummy;
-
-    if ( f.inZ() && g.inZ() && ! isOn( SW_RATIONAL ) ) {
-	if ( f.sign() < 0 ) a = -f; else a = f;
-	if ( g.sign() < 0 ) b = -g; else b = g;
-	while ( ! b.isZero() ) {
-	    divrem( a, b, dummy, c );
-	    a = b;
-	    b = c;
-	}
-	return a;
-    }
-    else
-	return 1;
-}
-//}}}
-
 //{{{ static CanonicalForm icontent ( const CanonicalForm & f, const CanonicalForm & c )
 //{{{ docu
 //
@@ -178,43 +148,6 @@ CanonicalForm
 icontent ( const CanonicalForm & f )
 {
     return icontent( f, 0 );
-}
-//}}}
-
-//{{{ CanonicalForm iextgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, CanonicalForm & b )
-//{{{ docu
-//
-// iextgcd() - calculate extended integer gcd.
-//
-// Returns gcd(f, g) and a and b sucht that f*a+g*b=gcd(f, g).
-// The gcd is calculated using an extended euclidean polynomial
-// remainder sequence.  Normalizes result.
-//
-// Note: be sure you are calculating in Z, and not in Q!
-//
-//}}}
-CanonicalForm
-iextgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, CanonicalForm & b )
-{
-    CanonicalForm p0 = f, p1 = g;
-    CanonicalForm f0 = 1, f1 = 0, g0 = 0, g1 = 1, q, r;
-
-    while ( ! p1.isZero() ) {
-	divrem( p0, p1, q, r );
-	p0 = p1; p1 = r;
-	r = g0 - g1 * q;
-	g0 = g1; g1 = r;
-	r = f0 - f1 * q;
-	f0 = f1; f1 = r;
-    }
-    a = f0;
-    b = g0;
-    if ( p0.sign() < 0 ) {
-	p0 = -p0;
-	a = -a;
-	b = -b;
-    }
-    return p0;
 }
 //}}}
 
@@ -276,7 +209,7 @@ gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primiti
 	CanonicalForm cF = content( F ), cG = content( G );
 	f = F / cF;
 	g = G / cG;
-	c = igcd( cF, cG );
+	c = bgcd( cF, cG );
     }
     cg = gcd( f.lc(), g.lc() );
     cl = ( f.lc() / cg ) * g.lc();
@@ -549,7 +482,7 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
 	    return f;
     else  if ( f.inBaseDomain() )
 	if ( g.inBaseDomain() )
-	    return igcd( f, g );
+	    return bgcd( f, g );
 	else
 	    return cf_content( g, f );
     else  if ( g.inBaseDomain() )

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_univar.cc,v 1.15 1997-12-08 18:24:35 schmidt Exp $ */
+/* $Id: fac_univar.cc,v 1.16 1998-02-02 08:58:49 schmidt Exp $ */
 
 #include <config.h>
 
@@ -28,11 +28,6 @@ TIMING_DEFINE_PRINT(fac_combineFactors);
 const int max_fp_fac = 3;
 
 static modpk theModulus;
-
-// !!! this should be placed in cf_gcd.h
-CanonicalForm
-iextgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, CanonicalForm & b );
-
 
 #ifdef DEBUGOUTPUT
 #define DEBOUTHPRINT(stream, msg, hg) \
@@ -536,7 +531,7 @@ ZFactorizeUnivariate( const CanonicalForm& ff, bool issqrfree )
 	DEBOUTLN( cerr, "p = " << pk.getp() << ", k = " << pk.getk() );
 	DEBOUTHPRINT( cerr, "D = ", D );
 	lf = lc( f );
-	(void)iextgcd( pk.getpk(), lf, dummy1, recip_lf );
+	(void)bextgcd( pk.getpk(), lf, dummy1, recip_lf );
 	DEBOUTLN( cerr, "recip_lf = " << recip_lf );
 	TIMING_START(fac_combineFactors);
 	for ( i = 1; i < D[0]; i++ )
