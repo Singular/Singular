@@ -271,6 +271,7 @@ check:
 install:
 	mkdir -p $(LIBDIR)
 	cp ntl.a $(LIBDIR)/libntl.a
+	- $(RANLIB)  $(LIBDIR)/libntl.a
 	mkdir -p $(INCLUDEDIR)
 	- rm -r $(INCLUDEDIR)/NTL
 	mkdir $(INCLUDEDIR)/NTL
