@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.66 2002-02-12 14:35:24 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.67 2002-02-12 17:39:27 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -12,8 +12,8 @@ OVERVIEW: A library to compute Hodge-theoretic invariants
 
 PROCEDURES:
  gmsring(t,s);              Gauss-Manin connection of t with variable s
- gmsnf(p,K[,Kmax]);         Gauss-Manin connection normal form of p
- gmscoeffs(p,K[,Kmax]);     Gauss-Manin connection basis representation of p
+ gmsnf(p,K);                Gauss-Manin connection normal form of p
+ gmscoeffs(p,K);            Gauss-Manin connection basis representation of p
  monodromy(t);              Jordan data of monodromy of t
  spectrum(t);               singularity spectrum of t
  sppairs(t);                spectral pairs of t
@@ -210,91 +210,21 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc gmsnf(ideal p,int K,list #)
-"USAGE:    gmsnf(p,K[,Kmax]); poly p, int K, int Kmax
-ASSUME:   basering returned by gmsring; K<=Kmax
+proc gmsnf(ideal p,int K)
+"USAGE:    gmsnf(p,K); poly p, int K
+ASSUME:   basering returned by gmsring
 RETURN:
 @format
 list nf; 
   ideal nf[1];  projection of p to gmsbasis mod s^(K+1)
-  ideal nf[2];  p=nf[1]+nf[2] mod s^(Kmax+1)
+  ideal nf[2];  p=nf[1]+nf[2]
 @end format
+NOTE:     by setting p=nf[2] the computation can be continued
 KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice
 EXAMPLE:  example gmsnf; shows examples
 "
 {
-  int Kmax=-1;
-  if(size(#)>0)
-  {
-    if(typeof(#[1])=="int")
-    {
-      Kmax=#[1];
-      if(K>Kmax)
-      {
-        Kmax=K;
-      }
-    }
-  }
-
-  intvec v=1;
-  v[nvars(basering)]=0;
-
-  int k;
-  if(Kmax>=0)
-  {
-    p=jet(jet(p,K,v),(Kmax+1)*deg(var(1))-2*gmsmaxdeg);
-  }
-
-  ideal r,q;
-  r[ncols(p)]=0;
-  q[ncols(p)]=0;
-
-  poly s;
-  int i,j;
-  for(k=ncols(p);k>=1;k--)
-  {
-    while(p[k]!=0&&deg(lead(p[k]),v)<=K)
-    {
-      i=1;
-      s=lead(p[k])/lead(gmsstd[i]);
-      while(i<ncols(gmsstd)&&s==0)
-      {
-        i++;
-        s=lead(p[k])/lead(gmsstd[i]);
-      }
-      if(s!=0)
-      {
-        p[k]=p[k]-s*gmsstd[i];
-        for(j=1;j<=nrows(gmsmatrix);j++)
-        {
-          if(Kmax>=0)
-          {
-            p[k]=p[k]+
-              jet(jet(diff(s*gmsmatrix[j,i],var(j+1))*var(1),Kmax,v),
-                (Kmax+1)*deg(var(1))-2*gmsmaxdeg);
-          }
-          else
-          {
-            p[k]=p[k]+diff(s*gmsmatrix[j,i],var(j+1))*var(1);
-          }
-        }
-      }
-      else
-      {
-        r[k]=r[k]+lead(p[k]);
-        p[k]=p[k]-lead(p[k]);
-      }
-      while(deg(lead(p[k]))>(K+1)*deg(var(1))-2*gmsmaxdeg&&
-        deg(lead(p[k]),v)<=K)
-      {
-        q[k]=q[k]+lead(p[k]);
-        p[k]=p[k]-lead(p[k]);
-      }
-    }
-    q[k]=q[k]+p[k];
-  }
-
-  return(list(r,q));
+  return(system("gmsnf",p,gmsstd,gmsmatrix,(K+1)*deg(var(1))-2*gmsmaxdeg,K));
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -311,22 +241,21 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc gmscoeffs(ideal p,int K,list #)
-"USAGE:    gmscoeffs(p,K[,Kmax]); poly p, int K, int Kmax
-ASSUME:   basering constructed by gmsring, K<=Kmax
+proc gmscoeffs(ideal p,int K)
+"USAGE:    gmscoeffs(p,K); poly p, int K
+ASSUME:   basering constructed by gmsring
 RETURN:
 @format
 list l; 
   matrix l[1];  gmsbasis representation of p mod s^(K+1)
-  ideal l[2];  p=matrix(gmsbasis)*l[1]+l[2] mod s^(Kmax+1)
+  ideal l[2];  p=matrix(gmsbasis)*l[1]+l[2]
 @end format
-NOTE:     by setting p=l[2] the computation can be continued up to degree 
-          at most Kmax, by default Kmax=infinity
+NOTE:     by setting p=l[2] the computation can be continued
 KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice
 EXAMPLE:  example gmscoeffs; shows examples
 "
 {
-  list l=gmsnf(p,K,#);
+  list l=gmsnf(p,K);
   ideal r,q=l[1..2];
   poly v=1;
   for(int i=2;i<=nvars(basering);i++)
@@ -410,7 +339,7 @@ static proc saturate(int K0)
     dbprint(printlevel-voice+2,"// compute matrix A of t");
     k++;
     dbprint(printlevel-voice+2,"// k="+string(k));
-    l=gmscoeffs(r,k,mu+K0);
+    l=gmscoeffs(r,k);
     C,r=l[1..2];
     A0=A0+C;
 
@@ -435,7 +364,7 @@ static proc basisrep(matrix A0,ideal r,module H,int k0,int K,int K0)
 {
   dbprint(printlevel-voice+2,"// compute matrix A of t");
   dbprint(printlevel-voice+2,"// k="+string(K+k0+1));
-  list l=gmscoeffs(r,K+k0+1,K0+k0+1);
+  list l=gmscoeffs(r,K+k0+1);
   matrix C;
   C,r=l[1..2];
   A0=A0+C;
