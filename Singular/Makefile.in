@@ -347,14 +347,14 @@ $(OBJG2): %.og: %.c
 	$(CCG)  ${CFLAGSG} ${CPPFLAGS} ${DEFSG} -c $< -o $@
 
 Singularg: scanner.cc $(OBJG) iparith.og mpsr_Tok.og tesths.cc version.h 
-	$(CXXG) ${CXXFLAGSG} ${CPPFLAGS} ${DEFSG} -o Singularg \
+	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} -o Singularg \
 	tesths.cc iparith.og mpsr_Tok.og $(OBJG) ${LDFLAGS} ${LIBS}
 
 iparith.og: iparith.inc iparith.cc
-	$(CXXG)  ${CXXFLAGSG} ${CPPFLAGS} ${DEFSG} -c iparith.cc -o iparith.og
+	$(CXXG)  ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} -c iparith.cc -o iparith.og
 
 mpsr_Tok.og: iparith.inc mpsr_Tok.cc
-	$(CXXG) ${CXXFLAGSG} ${CPPFLAGS} ${DEFSG} -c mpsr_Tok.cc -o mpsr_Tok.og
+	$(CXXG) ${CXXFLAGSG} ${CPPFLAGS} ${CXXTEMPLFLAGSG} ${DEFSG} -c mpsr_Tok.cc -o mpsr_Tok.og
 
 installg: Singularg
 	${MKINSTALLDIRS} ${bindir}
