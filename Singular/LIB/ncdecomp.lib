@@ -1,10 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncdecomp.lib,v 1.2 2004-06-01 13:53:35 levandov Exp $";
+version="$Id: ncdecomp.lib,v 1.3 2004-07-29 16:46:21 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  ncdecomp.lib      Central character decomposition of a module 
-AUTHORS:  Viktor Levandovskyy,     levandov@mathematik.uni-kl.de,
-@*        Oleksandr Khomenko,      Oleksandr.Khomenko@math.uni-freiburg.de.
+AUTHORS:  Viktor Levandovskyy,     levandov@mathematik.uni-kl.de.
 
 PROCEDURES:
 CentralQuot(I,G);       for a module I and an ideal G, returns I:G,
@@ -14,6 +13,7 @@ L[*][1] is the character, L[*][2] is the Groebner basis of corresponding weight 
 ";
 
   LIB "ncalg.lib";
+  LIB "primdec.lib";
 ///////////////////////////////////////////////////////////////////////////////
 static proc CharKernel(list L, int i)
 {
@@ -74,6 +74,7 @@ static proc CentralQuotPoly(module M, poly g)
 ///////////////////////////////////////////////////////////////////////////////
 static proc MyIsEqual(module A, module B)
 {
+// both A and B are submodules of free module
   option(redSB);
   option(redTail);
   if (attrib(A,"isSB")!=1) 
@@ -223,7 +224,6 @@ EXAMPLE: example CenCharDec; shows examples
   }
 //  print(@JcapZ);
 // 2. compute the min.ass.primes of the ideal in the center
-  LIB "primdec.lib";
   list @L = minAssGTZ(@JcapZ);
   int sL = size(@L);
   list @CharKer;
@@ -248,6 +248,10 @@ EXAMPLE: example CenCharDec; shows examples
   for(i=1; i<=sL; i++)
   {
     @R[1] = L[i];
+    if (nrows(@R[1])==1)
+    {
+      @R[1] = ideal(@R[1]);
+    }
     @R[2] = CentralSaturation(I,L[i]);
     if (nrows(@R[2])==1)
     {
@@ -261,7 +265,6 @@ EXAMPLE: example CenCharDec; shows examples
 }
 example
 { "EXAMPLE:"; echo = 2;
-
    option(returnSB);
    def a = sl2();
    setring a;
