@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.12 1998-07-30 12:22:48 schmidt Exp $
+;; $Id: singular.el,v 1.13 1998-07-30 16:22:55 schmidt Exp $
 
 ;;; Commentary:
 
@@ -23,6 +23,9 @@
 ;;   conformity
 ;; - mark incomplete doc strings or code with `NOT READY' (optionally
 ;;   followed by an explanation what exactly is missing)
+;; - documentation on the customization of the modes is in the
+;;   doc-strings to `singular-mode-configuration' and
+;;   `singular-interactive-mode-configuration', resp.
 ;;
 ;; - use `singular' as prefix for all global symbols
 ;; - use `singular-debug' as prefix for all global symbols concerning
@@ -136,14 +139,25 @@ on Emacs 19.34, Emacs 20.2, and XEmacs 20.2."))
 ;;}}}
 
 ;;{{{ Faces
+
+;; Note:
+;;
+;; These fonts look quite good:
+;; "-adobe-courier-bold-r-*-*-18-*-*-*-*-*-*-*" for input
+;; "-adobe-courier-bold-o-*-*-18-*-*-*-*-*-*-*" for output
+;;
+;; For my (Jens) Emacs a quite good variant is:
+;; "-misc-fixed-bold-*-*-*-15-*-*-*-*-*-*-*" for input
+;; "-misc-fixed-medium-*-*-*-15-*-*-*-*-*-*-*" for output
+
 (make-face 'singular-input-face)
-(set-face-background 'singular-input-face "peach puff")
+(set-face-background 'singular-input-face "Orange")
 (defvar singular-input-face 'singular-input-face
   "Face for user input.
 This face should have set background only.")
 
 (make-face 'singular-output-face)
-(set-face-background 'singular-output-face "blanched almond")
+(set-face-background 'singular-output-face "Wheat")
 (defvar singular-output-face 'singular-output-face
   "Face for Singular output.
 This face should have set background only.")
@@ -195,6 +209,10 @@ off."
   "Create the buffer name for PROCESS-NAME.
 The buffer name is the process name with surrounding `*'."
   (concat "*" process-name "*"))
+
+(defmacro singular-process ()
+  "Return process of current buffer."
+  (get-buffer-process (current-buffer)))
 
 (defmacro singular-process-mark ()
   "Return process mark of current buffer."
@@ -730,32 +748,75 @@ This variable is buffer-local.")
 
 This variable is buffer-local.")
 
-(defun singular-demo-mode-init ()
-  "Initialize local variables and markers beloging to demo mode."
-  (make-local-variable 'singular-demo-mode)
-  (make-local-variable 'singular-demo-mode-old-name)
-  (make-local-variable 'singular-demo-mode-end)
-  (if (not (and (boundp 'singular-demo-end)
-		singular-demo-end))
-      (setq singular-demo-end (make-marker))))
+(defvar singular-demo-command-on-enter nil
+  "Singular command to send when entering demo mode or nil if no string to send.")
 
-(defun singular-demo-mode (on)
-  "Turn Singular demo mode on if ON is non-nil, otherwise off.
-Modifies `singular-demo-mode' and buffer's mode line."
+(defvar singular-demo-command-on-leave nil
+  "Singular command to send when leaving demo mode or nil if no string to send.")
+  
+(defun singular-demo-mode (mode)
+  "Switch between demo mode states.
+MODE may be either:
+- `init' to initialize global variables;
+- `exit' to clean up demo and leave Singular demo mode;
+- `enter' to enter Singular demo mode;
+- `leave' to leave Singular demo mode.
+
+Modifies the global variables `singular-demo-mode',
+`singular-demo-end', and `singular-demo-old-mode-name' to reflect the
+new state of Singular demo mode."
   (cond
-   ;; test on logical equality off ON and `singular-demo-mode'
-   ((eq (not on) (not singular-demo-mode)) nil)
-   ;; switch on
-   (on
+   ;; initialization.  Should be called only once.
+   ((eq mode 'init)
+    (make-local-variable 'singular-demo-mode)
+    (make-local-variable 'singular-demo-mode-old-name)
+    (make-local-variable 'singular-demo-mode-end)
+    (if (not (and (boundp 'singular-demo-end)
+		  singular-demo-end))
+	(setq singular-demo-end (make-marker))))
+
+   ;; final exit.  Clean up demo.
+   ((and (eq mode 'exit)
+	 singular-demo-mode)
+    (setq mode-name singular-demo-old-mode-name
+	  singular-demo-mode nil)
+    ;; clean up hidden rest of demo file if existent
+    (let ((old-point-min (point-min))
+	  (old-point-max (point-max)))
+      (unwind-protect
+	  (progn
+	    (widen)
+	    (delete-region old-point-max singular-demo-end))
+	;; this is unwide-protected
+	(narrow-to-region old-point-min old-point-max)))
+    (if (and singular-demo-command-on-leave
+	     (singular-process))
+	(send-string (singular-process) singular-demo-command-on-leave))
+    (force-mode-line-update))
+
+   ;; enter demo mode
+   ((and (eq mode 'enter)
+	 (not singular-demo-mode))
     (setq singular-demo-old-mode-name mode-name
 	  mode-name "Singular Demo"
 	  singular-demo-mode t)
+    (if singular-demo-command-on-enter
+	(send-string (singular-process) singular-demo-command-on-enter))
     (force-mode-line-update))
-   (;; switch off
-    t
+
+   ;; leave demo mode
+   ((and (eq mode 'leave)
+	 singular-demo-mode)
     (setq mode-name singular-demo-old-mode-name
 	  singular-demo-mode nil)
+    (if singular-demo-command-on-leave
+	(send-string (singular-process) singular-demo-command-on-leave))
     (force-mode-line-update))))
+
+(defun singular-demo-exit ()
+  "Prematurely exit singular demo mode."
+  (interactive)
+  (singular-demo-mode 'exit))
 
 (defun singular-demo-show-next-chunk ()
   "Show next chunk of demo file at input prompt.
@@ -765,33 +826,34 @@ Finds and removes chunk separators as specified by
 `singular-demo-chunk-regexp'.
 Removing chunk separators affects undo information and buffer-modified
 flag.
-Returns non-nil if there is still demo text to show."
+Leaves demo mode after showing last chunk."
   (let ((old-point-min (point-min)))
     (unwind-protect
 	(progn
 	  (goto-char (point-max))
 	  (widen)
-	  (progn
-	    (if (re-search-forward singular-demo-chunk-regexp singular-demo-end 'limit)
-		(progn
-		  (and (match-beginning 1)
-		       (delete-region (match-beginning 1) (match-end 1)))
-		  t)
-	      ;; remove trailing white-space
-	      (skip-syntax-backward "-")
-	      (delete-region (point) singular-demo-end)
-	      nil)))
+	  (if (re-search-forward singular-demo-chunk-regexp singular-demo-end 'limit)
+	      (and (match-beginning 1)
+		   (delete-region (match-beginning 1) (match-end 1)))
+	    ;; remove trailing white-space
+	    (skip-syntax-backward "-")
+	    (delete-region (point) singular-demo-end)
+	    (singular-demo-mode 'leave)))
 
       ;; this is unwind-protected
       (narrow-to-region old-point-min (point)))))
 
 (defun singular-demo-load (demo-file)
-  "Load demo file DEMO-FILE and switch to Singular demo mode.
-For a description of Singular demo mode one should refer to the
-doc-string of `singular-send-input'.
-Moves point to end of buffer, inserts contents of DEMO-FILE there, and
-makes the first chunk of the demo file visible."
+  "Load demo file DEMO-FILE and enter Singular demo mode.
+For a description of the Singular demo mode one should refer to the
+doc-string of `singular-interactive-mode'.
+Moves point to end of buffer and inserts contents of DEMO-FILE there."
   (interactive "fLoad demo file: ")
+
+  ;; check for running demo
+  (and singular-demo-mode
+       (error "Another demo is already running"))
+
   (let ((old-point-min (point-min)))
     (unwind-protect
 	(progn
@@ -805,8 +867,8 @@ makes the first chunk of the demo file visible."
       ;; This is unwide protected.
       (narrow-to-region old-point-min (point)))
 
-    ;; show first chunk of demo file
-    (singular-demo-mode (singular-demo-show-next-chunk))))
+    ;; switch demo mode on
+    (singular-demo-mode 'enter)))
 ;;}}}
       
 ;;{{{ Sending input and receiving output
@@ -925,7 +987,7 @@ non-nil, otherwise on a per-line base."
       (and singular-demo-mode
 	  (eq (point) pmark)
 	  (eq pmark (point-max)))
-      (singular-demo-mode (singular-demo-show-next-chunk)))
+      (singular-demo-show-next-chunk))
 
      (;; get old input
       (< (point) pmark)
@@ -1095,7 +1157,7 @@ NOT READY [much more to come.  See shell.el.]!"
       (setq comint-input-ring-file-name nil))
 
   ;; initialize singular demo mode
-  (singular-demo-mode-init)
+  (singular-demo-mode 'init)
 
   ;; selective display
   (setq selective-display t)
@@ -1148,7 +1210,8 @@ process buffer is still alive."
   (save-excursion
     (singular-debug 'interactive
 		    (message "Sentinel: %s" (substring message 0 -1)))
-    (singular-demo-mode nil)
+    ;; exit demo mode if necessary
+    (singular-demo-mode 'exit)
     (if (string-match "finished\\|exited" message)
 	(let ((process-buffer (process-buffer process)))
 	  (if (and process-buffer
