@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.12 1997-07-30 15:06:33 schmidt Exp $ */
+/* $Id: canonicalform.cc,v 1.13 1997-07-31 13:10:10 schmidt Exp $ */
 
 #include <config.h>
 
@@ -1243,49 +1243,60 @@ CanonicalForm::isFFinGF() const
     return is_imm( value ) == GFMARK && gf_isff( imm2int( value ) );
 }
 
+//{{{ CanonicalForm CanonicalForm::sqrt() const
+//{{{ docu
+//
+// sqrt() - calculate integer square root.
+//
+// CO has to be an integer greater or equal zero.  Returns the
+// largest integer less or equal sqrt(CO).
+//
+// In the immediate case, we use the newton method to find the
+// root.  The algorithm is from H. Cohen - A Course in
+// Computational Algebraic Number Theory, ch. 1.7.1.
+//
+//}}}
 CanonicalForm
-CanonicalForm::sqrt ( ) const
+CanonicalForm::sqrt() const
 {
     if ( is_imm( value ) ) {
-	ASSERT( is_imm( value ) == INTMARK, "not implemented" );
-	int a = imm2int( value );
-	ASSERT( a >= 0, "arg to sqrt less than zero" );
-	if ( a == 0 || a == 1 )
-	    return CanonicalForm( CFFactory::basic( a ) );
+	ASSERT( is_imm( value ) == INTMARK, "sqrt() not implemented" );
+	int n = imm2int( value );
+	ASSERT( n >= 0, "arg to sqrt() less than zero" );
+	if ( n == 0 || n == 1 )
+	    return CanonicalForm( CFFactory::basic( n ) );
 	else {
-	    int x0, x1 = a;
-	    long long int h;
+	    int x, y = n;
 	    do {
-		x0 = x1;
-		h = (long long int)x0 * x0 + a - 1;
-		if ( h % (2 * x0) == 0 )
-		    x1 = h / (2 * x0);
-		else
-		    x1 = (h - 1)  / (2 * x0);
-	    } while ( x1 < x0 );
-	    return CanonicalForm( CFFactory::basic( x1 ) );
+		x = y;
+		// the intermediate result may not fit into an
+		// integer, but the result does
+		y = (unsigned int)(x + n/x)/2;
+	    } while ( y < x );
+	    return CanonicalForm( CFFactory::basic( x ) );
 	}
     }
     else
 	return CanonicalForm( value->sqrt() );
 }
+//}}}
 
-//{{{ int CanonicalForm::ilog2( ) const
+//{{{ int CanonicalForm::ilog2 () const
 //{{{ docu
 //
 // ilog2() - integer logarithm to base 2.
 //
-// Returns the largest integer smaller than logarithm of CO to
-// base 2.  CO should be an integer.
+// Returns the largest integer less or equal logarithm of CO to
+// base 2.  CO should be a positive integer.
 //
 //}}}
 int
-CanonicalForm::ilog2( ) const
+CanonicalForm::ilog2 () const
 {
     if ( is_imm( value ) ) {
-	ASSERT( is_imm( value ) == INTMARK, "not implemented" );
+	ASSERT( is_imm( value ) == INTMARK, "ilog2() not implemented" );
 	int a = imm2int( value );
-	ASSERT( a > 0, "log arg <= 0" );
+	ASSERT( a > 0, "arg to ilog2() less or equal zero" );
 	int n = -1;
 	while ( a != 0 ) {
 	    n++;
