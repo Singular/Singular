@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmcheck.c,v 1.4 1999-03-18 17:00:15 Singular Exp $ */
+/* $Id: mmcheck.c,v 1.5 1999-03-19 16:00:06 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -20,6 +20,9 @@
 #include "mmprivate.h"
 #include "mmpage.h"
 #include "mmheap.h"
+#ifdef MTRACK
+#include "mmbt.h"
+#endif
 
 
 
@@ -167,9 +170,6 @@ void mmFillDBMCB(DBMCB* what, size_t size, memHeap heap,
 
   memset(what->front_pattern, MM_FRONT_PATTERN, MM_NUMBER_OF_FRONT_PATTERNS);
   memset((char*) addr + size, MM_BACK_PATTERN, DebugOffsetBack);
-  #ifdef MTRACK
-  mmTrack(what->bt_stack);
-  #endif
 }
 
 /**********************************************************************

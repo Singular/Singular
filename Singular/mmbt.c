@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmbt.c,v 1.6 1999-03-18 17:00:15 Singular Exp $ */
+/* $Id: mmbt.c,v 1.7 1999-03-19 16:00:05 Singular Exp $ */
 /*
 * ABSTRACT: backtrace: part of memory subsystem (for linux/elf)
 * needed programs: - mprpc to set the variable MPRPC
@@ -32,7 +32,7 @@
 */
 #if defined(linux) && defined(__i386__)
 
-static ulong mm_lowpc=0, mm_highpc=0;
+static unsigned long mm_lowpc=0, mm_highpc=0;
 
 extern int etext ();
 
@@ -45,7 +45,7 @@ extern int etext ();
 #define SLOP 0
 #endif
 
-#define entrypc(pc)        ((pc >= mm_lowpc && pc <= mm_highpc) || pc >= (ulong) &etext || (pc < 4096))
+#define entrypc(pc)        ((pc >= mm_lowpc && pc <= mm_highpc) || pc >= (unsigned long) &etext || (pc < 4096))
 #define getfp(ap)        (ap-2-SLOP)
 #define getpc(fp)        (fp[1+SLOP])
 
@@ -62,18 +62,18 @@ int mmTrackInit ()
   return 1;
 }
 
-void mmTrack (ulong *bt_stack)
+void mmTrack (unsigned long *bt_stack)
 {
-  ulong pc, *fp = getfp ((ulong *) &bt_stack);
+  unsigned long pc, *fp = getfp ((unsigned long *) &bt_stack);
   int i=0;
 
   if (mm_lowpc==0) mmTrackInit();
 
-  while ((fp!=NULL) && ((ulong)fp>4095)  && *fp && (pc = getpc (fp)) 
+  while ((fp!=NULL) && ((unsigned long)fp>4095)  && *fp && (pc = getpc (fp)) 
   && !entrypc (pc) && (i<BT_MAXSTACK))
   {
     bt_stack[i]=pc; i++;
-    fp = (ulong *) *fp;
+    fp = (unsigned long *) *fp;
   }
   while(i<BT_MAXSTACK)
   {
@@ -83,11 +83,11 @@ void mmTrack (ulong *bt_stack)
 
 struct
 {
-  ulong p;
+  unsigned long p;
   char *name;
 } p2n[MAX_PROCS_BT];
 
-static int mm_p2n_max;
+static int mm_p2n_max = -1;
 void mmP2cNameInit()
 {
   FILE *f;
@@ -109,11 +109,13 @@ void mmP2cNameInit()
   p2n[i].p=~1;
   mm_p2n_max=i;
 }
-char * mmP2cName(ulong p)
+char * mmP2cName(unsigned long p)
 {
   int a=0;
   int e=mm_p2n_max;
   int i;
+  if (mm_p2n_max == -1)
+    mmP2cNameInit();
   loop
   {
     if (a>=e-1) 
@@ -145,15 +147,20 @@ char * mmP2cName(ulong p)
 #endif
 }
 
-void mmPrintStack(ulong *bt_stack) /* print stack */
+void mmPrintStack(unsigned long *bt_stack) /* print stack */
 {
   int i=0;
+  PrintS(" ");
   do
   {
-    Print(":%x(%s)",bt_stack[i],mmP2cName(bt_stack[i]));
+    char *s;
+    fprintf( stderr,":%x",bt_stack[i]);
+    s=mmP2cName(bt_stack[i]); 
+    if (s!=NULL)
+      fprintf( stderr,"/%s",s);
     i++;
   } while ((i<BT_MAXSTACK) && (bt_stack[i]!=0));
-  PrintLn();
+  fprintf( stderr,"\n");
 }
 #endif /* linux, i386 */
 #endif /* not optimize */

@@ -272,6 +272,9 @@
 #define MAX_INT_LEN 11
 extern int pShortOut;
 
+/* the maximal level of stacks to remembre in debug (MTRACK) mode */
+#define BT_MAXSTACK 10
+
 #ifdef DO_PROFILE
 /* define to enable explicit profiling of some crucial inline
  * routines and defines  */
@@ -329,9 +332,9 @@ extern int pShortOut;
 #undef PAGE_DEBUG
 #endif
 
-
 /* define MTRACK for allowing to keep track of Alloc/Free with a backtrace */
 /* #define MTRACK */
+
 
 /* define PDEBUG checking polys, undefine otherwise */
 /* define PDEBUG 1 for additionally checking access to polys  -- vewry slow !*/

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmisc.c,v 1.3 1999-03-19 14:18:02 obachman Exp $ */
+/* $Id: mmisc.c,v 1.4 1999-03-19 16:00:07 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -12,6 +12,9 @@
 #include "mmprivate.h"
 #include "mmpage.h"
 #include "febase.h"
+#ifdef MTRACK
+#include "mmbt.h"
+#endif
 
 static int mm_specIndex = 0;
 static int mm_specSize = 0;
@@ -142,8 +145,13 @@ void mmTestList ( )
   fprintf(stderr,"list of used blocks:\n");
   while (what!=NULL)
   {
-    (void)fprintf( stderr, "%d bytes at %p in: %s:%d\n",
+    fprintf( stderr, "%d bytes at %p in: %s:%d",
       (int)what->size, what, what->fname, what->lineno);
+#ifdef MTRACK
+    mmPrintStack(what->bt_stack);
+#else
+    fprintf( stderr, "\n");
+#endif
     what=what->next;
   }
 }

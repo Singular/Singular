@@ -3,12 +3,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmprivate.h,v 1.6 1999-03-19 14:18:03 obachman Exp $ */
+/* $Id: mmprivate.h,v 1.7 1999-03-19 16:00:07 Singular Exp $ */
 /*
 * ABSTRACT
 */
 #include "structs.h"
 #include "mmheap.h"
+
+#define MAX_BLOCK_SIZE  (((SIZE_OF_HEAP_PAGE) / 16)*4)
 
 #define INDEX_ENTRY_T   char
 extern const INDEX_ENTRY_T mm_IndexTable[];
@@ -31,10 +33,8 @@ typedef struct DBMCB
   void* _nnext;
   struct DBMCB * next;
   struct DBMCB * prev;
-  #ifdef MTRACK
-  unsigned long bt_stack[BT_STACKMAX];
-  #endif
   char * fname;
+  unsigned long bt_stack[BT_MAXSTACK];
   size_t size;
   int lineno;
   int flags;

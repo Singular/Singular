@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmalloc.c,v 1.12 1999-02-03 13:18:59 obachman Exp $ */
+/* $Id: mmalloc.c,v 1.13 1999-03-19 16:00:04 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -20,6 +20,9 @@
 #include "tok.h"
 #include "mmemory.h"
 #include "mmprivate.h"
+#ifdef MTRACK
+#include "mmbt.h"
+#endif
 
 #undef HAVE_ASSUME
 #define HAVE_ASSUME
@@ -184,6 +187,10 @@ static void * mmDBAllocHeapS(memHeap heap, size_t size,
   mmAllocHeap((void*) result, heap);
 #endif  
 
+#ifdef MTRACK
+  mmTrack(result->bt_stack);
+#endif
+
   if (! mmCheckDBMCB(result, SizeFromRealSize(mmGetHeapBlockSize(heap)),
                      MM_FREEFLAG))
   {
@@ -272,6 +279,10 @@ void * mmDBAllocBlock( size_t size,  char * fname, int lineno)
         mm_maxAddr = (void*)result;
 
       mmFillDBMCB(result, size, NULL, MM_USEDFLAG, fname, lineno);
+  
+      #ifdef MTRACK
+      mmTrack(result->bt_stack);
+      #endif
       
       return (void*) &(result->data);
     }
