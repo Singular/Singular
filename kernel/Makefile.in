@@ -276,9 +276,9 @@ p_Procs_Lib.o: p_Procs_Lib.inc
 claptmpl.o: claptmpl.cc mod2.h
 	${CXX} ${CXXFLAGS}  ${CPPFLAGS} ${DEFS} -c $<	
 
-version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in \
+kversion.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in \
            configure.in
-	echo "#define feVersionId "  `date '+%Y%m%d%H'` >version.h
+	echo "#define feVersionId0 "  `date '+%Y%m%d%H'` >kversion.h
 
 # Hmm compiling with -fomit-frame-pointer resulted in access violation
 # under cygwin
@@ -340,7 +340,7 @@ clean: mostlyclean
 	-rm -f *.bak *.d *.dd depend 
 
 distclean: clean
-	-rm -f *~ .\#* version.h
+	-rm -f *~ .\#* kversion.h
 	-rm -f mod2.h Makefile TAGS* tags config.status config.cache config.log
 
 srcclean:

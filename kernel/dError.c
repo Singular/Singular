@@ -6,7 +6,7 @@
  *  Purpose: implementation for debug error handling
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: dError.c,v 1.1.1.1 2003-10-06 12:15:51 Singular Exp $
+ *  Version: $Id: dError.c,v 1.2 2005-01-14 10:46:15 Singular Exp $
  *******************************************************************/
 #ifndef DERROR_C
 #define DERROR_C
@@ -15,13 +15,13 @@
 #include "mod2.h"
 #include "distrib.h"
 #ifdef p_Procs_Static
-#include "version.h"
+#include "kversion.h"
 #endif
 #ifdef HAVE_CONFIG_H
 #include "omalloc.h"
 #endif
 #ifdef MAKE_DISTRIBUTION
-#include "version.h"
+#include "kversion.h"
 #endif
 
 #ifdef __cplusplus

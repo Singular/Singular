@@ -24,7 +24,7 @@
 #include "ring.h"
 #include "omSingularConfig.h"
 #include "p_Procs.h"
-#include "version.h"
+#include "kversion.h"
 
 #include "static.h"
 #ifdef HAVE_STATIC
