@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.122 1999-11-29 14:46:53 Singular Exp $ */
+/* $Id: extra.cc,v 1.123 1999-11-29 18:07:14 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -102,7 +102,9 @@ TIMING_DEFINE_PRINTPROTO( algLcmTimer );
 #endif
 
 void piShowProcList();
+#ifndef MAKE_DISTRIBUTION
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h);
+#endif
 
 
 //void emStart();
@@ -524,7 +526,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
    {
    #endif
 /*================= Extended system call ========================*/
-#ifdef HAVE_EXTENDED_SYSTEM
+#ifndef MAKE_DISTRIBUTION
      return(jjEXTENDED_SYSTEM(res, args));
 #else
      Werror( "system(\"%s\",...) %s", sys_cmd, feNotImplemented );
