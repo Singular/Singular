@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.184 2000-12-08 15:51:22 obachman Exp $
+@comment $Id: general.doc,v 1.185 2000-12-14 12:05:00 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -70,7 +70,7 @@ the online help is accessible by means of the @code{help} function
 @sc{Singular} can either be run in ASCII-terminal or within Emacs.
 
 To start @sc{Singular} in its ASCII-terminal user interface,  enter
-@code{Singular} at the system prompt. The 
+@code{Singular} at the system prompt. The
 @sc{Singular} banner appears which, among others, reports the version
 and the compilation date.
 
@@ -78,17 +78,17 @@ To start @sc{Singular} in its Emacs user interface, either enter
 @code{ESingular} at the system prompt, or type @code{M-x singular}
 wtihin a running Emacs (provided you have loaded the file
 @code{singular.el} in your running Emacs, see @ref{Running SINGULAR
-under Emacs} for details). 
+under Emacs} for details).
 
 Generally, we recommend to use @sc{Singular} in its Emacs interface,
-since this it offers many more features and is more convenient to 
+since this it offers many more features and is more convenient to
 use than the ASCII-terminal interface(@pxref{Emacs user interface}.
 
 To exit @sc{Singular} type @code{quit;}, @code{exit;} or @code{$} (or,
 when running within Emacs preferably type @code{C-c $}).
 
 @sc{Singular} and @code{ESingular} may also be started with command line
-options and with 
+options and with
 filenames as arguments. More generally, the synopsis of @sc{Singular} is
 @smallexample
 Singular  [options] [file1 [file2 @dots{}]]
@@ -227,7 +227,7 @@ file is executed before the first user input. Hence, putting
 @smallexample
 if (system("version") >= 1306) // keep backwards-compatibility
 @{
-  if (! system("--emacs") 
+  if (! system("--emacs")
   @{
     // only set help browser if not running within emacs
     system("--browser", "info");
@@ -238,7 +238,7 @@ if (system("version") >= 1306) // keep backwards-compatibility
 @}; // the last semicolon is important: otherwise no ">", but "." prompt
 @end smallexample
 in your file @code{$HOME/.singularrc} sets your default browser to
-@code{info}, unless @sc{Singular} is run within emacs (in which case the 
+@code{info}, unless @sc{Singular} is run within emacs (in which case the
 default browser is set automatically to @code{emacs}).
 
 
@@ -268,21 +268,21 @@ are the names of the respective programs in all up-case letters).
 @*For example,
 to use the program @code{navigator} with a private colormap as
 @code{netscape} help browser, set the environment variable
-@code{NETSCAPE} to the value 
+@code{NETSCAPE} to the value
 @code{"navigator -install"}.
 @c TBC (@xref{Setting environment variables}).
 
-@item 
+@item
 If the help browser @code{netscape} can not find the local html
 pages of the @sc{Singular} manual (which it looks for at
 @code{$RootDir/html} -- see @ref{Loading of a library} for more info on
 @code{$RootDir}) @emph{and} the (command-line) option @code{--allow-net}
 has @emph{explicitely} been set (see @ref{Command line options} and
-@ref{system} for more info on 
+@ref{system} for more info on
 setting values of command-line options), then it dispatches the html
 pages from
 @url{http://www.singular.uni-kl.de/Manual} (note that
-the non-local net-access of HTML pages is disabled, by default). 
+the non-local net-access of HTML pages is disabled, by default).
 @*An
 alternative location of a local directory where the html pages reside
 can be specified by setting the environment variable
@@ -308,7 +308,7 @@ environment variable @code{SINGULAR_INFO_FILE}.
 
 
 @subsubheading Info help browsers
-@cindex info 
+@cindex info
 
 The help browsers @code{tkinfo}, @code{xinfo} and @code{info} (so-called
 info help browsers) are based on the
@@ -375,7 +375,7 @@ picks i-th subtopic from a menu
 @cindex Interrupting SINGULAR
 
 On Unix-like operating systems and on Windows NT, typing @code{CTRL-C}
-(or, alternatively @code{C-c C-c}, when running within Emacs), 
+(or, alternatively @code{C-c C-c}, when running within Emacs),
 interrupts @sc{Singular}.  @sc{Singular} prints the current command and
 the current line and prompts for further action.  The following choices
 are available:
@@ -492,7 +492,7 @@ Print a one-line description of each command line option and exit.
 @cindex help, accessing over the net
 Allow the @code{netscape} and @code{html} help browser to fetch HTML manual pages over
 the net from the WWW home-site of @sc{Singular}. @xref{The online help
-system}, for more info. 
+system}, for more info.
 
 @item @code{--browser=VAL}
 @cindex --browser
@@ -503,7 +503,7 @@ Use @code{VAL} as browser for the @sc{Singular} online manual.
 on your platform and local
 installation, only some browsers might be available. The default browser
 is @code{html} for Windows and @code{netscape} for Unix
-platforms. @xref{The online help system}, for more info. 
+platforms. @xref{The online help system}, for more info.
 
 @item @code{--no-rc}
 @cindex --no-rc
@@ -656,8 +656,8 @@ if an option was not given), can be checked with the command
 @c example
 @end smallexample
 
-Furthermore, the value of options (e.g., @code{--browser}) can be 
-re-set while @sc{Singular} is running with the command 
+Furthermore, the value of options (e.g., @code{--browser}) can be
+re-set while @sc{Singular} is running with the command
 @code{system("}--long_option_name_string @code{",}expression@code{)}. @xref{system}.
 @smallexample
   system("--browser", "builtin");  // sets browser to 'builtin'
@@ -698,36 +698,36 @@ line) in that order.
 @end enumerate
 
 @strong{Note:} @code{.singularrc} file(s) are an approriate place for
-setting some default values of (command-line) options. 
+setting some default values of (command-line) options.
 
 For example, a system administrator might remove the locally installed
 HTML version of the manual and put a @code{.singularrc} file
 with the following content
 @smallexample
 if (system("version") >= 1306) // assure backwards-compatibility
-@{ 
-  system("--allow-net", 1);    
+@{
+  system("--allow-net", 1);
 @}; // the last semicolon is important: otherwise no ">", but "." prompt
 @end smallexample
 in the directory containing the @sc{Singular} libraries, thereby
 allowing to fetch the HTML on-line help from the WWW home-site of
 @sc{Singular}.
 
-On the other hand, a single user might put a @code{.singularrc} with the 
-following content 
+On the other hand, a single user might put a @code{.singularrc} with the
+following content
 @smallexample
 if (system("version") >= 1306) // assure backwards-compatibility
-@{ 
+@{
   if (! system("--emacs"))
   @{
     // set default browser to info, unless we run within emacs
-    system("--browser", "info"); 
+    system("--browser", "info");
   @}
 @}; // the last semicolon is important: otherwise no ">", but "." prompt
 @end smallexample
 in her home directory, which sets the default help browser to
 @code{info} (unless @sc{Singular} is run within emcas) and thereby
-prevents the execution of the"global" 
+prevents the execution of the"global"
 @code{.singularrc} file installed by the system administrator (since the
 @code{.singularrc} file of the user is found before the "global"
 @code{.singularrc} file installed by the system administrator).
@@ -757,31 +757,31 @@ offers much more. Among others, it offers
 color-highlighting
 @item
 truncation of long lines
-@item 
+@item
 folding of input and output
 @item
 TAB-completion for help topics
-@item 
+@item
 highlighting of matching parenthesis
-@item 
+@item
 key-bindings and interactive menus for most user interface commands and
 for basic @sc{Singular} commands (such as loading of libraries and files)
 @item
 a mode for running interactive @sc{Singular} demonstrations
-@item 
+@item
 convenient ways to edit @sc{Singular} input files
-@item 
+@item
 interactive customization of nearly all aspects of the user-interface.
 @end itemize
 
 To use the @sc{Singular}-Emacs interface you need to have Emacs version
-20 or higher, or XEmacs 
+20 or higher, or XEmacs
 version 20 or higher installed on your system. These
 editors can be downloaded for most hard- and software platforms
-(including Windows 
+(including Windows
 95/98/NT, but excluding the Macintosh), from either
 @uref{http://www.fsf.org/software/emacs/emacs.html} (Emacs), from
-@uref{http://www.xemacs.org} (XEmacs), or from our ftp site at 
+@uref{http://www.xemacs.org} (XEmacs), or from our ftp site at
 @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils/}. The
 differences between Emacs and XEmacs w.r.t. the  @sc{Singular}-Emacs
 interface are marginal -- which editor to use is mainly a matter of personal
@@ -794,10 +794,10 @@ already running Emacs -- see @ref{Running SINGULAR under Emacs} for
 details.
 
 The next section gives  a tutorial-like introduction of Emacs. This
-introductory section is 
-followed by sections which explain the functionality of various aspects 
+introductory section is
+followed by sections which explain the functionality of various aspects
 of the Emacs user interface in more detail: how to start/restart/kill
-@sc{Singular} within Emacs, how to run an interactive demonstration, how 
+@sc{Singular} within Emacs, how to run an interactive demonstration, how
 to customize the Emacs user interface, etc. Finally, the 20 most
 important commands of the Emacs interface together with their key
 bindings are listed.
@@ -814,7 +814,7 @@ bindings are listed.
 @c --------------------------------------------------------------------------
 @node A quick guide to Emacs, Running SINGULAR under Emacs, Emacs user interface, Emacs user interface
 @subsection A quick guide to Emacs
-@cindex Emacs, overview 
+@cindex Emacs, overview
 @cindex Emacs, a quick guide
 
 This section gives a tutorial-like introduction to Emacs. Especially to
@@ -827,16 +827,16 @@ keyboards, the @code{META} key is labeled @code{ALT} or @code{EDIT} or
 something else (for example, on Sun keyboards, the diamond key to the
 left of the space-bar is @code{META}).  If there is no @code{META} key,
 the @code{ESC} key can be used, instead.  Rather than writing out
-@code{META} or 
+@code{META} or
 @code{CONTROL} each time we want to prefix a character, we will use the
-following abbreviations: 
+following abbreviations:
 
 @multitable @columnfractions .2 .8
 @item @code{C-<chr>}
 @tab means hold the @code{CONTROL} key while typing the character
 @code{<chr>}. Thus, @code{C-f} would be: hold the @code{CONTROL} key and
 type @code{f}.
-@item @code{M-<chr>}  
+@item @code{M-<chr>}
 @tab means hold the @code{META} key down while typing @code{<chr>}.  If there
 is no @code{META} key, type @code{<ESC>}, release it, then type the
 character @code{<chr>}.
@@ -850,15 +850,15 @@ For others, it is important to understand the following Emacs concepts:
 @item window
 In Emacs terminology, a window refers to separate panes within the same
 window of the window system, and not to overlapping, separate
-windows. When using @sc{Singular} within Emacs, extra windows may appear 
-which display help or output from certain commands. The most important 
+windows. When using @sc{Singular} within Emacs, extra windows may appear
+which display help or output from certain commands. The most important
 window commands are:
 @multitable @columnfractions 2. .3 .5
-@item @code{C-x 1} 
+@item @code{C-x 1}
 @tab @code{File->Un-Split}
 @tab Un-Split window (i.e., kill other windows)
 @item @code{C-x o}
-@tab 
+@tab
 @tab Goto other window, i.e. move cursor into other window.
 @end multitable
 
@@ -868,16 +868,16 @@ paraphrase, the cursor shows on the screen where point is located in
 the text. Here is a summary of simple cursor-moving operations:
 @multitable @columnfractions .2 .8
 @item @code{C-f} @tab   Move forward a character
-@item @code{C-b} @tab 	Move backward a character
-@item @code{M-f} @tab 	Move forward a word
-@item @code{M-b} @tab 	Move backward a word
-@item @code{C-a} @tab 	Move to beginning of line
-@item @code{C-e} @tab 	Move to end of line
+@item @code{C-b} @tab   Move backward a character
+@item @code{M-f} @tab   Move forward a word
+@item @code{M-b} @tab   Move backward a word
+@item @code{C-a} @tab   Move to beginning of line
+@item @code{C-e} @tab   Move to end of line
 @end multitable
 
 @item buffer
 Any text you see in an Emacs window is always part of some buffer. For
-example, each file you are editing with Emacs is stored inside a buffer, 
+example, each file you are editing with Emacs is stored inside a buffer,
 but also @sc{Singular} is running inside an Emacs buffer. Each buffer
 has a name: for example, the buffer of a file you edit usually has the
 same name as the file, @sc{Singular} is running in a buffer which has
@@ -889,14 +889,14 @@ When you are asked for input to an Emacs command, the cursor
 moves to the bottom line of Emacs, i.e., to a special buffer, called the
 "minibuffer". Typing @code{<RETURN>} within the minibuffer, ends the
 input, typing @code{<SPACE>} within the minibuffer, lists all possible
-input values to the interactive Emacs command. 
+input values to the interactive Emacs command.
 
 The most important buffer commands are
 @multitable @columnfractions .2 .8
 @item @code{C-x b} @tab Switch buffer
 @item @code{C-x k} @tab Kill current buffer
 @end multitable
-Alternatively, you can switch to or kill buffers using the @code{Buffer} 
+Alternatively, you can switch to or kill buffers using the @code{Buffer}
 menu.
 
 @item Executing commands
@@ -904,7 +904,7 @@ Emacs commands are executed by typing @code{M-x <command-name>}
 (remember that @code{<SPACE>} completes partial
 command names). Important and frequently used commands have short-cuts
 for their execution: Key bindings or even menu entries. For example, a
-file can be loaded with @code{M-x load-file}, or @code{C-x C-f}, or with 
+file can be loaded with @code{M-x load-file}, or @code{C-x C-f}, or with
 the @code{File->Open} menu.
 
 @item How to exit
@@ -918,7 +918,7 @@ typing @code{C-g}, or, if this fails, by typing @code{C-]}.
 
 @item More help
 Nearly all aspects of Emacs are very well documented: type
-@code{C-h}  and then a character saying what kind of help you want. 
+@code{C-h}  and then a character saying what kind of help you want.
 For example, typing @code{C-h i} enters the @code{Info} documentation
 browser.
 
@@ -1060,7 +1060,7 @@ The default working directory. This is the path to an existing
 directory, e.g., @code{~/work}. The current directory is set to this
 directory before @sc{Singular} is started.
 
-@item 
+@item
 Command line options. You can set any @sc{Singular} command line
 option (see @ref{Command line options}).
 
@@ -1075,7 +1075,7 @@ default})
 
 Starts @sc{Singular} with default settings for the executable, the
 working directory, command line switches, and the buffer name. You can
-customize this default settings, see 
+customize this default settings, see
 @ref{Customization of the Emacs interface}.
 
 @item @code{singular-exit-singular} (bound to @code{C-c $} or menu
@@ -1106,7 +1106,7 @@ Whenever a @sc{Singular} process is started within the Emacs interface,
 the contents of a special startup file (by default
 @code{~/.emacs-singularrc}) is pasted as input to @sc{Singular} at the
 very end of the usual startup sequence (see @ref{Startup sequence}). The
-name of the startup file can be changed, see 
+name of the startup file can be changed, see
 @ref{Customization of the Emacs interface}.
 
 
@@ -1120,24 +1120,24 @@ name of the startup file can be changed, see
 The Emacs interface can be used to run interactive @sc{Singular}
 demonstrations. A demonstration is started by loading a so-called
 @sc{Singular} demo file with the Emacs command
-@code{singular-demo-load}, bound to 
+@code{singular-demo-load}, bound to
 @code{C-c C-d}, or with the menu @code{Commands->Load Demo}.
 
 A @sc{Singular} demo file should consist of @sc{Singular} commands
 separated by blank lines. When running a demo, the input up to the next
-blank line is echoed to the screen. Hitting @code{<RETURN>} executes the 
+blank line is echoed to the screen. Hitting @code{<RETURN>} executes the
 echoed commands and shows their output. Hitting @code{<RETURN>} again,
 echos the next commands to the screen, and so on, until all commands of
-the demo file are executed. While running a demo, you can 
+the demo file are executed. While running a demo, you can
 execute other commands on the @sc{Singular} prompt: the next input of
 from the demo file is then echoed again, if you hit @code{<RETURN>} on
 an empty input line.
 
 A @sc{Singular} demo can prematurely be exited by either starting
 another demo, or by executing the Emacs command
-@code{singular-demo-exit} (menu: @code{Commands->Exit Demo}). 
+@code{singular-demo-exit} (menu: @code{Commands->Exit Demo}).
 
-Some aspects of running @sc{Singular} demos can be customized. 
+Some aspects of running @sc{Singular} demos can be customized.
 @xref{Customization of the Emacs interface}, for more info.
 
 
@@ -1193,7 +1193,7 @@ to your personal @code{.emacs} file.
 Here you can specify various different things such as the behavior of
 the cursor keys, the name of the special @sc{Singular} startup file, the
 appearance of the help window, or the default values for the
-@code{singular} command. 
+@code{singular} command.
 @c Time: I find this sentence rather confusing
 @c For a first look at customization of the
 @c interface, this is probably the best group.
@@ -1224,8 +1224,8 @@ should use the Emacs C/C++-mode to edit @sc{Singular} input files and
 @sc{Singular} libraries. Among others, this Emacs mode provides
 automatic indentation, line-breaking and keyword highlighting.
 
-When running @code{ESingular}, the C/C++-mode is automatically turned on 
-whenever a file with the suffix @code{.sing}, or @code{.lib} is loaded. 
+When running @code{ESingular}, the C/C++-mode is automatically turned on
+whenever a file with the suffix @code{.sing}, or @code{.lib} is loaded.
 
 For Emacs sessions which were not started by @code{ESingular},  you
 should add the following to your @code{.emacs} file:
@@ -1235,7 +1235,7 @@ should add the following to your @code{.emacs} file:
 (setq auto-mode-alist (cons '("\\.lib\\'" .  c++-mode) auto-mode-alist))
 ;; turn-on fontification for c++-mode
 (add-hook 'c++-mode-hook
-	  (function (lambda () (font-lock-mode 1))))
+         (function (lambda () (font-lock-mode 1))))
 ;; turn on aut-new line and hungry-delete
 (add-hook 'c++-mode-hook
           (function (lambda () (c-toggle-auto-hungry-state 1))))
@@ -1245,7 +1245,7 @@ should add the following to your @code{.emacs} file:
   (interactive)
   (let ((face (get-text-property (point) 'face)))
     (if face
-	(customize-face face)
+        (customize-face face)
       (message "No face defined at point"))))
 
 @end smallexample
@@ -3238,7 +3238,7 @@ Libraries can be loaded with the @code{LIB} command:
 none
 @item @strong{Purpose:}
 reads a library of procedures from a file. If the given filename does
-not start with @kbd{.} or @kbd{/} and can not be located in the current 
+not start with @kbd{.} or @kbd{/} and can not be located in the current
 directory, each directory contained in the library
 @code{SearchPath} is searched for file of this name.
 @item @strong{Note on SearchPath:}
@@ -3249,22 +3249,22 @@ start-up time as follows:
 the directories contained in the environment variable
 @code{SINGULARPATH} are appended
 
-@item 
+@item
 the directories @code{$BinDir/LIB}, @code{$RootDir/LIB},
 @code{$RootDir/../LIB}, @code{$DefaultDir/LIB}, @code{$DefaultDir/../LIB}
-are appended, where 
+are appended, where
 @itemize @bullet
-@item @code{$BinDir} 
+@item @code{$BinDir}
 is the value of the environment variable
 @code{SINGULAR_BIN_DIR}, if set, or, if not set, the directory in which the
-@sc{Singular} program 
+@sc{Singular} program
 resides
-@item @code{$RootDir} 
+@item @code{$RootDir}
 is the value of the environment variable
 @code{SINGULAR_ROOT_DIR}, if set, or, if not set, @code{$BinDir/../}.
-@item @code{$DefaultDir} 
+@item @code{$DefaultDir}
 is the value of the environment variable
-@code{SINGULAR_DEFAULT_DIR}, if set, or @code{/usr/local/Singular/} on a 
+@code{SINGULAR_DEFAULT_DIR}, if set, or @code{/usr/local/Singular/} on a
 Unix platform, @code{\Singular\} on a Windows 95/98/NT platform, and
 @code{::Singular:} on a Macintosh.
 @end itemize
@@ -3278,7 +3278,7 @@ your shell.
 
 The library @code{SearchPath} can be examined  by starting up
 @sc{Singular} with the option @code{-v}, or by issuing the command
-@code{system("--version");}. 
+@code{system("--version");}.
 
 @item @strong{Note on standard.lib:}
 Unless  @sc{Singular} is started with the @code{--no-stdlib} option, the
@@ -3562,8 +3562,8 @@ procedures}
 
 @item
 consult the source code of libraries like
-@code{template.lib} (@pxref{template_lib}) or @code{standard.lib}
-(@pxref{standard_lib}) for examples on how library documentations are
+@code{template.lib} (@pxref{template_lib})
+for examples on how library documentations are
 written
 
 @item
@@ -3618,7 +3618,7 @@ help strings are typeset within a @code{@@table @@asis} environment
 (which is similar to a latex @code{description} environment).
 @item
 If a line starts with  only uppercase words and contains a colon, then
-the text up 
+the text up
 to the colon is taken to be the description-string of an item and the
 text following the colon is taken to be the content of the item.
 @item
@@ -3691,7 +3691,7 @@ for a reference to the node @code{node} within parenthesis.
 @code{... storms cause flooding (@@pxref@{Hurricanes@}) ...}
 @*@expansion{}... storms cause flooding (*Note Hurricanes::) ...
 @*@expansion{}... storms cause flooding (see Section 3.1 [Hurricanes],
-page 24) 
+page 24)
 @end table
 
 @item @code{@@math@{..@}}
