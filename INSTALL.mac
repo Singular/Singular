@@ -47,13 +47,13 @@ After unpacking, you will have a directory structure like:
   ./Singular/<x-y-z>/Singular            Singular executable
   ./Singular/<x-y-z>/libparse            parser for Singular libraries
   ./Singular/LIB/<x-y-z>/                Singular libraries
-  ./Singular/LIB/gftables/             Singular gftables
+  ./Singular/LIB/gftables/               Singular gftables
   ./Singular/doc/<x-y-z>/                documentation (ps, dvi, info)
   ./Singular/html/<x-y-z>/               documentation (html)
-  ./Singular/README                    information of the distribution
-  ./Singular/COPYING                   licence information
-  ./Singular/README.general            general Singular info 
-  ./Singular/INSTALL                   this file
+  ./Singular/README                      information of the distribution
+  ./Singular/COPYING                     licence information
+  ./Singular/README.general              general Singular info 
+  ./Singular/INSTALL                     this file
 
 
 For the executable to work, the directory layout must look like this.
@@ -63,9 +63,9 @@ another place.
 TO INSTALL MPW
 ==============
 A minimal version of MPW is downloadable from Apple at
-ftp://dev.apple.com//devworld/Tool_Chest/Core_Mac_OS_Tools/MPW_etc./MPW-GM/MPW/ .
-You only need the file containing the MPW shell (i.e., 'MPW_Shell.sit.hqx'). 
+ftp://ftp.apple.com/developer/Tool_Chest/Core_Mac_OS_Tools/MPW_etc./MPW-GM/MPW/
 
+You only need the file containing the MPW shell (i.e., 'MPW_Shell.sit.hqx'). 
 However, if you wish to start Singular  from within the MPW shell you
 furthermore need the file  'Tools/GetFileName.sit.hqx'.
 
