@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.42 1999-11-23 17:58:47 Singular Exp $ */
+/* $Id: polys-impl.h,v 1.43 2000-01-26 18:10:53 Singular Exp $ */
 
 /***************************************************************
  *
@@ -136,6 +136,7 @@ extern Exponent_t pDBRingSetComp(ring r, poly p, Exponent_t k, char* f, int l);
 #define pSetCompS(p, k, l) pDBSetComp(p, k, l, __FILE__, __LINE__)
 
 #else  // ! (defined(PDEBUG) && PDEBUG > 1)
+#ifndef HAVE_SHIFTED_EXPONENTS
 
 #define _pSetExp(p,v,E)     (p)->exp.e[_pExpIndex(v)]=(E)
 #define _pGetExp(p,v)       (p)->exp.e[_pExpIndex(v)]
@@ -147,6 +148,73 @@ extern Exponent_t pDBRingSetComp(ring r, poly p, Exponent_t k, char* f, int l);
 
 #define _pRingSetExp(r,p,e_i,e_v)     (p)->exp.e[_pRingExpIndex(r,e_i)]=(e_v)
 #define _pRingGetExp(r,p,v)       (p)->exp.e[_pRingExpIndex(r,v)]
+#else
+inline Exponent_t pSGetExp(poly p, int v, ring r)
+{
+  return (p->exp.l[(r->VarOffset[v] & 0xffffff)] >> (r->VarOffset[v] >> 24))
+          & r->bitmask;
+}
+
+inline Exponent_t pSSetExp(poly p, int v, int e, ring r)
+{
+  // shift e to the left:
+  register int shift = r->VarOffset[v] >> 24;
+  unsigned long ee = ((unsigned long)e) << shift /*(r->VarOffset[v] >> 24)*/;
+  // clear the bits in the exponent vector:
+  register int offset = (r->VarOffset[v] & 0xffffff);
+  p->exp.l[offset]  &=
+    ~( r->bitmask << shift );
+  // insert e with |
+  p->exp.l[ offset ] |= ee;
+  return e;
+}
+
+inline Exponent_t pSIncrExp(poly p, int v, ring r)
+{
+  Exponent_t e=pSGetExp(p,v,r);
+  e++;
+  return pSSetExp(p,v,e,r);
+}
+
+inline Exponent_t pSDecrExp(poly p, int v, ring r)
+{
+  Exponent_t e=pSGetExp(p,v,r);
+  e--;
+  return pSSetExp(p,v,e,r);
+}
+
+inline Exponent_t pSAddExp(poly p, int v, Exponent_t e, ring r)
+{
+  Exponent_t ee=pSGetExp(p,v,r);
+  ee+=e;
+  return pSSetExp(p,v,ee,r);
+}
+
+inline Exponent_t pSSubExp(poly p, int v, Exponent_t e, ring r)
+{
+  Exponent_t ee=pSGetExp(p,v,r);
+  ee-=e;
+  return pSSetExp(p,v,ee,r);
+}
+
+inline Exponent_t pSMultExp(poly p, int v, Exponent_t e, ring r)
+{
+  Exponent_t ee=pSGetExp(p,v,r);
+  ee*=e;
+  return pSSetExp(p,v,ee,r);
+}
+
+#define _pSetExp(p,v,E)     pSSetExp(p,v,E,currRing)
+#define _pGetExp(p,v)       pSGetExp(p,v,currRing)
+#define _pIncrExp(p,v)      pSIncrExp(p,v,currRing)
+#define _pDecrExp(p,v)      pSDecrExp(p,v,currRing)
+#define _pAddExp(p,i,v)     pSAddExp(p,i,v,currRing)
+#define _pSubExp(p,i,v)     pSSubExp(p,i,v,currRing)
+#define _pMultExp(p,i,v)    pSMultExp(p,i,v,currRing)
+
+#define _pRingSetExp(r,p,e_i,e_v)  pSSetExp(p,e_i,e_v,r)
+#define _pRingGetExp(r,p,v)        pSGetExp(p,v,r)
+#endif
 
 #define _pSetComp(p,k)      _pGetComp(p) = (k)
 #define _pDecrComp(p)       _pGetComp(p)--
@@ -161,6 +229,7 @@ extern Exponent_t pDBRingSetComp(ring r, poly p, Exponent_t k, char* f, int l);
 #define _pIncrComp(p)       _pGetComp(p)++
 #define _pRingGetComp(r,p)        ((p)->exp.e[_pRingCompIndex(r)])
 
+#ifndef HAVE_SHIFTED_EXPONENTS
 inline Exponent_t _pGetExpSum(poly p1, poly p2, int i)
 {
   int index = _pExpIndex(i);
@@ -171,7 +240,16 @@ inline Exponent_t _pGetExpDiff(poly p1, poly p2, int i)
   int index = _pExpIndex(i);
   return p1->exp.e[index] - p2->exp.e[index];
 }
-
+#else
+inline Exponent_t _pGetExpSum(poly p1, poly p2, int i)
+{
+  return _pGetExp(p1,i) + _pGetExp(p2,i);
+}
+inline Exponent_t _pGetExpDiff(poly p1, poly p2, int i)
+{
+  return _pGetExp(p1,i) - _pGetExp(p2,i);
+}
+#endif
 
 inline void _pGetExpV(poly p, Exponent_t *ev)
 {

@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.45 1999-11-25 11:55:16 obachman Exp $ */
+/* $Id: ring.h,v 1.46 2000-01-26 18:10:54 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -219,6 +219,10 @@ void rOptimizeOrder(ring r);
 extern BOOLEAN rDBTest(ring r, char* fn, int l);
 #else
 #define rTest(r)
+#endif
+
+#ifdef HAVE_SHIFTED_EXPONENTS
+unsigned long rGetExpSize(unsigned long bitmask, int & bits);
 #endif
 
 void rDebugPrint(ring r);
