@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.25 1997-07-11 14:27:57 Singular Exp $ */
+/* $Id: tesths.cc,v 1.26 1997-07-15 11:58:52 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -208,7 +208,15 @@ int main(          /* main entry to Singular */
   dlInit(thisfile);
   myynest=0;
   if (load_std_lib)
+  {
     iiLibCmd(mstrdup("standard.lib"),TRUE);
+    idhdl h=idroot->get("init",0);
+    if ((h!=NULL) && (IDTYP(h)==PROC_CMD))
+    {
+      leftv r=iiMake_proc(h,NULL);
+      r->CleanUp();
+    }
+  }  
   errorreported = 0;
 #ifndef macintosh
 #if defined(HAVE_FEREAD) || defined(HAVE_READLINE)
