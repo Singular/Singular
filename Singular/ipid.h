@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.11 1998-04-03 17:38:39 Singular Exp $ */
+/* $Id: ipid.h,v 1.12 1998-05-04 14:11:38 Singular Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -21,8 +21,8 @@ struct sip_sring
   char**     parameter; /* names of parameters */
   number     minpoly;
   short**    wvhdl;  /* array of weight vectors */
-  char **    names;  /* array of varibale names */
-  /* extension to the ring structure: */
+  char **    names;  /* array of variable names */
+  /* extension to the ring structure: qring */
   ideal      qideal;
 #ifdef SDRING
   short      partN;
