@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.6 1997-09-01 08:50:56 schmidt Exp $ */
+/* $Id: cf_factor.cc,v 1.7 1997-09-09 09:25:52 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -18,7 +18,6 @@
 #include "assert.h"
 
 #include "cf_defs.h"
-#include "cf_globals.h"
 #include "canonicalform.h"
 #include "cf_iter.h"
 #include "fac_berlekamp.h"
@@ -42,7 +41,7 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
 	return CFFList( f );
     if ( getCharacteristic() > 0 ) {
 	ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
-	if ( cf_glob_switches.isOn( SW_BERLEKAMP ) )
+	if ( isOn( SW_BERLEKAMP ) )
 	    return FpFactorizeUnivariateB( f, issqrfree );
 	else
 	    return FpFactorizeUnivariateCZ( f, issqrfree );
