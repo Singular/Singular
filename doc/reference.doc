@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.9 1998-04-28 12:49:29 schmidt Exp $
+@comment $Id: reference.doc,v 1.10 1998-04-28 14:08:47 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -26,12 +26,6 @@
 @section Functions
 @cindex Functions
 
-The general syntax for a function is
-@*
-  [target @code{=} ] function_name @code{(} parameters @code{);}
-@*
-If no target is specified, the result is printed.
-@* In the following, @strong{Type} means the return type of the function.
 @ifinfo
 @*List of all supported functions.
 @end ifinfo
