@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sdb.cc,v 1.10 1999-08-20 16:06:48 Singular Exp $ */
+/* $Id: sdb.cc,v 1.11 1999-09-27 11:22:13 Singular Exp $ */
 /*
 * ABSTRACT: Singular debugger
 */
@@ -282,7 +282,7 @@ void sdb(Voice * currentVoice, const char * currLine, int len)
             memset(&tmp,0,sizeof(tmp));
             tmp.rtyp=IDHDL;
             tmp.data=h;
-            Print("(type %s):",Tok2Cmdname(tmp.Typ()));
+            Print("(type %s):\n",Tok2Cmdname(tmp.Typ()));
             tmp.Print();
           }
           break;

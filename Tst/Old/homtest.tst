@@ -4,6 +4,8 @@
 //==== Macaulay 1 sec
 //=== 0.54 sec
 
+option(prot);
+
 ring b1=32003,(a,b,c,d,e),dp;
 int n =10;
 poly s1=a+b+c+d+e;

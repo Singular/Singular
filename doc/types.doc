@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.103 1999-09-20 19:41:23 obachman Exp $
+@comment $Id: types.doc,v 1.104 1999-09-27 11:22:15 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -1919,10 +1919,26 @@ Q -> Q(a,..)
 
 @item
 @tex
+$Q \rightarrow R$
+@end tex
+@ifinfo
+Q -> R
+@end ifinfo
+
+@item
+@tex
 $Q \rightarrow  R$
 @end tex
 @ifinfo
 Q -> R
+@end ifinfo
+
+@item
+@tex
+$Q \rightarrow  C$
+@end tex
+@ifinfo
+Q -> C
 @end ifinfo
 
 @item
@@ -1943,26 +1959,18 @@ Z/p -> GF(p^n)
 
 @item
 @tex
-$Q \rightarrow  C$
+$Z/p \rightarrow  R$
 @end tex
 @ifinfo
-Q -> C
+Z/p -> R
 @end ifinfo
 
 @item
 @tex
-$Q \rightarrow  R$
+R \rightarrow Q$
 @end tex
 @ifinfo
-Q -> R
-@end ifinfo
-
-@item
-@tex
-$Z/p \rightarrow  short R$
-@end tex
-@ifinfo
-Z/p -> short R
+R -> Q
 @end ifinfo
 @end itemize
 
