@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.190 2001-01-18 15:38:19 keilen Exp $
+@comment $Id: general.doc,v 1.191 2001-01-19 10:37:48 keilen Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -634,7 +634,8 @@ interface, where @code{EMACS} may e.g. be emacs ore xemacs.
 
 @item --emacs-dir=DIR
 @cindex --emacs-dir
-Set the singular-emacs-home-directory to @code{DIR}.
+Set the singular-emacs-home-directory, which is the directory where
+singular.el can be found, to @code{DIR}.
 
 @item --emacs-load=FILE
 @cindex --emacs-load
@@ -989,7 +990,8 @@ interface, where @code{EMACS} may e.g. be emacs or xemacs.
 
 @item @code{--emacs-dir=DIR}
 @*@code{ESINGULAR_EMACS_DIR}
-@tab Set the singular-emacs-home-directory to @code{DIR}.
+@tab Set the singular-emacs-home-directory, which is the directory where
+singular.el can be found,  to @code{DIR}.
 
 @item @code{--emacs-load=FILE}
 @*@code{ESINGULAR_EMACS_LOAD}
