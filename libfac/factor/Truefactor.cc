@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-//static char * rcsid = "@(#) $Id: Truefactor.cc,v 1.4 1997-11-18 16:39:07 Singular Exp $";
+//static char * rcsid = "@(#) $Id: Truefactor.cc,v 1.5 2001-06-21 14:57:06 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // Factory - Includes
 #include <factory.h>
@@ -24,6 +24,48 @@
 
 #include "debug.h"
 #include "timing.h"
+
+int hasAlgVar(const CanonicalForm &f, const Variable &v)
+{
+  if (f.inBaseDomain()) return 0;
+  if (f.inCoeffDomain())
+  {
+    if (f.mvar()==v) return 1;
+    return hasAlgVar(f.LC(),v);
+  }
+  if (f.inPolyDomain())
+  {
+    if (hasAlgVar(f.LC(),v)) return 1;
+    for( CFIterator i=f; i.hasTerms(); i++)
+    {
+      if (hasAlgVar(i.coeff(),v)) return 1;
+    }
+  }  
+  return 0;
+}
+
+int hasAlgVar(const CanonicalForm &f)
+{
+  if (f.inBaseDomain()) return 0;
+  if (f.inCoeffDomain())
+  {
+    if (f.level()!=0) 
+    {
+      //cout << "hasAlgVar:" << f.mvar() <<endl;
+      return 1;
+    }  
+    return hasAlgVar(f.LC());
+  }
+  if (f.inPolyDomain())
+  {
+    if (hasAlgVar(f.LC())) return 1;
+    for( CFIterator i=f; i.hasTerms(); i++)
+    {
+      if (hasAlgVar(i.coeff())) return 1;
+    }
+  }  
+  return 0;
+}
 
 ///////////////////////////////////////////////////////////////
 // generate all different k-subsets of the set with n        //
@@ -80,6 +122,7 @@ combine( int m, const CFFList & LiftedFactors ){
     intermediate=1;
     for ( IntListIterator k=j.getItem(); k.hasItem(); k++ )
       intermediate *= getItemNr(k.getItem(), LiftedFactors);
+    if (!hasAlgVar(intermediate))    
     result.append(CFFactor(intermediate,1));
   }
   return result;
@@ -150,15 +193,23 @@ Truefactors( const CanonicalForm Ua, int levelU, const SFormList & SubstitutionL
   int c,r = PiList.length(),degU, onemore,M, h = subvardegree(Ua,levelU) + 1;
   ListIterator<CFFactor> i;
 
+  //cout << "SubstitutionList="<< SubstitutionList<<endl;
 // step 1: simply test the generated factors alone
   for ( i= PiList; i.hasItem();i++){
     factor = i.getItem();
-    c= mydivremt(U,factor.factor(),a,b);
-    if (  c  && b == U.genZero()) { // factor.getFactor() divides U
+    //CanonicalForm test_f=change_poly(factor.factor(),SubstitutionList,0);
+    CanonicalForm test_f=factor.factor();
+    //cout <<"f:" << factor.factor() << " -> test_f:"<<test_f <<endl;
+    //cout << "           1:" << change_poly(factor.factor(),SubstitutionList,1) <<endl;
+    c= mydivremt(U,test_f,a,b);
+    if (  c  && b == U.genZero() && !hasAlgVar(test_f)) // factor.getFactor() divides U
+    {
+      //cout << " teilt:" << test_f <<endl;
       U= a;
       FAC.append(factor);
     }
     else{
+      //cout << " teilt nicht:" << test_f <<endl;
       L.append(factor);
     }
   }
@@ -337,6 +388,10 @@ TakeNorms(const CFFList & PiList){
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.4  1997/11/18 16:39:07  Singular
+* hannes: moved WerrorS from C++ to C
+     (Factor.cc MVMultiHensel.cc SqrFree.cc Truefactor.cc)
+
 Revision 1.3  1997/09/12 07:19:52  Singular
 * hannes/michael: libfac-0.3.0
 

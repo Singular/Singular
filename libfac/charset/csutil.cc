@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: csutil.cc,v 1.4 1998-03-12 12:34:35 schmidt Exp $";
+static char * rcsid = "$Id: csutil.cc,v 1.5 2001-06-21 14:57:04 Singular Exp $";
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -19,9 +19,9 @@ lowerRank ( const CanonicalForm & f, const CanonicalForm & g, int & ind )
 {
   int df, dg;
   Variable vf = f.mvar(), vg = g.mvar();
-    
+
   if ( f.inCoeffDomain() ) {
-    if ( g.inCoeffDomain() ) ind= 1; 
+    if ( g.inCoeffDomain() ) ind= 1;
     return true;//( vg > vf );
   }
   else if ( g.inCoeffDomain() ) return false;
@@ -41,24 +41,24 @@ lowestRank( const CFList & F )
   CFListIterator i = F;
   CanonicalForm f;
   int ind=0;
-  if ( ! i.hasItem() )	return f;
+  if ( ! i.hasItem() )        return f;
   f = i.getItem(); ++i;
   while ( i.hasItem() ) {
-    //cout << "comparing " << f << "  and " << i.getItem() 
+    //cout << "comparing " << f << "  and " << i.getItem()
     // << " == " << lowerRank( i.getItem(), f, ind ) << endl;
     if ( lowerRank( i.getItem(), f, ind ) ) {
       if ( ind ){
-	CFList Itemlist= get_Terms(i.getItem());
-	CFList Flist= get_Terms(f);
-	
-	// Have to further compare number of terms!
-	//cout << "compare terms! f= " << Flist.length() << "  item= " 
-	//     << Itemlist.length() <<endl;
-	if ( Itemlist.length() < Flist.length()) f = i.getItem();
-	ind=0;
+        CFList Itemlist= get_Terms(i.getItem());
+        CFList Flist= get_Terms(f);
+
+        // Have to further compare number of terms!
+        //cout << "compare terms! f= " << Flist.length() << "  item= "
+        //     << Itemlist.length() <<endl;
+        if ( Itemlist.length() < Flist.length()) f = i.getItem();
+        ind=0;
       }
       else{
-	f = i.getItem();
+        f = i.getItem();
       }
     }
     ++i;
@@ -82,7 +82,7 @@ lowestRank( const CFList & F )
 //       reord = false;
 //       v = vg;
 //     }
-//     else { 
+//     else {
 //       v = Variable(level(f.mvar()) + 1);
 //       ff = swapvar(f,vg,v);
 //       gg = swapvar(g,vg,v);
@@ -114,7 +114,7 @@ Prem ( const CanonicalForm &f, const CanonicalForm &g ){
       reord = false;
       v = vg;
     }
-    else { 
+    else {
       v = Variable(level(f.mvar()) + 1);
       ff = swapvar(f,vg,v);
       gg = swapvar(g,vg,v);
@@ -152,8 +152,8 @@ Sprem ( const CanonicalForm &f, const CanonicalForm &g, CanonicalForm & m, Canon
   bool reord;
   Variable vf, vg, v;
 
-  if ( (vf = f.mvar()) < (vg = g.mvar()) ) { 
-    m=CanonicalForm(0); q=CanonicalForm(0); 
+  if ( (vf = f.mvar()) < (vg = g.mvar()) ) {
+    m=CanonicalForm(0); q=CanonicalForm(0);
     return f;
   }
   else {
@@ -162,13 +162,13 @@ Sprem ( const CanonicalForm &f, const CanonicalForm &g, CanonicalForm & m, Canon
       reord = false;
       v = vg; // == x
     }
-    else { 
+    else {
       v = Variable(level(f.mvar()) + 1);
       ff = swapvar(f,vg,v); // == r
       gg = swapvar(g,vg,v); // == v
       reord=true;
     }
-    dg = degree( gg, v ); // == dv 
+    dg = degree( gg, v ); // == dv
     df = degree( ff, v ); // == dr
     if (dg <= df) {l=LC(gg); gg = gg -LC(gg)*power(v,dg);}
     else { l = 1; }
@@ -295,14 +295,14 @@ nopower( const CanonicalForm & init ){
   CFList output;
   CanonicalForm elem;
   int count=0;
-  
+
   for ( CFIterator j=init; j.hasTerms(); j++ )
     if (j.coeff() != 1 ) count += 1;
   //  if ( init != 1 ){
   //  cout << "nopower: f is " << init << endl;
   //  cout << "nopower: count is " << count << endl;}
   if ( count > 1 ) sqrfreelist = CFFList( CFFactor(init,1));
-  else { 
+  else {
     sqrfreelist = Factorize(init);
     //sqrfreelist.removeFirst();
   }
@@ -315,7 +315,7 @@ nopower( const CanonicalForm & init ){
 
 // remove the content of polys in PS; add the removed content to
 // Remembern.FS2 ( the set of removed factors )
-CFList 
+CFList
 removecontent ( const CFList & PS, PremForm & Remembern ){
   CFList output;
   CanonicalForm cc,elem;
@@ -325,9 +325,9 @@ removecontent ( const CFList & PS, PremForm & Remembern ){
   for (CFListIterator i=PS; i.hasItem(); i++){
     elem = i.getItem();
     cc = content(elem, elem.mvar());
-    if ( cls(cc) > 0 ) { 
-      output.append(elem/cc); 
-      Remembern.FS2 = Union(CFList(cc), Remembern.FS2); 
+    if ( cls(cc) > 0 ) {
+      output.append(elem/cc);
+      Remembern.FS2 = Union(CFList(cc), Remembern.FS2);
     }
     else{ output.append(elem); }
   }
@@ -336,7 +336,7 @@ removecontent ( const CFList & PS, PremForm & Remembern ){
 
 // remove possible factors in Remember.FS1 from poly r
 // Remember.FS2 contains all factors removed before
-void 
+void
 removefactor( CanonicalForm & r , PremForm & Remembern){
   int test;
   CanonicalForm a,b,testelem;
@@ -347,7 +347,7 @@ removefactor( CanonicalForm & r , PremForm & Remembern){
   for ( int J=1; J<= n ; J++ ){
     testlist.append(CanonicalForm(Variable(J)));
   }
-  
+
   //  testlist = Union(Remembern.FS1, testlist); // add candidates
 
   // remove already removed factors
@@ -366,13 +366,13 @@ removefactor( CanonicalForm & r , PremForm & Remembern){
 //    if ( testelem != r && testelem != r.mvar() ){
     if ( testelem != r ){
       while ( 1 ){
-	test = divremt(r,testelem,a,b);
-	if ( test && b == r.genZero() ){
-	  Remembern.FS2= Union(Remembern.FS2, CFList(testelem));
-	  r = a;
-	  if ( r == 1 ) break;
-	}
-	else break;
+        test = divremt(r,testelem,a,b);
+        if ( test && b == r.genZero() ){
+          Remembern.FS2= Union(Remembern.FS2, CFList(testelem));
+          r = a;
+          if ( r == 1 ) break;
+        }
+        else break;
       }
     }
   }
@@ -389,15 +389,15 @@ factorps( const CFList &ps ){
   CFList qs;
   CFFList q;
   CanonicalForm elem;
-  
+
   for ( CFListIterator i=ps; i. hasItem(); i++ ){
     q=Factorize(i.getItem());
     q.removeFirst();
-    // Next can be simplified ( first (already removed) elem in q is the only constant 
+    // Next can be simplified ( first (already removed) elem in q is the only constant
     for ( CFFListIterator j=q; j.hasItem(); j++ ){
       elem = j.getItem().factor();
       if ( getNumVars(elem) > 0 )
-	qs= Union(qs, CFList(myfitting(elem)));
+        qs= Union(qs, CFList(myfitting(elem)));
     }
   }
   return qs;
@@ -409,9 +409,9 @@ inital( const CanonicalForm &f ){
   CanonicalForm leadcoeff;
 
   if ( cls(f) == 0 ) {return f.genOne(); }
-  else { 
+  else {
     leadcoeff = LC(f,lvar(f));
-    //    if ( leadcoeff != 0 ) 
+    //    if ( leadcoeff != 0 )
     return myfitting(leadcoeff); //num(leadcoeff/lc(leadcoeff));
     //    else return leadcoeff;
   }
@@ -449,7 +449,7 @@ initalset1(const CFList & CS){
     for ( CFListIterator j = initals; j.hasItem(); j++){
       init = j.getItem();
       if ( cls(init) > 0 )
-	temp= Union(temp, CFList(init));
+        temp= Union(temp, CFList(init));
     }
   }
   return temp;
@@ -471,9 +471,9 @@ initalset2(const CFList & CS, const CanonicalForm & reducible){
       initals= nopower( inital(init) );
       //    init= inital(i.getItem());
       for ( CFListIterator j = initals; j.hasItem(); j++){
-	init = j.getItem();
-	if ( cls(init) > 0 )
-	  temp= Union(temp, CFList(init));
+        init = j.getItem();
+        if ( cls(init) > 0 )
+          temp= Union(temp, CFList(init));
       }
     }
   }
@@ -494,7 +494,7 @@ initalset2(const CFList & CS, const CanonicalForm & reducible){
 // }
 
 // the sequence of distinct factors of f
-//CF pfactor( ..... ) 
+//CF pfactor( ..... )
 
 // //////////////////////////////////////////
 // // for IrrCharSeries
@@ -587,8 +587,8 @@ subset( const CFList &PS, const CFList &CS ){
 
   //  cout << "subset: called with: " << PS << "   " << CS << endl;
   for ( CFListIterator i=PS; i.hasItem(); i++ )
-    if ( ! member(i.getItem(), CS) ) { 
-      //      cout << "subset: " << i.getItem() << "  is not a member of " << CS << endl; 
+    if ( ! member(i.getItem(), CS) ) {
+      //      cout << "subset: " << i.getItem() << "  is not a member of " << CS << endl;
       return 0;
     }
   return 1;
@@ -600,7 +600,7 @@ MyUnion( const ListCFList & a, const ListCFList &b ){
   ListCFList output;
   ListCFListIterator i;
   CFList elem;
-  
+
   for ( i = a ; i.hasItem(); i++ ){
     elem=i.getItem();
     // if ( ! member(elem,output) ){
@@ -608,7 +608,7 @@ MyUnion( const ListCFList & a, const ListCFList &b ){
       output.append(elem);
     }
   }
-  
+
   for ( i = b ; i.hasItem(); i++ ){
     elem=i.getItem();
     // if ( ! member(elem,output) ){
@@ -648,6 +648,10 @@ Minus( const ListCFList & a, const ListCFList & b){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.4  1998/03/12 12:34:35  schmidt
+        * charset/csutil.cc, charset/alg_factor.cc: all references to
+          `common_den()' replaced by `bCommonDen()'
+
 Revision 1.3  1997/09/12 07:19:41  Singular
 * hannes/michael: libfac-0.3.0
 

@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: algfactor.cc,v 1.3 2001-06-18 08:44:40 pfister Exp $";
+static char * rcsid = "$Id: algfactor.cc,v 1.4 2001-06-21 14:57:04 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -58,7 +58,7 @@ static int
 isquasilinear( const CFList & as ){
   if (as.length() <= 1) { return 1; }
   else {
-    CFList AS=as; 
+    CFList AS=as;
     AS.removeFirst(); // we are not interested in the first elem
     for ( CFListIterator i=AS; i.hasItem(); i++)
       if ( degree(i.getItem()) > 1 ) return 0;
@@ -93,14 +93,14 @@ charsetnA(const CFList & AS, const CFList &PS, PremForm & Remembern, const Varia
       DEBOUT(cout, " , ", CS);
       DEBOUTLN(cout, " ) = ", D);
       for ( CFListIterator i = D; i.hasItem(); ++i ) {
-	CanonicalForm r = Prem( i.getItem(), CS );
-	DEBOUT(cout,"charsetnA: Prem(", i.getItem()  );
-	DEBOUT(cout, ",", CS);
-	DEBOUTLN(cout,") = ", r); 
-	if ( r != 0 ){
-	  //removefactor( r, Remembern );
+        CanonicalForm r = Prem( i.getItem(), CS );
+        DEBOUT(cout,"charsetnA: Prem(", i.getItem()  );
+        DEBOUT(cout, ",", CS);
+        DEBOUTLN(cout,") = ", r);
+        if ( r != 0 ){
+          //removefactor( r, Remembern );
             RS=Union(RS,CFList(r));
-	}
+        }
       }
       if ( ! checkok(RS,Remembern.FS2)) return CFList(CanonicalForm(1));
       DEBOUTLN(cout, "charsetnA: RS= ", RS);
@@ -122,7 +122,7 @@ charsetnA(const CFList & AS, const CFList &PS, PremForm & Remembern, const Varia
 #  undef DEBUGOUTPUT
 #endif
 #include "debug.h"
-// compute the GCD of f and g over the algebraic field having 
+// compute the GCD of f and g over the algebraic field having
 // adjoing ascending set as
 CanonicalForm
 algcd(const CanonicalForm & F, const CanonicalForm & g, const CFList & as, const Varlist & order){
@@ -157,9 +157,13 @@ algcd(const CanonicalForm & F, const CanonicalForm & g, const CFList & as, const
 //      DEBOUTLN(cout, "vf= ", i.getItem());
 //      DEBOUTLN(cout, "CharSetA((as,bs))= " , charsetnA(as,bs,Remembern,i.getItem()));
 //    }
-  
+
   CanonicalForm result;
-  if (cs.length()==nas) result= cs.getLast();
+  if (cs.length()==nas)
+  {
+    result= cs.getLast();
+    result/=result.Lc();
+  }
   else result= CanonicalForm(1);
   DEBOUTLN(cout, "Result= ", result);
   return result;
@@ -184,12 +188,12 @@ factoras( const CanonicalForm & f, const CFList & as, int & success ){
 
 // F1: [Test trivial cases]
 // 1) first trivial cases:
-  if ( (cls(vf) <= cls(as.getLast())) || 
-       degree(f,vf)<=1 
+  if ( (cls(vf) <= cls(as.getLast())) ||
+       degree(f,vf)<=1
 // ||( (as.length()==1) && (degree(f,vf)==3) && (degree(as.getFirst()==2)) )
        ){
     success=1;
-    DEBDECLEVEL(cout,"factoras"); 
+    DEBDECLEVEL(cout,"factoras");
     return CFFList(CFFactor(f,1));
   }
 
@@ -209,9 +213,9 @@ factoras( const CanonicalForm & f, const CFList & as, int & success ){
     x= elem.mvar();
     if ( degree(elem,x) > 1){ // otherwise it's not an extension
       //if ( degree(f,x) > 0 ){ // does it occure in f? RICHTIG?
-	Astar.append(elem);
-	ord.append(x);
-	//}
+        Astar.append(elem);
+        ord.append(x);
+        //}
     }
   }
   uord= Difference(uord,ord);
@@ -220,10 +224,10 @@ factoras( const CanonicalForm & f, const CFList & as, int & success ){
   DEBOUTLN(cout, "uord is: ", uord);
 
 // 3) second trivial cases
-  if ( Astar.length() == 0 ){ 
-    success=1; 
-    DEBDECLEVEL(cout,"factoras"); 
-    return CFFList(CFFactor(f,1)); 
+  if ( Astar.length() == 0 ){
+    success=1;
+    DEBDECLEVEL(cout,"factoras");
+    return CFFList(CFFactor(f,1));
   }
 
 // 4) Try to obtain a partial factorization using prop2 and prop3
@@ -249,12 +253,12 @@ F2: //[Characteristic set computation]
     substhin-= monom; substback+= monom;
   }
   DEBOUTLN(cout, "substhin= ", substhin);
-  DEBOUTLN(cout, "substback= ", substback);    
+  DEBOUTLN(cout, "substback= ", substback);
   CanonicalForm fstar=f(substhin,vf);
   DEBOUTLN(cout, "fstar= ", fstar);
 
 // 7) Set up Variable ordering from ord,vf to vf,ord ! i.e. vf is the variable
-//    with lowest level. 
+//    with lowest level.
   Varlist nord=uord;
   nord.append(vf); nord= Union(ord,nord);
   DEBOUTLN(cout, "          nord= ", nord);
@@ -274,7 +278,7 @@ F2: //[Characteristic set computation]
   DEBOUTLN(cout, " Possible Factors considered:= ", Remembern.FS1 );
   DEBOUTLN(cout, " Reorderd Cstar= ", reorder(nord,Cstar));
 
-// 9) Compute Delta: the set of all irr. factors (over K_0) of initials of 
+// 9) Compute Delta: the set of all irr. factors (over K_0) of initials of
 //    Cstar
   CFList iniset= initalset1(Cstar);
   DEBOUTLN(cout, "Set of initials: ", iniset);
@@ -294,7 +298,7 @@ F2: //[Characteristic set computation]
   Off(SW_RATIONAL);
   CFFList Psi=Factorize(Cstar.getFirst());
   On(SW_RATIONAL);
-  Psi.removeFirst(); 
+  Psi.removeFirst();
   Psi= myDifference(Psi,Delta);
   DEBOUTLN(cout, "Psi= ", Psi);
 
@@ -332,10 +336,12 @@ F4: //[GCD Computation]
       break;
     }
     fp= jj.getItem().factor();
-    DEBOUT(cout, "Calculating fp= gcd(", g); 
+    DEBOUT(cout, "Calculating fp= gcd(", g);
     DEBOUT(cout, ",", fp(substback,vf));
     DEBOUT(cout, ") over K_r wrt ", vf);
+    //cout << "algcd(" << g << "," << fp(substback,vf) << " as:" << as <<endl;
     fp= algcd(g,fp(substback,vf), as, oldord);
+    //cout << "algcd res:" << fp << endl;
     DEBOUTLN(cout, " = ", fp);
     if ( degree(fp,vf) > 0 ){ //otherwise it's a constant
       g= divide(g, fp,as);
@@ -350,10 +356,12 @@ F4: //[GCD Computation]
       break;
     }
     fp= jj.getItem().factor();
-    DEBOUT(cout, "Calculating fp= gcd(", g); 
+    DEBOUT(cout, "Calculating fp= gcd(", g);
     DEBOUT(cout, ",", fp(substback,vf));
     DEBOUT(cout, ") over K_r wrt ", vf);
+    //cout << "algcd(" << g << "," << fp(substback,vf) << " as:" << as <<endl;
     fp= algcd(g,fp(substback,vf), as, oldord);
+    //cout << "algcd res:" << fp << endl;
     DEBOUTLN(cout, " = ", fp);
     if ( degree(fp,vf) > 0 ){ //otherwise it's a constant
       g= divide(g, fp,as);
@@ -363,15 +371,15 @@ F4: //[GCD Computation]
       success=0;
     }
   }
-  
+
 //  if (reduceresult.length() > 0){ //we have factors;
 //    for ( CFListIterator I=reduceresult; I.hasItem(); I++ ){
 //      // try to obtain an irreducible factorization
 //      result= Union( result,
-//		     factoras(I.getItem(), Astar, success) );
+//                     factoras(I.getItem(), Astar, success) );
 //    }
 //  }
-    
+
   if ( result.length()==0 ){
     if ( isquasilinear(Cstar) ){ // Cstar quasilinear => f is irreduzible
       success=1;
@@ -429,6 +437,9 @@ cfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  2001/06/18 08:44:40  pfister
+* hannes/GP/michael: factory debug, Factorize
+
 Revision 1.2  1997/09/12 07:19:38  Singular
 * hannes/michael: libfac-0.3.0
 

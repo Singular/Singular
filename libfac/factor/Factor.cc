@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.6 2001-06-18 08:44:41 pfister Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.7 2001-06-21 14:57:05 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -15,6 +15,8 @@ static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) mi
 #include "interrupt.h"
 // some CC's need this:
 #include "Factor.h"
+
+#include "alg_factor.h"
 
 #ifdef SINGULAR
 #  define HAVE_SINGULAR
@@ -42,7 +44,7 @@ TIMING_DEFINE_PRINT(truefactor_time);
 // Choose a main variable if the user didn`t wish a          //
 // special one. Returns level of main variable.              //
 ///////////////////////////////////////////////////////////////
-static int 
+static int
 choose_main_variable( const CanonicalForm & f, int Mainvar=0){
   CanonicalForm remlc, newlc;
   int n= level(f), mainvar= Mainvar;
@@ -57,12 +59,12 @@ choose_main_variable( const CanonicalForm & f, int Mainvar=0){
     DEBOUTLN(cout, "newlc= " , newlc);
     if ( (remlc.isOne()) && (newlc.isOne()) ){ // take care of the degrees
       if ( degree(f,i) < degree(f,mainvar) ){
-	remlc= newlc; 
-	mainvar= i;
+        remlc= newlc;
+        mainvar= i;
       }
     }
     else  if ( (! remlc.isOne() ) && ( newlc.isOne() ) ){
-      remlc= newlc; 
+      remlc= newlc;
       mainvar= i;
     }
   }
@@ -73,16 +75,16 @@ choose_main_variable( const CanonicalForm & f, int Mainvar=0){
 // Check if the derivative is nonzero for oldmainvar.        //
 // Returns the level of the choosen main variable.           //
 ///////////////////////////////////////////////////////////////
-static int 
+static int
 necessary_condition( const CanonicalForm & F, int oldmainvar){
   CanonicalForm g;
   int n=level(F);
 
-  g= swapvar(F,oldmainvar,n); 
+  g= swapvar(F,oldmainvar,n);
   g= g.deriv();
-  if ( g.isZero() ) 
+  if ( g.isZero() )
     for ( int i=n; i>=1; i-- ){
-      g= swapvar(F,i,n); 
+      g= swapvar(F,i,n);
       g= g.deriv();
       if ( ! g.isZero() ) return i;
     }
@@ -92,7 +94,7 @@ necessary_condition( const CanonicalForm & F, int oldmainvar){
 ///////////////////////////////////////////////////////////////
 // Make F monic. Return monic polynomial.                    //
 ///////////////////////////////////////////////////////////////
-static CanonicalForm 
+static CanonicalForm
 make_monic( const CanonicalForm & F, const CanonicalForm & lt){
   CanonicalForm intermediatpoly,f;
   Variable x(level(F));
@@ -102,18 +104,18 @@ make_monic( const CanonicalForm & F, const CanonicalForm & lt){
     intermediatpoly= power(lt,degree(F)-1);
     for ( int i=0; i<=degree(F); i++ )
       if ( ! F[i].isZero())
-	f+= (F[i] * intermediatpoly*power(x,i))/power(lt,i);
+        f+= (F[i] * intermediatpoly*power(x,i))/power(lt,i);
   }
   return f;
 }
 
 ///////////////////////////////////////////////////////////////
-// Decide whether num/denum (num,denum both from the         // 
+// Decide whether num/denum (num,denum both from the         //
 // FiniteFielddomain)  lies in the RationalDomain.           //
 // If false, return num/denum else return the zero poly from //
 // the FiniteFielddomain.                                    //
 ///////////////////////////////////////////////////////////////
-static CanonicalForm 
+static CanonicalForm
 is_rational( const CanonicalForm & num, const CanonicalForm & denum ){
   CanonicalForm a, b;
   int retvalue;
@@ -129,7 +131,7 @@ is_rational( const CanonicalForm & num, const CanonicalForm & denum ){
 // lt_is_product returns 1 iff lt is a product, 0 iff lt is  //
 // a sum.                                                    //
 ///////////////////////////////////////////////////////////////
-static int 
+static int
 lt_is_product( const CanonicalForm & lt ){
   CFList result;
 
@@ -142,7 +144,7 @@ lt_is_product( const CanonicalForm & lt ){
 // Reverse the make_monic transformation.                    //
 // Return the list of factors.                               //
 ///////////////////////////////////////////////////////////////
-static CFFList 
+static CFFList
 not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalForm & F, int levelF){
   CFFList Returnlist,IntermediateList;
   CFFListIterator i;
@@ -155,8 +157,8 @@ not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalFo
   if ( TheList.length() <= 1 ){ // only one factor to substitute back
     if ( totaldegree(lt) == 0 ) // lt is type numeric
       Returnlist.append( CFFactor(lt*TheList.getFirst().factor(),
-				  TheList.getFirst().exp()) );
-    else { 
+                                  TheList.getFirst().exp()) );
+    else {
       intermediate = F(x*lt, levelF)/power(lt,degree(F,levelF)-1);
       Returnlist.append(CFFactor(intermediate,TheList.getFirst().exp()));
     }
@@ -165,77 +167,77 @@ not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalFo
     IntermediateList= TheList;
     if ( totaldegree(lt) == 0 ){ // lt is type numeric;(SqrFree-use, see above)
       Returnlist.append( CFFactor(lt*IntermediateList.getFirst().factor()
-				  , IntermediateList.getFirst().exp()) );
+                                  , IntermediateList.getFirst().exp()) );
       IntermediateList.removeFirst();
       Returnlist= Union(Returnlist,IntermediateList);
     }
     else{ // lt is a) a product or b) a sum of terms
       if ( lt_is_product(lt) ){ // case a)
-	DEBOUTLN(cout, "lt_is_product: ", lt);
-	savelc= content(lt) ; // can we simplify to savelc= lc(lt); ?
-	while ( getNumVars(savelc) != 0 )
-	  savelc= content(savelc);
-	for ( i=TheList; i.hasItem();i++ ){
-	  numerator= i.getItem().factor();
-	  numerator= numerator(x*lt,levelF); // x <- x*lt
-	  denumerator= power(lt,degree(F,levelF)-1); // == lt^(1-degree(F,x)
-	  while (numerator.genZero() == is_rational(numerator, denumerator))
-	    numerator*= lt;
-	  intermediate= is_rational(numerator,denumerator);
+        DEBOUTLN(cout, "lt_is_product: ", lt);
+        savelc= content(lt) ; // can we simplify to savelc= lc(lt); ?
+        while ( getNumVars(savelc) != 0 )
+          savelc= content(savelc);
+        for ( i=TheList; i.hasItem();i++ ){
+          numerator= i.getItem().factor();
+          numerator= numerator(x*lt,levelF); // x <- x*lt
+          denumerator= power(lt,degree(F,levelF)-1); // == lt^(1-degree(F,x)
+          while (numerator.genZero() == is_rational(numerator, denumerator))
+            numerator*= lt;
+          intermediate= is_rational(numerator,denumerator);
 
-	  Returnlist.append( CFFactor(lc(content(intermediate))*intermediate/content(intermediate), i.getItem().exp() ) );
-	}
-	// Now we add a test. If product(factors)/F is a multiple of 
-	// savelc, we have to add 1/multiplicity to the factors
-	IntermediateList= Returnlist;
-	intermediate= 1;
-	for ( CFFListIterator j=IntermediateList; j.hasItem(); j++)
-	  intermediate*= j.getItem().factor();
-	test1= mydivremt( intermediate,F,a,b);
-	if ( test1 && b == intermediate.genZero() ) { // Yupp!
-	  IntermediateList.append(CFFactor(1/a,1));
-	  Returnlist= IntermediateList;
-	}
-	else { Returnlist= IntermediateList; }
+          Returnlist.append( CFFactor(lc(content(intermediate))*intermediate/content(intermediate), i.getItem().exp() ) );
+        }
+        // Now we add a test. If product(factors)/F is a multiple of
+        // savelc, we have to add 1/multiplicity to the factors
+        IntermediateList= Returnlist;
+        intermediate= 1;
+        for ( CFFListIterator j=IntermediateList; j.hasItem(); j++)
+          intermediate*= j.getItem().factor();
+        test1= mydivremt( intermediate,F,a,b);
+        if ( test1 && b == intermediate.genZero() ) { // Yupp!
+          IntermediateList.append(CFFactor(1/a,1));
+          Returnlist= IntermediateList;
+        }
+        else { Returnlist= IntermediateList; }
       }
       else{ // case b)
-	DEBOUTLN(cout, "lt_is_sum: ", lt);
-	CanonicalForm save_denumerator= 1;
-	for ( i=TheList; i.hasItem(); i++ ){
-	  numerator= i.getItem().factor();
-	  numerator= numerator(x*lt,levelF); // x <- x*lt
-	  denumerator= power(lt,degree(numerator,levelF)); // == lt^(-degree(numerator,x)
-	  test= content(numerator,x); 
-	  test1= mydivremt(denumerator,test,a,b);
-	  if ( test1 && b == numerator.genZero() ){ // Yupp!
-	    save_denumerator*= a;
-	    Returnlist.append(CFFactor(numerator/test ,1));
-	  }
-	  else { 
+        DEBOUTLN(cout, "lt_is_sum: ", lt);
+        CanonicalForm save_denumerator= 1;
+        for ( i=TheList; i.hasItem(); i++ ){
+          numerator= i.getItem().factor();
+          numerator= numerator(x*lt,levelF); // x <- x*lt
+          denumerator= power(lt,degree(numerator,levelF)); // == lt^(-degree(numerator,x)
+          test= content(numerator,x);
+          test1= mydivremt(denumerator,test,a,b);
+          if ( test1 && b == numerator.genZero() ){ // Yupp!
+            save_denumerator*= a;
+            Returnlist.append(CFFactor(numerator/test ,1));
+          }
+          else {
 #ifdef HAVE_SINGULAR
-	    WerrorS("libfac: ERROR: not_monic1: case lt is a sum.");
-#else 
-	    cerr << "libfac: ERROR: not_monic1: case lt is a sum.\n" 
-		 << rcsid << errmsg << endl;
+            WerrorS("libfac: ERROR: not_monic1: case lt is a sum.");
+#else
+            cerr << "libfac: ERROR: not_monic1: case lt is a sum.\n"
+                 << rcsid << errmsg << endl;
 #endif
-	  } 
-	}
-	// Now we add a test if we did the right thing:
-	// save_denumerator should be a multiple of the leading coeff
-	test1= mydivremt(save_denumerator,lt,a,b);
-	if ( test1 && b == save_denumerator.genZero() ) // Yupp!
-	  // We have to multiply one of the factors with 
-	  // the multiplicity of the save_denumerator <-> lc
-	  // the following will do what we want
-	  Returnlist= myUnion( CFFList(CFFactor(1/a,1)),Returnlist) ;
-	else {
+          }
+        }
+        // Now we add a test if we did the right thing:
+        // save_denumerator should be a multiple of the leading coeff
+        test1= mydivremt(save_denumerator,lt,a,b);
+        if ( test1 && b == save_denumerator.genZero() ) // Yupp!
+          // We have to multiply one of the factors with
+          // the multiplicity of the save_denumerator <-> lc
+          // the following will do what we want
+          Returnlist= myUnion( CFFList(CFFactor(1/a,1)),Returnlist) ;
+        else {
 #ifdef HAVE_SINGULAR
-	  WerrorS("libfac: ERROR: not_monic2: case lt is a sum.");
-#else 
-	  cerr << "libfac: ERROR: not_monic2: case lt is a sum.\n" 
+          WerrorS("libfac: ERROR: not_monic2: case lt is a sum.");
+#else
+          cerr << "libfac: ERROR: not_monic2: case lt is a sum.\n"
                << rcsid << errmsg << endl;
 #endif
-	} 
+        }
       }
     }
   }
@@ -247,7 +249,7 @@ not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalFo
 // Substitute the (Variable,Value)-Pair(s) from Substitution-//
 // list into the polynomial F. Returns the resulting poly.   //
 ///////////////////////////////////////////////////////////////
-static CanonicalForm 
+static CanonicalForm
 substitutePoly( const CanonicalForm & F, const SFormList & Substitutionlist){
   CanonicalForm f= F;
 
@@ -276,14 +278,14 @@ various_tests( const CanonicalForm & g, int deg, int vars_left){
     if ( level(compress(g,m)) == (vars_left) ) // exactly one variable less
       if ( SqrFreeTest(g,1) ) // poly is sqrfree
         if ( mygcd(g,g.deriv()) == 1 ) // Discriminante != 0
-	   return 1;
+           return 1;
   return 0;
 }
 
 ///////////////////////////////////////////////////////////////
 // specialize one variable over the given field.             //
 ///////////////////////////////////////////////////////////////
-// substitutes in poly f of degree deg with former 
+// substitutes in poly f of degree deg with former
 // former_nr_of_variables variables the variable nr_of_variable ;
 // this is done in the field of Char getCharacteristic() and
 // Extension given by Extgenerator.
@@ -298,7 +300,7 @@ specialize_variable( CanonicalForm & f, int deg, SFormList & Substitutionlist, i
     DEBOUTLN(cout, "  specialize_variable: trying:  ", Extgenerator.item());
     g= f( Extgenerator.item(), x );
     DEBOUTLN(cout, "  specialize_variable: resulting g= ", g);
-    if ( various_tests(g,deg,former_nr_of_variables - nr_of_variable ) ){ 
+    if ( various_tests(g,deg,former_nr_of_variables - nr_of_variable ) ){
       Substitutionlist.insert(SForm(x,Extgenerator.item())); // append (Var,value) pair
       f= g;
       return 1;
@@ -313,16 +315,16 @@ specialize_variable( CanonicalForm & f, int deg, SFormList & Substitutionlist, i
 ///////////////////////////////////////////////////////////////
 CanonicalForm
 generate_mipo( int degree_of_Extension , const Variable & Extension ){
-  FFRandom gen; 
-  if ( degree(Extension) > 0 ) GFRandom gen; 
+  FFRandom gen;
+  if ( degree(Extension) > 0 ) GFRandom gen;
   else {
     if ( degree(Extension) == 0 ) FFRandom gen;
-    else { 
+    else {
 #ifdef HAVE_SINGULAR
     WerrorS("libfac: evaluate: Extension not inFF() or inGF() !");
-#else 
-    cerr << "libfac: evaluate: " << Extension << " not inFF() or inGF() !" 
-	 << endl;
+#else
+    cerr << "libfac: evaluate: " << Extension << " not inFF() or inGF() !"
+         << endl;
 #endif
     FFRandom gen;
     }
@@ -353,8 +355,8 @@ try_specializePoly(const CanonicalForm & f, const Variable & Extension, int deg,
   if ( degree(Extension) > 0 ){ // working over Extensions
     DEBOUTLN(cout, "try_specializePoly: working over Extensions: ", Extension);
     AlgExtGenerator g(Extension);
-    for ( int k=i ; k<j ; k++ ){ // try to find specialization for all 
-                                 // variables (# = k ) beginning with the 
+    for ( int k=i ; k<j ; k++ ){ // try to find specialization for all
+                                 // variables (# = k ) beginning with the
                                  // starting value i
       ok= specialize_variable( ff, deg, Substitutionlist, k, j, g );
       if ( ! ok ) return 0; // we failed
@@ -391,8 +393,8 @@ specializePoly(const CanonicalForm & f, Variable & Extension, int deg, SFormList
     else {
 #ifdef HAVE_SINGULAR
       WerrorS("libfac: spezializePoly ERROR: Working over given extension-field not yet implemented!");
-#else 
-      cerr << "libfac: spezializePoly ERROR: Working over given extension-field not yet implemented!\n" 
+#else
+      cerr << "libfac: spezializePoly ERROR: Working over given extension-field not yet implemented!\n"
            << rcsid << errmsg << endl;
 #endif
       return 0;
@@ -420,14 +422,14 @@ evaluate( int maxtries, int sametries, int failtries, const CanonicalForm &f , c
   FFRandom gen;
   CFFList unilist;
 
-  if ( degree(Extension) >0 ) GFRandom gen; 
+  if ( degree(Extension) >0 ) GFRandom gen;
   else { if ( degree(Extension) == 0 ) FFRandom gen;
-  else { 
+  else {
 #ifdef HAVE_SINGULAR
     WerrorS("libfac: evaluate: Extension not inFF() or inGF() !");
 #else
-    cerr << "libfac: evaluate: " << Extension << " not inFF() or inGF() !" 
-	 << endl;
+    cerr << "libfac: evaluate: " << Extension << " not inFF() or inGF() !"
+         << endl;
 #endif
     FFRandom gen; }}
   REvaluation k(1,n,gen);
@@ -436,33 +438,33 @@ evaluate( int maxtries, int sametries, int failtries, const CanonicalForm &f , c
     // k.nextpoint();
     SFormList Substitutionlist;
     for ( int j=1; j<=n; j++ )
-     Substitutionlist.insert(SForm(Variable(j),k[j])); 
+     Substitutionlist.insert(SForm(Variable(j),k[j]));
     k.nextpoint();
     CanonicalForm g=substitutePoly(f,Substitutionlist);
     if ( various_tests(g, degf,1) ){ // found a valid point
       failedfactor = 0; tried += 1;
       if ( degree(Extension) == 0   )
-	unilist = factorize(g,1); // poly is sqr-free!
+        unilist = factorize(g,1); // poly is sqr-free!
       else
-	unilist = factorize(g,Extension);
+        unilist = factorize(g,Extension);
       if (unilist.length() <= minfactors ) {
-	minfactors=unilist.length();
-	minEvaluation=Substitutionlist;
-	minFactorisation=unilist;
+        minfactors=unilist.length();
+        minEvaluation=Substitutionlist;
+        minFactorisation=unilist;
       }
       else samefactors +=1;
 
       if (unilist.length() == 1 ){ // wow! we found f is irreducible!
-	BestEvaluationpoint=minEvaluation;
-	BestFactorisation=minFactorisation;
-	return 1;
+        BestEvaluationpoint=minEvaluation;
+        BestFactorisation=minFactorisation;
+        return 1;
       }
 
       if ( samefactors >= sametries ){ // now we stop ( maybe polynomial *has*
-	                               // minfactors factors? )
-	BestEvaluationpoint=minEvaluation;
-	BestFactorisation=minFactorisation;
-	return minfactors;
+                                       // minfactors factors? )
+        BestEvaluationpoint=minEvaluation;
+        BestFactorisation=minFactorisation;
+        return minfactors;
       }
 
     }
@@ -471,11 +473,11 @@ evaluate( int maxtries, int sametries, int failtries, const CanonicalForm &f , c
     if ( failedfactor >= failtries ){ // now we stop ( perhaps Extension isn't
                                       // big enough )
       if ( tried == 0 )
-	return 0;
+        return 0;
       else{
-	BestEvaluationpoint=minEvaluation;
-	BestFactorisation=minFactorisation;
-	return minfactors;
+        BestEvaluationpoint=minEvaluation;
+        BestFactorisation=minFactorisation;
+        return minfactors;
       }
     }
 
@@ -499,7 +501,7 @@ find_evaluation(int maxtries, int sametries, int failtries, const CanonicalForm 
 // A factorization routine for a sqrfree polynomial.         //
 // Returns the list of factors.                              //
 ///////////////////////////////////////////////////////////////
-CFFList 
+CFFList
 Factorized( const CanonicalForm & F, const Variable & alpha, int Mainvar){
   CanonicalForm f,lt,ff,ffuni;
   Variable Extension=alpha;
@@ -521,8 +523,17 @@ Factorized( const CanonicalForm & F, const Variable & alpha, int Mainvar){
       return Outputlist;
     }
     else{
+      DEBOUTLN(cout, "Univ. Factorization over extension of degree ",
+               degree(getMipo(Extension,'x')) );
       TIMING_START(evaluate_time);
+     #if 0 	       
       Outputlist = factorize(F,Extension);
+     #else
+      Variable X;
+      CanonicalForm mipo=getMipo(Extension,X);
+      CFList as(mipo);
+      Outputlist = newfactoras( F, as, 1);
+     #endif 
       TIMING_END(evaluate_time);
       return Outputlist;
     }
@@ -536,7 +547,7 @@ Factorized( const CanonicalForm & F, const Variable & alpha, int Mainvar){
   // Now we have definetly choosen a main variable
   // swap poly such that the mainvar has highest level
   f=swapvar(F,mainvar,level(F));
-  
+
   // INTERRUPTHANDLER
   if ( interrupt_handle() ) return CFFList() ;
   // INTERRUPTHANDLER
@@ -552,7 +563,7 @@ Factorized( const CanonicalForm & F, const Variable & alpha, int Mainvar){
     ffuni = mygcd(f,ff);
     TIMING_END(discr_time);
     if ( ffuni != 1 ){ //discriminante nonzero: split poly
-      DEBOUTLN(cout,"Nontrivial GCD of f= ", f); 
+      DEBOUTLN(cout,"Nontrivial GCD of f= ", f);
       DEBOUTLN(cout,"             and @f= ", ff);
       DEBOUTLN(cout,"          GCD(f,@f)= ", ffuni);
       ff=f/ffuni;
@@ -564,8 +575,8 @@ Factorized( const CanonicalForm & F, const Variable & alpha, int Mainvar){
       Outputlist = myUnion(Outputlist_a, Outputlist_b);
       // have to back-swapvar the factors....
       for ( CFFListIterator i=Outputlist; i.hasItem(); i++ ){
-	copy=i.getItem();
-	Outputlist2.append(CFFactor(swapvar(copy.factor(),oldmainvar,mainvar),copy.exp()));
+        copy=i.getItem();
+        Outputlist2.append(CFFactor(swapvar(copy.factor(),oldmainvar,mainvar),copy.exp()));
       }
       DEBOUTLN(cout, "Outputlist2 (a+b swapped) (to return) = ", Outputlist2);
       return Outputlist2;
@@ -603,10 +614,10 @@ Factorized( const CanonicalForm & F, const Variable & alpha, int Mainvar){
     DEBOUTLN(cout,  "Returned from specializePoly: success: ", success);
     if (success == 0 ){ // No spezialisation could be found
 #ifdef SINGULAR
-      WarnS("libfac: Factorize: ERROR: Not able to find a valid specialization!");    
+      WarnS("libfac: Factorize: ERROR: Not able to find a valid specialization!");
 #else
-      cerr << "libfac: Factorize: ERROR: Not able to find a valid specialization!\n" 
-	   << rcsid << errmsg << endl; 
+      cerr << "libfac: Factorize: ERROR: Not able to find a valid specialization!\n"
+           << rcsid << errmsg << endl;
 #endif
       Outputlist.append(CFFactor(F,1));
       return Outputlist;
@@ -624,12 +635,19 @@ Factorized( const CanonicalForm & F, const Variable & alpha, int Mainvar){
     }
     else{
       DEBOUTLN(cout, "Univ. Factorization over extension of degree ",
-	       degree(getMipo(Extension,'x')) );
+               degree(getMipo(Extension,'x')) );
+     #if 0 	       
       UnivariateFactorlist = factorize(ffuni,Extension);
+     #else
+      Variable X;
+      CanonicalForm mipo=getMipo(Extension,X);
+      CFList as(mipo);
+      UnivariateFactorlist = newfactoras( ffuni, as, 1);
+     #endif 
     }
   }
   else{
-    ffuni = substitutePoly(ff,Substitutionlist); 
+    ffuni = substitutePoly(ff,Substitutionlist);
   }
     TIMING_END(evaluate_time);
   if (UnivariateFactorlist.length() == 1){ // poly is irreduzibel
@@ -638,9 +656,9 @@ Factorized( const CanonicalForm & F, const Variable & alpha, int Mainvar){
     return Outputlist;
   }
   else{ // we have factors
-    DEBOUTSL(cout); 
+    DEBOUTSL(cout);
     DEBOUT(cout, "Univariate poly has " , UnivariateFactorlist.length());
-    DEBOUT(cout, " factors:  ", ffuni); 
+    DEBOUT(cout, " factors:  ", ffuni);
     DEBOUT(cout, " = ", UnivariateFactorlist); DEBOUTNL(cout);
 
     // INTERRUPTHANDLER
@@ -672,8 +690,8 @@ Factorized( const CanonicalForm & F, const Variable & alpha, int Mainvar){
 
     // have to back-swapvar the factors....
     for ( CFFListIterator i=Outputlist; i.hasItem(); i++ ){
-	copy=i.getItem();
-	Outputlist2.append(CFFactor(swapvar(copy.factor(),oldmainvar,mainvar),copy.exp()));
+        copy=i.getItem();
+        Outputlist2.append(CFFactor(swapvar(copy.factor(),oldmainvar,mainvar),copy.exp()));
     }
 
     return Outputlist2;
@@ -687,11 +705,11 @@ Factorized( const CanonicalForm & F, const Variable & alpha, int Mainvar){
 //           * choosing an algebraic extension (n.y.u.)      //
 //           * ensuring poly is sqrfree (n.y.i.)             //
 ///////////////////////////////////////////////////////////////
-CFFList 
+CFFList
 Factorize( const CanonicalForm & F, int is_SqrFree ){
   CFFList Outputlist,SqrFreeList,Intermediatelist,Outputlist2;
   ListIterator<CFFactor> i,j;
-  CanonicalForm g=1,unit=1,r=1; 
+  CanonicalForm g=1,unit=1,r=1;
   Variable minpoly; // reserved (-> Factorisation over algebraic Extensions)
   int exp;
   CFMap m;
@@ -708,7 +726,7 @@ Factorize( const CanonicalForm & F, int is_SqrFree ){
     //cout << "Factoring in char=0 of " << F << " = " << Outputlist << endl;
     Outputlist= factorize(F);
     // Factorization in char=0 doesn't sometimes return at least two elements!!!
-    if ( getNumVars(Outputlist.getFirst().factor()) != 0 ) 
+    if ( getNumVars(Outputlist.getFirst().factor()) != 0 )
       Outputlist.insert(CFFactor(1,1));
     //cout << "  Factorize in char=0: returning with: " << Outputlist << endl;
     TIMING_END(factorize_time);
@@ -735,41 +753,41 @@ Factorize( const CanonicalForm & F, int is_SqrFree ){
     // INTERRUPTHANDLER
 
   }
-  else 
+  else
     SqrFreeList.append(CFFactor(F,1));
   DEBOUTLN(cout, "InternalSqrFreeList= ", SqrFreeList);
   for ( i=SqrFreeList; i.hasItem(); i++ ){
     DEBOUTLN(cout, "Factor under consideration: ", i.getItem().factor());
     // We need a compress on each list item ! Maybe we have less variables!
-    g =compress(i.getItem().factor(),m); 
+    g =compress(i.getItem().factor(),m);
     exp = i.getItem().exp();
     if ( getNumVars(g) ==0 ) // a constant; Exp==1
       Outputlist.append( CFFactor(g,1) ) ;
     else// a real polynomial
       if ( g.isUnivariate() ){
-	Intermediatelist=factorize(g,1); // poly is sqr-free!
-	for ( j=Intermediatelist; j.hasItem(); j++ )
-	  //Normally j.getItem().exp() should be 1
-	  Outputlist.append( CFFactor( m(j.getItem().factor()),exp*j.getItem().exp()));
+        Intermediatelist=factorize(g,1); // poly is sqr-free!
+        for ( j=Intermediatelist; j.hasItem(); j++ )
+          //Normally j.getItem().exp() should be 1
+          Outputlist.append( CFFactor( m(j.getItem().factor()),exp*j.getItem().exp()));
       }
       else{ // multivariate polynomial
-	if ( is_homogeneous(g) ){
-	  DEBOUTLN(cout, "Poly is homogeneous! : ", g);
-	  // Now we can substitute one variable to 1, factorize and then 
-	  // look on the resulting factors and their monomials for 
-	  // backsubstitution of the substituted variable.
-	  Intermediatelist = HomogFactor(g, minpoly, 0);
-	}
-	else // not homogeneous
-	  Intermediatelist = Factorized(g, minpoly, 0);
+        if ( is_homogeneous(g) ){
+          DEBOUTLN(cout, "Poly is homogeneous! : ", g);
+          // Now we can substitute one variable to 1, factorize and then
+          // look on the resulting factors and their monomials for
+          // backsubstitution of the substituted variable.
+          Intermediatelist = HomogFactor(g, minpoly, 0);
+        }
+        else // not homogeneous
+          Intermediatelist = Factorized(g, minpoly, 0);
 
-	// INTERRUPTHANDLER
-	if ( interrupt_handle() ) return CFFList() ;
-	// INTERRUPTHANDLER
+        // INTERRUPTHANDLER
+        if ( interrupt_handle() ) return CFFList() ;
+        // INTERRUPTHANDLER
 
-	for ( j=Intermediatelist; j.hasItem(); j++ )
-	  //Normally j.getItem().exp() should be 1
-	  Outputlist= myappend( Outputlist, CFFactor(m(j.getItem().factor()),exp*j.getItem().exp()));
+        for ( j=Intermediatelist; j.hasItem(); j++ )
+          //Normally j.getItem().exp() should be 1
+          Outputlist= myappend( Outputlist, CFFactor(m(j.getItem().factor()),exp*j.getItem().exp()));
       }
   }
   g=1; unit=1;
@@ -778,18 +796,18 @@ Factorize( const CanonicalForm & F, int is_SqrFree ){
     if ( level(i.getItem().factor()) > 0 ){
       unit = lc(i.getItem().factor());
       if ( getNumVars(unit) == 0 ){ // a constant; possibly 1
-	Outputlist2.append(CFFactor(i.getItem().factor()/unit , i.getItem().exp()));
-	g *=power(i.getItem().factor()/unit,i.getItem().exp());
+        Outputlist2.append(CFFactor(i.getItem().factor()/unit , i.getItem().exp()));
+        g *=power(i.getItem().factor()/unit,i.getItem().exp());
       }
       else{
-	Outputlist2.append(i.getItem());
-	g *=power(i.getItem().factor(),i.getItem().exp());
+        Outputlist2.append(i.getItem());
+        g *=power(i.getItem().factor(),i.getItem().exp());
       }
     }
-  
-  r=F/g; 
+
+  r=F/g;
   Outputlist2.insert(CFFactor(r,1));
-  
+
   DEBDECLEVEL(cout, "Factorize");
   TIMING_END(factorize_time);
 
@@ -804,6 +822,9 @@ Factorize( const CanonicalForm & F, int is_SqrFree ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.6  2001/06/18 08:44:41  pfister
+* hannes/GP/michael: factory debug, Factorize
+
 Revision 1.5  1999/06/15 12:54:55  Singular
 * hannes: debug fixes for Singular-interface
 

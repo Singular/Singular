@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: alg_factor.cc,v 1.5 2001-06-18 08:44:39 pfister Exp $";
+static char * rcsid = "$Id: alg_factor.cc,v 1.6 2001-06-21 14:57:04 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -29,10 +29,33 @@ static char * rcsid = "$Id: alg_factor.cc,v 1.5 2001-06-18 08:44:39 pfister Exp 
 #include "timing.h"
 TIMING_DEFINE_PRINT(newfactoras_time);
 
+int getAlgVar(const CanonicalForm &f, Variable &X)
+{
+  if (f.inBaseDomain()) return 0;
+  if (f.inCoeffDomain())
+  {
+    if (f.level()!=0)
+    {
+      X= f.mvar();
+      return 1;
+    }
+    return getAlgVar(f.LC(),X);
+  }
+  if (f.inPolyDomain())
+  {
+    if (getAlgVar(f.LC(),X)) return 1;
+    for( CFIterator i=f; i.hasTerms(); i++)
+    {
+      if (getAlgVar(i.coeff(),X)) return 1;
+    }
+  }
+  return 0;
+}
+
 ////////////////////////////////////////////////////////////////////////
-// This implements the algorithm of Trager for factorization of 
-// (multivariate) polynomials over algebraic extensions and so called 
-// function field extensions. 
+// This implements the algorithm of Trager for factorization of
+// (multivariate) polynomials over algebraic extensions and so called
+// function field extensions.
 ////////////////////////////////////////////////////////////////////////
 
 // // missing class: IntGenerator:
@@ -93,7 +116,7 @@ return resultant(f,g,v);
     return 1;
   }
 
-  if ( f.degree( v ) < 1 || g.degree( v ) < 1 ){ 
+  if ( f.degree( v ) < 1 || g.degree( v ) < 1 ){
     DEBOUTMSG(cout, "resultante: f.degree( v ) < 1 || g.degree( v ) < 1");
     // If deg(F,v) == 0 , then resultante(F,G,v) = F^n, where n=deg(G,v)
     if ( f.degree( v ) < 1 ) return power(f,degree(g,v));
@@ -128,22 +151,22 @@ alg_sqrfree( const CanonicalForm & f ){
 }
 
 // Calculates a square free norm
-// Input: f(x, alpha) a square free polynomial over K(alpha), 
+// Input: f(x, alpha) a square free polynomial over K(alpha),
 // alpha is defined by the minimal polynomial Palpha
 // K has more than S elements (S is defined in thesis; look getextension)
 static void
-sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha, 
-	   CFGenerator & myrandom, CanonicalForm & s,  CanonicalForm & g, 
-	   CanonicalForm & R){  
+sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
+           CFGenerator & myrandom, CanonicalForm & s,  CanonicalForm & g,
+           CanonicalForm & R){
   Variable y=PPalpha.mvar(),vf=f.mvar();
   CanonicalForm temp, Palpha=PPalpha, t;
   int sqfreetest=0;
   CFFList testlist;
   CFFListIterator i;
-  
+
   DEBOUTLN(cout, "sqrf_norm_sub:      f= ", f);
   DEBOUTLN(cout, "sqrf_norm_sub: Palpha= ", Palpha);
-  myrandom.reset();   s=f.mvar()-myrandom.item()*Palpha.mvar();   g=f;   
+  myrandom.reset();   s=f.mvar()-myrandom.item()*Palpha.mvar();   g=f;
   R= CanonicalForm(0);
   DEBOUTLN(cout, "sqrf_norm_sub: myrandom s= ", s);
 
@@ -154,48 +177,48 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
     DEBOUTLN(cout, "sqrf_norm_sub: R= ", R);
     // sqfree check ; R is a polynomial in K[x]
     if ( getCharacteristic() == 0 ){
-      temp= gcd(R, R.deriv(vf)); 
+      temp= gcd(R, R.deriv(vf));
       DEBOUTLN(cout, "sqrf_norm_sub: temp= ", temp);
       if (degree(temp,vf) != 0 || temp == temp.genZero() ){ sqfreetest= 0; }
       else { sqfreetest= 1; }
       DEBOUTLN(cout, "sqrf_norm_sub: sqfreetest= ", sqfreetest);
     }
-    else{  
+    else{
       DEBOUTMSG(cout, "Starting SqrFreeTest(R)!");
-      // Look at SqrFreeTest! 
+      // Look at SqrFreeTest!
       // (z+a^5+w)^4 with z<w<a should not give sqfreetest=1 !
-      // for now we use this workaround with Factorize... 
+      // for now we use this workaround with Factorize...
       // ...but it should go away soon!!!!
-      testlist= Factorize(R);  
+      testlist= Factorize(R);
       DEBOUTLN(cout, "testlist= ", testlist);
       testlist.removeFirst();
       sqfreetest=1;
       for ( i=testlist; i.hasItem(); i++)
-	if ( i.getItem().exp() > 1 && degree(i.getItem().factor(), R.mvar()) > 0) { sqfreetest=0; break; }
+        if ( i.getItem().exp() > 1 && degree(i.getItem().factor(), R.mvar()) > 0) { sqfreetest=0; break; }
       DEBOUTLN(cout, "SqrFreeTest(R)= ", sqfreetest);
     }
     if ( ! sqfreetest ){
-      myrandom.next();   
+      myrandom.next();
       DEBOUTLN(cout, "sqrf_norm_sub generated new myrandom item: ", myrandom.item());
       if ( getCharacteristic() == 0 ) t= CanonicalForm(mapinto(myrandom.item()));
       else t= CanonicalForm(myrandom.item());
       s= f.mvar()+t*Palpha.mvar(); // s defines backsubstitution
-      DEBOUTLN(cout, "sqrf_norm_sub: testing s= ", s); 
+      DEBOUTLN(cout, "sqrf_norm_sub: testing s= ", s);
       g= f(f.mvar()-t*Palpha.mvar(), f.mvar());
-      DEBOUTLN(cout, "             gives g= ", g); 
+      DEBOUTLN(cout, "             gives g= ", g);
     }
   }
 }
 
 static void
-sqrf_norm( const CanonicalForm & f, const CanonicalForm & PPalpha, 
-	   const Variable & Extension, CanonicalForm & s,  CanonicalForm & g, 
-	   CanonicalForm & R){  
-  
+sqrf_norm( const CanonicalForm & f, const CanonicalForm & PPalpha,
+           const Variable & Extension, CanonicalForm & s,  CanonicalForm & g,
+           CanonicalForm & R){
+
   DEBOUTLN(cout, "sqrf_norm:      f= ", f);
   DEBOUTLN(cout, "sqrf_norm: Palpha= ", PPalpha);
   if ( getCharacteristic() == 0 ) {
-    IntGenerator myrandom; 
+    IntGenerator myrandom;
     DEBOUTMSG(cout, "sqrf_norm: no extension, char=0");
     sqrf_norm_sub(f,PPalpha, myrandom, s,g,R);
     DEBOUTLN(cout, "sqrf_norm:      f= ", f);
@@ -203,7 +226,7 @@ sqrf_norm( const CanonicalForm & f, const CanonicalForm & PPalpha,
     DEBOUTLN(cout, "sqrf_norm:      s= ", s);
     DEBOUTLN(cout, "sqrf_norm:      g= ", g);
     DEBOUTLN(cout, "sqrf_norm:      R= ", R);
-  } 
+  }
   else if ( degree(Extension) > 0 ){ // working over Extensions
     DEBOUTLN(cout, "sqrf_norm: degree of extension is ", degree(Extension));
     AlgExtGenerator myrandom(Extension);
@@ -211,7 +234,7 @@ sqrf_norm( const CanonicalForm & f, const CanonicalForm & PPalpha,
   }
   else{
     FFGenerator myrandom;
-    DEBOUTMSG(cout, "sqrf_norm: degree of extension is 0"); 
+    DEBOUTMSG(cout, "sqrf_norm: degree of extension is 0");
     sqrf_norm_sub(f,PPalpha, myrandom, s,g,R);
   }
 }
@@ -227,8 +250,8 @@ Var_is_in_AS(const Varlist & uord, const CFList & Astar){
     for ( CFListIterator j=Astar; j.hasItem(); j++ ){
       elem= j.getItem();
       if ( degree(elem,x) > 0 ){ // x actually occures in Astar
-	output.append(x);
-	break;
+        output.append(x);
+        break;
       }
     }
   }
@@ -236,7 +259,7 @@ Var_is_in_AS(const Varlist & uord, const CFList & Astar){
 }
 
 // Look if Minimalpolynomials in Astar define seperable Extensions
-// Must be a power of p: i.e. y^{p^e}-x 
+// Must be a power of p: i.e. y^{p^e}-x
 static int
 inseperable(const CFList & Astar){
   CanonicalForm elem;
@@ -282,8 +305,8 @@ getextension( IntList & degreelist, int n){
     for (i=degreelist; i.hasItem(); i++){
       l= l+1;
       if ( gcd0(k,i.getItem()) == 1){
-	DEBOUTLN(cout, "getextension: gcd == 1, l=",l);
-	if ( l==length ){ setCharacteristic(charac);  return k; }
+        DEBOUTLN(cout, "getextension: gcd == 1, l=",l);
+        if ( l==length ){ setCharacteristic(charac);  return k; }
       }
       else { DEBOUTMSG(cout, "getextension: Next iteration"); break; }
     }
@@ -294,9 +317,9 @@ getextension( IntList & degreelist, int n){
 
 // calculate a "primitive element"
 // K must have more than S elements (->thesis, -> getextension)
-static CFList  
-simpleextension(const CFList & Astar, const Variable & Extension, 
-		CanonicalForm & R){
+static CFList
+simpleextension(const CFList & Astar, const Variable & Extension,
+                CanonicalForm & R){
   CFList Returnlist, Bstar=Astar;
   CanonicalForm s, g;
 
@@ -335,15 +358,36 @@ alg_factor( const CanonicalForm & f, const CFList & Astar, const Variable & vmin
   DEBOUTLN(cout, "alg_factor: substlist= ", substlist);
   DEBOUTLN(cout, "alg_factor: minpoly Rstar= ", Rstar);
   DEBOUTLN(cout, "alg_factor: vminpoly= ", vminpoly);
-  
+
   sqrf_norm(f, Rstar, vminpoly, s, g, R );
   DEBOUTLN(cout, "alg_factor: g= ", g);
   DEBOUTLN(cout, "alg_factor: s= ", s);
   DEBOUTLN(cout, "alg_factor: R= ", R);
   Off(SW_RATIONAL);
-  Factorlist = Factorize(R); 
+  Variable X;
+  if (getAlgVar(R,X))
+  {
+    // factorize R over alg.extension with X
+//cout << "alg: "<< X << " mipo=" << getMipo(X,Variable('X')) <<endl;
+    if (R.isUnivariate())
+      Factorlist =  factorize( R, X );
+    else
+    {
+      Variable XX;
+      CanonicalForm mipo=getMipo(X,XX);
+      CFList as(mipo);
+      Factorlist = newfactoras(R, as , 1);
+    }
+  }
+  else
+  {
+    // factor R over k
+    Factorlist = Factorize(R);
+  }
   On(SW_RATIONAL);
   DEBOUTLN(cout, "alg_factor: Factorize(R)= ", Factorlist);
+  if ( !Factorlist.getFirst().factor().inCoeffDomain() )
+    Factorlist.insert(CFFactor(1,1));
   if ( Factorlist.length() == 2 && Factorlist.getLast().exp()== 1){ // irreduzibel (first entry is a constant)
     L.append(CFFactor(f,1));
   }
@@ -358,26 +402,27 @@ alg_factor( const CanonicalForm & f, const CFList & Astar, const Variable & vmin
       DEBOUTLN(cout, "alg_factor: fnew= ", fnew);
       DEBOUTLN(cout, "alg_factor: substlist= ", substlist);
       for ( CFListIterator ii=substlist; ii.hasItem(); ii++){
-	DEBOUTLN(cout, "alg_factor: item= ", ii.getItem());
-	fnew= fnew(ii.getItem(), ii.getItem().mvar());
-	DEBOUTLN(cout, "alg_factor: fnew= ", fnew);
+        DEBOUTLN(cout, "alg_factor: item= ", ii.getItem());
+        fnew= fnew(ii.getItem(), ii.getItem().mvar());
+        DEBOUTLN(cout, "alg_factor: fnew= ", fnew);
       }
       if (degree(i.getItem().factor()) > 0 ){
-	// undo linear transformation!!!! and then gcd!
-	//cout << "algcd(" << g << "," << i.getItem().factor()(s,s.mvar()) << ",as" << as << ")" << endl;
-	h= algcd(g,fnew, as, oldord);
-	DEBOUTLN(cout, "  alg_factor: h= ", h);
-	DEBOUTLN(cout, "  alg_factor: oldord= ", oldord);
-	if ( degree(h) > 0 ){ //otherwise it's a constant
-	  g= divide(g, h,as);
-	  DEBOUTLN(cout, "alg_factor: g/h= ", g);
-	  DEBOUTLN(cout, "alg_factor: s= ", s);
-	  DEBOUTLN(cout, "alg_factor: substlist= ", substlist);
-	  L.append(CFFactor(h,1));
-	}
+        // undo linear transformation!!!! and then gcd!
+        //cout << "algcd(" << g << "," << fnew << ",as" << as << ")" << endl;
+        h= algcd(g,fnew, as, oldord);
+        //cout << "algcd result:" << h << endl;
+        DEBOUTLN(cout, "  alg_factor: h= ", h);
+        DEBOUTLN(cout, "  alg_factor: oldord= ", oldord);
+        if ( degree(h) > 0 ){ //otherwise it's a constant
+          g= divide(g, h,as);
+          DEBOUTLN(cout, "alg_factor: g/h= ", g);
+          DEBOUTLN(cout, "alg_factor: s= ", s);
+          DEBOUTLN(cout, "alg_factor: substlist= ", substlist);
+          L.append(CFFactor(h,1));
+        }
       }
     }
-    // we are not interested in a 
+    // we are not interested in a
     // constant (over K_r, which can be a polynomial!)
     if (degree(g, f.mvar())>0){ L.append(CFFactor(g,1)); }
   }
@@ -394,37 +439,37 @@ endler( const CanonicalForm & f, const CFList & AS, const Varlist & uord ){
   CFListIterator i,ii;
   VarlistIterator j;
   Variable vg;
-  
+
   for (i=as; i.hasItem(); i++){
     g= i.getItem();
     if (g.deriv() == 0 ){
       DEBOUTLN(cout, "Inseperable extension detected: ", g);
       for (j=uord; j.hasItem(); j++){
-	if ( degree(g,j.getItem()) > 0 ) vg= j.getItem();
+        if ( degree(g,j.getItem()) > 0 ) vg= j.getItem();
       }
       // Now we have the highest transzendental in vg;
       DEBOUTLN(cout, "Transzendental is ", vg);
       CanonicalForm gg=-1*g[0];
       divrem(gg,vg,q,r); r= gg-q*vg;   gg= gg-r;
-      //DEBOUTLN(cout, "q= ", q); DEBOUTLN(cout, "r= ", r); 
+      //DEBOUTLN(cout, "q= ", q); DEBOUTLN(cout, "r= ", r);
       DEBOUTLN(cout, "  that is ", gg);
       DEBOUTLN(cout, "  maps to ", g+gg);
       One.insert(gg); Two.insert(g+gg);
       // Now transform all remaining polys in as:
       int x=0;
       for (ii=i; ii.hasItem(); ii++){
-	if ( x != 0 ){
-	  divrem(ii.getItem(), gg, q,r);
-//	  cout << ii.getItem() << " divided by " << gg << endl;
-	  DEBOUTLN(cout, "q= ", q); DEBOUTLN(cout, "r= ", r);
-	  ii.append(ii.getItem()+q*g); ii.remove(1);
-	  DEBOUTLN(cout, "as= ", as);
-	}
-	x+= 1;
+        if ( x != 0 ){
+          divrem(ii.getItem(), gg, q,r);
+//          cout << ii.getItem() << " divided by " << gg << endl;
+          DEBOUTLN(cout, "q= ", q); DEBOUTLN(cout, "r= ", r);
+          ii.append(ii.getItem()+q*g); ii.remove(1);
+          DEBOUTLN(cout, "as= ", as);
+        }
+        x+= 1;
       }
-      // Now transform F: 
+      // Now transform F:
       divrem(F, gg, q,r);
-      F= F+q*g; 
+      F= F+q*g;
       DEBOUTLN(cout, "new F= ", F);
     }
     else{ asnew.append(i.getItem());  }// just the identity
@@ -448,7 +493,7 @@ endler( const CanonicalForm & f, const CFList & AS, const Varlist & uord ){
       DEBOUTLN(cout, "     in ", factor);
       divrem(factor,i.getItem(),q,r); r=factor -q*i.getItem();
       DEBOUTLN(cout, "q= ", q); DEBOUTLN(cout, "r= ", r);
-      factor= ii.getItem()*q +r; // 
+      factor= ii.getItem()*q +r; //
       ii++;
     }
     Output.append(CFFactor(factor,k.getItem().exp()));
@@ -459,7 +504,7 @@ endler( const CanonicalForm & f, const CFList & AS, const Varlist & uord ){
 
 
 // 1) prepares data
-// 2) for char=p we distinguish 3 cases: 
+// 2) for char=p we distinguish 3 cases:
 //           no transcendentals, seperable and inseperable extensions
 CFFList
 newfactoras( const CanonicalForm & f, const CFList & as, int success){
@@ -468,7 +513,7 @@ newfactoras( const CanonicalForm & f, const CFList & as, int success){
   CFFListIterator jj;
   CFList reduceresult;
   CFFList result;
-  
+
   success=1;
   DEBINCLEVEL(cout, "newfactoras");
   DEBOUTMSG(cerr, rcsid);
@@ -483,7 +528,7 @@ newfactoras( const CanonicalForm & f, const CFList & as, int success){
 // 1) first trivial cases:
   if ( (cls(vf) <= cls(as.getLast())) ||  degree(f,vf)<=1 ){
 // ||( (as.length()==1) && (degree(f,vf)==3) && (degree(as.getFirst()==2)) )
-    DEBDECLEVEL(cout,"newfactoras"); 
+    DEBDECLEVEL(cout,"newfactoras");
     return CFFList(CFFactor(f,1));
   }
 
@@ -502,9 +547,9 @@ newfactoras( const CanonicalForm & f, const CFList & as, int success){
     x= elem.mvar();
     if ( degree(elem,x) > 1){ // otherwise it's not an extension
       //if ( degree(f,x) > 0 ){ // does it occure in f? RICHTIG?
-	Astar.append(elem);
-	ord.append(x);
-	//}
+        Astar.append(elem);
+        ord.append(x);
+        //}
     }
   }
   uord= Difference(uord,ord);
@@ -513,17 +558,17 @@ newfactoras( const CanonicalForm & f, const CFList & as, int success){
   DEBOUTLN(cout, "uord is: ", uord);
 
 // 3) second trivial cases: we already prooved irr. of f over no extensions
-  if ( Astar.length() == 0 ){ 
-    DEBDECLEVEL(cout,"newfactoras"); 
-    return CFFList(CFFactor(f,1)); 
+  if ( Astar.length() == 0 ){
+    DEBDECLEVEL(cout,"newfactoras");
+    return CFFList(CFFactor(f,1));
   }
 
 // 4) Try to obtain a partial factorization using prop2 and prop3
 //    Use with caution! We have to proof these propositions first!
   // Not yet implemented
 
-// 5) Look if elements in uord actually occure in any of the minimal 
-//    polynomials. If no element of uord occures in any of the minimal 
+// 5) Look if elements in uord actually occure in any of the minimal
+//    polynomials. If no element of uord occures in any of the minimal
 //   polynomials, we don't have transzendentals.
   Varlist newuord=Var_is_in_AS(uord,Astar);
   DEBOUTLN(cout, "newuord is: ", newuord);
@@ -531,7 +576,9 @@ newfactoras( const CanonicalForm & f, const CFList & as, int success){
   CFFList Factorlist;
   Varlist gcdord= Union(ord,newuord); gcdord.append(f.mvar());
   // This is for now. we need alg_sqrfree implemented!
+  //cout << "algcd(" << f << "," << f.deriv() << " as:" << Astar <<endl;
   CanonicalForm Fgcd= algcd(f,f.deriv(),Astar,gcdord);
+ // cout << "algcd result:"  << Fgcd << endl;
   if ( Fgcd == 0 ) DEBOUTMSG(cerr, "WARNING: p'th root ?");
   if ( degree(Fgcd, f.mvar()) > 0 ){
     DEBOUTLN(cout, "Nontrivial GCD found of ", f);
@@ -555,16 +602,16 @@ newfactoras( const CanonicalForm & f, const CFList & as, int success){
     if ( newuord.length() == 0 ){ // no transzendentals
       DEBOUTMSG(cout, "No transzendentals!");
       if ( extdeg > 1 ){
-	CanonicalForm MIPO= generate_mipo( extdeg, vminpoly);
-	DEBOUTLN(cout, "Minpoly produced ", MIPO);
-	vminpoly= rootOf(MIPO);
+        CanonicalForm MIPO= generate_mipo( extdeg, vminpoly);
+        DEBOUTLN(cout, "Minpoly produced ", MIPO);
+        vminpoly= rootOf(MIPO);
       }
       Factorlist= alg_factor(f, Astar, vminpoly, oldord, as);
       DEBDECLEVEL(cout,"newfactoras");
       return Factorlist;
     }
     else if ( inseperable(Astar) > 0 ){ // Look if extensions are seperable
-      // a) Use Endler 
+      // a) Use Endler
       DEBOUTMSG(cout, "Inseperable extensions! Using Endler!");
       CFFList templist= endler(f,Astar, newuord);
       DEBOUTLN(cout, "Endler gives: ", templist);
@@ -573,11 +620,11 @@ newfactoras( const CanonicalForm & f, const CFList & as, int success){
     else{ // we are on the save side: Use trager
       DEBOUTMSG(cout, "Only seperable extensions!");
       if (extdeg > 1 ){
-	CanonicalForm MIPO=generate_mipo(extdeg, vminpoly );
-	vminpoly= rootOf(MIPO);
-	DEBOUTLN(cout, "Minpoly generated: ", MIPO);
-	DEBOUTLN(cout, "vminpoly= ", vminpoly);
-	DEBOUTLN(cout, "degree(vminpoly)= ", degree(vminpoly));
+        CanonicalForm MIPO=generate_mipo(extdeg, vminpoly );
+        vminpoly= rootOf(MIPO);
+        DEBOUTLN(cout, "Minpoly generated: ", MIPO);
+        DEBOUTLN(cout, "vminpoly= ", vminpoly);
+        DEBOUTLN(cout, "degree(vminpoly)= ", degree(vminpoly));
       }
       Factorlist= alg_factor(f, Astar, vminpoly, oldord, as);
       DEBDECLEVEL(cout,"newfactoras");
@@ -594,8 +641,8 @@ newfactoras( const CanonicalForm & f, const CFList & as, int success){
     ;
   }
 
-  DEBDECLEVEL(cout,"newfactoras"); 
-  return CFFList(CFFactor(f,1)); 
+  DEBDECLEVEL(cout,"newfactoras");
+  return CFFList(CFFactor(f,1));
 }
 
 CFFList
@@ -618,17 +665,20 @@ newcfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.5  2001/06/18 08:44:39  pfister
+* hannes/GP/michael: factory debug, Factorize
+
 Revision 1.4  1998/05/25 18:32:38  obachman
 1998-05-25  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* charset/alg_factor.cc: replaced identifiers 'random' by
-	'myrandom' to avoid name conflicts with the built-in (stdlib)
-	library function 'random' which might be a macro -- and, actually
-	is  under gcc v 2.6.3
+        * charset/alg_factor.cc: replaced identifiers 'random' by
+        'myrandom' to avoid name conflicts with the built-in (stdlib)
+        library function 'random' which might be a macro -- and, actually
+        is  under gcc v 2.6.3
 
 Revision 1.3  1998/03/12 12:34:24  schmidt
-	* charset/csutil.cc, charset/alg_factor.cc: all references to
-	  `common_den()' replaced by `bCommonDen()'
+        * charset/csutil.cc, charset/alg_factor.cc: all references to
+          `common_den()' replaced by `bCommonDen()'
 
 Revision 1.2  1997/09/12 07:19:37  Singular
 * hannes/michael: libfac-0.3.0
