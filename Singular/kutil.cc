@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.23 1998-06-12 10:13:34 Singular Exp $ */
+/* $Id: kutil.cc,v 1.24 1998-07-23 09:07:00 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -131,12 +131,20 @@ void cancelunit (LObject* p)
   int  i;
   poly h;
 
-  if(!pIsVector((*p).p) && ((*p).ecart != 0))
+  if(pIsVector((*p).p))
   {
+    if(!pOneComp((*p).p)) return;
+  }
+  if ((*p).ecart != 0)
+  {
+    for(i=1;i<=pVariables;i++)
+    {
+      if ((pGetExp((*p).p,1)>0) && (rIsPolyVar(i)==TRUE)) return;
+    }
     h = pNext(((*p).p));
     loop
     {
-      if (!h)
+      if (h==NULL)
       {
         pDelete(&(pNext((*p).p)));
         (*p).ecart = 0;
@@ -3150,7 +3158,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
           redSi = pHead(strat->S[i]);
           strat->S[i] = redBba(strat->S[i],i-1,strat);
           if ((strat->ak!=0)&&(strat->S[i]!=NULL))
-	    strat->S[i]=redQ(strat->S[i],i+1,strat); /*reduce S[i] mod Q*/
+            strat->S[i]=redQ(strat->S[i],i+1,strat); /*reduce S[i] mod Q*/
           if (TEST_OPT_PROT && (pComp(redSi,strat->S[i])!=0))
           {
             if (strat->S[i]==NULL)
@@ -3811,7 +3819,7 @@ void completeReduce (kStrategy strat)
       if (TEST_OPT_INTSTRATEGY)
       {
         //if (strat->redTailChange)
-	  pCleardenom(strat->S[i]);
+          pCleardenom(strat->S[i]);
       }
       if (TEST_OPT_PROT)
       {

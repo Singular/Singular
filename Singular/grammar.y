@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.40 1998-06-18 17:32:11 Singular Exp $ */
+/* $Id: grammar.y,v 1.41 1998-07-23 09:06:59 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -1428,7 +1428,7 @@ proccmd:
         PROC_CMD extendedid BLOCKTOK
           {
             procinfov pi;
-            idhdl h = enterid($2,myynest,PROC_CMD,&IDROOT,FALSE);
+            idhdl h = enterid($2,myynest,PROC_CMD,&IDROOT,TRUE);
             if (h==NULL) {FreeL((ADDRESS)$3); YYERROR;}
             iiInitSingularProcinfo(IDPROC(h),"", $2, 0, 0);
             IDPROC(h)->data.s.body = (char *)AllocL(strlen($3)+31);;
@@ -1437,7 +1437,7 @@ proccmd:
           }
         | PROC_DEF STRINGTOK BLOCKTOK
           {
-            idhdl h = enterid($1,myynest,PROC_CMD,&IDROOT,FALSE);
+            idhdl h = enterid($1,myynest,PROC_CMD,&IDROOT,TRUE);
             if (h==NULL)
             {
               FreeL((ADDRESS)$2);

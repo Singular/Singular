@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.29 1998-07-22 07:51:00 Singular Exp $ */
+/* $Id: ring.cc,v 1.30 1998-07-23 09:07:03 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1731,4 +1731,37 @@ BOOLEAN rHasSimpleLexOrder(ring r)
      r->order[1] == ringorder_lp);
 }
 
-
+BOOLEAN rIsPolyVar(int v)
+{
+  int  i=0;
+  while(currRing->order[i]!=0)
+  {
+    if((currRing->block0[i]<=v)
+    && (currRing->block1[i]>=v))
+    {
+      switch(currRing->order[i])
+      {
+        case ringorder_a:
+          return (currRing->wvhdl[i][v-currRing->block0[i]]>0);
+        case ringorder_M:
+          return 2; /*don't know*/
+        case ringorder_lp:
+        case ringorder_dp:
+        case ringorder_Dp:
+        case ringorder_wp:
+        case ringorder_Wp:
+          return TRUE;
+        case ringorder_ls:
+        case ringorder_ds:
+        case ringorder_Ds:
+        case ringorder_ws:
+        case ringorder_Ws:
+          return FALSE;
+        default:
+          break;
+      }
+    }
+    i++;
+  }
+  return 3; /* could not find var v*/
+}

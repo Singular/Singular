@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.15 1998-06-02 15:30:03 Singular Exp $ */
+/* $Id: ring.h,v 1.16 1998-07-23 09:07:04 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -83,6 +83,7 @@ BOOLEAN rHasSimpleOrder(ring r);
 // returns TRUE, if simple lp or ls ordering
 BOOLEAN rHasSimpleLexOrder(ring r);
 rOrderType_t    rGetOrderType(ring r);
+BOOLEAN rIsPolyVar(int i); /* returns TRUE if var(i) belongs to p-block */
 
 #ifdef RDEBUG
 extern short rNumber; /* current ring id (r->no) */

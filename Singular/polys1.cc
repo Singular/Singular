@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.15 1998-05-28 16:50:52 Singular Exp $ */
+/* $Id: polys1.cc,v 1.16 1998-07-23 09:07:02 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -656,6 +656,23 @@ int pMinComp(poly p)
     if (i<result) result = i;
   }
   return result;
+}
+
+/*2
+* returns TRUE, if all monoms have the same component
+*/
+BOOLEAN pOneComp(poly p)
+{
+  if(p!=NULL)
+  {
+    int i = pGetComp(p);
+    while (pNext(p)!=NULL)
+    {
+      pIter(p);
+      if(i != pGetComp(p)) return FALSE;
+    }
+  }
+  return TRUE;
 }
 
 /*2

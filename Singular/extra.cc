@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.64 1998-07-15 16:17:34 Singular Exp $ */
+/* $Id: extra.cc,v 1.65 1998-07-23 09:06:57 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -47,9 +47,10 @@
 #include "ideals.h"
 #include "kstd1.h"
 #include "syz.h"
+#include "lamat.h"
 
 // Define to enable many more system commands
-//#define HAVE_EXTENDED_SYSTEM
+#define HAVE_EXTENDED_SYSTEM
 
 #ifdef STDTRACE
 //#include "comm.h"
@@ -396,6 +397,26 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 {
   if(h->Typ() == STRING_CMD)
   {
+/*==================== latest ==================================*/
+    if(strcmp((char*)(h->Data()),"la")==0)
+    {
+      if ((h->next!=NULL) &&(h->next->Typ()==INT_CMD))
+      {
+        laSet();
+	int i=(int)(h->next->Data());
+	Print(" i=%d .. p=",i);
+	poly p=laNumberMon(i);
+	wrp(p);
+	i=laMonNumber(p);
+	pDelete(&p);
+	Print(" .. i=%d\n",i);
+        laReset();
+        return FALSE;
+      }
+      else
+         WerrorS("int expected");
+    }
+    else
 /*==================== naIdeal ==================================*/
     if(strcmp((char*)(h->Data()),"naIdeal")==0)
     {
