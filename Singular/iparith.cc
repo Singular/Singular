@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.311 2004-02-04 20:19:46 levandov Exp $ */
+/* $Id: iparith.cc,v 1.312 2004-02-11 11:37:11 bricken Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -44,6 +44,7 @@
 #include "sparsmat.h"
 #include "algmap.h"
 #include "units.h"
+#include "../kernel/GMPrat.h"
 #ifdef HAVE_FACTORY
 #include "clapsing.h"
 #include "kstdfac.h"
