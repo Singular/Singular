@@ -80,6 +80,7 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc clapconv.cc \
     clapsing.cc cntrlc.cc mminit.cc\
     extra.cc febase.cc feread.cc fehelp.cc feResource.cc feOpt.cc \
     ffields.cc hdegree.cc hilb.cc hutil.cc \
+    gring.cc \
     ideals.cc intvec.cc \
     ipassign.cc ipconv.cc ipid.cc iplib.cc \
     ipprint.cc ipshell.cc khstd.cc kstdfac.cc \
@@ -126,7 +127,7 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	subexpr.h clapsing.h ipid.h matpol.h polys.h p_polys.h syz.h \
 	cntrlc.h ipprint.h ring.h timer.h sdb.h dError.h \
 	febase.h ipshell.h shortfl.h tok.h mpr_complex.h mpr_global.h \
-	page.h \
+	page.h gring.h \
 	ffields.h khstd.h silink.h sparsmat.h gnumpfl.h gnumpc.h \
 	fglm.h kstd1.h modulop.h sing_dbm.h weight.h \
 	fglmgauss.h fglmvec.h mpsr.h sing_mp.h \

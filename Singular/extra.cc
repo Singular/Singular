@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.149 2000-11-03 14:50:15 obachman Exp $ */
+/* $Id: extra.cc,v 1.150 2000-11-13 14:50:21 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -60,6 +60,9 @@
 #include "spectrum.h"
 #endif
 
+#ifdef HAVE_PLURAL
+#include "gring.h"
+#endif
 
 // Define to enable many more system commands
 #ifndef MAKE_DISTRIBUTION
@@ -1179,7 +1182,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       if ((h!=NULL) && (h->Typ()==MODUL_CMD))
       {
         i1=(ideal)h->CopyD();
-	h=h->next;
+        h=h->next;
       }
       else return TRUE;
       if ((h!=NULL) && (h->Typ()==INT_CMD))
@@ -1192,6 +1195,68 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
+#ifdef HAVE_PLURAL
+/*==================== PLURAL =================*/
+    if (strcmp(sys_cmd, "PLURAL") == 0)
+    {
+      matrix C;
+      matrix D;
+
+      if ((h!=NULL) && (h->Typ()==MATRIX_CMD))
+      {
+        C=(matrix)h->CopyD();
+        h=h->next;
+      }
+      else return TRUE;
+      if ((h!=NULL) && (h->Typ()==MATRIX_CMD))
+      {
+        D=(matrix)h->CopyD();
+      }
+      else return TRUE;
+      if (currRing->nc==NULL)
+      {
+        currRing->nc=(nc_struct *)omAlloc0(sizeof(nc_struct));
+	currRing->nc->MT=(matrix *)omAlloc0(pVariables*(pVariables-1)/2*sizeof(matrix));
+	currRing->nc->MTsize=(int *)omAlloc0(pVariables*(pVariables-1)/2*sizeof(int));
+      }
+      else
+      {
+        WarnS("redefining algebra structure");
+      }
+      currRing->nc->type=nc_general;
+      currRing->nc->C=C;
+      currRing->nc->D=D;
+      {
+        int i,j;
+        poly p;
+        short DefMTsize=7;
+        int nv=pVariables;
+        for(i=1;i<nv;i++)
+        {
+          for(j=i+1;j<=nv;j++)
+          { 
+            currRing->nc->MTsize[UPMATELEM(i,j)]=DefMTsize; /* default sizes */
+            currRing->nc->MT[UPMATELEM(i,j)]=mpNew(DefMTsize,DefMTsize);
+            p=pOne();
+            pSetCoeff(p,nCopy(pGetCoeff(MATELEM(currRing->nc->C,i,j))));
+            pSetExp(p,i,1);
+            pSetExp(p,j,1);
+            pSetm(p);
+            p=pAdd(p,pCopy(MATELEM(currRing->nc->D,i,j)));
+            MATELEM(currRing->nc->MT[UPMATELEM(i,j)],1,1)=p;
+            /* set MT[i,j,1,1] to c_i_j*x_i*x_j + D_i_j */
+          }
+        }
+      }
+      // set p_Procs:
+//      currRing->p_Procs->pp_Mult_mm =nc_pp_Mult_mm;
+//      currRing->p_Procs->p_Mult_mm =nc_p_Mult_mm;
+//      currRing->p_Procs->p_Minus_mm_Mult_qq =nc_p_Minus_mm_Mult_qq;
+
+      return FALSE;
+    }
+    else
+#endif
 #ifdef HAVE_WALK
 /*==================== walk stuff =================*/
     if (strcmp(sys_cmd, "walkNextWeight") == 0)

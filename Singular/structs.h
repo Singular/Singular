@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.43 2000-10-30 13:40:27 obachman Exp $ */
+/* $Id: structs.h,v 1.44 2000-11-13 14:50:25 levandov Exp $ */
 /*
 * ABSTRACT
 */
@@ -42,6 +42,14 @@ enum noeof_t
   noeof_string
 };
 
+#ifdef HAVE_PLURAL
+enum nc_type
+{
+  nc_general,
+  nc_skew,
+  nc_lie
+};
+#endif
 /* C++-part */
 #ifdef __cplusplus
 class ip_smatrix;
@@ -68,6 +76,10 @@ struct sip_command;
 struct sip_package;
 struct s_si_link_extension;
 struct reca;
+#ifdef HAVE_PLURAL
+struct nc_struct;
+typedef struct nc_struct   nc_struct;
+#endif
 typedef struct _ssubexpr   sSubexpr;
 typedef struct _sssym      ssym;
 typedef struct spolyrec    polyrec;
@@ -241,6 +253,17 @@ struct sro_ord
   } data;
 };
 
+#ifdef HAVE_PLURAL
+struct nc_struct
+{
+  nc_type type;
+  matrix C;
+  matrix D;
+  matrix *MT;
+  int *MTsize;
+};
+#endif
+
 struct sip_sring
 {
   idhdl      idroot; /* local objects */
@@ -333,6 +356,9 @@ struct sip_sring
   pFDegProc     pFDeg;
   pLDegProc     pLDeg;
   p_SetmProc    p_Setm;
+#ifdef HAVE_PLURAL
+  nc_struct     *nc;
+#endif
 };
 
 struct sip_sideal
