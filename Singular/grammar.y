@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.69 1999-09-17 11:42:23 Singular Exp $ */
+/* $Id: grammar.y,v 1.70 1999-09-27 11:38:33 obachman Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -1335,8 +1335,7 @@ ringcmd:
             rInit(ring_name,      /* ringname */
                   &$4,            /* characteristik and list of parameters*/
                   &$6,            /* names of ringvariables */
-                  &$8,            /* ordering */
-                  FALSE);         /* is not a dring */
+                  &$8);            /* ordering */
 #ifdef HAVE_NAMESPACES
             if(do_pop) namespaceroot->pop();
 #endif /* HAVE_NAMESPACES */

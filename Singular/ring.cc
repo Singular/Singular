@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.63 1999-09-15 12:23:02 Singular Exp $ */
+/* $Id: ring.cc,v 1.64 1999-09-27 11:38:32 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -493,8 +493,7 @@ static BOOLEAN rSleftvList2StringArray(sleftv* sl, char** p)
 //         NULL        on error
 // NOTE:   * makes new ring to current ring, on success
 //         * considers input sleftv's as read-only
-idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
-            BOOLEAN isDRing)
+idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord)
 {
   int ch;
   int float_len=0;
