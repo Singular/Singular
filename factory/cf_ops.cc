@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_ops.cc,v 1.3 1997-07-19 08:09:28 schmidt Exp $ */
+/* $Id: cf_ops.cc,v 1.4 1997-07-30 07:40:20 schmidt Exp $ */
 
 #include <config.h>
 
@@ -109,19 +109,44 @@ apply ( const CanonicalForm & f, void (*mf)( CanonicalForm &, int & ) )
     }
 }
 
-void
+//{{{ static void degreesRec ( const CanonicalForm & f, int * degs )
+//{{{ docu
+//
+// degreesRec() - recursively get degrees of f.
+//
+//}}}
+static void
 degreesRec ( const CanonicalForm & f, int * degs )
 {
     if ( ! f.inCoeffDomain() ) {
 	int level = f.level();
 	int deg = f.degree();
+	// calculate the maximum degree of all coefficients which
+	// are in the same level
 	if ( degs[level] < deg )
 	    degs[level] = f.degree();
 	for ( CFIterator i = f; i.hasTerms(); i++ )
 	    degreesRec( i.coeff(), degs );
     }
 }
+//}}}
 
+//{{{ int * degrees ( const CanonicalForm & f, int * degs )
+//{{{ docu
+//
+// degress() - return the degrees of all polynomial variables in f.
+//
+// Returns 0 if f is in a coefficient domain, the degrees of f in
+// all its polynomial variables in an array of int otherwise:
+//
+//   degrees( f, 0 )[i] = degree( f, Variable(i) )
+//
+// If degs is not the zero pointer the degrees are stored in this
+// array.  In this case degs should be larger than the level of
+// f.  If degs is the zero pointer, an array of sufficient size
+// is allocated automatically.
+//
+//}}}
 int *
 degrees ( const CanonicalForm & f, int * degs )
 {
@@ -137,7 +162,18 @@ degrees ( const CanonicalForm & f, int * degs )
 	return degs;
     }
 }
+//}}}
 
+//{{{ CanonicalForm mapdomain ( const CanonicalForm & f, CanonicalForm (*mf)( const CanonicalForm & ) )
+//{{{ docu
+//
+// mapdomain() - map all coefficients of f through mf.
+//
+// Recursively descends down through f to the coefficients which
+// are in a coefficient domain mapping each such coefficient
+// through mf and returns the result.
+//
+//}}}
 CanonicalForm
 mapdomain ( const CanonicalForm & f, CanonicalForm (*mf)( const CanonicalForm & ) )
 {
@@ -152,7 +188,18 @@ mapdomain ( const CanonicalForm & f, CanonicalForm (*mf)( const CanonicalForm & 
 	return result;
     }
 }
+//}}}
 
+//{{{ int totaldegree ( const CanonicalForm & f )
+//{{{ docu
+//
+// totaldegree() - return the total degree of f.
+//
+// If f is zero, return -1.  If f is in a coefficient domain,
+// return 0.  Otherwise return the total degree of f in all
+// polynomial variables.
+//
+//}}}
 int
 totaldegree ( const CanonicalForm & f )
 {
@@ -163,14 +210,28 @@ totaldegree ( const CanonicalForm & f )
     else {
 	CFIterator i;
 	int cdeg = 0, dummy;
+	// calculate maximum over all coefficients of f, taking
+	// in account our own exponent
 	for ( i = f; i.hasTerms(); i++ )
 	    if ( (dummy = totaldegree( i.coeff() ) + i.exp()) > cdeg )
 		cdeg = dummy;
 	return cdeg;
     }
 }
+//}}}
 
-
+//{{{ int totaldegree ( const CanonicalForm & f, const Variable & v1, const Variable & v2 )
+//{{{ docu
+//
+// totaldegree() - return the total degree of f as a polynomial
+//   in the polynomial variables between v1 and v2 (inclusively).
+//
+// If f is zero, return -1.  If f is in a coefficient domain,
+// return 0.  Also, return 0 if v1 > v2.  Otherwise, take f to be
+// a polynomial in the polynomial variables between v1 and v2 and
+// return its total degree.
+//
+//}}}
 int
 totaldegree ( const CanonicalForm & f, const Variable & v1, const Variable & v2 )
 {
@@ -185,22 +246,28 @@ totaldegree ( const CanonicalForm & f, const Variable & v1, const Variable & v2 
     else if ( f.mvar() == v1 )
 	return f.degree();
     else if ( f.mvar() > v2 ) {
+	// v2's level is larger than f's level, descend down
 	CFIterator i;
 	int cdeg = 0, dummy;
+	// calculate maximum over all coefficients of f
 	for ( i = f; i.hasTerms(); i++ )
 	    if ( (dummy = totaldegree( i.coeff(), v1, v2 )) > cdeg )
 		cdeg = dummy;
 	return cdeg;
     }
     else {
+	// v1 < f.mvar() <= v2
 	CFIterator i;
 	int cdeg = 0, dummy;
+	// calculate maximum over all coefficients of f, taking
+	// in account our own exponent
 	for ( i = f; i.hasTerms(); i++ )
 	    if ( (dummy = totaldegree( i.coeff(), v1, v2 ) + i.exp()) > cdeg )
 		cdeg = dummy;
 	return cdeg;
     }
 }
+//}}}
 
 //{{{ CanonicalForm resultant( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
 //{{{ docu
