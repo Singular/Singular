@@ -1,8 +1,7 @@
-
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.14 1998-01-16 08:24:04 Singular Exp $ */
+/* $Id: polys.cc,v 1.15 1998-01-27 16:20:42 pohl Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -1286,12 +1285,12 @@ static int ldeg1c(poly p,int *l)
 
 /*2
 * sets the comparision routine for monomials: for the first block
-* of variables (or is the number of the ordering)
+* of variables (o_r is the number of the ordering)
 */
 #ifdef COMP_FAST
-static void SimpleChoose(int or, int comp_order, pCompProc *p)
+static void SimpleChoose(int o_r, int comp_order, pCompProc *p)
 #else  
-static void SimpleChoose(int or, pCompProc *p)
+static void SimpleChoose(int o_r, pCompProc *p)
 #endif  
 {
 #ifdef COMP_TRADITIONAL
@@ -1301,7 +1300,7 @@ static void SimpleChoose(int or, pCompProc *p)
   }
   else
   {
-    switch(or)
+    switch(o_r)
     {
         case ringorder_lp:
         case ringorder_Dp:
@@ -1327,22 +1326,22 @@ static void SimpleChoose(int or, pCompProc *p)
           break;
 #ifdef PDEBUG
         default:
-          Werror("wrong internal ordering:%d at %s, l:%d\n",or,__FILE__,__LINE__);
+          Werror("wrong internal ordering:%d at %s, l:%d\n",o_r,__FILE__,__LINE__);
 #endif
     }
   }
-  if (or == ringorder_lp || or == ringorder_ls)
+  if (o_r == ringorder_lp || o_r == ringorder_ls)
   {
       pLexOrder=TRUE;
       pFDeg = pTotaldegree;
       pLDeg = ldeg1c;
-      if (or == ringorder_ls) pLexSgn = -1;
+      if (o_r == ringorder_ls) pLexSgn = -1;
   }
   
   *p = t_pComp0;
 #endif
 #ifdef COMP_FAST
-  switch(or)
+  switch(o_r)
   {
       case ringorder_dp:
       case ringorder_wp:
@@ -1352,7 +1351,7 @@ static void SimpleChoose(int or, pCompProc *p)
       case ringorder_unspec:
         pSetVarIndicies_RevLex(pVariables);
         pLexSgn = -1;
-        if (comp_order == ringorder_C || or == ringorder_unspec)
+        if (comp_order == ringorder_C || o_r == ringorder_unspec)
         {
           if (pVariables1W == 1)
             f_pComp0 = f_comp_1_c;
@@ -1412,16 +1411,16 @@ static void SimpleChoose(int or, pCompProc *p)
 #ifdef PDEBUG
         break;
       default:
-        Werror("wrong internal ordering:%d at %s, l:%d\n",or,__FILE__,__LINE__);
+        Werror("wrong internal ordering:%d at %s, l:%d\n",o_r,__FILE__,__LINE__);
 #endif
   }
   
-  if (or == ringorder_lp || or == ringorder_ls)
+  if (o_r == ringorder_lp || o_r == ringorder_ls)
   {
     pLexOrder=TRUE;
     pFDeg = pTotaldegree;
     pLDeg = ldeg1c;
-    if (or == ringorder_ls)
+    if (o_r == ringorder_ls)
       pSetVarIndicies_Lex(pVariables);
   }
   *p = f_pComp0;
@@ -1434,11 +1433,11 @@ static void SimpleChoose(int or, pCompProc *p)
 
 /*2
 * sets pSetm
-* (according or = order of first block)
+* (according o_r = order of first block)
 */
-static void SetpSetm(int or, int ip)
+static void SetpSetm(int o_r, int ip)
 {
-  switch(or)
+  switch(o_r)
   {
     case ringorder_lp:
     case ringorder_ls:
@@ -1469,7 +1468,7 @@ static void SetpSetm(int or, int ip)
       /*do not set firstBlockEnds for this orderings*/
 #ifdef TEST
     default:
-      Werror("wrong internal ordering:%d at %s, l:%d\n",or,__FILE__,__LINE__);
+      Werror("wrong internal ordering:%d at %s, l:%d\n",o_r,__FILE__,__LINE__);
 #endif
   }
   firstBlockEnds=block1[ip];
@@ -1477,12 +1476,12 @@ static void SetpSetm(int or, int ip)
 
 /*2
 * sets the comparision routine for monomials: for the first block
-* of variables (or is the number of the ordering)
+* of variables (o_r is the number of the ordering)
 */
 #ifdef COMP_FAST
-static void SimpleChooseC(int or, int comp_order, pCompProc *p)
+static void SimpleChooseC(int o_r, int comp_order, pCompProc *p)
 #else  
-static void SimpleChooseC(int or, pCompProc *p)
+static void SimpleChooseC(int o_r, pCompProc *p)
 #endif  
 {
 #ifdef COMP_TRADITIONAL
@@ -1492,7 +1491,7 @@ static void SimpleChooseC(int or, pCompProc *p)
   }
   else
   {
-    switch(or)
+    switch(o_r)
     {
         case ringorder_lp:
         case ringorder_Dp:
@@ -1518,22 +1517,22 @@ static void SimpleChooseC(int or, pCompProc *p)
           break;
 #ifdef PDEBUG
         default:
-          Werror("wrong internal ordering:%d at %s, l:%d\n",or,__FILE__,__LINE__);
+          Werror("wrong internal ordering:%d at %s, l:%d\n",o_r,__FILE__,__LINE__);
 #endif
     }
   }
-  if (or == ringorder_lp || or == ringorder_ls)
+  if (o_r == ringorder_lp || o_r == ringorder_ls)
   {
       pLexOrder=TRUE;
       pFDeg = pTotaldegree;
       pLDeg = ldeg1c;
-      if (or == ringorder_ls) pLexSgn = -1;
+      if (o_r == ringorder_ls) pLexSgn = -1;
   }
   
   *p = t_pComp0;
 #endif
 #ifdef COMP_FAST
-  switch(or)
+  switch(o_r)
   {
       case ringorder_dp:
       case ringorder_wp:
@@ -1574,15 +1573,15 @@ static void SimpleChooseC(int or, pCompProc *p)
 #ifdef PDEBUG
         break;
       default:
-        Werror("wrong internal ordering:%d at %s, l:%d\n",or,__FILE__,__LINE__);
+        Werror("wrong internal ordering:%d at %s, l:%d\n",o_r,__FILE__,__LINE__);
 #endif
   }
-  if (or == ringorder_lp || or == ringorder_ls)
+  if (o_r == ringorder_lp || o_r == ringorder_ls)
   {
     pLexOrder=TRUE;
     pFDeg = pTotaldegree;
     pLDeg = ldeg1c;
-    if (or == ringorder_ls)
+    if (o_r == ringorder_ls)
      pSetVarIndicies_Lex(pVariables);
   }
   *p = f_pComp0;
@@ -1595,11 +1594,11 @@ static void SimpleChooseC(int or, pCompProc *p)
 
 /*2
 * sets the comparision routine for monomials: for all but the first
-* block of variables (ip is the block number, or the number of the ordering)
+* block of variables (ip is the block number, o_r the number of the ordering)
 */
-static void HighSet(int ip, int or)
+static void HighSet(int ip, int o_r)
 {
-  switch(or)
+  switch(o_r)
   {
     case ringorder_lp:
       bcomph[ip]=comp_lp;
@@ -1657,7 +1656,7 @@ static void HighSet(int ip, int or)
       break;
 #ifdef TEST
     default:
-      Werror("wrong internal ordering:%d at %s, l:%d\n",or,__FILE__,__LINE__);
+      Werror("wrong internal ordering:%d at %s, l:%d\n",o_r,__FILE__,__LINE__);
 #endif
   }
 }
