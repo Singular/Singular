@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_int.cc,v 1.5 1997-07-16 10:18:46 schmidt Exp $ */
+/* $Id: int_int.cc,v 1.6 1997-09-10 15:42:11 schmidt Exp $ */
 
 #include <config.h>
 
@@ -757,10 +757,14 @@ int InternalInteger::intmod( int p ) const
   return (int)mpz_mmod_ui( 0, &thempi, (unsigned long)p );
 }
 
-int InternalInteger::sign ( ) const
+//{{{ int InternalInteger::sign () const
+// docu: see CanonicalForm::sign()
+int
+InternalInteger::sign () const
 {
-    return mpz_cmp_si( &thempi, 0 );
+    return mpz_sgn( &thempi );
 }
+//}}}
 
 InternalCF*
 InternalInteger::sqrt()
