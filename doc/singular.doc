@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.69 1999-07-21 19:53:27 obachman Exp $
+@comment $Id: singular.doc,v 1.70 1999-07-22 14:47:57 pohl Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -52,8 +52,8 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @center B. Martin, M. Messollen, W. Neumann, T. Nuessler, W. Pohl, T. Siebert, R. Stobbe, T. Wichmann
 @sp 2
 @author Fachbereich Mathematik
-@author Zentrum fuer Computeralgebra
-@author Universitaet Kaiserslautern
+@author Zentrum f@"ur Computeralgebra
+@author Universit@"at Kaiserslautern
 @author D-67653 Kaiserslautern
 @end titlepage
 
