@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.85 2000-12-18 17:26:40 obachman Exp $ */
+/* $Id: kutil.cc,v 1.86 2000-12-18 17:47:18 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1684,7 +1684,7 @@ int posInS (polyset set,int length,poly p)
 * looks up the position of p in set
 * the position is the last one
 */
-int posInT0 (const TSet set,const int length,const LObject &p)
+int posInT0 (const TSet set,const int length,LObject &p)
 {
   return (length+1);
 }
@@ -1695,7 +1695,7 @@ int posInT0 (const TSet set,const int length,const LObject &p)
 * set[0] is the smallest with respect to the ordering-procedure
 * pComp
 */
-int posInT1 (const TSet set,const int length,const LObject &p)
+int posInT1 (const TSet set,const int length,LObject &p)
 {
   if (length==-1) return 0;
 
@@ -1723,7 +1723,7 @@ int posInT1 (const TSet set,const int length,const LObject &p)
 * set[0] is the smallest with respect to the ordering-procedure
 * length
 */
-int posInT2 (const TSet set,const int length,const LObject &p)
+int posInT2 (const TSet set,const int length,LObject &p)
 {
   if (length==-1)
     return 0;
@@ -1752,7 +1752,7 @@ int posInT2 (const TSet set,const int length,const LObject &p)
 * set[0] is the smallest with respect to the ordering-procedure
 * totaldegree,pComp
 */
-int posInT11 (const TSet set,const int length,const LObject &p)
+int posInT11 (const TSet set,const int length,LObject &p)
 /*{
  * int j=0;
  * int o;
@@ -1809,7 +1809,7 @@ int posInT11 (const TSet set,const int length,const LObject &p)
 * set[0] is the smallest with respect to the ordering-procedure
 * totaldegree,pComp
 */
-int posInT110 (const TSet set,const int length,const LObject &p)
+int posInT110 (const TSet set,const int length,LObject &p)
 {
   if (length==-1) return 0;
 
@@ -1854,7 +1854,7 @@ int posInT110 (const TSet set,const int length,const LObject &p)
 * set[0] is the smallest with respect to the ordering-procedure
 * pFDeg
 */
-int posInT13 (const TSet set,const int length,const LObject &p)
+int posInT13 (const TSet set,const int length,LObject &p)
 {
   if (length==-1) return 0;
 
@@ -1883,7 +1883,7 @@ int posInT13 (const TSet set,const int length,const LObject &p)
 }
 
 // determines the position based on: 1.) Ecart 2.) pLength
-int posInT_EcartpLength(const TSet set,const int length,const LObject &p)
+int posInT_EcartpLength(const TSet set,const int length,LObject &p)
 {
   if (length==-1) return 0;
 
@@ -1922,7 +1922,7 @@ int posInT_EcartpLength(const TSet set,const int length,const LObject &p)
 * set[0] is the smallest with respect to the ordering-procedure
 * maximaldegree, pComp
 */
-int posInT15 (const TSet set,const int length,const LObject &p)
+int posInT15 (const TSet set,const int length,LObject &p)
 /*{
  *int j=0;
  * int o;
@@ -1980,7 +1980,7 @@ int posInT15 (const TSet set,const int length,const LObject &p)
 * set[0] is the smallest with respect to the ordering-procedure
 * pFDeg+ecart, ecart, pComp
 */
-int posInT17 (const TSet set,const int length,const LObject &p)
+int posInT17 (const TSet set,const int length,LObject &p)
 /*
 *{
 * int j=0;
@@ -2044,7 +2044,7 @@ int posInT17 (const TSet set,const int length,const LObject &p)
 * set[0] is the smallest with respect to the ordering-procedure
 * pGetComp, pFDeg+ecart, ecart, pComp
 */
-int posInT17_c (const TSet set,const int length,const LObject &p)
+int posInT17_c (const TSet set,const int length,LObject &p)
 {
   if (length==-1) return 0;
 
@@ -2109,7 +2109,7 @@ int posInT17_c (const TSet set,const int length,const LObject &p)
 * set[0] is the smallest with respect to
 * ecart, pFDeg, length
 */
-int posInT19 (const TSet set,const int length,const LObject &p)
+int posInT19 (const TSet set,const int length,LObject &p)
 {
   if (length==-1) return 0;
 
@@ -4207,7 +4207,7 @@ virasoro	3.39	3.50	3.35	3.47	3.70	7.66
 
 #ifdef HAVE_MORE_POS_IN_T
 // determines the position based on: 1.) Ecart 2.) FDeg 3.) pLength
-int posInT_EcartFDegpLength(const TSet set,const int length,const LObject &p)
+int posInT_EcartFDegpLength(const TSet set,const int length,LObject &p)
 {
 
   if (length==-1) return 0;
@@ -4261,7 +4261,7 @@ int posInT_EcartFDegpLength(const TSet set,const int length,const LObject &p)
 }
 
 // determines the position based on: 1.) FDeg 2.) pLength
-int posInT_FDegpLength(const TSet set,const int length,const LObject &p)
+int posInT_FDegpLength(const TSet set,const int length,LObject &p)
 {
 
   if (length==-1) return 0;
@@ -4298,7 +4298,7 @@ int posInT_FDegpLength(const TSet set,const int length,const LObject &p)
 
 
 // determines the position based on: 1.) Ecart 2.) FDeg 3.) pLength
-int posInT_pLength(const TSet set,const int length,const LObject &p)
+int posInT_pLength(const TSet set,const int length,LObject &p)
 {
   if (length==-1)
     return 0;

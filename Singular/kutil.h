@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.49 2000-12-18 17:26:41 obachman Exp $ */
+/* $Id: kutil.h,v 1.50 2000-12-18 17:47:17 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -208,7 +208,7 @@ public:
   kStrategy next;
   int (*red)(LObject * L,kStrategy strat);
   void (*initEcart)(LObject * L);
-  int (*posInT)(const TSet T,const int tl,const LObject &h);
+  int (*posInT)(const TSet T,const int tl,LObject &h);
   int (*posInL)(const LSet set, const int length,
                 LObject* L,const kStrategy strat);
   void (*enterS)(LObject h, int pos,kStrategy strat, int atR = -1);
@@ -298,20 +298,20 @@ void enterSBba (LObject p,int atS,kStrategy strat, int atR = -1);
 void initEcartPairBba (LObject* Lp,poly f,poly g,int ecartF,int ecartG);
 void initEcartPairMora (LObject* Lp,poly f,poly g,int ecartF,int ecartG);
 int posInS (polyset set,int length,poly p);
-int posInT0 (const TSet set,const int length,const LObject &p);
-int posInT1 (const TSet set,const int length,const LObject &p);
-int posInT2 (const TSet set,const int length,const LObject &p);
-int posInT11 (const TSet set,const int length,const LObject &p);
-int posInT13 (const TSet set,const int length,const LObject &p);
-int posInT15 (const TSet set,const int length,const LObject &p);
-int posInT17 (const TSet set,const int length,const LObject &p);
-int posInT19 (const TSet set,const int length,const LObject &p);
-int posInT_EcartpLength(const TSet set,const int length,const LObject &p);
+int posInT0 (const TSet set,const int length,LObject &p);
+int posInT1 (const TSet set,const int length,LObject &p);
+int posInT2 (const TSet set,const int length,LObject &p);
+int posInT11 (const TSet set,const int length,LObject &p);
+int posInT13 (const TSet set,const int length,LObject &p);
+int posInT15 (const TSet set,const int length,LObject &p);
+int posInT17 (const TSet set,const int length,LObject &p);
+int posInT19 (const TSet set,const int length,LObject &p);
+int posInT_EcartpLength(const TSet set,const int length,LObject &p);
 
 #ifdef HAVE_MORE_POS_IN_T
-int posInT_pLength(const TSet set,const int length,const LObject &p);
-int posInT_EcartFDegpLength(const TSet set,const int length,const LObject &p);
-int posInT_FDegpLength(const TSet set,const int length,const LObject &p);
+int posInT_EcartFDegpLength(const TSet set,const int length,LObject &p);
+int posInT_FDegpLength(const TSet set,const int length,LObject &p);
+int posInT_pLength(const TSet set,const int length,LObject &p);
 #endif
 
 
