@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.48 1998-06-08 09:17:49 Singular Exp $ */
+/* $Id: febase.cc,v 1.49 1998-06-08 17:48:09 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -357,7 +357,7 @@ static char* feGetInfoProgram(const char* bindir)
   return mstrdup(infoprog);
 }
 
-#ifdef WINNT && __GNUC__
+#if defined(WINNT) && defined(__GNUC__)
 // add utility function of Cygwin32:
 extern "C" int cygwin32_posix_path_list_p (const char *path);
 #endif
@@ -372,7 +372,7 @@ void feExpandPath(char *dir)
   }
   else
   {
-    #ifdef WINNT && __GNUC__
+    #if defined(WINNT) && defined(__GNUC__)
     char path_delim = cygwin32_posix_path_list_p (path) ? ':' : ';';
     #else
     char path_delim=FS_SEP;
