@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.136 1999-08-09 08:22:34 wichmann Exp $
+@comment $Id: reference.doc,v 1.137 1999-08-18 14:28:41 siebert Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2968,27 +2968,25 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{lres (} ideal_expression@code{,} int_expression @code{)}
-@*@code{lres (} module_expression@code{,} int_expression @code{)}
 @item @strong{Type:}
 resolution
 @item @strong{Purpose:}
-computes a free resolution of an ideal or module with LaScala's
-method.
+computes a free resolution of an ideal using LaScala's algorithm.
 
-The ideal_expression, resp.@: module_expression, has to be homogeneous.
+The ideal_expression has to be homogeneous.
 
-More precisely, let M be given by a generating set and
+More precisely, let M  be a cyclic module and
 @tex
 $A_1=$matrix$(M)$.
 @end tex
 @ifinfo
 A1=matrix(M).
 @end ifinfo
-Then @code{lres}
+Then A1 is an ideal in the basering R and @code{lres}
 computes a minimal free resolution of
 @ifinfo
 M1=coker(A1)
-@*...--> F2 --A2-> F1 --A1-> F0-->M1-->0.
+@*...--> F2 --A2-> F1 --A1-> R-->M1-->0.
 @end ifinfo
 @tex
 $M_1=coker(A_1)$
