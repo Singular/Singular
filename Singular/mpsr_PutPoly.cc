@@ -570,7 +570,7 @@ static mpsr_Status_t PutSimpleOrdering(MP_Link_pt link, ring r, short index)
   MP_Uint32_t vlength = 0, i;
 
   // find out the length of the weight-vector
-  if (r->wvhdl[index] != NULL)
+  if (r->wvhdl && r->wvhdl[index] != NULL)
     vlength = r->block1[index] - r->block0[index] + 1;
 
   mp_failr(MP_PutCommonConstantPacket(link,

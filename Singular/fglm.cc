@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.cc,v 1.1.1.1 1997-03-19 13:18:45 obachman Exp $ 
+// $Id: fglm.cc,v 1.2 1997-03-20 16:59:33 obachman Exp $ 
 //=============================================
 //             FGLM - Algorithm 
 //=============================================
@@ -1620,7 +1620,7 @@ fglmProc( leftv first, leftv second )
     rSetHdl( (idhdl)first->data, TRUE );
     //. check if rings are compatible:
     if ( currRing->N == destRing->N ) {
-	maFindPerm( currRing->names, pVariables, NULL, destRing->names, pVariables, NULL, perm, NULL );
+	maFindPerm( currRing->names, pVariables, NULL, destRing->names, pVariables, NULL, 0, perm, NULL );
 	for ( int k = 1; state == FglmOk && k <= pVariables; k++ ) 
 	    if ( perm[k] <= 0 ) state= FglmIncompatibleRings;
     } else state= FglmIncompatibleRings;

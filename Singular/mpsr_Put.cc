@@ -122,6 +122,9 @@ mpsr_Status_t mpsr_PutLeftv(MP_Link_pt link, leftv v, ring cring)
       case MAP_CMD:
         return mpsr_PutMapLeftv(link, v, cring);
 
+      case NONE:
+        return mpsr_Success;
+        
       default:
         return mpsr_SetError(mpsr_UnknownLeftvType);
   }
@@ -513,6 +516,7 @@ BOOLEAN mpsr_PutDump(MP_Link_pt link)
   MP_ResetLink(link);
   while (h != NULL && h2 == NULL)
   {
+    
     if (IDTYP(h) == PROC_CMD)
     {
       failr(mpsr_PutLeftv(link, (leftv) h, NULL));
@@ -520,7 +524,7 @@ BOOLEAN mpsr_PutDump(MP_Link_pt link)
       Print("Dumped Proc %s\n", IDID(h));
 #endif
     }
-    else
+    else if (IDTYP(h) != LINK_CMD)
     {
       cmd.arg1.name = IDID(h);
       memcpy(&(cmd.arg2), h, sizeof(sleftv));

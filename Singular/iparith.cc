@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/iparith.cc,v 1.1.1.1 1997-03-19 13:18:46 obachman Exp $";
+static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/iparith.cc,v 1.2 1997-03-20 16:59:36 obachman Exp $";
 /* $Log: not supported by cvs2svn $
 */
 
@@ -1408,7 +1408,7 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
       if (par_perm_size!=0)
         par_perm=(int *)Alloc0(par_perm_size*sizeof(int));
       maFindPerm(r->names,       r->N,       r->parameter,
-                 currRing->names,currRing->N,currRing->parameter,
+                 currRing->names,currRing->N,currRing->parameter, currRing->P,
                  perm,par_perm);
     }
     sleftv tmpW;

@@ -5,10 +5,14 @@
 * ABSTRACT
 */
 /* $Log: not supported by cvs2svn $
+// Revision 1.1.1.1  1997/03/19  13:18:41  obachman
+// Imported Singular sources
+//
 */
 
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include "mod2.h"
 #include "tok.h"
 #include "mmemory.h"
@@ -48,10 +52,11 @@ MP_Env_pt mp_Env = NULL;
 void slInitBatchLink(si_link l, int argc, char** argv)
 {
   int i;
-  l->argv = (char **) Alloc0(argc * sizeof(char *));
-  for (i=0; i<argc; i++)
+  l->argv = (char **) Alloc0((argc +1) * sizeof(char *));
+  l->argv[0] = mstrdup("MP:connect");
+  for (i=1; i<=argc; i++)
     l->argv[i] = mstrdup(argv[i]);
-  l->argc = argc;
+  l->argc = argc + 1;
   l->name = mstrdup("MP:connect");
   slInit(l,NULL);
 }
@@ -190,7 +195,7 @@ MP_Link_pt slOpenMPConnect(si_link l)
   char *host = IMP_GetCmdlineArg(l->argc, l->argv, "-MPhost");
   char **argv;
   int argc;
-  MP_Link_pt link;
+  MP_Link_pt link = NULL;
 
   GetCmdArgs(&argc, &argv, argvstr);
 
@@ -203,7 +208,13 @@ MP_Link_pt slOpenMPConnect(si_link l)
   }
 
   if (host == NULL)
-     Warn("No host specified for MP:connect; We try localhost");
+  {
+    char *hn = (char *) AllocL(64*sizeof(char*));
+    FreeL(argv[7]);
+    gethostname(hn, 64);
+    argv[7] = hn;
+    Warn("No host specified for MP:connect; We try %s", hn);
+  }
   else
   {
     FreeL(argv[7]);
@@ -249,16 +260,19 @@ MP_Link_pt slOpenMPLaunch(si_link l)
   char *appargs = NULL;
   char **argv;
   int argc;
-  MP_Link_pt link;
+  MP_Link_pt link=NULL;
 
   GetCmdArgs(&argc, &argv,
-             "-MPtransp TCP -MPmode launch -MPhost r -MPapplication s");
+             "-MPtransp TCP -MPmode launch -MPhost localhost -MPapplication s");
 
   FreeL(argv[5]);
   if (host == NULL)
   {
-    Warn("No host specified for MP:launch; We try: localhost");
-    argv[5] = mstrdup("localhost");
+    char *hn = (char *) AllocL(64*sizeof(char*));
+    FreeL(argv[7]);
+    gethostname(hn, 64);
+    argv[5] = hn;
+    Warn("No host specified for MP:connect; We try %s", hn);
   }
   else
   {
@@ -286,7 +300,7 @@ MP_Link_pt slOpenMPLaunch(si_link l)
 
 BOOLEAN slOpenMPTcp(si_link l)
 {
-  MP_Link_pt link;
+  MP_Link_pt link = NULL;
 
   if (l->argc < 1)
     return TRUE;
@@ -409,9 +423,13 @@ si_link_extension slInitMPTcp()
 
 BOOLEAN mpsr_IsMPLink(si_link l)
 {
-  return strcmp(l->name, "MP:tcp") == 0 ||
-    strcmp(l->name, "MP:file") == 0;
+  return strcmp(l->name, "MP") > 0;
 }
+#endif
+
+#define MPSR_BATCH_DEBUG
+#ifdef MPSR_BATCH_DEBUG
+BOOLEAN stop = 1;
 #endif
 
 int Batch_do(int argc, char **argv)
@@ -420,6 +438,11 @@ int Batch_do(int argc, char **argv)
   si_link silink = (si_link) Alloc0(sizeof(sip_link));
   leftv v = NULL;
 
+#ifdef MPSR_BATCH_DEBUG
+  fprintf(stderr, "Was started with pid %d\n", getpid());
+  while (stop){};
+#endif
+  
   // connect to a listening application
   slInitBatchLink(silink, argc, argv);
   if (slOpenMPTcp(silink))
@@ -443,12 +466,14 @@ int Batch_do(int argc, char **argv)
       return 0;
     }
 
-    if (v == NULL)
-      v = mpsr_InitLeftv(STRING_CMD, (void *) mstrdup("MPSR_DONE"));
-
     slWriteMP(silink, v);
-    v->CleanUp();
-    Free(v, sizeof(sleftv));
+
+    if (v != NULL)
+    {
+      v->CleanUp();
+      Free(v, sizeof(sleftv));
+      v = NULL;
+    }
   }
   // should never get here
   return 1;

@@ -20,7 +20,7 @@ poly maIMap(ring r, poly p);
 BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w,
                      int *perm,int N,
                      int *par_perm,int P);
-void maFindPerm(char **npi, int lpi, char **spi,
-                 char **ni, int li, char ** si,
+void maFindPerm(char **preim_names, int preim_n, char **preim_par,
+                 char **names, int n, char ** par, int nop,
                  int * perm, int *par_perm);
 #endif

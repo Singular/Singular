@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/maps.cc,v 1.1.1.1 1997-03-19 13:18:49 obachman Exp $";
+static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/maps.cc,v 1.2 1997-03-20 16:59:39 obachman Exp $";
 /* $Log: not supported by cvs2svn $
 */
 /*
@@ -270,7 +270,7 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
 }
 
 void maFindPerm(char **preim_names, int preim_n, char **preim_par,
-                char **names, int n, char **par,
+                char **names, int n, char **par, int nop,
                 int * perm, int *par_perm)
 {
   int i,j;
@@ -290,7 +290,7 @@ void maFindPerm(char **preim_names, int preim_n, char **preim_par,
     }
     if ((perm[i+1]==0)&&(par!=NULL))
     {
-      for(j=0; par[j]!='\0'; j++)
+      for(j=0; j<nop; j++)
       {
         if (strcmp(preim_names[i],par[j])==0)
         {
@@ -319,7 +319,7 @@ void maFindPerm(char **preim_names, int preim_n, char **preim_par,
       }
       if ((par!=NULL) && (par_perm[i]==0))
       {
-        for(j=0; par[j]!='\0'; j++)
+        for(j=0; j<nop; j++)
         {
           if (strcmp(preim_par[i],par[j])==0)
           {
@@ -345,7 +345,7 @@ poly maIMap(ring r, poly p)
   int *perm=(int *)Alloc0((r->N+1)*sizeof(int));
   //int *par_perm=(int *)Alloc0(rPar(r)*sizeof(int));
   maFindPerm(r->names,r->N, r->parameter,
-             currRing->names,currRing->N,currRing->parameter,
+             currRing->names,currRing->N,currRing->parameter, currRing->P,
              perm,NULL/*par_perm*/);
   poly res=pPermPoly(p,perm,r->N/*,par_perm,rPar(r)*/);
   Free((ADDRESS)perm,(r->N+1)*sizeof(int));

@@ -1,8 +1,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/ffields.cc,v 1.1.1.1 1997-03-19 13:18:44 obachman Exp $";
+static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/ffields.cc,v 1.2 1997-03-20 16:59:31 obachman Exp $";
 /* $Log: not supported by cvs2svn $
+// Revision 1.1.1.1  1997/03/19  13:18:44  obachman
+// Imported Singular sources
+//
 */
 
 /*
@@ -472,8 +475,13 @@ void nfSetChar(int c, char **param)
     FILE * fp = feFopen(buf,"r",NULL,TRUE);
     if (fp==NULL)
     {
-      Werror("cannot open %s",buf);
-      return;
+      sprintf(buf,"../gftables/%d",nfCharQ);
+      fp = feFopen(buf,"r",NULL,TRUE);
+      if (fp == NULL)
+      {
+        Werror("cannot find gftables/%d", nfCharQ);
+        return;
+      }
     }
     if(!fgets( buf, sizeof(buf), fp)) return;
     if(strcmp(buf,"@@ factory GF(q) table @@\n")!=0)

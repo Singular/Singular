@@ -282,6 +282,10 @@ mpsr_Status_t mpsr_GetMsg(MP_Link_pt link, leftv &lv)
 {
   mpsr_sleftv mlv, mlv1;
   mpsr_Status_t status = mpsr_Success;
+  mlv.lv = NULL;
+  mlv.r = NULL;
+  mlv1.lv = NULL;
+  mlv1.r = NULL;
 
   MP_SkipMsg(link);
   
@@ -818,7 +822,7 @@ BOOLEAN mpsr_GetDump(MP_Link_pt link)
     {
 #ifdef MPSR_DEBUG
       command cmd = (command) mlv.lv->data;
-      Print("Dump got %s", cmd->arg1.name);
+      Print("Dump got %s \n", cmd->arg1.name);
 #endif      
       mpsr_SetCurrRingHdl(mlv.r);
       if (mlv.lv != NULL)

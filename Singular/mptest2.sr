@@ -19,10 +19,6 @@ list l1 = i,iv,im,i1,iv1,im1;
 list l2 = l1, iv2, l, im2;
 
 
-string s;
-string s1 = "Hello World";
-
-
 ring r;
 
 poly p;
