@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.32 2003-03-12 21:34:51 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.33 2003-03-13 16:51:43 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -237,7 +237,7 @@ poly nc_mm_Mult_nn(int *F0, int *G0, const ring r)
   // pExpVectorCopy(F,F0);
   memcpy(G, G0,(rN+1)*sizeof(int));
   //  pExpVectorCopy(G,G0);
-  F[0]=0;
+  F[0]=0; /* important for p_MemAdd */
   G[0]=0;
 
   iF=rN;

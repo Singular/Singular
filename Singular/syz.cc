@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.42 2003-01-30 21:41:04 levandov Exp $ */
+/* $Id: syz.cc,v 1.43 2003-03-13 16:51:41 levandov Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -368,7 +368,7 @@ void syMinimizeResolvente(resolvente res, int length, int first)
   intvec *dummy;
 
   if (syzIndex<1) syzIndex=1;
-  if ((syzIndex==1) && (idHomModule(res[0],currQuotient,&dummy)))
+  if ((syzIndex==1) && (idHomModule(res[0],currQuotient,&dummy)) && (!rIsPluralRing(currRing)))
   {
     syMinStep1(res,length);
     delete dummy;
