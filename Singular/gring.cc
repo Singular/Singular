@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.38 2003-04-29 21:17:18 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.39 2003-06-14 16:55:13 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -1013,7 +1013,9 @@ poly nc_uu_Mult_ww_horvert (int i, int a, int j, int b, const ring r)
 
 poly nc_spGSpolyRed(poly p1, poly p2,poly spNoether, const ring r)
 {
-  if (p_GetComp(p1,r)!=p_GetComp(p2,r))
+  if (p_GetComp(p1,r)!=p_GetComp(p2,r)
+  && (p_GetComp(p1,r)!=0)
+  && (p_GetComp(p2,r)!=0))
   {
     Print("nc_spGSpolyRed: different components");
     return(NULL);
@@ -1062,9 +1064,11 @@ poly nc_spGSpolyRedNew(poly p1, poly p2,poly spNoether, const ring r)
 */
 poly nc_spGSpolyCreate(poly p1, poly p2,poly spNoether, const ring r)
 {
-  if (p_GetComp(p1,r)!=p_GetComp(p2,r))
+  if ((p_GetComp(p1,r)!=p_GetComp(p2,r))
+  && (p_GetComp(p1,r)!=0)
+  && (p_GetComp(p2,r)!=0))
   {
-    Print("nc_spGSpolyCreate : different components!");
+    /* Print("nc_spGSpolyCreate : different components!"); */
     return(NULL);
   }
   if ((r->nc->type==nc_lie) && pHasNotCF(p1,p2)) /* prod crit */
@@ -1080,13 +1084,13 @@ poly nc_spGSpolyCreate(poly p1, poly p2,poly spNoether, const ring r)
   p_Test(pL,r);
 #endif
   p_ExpVectorDiff(m1,pL,p1,r);
-  p_SetComp(m1,0,r);
+  //p_SetComp(m1,0,r);
   p_Setm(m1,r);
 #ifdef PDEBUG
   p_Test(m1,r);
 #endif
   p_ExpVectorDiff(m2,pL,p2,r);
-  p_SetComp(m2,0,r);
+  //p_SetComp(m2,0,r);
   p_Setm(m2,r);
 #ifdef PDEBUG
   p_Test(m2,r);
@@ -1143,7 +1147,7 @@ void nc_spGSpolyRedTail(poly p1, poly q, poly q2, poly spNoether, const ring r)
   number cQ=p_GetCoeff(Q,r);
   poly m=pOne();
   p_ExpVectorDiff(m,Q,p1,r);
-  p_SetComp(m,0,r);
+  //  p_SetComp(m,0,r);
   p_Setm(m,r);
 #ifdef PDEBUG
   p_Test(m,r);
@@ -1223,7 +1227,7 @@ void nc_kBucketPolyRed(kBucket_pt b, poly p, number *c)
 void nc_PolyPolyRed(poly &b, poly p, number *c)
   // reduces b with p, do not delete both
 {
-  // b will not by multiplied by any constannt in this impl.
+  // b will not by multiplied by any constant in this impl.
   // ==> *c=1
   *c=nInit(1);
   poly m=pOne();

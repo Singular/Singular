@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.121 2003-05-31 14:13:33 Singular Exp $ */
+/* $Id: kutil.cc,v 1.122 2003-06-14 16:55:15 levandov Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1068,7 +1068,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
   else /*sugarcrit*/
   {
 #ifdef HAVE_PLURAL
-    if (currRing->nc==NULL)
+    if (!rIsPluralRing(currRing))
     {
     // if currRing->nc_type!=quasi (or skew)
 #endif
@@ -4080,7 +4080,7 @@ void exitBuchMora (kStrategy strat)
 * in every case (also for ideals:)
 * deletes divisible vectors/polynomials
 */
-void updateResult(ideal r,ideal Q,kStrategy strat)
+void updateResult(ideal r,ideal Q, kStrategy strat)
 {
   int l;
   if (strat->ak>0)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.134 2003-06-11 10:00:49 Singular Exp $ */
+/* $Id: ideals.cc,v 1.135 2003-06-14 16:55:14 levandov Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1464,7 +1464,7 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
   idSkipZeroes(s_h3);
   idSkipZeroes(e);
 
-  if (deg != NULL
+  if ((deg != NULL)
   && (!isMonomial)
   && (!TEST_OPT_NOTREGULARITY)
   && (setRegularity)
