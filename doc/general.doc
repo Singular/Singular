@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.113 1999-04-16 08:55:48 obachman Exp $
+@comment $Id: general.doc,v 1.114 1999-05-06 16:53:28 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -280,7 +280,7 @@ this library is loaded on start-up.  @xref{Startup sequence}.
 Do not display warning messages.
 
 @item @code{--no-out}
-Suppress display of all ouput. 
+Suppress display of all ouput.
 
 @item @code{-t}, @code{--no-tty}
 Do not redefine the terminal characteristics.  This option should be
@@ -859,7 +859,7 @@ block orderings preceding the component ordering have higher precedence,
 all monomial block orderings following after it have lower precedence.
 @end enumerate
 
-For a mathematical description of these orderings, see 
+For a mathematical description of these orderings, see
 @ref{Polynomial data}.
 
 @c ---------------------------------------------------------------------------
@@ -1000,7 +1000,7 @@ method. The input has to be a standard basis.
 @item nres
 @ref{nres}@*
 computes a free resolution of an ideal or module with the standard basis
-method. 
+method.
 @item minres
 @ref{minres}@*
 minimizes a free resolution of an ideal or module.
@@ -1087,7 +1087,7 @@ computes all minors (=subdeterminants) of a given size for a matrix.
 @table @code
 @item option
 @ref{option}@*
-allows to set options for manipulating the behaviour of computations 
+allows to set options for manipulating the behaviour of computations
 (such as reduction strategies) and to show protocol information indicating
 the progress of a computation.
 @end table
@@ -1549,7 +1549,7 @@ Possible type casts are:
 @c too.
 @c ------------------------------------------------
 @multitable @columnfractions .05 .15 .83
-@item 
+@item
 @    @tab to @tab from
 @item
 @    @tab  @code{ideal} @tab  expression lists of @code{int}, @code{number}, @code{poly}
@@ -1559,7 +1559,7 @@ Possible type casts are:
 @    @tab  @code{int} @tab    @code{number}, @code{poly}
 @item
 @    @tab  @code{intvec} @tab expression lists of @code{int}, @code{intmat}
-@item 
+@item
 @    @tab  @code{intmat} @tab @code{intvec} (@pxref{intmat type cast})
 @item
 @    @tab  @code{list} @tab   expression lists of any type
@@ -2254,27 +2254,27 @@ No procedures should be defined within the body of another procedure.
 It is often useful for a procedure to print out comments, either to
 explain results or to display intermediate computations. However,
 if this procedure is called by another procedure, such comments are
-confusing and disturbing in most cases. 
+confusing and disturbing in most cases.
 
 @sc{Singular} offers an elegant solution, which requires the usage of
 the @sc{Singular} function @ref{dbprint} and the reserved variables
 @ref{printlevel}, and @ref{voice} (@code{voice} counts the nesting of
 procedures; It has the value 1 on the top level, 2 inside the first
 procedure etc.; @code{printlevel} has the value 0 by default, but can be
-set to any integer value by the user).  
+set to any integer value by the user).
 
 For example, if the following procedure @code{Test} is called
 directly from the top level then @samp{comment1} is displayed (i.e.,
 printed out) but not
 @samp{comment2}; and nothing is displayed if  @code{Test} is called
-from within any other procedure. 
+from within any other procedure.
 However, if @code{printlevel} is set to  a value k with k>0, then
 @samp{comment1} (resp. @samp{comment2} is displayed provided that
 @code{Test} is called from other procedures, with a nesting level up to
-k (resp. k-1).  
+k (resp. k-1).
 
-Note furthermore, that the example part of a procedure 
-behaves in this respect like a procedure (i.e. the value of @code{voice} 
+Note furthermore, that the example part of a procedure
+behaves in this respect like a procedure (i.e. the value of @code{voice}
 is 1). Therefore, the command @code{printlevel=1;} is necessary for
 @samp{comment1} to be displayed on @code{ example Test;}. However,
 since printlevel is a global variable, it should be reset to the old
@@ -2290,7 +2290,7 @@ EXAMPLE: example Test; shows an example
    int p = printlevel - voice + 3;
     ...
    dbprint(p,"comment1");
-   dbprint(p-1,"comment2");   
+   dbprint(p-1,"comment2");
    // dbprint prints only if p > 0
     ...
 @}
@@ -2299,7 +2299,7 @@ example
    int p = printlevel;   //store old value of printlevel
    printlevel = 1;       //assign new value to printlevel
     ...
-   Test(); 
+   Test();
    printlevel = p;       //reset printlevel to old value
 @}
 @end example
@@ -2459,7 +2459,7 @@ each of the following is the position of the byte in the library.
 @item eoe: end of example '@}'
 @end itemize
 
-Hence in the above example, the first procedure of the library 
+Hence in the above example, the first procedure of the library
 sample.lib is user-accessible and its name is tab. The procedure
 starts in line 9, at character 149. The head of the procedure
 ends at character 165, the body starts in line 13 at character 271

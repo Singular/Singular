@@ -3,15 +3,19 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sdb.h,v 1.3 1999-04-29 16:57:18 Singular Exp $ */
+/* $Id: sdb.h,v 1.4 1999-05-06 16:53:25 Singular Exp $ */
 /*
 * ABSTRACT: Singular debugger
 */
 
 #include "febase.h"
+#include "structs.h"
 
-extern int sdb_lines[];
+extern int    sdb_lines[];
+extern char * sdb_files[];
+extern int    sdb_flags;
 
-void sdb(Voice * currentVoice, char * currLine, int len, char * buffer);
+void sdb_edit(procinfo *pi);
+void sdb(Voice * currentVoice, const char * currLine, int len);
 #endif
 

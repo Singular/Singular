@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.31 1999-03-16 15:33:13 Singular Exp $ */
+/* $Id: ipid.cc,v 1.32 1999-05-06 16:53:24 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -64,7 +64,7 @@ idhdl idrec::get(const char * s, int lev)
     else if ((l==lev) && (*(short *)s==*(short *)id) && (0 == strcmp(s+1,id+1)))
     {
       return h;
-    }  
+    }
 #endif
 // =============================================================
 #if 0
@@ -88,7 +88,7 @@ idhdl idrec::get(const char * s, int lev)
 // timings: ratchwum: 501 s, wilde13: 357 s, nepomuck: 267 s, lukas 816 s
     l=IDLEV(h);
     if ((l==0)||(l==lev))
-    { 
+    {
       id=IDID(h);
       if (*(short *)s==*(short *)id)
       {
@@ -349,7 +349,7 @@ void killhdl(idhdl h)
 #ifdef HAVE_NAMESPACES
     if(t==PACKAGE_CMD) {
       killhdl(h,&NSROOT(namespaceroot->root));
-    } else 
+    } else
 #endif /* HAVE_NAMESPACES */
     {
       idhdl s=IDROOT;
@@ -415,14 +415,20 @@ void killhdl(idhdl h, idhdl * ih)
   }
 #ifdef HAVE_NAMESPACES
   // package -------------------------------------------------------------
-  else if (IDTYP(h) == PACKAGE_CMD) {
-    if(IDPACKAGE(h)->language!=LANG_TOP) {
+  else if (IDTYP(h) == PACKAGE_CMD)
+  {
+    if(IDPACKAGE(h)->language!=LANG_TOP)
+    {
       if(!paKill(IDPACKAGE(h))) return;
-    } else {
-      if(strcmp(IDID(h), "Top")!=0) {
+    }
+    else
+    {
+      if(strcmp(IDID(h), "Top")!=0)
+      {
         if(!paKill(IDPACKAGE(h))) return;
       }
-      else {
+      else
+      {
         if(!paKill(IDPACKAGE(h), TRUE)) return;
       }
     }
@@ -856,7 +862,7 @@ namehdl namerec::push(package pack, char *name, int nesting, BOOLEAN init)
   }
   ns->name    = mstrdup(name);
   ns->myynest = nesting;
-  
+
   //ns->currRing = currRing;
   //ns->currRingHdl = currRingHdl;
   if(ns->isroot) ns->root=ns; else ns->root = this->root;
@@ -914,7 +920,7 @@ idhdl namerec::get(const char * s, int lev, BOOLEAN root)
 BOOLEAN checkPackage(package pack)
 {
   namehdl nshdl = namespaceroot;
-      
+
   for(nshdl=namespaceroot; nshdl->isroot != TRUE; nshdl = nshdl->next) {
     //Print("NSstack: %s:%d, nesting=%d\n", nshdl->name, nshdl->lev, nshdl->myynest);
     if (nshdl->pack==pack)
@@ -930,6 +936,6 @@ BOOLEAN checkPackage(package pack)
     return FALSE;
   }
   return TRUE;
-  
+
 }
 #endif /* HAVE_NAMESPACES */

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.59 1999-04-16 07:53:32 obachman Exp $ */
+/* $Id: grammar.y,v 1.60 1999-05-06 16:53:23 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -38,6 +38,7 @@
 #include "subexpr.h"
 #include "ipshell.h"
 #include "ipconv.h"
+#include "sdb.h"
 #include "ideals.h"
 #include "numbers.h"
 #include "polys.h"
@@ -120,7 +121,8 @@ void yyerror(char * fmt)
   }
   if ((currentVoice!=NULL)
   && (currentVoice->prev!=NULL)
-  && (myynest>0))
+  && (myynest>0)
+  && ((sdb_flags &1)==0))
   {
     Werror("leaving %s",VoiceName());
   }
@@ -322,6 +324,7 @@ lines:
             }
             #endif
             prompt_char = '>';
+	    if (sdb_flags & 2) { sdb_flags=0; YYERROR; }
             if(siCntrlc)
             {
               siCntrlc=FALSE;
@@ -376,6 +379,11 @@ pprompt:
             if (!errorreported) WerrorS("...parse error");
             yyerror("");
             yyerrok;
+	    if ((sdb_flags & 1) && currentVoice->pi!=NULL)
+	    {
+	      currentVoice->pi->trace_flag |=1;
+	    } 
+	    else
             if (myynest>0)
             {
               feBufferTypes t=currentVoice->Typ();
@@ -390,6 +398,7 @@ pprompt:
             {
               exitVoice();
             }
+	    if (sdb_flags &2) sdb_flags=1;
           }
         ;
 

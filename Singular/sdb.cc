@@ -1,11 +1,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sdb.cc,v 1.3 1999-04-29 16:57:18 Singular Exp $ */
+/* $Id: sdb.cc,v 1.4 1999-05-06 16:53:25 Singular Exp $ */
 /*
 * ABSTRACT: Singular debugger
 */
 
+#include <unistd.h>   // for unlink,fork,execlp,getpid
+#include <sys/wait.h> // for wait
 #include "mod2.h"
 #include "tok.h"
 #include "mmemory.h"
@@ -15,6 +17,8 @@
 #include "sdb.h"
 
 int sdb_lines[]={-1,-1,-1,-1,-1,-1,-1,-1};
+char * sdb_files[6];
+int sdb_flags=1;
 
 int sdb_checkline(char f)
 {
@@ -30,9 +34,94 @@ int sdb_checkline(char f)
   return 0;
 }
 
+void sdb_edit(procinfo *pi)
+{
+  char * filename = "/tmp/sd000000";
+  sprintf(filename+7,"%d",getpid());
+  FILE *fp=fopen(filename,"w");
+  if (fp==NULL)
+  {
+    Print("cannot open %s\n",filename);
+    return;
+  }
+  if (pi->language!= LANG_SINGULAR)
+  {
+    Print("cannot edit type %d\n",pi->language);
+    fclose(fp);
+    fp=NULL;
+  }
+  else
+  {
+    char *editor=getenv("EDITOR");
+    if (editor==NULL)
+      editor=getenv("VISUAL");
+    if (editor==NULL)
+      editor="vi";
+
+    if (pi->data.s.body==NULL)
+    {
+      iiGetLibProcBuffer(pi);
+      if (pi->data.s.body==NULL)
+      {
+        PrintS("cannot get the procedure body\n");
+        fclose(fp);
+        unlink(filename);
+        return;
+      }
+    }
+
+    fwrite(pi->data.s.body,1,strlen(pi->data.s.body),fp);
+    fclose(fp);
+
+    int pid=fork();
+    if (pid!=0)
+    {
+      wait(&pid);
+    }
+    else if(pid==0)
+    {
+      execlp(editor,editor,filename,NULL);
+      Print("cannot exec %s\n",editor);
+    }
+    else
+    {
+      PrintS("cannot fork\n");
+    }
+
+    fp=fopen(filename,"r");
+    if (fp==NULL)
+    {
+      Print("cannot read from %s\n",filename);
+    }
+    else
+    {
+      fseek(fp,0L,SEEK_END);
+      long len=ftell(fp);
+      fseek(fp,0L,SEEK_SET);
+
+      FreeL((ADDRESS)pi->data.s.body);
+      pi->data.s.body=(char *)AllocL((int)len+1);
+      myfread( pi->data.s.body, len, 1, fp);
+      pi->data.s.body[len]='\0';
+      fclose(fp);
+    }
+  }
+  unlink(filename);
+}
+
+static char *sdb_find_arg(char *p)
+{
+  p++;
+  while (*p==' ') p++;
+  char *pp=p;
+  while (*pp>' ') pp++;
+  *pp='\0';
+  return p;
+}
+
 static char sdb_lastcmd='c';
 
-void sdb(Voice * currentVoice, char * currLine, int len, char *b)
+void sdb(Voice * currentVoice, const char * currLine, int len)
 {
   int bp=0;
   if ((len>1)
@@ -43,7 +132,7 @@ void sdb(Voice * currentVoice, char * currLine, int len, char *b)
     loop
     {
       char gdb[80];
-      char *p=currLine+len-1;
+      char *p=(char *)currLine+len-1;
       while ((*p<=' ') && (p!=currLine))
       {
         p--; len--;
@@ -51,37 +140,48 @@ void sdb(Voice * currentVoice, char * currLine, int len, char *b)
       if (p==currLine) return;
 
       currentVoice->pi->trace_flag&= ~1; // delete flag for "all lines"
-      fprintf(stdout,"(%s,%d) >>",currentVoice->filename,yylineno);mflush();
+      Print("(%s,%d) >>",currentVoice->filename,yylineno);
       fwrite(currLine,1,len,stdout);
-      fprintf(stdout,"<<\nbreakpoint %d (p..,f,b,c,n,q,e..)\n",bp);mflush();
-      fgets(gdb,80,stdin);
-      p=gdb;
+      Print("<<\nbreakpoint %d (press ? for list of commands)\n",bp);
+      p=fe_fgets_stdin("!",gdb,80);
       while (*p==' ') p++;
       if (*p >' ')
       {
         sdb_lastcmd=*p;
       }
-      printf("command:%c\n",sdb_lastcmd);
+      Print("command:%c\n",sdb_lastcmd);
       switch(sdb_lastcmd)
       {
+        case '?':
+        case 'h':
+        {
+          PrintS(
+          "b - print backtrace of calling stack\n"
+          "c - continue\n"
+          "d - delete current breakpoint\n"
+          "e - edit the current procedure (current call will be aborted)\n"
+          "h,? - display this help screen\n"
+          "n - execute current line, break at next line\n"
+          "p <var> - display type and value of the variable <var>\n"
+          "q <flags> - quit debugger, set debugger flags(0,1,2)\n"
+          "Q - quit Singular\n");
+          int i;
+          for(i=0;i<7;i++)
+          {
+            if (sdb_lines[i] != -1)
+              Print("breakpoint %d at line %d in %s\n",
+                i,sdb_lines[i],sdb_files[i]);
+          }
+          break;
+        }
         case 'd':
         {
-          fprintf(stdout,"delete break point %d\n",bp);
+          Print("delete break point %d\n",bp);
           currentVoice->pi->trace_flag &= (~Sy_bit(bp));
           if (bp!=0)
           {
             sdb_lines[bp-1]=-1;
           }
-          int f=currentVoice->pi->trace_flag;
-          fprintf(stdout,"active breakpoints: \n");
-          int i;
-          for(i=1;i<=7;i++)
-          {
-            f=f>>1;
-            if (f&1)
-              fprintf(stdout,"%d:line %d", i,  sdb_lines[i-1]);
-          }
-          fprintf(stdout,"\n");
           break;
         }
         case 'n':
@@ -89,55 +189,24 @@ void sdb(Voice * currentVoice, char * currLine, int len, char *b)
           return;
         case 'e':
         {
-          int i=strlen(b);
-          while ((i>=0) && (b[i]<=' ')) i--;
-          if (i<0)
-          {
-            fprintf(stdout,"cannot set ~ at empty line\n");
-            break;
-          }
-          if (b[i]!=';')
-          {
-            fprintf(stdout,"cannot set ~ at char `%c`\n",b[i]);
-            break;
-          }
-          b[i+1]='~';
-          b[i+2]=';';
-          b[i+3]='\n';
-          b[i+4]='\0';
+          sdb_edit(currentVoice->pi);
+          sdb_flags=2;
           return;
         }
-//          sdb_lastcmd='c';
-//          if (*(p+1)!=' ')
-//          {
-//            printf("?? no string to execute\n");
-//          }
-//          else
-//          {
-//            p+=2;
-//            char *s=(char *)AllocL(strlen(p) + 4);
-//            strcpy( s,p);
-//            strcat( s,"\n;\n");
-//            newBuffer(s,BT_execute);
-//          }
-//          return;
-//        }
         case 'p':
         {
-          p+=2;
-          char *pp=p+1;
-          while (*pp>' ') pp++;
-          *pp='\0';
-          printf("request `%s`",p);
+          p=sdb_find_arg(p);
+          Print("request `%s`",p);
           idhdl h=ggetid(p,TRUE);
-          if (h==NULL) printf("NULL\n");
+          if (h==NULL)
+            PrintS("NULL\n");
           else
           {
             sleftv tmp;
             memset(&tmp,0,sizeof(tmp));
             tmp.rtyp=IDHDL;
             tmp.data=h;
-            printf("(type %s):",Tok2Cmdname(tmp.Typ()));
+            Print("(type %s):",Tok2Cmdname(tmp.Typ()));
             tmp.Print();
           }
           break;
@@ -146,6 +215,16 @@ void sdb(Voice * currentVoice, char * currLine, int len, char *b)
           VoiceBackTrack();
           break;
         case 'q':
+        {
+          p=sdb_find_arg(p);
+          if (*p!='\0')
+          {
+            sdb_flags=atoi(p);
+            Print("new sdb_flags:%d\n",sdb_flags);
+          }
+          return;
+        }
+        case 'Q':
           m2_end(999);
         case 'c':
         default:

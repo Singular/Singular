@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.90 1999-04-29 11:38:40 Singular Exp $ */
+/* $Id: extra.cc,v 1.91 1999-05-06 16:53:21 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -939,6 +939,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         else
         {
           sdb_lines[i]=lineno;
+          sdb_files[i]=p->libname;
           i++;
           Print("breakpoint %d, at line %d in %s\n",i,lineno,p->procname);
           p->trace_flag|=(1<<i);
@@ -947,6 +948,37 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       else
       {
         WerrorS("system(\"breakpoint\",`proc`,`int`) expected");
+        return TRUE;
+      }
+      return FALSE;
+    }
+    else
+/*==================== sdb_flags =================*/
+    if (strcmp(sys_cmd, "sdb_flags") == 0)
+    {
+      if ((h!=NULL) && (h->Typ()==INT_CMD))
+      {
+        sdb_flags=(int)h->Data();
+      }
+      else
+      {
+        WerrorS("system(\"sdb_flags\",`int`) expected");
+        return TRUE;
+      }
+      return FALSE;
+    }
+    else
+/*==================== sdb_edit =================*/
+    if (strcmp(sys_cmd, "sdb_edit") == 0)
+    {
+      if ((h!=NULL) && (h->Typ()==PROC_CMD))
+      {
+        procinfov p=(procinfov)h->Data();
+        sdb_edit(p);
+      }
+      else
+      {
+        WerrorS("system(\"sdb_edit\",`proc`) expected");
         return TRUE;
       }
       return FALSE;

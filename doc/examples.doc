@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.37 1999-02-09 08:16:07 obachman Exp $
+@comment $Id: examples.doc,v 1.38 1999-05-06 16:53:26 Singular Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -350,7 +350,7 @@ Note that polynomials, ideals, matrices (of polys), vectors,
   the same names.
   Instead of defining f again we map it from ring r1 to r2 by using
   the @code{imap} command (@code{imap} is a convenient way to map variables
-  from some ring identically to variables with the same name in the 
+  from some ring identically to variables with the same name in the
   basering, even if the groundfield is different. Compare with @code{fetch}
   which works for almost identical rings,
   e.g. if the rings differ only by the ordering or the names of the variables
@@ -606,7 +606,7 @@ We compute the dimension at the generic point,
 @ifclear singularmanual
 Let us now deform a given 0-dimensional ideal j by introducing a parameter t
 and compute over the ground field Q(t).
-We compute the dimension at the generic point, 
+We compute the dimension at the generic point,
 @end ifclear
 i.e.
 @tex
@@ -621,14 +621,14 @@ same result as for the deformed ideal above. Hence, the above small
 deformation was "generic".)
 @end ifset
 
-For almost all 
+For almost all
 @tex
 $a \in Q$
 @end tex
 @ifinfo
 a in Q
 @end ifinfo
-this is the same as 
+this is the same as
 @tex
 $dim_Q Q[x,y]/j_0$,
 @end tex
@@ -826,7 +826,7 @@ We compute for the same examples as in the preceeding section
 the miniversal deformations:
 @end ifset
 @ifclear singularmanual
-We give three examples, the first being a hypersurface, the second a 
+We give three examples, the first being a hypersurface, the second a
 complete intersection, the third no complete intersection and compute
 in each of the cases the miniversal deformation:
 @end ifclear
@@ -1192,8 +1192,8 @@ resolution. It is a structure that stores all information related to
 free resolutions. This allows partial computations of resolutions via
 the command @code{res}. After applying @code{res}, only a pre-format of the
 resolution is computed which allows to determine invariants like
-Betti-numbers or homological dimension. To see the differentials 
-of the complex, a resolution must be converted into the type list which 
+Betti-numbers or homological dimension. To see the differentials
+of the complex, a resolution must be converted into the type list which
 yields a list of modules: the k-th module in this
 list is the first syzygy-module (module of relations) of the (k-1)st module.
 There are the following commands to compute a resolution:
@@ -1229,7 +1229,7 @@ method. The input has to be a standard basis.
 @ref{nres}@*
 @end ifset
 computes a free resolution of an ideal or module with the standard basis
-method. 
+method.
 @item minres
 minimizes a free resolution of an ideal or module.
 @item syz
@@ -2254,7 +2254,7 @@ g=h(f_1,@dots{},f_r).
 Both questions can be answered using the following procedure. If the
 second argument is zero, it checks for algebraic dependence and returns
 the ideal of relations between the generators of the given ideal.
-Otherwise it checks for subring membership and returns the normal form 
+Otherwise it checks for subring membership and returns the normal form
 of the second argument with respect to the ideal I.
 
 @example
@@ -2266,9 +2266,9 @@ of the second argument with respect to the ideal I.
     int k=nvars(R);
     int i;
     intvec v;
-  
+
     // construction of the new ring
-  
+
     v[n+k]=0;               // construct a weight vector
     for(i=1;i<=k;i++)
     {
@@ -2279,7 +2279,7 @@ of the second argument with respect to the ideal I.
                           ("+varstr(R)+",Y(1.."+string(n)+")),"+orde;
                             // ring definition as a string
     execute(ri);            // execution of the string
-  
+
     // construction of the new ideal I=(J[1]-Y(1),...,J[n]-y(n))
     ideal I=imap(R,J);
     for(i=1;i<=n;i++)
@@ -2302,7 +2302,7 @@ of the second argument with respect to the ideal I.
     // reduction of g with respect to I
     ideal KK=reduce(g,std(I));
     keepring(Rhelp);
-    return(KK); 
+    return(KK);
   }
 
   // applications of the procedure
@@ -2513,7 +2513,7 @@ e.g.:
 @item T1 and T2
 @*compute first order deformations and obstructions
 @item Finite fields
-@*compute in fields with 
+@*compute in fields with
 @tex
 $q=p^n$
 @end tex
@@ -2547,24 +2547,8 @@ after Arnold
 @*use MP for distributed and parallel computation
 @end itemize
 
-In this list the names of the items are the names of the 
-examples in the online help system. So by the command 
+In this list the names of the items are the names of the
+examples in the online help system. So by the command
 @code{help T1 and T2} the example about the computation of
 first order deformations and obstructions is displayed.
 @end ifclear
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

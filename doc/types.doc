@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.79 1999-04-19 11:03:03 obachman Exp $
+@comment $Id: types.doc,v 1.80 1999-05-06 16:53:35 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -198,7 +198,7 @@ ideal expressions combined by the arithmetic operations
 @item
 a power of an ideal expression (operator @code{^} or @code{**})
 @*Note that the computation of the product @code{i*i} involves
-all products of generators of @code{i} while @code{i^2} involves 
+all products of generators of @code{i} while @code{i^2} involves
 only the different ones, and is therefore faster.
 @item
 a type cast to ideal
@@ -507,7 +507,7 @@ m[1,1] + m[2,1] == trace(m);
 intvec v = 1,2,3;
 def d =transpose(v)*v;    // scalarproduct gives an 1x1 intvec
 typeof(d);
-int i = d[1];             // access the first (the only) entry in the intvec 
+int i = d[1];             // access the first (the only) entry in the intvec
 ring rr=31,(x,y,z),dp;
 poly f = 1;
 i = int(f);               // cast to int
@@ -687,7 +687,7 @@ a number comparison:
 @end example
 For numbers from Z/p or from field extensions not all operations are useful:
 @* - 0 ist always the smallest element,
-@* - in Z/p the representatives in the range -(p-1)/2..(p-1)/2 when p>2 resp. 
+@* - in Z/p the representatives in the range -(p-1)/2..(p-1)/2 when p>2 resp.
      0 and 1 for p=2 are used for comparisons,
 @* - in field extensions the last two operations
 (@code{>=,<=}) yield always TRUE (1) and
@@ -860,7 +860,7 @@ a type cast to intmat (@pxref{intmat type cast})
 @c example
   intmat Idm[3][3];
   Idm +1;          // add the unit intmat
-  intmat m1[3][2] = _,1,-2;  // take entries from the last result 
+  intmat m1[3][2] = _,1,-2;  // take entries from the last result
   m1;
   intmat m2[2][3]=1,0,2,4,5,1;
   transpose(m2);
@@ -889,11 +889,11 @@ See
 intmat
 @item @strong{Purpose:}
 Converts expression to an intmat, where expression must be of type
-intvec, or intmat. If 
+intvec, or intmat. If
 int_n and int_m are supplied, then they specifify the dimension of the
 intmat. Otherwise, the size (resp. dimensions) of the intmat
 are determined  by the size (resp. dimensions) of the
-expression. 
+expression.
 @item @strong{Example:}
 @example
 @c example
@@ -1456,7 +1456,7 @@ either for reading or for writing, but not for both at the same time. A
   def i = read(l);              // second expression
   // notice that current ring was set, the name was assigned
   // automatically
-  listvar(ring);                    
+  listvar(ring);
   def s = read(l);              // third expression
   listvar();
   close(l);                     // link is closed
@@ -1947,7 +1947,7 @@ For the mapping of coefficients from different fields see @ref{map}.
 none
 
 @item Note:
-There are standard mappings for maps which are close to the identity 
+There are standard mappings for maps which are close to the identity
 map: @code{fetch} and @code{imap}.
 
 The name of a map serves as the function which maps objects from the
@@ -2021,7 +2021,7 @@ is a map entry (the image of the corresponding variable)
 @example
 @c example
   ring r=0,(x,y),dp;
-  map f=r,y,x;    // the map f permutes the variables 
+  map f=r,y,x;    // the map f permutes the variables
   f;
   poly p=x+2y3;
   f(p);
@@ -2151,11 +2151,11 @@ a type cast to matrix (@pxref{matrix type cast})
 matrix
 @item @strong{Purpose:}
 Converts expression to a matrix, where expression must be of type int,
-intmat, intvec, number, poly, ideal, vector, module, or matrix. If 
+intmat, intvec, number, poly, ideal, vector, module, or matrix. If
 int_n and int_m are supplied, then they specifify the dimension of the
 matrix. Otherwise, the size (resp. dimensions) of the matrix
 are determined  by the size (resp. dimensions) of the
-expression. 
+expression.
 @item @strong{Example:}
 @example
 @c example
@@ -2452,7 +2452,7 @@ module intersection (see @ref{intersect})
 @item jet
 Taylor series up to a given order (see @ref{jet})
 @item kbase
-vector space basis of free module over the basering modulo the module of 
+vector space basis of free module over the basering modulo the module of
 leading terms (see @ref{kbase})
 @item lead
 initial module (see @ref{lead})
@@ -2511,7 +2511,7 @@ substitute a ring variable (see @ref{subst})
 @item syz
 computation of the first syzygy module (see @ref{syz})
 @item vdim
-vector space dimension of free module over the basering modulo module 
+vector space dimension of free module over the basering modulo module
 of leading terms (see @ref{vdim})
 @item weight
 "optimal" weights (see @ref{weight})
@@ -2599,9 +2599,9 @@ a type cast to number
 @*@strong{Example:}
 @example
 @c example
-  // the following expressions are in any ring int expressions 
+  // the following expressions are in any ring int expressions
   2 / 3;
-  4/ 8;  
+  4/ 8;
   2 /2;   // the notation of / for div might change in the future
   ring r0=0,x,dp;
   2/3, 4/8, 2/2 ; // are numbers
@@ -2648,7 +2648,7 @@ comparison
 
 @strong{Note:} quotient and exponentiation is only recognized as a
 number expression is if is already a number, see @ref{Miscellaneous
-oddities}. 
+oddities}.
 @* To acces the denominator or nominator of a rtional number see
 @ref{Tricks and pitfalls}.
 @* For the behavior of comparison operators in rings with
@@ -2835,13 +2835,13 @@ the monomial at the indicated place w.r.t.@: the monomial order
   ring R=0,(x,y),dp;
   poly f = x3y2 + 2x2y2 + xy - x + y + 1;
   f;
-  f + x5 + 2;  
+  f + x5 + 2;
   f * x2;
   (x+y)/x;
   f/3x2;
   x5 > f;
   x<=y;
-  x>y;  
+  x>y;
   ring r=0,(x,y),ds;
   poly f = fetch(R,f);
   f;
@@ -2981,7 +2981,7 @@ The help and example sections are ignored if the procedure is defined
 interactively, i.e., if it was not loaded from a file by a @ref{LIB} command.
 @* Specifying @code{static} in front of the proc-definition (in a library file)
 makes this procedure local to the library, i.e., accessible only for the other
-procedures in the same library, but not for the users. 
+procedures in the same library, but not for the users.
 
 @item Example:
 @example
@@ -3385,7 +3385,7 @@ Converts each expression to a string, where expression can be of any
 type. The concatenated string of all concersions is returned.
 
 @*The elements of intvec, intmat, ideal, module, matrix, and list, are
-separated by a comma. No newlines are inserted. 
+separated by a comma. No newlines are inserted.
 @*Not defined elements of a list are ommitted.
 @*For link, the name of the link is used.
 @*For qring, the ideal defining the quotient is appended to the ring
@@ -3401,7 +3401,7 @@ matrix, and list become indistinguishable.
 @c example
   string("1+1=", 2);
   string(intvec(1,2,3,4));
-  string(intmat(intvec(1,2,3,4), 2, 2)); 
+  string(intmat(intvec(1,2,3,4), 2, 2));
   ring r;
   string(r);
   string(ideal(x,y));
@@ -3522,7 +3522,7 @@ can only be defined or accessed with respect to this basering.
 @code{f*gen(1)+g*gen(3)+gen(4)} may also be written as @code{[f,0,g,1]}
 or as @code{[f,0,g,1,0]}.). Note that the elements of a vector have to be
 surrounded by square brackets (@code{[}  , @code{]}).
-(cf. @ref{Representation of mathematical objects}) 
+(cf. @ref{Representation of mathematical objects})
 
 @menu
 * vector declarations::

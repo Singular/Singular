@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.inc,v 1.23 1999-04-29 16:57:12 Singular Exp $ */
+/* $Id: febase.inc,v 1.24 1999-05-06 16:53:22 Singular Exp $ */
 /*
 * ABSTRACT: handling of 'voices'
 */
@@ -429,7 +429,7 @@ static int fePrintEcho(char *anf, char *b)
   && (currentVoice->pi!=NULL)
   && (currentVoice->pi->trace_flag!=0))
   {
-    sdb(currentVoice, anf, len_s, b);
+    sdb(currentVoice, anf, len_s);
   }
   prompt_char = '.';
   return len_s;
@@ -446,13 +446,14 @@ int feReadLine(char* b, int l)
     && (currentVoice->buffer[currentVoice->fptr]!='\0'))
     {
   NewBuff:
-      int i=0;
-      int startfptr=currentVoice->fptr;
+      register int i=0;
+      long startfptr=currentVoice->fptr;
+      long tmp_ptr=currentVoice->fptr;
       l--;
       loop
       {
-        char c=
-        b[i]=currentVoice->buffer[currentVoice->fptr];
+        register char c=
+        b[i]=currentVoice->buffer[tmp_ptr/*currentVoice->fptr*/];
         i++;
         if (yy_noeof==noeof_block)
         {
@@ -468,9 +469,10 @@ int feReadLine(char* b, int l)
             break;
         }
         if (i>=l) break;
-        currentVoice->fptr++;
-        if(currentVoice->buffer[currentVoice->fptr]=='\0') break;
+        tmp_ptr++;/*currentVoice->fptr++;*/
+        if(currentVoice->buffer[tmp_ptr/*currentVoice->fptr*/]=='\0') break;
       }
+      currentVoice->fptr=tmp_ptr;
       b[i]='\0';
       if (currentVoice->sw==BI_buffer)
       {
@@ -521,7 +523,7 @@ int feReadLine(char* b, int l)
       feShowPrompt();
       s=fe_fgets_stdin(fe_promptstr,
                        currentVoice->buffer+offset,
-		       (4096-1-sizeof(ADDRESS))-offset);
+                       (4096-1-sizeof(ADDRESS))-offset);
     }
     else if (currentVoice->sw==BI_file)
     {
@@ -529,9 +531,7 @@ int feReadLine(char* b, int l)
               currentVoice->files);
     }
     //else /* BI_buffer */ s==NULL  => return 0
-    //{
-    //  return 0;
-    //}
+    // done by the default return
   }
   if (s!=NULL)
   {
@@ -555,7 +555,7 @@ int feReadLine(char* b, int l)
   }
   /* else if (s==NULL) */
   {
-    char *err=NULL;
+    char *err;
     switch(yy_noeof)
     {
       case noeof_brace:
@@ -578,10 +578,9 @@ int feReadLine(char* b, int l)
         err="/*...*/";
         break;
       default:
-        break;
+        return 0;
     }
-    if (err!=NULL)
-      Werror("premature end of file while reading %s",err);
+    Werror("premature end of file while reading %s",err);
     return 0;
   }
 }

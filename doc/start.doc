@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.32 1999-02-09 08:16:14 obachman Exp $
+@comment $Id: start.doc,v 1.33 1999-05-06 16:53:33 Singular Exp $
 @comment this file contains the "Introduction" chapter.
 @c * wichmann: + added chages by GMG.
 
@@ -123,7 +123,7 @@ step-by-step manner to introduce into @sc{Singular}.
 
 @ref{Examples} should come next for real learning-by-doing or to quickly
 solve some given mathematical problems without dwelling to deeply into
-@sc{Singular}. 
+@sc{Singular}.
 @ifset singularmanual
 This chapter contains a lot of real-life examples and
 detailed instructions and explanations on how to solve mathematical
@@ -576,7 +576,7 @@ of the different symbols printed during calculation.
 @end ifset
 
 The command @code{kbase} calculates a basis of the polynomial ring
-modulo an ideal, if the quotient ring is finite dimensional. 
+modulo an ideal, if the quotient ring is finite dimensional.
 As an example we calculate the Milnor number of a
 hypersurface singularity in the global and local case. This is the
 vector space dimension of the polynomial ring modulo the Jacobian ideal
@@ -636,7 +636,7 @@ $K[x,y,z]/\hbox{\rm jacob}(f)$.
 K[x,y,z]/jacob(f).
 @end ifinfo
 As in @sc{Singular} the functions may take the input directly from
-earlier calculations, the whole sequence of commands may be written 
+earlier calculations, the whole sequence of commands may be written
 in one single statement.
 
 @example
@@ -696,7 +696,7 @@ Milnor(f);
 @noindent Note, that the result may depend on the basering as we will
 see in the next chapter.
 
-The distribution of  @sc{Singular} contains  several libraries, each of 
+The distribution of  @sc{Singular} contains  several libraries, each of
 which is a collection of useful
 procedures based on the kernel commands, which extend the functionality
 of @sc{Singular}. The command @code{help "all.lib";} lists all libraries
@@ -729,7 +729,7 @@ milnor(f);
 @end example
 
 The procedures in a library have a help part
-which is displayed by typing 
+which is displayed by typing
 
 @example
 help milnor;
@@ -764,7 +764,7 @@ example milnor;
 @c @expansion{}
 @end example
 
-@noindent Likewise, the library itself has a help part, to show a list of 
+@noindent Likewise, the library itself has a help part, to show a list of
 all the functions
 available for the user which are contained in the library.
 
@@ -888,8 +888,8 @@ $1\times1$-minors
 @ifinfo
 1 x 1 - minors
 @end ifinfo
-is empty. The algorithm of the standard basis computations may be 
-affected by the command @code{option}. For instance, a reduced standard 
+is empty. The algorithm of the standard basis computations may be
+affected by the command @code{option}. For instance, a reduced standard
 basis is obtained in the following way
 
 @example
@@ -952,7 +952,7 @@ To define a module, we give a list of vectors generating a submodule of
 a free module. Then this set of vectors may be identified with the
 columns of a matrix.  For that reason in @sc{Singular} matrices and
 modules may be interchanged. However, the representation is different
-(modules may be considered as sparse represented matrices). 
+(modules may be considered as sparse represented matrices).
 
 @example
 ring r =0,(x,y,z),dp;
@@ -997,7 +997,7 @@ $M = r^3/U$,
 @ifinfo
 M = r^3/U,
 @end ifinfo
-where U is our defining module of relations for the module 
+where U is our defining module of relations for the module
 @tex
 $M$.
 @end tex
@@ -1051,8 +1051,8 @@ quotient(U,freemodule(nrows(U)));
 @cindex Resolution
 
 There are several commands in @sc{Singular} for computing free resolutions.
-The command @code{mres(... ,n)}, for example, calculates a minimal free 
-resolution with the standard basis method up to the length @math{n}, 
+The command @code{mres(... ,n)}, for example, calculates a minimal free
+resolution with the standard basis method up to the length @math{n},
 where @math{n=0} corresponds to the full resolution.
 
 Here we use the possibility to inspect the calculation process using the

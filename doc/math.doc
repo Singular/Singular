@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.36 1999-02-09 08:16:10 obachman Exp $
+@comment $Id: math.doc,v 1.37 1999-05-06 16:53:30 Singular Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -430,11 +430,11 @@ bases by change of ordering. Journal of Symbolic Computation, 1989
 
 @item
 @tex
-Gr\"abe, H.-G.: On factorized Gr\"obner bases, Univ. Leibzig, Inst. f"ur 
+Gr\"abe, H.-G.: On factorized Gr\"obner bases, Univ. Leibzig, Inst. f"ur
 Informatik, 1994
 @end tex
 @ifinfo
-Graebe, H.-G.: On factorized Groebner bases, Univ. Leibzig, Inst. fuer 
+Graebe, H.-G.: On factorized Groebner bases, Univ. Leibzig, Inst. fuer
 Informatik, 1994
 @end ifinfo
 @item
