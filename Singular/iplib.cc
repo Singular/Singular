@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.83 2001-03-26 19:40:50 Singular Exp $ */
+/* $Id: iplib.cc,v 1.84 2001-03-26 21:35:58 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -35,7 +35,7 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror);
 
 #include "mod_raw.h"
 
-static char *iiConvName(char *p);
+static char *iiConvName(const char *p);
 #ifdef HAVE_LIBPARSER
 void yylprestart (FILE *input_file );
 int current_pos(int i=0);
@@ -1029,9 +1029,10 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror)
 {
   int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
                  BOOLEAN(*func)(leftv res, leftv v));
-  int (*fktn)(int(*iiAddCproc)(char *libname, char *procname,
+  typedef int (*fktn_t)(int(*iiAddCproc)(char *libname, char *procname,
                                BOOLEAN pstatic,
                                BOOLEAN(*func)(leftv res, leftv v)));
+  fktn_t fktn;
   idhdl pl;
   char *plib = iiConvName(newlib);
   BOOLEAN RET=TRUE;
@@ -1043,7 +1044,7 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror)
   else strcpy(FullName, fullname);
 
 
-  if(IsCmd(plib, &token))
+  if(IsCmd(plib, token))
   {
     Werror("'%s' is resered identifier\n", plib);
     goto load_modules_end;
@@ -1083,7 +1084,7 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror)
   }
   else
   {
-    fktn = dynl_sym(IDPACKAGE(pl)->handle, "mod_init");
+    fktn = (fktn_t)dynl_sym(IDPACKAGE(pl)->handle, "mod_init");
     if( fktn!= NULL) (*fktn)(iiAddCproc);
     else Werror("mod_init: %s\n", dynl_error());
     if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loaded %s \n", fullname);
@@ -1119,7 +1120,7 @@ char mytolower(char c)
 //#  define FS_SEP '/'
 //#endif
 
-static char *iiConvName(char *libname)
+static char *iiConvName(const char *libname)
 {
   char *tmpname = omStrDup(libname);
   char *p = strrchr(tmpname, DIR_SEP);
