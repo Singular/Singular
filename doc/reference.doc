@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.85 1998-06-03 10:04:30 obachman Exp $
+@comment $Id: reference.doc,v 1.86 1998-06-03 10:49:47 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -3852,11 +3852,11 @@ special command for computing the kernel of a map in @sc{Singular}.
   ring r=32003,(x,y,z),dp;
   ideal i=x,y,z;
   ideal i1=x,y;
+  ideal i0=0;
   map f=r1,i;
   setring r1;
   ideal i1=preimage(r,f,i1);
   i1;
-  ideal i0=0;
   // the kernel of f
   preimage(r,f,i0);
 @c example
