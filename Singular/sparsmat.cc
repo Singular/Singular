@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.10 1999-06-30 14:42:39 pohl Exp $ */
+/* $Id: sparsmat.cc,v 1.11 1999-07-01 12:26:53 pohl Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -530,8 +530,8 @@ void sparse_mat::smNewBareiss(int x, int y)
     tored -= x;
     this->smToredElim();
   }
-  if (y < 2) y = 2;
-  if (act < y)
+  if (y < 1) y = 1;
+  if (act <= y)
   {
     this->smCopToRes();
     return;
@@ -568,7 +568,7 @@ void sparse_mat::smNewBareiss(int x, int y)
     this->smZeroElim();
     if (tored != nrows)
       this->smToredElim();
-    if (act < y)
+    if (act <= y)
     {
       this->smFinalMult();
       this->smCopToRes();
