@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.18 2001-08-25 10:51:07 mschulze Exp $";
+version="$Id: linalg.lib,v 1.19 2001-08-25 14:56:41 mschulze Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib        Algorithmic Linear Algebra
@@ -8,29 +8,30 @@ AUTHORS:  Ivor Saynisch (ivs@math.tu-cottbus.de)
 @*        Mathias Schulze (mschulze@mathematik.uni-kl.de)
 
 PROCEDURES:
- inverse(A);        matrix, the inverse of A
- inverse_B(A);      list(matrix Inv,poly p),Inv*A=p*En ( using busadj(A) )
- inverse_L(A);      list(matrix Inv,poly p),Inv*A=p*En ( using lift )
- sym_gauss(A);      symmetric gaussian algorithm
- orthogonalize(A);  Gram-Schmidt orthogonalization
- diag_test(A);      test whether A can be diagnolized
- busadj(A);         coefficients of Adj(E*t-A) and coefficients of det(E*t-A)
- charpoly(A,v);     characteristic polynomial of A ( using busadj(A) )
- adjoint(A);        adjoint of A ( using busadj(A) )
- det_B(A);          determinant of A ( using busadj(A) )
- gaussred(A);       gaussian reduction: P*A=U*S, S a row reduced form of A
- gaussred_pivot(A); gaussian reduction: P*A=U*S, uses row pivoting
- gauss_nf(A);       gaussian normal form of A
- mat_rk(A);         rank of constant matrix A
- U_D_O(A);          P*A=U*D*O, P,D,U,O=permutaion,diag,lower-,upper-triang
- pos_def(A,i);      test symmetric matrix for positive definiteness
- hessenberg(M);     transforms M to Hessenberg form
- eigenval(M);       eigenvalues of M with multiplicities
- jordan(M);         Jordan data of constant square matrix M
- jordanbasis(M);    Jordan basis of constant square matrix M
- jordanmatrix(e,b); Jordan matrix with eigenvalues e and Jordan block sizes b
- jordanform(M);     Jordan matrix of constant square matrix M
- commutator(A);     matrix of commutator B->[A,B]=AB-BA 
+ inverse(A);          matrix, the inverse of A
+ inverse_B(A);        list(matrix Inv,poly p),Inv*A=p*En ( using busadj(A) )
+ inverse_L(A);        list(matrix Inv,poly p),Inv*A=p*En ( using lift )
+ sym_gauss(A);        symmetric gaussian algorithm
+ orthogonalize(A);    Gram-Schmidt orthogonalization
+ diag_test(A);        test whether A can be diagnolized
+ busadj(A);           coefficients of Adj(E*t-A) and coefficients of det(E*t-A)
+ charpoly(A,v);       characteristic polynomial of A ( using busadj(A) )
+ adjoint(A);          adjoint of A ( using busadj(A) )
+ det_B(A);            determinant of A ( using busadj(A) )
+ gaussred(A);         gaussian reduction: P*A=U*S, S a row reduced form of A
+ gaussred_pivot(A);   gaussian reduction: P*A=U*S, uses row pivoting
+ gauss_nf(A);         gaussian normal form of A
+ mat_rk(A);           rank of constant matrix A
+ U_D_O(A);            P*A=U*D*O, P,D,U,O=permutaion,diag,lower-,upper-triang
+ pos_def(A,i);        test symmetric matrix for positive definiteness
+ hessenberg(M);       transforms M to Hessenberg form
+ spnormalize(a[,m]);  normalize spectrum
+ eigenval(M);         eigenvalues of M with multiplicities
+ jordan(M);           Jordan data of constant square matrix M
+ jordanbasis(M);      Jordan basis of constant square matrix M
+ jordanmatrix(e,b);   Jordan matrix with eigenvalues e and Jordan block sizes b
+ jordanform(M);       Jordan matrix of constant square matrix M
+ commutator(A);       matrix of commutator B->[A,B]=AB-BA 
 ";
 
 LIB "matrix.lib";
@@ -1333,50 +1334,83 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc addval(list l,poly e,int m)
+static proc spappend(list l,number e,int m)
 {
   if(size(l)==0)
   {
-    return(list(ideal(e),intvec(m)));
+    l=list(ideal(e),intvec(m));
   }
-  int n=ncols(l[1]);
-  for(int i=n;i>=1;i--)
+  else
   {
-    if(l[1][i]==e)
-    {
-      l[2][i]=l[2][i]+m;
-      return(l);
-    }
+    int n=ncols(l[1]);
+    l[1][n+1]=e;
+    l[2][n+1]=m;
   }
-  l[1][n+1]=e;
-  l[2][n+1]=m;
   return(l);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc sortval(list l)
+proc spnormalize(ideal e,list #)
+"USAGE:    spnormalize(a,w[,m]);
+RETURN:
+@format
+list Sp: normalized spectrum (a,m)
+  ideal Sp[1]: numbers in a in increasing order
+  intvec Sp[2]:
+    int Sp[2][i]: multiplicity of number Sp[1][i] in a
+@end format
+EXAMPLE:  example spnormalize; shows examples
+"
 {
-  def e,m=l[1..2];
-  int n=ncols(e);
-  poly ee;
-  int mm;
+  intvec m;
   int i,j;
-  for(i=n;i>1;i--)
+  if(size(#)==0)
   {
-    for(j=i-1;j>=1;j--)
+    for(i=ncols(e);i>=1;i--)
     {
-      if(number(e[j])>number(e[i]))
-      {
-        ee=e[i];
-        e[i]=e[j];
-        e[j]=ee;
-        mm=m[i];
-        m[i]=m[j];
-        m[j]=mm;
-      }
+      m[i]=1;
     }
   }
-  return(list(e,m));
+  else
+  {
+    m=#[1];
+  }
+
+  list l;
+  number e0;
+  int m0;
+  for(i=ncols(e);i>=1;i--)
+  {
+    if(m[i]!=0)
+    {
+      for(j=i-1;j>=1;j--)
+      {
+        if(m[j]!=0)
+	{
+          if(number(e[i])>number(e[j]))
+          {
+            e0=number(e[i]);
+            e[i]=e[j];
+            e[j]=e0;
+            m0=m[i];
+            m[i]=m[j];
+            m[j]=m0;
+          }
+          if(number(e[i])==number(e[j]))
+          {
+            m[i]=m[i]+m[j];
+            m[j]=0;
+          }
+        }
+      }
+      l=spappend(l,number(e[i]),m[i]);
+    }
+  }
+
+  return(l);
+}
+example
+{ "EXAMPLE:"; echo=2;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1395,11 +1429,11 @@ EXAMPLE: example eigenval; shows examples
 {
   M=jet(hessenberg(M),0);
   int n=ncols(M);
-  number e;
+  number e0;
   intvec v;
   list l,f;
-  int i;
-  int j=1;
+  int i,j,k;
+  j=1;
   while(j<=n)
   {
     v=j;
@@ -1419,22 +1453,22 @@ EXAMPLE: example eigenval; shows examples
     }
     if(size(v)==1)
     {
-      l=addval(l,M[v,v],1);
+      l=spappend(l,number(M[v,v]),1);
     }
     else
     {
       f=factorize(det(submat(M,v,v)-var(1)));
       for(i=size(f[1]);i>=1;i--)
       {
-        e=number(jet(f[1][i]/var(1),0));
-        if(e!=0)
+        e0=number(jet(f[1][i]/var(1),0));
+        if(e0!=0)
 	{
-          l=addval(l,(e*var(1)-f[1][i])/e,f[2][i]);
+          l=spappend(l,number((e0*var(1)-f[1][i])/e0),f[2][i]);
 	}
       }
     }
   }
-  return(sortval(l));
+  return(spnormalize(l[1],l[2]));
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -1445,7 +1479,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc jordan(matrix M)
+proc jordan(matrix M,list #)
 "USAGE:   jordan(M); matrix M
 ASSUME:  M constant square matrix, eigenvalues of M in coefficient field
 RETURN:
@@ -1469,9 +1503,11 @@ EXAMPLE: example jordan; shows examples
 
   M=jet(M,0);
 
-  list l=eigenvalues(M);
-  def e0,m0=l[1..2];
-  kill l;
+  if(size(#)==0)
+  {
+    #=eigenvalues(M);
+  }
+  def e0,m0=#[1..2];
 
   int i;
   for(i=1;i<=ncols(e0);i++)
@@ -1534,7 +1570,7 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc jordanbasis(matrix M)
+proc jordanbasis(matrix M,list #)
 "USAGE:   jordanbasis(M); matrix M
 ASSUME:  M constant square matrix, eigenvalues of M in coefficient field
 RETURN:
@@ -1557,9 +1593,11 @@ EXAMPLE: example jordanbasis; shows examples
 
   M=jet(M,0);
 
-  list l=eigenvalues(M);
-  def e,m=l[1..2];
-  kill l;
+  if(size(#)==0)
+  {
+    #=eigenvalues(M);
+  }
+  def e,m=#[1..2];
 
   int i;
   for(i=1;i<=ncols(e);i++)
@@ -1676,14 +1714,14 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc jordanform(matrix M)
+proc jordanform(matrix M,list #)
 "USAGE:   jordanform(M); matrix M
 ASSUME:  M constant square matrix, eigenvalues of M in coefficient field
 RETURN:  matrix J in Jordan normal form with J=inverse(U)*M*U for some U
 EXAMPLE: example jordanform; shows examples
 "
 {
-  list l=jordan(M);
+  list l=jordan(M,#);
   return(jordanmatrix(l[1],l[2]));
 }
 example
