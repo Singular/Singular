@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.7 1998-05-12 13:06:17 schmidt Exp $
+@comment $Id: start.doc,v 1.8 1998-05-12 14:55:11 wichmann Exp $
 @comment this file contains the "Introduction" chapter.
 @menu
 * Background::
@@ -135,8 +135,20 @@ index}, resp.
 @section Getting started
 @cindex Getting started
 
-@subsection generalities
-@cindex generalities
+@menu
+* Generalities::                
+* Rings and standard bases::    
+* Procedures and libraries::    
+* Change of rings::             
+* Maps and elimination::        
+* Modules and their annilator::  
+* Resolution and Hilbert series::  
+@end menu
+
+@c ------------------------------------------------------------------
+@node Generalities, Rings and standard bases, Getting started, Getting started
+@subsection Generalities
+@cindex Generalities
 
 @c {{{ subsection generalities }}}
 Once @sc{Singular} is started, it attends input after the promt @code{>}.
@@ -208,8 +220,10 @@ the curly brackets @code{@{} and @code{@}} benote a begin and end of a block.
   @expansion{} 22316,20368,32460 
 @end example  
 
-@subsection rings and standard bases
-@cindex rings and standard bases
+@c ------------------------------------------------------------------
+@node Rings and standard bases, Procedures and libraries, Generalities, Getting started
+@subsection Rings and standard bases
+@cindex Rings and standard bases
 To calculate with objects as ideals, matrices, modules and vectors based on 
 polynomials a ring has to be defined first.
 @example
@@ -331,8 +345,10 @@ and write
   @expansion{}
 @end example
 
-@subsection procedures and libraries
-@cindex procedures and libraries
+@c ------------------------------------------------------------------
+@node Procedures and libraries, Change of rings, Rings and standard bases, Getting started
+@subsection Procedures and libraries
+@cindex Procedures and libraries
 
 @sc{Singular} offers comfortable programming language, so it is possible to 
 define procedures which collect several commands to an new one. 
@@ -394,9 +410,10 @@ available for the user defined in the library.
   help sing.lib;
 @end example
 
-
-@subsection change of rings
-@cindex change of rings
+@c ------------------------------------------------------------------
+@node Change of rings, Maps and elimination, Procedures and libraries, Getting started
+@subsection Change of rings
+@cindex Change of rings
 
 To calculate the local Milnor number we have to do the calculation with the
 same commands in a ring with local ordering.  Define
@@ -463,23 +480,29 @@ in the following way
 Coming back to some mathematical considerations, we study the problem how
 to calculate some ....
 
-@subsection maps and elimintation
-@cindex maps and eliminination
+@c ------------------------------------------------------------------
+@node Maps and elimination, Modules and their annilator, Change of rings, Getting started
+@subsection Maps and elimination
+@cindex Maps and elimination
 
 @example
   std(_);
   @expansion{}
 @end example
 
-@subsection modules and their annilator
-@cindex modules and and theis annilator
+@c ------------------------------------------------------------------
+@node Modules and their annilator, Resolution and Hilbert series, Maps and elimination, Getting started
+@subsection Modules and their annilator
+@cindex Modules and and their annilator
 @example
   std(_);
   @expansion{}
 @end example
 
-@subsection resolution and Hilbertseries
-@cindex resolution and Hilbertseries
+@c ------------------------------------------------------------------
+@node Resolution and Hilbert series,  , Modules and their annilator, Getting started
+@subsection Resolution and Hilbert series
+@cindex Resolution and Hilbert series
 This final example in the introduction shows how to calculate an @code{Ext}
 group.
 
