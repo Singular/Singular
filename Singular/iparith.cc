@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.177 1999-09-27 13:31:38 obachman Exp $ */
+/* $Id: iparith.cc,v 1.178 1999-10-01 17:18:24 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2505,7 +2505,8 @@ nonconst:
     idDelete(&I);
 #ifdef PDEBUG
   poly old = mpDet(m);
-  if (!pEqual(p,old))
+  if (!((p==NULL)&&(old==NULL))
+  && (!pEqual(p,old)))
   {
     WerrorS("error in mpDetBareiss");
   }

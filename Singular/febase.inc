@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.inc,v 1.26 1999-09-23 12:03:03 Singular Exp $ */
+/* $Id: febase.inc,v 1.27 1999-10-01 17:18:24 Singular Exp $ */
 /*
 * ABSTRACT: handling of 'voices'
 */
@@ -341,6 +341,7 @@ BOOLEAN exitVoice()
         currentVoice->buffer=NULL;
       }
       yylineno=currentVoice->prev->curr_lineno;
+      currentVoice->prev->next=NULL;
     }
     Voice *p=currentVoice->prev;
     delete currentVoice;

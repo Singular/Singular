@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_mp.cc,v 1.28 1999-09-21 12:03:07 obachman Exp $ */
+/* $Id: sing_mp.cc,v 1.29 1999-10-01 17:18:26 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to MP links
@@ -463,7 +463,7 @@ int Batch_ReadEval(si_link silink)
   IDLINK(id) = silink;
 
   // the main read-eval-write loop
-  while(1)
+  loop
   {
     errorreported = FALSE;
     v = slRead(silink, v);
@@ -573,6 +573,4 @@ void slInitMPTcpExtension(si_link_extension s)
   s->Status=slStatusMP;
   s->type="MPtcp";
 }
-
 #endif
-

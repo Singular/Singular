@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.32 1999-09-30 14:09:35 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.33 1999-10-01 17:18:25 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -78,7 +78,7 @@ static void redSyz (LObject* h,kStrategy strat)
     PrintS("red:");
     wrp(h->p);
   }
-  while(1)
+  loop
   {
     i = 0;
     j = strat->sl + 1;
@@ -102,7 +102,7 @@ static void redSyz (LObject* h,kStrategy strat)
       }
       i++;
     }
-    
+
     if (i > strat->tl)
     {
       // nothing to reduce with
@@ -349,7 +349,7 @@ static void redHomog (LObject* h,kStrategy strat)
       if (K_DIVISIBLE_BY(strat->T[j], h->p)) break;
       j++;
     }
-    
+
     if (j > strat->tl)
     {
       if (TEST_OPT_INTSTRATEGY)
@@ -410,7 +410,7 @@ static void redLazy (LObject* h,kStrategy strat)
       if (pDivisibleBy1(strat->T[j].p,(*h).p)) break;
       j++;
     }
-    
+
     if (j>strat->tl)
     {
       if (TEST_OPT_INTSTRATEGY)
@@ -494,7 +494,7 @@ static void redHoney (LObject*  h,kStrategy strat)
 
   pass = j = 0;
   d = reddeg = pFDeg((*h).p)+(*h).ecart;
-  while(1)
+  loop
   {
     j = 0;
     K_INIT_SHORT_EVECTOR(h->p);
@@ -503,7 +503,7 @@ static void redHoney (LObject*  h,kStrategy strat)
       if (K_DIVISIBLE_BY(strat->T[j], h->p)) break;
       j++;
     }
-    
+
     if (j > strat->tl)
     {
       if (TEST_OPT_INTSTRATEGY)
@@ -514,7 +514,7 @@ static void redHoney (LObject*  h,kStrategy strat)
       enterTBba((*h),at,strat);
       return;
     }
-    
+
     pi = strat->T[j].p;
     ei = strat->T[j].ecart;
     ii = j;
@@ -523,7 +523,7 @@ static void redHoney (LObject*  h,kStrategy strat)
      * pi with ecart ei
      */
     i = j;
-    while(1)
+    loop
     {
       /*- takes the first possible with respect to ecart -*/
       i++;
