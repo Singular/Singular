@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.26 2001-08-27 14:47:12 Singular Exp $ */
+/* $Id: modulop.cc,v 1.27 2003-01-31 09:09:46 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -23,8 +23,14 @@ int npGen=0;
 int npPminus1M=0;
 int npMapPrime;
 
+#ifdef HAVE_DIV_MOD
+CARDINAL *npInvTable=NULL;
+#endif
+
+#if !defined(HAVE_DIV_MOD) || !defined(HAVE_MULT_MOD)
 CARDINAL *npExpTable=NULL;
 CARDINAL *npLogTable=NULL;
+#endif
 
 
 BOOLEAN npGreaterZero (number k)
@@ -33,22 +39,20 @@ BOOLEAN npGreaterZero (number k)
   return ((int)h !=0) && (h <= (npPrimeM>>1));
 }
 
-unsigned long npMultMod(unsigned long a, unsigned long b)
-{
-  unsigned long c = a*b;
-  c = c % npPrimeM;
-  assume(c == (unsigned long) npMultM((number) a, (number) b));
-  return c;
-}
+//unsigned long npMultMod(unsigned long a, unsigned long b)
+//{
+//  unsigned long c = a*b;
+//  c = c % npPrimeM;
+//  assume(c == (unsigned long) npMultM((number) a, (number) b));
+//  return c;
+//}
 
 number npMult (number a,number b)
 {
   if (((int)a == 0) || ((int)b == 0))
     return (number)0;
   else
-  {
     return npMultM(a,b);
-  }
 }
 
 /*2
@@ -95,10 +99,88 @@ BOOLEAN npIsMOne (number a)
   return ((npPminus1M == (int)a)&&(1!=(int)a));
 }
 
+#ifdef HAVE_DIV_MOD
+#if 1 //ifdef HAVE_NTL // in ntl.a
+extern void XGCD(long& d, long& s, long& t, long a, long b);
+#else
+void XGCD(long& d, long& s, long& t, long a, long b)
+{
+   long  u, v, u0, v0, u1, v1, u2, v2, q, r;
+
+   long aneg = 0, bneg = 0;
+
+   if (a < 0) {
+      a = -a;
+      aneg = 1;
+   }
+
+   if (b < 0) {
+      b = -b;
+      bneg = 1;
+   }
+
+   u1=1; v1=0;
+   u2=0; v2=1;
+   u = a; v = b;
+
+   while (v != 0) {
+      q = u / v;
+      r = u % v;
+      u = v;
+      v = r;
+      u0 = u2;
+      v0 = v2;
+      u2 =  u1 - q*u2;
+      v2 = v1- q*v2;
+      u1 = u0;
+      v1 = v0;
+   }
+
+   if (aneg)
+      u1 = -u1;
+
+   if (bneg)
+      v1 = -v1;
+
+   d = u;
+   s = u1;
+   t = v1;
+}
+#endif
+
+long InvMod(long a)
+{
+   long d, s, t;
+
+   XGCD(d, s, t, a, npPrimeM);
+   assume (d == 1);
+   if (s < 0)
+      return s + npPrimeM;
+   else
+      return s;
+}
+#endif
+
+inline number npInversM (number c)
+{
+#ifndef HAVE_DIV_MOD
+  return (number)npExpTable[npPminus1M - npLogTable[(int)c]];
+#else
+  CARDINAL inv=npInvTable[(int)c];
+  if (inv==0)
+  {
+    inv=InvMod((long)c);
+    npInvTable[(int)c]=inv;
+  }
+  return (number)inv;
+#endif
+}
+
 number npDiv (number a,number b)
 {
   if ((int)a==0)
     return (number)0;
+#ifndef HAVE_DIV_MOD
   else if ((int)b==0)
   {
     WerrorS("div by 0");
@@ -111,8 +193,11 @@ number npDiv (number a,number b)
       s += npPminus1M;
     return (number)npExpTable[s];
   }
+#else
+  number inv=npInversM(b);
+  return npMultM(a,inv);
+#endif
 }
-
 number  npInvers (number c)
 {
   if ((int)c==0)
@@ -120,7 +205,7 @@ number  npInvers (number c)
     WerrorS("1/0");
     return (number)0;
   }
-  return (number)npExpTable[npPminus1M - npLogTable[(int)c]];
+  return npInversM(c);
 }
 
 number npNeg (number c)
@@ -194,7 +279,15 @@ char * npRead (char *s, number *a)
     s++;
     s = npEati(s, &n);
   }
-  *a = npDiv((number)z,(number)n);
+  if (n == 1)
+    *a = (number)z;
+  else 
+#ifdef NV_OPS
+    if (npPrimeM>NV_MAX_PRIME)
+      *a = nvDiv((number)z,(number)n);
+    else
+#endif    
+      *a = npDiv((number)z,(number)n);
   return s;
 }
 
@@ -215,31 +308,30 @@ void npSetChar(int c, ring r)
 //  int i, w;
 
 //  if (c==npPrimeM) return;
-//  if (npPrimeM > 1)
-//  {
-//    omFreeSize( (ADDRESS)npExpTable,npPrimeM*sizeof(CARDINAL) );
-//    omFreeSize( (ADDRESS)npLogTable,npPrimeM*sizeof(CARDINAL) );
-//  }
   if ((c>1) || (c<(-1)))
   {
     if (c>1) npPrimeM = c;
     else     npPrimeM = -c;
     npPminus1M = npPrimeM - 1;
-//    npExpTable= (CARDINAL *)omAlloc( npPrimeM*sizeof(CARDINAL) );
-//     npLogTable= (CARDINAL *)omAlloc( npPrimeM*sizeof(CARDINAL) );
-//     omMarkAsStaticAddr(npExpTable);
-//     omMarkAsStaticAddr(npLogTable);
-//     memcpy(npExpTable,r->cf->npExpTable,npPrimeM*sizeof(CARDINAL));
-//     memcpy(npLogTable,r->cf->npLogTable,npPrimeM*sizeof(CARDINAL));
+#ifdef HAVE_DIV_MOD
+    npInvTable=r->cf->npInvTable;
+#endif
+#if !defined(HAVE_DIV_MOD) || !defined(HAVE_MULT_MOD)
     npExpTable=r->cf->npExpTable;
     npLogTable=r->cf->npLogTable;
     npGen = npExpTable[1];
+#endif
   }
   else
   {
     npPrimeM=0;
+#ifdef HAVE_DIV_MOD
+    npInvTable=NULL;
+#endif
+#if !defined(HAVE_DIV_MOD) || !defined(HAVE_MULT_MOD)
     npExpTable=NULL;
     npLogTable=NULL;
+#endif
   }
 }
 
@@ -252,35 +344,45 @@ void npInitChar(int c, ring r)
     if (c>1) r->cf->npPrimeM = c;
     else     r->cf->npPrimeM = -c;
     r->cf->npPminus1M = r->cf->npPrimeM - 1;
-    r->cf->npExpTable= (CARDINAL *)omAlloc( r->cf->npPrimeM*sizeof(CARDINAL) );
-    r->cf->npLogTable= (CARDINAL *)omAlloc( r->cf->npPrimeM*sizeof(CARDINAL) );
-    r->cf->npExpTable[0] = 1;
-    r->cf->npLogTable[0] = 0;
-    if (r->cf->npPrimeM > 2)
+#ifdef NV_OPS
+    if (r->cf->npPrimeM <=NV_MAX_PRIME)
+#endif
     {
-      w = 1;
-      loop
+#if !defined(HAVE_DIV_MOD) || !defined(HAVE_MULT_MOD)
+      r->cf->npExpTable=(CARDINAL *)omAlloc( r->cf->npPrimeM*sizeof(CARDINAL) );
+      r->cf->npLogTable=(CARDINAL *)omAlloc( r->cf->npPrimeM*sizeof(CARDINAL) );
+      r->cf->npExpTable[0] = 1;
+      r->cf->npLogTable[0] = 0;
+      if (r->cf->npPrimeM > 2)
       {
-        r->cf->npLogTable[1] = 0;
-        w++;
-        i = 0;
+        w = 1;
         loop
         {
-          i++;
-          r->cf->npExpTable[i] = (int)(((long)w * (long)r->cf->npExpTable[i-1])
+          r->cf->npLogTable[1] = 0;
+          w++;
+          i = 0;
+          loop
+          {
+            i++;
+            r->cf->npExpTable[i] =(int)(((long)w * (long)r->cf->npExpTable[i-1])
                                  % r->cf->npPrimeM);
-          r->cf->npLogTable[r->cf->npExpTable[i]] = i;
-          if (/*(i == npPrimeM - 1 ) ||*/ (r->cf->npExpTable[i] == 1))
+            r->cf->npLogTable[r->cf->npExpTable[i]] = i;
+            if (/*(i == npPrimeM - 1 ) ||*/ (r->cf->npExpTable[i] == 1))
+              break;
+          }
+          if (i == r->cf->npPrimeM - 1)
             break;
         }
-        if (i == r->cf->npPrimeM - 1)
-          break;
       }
-    }
-    else
-    {
-      r->cf->npExpTable[1] = 1;
-      r->cf->npLogTable[1] = 0;
+      else
+      {
+        r->cf->npExpTable[1] = 1;
+        r->cf->npLogTable[1] = 0;
+      }
+#endif
+#ifdef HAVE_DIV_MOD
+      r->cf->npInvTable=(CARDINAL*)omAlloc0( r->cf->npPrimeM*sizeof(CARDINAL) );
+#endif
     }
   }
   else
@@ -348,6 +450,9 @@ static number npMapLongR(number from)
 #if defined(LDEBUG)
   res->debug=123456;
 #endif
+#ifndef NL_OLDCOPY
+  res->ref=1;
+#endif
   dest = &(res->z);
 
   if (e<0)
@@ -411,3 +516,79 @@ nMapFunc npSetMap(ring src, ring dst)
   }
   return NULL;      /* default */
 }
+
+// -----------------------------------------------------------
+//  operation for very large primes (32003< p < 2^31-1)
+// ----------------------------------------------------------
+#ifdef NV_OPS
+
+number nvMult (number a,number b)
+{
+  if (((int)a == 0) || ((int)b == 0))
+    return (number)0;
+  else
+    return nvMultM(a,b);
+}
+
+long nvInvMod(long a)
+{
+   long  s, t;
+
+   long  u, v, u0, v0, u1, v1, u2, v2, q, r;
+
+   u1=1; v1=0;
+   u2=0; v2=1;
+   u = a; v = npPrimeM;
+
+   while (v != 0) {
+      q = u / v;
+      r = u % v;
+      u = v;
+      v = r;
+      u0 = u2;
+      v0 = v2;
+      u2 =  u1 - q*u2;
+      v2 = v1- q*v2;
+      u1 = u0;
+      v1 = v0;
+   }
+
+   s = u1;
+   //t = v1;
+   if (s < 0)
+      return s + npPrimeM;
+   else
+      return s;
+}
+
+inline number nvInversM (number c)
+{
+  long inv=InvMod((long)c);
+  return (number)inv;
+}
+
+number nvDiv (number a,number b)
+{
+  if ((int)a==0)
+    return (number)0;
+  else if ((int)b==0)
+  {
+    WerrorS("div by 0");
+    return (number)0;
+  }
+  else
+  {
+    number inv=nvInversM(b);
+    return nvMultM(a,inv);
+  }
+}
+number  nvInvers (number c)
+{
+  if ((int)c==0)
+  {
+    WerrorS("1/0");
+    return (number)0;
+  }
+  return nvInversM(c);
+}
+#endif

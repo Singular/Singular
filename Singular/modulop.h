@@ -3,14 +3,23 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.h,v 1.16 2001-10-09 16:36:09 Singular Exp $ */
+/* $Id: modulop.h,v 1.17 2003-01-31 09:09:46 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
 #include "structs.h"
 
+// defines are in struct.h
 // define if a*b is with mod instead of tables
-#define HAVE_MULT_MOD
+//#define HAVE_MULT_MOD 
+// define if a/b is with mod instead of tables
+//#define HAVE_DIV_MOD 
+// define if an if should be used
+//#define HAVE_GENERIC_ADD
+
+// enable large primes (32003 < p < 2^31-)
+#define NV_OPS
+#define NV_MAX_PRIME 32003
 
 extern int npPrimeM;
 extern int npGen;
@@ -45,18 +54,40 @@ nMapFunc npSetMap(ring src, ring dst);
 number  npMapP(number from);
 /*-------specials for spolys, do NOT use otherwise--------------------------*/
 /* for npMultM, npSubM, npNegM, npEqualM : */
+#ifdef HAVE_DIV_MOD
+extern CARDINAL *npInvTable;
+#else
+#ifndef HAVE_MULT_MOD
 extern int npPminus1M;
 extern CARDINAL *npExpTable;
 extern CARDINAL *npLogTable;
+#endif
+#endif
 
-#ifdef HAVE_MULT_MOD
+#if 0
 inline number npMultM(number a, number b)
+// return (a*b)%n
 {
-  return (number)
+   double ab;
+   long q, res;
+
+   ab = ((double) ((int)a)) * ((double) ((int)b));
+   q  = (long) (ab/((double) npPrimeM));  // q could be off by (+/-) 1
+   res = (long) (ab - ((double) q)*((double) npPrimeM));
+   res += (res >> 31) & npPrimeM;
+   res -= npPrimeM;
+   res += (res >> 31) & npPrimeM;
+   return (number)res;
+}
+#endif
+#ifdef HAVE_MULT_MOD
+static inline number npMultM(number a, number b)
+{
+  return (number) 
     ((((unsigned long) a)*((unsigned long) b)) % ((unsigned long) npPrimeM));
 }
 #else
-inline number npMultM(number a, number b)
+static inline number npMultM(number a, number b)
 {
   int x = npLogTable[(int)a]+npLogTable[(int)b];
   return (number)npExpTable[x<npPminus1M ? x : x-npPminus1M];
@@ -83,14 +114,34 @@ inline number npSubAsm(number a, number b, int m)
   return r;
 }
 #endif
-
-inline number npAddM(number a, number b)
+#ifdef HAVE_GENERIC_ADD
+static inline number npAddM(number a, number b)
 {
   int r = (int)a + (int)b;
   return (number)(r >= npPrimeM ? r - npPrimeM : r);
 }
+static inline number npSubM(number a, number b)
+{
+  return (number)((int)a<(int)b ?
+                       npPrimeM-(int)b+(int)a : (int)a-(int)b);
+}
+#else
+static inline number npAddM(number a, number b)
+{
+   int res = (int)a + (int)b;
+   res -= npPrimeM;
+   res += (res >> 31) & npPrimeM;
+   return (number)res;
+}
+static inline number npSubM(number a, number b)
+{
+   int res = (int)a - (int)b;
+   res += (res >> 31) & npPrimeM;
+   return (number)res;
+}
+#endif
 
-inline BOOLEAN npIsZeroM (number  a)
+static inline BOOLEAN npIsZeroM (number  a)
 {
   return 0 == (int)a;
 }
@@ -102,11 +153,19 @@ inline BOOLEAN npIsZeroM (number  a)
 *}
 */
 
-#define npSubM(a,b)    (number)((int)a<(int)b ?\
-                       npPrimeM-(int)b+(int)a : (int)a-(int)b)
-
 #define npNegM(A)      (number)(npPrimeM-(int)(A))
 #define npEqualM(A,B)  ((int)A==(int)B)
-#define npIsZeroM(a)   (0 == (int)a)
+
+
+#ifdef NV_OPS
+static inline number nvMultM(number a, number b)
+{
+  return (number) 
+    ((((unsigned long long) a)*((unsigned long long) b)) % ((unsigned long long) npPrimeM));
+}
+number  nvMult        (number a, number b);
+number  nvDiv         (number a, number b);
+number  nvInvers      (number c);
 #endif
 
+#endif
