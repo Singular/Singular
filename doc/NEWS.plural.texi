@@ -1,0 +1,95 @@
+@comment -*-texinfo-*-
+@comment $Id: NEWS.plural.texi,v 1.1 2003-05-22 19:15:53 levandov Exp $
+@comment this file contains the News about Singular versions
+@comment Unix
+@ifclear VERSION
+@include version.texi
+@end ifclear
+
+@majorheading NEWS in SINGULAR::PLURAL @value{VERSION}
+
+@ifclear singularmanual
+@macro nref{what}
+\what\
+@end macro
+@end ifclear
+
+@ifset singularmanual
+@macro nref{what}
+@ref{\what\}
+@end macro
+@end ifset
+
+The current version @value{VERSION} is the first pre-release
+of the upcoming release series version 2-2. Therefore, some
+command names are subject to change. 
+
+Singular::Plural version 2-1 is generally much faster than any previous
+experimental version of Singular::Plural, due to a rewrite of major parts 
+of the Singular kernel (e.g., the kernel has a new memory manager 
+and a new polynomial arithmetic) 
+and due to new and better implemented algorithms 
+(e.g., for two-sided Gr"obner bases).
+
+Besides theses internal changes, Singular version 2 offers many new
+features and functionalities 
+
+@heading Efficiency Improvements
+The following table shows some timings which compare the efficincy of
+Singular:Plural version 0-9-9 and Singular version 2-1-2. 
+All times are in seconds
+and were obtained on HP 160 workstation with 512 MB RAM running HP-UX 10.20.
+
+@multitable @columnfractions .50 .20 .20 .15
+@item @strong{Example} @tab @strong{0-9} @tab @strong{2-1} @tab @strong{Speedup}
+@c @item @uref{http://www.singular.uni-kl.de/Benchmarks/Singular/mora_1.sing,,mora_1} @tab std  @tab 32003,x(1..3),ds @tab 82 @tab 9.4 @tab 8.7
+
+@item AnnFD-sl2-4 @tab 3.34       @tab 0.92    @tab 3.6
+@item TwoGB-g2-3  @tab 24577      @tab 165     @tab  149
+@item ucha4       @tab 12.9       @tab 8.5     @tab  1.5
+@item ucha2       @tab 44.3 hrs @tab 9 hrs @tab  4.9
+@end multitable
+
+@heading (Commutative) Factorizing algorithms revisited
+Starting with version 2-0-4, we use NTL (of Victor Shoup) for factoring
+univariate polynomials. The multivariate factoring code in libfac/factory
+does now also work over algebraic extension fields.
+
+@heading General Changes
+@table @asis
+@item @nref{Emacs user interface}
+the recommended interface for using @sc{Singular::Plural}
+@item @code{EPlural}
+new program for an out-of-the-box, pre-customized Emacs which runs
+Plural
+@item @nref{The online help system}
+choose in which browser the on-line help is displayed;
+@*wildcard expansion of help topics
+@*new layout of html manual pages
+@item @nref{Source code debugger}
+interactive debugging of procedures written in the @sc{Singular}
+language
+@item http://www.singular.uni-kl.de
+New WWW home-site of @sc{Singular}
+@end table
+
+@heading @sc{Singular::Plural} libraries
+
+@table @asis
+@item @nref{lieA_lib} Plural definitions of several enveloping algebras of simple Lie algebras
+@end table
+
+@heading Internal Changes
+@table @asis
+@item new data structures for monomials and polynomials
+Makes polynomial arithmetic significantly faster: Especially for block -
+or weighted orderings.
+Bucket representation of polynomials in std and NF;
+Ring change during std-related computations
+(resulting in more speed and less space consumption).
+@item new memory management
+Results is less memory usage, faster memory allocation/free, less
+fragmentation, much better locality of reference.
+@end table
+
+@end itemize
