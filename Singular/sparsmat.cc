@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.50 2001-01-31 15:11:36 pohl Exp $ */
+/* $Id: sparsmat.cc,v 1.51 2001-01-31 18:48:42 Singular Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -173,6 +173,7 @@ Exponent_t smExpBound( ideal m, int di, int ra, int t)
   Exponent_t *r, *c;
   int al, bl, i, j, k;
 
+  if (ra==0) ra=1;
   al = di*sizeof(Exponent_t);
   c = (Exponent_t *)omAlloc(al);
   bl = ra*sizeof(Exponent_t);
