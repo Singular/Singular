@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.16 1998-12-02 13:57:41 obachman Exp $ */
+/* $Id: structs.h,v 1.17 1998-12-14 15:32:29 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -16,6 +16,9 @@ typedef short BOOLEAN;
 typedef void * Sy_reference;
 #define ADDRESS Sy_reference
 #define BITSET  unsigned int
+
+/* EXPONENT_TYPE is determined by configure und defined in mod2.h */
+typedef EXPONENT_TYPE Exponent_t;
 
 enum tHomog
 {

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.26 1998-12-02 13:57:40 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.27 1998-12-14 15:32:31 Singular Exp $ */
 
 /***************************************************************
  *
@@ -25,9 +25,6 @@
  * definition of the poly structure and its fields
  *
  ***************************************************************/
-
-// EXPONENT_TYPE is determined by configure und defined in mod2.h
-typedef EXPONENT_TYPE Exponent_t;
 
 #ifndef NDEBUG
 #define VARS (10)   /*max. number of variables as constant*/
