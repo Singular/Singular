@@ -1255,10 +1255,12 @@ static BOOLEAN jjINDEX_V_IV(leftv res, leftv u, leftv v)
 static BOOLEAN jjKLAMMER(leftv res, leftv u, leftv v)
 {
   if(u->name==NULL) return TRUE;
-  char * n = (char *)AllocL(strlen(u->name) + 6);
-  sprintf(n,"%s(%d)",u->name,(int)v->Data());
+  char * nn = (char *)AllocL(strlen(u->name) + 13);
+  sprintf(nn,"%s(%d)",u->name,(int)v->Data());
   FreeL((ADDRESS)u->name);
   u->name=NULL;
+  char *n=mstrdup(nn);
+  FreeL((ADDRESS)nn);
 #ifdef HAVE_NAMESPACES
   if(u->req_packhdl != NULL)
   {

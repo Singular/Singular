@@ -72,7 +72,7 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     comm.cc kstd1.cc kstd2.cc kutil.cc lists.cc \
     longalg.cc longrat.cc longrat0.cc \
     maps.cc matpol.cc misc.cc \
-    mminit.cc modulop.cc \
+    mminit.cc modulop.cc sparsmat.cc \
     fglm.cc fglmzero.cc fglmvec.cc fglmgauss.cc fglmhom.cc fglmcomb.cc \
     numbers.cc polys.cc polys0.cc polys1.cc polys-impl.cc \
     ring.cc shortfl.cc silink.cc sing_mp.cc\
@@ -96,7 +96,7 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	cntrlc.h ipprint.h ring.h timer.h \
 	febase.h ipshell.h shortfl.h tok.h \
 	mmemory.h mmprivate.h mmheap.h mmpage.h page.h \
-	ffields.h khstd.h silink.h \
+	ffields.h khstd.h silink.h sparsmat.h \
 	fglm.h comm.h kstd1.h modulop.h sing_dbm.h weight.h \
 	fglmgauss.h fglmvec.h kstd2.h mpsr.h sing_mp.h \
 	kstdfac.h mpsr_Get.h spolys.h \
@@ -122,7 +122,7 @@ OBJS=grammar.o scanner.o matpol.o binom.o\
      ideals.o subexpr.o hdegree.o hutil.o ffields.o shortfl.o \
      longalg.o spolys0.o syz.o syz0.o syz1.o weight.o weight0.o \
      ipid.o ipshell.o iplib.o ipassign.o ipconv.o ipprint.o\
-     polys.o polys0.o polys1.o polys-impl.o extra.o\
+     polys.o polys0.o polys1.o polys-impl.o extra.o sparsmat.o\
      mminit.o mmtables.o mmalloc.o mmheap.o mmpage.o page.o \
      mmisc.o mmcheck.o mmbt.o sing_dld.o sing_dbm.o silink.o \
      sing_mp.o fglm.o fglmzero.o fglmvec.o fglmhom.o fglmgauss.o cntrlc.o \
@@ -339,7 +339,7 @@ OBJG1=	grammar.og scanner.og matpol.og binom.og\
      longalg.og spolys0.og syz.og syz0.og syz1.og weight.og \
      ipid.og ipshell.og iplib.og ipassign.og ipconv.og ipprint.og\
      polys.og polys0.og polys1.og polys-impl.og extra.og\
-     mminit.og sing_dld.og sing_dbm.og silink.og \
+     mminit.og sing_dld.og sing_dbm.og silink.og sparsmat.og\
      sing_mp.og fglm.og fglmzero.og fglmvec.og fglmgauss.og fglmhom.og\
      algmap.og clapconv.og  clapmem.og clapsing.og \
      cntrlc.og  \
@@ -415,7 +415,7 @@ OBJP1=	grammar.op scanner.op matpol.op binom.op\
      longalg.op spolys0.op syz.op syz0.op syz1.op weight.op \
      ipid.op ipshell.op iplib.op ipassign.op ipconv.op ipprint.op\
      polys.op polys0.op polys1.op polys-impl.op extra.op\
-     mminit.op sing_dld.op sing_dbm.op silink.op \
+     mminit.op sing_dld.op sing_dbm.op silink.op sparsmat.op\
      sing_mp.op fglm.op fglmzero.op fglmvec.op fglmgauss.op fglmhom.op\
      algmap.op clapconv.op  clapmem.op clapsing.op \
      cntrlc.op  \
@@ -441,7 +441,7 @@ OBJB1=	grammar.ob scanner.ob matpol.ob binom.ob\
      longalg.ob spolys0.ob syz.ob syz0.ob syz1.ob weight.ob \
      ipid.ob ipshell.ob iplib.ob ipassign.ob ipconv.ob ipprint.ob\
      polys.ob polys0.ob polys1.ob polys-impl.ob extra.ob\
-     mminit.ob sing_dld.ob sing_dbm.ob silink.ob \
+     mminit.ob sing_dld.ob sing_dbm.ob silink.ob sparsmat.ob\
      sing_mp.ob fglm.ob fglmzero.ob fglmvec.ob fglmgauss.ob fglmhom.ob\
      algmap.ob clapconv.ob  clapmem.ob clapsing.ob \
      cntrlc.ob  \

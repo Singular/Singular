@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.42 1998-12-16 12:08:38 Singular Exp $ */
+/* $Id: ring.cc,v 1.43 1999-02-10 16:00:04 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -669,7 +669,7 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
 // set those fields of the ring, which can be computed from other fields:
 // More particularly, sets r->VarOffset
 
-void rComplete(ring r)
+void rComplete(ring r, int force)
 {
   int VarCompIndex, VarLowIndex, VarHighIndex;
   
@@ -1894,6 +1894,12 @@ BOOLEAN rIsPolyVar(int v)
     i++;
   }
   return 3; /* could not find var v*/
+}
+
+void rUnComplete(ring r)
+{
+  Free((ADDRESS)r->VarOffset,(r->N + 1)*sizeof(int));
+  r->VarOffset=NULL;
 }
 
 #ifdef RDEBUG
