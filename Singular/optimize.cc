@@ -128,8 +128,6 @@ void maPoly_Optimize(mapoly mpoly, ring src_r){
   mapoly fp=NULL;
   mapoly fq=NULL;
   while (iter->next!=NULL){
-    printf("topIter:\n");
-    
     choice=iter->next;
     if ((iter->f1==NULL)){
       ggT=maFindBestggT(iter, choice, fp, fq,src_r);      
@@ -148,3 +146,16 @@ void maPoly_Optimize(mapoly mpoly, ring src_r){
   }
 
 }
+#if 0
+ring map_r = 32003, (a, b, c), Wp(1,2,3);
+ideal map_id = a5+a4, ab+ab3+c*b2+ca5, a3b2+c3 + ab, ab2 + a2b4;
+
+
+ring image_r;
+ideal image_id = x2y3, y, z+x6;
+
+map Phi = map_r, image_id;
+
+system("mapmb", Phi, map_id);
+
+#endif
