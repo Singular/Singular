@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_ops.cc,v 1.7 1997-09-09 08:39:02 schmidt Exp $ */
+/* $Id: cf_ops.cc,v 1.8 1997-09-29 16:07:28 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -578,6 +578,59 @@ totaldegree ( const CanonicalForm & f, const Variable & v1, const Variable & v2 
 	    if ( (dummy = totaldegree( i.coeff(), v1, v2 ) + i.exp()) > cdeg )
 		cdeg = dummy;
 	return cdeg;
+    }
+}
+//}}}
+
+//{{{ int size ( const CanonicalForm & f, const Variable & v )
+//{{{ docu
+//
+// size() - count number of monomials of f with level higher
+//   or equal than level of v.
+//
+// Returns one if f is in an base domain.
+//
+//}}}
+int
+size ( const CanonicalForm & f, const Variable & v )
+{
+    if ( f.inBaseDomain() )
+	return 1;
+
+    int result = 0;
+    CFIterator i;
+    if ( f.mvar() < v )
+	// polynomials with level < v1 are counted as coefficients
+	return 1;
+    else {
+	// polynomials with level > v2 are not counted al all
+	for ( i = f; i.hasTerms(); i++ )
+	    result += size( i.coeff(), v );
+	return result;
+    }
+}
+//}}}
+
+//{{{ int size ( const CanonicalForm & f )
+//{{{ docu
+//
+// size() - return number of monomials in f which are in an
+//   coefficient domain.
+//
+// Returns one if f is in an coefficient domain.
+//
+//}}}
+int
+size ( const CanonicalForm & f )
+{
+    if ( f.inCoeffDomain() )
+	return 1;
+    else {
+	int result = 0;
+	CFIterator i;
+	for ( i = f; i.hasTerms(); i++ )
+	    result += size( i.coeff() );
+	return result;
     }
 }
 //}}}
