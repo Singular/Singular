@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.155 1999-10-19 12:45:15 obachman Exp $
+@comment $Id: reference.doc,v 1.156 1999-10-19 16:07:34 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2841,9 +2841,9 @@ This command is obsoleted by
 @ifclear namespaces
 @item @strong{Purpose:}
 reads a library of procedures from a file. If the given filename does
-not start with @kbd{.} or @kbd{/} and can not be located in the current 
+not start with @kbd{.} or @kbd{/} and can not be located in the current
 directory, each directory contained in the library
-@code{SearchPath} is searched for file of this name. 
+@code{SearchPath} is searched for file of this name.
 @xref{Loading of a library}, for more info on @code{SearchPath}.
 @end ifclear
 
@@ -3206,11 +3206,11 @@ To monitor the memory usage during ongoing computations the option
 @code{mem} should be set (using the command @code{option(mem);}, see
 also @ref{option}).
 @item @strong{Note on memory management:}
-While running, @sc{Singular} periodically performs garbage collection, 
+While running, @sc{Singular} periodically performs garbage collection,
 i.e., it frees unused memory as much as possible. In particular, a
 garbage collection is performed whenever the basering is changed. An
 immediate garbage collection can be enforced with the command
-@code{system("gc");} (@pxref{system}). 
+@code{system("gc");} (@pxref{system}).
 @item @strong{Example:}
 @smallexample
 @c example
@@ -3222,11 +3222,11 @@ immediate garbage collection can be enforced with the command
      memory(1)/1023, "KByte)";
   }
   ReportMemoryUsage();
-  kill p;              
+  kill p;
   ReportMemoryUsage(); // less memory used: p killed
-  system("gc");        
+  system("gc");
   ReportMemoryUsage(); // less memory allocated: garbage collect
-  kill r;              
+  kill r;
   ReportMemoryUsage(); // even less memory: r killed and implicit gc
 @c example
 @end smallexample
@@ -3567,11 +3567,13 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{mstd (} ideal_expression @code{)}
+@*@code{mstd (} module_expression @code{)}
 @item @strong{Type:}
 list
 @item @strong{Purpose:}
 returns a list whose first entry is a standard basis and whose second
-entry is a minimal generating set of the ideal which is a subset of the
+entry is both a minimal generating set for the ideal resp. module
+and a subset of the
 standard basis for homogeneous input (w.r.t. any monomial ordering).
 @item @strong{Example:}
 @smallexample
@@ -3587,6 +3589,7 @@ standard basis for homogeneous input (w.r.t. any monomial ordering).
 @c ref
 See
 @ref{ideal};
+@ref{module};
 @ref{std};
 @ref{minbase}.
 @c ref
@@ -4425,10 +4428,10 @@ d in row i and column j
 is the minimal number of generators in
 degree
 @tex
-$i+j$ of the $j$-th 
+$i+j$ of the $j$-th
 @end tex
 @ifinfo
-i+j of the j-th 
+i+j of the j-th
 @end ifinfo
  syzygy module of
 @tex
@@ -5523,8 +5526,8 @@ type of the returned value is either string or int.
 @cindex timer resolution, setting the
 @cindex minimal display time, setting the
 sets the value of the (command-line) option long_option_name to the
-value given by the expression. Type of the expression must be string, or 
-int.  @xref{Command line options}, for more info. Among others, 
+value given by the expression. Type of the expression must be string, or
+int.  @xref{Command line options}, for more info. Among others,
 this can be used for setting the seed of the random number generator,
 the used help browser, the minimal display time, or the timer
 resolution.
@@ -5553,28 +5556,28 @@ system("Singular");
 // report value of all options
 system("--");
 @expansion{} // --batch           0
-@expansion{} // --execute        
+@expansion{} // --execute
 @expansion{} // --sdb             0
 @expansion{} // --echo            0
 @expansion{} // --help            0
 @expansion{} // --quiet           0
 @expansion{} // --random          937848971
 @expansion{} // --no-tty          0
-@expansion{} // --user-option    
+@expansion{} // --user-option
 @expansion{} // --version         0
 @expansion{} // --allow-net       0
-@expansion{} // --browser        
+@expansion{} // --browser
 @expansion{} // --emacs           0
 @expansion{} // --no-stdlib       0
 @expansion{} // --no-rc           0
 @expansion{} // --no-warn         0
 @expansion{} // --no-out          0
 @expansion{} // --min-time        "0.5"
-@expansion{} // --mp-port        
-@expansion{} // --mp-host        
+@expansion{} // --mp-port
+@expansion{} // --mp-host
 @expansion{} // --ticks-per-sec   1
-@expansion{} // --mp-transp      
-@expansion{} // --mp-mode  
+@expansion{} // --mp-transp
+@expansion{} // --mp-mode
 // set minimal display time to 0.02 seconds
 system("--min-time", "0.02");
 // set timer resolution to 0.01 seconds
