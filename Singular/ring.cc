@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.98 2000-03-20 13:41:45 Singular Exp $ */
+/* $Id: ring.cc,v 1.99 2000-03-21 16:21:43 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3558,6 +3558,12 @@ void rSetSyzComp(int k)
   {
     WarnS("syzcomp in incompatible ring");
   }
+#ifdef PDEBUG
+#ifdef HAVE_SHIFTED_EXPONENTS
+  extern int pDBsyzComp;
+  pDBsyzComp=k; 
+#endif
+#endif
 }
 
 // return the max-comonent wchich has syzIndex i

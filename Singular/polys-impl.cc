@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.35 2000-02-07 17:21:48 Singular Exp $ */
+/* $Id: polys-impl.cc,v 1.36 2000-03-21 16:21:41 Singular Exp $ */
 
 /***************************************************************
  *
@@ -28,6 +28,12 @@
 #include "polys.h"
 #include "ring.h"
 #include "polys-impl.h"
+
+#ifdef HAVE_SHIFTED_EXPONENTS
+#ifdef PDEBUG
+int pDBsyzComp=0;
+#endif
+#endif
 
 /***************************************************************
  *
@@ -744,7 +750,7 @@ BOOLEAN pDBDivisibleBy2(poly a, poly b, char* f, int l)
 BOOLEAN mmDBEqual(poly p, poly q, char *f, int l)
 {
   int i;
-  
+
   for (i = 1; i<=pVariables; i++)
   {
     if (pGetExp(p,i) != pGetExp(q, i)) return FALSE;
@@ -762,7 +768,7 @@ BOOLEAN prDBTest(poly p, ring r, char* f, int l)
 {
   ring old_ring = NULL;
   BOOLEAN res;
-  
+
   if (r != currRing)
   {
     old_ring = currRing;
@@ -918,6 +924,227 @@ BOOLEAN pDBTest(poly p, memHeap heap, char *f, int l)
   }
   return TRUE;
 }
+
+#ifdef HAVE_SHIFTED_EXPONENTS
+int rComp_a(poly p1, poly p2, int i, int rr)
+{
+  int j;
+  int o1=0;
+  int o2=0;
+  for(j=currRing->block0[i];j<=currRing->block1[i];j++)
+  {
+    o1+=pGetExp(p1,j)*currRing->wvhdl[i][j-currRing->block0[i]];
+    o2+=pGetExp(p2,j)*currRing->wvhdl[i][j-currRing->block0[i]];
+  }
+  if (o1>o2)
+  {
+    assume(rr==1);
+    return 1;
+  }
+  if (o1<o2)
+  {
+    assume(rr==-1);
+    return -1;
+  }
+  return 0;
+}
+int rComp_deg(poly p1, poly p2, int i, int rr)
+{
+  int j;
+  int o1=0;
+  int o2=0;
+  for(j=currRing->block0[i];j<=currRing->block1[i];j++)
+  {
+    o1+=pGetExp(p1,j);
+    o2+=pGetExp(p2,j);
+  }
+  if (o1>o2)
+  {
+    assume(rr==1);
+    return 1;
+  }
+  if (o1<o2)
+  {
+    assume(rr==-1);
+    return -1;
+  }
+  return 0;
+}
+int rComp_lex(poly p1, poly p2, int i, int rr)
+{
+  int j;
+  for(j=currRing->block0[i];j<=currRing->block1[i];j++)
+  {
+    if (pGetExp(p1,j) > pGetExp(p2,j))
+    {
+      assume(rr==1);
+      return 1;
+    }
+    else if (pGetExp(p1,j) < pGetExp(p2,j))
+    {
+      assume(rr==-1);
+      return -1;
+    }
+  }
+  return 0;
+}
+int rComp_revlex(poly p1, poly p2, int i, int rr)
+{
+  int j;
+  int e1,e2;
+  for(j=currRing->block1[i];j>=currRing->block0[i];j--)
+  {
+    e1=pGetExp(p1,j);
+    e2=pGetExp(p2,j);
+    if (e1 < e2)
+    {
+      assume(rr== 1);
+      return  1;
+    }
+    else if (e1 > e2)
+    {
+      assume(rr== -1);
+      return -1;
+    }
+  }
+  return 0;
+}
+int rComp0(poly p1, poly p2)
+{
+  int rr,r;
+  _prMonCmp(p1, p2, currRing, {rr=0;goto next_after_comp;}, {rr=1;goto next_after_comp;}, {rr=-1;goto next_after_comp;});
+  next_after_comp:
+  int n=rBlocks(currRing)-1;
+  int i,j;
+  for(i=0;i<n;i++)
+  {
+    switch (currRing->order[i])
+    {
+      case ringorder_a:
+        r=rComp_a(p1,p2,i,rr);
+        if (r!=0) return r;
+        break;
+
+      case ringorder_c:
+        if (pGetComp(p1) < pGetComp(p2))
+        {
+          assume(rr==1);
+          return 1;
+        }
+        if (pGetComp(p1) > pGetComp(p2))
+        {
+          assume(rr==-1);
+          return -1;
+        }
+        break;
+
+      case ringorder_C:
+        if (pGetComp(p1) > pGetComp(p2))
+        {
+          assume(rr==1);
+          return 1;
+        }
+        if (pGetComp(p1) < pGetComp(p2))
+        {
+          assume(rr==-1);
+          return -1;
+        }
+        break;
+
+      case ringorder_M:
+        {
+          assume(0); // not yet implemented
+          break;
+        }
+
+      case ringorder_lp:
+        r=rComp_lex(p1,p2,i,rr);
+	if (r!=0) return r;
+        break;
+
+      case ringorder_ls:
+        r=rComp_lex(p1,p2,i,-rr);
+	if (r!=0) return -r;
+        break;
+
+      case ringorder_dp:
+        r=rComp_deg(p1,p2,i,rr);
+        if (r!=0)  return r;
+        r=rComp_revlex(p1,p2,i,rr);
+	if (r!=0) return r;
+        break;
+
+      case ringorder_Dp:
+        r=rComp_deg(p1,p2,i,rr);
+        if (r!=0) return r;
+	r=rComp_lex(p1,p2,i,rr);
+        if (r!=0) return r;
+        break;
+
+      case ringorder_ds:
+        r=rComp_deg(p1,p2,i,-rr);
+        if (r!=0) return -r;
+        r=rComp_revlex(p1,p2,i,rr);
+	if (r!=0) return r;
+        break;
+
+      case ringorder_Ds:
+        r=rComp_deg(p1,p2,i,-rr);
+        if (r!=0) return -r;
+	r=rComp_lex(p1,p2,i,rr);
+        if (r!=0) return r;
+        break;
+
+      case ringorder_wp:
+        r=rComp_a(p1,p2,i,rr);
+        if (r!=0) return r;
+        r=rComp_revlex(p1,p2,i,rr);
+	if (r!=0) return r;
+        break;
+
+      case ringorder_Wp:
+        r=rComp_a(p1,p2,i,rr);
+        if (r!=0) return r;
+	r=rComp_lex(p1,p2,i,rr);
+        if (r!=0) return r;
+        break;
+
+      case ringorder_ws:
+        r=rComp_a(p1,p2,i,-rr);
+        if (r!=0) return -r;
+        r=rComp_revlex(p1,p2,i,rr);
+	if (r!=0) return r;
+        break;
+
+      case ringorder_Ws:
+        r=rComp_a(p1,p2,i,-rr);
+        if (r!=0) return -r;
+	r=rComp_lex(p1,p2,i,rr);
+        if (r!=0) return r;
+        break;
+
+      case ringorder_S:
+        assume(0);
+        break;
+
+      case ringorder_s:
+        /*  ro_syz */
+	if ((pGetComp(p1) > pDBsyzComp) && (pGetComp(p2) > pDBsyzComp)) break;
+	if ((pGetComp(p1) <= pDBsyzComp) && (pGetComp(p2) <= pDBsyzComp)) break;
+	if (pGetComp(p1) <= pDBsyzComp) return 1;
+	/* if (pGetComp(p2) <= pDBsyzComp) */ return -1;
+        break;
+
+      case ringorder_unspec:
+      case ringorder_no:
+      default:
+          Print("undef. ringorder used\n");
+          break;
+    }
+  }
+  return rr;
+}
+#endif
 #endif // PDEBUG
 
 static unsigned long GetBitFields(Exponent_t e,

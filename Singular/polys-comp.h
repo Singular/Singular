@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-comp.h,v 1.20 2000-03-20 13:42:54 Singular Exp $ */
+/* $Id: polys-comp.h,v 1.21 2000-03-21 16:21:41 Singular Exp $ */
 
 /***************************************************************
  *
@@ -93,6 +93,7 @@ while (0)
 #endif // WORDS_BIGENDIAN
 
 #ifdef PDEBUG
+extern int pDBsyzComp;
 int rComp0(poly p1, poly p2);
 #else
 inline int rComp0(poly p1, poly p2)
