@@ -1,0 +1,28 @@
+#####################################################################
+### 
+### Makefile for emacs stuff
+###
+#####################################################################
+SHELL=/bin/sh
+
+prefix		= @prefix@
+PERL5		= @PERL5@
+docdir		= ${prefix}/doc
+SINGULAR	= @SINGULAR@
+
+SINGULAR_HLP	= ${docdir}/singular.hlp
+
+all install: cmd-cmpl.el hlp-cmpl.el
+
+cmd-cmpl.el: ${SINGULAR} cmpl.pl
+	cmpl.pl -Singular ${SINGULAR} -cmpl cmd > cmd-cmpl.el
+
+hlp-cmpl.el: ${SINGULAR_HLP} cmpl.pl
+	cmpl.pl -hlp ${SINGULAR_HLP} -cmpl hlp > hlp-cmpl.el
+
+
+${SINGULAR_HLP}:
+	cd ${docdir}; make singular.hlp
+
+${SINGULAR}:
+	cd ..; make install
