@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.82 2002-06-10 15:25:35 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.83 2002-06-26 11:17:10 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -1261,7 +1261,7 @@ void syMake(leftv v,char * id, idhdl packhdl)
 {
   /* resolv an identifier: (to DEF_CMD, if siq>0)
   * 1) reserved id: done by scanner
-  * 2) `basering`
+  * 2) `basering` / 'Current`
   * 3) existing identifier, local
   * 4) ringvar, local ring
   * 5) existing identifier, global
@@ -1316,6 +1316,23 @@ void syMake(leftv v,char * id, idhdl packhdl)
         }
       }
 #ifdef HAVE_NS
+      if (strcmp(id,"Current")==0)
+      {
+        if (currPackHdl!=NULL)
+        {
+          omFree((ADDRESS)id);
+          v->rtyp = IDHDL;
+          v->data = (char *)currPackHdl;
+          v->name = IDID(currPackHdl);
+          v->flag = IDFLAG(currPackHdl);
+          return;
+        }
+        else
+        {
+          v->name = id;
+          return; /* undefined */
+        }
+      }
       if(v->req_packhdl!=currPack)
       {
         h=v->req_packhdl->idroot->get(id,myynest);
@@ -1439,7 +1456,7 @@ void syMake(leftv v,char * id, idhdl packhdl)
       }
     }
 #ifdef HAVE_NS
-    if(v->req_packhdl!=basePack)
+    if((v->req_packhdl!=basePack) && (v->req_packhdl==currPack))
     {
       v->req_packhdl=basePack;
       return syMake(v,id,basePackHdl);
