@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: clapconv.h,v 1.1.1.1 1997-03-19 13:18:53 obachman Exp $
+// $Id: clapconv.h,v 1.2 1997-03-21 13:18:55 Singular Exp $
 
 #ifndef INCL_SINGCONV_H
 #define INCL_SINGCONV_H
@@ -7,7 +7,7 @@
 #include "mod2.h"
 #include "structs.h"
 #include "longalg.h"
-#include "../factory/singfactory.h"
+#include <singfactory.h>
 
 alg convClapPSingTr ( const CanonicalForm & f );
 CanonicalForm convSingTrClapP( alg p );

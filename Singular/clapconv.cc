@@ -1,11 +1,10 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: clapconv.cc,v 1.1.1.1 1997-03-19 13:18:44 obachman Exp $
+// $Id: clapconv.cc,v 1.2 1997-03-21 13:18:54 Singular Exp $
 
 #include "mod2.h"
 #ifdef HAVE_LIBFACTORY
 #include "tok.h"
 #define SI_DONT_HAVE_GLOBAL_VARS
-#include <conf.h>
 #include "clapconv.h"
 #include "numbers.h"
 #include "polys.h"

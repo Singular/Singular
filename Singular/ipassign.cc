@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/ipassign.cc,v 1.1.1.1 1997-03-19 13:18:47 obachman Exp $";
+static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/ipassign.cc,v 1.2 1997-03-21 13:19:03 Singular Exp $";
 /* $Log: not supported by cvs2svn $
 */
 
@@ -977,15 +977,15 @@ static BOOLEAN jiAssign_list(leftv l, leftv r)
     return TRUE;
   }
   if(l->attribute!=NULL)
-    l->attribute->killAll();
-  l->attribute=NULL;
+  {
+    atKillAll((idhdl)l);
+    l->attribute=NULL;
+  }  
   l->flag=0;
   lists li;
   if (l->rtyp==IDHDL) 
   {
     li=IDLIST((idhdl)l->data);
-    IDATTR((idhdl)l->data)=NULL;;
-    IDFLAG((idhdl)l->data)=0;
   }  
   else
   {
@@ -1000,26 +1000,25 @@ static BOOLEAN jiAssign_list(leftv l, leftv r)
       li->m[j].rtyp=DEF_CMD;
     li->nr=i;
   }
-  leftv ld=l->LHdl();
-  Subexpr e=l->e->next;
-  if (e==NULL)
+  leftv ld=&(li->m[i]);
+  ld->e=l->e->next;
+  BOOLEAN b;
+  if ((ld->rtyp!=LIST_CMD)
+  &&(ld->e==NULL)
+  &&(ld->Typ()!=r->Typ()))
   {
+    sleftv tmp;
+    memset(&tmp,0,sizeof(sleftv));
+    tmp.rtyp=DEF_CMD;
+    b=iiAssign(&tmp,r);
     ld->CleanUp();
-    ld->rtyp=DEF_CMD;
-    BOOLEAN b=jiAssign_1(ld,r);
-    return b; 
-  }  
-  BOOLEAN b;  
-  ld->e=e;
-  if(ld->rtyp!=LIST_CMD)
-  {
-    b=jiAssign_1(ld,r);
+    memcpy(ld,&tmp,sizeof(sleftv));
   }
   else
   {
-    b=jiAssign_list(ld,r);
-  }    
-  ld->e=NULL;
+    b=iiAssign(ld,r);
+    l->e->next=ld->e;
+  }  
   return b;
 }
 static BOOLEAN jiAssign_rec(leftv l, leftv r)
@@ -1055,32 +1054,44 @@ BOOLEAN iiAssign(leftv l, leftv r)
 
   if(l->attribute!=NULL)
   {
-    atKillAll((idhdl)l->data);
-    l->attribute=NULL;
+    if (l->rtyp==IDHDL)
+    {
+      atKillAll((idhdl)l->data);
+      l->attribute=NULL;
+    }
+    else
+      atKillAll((idhdl)l);
   }
   if(l->rtyp==IDHDL)
   {
     IDFLAG((idhdl)l->data)=0;
-    IDATTR((idhdl)l->data)=NULL;
   }  
   l->flag=0;
   if (ll==1)
   {
     /* l[..] = ... */
     if((l->e!=NULL)
-    && (l->rtyp==IDHDL)
-    && (IDTYP((idhdl)l->data)==LIST_CMD))
+    && (((l->rtyp==IDHDL) && (IDTYP((idhdl)l->data)==LIST_CMD))
+      || (l->rtyp==LIST_CMD)))   
     {
        if(r->next!=NULL)
          b=jiA_L_LIST(l,r);
        else  
          b=jiAssign_list(l,r);
-       if(l->data!=NULL)
+       if((l->rtyp==IDHDL) && (l->data!=NULL))
        {
          ipMoveId((idhdl)l->data);
+         l->attribute=IDATTR((idhdl)l->data);
+         l->flag=IDFLAG((idhdl)l->data);
        }  
        r->CleanUp();
-       l->CleanUp();
+       Subexpr h;
+       while (l->e!=NULL)
+       {
+         h=l->e->next;
+         Free((ADDRESS)l->e,sizeof(*(l->e)));
+         l->e=h;
+       }
        return b;
     }
     rl=r->listLength();
@@ -1102,14 +1113,14 @@ BOOLEAN iiAssign(leftv l, leftv r)
       &&((lt==rt)||(lt!=LIST_CMD)))
       {
          b=jiAssign_1(l,r);
-         if(l->data!=NULL)
+         if (l->rtyp==IDHDL)
          {
            if ((lt==DEF_CMD)||(lt=LIST_CMD)) ipMoveId((idhdl)l->data);
            l->attribute=IDATTR((idhdl)l->data);
            l->flag=IDFLAG((idhdl)l->data);
+           l->CleanUp();
          }  
          r->CleanUp();
-         l->CleanUp();
          return b;
       } 
       if ((lt!=LIST_CMD)
@@ -1119,14 +1130,20 @@ BOOLEAN iiAssign(leftv l, leftv r)
         ||(rt==MODUL_CMD)))
       {   
          b=jiAssign_1(l,r);
-         if(l->data!=NULL)
+         if((l->rtyp==IDHDL)&&(l->data!=NULL))
          {
            if (lt==DEF_CMD) ipMoveId((idhdl)l->data);
            l->attribute=IDATTR((idhdl)l->data);
            l->flag=IDFLAG((idhdl)l->data);
          }  
          r->CleanUp();
-         l->CleanUp();
+         Subexpr h;
+         while (l->e!=NULL)
+         {
+           h=l->e->next;
+           Free((ADDRESS)l->e,sizeof(*(l->e)));
+           l->e=h;
+         }
          return b;
       }
     }

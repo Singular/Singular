@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/intvec.cc,v 1.1.1.1 1997-03-19 13:18:42 obachman Exp $";
+static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/intvec.cc,v 1.2 1997-03-21 13:18:59 Singular Exp $";
 /* $Log: not supported by cvs2svn $
 */
 
@@ -270,15 +270,21 @@ void intvec::operator%=(int intop)
 //}
 int intvec::compare(intvec* op)
 {
-  if ((col!=1) ||(op->cols()!=1)) return -2;
+  if ((col!=1) ||(op->cols()!=1)) 
+  {
+    if((col!=op->cols())
+    || (row!=op->rows()))
+      return -2;
+  }    
   int i;
-  for (i=0; i<min(row,op->rows()); i++)
+  for (i=0; i<min(length(),op->length()); i++)
   {
     if (v[i] > (*op)[i])
       return 1;
     if (v[i] < (*op)[i])
       return -1;
   }
+  // this can only happen for intvec: (i.e. col==1)
   for (; i<row; i++)
   {
     if (v[i] > 0)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/subexpr.cc,v 1.1.1.1 1997-03-19 13:18:42 obachman Exp $";
+static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/subexpr.cc,v 1.2 1997-03-21 13:19:05 Singular Exp $";
 /* $Log: not supported by cvs2svn $
 */
 
@@ -236,8 +236,8 @@ void sleftv::CleanUp()
   {
     //::Print("free %x (%s)\n",name,name);
     FreeL((ADDRESS)name);
-    name=NULL;
   }
+  name=NULL;
   if (data!=NULL)
   {
     switch (rtyp)
@@ -362,6 +362,7 @@ void sleftv::CleanUp()
     Free((ADDRESS)e,sizeof(*e));
     e=h;
   }
+  rtyp=NONE;
   if (next!=NULL)
   {
     next->name=NULL;
@@ -870,16 +871,6 @@ void * sleftv::Data()
       {
         r[0]='\0';
       }
-      if (rtyp==IDHDL)
-      {
-        rtyp=STRING_CMD;
-        name=NULL;
-      }
-      else
-        FreeL((ADDRESS)d);
-      data=r;
-      Free((ADDRESS)e,sizeof(*e));
-      e=NULL;
       break;
     }
     case MATRIX_CMD:
@@ -961,9 +952,25 @@ leftv sleftv::LHdl()
 {
   if (e!=NULL)
   {
-    leftv v=LData();
-    if (v!=NULL)
-      return v;
+    lists l=NULL;
+
+    if (rtyp==LIST_CMD)
+      l=(lists)data;
+    if ((rtyp==IDHDL)&& (IDTYP((idhdl)data)==LIST_CMD))
+      l=IDLIST((idhdl)data);
+    if (l!=NULL)
+    {
+      if ((0>=e->start)||(e->start>l->nr+1))
+        return NULL;
+      if (e->next!=NULL)
+      {
+        l->m[e->start-1].e=e->next;
+        leftv r=l->m[e->start-1].LHdl();
+        l->m[e->start-1].e=NULL;
+        return r;
+      }
+      return &(l->m[e->start-1]);
+    }
   }
   return this;
 }

@@ -1,8 +1,24 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/iparith.cc,v 1.2 1997-03-20 16:59:36 obachman Exp $";
+static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/iparith.cc,v 1.3 1997-03-21 13:19:00 Singular Exp $";
 /* $Log: not supported by cvs2svn $
+// Revision 1.2  1997/03/20  16:59:36  obachman
+// Various minor bug-fixes in mpsr interface
+//
+// Thu Mar 20 11:57:00 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
+//
+// 	* sing_mp.cc (slInitBatchLink): initialized silink such that
+// 	  l->argv[0] == "MP:connect" (otherwise, slInitMP failed)
+//
+// Wed Mar 19 15:38:08 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
+//
+// 	* hannes fixed maFindPerm to reflect new names <->parameter scheme
+//
+// 	* sing_mp.cc (mpsr_IsMPLink): fixed it
+//
+// 	* Makefile (tags): added target tags
+//
 */
 
 /*
@@ -1003,17 +1019,10 @@ static BOOLEAN jjOR_I(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjINDEX_I(leftv res, leftv u, leftv v)
 {
-  if (u->e==NULL)
-  {
-    res->rtyp=u->rtyp; u->rtyp=0;
-    res->data=u->data; u->data=NULL;
-    res->name=u->name; u->name=NULL;
-  }
-  else
-  {
-    res->rtyp=u->Typ();
-    res->data=u->CopyD(res->rtyp);
-  }
+  res->rtyp=u->rtyp; u->rtyp=0;
+  res->data=u->data; u->data=NULL;
+  res->name=u->name; u->name=NULL;
+  res->e=u->e;       u->e=NULL;
   if (res->e==NULL) res->e=jjMakeSub(v);
   else
   {
@@ -2227,20 +2236,23 @@ static BOOLEAN jjDET(leftv res, leftv v)
 {
   int i,j;
   matrix m=(matrix)v->Data();
-  for(i=1;i<=m->rows();i++)
+  if (currRing->parameter==NULL)
   {
-    for(j=1;j<=m->cols();j++)
+    for(i=1;i<=m->rows();i++)
     {
-      if((MATELEM(m,i,j)!=NULL)
-      && (!pIsConstant(MATELEM(m,i,j))))
+      for(j=1;j<=m->cols();j++)
       {
-        goto nonconst;
+        if((MATELEM(m,i,j)!=NULL)
+        && (!pIsConstant(MATELEM(m,i,j))))
+        {
+          goto nonconst;
+        }
       }
     }
-  }
 
-  res->data = (char *)singclap_det((matrix)(v->Data()));
-  return FALSE;
+    res->data = (char *)singclap_det((matrix)(v->Data()));
+    return FALSE;
+  }
 nonconst:
   res->data = (char *)mpDet((matrix)(v->Data()));
   return FALSE;

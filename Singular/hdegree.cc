@@ -1,8 +1,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char  rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/hdegree.cc,v 1.1.1.1 1997-03-19 13:18:45 obachman Exp $";
-/* $Log: not supported by cvs2svn $*/
+static char  rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/hdegree.cc,v 1.2 1997-03-21 13:18:57 Singular Exp $";
+/* $Log: not supported by cvs2svn $
+// Revision 1.1.1.1  1997/03/19  13:18:45  obachman
+// Imported Singular sources
+//
+*/
 /*
 *  ABSTRACT -  dimension, multiplicity, HC, kbase
 */

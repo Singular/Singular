@@ -1,11 +1,8 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/cntrlc.cc,v 1.2 1997-03-20 16:59:30 obachman Exp $";
+static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/cntrlc.cc,v 1.3 1997-03-21 13:18:56 Singular Exp $";
 /* $Log: not supported by cvs2svn $
-// Revision 1.1.1.1  1997/03/19  13:18:44  obachman
-// Imported Singular sources
-//
 */
 /*
 * ABSTRACT - interupt handling
@@ -27,18 +24,19 @@ static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/cntrlc.cc,v 
 #endif
 
 #ifdef unix
+#ifndef hpux
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/time.h>
 
 #define INTERACTIVE 0
 #define STACK_TRACE 1
-#undef __OPTIMIZE__
 #ifndef __OPTIMIZE__
-void debug (int);
+static void debug (int);
 static void debug_stop (char **);
 static void stack_trace (char **);
 static void stack_trace_sigchld (int);
+#endif
 #endif
 #endif
 
@@ -376,21 +374,17 @@ void test_int()
 #endif
 
 #ifdef unix
+#ifndef hpux
 #ifndef __OPTIMIZE__
 #ifndef MSDOS
 int si_stop_stack_trace_x;
 
-void debug (int method)
+static void debug (int method)
 {
   int pid;
   char buf[16];
-
-#define HANNES  
-#ifdef HANNES  
   char *args[4] = { "gdb", "Singularg", NULL, NULL };
-#else
-  char *args[4] = { "ddd", "Singularg", NULL, NULL };
-#endif  
+
   sprintf (buf, "%d", getpid ());
 
   args[2] = buf;
@@ -537,6 +531,7 @@ static void stack_trace_sigchld (int signum)
   stack_trace_done = 1;
 }
 
+#endif
 #endif
 #endif
 #endif

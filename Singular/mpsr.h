@@ -98,7 +98,7 @@ inline void mpsr_SetCurrRing(ring rg, BOOLEAN complete)
 #ifdef PDEBUG
     nSetChar(rg->ch, TRUE, rg->parameter,rg->P);
 #else
-    nSetChar(rg->ch, complete, rg->parameter);
+    nSetChar(rg->ch, complete, rg->parameter,rg->P);
 #endif    
     pChangeRing(rg->N, rg->OrdSgn, rg->order, rg->block0, rg->block1,
                 rg->wvhdl);
