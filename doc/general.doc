@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.52 1998-05-12 13:54:42 obachman Exp $
+@comment $Id: general.doc,v 1.53 1998-05-12 15:18:29 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -2432,7 +2432,7 @@ typeof(p); p;
 @c example
 @end example
 MPfile links should primarily be used for storing large amounts of data
-(like dumping the contents of an entire @sc{Singular} session, and if
+(like dumps of the content of an entire @sc{Singular} session), and if
 the data to be stored can not be (easily) converted from/to a string
 (like rings, or maps).
 
@@ -2500,7 +2500,6 @@ cases (except for MPtcp links), links do not need to be explicitely
 opened (see @ref{open}) or closed (see @ref{close}) before (resp. after)
 they are used. Furthermore, links have various properties which can be
 checked for using the @code{status} (see @ref{status}) command. 
-
 @*@strong{Example:}
 @example
 @c example

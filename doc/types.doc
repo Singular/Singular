@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.34 1998-05-12 14:43:22 Singular Exp $
+@comment $Id: types.doc,v 1.35 1998-05-12 15:18:30 obachman Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -978,7 +978,7 @@ a string describing the link
 A link is described by a string which consists of two parts: a property
 string followed by a name string. The property string describes the type
 of the link (@code{ASCII}, @code{MPfile}, @code{MPtcp} or @code{DBM})
-and the mode of the link (open for read, write or append). The name
+and the mode of the link (e.g., open for read, write or append). The name
 string describes the filename of the link, resp. a network connection
 for MPtcp links.
 
@@ -1164,7 +1164,8 @@ There are the following default values:
 @item if none of @code{r}, @code{w} or @code{a} is specified, the mode of
 the link is set by the first @code{read} or @code{write} command on the
 link. If the first command is @code{write}, the mode is set to @code{a}
-(append mode).
+(append mode). 
+@c Tim: You and I were right here: It is indeed append. Olaf
 @end itemize
 
 Note that the filename may contain a path. An MP file link can be used
@@ -1179,19 +1180,18 @@ either for reading or for writing, but not for both at the same time. A
   l;
   ideal i=x2,y2,z2;
   write (l,1, i, "hello world");// write three expressions
-  status(l, "open", "yes");     // now link is open
-  status(l, "mode");            // in write mode
   write(l,4);                   // append one more expression
   close(l);                     // link is closed
   read(l);                      // only first expression is read
-  status(l, "open", "yes");     // now link is open
-  status(l, "mode");            // for reading
   kill r;
   def i = read(l);              // second expression
-  listvar();                    // notice that current ring was set
   def s = read(l);              // third expression
+  listvar();                    // notice that current ring was set
   close(l);                     // link is closed
   dump("MPfile:w example.mp");  // dump everything to example.mp
+  kill i, s, r;                 // kill everything
+  getdump("MPfile: example.mp");// get previous dump
+  listvar();                    // got all variables and values back
 @c example
 @end example
 
@@ -1258,7 +1258,7 @@ There are the following default values:
 @code{fork} is specified, the default mode is set to @code{fork}. 
 
 @item if no application is specified (in mode @code{launch}) the default
-application is @code{Singular -b}.
+application is @code{system("whoami") + " -b"}.
 
 @item if no hostname is specified the localhost is used as default host.
 @end itemize
@@ -1310,42 +1310,38 @@ is data to read.
 @strong{Example:}
 @example
 @c example
-  LIB "general.lib"; // needed for "which" and "killall" commands
-  // MPtcp:launch link for launching SINGULAR in batch modus
-  // on the local host 
+  LIB "general.lib"; // needed for "killall" command
   link l="MPtcp:launch";
-  open(l);
-  l; // notice that link is ready for writing but not for reading
+  open(l); l;        // l is ready for writing but not for reading
+
   ring r; ideal i=x2+y,xyz+z,x2+y2;
-  write (l,quote(std(eval(i)))); // std(i) is computed on server
-  // server wrote result back -- ready for reading
-  def j = read(l);   // result of computation on server is read
-  j;
-  write(l, quote(std(i)));
-                     // std of polynomial "i" is computed on server
-  def k = read(l);   // result of computation is read
+
+  write (l,quote(std(eval(i))));   // std(i) is computed on server
+  def j = read(l);j; // result of computation on server is read
+
+  write(l,quote(std(i)));// std of polynomial "i" is computed on server
+  def k = read(l);   
   k; basering;       // notice that a new ring was created and set
   listvar(all);
-  write(l, killall); read(l);
-                     // write killall procedure to server
-  // and kill everything in server, but links (need to protect mp_ll)
-  write(l, quote(killall("not", "link"))); read(l);
-  write(l, quote(getdump(mp_ll))); // server gets dump
+
+  write(l, quote(getdump(mp_ll))); // server reads dump
   dump(l);           //  dump is written to server (includes proc's)
   read(l);           // result of previous write-command is read
-  killall("not", "link"); killall("proc");
-                     // kills eveything, but links
-  write(l, quote(dump(mp_ll))); // server writes dump
+  killall("not", "link"); killall("proc"); // kills eveything, but links
+                     
+  write(l, quote(dump(mp_ll)));    // server writes dump
   getdump(l);        // dump is read from server
   read(l);           // result of previous write-command is read
+
   close(l);          // server is shut down
   listvar(all);      // same state as we had before "killall()"
+
   l = "MPtcp:";      // fork link declaration
   open(l); l;        // Notice that name is "parent"
-  // and name of forked link is "child"
-  write(l, quote(status(mp_ll, "name")));
-  read(l);
-  write(l, quote(i)); // Child inherited vars and their values
+  
+  write(l, quote(status(mp_ll, "name"))); 
+  read(l);           // and name of forked link is "child"
+  write(l,quote(i)); // Child inherited vars and their values
   read(l);
   close(l);          // shut down forked child
 @c example
