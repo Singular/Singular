@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.35 1999-08-10 12:56:20 Singular Exp $
+### $Id: Makefile.in,v 1.36 1999-08-16 09:06:38 obachman Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -203,18 +203,20 @@ ${IMAGES_HTML} :
 install: singular.hlp html/index.htm singular.idx
 	${MKINSTALLDIRS} ${infodir}
 	${INSTALL_DATA} singular.hlp ${infodir}
-	test -e ${htmldir} || ${LN_S} ${prefix}/doc/${HTML_SUBDIR} ${htmldir}
+	- ln -s `pwd`/${HTML_SUBDIR} ${htmldir}
 
 uninstall: 
 	rm -f ${infodir}/singular.hlp
 	- rmdir ${infodir}
+
+texi2html = $(TEXI2HTML:%.pl=%)
 
 lib2doc.tar.gz:
 	rm -rf lib2doc lib2doc.tar.gz
 	mkdir lib2doc
 	cp Makefile.lib2doc lib2doc/Makefile
 	${MAKEINFO} --no-header --paragraph-indent none -o lib2doc/README lib2doc.texi
-	cp pl2doc.pl doc2tex.pl ${TEXI2HTML} lib2doc
+	cp pl2doc.pl doc2tex.pl ${texi2html} lib2doc
 	tar cf lib2doc.tar lib2doc
 	gzip lib2doc.tar
 
