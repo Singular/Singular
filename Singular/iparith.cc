@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.263 2001-04-19 12:54:26 Singular Exp $ */
+/* $Id: iparith.cc,v 1.264 2001-05-22 13:20:02 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -284,6 +284,7 @@ cmdnames cmds[] =
   { "return",      0, RETURN ,            RETURN},
   { "RETURN",      0, END_GRAMMAR ,       RETURN},
   { "ring",        0, RING_CMD ,          RING_CMD},
+  { "ringlist",    0, RINGLIST_CMD ,      CMD_1},
   { "rvar",        0, IS_RINGVAR ,        CMD_1},
   { "setring",     0, SETRING_CMD ,       SETRING_CMD},
   { "simplex",     0, SIMPLEX_CMD,        CMD_M},
@@ -3155,6 +3156,11 @@ static BOOLEAN jjREPART(leftv res, leftv v)
   res->data = (char *)nRePart((number)v->Data());
   return FALSE;
 }
+static BOOLEAN jjRINGLIST(leftv res, leftv v)
+{
+  res->data = (char *)rDecompose((ring)v->Data());
+  return FALSE;
+}
 static BOOLEAN jjROWS(leftv res, leftv v)
 {
   ideal i = (ideal)v->Data();
@@ -3738,6 +3744,8 @@ struct sValCmd1 dArith1[]=
 ,{jjRESERVEDNAME,RESERVEDNAME_CMD, INT_CMD,      STRING_CMD }
 ,{jjL2R,        RESOLUTION_CMD,  RESOLUTION_CMD, LIST_CMD }
 ,{jjDUMMY,      RESOLUTION_CMD,  RESOLUTION_CMD, RESOLUTION_CMD }
+,{jjRINGLIST,   RINGLIST_CMD,    LIST_CMD,       RING_CMD }
+,{jjRINGLIST,   RINGLIST_CMD,    LIST_CMD,       QRING_CMD }
 ,{jjDUMMY,      RING_CMD,        RING_CMD,       RING_CMD}
 ,{jjWRONG,      ROWS_CMD,        0,              POLY_CMD }
 ,{jjpMaxComp,   ROWS_CMD,        XS(INT_CMD),    VECTOR_CMD }

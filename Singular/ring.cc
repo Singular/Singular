@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.162 2001-03-26 19:30:23 Singular Exp $ */
+/* $Id: ring.cc,v 1.163 2001-05-22 13:20:00 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3877,3 +3877,65 @@ void rSetWeightVec(ring r, int *wv)
   memcpy(r->typ[0].data.wp.weights,wv,r->N*sizeof(int));
 }
 
+lists rDecompose(ring r)
+{
+  // 0: char/ cf - ring
+  // 1: list (var)
+  // 3: list (ord)
+  // 4: qideal
+  lists L=(lists)omAlloc0Bin(slists_bin);
+  L->Init(4);
+  // ----------------------------------------
+  #if 0 /* TODO */
+  if (rIsExtension(r))
+    rDecomposeCF(&(L->m[0]),r);
+  else
+  #endif
+  {
+    L->m[0].rtyp=INT_CMD;
+    L->m[0].data=(void *)r->ch;
+  }
+  // ----------------------------------------
+  lists LL=(lists)omAlloc0Bin(slists_bin);
+  L->m[1].rtyp=LIST_CMD;
+  L->m[1].data=(void *)LL;
+  LL->Init(r->N);
+  int i;
+  for(i=0; i<r->N; i++)
+  {
+    LL->m[i].rtyp=STRING_CMD;
+    LL->m[i].data=(void *)omStrDup(r->names[i]);
+  }  
+  // ----------------------------------------
+  LL=(lists)omAlloc0Bin(slists_bin);
+  L->m[2].rtyp=LIST_CMD;
+  L->m[2].data=(void *)LL;
+  LL->Init((i=rBlocks(r)));
+  lists LLL;
+  for(; i>=0; i--)
+  {
+    intvec *iv;
+    LL->m[i].rtyp=LIST_CMD;
+    LLL=(lists)omAlloc0Bin(slists_bin);
+    LLL->Init(2);
+    LLL->m[0].rtyp=INT_CMD;
+    LLL->m[0].data=(void *)r->order[i];
+    LLL->m[1].rtyp=INTVEC_CMD;
+    iv=new intvec(r->block1[i]-r->block0[i]);
+    LLL->m[1].data=(void *)iv;
+    if ((r->wvhdl!=NULL) && (r->wvhdl[i]!=NULL))
+    {
+      int j;
+      for(j=0;j< iv->length(); j++)
+       (*iv)[j]=r->wvhdl[i][j];
+    }	
+    LL->m[i].data=(void *)LLL;
+  }
+  // ----------------------------------------
+  L->m[3].rtyp=IDEAL_CMD;
+  if (r->qideal==NULL)
+    L->m[3].data=(void *)idInit(1,1);
+  else
+    L->m[3].data=(void *)idCopy(r->qideal);
+  return L;
+}
