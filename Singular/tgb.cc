@@ -16,6 +16,7 @@
 #include "kbuckets.h"
 
 #define FULLREDUCTIONS
+#define HALFREDUCTIONS
 #define HEAD_BIN
 //#define HOMOGENEOUS_EXAMPLE
 #define REDTAIL_S
@@ -37,11 +38,11 @@ int my_rand(int n){
 }
 #endif
 enum calc_state
-{
-  UNCALCULATED,
-  HASTREP,
-  UNIMPORTANT
-};
+  {
+    UNCALCULATED,
+    HASTREP,
+    UNIMPORTANT
+  };
 struct calc_dat
 {
   int* rep;
@@ -55,9 +56,9 @@ struct calc_dat
   int* T_deg;
   int* misses;
   int_pair_node* soon_free;
-  #ifdef HEAD_BIN
+#ifdef HEAD_BIN
   struct omBin_s*   HeadBin;
-  #endif
+#endif
   int max_misses;
   int found_i;
   int found_j;
@@ -91,40 +92,40 @@ bool find_next_pair(calc_dat* c)
   start_i=0;
   start_j=-1;
 #ifndef HOMOGENEOUS_EXAMPLE
-   if (c->misses_series>80){
-     c->current_degree++;
-     c->misses_series=0;
-   }
+  if (c->misses_series>80){
+    c->current_degree++;
+    c->misses_series=0;
+  }
 #endif
   start_i=c->continue_i;
   start_j=c->continue_j;
 #ifndef DIAGONAL_GOING
   for (int i=start_i;i<c->n;i++){
     if (c->T_deg[i]>c->current_degree)
-    {
-      c->skipped_pairs++;
-      continue;
-    }
+      {
+	c->skipped_pairs++;
+	continue;
+      }
     for(int j=(i==start_i)?start_j+1:0;j<i;j++){
       // printf("searching at %d,%d",i,j);
       if (c->misses_counter>=2) {
         c->skipped_pairs++;
         break;
-        }
+      }
       if (c->states[i][j]==UNCALCULATED){
         if(c->deg[i][j]<=c->current_degree)
-        {
-          c->continue_i=c->found_i=i;
-          c->continue_j=c->found_j=j;
-          return true;
-        }
-          else
+	  {
+	    c->continue_i=c->found_i=i;
+	    c->continue_j=c->found_j=j;
+	    return true;
+	  }
+	else
           {
             ++(c->skipped_pairs);
           }
       }
     }
-      c->misses_counter=0;
+    c->misses_counter=0;
   }
 
 
@@ -147,15 +148,15 @@ bool find_next_pair(calc_dat* c)
       } else{
         if(c->states[i][j]==UNCALCULATED){
           if (c->deg[i][j]<=c->current_degree)
-          {
-            c->continue_i=c->found_i=i;
-            c->continue_j=c->found_j=j;
-            return true;
-          }
+	    {
+	      c->continue_i=c->found_i=i;
+	      c->continue_j=c->found_j=j;
+	      return true;
+	    }
           else
-          {
-            ++(c->skipped_pairs);
-          }
+	    {
+	      ++(c->skipped_pairs);
+	    }
         }
       }
       --i;
@@ -194,7 +195,7 @@ void move_forward_in_S(int old_pos, int new_pos,kStrategy strat)
     for (i=old_pos; i>new_pos; i--)
       strat->lenS[i] = strat->lenS[i-1];
 
-    strat->S[new_pos]=p;
+  strat->S[new_pos]=p;
   strat->ecartS[new_pos]=ecart;
   strat->sevS[new_pos]=sev;
   strat->S_2_R[new_pos]=s_2_r;
@@ -214,15 +215,15 @@ void replace_pair(int & i, int & j, calc_dat* c)
 
   for (int n=0;((n<c->n) && (i_con[n]>=0));n++){
     if (i_con[n]==j){
-//       curr_deg=pFDeg(lm);
-//       for(int z1=0;((z1<c->n) && (i_con[z1]>=0));z1++)
-//         for (int z2=z1+1;((z2<c->n)&&(i_con[z2]>=0));z2++)
-//         {
-//           pLcm(c->S->m[i_con[z1]], c->S->m[i_con[z2]], lm);
-//           pSetm(lm);
-//           if (pFDeg(lm)==curr_deg)
-//             now_t_rep(i_con[z1],i_con[z2],c);
-//         }
+      //       curr_deg=pFDeg(lm);
+      //       for(int z1=0;((z1<c->n) && (i_con[z1]>=0));z1++)
+      //         for (int z2=z1+1;((z2<c->n)&&(i_con[z2]>=0));z2++)
+      //         {
+      //           pLcm(c->S->m[i_con[z1]], c->S->m[i_con[z2]], lm);
+      //           pSetm(lm);
+      //           if (pFDeg(lm)==curr_deg)
+      //             now_t_rep(i_con[z1],i_con[z2],c);
+      //         }
       now_t_rep(i,j,c);
       omfree(i_con);
       p_Delete(&lm,c->r);
@@ -252,17 +253,17 @@ void replace_pair(int & i, int & j, calc_dat* c)
       pLcm(c->S->m[i_con[m]], c->S->m[j_con[n]], lm);
       pSetm(lm);
       if (pFDeg(lm)>=deciding_deg)
-      {
-        int_pair_node* h= (int_pair_node*)omalloc(sizeof(int_pair_node));
-        if (last!=NULL)
-          last->next=h;
-        else
-          c->soon_free=h;
-        h->next=NULL;
-        h->a=i_con[m];
-        h->b=j_con[n];
-        last=h;
-      }
+	{
+	  int_pair_node* h= (int_pair_node*)omalloc(sizeof(int_pair_node));
+	  if (last!=NULL)
+	    last->next=h;
+	  else
+	    c->soon_free=h;
+	  h->next=NULL;
+	  h->a=i_con[m];
+	  h->b=j_con[n];
+	  last=h;
+	}
       //      if ((comp_deg<curr_deg)
       //  ||
       //  ((comp_deg==curr_deg) &&
@@ -303,18 +304,18 @@ void replace_pair(int & i, int & j, calc_dat* c)
            (c->misses[i]+c->misses[j]
             <=
             c->misses[i_con[m]]+c->misses[j_con[n]])))
-//       if ((comp_deg<curr_deg)
-//           ||
-//           ((comp_deg==curr_deg) &&
-//            (c->lengths[i]+c->lengths[j]
-//             <=
-//             c->lengths[i_con[m]]+c->lengths[j_con[n]])))
+	//       if ((comp_deg<curr_deg)
+	//           ||
+	//           ((comp_deg==curr_deg) &&
+	//            (c->lengths[i]+c->lengths[j]
+	//             <=
+	//             c->lengths[i_con[m]]+c->lengths[j_con[n]])))
 
-      {
-        curr_deg=comp_deg;
-        i=i_con[m];
-        j=j_con[n];
-      }
+	{
+	  curr_deg=comp_deg;
+	  i=i_con[m];
+	  j=j_con[n];
+	}
     }
   }
   p_Delete(&lm,c->r);
@@ -378,14 +379,14 @@ int* make_connections(int from, int to, poly bound, calc_dat* c)
   int connected_length=1;
   long neg_bounds_short= ~p_GetShortExpVector(bound,c->r);
   // for (int i=0;i<c->n;i++){
-//     if (c->T_deg[i]>s) continue;
-//     if (i!=from){
-//       if(p_LmShortDivisibleBy(I->m[i],c->short_Exps[i],bound,neg_bounds_short,c->r)){
-//         cans[cans_length]=i;
-//         cans_length++;
-//       }
-//     }
-//   }
+  //     if (c->T_deg[i]>s) continue;
+  //     if (i!=from){
+  //       if(p_LmShortDivisibleBy(I->m[i],c->short_Exps[i],bound,neg_bounds_short,c->r)){
+  //         cans[cans_length]=i;
+  //         cans_length++;
+  //       }
+  //     }
+  //   }
   int not_yet_found=cans_length;
   int con_checked=0;
   int pos;
@@ -487,9 +488,9 @@ void initial_data(calc_dat* c){
   c->continue_i=0;
   c->continue_j=0;
   c->skipped_i=-1;
-  #ifdef HEAD_BIN
+#ifdef HEAD_BIN
   c->HeadBin=omGetSpecBin(POLYSIZE + (currRing->ExpL_Size)*sizeof(long));
-  #endif
+#endif
   /* omUnGetSpecBin(&(c->HeadBin)); */
   h=omalloc(n*sizeof(char*));
   if (h!=NULL)
@@ -511,30 +512,30 @@ void initial_data(calc_dat* c){
     exit(1);
   c->short_Exps=(long*) omalloc(n*sizeof(long));
   for (i=0;i<n;i++)
-  {
-  #ifdef HEAD_BIN
-    c->S->m[i]=p_MoveHead(c->S->m[i],c->HeadBin);
-  #endif
-    c->T_deg[i]=pFDeg(c->S->m[i]);
-    c->lengths[i]=pLength(c->S->m[i]);
-    c->misses[i]=0;
-    c->states[i]=(char *)omAlloc((i+1)*sizeof(char));
-    c->deg[i]=(int*) omAlloc((i+1)*sizeof(int));
-    for (j=0;j<i;j++){
-      //check product criterion
-      if (pHasNotCF(c->S->m[i],c->S->m[j])){
-        c->states[i][j]=HASTREP;
-      } else {
-        c->states[i][j]=UNCALCULATED;
+    {
+#ifdef HEAD_BIN
+      c->S->m[i]=p_MoveHead(c->S->m[i],c->HeadBin);
+#endif
+      c->T_deg[i]=pFDeg(c->S->m[i]);
+      c->lengths[i]=pLength(c->S->m[i]);
+      c->misses[i]=0;
+      c->states[i]=(char *)omAlloc((i+1)*sizeof(char));
+      c->deg[i]=(int*) omAlloc((i+1)*sizeof(int));
+      for (j=0;j<i;j++){
+	//check product criterion
+	if (pHasNotCF(c->S->m[i],c->S->m[j])){
+	  c->states[i][j]=HASTREP;
+	} else {
+	  c->states[i][j]=UNCALCULATED;
+	}
+	c->deg[i][j]=pLcmDeg(c->S->m[i],c->S->m[j]);
       }
-      c->deg[i][j]=pLcmDeg(c->S->m[i],c->S->m[j]);
-    }
-    if ((c->lengths[i]==1) && (c->lengths[j]==1))
-      c->states[i][j]=HASTREP;
-    c->rep[i]=i;
-    c->short_Exps[i]=p_GetShortExpVector(c->S->m[i],c->r);
+      if ((c->lengths[i]==1) && (c->lengths[j]==1))
+	c->states[i][j]=HASTREP;
+      c->rep[i]=i;
+      c->short_Exps[i]=p_GetShortExpVector(c->S->m[i],c->r);
 
-  }
+    }
 
 
   c->strat=new skStrategy;
@@ -545,38 +546,38 @@ void initial_data(calc_dat* c){
   c->strat->enterS = enterSBba;
   c->strat->sl = -1;
   /* initS(c->S,NULL,c->strat); */
-  /* intS start: */
-  i=((i+IDELEMS(c->S)+15)/16)*16;
-  c->strat->ecartS=(intset)omAlloc(i*sizeof(int)); /*initec(i);*/
-  c->strat->sevS=(unsigned long*)omAlloc0(i*sizeof(unsigned long));
-                    /*initsevS(i);*/
-  c->strat->S_2_R=(int*)omAlloc0(i*sizeof(int));/*initS_2_R(i);*/
-  c->strat->fromQ=NULL;
-  c->strat->Shdl=idInit(i,1);
-  c->strat->S=c->strat->Shdl->m;
-  c->strat->lenS=(int*)omAlloc0(i*sizeof(int));
-  for (i=0; i<IDELEMS(c->S); i++)
-  {
-    int pos;
-    assume (c->S->m[i]!=NULL);
-    LObject h;
-    h.p = c->S->m[i];
-    h.pNorm();
-    c->strat->initEcart(&h);
-    assume(c->lengths[i]==pLength(h.p));
-    if (c->strat->sl==-1) pos=0;
-    else pos = simple_posInS(c->strat,h.p,c->lengths[i]);
-    h.sev = pGetShortExpVector(h.p);
-    c->strat->enterS(h,pos,c->strat);
-    c->strat->lenS[pos]=c->lengths[i];
-  }
-  //c->strat->lenS=(int*)omAlloc0(IDELEMS(c->strat->Shdl)*sizeof(int));
-  //for (i=c->strat->sl;i>=0;i--)
-  //{
-  //  pNorm(c->strat->S[i]);
-  //  c->strat->lenS[i]=pLength(c->strat->S[i]);
-  //}
-  /* initS end */
+/* intS start: */
+ i=((i+IDELEMS(c->S)+15)/16)*16;
+ c->strat->ecartS=(intset)omAlloc(i*sizeof(int)); /*initec(i);*/
+ c->strat->sevS=(unsigned long*)omAlloc0(i*sizeof(unsigned long));
+ /*initsevS(i);*/
+ c->strat->S_2_R=(int*)omAlloc0(i*sizeof(int));/*initS_2_R(i);*/
+ c->strat->fromQ=NULL;
+ c->strat->Shdl=idInit(i,1);
+ c->strat->S=c->strat->Shdl->m;
+ c->strat->lenS=(int*)omAlloc0(i*sizeof(int));
+ for (i=0; i<IDELEMS(c->S); i++)
+   {
+     int pos;
+     assume (c->S->m[i]!=NULL);
+     LObject h;
+     h.p = c->S->m[i];
+     h.pNorm();
+     c->strat->initEcart(&h);
+     assume(c->lengths[i]==pLength(h.p));
+     if (c->strat->sl==-1) pos=0;
+     else pos = simple_posInS(c->strat,h.p,c->lengths[i]);
+     h.sev = pGetShortExpVector(h.p);
+     c->strat->enterS(h,pos,c->strat);
+     c->strat->lenS[pos]=c->lengths[i];
+   }
+ //c->strat->lenS=(int*)omAlloc0(IDELEMS(c->strat->Shdl)*sizeof(int));
+ //for (i=c->strat->sl;i>=0;i--)
+ //{
+ //  pNorm(c->strat->S[i]);
+ //  c->strat->lenS[i]=pLength(c->strat->S[i]);
+ //}
+ /* initS end */
 }
 int simple_posInS (kStrategy strat, poly p,int len)
 {
@@ -589,31 +590,31 @@ int simple_posInS (kStrategy strat, poly p,int len)
   int en= length;
 
   if ((len>setL[length])
-  || ((len==setL[length]) && (pLmCmp(set[length],p)== -1)))
+      || ((len==setL[length]) && (pLmCmp(set[length],p)== -1)))
     return length+1;
 
   loop
-  {
-    if (an >= en-1)
     {
-      if ((len<setL[an])
-      || ((len==setL[length]) && (pLmCmp(set[an],p) == 1))) return an;
-      return en;
+      if (an >= en-1)
+	{
+	  if ((len<setL[an])
+	      || ((len==setL[length]) && (pLmCmp(set[an],p) == 1))) return an;
+	  return en;
+	}
+      i=(an+en) / 2;
+      if ((len<setL[i])
+	  || ((len==setL[i]) && (pLmCmp(set[i],p) == 1))) en=i;
+      //else if ((len>setL[i])
+      //|| ((len==setL[i]) && (pLmCmp(set[i],p) == -1))) an=i;
+      else an=i;
     }
-    i=(an+en) / 2;
-    if ((len<setL[i])
-    || ((len==setL[i]) && (pLmCmp(set[i],p) == 1))) en=i;
-    //else if ((len>setL[i])
-    //|| ((len==setL[i]) && (pLmCmp(set[i],p) == -1))) an=i;
-    else an=i;
-  }
 }
 /*2
-*if the leading term of p
-*divides the leading term of some S[i] it will be canceled
-*/
+ *if the leading term of p
+ *divides the leading term of some S[i] it will be canceled
+ */
 static inline void clearS (poly p, unsigned long p_sev,int l, int* at, int* k,
-                    kStrategy strat)
+			   kStrategy strat)
 {
   assume(p_sev == pGetShortExpVector(p));
   if (!pLmShortDivisibleBy(p,p_sev, strat->S[*at], ~ strat->sevS[*at])) return;
@@ -677,34 +678,34 @@ void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c)
   c->short_Exps[i]=p_GetShortExpVector(h,c->r);
   for (j=0;j<i;j++){
     c->deg[i][j]=pLcmDeg(c->S->m[i],c->S->m[j]);
-       if (c->rep[j]==j){
+    if (c->rep[j]==j){
       //check product criterion
 
-         c->states[i][j]=UNCALCULATED;
+      c->states[i][j]=UNCALCULATED;
 
 
       //lies I[i] under I[j] ?
-         if(p_LmShortDivisibleBy(c->S->m[i],c->short_Exps[i],c->S->m[j],~(c->short_Exps[j]),c->r)){
-           c->rep[j]=i;
-           PrintS("R"); R_found=TRUE;
+      if(p_LmShortDivisibleBy(c->S->m[i],c->short_Exps[i],c->S->m[j],~(c->short_Exps[j]),c->r)){
+	c->rep[j]=i;
+	PrintS("R"); R_found=TRUE;
 
-           c->misses[i_pos]--;
-           c->misses[j_pos]--;
-           for(int z=0;z<j;z++){
-             if (c->states[j][z]==UNCALCULATED){
-               c->states[j][z]=UNIMPORTANT;
-             }
-           }
-           for(int z=j+1;z<i;z++){
-             if (c->states[z][j]==UNCALCULATED){
-               c->states[z][j]=UNIMPORTANT;
-             }
-           }
-         }
-       }
+	c->misses[i_pos]--;
+	c->misses[j_pos]--;
+	for(int z=0;z<j;z++){
+	  if (c->states[j][z]==UNCALCULATED){
+	    c->states[j][z]=UNIMPORTANT;
+	  }
+	}
+	for(int z=j+1;z<i;z++){
+	  if (c->states[z][j]==UNCALCULATED){
+	    c->states[z][j]=UNIMPORTANT;
+	  }
+	}
+      }
+    }
     else {
-           c->states[i][j]=UNIMPORTANT;
-         }
+      c->states[i][j]=UNIMPORTANT;
+    }
     if ((c->lengths[i]==1) && (c->lengths[j]==1))
       c->states[i][j]=HASTREP;
     else if (pHasNotCF(c->S->m[i],c->S->m[j]))
@@ -718,34 +719,34 @@ void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c)
   }
 
   //i=posInS(c->strat,c->strat->sl,h,0 /*ecart*/);
-  i=simple_posInS(c->strat,h,c->lengths[c->n-1]);
+    i=simple_posInS(c->strat,h,c->lengths[c->n-1]);
 
-  LObject P; memset(&P,0,sizeof(P));
-  P.tailRing=c->r;
-  P.p=h; /*p_Copy(h,c->r);*/
-  P.FDeg=pFDeg(P.p,c->r);
-  if (!rField_is_Zp(c->r)) pCleardenom(P.p);
-  //enterT(P,c->strat,-1);
-  c->strat->enterS(P,i,c->strat);
-  c->strat->lenS[i]=/*pLength(c->strat->S[i]);*/ c->lengths[c->n-1];
-  pNorm(c->strat->S[i]);
-  if (0 /*R_found && (i<c->strat->sl)*/)
-  {
-    i++;
-    unsigned long h_sev = pGetShortExpVector(h);
-    loop
-    {
-      if (i>c->strat->sl) break;
-      clearS(h,h_sev,c->lengths[c->n-1], &i,&(c->strat->sl),c->strat);
-      i++;
-    }
-  }
-  if (c->lengths[c->n-1]==1)
-    shorten_tails(c,c->S->m[c->n-1]);
+    LObject P; memset(&P,0,sizeof(P));
+    P.tailRing=c->r;
+    P.p=h; /*p_Copy(h,c->r);*/
+    P.FDeg=pFDeg(P.p,c->r);
+    if (!rField_is_Zp(c->r)) pCleardenom(P.p);
+    //enterT(P,c->strat,-1);
+    c->strat->enterS(P,i,c->strat);
+    c->strat->lenS[i]=/*pLength(c->strat->S[i]);*/ c->lengths[c->n-1];
+    pNorm(c->strat->S[i]);
+    if (0 /*R_found && (i<c->strat->sl)*/)
+      {
+	i++;
+	unsigned long h_sev = pGetShortExpVector(h);
+	loop
+	  {
+	    if (i>c->strat->sl) break;
+	    clearS(h,h_sev,c->lengths[c->n-1], &i,&(c->strat->sl),c->strat);
+	    i++;
+	  }
+      }
+    if (c->lengths[c->n-1]==1)
+      shorten_tails(c,c->S->m[c->n-1]);
     //you should really update c->lengths, c->strat->lenS, and the oder of polys in strat if you sort after lengths
 
-  //for(i=c->strat->sl; i>0;i--)
-  //  if(c->strat->lenS[i]<c->strat->lenS[i-1]) printf("fehler bei %d\n",i);
+    //for(i=c->strat->sl; i>0;i--)
+    //  if(c->strat->lenS[i]<c->strat->lenS[i-1]) printf("fehler bei %d\n",i);
 }
 #if 0
 static poly redNF (poly h,kStrategy strat)
@@ -755,53 +756,195 @@ static poly redNF (poly h,kStrategy strat)
   unsigned long not_sev;
 
   if (0 > strat->sl)
-  {
-    return h;
-  }
+    {
+      return h;
+    }
   not_sev = ~ pGetShortExpVector(h);
   loop
-  {
-    if (pLmShortDivisibleBy(strat->S[j], strat->sevS[j], h, not_sev))
     {
-      //if (strat->interpt) test_int_std(strat->kIdeal);
-      /*- compute the s-polynomial -*/
+      if (pLmShortDivisibleBy(strat->S[j], strat->sevS[j], h, not_sev))
+	{
+	  //if (strat->interpt) test_int_std(strat->kIdeal);
+	  /*- compute the s-polynomial -*/
 #ifdef KDEBUG
-      if (TEST_OPT_DEBUG)
-      {
-        PrintS("red:");
-        wrp(h);
-        PrintS(" with ");
-        wrp(strat->S[j]);
-      }
+	  if (TEST_OPT_DEBUG)
+	    {
+	      PrintS("red:");
+	      wrp(h);
+	      PrintS(" with ");
+	      wrp(strat->S[j]);
+	    }
 #endif
-      h = ksOldSpolyRed(strat->S[j],h,strat->kNoether);
+	  h = ksOldSpolyRed(strat->S[j],h,strat->kNoether);
 #ifdef KDEBUG
-      if (TEST_OPT_DEBUG)
-      {
-        PrintS("\nto:");
-        wrp(h);
-        PrintLn();
-      }
+	  if (TEST_OPT_DEBUG)
+	    {
+	      PrintS("\nto:");
+	      wrp(h);
+	      PrintLn();
+	    }
 #endif
-      if (h == NULL) return NULL;
-      z++;
-      if (z>=10)
-      {
-        z=0;
-        pNormalize(h);
-      }
-      /*- try to reduce the s-polynomial -*/
-      j = 0;
-      not_sev = ~ pGetShortExpVector(h);
+	  if (h == NULL) return NULL;
+	  z++;
+	  if (z>=10)
+	    {
+	      z=0;
+	      pNormalize(h);
+	    }
+	  /*- try to reduce the s-polynomial -*/
+	  j = 0;
+	  not_sev = ~ pGetShortExpVector(h);
+	}
+      else
+	{
+	  if (j >= strat->sl) return h;
+	  j++;
+	}
     }
-    else
-    {
-      if (j >= strat->sl) return h;
-      j++;
-    }
-  }
 }
 #else
+static poly redNF2 (poly h,calc_dat* c , int &len)
+{
+  len=0;
+  if (h==NULL) return NULL;
+  int j;
+
+  kStrategy strat=c->strat;
+  len=pLength(h);
+  int len_upper_bound=len;
+  if (0 > strat->sl)
+    {
+      return h;
+    }
+  LObject P(h);
+  P.SetShortExpVector();
+  P.bucket = kBucketCreate(currRing);
+  kBucketInit(P.bucket,P.p,len /*pLength(P.p)*/);
+  //int max_pos=simple_posInS(strat,P.p);
+  loop
+    {
+      j=kFindDivisibleByInS(strat->S,strat->sevS,strat->sl,&P);
+      if (j>=0)
+	{
+	  poly sec_copy=NULL;
+	  //pseudo code
+	  bool must_replace_in_basis=(len_upper_bound<=strat->lenS[j]);//first test
+	  if (must_replace_in_basis)
+	    {
+	      //second test
+	      if (pLmEqual(P.p,strat->S[j]))
+		{
+		  PrintS("b");
+		  sec_copy=kBucketClear(P.bucket);
+		  kBucketInit(P.bucket,pCopy(sec_copy),pLength(sec_copy));
+		}
+	      else
+		{
+		  must_replace_in_basis=false;
+		}
+	    }
+	  nNormalize(pGetCoeff(P.p));
+#ifdef KDEBUG
+	  if (TEST_OPT_DEBUG)
+	    {
+	      PrintS("red:");
+	      wrp(h);
+	      PrintS(" with ");
+	      wrp(strat->S[j]);
+	    }
+#endif
+	  len_upper_bound=len_upper_bound+strat->lenS[j]-2;
+	  number coef=kBucketPolyRed(P.bucket,strat->S[j],
+				     strat->lenS[j]/*pLength(strat->S[j])*/,
+  strat->kNoether);
+ nDelete(&coef);
+ h = kBucketGetLm(P.bucket);
+ //pseudo code
+ if (must_replace_in_basis){
+   int old_pos_in_c=-1;
+   poly p=strat->S[j];
+   int z;
+   
+   int new_length=pLength(sec_copy);
+   Print("%i",strat->lenS[j]-new_length);
+   len_upper_bound=new_length +strat->lenS[j]-2;//old entries length
+   int new_pos=simple_posInS(c->strat,strat->S[j],new_length);
+   strat->S[j]=sec_copy;
+   c->strat->lenS[j]=new_length;
+   
+   for (z=c->n;z;z--)
+     {
+       if(p==c->S->m[z-1])
+	 {
+	   c->S->m[z-1]=sec_copy;
+	   old_pos_in_c=z-1;
+	   c->lengths[z-1]=new_length;
+	   if (new_length==1)
+	     {
+	       int i;
+	       for ( i=0;i<z-1;i++)
+		 {
+		   if (c->lengths[i]==1)
+		     c->states[z-1][i]=HASTREP;
+		 }
+	       for ( i=z;i<c->n;i++){
+		 if (c->lengths[i]==1)
+		   c->states[i][z-1]=HASTREP;
+	       }
+	       shorten_tails(c,sec_copy);
+	     }
+	   break;
+	 }
+     }
+   pDelete(&p);
+
+   //	replace_quietly(c,j,sec_copy);
+   // have to do many additional things for consistency
+   {
+     
+     
+     
+
+     int old_pos=j;
+     assume(new_pos<=old_pos);
+ 
+
+     c->strat->lenS[old_pos]=new_length;
+     int i=0;
+     for(i=new_pos;i<old_pos;i++){
+       if (strat->lenS[i]<=new_length)
+	 new_pos++;
+       else
+	 break;
+     }
+     if (new_pos<old_pos)
+       move_forward_in_S(old_pos,new_pos,c->strat);
+    
+
+   }
+ }
+ if (h==NULL) return NULL;
+ P.p=h;
+ P.t_p=NULL;
+ P.SetShortExpVector();
+#ifdef KDEBUG
+ if (TEST_OPT_DEBUG)
+   {
+     PrintS("\nto:");
+     wrp(h);
+     PrintLn();
+   }
+#endif
+	}
+    else
+      {
+	kBucketClear(P.bucket,&(P.p),&len);
+	kBucketDestroy(&P.bucket);
+	pNormalize(P.p);
+	return P.p;
+      }
+    }
+}
 static poly redNF (poly h,kStrategy strat, int &len)
 {
   len=0;
@@ -810,55 +953,55 @@ static poly redNF (poly h,kStrategy strat, int &len)
 
   len=pLength(h);
   if (0 > strat->sl)
-  {
-    return h;
-  }
+    {
+      return h;
+    }
   LObject P(h);
   P.SetShortExpVector();
   P.bucket = kBucketCreate(currRing);
   kBucketInit(P.bucket,P.p,len /*pLength(P.p)*/);
   //int max_pos=simple_posInS(strat,P.p);
   loop
-  {
-    j=kFindDivisibleByInS(strat->S,strat->sevS,strat->sl,&P);
-    if (j>=0)
     {
-      nNormalize(pGetCoeff(P.p));
+      j=kFindDivisibleByInS(strat->S,strat->sevS,strat->sl,&P);
+      if (j>=0)
+	{
+	  nNormalize(pGetCoeff(P.p));
 #ifdef KDEBUG
-      if (TEST_OPT_DEBUG)
-      {
-        PrintS("red:");
-        wrp(h);
-        PrintS(" with ");
-        wrp(strat->S[j]);
-      }
+	  if (TEST_OPT_DEBUG)
+	    {
+	      PrintS("red:");
+	      wrp(h);
+	      PrintS(" with ");
+	      wrp(strat->S[j]);
+	    }
 #endif
-      number coef=kBucketPolyRed(P.bucket,strat->S[j],
-                          strat->lenS[j]/*pLength(strat->S[j])*/,
-                          strat->kNoether);
-      nDelete(&coef);
-      h = kBucketGetLm(P.bucket);
-      if (h==NULL) return NULL;
-      P.p=h;
-      P.t_p=NULL;
-      P.SetShortExpVector();
+	  number coef=kBucketPolyRed(P.bucket,strat->S[j],
+				     strat->lenS[j]/*pLength(strat->S[j])*/,
+  strat->kNoether);
+ nDelete(&coef);
+ h = kBucketGetLm(P.bucket);
+ if (h==NULL) return NULL;
+ P.p=h;
+ P.t_p=NULL;
+ P.SetShortExpVector();
 #ifdef KDEBUG
-      if (TEST_OPT_DEBUG)
-      {
-        PrintS("\nto:");
-        wrp(h);
-        PrintLn();
-      }
+ if (TEST_OPT_DEBUG)
+   {
+     PrintS("\nto:");
+     wrp(h);
+     PrintLn();
+   }
 #endif
-    }
+	}
     else
-    {
-      kBucketClear(P.bucket,&(P.p),&len);
-      kBucketDestroy(&P.bucket);
-      pNormalize(P.p);
-      return P.p;
+      {
+	kBucketClear(P.bucket,&(P.p),&len);
+	kBucketDestroy(&P.bucket);
+	pNormalize(P.p);
+	return P.p;
+      }
     }
-  }
 }
 #endif
 #ifdef REDTAIL_S
@@ -882,82 +1025,82 @@ poly redNFTail (poly h,const int sl,kStrategy strat, int len)
   kBucketInit(P.bucket,h /*P.p*/,len /*pLength(P.p)*/);
   pTest(h);
   loop
-  {
-    P.p=h;
-    P.t_p=NULL;
-    P.SetShortExpVector();
-    loop
     {
-      j=kFindDivisibleByInS(strat->S,strat->sevS,sl,&P);
-      if (j>=0)
-      {
-      #ifdef REDTAIL_PROT
-        PrintS("r");
-      #endif
-        nNormalize(pGetCoeff(P.p));
-#ifdef KDEBUG
-        if (TEST_OPT_DEBUG)
-        {
-          PrintS("red tail:");
-          wrp(h);
-          PrintS(" with ");
-          wrp(strat->S[j]);
-        }
+      P.p=h;
+      P.t_p=NULL;
+      P.SetShortExpVector();
+      loop
+	{
+	  j=kFindDivisibleByInS(strat->S,strat->sevS,sl,&P);
+	  if (j>=0)
+	    {
+#ifdef REDTAIL_PROT
+	      PrintS("r");
 #endif
-        number coef;
-        pTest(strat->S[j]);
-        coef=kBucketPolyRed(P.bucket,strat->S[j],
-               strat->lenS[j]/*pLength(strat->S[j])*/,strat->kNoether);
-        pMult_nn(res,coef);
-        nDelete(&coef);
-        h = kBucketGetLm(P.bucket);
-        pTest(h);
-        if (h==NULL)
-        {
-          #ifdef REDTAIL_PROT
-            PrintS(" ");
-          #endif
-          return res;
-        }
-  pTest(h);
-        P.p=h;
-        P.t_p=NULL;
-        P.SetShortExpVector();
+	      nNormalize(pGetCoeff(P.p));
 #ifdef KDEBUG
-        if (TEST_OPT_DEBUG)
-        {
-          PrintS("\nto tail:");
-          wrp(h);
-          PrintLn();
-        }
+	      if (TEST_OPT_DEBUG)
+		{
+		  PrintS("red tail:");
+		  wrp(h);
+		  PrintS(" with ");
+		  wrp(strat->S[j]);
+		}
 #endif
-      }
-      else
-      {
-        #ifdef REDTAIL_PROT
-          PrintS("n");
-        #endif
-        break;
-      }
-    } /* end loop current mon */
-    poly tmp=pHead(h /*kBucketGetLm(P.bucket)*/);
-    act->next=tmp;pIter(act);
-    poly tmp2=pHead(h);
-    pNeg(tmp2);
-    int ltmp2=1;
-    pTest(tmp2);
-    kBucket_Add_q(P.bucket, tmp2, &ltmp2);
+	      number coef;
+	      pTest(strat->S[j]);
+	      coef=kBucketPolyRed(P.bucket,strat->S[j],
+				  strat->lenS[j]/*pLength(strat->S[j])*/,strat->kNoether);
+	      pMult_nn(res,coef);
+	      nDelete(&coef);
+	      h = kBucketGetLm(P.bucket);
+	      pTest(h);
+	      if (h==NULL)
+		{
+#ifdef REDTAIL_PROT
+		  PrintS(" ");
+#endif
+		  return res;
+		}
+	      pTest(h);
+	      P.p=h;
+	      P.t_p=NULL;
+	      P.SetShortExpVector();
+#ifdef KDEBUG
+	      if (TEST_OPT_DEBUG)
+		{
+		  PrintS("\nto tail:");
+		  wrp(h);
+		  PrintLn();
+		}
+#endif
+	    }
+	  else
+	    {
+#ifdef REDTAIL_PROT
+	      PrintS("n");
+#endif
+	      break;
+	    }
+	} /* end loop current mon */
+      poly tmp=pHead(h /*kBucketGetLm(P.bucket)*/);
+      act->next=tmp;pIter(act);
+      poly tmp2=pHead(h);
+      pNeg(tmp2);
+      int ltmp2=1;
+      pTest(tmp2);
+      kBucket_Add_q(P.bucket, tmp2, &ltmp2);
 
-    h = kBucketGetLm(P.bucket);
-    if (h==NULL)
-    {
-      #ifdef REDTAIL_PROT
-        PrintS(" ");
-      #endif
-      return res;
+      h = kBucketGetLm(P.bucket);
+      if (h==NULL)
+	{
+#ifdef REDTAIL_PROT
+	  PrintS(" ");
+#endif
+	  return res;
+	}
+      pTest(h);
     }
-  pTest(h);
-  }
 }
 #endif
 
@@ -968,44 +1111,57 @@ void do_this_spoly_stuff(int i,int j,calc_dat* c){
   poly hr=NULL;
 #ifdef FULLREDUCTIONS
   if (h!=NULL)
-  {
-    int len;
-    hr=redNF(h,c->strat,len);
-    if (hr!=NULL)
-    #ifdef REDTAIL_S
-      hr = redNFTail(hr,c->strat->sl,c->strat,len);
-    #else
+    {
+      int len;
+
+      hr=redNF2(h,c,len);
+#ifdef HALFREDUCTIONS
+      int real_sl=c->strat->sl;
+      int l;
+      for(l=0;l<c->n;l++){
+	if (c->strat->lenS[l]>4)
+	  break;
+      }
+      c->strat->sl=l;
+#endif
+      if (hr!=NULL)
+#ifdef REDTAIL_S
+	hr = redNFTail(hr,c->strat->sl,c->strat,len);
+#else
       hr = redtailBba(hr,c->strat->sl,c->strat);
-    #endif
-  }
+#endif
+#ifdef HALFREDUCTIONS
+      c->strat->sl=real_sl;
+#endif
+    }
 #else
   if (h!=NULL)
-  {
-    int len;
-    hr=redNF(h,c->strat,&len);
-  }
+    {
+      int len;
+      hr=redNF2(h,c,len);
+    }
 #endif
   c->normal_forms++;
   if (hr==NULL)
-  {
-    PrintS("-");
-    c->misses_counter++;
-    c->misses[i]++;
-    c->misses[j]++;
-    c->misses_series++;
-  }
+    {
+      PrintS("-");
+      c->misses_counter++;
+      c->misses[i]++;
+      c->misses[j]++;
+      c->misses_series++;
+    }
   else
-  {
-    c->misses_series=0;
-  #ifdef HEAD_BIN
-    hr=p_MoveHead(hr,c->HeadBin);
-  #endif
-    add_to_basis(hr, i,j,c);
-  }
+    {
+      c->misses_series=0;
+#ifdef HEAD_BIN
+      hr=p_MoveHead(hr,c->HeadBin);
+#endif
+      add_to_basis(hr, i,j,c);
+    }
 }
 
 ideal t_rep_gb(ring r,ideal arg_I){
-  ideal I_temp=kInterRed(arg_I);
+  ideal I_temp=idCopy(arg_I); //kInterRed(arg_I);
   ideal I=idCompactify(I_temp);
   idDelete(&I_temp);
   calc_dat* c=(calc_dat*) omalloc(sizeof(calc_dat));
@@ -1032,13 +1188,13 @@ ideal t_rep_gb(ring r,ideal arg_I){
 #endif
     int_pair_node* h=c->soon_free;
     while(h!=NULL)
-    {
-      int_pair_node* s=h;
-      now_t_rep(h->a,h->b,c);
+      {
+	int_pair_node* s=h;
+	now_t_rep(h->a,h->b,c);
 
-      h=h->next;
-      omfree(s);
-    }
+	h=h->next;
+	omfree(s);
+      }
 
 
   }
@@ -1069,25 +1225,25 @@ void now_t_rep(int arg_i, int arg_j, calc_dat* c){
 bool has_t_rep(const int & arg_i, const  int & arg_j, calc_dat* state){
 
   if (arg_i==arg_j)
-  {
-    return (true);
-  }
+    {
+      return (true);
+    }
   if (arg_i>arg_j)
-  {
-    return (state->states[arg_i][arg_j]==HASTREP);
-  } else
-  {
-    return (state->states[arg_j][arg_i]==HASTREP);
-  }
+    {
+      return (state->states[arg_i][arg_j]==HASTREP);
+    } else
+      {
+	return (state->states[arg_j][arg_i]==HASTREP);
+      }
 }
 int pLcmDeg(poly a, poly b)
 {
   int i;
   int n=0;
   for (i=pVariables; i; i--)
-  {
-    n+=max( pGetExp(a,i), pGetExp(b,i));
-  }
+    {
+      n+=max( pGetExp(a,i), pGetExp(b,i));
+    }
   return n;
 
 }
@@ -1118,68 +1274,70 @@ void shorten_tails(calc_dat* c, poly monom)
 {
 
   for(int i=0;i<c->n;i++)
-  {
-    //enter tail
-    if (c->rep[i]!=i) continue;
-    if (c->S->m[i]==NULL) continue;
-    poly tail=c->S->m[i]->next;
-    poly prev=c->S->m[i];
-    bool did_something=false;
-    while((tail!=NULL)&& (pLmCmp(tail, monom)>=0))
     {
-      if (p_LmDivisibleBy(monom,tail,c->r))
-      {
-        did_something=true;
-        prev->next=tail->next;
-        tail->next=NULL;
-        p_Delete(& tail,c->r);
-        tail=prev;
-        //PrintS("Shortened");
-        c->lengths[i]--;
-      }
-      prev=tail;
-      tail=tail->next;
+      //enter tail
+      if (c->rep[i]!=i) continue;
+      if (c->S->m[i]==NULL) continue;
+      poly tail=c->S->m[i]->next;
+      poly prev=c->S->m[i];
+      bool did_something=false;
+      while((tail!=NULL)&& (pLmCmp(tail, monom)>=0))
+	{
+	  if (p_LmDivisibleBy(monom,tail,c->r))
+	    {
+	      did_something=true;
+	      prev->next=tail->next;
+	      tail->next=NULL;
+	      p_Delete(& tail,c->r);
+	      tail=prev;
+	      //PrintS("Shortened");
+	      c->lengths[i]--;
+	    }
+	  prev=tail;
+	  tail=tail->next;
+	}
+      if (did_something)
+	{
+	  int new_pos=simple_posInS(c->strat,c->S->m[i],c->lengths[i]);
+	  int old_pos=-1;
+	  //assume new_pos<old_pos
+	  for (int z=new_pos;z<=c->strat->sl;z++)
+	    {
+	      if (c->strat->S[z]==c->S->m[i])
+		{
+		  old_pos=z;
+		  break;
+		}
+	    }
+	  if (old_pos== -1)
+	    for (int z=new_pos-1;z>=0;z--)
+	      {
+		if (c->strat->S[z]==c->S->m[i])
+		  {
+		    old_pos=z;
+		    break;
+		  }
+	      }
+	  assume(old_pos>=0);
+	  assume(pLength(c->strat->S[old_pos])==c->lengths[i]);
+	  c->strat->lenS[old_pos]=c->lengths[i];
+	  if (new_pos<old_pos)
+	    move_forward_in_S(old_pos,new_pos,c->strat);
+	  if (c->lengths[i]==1)
+	    {
+	     
+	      int j;
+	      for ( j=0;j<i;j++)
+		{
+		  if (c->lengths[j]==1)
+		    c->states[i][j]=HASTREP;
+		}
+	      for ( j=i+1;j<c->n;j++){
+		if (c->lengths[j]==1)
+		  c->states[j][i]=HASTREP;
+	      }
+	      shorten_tails(c,c->S->m[i]);
+	    }
+	}
     }
-    if (did_something)
-    {
-      int new_pos=simple_posInS(c->strat,c->S->m[i],c->lengths[i]);
-      int old_pos=-1;
-      //assume new_pos<old_pos
-      for (int z=new_pos;z<=c->strat->sl;z++)
-      {
-        if (c->strat->S[z]==c->S->m[i])
-        {
-          old_pos=z;
-          break;
-        }
-      }
-      if (old_pos== -1)
-      for (int z=new_pos-1;z>=0l;z--)
-      {
-        if (c->strat->S[z]==c->S->m[i])
-        {
-          old_pos=z;
-          break;
-        }
-      }
-      assume(old_pos>=0);
-      assume(pLength(c->strat->S[old_pos])==c->lengths[i]);
-      c->strat->lenS[old_pos]=c->lengths[i];
-      if (new_pos<old_pos)
-        move_forward_in_S(old_pos,new_pos,c->strat);
-      if (c->lengths[i]==1)
-      {
-        int j;
-        for ( j=0;j<i;j++)
-        {
-          if (c->lengths[j]==1)
-            c->states[i][j]=HASTREP;
-        }
-        for ( j=i+1;j<c->n;j++){
-          if (c->lengths[j]==1)
-            c->states[j][i]=HASTREP;
-        }
-      }
-    }
-  }
 }
