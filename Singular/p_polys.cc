@@ -6,7 +6,7 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_polys.cc,v 1.7 2000-11-03 14:50:22 obachman Exp $
+ *  Version: $Id: p_polys.cc,v 1.8 2000-11-09 16:32:53 obachman Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -502,7 +502,7 @@ poly p_GetMaxExpP(poly p, ring r)
     // do the divisibility trick to find out whether l has an exponent
     if (l_p > l_max || 
         (((l_max & divmask) ^ (l_p & divmask)) != ((l_max-l_p) & divmask)))
-      max->exp[offset] = p_GetMaxExpL2(l_max, l_p, r, r->MinExpPerLong);
+      max->exp[offset] = p_GetMaxExpL2(l_max, l_p, r);
 
     for (i=1; i<r->VarL_Size; i++)
     {
@@ -530,7 +530,7 @@ unsigned long p_GetMaxExpL(poly p, ring r, unsigned long l_max)
     l_p = p->exp[r->VarL_Offset[0]];
     if (l_p > l_max ||
         (((l_max & divmask) ^ (l_p & divmask)) != ((l_max-l_p) & divmask)))
-      l_max = p_GetMaxExpL2(l_max, l_p, r, r->MinExpPerLong);
+      l_max = p_GetMaxExpL2(l_max, l_p, r);
     for (i=1; i<r->VarL_Size; i++)
     {
       l_p = p->exp[r->VarL_Offset[i]];

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.28 2000-09-18 09:19:15 obachman Exp $ */
+/* $Id: maps.cc,v 1.29 2000-11-09 16:32:52 obachman Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -211,6 +211,9 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
   int imagepvariables = theImageRing->N;
   ring sourcering = currRing;
   int N = pVariables+imagepvariables;
+  char** names = (char**) omAlloc0(N*sizeof(char*));
+
+  memcpy(names, currRing->names, currRing->N*sizeof(char*));
   sip_sring tmpR;
 
   if (theImageRing->OrdSgn == 1) orders[0] = ringorder_dp;
@@ -239,6 +242,7 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
   tmpR.block0 = block0;
   tmpR.block1 = block1;
   tmpR.wvhdl = wv;
+  tmpR.names = names;
   rComplete(&tmpR, 1);
   rTest(&tmpR);
 
@@ -306,15 +310,14 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
       j++;
     }
   }
-  rChangeCurrRing(&tmpR, FALSE);
-  idDelete(&temp2);
-  rChangeCurrRing(sourcering, TRUE);
+  id_Delete(&temp2, &tmpR);
   idSkipZeroes(temp1);
+  rUnComplete(&tmpR);
   omFreeSize(orders, sizeof(int)*(ordersize));
   omFreeSize(block0, sizeof(int)*(ordersize));
   omFreeSize(block1, sizeof(int)*(ordersize));
   omFreeSize(wv, sizeof(int*)*(ordersize));
-  rUnComplete(&tmpR);
+  omFreeSize(names, (currRing->N)*sizeof(char*));
   return temp1;
 }
 

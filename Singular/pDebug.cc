@@ -6,7 +6,7 @@
  *  Purpose: implementation of debug related poly routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pDebug.cc,v 1.12 2000-11-03 14:50:19 obachman Exp $
+ *  Version: $Id: pDebug.cc,v 1.13 2000-11-09 16:32:53 obachman Exp $
  *******************************************************************/
 
 #ifndef PDEBUG_CC
@@ -178,7 +178,7 @@ BOOLEAN pHaveCommonMonoms(poly p, poly q)
  ***************************************************************/
 extern void p_Setm_General(poly p, ring r);
 
-static poly p_DebugInit(poly p, ring dest_ring, ring src_ring)
+static poly p_DebugInit(poly p, ring src_ring, ring dest_ring)
 {
   poly d_p = p_Init(dest_ring);
   int i;
@@ -303,13 +303,13 @@ BOOLEAN _pp_Test(poly p, ring lmRing, ring tailRing, int level)
   if (level > 1)
   {
     poly lm = p;
-    poly tail = p_DebugInit(pNext(p), lmRing, tailRing);
+    poly tail = p_DebugInit(pNext(p), tailRing, lmRing);
     poly pnext = pNext(lm);
     pNext(lm) = tail;
     BOOLEAN cmp = p_LmCmp(lm, tail, lmRing);
     if (cmp != 1)
       dPolyReportError(lm, lmRing, "wrong order: lm <= Lm(tail)");
-    p_LmFree(tail, tailRing);
+    p_LmFree(tail, lmRing);
     pNext(lm) = pnext;
     return (cmp == 1);
   }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.46 2000-11-06 14:47:35 obachman Exp $ */
+/* $Id: kstdfac.cc,v 1.47 2000-11-09 16:32:51 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -175,7 +175,7 @@ kStrategy kStratCopy(kStrategy o)
   s->R=(TObject**)omAlloc(o->tmax*sizeof(TObject*));
   memcpy(s->R, o->R, o->tmax*sizeof(TObject*));
   s->sevT=(unsigned long *)omAlloc(o->tmax*sizeof(unsigned long));
-  memcpy(s->sevT,o->sevT,IDELEMS(o->Shdl)*sizeof(unsigned long));
+  memcpy(s->sevT,o->sevT,o->tmax*sizeof(unsigned long));
   if(o->fromQ!=NULL)
   {
     s->fromQ=(int *)omAlloc(IDELEMS(o->Shdl)*sizeof(int));

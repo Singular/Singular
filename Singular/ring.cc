@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.138 2000-11-08 15:35:00 obachman Exp $ */
+/* $Id: ring.cc,v 1.139 2000-11-09 16:32:54 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1772,7 +1772,17 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
     return 0;
 
   for (i=0; i<r1->N; i++)
-    if (strcmp(r1->names[i], r2->names[i])) return 0;
+  {
+    if (r1->names[i] != NULL && r2->names[i] != NULL)
+    {
+      if (strcmp(r1->names[i], r2->names[i])) return 0;
+    }
+    else if ((r1->names[i] != NULL) ^ (r2->names[i] != NULL))
+    {
+      return 0;
+    }
+  }
+    
 
   i=0;
   while (r1->order[i] != 0)

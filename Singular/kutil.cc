@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.75 2000-11-08 17:12:32 obachman Exp $ */
+/* $Id: kutil.cc,v 1.76 2000-11-09 16:32:51 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -3852,6 +3852,8 @@ BOOLEAN kCheckSpolyCreation(kStrategy strat,
   {
     p_LmFree(m1, strat->tailRing);
     p_LmFree(m2, strat->tailRing);
+    m1 = NULL;
+    m2 = NULL;
     return FALSE;
   }
   return TRUE;
