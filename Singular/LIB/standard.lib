@@ -1,4 +1,4 @@
-// $Id: standard.lib,v 1.5 1997-10-17 07:39:27 Singular Exp $
+// $Id: standard.lib,v 1.6 1998-03-06 15:32:23 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
 LIBRARY: standard.lib	PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
@@ -30,7 +30,7 @@ EXAMPLE: example stdfglm; shows an example
      }
    }
    else { os = #[1]; }
-   execute "ring sr="+charstr(dr)+",("+varstr(dr)+"),"+os+";";
+   execute "ring sr=("+charstr(dr)+"),("+varstr(dr)+"),"+os+";";
    ideal i= fetch(dr,i);
    intvec opt= option(get);
    option(redSB);
