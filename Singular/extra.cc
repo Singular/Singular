@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.187 2002-06-06 16:02:09 levandov Exp $ */
+/* $Id: extra.cc,v 1.188 2002-06-11 14:57:06 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1465,6 +1465,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       {
         for(j=i+1;j<=currRing->N;j++)
         {
+	  if (MATELEM(currRing->nc->C,i,j)==NULL)
+	  {
+	    Werror("Incorrect input : matrix of coefficients contains zeros in the upper triangle!");
+	    return TRUE;
+	  }
 	  if (!nEqual(pGetCoeff(pN),pGetCoeff(MATELEM(currRing->nc->C,i,j)))) IsSkewConstant=0; 
           if (MATELEM(currRing->nc->D,i,j)==NULL) /* quasicommutative case */
           {
