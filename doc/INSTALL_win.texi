@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_win.texi,v 1.5 2000-06-05 13:39:31 obachman Exp $
+@comment $Id: INSTALL_win.texi,v 1.6 2000-06-07 13:13:34 obachman Exp $
 @c FILE:    INSTALL.texi
 @c PURPOSE: Installation instructions for Singular on MSWindows
 @c          This file is displayed during installation and copied to
@@ -13,20 +13,84 @@
 @majorheading Installation innstructions for Singular on MSWINDOWS.
 @end ifclear
 
+@heading For the impatient:
+@itemize
+@item
+If you run Windows NT/2K, make sure you are logged in as
+@code{Administrator}.
+@item
+If you have Cygwin already installed on your system, uninstall it.
+@item 
+Execute the self-extracting installation archive and accept all default
+answers.
+@item 
+In case of troubles, see the installed files @code{C:\etc\INSTALL} or
+@code{C:\etc\FAQ}.
+@end itemize
+
+@heading Installation preliminaries
+
+To run @sc{Singular} on MSWINDOWS requires that the Cygwin DLL
+(dynamically linked library) version 1.0 or higher is installed on your
+system (see @uref{???} for details about 
+Cygwin).
+
+To run @sc{ESingular} (i.e. @sc{Singular} within its Emacs interface) on
+MSWINDOWS requires furthermore that the (X)Emacs editor is installed on
+your system.
+
+Therefore, the @sc{Singular} installation is devided into the following
+components: 
+@table @code
+@item Singular-@value{version}
+Contains the @sc{Singular} program and all documentation and example
+files.
+@*All files of this component are installed under the directory
+@code{/usr/local/Singular/@value{VERSION}/}
+@item BasicCygwin
+Contains the Cygwin DLL and basic tools/programs (like @code{bash} or
+@code{info}) of the  Cygwin environment.
+@*The Cygwin DLL and programs are installed in the directory
+@code{/bin}. Miscellanous documentation and configuration files are
+installed into the directory @code{/etc}.
+@item Xemacs-21.10
+Contains the Cygwin port of the Xemacs editor (see
+@url{http://www.xemacs.org} for more about XEmacs) version 21.10. 
+@*All files of this component are installed under the directory
+@code{/usr/local}.
+@item AdditionalCygwin
+Contains additional Cygwin development tools (like @code{gcc},
+@code{gdb}, @code{make}, @code{perl}, etc). Roughly speaking, togehter
+with the @code{BasicCygwin} component, this component contains the
+development environment we use to build/compile/develop @sc{Singular}
+under MSWINDOWS.
+@*Most of the programs of this component are installed into the
+directories @code{/bin} or @code{/usr/local/bin}.
+@table
+
+@heading Downloading preliminaries
+
 To install @sc{Singular} on a PC running Windows 95/98/NT/2K, you need
 to download @emph{one} of the following three archive files:
 
 @table @code
-@item Singular-@value{VERSION}-Compact. exe
-Minimal archive to download. Installs Singular and minimal set of needed
-tools/DLLs.
-@item Singular-@value{VERSION}-Typical. exe
-Typical archive to download. Installs Singular and the XEmacs editor to
-run ESingular.
-@item Singular-@value{VERSION}-Custom. exe
-Maximal archive to download. Installs Singular, XEmacs, and many Cygwin
-development tools (like gcc, gdb, make, perl, etc).
+@item Singular-@value{VERSION}-Compact.exe
+Minimal archive to download. Contains the @code{BasicCygwin} and
+@code{Singular-@value{VERSION}} components.
+@item Singular-@value{VERSION}-Typical.exe
+Typical archive to download. Contains the @code{BasicCygwin},
+@code{Singular-@value{VERSION}} and @code{XEmacs-21.10} components.
+@item Singular-@value{VERSION}-Custom.exe
+Maximal archive to download. Contains the @code{BasicCygwin},
+@code{Singular-@value{VERSION}}, @code{XEmacs-21.10} and
+@code{AdditionalCygwin} components.
 @end table
+
+@ignore
+@c later, only Singular updates should be possible
+@item Singular-@value{VERSION}-Only.exe
+Minimal archive to download. Contains only the  component. 
+@end ignore
 
 You can obtain these (and other) archives from
 @display
@@ -39,7 +103,7 @@ You can obtain these (and other) archives from
 @uref{COPYING.html, COPYING}
 @end ifhtml
 @ifnothtml
-the file COPYING contained in the distribution 
+the file @code{/etc/COPYING} contained in the distribution 
 @end ifnothtml
 for license
 information on @sc{Singular}. In particular, notice that we only grant you
@@ -59,7 +123,7 @@ system, then uninstall it. Especially make sure that you delete the
 programs).
 @item 
 If you have Cygwin version 1.0 or higher installed on your system, you
-should either delete it, or, do not install the Cygwin component contained
+should either uninstall it, or, do not install the Cygwin component contained
 in the @sc{Singular} installation archives.
 @item 
 If you are running Windows NT/2000, make sure that you are logged on as
@@ -73,19 +137,6 @@ When asked for the installation folder, you should simply choose a drive
 @strong{Important:} If you have Cygwin already installed on your system, 
 make sure that the folder you choose is mounted to the root of your
 (Cygwin) file system.
-@* Among others, the folowing subfolders will be created:
-@table @code
-@item bin
-contains the basic cygwin DLLs and tools
-@item etc
-contains miscellanous configuration and documentation file (like a FAQ
-and README file)
-@item tmp
-for temporary files
-@item usr
-contains subfolders which contain the @sc{Singular} and XEmacs program and
-documentation.
-@end table
 @item
 When asked for the Setup Type, choose @code{Typical}, unless you know
 what you are doing. 
@@ -100,11 +151,7 @@ already installed on your system, you can safely de-selct the
 some quirks and do not work right together with @sc{Singular} (i.e.,
 running @code{Esingular} results in problems).
 @* You only should install the @code{AdditionalCygwin} component, if you 
-plan on doing some software-develpment with cygwin. This component
-contains, among others, the gcc compiler, gdb debugger, a cygwin port of 
-perl, the cvs version control system, and many other
-software-development tools and libraries (you basically get what we use
-as our environment for building @sc{Singular}). 
+plan on doing some software-development with cygwin. 
 @item 
 At the end, you @emph{should} reboot your computer. Otherwise, some 
 @end enumerate

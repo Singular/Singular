@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.180 2000-06-05 13:39:32 obachman Exp $
+@comment $Id: general.doc,v 1.181 2000-06-07 13:13:34 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -3912,13 +3912,18 @@ See @ref{TRACE var}.
 @node Source code debugger, Break points, Tracing of procedures, Debugging tools
 @subsection Source code debugger
 @cindex debugging library code
-@cindex Source code debugger
+@cindex source code debugger, sdb
 @cindex debugger
-The source code debugger is an experimental feature, it's interface may change
-in future versions of Singular.@*
-To enable the use of the source code debugger @sc{Singular} has to be started
-with the option @code{-d} or @code{--sdb} (see @ref{Command line options}).
-@subsubsection sdb commands
+@cindex sdb, source code debugger
+
+
+The source code debugger (sdb) is an experimental feature, it's
+interface may change in future versions of Singular.  @*To enable the
+use of the source code debugger @sc{Singular} has to be started with the
+option @code{-d} or @code{--sdb} (see @ref{Command line options}).
+
+
+@subsubheading sdb commands
 Each sdb command consist of one character which may be followed by
 a parameter.
 @table @asis
@@ -3943,14 +3948,16 @@ quit debugger, set debugger flags(0,1,2)
 @* 1: continue
 @* 2: throw an error, return to toplevel
 @end table
-@subsubsection Syntactical errors in procedures
+
+
+@subsubheading Syntactical errors in procedures
 If @sc{Singular} was started with the command line option @code{-d} or
 @code{--sdb} an syntactical error in a procedure will start the
 source code debugger instead of returning to the top level with an
 error message. The commands @code{q 1} and @code{q 2} are equivalent in this
 case.
 
-@subsubsection SDB breakpoints in procedures
+@subsubheading SDB breakpoints in procedures
 @cindex SDB breakpoint
 @cindex SDB debugger
 Up to seven SDB breakpoints can be set.
@@ -3959,6 +3966,8 @@ To set a breakpoint at a procedure use
 @*These breakpoints can be cleared with the command @code{d breakpoint_no}
 from within the debugger or with
 @code{breakpoint(} proc_name @code{,-1);}.
+
+
 @c ---------------------------------------
 @node Break points, Printing of data, Source code debugger, Debugging tools
 @subsection Break points
