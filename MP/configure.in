@@ -140,6 +140,7 @@ AC_ARG_ENABLE(mpviewer, \
 AC_ARG_ENABLE(mppvm, \
  [  --enable-mppvm          enable building of mppvm routines])
 
+
 if test "$enable_gmp" != no && test -d gmp; then
   CONFIG_SUBDIRS="gmp"
   enable_gmp=yes
@@ -453,6 +454,23 @@ if test "${mp_rsh_found}" = none; then
 else
   AC_DEFINE_UNQUOTED(MP_RSH_COMMAND, "$mp_rsh_found")
 fi
+
+dnl Check for external memory managements
+AC_ARG_WITH(malloc, \
+ [  --with-malloc=HEADER    use external malloc routines declared in HEADER])
+
+if test "${with_malloc+set}" = set; then
+  AC_CHECK_HEADER(${with_malloc},,with_malloc=)
+fi
+AC_MSG_CHECKING(where malloc rotuines come from)
+if test "${with_malloc+set}" = set; then
+  AC_MSG_RESULT(${with_malloc})
+  AC_DEFINE(WITH_EXTERNAL_MALLOC)
+  AC_DEFINE_UNQUOTED(EXTERNAL_MALLOC_H, "${with_malloc}")
+else
+  AC_MSG_RESULT(stdlib.h)
+fi
+
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_BIGENDIAN

@@ -77,3 +77,7 @@
 
 /* Define remote shell command */
 #define MP_RSH_COMMAND	"rsh"
+
+/* Define to use external declarations of memory allocation functions */
+#undef EXTERNAL_MALLOC_H
+

@@ -7,6 +7,9 @@
  ***************************************************************/
 
 #include "MP.h"
+
+#ifndef EXTERNAL_MALLOC_H
+
 #include <stdlib.h>
 
 void mfree(void *mm, size_t sz)
@@ -27,6 +30,7 @@ void* (*IMP_RawMemAllocFnc) _ANSI_ARGS_((size_t)) = malloc;
 void* (*IMP_RawMemReallocFnc) _ANSI_ARGS_((void *, size_t)) = realloc;
 void  (*IMP_RawMemFreeFnc) _ANSI_ARGS_((void *)) = free;
 
+#endif /* EXTERNAL_MALLOC_H */
 
 
 

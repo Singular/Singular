@@ -18,22 +18,22 @@
  * Declare all names of types that we use
  * 
  ***************************************************************/
-typedef struct MPT_Tree_t MPT_Tree_t;
+struct MPT_Tree_t;
 typedef MPT_Tree_t * MPT_Tree_pt;
 
-typedef struct MPT_Node_t MPT_Node_t;
+struct MPT_Node_t;
 typedef MPT_Node_t * MPT_Node_pt;
 
-typedef struct MPT_Annot_t MPT_Annot_t;
+struct MPT_Annot_t;
 typedef MPT_Annot_t * MPT_Annot_pt;
 
 typedef void * MPT_Arg_t;
 typedef MPT_Arg_t * MPT_Arg_pt;
 
-typedef struct MPT_Union_t MPT_Union_t;
+struct MPT_Union_t;
 typedef MPT_Union_t * MPT_Union_pt;
 
-typedef struct MPT_DynArgs_t MPT_DynArgs_t;
+struct MPT_DynArgs_t;
 typedef MPT_DynArgs_t * MPT_DynArgs_pt;
 
 typedef void * MPT_ExternalData_t;
