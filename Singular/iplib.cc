@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.82 2001-03-26 19:30:22 Singular Exp $ */
+/* $Id: iplib.cc,v 1.83 2001-03-26 19:40:50 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -287,7 +287,6 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
   if (sLastPrinted.rtyp!=0)
   {
     sLastPrinted.CleanUp();
-    memset(&sLastPrinted,0,sizeof(sleftv));
   }
   //Print("kill locals for %s (level %d)\n",IDID(pn),myynest);
   killlocals(myynest);
@@ -450,7 +449,7 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
   if (err)
   {
     iiRETURNEXPR[myynest+1].CleanUp();
-    iiRETURNEXPR[myynest+1].Init();
+    //iiRETURNEXPR[myynest+1].Init(); //done by CleanUp
   }
 #ifdef USE_IILOCALRING
   if(namespaceroot->next->currRing != iiLocalRing[myynest]) printf("iiMake_proc: 1 ring not saved\n");
@@ -558,7 +557,7 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
   if (sLastPrinted.rtyp!=0)
   {
     sLastPrinted.CleanUp();
-    memset(&sLastPrinted,0,sizeof(sleftv));
+    //memset(&sLastPrinted,0,sizeof(sleftv)); //done by CleanUp
   }
   killlocals(myynest);
   myynest--;
