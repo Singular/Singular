@@ -1,14 +1,18 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_distrib.cc,v 1.1 1996-12-06 14:44:08 schmidt Exp $
+// $Id: fac_distrib.cc,v 1.2 1997-03-27 09:39:51 schmidt Exp $
 
 /*
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  1996/12/06 14:44:08  schmidt
+ * Initial revision
+ *
  */
 
-#undef DEBUGOUTPUT
-
 #include "assert.h"
+#include "debug.h"
+
 #include "cf_defs.h"
+
 #include "canonicalform.h"
 #include "cf_iter.h"
 #include "fac_util.h"
@@ -68,7 +72,7 @@ distributeLeadingCoeffs ( CanonicalForm & U, CFArray & G, CFArray & lcG, const C
     lcG = CFArray( 1, r );
     for ( j = 1; j <= r; j ++ )
 	lcG[j] = 1;
-    
+
     for ( I = F, i = 1; I.hasItem(); I++, i++ ) {
 	ft = I.getItem().factor();
 	m = I.getItem().exp();
