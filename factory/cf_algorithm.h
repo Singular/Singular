@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_algorithm.h,v 1.7 1997-09-08 10:55:04 schmidt Exp $ */
+/* $Id: cf_algorithm.h,v 1.8 1997-11-19 17:42:11 schmidt Exp $ */
 
 #ifndef INCL_CF_ALGORITHM_H
 #define INCL_CF_ALGORITHM_H
@@ -37,7 +37,7 @@ CanonicalForm common_den ( const CanonicalForm & f );
 //}}}
 
 //{{{ function declarations from cf_chinese.cc
-void chineseRemainder ( const CanonicalForm x1, const CanonicalForm q1, const CanonicalForm x2, const CanonicalForm q2, CanonicalForm & xnew, CanonicalForm & qnew );
+void chineseRemainder ( const CanonicalForm & x1, const CanonicalForm & q1, const CanonicalForm & x2, const CanonicalForm & q2, CanonicalForm & xnew, CanonicalForm & qnew );
 
 void chineseRemainder ( const CFArray & x, const CFArray & q, CanonicalForm & xnew, CanonicalForm & qnew );
 //}}}

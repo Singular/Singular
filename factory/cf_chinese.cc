@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_chinese.cc,v 1.7 1997-09-29 06:51:46 schmidt Exp $ */
+/* $Id: cf_chinese.cc,v 1.8 1997-11-19 17:42:15 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -17,7 +17,7 @@
 
 #include "canonicalform.h"
 
-//{{{ void chineseRemainder ( const CanonicalForm x1, const CanonicalForm q1, const CanonicalForm x2, const CanonicalForm q2, CanonicalForm & xnew, CanonicalForm & qnew )
+//{{{ void chineseRemainder ( const CanonicalForm & x1, const CanonicalForm & q1, const CanonicalForm & x2, const CanonicalForm & q2, CanonicalForm & xnew, CanonicalForm & qnew )
 //{{{ docu
 //
 // chineseRemainder - integer chinese remaindering.
@@ -37,7 +37,7 @@
 //
 //}}}
 void
-chineseRemainder ( const CanonicalForm x1, const CanonicalForm q1, const CanonicalForm x2, const CanonicalForm q2, CanonicalForm & xnew, CanonicalForm & qnew )
+chineseRemainder ( const CanonicalForm & x1, const CanonicalForm & q1, const CanonicalForm & x2, const CanonicalForm & q2, CanonicalForm & xnew, CanonicalForm & qnew )
 {
     CanonicalForm a1, a2;
     (void)iextgcd( q1, q2, a1, a2 );
