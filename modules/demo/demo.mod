@@ -1,6 +1,6 @@
 %{
 /*
- *  $Id: demo.mod,v 1.1 2000-03-29 13:47:24 krueger Exp $
+ *  $Id: demo.mod,v 1.2 2000-03-30 06:36:52 krueger Exp $
  *
  *  Test mod fuer modgen
  */
@@ -13,7 +13,7 @@ extern void piShowProcList();
 // some comments here
 
 module="demo_module";
-version	= "$Id: demo.mod,v 1.1 2000-03-29 13:47:24 krueger Exp $";
+version	= "$Id: demo.mod,v 1.2 2000-03-30 06:36:52 krueger Exp $";
 info	="
 LIBRARY: kernel.lib  PROCEDURES OF GENERAL TYPE WRITEN IN C
 
@@ -24,7 +24,7 @@ LIBRARY: kernel.lib  PROCEDURES OF GENERAL TYPE WRITEN IN C
 //static int i;
 //%}
 
-other ="hallo";   // should return an error
+//other ="hallo";   // should return an error
 
 //cxxsource = proclist.cc , misc.cc;
 //cxxsource = misc.cc;
@@ -56,8 +56,6 @@ example
  */
 static start_sg
 {
-//  %singularcmd;
-//  %singularcmd();
   %singularcmd(inout::f(q,w,e));
 }
 
@@ -76,7 +74,8 @@ int mysum(
   // generate typecheck and typeconversation code
   %typecheck;
   
-  %return = (void*)((int)i->Data() + (int)j->Data());
+  //%return = (void*)((int)i->Data() + (int)j->Data());
+  %return = (void *)(i + j);
 }
 example
 { Demo::mysum(2,3); 

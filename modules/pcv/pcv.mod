@@ -1,6 +1,6 @@
 %{
 /*
- *  $Id: pcv.mod,v 1.4 2000-03-29 14:22:26 krueger Exp $
+ *  $Id: pcv.mod,v 1.5 2000-03-30 06:37:22 krueger Exp $
  *
  *  Test mod fuer modgen
  */
@@ -12,7 +12,7 @@
 
 module="pcv";
 
-version="$Id: pcv.mod,v 1.4 2000-03-29 14:22:26 krueger Exp $";
+version="$Id: pcv.mod,v 1.5 2000-03-30 06:37:22 krueger Exp $";
 info="
 LIBRARY: pcv.so  CONVERSION BETWEEN POLYS AND COEF VECTORS
 AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
@@ -31,7 +31,7 @@ cxxsource = Pcv.cc;
 int MinDeg(poly p) {
    %declaration;
    %typecheck;
-   %return(pcvMinDeg);
+   %return(pcvMinDeg(p));
 }
 
 list P2CV(list pl,int d0,int d1) {
@@ -45,7 +45,7 @@ list P2CV(list pl,int d0,int d1) {
   }
   
   %typecheck;
-  %return(pcvP2CV);
+  %return(pcvP2CV(pl, d0, d1));
 }
 
 list CV2P(list pl,int d0,int d1)
@@ -60,7 +60,7 @@ list CV2P(list pl,int d0,int d1)
   }
   
   %typecheck;
-  %return(pcvCV2P);
+  %return(pcvCV2P(pl, d0, d1));
 }
 
 int Dim(int d0,int d1)
