@@ -2577,9 +2577,9 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c)
     if (0){
       PrintS("L");
       if(!erg.fromS){
-	erg.to_reduce_u=MAX(erg.to_reduce_u,erg.reduce_by);
+	erg.to_reduce_u=max(erg.to_reduce_u,erg.reduce_by);
 	if (pLmEqual(los[erg.reduce_by].p,los[erg.to_reduce_l].p))
-	  erg.to_reduce_l=MIN(erg.to_reduce_l,erg.reduce_by);
+	  erg.to_reduce_l=min(erg.to_reduce_l,erg.reduce_by);
       }
       int pn=erg.to_reduce_u+1-erg.to_reduce_l;
       poly* p=(poly*) omalloc((pn)*sizeof(poly));
