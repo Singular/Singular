@@ -1,30 +1,30 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: jordan.lib,v 1.2 1998-12-23 13:13:09 mschulze Exp $";
+version="$Id: jordan.lib,v 1.3 1998-12-28 14:30:54 mschulze Exp $";
 info="
 LIBRARY: jordan.lib  PROCEDURES TO COMPUTE THE JORDAN NORMAL FORM
                      by Mathias Schulze
                      email: mschulze@mathematik.uni-kl.de
 
- jordandata(M);      data of the jordan normal form of the constant part 
-                     of the matrix M
- jordanmatrix(d);    jordan matrix defined by the data d
- jordanform(M);      jordan normal form of the constant part of the matrix M
- jordanbasis(M);     basis with respect to which the constant part 
-                     of the matrix M is in jordan normal form
+ jordan        : eigenvalues, jordan block sizes and jordan basis
+ jordanmatrix  : jordan matrix from eigenvalues and jordan block sizes
+ jordanform    : jordan normal form
+ invmat        : inverse matrix
 ";
 
 LIB "ring.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
-proc jordandata(matrix M)
-INPUT:   square matrix M with factorizable characteristic polynomial 
-         of the constant part M0
-OUTPUT:  nothing, if the assumptions are not fulfilled, else,
-         a list with first entry an ideal containing the eigenvalues of M0 
-         in increasing order and second entry a list of increasingly ordered 
-         int vectors containing the corresponding jordan block sizes
-EXAMPLE: example jordandata; shows an example
+proc jordan(matrix M,list #)
+USAGE:   <list> ret=jordan(<matrix> M[,<int> opt=0]); 
+INPUT:   <matrix> M : square matrix with factorizable characteristic 
+                      polynomial of the constant part
+          <int> opt : compute ret[2], iff opt<2
+                      compute ret[3], iff opt>0
+OUTPUT:         <ideal> ret[1] : eigenvalues of the constant part of M
+         <list<intvec>> ret[2] : jordan block sizes of the constant part of M
+               <module> ret[3] : jordan basis for the constant part of M
+EXAMPLE: example jordan; shows an example
 {
   int n=nrows(M);
   if(n!=ncols(M))
@@ -36,6 +36,7 @@ EXAMPLE: example jordandata; shows an example
   def br=basering;
   map zero=br,0;
   M=zero(M);
+  kill zero;
 
   changeord("pr","dp");
   matrix M=imap(br,M);
@@ -81,244 +82,94 @@ EXAMPLE: example jordandata; shows an example
   }
   kill e,m;
 
-  int k,l,m;
-  intvec bMi;
-  list bM;
-  matrix Mi,Mj;
-  matrix E=freemodule(nrows(M));
-  for(i=ncols(eM);i>=1;i--)
+  int opt=0;
+  if(size(#)>0)
   {
-    Mi=M-eM[i]*E;
-    Mj=Mi;
-    k=ncols(syz(Mj));
-    m=k;
-    bMi=0;
-    bMi[m]=0;
-    for(j=k;j>=1;j--)
+    if(typeof(#[1])=="int")
     {
-      bMi[j]=1;
-    }
-    for(j=mM[i];j>=1;j--)
-    {
-      Mj=Mj*Mi;
-      k=ncols(syz(Mj));
-      for(l=size(bMi);l>size(bMi)+m-k;l--)
-      {
-        bMi[l]=bMi[l]+1;
-      }
-      m=k;
-    }
-    bM=list(bMi)+bM;
-  }
-
-  return(list(eM,bM));
-}
-example
-{
-  "EXAMPLE:";
-  echo=2;
-  LIB "random.lib";
-  ring r;
-  list d=ideal(2,3),list(intvec(1,1,2,2,2),intvec(3,4,5));
-  matrix M=jordanmatrix(d);
-  print(M);
-  int n=nrows(M);
-  matrix U;
-  while(det(U)==0)
-  {
-    U=randommat(n,n,ideal(1)); 
-  }
-  matrix invU=lift(U,freemodule(n));
-  M=invU*M*U;
-  print(M);
-  jordandata(M);
-}
-///////////////////////////////////////////////////////////////////////////////
-
-proc jordanmatrix(list d)
-INPUT:   list d
-ASSUME:  first entry of d an ideal containing numbers and second entry of d 
-         a list of same length containing int vectors with positive entries
-OUTPUT:  a jordan matrix with eigenvalues from the first entry of d 
-         and jordan block sizes from the second entry of d
-EXAMPLE: example jordanmatrix; shows an example
-{
-  def eM,bM=d[1..2];
-
-  int i,j,n;
-  for(i=size(bM);i>=1;i--)
-  {
-    for(j=size(bM[i]);j>=1;j--)
-    {
-      n=n+bM[i][j];
+      opt=#[1];
     }
   }
-  matrix M[n][n];
 
   int k,l;
-  for(i,l,M=1,1,0;i<=size(eM);i++)
-  {
-    for(j=1;j<=size(bM[i]);j++)
-    {
-      for(k=bM[i][j];k>=2;k,l=k-1,l+1)
-      {
-        M[l,l]=eM[i];
-        M[l,l+1]=1;
-      }
-      M[l,l]=eM[i];
-      l++;
-    }
-  }
-
-  return(M);
-}
-example
-{
-  "EXAMPLE:";
-  echo=2;
-  ring r;
-  list d=ideal(2,3),list(intvec(1,1,2,2,2),intvec(3,4,5));
-  d;
-  print(jordanmatrix(d));
-}
-///////////////////////////////////////////////////////////////////////////////
-
-proc jordanform(matrix M)
-INPUT:   square matrix M with factorizable characteristic polynomial 
-         of the constant part M0
-OUTPUT:  nothing, if the assumptions are not fulfilled, else,
-         a jordan matrix of M0
-EXAMPLE: example jordanform; shows an example
-{
-  return(jordanmatrix(jordandata(M)));
-}
-example
-{
-  "EXAMPLE:";
-  echo=2;
-  LIB "random.lib";
-  ring r;
-  list d=ideal(2,3),list(intvec(1,1,2,2,2),intvec(3,4,5));
-  matrix M=jordanmatrix(d);
-  print(M);
-  int n=nrows(M);
-  matrix U;
-  while(det(U)==0)
-  {
-    U=randommat(n,n,ideal(1)); 
-  }
-  matrix invU=lift(U,freemodule(n));
-  M=invU*M*U;
-  print(M);
-  print(jordanform(M));
-}
-///////////////////////////////////////////////////////////////////////////////
-
-proc jordanbasis(matrix M)
-INPUT:   square matrix M with factorizable characteristic polynomial 
-         of the constant part M0
-OUTPUT:  nothing, if the assumptions are not fulfilled, else,
-         a module containing a basis with respect to which M0 is in
-         jordan normal form
-EXAMPLE: example jordanbasis; shows an example
-{
-  int n=nrows(M);
-  if(n!=ncols(M))
-  {
-    "//no square matrix";
-    return();
-  }
-
-  def br=basering;
-  map zero=br,0;
-  M=zero(M);
-
-  changeord("pr","dp");
-  matrix M=imap(br,M);
-
-  list l=factorize(det(M-var(1)*freemodule(n)),2);
-  def eM,mM=l[1..2];
-
-  int i;
-  for(i=size(eM);i>=1;i--)
-  {
-    if(deg(eM[i])>1)
-    {
-      kill pr;
-      "//unable to factorize characteristic polynomial";
-      return();
-    }
-  }
-
-  map inv=pr,-var(1);
-  eM=simplify(inv(eM),1);
-  setring br;
-  map zero=pr,0;
-  ideal eM=zero(eM);
-  kill pr;
-
-  int j;
-  poly e;
-  int m;
-  for(i=size(eM);i>=2;i--)
-  {
-    for(j=i-1;j>=1;j--)
-    {
-      if(eM[i]<eM[j])
-      {
-        e=eM[i];
-        eM[i]=eM[j];
-        eM[j]=e;
-        m=mM[i];
-        mM[i]=mM[j];
-        mM[j]=m;
-      }
-    }
-  }
-  kill e,m;
-
-  int k,l;
-  matrix Mi,Ni;
   matrix E=freemodule(n);
-  module V,K1,K2,sNi;
-  matrix v[n][1];
+  matrix Mi,Ni;
+  module sNi;
   list K;
+
+  if(opt>0)
+  {
+    module V,K1,K2,sNi;
+    matrix v[n][1];
+  }
+  if(opt<2)
+  {
+    list bM;
+    intvec bMi;
+  }
+
   for(i=ncols(eM);i>=1;i--)
   {
     Mi=M-eM[i]*E;
-    K=list();
-
+  
+    K=list(module());
     for(Ni,sNi=Mi,0;size(sNi)<mM[i];Ni=Ni*Mi)
     {
       sNi=syz(Ni);
       K=K+list(sNi);
     }
-    if(size(K)>1)
+
+    if(opt<2)
     {
-      K1=K[1];
-      K[1]=interred(reduce(K[1],std(module(Mi*K[2]))));
-      for(j=2;j<=size(K)-1;j++)
+      bMi=0;
+      bMi[size(K[2])]=0;
+      for(j=size(K);j>=2;j--)
       {
-        K2=K[j];
-        K[j]=interred(reduce(K[j],std(K1+module(Mi*K[j+1]))));
-        K1=K2;
-      }
-      K[j]=interred(reduce(K[j],std(K1)));
-    }
-    for(j=size(K);j>=1;j--)
-    {
-      for(k=size(K[j]);k>=1;k--)
-      {
-        v=K[j][k];
-        for(l=j;l>=1;l--)
+        for(k=size(bMi);k>size(bMi)+size(K[j-1])-size(K[j]);k--)
         {
-          V=module(v)+V;
-          v=Mi*v;
+          bMi[k]=bMi[k]+1;
+        }
+      }
+      bM=list(bMi)+bM;
+    }
+
+    if(opt>0)
+    {
+      if(size(K)>1)
+      {
+        for(j,K1=2,0;j<=size(K)-1;j++)
+        {
+          K2=K[j];
+          K[j]=interred(reduce(K[j],std(K1+module(Mi*K[j+1]))));
+          K1=K2;
+        }
+        K[j]=interred(reduce(K[j],std(K1)));
+      }
+      for(j=size(K);j>=2;j--)
+      {
+        for(k=size(K[j]);k>=1;k--)
+        {
+          v=K[j][k];
+          for(l=j;l>=1;l--)
+          {
+            V=module(v)+V;
+            v=Mi*v;
+          }
         }
       }
     }
   }
-  return(V);
+
+  list ret=eM;
+  if(opt<2)
+  {
+    ret[2]=bM;
+  }
+  if(opt>0)
+  {
+    ret[3]=V;
+  }
+  return(ret);
 }
 example
 {
@@ -326,20 +177,176 @@ example
   echo=2;
   LIB "random.lib";
   ring r;
-  list d=ideal(2,3),list(intvec(1,1,2,2,2),intvec(3,4,5));
-  matrix M=jordanmatrix(d);
-  print(M);
-  int n=nrows(M);
+  list eb=ideal(2,3),list(intvec(1,1,2,2,2),intvec(3,4,5));
+  matrix J=jordanmatrix(eb);
+  print(J);
+  int n=nrows(J);
   matrix U;
   while(det(U)==0)
   {
     U=randommat(n,n,ideal(1)); 
   }
-  matrix invU=lift(U,freemodule(n));
-  M=invU*M*U;
+  matrix invU=invmat(U);
+  matrix M=invU*J*U;
   print(M);
-  U=jordanbasis(M);
-  invU=lift(U,freemodule(n));
-  print(invU*M*U);
+  jordan(M);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc jordanmatrix(list eb)
+USAGE:   <matrix> J=jordanmatrix(<list> eb);
+INPUT:          <ideal> eb[1] : eigenvalues
+         <list<intvec>> eb[2] : jordan block sizes
+OUTPUT:  <matrix> J : jordan matrix defined by eb
+EXAMPLE: example jordanmatrix; shows an example
+{
+  if(size(eb)<2)
+  {
+    "//not enough entries in argument list";
+    return(); 
+  }
+  def eJ,bJ=eb[1..2];
+  if(typeof(eJ)!="ideal")
+  {
+    "//first entry in argument list not an ideal";
+    return();
+  }
+  if(typeof(bJ)!="list")
+  {
+    "//second entry in argument list not a list";
+    return();
+  }
+  int s=size(eJ);
+  if(size(eJ)<size(bJ))
+  {
+    int s=size(eJ);
+  }
+  else
+  {
+    int s=size(bJ);
+  }
+
+  int i,j,k,n;
+  for(i=s;i>=1;i--)
+  {
+    if(typeof(bJ[i])!="intvec")
+    {
+      "//second entry in argument list not a list of int vectors";
+      return();
+    }
+    else
+    {
+      for(j=size(bJ[i]);j>=1;j--)
+      {
+        k=bJ[i][j];
+        if(k>0)
+        {
+          n=n+k;
+        }
+      }
+    }
+  }
+  matrix J[n][n];
+
+  int k,l;
+  for(i,l=1,1;i<=s;i++)
+  {
+    for(j=1;j<=size(bJ[i]);j++)
+    {
+      k=bJ[i][j];
+      if(k>0)
+      {
+        while(k>=2)
+        {
+          J[l,l]=eJ[i];
+          J[l,l+1]=1;
+          k,l=k-1,l+1;
+        }
+        J[l,l]=eJ[i];
+        l++;
+      }
+    }
+  }
+
+  return(J);
+}
+example
+{
+  "EXAMPLE:";
+  echo=2;
+  ring r;
+  list eb=ideal(2,3),list(intvec(1,1,2,2,2),intvec(3,4,5));
+  eb;
+  matrix J=jordanmatrix(eb);
+  print(J);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc jordanform(matrix M)
+USAGE:   <matrix J> jordanform(<matrix M>);
+INPUT:   <matrix> M : square matrix with factorizable characteristic 
+                      polynomial of the constant part
+OUTPUT:  <matrix J> : jordan normal form of M
+EXAMPLE: example jordanform; shows an example
+{
+  return(jordanmatrix(jordan(M)));
+}
+example
+{
+  "EXAMPLE:";
+  echo=2;
+  LIB "random.lib";
+  ring r;
+  list eb=ideal(2,3),list(intvec(1,1,2,2,2),intvec(3,4,5));
+  matrix J=jordanmatrix(eb);
+  print(J);
+  int n=nrows(J);
+  matrix U;
+  while(det(U)==0)
+  {
+    U=randommat(n,n,ideal(1)); 
+  }
+  matrix invU=invmat(U);
+  matrix M=invU*J*U;
+  print(M);
+  J=jordanform(M);
+  print(J);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc invmat(matrix U)
+USAGE:   <matrix> invU=invmat(<matrix> U);
+INPUT:   <matrix> U : matrix with invertible constant part
+OUTPUT:  <matrix> invU : inverse matrix of constant part of U
+EXAMPLE: example invmat; shows an example
+{
+  int n=nrows(U);
+  if(n!=ncols(U))
+  {
+    "//no square matrix";
+    return();
+  }
+
+  def br=basering;
+  map zero=br,0;
+  U=zero(U);
+
+  return(lift(U,freemodule(n)));
+}
+example
+{
+  "EXAMPLE:";
+  echo=2;
+  LIB "random.lib";
+  ring r;
+  int n=10;
+  matrix U;
+  while(det(U)==0)
+  {
+    U=randommat(n,n,ideal(1)); 
+  }
+  print(U);
+  matrix invU=invmat(U);
+  print(invU*U);
 }
 ///////////////////////////////////////////////////////////////////////////////
