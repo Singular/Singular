@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: latex.lib,v 1.21 2004-02-23 10:19:10 Singular Exp $";
+version="$Id: latex.lib,v 1.22 2004-04-20 16:31:04 Singular Exp $";
 category="Visualization";
 info="
 LIBRARY: latex.lib    Typesetting of Singular-Objects in LaTeX2e
@@ -505,7 +505,7 @@ example
   "EXAMPLE:"; echo = 2;
   string fname = "tldemo";
   ring @r1=0,(x,y,z),dp;
-  if(system("with","Namespaces")) { exportto(Current, @r1); }
+  if(system("with","Namespaces")) { export @r1 to Current; }
   else { export @r1; }
   ring r2=0,(u,v),dp;
   map @phi =(@r1,u2,uv -v,v2); export @phi;
@@ -2755,7 +2755,7 @@ bv +
 ev);
  
   ring @r4_h=0,(x,y,z),dp;
-  if(system("with","Namespaces")) { exportto(Current, @r4_h); }
+  if(system("with","Namespaces")) { export @r4_h to Current; }
   else { export @r4_h; }
   ring r5=0,(u,v),dp;
   map @phi_h=@r4_h,u2,uv -v,v2;  export @phi_h;
