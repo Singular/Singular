@@ -43,14 +43,15 @@ MKINSTALLDIRS   = ./mkinstalldirs
 ##
 ## compiler and linker options
 ##
-CFLAGS		= @CFLAGS@ -pipe 
-CXXFLAGS	= @CXXFLAGS@ -pipe 
+CFLAGS		= @CFLAGS@ ${PIPE} 
+CXXFLAGS	= @CXXFLAGS@ ${PIPE} 
 CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@
 CPPFLAGS	= -I${srcdir} @CPPFLAGS@
 DEFS		= @DEFS@ -DNDEBUG
 LDFLAGS		= @LDFLAGS@
 STATIC_LDFLAGS	= @STATIC_LDFLAGS@
 LIBS		= @NEED_LIBS@
+PIPE		=
 
 ##
 ## subdirectories
@@ -203,8 +204,8 @@ iparith.inc mpsr_Tok.inc: iparith.cc ipconv.cc tok.h mpsr_Tok.cc grammar.h mod2.
 		     ${OBJS} ${LDFLAGS} ${LIBS};\
 		echo ./gentable; \
 		./gentable; \
-		echo /bin/rm gentable;\
-		/bin/rm gentable; \
+		echo /bin/rm -f gentable gentable.exe;\
+		/bin/rm -f gentable gentable.exe; \
 	fi
 
 
@@ -212,7 +213,7 @@ mmutil.inc: mmutil.c mmprivat.h
 	${CXX} ${CXXFLAGS}  ${CPPFLAGS} ${DEFS} \
 	       -DGENERATE_INDEX_TABLE -DHAVE_INDEX_TABLE mmutil.c -o mmutil
 	./mmutil > mmutil.inc
-	rm -f mmutil
+	rm -f mmutil mmutil.exe
 
 mmutil.o mmutil.d: mmutil.inc
 
@@ -386,8 +387,8 @@ CXXG		= gcc
 CXXM		= gcc -MM
 CCM		= gcc -MM
 
-CFLAGSG		= -g -Wall -Wno-unused -pipe 
-CXXFLAGSG	= -g -Wall -Wno-unused -pipe 
+CFLAGSG		= -g -Wall -Wno-unused ${PIPE} 
+CXXFLAGSG	= -g -Wall -Wno-unused ${PIPE} 
 CXXTEMPLFLAGSG	= -fno-implicit-templates
 DEFSG		= @DEFS@ 
 
@@ -450,14 +451,14 @@ installg: Singularg
 CCP		= gcc
 CXXP		= gcc
 
-CFLAGSP		= -pg -O3 -pipe  
-CXXFLAGSP	= -pg -O3 -pipe 
+CFLAGSP		= -pg -O3 ${PIPE}  
+CXXFLAGSP	= -pg -O3 ${PIPE} 
 CXXTEMPLFLAGSP	= -fno-implicit-templates
 DEFSP		= @DEFS@ -DNDEBUG -DDO_PROFILE
 LDFLAGSP	= -static @LDFLAGS@
 
-CFLAGSB		= -g -O3 -pipe  
-CXXFLAGSB	= -g -O3 -pipe 
+CFLAGSB		= -g -O3 ${PIPE}  
+CXXFLAGSB	= -g -O3 ${PIPE} 
 CXXTEMPLFLAGSB	= -fno-implicit-templates
 DEFSB		= @DEFS@ -DNDEBUG 
 LDFLAGSB	= -static @LDFLAGS@
