@@ -26,6 +26,7 @@ MKINSTALLDIRS   = ../mkinstalldirs
 
 TEX		= tex
 MAKEINFO	= makeinfo
+TEXI2DVI	= texi2dvi
 TEXINDEX	= texindex
 DVIPS		= dvips
 
@@ -33,52 +34,64 @@ SINGULAR	= @SINGULAR@
 ##
 ## End configuration dependend stuff
 #################################################################
-#
-# examples, general, math, reference,
-# singular, start, types
-#SINGULAR_OBJS= copyright.tex proc.tex
-TEX_FILES = copyright.tex # proc.tex
-SINGULAR_OBJS= examples.tex general.tex math.tex reference.tex \
-	singular.tex start.tex types.tex pdata.tex
 
-all: info dvi 
+# files
+TEX_FILES	= copyright.tex
+DOC2TEX_FILES	= \
+		examples.tex general.tex math.tex reference.tex \
+		singular.tex start.tex types.tex pdata.tex
 
+MANUAL_FILES	= ${TEX_FILES} ${DOC2TEX_FILES}
+TUTOR_FILES	= \
+		tutor.tex examples.tex start.tex proc.tex copyright.tex
+
+# default target
+all: info dvi html
+
+# info stuff
 info: singular.hlp 
 
-singular.hlp: ${SINGULAR_OBJS} ${TEX_FILES} Makefile
+singular.hlp: ${MANUAL_FILES}
 	- ${MAKEINFO} --no-split singular.tex
 
-html: ${SINGULAR_OBJS} ${TEX_FILES} Makefile
-	if [ ! -d html ]; then
-		mkdir html
-	fi
-	(cd html; \
-	../texi2html -I .. -menu -expandinfo -number -split_chapter -verbose ../singular.tex;\
-	)
-	touch html-done
-
+# dvi stuff
 dvi: singular.dvi tutor.dvi usercard.dvi
 
-ps: dvi
-	${DVIPS} singular.dvi -o
-	${DVIPS} tutor.dvi -o
-	${DVIPS} usercard.dvi  -o
+singular.dvi: ${MANUAL_FILES}
+	${TEXI2DVI} singular.tex
 
-singular.dvi:  ${SINGULAR_OBJS} ${TEX_FILES} Makefile
-	${TEX} singular.tex
-	${TEX} singular.tex
-	${TEXINDEX} singular.??
-	${TEX} singular.tex
-
-tutor.dvi: tutor.tex examples.tex start.tex proc.tex copyright.tex
-	${TEX} tutor.tex
-	${TEX} tutor.tex
-	${TEXINDEX} tutor.??
-	${TEX} tutor.tex
+tutor.dvi: ${TUTOR_FILES}
+	${TEXI2DVI} tutor.tex
 
 usercard.dvi: usercard.tex singcard.tex
 	${TEX} $<
 
+# postscript stuff
+ps: singular.ps tutor.ps usercard.ps
+
+usercard.ps: usercard.dvi
+	${DVIPS} -t landscape $< -o $@
+
+%.ps: %.dvi
+	${DVIPS} $< -o $@
+
+# html stuff
+html: ${MANUAL_FILES}
+	test -d html || mkdir html
+	cd html && ../texi2html -I .. -menu -expandinfo -number -split_node -verbose ../singular.tex
+
+# how to create the texinfo files
+%.tex: %.doc doc2tex ${SINGULAR}
+	@ echo
+	@ echo "Be sure Singular is up-to-date before making the examples!"
+	@ echo
+	./doc2tex ${SINGULAR} $*
+	- grep "error occurred" $@
+
+doc2tex: doc2tex.c
+	$(CC) doc2tex.c -o doc2tex
+
+# targets concerned with maintenance
 install: 
 	${MKINSTALLDIRS} ${infodir}
 	${INSTALL_DATA} singular.hlp ${infodir}
@@ -88,39 +101,23 @@ uninstall:
 	- rmdir ${infodir}
 
 clean:
-	/bin/rm -f Z* doc2tex example.* save_i *~ *.tst manual.lst doe core
-	/bin/rm -f singular.?? singular.??s singular.aux singular.log singular.toc
-	/bin/rm -f tutor.?? tutor.??s tutor.aux tutor.log tutor.toc *.lst
-	/bin/rm -f doe* singular.info
+	/bin/rm -f .singular_hist doe.tmp dump.ascii example.mp example.txt
+	/bin/rm -f save_i test.ascii test.mp
+	/bin/rm -f Z* *.tst *.pag *.dir *.lst *.log *.aux *.cp *.cps
+	/bin/rm -f *.fn *.fns *.ky *.kys *.log *.pg *.pgs *.toc *.tp
+	/bin/rm -f *.tps *.vr *.vrs
+	/bin/rm -f doc2tex singular.hlp *.dvi *.ps ${DOC2TEX_FILES}
+	/bin/rm -rf html
 
 mostlyclean: clean
 
-distclean: clean
-	/bin/rm -f Makefile *.ps
+distclean: mostlyclean
+	/bin/rm -f Makefile
 
 maintainer-clean: distclean
-	@echo "This command is intended for maintainers to use;"
-	@echo "Rebuilding the deleted files requires makeinfo, tex and texindex"
-	/bin/rm -f *.dvi singular.hlp configure ${SINGULAR_OBJS}
 
-%.tex: %.doc doc2tex ${SINGULAR}
-	./doc2tex ${SINGULAR} $*
-	-grep "error occurred" $@
-
-doc2tex: doc2tex.c
-	$(CC) doc2tex.c -o doc2tex
-
-${SINGULAR}: 
-	cd ..; ${MAKE} ${SINGULAR}
+${SINGULAR}:
+#	cd ..; ${MAKE} ${SINGULAR}
 
 Makefile: Makefile.in
-	cd ..; ${MAKE} Makefile
-
-#examples.tex: examples.doc
-#general.tex: general.doc
-#math.tex: math.doc
-#reference.tex: reference.doc
-#singular.tex: singular.doc
-#start.tex: start.doc
-#types.tex: types.doc
-#pdata.tex: pdata.doc
+	cd ..; ${MAKE} doc/Makefile
