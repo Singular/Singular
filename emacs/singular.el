@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.11 1998-07-29 16:57:32 schmidt Exp $
+;; $Id: singular.el,v 1.12 1998-07-30 12:22:48 schmidt Exp $
 
 ;;; Commentary:
 
@@ -267,18 +267,6 @@ Singular interactive mode starts up.")
 ;;
 ;; All of these functions modify the match data!
 
-(defconst singular-extended-prompt-regexp "\\([>.] \\)"
-  "Matches one Singular prompt.
-Should not be anchored neither to start nor to end!")
-
-(defconst singular-string-start-anchored-prompt-regexp
-  (concat "\\`" singular-extended-prompt-regexp "+")
-  "Matches Singular prompt anchored to string start.")
-
-(defconst singular-prompt-sequence-regexp
-  (concat singular-extended-prompt-regexp "*")
-  "Matches an arbitary sequence of Singular prompts.")
-
 (defun singular-strip-white-space (string &optional trailing leading)
   "Strip off trailing or leading white-space from STRING.
 Strips off trailing white-space if optional argument TRAILING is
@@ -295,20 +283,55 @@ non-nil."
 	 (setq end (match-beginning 0)))
     (substring string beg end)))
 
-(defun singular-strip-prompts (string where)
-  "NOT READY!"
-  (cond
-   ((eq where 'trailing) string)
-   ((eq where 'all) string)
-   (t
-    ;; default is to remove leading prompts
-    (if (string-match singular-string-start-anchored-prompt-regexp string)
-	(substring string (match-end 0))
-      string))))
+(defconst singular-extended-prompt-regexp "\\([>.] \\)"
+  "Matches one Singular prompt.
+Should not be anchored neither to start nor to end!")
+
+(defconst singular-strip-leading-prompt-regexp
+  (concat "\\`" singular-extended-prompt-regexp "+")
+  "Matches Singular prompt anchored to string start.")
+
+(defun singular-strip-leading-prompt (string)
+  "Strip leading prompts from STRING.
+May or may not return STRING or a modified copy of it."
+  (if (string-match singular-strip-leading-prompt-regexp string)
+      (substring string (match-end 0))
+    string))
+
+(defconst singular-remove-prompt-regexp
+  (concat "^" singular-extended-prompt-regexp
+	  "*" singular-extended-prompt-regexp)
+  "Matches a non-empty sequence of prompts at start of a line.")
+
+(defun singular-remove-prompt (beg end)
+  "Remove all superfluous prompts from region between BEG and END.
+More precisely, removes prompts from first beginning of line before
+BEG to END.
+Removes all but the last prompt of a seuqnce if that sequence ends at
+END.
+The region between BEG and END should be accessible."
+  (save-excursion
+    (let ((end (copy-marker end))
+	  prompt-end)
+      (goto-char beg)
+      (beginning-of-line)
+      (while (and (setq prompt-end
+			(re-search-forward singular-remove-prompt-regexp end t))
+		  (not (= end prompt-end)))
+	(delete-region (match-beginning 0) prompt-end))
+
+      ;; check for trailing prompt
+      (if prompt-end
+	  (delete-region (match-beginning 0)  (match-beginning 2)))
+      (set-marker end nil))))
+
+(defconst singular-skip-prompt-forward-regexp
+  (concat singular-extended-prompt-regexp "*")
+  "Matches an arbitary sequence of Singular prompts.")
 
 (defun singular-skip-prompt-forward ()
   "Skip forward over prompts."
-  (looking-at singular-prompt-sequence-regexp)
+  (looking-at singular-skip-prompt-forward-regexp)
   (goto-char (match-end 0)))
 ;;}}}
 
@@ -621,9 +644,8 @@ RAW is non-nil."
 		    (buffer-substring (singular-section-start section)
 				      (singular-section-end section)))))
       (if raw string
-	(singular-strip-prompts
-	 (singular-strip-trailing-white-space string t)
-	 'leading)))))
+	(singular-strip-leading-prompt
+	 (singular-strip-white-space string t))))))
 ;;}}}
 
 ;;{{{ Folding sections
@@ -633,17 +655,15 @@ RAW is non-nil."
 (defun singular-fold-internal (start end fold)
   "(Un)fold region from START to END.
 Folds if FOLD is non-nil, otherwise unfolds.
-Folds without affecting undo information, but changes buffer-modified
-flag.
+Folding affects undo information and buffer modified flag.
 Assumes that there is no narrowing in effect."
   (save-excursion
-    (let ((buffer-undo-list t))
-      (if fold
-	  (progn
-	    (goto-char start) (insert ?\r)
-	    (subst-char-in-region start end ?\n ?\r t))
-	(subst-char-in-region start end ?\r ?\n t)
-	(goto-char start) (delete-char 1)))))
+    (if fold
+	(progn
+	  (goto-char start) (insert ?\r)
+	  (subst-char-in-region start end ?\n ?\r t))
+      (subst-char-in-region start end ?\r ?\n t)
+      (goto-char start) (delete-char 1))))
 
 (defun singular-section-foldedp (section)
   "Return t iff SECTION is folded.
@@ -743,11 +763,10 @@ Moves point to end of buffer and widenes the buffer such that the next
 chunk of the demo file becomes visible.
 Finds and removes chunk separators as specified by
 `singular-demo-chunk-regexp'.
-Removing chunk separators works without affecting undo information,
-but may change buffer-modified flag.
+Removing chunk separators affects undo information and buffer-modified
+flag.
 Returns non-nil if there is still demo text to show."
-  (let ((buffer-undo-list t)
-	(old-point-min (point-min)))
+  (let ((old-point-min (point-min)))
     (unwind-protect
 	(progn
 	  (goto-char (point-max))
@@ -1129,6 +1148,7 @@ process buffer is still alive."
   (save-excursion
     (singular-debug 'interactive
 		    (message "Sentinel: %s" (substring message 0 -1)))
+    (singular-demo-mode nil)
     (if (string-match "finished\\|exited" message)
 	(let ((process-buffer (process-buffer process)))
 	  (if (and process-buffer
