@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.30 2000-12-08 12:47:37 Singular Exp $
+// $Id: clapconv.cc,v 1.31 2000-12-08 13:42:08 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -540,7 +540,7 @@ napoly convClapASingA ( const CanonicalForm & f )
     napGetCoeff(t)=convClapNSingAN( i.coeff() );
     if (nacIsZero(napGetCoeff(t)))
     {
-      p_Delete(&t, currRing->algring);
+      napDelete(&t);
     }
     else
     {

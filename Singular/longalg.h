@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.19 2000-12-07 16:25:18 Singular Exp $ */
+/* $Id: longalg.h,v 1.20 2000-12-08 13:42:07 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -38,7 +38,7 @@ extern char **naParNames;
 extern int napMonomSize;
 
 void naSetChar(int p, BOOLEAN complete, ring r);
-#define napAddExp(p,i,e)  ((p)->e[i-1]+=(e))
+#define napAddExp(P,I,E)  ((P)->e[I-1]+=(E))
 #define napLength(p)      (pLength((poly)p))
 #ifdef LDEBUG
 void    naDBDelete (number *p,char *f, int l);
