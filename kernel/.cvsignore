@@ -1,7 +1,8 @@
 Makefile *.dd *.d depend scanner.cc grammar.cc grammar version.h mod2.h
 Singular libparse .gdb_history si_paths.h libparse.cc
-.gdbinit grammar.h *.sv config.log config.status stamp-h
+.gdbinit grammar.h *.sv config.log config.status config.cache stamp-h
 *.soa *.oa
+*.sog *.og
 *.sop *.op
 *.dl_o*
 Singularg*
