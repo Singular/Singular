@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.40 1998-05-08 10:11:50 obachman Exp $ */
+/* $Id: tesths.cc,v 1.41 1998-05-08 12:23:42 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -55,7 +55,7 @@
 #define LON_MP_MODE         "MPmode"
 #endif
 
-#define LONG_OPTION_RETURN -1
+#define LONG_OPTION_RETURN 13
 static struct option longopts[] =
 {
 #ifdef HAVE_MPSR
