@@ -23,7 +23,7 @@
 #define HEAD_BIN
 //#define HOMOGENEOUS_EXAMPLE
 #define REDTAIL_S
-#define PAR_N 20
+#define PAR_N 1
 //#define REDTAIL_PROT
 //#define QUICK_SPOLY_TEST
 //#define DIAGONAL_GOING
@@ -38,6 +38,8 @@ struct sorted_pair_node{
   sorted_pair_node* next;
   int i;
   int j;
+  int deg;
+  int expected_length;
   poly lcm_of_lm;
 };
 
@@ -79,6 +81,7 @@ struct calc_dat
 #ifdef HEAD_BIN
   struct omBin_s*   HeadBin;
 #endif
+  unsigned int reduction_steps;
   int max_misses;
   int found_i;
   int found_j;
@@ -94,11 +97,13 @@ struct calc_dat
   int Rcounter;
   int last_index;
 };
+static poly redNFTail (poly h,const int sl,kStrategy strat, int len);
+static poly redNF2 (poly h,calc_dat* c , int &len);
 static void free_sorted_pair_node(sorted_pair_node* s, ring r);
 static void shorten_tails(calc_dat* c, poly monom);
 static void replace_pair(int & i, int & j, calc_dat* c);
 static void initial_data(calc_dat* c);
-static void add_to_basis(poly h, calc_dat* c);
+static void add_to_basis(poly h, int i, int j,calc_dat* c);
 static void do_this_spoly_stuff(int i,int j,calc_dat* c);
 ideal t_rep_gb(ring r,ideal arg_I);
 static BOOLEAN has_t_rep(const int & arg_i, const int & arg_j, calc_dat* state);
@@ -116,4 +121,5 @@ static void clean_top_of_pair_list(calc_dat* c);
 static BOOLEAN state_is(calc_state state, const int & i, const int & j, calc_dat* c);
 static BOOLEAN pair_better(sorted_pair_node* a,sorted_pair_node* b, calc_dat* c);
 static void sort_pair_in(int i, int j,calc_dat* c);
+static int pair_better_gen(const void* ap,const void* bp);
 #endif
