@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.21 1998-01-17 18:07:54 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.22 1998-01-27 15:13:10 pohl Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -805,7 +805,7 @@ static BOOLEAN jjA_L_LIST(leftv l, leftv r)
 {
   int sl = r->listLength();
   lists L=(lists)Alloc(sizeof(slists));
-  leftv h=NULL,or=r;
+  leftv h=NULL,o_r=r;
   int i;
   int rt;
 
@@ -840,7 +840,7 @@ static BOOLEAN jjA_L_LIST(leftv l, leftv r)
   IDLIST((idhdl)l->data)->Clean();
   IDLIST((idhdl)l->data)=L;
   ipMoveId((idhdl)l->data);
-  or->CleanUp();
+  o_r->CleanUp();
   return FALSE;
 }
 static BOOLEAN jiA_L_LIST(leftv l, leftv r)
@@ -989,7 +989,7 @@ static BOOLEAN jiA_MATRIX_L(leftv l,leftv r)
   matrix m=(matrix)r->CopyD(MATRIX_CMD);
   leftv h;
   leftv ol=l;
-  leftv or=r;
+  leftv o_r=r;
   sleftv t;
   memset(&t,0,sizeof(sleftv));
   t.rtyp=POLY_CMD;
@@ -1044,7 +1044,7 @@ static BOOLEAN jiA_MATRIX_L(leftv l,leftv r)
     }
   }
 ende:
-  or->CleanUp();
+  o_r->CleanUp();
   ol->CleanUp();
   return nok;
 }
