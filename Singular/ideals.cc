@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.94 2000-05-09 14:34:11 Singular Exp $ */
+/* $Id: ideals.cc,v 1.95 2000-05-24 14:32:37 siebert Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1761,14 +1761,13 @@ ideal   idLift (ideal mod, ideal submod,ideal * rest, BOOLEAN goodShape,
   {
     *unit=mpNew(comps_to_add,comps_to_add);
     int i;
-    int comps=k+comps_to_add;
     for(i=0;i<IDELEMS(s_result);i++)
     {
       poly p=s_result->m[i];
       poly q=NULL;
       while(p!=NULL)
       {
-        if(pGetComp(p)<comps)
+        if(pGetComp(p)<=comps_to_add)
         {
           pSetComp(p,0);
           if (q!=NULL)
