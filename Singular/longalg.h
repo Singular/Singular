@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.25 2001-01-09 15:40:10 Singular Exp $ */
+/* $Id: longalg.h,v 1.26 2001-01-20 11:39:14 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -14,34 +14,42 @@
 struct slnumber;
 typedef struct slnumber * lnumber;
 
+#ifndef LONGALGNEW
 //make parameter type same as exponent type
 #define PARAMETER_TYPE short
 #define SIZEOF_PARAMETER SIZEOF_SHORT
 
 struct reca
 {
-  alg ne;
+  napoly ne;
   number ko;
   PARAMETER_TYPE e[1];
 };
+#endif /* not LONGALGNEW */
 
 struct slnumber
 {
-  alg z;
-  alg n;
+  napoly z;
+  napoly n;
   BOOLEAN s;
 };
 
 extern int naNumbOfPar;             /* maximal number of parameters */
-extern alg naMinimalPoly;
+extern napoly naMinimalPoly;
+#ifndef LONGALGNEW
 extern char **naParNames;
 extern int napMonomSize;
+#endif /* LONGALGNEW */
 
 void naSetChar(int p, ring r);
+#ifndef LONGALGNEW
 #define napAddExp(P,I,E)  ((P)->e[I-1]+=(E))
-#define napLength(p)      (pLength((poly)p))
+#define napLength(p)      pLength((poly)p)
 napoly napNeg(napoly a);
 void    naDelete (number *p, ring r);
+#else /* LONGALGNEW */
+void    naDelete (number *p, const ring r);
+#endif /* LONGALGNEW */
 number  naInit(int i);                              /* z := i */
 number  naPar(int i);                               /* z := par(i) */
 int     naParDeg(number n);                         /* i := deg(n) */
@@ -67,8 +75,8 @@ number  naIntDiv(number la, number li);            /* lo := la/li */
 //number  naIntMod(number la, number li);            /* lo := la/li */
 number  naSub(number la, number li);               /* lu := la-li */
 void    naNormalize(number &p);
-number  naGcd(number a, number b, ring r);
-number  naLcm(number a, number b, ring r);
+number  naGcd(number a, number b, const ring r);
+number  naLcm(number a, number b, const ring r);
 char *  naRead(char * s, number * p);
 void    naWrite(number &p);
 char *  naName(number n);
@@ -80,10 +88,13 @@ BOOLEAN naDBTest(number a, char *f,int l);
 void    naSetIdeal(ideal I);
 
 // external access to the interna
-#define RECA_SIZE (sizeof(alg)+sizeof(number))
-alg napAdd(alg p1, alg p2);
-void napDelete(alg *p);
+#ifndef LONGALGNEW
+#define RECA_SIZE (sizeof(napoly)+sizeof(number))
+napoly napAdd(napoly p1, napoly p2);
+void napDelete(napoly *p);
+#endif /* not LONGALGNEW */
 poly naPermNumber(number z, int * par_perm, int P, ring r);
+#ifndef LONGALGNEW
 #define napVariables naNumbOfPar
 #define napNext(p) (p->ne)
 #define napIter(p) ((p) = (p)->ne)
@@ -91,15 +102,33 @@ poly naPermNumber(number z, int * par_perm, int P, ring r);
 #define napGetExp(p,i) ((p)->e[(i)-1])
 #define napGetExpFrom(p,i,r) ((p)->e[(i)-1])
 #define napSetExp(p,i,ee) ((p)->e[(i)-1]=ee)
-#define napNew() ((alg)omAlloc0(napMonomSize))
+#define napNew() ((napoly)omAlloc0(napMonomSize))
 #define nanumber lnumber
 #define naGetNom0(na)  (((nanumber)(na))->z)
 #define naGetDenom0(na)  (((nanumber)(na))->n)
+#else /* LONGALGNEW */
+#define napAddExp(p,i,e)       (p_AddExp(p,i,e,currRing->algring))
+#define napLength(p)           pLength(p)
+#define napNeg(p)              (p_Neg(p,currRing->algring))
+#define napVariables           naNumbOfPar
+#define napNext(p)             pNext(p)
+#define napIter(p)             pIter(p)
+#define napGetCoeff(p)         pGetCoeff(p)
+#define napGetExp(p,i)         (p_GetExp(p,i,currRing->algring))
+#define napGetExpFrom(p,i,r)   (p_GetExp(p,i,r->algring))
+#define napSetExp(p,i,e)       (p_SetExp(p,i,e,currRing->algring))
+#define napDelete(p)           p_Delete(p, currRing->algring)
+#define napNew()               (p_Init(currRing->algring))
+#define napAdd(p1,p2)          (p_Add_q(p1,p2,currRing->algring))
+#define nanumber               lnumber
+#define naGetNom0(na)          (((nanumber)(na))->z)
+#define naGetDenom0(na)        (((nanumber)(na))->n)
+#endif /* LONGALGNEW */
 extern number   (*nacCopy)(number a);
 extern BOOLEAN  (*nacIsZero)(number a);
 extern number   (*nacInit)(int i);
 extern void     (*nacNormalize)(number &a);
-extern void napWrite(alg l);
+extern void napWrite(napoly l);
 extern number   naGetDenom(number &n);
 #endif
 

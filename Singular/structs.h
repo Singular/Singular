@@ -3,11 +3,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.53 2001-01-09 15:40:13 Singular Exp $ */
+/* $Id: structs.h,v 1.54 2001-01-20 11:41:48 Singular Exp $ */
 /*
 * ABSTRACT
 */
-
+//#define LONGALGNEW
 /* standard types */
 typedef unsigned char  uchar ;
 typedef unsigned short CARDINAL;
@@ -140,10 +140,9 @@ typedef union uutypes      utypes;
 typedef ip_command *       command;
 typedef struct s_si_link_extension *si_link_extension;
 #ifndef LONGALGNEW
-typedef struct reca *      alg;
-#define napoly             alg
+typedef struct reca *      napoly;
 #else /* LONGALGNEW */
-#define napoly             poly
+typedef struct polyrec *   napoly;
 #endif /* LONGALGNEW */
 
 #ifdef __cplusplus
@@ -176,11 +175,7 @@ struct sindlist
 struct snaIdeal
 {
   int anz;
-#ifndef LONGALGNEW
-  alg *liste;
-#else /* LONGALGNEW */
-  poly *liste;
-#endif /* LONGALGNEW */
+  napoly *liste;
 };
 typedef struct snaIdeal * naIdeal;
 
@@ -251,9 +246,9 @@ struct n_Procs_s
            (*nGreaterZero)(number a);
    void    (*nPower)(number a, int i, number * result);
    number  (*nGetDenom)(number &n);
-   number  (*nGcd)(number a, number b, ring r);
-   number  (*nLcm)(number a, number b, ring r);
-   void    (*cfDelete)(number * a, ring r);
+   number  (*nGcd)(number a, number b, const ring r);
+   number  (*nLcm)(number a, number b, const ring r);
+   void    (*cfDelete)(number * a, const ring r);
    nMapFunc (*nSetMap)(ring src, ring dst);
    char *  (*nName)(number n);
 //extern number  (*nMap)(number from);
