@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.26 1998-06-04 13:36:23 wichmann Exp $
+@comment $Id: start.doc,v 1.27 1998-06-05 08:22:55 wichmann Exp $
 @comment this file contains the "Introduction" chapter.
 @c * wichmann: + added chages by GMG.
 
@@ -179,29 +179,39 @@ adopted:
 @item 
 text in @code{typewriter} denotes @sc{Singular} input and output as well 
 as reserved names:
+
 @itemize @asis
 @item The basering can be set using the command @code{setring}.
 @end itemize
+
 @item
 the arrow @expansion{} denotes @sc{Singular} output:
+
 @itemize @asis
 @item @code{poly p=x+y+z;}
 @item @code{p*p;}
 @item @code{@expansion{} x2+2xy+y2+2xz+2yz+z2}
 @end itemize
+
 @item
 square brackets are used to denote parts of syntax descriptions which
 are optional: 
+
 @itemize @asis
 [optional_text] required_text
 @end itemize
+
 @item 
-keys are denoted using typewriter: 
+keys are denoted using typewriter, for example: 
+
 @itemize @asis
-@item @code{N}
-@item @code{RETURN}
-@item @code{CTRL-P} (press control key together with the key @code{P})
+@item @code{N} (press the key @code{N} to get to the next node in help
+mode) 
+@item @code{RETURN} (press @code{RETURN} to finish an input line)
+@item @code{CTRL-P} (press control key together with the key @code{P} to 
+get the previous input line)
 @end itemize
+
 @end itemize
 
 @c ------------------------------------------------------------------
@@ -415,6 +425,7 @@ transcendental extension of @math{Q} by @math{a}, variable names
 Typing the name of a ring prints its definition. The example below
 shows, that the default ring in @sc{Singular} is @math{Z/32003[x,y,z]}
 with degree reverse lexicographical ordering:
+
 @example
 @c example
 ring r5;
@@ -433,6 +444,7 @@ be done using the function @code{setring}:
 @example
 setring r;
 @end example
+
 Once a ring is active, we can define polynomials. A monomial, say
 @tex
 $x^3$
@@ -443,7 +455,9 @@ x^3
 may be entered in two ways: either using the power operator @code{^},
 saying @code{x^3}, or in short-hand notation without operator, saying
 @code{x3}. Note, that the short-hand notation is forbidden if the name
-of the ring variable consists of more than one character.
+of the ring variable consists of more than one character. Note, that
+@sc{Singular} always expands brackets and automatically sorts the terms
+with respect to the monomial ordering of the basering.
 
 @example
 poly f =  x3+y3+(x-y)*x2y2+z2;
@@ -452,11 +466,9 @@ f;
 @expansion{} x3y2-x2y3+x3+y3+z2
 @end example
 
-@noindent Note, that @sc{Singular} always expands brackets etc.@: and
-automatically sorts the terms with respect to the monomial ordering of
-the basering. The command @code{size} determines in general the number
-of ''single entries`` in an object. In particular, for polynomials,
-@code{size} determines the number of monomials.
+The command @code{size} determines in general the number of ''single
+entries`` in an object. In particular, for polynomials, @code{size}
+determines the number of monomials.
 
 @example
 size(f);
@@ -496,6 +508,12 @@ reduce(g,sI);
 
 @noindent As the result is @code{0} the polynomial @code{f} belongs to the
 ideal defined by @code{g}.
+
+The function @code{groebner}, like many other functions in
+@sc{Singular}, prints a protocol during calculation, if you want so. The
+command @code{option(prot);} enables protocoling whereas
+@code{option(noprot);} turns it off. @ref{option}, explains the meaning
+of the different symbols printed during calculation.
 
 The command @code{kbase} calculates a basis of the polynomial ring
 modulo an ideal. As an example we calculate the Milnor number of a
@@ -597,9 +615,9 @@ proc Milnor(poly h)
 Note: if you have entered the first line of the procedure and pressed
 @code{RETURN}, @sc{Singular} prints the prompt @code{.} (dot) instead of
 the usual prompt @code{>} . This shows, that the input is incomplete and
-@sc{Singular} expects more lines. After typing the closing bracket,
-@sc{Singular} prints the usual prompt indicating that the input is now
-complete.
+@sc{Singular} expects more lines. After typing the closing curly
+bracket, @sc{Singular} prints the usual prompt indicating that the input
+is now complete.
 
 @noindent Then call the procedure:
 
@@ -698,7 +716,7 @@ the polynomial ring at the origin (@pxref{Polynomial data} and
 @ref{Mathematical background}).
 
 @example
-ring r2 = 0,(x,y,z),ds;
+ring rl = 0,(x,y,z),ds;
 @end example
 
 This ordering determines the standard basis which will be calculated.
@@ -714,7 +732,7 @@ f;
 @noindent Instead of @code{fetch} we can use the function @code{imap}
 which is more general but less efficient. The most general way to fetch
 data from one ring to another is to use maps, this will be explained in
-@ref{Data types}.
+@ref{map}.
 
 Here the terms are ordered by increasing exponents. The local Milnor
 number is now
@@ -736,7 +754,12 @@ Using global and local orderings as above is a convenient way to check
 wether a variety has outside the origin a singularity or not.
 
 The command @code{jacob} applied twice gives the Hessian of @code{f} a
-@code{3x3} matrix.
+@tex
+$3\times3$-matrix.
+@end tex
+@ifinfo
+3 x 3 - matrix.
+@end ifinfo
 
 @example
 matrix H = jacob(jacob(f));
@@ -796,7 +819,7 @@ This shows that 1 is contained in the ideal of the
 $1\times1$-minors,
 @end tex
 @ifinfo
-1x1-minors,
+1 x 1 - minors,
 @end ifinfo
 hence the variety is empty.
 @c Coming back to some mathematical considerations, we study the problem how
@@ -925,8 +948,8 @@ The corresponding commands in @sc{Singular} are first the command
 standard basis method up to the length @math{n}, where @math{n=0} means
 the full resolution.
 
-Here we mention that @sc{Singular} gives the possibility to inspect its
-calculation process. This can be enabled with the @code{option} command.
+Here we use the possibility to inspect the calculation process using the
+option @code{prot}. 
 
 @example
 ring rr;      // the default ring in char 32003
@@ -943,7 +966,7 @@ resolution rs = mres(I,0);
 @expansion{} product criterion:0 chain criterion:8
 @expansion{} (6)(5).(4).(3)..(2)..(1).[1]
 @expansion{} (7)(6)(5)(4).(3)(2).(1)[2]
-@expansion{}  // ....
+@expansion{}  // .... rest of protocol omitted here
 @end example
 
 @noindent Disable this protocol with
