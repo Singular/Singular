@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.229 2000-10-26 11:58:35 Singular Exp $ */
+/* $Id: iparith.cc,v 1.230 2000-11-14 16:08:25 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2887,11 +2887,6 @@ static BOOLEAN jjKBASE(leftv res, leftv v)
   res->data = (char *)scKBase(-1,(ideal)(v->Data()),currQuotient);
   return FALSE;
 }
-static BOOLEAN jjKLAMMER_LIB(leftv res, leftv u)
-{
-  char * s=(char *)u->Data();
-  return iiLibCmd(s);
-}
 #ifdef MDEBUG
 static BOOLEAN jjpHead(leftv res, leftv v)
 {
@@ -3552,7 +3547,7 @@ struct sValCmd1 dArith1[]=
 ,{jjUMINUS_IV,  '-',             INTVEC_CMD,     INTVEC_CMD }
 ,{jjUMINUS_IV,  '-',             INTMAT_CMD,     INTMAT_CMD }
 ,{jjPROC1,      '(',             ANY_TYPE/*set by p*/,PROC_CMD }
-,{jjKLAMMER_LIB,'(',             NONE,           STRING_CMD }
+,{jjLIB,        '(',             NONE,           STRING_CMD }
 // and the procedures with 1 argument:
 ,{atATTRIB1,    ATTRIB_CMD,      NONE,           DEF_CMD }
 ,{jjBAREISS_IM, BAREISS_CMD,     INTMAT_CMD,     INTMAT_CMD }

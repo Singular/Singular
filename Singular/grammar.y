@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.85 2000-11-10 15:00:02 Singular Exp $ */
+/* $Id: grammar.y,v 1.86 2000-11-14 16:08:23 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -52,7 +52,7 @@
 #include "libparse.h"
 
 /* From the bison docu:
-   
+
      By defining the macro `YYMAXDEPTH', you can control how deep the
 parser stack can become before a stack overflow occurs.  Define the
 macro with a value that is an integer.  This value is the maximum number
@@ -69,7 +69,7 @@ to save space for ordinary inputs that do not need much stack.
    The default value of `YYMAXDEPTH', if you do not define it, is 10000.
 */
 #define YYMAXDEPTH INT_MAX
-    
+
 extern int   yylineno;
 extern FILE* yyin;
 
@@ -1039,7 +1039,7 @@ cmdeq:  '='
 filecmd:
         '<' stringexpr
           { if ($<i>1 != '<') YYERROR;
-	    if((feFilePending=feFopen($2,"r",NULL,TRUE))==NULL) YYERROR; }
+            if((feFilePending=feFopen($2,"r",NULL,TRUE))==NULL) YYERROR; }
         ';'
           { newFile($2,feFilePending); }
         ;
@@ -1370,12 +1370,9 @@ ringcmd:
         ;
 
 scriptcmd:
-         SYSVAR elemexpr
+         SYSVAR stringexpr
           {
-	    sleftv dummy;
-            if (($1!=LIB_CMD)
-	    ||(iiExprArith1(&dummy,&$2,LIB_CMD)))
-	      YYERROR;
+            if (($1!=LIB_CMD)||(iiLibCmd($2))) YYERROR;
           }
         ;
 
