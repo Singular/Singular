@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.40 1999-07-01 12:48:01 obachman Exp $
+@comment $Id: examples.doc,v 1.41 1999-07-07 13:57:47 Singular Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -154,6 +154,9 @@ ordering (look at the manual to get information about the possible
 monomial orderings in @sc{Singular}, or type @code{help Monomial orderings;}
 to get a menu of possible orderings. For further help type e.g.
 @code{help local orderings;}).
+@ifset singularmanual
+See @ref{Monomial orderings}.
+@end ifset
 
 We shall show in the example below how to realize the following:
 @itemize @bullet
@@ -310,7 +313,7 @@ milrina(f)[2];  // the second element of the list
 @section Critical points
 @cindex Critical points
 
-The same computation which computes the Milnor resp. the Tjurina
+The same computation which computes the Milnor, resp. the Tjurina,
 number, but with ordering dp instead of ds (i.e., in
 @tex
 $K[x_1,\ldots,x_n]$
@@ -421,7 +424,7 @@ the affine surface f=0 is smooth outside the origin.
 
 Since in the example above, the ideal j+(f) has the same vdim
 in the polynomial ring and in the localization at 0 (each 195),
-f=0 is smooth outside 0!
+f=0 is smooth outside 0.
 Hence j+(f) contains some power of the maximal ideal m. We shall
 check this in a different manner:
 For any two ideals i, j in the basering R let
@@ -548,20 +551,20 @@ poly p=-(1/12103947791971846719838321886393392913750065060875)*j[2];
 ring R1=real,(x,y),lp;
 poly p=imap(R0,p);
 p;
-@expansion{} -xy8
-@expansion{} +2.366e-02y38
-@expansion{} +2.640e-01y37
-@expansion{} -4.745e-06y36
-@expansion{} -1.370e-04y35
-@expansion{} -1.760e-03y34
-@expansion{} -1.505e-01y33
-@expansion{} +3.884e-07y32
-@expansion{} +1.117e-05y31
-@expansion{} +3.200e-04y30
-@expansion{} -1.095e-01y29
-@expansion{} -1.320e+00y28
-@expansion{} +2.170e-05y27
-@expansion{} +6.267e-04y26
+@expansion{} xy8
+@expansion{} -2.366e-02y38
+@expansion{} -2.640e-01y37
+@expansion{} +4.745e-06y36
+@expansion{} +1.370e-04y35
+@expansion{} +1.760e-03y34
+@expansion{} +1.505e-01y33
+@expansion{} -3.884e-07y32
+@expansion{} -1.117e-05y31
+@expansion{} -3.200e-04y30
+@expansion{} +1.095e-01y29
+@expansion{} +1.320e+00y28
+@expansion{} -2.170e-05y27
+@expansion{} -6.267e-04y26
 @expansion{} +7.170e-03y25
 @expansion{} +4.582e-01y24
 @expansion{} +1.576e-06y23
@@ -667,12 +670,12 @@ j_0=j_t=a
 @cindex T2
 
 T1 resp. T2 of an ideal j do usually denote the vector spaces of
-infinitesimally deformations resp. of obstructions.
+infinitesimal deformations resp. of obstructions.
 In @sc{Singular} there are procedures @code{T1} and @code{T2} in
-@code{sing.lib} to compute this.
+@code{sing.lib} such that
 @code{T1(j)} and @code{T2(j)} compute a standard basis of
 a presentation of these modules.
-A basis of the vectorspaces T1 resp. T2 is computed by applying @code{kbase}:
+A basis of the vectorspaces T1 resp. T2 is computed by applying
 @code{kbase(T1(j));} resp. @code{kbase(T2(j));}, the dimensions by
 applying @code{vdim}.
 For a complete intersection j the procedure @code{Tjurina} also
@@ -795,9 +798,9 @@ L[4];                 // vdim of T2
 
 @itemize @bullet
 @item
-The libraries @code{sing.lib} resp. @code{deform.lib} contain procedures
+The libraries @code{sing.lib}, resp. @code{deform.lib}, contain procedures
 to compute the miniversal (= semiuniversal deformation) of an
-isolated complete intersection singularity resp. arbitrary isolated
+isolated complete intersection singularity, resp. arbitrary isolated
 singularity.
 @item
 The procedure @code{deform} in @code{sing.lib} returns a matrix whose columns
@@ -1272,8 +1275,8 @@ $P^4$
 P^4
 @end ifinfo
 from above.
-Finally we demonstrate the use of the type resolution in connection with
-the lres command.
+Finally we demonstrate the use of the type @code{resolution} in connection with
+the @code{lres} command.
 
 @example
 @c example
@@ -1949,7 +1952,7 @@ positive characteristic" SLN 813, 1980.  This algorithm has the
 advantage that it needs least possible field extensions and, moreover,
 works in any characteristic. This fact can be used to compute the
 invariants over a field of finite characteristic, say 32003, which will
-then be most probably be the same in characteristic 0.
+then most probably be the same in characteristic 0.
 
 We compute the Hamburger-Noether expansion of some plane curve
 singularities given by a polynomial @math{f} in two variables. This is a
@@ -1959,13 +1962,13 @@ and all numerical invariants like
 @item
     characteristic exponents
 @item
-    puiseux pairs (of a complex model)
+    Puiseux pairs (of a complex model)
 @item
     degree of the conductor
 @item
     delta invariant
 @item
-    generators of semigroup
+    generators of the semigroup
 @end itemize
 Besides this, the library contains procedures to compute the Newton
 polygon of @math{f}, the squarefree part of @math{f} and a procedure to
@@ -2406,19 +2409,19 @@ and @code{stdhilb} about 10 times faster than std.
 In this example, we demonstrate how MPtcp links can be used to
 parallelize computations.
 
-To compute a standard base for a zero-dimensional ideal in the
+To compute a standard basis for a zero-dimensional ideal in the
 lexicographical ordering, one of the two powerful routines
 @code{stdhilb}
 @ifset singularmanual
-(see @ref{stdhilb})s
+(see @ref{stdhilb})
 @end ifset
 and @code{stdfglm}
 @ifset singularmanual
 (see @ref{stdfglm})
 @end ifset
 should be used. However, one can not a priory predict
-which one the two commands is faster. This very much depends on the
-(input) example. Therefore, we use MPtcp links to let the two commands
+which one of the two commands is faster. This very much depends on the
+(input) example. Therefore, we use MPtcp links to let both commands
 work on the problem independently and in parallel, so that the one which
 finishes first delivers the result.
 
@@ -2473,15 +2476,15 @@ involved (as it usually is with forked processes).
 Unfortunately, MPtcp links do not offer means to (asynchronously)
 interrupt or kill an attached (i.e., launched or forked)
 process. Therefore, we explicitely need to get the process id numbers of
-the competing @sc{Singular} processes, so that we can later "kill" the
-looser.
+the competing @sc{Singular} processes, so that we can "kill" the
+looser later.
 
 @item
 Notice how quoting is used in order to prevent local evaluation
 (i.e., local computation of results). Since we "forked" the two
 competing processes, the identifier @code{i} is defined and has
-identical values in the two child processes. Therefore, the innermost
-@code{eval} can be ommited (as is done for the @code{l_hilb} link),
+identical values in both child processes. Therefore, the innermost
+@code{eval} can be omited (as is done for the @code{l_hilb} link),
 and only the identifier @code{i} needs to be communicated to the
 children. However, when @code{MPtcp:launch} links are used, the inner
 evaluation must be applied so that actual values, and not the
@@ -2489,12 +2492,12 @@ identifiers are communicated (as is done for the @code{l_fglm} link).
 
 @item
 We go into a "sleepy" loop and wait until one of the two children
-finished the computation. That is, the current process checks appr. once
-a per second the status of one of the connecting links, and sleeps
+finished the computation. That is, the current process checks approximatly
+once per second the status of one of the connecting links, and sleeps
 (i.e., suspends its execution) in the intermediate time.
 
 @item
-The child which won delivers the result and is terminated with the usual
+The child which has won delivers the result and is terminated with the usual
 @code{close} command. The other child which is still computing needs to
 be terminated by an explicit (i.e., system) kill command, since it can
 not be terminated through the link while it is still computing.
