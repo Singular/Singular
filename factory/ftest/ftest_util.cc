@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_util.cc,v 1.13 1997-11-21 11:37:21 schmidt Exp $ */
+/* $Id: ftest_util.cc,v 1.14 1997-11-21 14:07:22 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -16,6 +16,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <iostream.h>
+#include <fstream.h>
 
 // we include timing.h for calculation of HZ only
 #define TIMING
@@ -23,17 +24,12 @@
 
 #include <factory.h>
 
+// we include `cf_switches.h' for the maximum number of switches
+// and hope that we will not get any conflicts
+#include <cf_switches.h>
+
 #include "ftest_util.h"
 #include "ftest_io.h"
-
-//{{{ const int CFSwitchesMax
-//{{{ docu
-//
-// const CFSwitchesMax - maximum number of switches.
-//
-//}}}
-const int CFSwitchesMax = 10;
-//}}}
 
 //{{{ struct varSpecT
 struct varSpecT
@@ -85,6 +81,7 @@ int ftestCircle = 1;
 int ftestAlarm = 0;
 
 int ftestCheckFlag = 1;
+
 int ftestPrintFlag = 0;
 int ftestPrintResultFlag = 0;
 //}}}
@@ -114,7 +111,6 @@ int ftestPrintResultFlag = 0;
 static int ftestPrintTimingFlag = 0;
 static int ftestPrintCheckFlag = 0;
 static int ftestPrintEnvFlag = 0;
-static int ftestPrintShortFlag = 0;
 
 const char * ftestExecName = 0;
 const char * ftestAlgorithmName = 0;
@@ -248,16 +244,8 @@ ftestParseRandom ( const char * tokenString )
 	    ftestSeedFile[nameLen] = '\0';
 
 	    // open file, read seed, close file
-	    FILE * seedFile = fopen( ftestSeedFile, "r" );
-	    if ( seedFile ) {
-		// if file exists, read seed
-		if ( fscanf( seedFile, "%d", &seed ) != 1 )
-		    ftestError( FileError,
-				"garbled seed in seed file `%s'\n", ftestSeedFile );
-		fclose( seedFile );
-
-		seedSet = true;
-	    } else
+	    ifstream seedStream( ftestSeedFile );
+	    if ( ! seedStream ) {
 		if ( errno != ENOENT )
 		    ftestError( FileError,
 				"failed to open `%s' for reading: %s\n", ftestSeedFile,
@@ -268,6 +256,15 @@ ftestParseRandom ( const char * tokenString )
 		    seed = 0;
 		    seedSet = true;
 		}
+	    } else {
+		// if file exists, read seed
+		seedStream >> seed;
+		if ( ! seedStream )
+		    ftestError( FileError,
+				"garbled seed in seed file `%s'\n", ftestSeedFile );
+
+		seedSet = true;
+	    }
 	} else
 	    ftestError( EnvSyntaxError,
 			"bad random specification `%s'\n", tokenString );
@@ -534,7 +531,6 @@ ftestParseOutputType ( const char * outputType )
 	case 't': ftestPrintTimingFlag = 1; break;
 	case 'c': ftestPrintCheckFlag = 1; break;
 	case 'e': ftestPrintEnvFlag = 1; break;
-	case 's': ftestPrintShortFlag = 1; break;
 	case 'a':
 	    ftestPrintResultFlag = 1;
 	    ftestPrintCheckFlag = 1;
@@ -631,15 +627,13 @@ ftestError ( const ftestErrorT errno, const char * format ... )
 	return;
     case TimeoutError:
 	if ( ftestPrintTimingFlag )
-	    ftestPrint( "time  : > %.2f\n", "> %.2f\n", (float)ftestAlarm );
+	    cout << "Time:\t\t> " << (float)ftestAlarm << endl;
 	if ( ftestPrintCheckFlag )
-	    ftestPrint( "check : TmeOut\n", "TmeOut\n" );
+	    cout << "Check:\t\tTime Out" << endl;
 	break;
     default:
-	if ( ftestPrintTimingFlag )
-	    ftestPrint( "time  : -0.00\n", "-0.00\n" );
 	if ( ftestPrintCheckFlag )
-	    ftestPrint( "check : Sig.%0.2d\n", "Sig.%0.2d\n", (int)errno-(int)SignalError );
+	    cout << "Check:\t\tReceived Signal " << (int)errno-(int)SignalError << endl;
     }
     exit( errno );
 }
@@ -667,30 +661,6 @@ Factory Test Environment, call `feval -?' (exactly in this way).
 " << endl;
     else
 	cerr << additionalUsage << endl;
-}
-//}}}
-
-//{{{ void ftestPrint ( const char * longFormat, const char * shortFormat ... )
-//{{{ docu
-//
-// ftestPrint() - print according to `ftestPrintShortFlag'.
-//
-// If variable ftestPrintShortFlag is set, use shortFormat as
-// format, otherwise longFormat.
-//
-//}}}
-void
-ftestPrint ( const char * longFormat, const char * shortFormat ... )
-{
-    va_list ap;
-    va_start( ap, shortFormat );
-
-    if ( ! ftestPrintShortFlag && longFormat )
-	vprintf( longFormat, ap );
-    else if ( ftestPrintShortFlag && shortFormat )
-	vprintf( shortFormat, ap );
-
-    va_end( ap );
 }
 //}}}
 
@@ -843,13 +813,12 @@ void
 ftestWriteSeed ()
 {
     if ( ftestSeedFile ) {
-	FILE * seedFile = fopen( ftestSeedFile, "w" );
-	if ( ! seedFile )
+	ofstream seedStream( ftestSeedFile );
+	if ( ! seedStream )
 	    ftestError( FileError,
 			"failed to open `%s' for writing: %s\n", ftestSeedFile,
 			strerror( errno ) );
-	fprintf( seedFile, "%d\n", factoryrandom( 0 ) );
-	fclose( seedFile );
+	seedStream << factoryrandom( 0 ) << endl;
     }
 }
 //}}}
@@ -864,7 +833,7 @@ void
 ftestPrintTimer ( const long timer )
 {
     if ( ftestPrintTimingFlag )
-	ftestPrint( "time  : %.2f\n", "%.2f\n", (float)timer / HZ );
+	cout << "Time:\t\t" << (float)timer / HZ << endl;
 }
 //}}}
 
@@ -883,11 +852,11 @@ ftestPrintCheck ( const ftestStatusT check )
 	switch (check) {
 	case Passed: checkStr = "Passed"; break;
 	case Failed: checkStr = "Failed"; break;
-	case UndefinedResult: checkStr = "Undef."; break;
+	case UndefinedResult: checkStr = "Undefined"; break;
 	default: checkStr = "Error!";
 	}
 
-	ftestPrint( "check : %s\n", "%s\n", checkStr );
+	cout << "Check:\t\t" << checkStr << endl;
     }
 }
 //}}}
@@ -906,59 +875,58 @@ ftestPrintEnv ()
     if ( ftestPrintEnvFlag ) {
 	// characteristic
 	if ( ftestEnv.extDegree )
-	    ftestPrint( "char  : %d^%d(%c)\n",
-			"%d^%d(%c)\n",
-			ftestEnv.characteristic, ftestEnv.extDegree, ftestEnv.extGen );
+	    cout << "Characteristic:\t" << ftestEnv.characteristic
+		 << '^' << ftestEnv.extDegree
+		 << '(' << ftestEnv.extGen << ')' << endl;
 	else
-	    ftestPrint( "char  : %d\n", "%d\n", ftestEnv.characteristic );
+	    cout << "Characteristic:\t" << ftestEnv.characteristic << endl;
 
 	// switches
 	bool switchSet = false;
-	ftestPrint( "switch: ", (char *)0 );
+	cout << "Switches:\t";
 	for ( int i = 0; i < CFSwitchesMax; i++ )
 	    if ( ftestEnv.switches[i] ) {
 		switchSet = true;
-		printf( "%s ", ftestSwitchNames[i] );
+		cout << ftestSwitchNames[i] << ' ';
 	    }
 	if ( ! switchSet )
-	    printf( "(not set)\n" );
+	    cout << "(not set)" << endl;
 	else
-	    printf( "\n" );
+	    cout << endl;
 
 	// variables
 	varSpecT * varSpec = ftestEnv.varSpec;
-	ftestPrint( "vars  : ", (char *)0 );
+	cout << "Variables:\t";
 	if ( ! varSpec )
-	    printf( "(not specified)" );
-	else
+	    cout << "(not specified)" << endl;
+	else {
 	    while ( varSpec ) {
 		if ( varSpec->mipo.isZero() )
-		    printf( "%c(%d) ",
-			    varSpec->variable,
-			    Variable( varSpec->variable ).level() );
+		    cout << varSpec->variable
+			 << "(" << Variable( varSpec->variable ).level() << ") ";
 		else {
-		    printf( "%c(%d)",
-			    varSpec->variable,
-			    Variable( varSpec->variable ).level() );
-		    cout << "(" << varSpec->mipo << ") ";
+		    cout << varSpec->variable
+			 << "(" << Variable( varSpec->variable ).level()
+			 << ", " << varSpec->mipo << ") ";
 		}
 		varSpec = varSpec->next;
 	    }
-	printf( "\n" );
+	    cout << endl;
+	}
 
 	// number of repetitions
-	ftestPrint( "circle: %d\n", "%d\n", ftestCircle );
+	cout << "Circles:\t" << ftestCircle << endl;
 
 	// random generator seed
 	if ( ftestEnv.seedSet )
-	    ftestPrint( "seed  : %d\n", "%d\n", ftestEnv.seed );
+	    cout << "Seed:\t\t" << ftestEnv.seed << endl;
 	else
-	    ftestPrint( "seed  : (not set)\n", "(not set)\n" );
+	    cout << "Seed:\t\t(not set)" << endl;
 
 	// factory version
 	const char * version;
 	version = strchr( factoryVersion, '=' )+2;
-	ftestPrint( "vers  : %s\n", "%s\n", version );
+	cout << "Version:\t" << version << endl;
     }
 }
 //}}}
