@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.34 2000-11-08 17:07:13 obachman Exp $
+# $Id: regress.cmd,v 1.35 2000-12-05 14:26:27 obachman Exp $
 # FILE:    regress.cmd
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -19,7 +19,7 @@ regress.cmd    -- regress test of Singular
   [-s <Singular>]   -- use <Singular> as executable to test
   [-h]              -- print out help and exit
   [-k]              -- keep all intermediate files
-  [-v num]          -- set verbosity to num (used range 0..3, default: 1)
+  [-v num]          -- set verbosity to num (used range 0..4, default: 2)
   [-g]              -- generate result (*.res.gz.uu) files, only
   [-r [crit%[val]]] -- report if status differences [of crit] > val (in %)
   [-c regexp]       -- when comparing results, version must match this regexp
@@ -28,6 +28,7 @@ regress.cmd    -- regress test of Singular
   [-m]              -- add status result for current version to result file
   [-t]              -- compute and call system("mtrack", 1) at the end, no diffs
   [-tt max]         -- compute and call system("mtrack", max) at the end
+  [-T]              -- simply compute and determine timmings, no diffs
   [file.lst]        -- read tst files from file.lst
   [file.tst]        -- test Singular script file.tst
 _EOM_
@@ -57,7 +58,7 @@ sub mysystem
 
   $call =~ s/"/\\"/g;
   $call = "$sh -c \"$call\"";
-  print "$call\n" if ($verbosity > 1);
+  print "$call\n" if ($verbosity > 2);
   return (system $call);
 }
 
@@ -104,7 +105,7 @@ $| = 1;
 #
 $singularOptions = "--ticks-per-sec=100 -teqr12345678 --no-rc";
 $keep = "no";
-$verbosity = 1;
+$verbosity = 2;
 $generate = "no";
 $exit_code = 0;
 chop($curr_dir=`pwd`);
@@ -371,7 +372,9 @@ sub tst_check
   local($root) = $_[0];
   local($system_call, $exit_status, $ignore_pattern, $error_cause);
 
-  print "--- $root\n" unless ($verbosity == 0);
+  print "--- $root " unless ($verbosity == 0);
+  $total_checks++;
+  
   # check for existence/readablity of tst and res file
   if (! (-r "$root.tst"))
   {
@@ -387,7 +390,7 @@ sub tst_check
   }
 
   # generate $root.res
-  if ($generate ne "yes" && ! defined($mtrack))
+  if ($generate ne "yes" && ! defined($mtrack) && !defined($timings_only))
   {
     if ((-r "$root.res.gz.uu") && ! ( -z "$root.res.gz.uu"))
     {
@@ -412,15 +415,15 @@ sub tst_check
   if (defined($mtrack))
   {
     $system_call = "$cat $root.tst | sed -e 's/\\\\\$/LIB \"general.lib\"; killall(); killall(\"proc\");kill killall;system(\"mtrack\", \"$root.mtrack.unused\", $mtrack); \\\$/' | $singular $singularOptions ";
-    $system_call .= ($verbosity > 2 ? " | $tee " : " > ");
+    $system_call .= ($verbosity > 3 ? " | $tee " : " > ");
     $system_call .= "$root.mtrack.res";
-    $system_call .= " 2>&1 " if ($verbosity <= 2);
+    $system_call .= " 2>&1 " if ($verbosity <= 3);
   }
   else
   {
     
     # prepare Singular run
-    if ($verbosity > 2 && !$WINNT)
+    if ($verbosity > 3 && !$WINNT)
     {
       $system_call = "$cat $root.tst | $singular --execute 'string tst_status_file=\"$statfile\";' $singularOptions | $tee $resfile";
     }
@@ -430,8 +433,12 @@ sub tst_check
     }
   }
   # Go Singular, Go!
+  
+  my ($user_t,$system_t,$cuser_t,$csystem_t) = times;
   $exit_status = &mysystem($system_call);
-
+  my ($user_t,$system_t,$cuser_t2,$csystem_t2) = times;
+  $cuser_t = $cuser_t2 - $cuser_t;
+  $csystem_t = $csystem_t2 - $csystem_t;
   if ($exit_status != 0)
   {
     $error_cause = "Singular call exited with status != 0";
@@ -445,7 +452,7 @@ sub tst_check
     {
       $error_cause = "Segment fault";
     }
-    elsif (! defined($mtrack))
+    elsif (! defined($mtrack) && !defined($timings_only))
     {
       &mysystem("$rm -f $root.diff");
       if ($generate eq "yes")
@@ -523,6 +530,19 @@ sub tst_check
     }
   }
   # und tschuess
+  unless ($verbosity == 0)
+  {
+    if ($verbosity > 1 || $timings_only)
+    {
+      my $used_time = $cuser_t + $csystem_t;
+      $total_used_time += $used_time;
+      $lst_used_time += $used_time;
+      print " " x (23 - length($root));
+      printf("%.2f", $used_time);
+    }
+    print " \n";
+  }
+  $total_checks_pass++ unless $exit_code;
   return ($exit_status);
 }
 
@@ -563,6 +583,10 @@ while ($ARGV[0] =~ /^-/)
   elsif(/^-t$/)
   {
     $mtrack = 1;
+  }
+  elsif (/^-T/)
+  {
+    $timings_only = 1;
   }
   elsif(/^-r$/)
   {
@@ -700,7 +724,7 @@ foreach (@ARGV)
     $path = $1;
     $base = $2;
     chdir($path);
-    print "cd $path\n" if ($verbosity > 1);
+    print "cd $path\n" if ($verbosity > 2);
   }
   else
   {
@@ -716,12 +740,16 @@ foreach (@ARGV)
   }
   elsif ($extension eq "lst")
   {
+    
     if (! open(LST_FILE, "<$file"))
     {
       print (STDERR "Can not open $path/$file for reading\n");
       $exit_code = 1;
       next;
     }
+    $lst_used_time = 0;
+    $lst_checks = 0;
+    $lst_checks_pass = 0;
     while (<LST_FILE>)
     {
       if (/^;/)          # ignore lines starting with ;
@@ -738,7 +766,7 @@ foreach (@ARGV)
         $tst_path = $1;
         $tst_base = $2;
         chdir($tst_path);
-        print "cd $tst_path\n" if ($verbosity > 1);
+        print "cd $tst_path\n" if ($verbosity > 2);
       }
       else
       {
@@ -747,15 +775,20 @@ foreach (@ARGV)
       }
       $tst_base =~ s/^\s*//;
       $tst_base =~ s/(.*?)\s+.*/$1/;
-      $exit_code = &tst_check($tst_base) || $exit_code;
+      $lst_checks++;
+      my $this_exit_code = &tst_check($tst_base);
+      $lst_checks_pass++ unless $this_exit_code;
+      $exit_code = $this_exit_code || $exit_code;
 
       if ($tst_path ne "")
       {
         chdir($tst_curr_dir);
-        print "cd $tst_curr_dir\n" if ($verbosity > 1);
+        print "cd $tst_curr_dir\n" if ($verbosity > 2);
       }
     }
     close (LST_FILE);
+    printf("$base Summary: Checks:$lst_checks Failed:%d Time:%.2f\n", $lst_checks - $lst_checks_pass, $lst_used_time) 
+      unless ($verbosity < 2)
   }
   else
   {
@@ -765,8 +798,13 @@ foreach (@ARGV)
   if ($path ne "")
   {
     chdir($curr_dir);
-    print "cd $curr_dir\n" if ($verbosity > 1);
+    print "cd $curr_dir\n" if ($verbosity > 2);
   }
+}
+
+unless ($verbosity < 2 || $lst_checks == $total_checks)
+{
+  printf("Summary: Checks:$total_checks Failed:%d Time:%.2f\n", $total_checks - $total_checks_pass, $total_used_time);
 }
 
 # Und Tschuess
