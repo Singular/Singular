@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.6 2001-02-26 15:08:44 levandov Exp $ */
+/* $Id: gring.h,v 1.7 2001-02-28 11:54:49 levandov Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -23,7 +23,14 @@ poly nc_mm_Mult_nn (Exponent_t *F, Exponent_t *G, const ring r);
 poly nc_mm_Mult_uu (Exponent_t *F,int jG,int bG, const ring r);
 poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r);
 poly _nc_p_Mult_q(poly p, poly q, const int copy, const ring r);
+//syzygies :
+poly nc_spGSpolyCreate(poly p1, poly p2,poly spNoether, const ring r);
+poly nc_spGSpolyRed(poly p1, poly p2,poly spNoether, const ring r);
+poly nc_spGSpolyRedNew(poly p1, poly p2,poly spNoether, const ring r);
+void nc_spGSpolyRedTail(poly p1, poly q, poly q2, poly spNoether, const ring r);
+poly nc_spShort(poly p1, poly p2, const ring r);
 
+ideal gr_bba (ideal F, ideal Q,kStrategy strat);
 #endif /* HAVE_PLURAL */
 #endif
 
