@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.219 2005-02-23 16:24:10 bricken Exp $ */
+/* $Id: extra.cc,v 1.220 2005-04-01 08:15:55 bricken Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -57,6 +57,7 @@
 #include "walk.h"
 #include "weight.h"
 #include "fast_mult.h"
+#include "digitech.h"
 #ifdef HAVE_SPECTRUM
 #include "spectrum.h"
 #endif
@@ -1784,7 +1785,30 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       res->data=(void*) pPower(pCopy(f),n);
       return(FALSE);
     }
-      else
+    else
+     
+	  	if (strcmp(sys_cmd, "MCpower")==0)
+    {
+      ring r = currRing;
+      poly f = (poly)h->Data();
+      h=h->next;
+      int n=(int)h->Data();
+      res->rtyp=POLY_CMD ;
+      res->data=(void*) pFastPowerMC(f,n,r);
+      return(FALSE);
+    }
+    else
+     
+	  	if (strcmp(sys_cmd, "bit_subst")==0)
+    {
+      ring r = currRing;
+      poly outer = (poly)h->Data();
+      h=h->next;
+      poly inner=(poly)h->Data();
+      res->rtyp=POLY_CMD ;
+      res->data=(void*) uni_subst_bits(outer, inner,r);
+      return(FALSE);
+    }
 /*==================== Error =================*/
       Werror( "system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }
