@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.59 2000-02-07 14:13:52 obachman Exp $
+### $Id: Makefile.in,v 1.60 2000-02-21 17:48:17 Singular Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -237,15 +237,15 @@ ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx: ${HTML_SUBDIR}/${HTML_MANUAL_TOP}
 ${TMP_DIR}:
 	${MKINSTALLDIRS} ${TMP_DIR}
 
-# pattern rules for images
+# pattern rules for images - but not everybody has gnu-uudecode
 images/%.gif : images/%.gif.uu
-	uudecode $< -o $@
+	cd images; uudecode ../$< ;cd ..
 
 images/%.jpg : images/%.jpg.uu
-	uudecode $< -o $@
+	cd images; uudecode ../$< ;cd ..
 
 images/%.xbm : images/%.xbm.uu
-	uudecode $< -o $@
+	cd images; uudecode ../$< ;cd ..
 
 ${IMAGES_HTML} : ${IMAGES_SRC} 
 	test -d ${HTML_SUBDIR} || mkdir ${HTML_SUBDIR}
