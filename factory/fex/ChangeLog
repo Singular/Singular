@@ -1,9 +1,12 @@
-Tue Mar 31 13:01:59 MET DST 1998  Jens Schmidt
+Tue Mar 31 13:17:04 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
-	* gcd.fex:
-	  ***** merge from branch `factory-gcd' to main trunk
+	* insert.fex: cosmetical changes
 
-Tue Mar 31 12:48:06 MET DST 1998  Jens Schmidt
+Fri Mar 27 12:26:17 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
-	* stdUnivPGcd.in, runfex, gcdUnivPAlpha.fex, gcdUnivP.fex:
-	  ***** merge from branch `factory-gcd' to main trunk
+	* stdUnivPGcd.in: cosmetical changes
+
+	* stdUnivPGcd.in (symmetric 4(1/p/1), inhomog cyclic 5(1/p/2),
+	  inhomog cyclic 5(1/p/2)): new examples
+
+	* stdUnivPGcd.in: major rewrite of format
