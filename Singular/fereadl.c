@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: fereadl.c,v 1.19 2001-01-31 13:44:19 levandov Exp $ */
+/* $Id: fereadl.c,v 1.20 2001-03-12 16:55:44 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -35,7 +35,9 @@
         #include <term.h>
       #endif
     #elif HAVE_TERMCAP_H
+      #ifndef SunOS_5
       #include <termcap.h>
+      #endif
     #endif
     #if defined(HAVE_TERMIOS_H) && ! defined(TCSANOW)
       #include <termios.h>
