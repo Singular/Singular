@@ -1117,6 +1117,8 @@ public:
   int exp;
   mac_poly_r():next(NULL){}
 };
+//mac_polys exp are smaller iff they are greater by monomial ordering
+//corresponding to solving linear equations notation
 struct int_poly_pair{
   poly p;
   int n;
@@ -1139,6 +1141,72 @@ void t2ippa(poly* ip,int* ia,exp_number_builder & e){
 }
 int anti_poly_order(const void* a, const void* b){
   return -pLmCmp(((int_poly_pair*) a)->p,((int_poly_pair*) b)->p );
+}
+mac_poly mac_p_add_ff_qq(mac_poly a, number f,mac_poly b){
+  mac_poly erg;
+  mac_poly* set_this;
+  set_this=&erg;
+  while((a!=NULL) &&(b!=NULL)){
+    if (a->exp<b->exp){
+      (*set_this)=a;
+      a=a->next;
+      set_this= &((*set_this)->next);
+    } 
+    else{
+      if (a->exp>b->exp){
+	mac_poly in =new mac_poly_r();
+	in->exp=b->exp;
+	in->coef=nMult(b->coef,f);
+	(*set_this)=in;
+	b=b->next;
+	set_this= &((*set_this)->next);
+      }
+      else {
+	//a->exp==b->ecp
+	number n=nMult(b->coef,f);
+	number n2=nAdd(a->coef,n);
+	nDelete(&n);
+	nDelete(&(a->coef));
+	if (nIsZero(n2)){
+	  nDelete(&n2);
+	  mac_poly ao=a;
+	  a=a->next;
+	  delete ao;
+	  b=b->next;
+	  
+	} else {
+	  a->coef=n2;
+	  b=b->next;
+	  (*set_this)=a;
+	  a=a->next;
+	  set_this= &((*set_this)->next);
+	}
+ 
+      }
+    
+    }
+  }
+  if((a==NULL)&&(b==NULL)){
+    (*set_this)=NULL;
+    return erg;
+  }
+  if (b==NULL) {
+    (*set_this=a);
+    return erg;
+  }
+  
+  //a==NULL
+  while(b!=NULL){
+    mac_poly mp= new mac_poly_r();
+    mp->exp=b->exp;
+    mp->coef=nMult(f,b->coef);
+    (*set_this)=mp;
+    set_this=&(mp->next);
+    b=b->next;
+  }
+  (*set_this)->next=NULL;
+  return erg;
+  
 }
 void pre_comp(poly* p,int pn,calc_dat* c){
   if(!(pn))
