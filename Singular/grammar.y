@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.18 1997-08-11 15:53:15 Singular Exp $ */
+/* $Id: grammar.y,v 1.19 1997-09-12 08:27:08 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -459,6 +459,10 @@ elemexpr:
           {
             memset(&$$,0,sizeof($$));
             int i = atoi($1);
+            /*remember not to FreeL($1)
+            *because it is a part of the scanner buffer*/
+            $$.rtyp  = INT_CMD;
+            $$.data = (void *)i;
 
             /* check: out of range input */
             int l = strlen($1)+2;
@@ -468,15 +472,16 @@ elemexpr:
               sprintf(tmp,"%d",i);
               if (strcmp(tmp,$1)!=0)
               {
-                Werror("`%s` greater than %d(max. integer representation)"
-                       ,$1,INT_MAX);
-                YYERROR;
+                if (currRing==NULL)
+                {
+                  Werror("`%s` greater than %d(max. integer representation)"
+                         ,$1,INT_MAX);
+                  YYERROR;
+                }  
+                char *t1=mstrdup($1);
+                syMake(&$$,t1);
               }
             }
-            /*remember not to FreeL($1)
-            *because it is a part of the scanner buffer*/
-            $$.rtyp  = INT_CMD;
-            $$.data = (void *)i;
           }
         | SYSVAR
           {
