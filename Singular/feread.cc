@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.5 1997-07-09 15:53:52 Singular Exp $ */
+/* $Id: feread.cc,v 1.6 1997-07-16 11:31:43 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -670,6 +670,8 @@ void fe_set_input_mode(void)
 
 char * fe_fgets_stdin_rl(char *pr,char *s, int size)
 {
+  if (feBatch)
+    return NULL;
   if(fe_use_fgets)
   {
     PrintS(pr);mflush();

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.20 1997-07-16 11:25:55 Singular Exp $ */
+/* $Id: febase.cc,v 1.21 1997-07-16 11:31:41 Singular Exp $ */
 /*
 * ABSTRACT: i/o system, handling of 'voices'
 */
@@ -903,7 +903,7 @@ void showInput(void)
       }
       else
 #endif
-      if (BVERBOSE(V_PROMPT))
+      if ((BVERBOSE(V_PROMPT))&&(!feBatch))
       {
         if (inputswitch == 0)
         {
