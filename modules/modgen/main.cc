@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
-#include <limits.h>
+#include <mylimits.h>
 #include <unistd.h>
 #include <getopt.h>
 

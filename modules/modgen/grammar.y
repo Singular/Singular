@@ -1,5 +1,5 @@
 /*
- * $Id: grammar.y,v 1.15 2000-11-09 21:58:13 krueger Exp $
+ * $Id: grammar.y,v 1.16 2002-06-18 15:09:15 anne Exp $
  */
 
 %{
@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
-#include <limits.h>
+#include <mylimits.h>
 
 #include <mod2.h>
 #include <tok.h>

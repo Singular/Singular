@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: creat_top.cc,v 1.13 2001-05-23 20:14:20 anne Exp $ */
+/* $Id: creat_top.cc,v 1.14 2002-06-18 15:09:15 anne Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -50,10 +50,13 @@ void write_enter_id(FILE *fp)
   fprintf(fp, "{\n");
   fprintf(fp, "  idhdl h;\n");
   fprintf(fp, "\n");
-  fprintf(fp, "  h=enterid(omStrDup(name),0, t, &IDROOT, TRUE/*FALSE*/);\n");
+  fprintf(fp, "  h=enterid(omStrDup(name),0, t, &(basePack->idroot), TRUE/*FALSE*/);\n");
   fprintf(fp, "  if(h!=NULL) {\n");
   fprintf(fp, "     switch(t) {\n");
-  fprintf(fp, "         case STRING_CMD: IDSTRING(h) = omStrDup(value);break;\n");
+  fprintf(fp, "         case STRING_CMD: \n");
+  fprintf(fp, "              omFree(IDSTRING(h));\n");
+  fprintf(fp, "              IDSTRING(h) = omStrDup(value);\n");
+  fprintf(fp, "              break;\n");
   fprintf(fp, "         case PACKAGE_CMD: break;\n");
   fprintf(fp, "         case PROC_CMD: break;\n");
   fprintf(fp, "     }\n");
@@ -65,6 +68,8 @@ void write_enter_id(FILE *fp)
 }
 
 /*========================================================================*/
+/* SINGULAR procedures sollen nicht in modules geladen werden!!
+   DAS HIER FLIEGT RAUS
 void write_add_singular_proc(FILE *fp)
 {
   fprintf(fp, "\nidhdl add_singular_proc(char *procname, int line,\n");
@@ -74,6 +79,8 @@ void write_add_singular_proc(FILE *fp)
   fprintf(fp, "  procinfov pi;\n\n");
   fprintf(fp, "  h = enter_id(procname, NULL, PROC_CMD);\n");
   fprintf(fp, "  if(h == NULL) return NULL;\n");
+  fprintf(fp, "\n");
+  fprintf(fp, "  IDDATA(h)=(char *) pi;\n");
   fprintf(fp, "\n");
 //  fprintf(fp, "  pi->libname = omStrDup(libname);\n");
   fprintf(fp, "  pi->procname = omStrDup(procname);\n");
@@ -98,6 +105,8 @@ void write_add_singular_proc(FILE *fp)
   fprintf(fp, "}\n");
   modlineno+=30;
 }
+  BIS HIERHIN FLIEGT ES RAUS
+*/
 
 /*========================================================================*/
 void write_mod_init(
@@ -110,6 +119,7 @@ void write_mod_init(
   fprintf(fp, "extern \"C\"\n");
   fprintf(fp, "int mod_init(int(*iiAddCproc)())\n{\n");
   fprintf(fp, "  idhdl h;\n");
+/* HIER MUSS ERST ZUARBEIT VON HANS KOMMEN
   fprintf(fp, "  idhdl helphdl = enter_id(\"Help\", NULL, PACKAGE_CMD);\n");
   fprintf(fp, "  idhdl examplehdl = enter_id(\"Example\", NULL, PACKAGE_CMD);\n\n");
   fprintf(fp, "  \n");
@@ -120,6 +130,8 @@ void write_mod_init(
   fprintf(fp, "   if( examplehdl == NULL)\n");
   fprintf(fp, "     Warn(\"Cannot create example-package\\n\");\n");
   fprintf(fp, "   else fill_example_package(examplehdl);\n");
+   BIS HIERHIN ZUARBEIT VON HANS NOETIG
+*/
 }
 
 /*========================================================================*/

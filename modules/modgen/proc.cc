@@ -1,5 +1,5 @@
 /*
- * $Id: proc.cc,v 1.16 2001-02-01 13:05:03 krueger Exp $
+ * $Id: proc.cc,v 1.17 2002-06-18 15:09:16 anne Exp $
  */
 
 #include <stdio.h>
@@ -363,24 +363,24 @@ void write_finish_functions(
   
   fprintf(module->modfp, "#line %d \"%s.cc\"\n", modlineno++, module->name);
   fprintf(module->modfp, "/* Help section */\n");
-  fprintf(module->modfp, "void fill_help_package(idhdl pl) {\n");
-  fprintf(module->modfp, "  namespaceroot->push(IDPACKAGE(pl), IDID(pl));\n");
-  modlineno+=3;
-  mod_copy_tmp(module->modfp, module->fmtfp2);
-  fprintf(module->modfp, "#line %d \"%s.cc\"\n", modlineno++, module->name);
-  fprintf(module->modfp, "  namespaceroot->pop();\n");
-  fprintf(module->modfp, "}  /* End of Help section */\n\n");
-  modlineno+=3;
+//  fprintf(module->modfp, "void fill_help_package(idhdl pl) {\n");
+//  fprintf(module->modfp, "  namespaceroot->push(IDPACKAGE(pl), IDID(pl));\n");
+//  modlineno+=3;
+//  mod_copy_tmp(module->modfp, module->fmtfp2);
+//  fprintf(module->modfp, "#line %d \"%s.cc\"\n", modlineno++, module->name);
+//  fprintf(module->modfp, "  namespaceroot->pop();\n");
+//  fprintf(module->modfp, "}  /* End of Help section */\n\n");
+//  modlineno+=3;
 
-  fprintf(module->modfp, "/* Example section */\n");
-  fprintf(module->modfp, "void fill_example_package(idhdl pl) {\n");
-  fprintf(module->modfp, "  namespaceroot->push(IDPACKAGE(pl), IDID(pl));\n");
-  modlineno+=3;
-  mod_copy_tmp(module->modfp, module->fmtfp3);
-  fprintf(module->modfp, "#line %d \"%s.cc\"\n", modlineno++, module->name);
-  fprintf(module->modfp, "  namespaceroot->pop();\n");
-  fprintf(module->modfp, "} /* End of Example section */\n\n");
-  modlineno+=2;
+//  fprintf(module->modfp, "/* Example section */\n");
+//  fprintf(module->modfp, "void fill_example_package(idhdl pl) {\n");
+//  fprintf(module->modfp, "  namespaceroot->push(IDPACKAGE(pl), IDID(pl));\n");
+//  modlineno+=3;
+//  mod_copy_tmp(module->modfp, module->fmtfp3);
+//  fprintf(module->modfp, "#line %d \"%s.cc\"\n", modlineno++, module->name);
+//  fprintf(module->modfp, "  namespaceroot->pop();\n");
+//  fprintf(module->modfp, "} /* End of Example section */\n\n");
+//  modlineno+=2;
 
   mod_copy_tmp(module->modfp, module->fmtfp);
   fprintf(module->modfp, "#line %d \"%s.cc\"\n", modlineno++, module->name);
