@@ -1,6 +1,10 @@
 @c -*-texinfo-*-
 @ifclear singularmanual
 @c -----------------------Top node-----------------------------------
+@menu
+* PLURAL conventions::          
+@end menu
+
 @node Top, PLURAL conventions, (dir), (dir)
 @c @chapter PLURAL
 @c @cindex PLURAL
@@ -69,7 +73,7 @@
 @c @include general.tex
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node PLURAL conventions, Data types @value{PSUFFIX},PLURAL, PLURAL
+@node PLURAL conventions,  , Top, Top
 @section  PLURAL conventions
 @end ifset 
 
@@ -85,7 +89,11 @@
 @c ----------------------------------------------------------------------------
 
 @ifset singularmanual
-@node Data types @value{PSUFFIX}, Functions and system variables @value{PSUFFIX}  , PLURAL conventions, PLURAL
+@menu
+* Data types @value{PSUFFIX}::  
+@end menu
+
+@node Data types @value{PSUFFIX},  , PLURAL conventions, PLURAL conventions
 @section Data types @value{PSUFFIX}
 @end ifset 
 
@@ -99,7 +107,11 @@
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node Functions and system variables @value{PSUFFIX},Mathematical background @value{PSUFFIX}, Data types @value{PSUFFIX}, PLURAL
+@menu
+* Functions and system variables @value{PSUFFIX}::  
+@end menu
+
+@node Functions and system variables @value{PSUFFIX},  , Data types @value{PSUFFIX}, Data types @value{PSUFFIX}
 @section Functions and system variables @value{PSUFFIX}
 @end ifset
 
@@ -131,7 +143,7 @@
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node Mathematical background @value{PSUFFIX},PLURAL libraries, Functions and system
+@node Mathematical background @value{PSUFFIX},  , Functions and system variables @value{PSUFFIX}, Functions and system variables @value{PSUFFIX}
 variables @value{PSUFFIX}, PLURAL 
 @section Mathematical background @value{PSUFFIX}
 @end ifset
@@ -161,25 +173,49 @@ Use the @code{LIB} command for loading of single libraries.
 @c @sc{Singular} and @sc{Plural} together.
 
 @menu
-* lieA_lib:: 
+* ncalg_lib::                    
+* nctools_lib::                 
+* gkdim_lib::                   
+* qmatrix_lib::                 
 @end menu
 
 @c ----------------------------------------------------------
-@node lieA_lib,, PLURAL libraries, PLURAL libraries
-@section lieA_lib
+@node ncalg_lib, nctools_lib, PLURAL libraries, PLURAL libraries
+@section ncalg_lib
 
-@c lib lieA.lib
+@c lib ncalg.lib
+
+@c ----------------------------------------------------------
+
+@node nctools_lib, gkdim_lib, ncalg_lib, PLURAL libraries
+@section nctools_lib
+
+@c lib nctools.lib
+
+@c ----------------------------------------------------------
+
+@node gkdim_lib, qmatrix_lib, nctools_lib, PLURAL libraries
+@section gkdim_lib
+
+@c lib gkdim.lib
+
+@c ----------------------------------------------------------
+
+@node qmatrix_lib,  , gkdim_lib, PLURAL libraries
+@section qmatrix_lib
+
+@c lib qmatrix.lib
 
 @c ----------------------------------------------------------
 
 @ifclear singularmanual
-@node Release Notes, Index , PLURAL libraries, Top
+@node Release Notes, Index, PLURAL libraries, Top
 @chapter Release Notes
 @cindex Release Notes
 @include pluplatform.tex
 
 @c ----------------------------------------------------------
-@node Index,  ,Release Notes, Top
+@node Index,  , Release Notes, Top
 @appendix Index
 @cindex  Index
 @printindex cp
