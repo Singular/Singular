@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.93 2001-10-23 14:04:22 Singular Exp $ */
+/* $Id: iplib.cc,v 1.94 2001-11-14 17:13:25 greuel Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -556,12 +556,14 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
       {
         //PrintS("reset ring\n");
         procstack->currRingHdl=rFindHdl(procstack->currRing,NULL, NULL);
+        #ifdef HAVE_NS
         if (procstack->currRingHdl==NULL)
           procstack->currRingHdl=
            rFindHdl(procstack->currRing,NULL,procstack->currPack->idroot);
         if (procstack->currRingHdl==NULL)
           procstack->currRingHdl=
            rFindHdl(procstack->currRing,NULL,basePack->idroot);
+        #endif
         o=IDID(procstack->currRingHdl);
         currRing=procstack->currRing;
         currRingHdl=procstack->currRingHdl;
