@@ -1,4 +1,8 @@
 #!/bin/sh
+if [ -f grammar.hh ]
+then
+  mv grammar.hh grammar.cc.h
+fi
 if [ -f grammar.h ]
 then
   if diff grammar.cc.h grammar.h >/dev/null
