@@ -1,12 +1,14 @@
 
-/*  A Bison parser, made from ../factory/readcf.y  */
+/*  A Bison parser, made from ../factory-normal/readcf.y
+ by  GNU Bison version 1.25
+  */
 
 #define YYBISON 1  /* Identify Bison output.  */
 
 #define	NUM	258
 #define	NEG	259
 
-#line 4 "../factory/readcf.y"
+#line 4 "../factory-normal/readcf.y"
 
 
 #if defined(WINNT) && ! defined(__GNUC__)
@@ -46,30 +48,15 @@ static istream * defaultin = 0;
 
 static CanonicalForm * retvalue = 0;
 
-
-#ifndef YYLTYPE
-typedef
-  struct yyltype
-    {
-      int timestamp;
-      int first_line;
-      int first_column;
-      int last_line;
-      int last_column;
-      char *text;
-   }
-  yyltype;
-
-#define YYLTYPE yyltype
-#endif
-
 #ifndef YYSTYPE
 #define YYSTYPE int
 #endif
 #include <stdio.h>
 
+#ifndef __cplusplus
 #ifndef __STDC__
 #define const
+#endif
 #endif
 
 
@@ -115,8 +102,6 @@ static const short yyprhs[] = {     0,
     30,    33,    37
 };
 
-#endif
-
 static const short yyrhs[] = {    -1,
     13,    14,     0,    10,     0,    15,    10,     0,     3,     0,
     15,     5,    15,     0,    15,     4,    15,     0,    15,     6,
@@ -124,14 +109,20 @@ static const short yyrhs[] = {    -1,
     15,     0,    15,     9,     3,     0,    11,    15,    12,     0
 };
 
+#endif
+
 #if YYDEBUG != 0
 static const short yyrline[] = { 0,
     56,    57,    60,    61,    64,    65,    66,    67,    68,    69,
     70,    71,    72
 };
+#endif
 
-static const char * const yytname[] = {   "$","error","$illegal.","NUM","'-'",
-"'+'","'*'","'/'","NEG","'^'","';'","'('","')'","input","line","exp",""
+
+#if YYDEBUG != 0 || defined (YYERROR_VERBOSE)
+
+static const char * const yytname[] = {   "$","error","$undefined.","NUM","'-'",
+"'+'","'*'","'/'","NEG","'^'","';'","'('","')'","input","line","exp", NULL
 };
 #endif
 
@@ -185,14 +176,14 @@ static const short yycheck[] = {     3,
      6,     7,    -1,     9
 };
 /* -*-C-*-  Note some compilers choke on comments on `#line' lines.  */
-#line 3 "/usr/local/lib/bison.simple"
+#line 3 "/usr/lib/bison.simple"
 
 /* Skeleton output parser for bison,
-   Copyright (C) 1984, 1989, 1990 Bob Corbett and Richard Stallman
+   Copyright (C) 1984, 1989, 1990 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 1, or (at your option)
+   the Free Software Foundation; either version 2, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -204,12 +195,16 @@ static const short yycheck[] = {     3,
    along with this program; if not, write to the Free Software
    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
+/* As a special exception, when this file is copied by Bison into a
+   Bison output file, you may use that output file without restriction.
+   This special exception was added by the Free Software Foundation
+   in version 1.24 of Bison.  */
 
 #ifndef alloca
 #ifdef __GNUC__
 #define alloca __builtin_alloca
 #else /* not GNU C.  */
-#if (!defined (__STDC__) && defined (sparc)) || defined (__sparc__)
+#if (!defined (__STDC__) && defined (sparc)) || defined (__sparc__) || defined (__sparc) || defined (__sgi)
 #include <alloca.h>
 #else /* not sparc */
 #if defined (MSDOS) && !defined (__TURBOC__)
@@ -218,6 +213,16 @@ static const short yycheck[] = {     3,
 #if defined(_AIX)
 #include <malloc.h>
  #pragma alloca
+#else /* not MSDOS, __TURBOC__, or _AIX */
+#ifdef __hpux
+#ifdef __cplusplus
+extern "C" {
+void *alloca (unsigned int);
+};
+#else /* not __cplusplus */
+void *alloca ();
+#endif /* not __cplusplus */
+#endif /* __hpux */
 #endif /* not _AIX */
 #endif /* not MSDOS, or __TURBOC__ */
 #endif /* not sparc.  */
@@ -267,10 +272,18 @@ while (0)
 
 #ifdef YYPURE
 #ifdef YYLSP_NEEDED
+#ifdef YYLEX_PARAM
+#define YYLEX		yylex(&yylval, &yylloc, YYLEX_PARAM)
+#else
 #define YYLEX		yylex(&yylval, &yylloc)
+#endif
+#else /* not YYLSP_NEEDED */
+#ifdef YYLEX_PARAM
+#define YYLEX		yylex(&yylval, YYLEX_PARAM)
 #else
 #define YYLEX		yylex(&yylval)
 #endif
+#endif /* not YYLSP_NEEDED */
 #endif
 
 /* If nonreentrant, generate the variables here */
@@ -311,18 +324,23 @@ int yydebug;			/*  nonzero means print parse trace	*/
 #ifndef YYMAXDEPTH
 #define YYMAXDEPTH 10000
 #endif
+
+/* Prevent warning if -Wstrict-prototypes.  */
+#ifdef __GNUC__
+int yyparse (void);
+#endif
 
 #if __GNUC__ > 1		/* GNU C and GNU C++ define this.  */
-#define __yy_bcopy(FROM,TO,COUNT)	__builtin_memcpy(TO,FROM,COUNT)
+#define __yy_memcpy(TO,FROM,COUNT)	__builtin_memcpy(TO,FROM,COUNT)
 #else				/* not GNU C or C++ */
 #ifndef __cplusplus
 
 /* This is the most reliable way to avoid incompatibilities
    in available built-in functions on various systems.  */
 static void
-__yy_bcopy (from, to, count)
-     char *from;
+__yy_memcpy (to, from, count)
      char *to;
+     char *from;
      int count;
 {
   register char *f = from;
@@ -338,7 +356,7 @@ __yy_bcopy (from, to, count)
 /* This is the most reliable way to avoid incompatibilities
    in available built-in functions on various systems.  */
 static void
-__yy_bcopy (char *from, char *to, int count)
+__yy_memcpy (char *to, char *from, int count)
 {
   register char *f = from;
   register char *t = to;
@@ -351,16 +369,37 @@ __yy_bcopy (char *from, char *to, int count)
 #endif
 #endif
 
-#line 169 "/usr/local/lib/bison.simple"
+#line 196 "/usr/lib/bison.simple"
+
+/* The user can define YYPARSE_PARAM as the name of an argument to be passed
+   into yyparse.  The argument should have type void *.
+   It should actually point to an object.
+   Grammar actions can access the variable by casting it
+   to the proper pointer type.  */
+
+#ifdef YYPARSE_PARAM
+#ifdef __cplusplus
+#define YYPARSE_PARAM_ARG void *YYPARSE_PARAM
+#define YYPARSE_PARAM_DECL
+#else /* not __cplusplus */
+#define YYPARSE_PARAM_ARG YYPARSE_PARAM
+#define YYPARSE_PARAM_DECL void *YYPARSE_PARAM;
+#endif /* not __cplusplus */
+#else /* not YYPARSE_PARAM */
+#define YYPARSE_PARAM_ARG
+#define YYPARSE_PARAM_DECL
+#endif /* not YYPARSE_PARAM */
+
 int
-yyparse()
+yyparse(YYPARSE_PARAM_ARG)
+     YYPARSE_PARAM_DECL
 {
   register int yystate;
   register int yyn;
   register short *yyssp;
   register YYSTYPE *yyvsp;
   int yyerrstatus;	/*  number of tokens to shift before error messages enabled */
-  int yychar1;		/*  lookahead token as an internal (translated) token number */
+  int yychar1 = 0;		/*  lookahead token as an internal (translated) token number */
 
   short	yyssa[YYINITDEPTH];	/*  the state stack			*/
   YYSTYPE yyvsa[YYINITDEPTH];	/*  the semantic value stack		*/
@@ -407,7 +446,8 @@ yyparse()
 
   /* Initialize stack pointers.
      Waste one element of value and location stack
-     so that they stay on the same level as the state stack.  */
+     so that they stay on the same level as the state stack.
+     The wasted elements are never initialized.  */
 
   yyssp = yyss - 1;
   yyvsp = yyvs;
@@ -438,13 +478,20 @@ yynewstate:
 #ifdef yyoverflow
       /* Each stack pointer address is followed by the size of
 	 the data in use in that stack, in bytes.  */
+#ifdef YYLSP_NEEDED
+      /* This used to be a conditional around just the two extra args,
+	 but that might be undefined if yyoverflow is a macro.  */
       yyoverflow("parser stack overflow",
 		 &yyss1, size * sizeof (*yyssp),
 		 &yyvs1, size * sizeof (*yyvsp),
-#ifdef YYLSP_NEEDED
 		 &yyls1, size * sizeof (*yylsp),
-#endif
 		 &yystacksize);
+#else
+      yyoverflow("parser stack overflow",
+		 &yyss1, size * sizeof (*yyssp),
+		 &yyvs1, size * sizeof (*yyvsp),
+		 &yystacksize);
+#endif
 
       yyss = yyss1; yyvs = yyvs1;
 #ifdef YYLSP_NEEDED
@@ -461,12 +508,12 @@ yynewstate:
       if (yystacksize > YYMAXDEPTH)
 	yystacksize = YYMAXDEPTH;
       yyss = (short *) alloca (yystacksize * sizeof (*yyssp));
-      __yy_bcopy ((char *)yyss1, (char *)yyss, size * sizeof (*yyssp));
+      __yy_memcpy ((char *)yyss, (char *)yyss1, size * sizeof (*yyssp));
       yyvs = (YYSTYPE *) alloca (yystacksize * sizeof (*yyvsp));
-      __yy_bcopy ((char *)yyvs1, (char *)yyvs, size * sizeof (*yyvsp));
+      __yy_memcpy ((char *)yyvs, (char *)yyvs1, size * sizeof (*yyvsp));
 #ifdef YYLSP_NEEDED
       yyls = (YYLTYPE *) alloca (yystacksize * sizeof (*yylsp));
-      __yy_bcopy ((char *)yyls1, (char *)yyls, size * sizeof (*yylsp));
+      __yy_memcpy ((char *)yyls, (char *)yyls1, size * sizeof (*yylsp));
 #endif
 #endif /* no yyoverflow */
 
@@ -490,6 +537,7 @@ yynewstate:
     fprintf(stderr, "Entering state %d\n", yystate);
 #endif
 
+  goto yybackup;
  yybackup:
 
 /* Do appropriate processing given the current state.  */
@@ -604,7 +652,8 @@ yydefault:
 /* Do a reduction.  yyn is the number of a rule to reduce with.  */
 yyreduce:
   yylen = yyr2[yyn];
-  yyval = yyvsp[1-yylen]; /* implement default value of the action */
+  if (yylen > 0)
+    yyval = yyvsp[1-yylen]; /* implement default value of the action */
 
 #if YYDEBUG != 0
   if (yydebug)
@@ -614,7 +663,7 @@ yyreduce:
       fprintf (stderr, "Reducing via rule %d (line %d), ",
 	       yyn, yyrline[yyn]);
 
-      /* Print the symboles being reduced, and their result.  */
+      /* Print the symbols being reduced, and their result.  */
       for (i = yyprhs[yyn]; yyrhs[i] > 0; i++)
 	fprintf (stderr, "%s ", yytname[yyrhs[i]]);
       fprintf (stderr, " -> %s\n", yytname[yyr1[yyn]]);
@@ -625,48 +674,48 @@ yyreduce:
   switch (yyn) {
 
 case 4:
-#line 61 "../factory/readcf.y"
+#line 61 "../factory-normal/readcf.y"
 { *retvalue = yyvsp[-1].getval(); return 0; ;
     break;}
 case 5:
-#line 64 "../factory/readcf.y"
+#line 64 "../factory-normal/readcf.y"
 { yyval = yyvsp[0]; ;
     break;}
 case 6:
-#line 65 "../factory/readcf.y"
+#line 65 "../factory-normal/readcf.y"
 { yyval = yyvsp[-2].getval() + yyvsp[0].getval(); ;
     break;}
 case 7:
-#line 66 "../factory/readcf.y"
+#line 66 "../factory-normal/readcf.y"
 { yyval = yyvsp[-2].getval() - yyvsp[0].getval(); ;
     break;}
 case 8:
-#line 67 "../factory/readcf.y"
+#line 67 "../factory-normal/readcf.y"
 { yyval = yyvsp[-2].getval() * yyvsp[0].getval(); ;
     break;}
 case 9:
-#line 68 "../factory/readcf.y"
+#line 68 "../factory-normal/readcf.y"
 { yyval = yyvsp[-2].getval() / yyvsp[0].getval(); ;
     break;}
 case 10:
-#line 69 "../factory/readcf.y"
+#line 69 "../factory-normal/readcf.y"
 { yyval = -yyvsp[0].getval(); ;
     break;}
 case 11:
-#line 70 "../factory/readcf.y"
+#line 70 "../factory-normal/readcf.y"
 { yyval = yyvsp[0].getval(); ;
     break;}
 case 12:
-#line 71 "../factory/readcf.y"
+#line 71 "../factory-normal/readcf.y"
 { yyval = power( yyvsp[-2].getval(), yyvsp[0].getintval() ); ;
     break;}
 case 13:
-#line 72 "../factory/readcf.y"
+#line 72 "../factory-normal/readcf.y"
 { yyval = yyvsp[-1].getval(); ;
     break;}
 }
    /* the action file gets copied in in place of this dollarsign */
-#line 440 "/usr/local/lib/bison.simple"
+#line 498 "/usr/lib/bison.simple"
 
   yyvsp -= yylen;
   yyssp -= yylen;
@@ -736,7 +785,9 @@ yyerrlab:   /* here on detecting error */
 	  int x, count;
 
 	  count = 0;
-	  for (x = 0; x < (sizeof(yytname) / sizeof(char *)); x++)
+	  /* Start X at -yyn if nec to avoid negative indexes in yycheck.  */
+	  for (x = (yyn < 0 ? -yyn : 0);
+	       x < (sizeof(yytname) / sizeof(char *)); x++)
 	    if (yycheck[x + yyn] == x)
 	      size += strlen(yytname[x]) + 15, count++;
 	  msg = (char *) malloc(size + 15);
@@ -747,7 +798,8 @@ yyerrlab:   /* here on detecting error */
 	      if (count < 5)
 		{
 		  count = 0;
-		  for (x = 0; x < (sizeof(yytname) / sizeof(char *)); x++)
+		  for (x = (yyn < 0 ? -yyn : 0);
+		       x < (sizeof(yytname) / sizeof(char *)); x++)
 		    if (yycheck[x + yyn] == x)
 		      {
 			strcat(msg, count == 0 ? ", expecting `" : " or `");
@@ -767,6 +819,7 @@ yyerrlab:   /* here on detecting error */
 	yyerror("parse error");
     }
 
+  goto yyerrlab1;
 yyerrlab1:   /* here on error raised explicitly by an action */
 
   if (yyerrstatus == 3)
@@ -858,7 +911,7 @@ yyerrhandle:
   yystate = yyn;
   goto yynewstate;
 }
-#line 75 "../factory/readcf.y"
+#line 75 "../factory-normal/readcf.y"
 
 
 #ifdef BISONPP
