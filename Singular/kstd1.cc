@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.27 1998-07-30 12:46:17 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.28 1998-11-11 14:40:39 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1808,6 +1808,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   /*- release temp data------------------------------- -*/
   Free((ADDRESS)strat->T,strat->tmax*sizeof(TObject));
   Free((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
+  Free((ADDRESS)strat->NotUsedAxis,(pVariables+1)*sizeof(BOOLEAN));
   if ((Q!=NULL)&&(strat->fromQ!=NULL))
   {
     i=((IDELEMS(Q)+IDELEMS(F)+15)/16)*16;
