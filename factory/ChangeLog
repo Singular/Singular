@@ -1,23 +1,26 @@
 Fri Jun  6 09:38:05 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* configure.in: removed some stupid warnings when 'dangerous'
-	  combinations of with's/enable's are specified
-	  some other fixes in configures messages
-	  doc fix
-	  (AC_ARG_ENABLE(memdebug)): removed code which sets
-	  enable_memdebug to 'normal' since this is really never tested
-	  (AC_ARG_WITH(gmp, builtingmp)): new command line options.  rest
-	  of configure.in adapted to the new scheme of specifying where
-	  gmp lives
+	  combinations of with's/enable's are specified and some other
+ 	  fixes in configures messages
 
-	* GNUmakefile.in (distsrc): gengftables added to the distribution
+	* configure.in (AC_ARG_ENABLE(memdebug)): removed code which sets
+	  enable_memdebug to 'normal' since this is really never tested
+
+	* configure.in (AC_ARG_WITH(gmp, builtingmp)): new command line
+	  options.  rest of configure.in adapted to the new scheme of
+ 	  specifying where gmp lives
+
+	* configure.in: doc fix
+
+	* GNUmakefile.in (distsrc, clean): gengftables added to the
+	  distribution
 	  (distfiles): ChangeLog added to the distribution
-	  (clean): gengftables added
 
 Thu Jun  5 15:03:48 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* configure.in: --with-Singular --enable-debugoutput is now
-	  possible.  so is --with-Singular --enable-timing
+	  possible.  So is --with-Singular --enable-timing.
 
 	* GNUmakefile.in (gengftables.o): added check which makes make
 	  complain if factory was not configured in the right way
@@ -29,16 +32,17 @@ Thu Jun  5 15:03:48 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* factoryconf.template: doc fix
 
-	* config.h.in: config.h.in is now a real source file and not
+	* GNUmakefile.in: ($(srcdir)/config.h.in, $(srcdir)/stamp-h.in,
+ 	  realmaintainerclean, dist, distfiles): instead of creating
+ 	  config.h.in we will deliver it as a real source file
+	* config.h.in: config.h.in is a real source file and not
 	  longer created from acconfig.h
-	  (INCL_CONFIG_H): added flag to prevent multiple inclusion of
- 	  config.h
+
+	* config.h.in (INCL_CONFIG_H): added flag to prevent multiple
+	  inclusion of config.h
 
 	* GNUmakefile.in ($(srcdir)/configure): make will not complain
 	  about a missing autoconf any longer
-	  ($(srcdir)/config.h.in, $(srcdir)/stamp-h.in,
- 	  realmaintainerclean, dist, distfiles): instead of creating
- 	  config.h.in we will deliver it as a real source file
 
 	* canonicalform.cc (operator >>): returns 0 now when compiled with
 	  Singular and with stream IO enabled
@@ -47,7 +51,129 @@ Before Mon Jun  4 1997 Jens Schmidt <schmidt@mathematik.uni-kl.de>
 
 	This is a list of most of the changes made after I took the
 	responsibility for factory development and before I started to
-	update the ChangeLog regularily.  It is unlikely to be complete...
+	update the ChangeLog regularily.  It is unlikely to be complete.
+
+	Besides minor changes at 'source code level' (bug fixes, new
+ 	functionality) which are not really visible to the user in general
+ 	there are quite a lot of changes at 'organization level' (aka
+ 	preprocessor functionality) and at 'distribution level'
+ 	(configure, Makefile).
+
+
+	First, the changes at distribution level:
+
+	* bin: some useful/necessary scripts added to the distribution
+	* install-sh: moved to bin
+
+	* ChangeLog: added to the distribution
+
+	* configure.in: totally rewritten
+
+	* conf.h.in, config.h.in: conf.h.in replaced by a totally
+	  rewritten config.h.in.  Furthermore, config.h is now explecitely
+ 	  included in allmost every file of the distribution.
+	* factoryconf.template: the contents of config.h and assert.h is
+	  now pasted into factoryconf.h created from factoryconf.template.
+  	  factoyconf.h is included instead of config.h in all source files
+ 	  which are not translated but installed (e.g. templates) and is
+	  installed, too.
+
+	* factory.template, factory.h: factory.h removed from the
+	  distribution, factory.template added since makeheader is now
+ 	  included in the distribution
+	* singfactory.h: removed from distribution.  Functionality
+	  moved to factory.template/factory.h.
+
+	* gengftables.cc: code for generating gftables added to the
+	  distribution
+
+	* INSTALL: removed from distribution since not up to date
+
+	* memman.h, mmalloc.c, mmallocs.c, mmheap.c, mmprivate.h,
+	  mmutil.c, mmallocb.c, mmblock.c, mminit.c, mmspec.c: new memory
+	  manager added to the distribution
+
+	* Makefile.in, GNUmakefile.in: Makefile.in replaced by a totally
+	  rewritten GNUmakefile.in
+
+	* mpext.cc, mpext.h, mpfactory.h: removed from distribution.  No
+	  more MP support.
+
+	* readcf.cc: added to distribution since not all users have
+	  bison available
+
+
+	Now for the changes at organization level:
+
+	* cf_gcd.cc (DEBOUT): debug output changed to calls of DEBOUT
+	  macros
+	* cf_linsys.cc (DEBOUT): debug output rewritten and changed to
+	  calls of DEBOUT macros
+	* fac_berlekamp.cc (QPrintFF, QPrintGF, DEBOUT): debug output
+	  changed to calls of DEBOUT macros
+	* fac_univar.cc (DEBOUT, DEBOUTLN, DEBINCLEVEL, DEBDECLEVEL):
+	  debug output rewritten
+	  (hprint, DEBOUTHPRINT, NDEBUG): calls to function hprint()
+	  wrapped by macro DEBOUTHPRINT, which definitions depends on
+	  DEBUGOUTPUT (instead of NDEBUG, as before).  All callers
+	  changed.
+
+	* cf_linsys.cc (TIMING): #define TIMING removed
+	* fac_distrib.cc (DEBUGOUTPUT): #undef DEBUGOUTPUT removed
+	* fac_ezgcd.cc (DEBUGOUTPUT, TIMING, timing.h): some spurious
+	  #define's and #include's removed
+	* fac_multihensel.cc (DEBUGOUTPUT, TIMING): some spurious
+	  #define's removed
+	* fac_multivar.cc (DEBUGOUTPUT, TIMING): some spurious
+	  #define's removed
+	* fac_univar.cc (DEBUGOUTPUT, TIMING, sys/times.h): some spurious
+	  #define's and #include's removed
+
+	* config.h.in (NOSTREAMIO): new define NOSTREAMIO to switch off
+	  stream IO.  Operators <<, >>, and related stuff wrapped by
+ 	  #ifndef where necessary
+
+	* fac_univar.cc (TIMING, timing.h): timing stuff changed to calls
+	  of TIMING macros
+
+
+	Last not least, changes at source code level:
+
+	* cf_linsys.cc (linearSystemSolve, determinant, determinant2):
+	  typedefs int_ptr introduced and used
+
+	* cf_random.cc (RandomGenerator, RanGen): new class
+	  RandomGenerator and new static RanGen which replace calls to the
+ 	  poorly programmed stdlib-random generator
+
+	* cf_reval.h (iostream.h): spurious #include <iostream.h> removed
+
+	* cf_switches.h (RATTIONAL): spurious #define RATIONAL removed
+
+	* fac_univar.cc (MAX_FP_FAC, max_fp_fac): #define changed to const int
+
+  	* fac_univar.cc (initHG, ZFactorizeUnivariate): added
+	  STICKYWARNings because of some strange errors which occure in
+ 	  these functions
+
+	* fac_univar.cc (kBound): added cast to double in calculation of
+	  the bound
+	  (UnivariateQuadraticLift): added cast to double in calculation
+	  of no_iter
+
+	* fac_univar.cc (ZFactorizeUnivariate): removed spurious
+	  declaration of CFFList G.  Some trivial structural changes.
+  	  Removed test on D != 0 before deleting D.
+
+	* fac_univar.cc: doc fix
+
+	* variable.cc (Variable::Variable( char ), Variable::Variable( int, char ),
+	  rootOf): delete changed to delete [] where necessary
+
+	* variable.cc (Variable::name): casts to int added
+
+
+	Not sorted yet:
 
 	* assert.h (NOASSERT, NDEBUG): the define to switch the assertions
 	  off is NOASSERT instead of NDEBUG.  But NDEBUG works, too, for
@@ -55,18 +181,16 @@ Before Mon Jun  4 1997 Jens Schmidt <schmidt@mathematik.uni-kl.de>
 	  (__ASSERT1, ASSERT1, STICKYASSERT1): new assert macros which
 	  print additional argument
 	  (DEBINCLEVEL, DEBDECLEVEL, DEBOUTSL, DEBOUT, DEBOUTLN): debug
-	  functionality moved to debug.h and debug.cc
+	  functionality moved to debug.h
 	  (PVIRT_VOID, PVIRT_INTCF, PVIRT_BOOL, PVIRT_INT, PVIRT_CHARCC):
 	  PVIRT_*-functionality moved from int_cf.h to assert.h
 	  (__WARN, WARN, STICKYWARN): new macros
 	  (__ASSERT, __STICKYASSERT): the preprocessor instead of
  	  fpritnf() pastes the message into the format string now
-	  
 	* assert.cc: renamed to debug.cc
-	
 	* debug.h, debug.cc: new files.  DEBOUT-functionality moved from
-	  assert.h/assert.cc to these files.  All files which need this
-	  functionality include debug.h.
+	  assert.h/assert.cc to these files.  All sourcre files which need
+	  this functionality include debug.h.
 	  (DEBUGOUTPUT, NDEBUG): DEBUGOUTPUT is switched off now if NDEBUG
 	  is switched on
 	  (DEBOUT, DEBOUTLN): slightly modified so they print 'objects'
@@ -74,51 +198,3 @@ Before Mon Jun  4 1997 Jens Schmidt <schmidt@mathematik.uni-kl.de>
 	  changed.
 	  (deb_level, level_msg, deb_inc_level): modified so
 	  deb_inc_level()'s output is more pretty at time of first call
-
-	* cf_gcd.cc (DEBOUT): debug output changed to calls of DEBOUT
-	  macros
-
-	* cf_linsys.cc (TIMING): #define TIMING removed
-	  (DEBOUT): debug output rewritten and changed to calls of DEBOUT
-	  macros
-	  (linearSystemSolve, determinant, determinant2): typedefs int_ptr
-	  introduced and used
-
-	* fac_berlekamp.cc (QPrintFF, QPrintGF, DEBOUT): debug output
-	  changed to calls of DEBOUT macros
-
-	* fac_distrib.cc (DEBUGOUTPUT): #undef DEBUGOUTPUT removed
-
-	* fac_ezgcd.cc (DEBUGOUTPUT, TIMING, timing.h): some spurious
-	  #define's and #include's removed
-
-	* fac_multihensel.cc (DEBUGOUTPUT, TIMING): some spurious
-	  #define's removed
-
-	* fac_multivar.cc (DEBUGOUTPUT, TIMING): some spurious
-	  #define's removed
-
-	* fac_univar.cc (DEBUGOUTPUT, TIMING, sys/times.h): some spurious
-	  #define's and #include's removed
-	  (TIMING, timing.h): timing stuff changed to calls of TIMING
-	  macros
-	  (DEBOUT, DEBOUTLN, DEBINCLEVEL, DEBDECLEVEL): debug output
-	  slightly rewritten
-	  (hprint, DEBOUTHPRINT, NDEBUG): calls to function hprint()
-	  wrapped by macro DEBOUTHPRINT, which definitions depends on
-	  DEBUGOUTPUT (instead of NDEBUG, as before).  All callers
-	  changed.
-	  (MAX_FP_FAC, max_fp_fac): #define changed to const int
-	  (initHG, ZFactorizeUnivariate): added STICKYWARNings because of
-	  some strange errors which occure in this function
-	  (kBound): added cast to double in calculation of the bound
-	  (UnivariateQuadraticLift): added cast to double in calculation
-	  of no_iter
-	  (ZFactorizeUnivariate): removed spurious declaration of CFFList
-	  G.  Some trivial structural changes.  Removed test on D != 0
-	  before deleting D.
-	  doc fix
-
-	* cf_reval.h (iostream.h): spurious #include <iostream.h> removed
-
-	* cf_switches.h (RATTIONAL): spurious #define RATIONAL removed
