@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz2.cc,v 1.9 1999-11-18 18:43:58 siebert Exp $ */
+/* $Id: syz2.cc,v 1.10 1999-11-19 16:42:43 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -953,7 +953,6 @@ syStrategy syHilb(ideal arg,int * length)
   
   // Creare dp,S ring and change to it
   syzstr->syRing = rCurrRingAssure_dp_C();
-  assume(syzstr->syRing != origR);
 
   // set initial ShiftedComps
   currcomponents = (int*)Alloc0((arg->rank+1)*sizeof(int));

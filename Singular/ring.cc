@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.88 1999-11-19 15:17:47 Singular Exp $ */
+/* $Id: ring.cc,v 1.89 1999-11-19 16:42:41 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1737,11 +1737,11 @@ static ring rCopy0(ring r, BOOLEAN copy_qideal = TRUE,
                    BOOLEAN copy_ordering = TRUE)
 {
   if (r == NULL) return NULL;
-  rTest(r);
   int i,j;
   ring res=(ring)AllocSizeOf(ip_sring);
 
   memcpy4(res,r,sizeof(ip_sring));
+  res->VarOffset = NULL;
   res->ref=0;
   if (r->parameter!=NULL)
   {
@@ -1791,7 +1791,7 @@ static ring rCopy0(ring r, BOOLEAN copy_qideal = TRUE,
   res->idroot = NULL;
   if (r->qideal!=NULL)
   {
-    if (copy_qideal) res->qideal= idCopy(r->qideal);
+    if (copy_qideal) res->qideal= idrCopyR_NoSort(r->qideal, r);
     else res->qideal = NULL;
   }
   return res;
@@ -1994,7 +1994,7 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
 
   if (r == NULL)
   {
-    Werror("Null ring in %s:%d\n", fn, l);
+    Warn("Null ring in %s:%d\n", fn, l);
     return FALSE;
   }
 
@@ -2014,7 +2014,7 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
 #endif
   if (r->VarOffset == NULL)
   {
-    Werror("Null ring VarOffset -- no rComplete (?) in n %s:%d\n", fn, l);
+    Warn("Null ring VarOffset -- no rComplete (?) in n %s:%d\n", fn, l);
     return FALSE;
   }
 #ifdef MDEBUG
@@ -2023,7 +2023,7 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
 
   if ((r->OrdSize==0)!=(r->typ==NULL))
   {
-    Werror("mismatch OrdSize and typ-pointer in %s:%d",fn,l);
+    Warn("mismatch OrdSize and typ-pointer in %s:%d",fn,l);
     return FALSE;
   }
 #ifdef MDEBUG
@@ -2041,13 +2041,13 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
         if (r->typ[j].ord_typ==ro_cp)
         {
           if(((short)r->VarOffset[i]) == r->typ[j].data.cp.place)
-            Print("ordrec %d conflicts with var %d\n",j,i);
+            Warn("ordrec %d conflicts with var %d\n",j,i);
         }
         else
         if ((r->typ[j].ord_typ!=ro_syzcomp)
          && (r->VarOffset[i]/(sizeof(long)/sizeof(Exponent_t)))
            == (size_t)r->typ[j].data.dp.place)
-          Print("ordrec %d conflicts with var %d\n",j,i);
+          Warn("ordrec %d conflicts with var %d\n",j,i);
       }
     }
     int tmp;
@@ -2058,13 +2058,13 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
       #else
         if ((r->VarOffset[i] >> 24) >31)
       #endif
-          Print("bit_start out of range:%d\n",r->VarOffset[i] >> 24);
+          Warn("bit_start out of range:%d\n",r->VarOffset[i] >> 24);
     #else
       tmp=r->VarOffset[i];
     #endif
     if ((tmp<0) ||(tmp>r->ExpESize-1))
     {
-      Print("varoffset out of range for var %d: %d\n",i,tmp);
+      Warn("varoffset out of range for var %d: %d\n",i,tmp);
     }
   }
   if(r->typ!=NULL)
@@ -2075,11 +2075,11 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
       || (r->typ[j].ord_typ==ro_wp))
       {
         if (r->typ[j].data.dp.start > r->typ[j].data.dp.end)
-          Print("in ordrec %d: start(%d) > end(%d)\n",j,
+          Warn("in ordrec %d: start(%d) > end(%d)\n",j,
             r->typ[j].data.dp.start, r->typ[j].data.dp.end);
         if ((r->typ[j].data.dp.start < 1)
         || (r->typ[j].data.dp.end > r->N))
-          Print("in ordrec %d: start(%d)<1 or end(%d)>vars(%d)\n",j,
+          Warn("in ordrec %d: start(%d)<1 or end(%d)>vars(%d)\n",j,
             r->typ[j].data.dp.start, r->typ[j].data.dp.end,r->N);
       }
     }
@@ -2278,7 +2278,7 @@ BOOLEAN rComplete(ring r, int force)
      case 0x7:        bits=3;  break;
      case 0x3:        bits=2;  break;
      default:
-       Werror("unknown bitmask %xl",r->bitmask);
+       Warn("unknown bitmask %xl",r->bitmask);
        return TRUE;
   }
   // will be used for ordsgn:
@@ -3101,23 +3101,27 @@ BOOLEAN rComplete(ring r, int force)
 void rUnComplete(ring r)
 {
   if (r == NULL) return;
-  if (r->mm_specHeap != NULL)
-    mmUnGetSpecHeap(&(r->mm_specHeap));
-  Free((ADDRESS)r->VarOffset, (r->N +1)*sizeof(int));
-  if (r->order != NULL)
+  if (r->VarOffset != NULL)
   {
-    if (r->order[0] == ringorder_s && r->typ[0].data.syz.limit > 0)
+    if (r->mm_specHeap != NULL)
+      mmUnGetSpecHeap(&(r->mm_specHeap));
+  
+    Free((ADDRESS)r->VarOffset, (r->N +1)*sizeof(int));
+    if (r->order != NULL)
     {
-      Free(r->typ[0].data.syz.syz_index,
-           (r->typ[0].data.syz.limit +1)*sizeof(int));
+      if (r->order[0] == ringorder_s && r->typ[0].data.syz.limit > 0)
+      {
+        Free(r->typ[0].data.syz.syz_index,
+             (r->typ[0].data.syz.limit +1)*sizeof(int));
+      }
     }
+    if (r->OrdSize!=0 && r->typ != NULL)
+    {
+      Free((ADDRESS)r->typ,r->OrdSize*sizeof(sro_ord));
+    }
+    if (r->ordsgn != NULL && r->pCompLSize != 0)
+      Free((ADDRESS)r->ordsgn,r->pCompLSize*sizeof(long));
   }
-  if (r->OrdSize!=0 && r->typ != NULL)
-  {
-    Free((ADDRESS)r->typ,r->OrdSize*sizeof(sro_ord));
-  }
-  if (r->ordsgn != NULL && r->pCompLSize != 0)
-    Free((ADDRESS)r->ordsgn,r->pCompLSize*sizeof(long));
 }
 
 void rDebugPrint(ring r)
@@ -3222,68 +3226,6 @@ void pDebugPrint(poly p)
   }
 }
 
-#if 0
-/*2
- * create a copy of the ring r, which must be equivalent to currRing
- * used for qring definition,..
- * (i.e.: normal rings: same nCopy as currRing;
- *        qring:        same nCopy, same idCopy as currRing)
- */
-ring   rCopyAndAddSComps(ring r)
-{
-  int i,j;
-  int *pi;
-  ring res=(ring)AllocSizeOf(ip_sring);
-
-  memcpy4(res,r,sizeof(ip_sring));
-  res->ref=0;
-  if (r->parameter!=NULL)
-  {
-    res->minpoly=nCopy(r->minpoly);
-    int l=rPar(r);
-    res->parameter=(char **)Alloc(l*sizeof(char_ptr));
-    int i;
-    for(i=0;i<r->P;i++)
-    {
-      res->parameter[i]=mstrdup(r->parameter[i]);
-    }
-  }
-  res->names   = (char **)Alloc(r->N * sizeof(char_ptr));
-  i=1; // ringorder_C ->  ringorder_S
-  pi=r->order;
-  while ((*pi)!=0) { i++;pi++; }
-  res->wvhdl   = (int **)Alloc(i * sizeof(int_ptr));
-  res->order   = (int *) Alloc(i * sizeof(int));
-  res->block0  = (int *) Alloc(i * sizeof(int));
-  res->block1  = (int *) Alloc(i * sizeof(int));
-  for (j=0; j<i; j++)
-  {
-    if (r->wvhdl[j]!=NULL)
-    {
-      res->wvhdl[j]=(int*)AllocL(mmSizeL((ADDRESS)r->wvhdl[j]));
-      memcpy(res->wvhdl[j],r->wvhdl[j],mmSizeL((ADDRESS)r->wvhdl[j]));
-    }
-    else
-      res->wvhdl[j]=NULL;
-  }
-  memcpy4(res->order+1,r->order,i * sizeof(int));
-  memcpy4(res->block0+1,r->block0,i * sizeof(int));
-  memcpy4(res->block1+1,r->block1,i * sizeof(int));
-  for (i=0; i<res->N; i++)
-  {
-    res->names[i] = mstrdup(r->names[i]);
-  }
-  res->idroot = NULL;
-  if (r->qideal!=NULL) res->qideal= idCopy(r->qideal);
-  // add the additional ordering:
-  res->order[1]=ringorder_S;
-  res->block0[1]=1;
-  res->block1[1]=0; // block1-block0 is the length
-  res->wvhdl[1]=NULL;
-  rComplete(res, 1);
-  return res;
-}
-#endif
 
 /*2
 * asssume that rComplete was called with r
@@ -3336,10 +3278,10 @@ void rNGetSComps(int** currComponents, long** currShiftedComponents, ring r)
 // if necessary
 
 // for the time being, this is still here
-static ring rAssureSyzComp(ring r);
-ring rCurrRingAssureSyzComp()
+static ring rAssure_SyzComp(ring r, BOOLEAN complete = TRUE);
+ring rCurrRingAssure_SyzComp()
 {
-  ring r = rAssureSyzComp(currRing);
+  ring r = rAssure_SyzComp(currRing);
   if (r != currRing)
   {
     ring old_ring = currRing;
@@ -3354,10 +3296,9 @@ ring rCurrRingAssureSyzComp()
   return r;
 }
 
-static ring rAssureSyzComp(ring r)
+static ring rAssure_SyzComp(ring r, BOOLEAN complete = TRUE)
 {
   if (r->order[0] == ringorder_s) return r;
-
   ring res=rCopy0(r, FALSE, FALSE);
   int i=rBlocks(r);
   int j;
@@ -3383,10 +3324,85 @@ static ring rAssureSyzComp(ring r)
   }
   res->wvhdl = wvhdl;
 
-  rComplete(res,1);
+  if (complete) rComplete(res, 1);
   return res;
 }
 
+static ring rAssure_CompLastBlock(ring r, BOOLEAN complete = TRUE)
+{
+  int last_block = rBlocks(r) - 2;
+  if (r->order[last_block] != ringorder_c && 
+      r->order[last_block] != ringorder_C)
+  {
+    int c_pos = 0;
+    int i;
+    
+    for (i=0; i< last_block; i++)
+    {
+      if (r->order[i] == ringorder_c || r->order[i] == ringorder_C)
+      {
+        c_pos = i;
+        break;
+      }
+    }
+    if (c_pos != -1) 
+    {
+      ring new_r = rCopy0(r, FALSE, TRUE);
+      for (i=c_pos+1; i<=last_block; i++)
+      {
+        new_r->order[i-1] = new_r->order[i];
+        new_r->block0[i-1] = new_r->block0[i];
+        new_r->block1[i-1] = new_r->block1[i];
+        new_r->wvhdl[i-1] = new_r->wvhdl[i];
+      }
+      new_r->order[last_block] = r->order[c_pos];
+      new_r->block0[last_block] = r->block0[c_pos];
+      new_r->block1[last_block] = r->block1[c_pos];
+      new_r->wvhdl[last_block] = r->wvhdl[c_pos];
+      if (complete) rComplete(new_r, 1);
+      return new_r;
+    }
+  }
+  return r;
+}
+
+ring rCurrRingAssure_CompLastBlock()
+{
+  ring new_r = rAssure_CompLastBlock(currRing);
+  if (currRing != new_r)
+  {
+    ring old_r = currRing;
+    rChangeCurrRing(new_r, TRUE);
+    if (old_r->qideal != NULL)
+    {
+      new_r->qideal = idrCopyR(old_r->qideal, old_r);
+      currQuotient = new_r->qideal;
+    }
+  }
+  return new_r;
+}
+
+ring rCurrRingAssure_SyzComp_CompLastBlock()
+{
+  ring new_r_1 = rAssure_CompLastBlock(currRing, FALSE);
+  ring new_r = rAssure_SyzComp(new_r_1, FALSE);
+  
+  if (new_r != currRing)
+  {
+    ring old_r = currRing;    
+    if (new_r_1 != new_r && new_r_1 != old_r) rDelete(new_r_1);
+    rComplete(new_r, 1);
+    rChangeCurrRing(new_r, TRUE);
+    if (old_r->qideal != NULL)
+    {
+      new_r->qideal = idrCopyR(old_r->qideal, old_r);
+      currQuotient = new_r->qideal;
+    }
+    rTest(new_r);
+    rTest(old_r);
+  }
+  return new_r;
+}
 
 // use this for global orderings consisting of two blocks
 static ring rCurrRingAssure_Global(rRingOrder_t b1, rRingOrder_t b2)
@@ -3395,13 +3411,18 @@ static ring rCurrRingAssure_Global(rRingOrder_t b1, rRingOrder_t b2)
   int i;
 
   assume(b1 == ringorder_c || b1 == ringorder_C ||
-         b2 == ringorder_c || b1 == ringorder_C ||
+         b2 == ringorder_c || b2 == ringorder_C ||
          b2 == ringorder_S);
 
-  if (r_blocks == 2 && currRing->order[0] == b1 && currRing->order[2] == 0)
+#if THOMAS_HAS_FIXED_ALLRES
+  if (r_blocks == 3 && 
+      currRing->order[0] == b1 && 
+      currRing->order[1] == b2 &&
+      currRing->order[2] == 0)
     return currRing;
+#endif
 
-  ring res = rCopy0(currRing, FALSE, FALSE);
+  ring res = rCopy0(currRing, TRUE, FALSE);
   res->order = (int*)Alloc0(3*sizeof(int));
   res->block0 = (int*)Alloc0(3*sizeof(int));
   res->block1 = (int*)Alloc0(3*sizeof(int));

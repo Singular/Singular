@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.75 1999-11-17 12:09:24 obachman Exp $ */
+/* $Id: ideals.cc,v 1.76 1999-11-19 16:42:40 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1085,7 +1085,7 @@ ideal idSect (ideal h1,ideal h2)
   temp = idInit(j /*IDELEMS(first)*/,length+j);
 
   ring orig_ring=currRing;
-  ring syz_ring=rCurrRingAssureSyzComp();
+  ring syz_ring=rCurrRingAssure_SyzComp();
   rSetSyzComp(length);
 
   while ((j>0) && (first->m[j-1]==NULL)) j--;
@@ -1209,7 +1209,7 @@ ideal idMultSect(resolvente arg, int length)
   syzComp = k*maxrk;
 
   ring orig_ring=currRing;
-  ring syz_ring=rCurrRingAssureSyzComp();
+  ring syz_ring=rCurrRingAssure_SyzComp();
   rSetSyzComp(syzComp);
 
   bigmat = idInit(j,(k+1)*maxrk);
@@ -1363,7 +1363,7 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
 
   assume(currRing != NULL);
   ring orig_ring=currRing;
-  ring syz_ring=rCurrRingAssureSyzComp();
+  ring syz_ring=rCurrRingAssure_SyzComp();
 
   if (setSyzComp)
     rSetSyzComp(k);
@@ -1475,7 +1475,7 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
   k=max(1,idRankFreeModule(h1));
 
   ring orig_ring=currRing;
-  ring syz_ring=rCurrRingAssureSyzComp();
+  ring syz_ring=rCurrRingAssure_SyzComp();
   rSetSyzComp(k);
 
   ideal s_h1=h1;
@@ -1576,7 +1576,7 @@ ideal idLiftNonStB (ideal  mod, ideal submod,BOOLEAN goodShape)
   k=max(k,1);
 
   ring orig_ring=currRing;
-  ring syz_ring=rCurrRingAssureSyzComp();
+  ring syz_ring=rCurrRingAssure_SyzComp();
   rSetSyzComp(k);
 
   ideal s_mod, s_temp;
@@ -1661,7 +1661,7 @@ ideal  idLift (ideal  mod,ideal submod)
 
 
   ring orig_ring=currRing;
-  ring syz_ring=rCurrRingAssureSyzComp();
+  ring syz_ring=rCurrRingAssure_SyzComp();
   rSetSyzComp(max(k,1));
 
   ideal s_result=idInit(IDELEMS(submod),submod->rank);
@@ -1877,7 +1877,7 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
   ideal s_h4 = idInitializeQuot (h1,h2,h1IsStb,&addOnlyOne,&kmax);
   hom = (tHomog)idHomModule(s_h4,currQuotient,&weights1);
   ring orig_ring=currRing;
-  ring syz_ring=rCurrRingAssureSyzComp();
+  ring syz_ring=rCurrRingAssure_SyzComp();
   rSetSyzComp(kmax-1);
   if (orig_ring!=syz_ring)
     s_h4 = idrMoveR_NoSort(s_h4,syz_ring);
@@ -2811,7 +2811,7 @@ matrix idDiffOp(ideal I, ideal J,BOOLEAN multiply)
 static ideal idHandleIdealOp(ideal arg,int syzcomp,int isIdeal=FALSE)
 {
   ring orig_ring=currRing;
-  ring syz_ring=rCurrRingAssureSyzComp();
+  ring syz_ring=rCurrRingAssure_SyzComp();
   rSetSyzComp(length);
 
   ideal s_temp;
@@ -2911,7 +2911,7 @@ ideal idModulo (ideal h2,ideal h1)
   }
 
   ring orig_ring=currRing;
-  ring syz_ring=rCurrRingAssureSyzComp();
+  ring syz_ring=rCurrRingAssure_SyzComp();
   rSetSyzComp(length);
   ideal s_temp;
   

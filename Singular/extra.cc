@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.117 1999-11-17 10:51:04 obachman Exp $ */
+/* $Id: extra.cc,v 1.118 1999-11-19 16:42:39 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1121,11 +1121,20 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     {
       poly p = (poly) h->Data();
       ring cr = currRing;
-      ring r = rCurrRingAssure_C_dp();
+      ring r = rCurrRingAssure_SyzComp_CompLastBlock();
       poly p_r = prCopyR(p, cr);
       pTest(p_r);
       pWrite(p_r);
-      rChangeCurrRing(cr, TRUE);
+      rWrite(r);
+      pDelete(&p_r);
+      assume(rCurrRingAssure_SyzComp() == currRing &&
+             rCurrRingAssure_CompLastBlock() == currRing &&
+             rCurrRingAssure_SyzComp_CompLastBlock() == currRing);
+      if (r != cr)
+      {
+        rChangeCurrRing(cr, TRUE);
+        rKill(r);
+      }
       return FALSE;
     }
 /*==================== Error =================*/

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.30 1999-11-18 18:43:57 siebert Exp $ */
+/* $Id: syz.cc,v 1.31 1999-11-19 16:42:42 obachman Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -423,7 +423,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
 
 /*--- initialize the syzygy-ring -----------------------------*/
   ring origR = currRing;
-  ring syz_ring = rCurrRingAssureSyzComp();
+  ring syz_ring = rCurrRingAssure_SyzComp();
   rSetSyzComp(rk_arg);
   
   if (syz_ring != origR)

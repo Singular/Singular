@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.43 1999-11-18 14:47:02 obachman Exp $ */
+/* $Id: ring.h,v 1.44 1999-11-19 16:42:42 obachman Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -191,11 +191,16 @@ inline int rGetCurrSyzLimit()
           currRing->typ[0].data.syz.limit : 0);}
 
 // Ring Manipulations
-ring   rCurrRingAssureSyzComp();
+ring   rCurrRingAssure_SyzComp();
 void   rSetSyzComp(int k);
 ring   rCurrRingAssure_dp_S();
 ring   rCurrRingAssure_dp_C();
 ring   rCurrRingAssure_C_dp();
+// makes sure that c/C ordering is last ordering
+ring   rCurrRingAssure_CompLastBlock();
+// makes sure that c/C ordering is last ordering and SyzIndex is first
+ring   rCurrRingAssure_SyzComp_CompLastBlock();
+
 // return the max-comonent wchich has syzIndex i
 // Assume: i<= syzIndex_limit
 int rGetMaxSyzComp(int i);
