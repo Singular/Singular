@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.132 1999-03-09 14:13:41 Singular Exp $ */
+/* $Id: iparith.cc,v 1.133 1999-03-09 14:23:07 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1341,7 +1341,7 @@ static BOOLEAN jjMAP(leftv res, leftv u, leftv v)
   }
   else
   {
-    Werror("%s(<name>) expected",u->Nmae());
+    Werror("%s(<name>) expected",u->Name());
   }
   if (sl==NULL) return TRUE;
   memcpy(res,sl,sizeof(sleftv));
