@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: copyright.tex,v 1.24 1999-08-24 12:00:38 Singular Exp $
+@comment $Id: COPYING.texi,v 1.1 1999-11-26 13:26:54 obachman Exp $
 @comment this file contains the copyright notice on Singular
 @include version.texi
 
@@ -56,9 +56,9 @@ sold.
 
 If you use Singular or parts thereof in a project and/or publish
 results that were partly obtained using @sc{Singular}, we request that you
-cite @sc{Singular} (see
-@uref{http://www.ma@-the@-ma@-tik.uni-kl.de/~zca/Singular/how_to_cite.html, for information}
- on how to cite Singular) and inform us about it.
+cite @sc{Singular} and inform us about it -- see
+@uref{http://www.ma@-the@-ma@-tik.uni-kl.de/~zca/Singular/how_to_cite.html},
+for information on how to cite Singular.
 
 Please send any comments or bug reports to
 @email{singular@@mathematik.uni-kl.de}.
@@ -69,7 +69,7 @@ the Factory library, and the libfac library.
 Their copyrights and licences can be found in the accompanying files
 which are distributed along with these libraries.
 
-@section Availability
+@heading Availability
 
 The latest information about @sc{Singular} is always available from
 @uref{http://www.ma@-the@-ma@-tik.uni-kl.de/~zca/Singular}.
@@ -105,7 +105,7 @@ WWW brow@-ser from
 @end table
 @end ifset
 
-@section Acknowledgements
+@heading Acknowledgements
 
 The development of @sc{Singular} is directed and coordinated by
 Gert-Martin Greuel, Gerhard Pfister, and Hans
@@ -115,6 +115,7 @@ Contributions to the kernel of @sc{Singular} have been made by
 Olaf Bachmann,
 Hubert Grassmann,
 Kai Kr@"uger,
+Michael Messollen,
 Wolfgang Neumann,
 Thomas N@"u@ss{}ler,
 Wilfred Pohl,
@@ -126,15 +127,18 @@ and
 Tim Wichmann.
 
 @sc{Singular} libraries have furthermore been contributed by
+Stephan Endra@ss{},
 Wolfram Decker,
 Anne Fr@"ubis-Kr@"uger,
 Christian Gorzel,
 Agnes Eileen Heydtmann,
+Dietmar Hillebrand,
 Ulrich Klein,
 Martin Lamm,
 Bernd Martin,
+Mathias Schulze,
 and
-Mathias Schulze.
+Moritz Wenk.
 
 We should like to acknowledge the financial support given by
 the Volkswagen-Stiftung,

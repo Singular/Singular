@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.41 1999-11-24 18:50:40 obachman Exp $
+### $Id: Makefile.in,v 1.42 1999-11-26 13:26:54 obachman Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -72,7 +72,8 @@ HTML_TUTOR_TOP     = tutor.htm
 ###########################################################
 # File sets
 #
-TEX_FILES	= copyright.tex
+STANDALONE_TEXI_FILES	= COPYING.texi
+
 DOC2TEX_FILES	= \
 		examples.tex general.tex math.tex reference.tex \
 		start.tex types.tex pdata.tex tricks.tex platform.tex
@@ -162,9 +163,29 @@ ${D2T_SUBDIR}/%_lib.pl : ${SINGULAR_LIB_DIR}/%.lib ${LIBPARSE}
 singular.idx: singular.hlp ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx doc2idx.pl
 	${PERL5} doc2idx.pl singular.hlp ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx ${CHKSUM_DB} > singular.idx
 
+###########################################################
+# stand-alone targest
+#
+
+STANDALONE_TXT_FILES := $(STANDALONE_TEXI_FILES:.texi=.txt)
+STANDALONE_HTML_FILES := $(STANDALONE_TEXI_FILES:.texi=.html)
+STANDALONE_FILES      := $(STANDALONE_TEXI_FILES:.texi=)
+
 # targets which produce stand-alone documents
-COPYING: copyright.tex
-	${MAKEINFO} --no-header --paragraph-indent none -o COPYING copyright.tex 
+%.txt :  %.texi
+	${MAKEINFO} --no-header --paragraph-indent none -o $@ $<
+
+%.html : %.texi
+	${TEXI2HTML} -init_file t2h_standalone.init -verbose -split none -o $@ $<
+
+% : %.txt
+	cp $< $@
+
+standalone: standalone-txt standalone-html ${STANDALONE_FILES}
+
+standalone-html: ${STANDALONE_HTML_FILES}
+standalone-txt:  ${STANDALONE_TXT_FILES}
+
 
 ###########################################################
 # html targets
@@ -243,6 +264,7 @@ mostlyclean:
 	/bin/rm -f *.tps *.vr *.vrs *.dvi *.ps
 	/bin/rm -f singular.hlp manual.hlp  ${DOC2TEX_FILES} singular.idx
 	/bin/rm -f ${HTML_SUBDIR}/${HTML_MANUAL_TOP} ${HTML_SUBDIR}/${HTML_TUTOR_TOP}
+	/bin/rm -rf ${STANDALONE_HTML_FILES} ${STANDALONE_FILES} ${STANDALONE_TXT_FILES}
 
 distclean: clean
 	/bin/rm -f Makefile

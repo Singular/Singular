@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.154 1999-11-24 17:09:38 Singular Exp $
+@comment $Id: general.doc,v 1.155 1999-11-26 13:26:56 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -22,6 +22,7 @@
 
 @menu
 * Interactive use::
+* Emacs user interface::
 * Rings and orderings::
 * Implemented algorithms::
 * The SINGULAR language::
@@ -34,7 +35,7 @@
 
 
 @c ---------------------------------------------------------------------------
-@node Interactive use, Rings and orderings, General concepts, General concepts
+@node Interactive use, Emacs user interface, General concepts, General concepts
 @section Interactive use
 @cindex Interactive use
 
@@ -679,7 +680,113 @@ prevents the execution of the"global"
 @code{.singularrc} file installed by the system administrator).
 
 @c ---------------------------------------------------------------------------
-@node Rings and orderings, Implemented algorithms, Interactive use, General concepts
+@node Emacs user interface, Rings and orderings, Interactive use, General concepts
+@section Emacs user interface
+@cindex Emacs, user interface
+
+Olaf
+@itemize
+@item 
+new from version 2.0; requirements
+@item 
+ESingular and Singular within
+@item 
+(Dis)Advantages of Emacs interface
+@item 
+quick guide to following section
+@end itemize
+
+@menu
+* Overview of the Emacs user interface::
+* Running SINGULAR under Emacs::
+* Demo mode::
+* Customization of the Emacs interface::
+* Editing SINGULAR input files with Emacs::
+* Top 20 Emacs commands::
+@end menu
+
+@c --------------------------------------------------------------------------
+@node Overview of the Emacs user interface, Running SINGULAR under Emacs, Emacs user interface, Emacs user interface
+@subsection Overview of the Emacs user interface
+@cindex Emacs, overview of the Singular interface
+@cindex Singular,  overview of the Emacs user interface
+@cindex Overview of the Emacs user interface
+Olaf
+
+@itemize
+@item 
+Emacs for dummys; tutorial; help for Emacs
+@item 
+Funktional comparison to terminal interface:
+Intoduce Emacs buffers, point
+@item
+Differences: tab-completion, restart, interrupt/kill,
+@item
+Additional things: Folding, truncation
+@item 
+help
+@item
+libraries, loading files
+@end itemize
+
+@c --------------------------------------------------------------------------
+@node Running SINGULAR under Emacs, Demo mode, Overview of the Emacs user interface, Emacs user interface
+@subsection Running SINGULAR under Emacs
+@cindex Emacs, running Singular under
+@cindex Singular, running within Emacs
+@cindex Running SINGULAR under Emacs
+
+Tim
+@itemize
+@item 
+ESingular vs running within existing emacs
+@item 
+ESingular (start-up sequence, command-line options, files)
+@item 
+Singular within running emacs (.emacs, start-up)
+@item 
+killing/restart/Singular other
+@end itemize
+
+@c --------------------------------------------------------------------------
+@node Demo mode, Customization of the Emacs interface, Running SINGULAR under Emacs, Emacs user interface
+@subsection Demo mode
+@cindex Emacs, Singular demo mode
+@cindex Singular, demo mode
+@cindex Demo mode
+
+Olaf
+
+@c --------------------------------------------------------------------------
+@node Customization of the Emacs interface, Editing SINGULAR input files with Emacs, Demo mode, Emacs user interface
+@subsection Customization of the Emacs interface
+@cindex Emacs, customization of Singular mode
+@cindex Singular, customization of Emacs user interface
+@cindex Customization of the Emacs interface
+
+Tim
+
+@c --------------------------------------------------------------------------
+@node Editing SINGULAR input files with Emacs, Top 20 Emacs commands, Customization of the Emacs interface, Emacs user interface
+@subsection Editing SINGULAR input files with Emacs
+@cindex Emacs, editing Singular input files
+@cindex Singular, editing input files with Emacs
+@cindex Editing SINGULAR input files with Emacs
+
+Olaf
+
+@c --------------------------------------------------------------------------
+@node Top 20 Emacs commands,,Editing SINGULAR input files with Emacs, Emacs user interface
+@subsection Top 20 Emacs commands
+@cindex Emacs, important commands
+@cindex Singular, important commands of Emacs interface
+@cindex Top 20 Emacs commands
+
+Tim
+
+@c ---------------------------------------------------------------------------
+@c ---------------------------------------------------------------------------
+@node Rings and orderings, Implemented algorithms, Emacs user interface, General concepts
 @section Rings and orderings
 @cindex Rings and orderings
 
@@ -3208,7 +3315,7 @@ See @ref{TRACE var}.
 @subsection Source code debugger
 The source code debugger is an experimental feature, it's interface may change
 in future versions of Singular.@*
-To enable the use of the source code debugger @sc{Singular} have to be started
+To enable the use of the source code debugger @sc{Singular} has to be started
 with the option @code{-d} or @code{--sdb} (see @ref{Command line options}).
 @subsubsection sdb commands
 Each sdb command consist of one character which may be followed by
