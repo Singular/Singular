@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.inc,v 1.9 1998-05-05 18:07:21 Singular Exp $ */
+/* $Id: febase.inc,v 1.10 1998-05-07 17:53:25 Singular Exp $ */
 /*
 * ABSTRACT: handling of 'voices'
 */
@@ -448,11 +448,6 @@ NewBuff:
       {
         if (c<' ')  yylineno++;
         else if (c=='}') break;
-      }
-      else if (yy_noeof==noeof_string) 
-      {
-        if (c<' ')  yylineno++;
-        else if (c=='"') break;
       }
       else
       {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.29 1998-04-24 16:39:20 Singular Exp $ */
+/* $Id: grammar.y,v 1.30 1998-05-07 17:53:29 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -1442,6 +1442,26 @@ proccmd:
             sprintf(IDPROC(h)->data.s.body,"%s\n%s;return();\n\n",args,$3);
             FreeL((ADDRESS)args);
             FreeL((ADDRESS)$3);
+            //Print(">>%s<<\n",IDPROC(h)->data.s.body);
+          }
+        | PROC_DEF STRINGTOK STRINGTOK BLOCKTOK
+          {
+            FreeL((ADDRESS)$3);
+            idhdl h = enterid($1,myynest,PROC_CMD,&idroot,FALSE);
+            if (h==NULL)
+            {
+              FreeL((ADDRESS)$2);
+              FreeL((ADDRESS)$4);
+              YYERROR;
+            }
+            char *args=iiProcArgs($2,FALSE);
+            procinfov pi;
+            FreeL((ADDRESS)$2);
+            iiInitSingularProcinfo(IDPROC(h),"", $1, 0, 0);
+            IDPROC(h)->data.s.body = (char *)AllocL(strlen($4)+strlen(args)+14);;
+            sprintf(IDPROC(h)->data.s.body,"%s\n%s;return();\n\n",args,$4);
+            FreeL((ADDRESS)args);
+            FreeL((ADDRESS)$4);
             //Print(">>%s<<\n",IDPROC(h)->data.s.body);
           }
         ;
