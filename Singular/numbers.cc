@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.49 2003-01-31 09:10:04 Singular Exp $ */
+/* $Id: numbers.cc,v 1.50 2003-02-03 15:28:54 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -182,7 +182,7 @@ void nInitChar(ring r)
   {
     if (r->algring==NULL)
     {
-      short ch=-c;
+      int ch=-c;
       if (c==1) ch=0;
       r->algring=(ring) rDefault(ch,r->P,r->parameter);
       //r->algring->ShortOut=r->ShortOut;
