@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: creat_top.cc,v 1.10 2000-03-30 06:35:44 krueger Exp $ */
+/* $Id: creat_top.cc,v 1.11 2000-05-01 19:13:05 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -136,7 +136,7 @@ int write_intro(
   mod_write_header(module->modfp, module->name, 'c');
   mod_copy_tmp(module->modfp, module->fmtfp);
   if(trace)printf("\n");fflush(stdout);
-  fclose(module->fmtfp);
+  fclose(module->fmtfp); module->fmtfp = NULL;
   if(create_tmpfile(module)) return -1;
   if(create_tmpfile(module, 1)) return -1;
   if(create_tmpfile(module, 2)) return -1;
