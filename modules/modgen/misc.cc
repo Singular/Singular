@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.3 2000-01-17 08:32:25 krueger Exp $ */
+/* $Id: misc.cc,v 1.4 2000-01-21 09:23:21 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -195,6 +195,32 @@ static int iiTabIndex(const jjValCmdTab dArithTab, const int len, const int op)
 #endif
 
 /*========================================================================*/
+struct valid_cmds_def 
+{
+  char *name;
+  void (*write_cmd)(moddefv module, procdefv pi);
+  cmd_token id;
+} valid_cmds[] = {
+  { "declaration",  write_function_declaration,  CMD_DECL   },
+  { "typecheck",    write_function_typecheck,  CMD_CHECK  },
+  { "return",       write_function_return,  CMD_RETURN },
+  { NULL,           0, CMD_NONE }
+};
+
+cmd_token checkcmd(
+  char *cmdname,
+  void (**write_cmd)(moddefv module, procdefv pi)
+  )
+{
+  int i;
+  for(i=0; valid_cmds[i].name!=NULL; i++)
+    if(strcmp(valid_cmds[i].name, cmdname)==0) {
+      *write_cmd = valid_cmds[i].write_cmd;
+      return valid_cmds[i].id;
+    }
+  return CMD_NONE;
+}
+  
 struct valid_vars_def {
   char *name;
   var_type type;
@@ -206,10 +232,11 @@ struct valid_vars_def {
   { "help",         VAR_STRING,  VAR_HELP },
   { "do_typecheck", VAR_BOOL,    VAR_TYPECHECK },
   { "do_return",    VAR_BOOL,    VAR_RETURN },
+  { "function",     VAR_STRING,  VAR_FUNCTION },
   { NULL,           VAR_UNKNOWN, VAR_NONE }
 };
 
-int checkvar(
+var_token checkvar(
   char *varname,
   var_type type
   )
@@ -218,7 +245,7 @@ int checkvar(
   for(i=0; valid_vars[i].name!=NULL; i++)
     if((strcmp(valid_vars[i].name, varname)==0) &&
        (valid_vars[i].type == type) ) return valid_vars[i].id;
-  return 0;
+  return VAR_NONE;
 }
 
   
@@ -437,6 +464,7 @@ void  write_procedure_text(
   free(module->procs[module->proccnt-1].c_code);
   module->procs[module->proccnt-1].c_code = NULL;
 
+#if 0
   if(pi->paramcnt>0) {
     if(pi->param[0].typ!=SELF_CMD) {
       switch( pi->return_val.typ) {
@@ -487,7 +515,8 @@ void  write_procedure_text(
           fprintf(module->fmtfp, "  return FALSE;");
     }
   }
-  fprintf(module->fmtfp, "\n}\n\n");
+#endif
+  fprintf(module->fmtfp, "/*\n}\n\n*/");
   
 }
 

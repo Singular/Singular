@@ -1,5 +1,5 @@
 /*
- * $Id: grammar.y,v 1.3 2000-01-17 08:32:25 krueger Exp $
+ * $Id: grammar.y,v 1.4 2000-01-21 09:23:20 krueger Exp $
  */
 
 %{
@@ -23,7 +23,6 @@ extern void write_intro(moddefv module);
 extern void write_mod_init(FILE *fp);
 extern void enter_id(FILE *fp, char *name, char *value,
                      int lineno, char *file);
-extern int checkvar(char *varname, var_type type);
  
 procdef procedure_decl;
 
@@ -50,7 +49,7 @@ void yyerror(char * fmt)
 %token SECTEND
 %token SECT2END
 %token SECT3END
-%token PROCEND
+/*%token PROCEND*/
 %token PROCDECLTOK
 
 /* BISON Declarations */
@@ -63,6 +62,7 @@ void yyerror(char * fmt)
 %token <name> MCCODETOK
 %token <name> MCODETOK
 %token <name> CODEPART
+%token <name> PROCCMD
 %token  <tp> VARTYPETOK
 %token <i>    NUMTOK
 %token <i>    BOOLTOK
@@ -114,79 +114,93 @@ sect1end: SECTEND
         ;
 
 expr:   NAME '=' MSTRINGTOK
-        {
+        { var_token vt;
           switch(sectnum) {
               case 1: /* pass 1: */
-                if( checkvar($1, VAR_STRING) ) {
+                if( (vt=checkvar($1, VAR_STRING)) ) {
                   enter_id(module_def.fmtfp, $1, $3, yylineno,
                            module_def.filename);
                 }
                 else {
-                  myyyerror("Unknown variable '%s' in section %d\n", $1,
-                            sectnum);
+                  myyyerror("Line %d: Unknown variable '%s' in section %d\n",
+                            yylineno, $1, sectnum);
                 }
-                
-                  // proc_set_var(&procedure_decl, VAR_STRING, $1, $3);
                 break;
               case 2: /* pass 2: procedure declaration */
-                proc_set_var(&procedure_decl, VAR_FILE, $1, $3);
+                if( (vt=checkvar($1, VAR_STRING)) ) {
+                  proc_set_var(&procedure_decl, VAR_STRING, vt, $1, $3);
+                }
+                else {
+                  myyyerror("Line %d: Unknown variable '%s' in section %d\n",
+                            yylineno, $1, sectnum);
+                }
                 break;
               default: break;
                 
           }
         }
         | NAME '=' FILENAME
-        {
+        { var_token vt;
           switch(sectnum) {
               case 1: /* pass 1: */
                 break;
               case 2: /* pass 2: procedure declaration */
-                proc_set_var(&procedure_decl, VAR_FILE, $1, $3);
+                if( (vt=checkvar($1, VAR_FILE)) ) {
+                  proc_set_var(&procedure_decl, VAR_FILE, vt, $1, $3);
+                }
                 break;
               default: break;
                 
           }
         }
         | NAME '=' files
-        {
+        { var_token vt;
           switch(sectnum) {
               case 1: /* pass 1: */
                 break;
               case 2: /* pass 2: procedure declaration */
-                proc_set_var(&procedure_decl, VAR_FILES, $1, &$3);
+                if( (vt=checkvar($1, VAR_FILES)) ) {
+                  proc_set_var(&procedure_decl, VAR_FILES, vt, $1, &$3);
+                }
                 break;
               default: break;
                 
           }
         }
         | NAME '=' NUMTOK
-        {
+        { var_token vt;
           switch(sectnum) {
               case 1: /* pass 1: */
                 break;
               case 2: /* pass 2: procedure declaration */
-                proc_set_var(&procedure_decl, VAR_NUM, $1, &$3);
+                if( (vt=checkvar($1, VAR_NUM)) ) {
+                  proc_set_var(&procedure_decl, VAR_NUM, vt, $1, &$3);
+                }
                 break;
               default: break;
                 
           }
         }
         | NAME '=' BOOLTOK
-        {
-          printf("BOOL\n");
-          
+        { var_token vt;
           switch(sectnum) {
               case 1: /* pass 1: */
-                if( checkvar($1, VAR_BOOL) ) {
-                  
+                if( (vt=checkvar($1, VAR_BOOL)) ) {
+                  proc_set_default_var(VAR_BOOL, vt, $1, &$3);
                 }
                 else {
-                  myyyerror("Unknown variable '%s' in section %d\n", $1,
-                            sectnum);
+                  myyyerror("Line %d: Unknown variable '%s' in section %d\n",
+                            yylineno, $1, sectnum);
                 }
                 break;
               case 2: /* pass 2: procedure declaration */
-                proc_set_var(&procedure_decl, VAR_BOOL, $1, &$3);
+                if( (vt=checkvar($1, VAR_BOOL)) ) {
+                  proc_set_var(&procedure_decl, VAR_BOOL, vt, $1, &$3);
+                }
+                else {
+                  myyyerror("Line %d: Unknown variable '%s' in section %d\n",
+                            yylineno, $1, sectnum);
+                }
                 break;
               default: break;
                 
@@ -200,8 +214,8 @@ files:  FILENAME ',' FILENAME
         }
 ;
 
-sect2:  procdecl
-        | sect2 procdecl
+sect2:  procdef 
+        | sect2 procdef
         ;
 
 sect2end: SECT2END
@@ -211,13 +225,20 @@ sect2end: SECT2END
         }
         ;
 
-procdecl: procdecl3 '{' MCODETOK 
+procdef: procdecl proccode
+{
+  printf("PROCDEF:\n");
+}
+
+        ;
+
+procdecl: procdecl3 '{'
         {
-          setup_proc(&module_def, &procedure_decl, $3);
+          setup_proc(&module_def, &procedure_decl);
         }
-        | procdecl3 procdeclhelp '{' MCODETOK
+        | procdecl3 procdeclhelp '{'
         {
-          setup_proc(&module_def, &procedure_decl, $4);
+          setup_proc(&module_def, &procedure_decl);
         }
         ;
 
@@ -247,19 +268,47 @@ procdeclhelp: MSTRINGTOK
 
 procdeclflags: expr ';'
         {
-          printf("expr-1\n");
+          //printf("expr-1\n");
         }
         | procdeclflags expr ';'
         {
-          printf("expr-2\n");
+          //printf("expr-2\n");
         }
         ;
 
-procdeclend: PROCEND
+proccode: proccodeline MCODETOK
+          {
+            generate_function(&procedure_decl, module_def.fmtfp);
+          };
+
+
+proccodeline: CODEPART
         {
-          printf("End of procedure declaration\n");
+          fprintf(module_def.fmtfp, "#line %d \"%s\"\n",
+					  yylineno-1, module_def.filename);
+          fprintf(module_def.fmtfp, "%s", $1);
         }
-        ;
+        | proccodeline CODEPART
+        {
+          fprintf(module_def.fmtfp, "%s", $2);
+        }
+        | proccodeline proccmd
+        {
+        };
+
+proccmd: '%' PROCCMD ';'
+        { cmd_token vt;
+          void (*write_cmd)(moddefv module, procdefv pi);
+          
+          if( (vt=checkcmd($2, &write_cmd)) ) {
+            write_cmd(&module_def, &procedure_decl);
+          }
+          else {
+            myyyerror("Line %d: Unknown command '%s' in section %d\n",
+                      yylineno, $1, sectnum);
+          }
+          free($2);
+        };
 
 typelist: VARTYPETOK
         {
@@ -273,17 +322,17 @@ typelist: VARTYPETOK
 
 code:  codeline SECT3END
         {
-          printf("C-code\n");
+          fprintf(module_def.modfp, "%s", $1);
         }
 ;
 
 codeline: CODEPART
         {
-          printf(">%s", $1);
+          fprintf(module_def.modfp, "#line %d \"%s\"\n",
+					  yylineno, module_def.filename);
         }
         | codeline CODEPART
         {
-          printf(">%s", $1);
         }
         ;
 

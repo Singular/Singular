@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.3 2000-01-17 08:32:26 krueger Exp $ */
+/* $Id: scanner.l,v 1.4 2000-01-21 09:23:22 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -12,7 +12,7 @@
 #include "stype.h"
 #include "grammar.h"
 
-/* #define DEBUG 3*/
+/*#define DEBUG 3*/
  
 #  define YYLP_ERR_NONE    0
 #  define YYLP_DEF_BR2     1
@@ -114,6 +114,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 /* %start START */
 
 %x preamble
+%x PROCCMDBLOCK
 %x CODEBLOCK
 %x CODEBLOCK2
 %x module
@@ -144,6 +145,12 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
         ^{WS}        push_state(YYSTATE, CODEBLOCK, "CODEBLOCK");
         ^"/*"       ACTION_ECHO; push_state(YYSTATE, COMMENT, "COMMENT");
         ^"//".*{NL}  ++yylineno; ACTION_ECHO; 
+	{BOOL}  { if(yyleng == 1) sscanf(yytext, "%d", &lvalp->i);
+	          else {
+		    if(strcasecmp(yytext, "yes")==0) lvalp->i = 1;
+		    else lvalp->i = 0;
+                  }
+                  return BOOLTOK; }
 	^"%{".*{NL} { 
 	        yylineno++;
 		push_state(YYSTATE, CODEBLOCK, "CODEBLOCK");
@@ -158,7 +165,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
         ","     { return ','; }
 
         "\""    { do_return++; push_state(YYSTATE, STRING, "string"); }
-        ^"%%".* {
+        ^"%%".* { 
 		  sectnum = 2;
 #if DEBUG
                   printf("Goto section %d\n", sectnum);
@@ -223,8 +230,8 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 <COMMENT>{
         "*/"            /*ACTION_ECHO;*/ pop_state(); yymore();
         "*"             /*ACTION_ECHO;*/ yymore();
-        [^*\n]+         ++yylineno; yymore(); /*ACTION_ECHO;*/
-        [^*\n]*{NL}     ++yylineno; yymore(); /*ACTION_ECHO;*/
+        {NL}          { yylineno++; yymore(); }
+        .             { yymore(); }
 	  }
 
 <SECT2>{
@@ -282,7 +289,7 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 	 {NAME}  { 
 	           int i,tok;
 #if DEBUG > 1
-	           printf("VAR: %s\n", yytext);
+	           printf("(%d) VAR: %s\n", yylineno, yytext);
 #endif
 		   i = IsCmd(yytext, tok);
 #if DEBUG > 1
@@ -312,14 +319,13 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 
 <CODEBLOCK2>{
          "/*"      push_state(YYSTATE, COMMENT, "COMMENT"); yymore();
-         "//".*{NL}  ++yylineno; yymore();
+         "//".*{NL} { yylineno++; lvalp->name = yytext; return CODEPART; }
          "\""    { push_state(YYSTATE, STRING, "string"); yymore();}
          "{"     { brace1++; yymore();}
          "}"     { brace1--;
                    if(brace1<=0) {
                      char * s, *t;
 
-                     /*yylineno++;*/
 		     pop_state();
 		     s = t = lvalp->name = dupyytext();
 		     while (*yytext)
@@ -329,16 +335,33 @@ BOOL           (([Yy][Ee][Ss])|([Nn][Oo])|[01])
 		     }
 		     if(s-t>2 && *(s-1)=='}' && *(s-2)=='%') *(s-2)='\0';
 #if DEBUG > 1
-                   printf("BRACE DOWN=%d\n", brace1);
+                     printf("2 BRACE DOWN=%d\n", brace1);
 #endif
 		     return MCODETOK;
-                   } else yymore();
+                   } else {
+                     yymore();
+                     /*yylineno++;*/
+		   }
                  }
-         {NL}    { yylineno++; yymore(); }
+         {NL}    { yylineno++; lvalp->name = yytext; return CODEPART; }
+	 "%" { push_state(YYSTATE, PROCCMDBLOCK, "PROCCMDBLOCK"); return '%'; }
          .       { yymore(); }
+
+       }
+
+<PROCCMDBLOCK>{
+       {col}  { pop_state(); return ';'; }
+       {WS}    /* ignore */
+       {NAME} { lvalp->name = strdup(yytext); return PROCCMD; }
+       .      { printf("PCB: '%s'\n", yytext); }
        }
 
 %%
+/*
+        [^*\n]+         ++yylineno; yymore(); /*ACTION_ECHO;* /
+        [^*\n]*{NL}     ++yylineno; yymore(); /*ACTION_ECHO;* /
+         .*(\n?) { yylineno++; lvalp->name = yytext; return CODEPART; }
+*/
 
 extern "C" {
   int yywrap() {

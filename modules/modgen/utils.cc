@@ -1,5 +1,5 @@
 /*
- * $Id: utils.cc,v 1.2 2000-01-17 08:32:27 krueger Exp $
+ * $Id: utils.cc,v 1.3 2000-01-21 09:23:22 krueger Exp $
  */
 
 #include <stdio.h>
@@ -70,7 +70,6 @@ void myyyerror(
 {
   va_list ap;
   va_start(ap, fmt);
-printf("ERROR report\n");
   vprintf(fmt, ap);
   va_end(ap);
 }

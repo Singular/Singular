@@ -1,5 +1,5 @@
 /*
- *  $Id: modgen.h,v 1.3 2000-01-17 08:32:26 krueger Exp $
+ *  $Id: modgen.h,v 1.4 2000-01-21 09:23:21 krueger Exp $
  *
  */
 
@@ -27,6 +27,9 @@ typedef procflags *procflagsv;
 
 class procflags {
   public:
+  char declaration_done;
+  char typecheck_done;
+  
   char do_typecheck;
   char do_return;
 };
@@ -81,13 +84,21 @@ typedef enum { VAR_UNKNOWN, VAR_BOOL, VAR_NUM, VAR_STRING,
                VAR_FILE, VAR_FILES
 } var_type;
 
+typedef enum { CMD_NONE, CMD_DECL, CMD_CHECK, CMD_RETURN
+} cmd_token;
+
 typedef enum { VAR_NONE, VAR_MODULE, VAR_HELP, VAR_INFO, VAR_VERSION,
-               VAR_TYPECHECK, VAR_RETURN
+               VAR_TYPECHECK, VAR_RETURN, VAR_FUNCTION
 } var_token;
 
 /*
  *
  */
+extern cmd_token checkcmd(char *cmdname,
+                          void(**write_cmd)(moddefv module, procdefv pi));
+extern var_token checkvar(char *varname, var_type type);
+
+
 extern int IsCmd(char *n, int & tok);
 extern char * decl2str(int n, char *name);
 
@@ -111,10 +122,20 @@ extern void write_procedure_text(moddefv module, int lineno);
 /*extern void write_procedure_header(moddefv module);*/
 
 extern int init_proc(procdefv p, char *procname, paramdefv ret, int line);
-extern void setup_proc(moddefv module, procdefv p, char *code);
-extern void proc_set_var(procdefv p, var_type type, char *varname, void *varvalue);
+extern void setup_proc(moddefv module, procdefv p);
+extern void proc_set_var(procdefv p, var_type type, var_token varid,
+                         char *varname, void *varvalue);
+void proc_set_default_var(var_type type, var_token varid, char *varname,
+                          void *varvalue);
 void write_finish_functions(moddefv module, procdefv proc);
 void AddParam(procdefv p, paramdefv vnew);
 
 extern int create_tmpfile(moddefv module_def);
+
+extern void write_procedure_typecheck(moddefv module, procdefv pi, FILE *fmtfp);
+extern void write_procedure_return(moddefv module, procdefv pi, FILE *fmtfp);
+extern void write_function_declaration(moddefv module, procdefv pi);
+extern void write_function_typecheck(moddefv module, procdefv pi);
+extern void write_function_return(moddefv module, procdefv pi);
+
 #endif /* _MODGEN_H */

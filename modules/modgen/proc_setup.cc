@@ -1,5 +1,5 @@
 /*
- * $Id: proc_setup.cc,v 1.1 2000-01-17 08:26:47 krueger Exp $
+ * $Id: proc_setup.cc,v 1.2 2000-01-21 09:23:22 krueger Exp $
  */
 
 #include <stdio.h>
@@ -52,8 +52,12 @@ int init_proc(
   }
   p->lineno = lineno;
   p->return_val.typ = NONE;
-  p->flags.do_typecheck=1;
-  p->flags.do_return=1;
+  p->flags.do_typecheck = default_do_typecheck;
+  p->flags.do_return = default_do_return;
+  p->flags.declaration_done = 0;
+  p->flags.typecheck_done = 0;
+  printf("Default: %d %d\n",  p->flags.do_typecheck,
+         p->flags.do_return);
   
   return 0;
 }
@@ -105,46 +109,31 @@ void AddParam(
 }
 
 /*========================================================================*/
-void proc_set_var(
-  procdefv p,
+void proc_set_default_var(
   var_type type,
+  var_token varid,
   char *varname,
   void *varvalue
   )
 {
   int *i;
   char *q;
-  
-  
-  printf(">>>>>>>>Test 4 %s()[%d] '%s' = ", p->procname, type, varname);
-  fflush(stdout);
+
   switch(type) {
       case VAR_NUM:
       case VAR_BOOL:
         i = (int *)varvalue;
-        if(strcmp(varname, "do_typecheck")==0) {
-          p->flags.do_typecheck = *i;
+        switch(varid) {
+            case VAR_TYPECHECK: default_do_typecheck = *i; break;
+            case VAR_RETURN:    default_do_return = *i; break;
+            default:            break;
         }
-        else if(strcmp(varname, "do_return")==0) {
-          p->flags.do_typecheck = *i;
-        }
-        else
-          printf("'%d'", *i);
         break;
-
       case VAR_STRING:
         q = (char *)varvalue;
-        if(strcmp(varname, "function")==0) {
-          if(p->funcname != NULL) free(p->funcname);
-          p->funcname = strdup(q);
+        switch(varid) {
         }
-        else if(strcmp(varname, "help")==0) {
-          //p->flags.do_typecheck = q;
-        }
-        else 
-          printf("'%s'", q);
         break;
-
       case VAR_FILE:
         q = (char *)varvalue;
         printf("'%s'", q);
@@ -154,6 +143,57 @@ void proc_set_var(
         break;
   }
   printf("\n");
+  
+  return;
+}
+
+/*========================================================================*/
+void proc_set_var(
+  procdefv p,
+  var_type type,
+  var_token varid,
+  char *varname,
+  void *varvalue
+  )
+{
+  int *i;
+  char *q;
+  
+  
+//  printf(">>>>>>>>Test 4 %s()[%d] '%s' = ", p->procname, type, varname);
+  fflush(stdout);
+  switch(type) {
+      case VAR_NUM:
+      case VAR_BOOL:
+        i = (int *)varvalue;
+        switch(varid) {
+            case VAR_TYPECHECK: p->flags.do_typecheck = *i; break;
+            case VAR_RETURN:    p->flags.do_return = *i; break;
+            default:            break;
+        }
+        break;
+
+      case VAR_STRING:
+        q = (char *)varvalue;
+        switch(varid) {
+            case VAR_FUNCTION:
+              if(p->funcname != NULL) free(p->funcname);
+              p->funcname = strdup(q);
+              break;
+            case VAR_HELP:
+              break;
+        }
+        break;
+
+      case VAR_FILE:
+        q = (char *)varvalue;
+        //printf("'%s'", q);
+        break;
+
+      case VAR_FILES:
+        break;
+  }
+//  printf("\n");
   
   return;
 }
