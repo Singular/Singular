@@ -3,21 +3,33 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.5 1998-02-17 15:05:53 obachman Exp $ */
+/* $Id: longalg.h,v 1.6 1998-04-21 10:59:26 obachman Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
 #include "structs.h"
 #include "longrat.h"
+#include "polys-impl.h"
 
 struct slnumber;
 typedef struct slnumber * lnumber;
+
+//make parameter type same as exponent type
+#if 1
+#define PARAMETER_TYPE EXPONENT_TYPE
+#define SIZEOF_PARAMETER SIZEOF_EXPONENT
+#else
+#define PARAMETER_TYPE int
+#define SIZEOF_PARAMETER SIZOF_EXPONENT
+#endif
+
 struct reca
 {
   alg ne;
   number ko;
-  int e[1];
+  PARAMETER_TYPE e[1];
 };
+
 struct slnumber
 {
   alg z;
@@ -28,6 +40,7 @@ struct slnumber
 extern int naNumbOfPar;             /* maximal number of parameters */
 extern alg naMinimalPoly;
 extern char **naParNames;
+extern int napMonomSize;
 
 void naSetChar(int p, BOOLEAN complete, char ** param, int pars);
 #ifdef LDEBUG
@@ -82,7 +95,7 @@ poly naPermNumber(number z, int * par_perm, int P);
 #define napNext(p) (p->ne)
 #define napGetCoeff(p) (p->ko)
 #define napGetExp(p,i) (p->e[(i)-1])
-#define napNew() ((alg)Alloc0(RECA_SIZE + naNumbOfPar * sizeof(int)))
+#define napNew() ((alg)Alloc0(napMonomSize))
 #define nanumber lnumber
 #define naGetNom(na)  (((nanumber)(na))->z)
 #define naGetDenom(na)  (((nanumber)(na))->n)

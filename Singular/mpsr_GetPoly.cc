@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.15 1998-04-07 18:35:26 obachman Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.16 1998-04-21 10:59:28 obachman Exp $ */
 
 /***************************************************************
  *
@@ -62,7 +62,6 @@ static mpsr_Status_t (*GetCoeff)(MP_Link_pt link, number *x);
 static mpsr_Status_t (*GetAlgNumberNumber)(MP_Link_pt link, number *x);
 static MP_Sint32_t gNalgvars = 0;
 static MP_Sint32_t gNvars = 0;
-static MP_Sint32_t *gTa = NULL;
 static ring        currGetRing = NULL;
 
 
@@ -102,17 +101,8 @@ static void SetGetFuncs(ring r)
 {
   currGetRing = r;
   // first, we set the PutNumber function
-  if (r->N != gNvars)
-  {
-    if (gTa != NULL)
-      Free(gTa, (gNvars+1)*sizeof(MP_Sint32_t));
-
-    gNvars = r->N;
-    if (gNvars > 1)
-      gTa = (MP_Sint32_t *) Alloc((gNvars+1)*sizeof(MP_Sint32_t));
-    else
-      gTa = NULL;
-  }
+  gNvars = r->N;
+  mpsr_InitTempArray(gNvars + 1);
 
   if ((r->ch) == 0)
     // rational numbers
@@ -130,6 +120,7 @@ static void SetGetFuncs(ring r)
   {
     // now we come to algebraic numbers
     gNalgvars = rPar(r);
+    mpsr_InitTempArray(gNalgvars);
     GetCoeff = GetAlgNumber;
     if ((r->ch) < 0)
       // first, Z/p(a)
@@ -314,7 +305,7 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
 static inline mpsr_Status_t GetAlgPoly(MP_Link_pt link, alg *p)
 {
   MP_Uint32_t j, nm;
-  int *exp;
+  int *exp, i;
   alg a;
 
   IMP_GetUint32(link, &nm);
@@ -328,16 +319,28 @@ static inline mpsr_Status_t GetAlgPoly(MP_Link_pt link, alg *p)
   *p = a;
 
   failr(GetAlgNumberNumber(link, &(a->ko)));
+#if SIZEOF_INT == SIZEOF_PARAMETER
   exp = &(a->e[0]);
   mp_failr(IMP_GetSint32Vector(link, (MP_Sint32_t **) &exp, naNumbOfPar));
+#else
+  mp_failr(IMP_GetSint32Vector(link, (MP_Sint32_t **) &gTa, naNumbOfPar));
+  for (i=0; i<naNumbOfPar; i++)
+    a->e[i] = (PARAMETER_TYPE) gTa[i];
+#endif  
 
   for (j=1; j<nm; j++)
   {
     a->ne = napNew();
     a = a->ne;
     failr(GetAlgNumberNumber(link, &(a->ko)));
+#if SIZEOF_INT == SIZEOF_PARAMETER
     exp = &(a->e[0]);
     mp_failr(IMP_GetSint32Vector(link, (MP_Sint32_t **) &exp, naNumbOfPar));
+#else
+  mp_failr(IMP_GetSint32Vector(link, (MP_Sint32_t **) &gTa, naNumbOfPar));
+  for (i=0; i<naNumbOfPar; i++)
+    a->e[i] = (PARAMETER_TYPE) gTa[i];
+#endif  
   }
   a->ne = NULL;
 

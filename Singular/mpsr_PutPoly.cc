@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_PutPoly.cc,v 1.11 1998-04-16 16:10:22 obachman Exp $ */
+/* $Id: mpsr_PutPoly.cc,v 1.12 1998-04-21 10:59:29 obachman Exp $ */
 
 /***************************************************************
  *
@@ -48,13 +48,14 @@ MP_Status_t MP_MyPutApIntPacket(MP_Link_pt link, MP_ApInt_t mp_apint,
  *
  ***************************************************************/
 
-mpsr_Status_t (*PutCoeff)(MP_Link_pt link, number x);
-mpsr_Status_t (*PutAlgAlgNumber)(MP_Link_pt link, number x);
-MP_Uint32_t gNalgvars = 0;
-MP_Sint32_t gNvars = 0;
-MP_Sint32_t *gTa = NULL;
-ring        CurrPutRing = NULL;
+static mpsr_Status_t (*PutCoeff)(MP_Link_pt link, number x);
+static mpsr_Status_t (*PutAlgAlgNumber)(MP_Link_pt link, number x);
+static MP_Uint32_t gNalgvars = 0;
+static MP_Sint32_t gNvars = 0;
+static ring        CurrPutRing = NULL;
 
+MP_Sint32_t *gTa = NULL;
+MP_Sint32_t gTa_Length = 0;
 
 /***************************************************************
  *
@@ -76,6 +77,7 @@ static mpsr_Status_t PutProtoTypeAnnot(MP_Link_pt link, ring r, BOOLEAN mv);
 static mpsr_Status_t PutMinPolyAnnot(MP_Link_pt link, ring r);
 static mpsr_Status_t PutDefRelsAnnot(MP_Link_pt link, ring r);
 
+
 /***************************************************************
  *
  * Setting the global Put Functions
@@ -85,17 +87,8 @@ static void SetPutFuncs(ring r)
 {
   CurrPutRing = r;
   // first, we set the PutNumber function
-  if (r->N != gNvars)
-  {
-    if (gTa != NULL)
-      Free(gTa, (gNvars+1)*sizeof(MP_Sint32_t));
-
-    gNvars = r->N;
-    if (gNvars > 1)
-      gTa = (MP_Sint32_t *) Alloc((gNvars+1)*sizeof(MP_Sint32_t));
-    else
-      gTa = NULL;
-  }
+  gNvars = r->N;
+  mpsr_InitTempArray(gNvars+1);
 
   if ((r->ch) == 0)
     // rational numbers
@@ -110,6 +103,7 @@ static void SetPutFuncs(ring r)
   {
     // now we come to algebraic numbers
     gNalgvars = rPar(r);
+    mpsr_InitTempArray(gNalgvars);
     PutCoeff = PutAlgNumber;
     if ((r->ch) < 0)
       // first, Z/p(a)
@@ -222,14 +216,20 @@ static mpsr_Status_t PutAlgNumber(MP_Link_pt link, number a)
 // this is very similar to putting a Poly
 static mpsr_Status_t PutAlgPoly(MP_Link_pt link, alg a)
 {
-  int i;
+  unsigned int i;
   int *exp;
 
   if (gNalgvars > 1)
     while (a != NULL)
     {
       failr(PutAlgAlgNumber(link, a->ko));
+#if (SIZEOF_INT == SIZEOF_PARAMETER)
       mp_failr(IMP_PutSint32Vector(link, (MP_Sint32_t *) a->e, gNalgvars));
+#else
+      for (i=0; i<gNalgvars; i++)
+        gTa[i] = a->e[i];
+      mp_failr(IMP_PutSint32Vector(link, gTa, gNalgvars));
+#endif
       a = a->ne;
     }
   else
