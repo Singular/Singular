@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.21 1998-04-21 10:59:24 obachman Exp $ */
+/* $Id: longalg.cc,v 1.22 1998-04-22 07:49:04 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1333,10 +1333,14 @@ number naMult(number la, number lb)
   lnumber lo;
   alg x;
 
-  lo = (lnumber)Alloc(sizeof(rnumber));
-  lo->z = napMult(napCopy(a->z), napCopy(b->z));
+  mmTestP(a,sizeof(rnumber));
+  mmTestP(b,sizeof(rnumber));
   naTest(la);
   naTest(lb);
+
+  lo = (lnumber)Alloc(sizeof(rnumber));
+  lo->z = napMult(napCopy(a->z), napCopy(b->z));
+
   if (a->n==NULL)
   {
     if (b->n==NULL)
@@ -1385,8 +1389,6 @@ number naMult(number la, number lb)
     Free((ADDRESS)lo,sizeof(rnumber));
     lo=NULL;
   }
-  naTest(la);
-  naTest(lb);
   naTest((number)lo);
   return (number)lo;
 }
@@ -1987,7 +1989,7 @@ void naNormalize(number &pp)
       p->n=yy;
       napDelete(&x);
       napDelete(&y);
-    }  
+    }
   }
 #endif
   /* remove common factors from z and n */

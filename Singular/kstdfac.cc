@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.16 1998-04-08 16:04:24 Singular Exp $ */
+/* $Id: kstdfac.cc,v 1.17 1998-04-22 07:49:00 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -463,8 +463,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
       if (TEST_OPT_PROT) message(pFDeg(strat->P.p),&olddeg,&reduc,strat);
     }
     /* reduction of the element choosen from L */
-    if (strat->P.p != NULL)
-      strat->red(&strat->P,strat);
+    strat->red(&strat->P,strat);
     if (strat->P.p != NULL)
     {
       int facdeg=pFDeg(strat->P.p);
@@ -495,64 +494,66 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
       }
       if ((IDELEMS(fac)==1)&&(facdeg==pFDeg(fac->m[0])))
       {
-        pDelete(&(fac->m[0]));
-        fac->m[0]=strat->P.p;
-      }
-      if (strat->P.lcm!=NULL) pFree1(strat->P.lcm);
-      int i;
-      for(i=0;i<IDELEMS(fac);i++)
-      {
-        int pos;
-        if (strat->sl==-1) pos=0;
-        else pos=posInS(strat->S,strat->sl,fac->m[i]);
         if (TEST_OPT_INTSTRATEGY)
         {
           if (!TEST_OPT_MINRES||(strat->syzComp==0)||(!strat->homog))
           {
-            fac->m[i] = redtailBba(fac->m[i],pos-1,strat);
-            pCleardenom(fac->m[i]);
+            strat->P.p = redtailBba(strat->P.p,strat->sl,strat);
+            if (strat->redTailChange) pCleardenom(strat->P.p);
           }
         }
         else
         {
-          pNorm(fac->m[i]);
+          pNorm(strat->P.p);
           if (!TEST_OPT_MINRES||(strat->syzComp==0)||(!strat->homog))
           {
-            fac->m[i] = redtailBba(fac->m[i],pos-1,strat);
+            strat->P.p = redtailBba(strat->P.p,strat->sl,strat);
           }
         }
-        facdeg=pFDeg(fac->m[i]);
-        ideal fac2=singclap_factorize(fac->m[i],NULL,1);
+        if (strat->redTailChange)
+	{
+          idDelete(&fac);
+          fac=singclap_factorize(strat->P.p,NULL,1);
 #ifndef HAVE_LIBFAC_P
-        if ((fac2!=NULL)&&(IDELEMS(fac2)>1)&&(facdeg!=pFDeg(fac2->m[0])))
-#else
-        if ((IDELEMS(fac2)>1)&&(facdeg!=pFDeg(fac2->m[0])))
+          if (fac==NULL)
+          {
+            fac=idInit(1,1);
+            fac->m[0]=pCopy(strat->P.p);
+          }
 #endif
-        {
-          if (TEST_OPT_DEBUG)
-          {
-            wrp(fac->m[i]);
-            Print("-> %d factors, again\n",IDELEMS(fac2));
-            //jjPRINT_MA0((matrix)fac2,"");
-          }
-          else if (TEST_OPT_PROT)
-          {
-            int ii=IDELEMS(fac2);
-            if (ii>1)
-            {
-              while(ii>0) { PrintS("F"); ii--; }
-            }
-          }
-          pDelete(&(fac->m[i]));
-          fac->m[i]=fac2->m[0];
-          pEnlargeSet(&(fac->m),IDELEMS(fac),IDELEMS(fac2)-1);
-          pEnlargeSet(&(fac_copy->m),IDELEMS(fac),IDELEMS(fac2)-1);
-          memcpy(fac->m+IDELEMS(fac),&(fac2->m[1]),(IDELEMS(fac2)-1)*sizeof(poly
-));
-          IDELEMS(fac)+=(IDELEMS(fac2)-1);
-	  IDELEMS(fac_copy)=IDELEMS(fac);
-         }
+          idDelete(&fac_copy);
+          fac_copy=idInit(IDELEMS(fac),1);
+	}
+	if ((IDELEMS(fac)==1)&&(facdeg==pFDeg(fac->m[0])))
+	{
+	  pDelete(&(fac->m[0]));
+	  fac->m[0]=strat->P.p;
+	}
       }
+      if (strat->P.lcm!=NULL) pFree1(strat->P.lcm);
+      int i;
+//      for(i=0;i<IDELEMS(fac);i++)
+//      {
+//        int pos;
+//        if (strat->sl==-1) pos=0;
+//        else pos=posInS(strat->S,strat->sl,fac->m[i]);
+//        if (TEST_OPT_INTSTRATEGY)
+//        {
+//          if (!TEST_OPT_MINRES||(strat->syzComp==0)||(!strat->homog))
+//          {
+//            fac->m[i] = redtailBba(fac->m[i],pos-1,strat);
+//            pCleardenom(fac->m[i]);
+//          }
+//        }
+//        else
+//        {
+//          pNorm(fac->m[i]);
+//          if (!TEST_OPT_MINRES||(strat->syzComp==0)||(!strat->homog))
+//          {
+//            fac->m[i] = redtailBba(fac->m[i],pos-1,strat);
+//          }
+//        }
+//      }
 
       for(i=IDELEMS(fac)-1;i>=0;i--)
       {
@@ -572,39 +573,49 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
         int pos;
         if (n->sl==-1) pos=0;
         else pos=posInS(n->S,n->sl,n->P.p);
-        // we have already reduced all elements from fac....
-        //if (TEST_OPT_INTSTRATEGY)
-        //{
-        //  if (!TEST_OPT_MINRES||(n->syzComp==0)||(!n->homog))
-        //  {
-        //    n->P.p = redtailBba(n->P.p,pos-1,n);
-        //    pCleardenom(n->P.p);
-        //  }
-        //}
-        //else
-        //{
-        //  pNorm(n->P.p);
-        //  if (!TEST_OPT_MINRES||(n->syzComp==0)||(!n->homog))
-        //  {
-        //    n->P.p = redtailBba(n->P.p,pos-1,n);
-        //  }
-        //}
-        if (TEST_OPT_DEBUG)
-        {
-          PrintS("new s:");
-          wrp(n->P.p);
-          PrintLn();
-        }
-        enterpairs(n->P.p,n->sl,n->P.ecart,pos,n);
-        n->enterS(n->P,pos,n);
-        if (n->sl>srmax) srmax = n->sl;
 
-        /* enter P.p into T */
-        if ((IDELEMS(fac)>1)||(facdeg!=pFDeg(fac->m[0])))
+        // we have already reduced all elements from fac....
+        if (TEST_OPT_INTSTRATEGY)
         {
-          int pos=n->posInT(n->T,n->tl,n->P);
-          enterTBba(n->P,pos,n);
+          if (!TEST_OPT_MINRES||(n->syzComp==0)||(!n->homog))
+          {
+            n->P.p = redtailBba(n->P.p,pos-1,n);
+            if (n->redTailChange) pCleardenom(n->P.p);
+          }
         }
+        else
+        {
+          pNorm(n->P.p);
+          if (!TEST_OPT_MINRES||(n->syzComp==0)||(!n->homog))
+          {
+            n->P.p = redtailBba(n->P.p,pos-1,n);
+          }
+        }
+
+        //if (n->redTailChange)
+	//{
+	//  int pos = n->posInL(n->L,n->Ll,n->P,n);
+	//  enterL(&n->L,&n->Ll,&n->Lmax,n->P,pos);
+	//}
+	//else
+	{
+          if (TEST_OPT_DEBUG)
+          {
+            PrintS("new s:");
+            wrp(n->P.p);
+            PrintLn();
+          }
+          enterpairs(n->P.p,n->sl,n->P.ecart,pos,n);
+          n->enterS(n->P,pos,n);
+          if (n->sl>srmax) srmax = n->sl;
+
+          /* enter P.p into T */
+          if ((IDELEMS(fac)>1)||(facdeg!=pFDeg(fac->m[0])))
+          {
+            int pos=n->posInT(n->T,n->tl,n->P);
+            enterTBba(n->P,pos,n);
+          }
+	}
 
         /* construct D */
         if (IDELEMS(fac)>1)
@@ -650,7 +661,9 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
                   PrintLn();
                   messageSets(n);
                 }
+		//if (n->Ll >=0) Print("Ll:%d|",n->Ll);
                 while (n->Ll >= 0) deleteInL(n->L,&n->Ll,n->Ll,n);
+		//if (n->tl >=0) Print("tl:%d|",n->tl);
                 while (n->tl >= 0) { pDelete(&n->T[n->tl].p); n->tl--; }
                 memset(n->Shdl->m,0,IDELEMS(n->Shdl)*sizeof(poly));
                 n->sl=-1;

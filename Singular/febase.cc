@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.29 1998-04-15 16:44:58 Singular Exp $ */
+/* $Id: febase.cc,v 1.30 1998-04-22 07:48:52 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -402,7 +402,7 @@ void PrintTCLS(char c, char *s)
 }
 
 extern "C" {
-void WerrorS(char *s)
+void WerrorS(const char *s)
 {
 #ifdef HAVE_MPSR
   if (feBatch)
@@ -411,16 +411,16 @@ void WerrorS(char *s)
     {
       feErrors=(char *)Alloc(256);
       feErrorsLen=256;
-      strcpy(feErrors,s);
+      strcpy(feErrors,(char *)s);
     }
     else
     {
-      if (((int)(strlen(s)+strlen(feErrors)))>=feErrorsLen)
+      if (((int)(strlen((char *)s)+strlen(feErrors)))>=feErrorsLen)
       {
         feErrors=(char *)ReAlloc(feErrors,feErrorsLen,feErrorsLen+256);
         feErrorsLen+=256;
       }
-      strcat(feErrors,s);
+      strcat(feErrors,(char *)s);
     }
     strcat(feErrors,"\n");
   }
@@ -430,22 +430,22 @@ void WerrorS(char *s)
 #ifdef HAVE_TCL
     if (tclmode)
     {
-      //PrintTCLS('E',s);
+      //PrintTCLS('E',(char *)s);
       //PrintTCLS('E',"\n");
-      PrintTCLS('N',s);
+      PrintTCLS('N',(char *)s);
       PrintTCLS('N',"\n");
     }
     else
 #endif
     {
       fwrite("   ? ",1,5,stderr);
-      fwrite(s,1,strlen(s),stderr);
+      fwrite((char *)s,1,strlen((char *)s),stderr);
       fwrite("\n",1,1,stderr);
       fflush(stderr);
       if (feProt&PROT_O)
       {
         fwrite("   ? ",1,5,feProtFile);
-        fwrite(s,1,strlen(s),feProtFile);
+        fwrite((char *)s,1,strlen((char *)s),feProtFile);
         fwrite("\n",1,1,feProtFile);
       }
     }

@@ -1490,7 +1490,7 @@ static BOOLEAN jjHILBERT2(leftv res, leftv u, leftv v)
       delete iv;
       return FALSE;
   }
-  WerrorS("not implemented yet");
+  WerrorS(feNotImplemented);
   delete iv;
   return TRUE;
 }
@@ -3103,9 +3103,9 @@ struct sValCmd1 dArith1[]=
 #endif
 #ifdef HAVE_FGLM
 ,{findUniProc,  FINDUNI_CMD,     IDEAL_CMD,      IDEAL_CMD}
-#else 
+#else
 ,{jjWRONG,      FINDUNI_CMD,     IDEAL_CMD,      IDEAL_CMD}
-#endif 
+#endif
 ,{jjidFreeModule,FREEMODULE_CMD, XS(MODUL_CMD),  INT_CMD }
 #ifdef HAVE_FACTORY
 ,{jjFACSTD,     FACSTD_CMD,      LIST_CMD,       IDEAL_CMD }

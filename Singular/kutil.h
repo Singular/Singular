@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.7 1998-04-06 17:59:33 obachman Exp $ */
+/* $Id: kutil.h,v 1.8 1998-04-22 07:49:02 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for std
 */
@@ -102,10 +102,9 @@ class skStrategy
     int HCord;
     int lastAxis;
     int newIdeal;
+    int minim;
     BOOLEAN interpt;
     BOOLEAN homog;
-    BOOLEAN news;
-    BOOLEAN newt;/*used for messageSets*/
     BOOLEAN kHEdgeFound;
     BOOLEAN honey,sugarCrit;
     BOOLEAN Gebauer,noTailReduction;
@@ -114,7 +113,9 @@ class skStrategy
     BOOLEAN update;
     BOOLEAN posInLOldFlag;
            /*FALSE, if posInL == posInL10*/
-    int minim;
+    char    redTailChange;
+    char    news;
+    char    newt;/*used for messageSets*/
 };
 
 void deleteHC(poly *p, int *e, int *l, kStrategy strat);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.16 1998-04-08 16:04:25 Singular Exp $ */
+/* $Id: kutil.cc,v 1.17 1998-04-22 07:49:01 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for std
 */
@@ -448,23 +448,41 @@ void deleteInL (LSet set, int *length, int j,kStrategy strat)
       pFree1(set[j].p);
       /*- tail belongs to several int spolys -*/
     }
-    else 
+    else
     {
       // search p in T, if it is there, do not delete it
       int i=strat->tl;
       poly p=set[j].p;
-      while (i>=0)
+      if (p!=NULL)
+      loop
       {
-        if (strat->T[i].p==p)
+        if (i < 0)
 	{
-          p=NULL;
-	  break;
+	  //if (strat->next!=NULL)
+	  //{
+	  //  strat=strat->next;
+	  //  i=strat->tl;
+	  //}
+	  //else
+	  {
+	    /* not found : */
+            pDelete(&p);
+	    break;
+	  }
 	}
-	i--;
+	else
+	{
+          if (strat->T[i].p==p)
+	  {
+	    /* found : */
+            p=NULL;
+	    break;
+	  }
+	  i--;
+	}
       }
-      if (p!=NULL) pDelete(&p);
-      set[j].p=NULL;
-    }  
+    }
+    set[j].p=NULL;
   }
   if ((*length)>0)
   {
@@ -2310,6 +2328,7 @@ poly redtailBba (poly p, int pos, kStrategy strat)
 {
   poly h, hn;
   int j;
+  strat->redTailChange=FALSE;
 
   if (strat->noTailReduction)
   {
@@ -2324,6 +2343,7 @@ poly redtailBba (poly p, int pos, kStrategy strat)
     {
       if (pDivisibleBy(strat->S[j], hn))
       {
+        strat->redTailChange=TRUE;
         spSpolyTail(strat->S[j], p, h, strat->kNoether, strat->spSpolyLoop);
         hn = pNext(h);
         if (hn == NULL)
@@ -3825,7 +3845,7 @@ rOrderType_t spGetOrderType(ring r, int modrank, int syzcomp)
   else
   {
     rOrderType_t rot = rGetOrderType(r);
-  
+
     if ((rot == rOrderType_CompExp || rot == rOrderType_ExpComp) &&
         (modrank == 0))
       return rOrderType_Exp;
@@ -3834,4 +3854,4 @@ rOrderType_t spGetOrderType(ring r, int modrank, int syzcomp)
   }
 }
 
-  
+

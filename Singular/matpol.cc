@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.10 1998-04-08 16:04:29 Singular Exp $ */
+/* $Id: matpol.cc,v 1.11 1998-04-22 07:49:05 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -349,7 +349,7 @@ matrix mpBareiss (matrix a, BOOLEAN sw)
   intvec *v = new intvec(Bareiss->mpGetCdim());
 //  lists res=(lists)Alloc(sizeof(slists));
 
-  if (sw) PrintS("not implemented");
+  if (sw) PrintS(feNotImplemented);
   /* Bareiss */
   div = NULL;
   while(Bareiss->mpPivotBareiss(&w))

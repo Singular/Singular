@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.19 1998-04-08 21:14:57 krueger Exp $ */
+/* $Id: ipshell.cc,v 1.20 1998-04-22 07:48:59 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -689,6 +689,10 @@ int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN init_
   }
   else
   {
+    //if (name->rtyp!=0)
+    //{
+    //  Warn("`%s` is already in use",name->name);
+    //}
     sy->data = (char *)enterid(name->name,lev,t,root,init_b);
     if (sy->data!=NULL)
     {

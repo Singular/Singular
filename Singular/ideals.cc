@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.21 1998-04-14 15:26:12 Singular Exp $ */
+/* $Id: ideals.cc,v 1.22 1998-04-22 07:48:54 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -421,29 +421,23 @@ ideal idSimpleAdd (ideal h1,ideal h2)
 
   if (h1==NULL) return idCopy(h2);
   if (h2==NULL) return idCopy(h1);
-  j = IDELEMS(h1);
-  while ((j > 0) && (h1->m[j-1] == NULL)) j--;
-  i = IDELEMS(h2);
-  while ((i > 0) && (h2->m[i-1] == NULL)) i--;
-  if (i+j==0)
-    result = idInit(1,1);
+  j = IDELEMS(h1)-1;
+  while ((j >= 0) && (h1->m[j] == NULL)) j--;
+  i = IDELEMS(h2)-1;
+  while ((i >= 0) && (h2->m[i] == NULL)) i--;
+  r = max(h1->rank,h2->rank);
+  if (i+j==(-2))
+    return idInit(1,r);
   else
-    result=idInit(i+j,1);
-  if (h1->rank<h2->rank)
-    result->rank = h2->rank;
-  else
-    result->rank = h1->rank;
-  if (i+j==0) return result;
-  r = 0;
-  for (l=0; l<j; l++)
+    result=idInit(i+j+2,r);
+  for (l=j; l>=0; l--)
   {
-    result->m[r] = pCopy(h1->m[l]);
-    r++;
+    result->m[l] = pCopy(h1->m[l]);
   }
-  for (l=0; l<i; l++)
+  r = i+j+1;
+  for (l=i; l>=0; l--, r--)
   {
     result->m[r] = pCopy(h2->m[l]);
-    r++;
   }
   return result;
 }
@@ -2369,15 +2363,15 @@ ideal idCompactify(ideal id)
   BOOLEAN b=FALSE;
 
   result=idCopy(id);
-  i = 0;
-  while ((! b) && (i<IDELEMS(result)))
+  i = IDELEMS(result)-1;
+  while ((! b) && (i>=0))
   {
     b=pIsUnit(result->m[i]);
-    i++;
+    i--;
   }
   if (b)
   {
-    for (i=0;i<IDELEMS(result);i++)
+    for (i=IDELEMS(result)-1;i>=0;i--)
       pDelete(&result->m[i]);
     result->m[0]=pOne();
   }
@@ -2434,9 +2428,9 @@ ideal idHead(ideal h)
   ideal m = idInit(IDELEMS(h),h->rank);
   int i;
 
-  for (i=0; i< IDELEMS(h); i++)
+  for (i=IDELEMS(h)-1;i>=0; i--)
   {
-    if (h->m[i]) m->m[i]=pHead(h->m[i]);
+    if (h->m[i]!=NULL) m->m[i]=pHead(h->m[i]);
   }
   return m;
 }
@@ -2446,7 +2440,7 @@ ideal idHomogen(ideal h, int varnum)
   ideal m = idInit(IDELEMS(h),h->rank);
   int i;
 
-  for (i=0; i< IDELEMS(h); i++)
+  for (i=IDELEMS(h)-1;i>=0; i--)
   {
     m->m[i]=pHomogen(h->m[i],varnum);
   }
