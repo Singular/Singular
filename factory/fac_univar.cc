@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_univar.cc,v 1.18 1998-04-06 12:05:51 schmidt Exp $ */
+/* $Id: fac_univar.cc,v 1.19 1998-04-07 08:10:58 pohl Exp $ */
 
 #include <config.h>
 
@@ -244,7 +244,7 @@ UnivariateQuadraticLift ( const CanonicalForm &F, const  CanonicalForm & G, cons
     CanonicalForm a, b, aa, bb, c, g, h, g1, h1, e, modulus, tmp, q, r;
     int i, j, save;
     int p = pk.getp(), k = pk.getk();
-    int no_iter = (int)(log( (double)k )/log(2)+2);
+    int no_iter = (int)(log( (double)k )/log(2.0)+2);
     int * kvals = new int[no_iter];
 
     DEBOUTLN( cerr, "quadratic lift called with p = " << p << "  and k = " << k );
