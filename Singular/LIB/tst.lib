@@ -1,8 +1,8 @@
-// $Id: tst.lib,v 1.10 1998-07-01 10:39:10 obachman Exp $
+// $Id: tst.lib,v 1.11 1998-07-14 06:50:11 obachman Exp $
 //(obachman, last modified 6/30/98)
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: tst.lib,v 1.10 1998-07-01 10:39:10 obachman Exp $";
+version="$Id: tst.lib,v 1.11 1998-07-14 06:50:11 obachman Exp $";
 info="
 LIBRARY:  tst.lib      PROCEDURES FOR RUNNING AUTOMATIC TST TESTS
 
@@ -10,9 +10,8 @@ LIBRARY:  tst.lib      PROCEDURES FOR RUNNING AUTOMATIC TST TESTS
  tst_system(s)          returns string which is stdout of system(\"sh\", s)
  tst_ignore(any,[keyword], [link]) writes string(any) to link (or stdout),
                                    prepending prefix \"// tst_ignore:\"
- tst_init()             writes some identification data to stdout
-                        with tst_ignore
- tst_status([any])      writes status info to stdout with tst_ignore()
+ tst_init()             writes some identification data to GetTstStatusFile()
+ tst_status([any])      writes status info to to GetTstStatusFile()
  tst_groebnerTest(ideal i)  
                         tests groebner command 
  tst_stdEqual(ideal i1, ideal i2) 
@@ -21,7 +20,7 @@ LIBRARY:  tst.lib      PROCEDURES FOR RUNNING AUTOMATIC TST TESTS
 
 /////////////////////////////////////////////////////////////////////////////
 
-proc tst_system(string s)
+proc tst_system(string s, list #)
 "USAGE:    tst_system(s); s string
 RETURN:   string which is stdout and stderr of system(\"sh\", s)
 EXAMPLE:  example tst_system; shows examples"
@@ -33,6 +32,10 @@ EXAMPLE:  example tst_system; shows examples"
   errno = system("sh", s);
   s = read(tmpfile);
   errno = system("sh", "rm -f " + tmpfile);
+  if (size(#) > 0)
+  {
+      s = s[1, size(s) -1];
+  }
   return (s);
 }
 example
@@ -42,14 +45,7 @@ example
   "The following is what the system call wrote to stdout: " + s;
 }
 
-proc GetHostName
-{
-  string tst_hostname = tst_system("hostname");
-  tst_hostname = tst_hostname[1..size(tst_hostname)-1];
-  return (tst_hostname);
-}
-
-proc tst_ignore
+proc tst_ignore(list #)
 "USAGE:    tst_ignore(any,[keyword], [link])
             any     -- valid argument to string()
             keyword -- an arbitrary string 
@@ -118,7 +114,7 @@ EXAMPLE:  example tst_ignore; shows examples
   // ready -- do the actual work
   if (keyword != "")
   {
-    write(outlink,"// tst_ignore:" + keyword + " " + GetHostName() + ":" + s);
+    write(outlink,"// tst_ignore:" + keyword + " :: " + tst_system("hostname", 1) + ":" + s);
   }
   else
   {
@@ -138,7 +134,7 @@ example
   tst_ignore(memory(1), "memory");
 }
 
-static proc Get_tst_timer
+static proc Get_tst_timer()
 {
   if (! defined (tst_timer))
   {
@@ -158,6 +154,31 @@ static proc Set_tst_timer (int this_time)
   tst_timer = tst_timer[1,14] + string(this_time);
 }
 
+static proc GetTstStatusFile()
+{
+  if (!defined(tst_status_file))
+  {
+    return ("tst_status.out");
+  }
+  else 
+  {
+    return (tst_status_file);
+  }
+}
+  
+static proc tst_status_out (def prefix, def what, list #)
+{
+  string outstring;
+  
+  outstring = string(prefix) + " >> " + string(what);
+  if (size(#) > 0)
+  {
+    outstring = outstring + " :: " + 
+      tst_system("hostname", 1) + ":" + string(#[1]);
+  }
+  write(":a " + GetTstStatusFile(), outstring);
+}
+  
 proc tst_status (list #)
 "USAGE:   tst_status([any])
 RETURN:   none; writes to stdout the current memory usage and used time
@@ -168,18 +189,29 @@ NOTE:     Should be used regularly within tst files to enable automatic
 EXAMPLE: example tst_status; shows example
 "
 {
-  tst_ignore(memory(0), "tst_memory_0");
-  tst_ignore(memory(1), "tst_memory_1");
-  tst_ignore(memory(2), "tst_memory_2");
-  if (size(#) > 0)
+  if (! defined(tst_status_counter))
   {
-    tst_ignore(timer, "tst_timer_1");
+    int tst_status_counter = 1;
+    export tst_status_counter;
   }
   else
   {
-    tst_ignore(timer - Get_tst_timer(), "tst_timer");
+    tst_status_counter++;
+  }
+  
+  tst_status_out(tst_status_counter, "tst_memory_0", memory(0));
+  tst_status_out(tst_status_counter, "tst_memory_1", memory(1));
+  tst_status_out(tst_status_counter, "tst_memory_2", memory(2));
+  if (size(#) > 0)
+  {
+    tst_status_out(tst_status_counter, "tst_timer_1", timer);
+  }
+  else
+  {
+    tst_status_out(tst_status_counter, "tst_timer", timer - Get_tst_timer());
     Set_tst_timer(timer);
   }
+  string(tst_status_counter) + " >> " + GetTstStatusFile();
 }
 example
 {
@@ -192,32 +224,21 @@ example
 }
 
   
-proc tst_init
+proc tst_init()
 "USAGE:   tst_init()
 RETURN:  none; writes some identification data to stdout;
          should be called as first routine in a tst file
 EXAMPLE: example tst_init; shows example
 "
 {
-  if (! defined(tst_hostname))
-  {
-    string tst_hostname = tst_system("hostname");
-    tst_hostname = tst_hostname[1..size(tst_hostname)-1];
-    export tst_hostname;
-  }
-  tst_ignore("USER    : " + system("getenv", "USER"));
-  tst_ignore("HOSTNAME: " + tst_hostname);
-  tst_ignore("uname -a: " + tst_system("uname -a"));
-  tst_ignore("date    : " + tst_system("date"));
-  tst_ignore("version : " + string(system("version")));
-  tst_ignore("ticks   : " + system("--ticks-per-sec"));
-  if (! defined(tst_timer))
-  {
-    int tst_timer;
-    export tst_timer;
-  }
-  
-  tst_status();
+  write(":w " + GetTstStatusFile(), "Status Output of " + GetTstStatusFile());
+  tst_status_out("init", "USER    :" + system("getenv", "USER"));
+  tst_status_out("init", "HOSTNAME:" + tst_system("hostname", 1));
+  tst_status_out("init", "uname -a:" + tst_system("uname -a", 1));
+  tst_status_out("init", "date    :" + tst_system("date", 1));
+  tst_status_out("init", "version :" + string(system("version")));
+  tst_status_out("init", "ticks   :" + system("--ticks-per-sec"));
+  "init >> " + GetTstStatusFile();
 }
 example
 {
