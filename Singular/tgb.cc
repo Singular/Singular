@@ -29,6 +29,8 @@ static inline poly pOne_Special(const ring r=currRing)
 #define LEN_VAR1
 #define degbound(p) assume(pTotaldegree(p)<10)
 //#define inDebug(p) assume((debug_Ideal==NULL)||(kNF(debug_Ideal,NULL,p,0,0)==0))
+
+//die meisten Varianten stossen sich an coef_buckets
 #ifdef LEN_VAR1
 // erste Variante: Laenge: Anzahl der Monome
 int pSLength(poly p, int l) {
@@ -494,8 +496,9 @@ static void cleanS(kStrategy strat, calc_dat* c){
 static int bucket_guess(kBucket* bucket){
   int sum=0;
   int i;
-  for (i=MAX_BUCKET;i>=0;i--){
-    sum+=bucket->buckets_length[i];
+  for (i=bucket->buckets_used;i>=0;i--){
+    if(bucket->buckets[i])
+       sum+=bucket->buckets_length[i];
   }
   return sum;
 }
@@ -4361,6 +4364,10 @@ static int guess_quality(const red_object & p, calc_dat* c){
   if (c->is_char0) return kSBucketLength(p.bucket);
   return (bucket_guess(p.bucket));
 }
+static int pQuality(poly p, calc_dat* c){
+  if(c->is_char0) return pSLength(p,pLength(p));
+  return pLength(p);
+}
 static int quality_of_pos_in_strat_S(int pos, calc_dat* c){
   if (c->is_char0) return c->strat->lenSw[pos];
   return c->strat->lenS[pos];
@@ -4389,7 +4396,10 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
       if(best!=erg.to_reduce_u+1){*/
       int qc;
       best=find_best(los,erg.to_reduce_l,erg.to_reduce_u,qc,c);
-      assume(qc==los[best].guess_quality(c));
+      los[best].flatten();
+      int b_pos=kBucketCanonicalize(los[best].bucket);
+      los[best].p=los[best].bucket->buckets[b_pos];
+      qc==pQuality(los[best].bucket->buckets[b_pos],c);
       if(qc<quality_a){
 	red_object h=los[erg.to_reduce_u];
 	los[erg.to_reduce_u]=los[best];
@@ -4413,14 +4423,19 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
 	best=find_best(los,erg.to_reduce_l,erg.to_reduce_u,qc,c);
 	assume(qc==los[best].guess_quality(c));
 	if(qc<quality_a){
-	  //(best!=erg.to_reduce_u+1){
+	  los[best].flatten();
+	  int b_pos=kBucketCanonicalize(los[best].bucket);
+	  los[best].p=los[best].bucket->buckets[b_pos];
+	  qc==pQuality(los[best].bucket->buckets[b_pos],c);
+	  //(best!=erg.to_reduce_u+1)
+	  if(qc<quality_a){
 	  red_object h=los[erg.to_reduce_l];
 	  los[erg.to_reduce_l]=los[best];
 	  los[best]=h;
 	  erg.reduce_by=erg.to_reduce_l;
 	  erg.fromS=FALSE;
 	  erg.to_reduce_l++;
-	  
+	  }
 	}
       }
       else 
@@ -4429,25 +4444,32 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
 	int quality_a=quality_of_pos_in_strat_S(erg.reduce_by,c);
 	int qc=los[erg.to_reduce_u].guess_quality(c);
 	if(qc<quality_a){
-	  BOOLEAN exp=FALSE;
-	  if(qc<=2)
-	    exp=TRUE;
-	  else {
-	    if (qc<quality_a/2)
+	  int best=erg.to_reduce_u;
+	  los[best].flatten();
+	  int b_pos=kBucketCanonicalize(los[best].bucket);
+	  los[best].p=los[best].bucket->buckets[b_pos];
+	  qc==pQuality(los[best].bucket->buckets[b_pos],c);
+	  if(qc<quality_a){
+	    BOOLEAN exp=FALSE;
+	    if(qc<=2)
 	      exp=TRUE;
-	    else
-	      if(erg.reduce_by<c->n/4)
+	    else {
+	      if (qc<quality_a/2)
 		exp=TRUE;
-	  }
-	  if (exp){
-	    poly clear_into;
-	    los[erg.to_reduce_u].flatten();
-	    kBucketClear(los[erg.to_reduce_u].bucket,&clear_into,&erg.expand_length);
-	    erg.expand=pCopy(clear_into);
-	    kBucketInit(los[erg.to_reduce_u].bucket,clear_into,erg.expand_length);
-	    if (TEST_OPT_PROT)
-	      PrintS("e");
-	    
+	      else
+		if(erg.reduce_by<c->n/4)
+		  exp=TRUE;
+	    }
+	    if (exp){
+	      poly clear_into;
+	      los[erg.to_reduce_u].flatten();
+	      kBucketClear(los[erg.to_reduce_u].bucket,&clear_into,&erg.expand_length);
+	      erg.expand=pCopy(clear_into);
+	      kBucketInit(los[erg.to_reduce_u].bucket,clear_into,erg.expand_length);
+	      if (TEST_OPT_PROT)
+		PrintS("e");
+	      
+	    }
 	  }
 	}
 
@@ -4482,6 +4504,7 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
     else
     {
       assume(!pLmEqual(los[erg.reduce_by].p,los[erg.to_reduce_l].p));
+      assume(erg.to_reduce_u==erg.to_reduce_l);
       //further assume, that reduce_by is the above all other polys
       //with same leading term
       int il=erg.reduce_by;
