@@ -339,7 +339,7 @@ int singular_manual(char *str)
   }
   return HELP_OK;
 }
-#endif
+#endif // buildin_help
 /*************************************************/
 
 void singular_help(char *str,BOOLEAN example)
@@ -443,30 +443,7 @@ void singular_help(char *str,BOOLEAN example)
 #ifdef buildin_help
       singular_manual(str);
 #else
-      char tmp[150];
-      char tmp2[150];
-      char strstr[100];
-      sprintf(tmp,"%s/singular.hlp", SINGULAR_INFODIR);
-      if (strcmp(str,"index")==0)
-         strstr[0]='\0';
-       else
-         sprintf(strstr," Index \"%s\"",str);
-      if (!access(tmp, R_OK))
-      {
-        sprintf(tmp, "info -f %s/singular.hlp %s", SINGULAR_INFODIR, strstr);
-      }
-      else
-      {
-        FILE *fd = feFopen("singular.hlp", "r", tmp2, FALSE);
-        if (fd != NULL)
-        {
-          fclose(fd);
-          sprintf(tmp, "info -f %s %s", tmp2,strstr);
-        }
-        else
-          sprintf(tmp,"info singular %s",strstr);
-      }
-      system(tmp);
+      system(feGetInfoCall(str));
 #ifndef MSDOS
       //sprintf(tmp,"clear");
       //system(tmp);

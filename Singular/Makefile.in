@@ -7,11 +7,10 @@
 SHELL		= /bin/sh
 
 ##
-## versions
+## version
 ##
-SINGULAR_MAJOR_VERSION	= @SINGULAR_MAJOR_VERSION@
-SINGULAR_MINOR_VERSION	= @SINGULAR_MINOR_VERSION@
-DISTNAME	= Singular-${SINGULAR_MAJOR_VERSION}.${SINGULAR_MINOR_VERSION}
+SINGULAR_VERSION	= @SINGULAR_VERSION@
+SINGULAR		= @SINGULAR@
 
 ## 
 ## various paths
@@ -22,27 +21,28 @@ exec_prefix 	= @exec_prefix@
 libdir 		= @libdir@
 # program executable goes here
 bindir		= @bindir@
-# Singular libs go here
-singulardatadir = @singulardatadir@
+# includes are taken from here
 includedir	= @includedir@
 
 ## 
 ## various programs
 ##
+@SET_MAKE@
 CC		= @CC@
 CXX		= @CXX@
-LEXP		= @LEXP@
-PERL		= @PERL@
+LEX		= @LEX@
+PERL5		= @PERL5@
 BISON		= bison
-@SET_MAKE@
 INSTALL		= ./install-sh -c
 INSTALL_PROGRAM	= ${INSTALL}
 INSTALL_DATA	= ${INSTALL} -m 644
 MKINSTALLDIRS   = ./mkinstalldirs
+LN_S		= @LN_S@
 
 ##
 ## compiler and linker options
 ##
+PIPE		= @PIPE@
 CFLAGS		= @CFLAGS@ ${PIPE} 
 CXXFLAGS	= @CXXFLAGS@ ${PIPE} 
 CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@
@@ -51,24 +51,6 @@ DEFS		= @DEFS@ -DNDEBUG
 LDFLAGS		= @LDFLAGS@
 STATIC_LDFLAGS	= @STATIC_LDFLAGS@
 LIBS		= @NEED_LIBS@
-PIPE		=
-
-##
-## subdirectories
-##
-# where the doumentation files are
-docdir		= doc
-# where the tests files are 
-testdir		= tests
-
-##
-## the configuration
-##
-WITH_MP		= @WITH_MP@
-WITH_FACTORY	= @WITH_FACTORY@
-WITH_LIBFAC	= @WITH_LIBFAC@
-WITH_DBM	= @WITH_DBM@
-DOS_CROSS	= @DOS_CROSS@
 
 ##
 ## End configuration dependend stuff
@@ -149,19 +131,21 @@ OBJS=grammar.o scanner.o matpol.o binom.o\
      find_exec.o getopt.o
 
 ##
-## PRIMARY Targets
+## Build Targets
 ##
 
 
 .l.cc:
-	@if test "${LEXP}" = touch; then \
-		touch scanner.cc; \
-		echo Warning: could not rebuilt scanner.cc;\
-	else \
-		echo "${LEXP} -s -I -t $< > scanner.cc"; \
-		${LEXP} -s -I -t $< > scanner.cc; \
+	@if test "x${LEX}" = x; then \
+		echo Error: no lex given, could not rebuilt scanner.cc;\
+                exit 1; \
 	fi
+	${LEX} -s -I -t $< > scanner.cc
 .y.cc:
+	@if test "x${BISON}" = x; then \
+		echo Error: no lex given, could not rebuilt scanner.cc;\
+                exit 1; \
+	fi
 	${BISON} -d -t -o grammar.cc $<
 	chmod +x testgh
 	./testgh
@@ -191,22 +175,11 @@ claptmpl.o: claptmpl.cc mod2.h
 	${CXX} ${CXXFLAGS}  ${CPPFLAGS} ${DEFS} -c $<	
 
 iparith.inc mpsr_Tok.inc: iparith.cc ipconv.cc tok.h mpsr_Tok.cc grammar.h mod2.h
-	@if test "${DOS_CROSS}" = yes; then \
-		echo "NEED TO GENERATE inc FILES -- Please be patient" ;\
-		cd ..; \
-		./configure.dos --generate-inc; \
-	else \
-		echo ${CXX} ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -DGENTABLE \
-		     -o gentable iparith.cc tesths.cc mpsr_Tok.cc \
-		     ${OBJS} ${LDFLAGS} ${LIBS};\
-		${CXX} ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -DGENTABLE \
-		     -o gentable iparith.cc tesths.cc mpsr_Tok.cc \
-		     ${OBJS} ${LDFLAGS} ${LIBS};\
-		echo ./gentable; \
-		./gentable; \
-		echo /bin/rm -f gentable gentable.exe;\
-		/bin/rm -f gentable gentable.exe; \
-	fi
+	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -DGENTABLE \
+	     -o gentable iparith.cc tesths.cc mpsr_Tok.cc \
+	     ${OBJS} ${LDFLAGS} ${LIBS}
+	./gentable
+	/bin/rm -f gentable gentable.exe
 
 
 mmutil.inc: mmutil.c mmprivat.h
@@ -220,15 +193,14 @@ mmutil.o mmutil.d: mmutil.inc
 version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in configure.in
 	echo "#define SINGULAR_VERSION_ID " `date '+%y%m%d%H'` >version.h
 
-mod2.h: stamp-h
-
-stamp-h : config.status mod2.h.in 
-	CONFIG_FILES= CONFIG_HEADERS=mod2.h ./config.status
-
 spSpolyLoop.cc spSpolyLoop.dd : spSpolyLoop.inc
 
 spSpolyLoop.inc: spSpolyLoop.pl
-	${PERL} spSpolyLoop.pl > spSpolyLoop.inc
+	@if test "x${PERL5}" = x; then \
+		echo Error: no perl5 given. Can not rebuild spSpolyLoop.inc;\
+		exit 1;\
+	fi
+	${PERL5} spSpolyLoop.pl > spSpolyLoop.inc
 
 libparse: libparse_main.o utils.o
 	${CXX} -o libparse libparse_main.o utils.o
@@ -237,19 +209,19 @@ libparse_main.o: libparse.cc
 	${CXX} -c -o libparse_main.o libparse.cc -DSTANDALONE_PARSER
 
 libparse.cc: libparse.l
-	@if test "${LEXP}" = touch; then \
-		touch libparse.cc; \
-		echo Warning: could not rebuilt libparse.cc;\
-	else \
-		echo ${LEXP} -I -Pyylp -olibparse.cc libparse.l;\
-		${LEXP} -I -Pyylp -olibparse.cc libparse.l;\
+	@if test "x${LEX}" = x; then \
+		echo Error: no lex given, could not rebuilt libparse.cc;\
+                exit 1; \
 	fi
+	${LEX} -I -Pyylp -olibparse.cc libparse.l
+
+mod2.h: stamp-h
+
+stamp-h : config.status mod2.h.in 
+	CONFIG_FILES= CONFIG_HEADERS=mod2.h ./config.status
 
 Makefile: Makefile.in config.status 
 	CONFIG_FILES="Makefile" CONFIG_HEADERS= ./config.status
-
-doc/Makefile: doc/Makefile.in config.status
-	CONFIG_FILES="doc/Makefile" CONFIG_HEADERS= ./config.status
 
 config.status: configure
 	./config.status --recheck
@@ -262,37 +234,24 @@ configure: configure.in
 ##
 ## install targets
 ##
-install: all installbin installdata installinfo
+install: all installbin 
 
 installbin: Singular
 	${MKINSTALLDIRS} ${bindir}
-	${INSTALL_PROGRAM} Singular ${bindir}
+	${INSTALL_PROGRAM} Singular ${bindir}/Singular-${SINGULAR_VERSION}
+	rm -f ${bindir}/Singular
+	cd ${bindir}; ${LN_S} Singular-${SINGULAR_VERSION} Singular;\
+	if test ! -x ${SINGULAR}; then \
+		${LN_S} Singular-${SINGULAR_VERSION} ${SINGULAR};\
+	fi
 
-installdata: 
-	${MKINSTALLDIRS} ${singulardatadir}
-	${MKINSTALLDIRS} ${singulardatadir}/gftables
-	for file in ${srcdir}/LIB/gftables/[0-9]*; do \
-		${INSTALL_DATA} $${file} ${singulardatadir}/gftables; \
-	done
-	for file in ${srcdir}/LIB/*.lib; do \
-		${INSTALL_DATA} $${file} ${singulardatadir}; \
-	done
 
-installinfo:
-	cd ${docdir}; ${MAKE} install
 
-uninstall: uninstallbin uninstalldata uninstallinfo
+uninstall: uninstallbin 
 
 uninstallbin:
-	-rm -f ${bindir}/Singular
+	rm -f ${bindir}/Singular rm -f ${bindir}/Singular-${SINGULAR_VERSION}
 	-rmdir ${bindir}
-
-uninstalldata:
-	-rm -rf ${singulardatadir}/*.lib ${singulardatadir}/gftables
-	-rmdir ${singulardatadir}
-
-unistallinfo:
-	cd ${docdir}; ${MAKE} uninstall
 
 ##
 ## clean targest
@@ -300,13 +259,12 @@ unistallinfo:
 mostlyclean: clean
 
 clean:
-	-rm -f Singular* *.o *.og core *.d *.dd *~ \#* /tmp/mp* \
+	-rm -f Singular *.o *.og core *.op *.ob *.d *.dd /tmp/mp* \
 	        *.got *dump* *.diff *.dir *.pag
-	cd ${docdir}; ${MAKE} clean
 
 distclean: clean
 	-rm -f depend iparith.inc mpsr_Tok.inc 
-	-rm -f ${DISTNAME} ${testdir}/out stamp-h
+	-rm -f Singular* *.gprof *.bprof *~ .\#*
 	-rm mod2.h Makefile TAGS* config.status config.cache config.log
 	cd ${docdir}; ${MAKE} distclean
 
@@ -315,42 +273,6 @@ maintainer-clean: distclean
 	@echo "Rebuilding the deleted files requires flex"
 	@echo "bison, perl and autoconf"
 	-rm configure scanner.cc grammar.h grammar.cc libparse.cc spSpolyLoop.inc
-
-info dvi ps html:
-	cd ${docdir}; ${MAKE} $@
-
-check:	Singular ${testdir}/general_test.in ${testdir}/general_test.out
-	- @ SINGULARPATH=`pwd`/LIB; export SINGULARPATH; \
-	PATH=`pwd`:${PATH}; export PATH;\
-	Singular=`pwd`/Singular; export Singular;\
-	${testdir}/comparecheck ${testdir}/general_test.in ${testdir}/general_test.out
-	@ if test "${WITH_MP}" = yes; then ${MAKE} mpcheck; fi; 
-	@ if test "${WITH_FACTORY}" = yes && test "${WITH_LIBFAC}" = yes; then \
-	  ${MAKE} factorycheck;\
-	fi
-	@ if test "${WITH_DBM}" = yes; then ${MAKE} dbmcheck; fi
-
-
-mpcheck: Singular ${testdir}/mpcheck ${testdir}/mpcheck.data
-	- @ SINGULARPATH=`pwd`/LIB; export SINGULARPATH; \
-	PATH=`pwd`:${PATH}; export PATH;\
-	Singular=`pwd`/Singular; export Singular;\
-	${testdir}/mpcheck ${testdir}/mpcheck.data
-
-factorycheck: Singular ${testdir}/comparecheck ${testdir}/fac_test.in \
-		${testdir}/fac_test.out
-	- @ SINGULARPATH=`pwd`/LIB; export SINGULARPATH; \
-	PATH=`pwd`:${PATH}; export PATH;\
-	Singular=`pwd`/Singular; export Singular;\
-	${testdir}/comparecheck ${testdir}/fac_test.in ${testdir}/fac_test.out
-
-dbmcheck: Singular ${testdir}/comparecheck ${testdir}/dbm_test.in \
-		${testdir}/dbm_test.out 
-	- @ SINGULARPATH=`pwd`/LIB; export SINGULARPATH; \
-	PATH=`pwd`:${PATH}; export PATH;\
-	Singular=`pwd`/Singular; export Singular;\
-	${testdir}/comparecheck ${testdir}/dbm_test.in ${testdir}/dbm_test.out
-
 
 ##
 ## miscellanous targets

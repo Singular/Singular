@@ -11,8 +11,8 @@
 /*******************************************************************
  * Defines which are set by configure 
  ******************************************************************/
-/* Define if you have TeXInfo */
-#undef HAVE_INFO
+/* Define the info program to use, if you have TeXInfo, undef otherwise */
+#undef HAVE_INFO 
 /* Define to use readline lib for fancy display */
 #undef HAVE_READLINE
 /* Define to use built-in command line parser */
@@ -21,8 +21,6 @@
 #undef HAVE_DLD
 /* Define to have dbm links */
 #undef HAVE_DBM
-/* Define to use gmp for rational arithmetic */
-#undef HAVE_GMP
 /* Define to have smallgmp */
 #undef HAVE_SMALLGMP
 /* Define to have MP links */
@@ -35,6 +33,8 @@
 #undef STDC_HEADERS
 /* Define if you have sys/file.h */
 #undef HAVE_SYS_FILE_H
+/* Define if you have sys/stat.h */
+#undef HAVE_SYS_STAT_H
 /* Define if you have sys/param.h */
 #undef HAVE_SYS_PARAM_H
 /* Define if you have sys/file.h */
@@ -94,20 +94,18 @@
 #define EXPONENT_TYPE short
 /* Define the size of exponent */
 #define SIZEOF_EXPONENT SIZEOF_SHORT
-/* Define major version of Singular -- should be set in configure.in!!!*/
+/* Define major version of Singular -- should be set in ../configure.in!!!*/
 #define SINGULAR_MAJOR_VERSION 0
-/* Define minor version of Singular -- should be set in configure.in!!! */
+/* Define minor version of Singular -- should be set in ../configure.in!!! */
 #define SINGULAR_MINOR_VERSION 0
-/* Define sub version of Singular -- should be set in configure.in!!! */
+/* Define sub version of Singular -- should be set in ../configure.in!!! */
 #define SINGULAR_SUB_VERSION 0
 /* Define version as a string */
 #define S_VERSION1 ""
 /* Define version date as a string */
 #define S_VERSION2 ""
-/* Define the data directory where Singular searches for libs and gftables */ 
-#define SINGULAR_DATADIR "/usr/local/share/Singular"
-/* Define the info directory where Singular searches for help files */ 
-#define SINGULAR_INFODIR "/usr/local/info"
+/* Define the root directory from where Singular searches for libs and info */
+#define SINGULAR_ROOT_DIR "/usr/local/"
 
 /*******************************************************************
  * Defines which are not set by configure
@@ -149,6 +147,9 @@
 #define PROFILER 
 #endif
 
+/* Define to use gmp for rational arithmetic */
+#define HAVE_GMP
+
 /*******************************************************************
  * Evaluate the set defines
  ******************************************************************/
@@ -179,7 +180,7 @@
 #define SDRING
 #endif
 
-#if HAVE_INFO != 1
+#ifndef HAVE_INFO
 #define buildin_help 1
 #endif
 

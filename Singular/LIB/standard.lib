@@ -1,7 +1,7 @@
-// $Id: standard.lib,v 1.17 1998-05-29 15:02:02 Singular Exp $
+// $Id: standard.lib,v 1.18 1998-06-03 10:04:26 obachman Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.17 1998-05-29 15:02:02 Singular Exp $";
+version="$Id: standard.lib,v 1.18 1998-06-03 10:04:26 obachman Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
@@ -386,7 +386,6 @@ example
 proc res(list #)
 {
    def P=basering;
-   list result;
    def m=#[1]; //the ideal or module
 
    int i=#[2]; //the length of the resolution
@@ -412,7 +411,7 @@ proc res(list #)
       def m=imap(P,m);
       list re=mres(m,i);
       setring P;
-      result=imap(Phelp,re);
+      resolution result=imap(Phelp,re);
       return(result);
    }
 
@@ -426,7 +425,7 @@ proc res(list #)
       m=std(m);
       list re=sres(m,i);
       setring P;
-      result=imap(Phelp,re);
+      resolution result=imap(Phelp,re);
       return(result);
    }
 
@@ -437,11 +436,33 @@ proc res(list #)
    def m=imap(P,m);
    list re=mres(m,i);
    setring P;
-   result=imap(Phelp,re);
+   resolution result=imap(Phelp,re);
    return(result);
 }
 
-proc minresu(list #)
+/*
+proc minres(list #)
 {
-   return(res(#[1],#[2],1));
+  if (size(#) == 2)
+  {
+    if (typeof(#[1]) == "ideal" || typeof(#[1]) == "module")
+    {
+      if (typeof(#[2] == "int"))
+      {
+        return (res(#[1],#[2],1));
+      }
+    }
+  }
+  
+  if (typeof(#[1]) == "resolution")
+  {
+    return minimizeres(#[1]);
+  }
+  else
+  {
+    return minimizeres(#);
+  }
+  
 }
+
+*/

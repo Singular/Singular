@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr.h,v 1.10 1998-06-02 15:29:58 Singular Exp $ */
+/* $Id: mpsr.h,v 1.11 1998-06-03 10:04:23 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr.h
@@ -16,18 +16,18 @@
 #ifndef __MPSR__
 #define __MPSR__
 
-#include"structs.h"
-#include"mmemory.h"
-#include"ipid.h"
-#include"polys.h"
-#include"numbers.h"
-
 // now the MP include stuff (is surrounded by ifndef there)
 extern "C"
 {
 #include"MP.h"
 #include"MPT.h"
 }
+
+#include"structs.h"
+#include"mmemory.h"
+#include"ipid.h"
+#include"polys.h"
+#include"numbers.h"
 
 /***************************************************************
  *

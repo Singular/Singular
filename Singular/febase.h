@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.18 1998-06-02 15:29:52 Singular Exp $ */
+/* $Id: febase.h,v 1.19 1998-06-03 10:04:21 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -26,6 +26,7 @@ extern FILE *myfopen(char *path, char *mode);
 #define myfopen fopen
 #endif
 extern size_t myfread(void *ptr, size_t size, size_t nmemb, FILE *stream);
+
 
 extern char*  feErrors;
 extern int    feErrorsLen;
@@ -82,8 +83,12 @@ enum   feBufferInputs
   BI_file
 };
 
-char*   feGetSearchPath(const char* argv0 = NULL);
-char*   feGetExpandedExecutable(const char* argv0 = NULL);
+void    feInitPaths(const char* argv0);
+char*   feGetSearchPath();
+char*   feGetExpandedExecutable();
+char*   feGetBinDir();
+char*   feGetInfoCall(const char* index);
+
 FILE *  feFopen(char *path, char *mode, char *where=NULL, int useWerror=FALSE);
 void    fePause(void);
 void    Print(char* fmt, ...);

@@ -1,14 +1,10 @@
 SHELL		= /bin/sh
 
-PRODUCT		= Singular
 SINGULAR_MAJOR_VERSION	= @SINGULAR_MAJOR_VERSION@
 SINGULAR_MINOR_VERSION	= @SINGULAR_MINOR_VERSION@
+SINGULAR_SUB_VERSION	= @SINGULAR_SUB_VERSION@
+SINGULAR		= @SINGULAR@
 
-DISTNAME	= ${PRODUCT}-full-${SINGULAR_MAJOR_VERSION}.${SINGULAR_MINOR_VERSION}
-BINDISTNAME	= ${PRODUCT}-${SINGULAR_MAJOR_VERSION}.${SINGULAR_MINOR_VERSION}.@host@
-STATIC_BINDISTNAME	= ${PRODUCT}-${SINGULAR_MAJOR_VERSION}.${SINGULAR_MINOR_VERSION}.static.@host@
-SHAREDISTNAME	= ${PRODUCT}-${SINGULAR_MAJOR_VERSION}.${SINGULAR_MINOR_VERSION}-share
-MKINSTALLDIRS	= ./mkinstalldirs
 
 @SET_MAKE@
 BUILD_SUBDIRS	= @CONFIG_SUBDIRS@
@@ -16,14 +12,15 @@ SUBDIRS		= @SUBDIRS@
 
 prefix 		= @prefix@
 exec_prefix	= @exec_prefix@
-infodir		= @infodir@
-datadir		= @datadir@
 bindir		= @bindir@
 
 TEMPDIR		= /tmp
 
 
-all install uninstall info dvi : Makefile
+${SINGULAR} :
+	${MAKE} install
+
+all install uninstall : Makefile 
 	for SUBDIR in ${BUILD_SUBDIRS}; \
 	do \
 		echo ${MAKE} $@ in $${SUBDIR}; \
@@ -40,112 +37,25 @@ clean distclean mostlyclean maintainer-clean:
 		${MAKE} $@; \
 		cd .. ;\
 	done;\
-	rm -rf *~ a.out core *.o .log lib bin info share include; \
+	rm -rf *~ a.out core *.o .log \
 	if test "$@" = distclean || test "$@" = maintainer-clean; then \
-	  rm -f Makefile config.cache config.log config.status TAGS* *.gz *.tar; \
+	  rm -rf Makefile config.cache config.log config.status TAGS* *.gz *.tar;\
 	fi; \
 	if test "$@" = maintainer-clean; then \
-	  echo "This command is inteneded for maintainer use, only" ; \
-	  rm -f configure ;\
+	  echo "This command is intended for maintainer use, only" ; \
+	  rm -rf configure;\
 	fi
 
-dist: 
-	rm -rf ${DISTNAME}.tar* ${TEMPDIR}/${DISTNAME}* 
-	mkdir ${TEMPDIR}/${DISTNAME}
-	- cp -pR . ${TEMPDIR}/${DISTNAME}
-	cd ${TEMPDIR}/${DISTNAME}; ${MAKE} distclean; 
-	cd ${TEMPDIR}; tar cf ${DISTNAME}.tar ${DISTNAME} 
-	rm -rf ${TEMPDIR}/${DISTNAME}
-	- gzip -9 ${TEMPDIR}/${DISTNAME}.tar
-	- mv ${TEMPDIR}/${DISTNAME}.tar.gz .
-
-bindist: ${bindir}/Singular
-	rm -rf  ${BINDISTNAME}*
-	if test "${datadir}" != /usr/local/share || \
-	   test "${infodir}" != /usr/local/info; then \
-		cd Singular ;\
-		mv mod2.h mod2.h.orig ;\
-		sed -f ../sed.bindist.cmd mod2.h.orig > mod2.h ;\
-		/bin/rm -f febase.o misc.o Singular; \
-		touch *.inc *.o;\
-		${MAKE} Singular ;\
-		/bin/rm -f febase.o misc.o;\
-		mv mod2.h.orig mod2.h;\
-	fi
-	mv Singular/Singular ${BINDISTNAME}
-	strip ${BINDISTNAME}
-	gzip -9 ${BINDISTNAME}
-
-staticbindist: ${bindir}/Singular-static
-	rm -rf  ${STATIC_BINDISTNAME}*
-	if test "${datadir}" != /usr/local/share || \
-	   test "${infodir}" != /usr/local/info; then \
-		cd Singular ;\
-		mv mod2.h mod2.h.orig ;\
-		sed -f ../sed.bindist.cmd mod2.h.orig > mod2.h ;\
-		/bin/rm -f febase.o misc.o Singular-static; \
-		touch *.inc *.o;\
-		${MAKE} Singular-static ;\
-		/bin/rm -f febase.o misc.o;\
-		mv mod2.h.orig mod2.h;\
-	fi
-	mv Singular/Singular-static ${STATIC_BINDISTNAME}
-	strip ${STATIC_BINDISTNAME}
-	gzip -9 ${STATIC_BINDISTNAME}
-
-dosdist: Singular/Singular.exe
-	mkdir /tmp/singdos
-	mkdir /tmp/singdos/Singular
-	mkdir /tmp/singdos/Singular/info
-	mkdir /tmp/singdos/Singular/share
-	mkdir /tmp/singdos/Singular/share/Singular
-	cp Singular/doc/singular.hlp /tmp/singdos/Singular/info
-	cp Singular/Singular.exe /tmp/singdos/Singular
-	cp Singular/LIB/*.lib /tmp/singdos/Singular/share/Singular
-	cp -R Singular/LIB/gftables /tmp/singdos/Singular/share/Singular
-	cp COPYING.share /tmp/singdos/Singular/COPYING
-	cp README.dos /tmp/singdos/Singular/README
-	cd /tmp/singdos/; zip -k -r sing Singular; cd -
-	mv /tmp/singdos/sing.zip Singular.zip
-	/bin/rm -rf /tmp/singdos
-
-sharedist: ${bindir}/Singular
-	cd Singular; ${MAKE} dvi; ${MAKE} info
-	/bin/rm -rf ${TEMPDIR}/Singular-share
-	${MKINSTALLDIRS} ${TEMPDIR}/Singular-share/info
-	${MKINSTALLDIRS} ${TEMPDIR}/Singular-share/share/Singular/doc
-	${MKINSTALLDIRS} ${TEMPDIR}/Singular-share/share/Singular/gftables
-	cp Singular/LIB/*.lib ${TEMPDIR}/Singular-share/share/Singular
-	cp Singular/LIB/gftables/[0-9]* \
-		${TEMPDIR}/Singular-share/share/Singular/gftables
-	cp Singular/doc/singular.hlp ${TEMPDIR}/Singular-share/info
-	cp Singular/doc/singular.dvi Singular/doc/tutor.dvi \
-		${TEMPDIR}/Singular-share/share/Singular/doc
-	cd  ${TEMPDIR}/Singular-share/share/Singular/; \
-	ln -s ../../info/singular.hlp singular.hlp
-	cp COPYING.share README.share ${TEMPDIR}/Singular-share
-	cd ${TEMPDIR}/Singular-share;\
-	tar cf ${SHAREDISTNAME}.tar * ;\
-	gzip -9 ${SHAREDISTNAME}.tar
-	mv ${TEMPDIR}/Singular-share/${SHAREDISTNAME}.tar.gz .
-	/bin/rm -rf ${TEMPDIR}/Singular-share
-
-${bindir}/Singular: 
-	cd Singular; ${MAKE} Singular	
-
-${bindir}/Singular-static : 
-	cd Singular; ${MAKE} Singular-static
-
-Singular/Singular.exe:
-	./configure.dos
-	${MAKE} clean
-	${MAKE} install
 
 Singular factory libfac MP gmp:
 	cd $@; ${MAKE} all
 
-check:
-	cd Singular; ${MAKE} check
+
+info dvi ps doc doc/singular.hlp: ${SINGULAR} 
+	cd doc; ${MAKE} $@
+
+info/singular.hlp:
+	cd doc; ${MAKE} install
 
 Makefile : Makefile.in config.status
 	./config.status

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_mp.cc,v 1.17 1998-05-25 21:28:32 obachman Exp $ */
+/* $Id: sing_mp.cc,v 1.18 1998-06-03 10:04:25 obachman Exp $ */
 
 /*
 * ABSTRACT: interface to MP links
@@ -14,13 +14,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include "mpsr.h"
 #include "tok.h"
 #include "mmemory.h"
 #include "febase.h"
 #include "subexpr.h"
 #include "ipid.h"
 #include "silink.h"
-#include"mpsr.h"
 
 static int Batch_ReadEval(si_link silink);
 

@@ -12,7 +12,7 @@ SHELL=/bin/sh
 
 ## directory where info files are installed
 prefix		= @prefix@
-infodir		= @infodir@
+infodir		= ${prefix}/info
 
 ##
 ## needed programs
@@ -29,9 +29,7 @@ MAKEINFO	= makeinfo
 TEXINDEX	= texindex
 DVIPS		= dvips
 
-# directory where Singular executable is found
-SINGULARDIR	= ..
-
+SINGULAR	= @SINGULAR@
 ##
 ## End configuration dependend stuff
 #################################################################
@@ -43,7 +41,7 @@ TEX_FILES = copyright.tex # proc.tex
 SINGULAR_OBJS= examples.tex general.tex math.tex reference.tex \
 	singular.tex start.tex types.tex pdata.tex
 
-all: info dvi
+all: info dvi 
 
 info: singular.hlp 
 
@@ -55,6 +53,7 @@ dvi: singular.dvi tutor.dvi usercard.dvi
 ps: dvi
 	${DVIPS} singular.dvi -o
 	${DVIPS} tutor.dvi -o
+	${DVIPS} usercard.dvi  -o
 
 singular.dvi:  ${SINGULAR_OBJS} ${TEX_FILES} Makefile
 	${TEX} singular.tex
@@ -95,28 +94,24 @@ maintainer-clean: distclean
 	@echo "Rebuilding the deleted files requires makeinfo, tex and texindex"
 	/bin/rm -f *.dvi singular.hlp configure ${SINGULAR_OBJS}
 
-singular.tex :  singular.doc  doc2tex ${SINGULARDIR}/Singular
-	SINGULARPATH=${SINGULARDIR}/LIB; export SINGULARPATH; \
-	PATH=`pwd`/${SINGULARDIR}:$(PATH); export PATH; \
-	./doc2tex ${SINGULARDIR}/Singular singular
+singular.tex :  singular.doc  doc2tex ${SINGULAR}
+	./doc2tex ${SINGULAR} singular
 	echo expect one error
 	-grep "error occurred" singular.tex
 
-%.tex: %.doc doc2tex ${SINGULARDIR}/Singular
-	SINGULARPATH=${SINGULARDIR}/LIB; export SINGULARPATH; \
-	PATH=`pwd`/${SINGULARDIR}:$(PATH); export PATH; \
-	./doc2tex ${SINGULARDIR}/Singular $*
+%.tex: %.doc doc2tex ${SINGULAR}
+	./doc2tex ${SINGULAR} $*
 	-grep "error occurred" $@
 
 
 doc2tex: doc2tex.c
 	$(CC) doc2tex.c -o doc2tex
 
-${SINGULARDIR}/Singular:
-	cd ${SINGULARDIR}; ${MAKE} Singular
+${SINGULAR}: 
+	cd ${prefix}; ${MAKE} ${SINGULAR}
 
 Makefile: Makefile.in
-	cd ${SINGULARDIR}; ${MAKE} newdoc/Makefile
+	cd ${prefix}; ${MAKE} Makefile
 
 #examples.tex: examples.doc
 #general.tex: general.doc

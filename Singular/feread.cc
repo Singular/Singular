@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.12 1998-05-25 08:50:23 pohl Exp $ */
+/* $Id: feread.cc,v 1.13 1998-06-03 10:04:22 obachman Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -672,15 +672,22 @@ void fe_set_input_mode(void)
 
     /* try to read a history */
     using_history();
-    read_history (".singular_hist");
+    char *p = getenv("SINGULARHIST");
+    if (p != NULL)
+    {
+      read_history (p);
+    }
   }  
 }
 
 void fe_reset_input_mode (void)
 {
-  /* try to read a history */
-  if(!feBatch && !fe_use_fgets && (history_total_bytes()!=0))
-    write_history (".singular_hist");
+  char *p = getenv("SINGULARHIST");
+  if (p != NULL)
+  {
+    if(!feBatch && !fe_use_fgets && (history_total_bytes()!=0))
+      write_history (p);
+  }
 }
 
 char * fe_fgets_stdin_rl(char *pr,char *s, int size)

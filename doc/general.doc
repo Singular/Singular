@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.100 1998-05-27 09:42:04 Singular Exp $
+@comment $Id: general.doc,v 1.101 1998-06-03 10:04:28 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -196,11 +196,8 @@ quits  @sc{Singular}
 @node Editing input,Command line options,Interrupting SINGULAR,Interactive use
 @subsection Editing input
 @cindex Editing input
+@cindex SINGULARHIST
 
-On Unix-like operating systems and on Windows NT, @sc{Singular} maintains a history of the
-last lines of input.  The history is stored in a file named
-@code{.singular_hist} in the current working directory.  Thus it is
-possible to reuse input from a former @sc{Singular} session.
 
 This section describes only a subset of the key bindings of
 @sc{Singular} binaries built with the GNU Readline library.
@@ -240,6 +237,14 @@ saves current line on history and get previous line
 saves the current line to the history and
 sends it to the @sc{Singular} parser for interpretation
 @end table
+
+On Unix-like operating systems and on Windows NT, @sc{Singular}
+maintains a history of the last lines of input.  If the environment
+variable @code{SINGULARHIST} is set and has a name of a file as value, 
+then the input history is stored across sessions using this
+file. Otherwsie, i.e., if the environment variable @code{SINGULARHIST}
+is not set, then the history of the last inputs is only available for
+the commands of the current session.
 
 @c --------------------------------------------------------------------------
 @node Command line options, Startup sequence, Editing input, Interactive use

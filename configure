@@ -16,8 +16,11 @@ ac_help="$ac_help
 \
   --enable-PACKAGE        configure and build PACKAGE
   --disable-PACKAGE       do not configure and build PACKAGE
- where PACKAGE can be:
+   where PACKAGE can be:
      smallgmp             minimal version of gmp written in C only"
+ac_help="$ac_help
+\
+     gmp                  Gnu Multiple Precision package"
 ac_help="$ac_help
 \
      MP                   Multi Protocol library"
@@ -32,12 +35,12 @@ ac_help="$ac_help
      sgroup               numerical semigroup computations"
 ac_help="$ac_help
 \
-     Singular             CAS for commutative algebra"
+     Singular             CAS for Polynomial Computations"
 ac_help="$ac_help
 \
   --with-PACKAGE          use PACKAGE, provide dependent functionality
   --without-PACKAGE       do not use PACKAGE, disable dependent functionality
- where PACKAGE can be:
+   where PACKAGE can be:
      MP                   Multi Protocol library"
 ac_help="$ac_help
 \
@@ -48,7 +51,7 @@ ac_help="$ac_help
 ac_help="$ac_help
 \
   --with-apint=PACKAGE    use PACKAGE for arbitary integer arithmetic
-                          where PACKAGE can be gmp, smallgmp, or buildin"
+                          where PACKAGE can be gmp or smallgmp"
 
 # Initialize some variables set by options.
 # The variables have the same names as the options, with
@@ -558,59 +561,14 @@ fi
 
 
 
-SINGULAR_MAJOR_VERSION=1
-SINGULAR_MINOR_VERSION=2
-SINGULAR_SUB_VERSION=0
-VERSION_DATE="May 1998"
+# make them to env variables 
+# pass them indirectly to subsequent configures
+export SINGULAR_MAJOR_VERSION=1
+export SINGULAR_MINOR_VERSION=2
+export SINGULAR_SUB_VERSION=0
+export SINGULAR_VERSION="${SINGULAR_MAJOR_VERSION}.${SINGULAR_MINOR_VERSION}.${SINGULAR_SUB_VERSION}"
+export VERSION_DATE="June 1998"
 
-
-
-
-ac_aux_dir=
-for ac_dir in $srcdir $srcdir/.. $srcdir/../..; do
-  if test -f $ac_dir/install-sh; then
-    ac_aux_dir=$ac_dir
-    ac_install_sh="$ac_aux_dir/install-sh -c"
-    break
-  elif test -f $ac_dir/install.sh; then
-    ac_aux_dir=$ac_dir
-    ac_install_sh="$ac_aux_dir/install.sh -c"
-    break
-  fi
-done
-if test -z "$ac_aux_dir"; then
-  { echo "configure: error: can not find install-sh or install.sh in $srcdir $srcdir/.. $srcdir/../.." 1>&2; exit 1; }
-fi
-ac_config_guess=$ac_aux_dir/config.guess
-ac_config_sub=$ac_aux_dir/config.sub
-ac_configure=$ac_aux_dir/configure # This should be Cygnus configure.
-
-
-# Make sure we can run config.sub.
-if $ac_config_sub sun4 >/dev/null 2>&1; then :
-else { echo "configure: error: can not run $ac_config_sub" 1>&2; exit 1; }
-fi
-
-echo $ac_n "checking host system type""... $ac_c" 1>&6
-echo "configure:596: checking host system type" >&5
-
-host_alias=$host
-case "$host_alias" in
-NONE)
-  case $nonopt in
-  NONE)
-    if host_alias=`$ac_config_guess`; then :
-    else { echo "configure: error: can not guess host type; you must specify one" 1>&2; exit 1; }
-    fi ;;
-  *) host_alias=$nonopt ;;
-  esac ;;
-esac
-
-host=`$ac_config_sub $host_alias`
-host_cpu=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\1/'`
-host_vendor=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\2/'`
-host_os=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
-echo "$ac_t""$host" 1>&6
 
 
 
@@ -618,7 +576,7 @@ echo "$ac_t""$host" 1>&6
 # Extract the first word of "gcc", so it can be a program name with args.
 set dummy gcc; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:622: checking for $ac_word" >&5
+echo "configure:580: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -647,7 +605,7 @@ if test -z "$CC"; then
   # Extract the first word of "cc", so it can be a program name with args.
 set dummy cc; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:651: checking for $ac_word" >&5
+echo "configure:609: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -695,7 +653,7 @@ fi
 fi
 
 echo $ac_n "checking whether the C compiler ($CC $CFLAGS $LDFLAGS) works""... $ac_c" 1>&6
-echo "configure:699: checking whether the C compiler ($CC $CFLAGS $LDFLAGS) works" >&5
+echo "configure:657: checking whether the C compiler ($CC $CFLAGS $LDFLAGS) works" >&5
 
 ac_ext=c
 # CFLAGS is not in ac_cpp because -g, -O, etc. are not valid cpp options.
@@ -705,11 +663,11 @@ ac_link='${CC-cc} -o conftest $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS 
 cross_compiling=$ac_cv_prog_cc_cross
 
 cat > conftest.$ac_ext <<EOF
-#line 709 "configure"
+#line 667 "configure"
 #include "confdefs.h"
 main(){return(0);}
 EOF
-if { (eval echo configure:713: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
+if { (eval echo configure:671: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
   ac_cv_prog_cc_works=yes
   # If we can't run a trivial program, we are probably using a cross compiler.
   if (./conftest; exit) 2>/dev/null; then
@@ -729,12 +687,12 @@ if test $ac_cv_prog_cc_works = no; then
   { echo "configure: error: installation or configuration problem: C compiler cannot create executables." 1>&2; exit 1; }
 fi
 echo $ac_n "checking whether the C compiler ($CC $CFLAGS $LDFLAGS) is a cross-compiler""... $ac_c" 1>&6
-echo "configure:733: checking whether the C compiler ($CC $CFLAGS $LDFLAGS) is a cross-compiler" >&5
+echo "configure:691: checking whether the C compiler ($CC $CFLAGS $LDFLAGS) is a cross-compiler" >&5
 echo "$ac_t""$ac_cv_prog_cc_cross" 1>&6
 cross_compiling=$ac_cv_prog_cc_cross
 
 echo $ac_n "checking whether we are using GNU C""... $ac_c" 1>&6
-echo "configure:738: checking whether we are using GNU C" >&5
+echo "configure:696: checking whether we are using GNU C" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_gcc'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -743,7 +701,7 @@ else
   yes;
 #endif
 EOF
-if { ac_try='${CC-cc} -E conftest.c'; { (eval echo configure:747: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
+if { ac_try='${CC-cc} -E conftest.c'; { (eval echo configure:705: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
   ac_cv_prog_gcc=yes
 else
   ac_cv_prog_gcc=no
@@ -758,7 +716,7 @@ if test $ac_cv_prog_gcc = yes; then
   ac_save_CFLAGS="$CFLAGS"
   CFLAGS=
   echo $ac_n "checking whether ${CC-cc} accepts -g""... $ac_c" 1>&6
-echo "configure:762: checking whether ${CC-cc} accepts -g" >&5
+echo "configure:720: checking whether ${CC-cc} accepts -g" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_cc_g'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -786,7 +744,7 @@ else
 fi
 
 echo $ac_n "checking how to run the C preprocessor""... $ac_c" 1>&6
-echo "configure:790: checking how to run the C preprocessor" >&5
+echo "configure:748: checking how to run the C preprocessor" >&5
 # On Suns, sometimes $CPP names a directory.
 if test -n "$CPP" && test -d "$CPP"; then
   CPP=
@@ -801,13 +759,13 @@ else
   # On the NeXT, cc -E runs the code through the compiler's parser,
   # not just through cpp.
   cat > conftest.$ac_ext <<EOF
-#line 805 "configure"
+#line 763 "configure"
 #include "confdefs.h"
 #include <assert.h>
 Syntax Error
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:811: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:769: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out`
 if test -z "$ac_err"; then
   :
@@ -818,13 +776,13 @@ else
   rm -rf conftest*
   CPP="${CC-cc} -E -traditional-cpp"
   cat > conftest.$ac_ext <<EOF
-#line 822 "configure"
+#line 780 "configure"
 #include "confdefs.h"
 #include <assert.h>
 Syntax Error
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:828: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:786: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out`
 if test -z "$ac_err"; then
   :
@@ -847,9 +805,9 @@ fi
 echo "$ac_t""$CPP" 1>&6
 
 echo $ac_n "checking for AIX""... $ac_c" 1>&6
-echo "configure:851: checking for AIX" >&5
+echo "configure:809: checking for AIX" >&5
 cat > conftest.$ac_ext <<EOF
-#line 853 "configure"
+#line 811 "configure"
 #include "confdefs.h"
 #ifdef _AIX
   yes
@@ -871,46 +829,56 @@ rm -f conftest*
 
 
 
-if test "$libdir" = '${exec_prefix}/lib'; then
-  if test "x$exec_prefix" = xNONE; then
-    if test "x$prefix" = xNONE; then
-      LDFLAGS="-L${ac_default_prefix}/lib ${LDFLAGS}"
-      ac_configure_args="$ac_configure_args --libdir=${ac_default_prefix}/lib"
+
+# expand prefix and pass it to subsequent configures
+test "x$prefix" = xNONE && prefix=${ac_default_prefix}; \
+    ac_configure_args="$ac_configure_args --prefix=${prefix}"
+
+# expand exec_prefix
+if test "x$exec_prefix" = xNONE; then
+  if test -x "singuname.sh"; then
+    if (singuname.sh >/dev/null 2>&1) then
+	exec_prefix=${prefix}/`singuname.sh`
+        ac_configure_args="$ac_configure_args --exec_prefix=${exec_prefix}"
     else
-      LDFLAGS="-L${prefix}/lib ${LDFLAGS}"
-      ac_configure_args="$ac_configure_args --libdir=${prefix}/lib"
+      { echo "configure: error: Unknown architecture: Check singuname.sh" 1>&2; exit 1; }
     fi
   else
-    LDFLAGS="-L${exec_prefix}/lib ${LDFLAGS}"
-    ac_configure_args="$ac_configure_args --libdir=${exec_prefix}/lib"
+    { echo "configure: error: Need singuname.sh" 1>&2; exit 1; }
   fi
-else
-  LDFLAGS="-L${libdir} ${LDFLAGS}"
 fi
 
-if test "$includedir" = '${prefix}/include'; then
-  if test "x$prefix" = xNONE; then
-    CPPFLAGS="-I${ac_default_prefix}/include ${CPPFLAGS}"
-    ac_configure_args="$ac_configure_args --includedir=${ac_default_prefix}/include"
-  else
-    CPPFLAGS="-I${prefix}/include ${CPPFLAGS}"
-    ac_configure_args="$ac_configure_args --includedir=${prefix}/include"
-  fi
-else
-  CPPFLAGS="-I${includedir} ${CPPFLAGS}"
-fi
+# expand bindir
+test "x$bindir" = 'x${exec_prefix}/bin' && \
+  bindir="${exec_prefix}/bin" ; \
+   ac_configure_args="$ac_configure_args --bindir=${bindir}"
 
-if test "x$prefix" = xNONE; then
-  ac_configure_args="$ac_configure_args --prefix=$ac_default_prefix"
-fi
+# construct name of installed Singular executable
+export SINGULAR=${bindir}/Singular-${SINGULAR_MAJOR_VERSION}.${SINGULAR_MINOR_VERSION}.${SINGULAR_SUB_VERSION}
+
+
+# expand libdir
+test "x$libdir" = 'x${exec_prefix}/lib' && \
+  libdir="${exec_prefix}/lib/${SINGULAR_VERSION}" ; \
+   ac_configure_args="$ac_configure_args --libdir=${libdir}"
+
+# expand includedir
+test "x$includedir" = 'x${prefix}/include' &&  \
+  includedir="${exec_prefix}/include/${SINGULAR_VERSION}" ; \
+   ac_configure_args="$ac_configure_args --includedir=${includedir}"
+
+# add to -I to CPPFLAGS and and -L to LDFLAGS, just to be sure
+LDFLAGS="-L${libdir} ${LDFLAGS}"
+CPPFLAGS="-I${includedir} ${CPPFLAGS}"
+
 
 echo $ac_n "checking whether _AIX is defined""... $ac_c" 1>&6
-echo "configure:909: checking whether _AIX is defined" >&5
+echo "configure:877: checking whether _AIX is defined" >&5
 if eval "test \"`echo '$''{'ac_cv_is_aix'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 914 "configure"
+#line 882 "configure"
 #include "confdefs.h"
 #ifdef _AIX
     yes
@@ -937,7 +905,7 @@ fi
 
 
 echo $ac_n "checking for atof in -lm""... $ac_c" 1>&6
-echo "configure:941: checking for atof in -lm" >&5
+echo "configure:909: checking for atof in -lm" >&5
 ac_lib_var=`echo m'_'atof | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -945,7 +913,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lm  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 949 "configure"
+#line 917 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -956,7 +924,7 @@ int main() {
 atof()
 ; return 0; }
 EOF
-if { (eval echo configure:960: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
+if { (eval echo configure:928: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -984,7 +952,7 @@ else
 fi
 
 echo $ac_n "checking for socket in -lbsd""... $ac_c" 1>&6
-echo "configure:988: checking for socket in -lbsd" >&5
+echo "configure:956: checking for socket in -lbsd" >&5
 ac_lib_var=`echo bsd'_'socket | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -992,7 +960,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lbsd  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 996 "configure"
+#line 964 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -1003,7 +971,7 @@ int main() {
 socket()
 ; return 0; }
 EOF
-if { (eval echo configure:1007: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
+if { (eval echo configure:975: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1031,7 +999,7 @@ else
 fi
 
 echo $ac_n "checking for listen in -lsocket""... $ac_c" 1>&6
-echo "configure:1035: checking for listen in -lsocket" >&5
+echo "configure:1003: checking for listen in -lsocket" >&5
 ac_lib_var=`echo socket'_'listen | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1039,7 +1007,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lsocket  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1043 "configure"
+#line 1011 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -1050,7 +1018,7 @@ int main() {
 listen()
 ; return 0; }
 EOF
-if { (eval echo configure:1054: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
+if { (eval echo configure:1022: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1078,7 +1046,7 @@ else
 fi
 
 echo $ac_n "checking for gethostbyname in -lnsl""... $ac_c" 1>&6
-echo "configure:1082: checking for gethostbyname in -lnsl" >&5
+echo "configure:1050: checking for gethostbyname in -lnsl" >&5
 ac_lib_var=`echo nsl'_'gethostbyname | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1086,7 +1054,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lnsl  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1090 "configure"
+#line 1058 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -1097,7 +1065,7 @@ int main() {
 gethostbyname()
 ; return 0; }
 EOF
-if { (eval echo configure:1101: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
+if { (eval echo configure:1069: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1125,7 +1093,7 @@ else
 fi
 
 echo $ac_n "checking for mpq_init in -lgmp""... $ac_c" 1>&6
-echo "configure:1129: checking for mpq_init in -lgmp" >&5
+echo "configure:1097: checking for mpq_init in -lgmp" >&5
 ac_lib_var=`echo gmp'_'mpq_init | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1133,7 +1101,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lgmp  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1137 "configure"
+#line 1105 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -1144,7 +1112,7 @@ int main() {
 mpq_init()
 ; return 0; }
 EOF
-if { (eval echo configure:1148: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
+if { (eval echo configure:1116: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1172,7 +1140,7 @@ else
 fi
 
 echo $ac_n "checking for mpz_init in -lsmallgmp""... $ac_c" 1>&6
-echo "configure:1176: checking for mpz_init in -lsmallgmp" >&5
+echo "configure:1144: checking for mpz_init in -lsmallgmp" >&5
 ac_lib_var=`echo smallgmp'_'mpz_init | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1180,7 +1148,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lsmallgmp  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1184 "configure"
+#line 1152 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -1191,7 +1159,7 @@ int main() {
 mpz_init()
 ; return 0; }
 EOF
-if { (eval echo configure:1195: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
+if { (eval echo configure:1163: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1219,7 +1187,7 @@ else
 fi
 
 echo $ac_n "checking for IMP_PutGmpInt in -lMP""... $ac_c" 1>&6
-echo "configure:1223: checking for IMP_PutGmpInt in -lMP" >&5
+echo "configure:1191: checking for IMP_PutGmpInt in -lMP" >&5
 ac_lib_var=`echo MP'_'IMP_PutGmpInt | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1227,7 +1195,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lMP  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1231 "configure"
+#line 1199 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -1238,7 +1206,7 @@ int main() {
 IMP_PutGmpInt()
 ; return 0; }
 EOF
-if { (eval echo configure:1242: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
+if { (eval echo configure:1210: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1266,7 +1234,7 @@ else
 fi
 
 echo $ac_n "checking for MPT_GetTree in -lMPT""... $ac_c" 1>&6
-echo "configure:1270: checking for MPT_GetTree in -lMPT" >&5
+echo "configure:1238: checking for MPT_GetTree in -lMPT" >&5
 ac_lib_var=`echo MPT'_'MPT_GetTree | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1274,7 +1242,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lMPT  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1278 "configure"
+#line 1246 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -1285,7 +1253,7 @@ int main() {
 MPT_GetTree()
 ; return 0; }
 EOF
-if { (eval echo configure:1289: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
+if { (eval echo configure:1257: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1313,7 +1281,7 @@ else
 fi
 
 echo $ac_n "checking for atof in -lsingcf""... $ac_c" 1>&6
-echo "configure:1317: checking for atof in -lsingcf" >&5
+echo "configure:1285: checking for atof in -lsingcf" >&5
 ac_lib_var=`echo singcf'_'atof | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1321,7 +1289,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lsingcf  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1325 "configure"
+#line 1293 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -1332,7 +1300,7 @@ int main() {
 atof()
 ; return 0; }
 EOF
-if { (eval echo configure:1336: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
+if { (eval echo configure:1304: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1360,7 +1328,7 @@ else
 fi
 
 echo $ac_n "checking for atof in -lsingfac""... $ac_c" 1>&6
-echo "configure:1364: checking for atof in -lsingfac" >&5
+echo "configure:1332: checking for atof in -lsingfac" >&5
 ac_lib_var=`echo singfac'_'atof | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1368,7 +1336,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lsingfac  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1372 "configure"
+#line 1340 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -1379,7 +1347,7 @@ int main() {
 atof()
 ; return 0; }
 EOF
-if { (eval echo configure:1383: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
+if { (eval echo configure:1351: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1411,17 +1379,17 @@ for ac_hdr in gmp.h smallgmp.h MP.h  MPT.h factory.h factor.h
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:1415: checking for $ac_hdr" >&5
+echo "configure:1383: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1420 "configure"
+#line 1388 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1425: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1393: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -1484,6 +1452,12 @@ if test "${enable_smallgmp+set}" = set; then
   :
 fi
 
+# Check whether --enable-gmp or --disable-gmp was given.
+if test "${enable_gmp+set}" = set; then
+  enableval="$enable_gmp"
+  :
+fi
+
 # Check whether --enable-MP or --disable-MP was given.
 if test "${enable_MP+set}" = set; then
   enableval="$enable_MP"
@@ -1540,255 +1514,294 @@ if test "${with_gmp+set}" = set; then
 fi
 
 
-echo $ac_n "checking whether to configure and build smallgmp lib""... $ac_c" 1>&6
-echo "configure:1545: checking whether to configure and build smallgmp lib" >&5
-if test "$enable_smallgmp" != yes && test "$enable_smallgmp" != no; then
-  if test "$ac_smallgmp_ok" != yes && \
-   test "$ac_gmp_ok" != yes && \
-   (test "$with_apint" = smallgmp || test "${with_apint+set}" != set); then
-    enable_smallgmp=yes
+echo $ac_n "checking whether to configure and build gmp lib""... $ac_c" 1>&6
+echo "configure:1519: checking whether to configure and build gmp lib" >&5
+if test "$enable_gmp" != yes && test "$enable_gmp" != no; then
+  if test "$ac_gmp_ok" != yes && test -d gmp; then
+    echo "$ac_t""yes" 1>&6
+    enable_gmp=yes
+    CONFIG_SUBDIRS="$CONFIG_SUBDIRS gmp"
+    ac_configure_args="$ac_configure_args --enable-gmp"
   else
-    enable_smallgmp=no
+    echo "$ac_t""no" 1>&6
+    enable_gmp=no
   fi
-fi
-if test "$enable_smallgmp" = yes && test -d smallgmp; then
-  echo "$ac_t""yes" 1>&6
-  CONFIG_SUBDIRS="$CONFIG_SUBDIRS smallgmp"
-  enable_smallgmp=yes
-  ac_will_have_gmp=yes
+elif test "$enable_gmp" = yes; then
+  if test ! -d gmp; then
+    echo "$ac_t""no" 1>&6
+    { echo "configure: error: Can not find gmp subdir" 1>&2; exit 1; }
+  else
+    echo "$ac_t""yes" 1>&6
+    CONFIG_SUBDIRS="$CONFIG_SUBDIRS gmp"
+  fi
 else
   echo "$ac_t""no" 1>&6
-  if test "$enable_smallgmp" = yes && test ! -d smallgmp; then
-    echo "configure: warning: Did not find smallgmp subdir" 1>&2
-  fi
-  enable_smallgmp=no
 fi
-if test "$ac_gmp_ok" != yes && \
-  test "$ac_smallgmp_ok" != yes && \
-  test "$enable_smallgmp" != yes; then
-    echo "configure: warning: Would rather have gmp or smallgmp to build libs and Singular" 1>&2
-    ac_configure_args="$ac_configure_args --disable-gmp"
-else
+
+echo $ac_n "checking whether to configure and build smallgmp lib""... $ac_c" 1>&6
+echo "configure:1543: checking whether to configure and build smallgmp lib" >&5
+if test "$enable_smallgmp" != yes && test "$enable_smallgmp" != no; then
+  if test "$ac_smallgmp_ok" != yes && test "$ac_gmp_ok" != yes && \
+     test "$enable_gmp" != yes && test -d smallgmp; then
+    echo "$ac_t""yes" 1>&6
+    enable_smallgmp=yes
+    CONFIG_SUBDIRS="$CONFIG_SUBDIRS smallgmp"
+    ac_configure_args="$ac_configure_args --enable-smallgmp --enable-gmp"
+  else
+    echo "$ac_t""no" 1>&6
+    enable_smallgmp=no
+  fi
+elif test "$enable_smallgmp" = yes; then
+  if test ! -d smallgmp; then
+    echo "$ac_t""no" 1>&6
+    { echo "configure: error: Can not find smallgmp subdir" 1>&2; exit 1; }
+  else
+    echo "$ac_t""yes" 1>&6
+    CONFIG_SUBDIRS="$CONFIG_SUBDIRS smallgmp"
+    if test "$ac_gmp_ok" != yes && test "$enable_gmp" != yes; then
+      ac_configure_args="$ac_configure_args --enable-gmp"
+    fi
+  fi
+else 
+  echo "$ac_t""${enable_smallgmp}" 1>&6
+fi
+
+# Check whether we have at least one of smallgmp or gmp
+if test "$ac_smallgmp_ok" != yes && test "$ac_gmp_ok" != yes && \
+   test "$enable_smallgmp" != yes && test "$enable_gmp" != yes; then
+  { echo "configure: error: can neither find nor built gmp or smallgmp" 1>&2; exit 1; }
+fi
+
+# Check whether we need to cheat subsequent configures with --enable-gmp
+if test "$ac_smallgmp_ok" != yes && test "$ac_gmp_ok" != yes; then
   ac_configure_args="$ac_configure_args --enable-gmp"
 fi
 
 echo $ac_n "checking whether to configure and build MP lib""... $ac_c" 1>&6
-echo "configure:1577: checking whether to configure and build MP lib" >&5
+echo "configure:1582: checking whether to configure and build MP lib" >&5
 if test "$enable_MP" != yes && test "$enable_MP" != no; then
-  if test "$with_MP" != no && test "$ac_MP_ok" != yes; then
-    enable_MP=yes
-  else
-    enable_MP=no
-  fi
-fi
-if test "$enable_MP" = yes && test -d MP; then
-  if test "$ac_will_have_gmp" = yes || test "$ac_gmp_ok" = yes; then
+  if test "$with_MP" != no && test "$ac_MP_ok" != yes && test -d MP && \
+     (test "$enable_gmp" = yes || test "$ac_gmp_ok" = yes); then
     echo "$ac_t""yes" 1>&6
+    enable_MP=yes
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS MP"
     ac_configure_args="$ac_configure_args --enable-MP"
   else
     echo "$ac_t""no" 1>&6
-    echo "configure: warning: Can not build MP without having gmp" 1>&2
-    enabl_MP=no
-    ac_configure_args="$ac_configure_args --disable-MP"
+    enable_MP=no
+  fi
+elif test "$enable_MP" = yes; then
+  if test ! -d MP; then
+    echo "$ac_t""no" 1>&6
+    { echo "configure: error: can not build MP without MP directory" 1>&2; exit 1; }
+  fi
+  if test "$enable_gmp" = yes || test "$ac_gmp_ok" = yes; then
+    echo "$ac_t""yes" 1>&6
+    CONFIG_SUBDIRS="$CONFIG_SUBDIRS MP"
+  else
+    echo "$ac_t""no" 1>&6
+    { echo "configure: error: can not build MP without gmp" 1>&2; exit 1; }
   fi
 else
   echo "$ac_t""no" 1>&6
-  if  test "$enable_MP" = yes && test ! -d MP; then
-    echo "configure: warning: Did not find MP subdirectory" 1>&2
-  fi
-  enable_MP=no
-  ac_configure_args="$ac_configure_args --disable-MP"
 fi
 
+  
 echo $ac_n "checking whether to configure and build factory lib""... $ac_c" 1>&6
-echo "configure:1606: checking whether to configure and build factory lib" >&5
+echo "configure:1612: checking whether to configure and build factory lib" >&5
 if test "$enable_factory" != yes && test "$enable_factory" != no; then
-  if test "$with_factory" != no && test "$ac_factory_ok" != yes; then
+  if test "$with_factory" != no && test "$ac_factory_ok" != yes && \
+     test -d factory; then
     enable_factory=yes
-  else
-    enable_factory=no
-  fi
-fi
-if test "$enable_factory" = yes && test -d factory; then
-  if test "$ac_will_have_gmp" = yes  || test "$ac_gmp_ok" = yes; then
     echo "$ac_t""yes" 1>&6
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS factory"
     ac_configure_args="$ac_configure_args --enable-factory"
   else
-    echo "$ac_t""no" 1>&6
-    echo "configure: warning: Can not build factory without having gmp" 1>&2
     enable_factory=no
-    ac_configure_args="$ac_configure_args --disable-factory"
+    echo "$ac_t""no" 1>&6
+  fi
+elif test "$enable_factory" = yes; then
+  if test -d factory; then
+    echo "$ac_t""yes" 1>&6
+    CONFIG_SUBDIRS="$CONFIG_SUBDIRS factory"
+  else
+    echo "$ac_t""no" 1>&6
+    { echo "configure: error: can not build factory without factory directory" 1>&2; exit 1; }
   fi
 else
   echo "$ac_t""no" 1>&6
-  if  test "$enable_factory" = yes && test ! -d factory; then
-    echo "configure: warning: Did not find factory subdirectory" 1>&2
-  fi
-  enable_factory=no
-  ac_configure_args="$ac_configure_args --disable-factory"
 fi
 
 echo $ac_n "checking whether to configure and build libfac lib""... $ac_c" 1>&6
-echo "configure:1635: checking whether to configure and build libfac lib" >&5
+echo "configure:1637: checking whether to configure and build libfac lib" >&5
 if test "$enable_libfac" != yes && test "$enable_libfac" != no; then
-  if test "$with_libfac" != no && test "$ac_libfac_ok" != yes; then
+  if test "$with_libfac" != no && test "$ac_libfac_ok" != yes && \
+     test -d libfac && \
+     (test "$ac_factory_ok" = yes || test "$enable_factory" = yes); then
     enable_libfac=yes
+    echo "$ac_t""yes" 1>&6
+    CONFIG_SUBDIRS="$CONFIG_SUBDIRS libfac"
+    ac_configure_args="$ac_configure_args --enable-libfac"
   else
     enable_libfac=no
+    echo "$ac_t""no" 1>&6
   fi
-fi
-if test "$enable_libfac" = yes && test -d libfac; then
+elif  test "$enable_libfac" = yes; then
+  if test ! -d libfac; then
+    echo "$ac_t""no" 1>&6
+    { echo "configure: error: can not build libfac without libfac directory" 1>&2; exit 1; }
+  fi
   if test "$ac_factory_ok" = yes || test "$enable_factory" = yes; then
-  echo "$ac_t""yes" 1>&6
-  CONFIG_SUBDIRS="$CONFIG_SUBDIRS libfac"
-  ac_configure_args="$ac_configure_args --enable-libfac"
+    echo "$ac_t""yes" 1>&6
+    CONFIG_SUBDIRS="$CONFIG_SUBDIRS libfac"
   else
     echo "$ac_t""no" 1>&6
-    echo "configure: warning: Can not build libfac without factory" 1>&2
-    enable_libfac=no
-    ac_configure_args="$ac_configure_args --disable-libfac"
+    { echo "configure: error: Can not build libfac without factory" 1>&2; exit 1; }
   fi
 else
   echo "$ac_t""no" 1>&6
-  if  test "$enable_libfac" = yes && test ! -d libfac; then
-    echo "configure: warning: Did not find libfac subdirectory" 1>&2
-  fi
-  enable_libfac=no
-  ac_configure_args="$ac_configure_args --disable-libfac"
 fi
 
-echo $ac_n "checking whether to configure and build sgroup""... $ac_c" 1>&6
-echo "configure:1664: checking whether to configure and build sgroup" >&5
-if test "$enable_sgroup" != no; then
+echo $ac_n "checking whether to configure and build sgroup lib""... $ac_c" 1>&6
+echo "configure:1667: checking whether to configure and build sgroup lib" >&5
+if test "$enable_sgroup" != yes && test "$enable_sgroup" != no; then
+  if test "$with_sgroup" != no && test "$ac_sgroup_ok" != yes && \
+     test -d sgroup && \
+     (test "$ac_MP_ok" = yes || test "$enable_MP" = yes); then
     enable_sgroup=yes
-fi
-
-if test "$enable_sgroup" = yes && test -d sgroup; then
-  if test "$ac_will_have_gmp" = yes  || test "$ac_gmp_ok" = yes; then
-    if test "$enable_MP" != no || test "$ac_MP_ok" = yes; then
-      echo "$ac_t""yes" 1>&6
-      CONFIG_SUBDIRS="$CONFIG_SUBDIRS sgroup"
-      ac_configure_args="$ac_configure_args --enable-sgroup"
-    else
-      echo "$ac_t""no" 1>&6
-      echo "configure: warning: Can not build sgroup without having MP" 1>&2
-      enable_sgroup=no
-      ac_configure_args="$ac_configure_args --disable-sgroup"
-    fi
+    echo "$ac_t""yes" 1>&6
+    CONFIG_SUBDIRS="$CONFIG_SUBDIRS sgroup"
+    ac_configure_args="$ac_configure_args --enable-sgroup"
+  else
+    enable_sgroup=no
+    echo "$ac_t""no" 1>&6
+  fi
+elif  test "$enable_sgroup" = yes; then
+  if test ! -d sgroup; then
+    echo "$ac_t""no" 1>&6
+    { echo "configure: error: can not build sgroup without sgroup directory" 1>&2; exit 1; }
+  fi
+  if test "$ac_MP_ok" = yes || test "$enable_MP" = yes; then
+    echo "$ac_t""yes" 1>&6
+    CONFIG_SUBDIRS="$CONFIG_SUBDIRS sgroup"
   else
     echo "$ac_t""no" 1>&6
-    echo "configure: warning: Can not build sgroup without having gmp" 1>&2
-    enable_sgroup=no
-    ac_configure_args="$ac_configure_args --disable-sgroup"
+    { echo "configure: error: Can not build sgroup without MP" 1>&2; exit 1; }
   fi
 else
   echo "$ac_t""no" 1>&6
-  if  test "$enable_sgroup" = yes && test ! -d sgroup; then
-    echo "configure: warning: Did not find sgroup subdirectory" 1>&2
-  fi
-  enable_sgroup=no
-  ac_configure_args="$ac_configure_args --disable-sgroup"
 fi
+
 
 echo $ac_n "checking whether to configure and build Singular""... $ac_c" 1>&6
-echo "configure:1697: checking whether to configure and build Singular" >&5
+echo "configure:1698: checking whether to configure and build Singular" >&5
 if test "$enable_Singular" != yes && test "$enable_Singular" != no; then
-  if test "$with_Singular" != no; then
+  if test "$with_Singular" != no && test -d Singular; then
     enable_Singular=yes
+    echo "$ac_t""yes" 1>&6
+    CONFIG_SUBDIRS="$CONFIG_SUBDIRS Singular"
+    ac_configure_args="$ac_configure_args --enable-Singular"
   else
     enable_Singular=no
+    echo "$ac_t""no" 1>&6
   fi
-fi
-if test "$enable_Singular" = yes && test -d Singular; then
-  echo "$ac_t""yes" 1>&6
-  CONFIG_SUBDIRS="$CONFIG_SUBDIRS Singular"
-  ac_configure_args="$ac_configure_args --enable-Singular"
+elif test "$enable_Singular" = yes; then
+  if test -d Singular; then
+    echo "$ac_t""yes" 1>&6
+    CONFIG_SUBDIRS="$CONFIG_SUBDIRS Singular"
+  else
+    echo "$ac_t""no" 1>&6
+    { echo "configure: error: can not build Singular without Singular directory" 1>&2; exit 1; }
+  fi
 else
   echo "$ac_t""no" 1>&6
-  if  test "$enable_Singular" = yes && test ! -d Singular; then
-    echo "configure: warning: Did not find Singular subdirectory" 1>&2
-  fi
-  enable_Singular=no
-  ac_configure_args="$ac_configure_args --disable-Singular"
 fi
 
 
 echo $ac_n "checking wich apint package to use""... $ac_c" 1>&6
-echo "configure:1720: checking wich apint package to use" >&5
-if test "$with_apint" != gmp && \
-  test "$with_apint" != smallgmp && \
-  test "$with_apint" != buildin; then
-   if test "$ac_gmp_ok" = yes; then
-     with_apint=gmp
-   elif test "$ac_enable_smallgmp" = yes; then
-     with_apint=smallgmp
-   else
-     with_apint=buildin
-   fi
-  ac_configure_args="$ac_configure_args --with-apint=$with_apint"
+echo "configure:1723: checking wich apint package to use" >&5
+if test "$with_apint" = gmp; then
+  if test "$ac_gmp_ok" = yes || test "$enable_gmp" = yes; then
+    echo "$ac_t""gmp" 1>&6
+  else
+    echo "$ac_t""none" 1>&6
+    { echo "configure: error: can not use with gmp without finding or building it" 1>&2; exit 1; }
+  fi
+elif test "$with_apint" = smallgmp; then
+  if test "$ac_smallgmp_ok" = yes || test "$enable_smallgmp" = yes; then
+    echo "$ac_t""smallgmp" 1>&6
+  else
+    echo "$ac_t""none" 1>&6
+    { echo "configure: error: can not use with smallgmp without finding or building it" 1>&2; exit 1; }
+  fi
+elif test "$ac_gmp_ok" = yes || test "$enable_gmp"; then
+    echo "$ac_t""gmp" 1>&6
+    ac_configure_args="$ac_configure_args --with-apint=gmp"
+else
+   echo "$ac_t""smallgmp" 1>&6
+   ac_configure_args="$ac_configure_args --with-apint=smallgmp"
 fi
-echo "$ac_t""${with_apint}" 1>&6
 
 echo $ac_n "checking whether to use with MP""... $ac_c" 1>&6
-echo "configure:1736: checking whether to use with MP" >&5
-if test "$with_MP" != no && test "$with_MP" != yes; then
-  if test "$ac_MP_ok" = yes || test "$enable_MP" = yes; then
-    with_MP=yes
-  else
-    with_MP=no
-  fi
-  ac_configure_args="$ac_configure_args --with-MP=$with_MP"
-fi
+echo "configure:1747: checking whether to use with MP" >&5
 if test "$with_MP" = yes; then
+  if test "$ac_MP_ok" = yes || test "$enable_MP" = yes; then
+    echo "$ac_t""yes" 1>&6
+  else
+    echo "$ac_t""none" 1>&6
+    { echo "configure: error: can not use with MP without finding or building it" 1>&2; exit 1; }
+  fi
+elif test "$with_MP" = no; then
+  echo "$ac_t""no" 1>&6
+elif test "$ac_MP_ok" = yes || test "$enable_MP" = yes; then
   echo "$ac_t""yes" 1>&6
+  ac_configure_args="$ac_configure_args --with-MP"
 else
   echo "$ac_t""no" 1>&6
-fi
-
-if test "$enable_MP" = yes; then
-  if test "${with_apint}" = smallgmp; then
-    ac_configure_args="$ac_configure_args --with-default_apreal=none"
-  elif test "${with_apint}" = buildin; then
-    ac_configure_args="$ac_configure_args --with-default_apreal=none --with-default-apint=none"
-  fi
+  ac_configure_args="$ac_configure_args --without-MP"
 fi
 
 echo $ac_n "checking whether to use with factory""... $ac_c" 1>&6
-echo "configure:1760: checking whether to use with factory" >&5
-if test "$with_factory" != no && test "$with_factory" != yes; then
-  if test "$ac_factory_ok" = yes || test "$enable_factory" = yes; then
-    with_factory=yes
-  else
-    with_factory=no
-  fi
-  ac_configure_args="$ac_configure_args --with-factory=$with_factory"
-fi
+echo "configure:1766: checking whether to use with factory" >&5
 if test "$with_factory" = yes; then
+  if test "$ac_factory_ok" = yes || test "$enable_factory" = yes; then
+    echo "$ac_t""yes" 1>&6
+  else
+    echo "$ac_t""none" 1>&6
+    { echo "configure: error: can not use with factory without finding or building it" 1>&2; exit 1; }
+  fi
+elif test "$with_factory" = no; then
+  echo "$ac_t""no" 1>&6
+elif test "$ac_factory_ok" = yes || test "$enable_factory" = yes; then
   echo "$ac_t""yes" 1>&6
+  ac_configure_args="$ac_configure_args --with-factory"
 else
   echo "$ac_t""no" 1>&6
+  ac_configure_args="$ac_configure_args --without-factory"
+fi
+  
+echo $ac_n "checking whether to use with libfac""... $ac_c" 1>&6
+echo "configure:1785: checking whether to use with libfac" >&5
+if test "$with_libfac" = yes; then
+  if test "$ac_libfac_ok" = yes || test "$enable_libfac" = yes; then
+    echo "$ac_t""yes" 1>&6
+  else
+    echo "$ac_t""none" 1>&6
+    { echo "configure: error: can not use with libfac without finding or building it" 1>&2; exit 1; }
+  fi
+elif test "$with_libfac" = no; then
+  echo "$ac_t""no" 1>&6
+elif test "$ac_libfac_ok" = yes || test "$enable_libfac" = yes; then
+  echo "$ac_t""yes" 1>&6
+  ac_configure_args="$ac_configure_args --with-libfac"
+else
+  echo "$ac_t""no" 1>&6
+  ac_configure_args="$ac_configure_args --without-libfac"
 fi
 
-echo $ac_n "checking whether to use with libfac""... $ac_c" 1>&6
-echo "configure:1776: checking whether to use with libfac" >&5
-if test "$with_libfac" != no && test "$with_libfac" != yes; then
-  if test "$ac_libfac_ok" = yes || test "$enable_libfac" = yes; then
-    with_libfac=yes
-  else
-    with_libfac=no
-  fi
-  ac_configure_args="$ac_configure_args --with-libfac=$with_libfac"
-fi
-if test "$with_libfac" = yes; then
-  echo "$ac_t""yes" 1>&6
-else
-  echo "$ac_t""no" 1>&6
-fi
 
 echo $ac_n "checking whether to use with Singular""... $ac_c" 1>&6
-echo "configure:1792: checking whether to use with Singular" >&5
+echo "configure:1805: checking whether to use with Singular" >&5
 if test "$with_Singular" != no && test "$with_Singular" != yes; then
   if test "$enable_Singular" = yes; then
     with_Singular=yes
@@ -1807,6 +1820,9 @@ fi
 if test -d smallgmp; then
   SUBDIRS="smallgmp"
 fi
+if test -d gmp; then
+  SUBDIRS="gmp"
+fi
 if test -d MP; then
   SUBDIRS="$SUBDIRS MP"
 fi
@@ -1816,13 +1832,16 @@ fi
 if test -d libfac; then
   SUBDIRS="$SUBDIRS libfac"
 fi
+if test -d sgroup; then
+  SUBDIRS="sgroup"
+fi
 if test -d Singular; then
   SUBDIRS="$SUBDIRS Singular"
 fi
   
 
 echo $ac_n "checking whether ${MAKE-make} sets \${MAKE}""... $ac_c" 1>&6
-echo "configure:1826: checking whether ${MAKE-make} sets \${MAKE}" >&5
+echo "configure:1845: checking whether ${MAKE-make} sets \${MAKE}" >&5
 set dummy ${MAKE-make}; ac_make=`echo "$2" | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_prog_make_${ac_make}_set'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1849,6 +1868,25 @@ else
 fi
 
 
+
+ac_aux_dir=
+for ac_dir in $srcdir $srcdir/.. $srcdir/../..; do
+  if test -f $ac_dir/install-sh; then
+    ac_aux_dir=$ac_dir
+    ac_install_sh="$ac_aux_dir/install-sh -c"
+    break
+  elif test -f $ac_dir/install.sh; then
+    ac_aux_dir=$ac_dir
+    ac_install_sh="$ac_aux_dir/install.sh -c"
+    break
+  fi
+done
+if test -z "$ac_aux_dir"; then
+  { echo "configure: error: can not find install-sh or install.sh in $srcdir $srcdir/.. $srcdir/../.." 1>&2; exit 1; }
+fi
+ac_config_guess=$ac_aux_dir/config.guess
+ac_config_sub=$ac_aux_dir/config.sub
+ac_configure=$ac_aux_dir/configure # This should be Cygnus configure.
 
 subdirs="$CONFIG_SUBDIRS"
  
@@ -1965,7 +2003,7 @@ done
 
 ac_given_srcdir=$srcdir
 
-trap 'rm -fr `echo "Makefile" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
+trap 'rm -fr `echo "Makefile doc/Makefile" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
 cat >> $CONFIG_STATUS <<EOF
 
@@ -1998,13 +2036,9 @@ s%@mandir@%$mandir%g
 s%@SINGULAR_MAJOR_VERSION@%$SINGULAR_MAJOR_VERSION%g
 s%@SINGULAR_MINOR_VERSION@%$SINGULAR_MINOR_VERSION%g
 s%@SINGULAR_SUB_VERSION@%$SINGULAR_SUB_VERSION%g
-s%@host@%$host%g
-s%@host_alias@%$host_alias%g
-s%@host_cpu@%$host_cpu%g
-s%@host_vendor@%$host_vendor%g
-s%@host_os@%$host_os%g
 s%@CC@%$CC%g
 s%@CPP@%$CPP%g
+s%@SINGULAR@%$SINGULAR%g
 s%@SET_MAKE@%$SET_MAKE%g
 s%@SUBDIRS@%$SUBDIRS%g
 s%@CONFIG_SUBDIRS@%$CONFIG_SUBDIRS%g
@@ -2050,7 +2084,7 @@ EOF
 
 cat >> $CONFIG_STATUS <<EOF
 
-CONFIG_FILES=\${CONFIG_FILES-"Makefile"}
+CONFIG_FILES=\${CONFIG_FILES-"Makefile doc/Makefile"}
 EOF
 cat >> $CONFIG_STATUS <<\EOF
 for ac_file in .. $CONFIG_FILES; do if test "x$ac_file" != x..; then

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.44 1998-05-25 15:32:13 Singular Exp $ */
+/* $Id: tesths.cc,v 1.45 1998-06-03 10:04:26 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -29,8 +29,11 @@
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory.h>
 #endif
-
 #include "getopt.h"
+
+#ifndef MAXPATHLEN
+#define MAXPATHLEN 1024
+#endif
 
 // define the long option names here
 #define LON_BATCH           "batch"
@@ -166,7 +169,7 @@ static void mainHelp(const char* name)
   struct sing_option *sopt;
   char tmp[20];
 
-  printf("Singular %s -- a CAS for polynomial computations. Usage:\n", S_VERSION1);
+  printf("Singular version %s -- a CAS for polynomial computations. Usage:\n", S_VERSION1);
   printf("   %s [options] [file1 [file2 ...]]\n", name);
   printf("Options:\n");
 
@@ -282,7 +285,7 @@ int main(          /* main entry to Singular */
   int optc, option_index;
 
   // do this first, because -v might print version path
-  feGetSearchPath(thisfile);
+  feInitPaths(thisfile);
 
   // parse command line options
   while((optc = getopt_long(argc, argv,
@@ -320,7 +323,7 @@ int main(          /* main entry to Singular */
           break;
 
         case 'v':
-          printf("Singular %s  %s  (%d)  %s %s\n",
+          printf("Singular version %s  %s  (%d)  %s %s\n",
                  S_VERSION1,S_VERSION2,
                  SINGULAR_VERSION_ID,__DATE__,__TIME__);
           printf("with\n");
@@ -467,7 +470,7 @@ int main(          /* main entry to Singular */
   {
     printf(
 "                     SINGULAR                             /\n"
-" a Computer Algebra System for Polynomial Computations   /   %s\n"
+" a Computer Algebra System for Polynomial Computations   /   version %s\n"
 "                                                       0<\n"
 "  by: G.-M. Greuel, G. Pfister, H. Schoenemann           \\   %s\n"
 "FB Mathematik der Universitaet, D-67653 Kaiserslautern    \\\n"
@@ -525,15 +528,28 @@ int main(          /* main entry to Singular */
   // first thing, however, is to load .singularrc
   if (load_rc)
   {
-    // Hmm, we should look into $cwd and then into $HOME, only
-    char * where=(char *)AllocL(256);
-    FILE * rc=feFopen(".singularrc","r",where,FALSE);
+    FILE * rc=myfopen(".singularrc","r");
     if (rc!=NULL)
     {
       fclose(rc);
-      newFile(where);
+      newFile(".singularrc");
     }
-    FreeL((ADDRESS)where);
+    else
+    {
+      char buf[MAXPATHLEN];
+      char *home = getenv("HOME");
+      if (home != NULL)
+      {
+        strcpy(buf, home);
+        strcat(buf, "/.singularrc");
+        rc = myfopen(buf, "r");
+        if (rc != NULL)
+        {
+          fclose(rc);
+          newFile(buf);
+        }
+      }
+    }
   }
 
   /* start shell */
