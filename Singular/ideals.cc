@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.93 2000-03-07 15:49:13 Singular Exp $ */
+/* $Id: ideals.cc,v 1.94 2000-05-09 14:34:11 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -387,17 +387,20 @@ void idDBTest(ideal h1,char *f,int l)
 */
 static int pComp_RevLex(poly a, poly b,BOOLEAN nolex)
 {
- if (nolex) return pComp0(a,b);
- int l=pVariables;
- while ((l>0) && (pGetExp(a,l)==pGetExp(b,l))) l--;
- if (l==0)
- {
-   if (pGetComp(a)==pGetComp(b)) return 0;
-   if (pGetComp(a)>pGetComp(b)) return 1;
- }
- else if (pGetExp(a,l)>pGetExp(b,l))
-   return 1;
- return -1;
+  if (b==NULL) return 1;
+  if (a==NULL) return -1;
+
+  if (nolex) return pComp0(a,b);
+  int l=pVariables;
+  while ((l>0) && (pGetExp(a,l)==pGetExp(b,l))) l--;
+  if (l==0)
+  {
+    if (pGetComp(a)==pGetComp(b)) return 0;
+    if (pGetComp(a)>pGetComp(b)) return 1;
+  }
+  else if (pGetExp(a,l)>pGetExp(b,l))
+    return 1;
+  return -1;
 }
 
 /*2
@@ -433,7 +436,8 @@ intvec *idSort(ideal id,BOOLEAN nolex)
       {
         notFound = FALSE;
       }
-      while ((newpos>=0) && (newpos<actpos) && (notFound))
+      //while ((newpos>=0) && (newpos<actpos) && (notFound))
+      while (notFound && (newpos>=0) && (newpos<actpos))
       {
         newcomp = pComp_RevLex(id->m[i],id->m[(*result)[newpos]],nolex);
         olddiff = diff;
@@ -1687,7 +1691,7 @@ ideal   idLift (ideal mod, ideal submod,ideal * rest, BOOLEAN goodShape,
         pIter(p);
         pSetComp(p,1+j+k);
         pSetmComp(p);
-	p = pNeg(p);
+        p = pNeg(p);
       }
     }
   }
@@ -2430,20 +2434,46 @@ ideal idCompactify(ideal id)
   else
   {
     ideal result=idCopy(id);
-    for (i=1;i<IDELEMS(result);i++)
+    //if (IDELEMS(result) < 1)
     {
-      if (result->m[i]!=NULL)
+      for (i=1;i<IDELEMS(result);i++)
       {
-        for (j=0;j<i;j++)
+        if (result->m[i]!=NULL)
         {
-          if ((result->m[j]!=NULL)
-          && (pComparePolys(result->m[i],result->m[j])))
+          for (j=0;j<i;j++)
           {
-            pDelete(&(result->m[j]));
+            if ((result->m[j]!=NULL)
+            && (pComparePolys(result->m[i],result->m[j])))
+            {
+              pDelete(&(result->m[j]));
+            }
           }
         }
       }
     }
+//    else
+//    {
+//      intvec *v=idSort(result,TRUE);
+//      for(i=0;i<IDELEMS(result);i++)
+//        (*v)[i]--;
+//      for (i=0;i<IDELEMS(result)-1;i++)
+//      {
+//	if (((*v)[i]>=0)
+//        && (result->m[(*v)[i]]!=NULL))
+//        {
+//          j=i+1;
+//          while ((j<IDELEMS(result))
+//	  && ((*v)[j]>=0)
+//          && (result->m[(*v)[j]]!=NULL)
+//          && (pComparePolys(result->m[(*v)[i]],result->m[(*v)[j]])))
+//          {
+//            pDelete(&(result->m[(*v)[j]]));
+//            j++;
+//          }
+//        }
+//      }
+//      delete v;
+//    }
     idSkipZeroes(result);
     return result;
   }
