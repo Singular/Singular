@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.25 2000-02-09 08:15:09 pohl Exp $ */
+/* $Id: sparsmat.cc,v 1.26 2000-04-19 15:45:00 pohl Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -41,7 +41,8 @@ static BOOLEAN smIsNegQuot(poly, const poly, const poly);
 static poly smEMult(poly, const poly);
 static BOOLEAN smCheckLead(const poly, const poly);
 static poly smDMult(poly, const poly);
-static void smPolyDivN(poly a, const number);
+static void smComplete(poly, const poly, const poly);
+static void smPolyDivN(poly, const number);
 static BOOLEAN smSmaller(poly, poly);
 static void smCombineChain(poly *, poly);
 static void smFindRef(poly *, poly *, poly);
@@ -1859,6 +1860,7 @@ poly smMultDiv(poly a, poly b, const poly c)
     {
       lead = smCheckLead(a, e);
       r = smDMult(a, e);
+      smComplete(r, b, c);
     }
     else
     {
@@ -1893,6 +1895,7 @@ poly smMultDiv(poly a, poly b, const poly c)
     if (smIsNegQuot(e, b, c))
     {
       r = smDMult(a, e);
+      smComplete(r, b, c);
       if (smCheckLead(a, e))
         smCombineChain(&pa, r);
       else
@@ -1940,7 +1943,10 @@ static void smExactPolyDiv(poly a, poly b)
     yn = nNeg(nCopy(y));
     pSetCoeff0(e,yn);
     if (smIsNegQuot(e, a, b))
+    {
       h = smDMult(tail, e);
+      smComplete(h, a, b);
+    }
     else
       h = smEMult(tail, e);
     nDelete(&yn);
@@ -1953,16 +1959,27 @@ static BOOLEAN smIsNegQuot(poly a, const poly b, const poly c)
 {
   int i;
 
-  for (i=pVariables; i; i--)
+  i=pVariables;
+  while (i&&(pGetExp(b,i)<pGetExp(c,i))) i--;
+  if(i)
   {
-    pSetExp(a,i,pGetExp(b,i)-pGetExp(c,i));
-    if (pGetExp(a,i) < 0)
+    for (i=pVariables; i; i--)
     {
-      while(--i) pSetExp(a,i,pGetExp(b,i)-pGetExp(c,i));
-      return TRUE;
+      if(pGetExp(b,i)<pGetExp(c,i))
+        pSetExp(a,i,pGetExp(c,i)-pGetExp(b,i));
+      else
+        pSetExp(a,i,0);
     }
+    return TRUE;
   }
-  return FALSE;
+  else
+  {
+    for (i=pVariables; i; i--)
+    {
+      pSetExp(a,i,pGetExp(b,i)-pGetExp(c,i));
+    }
+    return FALSE;
+  }
 }
 
 static poly smEMult(poly t, const poly e)
@@ -1971,12 +1988,12 @@ static poly smEMult(poly t, const poly e)
   poly res, h;
   int i;
 
-  h = res = pInit();
+  h = res = pNew();
   loop
   {
-    //pSetComp(h,0);
+    pCopy2(h,t);
     for (i=pVariables; i; i--)
-      pSetExp(h,i,pGetExp(e,i)+pGetExp(t,i));
+      pAddExp(h,i,pGetExp(e,i));
     pSetm(h);
     pSetCoeff0(h,nMult(y,pGetCoeff(t)));
     pIter(t);
@@ -1985,16 +2002,18 @@ static poly smEMult(poly t, const poly e)
       pNext(h) = NULL;
       return res;
     }
-    h = pNext(h) = pInit();
+    h = pNext(h) = pNew();
   }
 }
 
 static BOOLEAN smCheckLead(const poly t, const poly e)
 {
   int i;
+  Exponent_t w;
   for (i=pVariables; i; i--)
   {
-    if ((pGetExp(e,i)+pGetExp(t,i)) < 0)
+    w = pGetExp(e,i);
+    if (w&&(w>pGetExp(t,i)))
       return FALSE;
   }
   return TRUE;
@@ -2003,46 +2022,45 @@ static BOOLEAN smCheckLead(const poly t, const poly e)
 static poly smDMult(poly t, const poly e)
 {
   const number y = pGetCoeff(e);
-  poly r = NULL;
   poly res, h;
-  int i;
-  Exponent_t w;
 
-  h = res = pInit();
   loop
   {
-    i=pVariables;
+    if(smCheckLead(t,e)) break;
+    pIter(t);
+    if(t==NULL) return NULL;
+  }
+  h = res = pNew();
+  loop
+  {
+    pCopy2(h,t);
+    pSetCoeff0(h,nMult(y,pGetCoeff(t)));
     loop
     {
-      w = pGetExp(e,i)+pGetExp(t,i);
-      if (w < 0) break;
-      pSetExp(h,i,w);
-      i--;
-      if (i == 0)
+      pIter(t);
+      if(t==NULL)
       {
-        pSetm(h);
-        pSetCoeff0(h,nMult(y,pGetCoeff(t)));
-        pIter(t);
-        if (t == NULL)
-        {
-          pNext(h) = NULL;
-          return res;
-        }
-        r = h;
-        h = pNext(h) = pInit();
-        i=pVariables;
+        pNext(h)=NULL;
+        return res;
       }
+      if(smCheckLead(t,e)) break;
+    }
+    h=pNext(h)=pNew();
+  }
+}
+
+static void smComplete(poly t, const poly b, const poly c)
+{
+  int i;
+  while(t!=NULL)
+  {
+    for (i=pVariables; i; i--)
+    {
+      pAddExp(t,i,pGetExp(b,i));
+      pSubExp(t,i,pGetExp(c,i));
+      pSetm(t);
     }
     pIter(t);
-    if (t == NULL)
-    {
-      if (r != NULL)
-        pNext(r) = NULL;
-      else
-        res = NULL;
-      pFree1(h);
-      return res;
-    }
   }
 }
 
