@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.97 2001-02-20 09:43:07 pfister Exp $";
+version="$Id: primdec.lib,v 1.98 2001-02-21 10:08:16 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -9,8 +9,8 @@ AUTHORS:  Gerhard Pfister, pfister@mathematik.uni-kl.de (GTZ)
 
 OVERVIEW:
     Algorithms for primary decomposition based on the ideas of
-    Gianni, Trager and Zacharias (implementation by Gerhard Pfister), 
-    respectively based on the ideas of Shimoyama and Yokoyama (implementation 
+    Gianni, Trager and Zacharias (implementation by Gerhard Pfister),
+    respectively based on the ideas of Shimoyama and Yokoyama (implementation
     by Wolfram Decker and Hans Schoenemann).
  @* The procedures are implemented to be used in characteristic 0.
  @* They also work in positive characteristic >> 0.
@@ -1642,7 +1642,7 @@ EXAMPLE: example minAssPrimes; shows an example
    if((size(q)==1)&&(dim(i)>1))
    {
       execute ("ring gnir=("+charstr(P)+"),("+varstr(P)+"),lp;");
-      
+
       list p=facstd(fetch(P,i));
       if(size(p)>1)
       {
@@ -1756,8 +1756,8 @@ proc equidim(ideal i,list #)
 RETURN: list of equidimensional ideals a[1],...,a[s] with:
         - a[s] the equidimensional locus of i, i.e. the intersection
           of the primary ideals of dimension of i
-        - a[1],...,a[s-1] the lower dimensional equidimensional loci.  
-NOTE:    An embedded component q (primary ideal) of i can be replaced in the 
+        - a[1],...,a[s-1] the lower dimensional equidimensional loci.
+NOTE:    An embedded component q (primary ideal) of i can be replaced in the
          decomposition by a primary ideal q1 with the same radical as q. @*
          @code{equidim(i,1)} uses the algorithm of Eisenbud/Huneke/Vasconcelos.
 
@@ -4382,7 +4382,7 @@ static proc reconvList(list l)
 proc primdecGTZ(ideal i)
 "USAGE:   primdecGTZ(i); i ideal
 RETURN:  a list pr of primary ideals and their associated primes:
-@format   
+@format
    pr[i][1]   the i-th primary component,
    pr[i][2]   the i-th prime component.
 @end format
@@ -4414,7 +4414,7 @@ example
 proc primdecSY(ideal i, list #)
 "USAGE:   primdecSY(i); i ideal, c int
 RETURN:  a list pr of primary ideals and their associated primes:
-@format   
+@format
    pr[i][1]   the i-th primary component,
    pr[i][2]   the i-th prime component.
 @end format
@@ -4470,7 +4470,7 @@ EXAMPLE: example minAssGTZ; shows an example
    {
       return(minAssPrimes(i,1));
    }
-   return(minAssPrimes(i));   
+   return(minAssPrimes(i));
 }
 example
 { "EXAMPLE:";  echo = 2;
@@ -4716,8 +4716,8 @@ proc zerodec(ideal I)
 ASSUME:  I is zero-dimensional, the characteristic of the ground field is 0
 RETURN:  list of primary ideals, the zero-dimensional decomposition of I
 NOTE:    The algorithm (of Monico), works well only for a small total number
-         of solutions (@code{vdim(std(I))} should be < 100) and without 
-         parameters. In practice, it works also in large characteristic p>0 
+         of solutions (@code{vdim(std(I))} should be < 100) and without
+         parameters. In practice, it works also in large characteristic p>0
          but may fail for small p.
 @*       If printlevel > 0 (default = 0) additional information is displayed.
 EXAMPLE: example zerodec; shows an example
@@ -4968,6 +4968,3 @@ time=timer; list pr =primdecGTZ(gls); timer-time;
 time=timer; list pr =primdecSY(gls); timer-time;
 time=timer; ideal ra =radical(gls); timer-time;size(pr);
 */
-
-
-

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.94 2001-02-06 13:14:02 hannes Exp $ */
+/* $Id: kutil.cc,v 1.95 2001-02-21 10:08:12 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -856,7 +856,7 @@ void deleteInL (LSet set, int *length, int j,kStrategy strat)
 
 /*2
 *is used after updating the pairset,if the leading term of p
-*devides the leading term of some S[i] it will be canceled
+*divides the leading term of some S[i] it will be canceled
 */
 inline void clearS (poly p, unsigned long p_sev, int* at, int* k,
                     kStrategy strat)
@@ -941,6 +941,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
   int      l,j,compare;
   LObject  Lp;
 
+  if (strat->interred_flag) return;
 #ifdef KDEBUG
   Lp.ecart=0; Lp.length=0;
 #endif
@@ -1669,19 +1670,27 @@ int posInS (polyset set,int length,poly p)
   }
   else
   {
-    if (pLmCmp(set[length],p)!= pOrdSgn)
+    if (pLmCmp(set[length],p)== -pOrdSgn)
       return length+1;
 
     loop
     {
+      int dummy;
       if (an >= en-1)
       {
         if (pLmCmp(set[an],p) == pOrdSgn) return an;
+        if (pLmCmp(set[an],p) == -pOrdSgn) return en;
+	if (pLDeg(set[an],&dummy)<pLDeg(p,&dummy)) return an;
         return en;
       }
       i=(an+en) / 2;
       if (pLmCmp(set[i],p) == pOrdSgn) en=i;
-      else                             an=i;
+      else if (pLmCmp(set[i],p) == -pOrdSgn) an=i;
+      else 
+      {
+	if (pLDeg(set[i],&dummy)<pLDeg(p,&dummy)) en=i;
+	else                                    an=i;
+      }
     }
   }
 }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.79 2001-01-23 13:30:52 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.80 2001-02-21 10:08:12 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1799,6 +1799,80 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
 /*2
 *interreduces F
 */
+#if 0
+// new version
+ideal kInterRed(ideal F, ideal Q)
+{
+  ideal r;
+  BOOLEAN b=pLexOrder,toReset=FALSE;
+  kStrategy strat=new skStrategy;
+  strat->interred_flag=TRUE;
+  tHomog h;
+  intvec *w=NULL;
+
+  if (rField_has_simple_inverse())
+    strat->LazyPass=20;
+  else
+    strat->LazyPass=2;
+  strat->LazyDegree = 1;
+  strat->ak = idRankFreeModule(F);
+  if (strat->ak == 0)
+  {
+    h = (tHomog)idHomIdeal(F,Q);
+  }
+  else
+  {
+    h = (tHomog)idHomModule(F,Q,&w);
+  }
+  pLexOrder=b;
+  if (h==isHomog)
+  {
+    if (strat->ak > 0 && (w!=NULL)) 
+    {
+      strat->kModW = kModW = w;
+      pFDegOld = pFDeg;
+      pLDegOld = pLDeg;
+      pSetDegProcs(kModDeg);
+      toReset = TRUE;
+    }
+    pLexOrder = TRUE;
+    strat->LazyPass*=2;
+  }
+  strat->homog=h;
+#ifdef KDEBUG
+  idTest(F);
+#endif
+  if (pOrdSgn==-1)
+  {
+    if (w!=NULL)
+      r=mora(F,Q,w,NULL,strat);
+    else
+      r=mora(F,Q,NULL,NULL,strat);
+  }
+  else
+  {
+    if (w!=NULL)
+      r=bba(F,Q,w,NULL,strat);
+    else
+      r=bba(F,Q,NULL,NULL,strat);
+  }
+#ifdef KDEBUG
+  idTest(r);
+#endif
+  if (toReset)
+  {
+    kModW = NULL;
+    pRestoreDegProcs(pFDegOld, pLDegOld);
+  }
+  pLexOrder = b;
+//Print("%d reductions canceled \n",strat->cel);
+  HCord=strat->HCord;
+  delete(strat);
+  if (w!=NULL) delete w;
+  return r;
+}
+#else
+// old version
 ideal kInterRed (ideal F, ideal Q)
 {
   int j;
@@ -1817,7 +1891,7 @@ ideal kInterRed (ideal F, ideal Q)
   strat->NotUsedAxis = (BOOLEAN *)omAlloc((pVariables+1)*sizeof(BOOLEAN));
   for (j=pVariables; j>0; j--) strat->NotUsedAxis[j] = TRUE;
   strat->enterS      = enterSBba;
-  strat->posInT      = posInT0;
+  strat->posInT      = posInT17;
   strat->initEcart   = initEcartNormal;
   strat->sl   = -1;
   strat->tl          = -1;
@@ -1860,6 +1934,7 @@ ideal kInterRed (ideal F, ideal Q)
   delete(strat);
   return shdl;
 }
+#endif
 
 // returns TRUE if mora should use buckets, false otherwise
 static BOOLEAN kMoraUseBucket(kStrategy strat)

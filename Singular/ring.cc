@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.160 2001-02-09 14:03:00 Singular Exp $ */
+/* $Id: ring.cc,v 1.161 2001-02-21 10:08:14 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3579,6 +3579,7 @@ void rNGetSComps(int** currComponents, long** currShiftedComponents, ring r)
 
 // for the time being, this is still here
 static ring rAssure_SyzComp(ring r, BOOLEAN complete = TRUE);
+
 ring rCurrRingAssure_SyzComp()
 {
   ring r = rAssure_SyzComp(currRing);
@@ -3596,7 +3597,7 @@ ring rCurrRingAssure_SyzComp()
   return r;
 }
 
-static ring rAssure_SyzComp(ring r, BOOLEAN complete = TRUE)
+static ring rAssure_SyzComp(ring r, BOOLEAN complete)
 {
   if (r->order[0] == ringorder_s) return r;
   ring res=rCopy0(r, FALSE, FALSE);

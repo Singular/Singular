@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.35 2001-02-13 13:11:10 Singular Exp $ */
+/* $Id: maps.cc,v 1.36 2001-02-21 10:08:14 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -22,7 +22,7 @@
 #include "prCopy.h"
 
 // This is a very dirty way to "normalize" numbers w.r.t. a
-// MinPoly 
+// MinPoly
 static poly pMinPolyNormalize(poly p);
 
 /* debug output: Tok2Cmdname in maApplyFetch*/
@@ -509,7 +509,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
         res->rtyp=POLY_CMD;
         if (currRing->minpoly!=NULL)
           res->data=(void *)pMinPolyNormalize((poly)res->data);
-	pTest((poly) res->data);
+        pTest((poly) res->data);
       }
       else
       {
@@ -517,7 +517,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
         if (currRing->minpoly!=NULL)
         {
           number a=(number)res->data;
-	  nNormalize(a);
+          nNormalize(a);
           res->data=(void *)a;
         }
         nTest((number) res->data);
@@ -640,15 +640,15 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
   return FALSE;
 }
 
-// This is a very dirty way to cancel monoms whose number equals the 
-// MinPoly 
+// This is a very dirty way to cancel monoms whose number equals the
+// MinPoly
 static poly pMinPolyNormalize(poly p)
 {
   number one = nInit(1);
   spolyrec rp;
-  
+
   poly q = &rp;
-  
+
   while (p != NULL)
   {
     // this returns 0, if p == MinPoly

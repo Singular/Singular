@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: normal.lib,v 1.32 2001-02-15 17:23:50 lossen Exp $";
+version="$Id: normal.lib,v 1.33 2001-02-21 10:08:16 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
@@ -79,7 +79,7 @@ COMPUTE: Endomorphism ring End_R(J)=Hom_R(J,J) with its ring structure as
          affine ring, together with the canonical map R --> Hom_R(J,J),
          where R is the quotient ring of P modulo the standard basis SBid.
 RETURN:  a list l of two objects
-@format	
+@format
          l[1] : a polynomial ring, containing two ideals, 'endid' and 'endphi'
                such that l[1]/endid = Hom_R(J,J) and
                endphi describes the canonical map R -> Hom_R(J,J)
