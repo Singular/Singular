@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.43 1998-06-18 13:26:18 krueger Exp $
+@comment $Id: singular.doc,v 1.44 1998-06-18 20:28:47 schmidt Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -698,5 +698,6 @@ see @ref{stdhilb}.
 @chapter Index
 @printindex cp
 @c ---------------------------------------------------------
+@shortcontents
 @contents
 @bye
