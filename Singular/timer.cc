@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: timer.cc,v 1.10 1998-04-27 10:45:21 pohl Exp $ */
+/* $Id: timer.cc,v 1.11 1998-10-15 14:13:22 Singular Exp $ */
 
 /*
 *  ABSTRACT - get the computing time
@@ -156,7 +156,7 @@ void startRTimer()
 int getRTimer()
 {
   struct timeval now;
-  
+
   gettimeofday(&now, &tzp);
 
   if (startRl.tv_usec > now.tv_usec)
@@ -164,11 +164,11 @@ int getRTimer()
     now.tv_usec += 1000000;
     now.tv_sec --;
   }
-  
+
   double f =((double)  (now.tv_sec - startRl.tv_sec))*timer_resolution +
     ((double) (now.tv_usec - startRl.tv_usec))*timer_resolution /
     (double) 1000000;
-  
+
   return (int)(f+0.5);
 }
 
@@ -187,13 +187,13 @@ void writeRTime(void* v)
     now.tv_usec += 1000000;
     now.tv_sec --;
   }
-  
+
   double f =((double)  (now.tv_sec - siStartRTime.tv_sec)) +
     ((double) (now.tv_usec - siStartRTime.tv_usec)) /
     (double) 1000000;
 
   if (f > mintime)
-   Print("//%s %.2f sec \n" ,v ,f); 
+   Print("//%s %.2f sec \n" ,v ,f);
 }
 #endif
 
