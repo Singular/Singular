@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: mondromy.lib,v 1.8 1999-08-03 11:43:07 obachman Exp $";
+version="$Id: mondromy.lib,v 1.9 1999-11-10 17:50:30 mschulze Exp $";
 info="
 LIBRARY:  mondromy.lib  PROCEDURES TO COMPUTE THE MONODROMY OF A SINGULARITY
 AUTHOR:   Mathias Schulze, email: mschulze@mathematik.uni-kl.de
@@ -64,7 +64,7 @@ static proc pcvinit()
 {
   if(system("with","DynamicLoading"))
   {
-    pcvlal=Pcv::LAddL;
+    pcvladdl=Pcv::LAddL;
     pcvpmull=Pcv::PMulL;
     pcvmindeg=Pcv::MinDeg;
     pcvp2cv=Pcv::P2CV;
