@@ -6,7 +6,7 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id: fast_maps.cc,v 1.6 2002-01-19 12:26:02 bricken Exp $
+ *  Version: $Id: fast_maps.cc,v 1.7 2002-01-19 12:29:32 obachman Exp $
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>
@@ -17,6 +17,40 @@
 #include "febase.h"
 #include "fast_maps.h"
 
+#if 0
+// paste into extra.cc
+    if(strcmp(sys_cmd,"map")==0)
+    {
+      ring image_r = currRing;
+      map theMap = (map)h->Data();
+      ideal image_id = (ideal) theMap;
+      ring map_r = IDRING(idroot->get(theMap->preimage, myynest));
+      ideal map_id = IDIDEAL(map_r->idroot->get(h->Next()->Name(), myynest));
+
+      ring src_r, dest_r;
+      maMap_CreateRings(map_id, map_r, image_id, image_r, src_r, dest_r);
+      mapoly mp;
+      maideal mideal;
+          
+      maMap_CreatePolyIdeal(map_id, map_r, src_r, dest_r, mp, mideal);
+      maPoly_Out(mp, src_r);
+      return FALSE;
+    }
+
+// use as Singular source template
+ring map_r = 32003, (a, b, c), Dp;
+ideal map_id = a, ab, c3 + ab, a2b + ab;
+
+
+ring image_r;
+ideal image_id = x2y3, y, z+x6;
+
+map Phi = map_r, image_id;
+
+
+system("map", Phi, map_id);
+
+#endif
 /*******************************************************************************
 **
 *F  debugging stuff
@@ -108,19 +142,28 @@ mapoly maPoly_InsertMonomial(mapoly into, mapoly what, ring src_r)
   mapoly prev = NULL;
   
   Top:
-  p_LmCmpAction(iter->src, what->src, src_r, goto Greater, goto Smaller, goto Equal);
+  p_LmCmpAction(iter->src, what->src, src_r, goto Equal, goto Greater, goto Smaller);
   
+
   Greater:
+  if (iter->next == NULL)
+  {
+    iter->next = what;
+    return into;
+  }
   prev = iter;
   iter = iter->next;
-  if (iter == NULL) goto Smaller;
   goto Top;
   
   Smaller:
+  if (prev == NULL)
+  {
+    what->next = iter;
+    return what;
+  }
+  prev->next = what;
   what->next = iter;
-  if (prev != NULL) 
-    prev->next = what;
-  return what;
+  return into;
   
   Equal:
   iter->ref += what->ref;
@@ -130,10 +173,10 @@ mapoly maPoly_InsertMonomial(mapoly into, mapoly what, ring src_r)
     while (coeff->next != NULL) coeff = coeff->next;
     coeff->next = iter->coeff;
     iter->coeff = what->coeff;
+    what->coeff = NULL;
   }
-  p_LmFree(what->src, src_r);
-  omFreeBinAddr(what);
-  return iter;
+  maMonomial_Free(what, src_r);
+  return into;
 }
 
 mapoly maPoly_InsertMonomial(mapoly into, poly p, ring src_r, sBucket_pt bucket = NULL)
@@ -154,8 +197,8 @@ static mapoly maPoly_InsertPoly(mapoly into, poly what, ring src_r, sBucket_pt b
   return into;
 }
 
-static void maMap_InitMpoly(ideal map_id, ring map_r, ring src_r, ring dest_r,
-                       mapoly &mp, maideal &mideal)
+void maMap_CreatePolyIdeal(ideal map_id, ring map_r, ring src_r, ring dest_r,
+                           mapoly &mp, maideal &mideal)
 {
   mideal = (maideal) omAlloc0(sizeof(maideal_s));
   mideal->n = IDELEMS(map_id);
@@ -168,13 +211,22 @@ static void maMap_InitMpoly(ideal map_id, ring map_r, ring src_r, ring dest_r,
     if (map_id->m[i] != NULL)
     {
       mideal->buckets[i] = sBucketCreate(dest_r);
-      maPoly_InsertMonomial(mp, 
-                            prShallowCopyR_NoSort(map_id->m[i], map_r, src_r),
-                            src_r,                     
-                            mideal->buckets[i]);
+      mp = maPoly_InsertPoly(mp, 
+                             prShallowCopyR_NoSort(map_id->m[i], map_r, src_r),
+                             src_r,                     
+                             mideal->buckets[i]);
     }
   }
 }
+
+void maMap_CreateRings(ideal map_id, ring map_r, 
+                       ideal image_id, ring image_r, 
+                       ring &src_r, ring &dest_r)
+{
+  src_r = map_r;
+  dest_r = image_r;
+}
+
 
 #if 0
 
@@ -289,50 +341,38 @@ static void maDestroyCompIdealRing(ideal map_id, ring map_r,
 */
 // return NULL if deg(ggt(m1, m2)) < 2
 // else return m = ggT(m1, m2) and q1, q2 such that m1 = q1*m m2 = q2*m
-
 static poly maEggT(const poly m1, const poly m2, poly &q1, poly &q2,const ring r)
 {
-
   int i;
   int dg = 0;
   poly ggt = NULL;
-  q1 = p_Init(r);
-  q2 = p_Init(r);
-  ggt=p_Init(r);
-
-  for (i=1;i<=r->N;i++) {
+  for (i=1; i<=r->N; i++)
+  {
     Exponent_t e1 = p_GetExp(m1, i, r);
     Exponent_t e2 = p_GetExp(m2, i, r);
-    if (e1 > 0 && e2 > 0){
+    if (e1 > 0 && e2 > 0)
+    {
       Exponent_t em = (e1 > e2 ? e2 : e1);
+      if (dg < 2)
+      {
+        ggt = p_Init(r);
+        q1 = p_Init(r);
+        q2 = p_Init(r);
+      }
       dg += em;
       p_SetExp(ggt, i, em, r);
       p_SetExp(q1, i, e1 - em, r);
       p_SetExp(q2, i, e2 - em, r);
     }
-    else {
-      p_SetExp(q1, i, e1, r);
-      p_SetExp(q2, i, e2, r);
-    }
   }
-  if (dg>1)
+  if (ggt != NULL)
   {
     p_Setm(ggt, r);
     p_Setm(q1, r);
     p_Setm(q2, r);
-
-    
-  }
-  else {
-    p_LmFree(ggt, r);
-    p_LmFree(q1, r);
-    p_LmFree(q2, r);
-    ggt = NULL;
   }
   return ggt;
 }
-
-
 
 /*******************************************************************************
 **
@@ -503,10 +543,6 @@ ideal maideal_2_ideal(ideal orig_id,
 
 #endif
 
-void map_main(ideal map_id, ring map_r, ideal image_id, ring image_r)
-{
-  
-}
 
     
     
