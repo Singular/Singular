@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_GetMisc.cc,v 1.9 1998-06-13 12:44:45 krueger Exp $ */
+/* $Id: mpsr_GetMisc.cc,v 1.10 1998-11-04 17:32:23 obachman Exp $ */
 
 /***************************************************************
  *
@@ -258,6 +258,9 @@ mpsr_Status_t mpsr_MergeLeftv(mpsr_leftv mlv1, mpsr_leftv mlv2)
   lv->next = mlv2->lv;
   mlv1->r = r;
 
+#ifdef RDEBUG
+  if (r!= NULL) rTest(r);
+#endif
   // this is an optimization for the mpsr_rDefault routines
   currRing = r;
   return mpsr_Success;
@@ -358,6 +361,7 @@ void mpsr_SetCurrRingHdl(ring r)
     return;
   }
   
+  rTest(r);
   // try to find an idhdl which is an equal ring
   while (h != NULL)
   {

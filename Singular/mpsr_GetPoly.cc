@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.18 1998-10-15 11:46:04 obachman Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.19 1998-11-04 17:32:24 obachman Exp $ */
 
 /***************************************************************
  *
@@ -552,6 +552,8 @@ mpsr_Status_t mpsr_GetRingAnnots(MPT_Node_pt node, ring &r,
   if (GetOrderingAnnot(node,r, mv, IsUnOrdered) != mpsr_Success)
     Warn("GetOrderingAnnot: using unspec ordering");
 
+  rComplete(r);
+
   if (GetDefRelsAnnot(node, r) != mpsr_Success)
     Warn("GetDefRelsAnnot: using no defining relations");
 
@@ -570,7 +572,6 @@ mpsr_Status_t mpsr_GetRingAnnots(MPT_Node_pt node, ring &r,
   }
 
   // complete ring constructions
-  rComplete(r);
   return mpsr_Success;
 }
 

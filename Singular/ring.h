@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.17 1998-08-25 13:33:21 krueger Exp $ */
+/* $Id: ring.h,v 1.18 1998-11-04 17:32:26 obachman Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -87,6 +87,10 @@ BOOLEAN rIsPolyVar(int i); /* returns TRUE if var(i) belongs to p-block */
 
 #ifdef RDEBUG
 extern short rNumber; /* current ring id (r->no) */
+#define rTest(r)    rDBTest(r, __FILE__, __LINE__)
+extern BOOLEAN rDBTest(ring r, char* fn, int l);
+#else
+#define rTest(r)
 #endif
 
 #endif

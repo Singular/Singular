@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.35 1998-11-04 15:55:35 obachman Exp $ */
+/* $Id: ring.cc,v 1.36 1998-11-04 17:32:25 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -51,6 +51,7 @@ void rChangeCurrRing(ring r, BOOLEAN complete)
 #endif
 {
   /*------------ set global ring vars --------------------------------*/
+  rTest(r);
   currRing = r;
   currQuotient=NULL;
 
@@ -832,6 +833,7 @@ void rWrite(ring r)
 
 void rKill(ring r)
 {
+  rTest(r);
   if ((r->ref<=0)&&(r->order!=NULL))
   {
 #ifdef RDEBUG
@@ -1893,3 +1895,57 @@ BOOLEAN rIsPolyVar(int v)
   }
   return 3; /* could not find var v*/
 }
+
+#ifdef RDEBUG
+// This should eventually become a full-fledge ring check, like pTest
+BOOLEAN rDBTest(ring r, char* fn, int l)
+{
+  if (r == NULL)
+  {
+    Werror("Null ring in %s:%l\n", fn, l);
+    return false;
+  }
+
+  if (r->N == 0) return true;
+  
+  if (r->VarOffset == NULL)
+  {
+    Werror("Null ring VarOffset -- no rComplete (?) in n %s:%l\n", fn, l);
+    assume(0);
+    return false;
+  }
+  
+  int  
+    VarCompIndex = r->VarCompIndex, 
+    VarLowIndex  = r->VarLowIndex, 
+    VarHighIndex = r->VarHighIndex,
+    i;
+  BOOLEAN ok = false;
+  int* VarOffset = r->VarOffset;
+  
+  rComplete(r);
+  
+  if (   VarCompIndex != r->VarCompIndex ||
+         VarLowIndex  != r->VarLowIndex ||
+         VarHighIndex != r->VarHighIndex)
+  {
+    Werror("Wrong ring VarIndicies -- no rComplete (?) in n %s:%l\n", fn, l);
+    assume(0);
+    ok = FALSE;
+  }
+  
+  for (i=0; i<=r->N; i++)
+  {
+    if (VarOffset[i] != r->VarOffset[i])
+    {
+      Werror("Wrong VarOffset value at %d in %s:%l\n", i, fn, l);
+      assume(0);
+      ok = FALSE;
+    }
+  }
+  Free(VarOffset, (r->N + 1)*sizeof(int));
+  return ok;
+}
+#endif
+
+
