@@ -1,5 +1,5 @@
 ;;; Emacs edit mode for this file is  -*- Emacs-Lisp -*-
-;;; $Id: .emacs-general,v 1.1 2000-05-24 15:10:35 obachman Exp $
+;;; $Id: .emacs-general,v 1.2 2000-05-30 15:25:09 obachman Exp $
 
 ;;;
 ;;; .emacs-general - Emacs initialization file for general emacs
@@ -39,22 +39,35 @@
 (add-hook 'TeX-mode-hook  'turn-on-font-lock)
 (add-hook 'shell-mode-hook 'turn-on-font-lock)
 
+;;;
+;;; settings for both Emacs and XEmacs
+;;;
+(custom-set-variables
+ '(next-line-add-newlines nil)
+ '(require-final-newline nil)
+ '(line-number-mode t)
+ '(kill-whole-line t)
+ ; I like unique buffer names based on dirs
+ '(uniquify-buffer-name-style 'post-forward-angle-brackets))
+
+(require 'uniquify)
+
 (cond ((string-match "XEmacs\\|Lucid" emacs-version)
+       ;;
        ;; XEmacs specific stuff
+       ;;
 
        ;; I like some more  keybindings for better moving
-       (define-key global-map '(control ,)
+       (define-key global-map '(control up)
 	 '(lambda () (interactive) (scroll-up -1)))
        ;; control-, scrolls up
-       (define-key global-map '(control 46)
+       (define-key global-map '(control down)
 	 '(lambda () (interactive) (scroll-up 1)))
-       ;; control-;  and control-'
-       (define-key global-map '(control 59)  'backward-word) 
-       (define-key global-map '(control 39) 'forward-word) 
 
        ;; a function which on C-= reload a file automatically without
        ;; asking for confirmation got it from From: Richard Mlynarik
        ;; <mly@adoc.xerox.com> on 1/18/95
+       ;; find-alternate-file (C-x C-v) is almost equivalent 
        (global-set-key [(control =)] '(lambda ()
 					(interactive)
 					(or (verify-visited-file-modtime
@@ -63,20 +76,16 @@
        ;; turn on auto-compression of gz files
        (toggle-auto-compression 1)
 
-       ;; I like unique buffer names based on dirs
-       (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
-       (require 'uniquify)
-
        ;; Use the "Describe Variable..." option on the "Help" menu
-       ;; or C-x v to find out what these variables mean.
-       (setq find-file-use-truenames nil
-	     find-file-compare-truenames t
-	     minibuffer-confirm-incomplete t
-	     complex-buffers-menu-p t
-	     next-line-add-newlines nil
-	     mail-yank-prefix "> "
-	     kill-whole-line t
-	     )
+       ;; or C-h v to find out what these variables mean.
+       (custom-set-variables
+	'(complex-buffers-menu-p t)
+	'(kill-whole-line t))
+
+       (setq minibuffer-confirm-incomplete t)
+
+       ;; show matching parantheses
+       (paren-set-mode 'paren)
 
        ;; func-menu is a package that scans your source file for function
        ;; definitions and makes a menubar entry that lets you jump to any
@@ -107,15 +116,24 @@
        ;; end Xemacs stuff
        )
       (t
+       ;;
        ;; Emcas stuff
+       ;;
+
+       ;; show matching parantheses
+       (show-paren-mode t)
+
+       ;; turn on auto (de)compression of files
+       (auto-compression-mode t)
+
        ;; End Emcas stuff
        )
       )
 
 ;; use auctex as default mode for editing latex stuff
-(setq auctex-filename (locate-library "tex-site"))
-(if auctex-filename 
-    (require 'tex-site auctex-filename))
+(let ((auctex-filename (locate-library "tex-site")))
+  (if auctex-filename 
+      (require 'tex-site auctex-filename)))
 
 ;; put stuff here which should not be/only be executed under
 ;; mswindows/unix
