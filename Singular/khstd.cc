@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: khstd.cc,v 1.8 1998-12-15 10:06:47 pohl Exp $ */
+/* $Id: khstd.cc,v 1.9 1999-10-22 09:39:05 pohl Exp $ */
 /*
 * ABSTRACT:utils for hilbert driven kStd
 */
@@ -78,6 +78,7 @@ void khCheck( ideal Q, intvec *w, intvec *hilb, int &eledeg, int &count,
             }
             deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
           }
+          delete newhilb;
           return;
         }
       }
