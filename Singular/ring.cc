@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.14 1998-01-27 15:57:14 pohl Exp $ */
+/* $Id: ring.cc,v 1.15 1998-02-16 09:46:55 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -130,12 +130,14 @@ void rSetHdl(idhdl h, BOOLEAN complete)
     /*------------ set pShortOut -----------------------*/
   if (complete /*&&(h!=NULL)*/)
   {
+    #ifdef HAVE_TCL
     if (tclmode)
     {
       PrintTCLS('R',IDID(h));
       pShortOut=(int)FALSE;
     }
     else
+    #endif
     {
       pShortOut=(int)TRUE;
       if ((rg->parameter!=NULL) && (rg->ch<2))

@@ -1,3 +1,6 @@
+Mon Feb 16 10:43:38 MET 1998 hannes
+   * added HAVE_TCL to ring.cc
+
 Mon Feb  9 12:28:21 MET 1998 hannes
    * added tests for coeff-filed GF(q), added stbus for GF(q)-conversion
      (clapconv.cc clapsing.cc clapconv.h)
@@ -17,112 +20,112 @@ Sat Jan 17 18:56:34 MET 1998 hannes
    * changes for TEST_MAC_ORDER, part 3 (binom.cc, binom.h, spSpolyLoop.cc)
 
 Sat Jan 17 18:21:15 MET 1998 hannes
-	* removed duplicate _memcpyW from mmalloc.c
-	* fixed type cast in iplib.cc
-	* changes for TEST_MAC_ORDER, part 2 (binom.cc, binom.h, spSpolyLoop.cc)
+        * removed duplicate _memcpyW from mmalloc.c
+        * fixed type cast in iplib.cc
+        * changes for TEST_MAC_ORDER, part 2 (binom.cc, binom.h, spSpolyLoop.cc)
 
 Fri Jan 16 15:30:07 MET 1998 Kai Krueger <krueger@mathematik.uni-kl.de>
-	* extra.cc,febase.cc,febase.inc,grammar.y,iparith.cc
-	* ipassign.cc,ipid.cc,ipid.h,iplib.cc,ipshell.h,misc.cc
-	* mpsr_Put.cc,mpsr_Put.h,silink.cc,structs.h,subexpr.cc,subexpr.h
-	* tesths.cc
-	  Implementation of new proc-scheme done.
-	
+        * extra.cc,febase.cc,febase.inc,grammar.y,iparith.cc
+        * ipassign.cc,ipid.cc,ipid.h,iplib.cc,ipshell.h,misc.cc
+        * mpsr_Put.cc,mpsr_Put.h,silink.cc,structs.h,subexpr.cc,subexpr.h
+        * tesths.cc
+          Implementation of new proc-scheme done.
+
 Fri Jan 16 14:51:07 MET 1998 Kai Krueger <krueger@mathematik.uni-kl.de>
-	* Makefile.in,tests/mpcheck,teste/comparecheck:
-	  fixed use of correct Singular during checks
+        * Makefile.in,tests/mpcheck,teste/comparecheck:
+          fixed use of correct Singular during checks
 
 Fri Jan 16 09:23:07 MET 1998
         * changes for TEST_MAC_ORDER, part 1 (hannes)
 
 Wed Jan 14 15:36:04 1998  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* polys-impl.h (pMonAddFast): fixed handling of component
+        * polys-impl.h (pMonAddFast): fixed handling of component
 
-	* mmutil.c: added _memcpyW for DO_DEEP_PROFILE
+        * mmutil.c: added _memcpyW for DO_DEEP_PROFILE
 
-	* binom.h: #undef TEST_MAC_ORDER as default
+        * binom.h: #undef TEST_MAC_ORDER as default
 
-	* polys-impl.h: fixes to make things clearer and for
-	  NO_EXP_VECTOR_OPS
+        * polys-impl.h: fixes to make things clearer and for
+          NO_EXP_VECTOR_OPS
 
-	* Makefile.in (Singularp): use static linking for
+        * Makefile.in (Singularp): use static linking for
 
 Fri Dec 19 17:22:26 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
-	* claptmpl.cc: template instantiation for `Array<REvaluation>'
-	  added
+        * claptmpl.cc: template instantiation for `Array<REvaluation>'
+          added
 
-	* fglmcomb.cc, fglmhom.cc, fglmzero.cc, claptmpl.cc: #include
-	  directives fixed (templates/list.h renamed to
- 	  templates/ftmpl_list.h)
+        * fglmcomb.cc, fglmhom.cc, fglmzero.cc, claptmpl.cc: #include
+          directives fixed (templates/list.h renamed to
+           templates/ftmpl_list.h)
 
 Thu Dec 18 15:23:29 MET 1997
-	* hannes:
-	- removed type "binary" and handling routines
-	(iparith.cc ipid.cc subexpr.cc tok.h)
-	- fixed m16ex (doc/examples.doc)
-	- fixed reference (doc/singular.doc, doc/start.doc)
+        * hannes:
+        - removed type "binary" and handling routines
+        (iparith.cc ipid.cc subexpr.cc tok.h)
+        - fixed m16ex (doc/examples.doc)
+        - fixed reference (doc/singular.doc, doc/start.doc)
 
 Wed Dec 17 09:47:58 MEZ 1997 Kai Krueger <krueger@mathematik.uni-kl.de>
         * test/dbm_test.[in/out]: rewrite of dbm-tests.
-	
+
 Tue Dec 16 16:59:41 1997  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* polys-impl.h: Introduced COMP_NO_EXP_VECTOR_OPS -- which turns
-	off "vector techniques" of monomial operations, i.e. does
-	everything exponent-wise
+        * polys-impl.h: Introduced COMP_NO_EXP_VECTOR_OPS -- which turns
+        off "vector techniques" of monomial operations, i.e. does
+        everything exponent-wise
 
 Mon Dec 15 23:31:56 1997  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* polys-impl.h: Various small bug - fixes and changes in
-	  preparation of COMP_FAST merge: hilbert series, maps are
-	  ok; sres and syz are still buggy; small things still need to be
-	  checked;
+        * polys-impl.h: Various small bug - fixes and changes in
+          preparation of COMP_FAST merge: hilbert series, maps are
+          ok; sres and syz are still buggy; small things still need to be
+          checked;
 
 Fri Dec 12 15:38:19 1997  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* mmallocb.c (mmDBFreeBlock): introduced UNREG_MEM_PATTERN which,
-	  when defined, inserts unregular memory pattern in
-	  allocated/freed memory
+        * mmallocb.c (mmDBFreeBlock): introduced UNREG_MEM_PATTERN which,
+          when defined, inserts unregular memory pattern in
+          allocated/freed memory
 
-	* all: changed dangerous pNew calls to pInit's
+        * all: changed dangerous pNew calls to pInit's
 
 Fri Dec  5 18:43:47 MET 1997
         * hannes: fix to ideals.cc: avoid pGetExp(p,0)
 
 Thu Dec  4 16:13:31 MEZ 1997 Kai Krueger <krueger@mathematik.uni-kl.de>
-	* ndbm.cc: don't replace bcopy by memcpy if possible, otherwise
-	  the database (>1024 bytes) will be corrupted.
-	- added check for bcopy() in configure.
-	
+        * ndbm.cc: don't replace bcopy by memcpy if possible, otherwise
+          the database (>1024 bytes) will be corrupted.
+        - added check for bcopy() in configure.
+
 Wed Dec  3 16:14:51 1997  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* Many changes to prepare for implementation of fast comparison
-		  schemes: Here are only a few:
-	- added file polys-impl.h which implements low-level poly stuff
-	- removed file polys2.cc, added polys-impl.cc
-	- added Singularp target to Make
-	- prepared configure for setting of exponent type
-	- got rid of as many direct p->exp[..] accesses as possible
-	- added file spSpolyLoop.cc spSpolyLoop.h polys-comp.h
-	* polys-impl.h: if you defined COMP_FAST, then fast polynomial
-		  comparsions are eanbled (still needs a lot of debugging)
-	
+        * Many changes to prepare for implementation of fast comparison
+                  schemes: Here are only a few:
+        - added file polys-impl.h which implements low-level poly stuff
+        - removed file polys2.cc, added polys-impl.cc
+        - added Singularp target to Make
+        - prepared configure for setting of exponent type
+        - got rid of as many direct p->exp[..] accesses as possible
+        - added file spSpolyLoop.cc spSpolyLoop.h polys-comp.h
+        * polys-impl.h: if you defined COMP_FAST, then fast polynomial
+                  comparsions are eanbled (still needs a lot of debugging)
+
 
 Fri Oct 31 05:45:25 1997  Olaf Bachman  <bachman@bombelli.dm.unipi.it>
 
-	* polys1.cc et al: got rid of p[Get/Set]ExpV routines, provided
-		  pCopy2 instead
+        * polys1.cc et al: got rid of p[Get/Set]ExpV routines, provided
+                  pCopy2 instead
 
 Wed Oct  8 12:22:47 1997  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* increased version number to 1.1.3
+        * increased version number to 1.1.3
 
-	* ndbm.cc: Solaris compatibility: #define bcopy bzero, bcmp;
-		  #include <fcntl.h>
-	* configure.in: added check for fcntl.h sys/types.h sys/stat.h, ucblib
-	  ensured that either lgmp or lsmallgmp is in $LIBS
+        * ndbm.cc: Solaris compatibility: #define bcopy bzero, bcmp;
+                  #include <fcntl.h>
+        * configure.in: added check for fcntl.h sys/types.h sys/stat.h, ucblib
+          ensured that either lgmp or lsmallgmp is in $LIBS
 
 Tue Sep 16 15:45:44 MET DST 1997
         * hannes: changed/corrected/clean naNormalize, naLcm, pCleardenom, pContent
@@ -134,14 +137,14 @@ Tue Sep  9 11:05:28 MET DST 1997
                changed tutorial (doc/examples.doc, version-no: doc/tutor.tex)
 
 Fri Aug 15 11:44:13 MESZ 1997  Kai Krueger <krueger@mathematik.uni-kl.de>
-	* ndbm.cc: fix open-bug  for dos
-	  default mode of open is ascii, we need binary mode.
+        * ndbm.cc: fix open-bug  for dos
+          default mode of open is ascii, we need binary mode.
 
 Thu Aug 14 18:04:04 1997  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
-	and anne
+        and anne
 
-	* Makefile.in, mod2.h.in, configure.in: cleaned up for dos
-	  cross-compilation
+        * Makefile.in, mod2.h.in, configure.in: cleaned up for dos
+          cross-compilation
 
 Tue Aug 12 19:08:20 MET DST 1997
         * hannes: added nExactDiv to numbers
@@ -155,9 +158,9 @@ Tue Aug 12 19:08:20 MET DST 1997
 
 Fri Aug  8 14:54:28 1997  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* Makefile.in ndbm.[cc,h]: Together with krueger: Added files
-	  ndbm.[cc,h]; no longer linking with libdbm, instead,
-	  user supplied files; added dbm_test; small changes to sing_dbm.cc
+        * Makefile.in ndbm.[cc,h]: Together with krueger: Added files
+          ndbm.[cc,h]; no longer linking with libdbm, instead,
+          user supplied files; added dbm_test; small changes to sing_dbm.cc
 
 Fri Aug  8 12:56:44 MET DST 1997
         * hannes: introduced "div" for integer division
@@ -166,10 +169,10 @@ Fri Aug  8 12:56:44 MET DST 1997
 
 Thu Aug  7 14:51:59 1997  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* mpsr_Get.cc (GetCopCommandLeftv): made +/* to binary ops
+        * mpsr_Get.cc (GetCopCommandLeftv): made +/* to binary ops
 
-	* longrat.[h,cc]: added number   nlInit(number i) to initialize a
-		  number, i.e. get it into the right Singular state
+        * longrat.[h,cc]: added number   nlInit(number i) to initialize a
+                  number, i.e. get it into the right Singular state
 
 Wed Jul 16 12:57:22 MET DST 1997: hannes
         * introduced '.singularrc', modified loading of satndard.lib
@@ -183,51 +186,51 @@ Wed Jul  9 17:50:23 MET DST 1997: hannes/siebert
 
 Fri Jun 20 12:18:10 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* tesths.cc (main): fixed condition of mprs_ttGen execution
+        * tesths.cc (main): fixed condition of mprs_ttGen execution
 
 Thu Jun 19 10:49:10 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* mpsr_Put.h: corrected efinitions of MP_AnnotReqValTree, MP_AnnotReqValNode
+        * mpsr_Put.h: corrected efinitions of MP_AnnotReqValTree, MP_AnnotReqValNode
 
 Tue Jun 17 11:47:47 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* Makefile.in (Singular): added mod2.h to dependencies of iparith.inc
+        * Makefile.in (Singular): added mod2.h to dependencies of iparith.inc
 
-	* tok.h: no discrimination of mac for inline definition any more
+        * tok.h: no discrimination of mac for inline definition any more
 
 Wed Jun 11 09:56:05 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* mpsr_Tok.cc (cmd_dictcops): changed names of some MP_Cops
+        * mpsr_Tok.cc (cmd_dictcops): changed names of some MP_Cops
 
-	* longrat.[cc,h], tesths.cc, Makefile.in, configure.in:
-	  added support for smallgmp
+        * longrat.[cc,h], tesths.cc, Makefile.in, configure.in:
+          added support for smallgmp
 
 Tue Jun 10 17:25:28 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* sing_mp.cc: Got rid off warnings, when incomplete link specs
+        * sing_mp.cc: Got rid off warnings, when incomplete link specs
 
 Thu Jun  5 15:16:19 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* tests/mpcheck: added check for correct remote shell
+        * tests/mpcheck: added check for correct remote shell
 
 Sun May 25 14:06:12 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* configure.in: Fixed handling of CXXFLAGS -- it is not touched if
-	  set as env var
+        * configure.in: Fixed handling of CXXFLAGS -- it is not touched if
+          set as env var
 
 Fri May 23 11:40:14 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* Makefile.in: Changed dist target to cp; make distclean
+        * Makefile.in: Changed dist target to cp; make distclean
 
 Wed May 21 08:56:19 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* mpsr_Tok.cc: fixed dependencies/generation of mpsr_Tok.inc
+        * mpsr_Tok.cc: fixed dependencies/generation of mpsr_Tok.inc
 
-	* tesths.cc (main): made -v option gmp v1.3 clean
+        * tesths.cc (main): made -v option gmp v1.3 clean
 
 Tue May 20 14:02:42 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* misc.cc: Put #include <factory.h> into #ifdef HAVE_FACTORY brackets
+        * misc.cc: Put #include <factory.h> into #ifdef HAVE_FACTORY brackets
 
 * hannes: ipshell.cc: fixed a bug in iiExport (multiple exports in rings)
           subexpr.cc: implemented sleftv::Copy for ring/qring
@@ -235,169 +238,169 @@ Tue May 20 14:02:42 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de
 
 Wed May 14 16:40:19 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* Makefile.in: changed mpcheck.data so that the brain-dead sed on
-	  the suns does not mess up the output on files with long lines
+        * Makefile.in: changed mpcheck.data so that the brain-dead sed on
+          the suns does not mess up the output on files with long lines
 
 Tue May 13 11:32:41 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* claptmpl.cc: changed template initializiation of libfac, so that
-	  class.cc and tmpl_inst.h does not need to be included
+        * claptmpl.cc: changed template initializiation of libfac, so that
+          class.cc and tmpl_inst.h does not need to be included
 
 Mon May 12 16:48:14 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* misc.cc: Added / to Help_File and Info_File
+        * misc.cc: Added / to Help_File and Info_File
 
 Tue May  6 08:29:57 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* added factorycheck target in Makefile.in
+        * added factorycheck target in Makefile.in
 
-	* Makefile.in (configure): took out rules which automatically
-	  reruns autoconf. Print out warning, instead
+        * Makefile.in (configure): took out rules which automatically
+          reruns autoconf. Print out warning, instead
 
-	* misc.cc, configure.in, mod2.h.in:
-	    added SINGULAR_INFODIR to search for info files
+        * misc.cc, configure.in, mod2.h.in:
+            added SINGULAR_INFODIR to search for info files
 
-	* configure.in: Added AC_SUBST(WITH_LIBFAC, WITH_MP, WITH_FACTORY)
+        * configure.in: Added AC_SUBST(WITH_LIBFAC, WITH_MP, WITH_FACTORY)
 
 Mon May  5 10:31:15 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* #include "factory" instead of include "singfactory"
+        * #include "factory" instead of include "singfactory"
 
-	* mod2.h.in: define buildin_gmp, if HAVE_GMP and macintosh
+        * mod2.h.in: define buildin_gmp, if HAVE_GMP and macintosh
 
 Sun May  4 11:14:44 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* Added make target mpcheck; Update INSTALL file
+        * Added make target mpcheck; Update INSTALL file
 
-	* mpsr_PutPoly.cc (PutRationalNumber): Normalize if number->s == 0
-	  and not if number->s == 2
+        * mpsr_PutPoly.cc (PutRationalNumber): Normalize if number->s == 0
+          and not if number->s == 2
 
-	* mpsr_GetPoly.cc (GetGaloisNumber): Introduced special routines,
-	  since npInit op in GetModuloNumber messed things up
+        * mpsr_GetPoly.cc (GetGaloisNumber): Introduced special routines,
+          since npInit op in GetModuloNumber messed things up
 
 Sat May  3 00:07:55 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* Makefile.in (CPPFLAGS): put -I. before other CPPFLAGS
+        * Makefile.in (CPPFLAGS): put -I. before other CPPFLAGS
 
-	* febase.cc (feFopen): fixed bug in opening library from
-	  SINGULAR_DATADIR: SINGULAR_DATADIR is appended to
-	  getenv("SINGULARPATH")
+        * febase.cc (feFopen): fixed bug in opening library from
+          SINGULAR_DATADIR: SINGULAR_DATADIR is appended to
+          getenv("SINGULARPATH")
 
-	* small mpsr Changes to reflect some name changes of MP Dicts
+        * small mpsr Changes to reflect some name changes of MP Dicts
 
-	* configure.in Makefile.in: new scheme for updating Makefile mod2.h
-	  based on time-stamps
+        * configure.in Makefile.in: new scheme for updating Makefile mod2.h
+          based on time-stamps
 
 Fri May  2 17:29:32 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* mpsr.h: reflected changes of MP version 1.1.2 (Dicts in MP.h)
+        * mpsr.h: reflected changes of MP version 1.1.2 (Dicts in MP.h)
 
-	* Fixed small bug in configure.in
+        * Fixed small bug in configure.in
 
 Mon Apr 28 21:00:07 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* Added README, INSTALL, COPYING file to distribution
+        * Added README, INSTALL, COPYING file to distribution
 
-	* tesths.cc (main): slightly changed Singular banner; fixed
-	  display of version number
+        * tesths.cc (main): slightly changed Singular banner; fixed
+          display of version number
 
 Fri Apr 25 16:59:31 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* fixed configure.in s.t. sprintf test is correct
+        * fixed configure.in s.t. sprintf test is correct
 
-	* Changed SingularPath to SINGULARPATH
+        * Changed SingularPath to SINGULARPATH
 
-	* fixed sys/times.h and sys/time.h confusion
+        * fixed sys/times.h and sys/time.h confusion
 
-	* Various changes to reflect new configure (versions defined in
-	  configure.in, changed HAVE_LIBFACTORY into HAVE_FACTORY, data
-	  dir is pasted from configure into mod2.h and used from there in
-	  feFopen.
+        * Various changes to reflect new configure (versions defined in
+          configure.in, changed HAVE_LIBFACTORY into HAVE_FACTORY, data
+          dir is pasted from configure into mod2.h and used from there in
+          feFopen.
 
-	* Added configure facility, repalced mod2.h by mod2.h.in Makefile
-	  by Makefile.in
+        * Added configure facility, repalced mod2.h by mod2.h.in Makefile
+          by Makefile.in
 
 Fri Apr 18 09:47:22 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* silink.cc (DumpAsciiIdhdl): LIB string is dumped without type
-	  declaration
+        * silink.cc (DumpAsciiIdhdl): LIB string is dumped without type
+          declaration
 
-	* mpsr_Get.cc (InitIdentifierLeftv): used mpsr_SetCurrRing(r,
-	  TRUE) so that pOne works if no ring did previously exist.
+        * mpsr_Get.cc (InitIdentifierLeftv): used mpsr_SetCurrRing(r,
+          TRUE) so that pOne works if no ring did previously exist.
 
-	* iparith.cc: Added jjPROC3.
+        * iparith.cc: Added jjPROC3.
 
 Tue Apr 15 12:07:17 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* silink.cc (slStandardInit): changed Ascii type specifyer from
-	  "ascii" to "Ascii" for consistency
+        * silink.cc (slStandardInit): changed Ascii type specifyer from
+          "ascii" to "Ascii" for consistency
 
-	* iparith.cc : added #else branch to #ifdef HAVE_FGLM in proc table
+        * iparith.cc : added #else branch to #ifdef HAVE_FGLM in proc table
 
-	*  (extra.cc): system("sh",command) returns exit status of command
+        *  (extra.cc): system("sh",command) returns exit status of command
 
 Thu Apr 10 11:59:41 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* remote quit is now arranged using MP_CopMpQuit
+        * remote quit is now arranged using MP_CopMpQuit
 
-	* Updated mpsr_* files for new naming convention of MP v:1.1.2
+        * Updated mpsr_* files for new naming convention of MP v:1.1.2
 
 Tue Apr  8 10:43:48 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* Reimplemented link structures. Cleaned it up. Introduced assignment
+        * Reimplemented link structures. Cleaned it up. Introduced assignment
 link = link. Fixed some bugs in asciidump. Made proc's work for MP links.
 
 Sat Mar 29 16:01:39 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* silink.cc (DumpQring): Takes care of dumping a Qring
-	(slInit): enable ascii link specification of the form "filename
-	mode:w"
+        * silink.cc (DumpQring): Takes care of dumping a Qring
+        (slInit): enable ascii link specification of the form "filename
+        mode:w"
 
 Fri Mar 28 14:12:05 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* Added routines dump(link) and getdump(link) for ascii and MP
-	  links
+        * Added routines dump(link) and getdump(link) for ascii and MP
+          links
 
-	* ipconv.cc (dConvertTypes): added int->module conversion so that
-	  'module m = 0' works
+        * ipconv.cc (dConvertTypes): added int->module conversion so that
+          'module m = 0' works
 
-	* iparith.cc (jjVAR1): added LINK_CMD to list of typeof(...)
+        * iparith.cc (jjVAR1): added LINK_CMD to list of typeof(...)
 
 Thu Mar 27 21:20:20 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* added real time timer (rtimer) analog to timer
+        * added real time timer (rtimer) analog to timer
 
-	* added command-line option "-d ticks_per_second" and "-m
-	  min_displayed_time_in_sec" and chahnged timer accordingly
+        * added command-line option "-d ticks_per_second" and "-m
+          min_displayed_time_in_sec" and chahnged timer accordingly
 
-	* added some #ifdef HAVE_FGLM in fglm*.cc
-	
+        * added some #ifdef HAVE_FGLM in fglm*.cc
+
 
 Wed Mar 26 14:02:15 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* added reference counter to links, updated slKill, slCopy, slInit
-	* various small bug fixes for Batch mode
+        * added reference counter to links, updated slKill, slCopy, slInit
+        * various small bug fixes for Batch mode
 
 Mon Mar 24 14:27:26 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* sing_mp.cc (slOpenWriteMPFile): Added append and write mode to
-	  open MP:file
+        * sing_mp.cc (slOpenWriteMPFile): Added append and write mode to
+          open MP:file
 
 Sun Mar 23 20:48:41 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* mpsr_Get.cc (InitIdentifierLeftv): Fixed bug which did not do
-	  pSetm(p) after creating a poly out of a variable
+        * mpsr_Get.cc (InitIdentifierLeftv): Fixed bug which did not do
+          pSetm(p) after creating a poly out of a variable
 
 Thu Mar 20 11:57:00 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* sing_mp.cc (slInitBatchLink): initialized silink such that
-	  l->argv[0] == "MP:connect" (otherwise, slInitMP failed)
+        * sing_mp.cc (slInitBatchLink): initialized silink such that
+          l->argv[0] == "MP:connect" (otherwise, slInitMP failed)
 
 Wed Mar 19 15:38:08 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* hannes fixed maFindPerm to reflect new names <->parameter scheme
+        * hannes fixed maFindPerm to reflect new names <->parameter scheme
 
-	* sing_mp.cc (mpsr_IsMPLink): fixed it
+        * sing_mp.cc (mpsr_IsMPLink): fixed it
 
-	* Makefile (tags): added target tags
+        * Makefile (tags): added target tags
 
