@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_io.cc,v 1.9 1997-11-13 08:36:17 schmidt Exp $ */
+/* $Id: ftest_io.cc,v 1.10 1997-11-21 13:59:07 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -150,7 +150,7 @@ void
 ftestPrintResult ( const char * resultName, const CanonicalForm & result )
 {
     if ( ftestPrintResultFlag ) {
-	cout << "Result: " << resultName << ":" << endl;
+	cout << "Result:\t\t" << resultName << ":" << endl;
 	cout << result << endl;
     } else if ( ! ftestPrintFlag )
 	cout << "(" << result << ")" << endl;
@@ -169,7 +169,7 @@ ftestPrintResult ( const char * resultName, const CFFList & result )
     CFFListIterator I;
 
     if ( ftestPrintResultFlag ) {
-	cout << "Result: " << resultName << ":" << endl;
+	cout << "Result:\t\t" << resultName << ":" << endl;
 	for ( I = result; I.hasItem(); I++ )
 	    cout << I.getItem() << endl;
     } else if ( ! ftestPrintFlag )
@@ -188,7 +188,7 @@ void
 ftestPrintResult ( const char * resultName, const int result )
 {
     if ( ftestPrintResultFlag )
-	cout << "Result: " << resultName << ": " << result << endl;
+	cout << "Result:\t\t" << resultName << ": " << result << endl;
     else if ( ! ftestPrintFlag )
 	cout << result << endl;
 }
