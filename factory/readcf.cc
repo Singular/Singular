@@ -9,7 +9,7 @@
 #line 4 "../factory/readcf.y"
 
 
-#ifdef WINNT
+#if defined(WINNT) && ! defined(__GNUC__)
 #include <malloc.h>
 #include <memory.h>
 #define alloca _alloca
