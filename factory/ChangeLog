@@ -21,7 +21,7 @@ Mon Jun 30 15:38:08 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 	  (WARNFLAGS): new variable
 
 	* imm.h (MINIMMEDIATELL, MAXIMMEDIATELL): initialization for mac
-	  added (he does not like a 'LL' suffix)
+	  added which does not like a 'LL' suffix
 
 	* templates/ftmpl_matrix.cc: include paths for mac added
 	* templates/ftmpl_list.cc: include paths for mac added
