@@ -11,13 +11,21 @@
  *           have to be defined before this file is included
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Set.h,v 1.5 2001-08-27 14:47:29 Singular Exp $
+ *  Version: $Id: p_Procs_Set.h,v 1.6 2003-01-31 09:23:07 Singular Exp $
  *******************************************************************/
 
 // extract p_Procs properties from a ring
 static inline p_Field p_FieldIs(ring r)
 {
-  if (rField_is_Zp(r)) return FieldZp;
+  if (rField_is_Zp(r))
+#ifdef NV_OPS
+  {
+    if (r->ch<=NV_MAX_PRIME) return FieldZp;
+    else                     return FieldGeneral;
+  }
+#else
+    return FieldZp;
+#endif
   if (rField_is_R(r)) return FieldR;
   if (rField_is_GF(r)) return FieldGF;
   if (rField_is_Q(r)) return FieldQ;
