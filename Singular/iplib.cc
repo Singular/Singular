@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.41 1998-11-19 14:04:36 krueger Exp $ */
+/* $Id: iplib.cc,v 1.42 1998-11-19 15:02:40 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -32,7 +32,9 @@
 #define NS_LRING namespaceroot->next->currRing
 
 #ifdef HAVE_DYNAMIC_LOADING
-#  include <dlfcn.h>
+void *dynl_open(char *filename);
+void *dynl_sym(void *handle, char *symbol);
+int dynl_close (void *handle);
 #endif /* HAVE_DYNAMIC_LOADING */
 
 char *iiConvName(char *p);
@@ -1042,15 +1044,15 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror)
   }
   namespaceroot->push(IDPACKAGE(pl), IDID(pl));
 
-  if((IDPACKAGE(pl)->handle=dlopen(FullName, RTLD_GLOBAL))==(void *)NULL)
+  if((IDPACKAGE(pl)->handle=dynl_open(FullName))==(void *)NULL)
   {
-    WerrorS("dlopen failed");
+    WerrorS("dynl_open failed");
     Werror("%s not found", newlib);
     goto load_modules_end; 
   }
   else
   {
-    fktn = dlsym(IDPACKAGE(pl)->handle, "mod_init");
+    fktn = dynl_sym(IDPACKAGE(pl)->handle, "mod_init");
     if( fktn!= NULL) (*fktn)(iiAddCproc);
     else Werror("mod_init: %s\n", dlerror());
     if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loaded %s \n", fullname);

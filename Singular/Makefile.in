@@ -11,6 +11,7 @@ SHELL		= /bin/sh
 ##
 SINGULAR_VERSION	= @SINGULAR_VERSION@
 SINGULAR		= @SINGULAR@
+SINGUNAME		= @SINGUNAME@
 
 ## 
 ## various paths
@@ -79,7 +80,7 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     tesths.cc timer.cc weight.cc \
     mpsr_Put.cc mpsr_PutPoly.cc mpsr_Tok.cc mpsr_GetPoly.cc \
     mpsr_Get.cc mpsr_GetMisc.cc mpsr_Error.cc \
-    ndbm.cc spSpolyLoop.cc libparse.cc \
+    ndbm.cc spSpolyLoop.cc libparse.cc mod-${SINGUNAME}.cc\
 	pcv.cc
 
 CSOURCES=mmalloc.c mmallocb.c mmallocs.c mmblock.c  mmspec.c mmutil.c \
@@ -126,7 +127,7 @@ OBJS=grammar.o scanner.o matpol.o binom.o\
      algmap.o clapconv.o  clapmem.o clapsing.o claptmpl.o\
      mpsr_Error.o mpsr_Put.o mpsr_PutPoly.o mpsr_GetPoly.o \
      mpsr_Get.o mpsr_GetMisc.o ndbm.o spSpolyLoop.o libparse.o \
-     find_exec.o getopt.o fereadl.o \
+     find_exec.o getopt.o fereadl.o  mod-${SINGUNAME}.o \
 	pcv.o
 
 ##
@@ -341,7 +342,7 @@ OBJG1=	grammar.og scanner.og matpol.og binom.og\
      cntrlc.og  \
      mpsr_Error.og mpsr_Put.og mpsr_PutPoly.og mpsr_GetPoly.og \
      mpsr_Get.og mpsr_GetMisc.og \
-     ndbm.og spSpolyLoop.og libparse.og \
+     ndbm.og spSpolyLoop.og libparse.og  mod-${SINGUNAME}.og \
 	pcv.og
 
 OBJG2= mmalloc.og mmallocb.og mmallocs.og mmblock.og mmbt.og \
@@ -416,7 +417,7 @@ OBJP1=	grammar.op scanner.op matpol.op binom.op\
      cntrlc.op  \
      mpsr_Error.op mpsr_Put.op mpsr_PutPoly.op mpsr_GetPoly.op \
      mpsr_Get.op mpsr_GetMisc.op \
-     ndbm.op spSpolyLoop.op libparse.op \
+     ndbm.op spSpolyLoop.op libparse.op  mod-${SINGUNAME}.op \
 	pcv.op
 
 OBJP2= mmalloc.op mmallocb.op mmallocs.op mmblock.op mmbt.op \
@@ -442,7 +443,7 @@ OBJB1=	grammar.ob scanner.ob matpol.ob binom.ob\
      cntrlc.ob  \
      mpsr_Error.ob mpsr_Put.ob mpsr_PutPoly.ob mpsr_GetPoly.ob \
      mpsr_Get.ob mpsr_GetMisc.ob \
-     ndbm.ob spSpolyLoop.ob libparse.ob \
+     ndbm.ob spSpolyLoop.ob libparse.ob mod-${SINGUNAME}.ob \
 	pcv.ob
 
 OBJB2= mmalloc.ob mmallocb.ob mmallocs.ob mmblock.ob mmbt.ob \

@@ -26,6 +26,8 @@ if test "$ac_cv_singuname" = unknown; then
   ac_cv_singuname="unknown"
 fi
 AC_DEFINE_UNQUOTED(S_UNAME, "$ac_cv_singuname")
+SINGUNAME=$ac_cv_singuname
+AC_SUBST(SINGUNAME)
 
 # stupid Win programs do not like dots in their pathnames
 if test "$ac_cv_singuname" = ix86-Win; then
