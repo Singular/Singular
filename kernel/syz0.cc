@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.1.1.1 2003-10-06 12:16:04 Singular Exp $ */
+/* $Id: syz0.cc,v 1.2 2004-06-02 16:03:14 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -142,7 +142,7 @@ static poly syRedtail2(poly p, polyset redWith, intvec *modcomp)
     {
       if (pLmDivisibleByNoComp(redWith[j], hn))
       {
-        //if (TEST_OPT_PROT) Print("r");
+        //if (TEST_OPT_PROT) PrintS("r");
         hn = ksOldSpolyRed(redWith[j],hn);
         if (hn == NULL)
         {
@@ -213,7 +213,7 @@ static ideal sySchreyersSyzygiesFM(ideal arg,intvec ** modcomp)
 /*----------------construction of the new ordering----------*/
   if (rkF>0)
     rSetSyzComp(rkF);
-  else 
+  else
     rSetSyzComp(1);
 /*----------------creating S--------------------------------*/
   for(j=0;j<Fl;j++)
@@ -853,7 +853,7 @@ static void syPrintResolution(resolvente res,int start,int length)
     idTest(res[start]);
     //idPrint(res[start]);
     start++;
-  }  
+  }
 }
 
 resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
@@ -882,8 +882,8 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
     sy0buck = kBucketCreate();
     if (syzIndex+1==*length)
     {
-      newres = (resolvente)omAlloc((*length+4)*sizeof(ideal));
-      for (j=0;j<*length+4;j++) newres[j] = NULL;
+      newres = (resolvente)omAlloc0((*length+4)*sizeof(ideal));
+      // for (j=0;j<*length+4;j++) newres[j] = NULL;
       for (j=0;j<*length;j++) newres[j] = res[j];
       omFreeSize((ADDRESS)res,*length*sizeof(ideal));
       *length += 4;
@@ -1018,6 +1018,36 @@ syStrategy sySchreyer(ideal arg, int maxlength)
     if (fr[i]!=NULL)
       result->fullres[i] = fr[i];
       fr[i] = NULL;
+  }
+  if (currQuotient!=NULL)
+  {
+    for (int i=0; i<rl; i++)
+    {
+      ideal t=kNF(currQuotient,NULL,result->fullres[i]);
+      idDelete(&result->fullres[i]);
+      result->fullres[i]=t;
+      if (i<rl-1)
+      {
+        for(int j=IDELEMS(t)-1;j>=0; j--)
+        {
+          if ((t->m[j]==NULL) && (result->fullres[i+1]!=NULL))
+          {
+            for(int k=IDELEMS(result->fullres[i+1])-1;k>=0; k--)
+            {
+              if (result->fullres[i+1]->m[k]!=NULL)
+              {
+                pDeleteComp(&(result->fullres[i+1]->m[k]),j+1);
+              }
+            }
+          }
+        }
+       }
+      idSkipZeroes(result->fullres[i]);
+    }
+    if (rl>maxlength)
+    {
+      idDelete(&result->fullres[rl-1]);
+    }
   }
   omFreeSize((ADDRESS)fr,(rl /*result->length*/)*sizeof(ideal));
   return result;
