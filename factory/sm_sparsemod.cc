@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: sm_sparsemod.cc,v 1.7 1998-03-12 14:31:13 schmidt Exp $ */
+/* $Id: sm_sparsemod.cc,v 1.8 2000-04-05 10:03:09 Singular Exp $ */
 
 //{{{ docu
 //
@@ -57,15 +57,10 @@ smodgcd( const CanonicalForm & u, const CanonicalForm & v, const CanonicalForm &
     else
       return gcd( v, u );
 
-
-
-
   //   u und v Polynome in levU - Variablen x1, ..., xlevU
   //   mit den gleichen Variablen, welches in sparsemod gesichert wurde
 
   int levU = level( u );
-
-
   CFArray G( 1, levU );
   Variable x( 1 );
   CanonicalForm alphau = alpha( u, 2, levU );
@@ -77,28 +72,22 @@ smodgcd( const CanonicalForm & u, const CanonicalForm & v, const CanonicalForm &
   //  Leitkoeffizienten auf univariaten gcd aufsetzen   //
 
   if( alpha(lcggt) != 0 && degree(G[1]) != 0 )
-    {
-      //G[1] =( alpha( lcggt ))*( ( 1/lc( G[1] ) ) * G[1] );
-      G[1] =( alpha( lcggt ))*( ( 1/Leitkoeffizient( G[1] ) ) * G[1] );
-
-    }
-
-
+  {
+    //G[1] =( alpha( lcggt ))*( ( 1/lc( G[1] ) ) * G[1] );
+    G[1] =( alpha( lcggt ))*( ( 1/Leitkoeffizient( G[1] ) ) * G[1] );
+  }
 
   if ( degree( G[1]) < 0 )
-    {
-
-     return 1 ;
-    }
+  {
+   return 1 ;
+  }
 
 
   if ( degree( G[1] ) == 0 )
-    {
-      // zwei Auswertungen um sicherzugehen, dass gcd Eins ist!
-
-      return 1;
-    }
-
+  {
+    // zwei Auswertungen um sicherzugehen, dass gcd Eins ist!
+    return 1;
+  }
 
   CFIterator J = G[ 1 ];
   CFArray g( 1, degree( G[ 1 ]) + 1 );
@@ -108,13 +97,12 @@ smodgcd( const CanonicalForm & u, const CanonicalForm & v, const CanonicalForm &
   //  g[i] enthaelt die momentan berechneten Monome bzgl x^emma[i] //
 
   while ( J.hasTerms() )
-    {
-      g[ i ] = J.coeff() ;
-      emma[ i ] = J.exp();
-      J++;
-      i++;
-    }
-
+  {
+    g[ i ] = J.coeff() ;
+    emma[ i ] = J.exp();
+    J++;
+    i++;
+  }
 
   m = i-1;           /// Anzahl der Terme bzgl x1
   int * n = new int[ m+1  ];
@@ -128,182 +116,167 @@ smodgcd( const CanonicalForm & u, const CanonicalForm & v, const CanonicalForm &
   DEBOUTLN( cerr, " unigcd mit alpha mit lc = " << G[1] );
 
   for( s = 2 ;s <= levU ; s++ )
+  {
+    U[ s ] = alpha( u, s+1, levU );  // s Variablen stehen lassen, fuer
+    V[ s ] = alpha( v, s+1, levU );  // den Rest alpha einsetzen
+    d = tmin( degree( U[ s ], s ), degree( V[ s ], s ));
+
+    DEBOUTLN( cerr, " U["<< s << "] = " << U[s] );
+    DEBOUTLN( cerr, " V["<< s << "] = " << V[s] );
+    DEBOUTLN( cerr, " d = " << d );
+
+    for ( i = 1; i <= m ; i++ )
     {
-      U[ s ] = alpha( u, s+1, levU );  // s Variablen stehen lassen, fuer
-      V[ s ] = alpha( v, s+1, levU );  // den Rest alpha einsetzen
+      // Anzahl der Monome berechnen pro gi liefert das Skeletonpolynom //
+      n[ i ] = countmonome( g[ i ] );
+      //cout << "n["<<i<<"] = "<< n[i] << endl;
+    }
 
-      d = tmin( degree( U[ s ], s ), degree( V[ s ], s ));
-
-      DEBOUTLN( cerr, " U["<< s << "] = " << U[s] );
-      DEBOUTLN( cerr, " V["<< s << "] = " << V[s] );
-      DEBOUTLN( cerr, " d = " << d );
-
-
-
-      for ( i = 1; i <= m ; i++ )
-	{
-	  // Anzahl der Monome berechnen pro gi liefert das Skeletonpolynom //
-
-	  n[ i ] = countmonome( g[ i ] );
-	  //cout << "n["<<i<<"] = "<< n[i] << endl;
-	}
-
-
-
-      for ( i = 1; i <= m    ; i++ )
-	{
-	  if ( i ==1 )
-	    N = n[i];
-	  else
-	    {
-	      if ( n[i]> N )
-		N = n[i];
-	    }
-	}
-
-
-      //      int tau[d+1][m+1][N+1];               /// keine Integers !!!
-      typedef CanonicalForm** CF_ptr_ptr;
-      typedef CanonicalForm* CF_ptr;
-
-      CanonicalForm ***tau = new CF_ptr_ptr[m+1];
-      for ( i = 1; i <= m; i++ ) {
-	tau[i] = new CF_ptr[d+1];
-	for ( j = 1; j <= d; j++ )
-	  tau[i][j] = new CanonicalForm[N+1];
+    for ( i = 1; i <= m    ; i++ )
+    {
+      if ( i ==1 )
+        N = n[i];
+      else
+      {
+        if ( n[i]> N )
+          N = n[i];
       }
+    }
 
-      CFArray beta( 1, d );
+    //      int tau[d+1][m+1][N+1];               /// keine Integers !!!
+    typedef CanonicalForm** CF_ptr_ptr;
+    typedef CanonicalForm* CF_ptr;
 
-      for ( i = 1; i <= d ; i++ )
-	{
-	  beta[ i ] =  gen.generate();   // verschiedene Elemente aus Zp
-	  //  cout << "  beta["<<i << "] = " << beta[i];
-	}
+    CanonicalForm ***tau = new CF_ptr_ptr[m+1];
+    for ( i = 1; i <= m; i++ )
+    {
+      tau[i] = new CF_ptr[d+1];
+      for ( j = 1; j <= d; j++ )
+        tau[i][j] = new CanonicalForm[N+1];
+    }
 
+    CFArray beta( 1, d );
 
+    for ( i = 1; i <= d ; i++ )
+    {
+      beta[ i ] =  gen.generate();   // verschiedene Elemente aus Zp
+      //  cout << "  beta["<<i << "] = " << beta[i];
+    }
 
+    Array<REvaluation> xi( 1, N );
+    REvaluation a( 2, s-1, gen  );
 
+    for ( i = 1 ; i <= N ; i++ )
+    {
+      a.nextpoint();
+      xi[ i ] = a;//REvaluation( 2, s-1, gen );
+      // cout << "  xi["<<i<<"] = "<< xi[i];
+    }
 
-      Array<REvaluation> xi( 1, N );
-      REvaluation a( 2, s-1, gen  );
+    //CFArray T(1, d*N );
 
-      for ( i = 1 ; i <= N ; i++ )
-	{
-	  a.nextpoint();
-	  xi[ i ] = a;//REvaluation( 2, s-1, gen );
-	  // cout << "  xi["<<i<<"] = "<< xi[i];
-	}
+    if ( d == 0 )
+    {
+      ASSERT( 0, "alpha bad point! try some other gcd algorithm" );
+      return gcd(u, v);
+    }
 
+    CFMatrix T( d, N ) ;  // diese Moeglichkeit laeuft!!!
+                    //help = Koeff( T( j, k ), emma[ i ] );
+                    //tau[i][j][k] = help; //.intval();
 
-      //CFArray T(1, d*N );
+    for ( j = 1 ; j <= d ; j++ ) // jedesmal andere REvaluation??
+    {
+      for ( k = 1 ; k <= N ; k++ )
+      {
+        CanonicalForm zwischenu, zwischenv, help, nfa ;
 
-      if ( d == 0 )
-	{
-	  ASSERT( 0, "alpha bad point! try some other gcd algorithm" );
-	  return gcd(u, v);
-	}
+        zwischenu = U[ s ]( beta[ j ], s );
+        zwischenv = V[ s ]( beta[ j ], s );
 
-      CFMatrix T( d, N ) ;  // diese Moeglichkeit laeuft!!!
-		    //help = Koeff( T( j, k ), emma[ i ] );
-		    //tau[i][j][k] = help; //.intval();
+        T( j, k) = gcd ( xi[k]( zwischenu, 2, s-1 ), xi[k]( zwischenv, 2, s-1 ));
 
+        nfa = lcggt( beta[j], s );
+        nfa =  alpha( nfa, s+1, levU );
 
+        //T(j, k ) = (xi[k]( nfa, 2, s-1 ))*((1/lc(T( j, k ))) * T( j, k ));
+        T(j, k ) = (xi[k]( nfa, 2, s-1 ))*((1/Leitkoeffizient(T( j, k ))) * T( j, k ));
 
-      for ( j = 1 ; j <= d ; j++ ) // jedesmal andere REvaluation??
-	for ( k = 1 ; k <= N ; k++ )
-	  {
-	    CanonicalForm zwischenu, zwischenv, help, nfa ;
+        //cout <<"T("<<j<<", "<< k <<") = " << T(j, k) << endl;
 
-	    zwischenu = U[ s ]( beta[ j ], s );
-	    zwischenv = V[ s ]( beta[ j ], s );
-
-	    T( j, k) = gcd ( xi[k]( zwischenu, 2, s-1 ), xi[k]( zwischenv, 2, s-1 ));
-
-
-	    nfa = lcggt( beta[j], s );
-	    nfa =  alpha( nfa, s+1, levU );
-
-	    //T(j, k ) = (xi[k]( nfa, 2, s-1 ))*((1/lc(T( j, k ))) * T( j, k ));
-	    T(j, k ) = (xi[k]( nfa, 2, s-1 ))*((1/Leitkoeffizient(T( j, k ))) * T( j, k ));
-
-	    //cout <<"T("<<j<<", "<< k <<") = " << T(j, k) << endl;
-
-
-	    for ( i = 1 ; i <= m ; i++ )
-	      {
-		// diese Moeglichkeit laeuft!!!
-		//help = Koeff( T( j, k ), emma[ i ] );
-		//tau[i][j][k] = help; //.intval();
-		if ( T( j, k).inBaseDomain() )
-		  {
-		    if ( emma[i] == 0 )
-		      tau[i][j][k] = T( j, k );
-		    else
-		      tau[i][j][k] =  0 ;
-		  }
-		else
-		  {
-		    tau[i][j][k] = T(j, k)[emma[i]];
-		  }
-	      }
-	  }
-
+        for ( i = 1 ; i <= m ; i++ )
+        {
+          // diese Moeglichkeit laeuft!!!
+          //help = Koeff( T( j, k ), emma[ i ] );
+          //tau[i][j][k] = help; //.intval();
+          if ( T( j, k).inBaseDomain() )
+          {
+            if ( emma[i] == 0 )
+              tau[i][j][k] = T( j, k );
+            else
+              tau[i][j][k] =  0 ;
+          }
+          else
+          {
+            tau[i][j][k] = T(j, k)[emma[i]];
+          }
+        }
+      }
 
       CFMatrix h( m, d );
 
-
       for ( i = 1; i <= m ; i++ )
-	{
-	  for ( j = 1 ; j <= d ; j++ )
-	    {
-	      zip = n[i] +1;
-	      CanonicalForm * zwischen = new CanonicalForm[ zip ];//n[i]+1 ];
+      {
+        for ( j = 1 ; j <= d ; j++ )
+        {
+          zip = n[i] +1;
+          CanonicalForm * zwischen = new CanonicalForm[ zip ];//n[i]+1 ];
 
-	      for ( k = 1 ; k <= n[i] ; k++ )
-		{
-		  zwischen[ k ] = tau[i][j][k];
-		}
+          for ( k = 1 ; k <= n[i] ; k++ )
+          {
+            zwischen[ k ] = tau[i][j][k];
+          }
 
-	      //cout <<" werte fuer sinterpol : " << endl;
-	      //cout <<" g["<<i<<"] = " << g[i] << " xi = " << xi << endl;
-              //cout << " zwischen = " << zwischen << " ni = " << n[i]<<endl;
-	      h[ i ][ j ] = sinterpol( g[i], xi, zwischen, n[i] );
-	      DEBOUTLN( cerr, " Ergebnis von sinterpol h["<<i<<"]["<<j<< "] = " << h[i][j] );
-	      delete [] zwischen;
-	    }
-	}
+          //cout <<" werte fuer sinterpol : " << endl;
+          //cout <<" g["<<i<<"] = " << g[i] << " xi = " << xi << endl;
+          //cout << " zwischen = " << zwischen << " ni = " << n[i]<<endl;
+          h[ i ][ j ] = sinterpol( g[i], xi, zwischen, n[i] );
+          DEBOUTLN( cerr, " Ergebnis von sinterpol h["<<i<<"]["<<j<< "] = " << h[i][j] );
+          delete [] zwischen;
+        }
+      }
       for ( i = 1 ; i <= m ; i++ )
-	{
-	  CFArray zwitscher( 1, d );
-	  for ( j = 1 ; j <= d ; j++ )
-	    {
-	      zwitscher[ j ] = h[ i ][ j ];
-	    }
+      {
+        CFArray zwitscher( 1, d );
+        for ( j = 1 ; j <= d ; j++ )
+        {
+          zwitscher[ j ] = h[ i ][ j ];
+        }
 
-	  DEBOUTLN( cerr, "Werte fuer dinterpol : " );
-	  DEBOUTLN( cerr, " d = " << d << " g["<<i<<"] = "<< g[i] );
-	  DEBOUTLN( cerr, " zwitscher = " << zwitscher );
-	  DEBOUTLN( cerr, " alpha["<<s<< "] = "<< alpha[s] << " beta = "<<beta << " n["<<i<<"] = " << n[i] );
+        DEBOUTLN( cerr, "Werte fuer dinterpol : " );
+        DEBOUTLN( cerr, " d = " << d << " g["<<i<<"] = "<< g[i] );
+        DEBOUTLN( cerr, " zwitscher = " << zwitscher );
+        DEBOUTLN( cerr, " alpha["<<s<< "] = "<< alpha[s] << " beta = "<<beta << " n["<<i<<"] = " << n[i] );
 
-	  g[ i ] = dinterpol( d, g[i], zwitscher, alpha, s, beta, n[ i ], CHAR );
-	  DEBOUTLN( cerr, " Ergebnis von dinterpol g["<<i<<"] = " << g[i] );
+        g[ i ] = dinterpol( d, g[i], zwitscher, alpha, s, beta, n[ i ], CHAR );
+        DEBOUTLN( cerr, " Ergebnis von dinterpol g["<<i<<"] = " << g[i] );
 
-	}
-
+      }
 
       for ( i = 1 ; i <= m ; i++ )
-	{
-	  G[ s ] += g[ i ] * ( power( x, emma[i] ) );
-	}
+      {
+        G[ s ] += g[ i ] * ( power( x, emma[i] ) );
+      }
       DEBOUTLN( cerr, "G["<<s<<"] = " << G[s] );
-      for ( i = 1; i <= m; i++ ) {
-	for ( j = 1; j <= d; j++ )
-	  delete [] tau[i][j];
-	delete [] tau[i];
+      for ( i = 1; i <= m; i++ )
+      {
+        for ( j = 1; j <= d; j++ )
+          delete [] tau[i][j];
+        delete [] tau[i];
       }
       delete [] tau;
     }
+  }
   delete [] emma;
 
   return G[ levU ];
@@ -317,15 +290,14 @@ internalSparsemod( const CanonicalForm & F, const CanonicalForm & G )
   On( SW_SYMMETRIC_FF );
   //cout << " in sparse " << endl;
   if( F.inCoeffDomain() &&  G.inCoeffDomain() )
-    {
-      return gcd( F, G );
-    }
+  {
+    return gcd( F, G );
+  }
 
   CanonicalForm f, g, ff, gg, ggt, res, fmodp, gmodp ;
   int i, count = 10;
 
   //   COMPRESS    ///////////////////
-
 
   CFArray A(1, 2);
   A[1] = F;
@@ -335,28 +307,20 @@ internalSparsemod( const CanonicalForm & F, const CanonicalForm & G )
   f = M(A[1]);
   g = M(A[2]);
 
-
   // POLYNOME PRIMITIV BZGL DER ERSTEN VARIABLE  /////
-
-
 
   CanonicalForm primif, primig, lcf, lcg, lcggt, lcggtmodp, result ;
   ff = content( f, Variable(1) );//contentsparse( f, 1  );
   gg = content( g, Variable(1) );//contentsparse( g, 1  );
-
-
 
   primif = f/ff;
   primig = g/gg;
   ggt = gcd( ff, gg );
 
   if( primif.inCoeffDomain() &&  primig.inCoeffDomain() )
-    {
-      return N( gcd( primif, primig ) ) * N( ggt );
-    }
-
-
-
+  {
+    return N( gcd( primif, primig ) ) * N( ggt );
+  }
 
   // Variablen, die in beiden Polynomen auftreten /////
 
@@ -379,62 +343,60 @@ internalSparsemod( const CanonicalForm & F, const CanonicalForm & G )
   int * schnitt = new int[levis];
 
   while ( ABFRAGE == 1 )
+  {
+    levelprimif = level(primif);
+    levelprimig = level(primig);
+
+    if ( levelprimif > levelprimig )
+      levis = levelprimif;
+    else
+      levis = levelprimig;
+
+    if ( levis < 0 )
+      return N( gcd(primif, primig ));
+
+    for( i = 1; i <= levis ; i++ )
     {
-      levelprimif = level(primif);
-      levelprimig = level(primig);
-
-      if ( levelprimif > levelprimig )
-	levis = levelprimif;
+      if ( degree( primif, i ) != 0 )
+        varf[i] = 1;
       else
-	levis = levelprimig;
-
-      if ( levis < 0 )
-	return N( gcd(primif, primig ));
-
-
-      for( i = 1; i <= levis ; i++ )
-	{
-	  if ( degree( primif, i ) != 0 )
-	    varf[i] = 1;
-	  else
-	    varf[i] = 0;
-	  if ( degree( primig, i ) != 0 )
-	    varg[i] = 1;
-	  else
-	    varg[i] = 0;
-	  if ( varg[i] == 1 && varf[i] == 1 )
-	    schnitt[i] = 1;
-	  else
-	    schnitt[i] = 0;
-	}
-
-      levelprimif = level(primif);
-      levelprimig = level(primig);
-
-      for ( m  = 1; m <= levis ; m++)
-	{
-	  if ( schnitt[m] == 0 )
-	    if ( varf[m] == 1)
-	      {
-		primif = content( primif, m ); //contentsparse( primif, m  );
-	      }
-	    else
-	      {
-		primig = content( primig, m ); //contentsparse( primig, m  );
-	      }
-	}
-
-      if ( level( primif ) == level( primig ) )
-	ABFRAGE = 0 ;
-
+        varf[i] = 0;
+      if ( degree( primig, i ) != 0 )
+        varg[i] = 1;
+      else
+        varg[i] = 0;
+      if ( varg[i] == 1 && varf[i] == 1 )
+        schnitt[i] = 1;
+      else
+        schnitt[i] = 0;
     }
 
-  
+    levelprimif = level(primif);
+    levelprimig = level(primig);
+
+    for ( m  = 1; m <= levis ; m++)
+    {
+      if ( schnitt[m] == 0 )
+      {
+        if ( varf[m] == 1)
+        {
+          primif = content( primif, m ); //contentsparse( primif, m  );
+        }
+        else
+        {
+          primig = content( primig, m ); //contentsparse( primig, m  );
+        }
+      }
+    }
+
+    if ( level( primif ) == level( primig ) )
+      ABFRAGE = 0 ;
+
+  }
+
   delete [] varf; delete [] varg; delete [] schnitt;
 
-
   //  Nochmal compress fuer den Fall, dass eine Variable rausfliegt //
-
 
   CFArray C(1, 2);
   C[1] = primif;
@@ -451,9 +413,9 @@ internalSparsemod( const CanonicalForm & F, const CanonicalForm & G )
   //cout << " primig = " << primig << endl;
 
   if( primif.inCoeffDomain() &&  primig.inCoeffDomain() )
-    {
-      return N( NN( gcd( primif, primig ) ) ) * N( ggt );
-    }
+  {
+    return N( NN( gcd( primif, primig ) ) ) * N( ggt );
+  }
 
   // erst hier Leitkoeffizienten updaten  /////////
 
@@ -462,8 +424,6 @@ internalSparsemod( const CanonicalForm & F, const CanonicalForm & G )
   lcf = LC(primif, 1 );
   lcg = LC(primig, 1 );
   lcggt = gcd ( lcf, lcg );
-
-
 
   //   BOUND BESTIMMEN fuer Charakteristik Null   /////////
 
@@ -481,52 +441,48 @@ internalSparsemod( const CanonicalForm & F, const CanonicalForm & G )
   CFArray p( 1, 10 ) ;
 
   if( CHAR == 0 )
-    {
-      p[ 1 ]  = cf_getBigPrime( count );
-      CanonicalForm q = p[ 1 ];
+  {
+    p[ 1 ]  = cf_getBigPrime( count );
+    CanonicalForm q = p[ 1 ];
 
-      while ( q < Bound )
-	{
-	  count++;
-	  length++;
-	  p[ length ] = cf_getBigPrime( count );
-	  q     *= p[ length ];  //G[levU] = ( 1/lc(G[levU] ))* G[levU];// sinnig?
-    //cout << " lcggt = " << lcggt << endl;
-    //bool ja;
-    //ja = divides( lcggt, lc( G[levU] ) );
-    //cout << " ja = " << ja << endl;
-    //cout << " vor Verlassen " << endl;
-	}
+    while ( q < Bound )
+    {
+      count++;
+      length++;
+      p[ length ] = cf_getBigPrime( count );
+      q     *= p[ length ];  //G[levU] = ( 1/lc(G[levU] ))* G[levU];// sinnig?
+      //cout << " lcggt = " << lcggt << endl;
+      //bool ja;
+      //ja = divides( lcggt, lc( G[levU] ) );
+      //cout << " ja = " << ja << endl;
+      //cout << " vor Verlassen " << endl;
     }
+  }
   else
-    {
-      //int q  = CHAR;
-      //setCharacteristic( 0 );
-      //CanonicalForm Bound2 = mapinto( Bound ) ;
-      //cout << " Bound2 " << Bound2 << endl;
-      //cout << " CHAR =  " << q << endl;
+  {
+    //int q  = CHAR;
+    //setCharacteristic( 0 );
+    //CanonicalForm Bound2 = mapinto( Bound ) ;
+    //cout << " Bound2 " << Bound2 << endl;
+    //cout << " CHAR =  " << q << endl;
 
-      // erstmal ohne Erweiterung !!!
-      //deg = 3; // Default Erweiterung
-      //q *= ( q * q ) ;cout << "q = " << q << endl;
+    // erstmal ohne Erweiterung !!!
+    //deg = 3; // Default Erweiterung
+    //q *= ( q * q ) ;cout << "q = " << q << endl;
 
-      //Bestimme Grad der Koerpererweiterung voellig unnuetz!!!
-      //while ( q < abs( Bound2 ) )
-      //	{
-      //  q *= CHAR;cout << " q = " << q << endl;
-      //deg++;cout << " degchar = " << deg << endl;
-      //cout << " in Graderhoehung? " << endl;
+    //Bestimme Grad der Koerpererweiterung voellig unnuetz!!!
+    //while ( q < abs( Bound2 ) )
+    //        {
+    //  q *= CHAR;cout << " q = " << q << endl;
+    //deg++;cout << " degchar = " << deg << endl;
+    //cout << " in Graderhoehung? " << endl;
 
-      //}
-      //setCharacteristic( CHAR );
-      //cerr << " JUHU " << endl;
-    }
-
-
-
+    //}
+    //setCharacteristic( CHAR );
+    //cerr << " JUHU " << endl;
+  }
 
   //        ENDE BOUNDBESTIMMUNG       /////////////////
-
 
   FFRandom gen ;
   levelprimif = level( primif );
@@ -539,123 +495,116 @@ internalSparsemod( const CanonicalForm & F, const CanonicalForm & G )
 
 
   for ( i = 1 ; i <= 10; i++ )               // 10 Versuche mit sparsemod
+  {
+    if ( CHAR == 0 )
     {
-      if ( CHAR == 0 )
-	{
-	  for( k = 1; k <= length ; k++)
-	    {
-	      help = p[ k ].intval();
-	      setCharacteristic( help );
-	      FFRandom mache;
-	      am = REvaluation( 2, levelprimif, mache  );
-	      am.nextpoint();
-	      fmodp  = mapinto( primif );
-	      gmodp = mapinto( primig );
-	      lcggtmodp = mapinto ( lcggt );
+      for( k = 1; k <= length ; k++)
+      {
+        help = p[ k ].intval();
+        setCharacteristic( help );
+        FFRandom mache;
+        am = REvaluation( 2, levelprimif, mache  );
+        am.nextpoint();
+        fmodp  = mapinto( primif );
+        gmodp = mapinto( primig );
+        lcggtmodp = mapinto ( lcggt );
 
-	      zwischen = smodgcd( fmodp, gmodp, lcggtmodp, am, mache, CHAR, Variable( 1 ));
-	      // Variable ( 1 ) Interface fuer endliche Koerper
+        zwischen = smodgcd( fmodp, gmodp, lcggtmodp, am, mache, CHAR, Variable( 1 ));
+        // Variable ( 1 ) Interface fuer endliche Koerper
 
-	      // Char auf 0 wegen Chinese Remainder ////////
+        // Char auf 0 wegen Chinese Remainder ////////
 
-	      setCharacteristic( 0 );
+        setCharacteristic( 0 );
 
+        resultat[ k ] = mapinto( zwischen );
+      }
 
-	      resultat[ k ] = mapinto( zwischen );
+      ////////////////////////////////////////////////////////////
+      // result[k] mod p[k] via Chinese Remainder zu Resultat //////
+      // ueber Z hochziehen                                //////
+      ////////////////////////////////////////////////////////////
 
-	    }
-
-
-	  ////////////////////////////////////////////////////////////
-	  // result[k] mod p[k] via Chinese Remainder zu Resultat //////
-	  // ueber Z hochziehen                                //////
-	  ////////////////////////////////////////////////////////////
-
-	  if( length != 1 )
-	    ChinesePoly( length, resultat, p, result );
-	  else
-	    result = resultat[1];
-
-	  CanonicalForm contentresult = content( result, 1 );
-
-	  if ( contentresult != 0 )
-	    res = result/contentresult;
-	  else
-	    res = result;
-
-	  if ( divides( res, primif ) && divides( res, primig ) )
-	    return  N(NN(res))*N(ggt) ;     /// compress rueckgaengig machen!
-	  else
-	    {
-
-	      // Start all over again ///
-
-	      count++;
-	      for ( k = 1; k <= length ; k++)
-		{
-		  p[k] = cf_getBigPrime( count );
-		  count++;
-	        }
-
-	    }
-	}
+      if( length != 1 )
+        ChinesePoly( length, resultat, p, result );
       else
-	{
-	  // Fall Char != 0 ///
-	  // in algebraische Erweiterung vom Grad deg gehen //
-	  //cout << " IN CHAR != 0 " << endl;
-	  //cout << " degree = " << deg << endl;
-	  CanonicalForm minimalpoly;
-	  //cout << " vor mini " << endl;
-	  minimalpoly = find_irreducible( deg, gen, alpha1 );
-	  //cout << " nach mini " << endl;
-	  Variable alpha2 = rootOf( minimalpoly, 'a' ) ;
-	  AlgExtRandomF hallo( alpha2 );
-	  //cout << " vor am " << endl;
-	  REvaluation am (  2, levelprimif, hallo );
-	  //cout << " nach ma " << endl;
-	  am.nextpoint();
-	  //cout << "vor smodgcd " << endl;
-	  result = smodgcd( primif, primig, lcggt, am, hallo, CHAR, alpha2  );
-	  if ( result == 1 && ABFRAGE == 0)
-	    {
-	      // zwei Auswertungen fuer gcd Eins
-	      am.nextpoint();
-	      ABFRAGE = 1;
-	    }
-	  //CanonicalForm contentresult = contentsparse(  result, 1 );
-	  //zuerst mal auf Nummer sicher gehen ...
-	  else
-	    {
-	      CanonicalForm contentresult = content(  result, 1 );
-	      //cout << "RESULT = " << result << endl;
-	      if ( contentresult != 0 )
-		res = result/contentresult;
-	      else
-		{
-		  res = result;
-		}
+        result = resultat[1];
 
+      CanonicalForm contentresult = content( result, 1 );
 
-	      if ( ( divides( res, primif )) && ( divides ( res, primig ) ))
-		{
-		  // make monic ////
-		  res = (1/lc(res)) * res;
-		  // eventuell auch hier Leitkoeffizient anstatt lc ?
+      if ( contentresult != 0 )
+        res = result/contentresult;
+      else
+        res = result;
 
-		  return  N( NN( res ) ) * N( ggt ) ;
-		}
-	      else
-		{
-		  // Grad der Erweiterung sukzessive um eins erhoehen
-		  deg++;
-		  //cout << " deg = " << deg << endl;
-		  am.nextpoint();
-		  // nextpoint() unnoetig?
-		}
-	    }
-	}
+      if ( divides( res, primif ) && divides( res, primig ) )
+        return  N(NN(res))*N(ggt) ;     /// compress rueckgaengig machen!
+      else
+      {
+
+        // Start all over again ///
+
+        count++;
+        for ( k = 1; k <= length ; k++)
+        {
+          p[k] = cf_getBigPrime( count );
+          count++;
+        }
+      }
     }
+    else
+    {
+      // Fall Char != 0 ///
+      // in algebraische Erweiterung vom Grad deg gehen //
+      //cout << " IN CHAR != 0 " << endl;
+      //cout << " degree = " << deg << endl;
+      CanonicalForm minimalpoly;
+      //cout << " vor mini " << endl;
+      minimalpoly = find_irreducible( deg, gen, alpha1 );
+      //cout << " nach mini " << endl;
+      Variable alpha2 = rootOf( minimalpoly, 'a' ) ;
+      AlgExtRandomF hallo( alpha2 );
+      //cout << " vor am " << endl;
+      REvaluation am (  2, levelprimif, hallo );
+      //cout << " nach ma " << endl;
+      am.nextpoint();
+      //cout << "vor smodgcd " << endl;
+      result = smodgcd( primif, primig, lcggt, am, hallo, CHAR, alpha2  );
+      if ( result == 1 && ABFRAGE == 0)
+      {
+        // zwei Auswertungen fuer gcd Eins
+        am.nextpoint();
+        ABFRAGE = 1;
+      }
+      //CanonicalForm contentresult = contentsparse(  result, 1 );
+      //zuerst mal auf Nummer sicher gehen ...
+      else
+      {
+        CanonicalForm contentresult = content(  result, 1 );
+        //cout << "RESULT = " << result << endl;
+        if ( contentresult != 0 )
+          res = result/contentresult;
+        else
+          res = result;
+
+        if ( ( divides( res, primif )) && ( divides ( res, primig ) ))
+        {
+          // make monic ////
+          res = (1/lc(res)) * res;
+          // eventuell auch hier Leitkoeffizient anstatt lc ?
+
+          return  N( NN( res ) ) * N( ggt ) ;
+        }
+        else
+        {
+          // Grad der Erweiterung sukzessive um eins erhoehen
+          deg++;
+          //cout << " deg = " << deg << endl;
+          am.nextpoint();
+          // nextpoint() unnoetig?
+        }
+      }
+    }
+  }
 
 
   //Fuer den Fall der unwahrscheinlichen Faelle, dass die Versuche
@@ -666,7 +615,6 @@ internalSparsemod( const CanonicalForm & F, const CanonicalForm & G )
     setCharacteristic( 0 );
 
   return 0;
-
 }
 
 CanonicalForm
