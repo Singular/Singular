@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_univar.cc,v 1.6 1997-04-08 10:33:19 schmidt Exp $
+// $Id: fac_univar.cc,v 1.7 1997-04-22 15:40:32 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.6  1997/04/08 10:33:19  schmidt
+#include <config.h> added
+
 Revision 1.5  1997/03/27 09:54:41  schmidt
 timing output changed to TIMING
 debug output rewritten
@@ -30,6 +33,7 @@ Initial revision
 
 */
 
+
 #include <config.h>
 
 #include <math.h>
@@ -52,14 +56,20 @@ TIMING_DEFINE_PRINT(fac_facModPrimes);
 TIMING_DEFINE_PRINT(fac_liftFactors);
 TIMING_DEFINE_PRINT(fac_combineFactors);
 
-#define MAX_FP_FAC 3
+
+const int max_fp_fac = 3;
 
 static modpk theModulus;
 
+// !!! this should be placed in cf_gcd.h
 CanonicalForm
 iextgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, CanonicalForm & b );
 
+
 #ifdef DEBUGOUTPUT
+#define DEBOUTHPRINT(stream, msg, hg) \
+{stream << deb_level_msg << msg, stream.flush(); hprint( hg ); stream << endl;}
+
 static void
 hprint ( int * a )
 {
@@ -71,9 +81,11 @@ hprint ( int * a )
 	    cerr << i << " ";
 	i++;
     }
-    cerr << ")" << endl << endl;
+    cerr << ")";
 }
-#endif
+#else /* DEBUGOUTPUT */
+#define DEBOUTHPRINT(stream, msg, hg)
+#endif /* DEBUGOUTPUT */
 
 static void
 hgroup ( int * a )
@@ -122,7 +134,13 @@ initHG ( int * a, const CFFList & F )
     for ( int j = 1; j < n; j++ ) a[j] = 0;
     for ( i = F; i.hasItem(); i++ )
 	if ( (k = i.getItem().factor().degree()) < n )
-	    if ( k != 0 )
+	    if ( k == -1 ) {
+		WARN( k == -1, "there occured an error.  factory was not able to factorize\n"
+		      "correctly mod p.  Please send the example which caused\n"
+		      "this error to the authors.  Nonetheless we will go on with the\n"
+		      "calculations hoping the result will be correct.  Thank you." );
+	    }
+	    else if ( k != 0 )
 		a[k] = 1;
 }
 
@@ -133,7 +151,13 @@ initHG ( int * a, const Array<CanonicalForm> & F )
     for ( i = 1; i < n; i++ ) a[i] = 0;
     for ( i = 1; i < m; i++ )
 	if ( (k = F[i].degree()) < n )
-	    if ( k != 0 )
+	    if ( k == -1 ) {
+		WARN( k == -1, "there occured an error.  factory was not able to factorize\n"
+		      "correctly mod p.  Please send the example which caused\n"
+		      "this error to the authors.  Nonetheless we will go on with the\n"
+		      "calculations hoping the result will be correct.  Thank you." );
+	    }
+	    else if ( k != 0 )
 		a[k] = 1;
 }
 
@@ -166,15 +190,15 @@ dnorm ( const CanonicalForm & f )
     CFIterator i;
     CanonicalForm sum = 0;
     for ( i = f; i.hasTerms(); i++ ) sum += i.coeff() * i.coeff();
-    DEBOUTLN( cerr, "sum = ", sum );
+    DEBOUTLN( cerr, "sum = " << sum );
     return sqrt( cf2double( sum ) );
 }
 
 static int
 kBound ( const CanonicalForm & f, int p )
 {
-    DEBOUTLN( cerr, "lc(f) = ", lc(f) );
-    return (int)((f.degree()*log(2)+log( fabs(cf2double(lc(f))) )+log( dnorm( f ) )) / log( p ) + 0.5) + 1;
+    DEBOUTLN( cerr, "lc(f) = " << lc(f) );
+    return (int)((f.degree()*log(2)+log( fabs(cf2double(lc(f))) )+log( dnorm( f ) )) / log( (double)p ) + 0.5) + 1;
 }
 
 modpk
@@ -189,13 +213,13 @@ liftDegreeFactRec( CFArray & theFactors, CanonicalForm & F, const CanonicalForm 
     if ( i >= theFactors.size() )
 	return false;
     else  if ( degree( f ) + degree( theFactors[i] ) == d ) {
-	DEBOUTLN( cerr, "ldfr (f) = ", f );
-	DEBOUTLN( cerr, "ldfr (g) = ", theFactors[i] );
+	DEBOUTLN( cerr, "ldfr (f) = " << f );
+	DEBOUTLN( cerr, "ldfr (g) = " << theFactors[i] );
 	CanonicalForm g = pp( pk( recip_lf * f * theFactors[i] ) );
-	DEBOUTLN( cerr, "ldfr (pk(f*g)) = ", g );
+	DEBOUTLN( cerr, "ldfr (pk(f*g)) = " << g );
 	CanonicalForm gg, hh;
-	DEBOUTLN( cerr, "F = ", F );
-	DEBOUTLN( cerr, "g = ", g );
+	DEBOUTLN( cerr, "F = " << F );
+	DEBOUTLN( cerr, "g = " << g );
 	if ( divremt( F, g, gg, hh ) && hh.isZero() ) {
 	    ZF.append( CFFactor( g, exp ) );
 	    F = gg;
@@ -218,6 +242,7 @@ liftDegreeFactRec( CFArray & theFactors, CanonicalForm & F, const CanonicalForm 
     }
 }
 
+
 static int
 choosePrimes ( int * p, const CanonicalForm & f )
 {
@@ -226,7 +251,7 @@ choosePrimes ( int * p, const CanonicalForm & f )
     int maxp = cf_getNumPrimes();
     int prime;
 
-    while ( ptr < maxp && i < MAX_FP_FAC ) {
+    while ( ptr < maxp && i < max_fp_fac ) {
 	prime = cf_getPrime( ptr );
 	if ( mod( lc( f ), prime ) != 0 ) {
 	    setCharacteristic( prime );
@@ -238,7 +263,7 @@ choosePrimes ( int * p, const CanonicalForm & f )
 	}
 	ptr++;
     }
-    return ( i == MAX_FP_FAC );
+    return ( i == max_fp_fac );
 }
 
 
@@ -249,12 +274,10 @@ UnivariateQuadraticLift ( const CanonicalForm &F, const  CanonicalForm & G, cons
     CanonicalForm a, b, aa, bb, c, g, h, g1, h1, e, modulus, tmp, q, r;
     int i, j, save;
     int p = pk.getp(), k = pk.getk();
-    int no_iter = (int)(log(k)/log(2)+2);
+    int no_iter = (int)(log( (double)k )/log(2)+2);
     int * kvals = new int[no_iter];
 
-    DEBOUTSL( cerr );
-    DEBOUT( cerr, "quadratic lift called with p = " << p << "  and k = " << k );
-    DEBOUTENDL( cerr );
+    DEBOUTLN( cerr, "quadratic lift called with p = " << p << "  and k = " << k );
     for ( j = 0, i = k; i > 1; i = ( i+1 ) / 2, j++ ) kvals[j] = i;
     kvals[j] = 1;
 
@@ -281,21 +304,19 @@ UnivariateQuadraticLift ( const CanonicalForm &F, const  CanonicalForm & G, cons
 	{
 	    j--;
 	    setCharacteristic( p, kvals[j+1] );
-	    DEBOUTSL( cerr );
-	    DEBOUT( cerr, "lifting from p^" << kvals[j+1] << " to p^" << kvals[j] );
-	    DEBOUTENDL( cerr );
+	    DEBOUTLN( cerr, "lifting from p^" << kvals[j+1] << " to p^" << kvals[j] );
 	    c = mapinto( c );
-	    DEBOUTLN( cerr, " !!! g = ", mapinto( g ) );
+	    DEBOUTLN( cerr, " !!! g = " << mapinto( g ) );
 	    g1 = mapinto( lf ) / mapinto( lc( g ) ) * mapinto( g );
 	    h1 = mapinto( lf ) / mapinto( lc( h ) ) * mapinto( h );
 //	    (void)extgcd( g1, h1, a, b );
-//	    DEBOUTLN( cerr, " a = ", aa );
-//	    DEBOUTLN( cerr, " b = ", bb );
+//	    DEBOUTLN( cerr, " a = " << aa );
+//	    DEBOUTLN( cerr, " b = " << bb );
 	    a = mapinto( a ); b = mapinto( b );
 	    a += ( ( 1 - a * g1 ) *  a ) % h1;
 	    b += ( ( 1 - b * h1 ) *  b ) % g1;
-	    DEBOUTLN( cerr, " a = ", a );
-	    DEBOUTLN( cerr, " b = ", b );
+	    DEBOUTLN( cerr, " a = " << a );
+	    DEBOUTLN( cerr, " b = " << b );
 	    divrem( a * c, h1, q, r );
 	    tmp = b * c + q * g1;
 	    setCharacteristic( 0 );
@@ -307,7 +328,7 @@ UnivariateQuadraticLift ( const CanonicalForm &F, const  CanonicalForm & G, cons
 	e = f - g * h;
 	modulus = power( CanonicalForm(p), kvals[j] );
 	if ( mod( f - g * h, modulus ) != 0 )
-	    DEBOUTLN( cerr, "error at lift stage ", i );
+	    DEBOUTLN( cerr, "error at lift stage " << i );
 	i++;
     }
     if ( e.isZero() ) {
@@ -374,6 +395,7 @@ UnivariateLinearLift ( const CanonicalForm &F, const  CanonicalForm & G, const C
     return (F-gk*hk).isZero();
 }
 
+
 CFFList
 ZFactorizeUnivariate( const CanonicalForm& ff, bool issqrfree )
 {
@@ -382,168 +404,163 @@ ZFactorizeUnivariate( const CanonicalForm& ff, bool issqrfree )
     CanonicalForm lf, recip_lf, fp, f, g = ff / cont, dummy1, dummy2;
     int i, k, exp, n;
     bool ok;
-    CFFList H, G, F[MAX_FP_FAC];
+    CFFList H, F[max_fp_fac];
     CFFList ZF;
-    int * p = new int [MAX_FP_FAC];
+    int * p = new int [max_fp_fac];
     int * D = 0;
     int * Dh = 0;
     ListIterator<CFFactor> J, I;
+
+    DEBINCLEVEL( cerr, "ZFactorizeUnivariate" );
     On( SW_SYMMETRIC_FF );
+
+    // get squarefree decomposition of f
     if ( issqrfree )
 	H.append( CFFactor( g, 1 ) );
     else
 	H = sqrFree( g );
+
+    DEBOUTLN( cerr, "H = " << H );
+
+    // cycle through squarefree factors of f
     for ( J = H; J.hasItem(); ++J ) {
 	f = J.getItem().factor();
 	if ( f.inCoeffDomain() ) continue;
 	n = f.degree() / 2 + 1;
-	if ( D != 0 ) {
-	    delete [] D;
-	    delete [] Dh;
-	}
+	delete [] D;
+	delete [] Dh;
 	D = new int [n]; D[0] = n;
 	Dh = new int [n]; Dh[0] = n;
 	exp = J.getItem().exp();
+
+	// choose primes to factor f
 	TIMING_START(fac_choosePrimes);
 	ok = choosePrimes( p, f );
 	TIMING_END_AND_PRINT(fac_choosePrimes, "time to choose the primes: ");
 	if ( ! ok ) {
-	    DEBOUTLN( cerr, "error: no good prime found to factorize ", f );
-	    ASSERT( 0, "error: no good prime found" );
+	    DEBOUTLN( cerr, "warning: no good prime found to factorize " << f );
+	    WARN( ok, "there occured an error.  We went out of primes p\n"
+		  "to factorize mod p.  Please send the example which caused\n"
+		  "this error to the authors.  Nonetheless we will go on with the\n"
+		  "calculations hoping the result will be correct.  Thank you.");
 	    ZF.append( CFFactor( f, exp ) );
+	    continue;
 	}
-	else {
-	    TIMING_START(fac_facModPrimes);
-	    for ( i = 0; i < MAX_FP_FAC; i++ ) {
-		setCharacteristic( p[i] );
-		fp = mapinto( f );
-		F[i] = FpFactorizeUnivariateCZ( fp, true );
+
+	// factorize f modulo certain primes
+	TIMING_START(fac_facModPrimes);
+	for ( i = 0; i < max_fp_fac; i++ ) {
+	    setCharacteristic( p[i] );
+	    fp = mapinto( f );
+	    F[i] = FpFactorizeUnivariateCZ( fp, true );
 //		if ( p[i] < 23 && fp.degree() < 10 )
 //		    F[i] = FpFactorizeUnivariateB( fp, true );
 //		else
 //		    F[i] = FpFactorizeUnivariateCZ( fp, true );
-		DEBOUTSL( cerr );
-		DEBOUT( cerr, "F[i] = " << F[i] << ", p = " << p[i] );
-		DEBOUTENDL( cerr );
-	    }
-	    TIMING_END_AND_PRINT(fac_facModPrimes, "time to factorize mod primes: ");
-	    setCharacteristic( 0 );
-#ifdef DEBUGOUTPUT
-	    DEBOUTLN( cerr, "D = ", ' ' );
-	    hprint( D );
-#endif
-	    initHG( D, F[0] );
-	    hgroup( D );
-#ifdef DEBUGOUTPUT
-	    DEBOUTLN( cerr, "D = ", ' ' );
-	    hprint( D );
-#endif
-	    for ( i = 1; i < MAX_FP_FAC; i++ ) {
-		initHG( Dh, F[i] );
-		hgroup( Dh );
-#ifdef DEBUGOUTPUT
-		DEBOUTLN( cerr, "Dh = ", ' ' );
-		hprint( Dh );
-#endif
-		hintersect( D, Dh );
-#ifdef DEBUGOUTPUT
-		DEBOUTLN( cerr, "D = ", ' ' );
-		hprint( D );
-#endif
+	    DEBOUTLN( cerr, "F[i] = " << F[i] << ", p = " << p[i] );
+	}
+	TIMING_END_AND_PRINT(fac_facModPrimes, "time to factorize mod primes: ");
+	setCharacteristic( 0 );
 
+	// do some strange things with the D's
+	initHG( D, F[0] );
+	hgroup( D );
+	DEBOUTHPRINT( cerr, "D = ", D );
+	for ( i = 1; i < max_fp_fac; i++ ) {
+	    initHG( Dh, F[i] );
+	    hgroup( Dh );
+	    DEBOUTHPRINT( cerr, "Dh = ", Dh );
+	    hintersect( D, Dh );
+	    DEBOUTHPRINT( cerr, "D = ", D );
+	}
+
+	// look which p gives the shortest factorization of f mod p
+	// j: index of that p in p[]
+	int min, j;
+	min = F[0].length(), j = 0;
+	for ( i = 1; i < max_fp_fac; i++ ) {
+	    if ( min >= F[i].length() ) {
+		j = i; min = F[i].length();
 	    }
-	    int min, j;
-	    min = F[0].length(), j = 0;
-	    for ( i = 1; i < MAX_FP_FAC; i++ ) {
-		if ( min >= F[i].length() ) {
-		    j = i; min = F[i].length();
-		}
-	    }
-	    k = kBound( f, p[j] );
-	    CFArray theFactors( F[j].length() );
+	}
+	k = kBound( f, p[j] );
+	CFArray theFactors( F[j].length() );
 //	    pk = power( CanonicalForm( p[j] ), k );
 //	    pkhalf = pk / 2;
-	    modpk pk( p[j], k );
-	    DEBOUTLN( cerr, "coeff bound = ", pk.getpk() );
-	    theModulus = pk;
-	    setCharacteristic( p[j] );
-	    fp = mapinto( f );
-	    F[j].sort( cmpFactor );
-	    I = F[j]; i = 0;
-	    TIMING_START(fac_liftFactors);
-	    while ( I.hasItem() ) {
-		DEBOUTLN( cerr, "factor to lift = ", I.getItem().factor() );
-		if ( isOn( SW_FAC_QUADRATICLIFT ) )
-		    ok = UnivariateQuadraticLift( f, I.getItem().factor(), fp / I.getItem().factor(), pk, lc( f ), dummy1, dummy2 );
-		else
-		    ok = UnivariateLinearLift( f, I.getItem().factor(), fp / I.getItem().factor(), pk, lc( f ), dummy1, dummy2 );
-		if ( ok ) {
-		    // should be done in a more efficient way
-		    DEBOUTLN( cerr, "dummy1 = ", dummy1 );
-		    DEBOUTLN( cerr, "dummy2 = ", dummy2 );
-		    f = dummy2;
-		    fp /= I.getItem().factor();
-		    ZF.append( CFFactor( dummy1, exp ) );
-		    I.remove( 0 );
-		    I = F[j];
-		    i = 0;
-		    DEBOUTLN( cerr, "F[j] = ", F[j] );
-		}
-		else {
-		    DEBOUTLN( cerr, "i = ", i );
-		    DEBOUTLN( cerr, "dummy1 = ", dummy1 );
-		    setCharacteristic( 0 );
-//		    theFactors[i] = pk( dummy1 * pk.inverse( lc( dummy1 ) ) );
-		    theFactors[i] = pk( dummy1 );
-		    setCharacteristic( p[j] );
-		    i++;
-		    I++;
-		}
+	modpk pk( p[j], k );
+	DEBOUTLN( cerr, "coeff bound = " << pk.getpk() );
+	theModulus = pk;
+	setCharacteristic( p[j] );
+	fp = mapinto( f );
+	F[j].sort( cmpFactor );
+	I = F[j]; i = 0;
+	TIMING_START(fac_liftFactors);
+	while ( I.hasItem() ) {
+	    DEBOUTLN( cerr, "factor to lift = " << I.getItem().factor() );
+	    if ( isOn( SW_FAC_QUADRATICLIFT ) )
+		ok = UnivariateQuadraticLift( f, I.getItem().factor(), fp / I.getItem().factor(), pk, lc( f ), dummy1, dummy2 );
+	    else
+		ok = UnivariateLinearLift( f, I.getItem().factor(), fp / I.getItem().factor(), pk, lc( f ), dummy1, dummy2 );
+	    if ( ok ) {
+		// should be done in a more efficient way
+		DEBOUTLN( cerr, "dummy1 = " << dummy1 );
+		DEBOUTLN( cerr, "dummy2 = " << dummy2 );
+		f = dummy2;
+		fp /= I.getItem().factor();
+		ZF.append( CFFactor( dummy1, exp ) );
+		I.remove( 0 );
+		I = F[j];
+		i = 0;
+		DEBOUTLN( cerr, "F[j] = " << F[j] );
 	    }
-	    TIMING_END_AND_PRINT(fac_liftFactors, "time to lift the factors: ");
-	    DEBOUTLN( cerr, "ZF = ", ZF );
-	    initHG( Dh, theFactors );
-	    hgroup( Dh );
-#ifdef DEBUGOUTPUT
-	    DEBOUTLN( cerr, "Dh = ", ' ' );
-	    hprint( Dh );
-#endif
-	    hintersect( D, Dh );
-	    setCharacteristic( 0 );
-	    for ( int l = i; l < F[j].length(); l++ )
-		theFactors[l] = 1;
-	    DEBOUTLN( cerr, "theFactors = ", theFactors );
-	    DEBOUTLN( cerr, "f = ", f );
-	    DEBOUTSL( cerr );
-	    DEBOUT( cerr, "p = " << pk.getp() << ", k = " << pk.getk() );
-	    DEBOUTENDL( cerr );
-#ifdef DEBUGOUTPUT
-	    DEBOUTLN( cerr, "D = ", ' ' );
-	    hprint( D );
-#endif
-	    lf = lc( f );
-	    (void)iextgcd( pk.getpk(), lf, dummy1, recip_lf );
-	    DEBOUTLN( cerr, "recip_lf = ", recip_lf );
-	    TIMING_START(fac_combineFactors);
-	    for ( i = 1; i < D[0]; i++ )
-		if ( D[i] != 0 )
-		    while ( liftDegreeFactRec( theFactors, f, recip_lf, lf, pk, 0, i, ZF, exp ) );
-	    if ( degree( f ) > 0 )
-		ZF.append( CFFactor( f, exp ) );
-	    TIMING_END_AND_PRINT(fac_combineFactors, "time to combine the factors: ");
+	    else {
+		DEBOUTLN( cerr, "i = " << i );
+		DEBOUTLN( cerr, "dummy1 = " << dummy1 );
+		setCharacteristic( 0 );
+//		    theFactors[i] = pk( dummy1 * pk.inverse( lc( dummy1 ) ) );
+		theFactors[i] = pk( dummy1 );
+		setCharacteristic( p[j] );
+		i++;
+		I++;
+	    }
 	}
+	TIMING_END_AND_PRINT(fac_liftFactors, "time to lift the factors: ");
+	DEBOUTLN( cerr, "ZF = " << ZF );
+	initHG( Dh, theFactors );
+	hgroup( Dh );
+	DEBOUTHPRINT( cerr, "Dh = ", Dh );
+	hintersect( D, Dh );
+	setCharacteristic( 0 );
+	for ( int l = i; l < F[j].length(); l++ )
+	    theFactors[l] = 1;
+	DEBOUTLN( cerr, "theFactors = " << theFactors );
+	DEBOUTLN( cerr, "f = " << f );
+	DEBOUTLN( cerr, "p = " << pk.getp() << ", k = " << pk.getk() );
+	DEBOUTHPRINT( cerr, "D = ", D );
+	lf = lc( f );
+	(void)iextgcd( pk.getpk(), lf, dummy1, recip_lf );
+	DEBOUTLN( cerr, "recip_lf = " << recip_lf );
+	TIMING_START(fac_combineFactors);
+	for ( i = 1; i < D[0]; i++ )
+	    if ( D[i] != 0 )
+		while ( liftDegreeFactRec( theFactors, f, recip_lf, lf, pk, 0, i, ZF, exp ) );
+	if ( degree( f ) > 0 )
+	    ZF.append( CFFactor( f, exp ) );
+	TIMING_END_AND_PRINT(fac_combineFactors, "time to combine the factors: ");
     }
+
+    // brush up our result
     if ( ZF.getFirst().factor().inCoeffDomain() )
 	ZF.removeFirst();
     if ( lc( ff ).sign() < 0 )
 	ZF.insert( CFFactor( -cont, 1 ) );
     else
 	ZF.insert( CFFactor( cont, 1 ) );
-    if ( D != 0 ) {
-	delete [] D;
-	delete [] Dh;
-    }
+    delete [] D;
+    delete [] Dh;
     if ( ! symmsave )
 	Off( SW_SYMMETRIC_FF );
+
+    DEBDECLEVEL( cerr, "ZFactorizeUnivariate" );
     return ZF;
 }
