@@ -1,8 +1,8 @@
-// $Id: deform.lib,v 1.17 1999-08-03 11:43:05 obachman Exp $
+// $Id: deform.lib,v 1.18 1999-08-19 15:19:52 obachman Exp $
 // author: Bernd Martin email: martin@math.tu-cottbus.de
 //(bm, last modified 4/98)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: deform.lib,v 1.17 1999-08-03 11:43:05 obachman Exp $";
+version="$Id: deform.lib,v 1.18 1999-08-19 15:19:52 obachman Exp $";
 info="
 LIBRARY:  deform.lib       PROCEDURES FOR COMPUTING MINIVERSAL DEFORMATION
 
@@ -26,20 +26,22 @@ proc versal (ideal Fo,list #)
 "USAGE:   versal(Fo[,d,any]); Fo=ideal, d=int, any=list
 COMUPTE: miniversal deformation of Fo up to degree d (default d=100),
 CREATE:  Rings (exported):
-         'my'Px = extending the basering Po by new variables given by \"A,B,..\"
-                  (deformation parameters), returns as basering,
-                  the new variables come before the old ones,
-                  the ordering is the product between \"ls\" and \"ord(Po)\",
-         'my'Qx = Px/Fo extending Qo=Po/Fo,
-         'my'So = being the embedding-ring of the versal base space,
-         'my'Ox = Px/Js extending So/Js.   (default my=\"\")
+         'my'Px = extending the basering Po by new variables given by 
+           \"A,B,..\" (deformation parameters), returns as basering, the 
+           new variables come before the old ones, the ordering is the 
+           product between \"ls\" and \"ord(Po)\"
+         @*'my'Qx = Px/Fo extending Qo=Po/Fo,
+         @*'my'So = being the embedding-ring of the versal base space,
+         @*'my'Ox = Px/Js extending So/Js.   (default my=\"\")
+
       Matrices (in Px, exported):
-         Js  = giving the versal base space (obstructions),
-         Fs  = giving the versal family of Fo,
-         Rs  = giving the lifting of Ro=syz(Fo).
+         @*Js  = giving the versal base space (obstructions),
+         @*Fs  = giving the versal family of Fo,
+         @*Rs  = giving the lifting of Ro=syz(Fo).
+
       If d is defined (!=0), it computes up to degree d.
-      If 'any' is defined and any[1] is no string, interactive version.
-      Otherwise 'any' gives predefined strings: \"my\",\"param\",\"order\",\"out\"
+      @*If 'any' is defined and any[1] is no string, interactive version.
+      @*Otherwise 'any' gives predefined strings: \"my\",\"param\",\"order\",\"out\"
       (\"my\" prefix-string, \"param\" is a letter (e.g. \"A\")  for the name of
       first parameter or (e.g. \"A(\") for index parameter variables, \"order\"
       ordering string for ring extension), \"out\" name of output-file).
@@ -288,15 +290,6 @@ example
    Js;"";
    // ___ Equations of miniversal total space ___:
    Fs;"";
-   if(system("with","Namespaces")) { kill Ring::Px,Top::Qx,Ring::So; }
-   kill Px,Qx,So;
-   ring  r2       = 0,(x,y,z),ds;
-   ideal Fo       = x2,xy,yz,zx;
-   printlevel     = 3;
-   versal(Fo);
-   printlevel     = p;
-   if(system("with","Namespaces")) { kill Ring::Px,Top::Qx,Ring::So; }
-   kill Px,Qx,So;
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc mod_versal(matrix Mo, ideal I, list #)
@@ -304,20 +297,22 @@ proc mod_versal(matrix Mo, ideal I, list #)
 USAGE:   mod_versal(Mo,I[,d,any]); I=ideal, M=module, d=int, any =list
 COMUPTE: miniversal deformation of coker(Mo) over Qo=Po/Io, Po=basering;
 CREATE:  Ringsr (exported):
-         'my'Px  = extending the basering by new variables
-                   (deformation parameters),
-                   the new variables come before the old ones,
-                   the ordering is the product between \"my_ord\" and \"ord(Po)\",
-         'my'Qx  = Px/Io extending Qo (returns as basering),
-         'my'Ox  = Px/(Io+Js) ring of the versal deformation of coker(Ms),
-         'my'So  = embedding-ring of the versal base space.  (default 'my'=\"\")
+         'my'Px  = extending the basering by new variables (deformation 
+                   parameters), the new variables come before the old ones,
+                   the ordering is the product between \"my_ord\" 
+                   and \"ord(Po)\"
+         @*'my'Qx  = Px/Io extending Qo (returns as basering),
+         @*'my'Ox  = Px/(Io+Js) ring of the versal deformation of coker(Ms),
+         @*'my'So  = embedding-ring of the versal base space.  (default 'my'=\"\")
+      
       Matrices (in Qx, exported):
-         Js  = giving the versal base space (obstructions),
-         Ms  = giving the versal family of Mo,
-         Ls  = giving the lifting of syzygies Lo=syz(Mo),
+         @*Js  = giving the versal base space (obstructions),
+         @*Ms  = giving the versal family of Mo,
+         @*Ls  = giving the lifting of syzygies Lo=syz(Mo),
+
       If d is defined (!=0), it computes up to degree d.
-      If 'any' is defined and any[1] is no string, interactive version.
-      Otherwise 'any' gives predefined strings:\"my\",\"param\",\"order\",\"out\"
+      @*If 'any' is defined and any[1] is no string, interactive version.
+      @*Otherwise 'any' gives predefined strings:\"my\",\"param\",\"order\",\"out\"
       (\"my\" prefix-string, \"param\" is a letter (e.g. \"A\")  for the name of
       first parameter or (e.g. \"A(\") for index parameter variables, \"ord\"
       ordering string for ringextension), \"out\" name of output-file).
@@ -546,8 +541,8 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc kill_rings(list #)
 "USAGE: kill_rings([string]);
-Sub-procedure: kills exported rings of 'versal' and
-               'mod_versal' with prefix 'string'
+RETURN: nothing, but kills exported rings generated by procedures
+        'versal' and 'mod_versal' with optional prefix 'string'
 "
 {
   string my,br;
@@ -703,15 +698,15 @@ Sub-procedure: compute infinitesimal family of a module and its syzygies
 //////////////////////////////////////////////////////////////////////////////
 proc lift_rel_kb (module N, module M, list #)
 "
-USAGE   lift_rel_kb(N,M[,kbaseM,p]);
-ASSUME  [p a monomial ] or the product of all variables
-        N, M modules of same rank,
-        M depending only on variables not in p and vdim(M) finite in this ring,
-        [ kbaseM the kbase of M in the subring given by variables not in p ]
-        warning: check that these assumtions are fulfilled!
-RETURN  matrix A, whose j-th columnes present the coeff's of N[j] in kbaseM,
-        i.e. kbaseM*A = reduce(N,std(M))
-EXAMPLE example lift_rel_kb;  shows examples
+USAGE:   lift_rel_kb(N,M[,kbaseM,p]);
+ASSUME:  [p a monomial ] or the product of all variables
+         N, M modules of same rank,
+         M depending only on variables not in p and vdim(M) finite in this ring,
+         [ kbaseM the kbase of M in the subring given by variables not in p ]
+         warning: check that these assumtions are fulfilled!
+RETURN:  matrix A, whose j-th columnes present the coeff's of N[j] in kbaseM,
+         i.e. kbaseM*A = reduce(N,std(M))
+EXAMPLE: example lift_rel_kb;  shows examples
 "
 {
   poly p = product(maxideal(1));
@@ -729,7 +724,7 @@ EXAMPLE example lift_rel_kb;  shows examples
 }
 example
 {
-  "EXAMPLE"; echo=2;
+  "EXAMPLE:"; echo=2;
   ring r=0,(A,B,x,y),dp;
   module M      = [x2,xy],[xy,y3],[y2],[0,x];
   module kbaseM = [1],[x],[xy],[y],[0,1],[0,y],[0,y2];
@@ -739,15 +734,6 @@ example
   print(A);
   "TEST:";
   print(matrix(kbaseM)*A-matrix(reduce(N,std(M))));
-  "2nd EXAMPLE";
-  ring   r = 100,(x,y),dp;
-  ideal  I = x2+y2,x2y;
-  module M = jacob(I)+I*freemodule(2);
-  module N = [x+y,1+x2+xy];
-  matrix A = lift_rel_kb(N,M);
-  print(A);
-  print(kbase(std(M))*A);
-  print(reduce(N,std(M)));
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc lift_kbase (N, M)
