@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: algmap.cc,v 1.18 2000-09-18 09:18:52 obachman Exp $ */
+/* $Id: algmap.cc,v 1.19 2000-12-08 12:45:28 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials from rings with
 * 'alg' numbers
@@ -44,7 +44,7 @@ static poly maLongalg1Fetch(poly res, poly p0, ring r0, int n,
       napGetCoeff(b0) = nacCopy(napGetCoeff(a0));
       for (i=1; i<=t; i++)
       {
-        napGetExp(b0,i) = napGetExp(a0,i);
+        napSetExp(b0,i,napGetExp(a0,i));
       }
     }
     else
@@ -101,7 +101,7 @@ static poly maLongalg2Fetch(poly res, poly p0, ring r0, int n, int s,
       napGetCoeff(b0) = nacCopy(napGetCoeff(a0));
       for (i=1; i<=s; i++)
       {
-        napGetExp(b0,i) = napGetExp(a0,i);
+        napSetExp(b0,i, napGetExp(a0,i));
       }
     }
     else
@@ -112,7 +112,7 @@ static poly maLongalg2Fetch(poly res, poly p0, ring r0, int n, int s,
     for (i=s+1; i<=t; i++)
     {
       j++;
-      napGetExp(b0,i) = p_GetExp(p0,j,r0);
+      napSetExp(b0,i, p_GetExp(p0,j,r0));
     }
     if (s==0)
     {
