@@ -46,7 +46,7 @@ int pSLength(poly p,int l)
   while (p!=NULL) { s+=nSize(pGetCoeff(p));pIter(p); }
   return s;
 }
-int kSBucketLength(kBucket* b)
+int kSBucketLength(kBucket* b, poly lm)
 {
   int s=0;
   int i;
@@ -60,7 +60,7 @@ int kSBucketLength(kBucket* b)
 
 #ifdef LEN_VAR3
 // 3.Variante: Laenge: Platz fuer Leitk * Monomanzahl
-int pSLength(poly p,int l)
+inline int pSLength(poly p,int l)
 {
   int c=nSize(pGetCoeff(p));
   return c*l /*pLength(p)*/;
@@ -4366,7 +4366,7 @@ static poly kBucketGcd(kBucket* b, ring r)
 
 static int guess_quality(const red_object & p, calc_dat* c){
   //looks only on bucket
-  if (c->is_char0) return kSBucketLength(p.bucket);
+  if (c->is_char0) return kSBucketLength(p.bucket,p.p);
   return (bucket_guess(p.bucket));
 }
 static int pQuality(poly p, calc_dat* c){
