@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.135 1999-08-06 14:06:47 obachman Exp $
+@comment $Id: reference.doc,v 1.136 1999-08-09 08:22:34 wichmann Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -3688,6 +3688,7 @@ See
 @ref{module};
 @ref{mres};
 @ref{res};
+@ref{resolution};
 @ref{sres}.
 @c ref
 @c ---------------------------------------
@@ -3743,15 +3744,18 @@ returns the number of variables of a ring.
 @item @strong{Example:}
 @smallexample
 @c example
-  ring r=23,(x,a(1..7)),ls;
+  ring r=(23,t,v),(x,a(1..7)),ls;
+  // the variables are x, a(1), ..., a(7)
   nvars(r);
 @c example
 @end smallexample
 @end table
 @c ref
 See
+@ref{npars};
 @ref{ring};
-@ref{var}.
+@ref{var};
+@ref{varstr}.
 @c ref
 @c ---------------------------------------
 @node open, option, nvars, Functions
@@ -3813,29 +3817,34 @@ restores the state of all options from an intvec (produced by @code{option(get)}
 @sp 1
 @item @strong{Values:}
 The following options are used to manipulate the behavior of
-computations:
+computations and act like boolean switches. Use the prefix @code{no} to
+disable an option.
 @table @asis
 @item @code{none}
 resets all options to the default
 @item @code{returnSB}
-the functions @code{syz},@code{intersect},@code{quotient},@code{modulo} return a standard base instead
-of a generating set if @code{returnSB} is set. This option should not be used for @code{lift}.
+the functions @code{syz}, @code{intersect}, @code{quotient},
+@code{modulo} return a standard base instead of a generating set if
+@code{returnSB} is set. This option should not be used for @code{lift}.
 @item @code{fastHC}
-tries to find HC (highest corner of the staircase) as fast as possible
-during a standard basis computation (only used for local orderings)
+tries to the find the highest corner of the staircase (HC) as fast as
+possible during a standard basis computation (only used for local
+orderings)
 @c @item @code{interrupt}
 @c allows fast interruption of standard basis computation
 @item @code{intStrategy}
 avoids divisions of coefficients during standard basis computations
 @item @code{minRes}
-special (additional) minimizing during computations (res,mres),
+special (additional) minimizing during computations (@code{res}, @code{mres}),
 @*assumes homogeneous case and degree-compatible ordering
 @item @code{morePairs}
-creates additional (useless) pairs to speed up computation in some cases
+creates additional (useless) pairs to speed up standard basis
+computation in some cases
 @item @code{notRegularity}
-disables the regularity bound for res/mres (see @ref{regularity})
+disables the regularity bound for @code{res} and @code{mres} (see
+@ref{regularity})
 @item @code{notSugar}
-disables the sugar strategy
+disables the sugar strategy during standard basis computation
 @item @code{prot}
 shows protocol information indicating the
 progress during the following computations:
@@ -3864,8 +3873,11 @@ automatically computes suitable weights for the weighted ecart and the
 weighted sugar method
 @end table
 @*
-There next options that control the behavior of the computations
-are not manipulated by the @code{option} command:
+The following options, which also control computations, are special,
+since they are not manipulated by the @code{option} command but by a
+direct assignment of a value. Reset the option by assigning the value 0;
+the command @code{option(none)} will not reset them! If there is a
+non-zero value assigned, the command @code{option()} prints the option.
 @table @asis
 @item @code{multBound}
 a multiplicity bound is set (see @ref{multBound})
@@ -3878,7 +3890,7 @@ The last set of options controls the output of @sc{Singular}:
 @item @code{Imap}
 shows the mapping of variables with the imap command
 @item @code{loadLib}
-shows loading of libraries (default)
+shows loading of libraries (set by default)
 @item @code{debugLib}
 warns about syntax errors during loading of libraries
 @item @code{loadProc}
@@ -3890,9 +3902,9 @@ shows prompt (@code{>} resp.@: @code{.}) if ready for input (default)
 @item @code{reading}
 shows the number of characters read from a file
 @item @code{redefine}
-warns about variable redefinitions (default)
+warns about variable redefinitions (set by default)
 @item @code{usage}
-shows correct usage in error messages (default)
+shows correct usage in error messages (set by default)
 @end table
 @item @strong{Example:}
 @smallexample
@@ -3996,13 +4008,14 @@ int
 returns the (weighted) degree of
 the initial term of a polynomial or a vector;
 the weights are the weights used for the first block of the ring ordering.
-@*@code{ord(0)} is @code{-1}.
+@item @strong{Note:}
+@code{ord(0)} is @code{-1}.
 @item @strong{Example:}
 @smallexample
 @c example
   ring r=7,(x,y),wp(2,3);
   ord(0);
-  poly f=x2+y3;
+  poly f=x2+y3;  // weight on y is 3
   ord(f);
   ring R=7,(x,y),ws(2,3);
   poly f=x2+y3;
@@ -4054,18 +4067,21 @@ See
 @item @strong{Type:}
 number
 @item @strong{Purpose:}
-returns the n-th parameter of the basering. This command should only be used if the basering
-has at least one parameter.
+returns the n-th parameter of the basering where n is given by the
+int_expression. This command should only be used if the basering has at
+least one parameter.
 @item @strong{Example:}
 @smallexample
 @c example
   ring r=(0,a,b,c),(x,y,z),dp;
-  par(2);
+  char(r);  // char to get the characteristic
+  par(2);   // par to get the n-th parameter
 @c example
 @end smallexample
 @end table
 @c ref
 See
+@ref{char};
 @ref{npars};
 @ref{parstr};
 @ref{ring};
@@ -4092,6 +4108,7 @@ returns the degree of a number considered as a polynomial in the ring parameters
 @end table
 @c ref
 See
+@ref{deg};
 @ref{number};
 @ref{ring};
 @ref{var}.
@@ -4109,8 +4126,9 @@ See
 string
 @item @strong{Purpose:}
 returns the list of parameters of the ring as a string
-or the name of the n-th parameter for an integer n.
-@*@code{parstr(n)} is equivalent to @code{parstr(basering,n)}.
+or the name of the n-th parameter where n is given by the int_expression.
+@*If the ring name is omitted, the basering is used, thus
+@code{parstr(n)} is equivalent to @code{parstr(basering,n)}.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -4172,6 +4190,7 @@ Hence there is no special command for computing the kernel of a map in
 @c ref
 See
 @ref{map};
+@ref{ideal};
 @ref{ring}.
 @c ref
 @c ---------------------------------------
@@ -4213,26 +4232,53 @@ See
 none (for the first two calling sequences)
 @*string (for the last calling sequence)
 @item @strong{Purpose:}
-prints expressions in a nice format, especially useful for matrices, modules
-and vectors.
-@*The second form uses a string to determine the format.
-@*The following format strings are supported:
+The first form prints the expression to the terminal and has no return
+value. Use the format string @code{%p} to print into a string (see
+below).
+@*The second form prints the graded Betti numbers from a matrix. See
+the description of the format string @code{"betti"} below for more
+details.
+@*The last form returns the printed output as a string. The format
+string determines, which format to use to generate the string. The
+following format strings are supported:
 @table @code
 @item "betti"
-displays the graded Betti numbers of
+given a matrix 
 @tex
-$R^n/M$, if $R$ denotes the basering and if $M$ is a homogeneous submodule of $R^n$:
+$M$
 @end tex
 @ifinfo
-R^n/M, if R denotes the basering and if M is a homogeneous submodule of R^n:
+M
 @end ifinfo
-@*The entry d at (i,j) is the minimal number of generators in degree i+j of
-the j-th syzygy module of
+(the result of a @code{betti} command), it displays
+the graded Betti numbers of
 @tex
-$R^n/M$ (the 0th (resp. 1st) syzygy module of $R^n/M$ is $R^n$ (resp.@: $M$))
+$R^n/M$, if $R$ denotes the basering and if $M$ is a homogeneous submodule of $R^n$.
 @end tex
 @ifinfo
-R^n/M (the 0th (resp. 1st) syzygy module of R^n/M is R^n (resp.@: M))
+R^n/M, if R denotes the basering and if M is a homogeneous submodule of R^n.
+@end ifinfo
+The Betti numbers are printed in a matrix like format where the entry
+@tex
+$d$ in row $i$ and column $j$
+@end tex
+@ifinfo
+d in row i and column j
+@end ifinfo
+is the minimal number of generators in
+degree 
+@tex
+$i+j$ of the $j$-th
+@end tex
+@ifinfo
+i+j of the j-th
+@end ifinfo
+syzygy module of
+@tex
+$R^n/M$ (the 0th and 1st syzygy module of $R^n/M$ is $R^n$ and $M$, resp).
+@end tex
+@ifinfo
+R^n/M (the 0th and 1st syzygy module of R^n/M is R^n and M, resp).
 @end ifinfo
 @item "%s"
 returns @code{string(} expression @code{)}
@@ -4251,9 +4297,9 @@ returns the string equivalent to typing @code{expression;}
 @item "%t"
 returns the string equivalent to typing @code{type expression;}
 @item "%p"
-returns the string equivalent to typing @code{print(expressions);}
+returns the string equivalent to typing @code{print(expression);}
 @item "%b"
-returns the string equivalent to typing @code{print(expressions, "betti");}
+returns the string equivalent to typing @code{print(expression, "betti");}
 @end table
 @item @strong{Example:}
 @smallexample
@@ -4272,7 +4318,6 @@ returns the string equivalent to typing @code{print(expressions, "betti");}
   s = print(l, "%s"); s;
   s = print(l, "%2s"); s;
   s = print(l, "%l"); s;
-  s = print("", "%2s"); size(s); s; // a simple newline
 @c example
 @end smallexample
 @end table
@@ -4451,29 +4496,31 @@ See
 @cindex random
 @table @code
 @item @strong{Syntax:}
-@code{random (} min_integer@code{,} max_integer @code{)}
+@code{random (} int_expression@code{,} int_expression @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-returns random integer between min_integer and max_integer.
+returns random integer between the integer given by the first
+int_expression and the number given by the second int_expression.
 @*
 @item @strong{Syntax:}
-@code{random (} max_integer@code{,} rows@code{,} cols @code{)}
+@code{random (} int_expression@code{,} int_expression@code{,} int_expression @code{)}
 @item @strong{Type:}
 intmat
 @item @strong{Purpose:}
-returns a random intmat of size rows x cols with entries between
--max_integer and +max_integer (inclusively).
+returns a random intmat where the size is given by the second (number of
+rows) and third argument (number of columns). The absolute value of the
+entries of the matrix is smaller than or equal to the integer given as
+the first argument.
 @item @strong{Note:}
 The random generator can be set to a startvalue with
-the function @code{system} by a commandline option.
+the function @code{system} and by a commandline option.
 @item @strong{Example:}
 @smallexample
 @c example
   random(1,1000);
   random(1,2,3);
-  // start the random generator with 210
-  system("random",210);
+  system("random",210);  // start random generator with 210
   random(-1000,1000);
   random(-1000,1000);
   system("random",210);
@@ -4504,17 +4551,16 @@ any
 reads data from a link.
 @*For ASCII links, the content of the entire
 file is returned as one string. If the ASCII link is the empty string,
-@code{read} reads from standard input the keyboard.
+@code{read} reads from standard input.
 @*For MP links, one expression is read
-from the link, and returned after an evaluation.
-As long as there is no data to read from an MPtcp
-link the @code{read} command blocks (i.e., does not return).
-The @code{status} command can be used to check whether or not
-there is data to read.
-@*For DBM links, a
-@code{read} with one argument returns the value of the next entry in the
-data base, and a @code{read} with two arguments returns the value to the
-key given as the second argument from the data base.
+from the link and returned after an evaluation.
+@*For MPtcp links the @code{read} command blocks as long as there is no
+data to read from the link. The @code{status} command can be used to
+check whether or not there is data to read.
+@*For DBM links, a @code{read} with one argument returns the value of
+the next entry in the data base, and a @code{read} with two arguments
+returns the value to the key given as the second argument from the data
+base.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -4570,7 +4616,7 @@ The result may have no meaning if the second argument is not a standard basis.
 @*The third (optional) argument 1 forces a reduction which considers
 only the leading term and does no tail reduction.
 @item @strong{Note:}
-@code{NF} may be used instead of @code{reduce}.
+The commands @code{reduce} and @code{NF} are synonymous.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -4585,14 +4631,10 @@ only the leading term and does no tail reduction.
 @c example
 @end smallexample
 @end table
-@menu
-* ideal::
-* vector::
-* std::
-@end menu
 @c ref
 See
 @ref{ideal};
+@ref{module};
 @ref{vector};
 @ref{std}.
 @c ref
@@ -4603,11 +4645,11 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{regularity (} list_expression @code{)}
-@code{regularity (} resolution_expression @code{)}
+@*@code{regularity (} resolution_expression @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-computes the regularity of a homogeneous ideal resp.@: module from a
+computes the regularity of a homogeneous ideal, resp.@: module from a
 minimal resolution given by the list expression.
 @*
 @ifinfo
@@ -4644,8 +4686,10 @@ the computation unless @code{option(notRegularity);} is given.
 @c ref
 See
 @ref{res};
+@ref{resolution};
 @ref{mres};
 @ref{sres};
+@ref{list};
 @ref{minres};
 @ref{option}.
 @c ref
@@ -4710,8 +4754,9 @@ $=M_i$
 @end tex
  in the notations from above).
 @item @strong{Note:}
-To access the elements of a resolution, it has to be assigned to a list,
-which also completes computations and may therefore take time.
+To access the elements of a resolution, it has to be assigned to a
+list. This my take some time since some further computations are
+necessary to do the assignment.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -4749,7 +4794,7 @@ none
 int
 @item @strong{Purpose:}
 prints a list of all reserved identifiers (first form) or tests
-whether the string is a reserved identifier.
+whether the string is a reserved identifier (second form).
 @item @strong{Example:}
 @smallexample
 reservedName();
@@ -4762,7 +4807,8 @@ reservedName();
 @end table
 @c ref
 See
-@ref{names}.
+@ref{names};
+@ref{string}.
 @c ref
 @c ---------------------------------------
 @node  resultant, rvar, reservedName, Functions
@@ -4803,8 +4849,10 @@ See
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-returns the number of the variable (hence its boolean value is TRUE) if the name is a ring variable
-or if the string is the name of a ring variable of the basering.
+returns the number of the variable if the name is a ring variable of the
+basering or if the string is the name of a ring variable of the
+basering; returns 0 if not. Hence the return value of @code{rvar} can
+also be used in a boolean context to check whether the variable exists.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -4849,10 +4897,10 @@ changes the basering to another (already defined) ring.
 @c example
 @end smallexample
 @item @strong{Use in procedures:}
-All changes of the basering by a definition
-of a new ring or a setring command in a procedure are local to this procedure.
-Use keepring to move a ring which is local to a procedure up by one nesting
-level.
+All changes of the basering by a definition of a new ring or a
+@code{setring} command in a procedure are local to this procedure.  Use
+@code{keepring} to move a ring which is local to a procedure up by one
+nesting level.
 
 @end table
 @c ref
@@ -4971,7 +5019,8 @@ returns the number of entries (rows*columns).
 @end smallexample
 @end table
 @c ref
-See @ref{string};
+See 
+@ref{string};
 @ref{intvec};
 @ref{intmat};
 @ref{poly};
@@ -4992,8 +5041,14 @@ See @ref{string};
 @item @strong{Type:}
 intvec
 @item @strong{Purpose:}
-computes the permutation v: I[i] -> I[v[i]]
-which orders the ideal, resp.@: module, by their initial term,
+computes the permutation 
+@tex
+$v\colon I[i]\leftarrow I[v[i]]$
+@end tex
+@ifinfo
+v: I[i] -> I[v[i]]
+@end ifinfo
+which orders the ideal, resp.@: module, by its initial terms,
 starting with the smallest.
 @item @strong{Example:}
 @smallexample
@@ -5005,7 +5060,6 @@ starting with the smallest.
 @end smallexample
 @end table
 @c ref
-@c See @ref{string expressions}; @ref{intvec expressions}; @ref{poly expressions};
 See
 @ref{general_lib}.
 @c ref
@@ -5072,8 +5126,9 @@ $=M_i$
 @end tex
  in the notations from above).
 @item @strong{Note:}
-To access the elements of a resolution, it has to be assigned to a list,
-which also completes computations and may therefore take time.
+To access the elements of a resolution, it has to be assigned to a
+list. This my take some time since some further computations are
+necessary to do the assignment.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -5124,7 +5179,7 @@ given and if @code{status(l,s1,s2)} yields @code{0}, then the execution
 of the current process is suspended (the process is put to ``sleep'')
 for approximately@: @code{i} microseconds, and afterwards the result of another
 call to @code{status(l,s1,s2)} is returned. The latter is useful for
-``polling'' the @code{read} status of @code{MPtcp} links such that busy
+``polling'' the @code{read} status of MPtcp links such that busy
 loops are avoided (see @ref{Parallelization with MPtcp links} for an
 example).  Note that on some systems, the minimum time for a process to
 be put to sleep is one second.
@@ -5188,23 +5243,23 @@ monomial ordering of the basering.
 A standard basis is a set of generators such that
 the leading terms generate the leading ideal, resp.@: module.
 @*Use an optional
-second argument of type @code{intvec} as Hilbert series
+second argument of type intvec as Hilbert series
 (result of @code{hilb(i,1)}, see @ref{hilb}),
 if the ideal, resp.@: module, is homogeneous,
 (Hilbert driven standard basis computation, @ref{stdhilb}).
 If the ideal is quasihomogeneous with some weights w and if the Hilbert series
 is computed w.r.t. to this weights, then use w as third argument if the ordering
 is not weighted degree with w.
+@*Use an optional second argument of type @code{poly}, resp.@ @code{vector}
+to construct the standard basis from an already computed one (given as the
+first argument) and one additional generator (the second argument).
 @item @strong{Note:}
 The
-standard basis is computed with a (more or less) brute-force
+standard basis is computed with a (more or less) straight-forward
 implementation of the classical
 Buchberger (resp.@: Mora) algorithm. For global orderings, use the
-@code{groebner} (@pxref{groebner}) command, instead, which heuristically
+@code{groebner} command instead (@pxref{groebner}), which heuristically
 chooses the "best" algorithm to compute a Groebner basis.
-@*Use an optional second argument of type @code{poly} resp.@ @code{vector}
-to construct the standard basis from an already computed one (givenn as the
-first argument) and one additional generator (the second argument).
 @item @strong{Example:}
 @smallexample
 @c example
@@ -5245,6 +5300,8 @@ See
 @ref{ring};
 @ref{option};
 @ref{facstd};
+@ref{fglm};
+@ref{groebner};
 @ref{mstd};
 @ref{stdfglm};
 @ref{stdhilb}.
@@ -5273,7 +5330,7 @@ See
 @*@code{subst (} ideal_expression@code{,} ring_variable@code{,} term @code{)}
 @*@code{subst (} module_expression@code{,} ring_variable@code{,} term @code{)}
 @item @strong{Type:}
-poly, vector, ideal or module (the same as the first argument)
+poly, vector, ideal or module (corresponding to the first argument)
 @item @strong{Purpose:}
 substitutes a ring variable by a term (a polynomial of length <=1).
 @item @strong{Example:}
@@ -5301,27 +5358,33 @@ See
 @cindex system
 @table @code
 @item @strong{Syntax:}
-@code{system (} expression_list @code{)}
-@sp 1
-the first expression must be of type string and selects the desired function.
+@code{system (} string_expression @code{)}
+@*@code{system (} string_expression@code{,} expression @code{)}
 @item @strong{Type:}
 depends on the desired function, may be none
 @item @strong{Purpose:}
-interface to internal data and the operating system.
+interface to internal data and the operating system. The
+string_expression determines the command to execute. Some commands
+require an additional argument (second form) where the type of the
+argument depends on the command. See below for a list of all possible
+commands.  
 @*Not all functions work on every platform.
 @item @strong{Functions:}
-@table @code
-@item @code{system("sh"},string_expression @code{)}
+@table @asis
+@item @code{system("sh"}, string_expression @code{)}
 @cindex sh
 @cindex system, sh
-shell escape, returns the return code of the shell
+shell escape, returns the return code of the shell as int. The string is
+sent literally to the shell.
 @item @code{system("pid")}
 @cindex pid
 @cindex system, pid
-returns the process number (for creating unique names)
-@item @code{system("getenv",}string_expression@code{)}
+returns the process number as int (for creating unique names)
+@item @code{system("getenv",} string_expression@code{)}
 @cindex getenv
 @cindex system, getenv
+returns the value of the shell environment variable given as the second
+argument. The return type is string.
 returns shell environment variable given as the second argument
 @item @code{system("setenv",}string_expression, string_expression@code{)}
 @cindex setenv
@@ -5336,42 +5399,44 @@ resets the terminal
 @item @code{system("version")}
 @cindex version
 @cindex system, version
-returns the version number of  @sc{Singular} (type int)
+returns the version number of  @sc{Singular} as int
 @item @code{system("contributors")}
 @cindex contributors
 @cindex system, contributors
-returns names of people who contributed to the Singular kernel
-@item @code{system("random"},int_expression @code{)}
+returns names of people who contributed to the Singular kernel as string
+@item @code{system("random"}, int_expression @code{)}
 @cindex random
 @cindex system, random
-resets the random generator to the given value and returns it (type int)
+resets the random generator to the given value and returns it as int
 @item @code{system("random")}
-returns the seed of the random generator (type int)
+returns the seed of the random generator as int
 @item @code{system("gen")}
 @cindex gen
 @cindex system, gen
 returns the generating element of the multiplicative
 group of Z/p\@{0@} (as int) where p is the characteristic of the
 basering
-@item @code{system("nblocks" [, ring])}
+@item @code{system("nblocks")}
+@item @code{system("nblocks",} ring_name @code{)}
 @cindex nblocks
 @cindex system, nblocks
-returns the number of blocks of @code{ring}, or the number of parameters
-of the current basering, if no second argument is given.
+returns the number of blocks of the given ring, or the number of parameters
+of the current basering, if no second argument is given. The return type
+is int.
 @item @code{system("Singular")}
 @cindex Singular
 @cindex system, Singular
-returns the absolute (path) name of the running @sc{Singular} (type string)
-@item @code{system("long_option_name")}
+returns the absolute (path) name of the running @sc{Singular} as string
+@item @code{system("}long_option_name@code{")}
 @cindex system, command-line option
-returns the value of the (command-line)
-option @code{"long_option_name"}; for on/off options, the return value is of type
-int and either 1 or 0; for all other options, the return type is
-string. @xref{Command line options}.
-@item @code{system("long_option_name", value)}
-sets the value of the (command-line)
-option @code{"long_option_name"} to @code{value}; can only be used for
-some options (e.g., for @code{--browser}). @xref{Command line options}.
+returns the value of the (command-line) option long_option_name; for
+on/off options, the return value is of type int and either 1 or 0; for
+all other options, the return type is string. @xref{Command line
+options}.
+@item @code{system("}long_option_name@code{",} expression@code{)}
+sets the value of the (command-line) option long_option_name to the
+value given by the expression. Can only be used for some options (e.g.,
+for @code{--browser}). @xref{Command line options}.
 @item @code{system("browsers");}
 @cindex system, browsers
 returns a string about available help browsers. 
@@ -5394,7 +5459,7 @@ system("Singular");
 system("--min-time");
 @expansion{} 0.5
 @end smallexample
-@item @strong{Example for MSDOS:}
+@item @strong{Example for Windows:}
 @smallexample
 // a listing of the current directory:
 system("sh","dir");
@@ -5416,8 +5481,8 @@ unique_name;
 @item @strong{Type:}
 module
 @item @strong{Purpose:}
-computes the first syzygy (i.e. the module of relations of the given generators)
-of the ideal, resp.@: module.
+computes the first syzygy (i.e., the module of relations of the given
+generators) of the ideal, resp.@: module.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -5446,7 +5511,8 @@ See
 @code{trace (} intmat_expression @code{)}
 @*@code{trace (} matrix_expression @code{)}
 @item @strong{Type:}
-int, resp.@: poly
+int, if the argument is an intmat
+@*poly, if the argument is a matrix
 @item @strong{Purpose:}
 returns the trace of an intmat, resp.@: matrix.
 @item @strong{Example:}
@@ -5473,7 +5539,7 @@ See
 @*@code{transpose (} matrix_expression @code{)}
 @*@code{transpose (} module_expression @code{)}
 @item @strong{Type:}
-same type as the argument
+intmat, matrix, or module, corresponding to the argument
 @item @strong{Purpose:}
 transposes a matrix.
 @item @strong{Example:}
@@ -5502,7 +5568,8 @@ See @ref{intmat};
 none
 @item @strong{Purpose:}
 prints the name, level, type and value of a variable. To display the
-value of an expression, it is sufficient to type @code{expression;}.
+value of an expression, it is sufficient to type the expression followed
+by @code{;}.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -5552,14 +5619,13 @@ Possible types are:
 @code{"string"},
 @code{"vector"}.
 
-For internal use only are the types
-@code{"package"},
+For internal use only is the type
+@c @code{"package"},
 @code{"?unknown type?"}.
 @item @strong{Example:}
 @smallexample
 @c example
-  int i = 9;
-  i;
+  int i = 9; i;
   typeof(_);
   print(i);
   typeof(_);
@@ -5576,6 +5642,7 @@ For internal use only are the types
 @end table
 @c ref
 See
+@ref{type};
 @ref{Data types}.
 @c ref
 @c ---------------------------------------
@@ -5609,7 +5676,7 @@ TBC (wenk)
 @item @strong{Type:}
 poly
 @item @strong{Purpose:}
-returns the n-th ring variable for a given integer n.
+returns the n-th ring variable where n is given by the int_expression.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -5638,8 +5705,10 @@ See
 string
 @item @strong{Purpose:}
 returns the list of the names of the ring variables as a string
-or the name of the n-th ring variable for a given integer n.
-@*@code{varstr(n)} is equivalent to @code{varstr(basering,n)}.
+or the name of the n-th ring variable, where n is given by the
+int_expression. 
+@*If the ring name is omitted, the basering is used, thus
+@code{varstr(n)} is equivalent to @code{varstr(basering,n)}.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -5671,13 +5740,13 @@ See
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-computes the vector space dimension of the ring (resp.@: free module)
-modulo the ideal (resp.@: module)
+computes the vector space dimension of the ring, resp.@: free module, 
+modulo the ideal, resp.@: module, 
 generated by the initial terms of the given generators.
-If the generators are  a standard basis,
-this is the same as the vector space dimension of the ring (resp.
-free module) modulo the ideal (resp.@: module).
-@*If the ideal (resp.@: module) is not zero-dimensional, -1 is returned
+If the generators form a standard basis,
+this is the same as the vector space dimension of the ring, resp.
+free module modulo the ideal, resp.@: module.
+@*If the ideal, resp.@: module, is not zero-dimensional, -1 is returned.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -5707,7 +5776,8 @@ See
 @item @strong{Type:}
 matrix
 @item @strong{Purpose:}
-computes the nth exterior power of a given matrix for a given integer n.
+computes the n-th exterior power of a given matrix where n is given by
+the int_expression.
 @item @strong{Example:}
 @smallexample
 @c example
