@@ -17,10 +17,12 @@ bindir		= @bindir@
 TEMPDIR		= /tmp
 
 
+##############################################################
 # default target
 ${SINGULAR}:
 	${MAKE} install
 
+# general targets
 # simply descend for these targets
 all install uninstall: Makefile 
 	for SUBDIR in ${BUILD_SUBDIRS}; \
@@ -32,7 +34,7 @@ all install uninstall: Makefile
 	done
 
 # clean up in all subdirectories known to us
-clean distclean mostlyclean maintainer-clean: 
+clean distclean mostlyclean maintainer-clean: uninstall
 	for SUBDIR in ${SUBDIRS}; \
 	do \
 	  echo ${MAKE} $@ in $${SUBDIR}; \
@@ -42,26 +44,48 @@ clean distclean mostlyclean maintainer-clean:
 	done; \
 	rm -rf *~ a.out core *.o *.log; \
 	if test "$@" = distclean || test "$@" = maintainer-clean; then \
-	  rm -rf Makefile config.cache config.log config.status TAGS* *.gz *.tar; \
-	fi; \
+	  rm -rf Makefile config.cache config.log config.status TAGS* *.gz *.tar;\
+	fi 
 	if test "$@" = maintainer-clean; then \
 	  echo "This command is intended for maintainer use, only"; \
 	  rm -rf configure;\
 	fi
 
+##############################################################
 # some extra targets for the specific packages
+${SINGULAR} :
+	${MAKE} install
+
 Singular factory libfac MP gmp:
 	cd $@; ${MAKE} all
 
+##############################################################
 # documentation
-info dvi ps doc doc/singular.hlp: ${SINGULAR} 
+info dvi ps doc/singular.hlp: ${SINGULAR} 
 	cd doc; ${MAKE} $@
 
-info/singular.hlp:
+doc info/singular.hlp: ${SINGULAR}		
 	cd doc; ${MAKE} install
 
-# remaking Makefile
-Makefile: Makefile.in config.status
+##############################################################
+# Tst targets
+Tst-All: Tst-Old Tst-Short Tst-Long
+
+Tst: Tst-Old Tst-Short
+
+Tst-Old: ${SINGULAR} Tst/Old/universal.lst Tst/regress.cmd
+	Tst/regress.cmd -s ${SINGULAR} Tst/Old/universal.lst
+
+Tst-Short: ${SINGULAR} Tst/Short Tst/regress.cmd
+	Tst/regress.cmd -s ${SINGULAR} Tst/Short/*.tst
+
+Tst-Long:  ${SINGULAR} Tst/Short Tst/regress.cmd
+	Tst/regess.cmd -s ${SINGULAR} Tst/Long/*.tst
+
+
+##############################################################
+#stuff for configure
+Makefile : Makefile.in config.status
 	./config.status
 
 config.status: configure

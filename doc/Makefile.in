@@ -94,24 +94,18 @@ maintainer-clean: distclean
 	@echo "Rebuilding the deleted files requires makeinfo, tex and texindex"
 	/bin/rm -f *.dvi singular.hlp configure ${SINGULAR_OBJS}
 
-singular.tex :  singular.doc  doc2tex ${SINGULAR}
-	./doc2tex ${SINGULAR} singular
-	echo expect one error
-	-grep "error occurred" singular.tex
-
 %.tex: %.doc doc2tex ${SINGULAR}
 	./doc2tex ${SINGULAR} $*
 	-grep "error occurred" $@
-
 
 doc2tex: doc2tex.c
 	$(CC) doc2tex.c -o doc2tex
 
 ${SINGULAR}: 
-	cd ${prefix}; ${MAKE} ${SINGULAR}
+	cd ..; ${MAKE} ${SINGULAR}
 
 Makefile: Makefile.in
-	cd ${prefix}; ${MAKE} Makefile
+	cd ..; ${MAKE} Makefile
 
 #examples.tex: examples.doc
 #general.tex: general.doc

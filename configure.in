@@ -25,11 +25,6 @@ AC_SUBST(SINGULAR_MAJOR_VERSION)
 AC_SUBST(SINGULAR_MINOR_VERSION)
 AC_SUBST(SINGULAR_SUB_VERSION)
 
-# construct name of installed Singular executable
-SINGULAR=${bindir}/Singular-${SINGULAR_MAJOR_VERSION}.${SINGULAR_MINOR_VERSION}.${SINGULAR_SUB_VERSION}
-export SINGULAR
-AC_SUBST(SINGULAR)
-
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Those are needed to check for libs and headers, later on
@@ -80,6 +75,10 @@ if test "x$includedir" = 'x${prefix}/include'; then
   ac_configure_args="$ac_configure_args --includedir=${includedir}"
 fi
 
+# construct name of installed Singular executable
+SINGULAR=${bindir}/Singular-${SINGULAR_MAJOR_VERSION}.${SINGULAR_MINOR_VERSION}.${SINGULAR_SUB_VERSION}
+export SINGULAR
+AC_SUBST(SINGULAR)
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Check for various libraries and headers
@@ -181,7 +180,10 @@ AC_ARG_WITH(libfac, \
  [    libfac               char set and modp poly factorization library])
 AC_ARG_WITH(gmp, \
  [ --with-apint=PACKAGE    use PACKAGE for arbitary integer arithmetic
-                          where PACKAGE can be gmp or smallgmp])
+                          where PACKAGE can be gmp or smallgmp
+All additional --enable and --with options are passed to subsequent calls 
+to configure of the packages to be built. See also configure --help in 
+these packages (resp. subdirs). ])
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Check whether or not to configure and build various packages
@@ -404,7 +406,9 @@ elif test "$with_apint" = smallgmp; then
 elif test "$ac_gmp_ok" = yes || test "$enable_gmp"; then
     AC_MSG_RESULT(gmp)
     ac_configure_args="$ac_configure_args --with-apint=gmp"
-else
+else 
+dnl now we are sure that we have the smallgmp --otherwise enable
+dnl checks had thrown an error
    AC_MSG_RESULT(smallgmp)
    ac_configure_args="$ac_configure_args --with-apint=smallgmp"
 fi

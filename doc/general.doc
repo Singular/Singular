@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.101 1998-06-03 10:04:28 obachman Exp $
+@comment $Id: general.doc,v 1.102 1998-06-04 13:59:33 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -238,7 +238,7 @@ saves the current line to the history and
 sends it to the @sc{Singular} parser for interpretation
 @end table
 
-On Unix-like operating systems and on Windows NT, @sc{Singular}
+On Unix-like operating systems, @sc{Singular}
 maintains a history of the last lines of input.  If the environment
 variable @code{SINGULARHIST} is set and has a name of a file as value, 
 then the input history is stored across sessions using this
