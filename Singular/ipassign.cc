@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.38 1998-10-22 12:26:14 krueger Exp $ */
+/* $Id: ipassign.cc,v 1.39 1998-10-29 09:50:43 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -830,7 +830,7 @@ static BOOLEAN jiA_VECTOR_L(leftv l,leftv r)
   return FALSE;
 }
 static BOOLEAN jjA_L_LIST(leftv l, leftv r)
-/* left side: list
+/* left side: list, has to be a "real" variable
 *  right side: expression list
 */
 {
@@ -857,7 +857,7 @@ static BOOLEAN jjA_L_LIST(leftv l, leftv r)
     {
       L->Clean();
       Werror("`%s` is undefined",h->Fullname());
-      return TRUE;
+      goto err;
     }
     //if ((rt==RING_CMD)||(rt==QRING_CMD))
     //{
@@ -867,6 +867,11 @@ static BOOLEAN jjA_L_LIST(leftv l, leftv r)
     //}
     //else
       L->m[i].Copy(h);
+      if(errorreported)
+      {
+        L->Clean();
+        goto err;
+      }
   }
   IDLIST((idhdl)l->data)->Clean();
   IDLIST((idhdl)l->data)=L;
@@ -881,56 +886,9 @@ static BOOLEAN jjA_L_LIST(leftv l, leftv r)
   else
 #endif /* HAVE_NAMESPACES */
     ipMoveId((idhdl)l->data);
-  o_r->CleanUp();
-  return FALSE;
-}
-static BOOLEAN jiA_L_LIST(leftv l, leftv r)
-/* left side: list
-*  right side: expression list
-*/
-{
-  int sl = r->listLength();
-  lists L=(lists)Alloc(sizeof(slists));
-  leftv h=NULL,o_r=r;
-  int i;
-  int rt;
-
-  L->Init(sl);
-  for (i=0;i<sl;i++)
-  {
-    if (h!=NULL) { /* e.g. not in the first step:
-                   * h is the pointer to the old sleftv,
-                   * r is the pointer to the next sleftv
-                   * (in this moment) */
-                   h->next=r;
-                 }
-    h=r;
-    r=r->next;
-    h->next=NULL;
-    rt=h->Typ();
-    if ((rt==0)||(rt==DEF_CMD))
-    {
-      Werror("`%s` is undefined",h->Fullname());
-      goto err;
-    }
-    if ((rt==RING_CMD)||(rt==QRING_CMD))
-    {
-      L->m[i].rtyp=rt;
-      L->m[i].data=h->Data();
-      ((ring)L->m[i].data)->ref++;
-    }
-    L->m[i].Copy(h);
-    if(errorreported)  goto err;
-  }
-  IDLIST((idhdl)l->data)->Clean();
-  IDLIST((idhdl)l->data)=L;
-  ipMoveId((idhdl)l->data);
-  o_r->CleanUp();
-  return FALSE;
 err:
   o_r->CleanUp();
-  L->Clean();
-  return TRUE;
+  return errorreported;
 }
 static BOOLEAN jjA_L_INTVEC(leftv l,leftv r,intvec *iv)
 {
