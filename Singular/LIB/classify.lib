@@ -1,8 +1,8 @@
-// $Id: classify.lib,v 1.31 1999-05-28 09:31:35 krueger Exp $
+// $Id: classify.lib,v 1.32 1999-06-15 12:50:31 Singular Exp $
 // KK, last modified: 04.04.1998
 ///////////////////////////////////////////////////////////////////////////////
 
-version  = "$Id: classify.lib,v 1.31 1999-05-28 09:31:35 krueger Exp $";
+version  = "$Id: classify.lib,v 1.32 1999-06-15 12:50:31 Singular Exp $";
 info="
 LIBRARY:  classify.lib  PROCEDURES FOR THE ARNOLD-CLASSIFIER OF SINGULARITIES
 
@@ -2542,7 +2542,7 @@ EXAMPLE:  example corank; shows an example"
 {
   matrix M = jacob(jacob(jet(f,2)));
   list lba = bareiss(M);
-  int cr = nvars(basering) - size(module(transpose(lba[1])));
+  int cr = nvars(basering) - size(module(lba[1]));
   return(cr);
 }
 example
