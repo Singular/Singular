@@ -1,9 +1,9 @@
-// $Id: elim.lib,v 1.4 1998-05-05 11:55:22 krueger Exp $
+// $Id: elim.lib,v 1.5 1999-07-01 15:51:50 Singular Exp $
 // system("random",787422842);
 // (GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: elim.lib,v 1.4 1998-05-05 11:55:22 krueger Exp $";
+version="$Id: elim.lib,v 1.5 1999-07-01 15:51:50 Singular Exp $";
 info="
 LIBRARY:  elim.lib      PROCEDURES FOR ELIMINATIOM, SATURATION AND BLOWING UP
 
@@ -219,7 +219,7 @@ EXAMPLE: example sat; shows an example
       i=quotient(id,j);
       for( ii=1; ii<=size(i); ii=ii+1 )
       {
-         if( reduce(i[ii],id)!=0 ) break;
+         if( reduce(i[ii],id,1)!=0 ) break;
       }
       id=std(i); kk=kk+1;
    }
