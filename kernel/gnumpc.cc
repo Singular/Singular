@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.cc,v 1.1.1.1 2003-10-06 12:15:53 Singular Exp $ */
+/* $Id: gnumpc.cc,v 1.2 2005-01-18 08:53:45 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP complex floating-point numbers
 *
@@ -163,11 +163,13 @@ number ngc_Copy(number a, ring r)
 /*2
 * za:= - za
 */
+gmp_complex ngc_m1(-1);
+
 number ngcNeg (number a)
 {
   if ( a == NULL ) return NULL;
-  number m1=nInit(-1);
-  a=ngcMult(m1,a);
+  gmp_complex* r=(gmp_complex*)a;
+  (*r) *= ngc_m1;
   return (number)a;
 }
 
