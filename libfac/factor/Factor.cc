@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.7 2001-06-21 14:57:05 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.8 2001-08-06 08:32:54 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -526,7 +526,7 @@ Factorized( const CanonicalForm & F, const Variable & alpha, int Mainvar){
       DEBOUTLN(cout, "Univ. Factorization over extension of degree ",
                degree(getMipo(Extension,'x')) );
       TIMING_START(evaluate_time);
-     #if 0 	       
+     #if 1
       Outputlist = factorize(F,Extension);
      #else
       Variable X;
@@ -636,7 +636,7 @@ Factorized( const CanonicalForm & F, const Variable & alpha, int Mainvar){
     else{
       DEBOUTLN(cout, "Univ. Factorization over extension of degree ",
                degree(getMipo(Extension,'x')) );
-     #if 0 	       
+     #if 1
       UnivariateFactorlist = factorize(ffuni,Extension);
      #else
       Variable X;
@@ -822,6 +822,9 @@ Factorize( const CanonicalForm & F, int is_SqrFree ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.7  2001/06/21 14:57:05  Singular
+*hannes/GP: Factorize, newfactoras, ...
+
 Revision 1.6  2001/06/18 08:44:41  pfister
 * hannes/GP/michael: factory debug, Factorize
 

@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: charset.cc,v 1.7 2001-06-27 13:58:06 Singular Exp $";
+static char * rcsid = "$Id: charset.cc,v 1.8 2001-08-06 08:32:53 Singular Exp $";
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -580,7 +580,7 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible){
           else
           {
 #ifdef SINGULAR
-            WarnS("libfac: Factoring over algebraic function field required!");
+            //WarnS("libfac: Factoring over algebraic function field required!");
 #else
 #ifndef NOSTREAMIO
             cerr << "libfac: Factoring over algebraic function field!" << endl;
@@ -598,6 +598,9 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible){
 ///////////////////////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.7  2001/06/27 13:58:06  Singular
+*hannes/GP: debug newfactoras, char_series, ...
+
 Revision 1.6  2000/03/08 12:54:35  obachman
  * comment out warning "libfac: Factoring over algebraic function
    field required!"

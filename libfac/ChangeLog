@@ -1,71 +1,75 @@
+Thu Jun 28 18:27:55 CEST 2001 Hans Schoenemann <hannes@mathematik.uni-kl.de>
+
+       * fixes to resultant, newfactoras, IrrCharSeries, Factorize
+
 Tue Apr 10 15:34:04 CEST 2001 Hans Schoenemann <hannes@mathematik.uni-kl.de>
 
        * changed copyright notice to GPL
 
 Wed Jun 03 14:42:51 1998    <pohl@FUECHSE>
 
-	* Makefile.in (CPPFLAGS): include paths fixed so that Windows
-	NT will find Factor.h before factor.h 
+        * Makefile.in (CPPFLAGS): include paths fixed so that Windows
+        NT will find Factor.h before factor.h
 
 1998-05-25  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* charset/alg_factor.cc: replaced identifiers 'random' by
-	'myrandom' to avoid name conflicts with the built-in (stdlib)
-	library function 'random' which might be a macro -- and, actually
-	is  under gcc v 2.6.3
-	
+        * charset/alg_factor.cc: replaced identifiers 'random' by
+        'myrandom' to avoid name conflicts with the built-in (stdlib)
+        library function 'random' which might be a macro -- and, actually
+        is  under gcc v 2.6.3
+
 
 Wed Apr 22 16:12:16 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
-	* header.tpl, factor.h, factor/version.cc (libfac_name,
-	  libgac_version, libfac_date, libfac_athur): defined/declared
- 	  const
+        * header.tpl, factor.h, factor/version.cc (libfac_name,
+          libgac_version, libfac_date, libfac_athur): defined/declared
+           const
 
 Thu Mar 12 14:32:06 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
-	* charset/csutil.cc, charset/alg_factor.cc: all references to
-	  `common_den()' replaced by `bCommonDen()'
+        * charset/csutil.cc, charset/alg_factor.cc: all references to
+          `common_den()' replaced by `bCommonDen()'
 
 Fri Feb 27 11:32:02 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
-	* factor/tmpl_inst.cc: template names adapted (`*.cc' ->
-	  `ftmpl_*.cc')
+        * factor/tmpl_inst.cc: template names adapted (`*.cc' ->
+          `ftmpl_*.cc')
 
 Tue May 13 11:32:11 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* Makefile.in (uninstall): took out template installation
-	(all): added OPTOBJ target so that the dir is created, if necessary
+        * Makefile.in (uninstall): took out template installation
+        (all): added OPTOBJ target so that the dir is created, if necessary
 
 Sun May 25 14:06:12 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* configure.in: Fixed handling of CXXFLAGS -- it is not touched if
-	  set as env var
+        * configure.in: Fixed handling of CXXFLAGS -- it is not touched if
+          set as env var
 
 Fri May 23 11:10:18 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* configure.in (CXXFLAGS): Check whether they are set before value
-	  is assigned 
+        * configure.in (CXXFLAGS): Check whether they are set before value
+          is assigned
 
 Tue May 13 20:09:03 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* configure.in: Exit with error if factory.h was not found and
-	  --enable-factory option was not explicitely given
+        * configure.in: Exit with error if factory.h was not found and
+          --enable-factory option was not explicitely given
 
 Tue May 13 11:32:11 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* Makefile.in (uninstall): took out template installation
+        * Makefile.in (uninstall): took out template installation
 
 Tue May  6 09:30:51 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* Added ranlib after installing libs -- Suns seem to need it
+        * Added ranlib after installing libs -- Suns seem to need it
 
-	* configure.in: Manuallu put INSTALL into Makefile.in
+        * configure.in: Manuallu put INSTALL into Makefile.in
 
 Mon May  5 15:43:58 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* added installation of templates
+        * added installation of templates
 
 Sat May  3 19:58:53 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
-	* Makefile.in (CPPFLAGS): Put -I. before other CPPFLAGS
+        * Makefile.in (CPPFLAGS): Put -I. before other CPPFLAGS
 
