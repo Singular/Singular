@@ -4,7 +4,7 @@
 
 //**************************************************************************/
 //
-// $Id: sing_dbm.cc,v 1.18 2001-10-09 16:36:22 Singular Exp $
+// $Id: sing_dbm.cc,v 1.19 2005-03-25 17:13:06 levandov Exp $
 //
 //**************************************************************************/
 //  'sing_dbm.cc' containes command to handle dbm-files under
@@ -27,12 +27,12 @@
 #  include "silink.h"
 #  include "sing_dbm.h"
 
-#ifdef ix86_Win
-#  define USE_GDBM
-#  define BLOCKSIZE 1
-#  define GDBM_STATIC
-#  include <gdbm.h>
-#endif
+// #ifdef ix86_Win
+// #  define USE_GDBM
+// #  define BLOCKSIZE 1
+// #  define GDBM_STATIC
+// #  include <gdbm.h>
+// #endif
 
 #ifdef USE_GDBM
 typedef struct {

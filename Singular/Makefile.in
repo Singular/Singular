@@ -69,7 +69,7 @@ STATIC_LDFLAGS	= @STATIC_LDFLAGS@
 ifneq ($(SINGUNAME),ix86-Win)
 LIBS		= -lm @NEED_LIBS@ 
 else
-LIBS		= -lsingfac -lsingcf -lntl -lgmp -static -lgdbm -lreadline -lncurses
+LIBS		= -lsingfac -lsingcf -lntl -lgmp -static -lreadline -lncurses
 endif
 MP_LIBS		= @MP_LIBS@
 DL_KERNEL	= @DL_KERNEL@

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.44 2004-01-22 15:01:22 Singular Exp $ */
+/* $Id: silink.cc,v 1.45 2005-03-25 17:13:05 levandov Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -24,11 +24,11 @@
 #include "numbers.h"
 #include "intvec.h"
 
-#ifdef HAVE_DBM
-#ifdef ix86_Win
-#define USE_GDBM
-#endif
-#endif
+// #ifdef HAVE_DBM
+// #ifdef ix86_Win
+// #define USE_GDBM
+// #endif
+// #endif
 
 omBin s_si_link_extension_bin = omGetSpecBin(sizeof(s_si_link_extension));
 omBin sip_link_bin = omGetSpecBin(sizeof(sip_link));
