@@ -1,13 +1,12 @@
-// (anne, last modified 23.5.00)
+// (anne, last modified 23.5.00) last modified: 12.12.2000
 /////////////////////////////////////////////////////////////////////////////
-version="$Id: stratify.lib,v 1.6 2001-01-16 13:48:44 Singular Exp $";
+version="$Id: stratify.lib,v 1.7 2001-01-31 17:49:53 Singular Exp $";
 category="Invariant theory";
 info="
 LIBRARY: stratify.lib   Algorithmic Stratification for Unipotent Group-Actions
 AUTHOR:  Anne Fruehbis-Krueger, anne@mathematik.uni-kl.de
-last modified: 12.12.2000
 
-Procedures:
+PROCEDURES:
   prepMat(M,wr,ws,step);  list of submatrices corresp. to given filtration
   stratify(M,wr,ws,step); algorithmic stratifcation (main procedure)
 ";
