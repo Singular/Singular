@@ -1,7 +1,7 @@
-// $Id: standard.lib,v 1.26 1998-10-15 11:46:10 obachman Exp $
+// $Id: standard.lib,v 1.27 1999-02-10 14:30:42 siebert Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.26 1998-10-15 11:46:10 obachman Exp $";
+version="$Id: standard.lib,v 1.27 1999-02-10 14:30:42 siebert Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
@@ -413,10 +413,25 @@ proc res(list #)
    //LaScala for the homogeneous case
    if(homog(m)==1)
    {
-      resolution re=lres(m,i);
-      if(size(#)>2)
+      resolution re;
+      if ((i==0) or (i>=nvars(basering)))
       {
-         re=minres(re);
+        re=lres(m,i);
+        if(size(#)>2)
+        {
+           re=minres(re);
+        }
+      }
+      else
+      {
+        if(size(#)>2)
+        {
+          re=mres(m,i);
+        }
+        else
+        {
+          re=sres(std(m),i);
+        }
       }
       return(re);
    }
