@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.70 1999-07-22 14:47:57 pohl Exp $
+@comment $Id: singular.doc,v 1.71 1999-07-23 12:09:07 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -8,7 +8,7 @@
 @c ------------------------
 @setfilename singular.hlp
 @settitle Singular Manual
-@setchapternewpage odd
+@c @setchapternewpage odd
 @paragraphindent 0
 @c ------------------------
 @c %**end of header

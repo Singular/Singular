@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.132 1999-07-23 08:32:34 pohl Exp $
+@comment $Id: general.doc,v 1.133 1999-07-23 12:09:07 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -450,8 +450,11 @@ transcendental extension of @math{Q} or @math{Z/p},
 @item
 simple algebraic extension of @math{Q} or @math{Z/p},
 @item
-the field of real numbers represented by simple precision floating point
-numbers.
+the field of real numbers represented by floating point
+numbers of a user defined precision.
+@item
+the field of complex numbers represented by (pairs of) floating point
+numbers of a user defined precision.
 @end enumerate
 
 Throughout this manual, the current active ring in @sc{Singular} is
@@ -591,7 +594,8 @@ ring r = (7^2,a),(x,y,z),dp;
 
 @item
 the ring @math{R'[x,y,z]}, where @math{R'} denotes the field of real
-numbers represented by simple precision floating point numbers:
+numbers represented by simple precision floating point numbers
+(i.e. with 3 valid decimal digits):
 
 @smallexample
 ring r = real,(x,y,z),dp;
@@ -617,7 +621,7 @@ ring r = (real,50,i),(x,y,z),dp;
 
 @item
 the ring @math{R''(i)[x,y,z]}, where @math{R''} denotes the field of real
-numbers represented by floating point numbers of 6 valid decimal digits
+numbers represented by floating point numbers of 3 valid decimal digits
 and @math{i} denotes the imaginary unit.
 
 @smallexample
@@ -697,10 +701,22 @@ are faster than arithmetic operations in algebraic extensions as
 described above.
 
 @item
-the name @code{real}.
-@* This specifies the field of real numbers represented as machine
-floating point numbers. Note that computations over this field are not
-exact.
+the name @code{real},
+optionally followed by an int giving the precision in decimal digits.
+@* This specifies the field of real numbers represented as floating point
+numbers.
+These numbers are implemented as machine floating point numbers
+of single precision (for a not given precision or a precision smaller 4).
+Note that computations over this field are not exact.
+
+@item
+an expression_list of the name real, an optional int_expression and a name.
+@* This specifies the field of complex numbers represented with floating point
+numbers with an precision given by the int expression (default: 3).
+@*The name of the imaginary unit is given by the last parameter.
+@*These numbers are implemented with machine floating point numbers
+of single precision (for a precision smaller 4).
+Note that computations over this field are not exact.
 @end enumerate
 
 The names_of_ring_variables is a list of names or indexed names.
@@ -1061,9 +1077,6 @@ method. The input has to be a standard basis.
 @ref{nres}@*
 computes a free resolution of an ideal or module with the standard basis
 method.
-@item minres
-@ref{minres}@*
-minimizes a free resolution of an ideal or module.
 @item syz
 @ref{syz}@*
 computes the first Syzygy (i.e., the module of relations of the
@@ -1149,14 +1162,14 @@ computes all minors (=subdeterminants) of a given size for a matrix.
 @subheading Numeric computations
 @table @code
 @item laguerre
-@c @ref{laguerre}@*
-computes ... TBC
+@ref{laguerre}@*
+computes all (complex) roots of a univariate polynomial
 @item uressolve
-@c @ref{uressolve}@*
-implements ... TBC
-@c @item vandermonde
-@c @ref{vandermonde}@*
-@c computes ... TBC
+@ref{uressolve}@*
+find all roots of 0-dimensional ideal i with multivariate resultants
+@item vandermonde
+@ref{vandermonde}@*
+interpolates a polynomial from its values at several points
 @end table
 
 @c ----------------------------------------------------------------------
@@ -2180,7 +2193,7 @@ See
 @cindex Libraries
 
 A library is a collection of @sc{Singular}
-procedures in a file. 
+procedures in a file.
 @*@sc{Singular} reads a library with the command
 @code{LIB}. General information about the library is displayed by the command
 @code{help lib_name}. After loading the library, its procedures can be used
@@ -2319,7 +2332,7 @@ defines the version number for the library. It is displayed when the
 library is loaded.
 @item @strong{Example:}
 @smallexample
-version="$I@comment 
+version="$I@comment
 @comment !! Do not erase the @comment at the end of the previous line !!
 @comment !! It prevents cvs to substitute the id string                !!
 d: sample.lib,v 1.2 1998/05/07 singular Exp $";
@@ -2356,7 +2369,7 @@ The info-string should have the following format:
 info="
 LIBRARY: <library_name> <one line description of the content>
 AUTHOR:  <name, and email address of author>
-      
+
 PROCEDURES:
   <procedure1>;     <one line description of the purpose>
    .
@@ -2445,60 +2458,60 @@ example
 The help and info strings of libraries which are included in the
 distribution of @sc{Singular} are parsed and automatically converted
 into the texinfo format (the typesetting language in which the
-documentation  of @sc{Singular} is written. 
+documentation  of @sc{Singular} is written.
 
 For optimal typesetting results, the guidelines for writing libraries
 and procedures should be followed, and the following points should be
 kept in mind:
 
 @itemize @bullet
-@item 
+@item
 If a help string starts with a @code{@@} sign, then no parsing is done,
 and the info string is assumed to be already in the texinfo format.
 @item
 help strings are typeset within a @code{@@table @@asis} environment
 (which is similar to a latex @code{description} environment).
 @item
-If a line starts with a character and contains a colon, then the text up 
+If a line starts with a character and contains a colon, then the text up
 to the colon is taken to be the description-string of an item and the
 text following the colon is taken to be the content of the item.
-@item 
+@item
 If the description-string of an item matches @code{EXAMPLE} then this
 item is ignored.
-@item 
+@item
 If the description-string of an item matches @code{SEE ALSO}, then the
 content of the item is assumed to be comma-separted words which are
 valid references to other texinfo nodes of the manual. (e.g., all
-procedure and command names are also texinfo nodes). 
-@item 
-If the description-string of an item matches @code{PROCEDURES}, then the 
+procedure and command names are also texinfo nodes).
+@item
+If the description-string of an item matches @code{PROCEDURES}, then the
 content of the item is assumed to be a summary description of the
-procedures contained in the library. Separate texinfo nodes (subsections 
+procedures contained in the library. Separate texinfo nodes (subsections
 in printed documents) are
 @strong{only} created out of the help strings of such procedures which
-appear in the summary description of a library. 
-@item 
+appear in the summary description of a library.
+@item
 The content-string of an item is typeset as follows:
-@itemize 
-@item 
+@itemize
+@item
 If the content-string starts with an @code{@@} sign, then no parsing is
 done, but the content-string is assumed to be in the texinfo format.
 
-@item 
+@item
 The texinfo commands @code{@@*}, @code{@@code@{..@}},
 @code{@@math@{..@}} may be used to enforce linebreaks, and typesetting
 in typewriter font resp. math mode. Text inside @code{@@math@{..@}}
 need to be valid latex math markup.
 
-@item 
+@item
 Words which are followed by matching round parenthesis (i.e., by
 @code{()}) are typeset using a typewriter font (like @code{myfunc()}).
 
 @item
 A linebreak is inserted in front of a line, if (1) the previous line is
-shorter than 60 characters and does not contain @code{@@code@{..@}}  and 
+shorter than 60 characters and does not contain @code{@@code@{..@}}  and
 @code{@@math@{..@}} constructs, or (2) if the first word of a line is
-followed by matching round parenthesis (like @code{myfunc()}), or (3) if 
+followed by matching round parenthesis (like @code{myfunc()}), or (3) if
 the previous line does only consist of a word followed by matching
 parehtesis.
 @end itemize
@@ -2514,7 +2527,7 @@ See @ref{template_lib} for an examples of the automatic typesetting.
 
 First, we show the source-code of a template library:
 @smallexample
-@c include template.lib 
+@c include template.lib
 @end smallexample
 
 After typesetting, the library appears in the document as follows (with
