@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.1.1.1 2003-10-06 12:15:53 Singular Exp $ */
+/* $Id: gr_kstd2.cc,v 1.2 2003-12-08 17:31:01 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -18,10 +18,8 @@
 //#include "spolys.h"
 #include "cntrlc.h"
 #include "weight.h"
-#include "ipid.h"
-#include "ipshell.h"
 #include "intvec.h"
-#include "tok.h"
+#include "structs.h"
 #include "gring.h"
 
 /*2
@@ -76,7 +74,7 @@ int redGrFirst (LObject* h,kStrategy strat)
         PrintS(" with ");
         wrp(strat->S[j]);
       }
-      (*h).p = nc_spGSpolyRed(strat->S[j],(*h).p, NULL, currRing);
+      (*h).p = nc_ReduceSpoly(strat->S[j],(*h).p, NULL, currRing);
       //spSpolyRed(strat->T[j].p,(*h).p,strat->kNoether);
 
       if (TEST_OPT_DEBUG)
@@ -151,7 +149,7 @@ int redGrFirst (LObject* h,kStrategy strat)
 *  reduction procedure for the homogeneous case
 *  and the case of a degree-ordering
 */
-static int redHomog (LObject* h,kStrategy strat)
+static int nc_redHomog (LObject* h,kStrategy strat)
 {
   if (strat->tl<0)
   {
@@ -178,7 +176,7 @@ static int redHomog (LObject* h,kStrategy strat)
         wrp(strat->S[j]);
       }
       /*- compute the s-polynomial -*/
-      (*h).p = nc_spGSpolyRed(strat->S[j],(*h).p,strat->kNoether,currRing);
+      (*h).p = nc_ReduceSpoly(strat->S[j],(*h).p,strat->kNoether,currRing);
       if ((*h).p == NULL)
       {
         if (TEST_OPT_DEBUG) PrintS(" to 0\n");
@@ -215,7 +213,7 @@ static int redHomog (LObject* h,kStrategy strat)
 *  reduction procedure for the homogeneous case
 *  and the case of a degree-ordering
 */
-static int redHomog0 (LObject* h,kStrategy strat)
+static int nc_redHomog0 (LObject* h,kStrategy strat)
 {
   if (strat->tl<0)
   {
@@ -243,7 +241,7 @@ static int redHomog0 (LObject* h,kStrategy strat)
         wrp(strat->S[j]);
       }
       /*- compute the s-polynomial -*/
-      (*h).p = nc_spGSpolyRed(strat->T[j].p,(*h).p,strat->kNoether,currRing);
+      (*h).p = nc_ReduceSpoly(strat->T[j].p,(*h).p,strat->kNoether,currRing);
       if ((*h).p == NULL)
       {
         if (TEST_OPT_DEBUG) PrintS(" to 0\n");
@@ -288,7 +286,7 @@ static int redHomog0 (LObject* h,kStrategy strat)
 *  reduction procedure for the inhomogeneous case
 *  and not a degree-ordering
 */
-static int redLazy (LObject* h,kStrategy strat)
+static int nc_redLazy (LObject* h,kStrategy strat)
 {
   if (strat->tl<0)
   {
@@ -318,7 +316,7 @@ static int redLazy (LObject* h,kStrategy strat)
         wrp(strat->S[j]);
       }
       /*- compute the s-polynomial -*/
-      (*h).p = nc_spGSpolyRed(strat->S[j],(*h).p,strat->kNoether,currRing);
+      (*h).p = nc_ReduceSpoly(strat->S[j],(*h).p,strat->kNoether,currRing);
       if ((*h).p == NULL)
       {
         if (TEST_OPT_DEBUG) PrintS(" to 0\n");
@@ -398,7 +396,7 @@ static int redLazy (LObject* h,kStrategy strat)
 * reduces h with elements from T choosing first possible
 * element in T with respect to the given ecart
 */
-static int redHoney (LObject*  h,kStrategy strat)
+static int nc_redHoney (LObject*  h,kStrategy strat)
 {
   if (strat->tl<0)
   {
@@ -481,10 +479,10 @@ static int redHoney (LObject*  h,kStrategy strat)
       if (strat->fromT)
       {
         strat->fromT=FALSE;
-        (*h).p = nc_spGSpolyRedNew(pi,(*h).p,strat->kNoether,currRing);
+        (*h).p = nc_ReduceSpolyNew(pi,(*h).p,strat->kNoether,currRing);
       }
       else
-        (*h).p = nc_spGSpolyRed(pi,(*h).p,strat->kNoether,currRing);
+        (*h).p = nc_ReduceSpoly(pi,(*h).p,strat->kNoether,currRing);
       if (TEST_OPT_DEBUG)
       {
         PrintS(" to ");
@@ -575,7 +573,7 @@ static int redHoney (LObject*  h,kStrategy strat)
 *  reduction procedure for tests only
 *  reduces with elements from T and chooses the best possible
 */
-static int redBest (LObject*  h,kStrategy strat)
+static int nc_redBest (LObject*  h,kStrategy strat)
 {
   if (strat->tl<0)
   {
@@ -606,7 +604,7 @@ static int redBest (LObject*  h,kStrategy strat)
       }
       else
 #endif
-      p = nc_spShort(strat->T[j].p,(*h).p);
+      p = nc_CreateShortSpoly(strat->T[j].p,(*h).p);
       /* computes only the first monomial of the spoly  */
       if (p)
       {
@@ -630,7 +628,7 @@ static int redBest (LObject*  h,kStrategy strat)
               }
               else
 #endif
-              ph = nc_spShort(strat->T[j].p,(*h).p);
+              ph = nc_CreateShortSpoly(strat->T[j].p,(*h).p);
               if (ph==NULL)
               {
                 pLmFree(p);
@@ -656,7 +654,7 @@ static int redBest (LObject*  h,kStrategy strat)
           }
         }
         pLmFree(p);
-        (*h).p = nc_spGSpolyRed(strat->T[jbest].p,(*h).p,strat->kNoether,currRing);
+        (*h).p = nc_ReduceSpoly(strat->T[jbest].p,(*h).p,strat->kNoether,currRing);
       }
       else
       {
@@ -733,15 +731,15 @@ static void gr_initBba(ideal F,kStrategy strat)
  /* setting global variables ------------------- */
   strat->enterS = enterSBba;
   if ((BTEST1(20)) && (!strat->honey))
-    strat->red = redBest;
+    strat->red = nc_redBest;
   else if (strat->honey)
-    strat->red = redHoney;
+    strat->red = nc_redHoney;
   else if (pLexOrder && !strat->homog)
-    strat->red = redLazy;
+    strat->red = nc_redLazy;
   else if (TEST_OPT_INTSTRATEGY && strat->homog)
-    strat->red = redHomog0;
+    strat->red = nc_redHomog0;
   else
-    strat->red = redHomog;
+    strat->red = nc_redHomog;
   if (rIsPluralRing(currRing))
   {
     strat->red = redGrFirst;
@@ -760,15 +758,15 @@ static void gr_initBba(ideal F,kStrategy strat)
   //strat->kIdeal->data=(void *)strat->Shdl;
   if ((TEST_OPT_WEIGHTM)&&(F!=NULL))
   {
-    //interred  machen   Aenderung
-    pFDegOld=pFDeg;
-    pLDegOld=pLDeg;
-    h=ggetid("ecart");
-    if ((h!=NULL) && (IDTYP(h)==INTVEC_CMD))
-    {
-      ecartWeights=iv2array(IDINTVEC(h));
-    }
-    else
+     //interred  machen   Aenderung
+     pFDegOld=pFDeg;
+     pLDegOld=pLDeg;
+  //   h=ggetid("ecart");
+  //   if ((h!=NULL) && (IDTYP(h)==INTVEC_CMD))
+  //   {
+  //     ecartWeights=iv2array(IDINTVEC(h));
+  //   }
+  //   else
     {
       ecartWeights=(short *)omAlloc((pVariables+1)*sizeof(short));
       /*uses automatic computation of the ecartWeights to set them*/
@@ -832,9 +830,9 @@ ideal gr_bba (ideal F, ideal Q, kStrategy strat)
       if ((currRing->nc->type==nc_lie) && pHasNotCF(strat->P.p1,strat->P.p2)) /* prod crit */
       {
         strat->cp++;
-        /* prod.crit itself in nc_spGSpolyCreate */
+        /* prod.crit itself in nc_CreateSpoly */
       }
-      strat->P.p = nc_spGSpolyCreate(strat->P.p1,strat->P.p2,strat->kNoether,currRing);
+      strat->P.p = nc_CreateSpoly(strat->P.p1,strat->P.p2,strat->kNoether,currRing);
     }
     if (strat->P.p != NULL)
     {

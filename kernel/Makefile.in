@@ -24,9 +24,7 @@ libdir 		= @libdir@
 bindir		= @bindir@
 # includes are taken from here
 includedir	= @includedir@
-slibdir		= ${prefix}/LIB
 install_bindir  = ${install_prefix}/${SINGUNAME}
-install_slibdir = ${install_prefix}/LIB
 
 ##
 ## various programs
@@ -97,7 +95,7 @@ endif
 # normal C++ source files
 CXXSOURCES=algmap.cc clapconv.cc \
     clapsing.cc mminit.cc\
-    febase.cc feread.cc fehelp.cc feResource.cc \
+    febase.cc feread.cc feResource.cc \
     ffields.cc hdegree.cc hilb.cc hutil.cc \
     gring.cc gr_kstd2.cc\
     ideals.cc intvec.cc \
@@ -124,9 +122,6 @@ MPSR_SOURCES = mpsr_Put.cc mpsr_PutPoly.cc mpsr_GetPoly.cc mpsr_sl.cc\
 	mpsr_Get.cc mpsr_GetMisc.cc mpsr_Error.cc \
 
 
-# stuff for dbm
-DBMSR_SOURCES =  ndbm.cc sing_dbm.cc
-
 # normal C source files
 CSOURCES=weight0.c fegetopt.c fereadl.c dError.c mmstd.c 
 
@@ -141,7 +136,7 @@ DL_LIB_SOURCES=p_Procs_Lib.cc
 STATIC_SOURCES=p_Procs_Static.cc slInit_Static.cc 
 
 # C++ sources for which both, shared and static object files are needed
-COMMON_SOURCES = $(MPSR_SOURCES) $(DBMSR_SOURCES)
+COMMON_SOURCES = $(MPSR_SOURCES) 
 
 # special C++ source files (need extra compiling and/or linking), for which
 # dependencies should be generated
@@ -173,7 +168,7 @@ HEADERS=algmap.h hutil.h stairc.h ideals.h \
 	fglmgauss.h fglmvec.h mpsr.h mpsr_sl.h\
 	kstdfac.h mpsr_Get.h kmatrix.h\
 	kutil.h mpsr_Put.h\
-	ndbm.h dbm_sl.h polys-impl.h \
+	dbm_sl.h polys-impl.h \
         GMPrat.h multicnt.h npolygon.h semic.h spectrum.h splist.h multicnt.h \
 	eigenval.h units.h mod_raw.h kbuckets.h sbuckets.h\
 	mpr_global.h mpr_inout.h mpr_base.h mpr_numeric.h \
@@ -200,8 +195,7 @@ P_PROCS_MODULES = FieldZp FieldIndep FieldQ FieldGeneral
 
 ifeq ($(DL_KERNEL),1)
 OBJS 	:= $(OBJS) $(DL_KERNEL_SOURCES:.cc=.o)
-DBMSR_SO= dbmsr.so
-DL_LIBS := $(P_PROCS_MODULES:%=p_Procs_%.so) $(DBMSR_SO)
+DL_LIBS := $(P_PROCS_MODULES:%=p_Procs_%.so) 
 else
 ifndef LD_STATIC
 LIBS := $(MP_LIBS) $(LIBS)
@@ -297,77 +291,25 @@ p_Procs_%.so: p_Procs_Lib_%.dl_o
 mpsr.so: $(MPSR_SOURCES:.cc=.dl_o)
 	$(LD) ${SLDFLAGS} -o $@ $^ -L${libdir} ${MP_LIBS}
 
-dbmsr.so: $(DBMSR_SOURCES:.cc=.dl_o)
-	$(LD) ${SLDFLAGS} -o $@ $^
-
-ifeq ($(SINGUNAME),ix86-Win)
-##
-## windows only targets
-##
-
-## resources
-Singular.rc: Singular.rc.in config.status
-	CONFIG_FILES="Singular.rc" CONFIG_HEADERS= ./config.status
-
-ESingular_res.o: Singular.rc
-	windres -DESINGULAR -i Singular.rc -o ESingular_res.o
-
-TSingular_res.o: Singular.rc
-	windres -DTSINGULAR -i Singular.rc -o TSingular_res.o
-
-Singular_res.o: Singular.rc
-	windres -DSINGULAR -i Singular.rc -o Singular_res.o
-
-## run
-run.o: run.c run.h
-	gcc -c -I. -O2 run.c -o run.o
-
-runTSingular : run.o TSingular_res.o
-	gcc -mwindows -e _mainCRTStartup run.o TSingular_res.o -o runTSingular.exe
-
-runESingular : run.o ESingular_res.o
-	gcc -mwindows -e _mainCRTStartup run.o ESingular_res.o -o runESingular.exe
-
-RUN_SINGULARS=runESingular runTSingular
-
-endif
-
 ##
 ## install targets
 ##
-install: all installbin installslib
+install: all installbin
 
-installbin: ${SING_EXEC}  ESingular TSingular ${RUN_SINGULARS}
+installbin: ${DL_LIBS}
 	${MKINSTALLDIRS} ${bindir}
-	${INSTALL_PROGRAM} ${SING_EXEC} ${SINGULAR}
-	${INSTALL_PROGRAM} libparse ${RUN_SINGULARS} ${bindir}
-	${INSTALL_PROGRAM} ESingular TSingular ${DL_LIBS} ${bindir}
-	chmod a+x ${SINGULAR}${EXEC_EXT}
-	rm -f ${bindir}/${SING_EXEC}${EXEC_EXT}
-	cd ${bindir}; ${LN_S} ${SINGULAR} Singular${EXEC_EXT};
-
-installslib: LIB
-	test -r ${slibdir} || ${LN_S} `pwd`/LIB ${slibdir}
-
-
-uninstall: uninstallbin
-
-uninstallbin:
-	rm -f ${bindir}/Singular${EXEC_EXT} 
-	rm -f ${SINGULAR}
-	-rmdir ${bindir}
+	${INSTALL_PROGRAM} ${DL_LIBS} ${bindir}
+	${INSTALL_PROGRAM} ${DL_LIBS} ../Singular
 
 ##
 ## clean targest
 ##
 mostlyclean: 
-	-rm -f Singular Singular-static Singulara feOpt*.inc p_Procs_*.inc
-	-rm -f *.o *.og core *.op *.ob *.ot Singulart *.od *_d.cc *_d.c p_Procs *.oa *.dl_o* *.so*
-	-rm -f ESingular* TSingular*
+	-rm -f p_Procs_*.inc
+	-rm -f *.o *.og core *.op *.ob *.ot *.od *_d.cc *_d.c p_Procs *.oa *.dl_o* *.so*
 
 clean: mostlyclean
 	-rm -f *.bak *.d *.dd depend 
-	-rm -f ${slibdir}
 
 distclean: clean
 	-rm -f *~ .\#* version.h
@@ -391,18 +333,10 @@ maintainer-clean: distclean srcclean
 install-bindist: $(HEADERS) $(SOURCES) Makefile depend
 	echo "#define MAKE_DISTRIBUTION	" > distrib.h
 	sleep 1
-	${MAKE} ${SING_EXEC} ESingular TSingular libparse ${RUN_SINGULARS}
 	${MKINSTALLDIRS} ${install_bindir} 
 	${INSTALL_PROGRAM} -s  ${SING_EXEC} ${install_bindir}/Singular
-	${INSTALL_PROGRAM} -s  libparse ${RUN_SINGULARS} ESingular TSingular ${DL_LIBS} ${install_bindir}
+	${INSTALL_PROGRAM} -s  libparse ${RUN_SINGULARS} ${DL_LIBS} ${install_bindir}
 	echo "#undef MAKE_DISTRIBUTION " > distrib.h
-
-install-sharedist: ${SLIBS_FILES} LIB/gftables
-	${MKINSTALLDIRS} ${install_slibdir}
-	cp ${SLIBS_FILES} ${install_slibdir}
-	${MKINSTALLDIRS} ${install_slibdir}/gftables
-	cp ${GFTABLES} ${install_slibdir}/gftables
-	chmod -R +rX ${install_slibdir}/*
 
 tar:
 	tar cf Singular-${SINGULAR_VERSION}-src.tar ${DISTFILES}
@@ -461,19 +395,19 @@ DL_TAILA=\"soa\"
 ifeq ($(DL_KERNEL),1)
 
 OBJG := $(OBJG) $(DL_KERNEL_SOURCES:.cc=.og)
-DL_LIBSG := $(P_PROCS_MODULES:%=p_Procs_%.sog) $(MPSR_SO:%.so=%.sog) $(DBMSR_SO:%.so=%.sog)
+DL_LIBSG := $(P_PROCS_MODULES:%=p_Procs_%.sog) $(MPSR_SO:%.so=%.sog)
 
 OBJP := $(OBJP) $(DL_KERNEL_SOURCES:.cc=.op)
-DL_LIBSP := $(P_PROCS_MODULES:%=p_Procs_%.sop) $(MPSR_SO:%.so=%.sop) $(DBMSR_SO:%.so=%.sop)
+DL_LIBSP := $(P_PROCS_MODULES:%=p_Procs_%.sop) $(MPSR_SO:%.so=%.sop)
 
 OBJB := $(OBJB) $(DL_KERNEL_SOURCES:.cc=.ob)
-DL_LIBSB := $(P_PROCS_MODULES:%=p_Procs_%.sob) $(MPSR_SO:%.so=%.sob) $(DBMSR_SO:%.so=%.sob)
+DL_LIBSB := $(P_PROCS_MODULES:%=p_Procs_%.sob) $(MPSR_SO:%.so=%.sob)
 
 OBJT := $(OBJT) $(DL_KERNEL_SOURCES:.cc=.ot)
-DL_LIBST := $(P_PROCS_MODULES:%=p_Procs_%.sot) $(MPSR_SO:%.so=%.sot) $(DBMSR_SO:%.so=%.sot)
+DL_LIBST := $(P_PROCS_MODULES:%=p_Procs_%.sot) $(MPSR_SO:%.so=%.sot)
 
 OBJA := $(OBJA) $(DL_KERNEL_SOURCES:.cc=.oa)
-DL_LIBSA := $(P_PROCS_MODULES:%=p_Procs_%.soa) $(MPSR_SO:%.so=%.soa) $(DBMSR_SO:%.so=%.soa)
+DL_LIBSA := $(P_PROCS_MODULES:%=p_Procs_%.soa) $(MPSR_SO:%.so=%.soa) 
 
 else
 
@@ -523,9 +457,6 @@ p_Procs_Lib_%.dl_og : p_Procs_Lib.cc  p_Procs_Dynamic.og
 	${CXXG} ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} ${SFLAGS} -c $< -o $@
 
 mpsr.sog: $(MPSR_SOURCES:.cc=.dl_og)
-	${CXXG} ${CXXFLAGSG} ${SFLAGS} ${SLDFLAGS} ${LDFLAGS} -o $@ $^ ${MP_LIBS}
-
-dbmsr.sog: $(DBMSR_SOURCES:.cc=.dl_og)
 	${CXXG} ${CXXFLAGSG} ${SFLAGS} ${SLDFLAGS} ${LDFLAGS} -o $@ $^ ${MP_LIBS}
 
 claptmpl.og: claptmpl.cc mod2.h
@@ -590,9 +521,6 @@ p_Procs_Lib_%.dl_op : p_Procs_Lib.cc p_Procs_Dynamic.op
 mpsr.sop: $(MPSR_SOURCES:.cc=.dl_op)
 	${CXXP} ${CXXFLAGSP} ${SFLAGS} ${SLDFLAGS} ${LDFLAGS} -o $@ $^ ${MP_LIBS}
 
-dbmsr.sop: $(DBMSR_SOURCES:.cc=.dl_op)
-	${CXXP} ${CXXFLAGSP} ${SFLAGS} ${SLDFLAGS} ${LDFLAGS} -o $@ $^ ${MP_LIBS}
-
 claptmpl.op: claptmpl.cc mod2.h
 	$(CXXP)  ${CXXFLAGSP} ${CPPFLAGS} ${DEFSP} -c $< -o $@
 
@@ -626,9 +554,6 @@ p_Procs_Lib_%.dl_ob : p_Procs_Lib.cc  p_Procs_Dynamic.ob
 	${CXXP} ${CXXFLAGSB} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSB} ${SFLAGS} -c $< -o $@
 
 mpsr.sob: $(MPSR_SOURCES:.cc=.dl_ob)
-	${CXXP} ${CXXFLAGSB} ${SFLAGS} ${SLDFLAGS} ${LDFLAGS} -o $@ $^ ${MP_LIBS}
-
-dbmsr.sob: $(DBMSR_SOURCES:.cc=.dl_ob)
 	${CXXP} ${CXXFLAGSB} ${SFLAGS} ${SLDFLAGS} ${LDFLAGS} -o $@ $^ ${MP_LIBS}
 
 claptmpl.ob: claptmpl.cc mod2.h
@@ -665,9 +590,6 @@ p_Procs_Lib_%.dl_ot : p_Procs_Lib.cc p_Procs_Dynamic.ot
 
 mpsr.sot: $(MPSR_SOURCES:.cc=.dl_ot)
 	${CXXP} ${CXXFLAGST} ${SFLAGS} ${SLDFLAGS} ${LDFLAGS} -o $@ $^ ${MP_LIBS}
-
-dbmsr.sot: $(DBMSR_SOURCES:.cc=.dl_ot)
-	${CXX} ${CXXFLAGST} ${SFLAGS} ${SLDFLAGS} ${LDFLAGS} -o $@ $^ ${MP_LIBS}
 
 claptmpl.ot: claptmpl.cc mod2.h
 	$(CXXP)  ${CXXFLAGST} ${CPPFLAGS} ${DEFST} -c $< -o $@
@@ -708,10 +630,6 @@ p_Procs_Lib_%.dl_oa : p_Procs_Lib.cc p_Procs_Dynamic.oa
 
 mpsr.soa: $(MPSR_SOURCES:.cc=.dl_oa)
 	${CXX} ${CXXFLAGSA} ${SFLAGS} ${SLDFLAGS} ${LDFLAGS} -o $@ $^ ${MP_LIBS}
-
-dbmsr.soa: $(DBMSR_SOURCES:.cc=.dl_oa)
-	${CXX} ${CXXFLAGSA} ${SFLAGS} ${SLDFLAGS} ${LDFLAGS} -o $@ $^ ${MP_LIBS}
-
 
 claptmpl.oa: claptmpl.cc mod2.h
 	$(CXX)  ${CXXFLAGSA} ${CPPFLAGS} ${DEFSA} -c $< -o $@

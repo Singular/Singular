@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.1.1.1 2003-10-06 12:15:54 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.2 2003-12-08 17:31:02 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -21,7 +21,6 @@
 #include "kstd1.h"
 #include "sbuckets.h"
 #include "prCopy.h"
-#include "ipid.h"
 #include "p_Mult_q.h"
 
 /* global nc_macros : */
@@ -775,7 +774,7 @@ poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
   int vik = UPMATELEM(j,i,rN);
   int cMTsize=r->nc->MTsize[vik];
   int newcMTsize=0;
-  newcMTsize=max(a,b);
+  newcMTsize=si_max(a,b);
 
   if (newcMTsize<=cMTsize)
   {
@@ -1016,14 +1015,14 @@ poly nc_uu_Mult_ww_horvert (int i, int a, int j, int b, const ring r)
 * p1 divides p2 -> for use in NF algorithm
 */
 
-poly nc_spGSpolyRed(poly p1, poly p2,poly spNoether, const ring r)
+poly nc_ReduceSpoly(poly p1, poly p2,poly spNoether, const ring r)
 {
   if (p_GetComp(p1,r)!=p_GetComp(p2,r)
   && (p_GetComp(p1,r)!=0)
   && (p_GetComp(p2,r)!=0))
   {
 #ifdef PDEBUG
-    Print("nc_spGSpolyRed: different components");
+    Print("nc_ReduceSpoly: different components");
 #endif
     return(NULL);
   }
@@ -1037,6 +1036,13 @@ poly nc_spGSpolyRed(poly p1, poly p2,poly spNoether, const ring r)
   poly N=nc_mm_Mult_p(m,p_Head(p1,r),r);
   number C=n_Copy(p_GetCoeff(N,r),r);
   number cF=n_Copy(p_GetCoeff(p2,r),r);
+  /* GCD stuff */
+  number cG = nGcd(C,cF,r);
+  if (!nEqual(cG,n_Init(1,r)))
+  {
+    cF = nDiv(cF,cG);
+    C  = nDiv(C,cG);
+  }
   p2=p_Mult_nn(p2,C,r);
   poly out = nc_mm_Mult_p(m, p_Copy(pNext(p1),r), r);
   N=p_Add_q(N,out,r);
@@ -1047,6 +1053,7 @@ poly nc_spGSpolyRed(poly p1, poly p2,poly spNoether, const ring r)
     N=p_Mult_nn(N,cF,r);
   }
   out=p_Add_q(p2,N,r);
+  if (out!=NULL) pContent(out);
   p_Delete(&m,r);
   n_Delete(&cF,r);
   n_Delete(&C,r);
@@ -1060,23 +1067,23 @@ poly nc_spGSpolyRed(poly p1, poly p2,poly spNoether, const ring r)
 * do not destroy p1 and p2
 * p1 divides p2 -> for use in NF algorithm
 */
-poly nc_spGSpolyRedNew(poly p1, poly p2,poly spNoether, const ring r)
+poly nc_ReduceSpolyNew(poly p1, poly p2,poly spNoether, const ring r)
 {
-  return(nc_spGSpolyRed(p1,p_Copy(p2,r),spNoether,r));
+  return(nc_ReduceSpoly(p1,p_Copy(p2,r),spNoether,r));
 }
 
 /*4
 * creates the S-polynomial of p1 and p2
 * do not destroy p1 and p2
 */
-poly nc_spGSpolyCreate(poly p1, poly p2,poly spNoether, const ring r)
+poly nc_CreateSpoly(poly p1, poly p2,poly spNoether, const ring r)
 {
   if ((p_GetComp(p1,r)!=p_GetComp(p2,r))
   && (p_GetComp(p1,r)!=0)
   && (p_GetComp(p2,r)!=0))
   {
 #ifdef PDEBUG
-    Print("nc_spGSpolyCreate : different components!");
+    Print("nc_CreateSpoly : different components!");
 #endif
     return(NULL);
   }
@@ -1106,10 +1113,17 @@ poly nc_spGSpolyCreate(poly p1, poly p2,poly spNoether, const ring r)
 #endif
   p_Delete(&pL,r);
   /* zero exponents ! */
-  poly M1=nc_mm_Mult_p(m1,p_Head(p1,r),r);
-  number C1=n_Copy(p_GetCoeff(M1,r),r);
-  poly M2=nc_mm_Mult_p(m2,p_Head(p2,r),r);
-  number C2=n_Copy(p_GetCoeff(M2,r),r);
+  poly M1    = nc_mm_Mult_p(m1,p_Head(p1,r),r);
+  number C1  = n_Copy(p_GetCoeff(M1,r),r);
+  poly M2    = nc_mm_Mult_p(m2,p_Head(p2,r),r);
+  number C2  = n_Copy(p_GetCoeff(M2,r),r);
+  /* GCD stuff */
+  number C = nGcd(C1,C2,r);
+  if (!nEqual(C,n_Init(1,r)))
+  {
+    C1=nDiv(C1,C);
+    C2=nDiv(C2,C);
+  }
   M1=p_Mult_nn(M1,C2,r);
   p_SetCoeff(m1,C2,r);
   number MinusOne=n_Init(-1,r);
@@ -1141,6 +1155,7 @@ poly nc_spGSpolyCreate(poly p1, poly p2,poly spNoether, const ring r)
 #ifdef PDEBUG
   p_Test(M2,r);
 #endif
+  if (M2!=NULL) pContent(M2);
   return(M2);
 }
 
@@ -1149,7 +1164,7 @@ poly nc_spGSpolyCreate(poly p1, poly p2,poly spNoether, const ring r)
 * lead(p1) divides lead(pNext(q2)) and pNext(q2) is reduced
 * do not destroy p1, but tail(q)
 */
-void nc_spGSpolyRedTail(poly p1, poly q, poly q2, poly spNoether, const ring r)
+void nc_ReduceSpolyTail(poly p1, poly q, poly q2, poly spNoether, const ring r)
 {
   poly a1=p_Head(p1,r);
   poly Q=pNext(q2);
@@ -1186,7 +1201,7 @@ void nc_spGSpolyRedTail(poly p1, poly q, poly q2, poly spNoether, const ring r)
 * creates the commutative lcm(lm(p1),lm(p2))
 * do not destroy p1 and p2
 */
-poly nc_spShort(poly p1, poly p2, const ring r)
+poly nc_CreateShortSpoly(poly p1, poly p2, const ring r)
 {
   if (p_GetComp(p1,r)!=p_GetComp(p2,r))
   {
@@ -1444,7 +1459,7 @@ ideal twostd(ideal I)
         pSetm(varj);
         q = nc_p_Mult_mm(pCopy(p),varj,currRing);
         pDelete(&varj);
-        q = nc_spGSpolyRed(p,q,NULL,currRing);
+        q = nc_ReduceSpoly(p,q,NULL,currRing);
         q = kNF(J,currQuotient,q,0,0);
         if (q!=NULL)
         {
