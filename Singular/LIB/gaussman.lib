@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.51 2001-08-25 10:52:01 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.52 2001-08-25 14:56:55 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -14,23 +14,23 @@ PROCEDURES:
  gmsring(t,s);              Brieskorn lattice in Gauss-Manin system of t
  gmsnf(p,K[,Kmax]);         Gauss-Manin system normal form
  gmscoeffs(p,K[,Kmax]);     Gauss-Manin system basis representation
- monodromy(t[,opt]);        Jordan data or eigenvalues of monodromy of t
+ monodromy(t);              Jordan data of monodromy of t
  spectrum(t);               spectrum of t
- sppairs(t[,opt]);          spectral pairs or spectrum of t
+ sppnormalize(a,w[,m]);     normalize spectral pairs
+ sppairs(t);                spectral pairs of t
  vfilt(t[,opt]);            V-filtration on H''/H' or spectrum of t
  endfilt(t,V);              endomorphism filtration of V-filtration V
- spgen(a);                  generate spectrum defined by a
- sppgen(a,w);               generate spectral pairs defined by a and w
- spprint(list Sp);          print spectrum or spectral pairs Sp
- spadd(list Sp1,list Sp2);  sum of spectra Sp1 and Sp2
- spsub(list Sp1,list Sp2);  difference of spectra Sp1 and Sp2
- spmul(list Sp,int k);      product of spectrum Sp and integer k
- spmul(list Sp,intvec k);   linear combination of spectra Sp with coeffs k
- spissemicont(list Sp[,opt]);         test spectrum Sp for semicontinuity
- spsemicont(list Sp0,list Sp[,opt]);  semicontinuity of spectra Sp0 and Sp
- spmilnor(list Sp);         milnor number of spectrum Sp
- spgeomgenus(list Sp);      geometrical genus of spectrum Sp
- spgamma(list Sp);          gamma invariant of spectrum Sp
+ spprint(Sp);               print spectrum Sp
+ sppprint(Spp);             print spectral pairs Spp
+ spadd(Sp1,Sp2);            sum of spectra Sp1 and Sp2
+ spsub(Sp1,Sp2);            difference of spectra Sp1 and Sp2
+ spmul(Sp,k);               product of spectrum Sp and integer k
+ spmul(Sp,k);               linear combination of spectra Sp with coeffs k
+ spissemicont(Sp[,opt]);    test spectrum Sp for semicontinuity
+ spsemicont(Sp0,Sp[,opt]);  semicontinuity of spectra Sp0 and Sp
+ spmilnor(Sp);              milnor number of spectrum Sp
+ spgeomgenus(Sp);           geometrical genus of spectrum Sp
+ spgamma(Sp);               gamma invariant of spectrum Sp
 
 SEE ALSO: mondromy_lib, spectrum_lib
 
@@ -445,7 +445,7 @@ static proc eigenvals(matrix A0,ideal r,module H,int K0)
     "// compute eigenvalues e with multiplicities m of A");
   matrix A;
   A,A0,r=tmatrix(A0,r,H,0,K0);
-  list l=eigenval(A);
+  list l=eigenvalues(A);
   def e,m=l[1..2];
   dbprint(printlevel-voice+2,"// e="+string(e));
   dbprint(printlevel-voice+2,"// m="+string(m));
@@ -467,6 +467,7 @@ static proc transform(ideal e,intvec m,matrix A,matrix A0,ideal r,module H,modul
   {
     int i,j,i0,j0,i1,j1;
     module U,V;
+    list l;
 
     while(e1>=e0+1)
     {
@@ -518,6 +519,9 @@ static proc transform(ideal e,intvec m,matrix A,matrix A0,ideal r,module H,modul
       }
       H0=transpose(H0);
 
+      l=spnormalize(e,m);
+      e,m=l[1..2];
+
       e1=e1-1;
       dbprint(printlevel-voice+2,"// e1="+string(e1));
     }
@@ -525,7 +529,7 @@ static proc transform(ideal e,intvec m,matrix A,matrix A0,ideal r,module H,modul
     A=jet(A,K);
   }
 
-  return(A,A0,r,H0);
+  return(e,m,A,A0,r,H0);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -551,12 +555,13 @@ EXAMPLE:  example monodromy; shows examples
 
   def A0,r,H,H0=saturate(n);
   e,m,A0,r=eigenvals(A0,r,H,n);
-  A,A0,r,H0=transform(e,m,A,A0,r,H,H0,0,0);
+  e,m,A,A0,r,H0=transform(e,m,A,A0,r,H,H0,0,0);
 
   setring(R);
   matrix A=imap(G,A);
+  ideal e=imap(G,e);
 
-  return(jordan(A));
+  return(jordan(A,e,m));
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -582,7 +587,8 @@ KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice; spectrum
 EXAMPLE:  example spnumbers; shows examples
 "
 {
-  return(spgen(sppairs(t)));
+  list l=sppairs(t);
+  return(spnormalize(l[1],l[3]));
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -592,16 +598,102 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
+static proc sppappend(list l,number a,int w,int m)
+{
+  if(size(l)==0)
+  {
+    l=list(ideal(a),intvec(w),intvec(m));
+  }
+  else
+  {
+    int n=ncols(l[1]);
+    l[1][n+1]=a;
+    l[2][n+1]=w;
+    l[3][n+1]=m;
+  }
+  return(l);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc sppnormalize(ideal a,intvec w,list #)
+"USAGE:    sppnormalize(a,w[,m]);
+RETURN:
+@format
+list Spp: normalized spectral pairs (a,w,m)
+  ideal Spp[1]: numbers in a in increasing order
+  intvec Spp[2]: integers in w in decreasing order
+  intvec Spp[3]:
+    int Spp[3][i]: multiplicity of pair (Spp[1][i],Spp[2][i]) in a,w
+@end format
+EXAMPLE:  example sppnormalize; shows examples
+"
+{
+  intvec m;
+  int i,j;
+  if(size(#)==0)
+  {
+    for(i=ncols(a);i>=1;i--)
+    {
+      m[i]=1;
+    }
+  }
+  else
+  {
+    m=#[1];
+  }
+
+  list l;
+  number a0;
+  int w0,m0;
+  for(i=ncols(a);i>=1;i--)
+  {
+    if(m[i]!=0)
+    {
+      for(j=i-1;j>=1;j--)
+      {
+        if(m[j]!=0)
+	{
+          if(number(a[i])>number(a[j])||
+            (number(a[i])==number(a[j])&&w[i]<w[j]))
+          {
+            a0=number(a[i]);
+            a[i]=a[j];
+            a[j]=a0;
+            w0=w[i];
+            w[i]=w[j];
+            w[j]=w0;
+            m0=m[i];
+            m[i]=m[j];
+            m[j]=m0;
+          }
+          if(number(a[i])==number(a[j])&&w[i]==w[j])
+          {
+            m[i]=m[i]+m[j];
+            m[j]=0;
+          }
+        }
+      }
+      l=sppappend(l,number(a[i]),w[i],m[i]);
+    }
+  }
+
+  return(l);
+}
+example
+{ "EXAMPLE:"; echo=2;
+}
+///////////////////////////////////////////////////////////////////////////////
+
 proc sppairs(poly t)
 "USAGE:    sppairs(t); poly t
 ASSUME:   basering with characteristic 0 and local degree ordering,
           t with isolated citical point 0
-RETURN: list l:
+RETURN: list Spp:
 @format
-  ideal l[1]: spectral numbers in increasing order
-  intvec l[2]: weight filtration indices in decreasing order
-  intvec l[3]:
-    int l[3][i]: multiplicity of spectral pair (l[1][i],l[2][i])
+  ideal Spp[1]: spectral numbers in increasing order
+  intvec Spp[2]: weight filtration indices in decreasing order
+  intvec Spp[3]:
+    int Spp[3][i]: multiplicity of spectral pair (Spp[1][i],Spp[2][i])
 @end format
 SEE ALSO: spectrum_lib
 KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice;
@@ -621,22 +713,20 @@ EXAMPLE:  example sppairs; shows examples
 
   def A0,r,H,H0=saturate(n);
   e,m,A0,r=eigenvals(A0,r,H,n);
-  A,A0,r,H0=transform(e,m,A,A0,r,H,H0,0,0);
+  e,m,A,A0,r,H0=transform(e,m,A,A0,r,H,H0,0,0);
 
   dbprint(printlevel-voice+2,"// compute weight filtration basis");
-  list l=jordanbasis(A);
+  list l=jordanbasis(A,e,m);
   def U,v=l[1..2];
   module V=inverse(U);
-  A0=jet(V*A*U,0);
+  A0=V*A*U;
   vector u;
   int i,j,k;
-  i=1;
-  while(i<ncols(A0))
+  for(i=ncols(A0);i>=2;i--)
   {
-    j=i+1;
-    while(j<ncols(A0)&&A0[i,i]==A0[j,j])
+    for(j=i-1;j>=1;j--)
     {
-      if(v[i]<v[j])
+      if(A0[i,i]==A0[j,j]&&v[i]>v[j])
       {
         k=v[i];
         v[i]=v[j];
@@ -645,18 +735,7 @@ EXAMPLE:  example sppairs; shows examples
         U[i]=U[j];
         U[j]=u;
       }
-      j++;
     }
-    if(j==ncols(A0)&&A0[i,i]==A0[j,j]&&v[i]<v[j])
-    {
-      k=v[i];
-      v[i]=v[j];
-      v[i]=k;
-      u=U[i];
-      U[i]=U[j];
-      U[j]=u;
-    }
-    i=j;
   }
 
   dbprint(printlevel-voice+2,"// transform to weight filtration basis");
@@ -677,13 +756,13 @@ EXAMPLE:  example sppairs; shows examples
 
   setring(R);
 
-  return(sppgen(imap(G,a),w));
+  return(sppnormalize(imap(G,a),w));
 }
 example
 { "EXAMPLE:"; echo=2;
   ring R=0,(x,y),ds;
   poly t=x5+x2y2+y5;
-  spprint(sppairs(t));
+  sppprint(sppairs(t));
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -822,7 +901,7 @@ EXAMPLE:  example vfilt; shows examples
   }
 
   dbprint(printlevel-voice+2,"// compute eigenvalues eA of A");
-  ideal eA=eigenval(jet(A,0))[1];
+  ideal eA=eigenvals(jet(A,0))[1];
   dbprint(printlevel-voice+2,"// eA="+string(eA));
 
   dbprint(printlevel-voice+2,"// compute eigenvalues eM of M");
@@ -1127,143 +1206,18 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc spgen(ideal a)
-"USAGE:   spgen(a); ideal a
-RETURN:
-@format
-list Sp: numbers in a with multiplicities
-  ideal Sp[1]: numbers in a in increasing order
-  intvec Sp[2]:
-    int Sp[2][i]: multiplicity of number Sp[1][i] in a
-@end format
-EXAMPLE: example spgen; shows examples
-"
-{
-  ideal a0=jet(a,0);
-  int i,j;
-  poly p;
-  for(i=1;i<=ncols(a0);i++)
-  {
-    for(j=i+1;j<=ncols(a0);j++)
-    {
-      if(number(a0[i])>number(a0[j]))
-      {
-        p=a0[i];
-        a0[i]=a0[j];
-        a0[j]=p;
-      }
-    }
-  }
-  j=1;
-  a=a0[1];
-  intvec m=1;
-  for(i=2;i<=ncols(a0);i++)
-  {
-    if(a0[i]==a[j])
-    {
-      m[j]=m[j]+1;
-    }
-    else
-    {
-      j++;
-      a[j]=a0[i];
-      m[j]=1;
-    }
-  }
-  return(list(a,m));
-}
-example
-{ "EXAMPLE:"; echo=2;
-  ring R=0,(x,y),ds;
-  ideal a=-1/2,-3/10,-3/10,-1/10,-1/10,0,1/10,1/10,3/10,3/10,1/2;
-  spprint(spgen(a));
-}
-///////////////////////////////////////////////////////////////////////////////
-
-proc sppgen(ideal a,intvec w)
-"USAGE:   sppgen(a,w); ideal a, intvec w
-RETURN:
-@format
-list Spp: pairs in a and w with multiplicities
-  ideal Spp[1]: numbers in a in increasing order
-  intvec Spp[2]: integers in w in decreasing order
-  intvec Spp[3]:
-    int Spp[3][i]: multiplicity of pair (Spp[1][i],Spp[2][i]) in a,w
-@end format
-EXAMPLE: example sppgen; shows examples
-"
-{
-  ideal a0=jet(a,0);
-  intvec w0=w;
-  int i,j,k;
-  poly p;
-  for(i=1;i<=ncols(a0);i++)
-  {
-    for(j=i+1;j<=ncols(a0);j++)
-    {
-      if(number(a0[i])>number(a0[j])||a0[i]==a0[j]&&w0[i]>w0[j])
-      {
-        p=a0[i];
-        a0[i]=a0[j];
-        a0[j]=p;
-        k=w0[i];
-        w0[i]=w0[j];
-        w0[j]=k;
-      }
-    }
-  }
-  j=1;
-  a=a0[1];
-  w=w0[1];
-  intvec m=1;
-  for(i=2;i<=ncols(a0);i++)
-  {
-    if(a0[i]==a[j]&&w0[i]==w[j])
-    {
-      m[j]=m[j]+1;
-    }
-    else
-    {
-      j++;
-      a[j]=a0[i];
-      w[j]=w0[i];
-      m[j]=1;
-    }
-  }
-  return(list(a,w,m));
-}
-example
-{ "EXAMPLE:"; echo=2;
-  ring R=0,(x,y),ds;
-  ideal a=-1/2,-3/10,-3/10,-1/10,-1/10,0,1/10,1/10,3/10,3/10,1/2;
-  intvec w=2,1,1,1,1,1,1,1,1,1,0;
-  spprint(sppgen(a,w));
-}
-///////////////////////////////////////////////////////////////////////////////
-
 proc spprint(list Sp)
 "USAGE:   spprint(Sp); list Sp
-RETURN:  string: spectrum or spectral pairs Sp
+RETURN:  string: spectrum Sp
 EXAMPLE: example spprint; shows examples
 "
 {
   string s;
-  if(size(Sp)==2)
+  for(int i=1;i<size(Sp[2]);i++)
   {
-    for(int i=1;i<size(Sp[2]);i++)
-    {
-      s=s+"("+string(Sp[1][i])+","+string(Sp[2][i])+"),";
-    }
-    s=s+"("+string(Sp[1][i])+","+string(Sp[2][i])+")";
+    s=s+"("+string(Sp[1][i])+","+string(Sp[2][i])+"),";
   }
-  else
-  {
-    for(int i=1;i<size(Sp[3]);i++)
-    {
-      s=s+"(("+string(Sp[1][i])+","+string(Sp[2][i])+"),"+string(Sp[3][i])+"),";
-    }
-    s=s+"(("+string(Sp[1][i])+","+string(Sp[2][i])+"),"+string(Sp[3][i])+")";
-  }
+  s=s+"("+string(Sp[1][i])+","+string(Sp[2][i])+")";
   return(s);
 }
 example
@@ -1271,6 +1225,28 @@ example
   ring R=0,(x,y),ds;
   list Sp=list(ideal(-1/2,-3/10,-1/10,0,1/10,3/10,1/2),intvec(1,2,2,1,2,2,1));
   spprint(Sp);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc sppprint(list Spp)
+"USAGE:   sppprint(Sp); list Spp
+RETURN:  string: spectral pairs Spp
+EXAMPLE: example sppprint; shows examples
+"
+{
+  string s;
+  for(int i=1;i<size(Spp[3]);i++)
+  {
+    s=s+"(("+string(Spp[1][i])+","+string(Spp[2][i])+"),"+string(Spp[3][i])+"),";
+  }
+  s=s+"(("+string(Spp[1][i])+","+string(Spp[2][i])+"),"+string(Spp[3][i])+")";
+  return(s);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  list Spp=list(ideal(-1/2,-3/10,-1/10,0,1/10,3/10,1/2),intvec(2,1,1,1,1,1,0),intvec(1,2,2,1,2,2,1));
+  sppprint(Spp);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
