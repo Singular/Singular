@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: gfops.h,v 1.3 1997-06-19 12:22:57 schmidt Exp $ */
+/* $Id: gfops.h,v 1.4 1997-09-10 14:14:39 schmidt Exp $ */
 
 #ifndef INCL_GFOPS_H
 #define INCL_GFOPS_H
@@ -62,13 +62,21 @@ inline int gf_one()
     return 0;
 }
 
-inline int gf_sign ( int a )
+//{{{ inline int gf_sign ( int a )
+//{{{ docu
+//
+// gf_sign() - return 0 if a=0, 1 otherwise.
+//
+//}}}
+inline
+int gf_sign ( int a )
 {
     if ( gf_iszero( a ) )
 	return 0;
     else
 	return 1;
 }
+//}}}
 
 inline int gf_neg ( int a )
 {
