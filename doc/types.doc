@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.42 1998-05-13 16:48:02 wichmann Exp $
+@comment $Id: types.doc,v 1.43 1998-05-14 07:28:27 wichmann Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -116,19 +116,19 @@ but you need a name for it (e.g. for a use with @code{setring} or @code{map}).
 @subsection def declarations
 @cindex def declarations
 
-@table @code
-@item @strong{Syntax:}
+@table @strong
+@item Syntax:
 @code{def} name @code{=} expression @code{;}
-@item @strong{Purpose:}
+@item Purpose:
 defines an object of the same type as the right-hand side.
-@item @strong{Default:}
+@item Default:
 none
-@item @strong{Note:}
+@item Note:
 This is useful if the right-hand side may be of
 variable type as a consequence of a computation (e.g. ideal or module or
 matrix). It is also used in procedures to give the basering a name which
 is local to the procedure.
-@item @strong{Example:}
+@item Example:
 @example
 @c example
   def i;
@@ -164,15 +164,15 @@ can only be defined or accessed with respect to a basering.
 @subsection ideal declarations
 @cindex ideal declarations
 
-@table @code
-@item @strong{Syntax:}
+@table @strong
+@item Syntax:
 @code{ideal} name @code{=} list_of_poly_expressions @code{;}
 @*@code{ideal} name @code{=} ideal_expression @code{;}
-@item @strong{Purpose:}
+@item Purpose:
 defines an ideal.
-@item @strong{Default:}
+@item Default:
 0
-@item @strong{Example:}
+@item Example:
 @example
 @c example
   ring r=0,(x,y,z),dp;
@@ -204,12 +204,12 @@ an identifier of type ideal
 @item
 a function returning ideal
 @item
-ideal expressions combined by arithmetic operations @code{+,*}
+ideal expressions combined by arithmetic operations (@code{+,*})
 @item
 a power of an ideal expression (operator @code{^} or @code{**})
-@*Note that the computation of the product i*i involves
-all products of generators of i while i^2 involves only the different ones
-and is therefore faster
+@*Note that the computation of the product @code{i*i} involves
+all products of generators of @code{i} while @code{i^2} involves only
+the different ones and is therefore faster
 @item
 a typecast to ideal.
 @end enumerate
@@ -223,18 +223,17 @@ a typecast to ideal.
 See @ref{Type conversion and casting}.
 @c ref
 
-
 @c ------------------------------
 @node ideal operations, ideal related functions, ideal expressions, ideal
 @subsection ideal operations
 @cindex ideal operations
 
-@table @asis
-@item @code{+}
+@table @code
+@item +
 addition (concatenation of the generator and simplification)
-@item @code{*}
+@item *
 multiplication (with ideal, poly, vector, module)
-@item @code{^}
+@item ^
 power, exponentiation (by an integer)
 @end table
 
@@ -253,64 +252,64 @@ ideal.
 @subsection ideal related functions
 @cindex ideal related functions
 
-@table @asis
-@item @code{char_series}
+@table @code
+@item char_series
 ireducible characteristic series (see @ref{char_series})
-@item @code{coeffs}
+@item coeffs
 matrix of coefficients (see @ref{coeffs})
-@item @code{contract}
+@item contract
 contraction by an ideal (see @ref{contract})
-@item @code{diff}
+@item diff
 partial derivative (see @ref{diff})
-@item @code{degree}
+@item degree
 multiplicity, dimension and codimension of the ideal of leading terms (see @ref{degree})
-@item @code{dim}
+@item dim
 Krull dimension of basering modulo the ideal of leading terms (see @ref{dim})
-@item @code{eliminate}
+@item eliminate
 elimination of variables (see @ref{eliminate})
-@item @code{facstd}
+@item facstd
 factorizing Groebner basis algorithm (see @ref{facstd})
-@item @code{ factorize } 
+@item factorize
 ideal of factors of a polynomial (see @ref{factorize})
-@item @code{fglm}
+@item fglm
 compute the Groebner basis from a Groebner basis w.r.t. a different
 ordering (see @ref{fglm})
-@item @code{finduni}
+@item finduni
 find univariate polynomials in a zero dimensional ideal (see @ref{finduni})
-@item @code{homog}
+@item homog
 homogenization with respect to a variable (see @ref{homog})
-@item @code{hilb}
+@item hilb
 Hilbert function of a standardbasis (see @ref{hilb})
-@item @code{indepSet}
+@item indepSet
 a maximal set of independent variables of an ideal (see @ref{indepSet})
-@item @code{interred}
+@item interred
 interreduction of an ideal (see @ref{interred})
-@item @code{intersect}
+@item intersect
 ideal intersection (see @ref{intersect})
-@item @code{jacob}
+@item jacob
 ideal of all partial derivatives resp. jacobian matrix (see @ref{jacob})
-@item @code{jet}
+@item jet
 k-jet: Taylor series up to a given order (see @ref{jet})
-@item @code{kbase}
+@item kbase
 vector space basis of basering modulo standardbasis (see @ref{kbase})
-@item @code{koszul}
+@item koszul
 Koszul matrix (see @ref{koszul})
-@item @code{lead}
+@item lead
 leading terms of a set of generators (see @ref{lead})
-@item @code{lift}
+@item lift
 lift-matrix (see @ref{lift})
-@item @code{liftstd}
+@item liftstd
 standardbasis and transformation matrix computation (see @ref{liftstd})
-@item @code{lres} 
+@item lres
 minimal resolution (see @ref{lres})
-@item @code{maxideal}
+@item maxideal
 power of the maximal ideal at 0 (see @ref{maxideal})
-@item @code{minbase}
+@item minbase
 minimal generating set of a homogeneous ideal/module or an ideal/module in a local ring
 (see @ref{minbase})
-@item @code{minor}
+@item minor
 set of minors of a matrix (see @ref{minor})
-@item @code{modulo}
+@item modulo
 represents
 @tex 
 $(h1+h2)/h1=h2/(h1 \cap h2)$ 
@@ -319,47 +318,47 @@ $(h1+h2)/h1=h2/(h1 \cap h2)$
 (h1+h2)/h1=h2/(h1 intersect h2) 
 @end ifinfo
 (see @ref{modulo})
-@item @code{mres}
+@item mres
 minimal free resolution of an ideal/module, also minimizing the given ideal/module
 (see @ref{mres})
-@item @code{mstd}
+@item mstd
 standard basis and minimal generating set of an ideal (see @ref{mstd})
-@item @code{mult}
+@item mult
 multiplicity of an ideal resp. module (see @ref{mult})
-@item @code{ncols}
+@item ncols
 number of columns (see @ref{ncols})
-@item @code{preimage}
+@item preimage
 preimage under a ring map (see @ref{preimage})
-@item @code{qhweight}
+@item qhweight
 quasihomogeneous weights of an ideal (see @ref{qhweight})
-@item @code{quotient}
+@item quotient
 ideal quotient (see @ref{quotient})
-@item @code{reduce}
+@item reduce
 normalform with respect to a standardbasis (see @ref{reduce})
-@item @code{res}
+@item res
 minimal free resolution of an ideal/module but not changing the given ideal/module
 (see @ref{res})
-@item @code{simplify}
+@item simplify
 simplify a set of polynomials (see @ref{simplify})
-@item @code{size}
+@item size
 number of non-zero generators (see @ref{size})
-@item @code{sortvec}
+@item sortvec
 permutation for sorting ideals/modules (see @ref{sortvec})
-@item @code{sres}
+@item sres
 free resolution of a standard basis (see @ref{sres})
-@item @code{std}
+@item std
 standardbasis computation (see @ref{std})
-@item @code{stdfglm} 
+@item stdfglm
 standard basis computation with fglm technique (see @ref{stdfglm})
-@item @code{stdhilbert} 
+@item stdhilbert
 Hilbert driven standardbasis computation (see @ref{stdhilbert} 
-@item @code{subst} 
+@item subst
 substitute a ring variable (see @ref{subst})
-@item @code{syz}
+@item syz
 computation of the first syzygy module (see @ref{syz})
-@item @code{vdim}
+@item vdim
 vector space dimension of basering modulo ideal (see @ref{vdim})
-@item @code{weight}
+@item weight
 optimal weights (see @ref{weight})
 @end table
 
@@ -391,14 +390,14 @@ to represent boolean values
 @subsection int declarations
 @cindex int declarations
 
-@table @code
-@item @strong{Syntax:}
+@table @strong
+@item Syntax:
 @code{int} name @code{=} int_expression @code{;}
-@item @strong{Purpose:}
+@item Purpose:
 defines an integer variable.
-@item @strong{Default:}
+@item Default:
 0
-@item @strong{Example:}
+@item Example:
 @example
 @c example
   int i = 42;
@@ -450,10 +449,10 @@ an element of an intvec or an intmat
 @item
 a function returning int
 @item
-a typecast to int
-@item
 int expressions combined by arithmetic operations
-@code{+},@code{-},@code{*},@code{/},@code{%} or @code{^}.
+(@code{+},@code{-},@code{*},@code{/},@code{%} or @code{^})
+@item
+a typecast to int
 @end enumerate
 Variables of type int represent the compiler integers  and are, therefore,
 limited  in their range (see @ref{Limitations}). If this range is too small 
@@ -483,7 +482,9 @@ characteristic 0.
 @c example
 @end example
 @c ref
-See @ref{Type conversion and casting}.
+See 
+@ref{number};
+@ref{Type conversion and casting}.
 @c ref
 
 @c ------------------------------
@@ -595,7 +596,7 @@ a string comparison:
 @end example
 @item
 boolean expressions combined by boolean operations (@code{and},
-@code{or}, @code{not}). 
+@code{or}, @code{not})
 
 @strong{Note:} All arguments of a logical expressions are first
 evaluated and then the value of the logical expression is
@@ -605,10 +606,7 @@ evaluated by first evaluating @code{a}, even though the value of
 this is different from the left-to-right evaluation of logical
 expressions (as found in most programming languages like C) which, for
 example, determine the @code{(1 || a)} without evaluating @code{a}.
-
-@c ref
 See @ref{Evaluation of logical expressions}.
-@c ref
 @end enumerate
 
 @c ------------------------------
@@ -631,51 +629,58 @@ logical not, may also be written as @code{!}
 @subsection int related functions
 @cindex int related functions
 
-@table @asis
-@item @code{char}
+@table @code
+@item char
 characteristic of the coefficient field of a ring (see @ref{char})
-@item @code{deg}
+@item deg
 degree of a poly resp. vector (see @ref{deg})
-@item @code{det}
+@item det
 determinant (see @ref{det})
-@item @code{dim}
+@item dim
 Krull dimension of basering modulo ideal resp. module (see @ref{dim})
-@item @code{find}
+@item extgcd
+extended greatest common divisor (see @ref{extgcd})
+@item find
 position of a substring in a string (see @ref{find})
-@item @code{gcd}
+@item gcd
 greatest common divisor (see @ref{gcd})
-@item @code{koszul} Koszul matrix (see @ref{koszul})
-@item @code{memory}
+@item koszul
+Koszul matrix (see @ref{koszul})
+@item memory
 memory usage (see @ref{memory})
-@item @code{mult}
+@item mult
 multiplicity of an ideal resp. module (see @ref{mult})
-@item @code{ncols}
+@item ncols
 number of columns (see @ref{ncols})
-@item @code{npars}
+@item npars
 number of ring parameters (see @ref{npars})
-@item @code{nrows}
+@item nrows
 number of rows of a matrix resp.
 the rank of the free module where the vector / module lives
 (see @ref{nrows})
-@item @code{nvars}
+@item nvars
 number of ring variables (see @ref{nvars})
-@item @code{ord}
+@item ord
 degree of the leading term of a poly resp. vector (see @ref{ord})
-@item @code{pardeg}
+@item par
+n-th paramter of the basering (see @ref{par})
+@item pardeg
 degree of a number considered as a polynomial in the ring parameters (see @ref{pardeg})
-@item @code{prime}
+@item prime
 the next lower prime (see @ref{prime})
-@item @code{random}
+@item random
 a pseudo random integer between the given limits (see @ref{random})
-@item @code{regularity}
+@item regularity
 regularity of a resolution (see @ref{regularity})
-@item @code{rvar}
+@item rvar
 test, if the given expression or string is a ring variable (see @ref{rvar})
-@item @code{size}
+@item size
 number of elements in an object (see @ref{size})
-@item @code{trace}
+@item trace
 trace of an integer matrix (see @ref{trace})
-@item @code{vdim}
+@item var
+n-th ring variable of the basering (see @ref{var})
+@item vdim
 vector space dimension of basering modulo ideal resp. of freemodule modulo
 module (see @ref{vdim})
 @end table
@@ -686,13 +691,7 @@ module (see @ref{vdim})
 @cindex intmat
 
 Integer matrices are matrices with entries of integers.
-For the range of integers see @ref{int expressions}.
-@example
-@c example
-  intmat m[2][3]=1,2,3,4,5,6;
-  m;
-@c example
-@end example
+For the range of integers see @ref{Limitations}.
 
 @menu
 * intmat declarations::         
@@ -706,21 +705,21 @@ For the range of integers see @ref{int expressions}.
 @subsection intmat declarations
 @cindex intmat declarations
 
-@table @code
-@item @strong{Syntax:}
+@table @strong
+@item Syntax:
 @code{intmat} name @code{=} intmat_expression @code{;}
 @*@code{intmat} name @code{[} rows @code{] [} cols @code{] =} intmat_expression @code{;}
 @*@code{intmat} name @code{[} rows @code{] [} cols @code{] =} list_of_int_expressions @code{;}
-@item @strong{Purpose:}
+@item Purpose:
 defines an intmat variable.
 @* Given a list of integers, the matrix is filled up with the first row
 from the left to the right, then the second row and so on.
 If the int_list contains less than rows*cols elements,
 the matrix is filled up with zeros; if it contains more
 elements, only the first rows*cols elements are used.
-@item @strong{Default:}
+@item Default:
 0 (1 x 1 matrix)
-@item @strong{Example:}
+@item Example:
 @example
 @c example
   intmat im[3][5]=1,3,5,7,8,9,10,11,12,13;
@@ -745,16 +744,15 @@ a list of int expressions, intvec expressions and intmat expressions
 @item
 a function returning intmat
 @item
- a typecast to intmat
+intmat operations with int (@code{+}, @code{-}, @code{*}, @code{/}, @code{%})
 @item
-intmat operations with int: @code{+}, @code{-}, @code{*}, @code{/}, @code{%}
+intmat operations (@code{+}, @code{-}, @code{*})
 @item
-intmat operations: @code{+}, @code{-}, @code{*}
+a typecast to intmat
 @end enumerate
 @c ref
 See @ref{Type conversion and casting}.
 @c ref
-
 
 @strong{Example:}
 @example
@@ -781,7 +779,7 @@ See @ref{Type conversion and casting}.
 
 @table @code
 @item + 
-addition with intmat, intvec and int
+addition with intmat and int
 @item -
 subtraction with intmat, intvec and int
 @item *
@@ -790,8 +788,12 @@ mulitplication with intmat and intvec
 comparison
 @end table
 
-Brackets may be used to access elements of intmats: intmat expression
-@code{[} int_expressions@code{,} int_expression @code{]} is an intmat entry.
+Brackets may be used to access elements of intmats: 
+@itemize @asis
+@item intmat_expression @code{[} int_expressions@code{,} int_expression @code{]} 
+is an intmat entry, where the first index indicates the row and the
+second the column. 
+@end itemize
 
 @strong{Example:}
 @example
@@ -805,24 +807,24 @@ Brackets may be used to access elements of intmats: intmat expression
 @subsection intmat related functions
 @cindex intmat related functions
 
-@table @asis
-@item @code{bareiss}
+@table @code
+@item bareiss
 Bareiss algorithm (see @ref{bareiss})
-@item @code{betti}
+@item betti
 Betti numbers of a free resolution (see @ref{betti})
-@item @code{det}
+@item det
 determinant (see @ref{det})
-@item @code{ncols}
+@item ncols
 number of cols (see @ref{ncols})
-@item @code{nrows}
+@item nrows
 number of rows (see @ref{nrows})
-@item @code{random}
+@item random
 create a pseudo random intmat (see @ref{random})
-@item @code{size}
+@item size
 total number of entries (see @ref{size})
-@item @code{transpose}
+@item transpose
 transpose of an intmat (see @ref{transpose})
-@item @code{trace}
+@item trace
 trace of an intmat (see @ref{trace})
 @end table
 
@@ -859,15 +861,15 @@ They are also return values of certain interpreter related functions
 @subsection intvec declarations
 @cindex intvec declarations
 
-@table @code
-@item @strong{Syntax:}
+@table @strong
+@item Syntax:
 @code{intvec} name @code{=} intvec_expression @code{;}
-@item @strong{Purpose:}
+@item Purpose:
 defines an intvec variable.
 @* An intvec consists of an ordered list of integers.
-@item @strong{Default:}
+@item Default:
 0
-@item @strong{Example:}
+@item Example:
 @example
 @c example
   intvec iv=1,3,5,7,8;
@@ -959,26 +961,29 @@ comparison (done lexicographically)
 @subsection intvec related functions
 @cindex intvec related functions
 
-@table @asis
-@item @code{factorize} multiplicities of factors of a polynomial (see @ref{factorize})
-@item @code{hilb}
+@table @code
+@item factorize 
+multiplicities of factors of a polynomial (see @ref{factorize}
+@item hilb
 returns Hilbert series as intvec (see @ref{hilb})
-@item @code{indepSet}
+@item indepSet
 indices of a maximal set of independent variables of an ideal (see @ref{indepSet})
-@item @code{leadexp}
+@item leadexp
 the exponent vector of the leading monomial (see @ref{leadexp})
-@item @code{nrows}
+@item nrows
 number of rows (see @ref{nrows})
-@item @code{qhweight}
+@item qhweight
 returns quasihgomogeneous weights (see @ref{qhweight})
-@item @code{size}
+@item size
 length of the intvec (see @ref{size})
-@item @code{sortvec}
+@item sortvec
 permutation for sorting ideals/modules (see @ref{sortvec})
-@item @code{stdhilbert} Hilbert series for Hilbert driven standard basis computation (see @ref{stdhilbert})
-@item @code{transpose}
+@item stdhilbert 
+Hilbert series for Hilbert driven standard basis computation (see
+@ref{stdhilbert})
+@item transpose
 transpose of an intvec, returns an intmat (see @ref{transpose})
-@item @code{weight}
+@item weight
 returns weights for the weighted ecart method (see @ref{weight})
 @end table
 
@@ -1019,14 +1024,14 @@ something @sc{Singular} can write to and/or read from. Currently,
 @subsection link declarations
 @cindex link declarations
 
-@table @code
-@item @strong{Syntax:}
+@table @strong
+@item Syntax:
 @code{link} name @code{=} string_expression @code{;}
-@item @strong{Purpose:}
+@item Purpose:
 defines a new communication link.
-@item @strong{Default:}
+@item Default:
 none
-@item @strong{Example:}
+@item Example:
 @example
 @c Tim: Let's only do the read here once, doing it twice without closing 
 @c it first migth be confusing
@@ -1092,22 +1097,22 @@ For a detailed format description of the link describing string see:
 @subsection link related functions
 @cindex link related functions
 
-@table @asis
-@item @code{close}
+@table @code
+@item close
 closes a link (see @ref{close})
-@item @code{dump}
+@item dump
 generates a dump of all variables and their values (see @ref{dump})
-@item @code{getdump}
+@item getdump
 reads a dump (see @ref{getdump})
-@item @code{open}
+@item open
 opens a link (see @ref{open})
-@item @code{read}
+@item read
 reads from a link (see @ref{read})
-@item @code{status}
+@item status
 gets the status of a link (see @ref{status})
-@item @code{write}
+@item write
 writes to a link (see @ref{write})
-@item @code{kill}
+@item kill
 closes and kills a link (see @ref{kill})
 @end table
 
@@ -1523,15 +1528,15 @@ is not a copy but another reference to the same ring.
 @subsection list declarations
 @cindex list declarations
 
-@table @code
-@item @strong{Syntax:}
+@table @strong
+@item Syntax:
 @code{list} name @code{=} expression_list@code{;}
 @*@code{list} name @code{=} list_expression@code{;}
-@item @strong{Purpose:}
+@item Purpose:
 defines a list (of objects of possibly different types).
-@item @strong{Default:}
+@item Default:
 empty list
-@item @strong{Example:}
+@item Example:
 @example
 @c example
   list l=1,"str";
@@ -1580,15 +1585,16 @@ See @ref{Type conversion and casting}.
 @subsection list operations
 @cindex list operations
 
-@table @asis
-@item @code{+}
+@table @code
+@item +
 concatenation
-@item @code{,}
+@item ,
 construct a new list whose elements are the parts of the expression list
 @end table
 
 Brackets may be used to access elements of lists:
-list_expression @code{[} int_expression @code{]} is a list entry.
+list_expression @code{[} int_expression @code{]} is a list entry. The
+first element of the list has the index 1.
 @strong{Example:}
 @example
 @c example 
@@ -1601,31 +1607,31 @@ list_expression @code{[} int_expression @code{]} is a list entry.
 @subsection list related functions
 @cindex list related functions
 
-@table @asis
-@item @code{betti}
+@table @code
+@item betti
 Betti numbers from a resolution (see @ref{betti})
-@item @code{delete}
+@item delete
 delete an element from a list (see @ref{delete})
-@item @code{facstd}
+@item facstd
 factorizing Groebner basis algorithm (see @ref{facstd})
-@item @code{factorize}
+@item factorize
 list of factors of a polynomial (see @ref{factorize})
-@item @code{insert}
+@item insert
 insert or append a new element to a list (see @ref{insert})
-@item @code{lres}
+@item lres
 minimal resolution (see @ref{lres})
-@item @code{minres}
+@item minres
 minimize a free resolution (see @ref{minres})
-@item @code{mres}
+@item mres
 minimal free resolution of an ideal/module, also
 minimizing the first module (see @ref{mres})
-@item @code{names}
+@item names
 list of all userdefined variable names (see @ref{names})
-@item @code{res}
+@item res
 minimal free resolution of an ideal/module (see @ref{res})
-@item @code{size}
+@item size
 number of entries (see @ref{size})
-@item @code{sres}
+@item sres
 free resolution of an ideal/module given by a standard base (see @ref{sres})
 @end table
 
@@ -1678,10 +1684,10 @@ See @ref{imap}; @ref{fetch}; @ref{subst}.
 @subsection map declarations
 @cindex map declarations
 
-@table @code
-@item @strong{Syntax:}
+@table @strong
+@item Syntax:
 @code{map} name @code{=} preimage_ring_name @code{,} ideal_expression @code{;}
-@item @strong{Purpose:}
+@item Purpose:
 defines a ring map from preimage_ring to basering
 @sp 1
 map the variables of the preimage ring to the generators of the ideal.
@@ -1690,11 +1696,11 @@ preimage_ring the remaining variables are maped to 0, if the ideal contains
 more elements these are ignored.
 The image ring is always the actual basering.
 For the mapping of coefficients from different fields see @ref{map}.
-@item @strong{Default:}
+@item Default:
 none
-@item @strong{Remark:}
+@item Remark:
 There are standard mappings for the identity map: @code{fetch} and @code{imap}.
-@item @strong{Example:}
+@item Example:
 @example
 @c example
   ring r1=32003,(x,y,z),dp;
@@ -1748,7 +1754,7 @@ Maps may be composed.
 @end table
 
 Brackets may be used to access elements of maps:
-@emph{map expressions} @code{[} @emph{int expressions} @code{]} is a map entry.
+map_expression @code{[} int_expressions @code{]} is a map entry.
 @strong{Example:}
 @example
 @c example
@@ -1795,11 +1801,11 @@ Note that the trailing zero columns of A may be deleted by module operations wit
 @subsection matrix declarations
 @cindex matrix declarations
 
-@table @code
-@item @strong{Syntax:}
+@table @strong
+@item Syntax:
 @code{matrix} name@code{[}rows@code{][}cols@code{] =} list_of_poly_expressions @code{;}
 @*@code{matrix} name = matrix_expression @code{;}
-@item @strong{Purpose:}
+@item Purpose:
 defines a matrix (of polynomials).
 
 The given poly_list fills up the matrix beginning with the first row
@@ -1811,9 +1817,9 @@ If the right-hand side is a matrix expression
 the matrix on the left-hand side becomes the same size as the right-hand side,
 otherwise the size is determined by the left-hand side.
 If the size is omitted a 1x1 matrix will be created.
-@item @strong{Default:}
+@item Default:
 0 (1 x 1 matrix)
-@item @strong{Example:}
+@item Example:
 @example
 @c example
   int ro = 3;
@@ -1877,9 +1883,10 @@ multiplication (with poly, matrix)
 comparison
 @end table
 
-Brackets may be used to access elements of matrices: matrix_expressions
+Brackets may be used to access elements of matrices: matrix_expression
 @code{[} int_expression@code{,} int_expression @code{]} is a matrix
-entry.
+entry, where the first index indicates the row and the second the
+column. 
 @strong{Example:}
 @example
 @c example
@@ -1892,42 +1899,42 @@ entry.
 @subsection matrix related functions
 @cindex matrix related functions
 
-@table @asis
-@item @code{bareiss}
+@table @code
+@item bareiss
 Bareiss algorithm (see @ref{bareiss})
-@item @code{coef}
+@item coef
 matrix of coefficients and monomials (see @ref{coef})
-@item @code{coeffs}
+@item coeffs
 matrix of coefficients (see @ref{coeffs})
-@item @code{det}
+@item det
 determinant (see @ref{det})
-@item @code{diff}
+@item diff
 partial derivative (see @ref{diff})
-@item @code{jacob}
+@item jacob
 Jacobi matrix (see @ref{jacob})
-@item @code{koszul}
+@item koszul
 Koszul matrix (see @ref{koszul})
-@item @code{lift}
+@item lift
 lift-matrix (see @ref{lift})
-@item @code{liftstd}
+@item liftstd
 standardbasis and transformation matrix computation (see @ref{liftstd})
-@item @code{minor}
+@item minor
 set of minors of a matrix (see @ref{minor})
-@item @code{ncols}
+@item ncols
 number of columns (see @ref{ncols})
-@item @code{nrows}
+@item nrows
 number of rows (see @ref{nrows})
-@item @code{print}
+@item print
 nice print format (see @ref{print})
-@item @code{size}
+@item size
 number of matrix entries (see @ref{size})
-@item @code{subst}
+@item subst
 substitute a ring variable (see @ref{subst})
-@item @code{trace}
+@item trace
 trace of a matrix (see @ref{trace})
-@item @code{transpose}
+@item transpose
 transpose a matrix (see @ref{transpose})
-@item @code{wedge}
+@item wedge
 wedge product (see @ref{wedge})
 @end table
 
@@ -1998,15 +2005,15 @@ which generate M.
 @subsection module declarations
 @cindex module declarations
 
-@table @code
-@item @strong{Syntax:}
+@table @strong
+@item Syntax:
 @code{module} name @code{=} list_of_vector_expressions @code{;}
 @*@code{module} name @code{=} module_expression @code{;}
-@item @strong{Purpose:}
+@item Purpose:
 defines a module.
-@item @strong{Default:}
+@item Default:
 [0]
-@item @strong{Example:}
+@item Example:
 @example
 @c example
   ring r=0,(x,y,z),(c,dp);
@@ -2063,7 +2070,12 @@ See @ref{Type conversion and casting}.
 addition (concatenation of the generators and simplification)
 @item @code{*}
 multiplication with ideal or poly, but not `module` * `module`
-@item 
+@item Brackets may be used to access elements of modules:
+@item module_expression @code{[} int_expression @code{,} int_expression @code{]} 
+is a module entry, where the first index indicates the row and
+the second the column. 
+@item module_expressions @code{[} int_expression @code{]} 
+is a vector, where the index indicates the column.
 @end table
 
 @strong{Example:}
@@ -2073,91 +2085,87 @@ multiplication with ideal or poly, but not `module` * `module`
 @c example
 @end example
 
-Brackets may be used to access elements of moduless:
-@emph{module expressions} @code{[} @emph{row} @emph{,} @emph{column}  @code{]} is a module entry.
-@emph{module expressions} @code{[} @emph{column} @code{]} is a vector.
-
 @c ------------------------------
 @node module related functions,  , module operations, module
 @subsection module related functions
 @cindex module related functions
 
-@table @asis
-@item @code{coeffs}
+@table @code
+@item coeffs
 matrix of coefficients (see @ref{coeffs})
-@item @code{degree}
+@item degree
 multiplicity, dimension and codimension of the module of leading terms (see @ref{degree})
-@item @code{diff}
+@item diff
 partial derivative (see @ref{diff})
-@item @code{dim}
+@item dim
 Krull dimension of free module over the basering modulo the module of leading terms (see @ref{dim})
-@item @code{eliminate}
+@item eliminate
 elimination of variables (see @ref{eliminate})
-@item @code{freemodule}
+@item freemodule
 the free module of given rank (see @ref{freemodule})
-@item @code{hilb}
+@item hilb
 Hilbert function of a standardbasis (see @ref{hilb})
-@item @code{homog}
+@item homog
 homogenization with respect to a variable (see @ref{homog})
-@item @code{interred}
+@item interred
 interreduction of a module (see @ref{interred})
-@item @code{intersect}
+@item intersect
 module intersection (see @ref{intersect})
-@item @code{jet}
+@item jet
 k-jet: Taylor series up to a given order (see @ref{jet})
-@item @code{kbase}
+@item kbase
 vector space basis of free module over the basering modulo standardbasis (see @ref{kbase})
-@item @code{lead}
+@item lead
 initial module (see @ref{lead})
-@item @code{lift}
+@item lift
 lift-matrix (see @ref{lift})
-@item @code{liftstd}
+@item liftstd
 standardbasis and transformation matrix computation (see @ref{liftstd})
-@item @code{lres}
+@item lres
 minimal resolution (see @ref{lres})
-@item @code{minbase}
+@item minbase
 minimal generating set of a homogeneous ideal/module or an ideal/module
 over a local ring
 (see @ref{minbase})
-@item @code{modulo}
+@item modulo
 represents (h1+h2)/h1=h2/(h1 intersect h2) (see @ref{modulo})
-@item @code{mres}
+@item mres
 minimal free resolution of an ideal/module, also minimizing the given module
 (see @ref{mres})
 @item @code{mult}
 multiplicity of a module (see @ref{mult})
-@item @code{ncols}
+@item ncols
 number of columns (see @ref{ncols})
-@item @code{nrows}
+@item nrows
 number of rows (see @ref{nrows})
-@item @code{prune}
+@item prune
 minimize the embedding into a free module (see @ref{prune})
-@item @code{qhweight}
+@item qhweight
 quasihomogeneous weights of an ideal/module (see @ref{qhweight})
-@item @code{quotient}
+@item quotient
 ideal quotient (see @ref{quotient})
-@item @code{reduce}
+@item reduce
 normalform with respect to a standardbasis (see @ref{reduce})
-@item @code{res}
+@item res
 minimal free resolution of an ideal/module but not changing the given ideal/module
 (see @ref{res})
-@item @code{simplify}
+@item simplify
 simplify a set of vectors (see @ref{simplify})
-@item @code{size}
+@item size
 number of non-zero generators (see @ref{size})
-@item @code{sortvec}
+@item sortvec
 permutation for sorting ideals/modules (see @ref{sortvec})
-@item @code{sres}
+@item sres
 free resolution of a standard basis (see @ref{sres})
-@item @code{std}
+@item std
 standardbasis computation (see @ref{std}, @ref{liftstd})
-@item @code{subst}
+@item subst
 substitute a ring variable (see @ref{subst})
-@item @code{syz}
+@item syz
 computation of the first syzygy module (see @ref{syz})
-@item @code{vdim}
+@item vdim
 vector space dimension of free module over the basering modulo module (see @ref{vdim})
-@item @code{weight}
+@item weight
 "optimal" weights (see @ref{weight})
 @end table
 
@@ -2199,14 +2207,14 @@ which determines the coefficient field.
 @subsection number declarations
 @cindex number declarations
 
-@table @code
-@item @strong{Syntax:}
+@table @strong
+@item Syntax:
 @code{number} name @code{=} number_expression @code{;}
-@item @strong{Purpose:}
+@item Purpose:
 defines a number.
-@item @strong{Default:}
+@item Default:
 0
-@item @strong{Example:}
+@item Example:
 @example
 @c example
   ring r = 32003,(x,y,z),dp;
@@ -2293,12 +2301,15 @@ comparison
 @subsection number related functions
 @cindex ideal number functions
 
-@table @strong
-@item @code{leadcoef} 
+@table @code
+@item leadcoef
 coefficient of the leading term (see @ref{leadcoef})
-@item @code{par} n-th paramter of the basering (see @ref{par})
-@item @code{pardeg} degree of a number in ring paramters (see @ref{pardeg}) 
-@item @code{parstr} string form of paramter  (see @ref{parstr})
+@item par
+n-th paramter of the basering (see @ref{par})
+@item pardeg
+degree of a number in ring paramters (see @ref{pardeg}) 
+@item parstr
+string form of paramter  (see @ref{parstr})
 @end table
 
 @c ---------------------------------------
@@ -2332,14 +2343,14 @@ monomial ordering.
 @subsection poly declarations
 @cindex poly declarations
 
-@table @code
-@item @strong{Syntax:}
+@table @strong
+@item Syntax:
 @code{poly} name @code{=} poly_expression @code{;}
-@item @strong{Purpose:}
+@item Purpose:
 defines a polynomial.
-@item @strong{Default:}
+@item Default:
 0
-@item @strong{Example:}
+@item Example:
 @example
   ring r = 32003,(x,y,z),dp;
   poly s1  = x3y2+151x5y+186xy6+169y9;
@@ -2411,8 +2422,8 @@ comparison
 @c choice of the monomial at the indicated place w.r.t. the monomial order
 @end table
 
-@*Brackets may be used to access single terms of a polynomial:
-@emph{list expressions} @code{[} @emph{int expressions} @code{]} is a poly  entry
+Brackets may be used to access single terms of a polynomial:
+poly_expression @code{[} int_expression @code{]} is a poly  entry.
 
 @strong{Example:}
 @example
@@ -2430,53 +2441,56 @@ comparison
 @subsection poly related functions
 @cindex poly related functions
 
-@table @asis
-@item @code{cleardenom}
+@table @code
+@item cleardenom
 quotient of a poly by its content (see @ref{cleardenom})
-@item @code{coef}
+@item coef
 matrix of coefficients and monomials (see @ref{coef})
-@item @code{coeffs}
+@item coeffs
 matrix of coefficients (see @ref{coeffs})
-@item @code{deg}
+@item deg
 degree (see @ref{deg})
-@item @code{det}
+@item det
 determinant (see @ref{det})
-@item @code{diff}
+@item diff
 partial derivative (see @ref{diff})
-@item @code{extgcd} Bezout representation of gcd (see @ref{extgcd})
-@item @code{factorize} factorize polynomial (see @ref{factorize})
-@item @code{finduni}
+@item extgcd
+Bezout representation of gcd (see @ref{extgcd})
+@item factorize
+factorize polynomial (see @ref{factorize})
+@item finduni
 find univariate polynomials in a zero dimensional ideal (see @ref{finduni})
-@item @code{homog}
+@item homog
 homogenization (see @ref{homog})
-@item @code{jacob}
+@item jacob
 ideal resp. matrix of all partial derivatives (see @ref{jacob})
-@item @code{lead}
+@item lead
 leading monomial (see @ref{lead})
-@item @code{leadcoef}
+@item leadcoef
 coefficient of the leading term (see @ref{leadcoef})
-@item @code{leadexp}
+@item leadexp
 the exponent vector of the leading monomial (see @ref{leadexp})
-@item @code{jet}
+@item jet
 monomials with degree smaller k+1 (see @ref{jet})
-@item @code{ord}
+@item ord
 degree of the leading monomial (see @ref{ord})
-@item @code{reduce}
+@item reduce
 normal form with respect to a standard base (see @ref{reduce})
-@item @code{rvar}
+@item rvar
 test for ring variable (see @ref{rvar})
-@item @code{simplify}
+@item simplify
 normalize a polynomial (see @ref{simplify})
-@item @code{qhweight}  quasihomogenous weights (see @ref{qhweight})
-@item @code{size}
+@item qhweight
+quasihomogenous weights (see @ref{qhweight})
+@item size
 number of monomials (see @ref{size})
-@item @code{subst}
+@item subst
 substitute a ring variable (see @ref{subst})
-@item @code{trace}
+@item trace
 trace of a matrix (see @ref{trace})
-@item @code{var}
+@item var
 the indicated variable of the ring (see @ref{var})
-@item @code{varstr} 
+@item varstr
 variable in string form (see @ref{varstr})
 @end table
 
@@ -2514,8 +2528,8 @@ using the command @code{LIB}. For more information on libraries see
 @c   chapter "Proc in a library".
 @c   If you change something here, change it there, too!
 @c ------------------------------------------------------------
-@table @code
-@item @strong{Syntax:}
+@table @strong
+@item Syntax:
 [@code{static}] @code{proc} proc_name [parameter_list]
 @*["help_text"]
 @*@code{@{}
@@ -2533,7 +2547,7 @@ using the command @code{LIB}. For more information on libraries see
 @end tex
    sequence_of_commands;
 @*@code{@}}]
-@item @strong{Purpose:}
+@item Purpose:
 defines a new function, the @code{proc} proc_name, with the additional 
 information help_text, which is copied to the screen by 
 @code{help proc_name;} and the @code{example} section
@@ -2541,7 +2555,7 @@ which is executed by @code{example proc_name;}.
 @* The help_text, the parameter_list, and the example section are optional.
 @* Specifying @code{static} in front of the procedure definition (in a
 library file) makes this procedure local to the library.
-@item @strong{Example:}
+@item Example:
 @example
 @c example
   proc milnor_number (poly p)
@@ -2574,17 +2588,17 @@ library file) makes this procedure local to the library.
 @subsection qring declaration
 @cindex qring declaration
 
-@table @code
-@item @strong{Syntax:}
+@table @strong
+@item Syntax:
 @code{qring} name @code{=} ideal_expression @code{;}
-@item @strong{Purpose:}
+@item Purpose:
 defines a quotient ring as the basering modulo an ideal.
 
 The ideal must be a standard basis. The qring command performs a change
 of the basering to this new ring.
-@item @strong{Default:}
+@item Default:
 none
-@item @strong{Example:}
+@item Example:
 @example
 @c example
   ring r1=32003,(x,y,z),dp;
@@ -2617,14 +2631,14 @@ can only be defined or accessed with respect to a basering.
 @subsection resolution declarations
 @cindex resolution declarations
 
-@table @code
-@item @strong{Syntax:}
+@table @strong
+@item Syntax:
 @code{resolution} name @code{=} resolution_expression @code{;}
-@item @strong{Purpose:}
+@item Purpose:
 defines a resolution.
-@item @strong{Default:}
+@item Default:
 none
-@item @strong{Example:}
+@item Example:
 @example
 @c example
   ring R;
@@ -2658,14 +2672,14 @@ See @ref{Type conversion and casting}.
 @subsection resolution related functions
 @cindex resolution related functions
 
-@table @asis
-@item @code{mres}
+@table @code
+@item mres
 minimal free resolution of an ideal/module, also minimizing the given ideal/module
 (see @ref{mres})
-@item @code{res}
+@item res
 minimal free resolution of an ideal/module but not changing the given ideal/module
 (see @ref{res})
-@item @code{sres}
+@item sres
 free resolution of a standard basis (see @ref{sres})
 @end table
 
@@ -2696,14 +2710,14 @@ For a detailed description of the concept of rings see
 @c   chapter "General syntax of a ring declaration".
 @c   If you change something here, change it there, too!
 @c ------------------------------------------------------------
-@table @code
-@item @strong{Syntax:}
+@table @strong
+@item Syntax:
 @code{ring} name @code{=} field@code{,}
 @code{(} names_of_ring_variables @code{),}
 @code{(} ordering @code{);}
-@item @strong{Default:}
+@item Default:
 @code{32003,(x,y,z),(dp,C);}
-@item @strong{Purpose:}
+@item Purpose:
 defines a basering for polynomials, ideals, vectors, modules, resolutions
 and matrices and sets it as the actual basering.
 
@@ -2743,7 +2757,7 @@ for components orders
 If one element of the list consists of only one entry, the parentheses may
 be omitted.
 
-@item @strong{Example: }
+@item Example:
 @example
 @c example
   ring r=0,(a,b,c,d),dp;
@@ -2801,14 +2815,14 @@ while a @code{+} concatenates strings.
 @subsection string declarations
 @cindex string declarations
 
-@table @code
-@item @strong{Syntax:}
+@table @strong
+@item Syntax:
 @code{string} name @code{=} string_expression @code{;}
-@item @strong{Purpose:}
+@item Purpose:
 defines a string variable.
-@item @strong{Default:}
+@item Default:
 "" (the empty string)
-@item @strong{Example:}
+@item Example:
 @example
 @c example
   string s1="Now I know";
@@ -2880,12 +2894,15 @@ concatenation
 comparison (lexicographic with respect to the ASCII coding)
 @end table
 
-@* Brackets may be used to access parts of a string: string_expression
-@code{[} int_expression @code{]} is a character of the string,
-string_expressions @code{[} int_expression@code{,} int_expression
-@code{]} is a substring filled up with blanks if length_int_expression
-exceeds the total size of the string, and string_expressions @code{[}
-intvec_expression @code{]} is a list of characters from the string.
+Brackets may be used to access parts of a string: 
+@*string_expression @code{[} int_expression @code{]} 
+is a character of the string, 
+@*string_expression @code{[} int_expression@code{,} int_expression @code{]} 
+is a substring, where the first argument is the start index and the
+second is the length of the substring, filled up with blanks if the
+length exceeds the total size of the string, and 
+@*string_expression @code{[} intvec_expression @code{]} 
+is a list of characters from the string.
 
 @strong{Example:}
 @example
@@ -2906,27 +2923,27 @@ intvec_expression @code{]} is a list of characters from the string.
 @subsection string related functions
 @cindex string related functions
 
-@table @asis
-@item @code{charstr}
+@table @code
+@item charstr
 description of the coeffinet field of a ring (see @ref{charstr})
-@item @code{find}
+@item find
 position of a substring in a string (see @ref{find})
-@item @code{nameof}
+@item nameof
 name of an object (see @ref{nameof})
-@item @code{option}
+@item option
 lists all defined options (see @ref{option})
-@item @code{ordstr}
+@item ordstr
 monomial ordering of a ring (see @ref{ordstr})
-@item @code{parstr}
+@item parstr
 names of all ring parameters or the
 name of the n-th ring parameter (see @ref{parstr})
-@item @code{read}
+@item read
 read a file (see @ref{read})
-@item @code{size}
+@item size
 length of a string (see @ref{size})
-@item @code{typeof}
+@item typeof
 type of an object (see @ref{typeof})
-@item @code{varstr}
+@item varstr
 names of all ring variables or the
 name of the n-th ring variable (see @ref{varstr})
 @end table
@@ -2964,14 +2981,14 @@ or as @code{[f,0,g,1,0]}.)
 @subsection vector declarations
 @cindex vector declarations
 
-@table @code
-@item @strong{Syntax:}
+@table @strong
+@item Syntax:
 @code{vector} name @code{=} vector_expression @code{;}
-@item @strong{Purpose:}
+@item Purpose:
 defines a vector of polynomials (an element of a free module).
-@item @strong{Default:}
+@item Default:
 [0]
-@item @strong{Example:}
+@item Example:
 @example
 @c example
   ring r=0,(x,y,z),(c,dp);
@@ -3048,44 +3065,45 @@ choice of a component
 @end example
 
 Brackets may be used to access elements of vectors:
-@emph{vector expressions} @code{[} @emph{int expressions} @code{]} is a vector entry.
+vector_expression @code{[} int_expressions @code{]} is a vector entry.
+
 @c ------------------------------
 @node vector related functions,  , vector operations, vector
 @subsection vector related functions
 @cindex vector related functions
 
-@table @asis
-@item @code{cleardenom}
+@table @code
+@item cleardenom
 quotient of a vector by its content (see @ref{cleardenom})
-@item @code{coeffs}
+@item coeffs
 matrix of coefficients (see @ref{coeffs})
-@item @code{deg}
+@item deg
 degree (see @ref{deg})
-@item @code{diff}
+@item diff
 partial derivative (see @ref{diff})
-@item @code{gen}
+@item gen
 i-th generator (see @ref{gen})
-@item @code{homog}
+@item homog
 homogenization (see @ref{homog})
-@item @code{jet}
+@item jet
 k-jet: monomials with degree smaller k+1 (see @ref{jet})
-@item @code{lead}
+@item lead
 leading monomial (see @ref{lead})
-@item @code{leadcoef}
+@item leadcoef
 leading coefficient (see @ref{leadcoef})
-@item @code{leadexp}
+@item leadexp
 the exponent vector of the leading monomial (see @ref{leadexp})
-@item @code{nrows}
+@item nrows
 number of rows (see @ref{nrows})
-@item @code{ord}
+@item ord
 degree of the leading monomial (see @ref{ord})
-@item @code{reduce}
+@item reduce
 normal form with respect to a standard base (see @ref{reduce})
-@item @code{simplify}
+@item simplify
 normalize a vector (see @ref{simplify})
-@item @code{size}
+@item size
 number of monomials (see @ref{size})
-@item @code{subst}
+@item subst
 substitute a ring variable (see @ref{subst})
 @end table
 
