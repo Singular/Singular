@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.10 1997-05-06 08:31:05 obachman Exp $ */
+/* $Id: misc.cc,v 1.11 1997-05-06 17:10:59 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -31,6 +31,8 @@
 #include "subexpr.h"
 #include "timer.h"
 #include "intvec.h"
+#define SI_DONT_HAVE_GLOBAL_VARS
+#include <factory.h>
 
 /*0 implementation*/
 
@@ -45,6 +47,7 @@ int inits(void)
 /*4 randomize: */
   t=initTimer();
   /*t=(int)time(NULL);*/
+  if (t==0) t=1;
 #ifdef HAVE_RTIMER
   initRTimer();
 #endif
@@ -53,6 +56,9 @@ int inits(void)
 #else
   srand((unsigned int)t);
 #endif
+#ifdef HAVE_FACTORY
+  factoryseed(t);
+#endif  
 /*4 inits for special machines */
 #ifdef macintosh
   mmIsInitialized=mmInit();
