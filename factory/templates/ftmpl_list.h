@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_list.h,v 1.6 2001-06-18 08:44:37 pfister Exp $ */
+/* $Id: ftmpl_list.h,v 1.7 2001-06-18 11:33:14 Singular Exp $ */
 
 #ifndef INCL_LIST_H
 #define INCL_LIST_H
@@ -65,9 +65,9 @@ public:
     void sort ( int (*) ( const T&, const T& ) );
 #ifndef NOSTREAMIO
     void print ( ostream & ) const;
+    friend ostream& operator<< <>( ostream & os, const List<T> & l );
 #endif /* NOSTREAMIO */
     friend class ListIterator<T>;
-    friend ostream& operator<< <>( ostream & os, const List<T> & l );
 };
 
 #ifndef NOSTREAMIO
