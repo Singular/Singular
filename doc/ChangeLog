@@ -1,3 +1,14 @@
+Fri Feb  7 13:32:09 2003  Viktor Levandovskyy <levandov@mathematik.uni-kl.de>
+
+	* plural documentation is merged with singular docs
+	* new targets: 
+		make plu_html (builds autonomous plural HTML)
+		make plural.hlp (plural info)
+	* if "@set withplural 1" exists in singular.doc, then
+	  the big singular+plural documentation will be built
+	  by default. "@clear withplural" will return to the
+	  original singular-only doc.
+
 Thu Jun 18 12:42:39 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* singular.doc: short table of contents added
