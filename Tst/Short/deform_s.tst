@@ -5,8 +5,26 @@ LIB "tst.lib";
 tst_init();
 LIB "deform.lib";
 example versal;
+// rest of what used to be in that example
+   ring  r2       = 0,(x,y,z),ds;
+   ideal Fo       = x2,xy,yz,zx;
+   printlevel     = 3;
+   versal(Fo);
+   printlevel     = p;
+   if(system("with","Namespaces")) { kill Ring::Px,Top::Qx,Ring::So; }
+   kill Px,Qx,So;
 example mod_versal;
 example lift_rel_kb;
+// rest of what used to be in that example
+  "2nd EXAMPLE";
+  ring   r = 100,(x,y),dp;
+  ideal  I = x2+y2,x2y;
+  module M = jacob(I)+I*freemodule(2);
+  module N = [x+y,1+x2+xy];
+  matrix A = lift_rel_kb(N,M);
+  print(A);
+  print(kbase(std(M))*A);
+  print(reduce(N,std(M)));
 example lift_kbase;
    printlevel =  2; 
 ring  r1  = 0,(x,y,z,u),dp;
