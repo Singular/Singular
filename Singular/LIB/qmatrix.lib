@@ -1,22 +1,24 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: qmatrix.lib,v 1.1 2004-03-18 20:40:22 levandov Exp $";
+version="$Id: qmatrix.lib,v 1.2 2004-03-18 21:36:09 levandov Exp $";
 category="Noncommutative";
 info="
-LIBRARY: qmatrix.lib     Definition of quantum matrix ring and quantum minors.
+LIBRARY: qmatrix.lib     Quantum matrices, quantum minors and symmetric groups.
 AUTHORS: Lobillo, F.J., email: jlobillo@ugr.es
 	 Rabelo, C., email: crabelo@ugr.es
 
 SUPPORT: Metodos algebraicos y efectivos en grupos cuanticos, BFM2001-3141, MCYT, Jose Gomez-Torrecillas (Main researcher).
 
 MAIN PROCEDURES:
-quant(n);		generates the quantum matrix ring of order n
-qminor(u,v,nr);  	calculate a quantum minor of a quantum matrix
+quant(n, [p]);		generates the quantum matrix ring of order n, the quantum parameter q will be specified at the p-th root of unity 
+qminor(u, v, nr);  	calculate a quantum minor of a quantum matrix
 
 AUXILIARY PROCEDURES:
 SymGroup(n);  		generates an intmat containing S(n), each row is an element of S(n)
 LengthSymElement(v);	calculates the length of the element v of S(n)
 LengthSym(M);		calculates the length of each element of M, being M a subset of S(n)
 ";
+
+LIB "nctools.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -128,7 +130,7 @@ example
 
 proc quant(int n, list #)
 "USAGE:   quant(n, [p]); n integer, n>1, p (optional) integer
-RETURN:  a ring, describing the quantum matrix ring of order n; if p is specified, the quantum parameter will be specialized at p-th root of unity
+RETURN:  a ring, describing the quantum matrix ring of order n; if p is specified, the quantum parameter q will be specialized at p-th root of unity
 NOTE:    You have to activate this ring with the "setring" command.
          The usual representation of the variables in this quantum
 	 algebra is not used because double indexes are not allowed
@@ -146,14 +148,13 @@ EXAMPLE: example quant; shows examples
       m[i,nv+1-i]=1;
     }
     ring @rrr=(0,q),(y(1..nv)),Dp;
-    if (size(#)>0) // check whether we are at special q
+    if (size(#)>0)
     {
       if ( typeof( #[1] ) == "int" )
       {
 	int chr = #[1];
 	if (chr>1)
 	{
-	  LIB "nctools.lib";
 	  minpoly = RooOfUnity(chr);
 	}
 	else
@@ -215,8 +216,7 @@ example
 
 proc qminor(intvec I, intvec J, int nr)
 "USAGE:	qminor(I,J,nr); I is the ORDERED LIST of the rows to consider
-	in the minor, J is the ORDERED LIST of the cols to consider in the minor 
-        and nr is the order of the quantum matrix algebra where you are working (quant(nr)).
+	in the minor, J is the ORDERED LIST of the cols to consider in the minor and nr is the order of the quantum matrix algebra where you are working (quant(nr)).
 RETURN: poly, the quantum minor.
 NOTE:    I and J must have the same number of elements.
 EXAMPLE: example qminor; shows examples
