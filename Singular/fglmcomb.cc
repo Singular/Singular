@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmcomb.cc,v 1.10 1998-05-15 14:31:20 wichmann Exp $
+// $Id: fglmcomb.cc,v 1.11 1998-05-19 09:46:46 pohl Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -259,7 +259,7 @@ fglmNewLinearCombination( ideal source, poly monset )
             pIter( temp );
         }
         nf[k]= current;
-#ifdef __MWERKS__
+#ifdef __NO_CONSTR__
         mv[k].mac_constr( currV );
 #else
         mv[k].fglmVector( currV );
@@ -270,7 +270,7 @@ fglmNewLinearCombination( ideal source, poly monset )
     for ( k= 0; k < numMonoms; k++ ) {
         STICKYPROT( "." );
  
-#ifdef __MWERKS__
+#ifdef __NO_CONSTR__
         v[k].mac_constr_i( basisSize );
 #else
         v[k].fglmVector( basisSize );
@@ -471,7 +471,7 @@ fglmLinearCombination( ideal source, poly monset )
     // get the vector representation
     STICKYPROT2( "(%i)", basisSize );
     for ( k= 0; k < numMonoms; k++ ) {
-#ifdef __MWERKS__
+#ifdef __NO_CONSTR__
         v[k].mac_constr_i( basisSize );
 #else
         v[k].fglmVector( basisSize );
