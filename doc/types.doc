@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.99 1999-08-23 17:07:41 Singular Exp $
+@comment $Id: types.doc,v 1.100 1999-08-25 16:03:20 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -3346,8 +3346,15 @@ a non-negative int_expression less or equal 32003.
 @item
 an expression_list of an int_expression and one or more names.
 @item
-the name @code{real}.
+the name @code{real}
+@item
+an expression_list of the name @code{real} and an  int_expression.
+@item
+an expression_list of the name @code{complex}, an optional int_expression
+and a name.
 @end enumerate
+
+For the definition of the coefficient_field, see @ref{Rings and orderings}.
 
 The names_of_ring_variables is a list of names or indexed names.
 

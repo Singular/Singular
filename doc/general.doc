@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.147 1999-08-24 11:04:58 obachman Exp $
+@comment $Id: general.doc,v 1.148 1999-08-25 16:03:18 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -623,6 +623,8 @@ monomial ordering on the ring variables.  @xref{Term orderings},
 
 The coefficient field of the rings may be
 
+@cindex real
+@cindex complex
 @enumerate
 @item
 the field of rational numbers @math{Q},
@@ -905,7 +907,8 @@ of single precision (for omitted precision or a precision smaller than 4).
 Note that computations over this field are not exact.
 
 @item
-an expression_list of the name real, an optional int_expression and a name.
+an expression_list of the name @code{complex},
+an optional int_expression and a name.
 @* This specifies the field of complex numbers represented with floating point
 numbers with an precision given by the int expression (default: 3).
 @*The name of the imaginary unit is given by the last parameter.
