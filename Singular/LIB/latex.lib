@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: latex.lib,v 1.13 2000-12-22 14:11:33 greuel Exp $";
+version="$Id: latex.lib,v 1.14 2001-02-05 15:57:13 Singular Exp $";
 category="Visualization";
 info="
 LIBRARY: latex.lib    Typesetting of Singular-Objects in LaTex2e
@@ -107,7 +107,14 @@ EXAMPLE: example tex; shows an example
    else {fname = fname + ".tex";}
    "calling ",default, " for :",fname,newline;
 
-   retval = system("sh",default + " " +  fname);
+   if (default=="latex2e")
+   {
+     retval = system("sh","latex " +  fname);
+   }
+   else
+   {
+     retval = system("sh",default + " " +  fname);
+   }
   }
   else
   { " -- Need a filename ";
@@ -1179,7 +1186,14 @@ EXAMPLE: example xdvi; shows an example
 
    "calling ",default, " for :",fname,newline;
 
-   retval = system("sh",default + " " +  fname + " &");
+   if (default=="latex2e")
+   {
+     retval = system("sh","latex " +  fname +" &");
+   }
+   else
+   {
+     retval = system("sh",default + " " +  fname +" &");
+   }
   }
   else
   { " -- Need a filename ";
