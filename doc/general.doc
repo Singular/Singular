@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.119 1999-07-01 12:48:04 obachman Exp $
+@comment $Id: general.doc,v 1.120 1999-07-01 13:08:59 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -2269,7 +2269,6 @@ which @sc{Singular} uses to locate its libraries, by starting up
 @ifset namespaces
 , or by issuing the command @code{system("with");"}
 @end ifset
-.
 
 Unless  @sc{Singular} is started with the @code{--no-stdlib} option, the
 library @code{standard.lib} is automatically loaded at start-up time.
@@ -2430,6 +2429,8 @@ It is common practice to simply define the version string to be
 @c ---------------------------------------
 @node Guidelines for writing a library, , Format of a library, Singular library
 @subsection Guidelines for writing a library
+@cindex Guidelines for writing a library
+@cindex library
 
 Although there are very few enforced rules on how libraries are written
 (e.g., on whether or where the info- and version-string are defined), it

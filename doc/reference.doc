@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.113 1999-07-01 12:48:08 obachman Exp $
+@comment $Id: reference.doc,v 1.114 1999-07-01 13:09:03 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4107,14 +4107,14 @@ R^n/M (the 0-th (resp.1-st) syzygy module of R^n/M is R^n (resp. M))
 returns @code{string(} expression @code{)}
 @item "%2s"
 similar to @code{"%s"}, except that newlines are inserted after every
-comma
+comma and at the end
 @item "%l"
 similar to @code{"%s"}, except that embracing explicite type casts are
 inserted as much as possible (this is mostly useful for "cutting and
 pasting")
 @item "%2l"
 similar to @code{"%l"}, except that newlines are inserted after every
-comma
+comma and at the end
 @item "%;"
 returns the string equivalent to typing @code{expression;}
 @item "%t"
@@ -4141,6 +4141,7 @@ returns the string equivalent to typing @code{print(expressions, "betti");}
   s = print(l, "%s"); s;
   s = print(l, "%2s"); s;
   s = print(l, "%l"); s;
+  s = print("", "%2s"); size(s); s; // a simple newline
 @c example
 @end example
 @end table
