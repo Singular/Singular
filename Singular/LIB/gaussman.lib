@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.37 2001-04-26 12:05:15 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.38 2001-05-23 16:57:10 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -34,6 +34,156 @@ KEYWORDS: singularities; Gauss-Manin connection; monodromy; spectrum;
 
 LIB "linalg.lib";
 
+///////////////////////////////////////////////////////////////////////////////
+
+proc gms(poly t,string d)
+{
+  def R=basering;
+  if(charstr(R)!="0")
+  {
+    ERROR("characteristic 0 expected");
+  }
+  for(int i=nvars(R);i>=1;i--)
+  {
+    if(var(i)>1)
+    {
+      ERROR("local ordering expected");
+    }
+  }
+
+  int @wmax;
+  for(i=nvars(R);i>=1;i--)
+  {
+    if(deg(var(i))==0)
+    {
+      ERROR("degree ordering expected");
+    }
+    if(deg(var(i))>@wmax)
+    {
+      @wmax=deg(var(i));
+    }
+  }
+
+  ideal dt=jacob(t);
+  ideal g=std(dt);
+  if(vdim(g)<=0)
+  {
+    if(vdim(g)==0)
+    {
+      ERROR("singularity at 0 expected");
+    }
+    else
+    {
+      ERROR("isolated singularity at 0 expected");
+    }
+  }  
+
+  list l=division(dt,g);
+  matrix a=l[1];
+  g=matrix(g)*l[2];
+  attrib(g,"isSB",1);
+  ideal m=kbase(g);
+
+  string s="ring G="+string(charstr(R))+",("+d+","+varstr(R)+
+    "),(ws("+string(deg(highcorner(g))+@wmax)+"),",ordstr(R),");";
+  execute(s);
+
+  poly @t=imap(R,t);
+  ideal @dt=imap(R,dt);
+  ideal @g=imap(R,g);
+  matrix @a=imap(R,a);
+  ideal @m=imap(R,m);
+
+  attrib(@g,"isSB",1);
+  export @t,@dt,@g,@a,@m,@wmax;
+
+  return(G);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc gmsnf(ideal p,int K,list #)
+{
+  int Kmax=-1;
+  if(size(#)>0)
+  {
+    if(typeof(l[1])=="int")
+    {
+      Kmax=l[1];
+    }
+  }
+
+  intvec v=1;
+  v[nvars(basering)]=0;
+
+  if(Kmax>=0)
+  {
+    p=jet(jet(p,K,v),(Kmax+1)*deg(var(1))-@wmax);
+  }
+
+  ideal r,q;
+  r[ncols(p)]=0;
+  q[ncols(p)]=0;
+
+  poly s;
+  int i,j,k;
+  for(k=1;k<=ncols(p);k++)
+  {
+    while(p[k]!=0&&deg(lead(p[k]),v)<=K)
+    {
+      i=1;
+      s=lead(p[k])/lead(@g[i]);
+      while(i<ncols(@g)&&s==0)
+      {
+        i++;
+        s=lead(p[k])/lead(@g[i]);
+      }
+      if(s!=0)
+      {
+        p[k]=p[k]-s*@g[i];
+        for(j=1;j<=nrows(@a);j++)
+        {
+          if(Kmax>=0)
+          {
+            p[k]=p[k]+
+              jet(jet(diff(s*@a[j,i],var(j+1))*var(1),K,v),
+                (Kmax+1)*deg(var(1))-@wmax);
+          }
+          else
+          {
+            p[k]=p[k]+diff(s*@a[j,i],var(j+1))*var(1);
+          }
+        }
+      }
+      else
+      {
+        r[k]=r[k]+lead(p[k]);
+        p[k]=p[k]-lead(p[k]);
+      }
+      while(deg(lead(p[k]))>(K+1)*deg(var(1))-@wmax&&
+        deg(lead(p[k]),v)<=K)
+      {
+        q[k]=q[k]+lead(p[k]);
+        p[k]=p[k]-lead(p[k]);
+      }
+    }
+    q[k]=q[k]+p[k];
+  }
+
+  return(r,q);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc gmsmat(ideal p,int K)
+{
+  def r,q=gmsnf(p,K);
+  poly v=1;
+  for(int i=2;i<=nvars(basering);i++)
+  {
+    v=v*var(i);
+  }
+  matrix C=coeffs(r,@m,v);
+  return(C,q);
+}
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc maxintdif(ideal e)
@@ -101,34 +251,9 @@ default: opt=1
 @end format
 SEE ALSO: mondromy_lib
 KEYWORDS: singularities; Gauss-Manin connection; monodromy
-EXAMPLE:  example monodromy; shows an example
+EXAMPLE:  example monodromy; shows examples
 "
 {
-  if(charstr(basering)!="0")
-  {
-    ERROR("characteristic 0 expected");
-  }
-  int n=nvars(basering)-1;
-  for(int i=n+1;i>=1;i--)
-  {
-    if(var(i)>1)
-    {
-      ERROR("local ordering expected");
-    }
-  }
-  ideal J=jacob(f);
-  ideal sJ=std(J);
-  if(vdim(sJ)<=0)
-  {
-    if(vdim(sJ)==0)
-    {
-      ERROR("singularity at 0 expected");
-    }
-    else
-    {
-      ERROR("isolated singularity at 0 expected");
-    }
-  }
   int opt=1;
   if(size(#)>0)
   {
@@ -138,109 +263,94 @@ EXAMPLE:  example monodromy; shows an example
     }
   }
 
-  ideal m=kbase(sJ);
-  int mu,modm=ncols(m),maxorddif(m);
+  def R=basering;
+  def G=gms(f,"D");
+  setring G;
 
-  ideal w=f*m;
+  int n=nvars(R)-1;
+  int mu,modm=ncols(@m),maxorddif(@m);
+  ideal w=@t*@m;
   matrix U=freemodule(mu);
-  matrix A0[mu][mu],A,C,D;
-  list l;
+  matrix A0[mu][mu],A,C;
   module H,dH=freemodule(mu),freemodule(mu);
   module H0;
   int sdH=1;
   int k=-1;
-  int j,K,N,mide;
 
-  while(k<K||sdH>0)
+  while(sdH>0)
   {
     k++;
     dbprint(printlevel-voice+2,"//gaussman::monodromy: k="+string(k));
 
     dbprint(printlevel-voice+2,"//gaussman::monodromy: compute C");
-    C=coeffs(reduce(w,U,sJ),m);
-    A0=A0+C*var(1)^k;
-
-    if(sdH>0)
+    if(opt==0)
     {
-      H0=H;
-      dbprint(printlevel-voice+2,"//gaussman::monodromy: compute dH");
-      dH=jet(module(A0*dH+var(1)^2*diff(matrix(dH),var(1))),k);
-      H=H*var(1)+dH;
-
-      dbprint(printlevel-voice+2,"//gaussman::monodromy: test dH==0");
-      sdH=size(reduce(H,std(H0*var(1))));
-      if(sdH>0)
-      {
-        A0=A0-var(1);
-      }
-      else
-      {
-        dbprint(printlevel-voice+2,
-          "//gaussman::monodromy: compute basis of saturation");
-        H=minbase(H0);
-        int modH=maxorddif(H);
-        K=modH+1;
-      }
+      C,w=gmsmat(w,k,mu);
     }
-
-    if(k==K&&sdH==0)
+    else
     {
-      N=k-modH;
-      dbprint(printlevel-voice+2,
-        "//gaussman::monodromy: compute A on saturation");
-      l=division(H*var(1),A0*H+var(1)^2*diff(matrix(H),var(1)));
-      A=jet(l[1],l[2],N-1);
-      if(mide==0)
-      {
-        dbprint(printlevel-voice+2,
-          "//gaussman::monodromy: compute eigenvalues e and"+
-          "multiplicities b of A");
-        l=system("eigenval",jet(A,0));
-        ideal e=l[1];
-        intvec b=l[2];
-        dbprint(printlevel-voice+2,"//gaussman::monodromy: e="+string(e));
-        dbprint(printlevel-voice+2,"//gaussman::monodromy: b="+string(b));
-        if(opt==1)
-        {
-          mide=maxintdif(e);
-          K=K+mide;
-        }
-      }
+      C,w=gmsmat(w,k,mu+n);
     }
+    A0=A0+C;
 
-    if(k<K||sdH>0)
-    {
-      dbprint(printlevel-voice+2,"//gaussman::monodromy: divide by J");
-      l=division(J,ideal(matrix(w)-matrix(m)*C*U));
-      D=l[1];
+    H0=H;
+    dbprint(printlevel-voice+2,"//gaussman::monodromy: compute dH");
+    dH=jet(module(A0*dH+D^2*diff(matrix(dH),D)),k);
+    H=H*D+dH;
 
-      dbprint(printlevel-voice+2,"//gaussman::monodromy: compute w/U");
-      for(j=mu;j>=1;j--)
-      {
-        if(l[2][j,j]!=0)
-        {
-          dbprint(printlevel-voice+2,
-            "//gaussman::monodromy: compute U["+string(j)+"]");
-          U[j,j]=U[j,j]*l[2][j,j];
-        }
-        dbprint(printlevel-voice+2,
-          "//gaussman::monodromy: compute w["+string(j)+"]");
-        w[j]=0;
-        for(i=n+1;i>=1;i--)
-        {
-          w[j]=w[j]+U[j,j]*diff(D[i,j],var(i))-diff(U[j,j],var(i))*D[i,j];
-        }
-      }
-      U=U*U;
-    }
+    dbprint(printlevel-voice+2,"//gaussman::monodromy: test dH==0");
+    sdH=size(reduce(H,std(H0*D)));
   }
+
+  A0=A0-D^k;
+
+  dbprint(printlevel-voice+2,
+    "//gaussman::monodromy: compute basis of saturation");
+  H=minbase(H0);
+  int modH=maxorddif(H)/deg(D);
+  if(opt==0)
+  {
+    C,w=gmsmat(w,modH+1,modH+1);
+  }
+  else
+  {
+    C,w=gmsmat(w,modH+1,modH+1+n);
+  }
+  A0=A0+C;
+
+  dbprint(printlevel-voice+2,
+    "//gaussman::monodromy: compute A on saturation");
+  list l=division(H*D,A0*H+D^2*diff(matrix(H),D));
+  A=jet(l[1],l[2],0);
+
+  dbprint(printlevel-voice+2,
+    "//gaussman::monodromy: compute eigenvalues e and "+
+    "multiplicities b of A");
+  l=eigenval(jet(A,0));
+  ideal e=l[1];
+  intvec b=l[2];
+  dbprint(printlevel-voice+2,"//gaussman::monodromy: e="+string(e));
+  dbprint(printlevel-voice+2,"//gaussman::monodromy: b="+string(b));
+
+  if(opt==0)
+  {
+    setring(R);
+    ideal e=imap(G,e);
+    return(e);
+  }
+
+  int mide=maxintdif(e);
 
   if(mide>0)
   {
+    C,w=gmsmat(w,modH+1+mide,modH+1+mide);
+    A0=A0+C;
+
     intvec ide;
     ide[mu]=0;
     module dU;
     matrix A0e;
+    int i,j;
     for(i=ncols(e);i>=1;i--)
     {
       for(j=i-1;j>=1;j--)
@@ -269,7 +379,7 @@ EXAMPLE:  example monodromy; shows an example
   {
     dbprint(printlevel-voice+2,"//gaussman::monodromy: mide="+string(mide));
 
-    U=0;
+    matrix U=0;
     A0=jet(A,0);
     for(i=ncols(e);i>=1;i--)
     {
@@ -289,13 +399,13 @@ EXAMPLE:  example monodromy; shows an example
       {
         if(ide[i]==0&&ide[j]>0)
         {
-          A[i,j]=A[i,j]*var(1);
+          A[i,j]=A[i,j]*d;
         }
         else
         {
           if(ide[i]>0&&ide[j]==0)
           {
-            A[i,j]=A[i,j]/var(1);
+            A[i,j]=A[i,j]/d;
           }
         }
       }
@@ -311,15 +421,11 @@ EXAMPLE:  example monodromy; shows an example
     }
     mide--;
   }
+  A=jet(A,0);
 
-  if(opt==1)
-  {
-    return(jet(A,0));
-  }
-  else
-  {
-    return(e);
-  }
+  setring(R);
+  matrix A=imap(G,A);
+  return(A);
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -352,34 +458,9 @@ NOTE:     H' and H'' denote the Brieskorn lattices
 SEE ALSO: spectrum_lib
 KEYWORDS: singularities; Gauss-Manin connection;
           Brieskorn lattice; Hodge filtration; V-filtration; spectrum
-EXAMPLE:  example vfiltration; shows an example
+EXAMPLE:  example vfiltration; shows examples
 "
 {
-  if(charstr(basering)!="0")
-  {
-    ERROR("characteristic 0 expected");
-  }
-  int n=nvars(basering)-1;
-  for(int i=n+1;i>=1;i--)
-  {
-    if(var(i)>1)
-    {
-      ERROR("local ordering expected");
-    }
-  }
-  ideal J=jacob(f);
-  ideal sJ=std(J);
-  if(vdim(sJ)<=0)
-  {
-    if(vdim(sJ)==0)
-    {
-      ERROR("singularity at 0 expected");
-    }
-    else
-    {
-      ERROR("isolated singularity at 0 expected");
-    }
-  }
   int opt=1;
   if(size(#)>0)
   {
@@ -389,83 +470,51 @@ EXAMPLE:  example vfiltration; shows an example
     }
   }
 
-  ideal m=kbase(sJ);
-  int mu,modm=ncols(m),maxorddif(m);
+  def R=basering;
+  def G=gms(f,"D");
+  setring G;
 
-  ideal w=f*m;
+  int n=nvars(R)-1;
+  int mu,modm=ncols(@m),maxorddif(@m);
+  ideal w=@t*@m;
   matrix U=freemodule(mu);
-  matrix A[mu][mu],C,D;
-  list l;
+  matrix A[mu][mu],C;
   module H,dH=freemodule(mu),freemodule(mu);
   module H0;
   int sdH=1;
   int k=-1;
-  int j,K;
+  int N=n+1;
 
-  while(k<K||sdH>0)
+  while(sdH>0)
   {
     k++;
     dbprint(printlevel-voice+2,"//gaussman::vfiltration: k="+string(k));
 
     dbprint(printlevel-voice+2,"//gaussman::vfiltration: compute C");
-    C=coeffs(reduce(w,U,sJ),m);
-    A=A+C*var(1)^k;
+    C,w=gmsmat(w,k);
+    A=A+C;
 
-    if(sdH>0)
-    {
-      H0=H;
-      dbprint(printlevel-voice+2,"//gaussman::vfiltration: compute dH");
-      dH=jet(module(A*dH+var(1)^2*diff(matrix(dH),var(1))),k);
-      H=H*var(1)+dH;
+    H0=H;
+    dbprint(printlevel-voice+2,"//gaussman::vfiltration: compute dH");
+    dH=jet(module(A*dH+D^2*diff(matrix(dH),D)),k);
+    H=H*D+dH;
 
-      dbprint(printlevel-voice+2,"//gaussman::vfiltration: test dH==0");
-      sdH=size(reduce(H,std(H0*var(1))));
-      if(sdH>0)
-      {
-        A=A-var(1);
-      }
-      else
-      {
-        dbprint(printlevel-voice+2,
-          "//gaussman::vfiltration: compute basis of saturation");
-        H=minbase(H0);
-        int modH=maxorddif(H);
-        K=modH+n+1;
-        H0=freemodule(mu)*var(1)^k;
-      }
-    }
-
-    if(k<K||sdH>0)
-    {
-      dbprint(printlevel-voice+2,"//gaussman::vfiltration: divide by J");
-      l=division(J,ideal(matrix(w)-matrix(m)*C*U));
-      D=l[1];
-
-      dbprint(printlevel-voice+2,"//gaussman::vfiltration: compute w/U");
-      for(j=mu;j>=1;j--)
-      {
-        if(l[2][j,j]!=0)
-        {
-          dbprint(printlevel-voice+2,
-            "//gaussman::vfiltration: compute U["+string(j)+"]");
-          U[j,j]=U[j,j]*l[2][j,j];
-        }
-        dbprint(printlevel-voice+2,
-          "//gaussman::vfiltration: compute w["+string(j)+"]");
-        w[j]=0;
-        for(i=n+1;i>=1;i--)
-        {
-          w[j]=w[j]+U[j,j]*diff(D[i,j],var(i))-diff(U[j,j],var(i))*D[i,j];
-        }
-      }
-      U=U*U;
-    }
+    dbprint(printlevel-voice+2,"//gaussman::vfiltration: test dH==0");
+    sdH=size(reduce(H,std(H0*D)));
   }
-  int N=k-modH;
+
+  A=A-D^k;
+
+  dbprint(printlevel-voice+2,
+    "//gaussman::vfiltration: compute basis of saturation");
+  H=minbase(H0);
+  int modH=maxorddif(H)/deg(D);
+  C,w=gmsmat(w,N+modH,N+modH);
+  A=A+C;
 
   dbprint(printlevel-voice+2,
     "//gaussman::vfiltration: transform H0 to saturation");
-  l=division(H,H0);
+  list l=division(H,freemodule(mu)*D^k);
   H0=jet(l[1],l[2],N-1);
 
   dbprint(printlevel-voice+2,
@@ -500,7 +549,7 @@ EXAMPLE:  example vfiltration; shows an example
 
   dbprint(printlevel-voice+2,
     "//gaussman::vfiltration: compute A on saturation");
-  l=division(H*var(1),A*H+var(1)^2*diff(matrix(H),var(1)));
+  l=division(H*D,A*H+D^2*diff(matrix(H),D));
   A=jet(l[1],l[2],N-1);
 
   dbprint(printlevel-voice+2,"//gaussman::vfiltration: compute matrix M of A");
@@ -531,7 +580,7 @@ EXAMPLE:  example vfiltration; shows an example
 
   dbprint(printlevel-voice+2,
     "//gaussman::vfiltration: compute eigenvalues eA of A");
-  ideal eA=system("eigenval",jet(A,0))[1];
+  ideal eA=eigenval(jet(A,0))[1];
   dbprint(printlevel-voice+2,"//gaussman::vfiltration: eA="+string(eA));
 
   dbprint(printlevel-voice+2,
@@ -539,7 +588,7 @@ EXAMPLE:  example vfiltration; shows an example
   ideal eM;
   k=0;
   intvec u;
-  for(i=N;i>=1;i--)
+  for(int i=N;i>=1;i--)
   {
     u[i]=1;
   }
@@ -596,7 +645,7 @@ EXAMPLE:  example vfiltration; shows an example
 
     dbprint(printlevel-voice+2,
       "//gaussman::vfiltration: symmetry index found");
-    j=k;
+    int j=k;
 
     if(number(eM[i])-1==number(n-1)/2)
     {
@@ -629,12 +678,14 @@ EXAMPLE:  example vfiltration; shows an example
       j--;
     }
 
+    setring(R);
+    ideal a=imap(G,a);
     return(list(a,d));
   }
   else
   {
     list v;
-    j=-1;
+    int j=-1;
     for(i=ncols(eM);i>=1;i--)
     {
       Me=freemodule(mu*N);
@@ -694,6 +745,10 @@ EXAMPLE:  example vfiltration; shows an example
     v[k]=std(v[k]);
     d[k]=size(v[k]);
 
+    setring(R);
+    ideal a=imap(G,a);
+    list v=imap(G,v);
+    ideal m=imap(G,@m);
     return(list(a,d,v,m));
   }
 }
@@ -718,7 +773,7 @@ list S: singularity spectrum of f
 @end format
 SEE ALSO: spectrum_lib
 KEYWORDS: singularities; Gauss-Manin connection; spectrum
-EXAMPLE:  example spectrum; shows an example
+EXAMPLE:  example spectrum; shows examples
 "
 {
   return(vfiltration(f,0));
@@ -749,7 +804,7 @@ list V1: endomorphim filtration of V on the Jacobian algebra of f
 SEE ALSO: spectrum_lib
 KEYWORDS: singularities; Gauss-Manin connection; spectrum;
           Brieskorn lattice; Hodge filtration; V-filtration
-EXAMPLE: example endfilt; shows an example
+EXAMPLE: example endfilt; shows examples
 "
 {
   if(charstr(basering)!="0")
@@ -920,7 +975,7 @@ example
 proc spprint(list S)
 "USAGE:   spprint(S); list S
 RETURN:  string: spectrum S
-EXAMPLE: example spprint; shows an example
+EXAMPLE: example spprint; shows examples
 "
 {
   string s;
@@ -942,7 +997,7 @@ example
 proc spadd(list S1,list S2)
 "USAGE:   spadd(S1,S2); list S1,S2
 RETURN:  list: sum of spectra S1 and S2
-EXAMPLE: example spadd; shows an example
+EXAMPLE: example spadd; shows examples
 "
 {
   ideal s;
@@ -1015,7 +1070,7 @@ example
 proc spsub(list S1,list S2)
 "USAGE:   spsub(S1,S2); list S1,S2
 RETURN:  list: difference of spectra S1 and S2
-EXAMPLE: example spsub; shows an example
+EXAMPLE: example spsub; shows examples
 "
 {
   return(spadd(S1,spmul(S2,-1)));
@@ -1042,7 +1097,7 @@ RETURN:
 1) list: product of spectrum S and integer k
 2) list: linear combination of spectra S with coefficients k
 @end format
-EXAMPLE: example spmul; shows an example
+EXAMPLE: example spmul; shows examples
 "
 {
   if(size(#)==2)
@@ -1093,7 +1148,7 @@ if opt==1:
   0, if sum of spectrum S over some interval [a,a+1) or (a,a+1) is negative
 default: opt=0
 @end format
-EXAMPLE: example spissemicont; shows an example
+EXAMPLE: example spissemicont; shows examples
 "
 {
   int opt=0;
@@ -1150,7 +1205,7 @@ RETURN:  list of intvecs l:
 NOTE:    if the spectra S occur with multiplicities k in a deformation
          of the [quasihomogeneous] spectrum S0 then 
          spissemicont(sub(S0,spmul(S,k))[,1])==1
-EXAMPLE: example spsemicont; shows an example
+EXAMPLE: example spsemicont; shows examples
 "
 {
   list l,l0;
@@ -1218,7 +1273,7 @@ example
 proc spmilnor(list S)
 "USAGE:   spmilnor(S); list S
 RETURN:  int: Milnor number of spectrum S
-EXAMPLE: example spmilnor; shows an example
+EXAMPLE: example spmilnor; shows examples
 "
 {
   return(sum(S[2]));
@@ -1235,7 +1290,7 @@ example
 proc spgeomgenus(list S)
 "USAGE:   spgeomgenus(S); list S
 RETURN:  int: geometrical genus of spectrum S
-EXAMPLE: example spgeomgenus; shows an example
+EXAMPLE: example spgeomgenus; shows examples
 "
 {
   int g=0;
@@ -1263,7 +1318,7 @@ example
 proc spgamma(list S)
 "USAGE:   spgamma(S); list S
 RETURN:  number: gamma invariant of spectrum S
-EXAMPLE: example spgamma; shows an example
+EXAMPLE: example spgamma; shows examples
 "
 {
   int i,j;
