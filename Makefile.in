@@ -17,6 +17,7 @@ BUILD_SUBDIRS	= @CONFIG_SUBDIRS@
 SUBDIRS		= @SUBDIRS@
 
 PERL		= @PERL@
+TMP_DIR		= @TMP_DIR@
 
 ##############################################################
 # default target
@@ -28,11 +29,25 @@ ${SINGULAR}:
 # simply descend for these targets
 .PHONY: all install uninstall 
 
+TEXINFO_TEX_FILES = epsf.tex texinfo.tex txi-cs.tex txi-de.tex txi-no.tex
+TEXINFO_TEX_DIR = Texinfo/doc
 all install uninstall:
 	@ for SUBDIR in ${BUILD_SUBDIRS}; \
 	do \
 	  echo ${MAKE} $@ in $${SUBDIR}; \
-	  ( cd $${SUBDIR} && ${MAKE} $@; ) \
+	  ( cd $${SUBDIR} && ${MAKE} $@;); \
+	  (if test "$${SUBDIR}" = Texinfo && test -d doc; then \
+		for FILE in ${TEXINFO_TEX_FILES}; \
+		do \
+		  if test "$@" = uninstall; then\
+		    echo rm -f doc/$${FILE};\
+                    rm -f doc/$${FILE}; \
+                  else \
+		    echo cp ${TEXINFO_TEX_DIR}/$${FILE} doc; \
+		    cp ${TEXINFO_TEX_DIR}/$${FILE} doc; \
+                  fi; \
+                done;\
+          fi;); \
 	done
 
 ##############################################################
@@ -107,12 +122,17 @@ Tst-Long:  ${SINGULAR} Tst/Short Tst/regress.cmd
 # distribution targets
 LN_S		= @LN_S@
 MKINSTALLDIRS 	= ./mkinstalldirs
-TMPDIR		= /tmp/singdist
+TMPDIR		= ${TMP_DIR}/singdist
 SINGUNAME 	= @SINGUNAME@
 S_VERSION       = $${SINGULAR_VERSION-@SINGULAR_VERSION@}
-DISTROOT_NAME	= Singular-${S_VERSION}
-BINDIST_NAME	= ${DISTROOT_NAME}-${SINGUNAME}
-SHAREDIST_NAME  = ${DISTROOT_NAME}-share
+BINDIR_NAME	= Singular/${SINGUNAME}/${S_VERSION}
+LIBDIR_NAME 	= Singular/LIB/${S_VERSION}
+GFTABLESDIR_NAME= Singular/LIB/gftables
+DOCDIR_NAME 	= Singular/doc/${S_VERSION}
+HTMLDIR_NAME	= Singular/html/${S_VERSION}
+
+BINDIST_NAME	= Singular-${S_VERSION}-${SINGUNAME}
+SHAREDIST_NAME  = Singular-${S_VERSION}-share
 ZIP		= zip
 
 test_t:
@@ -122,18 +142,18 @@ test_t:
 sharedist: ${SINGULAR}
 	cd doc; ${MAKE} all ps
 	rm -rf ${TMPDIR}/
-	${MKINSTALLDIRS} ${TMPDIR}/Singular/LIB/${S_VERSION}
-	${MKINSTALLDIRS} ${TMPDIR}/Singular/doc/${S_VERSION}
-	${MKINSTALLDIRS} ${TMPDIR}/Singular/html/${S_VERSION}
-	${MKINSTALLDIRS} ${TMPDIR}/Singular/LIB/gftables
-	cp Singular/LIB/*.lib ${TMPDIR}/Singular/LIB/${S_VERSION}
+	${MKINSTALLDIRS} ${TMPDIR}/${LIBDIR_NAME}
+	${MKINSTALLDIRS} ${TMPDIR}/${GFTABLESDIR_NAME}
+	${MKINSTALLDIRS} ${TMPDIR}/${DOCDIR_NAME}
+	${MKINSTALLDIRS} ${TMPDIR}/${HTMLDIR_NAME}
+	cp Singular/LIB/*.lib ${TMPDIR}/${LIBDIR_NAME}
 	rm -f ${TMPDIR}/Singular/LIB/${S_VERSION}/fastsolv.lib
 	rm -f ${TMPDIR}/Singular/LIB/${S_VERSION}/tst.lib
-	cp Singular/LIB/gftables/[0-9]* ${TMPDIR}/Singular/LIB/gftables
+	cp Singular/LIB/gftables/[0-9]* ${TMPDIR}/${GFTABLESDIR_NAME}
 	cp doc/singular.hlp doc/singular.ps doc/usercard.ps \
            doc/singular.dvi doc/usercard.dvi \
-           ${TMPDIR}/Singular/doc/${S_VERSION}
-	cp -R doc/html/* ${TMPDIR}/Singular/html/${S_VERSION}
+           ${TMPDIR}/${DOCDIR_NAME}
+	cp -R doc/html/* ${TMPDIR}/${HTMLDIR_NAME}
 	cat README.general | sed -e "s/<x-y-z>/${S_VERSION}/g" > \
                              ${TMPDIR}/Singular/README
 	cat COPYING | sed -e "s/<x-y-z>/${S_VERSION}/g" > \
@@ -149,18 +169,14 @@ sharedist: ${SINGULAR}
 bindist: ${SINGULAR}
 	cd Singular; ${MAKE} Singular-$@ libparse
 	rm -rf ${TMPDIR}
-	${MKINSTALLDIRS} ${TMPDIR}/${SINGUNAME}/bin/
-	${MKINSTALLDIRS} ${TMPDIR}/Singular
-	cp Singular/Singular-$@ \
-           ${TMPDIR}/${SINGUNAME}/bin/Singular-${S_VERSION}
-	cd ${TMPDIR}/${SINGUNAME}/bin; \
-           ${LN_S} Singular-${S_VERSION} Singular
-	cp Singular/libparse ${TMPDIR}/${SINGUNAME}/bin/
-	-strip ${TMPDIR}/${SINGUNAME}/bin/*
+	${MKINSTALLDIRS} ${TMPDIR}/${BINDIR_NAME}
+	cp Singular/Singular-$@ ${TMPDIR}/${BINDIR_NAME}/Singular
+	cp Singular/libparse ${TMPDIR}/${BINDIR_NAME}
+	-strip ${TMPDIR}/${BINDIR_NAME}/*
 	cat INSTALL.unix | sed -e "s/<x-y-z>/${S_VERSION}/g" > \
                       ${TMPDIR}/Singular/INSTALL
 	cd ${TMPDIR}; chmod -R a+rX *;\
-           tar cf ${BINDIST_NAME}.tar ${SINGUNAME} Singular; \
+           tar cf ${BINDIST_NAME}.tar Singular; \
            gzip ${BINDIST_NAME}.tar
 	mv ${TMPDIR}/${BINDIST_NAME}.tar.gz .
 	rm -rf ${TMPDIR}
@@ -168,16 +184,14 @@ bindist: ${SINGULAR}
 static-bindist: ${SINGULAR}
 	cd Singular; ${MAKE} Singular-$@ libparse
 	rm -rf ${TMPDIR}
-	${MKINSTALLDIRS} ${TMPDIR}/${SINGUNAME}/bin/
-	${MKINSTALLDIRS} ${TMPDIR}/Singular
-	cp Singular/Singular-$@ \
-           ${TMPDIR}/${SINGUNAME}/bin/Singular-${S_VERSION}-static
-	cd ${TMPDIR}/${SINGUNAME}/bin;  \
-           ${LN_S} Singular-${S_VERSION}-static Singular
-	cat INSTALL | sed -e "s/<x-y-z>/${S_VERSION}/g" > \
+	${MKINSTALLDIRS} ${TMPDIR}/${BINDIR_NAME}
+	cp Singular/Singular-$@ ${TMPDIR}/${BINDIR_NAME}/Singular-static
+	cp Singular/libparse ${TMPDIR}/${BINDIR_NAME}
+	-strip ${TMPDIR}/${BINDIR_NAME}/*
+	cat INSTALL.unix | sed -e "s/<x-y-z>/${S_VERSION}/g" > \
                       ${TMPDIR}/Singular/INSTALL
 	cd ${TMPDIR}; chmod -R a+rX *;\
-           tar cf ${BINDIST_NAME}-static.tar ${SINGUNAME} Singular;\
+           tar cf ${BINDIST_NAME}-static.tar Singular; \
            gzip ${BINDIST_NAME}-static.tar
 	mv ${TMPDIR}/${BINDIST_NAME}-static.tar.gz .
 	rm -rf ${TMPDIR}
@@ -196,24 +210,23 @@ INSTALL		= ./Singular/install-sh -c
 SH_PROGRAM 	= /bin/sh
 INFO_PROGRAM 	= /bin/info
 CYGWIN_DLL	= /bin/cygwin1.dll
-WIN_BINDIR      = ${TMPDIR}/Singular/${S_VERSION}
 
 windist: ${SINGULAR}
 	cd Singular; ${MAKE} Singular-bindist libparse
 	rm -rf ${TMPDIR}
-	${MKINSTALLDIRS} ${WIN_BINDIR}
-	${INSTALL} Singular/Singular-bindist ${WIN_BINDIR}/Singular.exe
-	${INSTALL} Singular/libparse ${WIN_BINDIR}
-	${INSTALL} ${SH_PROGRAM} ${WIN_BINDIR}
-	${INSTALL} ${INFO_PROGRAM} ${WIN_BINDIR}
-	${INSTALL} ${CYGWIN_DLL} ${WIN_BINDIR}
+	${MKINSTALLDIRS} ${TMPDIR}/${BINDIR_NAME}
+	${INSTALL} Singular/Singular-bindist \
+                   ${TMPDIR}/${BINDIR_NAME}/Singular.exe
+	${INSTALL} Singular/libparse ${TMPDIR}/${BINDIR_NAME}
+	${INSTALL} ${SH_PROGRAM} ${TMPDIR}/${BINDIR_NAME}
+	${INSTALL} ${INFO_PROGRAM} ${TMPDIR}/${BINDIR_NAME}
+	${INSTALL} ${CYGWIN_DLL} ${TMPDIR}/${BINDIR_NAME}
 	cat INSTALL.win	| sed -e "s/<x-y-z>/${S_VERSION}/g" > \
                          ${TMPDIR}/Singular/INSTALL
 	cd ${TMPDIR}; chmod -R a+rX *;\
            ${ZIP} -r sing Singular 
 	mv ${TMPDIR}/sing.zip Singular-${S_VERSION}-${SINGUNAME}.zip 
 	rm -rf ${TMPDIR}
-
 srcdist: 
 	rm -rf ${TMPDIR}
 	${MKINSTALLDIRS} ${TMPDIR}/Singular-${S_VERSION}
@@ -223,9 +236,6 @@ srcdist:
 	gzip Singular-${S_VERSION}.tar
 	cp ${TMPDIR}/Singular-${S_VERSION}.tar.gz .
 	rm -rf ${TMPDIR}
-
-rpmdist:
-	cd rpm; ${MAKE} rpm
 
 # You can remeber the password with "iwd" == "ich war dabei"
 CRYPT	= enigma # it does not seem to decrypt correctly with the HP crypt

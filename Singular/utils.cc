@@ -13,6 +13,7 @@ extern FILE *yylpin;
 extern char *optarg;
 extern int optind, opterr, optopt;
 extern int lpverbose, check;
+extern int texinfo_out;
 extern int found_version, found_info, found_oldhelp, found_proc_in_proc;
 int warning_info = 0, warning_version = 0;
 
@@ -24,30 +25,37 @@ static usage(char *progname)
   printf("   -f <singular library> : performs syntax-checks\n");
   printf("   -d [digit]            : digit=1,..,4 increases the verbosity of the checks\n");
   printf("   -s                    : turns on reporting about violations of unenforced syntax rules\n");
+  printf("   -i                    : perl output of examples and help of procs\n");
   printf("   -h                    : print this message\n");
   exit(1);
 }
+ 
+static char* lib_file = NULL;
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 void main_init(int argc, char *argv[])
 {
-  char c, *file=NULL;
+  char c;
 
-  while((c=getopt(argc, argv, "hd:sf:"))>=0) {
+  while((c=getopt(argc, argv, "ihd:sf:"))>=0) {
     switch(c) {
         case 'd':
           lpverbose = 1;
           if(isdigit(argv[optind-1][0])) sscanf(optarg, "%d", &lpverbose);
           else optind--;
           break;
-        case 'f': file = argv[optind-1];
+        case 'f': lib_file = argv[optind-1];
           break;
         case 's':
           check++;
           break;
+        case 'i':
+          texinfo_out = 1;
+          break;
         case 'h' :
           usage(argv[0]);
           break;
+          
         case -1 : printf("no such option:%s\n", argv[optind]);
           usage(argv[0]);
           break;
@@ -55,13 +63,25 @@ void main_init(int argc, char *argv[])
           usage(argv[0]);
     }
   }
-  if(file!=NULL) {
-    yylpin = fopen( file, "rb" );
-    printf("Checking library '%s'\n", file);
+  if (texinfo_out) lpverbose = 0;
+    
+  if(lib_file!=NULL) {
+    yylpin = fopen( lib_file, "rb" );
+    if (! texinfo_out) 
+      printf("Checking library '%s'\n", lib_file);
+    else
+      printf("$library = \"%s\";\n", lib_file);
   } else {
     while(argc>optind && yylpin==NULL) {
       yylpin = fopen( argv[optind], "rb" );
-      if(yylpin!=NULL) printf("Checking library '%s'\n", argv[optind]);
+      if(yylpin!=NULL) 
+      {
+        lib_file = argv[optind];
+        if (! texinfo_out) 
+          printf("Checking library '%s'\n", argv[optind]);
+        else
+          printf("$library = \"%s\";\n", lib_file);
+      }
       else optind++;
     }
   }
@@ -119,35 +139,82 @@ pi_clear(procinfov pi)
 }
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+
+#ifndef SEEK_SET
+#define SEEK_SET 0
+#endif
+
+static void PrintOut(FILE *fd, int pos_start, int pos_end)
+{
+  if (pos_start <= 0 || pos_end - pos_start <= 4) return;
+  char c;
+  
+  fseek(fd, pos_start, SEEK_SET);
+  while (pos_start++ <= pos_end) 
+  {
+    c = fgetc(fd);
+    if (c == '@' || c == '$') putchar('\\');
+    if (c != '\r') putchar(c);
+  }
+}
+
+
 printpi(procinfov pi)
 {
-  FILE *fp = fopen( pi->libname, "rb");
   char *buf, name[256];
   int len1, len2;
+  /* pi->libname is badly broken -- use file, instead */
+  FILE *fp = fopen( lib_file, "rb");
+
+  if (fp == NULL) 
+  {
+    printf("Can not open %s\n", lib_file);
+    return 0;
+  }
 
   if(!found_info && !warning_info) warning_info++;
   if(!found_version && !warning_version) warning_version++;
   if(pi->data.s.body_end==0)
     pi->data.s.body_end = pi->data.s.proc_end;
 
-  if(lpverbose) printf("//     ");
-  printf( "%c %-15s  %20s ", pi->is_static ? 'l' : 'g', pi->libname,
-          pi->procname);
-  printf("line %4d,%5ld-%-5ld  %4d,%5ld-%-5ld  %4d,%5ld-%-5ld\n",
-         pi->data.s.proc_lineno, pi->data.s.proc_start, pi->data.s.def_end,
-         pi->data.s.body_lineno, pi->data.s.body_start, pi->data.s.body_end,
-         pi->data.s.example_lineno, pi->data.s.example_start,
-         pi->data.s.proc_end);
-  if(check) {
-    if(!pi->is_static && (pi->data.s.body_start-pi->data.s.def_end)<4)
-      printf("*** Procedure '%s' is global and has no help-section.\n",
-             pi->procname);
-    if(!pi->is_static && !pi->data.s.example_start)
-      printf("*** Procedure '%s' is global and has no example-section.\n",\
-             pi->procname);
-    if(found_proc_in_proc)
-      printf("*** found proc within procedure '%s'.\n", pi->procname);
+  if (texinfo_out)
+  {
+    if ((! pi->is_static) &&
+        (pi->data.s.body_start - pi->data.s.def_end > 10) &&
+        (pi->data.s.example_start > 0) &&
+        (pi->data.s.proc_end - pi->data.s.example_start > 10) &&
+        (! found_proc_in_proc))
+    {
+      printf("push(@procs, \"%s\");\n", pi->procname);
+      printf("$help{\"%s\"} = <<EOT;\n", pi->procname);
+      PrintOut(fp, pi->data.s.help_start, pi->data.s.body_start-3);
+      printf("\nEOT\n$example{\"%s\"} = <<EOT;\n", pi->procname);
+      PrintOut(fp, pi->data.s.example_start, pi->data.s.proc_end);
+      printf("\nEOT\n");
+    }
   }
+  else
+  {
+    if(lpverbose) printf("//     ");
+    printf( "%c %-15s  %20s ", pi->is_static ? 'l' : 'g', pi->libname,
+            pi->procname);
+    printf("line %4d,%5ld-%-5ld  %4d,%5ld-%-5ld  %4d,%5ld-%-5ld\n",
+           pi->data.s.proc_lineno, pi->data.s.proc_start, pi->data.s.def_end,
+           pi->data.s.body_lineno, pi->data.s.body_start, pi->data.s.body_end,
+           pi->data.s.example_lineno, pi->data.s.example_start,
+           pi->data.s.proc_end);
+    if(check) {
+      if(!pi->is_static && (pi->data.s.body_start-pi->data.s.def_end)<4)
+        printf("*** Procedure '%s' is global and has no help-section.\n",
+               pi->procname);
+      if(!pi->is_static && !pi->data.s.example_start)
+        printf("*** Procedure '%s' is global and has no example-section.\n",\
+               pi->procname);
+      if(found_proc_in_proc)
+        printf("*** found proc within procedure '%s'.\n", pi->procname);
+    }
+  }
+  
 
 #if 0
   if( fp != NULL) { // loading body

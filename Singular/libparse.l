@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.31 1998-12-02 15:56:05 krueger Exp $ */
+/* $Id: libparse.l,v 1.32 1999-07-01 12:49:48 obachman Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -56,6 +56,7 @@ long string_start;
 char *yylp_buffer_start;
 int yylplineno = 1;
 int lpverbose = 0, check = 0;
+int texinfo_out = 0;
 int found_info=0,
     found_version=0,
     found_oldhelp = 0,
@@ -251,7 +252,10 @@ eqnl           ([ \t\n]*+=[ \t\n]*)
              {
                make_version(yytext,1);
 #ifdef STANDALONE_PARSER
-               printf("Version:%s;\n", libnamebuf);
+               if (texinfo_out) 
+                 printf("$version = \"%s\";\n", libnamebuf);
+               else
+                 printf("Version:%s;\n", libnamebuf);
 #else
 #  ifdef HAVE_NAMESPACES
                h0 = enterid( mstrdup("version"), myynest, STRING_CMD,
@@ -813,7 +817,34 @@ void copy_string(lp_modes mode, idhdl pl)
 void copy_string(lp_modes mode)
 #endif /* HAVE_NAMESPACES */
 {
-#  ifndef STANDALONE_PARSER
+#ifdef STANDALONE_PARSER
+  if (texinfo_out && last_cmd == LP_INFO)
+  {
+    long current_location = ftell(yylpin), i = string_start, quote = 0;
+    char c;
+    printf("$info = <<EOT;\n");
+    fseek (yylpin, i, SEEK_SET);
+    while (i< current_location) 
+    { 
+      c = fgetc(yylpin);
+      if (c == '\\') 
+      {
+        quote = (! quote);
+      }
+      else if (c == '"')
+      {
+        if (! quote) break;
+      }
+      else
+        quote = 0;
+      if (c == '@' || c == '$') putchar('\\');
+      if (c != '\r') putchar(c);
+      i++;
+    }
+    fseek (yylpin, current_location, SEEK_SET);
+    printf("\nEOT\n");
+  }
+#else
   if((last_cmd == LP_INFO)&&(mode == GET_INFO))
   {
     int i, offset=0;
@@ -848,7 +879,7 @@ void copy_string(lp_modes mode)
     }
 #    endif /* HAVE_NAMESPACES */
   }
-#  endif /* STANDALONE_PARSER */
+#endif /* STANDALONE_PARSER */
 }
 
 void print_init()
@@ -875,26 +906,29 @@ main( int argc, char *argv[] )
   lib_style_types lib_style;
   main_init(argc, argv);
   if(yyin == NULL) {
-    printf("No library found to parse.\n");
+    fprintf(stderr, "No library found to parse.\n");
     exit(1);
   }
-
-  if(lpverbose)printf("Verbose level=%d\n", lpverbose);
-  if(check)printf("Reporting most possible annomalies.\n");
-  if(lpverbose||check)printf("\n");
-
-  printf( "  %-15s  %20s      %s,%s    %s,%s     %s,%s\n", "Library",
-          "function", "line", "start-eod", "line", "body-eob",
-          "line", "example-eoe");
-  yylplex(argv[0], argv[0], &lib_style);
-  if(yylp_errno)
+  if (! texinfo_out)
   {
+    if(lpverbose)printf("Verbose level=%d\n", lpverbose);
+    if(check)printf("Reporting most possible annomalies.\n");
+    if(lpverbose||check)printf("\n");
+
+    printf( "  %-15s  %20s      %s,%s    %s,%s     %s,%s\n", "Library",
+            "function", "line", "start-eod", "line", "body-eob",
+            "line", "example-eoe");
+  }
+  yylplex(argv[0], argv[0], &lib_style);
+  if(yylp_errno) {
     printf("ERROR occured: [%d] ", yylp_errno);
     printf(yylp_errlist[yylp_errno], yylplineno);
     printf("\n");
   }
   else if(pi!=NULL) printpi(pi);
-  main_result(argv[0]);
+  if (texinfo_out)
+    printf("1;");
+  exit(0);
 }
 
 #  endif /* STANDALONE_PARSER */

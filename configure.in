@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script
 AC_INIT(Singular/matpol.h)
 AC_PREFIX_DEFAULT(`pwd`)
-OUTPUT_MAKEFILES="Makefile doc/Makefile"
+OUTPUT_MAKEFILES="Makefile doc/Makefile doc/version.texi"
 if test -d "mpr"; then
    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" mpr/Makefile"
 fi
@@ -46,9 +46,10 @@ dnl
 SINGULAR_MAJOR_VERSION=1
 SINGULAR_MINOR_VERSION=3
 SINGULAR_SUB_VERSION=3
-SINGULAR_VERSION="${SINGULAR_MAJOR_VERSION}${VERSION_SEP}${SINGULAR_MINOR_VERSION}${VERSION_SEP}${SINGULAR_SUB_VERSION}"
-VERSION_DATE="May 1999"
-SINGULAR_DOS_VERSION="${SINGULAR_MAJOR_VERSION}-${SINGULAR_MINOR_VERSION}-${SINGULAR_SUB_VERSION}"
+SINGULAR_SHORT_VERSION="${SINGULAR_MAJOR_VERSION}${VERSION_SEP}${SINGULAR_MINOR_VERSION}"
+SINGULAR_VERSION="${SINGULAR_SHORT_VERSION}${VERSION_SEP}${SINGULAR_SUB_VERSION}"
+VERSION_DATE="February 1999"
+
 export SINGULAR_MINOR_VERSION
 export SINGULAR_MAJOR_VERSION
 export SINGULAR_SUB_VERSION
@@ -57,7 +58,8 @@ export VERSION_DATE
 
 dnl substitue them into the Makefiles
 AC_SUBST(SINGULAR_VERSION)
-AC_SUBST(SINGULAR_DOS_VERSION)
+AC_SUBST(VERSION_DATE)
+AC_SUBST(SINGULAR_SHORT_VERSION)
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Those are needed to check for libs and headers, later on
@@ -67,7 +69,21 @@ AC_PROG_CPP
 AC_AIX
 
 AC_CHECK_PROGS(PERL, perl5 perl)
+AC_CHECK_PROG(LATEX2HTML, latex2html, latex2html)
 AC_PROG_LN_S
+if test -x Texi2html/texi2html; then
+TEXI2HTML=`pwd`/Texi2html/texi2html
+AC_SUBST(TEXI2HTML)
+else
+AC_MSG_WARN(could not find Texi2html/texi2html HTML generation might fail)
+AC_CHECK_PROG(TEXI2HTML, texi2html, texi2html)
+fi
+if test "$ac_cv_prog_LATEX2HTML" = latex2html; then
+  TEXI2HTML_OPTS="-l2h"
+else
+ TEXI2HTML_OPTS="-expandinfo" 
+fi
+AC_SUBST(TEXI2HTML_OPTS)
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Set exec_prefix, bindir, libdir, includedir to some sensible values
@@ -178,6 +194,8 @@ fi
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Check command line arguments
 dnl
+AC_ARG_WITH(tmpdir, \
+ [ --with-tmpdir=DIR       use DIR as temporary directory])
 AC_ARG_ENABLE(smallgmp, \
  [ --enable-PACKAGE        configure and build PACKAGE
   --disable-PACKAGE       do not configure and build PACKAGE
@@ -195,6 +213,8 @@ AC_ARG_ENABLE(sgroup, \
  [    sgroup               numerical semigroup computations])
 AC_ARG_ENABLE(Singular, \
  [    Singular             CAS for Polynomial Computations])
+AC_ARG_ENABLE(Texinfo, \
+ [    Texinfo              Texinfo for info, texi2dvi, makeinfo])
 
 AC_ARG_WITH(MP,\
  [ --with-PACKAGE          use PACKAGE, provide dependent functionality
@@ -213,8 +233,46 @@ to configure of the packages to be built. See also configure --help in
 these packages (resp. subdirs). ])
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl Check what to use as tmp dir
+dnl
+AC_MSG_CHECKING(which tmp dir to use)
+if test "${with_tmpdir+set}" = set && test -d ${with_tmpdir}; then
+  if (echo "${with_tmpdir}" | egrep "\." >/dev/null 2>&1)
+  then
+    TMP_DIR="/tmp"
+  else
+    TMP_DIR=${with_tmpdir}
+  fi
+else
+  TMP_DIR="/tmp"
+fi
+AC_MSG_RESULT($TMP_DIR)
+AC_SUBST(TMP_DIR)
+
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Check whether or not to configure and build various packages
 dnl
+AC_MSG_CHECKING(whether to configure and build texinfo)
+if test "$enable_texinfo" != no && test -d Texinfo; then
+  AC_MSG_RESULT(yes)
+  enable_texinfo=yes
+  CONFIG_SUBDIRS="$CONFIG_SUBDIRS Texinfo"
+  TEXI2DVI=${bindir}/texi2dvi
+  MAKEINFO="${bindir}/makeinfo --force"
+  TEXINDEX=${bindir}/texindex
+else
+  AC_MSG_RESULT(no)
+  AC_MSG_WARN(Building of doc might fail. Need Texinfo)
+  enable_texinfo=no
+  TEXI2DVI=texi2dvi
+  MAKEINFO=makeinfo
+  TEXINDEX=${bindir}/texindex
+fi  
+AC_SUBST(TEXI2DVI)
+AC_SUBST(MAKEINFO)
+AC_SUBST(TEXINDEX)
+
+
 AC_MSG_CHECKING(whether to configure and build gmp lib)
 if test "$enable_gmp" != yes && test "$enable_gmp" != no; then
   if test "$ac_gmp_ok" != yes && test -d gmp; then

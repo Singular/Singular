@@ -1,0 +1,50 @@
+######################################################################
+# 
+# File: t2h_singular.init init file for singular t2h
+#
+
+# we only redefine things which ar of relevance to singular
+# all the others we simply "include"
+
+require("./texi2html.init") if (-r "./texi2html.init");
+require("../texi2html.init") if (-r "../texi2html.init");
+require("./t2h.init") if (-r "./t2h.init");
+require("../t2h.init") if (-r "../t2h.init");
+
+# if set, ISO8879 characters are used for special symbols (like copyright, etc)
+$T2H_USE_ISO = 0;
+
+# list directories where @include files are searched for (besides the
+# directory of the doc file) additional '-I' args add to this list
+@T2H_INCLUDE_DIRS = push(@T2H_INCLUDE_DIRS, "..");
+
+# if set, show the Texinfo menus
+$T2H_SHOW_MENU = 1;
+
+# if set, number sections
+$T2H_NUMBER_SECTIONS = 1;
+
+# if set, creates one html file per node
+$T2H_SPLIT_NODE = 1;
+
+# if set, puts html files into current directory, overwrites settings of
+# $T2H_SUBDIR
+$T2H_NO_SUBDIR = 0;
+
+# -short_extn
+# If this is set all HTML file will have extension ".htm" instead of
+# ".html". This is helpful when shipping the document to PC systems.
+$T2H_SHORTEXTN = 1;
+
+# -prefix
+# Set the output file prefix, prepended to all .html, .gif and .pl files.
+$T2H_PREFIX = '';
+
+#if set cross-references are given without section numbers
+$T2H_SHORT_REF = 1;
+
+# if set, chatter about what we are doing
+$T2H_VERBOSE = 1;
+
+
+1; 	# This must be the last line

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.118 1999-06-21 19:45:32 Singular Exp $
+@comment $Id: general.doc,v 1.119 1999-07-01 12:48:04 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -27,11 +27,11 @@
 * The SINGULAR language::
 * Input and output::
 * Procedures::
+* Libraries::
+* Debugging tools::
 @ifset namespaces
 * Namespaces::
 @end ifset
-* Libraries::
-* Debugging tools::
 @end menu
 
 
@@ -171,7 +171,7 @@ invokes info tutorial (use @code{l} to return to the manual or
 shows a short overview on the online help system (use @code{l} to return
 to the manual or @code{CTRL-X 0} to remove extra window)
 @item @code{s}
-searches through the manual for a specified string, and select the node in
+searches through the manual for a specified string, and selects the node in
 which the next occurrence is found
 @item @code{1}, @dots{}, @code{9}
 picks i-th subtopic from a menu
@@ -233,9 +233,9 @@ kills from cursor to end of line
 @item CTRL-U
 kills from cursor to beginning of line
 @item CTRL-N
-saves current line on history and get next line
+saves current line on history and gives next line
 @item CTRL-P
-saves current line on history and get previous line
+saves current line on history and gives previous line
 @item RETURN
 saves the current line to the history and
 sends it to the @sc{Singular} parser for interpretation
@@ -303,7 +303,7 @@ an error to the authors.
 @end table
 
 The following command line options allow manipulations of the timer and
-the pseudo random generator and enables passing of commands and strings
+the pseudo random generator and enable passing of commands and strings
 to @sc{Singular}:
 
 @table @asis
@@ -317,23 +317,28 @@ exits.
 @item @code{-u}, @code{--user-option=STRING}
 Returns @code{STRING} on @code{system("--user-option")}. This is useful
 for passing arbitrary arguments from the command line to the
-@sc{Singular} interpreter.  E.g., @code{Singular -u "xxx.dump" -c
-'getdump(system("--user-option"))'} reads the file @code{xxx.dump} at
-startup and allows the user to start working with all the objects
+@sc{Singular} interpreter.  E.g., 
+@*@code{Singular -u "xxx.dump" -c 'getdump(system("--user-option"))'} 
+reads the file @code{xxx.dump} at
+start-up and allows the user to start working with all the objects
 defined in a previous session.
 
 @item @code{-r}, @code{--random=SEED}
 Seed (i.e., set the initial value of) the pseudo random generator with
 integer @code{SEED}.  If this option is not given, then the random
-generated is seeded with a time-based @code{SEED} (e.g., the number of
-seconds since January, 1, 1970, on Unix-like operating systems).
+generator is seeded with a time-based @code{SEED} (the number of
+seconds since January, 1, 1970, on Unix-like operating systems, to be
+precise). 
 
 @item @code{--min-time=SECS}
-If the @code{timer} (resp.  @code{rtimer}) variable is set, report only
+If the @code{timer} (@pxref{timer}), resp.  @code{rtimer}
+(@pxref{rtimer}) , variable is 
+set, report only 
 times larger than @code{SECS} seconds (@code{SECS} needs to be a
 floating point number greater than 0).  By default, this value is set to
 0.5 (i.e., half a second).  E.g., the option @code{--min-time=0.01}
-forces @sc{Singular} to report all times larger than 1/100 of a second.
+forces @sc{Singular} to report all times larger than 1/100 of a
+second. 
 
 @item @code{--ticks-per-sec=TICKS}
 Set unit of timer to @code{TICKS} ticks per second (i.e., the value
@@ -481,7 +486,10 @@ procedure.  @xref{Procedures}, @ref{keepring}.
 @cindex Examples of ring declarations
 
 The exact syntax of a ring declaration is given in the next two
-subsections; this subsection lists some examples first.
+subsections; this subsection lists some examples first. Note that the
+ordering has to be chosen such that the unit-elements of the
+ring are precisely those elements with leading monomial 1.  For more
+information, see @ref{Monomial orderings}.
 
 @itemize @bullet
 @item
@@ -549,13 +557,13 @@ ring r = 0,(x,y,z,a,b,c),(ds(3), dp(3));
 @item
 the ring @math{Q[x,y,z]} with weighted reverse lexicographical ordering.
 The variables @math{x}, @math{y}, and @math{z} have the weights 2, 1,
-and 3, resp.  Vectors are ordered by components first, then by
-monomials.  Vector components are ordered in descending order.  For
-ascending order, component ordering @code{C} would have been specified:
-
+and 3, respectively, and  vectors are first ordered by components (in
+descending order) and then by monomials:  
 @example
 ring r = 0,(x,y,z),(c,wp(2,1,3));
 @end example
+For ascending component order, the component ordering @code{C} has to be 
+used.
 
 @item
 the ring @math{K[x,y,z]}, where @math{K=Z/7(a,b,c)} denotes the
@@ -598,7 +606,7 @@ the quotient ring @math{Z/7[x,y,z]} modulo the square of the maximal
 ideal @math{(x,y,z)}:
 
 @example
-ring R;
+ring R = 7,(x,y,z), dp;
 qring r = std(maxideal(2));
 @end example
 @end itemize
@@ -692,8 +700,7 @@ weight vector given as an intvec_expression in parentheses.
 @code{c} or @code{C}.
 @end enumerate
 
-For the definition of the orderings, see @ref{Term orderings},
-@ref{Mathematical background}.
+For the definition of the orderings, see @ref{Term orderings} and @ref{Monomial orderings}. 
 
 If one of coefficient_field, names_of_ring_variables, and ordering
 consists of only one entry, the parentheses around this entry may be
@@ -724,11 +731,11 @@ ideal_expression has to be represented by a standard basis.
 The most convenient way to map objects from a ring to its quotient ring
 and vice versa is to use the @code{fetch} function (@pxref{fetch}).
 
-@sc{Singular} computes in a quotient rings as long as possible with the
+@sc{Singular} computes in a quotient ring as long as possible with the
 given representative of a polynomial, say, @code{f}.  I.e., it usually
 does not reduce @code{f} w.r.t. the quotient ideal.  This is only done
 when necessary
-during standard bases computations or by an explicate reduction using
+during standard bases computations or by an explicit reduction using
 the command @code{reduce(f, std(0))} (@pxref{reduce}).
 
 @strong{Example:}
@@ -901,10 +908,10 @@ resultant and gcd computations.
 @item facstd
 @ref{facstd}
 @*computes a list of Groebner bases via the Factorizing Groebner Basis
-Algorithm, i.e. has the same radical as the original ideal. It need not
+Algorithm, i.e., has the same radical as the original ideal. It need not
 be a Groebner basis of the given ideal.
 
-The intersection of the zero sets is the zero set of the given ideal.
+The intersection of the zero-sets is the zero-set of the given ideal.
 @item fglm
 @ref{fglm}
 @*computes a Groebner basis provided that a reduced Groebner basis
@@ -928,14 +935,14 @@ bases.
 @item stdfglm
 @ref{stdfglm}
 @*computes a Groebner basis in a ring with a ``difficult'' ordering
-(e.g.@: lexicographical) via @code{std} w.r.t.@: a ``simple'' ordering and
+(e.g., lexicographical) via @code{std} w.r.t.@: a ``simple'' ordering and
 @code{fglm}.
 
 The given ideal must be zero-dimensional.
 @item stdhilb
 @ref{stdhilb}@*
 computes a Groebner basis in a ring with a ``difficult'' ordering
-(e.g.@: lexicographical) via @code{std} w.r.t.@: a ``simple'' ordering
+(e.g., lexicographical) via @code{std} w.r.t.@: a ``simple'' ordering
 and a @code{std} computation guided by the Hilbert series.
 @end table
 
@@ -1441,7 +1448,7 @@ Defined variables cannot interfere with names in other
 packages.
 
 @example
-@c example
+@c example error
   package packa;
   package packb;
   int packa::i=4;
@@ -1602,7 +1609,7 @@ by the size of expression.
 @* But @code{matrix(} expression @code{,} m @code{,} n @code{)} may also be
 used - the result is a
 @tex
-$ m @times n $
+$ m \times n $
 @end tex
 @ifinfo
 m x n
@@ -1961,7 +1968,7 @@ First, the library definition:
 
 Now, we load the library and execute the procedures defined there:
 @example
-@c example
+@c example error
   LIB "sample.lib";        // load the library sample.lib
   example tab;             // show an example
   "*"+tab(3)+"*";          // use the procedure tab
@@ -2027,7 +2034,7 @@ together with the ring resp. package and deleted
 when the object they live in is deleted.
 
 @example
-@c example
+@c example error
 proc xxx
 {
   int k=4;        //defines a local variable k
@@ -2167,7 +2174,7 @@ all loaded libraries, but a namespace can also be created by a user:@*
 @code{package} package_name@code{;} @ref{package}.
 
 @example
-@c example
+@c example 
   option(loadLib);   // show loading of libraries;
                      // standard.lib is loaded
   listvar(package);
@@ -2224,6 +2231,7 @@ comply with the syntax rules described below.
 
 @c ---------------------------------------
 @node Loading of a library, Singular library, Libraries, Libraries
+@subsection Loading of a library
 @cindex Loading of a library
 
 @ifset namespaces
@@ -2286,7 +2294,7 @@ command:
 All loaded libraries are displayed by the @code{listvar(package);}
 command:
 @example
-@c example
+@c example error
   option(loadLib);   // show loading of libraries;
                      // standard.lib is loaded
   listvar(package);
@@ -2309,7 +2317,7 @@ For a dynamic module the packagename is hard-coded in the binary file.
 To use this features, just specify the identifier by its full name:
 
 @example
-@c example
+@c example error
   listvar(package);
   Inout::version;     // full name of a variable in the package Inout
   listvar(package);   // the package Inout has been autoloaded
@@ -2359,7 +2367,7 @@ monitoring of library loading (@pxref{option}).
 A library file can contain comments, an info- and version-string
 definition, @code{LIB} commands, @code{proc} commands
 and @code{proc} commands with @code{example} and @code{help} sections,
-i.e. the following keywords are allowed:
+i.e., the following keywords are allowed:
 @code{info},
 @code{version},
 @code{LIB},
@@ -2486,8 +2494,8 @@ However, if @code{printlevel} is set to  a value k with k>0, then
 @code{Test} is called from other procedures, with a nesting level up to
 k (resp. k-1).
 
-Note furthermore, that the example part of a procedure
-behaves in this respect like a procedure (i.e. the value of @code{voice}
+Note furthermore, that the example part of a procedure 
+behaves in this respect like a procedure (i.e., the value of @code{voice} 
 is 1). Therefore, the command @code{printlevel=1;} is necessary for
 @samp{comment1} to be displayed on @code{ example Test;}. However,
 since printlevel is a global variable, it should be reset to the old
@@ -2686,7 +2694,7 @@ l Sample      internal_tab line   24,  450-475   25,  476-496    0,    0-496
 where the following abbreviations are used:
 @itemize @bullet
 @item g: global procedure (default)
-@item l: static procedure, i.e. local to the library.
+@item l: static procedure, i.e., local to the library.
 @end itemize
 
 each of the following is the position of the byte in the library.

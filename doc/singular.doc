@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.54 1999-06-21 17:39:06 Singular Exp $
+@comment $Id: singular.doc,v 1.55 1999-07-01 12:48:10 obachman Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -9,23 +9,32 @@
 @iftex
 @afourpaper
 @finalout
+@pagesizes 23cm, 16.5cm
 @end iftex
+@paragraphindent 0
 @comment %**end of header
 @c redirect funtion index:
 @c @syncodeindex fn cp
 @c ------------------------
 @set singularmanual 1
 @c @set namespaces 1
-@set VERSION 1.2
+@include version.texi
 @c @set manual 1
 @c ------------------------
-@c <CENTER><IMG SRC="Singular2.gif"></CENTER><BR>
-@html
+@ifhtml
 <CENTER><A HREF="http://www.mathematik.uni-kl.de/~zca/Singular" TARGET="_parent">
-<IMG SRC="images/singular.jpg"></A></CENTER><BR>
-@end html
+<IMG SRC="images/singular.jpg"></A><br>
+<h4> A Computer Algebra System for Polynomial Computations </h4>
+<p></p>
+<h4>HTML User Manual for Singular Version 1.2 </h4>
+</center>
+<CENTER><A HREF="http://www.uni-kl.de/" TARGET="_parent"><TT>University of Kaiserslautern</TT></A></CENTER>
+<CENTER><A HREF="http://www.mathematik.uni-kl.de/" TARGET="_parent"><TT>Department of Mathematics</TT></A></CENTER>
+<CENTER>and</CENTER>
+<CENTER><A HREF="http://www.mathematik.uni-kl.de/~zca/" TARGET="_parent"><TT>Centre for Computer Algebra</TT></A></CENTER>
+@end ifhtml
 @ifinfo
-this is the texinfo file describing Singular (version @value{VERSION})
+this is the texinfo file describing Singular (version @value{SHORT_VERSION})
 @end ifinfo
 @c
 @titlepage
@@ -35,7 +44,7 @@ this is the texinfo file describing Singular (version @value{VERSION})
 @center A Computer Algebra System for Polynomial Computations
 @sp 5
 @center @titlefont{Manual}
-@center Version @value{VERSION}
+@center Version @value{SHORT_VERSION}
 @sp 2
 @center Singular is created and its development is directed and coordinated by
 @center G.-M. Greuel, G. Pfister, and H. Schoenemann
@@ -50,8 +59,9 @@ this is the texinfo file describing Singular (version @value{VERSION})
 @author Universitaet Kaiserslautern
 @author D-67653 Kaiserslautern
 @end titlepage
+@shortcontents
+@contents
 @c ----------------------------------------------------------------------------
-@node Top, Preface, (dir), (dir)
 @ifinfo
 @c @manual
 @c q:quit, m:menu item, n:next node, p:previous node, u:up, g:goto node
@@ -60,13 +70,14 @@ this is the texinfo file describing Singular (version @value{VERSION})
 @center Singular
 @center A Computer Algebra System for Polynomial Computations
 @sp 1
-@center User Manual for Singular Version @value{VERSION}
+@center User Manual for Singular Version @value{SHORT_VERSION}
 @sp 2
-@center @url{http://www.uni-kl.de/,University of Kaiserslautern}
-@center @url{http://www.mathematik.uni-kl.de/,Department of Mathematics}
+@center @uref{http://www.uni-kl.de/ ,University of Kaiserslautern}
+@center @uref{http://www.mathematik.uni-kl.de/ ,Department of Mathematics}
 @center and
-@center @url{http://www.mathematik.uni-kl.de/~zca/,Centre for Computer Algebra}
+@center @uref{http://www.mathematik.uni-kl.de/~zca/ ,Centre for Computer Algebra}
 @end ifinfo
+@node Top, Preface, (dir), (dir)
 @menu
 * Preface::
 * Introduction::
@@ -175,7 +186,7 @@ differences. Most notably:
 @end menu
 @c ---------------------------------------
 @node No rvalue of increments and assignments, Evaluation of logical expressions,,Major differences to the C programming language
-@heading No rvalue of increments and assignments
+@subsection No rvalue of increments and assignments
 @cindex rvalue
 
 The increment @code{++} (resp.@: decrement operator @code{--}) has no
@@ -198,7 +209,7 @@ in an error.
 
 @c ---------------------------------------
 @node Evaluation of logical expressions, No case or switch statement, No rvalue of increments and assignments, Major differences to the C programming language
-@heading Evaluation of logical expressions
+@subsection Evaluation of logical expressions
 @cindex Evaluation of logical expressions
 @cindex and
 @cindex or
@@ -271,7 +282,7 @@ value is overwritten by its global one.
 
 @c ---------------------------------------
 @node No case or switch statement,  Usage of commas, Evaluation of logical expressions, Major differences to the C programming language
-@heading No case or switch statement
+@subsection No case or switch statement
 @cindex case
 @cindex switch
 
@@ -291,7 +302,7 @@ while (1)
 
 @c ---------------------------------------
 @node Usage of commas, Usage of brackets, No case or switch statement, Major differences to the C programming language
-@heading Usage of commas
+@subsection Usage of commas
 @cindex comma
 
 In @sc{Singular}, a comma separates list elements and the value of a comma
@@ -311,7 +322,7 @@ for (i,j = 1,5; i<5 || j<10; i++, j++) @{@dots{}@}
 
 @c ---------------------------------------
 @node Usage of brackets, Behavior of continue, Usage of commas, Major differences to the C programming language
-@heading Usage of brackets
+@subsection Usage of brackets
 @cindex bracket
 
 In @sc{Singular}, curly brackets (@code{@{} @code{@}}) @strong{must
@@ -335,7 +346,7 @@ if (i == 1) @{ return (i); @}
 
 @c ---------------------------------------
 @node  Behavior of continue, Return type of procedures, Usage of brackets, Major differences to the C programming language
-@heading Behavior of continue
+@subsection Behavior of continue
 @cindex continue
 @sc{Singular}'s @code{continue} construct is only valid inside the body
 of a @code{for} or @code{while} construct. It skips the rest of the
@@ -358,9 +369,10 @@ for (int i = 1 ; i<=10; i=i+1)
 @expansion{} 9
 @expansion{} 10
 @end example
-
 @c ---------------------------------------
 @node Return type of procedures,,Behavior of continue, Major differences to the C programming language
+@subsection Return type of procedures
+@cindex return type of procedures
 
 Although the @sc{Singular} language is a strongly typed programming
 language, the type of the
@@ -426,7 +438,7 @@ With spaces it is an expression of type int
 (and @code{/} is the integer division).
 To avoid confusion use the operand @code{div}.
 @example
-@c example
+@c example error
   ring r=32002,x,dp;
   3/2;
   3 / 2;
@@ -515,7 +527,7 @@ In particular,
 
 See example
 @example
-@c example
+@c example error
 package K;
 string K::varok;
 string K::donotwork(1);
@@ -558,7 +570,7 @@ be kept in mind. Otherwise, surprising results may come up.
 @c example
 ring r=0,(x,y),dp;
 int x;
-x*y; // resolved product int*poly, i.e. 0*y
+x*y; // resolved product int*poly, i.e., 0*y
 xy; // "xy" is one identifier and resolved to monomial xy
 @c example
 @end example
@@ -617,18 +629,14 @@ described in the following subsections.
 @node standard_lib, all_lib, SINGULAR libraries, SINGULAR libraries
 @section standard_lib
 @cindex standard_lib
+
 The library @code{standard.lib} provides extensions to the
 set of built-in commands and is automatically loaded
-during the start of @sc{Singular}.
-It contains:
-@table @code
-@item groebner
-see @ref{groebner}.
-@item stdfglm
-see @ref{stdfglm}.
-@item stdhilb
-see @ref{stdhilb}.
-@end table
+during the start of @sc{Singular}, unless @sc{Singular} is started up
+with the @code{--no-stdlib} command line option (see 
+@ref{Command line options}).
+ 
+@c lib standard.lib lib_fun lib_ex
 @c ----------------------------------------------------------
 @node all_lib, general_lib, standard_lib, SINGULAR libraries
 @section all_lib
@@ -708,7 +716,7 @@ see @ref{stdhilb}.
 @node latex_lib,hnoether_lib,invar_lib, SINGULAR libraries
 @section latex_lib
 @cindex latex_lib
-@c lib latex.lib
+@c lib latex.lib no_ex
 @c ---------------------------------------------------------
 @node hnoether_lib,classify_lib,latex_lib, SINGULAR libraries
 @section hnoether_lib
@@ -738,6 +746,6 @@ see @ref{stdhilb}.
 @chapter Index
 @printindex cp
 @c ---------------------------------------------------------
-@shortcontents
-@contents
+@c @shortcontents
+@c @contents
 @bye

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.84 1999-06-28 16:06:34 Singular Exp $
+@comment $Id: types.doc,v 1.85 1999-07-01 12:48:18 obachman Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -45,9 +45,6 @@ For the general syntax of a declaration see @ref{General command syntax}.
 * matrix::
 * module::
 * number::
-@ifset namespaces
-* package::
-@end ifset
 * poly::
 * proc::
 * qring::
@@ -55,6 +52,9 @@ For the general syntax of a declaration see @ref{General command syntax}.
 * ring::
 * string::
 * vector::
+@ifset namespaces
+* package::
+@end ifset
 @end menu
 
 @c ---------------------------------------
@@ -142,7 +142,7 @@ Ideals are represented as lists of polynomials which generate the ideal.
 Like polynomials they
 can only be defined or accessed with respect to a basering.
 
-@strong{Note:} @code{size} counts only the non zero generators of an ideal
+@strong{Note:} @code{size} counts only the non-zero generators of an ideal
 whereas @code{ncols} counts all generators.
 @menu
 * ideal declarations::
@@ -485,8 +485,8 @@ characteristic 0.
 
 @*@strong{Example:}
 @example
-@c example
-12345678901;
+@c example error
+12345678901; // too large
 typeof(_);
 ring r=0,x,dp;
 12345678901;
@@ -566,13 +566,14 @@ the value of @code{j}, see @ref{Limitations}.
 
 @*@strong{Example:}
 @example
-@c example
+@c example error
   int i=1;
   int j;
   i++; i;  i--; i;
-  // ++ and -- do not return a value as in C, the variable j is unchanged
-  j = i++; j; i;
-  j = i--; j; i;
+  // ++ and -- do not return a value as in C, can not assign
+  j = i++; 
+  // the value of j is unchanged
+  j; i; 
   i+2, 2-i, 5^2;
   5 div 2, 8%3;
   1<2, 2<=2;
@@ -650,11 +651,6 @@ module of leading terms (see @ref{vdim})
 @cindex <>
 @cindex <=
 @cindex >=
-@cindex and
-@cindex &&
-@cindex or
-@cindex ||
-@cindex not
 
 A boolean expression is really an int expression used in a logical context:
 
@@ -750,6 +746,12 @@ See @ref{Major differences to the C programming language}.
 @node boolean operations, , boolean expressions, int
 @subsection boolean operations
 @cindex boolean operations
+@cindex and
+@cindex &&
+@cindex or
+@cindex ||
+@cindex not
+
 @table @code
 @item and
 logical and, may also be written as @code{&&}
@@ -1861,9 +1863,9 @@ possible, coefficients are mapped in the following way:
 @item
 @tex
 % This is quite a hack, but for now it works.
-\rlap{$Z/p \mapsto Q$}\phantom{$Z/p \mapsto Z/p^\prime$}
+$Z/p \rightarrow Q, 
 \quad
-$[i]_p \rightarrow i \in [-p/2, \, p/2]
+[i]_p \mapsto i \in [-p/2, \, p/2]
 \subseteq Z$
 @end tex
 @ifinfo
@@ -1871,21 +1873,21 @@ Z/p -> Q : [i]_p -> i in [-p/2, p/2] in Z
 @end ifinfo
 @item
 @tex
-$Z/p \mapsto Z/p^\prime$
+$Z/p \rightarrow Z/p^\prime, 
 \quad
-$[i]_p \in Z/p \rightarrow i \in [-p/2, \, p/2] \subseteq Z, \;
-i \rightarrow [i]_{p^\prime} \in Z/p^\prime$
+[i]_p \mapsto i \in [-p/2, \, p/2] \subseteq Z, \;
+i \mapsto [i]_{p^\prime} \in Z/p^\prime$
 @end tex
 @ifinfo
 Z/p -> Z/p' : [i]_p in Z/p -> i in [-p/2,p/2] in Z, i -> [i]_p' in Z/p'
 @end ifinfo
 @end itemize
 
-and as usual:
+and, as usual:
 @itemize @bullet
 @item
 @tex
-$Q \mapsto Z/p$
+$Q \rightarrow Z/p$
 @end tex
 @ifinfo
 Q -> Z/p
@@ -1893,7 +1895,7 @@ Q -> Z/p
 
 @item
 @tex
-$Q \mapsto (Z/p)(a, \ldots)$
+$Q \rightarrow (Z/p)(a, \ldots)$
 @end tex
 @ifinfo
 Q -> (Z/p)(a,..)
@@ -1901,7 +1903,7 @@ Q -> (Z/p)(a,..)
 
 @item
 @tex
-$Q \mapsto Q(a, \ldots)$
+$Q \rightarrow  Q(a, \ldots)$
 @end tex
 @ifinfo
 Q -> Q(a,..)
@@ -1909,7 +1911,7 @@ Q -> Q(a,..)
 
 @item
 @tex
-$Z/p \mapsto (Z/p)(a, \ldots)$
+$Z/p \rightarrow  (Z/p)(a, \ldots)$
 @end tex
 @ifinfo
 Z/p ->(Z/p)(a,...)
@@ -2572,7 +2574,7 @@ defines a number.
   ring R=real,x,dp;
   number n=4/6;
   n;
-  n=0.25e+2;
+//  n=0.25e+2;
   n;
 @c example
 @end example
@@ -2618,7 +2620,7 @@ a type cast to number
   leadcoef(f);
   typeof(_);
   ring rr =real,x,dp;
-  1.7e-2; 1.7e+2; // are valid (but  1.7e2 not), if the field is `real`
+//  1.7e-2; 1.7e+2; // are valid (but  1.7e2 not), if the field is `real`
   ring rp = (31,t),x,dp;
   2/3, 4/8, 2/2 ; // are numbers
   poly g = (3t2 +1)*x2 +1;
@@ -2665,7 +2667,7 @@ expressions}.
 
 @*@strong{Example:}
 @example
-@c example
+@c example error
   ring r=0,x,dp;
   number n = 1/2 +1/3;
   n;
@@ -2677,7 +2679,7 @@ expressions}.
   // the following oddities appear here
   2/(2+3);
   number(2)/(2+3);
-  2^-2;
+  2^-2; // for int's exponent must be non-negative
   number(2)^-2;
   3/4>=2/5;
   2/6==1/3;
@@ -2737,7 +2739,7 @@ defines a package
 
 @item Example:
 @example
-@c example
+@c example error
   package Test;
   int Test::i;
   listvar();
@@ -2963,7 +2965,7 @@ Bezout representation of gcd (see @ref{extgcd})
 @item factorize
 factorize polynomial (see @ref{factorize})
 @item finduni
-find univariate polynomials in a zero dimensional ideal (see @ref{finduni})
+find univariate polynomials in a zero-dimensional ideal (see @ref{finduni})
 @item gcd
 greatest common divisor (see @ref{gcd})
 @item homog
@@ -3598,7 +3600,7 @@ name of the n-th ring variable (see @ref{varstr})
 Vectors are elements of a free module over the basering with basis
 @code{gen(1)}, @code{gen(2)}, @dots{} .
 Each vector belongs to a free module of rank equal to the biggest index
-of a generator with nonzero coefficient. Since generators with zero
+of a generator with non-zero coefficient. Since generators with zero
 coefficients need not be written any vector may be considered
 also as an element of a free module of higher rank.
 Like polynomials they

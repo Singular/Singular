@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.112 1999-06-21 19:45:34 Singular Exp $
+@comment $Id: reference.doc,v 1.113 1999-07-01 12:48:08 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -32,16 +32,25 @@
 @section Functions
 @cindex Functions
 
+This section gives a complete reference of all functions, commands and
+special variables of the @sc{Singular} kernel (i.e., all built-in
+commands). @xref{standard_lib}, for those
+functions from the @code{standard.lib} (this library is automatically
+loaded at start-up time) which extend the functionality of the kernel
+and are written
+in the  @sc{Singular} programming language.
+
 The general syntax of a function is
 @* [target =] function_name (<arguments>);
 @* If no target is specified, the result is printed.
 
-In some cases (e.g. @code{execute, export, keepring, kill, setring, type})
-the brackets are optional. In the syntax of the commands @code{help}, @code{break},
-@code{quit}, @code{exit} and @code{LIB} no brackets are allowed.
+In some cases (e.g., @code{execute, export, keepring, kill, setring,
+type}) the brackets are optional. For the commands
+@code{help}, @code{break}, @code{quit}, @code{exit} and @code{LIB} no
+brackets are allowed.
 
 @ifinfo
-@*List of all supported functions.
+@*List of all supported kernel functions.
 @end ifinfo
 @menu
 * attrib::
@@ -80,7 +89,6 @@ the brackets are optional. In the syntax of the commands @code{help}, @code{brea
 * gcd::
 * gen::
 * getdump::
-* groebner::
 * help::
 * highcorner::
 * hilb::
@@ -152,8 +160,6 @@ the brackets are optional. In the syntax of the commands @code{help}, @code{brea
 * sres::
 * status::
 * std::
-* stdfglm::
-* stdhilb::
 * subst::
 * system::
 * syz::
@@ -448,7 +454,7 @@ matrix
 @item @strong{Purpose:}
 the rows of the matrix represent the irreducible characteristic series of the
 ideal with respect to the current variable ordering.
-@*One application is the decomposition of the zero set.
+@*One applicatation is the decomposition of the zero-set.
 @item @strong{Example:}
 @example
 @c example
@@ -461,7 +467,7 @@ ideal with respect to the current variable ordering.
 @c Let $>$ be the lexicographical ordering $x_1 < ... < x_n$ on $R=K[x_1,...,x_n]$.
 @c For $f \in R$ let lvar(f) (the leading variable of f) be the largest
 @c variable in lead(f) (the leading term of f with respect to $>$),
-@c i.e. if $f=a_k(x_1,...,x_{k-1})x_k^s+...+a_0(x_1,...,x_{k-1})$ for some
+@c i.e., if $f=a_k(x_1,...,x_{k-1})x_k^s+...+a_0(x_1,...,x_{k-1})$ for some
 @c $k \leq n$ then $lvar(f)=x_k$, moreover let $ini(f):=a_k(x_1,...,x_{k-1})$.
 @c
 @c A set $T=\{f_1,...,f_r\} \subset R$ is called triangular if $lvar(f_1)<...<lvar(f_r)$.
@@ -490,7 +496,7 @@ ideal with respect to the current variable ordering.
 @c Let > be the lexicographical ordering x_1 < ... < x_n on R=K[x_1,...,x_n].
 @c For f in R let lvar(f) (the leading variable of f) be the largest
 @c variable in lead(f) (the leading term of f with respect to >),
-@c i.e. if f=a_k(x_1,...,x_(k-1))x_k^s+...+a_0(x_1,...,x_(k-1)) for some
+@c i.e., if f=a_k(x_1,...,x_(k-1))x_k^s+...+a_0(x_1,...,x_(k-1)) for some
 @c k<=n then lvar(f)=x_k, moreover let ini(f):=a_k(x_1,...,x_(k-1)).
 @c
 @c A set T=@{f_1,...,f_r@} in R is called triangular if lvar(f_1)<...<lvar(f_r).
@@ -499,7 +505,7 @@ ideal with respect to the current variable ordering.
 @c a minimal.
 @c
 @c (T,U) is called a triangular system, if T is a triangular set such that ini(T)
-@c does not vanish on the zero set of T \ zero set of U
+@c does not vanish on the zero-set of T \ zero-set of U
 @c ( =:Zero(T\U)).
 @c
 @c T is called irreducible if for every i there are no d_i,f_i',f_i'' with
@@ -647,14 +653,14 @@ The first row consists of these monomials, the second row
 of the corresponding coefficients of the monomials in f.
 Thus f = M[1,1]*M[2,1]+..+M[1,n]*M[2,n].
 
-Second case: the first matrix (i.e. the 3rd argument) contains the
-monomials, the second matrix (i.e. the 4th argument) the corresponding
+Second case: the first matrix (i.e., the 3rd argument) contains the
+monomials, the second matrix (i.e., the 4th argument) the corresponding
 coefficients of the monomials in the vector.
 
 @item @strong{Note:}
-coef considers only monomials which really occur in f (i.e. are not 0),
+coef considers only monomials which really occur in f (i.e., are not 0),
 while coeffs returns the coefficient 0 at the appropriate place if a
-monomial is not present (c.f. @ref{coeffs}).
+monomial is not present (see @ref{coeffs}).
 
 @item @strong{Example:}
 @example
@@ -845,9 +851,8 @@ none
 The print command is applied to the expression,
 if @code{printlevel=>voice}.
 @item @strong{Note:}
-For an example how this is used
-for the display of comments while procedures are executed see
-@ref{Guidelines for writing a library}.
+@xref{Guidelines for writing a library}, for an example how this is used
+for the display of comments while procedures are executed.
 @item @strong{Example:}
 @example
 @c example
@@ -882,7 +887,7 @@ int
 @item @strong{Purpose:}
 returns a value !=0 (TRUE) if there is a userdefined object with this name,
 and 0 (FALSE) otherwise.
-@*A nonzero return value is the level where the object is defined (level
+@*A non-zero return value is the level where the object is defined (level
 1 denotes the top level, level 2 the level of a first procedure, level 3
 the level of a procedure called by a first procedure, etc.).
 A local object @code{m} may be identified by @code{if (defined(m)==voice)}.
@@ -1185,7 +1190,7 @@ ideal resp. module by intersection with the subring not containing these variabl
 
 @*Since elimination is expensive, it might be useful if the input is
 homogeneous, first to compute the Hilbert function of the ideal (first
-argument) with a fast ordering (e.g. dp). Then make use of it to speed
+argument) with a fast ordering (e.g., @code{dp}). Then make use of it to speed
 up the computation: a Hilbert-driven elimination uses the intvec
 provided as the third argument.
 @item @strong{Example:}
@@ -1340,15 +1345,15 @@ See
 list of ideals
 @item @strong{Purpose:}
 returns a list of Groebner bases by the factorizing Groebner basis algorithm.
-@*The intersection of these ideals has the same zero set as the input,
-i.e. the radical of the intersection coincides with the radical of the input
+@*The intersection of these ideals has the same zero-set as the input,
+i.e., the radical of the intersection coincides with the radical of the input
 ideal.
 In many cases (but not all!) this is already a decomposition of the radical
 of the ideal. (Note however, that, in general, no inclusion holds.)
 @*The second, optional argument gives a list of polynomials which define
 non-zero constraints. Hence, the intersection of the output ideals
-has a zero set which is the (closure of the) complement of the zero set
-of the second argument in the zero set of the first argument.
+has a zero-set which is the (closure of the) complement of the zero-set
+of the second argument in the zero-set of the first argument.
 @item @strong{Note:}
 Not implemented for basering real, galoisfields with gftables and algebraic
 extensions over the rational numbers.
@@ -1477,7 +1482,7 @@ ideal
 calculates for the given ideal in the given ring
 a Groebner basis in the current ring. Implements the so-called FGLM
 (Faugere, Gianni, Lazard, Mora)  algorithm.
-@*The ideal must be zero dimensional and given as a reduced Groebner
+@*The ideal must be zero-dimensional and given as a reduced Groebner
 basis in the given ring.
 The result is a reduced Groebner basis.
 @*The only permissible difference between the given ring and the current ring
@@ -1571,10 +1576,10 @@ See
 @item @strong{Type:}
 ideal
 @item @strong{Purpose:}
-returns an ideal such that the it-h generator is an univariate polynomial
-in the it-h ring variable belonging to ideal_expression.
+returns an ideal such that the i-th generator is an univariate polynomial
+in the i-th ring variable belonging to ideal_expression.
 @* The polynomials have minimal degree w.r.t.@: this property.  The
-ideal must be zero dimensional and given as a reduced Groebner basis in
+ideal must be zero-dimensional and given as a reduced Groebner basis in
 the current ring.
 @item @strong{Example:}
 @example
@@ -1684,7 +1689,7 @@ returns the i-th free generator of a free module.
 See @ref{freemodule}; @ref{int}; @ref{vector}.
 @c ref
 @c ---------------------------------------
-@node getdump, groebner, gen, Functions
+@node getdump, help, gen, Functions
 @subsection getdump
 @cindex getdump
 @table @code
@@ -1719,36 +1724,36 @@ See
 @ref{dump};
 @ref{read}.
 @c ref
+@c @c ---------------------------------------
+@c @node groebner, help, getdump, Functions
+@c @subsection groebner
+@c @cindex groebner
+@c @table @code
+@c @item @strong{Syntax:}
+@c @code{groebner (} ideal_expression @code{)}
+@c @*@code{groebner (} module_expression @code{)}
+@c @item @strong{Type:}
+@c ideal or module
+@c @item @strong{Purpose:}
+@c returns a standard basis of an ideal or module with respect to the
+@c monomial ordering of the basering using a heuristically chosen method.
+@c @item @strong{Example:}
+@c @example
+@c @c example
+@c   ring r = 0, (a,b,c,d), lp;
+@c   ideal i = a+b+c+d, ab+ad+bc+cd, abc+abd+acd+bcd, abcd-1;
+@c   groebner(i);
+@c @c example
+@c @end example
+@c @end table
+@c @c ref
+@c See
+@c @ref{std};
+@c @ref{stdfglm};
+@c @ref{stdhilb}.
+@c @c ref
 @c ---------------------------------------
-@node groebner, help, getdump, Functions
-@subsection groebner
-@cindex groebner
-@table @code
-@item @strong{Syntax:}
-@code{groebner (} ideal_expression @code{)}
-@*@code{groebner (} module_expression @code{)}
-@item @strong{Type:}
-ideal or module
-@item @strong{Purpose:}
-returns a standard basis of an ideal or module with respect to the
-monomial ordering of the basering using a heuristically chosen method.
-@item @strong{Example:}
-@example
-@c example
-  ring r = 0, (a,b,c,d), lp;
-  ideal i = a+b+c+d, ab+ad+bc+cd, abc+abd+acd+bcd, abcd-1;
-  groebner(i);
-@c example
-@end example
-@end table
-@c ref
-See
-@ref{std};
-@ref{stdfglm};
-@ref{stdhilb}.
-@c ref
-@c ---------------------------------------
-@node help, highcorner, groebner, Functions
+@node help, highcorner, getdump, Functions
 @subsection help
 @cindex help
 @table @code
@@ -2153,7 +2158,7 @@ ideal resp. module
 @item @strong{Purpose:}
 ideal resp. module intersection.
 @item @strong{Note:}
-If the option @code{computeSB} is enabled then the result is a standard basis.
+If the option @code{returnSB} is enabled then the result is a standard basis.
 @item @strong{Example:}
 @example
 @c example
@@ -2320,7 +2325,7 @@ none
 deletes objects.
 @item @strong{Example:}
 @example
-@c example
+@c example error
   int i=3;
   ring r= 0,x,dp;
   poly p;
@@ -2576,8 +2581,9 @@ shows all loaded libraries written in Singular.
 @item @strong{Example:}
 @example
 @c example
-  option(loadLib); // show loading of libraries; standard.lib is loaded
-  LIB;
+  option(loadLib); // show loading of libraried
+  LIB;             // standard.lib is loaded
+
                    // the names of the procedures of inout.lib
   LIB "inout.lib"; // are now known to Singular
   LIB;
@@ -2729,7 +2735,7 @@ package can be @code{Current}, @code{Up}, @code{Top} or any other
 identifier of type package.
 @item @strong{Example:}
 @example
-@c example
+@c example error
   proc t1 { }
   proc t2 { }
   ring s;
@@ -2856,9 +2862,9 @@ which also completes computations and may therefore take time.
   ring r=0,(x,y,z),dp;
   ideal i=xz,yz,x^3-y^3;
   def l=lres(i,0);
-  print(betti(l),"betti"); // input to betti may be of type resolution
+  print(betti(l),"betti");// input to betti may be of type resolution
   list ll=l;
-  l[2];                    // elements can only be accessed in the list
+  l[2];                   // elements can only be accessed in the list
 @c example
 @end example
 @end table
@@ -3230,7 +3236,7 @@ list
 @item @strong{Purpose:}
 returns a list whose first entry is a standard basis and whose second
 entry is a set of generators of size smaller or equal to the input set,
-which is a minimal subset of the standard basis for homogeneous
+which is a minimal subset of the standard basis for homogenous
 input  (w.r.t. any monomial ordering).
 @item @strong{Example:}
 @example
@@ -3300,7 +3306,7 @@ string
 returns the name of an expression as string.
 @item @strong{Example:}
 @example
-@c example
+@c example error
   int i = 9;
   string s = nameof(i);
   s;
@@ -3342,7 +3348,7 @@ package_name can be @code{Current}, @code{Up}, @code{Top} or any other
 identifier of type package.
 @item @strong{Example:}
 @example
-@c example
+@c example error
   int i = 9;
   ring r;
   poly f;
@@ -3750,69 +3756,59 @@ shows correct usage in error messages (default)
 @item @tab @code{facstd}
 @tab @code{F} @tab found a new factor
 @item @tab @tab @tab all other characters: like the output of @code{std}
-
+@item @tab @tab @tab
 @item @tab @code{fglm}
 @tab @code{.} @tab basis monomial found
 @item @tab @tab @code{+} @tab edge monomial found
 @item @tab @tab @code{-} @tab border monomial found
-
-@item @tab @code{groebner} @tab @tab all characters:
-like the output of @code{std}
-
+@item @tab @tab @tab
+@item @tab @code{groebner} @tab @tab all characters: like the output of @code{std}
+@item @tab @tab @tab
 @item @tab @code{lres}
 @tab @code{.} @tab minimal syzygy found
 @item @tab @tab @math{n} @tab slanted degree, i.e., row of Betti matrix
-@item @tab @tab @code{(m}@math{n}@code{)} @tab calculate in module
-@math{n}
+@item @tab @tab @code{(m}@math{n}@code{)} @tab calculate in module @math{n}
 @item @tab @tab @code{g} @tab pair found giving reductum and syzygy
-
+@item @tab @tab @tab
 @item @tab @code{mres}
 @tab @code{[}@math{d}@code{]}
 @tab computations of the @math{d}-th syzygy module
 @item @tab @tab @tab all other characters: like the output of @code{std}
-
+@item @tab @tab @tab
 @item @tab @code{minres}
 @tab @code{[}@math{d}@code{]}
 @tab minimizing of the @math{d}-th syzygy module
-
-@item @tab @code{mstd} @tab @tab all characters:
-like the output of @code{std}
-
+@item @tab @tab @tab
+@item @tab @code{mstd} @tab @tab all characters: like the output of @code{std}
+@item @tab @tab @tab
 @item @tab @code{res}
 @tab @code{[}@math{d}@code{]}
 @tab computations of the @math{d}-th syzygy module
 @item @tab @tab @tab all other characters: like the output of @code{std}
-
+@item @tab @tab @tab
 @item @tab @code{sres}
 @tab @code{.} @tab syzygy found
 @item @tab @tab @code{(}@math{n}@code{)} @tab @math{n} elements remaining
 @item @tab @tab @code{[}@math{n}@code{]} @tab finished module @math{n}
-
+@item @tab @tab @tab
 @item @tab @code{std}
 @tab @code{s} @tab found a new element of the standard basis
 @item @tab @tab @code{-} @tab reduced a pair/S-polynomial to 0
-@item @tab @tab @code{.} @tab postponed a reduction of a
-pair/S-polynomial
+@item @tab @tab @code{.} @tab postponed a reduction of a pair/S-polynomial
 @item @tab @tab @code{h} @tab used Hilbert series criterion
-@item @tab @tab @code{H(}@math{d}@code{)} @tab found a 'highest corner'
-of degree @math{d}, no need to consider higher degrees
-@item @tab @tab @code{(}@math{n}@code{)} @tab @math{n} critical pairs
-are still to be reduced
-@item @tab @tab @code{(S:}@math{n}@code{)} @tab doing complete reduction
-of @math{n} elements
-@item @tab @tab @math{d} @tab the degree of the leading terms is
-currently @math{d}
-
-@item @tab @code{stdfglm} @tab @tab all characters in first part:
-like the output of @code{std}
-@item @tab @tab @tab all characters in second part:
-like the output of @code{fglm}
-
-@item @tab @code{stdhilb} @tab @tab all characters:
-like the output of @code{std}
-
+@item @tab @tab @code{H(}@math{d}@code{)} @tab found a 'highest corner' of degree @math{d}, no need to consider higher degrees
+@item @tab @tab @code{(}@math{n}@code{)} @tab @math{n} critical pairs are still to be reduced
+@item @tab @tab @code{(S:}@math{n}@code{)} @tab doing complete reduction of @math{n} elements
+@item @tab @tab @math{d} @tab the degree of the leading terms is currently @math{d}
+@item @tab @tab @tab
+@item @tab @code{stdfglm} @tab @tab all characters in first part: like the output of @code{std}
+@item @tab @tab @tab all characters in second part: like the output of @code{fglm}
+@item @tab @tab @tab
+@item @tab @code{stdhilb} @tab @tab all characters: like the output of @code{std}
+@item @tab @tab @tab
 @item @tab @code{syz} @tab @tab all characters: like the output of @code{std}
 @end multitable
+
 
 @c ref
 See
@@ -4197,7 +4193,7 @@ See @ref{module}.
 intvec
 @item @strong{Purpose:}
 computes the weight vector of the variables for a quasihomogeneous ideal.
-If the input is not weighted homogeneous, an intvec of zeroes is returned.
+If the input is not weighted homogeneous, an intvec of zeros is returned.
 @item @strong{Example:}
 @example
 @c example
@@ -4764,10 +4760,10 @@ keep only the first from identical generators/columns
 keep only the first from generators/columns which differ by a factor
 from the ground field
 @item 16
-keep only the first from generators/columns whose leading monomials
-differ
+keep only those generators/columns whose leading monomials
+differ.
 @item 32
-keep only the first from generators/columns whose leading monomials are
+keep only those generators/columns whose leading monomials are
 not divisible.
 @end table
 @item @strong{Example:}
@@ -4819,9 +4815,9 @@ int
 @item @strong{Purpose:}
 @table @asis
 @item ideal or module
-returns the number of (non zero) generators.
+returns the number of (non-zero) generators.
 @item string, intvec, list or resolution
-returns the length, i.e. the number of characters, entries or elements.
+returns the length, i.e., the number of characters, entries or elements.
 @item poly or vector
 returns the number of monomials.
 @item matrix or intmat
@@ -5056,7 +5052,7 @@ returns (depending on the type of the link and its status)
 See @ref{link}; @ref{open}; @ref{read}; @ref{write}.
 @end iftex
 @c ---------------------------------------
-@node std, stdfglm, status, Functions
+@node std, subst, status, Functions
 @subsection std
 @cindex std
 @table @code
@@ -5079,8 +5075,15 @@ second argument of type @code{intvec} as Hilbert series
 (result of @code{hilb(i,1)}, see @ref{hilb}),
 if the ideal resp. module is homogeneous,
 (Hilbert driven standard basis computation, @ref{stdhilb}).
+@item @strong{Note:}
+The
+standard basis is computed with a (more or less) brute-force
+implementation of the classical
+Buchberger (resp. Mora) algorithm. For global orderings, use the
+@code{groebner} (@pxref{groebner}) command, instead, which heuristically
+chooses the "best" algorithm to compute a Groebner basis.
 @*Use an optional second argument of type @code{poly} resp.@ @code{vector}
-to construct the standard basis from an already computed one (givenn as the
+to construct the standard basis from an already computed one (given as the
 first argument) and one additional generator (the second argument).
 @item @strong{Example:}
 @example
@@ -5106,106 +5109,19 @@ See
 @ref{stdhilb}.
 @c ref
 @c ---------------------------------------
-@node stdfglm, stdhilb, std, Functions
-@subsection stdfglm
-@cindex stdfglm
-@table @code
-@item @strong{Syntax:}
-@code{stdfglm (} ideal_expression @code{)}
-@item @strong{Purpose:}
-returns a standard basis of an ideal in the basering, calculated via
-the FGLM algorithm from the ordering "dp" (degrevlex) to the ordering
-of the basering.
-@item @strong{Syntax:}
-@code{stdfglm (} ideal_expression@code{,} string_expression @code{)}
-@item @strong{Purpose:}
-returns a standard basis of an ideal in the basering, calculated via
-the FGLM algorithm from the ordering given by the second argument to
-the ordering of the basering.
-@item @strong{Note:}
-The first argument has to be a zero-dimensional ideal.
-@item @strong{Type:}
-ideal
-@item @strong{Example:}
-@example
-@c example
-  ring r  = 0,(x,y,z),lp;
-  ideal i = y3+x2, x2y+x2, x3-x2, z4-x2-y;
-  ideal i1= stdfglm(i);         //uses fglm from "dp" to "lp"
-  i1;
-  ideal i2= stdfglm(i,"Dp");    //uses fglm from "Dp" to "lp"
-  i2;
-@c example
-@end example
-@end table
-@c ref
-See
-@ref{ideal};
-@ref{ring};
-@ref{option};
-@ref{facstd};
-@ref{mstd};
-@ref{std};
-@ref{stdhilb}.
-@c ref
-@c ---------------------------------------
-@node stdhilb, subst, stdfglm, Functions
-@subsection stdhilb
-@cindex stdhilb
-@table @code
-@item @strong{Syntax:}
-@code{stdhilb (} ideal_expression @code{)}
-@*@code{stdhilb (} ideal_expression@code{,} intvec_expression @code{)}
-@item @strong{Type:}
-ideal
-@item @strong{Purpose:}
-returns a standard basis of a homogeneous ideal with respect to the
-monomial ordering of the basering
-(Hilbert driven standard basis computation).
-First the Hilbert series is computed (if not given).
-@*Use an optional
-second argument as Hilbert series
-(result of @code{hilb(i,1)}, see @ref{hilb}).
-@item @strong{Example:}
-@example
-@c example
-  ring  r = 0,(x,y,z),lp;
-  ideal i = y3+x2, x2y+x2, x3-x2, z4-x2-y;
-  ideal i1= stdhilb(i); i1;
-  // is in this case equivalent to:
-  intvec v=1,0,0,-3,0,1,0,3,-1,-1;
-  ideal i2=stdhilb(i,v);
-@c example
-@end example
-@end table
-@menu
-* ideal::
-* hilb::
-* ring::
-* option::        Sets certain strategies.
-* facstd::
-* mstd::
-* std::
-* stdfglm::
-@end menu
-@iftex
-See @ref{ideal}; @ref{hilb}; @ref{ring}; @ref{option}; @ref{facstd}; @ref{mstd};
-@ref{std}; @ref{stdfglm}.
-@end iftex
-@c ---------------------------------------
-@node subst, system, stdhilb, Functions
+@node subst, system, std, Functions
 @subsection subst
 @cindex subst
 @table @code
 @item @strong{Syntax:}
-@code{subst (} poly_expression@code{,} ring_variable@code{,} monomial @code{)}
-@*@code{subst (} vector_expression@code{,} ring_variable@code{,} monomial @code{)}
-@*@code{subst (} ideal_expression@code{,} ring_variable@code{,} monomial @code{)}
-@*@code{subst (} module_expression@code{,} ring_variable@code{,} monomial @code{)}
+@code{subst (} poly_expression@code{,} ring_variable@code{,} term @code{)}
+@*@code{subst (} vector_expression@code{,} ring_variable@code{,} term @code{)}
+@*@code{subst (} ideal_expression@code{,} ring_variable@code{,} term @code{)}
+@*@code{subst (} module_expression@code{,} ring_variable@code{,} term @code{)}
 @item @strong{Type:}
 poly, vector, ideal or module (the same as the first argument)
 @item @strong{Purpose:}
-substitutes a ring variable by a monomial (a polynomial of length <=1).
+substitutes a ring variable by a term (a polynomial of length <=1).
 @item @strong{Example:}
 @example
 @c example
@@ -5738,12 +5654,6 @@ See
 * continue::
 * else::
 * export::
-@ifset namespaces
-* exportto::
-* importfrom::
-* load::
-* unload::
-@end ifset
 * for::
 * if::
 * keepring::
@@ -5751,6 +5661,12 @@ See
 * return::
 * while::
 * ~::
+@ifset namespaces
+* exportto::
+* importfrom::
+* load::
+* unload::
+@end ifset
 @end menu
 
 A sequence of commands surrounded by curly brackets (@code{@{} and
@@ -6468,7 +6384,7 @@ See @ref{ring}.
 int
 @item @strong{Purpose:}
 The standard basis computation is stopped if the ideal is
-zerodimensional in a ring with local ordering
+zero-dimensional in a ring with local ordering
 and its multiplicity (@code{mult}) is lower than @code{multBound}.
 @*Reset this bound by setting @code{multBound} to 0
 @item @strong{Example:}
@@ -6535,9 +6451,8 @@ sets the debug level for dbprint.
 If @code{printlevel} >= @code{voice} @code{dbprint} is equivalent to
 @code{print}, otherwise nothing is printed.
 @item @strong{Note:}
-For an example how this is used
-for the display of comments while procedures are executed see
-@ref{Guidelines for writing a library}.
+@xref{Guidelines for writing a library}, for an example how this is used
+for the display of comments while procedures are executed.
 @item @strong{Example:}
 @example
 @c example
@@ -6566,7 +6481,7 @@ See @ref{int}; @ref{dbprint}; @ref{voice}.
 int
 @item @strong{Purpose:}
 the output of monomials is done in the short manner,
-if @code{short} is nonzero. A C-like notion is used, if short is zero.
+if @code{short} is non-zero. A C-like notion is used, if short is zero.
 Both notations may be used as input.
 @*The default depends on the names of the ring variables
 (0 if there are names of variables longer than 1 character, 1 otherwise). Every
@@ -6595,8 +6510,12 @@ int
 @item @strong{Purpose:}
 @enumerate
 @item
-the CPU time used for each command is printed if timer >0 and if this
-time is bigger than a (customizable) minimal time;
+the CPU time (i.e, user and system time) used for each command is
+printed if timer >0 , if this
+time is bigger than a (customizable) minimal time and
+if @code{printlevel+1 >= voice} (which is by default true on the
+@sc{Singular} top level, but not true while procedures are executed).
+
 @item
 yields the used CPU time since the start-up of @sc{Singular} in a
 (customizable) resolution.
@@ -6627,14 +6546,14 @@ commands, see example below.
 @c example
 @end example
 @end table
-@menu
-* Command line options::
-* system::
-* rtimer::
-@end menu
-@iftex
-See @ref{Command line options}; @ref{system}; @ref{rtimer}.
-@end iftex
+@c ref
+See
+@ref{Command line options};
+@ref{printlevel};
+@ref{rtimer};
+@ref{system};
+@ref{voice}.
+@c ref
 @c ---------------------------------------
 @node TRACE var, rtimer, timer, System variables
 @subsection TRACE
@@ -6680,22 +6599,9 @@ See @ref{int}.
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-identical to @code{timer}, except that real times (i.e., wall-clock)
-times are reported, instead of CPU times.
-@item @strong{Example:}
-@example
-@c example
-@c example
-@end example
+identical to @code{timer} (@pxref{timer}), except that real times (i.e.,
+wall-clock) times are reported, instead of CPU times.
 @end table
-@menu
-* timer::
-* Command line options::
-* system::
-@end menu
-@iftex
-See @ref{timer}; @ref{Command line options}; @ref{system}.
-@end iftex
 @c ---------------------------------------
 @node voice,, rtimer, System variables
 @subsection voice
@@ -6707,9 +6613,8 @@ int
 @item @strong{Purpose:}
 shows the nesting level of procedures.
 @item @strong{Note:}
-For an example how this is used
-for the display of comments while procedures are executed see
-@ref{Guidelines for writing a library}.
+@xref{Guidelines for writing a library}, for an example how this is used
+for the display of comments while procedures are executed.
 @item @strong{Example:}
 @example
 @c example

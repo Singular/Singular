@@ -30,9 +30,6 @@ DOWNLOAD:
         AND, one of `Singular-<x.y.z>-<uname>.[tar.gz,zip,sea.hqx]'
     where <uname> is a description of your hardware and
     operating system. 
-    Messages from tar like "Could not create symlink to ..."
-    can safely be ignored - they appaer only in the case that you install
-    the same version of Singular twice.
 
 (2) Unpack them at the same place and follow the instructions
     contained in the `INSTALL' file of the architecture dependent

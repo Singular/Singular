@@ -252,9 +252,11 @@ configure: configure.in
 ##
 install: all installbin 
 
-installbin: Singular
+installbin: Singular libparse
 	${MKINSTALLDIRS} ${bindir}
 	${INSTALL_PROGRAM} Singular ${bindir}/Singular-${SINGULAR_VERSION}
+	${INSTALL_PROGRAM} libparse ${bindir}/libparse
+	chmod a+x ${bindir}/Singular-${SINGULAR_VERSION}
 	rm -f ${bindir}/Singular
 	cd ${bindir}; ${LN_S} Singular-${SINGULAR_VERSION} Singular;\
 	if test ! -x ${SINGULAR}; then \

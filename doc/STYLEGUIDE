@@ -48,6 +48,29 @@
 
 + Email Adressen in @email{...} notieren, URL's in @url{...}
 
++ Muticolumn tables: Rows of multicolumn tables need to go in one
+  line, otherwise exi2html chockes. Space beween rows with "empty"
+  rows (c.f. texi2html), i.e., with @item @tab @tab ....
+
+
+* tex *
+=======
++ Use @math{...} as you would use $..$ in latex -- i.e., ANY
+  mathematical symbols should be within @math (or, @tex, if they
+  require special tex symbols)
+
++ don't use \mbox, use \hbox, instead
+
++ use \hbox only within math environment
+
++ don't use any sophisticated tex commands (like \eqalign), restrict
+  yourself to command which latex understands, as well.
+
++ no "@"-constructs within @tex ... @end tex 
+
++ @tex and '@end tex' should always be on separate lines
+
+
 
 * Notationen *
 ==============
@@ -106,9 +129,11 @@
 + Konstrukte wie "the ideal/module is..." vermeiden. Stattdessen etwa
   "the ideal resp.@: module is..." schreiben.
 
-+ Zum Englischen:
-  "i.e.", "e.g.", "for example", "that is" usw. werden immer in Kommas
-  eingebettet:
++ non-zero, zero-dimensional, zero-set: use hyphen; Plural of zero:
+  zeros (instead of zeroes)
+
++ Zum Englischen: "i.e.", "e.g.", "for example", "that is",
+  "resp. ..."  usw. werden immer in Kommas eingebettet:
     @sc{Singular}, for example, has the ...
   Nach einem Doppelpunkt schreiben wir klein weiter:
     Purpose: computes the dimension.
@@ -214,6 +239,7 @@ i;  // mit Leerzeichen beginnen.
   Die Referenzen bitte alphabetisch sortieren und mit einem Semikolon
   trennen.
 
+
 * allgemeines *
 ===============
 
@@ -221,5 +247,4 @@ i;  // mit Leerzeichen beginnen.
   domkumentiert. Siehe doc2tex.c.
 
 ------------------------------------------------------------
-$Id: STYLEGUIDE,v 1.9 1998-10-26 15:05:33 obachman Exp $
-------------------------------------------------------------
+$Id: STYLEGUIDE,v 1.10 1999-07-01 12:47:59 obachman Exp $
