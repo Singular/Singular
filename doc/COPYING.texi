@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.1 1999-11-26 13:26:54 obachman Exp $
+@comment $Id: COPYING.texi,v 1.2 1999-12-02 13:52:49 obachman Exp $
 @comment this file contains the copyright notice on Singular
 @include version.texi
 
@@ -111,6 +111,10 @@ The development of @sc{Singular} is directed and coordinated by
 Gert-Martin Greuel, Gerhard Pfister, and Hans
 Sch@"onemann.
 
+@cindex  Greuel, Gert-Martin
+@cindex  Pfister, Gerhard
+@cindex Sch@"onemann, Hans
+
 Contributions to the kernel of @sc{Singular} have been made by
 Olaf Bachmann,
 Hubert Grassmann,
@@ -125,6 +129,19 @@ R@"udiger Stobbe,
 Moritz Wenk
 and
 Tim Wichmann.
+@cindex Bachmann, Olaf
+@cindex Grassmann, Hubert
+@cindex Kr@"uger, Kai
+@cindex Messollen Michael
+@cindex Neumann, Wolfgang
+@cindex N@"u@ss{}ler, Thomas
+@cindex Pohl, Wilfred
+@cindex Schmidt, Jens
+@cindex Siebert, Thomas
+@cindex R@"Stobbe, udiger
+@cindex Wenk, Moritz
+@cindex Wichmann, Tim
+
 
 @sc{Singular} libraries have furthermore been contributed by
 Stephan Endra@ss{},
@@ -139,6 +156,17 @@ Bernd Martin,
 Mathias Schulze,
 and
 Moritz Wenk.
+
+@cindex Endra@ss{}, Stephan
+@cindex Decker, Wolfram
+@cindex  Fr@"ubis-Kr@"uge,r Anne
+@cindex Gorzel, Christian
+@cindex Heydtmann, Agnes Eileen 
+@cindex Hillebrand, Dietmar
+@cindex Klein, Ulrich
+@cindex Lamm, Martin
+@cindex Martin, Bernd
+@cindex Schulze, Mathias
 
 We should like to acknowledge the financial support given by
 the Volkswagen-Stiftung,

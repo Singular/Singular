@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.166 1999-12-01 15:53:04 obachman Exp $
+@comment $Id: reference.doc,v 1.167 1999-12-02 13:52:52 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -386,8 +386,8 @@ $R^n/M$.
 @tex
 The entry d of the intmat at place (i,j) is the minimal number of
 generators in degree i+j of the j-th syzygy module (= module of
-relations) of $R^n/M$ (the 0th (resp.@: 1st) syzygy module of $R^n/M$ is
-$R^n$ (resp.@: $M$)).
+relations) of $R^n/M$ (the 0th (resp. 1st) syzygy module of $R^n/M$ is
+$R^n$ (resp. $M$)).
 @end tex
 @ifinfo
 R^n/M, if R denotes the basering and
@@ -1339,7 +1339,7 @@ See
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-Immediately Interrupts the current computation, returns to the
+Immediately interrupts the current computation, returns to the
 top-level, and displays the argument @code{string_expression} as error
 message.
 
@@ -5826,7 +5826,8 @@ See
 @item @strong{Type:}
 list
 @item @strong{Purpose:}
-computes all complex roots of a zerodimensional ideal
+computes all complex roots of a zerodimensional ideal.
+
 Makes either use of the multipolynomial resultant of Macaulay (second argument = 1),
 which works only for homogeneous ideals,
 or uses the sparse resultant of Gelfand, Kapranov and Zelevinsky (second argument = 0).

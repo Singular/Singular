@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.163 1999-12-01 15:53:02 obachman Exp $
+@comment $Id: general.doc,v 1.164 1999-12-02 13:52:50 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -39,7 +39,7 @@
 @section Interactive use
 @cindex Interactive use
 
-In this section, all aspects of interactive use are discussed.  This
+In this section, aspects of interactive use are discussed.  This
 includes how to enter and exit @sc{Singular}, how to interpret its
 prompt, how to get the online help, and so on.
 
@@ -67,19 +67,36 @@ the online help is accessible by means of the @code{help} function
 @subsection How to enter and exit
 @cindex How to enter and exit
 
-To start @sc{Singular}, enter @code{Singular} at the system prompt. The
+@sc{Singular} can either be run in ASCII-terminal or within Emacs.
+
+To start @sc{Singular} in its ASCII-terminal user interface,  enter
+@code{Singular} at the system prompt. The 
 @sc{Singular} banner appears which, among others, reports the version
 and the compilation date.
 
-To exit @sc{Singular} type @code{quit;}, @code{exit;} or @code{$}.
+To start @sc{Singular} in its Emacs user interface, either enter
+@code{ESingular} at the system prompt, or type @code{M-x singular}
+wtihin a running Emacs (provided you have loaded the file
+@code{singular.el} in your running Emacs, see @ref{Running SINGULAR
+under Emacs} for details). 
 
-@sc{Singular} may also be started with command line options and with
+Generally, we recommend to use @sc{Singular} in its Emacs interface,
+since this it offers many more features and is more convenient to 
+use than the ASCII-terminal interface(@pxref{Emacs user interface}.
+
+To exit @sc{Singular} type @code{quit;}, @code{exit;} or @code{$} (or,
+when running within Emacs preferably type @code{C-c $}).
+
+@sc{Singular} and @code{ESingular} may also be started with command line
+options and with 
 filenames as arguments. More generally, the synopsis of @sc{Singular} is
 @smallexample
 Singular  [options] [file1 [file2 @dots{}]]
+ESingular  [options] [file1 [file2 @dots{}]]
 @end smallexample
 
-@xref{Command line options}, @ref{Startup sequence}.
+@xref{Command line options}, @ref{Startup sequence}, @ref{Running SINGULAR
+under Emacs}.
 
 
 @c --------------------------------------------------------------------------
@@ -201,7 +218,7 @@ to set your default browser. Recall that if a file
 @code{$HOME/.singularrc} exists on your system, then the content of this
 file is executed before the first user input. Hence, putting
 @smallexample
-if (system("version") >= 1400) // keep backwards-compatibility
+if (system("version") >= 1306) // keep backwards-compatibility
 @{
   if (! system("--emacs") 
   @{
@@ -346,6 +363,7 @@ picks i-th subtopic from a menu
 @cindex Interrupting SINGULAR
 
 On Unix-like operating systems and on Windows NT, typing @code{CTRL-C}
+(or, alternatively @code{C-c C-c}, when running within Emacs), 
 interrupts @sc{Singular}.  @sc{Singular} prints the current command and
 the current line and prompts for further action.  The following choices
 are available:
@@ -403,6 +421,16 @@ saves the current line to the history and
 sends it to the @sc{Singular} parser for interpretation
 @end table
 
+When run under a Unix-like operating system and in its ASCII-terminal
+user interface,   @sc{Singular} tries to dynamically link at runtime
+with the GNU Readline library. @xref{Command Line Editing, GNU Readline
+Library, Command Line Editing, readline, The GNU Readline Library
+Manual}, for more information. If a shared version of this library can
+be found on your machine, then additional command-line editing
+features like  history completion are available.
+TBC !!!
+
+
 @c On Unix-like operating systems, @sc{Singular}
 @c maintains a history of the last lines of input.  If the environment
 @c variable @code{SINGULARHIST} is set and has a name of a file as value,
@@ -419,6 +447,7 @@ sends it to the @sc{Singular} parser for interpretation
 The synopsis of @sc{Singular} is
 @smallexample
 Singular  [options] [file1 [file2 @dots{}]]
+ESingular  [options] [file1 [file2 @dots{}]]
 @end smallexample
 Options can be given in both, their long and short format. The following
 options control the general behaviour of @sc{Singular}:
@@ -463,13 +492,6 @@ Use @code{VAL} as browser for the @sc{Singular} online manual.
 on your platform and local
 installation, only some browsers might be available. The default browser
 is @code{netscape}. @xref{The online help system}, for more info.
-
-@item @code{--allow-net}
-@cindex --allow-net
-@cindex allow-net, command line option
-Allow the @code{netscape} help browser to fetch the HTML pages from the
-@sc{Singular} homepage, if HTML pages are not found locally. 
-@xref{The online help system}.
 
 @item @code{--no-rc}
 @cindex --no-rc
@@ -565,7 +587,7 @@ reported by the @code{timer} and @code{rtimer} variable divided by
 
 @end table
 
-The last three options are of interest for the use with MP links:
+The next three options are of interest for the use with MP links:
 @table @asis
 @item @code{-b}, @code{--batch}
 @cindex -b
@@ -586,6 +608,30 @@ option is given.  @xref{MPtcp links}.
 Use @code{HOST} as default host for MP connections (whenever not
 further specified).  This option is mandatory when the @code{--batch}
 option is given.  @xref{MPtcp links}.
+
+Finally, the following options are only available when running
+@code{ESingular} (see @ref{ Running SINGULAR under Emacs} for details).
+
+@table @code
+
+@item --emacs=EMACS
+@cindex --emacs
+Use @code{EMACS} as Emacs program to run the @sc{Singular} Emacs
+interface.
+
+@item --emacs-dir=DIR
+@cindex --emacs-dir
+Set the singular-emacs-home-directory to @code{DIR}.
+
+@item --emacs-load=FILE
+@cindex --emacs-load
+Load @code{FILE} on Emacs start-up, instead of the default load file.
+
+@item --singular=PROG
+@cindex --singular
+Start @code{PROG} as @sc{Singular} program within Emacs
+
+@end table
 
 @end table
 The value of options given to @sc{Singular} (resp.@: their default values,
@@ -647,19 +693,19 @@ For example, a system administrator might remove the locally installed
 HTML version of the manual and put a @code{.singularrc} file
 with the following content
 @smallexample
-if (system("version") >= 1400) // assure backwards-compatibility
+if (system("version") >= 1306) // assure backwards-compatibility
 @{ 
-  system("--allow-net", 1);    // option is new in version 1.4
+  system("--allow-net", 1);    
 @}
 @end smallexample
 in the directory containing the @sc{Singular} libraries, thereby
-allowing to fetch the HTML on-line help from the home-site of
+allowing to fetch the HTML on-line help from the WWW home-site of
 @sc{Singular}.
 
 On the other hand, a single user might put a @code{.singularrc} with the 
 following content 
 @smallexample
-if (system("version") >= 1400) // assure backwards-compatibility
+if (system("version") >= 1306) // assure backwards-compatibility
 @{ 
   if (! system("--emacs"))
   @{
@@ -684,10 +730,10 @@ prevents the execution of the"global"
 @cindex user interface, Emacs
 
 Besides running @sc{Singular} in an ASCII-terminal, @sc{Singular} might
-also be run within Emacs. Emacs (or, Xemacs which is very similar) is a
-very powerful and freely available text editor, which, among others,
+also be run within Emacs. Emacs (or, XEmacs which is very similar) is a
+powerful and freely available text editor, which, among others,
 provides a framework for the implementation of interactive user
-interfaces. Starting from version 2.0, @sc{Singular} provides such an
+interfaces. Starting from version 1.3.6 , @sc{Singular} provides such an
 implementation, the so-called @sc{Singular} Emacs mode, or Emacs user
 interface.
 
@@ -705,6 +751,8 @@ folding of input and output
 @item
 TAB-completion for help topics
 @item 
+highlighting of matching parenthesis
+@item 
 key-bindings and interactive menus for most user interface commands and
 for basic @sc{Singular} commands (such as loading of libraries and files)
 @item
@@ -716,21 +764,26 @@ interactive customization of nearly all aspects of the user-interface.
 @end itemize
 
 To use the @sc{Singular}-Emacs interface you need to have Emacs version
-20 or higher, or Xemacs 
+20 or higher, or XEmacs 
 version 20 or higher installed on your system. These
 editors can be downloaded for most hard- and software platforms
 (including Windows 
 95/98/NT, but excluding the Macintosh), from either
 @uref{http://www.fsf.org/software/emacs/emacs.html} (Emacs), from
-@uref{http://www.xemacs.org} (Xemacs), or from our ftp site at 
+@uref{http://www.xemacs.org} (XEmacs), or from our ftp site at 
 @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils/}. The
-differences between Emacs and Xemacs w.r.t. the  @sc{Singular}-Emacs
+differences between Emacs and XEmacs w.r.t. the  @sc{Singular}-Emacs
 interface are marginal -- which editor to use is mainly a matter of personal
 preferences.
 
+The simplest way to start-up @sc{Singular} in its Emacs interface is by
+running the program @code{ESingular} which is contained in the Singular
+distribution. Alternatively, @sc{Singular} can be started within an
+already running Emacs -- see @ref{Running SINGULAR under Emacs} for
+details.
 
-The next section gives  a tutorial-like introduction of Emacs and the 
-the @sc{Singular}-Emacs user interface. This introductory section is
+The next section gives  a tutorial-like introduction of Emacs. This
+introductory section is 
 followed by sections which explain the functionality of various aspects 
 of the Emacs user interface in more detail: how to start/restart/kill
 @sc{Singular} within Emacs, how to run an interactive demonstration, how 
@@ -739,7 +792,7 @@ important commands of the Emacs interface together with their key
 bindings are listed.
 
 @menu
-* Overview of the Emacs user interface::
+* A quick guide to Emacs::
 * Running SINGULAR under Emacs::
 * Demo mode::
 * Customization of the Emacs interface::
@@ -748,36 +801,20 @@ bindings are listed.
 @end menu
 
 @c --------------------------------------------------------------------------
-@node Overview of the Emacs user interface, Running SINGULAR under Emacs, Emacs user interface, Emacs user interface
-@subsection Overview of the Emacs user interface
-@cindex Emacs, overview of the Singular interface
-@cindex Singular,  overview of the Emacs user interface
-@cindex Overview of the Emacs user interface
+@node A quick guide to Emacs, Running SINGULAR under Emacs, Emacs user interface, Emacs user interface
+@subsection A quick guide to Emacs
+@cindex Emacs, overview 
+@cindex Emacs, a quick guide
 
-This section gives  a tutorial-like introduction of Emacs and the 
-the @sc{Singular}-Emacs user interface. Especially to users who are not
-familiar with Emacs, we recommend that they go trough this section and
-try out the described features. 
-
-The simplest way to start-up @sc{Singular} in its Emacs interface is by
-running the program @code{ESingular} which is contained in the Singular
-distribution. @code{ESingular} starts-up Emacs and @sc{Singular} and
-awaits user input from the usual @sc{Singular} prompt.
-
-@menu 
-* A quick guide to Emacs::
-* A quick guide to running Singular under Emacs::
-@end menu
-
-@c --------------------------------------------------------------------------
-@node A quick guide to Emacs, A quick guide to running Singular under Emacs,,Overview of the Emacs user interface
-@subsubsection A quick guide to Emacs
+This section gives a tutorial-like introduction of Emacs. Especially to
+users who are not familiar with Emacs, we recommend that they go trough
+this section and try out the described features.
 
 Emacs commands generally involve the @code{CONTROL} key (sometimes
-labelled @code{CTRL} or @code{CTL}) or the @code{META} key.  On some
-keyboards, the @code{META} key is labelled @code{ALT} or @code{EDIT} or
+labeled @code{CTRL} or @code{CTL}) or the @code{META} key.  On some
+keyboards, the @code{META} key is labeled @code{ALT} or @code{EDIT} or
 something else (for example, on Sun keyboards, the diamond key to the
-left of the spacebar is @code{META}).  If there is no @code{META} key,
+left of the space-bar is @code{META}).  If there is no @code{META} key,
 the @code{ESC} key can be used, instead.  Rather than writing out
 @code{META} or 
 @code{CONTROL} each time we want to prefix a character, we will use the
@@ -819,7 +856,7 @@ The location of the cursor in the text is also called "point".  To
 paraphrase, the cursor shows on the screen where point is located in
 the text. Here is a summary of simple cursor-moving operations:
 @multitable @columnfractions .2 .8
-@item @code{C-f} @tab Move forward a character
+@item @code{C-f} @tab   Move forward a character
 @item @code{C-b} @tab 	Move backward a character
 @item @code{M-f} @tab 	Move forward a word
 @item @code{M-b} @tab 	Move backward a word
@@ -840,7 +877,7 @@ sessions within the same Emacs).
 When you are asked for input to an Emacs commands, the cursor
 moves to the bottom line of Emacs, i.e., to a special buffer, called the
 "minibuffer". Typing @code{<RETURN>} within the minibuffer, ends the
-input, typeing @code{<SPACE>} within the minibuffer, lists all possible
+input, typing @code{<SPACE>} within the minibuffer, lists all possible
 input values to the interactive Emacs command. 
 
 The most important buffer commands are
@@ -851,65 +888,37 @@ The most important buffer commands are
 Alternatively, you can switch to or kill buffers using the @code{Buffer} 
 menu.
 
+@item Executing commands
+Emacs commands are executed by typing @code{M-x <command-name>}
+(remember that @code{<SPACE>} completes partial
+command names). Important and frequently used commands have short-cuts
+for their execution: Key bindings or even menu entries. For example, a
+file can be loaded with @code{M-x load-file}, or @code{C-x C-f}, or with 
+the @code{File->Open} menu.
+
 @item How to exit
 To end the Emacs (and, @sc{Singular}) session,
 type @code{C-x C-c} (two characters), or use the @code{File -> Exit}
 menu.
+
 @item When Emacs is hung
 If Emacs stops responding to your commands, you can stop it safely by
 typing @code{C-g}, or, if this fails, by typing @code{C-]}.
+
 @item More help
 Nearly all aspects of Emacs are very well documented: type
 @code{C-h}  and then a character saying what kind of help you want. 
 For example, typing @code{C-h i} enters the @code{Info} documentation
 browser.
+
 @item Using the mouse
 Emacs is fully integrated with the mouse. In particular, clicking the
-right mouse button brings up a popup menu which usually contains a few
+right mouse button brings up a pop-up menu which usually contains a few
 commonly used commands.
 @end table
 
 @c --------------------------------------------------------------------------
-@node A quick guide to running Singular under Emacs,,A quick guide to Emacs,Overview of the Emacs user interface
-@subsubsection A quick guide to running Singular under Emacs
-
-On first sight, running @sc{Singular} under Emacs is almost identical to 
-running @sc{Singular} in an ASCII-terminal. In particular, all the
-editing commands (and, key-bindings) are the same (@pxref{Editing
-input}). 
-
-An important difference of the Emacs interface is that @code{C-c} does
-not interrupt @sc{Singular}. TBC !!!!
-
-
-Most Emacs 
-In its basic functionality, the Emacs user interface is almost identical 
-to the ASCII-terminal interface (@pxref{The SINGULAR prompt},
-@pxref{Editing input}).
-
-
-@sc{Singular} can be either started within an already running Emacs, or
-by using the program @code{ESingular} which is contained in the
-@sc{Singular} distribution.  @code{ESingular} is an "out of the box and
-ready to run" program. It starts up an Emacs editor, an
-@itemize
-@item 
-Emacs for dummys; tutorial; help for Emacs
-@item 
-Funktional comparison to terminal interface:
-Intoduce Emacs buffers, point
-@item
-Differences: tab-completion, restart, interrupt/kill,
-@item
-Additional things: Folding, truncation
-@item 
-help
-@item
-libraries, loading files
-@end itemize
-
-@c --------------------------------------------------------------------------
-@node Running SINGULAR under Emacs, Demo mode, Overview of the Emacs user interface, Emacs user interface
+@node Running SINGULAR under Emacs, Demo mode, A quick guide to Emacs, Emacs user interface
 @subsection Running SINGULAR under Emacs
 @cindex Emacs, running Singular under
 @cindex Singular, running within Emacs
@@ -940,8 +949,8 @@ startup (and the loading of the @code{.emacs} file is automatically
 suppressed).
 
 The customizable variables of the @sc{Singular} Emacs interface are set
-to useful default settings giving the novice user a very shell like
-feeling of the interface. Nevertheless, this default settings can be
+to defaults which give the novice user a very shell like
+feeling of the interface. Nevertheless, these default settings can be
 changed, see @ref{Customization of the Emacs interface}. Besides other
 Emacs initializations, such as fontification or blinking parentheses, a
 new menu item called @code{Singular} is added to the main menu,
@@ -956,32 +965,41 @@ ready to start your @sc{Singular} session.
 off all these options, see @ref{Command line options}. Additionally
 there are the following options which are special to @code{ESingular}:
 
-@table @code
+@multitable @columnfractions .25 .65 .1
 
-@item --emacs=EMACS
-@cindex --emacs
-Use @code{EMACS} as Emacs program to run the @sc{Singular} Emacs
+@item command-line option
+@tab functionality
+@tab environment variable 
+
+@item @code{--emacs=EMACS}
+@tab Use @code{EMACS} as Emacs program to run the @sc{Singular} Emacs
 interface.
+@tab EMACS
 
-@item --emacs-dir=DIR
-@cindex --emacs-dir
-Set the singular-emacs-home-directory to @code{DIR}.
+@item @code{--emacs-dir=DIR}
+@tab Set the singular-emacs-home-directory to @code{DIR}.
+@tab SINGULAR_EMACS_DIR
 
-@item --emacs-load=FILE
-@cindex --emacs-load
-Load @code{FILE} on Emacs start-up, instead of the default load file.
+@item @code{--emacs-load=FILE}
+@tab Load @code{FILE} on Emacs start-up, instead of the default load file.
+@tab SINGULAR_EMACS_LOAD
 
-@item --singular=PROG
-@cindex --singular
-Start @code{PROG} as @sc{Singular} program within Emacs
+@item @code{--singular=PROG}
+@tab Start @code{PROG} as @sc{Singular} program within Emacs
+@tab SINGULAR
 
-@end table
+@end multitable
 
-@subheading Starting the interface using running Emacs
+Notice that values of these options can also be given by setting the
+above mentioned environment variables (where values  given as
+command-line arguments take priority over values given by environment
+variables).
+
+@subheading Starting the interface within a running Emacs
 
 If you are a more experienced Emacs user and you already have your own
 local @code{.emacs} startup file, you might want to start the interface
-out of your own Emacs without using @code{ESingular}. For this, you
+out of your running Emacs without using @code{ESingular}. For this, you
 should add the following lisp code to your @code{.emacs} file:
 
 @smallexample
@@ -1006,7 +1024,7 @@ useful for your @code{.emacs} file, too. And if you are a Emacs wizard,
 it is of course a good idea to take a look at @code{singular.el} in the
 singular-emacs-home-directory.
 
-@subheading Starting and stopping SINGULAR
+@subheading Starting, interrupting and stopping SINGULAR
 
 There are the following commands to start and stop @sc{Singular}:
 
@@ -1067,12 +1085,16 @@ arguments as before.
 
 @end itemize
 
+An important difference of the Emacs interface is that @code{C-c} does
+not interrupt @sc{Singular}. TBC !!!!
+
 Whenever a @sc{Singular} process is started within the Emacs interface,
 the contents of a special startup file (by default
 @code{~/.emacs-singularrc}) is pasted as input to @sc{Singular} at the
 very end of the usual startup sequence (see @ref{Startup sequence}). The
 name of the startup file can be changed, see @ref{Customization of the
 Emacs interface}.
+
 
 @c --------------------------------------------------------------------------
 @node Demo mode, Customization of the Emacs interface, Running SINGULAR under Emacs, Emacs user interface
@@ -1081,7 +1103,29 @@ Emacs interface}.
 @cindex Singular, demo mode
 @cindex Demo mode
 
-Olaf
+The Emacs interface can be used to run interactive @sc{Singular}
+demonstrations. A demonstration is started by loading a so-called
+@sc{Singular} demo file with the Emacs command
+@code{singular-demo-load}, bound to 
+@code{C-c C-d}, or or with the menu @code{Commands->Load Demo}.
+
+A @sc{Singular} demo file should consist of @sc{Singular} commands
+separated by blank lines. When running a demo, the input up to the next
+blank line is echoed to the screen. Hitting @code{<RETURN>} executes the 
+echoed commands and shows their output. Hitting @code{<RETURN>} again,
+echos the next commands to the screen, and so on, until all commands of
+the demo file are executed. While running a demo, you can 
+execute other commands on the @sc{Singular} prompt: the next input of
+from the demo file is then echoed again, if you hit @code{<RETURN>} on
+an empty input line.
+
+A @sc{Singular} demo can prematurely be exited by either starting
+another demo, or by executing the Emacs command
+@code{singular-demo-exit} (menu: @code{Commands->Exit Demo}). 
+
+Some aspects of running @sc{Singular} demos can be customized. @xref{
+Customization of the Emacs interface}, for more info.
+
 
 @c --------------------------------------------------------------------------
 @node Customization of the Emacs interface, Editing SINGULAR input files with Emacs, Demo mode, Emacs user interface
@@ -1115,12 +1159,20 @@ groups:
 @itemize @bullet
 @item Singular faces
 
-Here you can specify various faces used if font-lock-mode is enabled.
+Here you can specify various faces used if font-lock-mode is enabled
+(which it is, by default).
 
 @item Singular Sections And Foldings
 
 Here you can specify special faces for @sc{Singular} input and output
 and change the text used as replacement for folded sections.
+
+For doing this, you also might
+find handy the function @code{customize-face-at-point},
+which let's you customize the face at the current position of
+point. This function is automatically defined if you run
+@code{ESingular}). Otherwise, you should at its definition (see below)
+to your personal @code{.emacs} file.
 
 @item Singular Interactive Miscellaneous
 
@@ -1136,6 +1188,13 @@ Here you can specify how chunks of the demo file are divided, or specify
 a default directory for demo files.
 @end itemize
 
+When you run @code{ESingular}, the settings of customized variables are
+saved in the file @code{$HOME/.emacs-singular-cust}. Otherwise, the
+settings are appended to your @code{.emacs} file. Among others, this
+means that the customized settings of @code{ESingular} are not
+automatically  taken over by a "normal" Emacs, and vice versa.
+
+
 @c --------------------------------------------------------------------------
 @node Editing SINGULAR input files with Emacs, Top 20 Emacs commands, Customization of the Emacs interface, Emacs user interface
 @subsection Editing SINGULAR input files with Emacs
@@ -1143,7 +1202,40 @@ a default directory for demo files.
 @cindex Singular, editing input files with Emacs
 @cindex Editing SINGULAR input files with Emacs
 
-Olaf
+Since @sc{Singular}'s programming language is similar to @code{C}, you
+should use the Emacs C/C++-mode to edit @sc{Singular} input files and
+@sc{Singular} libraries. Among others, this Emacs mode provides
+automatic indentation, line-breaking and keyword highlighting.
+
+When running @code{ESingular}, the C/C++-mode is automatically turned on 
+whenever a file with the suffix @code{.sing}, or @code{.lib} is loaded. 
+
+For Emacs sessions which were not started by @code{ESingular},  you
+should add the following to your @code{.emacs} file:
+@smallexample
+;; turn on c++-mode for files ending in ".sing" and ".lib"
+(setq auto-mode-alist (cons '("\\.sing\\'" . c++-mode) auto-mode-alist))
+(setq auto-mode-alist (cons '("\\.lib\\'" .  c++-mode) auto-mode-alist))
+;; turn-on fontification for c++-mode
+(add-hook 'c++-mode-hook
+	  (function (lambda () (font-lock-mode 1))))
+;; turn on aut-new line and hungry-delete
+(add-hook 'c++-mode-hook
+          (function (lambda () (c-toggle-auto-hungry-state 1))))
+;; a handy function for customization
+(defun customize-face-at-point ()
+"Customize face which point is at"
+  (interactive)
+  (customize-face (get-text-property (point) 'face)))
+
+@end smallexample
+
+Notice that you can change the default settings for source-code
+highlighting (colors, fonts, etc.) by customizing the respective faces
+using the @code{Customize} feature of Emacs. For doing this, you might
+find handy the above given function @code{customize-face-at-point},
+which lets you customize the of the current position of point (this
+function is automatically defined if you run @code{ESingular}).
 
 @c --------------------------------------------------------------------------
 @node Top 20 Emacs commands,,Editing SINGULAR input files with Emacs, Emacs user interface
@@ -1184,7 +1276,7 @@ Editing input and output:
 beginning of line, then skip past the @sc{Singular} prompt, if any.
 
 @item @code{singular-toggle-truncate-lines} (key @code{C-c C-t} or menu
-@code{Commands->Truncate lines}): toggles wether long lines should be
+@code{Commands->Truncate lines}): toggles whether long lines should be
 truncated or not. If lines are not truncated, the commands
 @code{singular-scroll-left} and @code{singular-scroll-right} are useful
 to scroll left and right, resp.
@@ -1238,7 +1330,7 @@ demo file in the minibuffer area (hit @code{RET} for completion) and
 enters the @sc{Singular} demo mode showing the first chunk of the demo.
 
 @item @code{singular-demo-exit} (menu @code{Commands->Exit Demo}):
-exitst from @sc{Singular} demo mode and cleans up everything that is
+exits from @sc{Singular} demo mode and cleans up everything that is
 left from the demo.
 
 @end itemize
