@@ -5,7 +5,7 @@ init >> uname -a:Linux lukas.mathematik.uni-kl.de 2.0.33 #1 Mon Apr 27 15:28:29 
 init >> date    :Thu Oct 15 15:47:48 MEZ 1998
 init >> version :1300
 init >> ticks   :100
-1 >> tst_memory_0 :: lukas.mathematik.uni-kl.de:543474
-1 >> tst_memory_1 :: lukas.mathematik.uni-kl.de:885774
-1 >> tst_memory_2 :: lukas.mathematik.uni-kl.de:884736
-1 >> tst_timer_1 :: lukas.mathematik.uni-kl.de:230
+1 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:546266  lukas.mathematik.uni-kl.de:543474
+1 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:881678  lukas.mathematik.uni-kl.de:885774
+1 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:884736  lukas.mathematik.uni-kl.de:884736
+1 >> tst_timer_1 :: nepomuck.mathematik.uni-kl.de:107  lukas.mathematik.uni-kl.de:230

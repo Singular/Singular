@@ -5,7 +5,7 @@ init >> uname -a:Linux nepomuck.mathematik.uni-kl.de 2.0.33 #1 Wed Jan 21 18:50:
 init >> date    :Fri Jul 10 18:02:36 MET DST 1998
 init >> version :1200
 init >> ticks   :100
-1 >> tst_memory_0 :: urmel:435893  nepomuck.mathematik.uni-kl.de:436493
-1 >> tst_memory_1 :: urmel:817297  nepomuck.mathematik.uni-kl.de:817297
-1 >> tst_memory_2 :: urmel:823296  nepomuck.mathematik.uni-kl.de:823296
-1 >> tst_timer_1 :: urmel:786  nepomuck.mathematik.uni-kl.de:239
+1 >> tst_memory_0 :: urmel:435893  nepomuck.mathematik.uni-kl.de:441885
+1 >> tst_memory_1 :: urmel:817297  nepomuck.mathematik.uni-kl.de:813201
+1 >> tst_memory_2 :: urmel:823296  nepomuck.mathematik.uni-kl.de:819200
+1 >> tst_timer_1 :: urmel:786  nepomuck.mathematik.uni-kl.de:253
