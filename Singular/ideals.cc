@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.85 2000-01-27 18:50:15 siebert Exp $ */
+/* $Id: ideals.cc,v 1.86 2000-01-28 09:45:56 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1693,6 +1693,7 @@ ideal   idLift (ideal mod, ideal submod,ideal * rest, BOOLEAN goodShape,
         pIter(p);
         pSetComp(p,1+j+k);
         pSetmComp(p);
+	p = pNeg(p);
       }
     }
   }
