@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: makefile.cc,v 1.9 2002-06-26 12:03:16 anne Exp $ */
+/* $Id: makefile.cc,v 1.10 2002-06-27 14:01:11 anne Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -88,12 +88,14 @@ void build_head_section(
 {
   fprintf(fp, "CC\t= gcc\n");
   fprintf(fp, "CXX\t= gcc\n");
-  fprintf(fp, "CFLAGS\t= -DNDEBUG -DBUILD_MODULE -I. -I%s/include\n",TOPSRCDIR);
-  fprintf(fp, "DCFLAGS\t= -DBUILD_MODULE -I. -I%s/include\n",TOPSRCDIR);
+#warning "PROBLEM: nice place for include file has to be found"
+  fprintf(fp, "CFLAGS\t= -DNDEBUG -DBUILD_MODULE -I. -I%s/Singular -I%s/include\n",PREFIX,EXEC_PREFIX);
+  fprintf(fp, "DCFLAGS\t= -DBUILD_MODULE -I. -I%s/Singular -I%s/include\n",PREFIX,EXEC_PREFIX);
   fprintf(fp, "#LD\t=\n");
   fprintf(fp, "\n");
   fprintf(fp, "instdir          = %s\n", inst_dir );
-  fprintf(fp, "INSTALL\t\t= %s/Singular/install-sh -c\n", TOPSRCDIR);
+#warning "PROBLEM: do we also install install-sh when installing Singular?"
+  fprintf(fp, "INSTALL\t\t= %s/Singular/install-sh -c\n", PREFIX);
   fprintf(fp, "INSTALL_PROGRAM\t= ${INSTALL}\n");
   fprintf(fp, "INSTALL_DATA\t= ${INSTALL} -m 644\n");
 }

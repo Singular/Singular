@@ -1,5 +1,5 @@
 /*
- * $Id: grammar.y,v 1.16 2002-06-18 15:09:15 anne Exp $
+ * $Id: grammar.y,v 1.17 2002-06-27 14:01:11 anne Exp $
  */
 
 %{
@@ -692,7 +692,6 @@ typelist: VARTYPETOK
 
 sect4:  SECT4START codeline SECT4END
         {
-          fprintf(module_def.modfp, "%s", $2);
         };
 
 codeline: CODEPART
@@ -702,6 +701,7 @@ codeline: CODEPART
         }
         | codeline CODEPART
         {
+	  fprintf(module_def.modfp, "%s", $2);
         }
         ;
 
