@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.50 1999-04-19 13:02:26 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.51 1999-06-15 11:36:41 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -424,10 +424,16 @@ void sleftv::CleanUp()
   rtyp=NONE;
   if (next!=NULL)
   {
-    //next->name=NULL;
-    next->CleanUp();
-    Free((ADDRESS)next,sizeof(sleftv));
-    next=NULL;
+    leftv tmp_n;
+    do
+    {
+      tmp_n=next->next;
+      //next->name=NULL;
+      next->next=NULL;
+      next->CleanUp();
+      Free((ADDRESS)next,sizeof(sleftv));
+      next=tmp_n;
+    } while (next!=NULL);
   }
 }
 
