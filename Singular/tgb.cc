@@ -875,28 +875,29 @@ static sorted_pair_node** add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c,
     if (c->states[i][j]==UNCALCULATED){
 
       
-      poly short_s=ksCreateShortSpoly(c->S->m[i],c->S->m[j],c->r);
-      if (short_s)
-      {
+//      poly short_s=ksCreateShortSpoly(c->S->m[i],c->S->m[j],c->r);
+      //    if (short_s)
+      //    {
         sorted_pair_node* s=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
         s->i=max(i,j);
         s->j=min(i,j);
         s->expected_length=c->lengths[i]+c->lengths[j]-2;
-        s->deg=pTotaldegree(short_s);
+      
         poly lm=pOne();
 
         pLcm(c->S->m[i], c->S->m[j], lm);
         pSetm(lm);
+	s->deg=pTotaldegree(lm);
         s->lcm_of_lm=lm;
-          pDelete(&short_s);
+//          pDelete(&short_s);
         //assume(lm!=NULL);
         nodes[spc]=s;
         spc++;
-      }
-      else
-      {
-        c->states[i][j]=HASTREP;
-      }
+	// }
+	//else
+	//{
+        //c->states[i][j]=HASTREP;
+	//}
     }
   }
 
