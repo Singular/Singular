@@ -6,7 +6,7 @@
 #include "tgb.h"
 
 
-#define LEN_VAR4
+#define LEN_VAR3
 
 #ifdef LEN_VAR1
 // erste Variante: Laenge: Anzahl der Monome
@@ -1522,6 +1522,7 @@ static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
     return TRUE;
 
   }
+  kBucketCanonicalize(obj->P->bucket);
   loop
     {
 
@@ -1530,7 +1531,7 @@ static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
 
         return FALSE;
       }
-      kBucketCanonicalize(obj->P->bucket);
+
       int compare_bound;
       compare_bound=bucket_guess(obj->P->bucket);
       obj->len_upper_bound=min(compare_bound,obj->len_upper_bound);
@@ -1562,7 +1563,7 @@ static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
                 ||(obj->len_upper_bound==2)
                 ||(obj->len_upper_bound<strat->lenS[j]/2)
 		||
-		(c->is_char0 && (wlen_upper<strat->lenSw[j]/2))
+		(c->is_char0 && (wlen_upper<strat->lenSw[j]/100))
 )
             {
               PrintS("e");
@@ -1955,7 +1956,7 @@ static BOOLEAN compute(calc_dat* c){
         init_red_spoly_phase2(c,i);
       if (!c->work_on[i].is_free){
 //        Print("Computing i=%i,j=%i",c->work_on[i].i,c->work_on[i].j);
-        if(redNF2_n_steps(&(c->work_on[i]),c,((c->reduction_steps+50)/(c->normal_forms+1))/2+5)){
+        if(redNF2_n_steps(&(c->work_on[i]),c,((c->reduction_steps+50)/(c->normal_forms+1))/4+5)){
 
 
           trep_them(&c->work_on[i],c);
