@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.139 1999-07-28 09:13:35 Singular Exp $
+@comment $Id: general.doc,v 1.140 1999-07-28 14:45:50 anne Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -116,10 +116,10 @@ name or, more generally, the name of any section of the printed manual.
 On Unix-like operating systems, the online help system is based on the
 @code{info} program from the Gnu @code{texinfo} package.  @xref{Top, An
 Introduction to Info, Getting started, info, The Info Manual}, for more
-information.  On the other systems the online help system is not interactively
-as described in the remainder of this section.  Instead, after
-displaying the information @sc{Singular} immediately returns to the
-input prompt.
+information.  On the other systems, the online help system is not interactive
+and does not match the description in the remainder of this section.  
+Instead, after displaying the information @sc{Singular} immediately returns 
+to the input prompt.
 
 The online manual is decomposed into ``nodes'' of information, closely
 related to the division of the printed manual into sections and
@@ -255,7 +255,7 @@ The synopsis of @sc{Singular} is
 Singular  [options] [file1 [file2 @dots{}]]
 @end smallexample
 Options can be given in both, their long and short format. The following
-options control the general behavior of @sc{Singular}:
+options control the general behaviour of @sc{Singular}:
 @table @asis
 
 @item @code{-d}, @code{--sdb}
@@ -402,7 +402,7 @@ executes the files @code{file1}, @code{file2} @dots{}  (given on the command
 line) in that order.
 @end enumerate
 
-See @ref{LIB} for the directories on where @sc{Singular} searches for its
+See @ref{LIB} for the directories in which @sc{Singular} searches for its
 library files.
 
 @c --------------------------------------------------------------------------
@@ -661,7 +661,7 @@ qring r = std(maxideal(2));
 @item Default:
 @code{32003,(x,y,z),(dp,C);}
 @item Purpose:
-declares a ring and sets it as the actual basering.
+declares a ring and sets it as the current basering.
 @end table
 
 The coefficient_field is given by one of the following:
@@ -710,7 +710,7 @@ optionally followed by an int giving the precision in decimal digits.
 @* This specifies the field of real numbers represented as floating point
 numbers.
 These numbers are implemented as machine floating point numbers
-of single precision (for a not given precision or a precision smaller 4).
+of single precision (for omitted precision or a precision smaller than 4).
 Note that computations over this field are not exact.
 
 @item
@@ -719,7 +719,7 @@ an expression_list of the name real, an optional int_expression and a name.
 numbers with an precision given by the int expression (default: 3).
 @*The name of the imaginary unit is given by the last parameter.
 @*These numbers are implemented with machine floating point numbers
-of single precision (for a precision smaller 4).
+of single precision (for a precision smaller than 4).
 Note that computations over this field are not exact.
 @end enumerate
 
@@ -807,8 +807,8 @@ Any polynomial (resp.@: vector) in @sc{Singular} is ordered w.r.t. a
 term ordering (or, monomial ordering), which has to be specified
 together with the declaration of a ring. @sc{Singular} stores and
 displays a polynomial (resp.@: vector) w.r.t. this ordering, i.e., the
-greates monomial (als called the leading monomial) comes first, and the
-smalles monomial comes last.
+greatest monomial (also called the leading monomial) is the first one 
+appearing in the output polynomial, and the smallest monomial is the last one.
 
 @strong{Remark:} The novice user should generally use the ordering
 @code{dp} for computations in the polynomial ring
@@ -926,8 +926,8 @@ ordering
 
 Here a capital @code{C} sorts generators in ascending order, i.e.,
 @code{gen(1)} < @code{gen(2)} < @enddots{} A small @code{c} sorts in
-descending order, i.e., @code{gen(1)} > @code{gen(2)} > @enddots{} The
-module ordering has not to be specified explicitly since @code{(}
+descending order, i.e., @code{gen(1)} > @code{gen(2)} > @enddots{} It is
+not necessary to specify the module ordering explicitly since @code{(}
 ordering@code{,} @dots{}@code{, C )} is the default.
 
 In fact, @code{c} or @code{C} may be specified anywhere in a product
@@ -1029,8 +1029,9 @@ The result is only displayed on the screen.
 computes the dimension of the ideal resp.@: module.
 @item highcorner
 @ref{highcorner}@*
-computes the smallest monomial not contained in the ideal.
-The ideal has to be zero-dimensional.
+computes the smallest monomial not contained in the ideal resp.@: module.
+The ideal resp.@: module has to be finite dimensional as a vector space
+over the ground field.
 @item hilb
 @ref{hilb}@*
 computes the first, and resp.@: or, second Hilbert series of an ideal
@@ -1040,8 +1041,9 @@ resp.@: module.
 the quotient of a ring by an ideal resp.@: of a free module by a
 submodule.
 
-The ideal resp.@: module has to be finite dimensional and has to be
-represented by a standard basis w.r.t.@: the ring ordering.
+The ideal resp.@: module has to be finite dimensional as a vector space
+over the ground field and has to be represented by a standard basis w.r.t.@: 
+the ring ordering.
 @item mult
 @ref{mult}@*
 computes the degree of the monomial ideal resp.@: module generated by
@@ -1096,6 +1098,10 @@ computes the graded Betti numbers of a module from a free resolution.
 @item minres
 @ref{minres}@*
 minimizes a free resolution of an ideal or module.
+@item regularity
+@ref{regularity}@*
+computes the regularity of a homogeneous ideal resp.@: module from a given
+minimal free resolution.
 @end table
 
 @c ----------------------------------------------------------------------
@@ -1181,8 +1187,8 @@ interpolates a polynomial from its values at several points
 @table @code
 @item option
 @ref{option}@*
-allows to set options for manipulating the behaviour of computations
-(such as reduction strategies) and to show protocol information indicating
+allows setting of options for manipulating the behaviour of computations
+(such as reduction strategies) and for showing protocol information indicating
 the progress of a computation.
 @end table
 
@@ -1349,7 +1355,7 @@ Some of these functions have to be called without parentheses, e.g.,
 @enumerate 7
 @item
 expression @code{;}
-@* prints the value of an expression, for smallexample, of a variable.
+@* prints the value of an expression, for example, of a variable.
 @end enumerate
 
 Use the function @code{print} (or the procedure show from inout.lib)
@@ -1621,46 +1627,48 @@ conversions are:
 @item
 @   4. @tab @code{int}  @tab @expansion{} @code{intvec}
 @item
-@   5. @tab @code{int}  @tab @expansion{} @code{intvec}
+@   5. @tab @code{int}  @tab @expansion{} @code{intmat}
 @item
-@   6. @tab @code{resolution} @tab @expansion{} @code{list}
+@   6. @tab @code{string}  @tab @expansion{} @code{link}
 @item
-@   7. @tab @code{ideal}  @tab @expansion{} @code{matrix}
+@   7. @tab @code{resolution} @tab @expansion{} @code{list}
 @item
-@   8. @tab @code{int}  @tab @expansion{} @code{matrix}
+@   8. @tab @code{ideal}  @tab @expansion{} @code{matrix}
 @item
-@   9. @tab @code{intmat}  @tab @expansion{} @code{matrix}
+@   9. @tab @code{int}  @tab @expansion{} @code{matrix}
 @item
-@  10. @tab @code{intvec}  @tab @expansion{} @code{matrix}
+@  10. @tab @code{intmat}  @tab @expansion{} @code{matrix}
 @item
-@  11. @tab @code{module}  @tab @expansion{} @code{matrix}
+@  11. @tab @code{intvec}  @tab @expansion{} @code{matrix}
 @item
-@  12. @tab @code{number}  @tab @expansion{} @code{matrix}
+@  12. @tab @code{module}  @tab @expansion{} @code{matrix}
 @item
-@  13. @tab @code{poly}  @tab @expansion{} @code{matrix}
+@  13. @tab @code{number}  @tab @expansion{} @code{matrix}
 @item
-@  14. @tab @code{vector}  @tab @expansion{} @code{matrix}
+@  14. @tab @code{poly}  @tab @expansion{} @code{matrix}
 @item
-@  15. @tab @code{ideal}  @tab @expansion{} @code{module}
+@  15. @tab @code{vector}  @tab @expansion{} @code{matrix}
 @item
-@  16. @tab @code{matrix}  @tab @expansion{} @code{module}
+@  16. @tab @code{ideal}  @tab @expansion{} @code{module}
 @item
-@  17. @tab @code{vector}  @tab @expansion{} @code{module}
+@  17. @tab @code{matrix}  @tab @expansion{} @code{module}
 @item
-@  18. @tab @code{int}  @tab @expansion{} @code{number}
+@  18. @tab @code{vector}  @tab @expansion{} @code{module}
 @item
-@  19. @tab @code{int}  @tab @expansion{} @code{poly}
+@  19. @tab @code{int}  @tab @expansion{} @code{number}
 @item
-@  20. @tab @code{number}  @tab @expansion{} @code{poly}
+@  20. @tab @code{int}  @tab @expansion{} @code{poly}
 @item
-@  21. @tab @code{string}  @tab @expansion{} @code{proc}
+@  21. @tab @code{number}  @tab @expansion{} @code{poly}
 @item
-@  22. @tab @code{list}  @tab @expansion{} @code{resolution}
+@  22. @tab @code{string}  @tab @expansion{} @code{proc}
 @item
-@  23. @tab @code{int}  @tab @expansion{} @code{vector}
+@  23. @tab @code{list}  @tab @expansion{} @code{resolution}
+@item
+@  24. @tab @code{int}  @tab @expansion{} @code{vector}
   (i @expansion{} i*@code{gen(1)})
 @item
-@  24. @tab @code{poly}  @tab @expansion{} @code{vector}
+@  25. @tab @code{poly}  @tab @expansion{} @code{vector}
   (p @expansion{} p*@code{gen(1)})
 @end multitable
 
@@ -1824,7 +1832,7 @@ or closed before, resp.@: after, they are used.  To explicitly open or
 close a link, the @code{open}, resp.@: @code{close}, commands may be
 used (see @ref{open}, @ref{close}).
 
-Links have various properties which can be checked for using the
+Links have various properties which can be queried using the
 @code{status} function (@pxref{status}).
 
 @strong{Example:}
@@ -1895,7 +1903,7 @@ MPfile links are implemented on Unix-like operating systems only.
 
 @subheading MPtcp links
 Data is communicated with other processes (e.g., @sc{Singular}
-processes) which may run on the same or on different computers.  Data
+processes) which may run on the same computer or on different ones.  Data
 exchange is accomplished using TCP/IP links in the binary MP format.
 Reading from an MPtcp link returns the written expressions (i.e., not a
 string, in general).
@@ -1926,7 +1934,7 @@ MPtcp links are implemented on Unix-like operating systems only.
 Data is stored in and accessed from a data base.  Writing is
 accomplished by a key and a value and associates the value with the key
 in the specified data base.  Reading is accomplished w.r.t.@: a key,
-whose associated value is returned.  Both the key and the value have to
+the value associated to it is returned.  Both the key and the value have to
 be specified as strings.  Hence, DBM links may be used only for data
 which may be converted to or from strings.
 
@@ -1957,7 +1965,7 @@ Procedures contain sequences of commands of the @sc{Singular} language.
 They are used to extend
 the set of commands with user defined commands.  Procedures are defined
 by either typing them on the command line or by loading them from a
-so-called library file with the @ref{LIB} command.  Procedures are
+so-called library file with the LIB command, see @ref{LIB}.  Procedures are
 invoked like normal built-in commands, i.e., by typing their name
 followed by the list of arguments in parentheses. The invocation then
 executes the sequence of commands stored in the specified procedure. All
@@ -1989,7 +1997,7 @@ defined procedures can be displayed by the command @code{listvar(proc);}.
 @end tex
    procedure_body
 @*@code{@}}
-@*[@code{smallexample}
+@*[@code{example}
 @*@code{@{}
 @*
 @tex
@@ -2002,14 +2010,15 @@ defines a new function, the @code{proc} proc_name, with the additional
 information help_text, which is copied to the screen by
 @code{help proc_name;} and the @code{example} section
 which is executed by @code{example proc_name;}.
-@* The help_text, the parameter_list, and the smallexample section are optional.
+@* The help_text, the parameter_list, and the example section are optional.
 The default for a parameter_list is @code{(list #)}, see @ref{Parameter list}.
 The help and example sections are ignored if the procedure is defined
 @ifset namesapces
 interactively, i.e., if it was not loaded from a file by a @ref{load} command.
 @end ifset
 @ifclear namesapces
-interactively, i.e., if it was not loaded from a file by a @ref{LIB} command.
+interactively, i.e., if it was not loaded from a file by a LIB command 
+(@ref{LIB}).
 @end ifclear
 @* Specifying @code{static} in front of the proc-definition (in a library file)
 makes this procedure local to the library, i.e., accessible only for the other
@@ -2050,7 +2059,7 @@ Now, we load the library and execute the procedures defined there:
   example tab;             // show an example
   "*"+tab(3)+"*";          // use the procedure tab
   // the static procedure internal_tab is not accessible
-  "*"+Sample::internal_tab(3)+"*";
+  "*"+internal_tab(3)+"*";
   // show the help section for tab
   help tab;
 @c example
@@ -2066,9 +2075,11 @@ The libraries contained in the @sc{Singular} distribution use the following
 format for the help text:
 @smallexample
 USAGE:    <proc_name>(<parameters>);   <explanation of parameters>
+[ASSUME:  <particular assumptions>]
 [CREATE:  <description of created objects which are not returned>]
 RETURN:   <description of the purpose and return value>
-[NOTE:    <particular assumptions or limitations, details>]
+[COMPUTE: <details about the computation if necessary>]
+[NOTE:    <particular limitations, details>]
 [SEE ALSO: <comma-seprated names of related procedures>]
 EXAMPLE:  example <proc_name>; shows an example
 @end smallexample
@@ -2157,7 +2168,7 @@ proc x3 (i,j)
 
 proc x5 (i,list #)
 @{
-... // can only be called with more than 1 argument
+... // can only be called with at least 1 argument
     // number of arguments: size(#)+1
 @}
 
@@ -2184,6 +2195,11 @@ proc x7 (ring r)
 @node Procedure commands, , Parameter list, Procedures
 @subsection Procedure commands
 @cindex Procedure commands
+
+Some commands only make sense inside a procedure, since they make 
+objects known to the nesting level from which the procedure was called
+or to all nesting levels.
+
 @c ref
 See
 @ref{export};
@@ -2237,7 +2253,7 @@ none
 @item @strong{Purpose:}
 reads a library of procedures from a file. If the given filename does
 not start with @kbd{.} or @kbd{/}, the following directories are
-searched for (in that order): the current directory, the directories given in
+searched for it (in that order): the current directory, the directories given in
 the environment variable @code{SINGULARPATH}, some default directories
 relative to the location of the @sc{Singular} executable program, and
 finally some default absolute directories. (For setting environment variables
@@ -2255,7 +2271,7 @@ Only the names of the procedures in the library are loaded, the body of
 the procedures is read during the first call of this procedure. This minimizes
 memory consumption by unused procedures.  When @sc{Singular} is started
 with the @code{-q} or @code{--quiet} option, no message about the
-loading of a library is displayed.  More exactly, option @code{-q} (and
+loading of a library is displayed.  More precisely, option @code{-q} (and
 likewise @code{--quiet}) unsets option @code{loadLib} to inhibit
 monitoring of library loading (@pxref{option}).
 
@@ -2267,7 +2283,7 @@ command:
                      // standard.lib is loaded
   LIB;
                      // the names of the procedures of inout.lib
-  LIB "inout.lib"; // are now known to Singular
+  LIB "inout.lib";   // are now known to Singular
   LIB;
 @c example
 @end smallexample
@@ -2417,14 +2433,14 @@ printed out) but not
 @samp{comment2}; and nothing is displayed if  @code{Test} is called
 from within any other procedure.
 However, if @code{printlevel} is set to  a value k with k>0, then
-@samp{comment1} (resp.@: @samp{comment2} is displayed provided that
+@samp{comment1} (resp.@: @samp{comment2}) is displayed provided that
 @code{Test} is called from other procedures, with a nesting level up to
 k (resp.@: k-1).
 
 Note furthermore, that the example part of a procedure
 behaves in this respect like a procedure (i.e., the value of @code{voice}
 is 1). Therefore, the command @code{printlevel=1;} is necessary for
-@samp{comment1} to be displayed on @code{ smallexample Test;}. However,
+@samp{comment1} to be displayed on @code{ example Test;}. However,
 since printlevel is a global variable, it should be reset to the old
 value after at the end of the example part.
 
@@ -2462,7 +2478,7 @@ example
 The help and info strings of libraries which are included in the
 distribution of @sc{Singular} are parsed and automatically converted
 into the texinfo format (the typesetting language in which the
-documentation  of @sc{Singular} is written.
+documentation  of @sc{Singular} is written).
 
 For optimal typesetting results, the guidelines for writing libraries
 and procedures should be followed, and the following points should be
@@ -2517,7 +2533,7 @@ shorter than 60 characters and does not contain @code{@@code@{..@}}  and
 @code{@@math@{..@}} constructs, or (2) if the first word of a line is
 followed by matching round parenthesis (like @code{myfunc()}), or (3) if
 the previous line does only consist of a word followed by matching
-parehtesis.
+parenthesis.
 @end itemize
 @end itemize
 
@@ -2718,7 +2734,7 @@ The following syntax checks are performed in any case:
     ( number of " must be even ).
 @item general library syntax
     ( only LIB, static, proc (with parameters, help, body and example)
-and comments, i.e // and @code{/* ... */} are allowed).
+and comments, i.e // and @code{/* ... */}, are allowed).
 @end itemize
 Its output lists all procedures that have been parsed successfully:
 
@@ -2743,8 +2759,8 @@ each of the following is the position of the byte in the library.
 @item eod: end of parameters
 @item body: start of procedurebody '@{'
 @item eob:  end of procedurebody '@}'
-@item example: position of 'smallexample'
-@item eoe: end of smallexample '@}'
+@item example: position of 'example'
+@item eoe: end of example '@}'
 @end itemize
 
 Hence in the above example, the first procedure of the library
