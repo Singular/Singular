@@ -1,5 +1,74 @@
+Wed Jul 30 09:40:08 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* cf_defs.h (SW_RATIONAL, SW_QUOTIENT, SW_SYMMETRIC_FF,
+	  SW_BERLEKAMP, SW_FAC_USE_BIG_PRIMES, SW_FAC_QUADRATICLIFT,
+	  SW_USE_EZGCD, SW_USE_SPARSEMOD): #defines replaced by 'const
+	  int's
+
+	* canonicalform.cc (fillVarsRec, getNumVars, getVars): moved to
+	  cf_ops.cc
+	* cf_ops.cc (fillVarsRec, getNumVars, getVars): moved from
+	  canonicalform.cc to cf_ops.cc
+
+	* cf_ops.cc: doc fix
+
+Thu Jul 24 12:44:46 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* GNUmakefile.in (distfiles): bin/folding.el and bin/fold-docu.el
+	  added
+
+Wed Jul 23 09:45:35 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* cf_map.h: doc checked
+
+	* cf_map.h (class CFMap): references to List<CanonicalForm>
+	  replaced by CFList
+
+	* cf_map.cc: doc checked
+
+	* cf_map.cc (CFMap( CFList )): 'P.append()' replaced by 'P.insert()'
+
+	* cf_chinese.cc (chineseRemainder( CF, ... )): operator % replaced
+	  by function mod()
+
+	* README: doc fix
+
 Tue Jul 22 11:04:30 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
+	* cf_map.cc (CFList, CFListIterator, MPListIterator): references to
+	  List<CanonicalForm>, ListIterator<CanonicalForm>, and
+ 	  ListIterator<MapPair> replaced by their respective typedefs
+
+	* canonicalform.cc (initCanonicalForm): initialization of switches
+	  removed since they are initialized by constructor
+
+	* bin/folding.el: doc checked
+
+	* bin/fold-docu.el: doc checked
+
+	* bin/folding.el: new file
+	* bin/fold-docu.el: new file
+	* bin/fold-docu.el (fold-docu): works now for all fold marks
+	* README: doc fix
+
+	* cf_switches.h: doc checked
+
+	* cf_switches.cc: doc checked
+
+	* cf_switches.h (CFSwitchesMax): new constant
+	* cf_switches.h (class CFSwitches): number of switches replaced by
+	  references to 'const int CFSwitchesMax'
+	* cf_switches.cc (CFSwitches): number of switches replaced by
+	  references to 'const int CFSwitchesMax'
+
+	* cf_util.h: doc checked
+
+	* cf_util.cc: doc checked
+
+
+    **************** Factory Version 1.3a released ****************
+
+	
 	* configure.in: doc fix
 
 	* INSTALL: doc fix
@@ -79,13 +148,7 @@ Wed Jul 16 11:35:06 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* cf_chinese.cc: doc checked
 
-	* cf_chinese.cc: doc fix
-
-	* cf_chinese.cc (chineseRemainder): doc fix
-
 	* cf_chinese.h: doc checked
-
-	* cf_chinese.h: doc fix
 
 	* .cvsignore (config.cache): new entry
 
