@@ -1,4 +1,4 @@
-// $Id: general.lib,v 1.2 1997-04-28 19:27:17 obachman Exp $
+// $Id: general.lib,v 1.3 1997-07-10 14:02:30 Singular Exp $
 //system("random",787422842);
 //(GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
@@ -19,7 +19,7 @@ LIBRARY:  general.lib   PROCEDURES OF GENERAL TYPE
  sort(ideal/module);    sort generators according to monomial ordering
  sum(vector/id/..[,v]); add components of vector/ideal/...[with indices v]
            (parameters in square brackets [] are optional)
- wich(command);		searches for command and returns absolute
+ which(command);	searches for command and returns absolute
                         path, if found
 LIB "inout.lib";
 ///////////////////////////////////////////////////////////////////////////////
