@@ -1,4 +1,4 @@
-// $Id: latex.lib,v 1.3 1998-08-07 17:33:55 gorzel Exp $   
+// $Id: latex.lib,v 1.4 1998-10-14 14:34:47 Singular Exp $   
 //                        1998/04/17
 // author : Christian Gorzel email: gorzelc@math.uni-muenster.de
 // 
@@ -1488,21 +1488,21 @@ static proc parst(string s,int sec)                // parse parameter
   int b,k,jj,mz;                         // begin and end 
   int saveshort=short;
             string t,c,vn,nom,denom,sg;
-
-  s = s[2,size(s)-2];    s = s + "!";
+  if (s[1]=="(") { s = s[2,size(s)-2]; }
+  s = s + "!";
 
   if(defined(TeXreplace)){ short =0;}   // only then replacing works correctly
   if (short)
   { while(s[i]<>"!")
     { b=i; j++;
       while(s[i]>="0" and s[i]<="9" or (s[i]=="+" or s[i]=="-") and s[i]!="!")
-      {i++;}     // scan the number 
+      {i++;}     // scan the number
         t =s[b,i-b];
     //  if (t=="-1" and s[i]!="!" and s[i]!="-" and s[i]!="+"){t = "-";}
       if (t=="-1" and (s[i]<="0" or s[i]>="9") and s[i]!= "/" and s[i]!="!")
        {
-     t = "-";} 
-      if (s[i]=="/")     
+     t = "-";}
+      if (s[i]=="/")
       { i++;
         sg = "";
         if (t[1]=="+" or t[1]=="-")
@@ -1510,7 +1510,7 @@ static proc parst(string s,int sec)                // parse parameter
           sg = t[1];
         }
         else { nom = t;}
-        b =i; 
+        b =i;
         while(s[i]>="0" and s[i]<="9") {i++;}
         denom = s[b,i-b];
         if (!(sec) and (!(defined(TeXaligned))))
@@ -1518,7 +1518,7 @@ static proc parst(string s,int sec)                // parse parameter
         else
         { t = sg + "(" + nom + "/" + denom + ")";
         }
-      }  
+      }
       c = c + t;
       if(s[i]!="!"){c = c + s[i]; i++;}      // the parameter
       b=i;
@@ -1528,12 +1528,12 @@ static proc parst(string s,int sec)                // parse parameter
      }
    }
    else                         // if not short ....
-   { while (s[i] <> "!") 
+   { while (s[i] <> "!")
      { b=i; j++;
        while(s[i]=="-" or s[i]=="+" or (s[i]>="0" and s[i]<="9")){i++;}
        t = s[b,i-b];
        if (t=="-1" and s[i]=="*" ) {t="-";}
-      if (s[i]=="/") 
+      if (s[i]=="/")
       { i++;
         sg = "";
         if (t[1]=="+" or t[1]=="-")
@@ -1541,7 +1541,7 @@ static proc parst(string s,int sec)                // parse parameter
           sg = t[1];
         }
         else { nom = t;}
-        b =i; 
+        b =i;
         while(s[i]>="0" and s[i]<="9") {i++;}
         denom = s[b,i-b];
         if (!(sec) and (!(defined(TeXaligned))))
@@ -1549,21 +1549,21 @@ static proc parst(string s,int sec)                // parse parameter
         else
         { t = sg + "(" + nom + "/" + denom + ")";
         }
-      }  
-       c = c+t; t="";   
-       if (s[i]=="*"){i++;} 
+      }
+       c = c+t; t="";
+       if (s[i]=="*"){i++;}
        b=i;
        while(s[i]!="+" and s[i]!="-" and s[i]!="!")  //pass a monom
-       { // start with letters 
+       { // start with letters
         // alternativ:
         while((s[i]>="a" and s[i]<="z") or (s[i]>="A" and s[i]<="Z")){i++;}
-             k = i-b; 
+             k = i-b;
         vn = s[b,k];
         if (defined(TeXreplace))
-        { for (jj=1; jj<= size(TeXreplace);jj++) 
-         { if (vn == TeXreplace[jj][1]) 
+        { for (jj=1; jj<= size(TeXreplace);jj++)
+         { if (vn == TeXreplace[jj][1])
            {vn = TeXreplace[jj][2]; k=1;
-             if (s[i]=="*") {vn = vn + " ";} 
+             if (s[i]=="*") {vn = vn + " ";}
             break;} //suppose replacing by a single sign
          }
         }
@@ -1597,11 +1597,11 @@ example
   poly f = (a2b12 + 23a2 -b13-1);
   f;
   parst(string(f));
- 
+
   f =(-a +4b2 -2);
   f;
   parst(string(f));
- 
+
   f = a23;
   f;
   parst(string(f));
@@ -1617,15 +1617,15 @@ example
 
 
 static proc parselong(string s)
-{ 
+{
   int i,j,k,b,mz;
   string t,vn;              // varname
-  
+
  // "s=" + s;
-  i = 1; 
-  while (s[i] <> "!") 
-  { b=i;     
-    
+  i = 1;
+  while (s[i] <> "!")
+  { b=i;
+
 // -- scan now the letter ...
 
   //  while(s[i]!="!" and )
@@ -1634,14 +1634,14 @@ static proc parselong(string s)
  while((s[i]>="a" and s[i]<="z") or (s[i]>="A" and s[i]<="Z"))
  { i++;}
  // s[i]; i;
-   k = i-b; 
+   k = i-b;
    vn = s[b,k];
 
    if (defined(TeXreplace))
-   { for (j=1; j<= size(TeXreplace);j++) 
-     { if (vn == TeXreplace[j][1]) 
+   { for (j=1; j<= size(TeXreplace);j++)
+     { if (vn == TeXreplace[j][1])
        {vn = TeXreplace[j][2]; k=1;
-        if (s[i]=="*") {vn = vn + " ";} 
+        if (s[i]=="*") {vn = vn + " ";}
          break;} //suppose replacing by a single sign
      }
    }
@@ -1666,14 +1666,14 @@ static proc parselong(string s)
   return(t,mz);
 }
 example
-{ "EXAMPLE:"; echo =2;  
+{ "EXAMPLE:"; echo =2;
   ring r =(49,a),x,dp;
   number f = a13;
   parsg(string(f));
   list TeXreplace; export TeXreplace;
   TeXreplace[1] = list("b","\\beta");
   TeXreplace[2] = list("a","\\alpha");
-  TeXreplace[3] = list("c","\\gamma"); 
+  TeXreplace[3] = list("c","\\gamma");
   parselong(string(f)+"!");
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -1716,11 +1716,11 @@ static proc part0(string fname)
     number nm,nom,denom;
     poly f,g;
     int nv,np=nvars(basering),npars(basering);
- 
+
     for (i=1; i<=n; i++)
-    { 
-      if (np) 
-      {  
+    {
+      if (np)
+      {
          nm=random(-cm,cm);
          for (j=1;j<=np;j++)
          { nm=nm*par(j)^random(-em/ 2,em/ 2);}
@@ -1750,9 +1750,9 @@ static proc part0(string fname)
   proc randomintv(int n, int m)
   {
    int i;
-   
+
    for(i=1; i<=n; i++)
-   { 
+   {
     v[i];
    }
   }
@@ -1762,7 +1762,7 @@ static proc part0(string fname)
   { int n,i= size(s),1;
     int p;
     string t;
-   
+
     while(n-i+1 >pagewidth)
     { p = find(s,newline,i);
       if (p and (p-i)<pagewidth)
@@ -1830,10 +1830,10 @@ LIBRARY: latex.lib    PROCEDURES FOR TYPESET OF SINGULAROBJECTS IN LATEX2E
  rmx(s);              removes .aux and .log files of TeXfile s
  xdvi(s);             calls xdvi for dvi-file s
          (parameters in square brackets [] are optional)
- 
-                      Global Variables: 
+
+                      Global Variables:
   TeXwidth, TeXnofrac, TeXbrack, TeXproj, TeXaligned, TeXreplace, NoDollars
-               are used to control the typesetting  
+               are used to control the typesetting
     Call example texdemo; to become familiar with the features of latex.lib
 
 " +
@@ -1863,14 +1863,14 @@ ev);
 
 //----------------------- opentex -----------------------------
    write(fname,"\\section{Opening a \\LaTeX\\ file}");
-   write(fname,"All starts by defining a variable " + nl 
+   write(fname,"All starts by defining a variable " + nl
                 + bv + "> string fname = \"" + fname + "\";" + nl +
                 "> texopen(fname);" + ev + nl);
  write(fname,"This variable \\verb|fname| has to given as first argument to
  all procedures in \\verb|latex.lib|");
- 
+
  //% opentex, defaulted to latex, possibly extension are ... and
- //% ``own'' 
+ //% ``own''
 
 
 pagewidth = 65;
@@ -1890,7 +1890,7 @@ static proc part1(string fname)
     return();
   }
   else { texdemopart=1; }
- 
+
 "Continuing part1 of " + fname + nl;
 
 write(fname,
@@ -1901,7 +1901,7 @@ write(fname,
 " A ring in characteristic 0 with short variablenames and polynomial ordering.
 " +nl);
  ring r0=0,(x,y,z),dp;        export r0;
- poly g = -x2y +2y13z +1;           export g;          
+ poly g = -x2y +2y13z +1;           export g;
  poly f = randompoly(5,25,25); f;      export f;
 write(fname,
 bv +
@@ -1909,11 +1909,11 @@ bv +
 > poly g = -x2y +2y13z +1; g;                 texpoly(fname,g);" +nl +
  string(g) + nl + 
 "> poly f = randompoly(5,25,25); f;            texpoly(fname,f);" +nl +
- splt(string(f)) + nl2 + 
-ev 
-); 
+ splt(string(f)) + nl2 +
+ev
+);
   texring(fname,r0);              write(fname,nl2);
-  texpoly(fname,g);              write(fname,nl2); 
+  texpoly(fname,g);              write(fname,nl2);
   texpoly(fname,f);              write(fname,nl2);
 // write(fname,"\\Line");
 
@@ -1928,7 +1928,7 @@ bv +
 > texpoly(fname,f);" +nl +
  splt(string(f)) + nl2 + 
 ev
-); 
+);
   texpoly(fname,f);              write(fname,nl2);
 write(fname,"\\Line");
 // -2-------- a ring in char 7, indexed varnames and series ordering ----------
