@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_inst.cc,v 1.6 1998-03-10 14:51:14 schmidt Exp $ */
+/* $Id: ftmpl_inst.cc,v 1.7 1998-04-06 12:35:32 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -68,6 +68,7 @@ template CanonicalForm tmin ( const CanonicalForm &, const CanonicalForm & );
 
 template int tmax ( const int &, const int & );
 template int tmin ( const int &, const int & );
+template int tabs ( const int & );
 #endif
 //}}}
 
