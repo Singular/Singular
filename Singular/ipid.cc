@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.14 1998-07-21 17:28:32 Singular Exp $ */
+/* $Id: ipid.cc,v 1.15 1998-08-25 13:33:18 krueger Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -147,6 +147,7 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
   return  h;
 }
 
+/* #define KAI */
 idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
 {
   idhdl h;
@@ -170,8 +171,12 @@ idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
     else if ((IDTYP(h) == t)||(t==DEF_CMD))
     {
       if (BVERBOSE(V_REDEFINE))
-        Warn("redefining %s **",s);
-      if (s==IDID(h))
+#ifdef KAI
+        Warn("1 redefining %s **",s);
+#else
+        Warn(" redefining %s **",s);
+#endif
+        if (s==IDID(h))
         IDID(h)=NULL;
       killhdl(h,root);
     }
@@ -181,11 +186,7 @@ idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
   // is it already defined in idroot ?
   else if (*root != IDROOT)
   {
-#ifdef HAVE_NAMESPACES
-    if ((h=namespaceroot->get(s,lev))!=NULL)
-#else
-    if ((h=idroot->get(s,lev))!=NULL)
-#endif /* HAVE_NAMESPACES */
+    if ((h=IDROOT->get(s,lev))!=NULL)
     {
       if (IDLEV(h)!=lev)
       {
@@ -194,7 +195,11 @@ idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
       else if ((IDTYP(h) == t)||(t==DEF_CMD))
       {
         if (BVERBOSE(V_REDEFINE))
-          Warn("redefining %s **",s);
+#ifdef KAI
+          Warn("2 redefining %s **",s);
+#else
+          Warn(" redefining %s **",s);
+#endif
         IDID(h)=NULL;
         killhdl(h,&IDROOT);
       }
@@ -210,25 +215,7 @@ idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
   {
     if ((h=topnsroot->get(s,lev))!=NULL)
     {
-#if 0
-      if (IDLEV(h)!=lev)
-      {
         s=mstrdup(s);
-      }
-      else if ((IDTYP(h) == t)||(t==DEF_CMD))
-      {
-        if (BVERBOSE(V_REDEFINE))
-          Warn("1 redefining %s **",s);
-        IDID(h)=NULL;
-        killhdl(h,&(NSROOT(topnsroot)));
-      }
-      else
-      {
-        goto errlabel;
-      }
-#else
-      s=mstrdup(s);
-#endif
     }
   }
 #endif /* HAVE_NAMESPACES */
@@ -244,7 +231,11 @@ idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
       else if ((IDTYP(h) == t)||(t==DEF_CMD))
       {
         if (BVERBOSE(V_REDEFINE))
-          Warn("redefining %s **",s);
+#ifdef KAI
+          Warn("3 redefining %s **",s);
+#else
+          Warn(" redefining %s **",s);
+#endif
         IDID(h)=NULL;
         killhdl(h,&currRing->idroot);
       }
@@ -425,6 +416,11 @@ void killhdl(idhdl h, idhdl * ih)
 
   //  general  -------------------------------------------------------------
   // now dechain it and delete idrec
+#ifdef KAI_
+  if(h->next != NULL)Print("=======>%s(%x) -> %s<====\n", IDID(h), IDID(h), IDID(h->next));
+  else Print("=======>%s(%x)<====\n", IDID(h), IDID(h));
+#endif
+  
   FreeL((ADDRESS)IDID(h));
   //IDID(h)=NULL;
   if (h == (*ih))
@@ -450,7 +446,7 @@ void killhdl(idhdl h, idhdl * ih)
   Free((ADDRESS)h,sizeof(idrec));
 }
 
-idhdl ggetid(const char *n)
+idhdl ggetid(const char *n, BOOLEAN local, idhdl *packhdl)
 {
 #ifdef HAVE_NAMESPACES
   idhdl h =namespaceroot->get(n,myynest, TRUE); // search in toplevel namespace
@@ -461,7 +457,44 @@ idhdl ggetid(const char *n)
     h3 = currRing->idroot->get(n,myynest);
   }
   if (h3==NULL) {
-    if (h2==NULL) return h; else return h2;
+    if (h2!=NULL) {
+      *packhdl=namespaceroot->get(namespaceroot->name,0, TRUE);
+      return h2;
+    }
+    if(!local) {
+      if(h!=NULL)*packhdl=namespaceroot->get("Top",0, TRUE);
+      return h;
+    }
+  }
+  if(h3!=NULL) *packhdl = currRingHdl;
+  else *packhdl = NULL;
+  return h3;
+#else /* HAVE_NAMESPACES */
+  idhdl h = idroot->get(n,myynest);
+  idhdl h2=NULL;
+  *packhdl = NULL;
+  if ((currRing!=NULL) && ((h==NULL)||(IDLEV(h)!=myynest)))
+  {
+    h2 = currRing->idroot->get(n,myynest);
+  }
+  if (h2==NULL) return h;
+  return h2;
+#endif /* HAVE_NAMESPACES */
+}
+
+idhdl ggetid(const char *n, BOOLEAN local)
+{
+#ifdef HAVE_NAMESPACES
+  idhdl h =namespaceroot->get(n,myynest, TRUE); // search in toplevel namespace
+  idhdl h2=namespaceroot->get(n,myynest); // search in current namespace
+  idhdl h3=NULL;
+  if ((currRing!=NULL) && ((h2==NULL)||(IDLEV(h2)!=myynest)))
+  {
+    h3 = currRing->idroot->get(n,myynest);
+  }
+  if (h3==NULL) {
+    if (h2!=NULL) return h2;
+    if(!local) return h;
   }
   return h3;
 #else /* HAVE_NAMESPACES */
@@ -596,6 +629,61 @@ void piKill(procinfov pi)
     Free((ADDRESS)pi, sizeof(procinfo));
 }
 
+char *idhdl2id(idhdl pck, idhdl h)
+{
+  char *name = AllocL(strlen(pck->id) + strlen(h->id) + 3);
+  sprintf(name, "%s::%s", pck->id, h->id);
+  return(name);
+}
+
+void iiname2hdl(char *name, idhdl *pck, idhdl *h)
+{
+  char *q = index(name, ':');
+  char *p, *i;
+
+  if(q==NULL)
+  {
+    p = mstrdup("");
+    i = AllocL(strlen(name)+1);
+    *i = '\0';
+    sscanf(name, "%s", i);
+#ifdef HAVE_NAMESPACES
+    *h = namespaceroot->get(i, myynest);
+#else /* HAVE_NAMESPACES */
+#endif /* HAVE_NAMESPACES */
+  }
+  else {
+    if( *(q+1) != ':') return;
+    i = AllocL(strlen(name)+1);
+    *i = '\0';
+    if(name == q)
+    {
+      p = mstrdup("");
+      sscanf(name, "::%s", i);
+#ifdef HAVE_NAMESPACES
+      *h =namespaceroot->get(i, myynest, TRUE); // search in toplevel namespace
+#else /* HAVE_NAMESPACES */
+#endif /* HAVE_NAMESPACES */
+    }
+    else
+    {
+      p = AllocL(strlen(name)+1);
+      sscanf(name, "%[^:]::%s", p, i);
+#ifdef HAVE_NAMESPACES
+      *pck =namespaceroot->get(p, myynest, TRUE); // search in toplevel namespace
+      namespaceroot->push(IDPACKAGE(*pck), IDID(*pck));
+      *h =namespaceroot->get(i, myynest); // search in toplevel namespace
+      namespaceroot->pop();
+#else /* HAVE_NAMESPACES */
+#endif /* HAVE_NAMESPACES */
+    }
+  }
+  //printf("Package: '%s'\n", p);
+  //printf("Id Rec : '%s'\n", i);
+  FreeL(p);
+  FreeL(i);
+}
+
 #ifdef HAVE_NAMESPACES
 char *getnamelev()
 {
@@ -620,7 +708,7 @@ namehdl namerec::push(package pack, char *name, BOOLEAN init)
     ns->isroot = TRUE;
     ns->lev    = 1;
   }
-  elses
+  else
   {
     ns->pack   = pack;
     ns->lev    = this->lev+1;
@@ -631,11 +719,16 @@ namehdl namerec::push(package pack, char *name, BOOLEAN init)
   //if(ns->isroot) Print("PUSH: Add root NameSpace\n");
   if(ns->isroot) ns->root=ns; else ns->root = this->root;
   namespaceroot = ns;
-  if(init && ns->isroot)
-  {
-    idhdl pl = enterid( mstrdup("toplevel"),0, PACKAGE_CMD,
+#if 0
+  if(init && ns->isroot) {
+    idhdl pl = enterid( mstrdup("Top"),0, PACKAGE_CMD, 
                       &NSROOT(namespaceroot), TRUE );
+    if(pl != NULL) {
+      Free((ADDRESS)IDPACKAGE(pl), sizeof(ip_package));
+      IDPACKAGE(pl) = ns->pack;
+    }
   }
+#endif
   return(namespaceroot);
 }
 
@@ -655,7 +748,7 @@ namehdl namerec::pop()
   return(namespaceroot);
 }
 
-idhdl namerec::get(const char * s, int lev, int root)
+idhdl namerec::get(const char * s, int lev, BOOLEAN root)
 {
   namehdl ns;
   if(root) {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.45 1998-07-30 07:34:29 Singular Exp $ */
+/* $Id: grammar.y,v 1.46 1998-08-25 13:33:16 krueger Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -1242,7 +1242,7 @@ setringcmd:
             && ($2.rtyp==IDHDL))
             {
               idhdl h=(idhdl)$2.data;
-              if ($2.e!=NULL) h=rFindHdl((ring)$2.Data(),NULL);
+              if ($2.e!=NULL) h=rFindHdl((ring)$2.Data(),NULL, NULL);
               if ($1==KEEPRING_CMD)
               {
                 if (h!=NULL)

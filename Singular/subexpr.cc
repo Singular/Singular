@@ -242,6 +242,7 @@ void sleftv::CleanUp()
     FreeL((ADDRESS)name);
   }
   name=NULL;
+  packhdl = NULL;
   if (data!=NULL)
   {
     switch (rtyp)
@@ -1014,7 +1015,7 @@ BOOLEAN assumeStdFlag(leftv h)
   if (!hasFlag(h,FLAG_STD))
   {
     if (!TEST_VERB_NSB)
-      Warn("%s is no standardbasis",h->Name());
+      Warn("%s is no standardbasis",h->Fullname());
     return FALSE;
   }
   return TRUE;
@@ -1026,7 +1027,7 @@ BOOLEAN assumeStdFlag(leftv h)
 * utility for grammar and iparith
 */
 extern BOOLEAN noringvars;
-void syMake(leftv v,char * id)
+void syMake(leftv v,char * id, idhdl packhdl)
 {
   /* resolv an identifier: (to DEF_CMD, if siq>0)
   * 1) reserved id: done by scanner
@@ -1049,6 +1050,14 @@ void syMake(leftv v,char * id)
   }
 #endif
   memset(v,0,sizeof(sleftv));
+  v->packhdl = NULL;
+  if(packhdl != NULL)
+    v->req_packhdl = packhdl;
+#ifdef HAVE_NAMESPACES
+  else v->req_packhdl = namespaceroot->get(namespaceroot->name, 0, TRUE);
+#else /* HAVE_NAMESPACES */
+  else v->req_packhdl = NULL;
+#endif /* HAVE_NAMESPACES */
 #ifdef SIQ
   if (siq<=0)
 #endif
@@ -1073,7 +1082,21 @@ void syMake(leftv v,char * id)
           return; /* undefined */
         }
       }
-      h=ggetid(id);
+#ifdef HAVE_NAMESPACES
+      if (strcmp(id,"Current")==0)
+      {
+        h = namespaceroot->get(namespaceroot->name,0, TRUE);
+        if (id!=IDID(h)) FreeL((ADDRESS)id);
+        v->rtyp = IDHDL;
+        v->data = (char *)h;
+        v->flag = IDFLAG(h);
+        v->name = IDID(h);
+        v->attribute=IDATTR(h);
+        return;
+      }
+#endif /* HAVE_NAMESPACES */
+      h=ggetid(id, packhdl==NULL ? FALSE : TRUE, &(v->packhdl));
+      //if(h==NULL) Print("syMake: h is null\n");
       /* 3) existing identifier, local */
       if ((h!=NULL) && (IDLEV(h)==myynest))
       {
@@ -1083,6 +1106,7 @@ void syMake(leftv v,char * id)
         v->flag = IDFLAG(h);
         v->name = IDID(h);
         v->attribute=IDATTR(h);
+        //if(v->req_packhdl v->packhdl)
         return;
       }
     }
@@ -1346,5 +1370,19 @@ int sleftv::Eval()
   if (nn!=NULL) nok=nok||nn->Eval();
   next=nn;
   return nok;
+}
+
+char *iiSleftv2name(leftv v)
+{
+  char *name;
+  if(v->packhdl != NULL) {
+    name = (char *)AllocL(strlen(v->name) + strlen(IDID(v->packhdl)) + 3);
+    sprintf(name, "%s::%s", IDID(v->packhdl), v->name);
+    return(name);
+  }
+  else
+  {
+    return(v->name);
+  }
 }
 

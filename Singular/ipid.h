@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.14 1998-06-13 12:44:41 krueger Exp $ */
+/* $Id: ipid.h,v 1.15 1998-08-25 13:33:18 krueger Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -143,31 +143,37 @@ class namerec {
   namehdl    next;
   namehdl    root;
   package    pack;
-  bool       isroot;
+  idhdl      currRingHdl;
   char *     name;
   int        lev;
+  BOOLEAN    isroot;
 #define NSROOT(a) ((a)->pack->idroot)
+#define NSPACK(a) ((a)->pack)
   
-  namerec()  { memset(this,0,sizeof(*this)); }
+
+ namerec()  { memset(this,0,sizeof(*this)); }
   //namehdl    Set(idhdl root);
   namehdl    pop();
   namehdl    push(package pack, char *name, BOOLEAN init=FALSE);
-  idhdl      get(const char * s, int lev, int root=FALSE);
+  idhdl      get(const char * s, int lev, BOOLEAN root=FALSE);
 };
 
 extern namehdl namespaceroot;
-#define IDROOT (NSROOT(namespaceroot))
+#  define IDROOT (NSROOT(namespaceroot))
 #else /* HAVE_NAMESPACES */
 extern idhdl      idroot;
-#define IDROOT idroot
+#  define IDROOT idroot
 #endif /* HAVE_NAMESPACES */
 
 extern idhdl      currRingHdl;
 /*extern ring     currRing;  in structs.h */
 extern ideal      currQuotient;
 
+char *idhdl2id(idhdl pck, idhdl h);
+void  iiname2hdl(char *name, idhdl *pck, idhdl *id);
 idhdl enterid(char * a, int lev, idtyp t, idhdl* root, BOOLEAN init=TRUE);
-idhdl ggetid(const char *n);
+idhdl ggetid(const char *n, BOOLEAN local = FALSE);
+idhdl ggetid(const char *n, BOOLEAN local, idhdl *packhdl);
 void  killid(char * a, idhdl * i);
 void  killhdl(idhdl h);
 void  killhdl(idhdl h, idhdl * ih);

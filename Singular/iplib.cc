@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.32 1998-08-03 16:39:06 Singular Exp $ */
+/* $Id: iplib.cc,v 1.33 1998-08-25 13:33:19 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -396,9 +396,9 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
       //idhdl hn;
       char *n;
       char *o;
-      if (iiLocalRing[myynest]!=NULL) o=rFindHdl(iiLocalRing[myynest],NULL)->id;
+      if (iiLocalRing[myynest]!=NULL) o=rFindHdl(iiLocalRing[myynest],NULL, NULL)->id;
       else                            o="none";
-      if (currRing!=NULL)             n=rFindHdl(currRing,NULL)->id;
+      if (currRing!=NULL)             n=rFindHdl(currRing,NULL, NULL)->id;
       else                            n="none";
       Werror("ring change during procedure call: %s -> %s",o,n);
       iiRETURNEXPR[myynest+1].CleanUp();
@@ -406,7 +406,7 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
     }
     if (iiLocalRing[myynest]!=NULL)
     {
-      rSetHdl(rFindHdl(iiLocalRing[myynest],NULL),TRUE);
+      rSetHdl(rFindHdl(iiLocalRing[myynest],NULL, NULL),TRUE);
       iiLocalRing[myynest]=NULL;
     }
     else
@@ -458,7 +458,7 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
   {
     if (iiLocalRing[myynest]!=NULL)
     {
-      rSetHdl(rFindHdl(iiLocalRing[myynest],NULL),TRUE);
+      rSetHdl(rFindHdl(iiLocalRing[myynest],NULL, NULL),TRUE);
       iiLocalRing[myynest]=NULL;
     }
     else

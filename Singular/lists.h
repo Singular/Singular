@@ -3,13 +3,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.h,v 1.4 1998-04-29 07:05:29 siebert Exp $ */
+/* $Id: lists.h,v 1.5 1998-08-25 13:33:20 krueger Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
 #include "structs.h"
 #include "mmemory.h"
 #include "subexpr.h"
+#include "ipid.h"
 #include "tok.h"
 
 class slists
@@ -33,9 +34,16 @@ class slists
       }
     }
     inline void Init(int l=0)
-      { nr=l-1; m=(sleftv *)((l>0) ? Alloc0(l*sizeof(sleftv)): NULL); }
+      { nr=l-1; m=(sleftv *)((l>0) ? Alloc0(l*sizeof(sleftv)): NULL);
+#ifdef HAVE_NAMESPACES
+        packhdl = namespaceroot->get(namespaceroot->name, 0, TRUE);
+#endif /* HAVE_NAMESPACES */
+      }
     int    nr; /* the number of elements in the list -1 */
                /* -1: empty list */
+#ifdef HAVE_NAMESPACES
+    idhdl packhdl;
+#endif /* HAVE_NAMESPACES */
     sleftv  *m;  /* field of sleftv */
 };
 

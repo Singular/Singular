@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: token for interpreter, as types; general macros
 */
-/* $Id: tok.h,v 1.19 1998-06-13 12:44:51 krueger Exp $ */
+/* $Id: tok.h,v 1.20 1998-08-25 13:33:24 krueger Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -39,9 +39,11 @@ inline int min(const int a, const int b)  { return (a<b) ? a : b; }
 #define COMMAND           UMINUS+2 /* in tok.h */
 #define ANY_TYPE          UMINUS+3
 #define IDHDL             UMINUS+4
+#define NSHDL             UMINUS+5
 
 enum {
-  ATTRIB_CMD     = UMINUS + 15,
+  ALIAS_CMD     = UMINUS + 15,
+  ATTRIB_CMD,
   BAREISS_CMD,
   CHARACTERISTIC_CMD,
   CHARSTR_CMD,

@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.16 1998-07-23 09:07:04 Singular Exp $ */
+/* $Id: ring.h,v 1.17 1998-08-25 13:33:21 krueger Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -27,7 +27,7 @@ void   rWrite(ring r);
 void   rKill(idhdl h);
 void   rKill(ring r);
 ring   rCopy(ring r);
-idhdl  rFindHdl(ring r, idhdl n);
+idhdl  rFindHdl(ring r, idhdl n, idhdl w);
 #ifdef DRING
 void rDSet();
 #endif

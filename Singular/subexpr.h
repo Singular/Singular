@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.h,v 1.6 1998-05-09 14:34:32 krueger Exp $ */
+/* $Id: subexpr.h,v 1.7 1998-08-25 13:33:23 krueger Exp $ */
 /*
 * ABSTRACT: handling of leftv
 */
@@ -22,6 +22,7 @@ typedef sSubexpr * Subexpr;
 
 extern const char sNoName[];
 extern BOOLEAN siq;
+extern char *iiSleftv2name(leftv v);
 
 class sleftv;
 typedef sleftv * leftv;
@@ -49,6 +50,8 @@ class sleftv
                   * ....
                   */
     Subexpr e;    /* holds the indices for indexed values */
+    idhdl       packhdl;
+    idhdl       req_packhdl;
     inline void Init() { memset(this,0,sizeof(*this)); }
     void Set(int val);
     void Print(leftv store=NULL,int spaces=0);
@@ -63,6 +66,11 @@ class sleftv
       if ((name!=NULL) && (e==NULL)) return name;
       else return sNoName;
     }
+    inline const char * Fullname()
+    {
+      if ((name!=NULL) && (e==NULL)) return(iiSleftv2name(this));
+      else return sNoName;
+    }
     int  Typ();
     int  LTyp(); /* returns LIST_CMD for l[i], otherwise returns Typ() */
     void * Data();
@@ -74,6 +82,8 @@ class sleftv
     int Eval(); /*replace a COMMAND by its result otherwise by CopyD*/
 };
 
+#define IDSROOT(a) (IDPACKAGE(((sleftv)a).packhdl)->idroot)
+
 extern sleftv sLastPrinted;
 
 struct _sssym
@@ -84,7 +94,7 @@ struct _sssym
 typedef struct _sssym ssym;
 typedef ssym * sym;
 
-void syMake(leftv v,char * name);
+void syMake(leftv v,char * name, idhdl packhdl = NULL);
 BOOLEAN assumeStdFlag(leftv h);
 
 class proc_singular

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.30 1998-07-23 09:07:03 Singular Exp $ */
+/* $Id: ring.cc,v 1.31 1998-08-25 13:33:21 krueger Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -53,6 +53,7 @@ void rChangeCurrRing(ring r, BOOLEAN complete)
   /*------------ set global ring vars --------------------------------*/
   currRing = r;
   currQuotient=NULL;
+  
   if (r != NULL)
   {
 
@@ -928,10 +929,31 @@ void rKill(idhdl h)
         break;
       currRingHdl=IDNEXT(currRingHdl);
     }
+#ifdef HAVE_NAMESPACES
+    if(currRingHdl==NULL) {
+      namehdl ns = namespaceroot;
+      BOOLEAN found=FALSE;
+      
+      while(ns->next!=NULL) {
+        currRingHdl=NSROOT(namespaceroot->next);
+        while (currRingHdl!=NULL)
+        {
+          if ((currRingHdl!=h)
+              && (IDTYP(currRingHdl)==IDTYP(h))
+              && (h->data.uring==currRingHdl->data.uring))
+          { found=TRUE; break; }
+          
+          currRingHdl=IDNEXT(currRingHdl);
+        }
+        if(found) break;
+        ns=IDNEXT(ns);
+      }
+    }
+#endif /* HAVE_NAMESPACES */
   }
 }
 
-idhdl rFindHdl(ring r, idhdl n)
+idhdl rFindHdl(ring r, idhdl n, idhdl w)
 {
 #ifdef HAVE_NAMESPACES
   idhdl h;
@@ -940,6 +962,7 @@ idhdl rFindHdl(ring r, idhdl n)
 #else
   idhdl h=IDROOT;
 #endif
+  if(w != NULL) h = w;
   while (h!=NULL)
   {
     if (((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))
