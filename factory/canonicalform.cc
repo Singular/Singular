@@ -1,8 +1,11 @@
 // emacs editmode for this file is -*- C++ -*-
-// $Id: canonicalform.cc,v 1.5 1997-04-18 13:10:30 schmidt Exp $
+// $Id: canonicalform.cc,v 1.6 1997-06-05 13:02:53 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.5  1997/04/18 13:10:30  schmidt
+o mapinto(): mapping from immediate to GF(q) corrected
+
 Revision 1.4  1997/04/07 14:53:44  schmidt
 #include <config.h> added
 
@@ -1027,8 +1030,12 @@ operator << ( ostream & os, const CanonicalForm & cf )
 istream&
 operator >> ( istream & is, CanonicalForm & cf )
 {
+#ifndef SINGULAR
     cf = readCF( is );
     return is;
+#else /* SINGULAR */
+    return 0;
+#endif /* SINGULAR */
 }
 #endif /* NOSTREAMIO */
 
