@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.61 2000-11-03 14:50:22 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.62 2000-12-05 11:15:10 obachman Exp $ */
 
 /***************************************************************
  *
@@ -158,9 +158,11 @@ while (0)
 
 #define pFalseReturn(cond)  do {if (! (cond)) return FALSE;} while (0)
 #if (OM_TRACK > 2) && defined(OM_TRACK_CUSTOM)
-#define p_SetRingOfPoly(p, r) omSetCustomOfAddr(p, r)
+#define p_SetRingOfLm(p, r) omSetCustomOfAddr(p, r)
+void p_SetRingOfLeftv(leftv l, ring r);
 #else
-#define p_SetRingOfPoly(p, r) ((void)0)
+#define p_SetRingOfLm(p, r) ((void)0)
+#define p_SetRingOfLeftv(l, r) ((void)0)
 #endif
 
 #else // ! defined(PDEBUG)
@@ -171,7 +173,8 @@ while (0)
 #define pAssumeReturn(cond)          ((void)0)
 #define pPolyAssumeReturn(cond)      ((void)0)
 #define _pPolyAssumeReturn(cond,p,r) ((void)0)
-#define p_SetRingOfPoly(p, r)        ((void)0)
+#define p_SetRingOfLm(p, r)          ((void)0)
+#define p_SetRingOfLeftv(l, r)       ((void)0)
 #endif // defined(PDEBUG)
 
 #if PDEBUG >= 1
@@ -242,7 +245,7 @@ while (0)
 do                                              \
 {                                               \
   omTypeAllocBin(poly, p, bin);                 \
-  p_SetRingOfPoly(p, r);                        \
+  p_SetRingOfLm(p, r);                        \
 }                                               \
 while (0)
 #define p_FreeBinAddr(p, r) p_LmFree(p, r)

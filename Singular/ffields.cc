@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.27 2000-10-19 15:00:11 obachman Exp $ */
+/* $Id: ffields.cc,v 1.28 2000-12-05 11:15:08 obachman Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -179,6 +179,9 @@ number nfMult (number a,number b)
 */
 number nfInit (int i)
 {
+  // Hmm .. this is just to prevent initialization
+  // from nfInitChar to go into an infinite loop
+  if (i==0) return (number)nfCharQ;
   while (i <  0)    i += nfCharP;
   while (i >= nfCharP) i -= nfCharP;
   if (i==0) return (number)nfCharQ;

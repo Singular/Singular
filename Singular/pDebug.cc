@@ -6,7 +6,7 @@
  *  Purpose: implementation of debug related poly routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pDebug.cc,v 1.15 2000-11-17 14:07:12 Singular Exp $
+ *  Version: $Id: pDebug.cc,v 1.16 2000-12-05 11:15:09 obachman Exp $
  *******************************************************************/
 
 #ifndef PDEBUG_CC
@@ -355,7 +355,93 @@ void pPrintDivisbleByStat()
         pDivisibleBy_FALSE, (unsigned long) ((double)pDivisibleBy_FALSE*((double) 100)/(double)pDivisibleBy_number),
         pDivisibleBy_ShortFalse, (unsigned long) ((double)pDivisibleBy_ShortFalse*((double)100)/(double)pDivisibleBy_FALSE));
 }
-#endif
+
+#if (OM_TRACK > 2) && defined(OM_TRACK_CUSTOM)
+
+#include "ideals.h"
+#include "lists.h"
+#include "ipid.h"
+
+
+void p_SetRingOfPoly(poly p, ring r)
+{
+  while (p != NULL)
+  {
+    p_SetRingOfLm(p, r);
+    pIter(p);
+  }
+}
+
+void p_SetRingOfIdeal(ideal id, ring r)
+{
+  if (id == NULL) return;
+  
+  int i, n = id->ncols*id->nrows;
+  
+  for (i=0; i<n; i++)
+  {
+    p_SetRingOfPoly(id->m[i], r);
+  }
+}
+
+void p_SetRingOfList(lists L, ring r)
+{
+  int i;
+  for (i=0; i<L->nr; i++)
+  {
+    p_SetRingOfLeftv(&(L->m[i]), r);
+  }
+}
+
+void p_SetRingOfCommand(command cmd, ring r)
+{
+  if (cmd->op == PROC_CMD && cmd->argc == 2)
+    p_SetRingOfLeftv(&(cmd->arg2), r);
+  else if (cmd->argc > 0)
+  {
+    p_SetRingOfLeftv(&(cmd->arg1), r);
+    if (cmd->argc > 1)
+    {
+      p_SetRingOfLeftv(&(cmd->arg2), r);
+      if (cmd->argc > 2)
+        p_SetRingOfLeftv(&(cmd->arg3), r);
+    }
+  }
+}
+
+void p_SetRingOfLeftv(leftv l, ring r)
+{
+  while (l != NULL)
+  {
+    switch(l->rtyp)
+    {
+        case POLY_CMD:
+        case VECTOR_CMD:
+          p_SetRingOfPoly((poly) l->data, r);  
+      break;
+
+      case IDEAL_CMD:
+      case MODUL_CMD:
+      case MATRIX_CMD:
+      case MAP_CMD:
+        p_SetRingOfIdeal((ideal) l->data, r);
+        break;
+
+        case LIST_CMD:
+          p_SetRingOfList((lists) l->data, r);
+          break;
+
+        case COMMAND:
+          p_SetRingOfCommand((command)l->data, r);
+        default:
+          break;
+    }
+    l = l->next;
+  }
+}
+#endif // (OM_TRACK > 2) && defined(OM_TRACK_CUSTOM)
+
+#endif // PDEBUG
 
 #endif // PDEBUG_CC
 

@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.32 2000-08-14 12:56:42 obachman Exp $ */
+/* $Id: mpsr_Get.cc,v 1.33 2000-12-05 11:15:08 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -342,7 +342,7 @@ mpsr_Status_t mpsr_GetMsg(MP_Link_pt link, leftv &lv)
         mlv.r = r;
     }
 
-    mpsr_SetCurrRingHdl(mlv.r);
+    mpsr_SetCurrRingHdl(&mlv);
 
     lv = mlv.lv;
   }
@@ -916,12 +916,12 @@ mpsr_Status_t mpsr_GetDump(MP_Link_pt link)
 
     if (status == mpsr_Success)
     {
-#ifdef MPSR_DEBUG
-      //command cmd = (command) mlv.lv->data;
-      //fprintf(stdout, "Dump got %s \n", cmd->arg1.name);
-      //fflush(stdout);
+#ifdef MPSR_DEBUG_DUMP
+      command cmd = (command) mlv.lv->data;
+      fprintf(stdout, "Dump got %s \n", cmd->arg1.name);
+      fflush(stdout);
 #endif
-      mpsr_SetCurrRingHdl(mlv.r);
+      mpsr_SetCurrRingHdl(&mlv);
       if (mlv.lv != NULL)
       {
         mlv.lv->Eval();

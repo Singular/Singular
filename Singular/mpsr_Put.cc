@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Put.cc,v 1.22 2000-08-14 12:56:43 obachman Exp $ */
+/* $Id: mpsr_Put.cc,v 1.23 2000-12-05 11:15:09 obachman Exp $ */
 
 /***************************************************************
  *
@@ -569,8 +569,8 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
     if (IDTYP(h) == PROC_CMD)
     {
       failr(mpsr_PutLeftv(link, (leftv) h, NULL));
-#ifdef MPSR_DEBUG
-      //Print("Dumped Proc %s\n", IDID(h));
+#ifdef MPSR_DEBUG_DUMP
+      Print("Dumped Proc %s\n", IDID(h));
 #endif
     }
     // do not dump LIB string and Links and Top PACKAGE
@@ -600,8 +600,8 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
       if (mpsr_PutLeftv(link, lv, r) != mpsr_Success) break;
 #endif
 
-#ifdef MPSR_DEBUG
-      //Print("Dumped %s\n", IDID(h));
+#ifdef MPSR_DEBUG_DUMP
+      Print("Dumped %s\n", IDID(h));
 #endif
       if (IDTYP(h) == RING_CMD || IDTYP(h) == QRING_CMD ||
           (IDTYP(h) == PACKAGE_CMD && strcmp(IDID(h), "Top") != 0))
@@ -642,8 +642,8 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
 #else
           if (mpsr_PutLeftv(link, lv, r) != mpsr_Success) break;
 #endif
-#ifdef MPSR_DEBUG
-          //Print("Dumped %s\n", IDID(h2));
+#ifdef MPSR_DEBUG_DUMP
+          Print("Dumped %s\n", IDID(h2));
 #endif
           h2 = h2->next;
         }

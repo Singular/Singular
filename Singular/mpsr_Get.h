@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Get.h,v 1.10 2000-08-14 12:56:42 obachman Exp $ */
+/* $Id: mpsr_Get.h,v 1.11 2000-12-05 11:15:09 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.h
@@ -51,7 +51,7 @@ extern int mpsr_rDefault(short ch, char *name, ring &r);
 extern ring mpsr_rDefault(short ch);
 extern mpsr_Status_t mpsr_MergeLeftv(mpsr_leftv mlv1, mpsr_leftv mlv2);
 extern void mpsr_MapLeftv(leftv l, ring from_ring, ring to_ring);
-extern void mpsr_SetCurrRingHdl(ring r);
+extern void mpsr_SetCurrRingHdl(mpsr_leftv mlv);
 extern idhdl mpsr_FindIdhdl(char *name, ring &r);
 
 // from mpsr_GetPoly.cc

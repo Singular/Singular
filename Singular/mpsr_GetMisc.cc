@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_GetMisc.cc,v 1.21 2000-10-19 15:00:17 obachman Exp $ */
+/* $Id: mpsr_GetMisc.cc,v 1.22 2000-12-05 11:15:09 obachman Exp $ */
 
 /***************************************************************
  *
@@ -282,9 +282,10 @@ void mpsr_MapLeftv(leftv l, ring from_ring, ring to_ring)
 // searches for a ring handle which has a ring which is equal to r
 // if one is found, then this one is set to the new global ring
 // otherwise, a ring name is generated, and a new idhdl is created
-void mpsr_SetCurrRingHdl(ring r)
+void mpsr_SetCurrRingHdl(mpsr_leftv mlv)
 {
   idhdl h = IDROOT, rh = NULL;
+  ring r = mlv->r;
 
   if (r == NULL)
   {
@@ -315,6 +316,10 @@ void mpsr_SetCurrRingHdl(ring r)
     if (currRingHdl != NULL && IDRING(currRingHdl) != currRing)
       mpsr_SetCurrRing(IDRING(currRingHdl), TRUE);
 
+    // reset debug field so that RingOfLm does not complain
+    // this does nothing on !PDEBUG
+    p_SetRingOfLeftv(mlv->lv, IDRING(rh));
+
     rSetHdl(rh, TRUE);
 
     if (currRing != r)
@@ -338,8 +343,8 @@ void mpsr_SetCurrRingHdl(ring r)
 }
 
 
-int gringcounter = 0;
-char grname[14];
+static int gringcounter = 0;
+static char grname[14];
 
 static char* GenerateRingName()
 {
