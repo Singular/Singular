@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: pdata.doc,v 1.14 1999-07-09 14:12:53 obachman Exp $
+@comment $Id: pdata.doc,v 1.15 1999-07-21 12:13:00 anne Exp $
 @comment this file contains the "Polynomial data" appendix.
 
 @c The following directives are necessary for proper compilation
@@ -80,13 +80,33 @@ However, in any case the procedure @code{show} from the library @code{inout.lib}
 
 A vector
 @tex
-v$=[f_1,...,f_n]$
+$v=[f_1,...,f_n]$
 @end tex
 @ifinfo
 v=[f_1,...,f_n]
 @end ifinfo
 should always be considered as a column vector in a free module
-of rank equal to nrows(v) where nrows(v) is equal to the maximal index r
+of rank equal to
+@tex
+nrows($v$)
+@end tex
+@ifinfo
+nrows(v)
+@end ifinfo
+where 
+@tex
+nrows($v$)
+@end tex
+@ifinfo
+nrows(v) 
+@end ifinfo
+is equal to the maximal index 
+@tex
+$r$
+@end tex
+@ifinfo
+r
+@end ifinfo
 such that
 @tex
 $f_r \not= 0$.
@@ -94,8 +114,14 @@ $f_r \not= 0$.
 @ifinfo
 f_r<>0.
 @end ifinfo
-This is due to the fact, that internally v is a polynomial in a sparse
-representation, i.e.,
+This is due to the fact, that internally 
+@tex
+$v$
+@end tex
+@ifinfo
+v
+@end ifinfo
+is a polynomial in a sparse representation, i.e.,
 @tex
 $f_i*gen(i)$
 @end tex
@@ -109,10 +135,24 @@ $f_i=0$
 @ifinfo
 f_i=0
 @end ifinfo
-(for reasons of efficiency), hence the last 0-entries of v are lost.
+(for reasons of efficiency), hence the last 0-entries of 
+@tex
+$v$
+@end tex
+@ifinfo
+v
+@end ifinfo
+are lost.
 Only more complex structures are able to keep the rank.
 
-A module M in @sc{Singular} is given by a list of vectors
+A module 
+@tex
+$M$
+@end tex
+@ifinfo
+M
+@end ifinfo
+in @sc{Singular} is given by a list of vectors
 @tex
 $v_1,...,v_k$
 @end tex
@@ -120,7 +160,14 @@ $v_1,...,v_k$
 v_1,....v_k
 @end ifinfo
 which generate the module as a submodule of the free module of rank
-equal to nrows(M) which is the maximum of
+equal to 
+@tex
+nrows($M$)
+@end tex
+@ifinfo
+nrows(M)
+@end ifinfo
+which is the maximum of
 @tex
 nrows($v_i$).
 @end tex
@@ -140,84 +187,139 @@ number of rows and columns.
 
 By the above remarks it might appear that @sc{Singular} is only able to handle
 submodules of a free module. However, this is not true. @sc{Singular}
-can compute with any finitely generated module over the basering R.
-Such a module, say N, is not represented by its generators but by its
+can compute with any finitely generated module over the basering 
+@tex
+$R$.
+@end tex 
+@ifinfo
+R.
+@end ifinfo
+Such a module, say 
+@tex
+$N$,
+@end tex
+@ifinfo
+N,
+@end ifinfo
+is not represented by its generators but by its
 (generators and) relations. This means that
 @tex
-N = R$^n$/M
+$N = R^n/M$ where $n$ 
 @end tex
 @ifinfo
-N = R^n/M
+N = R^n/M where n
 @end ifinfo
-where n is the number of generators of N and
+is the number of generators of 
 @tex
-M $\subseteq$ R$^n$
+$N$ and $M \subseteq R^n$
 @end tex
 @ifinfo
-M in R^n
+N and M in R^n
 @end ifinfo
 is the module of relations.
-In other words, defining  a module M as a submodule of a free
-module
+In other words, defining  a module 
 @tex
-R$^n$
+$M$
+@end tex
+@ifinfo
+M
+@end ifinfo
+as a submodule of a free module
+@tex
+$R^n$
 @end tex
 @ifinfo
 R^n
 @end ifinfo
 can also be considered as the definition of
 @tex
-N = R$^n$/M.
+$N = R^n/M$.
 @end tex
 @ifinfo
 N=R^n/M.
 @end ifinfo
 
-Note that most functions, when applied to a module M, really deal with
-M. However, there are some functions which deal with 
+Note that most functions, when applied to a module 
 @tex
-N = R$^n$/M.
+$M$,
 @end tex
 @ifinfo
-N=R^n/M.
+M,
 @end ifinfo
-instead of M. 
-
-For example, @code{std(M)} computes a standard basis of M
-(and thus gives another representation of N as
+really deal with
 @tex
-N = R$^n$/std(M)).
+$M$.
 @end tex
 @ifinfo
-N=R^n/std(M)).
+M.
+@end ifinfo
+However, there are some functions which deal with 
+@tex
+$N = R^n/M$ instead of $M$.
+@end tex
+@ifinfo
+N=R^n/M instead of M.
+@end ifinfo
+
+For example, @code{std(M)} computes a standard basis of 
+@tex
+$M$
+@end tex
+@ifinfo
+M
+@end ifinfo
+(and thus gives another representation of 
+@tex
+$N$ as $N = R^n/$std($M$)).
+@end tex
+@ifinfo
+N as N=R^n/std(M)).
 @end ifinfo
 However, @code{dim(M)}, resp.@: @code{vdim(M)}, returns
 @tex
-dim(R$^n$/M), resp. dim$_k$(R$^n$/M)
+dim$(R^n/M)$, resp. dim$_k(R^n/M)$
 @end tex
 @ifinfo
 dim(R^n/M), resp. dim_k(R^n/M)
 @end ifinfo
 (if M is given by a standard basis).
 
-The function @code{syz(M)}  returns the first syzygy module of M,
+The function @code{syz(M)}  returns the first syzygy module of 
+@tex
+$M$,
+@end tex
+@ifinfo
+M,
+@end ifinfo
 i.e@:., the module 
-of relations of the given generators of M which is equal to the second
-syzygy module of N.  Refer to the description of each function in
+of relations of the given generators of 
+@tex
+$M$
+@end tex
+@ifinfo
+M
+@end ifinfo
+which is equal to the second syzygy module of 
+@tex
+$N$.
+@end tex
+@ifinfo
+N.
+@end ifinfo
+Refer to the description of each function in
 @ref{Functions} to get information which module the function deals with.
 
 The numbering in @code{res} and other commands for computing resolutions
 refer to a resolution of
 @tex
-N = R$^n$/M
+$N = R^n/M$
 @end tex
 @ifinfo
 N=R^n/M
 @end ifinfo
 (see @ref{res}; @ref{Syzygies and resolutions}).
 
-Since any ring in @sc{Singular} is defined over a ground field, it is
-possible to compute in any field which is a valid ground field in
+It is possible to compute in any field which is a valid ground field in
 @sc{Singular}.  For doing so, one has to define a ring with the desired
 ground field and at least one variable. The elements of the field are of
 type number, but may also be considered as polynomials (of degree
@@ -273,7 +375,7 @@ Loc_(x)K[x1,...,xn]).
 @end ifinfo
 
 For inhomogenous input ideals,  standard (resp. groebner) bases
-computations  are generally faster 
+computations are generally faster 
 with the orderings Wp(w_1, @dots{}, w_n) (resp. Ws(w_1, @dots{}, w_n))
 if the input is quasihomogenous w.r.t. the weights w_1, @dots{}, w_n of
 x_1, @dots{}, x_n. 
@@ -302,7 +404,7 @@ We do not require
 $<$ to be  a wellordering.
 @end tex
 @ifinfo
-A monomial ordering (term ordering) on $[x_1, ..., x_n] is
+A monomial ordering (term ordering) on K[x_1, ..., x_n] is
 a total ordering < on the
 set of monomials (power products) @{x^a | a in N^n@}
 which is compatible with the
@@ -315,8 +417,14 @@ We do not require
 See the literature cited in @ref{References}.
 @end ifset
 
-It is known that any monomial ordering can be represented by a matrix M in
-GL(n,R), but, of course, only integer coefficients are of relevance in
+It is known that any monomial ordering can be represented by a matrix 
+@tex
+$M$ in $GL(n,R)$,
+@end tex
+@ifinfo
+M in GL(n,R),
+@end ifinfo
+but, of course, only integer coefficients are of relevance in
 practice.
 
 @tex
@@ -359,7 +467,12 @@ described in the following sections.
 @subsection Global orderings
 @cindex Global orderings
 
+@tex
+For all these orderings: Loc $K[x]$ = $K[x]$
+@end tex
+@ifinfo
 For all these orderings: Loc K[x] = K[x]
+@end ifinfo
 
 @table @asis
 @item lp:
@@ -377,16 +490,21 @@ $x^\alpha < x^\beta  \Leftrightarrow  \exists\; 1 \le i \le n :
 @item dp:
 degree reverse lexicographical ordering:
 @*
+@ifinfo 
+Let deg(x^a) = a_1 + @dots{} + a_n, then
+@end ifinfo
+@tex
+Let $\deg(x^\alpha) = \alpha_1 + \cdots + \alpha_n,$ then
+@end tex
 @ifinfo
-x^a < x^b <==>
-@* deg(x^a) < deg(x^b), where deg(x^a) = a_1 + @dots{} + a_n,
+@*x^a < x^b <==>
+@* deg(x^a) < deg(x^b),
 @* or
 @* deg(x^a) = deg(x^b) and there exist an i, 1 <= i <= n:
 @*     a_n = b_n, @dots{}, a_(i+1) = b_(i+1), a_i > b_i.
 @end ifinfo
 @tex
-    $x^\alpha < x^\beta \Leftrightarrow \deg(x^\alpha) < \deg(x^\beta)$,
-where $\deg(x^\alpha) = \alpha_1 + \cdots + \alpha_n,$ or  
+    $x^\alpha < x^\beta \Leftrightarrow \deg(x^\alpha) < \deg(x^\beta)$, or
 @end tex
 @iftex
 @*
@@ -399,16 +517,21 @@ where $\deg(x^\alpha) = \alpha_1 + \cdots + \alpha_n,$ or
 @item Dp:
 degree lexicographical ordering:
 @*
+@ifinfo 
+Let deg(x^a) = a_1 + @dots{} + a_n, then
+@end ifinfo
+@tex
+Let $\deg(x^\alpha) = \alpha_1 + \cdots + \alpha_n,$ then
+@end tex
 @ifinfo
-x^a < x^b <==>
+@*x^a < x^b <==>
 @* deg(x^a) < deg(x^b)
 @* or
 @* deg(x^a) = deg(x^b) and there exist an i, 1 <= i <= n:
 @*     a_1 = b_1, @dots{}, a_(i-1) = b_(i-1), a_i < b_i.
 @end ifinfo
 @tex
-    $x^\alpha < x^\beta \Leftrightarrow \deg(x^\alpha) < \deg(x^\beta)$,
-where $\deg(x^\alpha) = \alpha_1 + \cdots + \alpha_n,$ or 
+    $x^\alpha < x^\beta \Leftrightarrow \deg(x^\alpha) < \deg(x^\beta)$, or
 @end tex
 @iftex
 @*
@@ -466,10 +589,16 @@ Ws,  we have
 Loc K[x] = K[x]_(x),
 @end ifinfo
 @tex
-Loc K[$x$] = K[$x$]$_{(x)}$,
+Loc $K[x]$ = $K[x]_{(x)}$,
 @end tex
- the localization of K[x] at the
-maximal ideal
+ the localization of 
+@tex
+$K[x]$
+@end tex
+@ifinfo
+K[x]
+@end ifinfo
+at the maximal ideal
 @ifinfo
  (x_1, @dots{}, x_n).
 @end ifinfo
@@ -493,16 +622,21 @@ $x^\alpha < x^\beta  \Leftrightarrow  \exists\; 1 \le i \le n :
 @item ds:
 negative degree reverse lexicographical ordering:
 @*
+@ifinfo 
+Let deg(x^a) = a_1 + @dots{} + a_n, then
+@end ifinfo
+@tex
+Let $\deg(x^\alpha) = \alpha_1 + \cdots + \alpha_n,$ then
+@end tex
 @ifinfo
-x^a < x^b <==>
-@* deg(x^a) > deg(x^b), where deg(x^a) = a_1 + @dots{} + a_n,
+@*x^a < x^b <==>
+@* deg(x^a) > deg(x^b)
 @* or
 @* deg(x^a) = deg(x^b) and there exist an i, 1 <= i <= n:
 @*     a_n = b_n, @dots{}, a_(i+1) = b_(i+1), a_i > b_i.
 @end ifinfo
 @tex
-    $x^\alpha < x^\beta \Leftrightarrow \deg(x^\alpha) > \deg(x^\beta)$,
-where $\deg(x^\alpha) = \alpha_1 + \cdots + \alpha_n,$ or
+    $x^\alpha < x^\beta \Leftrightarrow \deg(x^\alpha) > \deg(x^\beta)$, or
 @end tex
 @iftex
 @*
@@ -516,6 +650,12 @@ where $\deg(x^\alpha) = \alpha_1 + \cdots + \alpha_n,$ or
 negative degree lexicographical ordering:
 @*
 @ifinfo
+Let deg(x^a) = a_1 + @dots{} + a_n, then
+@end ifinfo
+@tex
+Let $\deg(x^\alpha) = \alpha_1 + \cdots + \alpha_n,$ then
+@end tex
+@ifinfo
 x^a < x^b <==>
 @* deg(x^a) > deg(x^b)
 @* or
@@ -523,8 +663,7 @@ x^a < x^b <==>
 @*     a_1 = b_1, @dots{}, a_(i-1) = b_(i-1), a_i < b_i.
 @end ifinfo
 @tex
-    $x^\alpha < x^\beta \Leftrightarrow \deg(x^\alpha) > \deg(x^\beta)$,
-where $\deg(x^\alpha) = \alpha_1 + \cdots + \alpha_n,$ or 
+    $x^\alpha < x^\beta \Leftrightarrow \deg(x^\alpha) > \deg(x^\beta)$, or 
 @end tex
 @iftex
 @*
@@ -599,9 +738,9 @@ generators of Loc K[x]^r, the r-fold direct sum of Loc K[x].
 @end ifinfo
 @tex
 $\{ x^a e_i  \mid  a \in N^n, 1 \leq i \leq r \}$ in Loc $K[x]^r$ = Loc
-K[x]$e_1 
-+ \ldots +$Loc K[x]$e_r$, where $e_1, \ldots, e_r$ denote the canonical
-generators of Loc K[x]$^r$, the r-fold direct sum of Loc K[x].
+$K[x]e_1 
++ \ldots +$Loc $K[x]e_r$, where $e_1, \ldots, e_r$ denote the canonical
+generators of Loc $K[x]^r$, the r-fold direct sum of Loc $K[x]$.
 (The function {\tt gen(i)} yields $e_i$).
 @end tex
 
@@ -611,14 +750,21 @@ vector in
 Loc K[x]^r
 @end ifinfo
 @tex
-Loc K[x]$^r$
+ Loc $K[x]^r$
 @end tex
 or (which is the default in @sc{Singular}) to give priority
 to the coefficients.
 The orderings @code{(<,c)} and @code{(<,C)} give priority to the
 coefficients; whereas
 @code{(c,<)} and @code{(C,<)} give priority to the components.
-@*Let < be any of the monomial orderings of Loc K[x] as above.
+@*Let < be any of the monomial orderings of 
+@tex
+Loc $K[x]$
+@end tex
+@ifinfo
+Loc K[x]
+@end ifinfo
+as above.
 
 @table @asis
 @item (<,C):
@@ -632,9 +778,7 @@ coefficients; whereas
 @tex
 $<_m = (<,C)$ denotes the module ordering (giving priority to the coefficients):
 @end tex
-@iftex
 @*
-@end iftex
 @tex
 \quad  \quad  $x^\alpha e_i <_m x^\beta e_j \Leftrightarrow x^\alpha <
 x^\beta$ or ($x^\alpha = x^\beta $ and $ i < j$).
@@ -760,14 +904,20 @@ input in both formats.
 @subsection Matrix orderings
 @cindex Matrix orderings
 
-Let M be an invertible n x n matrix with integer coefficients and
+Let 
+@tex
+$M$
+@end tex
 @ifinfo
-M_1, @dots{}, M_n
+M
+@end ifinfo
+be an invertible n x n matrix with integer coefficients and
+@ifinfo
+M_1, @dots{}, M_n the rows of M.
 @end ifinfo
 @tex
-M$_1, \ldots,$ M$_n$
+$M_1, \ldots, M_n$ the rows of $M$.
 @end tex
- the rows of M.
 
 The M-ordering < is defined as follows:
 @*
@@ -776,8 +926,8 @@ x^a < x^b <==> there exists an i: 1 <= i <= n :
 M_1*a = M_1*b, @dots{}, M_(i-1)*a = M_(i-1)*b, M_i*a < M_i*b.
 @end ifinfo
 @tex
-\quad \quad $x^a < x^b \Leftrightarrow \exists\  1 \leq i \leq n :$
-M$_1 a = $ M$_1 b, \ldots, $M$_{i-1} a = $ M$_{i-1} b$ and M$_i a < $ M$_i b$.
+\quad \quad $x^a < x^b \Leftrightarrow \exists\  1 \leq i \leq n :
+M_1 a = \; M_1 b, \ldots, M_{i-1} a = \; M_{i-1} b$ and $M_i a < \; M_i b$.
 @end tex
 
 Thus,
@@ -787,7 +937,7 @@ if and only if M*a is smaller than M*b
 @end ifinfo
 @tex
 $x^a < x^b$
-if and only if M$ a$ is smaller than M$ b$
+if and only if $M a$ is smaller than $M b$
 @end tex
 with respect to the lexicographical ordering.
 
@@ -1012,8 +1162,21 @@ $\left(\matrix{
 @c example
 @end smallexample
 
-If the ring has n variables and the matrix contains less than n x n entries
-an error message is given, if there are more entries,
+If the ring has 
+@tex
+$n$
+@end tex
+@ifinfo
+n
+@end ifinfo
+variables and the matrix contains less than 
+@tex
+$n \times n$
+@end tex
+@ifinfo
+n x n 
+@end ifinfo
+entries an error message is given, if there are more entries,
 the last ones are ignored.
 
 @strong{WARNING:} @sc{Singular}
@@ -1039,7 +1202,7 @@ y(1..m)
 @tex
 $x = (x_1, \ldots, x_n)$ and $y = (y_1, \ldots, y_m)$
 @end tex
- be two ordered sets of variables,
+be two ordered sets of variables,
 @ifinfo
 <_1 a monomial
 ordering on K[x] and <_2 a monomial ordering on K[y].   The product
@@ -1091,7 +1254,7 @@ w_1,@dots{},w_n
 @tex
 $w_1,\ldots,w_n$
 @end tex
- any integers (including 0), defines
+any integers (including 0), defines
 @ifinfo
   deg(x^a) = w_1 a_1 + @dots{} + w_n a_n
 @end ifinfo
