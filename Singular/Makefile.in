@@ -254,13 +254,12 @@ uninstallbin:
 mostlyclean: clean
 
 clean:
-	-rm -f Singular *.o *.og core *.op *.ob *.d *.dd /tmp/mp* \
-	        *.got *dump* *.diff *.dir *.pag
+	-rm -f Singular Singularg Singularp Singularb *.o *.og core *.op *.ob 
 
 distclean: clean
-	-rm -f depend iparith.inc mpsr_Tok.inc 
-	-rm -f Singular* *.gprof *.bprof *~ .\#*
-	-rm mod2.h Makefile TAGS* config.status config.cache config.log
+	-rm -f depend iparith.inc mpsr_Tok.inc stamp.h *.d *.dd 
+	-rm -f Singular* *.gprof *.bprof *~ .\#* version.h
+	-rm -f mod2.h Makefile TAGS* config.status config.cache config.log
 
 maintainer-clean: distclean
 	@echo "This command is intended for maintainers to use;"
