@@ -1,8 +1,9 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_win.texi,v 1.1 2000-05-23 11:22:53 obachman Exp $
+@comment $Id: INSTALL_win.texi,v 1.2 2000-05-23 14:41:21 obachman Exp $
 @c FILE:    INSTALL.texi
 @c PURPOSE: Installation instructions for Singular on MSWindows
-@c
+@c          This file is displayed during installation and copied to
+@c          /etc/INSTALL
 
 @ifclear VERSION
 @include version.texi
@@ -12,5 +13,81 @@
 @majorheading Installation innstructions for Singular on MSWINDOWS.
 @end ifclear
 
-This file contains installation instructions for Singular on MSWINDOWS.
+To install @sc{Singular} on a PC running Windows 95/98/NT/2K, you need
+to download one of the following three archives:
+
+@table @code
+@item Singular-@value{VERSION}-Compact. exe
+Minimal archive to download. Installs Singular and minimal set of needed
+tools/DLLs.
+@item Singular-@value{VERSION}-Typical. exe
+Typical archive to download. Installs Singular and the XEmacs editor to
+run ESingular.
+@item Singular-@value{VERSION}-Custom. exe
+Maximal archive to download. Installs Singular, XEmacs, and many Cygwin
+development tools (like gcc, gdb, make, perl, etc).
+@end table
+
+You can obtain these (and other) archives from
+@display
+@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Development}. 
+@end display
+
+@ifclear singularmanual
+@strong{Important:} Please see 
+@ifhtml
+@uref{COPYING.html, COPYING}
+@end ifhtml
+@ifnothtml
+the file COPYING contained in the distribution 
+@end ifnothtml
+for license
+information on @sc{Singular}. In particular, notice that we only grant you
+permission to use @sc{Singular} if you have registered yourself as a
+@sc{Singular} user by sending email to @email{singular@@mathematik.uni-kl.de}
+with the subject line (or, mail body) @code{register}.
+@end ifclear
+
+@heading To install SINGULAR
+
+@enumerate
+@item
+Uninstall Cygwin
+@item 
+Double-click
+@item
+Choosing root
+@item 
+Choosing setup type/components
+@end enumerate
+
+@heading Uninstalling Singular
+
+@heading Troubleshooting
+
+@itemize @bullet
+@item For any other troubles: 
+@*Please send an email to @email{singular@@mathematik.uni-kl.de}
+and include the header which is displayed by starting up @sc{Singular}
+with the @code{-v} option, and a description of your machine (issue the
+command @code{uname -a} on your shell) in your report.
+@end itemize
+
+
+@heading More information about @sc{Singular}: Comments, Questions, Bug Reports
+More and up-to-date information about @sc{Singular} is always available
+from
+@display
+@uref{http://www.singular.uni-kl.de}.
+@end display
+We very much welcome any comments, questions, and bug reports. Please
+contact us at
+@display
+@email{singular@@mathematik.uni-kl.de}.
+@end display
+
+@ifclear singularmanual
+GOOD LUCK and ENJOY!                         
+Your @sc{Singular} team.
+@end ifclear
 

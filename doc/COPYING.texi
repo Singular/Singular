@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.6 2000-05-05 18:40:33 obachman Exp $
+@comment $Id: COPYING.texi,v 1.7 2000-05-23 14:41:20 obachman Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -65,11 +65,14 @@ for information on how to cite Singular.
 Please send any comments or bug reports to
 @email{singular@@mathematik.uni-kl.de}.
 
-The following parts of @sc{Singular} have their own copyright: the Gnu Multiple
-Precision Library (GMP), the Multi Protocol library (MP), the Readline library,
-the Factory library, and the libfac library.
+The following parts of @sc{Singular} have their own copyright: the Gnu
+Multiple Precision Library (GMP), the Multi Protocol library (MP), the
+Factory library, the libfac library, and, for the Windows 9X/NT
+distributions the Cygwin DLL and the Cygwin tools (Cygwin) and the
+XEmacs editor (XEmacs).
+
 Their copyrights and licences can be found in the accompanying files
-which are distributed along with these libraries.
+which are distributed along with these packages.
 
 @heading Availability
 
@@ -80,30 +83,26 @@ The program @sc{Singular} and the above mentioned parts are available via
 anonymous ftp through the following addresses:
 @table @asis
 @item GMP
-@copyright{} Free Software Foundation:
-@code{libgmp-2.0.2.tar.gz}
-@* @uref{ftp://ftp.gnu.ai.mit.edu} or its mirrors
-@item readline
-@copyright{} Free Software Foundation:
-@code{libreadline-2.0.tar.gz}
+@copyright{} Free Software Foundation
 @* @uref{ftp://ftp.gnu.ai.mit.edu} or its mirrors
 @item MP
-@copyright{} Gray/Kajler/Wang, Kent State University:
-@code{MP-1.1.2.tar.gz},
+@copyright{} Gray/Kajler/Wang, Kent State University
 @* @uref{http://SymbolicNet.mcs.kent.edu/areas/protocols/mp.html}
 @item Factory
 @copyright{} Greuel/Stobbe, University of Kaiserslautern:
-@code{factory-1.3b.tar.gz}
 @* Contact @email{factory@@mathematik.uni-kl.de} for details on Factory.
 @item libfac
 @copyright{}  Messollen, University of
 Saarbr@"ucken:
-@code{libfac-0.3.0.tar.gz}
 @* Contact @email{michael@@math.uni-sb.de} for details on libfac.
 @item @sc{Singular} binaries
 @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/} or via a
 WWW brow@-ser from
-@uref{http://www.mathematik.uni-kl.de/ftp/pub/Math/@-Singular/}
+@uref{http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/}
+@item Cygwin 
+@uref{http://sourceware.cygnus.com/cygwin/}
+@item Xemacs
+@uref{http://www.xemacs.org}
 @end table
 @end ifset
 

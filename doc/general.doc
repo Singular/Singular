@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.178 2000-05-19 14:07:18 obachman Exp $
+@comment $Id: general.doc,v 1.179 2000-05-23 14:41:22 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -146,6 +146,12 @@ more details about particular browsers.
 @item @strong{Browser} @tab @strong{Platform}
 @tab @strong{Description}
 
+@item html
+@cindex help browsers, html
+@cindex html, default help
+@tab Windows
+@tab displays html version of manual in your default html browser
+
 @item netscape
 @cindex netscape
 @cindex help browsers, netscape
@@ -161,7 +167,7 @@ more details about particular browsers.
 @item xinfo
 @cindex xinfo
 @cindex help browsers, xinfo
-@tab Unix
+@tab Unix, Windows
 @tab uses the @code{info} program to display texinfo version of manual in an
 extra @code{xterm}
 
@@ -210,7 +216,8 @@ returns the currently used browser.
 
 If no browser is explicitely set by the user, then the first (w.r.t. the
 order of the browsers in the table above) available browser is
-chosen. In other words, the default browser is @code{netscape}, unless
+chosen. In other words, the default browser is @code{netscape} for Unix
+platforms, and @code{html} for Windows, unless
 your local set-up does not allow to run it.
 
 The @code{.singularrc} (@pxref{Startup sequence}) file is a good place
@@ -478,7 +485,7 @@ Print a one-line description of each command line option and exit.
 @cindex net access
 @cindex allowing net access
 @cindex help, accessing over the net
-Allow the @code{netscape} help browser to fetch HTML manual pages over
+Allow the @code{netscape} and @code{html} help browser to fetch HTML manual pages over
 the net from the WWW home-site of @sc{Singular}. @xref{The online help
 system}, for more info. 
 
@@ -486,11 +493,12 @@ system}, for more info.
 @cindex --browser
 @cindex browser, command line option
 Use @code{VAL} as browser for the @sc{Singular} online manual.
-@*@code{VAL} may be one of @code{netscape}, @code{xinfo},
+@*@code{VAL} may be one of @code{html} (Windows only), @code{netscape}, @code{xinfo},
 @code{tkinfo}, @code{info}, @code{builtin}, or @code{emacs}. Depending
 on your platform and local
 installation, only some browsers might be available. The default browser
-is @code{netscape}. @xref{The online help system}, for more info.
+is @code{html} for Windows and @code{netscape} for Unix
+platforms. @xref{The online help system}, for more info. 
 
 @item @code{--no-rc}
 @cindex --no-rc

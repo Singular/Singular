@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.66 2000-05-23 12:59:53 obachman Exp $
+### $Id: Makefile.in,v 1.67 2000-05-23 14:41:21 obachman Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -216,6 +216,7 @@ install-standalone: standalone
 	cp INSTALL_unix.html COPYING.html ${WWW_DIR}
 	cp COPYING COPYING.html ${FTP_DIR}
 	cp INSTALL_unix INSTALL_unix.html ${FTP_DIR}
+	cp INSTALL_win INSTALL_win.html ${FTP_DIR}
 	cp README_ftp.html ${FTP_DIR}/README.html
 	cp README_ftp ${FTP_DIR}/README
 	cp NEWS.html NEWS ${FTP_DIR}
