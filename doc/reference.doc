@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.64 1998-05-19 07:52:02 schmidt Exp $
+@comment $Id: reference.doc,v 1.65 1998-05-19 08:16:02 pohl Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2226,21 +2226,29 @@ See @ref{poly expressions}; @ref{vector expressions};
 @item @strong{Syntax:}
 @code{kbase (} ideal_expression @code{)}
 @*@code{kbase (} module_expression @code{)}
+@*@code{kbase (} ideal_expression@code{,} int_expresion@code{)}
+@*@code{kbase (} module_expression@code{,} int_expresion@code{)}
 @item @strong{Type:}
-the same as the input type
+the same as the input type of the first argument
 @item @strong{Purpose:}
+@*with one argument:
 computes a vector space basis (consisting of monomials)
 of the quotient of the ring by an ideal
 resp. of a free module by a module in case this is finite dimensional
 (and if the input is a standard basis with respect to the ring ordering).
 If the input is no standard basis, the leading terms of the input are
 used and the result may have no meaning.
+@*with two arguments:
+a part of the same result with degree of the monomials equal to the
+second argument, the quotient must be not finite dimensional.
 @item @strong{Example:}
 @example
 @c example
   ring r=32003,(x,y,z),ds;
   ideal i=x2,y2,z;
   kbase(std(i));
+  i=x2,y3,xyz;
+  kbase(std(i),2);
 @c example
 @end example
 @end table
