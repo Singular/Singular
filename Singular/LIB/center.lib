@@ -9,7 +9,7 @@ OVERVIEW:
  (advisor: Prof. Ovsienko Sergiy Adamovich) at Kyiv Taras Shevchenko University: 
  'An algorithm for the computation of the center of noncommutative polynomial algebra'.
  @* The last version of this library can be found via internet.
-SUPPORT: 
+SUPPORT: Forschungsschwerpunkt
 PROCEDURES:
 	center(MaxDeg[,N]);             Computing of a Center of current algebra
 	centralizator(f, MaxDeg[,N]);   Computing of a Centralizator of f in current algebra
@@ -2794,12 +2794,12 @@ example
    D[1,3]=2*x;
    D[2,3]=-2*y;
    ncalgebra(1,D); // this is U(sl_2)
-   ideal z = center(2); /// find all central elements of degree <= 2
-   z;
-   inCenter(z); 
-   ideal zz = center(-1, 1 ); /// find the first non trivial central element
-   zz;
-   inCenter(zz);
+   ideal Z = center(2); /// find all central elements of degree <= 2
+   Z;
+   inCenter(Z); 
+   ideal ZZ = center(-1, 1 ); /// find the first non trivial central element
+   ZZ;
+   inCenter(ZZ);
 };
 
 
