@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.19 1998-10-15 11:46:03 obachman Exp $ */
+/* $Id: mpsr_Get.cc,v 1.20 1998-11-09 15:43:03 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -75,7 +75,7 @@ inline BOOLEAN IsIntVecNode(MPT_Node_pt node)
 {
   fr(NodeCheck(node, MP_MatrixDict, MP_CopMatrixDenseVector));
 
-  MPT_Tree_pt tree = MPT_GetProtoTypespec(node);
+  MPT_Tree_pt tree = MPT_ProtoAnnotValue(node);
   return tree != NULL && NodeCheck(tree->node, MP_CommonMetaType,
                                    MP_ProtoDict, MP_CmtProtoIMP_Sint32);
 }
@@ -84,7 +84,7 @@ inline BOOLEAN IsIntMatNode(MPT_Node_pt node)
 {
   fr(NodeCheck(node, MP_MatrixDict, MP_CopMatrixDenseMatrix));
 
-  MPT_Tree_pt tree = MPT_GetProtoTypespec(node);
+  MPT_Tree_pt tree = MPT_ProtoAnnotValue(node);
   return tree != NULL && NodeCheck(tree->node, MP_CommonMetaType,
                                    MP_ProtoDict, MP_CmtProtoIMP_Sint32);
 }
@@ -104,7 +104,7 @@ inline BOOLEAN IsPolyNode(MPT_Node_pt node, ring &r, BOOLEAN &IsUnOrdered)
   //for the timne being, we only accept DDP's
   return
     NodeCheck(node, MP_PolyDict, MP_CopPolyDenseDistPoly) &&
-    MPT_FindAnnot(node, MP_PolyDict, MP_AnnotPolyModuleVector) == NULL &&
+    MPT_Annot(node, MP_PolyDict, MP_AnnotPolyModuleVector) == NULL &&
     mpsr_GetRingAnnots(node, r, mv, IsUnOrdered) == MP_Success;
 }
 
@@ -116,7 +116,7 @@ inline BOOLEAN IsPolyVectorNode(MPT_Node_pt node, ring &r,
   //for the timne being, we only accept DDP's
   return
     NodeCheck(node, MP_PolyDict, MP_CopPolyDenseDistPoly) &&
-    MPT_FindAnnot(node, MP_PolyDict, MP_AnnotPolyModuleVector) != NULL &&
+    MPT_Annot(node, MP_PolyDict, MP_AnnotPolyModuleVector) != NULL &&
     mpsr_GetRingAnnots(node, r, mv, IsUnOrdered) == MP_Success;
 }
 
@@ -124,7 +124,7 @@ inline BOOLEAN IsIdealNode(MPT_Node_pt node, ring &r,
                            BOOLEAN &IsUnOrdered)
 {
   fr(NodeCheck(node, MP_PolyDict, MP_CopPolyIdeal));
-  MPT_Tree_pt tree = MPT_GetProtoTypespec(node);
+  MPT_Tree_pt tree = MPT_ProtoAnnotValue(node);
   fr(tree != NULL);
   node = tree->node;
   return
@@ -136,7 +136,7 @@ inline BOOLEAN IsIdealNode(MPT_Node_pt node, ring &r,
 inline BOOLEAN IsModuleNode(MPT_Node_pt node, ring &r, BOOLEAN &IsUnOrdered)
 {
   fr(NodeCheck(node, MP_PolyDict, MP_CopPolyModule));
-  MPT_Tree_pt tree = MPT_GetProtoTypespec(node);
+  MPT_Tree_pt tree = MPT_ProtoAnnotValue(node);
   fr(tree != NULL);
   node = tree->node;
   return
@@ -148,7 +148,7 @@ inline BOOLEAN IsModuleNode(MPT_Node_pt node, ring &r, BOOLEAN &IsUnOrdered)
 inline BOOLEAN IsMatrixNode(MPT_Node_pt node, ring &r, BOOLEAN &IsUnOrdered)
 {
   fr(NodeCheck(node, MP_MatrixDict, MP_CopMatrixDenseMatrix));
-  MPT_Tree_pt tree = MPT_GetProtoTypespec(node);
+  MPT_Tree_pt tree = MPT_ProtoAnnotValue(node);
   fr(tree != NULL);
   node = tree->node;
   return
@@ -253,7 +253,7 @@ inline mpsr_Status_t mpsr_GetIdentifierLeftv(MPT_Node_pt node, mpsr_leftv mlv,
 {
   mpsr_assume(MP_IsIdType(node->type));
   char *id;
-  MPT_Annot_pt proc_annot = MPT_FindAnnot(node, MP_SingularDict,
+  MPT_Annot_pt proc_annot = MPT_Annot(node, MP_SingularDict,
                                           MP_AnnotSingularProcDef);
 
   if (node->type == MP_CommonGreekIdentifierType ||
@@ -329,7 +329,7 @@ mpsr_Status_t mpsr_GetMsg(MP_Link_pt link, leftv &lv)
     if (mlv.r != NULL && mlv.r->order[0] == ringorder_unspec)
     { 
         ring r = rCopy(mlv.r);
-        r->order[0] = ringorder_lp;
+        r->order[0] = ringorder_dp;
         mpsr_rSetOrdSgn(r);
         mpsr_MapLeftv(mlv.lv, mlv.r, r);
         rKill(mlv.r);
@@ -460,7 +460,7 @@ mpsr_Status_t mpsr_GetOperatorLeftv(MP_Link_pt link,
   mpsr_sleftv smlv1, *mlv1 = &smlv1;
   
 
-  if (MPT_GetProtoTypespec(node) != NULL)
+  if (MPT_ProtoAnnotValue(node) != NULL)
     return mpsr_SetError(mpsr_CanNotHandlePrototype);
 
   if (nc > 0)
@@ -514,7 +514,7 @@ static mpsr_Status_t GetIntMatLeftv(MP_Link_pt link, MPT_Node_pt node,
 {
   intvec *iv;
   int row = node->numchild, col = 1, *v;
-  MPT_Annot_pt annot = MPT_FindAnnot(node, MP_MatrixDict,
+  MPT_Annot_pt annot = MPT_Annot(node, MP_MatrixDict,
                                      MP_AnnotMatrixDimension);
   if (annot != NULL &&
       annot->value != NULL &&
@@ -606,7 +606,7 @@ static mpsr_Status_t GetModuleLeftv(MP_Link_pt link, MPT_Node_pt node,
   MP_NumChild_t nc = node->numchild, i;
   ring r = mlv->r;
   MP_Uint32_t nmon, rank = 1;
-  MPT_Annot_pt annot = MPT_FindAnnot(node, MP_PolyDict,
+  MPT_Annot_pt annot = MPT_Annot(node, MP_PolyDict,
                                      MP_AnnotPolyModuleRank);
   if (annot != NULL && 
       annot->value != NULL &&
@@ -635,7 +635,7 @@ static mpsr_Status_t GetMatrixLeftv(MP_Link_pt link, MPT_Node_pt node,
   MP_NumChild_t nc = node->numchild, row = nc, col = 1, i;
   matrix mp;
   MP_Uint32_t nmon;
-  MPT_Annot_pt annot = MPT_FindAnnot(node, MP_MatrixDict,
+  MPT_Annot_pt annot = MPT_Annot(node, MP_MatrixDict,
                                      MP_AnnotMatrixDimension);
   if (annot != NULL &&
       annot->value != NULL &&
@@ -726,7 +726,7 @@ static mpsr_Status_t GetCopCommandLeftv(MP_Link_pt link, MPT_Node_pt node,
   
   failr(mpsr_mp2tok(node->dict, MP_COMMON_T(node->nvalue), &tok));
 
-  if ((typespec = MPT_GetProtoTypespec(node)) &&
+  if ((typespec = MPT_ProtoAnnotValue(node)) &&
       MPT_IsTrueProtoTypeSpec(typespec))
     return mpsr_SetError(mpsr_CanNotHandlePrototype);
 

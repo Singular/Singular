@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.19 1998-11-04 17:32:24 obachman Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.20 1998-11-09 15:43:04 obachman Exp $ */
 
 /***************************************************************
  *
@@ -530,7 +530,7 @@ mpsr_Status_t mpsr_GetRingAnnots(MPT_Node_pt node, ring &r,
   memset(&r1, 0, sizeof(sip_sring));
 
   r = NULL;
-  if (MPT_FindAnnot(node, MP_PolyDict, MP_AnnotPolyModuleVector) != NULL)
+  if (MPT_Annot(node, MP_PolyDict, MP_AnnotPolyModuleVector) != NULL)
     mv = 1;
   else
     mv = 0;
@@ -578,7 +578,7 @@ mpsr_Status_t mpsr_GetRingAnnots(MPT_Node_pt node, ring &r,
 
 static mpsr_Status_t GetVarNumberAnnot(MPT_Node_pt node, ring r, BOOLEAN mv)
 {
-  MPT_Annot_pt annot = MPT_FindAnnot(node, MP_PolyDict, MP_AnnotPolyVarNumber);
+  MPT_Annot_pt annot = MPT_Annot(node, MP_PolyDict, MP_AnnotPolyVarNumber);
 
   if (annot != NULL) 
   {
@@ -604,7 +604,7 @@ static mpsr_Status_t GetProtoTypeAnnot(MPT_Node_pt node, ring r, BOOLEAN mv,
   subring = NULL;
   
   // look for prototype annot
-  if ((val = MPT_GetProtoTypespec(node)) == NULL)
+  if ((val = MPT_ProtoAnnotValue(node)) == NULL)
     return mpsr_Failure;
 
   // check value of annot
@@ -639,7 +639,7 @@ static mpsr_Status_t GetProtoTypeAnnot(MPT_Node_pt node, ring r, BOOLEAN mv,
     }
   }
   // check for type of exponent
-  if ((val = MPT_GetProtoTypespec(node)) == NULL)
+  if ((val = MPT_ProtoAnnotValue(node)) == NULL)
     return mpsr_Failure;
   
   node = val->node;
@@ -659,7 +659,7 @@ static mpsr_Status_t GetProtoTypeAnnot(MPT_Node_pt node, ring r, BOOLEAN mv,
     }
     else if (MP_COMMON_T(node->nvalue) == MP_CmtProtoIMP_Uint32 &&
              node->dict == MP_ProtoDict &&
-             (annot = MPT_FindAnnot(node,MP_NumberDict,MP_AnnotNumberModulos))
+             (annot = MPT_Annot(node,MP_NumberDict,MP_AnnotNumberModulos))
               != NULL)
     {
       // char p || GF(p,n)
@@ -667,11 +667,11 @@ static mpsr_Status_t GetProtoTypeAnnot(MPT_Node_pt node, ring r, BOOLEAN mv,
              annot->value->node->type == MP_Uint32Type);
       r->ch = MP_UINT32_T(annot->value->node->nvalue);
 
-      if (MPT_FindAnnot(annot->value->node,
+      if (MPT_Annot(annot->value->node,
                         MP_NumberDict, MP_AnnotNumberIsPrime) == NULL)
       {
         // GF(p,n)
-        falser((annot = MPT_FindAnnot(annot->value->node, 129,
+        falser((annot = MPT_Annot(annot->value->node, 129,
                                   MP_AnnotSingularGalois)) != NULL &&
            (annot->value != NULL) &&
            (annot->value->node->type == MP_StringType));
@@ -701,7 +701,7 @@ static mpsr_Status_t GetProtoTypeAnnot(MPT_Node_pt node, ring r, BOOLEAN mv,
     falser(NodeCheck(node, MP_CommonMetaOperatorType, MP_BasicDict,
                     MP_CopBasicDiv) &&
            node->numchild == 0);
-    falser((val = MPT_GetProtoTypespec(node)) != NULL);
+    falser((val = MPT_ProtoAnnotValue(node)) != NULL);
     node = val->node;
     mpsr_assume(node != NULL);
     falser(NodeCheck(node, MP_CommonMetaOperatorType, MP_PolyDict,
@@ -730,7 +730,7 @@ static mpsr_Status_t GetProtoTypeAnnot(MPT_Node_pt node, ring r, BOOLEAN mv,
 
 static mpsr_Status_t GetVarNamesAnnot(MPT_Node_pt node, ring r)
 {
-  MPT_Annot_pt annot = MPT_FindAnnot(node, MP_PolyDict, MP_AnnotPolyVarNames);
+  MPT_Annot_pt annot = MPT_Annot(node, MP_PolyDict, MP_AnnotPolyVarNames);
   short num_vars = 0, N, lb, offset, nc;
 
   mpsr_assume(r != NULL);
@@ -744,7 +744,7 @@ static mpsr_Status_t GetVarNamesAnnot(MPT_Node_pt node, ring r)
     nc = (short) node->numchild;
     if (NodeCheck(node, MP_CommonOperatorType, MP_ProtoDict, MP_CopProtoArray))
     {
-      MPT_Tree_pt val = MPT_GetProtoTypespec(node);
+      MPT_Tree_pt val = MPT_ProtoAnnotValue(node);
       if (val != NULL &&
           NodeCheck(val->node, MP_CommonMetaType, MP_ProtoDict,
                     MP_CmtProtoIMP_Identifier))
@@ -784,18 +784,20 @@ static mpsr_Status_t GetVarNamesAnnot(MPT_Node_pt node, ring r)
 static mpsr_Status_t GetOrderingAnnot(MPT_Node_pt node, ring r, 
                                       BOOLEAN mv, BOOLEAN &IsUnOrdered)
 {
-  MPT_Annot_pt annot = MPT_FindAnnot(node, MP_PolyDict,MP_AnnotPolyOrdering);
-  mpsr_Status_t status = mpsr_Success;
-
+  MPT_Annot_pt annot = MPT_Annot(node, MP_PolyDict, 
+                                 MP_AnnotShouldHavePolyOrdering); 
   IsUnOrdered = FALSE;
-  if (annot == NULL || annot->value == NULL) 
+  mpsr_Status_t status = mpsr_Success;
+  if (annot == NULL)
   {
-    annot = MPT_FindAnnot(node, MP_PolyDict, MP_AnnotShouldHavePolyOrdering);
-    if (annot == NULL || annot->value == NULL)
-      status = mpsr_Failure;
-    else
-      IsUnOrdered = TRUE;
+    annot = MPT_Annot(node, MP_PolyDict,MP_AnnotPolyOrdering);
+    if (annot == NULL) status = mpsr_Failure;
   }
+  else
+  {
+    IsUnOrdered = TRUE;
+  }
+
 
   if (status == mpsr_Success) node =  annot->value->node;
 
@@ -855,6 +857,7 @@ static mpsr_Status_t GetOrderingAnnot(MPT_Node_pt node, ring r,
     if (status == mpsr_Failure)
     {
       if (mv) nc++;
+      else nc += 2;
       Free(r->block0, nc*sizeof(int *));
       Free(r->block1, nc*sizeof(int *));
       Free(r->order, nc*sizeof(int *));
@@ -875,13 +878,12 @@ static mpsr_Status_t GetOrderingAnnot(MPT_Node_pt node, ring r,
 
   // Check for simple Ordering
   if (status == mpsr_Success)
-  {
     status = GetSimpleOrdering(node, r, 0);
-  }
-  else
+
+  if (status != mpsr_Success)
   {
-    IsUnOrdered = FALSE;
     r->order[0] = ringorder_unspec;
+    IsUnOrdered = FALSE;
   }
   
   return mpsr_rSetOrdSgn(r);
@@ -892,10 +894,12 @@ static mpsr_Status_t GetSimpleOrdering(MPT_Node_pt node, ring r, short i)
   if (node->type != MP_CommonConstantType)
     return mpsr_Failure;
 
-  r->order[i] = mpsr_mp2ord(MP_UINT32_T(node->nvalue));
+  int sr_ord =  mpsr_mp2ord(MP_COMMON_T(node->nvalue));
+  
+  r->order[i] = sr_ord;
   if (r->order[i] == ringorder_unspec) return mpsr_Failure;
 
-  MPT_Annot_pt annot = MPT_FindAnnot(node, MP_PolyDict, MP_AnnotPolyWeights);
+  MPT_Annot_pt annot = MPT_Annot(node, MP_PolyDict, MP_AnnotPolyWeights);
 
   if (annot == NULL) return mpsr_Success;
   if (annot->value == NULL) return mpsr_Failure;
@@ -910,11 +914,17 @@ static mpsr_Status_t GetSimpleOrdering(MPT_Node_pt node, ring r, short i)
   else
   {
     if (! NodeCheck(node, MP_CommonOperatorType, MP_MatrixDict,
-                   MP_CopMatrixDenseVector))
+                    MP_CopMatrixDenseVector))
+      return mpsr_Failure;
+    if (sr_ord == ringorder_lp) r->order[i] = ringorder_Wp;
+    else if (sr_ord == ringorder_ls) r->order[i] = ringorder_Ws;
+    else if (sr_ord != ringorder_wp && sr_ord != ringorder_ws &&
+             sr_ord != ringorder_a)
       return mpsr_Failure;
   }
 
-  MPT_Annot_pt annot2 = MPT_FindAnnot(node, MP_ProtoDict, MP_AnnotProtoPrototype);
+  MPT_Annot_pt 
+    annot2 = MPT_Annot(node, MP_ProtoDict, MP_AnnotProtoPrototype);
 
   if (annot2 == NULL ||
       ! NodeCheck(annot2->value->node, MP_CommonMetaType, MP_ProtoDict,
@@ -934,7 +944,7 @@ static mpsr_Status_t GetSimpleOrdering(MPT_Node_pt node, ring r, short i)
 
 static mpsr_Status_t GetDefRelsAnnot(MPT_Node_pt node, ring r)
 {
-  MPT_Annot_pt annot = MPT_FindAnnot(node, MP_PolyDict, MP_AnnotPolyDefRel);
+  MPT_Annot_pt annot = MPT_Annot(node, MP_PolyDict, MP_AnnotPolyDefRel);
   mpsr_leftv mlv;
   leftv lv;
   ring r1;

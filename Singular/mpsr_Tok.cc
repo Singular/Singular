@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Tok.cc,v 1.19 1998-10-21 10:25:50 krueger Exp $ */
+/* $Id: mpsr_Tok.cc,v 1.20 1998-11-09 15:43:05 obachman Exp $ */
 
 /***************************************************************
  *
@@ -109,62 +109,48 @@ mpsr_Status_t mpsr_mp2tok(MP_DictTag_t dict, MP_Common_t cop, short *o_tok)
 
 
 #define MAX_ORD ringorder_unspec
-// the following assume that the ringorders are defiend as follows:
-// enum
-// {
-//   ringorder_no = 0,
-//   ringorder_a,
-//   ringorder_c,
-//   ringorder_C,
-//   ringorder_M,
-//   ringorder_lp,
-//   ringorder_dp,
-//   ringorder_Dp,
-//   ringorder_wp,
-//   ringorder_Wp,
-//   ringorder_ls,
-//   ringorder_ds,
-//   ringorder_Ds,
-//   ringorder_ws,
-//   ringorder_Ws,
-//   ringorder_unspec
-// };
 
-static MP_Common_t ord2mp[] =
+static struct 
 {
-  MP_CcPolyOrdering_No,
-  MP_CcPolyOrdering_a,
-  MP_CcPolyOrdering_c,
-  MP_CcPolyOrdering_C,
-  MP_CcPolyOrdering_M,
-  MP_CcPolyOrdering_lp,
-  MP_CcPolyOrdering_Dp,
-  MP_CcPolyOrdering_wp,
-  MP_CcPolyOrdering_Wp,
-  MP_CcPolyOrdering_ls,
-  MP_CcPolyOrdering_ds,
-  MP_CcPolyOrdering_Ds,
-  MP_CcPolyOrdering_ws,
-  MP_CcPolyOrdering_Ws,
-  MP_CcPolyOrdering_Unspec
+  int sing_ord;
+  int mp_ord;
+} sing_mp_ord[] =
+{
+  {ringorder_no,    MP_CcPolyOrdering_Unknown},
+  {ringorder_a,     MP_CcPolyOrdering_Vector},
+  {ringorder_c,     MP_CcPolyOrdering_IncComp},
+  {ringorder_C,     MP_CcPolyOrdering_DecComp},
+  {ringorder_M,     MP_CcPolyOrdering_Matrix},
+  {ringorder_lp,    MP_CcPolyOrdering_Lex},
+  {ringorder_dp,    MP_CcPolyOrdering_DegRevLex},
+  {ringorder_Dp,    MP_CcPolyOrdering_DegLex},
+  {ringorder_wp,    MP_CcPolyOrdering_RevLex},
+  {ringorder_Wp,    MP_CcPolyOrdering_Lex},
+  {ringorder_ls,    MP_CcPolyOrdering_NegLex},
+  {ringorder_ds,    MP_CcPolyOrdering_NegDegRevLex},
+  {ringorder_Ds,    MP_CcPolyOrdering_NegDegLex},
+  {ringorder_ws,    MP_CcPolyOrdering_NegRevLex},
+  {ringorder_Ws,    MP_CcPolyOrdering_NegLex},
+  {ringorder_unspec, MP_CcPolyOrdering_Unknown}
 };
-
-
+  
 MP_Common_t mpsr_ord2mp(int sr_ord)
 {
-  if (sr_ord > 0 && sr_ord < MAX_ORD)
-    return ord2mp[sr_ord];
-
-  return MP_CcPolyOrdering_Unspec;
+  int or = ringorder_no;
+  
+  while (sing_mp_ord[or].sing_ord != sr_ord && 
+         sing_mp_ord[or].sing_ord <= ringorder_unspec) or++;
+  
+  return sing_mp_ord[or].mp_ord;
 }
 
 short mpsr_mp2ord(MP_Common_t mp_ord)
 {
-  int i;
-  for (i=0; i< MAX_ORD; i++)
-    if (ord2mp[i] == mp_ord) return i;
-
-  return ringorder_unspec;
+  int or = ringorder_no;
+  
+  while (sing_mp_ord[or].mp_ord != mp_ord &&
+         sing_mp_ord[or].sing_ord <= ringorder_unspec) or++;
+  return sing_mp_ord[or].sing_ord;
 }
 
 

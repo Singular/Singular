@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr.h,v 1.11 1998-06-03 10:04:23 obachman Exp $ */
+/* $Id: mpsr.h,v 1.12 1998-11-09 15:43:02 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr.h
@@ -20,9 +20,9 @@
 extern "C"
 {
 #include"MP.h"
-#include"MPT.h"
 }
 
+#include"MPT.h"
 #include"structs.h"
 #include"mmemory.h"
 #include"ipid.h"

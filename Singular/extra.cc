@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.72 1998-10-29 13:15:18 Singular Exp $ */
+/* $Id: extra.cc,v 1.73 1998-11-09 15:43:01 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -387,6 +387,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 #ifdef HAVE_NEWTON
 #include <hc_newton.h>
 #endif
+#include "mpsr.h"
+
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 {
   if(h->Typ() == STRING_CMD)
@@ -915,6 +917,40 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
+/*==================== gp =================*/
+     if (strcmp(sys_cmd, "gp") == 0)
+    {
+      if (h->Typ() != LINK_CMD)
+      {
+        WerrorS("No Link arg");
+        return FALSE;
+      }
+      si_link l = (si_link) h->Data();
+      if (strcmp(l->m->type, "MPfile") != 0)
+      {
+        WerrorS("No MPfile link");
+        return TRUE;
+      }
+      if( ! SI_LINK_R_OPEN_P(l)) // open r ?
+      {
+        if (slOpen(l, SI_LINK_READ)) return TRUE;
+      }
+      
+      MP_Link_pt link = (MP_Link_pt) l->data;
+      if (MP_InitMsg(link) != MP_Success) 
+      {
+        WerrorS("Can not Init");
+      }
+      MPT_Tree_pt tree = NULL;
+      if (MPT_GetTree(link, &tree) != MPT_Success)
+      {
+        WerrorS("Can not get tree");
+        return TRUE;
+      }
+      MPT_DeleteTree(tree);
+      return FALSE;
+    }
+    else
 /*==================== print all option values =================*/
 #ifndef NDEBUG
     if (strcmp(sys_cmd, "options") == 0)
