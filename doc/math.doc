@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.62 2001-01-22 12:05:09 mschulze Exp $
+@comment $Id: math.doc,v 1.63 2001-01-22 12:08:46 mschulze Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -493,7 +493,7 @@ Using the library @code{gaussman.lib} one can compute the @strong{monodromy}, th
 Let us consider as an example @math{f=x^5+x^2y^2+y^5}.
 First, we compute a matrix @math{M} such that
 @tex
-\exp(2\pi iM)
+$\exp(2\pi iM)$
 @end tex
 @ifinfo
 exp(-2*pi*i*M)
@@ -524,7 +524,7 @@ Now, we compute the V-fitration on @math{H''/H'} and the spectrum:
 @end smallexample
 Here @code{l[1]} contains the spectral numbers, @code{l[2]} the corresponding multiplicities, @code{l[3]} a @math{C}-basis of the V-filtration on @math{H''/H'} in terms of the monomial basis of
 @tex
-O/J_f\cong H''/H'
+$O/J_f\cong H''/H'$
 @end tex
 @ifinfo
 O/J_f~=H''/H' 
