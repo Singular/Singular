@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_unix.texi,v 1.1 1999-11-26 17:45:49 obachman Exp $
+@comment $Id: INSTALL_unix.texi,v 1.2 1999-11-26 18:03:25 obachman Exp $
 @comment this file contains the installation instruction for Singular on 
 @comment Unix
 @include version.texi
@@ -155,21 +155,20 @@ so that the @code{$PATH} variable is set automatically each time you login.
 soft-links instead. 
 
 @item
-If you wish to enable any of following features of
-@sc{Singular}, make sure that the respective programs (or,
-shared libraries) are installed on your system:
+If you wish to use any of following features of
+@sc{Singular}, make sure that the respective programs are installed on your system:
 
 @multitable @columnfractions .5 .5
 @item @strong{Feature} @tab @strong{Requires}
 @item running @code{ESingular}, or @code{Singular} within Emacs
-@tab @uref{www.fsf.org/software/emacs/emacs.html,Emacs} version
-20 or higher, or, @uref{www.xemacs.org,Xemacs} version 20 or
+@tab @uref{http://www.fsf.org/software/emacs/emacs.html,Emacs} version
+20 or higher, or, @uref{http://www.xemacs.org,Xemacs} version 20 or
 higher
 @item on-line @code{html} help
-@tab @uref{www.netscape.com, netscape} browser
+@tab @uref{http://www.netscape.com, netscape} browser
 @item on-line @code{info} help
-@tab @uref{www.texinfo.org, info}, or
-@uref{math-www.uni-paderborn.de/~axel/tkinfo/, tkinfo} texinfo browser programs
+@tab @uref{http://www.texinfo.org, info}, or
+@uref{http://math-www.uni-paderborn.de/~axel/tkinfo/, tkinfo} texinfo browser programs
 @item TAB completion and history mechanism of ASCII-terminal interface
 @tab shared @uref{ftp://ftp.de.uu.net/pub/gnu/readline/, readline}
 library, i.e. @code{/usr/lib/libreadline.so}
