@@ -1812,7 +1812,7 @@ static void do_this_spoly_stuff(int i,int j,calc_dat* c){
   }
 }
 //try to fill, return FALSE iff queue is empty
-static void simplify(monom_poly h, calc_dat* c){
+static void simplify(monom_poly& h, calc_dat* c){
   mp_array_list* F=c->F;
   poly_array_list* F_minus=c->F_minus;
   while(F)
@@ -1872,15 +1872,18 @@ tgb_matrix::~tgb_matrix(){
   int z;
   for(z=0;z<rows;z++)
   {
-    if(free_numbers)
+    if(n[z])
     {
-      int z2;
-      for(z2=0;z2<columns;z2++)
+      if(free_numbers)
       {
-	nDelete(&(n[z][z2]));
+	int z2;
+	for(z2=0;z2<columns;z2++)
+	{
+	  nDelete(&(n[z][z2]));
+	}
       }
+      omfree(n[z]);
     }
-    omfree(n[z]);
   }
   omfree(n);
 }
@@ -1911,9 +1914,18 @@ void tgb_matrix::perm_rows(int i, int j){
   n[i]=n[j];
   n[j]=h;
 }
-BOOLEAN tgb_matrix::min_col_not_zero_in_row(int row){
+int tgb_matrix::min_col_not_zero_in_row(int row){
   int i;
   for(i=0;i<columns;i++)
+  {
+    if(!(nIsZero(n[row][i])))
+      return i;
+  }
+  return columns;//error code
+}
+int tgb_matrix::next_col_not_zero(int row,int pre){
+  int i;
+  for(i=pre+1;i<columns;i++)
   {
     if(!(nIsZero(n[row][i])))
       return i;
@@ -1963,6 +1975,14 @@ void tgb_matrix::mult_row(int row,number factor){
       nDelete(&n1);
     }
   }
+}
+void tgb_matrix::free_row(int row, BOOLEAN free_non_zeros){
+  int i;
+  for(i=0;i<columns;i++)
+    if((free_non_zeros)||(nIsZero(n[row][i])))
+      nDelete(&(n[row][i]));
+  omfree(n[row]);
+  n[row]=NULL;
 }
 void simple_gauss(tgb_matrix* mat){
   int col, row;
@@ -2069,6 +2089,53 @@ static tgb_matrix* build_matrix(poly* p,int p_index,poly* done, int done_index, 
     }
   }
   return t;
+}
+
+//returns m_index and destroys mat
+static int retranslate(poly* m,tgb_matrix* mat,poly* done, calc_dat* c){
+  int i;
+  int m_index=0;
+  for(i=0;i<mat->get_rows();i++)
+  {
+    if(mat->zero_row(i))
+    {
+      mat->free_row(i);
+      continue;
+    }
+    
+    m[m_index]=pInit();
+    int v=mat->min_col_not_zero_in_row(i);
+    //v=done_index-1-pos; => pos=done_index-1-v=mat->get_columns()-1-v
+    int pos=mat->get_columns()-1-v;
+    int* ev=(int*) omalloc((c->r->N+1)*sizeof(int));
+    pGetExpV(done[pos],ev);
+    pSetExpV(m[m_index],ev);
+    omfree(ev);
+    
+    poly p=m[m_index];
+    pSetCoeff(p,mat->get(i,v));
+    while((v=mat->next_col_not_zero(i,v))!=mat->get_columns())
+    {
+      poly pn=pInit();
+      
+      //v=done_index-1-pos; => pos=done_index-1-v=mat->get_columns()-1-v
+      pos=mat->get_columns()-1-v;
+      ev=(int*) omalloc((c->r->N+1)*sizeof(int));
+      pGetExpV(done[pos],ev);
+      pSetExpV(pn,ev);
+      omfree(ev);
+      pSetCoeff(pn,mat->get(i,v));
+      p->next=pn;
+      p=pn;
+    }
+    p->next=NULL;
+    mat->free_row(i, FALSE);
+    m_index++;
+  }
+
+  delete mat;
+  return m_index;
+
 }
 static void go_on_F4 (calc_dat* c){
   //set limit of 1000 for multireductions, at the moment for
@@ -2334,9 +2401,17 @@ static void go_on_F4 (calc_dat* c){
   tgb_matrix* mat=build_matrix(p,p_index,done, done_index,c);
 
   //next Step Gauss
+  simple_gauss(mat);
+  //next Step retranslate
 
-  //next Step addElements to basis
- 
+  assume(mat->get_rows()<=p_index);
+  //new meaning of m
+  m_size=mat->get_rows();
+  m=(poly*) omalloc(m_size*sizeof(poly));
+  m_index=retranslate(m,mat,done,c);
+  mat=NULL;
+  //next Step addElements to basis 
+  
 //  pre_comp(p,i,c);
   if(i==0){
     omfree(p);
@@ -2534,7 +2609,10 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
 
   while(c->pair_top>=0)
   {
-    go_on(c);
+    if(F4_mode)
+      go_on_F4(c);
+    else
+      go_on(c);
   }
   while(c->to_destroy)
   {

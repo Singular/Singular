@@ -112,7 +112,9 @@ class tgb_matrix{
   void set(int i, int j, number n);
   number get(int i, int j);
   BOOLEAN is_zero_entry(int i, int j);
-  BOOLEAN min_col_not_zero_in_row(int row);
+  void free_row(int row, BOOLEAN free_non_zeros=TRUE);
+  int min_col_not_zero_in_row(int row);
+  int next_col_not_zero(int row,int pre);
   BOOLEAN zero_row(int row);
   void mult_row(int row,number factor);
   void add_lambda_times_row(int add_to,int summand,number factor);
