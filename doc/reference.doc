@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.77 1998-05-24 15:50:29 obachman Exp $
+@comment $Id: reference.doc,v 1.78 1998-05-25 07:53:09 schmidt Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4672,7 +4672,7 @@ See @ref{betti}; @ref{ideal}; @ref{int};
 string
 @item @strong{Syntax:}
 @code{status (} link_expression@code{,} string_expression@code{,} string_expression @code{)}
-@code{status (} link_expression@code{,} string_expression@code{,} string_expression @code{,} int_expression @code{)}
+@*@code{status (} link_expression@code{,} string_expression@code{,} string_expression @code{,} int_expression @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
