@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.85 1998-05-19 08:55:21 wichmann Exp $
+@comment $Id: general.doc,v 1.86 1998-05-19 14:05:49 wichmann Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -171,7 +171,7 @@ to the manual or @code{CTRL-X 0} to remove extra window)
 @item @code{s}
 searches through the manual for a specified string, and select the node in
 which the next occurrence is found
-@item @code{1}, @dots, @code{9}
+@item @code{1}, @dots{}, @code{9}
 picks i-th subtopic from a menu
 @end table
 
@@ -260,7 +260,7 @@ options control the general behaviour of @sc{Singular}:
 
 @item @code{-e}, @code{--echo[=VAL]}
 Set value of variable @code{echo} to @code{VAL} (integer in the range
-0, @dots, 9). Without an argument, @code{echo} is set to 1, which echoes
+0, @dots{}, 9). Without an argument, @code{echo} is set to 1, which echoes
 all input coming from a file. By default, the value of @code{echo} is
 0. @xref{echo}.
 
