@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: fegetopt.c,v 1.2 1999-09-22 10:19:04 Singular Exp $ */
+/* $Id: fegetopt.c,v 1.3 1999-09-22 15:42:13 Singular Exp $ */
 
 /* Getopt for GNU.
    NOTE: getopt is now part of the C library, so if you don't know what
@@ -305,9 +305,8 @@ static void exchange (char **argv)
    or is an exact match for some defined option.  If they have an
    argument, it follows the option name in the same ARGV-element, separated
    from the option name by a `=', or else the in next ARGV-element.
-   When `getopt' finds a long-named option, it returns 0 if that option's
-   `flag' field is nonzero, the value of the option's `val' field
-   if the `flag' field is zero.
+   When `getopt' finds a long-named option, it returns
+   the value of the option's `val' field.
 
    The elements of ARGV aren't really const, because we permute them.
    But we pretend they're const in the prototype to be compatible
@@ -540,11 +539,6 @@ int _fe_getopt_internal (
           nextchar += my_strlen (nextchar);
           if (longind != NULL)
             *longind = option_index;
-          if (pfound->flag)
-            {
-              *(pfound->flag) = pfound->val;
-              return 0;
-            }
           return pfound->val;
         }
       /* Can't find it as a long option.  If this is not getopt_long_only,

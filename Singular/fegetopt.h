@@ -68,16 +68,11 @@ extern int fe_optopt;
    required_argument        (or 1) if the option requires an argument,
    optional_argument         (or 2) if the option takes an optional argument.
 
-   If the field `flag' is not NULL, it points to a variable that is set
-   to the value given in the field `val' when the option is found, but
-   left unchanged if the option is not found.
-
    To have a long-named option do something other than set an `int' to
    a compiled-in constant, such as set a value from `optarg', set the
-   option's `flag' field to zero and its `val' field to a nonzero
-   value (the equivalent single-letter option character, if there is
-   one).  For long options that have a zero `flag' field, `getopt'
-   returns the contents of the `val' field.  */
+   `val' field to a nonzero value (the equivalent single-letter option
+   character, if there is one).
+   For long options `getopt' returns the contents of the `val' field.  */
 
 typedef enum {feOptUntyped, feOptBool, feOptInt, feOptString} feOptType;
 struct fe_option
@@ -90,7 +85,6 @@ struct fe_option
   /* has_arg can't be an enum because some compilers complain about
      type mismatches in all the code that assumes it is an int.  */
   int has_arg;
-  int *flag;
   int val;
   /* Stuff added for Singular  */
   const char*   arg_name;// name of argument, for display in help
