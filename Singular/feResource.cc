@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.11 1999-09-20 18:03:45 obachman Exp $ */
+/* $Id: feResource.cc,v 1.12 1999-09-21 16:40:15 obachman Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -348,7 +348,7 @@ static char* feInitResource(feResourceConfig config, int warn)
   if (warn > 0 || (warn < 0 && config->value != NULL))
   {
     Warn("Could not get %s. ", config->key);
-    Warn("Either set environment variable %s to the location of %s ", 
+    Warn("Either set environment variable %s to %s,", 
          config->env, config->key);
     feSprintf(value, config->fmt, warn);
     Warn("or make sure that %s is at %s", config->key, value);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.cc,v 1.3 1999-09-21 14:44:57 obachman Exp $ */
+/* $Id: feOpt.cc,v 1.4 1999-09-21 16:40:14 obachman Exp $ */
 /*
 * ABSTRACT: Implementation of option buisness
 */
@@ -46,8 +46,9 @@ struct fe_option feOptSpec[] =
 //      
 //        help  one-line description of option
 //
-//        type  one of feOptBool, feOptInt, feOptString
-//
+//        type  one of feOptUntyped (value is never set), 
+//                     feOptBool, feOptInt, feOptString
+//                     
 //        value (default) value of option
 //         
 //       set   only relevant for feOptString: 
@@ -93,7 +94,7 @@ struct fe_option feOptSpec[] =
    "VAL",       "Set value of variable `echo' to (integer) VAL",        feOptInt,    0,      0},
    
   {"help",              no_argument,  0,  'h',
-   0,          "Print help message and exit",                          feOptBool,    0,      0},
+   0,          "Print help message and exit",                          feOptUntyped,    0,      0},
 
   {"quiet",             no_argument,  0,  'q',
    0,          "Do not print start-up banner and lib load messages",   feOptBool,    0,      0},
@@ -108,7 +109,7 @@ struct fe_option feOptSpec[] =
    "STRING",   "Return STRING on `system(\"--user-option\")'",         feOptString, 0,   0},
 
   {"version",           no_argument,  0,  'v',
-   0,          "Print extended version and configuration info",        feOptBool,    0,      0},
+   0,          "Print extended version and configuration info",        feOptUntyped,    0,      0},
 
 #ifdef HAVE_TCL
   {"tclmode",           no_argument,  0,  'x',
@@ -285,31 +286,33 @@ char* feSetOptValue(feOptIndex opt, char* optarg)
 {
   if (opt == FE_OPT_UNDEF) return "option undefined";
   
-  if (feOptSpec[opt].type != feOptString)
+  if (feOptSpec[opt].type != feOptUntyped)
   {
-    if (optarg != NULL)
+    if (feOptSpec[opt].type != feOptString)
     {
-      errno = 0;
-      feOptSpec[opt].value = (void*) strtol(optarg, NULL, 10);
-      if (errno) return "invalid integer argument";
+      if (optarg != NULL)
+      {
+        errno = 0;
+        feOptSpec[opt].value = (void*) strtol(optarg, NULL, 10);
+        if (errno) return "invalid integer argument";
+      }
+      else
+      {
+        feOptSpec[opt].value = (void*) 0;
+      }
     }
     else
     {
-      feOptSpec[opt].value = (void*) 0;
+      assume(feOptSpec[opt].type == feOptString);
+      if (feOptSpec[opt].set && feOptSpec[opt].value != NULL)
+        FreeL(feOptSpec[opt].value);
+      if (optarg != NULL)
+        feOptSpec[opt].value = mstrdup(optarg);
+      else
+        feOptSpec[opt].value = NULL;
+      feOptSpec[opt].set = 1;
     }
   }
-  else
-  {
-    assume(feOptSpec[opt].type == feOptString);
-    if (feOptSpec[opt].set && feOptSpec[opt].value != NULL)
-      FreeL(feOptSpec[opt].value);
-    if (optarg != NULL)
-      feOptSpec[opt].value = mstrdup(optarg);
-    else
-      feOptSpec[opt].value = NULL;
-    feOptSpec[opt].set = 1;
-  }
-  
   return feOptAction(opt);
 }
 
@@ -317,10 +320,13 @@ char* feSetOptValue(feOptIndex opt, int optarg)
 {
   if (opt == FE_OPT_UNDEF) return "option undefined";
   
-  if (feOptSpec[opt].type == feOptString)
-    return "option value needs to be a string";
+  if (feOptSpec[opt].type != feOptUntyped)
+  {
+    if (feOptSpec[opt].type == feOptString)
+      return "option value needs to be an integer";
   
-  feOptSpec[opt].value = (void*) optarg;
+    feOptSpec[opt].value = (void*) optarg;
+  }
   return feOptAction(opt);
 }
 
@@ -331,7 +337,8 @@ static char* feOptAction(feOptIndex opt)
   {
 #ifdef HAVE_MPSR
       case FE_OPT_BATCH:
-        fe_fgets_stdin=fe_fgets_dummy;
+        if (feOptSpec[FE_OPT_BATCH].value)
+          fe_fgets_stdin=fe_fgets_dummy;
         return NULL;
 #endif
 
@@ -340,17 +347,24 @@ static char* feOptAction(feOptIndex opt)
         return NULL;
 
       case FE_OPT_QUIET:
-        verbose &= ~(Sy_bit(0)|Sy_bit(V_LOAD_LIB));
+        if (feOptSpec[FE_OPT_QUIET].value)
+          verbose &= ~(Sy_bit(0)|Sy_bit(V_LOAD_LIB));
+        else
+          verbose |= Sy_bit(V_LOAD_LIB)|Sy_bit(0);
         return NULL;
 
       case FE_OPT_NO_TTY:
 #if defined(HAVE_FEREAD) || defined(HAVE_READLINE)
-        fe_fgets_stdin=fe_fgets;
+        if (feOptSpec[FE_OPT_NO_TTY].value)
+          fe_fgets_stdin=fe_fgets;
 #endif
         return NULL;
 
       case FE_OPT_SDB:
-        sdb_flags = 1;
+        if (feOptSpec[FE_OPT_SDB].value)
+          sdb_flags = 1;
+        else
+          sdb_flags = 0;
         return NULL;
 
       case FE_OPT_VERSION:
@@ -364,20 +378,23 @@ static char* feOptAction(feOptIndex opt)
 
 #ifdef HAVE_TCL
       case FE_OPT_TCLMODE:
-        tclmode = TRUE;
-        fe_fgets_stdin=fe_fgets_tcl;
-        verbose|=Sy_bit(V_SHOW_MEM);
+        if (feOptSpec[FE_OPT_TCLMODE].value)
+        {
+          tclmode = TRUE;
+          fe_fgets_stdin=fe_fgets_tcl;
+          verbose|=Sy_bit(V_SHOW_MEM);
+        }
         return NULL;
 #endif
 
       case FE_OPT_ECHO:
-        si_echo = (int) feOptSpec[opt].value;
+        si_echo = (int) feOptSpec[FE_OPT_ECHO].value;
         if (si_echo < 0 || si_echo > 9)
           return "argument of option is not in valid range 0..9";
         return NULL;
         
-      case 'r':
-        siRandomStart = (unsigned int) feOptSpec[opt].value;
+      case FE_OPT_RANDOM:
+        siRandomStart = (unsigned int) feOptSpec[FE_OPT_RANDOM].value;
 #ifdef buildin_rand
         siSeed=siRandomStart;
 #else
@@ -389,20 +406,29 @@ static char* feOptAction(feOptIndex opt)
         return NULL;
 
       case FE_OPT_EMACS:
-        // print EmacsDir and InfoFile so that Emacs
-        // mode can pcik it up
-        Warn("EmacsDir: %s", (feResource('e' /*"EmacsDir"*/) != NULL ?
-                              feResource('e' /*"EmacsDir"*/) : ""));
-        Warn("InfoFile: %s", (feResource('i' /*"InfoFile"*/) != NULL ?
-                              feResource('i' /*"InfoFile"*/) : ""));
+        if (feOptSpec[FE_OPT_EMACS].value)
+        {
+          // print EmacsDir and InfoFile so that Emacs
+          // mode can pcik it up
+          Warn("EmacsDir: %s", (feResource('e' /*"EmacsDir"*/) != NULL ?
+                                feResource('e' /*"EmacsDir"*/) : ""));
+          Warn("InfoFile: %s", (feResource('i' /*"InfoFile"*/) != NULL ?
+                                feResource('i' /*"InfoFile"*/) : ""));
+        }
         return NULL;
 
       case FE_OPT_NO_WARN:
-        feWarn = FALSE;
+        if (feOptSpec[FE_OPT_NO_WARN].value)
+          feWarn = FALSE;
+        else
+          feWarn = TRUE;
         return NULL;
         
       case FE_OPT_NO_OUT:
-        feOut = FALSE;
+        if (feOptSpec[FE_OPT_NO_OUT].value)
+          feOut = FALSE;
+        else
+          feOut = TRUE;
         return NULL;
 
       case FE_OPT_MIN_TIME:
@@ -418,12 +444,13 @@ static char* feOptAction(feOptIndex opt)
 
       case FE_OPT_TICKS_PER_SEC:
       {
-        int ticks = (int) feOptSpec[opt].value;
+        int ticks = (int) feOptSpec[FE_OPT_TICKS_PER_SEC].value;
         if (ticks <= 0)
           return "integer argument must be larger than 0";
         SetTimerResolution(ticks);
         return NULL;
       }
+
       default:
         return NULL;
   }
@@ -436,7 +463,7 @@ void fePrintOptValues()
 
   while (feOptSpec[i].name != 0)
   {
-    if (feOptSpec[i].help != NULL
+    if (feOptSpec[i].help != NULL && feOptSpec[i].type != feOptUntyped
 #ifndef NDEBUG
         && *(feOptSpec[i].help) != '/'
 #endif

@@ -79,7 +79,7 @@ extern int fe_optopt;
    one).  For long options that have a zero `flag' field, `getopt'
    returns the contents of the `val' field.  */
 
-typedef enum {feOptBool=0, feOptInt, feOptString} feOptType;
+typedef enum {feOptUntyped, feOptBool, feOptInt, feOptString} feOptType;
 struct fe_option
 {
 #if        __STDC__

@@ -665,7 +665,12 @@ static void heBrowserHelp(heEntry hentry)
   if (! feHelpCalled)
   {
     Warn("Displaying help in browser '%s'.", heCurrentHelpBrowser->browser);
-    Warn("Use 'system(\"--browser\", <browser>);' to change browser");
+    if (strcmp(heCurrentHelpBrowser->browser, "netscape") == 0 &&
+        feResource('h', 0) == NULL)
+    {
+      Warn("Using URL '%s'.", feResource('u', 0));
+    }
+    Warn("Use 'system(\"--browser\", <browser>);' to change browser,");
     char* browsers = StringSetS("where <browser> can be: ");
     int i = 0;
     i = 0;
@@ -737,12 +742,14 @@ static BOOLEAN heNetscapeInit(int warn)
     return FALSE;
   }
 
-  if (feResource('h' /*"HtmlDir"*/, warn) == NULL)
+  
+  if (feResource('h' /*"HtmlDir"*/, (feOptValue(FE_OPT_ALLOW_NET)? 0 : warn)) 
+      == NULL)
   {
-    if (warn) WarnS("no local HtmlDir found");
+    if (warn) WarnS("No local HtmlDir found.");
     if (feOptValue(FE_OPT_ALLOW_NET))
     {
-      if (warn) Warn("using URL %s instead", feResource('u' /*"ManualUrl"*/, warn));
+      if (warn) Warn("Using URL '%s' instead.", feResource('u' /*"ManualUrl"*/, warn));
     }
     else
       return FALSE;

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.104 1999-09-20 18:03:43 obachman Exp $ */
+/* $Id: extra.cc,v 1.105 1999-09-21 16:40:13 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -329,6 +329,14 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         Werror("Unknown option %s", sys_cmd);
         Werror("Use 'system(\"--\");' for listing of available options");
         return TRUE;
+      }
+      
+      // for Untyped Options (help version), 
+      // setting it just triggers action
+      if (feOptSpec[opt].type == feOptUntyped)
+      {
+        feSetOptValue(opt,NULL);
+        return FALSE;
       }
       
       if (h == NULL)
