@@ -62,6 +62,7 @@ int init_modgen(
   );
 
 extern int yyparse (void);
+extern void init_type_conv();
 
 main( int argc, char *argv[] )
 {
@@ -76,16 +77,20 @@ main( int argc, char *argv[] )
   }
   
   if(init_modgen(&module_def, argv[1])) return 1;
+  init_type_conv();
   do {
       i=yyparse();
       if(i)printf("NEXT LOOP at line %d (%s) %d\n", yylineno, yytext, i);
+      else printf("FINISH? (%d)\n", i);
   }
-  while (i);
+  while (!i);
   printf("ENDE\n");
   
   //fflush(module_def.fmtfp);
   //PrintProclist(&module_def);
   //generate_mod(&module_def, 2);
   //mod_create_makefile(&module_def);
-  fclose(module_def.fmtfp);
+  if(module_def.fmtfp != NULL) fclose(module_def.fmtfp);
+  if(module_def.modfp != NULL) fclose(module_def.modfp);
+  if(module_def.modfp_h != NULL) fclose(module_def.modfp_h);
 }

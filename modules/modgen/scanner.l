@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.1 1999-11-23 21:30:22 krueger Exp $ */
+/* $Id: scanner.l,v 1.2 1999-12-21 12:15:42 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -12,7 +12,7 @@
 #include "stype.h"
 #include "grammar.h"
 
-/*#define DEBUG 1*/
+/* #define DEBUG 2 */
  
 #  define YYLP_ERR_NONE    0
 #  define YYLP_DEF_BR2     1
@@ -158,7 +158,9 @@ FILENAME       ([[:alpha:]_][[:alnum:]_-]*\.(c|cc|h))
         "\""    { do_return++; push_state(YYSTATE, STRING, "string"); }
         ^"%%".* {
 		  sectnum = 2;
+#if DEBUG
                   printf("Goto section %d\n", sectnum);
+#endif
                   push_state(YYSTATE, SECT2, "SECT2");
                   /*line_directive_out( (FILE *) 0, 1 );*/
                   return SECTEND;
@@ -226,7 +228,9 @@ FILENAME       ([[:alpha:]_][[:alnum:]_-]*\.(c|cc|h))
 <SECT2>{
         ^"%%".* {
 	          sectnum = 3;
+#if DEBUG
                   printf("Goto section %d\n", sectnum);
+#endif
                   switch_state(YYSTATE, SECT3, "SECT3");
 		  /*yyterminate();*/
                   /*line_directive_out( (FILE *) 0, 1 );*/
@@ -244,16 +248,18 @@ FILENAME       ([[:alpha:]_][[:alnum:]_-]*\.(c|cc|h))
 	          push_state(YYSTATE, PROCDECL, "PROCDECL");
 		  return PROCDECLTOK;
                 }
-        .       { printf("'%s' ", yytext); }
+        .       { printf("<<<'%s' ", yytext); }
 
        }
 
 <SECT3>{
         {NL}    { yylineno++; }
-        .*(\n?)         ECHO;
+        .*(\n?) { lvalp->name = yytext; return CODEPART; }
+
         <<EOF>>  { sectnum = 0; printf("XXXX\n"); 
 	           return SECT3END;
-                   /*yyterminate();*/ }
+                   /*yyterminate();*/
+                 }
        }
 
 <PROCDECL>{
@@ -261,16 +267,31 @@ FILENAME       ([[:alpha:]_][[:alnum:]_-]*\.(c|cc|h))
 		   switch_state(YYSTATE, CODEBLOCK2, "CODEBLOCK2");
 		   return '{';
 		 }
+         "\""    { do_return++; push_state(YYSTATE, STRING, "string"); yymore();}
 	 {NAME}  { 
 	           int i,tok;
+#if DEBUG > 1
 	           printf("VAR: %s\n", yytext);
-	           lvalp->name = strdup(yytext);
-		   i = IsCmd(lvalp->name, tok);
-		   printf("Res=%d, %d\n", i, tok);
-		   if(i) return VARTYPETOK;
-		   else return NAME;
+#endif
+		   i = IsCmd(yytext, tok);
+#if DEBUG > 1
+		   printf("Res=%d, %d => %s\n", i, tok,
+			  i ? "VARTYPETOK" : "NAME");
+#endif
+		   if(i) {
+		     lvalp->tp.name = strdup(yytext);
+		     lvalp->tp.typ = tok;
+		     return VARTYPETOK;
+		   }
+		   else {
+		     lvalp->name = strdup(yytext);
+		     return NAME;
+		   }
                  }
          {NL}    { yylineno++; }
+	 "("     { return '('; }
+	 ")"     { return ')'; }
+	 ","     { return ','; }
          .       { }
 
        }
@@ -284,7 +305,7 @@ FILENAME       ([[:alpha:]_][[:alnum:]_-]*\.(c|cc|h))
                    if(brace1<=0) {
                      char * s, *t;
 
-                     yylineno++;
+                     /*yylineno++;*/
 		     pop_state();
 		     s = t = lvalp->name = dupyytext();
 		     while (*yytext)
@@ -293,9 +314,10 @@ FILENAME       ([[:alpha:]_][[:alnum:]_-]*\.(c|cc|h))
 		       *s++ = *yytext++;
 		     }
 		     if(s-t>2 && *(s-1)=='}' && *(s-2)=='%') *(s-2)='\0';
+#if DEBUG > 1
                    printf("BRACE DOWN=%d\n", brace1);
+#endif
 		     return MCODETOK;
-                     return PROCEND;
                    } else yymore();
                  }
          {NL}    { yylineno++; yymore(); }
@@ -306,7 +328,7 @@ FILENAME       ([[:alpha:]_][[:alnum:]_-]*\.(c|cc|h))
 
 extern "C" {
   int yywrap() {
-    /*printf("yywrap()\n");*/
+    printf("===================== yywrap() =====================\n");
     return 1;
   }
 }
@@ -325,7 +347,7 @@ int libread(FILE* f, char* buf, int max_size)
 
 void switch_state(int state, int new_state, char *name)
 {
-#if DEBUG
+#if DEBUG > 2
   printf("====>SWITCH to new state %d/%d l=%d, [%s] at %d\n",
          state, new_state, state_level, name, yylineno);
 #endif
@@ -337,7 +359,7 @@ void switch_state(int state, int new_state, char *name)
 void push_state(int state, int new_state, char *name)
 {
   state_level++;
-#if DEBUG
+#if DEBUG > 2
   printf("====>PUSH to new state %d/%d l=%d, [%s] at %d\n",
          state, new_state, state_level, name, yylineno);
 #endif
@@ -358,7 +380,7 @@ void push_state(int state, int new_state, char *name)
 
 void pop_state()
 {
-#if DEBUG
+#if DEBUG > 2
   printf("====>Back to old state %d, l=%d [%s] at %d\n",
          old_states[state_level].state,
          state_level,

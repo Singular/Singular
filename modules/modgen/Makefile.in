@@ -33,7 +33,7 @@ CFLAGS	+= -g -I../include -I../../Singular -DNDEBUG -DMODULE_GENERATOR \
 LIBS	+= -L/usr/local/lib -lgmp
 
 OBJS	= main.o grammar.o scanner.o misc.o makefile.o utils.o \
-	creat_top.o
+	creat_top.o proc.o
 
 #	iparith.o febase.o \
 #	mmalloc.o mmallocb.o mminit.o mmutil.o mmblock.o mmspec.o
@@ -67,8 +67,13 @@ scanner.cc: scanner.l grammar.h modgen.h
 #	flex -Pyymod -oscanner.cc scanner.l
 
 clean:
-	rm -f a.out *~ scanner.cc *.o core modgen
+	rm -f scanner.cc *.o core modgen
 	rm -f pathnames.h
+
+distclean: clean
+	rm -f a.out *~ 
+	rm -f grammar.cc grammar.h decl.inc 
+#	rm -f Makefile
 
 install: modgen
 	${MKINSTALLDIRS} ${bindir}
@@ -109,7 +114,7 @@ decl.inc: ../../Singular/grammar.h ../../Singular/tok.h
 	mv grammar.cc.h grammar.h
 
 makefile.cc:	pathnames.h
-misc.cc:	modgen.h
+misc.cc:	modgen.h decl.inc
 utils.cc:	modgen.h
 grammar.cc:	grammar.y
 grammar.h:	grammar.y

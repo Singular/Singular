@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: creat_top.cc,v 1.1 1999-11-23 21:30:20 krueger Exp $ */
+/* $Id: creat_top.cc,v 1.2 1999-12-21 12:15:39 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -12,7 +12,7 @@
 
 void enter_id(FILE *fp, char *name, char *value);
 /*========================================================================*/
-static void  mod_copy_tmp(
+void  mod_copy_tmp(
   FILE *fp_out,
   FILE *fp_in
   )
@@ -70,5 +70,11 @@ void write_intro(
   fclose(module->fmtfp);
   create_tmpfile(module);
 
+  sprintf(filename, "tmp/%s.h", module->name);
+  module->modfp_h = fopen(filename, "w");
+  printf("Creating %s, ", filename);fflush(stdout);
+  mod_write_header(module->modfp_h, module->name);
+
+  free(filename);
 //  write_enter_id(module->modfp);
 }

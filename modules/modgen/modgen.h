@@ -1,5 +1,5 @@
 /*
- *  $Id: modgen.h,v 1.1 1999-11-23 21:30:22 krueger Exp $
+ *  $Id: modgen.h,v 1.2 1999-12-21 12:15:41 krueger Exp $
  *
  */
 
@@ -25,7 +25,6 @@ typedef moddef * moddefv;
 
 class paramdef {
  public:
-  paramdefv next;
   char *name;
   char *typname;
   int  typ;
@@ -33,9 +32,9 @@ class paramdef {
 
 class procdef {
  public:
-  procdefv next;
   char *procname;
   char *funcname;
+  int lineno;
   int is_static;
   paramdef  return_val;
   paramdefv param;
@@ -51,7 +50,8 @@ class cfiles {
 
 class moddef {
  public:
-  FILE * modfp;
+  FILE * modfp;           /* module file */
+  FILE * modfp_h;         /* header file */
   FILE * fmtfp;
   char * filename;        /* inputfile to parse */
   char * name;            /* name of the module */
@@ -77,11 +77,11 @@ extern void PrintProclist(moddefv module);
 extern void Add2proclist(moddefv module, char *name, char *ret_val,
                            char *ret_typname, int ret_typ);
 extern void generate_mod(moddefv module, int section);
-extern void AddParam(moddefv module, char *name, char *typname, int typ);
 extern void mod_create_makefile(moddefv module);
 extern void Add2files(moddefv module, char *buff);
 
 extern void generate_function(procdefv pi, FILE *fp);
+extern void  mod_copy_tmp(FILE *fp_out, FILE *fp_in);
 extern void mod_write_header(FILE *fp, char *module);
 extern void generate_header(procdefv pi, FILE *fp);
 extern void write_header(FILE *fp, char *module, char *comment="");
@@ -89,6 +89,10 @@ extern void make_version(char *p, moddefv module);
 extern void write_procedure_text(moddefv module, int lineno);
 extern void write_procedure_header(moddefv module);
 
+extern int init_proc(procdefv p, char *procname, paramdefv ret, int line);
+extern void setup_proc(moddefv module, procdefv p, char *code);
+void write_finish_functions(moddefv module, procdefv proc);
+void AddParam(procdefv p, paramdefv vnew);
 
 extern int create_tmpfile(moddefv module_def);
 #endif /* _MODGEN_H */

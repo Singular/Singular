@@ -1,5 +1,5 @@
 /*
- * $Id: grammar.y,v 1.1 1999-11-23 21:30:21 krueger Exp $
+ * $Id: grammar.y,v 1.2 1999-12-21 12:15:40 krueger Exp $
  */
 
 %{
@@ -25,6 +25,8 @@ extern void enter_id(FILE *fp, char *name, char *value,
                      int lineno, char *file);
 extern int checkvar(char *varname);
  
+procdef procedure_decl;
+
  
 void yyerror(char * fmt)
   {
@@ -60,7 +62,8 @@ void yyerror(char * fmt)
 %token <name> FILENAME
 %token <name> MCCODETOK
 %token <name> MCODETOK
-%token <name> VARTYPETOK
+%token <name> CODEPART
+%token  <tp> VARTYPETOK
 
 %type <i>    '='
 
@@ -133,38 +136,42 @@ files:  FILENAME ',' FILENAME
 
 sect2:  procdecl
         | sect2 procdecl
-        {
-          printf("unknown error processing section 2\n" );
-        }
         ;
 
 sect2end: SECT2END
         {
+          write_finish_functions(&module_def, &procedure_decl);
           printf("End of section %d\n", sectnum-1);
         }
         ;
 
-procdecl: PROCDECLTOK NAME '{' MCODETOK
+procdecl: procdecl2 '{' MCODETOK
         {
-          printf("Proc without parameters 2\n");
-          printf("========== proc %s begin ===========================\n", $2);
-          printf($4);
-          printf("========== proc end =============================\n");
+          setup_proc(&module_def, &procedure_decl, $3);
         }
-        | PROCDECLTOK VARTYPETOK NAME '{' MCODETOK
+        | procdecl2 procdeclhelp '{' MCODETOK
         {
-          printf("Proc without parameters 2\n");
-          printf("========== proc %s begin ===========================\n", $2);
-          printf($3);
-          printf("========== proc end =============================\n");
+          setup_proc(&module_def, &procedure_decl, $4);
         }
-        | PROCDECLTOK NAME '(' typelist ')' '{' MCCODETOK
+        ;
+
+procdecl1: PROCDECLTOK NAME
         {
-          printf("Proc with parameters\n");
+          init_proc(&procedure_decl, $2, NULL, yylineno);
         }
-        | PROCDECLTOK VARTYPETOK NAME '(' typelist ')' '{' MCCODETOK
+        | PROCDECLTOK VARTYPETOK NAME
         {
-          printf("Proc with parameters\n");
+          init_proc(&procedure_decl, $3, &$2, yylineno);
+        }
+
+procdecl2: procdecl1
+        | procdecl1 '(' ')'
+        | procdecl1 '(' typelist ')'
+        ;
+
+procdeclhelp: MSTRINGTOK
+        {
+          printf("++++++++++Help section '%s'\n", $1);
         }
         ;
 
@@ -176,19 +183,30 @@ procdeclend: PROCEND
 
 typelist: VARTYPETOK
         {
-          printf(">>>>>>VarType\n");
+          AddParam(&procedure_decl, &$1);
         }
         | typelist ',' VARTYPETOK
         {
-          printf(">>>>>>VarType\n");
+          AddParam(&procedure_decl, &$3);
         }
         ;
 
-code:  SECT3END
+code:  codeline SECT3END
         {
           printf("C-code\n");
         }
 ;
+
+codeline: CODEPART
+        {
+          printf(">%s", $1);
+        }
+        | codeline CODEPART
+        {
+          printf(">%s", $1);
+        }
+        ;
+
 
 %%
 

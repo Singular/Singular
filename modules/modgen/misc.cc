@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.1 1999-11-23 21:30:22 krueger Exp $ */
+/* $Id: misc.cc,v 1.2 1999-12-21 12:15:41 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -27,7 +27,7 @@
 #define SYSTYP_HPUX9  2
 #define SYSTYP_HPUX10 3
 
-#if 1
+#if 0
 #  define logx printf
 #else
 #  define logx
@@ -215,18 +215,21 @@ int checkvar(
   
 /*========================================================================*/
 void PrintProc(
-  procdef pi
+  procdefv pi
   )
 {
   int i;
   
-  printf("proc: %s(", pi.procname);
+  printf("%4d proc: %s(", pi->lineno, pi->procname);
   
-  for(i=0; i<pi.paramcnt; i++) {
-    printf("%s", pi.param[i].name);
-    if(i < (pi.paramcnt-1)) printf(",");
+  for(i=0; i<pi->paramcnt; i++) {
+    printf("%s (%s)", (pi->param[i]).name, (pi->param[i]).typname);
+    if(i < (pi->paramcnt-1)) printf(",");
   }
   printf(")\n");
+  if(pi->return_val.typ!=0)
+    printf("\treturn = %s (%s)\n", pi->return_val.name, pi->return_val.typname);
+  printf("{%s}\n", pi->c_code);
 }
 
 /*========================================================================*/
@@ -338,47 +341,6 @@ void Add2proclist(
 }
 
 /*========================================================================*/
-void AddParam(
-  moddefv module,
-  char *name,
-  char *typname,
-  int typ
-  )
-{
-  paramdef pnew;
-  int proccnt = module->proccnt-1;
-  int paramcnt = 0;
-
-  logx("AddParam(%d, %s, %s, %d)\n", module->procs[proccnt].paramcnt,
-       module->procs[proccnt].procname,
-       typname, typ);
-  memset((void *)&pnew, '\0', sizeof(paramdef));
-  pnew.name = (char *)malloc(strlen(name)+1);
-  memset(pnew.name, '\0', strlen(name)+1);
-  pnew.next = NULL;
-  memcpy(pnew.name, name, strlen(name));
-  pnew.typname = (char *)malloc(strlen(typname)+1);
-  memset(pnew.typname, '\0', strlen(typname)+1);
-  memcpy(pnew.typname, typname, strlen(typname));
-  pnew.typ = typ;
-
-  paramcnt = module->procs[proccnt].paramcnt;
- if(module->procs[proccnt].paramcnt==0) {
-    module->procs[proccnt].param = (paramdefv)malloc(sizeof(paramdef));
- }
-  else {
-    module->procs[proccnt].param =
-      (paramdefv)realloc(module->procs[proccnt].param,
-                         (paramcnt+1)*sizeof(paramdef));
-  }
-  
-  memcpy((void *)(&module->procs[proccnt].param[paramcnt]),
-         (void *)&pnew, sizeof(paramdef));
-  (module->procs[proccnt].paramcnt)++;
-  logx("AddParam() done\n");
-}
-
-/*========================================================================*/
 void PrintProclist(
   moddefv module
   )
@@ -386,7 +348,7 @@ void PrintProclist(
   logx("PrintProclist()\n");
   int j;
   for(j=0; j<module->proccnt; j++) {
-    PrintProc(module->procs[j]);
+    PrintProc(&(module->procs[j]));
   }
 }
 
@@ -442,34 +404,13 @@ void generate_mod(
   /* building entry-functions */
   for(proccnt=0; proccnt<module->proccnt; proccnt++) {
     generate_function(&module->procs[proccnt], module->modfp);
-    generate_header(&module->procs[proccnt], fp_h);
+    //generate_header(&module->procs[proccnt], fp_h);
   }
   printf("  done.\n");fflush(stdout);
   fclose(module->modfp);
   fclose(fp_h);
 }
 
-/*========================================================================*/
-void generate_header(procdefv pi, FILE *fp)
-{
-  int i;
-  
-  fprintf(fp, "BOOLEAN mod_%s(leftv res, leftv h);\n", pi->funcname);
-  switch( pi->return_val.typ) {
-      case SELF_CMD:
-        fprintf(fp, "BOOLEAN %s(res, ", pi->funcname);
-        break;
-
-      default:
-        fprintf(fp, "%s %s(", type_conv[pi->return_val.typ],
-                pi->funcname);
-  }
-  for (i=0;i<pi->paramcnt; i++) {
-    fprintf(fp, "%s res%d", type_conv[pi->param[i].typ], i);
-    if(i<pi->paramcnt-1) fprintf(fp, ", ");
-  }
-  fprintf(fp, ");\n\n");
-}
 
 void gen_func_param_check(
   FILE *fp,
