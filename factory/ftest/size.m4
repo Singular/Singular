@@ -1,12 +1,12 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: size.m4,v 1.2 1997-10-15 09:19:17 schmidt Exp $ */
+/* $Id: size.m4,v 1.3 1997-11-05 16:12:18 schmidt Exp $ */
 
-ftestSetNameOfGame( size,
-        `"Usage: size [<options>] [<envSpec>] <f> [<x>]\n"
-        "  calculates number of monomials of canonical form f\n"
-        "  which are in a coefficient domain.\n"
-	"  If the variable x is specified, calculates number of\n"
-	"  monomials of f with level higher or equal than level of x.\n"' )
+ftestSetNameOfGame( size, `"
+Usage: size [<options>] [<envSpec>] <f> [<x>]
+  calculates number of monomials of canonical form f.  If
+  variable x is specified, calculates number of monomials of f
+  with level higher or equal than level of x.
+"'`' )
 
 //{{{ docu
 //

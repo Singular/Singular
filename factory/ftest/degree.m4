@@ -1,11 +1,12 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: degree.m4,v 1.1 1997-10-15 08:51:07 schmidt Exp $ */
+/* $Id: degree.m4,v 1.2 1997-11-05 16:12:12 schmidt Exp $ */
 
-ftestSetNameOfGame( degree,
-        `"Usage: degree [<options>] [<envSpec>] <f> [<x>]\n"
-        "  returns degree of f with respect to its main variable.\n"
-	"  If the variable x is specified, returns degree of\n"
-	"  f with respect to x.\n"' )
+ftestSetNameOfGame( degree, `"
+Usage: degree [<options>] [<envSpec>] <f> [<x>]
+  returns degree of canonical form f with respect to its main
+  variable.  If variable x is specified, returns degree of f with
+  respect to x.
+"'`' )
 
 //{{{ docu
 //

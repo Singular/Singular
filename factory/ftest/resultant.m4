@@ -1,10 +1,11 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: resultant.m4,v 1.4 1997-10-15 09:19:14 schmidt Exp $ */
+/* $Id: resultant.m4,v 1.5 1997-11-05 16:12:16 schmidt Exp $ */
 
-ftestSetNameOfGame( resultant,
-        `"Usage: resultant [<options>] [<envSpec>] <f> <g> <x>\n"
-        "  calculates resultant of canonical forms f and g with\n"
-        "  respect to variable x.\n"' )
+ftestSetNameOfGame( resultant, `"
+Usage: resultant [<options>] [<envSpec>] <f> <g> <x>
+  calculates resultant of canonical forms f and g with respect to
+  variable x.
+"'`' )
 
 //{{{ docu
 //

@@ -1,12 +1,13 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: totaldegree.m4,v 1.2 1997-10-15 09:19:20 schmidt Exp $ */
+/* $Id: totaldegree.m4,v 1.3 1997-11-05 16:12:21 schmidt Exp $ */
 
-ftestSetNameOfGame( totaldegree,
-        `"Usage: totaldegree [<options>] [<envSpec>] <f> [<x> <y>]\n"
-        "  calculates total degree of canonical form f.\n"
-	"  If the variables x and y are specified, calculates total\n"
-	"  degree of f with respect to the polynomials variables between\n"
-        "  x and y (inclusively).\n"' )
+ftestSetNameOfGame( totaldegree, `"
+Usage: totaldegree [<options>] [<envSpec>] <f> [<x> <y>]
+  calculates total degree of canonical form f.  If the variables
+  x and y are specified, calculates total degree of f with
+  respect to the polynomial variables between x and y
+  (inclusively).
+"'`' )
 
 //{{{ docu
 //
