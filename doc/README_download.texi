@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: README_download.texi,v 1.3 1999-12-08 22:55:54 obachman Exp $
+@comment $Id: README_download.texi,v 1.4 1999-12-15 14:07:20 obachman Exp $
 @c FILE: README_download.texi
 @c PURPOSE: downloading instructions, to be includeded in manual and README_ftp
 @c
@@ -29,7 +29,11 @@ program.
 system for which @sc{Singular} is compiled. Choose one of the following:
 @multitable @columnfractions .2 .8
 @item @code{ix86-Linux}
-@tab PC's running under Linux
+@tab PC's running under Linux with @code{libc} version 6 (e.g., for SuSe
+Linux distirbution version >= 6; RedHat Linux distirbution version >= 5.2).
+@item @code{ix86-Linux-libc5}
+@tab PC's running under Linux with @code{libc} version 5 (if you are not 
+sure which @code{libc} version you have, run @code{ldd /bin/ls}).
 @item @code{HPUX-9}
 @tab HP workstations running under HPUX version 9
 @item @code{HPUX-10}
