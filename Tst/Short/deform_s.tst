@@ -8,7 +8,7 @@ example versal;
 // rest of what used to be in that example
    ring  r2       = 0,(x,y,z),ds;
    ideal Fo       = x2,xy,yz,zx;
-   printlevel     = 3;
+   printlevel     = 2;
    versal(Fo);
    printlevel     = p;
    if(system("with","Namespaces")) { kill Ring::Px,Top::Qx,Ring::So; }
