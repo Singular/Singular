@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: gms.cc,v 1.3 2002-02-12 18:04:23 mschulze Exp $ */
+/* $Id: gms.cc,v 1.4 2002-02-16 11:00:46 mschulze Exp $ */
 /*
 * ABSTRACT: Gauss-Manin system normal form
 */
@@ -20,7 +20,7 @@
 #include "matpol.h"
 #include "gms.h"
 
-lists gmsnf(ideal p,ideal g,matrix B,int D,int K)
+lists gmsNF(ideal p,ideal g,matrix B,int D,int K)
 {
   ideal r=idInit(IDELEMS(p),1);
   ideal q=idInit(IDELEMS(p),1);
@@ -71,7 +71,7 @@ lists gmsnf(ideal p,ideal g,matrix B,int D,int K)
   return l;
 }
 
-BOOLEAN gmsnf(leftv res,leftv h)
+BOOLEAN gmsNF(leftv res,leftv h)
 {
   if(currRingHdl)
   {
@@ -95,7 +95,7 @@ BOOLEAN gmsnf(leftv res,leftv h)
             {
               int K=(int)h->Data();
               res->rtyp=LIST_CMD;
-              res->data=(void*)gmsnf(idCopy(p),g,B,D,K);
+              res->data=(void*)gmsNF(idCopy(p),g,B,D,K);
               return FALSE;
 	    }
 	  }
