@@ -1,5 +1,6 @@
 #include "fast_mult.h"
 #include "kbuckets.h"
+typedef poly fastmultrec(poly f, poly g);
 static const int pass_option=1;
 static void degsplit(poly p,int n,poly &p1,poly&p2, int vn){
   poly erg1_i, erg2_i;
@@ -40,7 +41,7 @@ static void div_by_x_power_n(poly p, int n, int vn){
   }
 }
 
-poly do_unifastmult(poly f,int df,poly g,int dg, int vn){
+poly do_unifastmult(poly f,int df,poly g,int dg, int vn, fastmultrec rec){
   int n=1;
   if ((f==NULL)||(g==NULL)) return NULL;
   //int df=pGetExp(f,vn);//pFDeg(f);
@@ -76,8 +77,8 @@ poly do_unifastmult(poly f,int df,poly g,int dg, int vn){
   div_by_x_power_n(g1,pot,vn);
   
   //p00, p11
-  poly p00=unifastmult(f0,g0);
-  poly p11=unifastmult(f1,g1);
+  poly p00=rec(f0,g0);//unifastmult(f0,g0);
+  poly p11=rec(f1,g1);
 
   //construct erg, factor
   poly erg=NULL;
@@ -91,11 +92,14 @@ poly do_unifastmult(poly f,int df,poly g,int dg, int vn){
 
 
   
-  //  if((f1!=NULL) &&(f0!=NULL) &&(g0!=NULL) && (g1!=NULL)){
-  if(true){
-//eat up f0,f1,g0,g1 
-  poly pbig=unifastmult(pAdd(f0,f1),pAdd(g0,g1));
-  
+  if((f1!=NULL) &&(f0!=NULL) &&(g0!=NULL) && (g1!=NULL)){
+  //if(true){
+//eat up f0,f1,g0,g1
+    poly s1=pAdd(f0,f1);
+    poly s2=pAdd(g0,g1);
+  poly pbig=rec(s1,s2);
+  pDelete(&s1);
+  pDelete(&s2);
 
  
   //eat up pbig
@@ -231,7 +235,7 @@ poly unifastmult(poly f,poly g){
   //  return
   //    do_unifastmult_buckets(f,g);
   //else
-  return do_unifastmult(f,df,g,dg,vn);
+  return do_unifastmult(f,df,g,dg,vn,unifastmult);
 
 }
 
