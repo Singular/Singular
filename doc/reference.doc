@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.132 1999-07-29 06:55:29 anne Exp $
+@comment $Id: reference.doc,v 1.133 1999-08-04 15:37:16 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1867,34 +1867,58 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{help;}
-@*@code{help} command_name @code{;}
-@*@code{help} section_title @code{;}
-@*@code{help} lib_name @code{;}
-@*@code{help} procedure_name @code{;}
+@*@code{help} topic @code{;}
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-provides help information.
-@* The online version of the manual is used for the first three forms of
-the @code{help} command.  @code{help} lib_name @code{;} and @code{help}
-procedure_name @code{;} directly display the help sections from libraries and
-procedures, resp., if those are present.  The latter forms do not enter
-the online help system.
+provides online help information for @code{topic} using the currently
+set help browser. If no @code{topic} is given, the title page of the
+manual is provided.
+
+@code{topic} can be an index entry of the @sc{Singular} manual or the
+name of (loaded) procedure which has a help section. 
+@*@code{topic} may contain wildcard characters (i.e.,
+@code{*}-characters).  
+@*If a (possibly "wildcarded") @code{topic} can not be found (or,
+uniquely matched) a warning is displayed and no help information is
+provided.
+
+The browser in which the help information is displayed can be either set
+with the command-line option @code{--browser} 
+(@pxref{Command line options}), 
+or with the command @code{system("--browser", "<browser>")}
+(@pxref{system}). @code{<browser>} may be one of @code{info},
+@code{netscape}, @code{xinfo}, @code{tkinfo}, or
+@code{builtin}. Depending on your platform and local installation, only
+some browsers might be available. The default browser is @code{info}.
+
 @cindex ?
 @item @strong{Note:}
 @code{?} may be used instead of @code{help}.
 @item @strong{Example:}
 @smallexample
-help;
-help ring;
-help Rings and orderings;
-help all.lib;
+help;      // display title page of manual
+help ring; // display help about 'ring'
+?ringe;    // equivalent to 'help ringe;'
+@expansion{} // ** No help for topic 'ringe' (not even for '*ringe*')
+@expansion{} // ** Try '?;'       for general help
+@expansion{} // ** or  '?Index;'  for all available help topics
+?ring*;     
+@expansion{} //  ** No unique help for 'ring*'
+@expansion{} // ** Try one of
+@expansion{} ?Rings and orderings; ?Rings and standard bases; ?ring; 
+@expansion{} ?ring declarations; ?ring operations; ?ring related functions; 
+@expansion{} ?ring.lib; ?ring_lib; ?ringtensor; ?ringweights;
+help Rings and orderings; 
+help standard.lib;  // displays help about library 'standard.lib'
 @end smallexample
 @end table
 @c ref
-See
+See also
 @ref{Format of a library};
 @ref{Procedure definition};
+@ref{Command line options};
+@ref{system};
 @ref{The online help system}.
 @c ref
 @c ---------------------------------------
@@ -5275,34 +5299,60 @@ interface to internal data and the operating system.
 @item @strong{Functions:}
 @table @code
 @item @code{system("sh"},string_expression @code{)}
+@cindex sh
+@cindex system, sh
 shell escape, returns the return code of the shell
 @item @code{system("pid")}
+@cindex pid
+@cindex system, pid
 returns the process number (for creating unique names)
 @item @code{system("getenv",}string_expression@code{)}
+@cindex getenv
+@cindex system, getenv
 returns shell environment variable given as the second argument
 @item @code{system("tty")}
+@cindex tty
+@cindex system, tty
 resets the terminal
 @item @code{system("version")}
+@cindex version
+@cindex system, version
 returns the version number of  @sc{Singular} (type int)
 @item @code{system("contributors")}
+@cindex contributors
+@cindex system, contributors
 returns names of people who contributed to the Singular kernel
 @item @code{system("random"},int_expression @code{)}
+@cindex random
+@cindex system, random
 resets the random generator to the given value and returns it (type int)
 @item @code{system("random")}
 returns the seed of the random generator (type int)
 @item @code{system("gen")}
+@cindex gen
+@cindex system, gen
 returns the generating element of the multiplicative
 group of Z/p\@{0@} (as int) where p is the characteristic of the
 basering
 @item @code{system("nblocks" [, ring])}
+@cindex nblocks
+@cindex system, nblocks
 returns the number of blocks of @code{ring}, or the number of parameters
 of the current basering, if no second argument is given.
 @item @code{system("Singular")}
+@cindex Singular
+@cindex system, Singular
 returns the absolute (path) name of the running @sc{Singular} (type string)
 @item @code{system("long_option_name")}
+@cindex system, command-line option
 returns the value of the (command-line)
 option @code{"long_option_name"}; for on/off options, the return value is of type
-int and either 1 or 0; for all other options, the return type is string.
+int and either 1 or 0; for all other options, the return type is
+string. @xref{Command line options}.
+@item @code{system("long_option_name", value)}
+sets the value of the (command-line)
+option @code{"long_option_name"} to @code{value}; can only be used for
+some options (e.g., for @code{--browser}). @xref{Command line options}.
 @end table
 @item @strong{Example for UNIX:}
 @smallexample
