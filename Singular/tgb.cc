@@ -3552,7 +3552,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
       if(!(c->is_homog)) break;
     }
   }
-  Print("is homog:%d",c->is_homog);
+  //  Print("is homog:%d",c->is_homog);
   void* h;
   poly hp;
   int i,j;
