@@ -424,7 +424,7 @@ instance and to find an initial solution in the case of existence (but
 none of the other algorithms does!). Details can be found in [CoTr91]
 and [The99].
 
-An implementation of the above algorithm and some examples can be found in @ref{ip_lib}.
+An implementation of the above algorithm and some examples can be found in @ref{intprog_lib}.
 
 Classical methods for solving IP instances like Branch-and-Bound
 methods seem to be faster in general than the methods using toric

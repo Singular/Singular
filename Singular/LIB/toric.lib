@@ -1,17 +1,17 @@
-// version="$Id: toric.lib,v 1.6 2000-08-14 12:56:58 obachman Exp $";
+// version="$Id: toric.lib,v 1.7 2000-09-14 12:37:10 Singular Exp $";
 
 ///////////////////////////////////////////////////////////////////////////////
 
 info="
-LIBRARY: toric.lib		COMPUTING TORIC IDEALS   
+LIBRARY: toric.lib                COMPUTING TORIC IDEALS
 
 AUTHOR:  Christine Theis, email: ctheis@math.uni-sb.de
 
 PROCEDURES:
 
-toric_ideal(intmat A, string alg [,intvec prsv]);	computes the toric ideal of A
+toric_ideal(intmat A, string alg [,intvec prsv]);        computes the toric ideal of A
 
-toric_std(ideal I);	computes the standard basis of I using a specialized Buchberger algorithm 
+toric_std(ideal I);        computes the standard basis of I using a specialized Buchberger algorithm
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -19,7 +19,7 @@ toric_std(ideal I);	computes the standard basis of I using a specialized Buchber
 
 
 static proc toric_ideal_1(intmat A, string alg)
-{	
+{
   ideal I;
   // to be returned
 
@@ -28,7 +28,7 @@ static proc toric_ideal_1(intmat A, string alg)
   {
     "ERROR: The number of matrix columns is smaller than the number of ring variables.";
     return(I);
-  }	
+  }
 
   // check suitability of actual term ordering
   // the "module ordering" c or C is ignored
@@ -117,7 +117,7 @@ static proc toric_ideal_1(intmat A, string alg)
     {
       "Warning: Block orderings are not supported; Dp used for computation.";
     }
-  }  
+  }
 
   int pos;
   string number_string;
@@ -213,7 +213,7 @@ static proc toric_ideal_1(intmat A, string alg)
     "ERROR: The term ordering of the actual basering is not supported.";
     return(I);
   }
- 
+
   // check algorithm
   if(alg=="ct" || alg=="pct")
     // these algorithms will not cause an error in the external program;
@@ -224,11 +224,11 @@ static proc toric_ideal_1(intmat A, string alg)
     return(I);
   }
 
-  // create temporary file with which the external program is called 
+  // create temporary file with which the external program is called
 
   int dummy;
   int process=system("pid");
-  string matrixfile="temp_MATRIX"+string(process);	
+  string matrixfile="temp_MATRIX"+string(process);
   link MATRIX=":w "+matrixfile;
   open(MATRIX);
 
@@ -245,12 +245,12 @@ static proc toric_ideal_1(intmat A, string alg)
       write(MATRIX,A[i,j]);
     }
   }
- 
+
   // search for positive row space vector, if required by the
-  // algorithm    
+  // algorithm
   int found=0;
   if((alg=="blr") || (alg=="hs"))
-  { 
+  {
     for(i=1;i<=nrows(A);i++)
     {
       found=i;
@@ -268,14 +268,14 @@ static proc toric_ideal_1(intmat A, string alg)
     }
     if(found==0)
     {
-      "ERROR: The chosen algorithm needs a positive vector in the row space of the matrix.";     
+      "ERROR: The chosen algorithm needs a positive vector in the row space of the matrix.";
       close(MATRIX);
       dummy=system("sh","rm -f "+matrixfile);
       return(I);
-    } 
+    }
     write(MATRIX,"positive row space vector:");
     for(j=1;j<=ncols(A);j++)
-    { 
+    {
       write(MATRIX,A[found,j]);
     }
   }
@@ -293,7 +293,7 @@ static proc toric_ideal_1(intmat A, string alg)
   pos=find(toric_id,"size");
   pos=find(toric_id,":",pos);
   pos++;
-  
+
   while(toric_id[pos]==" " || toric_id[pos]==newline)
   {
     pos++;
@@ -305,7 +305,7 @@ static proc toric_ideal_1(intmat A, string alg)
     pos++;
   }
   execute("generators="+number_string+";");
-  
+
   intvec v;
   poly head;
   poly tail;
@@ -338,12 +338,12 @@ static proc toric_ideal_1(intmat A, string alg)
       }
       if(v[j]>0)
       {
-        head=head*var(j)^v[j];    
+        head=head*var(j)^v[j];
       }
     }
     I[i]=head-tail;
   }
-     
+
   // delete all created files
   dummy=system("sh","rm -f "+matrixfile);
   dummy=system("sh","rm -f "+matrixfile+".GB."+alg);
@@ -354,7 +354,7 @@ static proc toric_ideal_1(intmat A, string alg)
 
 
 static proc toric_ideal_2(intmat A, string alg, intvec prsv)
-{	
+{
   ideal I;
   // to be returned
 
@@ -363,14 +363,14 @@ static proc toric_ideal_2(intmat A, string alg, intvec prsv)
   {
     "ERROR: The number of matrix columns does not equal the size of the positive row space vector.";
     return(I);
-  }	
+  }
 
   // check suitability of actual basering
   if(nvars(basering)!=ncols(A))
   {
     "ERROR: The number of matrix columns is smaller than the number of ring variables.";
     return(I);
-  }	
+  }
 
   // check suitability of actual term ordering
   // the "module ordering" c or C is ignored
@@ -459,7 +459,7 @@ static proc toric_ideal_2(intmat A, string alg, intvec prsv)
     {
       "Warning: Block orderings are not supported; Dp used for computation.";
     }
-  }  
+  }
 
   int pos;
   string number_string;
@@ -555,7 +555,7 @@ static proc toric_ideal_2(intmat A, string alg, intvec prsv)
     "ERROR: The term ordering of the actual basering is not supported.";
     return(I);
   }
- 
+
   // check algorithm
   if(alg=="ct" || alg=="pct")
     // these algorithms will not cause an error in the external program;
@@ -566,11 +566,11 @@ static proc toric_ideal_2(intmat A, string alg, intvec prsv)
     return(I);
   }
 
-  // create temporary file with that the external program is called 
+  // create temporary file with that the external program is called
 
   int dummy;
   int process=system("pid");
-  string matrixfile="temp_MATRIX"+string(process);	
+  string matrixfile="temp_MATRIX"+string(process);
   link MATRIX=":w "+matrixfile;
   open(MATRIX);
 
@@ -590,10 +590,10 @@ static proc toric_ideal_2(intmat A, string alg, intvec prsv)
 
   // enter positive row space vector, if required by the algorithm
   if((alg=="blr") || (alg=="hs"))
-  { 
+  {
     write(MATRIX,"positive row space vector:");
     for(j=1;j<=ncols(A);j++)
-    { 
+    {
       write(MATRIX,prsv[j]);
     }
   }
@@ -610,7 +610,7 @@ static proc toric_ideal_2(intmat A, string alg, intvec prsv)
   pos=find(toric_id,"size");
   pos=find(toric_id,":",pos);
   pos++;
-  
+
   while(toric_id[pos]==" " || toric_id[pos]==newline)
   {
     pos++;
@@ -622,7 +622,7 @@ static proc toric_ideal_2(intmat A, string alg, intvec prsv)
     pos++;
   }
   execute("generators="+number_string+";");
-  
+
   intvec v;
   poly head;
   poly tail;
@@ -655,12 +655,12 @@ static proc toric_ideal_2(intmat A, string alg, intvec prsv)
       }
       if(v[j]>0)
       {
-        head=head*var(j)^v[j];    
+        head=head*var(j)^v[j];
       }
     }
     I[i]=head-tail;
   }
-     
+
   // delete all created files
   dummy=system("sh","rm -f "+matrixfile);
   dummy=system("sh","rm -f "+matrixfile+".GB."+alg);
@@ -673,9 +673,9 @@ static proc toric_ideal_2(intmat A, string alg, intvec prsv)
 proc toric_ideal
 "USAGE:    toric_ideal(A,alg);      A intmat, alg string
            toric_ideal(A,alg,prsv); A intmat, alg string, prsv intvec
-RETURN:   ideal: standard basis of the toric ideal of A 
+RETURN:   ideal: standard basis of the toric ideal of A
 NOTE:     These procedures return the standard basis of the toric ideal of A with respect to the term ordering in the actual basering. Not all term orderings are supported: The usual global term orderings may be used, but no block orderings combining them.
- 
+
 One may call the procedure with several different algorithms:
 
 - the algorithm of Conti/Traverso using elimination (ect),
@@ -688,16 +688,16 @@ One may call the procedure with several different algorithms:
 
 - the algorithm of DiBiase/Urbanke (du).
 
-The argument `alg' should be the abbreviation for an algorithm as above: ect, pt, blr, hs or du. 
+The argument `alg' should be the abbreviation for an algorithm as above: ect, pt, blr, hs or du.
 
 If `alg' is chosen to be `blr' or `hs', the algorithm needs a vector with positive coefficcients in the row space of A. If no row of A contains only positive entries, one has to use the second version of toric_ideal which takes such a vector as its third argument.
 
-For the mathematical background, see 
-@texinfo 
-@ref{Toric ideals and integer programming}. 
+For the mathematical background, see
+@texinfo
+@ref{Toric ideals and integer programming}.
 @end texinfo
 EXAMPLE:  example toric_ideal; shows an example
-SEE ALSO: toric_std, toric_lib, ip_lib, Toric ideals
+SEE ALSO: toric_std, toric_lib, intprog_lib, Toric ideals
 "
 {
   if(size(#)==2)
@@ -716,7 +716,7 @@ example
 {
 "EXAMPLE"; echo=2;
 
-ring r=0,(x,y,z),dp; 
+ring r=0,(x,y,z),dp;
 
 // call with two arguments
 intmat A[2][3]=1,1,0,0,1,1;
@@ -724,29 +724,29 @@ A;
 
 ideal I=toric_ideal(A,"du");
 I;
- 
+
 I=toric_ideal(A,"blr");
 I;
- 
+
 // call with three arguments
 intvec prsv=1,2,1;
 I=toric_ideal(A,"blr",prsv);
 I;
- 
+
 }
 
 
 
 proc toric_std(ideal I)
 "USAGE:   toric_std(I);      I ideal
-RETURN:   ideal: standard basis of I 
-NOTE:     This procedure computes the standard basis of I using a specialized Buchberger algorithm. The generating system by which I is given has to consist of binomials of the form x^u-x^v. There is no real check if I is toric. If I is generated by binomials of the above form, but not toric, toric_std computes an ideal `between' I and its saturation with respect to all variables. 
-For the mathematical background, see 
-@texinfo 
-@ref{Toric ideals and integer programming}. 
+RETURN:   ideal: standard basis of I
+NOTE:     This procedure computes the standard basis of I using a specialized Buchberger algorithm. The generating system by which I is given has to consist of binomials of the form x^u-x^v. There is no real check if I is toric. If I is generated by binomials of the above form, but not toric, toric_std computes an ideal `between' I and its saturation with respect to all variables.
+For the mathematical background, see
+@texinfo
+@ref{Toric ideals and integer programming}.
 @end texinfo
 EXAMPLE:  example toric_std; shows an example
-SEE ALSO: toric_ideal, toric_lib, ip_lib, Toric ideals
+SEE ALSO: toric_ideal, toric_lib, intprog_lib, Toric ideals
 "
 {
   ideal J;
@@ -839,7 +839,7 @@ SEE ALSO: toric_ideal, toric_lib, ip_lib, Toric ideals
     {
       "Warning: Block orderings are not supported; Dp used for computation.";
     }
-  }  
+  }
 
   int pos;
   string number_string;
@@ -865,7 +865,7 @@ SEE ALSO: toric_ideal, toric_lib, ip_lib, Toric ideals
       "Warning: Block orderings are not supported; wp("+string(weightvec)+") used for computation.";
     }
   }
-  
+
   if(external_ord=="" && find(singular_ord,"wp")==3)
   {
     external_ord="W_REV_LEX";
@@ -936,23 +936,23 @@ SEE ALSO: toric_ideal, toric_lib, ip_lib, Toric ideals
     "ERROR: The term ordering of the actual basering is not supported.";
     return(I);
   }
- 
+
   // create first temporary file with which the external program is called
- 
+
   int dummy;
   int process=system("pid");
-  string groebnerfile="temp_GROEBNER"+string(process);	
+  string groebnerfile="temp_GROEBNER"+string(process);
   link GROEBNER=":w "+groebnerfile;
   open(GROEBNER);
 
   write(GROEBNER,"GROEBNER","computed with algorithm:","pt","term ordering:","elimination block",0,"weighted block",nvars(basering),external_ord);
   // algorithm is totally unimportant, only required by the external program
-  
+
   for(i=1;i<=nvars(basering);i++)
   {
     write(GROEBNER,weightvec[i]);
   }
-  
+
   write(GROEBNER,"size:",size(I),"Groebner basis:");
   poly head;
   poly tail;
@@ -961,13 +961,13 @@ SEE ALSO: toric_ideal, toric_lib, ip_lib, Toric ideals
 
   for(j=1;j<=size(I);j++)
   {
-    // test suitability of generator j 
+    // test suitability of generator j
     rest=I[j];
     head=lead(rest);
     rest=rest-head;
     tail=lead(rest);
     rest=rest-tail;
-    
+
     if(head==0 && tail==0 && rest!=0)
     {
       "ERROR: Generator "+string(j)+" of the input ideal is no binomial.";
@@ -975,7 +975,7 @@ SEE ALSO: toric_ideal, toric_lib, ip_lib, Toric ideals
       dummy=system("sh","rm -f "+groebnerfile);
       return(J);
     }
-    
+
     if(leadcoef(tail)!=-leadcoef(head))
       // generator is no difference of monomials (or a constant multiple)
     {
@@ -984,12 +984,12 @@ SEE ALSO: toric_ideal, toric_lib, ip_lib, Toric ideals
       dummy=system("sh","rm -f "+groebnerfile);
       return(J);
     }
-       
+
     if(gcd(head,tail)!=1)
     {
       "Warning: The monomials of generator "+string(j)+" of the input ideal are not relatively prime.";
     }
-    
+
     // write vector representation of generator j into the file
     v=leadexp(head)-leadexp(tail);
     for(i=1;i<=nvars(basering);i++)
@@ -998,22 +998,22 @@ SEE ALSO: toric_ideal, toric_lib, ip_lib, Toric ideals
     }
   }
   close(GROEBNER);
-  
+
   // create second temporary file
 
-  string newcostfile="temp_NEW_COST"+string(process);	
+  string newcostfile="temp_NEW_COST"+string(process);
   link NEW_COST=":w "+newcostfile;
   open(NEW_COST);
 
-  write(NEW_COST,"NEW_COST","variables:",nvars(basering),"cost vector:");  
+  write(NEW_COST,"NEW_COST","variables:",nvars(basering),"cost vector:");
   for(i=1;i<=nvars(basering);i++)
   {
     write(NEW_COST,weightvec[i]);
   }
-  
+
   // call external program
   dummy=system("sh","change_cost "+groebnerfile+" "+newcostfile);
-  
+
   // read toric standard basis from created file
   link TORIC_IDEAL=":r "+newcostfile+".GB.pt";
   string toric_id=read(TORIC_IDEAL);
@@ -1022,7 +1022,7 @@ SEE ALSO: toric_ideal, toric_lib, ip_lib, Toric ideals
   pos=find(toric_id,"size");
   pos=find(toric_id,":",pos);
   pos++;
-  
+
   while(toric_id[pos]==" " || toric_id[pos]==newline)
   {
     pos++;
@@ -1063,16 +1063,16 @@ SEE ALSO: toric_ideal, toric_lib, ip_lib, Toric ideals
       }
       if(v[i]>0)
       {
-        head=head*var(i)^v[i];    
+        head=head*var(i)^v[i];
       }
     }
     J[j]=head-tail;
   }
-     
+
   // delete all created files
   dummy=system("sh","rm -f "+groebnerfile);
   dummy=system("sh","rm -f "+groebnerfile+".GB.pt");
-  dummy=system("sh","rm -f "+newcostfile);  
+  dummy=system("sh","rm -f "+newcostfile);
 
   return(J);
 }
@@ -1089,25 +1089,23 @@ ring r=0,(x,y,z),wp(3,2,1);
 ideal I=x-y,x-z;
 ideal J=toric_std(I);
 J;
- 
+
 // call with the same ideal, but badly chosen generators:
-// 1) not only binomials 
+// 1) not only binomials
 I=x-y,2x-y-z;
 J=toric_std(I);
 // 2) binomials whose monomials are not relatively prime
 I=x-y,xy-yz,y-z;
 J=toric_std(I);
 J;
- 
+
 // call with a non-toric ideal that seems to be toric
 I=x-yz,xy-z;
 J=toric_std(I);
 J;
-// comparison with real standard basis and saturation 
+// comparison with real standard basis and saturation
 ideal H=std(I);
 H;
 LIB "elim.lib";
 sat(H,xyz);
 }
-
-
