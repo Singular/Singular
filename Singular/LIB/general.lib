@@ -2,7 +2,7 @@
 //anne, added deleteSublist and watchdog 12.12.2000
 //eric, added absValue 11.04.2002
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: general.lib,v 1.43 2004-08-13 12:52:37 Singular Exp $";
+version="$Id: general.lib,v 1.44 2004-08-13 14:09:21 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type
@@ -25,7 +25,7 @@ PROCEDURES:
  sum(vector/id/..[,v]); add components of vector/ideal/...[with indices v]
  watchdog(i,cmd);       only wait for result of command cmd for i seconds
  which(command);        search for command and return absolute path, if found
- primecoeffs(J[,q]);    primefactors <= min(p,32003) of coeffs of J 
+ primecoeffs(J[,q]);    primefactors <= min(p,32003) of coeffs of J
  primefactors(n [,p]);  primefactors <= min(p,32003) of n
            (parameters in square brackets [] are optional)
 ";
@@ -140,11 +140,11 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc absValue(def c)
-"USAGE:  absValue(c); c int, number or poly 
+"USAGE:  absValue(c); c int, number or poly
 RETURN:  absValue(c); the absolute value of c
 NOTE:    absValue(c)=c if c>=0; absValue=-c if c<=0.
 @*       So the function can be applied to any type, for which comparison
-@*       operators are defined. 
+@*       operators are defined.
 SEE ALSO: boolean expressions
 EXAMPLE: example absValue; shows an example
 "
@@ -491,17 +491,20 @@ EXAMPLE: example killall; shows an example AND KILLS ALL YOUR VARIABLES
       {
         for ( @joni=size(@marie); @joni>0; @joni-- )
         {
-          if((@marie[@joni]!="General")
+          if( (@marie[@joni]!="General")
           and (@marie[@joni]!="Top")
           and (@marie[@joni]!="killall")
-          and (@marie[@joni]=="LIB" or
-              typeof(`@marie[@joni]`)=="package" or
-              typeof(`@marie[@joni]`)=="proc"))
-          { kill `@marie[@joni]`;
-          if (defined(`@marie[@joni]`)) {kill `@marie[@joni]`;}}
+          and (@marie[@joni]!="LIB") and
+              ((typeof(`@marie[@joni]`)=="package") or
+              (typeof(`@marie[@joni]`)=="proc")))
+          {
+            if (defined(`@marie[@joni]`)) {kill `@marie[@joni]`;}
+          }
+          if (!defined(@joni)) break;
         }
-        if (system("with","Namespaces"))
+        if ((system("with","Namespaces")) && defined(General))
         {
+          
           @marie=names(General);
           for ( @joni=size(@marie); @joni>0; @joni-- )
           {
@@ -545,6 +548,7 @@ EXAMPLE: example killall; shows an example AND KILLS ALL YOUR VARIABLES
             kill `@marie[@joni]`;
           }
         }
+        if (!defined(@joni)) break;
       }
     }
   }
@@ -1243,8 +1247,8 @@ example
 proc primefactors (n, list #)
 "USAGE:   primefactors(n [,p]); n = int or number, p = integer
 COMPUTE: primefactors <= min(p,32003) of n (default p = 32003)
-RETURN:  a list, say l, 
-         l[1] : primefactors <= min(p,32003) of n 
+RETURN:  a list, say l,
+         l[1] : primefactors <= min(p,32003) of n
          l[2] : l[2][i] = multiplicity of l[1][i]
          l[3] : remaining factor ( n=product{ (l[1][i]^l[2][i])*l[3]} )
                 type(l[3])=typeof(n)
@@ -1259,11 +1263,11 @@ EXAMPLE: example primefactors; shows an example
    int ii,jj,z,p,num,w3,q;
    intvec w1,w2,v;
    list l;
-   if (size(#) == 0) 
+   if (size(#) == 0)
    {
-      p=32003; 
+      p=32003;
    }
-   else 
+   else
    {
      if( typeof(#[1]) != "int")
      {
@@ -1273,7 +1277,7 @@ EXAMPLE: example primefactors; shows an example
    }
    if( n<0) { n=-n;};
 
-// ----------------- case: 1st parameter is a number --------------------   
+// ----------------- case: 1st parameter is a number --------------------
    if (typeof(n) =="number")
    {
      kill w3;
@@ -1283,17 +1287,17 @@ EXAMPLE: example primefactors; shows an example
         v = primes(2,p);
         number m;
         for( ii=1; ii<=size(v); ii++)
-        { 
+        {
           jj=0;
           while(1)
-          { 
+          {
             q  = v[ii];
-            jj = jj+1;             
+            jj = jj+1;
             m  = n/q;                  //divide n as often as possible
             if (denominator(m)!=1) { break;  }
             n=m;
           }
-          if( jj>1 ) 
+          if( jj>1 )
           {
              w1 = w1,v[ii];          //primes
              w2 = w2,jj-1;           //powers
@@ -1308,11 +1312,11 @@ EXAMPLE: example primefactors; shows an example
        {
          w1 = w1[2..size(w1)];
          w2 = w2[2..size(w2)];
-       } 
+       }
        else                           //no primefactor was found
        {
          w1 = 1; w2 = 1;
-       }     
+       }
        l  = w1,w2,n;
        return(l);
      }
@@ -1324,33 +1328,33 @@ EXAMPLE: example primefactors; shows an example
        int n = num;
      }
    }
-   
+
 // --------------------------- trivial cases --------------------
-   if( n==0 ) 
-   {  
+   if( n==0 )
+   {
      w1=1; w2=1; w3=0; l=w1,w2,w3;
      return(l);
    }
-   
-   if( n==1 ) 
-   {   
+
+   if( n==1 )
+   {
        w3=1;
        if( size(w1) >1 )               //at least 1 primefactor was found
        {
          w1 = w1[2..size(w1)];
          w2 = w2[2..size(w2)];
-       } 
+       }
        else                           //no primefactor was found
        {
          w1 = 1; w2 = 1;
-       }     
+       }
       l=w1,w2,w3;
       return(l);
    }
    if ( prime(n)==n )         //note: prime(n) <= 32003 in Singular
    {                          //case n is a prime
       if (p > n)
-      {  
+      {
         w1=w1,n; w2=w2,1; w3=1;
         w1 = w1[2..size(w1)];
         w2 = w2[2..size(w2)];
@@ -1364,16 +1368,16 @@ EXAMPLE: example primefactors; shows an example
         {
            w1 = w1[2..size(w1)];
            w2 = w2[2..size(w2)];
-         } 
+         }
          else                           //no primefactor was found
          {
            w1 = 1; w2 = 1;
-         }     
+         }
          l=w1,w2,w3;
         return(l);
-      }      
+      }
    }
-   else 
+   else
    {
       if ( p >= n)
       {
@@ -1383,17 +1387,17 @@ EXAMPLE: example primefactors; shows an example
       {
          v = primes(q,p);
       }
-//------------- search for primfactors <= last entry of v ------------    
+//------------- search for primfactors <= last entry of v ------------
       for(ii=1; ii<=size(v); ii++)
       {
          z=0;
          while( (n mod v[ii]) == 0 )
-         {  
+         {
             z=z+1;
             n = n div v[ii];
          }
          if (z!=0)
-         { 
+         {
             w1 = w1,v[ii];        //primes
             w2 = w2,z;            //multiplicities
          }
@@ -1404,11 +1408,11 @@ EXAMPLE: example primefactors; shows an example
    {
       w1 = w1[2..size(w1)];
       w2 = w2[2..size(w2)];
-   } 
+   }
    else                           //no primefactor was found
    {
      w1 = 1; w2 = 1;
-   } 
+   }
    w3 = n;
    l  = w1,w2,w3;
    return(l);
@@ -1418,7 +1422,7 @@ example
    primefactors(7*8*121);
    ring r = 0,x,dp;
    primefactors(123456789100);
-}  
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 proc primecoeffs(J, list #)
@@ -1435,11 +1439,11 @@ EXAMPLE: example primecoeffs; shows an example
 "
 {
    int q,ii,n,mark;;
-   if (size(#) == 0) 
+   if (size(#) == 0)
    {
-      q=32003; 
+      q=32003;
    }
-   else 
+   else
    {
      if( typeof(#[1]) != "int")
      {
@@ -1455,7 +1459,7 @@ EXAMPLE: example primecoeffs; shows an example
    }
    def I = ideal(matrix(J));
    poly p = product(maxideal(1));
-   matrix Coef=coef(I[1],p); 
+   matrix Coef=coef(I[1],p);
    ideal id, jd, rest;
    intvec v,re;
    list result,l;
@@ -1465,15 +1469,15 @@ EXAMPLE: example primecoeffs; shows an example
    }
    id = Coef[2,1..ncols(Coef)];
    id = simplify(id,6);
-   for (ii=1; ii<=size(id); ii++)  
-   {   
-     l = primefactors(number(id[ii]),q);     
+   for (ii=1; ii<=size(id); ii++)
+   {
+     l = primefactors(number(id[ii]),q);
      jd = jd,l[1];
      rest = rest,l[3];
-   } 
+   }
    jd = simplify(jd,6);
-   for (ii=1; ii<=size(jd); ii++)  
-   { 
+   for (ii=1; ii<=size(jd); ii++)
+   {
      v[ii]=int(jd[ii]);
    }
    v = sort(v)[1];
@@ -1489,7 +1493,7 @@ EXAMPLE: example primecoeffs; shows an example
    }
    else
    {
-      result = v,rest; 
+      result = v,rest;
    }
    return(result);
 }
@@ -1499,5 +1503,5 @@ example
    ring r = 0,(b,c,t),dp;
    ideal I = -13b6c3t+4b5c4t,-10b4c2t-5b4ct2;
    primecoeffs(I);
-}  
+}
 ///////////////////////////////////////////////////////////////////////////////
