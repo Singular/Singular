@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.15 1997-08-29 13:15:16 schmidt Exp $ */
+/* $Id: canonicalform.cc,v 1.16 1997-08-29 14:52:50 schmidt Exp $ */
 
 #include <config.h>
 
@@ -267,15 +267,17 @@ CanonicalForm::degree( const Variable & v ) const
 	return 0;
     else  if ( inBaseDomain() )
 	return 0;
-    else  if ( v == mvar() )
+
+    Variable x = mvar();
+    if ( v == x )
 	return value->degree();
-    else  if ( v > mvar() )
+    else  if ( v > x )
 	// relatively to v, f is in a coefficient ring
 	return 0;
     else {
 	// v < mvar(), make v main variable
-	CanonicalForm f = swapvar( *this, v, mvar() );
-	if ( f.mvar() == mvar() )
+	CanonicalForm f = swapvar( *this, v, x );
+	if ( f.mvar() == x )
 	    return f.value->degree();
 	else
 	    // in this case, we lost our main variable because
@@ -392,13 +394,21 @@ CanonicalForm::deriv() const
 // polynomial variable.  Returns zero if f is in a coefficient
 // domain.
 //
+// Timing Note (for the developer): I tried the same without
+// 'Variable y = mvar()', replacing each occurence of y directly
+// with 'mvar()'.  It turned out that this version is slower in all
+// cases.
+//
 //}}}
 CanonicalForm
 CanonicalForm::deriv( const Variable & x ) const
 {
     ASSERT( x.level() > 0, "cannot derive with respect to algebraic variables" );
+    if ( inCoeffDomain() )
+	return 0;
+
     Variable y = mvar();
-    if ( inCoeffDomain() || x > y )
+    if ( x > y )
 	return 0;
     else if ( x == y )
 	return deriv();
