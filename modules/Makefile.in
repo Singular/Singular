@@ -2,7 +2,7 @@
 ###
 ### Makefile for Singular-modules
 ###
-### $Id: Makefile.in,v 1.5 2000-03-30 07:23:42 krueger Exp $
+### $Id: Makefile.in,v 1.6 2000-03-30 07:25:11 krueger Exp $
 ###
 #################################################################
 
@@ -87,7 +87,7 @@ modules:
 	do \
 		echo ${MAKE} $@ in $${SUBDIR}; \
 		( cd $${SUBDIR} && ${MODGEN} $${SUBDIR}.mod ;); \
-		( cd $${SUBDIR} && ${MAKE} ;) \
+		( cd $${SUBDIR}/$${SUBDIR} && ${MAKE} ;) \
 	done
 
 clean:
