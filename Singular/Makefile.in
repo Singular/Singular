@@ -151,7 +151,7 @@ SLIBS = algebra.lib        all.lib            classify.lib       deform.lib  \
         elim.lib           factor.lib         finvar.lib         general.lib \
         graphics.lib       hnoether.lib       homolog.lib        inout.lib   \
         ainvar.lib         jordan.lib         latex.lib          linalg.lib  \
-        matrix.lib         mondromy.lib       normal.lib                     \
+        matrix.lib         mondromy.lib       normal.lib         makedbm.lib \
         poly.lib           presolve.lib       primdec.lib                    \
         primitiv.lib       random.lib         ring.lib           sing.lib    \
         solve.lib          solver.lib         spcurve.lib        standard.lib\
@@ -238,12 +238,12 @@ libparse.cc: libparse.l
 ESingular: fegetopt.o feResource.cc mod2.h feOpt.cc version.h emacs.cc \
            feOptES.inc mmalloc.o
 	${CXX} -O2 ${CPPFLAGS} ${DEFS} -DESINGULAR -o ESingular emacs.cc fegetopt.o \
-	${LDFLAGS} -lomalloc_ndebug mmalloc.o
+	${LDFLAGS} ${LIBS} -lomalloc_ndebug mmalloc.o
 
 TSingular: fegetopt.o feResource.cc mod2.h feOpt.cc version.h emacs.cc \
            feOptTS.inc mmalloc.o
 	${CXX} -O2 ${CPPFLAGS} ${DEFS} -DTSINGULAR -o TSingular emacs.cc fegetopt.o \
-	${LDFLAGS}  -lomalloc_ndebug mmalloc.o
+	${LDFLAGS}  ${LIBS} -lomalloc_ndebug mmalloc.o
 
 feOpt.h: feOpt.inc feOptES.inc feOptTS.inc
 
