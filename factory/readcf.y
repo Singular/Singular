@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: readcf.y,v 1.7 1998-06-03 12:51:40 pohl Exp $ */
+/* $Id: readcf.y,v 1.8 1998-06-12 14:33:57 schmidt Exp $ */
 
 %{
 
@@ -16,9 +16,9 @@
 
 #include "assert.h"
 
+#include "canonicalform.h"
 #include "cf_defs.h"
 #include "gfops.h"
-#include "canonicalform.h"
 #include "parseutil.h"
 #include "variable.h"
 

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: gfops.cc,v 1.4 1998-06-03 11:47:56 Singular Exp $ */
+/* $Id: gfops.cc,v 1.5 1998-06-12 14:33:41 schmidt Exp $ */
 
 #include <config.h>
 
@@ -9,7 +9,6 @@
 #include "assert.h"
 
 #include "cf_defs.h"
-#include "gfops.h"
 #include "gf_tabutil.h"
 #include "cf_util.h"
 #include "canonicalform.h"
@@ -17,6 +16,7 @@
 #ifdef SINGULAR
 #include "singext.h"
 #endif
+#include "gfops.h"
 
 
 const int gf_maxtable = 32767;

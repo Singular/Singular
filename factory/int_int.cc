@@ -1,14 +1,14 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_int.cc,v 1.12 1998-03-17 15:56:04 schmidt Exp $ */
+/* $Id: int_int.cc,v 1.13 1998-06-12 14:33:50 schmidt Exp $ */
 
 #include <config.h>
 
+#include "canonicalform.h"
 #include "imm.h"
 #include "int_int.h"
 #include "int_rat.h"
 #include "cf_gmp.h"
 #include "gmpext.h"
-#include "canonicalform.h"
  
 InternalInteger::InternalInteger()
 {
