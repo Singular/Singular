@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.30 2005-02-09 12:55:38 levandov Exp $ */
+/* $Id: ring.cc,v 1.31 2005-03-14 16:45:15 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1299,6 +1299,10 @@ static ring rCopy0(ring r, BOOLEAN copy_qideal = TRUE,
     for(i=0;i<rPar(r);i++)
     {
       res->parameter[i]=omStrDup(r->parameter[i]);
+    }
+    if (r->minideal!=NULL)
+    {
+      res->minideal-id_Copy(r->minideal,r->algring);
     }
   }
   if (copy_ordering == TRUE)
