@@ -76,10 +76,12 @@ void maPoly_Eval(mapoly root, ring src_r, ideal dest_id, ring dest_r, int total_
     {
       if ((p->f1!=NULL)&&(p->f2!=NULL))
       {
+#if 0
         printf("found prod:");
         p_wrp(p->src,src_r);printf("=");
         p_wrp(p->f1->src,src_r);printf(" * ");
         p_wrp(p->f2->src,src_r);printf("\n");
+#endif
         poly f1=p->f1->dest;
         poly f2=p->f2->dest;
         if (p->f1->ref>0) f1=p_Copy(f1,dest_r);

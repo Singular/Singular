@@ -6,7 +6,7 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id: fast_maps.cc,v 1.24 2002-01-19 20:08:12 Singular Exp $
+ *  Version: $Id: fast_maps.cc,v 1.25 2002-01-19 20:21:19 obachman Exp $
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>
@@ -327,15 +327,12 @@ ideal maIdeal_2_Ideal(maideal m_id, ring dest_r)
   return res;
 }
 
-void maPoly_GetLength(mapoly mp, ring src_r, int &length, int &total_cost)
+void maPoly_GetLength(mapoly mp, int &length)
 {
   length = 0;
-  total_cost = 0;
   while (mp != NULL)
   {
     length++;
-    if (mp->src != NULL)
-      total_cost += pDeg(mp->src, src_r);
     mp = mp->next;
   }
 }
@@ -350,7 +347,7 @@ ideal fast_map(ideal map_id, ring map_r, ideal image_id, ring image_r)
 {
   ring src_r, dest_r;
   ideal dest_id, res_id;
-  int length, total_cost = 0;
+  int length = 0;
 
   // construct rings we work in: 
   // src_r: Wp with Weights set to length of poly in image_id
@@ -370,8 +367,8 @@ ideal fast_map(ideal map_id, ring map_r, ideal image_id, ring image_r)
   
   if (TEST_OPT_PROT)
   {
-    maPoly_GetLength(mp, src_r, length, total_cost);
-    Print("map[%d:%d]{%d:%d}", dest_r->bitmask, dest_r->ExpL_Size, length, total_cost);
+    maPoly_GetLength(mp, length);
+    Print("map[%d:%d]{%d:", dest_r->bitmask, dest_r->ExpL_Size, length);
   }
   
   // do the optimization step
@@ -380,12 +377,12 @@ ideal fast_map(ideal map_id, ring map_r, ideal image_id, ring image_r)
 #endif
   if (TEST_OPT_PROT)
   {
-    maPoly_GetLength(mp, src_r, length, total_cost);
-    Print("{%d:%d}", length, total_cost);
+    maPoly_GetLength(mp, length);
+    Print("%d}", length);
   }
       
   // do the actual evaluation
-  maPoly_Eval(mp, src_r, dest_id, dest_r, total_cost);
+  maPoly_Eval(mp, src_r, dest_id, dest_r, length);
 
   // collect the results back into an ideal
   ideal res_dest_id = maIdeal_2_Ideal(mideal, dest_r);
