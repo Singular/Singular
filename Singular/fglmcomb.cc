@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmcomb.cc,v 1.7 1998-01-27 14:16:14 pohl Exp $
+// $Id: fglmcomb.cc,v 1.8 1998-03-27 14:21:29 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -192,9 +192,12 @@ fglmNewLinearCombination( ideal source, poly monset )
     m= (polyset)Alloc( numMonoms * sizeof( poly ) );
     poly temp= monset;
     for ( k= 0; k < numMonoms; k++ ) {
-        m[k]= pOne();
-        pSetExpV( m[k], temp->exp );
-        pSetm( m[k] );
+//         m[k]= pOne();
+//         pSetExpV( m[k], temp->exp );
+//         pSetm( m[k] );
+	m[k]= pNew();
+	pCopy2( m[k], temp );
+	pSetCoeff( m[k], nInit(1) );
         temp= pIter( temp );
     }
 
@@ -249,9 +252,12 @@ fglmNewLinearCombination( ideal source, poly monset )
                     basis= (polyset)ReAlloc( basis, basisMax * sizeof( poly ), (basisMax + basisBS ) * sizeof( poly ) );
                     basisMax+= basisBS;
                 }
-                basis[basisSize]= pOne();
-                pSetExpV( basis[basisSize], temp->exp );
-                pSetm( basis[basisSize] );
+//                 basis[basisSize]= pOne();
+//                 pSetExpV( basis[basisSize], temp->exp );
+//                 pSetm( basis[basisSize] );
+		basis[basisSize]= pNew();
+		pCopy2( basis[basisSize], temp );
+		pSetCoeff( basis[basisSize], nInit(1) );
                 basisSize++;
             }
             temp= pIter( temp );
