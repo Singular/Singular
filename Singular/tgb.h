@@ -107,7 +107,6 @@ static poly redNF2 (poly h,calc_dat* c , int &len);
 static void free_sorted_pair_node(sorted_pair_node* s, ring r);
 static void shorten_tails(calc_dat* c, poly monom);
 static void replace_pair(int & i, int & j, calc_dat* c);
-static void initial_data(calc_dat* c);
 static void add_to_basis(poly h, int i, int j,calc_dat* c);
 static void do_this_spoly_stuff(int i,int j,calc_dat* c);
 ideal t_rep_gb(ring r,ideal arg_I);

@@ -6,12 +6,11 @@
 #include "tgb.h"
 
 
-#define LEN_VAR1
+#define LEN_VAR3
 
 #ifdef LEN_VAR1
 // erste Variante: Laenge: Anzahl der Monome
-int pSLength(poly p) { 
-  PrintS("have char0");
+int pSLength(poly p) {
   return pLength(p); }
 int kSBucketLength(kBucket* bucket) {return bucket_guess(bucket);}
 #endif
@@ -40,13 +39,13 @@ int kSBucketLength(kBucket* b)
 // 3.Variante: Laenge: Platz fuer Leitk * Monomanzahl
 int pSLength(poly p)
 {
-  int c=nSize(pGetCoeff(p));
+  int c=nSize(pGetCoeff(p))+1;
   return c*pLength(p);
 }
 int kSBucketLength(kBucket* b)
 {
   int s=1;
-  int c=nSize(pGetCoeff(b->buckets[0]));
+  int c=nSize(pGetCoeff(kBucketGetLm(b)))+1;
   int i;
   for (i=MAX_BUCKET;i>0;i--)
   {
@@ -69,10 +68,11 @@ int pSLength(poly p)
 int kSBucketLength(kBucket* b)
 {
   int s=1;
-  int c=nSize(pGetCoeff(b->buckets[0]));
+  int c=nSize(pGetCoeff(kBucketGetLm(b)));
   int i;
   for (i=MAX_BUCKET;i>0;i--)
   {
+    if(b->buckets[i]==NULL) continue;
     s+=pSLength(b->buckets[i]);
   }
   return s*c;
@@ -323,7 +323,6 @@ static void add_to_reductors(calc_dat* c, poly h, int len){
     c->strat->lenSw[i]=pSLength(P.p);
  
  
-  //pNorm(c->strat->S[i]);
 }
 static void length_one_crit(calc_dat* c, int pos, int len)
 {
@@ -906,123 +905,8 @@ static void init_red_spoly_phase2(calc_dat* c,int pos){
   c->work_on[pos].P->bucket = kBucketCreate(currRing);
   kBucketInit(c->work_on[pos].P->bucket,c->work_on[pos].P->p,len /*pLength(P.p)*/);
 }
-static void initial_data(calc_dat* c){
-  void* h;
-  int i,j;
-  c->last_index=-1;
-  c->work_on=(redNF_inf*) omalloc(PAR_N*sizeof(redNF_inf));
-  int counter;
-  for(counter=0;counter<PAR_N;counter++){
-    c->work_on[counter].is_free=TRUE;
-    c->work_on[counter].P=NULL;
-  }
-  c->misses_series=0;
-  c->soon_free=NULL;
-  c->misses_counter=0;
-  c->max_misses=0;
-  c->normal_forms=0;
-  c->current_degree=1;
-  c->skipped_pairs=0;
-  c->pairs=NULL;
-  int n=c->S->idelems();
-  c->n=n;
-  c->T_deg=(int*) omalloc(n*sizeof(int));
-  c->continue_i=0;
-  c->continue_j=0;
-  c->skipped_i=-1;
-#ifdef HEAD_BIN
-  c->HeadBin=omGetSpecBin(POLYSIZE + (currRing->ExpL_Size)*sizeof(long));
-#endif
-  /* omUnGetSpecBin(&(c->HeadBin)); */
-  h=omalloc(n*sizeof(char*));
-  if (h!=NULL)
-    c->states=(char**) h;
-  else
-    exit(1);
-  c->misses=(int*) omalloc(n*sizeof(int));
-  c->deg=(int **) omalloc(n*sizeof(int*));
-  h=omalloc(n*sizeof(int));
-  if (h!=NULL)
-    c->lengths=(int*) h;
-  else
-    exit(1);
-  h=omalloc(n*sizeof(int));
-  if (h!=NULL)
-    c->rep=(int*) h;
-  else
-    exit(1);
-  c->short_Exps=(long*) omalloc(n*sizeof(long));
-  for (i=0;i<n;i++)
-  {
-#ifdef HEAD_BIN
-    c->S->m[i]=p_MoveHead(c->S->m[i],c->HeadBin);
-#endif
-    c->T_deg[i]=pFDeg(c->S->m[i]);
-    c->lengths[i]=pLength(c->S->m[i]);
-    c->misses[i]=0;
-    c->states[i]=(char *)omAlloc((i+1)*sizeof(char));
-    c->deg[i]=(int*) omAlloc((i+1)*sizeof(int));
-    for (j=0;j<i;j++){
-      //check product criterion
-      if (pHasNotCF(c->S->m[i],c->S->m[j])){
-        c->states[i][j]=HASTREP;
-      } else {
-        c->states[i][j]=UNCALCULATED;
-      }
-      if ((c->lengths[i]==1) && (c->lengths[j]==1))
-        c->states[i][j]=HASTREP;
-      c->deg[i][j]=pLcmDeg(c->S->m[i],c->S->m[j]);
-      if (c->states[i][j]==UNCALCULATED){
-        sort_pair_in(i,j,c);
-      }
-    }
-    c->rep[i]=i;
-    c->short_Exps[i]=p_GetShortExpVector(c->S->m[i],c->r);
-  }
-  c->strat=new skStrategy;
-  c->strat->syzComp = 0;
-  initBuchMoraCrit(c->strat);
-  initBuchMoraPos(c->strat);
-  c->strat->initEcart = initEcartBBA;
-  c->strat->enterS = enterSBba;
-  c->strat->sl = -1;
-  /* initS(c->S,NULL,c->strat); */
-/* intS start: */
-  i=((i+IDELEMS(c->S)+15)/16)*16;
-  c->strat->ecartS=(intset)omAlloc(i*sizeof(int)); /*initec(i);*/
-  c->strat->sevS=(unsigned long*)omAlloc0(i*sizeof(unsigned long));
-  /*initsevS(i);*/
-  c->strat->S_2_R=(int*)omAlloc0(i*sizeof(int));/*initS_2_R(i);*/
-  c->strat->fromQ=NULL;
-  c->strat->Shdl=idInit(i,1);
-  c->strat->S=c->strat->Shdl->m;
-  c->strat->lenS=(int*)omAlloc0(i*sizeof(int));
-  c->strat->lenSw=(int*)omAlloc0(i*sizeof(int));
-  for (i=0; i<IDELEMS(c->S); i++)
-  {
-    int pos;
-    assume (c->S->m[i]!=NULL);
-    LObject h;
-    h.p = c->S->m[i];
-    h.pNorm();
-    c->strat->initEcart(&h);
-    assume(c->lengths[i]==pLength(h.p));
-    if (c->strat->sl==-1) pos=0;
-    else 
-      if(c->is_char0)
-	pos=simple_posInS(c->strat,h.p,pSLength(h.p),c->is_char0);
-      else
-	pos = simple_posInS(c->strat,h.p,c->lengths[i],c->is_char0);
-    h.sev = pGetShortExpVector(h.p);
-    c->strat->enterS(h,pos,c->strat);
-    c->strat->lenS[pos]=c->lengths[i];
-#if 0
-    c->strat->lenSw[pos]=pSLength(h.p);
-#endif
-  }
-  /* initS end */
-}
-static void initial_data2(calc_dat* c, ideal I){
+
+static void initial_data(calc_dat* c, ideal I){
   void* h;
   poly hp;
   int i,j;
@@ -1541,6 +1425,8 @@ static poly redNF2 (poly h,calc_dat* c , int &len)
 
 
               c->strat->lenS[old_pos]=new_length;
+	      if(c->strat->lenSw)
+		c->strat->lenS[old_pos]=pSLength(sec_copy);
               int i=0;
               for(i=new_pos;i<old_pos;i++){
                 if (strat->lenS[i]<=new_length)
@@ -1621,6 +1507,7 @@ static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
   if (obj->is_free){
     return TRUE;}
   int len;
+  int wlen_upper;
   int j;
   kStrategy strat=c->strat;
   assume(strat->sl<50000);
@@ -1647,13 +1534,18 @@ static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
       int compare_bound;
       compare_bound=bucket_guess(obj->P->bucket);
       obj->len_upper_bound=min(compare_bound,obj->len_upper_bound);
+      
       j=kFindDivisibleByInS(strat->S,strat->sevS,strat->sl,obj->P);
       if (j>=0)
       {
         poly sec_copy=NULL;
-
+	if (c->is_char0) wlen_upper=kSBucketLength(obj->P->bucket);
         BOOLEAN must_expand=FALSE;
-        BOOLEAN must_replace_in_basis=(obj->len_upper_bound<strat->lenS[j]);//first test
+        BOOLEAN must_replace_in_basis;
+	if(c->is_char0)
+	  must_replace_in_basis=(wlen_upper<strat->lenSw[j]);//first test
+	else
+	  must_replace_in_basis=(obj->len_upper_bound<strat->lenS[j]);//first test
         if (must_replace_in_basis)
         {
           //second test
@@ -1739,6 +1631,8 @@ static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
               new_pos=min(old_pos, new_pos);
               assume(new_pos<=old_pos);
               c->strat->lenS[old_pos]=new_length;
+	      if(c->strat->lenSw)
+		c->strat->lenS[old_pos]=pSLength(sec_copy);
               int i=0;
               for(i=new_pos;i<old_pos;i++){
                 if (strat->lenS[i]<=new_length)
@@ -1746,6 +1640,7 @@ static BOOLEAN redNF2_n_steps (redNF_inf* obj,calc_dat* c, int n)
                 else
                   break;
               }
+	      assume(new_pos<=old_pos);
               if (new_pos<old_pos)
                 move_forward_in_S(old_pos,new_pos,c->strat,c->is_char0);
 	      assume(0<=pos_in_c);
@@ -2159,7 +2054,7 @@ ideal t_rep_gb(ring r,ideal arg_I){
   calc_dat* c=(calc_dat*) omalloc(sizeof(calc_dat));
   c->r=currRing;
 
-  initial_data2(c,I);
+  initial_data(c,I);
 #if 0
   while (find_next_pair(c)){
     int i,j;
