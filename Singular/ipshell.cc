@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.94 2005-01-18 15:41:59 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.95 2005-01-24 15:04:39 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -3388,8 +3388,11 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   elist->Clean();
   //omFreeSize( (ADDRESS) elist, sizeof(slists) );
 
-  for ( i= deg; i >= 0; i-- ) nDelete( &pcoeffs[i] );
-  omFreeSize( (ADDRESS) pcoeffs, (deg+1) * sizeof( number ) );
+  // this is (via fillContainer) the same data as in root
+  //for ( i= deg; i >= 0; i-- ) nDelete( &pcoeffs[i] );
+  //omFreeSize( (ADDRESS) pcoeffs, (deg+1) * sizeof( number ) );
+
+  delete roots;
 
   res->rtyp= LIST_CMD;
   res->data= (void*)rlist;
