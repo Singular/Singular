@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.270 2001-10-30 09:43:44 Singular Exp $ */
+/* $Id: iparith.cc,v 1.271 2001-11-05 13:25:36 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1168,6 +1168,40 @@ static BOOLEAN jjDIV_P(leftv res, leftv u, leftv v)
   }
   return FALSE;
 }
+static BOOLEAN jjDIV_Ma(leftv res, leftv u, leftv v)
+{
+  poly q=(poly)v->Data();
+  if (q==NULL)
+  {
+    WerrorS(ii_div_by_0);
+    return TRUE;
+  }
+  matrix m=(matrix)(u->Data());
+  int r=m->rows();
+  int c=m->cols();
+  matrix mm=mpNew(r,c);
+  int i,j;
+  for(i=r;i>0;i--)
+  {
+    for(j=c;j>0;j--)
+    {
+      if (pNext(q)!=NULL)
+      {
+      #ifdef HAVE_FACTORY
+        MATELEM(mm,i,j) = singclap_pdivide( MATELEM(m,i,j) ,
+                                           q /*(poly)(v->Data())*/ );
+      #else
+        WerrorS("division only by a monomial");
+        return TRUE;
+      #endif
+      }
+      else
+        MATELEM(mm,i,j) = pDivideM(pCopy(MATELEM(m,i,j)),pHead(q));
+    }
+  }
+  res->data=(char *)mm;
+  return FALSE;
+}
 static BOOLEAN jjEQUAL_I(leftv res, leftv u, leftv v)
 {
   res->data = (char *)((int)u->Data() == (int)v->Data());
@@ -2277,6 +2311,7 @@ struct sValCmd2 dArith2[]=
 ,{jjDIV_N,     '/',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD PROFILER}
 ,{jjDIV_P,     '/',            POLY_CMD,       POLY_CMD,   POLY_CMD PROFILER}
 ,{jjDIV_P,     '/',            VECTOR_CMD,     VECTOR_CMD, POLY_CMD PROFILER}
+,{jjDIV_Ma,    '/',            MATRIX_CMD,     MATRIX_CMD, POLY_CMD PROFILER}
 ,{jjDIVMOD_I,  '/',            INT_CMD,        INT_CMD,    INT_CMD PROFILER}
 ,{jjOP_IV_I,   '/',            INTVEC_CMD,     INTVEC_CMD, INT_CMD PROFILER}
 ,{jjOP_IV_I,   '/',            INTMAT_CMD,     INTMAT_CMD, INT_CMD PROFILER}
