@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: normal.lib,v 1.39 2004-04-19 15:15:34 Singular Exp $";
+version="$Id: normal.lib,v 1.40 2004-04-20 14:27:46 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
@@ -1465,8 +1465,8 @@ EXAMPLE: example genus; shows an example
    if((w>=1)&&(inv[2]!=0)){ nsing++;}
    deltainf=deltainf+inv[1];
    tauinf=tauinf+inv[2];
-   if(inv[2]==1){nodesinf=nodeainf++;}
-   if(inv[2]==2){cuspsinf=cuspsinf++;}         
+   if(inv[2]==1){nodesinf++;}
+   if(inv[2]==2){cuspsinf++;}         
    
    if((w>=1)&&(inv[2]==0)){"            the curve is smooth at (0,1,0)";"";}
    if(inv[2]>0){nbranchinf=nbranchinf+inv[3];}
