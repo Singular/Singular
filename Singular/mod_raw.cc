@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.cc,v 1.18 2003-02-18 17:44:31 Singular Exp $ */
+/* $Id: mod_raw.cc,v 1.19 2003-05-22 17:56:37 Singular Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -77,11 +77,14 @@ void* dynl_sym_warn(void* handle, char* proc, const char* msg)
   return proc_ptr;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*****************************************************************************
- * SECTION ix86-linux / alpha-linux                                          *
+ * SECTION ix86-linux / alpha-linux / IA64-linux                             *
  *****************************************************************************/
-#if defined(ix86_Linux) || defined(DecAlpha_Linux) || defined(ix86_Linux_libc5)
+#if defined(ix86_Linux) || defined(DecAlpha_Linux) || defined(ix86_Linux_libc5) || defined(IA64_Linux)
 #include <dlfcn.h>
 
 static void* kernel_handle = NULL;
@@ -379,5 +382,8 @@ const char *dynl_error()
 }
 #  endif /* ppc_MPW */
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* HAVE_DL */
