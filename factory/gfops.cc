@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: gfops.cc,v 1.3 1997-10-10 12:30:40 schmidt Exp $ */
+/* $Id: gfops.cc,v 1.4 1998-06-03 11:47:56 Singular Exp $ */
 
 #include <config.h>
 
@@ -84,10 +84,11 @@ gf_get_table ( int p, int n )
     // try to open file
 #ifndef SINGULAR
     sprintf( buffer, GFTABLEDIR "/gftable.%d.%d", p, n );
-#else
-    sprintf( buffer, GFTABLEDIR "/%d", q );
-#endif
     FILE * inputfile = fopen( buffer, "r" );
+#else
+    sprintf( buffer, "gftables/%d", q );
+    FILE * inputfile = feFopen( buffer, "r" );
+#endif
     STICKYASSERT( inputfile, "can not open GF(q) table" );
 
     // read ID
