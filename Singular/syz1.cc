@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.19 1998-01-27 15:47:07 pohl Exp $ */
+/* $Id: syz1.cc,v 1.20 1998-02-17 17:35:13 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -2773,6 +2773,7 @@ syStrategy syLaScala3(ideal arg,int * length)
       if (j<actdeg) actdeg = j;
     }
   }
+  idSkipZeroes(temp);
   sySetHighdeg();
   binomials = (int*)Alloc(pVariables*(highdeg+1)*sizeof(int));
   syBinomSet();
