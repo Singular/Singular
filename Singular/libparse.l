@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.22 1998-05-18 09:32:07 krueger Exp $ */
+/* $Id: libparse.l,v 1.23 1998-05-27 14:02:36 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -292,7 +292,7 @@ static     { p_static=TRUE; }
                   printf("// PROCEDURE '%s' status: %s, ", proc,
                       p_static ? "local" : "global");
                   printf("starting at line %d,%d: definition end: %d (%d).\n", 
-                      yylplineno, current_pos(0), pi->data.s.def_end, brace1);
+                      yylplineno, current_pos(0), (int)pi->data.s.def_end, brace1);
                }
 #endif
                p_static=FALSE;
@@ -499,7 +499,7 @@ LIB[ \t]+"\"" { quote++;
                 brace1++; BEGIN(pbody);
                 if(lpverbose) {
                    printf("//     HELP from %d to %d\n", 
-                       pi->data.s.help_start, pi->data.s.help_end);
+                       (int)pi->data.s.help_start, (int)pi->data.s.help_end);
                    printf("//     BODY at line %d,%d (%d)\n", yylplineno,
                        current_pos(0), brace1);
                 }
@@ -524,7 +524,7 @@ LIB[ \t]+"\"" { quote++;
              brace1++; BEGIN(pbody);
              if(lpverbose) {
                 printf("//     HELP from %d to %d\n", 
-                    pi->data.s.help_start, pi->data.s.help_end);
+                    (int)pi->data.s.help_start, (int)pi->data.s.help_end);
                 printf("//     BODY at line %d,%d (%d)\n", yylplineno,
                     current_pos(0), brace1);
              }

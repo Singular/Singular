@@ -1244,8 +1244,8 @@ static BOOLEAN jjMAP(leftv res, leftv u, leftv v)
   leftv sl=NULL;
   if (v->e==NULL)
   {
-    idhdl h=(idhdl)u->data;
-    sl=iiMap(IDMAP(h),v->name);
+    map m=(map)u->Data();
+    sl=iiMap(m,v->name);
   }
   //else
   //{
@@ -3971,7 +3971,7 @@ static BOOLEAN jjCALL3ARG(leftv res, leftv u)
   v->next = w;
   return b;
 }
-  
+
 static BOOLEAN jjCOEF_M(leftv res, leftv v)
 {
   if((v->Typ() != VECTOR_CMD)
@@ -4347,7 +4347,7 @@ static BOOLEAN jjSTATUS_M(leftv res, leftv v)
   return FALSE;
 }
 
-      
+
 /*=================== operations with many arg.: table =================*/
 /* number_of_args:  -1: any, -2: any >0, .. */
 struct sValCmdM dArithM[]=
