@@ -6,7 +6,7 @@
  *  Purpose: source for dynamically loaded version of p_Procs
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Dynamic.cc,v 1.3 2000-12-31 15:14:39 obachman Exp $
+ *  Version: $Id: p_Procs_Dynamic.cc,v 1.4 2001-01-30 12:19:24 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "structs.h"
@@ -81,35 +81,35 @@ static void* GetGeneralProc(p_Proc proc)
   switch(proc)
   {
       case p_Copy_Proc: 
-        return p_Copy__FieldGeneral_LengthGeneral_OrdGeneral;
+        return (void *)p_Copy__FieldGeneral_LengthGeneral_OrdGeneral;
       case p_Delete_Proc: 
-        return p_Delete__FieldGeneral_LengthGeneral_OrdGeneral;
+        return (void *)p_Delete__FieldGeneral_LengthGeneral_OrdGeneral;
       case p_ShallowCopyDelete_Proc: 
-        return p_ShallowCopyDelete__FieldGeneral_LengthGeneral_OrdGeneral;
+        return (void *)p_ShallowCopyDelete__FieldGeneral_LengthGeneral_OrdGeneral;
       case p_Mult_nn_Proc: 
-        return p_Mult_nn__FieldGeneral_LengthGeneral_OrdGeneral;
+        return (void *)p_Mult_nn__FieldGeneral_LengthGeneral_OrdGeneral;
       case pp_Mult_nn_Proc: 
-        return pp_Mult_nn__FieldGeneral_LengthGeneral_OrdGeneral;
+        return (void *)pp_Mult_nn__FieldGeneral_LengthGeneral_OrdGeneral;
       case pp_Mult_mm_Proc: 
-        return pp_Mult_mm__FieldGeneral_LengthGeneral_OrdGeneral;
+        return (void *)pp_Mult_mm__FieldGeneral_LengthGeneral_OrdGeneral;
       case pp_Mult_mm_Noether_Proc: 
-        return pp_Mult_mm_Noether__FieldGeneral_LengthGeneral_OrdGeneral;
+        return (void *)pp_Mult_mm_Noether__FieldGeneral_LengthGeneral_OrdGeneral;
       case p_Mult_mm_Proc: 
-        return p_Mult_mm__FieldGeneral_LengthGeneral_OrdGeneral;
+        return (void *)p_Mult_mm__FieldGeneral_LengthGeneral_OrdGeneral;
       case p_Add_q_Proc: 
-        return p_Add_q__FieldGeneral_LengthGeneral_OrdGeneral;
+        return (void *)p_Add_q__FieldGeneral_LengthGeneral_OrdGeneral;
       case p_Minus_mm_Mult_qq_Proc: 
-        return p_Minus_mm_Mult_qq__FieldGeneral_LengthGeneral_OrdGeneral;
+        return (void *)p_Minus_mm_Mult_qq__FieldGeneral_LengthGeneral_OrdGeneral;
       case p_Neg_Proc: 
-        return p_Neg__FieldGeneral_LengthGeneral_OrdGeneral;
+        return (void *)p_Neg__FieldGeneral_LengthGeneral_OrdGeneral;
       case pp_Mult_Coeff_mm_DivSelect_Proc: 
-        return pp_Mult_Coeff_mm_DivSelect__FieldGeneral_LengthGeneral_OrdGeneral;
+        return (void *)pp_Mult_Coeff_mm_DivSelect__FieldGeneral_LengthGeneral_OrdGeneral;
       case pp_Mult_Coeff_mm_DivSelectMult_Proc: 
-        return pp_Mult_Coeff_mm_DivSelectMult__FieldGeneral_LengthGeneral_OrdGeneral;
+        return (void *)pp_Mult_Coeff_mm_DivSelectMult__FieldGeneral_LengthGeneral_OrdGeneral;
       case p_Merge_q_Proc: 
-        return p_Merge_q__FieldGeneral_LengthGeneral_OrdGeneral;
+        return (void *)p_Merge_q__FieldGeneral_LengthGeneral_OrdGeneral;
       case p_kBucketSetLm_Proc: 
-        return p_kBucketSetLm__FieldGeneral_LengthGeneral_OrdGeneral;
+        return (void *)p_kBucketSetLm__FieldGeneral_LengthGeneral_OrdGeneral;
       case p_Unknown_Proc:
         break;
   }
