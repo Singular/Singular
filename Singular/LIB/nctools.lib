@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.5 2004-05-12 11:36:15 levandov Exp $";
+version="$Id: nctools.lib,v 1.6 2004-07-29 16:47:07 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
@@ -37,38 +37,62 @@ wRing(r);		alias to weightedRing,
 // r must be a G-algebra
 
 proc Gweights(def r)
-"USAGE:   Gweights(r); r a ring
-RETURN:  a weights vector for the G-Algebra r
-NOTE:    with Gweights you only obtain a vector, then you must use it to redefine the G-Algebra. Another posibility is to use wRing or weightedRing to obtain directly the G-Algebra.
+"USAGE:   Gweights(r); r a ring or a square matrix
+RETURN:  a weights vector for the G-algebra r or for a G-algebra which tails matrix is r
+NOTE:    with Gweights you only obtain a vector, then you must use it to redefine the G-Algebra. If the input is a matrix and the output is the zero vector then there is not a G-algebra structure associated to these relations with respect to the given variables. Another possibility is to use wRing or weightedRing to obtain directly the G-Algebra.
 EXAMPLE: example Gweights; shows examples
 SEE ALSO: wRing, weightedRing
 "{
-  if (typeof(r)=="ring")
+  matrix tails;
+  int novalid=0;
+  if (typeof(r)=="ring") //a ring is admissible as input
   {
     setring r;
-    def l=NCRelations(r);
-    intmat IM=SimplMat(l[2]); // l=C,D we need D
-    if (size(IM)>1) 
+    def l = NCRelations(r);
+    tails = l[2]; // l=C,D we need D, the tails of the relations
+  }
+  else
+  {
+    if ( (typeof(r)=="matrix") || (typeof(r)=="intmat") )
     {
-      int n=nvars(basering);
-      int m=nrows(IM)-1;
-      int m1=0;
-      int m2=m;
-      int m3=0;
+      if ( nrows(r)==ncols(r) ) //the input is a square matrix
+      {
+        tails = matrix(r);
+      }
+      else
+      {
+        novalid = 1;
+      }
+    }
+    else
+    {
+      novalid=1;
+    }
+  }
+  if (novalid==0)
+  {
+    intmat IM = SimplMat(tails);
+    if ( size(IM)>1 )
+    {
+      int n  = ncols(tails);
+      int m  = nrows(IM)-1;
+      int m1 = 0;
+      int m2 = m;
+      int m3 = 0;
       ring simplexring=(real,10),(x),lp;// The simplex procedure requires a basering of this type
-      matrix M=IM;
-      list sol=simplex (M,m,n,m1,m2,m3);
+      matrix M = IM;
+      list sol = simplex (M,m,n,m1,m2,m3);
       return(weightvector(sol));
-    } 
-    else 
+    }
+    else
     {
-      "Invalid input.";
+      "Invalid input"; //usually because the input is a one variable ring
       return();
     }
-  } 
-  else 
+  }
+  else
   {
-    "The input must be a ring.";
+    "The input must be a ring or a square matrix";
     return();
   }
 }
@@ -91,6 +115,8 @@ example
   ncalgebra(C,D);
   setring r; r;
   Gweights(r);
+  Gweights(D);
+  Gweights(C);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -120,17 +146,17 @@ SEE ALSO: wRing, Gweights
       m[1,i]=wv[i];
       m[i,n+2-i]=1;
     }
-    // End of generating.
+    // End of generation.
     def lr=NCRelations(r);
     string newringstring="ring newring=("+charstr(r)+"),("+varstr(r)+"),M("+string(m)+")";
     execute (newringstring);
     def lnewring=imap(r,lr);
     ncalgebra(lnewring[1],lnewring[2]);
     return(newring);
-  } 
-  else 
+  }
+  else
   {
-    "Invalid input.";
+    "Invalid input.";//usually because the input is a one variable ring
     return();
   }
 }
@@ -165,8 +191,8 @@ proc wRing(def r)
   if (typeof(a)=="ring") { return(a); }
   "Error";
   return();
-} 
-example 
+}
+example
 {
   "EXAMPLE:";echo=2;
   LIB "qmatrix.lib";
@@ -201,8 +227,8 @@ static proc Cij(intmat M, int i,j)
   {
     N=N[2..size(N)]; // Deleting the zero added in the definition of N
     M=intmat(N,size(N)/nc,nc); // Conversion from vector to matrix
-  } 
-  else 
+  }
+  else
   {
     intmat M[1][1]=0;
   }
@@ -215,30 +241,35 @@ static proc Cij(intmat M, int i,j)
 
 static proc Ct(matrix P)
 {
-  int k=ncols(P);
-  int n=nvars(basering);
-  intvec T=0;
-  int i,j;
+  int    k = ncols(P);
+  intvec T = 0;
+  int    i,j;
+//  int notails=1;
+  def S;
   for (j=2; j<=k; j++)
   {
     for (i=1; i<j; i++)
     {
-      if (deg(P[i,j])>0)
+      if ( P[i,j] != 0 )
       {
-	def S=Newton(P[i,j]);
-	S=Cij(S,i,j);
-	if (size(S)>1) {T=T,S;}
+//        notails=0;
+        S = Newton(P[i,j]);
+        S = Cij(S,i,j);
+        if ( size(S)>1 )
+        {
+          T = T,S;
+        }
       }
     }
   }
-  if (size(T)==1) 
-  { 
-    intmat C[1][1]; 
+  if ( size(T)==1 )
+  {
+    intmat C[1][1] = 0;
   }
-  else 
+  else
   {
     T=T[2..size(T)]; // Deleting the zero added in the definition of T
-    intmat C=intmat(T,size(T)/n,n); // Conversion from vector to matrix
+    intmat C = intmat(T,size(T)/k,k); // Conversion from vector to matrix
   }
   return (C);
 }
@@ -250,21 +281,30 @@ static proc Ct(matrix P)
 static proc SimplMat(matrix P)
 {
   intmat C=Ct(P);
-  if (size(C)>1) 
+  if (size(C)>1)
   {
-    int r=nrows(C);
-    int n=nvars(basering);
-    int f=1+n+r;
+    int r = nrows(C);
+    int n = ncols(C);
+    int f = 1+n+r;
+    intmat M[f][n+1]=0;
+    int i;
+    for (i=2; i<=(n+1); i++) 
+    {
+      M[1,i]=-1; // (0,-1,-1,-1,...) objective function in the first row
+    }
+    for (i=2; i<=f; i++) {M[i,1]=1;} // All the independent terms are 1
+    for (i=2; i<=(n+1); i++) {M[i,i]=-1;} // wi>=1 is an identity matrix
+    M[(n+2)..f,2..(n+1)]=(-1)*intvec(C); // <wi,a> >= 1, a in C ...
+  }
+  else
+  {
+    int n = ncols(P);
+    int f = 1+n;
     intmat M[f][n+1]=0;
     int i;
     for (i=2; i<=(n+1); i++) {M[1,i]=-1;} // (0,-1,-1,-1,...) objective function in the first row
     for (i=2; i<=f; i++) {M[i,1]=1;} // All the independent terms are 1
     for (i=2; i<=(n+1); i++) {M[i,i]=-1;} // wi>=1 is an identity matrix
-    M[(n+2)..f,2..(n+1)]=(-1)*intvec(C); // <wi,a> >= 1, a in C ...
-  } 
-  else 
-  {
-    intmat M=C;
   }
   return (M);
 }
@@ -275,6 +315,7 @@ static proc SimplMat(matrix P)
 // with the solutions. The vector is ordered.
 
 static proc weightvector(list l)
+
 "ASSUME:  l is the output of simplex.
 RETURNS: if there is a solution, an intvec with the solution."
 {
@@ -285,15 +326,15 @@ RETURNS: if there is a solution, an intvec with the solution."
   int N=l[6];
   intmat wv[1][N]=0;
   int i;
-  if (sol) 
+  if (sol)
   {
     "no solution satisfies the given constraints";
   }
-  else 
+  else
   {
-    for ( i = 2; i <= rows; i++ ) 
+    for ( i = 2; i <= rows; i++ )
     {
-      if ( nv[i-1] <= N ) 
+      if ( nv[i-1] <= N )
       {
 	wv[1,nv[i-1]]=int(m[i,1]);
       }
@@ -315,19 +356,19 @@ EXAMPLE: example Newton; shows examples
 "{
   int n=nvars(basering);
   intvec N=0;
-  if (deg(f)>0)
+  if ( f != 0 )
   {
-    while (leadexp(f)!=0)
+    while ( f != 0 )
     {
-      N=N, leadexp(f);
-      f=f-lead(f);
+      N = N, leadexp(f);
+      f = f-lead(f);
     }
-  } 
-  else 
-  { 
-    N=N, leadexp(f); 
   }
-  N=N[2..size(N)]; // Deletes the zero added in the definition of T
+  else
+  {
+    N=N, leadexp(f);
+  }
+  N = N[2..size(N)]; // Deletes the zero added in the definition of T
   intmat M=intmat(N,(size(N)/n),n); // Conversion from vector to matrix
   return (M);
 }
@@ -372,8 +413,8 @@ EXAMPLE: example NCRelations; shows examples
 	    {
 	      C[j,i]=leadcoef(f);
 	      D[j,i]=D[j,i]+f-lead(f);
-	    } 
-	    else 
+	    }
+	    else
 	    {
 	      D[j,i]=D[j,i]+lead(f);
 	      f=f-lead(f);
@@ -383,7 +424,7 @@ EXAMPLE: example NCRelations; shows examples
       }
       l=C,D;
     }
-    else { "The ring must have two or more variables"; }  
+    else { "The ring must have two or more variables"; }
   }
   else { "The input must be of a type ring";}
   return (l);
@@ -416,7 +457,7 @@ EXAMPLE: Fin_dim_algebra; shows examples
   if (size(#) >0)
   {
     if ( typeof(#[1])!="ring" ) { return();}
-    else 
+    else
     {
       def @R1 = #[1];
       setring @R1;
@@ -432,7 +473,7 @@ EXAMPLE: Fin_dim_algebra; shows examples
   for (i=1; i<=n; i++)
   {
     for (j=i; j<=n; j++)
-    {  
+    {
       p=var(i)*var(j)-M[i,j];
       if ( (size(I)==1) && (I[1]==0) )   { I=p; }
       else { I=I,p; }
@@ -462,7 +503,7 @@ example
   matrix S[3][3];
   S[2,3]=a*x(1); S[3,2]=-b*x(1);
   Fin_dim_algebra(S);
-  Quot = system("twostd",Quot);
+  Quot = twostd(Quot);
   qring Qr = Quot;
   Qr;
 }
@@ -474,13 +515,13 @@ proc IsCentral(poly p, list #)
 RETURN:  integer (1 if p commutes with all variables, 0 otherwise)
 EXAMPLE: example IsCentral; shows examples
 "{
-  int N=nvars(basering);
+  int N = nvars(basering);
   int in;
-  int flag=1;
-  poly q=0;
+  int flag = 1;
+  poly   q = 0;
   for (in=1; in<=N; in++)
   {
-    q=p*var(in)-var(in)*p;
+    q = p*var(in)-var(in)*p;
     if (q!=0)
     {
       if (size(#) >0 )
@@ -501,13 +542,15 @@ example
   D[1,3]=2*x;
   D[2,3]=-2*y;
   ncalgebra(1,D); // this is U(sl_2)
-  poly c=4*x*y+z^2-2*z;
-  IsCentral(c,1);
+  poly c = 4*x*y+z^2-2*z;
+  IsCentral(c,0);
+  poly h = x*c;
+  IsCentral(h,1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc UpOneMatrix (int N)
+proc UpOneMatrix(int N)
 "USAGE:   UpOneMatrix(N); N an integer, the number of columns
 RETURN:  intmat, NxN matrix with 1's in the whole upper triagle
 NOTE: is useful while setting noncommutative algebras
@@ -536,23 +579,23 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc ndc (list #)
+proc ndc(list #)
 "USAGE:   ndc([v]); v an optional integer. If v!=0 procedure will be verbose
 RETURN:  ideal of non-degeneracy conditions
 EXAMPLE: example ndc; shows examples
 "
 // if the second argument is given, produces ndc wrt powers x^N
 {
-  int N=1;
-  int Verbose=0;
+  int N = 1;
+  int Verbose = 0;
   if ( size(#)>=1 ) { Verbose = int(#[1]); }
   if ( size(#)>=2 ) { N = int(#[2]); }
-  int cnt=1;
-  int numvars=nvars(basering);
+  int cnt = 1;
+  int numvars = nvars(basering);
   int a,b,c;
-  poly p=1;
-  ideal res=0;
-  for (cnt=1;cnt<=N;cnt++)
+  poly p = 1;
+  ideal res = 0;
+  for (cnt=1; cnt<=N; cnt++)
   {
     if (Verbose) { "Processing degree :",cnt;}
     for (a=1; a<=numvars-2; a++)
@@ -561,19 +604,19 @@ EXAMPLE: example ndc; shows examples
       {
 	for(c=b+1; c<=numvars; c++)
 	{
-	  p=(var(c)^cnt)*(var(b)^cnt);
-	  p=p*(var(a)^cnt);
-	  p=p-(var(c)^cnt)*((var(b)^cnt)*(var(a)^cnt));
+	  p = (var(c)^cnt)*(var(b)^cnt);
+	  p = p*(var(a)^cnt);
+	  p = p-(var(c)^cnt)*((var(b)^cnt)*(var(a)^cnt));
 	  if (Verbose) {a,".",b,".",c,".";}
-	  if (p!=0) 
+	  if (p!=0)
 	  { 
 	    if ( res==0 )
 	    {
-	      res[1]=p;
+	      res[1] = p;
 	    }
 	    else
 	    {
-	      res=res,p;
+	      res = res,p;
 	    }
 	    if (Verbose) { "failed:",p; }
 	  }
@@ -614,7 +657,7 @@ EXAMPLE: example RootOfUnity; shows examples
     return(0);
   }
   if (n<1) { return(0); }
-  number mp = par(1);  
+  number mp = par(1);
   if (n==1) { return(mp-1); }
   if (n==2) { return(mp+1); }
   def OldRing = basering;
@@ -622,7 +665,7 @@ EXAMPLE: example RootOfUnity; shows examples
   string MCH;
   int j=1;
   while ( (CH[j] !=",") && (j<=size(CH)))
-  { 
+  {
     MCH=MCH+CH[j]; j++;
   }
   string SR = "ring @@rR="+MCH+","+parstr(basering)+",dp;";
@@ -643,15 +686,15 @@ EXAMPLE: example RootOfUnity; shows examples
   {
     if ( deg(@l[j]) == d) { @d[cnt]=@l[j]; cnt++; }
   }
-  if ( size(@d)==1 ) 
-  { 
-    res = poly(@d[1]); 
+  if ( size(@d)==1 )
+  {
+    res = poly(@d[1]);
   }
   else
   {
     j=1;
     while  ( j <= size(@d) )
-    { 
+    {
       res = @d[j]-lead(@d[j]);
       if ( leadcoef(res) >=0 ) { j++; }
       else { break; }
@@ -776,7 +819,7 @@ EXAMPLE: example Heisenberg; shows examples
 example
 {
   "EXAMPLE:";echo=2;
-  def a=Heisenberg(2);
+  def a = Heisenberg(2);
   setring a; 
   a;
 }
@@ -808,7 +851,7 @@ EXAMPLE: example Exterior; shows examples
   {
     Q[i] = var(i)^2;
   }
-  Q = system("twostd",Q);
+  Q = twostd(Q);
   qring @EA = Q;
   return(@EA);
 }
@@ -845,7 +888,15 @@ EXAMPLE: example CreateWeyl; shows examples
       @p = #[1];
     }
   }
-  ring @rr=@p,(x(1..n),D(1..n)),dp;
+  if (n ==1)
+  {
+    ring @rr = @p,(x,D),dp;
+  }
+  else
+  {
+    ring @rr = @p,(x(1..n),D(1..n)),dp;
+  }
+  setring @rr;
   Weyl();
   return(@rr);
 }
