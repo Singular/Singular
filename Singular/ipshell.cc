@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.34 1999-03-08 17:30:37 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.35 1999-03-08 18:11:46 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -570,7 +570,7 @@ leftv iiMap(map theMap, char * what)
   {
     if (!nSetMap(rInternalChar(IDRING(r)),
                  IDRING(r)->parameter,
-                 IDRING(r)->P,
+                 rPar(IDRING(r)),
                  IDRING(r)->minpoly))
     {
       Werror("map from characteristic %d to %d not implemented",

@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.cc,v 1.15 1999-03-08 17:30:32 Singular Exp $
+// $Id: fglm.cc,v 1.16 1999-03-08 18:11:39 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -123,11 +123,13 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
         WerrorS( "only works for global orderings" );
         state= FglmIncompatibleRings;
     }
-    if ( sring->N != dring->N ) {
+    if ( sring->N != dring->N )
+    {
         WerrorS( "rings must have same number of variables" );
         state= FglmIncompatibleRings;
     }
-    if ( sring->P != dring->P ) {
+    if ( rPar(sring) != rPar(dring) )
+    {
         WerrorS( "rings must have same number of parameters" );
         state= FglmIncompatibleRings;
     }
@@ -135,7 +137,7 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
     // now the rings have the same number of variables resp. parameters.
     // check if the names of the variables resp. parameters do agree:
     int nvar = sring->N;
-    int npar = sring->P;
+    int npar = rPar(sring);
     int * pperm;
     if ( npar > 0 )
         pperm= (int *)Alloc0( (npar+1)*sizeof( int ) );

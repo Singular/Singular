@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.43 1999-02-10 16:00:04 Singular Exp $ */
+/* $Id: ring.cc,v 1.44 1999-03-08 18:11:50 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -66,7 +66,7 @@ void rChangeCurrRing(ring r, BOOLEAN complete)
     }
 
     /*------------ global variables related to coefficients ------------*/
-    nSetChar(r->ch, complete, r->parameter, r->P);
+    nSetChar(r->ch, complete, r->parameter, rPar(r));
 
     /*------------ global variables related to polys -------------------*/
     pSetGlobals(r, complete);
@@ -160,7 +160,7 @@ void rSetHdl(idhdl h, BOOLEAN complete)
       pShortOut=(int)TRUE;
       if ((rg->parameter!=NULL) && (rg->ch<2))
       {
-        for (i=0;i<rg->P;i++)
+        for (i=0;i<rPar(rg);i++)
         {
           if(strlen(rg->parameter[i])>1)
           {
@@ -730,14 +730,12 @@ void rWrite(ring r)
   nblocks--;
 
 
-  if ((r->parameter!=NULL)&&(r->ch>1))
+  if (rField_is_GF(r))
     PrintS("//   # ground field : ");
   else
     PrintS("//   characteristic : ");
-  if (r->ch==-1)     PrintS("0 (real)\n");  /* R */
-  else if (r->ch<0)  Print ("%d\n",-r->ch); /* Fp(a) */
-  else if (r->ch==1) PrintS("0\n");         /* Q(a)  */
-  else               Print ("%d\n",r->ch);  /* Fq, Fp, Q */
+  if ( rField_is_R(r) )        PrintS("0 (real)\n");  /* R */
+  else Print ("%d\n",rChar(r)); /* Fp(a) */
   if (r->parameter!=NULL)
   {
     if (r->ch<2)
@@ -745,7 +743,7 @@ void rWrite(ring r)
       Print ("//   %d parameter    : ",rPar(r));
       char **sp=r->parameter;
       int nop=0;
-      while (nop<r->P)
+      while (nop<rPar(r))
       {
         PrintS(*sp);
         PrintS(" ");
@@ -925,13 +923,13 @@ void rKill(ring r)
       {
         int len=0;
         char **s=r->parameter;
-        while (len<r->P)
+        while (len<rPar(r))
         {
           FreeL((ADDRESS)*s);
           s++;
           len++;
         }
-        Free((ADDRESS)r->parameter,r->P*sizeof(char *));
+        Free((ADDRESS)r->parameter,rPar(r)*sizeof(char *));
       }
       Free((ADDRESS)r->VarOffset, (r->N +1)*sizeof(int));
     }
@@ -1205,7 +1203,7 @@ char * rCharStr(ring r)
     return s;
   }
   int l=0;
-  for(i=0; i<r->P;i++)
+  for(i=0; i<rPar(r);i++)
   {
     l+=(strlen(r->parameter[i])+1);
   }
@@ -1221,7 +1219,7 @@ char * rCharStr(ring r)
   char tt[2];
   tt[0]=',';
   tt[1]='\0';
-  for(i=0; i<r->P;i++)
+  for(i=0; i<rPar(r);i++)
   {
     strcat(s,tt);
     strcat(s,r->parameter[i]);
@@ -1236,13 +1234,13 @@ char * rParStr(ring r)
   int i;
   int l=2;
 
-  for (i=0; i<r->P; i++)
+  for (i=0; i<rPar(r); i++)
   {
     l+=strlen(r->parameter[i])+1;
   }
   char *s=(char *)AllocL(l);
   s[0]='\0';
-  for (i=0; i<r->P-1; i++)
+  for (i=0; i<rPar(r)-1; i++)
   {
     strcat(s,r->parameter[i]);
     strcat(s,",");
@@ -1312,10 +1310,10 @@ int rSum(ring r1, ring r2, ring &sum)
   ip_sring tmpR;
   memset(&tmpR,0,sizeof(tmpR));
   /* check coeff. field =====================================================*/
-  if (r1->ch==r2->ch)
+  if (rInternalChar(r1)==rInternalChar(r2))
   {
-    tmpR.ch=r1->ch;
-    if ((r1->ch==0)||(r1->ch>=2)) /* Q, Z/p, GF(p,n) */
+    tmpR.ch=rInternalChar(r1);
+    if (rField_is_Q(r1)||rField_is_Zp(r1)||rField_is_GF(r1)) /*Q, Z/p, GF(p,n)*/
     {
       if (r1->parameter!=NULL)
       {
@@ -1338,7 +1336,7 @@ int rSum(ring r1, ring r2, ring &sum)
       {
         if (r2->minpoly!=NULL)
         {
-          nSetChar(r1->ch,TRUE,r1->parameter,r1->P);
+          nSetChar(rInternalChar(r1),TRUE,r1->parameter,rPar(r1));
           if ((strcmp(r1->parameter[0],r2->parameter[0])==0) /* 1 char */
               && naEqual(r1->minpoly,r2->minpoly))
           {
@@ -1346,11 +1344,13 @@ int rSum(ring r1, ring r2, ring &sum)
             tmpR.parameter[0]=mstrdup(r1->parameter[0]);
             tmpR.minpoly=naCopy(r1->minpoly);
             tmpR.P=1;
-            nSetChar(currRing->ch,TRUE,currRing->parameter,currRing->P);
+            nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,
+	      rPar(currRing));
           }
           else
           {
-            nSetChar(currRing->ch,TRUE,currRing->parameter,currRing->P);
+            nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,
+	      rPar(currRing));
             WerrorS("different minpolys");
             return -1;
           }
@@ -1358,14 +1358,15 @@ int rSum(ring r1, ring r2, ring &sum)
         else
         {
           if ((strcmp(r1->parameter[0],r2->parameter[0])==0) /* 1 char */
-              && (r2->P==1))
+              && (rPar(r2)==1))
           {
             tmpR.parameter=(char **)Alloc0(sizeof(char *));
             tmpR.parameter[0]=mstrdup(r1->parameter[0]);
             tmpR.P=1;
-            nSetChar(r1->ch,TRUE,r1->parameter,r1->P);
+            nSetChar(rInternalChar(r1),TRUE,r1->parameter,rPar(r1));
             tmpR.minpoly=naCopy(r1->minpoly);
-            nSetChar(currRing->ch,TRUE,currRing->parameter,currRing->P);
+            nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,
+	      rPar(currRing));
           }
           else
           {
@@ -1379,14 +1380,15 @@ int rSum(ring r1, ring r2, ring &sum)
         if (r2->minpoly!=NULL)
         {
           if ((strcmp(r1->parameter[0],r2->parameter[0])==0) /* 1 char */
-              && (r1->P==1))
+              && (rPar(r1)==1))
           {
             tmpR.parameter=(char **)Alloc(sizeof(char *));
             tmpR.parameter[0]=mstrdup(r1->parameter[0]);
             tmpR.P=1;
-            nSetChar(r2->ch,TRUE,r2->parameter,r2->P);
+            nSetChar(rInternalChar(r2),TRUE,r2->parameter,rPar(r2));
             tmpR.minpoly=naCopy(r2->minpoly);
-            nSetChar(currRing->ch,TRUE,currRing->parameter,currRing->P);
+            nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,
+	      rPar(currRing));
           }
           else
           {
@@ -1399,12 +1401,12 @@ int rSum(ring r1, ring r2, ring &sum)
           int len=rPar(r1)+rPar(r2);
           tmpR.parameter=(char **)Alloc(len*sizeof(char *));
           int i;
-          for (i=0;i<r1->P;i++)
+          for (i=0;i<rPar(r1);i++)
           {
             tmpR.parameter[i]=mstrdup(r1->parameter[i]);
           }
           int j,l;
-          for(j=0;j<r2->P;j++)
+          for(j=0;j<rPar(r2);j++)
           {
             for(l=0;l<i;l++)
             {
@@ -1432,15 +1434,16 @@ int rSum(ring r1, ring r2, ring &sum)
       if ((r2->ch==0) /* Q */
           || (r2->ch==-r1->ch)) /* Z/p */
       {
-        tmpR.ch=r1->ch;
+        tmpR.ch=rInternalChar(r1);
         tmpR.parameter=(char **)Alloc(rPar(r1)*sizeof(char *));
-        tmpR.P=r1->P;
+        tmpR.P=rPar(r1);
         memcpy(tmpR.parameter,r1->parameter,rPar(r1)*sizeof(char *));
         if (r1->minpoly!=NULL)
         {
-          nSetChar(r1->ch,TRUE,r1->parameter,r1->P);
+          nSetChar(rInternalChar(r1),TRUE,r1->parameter,rPar(r1));
           tmpR.minpoly=naCopy(r1->minpoly);
-          nSetChar(currRing->ch,TRUE,currRing->parameter,currRing->P);
+          nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,
+	    rPar(currRing));
         }
       }
       else  /* R, Q(a),Z/q,Z/p(a),GF(p,n) */
@@ -1458,15 +1461,16 @@ int rSum(ring r1, ring r2, ring &sum)
     {
       if ((r2->ch<-1)||(r2->ch==1)) /* Z/p(a),Q(a) */
       {
-        tmpR.ch=r2->ch;
-        tmpR.P=r2->P;
+        tmpR.ch=rInternalChar(r2);
+        tmpR.P=rPar(r2);
         tmpR.parameter=(char **)Alloc(rPar(r2)*sizeof(char *));
         memcpy(tmpR.parameter,r2->parameter,rPar(r2)*sizeof(char *));
         if (r2->minpoly!=NULL)
         {
-          nSetChar(r1->ch,TRUE,r1->parameter,r1->P);
+          nSetChar(rInternalChar(r1),TRUE,r1->parameter,rPar(r1));
           tmpR.minpoly=naCopy(r2->minpoly);
-          nSetChar(currRing->ch,TRUE,currRing->parameter,currRing->P);
+          nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,
+	    rPar(currRing));
         }
       }
       else if (r2->ch>1) /* Z/p,GF(p,n) */
@@ -1489,19 +1493,20 @@ int rSum(ring r1, ring r2, ring &sum)
     {
       if (r2->ch==0) /* Q */
       {
-        tmpR.ch=r1->ch;
+        tmpR.ch=rInternalChar(r1);
         tmpR.P=rPar(r1);
         tmpR.parameter=(char **)Alloc0(rPar(r1)*sizeof(char *));
         int i;
-        for(i=0;i<r1->P;i++)
+        for(i=0;i<rPar(r1);i++)
         {
           tmpR.parameter[i]=mstrdup(r1->parameter[i]);
         }
         if (r1->minpoly!=NULL)
         {
-          nSetChar(r1->ch,TRUE,r1->parameter,r1->P);
+          nSetChar(rInternalChar(r1),TRUE,r1->parameter,rPar(r1));
           tmpR.minpoly=naCopy(r1->minpoly);
-          nSetChar(currRing->ch,TRUE,currRing->parameter,currRing->P);
+          nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,
+	    rPar(currRing));
         }
       }
       else  /* R, Z/p,GF(p,n) */
@@ -1518,19 +1523,20 @@ int rSum(ring r1, ring r2, ring &sum)
       }
       else if (r2->ch==-r1->ch) /* Z/p(a) */
       {
-        tmpR.ch=r2->ch;
+        tmpR.ch=rInternalChar(r2);
         tmpR.P=rPar(r2);
         tmpR.parameter=(char **)Alloc(rPar(r2)*sizeof(char *));
         int i;
-        for(i=0;i<r2->P;i++)
+        for(i=0;i<rPar(r2);i++)
         {
           tmpR.parameter[i]=mstrdup(r2->parameter[i]);
         }
         if (r2->minpoly!=NULL)
         {
-          nSetChar(r2->ch,TRUE,r2->parameter,r2->P);
+          nSetChar(rInternalChar(r2),TRUE,r2->parameter,rPar(r2));
           tmpR.minpoly=naCopy(r2->minpoly);
-          nSetChar(currRing->ch,TRUE,currRing->parameter,currRing->P);
+          nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,
+	    rPar(currRing));
         }
       }
       else
@@ -1556,7 +1562,7 @@ int rSum(ring r1, ring r2, ring &sum)
       b = FALSE;
     else if ((r2->parameter!=NULL) && (strlen(r1->names[i])==1))
     {
-      for(j=0;j<r2->P;j++)
+      for(j=0;j<rPar(r2);j++)
       {
         if (strcmp(r1->names[i],r2->parameter[j])==0)
         {
@@ -1585,7 +1591,7 @@ int rSum(ring r1, ring r2, ring &sum)
       b = FALSE;
     else if ((r1->parameter!=NULL) && (strlen(r2->names[i])==1))
     {
-      for(j=0;j<r1->P;j++)
+      for(j=0;j<rPar(r1);j++)
       {
         if (strcmp(r2->names[i],r1->parameter[j])==0)
         {
@@ -1759,7 +1765,7 @@ ring rCopy(ring r)
     int l=rPar(r);
     res->parameter=(char **)Alloc(l*sizeof(char *));
     int i;
-    for(i=0;i<r->P;i++)
+    for(i=0;i<rPar(r);i++)
     {
       res->parameter[i]=mstrdup(r->parameter[i]);
     }

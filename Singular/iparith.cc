@@ -1487,7 +1487,7 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
     BOOLEAN bo;
     if (iiOp==IMAP_CMD)
     {
-      if (!nSetMap(rInternalChar(r),r->parameter,r->P,r->minpoly))
+      if (!nSetMap(rInternalChar(r),r->parameter,rPar(r),r->minpoly))
       {
         if (iiOp!=IMAP_CMD)
           goto err_fetch;
@@ -1507,15 +1507,18 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
             goto err_fetch;
         }
         BITSET save_test=test;
-        naSetChar(rInternalChar(r),TRUE,r->parameter,r->P);
-        nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,currRing->P);
+        naSetChar(rInternalChar(r),TRUE,r->parameter,rPar(r));
+        nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,
+	  rPar(currRing));
         test=save_test;
       }
       perm=(int *)Alloc0((r->N+1)*sizeof(int));
       if (par_perm_size!=0)
         par_perm=(int *)Alloc0(par_perm_size*sizeof(int));
-      maFindPerm(r->names,       r->N,       r->parameter,        r->P,
-                 currRing->names,currRing->N,currRing->parameter, currRing->P,
+      maFindPerm(r->names,       r->N,       
+                      r->parameter,        rPar(r),
+                 currRing->names,currRing->N,
+		      currRing->parameter, rPar(currRing),
                  perm,par_perm);
     }
     sleftv tmpW;
@@ -2883,7 +2886,7 @@ static BOOLEAN jjROWS_IV(leftv res, leftv v)
 }
 static BOOLEAN jjRPAR(leftv res, leftv v)
 {
-  res->data = (char *)((ring)v->Data())->P;
+  res->data = (char *)rPar(((ring)v->Data()));
   return FALSE;
 }
 static BOOLEAN jjSTD(leftv res, leftv v)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.29 1999-03-08 17:30:40 Singular Exp $ */
+/* $Id: longalg.cc,v 1.30 1999-03-08 18:11:47 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -2388,7 +2388,7 @@ BOOLEAN naSetMap(int c, char ** par, int nop, number minpol)
       naParsToCopy=0;
       for(i=0;i<nop;i++)
       {
-        if ((i>=currRing->P)
+        if ((i>=rPar(currRing))
         ||(strcmp(par[i],currRing->parameter[i])!=0))
            return FALSE;
         naParsToCopy++;
@@ -2442,7 +2442,7 @@ BOOLEAN naSetMap(int c, char ** par, int nop, number minpol)
       naParsToCopy=0;
       for(i=0;i<nop;i++)
       {
-        if ((i>=currRing->P)
+        if ((i>=rPar(currRing))
         ||(strcmp(par[i],currRing->parameter[i])!=0))
            return FALSE;
         naParsToCopy++;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.45 1999-03-08 17:30:36 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.46 1999-03-08 18:11:45 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -116,7 +116,7 @@ static BOOLEAN jjSHORTOUT(leftv res, leftv a)
 static BOOLEAN jjMINPOLY(leftv res, leftv a)
 {
   if ((currRing->parameter!=NULL)
-  && ((currRing->P>1)
+  && ((rPar(currRing)>1)
     || (rField_is_GF())))
   {
     WerrorS("no minpoly allowed");

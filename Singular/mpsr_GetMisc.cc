@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_GetMisc.cc,v 1.12 1999-03-08 17:30:46 Singular Exp $ */
+/* $Id: mpsr_GetMisc.cc,v 1.13 1999-03-08 18:11:49 Singular Exp $ */
 
 /***************************************************************
  *
@@ -112,7 +112,7 @@ BOOLEAN mpsr_RingEqual(ring r1, ring r2)
   if ((rInternalChar(r1) != rInternalChar(r2))
   // orig: r1->ch == r2->ch ???
   || (r1->N != r2->N) || (r1->OrdSgn != r2->OrdSgn)
-      || (r1->P != r2->P))
+      || (rPar(r1) != rPar(r2)))
     return 0;
 
   for (i=0; i<r1->N; i++)
@@ -185,7 +185,7 @@ inline BOOLEAN RingLessEqual(ring r1, ring r2)
 
   if (r2 == NULL) return 0;
 
-  if ((r1->N > r2->N) || (r1->OrdSgn != r2->OrdSgn) || (r1->P > r2->P))
+  if ((r1->N > r2->N) || (r1->OrdSgn != r2->OrdSgn) || (rPar(r1) > rPar(r2)))
     return 0;
 
   if (!rField_is_Q(r1) && rInternalChar(r1) != rInternalChar(r2)) return 0;
@@ -201,7 +201,7 @@ inline BOOLEAN RingLessEqual(ring r1, ring r2)
       r1->order[1] != r2->order[1])
     return 0;
   
-  for (i=0; i<r1->P;i++)
+  for (i=0; i<rPar(r1);i++)
   {
       if (strcmp(r1->parameter[i], r2->parameter[i])!=0)
         return 0;
@@ -340,7 +340,8 @@ void mpsr_MapLeftv(leftv l, ring from_ring, ring to_ring)
         {
           number nn = (number) l->data;
           mpsr_SetCurrRing(to_ring, TRUE);
-          nSetMap(rInternalChar(from_ring), from_ring->parameter, from_ring->P, from_ring->minpoly);
+          nSetMap(rInternalChar(from_ring), from_ring->parameter,
+	    rPar(from_ring), from_ring->minpoly);
           l->data = (void *) nMap(nn);
           mpsr_SetCurrRing(from_ring, FALSE);
           nDelete(&nn);
