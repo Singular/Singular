@@ -1,7 +1,7 @@
 #####################################################################
 ###
 ### Makefile for Singular documentation
-### $Id: Makefile.in,v 1.79 2001-08-27 14:40:02 Singular Exp $
+### $Id: Makefile.in,v 1.80 2002-12-11 17:06:23 levandov Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -68,6 +68,7 @@ PL2DOC		= ${PERL} ./pl2doc.pl -db  ${CHKSUM_DB}
 # t2h stuff
 TMP_DIR		= @TMP_DIR@
 HTML_SUBDIR     = html
+PLU_HTML_SUBDIR = pluhtml
 TEXI2HTML_INIT  = t2h_singular.init
 ifeq ($(VERBOSE),0)
 T2H_VERBOSE	=
@@ -77,7 +78,11 @@ endif
 TEXI2HTML_OPTS  = -init_file ${TEXI2HTML_INIT} @TEXI2HTML_OPTS@ \
 	          -short_ext -l2h_tmp ${TMP_DIR} -subdir ${HTML_SUBDIR} \
                   ${T2H_VERBOSE}
+PLU_TEXI2HTML_OPTS  = -init_file ${TEXI2HTML_INIT} @TEXI2HTML_OPTS@ \
+	          -short_ext -l2h_tmp ${TMP_DIR} -subdir ${PLU_HTML_SUBDIR} \
+                  ${T2H_VERBOSE}
 HTML_MANUAL_PREFIX = sing
+PLU_HTML_MANUAL_PREFIX = plu
 HTML_TUTOR_PREFIX  = tut
 HTML_MANUAL_TOP    = index.htm
 HTML_TUTOR_TOP     = tutor.htm
@@ -97,7 +102,13 @@ DOC2TEX_FILES	= \
 		examples.tex general.tex ti_ip.tex math.tex reference.tex \
 		start.tex types.tex pdata.tex tricks.tex platform.tex
 
+PLU_DOC2TEX_FILES	= \
+		plumath.tex plutypes.tex
+
 MANUAL_FILES	= ${TEX_FILES} ${DOC2TEX_FILES}
+
+PLU_MANUAL_FILES = ${PLU_DOC2TEX_FILES}
+
 TUTOR_FILES	= \
 		tutor.tex examples.tex start.tex copyright.tex
 
@@ -123,6 +134,9 @@ info: singular.hlp
 
 singular.hlp: ${MANUAL_FILES} singular.tex
 	- ${MAKEINFO} --no-split singular.tex
+
+plural.hlp:	${PLU_MANUAL_FILES} plural.tex
+	- ${MAKEINFO} --no-split plural.tex
 
 # dvi stuff
 dvi: manual.dvi usercard.dvi
@@ -182,6 +196,9 @@ ${DOC_SUBDIR}/%_lib.pl : ${SINGULAR_LIB_DIR}/%.lib ${LIBPARSE}
 singular.idx: singular.hlp ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx doc2idx.pl
 	${PERL} doc2idx.pl singular.hlp ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx ${CHKSUM_DB} > singular.idx
 
+plural.idx: plural.hlp ${PLU_HTML_SUBDIR}/${PLU_HTML_MANUAL_PREFIX}_cp.idx doc2idx.pl
+	${PERL} doc2idx.pl plural.hlp ${PLU_HTML_SUBDIR}/${PLU_HTML_MANUAL_PREFIX}_cp.idx ${CHKSUM_DB} > plural.idx
+
 ###########################################################
 # stand-alone targest
 #
@@ -239,6 +256,11 @@ ${HTML_SUBDIR}/${HTML_MANUAL_TOP}: ${TEXI2HTML_INIT} ${TEXI2HTML} singular.tex
 	${PERL} ${TEXI2HTML} ${TEXI2HTML_OPTS} -prefix ${HTML_MANUAL_PREFIX} \
         -top_file ${HTML_MANUAL_TOP} singular.tex
 
+plu_html: ${TMP_DIR} ${PLU_HTML_SUBDIR}/${HTML_MANUAL_TOP} ${PLU_IMAGES_HTML}
+${PLU_HTML_SUBDIR}/${HTML_MANUAL_TOP}: ${TEXI2HTML_INIT} ${TEXI2HTML} plural.tex
+	${PERL} ${TEXI2HTML} ${PLU_TEXI2HTML_OPTS} -prefix ${PLU_HTML_MANUAL_PREFIX} \
+        -top_file ${HTML_MANUAL_TOP} plural.tex
+
 # html stuff
 html_tutor: ${TMP_DIR} ${HTML_SUBDIR}/${HTML_TUTOR_TOP} ${IMAGES_HTML}
 ${HTML_SUBDIR}/${HTML_TUTOR_TOP}: ${TEXI2HTML_INIT} ${TEXI2HTML} tutor.tex
@@ -263,6 +285,10 @@ images/%.xbm : images/%.xbm.uu
 ${IMAGES_HTML} : ${IMAGES_SRC}
 	test -d ${HTML_SUBDIR} || mkdir ${HTML_SUBDIR}
 	cp ${IMAGES_SRC} ${HTML_SUBDIR}
+
+${PLU_IMAGES_HTML} : ${IMAGES_SRC}
+	test -d ${PLU_HTML_SUBDIR} || mkdir ${PLU_HTML_SUBDIR}
+	cp ${IMAGES_SRC} ${PLU_HTML_SUBDIR}
 
 
 
@@ -350,13 +376,15 @@ mostlyclean:
 	/bin/rm -f *.fn *.fns *.ky *.kys *.log *.pg *.pgs *.toc *.tp
 	/bin/rm -f *.tps *.vr *.vrs *.dvi *.ps
 	/bin/rm -f singular.hlp manual.hlp  ${DOC2TEX_FILES} singular.idx
-	/bin/rm -f ${HTML_SUBDIR}/${HTML_MANUAL_TOP} ${HTML_SUBDIR}/${HTML_TUTOR_TOP}
+	/bin/rm -f plural.hlp manual.hlp  ${PLU_DOC2TEX_FILES} singular.idx		/bin/rm -f ${HTML_SUBDIR}/${HTML_MANUAL_TOP} ${HTML_SUBDIR}/${HTML_TUTOR_TOP}
+	/bin/rm -f ${PLU_HTML_SUBDIR}/${HTML_MANUAL_TOP} ${PLU_HTML_SUBDIR}/${HTML_TUTOR_TOP}
 	/bin/rm -rf ${STANDALONE_HTML_FILES} ${STANDALONE_FILES} ${STANDALONE_TXT_FILES}
 	/bin/rm -f INSTALL_unix.${SINGUNAME}.txt INSTALL_unix.${SINGUNAME}.html
 
 distclean: clean
 	/bin/rm -f Makefile
 	/bin/rm -rf ${HTML_SUBDIR} ../html ../examples
+	/bin/rm -rf ${PLU_HTML_SUBDIR} ../html ../examples
 
 maintainer-clean: distclean
 
