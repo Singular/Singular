@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps_ip.cc,v 1.3 2004-04-06 09:13:35 Singular Exp $ */
+/* $Id: maps_ip.cc,v 1.4 2004-04-06 15:14:26 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -299,13 +299,38 @@ poly pSubstPoly(poly p, int var, poly image)
 */
 ideal  idSubstPoly(ideal id, int n, poly e)
 {
-  int k=MATROWS((matrix)id)*MATCOLS((matrix)id);
-  ideal res=(ideal)mpNew(MATROWS((matrix)id),MATCOLS((matrix)id));
 
-  res->rank = id->rank;
-  for(k--;k>=0;k--)
+#ifdef HAVE_PLURAL
+  if (rIsPluralRing(currRing))
   {
-    res->m[k]=pSubstPoly(id->m[k],n,e);
+    int k=MATROWS((matrix)id)*MATCOLS((matrix)id);
+    ideal res=(ideal)mpNew(MATROWS((matrix)id),MATCOLS((matrix)id));
+    res->rank = id->rank;
+    WarnS("not implemented: only substitution only by a monomial");
+    for(k--;k>=0;k--)
+    {
+      res->m[k]=pSubst(pCopy(id->m[k]),n,e);
+    }
+    return res;
   }
+#endif
+  map theMap=(map)idMaxIdeal(1);
+  theMap->preimage=NULL;
+  pDelete(&(theMap->m[n-1]));
+  theMap->m[n-1]=pCopy(e);
+
+  leftv v=(leftv)omAlloc0Bin(sleftv_bin);
+  sleftv tmpW;
+  memset(&tmpW,0,sizeof(sleftv));
+  tmpW.rtyp=IDEAL_CMD;
+  tmpW.data=id;
+  if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,currRing,NULL,NULL,0,nCopy))
+  {
+    WerrorS("map failed");
+    v->data=NULL;
+  }
+  ideal res=(ideal)(v->data);
+  idDelete((ideal *)(&theMap));
+  omFreeBin((ADDRESS)v, sleftv_bin);
   return res;
 }
