@@ -1,20 +1,30 @@
-// $Id: spectrum.lib,v 1.4 1999-12-01 13:22:55 Singular Exp $
+// $Id: spectrum.lib,v 1.5 2000-02-09 18:15:10 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: spectrum.lib,v 1.4 1999-12-01 13:22:55 Singular Exp $";
+version="$Id: spectrum.lib,v 1.5 2000-02-09 18:15:10 Singular Exp $";
 info="
 LIBRARY:  spectrum.lib   PROCEDURES FOR COMPUTING SPECTRA
 
 PROCEDURES:
- spectrum(poly);        spectrum of a isoloated singularity
- spectrum(poly[,1]);    spectrum of a isoloated singularity without tests
+ spectrum(poly);        spectrum of a isolated singularity
+ spectrum(poly[,1]);    spectrum of a isolated singularity without tests
+ semic(s1,s2[,1]);      tests if s2 is semicontinous for s1 using
+                        half open intervalls
+                        (and open intervalls for a 3rd paramater 1)
+ semicqh(s1,s2[,1]);    tests if s2 is semicontinous for s1 using
+                        open and half open intervalls
+ spadd(s1,s2);          sum of two spectra s1 and s2
+ spmul(s,k);            multiplies the spectrum s with the int k
           (parameters in square brackets [] are optional)
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
 
 proc spectrum (poly f, list #)
-"USAGE:   spectrum(f[,1]);  f polynomial
+"USAGE:  spectrum(f[,1]);  f polynomial
+         computes the spectrum of f
+	 if a second argument 1 is given, 
+	 no test for a degenerate principal part will be done
 RETURN:  list
 EXAMPLE: example spectrum; shows examples
 "
@@ -25,11 +35,16 @@ EXAMPLE: example spectrum; shows examples
 }
 example
 { "EXAMPLE:"; echo = 2;
+  ring r=0,(x,y),ds;
+  poly f=x^31+x^6*y^7+x^2*y^12+x^13*y^2+y^29;
+  spectrum(f);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc semic (list s, list ss, list #)
-"USAGE:   semic(s,ss[,i]);  s, ss spectra, i int
+"USAGE:  semic(s,ss[,i]);  s, ss spectra, i int
+         tests if ss is semicontinous for s using half open intervalls
+         (and open intervalls for a 3rd paramater 1)
 RETURN:  int
 EXAMPLE: example semic; shows examples
 "
@@ -43,8 +58,9 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc semicsqh (list s, list ss)
-"USAGE:   semicsqh(s,ss);  s, ss spectra, i int
-RETURN:  int
+"USAGE: semicsqh(s,ss);  s, ss spectra, i int
+        tests if ss is semicontinous for s using open and half open intervalls
+RETURN: int
 EXAMPLE: example semicsqh; shows examples
 "
 {
@@ -55,7 +71,8 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc spadd (list s1, list s2)
-"USAGE:   spadd(s1,s2);  s1, s2 spectra
+"USAGE:  spadd(s1,s2);  s1, s2 spectra
+         sum of two spectra s1 and s2
 RETURN:  list
 EXAMPLE: example spadd; shows examples
 "
@@ -67,7 +84,8 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc spmul (list s, int k)
-"USAGE:   spmul(s,k);  s spectrum, k int
+"USAGE:  spmul(s,k);  s spectrum, k int
+         multiplies the spectrum s with the int k
 RETURN:  list
 EXAMPLE: example spmul; shows examples
 "
