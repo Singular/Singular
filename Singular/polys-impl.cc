@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.46 2000-08-24 14:28:55 Singular Exp $ */
+/* $Id: polys-impl.cc,v 1.47 2000-08-24 14:42:44 obachman Exp $ */
 
 /***************************************************************
  *
@@ -914,6 +914,22 @@ void pPrintDivisbleByStat()
 #endif
 
 #ifdef HAVE_SHIFTED_EXPONENTS
+int rComp0_Func(poly p1,poly p2)
+{
+  int i;
+  for(i=0; i<=currRing->pCompHighIndex;i++)
+  {
+    if (p1->exp.l[i] != p2->exp.l[i])
+    {
+      if (p1->exp.l[i] > p2->exp.l[i])
+        return currRing->ordsgn[i];
+      else
+        return -currRing->ordsgn[i];
+    }
+  }
+  return 0;
+}
+
 #ifdef PDEBUG
 int rComp0(poly p1,poly p2)
 {

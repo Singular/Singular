@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.42 2000-08-24 11:21:45 Singular Exp $ */
+/* $Id: polys1.cc,v 1.43 2000-08-24 14:42:45 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -135,6 +135,7 @@ void pSetModDeg(intvec *w)
   }
 }
 
+#ifndef HAVE_P_PROCS
 /*-------------operations on polynomials:------------*/
 /*2
 * add p1 and p2, p1 and p2 are destroyed
@@ -205,6 +206,8 @@ poly pAdd(poly p1, poly p2)
   pDelete1(&p);
   return p;
 }
+#endif
+
 
 /*2
 * multiply a polynomial by -1

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.220 2000-08-14 12:56:21 obachman Exp $ */
+/* $Id: iparith.cc,v 1.221 2000-08-24 14:42:40 obachman Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -23,6 +23,7 @@
 #include "sdb.h"
 #include "longalg.h"
 #include "polys.h"
+#include "polys-comp.h"
 #include "ideals.h"
 #include "matpol.h"
 #include "kstd1.h"

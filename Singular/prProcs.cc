@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: prProcs.cc,v 1.3 2000-08-14 12:56:47 obachman Exp $ */
+/* $Id: prProcs.cc,v 1.4 2000-08-24 14:42:45 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for primitive poly arithmetic
 */
@@ -42,14 +42,6 @@ do                                              \
   omFreeBin(__p, r->PolyBin);                \
 }                                               \
 while(0)
-/***************************************************************
- *
- * General:  pr_Mult_n which always works
- * Returns:  p*n
- * Destroys: p
- * Const:    n
- *
- ***************************************************************/
 
 poly pr_Mult_n_General(poly p, number n)
 {

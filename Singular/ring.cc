@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.106 2000-08-24 11:21:46 Singular Exp $ */
+/* $Id: ring.cc,v 1.107 2000-08-24 14:42:46 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -27,6 +27,7 @@
 #include "lists.h"
 #include "ring.h"
 #include "prCopy.h"
+#include "p_Procs.h"
 
 #define BITS_PER_LONG 8*SIZEOF_LONG
 
@@ -185,7 +186,9 @@ idhdl rDefault(char *s)
   if (tmp==NULL) return NULL;
 
   if (ppNoether!=NULL) pDelete(&ppNoether);
-  if ((sLastPrinted.rtyp>BEGIN_RING) && (sLastPrinted.rtyp<END_RING))
+  if (((sLastPrinted.rtyp>BEGIN_RING) && (sLastPrinted.rtyp<END_RING)) ||
+      ((sLastPrinted.rtyp==LIST_CMD)&&(lRingDependend((lists)sLastPrinted.data))))
+
   {
     sLastPrinted.CleanUp();
     memset(&sLastPrinted,0,sizeof(sleftv));
@@ -873,7 +876,8 @@ void rKill(ring r)
         currQuotient=NULL;
       }
       if (ppNoether!=NULL) pDelete(&ppNoether);
-      if ((sLastPrinted.rtyp>BEGIN_RING) && (sLastPrinted.rtyp<END_RING))
+      if (((sLastPrinted.rtyp>BEGIN_RING) && (sLastPrinted.rtyp<END_RING)) ||
+          ((sLastPrinted.rtyp==LIST_CMD)&&(lRingDependend((lists)sLastPrinted.data))))
       {
         sLastPrinted.CleanUp();
         memset(&sLastPrinted,0,sizeof(sleftv));
@@ -2554,7 +2558,7 @@ BOOLEAN rComplete(ring r, int force)
   //
   // r->pCompHighIndex already set
   r->pCompLSize = r->pCompHighIndex + 1;
-  r->ordsgn=(long *)omAlloc0(r->pCompLSize*sizeof(long));
+  r->ordsgn=(long *)omAlloc0(r->ExpLSize*sizeof(long));
 
   for(j=0;j<=r->pCompHighIndex;j++)
   {
@@ -2577,7 +2581,6 @@ BOOLEAN rComplete(ring r, int force)
 
   // ----------------------------
   // indices for (first copy of ) variable entries in exp.e vector (VarOffset):
-  // BIGENDIAN:
   r->VarOffset=v;
 
   // ----------------------------
@@ -2597,6 +2600,11 @@ BOOLEAN rComplete(ring r, int force)
   }
   if (i==r->pCompIndex) i++;
   r->pOrdIndex=i;
+
+  // ----------------------------
+  // p_Procs
+  r->p_Procs = omAlloc(sizeof(p_Procs_s));
+  p_SetProcs(r, r->p_Procs);
   return FALSE;
 }
 #else /* not HAVE_SHIFTED_EXPONENTS: */
@@ -2984,7 +2992,7 @@ BOOLEAN rComplete(ring r, int force)
   // r->pCompHighIndex already set
 #endif
   r->pCompLSize = r->pCompHighIndex - r->pCompLowIndex + 1;
-  r->ordsgn=(long *)omAlloc0(r->pCompLSize*sizeof(long));
+  r->ordsgn=(long *)omAlloc0(r->ExpLSize*sizeof(long));
 
 #ifndef WORDS_BIGENDIAN
   for(j=r->pCompLowIndex;j<=r->pCompHighIndex;j++)
@@ -3115,10 +3123,13 @@ void rUnComplete(ring r)
       omFreeSize((ADDRESS)r->typ,r->OrdSize*sizeof(sro_ord));
     }
     if (r->ordsgn != NULL && r->pCompLSize != 0)
-      omFreeSize((ADDRESS)r->ordsgn,r->pCompLSize*sizeof(long));
+      omFreeSize((ADDRESS)r->ordsgn,r->pExpLSize*sizeof(long));
+    if (r->p_Procs != NULL)
+      omFreeSize(r->p_Procs, sizeof(p_Procs_s));
   }
 }
 
+#ifdef RDEBUG
 void rDebugPrint(ring r)
 {
   if (r==NULL)
@@ -3224,7 +3235,23 @@ void rDebugPrint(ring r)
     else
       PrintLn();
   }
+
+  // p_Procs stuff
+  p_Procs_s proc_names;
+  char* field;
+  char* length;
+  char* ord;
+  p_Debug_GetProcNames(r, &proc_names);
+  p_Debug_GetSpecNames(r, field, length, ord);
+
+  Print("p_Spec  : %s, %s, %s\n", field, length, ord);
+  PrintS("p_Procs :\n");
+  for (i=0; i<sizeof(p_Procs_s)/sizeof(void*); i++)
+  {
+    Print(" %s,\n", ((char**) &proc_names)[i]);
+  }
 }
+
 void pDebugPrint(poly p)
 {
   int i,j;
@@ -3249,6 +3276,7 @@ void pDebugPrint(poly p)
     if (j==0) { PrintS("...\n"); break; }
   }
 }
+#endif // RDEBUG
 
 
 /*2

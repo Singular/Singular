@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.138 2000-08-14 14:35:50 Singular Exp $ */
+/* $Id: extra.cc,v 1.139 2000-08-24 14:42:39 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -627,6 +627,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   {
     char *sys_cmd=(char *)(h->Data());
     h=h->next;
+#ifdef RDEBUG
 /*==================== poly debug ==================================*/
     if(strcmp(sys_cmd,"p")==0)
     {
@@ -641,6 +642,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
+#endif
 /*==================== mtrack ==================================*/
     if(strcmp(sys_cmd,"mtrack")==0)
     {

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.32 2000-08-14 12:56:46 obachman Exp $ */
+/* $Id: polys.h,v 1.33 2000-08-24 14:42:45 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
@@ -123,8 +123,7 @@ int  pModuleOrder();
 #define pFree1(m)       _pFree1(m, currPolyBin)
 // frees the space of monomial and frees coefficient
 #define pDelete1(m)     _pDelete1(m, currPolyBin)
-// deletes the whole polynomial p
-#define pDelete(p)      _pDelete(p, currPolyBin)
+
 
 // similar to routines above, except that monomials are assumed to be from heap h (resp. are allocated from heap h)
 #define pHeapNew(h)             _pNew(h)
@@ -153,8 +152,6 @@ int  pModuleOrder();
   _pShallowCopyDeleteHead(dest_heap, source_p, source_heap)
 
 extern  poly pHeadProc(poly p);
-// Returns copy of the whole polynomial
-#define pCopy(p)        _pCopy(currPolyBin, p)
 // Returns copy of the whole poly, new monomials are taken from dest_heap
 #define pHeapCopy(dest_heap, p) _pCopy(dest_heap, p)
 
@@ -179,13 +176,28 @@ poly      pmInit(char *s, BOOLEAN &ok);   /* monom -> poly */
 void      ppDelete(poly * a, ring r);
 
 /*-------------operations on polynomials:------------*/
-poly      pAdd(poly p1, poly p2);
 poly      pNeg(poly p);
 poly      pSub(poly a, poly b);
 poly      pMult(poly a, poly b);
 void      pMultN(poly a, number c);
 poly      pMultCopyN(poly a, number c);
 poly      pPower(poly p, int i);
+
+
+// ----------------- define to enable new p_procs -----*/
+// #define HAVE_P_PROCS
+#ifdef HAVE_P_PROCS
+#include "p_Procs.h"
+#define pDelete p_Delete
+#define pCopy   p_Copy
+#define pAdd    p_Add_q
+#else
+// deletes the whole polynomial p
+#define pDelete(p)      _pDelete(p, currPolyBin)
+// Returns copy of the whole polynomial
+#define pCopy(p)        _pCopy(currPolyBin, p)
+poly      pAdd(poly p1, poly p2);
+#endif
 
 // return TRUE, if exponent and component of Lm(p1) and Lm(p2) are equal,
 // FALSE otherwise;

@@ -99,7 +99,7 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     ndbm.cc  libparse.cc mod_raw.cc\
     pcv.cc kbuckets.cc prProcs.cc \
     mpr_inout.cc mpr_base.cc mpr_numeric.cc \
-    prCopy.cc
+    prCopy.cc p_Procs.cc
 
 
 # normal C source files
@@ -109,7 +109,10 @@ CSOURCES=weight0.c fegetopt.c fereadl.c page.c feOpenWinntUrl.c
 ESOURCES=iparith.cc tesths.cc mpsr_Tok.cc claptmpl.cc
 
 SOURCES=${CSOURCES} ${CXXSOURCES} ${ESOURCES} mmalloc.cc\
-	grammar.y scanner.l libparse.l syz2.cc
+	grammar.y scanner.l libparse.l syz2.cc \
+        p_Delete__Template.cc p_ShallowCopyDelete__Template.cc \
+        p_Copy__Template.cc p_Mult_n__Template.cc p_Mult_m__Template.cc \
+        p_Minus_m_Mult_q__Template.cc p_Add_q__Template.cc
 
 
 HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
@@ -129,7 +132,8 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	pcv.h mod_raw.h kbuckets.h prProcs.h \
 	mpr_global.h mpr_inout.h mpr_base.h mpr_numeric.h \
 	feOpt.h fegetopt.h distrib.h walk.h \
-	prCopy.h
+	prCopy.h \
+        p_MemAdd.h p_MemCopy.h p_MemCmp.h p_Numbers.h
 
 INCS=febase.inc polys.inc iparith.inc mpsr_Tok.inc feOpt.inc
 
@@ -267,6 +271,11 @@ prCopy.cc : prCopy.inc
 prCopy.inc : prCopyMacros.h prCopyTemplate.cc prCopy.pl
 	$(PERL) prCopy.pl > prCopy.inc
 
+p_Procs.inc: p_Procs.cc p_Procs.h mod2.h 
+	$(CXX) -g -Wall -DGENERATE_P_PROCS p_Procs.cc -o p_Procs
+	./p_Procs > p_Procs.inc
+
+
 src: scanner.cc grammar.h grammar.cc libparse.cc 
 
 mod2.h: stamp-h
@@ -347,8 +356,8 @@ uninstallbin:
 ## clean targest
 ##
 mostlyclean: 
-	-rm -f Singular Singular-static Singularg Singularp Singularb libparse feOpt*.inc
-	-rm -f *.o *.og core *.op *.ob *.ot Singulart
+	-rm -f Singular Singular-static Singulara Singularg Singularp Singularb libparse feOpt*.inc p_Procs.inc
+	-rm -f *.o *.og core *.op *.ob *.ot Singulart *.od *_d.cc *_d.c p_Procs *.oa
 	-rm ESingular* TSingular*
 
 clean: mostlyclean
@@ -497,7 +506,7 @@ CFLAGST		= -g  -O2 -w ${PIPE}
 CXXFLAGST	= -g  -O2 -w ${PIPE}
 
 ##
-## op and ob files for gprof and bprof, ot for mtrack
+## op and ob files for gprof and bprof, ot for mtrack, oc for OMCHECK=1
 ##
 
 OBJP1 := $(CXXSOURCES:.cc=.op) 
@@ -584,6 +593,69 @@ mpsr_Tok.ot: iparith.inc mpsr_Tok.cc
 	$(CXXP) ${CXXFLAGST} ${CXXTEMPLFLAGSB} ${CPPFLAGS} ${DEFST} -c mpsr_Tok.cc -o mpsr_Tok.ot
 
 
+#
+# for Singulara
+#
+DEFSA = -DOM_CHECK=1 -DHAVE_ASSUME -DNDEBUG -D@SING_UNAME@ @DEFS@
+OBJA1 := $(CXXSOURCES:.cc=.oa) 
+OBJA2 := $(CSOURCES:.c=.oa) 
+OBJA=$(OBJA1) $(OBJA2)
+CFLAGSA		= -g  -O -Wall -Wno-unused ${PIPE}
+CXXFLAGSA	= -g  -O -Wall -Wno-unused ${PIPE}
+
+claptmpl.oa: claptmpl.cc mod2.h
+	$(CXX)  ${CXXFLAGSA} ${CPPFLAGS} ${DEFSA} -c $< -o $@
+
+$(OBJA1) mmalloc.oa: %.oa: %.cc
+	$(CXX) ${CXXFLAGSA} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSA} -c $< -o $@
+
+$(OBJA2) : %.oa: %.c
+	$(CCP)  ${CFLAGSA} ${CPPFLAGS} ${DEFSA} -c $< -o $@
+
+Singulara: scanner.cc   $(OBJA) iparith.oa mpsr_Tok.oa claptmpl.oa tesths.cc version.h  mmalloc.oa
+	$(CXXP) ${CXXFLAGSA} ${CPPFLAGS} ${DEFSA} -o Singulara \
+	tesths.cc iparith.oa mpsr_Tok.oa claptmpl.oa $(OBJA) ${LDFLAGS} ${LIBS} -lomalloc mmalloc.oa \
+	${LD_DYN_FLAGS} 
+
+iparith.oa: iparith.inc iparith.cc
+	$(CXXP)  ${CXXFLAGSA} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSA} -c iparith.cc -o iparith.oa
+
+mpsr_Tok.oa: iparith.inc mpsr_Tok.cc
+	$(CXXP) ${CXXFLAGAT} ${CXXTEMPLFLAGSB} ${CPPFLAGS} ${DEFSA} -c mpsr_Tok.cc -o mpsr_Tok.oa
+
+#
+# for Macro expansion
+# 
+CXXSOURCESD := $(CXXSOURCES:%.cc=%_d.cc)
+CSOURCESD := $(CSOURCES:%.c=%_d.c)
+OBJD1 := $(CXXSOURCESD:.cc=.od)
+OBJD2 := $(CSOURCESD:.c=.od)
+
+p_ProcsGen_d.cc: p_Procs.cc p_Procs.h mod2.h 
+	$(CCG) -DGENERATE_P_PROCS ${CPPFLAGS} -E -P p_Procs.cc | $(PERL) -p -e 's/;/;\n/g' | $(PERL) -p -e 's/\{/\n\{/g' | $(PERL) -p -e 's/\}/\n\}/g' > $@
+p_ProcsGen_d: p_Procs_d.cc
+	gcc -g -Wall -DGENERATE_P_PROCS p_Procs_d.cc -o p_ProcsGen_d
+
+%_d.c : %.c
+	$(CCG) $(CFLAGSG) ${CPPFLAGS} -E -P $< | $(PERL) -p -e 's/;/;\n/g' | $(PERL) -p -e 's/\{/\n\{/g' | $(PERL) -p -e 's/\}/\n\}/g' > $@
+
+%_d.cc : %.cc
+	$(CCG) $(CXXFLAGS) ${CPPFLAGS} -E -P $< | $(PERL) -p -e 's/;/;\n/g' | $(PERL) -p -e 's/\{/\n\{/g' | $(PERL) -p -e 's/\}/\n\}/g' > $@
+
+.PRECIOUS: %_d.cc %_d.c
+
+%.od : %.c
+	$(CCG)  ${CFLAGSG} ${CPPFLAGS} ${DEFSG} -c $< -o $@
+
+%.od : %.cc
+	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} -c $< -o $@
+
+Singular_d: scanner.cc  $(OBJD)  mmalloc.od\
+           iparith.od mpsr_Tok.od claptmpl.og tesths.cc version.h 
+	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} -o Singularg_d \
+	tesths.cc iparith.od mpsr_Tok.od claptmpl.og $(OBJG) ${LDFLAGS} ${LIBS} -lomalloc mmalloc.od \
+	${LD_DYN_FLAGS} ${LD_LIBC} 
+
 ##
 ## check_aso
 ##
@@ -594,19 +666,18 @@ check_aso:
 ##
 
 %.dd: %.cc mod2.h 
-	echo $(@:.dd=.og) $(@:.dd=.op) $(@:.dd=.ob) $(@:.dd=.ot)" " \\ > $@
+	echo $(@:.dd=.og) $(@:.dd=.op) $(@:.dd=_d.cc) $(@:.dd=.od) $(@:.dd=.ob) $(@:.dd=.ot) $(@:.dd=.oa) " " \\ > $@
 	$(CXXM) -DGENTABLE ${CPPFLAGS} ${DEFSG} $< >> $@
 
 %.d: %.c mod2.h 
-	echo $(@:.d=.og) $(@:.d=.op) $(@:.d=.ob) $(@:.d=.ot)" " \\ > $@
+	echo $(@:.d=.og) $(@:.d=.od) $(@:.dd=_d.c) $(@:.d=.op) $(@:.d=.ob) $(@:.d=.ot) $(@:.dd=.oa)" " \\ > $@
 	$(CCM) ${CPPFLAGS} ${DEFSG} $< >> $@
 
-depend:   $(CXXSOURCES:.cc=.dd) $(CSOURCES:.c=.d) mmalloc.dd mod2.h 
+depend:   $(CXXSOURCES:.cc=.dd) $(CSOURCES:.c=.d) iparith.dd mmalloc.dd mod2.h 
 	cat *.d *.dd >depend
 
 ifeq (depend,$(wildcard depend))
 include depend
 endif
-
 
 

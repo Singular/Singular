@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-comp.h,v 1.23 2000-08-18 15:42:06 Singular Exp $ */
+/* $Id: polys-comp.h,v 1.24 2000-08-24 14:42:44 obachman Exp $ */
 
 /***************************************************************
  *
@@ -99,7 +99,7 @@ while (0)
 // copied from BIGENDIAN case, with modification: pCompLowIndex=0
 
 // need to undefine this, since longs might be negative
-#define u_s
+#define u_s unsigned
 
 #define _memcmp(p1, p2, i, l, actionE, actionD) \
 do                                              \
@@ -136,9 +136,8 @@ while (0)
 
 #endif
 
-#if defined(PDEBUG) && defined(HAVE_SHIFTED_EXPONENTS)
-extern int pDBsyzComp;
-int rComp0(poly p1, poly p2);
+#ifdef PDEBUG
+extern int rComp0(poly p1, poly p2);
 #else
 inline int rComp0(poly p1, poly p2)
 {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.88 2000-08-14 12:56:06 obachman Exp $ */
+/* $Id: febase.cc,v 1.89 2000-08-24 14:42:40 obachman Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -406,6 +406,7 @@ extern "C" {
 void assume_violation(char* file, int line)
 {
   fprintf(stderr, "Internal assume violation: file %s line %d\n", file, line);
+  omPrintCurrentBackTrace(stderr);
 }
 }
 

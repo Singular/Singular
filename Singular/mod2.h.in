@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.84 2000-08-14 12:56:39 obachman Exp $
+ *  Version: $Id: mod2.h.in,v 1.85 2000-08-24 14:42:42 obachman Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -103,6 +103,8 @@
 #undef HAVE_SETENV
 /* Define if you have petpwnam */
 #undef HAVE_GETPWNAM
+/* Define if you have popen */
+#undef HAVE_POPEN
 /* Define sizeof(char) */
 #define SIZEOF_CHAR 1
 /* Define sizeof(short) */

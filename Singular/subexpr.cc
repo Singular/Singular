@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.58 2000-08-14 12:56:52 obachman Exp $ */
+/* $Id: subexpr.cc,v 1.59 2000-08-24 14:42:47 obachman Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -1522,8 +1522,8 @@ int sleftv::Eval()
           memcpy(&d->arg1,&t,sizeof(sleftv));
           omCheckAddr(d->arg1.name);
           nok=nok||iiAssign(&d->arg1,&d->arg2);
-          omDebugIf(d->arg1.name != NULL,  // OB: ????
-                   omCheckAddr(d->arg1.name));
+          omCheckIf(d->arg1.name != NULL,  // OB: ????
+                    omCheckAddr(d->arg1.name));
           if (!nok)
           {
             memset(&d->arg1,0,sizeof(sleftv));

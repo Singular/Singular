@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.34 2000-08-24 11:21:47 Singular Exp $ */
+/* $Id: structs.h,v 1.35 2000-08-24 14:42:46 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -104,7 +104,6 @@ typedef ip_command *       command;
 typedef struct s_si_link_extension *si_link_extension;
 typedef struct reca *      alg;
 
-
 #ifdef __cplusplus
 typedef idrec *            idhdl;
 typedef ip_smatrix *       matrix;
@@ -119,6 +118,7 @@ typedef ssyStrategy *      syStrategy;
 typedef procinfo *         procinfov;
 typedef namerec *          namehdl;
 typedef kBucket*           kBucket_pt;
+typedef struct p_Procs_s p_Procs_s;
 
 // for hdegree.cc   
 typedef struct sindlist indlist;
@@ -304,6 +304,7 @@ struct sip_sring
   short      ExpLSize; /* size of exponent vector in long */
   short      OrdSize; /* size of ord vector (in sro_ord) */
 
+  p_Procs_s* p_Procs;
   short      ref; /* reference counter to the ring */
 };
 
