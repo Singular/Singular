@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_reval.cc,v 1.2 1997-06-19 12:23:58 schmidt Exp $ */
+/* $Id: cf_reval.cc,v 1.3 2001-01-19 18:11:50 Singular Exp $ */
 
 #include <config.h>
 
@@ -28,6 +28,8 @@ REvaluation&
 REvaluation::operator= ( const REvaluation & e )
 {
     if ( this != &e ) {
+        if (gen!=0)
+	  delete gen;
 	values = e.values;
 	if ( e.gen == 0 )
 	    gen = 0;
