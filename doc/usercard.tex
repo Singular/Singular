@@ -1,4 +1,4 @@
-% $Id: usercard.tex,v 1.2 1998-05-25 09:49:02 schmidt Exp $
+% $Id: usercard.tex,v 1.3 1998-05-27 13:24:20 schmidt Exp $
 
 %
 % usercard.tex - Singular user quick reference card.
@@ -15,7 +15,7 @@
 Do not forget to terminate all commands with a {\tt ;} (semicolon)!
 
 In particular if \Singular\ prints the continuation prompt {\tt .}
-(dot) instead of the regular command prompt {\tt >}, then it
+(peri\-od) instead of the regular command prompt {\tt >}, then it
 waits for a command to be terminated by a {\tt ;}.  If that does
 not help, try one or more {\tt "} or {\tt \char`}} to close an
 opened string or block.
@@ -27,7 +27,7 @@ Some of the topics concerning interactive use are system dependent.
 
 \sec Starting SINGULAR(2.5cm)
 Singular& 			start \Singular\cr
-Singular {\it files} $\ldots$&	read {\it files\/} and prompt for further commands\cr
+Singular {\it files} \rep&	read {\it files\/} and prompt for further commands\cr
 Singular --help&		print help on command line options and exit\cr
 \endsec
 
@@ -91,7 +91,7 @@ last expression printed.
 \eject
 
 \sec Ring declaration()
-\longentry ring {\it name\/} = {\it basefield}, ({\it ringvars}), {\it ordering\/};&
+\longentry ring {\it name\/} = {\it basefield}, ({\it ringvars\/}), {\it ordering\/};&
 				\hyphenpenalty=50 \tolerance=200 declare ring
 				{\it name\/} and make it the current base\-ring.
 				{\it ringvars\/} has to be a list of names, the
@@ -145,7 +145,7 @@ ds&				negative degree reverse lexicographical ordering\cr
 Ds&				negative degree lexicographical ordering\cr
 ws($w_1$, $\ldots$)&		general weighted reverse lexicographical ordering\cr
 Ws($w_1$, $\ldots$)&		general weighted lexicographical ordering\cr
-&				$w_1$ has to be a nonzero integer, every other
+&				$w_1$ has to be a non-zero integer, every other
 				$w_i$ may be any integer\cr
 \subsec{Matrix orderings}
 \longentry M($m_{11}$, $m_{12}$, $\ldots$, $m_{nn}$)&
@@ -249,16 +249,15 @@ def d = read("MPfile:r example.mp");&
 
 \sec Monitoring and debugging tools()
 timer = 1;&			print time used for commands to execute\cr
-\longentry int t = timer; {\it commandsequence}; timer-t;&
-				print time used for {\it commandsequence} to
-				execute\cr
+\longentry int t = timer; {\it commands\/}; \rep; timer-t;&
+				print time used for {\it commands\/} to execute\cr
 memory(1);&			print number of bytes allocated from system\cr
 option(prot);&			show algorithm protocol\cr
 option(mem);&			show algorithm memory usage\cr
 \entryskip
 TRACE = 1;&			print protocol on execution of procedures\cr
 listvar(all);&			list all (user-)defined names\cr
-\longentry listvar({\it ringname});&
+\longentry listvar({\it ringname\/});&
 				list all names belonging to {\it ringname}\cr
 \endsec
 
@@ -266,7 +265,7 @@ listvar(all);&			list all (user-)defined names\cr
 
 \sec Options()
 option();&			show current option settings\cr
-\longentry option($option_1$, no$option_2$, $\ldots$);&
+\longentry option($option_1$, no$option_2$, \rep);&
 				switch $option_1$ on and $option_2$ off, resp.\cr
 option(none);&			reset all options to default values\cr
 \sectext
@@ -299,7 +298,7 @@ degBound&			stop if (weighted) total degree exceeds {\tt
 				degBound}\cr
 multBound&			stop if multiplicity gets smaller than {\tt
 				multBound}\cr
-noether&			cut off all monomials above the monomial {\tt
+noether&			cut off all monomials above monomial {\tt
 				noether}\cr
 \subsec{Miscellany}
 basering&			the current basering\cr
@@ -314,16 +313,16 @@ TRACE&				print information on procedures being executed
 \endsec
 
 \sec Input and output()
-< "{\it filename}";&		load and execute {\it filename}\cr
-\longentry write("{\it filename}", {\it expression\_list})&
-				write {\it expression\_list} to ASCII file {\it
+< "{\it filename\/}";&		load and execute {\it filename\/}\cr
+\longentry write("{\it filename\/}", {\it expression\_list\/})&
+				write {\it expression\_list\/} to ASCII file {\it
 				filename}\cr
-\longentry read("{\it filename}");&
-				read ASCII file {\it filename} and return
+\longentry read("{\it filename\/}");&
+				read ASCII file {\it filename\/} and return
 				content as a string.  See also example below.\cr
 \longentry
-dump("MPfile: {\it filename}");\par
-getdump("MPfile: {\it filename}");&
+dump("MPfile: {\it filename\/}");\par
+getdump("MPfile: {\it filename\/}");&
 				dump current state of {\sc Singular} to {\it
 				filename} and retrieve it, resp.\cr
 \entryskip
@@ -347,9 +346,9 @@ help all.lib;&			show list of all libraries\cr
 
 \sec Mapping(1.5cm)
 \longentry map {\it name\/} = {\it ringname}, {\it ideal\/};&
-				declare a map {\it name\/} from {\it ringname}
+				declare a map {\it name\/} from {\it ringname\/}
 				to current basering.  The $i$'th ring variable
-				from {\it ringname} is mapped to the $i$'th
+				from {\it ringname\/} is mapped to the $i$'th
 				generator of {\it ideal}.\cr
 \longentry {\it mapname\/}({\it expression\/})&
 				apply map {\it mapname\/} to {\it expression}\cr
@@ -379,10 +378,42 @@ $$
 \endsec
 
 \sec Miscellany(1.5cm)
-\longentry ord({\it poly\/}\alt{\it vector\/})&
+\longentry ord({\it poly\/\alt vector\/})&
 				return (weighted) degree of initial term\cr
-\longentry deg({\it poly\/}\alt{\it vector\/})&
-				return maximal (weighted) degree of terms\cr
+\longentry deg({\it poly\/\alt vector\/})&
+				return maximal (weighted) degree\cr
+\longentry
+size({\it ideal\/\alt module\/})\par
+size({\it poly\/\alt vector\/})\par
+size({\it string\/\alt intvec\/\alt list\/})&
+				return (1) number of non-zero generators;
+				(2) number of monomials; (3) length\cr
+\longentry kill({\it name\/})&
+				delete variable {\it name}\cr
+\longentry setring({\it name}\/)&
+				make {\it name} the current basering\cr
+\endsec
+
+\sec Standard bases(1.5cm)
+\longentry groebner({\it ideal\/\alt module\/}\opt{, {\it int\/}})&
+				compute a standard basis using a heuristically
+				choosen method.  Delimit computation time to
+				{\it int\/} seconds.\cr
+\longentry std({\it ideal\/\alt module\/}\opt{, {\it intvec\/}})&
+				compute a standard basis.  Use first
+				Hilbert-series {\it intvec\/} (result from {\tt
+				hilb($\ldots$, 1)}) for Hilbert-driven
+				computation.\cr
+\longentry stdfglm({\it ideal\/}\opt{,{\it string\/}})&
+				compute a standard basis\cr
+\longentry stdhilb({\it ideal\/}\opt{,{\it intvec\/}})&
+				compute a standard basis\cr
+\endsec
+
+\sec Invariants of ideals and modules(1.5cm)
+\longentry hilb({\it ideal\/\alt module\/}\opt{, {\it int\/}})&
+				display first and second hilbert series with one
+				argument.\cr
 \endsec
 
 \bye
