@@ -9,9 +9,9 @@ SHELL		= /bin/sh
 ##
 ## versions
 ##
-MAJOR_VERSION	= @MAJOR_VERSION@
-MINOR_VERSION	= @MINOR_VERSION@
-DIST_NAME	= Singular-${MAJOR_VERSION}.${MINOR_VERSION}
+SINGULAR_MAJOR_VERSION	= @SINGULAR_MAJOR_VERSION@
+SINGULAR_MINOR_VERSION	= @SINGULAR_MINOR_VERSION@
+DIST_NAME	= Singular-${SINGULAR_MAJOR_VERSION}.${SINGULAR_MINOR_VERSION}
 CONFIGURE_INPUT = @ac_configure_args@
 
 ## 
@@ -160,7 +160,7 @@ iparith.inc : iparith.cc ipconv.cc tok.h mpsr_Tok.cc grammar.h
 	/bin/rm gentable
 
 version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in configure.in
-	echo "#define VERSION_ID " `date '+%y%m%d%H'` >version.h
+	echo "#define SINGULAR_VERSION_ID " `date '+%y%m%d%H'` >version.h
 
 mod2.h: config.status config.cache mod2.h.in Makefile.in
 	./config.status

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.9 1997-04-25 18:35:06 obachman Exp $ */
+/* $Id: cntrlc.cc,v 1.10 1997-05-02 07:44:47 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -100,7 +100,7 @@ typedef struct sigcontext_struct sigcontext;
 */
 void sigsegv_handler(int sig, sigcontext s)
 {
-  fprintf(stderr,"Singular : signal %d (v: %d/%d):\n",sig,VERSION,VERSION_ID);
+  fprintf(stderr,"Singular : signal %d (v: %d/%d):\n",sig,SINGULAR_VERSION,SINGULAR_VERSION_ID);
   if (sig!=SIGINT)
   {
     fprintf(stderr,"Segment fault/Bus error occurred at %x because of %x (r:%d)\n"

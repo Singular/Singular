@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.10 1997-04-28 19:25:50 obachman Exp $ */
+/* $Id: tesths.cc,v 1.11 1997-05-02 07:44:46 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -120,7 +120,7 @@ int main(          /* main entry to Singular */
             case 'v':{
               printf("Singular %s  %s  (%d)  %s %s\n",
                      S_VERSION1,S_VERSION2,
-                     VERSION_ID,__DATE__,__TIME__);
+                     SINGULAR_VERSION_ID,__DATE__,__TIME__);
               printf("with ");
 #ifdef HAVE_FACTORY
               printf("factory,");
@@ -224,7 +224,7 @@ int main(          /* main entry to Singular */
 "Fachbereich Mathematik der Universitaet, D-67653 Kaiserslautern\n"
 "contributions: O.Bachmann,W.Decker,H.Grassmann,B.Martin,M.Messollen,W.Neumann,\n"
 "W.Pohl,T.Siebert,R.Stobbe                 e-mail: singular@mathematik.uni-kl.de\n");
-    printf("%s  %s  (%d)",S_VERSION1,S_VERSION2, VERSION_ID);
+    printf("%s  %s  (%d)",S_VERSION1,S_VERSION2, SINGULAR_VERSION_ID);
     printf("\n\nPlease note:  EVERY COMMAND MUST END WITH A SEMICOLON \";"
            "\"\n(e.g. help; help command; help General syntax; help ring; quit;)\n\n");
   }

@@ -64,11 +64,11 @@
 /* Define sizeof(void*) */
 #define SIZEOF_VOIDP 4
 /* Define major version of Singular -- should be set in configure.in!!!*/
-#define MAJOR_VERSION 0
+#define SINGULAR_MAJOR_VERSION 0
 /* Define minor version of Singular -- should be set in configure.in!!! */
-#define MINOR_VERSION 0
+#define SINGULAR_MINOR_VERSION 0
 /* Define sub version of Singular -- should be set in configure.in!!! */
-#define SUB_VERSION 0
+#define SINGULAR_SUB_VERSION 0
 /* Define version as a string */
 #define S_VERSION1 ""
 /* Define version date as a string */
@@ -117,7 +117,7 @@ char *strstr(const char *haystack, const char *needle);
 #define ALIGN_8
 #endif
 
-#define VERSION (MAJOR_VERSION*1000 + MINOR_VERSION*100 + SUB_VERSION)
+#define SINGULAR_VERSION (SINGULAR_MAJOR_VERSION*1000 + SINGULAR_MINOR_VERSION*100 + SINGULAR_SUB_VERSION)
 #ifdef DRING
 #define SDRING
 #endif

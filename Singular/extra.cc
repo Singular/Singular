@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.10 1997-04-25 18:52:24 Singular Exp $ */
+/* $Id: extra.cc,v 1.11 1997-05-02 07:44:48 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -80,7 +80,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     if(strcmp((char*)(h->Data()),"version")==0)
     {
       res->rtyp=INT_CMD;
-      res->data=(void *)VERSION;
+      res->data=(void *)SINGULAR_VERSION;
       return FALSE;
     }
     else
@@ -118,8 +118,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     {
       if (h->next==NULL)
       {
-        res->rtyp=STRING_CMD;
-        char *s=mstrdup(""
+        char with_str[]=""
         #ifdef DRING
           "DRING "
         #endif
@@ -150,7 +149,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
         #ifdef SRING
           "SRING "
         #endif
-        );
+        ;
+        res->rtyp=STRING_CMD;
+        char *s=mstrdup(with_str);
         s[strlen(s)-1]='\0';
         res->data=(void *)s;
         return FALSE;
