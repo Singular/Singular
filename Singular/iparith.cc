@@ -1475,7 +1475,7 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
   idhdl w;
 
   if ((iiOp!=IMAP_CMD)
-  && ((currRing->ch != r->ch)
+  && ((rInternalChar(currRing) != rInternalChar(r))
     || ((currRing->N != r->N)&& (iiOp==FETCH_CMD)))
   )
     goto err_fetch;
@@ -1487,26 +1487,28 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
     BOOLEAN bo;
     if (iiOp==IMAP_CMD)
     {
-      if (!nSetMap(r->ch,r->parameter,r->P,r->minpoly))
+      if (!nSetMap(rInternalChar(r),r->parameter,r->P,r->minpoly))
       {
         if (iiOp!=IMAP_CMD)
           goto err_fetch;
         par_perm_size=rPar(r);
-        if (r->ch==1)
+	if (rChar(r)!=rChar(currRing))
+	  goto err_fetch;
+        if (rField_is_Q_a(r))
         {
-          if ((currRing->ch!=0)
-          && (currRing->ch!=1))
+          if ((!rField_is_Q_a(currRing))
+          && (!rField_is_Q(currRing)))
             goto err_fetch;
         }
-        else if(r->ch<(-1))
+        else if (rField_is_Zp_a(r))
         {
-          if ((currRing->ch==(-currRing->ch))
-          && (currRing->ch!=currRing->ch))
+          if ((!rField_is_Zp_a(currRing))
+          && (!rField_is_Zp(currRing)))
             goto err_fetch;
         }
         BITSET save_test=test;
-        naSetChar(r->ch,TRUE,r->parameter,r->P);
-        nSetChar(currRing->ch,TRUE,currRing->parameter,currRing->P);
+        naSetChar(rInternalChar(r),TRUE,r->parameter,r->P);
+        nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,currRing->P);
         test=save_test;
       }
       perm=(int *)Alloc0((r->N+1)*sizeof(int));
@@ -2579,7 +2581,7 @@ static BOOLEAN jjIDEAL_R(leftv res, leftv v)
   if (currRing!=NULL)
   {
     ring q=(ring)v->Data();
-    if ((q->ch==currRing->ch)
+    if ((rInternalChar(q)==rInternalChar(currRing))
     && (q->N==currRing->N)) /* && varnames equ. */
     {
       if (q->qideal==NULL)

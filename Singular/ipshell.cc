@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.33 1998-12-15 13:35:05 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.34 1999-03-08 17:30:37 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -568,13 +568,13 @@ leftv iiMap(map theMap, char * what)
 #endif /* HAVE_NAMESPACES */
   if ((r!=NULL) && ((r->typ == RING_CMD) || (r->typ== QRING_CMD)))
   {
-    if (!nSetMap(IDRING(r)->ch,
+    if (!nSetMap(rInternalChar(IDRING(r)),
                  IDRING(r)->parameter,
                  IDRING(r)->P,
                  IDRING(r)->minpoly))
     {
       Werror("map from characteristic %d to %d not implemented",
-        IDRING(r)->ch,currRing->ch);
+        rChar(IDRING(r)),rChar());
       return NULL;
     }
     if (IDELEMS(theMap)<IDRING(r)->N)

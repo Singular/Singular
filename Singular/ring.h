@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.20 1999-02-10 16:00:05 Singular Exp $ */
+/* $Id: ring.h,v 1.21 1999-03-08 17:30:50 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -47,6 +47,21 @@ void   rComplete(ring r, int force = 0);
 void   rUnComplete(ring r);
 int    rBlocks(ring r);
 
+#define  rInternalChar(r) ((r)->ch)
+inline BOOLEAN rField_is_Zp(ring r=currRing)
+{ return (r->ch>1) && (r->parameter==NULL); }
+inline BOOLEAN rField_is_Q(ring r=currRing)
+{ return (r->ch==0) && (r->parameter==NULL); }
+inline BOOLEAN rField_is_R(ring r=currRing)
+{ return (r->ch==-1); }
+inline BOOLEAN rField_is_GF(ring r=currRing)
+{ return (r->ch>1) && (r->parameter!=NULL); }
+inline BOOLEAN rField_is_Zp_a(ring r=currRing)
+{ return (r->ch<-1); }
+inline BOOLEAN rField_is_Q_a(ring r=currRing)
+{ return (r->ch==1); }
+inline BOOLEAN rField_has_simple_inverse(ring r=currRing)
+{ return (r->ch>1); } /* Z/p and GF(p,n) */
 
 enum
 {

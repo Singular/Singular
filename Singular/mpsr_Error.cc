@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Error.cc,v 1.5 1997-06-30 17:04:45 obachman Exp $ */
+/* $Id: mpsr_Error.cc,v 1.6 1999-03-08 17:30:44 Singular Exp $ */
 
 /***************************************************************
  *
@@ -17,7 +17,7 @@
 #ifdef HAVE_MPSR
 
 #include "febase.h"
-#include"mpsr.h"
+#include "mpsr.h"
 
 char *mpsr_errlist[] =
 {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.20 1998-09-30 14:12:48 Singular Exp $ */
+/* $Id: matpol.cc,v 1.21 1999-03-08 17:30:42 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -22,6 +22,7 @@
 #include "ipid.h"
 #include "subexpr.h"
 #include "intvec.h"
+#include "ring.h"
 #include "matpol.h"
 
 /*0 implementation*/
@@ -466,9 +467,7 @@ poly mpDet (matrix m)
     Werror("det of %d x %d matrix",n,MATCOLS(m));
     return NULL;
   }
-  k=currRing->ch;
-  if (k<0) k=-k;
-  else if (k==1) k=0;
+  k=rChar();
   if (((k > 0) && (k <= n))
 #ifdef SRING
   || (pSRING)

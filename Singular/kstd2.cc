@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.22 1998-10-15 11:45:56 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.23 1999-03-08 17:30:39 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1679,8 +1679,10 @@ ideal stdred(ideal F, ideal Q, tHomog h,intvec ** w)
   BOOLEAN delete_w=(w==NULL);
   kStrategy strat=(kStrategy)Alloc0(sizeof(skStrategy));
 
-  if (currRing->ch==0) strat->LazyPass=2;
-  else                 strat->LazyPass=20;
+  if (rField_has_simple_inverse() || rField_is_R())
+    strat->LazyPass=20;
+  else
+   strat->LazyPass=2;
   strat->LazyDegree = 1;
   strat->ak = idRankFreeModule(F);
   if ((h==testHomog))

@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Tok.cc,v 1.21 1998-12-18 11:11:42 obachman Exp $ */
+/* $Id: mpsr_Tok.cc,v 1.22 1999-03-08 17:30:49 Singular Exp $ */
 
 /***************************************************************
  *
@@ -21,7 +21,6 @@
 
 #include"febase.h"
 #include"tok.h"
-#include"ring.h"
 
 #include "mpsr.h"
 #include "mpsr_Tok.h"

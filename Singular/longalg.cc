@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.28 1999-01-22 17:40:51 Singular Exp $ */
+/* $Id: longalg.cc,v 1.29 1999-03-08 17:30:40 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -18,6 +18,7 @@
 #include "polys.h"
 #include "ideals.h"
 #include "ipid.h"
+#include "ring.h"
 #ifdef HAVE_FACTORY
 #include "clapsing.h"
 #endif
@@ -2357,7 +2358,7 @@ number naMapQaQb(number c)
 
 BOOLEAN naSetMap(int c, char ** par, int nop, number minpol)
 {
-  if (currRing->ch==1) /* -> Q(a) */
+  if (rField_is_Q_a()) /* -> Q(a) */
   {
     if (c == 0)
     {
@@ -2398,7 +2399,7 @@ BOOLEAN naSetMap(int c, char ** par, int nop, number minpol)
     }
   }
   /*-----------------------------------------------------*/
-  if (currRing->ch<0) /* -> Z/p(a) */
+  if (rField_is_Zp_a()) /* -> Z/p(a) */
   {
     if (c == 0)
     {
@@ -2428,7 +2429,7 @@ BOOLEAN naSetMap(int c, char ** par, int nop, number minpol)
     }
     if (c<0)
     {
-      if (c==currRing->ch)
+      if (c==rChar())
       {
         nacMap=nacCopy;
       }

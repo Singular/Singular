@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.cc,v 1.14 1998-07-29 13:55:47 Singular Exp $
+// $Id: fglm.cc,v 1.15 1999-03-08 17:30:32 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -115,7 +115,7 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
     ring dring = IDRING( dringHdl );
     ring sring = IDRING( sringHdl );
 
-    if ( sring->ch != dring->ch ) {
+    if ( rChar(sring) != rChar(dring) ) {
         WerrorS( "rings must have same characteristic" );
         state= FglmIncompatibleRings;
     }
@@ -163,7 +163,7 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
         // both rings are qrings, now check if both quotients define the same ideal.
         // check if sring->qideal is contained in dring->qideal:
         rSetHdl( dringHdl, TRUE );
-        nSetMap( sring->ch, sring->parameter, npar, sring->minpoly );
+        nSetMap( rInternalChar(sring), sring->parameter, npar, sring->minpoly );
         ideal sqind = idInit( IDELEMS( sring->qideal ), 1 );
         for ( k= IDELEMS( sring->qideal )-1; k >= 0; k-- )
             (sqind->m)[k]= pPermPoly( (sring->qideal->m)[k], vperm, sring);
@@ -179,7 +179,7 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
         // check if dring->qideal is contained in sring->qideal:
         int * dsvperm = (int *)Alloc0( (nvar+1)*sizeof( int ) );
         maFindPerm( dring->names, nvar, NULL, 0, sring->names, nvar, NULL, 0, dsvperm, NULL );
-        nSetMap( dring->ch, dring->parameter, npar, dring->minpoly );
+        nSetMap( rInternalChar(dring), dring->parameter, npar, dring->minpoly );
         ideal dqins = idInit( IDELEMS( dring->qideal ), 1 );
         for ( k= IDELEMS( dring->qideal )-1; k >= 0; k-- )
             (dqins->m)[k]= pPermPoly( (dring->qideal->m)[k], dsvperm, sring);

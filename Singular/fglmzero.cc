@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmzero.cc,v 1.19 1999-02-26 15:32:04 Singular Exp $
+// $Id: fglmzero.cc,v 1.20 1999-03-08 17:30:33 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -139,7 +139,8 @@ idealFunctionals::map( ring source )
 
     int * perm = (int *)Alloc0( (_nfunc+1)*sizeof( int ) );
     maFindPerm( source->names, source->N, NULL, 0, currRing->names, currRing->N, NULL, 0, perm, NULL );
-    nSetMap( source->ch, source->parameter, source->P, source->minpoly );
+    nSetMap( rInternalChar(source), source->parameter,
+       source->P, source->minpoly );
 
     matHeader ** temp = (matHeader **)Alloc( _nfunc*sizeof( matHeader * ));
     for ( var= 0; var < _nfunc; var ++ ) {

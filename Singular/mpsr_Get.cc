@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.22 1998-12-18 11:11:40 obachman Exp $ */
+/* $Id: mpsr_Get.cc,v 1.23 1999-03-08 17:30:45 Singular Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -23,7 +23,6 @@
 
 #include "tok.h"
 #include "longrat.h"
-#include "ring.h"
 #include "intvec.h"
 #include "ideals.h"
 #include "matpol.h"

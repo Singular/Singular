@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.20 1998-11-02 09:05:39 Singular Exp $ */
+/* $Id: kstdfac.cc,v 1.21 1999-03-08 17:30:39 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -752,8 +752,10 @@ lists kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
   lists L=(lists)Alloc(sizeof(slists)); L->Init(0);
   sleftv v; memset(&v,0,sizeof(v));
 
-  if (currRing->ch==0) strat->LazyPass=2;
-  else                 strat->LazyPass=20;
+  if (rField_has_simple_inverse() || rField_is_R())
+    strat->LazyPass=20;
+  else
+    strat->LazyPass=2;
   strat->LazyDegree = 1;
   strat->ak = idRankFreeModule(F);
   if ((h==testHomog))

@@ -143,7 +143,7 @@ spSpolyLoopProc spGetSpolyLoop(ring r, rOrderType_t rot, BOOLEAN homog)
   int Variables1W;
 
   // set characterisic
-  if (r->ch > 1) ch = chMODP;
+  if (rField_is_Zp(r)) ch = chMODP;
   
   // set Ordering Type
   switch (rot)

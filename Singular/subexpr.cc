@@ -607,7 +607,7 @@ void * sleftv::CopyD(int t)
     if (rtyp==VNOETHER) x=(void *)pCopy(ppNoether);
     else if (rtyp==LIB_CMD)
       x=(void *)mstrdup((char *)Data());
-    else if ((rtyp==VMINPOLY)&& (currRing->minpoly!=NULL)&&(currRing->ch<2))
+    else if ((rtyp==VMINPOLY)&& (currRing->minpoly!=NULL)&&(!rField_is_GF()))
       x=(void *)nCopy(currRing->minpoly);
     data=NULL;
     return x;
@@ -687,7 +687,7 @@ char *  sleftv::String(void *d)
           nWrite(n);
           data=(char *)n;
         }
-        else if((rtyp==VMINPOLY)&&(currRing->ch>2)&&(currRing->P==1))
+        else if((rtyp==VMINPOLY)&&(rField_is_GF()))
         {
           nfShowMipo();
         }
@@ -866,7 +866,7 @@ void * sleftv::Data()
       case VMAXMULT:   return (void *)Kstd1_mu;
       case TRACE:      return (void *)traceit;
       case VSHORTOUT:  return (void *)pShortOut;
-      case VMINPOLY:   if ((currRing->minpoly!=NULL)&&(currRing->ch<2))
+      case VMINPOLY:   if ((currRing->minpoly!=NULL)&&(!rField_is_GF()))
                        /* Q(a), Fp(a), but not GF(q) */
                          return (void *)currRing->minpoly;
                        else

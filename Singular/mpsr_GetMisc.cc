@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_GetMisc.cc,v 1.11 1998-11-23 11:05:34 obachman Exp $ */
+/* $Id: mpsr_GetMisc.cc,v 1.12 1999-03-08 17:30:46 Singular Exp $ */
 
 /***************************************************************
  *
@@ -17,8 +17,7 @@
 
 #ifdef HAVE_MPSR
 
-#include"mpsr_Get.h"
-#include "ring.h"
+#include "mpsr_Get.h"
 #include "longalg.h"
 #include "tok.h"
 #include "maps.h"
@@ -38,7 +37,8 @@ static char* GenerateRingName();
 int mpsr_rDefault(short ch, char *name, ring &r)
 {
   // check for currRing
-  if (currRing != NULL && currRing->ch == ch)
+  if (currRing != NULL && rInternalChar(currRing) == ch) 
+  // orig: currRing->ch==ch ???
   {
     int i, n = currRing->N;
     char **names = currRing->names;
@@ -59,7 +59,8 @@ int mpsr_rDefault(short ch, char *name, ring &r)
 
 ring mpsr_rDefault(short ch)
 {
-  if (currRing != NULL && currRing->ch == ch)
+  if (currRing != NULL && rInternalChar(currRing) == ch) 
+  // orig: currRing->ch==ch ???
   {
     (currRing->ref)++;
     return currRing;
@@ -108,7 +109,9 @@ BOOLEAN mpsr_RingEqual(ring r1, ring r2)
 
   if (r1 == NULL || r2 == NULL) return 0;
 
-  if ((r1->ch != r2->ch) || (r1->N != r2->N) || (r1->OrdSgn != r2->OrdSgn)
+  if ((rInternalChar(r1) != rInternalChar(r2))
+  // orig: r1->ch == r2->ch ???
+  || (r1->N != r2->N) || (r1->OrdSgn != r2->OrdSgn)
       || (r1->P != r2->P))
     return 0;
 
@@ -185,7 +188,8 @@ inline BOOLEAN RingLessEqual(ring r1, ring r2)
   if ((r1->N > r2->N) || (r1->OrdSgn != r2->OrdSgn) || (r1->P > r2->P))
     return 0;
 
-  if (r1->ch != 0 && r1->ch != r2->ch) return 0;
+  if (!rField_is_Q(r1) && rInternalChar(r1) != rInternalChar(r2)) return 0;
+  // orig: if (r1->ch != 0 && r1->ch != r2->ch) return 0;
 
   for (i=0, j=0; j<r1->N && i<r2->N; i++)
     if (strcmp(r1->names[j], r2->names[i]) == 0) j++;
@@ -336,7 +340,7 @@ void mpsr_MapLeftv(leftv l, ring from_ring, ring to_ring)
         {
           number nn = (number) l->data;
           mpsr_SetCurrRing(to_ring, TRUE);
-          nSetMap(from_ring->ch, from_ring->parameter, from_ring->P, from_ring->minpoly);
+          nSetMap(rInternalChar(from_ring), from_ring->parameter, from_ring->P, from_ring->minpoly);
           l->data = (void *) nMap(nn);
           mpsr_SetCurrRing(from_ring, FALSE);
           nDelete(&nn);

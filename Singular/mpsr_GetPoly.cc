@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.20 1998-11-09 15:43:04 obachman Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.21 1999-03-08 17:30:47 Singular Exp $ */
 
 /***************************************************************
  *
@@ -22,7 +22,6 @@
 #include "gmp.h"
 #include "mmemory.h"
 #include "tok.h"
-#include "ring.h"
 #include "ipid.h"
 #include "longalg.h"
 #include "maps.h"
@@ -105,17 +104,14 @@ static void SetGetFuncs(ring r)
   gNvars = r->N;
   mpsr_InitTempArray(gNvars + 1);
 
-  if ((r->ch) == 0)
+  if (rField_is_Q(r))
     // rational numbers
     GetCoeff = GetRationalNumber;
-  else if ((r->ch) > 1)
-  {
-    if (r->parameter == NULL)
-      GetCoeff = GetModuloNumber;
-    else
+  else if (rField_is_Zp(r))
+    GetCoeff = GetModuloNumber;
+  else if (rField_is_GF(r))
       GetCoeff = GetGaloisNumber;
-  }
-  else if ((r->ch) == -1)
+  else if (rField_is_R(r))
     GetCoeff = GetFloatNumber;
   else
   {
@@ -123,7 +119,7 @@ static void SetGetFuncs(ring r)
     gNalgvars = rPar(r);
     mpsr_InitTempArray(gNalgvars);
     GetCoeff = GetAlgNumber;
-    if ((r->ch) < 0)
+    if (rField_is_Zp_a(r))
       // first, Z/p(a)
       GetAlgNumberNumber = GetModuloNumber;
     else
@@ -710,14 +706,15 @@ static mpsr_Status_t GetProtoTypeAnnot(MPT_Node_pt node, ring r, BOOLEAN mv,
     // GetRingAnnots
     failr(mpsr_GetRingAnnots(node, subring, mv2, IsUnOrdered));
     // Check whether the ring can be "coerced" to an algebraic number
-    falser(subring->ch >= 0 &&
+    falser( (rField_is_Zp(subring)||rField_is_Q(subring)) && 
+           // orig: subring->ch >= 0 &&a ???
            subring->order[0] == ringorder_lp &&
            subring->order[2] == 0 &&
            mv2 == FALSE &&
            IsUnOrdered == FALSE);
 
     // Now do the coercion
-    r->ch = (subring->ch == 0 ? 1 : - (subring->ch));
+    r->ch = (rField_is_Q(subring) ? 1 : - rChar(subring));
     r->parameter = (char **) Alloc((subring->N)*sizeof(char*));
     r->P = subring->N;
     for (i=0; i < subring->N; i++)

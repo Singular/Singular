@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.14 1998-11-21 13:55:41 siebert Exp $ */
+/* $Id: syz.cc,v 1.15 1999-03-08 17:30:53 Singular Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -163,7 +163,7 @@ static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
 //--takes out the founded syzygy--
       if (TEST_OPT_PROT) PrintS("f");
       actWith = syz->m[i];
-      if (currRing->ch<2) pCleardenom(actWith);
+      if (!rField_has_simple_inverse()) pCleardenom(actWith);
 //Print("actWith: ");pWrite(actWith);
       syz->m[i] = NULL;
       for (k=i;k<j-1;k++)  syz->m[k] = syz->m[k+1];
@@ -226,7 +226,7 @@ static void syGaussForOne(ideal syz, int elnum, int ModComp)
   poly actWith=syz->m[elnum];
 
   syz->m[elnum] = NULL;
-  if (currRing->ch<2) pCleardenom(actWith);
+  if (!rField_has_simple_inverse()) pCleardenom(actWith);
 /*--makes Gauss alg. for the column ModComp--*/
   unit1 = pTakeOutComp1(&(actWith), ModComp);
   k=0;

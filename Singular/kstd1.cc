@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.30 1998-12-15 10:06:46 pohl Exp $ */
+/* $Id: kstd1.cc,v 1.31 1999-03-08 17:30:38 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1866,8 +1866,10 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
     strat->syzComp = syzComp;
   if (TEST_OPT_SB_1)
     strat->newIdeal = newIdeal;
-  if (currRing->ch==0) strat->LazyPass=2;
-  else                 strat->LazyPass=20;
+  if (rField_has_simple_inverse() || rField_is_R())
+    strat->LazyPass=20;
+  else
+    strat->LazyPass=2;
   strat->LazyDegree = 1;
   strat->ak = idRankFreeModule(F);
   strat->kModW=kModW=NULL;
@@ -2079,8 +2081,10 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 
   if(!TEST_OPT_RETURN_SB)
      strat->syzComp = syzComp;
-  if (currRing->ch==0) strat->LazyPass=2;
-  else                 strat->LazyPass=20;
+  if (rField_has_simple_inverse() || rField_is_R())
+    strat->LazyPass=20;
+  else
+    strat->LazyPass=2;
   strat->LazyDegree = 1;
   strat->minim=(reduced % 2)+1;
   strat->ak = idRankFreeModule(F);
