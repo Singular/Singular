@@ -169,10 +169,10 @@ void m2_end(short i)
  */
 
 
-#define  A        16807L        /*  A "good" multiplier          */
-#define  M   2147483647L        /*  Modulus: 2^31 - 1          */
-#define  Q       127773L        /*  M / A                  */
-#define  R         2836L        /*  M % A                  */
+#define  A        16807        /*  A "good" multiplier          */
+#define  M   2147483647        /*  Modulus: 2^31 - 1          */
+#define  Q       127773        /*  M / A                  */
+#define  R         2836        /*  M % A                  */
 
 
 int siSeed = 1L;
