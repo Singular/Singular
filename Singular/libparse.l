@@ -2,14 +2,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.25 1998-06-13 12:44:44 krueger Exp $ */
+/* $Id: libparse.l,v 1.26 1998-06-18 06:57:18 obachman Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
 #ifdef STANDALONE_PARSER
 #  include "utils.h"
-#  include <getopt.h>
+#  include "getopt.h"
 #  define HAVE_LIBPARSER
 #  define YYLPDEBUG 1
 #else
