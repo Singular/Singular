@@ -1,15 +1,15 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: center.lib,v 1.10 2004-08-13 12:39:35 levandov Exp $";
+version="$Id: center.lib,v 1.11 2004-12-07 16:02:02 plural Exp $";
 category="Noncommutative";
 info="
-LIBRARY:  center.lib      Computation of central elements of G- and GR-algebras
+LIBRARY:  center.lib      computation of central elements of G-algebras and Q-algebras.
 AUTHORS:  Oleksandr Motsak,        motsak@mathematik.uni-kl.de.
 OVERVIEW:
  This is a library for computing the central elements and centralisators of elements in various noncommutative algebras. 
- Implementation is mainly based on algorithms, written in the frame of the diploma thesis by Oleksandr Motsak (advisor: Prof.Dr. S.A. Ovsienko, co-advisor V.Levandovskyy), at Kyiv Taras Shevchenko University:  'An algorithm for the computation of the center of noncommutative polynomial algebra'.
+ Implementation is mainly based on algorithms, written in the frame of the diploma thesis by Oleksandr Motsak (advisor: Prof. S.A. Ovsienko, using the definitions from diploma thesis by V.Levandovskyy), at Kyiv Taras Shevchenko University:  'An algorithm for the computation of the center of noncommutative polynomial algebra'.
  @* The last version of this library can be found via internet.
 
-SUPPORT: Forschungsschwerpunkt 'Mathematik und Praxis', (Project Prof.Dr. G.-M. Greuel and V.Levandovskyy)
+SUPPORT: Forschungsschwerpunkt 'Mathematik und Praxis'
 
 PROCEDURES:
 	center(MaxDeg[,N]);             returns the center of basering,
