@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.54 1999-05-19 15:17:01 Singular Exp $ */
+/* $Id: ring.cc,v 1.55 1999-07-01 16:13:41 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -37,6 +37,11 @@ short rNumber=0;
 static void rDelete(ring r);
 
 /*0 implementation*/
+BOOLEAN rField_is_R(ring r=currRing)
+{
+  return ((r->ch == -1) && (r->ch_flags==0));
+}
+
 int rBlocks(ring r)
 {
   int i=0;

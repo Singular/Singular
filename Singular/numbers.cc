@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.16 1999-06-23 10:04:55 wenk Exp $ */
+/* $Id: numbers.cc,v 1.17 1999-07-01 16:13:40 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -163,8 +163,7 @@ void nSetChar(ring r, BOOLEAN complete)
 #endif
     }
   }
-  else
-  if (rField_is_Q(r))
+  else if (rField_is_Q(r))
   {
 #ifdef LDEBUG
     nDBDelete= nlDBDelete;
@@ -252,9 +251,8 @@ void nSetChar(ring r, BOOLEAN complete)
 #endif
     }
   }
-  else
   /* -------------- GF(p^m) -----------------------*/
-  if (rField_is_GF(r))
+  else if (rField_is_GF(r))
   {
 #ifdef LDEBUG
     nDBDelete= nDBDummy1;
@@ -300,10 +298,9 @@ void nSetChar(ring r, BOOLEAN complete)
 #endif
     }
   }
-  else
   /* -------------- R -----------------------*/
   //if (c==(-1))
-  if (rField_is_R(r))
+  else if (rField_is_R(r))
   {
 #ifdef LDEBUG
     nDBDelete= nDBDummy1;
@@ -345,9 +342,8 @@ void nSetChar(ring r, BOOLEAN complete)
 #endif
     }
   }
-  else
   /* -------------- long R -----------------------*/
-  if (rField_is_long_R(r))
+  else if (rField_is_long_R(r))
   {
     setGMPFloatDigits(r->ch_flags);
 #ifdef LDEBUG
