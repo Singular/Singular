@@ -7,7 +7,7 @@
  *          (bareis, ...)
  *
  *******************************************************************/
-/* $Id: sparsmat.h,v 1.8 2000-07-06 13:24:21 pohl Exp $ */
+/* $Id: sparsmat.h,v 1.9 2001-01-30 08:39:29 pohl Exp $ */
 
 
 poly smMult(poly, poly);
@@ -30,4 +30,8 @@ lists smCallBareiss(ideal smat, int x, int y);
 lists smCallNewBareiss(ideal smat, int x, int y);
 lists smCallSolv(ideal I);
 
+void smRingChange(ring *, sip_sring &, Exponent_t);
+void smRingClean(ring, ip_sring &);
+Exponent_t smExpBound(ideal, int, int, int);
+BOOLEAN smCheckDet(ideal, int, BOOLEAN);
 #endif

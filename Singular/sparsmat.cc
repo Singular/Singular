@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.48 2000-12-31 15:54:47 obachman Exp $ */
+/* $Id: sparsmat.cc,v 1.49 2001-01-30 08:39:29 pohl Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -159,72 +159,167 @@ public:
   void smToIntvec(intvec *);
 };
 
-Exponent_t smExpBound(ideal Id)
+/*
+* estimate maximal exponent for det or minors,
+* the module m has di vectors and maximal rank ra,
+* estimate yields for the tXt minors,
+* we have di,ra >= t
+*/
+static void smMinSelect(Exponent_t *, int, int);
+Exponent_t smExpBound( ideal m, int di, int ra, int t)
 {
-  Exponent_t max = 0;
-  long ldeg;
-  int dummy, i, n = IDELEMS(Id);
-  
-  for (i=0; i<n; i++)
+  poly p;
+  Exponent_t kr, kc;
+  Exponent_t *r, *c;
+  int al, bl, i, j, k;
+
+  al = di*sizeof(Exponent_t);
+  c = omAlloc(al);
+  bl = ra*sizeof(Exponent_t);
+  r = omAlloc0(bl);
+  for (i=di-1;i>=0;i--)
   {
-    if (Id->m[i] != NULL)
+    kc = 0;
+    p = m->m[i];
+    while(p!=NULL)
     {
-      ldeg = pLDeg(Id->m[i], &dummy);
-      if (ldeg > max) max = ldeg;
+      k = pGetComp(p)-1;
+      kr = r[k];
+      for (j=pVariables;j>0;j--)
+      {
+        if(pGetExp(p,j)>kc)
+          kc=pGetExp(p,j);
+        if(pGetExp(p,j)>kr)
+          kr=pGetExp(p,j);
+      }
+      r[k] = kr;
+      pIter(p);
     }
+    c[i] = kc;
   }
-  return max*2*n;
+  if (t<di) smMinSelect(c, t, di);
+  if (t<ra) smMinSelect(r, t, ra);
+  kr = kc = 0;
+  for (j=t-1;j>=0;j--)
+  {
+    kr += r[j];
+    kc += c[j];
+  }
+  omFreeSize((ADDRESS)c, al);
+  omFreeSize((ADDRESS)r, bl);
+  if (kr<kc) kc = kr;
+  if (kr<1) kr = 1;
+  return kr;
 }
 
-// #define HOMOG_LP
-/* ----------------- ops with rings ------------------ */
-ideal smRingCopy(ideal I, ring *ri, sip_sring &tmpR)
+static void smMinSelect(Exponent_t *c, int t, int d)
 {
-  ring origR =NULL;
-  ideal II;
-  origR =currRing;
-  tmpR=*origR;
+  Exponent_t m;
+  int pos, i;
+  do
+  {
+    d--;
+    pos = d;
+    m = c[pos];
+    for (i=d-1;i>=0;i--)
+    {
+      if(c[i]<m)
+      {
+        pos = i;
+        m = c[i];
+      }
+    }
+    for (i=pos;i<d;i++) c[i] = c[i+1];
+  } while (d>t);
+}
+
+/* ----------------- ops with rings ------------------ */
+void smRingChange(ring *origR, sip_sring &tmpR, Exponent_t bound)
+{
+  *origR =currRing;
+  tmpR=*currRing;
   int *ord=(int*)omAlloc0(3*sizeof(int));
   int *block0=(int*)omAlloc(3*sizeof(int));
   int *block1=(int*)omAlloc(3*sizeof(int));
   ord[0]=ringorder_c;
-#ifdef HOMOG_LP
-  if (idHomIdeal(I))
-    ord[1] = ringorder_lp;
-  else
-#endif
-    ord[1]=ringorder_dp;
+  ord[1]=ringorder_dp;
   tmpR.order=ord;
   tmpR.OrdSgn=1;
   block0[1]=1;
   tmpR.block0=block0;
   block1[1]=tmpR.N;
   tmpR.block1=block1;
+  tmpR.bitmask = bound;
 
-  tmpR.bitmask = smExpBound(I);
-
-  // unfortunately, we can not work (yet) with r->N == 0
-  if (tmpR.bitmask < 1) tmpR.bitmask = 1;
-  if (tmpR.bitmask > currRing->bitmask) tmpR.bitmask = currRing->bitmask;
+// ???
+//  if (tmpR.bitmask > currRing->bitmask) tmpR.bitmask = currRing->bitmask;
 
   rComplete(&tmpR,1);
   rChangeCurrRing(&tmpR);
   if (TEST_OPT_PROT)
     Print("[%d:%d]", (long) tmpR.bitmask, tmpR.ExpL_Size);
-  // fetch data from the old ring
-  II = idrCopyR(I, origR);
-  idTest(II);
-  *ri = origR;
-  return II;
 }
 
 void smRingClean(ring origR, ip_sring &tmpR)
 {
-  rChangeCurrRing(origR);
   rUnComplete(&tmpR);
   omFreeSize((ADDRESS)tmpR.order,3*sizeof(int));
   omFreeSize((ADDRESS)tmpR.block0,3*sizeof(int));
   omFreeSize((ADDRESS)tmpR.block1,3*sizeof(int));
+}
+
+/*2
+* Bareiss or Chinese remainder ?
+* I is dXd
+* sw = TRUE  -> I Matrix
+*      FALSE -> I Module
+* return True  -> change Type
+*        FALSE -> same Type
+*/
+BOOLEAN smCheckDet(ideal I, int d, BOOLEAN sw)
+{
+  int s,t,i;
+  poly p;
+
+  if ((d>100) || (currRing->parameter!=NULL))
+    return sw;
+  if (rField_is_Q(currRing)==FALSE)
+    return sw;
+  s = t = 0;
+  if (sw)
+  {
+    for(i=IDELEMS(I)-1;i>=0;i--)
+    {
+      p=I->m[i];
+      if (p!=NULL)
+      {
+        if(!pIsConstant(p))
+          return sw;
+        s++;
+        t+=nSize(pGetCoeff(p));
+      }
+    }
+  }
+  else
+  {
+    for(i=IDELEMS(I)-1;i>=0;i--)
+    {
+      p=I->m[i];
+      if (!pIsConstantPoly(p))
+        return sw;
+      while (p!=NULL)
+      {
+        s++;
+        t+=nSize(pGetCoeff(p));
+        pIter(p);
+      }
+    }
+  }
+  s*=15;
+  if (t>s)
+    return !sw;
+  else
+    return sw;
 }
 
 /* ----------------- basics (used from 'C') ------------------ */
@@ -244,34 +339,32 @@ poly smCallDet(ideal I)
   {
     return NULL;
   }
+  Exponent_t bound=smExpBound(I,r,r,r);
   number diag,h=nInit(1);
-  poly res,save;
+  poly res;
   ring origR;
   sip_sring tmpR;
   sparse_mat *det;
-  ideal II=smRingCopy(I,&origR,tmpR);
+  ideal II;
 
+  smRingChange(&origR,tmpR,bound);
+  II = idrCopyR(I, origR);
   diag = smCleardenom(II);
   det = new sparse_mat(II);
   idDelete(&II);
   if (det->smGetAct() == NULL)
   {
     delete det;
-    if (origR!=NULL) smRingClean(origR,tmpR);
+    rChangeCurrRing(origR);
+    smRingClean(origR,tmpR);
     return NULL;
   }
   res=det->smDet();
   if(det->smGetSign()<0) res=pNeg(res);
   delete det;
-  if (origR!=NULL)
-  {
-    rChangeCurrRing(origR);
-    save = res;
-    res = prCopyR( save, &tmpR);
-    rChangeCurrRing(&tmpR);
-    pDelete(&save);
-    smRingClean(origR,tmpR);
-  }
+  rChangeCurrRing(origR);
+  res = prMoveR(res, &tmpR);
+  smRingClean(origR,tmpR);
   if (nEqual(diag,h) == FALSE)
   {
     pMult_nn(res,diag);
@@ -284,96 +377,96 @@ poly smCallDet(ideal I)
 
 lists smCallBareiss(ideal I, int x, int y)
 {
+  lists res=(lists)omAllocBin(slists_bin);
+  int r=idRankFreeModule(I),t=r;
+  int c=IDELEMS(I),s=c;
+  Exponent_t bound;
   ring origR;
   sip_sring tmpR;
-  lists res=(lists)omAllocBin(slists_bin);
-  ideal II = smRingCopy(I,&origR,tmpR);
-  sparse_mat *bareiss = new sparse_mat(II);
+  ideal II;
+  sparse_mat *bareiss;
   ideal mm=II;
   intvec *v;
-  ideal m;
 
+  res->Init(2);
+  res->m[0].rtyp=MODUL_CMD;
+  res->m[1].rtyp=INTVEC_CMD;
+  if ((x>0) && (x<t))
+    t-=x;
+  if ((y>1) && (y<s))
+    s-=y;
+  if (t>s) t=s;
+  bound=2*smExpBound(I,c,r,t);
+  smRingChange(&origR,tmpR,bound);
+  II = idrCopyR(I, origR);
+  bareiss = new sparse_mat(II);
   if (bareiss->smGetAct() == NULL)
   {
     delete bareiss;
-    if (origR!=NULL) smRingClean(origR,tmpR);
     v=new intvec(1,pVariables);
+    rChangeCurrRing(origR);
   }
   else
   {
     idDelete(&II);
     bareiss->smBareiss(x, y);
-    m = bareiss->smRes2Mod();
+    II = bareiss->smRes2Mod();
     v = new intvec(bareiss->smGetRed());
     bareiss->smToIntvec(v);
     delete bareiss;
-    if (origR!=NULL)
-    {
-      rChangeCurrRing(origR);
-      mm=idInit(IDELEMS(m),m->rank);
-      int k;
-      for (k=0;k<IDELEMS(m);k++) mm->m[k] = prCopyR( m->m[k], &tmpR);
-      rChangeCurrRing(&tmpR);
-      idDelete(&m);
-      smRingClean(origR,tmpR);
-    }
-    else
-    {
-      mm=m;
-    }
+    rChangeCurrRing(origR);
+    II = idrMoveR(II,&tmpR);
   }
-  res->Init(2);
-  res->m[0].rtyp=MODUL_CMD;
-  res->m[0].data=(void *)mm;
-  res->m[1].rtyp=INTVEC_CMD;
+  smRingClean(origR,tmpR);
+  res->m[0].data=(void *)II;
   res->m[1].data=(void *)v;
   return res;
 }
 
 lists smCallNewBareiss(ideal I, int x, int y)
 {
+  lists res=(lists)omAllocBin(slists_bin);
+  int r=idRankFreeModule(I),t=r;
+  int c=IDELEMS(I),s=c;
+  Exponent_t bound;
   ring origR;
   sip_sring tmpR;
-  lists res=(lists)omAllocBin(slists_bin);
-  ideal II=smRingCopy(I,&origR,tmpR);
-  sparse_mat *bareiss = new sparse_mat(II);
+  ideal II;
+  sparse_mat *bareiss;
   ideal mm=II;
   intvec *v;
-  ideal m;
 
+  res->Init(2);
+  res->m[0].rtyp=MODUL_CMD;
+  res->m[1].rtyp=INTVEC_CMD;
+  if ((x>0) && (x<t))
+    t-=x;
+  if ((y>1) && (y<s))
+    s-=y;
+  if (t>s) t=s;
+  bound=smExpBound(I,c,r,t);
+  smRingChange(&origR,tmpR,bound);
+  II = idrCopyR(I, origR);
+  bareiss = new sparse_mat(II);
   if (bareiss->smGetAct() == NULL)
   {
     delete bareiss;
-    if (origR!=NULL) smRingClean(origR,tmpR);
     v=new intvec(1,pVariables);
+    rChangeCurrRing(origR);
   }
   else
   {
     idDelete(&II);
     bareiss->smNewBareiss(x, y);
-    m = bareiss->smRes2Mod();
+    II = bareiss->smRes2Mod();
     v = new intvec(bareiss->smGetRed());
     bareiss->smToIntvec(v);
     delete bareiss;
-    if (origR!=NULL)
-    {
-      rChangeCurrRing(origR);
-      mm=idInit(IDELEMS(m),m->rank);
-      int k;
-      for (k=0;k<IDELEMS(m);k++) mm->m[k] = prCopyR( m->m[k], &tmpR);
-      rChangeCurrRing(&tmpR);
-      idDelete(&m);
-      smRingClean(origR,tmpR);
-    }
-    else
-    {
-      mm=m;
-    }
+    rChangeCurrRing(origR);
+    II = idrMoveR(II,&tmpR);
   }
-  res->Init(2);
-  res->m[0].rtyp=MODUL_CMD;
-  res->m[0].data=(void *)mm;
-  res->m[1].rtyp=INTVEC_CMD;
+  smRingClean(origR,tmpR);
+  res->m[0].data=(void *)II;
   res->m[1].data=(void *)v;
   return res;
 }
@@ -2490,10 +2583,9 @@ public:
 lists smCallSolv(ideal I)
 {
   sparse_number_mat *linsolv;
-  int k;
   ring origR;
   sip_sring tmpR;
-  ideal rr, ss;
+  ideal rr;
   lists res;
 
   if (idIsConstant(I)==FALSE)
@@ -2504,33 +2596,26 @@ lists smCallSolv(ideal I)
   I->rank = idRankFreeModule(I);
   if (smCheckSolv(I)) return NULL;
   res=(lists)omAllocBin(slists_bin);
-  rr=smRingCopy(I,&origR,tmpR);
-  ss = NULL;
+  smRingChange(&origR,tmpR,1);
+  rr=idrCopyR(I,origR);
   linsolv = new sparse_number_mat(rr);
+  rr=NULL;
   linsolv->smTriangular();
   if (linsolv->smIsSing() == 0)
   {
     linsolv->smSolv();
-    ss = linsolv->smRes2Ideal();
+    rr = linsolv->smRes2Ideal();
   }
   else
     WerrorS("singular problem for linsolv");
   delete linsolv;
-  if ((origR!=NULL) && (ss!=NULL))
-  {
-    rChangeCurrRing(origR);
-    rr = idInit(IDELEMS(ss), 1);
-    for (k=0;k<IDELEMS(ss);k++)
-      rr->m[k] = prCopyR(ss->m[k], &tmpR);
-    rChangeCurrRing(&tmpR);
-    idDelete(&ss);
-    ss = rr;
-  }
-  if(origR!=NULL)
-    smRingClean(origR,tmpR);
+  rChangeCurrRing(origR);
+  if (rr!=NULL)
+    rr = idrMoveR(rr,&tmpR);
+  smRingClean(origR,tmpR);
   res->Init(1);
   res->m[0].rtyp=IDEAL_CMD;
-  res->m[0].data=(void *)ss;
+  res->m[0].data=(void *)rr;
   return res;
 }
 
