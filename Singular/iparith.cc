@@ -4096,7 +4096,7 @@ static BOOLEAN jjSTD_HILB_W(leftv res, leftv u, leftv v, leftv w)
   idSkipZeroes(result);
   res->data = (char *)result;
   setFlag(res,FLAG_STD);
-  if (ww!=NULL) atSet(res,mstrdup("isHomog"),w,INTVEC_CMD);
+  if (ww!=NULL) atSet(res,mstrdup("isHomog"),ww,INTVEC_CMD);
   return FALSE;
 }
 
