@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_util.h,v 1.3 1997-09-24 07:28:15 schmidt Exp $ */
+/* $Id: ftest_util.h,v 1.4 1997-09-29 13:14:44 schmidt Exp $ */
 
 #ifndef INCL_FTEST_UTIL_H
 #define INCL_FTEST_UTIL_H
@@ -24,6 +24,8 @@ enum ftestErrorT
 
 extern int ftestCircle;
 extern int ftestAlarm;
+
+extern int ftestPrintFlag;
 extern int ftestPrintResultFlag;
 
 void ftestSignalCatch ();
