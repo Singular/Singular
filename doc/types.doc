@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.94 1999-07-21 19:53:28 obachman Exp $
+@comment $Id: types.doc,v 1.95 1999-07-22 07:12:31 wichmann Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -340,7 +340,7 @@ minimal resolution for homogeneous ideals (see @ref{lres})
 @item maxideal
 power of the maximal ideal at 0 (see @ref{maxideal})
 @item minbase
-minimal generating set of a homogeneous ideal resp.@: module or an ideal resp.@: module in a local ring
+minimal generating set of a homogeneous ideal, resp.@: module, or an ideal, resp.@: module, in a local ring
 (see @ref{minbase})
 @item minor
 set of minors of a matrix (see @ref{minor})
@@ -359,7 +359,7 @@ minimal free resolution of an ideal resp.@: module, also minimizing the given id
 @item mstd
 standard basis and minimal generating set of an ideal (see @ref{mstd})
 @item mult
-multiplicity resp. degree of the ideal of leading terms (see @ref{mult})
+multiplicity, resp.@: degree, of the ideal of leading terms (see @ref{mult})
 @item ncols
 number of columns (see @ref{ncols})
 @item preimage
@@ -517,7 +517,7 @@ i = int(f);               // cast to int
 // Integers may be converted to constant  polynomials by an assignment,
 poly g=37;
 // define the constant polynomial g equal to the image of
-// the integer j in the actual coefficient field, here it equals 6
+// the integer 37 in the actual coefficient field, here it equals 6
 g;
 @c example
 @end smallexample
@@ -593,8 +593,8 @@ degree of a poly resp.@: vector (see @ref{deg})
 @item det
 determinant (see @ref{det})
 @item dim
-Krull dimension of basering modulo ideal resp.@: module of leading terms
-(see @ref{dim})
+Krull dimension of basering modulo ideal of leading terms, resp.@:
+dimension of module of leading terms (see @ref{dim})
 @item extgcd
 Bezout representation of gcd (see @ref{extgcd})
 @item find
@@ -606,13 +606,13 @@ Koszul matrix (see @ref{koszul})
 @item memory
 memory usage (see @ref{memory})
 @item mult
-multiplicity of an ideal resp.@: module of leading terms (see @ref{mult})
+multiplicity of an ideal, resp.@: module, of leading terms (see @ref{mult})
 @item ncols
 number of columns (see @ref{ncols})
 @item npars
 number of ring parameters (see @ref{npars})
 @item nrows
-number of rows of a matrix resp.
+number of rows of a matrix, resp.@:
 the rank of the free module where the vector or module lives
 (see @ref{nrows})
 @item nvars
@@ -620,7 +620,7 @@ number of ring variables (see @ref{nvars})
 @item ord
 degree of the leading term of a poly resp.@: vector (see @ref{ord})
 @item par
-n-th paramter of the basering (see @ref{par})
+n-th parameter of the basering (see @ref{par})
 @item pardeg
 degree of a number considered as a polynomial in the ring parameters (see @ref{pardeg})
 @item prime
@@ -638,8 +638,8 @@ trace of an integer matrix (see @ref{trace})
 @item var
 n-th ring variable of the basering (see @ref{var})
 @item vdim
-vector space dimension of basering modulo ideal resp.@: of freemodule modulo
-module of leading terms (see @ref{vdim})
+vector space dimension of basering modulo ideal of leading terms,
+resp.@: of freemodule modulo module of leading terms (see @ref{vdim})
 @end table
 
 @c ------------------------------
@@ -656,9 +656,9 @@ A boolean expression is really an int expression used in a logical context:
 
 @c item
 @*An int expression (<> 0 evaluates to @emph{TRUE} (represented by 1),
-0 represents @emph{FALSE})
+0 represents @emph{FALSE}).
 
-The following is the list of available comparisons of objects of a same type.
+The following is the list of available comparisons of objects of the same type.
 
 @strong{Note:} There are no comparisons for ideals and modules, resolution
 and maps.
@@ -729,7 +729,7 @@ boolean expressions combined by boolean operations (@code{and},
 @c ------------------------------------------------------------
 All arguments of a logical expressions are first evaluated and
 then the value of the logical expression is determined. For example, the
-logical expressions @code{(a || b)} is evaluated by first evaluating
+logical expression @code{(a || b)} is evaluated by first evaluating
 @code{a} @emph{and} @code{b}, even though the value of @code{b} has no
 influence on the value of @code{(a || b)}, if @code{a} evaluates to
 true.
@@ -814,7 +814,7 @@ matrix.
 @code{intmat} name @code{=} intmat_expression @code{;}
 @*@code{intmat} name @code{[} rows @code{] [} cols @code{] =} intmat_expression @code{;}
 @*@code{intmat} name @code{[} rows @code{] [} cols @code{] =} list_of_int_expressions @code{;}
-@*rows and cols must be int expressions.
+@*rows and cols must be positive int expressions.
 
 @item Purpose:
 defines an intmat variable.
@@ -863,7 +863,7 @@ a type cast to intmat (@pxref{intmat type cast})
 @*@strong{Example:}
 @smallexample
 @c example
-  intmat Idm[3][3];
+  intmat Idm[2][2];
   Idm +1;          // add the unit intmat
   intmat m1[3][2] = _,1,-2;  // take entries from the last result
   m1;
@@ -896,8 +896,8 @@ intmat
 Converts expression to an intmat, where expression must be of type
 intvec, or intmat. If
 int_n and int_m are supplied, then they specifify the dimension of the
-intmat. Otherwise, the size (resp. dimensions) of the intmat
-are determined  by the size (resp. dimensions) of the
+intmat. Otherwise, the size (resp.@: dimensions) of the intmat
+are determined  by the size (resp.@: dimensions) of the
 expression.
 @item @strong{Example:}
 @smallexample
@@ -999,9 +999,9 @@ trace of an intmat (see @ref{trace})
 
 Variables of type intvec are lists of integers.  For the range of
 integers see @ref{Limitations}. They may be used for simulating
-integers sets (and other sets if the intvec is used as an index set
+sets of integers (and other sets if the intvec is used as an index set
 for other objects). Addition and subtraction of an
-intvec with in int is done element wise.
+intvec within int is done element-wise.
 @c @example
 @c @c example
 @c   intvec iv=1,2,5,7;
@@ -1106,7 +1106,7 @@ negation or subtraction with intvec or int (component-wise)
 multiplication with int (component-wise)
 
 @item @code{/}, @code{div}
-division with int (component-wise)
+division by int (component-wise)
 
 @item  @code{%, mod}
 modulo (component-wise)
@@ -1129,7 +1129,7 @@ is an element of the intvec; the first element has index one.
   iv=iv,0;
   iv;
   iv div 2;
-  iv+iv;              // componentwise addition
+  iv+iv;              // component-wise addition
   iv[size(iv)-1];     // last-1 entry
   intvec iw=2,3,4,0;
   iv==iw;             // lexicographic comparison
@@ -1349,7 +1349,7 @@ mode is set by the first @code{read} or @code{write} command. See also
 the example below.
 
 Note that the filename may contain a path. On Microsoft Windows
-(resp. MS-DOS) platforms, names of a drive can preceed the filename, but
+(resp.@: MS-DOS) platforms, names of a drive can preceed the filename, but
 must be started with a @code{//} (as in @code{//c/temp/ex}. An ASCII
 link can be used either for reading or for writing, but not for both at
 the same time. A @code{close} command must be used before a change of
@@ -1441,7 +1441,7 @@ link. If the first command is @code{write}, the mode is set to @code{a}
 @c Tim: You and I were right here: It is indeed append. Olaf
 @end itemize
 
-Note that the filename may contain a path. An MP file link can be used
+Note that the filename may contain a path. An MPfile link can be used
 either for reading or for writing, but not for both at the same time. A
 @code{close} command must be used before a change of I/O direction.
 
@@ -1645,8 +1645,8 @@ returns the next key in the data base. Using this feature a
 data base can be scanned in order to access all entries of the data base.
 
 If a data base with name @code{name} is opened for writing for the first
-time, two files (@code{name.pag} and @code{name.dir}) are automatically
-created, which contain the data base.
+time, two files (@code{name.pag} and @code{name.dir}), which contain the
+data base, are automatically created.
 
 The DBM link describing string has to be one of the following:
 
@@ -1661,7 +1661,7 @@ The DBM link describing string has to be one of the following:
 @*opens the data base for reading and writing.
 @end enumerate
 
-Note, that @code{name} must be given without the suffix @code{.pag} ors
+Note, that @code{name} must be given without the suffix @code{.pag} or
 @code{.dir}. The name may contain an (absolute) path.
 
 @*@strong{Example:}
@@ -1837,16 +1837,16 @@ minimal resolution (see @ref{lres})
 @item minres
 minimize a free resolution (see @ref{minres})
 @item mres
-minimal free resolution of an ideal resp.@: module, also
+minimal free resolution of an ideal, resp.@: module, also
 minimizing the first module (see @ref{mres})
 @item names
 list of all userdefined variable names (see @ref{names})
 @item res
-minimal free resolution of an ideal resp.@: module (see @ref{res})
+minimal free resolution of an ideal, resp.@: module (see @ref{res})
 @item size
 number of entries (see @ref{size})
 @item sres
-free resolution of an ideal resp.@: module given by a standard base (see @ref{sres})
+free resolution of an ideal, resp.@: module, given by a standard base (see @ref{sres})
 @end table
 
 
@@ -2095,7 +2095,7 @@ If the poly_list contains less than rows*cols elements,
 the matrix is filled up with zeros; if it contains more
 elements, then only the first rows*cols elements are used.
 If the right-hand side is a matrix expression
-the matrix on the left-hand side becomes the same size as the right-hand side,
+the matrix on the left-hand side gets the same size as the right-hand side,
 otherwise the size is determined by the left-hand side.
 If the size is omitted a 1x1 matrix is created.
 
@@ -2170,8 +2170,8 @@ matrix
 Converts expression to a matrix, where expression must be of type int,
 intmat, intvec, number, poly, ideal, vector, module, or matrix. If
 int_n and int_m are supplied, then they specifify the dimension of the
-matrix. Otherwise, the size (resp. dimensions) of the matrix
-are determined  by the size (resp. dimensions) of the
+matrix. Otherwise, the size (resp.@: dimensions) of the matrix
+are determined  by the size (resp.@: dimensions) of the
 expression.
 @item @strong{Example:}
 @smallexample
@@ -2325,7 +2325,14 @@ between the canonical generators @code{gen(1)},@dots{},@code{gen(n)}.
 Hence any finitely generated @math{R}-module can be represented in @sc{Singular}
 by its module of relations. The assignments
 @code{module M=v1,...,vk; matrix A=M;}
-creates the presentation matrix of size n x k for
+create the presentation matrix of size
+@ifinfo
+n x k
+@end info
+@tex
+n$\times$k
+@end tex
+for
 @ifinfo
 R^n/M,
 @end ifinfo
@@ -2396,7 +2403,7 @@ a function returning module
 @item
 module expressions combined by the arithmetic operation @code{+}
 @item
-multiplication of a module expressions with an ideal or poly expression: @code{*}
+multiplication of a module expression with an ideal or a poly expression: @code{*}
 @item
 a type cast to module
 @end enumerate
@@ -2487,7 +2494,7 @@ standard basis and transformation matrix computation (see @ref{liftstd})
 @item lres
 minimal resolution (see @ref{lres})
 @item minbase
-minimal generating set of a homogeneous ideal resp.@: module or an ideal resp.@: module
+minimal generating set of a homogeneous ideal, resp.@: module, or an ideal, resp.@: module,
 over a local ring
 @item modulo
 represents
@@ -2502,7 +2509,7 @@ $(h1+h2)/h1=h2/(h1 \cap h2)$
 minimal free resolution of an ideal resp.@: module, also minimizing the given module
 (see @ref{mres})
 @item mult
-multiplicity resp. degree of the module of leading terms (see @ref{mult})
+multiplicity, resp.@: degree, of the module of leading terms (see @ref{mult})
 @item ncols
 number of columns (see @ref{ncols})
 @item nrows
@@ -2512,13 +2519,13 @@ nice print format (see @ref{print})
 @item prune
 minimize the embedding into a free module (see @ref{prune})
 @item qhweight
-quasihomogeneous weights of an ideal resp.@: module (see @ref{qhweight})
+quasihomogeneous weights of an ideal, resp.@: module (see @ref{qhweight})
 @item quotient
 ideal quotient (see @ref{quotient})
 @item reduce
 normalform with respect to a standard basis (see @ref{reduce})
 @item res
-minimal free resolution of an ideal resp.@: module but not changing the given ideal resp.@: module
+minimal free resolution of an ideal, resp.@: module, but not changing the given ideal, resp.@: module
 (see @ref{res})
 @item simplify
 simplify a set of vectors (see @ref{simplify})
@@ -2716,12 +2723,12 @@ comparison
 @end table
 
 @strong{Note:} quotient and exponentiation is only recognized as a
-number expression is if is already a number, see @ref{Miscellaneous
+number expression if it is already a number, see @ref{Miscellaneous
 oddities}.
 @* To access the denominator or nominator of a rational number see
 @ref{Tricks and pitfalls}.
 @* For the behavior of comparison operators in rings with
-basering different from real or the rational numbers, see @ref{boolean
+ground field different from real or the rational numbers, see @ref{boolean
 expressions}.
 
 @*@strong{Example:}
@@ -2752,7 +2759,7 @@ expressions}.
 
 @table @code
 @item cleardenom
-cancels denominators of numbers in poly and divide by its content
+cancel denominators of numbers in poly and divide it by its content
 (see @ref{cleardenom})
 @item leadcoef
 coefficient of the leading term (see @ref{leadcoef})
@@ -2761,7 +2768,7 @@ n-th parameter of the basering (see @ref{par})
 @item pardeg
 degree of a number in ring parameters (see @ref{pardeg})
 @item parstr
-string form of ring parameter (see @ref{parstr})
+string form of ring parameters (see @ref{parstr})
 @end table
 
 @c ---------------------------------------
@@ -2972,7 +2979,7 @@ power by an integer
 comparison (of leading terms w.r.t. monomial ordering)
 
 @item poly_expression @code{[} intvec_expression @code{]}
-the monomial at the indicated place w.r.t.@: the monomial order
+the monomial at the indicated place w.r.t.@: the monomial ordering
 @end table
 
 @*@strong{Example:}
@@ -3007,7 +3014,7 @@ the monomial at the indicated place w.r.t.@: the monomial order
 
 @table @code
 @item cleardenom
-cancels denominators of numbers in poly and divide by its content
+cancel denominators of numbers in poly and divide it by its content
 (see @ref{cleardenom})
 @item coef
 matrix of coefficients and monomials (see @ref{coef})
@@ -3030,7 +3037,7 @@ greatest common divisor (see @ref{gcd})
 @item homog
 homogenization (see @ref{homog})
 @item jacob
-ideal resp.@: matrix of all partial derivatives (see @ref{jacob})
+ideal, resp.@: matrix, of all partial derivatives (see @ref{jacob})
 @item lead
 leading term (see @ref{lead})
 @item leadcoef
@@ -3206,8 +3213,8 @@ basering;
 @cindex resolution
 
 The resolution type is intended as an intermediate representation which
-internally retains additional information obtained during resolution
-computations. It furthermore enables the use of partial results to
+internally retains additional information obtained during computation of
+resolutions. It furthermore enables the use of partial results to
 compute, for example, Betti numbers or minimal resolutions. Like ideals
 and modules, a resolution can only be defined w.r.t.@: a basering.
 
@@ -3264,7 +3271,7 @@ an identifier of type resolution
 @item
 a function returning a resolution
 @item
-a type cast to resolution from a list of ideals resp.@: modules..
+a type cast to resolution from a list of ideals, resp.@: modules..
 @end enumerate
 
 @c ref
@@ -3284,11 +3291,11 @@ minimal resolution (see @ref{lres})
 @item minres
 minimize a free resolution (see @ref{minres})
 @item mres
-minimal free resolution of an ideal resp.@: module, also minimizing the
-given ideal resp.@: module (see @ref{mres})
+minimal free resolution of an ideal, resp.@: module, also minimizing the
+given ideal, resp.@: module (see @ref{mres})
 @item res
-minimal free resolution of an ideal resp.@: module but not changing the
-given ideal resp.@: module (see @ref{res})
+minimal free resolution of an ideal, resp.@: module, but not changing the
+given ideal, resp.@: module (see @ref{res})
 @item sres
 free resolution of a standard basis (see @ref{sres})
 @end table
@@ -3373,7 +3380,7 @@ omitted.
 
 @table @code
 @item charstr
-description of the coeffinet field of a ring (see @ref{charstr})
+description of the coefficient field of a ring (see @ref{charstr})
 @item keepring
 move ring to next upper level (see @ref{keepring})
 @item npars
@@ -3431,7 +3438,7 @@ intermediate conversion of one type into another.
 @c example
 @end smallexample
 A comma between two strings makes an expression list out of them
-(such a list is printed with as a separating blank between),
+(such a list is printed with a separating blank in between),
 while a @code{+} concatenates strings.
 
 @menu
@@ -3627,7 +3634,7 @@ is a expression list of characters from the string
 
 @table @code
 @item charstr
-description of the coeffinet field of a ring (see @ref{charstr})
+description of the coefficient field of a ring (see @ref{charstr})
 @item execute
 executing string as command (see @ref{execute})
 @item find
@@ -3672,12 +3679,12 @@ of a generator with non-zero coefficient. Since generators with zero
 coefficients need not be written any vector may be considered
 also as an element of a free module of higher rank.
 Like polynomials they
-can only be defined or accessed with respect to this basering.
+can only be defined or accessed with respect to the basering.
 (E.g., if @code{f} and @code{g} are polynomials then
 @code{f*gen(1)+g*gen(3)+gen(4)} may also be written as @code{[f,0,g,1]}
 or as @code{[f,0,g,1,0]}.). Note that the elements of a vector have to be
-surrounded by square brackets (@code{[}  , @code{]}).
-(cf. @ref{Representation of mathematical objects})
+surrounded by square brackets (@code{[}  , @code{]})
+(cf. @ref{Representation of mathematical objects}).
 
 @menu
 * vector declarations::
