@@ -19,7 +19,7 @@ bug_5
 bug_6
 bug_7
 bug_8
-; bug_9 component/poly
+bug_9 
 bug_barei
 bug_c_dp
 bug_factorize
@@ -76,9 +76,9 @@ rInit
 res_s
 resultantp_s
 ringsum
-; sing_s wrong rank
-; solve_s debug output etc
-; spcurve weights?
+sing_s
+solve_s
+spcurve
 sres_s
 std_s
 string 
