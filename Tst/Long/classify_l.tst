@@ -2,7 +2,7 @@ LIB "tst.lib";
 LIB "classify.lib";
 
 tst_init();
-tst_ignore("CVS: $Id: classify_l.tst,v 1.2 1998-07-01 10:10:30 obachman Exp $");
+tst_ignore("CVS: $Id: classify_l.tst,v 1.3 2000-12-04 13:12:45 Singular Exp $");
 
 
 "======================================================================";
@@ -161,6 +161,8 @@ map phi=r,y-x^2,x+y,y-z;
 
 //classify(f);
 
+"=====================================================================";
+example classify;
 "======================================================================";
 "// reomving database.";
 int i=system("sh", "/bin/rm -f NFlist.dir NFlist.pag");
