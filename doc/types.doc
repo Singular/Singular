@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.54 1998-05-18 19:10:01 wichmann Exp $
+@comment $Id: types.doc,v 1.55 1998-05-19 07:32:14 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -1544,7 +1544,7 @@ an identifier of type list
 @item
 a function returning list
 @item
-list expressions combined by the arithmetic operation @code{+} or @code{,}
+list expressions combined by the arithmetic operation @code{+}
 @item
 a typecast to list
 @end enumerate
@@ -1569,9 +1569,6 @@ See @ref{Type conversion and casting}.
 @table @asis
 @item @code{+}
 concatenation
-
-@item @code{,}
-construct a new list whose elements are the parts of the expression list
 
 @item list_expression @code{[} int_expression @code{]}
 is a list entry; the index 1 gives the first element.
@@ -1799,7 +1796,7 @@ only be defined or accessed with respect to a basering. In order to
 compute with matrices having integer or rational entries define a ring
 with characteristic 0 and at least one variable.
 
-A matrix can be multiplied by and added to an poly; in this case the
+A matrix can be multiplied by and added to a poly; in this case the
 poly is converted into a matrix of the right size with the poly on the
 diagonal.
 
@@ -2547,8 +2544,8 @@ user definable commands. Once a procedure is defined it can be used as
 any other @sc{Singular} command. Procedures may be defined by either
 typing them on the command line or by loading them from a file. For a
 detailed description on the concept of procedures in @sc{Singular} see
-@ref{Procedures}. A file containing procedure definitions which complies
-certain syntax rules is called a library. Such a file can be loaded
+@ref{Procedures}. A file containing procedure definitions which comply with
+certain syntax rules is called a library. Such a file is loaded
 using the command @code{LIB}. For more information on libraries see
 @ref{Libraries}.
 
@@ -2626,6 +2623,7 @@ in form of a standard basis.
 * qring declaration::
 @end menu
 
+@c ---------------------------------------
 @node qring declaration,  , qring, qring
 @subsection qring declaration
 @cindex qring declaration
@@ -2641,7 +2639,7 @@ of the basering to this new ring.
 @item Default:
 none
 @item Note:
-In an @code{qring}, polynomials are not immediately reduced with respect
+In a @code{qring}, polynomials are not immediately reduced with respect
 to the quotient ring.
 @item Example:
 @example
@@ -2884,7 +2882,7 @@ intermidiate conversion of one type into another.
   "a"+"b","c";
 @c example
 @end example
-A comma between two expressions makes an expression list out of them
+A comma between two strings makes an expression list out of them
 (such a list is printed with as a separating blank between),
 while a @code{+} concatenates strings.
 
@@ -2927,7 +2925,7 @@ defines a string variable.
 A string expression is:
 @enumerate
 @item
-a sequence of characters between two quotes (@code{"})
+a sequence of characters between two unescaped quotes (@code{"})
 @item
 an identifier of type string
 @item
@@ -2942,26 +2940,25 @@ string expressions combined by the operation @code{+}.
 
 @strong{Example:}
 @example
-  // a string constant
-  "@dots{}";
-  // a typecast from name
-  string(name)
-  // concatenation
-  string_expression + string_expression
-  //string_expression[start, length] : a substring
-  //(possibly filled up with blanks)
-  string s="123456";
-  s[2,4];// the substring of s starting at position 2
-         // with a length of 4
-  @expansion{} 2345
-  "abcd"[2,2];
-  @expansion{} bc
-  //string_expression[position] : a character from a string
-  s[3];
-  @expansion{} 3
-  //a function returning a string
-  typeof(s);
-  @expansion{} string
+@c  // a string constant
+@c  "@dots{}";
+@c  // a typecast from name
+@c  string(name)
+@c  // concatenation
+@c  string_expression + string_expression
+@c example
+// string_expression[start, length] : a substring
+// (possibly filled up with blanks)
+// the substring of s starting at position 2
+// with a length of 4
+string s="123456";
+s[2,4];
+"abcd"[2,2];
+// string_expression[position] : a character from a string
+s[3];
+// a function returning a string
+typeof(s);
+@c example
 @end example
 @c ref
 See @ref{Type conversion and casting}.
@@ -2977,7 +2974,7 @@ See @ref{Type conversion and casting}.
 concatenation
 
 @item @code{<=}, @code{>=}, @code{==}, @code{<>}
-comparison (lexicographic with respect to the ASCII coding)
+comparison (lexicographic with respect to the ASCII encoding)
 
 @item string_expression @code{[} int_expression @code{]}
 is a character of the string; the index 1 gives the first character.
@@ -2988,7 +2985,7 @@ second is the length of the substring, filled up with blanks if the
 length exceeds the total size of the string
 
 @item string_expression @code{[} intvec_expression @code{]}
-is a list of characters from the string
+is a expression list of characters from the string
 @end table
 
 @strong{Example:}
@@ -3054,9 +3051,9 @@ coefficients need not be written any vector may be considered
 also as an element of a free module of higher rank.
 Like polynomials they
 can only be defined or accessed with respect to this basering.
-(E.g. if @code{f} and @code{g} are polynomials then
-@code{f*gen(1)+g*gen(3)+gen(4)} can also be written as @code{[f,0,g,1]}
-or as @code{[f,0,g,1,0]}.) Note that the elements of a vector have to be
+(E.g., if @code{f} and @code{g} are polynomials then
+@code{f*gen(1)+g*gen(3)+gen(4)} may also be written as @code{[f,0,g,1]}
+or as @code{[f,0,g,1,0]}.). Note that the elements of a vector have to be
 surrounded by square brackets (@code{[}, @code{]}).
 
 @menu
