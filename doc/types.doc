@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.39 1998-05-13 15:05:31 Singular Exp $
+@comment $Id: types.doc,v 1.40 1998-05-13 15:09:14 obachman Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -1024,6 +1024,8 @@ defines a new communication link.
 none
 @item @strong{Example:}
 @example
+@c Tim: Let's only do the read here once, doing it twice without closing 
+@c it first migth be confusing
 @c example
   link l=":w example.txt";
   int i=22;
@@ -1031,7 +1033,6 @@ none
   write(l,s,i);
   l;
   close(l);
-  read(l);
   read(l);
   close(l);
 @c example
@@ -1909,7 +1910,7 @@ set of minors of a matrix (see @ref{minor})
 number of columns (see @ref{ncols})
 @item @code{nrows}
 number of rows (see @ref{nrows})
-@print @code(print)  
+@print @code{print}
 nice print format (see @ref{print})
 @item @code{size}
 number of matrix entries (see @ref{size})
