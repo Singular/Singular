@@ -413,20 +413,44 @@ if test "${with_extra_cflags+set}" = set; then
 fi
 
 if test "${with_rsh+set}" = set; then
-  ac_cv_rsh_program=${with_rsh}
-else
-  AC_CHECK_PROGS(ac_cv_rsh_program,remsh rsh ssh, none)
+  AC_CHECK_PROG(with_rsh, ${with_rsh}, ${with_rsh})
+  if test "$ac_cv_prog_with_rsh" = $with_rsh; then
+    ac_rsh_programs=${with_rsh}
+  else
+   ac_rsh_programs=
+  fi
 fi
-AC_MSG_CHECKING(which remote shell command to use)
-AC_DEFINE_UNQUOTED(MP_RSH_COMMAND, "$ac_cv_rsh_program")
-AC_MSG_RESULT($ac_cv_rsh_program)
 
-AC_MSG_CHECKING(whether remote shell command works)
-if $ac_cv_rsh_program `hostname` -n uname \>\& /dev/null; then
-  AC_MSG_RESULT(yes)
+
+AC_CHECK_PROG(mp_ssh, ssh, ssh, no)
+if test "$ac_cv_prog_mp_ssh" = ssh; then
+   ac_rsh_programs="$ac_rsh_programs ssh"
+fi
+
+AC_CHECK_PROG(mp_rsh, rsh, rsh, no)
+if test "$ac_cv_prog_mp_rsh" = rsh; then
+   ac_rsh_programs="$ac_rsh_programs rsh"
+fi
+
+AC_CHECK_PROG(mp_remsh, remsh, remsh, no)
+if test "$ac_cv_prog_mp_remsh" = remsh; then
+   ac_rsh_programs="$ac_rsh_programs remsh"
+fi
+
+AC_MSG_CHECKING(which remote shell command to use)
+for mp_rsh in $ac_rsh_programs; do
+    if $mp_rsh `hostname` -n uname \>\& /dev/null; then
+      mp_rsh_found=$mp_rsh
+      break;
+    else
+      mp_rsh_found=none
+    fi
+done
+AC_MSG_RESULT($mp_rsh_found)
+if test "${mp_rsh_found}" = none; then
+   AC_MSG_WARN("No working remote shell command found")
 else
-  AC_MSG_RESULT(no)
-  AC_MSG_WARN(Remote shell does not work. Check your .rhosts file)
+  AC_DEFINE_UNQUOTED(MP_RSH_COMMAND, "$mp_rsh_found")
 fi
 
 dnl Checks for typedefs, structures, and compiler characteristics.

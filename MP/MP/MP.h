@@ -2077,6 +2077,7 @@ EXTERN MP_Status_t MP_TbSetTerm _ANSI_ARGS_((MP_Link_pt link, term *t));
 #define MP_AnnotPolyIrreducible         6
 #define MP_AnnotPolyWeights             8
 #define MP_AnnotPolyModuleRank          9
+#define MP_AnnotShouldHavePolyOrdering  10
 
 /***************************************************************************
  *
