@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.cc,v 1.13 2000-06-21 07:35:41 pohl Exp $ */
+/* $Id: gnumpfl.cc,v 1.14 2000-06-27 12:07:01 pohl Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 *
@@ -33,12 +33,13 @@ static number ngfMapP(number from)
 }
 static number ngfMapQ(number from)
 {
-  gmp_float *res= new gmp_float();
   if ( from != NULL )
   {
-    *res= numberFieldToFloat(from,QTOF);
+    gmp_float *res=new gmp_float(numberFieldToFloat(from,QTOF));
+    return (number)res;
   }
-  return (number)res;
+  else
+    return NULL;
 }
 
 BOOLEAN ngfSetMap(ring r)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.cc,v 1.10 1999-11-15 17:20:03 obachman Exp $ */
+/* $Id: gnumpc.cc,v 1.11 2000-06-27 12:07:00 pohl Exp $ */
 /*
 * ABSTRACT: computations with GMP complex floating-point numbers
 *
@@ -25,12 +25,13 @@ extern size_t gmp_output_digits;
 
 static number ngcMapQ(number from)
 {
-  gmp_complex *res= new gmp_complex();
   if ( from != NULL )
   {
-    *res= numberFieldToFloat(from,QTOF);
+    gmp_complex *res=new gmp_complex(numberFieldToFloat(from,QTOF));
+    return (number)res;
   }
-  return (number)res;
+  else
+    return NULL;
 }
 
 BOOLEAN ngcSetMap(ring r)
@@ -56,8 +57,7 @@ number   ngcPar(int i)
 
 void ngcNew (number * r)
 {
-  gmp_complex* n= new gmp_complex( );
-  *r=(number)n;
+  *r=NULL;
 }
 
 /*2
