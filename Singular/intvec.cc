@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: intvec.cc,v 1.21 2000-11-14 16:04:53 obachman Exp $ */
+/* $Id: intvec.cc,v 1.22 2001-01-19 09:47:46 Singular Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -145,15 +145,28 @@ void intvec::operator*=(int intop)
 void intvec::operator/=(int intop)
 {
   if (intop == 0) return;
-  for (int i=0; i<row*col; i++) { v[i] /= intop; }
+  int bb=ABS(intop);
+  for (int i=0; i<row*col; i++)
+  {
+    int r=v[i];
+    int c=r%bb;
+    if (c<0) c+=bb;
+    r=(r-c)/intop;
+    v[i]=r;
+  }
 }
 
 void intvec::operator%=(int intop)
 {
   if (intop == 0) return;
-  if (intop<0) intop*=(-1);
+  int bb=ABS(intop);
   for (int i=0; i<row*col; i++)
-  { v[i] %= intop; if (v[i]<0) v[i] += intop; }
+  {
+    int r=v[i];
+    int c=r%bb;
+    if (c<0) c+=bb;
+    v[i]=c;
+  }
 }
 
 int intvec::compare(intvec* op)
