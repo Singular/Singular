@@ -7,7 +7,7 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: p_polys.h,v 1.8 2000-10-26 06:39:30 obachman Exp $
+ *  Version: $Id: p_polys.h,v 1.9 2000-10-26 16:31:37 obachman Exp $
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -170,6 +170,8 @@ PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a,
 
 PINLINE1 BOOLEAN p_DivisibleBy(poly a, ring r_a, poly b, ring r_b);
 PINLINE1 BOOLEAN p_LmDivisibleBy(poly a, ring r_a, poly b, ring r_b);
+PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a, ring r_a,
+                                      poly b, unsigned long not_sev_b, ring r_b);
 
 /***************************************************************
  *
@@ -294,11 +296,17 @@ PINLINE0 poly pReverse(poly p);
  * I/O
  *
  ***************************************************************/
-char*     pString(poly p, ring lmRing, ring tailRing = currRing);
-char*     pString0(poly p, ring lmRing, ring tailRing = currRing);
-void      pWrite(poly p, ring lmRing, ring tailRing = currRing);
-void      pWrite0(poly p, ring lmRing, ring tailRing = currRing);
-void      wrp(poly p, ring lmRing, ring tailRing = currRing);
+char*     p_String(poly p, ring lmRing, ring tailRing);
+char*     p_String0(poly p, ring lmRing, ring tailRing);
+void      p_Write(poly p, ring lmRing, ring tailRing);
+void      p_Write0(poly p, ring lmRing, ring tailRing);
+void      p_wrp(poly p, ring lmRing, ring tailRing);
+
+PINLINE2 char*     p_String(poly p, ring p_ring);
+PINLINE2 char*     p_String0(poly p, ring p_ring);
+PINLINE2 void      p_Write(poly p, ring p_ring);
+PINLINE2 void      p_Write0(poly p, ring p_ring);
+PINLINE2 void      p_wrp(poly p, ring p_ring);
 
 
 /***************************************************************

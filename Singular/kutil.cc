@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.69 2000-10-26 06:39:28 obachman Exp $ */
+/* $Id: kutil.cc,v 1.70 2000-10-26 16:31:35 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -335,6 +335,14 @@ int kFindInT(poly p, TSet T, int tlength)
 }
 
 #ifdef KDEBUG
+
+void sTObject::wrp()
+{
+  if (t_p != NULL) p_wrp(t_p, tailRing);
+  else if (p != NULL) p_wrp(p, currRing, tailRing);
+  else ::wrp(NULL);
+}
+
 #define kFalseReturn(x) do { if (!x) return FALSE;} while (0)
 
 // check that Lm's of a poly from T are "equal"
@@ -2452,7 +2460,8 @@ poly redtailBba (LObject* L, int pos, kStrategy strat)
     not_sev = ~ p_GetShortExpVector(hn, strat->tailRing);
     while (j <= pos)
     {
-      if (pLmShortDivisibleBy(strat->S[j], strat->sevS[j], hn, not_sev))
+      if (p_LmShortDivisibleBy(strat->S[j], strat->sevS[j], currRing, 
+                               hn, not_sev, strat->tailRing))
       {
         strat->redTailChange=TRUE;
         assume(p != strat->S[j]);
@@ -2581,6 +2590,7 @@ void messageStat (int srmax,int lrmax,int hilbcount,kStrategy strat)
   /*mflush();*/
 }
 
+#ifdef KDEBUG
 /*2
 *debugging output: all internal sets, if changed
 *for testing purpuse only/has to be changed for later use
@@ -2594,7 +2604,7 @@ void messageSets (kStrategy strat)
     for (i=0; i<=strat->sl; i++)
     {
       Print("\n  %d:",i);
-      wrp(strat->S[i], currRing, strat->tailRing);
+      p_wrp(strat->S[i], currRing, strat->tailRing);
     }
     strat->news = FALSE;
   }
@@ -2604,9 +2614,9 @@ void messageSets (kStrategy strat)
     for (i=0; i<=strat->tl; i++)
     {
       Print("\n  %d:",i);
-      wrp(strat->T[i].GetLmTailRing());
+      strat->T[i].wrp();
       Print(" o:%d e:%d l:%d",
-        pFDeg(strat->T[i].p),strat->T[i].ecart,strat->T[i].length);
+        strat->T[i].pFDeg(),strat->T[i].ecart,strat->T[i].length);
     }
     strat->newt = FALSE;
   }
@@ -2614,17 +2624,19 @@ void messageSets (kStrategy strat)
   for (i=strat->Ll; i>=0; i--)
   {
     Print("\n%d:",i);
-    wrp(strat->L[i].p1, currRing, strat->tailRing);
+    p_wrp(strat->L[i].p1, currRing, strat->tailRing);
     PrintS("  ");
-    wrp(strat->L[i].p2, currRing, strat->tailRing);
-    PrintS(" lcm: ");wrp(strat->L[i].lcm, currRing);
+    p_wrp(strat->L[i].p2, currRing, strat->tailRing);
+    PrintS(" lcm: ");p_wrp(strat->L[i].lcm, currRing);
     PrintS("\n  p : ");
-    wrp(strat->L[i].GetLmTailRing(), strat->tailRing);
+    strat->L[i].wrp();
     Print("  o:%d e:%d l:%d",
-     pFDeg(strat->L[i].p),strat->L[i].ecart,strat->L[i].length);
+          strat->L[i].pFDeg(),strat->L[i].ecart,strat->L[i].length);
   }
   PrintLn();
 }
+
+#endif
 
 /*2
 *construct the set s from F
@@ -3167,7 +3179,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
           if (TEST_OPT_DEBUG && (pCmp(redSi,strat->S[i])!=0))
           {
             PrintS("reduce:");
-            wrp(redSi);PrintS(" to ");wrp(strat->S[i], currRing, strat->tailRing);PrintLn();
+            wrp(redSi);PrintS(" to ");p_wrp(strat->S[i], currRing, strat->tailRing);PrintLn();
           }
           if (TEST_OPT_PROT && (pCmp(redSi,strat->S[i])!=0))
           {
@@ -3390,14 +3402,17 @@ void enterT (LObject p,kStrategy strat)
   }
   else atT = 0;
 
-  strat->T[atT] = p;
 
-  if (strat->tailBin != NULL && pNext(p.p) != NULL)
+  if (strat->tailBin != NULL && strat->tailBin != strat->tailRing->PolyBin &&
+      pNext(p.p) != NULL)
+  {
     pNext(p.p)=p_ShallowCopyDelete(pNext(p.p),
                                    (strat->tailRing != NULL ? 
                                     strat->tailRing : currRing),
                                    strat->tailBin);
-  strat->T[atT].p = p.p;
+    if (p.t_p != NULL) pNext(p.t_p) = pNext(p.p);
+  }
+  strat->T[atT] = p;
   if (strat->use_buckets && p.pLength <= 0)
     strat->T[atT].pLength = pLength(p.p);
   else
@@ -3429,12 +3444,15 @@ void enterTBba (LObject p, int atT,kStrategy strat)
   for (i=strat->tl+1; i>=atT+1; i--)
     strat->T[i] = strat->T[i-1];
 
-  strat->T[atT] = (TObject) p;
   if (strat->tailBin != NULL && (pNext(p.p) != NULL))
+  {
     pNext(p.p)=p_ShallowCopyDelete(pNext(p.p),
                                    (strat->tailRing != NULL ? 
                                     strat->tailRing : currRing),
                                    strat->tailBin);
+    if (p.t_p != NULL) pNext(p.t_p) = pNext(p.p);
+  }
+  strat->T[atT] = (TObject) p;
   if (strat->use_buckets && p.pLength <= 0)
     strat->T[atT].pLength = pLength(p.p);
 
@@ -3449,6 +3467,7 @@ void enterTBba (LObject p, int atT,kStrategy strat)
   {
     assume(p.sev == pGetShortExpVector(p.p));
   }
+  kTest_T(&(strat->T[atT]));
   strat->tl++;
 }
 
@@ -3780,7 +3799,6 @@ BOOLEAN newHEdge(polyset S, int ak,kStrategy strat)
   return FALSE;
 }
 
-
 /***************************************************************
  *
  * Routines related for ring changes during std computations
@@ -3791,7 +3809,7 @@ BOOLEAN kCheckSpolyCreation(kStrategy strat,
 {
   assume(pNext(strat->P.p) == strat->tail);
   assume(strat->P.p1 != NULL && strat->P.p2 != NULL);
-  assume(strat->tailRing != currRing && strat->tailRing == strat->P.tailRing);
+  assume(strat->tailRing != currRing);
   
   if (! k_GetLeadTerms(strat->P.p1, strat->P.p2, currRing,
                        m1, m2, strat->tailRing))
@@ -3858,9 +3876,13 @@ void kStratChangeTailRing(kStrategy strat, ring new_tailRing)
   }
   for (i=0; i<=strat->Ll; i++)
   {
-    strat->L[i].ShallowCopyDelete(new_tailRing, p_shallow_copy_delete);
+    assume(strat->L[i].p != NULL);
+    if (pNext(strat->L[i].p) != strat->tail)
+      strat->L[i].ShallowCopyDelete(new_tailRing, p_shallow_copy_delete);
   }
-  strat->P.ShallowCopyDelete(new_tailRing, p_shallow_copy_delete);
+  if (strat->P.t_p != NULL || 
+      (strat->P.p != NULL && pNext(strat->P.p) != strat->tail))
+    strat->P.ShallowCopyDelete(new_tailRing, p_shallow_copy_delete);
   
   omMergeStickyBinIntoBin(strat->tailBin, strat->tailRing->PolyBin);
   if (strat->tailRing != currRing)

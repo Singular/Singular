@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys0.cc,v 1.16 2000-10-23 12:02:18 obachman Exp $ */
+/* $Id: polys0.cc,v 1.17 2000-10-26 16:31:38 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to convert polynomials to strings
@@ -79,7 +79,7 @@ static void writemon(poly p, int ko, ring r)
   }
 }
 
-char* pString0(poly p, ring lmRing, ring tailRing)
+char* p_String0(poly p, ring lmRing, ring tailRing)
 {
   if (p == NULL)
   {
@@ -123,26 +123,26 @@ char* pString0(poly p, ring lmRing, ring tailRing)
   return StringAppendS("]");
 }
 
-char* pString(poly p, ring lmRing, ring tailRing)
+char* p_String(poly p, ring lmRing, ring tailRing)
 {
   StringSetS("");
-  return pString0(p, lmRing, tailRing);
+  return p_String0(p, lmRing, tailRing);
 }
 
 /*2
 * writes a polynomial p to stdout
 */
-void pWrite0(poly p, ring lmRing, ring tailRing)
+void p_Write0(poly p, ring lmRing, ring tailRing)
 {
-  PrintS(pString(p, lmRing, tailRing));
+  PrintS(p_String(p, lmRing, tailRing));
 }
 
 /*2
 * writes a polynomial p to stdout followed by \n
 */
-void pWrite(poly p, ring lmRing, ring tailRing)
+void p_Write(poly p, ring lmRing, ring tailRing)
 {
-  pWrite0(p, lmRing, tailRing);
+  p_Write0(p, lmRing, tailRing);
   PrintLn();
 }
 
@@ -151,17 +151,17 @@ void pWrite(poly p, ring lmRing, ring tailRing)
 *print the first two monomials of the poly (wrp) or only the lead term (wrp0),
 *possibly followed by the string "+..."
 */
-void wrp0(poly p, ring ri)
+void p_wrp0(poly p, ring ri)
 {
   poly r;
 
   if (p==NULL) PrintS("NULL");
-  else if (pNext(p)==NULL) pWrite0(p, ri);
+  else if (pNext(p)==NULL) p_Write0(p, ri);
   else
   {
     r = pNext(p);
     pNext(p) = NULL;
-    pWrite0(p, ri);
+    p_Write0(p, ri);
     if (r!=NULL)
     {
       PrintS("+...");
@@ -169,17 +169,17 @@ void wrp0(poly p, ring ri)
     }
   }
 }
-void wrp(poly p, ring lmRing, ring tailRing)
+void p_wrp(poly p, ring lmRing, ring tailRing)
 {
   poly r;
 
   if (p==NULL) PrintS("NULL");
-  else if (pNext(p)==NULL) pWrite0(p, lmRing);
+  else if (pNext(p)==NULL) p_Write0(p, lmRing);
   else
   {
     r = pNext(pNext(p));
     pNext(pNext(p)) = NULL;
-    pWrite0(p, lmRing, tailRing);
+    p_Write0(p, lmRing, tailRing);
     if (r!=NULL)
     {
       PrintS("+...");

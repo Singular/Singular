@@ -6,7 +6,7 @@
  *  Purpose: implementation of debug related poly routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pDebug.cc,v 1.9 2000-10-23 16:32:25 obachman Exp $
+ *  Version: $Id: pDebug.cc,v 1.10 2000-10-26 16:31:36 obachman Exp $
  *******************************************************************/
 
 #ifndef PDEBUG_CC
@@ -43,7 +43,7 @@ BOOLEAN dPolyReportError(poly p, ring r, const char* fmt, ...)
     if (r == currRing)
     {
       fprintf(stderr, " occured for poly: ");
-      wrp(p, r);
+      p_wrp(p, r);
       omPrintAddrInfo(stderr, p, " ");
     }
     else
@@ -290,6 +290,7 @@ BOOLEAN _pp_Test(poly p, ring lmRing, ring tailRing, int level)
     BOOLEAN cmp = p_LmCmp(lm, tail, lmRing);
     if (cmp != 1)
       dPolyReportError(lm, lmRing, "wrong order: lm <= Lm(tail)");
+    p_LmFree(tail, tailRing);
     pNext(lm) = pnext;
     return (cmp == 1);
   }

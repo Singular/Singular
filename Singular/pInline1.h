@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.9 2000-10-26 06:39:29 obachman Exp $
+ *  Version: $Id: pInline1.h,v 1.10 2000-10-26 16:31:36 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H
@@ -425,7 +425,7 @@ PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a,
 }
 
 PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a, ring r_a,
-                                    poly b, unsigned long not_sev_b, ring r_b)
+                                      poly b, unsigned long not_sev_b, ring r_b)
 {
   p_LmCheckPolyRing1(a, r_a);
   p_LmCheckPolyRing1(b, r_b);

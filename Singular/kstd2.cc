@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.54 2000-10-26 06:39:27 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.55 2000-10-26 16:31:34 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -108,7 +108,7 @@ static int redHomog (LObject* h,kStrategy strat)
   if (TEST_OPT_DEBUG)
   {
     PrintS("red:");
-    wrp(h->GetLmTailRing(), h->tailRing);
+    h->wrp();
     PrintS(" ");
   }
 #endif
@@ -127,7 +127,7 @@ static int redHomog (LObject* h,kStrategy strat)
     if (TEST_OPT_DEBUG)
     {
       PrintS("\nto ");
-      wrp(h->GetLmTailRing(), strat->tailRing);
+      h->wrp();
       PrintLn();
     }
 #endif
@@ -167,9 +167,9 @@ static int redLazy (LObject* h,kStrategy strat)
     if (TEST_OPT_DEBUG)
     {
       PrintS("red:");
-      wrp(h->p);
+      h->wrp();
       PrintS(" with ");
-      wrp(strat->T[j].p);
+      strat->T[j].wrp();
     }
 #endif
 
@@ -179,7 +179,7 @@ static int redLazy (LObject* h,kStrategy strat)
     if (TEST_OPT_DEBUG)
     {
       PrintS("\nto ");
-      wrp(h->p);
+      h->wrp();
       PrintLn();
     }
 #endif
@@ -313,9 +313,9 @@ static int redHoney (LObject* h, kStrategy strat)
     if (TEST_OPT_DEBUG)
     {
       PrintS("red:");
-      wrp(h->p);
+      h->wrp();
       PrintS(" with ");
-      wrp(pi);
+      strat->T[ii].wrp();
     }
 #endif
     if (strat->fromT)
@@ -330,7 +330,7 @@ static int redHoney (LObject* h, kStrategy strat)
     if (TEST_OPT_DEBUG)
     {
       PrintS("\nto ");
-      wrp(h->p);
+      h->wrp();
       PrintLn();
     }
 #endif
@@ -609,6 +609,7 @@ void initBba(ideal F,kStrategy strat)
 
 ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 {
+  om_Opts.MinTrack = 5;
   int   srmax,lrmax, red_result;
   int   olddeg,reduc;
   int hilbeledeg=1,hilbcount=0,minimcnt=0;
@@ -660,8 +661,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     if (pNext(strat->P.p) == strat->tail)
     {
       poly m1 = NULL, m2 = NULL;
-      /* deletes the short spoly and computes */
-      pLmFree(strat->P.p);
       /* check that spoly creation is ok */
       if (strat->tailRing != currRing && 
           !kCheckSpolyCreation(strat, m1, m2))
@@ -674,6 +673,9 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
                              rModifyRing(currRing, strat->homog, ! strat->ak,
                                          strat->tailRing->bitmask << 1));
       }
+      /* deletes the short spoly and computes */
+      pLmFree(strat->P.p);
+      strat->P.p=NULL;
       /* create the real one */
       ksCreateSpoly(&(strat->P), strat->kNoether, strat->use_buckets, 
                     strat->tailRing, m1, m2);
@@ -700,17 +702,17 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         int pos=posInS(strat->S,strat->sl,strat->P.p);
         if (TEST_OPT_INTSTRATEGY)
         {
-          pCleardenom(strat->P.p);
+          strat->P.pCleardenom();
           if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
           {
             strat->P.p = redtailBba(strat->P.p,pos-1,strat);
             if (strat->redTailChange)  strat->P.pLength = 0;
-            pCleardenom(strat->P.p);
+            strat->P.pCleardenom();
           }
         }
         else
         {
-          pNorm(strat->P.p);
+          strat->P.pNorm();
           if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
           {
             strat->P.p = redtailBba(strat->P.p,pos-1,strat);
@@ -718,7 +720,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           }
         }
 #ifdef KDEBUG
-        if (TEST_OPT_DEBUG){PrintS("new s:");wrp(strat->P.p);PrintLn();}
+        if (TEST_OPT_DEBUG){PrintS("new s:");strat->P.wrp();PrintLn();}
 #endif
         if ((strat->P.p1==NULL) && (strat->minim>0))
         {
@@ -747,7 +749,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       if (strat->sl>srmax) srmax = strat->sl;
     }
 #ifdef KDEBUG
-    strat->P.lcm=NULL;
+    memset(&(strat->P), 0, sizeof(strat->P));
 #endif
     kTest_TS(strat);
   }

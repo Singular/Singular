@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.9 2000-10-26 06:39:26 obachman Exp $
+ *  Version: $Id: kInline.cc,v 1.10 2000-10-26 16:31:34 obachman Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -271,8 +271,29 @@ sTObject::ShallowCopyDelete(ring new_tailRing, omBin new_tailBin,
 KINLINE int sTObject::pFDeg()
 {
   if (p != NULL) return ::pFDeg(p, currRing);
-  return ::pFDeg(t_p, tailRing);
+  return tailRing->pFDeg(t_p, tailRing);
 }
+
+extern void pCleardenom(poly p);
+extern void pNorm(poly p);
+// manipulations
+KINLINE void  sTObject::pCleardenom()
+{
+  assume(p != NULL);
+  ::pCleardenom(p);
+  if (t_p != NULL)
+    pSetCoeff0(t_p, pGetCoeff(p));
+}
+
+KINLINE void  sTObject::pNorm()
+{
+  assume(p != NULL);
+  ::pNorm(p);
+  if (t_p != NULL)
+    pSetCoeff0(t_p, pGetCoeff(p));
+}
+  
+
     
 /***************************************************************
  *

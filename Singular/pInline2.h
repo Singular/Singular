@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.12 2000-10-26 06:39:29 obachman Exp $
+ *  Version: $Id: pInline2.h,v 1.13 2000-10-26 16:31:36 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -511,7 +511,31 @@ PINLINE2 poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, const ring r)
   return res;
 }
 
-
+/***************************************************************
+ *
+ * I/O
+ *
+ ***************************************************************/
+PINLINE2 char*     p_String(poly p, ring p_ring)
+{
+  return p_String(p, p_ring, p_ring);
+}
+PINLINE2 char*     p_String0(poly p, ring p_ring)
+{
+  return p_String0(p, p_ring, p_ring);
+}
+PINLINE2 void      p_Write(poly p, ring p_ring)
+{
+  return p_Write(p, p_ring, p_ring);
+}
+PINLINE2 void      p_Write0(poly p, ring p_ring)
+{
+  return p_Write0(p, p_ring, p_ring);
+}
+PINLINE2 void      p_wrp(poly p, ring p_ring)
+{
+  return p_wrp(p, p_ring, p_ring);
+}
 #endif // !defined(NO_PINLINE2) || defined(POLYS_IMPL_CC)
 #endif // PINLINE2_H
 

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.37 2000-10-26 06:39:29 obachman Exp $ */
+/* $Id: kutil.h,v 1.38 2000-10-26 16:31:36 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -64,17 +64,28 @@ public:
 
   // Iterations
   KINLINE void LmDeleteAndIter();
-  
+
+  // deg stuff
   KINLINE int pFDeg();
 
   // arithmetic
   KINLINE void Mult_nn(number n);
   KINLINE void ShallowCopyDelete(ring new_tailRing, omBin new_tailBin,
                                  pShallowCopyDeleteProc p_shallow_copy_delete);
+
+  // manipulations
+  KINLINE void pNorm();
+  KINLINE void pCleardenom();
+  
+#ifdef KDEBUG
+  void wrp();
+#endif
+  
 };
 
 class sLObject : public sTObject
 {
+
 public:
   poly  p1,p2; /*- the pair p comes from -*/
   
@@ -213,7 +224,12 @@ void entersets (LObject h);
 void pairs ();
 void message (int i,int* reduc,int* olddeg,kStrategy strat);
 void messageStat (int srmax,int lrmax,int hilbcount,kStrategy strat);
+#ifdef KDEBUG
 void messageSets (kStrategy strat);
+#else
+#define messageSets(s)  ((void) 0)
+#endif
+
 void initEcartNormal (LObject* h);
 void initEcartBBA (LObject* h);
 void initS (ideal F, ideal Q,kStrategy strat);

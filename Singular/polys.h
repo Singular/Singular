@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.42 2000-10-23 12:02:18 obachman Exp $ */
+/* $Id: polys.h,v 1.43 2000-10-26 16:31:38 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing
@@ -299,12 +299,12 @@ int pMaxCompProc(poly p);
 BOOLEAN   pOneComp(poly p);
 #define   pSetCompP(a,i)    p_SetCompP(a, i, currRing)
 
-
-char*     pString(poly p, ring lmRing = currRing, ring tailRing = currRing);
-char*     pString0(poly p, ring lmRing = currRing, ring tailRing = currRing);
-void      pWrite(poly p, ring lmRing = currRing, ring tailRing = currRing);
-void      pWrite0(poly p, ring lmRing = currRing, ring tailRing = currRing);
-void      wrp(poly p, ring lmRing = currRing, ring tailRing = currRing);
+// let's inline those, so that we can call them from the debugger
+inline char*   pString(poly p)    {return p_String(p, currRing, currRing);}
+inline char*   pString0(poly p)   {return p_String0(p, currRing, currRing);}
+inline void    pWrite(poly p)     {return p_Write(p, currRing, currRing);}
+inline void    pWrite0(poly p)    {return p_Write0(p, currRing, currRing);}
+inline void    wrp(poly p)        {return p_wrp(p, currRing, currRing);}
 
 void      pEnlargeSet(polyset *p, int length, int increment);
 poly      pISet(int i);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.133 2000-10-26 13:34:56 Singular Exp $ */
+/* $Id: ring.cc,v 1.134 2000-10-26 16:31:38 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2370,7 +2370,6 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
 {
   assume (r != NULL );
   assume (exp_limit > 1);
-
   BOOLEAN need_other_ring;
   int bits;
 
@@ -2538,6 +2537,7 @@ static void rHighSet(ring r, int o_r)
     case ringorder_Dp:
     case ringorder_wp:
     case ringorder_Wp:
+    case ringorder_rp:
     case ringorder_a:
       if (r->OrdSgn==-1) r->MixedOrder=TRUE;
       break;
@@ -2585,7 +2585,7 @@ static void rSetDegStuff(ring r)
   r->pLDeg = (r->OrdSgn == 1 ? r->pLDeg = pLDegb : pLDeg0);
 
   /*======== ordering type is (_,c) =========================*/
-  if ((order[0]==ringorder_unspec)
+  if ((order[0]==ringorder_unspec) || (order[1] == 0)
       ||(
     ((order[1]==ringorder_c)||(order[1]==ringorder_C)
      ||(order[1]==ringorder_S)
