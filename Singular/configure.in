@@ -96,7 +96,8 @@ AC_AIX
 if test "${GXX}" = yes && test "${ac_cxx_set}" = no; then
   CXX=gcc
 temp_cflags=${CXXFLAGS}
-
+AC_LANG_SAVE
+AC_LANG_CPLUSPLUS
 # check whether gcc accepts --no-rtti
 AC_MSG_CHECKING(whether gcc accepts --no-rtti)
 CXXFLAGS="${CXXFLAGS} --no-rtti"
@@ -123,6 +124,7 @@ else
 CXX="${CXX} --no-exceptions"
 fi
 
+AC_LANG_RESTORE
 CXXFLAGS=$temp_flags
 
 fi
@@ -288,8 +290,6 @@ dnl AC_CHECK_LIB(socket, listen)
 dnl AC_CHECK_LIB(nsl, gethostbyname)
 dnl AC_CHECK_LIB(ucb, index)
 dnl MP_LIBS=${LIBS}
-dnl LIBS=
-
 # check for dl lib
 case "$ac_cv_singuname" in
 	HPUX*)
