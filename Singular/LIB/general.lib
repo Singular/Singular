@@ -1,7 +1,7 @@
 //GMG, last modified 18.6.99
 //anne, added deleteSublist and watchdog 12.12.2000
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: general.lib,v 1.32 2000-12-29 02:19:24 greuel Exp $";
+version="$Id: general.lib,v 1.33 2000-12-30 03:00:57 greuel Exp $";
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type
@@ -659,44 +659,55 @@ RETURN:   The product of all entries of id [with index given by v] of type
 NOTE:     If id is not a list, id is treated as a list of polys resp. integers.
           A module m is identified with the corresponding matrix M (columns
           of M generate m).
+@*        If v is outside the range of id, we have the empty product and the
+          result will be 1 (of type int).
 EXAMPLE:  example product; shows an example
 "
-{
+{  
+//-------------------- initialization and special feature ---------------------
    int n,j,tt;
-   string ty;
+   string ty;		                              //will become type of id
    list l;
+
+// We wish to allow something like product(x(1..10)) if x(1),...,x(10) are
+// variables. x(1..10) is a list of polys and enters the procedure with 
+// id=x(1) and # a list with 9 polys, #[1]= x(2),...,#[9]= x(10). Hence, in
+// this case # is never empty. If an additional intvec v is given,
+// it is added to #, so we have to separate it first and make
+// the rest a list which has to be multiplied.
+
    int s = size(#);
    if( s!=0 )
-   {  if ( typeof(#[s])=="intvec" )
-      {  intvec v = #[s];
-         tt=1; s=s-1;
+   {  if ( typeof(#[s])=="intvec" or typeof(#[s])=="int")   
+      {  
+         intvec v = #[s];
+         tt=1; 
+         s=s-1;
          if ( s>0 ) { # = #[1..s]; }
       }
    }
    if ( s>0 )
    {
-     l = list(id)+#;
-     kill id;
-     list id = l;
-     ty = "list";
+      l = list(id)+#;
+      kill id;
+      list id = l;                                    //case: id = list
+      ty = "list";
+      n = size(id);
    }
    else
-   { ty = typeof(id);
+   { 
+      ty = typeof(id);
+      if( ty == "list" ) 
+      { n = size(id); }
    }
-   if( ty=="list" )
-   { n = size(id);
-     def f(1) = id[1];
-     for( j=2; j<=n; j=j+1 ) { def f(j)=f(j-1)*id[j]; }
-     return(f(n));
-   }
+//------------------------------ reduce to 3 cases ---------------------------
    if( ty=="poly" or ty=="ideal" or ty=="vector"
        or ty=="module" or ty=="matrix" )
    {
       ideal i = ideal(matrix(id));
       kill id;
-      ideal id = i;
-      if( tt!=0 ) { id = id[v]; }
-      n = ncols(id); poly f(1)=id[1];
+      ideal id = i;                                   //case: id = ideal
+      n = ncols(id);
    }
    if( ty=="int" or ty=="intvec" or ty=="intmat" )
    {
@@ -704,10 +715,32 @@ EXAMPLE:  example product; shows an example
       else { intmat S = intmat(id); }
       intvec i = S[1..nrows(S),1..ncols(S)];
       kill id;
-      intvec id = i;
-      if( tt!=0 ) { id = id[v]; }
-      n = size(id); int f(1)=id[1];
+      intvec id = i;                                  //case: id = intvec
+      n = size(id); 
    }
+//--------------- consider intvec v and empty product  -----------------------
+   if( tt!=0 ) 
+   {
+      for (j=1; j<=size(v); j++)
+      {
+         if ( v[j] <= 0 or v[j] > n )                 //v outside range of id
+         { 
+            return(1);                                //empty product is 1
+         }                               
+      }
+      id = id[v];                                     //consider part of id
+   }                                                  //corresponding to v
+//--------------------- special case: one factor is zero  ---------------------
+   if ( typeof(id) == "ideal")
+   {
+      if( size(id) < ncols(id) )
+      {
+          poly f; return(f);
+      }
+   }
+//-------------------------- finally, multiply objects  -----------------------
+   n = size(id); 
+   def f(1) = id[1];
    for( j=2; j<=n; j=j+1 ) { def f(j)=f(j-1)*id[j]; }
    return(f(n));
 }
@@ -946,47 +979,53 @@ proc sum (id, list #)
 ASSUME:   list members can be added.
 RETURN:   The sum of all entries of id [with index given by v] of type 
           depending on the entries of id.
-NOTE:      If id is not a list, id is treated as a list of polys resp. integers.
+NOTE:     If id is not a list, id is treated as a list of polys resp. integers.
           A module m is identified with the corresponding matrix M (columns
           of M generate m).
+@*        If v is outside the range of id, we have the empty sum and the
+          result will be 0 (of type int).
 EXAMPLE:  example sum; shows an example
 "
 {
+//-------------------- initialization and special feature ---------------------
    int n,j,tt;
-   string ty;
+   string ty;                                  // will become type of id
    list l;
+
+// We wish to allow something like sum(x(1..10)) if x(1),...,x(10) are
+// variables. x(1..10) is a list of polys and enters the procedure with 
+// id=x(1) and # a list with 9 polys, #[1]= x(2),...,#[9]= x(10). Hence, in
+// this case # is never empty. If an additional intvec v is given,
+// it is added to #, so we have to separate it first and make
+// the rest a list which has to be added.
+
    int s = size(#);
    if( s!=0 )
-   {  if ( typeof(#[s])=="intvec" )
+   {  if ( typeof(#[s])=="intvec" or typeof(#[s])=="int")
       {  intvec v = #[s];
-         tt=1; s=s-1;
+         tt=1; 
+         s=s-1;
          if ( s>0 ) { # = #[1..s]; }
       }
    }
    if ( s>0 )
    {
-     l = list(id)+#;
-     kill id;
-     list id = l;
-     ty = "list";
+      l = list(id)+#;
+      kill id;
+      list id = l;                                    //case: id = list
+      ty = "list";
    }
    else
-   { ty = typeof(id);
+   { 
+      ty = typeof(id);
    }
-   if( ty=="list" )
-   { n = size(id);
-     def f(1) = id[1];
-     for( j=2; j<=n; j=j+1 ) { def f(j)=f(j-1)+id[j]; }
-     return(f(n));
-   }
+//------------------------------ reduce to 3 cases ---------------------------
    if( ty=="poly" or ty=="ideal" or ty=="vector"
        or ty=="module" or ty=="matrix" )
-   {
+   {                                                 //case: id = ideal
       ideal i = ideal(matrix(id));
       kill id;
-      ideal id = i;
-      if( tt!=0 ) { id = id[v]; }
-      n = ncols(id); poly f(1)=id[1];
+      ideal id = simplify(i,2);                      //delete 0 entries
    }
    if( ty=="int" or ty=="intvec" or ty=="intmat" )
    {
@@ -994,10 +1033,24 @@ EXAMPLE:  example sum; shows an example
       else { intmat S = intmat(id); }
       intvec i = S[1..nrows(S),1..ncols(S)];
       kill id;
-      intvec id = i;
-      if( tt!=0 ) { id = id[v]; }
-      n = size(id); int f(1)=id[1];
+      intvec id = i;                                 //case: id = intvec
    }
+//------------------- consider intvec v and empty sum  -----------------------
+   if( tt!=0 ) 
+   {
+      for (j=1; j<=size(v); j++)
+      {
+         if ( v[j] <= 0 or v[j] > size(id) )         //v outside range of id
+         { 
+            return(0);                               //empty sum is 0
+         }                               
+      }
+      id = id[v];                                    //consider part of id
+   }                                                 //corresponding to v
+
+//-------------------------- finally, add objects  ---------------------------
+   n = size(id); 
+   def f(1) = id[1];
    for( j=2; j<=n; j=j+1 ) { def f(j)=f(j-1)+id[j]; }
    return(f(n));   int n,j,tt;
 }
