@@ -123,6 +123,7 @@ int omtTestErrors()
               spec.MaxSize = 0;
               spec.MinTrack = 3;
               spec.NotIsBin = 1;
+              spec.MinSize = 2;
               cell = omFindCell(spec);
               if (cell != NULL)
               {   
@@ -386,7 +387,15 @@ int omtTestErrors()
           break;
 #endif
           omStrDup(NULL);
+          break;
         }
+
+        case omError_StickyBin:
+        {
+          omMergeStickyBinIntoBin(NULL, NULL);
+          break;
+        }
+          
         default:
           printf("No Error test implemented\n");
     }

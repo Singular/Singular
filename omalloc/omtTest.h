@@ -8,8 +8,8 @@
 #define KEEP_LEVEL    20
 
 // #define MAX_CELLS  500000   
+// #define MAX_CELLS     100000
 #define MAX_CELLS     100000
-// #define MAX_CELLS     1000
 #define KEEP_ADDR     100
 #define END_CHECK_LEVEL 5
 
@@ -25,6 +25,7 @@ struct omMemCell_s
   void* addr;
   omBin bin;
   unsigned long spec;
+  omBin orig_bin;
 };
 
 typedef struct omMemCell_s omMemCell_t;
@@ -44,6 +45,8 @@ void TestFree(omMemCell cell);
 #define myfflush(what)            ((void) 0)
 #endif
 
+#define IS_STICKY_BIN(spec) (spec & 1)
+// #define IS_STICKY_BIN(spec) (0)
 #define GET_SIZE(spec)      (spec & ((1 << 14) -1))
 #define SET_SIZE(spec, size) spec = ((spec & ~((1 << 14) -1)) | (size))
 #define IS_ALIGNED(spec)    (spec & (1 << 15))
@@ -109,6 +112,7 @@ void omtTestFreeKeep(omMemCell cell);
 
 void InitCellAddrContent(omMemCell cell);
 int omtTestErrors();
+omBin omtGetStickyBin(omBin bin);
 
 #if CHECK_LEVEL > 0
 void omtTestDebug(omMemCell cell);

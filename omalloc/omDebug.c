@@ -3,9 +3,10 @@
  *  Purpose: implementation of main omTest functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 7/00
- *  Version: $Id: omDebug.c,v 1.11 2000-09-25 12:27:42 obachman Exp $
+ *  Version: $Id: omDebug.c,v 1.12 2000-10-04 13:12:29 obachman Exp $
  *******************************************************************/
 #include <limits.h>
+#include <string.h>
 #include "omConfig.h"
 #include "omAlloc.h"
 #include "omDebug.h"
@@ -267,7 +268,7 @@ char* _omDebugStrDup(const char* addr, OM_TFL_DECL)
   ret[i] = '\0';
 
 #ifdef OM_INTERNAL_DEBUG
-  (void) _omCheckAddr(ret, i+1,OM_FUSED|OM_FSIZE,om_Opts.MinCheck, omError_InternalBug, OM_FLR);
+  (void) _omCheckAddr(ret, (void*)i+1,OM_FUSED|OM_FSIZE,om_Opts.MinCheck, omError_InternalBug, OM_FLR);
 #endif
   return ret;
 }
@@ -452,7 +453,7 @@ static omBin omGetOrigSpecBinOfAddr(void* addr)
 #endif
     {
       omBin bin = omGetTopBinOfAddr(addr);
-      if (!omIsStaticNormalBin(bin)) return bin;
+      if (omIsSpecBin(bin)) return bin;
     }
   }
   return NULL;
@@ -535,36 +536,106 @@ static void __omDebugFree(void* addr, void* size_bin, omTrackFlags_t flags, OM_F
   if (bin != NULL) omUnGetSpecBin(&bin);
 }
 
+void omFreeKeptAddrFromBin(omBin bin)
+{
+  void* addr = om_KeptAddr;
+  void* prev_addr = NULL;
+  void* next_addr;
+  omTrackFlags_t flags;
+  
+  while (addr != NULL)
+  {
+    next_addr = *((void**) addr);
+    if (omIsBinPageAddr(addr) && omGetTopBinOfAddr(addr) == bin)
+    {
+      if (prev_addr != NULL)
+        *((void**) prev_addr) = next_addr;
+      else
+        om_KeptAddr =  next_addr;
+      if (addr == om_LastKeptAddr)
+        om_LastKeptAddr = prev_addr;
+      om_NumberOfKeptAddrs--;
+#ifdef OM_HAVE_TRACK
+      if (omIsTrackAddr(addr)) 
+      {
+        omMarkAsFreeTrackAddr(addr, 0, &flags, OM_FLR);
+        omFreeTrackAddr(addr);
+      }
+    else
+#endif    
+      __omFree(addr);
+      addr = next_addr;
+    }
+    else
+    {
+      prev_addr = addr;
+      addr = next_addr;
+    }
+  }
+  
+  addr = om_AlwaysKeptAddrs;
+  prev_addr = NULL;
+  while (addr != NULL)
+  {
+    next_addr = *((void**) addr);
+    if (omIsBinPageAddr(addr) && omGetTopBinOfAddr(addr) == bin)
+    { 
+      if (prev_addr != NULL)
+        *((void**) prev_addr) = next_addr;
+      else
+        om_AlwaysKeptAddrs = next_addr;
+#ifdef OM_HAVE_TRACK
+      if (omIsTrackAddr(addr)) 
+      {
+        omMarkAsFreeTrackAddr(addr, 0, &flags, OM_FLR);
+        omFreeTrackAddr(addr);
+      }
+    else
+#endif    
+      __omFree(addr);
+      addr = next_addr;
+    }
+    else
+    {
+      prev_addr = addr;
+      addr = next_addr;
+    }
+  }
+}
+  
 void omFreeKeptAddr()
 {
   void* next;
   omBin bin;
   omTrackFlags_t flags;
+  void* addr = om_KeptAddr;
 
   if (om_LastKeptAddr != NULL)
     *((void**) om_LastKeptAddr) = om_AlwaysKeptAddrs;
   
-  while (om_KeptAddr != NULL)
-  {
-    next = *((void**)om_KeptAddr);
-    bin = omGetOrigSpecBinOfAddr(om_KeptAddr);
-
-#ifdef OM_HAVE_TRACK
-    if (omIsTrackAddr(om_KeptAddr)) 
-    {
-      omMarkAsFreeTrackAddr(om_KeptAddr, 0, &flags, OM_FLR);
-      omFreeTrackAddr(om_KeptAddr);
-    }
-    else
-#endif    
-      __omFree(om_KeptAddr);
-
-    if (bin != NULL) omUnGetSpecBin(&bin);
-    om_KeptAddr = next;
-  }
   om_NumberOfKeptAddrs = 0;
   om_LastKeptAddr = NULL;
   om_AlwaysKeptAddrs = NULL;
+  om_KeptAddr = NULL;
+  
+  while (addr != NULL)
+  {
+    next = *((void**)addr);
+    bin = omGetOrigSpecBinOfAddr(addr);
+
+#ifdef OM_HAVE_TRACK
+    if (omIsTrackAddr(addr)) 
+    {
+      omMarkAsFreeTrackAddr(addr, 0, &flags, OM_FLR);
+      omFreeTrackAddr(addr);
+    }
+    else
+#endif    
+      __omFree(addr);
+
+    addr = next;
+    if (bin != NULL) omUnGetSpecBin(&bin);
+  }
 }
 
 #endif /* ! OM_NDEBUG */

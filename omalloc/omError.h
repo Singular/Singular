@@ -3,7 +3,7 @@
  *  Purpose: Error handling of omalloc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omError.h,v 1.6 2000-09-18 09:12:15 obachman Exp $
+ *  Version: $Id: omError.h,v 1.7 2000-10-04 13:12:30 obachman Exp $
  *******************************************************************/
 #ifndef OM_ERROR_H
 #define OM_ERROR_H
@@ -39,6 +39,7 @@ enum omError_e
   omError_BackPattern,
   omError_FrontPattern,
   omError_NotString,
+  omError_StickyBin,
   omError_MaxError
 };
 typedef enum omError_e omError_t;

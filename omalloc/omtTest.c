@@ -273,6 +273,49 @@ void TestFree(omMemCell cell)
   }
 }
 
+omBin omtGetStickyBin(omBin bin)
+{
+  omBin sticky_bin = omFindInGList(om_StickyBins, next, max_blocks, bin->max_blocks);
+  if (sticky_bin == NULL)
+    sticky_bin = omGetStickyBinOfBin(bin);
+  return sticky_bin;
+}
+
+void omtMergeStickyBins(omMemCell cell, int n)
+{
+  int i;
+  omBin bin;
+  
+  for (i=0; i<n; i++)
+  {
+    if (cell[i].orig_bin != NULL)
+    {
+      if (omIsOnGList(om_StickyBins, next, cell[i].bin))
+        omMergeStickyBinIntoBin(cell[i].bin, cell[i].orig_bin);
+
+      cell[i].bin = cell[i].orig_bin;
+      cell[i].orig_bin = NULL;
+    }
+  }
+  
+  bin = om_StickyBins;
+  while (bin != NULL)
+  {
+    if (bin->current_page == om_ZeroPage)
+    {
+      omBin next_bin = bin->next;
+      om_StickyBins = omRemoveFromGList(om_StickyBins, next, bin);
+      __omFreeBinAddr(bin);
+      bin = next_bin;
+    }
+    else
+    {
+      bin = bin->next;
+    }
+  }
+}
+
+  
 void my_exit()
 {
   printf("\nomtTest Summary: ");
@@ -350,12 +393,14 @@ int main(int argc, char* argv[])
         }
       }
 #endif
+      omtMergeStickyBins(cells, n_cells);
       while (i< n_cells)
       {
         TestFree(&cells[i]);
         i++;
       }
       omFreeKeptAddr();
+      omtMergeStickyBins(cells, -1);
       omPrintStats(stdout);
       omPrintInfo(stdout);
       if (om_Info.CurrentRegionsAlloc > 0) 

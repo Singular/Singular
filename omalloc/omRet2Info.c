@@ -3,7 +3,7 @@
  *  Purpose: translation of return addr to RetInfo
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omRet2Info.c,v 1.7 2000-09-18 09:12:16 obachman Exp $
+ *  Version: $Id: omRet2Info.c,v 1.8 2000-10-04 13:12:31 obachman Exp $
  *******************************************************************/
 #include <stdio.h>
 #include <strings.h>
@@ -243,7 +243,7 @@ int _omPrintBackTrace(void** bt, int max, FILE* fd , OM_FLR_DECL)
     fprintf(fd, " %s:%d", f, l);
 #endif
 #ifdef OM_TRACK_RETURN
-    fprintf(fd," ra=%p");
+    fprintf(fd," ra=%p", r);
 #endif
 
 #ifndef OM_INTERNAL_DEBUG

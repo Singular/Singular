@@ -3,7 +3,7 @@
  *  Purpose: implementation of Error handling routines 
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omError.c,v 1.6 2000-09-25 12:27:43 obachman Exp $
+ *  Version: $Id: omError.c,v 1.7 2000-10-04 13:12:30 obachman Exp $
  *******************************************************************/
 
 #include <stdarg.h>
@@ -45,6 +45,7 @@ static struct omErrorString_s om_ErrorStrings[] =
   {omError_BackPattern,                 "omError_BackPattern",                 "written after end of addr"},
   {omError_FreePattern,                 "omError_FreePattern",                 "written into freed memory"},
   {omError_NotString,                   "omError_NotString",                   "string not null terminated"},
+  {omError_StickyBin,                   "omError_StickyBin",                   "wrong handling of sticky bins"},
   
   {omError_MaxError, NULL} /* this needs to be the last entry */
 };

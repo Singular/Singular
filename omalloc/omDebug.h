@@ -3,7 +3,7 @@
  *  Purpose: declaration of common Debug/Check/Track stuff
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 7/00
- *  Version: $Id: omDebug.h,v 1.10 2000-09-18 09:12:14 obachman Exp $
+ *  Version: $Id: omDebug.h,v 1.11 2000-10-04 13:12:29 obachman Exp $
  *******************************************************************/
 #ifndef OM_DEBUG_H
 #define OM_DEBUG_H
@@ -92,14 +92,13 @@ void* omGetCustomOfTrackAddr(void* addr);
 #endif
 
 #ifndef OM_NDEBUG
-
-
 void* om_KeptAddr;
 void* om_LastKeptAddr;
 unsigned long om_MaxAddr;
 unsigned long om_MinAddr;
 void* om_AlwaysKeptAddrs;
 
+void omFreeKeptAddrFromBin(omBin bin);
 /***********************************************************************
  *
  * omDebugCheck.c
@@ -116,7 +115,6 @@ omError_t omReportAddrError(omError_t error, omError_t report, void* addr, void*
                             OM_FLR_DECL, const char* fmt, ...);
 omError_t omDoCheckBin(omBin bin, int normal_bin, char level, 
                        omError_t report, OM_FLR_DECL);
-int omIsKnownTopBin(omBin bin, int normal_bin);
 void omIterateTroughAddrs(int normal, int track, void (*CallBackUsed)(void*), void (*CallBackFree)(void*));
 void omIterateTroughBinAddrs(omBin bin, void (*CallBackUsed)(void*), void (*CallBackFree)(void*));
 omError_t omDoCheckAddr(void* addr, void* bin_size, omTrackFlags_t flags, char level, 
@@ -190,7 +188,10 @@ do                                                                            \
 #define omAddrCheckReturnCorrupted(cond) \
   omAddrCheckReturnError(cond, omError_MemoryCorrupted)
 
+#else
+#define omFreeKeptAddrFromBin(bin) ((void)0)
 #endif /* ! OM_NDEBUG */
 /*ENDPRIVATE*/
+
 
 #endif /* OM_DEBUG_H */

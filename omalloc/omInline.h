@@ -4,7 +4,7 @@
  *           be inlined
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omInline.h,v 1.4 2000-08-16 16:08:33 obachman Exp $
+ *  Version: $Id: omInline.h,v 1.5 2000-10-04 13:12:31 obachman Exp $
  *******************************************************************/
 #if defined(OM_INLINE) || defined(OM_ALLOC_C)
 
@@ -15,10 +15,13 @@ OM_INLINE_IMPL omBin omGetBinOfPage(omBinPage page)
 {
   unsigned long sticky = omGetStickyOfPage(page);
   omBin bin = omGetTopBinOfPage(page);
-  
-  while (bin->sticky != sticky && bin->next != NULL) 
+
+  if (! omIsStickyBin(bin))
   {
-    bin = bin->next;
+    while (bin->sticky != sticky && bin->next != NULL) 
+    {
+      bin = bin->next;
+    }
   }
   return bin;
 }

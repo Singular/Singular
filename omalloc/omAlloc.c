@@ -3,7 +3,7 @@
  *  Purpose: implementation of main omalloc functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omAlloc.c,v 1.8 2000-08-14 12:26:38 obachman Exp $
+ *  Version: $Id: omAlloc.c,v 1.9 2000-10-04 13:12:28 obachman Exp $
  *******************************************************************/
 #ifndef OM_ALLOC_C
 #define OM_ALLOC_C
@@ -133,7 +133,7 @@ void* omAllocBinFromFullPage(omBin bin)
 #endif
   }
 
-  if (bin->current_page->next != NULL)
+  if (!bin->sticky && bin->current_page->next != NULL)
   {
     omAssume(bin->current_page->next->current != NULL);
     newpage = bin->current_page->next;
@@ -144,8 +144,8 @@ void* omAllocBinFromFullPage(omBin bin)
     newpage = omAllocNewBinPage(bin);
     omInsertBinPage(bin->current_page, newpage, bin);
   }
+    
   bin->current_page = newpage;
-  
   omAssume(newpage != NULL && newpage != om_ZeroPage && 
            newpage->current != NULL);
   __omTypeAllocFromNonEmptyPage(void*, addr, newpage);
@@ -206,9 +206,9 @@ void  omFreeToPageFault(omBinPage page, void* addr)
     bin->current_page = page;
 #else
 #  if defined(PAGE_AFTER_CURRENT)
-    omInsertBinPage(bin->current_page, page, bin);
+      omInsertBinPage(bin->current_page, page, bin);
 #  else
-    omInsertBinPage(bin->last_page, page, bin);
+      omInsertBinPage(bin->last_page, page, bin);
 #  endif
 #endif
   }

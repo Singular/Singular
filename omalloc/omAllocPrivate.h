@@ -4,7 +4,7 @@
  *           routines for omalloc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omAllocPrivate.h,v 1.4 2000-08-18 09:05:51 obachman Exp $
+ *  Version: $Id: omAllocPrivate.h,v 1.5 2000-10-04 13:12:28 obachman Exp $
  *******************************************************************/
 #ifndef OM_ALLOC_PRIVATE_H
 #define OM_ALLOC_PRIVATE_H
@@ -52,7 +52,8 @@ struct omSpecBin_s
   long             ref;        /* ref count */
 };
 
-extern  omSpecBin om_SpecBin;
+extern  omSpecBin   om_SpecBin;
+extern  omBin       om_StickyBins;
 extern  omBinPage_t om_ZeroPage[];
 extern  omBin       om_Size2Bin[];
 
@@ -68,10 +69,11 @@ extern  omBin       om_Size2Bin[];
 #define omSetTopBinOfPage(page, bin) \
   (page)->bin_sticky= (void*)((unsigned long)bin + omGetStickyOfPage(page))
 #define omSetStickyOfPage(page, sticky) \
-  (page)->bin_sticky = (void*)((unsigned long)sticky + \
+  (page)->bin_sticky = (void*)(((unsigned long)sticky & (SIZEOF_VOIDP-1)) + \
                                 (unsigned long)omGetTopBinOfPage(page))
 #define omSetTopBinAndStickyOfPage(page, bin, sticky) \
-  (page)->bin_sticky= (void*)((unsigned long)sticky + (unsigned long)bin)
+  (page)->bin_sticky= (void*)(((unsigned long)sticky & (SIZEOF_VOIDP-1)) \
+                               + (unsigned long)bin)
 
 #define omGetTopBinOfAddr(addr) \
   omGetTopBinOfPage(((omBinPage) omGetPageOfAddr(addr)))

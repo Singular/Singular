@@ -3,7 +3,7 @@
  *  Purpose: implementation of omCheck functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDebugCheck.c,v 1.8 2000-09-25 12:27:42 obachman Exp $
+ *  Version: $Id: omDebugCheck.c,v 1.9 2000-10-04 13:12:30 obachman Exp $
  *******************************************************************/
 #include <limits.h>
 #include <stdarg.h>
@@ -60,6 +60,7 @@ omError_t _omCheckMemory(char check, omError_t report, OM_FLR_DECL)
 {
   int i = 0;
   omSpecBin s_bin;
+  omBin sticky;
   
   if (check <= 0) return omError_NoError;
   
@@ -78,6 +79,14 @@ omError_t _omCheckMemory(char check, omError_t report, OM_FLR_DECL)
     s_bin = s_bin->next;
   }
 
+  sticky = om_StickyBins;
+  omCheckReturn(omCheckGList(sticky, next, check, omError_MemoryCorrupted, OM_FLR_VAL));
+  while (sticky != NULL)
+  {
+    omCheckReturn(omDoCheckBin(sticky, 1, check, report, OM_FLR_VAL));
+    sticky = sticky->next;
+  }
+  
 #ifdef OM_HAVE_TRACK
   for (i=0; i<= OM_MAX_BIN_INDEX; i++)
   {
@@ -232,7 +241,7 @@ omError_t omDoCheckBinAddr(void* addr, void* bin_size, omTrackFlags_t flags, cha
   omAddrCheckReturnError((flags & OM_FBIN) &&  bin_size != NULL 
                          && ((omBin) bin_size) != omGetTopBinOfAddr(addr), omError_WrongBin);
 
-  if (flags & OM_FSIZE && (!(flags & OM_FSLOPPY)  || (size_t) bin_size > 0))
+  if ((flags & OM_FSIZE) && (!(flags & OM_FSLOPPY)  || (size_t) bin_size > 0))
   {
     size_t size = (size_t) bin_size;
     omAssume(!omIsBinAddrTrackAddr(addr));
@@ -248,7 +257,8 @@ omError_t omDoCheckBin(omBin bin, int normal_bin, char level,
   omBin top_bin = bin;
   
   omCheckReturnError(!omIsKnownTopBin(bin, normal_bin), omError_UnknownBin);
-  omCheckReturn(omCheckGList(bin->next, next, level, report, OM_FLR_VAL));
+  if (! omIsStickyBin(bin))
+    omCheckReturn(omCheckGList(bin->next, next, level, report, OM_FLR_VAL));
   
   do
   {
@@ -272,7 +282,8 @@ omError_t omDoCheckBin(omBin bin, int normal_bin, char level,
     }
     if (level <= 1) continue;
     
-    omCheckReturnCorrupted(omFindInGList(bin->next, next, sticky, bin->sticky));
+    if (! omIsStickyBin(bin))
+      omCheckReturnCorrupted(omFindInGList(bin->next, next, sticky, bin->sticky));
     omCheckReturn(omCheckGList(bin->last_page, prev, level-1, report, OM_FLR_VAL));
     page = omGListLast(bin->last_page, prev);
     omCheckReturn(omCheckGList(page, next, level-1, report, OM_FLR_VAL));
@@ -292,74 +303,36 @@ omError_t omDoCheckBin(omBin bin, int normal_bin, char level,
                              (page->next == NULL || page->next->prev != page));
       omCheckReturnCorrupted(page->prev != NULL && page->prev->next != page);
       
-      omCheckReturnCorrupted(omGetStickyOfPage(page) != bin->sticky);
+      omCheckReturnCorrupted(omGetStickyOfPage(page) != bin->sticky && bin->sticky < SIZEOF_VOIDP);
       omCheckReturnCorrupted(omGetBinOfPage(page) != bin);
       
-      if (! bin->sticky)
+      if (where == -1)
       {
-        if (where == -1)
+        /* we are at the left of current_page,
+           i.e., page is empty */
+        omCheckReturnCorrupted(omGetUsedBlocksOfPage(page) != 0 || page->current != NULL);
+      }
+      else
+      {
+        if (page == bin->current_page)
         {
-          /* we are at the left of current_page,
-             i.e., page is empty */
-          omCheckReturnCorrupted(omGetUsedBlocksOfPage(page) != 0 || page->current != NULL);
+          where = -1;
         }
         else
         {
-          if (page == bin->current_page)
-          {
-            where = -1;
-          }
-          else
-          {
-            /* we are at the right of current_page, 
-               i.e., page is neither full nor empty */
-            omCheckReturnCorrupted(page->current == NULL ||
-                                   omGetUsedBlocksOfPage(page) == bin->max_blocks - 1);
-          }
+          /* we are at the right of current_page, 
+             i.e., page is neither full nor empty */
+          omCheckReturnCorrupted(page->current == NULL ||
+                                 omGetUsedBlocksOfPage(page) == bin->max_blocks - 1);
         }
       }
       page = page->prev;
     }   /* while (page != NULL) */
-  } while ((bin = bin->next) != NULL);
+  } while (!omIsStickyBin(bin) && ((bin = bin->next) != NULL));
   
   return omError_NoError;
 }
   
-int omIsKnownTopBin(omBin bin, int normal_bin)
-{
-  omBin to_check;
-  omSpecBin s_bin;
-  int i;
-  
-  omAssume(normal_bin == 1 || normal_bin == 0);
-  
-#ifdef OM_HAVE_TRACK
-  if (! normal_bin) 
-  {
-    to_check = om_StaticTrackBin;
-    s_bin = om_SpecTrackBin;
-  }
-  else 
-#endif
-  {
-    omAssume(normal_bin);
-    to_check = om_StaticBin;
-    s_bin = om_SpecBin;
-  }
-
-  for (i=0; i<= OM_MAX_BIN_INDEX; i++)
-  {
-    if (bin == &(to_check[i])) 
-      return 1;
-  }
-  
-  while (s_bin != NULL)
-  {
-    if (bin == s_bin->bin) return 1;
-    s_bin = s_bin->next;
-  }
-  return 0;
-}
 
 static omError_t omDoCheckBinPage(omBinPage page, int normal_page, int level, 
                                   omError_t report, OM_FLR_DECL)
@@ -509,7 +482,10 @@ void omIterateTroughBinAddrs(omBin bin, void (*CallBackUsed)(void*), void (*Call
       } while (i < bin->max_blocks);
       page = page->prev;
     }
-    bin = bin->next;
+    if (omIsStickyBin(bin))
+      bin = NULL;
+    else 
+      bin = bin->next;
   } while (bin != NULL);
   
 }
@@ -518,6 +494,7 @@ void omIterateTroughAddrs(int normal, int track, void (*CallBackUsed)(void*), vo
 {
   int i;
   omSpecBin s_bin;
+  omBin sticky;
 
   if (normal)
   {
@@ -548,6 +525,12 @@ void omIterateTroughAddrs(int normal, int track, void (*CallBackUsed)(void*), vo
     }
   }
 #endif
+  sticky = om_StickyBins;
+  while (sticky != NULL)
+  {
+    omIterateTroughBinAddrs(sticky, CallBackUsed, CallBackFree);
+    sticky = sticky->next;
+  }
 }
 
 static FILE* om_print_used_addr_fd;

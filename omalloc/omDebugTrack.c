@@ -3,9 +3,10 @@
  *  Purpose: implementation of main omDebug functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDebugTrack.c,v 1.10 2000-09-20 11:52:31 obachman Exp $
+ *  Version: $Id: omDebugTrack.c,v 1.11 2000-10-04 13:12:30 obachman Exp $
  *******************************************************************/
 #include <limits.h>
+#include <string.h>
 #include "omConfig.h"
 #include "omDerivedConfig.h"
 
@@ -325,7 +326,14 @@ void* omAllocTrackAddr(void* bin_size,
       
     if (track > 2)
     {
-      d_addr->bin_size = (flags & OM_FBIN ? bin_size : (void*) o_size);
+      if (flags & OM_FBIN && ((omBin) bin_size)->sticky)
+      {
+        d_addr->bin_size = (void*)(((omBin) bin_size)->sizeW<<LOG_SIZEOF_LONG);
+        d_addr->flags &= ~OM_FBIN;
+        d_addr->flags |= OM_FSIZE;
+      }
+      else
+        d_addr->bin_size = (flags & OM_FBIN ? bin_size : (void*) o_size);
       omAssume(OM_ALIGN_SIZE((size_t)d_addr->bin_size) == (size_t) d_addr->bin_size);
 
       memset(omTrackAddr_2_FrontPattern(d_addr), OM_FRONT_PATTERN, omTrackAddr_2_SizeOfFrontPattern(d_addr));
@@ -493,16 +501,26 @@ static omError_t omDoCheckTrackAddr(omTrackAddr d_addr, void* addr, void* bin_si
     }
       
     omAddrCheckReturnError((flags & OM_FBINADDR) && !((d_addr->flags & OM_FBIN) || ((size_t) d_addr->bin_size <= OM_MAX_BLOCK_SIZE)), omError_NotBinAddr);
-      
-    omAddrCheckReturnError((flags & OM_FBIN) && ( !(d_addr->flags & OM_FBIN) || d_addr->bin_size != bin_size),omError_WrongBin);
-    if (flags & OM_FSIZE)
+     
+    if (flags & OM_FBIN)
     {
-      if (d_addr->flags & OM_FSIZE)
-        omAddrCheckReturnError((size_t) d_addr->bin_size != OM_ALIGN_SIZE((size_t) bin_size), omError_WrongSize);
+      if (d_addr->flags & OM_FBIN)
+        omAddrCheckReturnError(((omBin) d_addr->bin_size)->sizeW != ((omBin) bin_size)->sizeW, omError_WrongBin);
       else
-        omAddrCheckReturnError(omTrackAddr_2_OutSize(d_addr) < (size_t) bin_size, omError_WrongSize);
+        omAddrCheckReturnError((((omBin) bin_size)->sizeW << LOG_SIZEOF_LONG) != OM_ALIGN_SIZE((size_t) d_addr->bin_size), omError_WrongBin);
     }
-
+    else if (flags & OM_FSIZE)
+    {
+      if (d_addr->flags & OM_FBIN)
+      {
+        omAddrCheckReturnError((((omBin) d_addr->bin_size)->sizeW << LOG_SIZEOF_LONG) < ((size_t) bin_size), omError_WrongSize);
+      }
+      else
+      {
+        omAddrCheckReturnError((size_t) d_addr->bin_size < (size_t) bin_size, omError_WrongSize);
+      }
+    }
+  
     omAddrCheckReturnError(omCheckPattern(omTrackAddr_2_FrontPattern(d_addr), OM_FRONT_PATTERN,omTrackAddr_2_SizeOfFrontPattern(d_addr)),omError_FrontPattern);
     omAddrCheckReturnError(omCheckPattern(omTrackAddr_2_BackPattern(d_addr), OM_BACK_PATTERN,omTrackAddr_2_SizeOfBackPattern(d_addr)),omError_BackPattern);
     if (! (d_addr->flags & OM_FUSED))
@@ -627,8 +645,7 @@ omBin omGetOrigSpecBinOfTrackAddr(void* addr)
   if (d_addr->track > 2 && (d_addr->flags & OM_FBIN))
   {
     omBin bin = (omBin) d_addr->bin_size;
-    if (! omIsStaticNormalBin(bin)) 
-      return bin;
+    if (omIsSpecBin(bin)) return bin;
   }
   return NULL;
 }
