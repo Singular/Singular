@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.46 1999-03-15 12:23:41 Singular Exp $ */
+/* $Id: ring.cc,v 1.47 1999-03-15 14:05:31 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1678,6 +1678,8 @@ int rSum(ring r1, ring r2, ring &sum)
         tmpR.order[i]=rb->order[i];
         tmpR.block0[i]=rb->block0[i];
         tmpR.block1[i]=rb->block1[i];
+	if (rb->wvhdl[i]!=NULL)
+	  WarnS("rSum: weights not implemented");
       }
       tmpR.block0[0]=1;
     }
@@ -1714,8 +1716,8 @@ int rSum(ring r1, ring r2, ring &sum)
           if (r2->wvhdl[i]!=NULL)
           {
             int l=mmSizeL(r2->wvhdl[i]);
-            tmpR.wvhdl[i]=(short *)AllocL(l);
-            memcpy(tmpR.wvhdl[i],r2->wvhdl[i],l);
+            tmpR.wvhdl[j]=(short *)AllocL(l);
+            memcpy(tmpR.wvhdl[j],r2->wvhdl[i],l);
           }
         }
       }
