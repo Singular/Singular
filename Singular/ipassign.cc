@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.52 1999-11-15 17:20:09 obachman Exp $ */
+/* $Id: ipassign.cc,v 1.53 2000-03-08 09:03:39 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -238,7 +238,7 @@ static BOOLEAN jiA_LIST_RES(leftv res, leftv a,Subexpr e)
 {
   syStrategy r=(syStrategy)a->CopyD(RESOLUTION_CMD);
   if (res->data!=NULL) ((lists)res->data)->Clean();
-  res->data=(void *)syConvRes(r);
+  res->data=(void *)syConvRes(r,TRUE);
   //jiAssignAttr(res,a);
   return FALSE;
 }
