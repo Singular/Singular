@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.27 1999-07-01 16:13:42 Singular Exp $ */
+/* $Id: ring.h,v 1.28 1999-07-01 16:40:44 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -57,7 +57,13 @@ inline BOOLEAN rField_is_Zp(ring r, int p)
 { return (r->ch > 1 && r->ch == ABS(p) && r->parameter==NULL); }
 inline BOOLEAN rField_is_Q(ring r=currRing)
 { return (r->ch == 0) && (r->parameter==NULL); }
-BOOLEAN rField_is_R(ring r=currRing);
+inline BOOLEAN rField_is_numeric(ring r=currRing) /* R, long R, long C */
+{ return (r->ch ==  -1); }
+inline BOOLEAN rField_is_R(ring r=currRing)
+{
+  if (rField_is_numeric(r) && (r->ch_flags == (short)0)) return TRUE;
+  return FALSE;
+}
 inline BOOLEAN rField_is_GF(ring r=currRing)
 { return (r->ch > 1) && (r->parameter!=NULL); }
 inline BOOLEAN rField_is_Zp_a(ring r=currRing)
@@ -67,9 +73,17 @@ inline BOOLEAN rField_is_Zp_a(ring r, int p)
 inline BOOLEAN rField_is_Q_a(ring r=currRing)
 { return (r->ch == 1); }
 inline BOOLEAN rField_is_long_R(ring r=currRing)
-{ return (r->ch == -1) && (r->ch_flags!=0) &&(r->parameter==NULL); }
+{
+  if (rField_is_numeric(r) && (r->ch_flags != (short)0))
+    return (r->parameter==NULL);
+  return FALSE;
+}
 inline BOOLEAN rField_is_long_C(ring r=currRing)
-{ return (r->ch == -1) && (r->ch_flags!=0) &&(r->parameter!=NULL); }
+{
+  if (rField_is_numeric(r) && (r->ch_flags != (short)0))
+    return (r->parameter!=NULL);
+  return FALSE;
+}
 inline BOOLEAN rField_has_simple_inverse(ring r=currRing)
 { return (r->ch>1) || (r->ch== -1); } /* Z/p, GF(p,n), R, long_R, long_C*/
 inline BOOLEAN rField_is_Extension(ring r=currRing)
