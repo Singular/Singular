@@ -1,14 +1,22 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: ftmpl_matrix.cc,v 1.2 1997-03-27 10:33:48 schmidt Exp $
+// $Id: ftmpl_matrix.cc,v 1.3 1997-04-15 10:12:43 schmidt Exp $
 
 /*
  * $Log: not supported by cvs2svn $
+ * Revision 1.2  1997/03/27 10:33:48  schmidt
+ * stream-io wrapped by NOSTREAMIO
+ * definition of assertions replaced by #include <assert.h>
+ *
  * Revision 1.1  1996/12/18 15:04:23  schmidt
  * Initial revision
  *
  */
 
-#include <templates/assert.h>
+/*MAKEHEADER*/
+#include "templates/config.h"
+
+/*MAKEHEADER*/
+#include "templates/assert.h"
 
 #include <templates/matrix.h>
 
