@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.144 1999-08-31 08:23:54 wenk Exp $
+@comment $Id: reference.doc,v 1.145 1999-09-02 13:06:09 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2569,7 +2569,7 @@ See
 @cindex laguerre
 @table @code
 @item @strong{Syntax:}
-@code{laguerre(} poly_expression@code{,} int_expression@code{,} int_expression @code{)} 
+@code{laguerre(} poly_expression@code{,} int_expression@code{,} int_expression @code{)}
 @item @strong{Type:}
 list
 @item @strong{Purpose:}
@@ -2590,8 +2590,8 @@ laguerre(f,10,2);
 @c example
 @end smallexample
 @end table
-@c ref
-@c ref
+@c @c ref
+@c @c ref
 @c -------------------------------------------------
 @node lead, leadcoef, laguerre, Functions
 @subsection lead
@@ -3329,19 +3329,19 @@ and opens the file given by the first string expression.
 @end smallexample
 @end table
 @c ---------------------------------------
-@node mpresmat, mres, monitor Functions
+@node mpresmat, mres, monitor, Functions
 @subsection mpresmat
 @cindex mpresmat
 @table @code
 @item @strong{Syntax:}
-@code{mpresmat(} ideal_expression@code{,} int_expression @code{)} 
+@code{mpresmat(} ideal_expression@code{,} int_expression @code{)}
 @item @strong{Type:}
 module representing the multipolynomial resultant matrix
 @item @strong{Purpose:}
 computes multipolynomial resultant matrix of input system.
 Uses sparse resultant matrix method of Gelfand, Kapranov and Zelevinsky (second parameter
 = 0) or resultant matrix method of Macaulay (second parameter
-= 1). 
+= 1).
 @item @strong{Notes:}
 When using resultant matrix method of Macaulay the input system must be homogeneous.
 Number of elements in input system must be number of variables in basering plus one.
@@ -5616,7 +5616,7 @@ See
 @cindex uressolve
 @table @code
 @item @strong{Syntax:}
-@code{urressolve(} ideal_expression@code{,} int_expression@code{,} int_expression@code{,} int_expression @code{)} 
+@code{urressolve(} ideal_expression@code{,} int_expression@code{,} int_expression@code{,} int_expression @code{)}
 @item @strong{Type:}
 list
 @item @strong{Purpose:}
@@ -5649,7 +5649,7 @@ subst(subst(i[1],x,l[1][1]),y,l[1][2]);
 @end smallexample
 @end table
 @c ref
-See 
+See
 @ref{laguerre}
 @ref{mpresmat}
 @c ref
@@ -5663,7 +5663,12 @@ See
 @item @strong{Type:}
 list
 @item @strong{Purpose:}
+@tex
 solves the Vandermonde linear system $\sum_{i=1}^{N} x_i^{k-1}z_i = w_k$, $k=1,\ldots,N$.
+@end tex
+@ifinfo
+solves the Vandermonde linear system sum_(i=1)^N x_i^(k-1)z_i = w_k, k=1,@dots{},N.
+@end ifinfo
 @item @strong{Example:}
 @smallexample
 @c example

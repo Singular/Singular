@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.79 1999-08-24 12:00:39 Singular Exp $
+@comment $Id: singular.doc,v 1.80 1999-09-02 13:06:11 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -174,39 +174,32 @@ Use the @ref{LIB} command for loading of single libraries, and the
 command @code{LIB "all.lib";} for loading all libraries.
 
 @menu
+* General purpose::
+* Linear algebra::
+* Commutative algebra::
+* Singularities::
+* Invariant theory::
+* Symbolic-numerical solving::
+* Visualization::
+@end menu
+@c ----------------------------------------------------------------------------
+@node General purpose, Linear algebra, SINGULAR libraries, SINGULAR libraries
+@section General purpose
+@cindex General purpose
+
+@menu
 * standard_lib:: extensions of singular kernel
 * all_lib:: load all other libraries
-* algebra_lib:: procedures for computing with algbras and maps
-* classify_lib:: procedures for classifying hypersurface singularities
-* deform_lib:: procedures for computing miniversal deformation
-* elim_lib:: procedures for elimination, saturation and blowing up
-* finvar_lib:: procedures to calculate invariant rings & more
 * general_lib:: procedures of general type
-* graphics_lib:: procedures to draw  with Mathematica
-* hnoether_lib:: procedures for the Hamburger-Noether-development
-* homolog_lib:: procedures for homological algebra
 * inout_lib:: procedures for manipulating in- and output
-* invar_lib:: procedures to compute the ring of invariants
-* jordan_lib:: procedures to compute the jordan normal form
-* latex_lib:: procedures for typesetting in TeX
-* matrix_lib:: procedures for matrix operations
-* mondromy_lib:: procedures to compute the monodromy of a singularity
-* normal_lib:: procedure for normalization
 * poly_lib:: procedures for manipulating polynomials and ideals
-* presolve_lib:: procedures for pre-solving polynomial equations
-* primdec_lib:: procedures for primary decomposition
-* primitiv_lib:: procedures for finding a primitive element
 * random_lib:: procedures of random/sparse  matrix and poly operations
 * ring_lib:: procedures for manipulating rings and maps
-* sing_lib:: procedures for computing invariants of singularities
-* solve_lib:: procedures to solve polynomial systems
-* spcurve_lib:: procedures for cm codimension 2 singularities
 @end menu
 
-
 @c ----------------------------------------------------------
-@node standard_lib, all_lib, SINGULAR libraries, SINGULAR libraries
-@section standard_lib
+@node standard_lib, all_lib, General purpose, General purpose
+@subsection standard_lib
 
 The library @code{standard.lib} provides extensions to the
 set of built-in commands and is automatically loaded
@@ -217,8 +210,8 @@ with the @code{--no-stdlib} command line option (see
 @c lib standard.lib:LibInfo lib_fun lib_ex
 
 @c ----------------------------------------------------------
-@node all_lib, algebra_lib, standard_lib, SINGULAR libraries
-@section all_lib
+@node all_lib, general_lib, standard_lib, General purpose
+@subsection all_lib
 @cindex all_lib
 @cindex all.lib
 
@@ -232,106 +225,174 @@ option(loadLib);
 LIB "all.lib";
 @c example
 @end smallexample
-@c ---------------------------------------------------------
-@node algebra_lib, classify_lib, all_lib, SINGULAR libraries
-@section algebra_lib
-@c lib algebra.lib
-@c ---------------------------------------------------------
-@node classify_lib, deform_lib, algebra_lib, SINGULAR libraries
-@section classify_lib
-@c lib classify.lib
 @c ----------------------------------------------------------
-@node deform_lib, elim_lib, classify_lib, SINGULAR libraries
-@section deform_lib
-@c lib deform.lib
-@c ----------------------------------------------------------
-@node elim_lib, finvar_lib, deform_lib, SINGULAR libraries
-@section elim_lib
-@c lib elim.lib
-@c ----------------------------------------------------------
-@node finvar_lib, general_lib, elim_lib, SINGULAR libraries
-@section finvar_lib
-@c lib finvar.lib
-@c ----------------------------------------------------------
-@node general_lib, graphics_lib, finvar_lib, SINGULAR libraries
-@section general_lib
+@node general_lib, inout_lib, all_lib, General purpose
+@subsection general_lib
 @c lib  general.lib
-@c ---------------------------------------------------------
-@node graphics_lib, hnoether_lib, general_lib, SINGULAR libraries
-@section graphics_lib
-@c lib graphics.lib no_ex
-@c ---------------------------------------------------------
-@node hnoether_lib, homolog_lib, graphics_lib, SINGULAR libraries
-@section hnoether_lib
-@c lib hnoether.lib
 @c ----------------------------------------------------------
-@node homolog_lib, inout_lib, hnoether_lib, SINGULAR libraries
-@section homolog_lib
-@c lib homolog.lib
-@c ----------------------------------------------------------
-@node inout_lib, invar_lib, homolog_lib, SINGULAR libraries
-@section inout_lib
+@node inout_lib, poly_lib, general_lib, General purpose
+@subsection inout_lib
 @c lib inout.lib
 @c ----------------------------------------------------------
-@node invar_lib, jordan_lib, inout_lib, SINGULAR libraries
-@section invar_lib
-@c lib invar.lib
-@c ---------------------------------------------------------
-@node jordan_lib, latex_lib, invar_lib, SINGULAR libraries
-@section jordan_lib
-@c lib jordan.lib
-@c ---------------------------------------------------------
-@node latex_lib, matrix_lib, jordan_lib, SINGULAR libraries
-@section latex_lib
-@c lib latex.lib no_ex
-@c ----------------------------------------------------------
-@node matrix_lib, mondromy_lib, latex_lib, SINGULAR libraries
-@section matrix_lib
-@c lib matrix.lib
-@c ---------------------------------------------------------
-@node mondromy_lib, normal_lib, matrix_lib, SINGULAR libraries
-@section mondromy_lib
-@c lib mondromy.lib
-@c ---------------------------------------------------------
-@node normal_lib, poly_lib, mondromy_lib, SINGULAR libraries
-@section normal_lib
-@c lib normal.lib
-@c ----------------------------------------------------------
-@node poly_lib, presolve_lib, normal_lib, SINGULAR libraries
-@section poly_lib
+@node poly_lib, random_lib, inout_lib, General purpose
+@subsection poly_lib
 @c lib poly.lib
-@c ---------------------------------------------------------
-@node presolve_lib, primdec_lib, poly_lib, SINGULAR libraries
-@section presolve_lib
-@c lib presolve.lib
 @c ----------------------------------------------------------
-@node primdec_lib, primitiv_lib, presolve_lib, SINGULAR libraries
-@section primdec_lib
-@c lib primdec.lib
-@c ---------------------------------------------------------
-@node primitiv_lib, random_lib, primdec_lib, SINGULAR libraries
-@section primitiv_lib
-@c lib primitiv.lib
-@c ----------------------------------------------------------
-@node random_lib, ring_lib, primitiv_lib, SINGULAR libraries
-@section random_lib
+@node random_lib, ring_lib, poly_lib, General purpose
+@subsection random_lib
 @c lib random.lib
 @c ----------------------------------------------------------
-@node ring_lib, sing_lib, random_lib, SINGULAR libraries
-@section ring_lib
+@node ring_lib, , random_lib, General purpose
+@subsection ring_lib
 @c lib ring.lib
+@c ----------------------------------------------------------------------------
+@node Linear algebra, Commutative algebra, General purpose, SINGULAR libraries
+@section Linear algebra
+@cindex Linear algebra
+
+@menu
+* matrix_lib:: procedures for matrix operations
+* jordan_lib:: procedures to compute the jordan normal form
+@end menu
+
 @c ----------------------------------------------------------
-@node sing_lib, solve_lib, ring_lib, SINGULAR libraries
-@section sing_lib
+@node matrix_lib, jordan_lib,  Linear algebra, Linear algebra
+@subsection matrix_lib
+@c lib matrix.lib
+@c ---------------------------------------------------------
+@node jordan_lib, , matrix_lib, Linear algebra
+@subsection jordan_lib
+@c lib jordan.lib
+@c ----------------------------------------------------------------------------
+@node Commutative algebra, Singularities, Linear algebra, SINGULAR libraries
+@section Commutative algebra
+@cindex Commutative algebra
+
+@menu
+* algebra_lib:: procedures for computing with algebras and maps
+* elim_lib:: procedures for elimination, saturation and blowing up
+* homolog_lib:: procedures for homological algebra
+* normal_lib:: procedure for normalization
+* primdec_lib:: procedures for primary decomposition
+* primitiv_lib:: procedures for finding a primitive element
+@end menu
+
+@c ---------------------------------------------------------
+@node algebra_lib, elim_lib, Commutative algebra, Commutative algebra
+@subsection algebra_lib
+@c lib algebra.lib
+@c ----------------------------------------------------------
+@node elim_lib, homolog_lib, algebra_lib, Commutative algebra
+@subsection elim_lib
+@c lib elim.lib
+@c ----------------------------------------------------------
+@node homolog_lib, normal_lib, elim_lib, Commutative algebra
+@subsection homolog_lib
+@c lib homolog.lib
+@c ---------------------------------------------------------
+@node normal_lib, primdec_lib, homolog_lib, Commutative algebra
+@subsection normal_lib
+@c lib normal.lib
+@c ----------------------------------------------------------
+@node primdec_lib, primitiv_lib, normal_lib, Commutative algebra
+@subsection primdec_lib
+@c lib primdec.lib
+@c ---------------------------------------------------------
+@node primitiv_lib, , primdec_lib, Commutative algebra
+@subsection primitiv_lib
+@c lib primitiv.lib
+@c ----------------------------------------------------------------------------
+@node Singularities, Invariant theory, Commutative algebra, SINGULAR libraries
+@section Singularities
+@cindex Singularities
+
+@menu
+* classify_lib:: procedures for classifying hypersurface singularities
+* deform_lib:: procedures for computing miniversal deformation
+* hnoether_lib:: procedures for the Hamburger-Noether-development
+* mondromy_lib:: procedures to compute the monodromy of a singularity
+* sing_lib:: procedures for computing invariants of singularities
+* spcurve_lib:: procedures for cm codimension 2 singularities
+@end menu
+
+@c ---------------------------------------------------------
+@node classify_lib, deform_lib, Singularities, Singularities
+@subsection classify_lib
+@c lib classify.lib
+@c ----------------------------------------------------------
+@node deform_lib, hnoether_lib, classify_lib, Singularities
+@subsection deform_lib
+@c lib deform.lib
+@c ---------------------------------------------------------
+@node hnoether_lib, mondromy_lib, deform_lib, Singularities
+@subsection hnoether_lib
+@c lib hnoether.lib
+@c ---------------------------------------------------------
+@node mondromy_lib, sing_lib, hnoether_lib, Singularities
+@subsection mondromy_lib
+@c lib mondromy.lib
+@c ----------------------------------------------------------
+@node sing_lib, spcurve_lib, mondromy_lib, Singularities
+@subsection sing_lib
 @c lib sing.lib
 @c ---------------------------------------------------------
-@node solve_lib, spcurve_lib, sing_lib, SINGULAR libraries
-@section solve_lib
-@c @c lib solve.lib no_ex
-@c ---------------------------------------------------------
-@node spcurve_lib, , solve_lib, SINGULAR libraries
-@section spcurve_lib
+@node spcurve_lib, , sing_lib, Singularities
+@subsection spcurve_lib
 @c lib spcurve.lib
+@c ----------------------------------------------------------------------------
+@node Invariant theory, Symbolic-numerical solving, Singularities, SINGULAR libraries
+@section Invariant theory
+@cindex Invariant theory
+
+@menu
+* finvar_lib:: procedures to calculate invariant rings & more
+* invar_lib:: procedures to compute the ring of invariants
+@end menu
+
+@c ----------------------------------------------------------
+@node finvar_lib, invar_lib, Invariant theory, Invariant theory
+@subsection finvar_lib
+@c lib finvar.lib
+@c ----------------------------------------------------------
+@node invar_lib, , finvar_lib, Invariant theory
+@subsection invar_lib
+@c lib invar.lib
+@c ----------------------------------------------------------------------------
+@node Symbolic-numerical solving, Visualization, Invariant theory, SINGULAR libraries
+@section Symbolic-numerical solving
+@cindex Symbolic-numerical solving
+
+@menu
+* presolve_lib:: procedures for pre-solving polynomial equations
+* solve_lib:: procedures to solve polynomial systems
+@end menu
+
+@c ---------------------------------------------------------
+@node presolve_lib, solve_lib, Symbolic-numerical solving, Symbolic-numerical solving
+@subsection presolve_lib
+@c lib presolve.lib
+@c ---------------------------------------------------------
+@node solve_lib, , presolve_lib, Symbolic-numerical solving
+@subsection solve_lib
+@c @c lib solve.lib no_ex
+@c ----------------------------------------------------------------------------
+@node Visualization, , Symbolic-numerical solving, SINGULAR libraries
+@section Visualization
+@cindex Visualization
+
+@menu
+* graphics_lib:: procedures to draw  with Mathematica
+* latex_lib:: procedures for typesetting in TeX
+@end menu
+
+@c ---------------------------------------------------------
+@node graphics_lib, latex_lib, Visualization, Visualization
+@subsection graphics_lib
+@c lib graphics.lib no_ex
+@c ---------------------------------------------------------
+@node latex_lib, , graphics_lib, Visualization
+@subsection latex_lib
+@c lib latex.lib no_ex
 
 @c ----------------------------------------------------------
 @node Installation and Platform Specifics, Index, SINGULAR libraries, Top

@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: pl2doc.pl,v 1.9 1999-08-19 15:23:22 obachman Exp $
+# $Id: pl2doc.pl,v 1.10 1999-09-02 13:06:08 Singular Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -83,7 +83,7 @@ unless ($no_fun)
     print LDOC ",";
     print LDOC " ".$procs[$i-1] if ($i > 0);
     print LDOC ", " . $lib ."_lib\n";
-    print LDOC "\@subsection " . $procs[$i] . "\n";
+    print LDOC "\@subsubsection " . $procs[$i] . "\n";
     print LDOC "\@cindex ". $procs[$i] . "\n";
     $CHECKSUMS{$procs[$i]} = $chksum{$procs[$i]} if ($db_file);
     print LDOC "\@c ---content $procs[$i]---\n";
