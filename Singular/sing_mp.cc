@@ -4,7 +4,27 @@
 /*
 * ABSTRACT
 */
-/* $Id: sing_mp.cc,v 1.3 1997-03-24 14:25:50 Singular Exp $ */
+/* $Log: not supported by cvs2svn $
+// Revision 1.2  1997/03/20  16:59:58  obachman
+// Various minor bug-fixes in mpsr interface
+//
+// Thu Mar 20 11:57:00 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
+//
+// 	* sing_mp.cc (slInitBatchLink): initialized silink such that
+// 	  l->argv[0] == "MP:connect" (otherwise, slInitMP failed)
+//
+// Wed Mar 19 15:38:08 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
+//
+// 	* hannes fixed maFindPerm to reflect new names <->parameter scheme
+//
+// 	* sing_mp.cc (mpsr_IsMPLink): fixed it
+//
+// 	* Makefile (tags): added target tags
+//
+// Revision 1.1.1.1  1997/03/19  13:18:41  obachman
+// Imported Singular sources
+//
+*/
 
 #include <stdio.h>
 #include <string.h>
@@ -48,6 +68,7 @@ MP_Env_pt mp_Env = NULL;
 void slInitBatchLink(si_link l, int argc, char** argv)
 {
   int i;
+  idhdl id;
   l->argv = (char **) Alloc0((argc +1) * sizeof(char *));
   l->argv[0] = mstrdup("MP:connect");
   for (i=1; i<=argc; i++)
@@ -55,6 +76,8 @@ void slInitBatchLink(si_link l, int argc, char** argv)
   l->argc = argc + 1;
   l->name = mstrdup("MP:connect");
   slInit(l,NULL);
+  id = enterid(mstrdup("mp_ll"), 0, LINK_CMD, &idroot, FALSE);
+  IDLINK(id) = l;
 }
 
 BOOLEAN slOpenWriteMPFile(si_link l)
@@ -64,40 +87,79 @@ BOOLEAN slOpenWriteMPFile(si_link l)
 
   GetCmdArgs(&argc, &argv, "-MPtransp FILE -MPmode write -MPfile /tmp/mpout");
   MP_Link_pt link = NULL;
-
-  if (SI_LINK_R_OPEN_P(l))
+  short mode = 0; // 0 -- write, 1 -- append, 2 -- read
+  BOOLEAN status = TRUE;
+  
+  if (l->argc > 2)
+  {
+    if (strcmp(l->argv[2], "mode:a") == 0)
+    {
+      mode = 1;
+      FreeL(argv[3]);
+      argv[3] = mstrdup("append");
+    }
+    else if (strcmp(l->argv[2], "mode:r") == 0)
+    {
+      mode = 2;
+      FreeL(argv[3]);
+      argv[3] = mstrdup("read");
+    }
+  }
+        
+  if (mode < 2 && SI_LINK_R_OPEN_P(l))
   {
     Werror("can not open an MP write link to file %s as read link also",
            l->name);
-    return TRUE;
+    status = FALSE;
   }
-  if (l->name != NULL)
+  else if (mode == 2 && SI_LINK_W_OPEN_P(l))
   {
-    FreeL(argv[5]);
-    argv[5] = mstrdup(l->name);
+   Werror("can not open an MP read link to file %s as write link also",
+           l->name);
+   status = FALSE;
   }
 
-  if (mp_Env == NULL)
-    mp_Env = MP_InitializeEnv(MP_AllocateEnv());
-
-  if (mp_Env == NULL)
+  if (status)
   {
-    Werror("Initialization of MP Environment");
-    return TRUE;
-  }
+    if (l->name != NULL)
+    {
+      FreeL(argv[5]);
+      argv[5] = mstrdup(l->name);
+    }
 
-  if ((link = MP_OpenLink(mp_Env, argc, argv)) == NULL)
-  {
-    Werror("Opening of MP Write to file %s", l->name);
-    FreeCmdArgs(argc, argv);
-    return TRUE;
-  }
-  MP_SET_LINK_OPTIONS(link);
+    if (mp_Env == NULL)
+      mp_Env = MP_InitializeEnv(MP_AllocateEnv());
 
+    if (mp_Env == NULL)
+    {
+      Werror("Initialization of MP Environment");
+      status = FALSE;
+    }
+    else
+    {
+      if ((link = MP_OpenLink(mp_Env, argc, argv)) == NULL)
+      {
+        Werror("Opening of MP Write to file %s", l->name);
+        status = FALSE;
+      }
+      else
+        MP_SET_LINK_OPTIONS(link);
+    }
+  }
+  
   FreeCmdArgs(argc, argv);
-  SI_LINK_SET_W_OPEN_P(l);
-  l->data = (void *) link;
-  return FALSE;
+  if (status)
+  {
+    if (mode < 2) 
+      SI_LINK_SET_W_OPEN_P(l);
+    else
+      SI_LINK_SET_R_OPEN_P(l);
+    
+    l->data = (void *) link;
+    return FALSE;
+  }
+  else
+    return TRUE;
 }
 
 MP_Link_pt OpenMPFile(char *fn, short mode)
@@ -265,7 +327,7 @@ MP_Link_pt slOpenMPLaunch(si_link l)
   if (host == NULL)
   {
     char *hn = (char *) AllocL(64*sizeof(char*));
-    FreeL(argv[7]);
+    FreeL(argv[5]);
     gethostname(hn, 64);
     argv[5] = hn;
     Warn("No host specified for MP:connect; We try %s", hn);
@@ -423,7 +485,6 @@ BOOLEAN mpsr_IsMPLink(si_link l)
 }
 #endif
 
-#define MPSR_BATCH_DEBUG
 #ifdef MPSR_BATCH_DEBUG
 BOOLEAN stop = 1;
 #endif

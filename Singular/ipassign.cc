@@ -1,7 +1,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: ipassign.cc,v 1.3 1997-03-24 14:24:53 Singular Exp $";
+static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/ipassign.cc,v 1.4 1997-03-26 14:57:56 obachman Exp $";
+/* $Log: not supported by cvs2svn $
+// Revision 1.2  1997/03/21  13:19:03  Singular
+// fixed assignment of lists, det(constants), comparision of intmats
+//
+*/
+
 /*
 * ABSTRACT: interpreter:
 *           assignment of expressions and lists to objects or lists
@@ -347,8 +353,7 @@ static BOOLEAN jiA_LINK(leftv res, leftv a, Subexpr e)
     Werror("cannot change open link");
     return TRUE;
   }
-  if (l!=NULL)
-    slKill(l);
+  if (l!=NULL) slCleanUp(l);
   // let's read in all args into argc and argv
   if (a->Typ() == STRING_CMD)
   {

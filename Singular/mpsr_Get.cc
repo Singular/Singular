@@ -1,7 +1,3 @@
-/****************************************
-*  Computer Algebra System SINGULAR     *
-****************************************/
-
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -196,7 +192,7 @@ inline void InitIdentifierLeftv(mpsr_leftv mlv, char *name, short quote)
 
     if (h != NULL)
     {
-      mlv->lv = mpsr_InitLeftv(IDTYP(h), (void *) IDDATA(h));
+      mlv->lv = mpsr_InitLeftv(IDHDL, (void *) h);
     }
     else
     {
@@ -206,6 +202,7 @@ inline void InitIdentifierLeftv(mpsr_leftv mlv, char *name, short quote)
       mpsr_SetCurrRing(mlv->r, FALSE);
       p = pOne();
       p->exp[pos+1] = 1;
+      pSetm(p);
       mlv->lv = mpsr_InitLeftv(POLY_CMD, (void *) p);
     }
     FreeL(name);

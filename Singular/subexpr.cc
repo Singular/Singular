@@ -1,7 +1,19 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: subexpr.cc,v 1.5 1997-03-24 14:25:58 Singular Exp $";
+static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/subexpr.cc,v 1.6 1997-03-26 14:58:06 obachman Exp $";
+/* $Log: not supported by cvs2svn $
+// Revision 1.4  1997/03/21  14:58:56  obachman
+// Fixed little bugs in sleftv::Eval and mpsr_GetMisc
+//
+// Revision 1.3  1997/03/21  14:06:52  Singular
+// * hannes: changed return value for Eval(assignment) to 'nothing'
+//
+// Revision 1.2  1997/03/21  13:19:05  Singular
+// fixed assignment of lists, det(constants), comparision of intmats
+//
+*/
+
 /*
 * ABSTRACT:
 */
@@ -271,7 +283,6 @@ void sleftv::CleanUp()
         break;
       case LINK_CMD:
         slKill((si_link)data);
-        Free((ADDRESS)data,sizeof(ip_link));
         break;
       case COMMAND:
       {
@@ -396,6 +407,8 @@ void * slInternalCopy(leftv source)
       return  (void *)maCopy((map)d);
     case LIST_CMD:
       return  (void *)lCopy((lists)d);
+    case LINK_CMD:
+      return (void *)slCopy((si_link) d);
 #ifdef TEST
     case DEF_CMD:
     case NONE:
@@ -459,6 +472,9 @@ void sleftv::Copy(leftv source)
       break;
     case LIST_CMD:
       data= (void *)lCopy((lists)d);
+      break;
+    case LINK_CMD:
+      data = (void *)slCopy((si_link) d);
       break;
 #ifdef TEST
     case DEF_CMD:
@@ -537,6 +553,8 @@ void * sleftv::CopyD(int t)
       return (void *)maCopy((map)d);
     case LIST_CMD:
       return (void *)lCopy((lists)d);
+    case LINK_CMD:
+      return (void *)slCopy((si_link) d);
     case 0:
       break;
 #ifdef TEST

@@ -1,3 +1,17 @@
+Wed Mar 26 14:02:15 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* added reference counter to links, updated slKill, slCopy, slInit
+
+Mon Mar 24 14:27:26 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* sing_mp.cc (slOpenWriteMPFile): Added append and write mode to
+	  open MP:file 
+
+Sun Mar 23 20:48:41 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* mpsr_Get.cc (InitIdentifierLeftv): Fixed bug which did not do
+	  pSetm(p) after creating a poly out of a variable
+
 Thu Mar 20 11:57:00 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
 
 	* sing_mp.cc (slInitBatchLink): initialized silink such that

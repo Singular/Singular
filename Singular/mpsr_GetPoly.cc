@@ -1,7 +1,3 @@
-/****************************************
-*  Computer Algebra System SINGULAR     *
-****************************************/
-
 /***************************************************************
  *
  * File:       mpsr_GetPoly.cc
@@ -26,7 +22,7 @@
 #include "ideals.h"
 #include "grammar.h"
 #include "febase.h"
-
+#include "modulop.h"
 
 #include "mpsr_Tok.h"
 #include "MP_BasicDict.h"
@@ -139,7 +135,7 @@ static void SetGetFuncs(ring r)
   }
   
   // still need to set the global ring
-  mpsr_SetCurrRing(r, FALSE);
+  mpsr_SetCurrRing(r, TRUE);
 }
 
 
@@ -153,7 +149,10 @@ static void SetGetFuncs(ring r)
 // we have type-spec this before
 static mpsr_Status_t GetModuloNumber(MP_Link_pt link, number *a)
 {
-  mp_return(IMP_GetUint32(link, (MP_Uint32_t *) a));
+  MP_Uint32_t x;
+  mp_failr(IMP_GetUint32(link, &x));
+  *a=npInit((int)x);
+  return mpsr_Success;
 }
 
 static mpsr_Status_t GetFloatNumber(MP_Link_pt link, number *a)

@@ -1,9 +1,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.2 1997-03-24 14:25:45 Singular Exp $ */
 /*
 * ABSTRACT
+*/
+/* $Log: not supported by cvs2svn $
+// Revision 1.1.1.1  1997/03/19  13:18:42  obachman
+// Imported Singular sources
+//
 */
 
 #include <stdio.h>
@@ -98,6 +102,8 @@ BOOLEAN slInit(si_link l, char *istr)
   if (l->name==NULL)
     l->name = mstrdup(argv[0]);
 
+  l->ref = 0;
+
   BOOLEAN not_found=TRUE;
   si_link_extension s=si_link_root;
   while (s!=NULL)
@@ -114,23 +120,40 @@ BOOLEAN slInit(si_link l, char *istr)
   return not_found;
 }
 
-void slKill(si_link l)
+void slCleanUp(si_link l)
 {
-  if (SI_LINK_OPEN_P(l)) slClose(l);
-  FreeL((ADDRESS)l->name);
-  l->name=NULL;
-  if (l->argc!=0)
+  (l->ref)--;
+  if (l->ref < 0)
   {
-    int i=l->argc-1;
-    while(i>=0)
+    if (SI_LINK_OPEN_P(l)) slClose(l);
+    if (l->name != NULL) FreeL((ADDRESS)l->name);
+    l->name=NULL;
+    if (l->argc!=0 && l->argv != NULL)
     {
-      FreeL((ADDRESS)l->argv[i]);
-      i--;
+      int i=l->argc-1;
+      while(i>=0)
+      {
+        if (l->argv[i] != NULL) FreeL((ADDRESS)l->argv[i]);
+        i--;
+      }
+      Free((ADDRESS)l->argv,l->argc*sizeof(char *));
     }
-    Free((ADDRESS)l->argv,l->argc*sizeof(char *));
     l->argv=NULL;
     l->argc=0;
+    l->ref=0;
   }
+}
+
+  
+void slKill(si_link l)
+{
+  if (l->ref == 0)
+  {
+    slCleanUp(l);
+    Free((ADDRESS)l, sizeof(ip_link));
+  }
+  else
+   slCleanUp(l); 
 }
 
 //--------------------------------------------------------------------------

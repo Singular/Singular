@@ -6,7 +6,11 @@
 /*
 * ABSTRACT
 */
-/* $Id: silink.h,v 1.2 1997-03-24 14:25:46 Singular Exp $ */
+/* $Log: not supported by cvs2svn $
+ * Revision 1.1.1.1  1997/03/19  13:18:41  obachman
+ * Imported Singular sources
+ *
+*/
 
 #include "structs.h"
 
@@ -42,6 +46,7 @@ struct sip_link
   int  linkType;
   int  argc;
   BITSET flags; /*0: open, 1: read, 2: write, ... */
+  short ref; /* reference counter */
 };
 
 BOOLEAN slExtend(si_link_extension s);
@@ -72,8 +77,14 @@ leftv   slRead(si_link l,leftv a=NULL);
 BOOLEAN slWrite(si_link l, leftv v);
 BOOLEAN slInit(si_link l, char *str);
 void slKill(si_link l);
+void slCleanUp(si_link l);
 void slExtensionInit(si_link_extension s);
 void slStandardInit();
+inline si_link slCopy(si_link l)
+{
+  l->ref++;
+  return l;
+}
 BOOLEAN slInitALink(si_link l,si_link_extension s);
 #ifdef HAVE_MPSR
 void slInitBatchLink(si_link l, int argc, char **argv);
