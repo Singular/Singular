@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: makefile.cc,v 1.5 2000-03-30 06:35:44 krueger Exp $ */
+/* $Id: makefile.cc,v 1.6 2000-03-30 11:47:48 Singular Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -132,7 +132,7 @@ static char *object_name(char *p)
 /*========================================================================*/
 /*===  Machine depend Makefile creation                                ===*/
 /*========================================================================*/
-#ifdef ix86_Linux
+#if defined(ix86_Linux) || defined(ix86_Linux_libc5)
 void build_compile_section(
   FILE *fp,
   moddefv module
