@@ -33,6 +33,7 @@ AC_PROG_CC
 AC_PROG_CPP
 AC_AIX
 
+AC_CHECK_PROGS(PERL, perl5 perl)
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Set exec_prefix, bindir, libdir, includedir to some sensible values

@@ -16,13 +16,18 @@ SINGULAR	= @SINGULAR@
 BUILD_SUBDIRS	= @CONFIG_SUBDIRS@
 SUBDIRS		= @SUBDIRS@
 
+PERL		= @PERL@
+
 ##############################################################
 # default target
 ${SINGULAR}:
 	${MAKE} install
 
+##############################################################
 # general targets
 # simply descend for these targets
+.PHONY: all install uninstall 
+
 all install uninstall:
 	@ for SUBDIR in ${BUILD_SUBDIRS}; \
 	do \
@@ -32,6 +37,8 @@ all install uninstall:
 
 ##############################################################
 # cleaning up
+.PHONY: local-clean local-distclean local-maintainer-clean \
+        clean distclean mostlyclean maintainer-clean 
 
 # we use a canned sequence to avoid code redundancy
 define recurse
@@ -46,7 +53,7 @@ local-clean:
 	rm -rf *~ a.out core *.o *.log
 
 local-distclean: local-clean
-	rm -rf Makefile config.cache config.log config.status TAGS* *.gz *.tar;\
+	rm -rf Makefile config.cache config.log config.status TAGS* *.gz *.tar
 
 local-maintainer-clean: local-distclean
 	@ echo "This command is intended for maintainer use, only"
@@ -63,33 +70,35 @@ maintainer-clean: uninstall local-maintainer-clean
 
 ##############################################################
 # some extra targets for the specific packages
-Singular factory libfac MP gmp:
+.PHONY: factory libfac MP gmp smallgmp 
+Singular factory libfac MP gmp smallgmp:
 	cd $@; ${MAKE} all
 
 ##############################################################
 # documentation
-.PHONY: info dvi ps
-info dvi ps doc/singular.hlp:
+.PHONY: info dvi ps doc doc/singular.hlp
+
+info dvi ps doc/singular.hlp: ${SINGULAR} 
 	cd doc; ${MAKE} $@
 
-.PHONY: doc info/singular.hlp
 doc info/singular.hlp:
 	cd doc; ${MAKE} install
 
 ##############################################################
-# Tst targets: DO NOT USE, YET -- THEY ARE STILL BROKEN
+# Tst targets
+.PHONY:	Tst-All Tst Tst-Old Tst-Short Tst-Long
 Tst-All: Tst-Old Tst-Short Tst-Long
 
 Tst: Tst-Old Tst-Short
 
 Tst-Old: ${SINGULAR} Tst/Old/universal.lst Tst/regress.cmd
-	Tst/regress.cmd -s ${SINGULAR} Tst/Old/universal.lst
+	${PERL} Tst/regress.cmd -s ${SINGULAR} Tst/Old/universal.lst
 
 Tst-Short: ${SINGULAR} Tst/Short Tst/regress.cmd
-	Tst/regress.cmd -s ${SINGULAR} Tst/Short/*.tst
+	${PERL} Tst/regress.cmd -s ${SINGULAR} Tst/Short/*.tst
 
 Tst-Long:  ${SINGULAR} Tst/Short Tst/regress.cmd
-	Tst/regess.cmd -s ${SINGULAR} Tst/Long/*.tst
+	${PERL} Tst/regress.cmd -s ${SINGULAR} Tst/Long/*.tst
 
 
 ##############################################################
