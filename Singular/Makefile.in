@@ -54,6 +54,7 @@ CXXFLAGS	= @CXXFLAGS@ ${PIPE}
 CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@
 CPPFLAGS	= -I${srcdir} -I../kernel @CPPFLAGS@
 DEFS		= -DNDEBUG -DOM_NDEBUG -D@SING_UNAME@ @DEFS@
+LDFLAGS2	= @LDFLAGS@
 LDFLAGS		= -L../kernel -lkernel @LDFLAGS@
 LDFLAGSG	= -L../kernel -lkernel-g @LDFLAGS@
 LD_DYN_FLAGS	= @LD_DYN_FLAGS@
@@ -302,7 +303,7 @@ version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in \
 	echo "#define feVersionId "  `date '+%Y%m%d%H'` >version.h
 
 libparse: libparse_main.o utils.o fegetopt.o
-	${CXX}  ${CPPFLAGS} -DSTANDALONE_PARSER -o libparse libparse_main.o utils.o fegetopt.o ${LDFLAGS} ${LIBS} -lomalloc_ndebug mmalloc.o
+	${CXX}  ${CPPFLAGS} -DSTANDALONE_PARSER -o libparse libparse_main.o utils.o fegetopt.o ${LDFLAGS2} -lomalloc_ndebug
 
 libparse_main.o: libparse.cc
 	${CXX} ${CPPFLAGS} -c -o libparse_main.o libparse.cc  -DSTANDALONE_PARSER
