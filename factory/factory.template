@@ -1,0 +1,42 @@
+// emacs edit mode for this file is -*- C++ -*-
+/* $Id: factory.template,v 1.1 1996-12-18 14:53:45 schmidt Exp $ */
+
+#ifndef INCL_FACTORY_H
+#define INCL_FACTORY_H
+
+#include <iostream.h>
+
+#include <templates/array.h>
+#include <templates/factor.h>
+#include <templates/list.h>
+#include <templates/matrix.h>
+
+.INCLUDE cf_defs.h
+
+.INCLUDE variable.h
+
+.INCLUDE canonicalform.h
+
+.INCLUDE cf_binom.h
+
+.INCLUDE cf_iter.h
+
+.INCLUDE cf_generator.h
+
+.INCLUDE cf_random.h
+
+.INCLUDE cf_irred.h
+
+.INCLUDE cf_eval.h
+
+.INCLUDE cf_reval.h
+
+.INCLUDE cf_chinese.h
+
+.INCLUDE cf_map.h
+
+.INCLUDE fac_util.h
+
+.INCLUDE cf_primes.h
+
+#endif /* INCL_FACTORY_H */
