@@ -3,7 +3,7 @@
  *  Purpose: alloc function to be included in omMain.c
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omtTestAlloc.c,v 1.3 2000-08-14 12:26:52 obachman Exp $
+ *  Version: $Id: omtTestAlloc.c,v 1.4 2000-08-18 09:02:02 obachman Exp $
  *******************************************************************/
 #include "omtTest.h"
 
@@ -21,7 +21,7 @@
 #define omSmallSize2AlignedBin omSmallSize2Bin
 #endif
 
-void omtTestAlloc(omMemCell cell, int spec)
+void omtTestAlloc(omMemCell cell, unsigned long spec)
 {
   int size = GET_SIZE(spec);
   void* addr;
@@ -118,7 +118,7 @@ void omtTestAlloc(omMemCell cell, int spec)
 void omtTestFree(omMemCell cell)
 {
   void* addr = cell->addr;
-  int spec = cell->spec;
+  unsigned long spec = cell->spec;
   omBin bin = cell->bin;
   size_t size = GET_SIZE(spec);
 
@@ -149,7 +149,7 @@ void omtTestFree(omMemCell cell)
   cell->bin = NULL;
 }
 
-void omtTestRealloc(omMemCell cell, int new_spec)
+void omtTestRealloc(omMemCell cell, unsigned long new_spec)
 {
   void* old_addr = cell->addr;
   int old_spec = cell->spec;
@@ -303,7 +303,7 @@ void omtTestRealloc(omMemCell cell, int new_spec)
 }
 
 #define DO_STRDUP(l) (l & 1)
-void omtTestDup(omMemCell cell, int spec)
+void omtTestDup(omMemCell cell, unsigned long spec)
 {
   omtTestDebug(cell);
   

@@ -3,7 +3,7 @@ dnl File: configure.in
 dnl Purpose: Process this file with autoconf to produce configure
 dnl Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
 dnl Created: 11/99
-dnl Version: $Id: configure.in,v 1.6 2000-08-16 12:55:45 obachman Exp $
+dnl Version: $Id: configure.in,v 1.7 2000-08-18 09:02:01 obachman Exp $
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 
 AC_INIT(omAlloc.c)
@@ -102,8 +102,8 @@ AC_CHECK_PROG(AR, ar, ar, :)
 if test "$ac_cv_prog_AR" != ar; then
   AC_MSG_ERROR(*** ar program not found)
 fi
-AC_CHECK_PROG(PERL, perl, perl, :)
-if test "$ac_cv_prog_PERL" != perl; then
+AC_CHECK_PROGS(PERL, perl, "no")
+if test "$ac_cv_prog_PERL" = no; then
   AC_MSG_ERROR(*** perl program not found)
 fi
 
@@ -120,7 +120,7 @@ AC_CHECK_HEADERS(limits.h,,
   AC_MSG_ERROR(Can not compile without limits.h))
 AC_CHECK_HEADERS(unistd.h sys/mman.h fcntl.h /usr/include/malloc.h)
 
-AC_CHECK_FUNCS(popen readlink getcwd getwd mmap sbrk)
+AC_CHECK_FUNCS(popen readlink getcwd getwd mmap sbrk random)
 
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Find out more about particularity of the system

@@ -20,15 +20,15 @@ struct omMemCell_s
 {
   void* addr;
   omBin bin;
-  int spec;
+  unsigned long spec;
 };
 
 typedef struct omMemCell_s omMemCell_t;
 typedef omMemCell_t* omMemCell;
 
 extern omMemCell_t cells[];
-void TestAlloc(omMemCell cell, int spec);
-void TestRealloc(omMemCell cell, int spec);
+void TestAlloc(omMemCell cell, unsigned long spec);
+void TestRealloc(omMemCell cell, unsigned long spec);
 void TestFree(omMemCell cell);
 
 #if CHECK_LEVEL > 2
@@ -79,24 +79,24 @@ void TestFree(omMemCell cell);
 
 #define PAGES_PER_REGION 128
 
-void omTestAlloc(omMemCell cell, int spec);
-void omTestRealloc(omMemCell cell, int spec);
-void omTestDup(omMemCell cell, int spec);
-void omTestFree(omMemCell cell);
+void omtTestAlloc(omMemCell cell, unsigned long spec);
+void omtTestRealloc(omMemCell cell, unsigned long spec);
+void omtTestDup(omMemCell cell, unsigned long spec);
+void omtTestFree(omMemCell cell);
 
-void omTestAllocDebug(omMemCell cell, int spec);
-void omTestReallocDebug(omMemCell cell, int spec);
-void omTestDupDebug(omMemCell cell, int spec);
-void omTestFreeDebug(omMemCell cell);
+void omtTestAllocDebug(omMemCell cell, unsigned long spec);
+void omtTestReallocDebug(omMemCell cell, unsigned long spec);
+void omtTestDupDebug(omMemCell cell, unsigned long spec);
+void omtTestFreeDebug(omMemCell cell);
 void InitCellAddrContent(omMemCell cell);
-int omTestErrors();
+int omtTestErrors();
 
 #if CHECK_LEVEL > 0
-void omTestDebug(omMemCell cell);
+void omtTestDebug(omMemCell cell);
 void TestAddrContent(void* addr, unsigned long value, size_t size);
 void TestAddrContentEqual(void* s1, void* s2, size_t size);
 #else
-#define omTestDebug(cell)               ((void)0)
+#define omtTestDebug(cell)               ((void)0)
 #define TestAddrContent(a,v,s)          ((void)0)
 #define TestAddrContentEqual(s1, s2, s) ((void)0)
 #endif

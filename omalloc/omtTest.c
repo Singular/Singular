@@ -12,6 +12,20 @@ int missed_errors = 0;
 int used_regions = 0;
 int seed;
 
+#if defined (__hpux) || defined (__alpha)  || defined (__svr4__) || defined (__SVR4)
+/* HPUX lacks random().  DEC OSF/1 1.2 random() returns a double.  */
+long mrand48 ();
+void srand48();
+static long
+random ()
+{
+  return mrand48 ();
+}
+static void srandom(long seed)
+{
+  srand48(seed);
+}
+#endif
 
 #if CHECK_LEVEL > 0
 void omtTestDebug(omMemCell cell)
@@ -151,7 +165,7 @@ int MyRandSpec()
   /* This behaves badly on the HP's, because RAND_MAX == 32767 */
   int spec = 1 + (int) ( ((double) SPEC_MAX)* ((double) random())/(RAND_MAX + 1.0));
 #else
-  int spec = random() + 1;
+  unsigned long spec = random() + 1;
 #endif  
   if (! size_range_number)
   {
@@ -166,7 +180,7 @@ int MyRandSpec()
 }
 
 
-void TestAlloc(omMemCell cell, int spec)
+void TestAlloc(omMemCell cell, unsigned long spec)
 {
   if (DO_CHECK(spec))
   {
@@ -186,7 +200,7 @@ void TestAlloc(omMemCell cell, int spec)
   }
 }
 
-void TestRealloc(omMemCell cell, int spec)
+void TestRealloc(omMemCell cell, unsigned long spec)
 {
   if (DO_CHECK(spec))
   {
@@ -206,7 +220,7 @@ void TestRealloc(omMemCell cell, int spec)
   }
 }
 
-void TestDup(omMemCell cell, int spec)
+void TestDup(omMemCell cell, unsigned long spec)
 {
   if (DO_CHECK(spec))
   {
@@ -268,7 +282,7 @@ void my_exit()
 int main(int argc, char* argv[])
 {
   int i=0, error_test = 1;
-  int spec, j;
+  unsigned long spec, j;
   int n = 1;
   int n_cells = MAX_CELLS;
   int decr = 2;
@@ -339,7 +353,7 @@ int main(int argc, char* argv[])
       }
     }
     spec = MyRandSpec();
-    myprintf("%d:%d:%d:%d", i, spec, GET_SIZE(spec), GET_TRACK(spec));
+    myprintf("%d:%lu:%ld:%ld", i, spec, GET_SIZE(spec), GET_TRACK(spec));
     myfflush(stdout);
     if (DO_FREE(spec))
     {
@@ -347,7 +361,7 @@ int main(int argc, char* argv[])
       {
         myprintf(" FREE");
         j = spec % i;
-        myprintf(" %d ", j);
+        myprintf(" %ld ", j);
         myfflush(stdout);
         TestFree(&cells[j]);
         TestAlloc(&cells[j], spec);
@@ -359,7 +373,7 @@ int main(int argc, char* argv[])
       {
         myprintf(" REALLOC");
         j = spec % i;
-        myprintf(" %d ", j);
+        myprintf(" %ld ", j);
         myfflush(stdout);
         TestRealloc(&cells[j], spec);
       }
@@ -370,7 +384,7 @@ int main(int argc, char* argv[])
       {
         myprintf(" DUP");
         j = spec % i;
-        myprintf(" %d ", j);
+        myprintf(" %ld ", j);
         myfflush(stdout);
         TestDup(&cells[j], spec);
       }
