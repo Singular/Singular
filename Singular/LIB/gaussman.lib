@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.61 2002-01-22 11:18:28 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.62 2002-01-22 17:26:44 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -1174,6 +1174,7 @@ EXAMPLE:  example endvfilt; shows examples
   module L;
   list v0=freemodule(ncols(m));
   ideal a0=b0;
+  list l;
 
   while(b0<number(a[ncols(a)]-a[1]))
   {
@@ -1199,7 +1200,7 @@ EXAMPLE:  example endvfilt; shows examples
     }
     b0=b1;
 
-    list l=ideal();
+    l=ideal();
     for(k=ncols(m);k>=2;k--)
     {
       l=l+list(ideal());
