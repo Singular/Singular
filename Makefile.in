@@ -18,6 +18,8 @@ SUBDIRS		= @SUBDIRS@
 
 PERL		= @PERL@
 TMP_DIR		= @TMP_DIR@
+MYGZIP		= @MYGZIP@
+GUNZIP		= @GUNZIP@
 
 ##############################################################
 # default target
@@ -155,31 +157,34 @@ install-sharedist: ${SINGULAR}
 
 dist: ${SHAREDIST_NAME}.tgz  ${BINDIST_NAME}.tgz 
 
-sharedist ${SHAREDIST_NAME}.tgz:
+sharedist ${SHAREDIST_NAME}.tar.gz:
 	if test -d ${TMPDIR}; then rm -rf ${TMPDIR}; fi
 	${MAKE} install-sharedist localdir=${TMPDIR}
-	cd ${TMPDIR}; tar cf - Singular| gzip -c > ${SHAREDIST_NAME}.tgz
-	mv ${TMPDIR}/${SHAREDIST_NAME}.tgz .
+	cd ${TMPDIR}; tar cf ${SHAREDIST_NAME}.tar Singular; ${MYGZIP} ${SHAREDIST_NAME}.tar
+	mv ${TMPDIR}/${SHAREDIST_NAME}.tar.gz .
 	rm -rf ${TMPDIR}
 
-bindist ${BINDIST_NAME}.tgz: 
+bindist ${BINDIST_NAME}.tar.gz: 
 	if test -d ${TMPDIR}; then rm -fr ${TMPDIR}; fi
 	${MAKE} install-bindist localdir=${TMPDIR}
-	cd ${TMPDIR}; tar cf - Singular | gzip -c > ${BINDIST_NAME}.tgz
-	mv ${TMPDIR}/Singular-${S_VERSION}-${SINGUNAME}.tgz .
+	cd ${TMPDIR}; tar cf ${BINDIST_NAME}.tar Singular; ${MYGZIP} ${BINDIST_NAME}.tar
+	mv ${TMPDIR}/Singular-${S_VERSION}-${SINGUNAME}.tar.gz
 	rm -rf ${TMPDIR}
 
-install-local-dist: ${SHAREDIST_NAME}.tgz ${BINDIST_NAME}.tgz
-	cp ${SHAREDIST_NAME}.tgz ${BINDIST_NAME}.tgz ${localdir}
-	cd ${localdir}
-	gunzip -c ${SHAREDIST_NAME}.tgz | tar xf - 
-	gunzip -c ${BINDIST_NAME}.tgz | tar xf -
-	rm -rf ${localdir}/${SHAREDIST_NAME}.tgz ${localdir}/${BINDIST_NAME}.tgz
+install-local-dist: ${SHAREDIST_NAME}.tar.gz ${BINDIST_NAME}.tar.gz
+	cp ${SHAREDIST_NAME}.tar.gz ${BINDIST_NAME}.tar.gz ${localdir}
+	cd ${localdir}; ${GUNZIP} ${SHAREDIST_NAME}.tar.gz; tar xf ${SHAREDIST_NAME}.tar
+	cd ${localdir}; ${GUNZIP} ${BINDIST_NAME}.tar.gz; tar xf ${BINDIST_NAME}.tar
+	rm -rf ${localdir}/${SHAREDIST_NAME}.tar.gz ${localdir}/${BINDIST_NAME}.tar.gz
 	${MKINSTALLDIRS} ${localdir}/bin
 	${LN_S} ${localdir}/Singular/${S_VERSION}/${SINGUNAME}/Singular ${localdir}/bin/Singular-${S_VERSION}
 	${LN_S} ${localdir}/Singular/${S_VERSION}/${SINGUNAME}/ESingular ${localdir}/bin/ESingular-${S_VERSION}
 
 
+
+##
+## old targets -- need to be updated
+##
 
 BINDIR_NAME	= Singular/${S_VERSION}/${SINGUNAME}
 LIBDIR_NAME 	= Singular/${S_VERSION}/LIB
@@ -195,49 +200,7 @@ test_t:
 	echo ${S_VERSION}
 
 .PHONY: sharedist bindist static-bindist infodist win-sharedist
-_sharedist: ${SINGULAR}
-	cd doc; ${MAKE} all ps
-	cd emacs; ${MAKE} all
-	rm -rf ${TMPDIR}/
-	${MKINSTALLDIRS} ${TMPDIR}/${LIBDIR_NAME}
-	${MKINSTALLDIRS} ${TMPDIR}/${GFTABLESDIR_NAME}
-	${MKINSTALLDIRS} ${TMPDIR}/${DOCDIR_NAME}
-	${MKINSTALLDIRS} ${TMPDIR}/${HTMLDIR_NAME}
-	${MKINSTALLDIRS} ${TMPDIR}/${INFODIR_NAME}
-	${MKINSTALLDIRS} ${TMPDIR}/${EMACSDIR_NAME}
-	cp Singular/LIB/*.lib ${TMPDIR}/${LIBDIR_NAME}
-	rm -f ${TMPDIR}/${LIBDIR_NAME}/tst.lib 
-	cp Singular/LIB/gftables/[0-9]* ${TMPDIR}/${GFTABLESDIR_NAME}
-	cp doc/singular.idx doc/manual.ps doc/usercard.ps \
-           doc/manual.dvi doc/usercard.dvi \
-           ${TMPDIR}/${DOCDIR_NAME}
-	cp doc/singular.hlp ${TMPDIR}/${INFODIR_NAME}
-	cp -R doc/html/* ${TMPDIR}/${HTMLDIR_NAME}
-	cp emacs/*.el ${TMPDIR}/${EMACSDIR_NAME}
-	cp emacs/.emacs-singular ${TMPDIR}/${EMACSDIR_NAME}
-	chmod -R  a+rX  ${TMPDIR}/Singular
-	cd ${TMPDIR}; \
-	    ${ZIP} -r ${SHAREDIST_NAME} Singular; \
-	    tar cf ${SHAREDIST_NAME}.tar Singular; gzip ${SHAREDIST_NAME}.tar
-	mv ${TMPDIR}/${SHAREDIST_NAME}.zip ${TMPDIR}/${SHAREDIST_NAME}.tar.gz .
-	rm -rf ${TMPDIR}/
-
-
-_bindist: ${SINGULAR}
-	cd Singular; ${MAKE} Singular-$@ libparse
-	rm -rf ${TMPDIR}
-	${MKINSTALLDIRS} ${TMPDIR}/${BINDIR_NAME}
-	cp Singular/Singular-$@ ${TMPDIR}/${BINDIR_NAME}/Singular
-	cp Singular/ESingular ${TMPDIR}/${BINDIR_NAME}/ESingular
-	cp Singular/libparse ${TMPDIR}/${BINDIR_NAME}
-	-strip ${TMPDIR}/${BINDIR_NAME}/*
-	cd ${TMPDIR}; chmod -R a+rX *;\
-           tar cf ${BINDIST_NAME}.tar Singular; \
-           gzip ${BINDIST_NAME}.tar
-	mv ${TMPDIR}/${BINDIST_NAME}.tar.gz .
-	rm -rf ${TMPDIR}
-
-static-bindist: ${SINGULAR}
+_static-bindist: ${SINGULAR}
 	cd Singular; ${MAKE} Singular-$@ libparse
 	rm -rf ${TMPDIR}
 	${MKINSTALLDIRS} ${TMPDIR}/${BINDIR_NAME}
@@ -248,17 +211,17 @@ static-bindist: ${SINGULAR}
                       ${TMPDIR}/Singular/INSTALL
 	cd ${TMPDIR}; chmod -R a+rX *;\
            tar cf ${BINDIST_NAME}-static.tar Singular; \
-           gzip ${BINDIST_NAME}-static.tar
+           ${MYGZIP} ${BINDIST_NAME}-static.tar
 	mv ${TMPDIR}/${BINDIST_NAME}-static.tar.gz .
 	rm -rf ${TMPDIR}
 
-infodist: 
+_infodist: 
 	rm -rf ${TMPDIR}
 	${MKINSTALLDIRS} ${TMPDIR}/${SINGUNAME}/bin/
 	cp `which info` ${TMPDIR}/${SINGUNAME}/bin/
 	-strip ${TMPDIR}/${SINGUNAME}/bin/info
 	cd ${TMPDIR}; tar cf info-${SINGUNAME}.tar ${SINGUNAME}; \
-                      gzip info-${SINGUNAME}.tar
+                      ${MYGZIP} info-${SINGUNAME}.tar
 	mv ${TMPDIR}/info-${SINGUNAME}.tar.gz .
 	rm -rf ${TMPDIR}
 
@@ -289,7 +252,7 @@ srcdist:
 	cd ${TMPDIR}/Singular-${S_VERSION}; cvs co All
 	cd  ${TMPDIR}; \
 	tar cf Singular-${S_VERSION}.tar Singular-${S_VERSION}; \
-	gzip Singular-${S_VERSION}.tar
+	${MYGZIP} Singular-${S_VERSION}.tar
 	cp ${TMPDIR}/Singular-${S_VERSION}.tar.gz .
 	rm -rf ${TMPDIR}
 

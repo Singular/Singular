@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.48 1999-12-08 12:47:55 obachman Exp $
+### $Id: Makefile.in,v 1.49 1999-12-08 14:47:00 obachman Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -34,6 +34,7 @@ INSTALL		= ../install-sh -c
 INSTALL_PROGRAM	= ${INSTALL}
 INSTALL_DATA	= ${INSTALL} -m 644
 MKINSTALLDIRS   = ../mkinstalldirs
+GZIP		= @GZIP@
 
 PERL5		= @PERL5@
 TEX		= tex
@@ -288,7 +289,7 @@ lib2doc.tar.gz:
 	${MAKEINFO} --no-header --paragraph-indent none -o lib2doc/README lib2doc.texi
 	cp pl2doc.pl doc2tex.pl ${texi2html} lib2doc
 	tar cf lib2doc.tar lib2doc
-	gzip lib2doc.tar
+	${GZIP} lib2doc.tar
 
 clean: mostlyclean
 	/bin/rm -rf singular.tex manual.tex ${DOC_SUBDIR} ${EX_SUBDIR}
