@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.36 1998-04-28 09:53:19 pohl Exp $ */
+/* $Id: tesths.cc,v 1.37 1998-05-04 11:36:45 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -374,7 +374,7 @@ int main(          /* main entry to Singular */
         case 'r':
           errno = 0;
           siRandomStart = strtol(optarg, NULL, 10);
-          if (errno)
+          if (errno || siRandomStart == 0)
           {
             printf("%s: `%s' invalid integer argument for option `--%s'\n", argv[0], optarg, LON_RANDOM);
             mainUsage(argv[0]);
