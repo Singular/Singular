@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.115 2003-02-06 19:33:16 levandov Exp $
+@comment $Id: singular.doc,v 1.116 2003-03-06 11:43:00 levandov Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -22,7 +22,8 @@
 @end iftex
 
 @set singularmanual 1
-@set withplural 1
+@set withplural 1 
+@set PSUFFIX  (plural)
 @c @set namespaces 1
 @include version.texi
 @include uname.texi

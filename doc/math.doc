@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.67 2001-08-27 16:25:47 Singular Exp $
+@comment $Id: math.doc,v 1.68 2003-03-06 11:42:55 levandov Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -32,6 +32,9 @@ some articles or text books (see @ref{References}).
 * Characteristic sets::
 * Gauss-Manin connection::
 * Toric ideals and integer programming::
+@ifset withplural
+* Non-commutative algebra  ::
+@end ifset
 * References::
 @end menu
 @c ---------------------------------------------------------------------------
@@ -673,16 +676,45 @@ principal part, then the spectrum may be computed much faster
 using @code{spectrumnd(f,1)}.
 
 @c ---------------------------------------------------------------------------
-@node Toric ideals and integer programming, References, Gauss-Manin connection, Mathematical background
+@node Toric ideals and integer programming, Reference, Gauss-Manin connection, Mathematical background
+
+@ifset withplural
+@node Toric ideals and integer programming, Non-commutative algebra , Gauss-Manin connection, Mathematical background
+@end ifset
+
 @section Toric ideals and integer programming
 @cindex Toric ideals and integer programming
-
 @include ti_ip.tex
 
+
+
+@ifset withplural
+
 @c ---------------------------------------------------------------------------
+@node Non-commutative algebra, Reference, Toric ideals and integer programming, Mathematical background
+
+@section Non-commutative algebra 
+@cindex  Non-commutative algebra 
+@xref{Mathematical background@value{PSUFFIX}} 
+
+
+@end ifset
+
+@c ---------------------------------------------------------------------------
+
+@ifclear withplural
 @node References, , Toric ideals and integer programming, Mathematical background
+@end ifclear
+
+@ifset withplural
+@node References, ,Non-commutative algebra , Mathematical background
+@end ifset
+
+
 @section References
 @cindex References
+
+
 
 The Centre for Computer Algebra Kaiserslautern publishes a series of preprints
 which are electronically available at

@@ -1,6 +1,7 @@
+@c -*-texinfo-*-
 @ifclear singularmanual
 @c -----------------------Top node-----------------------------------
-@node Top, PLURAL functions, (dir) ,(dir)
+@node Top, PLURAL conventions, (dir), (dir)
 @c @chapter PLURAL
 @c @cindex PLURAL
 
@@ -30,15 +31,18 @@
 @c * Preface::
 @c * Introduction::
 @c * General concepts::
-@c * Data types::
-* PLURAL functions::
+* PLURAL conventions::
+* Data types@value{PSUFFIX}::
+* Functions and system variables@value{PSUFFIX}::
 @c * Tricks and pitfalls::
 @c * Examples::
 @c * Polynomial data::
-@c * Mathematical background::
-@c * SINGULAR libraries::
+* Mathematical background@value{PSUFFIX}::
+@c * PLURAL libraries::
 @c * Release Notes::
-* PLURAL Index::
+@ifclear singularmanual
+* Index::
+@end ifclear
 @end menu
 
 @c @c ----------------------------------------------------------------------------
@@ -58,17 +62,48 @@
 @c @chapter General concepts
 @c @cindex General concepts
 @c @include general.tex
+@c ----------------------------------------------------------------------------
+@ifset singularmanual
+@node PLURAL conventions, Data types@value{PSUFFIX},PLURAL, PLURAL
+@section  PLURAL conventions
+@end ifset 
+
+@ifclear singularmanual
+@node  PLURAL conventions, Data types@value{PSUFFIX}, Top, Top
+@chapter PLURAL conventions
+@end ifclear 
+
+@cindex  PLURAL conventions
+@include pluconventions.tex
+
 
 @c ----------------------------------------------------------------------------
-@c @node Data types, Functions and system variables , Top, Top
-@c @chapter Data types
-@c @cindex Data types
-@c @include plutypes.tex
+
+@ifset singularmanual
+@node Data types@value{PSUFFIX}, Functions and system variables@value{PSUFFIX}  , PLURAL conventions, PLURAL
+@section Data types@value{PSUFFIX}
+@end ifset 
+
+@ifclear singularmanual
+@node Data types@value{PSUFFIX}, Functions and system variables@value{PSUFFIX}, PLURAL conventions, Top
+@chapter Data types@value{PSUFFIX}
+@end ifclear 
+
+@cindex Data types@value{PSUFFIX}
+@include plutypes.tex
 
 @c ----------------------------------------------------------------------------
-@node PLURAL functions, PLURAL Index, Top, Top
-@section Plural functions and system variables
-@cindex Plural commands
+@ifset singularmanual
+@node Functions and system variables@value{PSUFFIX},Mathematical background@value{PSUFFIX}, Data types@value{PSUFFIX}, PLURAL
+@section Functions and system variables@value{PSUFFIX}
+@end ifset
+
+@ifclear singularmanual
+@node Functions and system variables@value{PSUFFIX}, Mathematical background@value{PSUFFIX}, Data types@value{PSUFFIX}, Top
+@chapter Functions and system variables@value{PSUFFIX}
+@end ifclear
+
+@cindex commands@value{PSUFFIX}
 @include plureference.tex
 
 @c @c ----------------------------------------------------------------------------
@@ -90,10 +125,22 @@
 @c @include pdata.tex
 
 @c ----------------------------------------------------------------------------
-@c @node Mathematical background, Index, Data types, Top
-@c @appendix Mathematical background
-@c @cindex Mathematical background
-@c @include plumath.tex
+@ifset singularmanual
+@node Mathematical background@value{PSUFFIX},  , Functions and system
+variables@value{PSUFFIX}, PLURAL 
+@section Mathematical background@value{PSUFFIX}
+@end ifset
+
+
+@ifclear singularmanual
+@node Mathematical background@value{PSUFFIX}, Index, Functions and system variables@value{PSUFFIX}, Top
+variables@value{PSUFFIX}, Top
+@appendix Mathematical background@value{PSUFFIX}
+@end ifclear
+
+
+@cindex Mathematical background@value{PSUFFIX}
+@include plumath.tex
 
 @c @c ----------------------------------------------------------------------------
 @c @node SINGULAR libraries, Release Notes, Mathematical background, Top
@@ -108,7 +155,9 @@
 @c command @code{LIB "all.lib";} for loading all libraries.
 
 @c ----------------------------------------------------------
-@node PLURAL Index,  , PLURAL functions
-@section Plural Index
-@cindex PLural Index
+@ifclear singularmanual
+@node Index,  ,Mathematical background@value{PSUFFIX},Top
+@appendix Index
+@cindex  Index
 @printindex cp
+@end ifclear 

@@ -22,6 +22,7 @@
 
 @clear singularmanual
 @set withplural 1
+@set PSUFFIX  
 @c @set namespaces 1
 @include version.texi
 @include uname.texi

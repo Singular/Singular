@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plutypes.doc,v 1.5 2003-02-06 19:37:14 levandov Exp $
+@comment $Id: plutypes.doc,v 1.6 2003-03-06 11:42:58 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -12,13 +12,14 @@
 %**start
 \input texinfo.tex
 @setfilename plutypes.info
-@node Top, Data types, (dir), (dir)
+
+@node Top, Data types@value{PSUFFIX}, (dir), (dir)
 @menu
-* Data types::
+* Data types@value{PSUFFIX}::
 @end menu
 
-@node Data types,  , Top, Top
-@chapter Data types
+@node Data types@value{PSUFFIX},  , Top, Top
+@chapter Data types@value{PSUFFIX}
 %**end
 @end ignore
 
@@ -35,15 +36,12 @@ For the general syntax of a declaration see
 @c @ref{General command syntax}.
 
 @menu
-* ideal::
-* list::
-* map::
-* module::
-* poly::
-* qring::
-* resolution::
-* ring::
-* vector::
+* ideal@value{PSUFFIX}::
+* module@value{PSUFFIX}::
+* poly@value{PSUFFIX}::
+* qring@value{PSUFFIX}::
+* resolution@value{PSUFFIX}::
+* ring@value{PSUFFIX}::
 @ifset namespaces
 @end ifset
 @end menu
@@ -51,16 +49,16 @@ For the general syntax of a declaration see
 
 @c ---------------------------------------
 
-@node ideal, list, Data types, Data types
-@section ideal
+@node ideal@value{PSUFFIX}, module@value{PSUFFIX}, Data types@value{PSUFFIX}, Data types@value{PSUFFIX}
+@section ideal@value{PSUFFIX}
 @c @cindex ideal
 @cindex  untyped definitions 
 
-Ideals are represented as lists of polynomials which are interpreted as
-left generators of  the ideal. For two-sided ideals see @ref{twostd}. 
+Under an ideal @sc{Plural} understand a @strong{left} ideal. Ideals are represented as lists of polynomials which are interpreted as
+left generators of  the ideal. For the operations with two-sided ideals see @ref{twostd}. 
 
 
-Like polynomials they
+Like polynomials ideals
 can only be defined or accessed with respect to a basering.
 
 @strong{Note:} @code{size} counts only the non-zero generators of an ideal
@@ -68,18 +66,18 @@ whereas @code{ncols} counts all generators.
 
 
 @menu
-* ideal declarations::
-* ideal expressions::
-* ideal operations::
-* ideal related functions::
+* ideal declarations@value{PSUFFIX}::
+* ideal expressions@value{PSUFFIX}::
+* ideal operations@value{PSUFFIX}::
+* ideal related functions@value{PSUFFIX}::
 @end menu
 
 
 @c ---------------------------------------
 
-@node ideal declarations, ideal expressions, ideal, ideal
-@subsection ideal declarations
-@cindex ideal declarations
+@node ideal declarations@value{PSUFFIX}, ideal expressions@value{PSUFFIX}, ideal@value{PSUFFIX}, ideal@value{PSUFFIX}
+@subsection ideal declarations@value{PSUFFIX}
+@cindex ideal declarations@value{PSUFFIX}
 
 @table @strong
 @item Syntax:
@@ -87,7 +85,7 @@ whereas @code{ncols} counts all generators.
 @*@code{ideal} name @code{=} ideal_expression @code{;}
 
 @item Purpose:
-defines an ideal.
+defines a left ideal.
 
 @item Default:
 0
@@ -96,6 +94,7 @@ defines an ideal.
 @smallexample
 @c example
   ring r=0,(x,y,z),dp;
+  system("PLURAL",-1,0);
   poly s1 = x2;
   poly s2 = y3;
   poly s3 = z;
@@ -111,9 +110,9 @@ defines an ideal.
 
 @c ------------------------------
 
-@node ideal expressions, ideal operations, ideal declarations, ideal
-@subsection ideal expressions
-@cindex ideal expressions
+@node ideal expressions@value{PSUFFIX}, ideal operations@value{PSUFFIX}, ideal declarations@value{PSUFFIX}, ideal@value{PSUFFIX}
+@subsection ideal expressions@value{PSUFFIX}
+@cindex ideal expressions@value{PSUFFIX}
 
 An ideal expression is:
 @enumerate
@@ -137,6 +136,7 @@ a type cast to ideal
 @smallexample
 @c example
   ring r=0,(x,y,z),dp;
+  system ("PLURAL",-1,0); 
   ideal m = maxideal(1);
   m;
   poly f = x2;
@@ -160,9 +160,9 @@ a type cast to ideal
 
 @c ------------------------------
 
-@node ideal operations, ideal related functions, ideal expressions, ideal
-@subsection ideal operations
-@cindex ideal operations
+@node ideal operations@value{PSUFFIX}, ideal related functions@value{PSUFFIX}, ideal expressions@value{PSUFFIX}, ideal@value{PSUFFIX}
+@subsection ideal operations@value{PSUFFIX}
+@cindex ideal operations@value{PSUFFIX}
 
 @table @asis
 @item @code{+}
@@ -179,18 +179,30 @@ exponentiation (by a non-negative integer)
 are polynomial generators of the ideal, index 1 gives the first
 generator.
 
+@ifset singularmanual
+@strong{Note:} For simplification of an ideal, see also
+ @ref{simplify} (in @sc{Singular}) .
+@end ifset 
 
-@strong{Note:} For simplification of an ideal, see also ???
-@c @ref{simplify}.
+@ifclear singularmanual
+@strong{Note:} For simplification of an ideal, see also @emph{simplify} in @sc{Singular}.
+@end ifclear  
+
+
 
 @*@strong{Example:}
 @smallexample
 @c example
   ring r=0,(x,y,z),dp;
+  matrix D[3][3];
+  D[1,2]=-z;
+  D[1,3]=y;
+  D[2,3]=x;
+  system("PLURAL",1,D); 
   ideal I = 0,x,0,1;
   I;
   I + 0;    // simplification
-  ideal J = I,0,x,x-z;;
+  ideal J = I,0,x,x-z;
   J;
   I * J;   //  multiplication with simplification
   I*x;
@@ -206,9 +218,9 @@ generator.
 
 @c ------------------------------
 
-@node ideal related functions,  , ideal operations, ideal
-@subsection ideal related functions
-@cindex ideal related functions
+@node ideal related functions@value{PSUFFIX},  , ideal operations@value{PSUFFIX}, ideal@value{PSUFFIX}
+@subsection ideal related functions@value{PSUFFIX}
+@cindex ideal related functions@value{PSUFFIX}
 
 
 
@@ -219,398 +231,26 @@ generator.
 
 
 
-@c ------------------------------
-
-@node list, map, ideal, Data types
-@c link, Data types
-@section list
-@cindex list
-
-Lists are arrays whose elements can be of any type (including ring and
-qring). If one element belongs to a ring the whole list belongs to that
-ring. This applies also to the special list @code{#}. The expression
-@code{list()} is the empty list.
-
-Note that a list stores the objects itself and not the names.  Hence, if
-@code{L} is a list, @code{L[1]} for example has no name.  A name, say
-@code{R}, can be created for @code{L[1]} by @code{def R=L[1];}. To store
-also the name of an object, say @code{r}, it can be added to the list
-with @code{nameof(r);}. Rings and qrings may be objects of a list.
-
-@strong{Note}: Unlike other assignments a ring as an element of a list
-is not a copy but another reference to the same ring.
-
-@menu
-* list declarations::
-* list expressions::
-* list operations::
-* list related functions::
-@end menu
-
-@c ------------------------------
-
-@node list declarations, list expressions, list, list
-@subsection list declarations
-@cindex list declarations
-
-@table @strong
-@item Syntax:
-@code{list} name @code{=} expression_list@code{;}
-@*@code{list} name @code{=} list_expression@code{;}
-
-@item Purpose:
-defines a list (of objects of possibly different types).
-
-@item Default:
-empty list
-
-@item Example:
-@smallexample
-@c example
-  list l=1,"str";
-  l[1];
-  l[2];
-  ring r;
-  listvar(r);
-  ideal i = x^2, y^2 + z^3;
-  l[3] = i;
-  l;
-  listvar(r);     // the list l belongs now to the ring r
-@c example
-@end smallexample
-@end table
-
-@c ------------------------------
-
-@node list expressions, list operations, list declarations, list
-@subsection list expressions
-@cindex list expressions
-
-A list expression is:
-@enumerate
-@item
-the empty list @code{list()}
-@item
-an identifier of type list
-@item
-a function returning list
-@item
-list expressions combined by the arithmetic operation @code{+}
-@item
-a type cast to list
-@end enumerate
-
-
-@*@strong{Example:}
-@smallexample
-@c example
-  list l = "hello",1;
-  l;
-  l = list();
-  l;
-  ring r =0,x,dp;
-  factorize((x+1)^2);
-  list(1,2,3);
-@c example
-@end smallexample
-
-
-@c ------------------------------
-
-@node list operations, list related functions, list expressions, list
-@subsection list operations
-@cindex list operations
-
-
-@*@strong{Example:}
-@smallexample
-@c example
-  list l1 = 1,"hello",list(-1,1);
-  list l2 = list(1,2,3);
-  l1 + l2;          // one new list
-  list l3 =_;
-  l1,l2;            // two lists
-  l2[2];
-@c example
-@end smallexample
-
-@c ------------------------------
-
-@node list related functions,  , list operations, list
-@subsection list related functions
-@cindex list related functions
-
-
-
-
-
-
-
-
 
 @c ---------------------------------------
 
-@node map, module, list, Data types
-@section map
-@cindex map
+@node module@value{PSUFFIX}, poly@value{PSUFFIX}, ideal@value{PSUFFIX}, Data types@value{PSUFFIX}
+@section module@value{PSUFFIX}
+@cindex module@value{PSUFFIX}
 
-Maps are ring maps from a preimage ring into the basering.
-
-@strong{Note:}
-@itemize @bullet
-@item
-the target of a map is @strong{ALWAYS} the actual basering
-@item
-the preimage ring is stored "by name", that means, maps can only be
-used in such contexts, where the name of the preimage ring can be
-resolved (i.e., there might be problems for rings/maps defined in
-subprocedures). 
-@end itemize
-
-Maps between rings with different coefficient fields are
-possible and listed below.
-
-Canonically realized are
-@itemize @bullet
-@item
-@tex
-$Q \rightarrow  Q(a, \ldots)$
-@end tex
-@ifinfo
-Q -> Q(a,..)
-@end ifinfo
-
-@item
-@tex
-$Q \rightarrow R$
-@end tex
-@ifinfo
-Q -> R
-@end ifinfo
-
-@item
-@tex
-$Q \rightarrow  C$
-@end tex
-@ifinfo
-Q -> C
-@end ifinfo
-
-@item
-@tex
-$Z/p \rightarrow  (Z/p)(a, \ldots)$
-@end tex
-@ifinfo
-Z/p ->(Z/p)(a,...)
-@end ifinfo
-
-@item
-@tex
-$Z/p \rightarrow  GF(p^n)$
-@end tex
-@ifinfo
-Z/p -> GF(p^n)
-@end ifinfo
-
-@item
-@tex
-$Z/p \rightarrow  R$
-@end tex
-@ifinfo
-Z/p -> R
-@end ifinfo
-
-@item
-@tex
-$R \rightarrow C$
-@end tex
-@ifinfo
-R -> C
-@end ifinfo
-@end itemize
-
-Possible are furthermore
-@itemize @bullet
-@item
-@tex
-% This is quite a hack, but for now it works.
-$Z/p \rightarrow Q,
-\quad
-[i]_p \mapsto i \in [-p/2, \, p/2]
-\subseteq Z$
-@end tex
-@ifinfo
-Z/p -> Q : [i]_p -> i in [-p/2, p/2] in Z
-@end ifinfo
-@item
-@tex
-$Z/p \rightarrow Z/p^\prime,
-\quad
-[i]_p \mapsto i \in [-p/2, \, p/2] \subseteq Z, \;
-i \mapsto [i]_{p^\prime} \in Z/p^\prime$
-@end tex
-@ifinfo
-Z/p -> Z/p' : [i]_p in Z/p -> i in [-p/2,p/2] in Z, i -> [i]_p' in Z/p'
-@end ifinfo
-@item
-@tex
-$C \rightarrow R, \quad$ the real part
-@end tex
-@ifinfo
-C -> R : the real part
-@end ifinfo
-@end itemize
-
-Finally, in Singular we allow the mapping from rings
-with coefficient field Q to rings whose ground fields 
-have finite characteristic:
-
-@itemize @bullet
-@item
-@tex
-$Q \rightarrow Z/p$
-@end tex
-@ifinfo
-Q -> Z/p
-@end ifinfo
-
-@item
-@tex
-$Q \rightarrow (Z/p)(a, \ldots)$
-@end tex
-@ifinfo
-Q -> (Z/p)(a,..)
-@end ifinfo
-@end itemize
-In these cases the denominator and the numerator 
-of a number are mapped separately by the usual
-map from Z to Z/p, and the image of the number 
-is built again afterwards by division. It is thus
-not allowed to map numbers whose denominator is 
-divisible by the characteristic of the target 
-ground field, or objects containing such numbers. 
-We, therefore, strongly recommend using such 
-maps only to map objects with integer coefficients. 
-
-
-@menu
-* map declarations::
-* map expressions::
-* map operations::
-@end menu
-
-@c ------------------------------
-
-@node map declarations, map expressions, map, map
-@subsection map declarations
-@cindex map declarations
-
-@table @strong
-@item Syntax:
-@code{map} name @code{=} preimage_ring_name @code{,} ideal_expression @code{;}
-@*@code{map} name @code{=} preimage_ring_name @code{,} list_of_poly_and_ideal_expressions @code{;}
-@*@code{map} name @code{=} map_expression @code{;}
-
-@item Purpose:
-defines a ring map from preimage_ring to basering.
-@* Maps the variables of the preimage ring to the generators of the ideal.
-If the ideal contains less elements than variables in the
-preimage_ring the remaining variables are mapped to 0, if the ideal contains
-more elements these are ignored.
-The image ring is always the actual basering.
-For the mapping of coefficients from different fields see @ref{map}.
-
-
-
-The name of a map serves as the function which maps objects from the
-preimage_ring into the basering.  These objects must be defined
-by names (no evaluation in the preimage ring is possible).
-
-@item Example:
-@smallexample
-@c example
-  ring r1=32003,(x,y,z),dp;
-  ideal i=x,y,z;
-  ring r2=32003,(a,b),dp;
-  map f=r1,a,b,a+b;
-  // maps from r1 to r2,
-  // x -> a
-  // y -> b
-  // z -> a+b
-  f(i);
-  // operations like f(i[1]) or f(i*i) are not allowed
-  ideal i=f(i);
-  // objects in different rings may have the same name
-  map g   = r2,a2,b2;
-  map phi = g(f);
-  // composition of map f and g
-  // maps from r1 to r2,
-  // x -> a2
-  // y -> b2
-  // z -> a2+b2
-  phi(i);
-@c example
-@end smallexample
-@end table
-
-
-@c ------------------------------
-
-@node map expressions, map operations, map declarations, map
-@subsection map expressions
-@cindex map expressions
-
-A map expression is:
-@enumerate
-@item
-an identifier of type map
-@item
-a function returning map
-@item
-map expressions combined by composition using parentheses (@code{(}, @code{)})
-@end enumerate
-
-@c ------------------------------
-@node map operations,  , map expressions, map
-@subsection map operations
-
-@cindex map operations
-
-@table @asis
-@item @code{( )}
-composition of maps. If, for example, @code{f} and @code{g} are maps,
-then @code{f(g)} is a map expression giving the composition of @code{f}
-and @code{g}.
-
-@item map_expression @code{[} int_expressions @code{]}
-is a map entry (the image of the corresponding variable)
-@end table
-
-@*@strong{Example:}
-@smallexample
-@c example
-  ring r=0,(x,y),dp;
-  map f=r,y,x;    // the map f permutes the variables
-  f;
-  poly p=x+2y3;
-  f(p);
-  map g=f(f);    // the map g defined as  f^2 is the identity
-  g;
-  g(p) == p;
-@c example
-@end smallexample
-
-@c ---------------------------------------
-
-@node module, qring, map, Data types
-@section module
-@cindex module
-
-Modules are submodules of a free module over the basering with basis
+Modules are left  submodules of a free module over the basering with basis
 @code{gen(1)}, @code{gen(2)}, @dots{} .
-They are represented by lists of vectors which generate the submodule.
+They are represented by lists of vectors
+@ifset singularmanual 
+(vector data type is the same as in @sc{Singular} @pxref{vector})
+@end ifset 
+@ifclear singularmanual 
+(vector data type is the same as in @sc{Singular})
+@end ifclear 
+ which generate the submodule.
 Like vectors they
 can only be defined or accessed with respect to a basering.
+
 If @math{M} is a submodule of
 @ifinfo
 R^n,
@@ -618,7 +258,7 @@ R^n,
 @tex
 $R^n$,
 @end tex
-@math{R} the basering, generated by vectors
+ where @math{R} is the basering, generated by vectors
 @ifinfo
 v_1, @dots{}, v_k, then v_1, @dots{}, v_k
 @end ifinfo
@@ -633,9 +273,9 @@ R^n/M
 $R^n/M$
 @end tex
 between the canonical generators @code{gen(1)},@dots{},@code{gen(n)}.
-Hence any finitely generated @math{R}-module can be represented in @sc{Singular}
+Hence any finitely generated @math{R}-module can be represented in @sc{Plural}
 by its module of relations. The assignments
-@code{module M=v1,...,vk; matrix A=M;}
+@code{module M=v1,...,vk; matrix A=M;} 
 create the presentation matrix of size
 @ifinfo
 n x k
@@ -643,14 +283,14 @@ n x k
 @tex
 n$\times$k
 @end tex
-for
+ for
 @ifinfo
 R^n/M,
 @end ifinfo
 @tex
 R$^n$/M,
 @end tex
-i.e., the columns of A are the vectors
+ i.e., the columns of A are the vectors
 @ifinfo
 v_1, @dots{}, v_k
 @end ifinfo
@@ -660,24 +300,22 @@ $v_1, \ldots, v_k$
 which generate M 
 
 @menu
-* module declarations::
-* module expressions::
-* module operations::
-* module related functions::
+* module declarations@value{PSUFFIX}::
+* module expressions@value{PSUFFIX}::
+* module operations@value{PSUFFIX}::
+* module related functions@value{PSUFFIX}::
 @end menu
 
 @c ------------------------------
 
-@node module declarations, module expressions, module, module
-@subsection module declarations
-@cindex module declarations
+@node module declarations@value{PSUFFIX}, module expressions@value{PSUFFIX}, module@value{PSUFFIX}, module@value{PSUFFIX}
+@subsection module declarations@value{PSUFFIX}
+@cindex module declarations@value{PSUFFIX}
 
 @table @strong
 @item Syntax:
 @code{module} name @code{=} list_of_vector_expressions which are interpreted as
-left generators of  the module. For two-sided modules see @ref{twostd}. 
-
- @code{;}
+left generators of  the module. @code{;}
 @*@code{module} name @code{=} module_expression @code{;}
 
 @item Purpose:
@@ -690,6 +328,11 @@ defines a left  module.
 @smallexample
 @c example
   ring r=0,(x,y,z),(c,dp);
+  matrix D[3][3];
+  D[1,2]=-z;
+  D[1,3]=y;
+  D[2,3]=x;
+  system("PLURAL",1,D); 
   vector s1 = [x2,y3,z];
   vector s2 = [xy,1,0];
   vector s3 = [0,x2-y2,z];
@@ -704,9 +347,9 @@ defines a left  module.
 
 @c ------------------------------
 
-@node module expressions, module operations, module declarations, module
-@subsection module expressions
-@cindex module expressions
+@node module expressions@value{PSUFFIX}, module operations@value{PSUFFIX}, module declarations@value{PSUFFIX}, module@value{PSUFFIX}
+@subsection module expressions@value{PSUFFIX}
+@cindex module expressions@value{PSUFFIX}
 
 A module expression is:
 @enumerate
@@ -730,9 +373,9 @@ a type cast to module
 @c @end example
 
 @c ------------------------------
-@node module operations, module related functions, module expressions, module
-@subsection module operations
-@cindex module operations
+@node module operations@value{PSUFFIX}, module related functions@value{PSUFFIX}, module expressions@value{PSUFFIX}, module@value{PSUFFIX}
+@subsection module operations@value{PSUFFIX}
+@cindex module operations@value{PSUFFIX}
 
 @table @asis
 @item @code{+}
@@ -743,40 +386,35 @@ multiplication with ideal or poly, but not `module` * `module`
 
 @item module_expression @code{[} int_expression @code{,} int_expression @code{]}
 is a module entry, where the first index indicates the row and
-the second the column
-
-@item module_expressions @code{[} int_expression @code{]}
-is a vector, where the index indicates the column
+the
+????????
 @end table
 
-@*@strong{Example:}
-@smallexample
-@c example
-  ring r=0,(x,y,z),dp;
-  module m=[x,y],[0,0,z];
-  print(m*(x+y));
-@c example
-@end smallexample
 
 @c ------------------------------
+@node module related functions@value{PSUFFIX}, poly declarations@value{PSUFFIX}, module operations@value{PSUFFIX}, module@value{PSUFFIX}
+@subsection module related functions@value{PSUFFIX}
+@cindex module related functions@value{PSUFFIX}
 
-@node module related functions, poly declarations, module operations, module
-@subsection module related functions
-@cindex module related functions
+
+
+
+
+
 
 @c ---------------------------------------
 
 @ifset namespaces
-@node poly, qring, module, Data types
+@node poly@value{PSUFFIX}, qring@value{PSUFFIX}, module@value{PSUFFIX}, Data types@value{PSUFFIX}
 @end ifset
 @ifclear namespaces
-@node poly, qring, module, Data types
+@node poly@value{PSUFFIX}, qring@value{PSUFFIX}, module@value{PSUFFIX}, Data types@value{PSUFFIX}
 @end ifclear
-@section poly
-@cindex poly
+@section poly@value{PSUFFIX}
+@cindex poly@value{PSUFFIX}
 
 Polynomials are the basic data for all main algorithms in
-@code{@sc{Singular}}. They consist of finitely many terms
+@code{@sc{Plural}}. They consist of finitely many terms
 (coefficient*power product) which are combined by the usual polynomial
 operations 
 @c (see @ref{poly expressions}).
@@ -792,17 +430,17 @@ type, the names of the indeterminants and the monomial ordering.
 @end smallexample
 
 @menu
-* poly declarations::
-* poly expressions::
-* poly operations::
-* poly related functions::
+* poly declarations@value{PSUFFIX}::
+* poly expressions@value{PSUFFIX}::
+* poly operations@value{PSUFFIX}::
+* poly related functions@value{PSUFFIX}::
 @end menu
 
 @c ------------------------------
 
-@node poly declarations, poly expressions, module related functions, module
-@subsection poly declarations
-@cindex poly declarations
+@node poly declarations@value{PSUFFIX}, poly expressions@value{PSUFFIX}, module related functions@value{PSUFFIX}, poly@value{PSUFFIX}
+@subsection poly declarations@value{PSUFFIX}
+@cindex poly declarations@value{PSUFFIX}
 
 @table @strong
 @item Syntax:
@@ -812,12 +450,13 @@ type, the names of the indeterminants and the monomial ordering.
 defines a polynomial.
 
 @item Default:
-0
+0 
 
 @item Example:
 @smallexample
 @c example
   ring r = 32003,(x,y,z),dp;
+  system("PLURAL",-1,1);  
   poly s1  = x3y2+151x5y+186xy6+169y9;
   poly s2  = 1*x^2*y^2*z^2+3z8;
   poly s3  = 5/4x4y2+4/5*x*y^5+2x2y2z3+y7+11x10;
@@ -834,9 +473,9 @@ defines a polynomial.
 
 @c ----------------------------
 
-@node poly expressions, poly operations, poly declarations, module
-@subsection poly expressions
-@cindex poly expressions
+@node poly expressions@value{PSUFFIX}, poly operations@value{PSUFFIX}, poly declarations@value{PSUFFIX}, poly@value{PSUFFIX}
+@subsection poly expressions@value{PSUFFIX}
+@cindex poly expressions@value{PSUFFIX}
 
 A poly expression is (optional parts in square brackets):
 @enumerate
@@ -845,19 +484,16 @@ a monomial (there are NO spaces allowed inside a monomial)
 @smallexample
   [coefficient] ring_variable [ exponent] [ring_variable [exponent] @dots{}]
 @end smallexample
-
 @c monomials which contain an indexed ring variable
 @c must be built from @code{ring_variable} and @code{coefficient}
 @c with the operations @code{*} and @code{^}
- @item
+@item
 an identifier of type poly
 @item
 a function returning poly
 @item
 poly expressions combined by the arithmetic operations
-@code{+}, @code{-}, @code{*}, @code{/}, or @code{^}
-@item
-
+@code{+}, @code{-}, @code{*}, @code{/}, or @code{^}.
 @item
 a type cast to poly
 @end enumerate
@@ -884,9 +520,7 @@ a type cast to poly
 @c example
 @end smallexample
 
-@*@strong{Remark:} in the non-commutative case: 
-y*x  is valid poly expression, but not equal to yx which will be
-interpreted as commutative expression. 
+@*@strong{Remark:} In the non-commutative case see @ref{PLURAL conventions}.
  
 @*@strong{Example:}
 @smallexample
@@ -904,9 +538,9 @@ y*x;     // correct input
 
 @c ------------------------------
 
-@node poly operations, poly related functions, poly expressions, module
-@subsection poly operations
-@cindex poly operations
+@node poly operations@value{PSUFFIX}, poly related functions@value{PSUFFIX}, poly expressions@value{PSUFFIX}, poly@value{PSUFFIX}
+@subsection poly operations@value{PSUFFIX}
+@cindex poly operations@value{PSUFFIX}
 
 @table @asis
 @item @code{+}
@@ -934,32 +568,37 @@ the monomial at the indicated place w.r.t.@: the monomial ordering
 
 @c ------------------------------
 
-@node poly related functions,  , poly operations, module
-@subsection poly related functions
-@cindex poly related functions
+@node poly related functions@value{PSUFFIX},  , poly operations@value{PSUFFIX}, poly@value{PSUFFIX}
+@subsection poly related functions@value{PSUFFIX}
+@cindex poly related functions@value{PSUFFIX}
 
 
 @c ---------------------------------------
 
-@node qring, resolution, module, Data types
-@section qring
-@cindex qring
+@node qring@value{PSUFFIX}, resolution@value{PSUFFIX}, poly@value{PSUFFIX}, Data types@value{PSUFFIX}
+@section qring@value{PSUFFIX}
+@cindex qring@value{PSUFFIX}
 
 @sc{Plural} offers the opportunity to calculate in 
 factor rings  modulo a two-sided ideal.  The ideal has to be given
 as a standard basis.  For a detailed description of the concept
-of rings and quotient rings see ???
-@c @ref{Rings and orderings}.
+of rings and quotient rings see
+@ifset singularmanual 
+@ref{Rings and orderings}.
+@end ifset
+@ifclear singularmanual
+in @sc{Singular} manual section Rings and orderings.
+@end ifclear
 
 @menu
-* qring declaration::
+* qring declaration@value{PSUFFIX}::
 @end menu
 
 @c ---------------------------------------
 
-@node qring declaration,  , qring, qring
-@subsection qring declaration
-@cindex qring declaration
+@node qring declaration@value{PSUFFIX},  , qring@value{PSUFFIX}, qring@value{PSUFFIX}
+@subsection qring declaration@value{PSUFFIX}
+@cindex qring declaration@value{PSUFFIX}
 
 @c ------------------------------------------------------------
 @c   This piece of text exists also in the file general.doc,
@@ -970,9 +609,9 @@ of rings and quotient rings see ???
 
 @c ---------------------------------------
 
-@node resolution, ring, qring, Data types
-@section resolution
-@cindex resolution
+@node resolution@value{PSUFFIX}, ring@value{PSUFFIX}, qring@value{PSUFFIX}, Data types@value{PSUFFIX}
+@section resolution@value{PSUFFIX}
+@cindex resolution@value{PSUFFIX}
 
 The resolution type is intended as an intermediate representation which
 internally retains additional information obtained during computation of
@@ -987,16 +626,16 @@ which also completes computations and may therefore take time,
 implicitly a cast to a list).
 
 @menu
-* resolution declarations::
-* resolution expressions::
-* resolution related functions::
+* resolution declarations@value{PSUFFIX}::
+* resolution expressions@value{PSUFFIX}::
+* resolution related functions@value{PSUFFIX}::
 @end menu
 
 @c ---------------------------------------
 
-@node resolution declarations, resolution expressions, resolution, resolution
-@subsection resolution declarations
-@cindex resolution declarations
+@node resolution declarations@value{PSUFFIX}, resolution expressions@value{PSUFFIX}, resolution@value{PSUFFIX}, resolution@value{PSUFFIX}
+@subsection resolution declarations@value{PSUFFIX}
+@cindex resolution declarations@value{PSUFFIX}
 
 @table @strong
 @item Syntax:
@@ -1024,9 +663,9 @@ none
 
 @c ------------------------------
 
-@node resolution expressions, resolution related functions, resolution declarations, resolution
-@subsection resolution expressions
-@cindex resolution expressions
+@node resolution expressions@value{PSUFFIX}, resolution related functions@value{PSUFFIX}, resolution declarations@value{PSUFFIX}, resolution@value{PSUFFIX}
+@subsection resolution expressions@value{PSUFFIX}
+@cindex resolution expressions@value{PSUFFIX}
 
 A resolution expression is:
 @enumerate
@@ -1041,32 +680,32 @@ a type cast to resolution from a list of ideals, resp.@: modules..
 
 @c ------------------------------
 
-@node resolution related functions,  , resolution expressions, resolution
-@subsection resolution related functions
-@cindex resolution related functions
+@node resolution related functions@value{PSUFFIX},  , resolution expressions@value{PSUFFIX}, resolution@value{PSUFFIX}
+@subsection resolution related functions@value{PSUFFIX}
+@cindex resolution related functions@value{PSUFFIX}
 
 
 @c ---------------------------------------
 
-@node ring, vector, resolution, Data types
-@section ring
-@cindex ring
+@node ring@value{PSUFFIX},  , resolution@value{PSUFFIX}, Data types@value{PSUFFIX}
+@section ring@value{PSUFFIX}
+@cindex ring@value{PSUFFIX}
 
 Rings are used to describe properties of polynomials, ideals etc.
-Almost all computations in @sc{Singular} require a basering.
+Almost all computations in @sc{Plural} require a basering.
 For a detailed description of the concept of rings see
 
 @menu
-* ring declarations::
-* ring related functions::
-* ring operations::
+* ring declarations@value{PSUFFIX}::
+* ring related functions@value{PSUFFIX}::
+* ring operations@value{PSUFFIX}::
 @end menu
 
 @c ---------------------------------------
 
-@node ring declarations, ring related functions, ring, ring
-@subsection ring declarations
-@cindex ring declarations
+@node ring declarations@value{PSUFFIX}, ring operations@value{PSUFFIX}, ring@value{PSUFFIX}, ring@value{PSUFFIX}
+@subsection ring declarations@value{PSUFFIX}
+@cindex ring declarations@value{PSUFFIX}
 
 @table @strong
 @item Syntax:
@@ -1119,18 +758,13 @@ If one of coefficient_field, names_of_ring_variables, and ordering
 consists of only one entry, the parentheses around this entry may be
 omitted.
 
-@c ---------------------------------------
-
-@node ring related functions, ring operations, ring declarations, ring
-@subsection ring related functions
-@cindex ring related functions
 
 
 @c ---------------------------------------
 
-@node ring operations,  , ring related functions, ring
-@subsection ring operations
-@cindex ring operations
+@node ring operations@value{PSUFFIX}, ring related functions@value{PSUFFIX}, ring declarations@value{PSUFFIX}, ring@value{PSUFFIX}
+@subsection ring operations@value{PSUFFIX}
+@cindex ring operations@value{PSUFFIX}
 @table @asis
 @item @code{+}
 construct a new ring @math{k[X,Y]} from @math{k_1[X]}  and @math{k_2[Y]}.
@@ -1150,183 +784,24 @@ following guide lines into consideration:
 @smallexample
 @c example
   ring R1=0,(x,y),dp;
-  ring R2=32ple003,(a,b),dp;
+  ring R2=32003,(a,b),dp;
   def R=R1+R2;
-  R;
+  R
+ 
+         ==> //   characteristic : 32003
+         ==> //   number of vars : 4
+         ==> //        block   1 : ordering dp
+         ==> //                  : names    x y 
+         ==> //        block   2 : ordering dp
+         ==> //                  : names    a b 
+         ==> //        block   3 : ordering C
+
+
 @c example
 @end smallexample
-
 
 @c ---------------------------------------
-@node vector,  ,ring , Data types
-@section vector
-@cindex vector
 
-Vectors are elements of a free module over the basering with basis
-@code{gen(1)}, @code{gen(2)}, @dots{} .
-Each vector belongs to a free module of rank equal to the biggest index
-of a generator with non-zero coefficient. Since generators with zero
-coefficients need not be written any vector may be considered
-also as an element of a free module of higher rank.
-Like polynomials they
-can only be defined or accessed with respect to the basering.
-(E.g., if @code{f} and @code{g} are polynomials then
-@code{f*gen(1)+g*gen(3)+gen(4)} may also be written as @code{[f,0,g,1]}
-or as @code{[f,0,g,1,0]}.) Note that the elements of a vector have to be
-surrounded by square brackets (@code{[}  , @code{]})
-@c(cf. @ref{Representation of mathematical objects}).
-
-@menu
-* vector declarations::
-* vector expressions::
-* vector operations::
-* vector related functions::
-@end menu
-
-@c ------------------------------
-@node vector declarations, vector expressions, vector, vector
-@subsection vector declarations
-@cindex vector declarations
-
-@table @strong
-@item Syntax:
-@code{vector} name @code{=} vector_expression @code{;}
-
-@item Purpose:
-defines a vector of polynomials (an element of a free module).
-
-@item Default:
-[0]
-
-@item Example:
-@smallexample
-@c example
-  ring r=0,(x,y,z),(c,dp);
-  poly s1 = x2;
-  poly s2 = y3;
-  poly s3 = z;
-  vector v = [s1, s2-s1, s3-s1]+ s1*gen(5);
-  // v is a vector in the free module of rank 5
-  v;
-@c example
-@end smallexample
-@end table
-
-@c ------------------------------
-@node vector expressions, vector operations, vector declarations, vector
-@subsection vector expressions
-@cindex vector expressions
-
-A vector expression is:
-@enumerate
-@item
-an identifier of type vector
-@item
-a function returning vector
-@item
-a poly expression (via the canonical embedding @code{p} @expansion{} @code{p*gen(1)})
-@item
-vector expressions combined by the arithmetic operations @code{+} or
-@code{-}
-@item
-a poly expression and a vector expression combined by the arithmetic
-operation @code{*}
-@item
-a type cast to vector using the brackets @code{[} , @code{]}
-@end enumerate
-
-@*@strong{Example:}
-@smallexample
-@c example
-  // ordering gives priority to components:
-  ring rr=0,(x,y,z),(c,dp);
-  vector v=[x2+y3,2,0,x*y]+gen(6)*x6;
-  v;
-  vector w=[z3-x,3y];
-  v-w;
-  v*(z+x);
-@c example
-@end smallexample
-
-@c ref
-See
-@ref{ring};
-@c ref
-
-@c ------------------------------
-@node vector operations, vector related functions, vector expressions, vector
-@subsection vector operations
-@cindex vector operations
-
-@table @asis
-@item @code{+}
-addition
-
-@item @code{-}
-negation or subtraction
-
-@item @code{/}
-division by a monomial, not divisible terms yield 0
-
-@item @code{<}, @code{<=}, @code{>}, @code{>=}, @code{==}, @code{<>}
-comparison of leading terms w.r.t. monomial ordering
-
-@item vector_expression @code{[} int_expressions @code{]}
-is a vector entry; the index 1 gives the first entry.
-@end table
-
-@*@strong{Example:}
-@smallexample
-@c example
-  ring R=0,(x,y),(c,dp);
-  [x,y]-[1,x];
-  [1,2,x,4][3];
-@c example
-@end smallexample
-
-
-@c ------------------------------
-@node vector related functions,  , vector operations, vector
-@subsection vector related functions
-@cindex vector related functions
-
-@c @table @code
-@c @item cleardenom
-@c quotient of a vector by its content (see @ref{cleardenom})
-@c @item coeffs
-@c matrix of coefficients (see @ref{coeffs})
-@c @item deg
-@c degree (see @ref{deg})
-@c @item diff
-@c partial derivative (see @ref{diff})
-@c @item gen
-@c i-th generator (see @ref{gen})
-@c @item homog
-@c homogenization (see @ref{homog})
-@c @item jet
-@c k-jet: monomials with degree smaller k+1 (see @ref{jet})
-@c @item lead
-@c leading term (see @ref{lead})
-@c @item leadcoef
-@c leading coefficient (see @ref{leadcoef})
-@c @item leadexp
-@c the exponent vector of the leading monomial (see @ref{leadexp})
-@c @item leadmonom
-@c leading monomial (see @ref{leadmonom})
-@c @item nrows
-@c number of rows (see @ref{nrows})
-@c @item ord
-@c degree of the leading monomial (see @ref{ord})
-@c @item reduce
-@c normal form with respect to a standard base (see @ref{reduce})
-@c @item simplify
-@c normalize a vector (see @ref{simplify})
-@c @item size
-@c number of monomials (see @ref{size})
-@c @item subst
-@c substitute a ring variable (see @ref{subst})
-@c @end table
-
-@c @*@strong{Example:}
-@c @example
-@c @end example
+@node ring related functions@value{PSUFFIX},  , ring operations@value{PSUFFIX}, ring@value{PSUFFIX}
+@subsection ring related functions@value{PSUFFIX}
+@cindex ring related functions@value{PSUFFIX}

@@ -1,5 +1,5 @@
-@comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.4 2003-02-06 19:37:13 levandov Exp $
+  @comment -*-texinfo-*-
+@comment $Id: plureference.doc,v 1.5 2003-03-06 11:42:57 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -13,27 +13,27 @@
 \input texinfo.tex
 @setfilename plureference.info
 @settitele PLURAL
-@node Top, Functions and system variables
+@node Top, Functions and system variables@value{PSUFFIX}, (dir), (dir)
 @menu
-* Functions and system variables::
+* Functions and system variables@value{PSUFFIX}::
 @end menu
-@node  Functions and system variables,Mathematical background , Data types, Top
-@chapter Functions and system variables
+@node  Functions and system variables@value{PSUFFIX},  , Top, Top
+@chapter Functions and system variables@value{PSUFFIX}
 %**end
 @end ignore
 
 
------------------------------
+@c -----------------------------
 @menu
-* Functions::
-* Control structures::
-* System variables::
+* Functions@value{PSUFFIX}::
+* Control structures@value{PSUFFIX}::
+* System variables@value{PSUFFIX}::
 @end menu
 
 @c ---------------------------------------
-@node Functions, Control structures, Functions and system variables, Functions and system variables
-@section Functions
-@cindex Functions
+@node Functions@value{PSUFFIX}, Control structures@value{PSUFFIX}, Functions and system variables@value{PSUFFIX}, Functions and system variables@value{PSUFFIX}
+@section Functions@value{PSUFFIX}
+@cindex Functions@value{PSUFFIX}
 
 This section gives a complete reference of all functions, commands and
 special variables of the @sc{Plural} kernel (i.e., all built-in
@@ -41,28 +41,29 @@ commands).
 
 The general syntax of a function is
 @format
-                   [target =] function_name (<arguments>);
++                   [target =] function_name (<arguments>);
 @end format
 
 
 @menu
 * bracket::
-* minres::
-* mres::
-* nres::
-* option::
+* memory@value{PSUFFIX}::
+* minres@value{PSUFFIX}::
+* mres@value{PSUFFIX}::
+* nres@value{PSUFFIX}::
+* option@value{PSUFFIX}::
 * plural::
-* reduce::
-* res::
-* std::
-* syz:: 
+* reduce@value{PSUFFIX}::
+* res@value{PSUFFIX}::
+* std@value{PSUFFIX}::
+* syz@value{PSUFFIX}:: 
 * twostd::
 @end menu
 
 
 
 @c -----------------------------
-@node bracket,plural,,PLURAL functions
+@node bracket, memory@value{PSUFFIX}, Functions@value{PSUFFIX}, Functions@value{PSUFFIX}
 @subsection bracket
 @cindex bracket
 
@@ -102,9 +103,9 @@ system("bracket",p,q);
 
 
 @c ---------------------------------------
-@node  memory, minres,bracket, Functions
-@subsection memory
-@cindex memory
+@node  memory@value{PSUFFIX}, minres@value{PSUFFIX}, bracket, Functions@value{PSUFFIX}
+@subsection memory@value{PSUFFIX}
+@cindex memory@value{PSUFFIX}
 @cindex memory managment
 @table @code
 @item @strong{Syntax:}
@@ -122,8 +123,10 @@ operating system during the current @sc{Singular} session.
 @end itemize
 @item @strong{Note:}
 To monitor the memory usage during ongoing computations the option
-@code{mem} should be set (using the command @code{option(mem);}, see
-also @ref{option}).
+@code{mem} should be set (using the command @code{option(mem);},
+@ifset singularmanual
+see also @ref{option}).
+@end ifset
 @item @strong{Example:}
 @smallexample
 @c example
@@ -151,9 +154,9 @@ also @ref{option}).
 
 
 c ---------------------------------------
-@node  minres, mres, memory, Functions
-@subsection minres
-@cindex minres
+@node  minres@value{PSUFFIX}, mres@value{PSUFFIX}, memory@value{PSUFFIX}, Functions@value{PSUFFIX}
+@subsection minres@value{PSUFFIX}
+@cindex minres@value{PSUFFIX}
 
 @table @code
 @item @strong{Syntax:}
@@ -169,17 +172,24 @@ minimizes a free resolution of an ideal or module
 given by the list_expression, resp.@: resolution_expression.
 @item @strong{Example:}
 
-@c @smallexample
-@c @c example
-@c   ring r1=32003,(x,y),dp;
-@c   ideal i=x5+xy4,x3+x2y+xy2+y3;
-@c   resolution rs=lres(i,0);
-@c   rs;
-@c   list(rs);
-@c   minres(rs);
-@c   list(rs);
-@c @c example
-@c @end smallexample
+@smallexample
+@c example
+ ring A=0,(x,y,z),Dp;
+matrix d[3][3];
+d[1,2]=-z;
+d[1,3]=2x;
+d[2,3]=-2y;
+system("PLURAL",1,d);
+ideal i=x,y,z;
+i=std(i);
+resolution F=nres(i,0);
+F;
+resolution MF=minres(F);
+MF;
+print(MF);
+
+@c example
+@end smallexample
 @end table
 
 @c @c ref
@@ -193,9 +203,9 @@ given by the list_expression, resp.@: resolution_expression.
 
 
 @c ---------------------------------------
-@node  mres, nres, minres, Functions
-@subsection mres
-@cindex mres
+@node  mres@value{PSUFFIX}, nres@value{PSUFFIX}, minres@value{PSUFFIX}, Functions@value{PSUFFIX}
+@subsection mres@value{PSUFFIX}
+@cindex mres@value{PSUFFIX}
 @table @code
 @item @strong{Syntax:}
 @code{mres (} ideal_expression@code{,} int_expression @code{)}
@@ -204,7 +214,7 @@ given by the list_expression, resp.@: resolution_expression.
 resolution
 @item @strong{Purpose:}
 computes a minimal free resolution of an ideal or module M with the
-standard basis method. More precisely, let A=@code{matrix}(M), then @code{mres}
+Groebner basis method. More precisely, let A=@code{matrix}(M), then @code{mres}
 computes a free resolution of
 @ifinfo
 coker(A)=F0/M
@@ -226,8 +236,8 @@ $A_1$
 @ifinfo
 A1
 @end ifinfo
-are a minimal set of generators
-of M if the basering is local or if M is homogeneous.
+are a (possibly) minimal set of generators
+of M. 
 If the int expression k is not zero then the computation stops after k steps
 and returns a list of modules
 @tex
@@ -254,33 +264,36 @@ is 0 (if the basering is not a qring).
 Accessing single elements of a resolution may require that some partial
 computations have to be finished and may therefore take some time.
 @item @strong{Example:}
-@c @smallexample
-@c @c example
-@c   ring r=31991,(t,x,y,z,w),ls;
-@c   ideal M=t2x2+tx2y+x2yz,t2y2+ty2z+y2zw,
-@c           t2z2+tz2w+xz2w,t2w2+txw2+xyw2;
-@c   resolution L=mres(M,0);
-@c   L;
-@c   // projective dimension of M is 5
-@c @c example
-@c @end smallexample
+@smallexample
+@c example
+ring A=0,(x,y,z),Dp;
+matrix d[3][3];
+d[1,2]=-z;
+d[1,3]=2x;
+d[2,3]=-2y;
+system("PLURAL",1,d);
+ideal i=x,y,z;
+i=std(i);
+resolution M=mres(i,0);
+M;
+@c example
+@end smallexample
 @end table
 @c @c ref
 @c See
-@c @ref{ideal};
-@c @ref{hres};
-@c @ref{lres};
-@c @ref{module};
-@c @ref{res};
-@c @ref{sres}.
+@c @ref{ideal@value{PSUFFIX}};
+@c @ref{minres@value{PSUFFIX}};
+@c @ref{nres@value{PSUFFIX}};
+@c @ref{module@value{PSUFFIX}};
+@c @ref{res@value{PSUFFIX}};
 @c @c ref
 
 
 
 
-@node  nres, option, mres, Functions
-@subsection nres
-@cindex nres
+@node  nres@value{PSUFFIX}, option@value{PSUFFIX}, mres@value{PSUFFIX}, Functions@value{PSUFFIX}
+@subsection nres@value{PSUFFIX}
+@cindex nres@value{PSUFFIX}
 @table @code
 @item @strong{Syntax:}
 @code{nres (} ideal_expression@code{,} int_expression @code{)}
@@ -288,78 +301,86 @@ computations have to be finished and may therefore take some time.
 @item @strong{Type:}
 resolution
 @item @strong{Purpose:}
-computes a free resolution of an ideal or module M which is minimized from
-the second module on (by the standard basis method).
+@c computes a free resolution of an ideal or module M which is minimized from
+@c the second module on (by the standard basis method).
 
-More precisely, let
-@tex
-$A_1$=matrix(M),
-@end tex
-@ifinfo
-A1=matrix(M),
-@end ifinfo
-then @code{nres} computes a free resolution of
-@ifinfo
-coker(A1)=F0/M
-@format
-                    A2       A1
-      ... ----> F2 ----> F1 ----> F0 --> F0/M --> 0.
-@end format
-@end ifinfo
-@tex
-$coker(A_1)=F_0/M$
-$$...\longrightarrow F_2 \buildrel{A_2}\over{\longrightarrow} F_1 \buildrel{A_1}\over{\longrightarrow} F_0\longrightarrow F_0/M\longrightarrow 0,$$
-@end tex
-@*where the columns of the matrix
-@tex
-$A_1$
-@end tex
-@ifinfo
-A1
-@end ifinfo
-are the given set of generators of M.
-If the int expression k is not zero then the computation stops after k steps
-and returns a list of modules
-@tex
-$M_i={\tt module}(A_i)$, i=1..k.
-@end tex
-@ifinfo
-Mi=module(Ai), i=1..k.
-@end ifinfo
-@*@code{nres(M,0)} returns a list of n modules where n is the number of
-variables of the basering.
-Let @code{list L=nres(M,0);} then @code{L[1]=M} is identical to the input,
-@code{L[2]} is a minimal set of generators for the first syzygy
-module of  @code{L[1]}, etc.
-@ifinfo
-(L[i]=M_i
-@end ifinfo
-@tex
-(${\tt L[i]}=M_i$
-@end tex
-in the notations from above).
-@item @strong{Example:}
-@c @smallexample
-@c @c example
-@c   ring r=31991,(t,x,y,z,w),ls;
-@c   ideal M=t2x2+tx2y+x2yz,t2y2+ty2z+y2zw,
-@c           t2z2+tz2w+xz2w,t2w2+txw2+xyw2;
-@c   resolution L=nres(M,0);
-@c   L;
-@c @c example
-@c @end smallexample
+@c More precisely, let
+@c @tex
+@c $A_1$=matrix(M),
+@c @end tex
+@c @ifinfo
+@c A1=matrix(M),
+@c @end ifinfo
+@c then @code{nres} computes a free resolution of
+@c @ifinfo
+@c coker(A1)=F0/M
+@c @format
+@c                     A2       A1
+@c       ... ----> F2 ----> F1 ----> F0 --> F0/M --> 0.
+@c @end format
+@c @end ifinfo
+@c @tex
+@c $coker(A_1)=F_0/M$
+@c $$...\longrightarrow F_2 \buildrel{A_2}\over{\longrightarrow} F_1 \buildrel{A_1}\over{\longrightarrow} F_0\longrightarrow F_0/M\longrightarrow 0,$$
+@c @end tex
+@c @*where the columns of the matrix
+@c @tex
+@c $A_1$
+@c @end tex
+@c @ifinfo
+@c A1
+@c @end ifinfo
+@c are the given set of generators of M.
+@c If the int expression k is not zero then the computation stops after k steps
+@c and returns a list of modules
+@c @tex
+@c $M_i={\tt module}(A_i)$, i=1..k.
+@c @end tex
+@c @ifinfo
+@c Mi=module(Ai), i=1..k.
+@c @end ifinfo
+@c @*@code{nres(M,0)} returns a list of n modules where n is the number of
+@c variables of the basering.
+@c Let @code{list L=nres(M,0);} then @code{L[1]=M} is identical to the input,
+@c @code{L[2]} is a minimal set of generators for the first syzygy
+@c module of  @code{L[1]}, etc.
+@c @ifinfo
+@c (L[i]=M_i
+@c @end ifinfo
+@c @tex
+@c (${\tt L[i]}=M_i$
+@c @end tex
+@c in the notations from above).
+@c @item @strong{Example:}
+@smallexample
+@c example
+ring A=0,(x,y,z),Dp;
+matrix d[3][3];
+d[1,2]=-z;
+d[1,3]=2x;
+d[2,3]=-2y;
+system("PLURAL",1,d);
+ideal i=x,y,z;
+i=std(i);
+resolution F=nres(i,0);
+F;
+for (int a=1;a<=size(list(F));a++)
+{print(F[a]);}
+print(betti(F),"betti"); 
+@c example
+@end smallexample
 @end table
-@c @c ref
-@c See
-@c @ref{ideal};
-@c @ref{lres};
-@c @ref{hres};
-@c @ref{module};
-@c @ref{mres};
-@c @ref{res};
-@c @ref{resolution};
-@c @ref{sres}.
-@c @c ref
+@c @c @c ref
+@c @c See
+@c @c @ref{ideal};
+@c @c @ref{lres};
+@c @c @ref{hres};
+@c @c @ref{module};
+@c @c @ref{mres};
+@c @c @ref{res};
+@c @c @ref{resolution};
+@c @c @ref{sres}.
+@c @c @c ref
 
 
 
@@ -367,9 +388,9 @@ in the notations from above).
 
 
 @c ---------------------------------------
-@node option, nres, plural , Functions
-@subsection option
-@cindex option
+@node option@value{PSUFFIX}, plural, nres@value{PSUFFIX}, Functions@value{PSUFFIX}
+@subsection option@value{PSUFFIX}
+@cindex option@value{PSUFFIX}
 @table @code
 @item @strong{Syntax:}
 @code{option ()}
@@ -407,6 +428,7 @@ The following options are used to manipulate the behavior of
 computations and act like boolean switches. Use the prefix @code{no} to
 disable an option. Notice that some options are ring dependent and reset
 to their default values on a change of the current basering.
+
 @table @asis
 @c ---------
 @item @code{prot}
@@ -423,12 +445,12 @@ progress during the following computations:
 @c ---------
 @item @code{redSB}
 @cindex redSB, option
-@cindex reduced standard basis
-computes a reduced standard basis in any standard basis computation.
+@cindex reduced standard basis,redused Groebner basis
+computes a reduced Groebner basis in any standard basis computation.
 @c ---------
 @item @code{redTail}
 @cindex redTail, option
-reduction of the tails of polynomials during standard basis
+reduction of the tails of polynomials during Groebner basis
 computations. This option is ring dependent. By default, it is set for
 rings with global degree orderings and not set for all other rings.
 @c ---------
@@ -445,7 +467,9 @@ The last set of options controls the output of @sc{Plural}:
 @table @asis
 @item @code{mem}
 @cindex mem, option
+@ifset  singularmanual 
 shows memory usage in square brackets (see @ref{memory}).
+@end ifset
 
 @c @smallexample
 @c @c example
@@ -486,6 +510,8 @@ shows memory usage in square brackets (see @ref{memory}).
 @item @tab @code{syz} @tab @tab all characters: like the output of @code{std}
 @end multitable
 
+@end table
+
 @c @c ref
 @c See
 @c @ref{std}.
@@ -499,7 +525,7 @@ shows memory usage in square brackets (see @ref{memory}).
 
 
 @c -----------------------------
-@node plural, twostd, bracket, PLURAL functions
+@node plural, reduce@value{PSUFFIX}, option@value{PSUFFIX}, Functions@value{PSUFFIX}
 @subsection plural
 @cindex plural
 
@@ -514,6 +540,12 @@ shows memory usage in square brackets (see @ref{memory}).
 Based on the given ring @code{r}, say, with "k" variables, strictly upper
 triangular matrices with numbers @code{(C)} from the field of @code{r}
 and polynomials from @code{(D)}.
+
+@item @strong{Remark:}
+At present, we do not perform checks of leading monomial condition
+and non-degeneracy conditions (@pxref{G-algebras}), while setting an algebra. 
+
+
 
 @item @strong{Example:}
 @smallexample
@@ -565,9 +597,9 @@ kill r4;
 
 
 @c ---------------------------------------
-@node reduce, plural , , Functions
-@subsection reduce
-@cindex reduce
+@node reduce@value{PSUFFIX}, res@value{PSUFFIX}, plural, Functions@value{PSUFFIX}
+@subsection reduce@value{PSUFFIX}
+@cindex reduce@value{PSUFFIX}
 @cindex NF
 @table @code
 @item @strong{Syntax:}
@@ -591,10 +623,11 @@ kill r4;
 @item @strong{Type:}
 the type of the first argument
 @item @strong{Purpose:}
-reduces a polynomial, vector, ideal  or module to its normal form with respect to an ideal or module represented by a standard basis.
+reduces a polynomial, vector, ideal  or module to its normal form with
+respect to an ideal or module represented by a Groebner basis.
 Returns 0 if and only if the polynomial (resp.@: vector, ideal, module)
 is an element (resp.@: subideal, submodule) of the ideal (resp.@: module).
-The result may have no meaning if the second argument is not a standard basis.
+The result may have no meaning if the second argument is not a Groebner basis.
 @*The third (optional) argument 1 of type int forces a reduction which considers only the leading term and does no tail reduction.
 @*If a second argument @code{u} of type poly or matrix is given, the first argument @code{p} is replaced by @code{p/u}.
 This works only for zero dimensional ideals (resp.@: modules) in the third argument and gives, even in a local ring, a reduced normal form which is the projection to the quotient by the ideal (resp.@: module).
@@ -605,38 +638,52 @@ The commands @code{reduce} and @code{NF} are synonymous.
 @item @strong{Example:}
 @smallexample
 @c example
-  ring r1 = 0,(z,y,x),ds;
-  poly s1=2x5y+7x2y4+3x2yz3;
-  poly s2=1x2y2z2+3z8;
-  poly s3=4xy5+2x2y2z3+11x10;
-  ideal i=s1,s2,s3;
-  ideal j=std(i);
-  reduce(3z3yx2+7y4x2+yx5+z12y2x2,j);
-  reduce(3z3yx2+7y4x2+yx5+z12y2x2,j,1);
+ring r=(0,a),(e,f,h),Dp;
+matrix d[3][3];
+d[1,2]=-h;
+d[1,3]=2e;
+d[2,3]=-2f;
+system("PLURAL",1,d);
+ideal I=e2,f2,h2-1;
+I=std(I);
+ideal J=e,h-a;
+J=std(J);
+poly z=4*e*f+h^2-2*h;
+poly C=NF(z,I);
+C;
+C=NF(z,J);
+C;
 @c example
 @end smallexample
 @end table
-@c ref
-See
-@ref{ideal};
-@ref{module};
-@ref{vector};
-@ref{std}.
-@c ref
+
+@c @c ref
+@c See
+@c @ref{ideal@value{PSUFFIX}},
+@c @ref{module@value{PSUFFIX}},
+@c @ref{std@value{PSUFFIX}}.
+
+@c @ifset singularmanual
+@c @ref{vector}.
+@c @end ifset 
+
+@c @ifclear singularmanual
+@c see also @code{vector} in @sc{Singular} manual.
+@c @end ifclear   
 
 @c -----------------------------
-@node  res, , , Functions
-@subsection res
-@cindex res
+@node  res@value{PSUFFIX}, std@value{PSUFFIX}, reduce@value{PSUFFIX}, Functions@value{PSUFFIX}
+@subsection res@value{PSUFFIX} 
+@cindex res@value{PSUFFIX}
 
 
 
 
 
 @c ---------------------------------------
-@node std,syz,res, Functions
-@subsection std
-@cindex std
+@node std@value{PSUFFIX}, syz@value{PSUFFIX}, res@value{PSUFFIX}, Functions@value{PSUFFIX}
+@subsection std@value{PSUFFIX}
+@cindex std@value{PSUFFIX}
 @table @code
 @item @strong{Syntax:}
 @code{std (} ideal_expression@code{)}
@@ -646,50 +693,53 @@ See
 @item @strong{Type:}
 ideal or module
 @item @strong{Purpose:}
-returns a standard basis of an ideal or module with respect to the
+returns a Groebner basis of an ideal or module with respect to the
 monomial ordering of the basering.
-A standard basis is a set of generators such that
+A Groebner basis is a set of generators such that
 the leading terms generate the leading ideal, resp.@: module.
 
 
 @*Use an optional second argument of type poly, resp.@: vector,
-to construct the standard basis from an already computed one (given as the
+to construct the Groebner basis from an already computed one (given as the
 first argument) and one additional generator (the second argument).
 @item @strong{Note:}
 @*To view the progress of long running computations, use
-@code{option(prot)} (see @ref{option}(prot)).
+@code{option(prot)} 
+@ifset singularmanual 
+(@pxref{option}(prot)).
+@end ifset
 
 @item @strong{Example:}
 @smallexample
 @c example
-  // local computation
-  ring r=32003,(x,y,z),ds;
-  poly s1=1x2y+151xyz10+169y21;
-  poly s2=1xz14+6x2y4+3z24;
-  poly s3=5y10z10x+2y20z10+y10z20+11x3;
-  ideal i=s1,s2,s3;
-  ideal j=std(i);
-  degree(j);
-  // Hilbert driven elimination (standard)
-  ring rhom=32003,(x,y,z,h),dp;
-  ideal i=homog(imap(r,i),h);
-  ideal j=std(i);
-  intvec iv=hilb(j,1);
-  ring rlex=32003,(x,y,z,h),lp;
-  ideal i=fetch(rhom,i);
-  ideal j=std(i,iv);
-  j=subst(j,h,1);
-  j[1];
-  // Hilbert driven elimination (ideal is quasihomogeneous)
-  intvec w=10,1,1;
-  ring whom=32003,(x,y,z),wp(w);
-  ideal i=fetch(r,i);
-  ideal j=std(i);
-  intvec iw=hilb(j,1,w);
-  ring wlex=32003,(x,y,z),lp;
-  ideal i=fetch(whom,i);
-  ideal j=std(i,iw,w);
-  j[1];
+ring R=0,(x,y,z),dp;
+matrix d[3][3];
+d[1,2]=-z;
+d[1,3]=2x;
+d[2,3]=-2y;
+system("PLURAL",1,d); //U(sl_2)
+option(prot);
+ideal I=x3,y3,z3-z;
+I=std(I);
+I;
+kill R;
+ring Rq3=(0,Q),(x,y,z),dp; //U_q(so_3)
+minpoly=Q^4+Q^2+1; // at the 3rd root of unity
+matrix C[3][3];
+matrix D[3][3];
+C[1,2]=Q2;
+C[1,3]=1/Q2;
+C[2,3]=Q2;
+D[1,2]=-Q*z;
+D[1,3]=1/Q*y;
+D[2,3]=-Q*x; 
+system("PLURAL",C,D);
+option(prot);
+ideal J=x3,y3,z3-z;
+J=std(J);
+J;
+
+
 @c example
 @end smallexample
 @end table
@@ -708,9 +758,9 @@ first argument) and one additional generator (the second argument).
 
 
 @c -------------------------------------------------
-@node syz, trace, system, Functions
-@subsection syz
-@cindex syz
+@node syz@value{PSUFFIX}, twostd, std@value{PSUFFIX}, Functions@value{PSUFFIX}
+@subsection syz@value{PSUFFIX}
+@cindex syz@value{PSUFFIX}
 @table @code
 @item @strong{Syntax:}
 @code{syz (} ideal_expression @code{)}
@@ -723,9 +773,29 @@ generators) of the ideal, resp.@: module.
 @item @strong{Example:}
 @smallexample
 @c example
-  ring R=0,(x,y),(c,dp);
-  ideal i=x,y;
-  syz(i);
+ring Rq=(0,Q),(x,y,z),dp; //U_q(so_3)
+matrix C[3][3];
+matrix D[3][3];
+C[1,2]=Q2;
+C[1,3]=1/Q2;
+C[2,3]=Q2;
+D[1,2]=-Q*z;
+D[1,3]=1/Q*y;
+D[2,3]=-Q*x; 
+system("PLURAL",C,D);
+poly Cq=Q^4*x2+y2+Q^4*z2+Q*(1-Q^4)*x*y*z;
+poly C1=x^3+x;
+poly C2=y^3+y;
+poly C3=z^3+z;
+ideal I=Cq,C1,C2,C3;
+I=std(I);
+module a=syz(I);
+print(a);
+minpoly=Q^2+1; // specialize q at the second root of unity
+ideal J=std(I);
+module aq=syz(J);
+print(aq);
+
 @c example
 @end smallexample
 @end table
@@ -745,24 +815,21 @@ generators) of the ideal, resp.@: module.
 
 
 @c ------------------------------
-@node twostd,,plural ,PLURAL functions
+@node twostd,  , syz@value{PSUFFIX}, Functions@value{PSUFFIX}
 @subsection twostd
 @cindex twostd
 
 @table @code
 @item @strong{Syntax:}
-@code{system (}"twostd", ideal_expression@code{)}; 
+  @code{system (}"twostd", ideal_expression@code{)}; 
 @item @strong{Type:}
 ideal or module
 @item @strong{Purpose:}
 returns a left Groebner basis of the two-sided ideal ,
 generated by the input, treated as a set of two-sided generators.
 @ifset singularmanual
-@xref{std}
+see @ref{std}
 @end ifset
-@ifclear singularmanual
-@xref{std,,std,singular.hlp,Singular Manual}
-@end ifclear
 
 @item @strong{Example:}
 @smallexample
@@ -795,1077 +862,27 @@ There are algebras with no two-sided ideals (like Weyl algebras).
 @end table
 
 @c ---------------------------------------
-@node Control structures, System variables, Functions, Functions and system variables
-@section Control structures
-@cindex Control structures
+@node Control structures@value{PSUFFIX}, System variables@value{PSUFFIX}, Functions@value{PSUFFIX}, Functions and system variables@value{PSUFFIX}
+@section Control structures@value{PSUFFIX}
+@cindex Control structures@value{PSUFFIX}
 @cindex block
-@ifinfo
-@*List of all supported control structures.
-@end ifinfo
-@menu
-* break::
-* breakpoint::
-* continue::
-* else::
-* export::
-* for::
-* if::
-* keepring::
-* quit::
-* return::
-* while::
-* ~::
-@ifset namespaces
-* exportto::
-* importfrom::
-* load::
-* unload::
+
+See SINGULAR Manual
+@ifset singularmanual
+(@ref{Control structures})
 @end ifset
-@end menu
+.
 
-A sequence of commands surrounded by curly brackets (@code{@{} and
-@code{@}}) is a so called block. Blocks are used in @sc{Singular} in
-order to define procedures and to collect commands belonging to
-@code{if}, @code{else}, @code{for} and @code{while} statements and to the
-@code{example} part in libraries. Even if
-the sequence of statements consists of only a single command it has to be
-surrounded by curly brackets!
-Variables which are defined inside a block
-are not local to that block. Note that there is no ending semicolon at
-the end of the block.
-@table @code
-@item @strong{Example:}
-@smallexample
-if ( i>j )
-@{
-  // This is the block
-  int temp;
-  temp=i;
-  i=j;
-  j=temp;
-  kill temp;
-@}
-@end smallexample
-@end table
 
 @c ---------------------------------------
-@node break, breakpoint, Control structures, Control structures
-@subsection break
-@cindex break
-@table @code
-@item @strong{Syntax:}
-@code{break;}
-@item @strong{Purpose:}
-leaves the innermost @code{for} or @code{while} block.
-@item @strong{Example:}
-@smallexample
-while (1)
-@{
-  @dots{}
-  if ( @dots{} )
-  @{
-    break; // leave the while block
-  @}
-@}
-@end smallexample
-@end table
-@c ref
-See
-@ref{Control structures};
-@ref{for};
-@ref{while}.
-@c ref
-@c ---------------------------------------
-@node breakpoint, continue, break, Control structures
-@subsection breakpoint
-@cindex breakpoint
-@table @code
-@item @strong{Syntax:}
-@code{breakpoint(} proc_name @code{);}
-@*@code{breakpoint(} proc_name@code{,} line_no @code{);}
-@item @strong{Purpose:}
-sets a breakpoint at the beginning of the specified procedure or
-at the given line.
-@strong{Note:} Line number 1 is the first line of a library (for
-procedures from libraries), resp.@: the line with the @code{@{}.
-@*A line number of -1 removes all breakpoint from that procedure.
-@item @strong{Example:}
-@smallexample
-@c example
-breakpoint(groebner);
-breakpoint(groebner, 176);
-breakpoint(groebner, -1);
-@c example
-@end smallexample
-@end table
-@c ref
-See
-@ref{~};
-@c ref
+@node System variables@value{PSUFFIX},  , Control structures@value{PSUFFIX}, Functions and system variables@value{PSUFFIX}
+@section System variables@value{PSUFFIX}
+@cindex System variables@value{PSUFFIX}
 
-@c ---------------------------------------
-@node continue, else, breakpoint, Control structures
-@subsection continue
-@cindex continue
-@table @code
-@item @strong{Syntax:}
-@code{continue;}
-@item @strong{Purpose:}
-skips the rest of the innermost @code{for} or @code{while} loop und jumps
-to the beginning of the block. This command is only valid inside a
-@code{for} or a @code{while} construction.
-@item @strong{Note:}
-Unlike the C-construct it @strong{does not execute the increment statement}.
-The command @code{continue} is mainly for internal use.
-@item @strong{Example:}
-@smallexample
-for (int i = 1 ; i<=10; i=i+1)
-@{
-   @dots{}
-   if (i==3) @{ i=8;continue; @}
-     // skip the rest if i is 3 and
-     // continue with the next i: 8
-   i;
-@}
-@expansion{} 1
-@expansion{} 2
-@expansion{} 8
-@expansion{} 9
-@expansion{} 10
-@end smallexample
-@end table
-@c ref
-See
-@ref{Control structures};
-@ref{for};
-@ref{while}.
-@c ref
-@c ---------------------------------------
-@node else, export, continue, Control structures
-@subsection else
-@table @code
-@item @strong{Syntax:}
-@code{if (} boolean_expression @code{)} true_block @code{else} false_block
-@item @strong{Purpose:}
-executes false_block if the boolean_expression of the @code{if} statement
-is false. This command is only valid in combination with an @code{if}
-command.
-@item @strong{Example:}
-@smallexample
-int i=3;
-if (i > 5)
-@{
-  "i is bigger than 5";
-@}
-else
-@{
-  "i is smaller than 6";
-@}
-@expansion{} i is smaller than 6
-@end smallexample
-@end table
+See SINGULAR Manual
 
-@c @c ref
-@c See
-@c @ref{if};
-@c @ref{boolean expressions};
-@c @ref{Control structures}.
-@c @c ref
-@c ---------------------------------------
-@ifset namespaces
-@node export, exportto, else, Control structures
+@ifset singularmanual
+(@pxref{System variables})
 @end ifset
-@ifclear namespaces
-@node export, for, else, Control structures
-@end ifclear
-@subsection export
-@cindex export
-@table @code
-@item @strong{Syntax:}
-@code{export} name @code{;}
-@*@code{export} list_of_names @code{;}
-@item @strong{Purpose:}
-converts a local variable of a procedure to a global one.
-@item @strong{Note:}
-Objects defined in a ring are not automatically exported
-when exporting the ring (use @code{keepring} instead).
-@item @strong{Example:}
-@smallexample
-proc p1
-@{
-  int i,j;
-  export(i);
-  intmat m;
-  listvar();
-  export(m);
-@}
-p1();
-@expansion{} // m                    [1]  intmat 1 x 1
-@expansion{} // j                    [1]  int 0
-@expansion{} // i                    [0]  int 0
-listvar();
-@expansion{} // m                    [0]  intmat 1 x 1
-@expansion{} // i                    [0]  int 0
-@end smallexample
-@end table
-
-@ifset namespaces
-@c ref
-See
-@ref{exportto}; @ref{keepring}.
-@c ref
-@end ifset
-@ifclear namespaces
-@c ref
-See
-@ref{keepring}.
-@c ref
-@end ifclear
-@c ---------------------------------------
-@ifset namespaces
-@c ---------------------------------------
-@node exportto, importfrom, export, Control structures
-@subsection exportto
-@cindex exportto
-@table @code
-@item @strong{Syntax:}
-@code{exportto(} package_name @code{, }name @code{);}
-@*@code{exportto(} package_name @code{,} list_of_names @code{);}
-@item @strong{Purpose:}
-converts a local variable of a procedure to a global one.
-package_name can be @code{Current}, @code{Up}, @code{Top} or any other
-identifier of type package.
-
-@item @strong{Note:}
-Objects defined in a ring are not automatically exported
-when exporting the ring (use @code{keepring} instead).
-@item @strong{Example:}
-@smallexample
-proc p1
-@{
-  int i,j;
-  exportto(Current,i);
-  intmat m;
-  listvar();
-  exportto(Top,m);
-@}
-p1();
-@expansion{} // m                    [1]  intmat 1 x 1
-@expansion{} // j                    [1]  int 0
-@expansion{} // i                    [0]  int 0
-listvar();
-@expansion{} // m                    [0]  intmat 1 x 1
-@expansion{} // i                    [0]  int 0
-@end smallexample
-@end table
-@c ref
-See @ref{keepring}.
-@c ref
-@c ---------------------------------------
-@node importfrom, load, exportto, Control structures
-@subsection importfrom
-@cindex importfrom
-@table @code
-@item @strong{Syntax:}
-@code{importfrom(}@code{);}
-@end table
-
-@c ref
-See @ref{exportto}.
-@c ref
-@c ---------------------------------------
-@node load, unload, importfrom, Control structures
-@subsection load
-@cindex load
-@table @code
-@item @strong{Syntax:}
-@code{load(} string_expression @code{);}
-@*@code{load(}string_expression@code{,"with");}
-@item @strong{Type:}
-none
-@item @strong{Purpose:}
-@c reads a library of procedures or functions from a file. If the given
-@c filename does not start with  @kbd{~}, @kbd{.} or @kbd{/}, the following
-@c directories are searched for (in that order): the current directory, the
-@c directories given in the environment variable @code{SINGULARPATH}, some
-@c default directories relative to the location of the @sc{Singular}
-@c executable program, and finally some default absolute directories. You
-@c can view the search path which @sc{Singular} uses to locate its
-@c libraries, by starting up @sc{Singular} with the option @code{-v}, or by
-@c issuing the command @code{system("with");"}.
-reads a library of procedures from a file. If the given filename does
-not start with @kbd{.} or @kbd{/}, the following directories are
-searched for (in that order): the current directory, the directories given in
-the environment variable @code{SINGULARPATH}, some default directories
-relative to the location of the @sc{Singular} executable program, and
-finally some default absolute directories. You can view the search path
-which @sc{Singular} uses to locate its libraries, by starting up
-@sc{Singular} with the option @code{-v}, or by issuing the command
-@code{system("with");"}.
-
-Unless  @sc{Singular} is started with the @code{--no-stdlib} option, the
-library @code{standard.lib} is automatically loaded at start-up time.
-@end table
-
-All loaded libraries are displayed by the @code{listvar(package);}
-command:
-@smallexample
-@c example
-  option(loadLib);   // show loading of libraries;
-                     // standard.lib is loaded
-  listvar(package);
-                     // the names of the procedures of inout.lib
-  load("inout.lib"); // are now known to Singular
-  listvar(package);
-@c example
-@end smallexample
-
-Each time a library @ref{Singular library} / dynamic module @ref{dynamic
-module} is loaded, the corresponding namespace is created, if it does
-not already exist.
-
-The name of this namespace corresponding to a Singular library is
-derived from the name of the library file. The first letter is
-capitalized and everything to right of the left-most dot is
-dropped.
-For a dynamic module the packagename is hard-coded in the binary file.
-
-@sc{Singular} also supports autoloading of packages.
-To use this features, just specify the identifier by its full name:
-
-@smallexample
-@c example error
-  listvar(package);
-  Inout::version;     // full name of a variable in the package Inout
-  listvar(package);   // the package Inout has been autoloaded
-@c example
-@end smallexample
-
-For autoloading the base of the filename is generated by converting the
-packagename to lowercase letters. The search is done in the standard
-@sc{Singular} search path, first looking for a file of this name, and then
-appending to the base @code{.lib}, @code{.so}, @code{.sl} (in this order).
 
 
-An identifier of type @code{package} is created and all procedures are
-stored in that package.
-Before loading the type of the file is checking. For an Singular
-library, the package is set as filename until the first '.' in the name
-with an uppercase first letter. If the library to load is an binary file
-with procedures written in an higher language (e.g. C, C++, ...) the
-package name s hard-code in the library.
-
-
-The second argument @code{"with"} will automatically export all none
-static procedures to the toplevel.
-
-
-Only the names of the procedures in the library are loaded, the body of
-the procedures is read during the first call of this procedure. This minimizes
-memory consumption by unused procedures.  When @sc{Singular} is started
-with the @code{-q} or @code{--quiet} option, no message about the
-loading of a library is displayed.  More exactly, option @code{-q} (and
-likewise @code{--quiet}) unsets option @code{loadLib} to inhibit
-monitoring of library loading (@pxref{option}).
-
-Unless  @sc{Singular} is started with the @code{--no-stdlib} option, the
-library @code{standard.lib} is automatically loaded at start-up time.
-
-@smallexample
-@c example
-  option(loadLib); // show loading of libraries; standard.lib is loaded
-                   // the names of the procedures of inout.lib
-  load("inout.lib"); // are now known to Singular
-  listvar();
-@c example
-@end smallexample
-@c @c ref
-@c See
-@c @ref{Command line options};
-@c @ref{Procedures and libraries};
-@c @ref{SINGULAR libraries};
-@c @ref{proc};
-@c @ref{standard_lib};
-@c @ref{package};
-@c @ref{string};
-@c @ref{system}.
-@c @ref{LIB};
-@c @ref{exportto};
-@c @ref{importfrom};
-@c @ref{Namespaces};
-@c @ref{dynamic module}
-@c @c ref
-
-@c ---------------------------------------
-@node unload, for, load, Control structures
-@subsection unload
-@cindex unload
-@table @code
-@item @strong{Syntax:}
-@code{unload(}@code{);}
-@end table
-@c ---------------------------------------
-@end ifset
-@c ---------------------------------------
-@ifset namespaces
-@node for, if, unload, Control structures
-@end ifset
-@ifclear namespaces
-@node for, if, export, Control structures
-@end ifclear
-@subsection for
-@cindex for
-@table @code
-@item @strong{Syntax:}
-@code{for (} init_command@code{;}
-boolean_expression@code{;}
-iterate_commands@code{)} block
-@item @strong{Purpose:}
-repetitive, conditional execution of a command block.
-@*The command init_command is executed first. Then boolean_expression is
-evaluated. If its value is TRUE the block is executed, otherwise the
-@code{for} statement is complete. After each execution of the block, the
-command iterate_command is executed and boolean_expression is
-evaluated. This is repeated until boolean_expression evaluates to FALSE.
-@*The command @code{break;} leaves the innermost @code{for} construct.
-@item @strong{Example:}
-@smallexample
-// sum of 1 to 10:
-int s=0;
-for (int i=1; i<=10; i=i+1)
-@{
-   s=s+i;
-@}
-s;
-@expansion{} 55
-@end smallexample
-@end table
-@c ref
-See
-@ref{Control structures};
-@ref{boolean expressions};
-@ref{while};
-@ref{if};
-@ref{break};
-@ref{continue}.
-@c ref
-@c ---------------------------------------
-@node if, keepring, for, Control structures
-@subsection if
-@cindex if
-@cindex else
-@table @code
-@item @strong{Syntax:}
-@code{if (} boolean_expression @code{)} true_block
-@*@code{if (} boolean_expression @code{)} true_block @code{else} false_block
-@item @strong{Purpose:}
-executes true_block if the boolean condition is true. If the @code{if}
-statement is followed by an @code{else} statement and the boolean
-condition is false, then false_block is executed.
-@item @strong{Example:}
-@smallexample
-int i = 9;
-matrix m[i][i];
-if (i > 5 and typeof(m) == "matrix")
-@{
-  m[i][i] = i;
-@}
-@end smallexample
-@end table
-@c ref
-See
-@ref{else};
-@ref{break};
-@ref{Control structures};
-@ref{boolean expressions}.
-@c ref
-@c ---------------------------------------
-@node keepring, quit, if, Control structures
-@subsection keepring
-@cindex keepring
-@table @code
-@item @strong{Syntax:}
-@code{keepring} name @code{;}
-@item @strong{Purpose:}
-moves the specified ring to the next (upper) level. This command can only
-be used inside of procedures and it should be the last command before the
-@code{return} statement. There it provides the possibility to keep
-a ring which is local to the procedure (and its objects) accessible after
-the procedure ended without making the ring global.
-@item @strong{Example:}
-@smallexample
-proc P1
-@{
-  ring r=0,x,dp;
-  keepring r;
-@}
-proc P2
-@{
-  "inside P2: " + nameof(basering);
-  P1();
-  "inside P2, after call of P1: " + nameof(basering);
-@}
-ring r1= 0,y,dp;
-P2();
-@expansion{} inside P2: r1
-@expansion{} inside P2, after call of P1: r
-"at top level: " + nameof(basering);
-@expansion{} at top level: r1
-@end smallexample
-@end table
-@c ref
-See
-@ref{ring}.
-@c ref
-@c ---------------------------------------
-@node quit, return, keepring, Control structures
-@subsection quit
-@cindex quit
-@cindex exit
-@table @code
-@item @strong{Syntax:}
-@code{quit;}
-@item @strong{Purpose:}
-quits @sc{Singular};
-works also from inside a procedure. The commands @code{quit} and
-@code{exit} are synonymous.
-@item @strong{Example:}
-@smallexample
-  quit;
-@end smallexample
-@end table
-@c ---------------------------------------
-@node return, while, quit, Control structures
-@subsection return
-@cindex return
-@table @code
-@item @strong{Syntax:}
-@code{return (} expression_list @code{);}
-@*@code{return ();}
-@item @strong{Type:}
-any
-@item @strong{Purpose:}
-returns the result(s) of a procedure and can only be used inside a
-procedure. Note that the brackets are required even if no return value
-is given.
-@item @strong{Example:}
-@smallexample
-proc p2
-@{
-  int i,j;
-  for(i=1;i<=10;i++)
-  @{
-    j=j+i;
-  @}
-  return(j);
-@}
-// can also return an expression list, i.e., more than one value
-proc tworeturn ()
-@{ return (1,2); @}
-int i,j = tworeturn();
-// return type may even depend on the input
-proc type_return (int i)
-@{
-  if (i > 0) @{return (i);@}
-  else @{return (list(i));@}
-@}
-// then we need def type (or list) to collect value
-def t1 = type_return(1);
-def t2 = type_return(-1);
-@end smallexample
-@end table
-@c ref
-See
-@ref{Data types};
-@ref{proc}.
-@c ref
-@c ---------------------------------------
-@node while, ~ , return, Control structures
-@subsection while
-@cindex while
-@table @code
-@item @strong{Syntax:}
-@code{while (}boolean_expression@code{)} block
-@item @strong{Purpose:}
-repetitive, conditional execution of block.
-@*The boolean_expression is evaluated and if its value is TRUE, the
-block gets executed. This is repeated until boolean_expression evaluates
-to FALSE.  The command @code{break} leaves the innermost @code{while}
-construction.
-@item @strong{Example:}
-@smallexample
-int i = 9;
-while (i>0)
-@{
-   // @dots{} // do something for i=9, 8, ..., 1
-   i = i - 1;
-@}
-while (1)
-@{
-   // @dots{}   // do something forever
-   if (i == -5) // but leave the loop if i is -5
-   @{
-     break;
-   @}
-@}
-@end smallexample
-@end table
-@c @c ref
-@c See
-@c @ref{Control structures};
-@c @ref{boolean expressions};
-@c @ref{break}.
-@c @c ref
-
-@c ---------------------------------------
-@node ~, , while, Control structures
-@subsection ~ (break point)
-@cindex ~
-@cindex break point
-@table @code
-@item @strong{Syntax:}
-@code{~;}
-@item @strong{Purpose:}
-sets a break point. Whenever @sc{Singular} reaches the command @code{~;}
-in a sequence of commands it prompts for input. The user may now input
-lines of @sc{Singular} commands. The line length cannot exceed 80
-characters.
-@sc{Singular} proceeds with the execution of the command following @code{~;}
-as soon as it receives an empty line.
-@item @strong{Example:}
-@smallexample
-proc t
-@{
-  int i=2;
-  ~;
-  return(i+1);
-@}
-t();
-@expansion{} -- break point in t --
-@expansion{} -- 0: called    from STDIN --
-// here local variables of the procedure can be accessed
-i;
-@expansion{} 2
-@expansion{} -- break point in t --
-
-@expansion{} 3
-@end smallexample
-@end table
-
-
-@c ---------------------------------------
-@node System variables,  , Control structures, Functions and system variables
-@section System variables
-@cindex System variables
-@ifinfo
-@*List of all system variables.
-@end ifinfo
-@menu
-* degBound::
-* echo::
-* minpoly::
-* multBound::
-* noether::
-* printlevel::
-* short::
-* timer::
-* TRACE var::
-* rtimer::
-* voice::
-@end menu
-@c ---------------------------------------
-@c @node alternating, degBound, System variables, System variables
-@c @subsection alternating
-@c @cindex alternating
-@c @table @code
-@c @item @strong{Syntax:}
-@c @code{alternating =} int_expression@code{;}
-@c @*int_variable @code{= alternating;}
-@c @item @strong{Purpose:}
-@c describes the position of the first alternating variable in the current
-@c basering, thus creating the tensor
-@c product of a polynomial ring with an exterior algebra.
-@c @*Remark: Setting @code{alternating=1;} defines the exterior algebra.
-@c @item @strong{Note:}
-@c These algebras are only available in those versions of
-@c @sc{Singular} which are compiled with the SRING option.
-@c The SRING version is
-@c significantly slower for usual (commutative) ring operations.
-@c @item @strong{Example:}
-@c @example
-@c   // define the exterior algebra in 3 variables x, y, z
-@c   ring r=0,(x,y,z),dp;
-@c   alternating=1;
-@c   y*x;
-@c   @expansion{} -1*xy
-@c @end example
-@c @end table
-@c @c ref
-@c See
-@c @ref{ring};
-@c @ref{int expressions}.
-@c @c ref
-@c @c -----------------------------------------------------
-@node degBound, echo, System variables, System variables
-@subsection degBound
-@cindex degBound
-@table @code
-@item @strong{Type:}
-int
-@item @strong{Purpose:}
-The standard basis computation is stopped if the total
-(weighted) degree
-exceeds @code{degBound}.
-@* @code{degBound} should not be used for a global ordering with inhomogeneous
-input.
-@*Reset this bound by setting @code{degBound} to 0.
-@item @strong{Example:}
-@smallexample
-degBound = 7;
-option();
-@expansion{} //options for 'std'-command: degBound
-ideal j=std(i);
-degBound;
-@expansion{} 7
-degBound = 0; //resets degree bound to infinity
-@end smallexample
-@end table
-@c ref
-See
-@ref{deg};
-@ref{int};
-@ref{option};
-@ref{std}.
-@c ref
-@c -----------------------------------------------------
-@node echo, minpoly, degBound, System variables
-@subsection echo
-@cindex echo
-@table @code
-@item @strong{Type:}
-int
-@item @strong{Purpose:}
-input is echoed if @code{echo} >= @code{voice}.
-@*@code{echo} is a local setting for a procedure and defaulted to 0.
-@*@code{echo} does not affect the output of commands.
-@item @strong{Example:}
-@c this example cannot be a computed one - echo interferes with -e
-@smallexample
-echo = 1;
-int i = echo;
-@expansion{} int i = echo;
-@end smallexample
-@end table
-@c ref
-See
-@ref{int};
-@ref{voice}.
-@c ref
-
-@c -----------------------------------------------------
-@node minpoly, multBound, echo, System variables
-@subsection minpoly
-@cindex minpoly
-@table @code
-@item @strong{Type:}
-number
-@item @strong{Purpose:}
-describes the coefficient field of the current basering as
-an algebraic extension with the minimal polynomial equal to @code{minpoly}.
-Setting the @code{minpoly} should be the first command after
-defining the ring.
-@item @strong{Note:}
-The minimal polynomial has to be specified in the syntax of a polynomial.
-Its variable is not one of the ring variables, but the algebraic element
-which is being adjoined to the field.
-Algebraic extensions in @sc{singular} are only possible over the rational
-numbers or over Z/p, p a prime number.
-@c @*@strong{Warning:}
-@*@sc{Singular} does not check whether the given
-polynomial is irreducible! It can be checked in advance with the
-function 
-@code{factorize} (@pxref{factorize}).
-
-@item @strong{Example:}
-@smallexample
-@c example
-  //(Q[i]/(i^2+1))[x,y,z]:
-  ring Cxyz=(0,i),(x,y,z),dp;
-  minpoly=i^2+1;
-  i2;  //this is a number, not a poly
-@c example
-@end smallexample
-@end table
-@c ref
-See
-@ref{factorize};
-@ref{ring}.
-@c ref
-@c -----------------------------------------------------
-@node multBound, noether, minpoly, System variables
-@subsection multBound
-@cindex multBound
-@table @code
-@item @strong{Type:}
-int
-@item @strong{Purpose:}
-The standard basis computation is stopped if the ideal is
-zero-dimensional in a ring with local ordering
-and its multiplicity (@code{mult}) is lower than @code{multBound}.
-@*Reset this bound by setting @code{multBound} to 0.
-@item @strong{Example:}
-@smallexample
-multBound = 20;
-option();
-@expansion{}    //options for 'std'-command: multBound
-ideal j=std(i);
-multBound;
-@expansion{} 20
-multBound = 0;  //disables multBound
-@end smallexample
-@end table
-@c ref
-See
-@ref{int};
-@ref{mult};
-@ref{option};
-@ref{std}.
-@c ref
-@c -----------------------------------------------------
-@node noether, printlevel, multBound, System variables
-@subsection noether
-@cindex noether
-@table @code
-@item @strong{Type:}
-poly
-@item @strong{Purpose:}
-The standard basis computation in local rings
-cuts off  all monomials above
-(in the sense of the monomial ordering)
-the monomial @code{noether} during the computation.
-@*Reset @code{noether} by setting @code{noether} to 0.
-@item @strong{Example:}
-@smallexample
-@c example
-  ring R=32003,(x,y,z),ds;
-  ideal i=x2+y12,y13;
-  std(i);
-  noether=x11;
-  std(i);
-  noether=0; //disables noether
-@c example
-@end smallexample
-@end table
-@c ref
-See
-@ref{poly};
-@ref{std}.
-@c ref
-@c -----------------------------------------------------
-@node printlevel, short, noether, System variables
-@subsection printlevel
-@cindex printlevel
-@table @code
-@item @strong{Type:}
-int
-@item @strong{Purpose:}
-sets the debug level for @code{dbprint}.
-If @code{printlevel} >= @code{voice} then @code{dbprint} is equivalent to
-@code{print}, otherwise nothing is printed.
-@item @strong{Note:}
-@xref{Procedures in a library}, for a small example about how this
-is used for the display of comments while procedures are executed.
-@item @strong{Example:}
-@smallexample
-@c example
-  voice;
-  printlevel=0;
-  dbprint(1);
-  printlevel=voice;
-  dbprint(1);
-@c example
-@end smallexample
-@end table
-@c ref
-See
-@ref{int};
-@ref{dbprint};
-@ref{voice}.
-@c ref
-@c -----------------------------------------------------
-@node short, timer, printlevel, System variables
-@subsection short
-@cindex short
-@table @code
-@item @strong{Type:}
-int
-@item @strong{Purpose:}
-the output of monomials is done in the short manner,
-if @code{short} is non-zero. A C-like notion is used, if short is zero.
-Both notations may be used as input.
-@*The default depends on the names of the ring variables
-(0 if there are names of variables longer than 1 character, 1 otherwise). Every
-change of the basering sets @code{short} to the previous value for
-that ring. In other words, the value of the variable @code{short} is
-"ring-local".
-@item @strong{Example:}
-@smallexample
-@c example
-  ring r=23,x,dp;
-  int save=short;
-  short=1;
-  2x2,x2;
-  short=0;
-  2x2,x2;
-  short=save;  //resets short to the previous value
-@c example
-@end smallexample
-@end table
-@c ref
-See
-@ref{int}.
-@c ref
-@c -----------------------------------------------------
-@node timer, TRACE var, short, System variables
-@subsection timer
-@cindex timer
-@table @code
-@item @strong{Type:}
-int
-@item @strong{Purpose:}
-@enumerate
-@item
-the CPU time (i.e, user and system time) used for each command is
-printed if timer >0 , if this
-time is bigger than a (customizable) minimal time and
-if @code{printlevel+1 >= voice} (which is by default true on the
-@sc{Singular} top level, but not true while procedures are executed).
-
-@item
-yields the used CPU time since the start-up of @sc{Singular} in a
-(customizable) resolution.
-@end enumerate
-
-The default setting of @code{timer} is 0, the default minimal time is
-0.5 seconds, and the default timer resolution is 1 (i.e., the default unit
-of time is one second). The minimal time and timer resolution
-can be set using the command line options @code{--min-time} and
-@code{--ticks-per-sec} and can be checked using
-@code{system("--min-time")} and @code{system("--ticks-per-sec")}.
-
-How to use @code{timer} in order to measure the time for a sequence of
-commands, see example below.
-
-@item @strong{Note for Windows95/98:}
-The value of the @code{timer} cannot be used (resp.@: trusted) when
-@sc{Singular} is run under Windows95/98 (this is due to the shortcomings
-of the Windows95/98 operating system). Use @ref{rtimer}, instead.
-
-@item @strong{Example:}
-@smallexample
-@c example
-  timer=1; // The time of each command is printed
-  int t=timer; // initialize t by timer
-  ring r=0,(x,y,z),dp;
-  poly p=(x+2y+3z+4xy+5xz+6yz)^20;
-  // timer as int_expression:
-  t=timer-t;
-  t;  // yields the time in ticks-per-sec (default 1)
-      // since t was initialized by timer
-  int tps=system("--ticks-per-sec");
-  t/tps; // yields the time in seconds truncated to int
-@c example
-@end smallexample
-@end table
-@c ref
-See
-@ref{Command line options};
-@ref{printlevel};
-@ref{rtimer};
-@ref{system};
-@ref{voice}.
-@c ref
-@c ---------------------------------------
-@node TRACE var, rtimer, timer, System variables
-@subsection TRACE
-@cindex TRACE
-
-@table @code
-@item @strong{Type:}
-int
-@item @strong{Purpose:}
-sets level of debugging.
-@table @asis
-@item @code{TRACE=0}
-no debugging messages are printed.
-@item @code{TRACE=1}
-messages about entering and leaving of procedures are displayed.
-@item @code{TRACE=3}
-messages about entering and leaving of procedures together with
-line numbers are displayed.
-@item @code{TRACE=4}
-each line is echoed and the interpretation of commands
-in this line is suspended until the user presses @code{RETURN}.
-@end table
-@*@code{TRACE} is defaulted to 0.
-@*@code{TRACE} does not affect the output of commands.
-@item @strong{Example:}
-@smallexample
-@c example
-  TRACE=1;
-  LIB "general.lib";
-  sum(1..100);
-@c example
-@end smallexample
-@end table
-@c ref
-See
-@ref{int}.
-@c ref
-@c ---------------------------------------
-@node rtimer, voice, TRACE var, System variables
-@subsection rtimer
-@cindex timer
-@table @code
-@item @strong{Type:}
-int
-@item @strong{Purpose:}
-identical to @code{timer} (@pxref{timer}), except that real times (i.e.,
-wall-clock) times are reported, instead of CPU times. This can be
-trusted on all operating systems (including Windows95/98).
-
-@end table
-@c ---------------------------------------
-@node voice,, rtimer, System variables
-@subsection voice
-@cindex voice
-
-@table @code
-@item @strong{Type:}
-int
-@item @strong{Purpose:}
-shows the nesting level of procedures.
-@item @strong{Note:}
-@xref{Guidelines for writing a library}, for an small example how this is used
-for the display of comments while procedures are executed.
-@item @strong{Example:}
-@smallexample
-@c example
-  voice;
-@c example
-proc p
-@{
-  voice;
-@};
-p();
-@expansion{} 2
-@end smallexample
-@end table
-@c ref
-See
-@ref{dbprint};
-@ref{listvar};
-@ref{printlevel}.
-@c ref
-@c ---------------------------------------
->>>>>>> 1.3
