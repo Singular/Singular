@@ -6,7 +6,7 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id: fast_maps.cc,v 1.5 2002-01-19 10:58:42 obachman Exp $
+ *  Version: $Id: fast_maps.cc,v 1.6 2002-01-19 12:26:02 bricken Exp $
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>
@@ -289,38 +289,50 @@ static void maDestroyCompIdealRing(ideal map_id, ring map_r,
 */
 // return NULL if deg(ggt(m1, m2)) < 2
 // else return m = ggT(m1, m2) and q1, q2 such that m1 = q1*m m2 = q2*m
+
 static poly maEggT(const poly m1, const poly m2, poly &q1, poly &q2,const ring r)
 {
+
   int i;
   int dg = 0;
   poly ggt = NULL;
-  for (i=1; i<=r->N; i++)
-  {
+  q1 = p_Init(r);
+  q2 = p_Init(r);
+  ggt=p_Init(r);
+
+  for (i=1;i<=r->N;i++) {
     Exponent_t e1 = p_GetExp(m1, i, r);
     Exponent_t e2 = p_GetExp(m2, i, r);
-    if (e1 > 0 && e2 > 0)
-    {
+    if (e1 > 0 && e2 > 0){
       Exponent_t em = (e1 > e2 ? e2 : e1);
-      if (dg < 2)
-      {
-        ggt = p_Init(r);
-        q1 = p_Init(r);
-        q2 = p_Init(r);
-      }
       dg += em;
       p_SetExp(ggt, i, em, r);
       p_SetExp(q1, i, e1 - em, r);
       p_SetExp(q2, i, e2 - em, r);
     }
+    else {
+      p_SetExp(q1, i, e1, r);
+      p_SetExp(q2, i, e2, r);
+    }
   }
-  if (ggt != NULL)
+  if (dg>1)
   {
     p_Setm(ggt, r);
     p_Setm(q1, r);
     p_Setm(q2, r);
+
+    
+  }
+  else {
+    p_LmFree(ggt, r);
+    p_LmFree(q1, r);
+    p_LmFree(q2, r);
+    ggt = NULL;
   }
   return ggt;
 }
+
+
 
 /*******************************************************************************
 **
