@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.103 1999-04-01 17:48:14 Singular Exp $
+@comment $Id: reference.doc,v 1.104 1999-04-19 11:03:01 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4142,14 +4142,16 @@ See @ref{int}; @ref{general_lib}.
 @table @code
 @item @strong{Syntax:}
 @code{print (} expression @code{);}
+@*@code{print (} expression@code{, "betti" );}
 @*@code{print (} expression@code{,} format_string @code{);}
 @item @strong{Type:}
-none
+none (for the first two calling sequences)
+@*string (for the last calling sequence)
 @item @strong{Purpose:}
 prints expressions in a nice format, especially useful for matrices, modules
 and vectors.
 @*The second form uses a string to determine the format.
-@*At the moment only the "betti" format is used:
+@*The following format strings are supported:
 @table @code
 @item "betti"
 displays the graded Betti numbers of
@@ -4167,6 +4169,26 @@ $R^n/M$ (the 0-th (resp.1-st) syzygy module of $R^n/M$ is $R^n$ (resp. $M$))
 @ifinfo
 R^n/M (the 0-th (resp.1-st) syzygy module of R^n/M is R^n (resp. M))
 @end ifinfo
+@item "%s"
+returns @code{string(} expression @code{)}
+@item "%2s"
+similar to @code{"%s"}, except that newlines are inserted after every
+comma
+@item "%l"
+similar to @code{"%s"}, except that embracing explicite type casts are
+inserted as much as possible (this is mostly useful for "cutting and
+pasting") 
+@item "%2l"
+similar to @code{"%l"}, except that newlines are inserted after every
+comma
+@item "%;"
+returns the string equivalent to typing @code{expression;}
+@item "%t"
+returns the string equivalent to typing @code{type expression;}
+@item "%p"
+returns the string equivalent to typing @code{print(expressions);}
+@item "%b"
+returns the string equivalent to typing @code{print(expressions, "betti");}
 @end table
 @item @strong{Example:}
 @example
@@ -4177,18 +4199,27 @@ R^n/M (the 0-th (resp.1-st) syzygy module of R^n/M is R^n (resp. M))
   print(m);  // the columns generate m
   intmat M=betti(mres(m,0));
   print(M,"betti");
+  string s = print(m, "%;"); s;
+  s = print(m, "%p"); s;
+  s = print(M, "%b"); s;
+  s = print(M, "%t"); s;
+  list l = r, m, M;
+  s = print(l, "%s"); s;
+  s = print(l, "%2s"); s;
+  s = print(l, "%l"); s;
 @c example
 @end example
 @end table
-@menu
-* dbprint::
-* short::
-* type::
-* betti::
-@end menu
-@iftex
-See @ref{dbprint}; @ref{short}; @ref{type}; @ref{betti}.
-@end iftex
+@c ref
+See 
+@ref{dbprint}
+@ref{short}
+@ref{type} 
+@ref{betti}
+@ref{string type cast}
+@ref{Type conversion and casting}.
+@c ref
+
 @c ---------------------------------------
 @node prune, qhweight, print, Functions
 @subsection prune

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.143 1999-04-17 14:58:47 obachman Exp $ */
+/* $Id: iparith.cc,v 1.144 1999-04-19 11:02:37 obachman Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1484,10 +1484,9 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
   ring r=(ring)u->Data();
   idhdl w;
 
-  if ((iiOp!=IMAP_CMD)
-  && ((rInternalChar(currRing) != rInternalChar(r))
-    || ((currRing->N != r->N)&& (iiOp==FETCH_CMD)))
-  )
+  if ((iiOp!=IMAP_CMD) &&
+      ((rInternalChar(currRing) != rInternalChar(r)) ||
+       (currRing->N != r->N && iiOp==FETCH_CMD)))
     goto err_fetch;
   if ((w=r->idroot->get(v->Name(),myynest))!=NULL)
   {

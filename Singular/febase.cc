@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.71 1999-04-17 14:58:45 obachman Exp $ */
+/* $Id: febase.cc,v 1.72 1999-04-19 11:02:34 obachman Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -1010,6 +1010,7 @@ void SPrintStart()
 
 static void SPrintS(char* s)
 {
+  mmTestL(sprint);
   if (s == NULL) return;
   int ls = strlen(s);
   if (ls == 0) return;
@@ -1022,12 +1023,14 @@ static void SPrintS(char* s)
   strcpy(&(ns[l]), s);
   FreeL(sprint);
   sprint = ns;
+  mmTestL(sprint);
 }
 
 char* SPrintEnd()
 {
   char* ns = sprint;
   sprint = NULL;
+  mmTestL(ns);
   return ns;
 }
 
@@ -1082,6 +1085,7 @@ void Print(char *fmt, ...)
     int ls = strlen(fmt);
     va_list ap;
     va_start(ap, fmt);
+    mmTestL(sprint);
     if (fmt != NULL && ls > 0)
     {
       char* ns;

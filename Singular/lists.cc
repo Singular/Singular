@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.cc,v 1.14 1999-04-17 14:58:51 obachman Exp $ */
+/* $Id: lists.cc,v 1.15 1999-04-19 11:02:40 obachman Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -355,32 +355,47 @@ resolvente liFindRes(lists L, int * len, int *typ0,intvec *** weights)
 
 char* lString(lists l, BOOLEAN typed, int dim)
 {
-  if (l->nr == -1) return mstrdup("");
+  if (l->nr == -1) 
+  {
+    if (typed) return mstrdup("list()");
+    return mstrdup("");
+  }
+  
   char** slist = (char**) Alloc((l->nr+1) * sizeof(char*));
   int i, j, k;
   char *s;
   for (i=0, j = 0, k = 0; i<=l->nr; i++)
   {
-    slist[i] = l->m[i].String();
+    slist[i] = l->m[i].String(NULL, typed, dim);
     assume(slist[i] != NULL);
+    mmTestL(slist[i]);
     if (*(slist[i]) != '\0')
     {
       j += strlen(slist[i]);
       k++;
     }
   }
-  s = (char*) AllocL(j+k+1);
-  *s = '\0';
+  s = (char*) AllocL(j+k+2+(typed ? 10 : 0) + (dim == 2 ? k : 0));
+
+  if (typed)
+    sprintf(s, "list(");
+  else
+    *s = '\0';
+
   for (i=0; i<=l->nr; i++)
   {
     if (*(slist[i]) != '\0')
     {
       strcat(s, slist[i]);
       strcat(s, ",");
+      if (dim == 2) strcat(s, "\n");
     }
+    mmTestL(s);
     FreeL(slist[i]);
   }
-  if (k > 0) s[strlen(s) - 1] = '\0';
+  if (k > 0) s[strlen(s) - (dim == 2 ? 2 : 1)] = '\0';
+  if (typed) strcat(s, ")");
+  mmTestL(s);
   Free(slist, (l->nr+1) * sizeof(char*));
   return s;
 }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipprint.cc,v 1.10 1999-04-17 14:58:49 obachman Exp $ */
+/* $Id: ipprint.cc,v 1.11 1999-04-19 11:02:39 obachman Exp $ */
 /*
 * ABSTRACT: interpreter: printing
 */
@@ -228,7 +228,7 @@ BOOLEAN jjPRINT(leftv res, leftv u)
 
       case IDEAL_CMD:
       {
-        char* s = u->String();
+        char* s = u->String(NULL, FALSE, 2);
         PrintS(s);
         PrintLn();
         FreeL(s);
@@ -333,23 +333,37 @@ BOOLEAN jjPRINT_FORMAT(leftv res, leftv u, leftv v)
   }
 /* ======================== end betti ================================= */
 
-  if (strcmp((char *)v->Data(),"%s") == 0)
+  char* ns = mstrdup((char*) v->Data());
+  int dim = 1;
+  if (strlen(ns) == 3 && ns[1] == '2')
   {
-    res->data = (char*) u->String();
+    dim = 2;
+    ns[1] = ns[2];
+    ns[2] = '\0';
   }
-  else if (strcmp((char *)v->Data(),"%;") == 0)
+  if (strcmp(ns,"%l") == 0)
+  {
+    res->data = (char*) u->String(NULL, TRUE, dim);
+  }
+  else if (strcmp(ns,"%t") == 0)
+  {
+    SPrintStart();
+    type_cmd((idhdl) u);
+    res->data = SPrintEnd();
+  }
+  else if (strcmp(ns,"%;") == 0)
   {
     SPrintStart();
     u->Print();
     res->data = SPrintEnd();
   }
-  else if  (strcmp((char *)v->Data(),"%p") == 0)
+  else if  (strcmp(ns,"%p") == 0)
   {
     SPrintStart();
     iiExprArith1(res, u, PRINT_CMD);
     res->data = SPrintEnd();
   }
-  else if (strcmp((char *)v->Data(),"%b") == 0 && (u->Typ()==INTMAT_CMD))
+  else if (strcmp(ns,"%b") == 0 && (u->Typ()==INTMAT_CMD))
   {
     SPrintStart();
     ipPrintBetti(u);
@@ -357,9 +371,10 @@ BOOLEAN jjPRINT_FORMAT(leftv res, leftv u, leftv v)
   }
   else 
   {
-    res->data = u->String();
+    res->data = u->String(NULL, FALSE, dim);
   }
     
+  FreeL(ns);
   res->rtyp = STRING_CMD;
   return FALSE;
 }

@@ -656,9 +656,6 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
   if (d==NULL) d=Data();
   if (!errorreported)
   {
-    /* create a string, which may be freed by FreeL
-     * leave the switch with return
-     * or with break, which copies the string s*/
     char *s;
     const char *n;
     if (name!=NULL) n=name;
@@ -666,19 +663,49 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
     switch (Typ())
     {
         case INT_CMD:
-          s=(char *)AllocL(MAX_INT_LEN+2);
-          sprintf(s,"%d",(int)d);
-          break;
+          if (typed)
+          {
+            s=(char *)AllocL(MAX_INT_LEN+7);
+            sprintf(s,"int(%d)",(int)d);
+          }
+          else
+          {
+            s=(char *)AllocL(MAX_INT_LEN+2);
+            sprintf(s,"%d",(int)d);
+          }
+          return s;
+
         case STRING_CMD:
-          if (d != NULL) s = mstrdup((char*)d);
-          else s = mstrdup("");
-          break;
+          if (d == NULL)
+          {
+            if (typed) return mstrdup("\"\"");
+            return mstrdup("");
+          }
+          if (typed)
+          {
+            s = (char*) AllocL(strlen((char*) d) + 3);
+            sprintf(s,"\"%s\"", (char*) d);
+            return s;
+          }
+          else
+          {
+            return mstrdup((char*)d);
+          }
+    
         case POLY_CMD:
         case VECTOR_CMD:
-          s = mstrdup(pString((poly)d));
-          break;
+          if (typed)
+          {
+            char* ps = pString((poly) d);
+            s = (char*) AllocL(strlen(ps) + 10);
+            sprintf(s,"%s(%s)", (Typ() == POLY_CMD ? "poly" : "vector"), ps);
+            return s;
+          }
+          else
+            return mstrdup(pString((poly)d));
+
         case NUMBER_CMD:
-          StringSetS("");
+          StringSetS((typed ? "number(" : ""));
           if ((rtyp==IDHDL)&&(IDTYP((idhdl)data)==NUMBER_CMD))
           {
             nWrite(IDNUMBER((idhdl)data));
@@ -699,77 +726,133 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
             nWrite(n);
             nDelete(&n);
           }
-          s = StringAppendS("");
-          s = mstrdup(s);
-          break;
+          s = StringAppendS((typed ? ")" : ""));
+          return mstrdup(s);
+          
         case MATRIX_CMD:
-          s= mstrdup(iiStringMatrix((matrix)d,dim));
-          break;
+          s= iiStringMatrix((matrix)d,dim);
+          if (typed)
+          {
+            char* ns = (char*) AllocL(strlen(s) + 40);
+            sprintf(ns, "matrix(ideal(%s),%d,%d)", s, 
+                    ((ideal) d)->nrows, ((ideal) d)->ncols);
+            mmTestL(ns);
+            return ns;
+          }
+          else
+          {
+            return mstrdup(s);
+          }
+
         case MODUL_CMD:
         case IDEAL_CMD:
         case MAP_CMD:
-          s= mstrdup(iiStringMatrix((matrix)d,dim));
-          break;
+          s= iiStringMatrix((matrix)d,dim);
+          if (typed)
+          {
+            char* ns = (char*) AllocL(strlen(s) + 10);
+            sprintf(ns, "%s(%s)", (Typ()==MODUL_CMD ? "module" : "ideal"), s);
+            mmTestL(ns);
+            return ns;
+          }
+          return mstrdup(s);
+
         case INTVEC_CMD:
         case INTMAT_CMD:
         {
           intvec *v=(intvec *)d;
           s = v->String(dim);
-          break;
+          if (typed)
+          {
+            char* ns;
+            if (Typ() == INTMAT_CMD)
+            {
+              ns = (char*) AllocL(strlen(s) + 40);
+              sprintf(ns, "intmat(intvec(%s),%d,%d)", s, v->rows(), v->cols());
+            }
+            else
+            {
+              ns = (char*) AllocL(strlen(s) + 10);
+              sprintf(ns, "intvec(%s)", s);
+            }
+            mmTestL(ns);
+            FreeL(s);
+            return ns;
+          }
+          else
+            return s;
         }
+
         case RING_CMD:
-        {
-          s = rString((ring)d);
-          break;
-        }
         case QRING_CMD:
-        {
-          char* r = rString((ring)d);
-          char* i = iiStringMatrix((matrix) ((ring) d)->qideal, 1);
-          s = (char*) AllocL(strlen(r) + strlen(i) + 4);
-          sprintf(s, "%s,(%s)", r, i);
-          FreeL(r);
-          break;
-        }
+          s  = rString((ring)d);
+          
+          if (typed)
+          {
+            char* ns;
+            if (Typ() == QRING_CMD)
+            {
+              char* id = iiStringMatrix((matrix) ((ring) d)->qideal, dim);
+              ns = (char*) AllocL(strlen(s) + strlen(id) + 20);
+              sprintf(ns, "\"%s\";%sideal(%s)", s,(dim == 2 ? "\n" : " "), id);
+            }
+            else
+            {
+              ns = (char*) AllocL(strlen(s) + 4);
+              sprintf(ns, "\"%s\"", s);
+            }
+            FreeL(s);
+            mmTestL(ns);
+            return ns;
+          }
+          return s;
+          
         case RESOLUTION_CMD:
         {
           lists l = syConvRes((syStrategy)d);
           s = lString(l, typed, dim);
           l->Clean();
-          break;
+          return s;
         }
+
         case PROC_CMD:
         {
           procinfo* pi = (procinfo*) d;
           if((pi->language == LANG_SINGULAR) && (pi->data.s.body!=NULL))
-            s = mstrdup(pi->data.s.body);
+            s = (pi->data.s.body);
           else
-            s = mstrdup("");
-          break;
+            s = "";
+          if (typed)
+          {
+            char* ns = (char*) AllocL(strlen(s) + 4);
+            sprintf(ns, "\"%s\"", s);
+            mmTestL(ns);
+            return ns;
+          }
+          return mstrdup(s);
         }
           
         case LINK_CMD:
-        {
           s = slString((si_link) d);
-          break;
-        }
+          if (typed)
+          {
+            char* ns = (char*) AllocL(strlen(s) + 10);
+            sprintf(ns, "link(\"%s\")", s);
+            FreeL(s);
+            mmTestL(ns);
+            return ns;
+          }
+          return s;
+          
         
         case LIST_CMD:
-        {
-          s = lString((lists) d, typed, dim);
-        }
-        default:
-#ifdef TEST
-          ::Print("String:unknown type %s(%d)", Tok2Cmdname(Typ()),Typ());
-#endif
-          return mstrdup("");
+          return lString((lists) d, typed, dim);
     } /* end switch: (Typ()) */
-
-    return s;
   }
   return mstrdup("");
 }
 
+    
 int  sleftv::Typ()
 {
   if (e==NULL)

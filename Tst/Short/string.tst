@@ -14,15 +14,20 @@ proc MyPrint(def what)
    print(what, "%s");
    "print(what, \"%p\")";
    print(what, "%p");
-   "print(what, \"%t\")";
-   print(what, "%t");
+   "print(what, \"%l\")";
+   print(what, "%l");
    "print(what, \"%;\")";
    print(what, "%;");
+   "print(what, \"%2s\")";
+   print(what, "%2s");
+   "print(what, \"%2l\")";
+   print(what, "%2l");
+   "print(what, \"%t\")";
+   print(what, "%t");
 }
 
 list l = 1, 2; 
 MyPrint(l);
-l;
 
 list ll;
 MyPrint(ll);
@@ -57,9 +62,21 @@ MyPrint(r);
 
 ideal i;
 MyPrint(i);
+ 
+number n = 12345;
+MyPrint(n);
+ 
+vector v = [x+1, y];
+MyPrint(v);
+ 
+poly p = x2+y3+n;
+MyPrint(p);
 
 l[8] = r;
 l[9] = i;
+l[7] = n;
+// l[1] = v;
+l[5] = p;
 MyPrint(l);
 
 matrix ma[2][2] = x,y,z,x2;
@@ -99,6 +116,11 @@ MyPrint(qr);
 list l = 1, qr, list(2, qr);
 MyPrint(l);
 
+map phi = r, maxideal(2);
+MyPrint(phi);
+
+l[5] = phi;
+MyPrint(l);
 
 tst_status(1);$
 
