@@ -1,4 +1,4 @@
-% $Id: singcard.tex,v 1.1 1998-05-12 07:24:04 schmidt Exp $
+% $Id: singcard.tex,v 1.2 1998-05-25 09:43:04 schmidt Exp $
 
 %
 % singcard.tex - common macros for Singular reference cards.
@@ -160,6 +160,7 @@
 % \Singular: for sake of corporate identity
 % \ctl: print control keys
 % \opt: print optional arguments
+% \alt: separate alternative arguments
 % \rmslash: print a slash in roman type face
 % \eg, \ie: obvious
 % \verysmallskip: skip a very small amount (used between \sec entries).
@@ -170,12 +171,13 @@
 \def\Singular{{\sc Singular}}
 \def\ctl#1{{\tt C-#1}}
 \def\opt#1{{\rm[{\tt #1}]}}
+\def\alt{\hbox{\hskip 1.15pt\vrule height5.5pt depth1pt width0.25pt\hskip 1pt}}
 \def\rmslash{{\rm /}}
 \def\eg{e.g.~}
 \def\ie{i.e.~}
 
 \newskip\verysmallskipamount
-\verysmallskipamount=1pt plus 3pt minus 0.333333pt
+\verysmallskipamount=1pt plus 0.333333pt minus 0.333333pt
 \def\verysmallskip{\vskip \verysmallskipamount}
 
 \newbox\sevenptstrutbox
@@ -211,12 +213,17 @@
 % \longentry: insert an entry with a long item field into a \sec
 % \longitem: insert an entry with a long item field and no
 %   definition field into a \sec
+% \entryskip: insert glue between two entries
 %
 \def\subsec#1{\noalign{\smallskip\bf #1}}
 \long\def\sectext#1\cr{\noalign{\strut\hyphenpenalty=50 #1\strut}}
 % the `\ ' forces a non empty item field
 \long\def\longentry#1&#2\cr{\noalign{\strut\tt #1\strut}\ &#2\cr}
 \long\def\longitem#1\cr{\noalign{\strut\tt #1\strut}}
+
+\newskip\entryskipamount
+\entryskipamount=\smallskipamount
+\def\entryskip{\noalign{\vskip \entryskipamount}}
 
 %
 % - initialization.
