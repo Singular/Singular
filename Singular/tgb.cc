@@ -1839,14 +1839,24 @@ static void simplify(monom_poly& h, calc_dat* c){
 	pSetCoeff(lm,nInit(1));
 
 	lm=pMult_mm(lm,F->mp[i].m);
-	for(j=0;j<F_minus->size;j++)
-	{
-	  if (pLmEqual(F_minus->p[j],lm))
-	    break;
-	}
-	assume(j<F_minus->size);
+
+	int pos;
+	j=-1;
+	pos=posInPolys (F_minus->p, F_minus->size, lm,c);
+      if((F_minus->size>pos)&&(pLmEqual(lm,F_minus->p[pos])))
+	j=pos;
+      if((pos>0) &&(pLmEqual(lm,F_minus->p[pos-1])))
+	j=pos-1;
+      assume(j!=-1);
+      //        if(j==-1) Print("\n jAltert \n");
+// 	for(j=0;j<F_minus->size;j++)
+// 	{
+// 	  if (pLmEqual(F_minus->p[j],lm))
+// 	    break;
+// 	}
+// 	assume(j<F_minus->size);
 	pDelete(&lm);
-	if(j<F_minus->size)
+	if(j>=0)
 	{
 	  pExpVectorSub(h.m,F->mp[i].m);
 	  h.f=F_minus->p[j];
@@ -2720,7 +2730,7 @@ static void go_on_F4 (calc_dat* c){
 
   //better algorithm replace p by its monoms, qsort,delete duplicates and binary search for testing if monom is contained in array
  
-  for(i=0;i<m_index;i++)
+  for(i=m_index-1;i>=0;--i)
   {
     int j;
     BOOLEAN minus=FALSE;
@@ -2741,6 +2751,10 @@ static void go_on_F4 (calc_dat* c){
       m[i]=NULL;
     }
   }
+  //in this order F_minus will be automatically ascending sorted
+  //to make this sure for foreign gauss
+  //uncomment the following line
+  //  qsort(F_minus, F_minus_index,sizeof(poly),pLmCmp_func);
   assume((F_plus_index+F_minus_index)==m_index);
   Print("%i]", F_plus_index);
   for(i=0;i<p_index;i++) 
