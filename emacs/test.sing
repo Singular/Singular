@@ -1,0 +1,34 @@
+// define a new ring
+option(prot);
+ring r1 = 32003,(x,y,z),ds;
+r1;
+
+// define the polynomial
+int a,b,c,t=11,5,3,0;
+poly f = x^a+y^b+z^(3*c)+x^(c+2)*y^(c-1)+x^(c-1)*y^(c-1)*z3+
+         x^(c-2)*y^c*(y^2+t*x)^2;
+f;
+
+// calculate its Jacobi ideal ...
+ideal i=jacob(f);
+i;
+
+// ... and the standard basis of the Jacobi ideal
+ideal j=std(i);
+
+// calculate the Milnor number ...
+"The Milnor number of f(11,5,3) for t=0 is", vdim(j);
+
+// ... and the Tjurina number
+j=i+f;
+j=std(j);
+"The Tjurina number of f(11,5,3) for t=0 is", vdim(j);
+
+// repeat everything for t=1
+t=1;
+f=x^a+y^b+z^(3*c)+x^(c+2)*y^(c-1)+x^(c-1)*y^(c-1)*z3
+  +x^(c-2)*y^c*(y^2+t*x)^2;
+ideal i1=jacob(f);
+ideal j1=std(i1);
+"The Milnor number of f(11,5,3) for t=1 is", vdim(j1);
+"The Tjurina number of f(11,5,3) for t=1 is", vdim(std(j1+f));
