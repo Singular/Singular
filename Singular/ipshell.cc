@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.40 1999-04-17 12:30:18 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.41 1999-04-17 14:58:50 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -497,7 +497,7 @@ char * iiStringMatrix(matrix im, int dim,char ch)
   int i,ii = MATROWS(im);
   int j,jj = MATCOLS(im);
   poly *pp = im->m;
-  char *s=StringSet("");
+  char *s=StringSetS("");
 
   for (i=0; i<ii; i++)
   {

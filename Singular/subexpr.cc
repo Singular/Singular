@@ -637,7 +637,7 @@ attr sleftv::CopyA()
   return NULL;
 }
 
-char *  sleftv::String(void *d, BOOLEAN func)
+char *  sleftv::String(void *d, BOOLEAN typed, int dim)
 {
 #ifdef SIQ
   if (rtyp==COMMAND)
@@ -668,13 +668,14 @@ char *  sleftv::String(void *d, BOOLEAN func)
         case INT_CMD:
           s=(char *)AllocL(MAX_INT_LEN+2);
           sprintf(s,"%d",(int)d);
-          return s;
+          break;
         case STRING_CMD:
-          if (d != NULL) return mstrdup((char*)d);
-          return mstrdup("");
+          if (d != NULL) s = mstrdup((char*)d);
+          else s = mstrdup("");
+          break;
         case POLY_CMD:
         case VECTOR_CMD:
-          s = pString((poly)d);
+          s = mstrdup(pString((poly)d));
           break;
         case NUMBER_CMD:
           StringSetS("");
@@ -699,24 +700,27 @@ char *  sleftv::String(void *d, BOOLEAN func)
             nDelete(&n);
           }
           s = StringAppendS("");
+          s = mstrdup(s);
           break;
         case MATRIX_CMD:
-          s= iiStringMatrix((matrix)d,1);
+          s= mstrdup(iiStringMatrix((matrix)d,dim));
           break;
         case MODUL_CMD:
         case IDEAL_CMD:
         case MAP_CMD:
-          s= iiStringMatrix((matrix)d,1);
+          s= mstrdup(iiStringMatrix((matrix)d,dim));
           break;
         case INTVEC_CMD:
         case INTMAT_CMD:
         {
           intvec *v=(intvec *)d;
-          return v->String(1);
+          s = v->String(dim);
+          break;
         }
         case RING_CMD:
         {
-          return rString((ring)d);
+          s = rString((ring)d);
+          break;
         }
         case QRING_CMD:
         {
@@ -725,37 +729,34 @@ char *  sleftv::String(void *d, BOOLEAN func)
           s = (char*) AllocL(strlen(r) + strlen(i) + 4);
           sprintf(s, "%s,(%s)", r, i);
           FreeL(r);
-          return s;
+          break;
         }
-        
         case RESOLUTION_CMD:
         {
           lists l = syConvRes((syStrategy)d);
-          s = lString(l);
+          s = lString(l, typed, dim);
           l->Clean();
-          return (s);
+          break;
         }
         case PROC_CMD:
         {
           procinfo* pi = (procinfo*) d;
           if((pi->language == LANG_SINGULAR) && (pi->data.s.body!=NULL))
-            return mstrdup(pi->data.s.body);
+            s = mstrdup(pi->data.s.body);
           else
-            return mstrdup("");
+            s = mstrdup("");
+          break;
         }
           
         case LINK_CMD:
         {
-          return slString((si_link) d);
-        }
-        case DEF_CMD:
-        {
-          return mstrdup("");
+          s = slString((si_link) d);
+          break;
         }
         
         case LIST_CMD:
         {
-          return lString((lists) d);
+          s = lString((lists) d, typed, dim);
         }
         default:
 #ifdef TEST
@@ -763,7 +764,8 @@ char *  sleftv::String(void *d, BOOLEAN func)
 #endif
           return mstrdup("");
     } /* end switch: (Typ()) */
-    return mstrdup(s);
+
+    return s;
   }
   return mstrdup("");
 }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.142 1999-04-16 07:53:37 obachman Exp $ */
+/* $Id: iparith.cc,v 1.143 1999-04-17 14:58:47 obachman Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2213,7 +2213,7 @@ struct sValCmd2 dArith2[]=
 ,{jjRES,       MRES_CMD,       RESOLUTION_CMD, MODUL_CMD,  INT_CMD PROFILER}
 ,{jjPARSTR2,   PARSTR_CMD,     STRING_CMD,     RING_CMD,   INT_CMD PROFILER}
 ,{jjPARSTR2,   PARSTR_CMD,     STRING_CMD,     QRING_CMD,  INT_CMD PROFILER}
-,{jjPRINT_FORMAT, PRINT_CMD,   NONE,           DEF_CMD,    STRING_CMD PROFILER}
+,{jjPRINT_FORMAT, PRINT_CMD,   ANY_TYPE,       DEF_CMD,    STRING_CMD PROFILER}
 ,{jjQUOT,      QUOTIENT_CMD,   IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD PROFILER}
 ,{jjQUOT,      QUOTIENT_CMD,   MODUL_CMD,      MODUL_CMD,  IDEAL_CMD PROFILER}
 ,{jjQUOT,      QUOTIENT_CMD,   IDEAL_CMD,      MODUL_CMD,  MODUL_CMD PROFILER}
@@ -3468,6 +3468,7 @@ struct sValCmd1 dArith1[]=
 ,{jjLEADMONOM,  LEADMONOM_CMD,   POLY_CMD,       POLY_CMD }
 ,{jjLEADMONOM,  LEADMONOM_CMD,   VECTOR_CMD,     VECTOR_CMD }
 ,{jjLIB,        LIB_CMD,         NONE,           STRING_CMD }
+,{jjDUMMY,      LINK_CMD,        LINK_CMD,       LINK_CMD}
 ,{jjCALL1MANY,  LIST_CMD,        LIST_CMD,       DEF_CMD }
 ,{jjWRONG,      MAP_CMD,         0,              ANY_TYPE}
 ,{jjDUMMY,      MATRIX_CMD,      MATRIX_CMD,     MATRIX_CMD }
@@ -3504,16 +3505,8 @@ struct sValCmd1 dArith1[]=
 ,{jjrParStr,    PARSTR_CMD,      XS(STRING_CMD), QRING_CMD }
 ,{jjDUMMY,      POLY_CMD,        POLY_CMD,       POLY_CMD }
 ,{jjPRIME,      PRIME_CMD,       INT_CMD,        INT_CMD }
-,{jjPRINT_GEN,  PRINT_CMD,       NONE,           INT_CMD }
-,{jjPRINT_INTVEC,PRINT_CMD,      NONE,           INTVEC_CMD }
-,{jjPRINT_INTMAT,PRINT_CMD,      NONE,           INTMAT_CMD }
-,{jjPRINT_GEN,  PRINT_CMD,       NONE,           STRING_CMD }
-,{jjPRINT_GEN,  PRINT_CMD,       NONE,           POLY_CMD }
-,{jjPRINT_V,    PRINT_CMD,       NONE,           VECTOR_CMD }
-,{jjPRINT_GEN,  PRINT_CMD,       NONE,           IDEAL_CMD }
-,{jjPRINT_MA,   PRINT_CMD,       NONE,           MATRIX_CMD }
-,{jjPRINT_LIST, PRINT_CMD,       NONE,           LIST_CMD }
-,{jjPRINT_GEN,  PRINT_CMD,       NONE,           RESOLUTION_CMD }
+,{jjPRINT,      PRINT_CMD,       NONE,           LIST_CMD}
+,{jjPRINT,      PRINT_CMD,       NONE,           DEF_CMD}
 ,{jjidMinEmbedding, PRUNE_CMD,   XS(MODUL_CMD),  MODUL_CMD }
 ,{kQHWeight,    QHWEIGHT_CMD,    INTVEC_CMD,     IDEAL_CMD }
 ,{kQHWeight,    QHWEIGHT_CMD,    INTVEC_CMD,     MODUL_CMD }
@@ -3523,6 +3516,7 @@ struct sValCmd1 dArith1[]=
 ,{jjRESERVEDNAME,RESERVEDNAME_CMD, INT_CMD,      STRING_CMD }
 ,{jjL2R,        RESOLUTION_CMD,  RESOLUTION_CMD, LIST_CMD }
 ,{jjDUMMY,      RESOLUTION_CMD,  RESOLUTION_CMD, RESOLUTION_CMD }
+,{jjDUMMY,      RING_CMD,        RING_CMD,       RING_CMD}
 ,{jjWRONG,      ROWS_CMD,        0,              POLY_CMD }
 ,{jjpMaxComp,   ROWS_CMD,        XS(INT_CMD),    VECTOR_CMD }
 ,{jjROWS,       ROWS_CMD,        INT_CMD,        MODUL_CMD }
@@ -5317,6 +5311,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
 
     iiOp=op;
     int i=iiTabIndex(dArithTab1,JJTAB1LEN,op);
+    int ti = i;
     while (dArith1[i].cmd==op)
     {
       if (at==dArith1[i].arg)
@@ -5350,7 +5345,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
     {
       int ai;
       leftv an = (leftv)Alloc0(sizeof(sleftv));
-      i=iiTabIndex(dArithTab1,JJTAB1LEN,op);
+      i=ti;
       //Print("fuer %c , typ: %s\n",op,Tok2Cmdname(at));
       while (dArith1[i].cmd==op)
       {
@@ -5384,11 +5379,16 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
           }
           else
           {
+            if (an->Next() != NULL)
+            {
+              res->next = (leftv)Alloc(sizeof(sleftv));
+              failed=iiExprArith1(res->next,an->next,op);
+            }
             // everything ok, clean up and return
             an->CleanUp();
             Free((ADDRESS)an,sizeof(sleftv));
             a->CleanUp();
-            return FALSE;
+            return failed;
           }
         }
         i++;
@@ -5405,7 +5405,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
       }
       else
       {
-        i=iiTabIndex(dArithTab1,JJTAB1LEN,op);
+        i=ti;
         char *s = iiTwoOps(op);
         Werror("%s(`%s`) is not supported"
                 ,s,Tok2Cmdname(at));
@@ -5800,15 +5800,17 @@ static int iiTabIndex(const jjValCmdTab dArithTab, const int len, const int op)
   int a=0;
   int e=len;
   int p=len/2;
-  while ( a!=e)
+  do
   {
      if (op==dArithTab[p].cmd) return dArithTab[p].start;
-     else if (op<dArithTab[p].cmd)
-     { e=p; p=a+(e-a)/2;}
-     else
-     { a=p; p=p+(e-p)/2; }
+     if (op<dArithTab[p].cmd) e=p-1;
+     else   a = p+1;
+     p=a+(e-a)/2;
   }
+  while ( a <= e);
+
 #endif
+  assume(0);
   return -1;
 }
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.cc,v 1.13 1999-04-16 07:53:39 obachman Exp $ */
+/* $Id: lists.cc,v 1.14 1999-04-17 14:58:51 obachman Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -353,7 +353,7 @@ resolvente liFindRes(lists L, int * len, int *typ0,intvec *** weights)
   return r;
 }
 
-char* lString(lists l)
+char* lString(lists l, BOOLEAN typed, int dim)
 {
   if (l->nr == -1) return mstrdup("");
   char** slist = (char**) Alloc((l->nr+1) * sizeof(char*));

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.70 1998-12-02 13:57:25 obachman Exp $ */
+/* $Id: febase.cc,v 1.71 1999-04-17 14:58:45 obachman Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -777,7 +777,7 @@ char * StringAppend(char *fmt, ...)
 {
   va_list ap;
   char *s = feBufferStart; /*feBuffer + strlen(feBuffer);*/
-  int more;
+  int more, vs;
   va_start(ap, fmt);
   if ((more=feBufferStart-feBuffer+strlen(fmt)+100)>feBufferLength)
   {
@@ -796,8 +796,22 @@ char * StringAppend(char *fmt, ...)
   while (*s!='\0') s++;
   feBufferStart =s;
 #else
+#ifdef HAVE_VSNPRINTF
+  vs = vsnprintf(s, feBufferLength - (feBufferStart - feBuffer), fmt, ap);
+  if (vs == -1)
+  {
+    assume(0);
+    feBufferStart = feBuffer + feBufferLength -1;
+  }
+  else
+  {
+    feBufferStart += vs;
+  }
+#else
   feBufferStart += vsprintf(s, fmt, ap);
 #endif
+#endif
+  mmTest(feBuffer, feBufferLength);
   va_end(ap);
   return feBuffer;
 }
@@ -817,22 +831,6 @@ char * StringAppendS(char *st)
   }
   strcat(feBufferStart, st);
   feBufferStart +=l;
-  return feBuffer;
-}
-
-char * StringSet(char *fmt, ...)
-{
-  va_list ap;
-  char *s = feBuffer;
-  va_start(ap, fmt);
-#ifdef BSD_SPRINTF
-  vsprintf(s, fmt, ap);
-  while (*s!='\0') s++;
-  feBufferStart = s;
-#else
-  feBufferStart = feBuffer + vsprintf(s, fmt, ap);
-#endif
-  va_end(ap);
   return feBuffer;
 }
 
@@ -1003,9 +1001,46 @@ void mwrite(uchar c)
 }
 #endif
 
+// some routines which redirect the output of print to a string
+static char* sprint = NULL;
+void SPrintStart()
+{
+  sprint = mstrdup("");
+}
+
+static void SPrintS(char* s)
+{
+  if (s == NULL) return;
+  int ls = strlen(s);
+  if (ls == 0) return;
+  
+  char* ns;
+  int l = strlen(sprint);
+  ns = (char*) AllocL((l + ls + 1)*sizeof(char));
+  if (l > 0) strcpy(ns, sprint);
+  
+  strcpy(&(ns[l]), s);
+  FreeL(sprint);
+  sprint = ns;
+}
+
+char* SPrintEnd()
+{
+  char* ns = sprint;
+  sprint = NULL;
+  return ns;
+}
+
+// Print routines
 extern "C" {
 void PrintS(char *s)
 {
+  if (sprint != NULL)
+  {
+    SPrintS(s);
+    return;
+  }
+  
   if (feOut) /* do not print when option --no-out was given */
   {
     
@@ -1042,6 +1077,31 @@ void PrintLn()
 
 void Print(char *fmt, ...)
 {
+  if (sprint != NULL)
+  {
+    int ls = strlen(fmt);
+    va_list ap;
+    va_start(ap, fmt);
+    if (fmt != NULL && ls > 0)
+    {
+      char* ns;
+      int l = strlen(sprint);
+      ns = (char*) AllocL(sizeof(char)*(ls + l + 256));
+      if (l > 0)  strcpy(ns, sprint);
+                
+#ifdef HAVE_VSNPRINTF
+      l = vsnprintf(&(ns[l]), ls+255, fmt, ap);
+      assume(l != -1);
+#else
+      vsprintf(&(ns[l]), fmt, ap);
+#endif
+      mmTestL(ns);
+      FreeL(sprint);
+      sprint = ns;
+    }
+    va_end(ap);
+    return;
+  }
   if (feOut)
   {
     va_list ap;

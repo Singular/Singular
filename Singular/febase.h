@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.27 1999-03-16 15:33:05 Singular Exp $ */
+/* $Id: febase.h,v 1.28 1999-04-17 14:58:46 obachman Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -123,7 +123,6 @@ inline void PrintTCL(const char c, int l,const char *s)
 
 char *  StringAppend(char *fmt, ...);
 char *  StringAppendS(char *s);
-char *  StringSet(char *fmt, ...);
 char *  StringSetS(char* s);
 const  char * VoiceName();
 void    VoiceBackTrack();
@@ -192,3 +191,9 @@ Voice * feInitStdin();
 #endif
 #endif
 #endif
+
+/* everything in between calls to these procedures is printed into a string
+ * which is returned by SprintEnd()
+ */
+void SPrintStart();
+char* SPrintEnd();

@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.49 1999-04-17 12:30:16 Singular Exp $
+// $Id: clapsing.cc,v 1.50 1999-04-17 14:58:38 obachman Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -608,8 +608,8 @@ void singclap_divide_content ( poly f )
         //nTest((number)c);
         //#ifdef LDEBUG
         //number cn=(number)c;
-        //StringSet(""); nWrite(nt); StringAppendS(" ==> ");
-        //nWrite(cn);PrintS(StringAppendS("\n"));
+        //StringSetS(""); nWrite(nt); StringAppend(" ==> ");
+        //nWrite(cn);PrintS(StringAppend("\n"));
         //#endif
       }
     }
@@ -916,7 +916,7 @@ char* singclap_neworder ( ideal I)
 
   List<int> IL=neworderint(L);
   ListIterator<int> Li;
-  StringSet("");
+  StringSetS("");
   Li = IL;
   int offs=rPar(currRing);
   int* mark=(int*)Alloc0((pVariables+offs)*sizeof(int));

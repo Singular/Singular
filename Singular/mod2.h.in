@@ -80,6 +80,8 @@
 #undef HAVE_GETCWD
 /* Define if you have the getwd function.  */
 #undef HAVE_GETWD
+/* Define if you have snprintf */
+#undef HAVE_VSNPRINTF
 /* Define if you have sbrk */
 #undef HAVE_SBRK
 /* Define if you have readlink */

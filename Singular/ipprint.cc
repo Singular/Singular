@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipprint.cc,v 1.9 1999-04-17 12:30:18 Singular Exp $ */
+/* $Id: ipprint.cc,v 1.10 1999-04-17 14:58:49 obachman Exp $ */
 /*
 * ABSTRACT: interpreter: printing
 */
@@ -17,33 +17,15 @@
 #include "intvec.h"
 #include "ipshell.h"
 #include "ipprint.h"
+#include "ideals.h"
 
 /*2
 * print for: int, string, poly, vector, ideal
 */
-BOOLEAN jjPRINT_GEN(leftv res, leftv u)
-{
-  char *s=u->String();
-  if (s==NULL) return TRUE;
-  PrintS(s);
-  PrintLn();
-  FreeL((ADDRESS)s);
-  return FALSE;
-}
-
-/*2
-* print for: list
-*/
-BOOLEAN jjPRINT_LIST(leftv res, leftv u)
-{
-  u->Print();
-  return FALSE;
-}
-
 /*2
 * print for: intvec
 */
-BOOLEAN jjPRINT_INTVEC(leftv res, leftv u)
+static BOOLEAN ipPrint_INTVEC(leftv u)
 {
   intvec *v=(intvec *)u->Data();
   v->show();
@@ -54,7 +36,7 @@ BOOLEAN jjPRINT_INTVEC(leftv res, leftv u)
 /*2
 * print for: intmat
 */
-BOOLEAN jjPRINT_INTMAT(leftv res, leftv u)
+static BOOLEAN ipPrint_INTMAT(leftv u)
 {
   intvec *v=(intvec *)u->Data();
   int i,j;
@@ -72,7 +54,7 @@ BOOLEAN jjPRINT_INTMAT(leftv res, leftv u)
 /*2
 * internal print for: matrix
 */
-void jjPRINT_MA0(matrix m, const char *name)
+static void ipPrint_MA0(matrix m, const char *name)
 {
   if (MATCOLS(m)>0)
   {
@@ -195,17 +177,17 @@ void jjPRINT_MA0(matrix m, const char *name)
 /*2
 * print for: matrix
 */
-BOOLEAN jjPRINT_MA(leftv res, leftv u)
+static BOOLEAN ipPrint_MA(leftv u)
 {
   matrix m=(matrix)u->Data();
-  jjPRINT_MA0(m,u->Fullname());
+  ipPrint_MA0(m,u->Fullname());
   return FALSE;
 }
 
 /*2
 * print for: vector
 */
-BOOLEAN jjPRINT_V(leftv res, leftv u)
+static BOOLEAN ipPrint_V(leftv u)
 {
   polyset m=NULL;
   int l,j;
@@ -231,6 +213,46 @@ BOOLEAN jjPRINT_V(leftv res, leftv u)
   return FALSE;
 }
 
+BOOLEAN jjPRINT(leftv res, leftv u)
+{
+  switch(u->Typ())
+  {
+      case INTVEC_CMD:
+        return ipPrint_INTVEC(u);
+        
+      case INTMAT_CMD:
+        return ipPrint_INTMAT(u);
+        
+      case MATRIX_CMD:
+        return ipPrint_MA(u);
+
+      case IDEAL_CMD:
+      {
+        char* s = u->String();
+        PrintS(s);
+        PrintLn();
+        FreeL(s);
+        return FALSE;
+      }
+      
+      case MODUL_CMD:
+      {
+        matrix m = idModule2Matrix(idCopy((ideal) u->Data()));
+        ipPrint_MA0(m, u->Fullname());
+        idDelete((ideal *) &m);
+        return FALSE;
+      }
+      
+      case VECTOR_CMD:
+        return ipPrint_V(u);
+        
+      default:
+        u->Print();
+        return FALSE;
+  }
+}
+
+
 /*2
 * dbprint
 */
@@ -251,13 +273,50 @@ BOOLEAN jjDBPRINT(leftv res, leftv u)
     {
       hh=h->next;
       h->next=NULL;
-      if (iiExprArith1(res,h,PRINT_CMD)) return TRUE;
+      if (jjPRINT(res, h)) return TRUE;
       h->next=hh;
       h=hh;
     }
   }
   return FALSE;
 }
+
+static void ipPrintBetti(leftv u)
+{
+  int i,j;
+  intvec * betti=(intvec *)u->Data();
+  // head line --------------------------------------------------------
+  PrintS("      "); // 6 spaces for no. and :
+  for(j=0;j<betti->cols();j++) Print(" %5d",j); // 6 spaces pro column
+  PrintS("\n------"); // 6 spaces for no. and :
+  for(j=0;j<betti->cols();j++) PrintS("------"); // 6 spaces pro column
+  PrintLn();
+  // the table --------------------------------------------------------
+  for(i=0;i<betti->rows();i++)
+  {
+    Print("%5d:",i);
+    for(j=1;j<=betti->cols();j++)
+    {
+      Print(" %5d",IMATELEM(*betti,i+1,j));
+    }
+    PrintLn();
+  }
+  // sum --------------------------------------------------------------
+  PrintS("------"); // 6 spaces for no. and :
+  for(j=0;j<betti->cols();j++) PrintS("------"); // 6 spaces pro column
+  PrintS("\ntotal:");
+  for(j=0;j<betti->cols();j++)
+  {
+    int s=0;
+    for(i=0;i<betti->rows();i++)
+    {
+      s+=IMATELEM(*betti,i+1,j+1);
+    }
+    Print(" %5d",s); // 6 spaces pro column
+  }
+  PrintLn();
+}
+
 
 /*2
 * print(...,"format")
@@ -267,41 +326,54 @@ BOOLEAN jjPRINT_FORMAT(leftv res, leftv u, leftv v)
 /* ==================== betti ======================================== */
   if ((u->Typ()==INTMAT_CMD)&&(strcmp((char *)v->Data(),"betti")==0))
   {
-    int i,j;
-    intvec * betti=(intvec *)u->Data();
-    // head line --------------------------------------------------------
-    PrintS("      "); // 6 spaces for no. and :
-    for(j=0;j<betti->cols();j++) Print(" %5d",j); // 6 spaces pro column
-    PrintS("\n------"); // 6 spaces for no. and :
-    for(j=0;j<betti->cols();j++) PrintS("------"); // 6 spaces pro column
-    PrintLn();
-    // the table --------------------------------------------------------
-    for(i=0;i<betti->rows();i++)
-    {
-      Print("%5d:",i);
-      for(j=1;j<=betti->cols();j++)
-      {
-        Print(" %5d",IMATELEM(*betti,i+1,j));
-      }
-      PrintLn();
-    }
-    // sum --------------------------------------------------------------
-    PrintS("------"); // 6 spaces for no. and :
-    for(j=0;j<betti->cols();j++) PrintS("------"); // 6 spaces pro column
-    PrintS("\ntotal:");
-    for(j=0;j<betti->cols();j++)
-    {
-      int s=0;
-      for(i=0;i<betti->rows();i++)
-      {
-        s+=IMATELEM(*betti,i+1,j+1);
-      }
-      Print(" %5d",s); // 6 spaces pro column
-    }
-    PrintLn();
+    ipPrintBetti(u);
+    res->data = NULL;
+    res->rtyp = NONE;
     return FALSE;
   }
 /* ======================== end betti ================================= */
 
-  return jjPRINT_GEN(res,u);
+  if (strcmp((char *)v->Data(),"%s") == 0)
+  {
+    res->data = (char*) u->String();
+  }
+  else if (strcmp((char *)v->Data(),"%;") == 0)
+  {
+    SPrintStart();
+    u->Print();
+    res->data = SPrintEnd();
+  }
+  else if  (strcmp((char *)v->Data(),"%p") == 0)
+  {
+    SPrintStart();
+    iiExprArith1(res, u, PRINT_CMD);
+    res->data = SPrintEnd();
+  }
+  else if (strcmp((char *)v->Data(),"%b") == 0 && (u->Typ()==INTMAT_CMD))
+  {
+    SPrintStart();
+    ipPrintBetti(u);
+    res->data = SPrintEnd();
+  }
+  else 
+  {
+    res->data = u->String();
+  }
+    
+  res->rtyp = STRING_CMD;
+  return FALSE;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -655,7 +655,7 @@ BOOLEAN setOption(leftv res, leftv v)
     {
       BITSET tmp;
       int i;
-      StringSet("");
+      StringSetS("");
       if ((test!=0)||(verbose!=0))
       {
         tmp=test;
@@ -683,7 +683,7 @@ BOOLEAN setOption(leftv res, leftv v)
           }
         }
         PrintTCLS('O',StringAppendS(""));
-        StringSet("");
+        StringSetS("");
       }
       else
       {
@@ -699,7 +699,7 @@ char * showOption()
   int i;
   BITSET tmp;
 
-  StringSet("//options:");
+  StringSetS("//options:");
   if ((test!=0)||(verbose!=0))
   {
     tmp=test;
@@ -742,7 +742,7 @@ char * showOption()
 
 char * versionString()
 {
-  StringSet("\t");
+  StringSetS("\t");
 #ifdef HAVE_FACTORY
               StringAppend("factory(%s),", factoryVersion);
 #endif
