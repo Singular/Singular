@@ -121,7 +121,11 @@ TROUBLES
     
    Can not find shared library ....
 
-  To fix this, download and install
+  To fix this, first delete the files
+	./<uname description>/bin/Singular
+	./<uname description>/bin/Singular-<x.y.z>	
+
+  and then download and install
    
    Singular-<x.y.z>-<uname description>-static.tar.gz 
  
