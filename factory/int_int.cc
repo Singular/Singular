@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: int_int.cc,v 1.2 1997-03-27 10:05:39 schmidt Exp $
+// $Id: int_int.cc,v 1.3 1997-04-15 09:12:08 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.2  1997/03/27 10:05:39  schmidt
+stream-io wrapped by NOSTREAMIO
+
 Revision 1.1  1996/12/20 15:35:26  schmidt
 Ruedigers last fryday afternoon fix
 
@@ -11,18 +14,17 @@ Initial revision
 
 */
 
+#include <config.h>
+
 #include "assert.h"
 
 #include "cf_defs.h"
-
 #include "cf_globals.h"
 #include "int_int.h"
 #include "int_rat.h"
 #include "imm.h"
 #include "canonicalform.h"
 #include "gmpext.h"
-
-#define IntInt InternalInteger
 
 InternalInteger::InternalInteger()
 {
