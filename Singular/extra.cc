@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.53 1998-06-08 11:09:39 krueger Exp $ */
+/* $Id: extra.cc,v 1.54 1998-06-08 13:11:25 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -85,7 +85,7 @@ TIMING_DEFINE_PRINTPROTO( algLcmTimer );
 #endif
 
 void piShowProcList();
-static BOOLEAN EXTENDED_SYSTEM(leftv res, leftv h);
+static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h);
 
 
 //void emStart();
@@ -363,49 +363,27 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
    }
    else
    {
-#ifdef HAVE_EXTENDED_SYSTEM
 /*================= Extended system call ========================*/
-     return(EXTENDED_SYSTEM(res, h));
+#ifdef HAVE_EXTENDED_SYSTEM
+     return(jjEXTENDED_SYSTEM(res, h));
 #else
      WerrorS( feNotImplemented );
 #endif
-   } 
+   }
   } /* typ==string */
   return TRUE;
 }
 
-  
+
 
 #ifdef HAVE_EXTENDED_SYSTEM
 // You can put your own system calls here
 #include "fglmcomb.cc"
 #include "fglm.h"
-static BOOLEAN EXTENDED_SYSTEM(leftv res, leftv h)
+static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 {
   if(h->Typ() == STRING_CMD)
   {
-/*==================== LaScala ==================================*/
-    if(strcmp((char*)(h->Data()),"LaScala")==0)
-    {
-      if ((h->next!=NULL)
-      &&((h->next->Typ()==IDEAL_CMD)||(h->next->Typ()==MODUL_CMD)))
-      {
-        int dummy;
-        res->data=(void *)syLaScala3((ideal)h->next->Data(),&dummy);
-        mmTest(res->data,sizeof(ssyStrategy));
-        syStrategy s=(syStrategy)res->data;
-        for (int i=s->length;i>=0;i--)
-        {
-          if (s->res[i]!=NULL)
-            idTest(s->res[i]);
-        }
-        res->rtyp=RESOLUTION_CMD;
-        return FALSE;
-      }
-      else
-         WerrorS("ideal/module expected");
-    }
-    else
 /*==================== naIdeal ==================================*/
     if(strcmp((char*)(h->Data()),"naIdeal")==0)
     {
@@ -475,23 +453,6 @@ static BOOLEAN EXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
-#ifdef HAVE_FACTORY
-/*==================== pdivide ====================*/
-    if (strcmp((char*)(h->Data()),"pdivide")==0)
-    {
-      if (h->next!=NULL && h->next->next!=NULL &&
-           h->next->Typ()==POLY_CMD && h->next->next->Typ()==POLY_CMD)
-      {
-        res->rtyp=POLY_CMD;
-        res->data=(void*)(singclap_pdivide((poly)(h->next->Data()),
-                                         (poly)(h->next->next->Data())));
-        return FALSE;
-      }
-      else
-        WerrorS("poly expected");
-    }
-    else
-#endif
 /*==================== algfetch =====================*/
     if (strcmp((char*)(h->Data()),"algfetch")==0)
     {
@@ -538,31 +499,8 @@ static BOOLEAN EXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
-/*==================== indsetall =============================*/
-    if(strcmp((char*)(h->Data()),"indsetall")==0)
-    {
-      if ((h->next!=NULL) &&(h->next->Typ()==IDEAL_CMD))
-      {
-        int i=0;
-        if (h->next->next!=NULL)
-        {
-          if (h->next->next->Typ()==INT_CMD)
-            i=(int)h->next->next->Data();
-          else
-          {
-            Warn("int expected");
-          }
-        }
-        res->rtyp=LIST_CMD;
-        res->data=(void *)scIndIndset((ideal)h->next->Data(),i,currQuotient);
-        return FALSE;
-      }
-      else
-        WerrorS("ideal expected");
-    }
-    else
-#ifdef STDTRACE
     /*==================== trace =============================*/
+#ifdef STDTRACE
     /* Parameter : Ideal, Liste mit Links. */
     if(strcmp((char*)(h->Data()),"stdtrace")==0)
     {
