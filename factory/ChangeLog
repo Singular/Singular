@@ -1,3 +1,9 @@
+Wed Jun 03 16:47:54 1998    <pohl@FUECHSE>
+
+	* ftmpl_factor.h (template <class T> class Factor):
+	  `operator == ( const Factor<T> &, const Factor<T> &)'
+	  removed as friend and added as extra operator
+
 Wed Jun 03 14:47:41 1998    <pohl@FUECHSE>
 
 	* timing.h, readcf.y, int_poly.cc, imm.h: test on WINNT
