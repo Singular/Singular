@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sdb.cc,v 1.4 1999-05-06 16:53:25 Singular Exp $ */
+/* $Id: sdb.cc,v 1.5 1999-05-17 13:34:03 Singular Exp $ */
 /*
 * ABSTRACT: Singular debugger
 */
@@ -18,7 +18,7 @@
 
 int sdb_lines[]={-1,-1,-1,-1,-1,-1,-1,-1};
 char * sdb_files[6];
-int sdb_flags=1;
+int sdb_flags=0;
 
 int sdb_checkline(char f)
 {
