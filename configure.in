@@ -3,7 +3,36 @@ AC_INIT(Singular/matpol.h)
 AC_PREFIX_DEFAULT(`pwd`)
 pwd=`pwd`
 
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl Version business --  set these here
+dnl
+# make them to env variables 
+# pass them indirectly to subsequent configures
+SINGULAR_MAJOR_VERSION=1
+SINGULAR_MINOR_VERSION=3
+SINGULAR_SUB_VERSION=8
+SINGULAR_SHORT_VERSION="${SINGULAR_MAJOR_VERSION}${VERSION_SEP}${SINGULAR_MINOR_VERSION}"
+SINGULAR_VERSION="${SINGULAR_SHORT_VERSION}${VERSION_SEP}${SINGULAR_SUB_VERSION}"
+VERSION_DATE="May 2000"
+SINGULAR_ROOT_DIR=$pwd
 
+export SINGULAR_MINOR_VERSION
+export SINGULAR_MAJOR_VERSION
+export SINGULAR_SUB_VERSION
+export SINGULAR_VERSION
+export VERSION_DATE
+export SINGULAR_ROOT_DIR
+
+dnl substitue them into the Makefiles
+AC_SUBST(SINGULAR_VERSION)
+AC_SUBST(VERSION_DATE)
+AC_SUBST(SINGULAR_SHORT_VERSION)
+AC_SUBST(SINGULAR_ROOT_DIR)
+
+
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl Makefiles to output
+dnl
 # determine Makefiles to output
 OUTPUT_MAKEFILES="Makefile"
 if test -d "doc"; then
@@ -58,31 +87,15 @@ AC_SUBST(SING_UNAME)
 
 VERSION_SEP="-"
 
-dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
-dnl Version business --  set these here
-dnl
-# make them to env variables 
-# pass them indirectly to subsequent configures
-SINGULAR_MAJOR_VERSION=1
-SINGULAR_MINOR_VERSION=3
-SINGULAR_SUB_VERSION=8
-SINGULAR_SHORT_VERSION="${SINGULAR_MAJOR_VERSION}${VERSION_SEP}${SINGULAR_MINOR_VERSION}"
-SINGULAR_VERSION="${SINGULAR_SHORT_VERSION}${VERSION_SEP}${SINGULAR_SUB_VERSION}"
-VERSION_DATE="May 2000"
-SINGULAR_ROOT_DIR=$pwd
 
-export SINGULAR_MINOR_VERSION
-export SINGULAR_MAJOR_VERSION
-export SINGULAR_SUB_VERSION
-export SINGULAR_VERSION
-export VERSION_DATE
-export SINGULAR_ROOT_DIR
-
-dnl substitue them into the Makefiles
-AC_SUBST(SINGULAR_VERSION)
-AC_SUBST(VERSION_DATE)
-AC_SUBST(SINGULAR_SHORT_VERSION)
-AC_SUBST(SINGULAR_ROOT_DIR)
+# for gmp-3.0 to work for all ix86 processors, set generic target
+if test "$target" = NONE; then 
+echo "target=$target uname=$ac_cv_singuname"
+case "$ac_cv_singuname" in 
+	ix86*) ac_configure_args="$ac_configure_args --target=i386" ;;
+esac
+fi
+echo $ac_configure_args
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl compiler stuff
@@ -327,7 +340,7 @@ if test "$enable_gmp" != yes && test "$enable_gmp" != no; then
     enable_gmp=yes
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS gmp"
     ac_configure_args="$ac_configure_args --enable-gmp"
-    OUTPUT_MAKEFILES="$OUTPUT_MAKEFILES gmp/Makefile.in"
+#    OUTPUT_MAKEFILES="$OUTPUT_MAKEFILES gmp/Makefile.in"
   else
     AC_MSG_RESULT(no)
     enable_gmp=no
@@ -339,7 +352,7 @@ elif test "$enable_gmp" = yes; then
   else
     AC_MSG_RESULT(yes)
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS gmp"
-    OUTPUT_MAKEFILES="$OUTPUT_MAKEFILES gmp/Makefile.in"
+#    OUTPUT_MAKEFILES="$OUTPUT_MAKEFILES gmp/Makefile.in"
   fi
 else
   AC_MSG_RESULT(no)

@@ -2244,7 +2244,7 @@ elif test "$enable_gmp" = yes; then
   else
     echo "$ac_t""yes" 1>&6
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS gmp"
-    OUTPUT_MAKEFILES="$OUTPUT_MAKEFILES gmp/Makefile.in"
+#    OUTPUT_MAKEFILES="$OUTPUT_MAKEFILES gmp/Makefile.in"
   fi
 else
   echo "$ac_t""no" 1>&6
