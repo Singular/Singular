@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.195 2002-06-26 11:26:32 Singular Exp $ */
+/* $Id: ring.cc,v 1.196 2002-12-13 16:20:59 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -950,11 +950,11 @@ void rKill(ring r)
 
       for(; nshdl != NULL; nshdl = nshdl->next)
       {
-        if (nshdl->currRing==r)
+        if (nshdl->cRing==r)
         {
           Warn("killing the basering for level %d",lev);
-          nshdl->currRing=NULL;
-          nshdl->currRingHdl=NULL;
+          nshdl->cRing=NULL;
+          nshdl->cRingHdl=NULL;
         }
       }
     }
@@ -980,18 +980,20 @@ void rKill(idhdl h)
     if (ref<=0) { currRing=NULL; currRingHdl=NULL;}
     else
     {
-      currRingHdl=rFindHdl(r,NULL,NULL);
+      currRingHdl=rFindHdl(r,currRingHdl,NULL);
     }
   }
 }
 
-idhdl rSimpleFindHdl(ring r, idhdl root)
+static idhdl rSimpleFindHdl(ring r, idhdl root, idhdl n=NULL)
 {
   idhdl h=root;
   while (h!=NULL)
   {
     if (((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))
-        && (h->data.uring==r))
+	&& (h!=n)
+        && (h->data.uring==r)
+	)
       return h;
     h=IDNEXT(h);
   }
@@ -1000,17 +1002,17 @@ idhdl rSimpleFindHdl(ring r, idhdl root)
 
 idhdl rFindHdl(ring r, idhdl n, idhdl w)
 {
-  idhdl h=rSimpleFindHdl(r,IDROOT);
+  idhdl h=rSimpleFindHdl(r,IDROOT,n);
   if (h!=NULL)  return h;
 #ifdef HAVE_NS
-  if (IDROOT!=basePack->idroot) h=rSimpleFindHdl(r,basePack->idroot);
+  if (IDROOT!=basePack->idroot) h=rSimpleFindHdl(r,basePack->idroot,n);
   if (h!=NULL)  return h;
   proclevel *p=procstack;
   while(p!=NULL)
   {
     if ((p->currPack!=basePack)
     && (p->currPack!=currPack))
-      h=rSimpleFindHdl(r,p->currPack->idroot);
+      h=rSimpleFindHdl(r,p->currPack->idroot,n);
     if (h!=NULL)  return h;
     p=p->next;
   }
@@ -1018,7 +1020,7 @@ idhdl rFindHdl(ring r, idhdl n, idhdl w)
   while (tmp!=NULL)
   {
     if (IDTYP(tmp)==PACKAGE_CMD)
-      h=rSimpleFindHdl(r,IDPACKAGE(tmp)->idroot);
+      h=rSimpleFindHdl(r,IDPACKAGE(tmp)->idroot,n);
     if (h!=NULL)  return h;
     tmp=IDNEXT(tmp);
   }
