@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.87 2002-04-30 13:35:11 levandov Exp $ */
+/* $Id: kstd1.cc,v 1.88 2002-06-17 16:27:45 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -167,7 +167,7 @@ int redEcart (LObject* h,kStrategy strat)
   d = h->GetpFDeg()+ h->ecart;
   reddeg = strat->LazyDegree+d;
   h->SetShortExpVector();
-  while (1)
+  loop
   {
     j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
     if (j < 0)
@@ -881,11 +881,11 @@ void firstUpdate(kStrategy strat)
         strat->tailRing->pLDeg = strat->pOrigLDeg_TailRing;
       }
       int i;
-      for (i =0; i<=strat->Ll; i++)
+      for (i=strat->Ll; i>=0; i--)
       {
         strat->L[i].SetpFDeg();
       }
-      for (i=0; i<=strat->tl; i++)
+      for (i=strat->tl; i>=0; i--)
       {
         strat->T[i].SetpFDeg();
       }
@@ -1731,7 +1731,7 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 #ifdef KDEBUG
   {
     int i;
-    for (i=0; i<IDELEMS(r); i++) pTest(r->m[i]);
+    for (i=IDELEMS(r)-1; i>=0; i--) pTest(r->m[i]);
   }
 #endif
   idSkipZeroes(r);
@@ -1929,7 +1929,7 @@ ideal kInterRed (ideal F, ideal Q)
 
   if (strat->fromQ)
   {
-    for (j=0;j<IDELEMS(strat->Shdl);j++)
+    for (j=IDELEMS(strat->Shdl)-1;j>=0;j--)
     {
       if(strat->fromQ[j]) pDelete(&strat->Shdl->m[j]);
     }
