@@ -443,7 +443,7 @@ fi
 
 AC_MSG_CHECKING(which remote shell command to use)
 for mp_rsh in $ac_rsh_programs; do
-    if $mp_rsh localhost -n uname \>\& /dev/null; then
+    if $mp_rsh `hostname` -n uname >& /dev/null; then
       mp_rsh_found=$mp_rsh
       break;
     else
@@ -455,7 +455,13 @@ if test "${mp_rsh_found}" = none; then
    AC_MSG_WARN("No working remote shell command found")
 else
   AC_DEFINE_UNQUOTED(MP_RSH_COMMAND, "$mp_rsh_found")
+   # check whether it alsow works with localhost, instead of hostname
+   if $mp_rsh localhost -n uname  >& /dev/null; then
+     AC_DEFINE(RSH_CAN_LOCALHOST)
+   fi
 fi
+
+
 
 dnl Check for external memory managements
 AC_ARG_WITH(malloc, \

@@ -438,7 +438,7 @@ MP_Status_t open_tcp_launch_mode(link, argc, argv)
     MP_TCP_t *tcp_rec;
     MP_Boolean_t localhost = MP_FALSE;
 
-#ifdef HAVE_GETHOSTBYNAME
+#if defined(HAVE_GETHOSTBYNAME) && defined(RSH_CAN_LOCALHOST)
     if (gethostbyname("localhost") != NULL) localhost = MP_TRUE;
 #endif
     
