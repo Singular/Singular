@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plutypes.doc,v 1.19 2004-06-01 12:46:40 levandov Exp $
+@comment $Id: plutypes.doc,v 1.20 2004-08-05 16:02:51 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -246,9 +246,9 @@ two-sided Groebner basis computation (see @ref{twostd})
 
 
 @c ---------------------------------------
-@node map@value{PSUFFIX}, module @value{PSUFFIX}, ideal @value{PSUFFIX}, Data types @value{PSUFFIX}
-@section map@value{PSUFFIX}
-@cindex map@value{PSUFFIX}
+@node map @value{PSUFFIX}, module @value{PSUFFIX}, ideal @value{PSUFFIX}, Data types @value{PSUFFIX}
+@section map @value{PSUFFIX}
+@cindex map @value{PSUFFIX}
 
 Maps are ring maps from a preimage ring into the basering.
 
@@ -391,19 +391,19 @@ maps only to map objects with integer coefficients.
 
 
 @menu
-* map@value{PSUFFIX} declarations::
-* map@value{PSUFFIX} expressions::
-* map@value{PSUFFIX} operations::
-* map@value{PSUFFIX} related functions::
+* map @value{PSUFFIX} declarations::
+* map @value{PSUFFIX} expressions::
+* map @value{PSUFFIX} operations::
+* map @value{PSUFFIX} related functions::
 @end menu
 @c @iftex
 @c See @ref{imap}; @ref{fetch}; @ref{subst}.
 @c @end iftex
 
 @c ------------------------------
-@node map@value{PSUFFIX} declarations, map@value{PSUFFIX} expressions, map@value{PSUFFIX}, map@value{PSUFFIX}
-@subsection map@value{PSUFFIX} declarations
-@cindex map@value{PSUFFIX} declarations
+@node map @value{PSUFFIX} declarations, map @value{PSUFFIX} expressions, map @value{PSUFFIX}, map @value{PSUFFIX}
+@subsection map @value{PSUFFIX} declarations
+@cindex map @value{PSUFFIX} declarations
 
 @table @strong
 @item Syntax:
@@ -425,7 +425,7 @@ none
 
 @item Note:
 There are standard mappings for maps which are close to the identity
-map: @code{fetch@value{PSUFFIX}} and @code{imap@value{PSUFFIX}}.
+map: @code{fetch @value{PSUFFIX}} and @code{imap @value{PSUFFIX}}.
 
 The name of a map serves as the function which maps objects from the
 preimage_ring into the basering.  These objects must be defined
@@ -453,16 +453,16 @@ F(D);
 
 @c ref
 See 
- @ref{fetch@value{PSUFFIX}};
+ @ref{fetch @value{PSUFFIX}};
 @ref{ideal expressions @value{PSUFFIX}};
-@ref{imap@value{PSUFFIX}};
-@ref{map@value{PSUFFIX}};
-@ref{ring@value{PSUFFIX}}.
+@ref{imap @value{PSUFFIX}};
+@ref{map @value{PSUFFIX}};
+@ref{ring @value{PSUFFIX}}.
 @c ref
 @c ------------------------------
-@node map@value{PSUFFIX} expressions, map@value{PSUFFIX} operations, map@value{PSUFFIX} declarations, map@value{PSUFFIX}
-@subsection map@value{PSUFFIX} expressions
-@cindex map@value{PSUFFIX} expressions
+@node map @value{PSUFFIX} expressions, map @value{PSUFFIX} operations, map @value{PSUFFIX} declarations, map @value{PSUFFIX}
+@subsection map @value{PSUFFIX} expressions
+@cindex map @value{PSUFFIX} expressions
 
 A map expression is:
 @enumerate
@@ -475,10 +475,10 @@ map expressions combined by composition using parentheses (@code{(}, @code{)})
 @end enumerate
 
 @c ------------------------------
-@node map@value{PSUFFIX} operations, map@value{PSUFFIX} related functions, map expressions, map@value{PSUFFIX}
-@subsection map@value{PSUFFIX} operations
+@node map @value{PSUFFIX} operations, map @value{PSUFFIX} related functions, map @value{PSUFFIX} expressions, map@value{PSUFFIX}
+@subsection map @value{PSUFFIX} operations
 
-@cindex map@value{PSUFFIX} operations
+@cindex map @value{PSUFFIX} operations
 
 @table @asis
 @item @code{( )}
@@ -507,20 +507,20 @@ G(p);
 @end smallexample
 
 @c ------------------------------
-@node map@value{PSUFFIX} related functions,  , map@value{PSUFFIX} operations, map
-@subsection map@value{PSUFFIX} related functions
+@node map @value{PSUFFIX} related functions,  , map @value{PSUFFIX} operations, map
+@subsection map @value{PSUFFIX} related functions
 
-@cindex map@value{PSUFFIX} related functions
+@cindex map @value{PSUFFIX} related functions
 
 @table @code
-@item fetch@value{PSUFFIX} 
-the identity map between rings and qrings (see @ref{fetch@value{PSUFFIX}})
+@item fetch @value{PSUFFIX} 
+the identity map between rings and qrings (see @ref{fetch @value{PSUFFIX}})
 
-@item imap@value{PSUFFIX}
-a convenient map procedure for inclusions and projections of rings (see @ref{imap@value{PSUFFIX}})
+@item imap @value{PSUFFIX}
+a convenient map procedure for inclusions and projections of rings (see @ref{imap @value{PSUFFIX}})
 
-@item preimage@value{PSUFFIX}
-preimage under a ring map (see @ref{preimage@value{PSUFFIX}})
+@item preimage @value{PSUFFIX}
+preimage under a ring map (see @ref{preimage @value{PSUFFIX}})
 
 @item subst
 substitute a ring variable (see @ref{subst})

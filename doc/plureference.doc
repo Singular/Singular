@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.19 2004-08-05 14:50:19 levandov Exp $
+@comment $Id: plureference.doc,v 1.20 2004-08-05 16:02:51 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -40,8 +40,8 @@ The general syntax of a function is
 * betti @value{PSUFFIX}::
 * bracket::
 * eliminate @value{PSUFFIX}::
-* fetch@value{PSUFFIX}::
-* imap@value{PSUFFIX}::
+* fetch @value{PSUFFIX}::
+* imap @value{PSUFFIX}::
 * intersect @value{PSUFFIX}::
 * kbase @value{PSUFFIX}::
 * lift @value{PSUFFIX}::
@@ -268,9 +268,9 @@ See
 @c ref
 
 @c ---------------------------------------
-@node fetch@value{PSUFFIX}, imap@value{PSUFFIX}, eliminate @value{PSUFFIX}, Functions @value{PSUFFIX}
-@section fetch@value{PSUFFIX}
-@cindex fetch@value{PSUFFIX}
+@node fetch @value{PSUFFIX}, imap @value{PSUFFIX}, eliminate @value{PSUFFIX}, Functions @value{PSUFFIX}
+@section fetch @value{PSUFFIX}
+@cindex fetch @value{PSUFFIX}
 
 @table @code
 @item @strong{Syntax:}
@@ -311,17 +311,17 @@ QJ;
 @end table
 @c ref
 See
-@ref{imap@value{PSUFFIX}};
-@ref{map@value{PSUFFIX}};
-@ref{qring@value{PSUFFIX}};
-@ref{ring@value{PSUFFIX}}.
+@ref{imap @value{PSUFFIX}};
+@ref{map @value{PSUFFIX}};
+@ref{qring @value{PSUFFIX}};
+@ref{ring @value{PSUFFIX}}.
 @c ref
 
 
 @c ---------------------------------------
-@node imap@value{PSUFFIX},intersect @value{PSUFFIX}, fetch@value{PSUFFIX}, Functions@value{PSUFFIX}
-@section imap@value{PSUFFIX}
-@cindex imap@value{PSUFFIX}
+@node imap @value{PSUFFIX},intersect @value{PSUFFIX}, fetch@value{PSUFFIX}, Functions@value{PSUFFIX}
+@section imap @value{PSUFFIX}
+@cindex imap @value{PSUFFIX}
 
 @table @code
 @item @strong{Syntax:}
@@ -377,7 +377,7 @@ See
 @c ------------------------------------------------
 @node intersect @value{PSUFFIX}, kbase @value{PSUFFIX}, imap @value{PSUFFIX}, Functions @value{PSUFFIX}
 @section  intersect @value{PSUFFIX}
-@cindex  intersect   @value{PSUFFIX}
+@cindex  intersect @value{PSUFFIX}
 
 @table @code
 @item @strong{Syntax:}
@@ -576,7 +576,7 @@ See
 @ref{ring @value{PSUFFIX}};
 @ref{option @value{PSUFFIX}};
 @ref{std @value{PSUFFIX}};
-@ref{matrix @value{PSUFFIX}}.
+@ref{matrix}.
 @c ref
 
 
@@ -1215,9 +1215,9 @@ See
 @c ref
 
 @c ---------------------------------------
-@node preimage@value{PSUFFIX}, quotient @value{PSUFFIX}, option @value{PSUFFIX}, Functions @value{PSUFFIX}
-@section preimage@value{PSUFFIX}
-@cindex preimage@value{PSUFFIX}
+@node preimage @value{PSUFFIX}, quotient @value{PSUFFIX}, option @value{PSUFFIX}, Functions @value{PSUFFIX}
+@section preimage @value{PSUFFIX}
+@cindex preimage @value{PSUFFIX}
 
 @table @code
 @item @strong{Syntax:}
@@ -1263,17 +1263,17 @@ factorize(PreK[1],1); // three characters
 @end table
 @c ref
 See
-@ref{map@value{PSUFFIX}};
-@ref{ideal@value{PSUFFIX}};
-@ref{ring@value{PSUFFIX}}.
+@ref{map @value{PSUFFIX}};
+@ref{ideal @value{PSUFFIX}};
+@ref{ring @value{PSUFFIX}}.
 @c ref
 
 
 
 @c ---------------------------------------
-@node quotient@value{PSUFFIX},  reduce @value{PSUFFIX},preimage@value{PSUFFIX}, Functions@value{PSUFFIX}
-@section quotient@value{PSUFFIX}
-@cindex quotient@value{PSUFFIX}
+@node quotient @value{PSUFFIX}, reduce @value{PSUFFIX}, preimage @value{PSUFFIX}, Functions @value{PSUFFIX}
+@section quotient @value{PSUFFIX}
+@cindex quotient @value{PSUFFIX}
 @table @code
 @item @strong{Syntax:}
 @code{quotient (} ideal_expression@code{,} ideal_expression @code{)}
@@ -1489,7 +1489,7 @@ See
 
 
 @c -------------------------------------------------
-@node subst  @value{PSUFFIX}, syz, std @value{PSUFFIX}, Functions @value{PSUFFIX}
+@node subst  @value{PSUFFIX}, syz @value{PSUFFIX}, std @value{PSUFFIX}, Functions @value{PSUFFIX}
 @section subst @value{PSUFFIX}
 @cindex subst @value{PSUFFIX}
 @table @code
@@ -1524,7 +1524,7 @@ C2;
 
 
 @c -------------------------------------------------
-@node syz @value{PSUFFIX}, twostd, subst  @value{PSUFFIX}, Functions @value{PSUFFIX}
+@node syz @value{PSUFFIX}, twostd, subst @value{PSUFFIX}, Functions @value{PSUFFIX}
 @section syz @value{PSUFFIX}
 @cindex syz @value{PSUFFIX}
 @table @code
@@ -1568,8 +1568,6 @@ See
 @ref{nres @value{PSUFFIX}};
 @ref{minres @value{PSUFFIX}};
 @c ref
-
-
 
 
 @c ------------------------------

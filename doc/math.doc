@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.71 2004-08-05 15:08:27 Singular Exp $
+@comment $Id: math.doc,v 1.72 2004-08-05 16:02:50 levandov Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -695,7 +695,7 @@ using @code{spectrumnd(f,1)}.
 
 @section Non-commutative algebra 
 @cindex  Non-commutative algebra 
-@xref{Mathematical background(plural)} 
+@xref{Mathematical background (plural)} 
 
 
 @end ifset
