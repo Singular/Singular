@@ -2113,7 +2113,9 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
     int dummy_len;
     int new_length;
     int bp=erg.to_reduce_u;//bucket_positon
-    kBucketClear(los[bp].bucket,&clear_into,&new_length);
+    //kBucketClear(los[bp].bucket,&clear_into,&new_length);
+    new_length=los[bp].clear_to_poly();
+    clear_into=los[bp].p;
     poly p=c->strat->S[erg.reduce_by];
     int j=erg.reduce_by;
     int old_length=c->strat->lenS[j];// in view of S
@@ -2410,7 +2412,12 @@ void red_object::validate(){
     p=kBucketGetLm(bucket);
 
 }
-
+int red_object::clear_to_poly(){
+  flatten();
+  int l;
+  kBucketClear(bucket,&p,&l);
+  return l;
+}
 void red_object::reduction_step(int reduction_id, poly reductor_full, int full_len, poly reductor_part, reduction_accumulator* join_to, calc_dat* c)
 {
   //we have to add support later for building new sums at this points, this involves a change in the interface

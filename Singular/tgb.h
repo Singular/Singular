@@ -117,6 +117,7 @@ class red_object{
   void red_object::reduction_step(int reduction_id, poly reductor_full, int full_len, poly reductor_part, reduction_accumulator* join_to, calc_dat* c);
   void adjust_coefs(number c_r, number c_ac_r);
   int guess_quality(calc_dat* c);
+  int red_object::clear_to_poly();
 };
 
 
@@ -162,4 +163,5 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c);
 static sorted_pair_node* quick_pop_pair(calc_dat* c);
 static sorted_pair_node* top_pair(calc_dat* c);
 static int quality(poly p, int len, calc_dat* c);
+
 #endif
