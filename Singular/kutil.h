@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.12 1998-06-29 13:09:54 pohl Exp $ */
+/* $Id: kutil.h,v 1.13 1998-12-15 10:08:50 pohl Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -66,6 +66,7 @@ class skStrategy
     poly tail;
     leftv kIdeal;
     intvec * kModW;
+    intvec * kHomW;
     BOOLEAN *pairtest;/*used for enterOnePair*/
     int cp,c3;
     int sl,mu;
