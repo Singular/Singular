@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.59 2000-09-18 09:19:04 obachman Exp $ */
+/* $Id: ipassign.cc,v 1.60 2000-09-19 12:43:29 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -38,16 +38,6 @@
 #include "ipshell.h"
 
 /*=================== proc =================*/
-#ifdef SRING
-static BOOLEAN jjALTVARS(leftv res, leftv a)
-{
-  pAltVars=(int)a->Data();
-  pSRING=(pAltVars<=pVariables);
-  pSDRING=pSDRING||pSRING;
-  currRing->partN=pAltVars;
-  return FALSE;
-}
-#endif
 static BOOLEAN jjECHO(leftv res, leftv a)
 {
   si_echo=(int)a->Data();
@@ -545,9 +535,6 @@ struct sValAssign_sys dAssign_sys[]=
 {
 // sysvars:
  {jjECHO,       VECHO,          INT_CMD }
-#ifdef SRING
-,{jjALTVARS,    VALTVARS,       INT_CMD }
-#endif
 ,{jjPAGELENGTH, VPAGELENGTH,    INT_CMD }
 ,{jjPRINTLEVEL, VPRINTLEVEL,    INT_CMD }
 ,{jjCOLMAX,     VCOLMAX,        INT_CMD }

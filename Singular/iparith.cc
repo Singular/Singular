@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.225 2000-09-18 09:19:02 obachman Exp $ */
+/* $Id: iparith.cc,v 1.226 2000-09-19 12:43:28 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -15,7 +15,6 @@
 #include <unistd.h>
 
 #include "mod2.h"
-
 #include "tok.h"
 #include "ipid.h"
 #include "intvec.h"

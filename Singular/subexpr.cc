@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.67 2000-09-18 14:31:37 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.68 2000-09-19 12:43:32 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -13,9 +13,6 @@
 #include <unistd.h>
 
 #include "mod2.h"
-#define OM_TRACK 5
-#define OM_CHECK 3
-#define OM_KEEP 1
 #include "tok.h"
 #include "ipid.h"
 #include "intvec.h"
@@ -1002,9 +999,6 @@ void * sleftv::Data()
   {
     switch (rtyp)
     {
-#ifdef SRING
-      case VALTVARS:   return (void *)pAltVars;
-#endif
       case VECHO:      return (void *)si_echo;
       case VPAGELENGTH:return (void *)pagelength;
       case VPRINTLEVEL:return (void *)printlevel;
@@ -1117,6 +1111,7 @@ void * sleftv::Data()
       if (rtyp==IDHDL)
       {
         tmp.next=next; next=NULL;
+        data=NULL; d=NULL;
         CleanUp();
         memcpy(this,&tmp,sizeof(tmp));
       }
@@ -1125,12 +1120,12 @@ void * sleftv::Data()
       {
         // ???
         // here we still have a memory leak...
-	// example: list L="123","456";
-	// L[1][2];
-	// therefore, it should never happen:
-	assume(0);
-	// but if it happens: here is the temporary fix:
-	omMarkAsStaticAddr(r);
+        // example: list L="123","456";
+        // L[1][2];
+        // therefore, it should never happen:
+        assume(0);
+        // but if it happens: here is the temporary fix:
+        // omMarkAsStaticAddr(r);
       }
       break;
     }
@@ -1157,27 +1152,27 @@ void * sleftv::Data()
       {
         if ((e->next!=NULL)
         && (l->m[index-1].rtyp==STRING_CMD))
-	// string[..].Data() modifies sleftv, so let's do it ourself
-	{
-	  char *dd=l->m[index-1].data;
-	  int j=e->next->start-1;
-	  r=(char *)omAllocBin(size_two_bin);
-          if ((j>=0)&& (j<(int)strlen((char *)dd)))
-	  {
-	    r[0]=*(((char *)dd)+j);
-	    r[1]='\0';
-	  }
-	  else
-	  {
-	    r[0]='\0';
-	  }
-	}
+        // string[..].Data() modifies sleftv, so let's do it ourself
+        {
+          char *dd=(char *)l->m[index-1].data;
+          int j=e->next->start-1;
+          r=(char *)omAllocBin(size_two_bin);
+          if ((j>=0) && (j<(int)strlen(dd)))
+          {
+            r[0]=*(dd+j);
+            r[1]='\0';
+          }
+          else
+          {
+            r[0]='\0';
+          }
+        }
         else
-	{
-	  l->m[index-1].e=e->next;
+        {
+          l->m[index-1].e=e->next;
           r=(char *)l->m[index-1].Data();
           l->m[index-1].e=NULL;
-	}
+        }
       }
       else //if (!errorreported)
         Werror("wrong range[%d] in list(%d)",index,l->nr+1);
