@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.65 2002-01-24 13:32:33 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.66 2002-02-12 14:35:24 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -117,7 +117,7 @@ ring G;  Gauss-Manin connection of t with variable s
   ideal gmsstd;  standard basis of Jacobian ideal
   matrix gmsmatrix;  matrix(gmsjacob)*gmsmatrix==matrix(gmsstd)
   ideal gmsbasis;  monomial vector space basis of Jacobian algebra
-  int gmsmaxweight;  maximal weight of variables
+  int gmsmaxdeg;  maximal weight of variables
 @end format
 KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice
 EXAMPLE:  example gmsring; shows examples
@@ -150,15 +150,15 @@ EXAMPLE:  example gmsring; shows examples
       ERROR("isolated critical point 0 expected");
     }
   }  
-  matrix a=l[2];
+  matrix B=l[2];
   ideal m=kbase(g);
 
-  int gmsmaxweight;
+  int gmsmaxdeg;
   for(i=nvars(R);i>=1;i--)
   {
-    if(deg(var(i))>gmsmaxweight)
+    if(deg(var(i))>gmsmaxdeg)
     {
-      gmsmaxweight=deg(var(i));
+      gmsmaxdeg=deg(var(i));
     }
   }
 
@@ -182,16 +182,16 @@ EXAMPLE:  example gmsring; shows examples
   }
 
   execute("ring G="+string(charstr(R))+",("+s+","+varstr(R)+"),(ws("+
-    string(deg(highcorner(g))+2*gmsmaxweight)+"),"+os+",c);");
+    string(deg(highcorner(g))+2*gmsmaxdeg)+"),"+os+",c);");
 
   poly gmspoly=imap(R,t);
   ideal gmsjacob=imap(R,dt);
   ideal gmsstd=imap(R,g);
-  matrix gmsmatrix=imap(R,a);
+  matrix gmsmatrix=imap(R,B);
   ideal gmsbasis=imap(R,m);
 
   attrib(gmsstd,"isSB",1);
-  export gmspoly,gmsjacob,gmsstd,gmsmatrix,gmsbasis,gmsmaxweight;
+  export gmspoly,gmsjacob,gmsstd,gmsmatrix,gmsbasis,gmsmaxdeg;
 
   return(G);
 }
@@ -206,7 +206,7 @@ example
   print(gmsstd);
   print(gmsmatrix);
   print(gmsbasis);
-  gmsmaxweight;
+  gmsmaxdeg;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -242,7 +242,7 @@ EXAMPLE:  example gmsnf; shows examples
   int k;
   if(Kmax>=0)
   {
-    p=jet(jet(p,K,v),(Kmax+1)*deg(var(1))-2*gmsmaxweight);
+    p=jet(jet(p,K,v),(Kmax+1)*deg(var(1))-2*gmsmaxdeg);
   }
 
   ideal r,q;
@@ -271,7 +271,7 @@ EXAMPLE:  example gmsnf; shows examples
           {
             p[k]=p[k]+
               jet(jet(diff(s*gmsmatrix[j,i],var(j+1))*var(1),Kmax,v),
-                (Kmax+1)*deg(var(1))-2*gmsmaxweight);
+                (Kmax+1)*deg(var(1))-2*gmsmaxdeg);
           }
           else
           {
@@ -284,7 +284,7 @@ EXAMPLE:  example gmsnf; shows examples
         r[k]=r[k]+lead(p[k]);
         p[k]=p[k]-lead(p[k]);
       }
-      while(deg(lead(p[k]))>(K+1)*deg(var(1))-2*gmsmaxweight&&
+      while(deg(lead(p[k]))>(K+1)*deg(var(1))-2*gmsmaxdeg&&
         deg(lead(p[k]),v)<=K)
       {
         q[k]=q[k]+lead(p[k]);
@@ -576,7 +576,7 @@ EXAMPLE:  example monodromy; shows examples
   list l=jordan(A,e,m);
   setring(R);
   list l=imap(G,l);
-  kill G,gmsmaxweight;
+  kill G,gmsmaxdeg;
 
   return(l);
 }
@@ -908,7 +908,7 @@ EXAMPLE:  example vwfilt; shows examples
   list l=sppnf(a,w,v)+list(gmsbasis,gmsstd);
   setring(R);
   list l=imap(G,l);
-  kill G,gmsmaxweight;
+  kill G,gmsmaxdeg;
   attrib(l[5],"isSB",1);
 
   return(l);
@@ -972,7 +972,7 @@ EXAMPLE:  example tmatrix; shows examples
   matrix A=imap(G,A);
   module H0=imap(G,H0);
   ideal e=imap(G,e);
-  kill G,gmsmaxweight;
+  kill G,gmsmaxdeg;
 
   dbprint(printlevel-voice+2,"// transform to Jordan basis");
   module U=jordanbasis(A,e,m)[1];
