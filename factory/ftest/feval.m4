@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: feval.m4,v 1.4 1997-11-21 11:18:08 schmidt Exp $ */
+/* $Id: feval.m4,v 1.5 1998-01-06 11:11:36 schmidt Exp $ */
 
 ftestSetNameOfGame( feval, `"
 Usage: feval [<options>] [<envSpec>] <f>
@@ -68,7 +68,7 @@ Long usage not yet written, sorry.
 	// paste arguments together
 	char * argString = new char[len+1];
 	argString[0] = '\0';
-	while ( optind <= i ) {
+	while ( optind < i ) {
 	    strcat( argString, argv[optind] );
 	    optind++;
 	}
