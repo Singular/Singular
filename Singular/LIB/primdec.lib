@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.1 1997-05-05 12:03:01 Singular Exp $
+// $Id: primdec.lib,v 1.2 1997-08-04 15:14:21 Singular Exp $
 ///////////////////////////////////////////////////////
 // primdec.lib
 // algorithms for primary decomposition based on
@@ -23,6 +23,7 @@ LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION (I)
   //computes the radical of the ideal I 
 
 LIB "random.lib";
+LIB "poly.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc sat1 (ideal id, poly p)
@@ -1173,60 +1174,6 @@ example
    poly  q = (a+b)*(y+z);
    ideal l=p,q;
    poly  pr= coeffLcm(l);
-   pr;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-proc lcm (ideal i)
-USAGE:   lcm(i); i list of polynomials
-RETURN:  poly = lcm(i[1],...,i[size(i)])
-NOTE:    
-EXAMPLE: example lcm; shows an example
-{
-  int k,j;
-   poly p,q;
-  i=simplify(i,10);
-  for(j=1;j<=size(i);j++)
-  {
-    if(deg(i[j])>0)
-    {
-      p=i[j];
-      break;
-    }
-  }
-  if(deg(p)==-1)
-  {
-    return(1);
-  }
-  for (k=j+1;k<=size(i);k++)
-  {
-     if(deg(i[k])!=0)
-     {
-        q=GCD(p,i[k]);
-        if(deg(q)==0)
-        {
-           p=p*i[k];
-        }
-        else
-        {
-           p=p/q;
-           p=p*i[k];
-        }
-     }
-   }
-  return(p);
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   ring  r = 0,(x,y,z),lp;
-   poly  p = (x+y)*(y+z);
-   poly  q = (z4+2)*(y+z);
-   ideal l=p,q;
-   poly  pr= lcm(l);
-   pr;
-   l=1,-1,p,1,-1,q,1;
-   pr=lcm(l);
    pr;
 }
 

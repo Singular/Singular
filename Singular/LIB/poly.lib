@@ -1,4 +1,4 @@
-// $Id: poly.lib,v 1.5 1997-08-04 14:46:51 Singular Exp $
+// $Id: poly.lib,v 1.6 1997-08-04 15:14:19 Singular Exp $
 //system("random",787422842);
 //(GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
@@ -9,6 +9,7 @@ LIBRARY:  poly.lib      PROCEDURES FOR MANIPULATING POLYS, IDEALS, MODULES
  freerank(poly/...)     rank of coker(input) if coker is free else -1
  is_homog(poly/...);    int, =1 resp. =0 if input is homogeneous resp. not
  is_zero(poly/...);     int, =1 resp. =0 if coker(input) is 0 resp. not
+ lcm(ideal);            lcm of given generators of ideal
  maxcoef(poly/...);     maximal length of coefficient occuring in poly/...
  maxdeg(poly/...);      int/intmat = degree/s of terms of maximal order
  maxdeg1(poly/...);     int = [weighted] maximal degree of input
@@ -517,5 +518,77 @@ example
            ideal J=x2+y2,z2,x4+y4;
            poly g=z;
            rad_con(g,I);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc lcm (ideal i)
+USAGE:   lcm(i); i ideal
+RETURN:  poly = lcm(i[1],...,i[size(i)])
+NOTE:    
+EXAMPLE: example lcm; shows an example
+{
+  int k,j;
+   poly p,q;
+  i=simplify(i,10);
+  for(j=1;j<=size(i);j++)
+  {
+    if(deg(i[j])>0)
+    {
+      p=i[j];
+      break;
+    }
+  }
+  if(deg(p)==-1)
+  {
+    return(1);
+  }
+  for (k=j+1;k<=size(i);k++)
+  {
+     if(deg(i[k])!=0)
+     {
+        q=GCD(p,i[k]);
+        if(deg(q)==0)
+        {
+           p=p*i[k];
+        }
+        else
+        {
+           p=p/q;
+           p=p*i[k];
+        }
+     }
+   }
+  return(p);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring  r = 0,(x,y,z),lp;
+   poly  p = (x+y)*(y+z);
+   poly  q = (z4+2)*(y+z);
+   ideal l=p,q;
+   poly  pr= lcm(l);
+   pr;
+   l=1,-1,p,1,-1,q,1;
+   pr=lcm(l);
+   pr;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc content(f)
+USAGE:   content(f); f polynomial/vector
+RETURN:  number, the content (greatest common factor of coefficients)
+         of the polynomial/vector f
+EXAMPLE: example content; shows an example
+{
+  return(leadcoef(f)/leadcoef(cleardenom(f)));
+}  
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z),(c,lp);
+   content(3x2+18xy-27xyz);
+   vector v=[3x2+18xy-27xyz,15x2+12y4,3];
+   content(v);
 }
 

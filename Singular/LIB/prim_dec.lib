@@ -1,4 +1,4 @@
-// $Id: prim_dec.lib,v 1.2 1997-08-04 14:46:51 Singular Exp $
+// $Id: prim_dec.lib,v 1.3 1997-08-04 15:14:20 Singular Exp $
 ///////////////////////////////////////////////////////
 // pseudoprimdec.lib
 // algorithms for primary decomposition based on
@@ -1043,54 +1043,3 @@ proc special_ideals_equal( ideal k1, ideal k2)
    }
    return(0);
 }
-
-
-
-//proc lcm (ideal i)
-//USAGE:   lcm(i); i list of polynomials
-//RETURN:  poly = lcm(i[1],...,i[size(i)])
-//NOTE:    
-//EXAMPLE: example lcm; shows an example
-//{
-//  int k,j;
-//  poly p,q;
-//  int sizei=size(i);
-//  for(j=1;j<=sizei;j++)
-//  {
-//    if(deg(i[j])>0)
-//    {
-//      p=i[j];
-//      break;
-//    }
-//  }
-//  if(deg(p)==-1)
-//  {
-//    return(1);
-//  }
-//  for (k=j+1;k<=sizei;k++)
-//  {
-//     if(deg(i[k])!=0)
-//     {
-//        q=gcd(p,i[k]);
-//        if(deg(q)!=0)     // gcd!=1
-//        {
-//           p=system("pdivide",p,q);
-//        }
-//        p=p*i[k];
-//     }
-//   }
-//  return(p);
-//}
-//example
-//{ "EXAMPLE:"; echo = 2;
-//   ring  r = 0,(x,y,z),lp;
-//   poly  p = (x+y)*(y+z);
-//   poly  q = (z4+2)*(y+z);
-//   ideal l=p,q;
-//   poly  pr= lcm(l);
-//   pr;
-//   l=1,-1,p,1,-1,q,1;
-//   pr=lcm(l);
-//   pr;
-//}
-
