@@ -99,6 +99,32 @@ static int red_object_better_gen(const void* ap, const void* bp)
 
   return(pLmCmp(((red_object*) ap)->p,((red_object*) bp)->p));
 }
+static int monom_poly_crit(const void* ap1, const void* ap2){
+  monom_poly* p1;
+  monom_poly* p2;
+  p1=((monom_poly*) ap1);
+  p2=((monom_poly*)ap2);
+
+  int c=pLmCmp(p1->f,p2->f);
+  if (c !=0) return c;
+  c=pLmCmp(p1->m,p2->m);
+  return c;
+}
+static int pLmCmp_func(const void* ap1, const void* ap2){
+    poly p1,p2;
+  p1=*((poly*) ap1);
+  p2=*((poly*)ap2);
+
+  return pLmCmp(p1,p2);
+}
+static int pLmCmp_func_inverted(const void* ap1, const void* ap2){
+    poly p1,p2;
+  p1=*((poly*) ap1);
+  p2=*((poly*)ap2);
+
+  return -pLmCmp(p1,p2);
+}
+
 static int pair_better_gen2(const void* ap,const void* bp){
   return(-pair_better_gen(ap,bp));
 }
@@ -106,6 +132,15 @@ static int kFindDivisibleByInS_easy(kStrategy strat,const red_object & obj){
   int i;
   long not_sev=~obj.sev;
   poly p=obj.p;
+  for(i=0;i<=strat->sl;i++){
+    if (pLmShortDivisibleBy(strat->S[i],strat->sevS[i],p,not_sev))
+      return i;
+  }
+  return -1;
+}
+static int kFindDivisibleByInS_easy(kStrategy strat,poly p, long sev){
+  int i;
+  long not_sev=~sev;
   for(i=0;i<=strat->sl;i++){
     if (pLmShortDivisibleBy(strat->S[i],strat->sevS[i],p,not_sev))
       return i;
@@ -134,6 +169,32 @@ static int posInPairs (sorted_pair_node**  p, int pn, sorted_pair_node* qe,calc_
       }
       i=(an+en) / 2;
         if (pair_better(p[i],qe,c))
+          en=i;
+      else an=i;
+    }
+}
+static int posInPolys (poly*  p, int pn, poly qe,calc_dat* c)
+{
+  if(pn==0) return 0;
+
+  int length=pn-1;
+  int i;
+  int an = 0;
+  int en= length;
+
+  if (pLmCmp(qe,p[en])==1)
+    return length+1;
+
+  while(1)
+    {
+      //if (an >= en-1)
+      if(en-1<=an)
+      {
+        if (pLmCmp(p[an],qe)==1) return an;
+        return en;
+      }
+      i=(an+en) / 2;
+        if (pLmCmp(p[i],qe)==1)
           en=i;
       else an=i;
     }
@@ -1397,7 +1458,7 @@ static void go_on (calc_dat* c){
 
   int curr_deg=-1;
   while(i<PAR_N){
-    sorted_pair_node* s=top_pair(c);
+    sorted_pair_node* s=top_pair(c);//here is actually chain criterium done
     if (!s) break;
     if(curr_deg>=0){
       if (s->deg >curr_deg) break;
@@ -1751,6 +1812,445 @@ static void do_this_spoly_stuff(int i,int j,calc_dat* c){
   }
 }
 //try to fill, return FALSE iff queue is empty
+static void simplify(monom_poly h, calc_dat* c){
+  mp_array_list* F=c->F;
+  poly_array_list* F_minus=c->F_minus;
+  while(F)
+  {
+    assume(F_minus!=NULL);
+    int i;
+    for(i=0;i<F->size;i++)
+    {
+      if ((h.f==F->mp[i].f) &&(p_LmDivisibleBy(F->mp[i].m,h.m,c->r)))
+      {
+	
+	  //according to the algorithm you should test (!(pIsConstant(F[i].m)))
+	  //but I think this is only because of bad formulation
+	int j;
+	
+	poly lm=pLmInit(h.f);
+	pSetCoeff(lm,nInit(1));
+
+	lm=pMult_mm(lm,F->mp[i].m);
+	for(j=0;j<F_minus->size;j++)
+	{
+	  if (pLmEqual(F_minus->p[j],lm))
+	    break;
+	}
+	assume(j<F_minus->size);
+	pDelete(&lm);
+	if(j<F_minus->size)
+	{
+	  pExpVectorSub(h.m,F->mp[i].m);
+	  h.f=F->mp[j].f;
+	}
+	break;
+      }
+    }
+    F=F->next;
+    F_minus=F_minus->next;
+  }
+  assume(F_minus==NULL);
+}
+tgb_matrix::tgb_matrix(int i, int j){
+  n=omalloc(i*sizeof (number*));;
+  int z;
+  int z2;
+  for(z=0;z<i;z++)
+  {
+    n[z]=omalloc(j*sizeof(number));
+    for(z2=0;z2<j;z2++)
+    {
+      n[z][z2]=nInit(0);
+    }
+  }
+  this->columns=j;
+  this->rows=i;
+  free_numbers=FALSE;
+}
+tgb_matrix::~tgb_matrix(){
+  int z;
+  for(z=0;z<rows;z++)
+  {
+    if(free_numbers)
+    {
+      int z2;
+      for(z2=0;z2<columns;z2++)
+      {
+	nDelete(&(n[z][z2]));
+      }
+    }
+    omfree(n[z]);
+  }
+}
+void tgb_matrix::set(int i, int j, number n){
+  assume(i<rows);
+  assume(j<columns);
+  this->n[i][j]=n;
+}
+static tgb_matrix* build_matrix(poly* p,int p_index,poly* done, int done_index, calc_dat* c){
+  tgb_matrix* t=new tgb_matrix(p_index,done_index);
+  int i, pos;
+  for(i=0;i<p_index;i++)
+  { 
+    poly p_i=p[i];
+    while(p_i)
+    {
+      int v=-1;
+      pos=posInPolys (done, done_index, p_i,c);
+      if((done_index>pos)&&(pLmEqual(p_i,done[pos])))
+	v=pos;
+      if((pos>0) &&(pLmEqual(p_i,done[pos-1])))
+	v=pos-1;
+      assume(v!=-1);
+      //v is ascending ordered, we need descending order
+      v=done_index-1-v;
+      t->set(i,v,nCopy(p_i->coef));
+    }
+  }
+  return t;
+}
+static void go_on_F4 (calc_dat* c){
+  //set limit of 1000 for multireductions, at the moment for
+  //programming reasons
+  int done_size=PAR_N_F4*2;
+  poly* done=(poly*) omalloc(done_size*sizeof(poly));
+  int done_index=0; //done_index must always be smaller than done_size
+  int chosen_size=PAR_N_F4*2;
+  monom_poly* chosen=(monom_poly*) omalloc(done_size*sizeof(monom_poly));
+  int chosen_index=0;
+  int i=0;
+  c->average_length=0;
+  for(i=0;i<c->n;i++){
+    c->average_length+=c->lengths[i];
+  }
+  c->average_length=c->average_length/c->n;
+  i=0;
+  poly* p;
+
+  int curr_deg=-1;
+  
+  //choose pairs and preprocess symbolically
+  while(chosen_index<PAR_N_F4)
+  {
+    sorted_pair_node* s=top_pair(c);//here is actually chain criterium done
+    if (!s) break;
+    if(curr_deg>=0)
+    {
+      if (s->deg >curr_deg) break;
+    }
+
+    else curr_deg=s->deg;
+    quick_pop_pair(c);
+    if(s->i>=0)
+    {
+      //replace_pair(s->i,s->j,c);
+      if(s->i==s->j) 
+      {
+	free_sorted_pair_node(s,c->r);
+	continue;
+      }
+    }
+    monom_poly h;
+    BOOLEAN only_free=FALSE;
+    if(s->i>=0)
+    {
+      
+      poly lcm=pOne();
+      
+      pLcm(c->S->m[s->i], c->S->m[s->j], lcm);
+      pSetm(lcm);
+      assume(lcm!=NULL);
+      poly factor1=pCopy(lcm);
+      pExpVectorSub(factor1,c->S->m[s->i]);
+      poly factor2=pCopy(lcm);
+      pExpVectorSub(factor2,c->S->m[s->j]);
+
+      if(done_index>=done_size)
+      {
+	done_size+=PAR_N_F4;
+	done=(poly*) omrealloc(done,done_size*sizeof(poly));
+      }
+      done[done_index++]=lcm;
+      if(chosen_index+1>=chosen_size)
+      {
+	//PAR_N_F4 must be greater equal 2
+	chosen_size+=max(PAR_N_F4,2);
+	chosen=(monom_poly*) omrealloc(chosen,chosen_size*sizeof(monom_poly));
+      }
+      h.f=c->S->m[s->i];
+      h.m=factor1;
+      chosen[chosen_index++]=h;
+      h.f=c->S->m[s->j];
+      h.m=factor2;
+      chosen[chosen_index++]=h;
+    }
+    else
+    {
+      if(chosen_index>=chosen_size)
+      {
+	chosen_size+=PAR_N_F4;
+	chosen=(monom_poly*) omrealloc(chosen,chosen_size*sizeof(monom_poly));
+      }
+      h.f=s->lcm_of_lm;
+      h.m=pOne();
+      pSetm(h.m);
+      chosen[chosen_index++]=h;
+      //must carefull remember to destroy such a h;
+      poly_list_node* next=c->to_destroy;
+      
+      c->to_destroy=(poly_list_node*) omalloc(sizeof(poly_list_node));
+      c->to_destroy->next=next;
+      only_free=TRUE;
+    }
+
+    if(s->i>=0)
+      now_t_rep(s->j,s->i,c);
+
+    if(!(only_free))
+      free_sorted_pair_node(s,c->r);
+    else
+      omfree(s);
+    
+  
+
+  }
+
+  //next Step, simplify all pairs
+  for(i=0;i<chosen_index;i++)
+  {
+    simplify(chosen[i],c);
+  }
+  
+  //next Step remove duplicate entries
+  qsort(chosen,chosen_index,sizeof(monom_poly),monom_poly_crit);
+  int pos=0;
+  for(i=1;i<chosen_index;i++)
+  {
+    if((!(pLmEqual(chosen[i].f,chosen[pos].f)))||(!(pLmEqual(chosen[i].m,chosen[pos].m))))
+      chosen[++pos]=chosen[i];
+    else pDelete(&(chosen[i].m));
+  }
+  chosen_index=pos;
+  //next step process polys
+  int p_size=2*chosen_index;
+  int p_index=0;
+  p=(poly*) omalloc(p_size*sizeof(poly));
+  for(p_index=0;p_index<chosen_index;p_index++)
+  {
+    p[p_index]=ppMult_mm(chosen[p_index].f,chosen[p_index].m);
+  }
+
+  qsort(done, done_index,sizeof(poly),pLmCmp_func);
+  pos=0;
+  for(i=1;i<done_index;i++)
+  {
+    if((!(pLmEqual(done[i],done[pos]))))
+      done[++pos]=done[i];
+    else pDelete(&(done[i]));
+  }
+  done_index=pos;
+
+  poly* m;
+  int m_index=0;
+  int m_size=0;
+  for(i=0;i<p_index;i++)
+  {
+    m_size+=pLength(p[i]);
+  }
+  //q=(poly*) omalloc(m_size*sizeof(poly));
+ 
+  for(i=0;i<p_index;i++)
+  {
+    poly p_i=p[i];
+    while(p_i)
+    {
+      m[m_index]=pLmInit(p_i);
+      pSetCoeff(m[m_index],nInit(1));
+      p_i=p_i->next;
+      m_index++;
+    }
+  }
+  int q_size=m_index;
+  poly* q=(poly*) omalloc(q_size*sizeof(poly));
+  int q_index=0;
+  //next Step additional reductors
+  while(m_index>0)
+  {
+    qsort(m, m_index,sizeof(poly),pLmCmp_func);
+
+    
+    pos;
+    for(i=1;i<m_index;i++)
+    {
+      if((!(pLmEqual(m[i],m[pos]))))
+	m[++pos]=m[i];
+      else pDelete(&(done[i]));
+    }
+    m_index=pos;
+    if(done_size<done_index+m_index)
+    {
+      done_size=done_index+2*m_index;
+      done=(poly*) omrealloc(done,done_size*sizeof(poly));
+    }
+    if(chosen_size<chosen_index+m_index)
+    {
+      chosen_size=chosen_index+2*m_index;
+      chosen=(monom_poly*) omrealloc(chosen,chosen_size*sizeof(monom_poly));
+    }
+    q_index=0;
+    if(q_size<m_index)
+    {
+      q_size=2*m_index;
+      omfree(q);
+      q=(poly*) omalloc(q_size*sizeof(poly));
+    }
+    for(i=0;i<m_index;i++)
+    {
+      BOOLEAN in_done=FALSE;
+      pos=posInPolys (done, done_index, m[i],c);
+      if(((done_index>pos)&&(pLmEqual(m[i],done[pos]))) ||(pos>0) &&(pLmEqual(m[i],done[pos-1])))
+	in_done=TRUE;
+      if (!(in_done))
+      {
+	pos=kFindDivisibleByInS_easy(c->strat,m[i], pGetShortExpVector(m[i]));
+	if(pos>=0)
+	{
+	  monom_poly h;
+	  h.f=c->strat->S[pos];
+	  h.m=pOne();
+	  int* ev=omalloc((c->r->N+1)*sizeof(int));
+	  pGetExpV(m[i],ev);
+	  pSetExpV(h.m,ev);
+	  omfree(ev);
+	  pExpVectorSub(h.m,c->strat->S[pos]);
+	  simplify(h,c);
+	  q[q_index]=ppMult_mm(h.f,h.m);
+	  chosen[chosen_index++]=h;
+	  q_index++;
+	}
+	done[done_index++]=m[i];
+      }
+      else
+	pDelete(&m[i]);
+    }
+    if(p_size<p_index+q_index)
+    {
+      p_size=p_index+2*q_index;
+      p=(poly*) omrealloc(p,p_size*sizeof(poly));
+    }
+    for (i=0;i<q_index;i++)
+      p[p_index++]=q[i];
+    m_index=0;
+    int sum=0;
+    for(i=0;i<p_index;i++)
+    {
+      sum+=pLength(p[i]);
+    }
+    if (m_size<sum)
+    {
+      omfree(m);
+      m=(poly*) omalloc(sum*sizeof(poly));
+    }
+    m_size=sum;
+    for(i=0;i<q_index;i++)
+    {
+      poly p_i=q[i];
+      while(p_i)
+      {
+	m[m_index]=pLmInit(p_i);
+	pSetCoeff(m[m_index],nInit(1));
+	p_i=p_i->next;
+	m_index++;
+      }
+    }
+    qsort(done, done_index,sizeof(poly),pLmCmp_func);
+  }
+  omfree(m);
+  omfree(q);
+  //next Step build matrix
+  assume(p_index==chosen_index);
+  
+  tgb_matrix* mat=build_matrix(p,p_index,done, done_index,c);
+
+  //next Step Gauss
+
+  //next Step addElements to basis
+ 
+//  pre_comp(p,i,c);
+  if(i==0){
+    omfree(p);
+    return;
+  }
+  red_object* buf=(red_object*) omalloc(i*sizeof(red_object));
+  c->normal_forms+=i;
+  int j;
+  for(j=0;j<i;j++){
+    buf[j].p=p[j];
+    buf[j].sev=pGetShortExpVector(p[j]);
+    buf[j].sum=NULL;
+    buf[j].bucket = kBucketCreate(currRing);
+    int len=pLength(p[j]);
+    kBucketInit(buf[j].bucket,buf[j].p,len);
+  }
+  omfree(p);
+  qsort(buf,i,sizeof(red_object),red_object_better_gen);
+//    Print("\ncurr_deg:%i\n",curr_deg);
+  Print("M[%i, ",i);
+
+  multi_reduction(buf, i, c);
+
+  //resort S
+
+  Print("%i]",i); 
+
+  int* ibuf=(int*) omalloc(i*sizeof(int));
+  sorted_pair_node*** sbuf=(sorted_pair_node***) omalloc(i*sizeof(sorted_pair_node**));
+  for(j=0;j<i;j++)
+  {
+    int len;
+    poly p;
+    buf[j].flatten();
+    kBucketClear(buf[j].bucket,&p, &len);
+    kBucketDestroy(&buf[j].bucket);
+    // delete buf[j];
+    //remember to free res here
+    //    p=redTailShort(p, c->strat);
+    sbuf[j]=add_to_basis(p,-1,-1,c,ibuf+j);
+    
+  }
+  int sum=0;
+  for(j=0;j<i;j++){
+    sum+=ibuf[j];
+  }
+  sorted_pair_node** big_sbuf=(sorted_pair_node**) omalloc(sum*sizeof(sorted_pair_node*));
+  int partsum=0;
+  for(j=0;j<i;j++)
+  {
+    memmove(big_sbuf+partsum, sbuf[j],ibuf[j]*sizeof(sorted_pair_node*));
+    omfree(sbuf[j]);
+    partsum+=ibuf[j];
+  }
+
+  qsort(big_sbuf,sum,sizeof(sorted_pair_node*),pair_better_gen2);
+  c->apairs=merge(c->apairs,c->pair_top+1,big_sbuf,sum,c);
+  c->pair_top+=sum;
+  clean_top_of_pair_list(c);
+  omfree(big_sbuf);
+  omfree(sbuf);
+  omfree(ibuf);
+  omfree(buf);
+#ifdef TGB_DEBUG
+  int z;
+  for(z=1;z<=c->pair_top;z++)
+  {
+    assume(pair_better(c->apairs[z],c->apairs[z-1],c));
+  }
+#endif
+
+  return;
+}
+
 
 static int poly_crit(const void* ap1, const void* ap2){
   poly p1,p2;
@@ -1765,6 +2265,7 @@ static int poly_crit(const void* ap1, const void* ap2){
   if (l1>l2) return 1;
   return 0;
 }
+
 ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   if (F4_mode)
     PrintS("F4 Modus \n");
@@ -1781,9 +2282,11 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   void* h;
   poly hp;
   int i,j;
+  c->to_destroy=NULL;
   c->easy_product_crit=0;
   c->extended_product_crit=0;
   c->is_char0=(rChar()==0);
+  c->F4_mode=F4_mode;
   c->reduction_steps=0;
   c->last_index=-1;
 
@@ -1854,24 +2357,33 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   assume(c->strat->sl==c->strat->Shdl->idelems()-1);
 
   for (i=1;i<n;i++)//the 1 is wanted, because first element is added to basis
-   {
-//     add_to_basis(I->m[i],-1,-1,c);
-     si=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
-      si->i=-1;
-      si->j=-1;
-      si->expected_length=pLength(I->m[i]);
-      si->deg=pTotaldegree(I->m[i]);
-      si->lcm_of_lm=I->m[i];
-
+  {
+    //     add_to_basis(I->m[i],-1,-1,c);
+    si=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
+    si->i=-1;
+    si->j=-1;
+    si->expected_length=pLength(I->m[i]);
+    si->deg=pTotaldegree(I->m[i]);
+    si->lcm_of_lm=I->m[i];
+    
 //      c->apairs[n-1-i]=si;
-      c->apairs[n-i-1]=si;
-      ++(c->pair_top);
+    c->apairs[n-i-1]=si;
+    ++(c->pair_top);
    }
  
 
   while(c->pair_top>=0)
+  {
     go_on(c);
-
+  }
+  while(c->to_destroy)
+  {
+    assume(c->to_destroy->i<0);
+    pDelete(&c->to_destroy->p);
+    poly_list_node* old=c->to_destroy;
+    c->to_destroy=c->to_destroy->next;
+    omfree(old);
+  }
   for(int z=0;z<c->n;z++){
     omfree(c->states[z]);
   }
@@ -1930,6 +2442,11 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
     if(!found) pDelete(&c->strat->S[i]);
   }
   omfree(c->rep);
+  for(i=0;i<I->idelems();i++)
+  {
+    I->m[i]=NULL;
+  }
+  idDelete(&I);
   I=c->S;
   
   IDELEMS(I)=c->n;

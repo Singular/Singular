@@ -26,6 +26,7 @@
 //#define HOMOGENEOUS_EXAMPLE
 #define REDTAIL_S
 #define PAR_N 100
+#define PAR_N_F4 1000
 #define AC_NEW_MIN 2
 #define AC_FLATTEN 1
 //#define FIND_DETERMINISTIC
@@ -73,6 +74,10 @@ class reduction_accumulator{
 
   
 };
+struct poly_list_node{
+  poly p;
+  poly_list_node* next;
+};
 struct formal_sum_descriptor{
   number c_my;
   number c_ac;
@@ -83,15 +88,30 @@ struct int_pair_node{
   int a;
   int b;
 };
-class monom_poly{
- public:
+struct monom_poly{
   poly m;
   poly f;
 };
-class mp_list{
+struct mp_array_list{
+  monom_poly* mp;
+  int size;
+  mp_array_list* next;
+};
+class tgb_matrix{
+ private:
+  number** n;
+  int columns;
+  int rows;
+  BOOLEAN free_numbers;
  public:
-  monom_poly mp;
-  mp_list* next;
+  tgb_matrix(int i, int j);
+  ~tgb_matrix();
+  void set(int i, int j, number n);
+};
+struct poly_array_list{
+  poly* p;
+  int size;
+  poly_array_list* next;
 };
 struct calc_dat
 {
@@ -108,9 +128,10 @@ struct calc_dat
   int_pair_node* soon_free;
   sorted_pair_node** apairs;
   BOOLEAN* modifiedS;
+  poly_list_node* to_destroy;
   //for F4
-  mp_list* F;
-  mp_list* F_minus;
+  mp_array_list* F;
+  poly_array_list* F_minus;
   //end for F4
 #ifdef HEAD_BIN
   struct omBin_s*   HeadBin;
@@ -127,6 +148,7 @@ struct calc_dat
   int extended_product_crit;
   int average_length;
   BOOLEAN is_char0;
+  BOOLEAN F4_mode;
 };
 class red_object{
  public:
