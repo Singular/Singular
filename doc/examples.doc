@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.58 1999-12-13 16:28:34 obachman Exp $
+@comment $Id: examples.doc,v 1.59 2000-02-16 13:29:36 Singular Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -48,6 +48,7 @@ The following topics are treated:
 * Puiseux pairs::
 * Primary decomposition::
 * Normalization::
+* Branches of an Isolated Space Curve Singularity::
 * Kernel of module homomorphisms::
 * Algebraic dependence::
 * Classification::
@@ -1443,7 +1444,7 @@ for some ideal @math{i} and with an extra option.
   module E = Ext(1,syz(m),syz(m));
   print(std(E));
   //The matrices which we have just computed are presentation matrices
-  //of the modules T2K and E. Hence we may ignore those columns 
+  //of the modules T2K and E. Hence we may ignore those columns
   //containing 1 as an entry and see that T2K and E are isomorphic
   //as expected, but differently presented.
   //-------------------------------------------
@@ -1942,10 +1943,10 @@ convert one set of invariants to another.
   setring s;
   displayInvariants(hn);
   // invariants(hn);  returns the invariants as list
-  // partial parametrization of f: param takes the first variable 
+  // partial parametrization of f: param takes the first variable
   // as infinite except the ring has more than 2 variables. Then
   // the 3rd variable is chosen.
-  param(hn);    
+  param(hn);
   ring extring=0,(x,y,t),ds;
   poly f=x3+2xy2+y2;
   list hn=develop(f,-1);
@@ -2011,7 +2012,7 @@ ideal form the corresponding primary ideal.
   J = intersect(J,maxideal(3));
   // The following shows that the maximal ideal defines an embedded
   // (prime) component.
-  primdecSY(J);      
+  primdecSY(J);
   minAssChar(J);
   radical(J);
 @c example
@@ -2019,7 +2020,7 @@ ideal form the corresponding primary ideal.
 @end ifset
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node Normalization, Kernel of module homomorphisms, Primary decomposition, Examples
+@node Normalization, Branches of an Isolated Space Curve Singularity, Primary decomposition, Examples
 @section Normalization
 @cindex Normalization
 The normalization will be computed for a reduced ring @math{R/I}. The
@@ -2050,7 +2051,85 @@ the factor rings of the rings in the list divided out by the ideals
 @end ifset
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node Kernel of module homomorphisms, Algebraic dependence, Normalization, Examples
+@node Branches of an Isolated Space Curve Singularity, Kernel of module homomorphisms, Normalization,Examples
+@section Branches of an Isolated Space Curve Singularity
+@cindex Branches of an Isolated Space Curve Singularity
+
+In this example, the number of branches of a given quasihomogeneous isolated
+space curve singularity will be computed as an example of the pitfalls
+appearing in the use of primary decomposition. When dealing with singularities,
+two situations are possible in which the primary decomposition algorithm
+might not lead to a complete decomposition: first of all, one of the computed
+components could be globally irreducible, but analytically reducible
+(this is impossible for quasihomogeneous singularities) and,
+as a second possibility, a component might be irreducible over the rational
+numbers, but reducible over the complex numbers.
+@smallexample
+@c example
+  ring r=0,(x,y,z),ds;
+  ideal i=x^4-y*z^2,x*y-z^3,y^2-x^3*z;  // the space curve singularity
+  qhweight(i);
+  // The given space curve singularity is quasihomogeneous. Hence we can pass
+  // to the polynomial ring.
+  ring rr=0,(x,y,z),dp;
+  ideal i=imap(r,i);
+  resolution ires=mres(i,0);
+  ires;
+  // From the structure of the resolution, we see that the Cohen-Macaulay
+  // type of the given singularity is 2
+  //
+  // Let us now look for the branches using the primdec library.
+  LIB "primdec.lib";
+  primdecSY(i);
+  def li=_[2];
+  ideal i2=li[2];       // call the second ideal i2
+  // The curve seems to have 2 branches by what we computed using the
+  // algorithm of Shimoyama-Yokoyama.
+  // Now the same computation by the Gianni-Trager-Zacharias algorithm:
+  primdecGTZ(i);
+  // Having computed the primary decomposition in 2 different ways and
+  // having obtained the same number of branches, we might expect that the
+  // number of branches is really 2, but we can check this by formulae
+  // for the invariants of space curve singularities:
+  //
+  // mu = tau - t + 1 (for quasihomogeneous curve singularities)
+  // where mu denotes the Milnor number, tau the Tjurina number and
+  // t the Cohen-Macaulay type
+  //
+  // mu = 2 delta - r + 1
+  // where delta denotes the delta-Invariant and r the number of branches
+  //
+  // tau can be computed by using the corresponding procedure T1 from
+  // sing.lib.
+  setring r;
+  LIB "sing.lib";
+  T_1(i);
+  setring rr;
+  // Hence tau is 13 and therefore mu is 12. But then it is impossible that
+  // the singularity has two branches, since mu is even and delta is an
+  // integer!
+  // So obviously, we did not decompose completely. Because the first branch
+  // is smooth, only the second ideal can be the one which can be decomposed
+  // further.
+  // Let us now consider the normalization of this second ideal i2.
+  LIB "normal.lib";
+  normal(i2);
+  def rno=_[1];
+  setring rno;
+  norid;
+  // The first polynomial is a polynomial in one variable of degree 4 and
+  // thus factors completely into 4 polynomials of type T(3)+a.
+  // From this and the second polynomial, we know that the ring of the
+  // normalization is the direct sum of 4 polynomial rings in one variable.
+  // Hence our original curve has these 4 branches plus a smooth one
+  // which we already determined by primary decomposition.
+  // Our final result is therefore: 5 branches.
+@c example
+@end smallexample
+@end ifset
+@c ----------------------------------------------------------------------------
+@ifset singularmanual
+@node Kernel of module homomorphisms, Algebraic dependence, Branches of an Isolated Space Curve Singularity, Examples
 @end ifset
 @ifclear singularmanual
 @node Kernel of module homomorphisms, Algebraic dependence, Factorization, Examples
@@ -2199,7 +2278,7 @@ $X=(x_1,\ldots,x_n)$ and $Y=(Y_1,\ldots,Y_r)$ with $X>Y$
 @ifinfo
 X=(x1,@dots{},xn) and Y=(Y_1,@dots{},Y_r) with X>Y
 @end ifinfo
-is in @math{K[Y]}. 
+is in @math{K[Y]}.
 @end enumerate
 
 Both questions can be answered using the following procedure. If the
