@@ -1,5 +1,5 @@
 /*
- * $Id: grammar.y,v 1.14 2000-05-12 12:24:43 krueger Exp $
+ * $Id: grammar.y,v 1.15 2000-11-09 21:58:13 krueger Exp $
  */
 
 %{
@@ -327,11 +327,13 @@ sect3end: SECT3END
 procdefsg: procdeclsg proccode
         {
           if(debug>2)printf("SG-PROCDEF:\n");
+          write_singular_end(&module_def, yylineno);
         }
         | procdecl proccode procdeclexample
         {
           if(debug>2)printf("SG-PROCDEF mit example:\n");
           fflush(module_def.fmtfp);
+          write_singular_end(&module_def, yylineno);
         }
 ;
 
@@ -607,6 +609,7 @@ proccmd: '%' NAME ';'
           }
           free($2);
         };
+
 
 identifier: NAME
         {

@@ -1,5 +1,5 @@
 /*
- * $Id: proc.cc,v 1.14 2000-05-12 12:24:44 krueger Exp $
+ * $Id: proc.cc,v 1.15 2000-11-09 21:58:14 krueger Exp $
  */
 
 #include <stdio.h>
@@ -598,6 +598,15 @@ void write_singular_parameter(
   )
 {
   fprintf(module->binfp, "  parameter %s %s;\n", typname, varname);
+}
+
+/*========================================================================*/
+void write_singular_end(
+  moddefv module,
+  int lineno
+  )
+{
+  fprintf(module->modfp, "#endif\n");
 }
 
 /*========================================================================*/

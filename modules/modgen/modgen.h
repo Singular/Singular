@@ -1,5 +1,5 @@
 /*
- *  $Id: modgen.h,v 1.12 2000-05-01 19:14:48 krueger Exp $
+ *  $Id: modgen.h,v 1.13 2000-11-09 21:58:14 krueger Exp $
  *
  */
 
@@ -192,6 +192,8 @@ extern void write_example(moddefv module, procdefv pi);
 extern int  write_singular_procedures(moddefv module, procdefv proc);
 extern void write_singular_parameter(moddefv module,int lineno,
                                      char *typname, char *varname);
+extern void write_singular_end(moddefv module,int lineno);
+
 extern void write_codeline(moddefv module, procdefv proc,
                            char *line, int lineno = -1);
 
