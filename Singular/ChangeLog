@@ -1,6 +1,19 @@
 Tue Apr 21 15:19:10 MET DST 1998 hannes/jens
   * gdc in Q(a) returns "not implemented" (clapsing.cc)
-  
+
+Tue Apr 21 12:30:44 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* clapsing.cc  (singclap_gcd): checks for `NULL' removed
+	
+	* clapsing.cc, extra.cc (FACTORY_GCD_TEST, FACTORY_GCD_STAT,
+ 	  FACTORY_GCD_DEBOUT, FACTORY_GCD_TIMING): new #defines for gcd
+	  testing
+	* clapsing.cc (singclap_divide_content, singclap_alglcm,
+	  singclap_algdividecontent): code added for factory testing.
+  	  Wrapped by #defines `FACTORY_GCD_TEST', `FACTORY_GCD_STAT',
+ 	  `FACTORY_GCD_DEBOUT', and `FACTORY_GCD_TIMING'.
+	* extra.cc (jjSYSTEM): code added for factory testing.  Wrapped
+	  by #defines `FACTORY_GCD_TEST' and `FACTORY_GCD_TIMING'.
 
 Fri Apr 17 09:53:53 MET DST 1998 hannes
  * fixed a minor but very nasty bug: nlSetMap was resetting npPrimeM
