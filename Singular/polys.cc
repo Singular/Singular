@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.6 1997-06-18 16:09:18 Singular Exp $ */
+/* $Id: polys.cc,v 1.7 1997-08-13 13:51:40 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -2862,7 +2862,12 @@ BOOLEAN pDBTest(poly p, char *f, int l)
     if (!nDBTest(p->coef,f,l))
        return FALSE;
 #endif
-    if ((p->coef!=NULL) && nIsZero(p->coef))
+    if ((p->coef==NULL)&&(nGetChar()<2))
+    {
+      Print("NULL coef in poly in %s:%d\n",f,l);
+      return FALSE;
+    }
+    if (nIsZero(p->coef))
     {
       Print("zero coef in poly in %s:%d\n",f,l);
       return FALSE;

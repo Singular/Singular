@@ -4,7 +4,7 @@
 
 //**************************************************************************/
 //
-// $Id: sing_dbm.cc,v 1.7 1997-08-12 17:14:44 Singular Exp $
+// $Id: sing_dbm.cc,v 1.8 1997-08-13 13:51:42 Singular Exp $
 //
 //**************************************************************************/
 //  'sing_dbm.cc' containes command to handle dbm-files under
@@ -40,14 +40,17 @@ BOOLEAN dbOpen(si_link l, short flag)
   DBM_info *db;
   int dbm_flags = O_RDONLY | O_CREAT;  // open database readonly as default
 
-  if((flag & SI_LINK_WRITE)
-  || ((l->mode!=NULL)&&
-    ((l->mode[0]=='w')||(l->mode[1]=='w')))
-  )
+  if((l->mode!=NULL)
+  && ((l->mode[0]=='w')||(l->mode[1]=='w')))
   {
     dbm_flags = O_RDWR | O_CREAT;
     mode = "rw";
-    flag|=SI_LINK_WRITE;
+    flag|=SI_LINK_WRITE|SI_LINK_READ;
+  }
+  else if(flag & SI_LINK_WRITE)
+  {
+    // request w- open, but mode is not "w" nor "rw" => fail
+    return TRUE;
   }
   if (((db = (DBM_info *)Alloc(sizeof *db)) != NULL)
   &&((db->db = dbm_open(l->name, dbm_flags, 0664 )) != NULL ))
