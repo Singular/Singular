@@ -1,6 +1,6 @@
 // last change: 98/11/05
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.29 2000-12-22 13:46:04 greuel Exp $"
+version="$Id: finvar.lib,v 1.30 2001-01-03 21:24:27 obachman Exp $"
 category="Invariant theory";
 info="
 LIBRARY:  finvar.lib    Invariant Rings of Finite Groups
@@ -1480,7 +1480,7 @@ EXAMPLE: example partial_molien; shows an example
     poly min;                         // min will be our smallest term -
     poly A(2)=fetch(br,A(2));         // fetching A(2) and M[1,2] into R
     poly den=fetch(br,A(1));
-    for (int i=1; i<=n; i++)           / getting n terms and adding them up
+    for (int i=1; i<=n; i++)          // getting n terms and adding them up
     { min=lead(A(2));
       A(1)=A(1)+min;
       A(2)=A(2)-min*den;
