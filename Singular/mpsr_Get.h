@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Get.h,v 1.12 2002-03-07 18:45:52 Singular Exp $ */
+/* $Id: mpsr_Get.h,v 1.13 2002-03-07 18:59:03 Singular Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.h
@@ -39,6 +39,7 @@ typedef struct mpsr_sleftv
 } mpsr_sleftv;
 
 typedef mpsr_sleftv * mpsr_leftv;
+extern omBin mpsr_sleftv_bin;
 
 /***************************************************************
  *
