@@ -1,0 +1,144 @@
+# @configure_input@
+# $Id: GNUmakefile.in,v 1.1 1997-11-05 16:36:52 schmidt Exp $
+
+#
+# GNUmakefile.in - used by `configure' to create `GNUmakefile', the
+#   makefile for the Factory Test Environment.
+#
+# In general, you should let `configure' guess the correct values
+# for the variables below.  But if something seriously goes wrong
+# in configuring, please inform the authors and feel free to
+# edit the marked section.
+#
+# See the `INSTALL' file for information on how to build the
+# Factory Test Environment.
+#
+# Note:	Use GNU `make' (`gmake') to make with this makefile.
+#
+# Note: Allthough you may use this `GNUmakefile' directly you
+# better use the top level `GNUmakefile' to make the test
+# programs.  Furthermore, you first have to `make' Factory before
+# you can `make' the Factory Test Environment.
+#
+
+############### START OF CONFIGURABLE SECTION ###############
+
+SHELL =		/bin/sh
+
+#
+# - paths.
+#
+srcdir =	@srcdir@
+VPATH =		@srcdir@
+
+#
+# - programs.
+#
+CXX =		@CXX@
+M4 =		@M4@
+
+#
+# - flags.
+#
+CPPFLAGS =	@CPPFLAGS@
+CXXFLAGS =	@CXXFLAGS@
+DEFS =		@DEFS@
+LDFLAGS =	@LDFLAGS@
+LIBS =		@LIBS@
+
+M4FLAGS =	@M4FLAGS@
+
+############### END OF CONFIGURABLE SECTION ###############
+
+#
+# - compiler flags.
+#
+WARNFLAGS =	-w
+
+# flags to translate library c++ files
+LIBCXXFLAGS =	$(WARNFLAGS) -fno-implicit-templates \
+		-I$(srcdir) -I.. -I$(srcdir)/.. \
+		$(DEFS) $(CPPFLAGS) $(CXXFLAGS)
+
+# flags to translate test programs
+FTESTCXXFLAGS =	$(LIBCXXFLAGS)
+
+# flags to link test programs
+FTESTLDFLAGS =	$(LIBS) $(LDFLAGS)
+
+#
+# - source files.
+#
+
+# use value from environment if set, otherwise supply reasonable
+# default value
+ifndef ftestm4src
+ftestm4src :=	feval.m4
+endif
+ftestccsrc :=	$(ftestm4src:.m4=.cc)
+ftestobj :=	$(ftestm4src:.m4=.o)
+ftestexec :=	$(ftestm4src:.m4=)
+
+#
+# - phony and precious targets.
+#
+.PHONY:		all clean distclean
+.PRECIOUS:	%.cc %.o
+
+#
+# - pattern rules.
+#
+
+# cancel some builtin rules which may cause confusion
+%: %.o
+%: %.cc
+
+# how to link the test files
+%: %.o ftest_util.o ftest_io.o ../libcf.a ../libcfmem.a ../ftmpl_inst.o
+		$(CXX) $^ $(FTESTLDFLAGS) -o $@
+
+# how to create the test file objects
+%.o: %.cc ../factory.h
+		$(CXX) -c $< $(FTESTCXXFLAGS) -o $@
+
+# how to create the test programs
+%.cc: %.m4 ftest_util.m4
+		$(M4) $(M4FLAGS) $(srcdir)/ftest_util.m4 $< > $@
+
+#
+# - create `feval'.
+#
+# This is a dummy target only just in case the user types `make'
+# in the FTE directory.
+#
+all:		feval
+
+#
+# - explicit targets.
+#
+
+# do not create ftest_util.cc from ftest_util.m4!
+ftest_util.cc:
+		@:
+
+ftest_util.o:	ftest_util.cc ftest_util.h ftest_io.h ../factory.h
+		$(CXX) -c $< $(LIBCXXFLAGS) -o $@
+
+ftest_io.o:	ftest_io.cc ftest_io.h ftest_util.h ../factory.h
+		$(CXX) -c $< $(LIBCXXFLAGS) -o $@
+
+#
+# - cleaning up.
+#
+clean:		
+		-rm -f $(ftestexec) $(ftestccsrc) *.o
+
+distclean:	clean
+		-rm -f GNUmakefile
+
+
+#
+# - configure stuff.
+#
+GNUmakefile:	GNUmakefile.in ../config.status
+		cd .. && CONFIG_FILES=ftest/GNUmakefile CONFIG_HEADERS= ./config.status
