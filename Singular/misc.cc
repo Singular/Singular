@@ -655,21 +655,6 @@ void showOption()
     PrintS(" none\n");
 }
 
-#ifndef HAVE_STRSTR
-char *strstr(const char *haystack, const char *needle)
-{
-  char *found = strchr(haystack,*needle);
-  if (*(needle+1)!='\0')
-  {
-    while((found !=NULL) && (strncmp(found+1,needle+1,strlen(needle+1))!=0))
-    {
-      found=strchr(found+1,*needle);
-    }
-  }
-  return found;
-}
-#endif
-
 char * versionString()
 {
   StringSet("\t");
