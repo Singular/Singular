@@ -1,17 +1,19 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.cc,v 1.12 1998-01-23 14:20:38 obachman Exp $ 
+// $Id: fglm.cc,v 1.13 1998-04-14 15:29:46 Singular Exp $ 
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /* 
-* ABSTRACT - The FGLM-Algorithm
+* ABSTRACT - The FGLM-Algorithm plus extension
 *   Calculate a reduced groebner basis for one ordering, given a 
 *   reduced groebner basis for another ordering.
 *   In this file the input is checked. Furthermore we decide, if
 *   the input is 0-dimensional ( then fglmzero.cc is used ) or
 *   if the input is homogeneous ( then fglmhom.cc is used. Yet 
 *   not implemented ).
+*   The extension (finduni) finds minimal univariate Polynomials
+*   lying in a 0-dimensional ideal.
 */
 
 #include "mod2.h"
@@ -200,14 +202,14 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
     return FglmOk;
 }
 
-//     Checks if the ideal "theIdeal" is zero-dimensional and minimal. It does
-//      not check, if it is reduced. 
-//     returns FglmOk if we can use theIdeal for CalculateFunctionals (this 
-//                     function reports an error if theIdeal is not reduced, 
-//                     so this need not to be tested here)
-//             FglmNotReduced if theIdeal is not minimal
-//             FglmNotZeroDim if it is not zero-dimensional
-//             FglmHasOne if 1 belongs to theIdeal
+// Checks if the ideal "theIdeal" is zero-dimensional and minimal. It does
+//  not check, if it is reduced. 
+// returns FglmOk if we can use theIdeal for CalculateFunctionals (this 
+//                 function reports an error if theIdeal is not reduced, 
+//                 so this need not to be tested here)
+//         FglmNotReduced if theIdeal is not minimal
+//         FglmNotZeroDim if it is not zero-dimensional
+//         FglmHasOne if 1 belongs to theIdeal
 FglmState 
 fglmIdealcheck( const ideal theIdeal )
 {
@@ -238,10 +240,9 @@ fglmIdealcheck( const ideal theIdeal )
     return state;
 }
 
-//     the main function for the fglm-Algorithm. 
-//     Checks the input-data, calls CalculateFunctionals, handles change
-//     of ring-vars and finaly calls GroebnerViaFunctionals.
-//     returns the new groebnerbasis or 0 if an error occoured.
+// The main function for the fglm-Algorithm. 
+// Checks the input-data, and calls fglmzero (see fglmzero.cc).
+// Returns the new groebnerbasis or 0 if an error occoured.
 BOOLEAN
 fglmProc( leftv result, leftv first, leftv second ) 
 {
@@ -315,21 +316,50 @@ fglmProc( leftv result, leftv first, leftv second )
 	return TRUE;
 }
 
+// The main function for finduni().
+// Checks the input-data, and calls FindUnivariateWrapper (see fglmzero.cc).
+// Returns an ideal containing the univariate Polynomials or 0 if an error
+// has occoured.
 BOOLEAN
 findUniProc( leftv result, leftv first ) 
 {
     ideal sourceIdeal;
-    ideal destIdeal;
+    ideal destIdeal = NULL;
+    FglmState state;
     
     idhdl sourceIdealHdl = (idhdl)first->data;
     sourceIdeal= IDIDEAL(sourceIdealHdl);
-    
-    destIdeal= FindUnivariateWrapper( sourceIdeal );
+
+    assumeStdFlag( first );
+    state= fglmIdealcheck( sourceIdeal );
+    if ( state == FglmOk ) {
+	if ( FindUnivariateWrapper( sourceIdeal, destIdeal ) == FALSE )
+	    state = FglmNotReduced;
+    }
+    switch (state) {
+	case FglmOk:
+	    break;
+	case FglmHasOne:
+	    destIdeal= idInit(1,1);
+	    (destIdeal->m)[0]= pOne();
+	    state= FglmOk;
+	    break;
+	case FglmNotZeroDim:
+	    Werror( "The ideal %s has to be 0-dimensional", first->Name() );
+	    destIdeal= idInit(0,0);
+	    break;
+	case FglmNotReduced:
+	    Werror( "The ideal %s has to be reduced", first->Name() );
+	    destIdeal= idInit(0,0);
+	    break;
+	default:
+	    destIdeal= idInit(1,1);
+    }
     
     result->rtyp = IDEAL_CMD;
     result->data= (void *)destIdeal;
     
-	return FALSE;
+    return FALSE;
 }
 #endif
 // ----------------------------------------------------------------------------
