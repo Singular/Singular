@@ -1,5 +1,5 @@
 dnl # emacs edit mode for this file is -*- sh -*-
-dnl # $Id: configure.in,v 1.17 1998-01-13 13:58:03 obachman Exp $
+dnl # $Id: configure.in,v 1.18 1998-02-05 15:56:45 schmidt Exp $
 
 dnl #
 dnl # configure.in - process this file with `autoconf' to generate
@@ -12,7 +12,7 @@ dnl #
 #
 # - initialisation.
 #
-AC_REVISION($Id: configure.in,v 1.17 1998-01-13 13:58:03 obachman Exp $)
+AC_REVISION($Id: configure.in,v 1.18 1998-02-05 15:56:45 schmidt Exp $)
 AC_INIT(canonicalform.cc)
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_AUX_DIR(bin)
@@ -366,69 +366,14 @@ if test "x$enable_assertions" = xno; then
   AC_DEFINE(NOASSERT)
 fi
 
-#
-# - debugoutput and timing magic.
-#
-# For those who do not like this: As long as you do not specify
-# --enable-timing or --enable-debugoutput the following code will
-# not be executed.
-#
-timingtargets=/dev/null
-debouttargets=/dev/null
-debtimingtargets=/dev/null
-enhanceddebtime=no
-
 # timing
 if test "x$enable_timing" != xno; then
-  if test "x$enable_timing" = xyes; then
-    AC_DEFINE(TIMING)
-  else
-    echo "$enable_timing" | tr ',' '\n' | sed 's/\..*$//' | sort > conftest.time
-    timingtargets=conftest.time
-    enhanceddebtime=yes
-  fi
+  AC_DEFINE(TIMING)
 fi
 
 # debugoutput
 if test "x$enable_debugoutput" != xno; then
-  if test "x$enable_debugoutput" = xyes; then
-    AC_DEFINE(DEBUGOUTPUT)
-  else
-    echo "$enable_debugoutput" | tr ',' '\n' | sed 's/\..*$//' | sort > conftest.debout
-    debouttargets=conftest.debout
-    enhanceddebtime=yes
-  fi
-fi
-
-# create makefile fragments
-if test "x$enhanceddebtime" = xyes; then
-  # get the intersection of timingtargets and debouttargets
-  sort "$timingtargets" "$debouttargets" | uniq -d > conftest.debtime
-  if test -s conftest.debtime; then
-    debtimingtargets=conftest.debtime
-  fi
-  if test "x$timingtargets" != x/dev/null; then
-    # get difference of timingtargets and debtimingtargets
-    sort "$timingtargets" "$debtimingtargets" | uniq -u |
-      while read line; do
-      	echo "$line.o: $line.cc config.h;" '$(CXX) -c $< -DTIMING $(LIBCXXFLAGS) -o $@'
-      done > conftest.tmp
-    mv conftest.tmp "$timingtargets"
-  fi
-  if test "x$debouttargets" != x/dev/null; then
-    # get difference of debouttargets and debtimingtargets
-    sort "$debouttargets" "$debtimingtargets" | uniq -u |
-      while read line; do
-      	echo "$line.o: $line.cc config.h;" '$(CXX) -c $< -DDEBUGOUTPUT $(LIBCXXFLAGS) -o $@'
-      done > conftest.tmp
-    mv conftest.tmp "$debouttargets"
-  fi
-  if test "x$debtimingtargets" != x/dev/null; then
-    while read line; do
-      echo "$line.o: $line.cc config.h;" '$(CXX) -c $< -DTIMING -DDEBUGOUTPUT $(LIBCXXFLAGS) -o $@'
-    done < "$debtimingtargets" > conftest.tmp
-    mv conftest.tmp "$debtimingtargets"
-  fi
+  AC_DEFINE(DEBUGOUTPUT)
 fi
 
 #
@@ -453,10 +398,6 @@ AC_SUBST(memmanincl)
 AC_SUBST(alltargets)
 AC_SUBST(installtargets)
 AC_SUBST(uninstalltargets)
-
-AC_SUBST_FILE(timingtargets)
-AC_SUBST_FILE(debouttargets)
-AC_SUBST_FILE(debtimingtargets)
 
 AC_DEFINE_UNQUOTED(FACTORYVERSION, "$factory_version")
 AC_DEFINE_UNQUOTED(FACTORYCONFIGURATION, "$factory_configuration")
