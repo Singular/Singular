@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.214 2000-05-26 11:23:31 siebert Exp $ */
+/* $Id: iparith.cc,v 1.215 2000-05-29 08:33:52 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4938,9 +4938,11 @@ static BOOLEAN jjSTATUS_M(leftv res, leftv v)
 #endif
 static BOOLEAN jjSUBST_M(leftv res, leftv u)
 {
-  leftv v = u->next;
+  leftv v = u->next; // number of args > 0
+  if (v==NULL) return TRUE;
   leftv w = v->next;
-  leftv rest = w->next;
+  if (w==NULL) return TRUE;
+  leftv rest = w->next;;
 
   u->next = NULL;
   v->next = NULL;
