@@ -50,12 +50,12 @@ as well as polynomials.  Using operator overloading, you can handle
 polynomial data similarly to built-in types such as the machine integers.
 For example, to add together two polynomials one simply uses the '+'
 operator.  Because of this, Factory is easy to use even if you are not
-familar with C++ programming.
+familiar with C++ programming.
 
   There are a couple of utility classes provided by Factory such as lists,
 arrays, polynomial maps, etc.  These make the usage more comfortable.
 
-
+
 2. Comments, questions, bug reports
 ====================================
   Factory is a project in evolution.  That means there is no guarantee that
@@ -63,7 +63,14 @@ Factory is bug free.  I am sure that there are bugs or at least features.
 If you find bugs or if you find a strange behavior of the library, please
 let me know (e-mail: Jens Schmidt <schmidt@mathematik.uni-kl.de>).
 Comments and questions are welcome, too.
+  Factory version 1.2c and newer define an external variable
+'factoryVersion' describing the version of the library.  Please include
+this version number in your bug reports.  You may either use the UNIX
+utility 'what' to get this number ('what libcf.a') or compile and run
+something similar to this:
 
+  #include <factory.h>
+  main() { cout << factoryVersion << endl; }
 
 3. Installation
 ===============
@@ -210,7 +217,7 @@ See the INSTALL file for more information.
 do not have to worry about compilation or installation at all.  The
 installation procedure for Singular should do everything for you.  If you
 want to configure/build the package on your own instead of letting
-Singulars configure do the work you should:
+Singular's configure do the work you should:
 
   ./configure --with-Singular --enable-gmp
 	(or, equivalently: )
@@ -290,11 +297,12 @@ factory-<version>/bin/fold-docu.el which contains some additional functions
 to fold only the documentation.  If you add the following lines to your
 .emacs-file, all this would be done automatically for you:
 
+  (load-file "factory-<version>/bin/folding.el")
+  (load-file "factory-<version>/bin/fold-docu.el")
   (add-hook 'c-mode-common-hook 'folding-mode)
   (setq fold-fold-on-startup nil
         fold-mode-marks-alist '((c++-mode "//{{{" "//}}}")))
   (set-default 'fold-internal-margins nil)
-  (load-file "factory-<version>/bin/fold-docu.el")
 
   For more information, see the respective files.
 
