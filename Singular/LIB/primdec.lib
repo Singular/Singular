@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.3 1997-08-12 14:01:10 Singular Exp $
+// $Id: primdec.lib,v 1.4 1997-09-10 10:55:39 Singular Exp $
 ///////////////////////////////////////////////////////
 // primdec.lib
 // algorithms for primary decomposition based on
@@ -1110,7 +1110,7 @@ EXAMPLE: example ggt; shows an example
      {
         return(1)
      }
-     p=GCD(p,i[k]);
+     p=gcd(p,i[k]);
      if(deg(p)==0)
      {
         return(1);
