@@ -6,7 +6,7 @@
  *  Purpose: implementation of debug related poly routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pDebug.cc,v 1.7 2000-10-19 15:00:18 obachman Exp $
+ *  Version: $Id: pDebug.cc,v 1.8 2000-10-23 12:02:16 obachman Exp $
  *******************************************************************/
 
 #ifndef PDEBUG_CC
@@ -29,7 +29,6 @@
  * Error reporting
  *
  ***************************************************************/
-extern void wrp(poly p, ring r);
 BOOLEAN dPolyReportError(poly p, ring r, const char* fmt, ...)
 {
   va_list ap;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: weight.cc,v 1.14 2000-09-18 09:19:38 obachman Exp $ */
+/* $Id: weight.cc,v 1.15 2000-10-23 12:02:23 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -260,13 +260,13 @@ short * iv2array(intvec * iv)
 *with respect to given ecartWeights
 *used for Graebes method if BTEST1(31) is set
 */
-int totaldegreeWecart(poly p)
+int totaldegreeWecart(poly p, ring r)
 {
   int i;
   int j =0;
 
-  for (i=pVariables; i; i--)
-    j += (int)(pGetExp(p,i) * ecartWeights[i]);
+  for (i=r->N; i; i--)
+    j += (int)(p_GetExp(p,i,r) * ecartWeights[i]);
   return  j;
 }
 
@@ -276,17 +276,17 @@ int totaldegreeWecart(poly p)
 *computes the length of the polynomial
 *used for Graebes method if BTEST1(31) is set
 */
-int maxdegreeWecart(poly p,int *l)
+int maxdegreeWecart(poly p,int *l, ring r)
 {
-  short k=pGetComp(p);
+  short k=p_GetComp(p, r);
   int ll=1;
   int  t,max;
 
-  max=totaldegreeWecart(p);
+  max=totaldegreeWecart(p, r);
   pIter(p);
-  while ((p!=NULL) && (pGetComp(p)==k))
+  while ((p!=NULL) && (p_GetComp(p, r)==k))
   {
-    t=totaldegreeWecart(p);
+    t=totaldegreeWecart(p, r);
     if (t>max) max=t;
     ll++;
     pIter(p);

@@ -88,7 +88,7 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc clapconv.cc \
     maps.cc matpol.cc misc.cc sdb.cc gnumpfl.cc gnumpc.cc \
     modulop.cc mpr_complex.cc sparsmat.cc \
     fglm.cc fglmzero.cc fglmvec.cc fglmgauss.cc fglmhom.cc fglmcomb.cc \
-    numbers.cc polys.cc polys0.cc polys1.cc polys-impl.cc \
+    numbers.cc polys.cc p_polys.cc polys0.cc polys1.cc polys-impl.cc \
     ring.cc shortfl.cc silink.cc sing_mp.cc\
     sing_dld.cc sing_dbm.cc kspoly.cc \
     subexpr.cc syz.cc syz0.cc syz1.cc syz2.cc syz3.cc\
@@ -141,7 +141,7 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
         pInline2.h pInline1.h pInline0.h p_Procs.h mmalloc.h static.h\
         omSingularConfig.h
 
-INCS=febase.inc polys.inc iparith.inc mpsr_Tok.inc feOpt.inc
+INCS=febase.inc iparith.inc mpsr_Tok.inc feOpt.inc
 
 DISTFILES=${SOURCES} ${HEADERS} Makefile.in configure.in configure \
 	mod2.h.in grammar.h testgh install-sh mkinstalldirs \

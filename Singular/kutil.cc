@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.66 2000-10-19 15:00:15 obachman Exp $ */
+/* $Id: kutil.cc,v 1.67 2000-10-23 12:02:14 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -297,28 +297,96 @@ BOOLEAN isInPairsetB(poly q,int*  k,kStrategy strat)
 #ifdef KDEBUG
 #define kFalseReturn(x) do { if (!x) return FALSE;} while (0)
 
-BOOLEAN kTest_L(LObject *L, ring strat_tailRing, 
-                BOOLEAN testp, int lpos, TSet T, int tlength)
+// check that Lm's of a poly from T are "equal"
+static const char* kTest_LmEqual(poly p, poly t_p, ring tailRing)
 {
-  ring tailRing = L->tailRing;
-  ring lmRing   = currRing;
+  int i;
+  for (i=1; i<=tailRing->N; i++)
+  {
+    if (p_GetExp(p, i, currRing) != p_GetExp(t_p, i, tailRing))
+      return "Lm[i] different";
+  }
+  if (p_GetComp(p, currRing) != p_GetComp(t_p, tailRing))
+    return "Lm[0] different";
+  if (pNext(p) != pNext(t_p))
+    return "Lm.next different";
+  if (pGetCoeff(p) != pGetCoeff(t_p))
+    return "Lm.coeff different";
+  return NULL;
+}
+
+BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
+{
+  ring tailRing = T->tailRing;
   if (strat_tailRing == NULL) strat_tailRing = tailRing;
   r_assume(strat_tailRing == tailRing);
 
+  poly p = T->p;
+  ring r = currRing;
+  
+  if (T->p == NULL && T->t_p == NULL && i >= 0)
+    return dReportError("%c[%d].poly is NULL", TN, i);
+
+  if (T->tailRing != currRing)
+  {
+    if (T->t_p == NULL && i > 0)
+      return dReportError("%c[%d].t_p is NULL", TN, i);
+    pFalseReturn(p_Test(T->t_p, T->tailRing));
+    if (T->p != NULL) pFalseReturn(p_LmTest(T->p, currRing));
+    if (T->p != NULL && T->t_p != NULL)
+    {
+      const char* msg = kTest_LmEqual(T->p, T->t_p, T->tailRing);
+      if (msg != NULL)
+        return dReportError("%c[%d] %s", TN, i, msg);
+      r = T->tailRing;
+      p = T->t_p;
+    }
+    if (T->p == NULL)
+    {
+      p = T->t_p;
+      r = T->tailRing;
+    }
+  }
+  else
+  {
+    if (T->t_p != NULL)
+      return dReportError("%c[%d].t_p != NULL but tailRing == currRing",TN,i);
+    if (T->p == NULL && i > 0)
+      return dReportError("%c[%d].p is NULL", TN, i);
+    pFalseReturn(p_Test(T->p, currRing));
+  }
+
+  if (T->pLength != 0 &&
+      T->pLength != pLength(p))
+  {
+    return dReportError("%c[%d] length error: has %d, specified to have %d",
+                        TN, i , pLength(p), T->pLength);
+  }
+  if (T->sev != 0 && p_GetShortExpVector(p, r) != T->sev)
+  {
+    return dReportError("%c[%d] wrong sev: has %o, specified to have %o",
+                        TN, i , p_GetShortExpVector(p, r), T->sev);
+  }
+  return TRUE;
+}
+
+BOOLEAN kTest_L(LObject *L, ring strat_tailRing, 
+                BOOLEAN testp, int lpos, TSet T, int tlength)
+{
   if (testp)
   {
     if (L->bucket != NULL)
     {
       kFalseReturn(kbTest(L->bucket));
-      r_assume(L->bucket->bucket_ring == tailRing);
+      r_assume(L->bucket->bucket_ring == L->tailRing);
     }
-    kFalseReturn(kTest_T(L, lpos, 'L'));
+    kFalseReturn(kTest_T(L, strat_tailRing, lpos, 'L'));
   }
 
   if (L->p1 == NULL)
   {
     // L->p2 either NULL or "normal" poly
-    pFalseReturn(pp_Test(L->p2, lmRing, tailRing));
+    pFalseReturn(pp_Test(L->p2, currRing, L->tailRing));
   }
   else if (tlength > 0 && T != NULL)
   {
@@ -349,7 +417,8 @@ BOOLEAN kTest (kStrategy strat)
   if (strat->T != NULL)
   {
     for (i=0; i<=strat->tl; i++)
-      kFalseReturn(kTest_T(&(strat->T[i]), i, 'T'));
+      kFalseReturn(kTest_T(&(strat->T[i]), strat->tailRing, i, 'T'));
+      
   }
 
   // test L
@@ -387,72 +456,7 @@ BOOLEAN kTest_S(kStrategy strat)
 }
 
 
-// check that Lm's of a poly from T are "equal"
-static const char* kTest_LmEqual(poly p, poly t_p, ring tailRing)
-{
-  int i;
-  for (i=1; i<=tailRing->N; i++)
-  {
-    if (p_GetExp(p, i, currRing) != p_GetExp(t_p, i, tailRing))
-      return "Lm[i] different";
-  }
-  if (p_GetComp(p, currRing) != p_GetComp(t_p, tailRing))
-    return "Lm[0] different";
-  if (pNext(p) != pNext(t_p))
-    return "Lm.next different";
-  if (pGetCoeff(p) != pGetCoeff(t_p))
-    return "Lm.coeff different";
-  return NULL;
-}
     
-BOOLEAN kTest_T(TObject * T, int i, char TN)
-{
-  poly p = T->p;
-  ring r = currRing;
-  
-  if (T->tailRing != currRing)
-  {
-    pFalseReturn(p_Test(T->t_p, T->tailRing));
-    if (T->p != NULL) pFalseReturn(p_LmTest(T->p, currRing));
-    if (T->p != NULL && T->t_p != NULL)
-    {
-      const char* msg = kTest_LmEqual(T->p, T->t_p, T->tailRing);
-      if (msg != NULL)
-        return dReportError("%c[%d] %s", TN, i, msg);
-      r = T->tailRing;
-      p = T->t_p;
-    }
-    else
-    {
-      if (T->p == NULL && T->t_p == NULL)
-        return dReportError("%c[%d].poly is NULL", TN, i);
-    }
-    if (T->p == NULL)
-    {
-      p = T->t_p;
-      r = T->tailRing;
-    }
-  }
-  else
-  {
-    if (T->t_p != NULL)
-      return dReportError("%c[%d].t_p != NULL but tailRing == currRing", TN, i);
-    pFalseReturn(p_Test(T->p, currRing));
-  }
-
-  if (T->pLength != 0 &&
-      T->pLength != pLength(p))
-  {
-    return dReportError("%c[%d] length error: has %d, specified to have %d",
-                        TN, i , pLength(p), T->pLength);
-  }
-  if (T->sev != 0 && p_GetShortExpVector(p, r) != T->sev)
-  {
-    return dReportError("%c[%d] wrong sev: has %o, specified to have %o",
-                        TN, i , p_GetShortExpVector(p, r), T->sev);
-  }
-  return TRUE;
-}
 
 
 int kFindInT(poly p, TSet T, int tlength)
@@ -1344,7 +1348,7 @@ int posInS (polyset set,int length,poly p)
   int i;
   int an = 0;
   int en= length;
-  if (pMixedOrder)
+  if (currRing->MixedOrder)
   {
     int cmp_int=pOrdSgn;
     int o=pWTotaldegree(p);
@@ -2487,7 +2491,7 @@ void messageSets (kStrategy strat)
     for (i=0; i<=strat->sl; i++)
     {
       Print("\n  %d:",i);
-      wrp(strat->S[i]);
+      wrp(strat->S[i], currRing, strat->tailRing);
     }
     strat->news = FALSE;
   }
@@ -2497,7 +2501,7 @@ void messageSets (kStrategy strat)
     for (i=0; i<=strat->tl; i++)
     {
       Print("\n  %d:",i);
-      wrp(strat->T[i].p);
+      wrp(strat->T[i].GetLm(strat->tailRing));
       Print(" o:%d e:%d l:%d",
         pFDeg(strat->T[i].p),strat->T[i].ecart,strat->T[i].length);
     }
@@ -2507,12 +2511,12 @@ void messageSets (kStrategy strat)
   for (i=strat->Ll; i>=0; i--)
   {
     Print("\n%d:",i);
-    wrp(strat->L[i].p1);
+    wrp(strat->L[i].p1, currRing, strat->tailRing);
     PrintS("  ");
-    wrp(strat->L[i].p2);
-    PrintS(" lcm: ");wrp(strat->L[i].lcm);
+    wrp(strat->L[i].p2, currRing, strat->tailRing);
+    PrintS(" lcm: ");wrp(strat->L[i].lcm, currRing);
     PrintS("\n  p : ");
-    wrp(strat->L[i].p);
+    wrp(strat->L[i].GetLm(strat->tailRing), strat->tailRing);
     Print("  o:%d e:%d l:%d",
      pFDeg(strat->L[i].p),strat->L[i].ecart,strat->L[i].length);
   }
@@ -3060,7 +3064,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
           if (TEST_OPT_DEBUG && (pCmp(redSi,strat->S[i])!=0))
           {
             PrintS("reduce:");
-            wrp(redSi);PrintS(" to ");wrp(strat->S[i]);PrintLn();
+            wrp(redSi);PrintS(" to ");wrp(strat->S[i], currRing, strat->tailRing);PrintLn();
           }
           if (TEST_OPT_PROT && (pCmp(redSi,strat->S[i])!=0))
           {

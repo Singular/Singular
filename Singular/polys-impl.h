@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.57 2000-10-05 15:19:57 Singular Exp $ */
+/* $Id: polys-impl.h,v 1.58 2000-10-23 12:02:16 obachman Exp $ */
 
 /***************************************************************
  *
@@ -259,18 +259,5 @@ while (0)
 
 // number of Variables
 extern int pVariables;
-// size of a monom in bytes - always a multiple of sizeof(void*)
-extern int pMonomSize;
-// size of a monom in units of sizeof(void*) -- i.e. in words
-extern int pMonomSizeW;
-// Ceiling((pVariables+1) / sizeof(void*)) == length of exp-vector in words
-// extern int pVariables1W;
-// Ceiling((pVariables) / sizeof(void*))
-// extern int pVariablesW;
-extern int *pVarOffset;
-// extern int pVarLowIndex;
-// extern int pVarHighIndex;
-// extern int pVarCompIndex;
-extern omBin currPolyBin;
 
 #endif // POLYS_IMPL_H

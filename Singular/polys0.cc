@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys0.cc,v 1.15 2000-10-19 15:00:20 obachman Exp $ */
+/* $Id: polys0.cc,v 1.16 2000-10-23 12:02:18 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to convert polynomials to strings
@@ -79,21 +79,21 @@ static void writemon(poly p, int ko, ring r)
   }
 }
 
-char* pString0(poly p, ring r)
+char* pString0(poly p, ring lmRing, ring tailRing)
 {
   if (p == NULL)
   {
     return StringAppendS("0");
   }
-  if ((p_GetComp(p, r) == 0) || (!r->VectorOut))
+  if ((p_GetComp(p, lmRing) == 0) || (!lmRing->VectorOut))
   {
-    writemon(p,0, r);
+    writemon(p,0, lmRing);
     p = pNext(p);
     while (p!=NULL)
     {
       if ((p->coef==NULL)||nGreaterZero(p->coef))
         StringAppendS("+");
-      writemon(p,0, r);
+      writemon(p,0, tailRing);
       p = pNext(p);
     }
     return StringAppendS("");
@@ -103,17 +103,17 @@ char* pString0(poly p, ring r)
   StringAppendS("[");
   loop
   {
-    while (k < p_GetComp(p,r))
+    while (k < p_GetComp(p,lmRing))
     {
       StringAppendS("0,");
       k++;
     }
-    writemon(p,k,r);
+    writemon(p,k,lmRing);
     pIter(p);
-    while ((p!=NULL) && (k == p_GetComp(p, r)))
+    while ((p!=NULL) && (k == p_GetComp(p, tailRing)))
     {
       if (nGreaterZero(p->coef)) StringAppendS("+");
-      writemon(p,k,r);
+      writemon(p,k,tailRing);
       pIter(p);
     }
     if (p == NULL) break;
@@ -123,32 +123,32 @@ char* pString0(poly p, ring r)
   return StringAppendS("]");
 }
 
-char* pString(poly p, ring r)
+char* pString(poly p, ring lmRing, ring tailRing)
 {
   StringSetS("");
-  return pString0(p, r);
+  return pString0(p, lmRing, tailRing);
 }
 
 /*2
 * writes a polynomial p to stdout
 */
-void pWrite0(poly p, ring r)
+void pWrite0(poly p, ring lmRing, ring tailRing)
 {
-  PrintS(pString(p, r));
+  PrintS(pString(p, lmRing, tailRing));
 }
 
 /*2
 * writes a polynomial p to stdout followed by \n
 */
-void pWrite(poly p, ring r)
+void pWrite(poly p, ring lmRing, ring tailRing)
 {
-  pWrite0(p, r);
+  pWrite0(p, lmRing, tailRing);
   PrintLn();
 }
 
 /*2
 *the standard debugging output:
-*print the first two monomials of the poly (wrp) or only the lead ter (wrp0),
+*print the first two monomials of the poly (wrp) or only the lead term (wrp0),
 *possibly followed by the string "+..."
 */
 void wrp0(poly p, ring ri)
@@ -169,17 +169,17 @@ void wrp0(poly p, ring ri)
     }
   }
 }
-void wrp(poly p, ring ri)
+void wrp(poly p, ring lmRing, ring tailRing)
 {
   poly r;
 
   if (p==NULL) PrintS("NULL");
-  else if (pNext(p)==NULL) pWrite0(p, ri);
+  else if (pNext(p)==NULL) pWrite0(p, lmRing);
   else
   {
     r = pNext(pNext(p));
     pNext(pNext(p)) = NULL;
-    pWrite0(p, ri);
+    pWrite0(p, lmRing, tailRing);
     if (r!=NULL)
     {
       PrintS("+...");

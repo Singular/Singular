@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.h,v 1.13 2000-05-09 14:33:03 Singular Exp $ */
+/* $Id: kstd1.h,v 1.14 2000-10-23 12:02:13 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -38,8 +38,8 @@ extern BITSET validOpts;
 void initMora(ideal F,kStrategy strat);
 
 ideal kInterRed (ideal F, ideal Q=NULL);
-int   kModDeg(poly p);
-int   kHomModDeg(poly p);
+int   kModDeg(poly p, ring r = currRing);
+int   kHomModDeg(poly p, ring r = currRing);
 
 ideal stdred(ideal F, ideal Q, tHomog h,intvec ** w);
 

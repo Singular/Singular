@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.122 2000-10-19 15:00:21 obachman Exp $ */
+/* $Id: ring.cc,v 1.123 2000-10-23 12:02:19 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2500,12 +2500,166 @@ static void rSetOutParams(ring r)
   }
   r->CanShortOut = r->ShortOut;
 }
+
+/*2
+* sets pMixedOrder and pComponentOrder for orderings with more than one block
+* block of variables (ip is the block number, o_r the number of the ordering)
+*/
+static void rHighSet(ring r, int o_r)
+{
+  switch(o_r)
+  {
+    case ringorder_lp:
+    case ringorder_dp:
+    case ringorder_Dp:
+    case ringorder_wp:
+    case ringorder_Wp:
+    case ringorder_a:
+      if (r->OrdSgn==-1) r->MixedOrder=TRUE;
+      break;
+    case ringorder_ls:
+    case ringorder_ds:
+    case ringorder_Ds:
+    case ringorder_ws:
+    case ringorder_Ws:
+    case ringorder_s:
+      break;
+    case ringorder_c:
+      r->ComponentOrder=1;
+      break;
+    case ringorder_C:
+    case ringorder_S:
+      r->ComponentOrder=-1;
+      break;
+    case ringorder_M:
+      r->MixedOrder=TRUE;
+      break;
+    default:
+      dReportError("wrong internal ordering:%d at %s, l:%d\n",o_r,__FILE__,__LINE__);
+  }
+}
+
+// set pFDeg, pLDeg, MixOrder, ComponentOrder, etc
+static void rSetDegStuff(ring r)
+{
+  int* order = r->order;
+  int* block0 = r->block0;
+  int* block1 = r->block1;
   
+  if (order[0]==ringorder_S ||order[0]==ringorder_s)
+  {
+    order++;
+    block0++;
+    block1++;
+  }
+  r->LexOrder = FALSE;
+  r->MixedOrder = FALSE;
+  r->ComponentOrder = 1;
+  r->pFDeg = pTotaldegree;
+  r->pLDeg = (r->OrdSgn == 1 ? r->pLDeg = pLDegb : pLDeg0);
+
+  /*======== ordering type is (_,c) =========================*/
+  if ((order[0]==ringorder_unspec)
+      ||(
+    ((order[1]==ringorder_c)||(order[1]==ringorder_C)
+     ||(order[1]==ringorder_S)
+     ||(order[1]==ringorder_s))
+    && (order[0]!=ringorder_M)
+    && (order[2]==0))
+    )
+  {
+    if ((order[0]!=ringorder_unspec)
+    && ((order[1]==ringorder_C)||(order[1]==ringorder_S)||
+        (order[1]==ringorder_s)))
+      r->ComponentOrder=-1;
+    if (r->OrdSgn == -1) r->pLDeg = pLDeg0c;
+    if ((order[0] == ringorder_lp) || (order[0] == ringorder_ls))
+    {
+      r->LexOrder=TRUE;
+      r->pLDeg = pLDeg1c;
+    }
+    if (order[0] == ringorder_wp || order[0] == ringorder_Wp ||
+        order[0] == ringorder_ws || order[0] == ringorder_Ws)
+      r->pFDeg = pWTotaldegree;
+    r->firstBlockEnds=block1[0];
+  }
+  /*======== ordering type is (c,_) =========================*/
+  else if (((order[0]==ringorder_c)
+            ||(order[0]==ringorder_C)
+            ||(order[0]==ringorder_S)
+            ||(order[0]==ringorder_s))
+  && (order[1]!=ringorder_M)
+  &&  (order[2]==0))
+  {
+    /* pLDeg = ldeg0; is standard*/
+    if ((order[0]==ringorder_C)||(order[0]==ringorder_S)||
+        order[0]==ringorder_s)
+      r->ComponentOrder=-1;
+    if ((order[1] == ringorder_lp) || (order[1] == ringorder_ls))
+    {
+      r->LexOrder=TRUE;
+      r->pLDeg = pLDeg1c;
+    }
+    r->firstBlockEnds=block1[1];
+    if (order[1] == ringorder_wp || order[1] == ringorder_Wp ||
+        order[1] == ringorder_ws || order[1] == ringorder_Ws)
+      r->pFDeg = pWTotaldegree;
+  }
+  /*------- more than one block ----------------------*/
+  else
+  {
+    if ((r->VectorOut)||(order[0]==ringorder_C)||(order[0]==ringorder_S)||(order[0]==ringorder_s))
+    {
+      if(block1[1]!=r->N) r->LexOrder=TRUE;
+      r->firstBlockEnds=block1[1];
+    }
+    else
+    {
+      if(block1[0]!=r->N) r->LexOrder=TRUE;
+      r->firstBlockEnds=block1[0];
+    }
+    /*the number of orderings:*/
+    int i = 0;
+    while (order[++i] != 0);
+    do
+    {
+      i--;
+      rHighSet(r, order[i]);
+    }
+    while (i != 0);
+
+    if ((order[0]!=ringorder_c)
+        && (order[0]!=ringorder_C)
+        && (order[0]!=ringorder_S)
+        && (order[0]!=ringorder_s))
+    {
+      r->pLDeg = pLDeg1c;
+    }
+    else
+    {
+      r->pLDeg = pLDeg1;
+    }
+    r->pFDeg = pWTotaldegree; // may be improved: pTotaldegree for lp/dp/ls/.. blocks
+  }
+  if (r->pFDeg!=pWTotaldegree) 
+  {
+    if (rOrd_is_Totaldegree_Ordering(r))
+    {
+      r->pFDeg = pDeg;
+    }
+    else
+    {
+      r->pFDeg=pTotaldegree;
+    }
+  }
+}
+
   
 BOOLEAN rComplete(ring r, int force)
 {
   if (r->VarOffset!=NULL && force == 0) return FALSE;
   rSetOutParams(r);
+  rSetDegStuff(r);
   int n=rBlocks(r)-1;
   int i;
   int bits;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.49 2000-10-19 15:26:24 Singular Exp $ */
+/* $Id: polys1.cc,v 1.50 2000-10-23 12:02:18 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -88,9 +88,9 @@ static pFDegProc pOldFDeg;
 static intvec * pModW;
 static BOOLEAN pOldLexOrder;
 
-static int pModDeg(poly p)
+static int pModDeg(poly p, ring r = currRing)
 {
-  return pOldFDeg(p)+(*pModW)[pGetComp(p)-1];
+  return pOldFDeg(p, r)+(*pModW)[p_GetComp(p, r)-1];
 }
 
 void pSetModDeg(intvec *w)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.51 2000-10-19 15:00:14 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.52 2000-10-23 12:02:13 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -40,6 +40,55 @@ static poly kFromInput(poly p,kStrategy strat)
   return NULL;
 }
 
+// return -1 if no divisor is found
+//        number of first divisor, otherwise
+static int kFindDivisibleBy(const TSet &T, int tl, LObject* L)
+{
+  unsigned long not_sev = ~L->sev;
+  poly t_p = L->GetLmTailRing();
+  ring tailRing = L->tailRing;
+  int j = 0;
+
+  assume(~not_sev == p_GetShortExpVector(t_p, tailRing));
+  
+  while (1)
+  {
+    if (j > tl) return -1;
+#if defined(PDEBUG) || defined(PDIV_DEBUG)
+    if (p_LmShortDivisibleBy(T[j].GetLmTailRing(), T[j].sev,
+                             t_p, not_sev, tailRing))
+        return j;
+#else
+    if ( !(T[j].sev & not_sev) &&
+         p_LmDivisibleBy(T[j].GetLmTailRing(), t_p, tailRing))
+      return j;
+#endif
+    j++;
+  }
+}
+// same as above, only with set S
+static int kFindDivisibleBy(const polyset &S, unsigned long* sev, int sl, LObject* L)
+{
+  unsigned long not_sev = ~L->sev;
+  poly p = L->GetLmCurrRing();
+  int j = 0;
+
+  while (1)
+  {
+    if (j > sl) return -1;
+#if defined(PDEBUG) || defined(PDIV_DEBUG)
+    if (p_LmShortDivisibleBy(S[j], sev[j],
+                             p, not_sev, currRing))
+        return j;
+#else
+    if ( !(sev[j] & not_sev) &&
+         p_LmDivisibleBy(S[j], p, currRing))
+      return j;
+#endif
+    j++;
+  }
+}
+  
 /*2
 *  reduction procedure for the homogeneous case
 *  and the case of a degree-ordering
@@ -51,24 +100,18 @@ static int redHomog (LObject* h,kStrategy strat)
   if (TEST_OPT_DEBUG)
   {
     PrintS("red:");
-    wrp(h->p);
+    wrp(h->GetLmTailRing(), h->tailRing);
     PrintS(" ");
   }
 #endif
+  ring tailRing = h->tailRing;
   int j;
-  unsigned long not_sev;
   while (1)
   {
-    j = 0;
-    h->sev = pGetShortExpVector(h->p);
-    not_sev = ~ h->sev;
-    while (1)
-    {
-      if (j > strat->tl) return 1;
-      if (pLmShortDivisibleBy(strat->T[j].p, strat->T[j].sev, 
-                              h->p, not_sev)) break;
-      j++;
-    }
+    // find a poly with which we can reduce
+    h->sev = p_GetShortExpVector(h->GetLmTailRing(), tailRing);
+    j = kFindDivisibleBy(strat->T, strat->tl, h);
+    if (j < 0) return 1;
     
     // now we found one which is divisible
     ksReducePoly(h, &(strat->T[j]), strat->kNoether);
@@ -76,11 +119,11 @@ static int redHomog (LObject* h,kStrategy strat)
     if (TEST_OPT_DEBUG)
     {
       PrintS("\nto ");
-      wrp(h->p);
+      wrp(h->GetLmTailRing(), tailRing);
       PrintLn();
     }
 #endif
-    if (h->p == NULL)
+    if (h->GetLmTailRing() == NULL)
     {
       if (h->lcm!=NULL) pLmFree((*h).lcm);
 #ifdef KDEBUG
@@ -104,22 +147,16 @@ static int redLazy (LObject* h,kStrategy strat)
   int pass = 0;
   int reddeg = pFDeg((*h).p);
   int not_sev;
+  ring tailRing = h->tailRing;
+  poly h_p;
 
-  h->sev = pGetShortExpVector(h->p);
-  not_sev = ~ h->sev;
+  h->sev = p_GetShortExpVector(h->GetLmTailRing(), tailRing);
   while (1)
   {
-    j = 0;
-    while (j <= strat->tl)
-    {
-      if (pLmShortDivisibleBy(strat->T[j].p,strat->T[j].sev,
-                            h->p, not_sev))
-          break;
-      j++;
-    }
+    j = kFindDivisibleBy(strat->T, strat->tl, h);
+    if (j < 0) return 1;
 
-    if (j>strat->tl) return 1;
-
+#ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
       PrintS("red:");
@@ -127,17 +164,21 @@ static int redLazy (LObject* h,kStrategy strat)
       PrintS(" with ");
       wrp(strat->T[j].p);
     }
+#endif
 
     ksReducePoly(h, &(strat->T[j]), strat->kNoether);
 
+#ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
       PrintS("\nto ");
       wrp(h->p);
       PrintLn();
     }
-
-    if ((*h).p == NULL)
+#endif
+    h_p = h->GetLmTailRing();
+    
+    if (h_p == NULL)
     {
       if (h->lcm!=NULL) pLmFree((*h).lcm);
 #ifdef KDEBUG
@@ -145,25 +186,22 @@ static int redLazy (LObject* h,kStrategy strat)
 #endif
       return 0;
     }
-    h->sev = pGetShortExpVector(h->p);
-    not_sev = ~ h->sev;
+    h->sev = p_GetShortExpVector(h_p, tailRing);
+    d = pFDeg(h_p, tailRing);
     /*- try to reduce the s-polynomial -*/
     pass++;
-    d = pFDeg((*h).p);
     if ((strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
     {
+      h->SetLmCurrRing();
       at = posInL11(strat->L,strat->Ll,*h,strat);
       if (at <= strat->Ll)
       {
-        i=strat->sl+1;
-        do
-        {
-          i--;
-          if (i<0) return 1;
-        }
-        while (!pLmShortDivisibleBy(strat->S[i], strat->sevS[i], 
-                                  h->p, not_sev));
+        if (kFindDivisibleBy(strat->S, strat->sevS, strat->sl, h) < 0)
+          return 1;
+#ifdef KDEBUG
         if (TEST_OPT_DEBUG) Print(" ->L[%d]\n",at);
+#endif
+        h->CanonicalizeP();
         enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
         (*h).p = NULL;
         return -1;
@@ -182,7 +220,7 @@ static int redLazy (LObject* h,kStrategy strat)
 * reduces h with elements from T choosing first possible
 * element in T with respect to the given ecart
 */
-static int redHoney (LObject*  h,kStrategy strat)
+static int redHoney (LObject* h, kStrategy strat)
 {
   if (strat->tl<0) return 1;
 
@@ -196,19 +234,8 @@ static int redHoney (LObject*  h,kStrategy strat)
   not_sev = ~ h->sev;
   loop
   {
-    j = 0;
-    while (j<= strat->tl)
-    {
-      if (pLmShortDivisibleBy(strat->T[j].p, strat->T[j].sev, 
-                            h->p, not_sev)) break;
-      j++;
-    }
-
-    if (j > strat->tl)
-    {
-      h->sev = ~ not_sev;
-      return 1;
-    }
+    j = kFindDivisibleBy(strat->T, strat->tl, h);
+    if (j < 0) return 1;
 
     pi = strat->T[j].p;
     ei = strat->T[j].ecart;
@@ -257,7 +284,9 @@ static int redHoney (LObject*  h,kStrategy strat)
         {
           h->CanonicalizeP();
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+#ifdef KDEBUG
           if (TEST_OPT_DEBUG) Print(" ecart too big: -> L%d\n",at);
+#endif
           (*h).p = NULL;
           return -1;
         }
@@ -270,6 +299,7 @@ static int redHoney (LObject*  h,kStrategy strat)
         enterpairs((*h).p,strat->sl,(*h).ecart,0,strat);
       }
     }
+#ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
       PrintS("red:");
@@ -277,18 +307,21 @@ static int redHoney (LObject*  h,kStrategy strat)
       PrintS(" with ");
       wrp(pi);
     }
+#endif
     if (strat->fromT)
     {
       strat->fromT=FALSE;
       h->p = pCopy(h->p);
     }
     ksReducePoly(h, &(strat->T[ii]), strat->kNoether);
+#ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
       PrintS("\nto ");
       wrp(h->p);
       PrintLn();
     }
+#endif
     if ((*h).p == NULL)
     {
       if (h->lcm!=NULL) pLmFree((*h).lcm);
@@ -318,18 +351,14 @@ static int redHoney (LObject*  h,kStrategy strat)
       at = strat->posInL(strat->L,strat->Ll,*h,strat);
       if (at <= strat->Ll)
       {
-        /*test if h is already standardbasis element*/
-        i=strat->sl+1;
-        do
-        {
-          i--;
-          if (i<0) return 1;
-        } while (!pLmShortDivisibleBy(strat->S[i], strat->sevS[i], 
-                                    h->p, not_sev));
+        if (kFindDivisibleBy(strat->S, strat->sevS, strat->sl, h) < 0)
+          return 1;
         h->CanonicalizeP();
         enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+#ifdef KDEBUG
         if (TEST_OPT_DEBUG)
           Print(" degree jumped: -> L%d\n",at);
+#endif
         (*h).p = NULL;
         return -1;
       }
@@ -471,6 +500,7 @@ static poly redNF (poly h,kStrategy strat)
     {
       //if (strat->interpt) test_int_std(strat->kIdeal);
       /*- compute the s-polynomial -*/
+#ifdef KDEBUG
       if (TEST_OPT_DEBUG)
       {
         PrintS("red:");
@@ -478,13 +508,16 @@ static poly redNF (poly h,kStrategy strat)
         PrintS(" with ");
         wrp(strat->S[j]);
       }
+#endif
       h = ksOldSpolyRed(strat->S[j],h,strat->kNoether);
+#ifdef KDEBUG
       if (TEST_OPT_DEBUG)
       {
         PrintS("\nto:");
         wrp(h);
         PrintLn();
       }
+#endif
       if (h == NULL) return NULL;
       z++;
       if (z>=10)
@@ -581,7 +614,9 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   while (strat->Ll >= 0)
   {
     if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
+#ifdef KDEBUG
     if (TEST_OPT_DEBUG) messageSets(strat);
+#endif
     if (strat->Ll== 0) strat->interpt=TRUE;
     if (TEST_OPT_DEGBOUND
         && ((strat->honey && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p)>Kstd1_deg))
@@ -646,9 +681,9 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
             if (strat->redTailChange)  strat->P.pLength = 0;
           }
         }
-
+#ifdef KDEBUG
         if (TEST_OPT_DEBUG){PrintS("new s:");wrp(strat->P.p);PrintLn();}
-
+#endif
         if ((strat->P.p1==NULL) && (strat->minim>0))
         {
           if (strat->minim==1)
@@ -680,7 +715,9 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #endif
     kTest_TS(strat);
   }
+#ifdef KDEBUG
   if (TEST_OPT_DEBUG) messageSets(strat);
+#endif
   /* complete reduction of the standard basis--------- */
   if (TEST_OPT_REDSB) completeReduce(strat);
   /* release temp data-------------------------------- */

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.43 2000-09-18 09:19:05 obachman Exp $ */
+/* $Id: ipid.cc,v 1.44 2000-10-23 12:02:12 obachman Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -42,7 +42,6 @@ idhdl idroot = NULL;
 idhdl currRingHdl = NULL;
 ring  currRing = NULL;
 ideal currQuotient = NULL;
-omBin currPolyBin = NULL;
 char* iiNoName="_";
 
 void paCleanUp(package pack);

@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.53 2000-10-19 15:00:22 obachman Exp $ */
+/* $Id: ring.h,v 1.54 2000-10-23 12:02:20 obachman Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -200,9 +200,9 @@ typedef enum rOrderType_t
 inline BOOLEAN rIsSyzIndexRing(ring r)
 { return r->order[0] == ringorder_s;}
 
-inline int rGetCurrSyzLimit()
-{ return (currRing->order[0] == ringorder_s ?
-          currRing->typ[0].data.syz.limit : 0);}
+inline int rGetCurrSyzLimit(ring r = currRing)
+{ return (r->order[0] == ringorder_s ?
+          r->typ[0].data.syz.limit : 0);}
 
 // Ring Manipulations
 ring   rCurrRingAssure_SyzComp();

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.43 2000-10-19 15:00:15 obachman Exp $ */
+/* $Id: kstdfac.cc,v 1.44 2000-10-23 12:02:14 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -290,7 +290,9 @@ static void completeReduceFac (kStrategy strat, lists FL)
         strat->next=n;
       }
       else
-        memset(&n->P,0,sizeof(n->P));
+      {
+        n->P.Init(strat->tailRing);
+      }
 
       n->P.p=fac->m[i];
       n->initEcart(&n->P);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.65 2000-10-19 16:32:40 obachman Exp $ */
+/* $Id: syz1.cc,v 1.66 2000-10-23 12:02:21 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -161,7 +161,6 @@ void syCompactify1(SSet sPairs, int* sPlength, int first)
   *sPlength -= kk;
 }
 
-static pCompProc syOldComp1;
 /*3
 * replaces comp1dpc during homogeneous syzygy-computations
 * compares with components of currcomponents instead of the
@@ -1791,17 +1790,9 @@ intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim,int * row_shift)
     j = j+sh;
     jj = jj+2;
     result=new intvec(j,jj-sh,0);
-    if ((syzstr->syRing!=NULL) && (syzstr->syRing!=currRing))
-    {
-      ring origR=currRing;
-      rChangeCurrRing(syzstr->syRing, TRUE);
-      IMATELEM(*result,1,1) = max(1,idRankFreeModule(syzstr->res[1]));
-      rChangeCurrRing(origR,TRUE);
-    }
-    else
-    {
-      IMATELEM(*result,1,1) = max(1,idRankFreeModule(syzstr->res[1]));
-    }
+    IMATELEM(*result,1,1) 
+      = max(1,idRankFreeModule(syzstr->res[1],
+                               (syzstr->syRing!=NULL?syzstr->syRing:currRing)));
     for (i=sh;i<jj;i++)
     {
       j = 0;
@@ -1977,7 +1968,9 @@ void syPrint(syStrategy syzstr)
     {
       syzstr->resolution = new intvec(syzstr->length+1);
       SRes rP=syzstr->resPairs;
-      (*syzstr->resolution)[0] = max(1,idRankFreeModule(syzstr->res[1],syzstr->syRing));
+      (*syzstr->resolution)[0] 
+        = max(1,idRankFreeModule(syzstr->res[1],
+                                 (syzstr->syRing != NULL ? syzstr->syRing : currRing)));
       while ((l<syzstr->length) && (rP[l]!=NULL))
       {
         j=0;
@@ -1999,7 +1992,9 @@ void syPrint(syStrategy syzstr)
         rr = syzstr->minres;
       else
         rr = syzstr->fullres;
-      (*syzstr->resolution)[0] = max(1,idRankFreeModule(rr[0], syzstr->syRing));
+      (*syzstr->resolution)[0] 
+        = max(1,idRankFreeModule(rr[0], 
+                                 (syzstr->syRing != NULL ? syzstr->syRing : currRing)));
       while ((l<syzstr->length) && (rr[l]!=NULL))
       {
         j = IDELEMS(rr[l]);

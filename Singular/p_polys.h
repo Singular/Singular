@@ -7,7 +7,7 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: p_polys.h,v 1.5 2000-10-19 15:00:18 obachman Exp $
+ *  Version: $Id: p_polys.h,v 1.6 2000-10-23 12:02:16 obachman Exp $
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -269,6 +269,36 @@ PINLINE0   int  p_MinComp(poly p, ring r);
 PINLINE0 int       pLength(poly a);
 PINLINE0 poly pReverse(poly p);
 
+
+/***************************************************************
+ *
+ * I/O
+ *
+ ***************************************************************/
+char*     pString(poly p, ring lmRing, ring tailRing = currRing);
+char*     pString0(poly p, ring lmRing, ring tailRing = currRing);
+void      pWrite(poly p, ring lmRing, ring tailRing = currRing);
+void      pWrite0(poly p, ring lmRing, ring tailRing = currRing);
+void      wrp(poly p, ring lmRing, ring tailRing = currRing);
+
+
+/***************************************************************
+ *
+ * Degree stuff -- see p_polys.cc for explainations
+ *
+ ***************************************************************/
+extern pLDegProc pLDeg;
+extern pFDegProc pFDeg;
+int pDeg(poly p, ring r);
+int pTotaldegree(poly p, ring r);
+int pWTotaldegree(poly p, ring r);
+int pWDegree(poly p, ring r);
+int pWeight(int i, ring r);
+int pLDeg0(poly p,int *l, ring r);
+int pLDeg0c(poly p,int *l, ring r);
+int pLDegb(poly p,int *l, ring r);
+int pLDeg1(poly p,int *l, ring r);
+int pLDeg1c(poly p,int *l, ring r);
 
 /***************************************************************
  *

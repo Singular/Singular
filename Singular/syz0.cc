@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.32 2000-09-18 09:19:36 obachman Exp $ */
+/* $Id: syz0.cc,v 1.33 2000-10-23 12:02:21 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -36,7 +36,7 @@ static void syInitSort(ideal arg,intvec **modcomp)
   polyset F,oldF=arg->m;
   int Fl=IDELEMS(arg);
   int rkF=idRankFreeModule(arg);
-  int syComponentOrder=pModuleOrder();
+  int syComponentOrder=currRing->ComponentOrder;
 
   while ((Fl!=0) && (oldF[Fl-1]==NULL)) Fl--;
   if (*modcomp!=NULL) delete modcomp;
@@ -214,7 +214,6 @@ static ideal sySchreyersSyzygiesFM(ideal arg,intvec ** modcomp)
   }
   rkF=idRankFreeModule(arg);
 /*----------------construction of the new ordering----------*/
-  //pSetSchreyerOrdM(F,Fl,rkF);
   if (rkF>0)
     rSetSyzComp(rkF);
   else 
@@ -274,19 +273,7 @@ static ideal sySchreyersSyzygiesFM(ideal arg,intvec ** modcomp)
   {
     (*newmodcomp)[j+1] = Sl;
     i = pGetComp(S[j]);
-//#define OLD_PAIR_CONSTRUCTION
-#ifdef OLD_PAIR_CONSTRUCTION
-    k=j+1;
-    if (TEST_OPT_PROT)
-    {
-      Print("(%d)",Fl-j);
-      mflush();
-    }
-    syCreatePairs(S,j+1,Fl,k,j,i,pairs);
-/*--------------computing the syzygies----------------------*/
-    for (k=j+1;k<Fl;k++)
-#else
-    int syComponentOrder=pModuleOrder();
+    int syComponentOrder= currRing->ComponentOrder;
     int lini,wend;
     if (syComponentOrder==1)
     {
@@ -306,7 +293,6 @@ static ideal sySchreyersSyzygiesFM(ideal arg,intvec ** modcomp)
     }
     syCreatePairs(S,lini,wend,k,j,i,pairs);
     for (k=lini;k<wend;k++)
-#endif
     {
       if (pairs[k]!=NULL)
       {
@@ -528,7 +514,7 @@ static ideal sySchreyersSyzygiesFB(ideal arg,intvec ** modcomp,ideal mW,BOOLEAN 
   int Fl=IDELEMS(arg);
   while ((Fl!=0) && (arg->m[Fl-1]==NULL)) Fl--;
   ideal result=idInit(16,Fl);
-  int i,j,l,k,kkk,rkF,Sl=0,syComponentOrder=pModuleOrder();
+  int i,j,l,k,kkk,rkF,Sl=0,syComponentOrder=currRing->ComponentOrder;
   int fstart,wend,lini,ltR,gencQ=0;
   intvec *newmodcomp;
   int *Flength;

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.34 2000-10-19 15:00:16 obachman Exp $ */
+/* $Id: kutil.h,v 1.35 2000-10-23 12:02:15 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -47,8 +47,13 @@ public:
   KINLINE void sTObject::Delete();
   
   // ring-dependent Lm access
-  KINLINE poly GetLm();
+  KINLINE poly GetLm(); // equivalent to GetLmCurrRing
+  KINLINE poly GetLmCurrRing();
+  KINLINE poly GetLmTailRing();
   KINLINE poly GetLm(ring r);
+
+  // makes sure that T.p exists
+  KINLINE void SetLmCurrRing();
 
   // Iterations
   KINLINE void LmDeleteAndIter();
@@ -243,7 +248,7 @@ BOOLEAN kTest_L(LObject* L, ring tailRing = NULL,
                  BOOLEAN testp = FALSE, int lpos = -1,
                  TSet T = NULL, int tlength = -1);
 // test TObject
-BOOLEAN kTest_T(TObject* T, int tpos = -1, char T = '?');
+BOOLEAN kTest_T(TObject* T, ring tailRing = NULL, int tpos = -1, char T = '?');
 // test set strat->SevS
 BOOLEAN kTest_S(kStrategy strat);
 #else

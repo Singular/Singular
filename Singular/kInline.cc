@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.6 2000-10-19 15:25:41 obachman Exp $
+ *  Version: $Id: kInline.cc,v 1.7 2000-10-23 12:02:12 obachman Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -154,8 +154,26 @@ KINLINE poly sTObject::GetLm()
 
   return p;
 }
+KINLINE poly sTObject::GetLmCurrRing()
+{
+  return GetLm();
+}
+KINLINE poly sTObject::GetLmTailRing()
+{
+  if (t_p == NULL)
+  {
+    if (p != NULL && tailRing != currRing)
+    {
+      t_p = k_LmInit_currRing_2_tailRing(p, tailRing);
+      return t_p;
+    }
+    return p;
+  }
+  return t_p;
+}
 KINLINE poly sTObject::GetLm(ring r)
 {
+  assume(r == tailRing || r == currRing);
   if (r == currRing) 
     return GetLm();
   
@@ -165,6 +183,12 @@ KINLINE poly sTObject::GetLm(ring r)
   return t_p;
 }
 
+KINLINE void sTObject::SetLmCurrRing()
+{
+  if (p == NULL && t_p != NULL)
+    p = k_LmInit_tailRing_2_currRing(t_p, tailRing);
+}
+    
 // Iterations
 KINLINE void sTObject::LmDeleteAndIter()
 {

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.41 2000-10-19 15:00:19 obachman Exp $ */
+/* $Id: polys.h,v 1.42 2000-10-23 12:02:18 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing
@@ -230,11 +230,8 @@ typedef poly*   polyset;
 extern int      pVariables;
 extern int      pOrdSgn;
 extern BOOLEAN  pLexOrder;
-extern BOOLEAN  pMixedOrder;
 extern poly     ppNoether;
 extern BOOLEAN  pVectorOut;
-// 1 for lex ordering (except ls), -1 otherwise
-extern int pComponentOrder;
 
 /*-------------predicate on polys ----------------------*/
 BOOLEAN   pIsConstant(const poly p);
@@ -255,19 +252,27 @@ extern void pSetGlobals(ring r, BOOLEAN complete = TRUE);
 // TODO:
 #define pSetmComp   pSetm
 
+/***************************************************************
+ *
+ * Degree stuff -- see p_polys.cc for explainations
+ *
+ ***************************************************************/
 extern pLDegProc pLDeg;
 extern pFDegProc pFDeg;
-int pDeg(poly p);
-int pTotaldegree(poly p);
-int pWTotaldegree(poly p);
-int pWDegree(poly p);
+int pDeg(poly p, ring r = currRing);
+int pTotaldegree(poly p, ring r = currRing);
+int pWTotaldegree(poly p, ring r = currRing);
+int pWDegree(poly p, ring r = currRing);
+int pWeight(int c, ring r = currRing);
+int pLDeg0(poly p,int *l, ring r = currRing);
+int pLDeg0c(poly p,int *l, ring r = currRing);
+int pLDegb(poly p,int *l, ring r = currRing);
+int pLDeg1(poly p,int *l, ring r = currRing);
+int pLDeg1c(poly p,int *l, ring r = currRing);
 
 /*-------------pComp for syzygies:-------------------*/
 
 void pSetModDeg(intvec *w);
-void pSetSchreyerOrdB(polyset nextorder, int length);
-void pSetSchreyerOrdM(polyset nextorder, int length, int comps);
-int  pModuleOrder();
 
 
 
@@ -292,15 +297,14 @@ poly      pDiffOp(poly a, poly b,BOOLEAN multiply);
 int pMaxCompProc(poly p);
 
 BOOLEAN   pOneComp(poly p);
-int       pWeight(int c);
 #define   pSetCompP(a,i)    p_SetCompP(a, i, currRing)
 
 
-char*     pString(poly p, ring r = currRing);
-char*     pString0(poly p, ring r = currRing);
-void      pWrite(poly p, ring r = currRing);
-void      pWrite0(poly p, ring r = currRing);
-void      wrp(poly p, ring r = currRing);
+char*     pString(poly p, ring lmRing = currRing, ring tailRing = currRing);
+char*     pString0(poly p, ring lmRing = currRing, ring tailRing = currRing);
+void      pWrite(poly p, ring lmRing = currRing, ring tailRing = currRing);
+void      pWrite0(poly p, ring lmRing = currRing, ring tailRing = currRing);
+void      wrp(poly p, ring lmRing = currRing, ring tailRing = currRing);
 
 void      pEnlargeSet(polyset *p, int length, int increment);
 poly      pISet(int i);

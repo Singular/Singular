@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.39 2000-10-19 15:00:22 obachman Exp $ */
+/* $Id: structs.h,v 1.40 2000-10-23 12:02:20 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -152,6 +152,13 @@ struct _scmdnames
 };
 typedef struct _scmdnames cmdnames;
 
+/* the function pointer types */
+typedef number (*numberfunc)(number a,number b);
+
+extern ring      currRing;
+typedef int     (*pLDegProc)(poly p, int *length, ring r= currRing);
+typedef int     (*pFDegProc)(poly p, ring r = currRing);
+
 typedef enum
 {
   ro_dp, // ordering is a degree ordering
@@ -247,15 +254,13 @@ struct sip_sring
                        /*  ExpLSize entries*/
 
   // is NULL for lp or N == 1, otherwise non-NULL (with OrdSize > 0 entries) */
-  sro_ord *  typ;   /* array of orderings + sizes, OrdSize entries */
+  sro_ord*   typ;   /* array of orderings + sizes, OrdSize entries */
 
   ideal      qideal; /* extension to the ring structure: qring */
 
 
   int      *VarOffset;
-  /* mapping exp. of var(i) -> p->exp */
-  /* mapping exp. of var(i) ->
-  p->exp[(VarOffset[i] & 0xffffff)] >> (VarOffset[i] >> 24) & bitmask */
+  int*     firstwv;
 
   struct omBin_s*   PolyBin; /* Bin from where monoms are allocated */
   short      ch;     /* characteristic */
@@ -266,9 +271,18 @@ struct sip_sring
   short      P;      /* number of pars */
   short      OrdSgn; /* 1 for polynomial rings, -1 otherwise */
 
+  short     firstBlockEnds;
+  
+
   BOOLEAN   VectorOut;
   BOOLEAN   ShortOut;
   BOOLEAN   CanShortOut;
+  BOOLEAN   LexOrder;
+  // TRUE if the monomial ordering has polynomial and power series blocks 
+  BOOLEAN   MixedOrder;
+  // 1 for lex ordering (except ls), -1 otherwise
+  BOOLEAN   ComponentOrder;
+  
   
   // what follows below here should be set by rComplete, _only_
   short      pVarLowIndex;  /* lowest index of a variable */
@@ -297,6 +311,13 @@ struct sip_sring
   /* if >= 0, long vars in exp vector are consecutive and start there
      if <  0, long vars in exp vector are not consecutive */
   short     VarL_LowIndex;
+  
+  /* if this is > 0, then NegWeightL_Offset[0..size_1] is index of longs in
+   ExpVector whose values need an offset due to negative weights */
+  short     NegWeightL_Size;
+  /* array of NegWeigtL_Size indicies */
+  int*      NegWeightL_Offset;
+  
   /* array of size VarL_Size, 
      VarL_Offset[i] gets i-th long var in exp vector */
   int*      VarL_Offset;
@@ -306,7 +327,9 @@ struct sip_sring
   /* mask used for divisiblity tests */
   unsigned long divmask;
 
-  p_Procs_s* p_Procs;
+  p_Procs_s*    p_Procs;
+  pFDegProc     pFDeg;
+  pLDegProc     pLDeg;
 };
 
 struct sip_sideal
@@ -328,21 +351,14 @@ struct sip_smap
 };
 #endif /* __cplusplus */
 
-/* the function pointer types */
-typedef number (*numberfunc)(number a,number b);
 
-typedef void    (*pSetmProc)(poly p);
-typedef int     (*pLDegProc)(poly p, int *length);
-typedef int     (*pFDegProc)(poly p);
-typedef int     (*pCompProc)(poly p1, poly p2);
-
-extern ring      currRing;
 
 /*
 **  7. runtime procedures/global data
 */
 
 /* 7.1 C-routines : */
+
 
 #ifdef __cplusplus
 extern "C" {
