@@ -1,4 +1,4 @@
-// $Id: deform.lib,v 1.4 1998-01-23 15:44:59 Singular Exp $
+// $Id: deform.lib,v 1.5 1998-01-24 13:06:00 Singular Exp $
 //(bm, last modified 12/97)   
 ///////////////////////////////////////////////////////////////////////////////
 LIBRARY:  deform.lib       PROCEDURES FOR COMPUTING MINIVERSAL DEFORMATION
@@ -8,6 +8,7 @@ LIBRARY:  deform.lib       PROCEDURES FOR COMPUTING MINIVERSAL DEFORMATION
                           miniversal deformation of module Mo modulo ideal I
  lift_rel_kb(N,M[,kbM,p]) lifting N into a kbase of M
  kill_rings(["prefix"])   kills the exported rings from above
+ lift_kbase(N,M);         coef-matrix expressing N as lin. comb. of k-basis of M
  
   SUB-PROCEDURES            used by main procedure:
                   get_rings,compute_ext,get_inf_def,interact1,
@@ -890,4 +891,92 @@ Sub-procedure: Computing relative (with respect to flatten(Fo)) weight_vec
  setring br; 
    kill nr;
    return(dv);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc lift_kbase (N, M)
+USAGE:   lift_kbase(N,M); N,M=poly/ideal/vector/module
+RETURN:  matrix A, coefficient matrix expressing N as linear combination of
+         k-basis of M. Let the k-basis have k elements and size(N)=c columns.
+         Then A satisfies:
+             matrix(reduce(N,std(M)),k,c) = matrix(kbase(std(M)))*A
+ASSUME:  dim(M)=0 and the monomial ordering is a well ordering or the last
+         block of the ordering is c or C
+EXAMPLE: example lift_kbase; shows an example
+{
+//----------  initialisation  -------------------------------------------------
+   string ords = ordstr(basering);
+   int    d,col,k,l;
+   module kb;
+   matrix testm;
+   vector v,p,q;
+//------- check wether ordering is correct ------------------------------------
+   k=1;
+   for( l=1;l<=nvars(basering);l=l+1 ) { k=k*(lead(1+var(l))==var(l)); }
+   if( k==0 )
+   {
+      if( ords[size(ords)]!="c" and ords[size(ords)]!="C" )
+      {
+         "// change ordering!";
+         "// ordering "+ordstr(basering)+" not implemented for this proc";
+         return();
+      }
+   }
+//----------  check assumtions  -----------------------------------------------
+   if( typeof(N)=="poly" ) { ideal J=ideal(N); kill N; module N=J; kill J; }
+   if( typeof(M)=="poly" ) { ideal J=ideal(M); kill M; module M=J; }
+   M = std(M);
+   d = vdim(M);
+   if( d<1 )
+   { "// second argument in `lift_kbase` has vdim",d; return(); }
+//----------  compute kbase and reduce(N,M) -----------------------------------
+   kb = kbase(M);
+   col = ncols(N);
+   N = reduce(N,M);
+   N = matrix(N,nrows(N),col);
+//----------  collecting coefficients of reduce(N,M) --------------------------
+   matrix result[d][col];
+   for( l=1;l<=col;l=l+1 )
+   {
+      v = N[l];
+      if( size(v)>0 )
+      {
+         for( k=1;k<=d;k=k+1 )
+         {
+            p = kb[k];
+            q = lead(v);
+            if( size(p-q)<2 )
+            {
+               result[k,l] = leadcoef(q);
+               v = v-q;
+               if( size(v)<1 ) { k=d+1; }
+               else { k=0; }
+            }
+         }
+      }
+   }
+//---------  final test -------------------------------------------------------
+   testm = matrix(N,nrows(kb),ncols(result))- matrix(kb)*result;
+   if( size(module(testm))!=0 )
+   {
+      "// proc `lift_kbase` did'nt work correctly!";
+      "// Please inform tthe authors";
+      return();
+   }
+   return(result);
+}
+example
+{"EXAMPLE:";     echo=2;
+  ring R=0,(x,y),ds;
+  module M=[x2,xy],[y2,xy],[0,xx],[0,yy];
+  module N=[x3+xy,x],[x,x+y2];
+  print(M);
+  module kb=kbase(std(M));
+  print(kb);
+  print(N);
+  matrix A=lift_kbase(N,M);
+  print(A);
+  matrix(reduce(N,std(M)),nrows(kb),ncols(A)) - matrix(kbase(std(M)))*A;
 }
