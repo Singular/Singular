@@ -1,11 +1,11 @@
 Status Output of tst_status.out
-init >> USER    :wenk
-init >> HOSTNAME:oxmox
-init >> uname -a:Linux oxmox 2.0.36 #8 Fri Feb 26 17:46:54 CET 1999 i586 unknown
-init >> date    :Sun Nov 14 22:08:35 CET 1999
-init >> version :1304
+init >> USER    :obachman
+init >> HOSTNAME:topgun
+init >> uname -a:Linux topgun 2.2.5 #15 Thu Sep 2 18:37:32 CEST 1999 i586 unknown
+init >> date    :Thu Nov 18 18:47:59 CET 1999
+init >> version :1306
 init >> ticks   :100
-1 >> tst_memory_0 :: oxmox:2276712
-1 >> tst_memory_1 :: oxmox:2376924
-1 >> tst_memory_2 :: oxmox:2297856
-1 >> tst_timer_1 :: oxmox:491
+1 >> tst_memory_0 :: topgun:2267292
+1 >> tst_memory_1 :: topgun:2364648
+1 >> tst_memory_2 :: topgun:2285568
+1 >> tst_timer_1 :: topgun:276

@@ -1,11 +1,9 @@
-// $Id: solve_l.tst,v 1.1 1999-11-14 21:13:39 wenk Exp $
-
 //
 // solve_s.tst - short tests for 
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID $Id: solve_l.tst,v 1.1 1999-11-14 21:13:39 wenk Exp $");
+tst_ignore("CVS ID $Id: solve_l.tst,v 1.2 1999-11-18 16:38:35 obachman Exp $");
 
 LIB "solve.lib";
 
