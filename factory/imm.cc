@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: imm.cc,v 1.2 1998-05-11 10:01:56 schmidt Exp $ */
+/* $Id: imm.cc,v 1.3 1998-05-11 10:38:23 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -17,9 +17,12 @@
 //{{{ InternalCF * imm_mul (InternalCF * lhs, InternalCF * rhs )
 //{{{ docu
 //
-// imm_mul() - multiplication of two immediates.
+// imm_mul() - multiplication of two immediate integers.
 //
 // Special implementation for MetroWerks.
+//
+// This function has been written by Wilfred Pohl
+// <pohl@mathematik.uni-kl.de>.
 //
 //}}}
 InternalCF *
