@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.54 2005-01-13 15:24:37 Singular Exp $ */
+/* $Id: libparse.l,v 1.55 2005-02-23 15:31:33 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -229,11 +229,11 @@ paramlist      ("("{parameters}")")
 quote          [\"]
 escquote       (\\\")
 escbrack       (\\\{)
-tnl            ([ \t\n]*)
+tnl            ([ \t\n\r]*)
 eos            ({quote}+{tnl}+"{")
 tos            ([ \t]*)
 eq             ([ \t]*+=[ \t]*)
-eqnl           ([ \t\n]*+=[ \t\n]*)
+eqnl           ([ \t\n\r]*+=[ \t\n\r]*)
 
 /* %start START */
 
