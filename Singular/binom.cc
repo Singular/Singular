@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: binom.cc,v 1.12 1998-01-28 22:11:19 Singular Exp $ */
+/* $Id: binom.cc,v 1.13 1998-03-16 14:56:25 obachman Exp $ */
 
 /*
 * ABSTRACT - set order (=number of monomial) for dp
@@ -185,10 +185,10 @@ int bComp1dpc(poly p1, poly p2)
     }
   #endif
   }
-  //o1=pGetComp(p1)-pGetComp(p2);
-  //if (o1 == 0) return 0;
-  //if (o1 > 0) return -pComponentOrder;
-  //return pComponentOrder;
+  o1=pGetComp(p1)-pGetComp(p2);
+  if (o1 == 0) return 0;
+  if (o1 > 0) return -pComponentOrder;
+  return pComponentOrder;
   return 0;
 }
 

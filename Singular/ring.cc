@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.15 1998-02-16 09:46:55 Singular Exp $ */
+/* $Id: ring.cc,v 1.16 1998-03-16 14:56:40 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1663,4 +1663,26 @@ ring rCopy(ring r)
   res->no=rNumber; rNumber++;
 #endif
   return res;
+}
+
+rOrderType_t rGetOrderType(ring r)
+{
+  // check for simple ordering
+  if ((r->order[0] == ringorder_unspec) ||
+      ((r->order[2] == 0) &&
+       (r->order[1] != ringorder_M &&
+        r->order[0] != ringorder_M)))
+  {
+    if ((r->order[1]==ringorder_c)||(r->order[1]==ringorder_C))
+    {
+      return rOrderType_ExpComp;
+    }
+    else
+    {
+      assume((r->order[0]==ringorder_c)||(r->order[0]==ringorder_C));
+      return rOrderType_CompExp;
+    }
+  }
+  else 
+    return rOrderType_General;
 }

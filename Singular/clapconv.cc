@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.14 1998-02-09 11:29:00 Singular Exp $
+// $Id: clapconv.cc,v 1.15 1998-03-16 14:56:25 obachman Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -125,7 +125,7 @@ convRecPP ( const CanonicalForm & f, int * exp, poly & result )
   }
   else
   {
-    poly term = pNew();
+    poly term = pInit();
     pNext( term ) = NULL;
     for ( int i = 1; i <= pVariables; i++ )
       pSetExp( term, i, exp[i]);
@@ -345,7 +345,7 @@ convRecAP ( const CanonicalForm & f, int * exp, poly & result )
     alg z=(alg)convClapASingA( f );
     if (z!=NULL)
     {
-      poly term = pNew();
+      poly term = pInit();
       pNext( term ) = NULL;
       for ( int i = 1; i <= pVariables; i++ )
         pSetExp( term, i , exp[i]);
@@ -512,7 +512,7 @@ convRecTrP ( const CanonicalForm & f, int * exp, poly & result , int offs)
   }
   else
   {
-    poly term = pNew();
+    poly term = pInit();
     pNext( term ) = NULL;
     for ( int i = 1; i <= pVariables; i++ )
       pSetExp( term, i ,exp[i]);
@@ -576,7 +576,7 @@ convRecGFGF ( const CanonicalForm & f, int * exp, poly & result )
   }
   else
   {
-    poly term = pNew();
+    poly term = pInit();
     pNext( term ) = NULL;
     for ( int i = 1; i <= pVariables; i++ )
       pSetExp( term, i, exp[i]);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.11 1998-01-05 16:39:23 Singular Exp $ */
+/* $Id: kutil.cc,v 1.12 1998-03-16 14:56:34 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for std
 */
@@ -3632,7 +3632,7 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
   strat->fromT = FALSE;
   strat->noTailReduction = !TEST_OPT_REDTAIL;
 #ifdef COMP_FAST
-  strat->spSpolyLoop = spSetSpolyLoop(currRing, strat->syzComp, strat->ak, strat->homog);
+  strat->spSpolyLoop = spGetSpolyLoop(currRing, strat);
 #endif
   if(!TEST_OPT_SB_1)
   {
@@ -3806,3 +3806,21 @@ BOOLEAN newHEdge(polyset S, int ak,kStrategy strat)
   pFree1(newNoether);
   return FALSE;
 }
+
+rOrderType_t spGetOrderType(ring r, kStrategy strat)
+{
+  if (strat->syzComp > 0)
+    return rOrderType_Syz;
+  else
+  {
+    rOrderType_t rot = rGetOrderType(r);
+  
+    if ((rot == rOrderType_CompExp || rot == rOrderType_ExpComp) &&
+        (strat->ak == 0))
+      return rOrderType_Exp;
+    else
+      return rot;
+  }
+}
+
+  

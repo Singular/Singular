@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.11 1998-01-27 18:51:19 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.12 1998-03-16 14:56:32 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1547,7 +1547,7 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   /*- set S -*/
   strat->sl = -1;
 #ifdef COMP_FAST
-  strat->spSpolyLoop = spSetSpolyLoop(currRing, strat->syzComp, strat->ak, strat->homog);
+  strat->spSpolyLoop = spGetSpolyLoop(currRing, strat);
 #endif
   /*- init local data struct.---------------------------------------- -*/
   /*Shdl=*/initS(F,Q,strat);
@@ -1592,7 +1592,7 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
   /*- set S -*/
   strat->sl = -1;
 #ifdef COMP_FAST
-  strat->spSpolyLoop = spSetSpolyLoop(currRing, strat->syzComp, strat->ak, strat->homog);
+  strat->spSpolyLoop = spGetSpolyLoop(currRing, strat);
 #endif
   /*- init local data struct.---------------------------------------- -*/
   /*Shdl=*/initS(F,Q,strat);
@@ -1684,7 +1684,7 @@ ideal stdred(ideal F, ideal Q, tHomog h,intvec ** w)
   strat->homog=h;
   spSet(currRing);
 #ifdef COMP_FAST
-  strat->spSpolyLoop = spSetSpolyLoop(currRing, strat->syzComp, strat->ak, strat->homog);
+  strat->spSpolyLoop = spGetSpolyLoop(currRing, strat);
 #endif
   initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
   initBuchMoraPos(strat);

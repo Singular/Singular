@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.14 1998-01-17 18:07:57 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.15 1998-03-16 14:56:31 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1643,7 +1643,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   initBuchMoraPos(strat);
   initMora(F,strat);
 #ifdef COMP_FAST
-  strat->spSpolyLoop = spSetSpolyLoop(currRing, strat->syzComp, strat->ak, strat->homog);
+  strat->spSpolyLoop = spGetSpolyLoop(currRing, strat);
 #endif  
   strat->enterS = enterSMoraNF;
   /*- set T -*/
@@ -1738,7 +1738,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   strat->enterS = enterSMoraNF;
   /*- set T -*/
 #ifdef COMP_FAST
-  strat->spSpolyLoop = spSetSpolyLoop(currRing, strat->syzComp, strat->ak, strat->homog);
+  strat->spSpolyLoop = spGetSpolyLoop(currRing, strat);
 #endif  
   strat->tl = -1;
   strat->tmax = setmax;
@@ -1876,7 +1876,7 @@ ideal std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   strat->homog=h;
   spSet(currRing);
 #ifdef COMP_FAST
-  strat->spSpolyLoop = spSetSpolyLoop(currRing, strat->syzComp, strat->ak, strat->homog);
+  strat->spSpolyLoop = spGetSpolyLoop(currRing, strat);
 #endif  
   if (pOrdSgn==-1)
   {
@@ -2077,7 +2077,7 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   strat->homog=h;
   spSet(currRing);
 #ifdef COMP_FAST
-  strat->spSpolyLoop = spSetSpolyLoop(currRing, strat->syzComp, strat->ak, strat->homog);
+  strat->spSpolyLoop = spGetSpolyLoop(currRing, strat);
 #endif
   if (pOrdSgn==-1)
   {
@@ -2153,7 +2153,7 @@ poly kNF(ideal F, ideal Q, poly p,int syzComp, int lazyReduce)
   strat->syzComp = syzComp;
   spSet(currRing);
 #ifdef COMP_FAST
-  strat->spSpolyLoop = spSetSpolyLoop(currRing, strat->syzComp, strat->ak, strat->homog);
+  strat->spSpolyLoop = spGetSpolyLoop(currRing, strat);
 #endif  
   if (pOrdSgn==-1)
     p=kNF1(F,Q,p,strat,lazyReduce);
@@ -2174,7 +2174,7 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
   kStrategy strat=(kStrategy)Alloc0(sizeof(skStrategy));
   strat->syzComp = syzComp;
 #ifdef COMP_FAST
-  strat->spSpolyLoop = spSetSpolyLoop(currRing, strat->syzComp, strat->ak, strat->homog);
+  strat->spSpolyLoop = spGetSpolyLoop(currRing, strat);
 #endif  
   if (pOrdSgn==-1)
     res=kNF1(F,Q,p,strat,lazyReduce);
@@ -2217,7 +2217,7 @@ ideal kInterRed (ideal F, ideal Q)
   strat->tmax        = setmax;
   strat->T           = initT();
 #ifdef COMP_FAST
-  strat->spSpolyLoop = spSetSpolyLoop(currRing, strat->syzComp, strat->ak, strat->homog);
+  strat->spSpolyLoop = spGetSpolyLoop(currRing, strat);
 #endif  
   if (pOrdSgn == -1)   strat->honey = TRUE;
   initS(F,Q,strat);

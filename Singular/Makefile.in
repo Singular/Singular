@@ -31,8 +31,9 @@ includedir	= @includedir@
 ##
 CC		= @CC@
 CXX		= @CXX@
+LEXP		= @LEXP@
 BISON		= bison
-LEX		= flex
+PERL		= perl
 @SET_MAKE@
 INSTALL		= ./install-sh -c
 INSTALL_PROGRAM	= ${INSTALL}
@@ -45,7 +46,7 @@ MKINSTALLDIRS   = ./mkinstalldirs
 CFLAGS		= @CFLAGS@ -pipe 
 CXXFLAGS	= @CXXFLAGS@ -pipe 
 CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@
-CPPFLAGS	= -I${srcdir} @CPPFLAGS@ 
+CPPFLAGS	= -I${srcdir} @CPPFLAGS@
 DEFS		= @DEFS@ -DNDEBUG
 LDFLAGS		= @LDFLAGS@
 STATIC_LDFLAGS	= @STATIC_LDFLAGS@
@@ -99,7 +100,7 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
 
 CSOURCES=mmalloc.c mmallocb.c mmallocs.c mmblock.c mmheap.c mmspec.c mmutil.c weight0.c
 
-SOURCES=${CSOURCES} ${CXXSOURCES} grammar.y scanner.l libparse.l
+SOURCES=${CSOURCES} ${CXXSOURCES} grammar.y scanner.l libparse.l spSpolyLoop.pl
 
 HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	longalg.h mpsr_Tok.h structs.h binom.h intvec.h longrat.h \
@@ -149,8 +150,13 @@ OBJS=grammar.o scanner.o matpol.o binom.o\
 
 
 .l.cc:
-	${LEX} -s -I -t $< > scanner.cc
-
+	@if test "${LEXP}" = touch; then \
+		touch scanner.cc; \
+		echo Warning: could not rebuilt scanner.cc;\
+	else \
+		echo "${LEXP} -s -I -t $< > scanner.cc"; \
+		${LEXP} -s -I -t $< > scanner.cc; \
+	fi
 .y.cc:
 	${BISON} -d -t -o grammar.cc $<
 	chmod +x testgh
@@ -174,11 +180,6 @@ Singular-static: mod2.h Makefile version.h scanner.cc ${OBJS} iparith.o \
 	tesths.cc iparith.o mpsr_Tok.o \
 	${OBJS} ${STATIC_LDFLAGS} ${LDFLAGS} ${LIBS}
 
-libparse: libparse_main.o utils.o
-	${CXX} -o libparse libparse_main.o utils.o
-
-libparse_main.o: libparse.cc
-	${CXX} -c -o libparse_main.o libparse.cc -DSTANDALONE_PARSER
 
 iparith.o mpsr_Tok.o : iparith.inc mpsr_Tok.inc
 
@@ -203,8 +204,6 @@ iparith.inc mpsr_Tok.inc: iparith.cc ipconv.cc tok.h mpsr_Tok.cc grammar.h mod2.
 		/bin/rm gentable; \
 	fi
 
-libparse.cc: libparse.l
-	${LEX} -I -Pyylp -olibparse.cc libparse.l
 
 version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in configure.in
 	echo "#define SINGULAR_VERSION_ID " `date '+%y%m%d%H'` >version.h
@@ -213,6 +212,26 @@ mod2.h: stamp-h
 
 stamp-h : config.status mod2.h.in 
 	CONFIG_FILES= CONFIG_HEADERS=mod2.h ./config.status
+
+spSpolyLoop.cc spSpolyLoop.dd : spSpolyLoop.inc
+
+spSpolyLoop.inc: spSpolyLoop.pl
+	${PERL} spSpolyLoop.pl > spSpolyLoop.inc
+
+libparse: libparse_main.o utils.o
+	${CXX} -o libparse libparse_main.o utils.o
+
+libparse_main.o: libparse.cc
+	${CXX} -c -o libparse_main.o libparse.cc -DSTANDALONE_PARSER
+
+libparse.cc: libparse.l
+	@if test "${LEXP}" = touch; then \
+		touch libparse.cc; \
+		echo Warning: could not rebuilt libparse.cc;\
+	else \
+		echo ${LEXP} -I -Pyylp -olibparse.cc libparse.l;\
+		${LEXP} -I -Pyylp -olibparse.cc libparse.l;\
+	fi
 
 Makefile: Makefile.in config.status 
 	CONFIG_FILES="Makefile" CONFIG_HEADERS= ./config.status

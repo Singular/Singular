@@ -7,7 +7,7 @@ dnl set the version here
 dnl
 SINGULAR_MAJOR_VERSION=1
 SINGULAR_MINOR_VERSION=1
-SINGULAR_SUB_VERSION=6
+SINGULAR_SUB_VERSION=7
 VERSION_DATE="March 1998"
 AC_SUBST(SINGULAR_MAJOR_VERSION)
 AC_SUBST(SINGULAR_MINOR_VERSION)
@@ -66,6 +66,20 @@ else
   ac_cxx_set=yes
 fi
 
+AC_PROG_LEX
+# make sure lex accepts -P option
+if test "${ac_cv_prog_LEX+set}" = set; then
+  AC_MSG_CHECKING(whether ${ac_cv_prog_LEX} accepts -P)
+  if ${ac_cv_prog_LEX} -P < /dev/null 2>&1| grep flag > /dev/null 2>&1; then
+    AC_MSG_RESULT(no)
+    AC_MSG_WARN(Can not run ${ac_cv_prog_LEX} with -P; make might fail)
+    LEXP=touch
+  else
+    AC_MSG_RESULT(yes)
+    LEXP=${ac_cv_prog_LEX}
+  fi
+fi
+AC_SUBST(LEXP)
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_CXX

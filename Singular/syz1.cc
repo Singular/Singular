@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.20 1998-02-17 17:35:13 obachman Exp $ */
+/* $Id: syz1.cc,v 1.21 1998-03-16 14:56:48 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -31,6 +31,7 @@
 #include "lists.h"
 #include "syz.h"
 
+
 /*--------------static variables------------------------*/
 /*---contains the real components wrt. cdp--------------*/
 //static int ** truecomponents=NULL;
@@ -52,6 +53,8 @@ static intvec * orderedcomp;
 static int *binomials;
 static int highdeg;
 static int highdeg_1;
+
+#include "syzvector.cc"
 
 /*3
 * deletes all entres of a pair
@@ -181,7 +184,32 @@ static int syzcomp1dpc(poly p1, poly p2)
 * compares with components of currcomponents instead of the
 * exp[0]
 */
+
+#ifdef SY_VEC_DEBUG
+static int normal_syzcomp2dpc(poly p1, poly p2);
+
 static int syzcomp2dpc(poly p1, poly p2)
+{
+  int n1 = normal_syzcomp2dpc(p1, p2);
+  int n2 = SyVecSyzCmp(p1, p2);
+  
+  if (n1 != n2)
+  {
+    PrintS("Error in syzcomp\n");
+    SyVecSyzCmp(p1, p2);
+    normal_syzcomp2dpc(p1, p2);
+  }
+  return n1;
+}
+
+static int normal_syzcomp2dpc(poly p1, poly p2)
+#else
+#ifdef HAVE_SY_VECTOR
+static int dummy(poly p1, poly p2)
+#else
+static int syzcomp2dpc(poly p1, poly p2)
+#endif
+#endif
 {
   int o1=pGetOrder(p1), o2=pGetOrder(p2);
   if (o1 > o2) return 1;
@@ -261,6 +289,9 @@ static inline int syBinom(int i,int j)
   return binomials[(j-1)*(highdeg_1)+i-j+1/*j-1,i-j*/];
 }
 
+#if defined(HAVE_SY_VECTOR) && ! defined(SY_VEC_DEBUG)
+#define syzSetm(p) pSetm(p)
+#else
 static void syzSetm(poly p)
 {
   int i = 0,j;
@@ -284,6 +315,7 @@ static void syzSetm(poly p)
   else
     pGetOrder(p)=i;
 }
+#endif
 
 static inline poly syMultT(poly p,poly m)
 {
@@ -535,7 +567,43 @@ poly syOrdPolySchreyer(poly p)
   return pOrdPolyMerge(p);
 }
 
+#ifdef SY_VEC_DEBUG
+static poly normal_sySPAdd(poly m1,poly m2,poly m);
+static poly sySPAdd(poly m1, poly m2, poly m)
+{
+  poly temp1 = pCopy(m1);
+  
+  poly p1 = normal_sySPAdd(m1, m2, m);
+  poly p2 = syVecSpoly(m2, temp1, m);
+  
+  pTest(p1);
+  pTest(p2);
+  if (p1 != NULL) 
+  {
+    if (p2 == NULL || ! pEqual(p1, p2))
+    {
+      PrintS("Error in SySpoly\n");
+//      poly temp5 = pCopy(temp3);
+//      poly temp6 = pCopy(temp4);
+//      p1 = normal_sySPAdd(temp3, temp4, m);
+//      p2 = syVecSpoly(temp6, temp5, m);
+    }
+  }
+  else if (p2 != NULL) 
+    PrintS("Error in SySpoly\n");
+
+  return p1;
+}
+
+static poly normal_sySPAdd(poly m1,poly m2,poly m)
+#else
+#ifdef HAVE_SY_VECTOR
+#define sySPAdd(p1, p2, m) syVecSpoly(p2, p1, m)
+static poly dummy(poly m1,poly m2,poly m)
+#else
 static poly sySPAdd(poly m1,poly m2,poly m)
+#endif
+#endif
 {
   int i2=-INT_MAX;
   int i1;
@@ -737,6 +805,9 @@ static poly sySPolyRed(poly m1,poly m2)
   if (pNext(m1)==NULL)
     return syMultT1(pNext(m2),a);
   poly res;
+#if defined(HAVE_SY_VECTOR) && ! defined (SY_VEC_DEBUG)
+    res = sySpolyProc(m2, m1,a);
+#else    
   if (pGetOrder(m1)>0)
   {
     // TBC: initialize spSpolyLoop where ordering is set!!!
@@ -746,7 +817,8 @@ static poly sySPolyRed(poly m1,poly m2)
   {
     res = sySPAdd(m1,m2,a);
   }
-  pDelete(&a);
+#endif
+  pDelete1(&a);
   return res;
 }
 
@@ -2378,10 +2450,12 @@ static resolvente syReadOutMinimalRes(syStrategy syzstr,
     b1[0] = pVariables;
     pChangeRing(pVariables,1,ord,b0,b1,currRing->wvhdl);
   }
+#if ! defined(HAVE_SY_VECTOR) || defined(SY_VEC_DEBUG)  
   pSetm =syzSetm;
+#endif
+  pComp0 = syzcomp2dpc;
   binomials = syzstr->binom;
   highdeg_1 = syzstr->highdeg_1;
-  pComp0 = syzcomp2dpc;
   for (index=syzstr->length-1;index>0;index--)
   {
     if (syzstr->resPairs[index]!=NULL)
@@ -2468,7 +2542,7 @@ static void sySetHighdeg()
   //Print("max deg=%d\n",highdeg);
 }
 
-
+#if THROW_IT_AWAY_EVENTUALLY
 /*2
 * implementation of LaScala's algorithm
 * assumes that the given module is homogeneous
@@ -2708,6 +2782,7 @@ resolvente syLaScala1(ideal arg,int * length)
   if (TEST_OPT_PROT) PrintLn();
   return syzstr->res;
 }
+#endif
 
 /*2
 * implementation of LaScala's algorithm
@@ -2773,12 +2848,15 @@ syStrategy syLaScala3(ideal arg,int * length)
       if (j<actdeg) actdeg = j;
     }
   }
+  idTest(temp);
   idSkipZeroes(temp);
+  idTest(temp);
   sySetHighdeg();
   binomials = (int*)Alloc(pVariables*(highdeg+1)*sizeof(int));
   syBinomSet();
+#if ! defined(HAVE_SY_VECTOR) || defined(SY_VEC_DEBUG)  
   pSetm =syzSetm;
-  for (i=0;i<IDELEMS(arg);i++)
+  for (i=0;i<IDELEMS(temp);i++)
   {
     p = temp->m[i];
     while (p!=NULL)
@@ -2787,6 +2865,9 @@ syStrategy syLaScala3(ideal arg,int * length)
       pIter(p);
     }
   }
+#else
+  SetSpolyProc();
+#endif
   pComp0 = syzcomp2dpc;
   currcomponents = (int*)Alloc0((arg->rank+1)*sizeof(int));
   for (i=0;i<=arg->rank;i++)

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-comp.h,v 1.4 1998-01-17 17:49:24 obachman Exp $ */
+/* $Id: polys-comp.h,v 1.5 1998-03-16 14:56:38 obachman Exp $ */
 
 /***************************************************************
  *
@@ -20,7 +20,7 @@
 
 #ifdef WORDS_BIGENDIAN
 #ifndef COMP_NO_EXP_VECTOR_OPS
-#define _pMonCmp_1(p1, p2, d, actionD, actionE)              \
+#define _pMonComp_otEXP_nwONE(p1, p2, d, actionD, actionE)              \
 do                                                          \
 {                                                           \
   d = *((long*) &(p1->exp[0])) - *((long*) &(p2->exp[0]));  \
@@ -29,7 +29,7 @@ do                                                          \
 }                                                           \
 while(0)
   
-#define _pMonCmp_1_c(p1, p2, d, actionD, actionE)            \
+#define _pMonComp_otEXPCOMP_nwONE(p1, p2, d, actionD, actionE)            \
 do                                                          \
 {                                                           \
   d = *((long*) &(p1->exp[0])) - *((long*) &(p2->exp[0]));  \
@@ -43,7 +43,7 @@ do                                                          \
 }                                                           \
 while(0)
 
-#define _pMonCmp_2(p1, p2, d, actionD, actionE)  \
+#define _pMonComp_otEXP_nwTWO(p1, p2, d, actionD, actionE)  \
 do                                              \
 {                                               \
   const long* s1 = (long*) &(p1->exp[0]);             \
@@ -56,7 +56,7 @@ do                                              \
 }                                               \
 while(0)
   
-#define _pMonCmp_2_c(p1, p2, d, actionD, actionE)        \
+#define _pMonComp_otEXPCOMP_nwTWO(p1, p2, d, actionD, actionE)        \
 do                                                      \
 {                                                       \
   const long* s1 = (long*) &(p1->exp[0]);                     \
@@ -74,7 +74,7 @@ do                                                      \
 }                                                       \
 while(0)
   
-#define _pMonCmp_2i(p1, p2, length, d, actionD, actionE) \
+#define _pMonComp_otEXP_nwEVEN(p1, p2, length, d, actionD, actionE) \
 do                                                      \
 {                                                       \
   const long* s1 = (long*) &(p1->exp[0]);                     \
@@ -96,7 +96,7 @@ do                                                      \
 }                                                       \
 while(0)
 
-#define _pMonCmp_2i_1(p1, p2, length, d, actionD, actionE)   \
+#define _pMonComp_otEXP_nwODD(p1, p2, length, d, actionD, actionE)   \
 do                                                          \
 {                                                           \
   const long* s1 = (long*) &(p1->exp[0]);                         \
@@ -118,7 +118,7 @@ do                                                          \
 }                                                           \
 while(0)
   
-#define _pMonCmp_2i_c(p1, p2, length, d, actionD, actionE)  \
+#define _pMonComp_otEXPCOMP_nwEVEN(p1, p2, length, d, actionD, actionE)  \
 do                                                          \
 {                                                           \
   const long* s1 = (long*) &(p1->exp[0]);                   \
@@ -149,7 +149,7 @@ do                                                          \
 }                                                           \
 while(0)
   
-#define _pMonCmp_2i_1_c(p1, p2, length, d, actionD, actionE)    \
+#define _pMonComp_otEXPCOMP_nwODD(p1, p2, length, d, actionD, actionE)    \
 do                                                              \
 {                                                               \
   const long* s1 = (long*) &(p1->exp[0]);                       \
@@ -205,7 +205,7 @@ do                                              \
 }                                               \
 while(0)
 
-#define _pMonCmp_c(p1, p2, d, actionD, actionE) \
+#define _pMonComp_otEXP_c(p1, p2, d, actionD, actionE) \
 do                                              \
 {                                               \
   Exponent_pt e1 = &(p1->exp[0]);         \
@@ -228,36 +228,36 @@ do                                              \
 }                                               \
 while(0)
 
-#define _pMonCmp_1(p1, p2, d, actionD, actionE)  \
+#define _pMonComp_otEXP_nwONE(p1, p2, d, actionD, actionE)  \
   _pMonCmp(p1, p2, d, actionD, actionE)
 
-#define _pMonCmp_1_c(p1, p2, d, actionD, actionE)  \
-  _pMonCmp_c(p1, p2, d, actionD, actionE)
+#define _pMonComp_otEXPCOMP_nwONE(p1, p2, d, actionD, actionE)  \
+  _pMonComp_otEXP_c(p1, p2, d, actionD, actionE)
   
-#define _pMonCmp_2(p1, p2, d, actionD, actionE)  \
+#define _pMonComp_otEXP_nwTWO(p1, p2, d, actionD, actionE)  \
   _pMonCmp(p1, p2, d, actionD, actionE)
 
-#define _pMonCmp_2_c(p1, p2, d, actionD, actionE)  \
-  _pMonCmp_c(p1, p2, d, actionD, actionE)
+#define _pMonComp_otEXPCOMP_nwTWO(p1, p2, d, actionD, actionE)  \
+  _pMonComp_otEXP_c(p1, p2, d, actionD, actionE)
   
-#define _pMonCmp_2i(p1, p2, length, d, actionD, actionE) \
+#define _pMonComp_otEXP_nwEVEN(p1, p2, length, d, actionD, actionE) \
   _pMonCmp(p1, p2, d, actionD, actionE)
 
-#define _pMonCmp_2i_1(p1, p2, length, d, actionD, actionE) \
+#define _pMonComp_otEXP_nwODD(p1, p2, length, d, actionD, actionE) \
   _pMonCmp(p1, p2, d, actionD, actionE)
 
-#define _pMonCmp_2i_c(p1, p2, length, d, actionD, actionE)   \
-  _pMonCmp_c(p1, p2, d, actionD, actionE)
+#define _pMonComp_otEXPCOMP_nwEVEN(p1, p2, length, d, actionD, actionE)   \
+  _pMonComp_otEXP_c(p1, p2, d, actionD, actionE)
 
-#define _pMonCmp_2i_1_c(p1, p2, length, d, actionD, actionE) \
-  _pMonCmp_c(p1, p2, d, actionD, actionE)
+#define _pMonComp_otEXPCOMP_nwODD(p1, p2, length, d, actionD, actionE) \
+  _pMonComp_otEXP_c(p1, p2, d, actionD, actionE)
 
 #endif // COMP_NO_EXP_VECTOR_OPS 
 
 #else //  ! WORDS_BIGENDIAN
 
 #ifndef COMP_NO_EXP_VECTOR_OPS  
-#define _pMonCmp_1(p1, p2, d, actionD, actionE)                              \
+#define _pMonComp_otEXP_nwONE(p1, p2, d, actionD, actionE)                              \
 do                                                                          \
 {                                                                           \
   d = *(((long*) p1) + pMonomSizeW-1) - *(((long*) p2)  + pMonomSizeW-1);   \
@@ -266,7 +266,7 @@ do                                                                          \
 }                                                                           \
 while(0)
   
-#define _pMonCmp_1_c(p1, p2, d, actionD, actionE)                            \
+#define _pMonComp_otEXPCOMP_nwONE(p1, p2, d, actionD, actionE)                            \
 do                                                                          \
 {                                                                           \
   d = *(((long*) p1) + pMonomSizeW-1) - *(((long*) p2)  + pMonomSizeW-1);   \
@@ -280,7 +280,7 @@ do                                                                          \
 }                                                                           \
 while(0)
 
-#define _pMonCmp_2(p1, p2, d, actionD, actionE)  \
+#define _pMonComp_otEXP_nwTWO(p1, p2, d, actionD, actionE)  \
 do                                              \
 {                                               \
   const long* s1 = ((long*) p1) + pMonomSizeW-1;      \
@@ -293,7 +293,7 @@ do                                              \
 }                                               \
 while(0)
   
-#define _pMonCmp_2_c(p1, p2, d, actionD, actionE)        \
+#define _pMonComp_otEXPCOMP_nwTWO(p1, p2, d, actionD, actionE)        \
 do                                                      \
 {                                                       \
   const long* s1 = ((long*) p1) + pMonomSizeW-1;              \
@@ -313,7 +313,7 @@ do                                                      \
 }                                                       \
 while(0)
   
-#define _pMonCmp_2i(p1, p2, length, d, actionD, actionE) \
+#define _pMonComp_otEXP_nwEVEN(p1, p2, length, d, actionD, actionE) \
 do                                                      \
 {                                                       \
   const long* s1 = ((long*) p1) + pMonomSizeW-1;              \
@@ -334,7 +334,7 @@ do                                                      \
 }                                                       \
 while(0)
 
-#define _pMonCmp_2i_1(p1, p2, length, d, actionD, actionE)   \
+#define _pMonComp_otEXP_nwODD(p1, p2, length, d, actionD, actionE)   \
 do                                                          \
 {                                                           \
   const long* s1 = ((long*) p1) + pMonomSizeW-1;                  \
@@ -356,7 +356,7 @@ do                                                          \
 }                                                           \
 while(0)
   
-#define _pMonCmp_2i_c(p1, p2, length, d, actionD, actionE)   \
+#define _pMonComp_otEXPCOMP_nwEVEN(p1, p2, length, d, actionD, actionE)   \
 do                                                          \
 {                                                           \
   const long* s1 = ((long*) p1) + pMonomSizeW-1;                  \
@@ -387,7 +387,7 @@ do                                                          \
 }                                                           \
 while(0)
   
-#define _pMonCmp_2i_1_c(p1, p2, length, d, actionD, actionE) \
+#define _pMonComp_otEXPCOMP_nwODD(p1, p2, length, d, actionD, actionE) \
 do                                                          \
 {                                                           \
   const long* s1 = ((long*) p1) + pMonomSizeW-1;                  \
@@ -443,7 +443,7 @@ do                                              \
 }                                               \
 while(0)
 
-#define _pMonCmp_c(p1, p2, d, actionD, actionE) \
+#define _pMonComp_otEXP_c(p1, p2, d, actionD, actionE) \
 do                                              \
 {                                               \
   Exponent_pt e1 = &(p1->exp[pVarHighIndex]);   \
@@ -466,29 +466,29 @@ do                                              \
 }                                               \
 while(0)
 
-#define _pMonCmp_1(p1, p2, d, actionD, actionE)  \
+#define _pMonComp_otEXP_nwONE(p1, p2, d, actionD, actionE)  \
   _pMonCmp(p1, p2, d, actionD, actionE)
 
-#define _pMonCmp_1_c(p1, p2, d, actionD, actionE)  \
-  _pMonCmp_c(p1, p2, d, actionD, actionE)
+#define _pMonComp_otEXPCOMP_nwONE(p1, p2, d, actionD, actionE)  \
+  _pMonComp_otEXP_c(p1, p2, d, actionD, actionE)
   
-#define _pMonCmp_2(p1, p2, d, actionD, actionE)  \
+#define _pMonComp_otEXP_nwTWO(p1, p2, d, actionD, actionE)  \
   _pMonCmp(p1, p2, d, actionD, actionE)
 
-#define _pMonCmp_2_c(p1, p2, d, actionD, actionE)  \
-  _pMonCmp_c(p1, p2, d, actionD, actionE)
+#define _pMonComp_otEXPCOMP_nwTWO(p1, p2, d, actionD, actionE)  \
+  _pMonComp_otEXP_c(p1, p2, d, actionD, actionE)
   
-#define _pMonCmp_2i(p1, p2, length, d, actionD, actionE) \
+#define _pMonComp_otEXP_nwEVEN(p1, p2, length, d, actionD, actionE) \
   _pMonCmp(p1, p2, d, actionD, actionE)
 
-#define _pMonCmp_2i_1(p1, p2, length, d, actionD, actionE) \
+#define _pMonComp_otEXP_nwODD(p1, p2, length, d, actionD, actionE) \
   _pMonCmp(p1, p2, d, actionD, actionE)
 
-#define _pMonCmp_2i_c(p1, p2, length, d, actionD, actionE)   \
-  _pMonCmp_c(p1, p2, d, actionD, actionE)
+#define _pMonComp_otEXPCOMP_nwEVEN(p1, p2, length, d, actionD, actionE)   \
+  _pMonComp_otEXP_c(p1, p2, d, actionD, actionE)
 
-#define _pMonCmp_2i_1_c(p1, p2, length, d, actionD, actionE) \
-  _pMonCmp_c(p1, p2, d, actionD, actionE)
+#define _pMonComp_otEXPCOMP_nwODD(p1, p2, length, d, actionD, actionE) \
+  _pMonComp_otEXP_c(p1, p2, d, actionD, actionE)
   
 #endif // COMP_NO_EXP_VECTOR_OPS 
   

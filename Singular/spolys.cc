@@ -20,9 +20,11 @@
 #include "spolys0.h"
 #include "spolys.h"
 
+
 #ifdef COMP_FAST
 #include "spSpolyLoop.h"
 #endif
+
 
 /*0 implementation*/
 
@@ -40,6 +42,8 @@ poly (*spSpolyRedNew)(poly p1, poly p2,poly spNoether,
 poly (*spSpolyCreate)(poly p1, poly p2,poly spNoether);
 poly (*spSpolyShortBba)(poly p1, poly p2);
 
+// #undef COMP_FAST
+
 /*2
 * assume m = L(m) and Lc(m) = 1
 * pNext(m) = result = p*m
@@ -55,8 +59,7 @@ static void spMultCopy0(poly p, poly m, poly spNoether)
     do
     {
       a = pNext(a) = pNew();
-      spMemcpy(a,p);
-      spMonAdd(a,m);
+      pCopyAddFast(a,p,m);
       pIter(p);
     }
     while (p!=NULL);
@@ -68,8 +71,7 @@ static void spMultCopy0(poly p, poly m, poly spNoether)
     do
     {
       b = pNext(a) = pNew();
-      spMemcpy(b,p);
-      spMonAdd(b,m);
+      pCopyAddFast(b,p,m);
       if (pComp0(b, spNoether) == -1)
       {
         pFree1(b);
@@ -99,8 +101,7 @@ static void spMultCopy1(poly p, poly m, poly n, poly spNoether)
     do
     {
       a = pNext(a) = pNew();
-      spMemcpy(a,p);
-      spMonAdd(a,m);
+      pCopyAddFast(a,p,m);
       pSetCoeff0(a,npNegM(pGetCoeff(a)));
       pIter(p);
     }
@@ -113,6 +114,7 @@ static void spMultCopy1(poly p, poly m, poly n, poly spNoether)
     do
     {
       b = pNext(a) = pNew();
+      pCopyAddFast(b,p,m);
       spMemcpy(b,p);
       spMonAdd(b,m);
       if (pComp0(b, spNoether) == -1)
@@ -147,8 +149,7 @@ static void spSpolyLoop1(poly a1, poly a2, poly m, poly spNoether)
   }
   a = m;
   b = pNew();
-  spMemcpy(b,a1);
-  spMonAdd(b,m);
+  pCopyAddFast(b,a1,m);
   loop
   {
     c = pComp0(b, a2);
@@ -160,8 +161,7 @@ static void spSpolyLoop1(poly a1, poly a2, poly m, poly spNoether)
       if (a1!=NULL)
       {
         b = pNew();
-        spMemcpy(b,a1);
-        spMonAdd(b,m);
+        pCopyAddFast(b,a1,m);
       }
       else
       {
@@ -228,8 +228,7 @@ void spMultCopyX(poly p, poly m, poly n, number exp, poly spNoether)
     do
     {
       a = pNext(a) = pNew();
-      spMemcpy(a,p);
-      pMonAddFast(a,m);
+      pCopyAddFast(a,p,m);
       pSetCoeff0(a,npMultM(pGetCoeff(p),exp));
       pIter(p);
     }
@@ -242,8 +241,7 @@ void spMultCopyX(poly p, poly m, poly n, number exp, poly spNoether)
     do
     {
       b = pNext(a) = pNew();
-      spMemcpy(b,p);
-      pMonAddFast(b,m);
+      pCopyAddFast(b,p,m);
       if (pComp0(b, spNoether) == -1)
       {
         pFree1(b);
@@ -280,8 +278,7 @@ static void spSpolyLoop(poly a1, poly a2, poly m,poly spNoether)
   }
   a = m;
   b = pNew();
-  spMemcpy(b,a1);
-  spMonAdd(b,m);
+  pCopyAddFast(b,a1,m);
   loop
   {
     c = pComp0(b, a2);
@@ -293,8 +290,7 @@ static void spSpolyLoop(poly a1, poly a2, poly m,poly spNoether)
       if (a1!=NULL)
       {
         b = pNew();
-        spMemcpy(b,a1);
-        pMonAddFast(b,m);
+        pCopyAddFast(b, a1,m);
       }
       else
       {
@@ -367,11 +363,11 @@ static poly spPSpolyRed(poly p1, poly p2,poly spNoether, spSpolyLoopProc SpolyLo
     reset_vec=TRUE;
   }
   spMonSub(p2,p1);
-#ifdef COMP_FAST  
-  if (SpolyLoop != NULL)
+#ifdef COMP_FAST 
+  if (SpolyLoop != NULL) 
     SpolyLoop(a1, a2, p2, spNoether);
-  else
-    spPSpolyLoop_General(a1, a2, p2, spNoether);
+  else 
+    spSpolyLoop_General(a1, a2, p2,spNoether);
 #else
   if (1!=(int)pGetCoeff(p2))
     spSpolyLoop(a1, a2, p2,spNoether);
@@ -429,9 +425,9 @@ static poly spPSpolyRedNew(poly p1, poly p2,poly spNoether,
   spMonSub(m,p1);
 #ifdef COMP_FAST
   if (SpolyLoop != NULL)
-    SpolyLoop(a1, a2, m, spNoether);
+    SpolyLoop(a1, a2, m , spNoether);
   else
-    spPSpolyLoop_General(a1, a2, m, spNoether);
+    spSpolyLoop_General(a1, a2, m,spNoether); 
 #else  
   if (1!=(int)pGetCoeff(m))
     spSpolyLoop(a1, a2, m,spNoether);
@@ -468,8 +464,8 @@ static poly spPSpolyCreate(poly p1, poly p2,poly spNoether)
       pSetCompP(p2,pGetComp(p1));
     }
   }
-  b = pNew();
-  m = pNew();
+  b = pInit();
+  m = pInit();
   for (int i = pVariables; i; i--)
   {
     c = pGetExpDiff(p1, p2,i);
@@ -524,7 +520,7 @@ static poly spPSpolyShortBba(poly p1, poly p2)
   {
     if(a2!=NULL)
     {
-      m2=pNew();
+      m2=pInit();
 x2:
       for (i = pVariables; i; i--)
       {
@@ -554,7 +550,7 @@ x2:
   }
   else if (a2==NULL)
   {
-    m1=pNew();
+    m1=pInit();
 x1:
     for (i = pVariables; i; i--)
     {
@@ -579,8 +575,8 @@ x1:
     pSetm(m1);
     return m1;
   }
-  m1 = pNew();
-  m2 = pNew();
+  m1 = pInit();
+  m2 = pInit();
   loop
   {
     for (i = pVariables; i; i--)
@@ -675,8 +671,8 @@ static poly spPSpolyShortBba(poly p1, poly p2)
     }
   }
   //------------------------------------------------------------
-  poly b = pNew(); /* the result */
-  poly lcm=pNew();
+  poly b = pInit(); /* the result */
+  poly lcm=pInit();
   pLcm(p1,p2,lcm);
   pSetComp(b,pGetComp(p1));
   loop

@@ -3,13 +3,15 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: spolys0.h,v 1.7 1998-01-16 08:24:06 Singular Exp $ */
+/* $Id: spolys0.h,v 1.8 1998-03-16 14:56:46 obachman Exp $ */
 /*
 * ABSTRACT: s-polynomials, internal header
 */
 #include "polys.h"
 #include "binom.h"
 #include "polys-impl.h"
+#include "spSpolyLoop.h"
+
 
 #define spMemcpy(A,B)      pCopy2(A,B)
 
@@ -67,7 +69,9 @@ poly spGSpolyCreate(poly p1, poly p2,poly spNoether);
 /* short s-polynomial for ordering in Bba and Mora */
 poly spGSpolyShortBba(poly p1, poly p2);
 //poly spGSpolyShortMora(poly p1, poly p2, int *ecart);
+
 extern void spMultCopyX(poly p, poly m, poly n, number exp, poly spNoether);
+extern void spGMultCopyX(poly p, poly m, poly n, number exp, poly spNoether);
 
 #endif
 

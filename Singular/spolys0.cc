@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: spolys0.cc,v 1.8 1997-12-17 15:12:24 pohl Exp $ */
+/* $Id: spolys0.cc,v 1.9 1998-03-16 14:56:46 obachman Exp $ */
 
 /*
 * ABSTRACT - s-polynomials and reduction in general
@@ -94,8 +94,7 @@ static void spGMultCopy0(poly p, poly m, poly spNoether)
     do
     {
       a = pNext(a) = pNew();
-      spMemcpy(a,p);
-      spMonAdd(a,m);
+      pCopyAddFast(a,p,m);
       pSetCoeff0(a,nCopy(pGetCoeff(a)));
       pIter(p);
     }
@@ -270,7 +269,7 @@ static void spGSpolyLoop1(poly a1, poly a2, poly m, poly spNoether)
 * pNext(n) = result = p*m
 * do not destroy p
 */
-static void spGMultCopyX(poly p, poly m, poly n, number exp, poly spNoether)
+void spGMultCopyX(poly p, poly m, poly n, number exp, poly spNoether)
 {
   poly a, b;
 
@@ -314,7 +313,7 @@ static void spGMultCopyX(poly p, poly m, poly n, number exp, poly spNoether)
 * pNext(m) = result = a2-a1*m
 * do not destroy a1, but a2
 */
-static void spGSpolyLoop(poly a1, poly a2, poly m,poly spNoether)
+void spGSpolyLoop(poly a1, poly a2, poly m,poly spNoether)
 {
   poly a, b, s;
   number tm = pGetCoeff(m);
@@ -619,8 +618,8 @@ poly spGSpolyCreate(poly p1, poly p2,poly spNoether)
       pSetCompP(p2,pGetComp(p1));
     }
   }
-  b = pNew();
-  m = pNew();
+  b = pInit();
+  m = pInit();
   for (int i = pVariables; i; i--)
   {
     x = pGetExp(p1,i) - pGetExp(p2,i);
@@ -702,7 +701,7 @@ poly spGSpolyShortBba(poly p1, poly p2)
   {
     if(a2!=NULL)
     {
-      m2=pNew();
+      m2=pInit();
 x2:
       for (i = pVariables; i; i--)
       {
@@ -733,7 +732,7 @@ x2:
   }
   if (a2==NULL)
   {
-    m1=pNew();
+    m1=pInit();
 x1:
     for (i = pVariables; i; i--)
     {
@@ -759,8 +758,8 @@ x1:
     nNew(&(pGetCoeff(m1)));
     return m1;
   }
-  m1 = pNew();
-  m2 = pNew();
+  m1 = pInit();
+  m2 = pInit();
   loop
   {
     for (i = pVariables; i; i--)

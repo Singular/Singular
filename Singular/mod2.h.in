@@ -232,9 +232,11 @@ char *strstr(const char *haystack, const char *needle);
 extern int pShortOut;
 
 #ifdef DO_PROFILE
-/* define to enable explicit profiling of some crucial inline routines and defines */
+/* define to enable explicit profiling of some crucial inline 
+ * routines and defines  */
 #define DO_DEEP_PROFILE
 #endif
+
 /*******************************************************************
  * DEBUG OPTIONS
  * -- only significant for for compiling without -DNDEBUG

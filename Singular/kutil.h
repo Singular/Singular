@@ -3,12 +3,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.4 1997-12-03 16:58:50 obachman Exp $ */
+/* $Id: kutil.h,v 1.5 1998-03-16 14:56:35 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for std
 */
 #include "structs.h"
 #include "mmemory.h"
+#include "ring.h"
 #include <string.h>
 
 #define setmax 16
@@ -171,6 +172,7 @@ void updateResult(ideal r,ideal Q,kStrategy strat);
 void completeReduce (kStrategy strat);
 BOOLEAN homogTest(polyset F, int Fmax);
 BOOLEAN newHEdge(polyset S, int ak,kStrategy strat);
+rOrderType_t spGetOrderType(ring r, kStrategy strat);
 
 inline TSet initT () { return (TSet)Alloc0(setmax*sizeof(TObject)); }
 #ifdef KDEBUG

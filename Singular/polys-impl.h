@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.17 1998-01-28 22:11:22 Singular Exp $ */
+/* $Id: polys-impl.h,v 1.18 1998-03-16 14:56:38 obachman Exp $ */
 
 /***************************************************************
  *
@@ -73,7 +73,7 @@ struct  spolyrec
     Like COMP_FAST, except that it turns off "vector techniques" of
     monomial operations, i.e. does everything exponent-wise.
  ***************************************************************/
-// #define COMP_FAST
+#define COMP_FAST
 // #define COMP_DEBUG
 // #define COMP_NO_EXP_VECTOR_OPS
 #define COMP_TRADITIONAL
@@ -399,8 +399,8 @@ while(0)
 #define _pNew()         (poly) mmDBAllocSpecialized(__FILE__,__LINE__)
 #else
 #define _pNew()         (poly) mmAllocSpecialized()
-#endif
 // #define _pNew() _pInit()
+#endif
 
 #include <string.h>
 
@@ -623,45 +623,20 @@ inline void __pCopyAddFast1(poly p1, poly p2, poly p3)
 
 DECLARE(BOOLEAN, __pDivisibleBy(poly a, poly b))
 {
-  const unsigned long* s1;
-  const unsigned long* s2;
-  const unsigned long* lb;
-
 #ifdef WORDS_BIGENDIAN
-  lb = (unsigned long*) &(a->exp[0]);
-  if (pVariables & ((SIZEOF_LONG / SIZEOF_EXPONENT) - 1))
-  {
-    // now pVariables == pVariables1W, i.e. there are exponents in the
-    // "first" word of exponentvector
-    s1 = ((unsigned long*) a) + pMonomSizeW -1;
-    s2 = ((unsigned long*) b) + pMonomSizeW -1;
-  }
-  else
-  {
-    // first exponent word has only component as significant field --
-    // Hence, do not bother
-    s1 = ((unsigned long*) a) + pMonomSizeW -2;
-    s2 = ((unsigned long*) b) + pMonomSizeW -2;
-  }
-#else // !WORDS_BIGENDIAN
-  lb = ((unsigned long*) a) + pMonomSizeW;
-  if (pVariables & ((SIZEOF_LONG / SIZEOF_EXPONENT) - 1))
-  {
-    s1 = (unsigned long*) &(a->exp[0]);
-    s2 = (unsigned long*) &(b->exp[0]);
-  }
-  else
-  {
-    s1 = (unsigned long*) &(a->exp[0]) + 1;
-    s2 = (unsigned long*) &(b->exp[0]) + 1;
-  }
+  const unsigned long* const lb = (unsigned long*) &(a->exp[0]);;
+  const unsigned long* s1 = ((unsigned long*) a) + pMonomSizeW -1;
+  const unsigned long* s2 = ((unsigned long*) b) + pMonomSizeW -1;
+#else
+  const unsigned long* const lb = ((unsigned long*) a) + pMonomSizeW;
+  const unsigned long* s1 = (unsigned long*) &(a->exp[0]);
+  const unsigned long* s2 = (unsigned long*) &(b->exp[0]);
 #endif
+  
   for (;;)
   {
-// O.K. -- and now comes a bit of magic. The following _really_
-// works. Think about it! If you can prove it, please tell me, for I
-// did not bother to prove it formally (Hint: We can assume that our
-// exponents are always positive).
+    // Yes, the following is correct, provided that the exponents do
+    // not have their first bit set
     if ((*s2 - *s1) & P_DIV_MASK) return FALSE;
 #ifdef WORDS_BIGENDIAN
     if (s1 == lb) return TRUE;

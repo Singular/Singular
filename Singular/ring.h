@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.8 1998-01-12 18:59:58 obachman Exp $ */
+/* $Id: ring.h,v 1.9 1998-03-16 14:56:41 obachman Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -65,6 +65,18 @@ enum
   ringorder_Ws,
   ringorder_unspec
 };
+
+typedef enum rOrderType_t
+{
+  rOrderType_General = 0, // non-simple ordering as specified by currRing
+  rOrderType_CompExp,     // simple ordering, component has priority 
+  rOrderType_ExpComp,     // simple ordering, exponent vector has priority
+  rOrderType_Exp,         // simple ordering, no components involved
+  rOrderType_Syz,         // syzygy ordering
+  rOrderType_Schreyer     // Schreyer ordering
+} rOrderType_t;
+
+rOrderType_t rGetOrderType(ring r);
 
 #ifdef RDEBUG
 extern short rNumber;

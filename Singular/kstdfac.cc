@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.11 1998-02-17 17:53:01 Singular Exp $ */
+/* $Id: kstdfac.cc,v 1.12 1998-03-16 14:56:34 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -753,7 +753,7 @@ lists stdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
   strat->homog=h;
   spSet(currRing);
 #ifdef COMP_FAST
-  strat->spSpolyLoop = spSetSpolyLoop(currRing, strat->syzComp, strat->ak, strat->homog);
+  strat->spSpolyLoop = spGetSpolyLoop(currRing, strat);
 #endif  
   initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
   initBuchMoraPos(strat);

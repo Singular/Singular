@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.7 1998-02-27 16:27:56 Singular Exp $ */
+/* $Id: febase.h,v 1.8 1998-03-16 14:56:30 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -99,6 +99,22 @@ void    newBuffer(char* s, feBufferTypes t, procinfo *pname = NULL, int start_li
 void *  myynewbuffer();
 void    myyoldbuffer(void * oldb);
 
+/* assume(x) -- a handy macro for assumptions */
+#ifdef NDEBUG
+/* empty macro, if NDEBUG */
+#define assume(x) ((void*) 0)
+#else /* ! NDEBUG */
+#define assume(x) _assume(x, __FILE__, __LINE__)
+#define _assume(x, f, l)                                        \
+do                                                              \
+{                                                               \
+  if (! (x))                                                    \
+  {                                                             \
+    Warn("Internal assume violation: file %s line %d\n", f, l); \
+  }                                                             \
+}                                                               \
+while (0)
+#endif /* NDEBUG */
 
 class Voice
 {

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.9 1998-03-06 11:50:38 krueger Exp $ */
+/* $Id: structs.h,v 1.10 1998-03-16 14:56:47 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -111,7 +111,6 @@ typedef void    (*pSetmProc)(poly p);
 typedef int     (*pLDegProc)(poly p, int *length);
 typedef int     (*pFDegProc)(poly p);
 typedef int     (*pCompProc)(poly p1, poly p2);
-typedef void (*spSpolyLoopProc)(poly p1, poly p2, poly m, poly spNoether);
 
 extern ring      currRing;
 #endif

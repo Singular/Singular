@@ -6,16 +6,17 @@
 /*
 * ABSTRACT: s-polynomials
 */
-/* $Id: spolys.h,v 1.4 1997-12-03 16:59:04 obachman Exp $ */
+/* $Id: spolys.h,v 1.5 1998-03-16 14:56:45 obachman Exp $ */
 #include "structs.h"
+#include "spSpolyLoop.h"
 
 /* reduction */
 extern poly (*spSpolyRed)(poly p1, poly p2,poly spNoether,
-                          spSpolyLoopProc spSpolyLoop=NULL);
+                          spSpolyLoopProc spSpolyLoop);
 extern void (*spSpolyTail)(poly p1, poly q, poly q2, poly spNoether,
-                           spSpolyLoopProc spSpolyLoop=NULL);
+                           spSpolyLoopProc spSpolyLoop);
 extern poly (*spSpolyRedNew)(poly p1, poly p2,poly spNoether,
-                             spSpolyLoopProc spSpolyLoop=NULL);
+                             spSpolyLoopProc spSpolyLoop);
 
 /* s-polynomial */
 extern poly (*spSpolyCreate)(poly p1, poly p2,poly spNoether);

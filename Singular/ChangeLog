@@ -1,3 +1,10 @@
+1998-03-16  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+	* polys-impl.h: #define COMP_FAST
+
+	* configure.in,Makefile.in: check for flex -P; increased version
+	number to 1.1.7
+
 Fri Mar 13 16:16:27 MET 1998 hannes
   * fixed: Singular crashed while changing the minpoly in GF(q)
     (ipassign.cc)
@@ -15,6 +22,17 @@ Fri Mar  6 13:27:45 MET 1998 Kai Krueger <krueger@mathematik.uni-kl.de>
 	       primdec.lib,tex.lib
 	  made fixes requested by libparse (s.a. brackets, ....)
 	
+1998-03-04  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+	* febase.h: added macro assume()
+
+	* spSpolyLoop.cc: Automatic generation of SpolyLoops using
+	spSpolyLoop.pl
+
+	* kstd*.cc: New calling interface to get SpolyLoop
+
+	* ring.h: Introduced rOrderType_t
+
 Mon Mar  2 16:18:25 MET 1998 hannes
    * changed handling of "echo" in examples: do not report file + lineno
      (febase.inc,lib0lib.res, inoutlib.res, mem.res, homlib.res)
