@@ -1,0 +1,87 @@
+#################################################################
+###
+### Makefile for Singular-modules
+###
+### $Id: Makefile.in,v 1.1 1998-11-19 15:17:26 krueger Exp $
+###
+#################################################################
+
+SHELL		= /bin/sh
+
+## 
+## various paths
+##
+srcdir		= @srcdir@
+prefix 		= @prefix@
+exec_prefix 	= @exec_prefix@
+libdir 		= @libdir@
+# program executable goes here
+bindir		= @bindir@
+# Singular libs go here
+includedir	= @includedir@
+MOD_DEST	= ./include
+INC_SRC		= ../Singular
+
+## 
+## various programs
+##
+CC		= @CC@
+CXX		= @CXX@
+LEXP		= @LEXP@
+PERL		= @PERL@
+BISON		= bison
+@SET_MAKE@
+INSTALL		= ./install-sh -c
+INSTALL_PROGRAM	= ${INSTALL}
+INSTALL_DATA	= ${INSTALL} -m 644
+MKINSTALLDIRS   = ./mkinstalldirs
+
+##
+## compiler and linker options
+##
+CFLAGS		= @CFLAGS@ -pipe -Iinclude -I../Singular
+CXXFLAGS	= @CXXFLAGS@ -pipe 
+#CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@
+CPPFLAGS	= -I${srcdir} @CPPFLAGS@
+DEFS		= @DEFS@ -DNDEBUG
+LDFLAGS		= @LDFLAGS@ # @LD_DYNAMIC@
+#STATIC_LDFLAGS	= @STATIC_LDFLAGS@
+#LIBS		= @NEED_LIBS@
+
+##
+## End configuration dependend stuff
+#################################################################
+##
+## compiler and linker options
+##
+CFLAGS		+= ${DEFS}
+
+MOD_INCLUDES	= mod2.h utils.h structs.h mmemory.h tok.h ipid.h \
+	subexpr.h febase.h modules.h grammar.h numbers.h polys.h \
+	ideals.h intvec.h polys-impl.h
+
+##
+##
+##
+
+all: mod_install
+
+mod_install:
+	for file in ${MOD_INCLUDES}; do \
+		if test -f ${MOD_DEST}/$${file}; then \
+			rm -f ${MOD_DEST}/$${file}; \
+		fi; \
+		cp ${INC_SRC}/$${file} ${MOD_DEST}/$${file}; \
+		chmod 444 ${MOD_DEST}/$${file}; \
+	done
+
+modgen:
+
+clean:
+	rm -f *.o *.lo *.so* *.la *~ core
+	for file in ${MOD_INCLUDES}; do \
+		rm -f ${MOD_DEST}/$${file}; \
+	done
+
+distclean: clean
+	rm -f Makefile
