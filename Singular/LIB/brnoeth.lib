@@ -1,4 +1,4 @@
-version="$Id: brnoeth.lib,v 1.10 2001-01-17 09:07:28 lossen Exp $";
+version="$Id: brnoeth.lib,v 1.11 2001-02-09 13:11:35 lossen Exp $";
 info="
 LIBRARY:   brnoeth.lib  Brill-Noether Algorithm, Weierstrass-SG and AG-codes
 AUTHORS:   Jose Ignacio Farran Martin, ignfar@eis.uva.es
@@ -38,6 +38,7 @@ KEYWORDS:  Weierstrass semigroup; Algebraic Geometry codes;
 LIB "matrix.lib";
 LIB "triang.lib";
 LIB "hnoether.lib";
+LIB "inout.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -52,7 +53,7 @@ RETURN:     list of prime ideals (each a Groebner basis), corresponding to
 NOTE:       The ideal must have dimension 0, the basering must have 2
             variables, the ordering must be lp, and the base field must
             be finite and prime.@*
-            The option(redSB) is convenient to be set in advance.
+            It might be convenient to set the option(redSB) in advance.
 SEE ALSO:   triang_lib
 EXAMPLE:    example closed_points; shows an example
 "
@@ -1978,8 +1979,8 @@ NOTE:     @code{Adj_div(f);} computes and stores the fundamental data of the
           second one is the position of those data in the lists POINTS, etc.,
           inside this local ring.@*
           In the intvec L[4] (conductor) the i-th entry corresponds to the
-          i-th entry in the list of places L[3].@*
-
+          i-th entry in the list of places L[3].
+          
           With no optional arguments, the conductor is computed by
           local invariants of the singularities; otherwise it is computed
           by the Dedekind formula. @*
@@ -1987,7 +1988,10 @@ NOTE:     @code{Adj_div(f);} computes and stores the fundamental data of the
           of a prime ideal and P[2] is an intvec containing the position
           of the places above P in the list of closed places L[3]. @*
           If the point is at infinity, P[1] is a homogeneous irreducible
-          polynomial in two variables.
+          polynomial in two variables. 
+
+          If @code{printlevel>=0} additional comments are displayed (default: 
+          @code{printlevel=0}). 
 KEYWORDS: Hamburger-Noether expansions; adjunction divisor
 SEE ALSO: closed_points, NSplaces
 EXAMPLE:  example Adj_div; shows an example
@@ -2115,40 +2119,33 @@ example
   printlevel=-1;
   ring s=2,(x,y),lp;
   list C=Adj_div(y9+y8+xy6+x2y3+y2+x3);
-  C;
-  // affine ring
-  def aff_R=C[1][1];
+  def aff_R=C[1][1];      // the affine ring
   setring aff_R;
-  // the affine equation of the curve
-  CHI;
-  // the ideal of affine singular locus
-  Aff_SLocus;
-  // the list of affine singular points
-  Aff_SPoints;
-  // the list of singular/non-singular points at infinity
-  Inf_Points;
-  // the projective ring
-  def proj_R=C[1][2];
+  listvar(aff_R);         // data in the affine ring
+  CHI;                    // affine equation of the curve
+  Aff_SLocus;             // ideal of the affine singular locus
+  Aff_SPoints[1];         // 1st affine singular point: (1:1:1), no.1
+  Inf_Points[1];          // singular point(s) at infinity: (1:0:0), no.4 
+  Inf_Points[2];          // list of non-singular points at infinity
+  //
+  pause("press RETURN");
+  def proj_R=C[1][2];     // the projective ring
   setring proj_R;
-  // the projective equation of the curve
-  CHI;
-  // the degree of the curve :
-  C[2][1];
-  // the genus of the curve :
-  C[2][2];
-  // the adjunction divisor :
-  C[4];
-  // the list of computed places
-  C[3];
-  // the list of local rings and degrees of base points
-  C[5];
-  // we look at some places
-  def S(1)=C[5][1][1];
-  setring S(1);
-  POINTS;
-  LOC_EQS;
-  PARAMETRIZATIONS;
-  BRANCHES;
+  CHI;                    // projective equation of the curve
+  C[2][1];                // degree of the curve
+  C[2][2];                // genus of the curve
+  C[3];                   // list of computed places
+  C[4];                   // adjunction divisor (all points are singular!)
+  //
+  pause("press RETURN");
+  // we look at the place(s) of degree 2 by changing to the ring 
+  C[5][2][1];
+  def S(2)=C[5][2][1];          
+  setring S(2);
+  POINTS;                // base point(s) of place(s) of degree 2: (1:a:1)
+  LOC_EQS;               // local equation(s)
+  PARAMETRIZATIONS;      // parametrization(s) and exactness
+  BRANCHES;              // Hamburger-Noether development
   printlevel=plevel;
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -2166,6 +2163,8 @@ RETURN:   list L with updated data of CURVE after computing all
    @end format
           See @ref{Adj_div} for a description of the entries in L.
 NOTE:     The list_expression should be the output of the procedure Adj_div.@*
+          If @code{printlevel>=0} additional comments are displayed (default: 
+          @code{printlevel=0}). 
 SEE ALSO: closed_points, Adj_div
 EXAMPLE:  example NSplaces; shows an example
 "
@@ -2221,19 +2220,20 @@ example
   printlevel=-1;
   ring s=2,(x,y),lp;
   list C=Adj_div(x3y+y3+x);
+  // The list of computed places:
+  C[3];
   // create places up to degree 1+3
   list L=NSplaces(3,C);
-  L;
-  // for example, here is the list with the affine non-singular
-  // points of degree 4 :
+  // The list of computed places is now:
+  L[3];
+  // e.g., affine non-singular points of degree 4 :
   def aff_r=L[1][1];
   setring aff_r;
   Aff_Points(4);
-  // for example, we check the places of degree 4 :
+  // e.g., base point of the 1st place of degree 4 :
   def S(4)=L[5][4][1];
   setring S(4);
-  // and for example, the base points of such places :
-  POINTS;
+  POINTS[1];
   printlevel=plevel;
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -3262,7 +3262,7 @@ static proc min_wt_rmat (matrix M)
 proc BrillNoether (intvec G,list CURVE)
 "USAGE:    BrillNoether(G,CURVE); G an intvec, CURVE a list
 RETURN:   list of ideals (each of them with two homogeneous generators,
-          which represent the nominator, resp. denominator, of a rational
+          which represent the numerator, resp. denominator, of a rational
           function).@*
           The corresponding rational functions form a vector basis of the
           linear system L(G), G a rational divisor over a non-singular curve.
@@ -3368,13 +3368,13 @@ example
   ring s=2,(x,y),lp;
   list C=Adj_div(x3y+y3+x);
   C=NSplaces(3,C);
-  // Places C[3][1] and C[3][2] are rational,
-  // so that we define a divisor of degree 8
-  intvec G=4,4;
+  // the first 3 Places in C[3] are of degree 1. 
+  // we define the rational divisor G = 4*C[3][1]+4*C[3][3] (of degree 8):
+  intvec G=4,0,4;
   def R=C[1][2];
   setring R;
   list LG=BrillNoether(G,C);
-  // here is the vector basis :
+  // here is the vector basis of L(G):
   LG;
   printlevel=plevel;
 }
@@ -3406,7 +3406,7 @@ static proc simplifyRF (ideal F)
 static proc sumRF (F,G)
 {
   // sum of two "rational functions" F,G given by either a pair
-  // nominator/denominator or a poly
+  // numerator/denominator or a poly
   if ( typeof(F)=="ideal" && typeof(G)=="ideal" )
   {
     ideal FG;
@@ -3521,11 +3521,10 @@ RETURN:   list WS of two lists:
   @end format
 NOTE:     The procedure must be called from the ring CURVE[1][2],
           where CURVE is the output of the procedure @code{NSplaces}.
-          i represents the place CURVE[3][i].
-          WARNING: the place must be rational, i.e., necessarily
-          CURVE[3][P][1]=1.
-          Rational functions are represented by nominator/denominator
+@*        i represents the place CURVE[3][i]. 
+@*        Rational functions are represented by numerator/denominator
           in form of ideals with two homogeneous generators.
+WARNING:  The place must be rational, i.e., necessarily CURVE[3][i][1]=1. @*
 SEE ALSO: Adj_div, NSplaces, BrillNoether
 EXAMPLE:  example Weierstrass; shows an example
 "
@@ -3627,8 +3626,8 @@ example
   def R=C[1][2];
   setring R;
   // Place C[3][1] has degree 1 (i.e it is rational);
-  list WS=Weierstrass(1,10,C);
-  // the first part of the list is the Weierstrass semigroup up to 10 :
+  list WS=Weierstrass(1,7,C);
+  // the first part of the list is the Weierstrass semigroup up to 7 :
   WS[1];
   // and the second part are the corresponding functions :
   WS[2];
@@ -3915,9 +3914,8 @@ example
   HC=extcurve(2,HC);
   def ER=HC[1][4];
   setring ER;
-  intvec G=5;
-  intvec D=2..9;
-  // we already have a rational divisor G and 8 more points over F_4;
+  intvec G=5;      // the rational divisor G = 5*HC[3][1] 
+  intvec D=2..9;   // D = sum of the rational places no. 2..9 over F_4
   // let us construct the corresponding evaluation AG code :
   matrix C=AGcode_L(G,D,HC);
   // here is a linear code of type [8,5,>=3] over F_4
@@ -3963,9 +3961,8 @@ example
   HC=extcurve(2,HC);
   def ER=HC[1][4];
   setring ER;
-  intvec G=5;
-  intvec D=2..9;
-  // we already have a rational divisor G and 8 more points over F_4;
+  intvec G=5;      // the rational divisor G = 5*HC[3][1] 
+  intvec D=2..9;   // D = sum of the rational places no. 2..9 over F_4
   // let us construct the corresponding residual AG code :
   matrix C=AGcode_Omega(G,D,HC);
   // here is a linear code of type [8,3,>=5] over F_4
@@ -3987,7 +3984,7 @@ RETURN:   list L which is the update of the list CURVE with additional entries
    L[1][5]: ring (p,a),(x,y,t),ls (local),
    L[2][3]: int  (the number of rational places),
    @end format
-          the rings being defined over a field extension of degree d.
+          the rings being defined over a field extension of degree d. @*
           If d<2 then @code{extcurve(d,CURVE);} creates a list L which
           is the update of the list CURVE with additional entries
    @format
@@ -4232,6 +4229,10 @@ example
   // since we have all points up to degree 4, we can extend the curve
   // to that extension, in order to get rational points over F_16;
   C=extcurve(4,C);
+  // e.g., display the basepoint of place no. 32:
+  def R=C[1][5];
+  setring R;
+  POINTS[32];
   printlevel=plevel;
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -4277,8 +4278,8 @@ RETURN:   list E of size n+3, where n=size(D). All its entries but E[n+3]
    E[1]:  parity check matrix for the current AG code
    E[2] ... E[n+2]:  matrices used in the procedure decodeSV
    E[n+3]:  intvec with
-       E[n+3][1]: correction capacity @math{\epsilon} of the algorithm
-       E[n+3][2]: designed Goppa distance @math{\delta} of the current AG code
+       E[n+3][1]: correction capacity @math{epsilon} of the algorithm
+       E[n+3][2]: designed Goppa distance @math{delta} of the current AG code
    @end format
 NOTE:     Computes the preprocessing for the basic (Skorobogatov-Vladut)
           decoding algorithm.@*
@@ -4290,15 +4291,15 @@ NOTE:     Computes the preprocessing for the basic (Skorobogatov-Vladut)
           for more details.).
           The current AG code is @code{AGcode_Omega(G,D,EC)}.@*
           If you know the exact minimum distance d and you want to use it in
-          @code{decodeSV} instead of @math{\delta}, you can change the value
+          @code{decodeSV} instead of @math{delta}, you can change the value
           of E[n+3][2] to d before applying decodeSV.
           If you have a systematic encoding for the current code and want to
           keep it during the decoding, you must previously permute D (using
           @code{permute_L(D,P);}), e.g., according to the permutation
           P=L[3], L being the output of @code{sys_code}.
-WARNINGS: F must be a divisor with support disjoint to the support of D and
-          with degree @math{\epsilon + genus}, where
-          @math{\epsilon:=[(deg(G)-3*genus+1)/2]}.@*
+WARNINGS: F must be a divisor with support disjoint from the support of D and
+          with degree @math{epsilon + genus}, where
+          @math{epsilon:=[(deg(G)-3*genus+1)/2]}.@*
           G should satisfy @math{ 2*genus-2 < deg(G) < size(D) }, which is
           not checked by the algorithm.
           G and D should also have disjoint supports (checked by the
@@ -4364,21 +4365,19 @@ example
   HC=extcurve(2,HC);
   def ER=HC[1][4];
   setring ER;
-  intvec G=5;
-  intvec D=2..9;
-  // we already have a rational divisor G and 8 more points over F_4;
-  // let us construct the corresponding residual AG code of type
-  //     [8,3,>=5] over F_4
+  intvec G=5;      // the rational divisor G = 5*HC[3][1] 
+  intvec D=2..9;   // D = sum of the rational places no. 2..9 over F_4
+  // construct the corresp. residual AG code of type [8,3,>=5] over F_4:
   matrix C=AGcode_Omega(G,D,HC);
-  // we can correct 1 error and the genus is 1, thus F must have
-  //    degree 2 and support disjoint to that of D;
+  // we can correct 1 error and the genus is 1, thus F must have degree 2 
+  // and support disjoint from that of D;
   intvec F=2;
   list SV=prepSV(G,D,F,HC);
   // now everything is prepared to decode with the basic algorithm;
   // for example, here is a parity check matrix to compute the syndrome :
   print(SV[1]);
   // and here you have the correction capacity of the algorithm :
-  int epsilon=SV[11][1];
+  int epsilon=SV[size(D)+3][1];
   epsilon;
   printlevel=plevel;
 }
@@ -4516,14 +4515,12 @@ example
   HC=extcurve(2,HC);
   def ER=HC[1][4];
   setring ER;
-  intvec G=5;
-  intvec D=2..9;
-  // we already have a rational divisor G and 8 more points over F_4;
-  // let us construct the corresponding residual AG code of type
-  //     [8,3,>=5] over F_4
+  intvec G=5;      // the rational divisor G = 5*HC[3][1] 
+  intvec D=2..9;   // D = sum of the rational places no. 2..9 over F_4
+  // construct the corresp. residual AG code of type [8,3,>=5] over F_4:
   matrix C=AGcode_Omega(G,D,HC);
-  // we can correct 1 error and the genus is 1, thus F must have
-  //    degree 2 and support disjoint to that of D;
+  // we can correct 1 error and the genus is 1, thus F must have degree 2
+  // and support disjoint from that of D
   intvec F=2;
   list SV=prepSV(G,D,F,HC);
   // now we produce 1 error on the zero-codeword :
@@ -4686,7 +4683,7 @@ example
   print(L[1]);
   // here is the control matrix in standard form
   print(L[2]);
-  // we can check that both codes are dual each other
+  // we can check that both codes are dual to each other
   print(L[1]*transpose(L[2]));
 }
 ///////////////////////////////////////////////////////////////////////////////
