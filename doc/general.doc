@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.47 1998-05-11 11:59:38 wichmann Exp $
+@comment $Id: general.doc,v 1.48 1998-05-11 15:15:37 anne Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -1488,16 +1488,21 @@ to @code{list} from expression lists of any type. (The list may be empty)
 @subsection Flow control
 @cindex Flow control
 @cindex block
-Hier fehlen noch die Verweise auf Kapitel 5.3 und Kapitel 6.
 
-A block is a sequence of commands surrounded by @{ and @}. Blocks
-are used for proc, if, else, while and for statements.
+A block is a sequence of commands surrounded by @{ and @}.
 @example
   @{
      command;
      @dots{}
   @}
 @end example
+Blocks are used whenever @sc{Singular} is used as a structured programming
+language. The @code{if} and @code{else} structures allow conditional 
+execution of blocks (See @ref{if}, @ref{else}). @code{for} and @code{while}
+loops are available for repeated execution of blocks (See @ref{for}, 
+@ref{while}).
+In procedure definitions the main part and the example section are blocks
+as well(See @ref{proc}).
 @menu
 * break::
 * quit::
@@ -1511,9 +1516,6 @@ are used for proc, if, else, while and for statements.
 * return::
 * continue::
 @end menu
-@iftex
-See @ref{if}; @ref{for}; @ref{while}; @ref{proc}
-@end iftex
 
 
 @c ---------------------------------------------------------------------------
@@ -1540,71 +1542,161 @@ the sequence of commands stored in the specified procedure.
 * Proc in a library::
 * Loading of procedure files::
 @end menu
-
-@c ---------------------------------------
-@node Proc definition, Names in proc, Procedures, Procedures
-@subsection Proc definition
-@cindex Proc definition
-@cindex proc
+@c -------------------------------------------------
+@node Proc definition, Names in procedures, Procedures, Procedures
+@subsection Proc in a library
+@cindex Proc in a library
 @table @code
 @item @strong{Syntax:}
-@code{proc} name block
-@*@code{proc} name parameter_list block
+@code{[static] proc} proc_name [parameter_list]
+@*["help_text"]
+@*@code{@{}
+@*
+@tex
+\quad
+@end tex
+   procedure_body
+@*@code{@}}
+@*[@code{example}
+@*@code{@{}
+@*
+@tex
+\quad
+@end tex
+   sequence_of_commands;
+@*@code{@}}]
 @item @strong{Purpose:}
-defines a new function.
-@item @strong{Default:}
-none
-@item @strong{Example (for a procedure without an argument list):}
-@example
-  // this proc tests if it is called with exactly one argument n
-  // and print the numbers 1 to n
-  // If the proc is called without an argument or with more
-  // than one argument, a message is displayed
-  // # is a reserved name and denotes the list of arguments,
-  // #[i] is the i-th argument
-  proc print_n
-  @{
-    if (size(#) != 1)
-    @{
-      "USAGE: print_n ( int_expression );";
-      return();
-    @}
-    int i;
-    for(i=1;i<=#[1];i=i+1)
-    @{
-      i;
-    @}
-  @}
+defines a new function, the @code{proc} proc_name, with the additional 
+information help_text, which is copied to the screen by 
+@code{help proc_name;} and the @code{example} section
+which is executed by @code{example proc_name;}. 
 
-  print_n();
-  @expansion{} USAGE: print_n ( int_expression );
-  print_n(1+2);
-  @expansion{} 1
-  @expansion{} 2
-  @expansion{} 3
-  print_n(1,2);
-  @expansion{} USAGE: print_n ( int_expression );
+@* The help_text, the parameter_list, and the example section are optional.
+The default for a parameter_list is @code{(list #)}, see @ref{Parameter list}.
+The help and example sections are ignored if the procedure is defined 
+interactively, i.e. if it was not loaded from a file by a @code{LIB} command.
+
+@* Specifying static in front of the proc-definition (in a library file)
+makes this procedure local to the library, i.e. accessible only for the other
+procedures in the same library, but not for the users. So there is no
+reason anymore to define a procedure within another one (it just makes
+debugging harder). 
+
+@item @strong{Example of a procedure:}
+@example
+@c example
+  //
+  // interactive definition of a procedure:
+  //
+  // The following procedure computes the Milnor number of a given
+  // polynomial p, i.e. of the hypersurface singularity defined by p
+  //
+  proc milnor_number (poly p)
+  "USAGE:    milnor_number(p);  p=poly
+   RETURN:   Milnor number of the hypersurface singularity defined by p,
+             resp. -1 if it is not isolated.
+   EXAMPLE:  example milnor_number; shows an example."
+  {
+  //-----------------------computations----------------------------------
+    ideal i= std(jacob(p));
+    int m_nr=vdim(i);
+  //-----------------------error message---------------------------------
+    if (m_nr<0) { "// not an isolated singularity";}
+  //-----------------------result----------------------------------------
+    return(m_nr);         // the value of m_nr is returned
+  }
+  example 
+  {
+    "EXAMPLE:"; echo=2;
+    ring r=0,(x,y),ds;
+    poly p=x^2+y^4;
+    milnor_number(p);
+  };
+  //
+  // Use of this procedure
+  //
+  ring r1=0,(x,y,z),ds;
+  poly p=x^2+y^2+z^5;
+  milnor_number(p);
+  //
+  // help section is ignored, since the procedure was defined 
+  // interactively
+  //
+  help milnor_number;
+  //
+  // example section is ignored for the same reason
+  //
+  example milnor_number;
+@c example
 @end example
-@end table
-A convenient and recommended way to define procedures is to prepare a file
+
+@item @strong{Example of a static library procedure:}
+@example
+@c include sample.lib
+@end example
+@example
+@c example
+  //
+  // load the library sample.lib
+  //
+  LIB "sample.lib";
+  //
+  // show an example
+  //
+  example tab;
+  //
+  // use the procedure tab
+  //
+  "*"+tab(3)+"*";
+  //
+  // the static procedure internal_tab is not accessible
+  //
+  "*"+internal_tab(3)+"*";
+  //
+  // show the help section for tab
+  //
+  help tab;
+@c example
+@c    " for(int n=0; n<=5; n=n+1)";
+@c    " { tab(5-n)+\"*\"+tab(n)+\"+\"+tab(n)+\"*\"; }";
+@end example
+
+@*A convenient and recommended way to define procedures is to prepare a file
 and read this file with the @code{LIB} command.
-The difference between procedures from libraries and
-other procedures is the missing help and example part
-which may be provided in a library file.
+The differences between procedures from libraries and
+other procedures are that the help and example part are ignored in 
+interactive definitions and that static can only be specified in libraries.
+
+@item @strong{Guidelines for the help section of a procedure:}
+@* The help text of a procedure should contain information about the usage,
+   purpose, return values and generated objects. Particular assumptions or 
+   limitations should be listed. If global objects are generated, this should 
+   be mentioned, too.
+
+@*The libraries contained in the @sc{Singular} distribution use the following 
+format for the help text:
+@example
+USAGE:    <proc_name>(<parameters>);   <explanation of parameters>
+[CREATE:  <description of created objects which are not returned>]
+RETURN:   <description of the purpose and return value>
+[NOTE:    <paritcular assumptions or limitations, hints>]
+EXAMPLE:  example <proc_name>; shows an example
+@end example
+@end table 
+
 @menu
 * LIB::
 * Libraries::
 * Procedures::
-* Proc in a library::
 * Examples::
 * Control structures::
 * return::
 @end menu
 
 @c ---------------------------------------
-@node Names in proc, Parameter list, Proc definition, Procedures
-@subsection Names in proc
-@cindex Names in proc
+@node Names in procedures, Parameter list, Proc definition, Procedures
+@subsection Names in procedures
+@cindex Names in procedures
 @cindex local names
 
 All variables are local to the procedure they are defined in.
@@ -1626,16 +1718,23 @@ ring will be moved together with that ring.
     export result;  //defines the global variable "result".
   @}
 @end example
+
 If you type @code{listvar(all);} after having executed a proc you will
 see that the variable @code{result} is still there while @code{k}
 has been deleted.
 
+Often a procedure is started while a basering is active. The procedure then 
+works in this basering without knowing its name. Therefore a name has to be
+assigned to the basering before executing e.g. map commands. This is done by 
+the assignment @code{def r=basering;}, writing @code{ring r=basering;} leads
+to an error.
+
 Internally, local variables are stored using the nesting level.
 You will see the nesting level
-if you do a @code{listvar()} command inside a proc.
+if you do a @code{listvar()} command inside a proc(See @ref{listvar}).
 
 @c ---------------------------------------
-@node Parameter list, Proc commands, Names in proc, Procedures
+@node Parameter list, Procedure commands, Names in procedures, Procedures
 @subsection Parameter list
 @cindex Parameter list
 @table @code
@@ -1700,9 +1799,9 @@ which means the arguments are referenced by @code{#[1], #[2]}, etc.
 @end table
 
 @c --------------------------------------- ----------
-@node Proc commands, Proc in a library, Parameter list, Procedures
-@subsection Proc commands
-@cindex Proc commands
+@node Procedure commands, Loading of procedure files, Parameter list, Procedures
+@subsection Procedure commands
+@cindex Procedure commands
 @menu
 * export::
 * keepring::
@@ -1719,89 +1818,9 @@ see @ref{return}
 @end table
 @end iftex
 
-@c -------------------------------------------------
-@node Proc in a library, Loading of procedure files, Proc commands, Procedures
-@subsection Proc in a library
-@cindex Proc in a library
-@table @code
-@item @strong{Syntax:}
-@code{[static] proc} proc_name parameter_list
-@*"help_text"
-@*@code{@{}
-@*
-@tex
-\quad
-@end tex
-   procedure_body
-@*@code{@}}
-@*@code{example}
-@*@code{@{}
-@*
-@tex
-\quad
-@end tex
-   sequence_of_commands;
-@*@code{@}}
-@item @strong{Purpose:}
-defines the @code{proc} proc_name with the additional information
-help_text, which is copied to the screen by @code{help proc_name;}
-and the @code{example} section
-which is executed by @code{example proc_name;}.
-
-@* Specifying static in front of the proc-definition makes this
-procedure local to the library, i.e. accessible only for the other
-procedures in the same library, but not for the users. So there is no
-reason anymore to define a procedure within another one (it just makes
-debugging harder).
-
-@* The help_text, the parameter_list,
-and the example section are optional.
-The default for a parameter_list is @code{(list #)}, see @ref{Parameter list}.
-
-@item @strong{Notes:}
-Procedures having this extended format may only appear in a library file
-which is loaded with the @code{LIB} command.
-
-@item @strong{Example of a library procedure:}
-@example
-@c example
-  // generating the library 'sample.lib'
-  write(":w sample.lib", "
-  info=\"LIBRARY: sample.lib
-
-        sample library for static and global procedures
-  \";
-
-  proc tab (int n)
-  \"USAGE:    tab(n);  (n integer)
-  RETURNS:  string of n space tabs
-  EXAMPLE:  example tab; shows an example\"
-  { return(internal_tab(n)); }
-  example
-  {
-    \"EXAMPLE:\"; echo=2;
-    for(int n=0; n<=5; n=n+1)
-    { tab(5-n)+\"*\"+tab(n)+\"+\"+tab(n)+\"*\"; }
-  }
-  static proc internal_tab(int n)
-  { return(\" \"[1,n]); }
-  "); // end of generatting library 'sample.lib'
-
-  // start of sample-script loading library sample.lib
-  LIB "sample.lib";
-  example tab;
-  "*"+tab(3)+"*";
-  "*"+internal_tab(3)+"*";
-  help tab;
-@c example
-@c    " for(int n=0; n<=5; n=n+1)";
-@c    " { tab(5-n)+\"*\"+tab(n)+\"+\"+tab(n)+\"*\"; }";
-@end example
-@end table
-
 
 @c ---------------------------------------
-@node Loading of procedure files,  , Proc in a library, Procedures
+@node Loading of procedure files,  , Procedure commands, Procedures
 @subsection Loading of procedure files
 @cindex LIB
 @cindex Loading of procedure files
@@ -1817,13 +1836,16 @@ To list all loaded procedures resp. libraries, type
 To close a procedure type
 @code{kill proc_name;}
 
-If the libary does not contain helptext and examples it can be loaded by
-@code{<"..."} because it contains valid @sc{Singular} commands.
-With @code{<} the whole file is read by @sc{Singular} and the body of the
-procedures is stored in the main memory. Any other text in the file is
+If the libary does not contain an info string and a version string 
+it can be loaded by @code{<"..."} because it contains valid @sc{Singular} 
+commands. With @code{<} the whole file is read by @sc{Singular} and the 
+body of the procedures is stored in the main memory. Help and example 
+sections of the procedures are ignored. Any other text in the file is
 executed. Problems may occur if one of the commands in the file is a
 procedure call. These problems do not occur if all procedures are called
-with the LIB command.
+with the LIB command. Because of these limitations and problems the use of 
+@code{<} is @strong{discouraged}.
+
 
 @menu
 * LIB command::
@@ -1977,31 +1999,8 @@ specifying the type of error and the line where it was detected.
 @table @code
 @item @strong{Example of a library file:}
 @example
+@c include sample_lib0.lib
 @c example
-  // generating the library sample_lib0.lib
-  write(":w sample_lib0.lib","
-  info=\"
-         LIBRARY: sample_lib0.lib
-  \";
-
-  proc dummy1(int i,  // parameter list can stretch across
-            int j)    // multiple lines
-  { return(string(i)+\"+\"+string(j)+\"=\"+string(i+j)); }
-
-  proc dummy2(proc sum, int j, int k)
-        { return(sum(j,k)); }
-  /* { and } does not need to be the
-     first charater in line */
-
-  //////////////////////////
-  /*
-    LIB\"sample_lib0.lib\"; // some comments at the end
-    help sample_lib0.lib;
-    proc tt1=dummy1;
-    kill dummy1;
-    dummy2(tt1,2,3);
-  */
-  "); // done writing sample_lib0.lib.
   LIB"sample_lib0.lib";     // load sample_lib0.lib
   help sample_lib0.lib;     // view its info string
 
@@ -2021,19 +2020,9 @@ specifying the type of error and the line where it was detected.
 @table @code
 @item @strong{Unrecognized character in a library:}
 @example
+@c include bad_lib0.lib
 @c example
-  // generating the library bad_lib0.lib
-  write(":w bad_lib0.lib","
-  info=\"LIBRARY: bad_lib0\";
-  proc tt(int i)
-  {
-  \"huhu\";
-  }
-  uu // here is the error
-  proc t1(int j)
-  { return(j); }
-  "); // done writing bad_lib0.lib.
-> LIB"bad_lib0";
+  LIB"bad_lib0";
 @c example
 @end example
 @end table
@@ -2083,7 +2072,7 @@ description of each procedure).
 @end table
 
 @c ---------------------------------------
-@node version, A good example, info, Libraries
+@node version, A syntax example, info, Libraries
 @subsection version
 @cindex  version in a library
 @table @code
@@ -2109,9 +2098,9 @@ It is common practice to simply define the version string to be
 @end table
 
 @c ---------------------------------------
-@node A good example, ,version, Libraries
-@subsection a good example
-@cindex a good example
+@node A syntax example, ,version, Libraries
+@subsection a syntax example
+@cindex a syntax example
 @cindex template
 
 Although there are very few enforced rules on the format of a library,
@@ -2172,6 +2161,25 @@ d: template.lib,v 1.2 1998/05/07 08:19:32 singular Exp $;
 
   ///////////////////////////////////////////////////////////////////////////
 @end example
+
+The libraries contained in the @sc{Singular} distribution follow additional
+guidelines for the info string. These can be summarized in the following
+synopsis:
+@example
+info="
+      LIBRARY: <library_name> <one line description of the content>
+
+      <procedure1>;     <one line description of the purpose>
+      .
+      .
+      <procedureN>;     <one line description of the purpose>";
+@end example
+The purpose of these one line descriptions is not to give a short help
+for the procedure, but to help the user decide what procedure might be 
+the right one for the job. Details can then be found in the help of
+each procedure. Therefore parameters may be omitted or abbreviated if
+necessary.
+
 @c @end table
 
 @c ----------------------------------------------------------------------
@@ -2192,8 +2200,8 @@ is to type some brackets or @code{ @ " } and then @code{<RETURN>;} .
 @end menu
 
 @c ---------------------------------------
-@node TRACE, Break points, Debugging tools, Debugging tools
-@subsection TRACE
+@node tracing of procedures, Break points, Debugging tools, Debugging tools
+@subsection tracing of procedures
 @*Setting the @code{TRACE} variable to 1 (resp. 3) results in a listing of
 the called procedures (resp. together with line numbers).
 If @code{TRACE} is set to 4, @code{Singular}
@@ -2232,12 +2240,13 @@ See @ref{TRACE var}.
 @end example
 
 @c ---------------------------------------
-@node Break points,Printing of data,TRACE,Debugging tools
+@node Break points,Printing of data,tracing of procedures,Debugging tools
 @subsection Break points
 @*A break point can be put into a proc by inserting the command @code{~}.
 If @code{Singular} reaches a break point it asks for lines of commands
 (linelength must be less than 80 characters)
 from the user. It returns to normal execution if given an empty line.
+See @ref{~}.
 @*@strong{Example:}
 @example
   proc t
@@ -2286,7 +2295,16 @@ if an error occurs while loading the library, but the whole block around the
 line specified seems to be correct. In these situations the real error might
 be hundreds of lines earlier in the library.
 
-The following syntax checks will be performed:
+Command line options:
+@table @asis
+@item @code{-d} Debuglevel
+increases the amount of output during parsing, where Debuglevel is an integer
+between 0 and 4. Default is 0.
+@item @code{-s}
+turns on reporting about violations of unenforced syntax rules
+@end table
+
+The following syntax checks will be performed in any case:
 @itemize @bullet
 @item counting of pairs of brackets @{,@} , [,] and (,)
     (number of @{ has to match number of @}, same for [,] and (,) ).
@@ -2296,7 +2314,7 @@ The following syntax checks will be performed:
     ( only LIB, static, proc (with paramaters, help, body and example)
 and comments, i.e // and '/* ... */' are allowed).
 @end itemize
-Its output lists all proc that have been parsed successfully:
+Its output lists all procedures that have been parsed successfully:
 
 @strong{Example:}
 @* $ @code{libparse general.lib}
@@ -2361,3 +2379,4 @@ The error message specifies a missing @} in line 664. But the output of
 libparse shows that the last properly recognized proc was
 @code{binomial} starting at line 86. So the error must be in the next
 proc  @code{factorial}.
+
