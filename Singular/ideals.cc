@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.84 2000-01-27 16:53:46 Singular Exp $ */
+/* $Id: ideals.cc,v 1.85 2000-01-27 18:50:15 siebert Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -74,7 +74,7 @@ void idPrint(ideal id)
 {
   Print("Module of rank %d,real rank %d and %d generators.\n",
          id->rank,idRankFreeModule(id),IDELEMS(id));
-  for (int i=0;i<IDELEMS(id);i++)
+  for (int i=0;i<id->ncols*id->nrows;i++)
   {
     if (id->m[i]!=NULL)
     {
@@ -1757,6 +1757,7 @@ ideal   idLift (ideal mod, ideal submod,ideal * rest, BOOLEAN goodShape,
     *rest = s_rest;
   else
     idDelete(&s_rest);
+idPrint(s_result);
   if (unit!=NULL)
   {
     *unit=mpNew(comps_to_add,comps_to_add);
@@ -1768,7 +1769,7 @@ ideal   idLift (ideal mod, ideal submod,ideal * rest, BOOLEAN goodShape,
       poly q=NULL;
       while(p!=NULL)
       {
-        if(pGetComp(p)<=comps)
+        if(pGetComp(p)<comps)
         {
           pSetComp(p,0);
           if (q!=NULL)
@@ -1777,8 +1778,6 @@ ideal   idLift (ideal mod, ideal submod,ideal * rest, BOOLEAN goodShape,
           }
           else
           {
-	    if(p!=s_result->m[i])
-	      PrintS("wrong q\n"); 
             pIter(s_result->m[i]);
           }
           pNext(p)=NULL;
@@ -1792,6 +1791,7 @@ ideal   idLift (ideal mod, ideal submod,ideal * rest, BOOLEAN goodShape,
           pIter(p);
         }
       }
+      pShift(&s_result->m[i],-comps_to_add);
     }
   }
   return s_result;
