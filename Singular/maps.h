@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.h,v 1.9 2000-12-15 18:49:33 Singular Exp $ */
+/* $Id: maps.h,v 1.10 2002-03-07 18:48:58 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -22,4 +22,5 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w,
 void maFindPerm(char **preim_names, int preim_n, char **preim_par, int preim_p,
                 char **names,       int n,       char **par,       int nop,
                 int * perm, int *par_perm, int ch);
+poly pSubstPoly(poly p, int var, poly image);
 #endif

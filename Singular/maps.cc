@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.38 2002-01-22 09:57:53 Singular Exp $ */
+/* $Id: maps.cc,v 1.39 2002-03-07 18:48:13 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -670,3 +670,28 @@ static poly pMinPolyNormalize(poly p)
   pNext(q) = NULL;
   return rp.next;
 }
+
+poly pSubstPoly(poly p, int var, poly image)
+{
+  map theMap=(map)idMaxIdeal(1);
+  theMap->preimage=NULL;
+  pDelete(&(theMap->m[var-1]));
+  theMap->m[var-1]=pCopy(image);
+  
+  leftv v=(leftv)omAlloc0Bin(sleftv_bin);
+  sleftv tmpW;
+  memset(&tmpW,0,sizeof(sleftv));
+  tmpW.rtyp=POLY_CMD;
+  tmpW.data=p;
+  poly res=NULL;
+  if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,currRing,NULL,NULL,0,nCopy))
+  {
+    WerrorS("map failed");
+    v->data=NULL;
+  }
+  res=(poly)(v->data);
+  idDelete((ideal *)(&theMap));
+  omFreeBin((ADDRESS)v, sleftv_bin);
+  return res;
+}
+
