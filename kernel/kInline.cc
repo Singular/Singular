@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.1.1.1 2003-10-06 12:15:56 Singular Exp $
+ *  Version: $Id: kInline.cc,v 1.2 2004-08-03 17:33:55 Singular Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -14,6 +14,7 @@
 #if !defined(NO_KINLINE) || defined(KUTIL_CC)
 
 #include "p_polys.h"
+#include "polys.h"
 #include "p_Procs.h"
 #include "kbuckets.h"
 #include "omalloc.h"
@@ -306,6 +307,32 @@ KINLINE void sTObject::Mult_nn(number n)
   else
   {
     p = p_Mult_nn(p, n, currRing, tailRing);
+  }
+}
+
+KINLINE void sLObject::Normalize()
+{
+  if (t_p != NULL)
+  { 
+    pNormalize(t_p);
+    if (p != NULL) pSetCoeff0(p, pGetCoeff(t_p));
+  }
+  else
+  {
+    pNormalize(p);
+  }
+}
+
+KINLINE void sLObject::HeadNormalize()
+{
+  if (t_p != NULL)
+  { 
+    nNormalize(pGetCoeff(t_p));
+    if (p != NULL) pSetCoeff0(p, pGetCoeff(t_p));
+  }
+  else
+  {
+    nNormalize(pGetCoeff(p));
   }
 }
 
@@ -941,12 +968,16 @@ KINLINE int ksReducePolyTail(LObject* PR, TObject* PW, LObject* Red)
   number coef;
 
   assume(PR->GetLmCurrRing() != PW->GetLmCurrRing());
+  Red->HeadNormalize();
   ret = ksReducePoly(Red, PW, NULL, &coef);
 
   if (!ret)
   {
     if (! n_IsOne(coef, currRing))
+    {
       PR->Mult_nn(coef);
+      // HANNES: mark for Normalize
+    }
     n_Delete(&coef, currRing);
   }
   return ret;

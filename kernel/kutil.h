@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.1.1.1 2003-10-06 12:15:52 Singular Exp $ */
+/* $Id: kutil.h,v 1.2 2004-08-03 17:33:56 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -212,6 +212,10 @@ public:
   KINLINE TObject* T_2(const skStrategy* strat);
   KINLINE void     T_1_2(const skStrategy* strat,
                          TObject* &T_1, TObject* &T_2);
+
+  // simplify coefficients
+  KINLINE void Normalize();
+  KINLINE void HeadNormalize();
 };
 
 

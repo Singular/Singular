@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.2 2003-12-08 17:31:02 Singular Exp $ */
+/* $Id: kutil.cc,v 1.3 2004-08-03 17:33:56 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2895,6 +2895,7 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT)
     L->last = NULL;
     L->length = 0;
   }
+  L->Normalize(); // HANNES: should have a test
   kTest_L(L);
   return L->GetLmCurrRing();
 }
