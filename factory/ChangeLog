@@ -1,3 +1,9 @@
+Mon Mar 23 17:00:00 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* GNUmakefile.in (ftestm4src): references `$(ftestm4develsrc)'
+	  instead of `$(ftestm4src)' from development `GNUmakefile' to
+	  avoid problems when building distributions
+
 Tue Mar 17 16:57:10 MET 1998  Jens Schmidt
 
 	* int_int.cc, int_int.h, int_poly.cc, int_poly.h, int_intdiv.cc, 
