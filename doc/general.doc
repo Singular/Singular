@@ -1,3 +1,38 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.1.1.1 1998-04-24 11:25:12 Singular Exp $
+@comment $Id: general.doc,v 1.2 1998-04-24 14:20:31 Singular Exp $
 @comment this file contains the general information about Singular
+
+@menu
+* Interactive use::
+* Rings and orderings::
+* The SINGULAR language::
+* Procedures and libraries::
+* Implemented algorithms::
+@end menu
+@c ---------------------------------------------------------------------------
+@node Interactive use, Rings and orderings, General concepts, General concepts
+@section Interactive use
+@cindex Interactive use
+
+@c ---------------------------------------------------------------------------
+@node Rings and orderings, The SINGULAR language, Interactive use, General concepts
+@section Rings and orderings
+@cindex Rings and orderings
+
+@c ---------------------------------------------------------------------------
+@node The SINGULAR language, Procedures and libraries, Rings and orderings, General concepts
+@section The SINGULAR language
+@cindex The SINGULAR language
+
+@c ---------------------------------------------------------------------------
+@node Procedures and libraries, Implemented algorithms, The SINGULAR language, General concepts
+@section Procedures and libraries
+@cindex Procedures and libraries
+@include libraries.tex
+
+@c ---------------------------------------------------------------------------
+@node Implemented algorithms, , Procedures and libraries, General concepts
+@section Implemented algorithms
+@cindex Implemented algorithms
+
+
