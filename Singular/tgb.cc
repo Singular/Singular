@@ -408,7 +408,7 @@ static int add_to_reductors(calc_dat* c, poly h, int len){
   else                     
     pNorm(P.p);
  
- 
+
   c->strat->enterS(P,i,c->strat);
  
  
@@ -902,7 +902,7 @@ static sorted_pair_node** add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c,
   }
 
   add_to_reductors(c, h, c->lengths[c->n-1]);
-  //i=posInS(c->strat,c->strat->sl,h,0 /*ecart*/);
+  //i=posInS(c->strat,c->strat->sl,h,0 ecart);
 
   if (c->lengths[c->n-1]==1)
     shorten_tails(c,c->S->m[c->n-1]);
@@ -1450,8 +1450,39 @@ static void go_on (calc_dat* c){
   omfree(p);
   qsort(buf,i,sizeof(red_object),red_object_better_gen);
 //    Print("\ncurr_deg:%i\n",curr_deg);
-  Print("M[%i, ",i);  
+  Print("M[%i, ",i);
+  c->modifiedS=(BOOLEAN*) omalloc((c->strat->sl+1)*sizeof(BOOLEAN));
+  c->expandS=(poly*) omalloc((1)*sizeof(poly));
+  c->expandS[0]=NULL;
+  int z2;
+  for(z2=0;z2<=c->strat->sl;z2++)
+    c->modifiedS[z2]=FALSE;
   multi_reduction(buf, i, c);
+
+  //resort S
+
+  for(z2=0;z2<=c->strat->sl;z2++)
+    {
+      if (c->modifiedS[z2])
+	{
+	  int qal;
+	  if (c->strat->lenSw)
+	    qal=c->strat->lenSw[z2];
+	  else
+	    qal=c->strat->lenS[z2];
+	  int new_pos=simple_posInS(c->strat,c->strat->S[z2],qal,c->is_char0);
+	  if (new_pos<z2)
+	    { 
+	      move_forward_in_S(z2,new_pos,c->strat,c->is_char0);
+	    }
+	}
+    }
+  for(z2=0;c->expandS[z2];z2++)
+    add_to_reductors(c,c->expandS[z2],pLength(c->expandS[z2]));
+  omfree(c->modifiedS);
+  c->modifiedS=NULL;
+  omfree(c->expandS);
+  c->expandS=NULL;
   Print("%i]",i); 
  //  for(j=0;j<i;j++){
 //     if(buf[j].p==NULL) PrintS("\n ZERO ALERT \n");
@@ -2420,10 +2451,12 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
     }
   else                     
     pNorm(clear_into);
-    if (new_pos<j){
-      move_forward_in_S(j,new_pos,c->strat,c->is_char0);
-      erg.reduce_by=new_pos;
-    }
+    erg.reduce_by=j;
+    //resort later see diploma thesis, find_in_S must be deterministic during multireduction 
+    //   if (new_pos<j){ 
+    //  move_forward_in_S(j,new_pos,c->strat,c->is_char0);
+    // erg.reduce_by=new_pos;
+    //}
   }
 }
 static void multi_reduction_find(red_object* los, int losl,calc_dat* c,int startf,find_erg & erg){
@@ -2642,7 +2675,13 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c)
 //   sort_region_down(los, 0, losl-1, c);
     //  qsort(los,losl,sizeof(red_object),red_object_better_gen);
     if(erg.expand)
-      add_to_reductors(c,erg.expand,erg.expand_length);
+      {
+	int i;
+	for(i=0;c->expandS[i];i++);
+	c->expandS=(poly*) omrealloc(c->expandS,(i+2)*sizeof(poly));
+	c->expandS[i+1]=NULL;
+      }
+      //      add_to_reductors(c,erg.expand,erg.expand_length);
   }
   return;
 }

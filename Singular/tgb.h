@@ -91,9 +91,11 @@ struct calc_dat
   long* short_Exps;
   kStrategy strat;
   int* T_deg;
+  poly* expandS;
   poly* gcd_of_terms;
   int_pair_node* soon_free;
   sorted_pair_node** apairs;
+  BOOLEAN* modifiedS;
 #ifdef HEAD_BIN
   struct omBin_s*   HeadBin;
 #endif
