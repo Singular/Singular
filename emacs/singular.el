@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.14 1998-07-31 08:04:32 wichmann Exp $
+;; $Id: singular.el,v 1.15 1998-07-31 08:18:30 schmidt Exp $
 
 ;;; Commentary:
 
@@ -56,8 +56,9 @@
 ;;{{{ Code common to both modes
 ;;{{{ Debugging stuff
 (defvar singular-debug nil
-  "*List of modes to debug or `all' to debug all modes.
-Currently, only the mode `interactive' is supported.")
+  "*List of modes to debug or t to debug all modes.
+Currently, there are the modes `interactive', `interactive-filter',
+`interactive-simple-secs', and `interactive-sections'.")
 
 (defun singular-debug-format (string)
   "Return STRING in a nicer format."
@@ -157,6 +158,7 @@ on Emacs 19.34, Emacs 20.2, and XEmacs 20.2."))
 This face should have set background only.")
 
 (make-face 'singular-output-face)
+;(set-face-font 'singular-output-face "-adobe-courier-bold-o-*-*-18-*-*-*-*-*-*-*")
 (set-face-background 'singular-output-face "Wheat")
 (defvar singular-output-face 'singular-output-face
   "Face for Singular output.
@@ -325,7 +327,7 @@ May or may not return STRING or a modified copy of it."
   "Remove all superfluous prompts from region between BEG and END.
 More precisely, removes prompts from first beginning of line before
 BEG to END.
-Removes all but the last prompt of a seuqnce if that sequence ends at
+Removes all but the last prompt of a sequence if that sequence ends at
 END.
 The region between BEG and END should be accessible."
   (save-excursion
@@ -804,9 +806,10 @@ Assumes that there is no narrowing in effect."
   (eq (char-after (singular-section-start section)) ?\r))
 
 (defun singular-fold-section (section)
-  "Fold SECTION.
-Folds section at point and goes to beginning of section if called
-interactively."
+  "(Un)fold SECTION.
+(Un)folds section at point and goes to beginning of section if called
+interactively.
+Unfolds folded sections and folds unfolded sections."
   (interactive (list (singular-section-at (point))))
   (let ((start (singular-section-start section))
 	;; we have to save restrictions this way since we change text
@@ -828,7 +831,9 @@ interactively."
     (if (interactive-p) (goto-char (max start (point-min))))))
 ;;}}}
 
-;;{{{ Debugging input and output filters
+;;{{{ Input and output filters
+
+;; debugging filters
 (defun singular-debug-input-filter (string)
   "Echo STRING in mini-buffer."
   (singular-debug 'interactive-filter
@@ -840,6 +845,12 @@ interactively."
   (singular-debug 'interactive-filter
 		  (message "Output filter: %s"
 			   (singular-debug-format string))))
+
+;; stripping prompts
+(defun singular-remove-prompt-filter (&optional string)
+  "Strip prompts from last simple section."
+  (singular-remove-prompt comint-last-output-start
+			  (singular-process-mark)))
 ;;}}}
 
 ;;{{{ Demo mode
@@ -1295,6 +1306,8 @@ NOT READY [much more to come.  See shell.el.]!"
   (singular-debug 'interactive-filter
 		  (add-hook 'comint-output-filter-functions
 			    'singular-debug-output-filter nil t))
+  (add-hook 'comint-output-filter-functions
+	    'singular-remove-prompt-filter nil t)
 
   (run-hooks 'singular-interactive-mode-hook))
 ;;}}}
