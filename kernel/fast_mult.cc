@@ -1,5 +1,6 @@
 #include "fast_mult.h"
 #include "kbuckets.h"
+static const int pass_option=1;
 static void degsplit(poly p,int n,poly &p1,poly&p2){
   poly erg1_i, erg2_i;
   erg1_i=NULL;
@@ -61,52 +62,83 @@ poly do_unifastmult(poly f,poly g){
   
   int pot=n/2;
   assume(pot*2==n);
+
+
+  //splitting
   poly f1=NULL;
-  //f/(x^(pot));
   poly f0=NULL;//f-(x^(pot)*F1);
   degsplit(pCopy(f),pot,f1,f0);
   div_by_x_power_n(f1,pot);
-  // poly G1=g/(x^(pot));
-  //poly G0=g-(x^(pot)*G1);
+
   poly g1=NULL;
   poly g0=NULL;
   degsplit(pCopy(g),pot,g1,g0);
   div_by_x_power_n(g1,pot);
   
+  //p00, p11
   poly p00=unifastmult(f0,g0);
-    poly p11=unifastmult(f1,g1);
-  
-  poly pbig=unifastmult(pAdd(f0,f1),pAdd(g0,g1));
-  
-  poly erg=NULL;//=p11;
- 
+  poly p11=unifastmult(f1,g1);
+
+  //construct erg, factor
+  poly erg=NULL;
   poly factor=pOne();
+
   pSetExp(factor,1,n);
   erg=ppMult_mm(p11,factor);
   erg=pAdd(erg,pCopy(p00));
+
+  
+
+
+  
+  //  if((f1!=NULL) &&(f0!=NULL) &&(g0!=NULL) && (g1!=NULL)){
+  if(true){
+//eat up f0,f1,g0,g1 
+  poly pbig=unifastmult(pAdd(f0,f1),pAdd(g0,g1));
+  
+
  
+  //eat up pbig
   poly sum=pbig;
   pSetExp(factor,1,pot);
- 
+  
+  //eat up p00
   sum=pAdd(sum,pNeg(p00));
  
-
+  //eat up p11
   sum=pAdd(sum,pNeg(p11));
 
- 
+  
   sum=pMult_mm(sum,factor);
- 
+
+
+  //eat up sum
   erg=pAdd(sum,erg);
-  //  erg=pAdd(erg,p00);
+  } else {
+    //eat up f0,f1,g0,g1 
+    poly s1=unifastmult(f0,g1);
+    poly s2=unifastmult(g0,f1);
+    pSetExp(factor,1,pot);
+    poly h=pMult_mm(((s1!=NULL)?s1:s2),factor);
+    pDelete(&f1);
+    pDelete(&f0);
+    pDelete(&g0);
+    pDelete(&g1);
+    erg=pAdd(erg,h);
+  }
+  
  
   pDelete(&factor);
+		  
+		  
+
   return(erg);
 }
 
 poly do_unifastmult_buckets(poly f,poly g){
    
   
-  // BOOLEAN corr=lenS_correct(strat);
+
 
   int n=1;
   if ((f==NULL)||(g==NULL)) return NULL;
@@ -130,28 +162,31 @@ poly do_unifastmult_buckets(poly f,poly g){
   }
   kBucket_pt erg_bucket= kBucketCreate(currRing);
   kBucketInit(erg_bucket,NULL,0 /*pLength(P.p)*/);
-  //poly erg_mult=pOne();
+
   int pot=n/2;
   assume(pot*2==n);
+
+
+  //splitting
   poly f1=NULL;
-  //f/(x^(pot));
   poly f0=NULL;//f-(x^(pot)*F1);
   degsplit(pCopy(f),pot,f1,f0);
   div_by_x_power_n(f1,pot);
-  // poly G1=g/(x^(pot));
-  //poly G0=g-(x^(pot)*G1);
   poly g1=NULL;
   poly g0=NULL;
   degsplit(pCopy(g),pot,g1,g0);
   div_by_x_power_n(g1,pot);
   
+  //p00
+  //p11
   poly p00=unifastmult(f0,g0);
-    poly p11=unifastmult(f1,g1);
+  poly p11=unifastmult(f1,g1);
   
-  poly pbig=unifastmult(pAdd(f0,f1),pAdd(g0,g1));
-  
-  //poly erg=p11;
-  
+
+
+
+  //eat up f0,f1,g0,g1
+  poly pbig=unifastmult(pAdd(f0,f1),pAdd(g0,g1));  
   poly factor=pOne();//pCopy(erg_mult);
   pSetExp(factor,1,n);
   pseudo_len=0;
@@ -159,35 +194,28 @@ poly do_unifastmult_buckets(poly f,poly g){
   pseudo_len=0;
   kBucket_Add_q(erg_bucket,pCopy(p00),&pseudo_len);
   pSetExp(factor,1,pot);
-  //poly sum=pbig;
+
+  //eat up pbig
   pseudo_len=0;
   kBucket_Add_q(erg_bucket,pMult_mm(pbig,factor),&pseudo_len);
   pseudo_len=0;
+  //eat up p00
   kBucket_Add_q(erg_bucket,pMult_mm(pNeg(p00),factor),&pseudo_len);
   pseudo_len=0;
+  //eat up p11
   kBucket_Add_q(erg_bucket,pMult_mm(pNeg(p11),factor),&pseudo_len);
-  //  pSetExp(factor,1,pot);
- 
-  // sum=pAdd(sum,pNeg(p00));
- 
 
-  //sum=pAdd(sum,pNeg(p11));
-
- 
-  //sum=pMult_mm(sum,factor);
  
   pseudo_len=0;
-  //  kBucket_Add_q(erg_bucket,sum,&pseudo_len);
-  //  erg=pAdd(erg,p00);
+
  
   pDelete(&factor);
-  //return(erg);
-  //  pDelete(&erg_mult);
+
   int len=0;
   poly erg=NULL;
   kBucketClear(erg_bucket,&erg,&len);
   kBucketDestroy(&erg_bucket);
-  //pNormalize(P.p);
+
   return erg;
 }
 poly unifastmult(poly f,poly g){
