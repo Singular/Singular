@@ -1,15 +1,15 @@
 // Last change 10.12.2000 (TB)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: rinvar.lib,v 1.5 2000-12-22 14:43:04 greuel Exp $";
+version="$Id: rinvar.lib,v 1.6 2001-01-11 17:13:00 Singular Exp $";
 category="Invariant theory";
 info="
 LIBRARY:  rinvar.lib      Invariant Rings of Reductive Groups
-AUTHOR:   Thomas Bayer,   tbayer@in.tum.de 
+AUTHOR:   Thomas Bayer,   tbayer@in.tum.de
           http://wwwmayr.informatik.tu-muenchen.de/personen/bayert/
           Current Adress: Institut fuer Informatik, TU Muenchen
-OVERVIEW: 
- Implementation based on Derksen's algorithm. Written in the frame of the 
- diploma thesis (advisor: Prof. Gert-Martin Greuel) 'Computations of moduli 
+OVERVIEW:
+ Implementation based on Derksen's algorithm. Written in the frame of the
+ diploma thesis (advisor: Prof. Gert-Martin Greuel) 'Computations of moduli
  spaces of semiquasihomogenous singularities and an implementation in Singular'
 
 PROCEDURES:
@@ -29,7 +29,7 @@ PROCEDURES:
  SimplifyIdeal(I[,m,s]);        simplify the ideal I (try to reduce variables)
  TransferIdeal(R,name,nA);      transfer the ideal 'name' from R to basering
 
-SEE ALSO: qhmoduli.lib, zeroset.lib
+SEE ALSO: qhmoduli_lib, zeroset_lib
 ";
 
 LIB "presolve.lib";

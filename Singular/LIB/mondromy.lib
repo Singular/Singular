@@ -1,15 +1,15 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: mondromy.lib,v 1.19 2000-12-22 15:30:39 greuel Exp $";
+version="$Id: mondromy.lib,v 1.20 2001-01-11 17:12:59 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  mondromy.lib  Monodromy of an Isolated Hypersurface Singularity
 AUTHOR:   Mathias Schulze, email: mschulze@mathematik.uni-kl.de
 
-OVERVIEW: 
- A library to compute the monodromy of an isolated hypersurface singularity. 
- It uses an algorithm by Brieskorn (manuscripta math. 2 (1970), 103-161) to 
- compute a connection matrix of the meromorphic Gauss-Manin connection up to 
- arbitrarily high order, and an algorithm of Gerard and Levelt (Ann. Inst. 
+OVERVIEW:
+ A library to compute the monodromy of an isolated hypersurface singularity.
+ It uses an algorithm by Brieskorn (manuscripta math. 2 (1970), 103-161) to
+ compute a connection matrix of the meromorphic Gauss-Manin connection up to
+ arbitrarily high order, and an algorithm of Gerard and Levelt (Ann. Inst.
  Fourier, Grenoble 23,1 (1973), pp. 157-195) to transform it to a simple pole.
 
 PROCEDURES:
@@ -22,7 +22,7 @@ PROCEDURES:
 KEYWORDS: Monodromy, hypersurface singularity, Gauss-Manin connection,
           Brieskorn lattice
 
-SEE ALSO: gaussman.lib
+SEE ALSO: gaussman_lib
 ";
 
 LIB "ring.lib";
@@ -178,7 +178,7 @@ EXAMPLE: example invunit; shows an example.
       ui=jet(ui*u,n);
       v=v+ui;
     }
-    v=jet(v,n)/u0;    
+    v=jet(v,n)/u0;
     dbprint(printlevel-voice+2,"//...inverse computed ["+string(timer-t)+
       " secs, "+string((memory(1)+1023)/1024)+" K]");
     return(v);

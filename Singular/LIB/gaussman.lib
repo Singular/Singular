@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.24 2001-01-10 17:42:26 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.25 2001-01-11 17:12:58 Singular Exp $";
 category="Singularities";
 
 info="
@@ -17,7 +17,7 @@ PROCEDURES:
  gamma(...);            Hertling's gamma invariant
  gamma4(...);           Hertling's gamma4 invariant
 
-SEE ALSO: mondromy.lib, spectrum.lib, jordan.lib
+SEE ALSO: mondromy_lib, spectrum_lib, jordan_lib
 
 KEYWORDS: singularities; Gauss-Manin connection; monodromy; spectrum;
           Brieskorn lattice; Hodge filtration; V-filtration;
@@ -249,7 +249,7 @@ EXAMPLE:  example monodromy; shows an example
         ideal e=l[1];
         intvec b;
         for(i=ncols(e);i>=1;i--)
-	{
+        {
           b[i]=sum(l[2][i]);
         }
         dbprint(printlevel-voice+2,"//gaussman::monodromy: e="+string(e));
@@ -773,7 +773,7 @@ RETURN:
            intvec l[2]:
              int l[2][i]: multiplicity of spectral number l[1][i]
            list l[3]:
-             module l[3][i]: vector space basis of the l[1][i]-th graded part 
+             module l[3][i]: vector space basis of the l[1][i]-th graded part
                              of the V-filtration on the Jacobian algebra
                              in terms of l[4]
            ideal l[4]: monomial vector space basis of the Jacobian algebra

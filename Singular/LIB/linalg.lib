@@ -1,21 +1,21 @@
-//GMG last modified: 04/25/2000 
+//GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.9 2001-01-07 02:06:39 greuel Exp $";
+version="$Id: linalg.lib,v 1.10 2001-01-11 17:12:59 Singular Exp $";
 category="Linear Algebra";
 info="
-LIBRARY:  linalg.lib	Algorithmic Linear Algebra
+LIBRARY:  linalg.lib        Algorithmic Linear Algebra
 AUTHORS:  Ivor Saynisch (ivs@math.tu-cottbus.de)
 @*        Mathias Schulze (mschulze@mathematik.uni-kl.de)
 
 PROCEDURES:
- inverse(A);	    matrix, the inverse of A
+ inverse(A);            matrix, the inverse of A
  inverse_B(A);      list(matrix Inv,poly p),Inv*A=p*En ( using busadj(A) )
  inverse_L(A);      list(matrix Inv,poly p),Inv*A=p*En ( using lift )
  sym_gauss(A);      symmetric gaussian algorithm
  orthogonalize(A);  Gram-Schmidt orthogonalization
  diag_test(A);      test whether A can be diagnolized
  busadj(A);         coefficients of Adj(E*t-A) and coefficients of det(E*t-A)
- charpoly(A,v);     characteristic polynomial of A ( using busadj(A) ) 
+ charpoly(A,v);     characteristic polynomial of A ( using busadj(A) )
  adjoint(A);        adjoint of A ( using busadj(A) )
  det_B(A);          determinant of A ( using busadj(A) )
  gaussred(A);       gaussian reduction: P*A=U*S, S a row reduced form of A
@@ -60,7 +60,7 @@ static proc const_mat(matrix A)
   }
   kill @R;
   setring BR;
-  return(1);  
+  return(1);
 }
 //////////////////////////////////////////////////////////////////////////////
 static proc red(matrix A,int i,int j)
@@ -69,22 +69,22 @@ static proc red(matrix A,int i,int j)
           reduces row j with respect to A[i,i] and row i
 RETURN:   matrix
 "
-{	
+{
   module m=module(A);
-  
+
   if(A[i,i]==0){
     m[i]=m[i]+m[j];
     m=module(transpose(matrix(m)));
     m[i]=m[i]+m[j];
     m=module(transpose(matrix(m)));
   }
-  
+
   A=matrix(m);
   m[j]=m[j]-(A[i,j]/A[i,i])*m[i];
   m=module(transpose(matrix(m)));
   m[j]=m[j]-(A[i,j]/A[i,i])*m[i];
   m=module(transpose(matrix(m)));
-  
+
   return(matrix(m));
 }
 
@@ -93,7 +93,7 @@ proc inner_product(vector v1,vector v2)
 "RETURN:   inner product <v1,v2> "
 {
   int k;
-  if (nrows(v2)>nrows(v1)) { k=nrows(v2); } else { k=nrows(v1); } 
+  if (nrows(v2)>nrows(v1)) { k=nrows(v2); } else { k=nrows(v1); }
   return ((transpose(matrix(v1,k,1))*matrix(v2,k,1))[1,1]);
 }
 
@@ -103,16 +103,16 @@ proc inner_product(vector v1,vector v2)
 
 proc inverse(matrix A, list #)
 "USAGE:    inverse(A [,opt]);  A a square matrix, opt integer
-RETURN:  
-@format   
+RETURN:
+@format
           a matrix:
           - the inverse matrix of A, if A is invertible;
           - the 1x1 0-matrix if A is not invertible (in the polynomial ring!).
           There are the following options:
-          - opt=0 or not given: heuristically best option from below 
+          - opt=0 or not given: heuristically best option from below
           - opt=1 : apply std to (transpose(E,A)), ordering (C,dp).
           - opt=2 : apply interred (transpose(E,A)), ordering (C,dp).
-          - opt=3 : apply lift(A,E), ordering (C,dp). 
+          - opt=3 : apply lift(A,E), ordering (C,dp).
 @end format
 NOTE:     parameters and minpoly are allowed; opt=2 is only correct for
           matrices with entries in a field
@@ -122,7 +122,7 @@ EXAMPLE:  example inverse; shows an example
 {
 //--------------------------- initialization and check ------------------------
    int ii,u,i,opt;
-   matrix invA;                     
+   matrix invA;
    int db = printlevel-voice+3;      //used for comments
    def R=basering;
    string mp = string(minpoly);
@@ -148,7 +148,7 @@ EXAMPLE:  example inverse; shows an example
          if( size(ideal(A-jet(A,0))) == 0 )   //constant matrix
          {opt = 1;}
          else
-         {opt = 1;}                          
+         {opt = 1;}
       }
       else {opt = 1;}
    }
@@ -176,7 +176,7 @@ EXAMPLE:  example inverse; shows an example
 //-------------- opt = 1 resp. opt = 2: use std resp. interred --------------
    if( opt==1 or opt==2 )
    {
-      option(redSB);  
+      option(redSB);
       module B = freemodule(n),M;
       if(opt == 2)
       {
@@ -185,14 +185,14 @@ EXAMPLE:  example inverse; shows an example
       }
       if(opt == 1)
       {
-         module D = std(transpose(B)); 
+         module D = std(transpose(B));
          D = transpose(simplify(D,1));
       }
       module D2 = D[1..n];
       module D1 = D[n+1..2*n];
 //----------------------- check if matrix is invertible ----------------------
-      for (ii=1; ii<=n; ii++) 
-      {  
+      for (ii=1; ii<=n; ii++)
+      {
          if ( D1[ii] != gen(ii) )
          {
             dbprint(db,"// ** matrix is not invertible");
@@ -224,8 +224,8 @@ example
    0,4,17;
   print(inverse(A));"";
   matrix B[3][3]=
-   y+1,  x+y,    y,   
-   z,    z+1,    z,   
+   y+1,  x+y,    y,
+   z,    z+1,    z,
    y+z+2,x+y+z+2,y+z+1;
   print(inverse(B));
   print(B*inverse(B));
@@ -243,14 +243,14 @@ EXAMPLE:  example sym_gauss; shows an example"
   if (ncols(A)!=n){
     "// ** input is not a square matrix";;
     return(A);
-  } 
-  
+  }
+
   if(!const_mat(A)){
     "// ** input is not a constant matrix";
     return(A);
   }
-  
-  if(deg(std(A-transpose(A))[1])!=-1){ 
+
+  if(deg(std(A-transpose(A))[1])!=-1){
     "// ** input is not a symmetric matrix";
     return(A);
   }
@@ -260,7 +260,7 @@ EXAMPLE:  example sym_gauss; shows an example"
       if(A[i,j]!=0){ A=red(A,i,j); }
     }
   }
-  
+
   return(A);
 }
 example
@@ -272,7 +272,7 @@ example
 }
 
 //////////////////////////////////////////////////////////////////////////////
-proc orthogonalize(matrix A) 
+proc orthogonalize(matrix A)
 "USAGE:    orthogonalize(A); A = constant matrix
 RETURN:    matrix, orthogonal basis of the colum space of A
 EXAMPLE:   example orthogonalize; shows an example "
@@ -285,10 +285,10 @@ EXAMPLE:   example orthogonalize; shows an example "
     "// ** input is not a constant matrix";
     matrix B;
     return(B);
-  }  
+  }
 
   module B=module(interred(A));
-  
+
   for(i=1;i<=n;i=i+1) {
     for(j=1;j<i;j=j+1) {
       k=inner_product(B[j],B[j]);
@@ -296,7 +296,7 @@ EXAMPLE:   example orthogonalize; shows an example "
       B[i]=B[i]-(inner_product(B[i],B[j])/k)*B[j];
     }
   }
-  
+
   return(matrix(B));
 }
 example
@@ -309,7 +309,7 @@ example
 
 ////////////////////////////////////////////////////////////////////////////
 proc diag_test(matrix A)
-"USAGE:	  diag_test(A); A = const square matrix
+"USAGE:          diag_test(A); A = const square matrix
 RETURN:   int,  1 if A is diagonalisable, 0 if not
                -1 no statement is possible, since A does not split.
 NOTE:     The test works only for split matrices, i.e if eigenvalues of A
@@ -318,50 +318,50 @@ NOTE:     The test works only for split matrices, i.e if eigenvalues of A
 EXAMPLE:  example diag_test; shows an example"
 {
   int i,j;
-  int n     = nrows(A);	
+  int n     = nrows(A);
   string mp = string(minpoly);
   string cs = charstr(basering);
   int np=0;
 
-  if(ncols(A) != n) { 
+  if(ncols(A) != n) {
     "// input is not a square matrix";
     return(-1);
-  }		
+  }
 
    if(!const_mat(A)){
     "// input is not a constant matrix";
     return(-1);
-  }  
+  }
 
   //Parameterring wegen factorize nicht erlaubt
   for(i=1;i<size(cs);i=i+1){
     if(cs[i]==","){np=np+1;} //Anzahl der Parameter
   }
   if(np>0){
-	"// rings with parameters not allowed";
-	return(-1);
+        "// rings with parameters not allowed";
+        return(-1);
   }
 
-  //speichern des aktuellen Rings  
+  //speichern des aktuellen Rings
   def BR=basering;
   //setze R[t]
   execute("ring rt=("+charstr(basering)+"),(@t,"+varstr(basering)+"),lp;");
   execute("minpoly="+mp+";");
-  matrix A=imap(BR,A);	
+  matrix A=imap(BR,A);
 
   intvec z;
   intvec s;
-  poly X;         //characteristisches Polynom 
+  poly X;         //characteristisches Polynom
   poly dXdt;      //Ableitung von X nach t
-  ideal g;	      //ggT(X,dXdt)
-  poly b;	      //Komponente der Busadjunkten-Matrix
+  ideal g;              //ggT(X,dXdt)
+  poly b;              //Komponente der Busadjunkten-Matrix
   matrix E[n][n]; //Einheitsmatrix
-	
+
   E=E+1;
   A=E*@t-A;
   X=det(A);
 
-  matrix Xfactors=matrix(factorize(X,1));	//zerfaellt die Matrtix ?
+  matrix Xfactors=matrix(factorize(X,1));        //zerfaellt die Matrtix ?
   int nf=ncols(Xfactors);
 
   for(i=1;i<=nf;i++){
@@ -370,30 +370,30 @@ EXAMPLE:  example diag_test; shows an example"
       setring BR;
       return(-1);
     }
-  }	
+  }
 
   dXdt=diff(X,@t);
   g=std(ideal(gcd(X,dXdt)));
 
   //Busadjunkte
-  z=2..n;	
+  z=2..n;
   for(i=1;i<=n;i++){
-    s=2..n;  
+    s=2..n;
     for(j=1;j<=n;j++){
       b=det(submat(A,z,s));
-    
+
       if(0!=reduce(b,g)){
-	//" matrix not diagonalizable";
-	setring BR;
-	return(0);
+        //" matrix not diagonalizable";
+        setring BR;
+        return(0);
       }
-      
+
       s[j]=j;
     }
     z[i]=i;
   }
-  
-  //"Die Matrix ist diagonalisierbar";  	
+
+  //"Die Matrix ist diagonalisierbar";
   setring BR;
   return(1);
 }
@@ -409,13 +409,13 @@ example
 proc busadj(matrix A)
 "USAGE:   busadj(A);  A = square matrix (of size nxn)
 RETURN:  list L:
-@format 
-         L[1] contains the (n+1) coefficients of the characteristic 
+@format
+         L[1] contains the (n+1) coefficients of the characteristic
               polynomial X of A, i.e.
               X = L[1][1]+..+L[1][k]*t^(k-1)+..+(L[1][n+1])*t^n
          L[2] contains the n (nxn)-matrices Hk which are the coefficients of
               the busadjoint bA = adjoint(E*t-A) of A, i.e.
-              bA = (Hn-1)*t^(n-1)+...+Hk*t^k+...+H0,  ( Hk=L[2][k+1] ) 
+              bA = (Hn-1)*t^(n-1)+...+Hk*t^k+...+H0,  ( Hk=L[2][k+1] )
 @end format
 EXAMPLE: example busadj; shows an example"
 {
@@ -427,10 +427,10 @@ EXAMPLE: example busadj; shows an example"
   list bA, X, L;
   poly a;
 
-  if(ncols(A) != n) { 
+  if(ncols(A) != n) {
     "input is not a square matrix";
     return(L);
-  }	
+  }
 
   bA   = E;
   X[1] = 1;
@@ -456,15 +456,15 @@ example
   print(A);
   list L = busadj(A);
   poly X = L[1][1]+L[1][2]*t+L[1][3]*t2; X;
-  matrix bA[2][2] = L[2][1]+L[2][2]*t; 
+  matrix bA[2][2] = L[2][1]+L[2][2]*t;
   print(bA);               //the busadjoint of A;
-  print(bA*(t*unitmat(2)-A));  
+  print(bA*(t*unitmat(2)-A));
 }
 
 //////////////////////////////////////////////////////////////////////////////
 proc charpoly(matrix A, list #)
 "USAGE:   charpoly(A[,v]); A square matrix, v string, name of a variable
-RETURN:  poly, the characteristic polynomial det(E*v-A) 
+RETURN:  poly, the characteristic polynomial det(E*v-A)
          (default: v=name of last variable)
 NOTE:    A must be independent of the variable v. The computation uses det.
          If printlevel>0, det(E*v-A) is diplayed recursively.
@@ -476,20 +476,20 @@ EXAMPLE: example charpoly; shows an example"
   string v;
   poly X;
   if(ncols(A) != n)
-  { 	
+  {
     "// input is not a square matrix";
     return(X);
-  }	
+  }
   //---------------------- test for correct variable -------------------------
-  if( size(#)==0 ){ 
-    #[1] = varstr(z); 
+  if( size(#)==0 ){
+    #[1] = varstr(z);
   }
   if( typeof(#[1]) == "string") { v = #[1]; }
   else
   {
     "// 2nd argument must be a name of a variable not contained in the matrix";
     return(X);
-  }  
+  }
   j=-1;
   for(i=1; i<=z; i++)
   {
@@ -535,14 +535,14 @@ EXAMPLE: example charpoly_B; shows an example"
   def BR    = basering;
   string mp = string(minpoly);
 
-  if(ncols(A) != n){ 	
+  if(ncols(A) != n){
     "// input is not a square matrix";
     return(X);
-  }	
+  }
 
   //test for correct variable
-  if( size(#)==0 ){ 
-    #[1] = varstr(nvars(BR)); 
+  if( size(#)==0 ){
+    #[1] = varstr(nvars(BR));
   }
   if( typeof(#[1]) == "string"){
      v = #[1];
@@ -550,8 +550,8 @@ EXAMPLE: example charpoly_B; shows an example"
   else{
     "// 2nd argument must be a name of a variable not contained in the matrix";
     return(X);
-  }  
-       
+  }
+
   j=-1;
   for(i=1; i<=nvars(BR); i++){
     if(varstr(i)==v){j=i;}
@@ -560,7 +560,7 @@ EXAMPLE: example charpoly_B; shows an example"
     "// "+v+" is not a variable in the basering";
     return(X);
   }
-  
+
   //var can not be in A
   s="Wp(";
   for( i=1; i<=nvars(BR); i++ ){
@@ -589,8 +589,8 @@ EXAMPLE: example charpoly_B; shows an example"
   for(i=1; i<=n+1; i++){
     execute("X=X+L[1][i]*"+v+"^"+string(i-1)+";");
   }
-  
-  return(X); 
+
+  return(X);
 }
 example
 { "EXAMPLE"; echo=2;
@@ -611,15 +611,15 @@ EXAMPLE:  example adjoint; shows an example"
   matrix Adj[n][n];
   list L;
 
-  if(ncols(A) != n) { 	
+  if(ncols(A) != n) {
     "// input is not a square matrix";
     return(Adj);
-  }	
-  
+  }
+
   L  = busadj(A);
   Adj= (-1)^(n-1)*L[2][1];
   return(Adj);
-  
+
 }
 example
 { "EXAMPLE"; echo=2;
@@ -635,9 +635,9 @@ example
 proc inverse_B(matrix A)
 "USAGE:    inverse_B(A);  A = square matrix
 RETURN:   list Inv with
-          - Inv[1] = matrix I and 
-          - Inv[2] = poly p 
-          such that I*A = unitmat(n)*p; 
+          - Inv[1] = matrix I and
+          - Inv[2] = poly p
+          such that I*A = unitmat(n)*p;
 NOTE:     p=1 if 1/det(A) is computable and  p=det(A) if not;
           the computation uses busadj.
 SEE ALSO: inverse, inverse_L
@@ -649,17 +649,17 @@ EXAMPLE:  example inverse_B; shows an example"
   poly factor;
   list L;
   list Inv;
-  
-  if(ncols(A) != n) { 	
+
+  if(ncols(A) != n) {
     "input is not a square matrix";
     return(I);
-  }	
-  
-  L=busadj(A);
-  I=module(-L[2][1]);        //+-Adj(A)   
+  }
 
-  if(reduce(1,std(L[1][1]))==0){ 
-    I=I*lift(L[1][1],1)[1][1];      
+  L=busadj(A);
+  I=module(-L[2][1]);        //+-Adj(A)
+
+  if(reduce(1,std(L[1][1]))==0){
+    I=I*lift(L[1][1],1)[1][1];
     factor=1;
   }
   else{ factor=L[1][1];}     //=+-det(A) or 1
@@ -681,12 +681,12 @@ example
 
 //////////////////////////////////////////////////////////////////////////////
 proc det_B(matrix A)
-"USAGE:     det_B(A);  A any matrix  
+"USAGE:     det_B(A);  A any matrix
 RETURN:    returns the determinant of A
 NOTE:      the computation uses the busadj algorithm
 EXAMPLE:   example det_B; shows an example"
 {
-  int n=nrows(A); 
+  int n=nrows(A);
   list L;
 
   if(ncols(A) != n){ return(0);}
@@ -695,23 +695,23 @@ EXAMPLE:   example det_B; shows an example"
   return((-1)^n*L[1][1]);
 }
 example
-{ "EXAMPLE"; echo=2; 
+{ "EXAMPLE"; echo=2;
   ring r=0,(x),dp;
   matrix A[10][10]=random(2,10,10)+unitmat(10)*x;
   print(A);
-  det_B(A); 
+  det_B(A);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 proc inverse_L(matrix A)
 "USAGE:     inverse_L(A);  A = square matrix
 RETURN:    list Inv representing a left inverse of A, i.e
-           - Inv[1] = matrix I and 
+           - Inv[1] = matrix I and
            - Inv[2] = poly p
-           such that I*A = unitmat(n)*p; 
+           such that I*A = unitmat(n)*p;
 NOTE:      p=1 if 1/det(A) is computable and p=det(A) if not;
            the computation computes first det(A) and then uses lift
-SEE ALSO:  inverse, inverse_B_
+SEE ALSO:  inverse, inverse_B
 EXAMPLE:   example inverse_L; shows an example"
 {
   int n=nrows(A);
@@ -734,9 +734,9 @@ EXAMPLE:   example inverse_L; shows an example"
 
   // test if 1/det(A) exists
   if(reduce(1,std(d))!=0){ E=E*d;}
-  
+
   I=lift(A,E);
-  if(I==unitmat(n)-unitmat(n)){ //catch error in lift 
+  if(I==unitmat(n)-unitmat(n)){ //catch error in lift
     "// matrix is not invertible";
     return(Inv);
   }
@@ -744,7 +744,7 @@ EXAMPLE:   example inverse_L; shows an example"
   factor=d;      //=det(A) or 1
   Inv=insert(Inv,factor);
   Inv=insert(Inv,I);
-  
+
   return(Inv);
 }
 example
@@ -760,13 +760,13 @@ example
 
 //////////////////////////////////////////////////////////////////////////////
 proc gaussred(matrix A)
-"USAGE:   gaussred(A);   A any constant matrix 
+"USAGE:   gaussred(A);   A any constant matrix
 RETURN:  list Z:  Z[1]=P , Z[2]=U , Z[3]=S , Z[4]=rank(A)
          gives a row reduced matrix S, a permutation matrix P and a
-         normalized lower triangular matrix U, with P*A=U*S   
+         normalized lower triangular matrix U, with P*A=U*S
 NOTE:    This procedure is designed for teaching purposes mainly.
-         The straight forward implementation in the interpreted library 
-         is not very efficient (no standard basis computation).         
+         The straight forward implementation in the interpreted library
+         is not very efficient (no standard basis computation).
 EXAMPLE: example gaussred; shows an example"
 {
   int i,j,l,k,jp,rang;
@@ -786,54 +786,54 @@ EXAMPLE: example gaussred; shows an example"
   if(n>m){mr=m;} //max. rang
 
   for(i=1;i<=mr;i=i+1){
-    if((i+k)>m){break}; 
-    
+    if((i+k)>m){break};
+
     //Test: Diagonalelement=0
     if(A[i,i+k]==0){
       jp=i;pivo=0;
       for(j=i+1;j<=n;j=j+1){
-	c=abs(A[j,i+k]);
-	if(pivo<c){ pivo=c;jp=j;}
+        c=abs(A[j,i+k]);
+        if(pivo<c){ pivo=c;jp=j;}
       }
       if(jp != i){       //Zeilentausch
-	for(j=1;j<=m;j=j+1){ //Zeilentausch in A (und U) (i-te mit jp-ter)
-	  c=A[i,j];         
-	  A[i,j]=A[jp,j];
-	  A[jp,j]=c;
-	}
-	for(j=1;j<=n;j=j+1){ //Zeilentausch in P
-	  c=P[i,j];        
-	  P[i,j]=P[jp,j];
-	  P[jp,j]=c;  
-	}
+        for(j=1;j<=m;j=j+1){ //Zeilentausch in A (und U) (i-te mit jp-ter)
+          c=A[i,j];
+          A[i,j]=A[jp,j];
+          A[jp,j]=c;
+        }
+        for(j=1;j<=n;j=j+1){ //Zeilentausch in P
+          c=P[i,j];
+          P[i,j]=P[jp,j];
+          P[jp,j]=c;
+        }
       }
       if(pivo==0){k++;continue;} //eine von selbst auftauchende Stufe !
     }                          //i sollte im naechsten Lauf nicht erhoeht sein
-    
-    //Eliminationsschritt   
-    for(j=i+1;j<=n;j=j+1){ 
+
+    //Eliminationsschritt
+    for(j=i+1;j<=n;j=j+1){
       c=A[j,i+k]/A[i,i+k];
       for(l=i+k+1;l<=m;l=l+1){
-	A[j,l]=A[j,l]-A[i,l]*c;
+        A[j,l]=A[j,l]-A[i,l]*c;
       }
       A[j,i+k]=0;  // nur wichtig falls k>0 ist
       A[j,i]=c;    // bildet U
     }
-  rang=i;    
+  rang=i;
   }
- 
+
   for(i=1;i<=mr;i=i+1){
     for(j=i+1;j<=n;j=j+1){
       U[j,i]=A[j,i];
       A[j,i]=0;
     }
   }
-  
+
   Z=insert(Z,rang);
   Z=insert(Z,A);
   Z=insert(Z,U);
   Z=insert(Z,P);
-  
+
   return(Z);
 }
 example
@@ -856,7 +856,7 @@ proc gaussred_pivot(matrix A)
 RETURN:    list Z:  Z[1]=P , Z[2]=U , Z[3]=S , Z[4]=rank(A)
            gives n row reduced matrix S, a permutation matrix P and a
            normalized lower triangular matrix U, with P*A=U*S
-NOTE:      with row pivoting            
+NOTE:      with row pivoting
 EXAMPLE:   example gaussred_pivot; shows an example"
 {
   int i,j,l,k,jp,rang;
@@ -876,8 +876,8 @@ EXAMPLE:   example gaussred_pivot; shows an example"
   if(n>m){mr=m;} //max. rang
 
   for(i=1;i<=mr;i=i+1){
-    if((i+k)>m){break}; 
-    
+    if((i+k)>m){break};
+
     //Pivotisierung
     pivo=abs(A[i,i+k]);jp=i;
     for(j=i+1;j<=n;j=j+1){
@@ -886,42 +886,42 @@ EXAMPLE:   example gaussred_pivot; shows an example"
     }
     if(jp != i){ //Zeilentausch
       for(j=1;j<=m;j=j+1){ //Zeilentausch in A (und U) (i-te mit jp-ter)
-	c=A[i,j];         
-	A[i,j]=A[jp,j];
-	A[jp,j]=c;
+        c=A[i,j];
+        A[i,j]=A[jp,j];
+        A[jp,j]=c;
       }
       for(j=1;j<=n;j=j+1){ //Zeilentausch in P
-	c=P[i,j];        
-	P[i,j]=P[jp,j];
-	P[jp,j]=c;  
+        c=P[i,j];
+        P[i,j]=P[jp,j];
+        P[jp,j]=c;
       }
     }
     if(pivo==0){k++;continue;} //eine von selbst auftauchende Stufe !
                                //i sollte im naechsten Lauf nicht erhoeht sein
-    //Eliminationsschritt   
-    for(j=i+1;j<=n;j=j+1){ 
+    //Eliminationsschritt
+    for(j=i+1;j<=n;j=j+1){
       c=A[j,i+k]/A[i,i+k];
       for(l=i+k+1;l<=m;l=l+1){
-	A[j,l]=A[j,l]-A[i,l]*c;
+        A[j,l]=A[j,l]-A[i,l]*c;
       }
       A[j,i+k]=0;  // nur wichtig falls k>0 ist
       A[j,i]=c;    // bildet U
     }
-  rang=i;    
+  rang=i;
   }
- 
+
   for(i=1;i<=mr;i=i+1){
     for(j=i+1;j<=n;j=j+1){
       U[j,i]=A[j,i];
       A[j,i]=0;
     }
   }
-  
+
   Z=insert(Z,rang);
   Z=insert(Z,A);
   Z=insert(Z,U);
   Z=insert(Z,P);
-  
+
   return(Z);
 }
 example
@@ -965,7 +965,7 @@ example
 //////////////////////////////////////////////////////////////////////////////
 proc mat_rk(matrix A)
 "USAGE:    mat_rk(A); A any constant matrix
-RETURN:   int, rank of A 
+RETURN:   int, rank of A
 EXAMPLE:  example mat_rk; shows an example"
 {
   list Z;
@@ -987,9 +987,9 @@ example
 proc U_D_O(matrix A)
 "USAGE:     U_D_O(A);   constant invertible matrix A
 RETURN:    list Z:  Z[1]=P , Z[2]=U , Z[3]=D , Z[4]=O
-           gives a permutation matrix P, 
+           gives a permutation matrix P,
            a normalized lower triangular matrix U ,
-           a diagonal matrix D, and 
+           a diagonal matrix D, and
            a normalized upper triangular matrix O
            with P*A=U*D*O
 NOTE:      Z[1]=-1 means that A is not regular (proc uses gaussred)
@@ -1009,12 +1009,12 @@ EXAMPLE:   example U_D_O; shows an example"
     "// input is not a constant matrix";
     return(Z);
   }
-  
+
   L=gaussred(A);
 
   if(L[4]!=n){
     "// input is not an invertible matrix";
-    Z=insert(Z,-1);  //hint for calling procedures 
+    Z=insert(Z,-1);  //hint for calling procedures
     return(Z);
   }
 
@@ -1036,12 +1036,12 @@ EXAMPLE:   example U_D_O; shows an example"
 example
 { "EXAMPLE";echo=2;
   ring r = 0,(x),dp;
-  matrix A[5][5] = 10, 4,  0, -9,  8, 
-                   -3, 6, -6, -4,  9, 
+  matrix A[5][5] = 10, 4,  0, -9,  8,
+                   -3, 6, -6, -4,  9,
                     0, 3, -1, -9, -8,
                    -4,-2, -6, -10,10,
                    -9, 5, -1, -6,  5;
-  list Z = U_D_O(A);              //construct P,U,D,O s.t. P*A=U*D*O 
+  list Z = U_D_O(A);              //construct P,U,D,O s.t. P*A=U*D*O
   print(Z[1]);                    //P
   print(Z[2]);                    //U
   print(Z[3]);                    //D
@@ -1052,11 +1052,11 @@ example
 
 //////////////////////////////////////////////////////////////////////////////
 proc pos_def(matrix A)
-"USAGE:     pos_def(A); A = constant, symmetric square matrix       
-RETURN:    int: 
-           1  if A is positive definit , 
-           0  if not, 
-           -1 if unknown 
+"USAGE:     pos_def(A); A = constant, symmetric square matrix
+RETURN:    int:
+           1  if A is positive definit ,
+           0  if not,
+           -1 if unknown
 EXAMPLE:   example pos_def; shows an example"
 {
   int j;
@@ -1071,12 +1071,12 @@ EXAMPLE:   example pos_def; shows an example"
   if(!const_mat(A)){
     "// input is not a constant matrix";
     return(-1);
-  }	
-  if(deg(std(A-transpose(A))[1])!=-1){ 
+  }
+  if(deg(std(A-transpose(A))[1])!=-1){
     "// input is not a hermitian (symmetric) matrix";
     return(-1);
   }
-  
+
   Z=U_D_O(A);
 
   if(Z[1]==-1){
@@ -1084,15 +1084,15 @@ EXAMPLE:   example pos_def; shows an example"
   }  //A not regular, therefore not pos. definit
 
   H=Z[1];
-  //es fand Zeilentausch statt: also nicht positiv definit 
+  //es fand Zeilentausch statt: also nicht positiv definit
   if(deg(std(H-unitmat(n))[1])!=-1){
     return(0);
   }
-  
+
   H=Z[3];
-  
+
   for(j=1;j<=n;j=j+1){
-    if(H[j,j]<=0){ 
+    if(H[j,j]<=0){
       return(0);
     } //eigenvalue<=0, not pos.definit
   }
@@ -1104,8 +1104,8 @@ example
   ring r = 0,(x),dp;
   matrix A[5][5] = 20,  4,  0, -9,   8,
                     4, 12, -6, -4,   9,
-                    0, -6, -2, -9,  -8, 
-                   -9, -4, -9, -20, 10, 
+                    0, -6, -2, -9,  -8,
+                   -9, -4, -9, -20, 10,
                     8,  9, -8,  10, 10;
   pos_def(A);
   matrix B[3][3] =  3,  2,  0,
@@ -1117,7 +1117,7 @@ example
 //////////////////////////////////////////////////////////////////////////////
 proc linsolve(matrix A, matrix b)
 "USAGE:     linsolve(A,b); A a constant nxm-matrix, b a constant nx1-matrix
-RETURN:    a 1xm matrix X, solution of inhomogeneous linear system A*X = b 
+RETURN:    a 1xm matrix X, solution of inhomogeneous linear system A*X = b
            return the 0-matrix if system is not solvable
 NOTE:      uses gaussred
 EXAMPLE:   example linsolve; shows an example"
@@ -1130,7 +1130,7 @@ EXAMPLE:   example linsolve; shows an example"
   int n_b= nrows(b);
   matrix Ab[n][m+1];
   matrix X[m][1];
-  	
+
   if(ncols(b)!=1){
     "// right hand side b is not a nx1 matrix";
     return(X);
@@ -1139,29 +1139,29 @@ EXAMPLE:   example linsolve; shows an example"
   if(!const_mat(A)){
     "// input hand is not a constant matrix";
     return(X);
-  }	
-  
+  }
+
   if(n_b>n){
     for(i=n; i<=n_b; i++){
       if(b[i,1]!=0){
-	"// right hand side b not in Image(A)";
-	return X;
+        "// right hand side b not in Image(A)";
+        return X;
       }
-    }    
+    }
   }
-  
-  if(n_b<n){ 
+
+  if(n_b<n){
     matrix copy[n_b][1]=b;
     matrix b[n][1]=0;
     for(i=1;i<=n_b;i=i+1){
       b[i,1]=copy[i,1];
     }
   }
-  
+
   r=mat_rk(A);
-	
+
   //1. b constant vector
-  if(const_mat(b)){	
+  if(const_mat(b)){
     //extend A with b
     for(i=1; i<=n; i++){
       for(j=1; j<=m; j++){
@@ -1169,45 +1169,45 @@ EXAMPLE:   example linsolve; shows an example"
       }
       Ab[i,m+1]=b[i,1];
     }
-      
+
     //Gauss reduction
     Z  = gaussred(Ab);
     Ab = Z[3];  //normal form
-    rc = Z[4];  //rank(Ab)  
+    rc = Z[4];  //rank(Ab)
     //print(Ab);
 
     if(r<rc){
-	"// no solution";
-        return(X); 
+        "// no solution";
+        return(X);
     }
-    k=m;	
+    k=m;
     for(i=r;i>=1;i=i-1){
-      
-      j=1;	
-      while(Ab[i,j]==0){j=j+1;}// suche Ecke 
-   
+
+      j=1;
+      while(Ab[i,j]==0){j=j+1;}// suche Ecke
+
       for(;k>j;k=k-1){ X[k]=0;}//springe zur Ecke
-     
+
 
       c=Ab[i,m+1]; //i-te Komponene von b
       for(j=m;j>k;j=j-1){
-	c=c-X[j,1]*Ab[i,j];
+        c=c-X[j,1]*Ab[i,j];
       }
       if(Ab[i,k]==0){
-	X[k,1]=1; //willkuerlich
+        X[k,1]=1; //willkuerlich
       }
-      else{ 
-  	X[k,1]=c/Ab[i,k];
+      else{
+          X[k,1]=c/Ab[i,k];
       }
       k=k-1;
       if(k==0){break;}
     }
-    
-    
+
+
   }//endif (const b)
   else{  //b not constant
     "// !not implemented!";
- 
+
   }
 
   return(X);
@@ -1216,7 +1216,7 @@ example
 { "EXAMPLE";echo=2;
   ring r=0,(x),dp;
   matrix A[3][2] = -4,-6,
-                    2, 3, 
+                    2, 3,
                    -5, 7;
   matrix b[3][1] = 10,
                    -5,
@@ -1276,9 +1276,9 @@ proc jordan(matrix M,list #)
 "USAGE:   jordan(M[,opt]); M constant square matrix, opt integer
 ASSUME:  The eigenvalues of M are in the coefficient field.
 RETURN:  The procedure returns a list jd with 3 entries:
-@format       
+@format
          - jd[1] ideal, eigenvalues of M,
-         - jd[2] list of intvecs, jd[2][i][j] size of j-th Jordan block with 
+         - jd[2] list of intvecs, jd[2][i][j] size of j-th Jordan block with
            eigenvalue jd[1][i], and
          - jd[3] a matrix, jd[3]^(-1)*M*jd[3] in Jordan normal form.
          Depending on opt, only certain entries of jd are computed.
@@ -1744,22 +1744,22 @@ example
 ring r1=0,(x),dp;
 system("--random", 12345678);
 int n = 70;
-matrix m = sparsemat(n,n,50,100);     
+matrix m = sparsemat(n,n,50,100);
 option(prot,mem);
 
 int t=timer;
-matrix im = inverse(m,1)[1]; 
+matrix im = inverse(m,1)[1];
 timer-t;
 print(im*m);
-//list l0 = watchdog(100,"inverse("+"m"+",3)");   
+//list l0 = watchdog(100,"inverse("+"m"+",3)");
 //bricht bei 100 sec ab und gibt l0[1]: string Killed zurueck
 
-//inverse(m,1): std       5sec 5,5 MB 
+//inverse(m,1): std       5sec 5,5 MB
 //inverse(m,2): interred  12sec
 //inverse(m,2): lift      nach 180 sec 13MB abgebrochen
 //n=60: linalgorig: 3  linalg: 5
-//n=70: linalgorig: 6,7 linalg: 11,12 
-// aber linalgorig rechnet falsch! 
+//n=70: linalgorig: 6,7 linalg: 11,12
+// aber linalgorig rechnet falsch!
 
 2. Sparse poly Matrizen
 -----------------------
@@ -1770,7 +1770,7 @@ matrix m = sparsematrix(n,n,2,0,50,50,9); //matrix of polys of deg <=2
 option(prot,mem);
 
 int t=timer;
-matrix im = inverse(m); 
+matrix im = inverse(m);
 timer-t;
 print(im*m);
 //inverse(m,1): std       0sec 1MB
@@ -1789,7 +1789,7 @@ matrix m = imap(r,m);
 option(prot,mem);
 
 int t=timer;
-matrix im = inverse(m); 
+matrix im = inverse(m);
 timer-t;
 print(im*m);
 //inverse(m)=inverse(m,3):15 sec inverse(m,1)=1sec inverse(m,2):>120sec
@@ -1806,7 +1806,7 @@ matrix m = imap(r,m);
 option(prot,mem);
 
 int t=timer;
-matrix im = inverse(m,3); 
+matrix im = inverse(m,3);
 timer-t;
 print(im*m);
 //n=7: inverse(m,3):lange sec inverse(m,1)=1sec inverse(m,2):1sec
@@ -1817,8 +1817,8 @@ LIB"random.lib"; LIB"linalg.lib";
 system("--random", 12345678);
 int n =3;
 ring r= 0,(x,y,z),(C,dp);
-matrix A=triagmatrix(n,n,1,0,0,50,2);   
-intmat B=sparsetriag(n,n,20,1);         
+matrix A=triagmatrix(n,n,1,0,0,50,2);
+intmat B=sparsetriag(n,n,20,1);
 matrix M = A*transpose(B);
 M=M*transpose(M);
 M[1,1..ncols(M)]=M[1,1..n]+xyz*M[n,1..ncols(M)];
@@ -1834,28 +1834,28 @@ print(iM*M);                      //test
 //mit n=3
 //eifacheres Gegenbeispiel:
 matrix M =
-9yz+3y+3z+2,             9y2+6y+1,           
+9yz+3y+3z+2,             9y2+6y+1,
 9xyz+3xy+3xz-9z2+2x-6z-1,9xy2+6xy-9yz+x-3y-3z
 //det M=1, inverse(M,2); ->// ** matrix is not invertible
 //lead(M); 9xyz*gen(2) 9xy2*gen(2) nicht teilbar!
 
 5. charpoly:
 -----------
-//ring rp=(0,A,B,C),(x),dp; 
-ring r=0,(A,B,C,x),dp;     
+//ring rp=(0,A,B,C),(x),dp;
+ring r=0,(A,B,C,x),dp;
 matrix m[12][12]=
-AC,BC,-3BC,0,-A2+B2,-3AC+1,B2,   B2,  1,   0, -C2+1,0,  
-1, 1, 2C,  0,0,     B,     -A,   -4C, 2A+1,0, 0,    0,  
-0, 0, 0,   1,0,     2C+1,  -4C+1,-A,  B+1, 0, B+1,  3B, 
+AC,BC,-3BC,0,-A2+B2,-3AC+1,B2,   B2,  1,   0, -C2+1,0,
+1, 1, 2C,  0,0,     B,     -A,   -4C, 2A+1,0, 0,    0,
+0, 0, 0,   1,0,     2C+1,  -4C+1,-A,  B+1, 0, B+1,  3B,
 AB,B2,0,   1,0,     1,     0,    1,   A,   0, 1,    B+1,
-1, 0, 1,   0,0,     1,     0,    -C2, 0,   1, 0,    1,  
-0, 0, 2,   1,2A,    1,     0,    0,   0,   0, 1,    1,  
-0, 1, 0,   1,1,     2,     A,    3B+1,1,   B2,1,    1,  
-0, 1, 0,   1,1,     1,     1,    1,   2,   0, 0,    0,  
-1, 0, 1,   0,0,     0,     1,    0,   1,   1, 0,    3,  
-1, 3B,B2+1,0,0,     1,     0,    1,   0,   0, 1,    0,  
-0, 0, 1,   0,0,     0,     0,    1,   0,   0, 0,    0,  
-0, 1, 0,   1,1,     3,     3B+1, 0,   1,   1, 1,    0; 
+1, 0, 1,   0,0,     1,     0,    -C2, 0,   1, 0,    1,
+0, 0, 2,   1,2A,    1,     0,    0,   0,   0, 1,    1,
+0, 1, 0,   1,1,     2,     A,    3B+1,1,   B2,1,    1,
+0, 1, 0,   1,1,     1,     1,    1,   2,   0, 0,    0,
+1, 0, 1,   0,0,     0,     1,    0,   1,   1, 0,    3,
+1, 3B,B2+1,0,0,     1,     0,    1,   0,   0, 1,    0,
+0, 0, 1,   0,0,     0,     0,    1,   0,   0, 0,    0,
+0, 1, 0,   1,1,     3,     3B+1, 0,   1,   1, 1,    0;
 option(prot,mem);
 
 int t=timer;
