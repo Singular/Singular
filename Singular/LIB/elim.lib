@@ -1,8 +1,8 @@
-// $Id: elim.lib,v 1.8 1999-09-21 17:32:15 Singular Exp $
+// $Id: elim.lib,v 1.9 2000-03-01 16:28:56 Singular Exp $
 // (GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: elim.lib,v 1.8 1999-09-21 17:32:15 Singular Exp $";
+version="$Id: elim.lib,v 1.9 2000-03-01 16:28:56 Singular Exp $";
 info="
 LIBRARY:  elim.lib      PROCEDURES FOR ELIMINATIOM, SATURATION AND BLOWING UP
 
@@ -116,10 +116,12 @@ EXAMPLE: example elim; shows examples
    else { poly p = 1+var(m+1); }
    if( ord(p)==0 ) { string ordering = "),ls;"; }
    if( ord(p)>0 ) { string ordering = "),dp;"; }
+   string mpoly=string(minpoly);
 //-------------- create new ring and map objects to new ring ------------------
    def br = basering;
    string str = "ring @newr = ("+charstr(br)+"),("+varstr(br)+ordering;
    execute(str);
+   if (mpoly!="0") { execute("minpoly="+mpoly+";"); }
    def i = imap(br,id);
    poly vars = imap(br,vars);
 //---------- now eliminate in new ring and map back to old ring ---------------
