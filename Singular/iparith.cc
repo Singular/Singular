@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.317 2004-04-23 14:10:13 Singular Exp $ */
+/* $Id: iparith.cc,v 1.318 2004-04-29 17:11:47 levandov Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2616,9 +2616,9 @@ struct sValCmd2 dArith2[]=
 ,{jjPARSTR2,   PARSTR_CMD,     STRING_CMD,     RING_CMD,   INT_CMD ALLOW_PLURAL}
 ,{jjPARSTR2,   PARSTR_CMD,     STRING_CMD,     QRING_CMD,  INT_CMD ALLOW_PLURAL}
 ,{jjPRINT_FORMAT, PRINT_CMD,   ANY_TYPE,       DEF_CMD,    STRING_CMD ALLOW_PLURAL}
-,{jjQUOT,      QUOTIENT_CMD,   IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD NO_PLURAL}
-,{jjQUOT,      QUOTIENT_CMD,   MODUL_CMD,      MODUL_CMD,  IDEAL_CMD NO_PLURAL}
-,{jjQUOT,      QUOTIENT_CMD,   IDEAL_CMD,      MODUL_CMD,  MODUL_CMD NO_PLURAL}
+,{jjQUOT,      QUOTIENT_CMD,   IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD ALLOW_PLURAL}
+,{jjQUOT,      QUOTIENT_CMD,   MODUL_CMD,      MODUL_CMD,  IDEAL_CMD ALLOW_PLURAL}
+,{jjQUOT,      QUOTIENT_CMD,   IDEAL_CMD,      MODUL_CMD,  MODUL_CMD ALLOW_PLURAL}
 ,{jjRANDOM,    RANDOM_CMD,     INT_CMD,        INT_CMD,    INT_CMD ALLOW_PLURAL}
 ,{jjREAD2,     READ_CMD,       STRING_CMD,     LINK_CMD,   STRING_CMD ALLOW_PLURAL}
 ,{jjREDUCE_P,  REDUCE_CMD,     POLY_CMD,       POLY_CMD,   IDEAL_CMD ALLOW_PLURAL}
