@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz3.cc,v 1.1.1.1 2003-10-06 12:16:04 Singular Exp $ */
+/* $Id: syz3.cc,v 1.2 2004-06-02 15:59:12 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -98,7 +98,7 @@ static void syShowRes(syStrategy syzstr)
     Print("aktueller hoechster index ist: %d\n",(*syzstr->Tl)[i]);
     Print("der %d-te modul ist:\n",i);
     idPrint(syzstr->res[i]);
-    Print("Seine Darstellung:\n");
+    PrintS("Seine Darstellung:\n");
     idPrint(syzstr->orderedRes[i]);
     i++;
   }
@@ -396,7 +396,7 @@ static void updatePairs(SSet *resPairs,int *l_pairs,syStrategy syzstr,
                 while ((ti<l) && (((*resPairs)[ti].ind1!=j1)|| ((*resPairs)[ti].ind2!=jj))) ti++;
                 if (ti<l) 
                 {
-                  if (TEST_OPT_PROT) Print("cc");
+                  if (TEST_OPT_PROT) PrintS("cc");
                   syDeletePair(&(*resPairs)[ti]);
                   syCompactifyPairSet(*resPairs,*l_pairs,ti);
                   l--;
@@ -451,10 +451,10 @@ static void updatePairs(SSet *resPairs,int *l_pairs,syStrategy syzstr,
         SSet rP=*resPairs;
 #ifdef SHOW_PROT
 Print("erzeuge Paar im Modul %d,%d mit: \n",index,tso.order);
-Print("poly1: ");pWrite(tso.p1);
-Print("poly2: ");pWrite(tso.p2);
-Print("syz: ");pWrite(tso.syz);
-Print("sPoly: ");pWrite(tso.p);
+PrintS("poly1: ");pWrite(tso.p1);
+PrintS("poly2: ");pWrite(tso.p2);
+PrintS("syz: ");pWrite(tso.syz);
+PrintS("sPoly: ");pWrite(tso.p);
 PrintLn();
 #endif
         syEnterPair(rP,&tso,&l,index);
@@ -674,7 +674,7 @@ static void redOnePair(SSet resPairs,int itso,int l, ideal syzygies,
   if ((tso.p1!=NULL) && (tso.p2!=NULL))
   {
     if (TEST_OPT_PROT)
-      Print(".");
+      PrintS(".");
     if (index==0)
     {
 /*--- tests wether a generator must be replaced (lt(f1)|lt(f2)!)--*/
@@ -759,10 +759,10 @@ static void redOnePair(SSet resPairs,int itso,int l, ideal syzygies,
     }                             //End of the else-part of EXPERIMENT3
 #ifdef SHOW_PROT
 Print("reduziere Paar im Module %d mit: \n",index);
-Print("poly1: ");pWrite(tso.p1);
-Print("poly2: ");pWrite(tso.p2);
-Print("syz: ");pWrite(tso.syz);
-Print("sPoly: ");pWrite(tso.p);
+PrintS("poly1: ");pWrite(tso.p1);
+PrintS("poly2: ");pWrite(tso.p2);
+PrintS("syz: ");pWrite(tso.syz);
+PrintS("sPoly: ");pWrite(tso.p);
 #endif
     assume(tso.syz!=NULL);
     kBucketInit(syzstr->syz_bucket,tso.syz,-1);
@@ -834,12 +834,12 @@ Print("sPoly: ");pWrite(tso.p);
   }
   else
   {
-    Print("Shit happens!\n");
+    PrintS("Shit happens!\n");
   }
 #ifdef SHOW_PROT
 Print("erhalte Paar im Module %d mit: \n",index);
-Print("syz: ");pWrite(tso.syz);
-Print("sPoly: ");pWrite(tso.p);
+PrintS("syz: ");pWrite(tso.syz);
+PrintS("sPoly: ");pWrite(tso.p);
 PrintLn();
 #endif
   if (toReplace)
@@ -1095,7 +1095,7 @@ static void updatePairsHIndex(SSet *resPairs,int *l_pairs,syStrategy syzstr,
                 while ((ti<l) && (((*resPairs)[ti].ind1!=j1)|| ((*resPairs)[ti].ind2!=j))) ti++;
                 if (ti<l) 
                 {
-                  if (TEST_OPT_PROT) Print("cc");
+                  if (TEST_OPT_PROT) PrintS("cc");
                   syDeletePair(&(*resPairs)[ti]);
                   syCompactifyPairSet(*resPairs,*l_pairs,ti);
                   l--;
@@ -1150,10 +1150,10 @@ static void updatePairsHIndex(SSet *resPairs,int *l_pairs,syStrategy syzstr,
         SSet rP=*resPairs;
 #ifdef SHOW_PROT
 Print("erzeuge Paar im Modul %d,%d mit: \n",index,tso.order);
-Print("poly1: ");pWrite(tso.p1);
-Print("poly2: ");pWrite(tso.p2);
-Print("syz: ");pWrite(tso.syz);
-Print("sPoly: ");pWrite(tso.p);
+PrintS("poly1: ");pWrite(tso.p1);
+PrintS("poly2: ");pWrite(tso.p2);
+PrintS("syz: ");pWrite(tso.syz);
+PrintS("sPoly: ");pWrite(tso.p);
 PrintLn();
 #endif
         syEnterPair(rP,&tso,&l,index);
@@ -1195,11 +1195,11 @@ static void redOnePairHIndex(SSet resPairs,int itso, int crit_comp,
   if ((tso.p1!=NULL) && (tso.p2!=NULL))
   {
     if (TEST_OPT_PROT)
-      Print(".");
+      PrintS(".");
 #ifdef USE_PROD_CRIT
     if (pFDeg(tso.p1)+pFDeg(tso.p2)==tso.order+pFDeg(deg_soc))
     {
-      if (TEST_OPT_PROT) Print("pc");
+      if (TEST_OPT_PROT) PrintS("pc");
       int ac=pGetComp(tso.p1);
       assume(ac=pGetComp(tso.p2));
       poly p1=pCopy(tso.p1);
@@ -1268,10 +1268,10 @@ static void redOnePairHIndex(SSet resPairs,int itso, int crit_comp,
     }
 #ifdef SHOW_PROT
 Print("reduziere Paar im Module %d mit: \n",index);
-Print("poly1: ");pWrite(tso.p1);
-Print("poly2: ");pWrite(tso.p2);
-Print("syz: ");pWrite(tso.syz);
-Print("sPoly: ");pWrite(tso.p);
+PrintS("poly1: ");pWrite(tso.p1);
+PrintS("poly2: ");pWrite(tso.p2);
+PrintS("syz: ");pWrite(tso.syz);
+PrintS("sPoly: ");pWrite(tso.p);
 #endif
     assume(tso.syz!=NULL);
     kBucketInit(syzstr->syz_bucket,tso.syz,-1);
@@ -1302,12 +1302,12 @@ Print("sPoly: ");pWrite(tso.p);
   }
   else
   {
-    Print("Shit happens!\n");
+    PrintS("Shit happens!\n");
   }
 #ifdef SHOW_PROT
 Print("erhalte Paar im Module %d mit: \n",index);
-Print("syz: ");pWrite(tso.syz);
-Print("sPoly: ");pWrite(tso.p);
+PrintS("syz: ");pWrite(tso.syz);
+PrintS("sPoly: ");pWrite(tso.p);
 PrintLn();
 #endif
   if (tso.p!=NULL)
@@ -1320,7 +1320,7 @@ PrintLn();
       nDelete(&n);
     }
   }
-  if ((TEST_OPT_PROT) && (tso.syz==NULL)) Print("null");
+  if ((TEST_OPT_PROT) && (tso.syz==NULL)) PrintS("null");
   if ((tso.p!=NULL) && (pGetComp(tso.p)>crit_comp))
   {
     if (*next_place_add>=IDELEMS(add_generators))
@@ -1730,9 +1730,9 @@ static ideal syAppendSyz(ideal new_generators, syStrategy syzstr,int index,int c
     }
     //omFreeSize((ADDRESS)og_l,IDELEMS(syzstr->res[0])*sizeof(int));
 #ifdef SHOW_PROT
-Print("Add new generators: \n");
+PrintS("Add new generators:\n");
 idPrint(new_generators);
-Print("with representaions: \n");
+PrintS("with representaions:\n");
 idPrint(new_repr);
 #endif
     result = kosz_std(new_generators,new_repr,syzstr,index,crit_comp);
@@ -1901,9 +1901,9 @@ syStrategy syKosz(ideal arg,int * length)
           if (TEST_OPT_PROT)
           {
             if (isRegular)
-              Print("\n regular\n");
+              PrintS("\n regular\n");
             else
-              Print("\n not regular\n");
+              PrintS("\n not regular\n");
           }
           if (next_gen!=NULL)
             pDelete(&next_gen);
@@ -1988,7 +1988,7 @@ syStrategy syKosz(ideal arg,int * length)
           }
           else
           {
-            Print("Da ist was faul!!!\n");
+            PrintS("Da ist was faul!!!\n");
             Print("Aber: Regularitaet %d, Grad %d\n",syzstr->regularity,pFDeg(totake[index]->m[i]));
           }
         }
