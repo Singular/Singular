@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.23 2000-12-13 11:55:36 Singular Exp $
+@comment $Id: NEWS.texi,v 1.24 2000-12-13 17:25:16 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -89,7 +89,7 @@ TODO: docu, tests
 @item @nref{mondromy_lib}
 procedures for computing the monodromy of a singularity
 @item @nref{spcurve_lib}
-procedures for cm codimension 2 singularities
+procedures for CM codimension 2 singularities
 @item @nref{triang_lib}
 procedures for decomposing zero-dimensional ideals
 @item @nref{solve_lib}
