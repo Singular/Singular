@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.49 1999-12-03 08:08:50 wichmann Exp $
+;; $Id: singular.el,v 1.50 1999-12-03 11:10:19 obachman Exp $
 
 ;;; Commentary:
 
@@ -3878,16 +3878,18 @@ If called non-interactiveley, MODE should be one of 'abort, 'quit, or
    (let (answer)
      (while (not answer) 
        (setq answer (read-from-minibuffer
-		   "(a)bort current command, (q)uit Singular or (c)ontinue? "))
+		   "(a)bort current command, (q)uit, (r)estart Singular or (c)ontinue? "))
        (setq answer
 	     (cond ((equal answer "a") 'abort)
 		   ((equal answer "c") 'continue)
+		   ((equal answer "r") 'restart)
 		   ((equal answer "q") 'quit)
 		   ((equal answer "") 'continue) ; default: continue
 		   (t nil))))
      (list answer)))
    (cond
     ((eq mode 'quit) (singular-kill-singular))
+    ((eq mode 'restart) (singular-restart))
     ((eq mode 'abort) (interrupt-process (singular-process)))))
 
 (defun singular-exec (buffer name executable start-file switches)
