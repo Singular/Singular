@@ -68,7 +68,7 @@ doc info/singular.hlp: ${SINGULAR}
 	cd doc; ${MAKE} install
 
 ##############################################################
-# Tst targets
+# Tst targets: DO NOT USE, YET -- THEY ARE STILL BROKEN
 Tst-All: Tst-Old Tst-Short Tst-Long
 
 Tst: Tst-Old Tst-Short
