@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.104 2000-08-18 15:42:08 Singular Exp $ */
+/* $Id: ring.cc,v 1.105 2000-08-22 09:03:21 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2558,8 +2558,7 @@ BOOLEAN rComplete(ring r, int force)
 
   for(j=0;j<=r->pCompHighIndex;j++)
   {
-    r->ordsgn[r->pCompLSize - j - 1]
-      = tmp_ordsgn[j];
+    r->ordsgn[j] = tmp_ordsgn[j];
   }
 
   omFreeSize((ADDRESS)tmp_ordsgn,(2*(n+r->N)*sizeof(long)));
