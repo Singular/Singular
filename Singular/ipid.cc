@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.68 2003-07-25 14:04:09 levandov Exp $ */
+/* $Id: ipid.cc,v 1.69 2004-08-10 12:46:29 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -656,7 +656,7 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
     // h is at the beginning of the list
     *ih = IDNEXT(h) /* ==*ih */;
   }
-  else
+  else if (ih!=NULL)
   {
     // h is somethere in the list:
     hh = *ih;

@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.87 2004-04-16 17:15:53 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.88 2004-08-10 12:46:13 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -279,17 +279,17 @@ void sleftv::CleanUp(ring r)
       case MATRIX_CMD:
       case MODUL_CMD:
       case IDEAL_CMD:
-        id_Delete((ideal *)(&data),r);
+        if (r!=NULL) id_Delete((ideal *)(&data),r);
         break;
       case STRING_CMD:
           omFree((ADDRESS)data);
         break;
       case POLY_CMD:
       case VECTOR_CMD:
-        p_Delete((poly *)(&data),r);
+        if (r!=NULL) p_Delete((poly *)(&data),r);
         break;
       case NUMBER_CMD:
-        n_Delete((number *)(&data),r);
+        if (r!=NULL) n_Delete((number *)(&data),r);
         break;
       case LIST_CMD:
         ((lists)data)->Clean(r); // may contain ring-dep data
@@ -314,10 +314,8 @@ void sleftv::CleanUp(ring r)
         break;
       }
       case RESOLUTION_CMD:
-      {
-        syKillComputation((syStrategy)data,r);
+        if (r!=NULL) syKillComputation((syStrategy)data,r);
         break;
-      }
 #ifdef TEST
       // the following types do not take memory
       // or are not copied
