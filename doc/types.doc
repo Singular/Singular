@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.18 1998-04-30 13:18:14 Singular Exp $
+@comment $Id: types.doc,v 1.19 1998-04-30 17:37:44 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -27,6 +27,7 @@
 * poly::                        
 * proc::                        
 * qring::                       
+* resolution::
 * ring::                        
 * string::                      
 * vector::                      
@@ -2354,7 +2355,8 @@ the indicated variable of the ring (see @ref{var})
 
 See @ref{Procedures}.
 
-@node qring, ring, proc, Data types
+@c ---------------------------------------
+@node qring, resolution, proc, Data types
 @section qring
 @cindex qring
 
@@ -2383,7 +2385,90 @@ none
 @c {{{endfold}}}
 
 @c ---------------------------------------
-@node ring, string, qring, Data types
+@node resolution, ring, qring, Data types
+@section resolution
+@cindex resolution
+
+@menu
+* resolution declarations::          
+* resolution expressions::           
+* resolution related functions::     
+@end menu
+
+Resolutions are represented as lists of ideals/modules which generate the
+resolution.
+Like ideals/modules they
+can only be defined or accessed with respect to a base ring.
+@c ---------------------------------------
+@node resolution declarations, resolution expressions, resolution, resolution
+@subsection resolution declarations
+@cindex resolution declarations
+
+@table @code
+@item @strong{Syntax:}
+@code{resolution} name @code{=} resolution_expression @code{;}
+@item @strong{Purpose:}
+defines an resolution.
+@item @strong{Default:}
+none
+@item @strong{Example:}
+@example
+@c example
+  ring R;
+  ideal i=z2,x;
+  resolution re=res(i,0);
+  re;
+@c example
+@end example
+@end table
+
+@c ------------------------------
+@node resolution expressions, resolution related functions, resolution declarations, resolution
+@subsection resolution expressions
+@cindex resolution expressions
+
+An resolution expression is:
+@enumerate
+@item
+an identifier of type resolution
+@item
+a function returning resolution
+@item
+a typecast from list to resolution.
+@end enumerate
+@menu
+* resolution::
+* resolution related functions::
+* implicit type conversions::
+* type casting::
+@end menu
+@iftex
+See @ref{resolution}; @ref{resolution related functions};
+@ref{implicit type conversions}; @ref{type casting}.
+@end iftex
+
+@c ------------------------------
+@node resolution related functions, ,resolution expressions, resolution
+@subsection resolution related functions
+@cindex resolution related functions
+
+@table @asis
+@item @code{mres}
+minimal free resolution of an ideal/module, also minimizing the given ideal/module
+(see @ref{mres})
+@item @code{res}
+minimal free resolution of an ideal/module but not changing the given ideal/module
+(see @ref{res})
+@item @code{sres}
+free resolution of a standard basis (see @ref{sres})
+@end table
+@c @strong{Example:}
+@c @example
+@c @end example
+
+
+@c ---------------------------------------
+@node ring, string, resolution, Data types
 @section ring
 @cindex ring
 
