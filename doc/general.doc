@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.61 1998-05-13 08:19:52 schmidt Exp $
+@comment $Id: general.doc,v 1.62 1998-05-13 11:41:22 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -1001,6 +1001,7 @@ the main variable to be specified by the user.
 @table @code
 @item bareiss
 @ref{bareiss}@*
+Bareiss' algorithm: a division-free Gaussian elimination
 @item det
 @ref{det}@*
 For matrices with integer entries a modular algorithm is used.
