@@ -1,8 +1,12 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: readcf.y,v 1.2 1997-04-15 09:36:32 schmidt Exp $ */
+/* $Id: readcf.y,v 1.3 1997-04-18 16:17:47 schmidt Exp $ */
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.2  1997/04/15 09:36:32  schmidt
+#include <config.h> added
+dependency on #define COMEAU removed
+
 Revision 1.1  1996/12/06 14:49:26  schmidt
 Initial revision
 
@@ -13,7 +17,7 @@ Initial revision
 #include <config.h>
 
 #include <ctype.h>
-#include <stdio.h>
+#include <iostream.h>
 
 #include "assert.h"
 
