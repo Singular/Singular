@@ -1,4 +1,4 @@
-// $Id: invar.lib,v 1.1 1997-05-01 17:50:42 Singular Exp $
+// $Id: invar.lib,v 1.2 1997-09-10 07:52:55 Singular Exp $
 ///////////////////////////////////////////////////////
 // invar.lib
 // algorithm for computing the ring of invariants under
@@ -141,17 +141,17 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 
-proc reduction(poly p, ideal mod, list #)
-USAGE:   reduction(p,mod,q); p poly, mod ideal, q (optional) monomial
+proc reduction(poly p, ideal mo, list #)
+USAGE:   reduction(p,mo,q); p poly, mo ideal, q (optional) monomial
 RETURN:  poly= (p-H(f1,...,fr))/q^a, if Lt(p)=H(Lt(f1),...,Lt(fr)) for 
                some polynomial H in r variables over the base field,
                a maximal such that q^a devides p-H(f1,...,fr),
-               mod =(f1,...,fr)
+               mo =(f1,...,fr)
 NOTE:    
 EXAMPLE: example reduction; shows an example
 {
   int i;
-  int z=size(mod);
+  int z=size(mo);
   def bsr=basering;
  
   //arranges the monomial v for elimination
@@ -164,17 +164,17 @@ EXAMPLE: example reduction; shows an example
   //changes the basering bsr to bsr[@(0),...,@(z)]
   execute "ring s="+charstr(basering)+",("+varstr(basering)+",@(0..z)),dp;";
   
-  //costructes the ideal mod=(p-@(0),mod[1]-@(1),...,mod[z]-@(z))
-  ideal mod=imap(bsr,mod);
+  //costructes the ideal mo=(p-@(0),mo[1]-@(1),...,mo[z]-@(z))
+  ideal mo=imap(bsr,mo);
   for (i=1;i<=z;i++)
   {
-    mod[i]=lead(mod[i])-var(nvars(bsr)+i+1);
+    mo[i]=lead(mo[i])-var(nvars(bsr)+i+1);
   }
-  mod=lead(imap(bsr,p))-@(0),mod;
+  mo=lead(imap(bsr,p))-@(0),mo;
  
   //eliminates the variables of the basering bsr
-  //i.e. computes mod intersected with K[@(0),...,@(z)]
-  ideal kern=eliminate(mod,imap(bsr,v));
+  //i.e. computes mo intersected with K[@(0),...,@(z)]
+  ideal kern=eliminate(mo,imap(bsr,v));
 
   // test wether @(0)-h(@(1),...,@(z)) is in ker for some poly h
   poly h;
@@ -185,9 +185,9 @@ EXAMPLE: example reduction; shows an example
      if (deg(h)==0)
      {
         h=(1/h)*kern[i];
-        // defines the map psi : s ---> bsr defined by @(i) ---> p,mod[i]
+        // defines the map psi : s ---> bsr defined by @(i) ---> p,mo[i]
         setring bsr;
-        map psi=s,maxideal(1),p,mod;
+        map psi=s,maxideal(1),p,mo;
         poly re=psi(h);
 
         // devides by the maximal power of #[1] 
@@ -209,27 +209,27 @@ example
 { "EXAMPLE:"; echo = 2;
    ring q=0,(x,y,z,u,v,w),dp;
    poly p=x2yz-x2v;
-   ideal mod =x-w,u2w+1,yz-v;
-   reduction(p,mod);
-   reduction(p,mod,w);
+   ideal mo =x-w,u2w+1,yz-v;
+   reduction(p,mo);
+   reduction(p,mo,w);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc completeReduction(poly p, ideal mod, list #)
-USAGE:   completeReduction(p,mod,q); p poly, mod ideal, 
+proc completeReduction(poly p, ideal mo, list #)
+USAGE:   completeReduction(p,mo,q); p poly, mo ideal, 
                                      q (optional) monomial
-RETURN:  poly= the polynomial p reduced with mod via the procedure
+RETURN:  poly= the polynomial p reduced with mo via the procedure
                reduction as long as possible
 NOTE:    
 EXAMPLE: example completeReduction; shows an example
 {
   poly p1=p;
-  poly p2=reduction(p,mod,#);
+  poly p2=reduction(p,mo,#);
   while (p1!=p2)
   {
     p1=p2;
-    p2=reduction(p1,mod,#);
+    p2=reduction(p1,mo,#);
   }
   return(p2);
 }
@@ -237,21 +237,21 @@ example
 { "EXAMPLE:"; echo = 2;
    ring q=0,(x,y,z,u,v,w),dp;
    poly p=x2yz-x2v;
-   ideal mod =x-w,u2w+1,yz-v;
-   completeReduction(p,mod);
-   completeReduction(p,mod,w);
+   ideal mo =x-w,u2w+1,yz-v;
+   completeReduction(p,mo);
+   completeReduction(p,mo,w);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc inSubring(poly p, ideal mod)
-USAGE:   inSubring(p,mod); p poly, mod ideal
-RETURN:  list= 1,string(@(0)-h(@(1),...,@(size(mod)))) :if p = h(mod[1],...,mod[size(mod)])
-              0,string(h(@(0),...,@(size(mod)))) :if there is only a nonlinear relation
-              h(p,mod[1],...,mod[size(mod)])=0.
+proc inSubring(poly p, ideal mo)
+USAGE:   inSubring(p,mo); p poly, mo ideal
+RETURN:  list= 1,string(@(0)-h(@(1),...,@(size(mo)))) :if p = h(mo[1],...,mo[size(mo)])
+              0,string(h(@(0),...,@(size(mo)))) :if there is only a nonlinear relation
+              h(p,mo[1],...,mo[size(mo)])=0.
 NOTE:    
 EXAMPLE: example inSubring; shows an example
 {
-  int z=size(mod);
+  int z=size(mo);
   int i;
   def gnir=basering;
   list l;
@@ -261,10 +261,10 @@ EXAMPLE: example inSubring; shows an example
     mile=mile*var(i);
   }
   string eli=string(mile);
-  // the intersection of ideal nett=(p-@(0),mod[1]-@(1),...)
+  // the intersection of ideal nett=(p-@(0),mo[1]-@(1),...)
   // with the ring k[@(0),...,@(n)] is computed, the result is ker
   execute "ring r1="+charstr(basering)+",("+varstr(basering)+",@(0..z)),dp;";
-  ideal nett=imap(gnir,mod);
+  ideal nett=imap(gnir,mo);
   poly p;
   for (i=1;i<=z;i++)
   {
@@ -298,8 +298,8 @@ example
 { "EXAMPLE:"; echo = 2;
    ring q=0,(x,y,z,u,v,w),dp;
    poly p=xyzu2w-1yzu2w2+u4w2-1xu2vw+u2vw2+xyz-1yzw+2u2w-1xv+vw+2;
-   ideal mod =x-w,u2w+1,yz-v;
-   inSubring(p,mod);
+   ideal mo =x-w,u2w+1,yz-v;
+   inSubring(p,mo);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
