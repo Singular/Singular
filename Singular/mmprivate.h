@@ -3,13 +3,16 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmprivate.h,v 1.14 1999-10-19 14:55:40 obachman Exp $ */
+/* $Id: mmprivate.h,v 1.15 1999-10-22 11:14:14 obachman Exp $ */
 /*
 * ABSTRACT
 */
 #include <stdlib.h>
 #include "mod2.h"
 #include "structs.h"
+#ifdef MTRACK
+#include "mmbt.h"
+#endif
 
 #if defined(HAVE_ASO) && HAVE_ASO == 1
 #include "mmprivate.aso"

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hilb.cc,v 1.10 1999-10-14 14:27:05 obachman Exp $ */
+/* $Id: hilb.cc,v 1.11 1999-10-22 11:14:09 obachman Exp $ */
 /*
 *  ABSTRACT -  Hilbert series
 */
@@ -216,7 +216,7 @@ static intvec * hSeries(ideal S, intvec *modulweight,
   hexist = hInit(S, Q, &hNexist);
   if (hNexist==0)
   {
-    hseries1=new intvec(2);
+    hseries1=NewIntvec1(2);
     (*hseries1)[0]=1;
     (*hseries1)[1]=0;
     return hseries1;
@@ -296,7 +296,7 @@ static intvec * hSeries(ideal S, intvec *modulweight,
         l = i + j;
         if (l > k)
         {
-          work = new intvec(l);
+          work = NewIntvec1(l);
           for (ii=0; ii<k; ii++)
             (*work)[ii] = (*hseries1)[ii];
           if (hseries1 != NULL)
@@ -318,7 +318,7 @@ static intvec * hSeries(ideal S, intvec *modulweight,
   }
   if (k==0)
   {
-    hseries1=new intvec(2);
+    hseries1=NewIntvec1(2);
     (*hseries1)[0]=0;
     (*hseries1)[1]=0;
   }
@@ -328,7 +328,7 @@ static intvec * hSeries(ideal S, intvec *modulweight,
     while ((*hseries1)[l-2]==0) l--;
     if (l!=k)
     {
-      work = new intvec(l);
+      work = NewIntvec1(l);
       for (ii=l-2; ii>=0; ii--)
         (*work)[ii] = (*hseries1)[ii];
       delete hseries1;
@@ -372,7 +372,7 @@ intvec * hSecondSeries(intvec *hseries1)
   int i, j, k, s, t, l;
   if (hseries1 == NULL)
     return NULL;
-  work = new intvec(hseries1);
+  work = NewIntvec1(hseries1);
   k = l = work->length()-1;
   s = 0;
   for (i = k-1; i >= 0; i--)
@@ -392,7 +392,7 @@ intvec * hSecondSeries(intvec *hseries1)
       t += j;
     }
   }
-  hseries2 = new intvec(k+1);
+  hseries2 = NewIntvec1(k+1);
   for (i = k-1; i >= 0; i--)
     (*hseries2)[i] = (*work)[i];
   (*hseries2)[k] = (*work)[l];

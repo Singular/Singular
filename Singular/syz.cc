@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.26 1999-10-19 12:42:48 obachman Exp $ */
+/* $Id: syz.cc,v 1.27 1999-10-22 11:14:18 obachman Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -50,7 +50,7 @@ static intvec * syPrepareModComp(ideal arg,intvec ** w)
     maxxx = 2;
     isIdeal = TRUE;
   }
-  w1 = new intvec(maxxx+IDELEMS(arg));
+  w1 = NewIntvec1(maxxx+IDELEMS(arg));
   if (!isIdeal)
   {
     for (i=0;i<maxxx;i++)
@@ -70,7 +70,7 @@ static intvec * syPrepareModComp(ideal arg,intvec ** w)
     }
   }
   delete (*w);
-  *w = new intvec(IDELEMS(arg)+1);
+  *w = NewIntvec1(IDELEMS(arg)+1);
   for (i=0;i<IDELEMS(arg);i++)
   {
      (**w)[i+1] = (*w1)[i+maxxx];
@@ -312,7 +312,7 @@ static void syMinStep1(resolvente res, int length)
       deg0 = idJet(res[index+1],0);
       reddeg0 = kInterRed(deg0);
       idDelete(&deg0);
-      have_del = new intvec(IDELEMS(res[index]));
+      have_del = NewIntvec1(IDELEMS(res[index]));
       for (i=0;i<IDELEMS(reddeg0);i++)
       {
         if (reddeg0->m[i]!=NULL)
@@ -496,8 +496,8 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
 //w1->show();
 //PrintLn();
       k = idRankFreeModule(res[syzIndex]);
-      w = new intvec(k+IDELEMS(res[syzIndex]));
-      (*weights)[syzIndex] = new intvec(k);
+      w = NewIntvec1(k+IDELEMS(res[syzIndex]));
+      (*weights)[syzIndex] = NewIntvec1(k);
       for (i=0;i<k;i++)
       {
         if (res[syzIndex-1]->m[i]!=NULL) // hs
@@ -724,9 +724,9 @@ intvec * syBetti(resolvente res,int length, int * regularity,
   if (idIs0(res[0]))
   {
     if (res[0]==NULL)
-      result = new intvec(1,1,1);
+      result = NewIntvec3(1,1,1);
     else
-      result = new intvec(1,1,res[0]->rank);
+      result = NewIntvec3(1,1,res[0]->rank);
     return result;
   }
   intvec *w=NULL;
@@ -776,7 +776,7 @@ intvec * syBetti(resolvente res,int length, int * regularity,
   mr--;
   /*------ computation betti numbers --------------*/
   rows -= mr;
-  result = new intvec(rows,cols,0);
+  result = NewIntvec3(rows,cols,0);
   (*result)[(-mr)*cols] = /*idRankFreeModule(res[0])*/ rkl;
   if ((!idIs0(res[0])) && ((*result)[(-mr)*cols]==0))
     (*result)[(-mr)*cols] = 1;
@@ -860,7 +860,7 @@ intvec * syBetti(resolvente res,int length, int * regularity,
       if (i>k+(i/cols)*cols) k = i-(i/cols)*cols;
     }
   }
-  intvec * exactresult=new intvec(j+1,k+1,0);
+  intvec * exactresult=NewIntvec3(j+1,k+1,0);
   for (i=0;i<exactresult->rows();i++)
   {
     for (j=0;j<exactresult->cols();j++)
@@ -946,8 +946,8 @@ intvec * syNewBetti(resolvente res, intvec ** weights, int length)
 //Print("rsmax = %d\n",rsmax);
 //Print("rsmin = %d\n",rsmin);
     rs = rsmax-rsmin+1;
-    result = new intvec(rs,i+2,0);
-    tocancel = new intvec(rs);
+    result = NewIntvec3(rs,i+2,0);
+    tocancel = NewIntvec1(rs);
 /*-----------enter the Betti numbers-------------------------------*/
     if (/*idRankFreeModule(res[0])*/ res[0]->rank==0)
     {
@@ -980,10 +980,10 @@ intvec * syNewBetti(resolvente res, intvec ** weights, int length)
   else                //-----the non-homgeneous case
   {
     homog = FALSE;
-    tocancel = new intvec(1);
+    tocancel = NewIntvec1(1);
     k = length;
     while ((k>0) && (idIs0(res[k-1]))) k--;
-    result = new intvec (1,k+1,0);
+    result = NewIntvec3(1,k+1,0);
     (*result)[0] = res[0]->rank;
     for (i=0;i<length;i++)
     {

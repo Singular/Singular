@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-comp.h,v 1.16 1999-10-22 09:07:05 obachman Exp $ */
+/* $Id: polys-comp.h,v 1.17 1999-10-22 11:14:16 obachman Exp $ */
 
 /***************************************************************
  *
@@ -15,7 +15,7 @@
 #include "polys-impl.h"
 
 // need to undefine this, since longs might be negative
-#define unsigned
+#define u_s
 
 #ifdef WORDS_BIGENDIAN
 
@@ -35,8 +35,8 @@ while (0)
 #define _pMonCmp(p1, p2, actionE, actionG, actionS)                         \
 do                                                                          \
 {                                                                           \
-  register const unsigned long* s1 = &(p1->exp.l[currRing->pCompLowIndex]); \
-  register const unsigned long* s2 = &(p2->exp.l[currRing->pCompLowIndex]); \
+  register const u_s long* s1 = &(p1->exp.l[currRing->pCompLowIndex]); \
+  register const u_s long* s2 = &(p2->exp.l[currRing->pCompLowIndex]); \
   int _l = currRing->pCompLSize;                                            \
   register int _i;                                                          \
   _memcmp(s1, s2, _i, _l, actionE, goto _NotEqual);                         \
@@ -71,8 +71,8 @@ while (0)
 #define _pMonCmp(p1, p2, actionE, actionG, actionS)                           \
 do                                                                            \
 {                                                                             \
-  register const unsigned long* __s1 = &(p1->exp.l[currRing->pCompLowIndex]); \
-  register const unsigned long* __s2 = &(p2->exp.l[currRing->pCompLowIndex]); \
+  register const u_s long* __s1 = &(p1->exp.l[currRing->pCompLowIndex]); \
+  register const u_s long* __s2 = &(p2->exp.l[currRing->pCompLowIndex]); \
   register int __i = currRing->pCompLSize - 1;                                \
   _memcmp(__s1, __s2, __i, actionE, goto _NotEqual);                          \
                                                                               \
@@ -94,8 +94,6 @@ inline int rComp0(poly p1, poly p2)
 {
   _pMonCmp(p1, p2, return 0, return 1, return -1);
 }
-
-#define unsigned unsigned
 
 #endif // POLYS_COMP_H
 

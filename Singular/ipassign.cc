@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.50 1999-10-14 14:27:07 obachman Exp $ */
+/* $Id: ipassign.cc,v 1.51 1999-10-22 11:14:12 obachman Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -201,7 +201,7 @@ static BOOLEAN jiA_INT(leftv res, leftv a, Subexpr e)
     {
       if (i>=iv->length())
       {
-        intvec *iv1=new intvec(i+1);
+        intvec *iv1=NewIntvec1(i+1);
         (*iv1)[i]=(int)a->Data();
         intvec *ivn=ivAdd(iv,iv1);
         delete iv;
@@ -1352,11 +1352,11 @@ BOOLEAN iiAssign(leftv l, leftv r)
   switch (lt)
   {
     case INTVEC_CMD:
-      nok=jjA_L_INTVEC(l,r,new intvec(exprlist_length(r)));
+      nok=jjA_L_INTVEC(l,r,NewIntvec1(exprlist_length(r)));
       break;
     case INTMAT_CMD:
     {
-      nok=jjA_L_INTVEC(l,r,new intvec(IDINTVEC((idhdl)l->data)));
+      nok=jjA_L_INTVEC(l,r,NewIntvec1(IDINTVEC((idhdl)l->data)));
       break;
     }
     case MAP_CMD:

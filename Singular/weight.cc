@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: weight.cc,v 1.10 1998-07-02 13:28:27 pohl Exp $ */
+/* $Id: weight.cc,v 1.11 1999-10-22 11:14:20 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -220,7 +220,7 @@ void kEcartWeights(polyset s, int sl, short *eweight)
 BOOLEAN kWeight(leftv res,leftv id)
 {
   ideal F=(ideal)id->Data();
-  intvec * iv = new intvec(pVariables);
+  intvec * iv = NewIntvec1(pVariables);
   polyset s;
   int  sl, n, i;
   int  *x;
@@ -243,7 +243,7 @@ BOOLEAN kQHWeight(leftv res,leftv v)
 {
   res->data=(char *)idQHomWeights((ideal)v->Data());
   if (res->data==NULL)
-    res->data=(char *)new intvec(pVariables);
+    res->data=(char *)NewIntvec1(pVariables);
   return FALSE;
 }
 

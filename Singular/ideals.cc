@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.68 1999-10-21 11:36:32 pohl Exp $ */
+/* $Id: ideals.cc,v 1.69 1999-10-22 11:14:09 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -426,7 +426,7 @@ static int pComp_RevLex(poly a, poly b)
 intvec *idSort(ideal id,BOOLEAN nolex)
 {
   poly p,q;
-  intvec * result = new intvec(IDELEMS(id));
+  intvec * result = NewIntvec1(IDELEMS(id));
   int i, j, actpos=0, newpos, l;
   int diff, olddiff, lastcomp, newcomp;
   BOOLEAN notFound;
@@ -2779,7 +2779,7 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
     cmax=max(cmax,pMaxComp(p)+1);
   }
   diff = (int *)Alloc0(cmax*sizeof(int));
-  if (w!=NULL) *w=new intvec(cmax-1);
+  if (w!=NULL) *w=NewIntvec1(cmax-1);
   iscom = (int *)Alloc0(cmax*sizeof(int));
   i=0;
   while (i<=length)
@@ -3046,10 +3046,10 @@ int idElem(ideal F)
 */
 intvec * idMWLift(ideal mod,intvec * weights)
 {
-  if (idIs0(mod)) return new intvec(2);
+  if (idIs0(mod)) return NewIntvec1(2);
   int i=IDELEMS(mod);
   while ((i>0) && (mod->m[i-1]==NULL)) i--;
-  intvec *result = new intvec(i+1);
+  intvec *result = NewIntvec1(i+1);
   while (i>0)
   {
     (*result)[i]=pFDeg(mod->m[i])+(*weights)[pGetComp(mod->m[i])];
@@ -3188,7 +3188,7 @@ matrix idCoeffOfKBase(ideal arg, ideal kbase, poly how)
 
 intvec * idQHomWeights(ideal id)
 {
-  intvec * imat=new intvec(2*pVariables,pVariables,0);
+  intvec * imat=NewIntvec3(2*pVariables,pVariables,0);
   poly actHead=NULL,wPoint=NULL;
   int actIndex,i=-1,j=1,k;
   BOOLEAN notReady=TRUE;
@@ -3246,8 +3246,8 @@ ideal idMinEmbedding(ideal arg)
   poly p,q;
   int rg=arg->rank;
   ideal res = idCopy(arg);
-  intvec *indexMap=new intvec(rg+1);
-  intvec *toKill=new intvec(rg+1);
+  intvec *indexMap=NewIntvec1(rg+1);
+  intvec *toKill=NewIntvec1(rg+1);
 
   loop
   {

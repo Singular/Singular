@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.183 1999-10-22 09:07:01 obachman Exp $ */
+/* $Id: iparith.cc,v 1.184 1999-10-22 11:14:10 obachman Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -397,7 +397,7 @@ static BOOLEAN jjOP_I_IM(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjDOTDOT(leftv res, leftv u, leftv v)
 {
-  res->data=(char *)new intvec((int)u->Data(),(int)v->Data());
+  res->data=(char *)NewIntvec2((int)u->Data(),(int)v->Data());
   return FALSE;
 }
 static void jjEQUAL_REST(leftv res,leftv u,leftv v)
@@ -2597,7 +2597,7 @@ static BOOLEAN jjHIGHCORNER_M(leftv res, leftv v)
   int rk=idRankFreeModule(I);
   if (w==NULL)
   {
-    w = new intvec(rk);
+    w = NewIntvec1(rk);
     delete_w=TRUE;
   }
   for(i=rk;i>0;i--)
@@ -2782,7 +2782,7 @@ static BOOLEAN jjLEADEXP(leftv res, leftv v)
   poly p=(poly)v->Data();
   int s=pVariables;
   if (v->Typ()==VECTOR_CMD) s++;
-  intvec *iv=new intvec(s);
+  intvec *iv=NewIntvec1(s);
   if (p!=NULL)
   {
     for(int i = pVariables;i;i--)
@@ -3963,7 +3963,7 @@ static BOOLEAN jjFIND3(leftv res, leftv u, leftv v, leftv w)
 }
 static BOOLEAN jjINTMAT3(leftv res, leftv u, leftv v,leftv w)
 {
-  intvec* im= new intvec((int)v->Data(),(int)w->Data(), 0);
+  intvec* im= NewIntvec3((int)v->Data(),(int)w->Data(), 0);
   intvec* arg = (intvec*) u->Data();
   int i, n = min(im->cols()*im->rows(), arg->cols()*arg->rows());
 
@@ -4054,7 +4054,7 @@ static BOOLEAN jjRANDOM_Im(leftv res, leftv u, leftv v, leftv w)
   int i=(int)u->Data();
   int r=(int)v->Data();
   int c=(int)w->Data();
-  intvec *iv = new intvec(r, c, 0);
+  intvec *iv = NewIntvec3(r, c, 0);
   if (iv->rows()==0)
   {
     delete iv;
@@ -4557,7 +4557,7 @@ static BOOLEAN jjINTVEC_PL(leftv res, leftv v)
   int i=0;
   leftv h=v;
   if (h!=NULL) i=exprlist_length(h);
-  intvec *iv=new intvec(i);
+  intvec *iv=NewIntvec1(i);
   i=0;
   while (h!=NULL)
   {

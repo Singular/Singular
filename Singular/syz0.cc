@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.22 1999-10-14 14:27:34 obachman Exp $ */
+/* $Id: syz0.cc,v 1.23 1999-10-22 11:14:18 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -38,7 +38,7 @@ static polyset syInitSort(polyset oldF,int rkF,int Fmax,
 
   while ((Fl!=0) && (oldF[Fl-1]==NULL)) Fl--;
   if (*modcomp!=NULL) delete modcomp;
-  *modcomp = new intvec(rkF+2);
+  *modcomp = NewIntvec1(rkF+2);
   F=(polyset)Alloc0(Fmax*sizeof(poly));
   j=0;
   for(i=0;i<=rkF;i++)
@@ -485,7 +485,7 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
   BOOLEAN isNotReduced=TRUE;
 
   while ((Fl!=0) && (F[Fl-1]==NULL)) Fl--;
-  newmodcomp = new intvec(Fl+2);
+  newmodcomp = NewIntvec1(Fl+2);
 //for (j=0;j<Fl;j++) pWrite(F[j]);
 //PrintLn();
   if (currQuotient==NULL)

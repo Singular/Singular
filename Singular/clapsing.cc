@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.55 1999-10-14 14:26:58 obachman Exp $
+// $Id: clapsing.cc,v 1.56 1999-10-22 11:14:06 obachman Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -637,7 +637,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     res=idInit(1,1);
     if (with_exps!=1)
     {
-      (*v)=new intvec(1);
+      (*v)=NewIntvec1(1);
       (**v)[0]=1;
     }
     return res;
@@ -768,7 +768,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
         n--;
         J++;
       }
-      *v = new intvec( n );
+      *v = NewIntvec1( n );
     }
     res = idInit( n ,1);
     for ( ; J.hasItem(); J++, j++ )
@@ -815,7 +815,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
         if ((v!=NULL) && ((*v)!=NULL))
         {
           intvec *w=*v;
-          *v = new intvec( max(n-j,1) );
+          *v = NewIntvec1( max(n-j,1) );
           for (i=0,j=0;i<w->length();i++)
           {
             if((*w)[i]!=0)

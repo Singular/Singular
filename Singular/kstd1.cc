@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.43 1999-10-22 09:07:02 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.44 1999-10-22 11:14:13 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1773,7 +1773,7 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   strat->ak = idRankFreeModule(F);
   if (delete_w)
   {
-    temp_w=new intvec((strat->ak)+1);
+    temp_w=NewIntvec1((strat->ak)+1);
     w = &temp_w;
   }
   if ((h==testHomog)

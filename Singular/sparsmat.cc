@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.14 1999-10-20 15:58:35 pohl Exp $ */
+/* $Id: sparsmat.cc,v 1.15 1999-10-22 11:14:17 obachman Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -247,14 +247,14 @@ lists smCallBareiss(ideal I, int x, int y)
   {
     delete bareiss;
     if (origR!=NULL) smRingClean(origR,tmpR);
-    v=new intvec(1,pVariables);
+    v=NewIntvec2(1,pVariables);
   }
   else
   {
     idDelete(&II);
     bareiss->smBareiss(x, y);
     m = bareiss->smRes2Mod();
-    v = new intvec(bareiss->smGetRed());
+    v = NewIntvec1(bareiss->smGetRed());
     bareiss->smToIntvec(v);
     delete bareiss;
     if (origR!=NULL)
@@ -295,14 +295,14 @@ lists smCallNewBareiss(ideal I, int x, int y)
   {
     delete bareiss;
     if (origR!=NULL) smRingClean(origR,tmpR);
-    v=new intvec(1,pVariables);
+    v=NewIntvec2(1,pVariables);
   }
   else
   {
     idDelete(&II);
     bareiss->smNewBareiss(x, y);
     m = bareiss->smRes2Mod();
-    v = new intvec(bareiss->smGetRed());
+    v = NewIntvec1(bareiss->smGetRed());
     bareiss->smToIntvec(v);
     delete bareiss;
     if (origR!=NULL)

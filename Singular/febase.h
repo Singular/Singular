@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.40 1999-09-22 14:11:23 Singular Exp $ */
+/* $Id: febase.h,v 1.41 1999-10-22 11:14:07 obachman Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -95,6 +95,7 @@ void   PrintTCLS(const char c, const char * s);
 void   PrintS(char* s);
 #define feReportBug(s) fePrintReportBug(s, __FILE__, __LINE__)
 void fePrintReportBug(char* msg, char* file, int line);
+char* feGetResource(const char id);
 
 #ifdef __cplusplus
 }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.46 1999-10-20 11:56:19 obachman Exp $ */
+/* $Id: syz1.cc,v 1.47 1999-10-22 11:14:18 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -423,7 +423,7 @@ SRes syInitRes(ideal arg,int * length, intvec * Tl, intvec * cw)
   }
   else
   {
-    iv = new intvec(IDELEMS(arg),1,-1);
+    iv = NewIntvec3(IDELEMS(arg),1,-1);
     for (i=0;i<IDELEMS(arg);i++)
     {
       (*iv)[i] = pTotaldegree(arg->m[i])+(*cw)[pGetComp(arg->m[i])-1];
@@ -721,7 +721,7 @@ static intvec* syLinStrat(SSet nextPairs, syStrategy syzstr,
   int ** Hin=syzstr->Howmuch;
   int ** bin=syzstr->backcomponents;
   ideal o_r=syzstr->orderedRes[index+1];
-  intvec *result=new intvec(howmuch+1);
+  intvec *result=NewIntvec1(howmuch+1);
   BOOLEAN isDivisible;
   SObject tso;
 
@@ -772,8 +772,8 @@ static intvec* syLinStrat(SSet nextPairs, syStrategy syzstr,
   int ** Hin=syzstr->Howmuch;
   int ** bin=syzstr->backcomponents;
   ideal o_r=syzstr->orderedRes[index+1];
-  intvec *result=new intvec(howmuch+1);
-  intvec *spl=new intvec(howmuch,1,-1);
+  intvec *result=NewIntvec1(howmuch+1);
+  intvec *spl=NewIntvec3(howmuch,1,-1);
   BOOLEAN isDivisible;
   SObject tso;
 
@@ -895,7 +895,7 @@ static void syRedNextPairs(SSet nextPairs, syStrategy syzstr,
   number coefgcd,n;
   polyset redset=syzstr->orderedRes[index]->m;
   poly p=NULL,q;
-  intvec *spl1=new intvec(howmuch+1);
+  intvec *spl1=NewIntvec1(howmuch+1);
   SObject tso;
   long * ShiftedComponents = syzstr->ShiftedComponents[index];
   int* Components = syzstr->truecomponents[index];
@@ -1778,7 +1778,7 @@ intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim)
     }
     j = j+sh;
     jj = jj+2;
-    result=new intvec(j,jj-sh,0);
+    result=NewIntvec3(j,jj-sh,0);
     IMATELEM(*result,1,1) = max(1,idRankFreeModule(syzstr->res[1]));
     for (i=sh;i<jj;i++)
     {
@@ -1950,7 +1950,7 @@ void syPrint(syStrategy syzstr)
     int j;
     if (syzstr->resPairs!=NULL)
     {
-      syzstr->resolution = new intvec(syzstr->length+1);
+      syzstr->resolution = NewIntvec1(syzstr->length+1);
       SRes rP=syzstr->resPairs;
       (*syzstr->resolution)[0] = max(1,idRankFreeModule(syzstr->res[1]));
       while ((l<syzstr->length) && (rP[l]!=NULL))
@@ -1969,7 +1969,7 @@ void syPrint(syStrategy syzstr)
     else
     {
       resolvente rr;
-      syzstr->resolution = new intvec(syzstr->length+2);
+      syzstr->resolution = NewIntvec1(syzstr->length+2);
       if (syzstr->minres!=NULL)
         rr = syzstr->minres;
       else
@@ -2410,7 +2410,7 @@ void syKillEmptyEntres(resolvente res,int length)
     if (ri!=NULL)
     {
       rj = IDELEMS(ri);
-      changes = new intvec(rj+1,1,-1);
+      changes = NewIntvec3(rj+1,1,-1);
       while ((rj>0) && (ri->m[rj-1]==NULL)) rj--;
       j = k = 0;
       while (j+k<rj)
@@ -2455,7 +2455,7 @@ static intvec * syToStrip(syStrategy syzstr, int index)
 
   if ((syzstr->resPairs[index-1]!=NULL) && (!idIs0(syzstr->res[index])))
   {
-    result=new intvec(IDELEMS(syzstr->res[index])+1);
+    result=NewIntvec1(IDELEMS(syzstr->res[index])+1);
     for (int i=(*syzstr->Tl)[index-1]-1;i>=0;i--)
     {
       if (syzstr->resPairs[index-1][i].isNotMinimal!=NULL)
@@ -2473,7 +2473,7 @@ static intvec * syToStrip(syStrategy syzstr, int index)
 */
 static intvec * syOrdPairs(SSet sPairs, int length)
 {
-  intvec * result=new intvec(length,1,-1);
+  intvec * result=NewIntvec3(length,1,-1);
   int i,j=0,k=-1,l,ii;
 
   loop
@@ -2705,7 +2705,7 @@ syStrategy syLaScala3(ideal arg,int * length)
   syzstr->syRing = tmpR;
   pComp0 = syzcomp2dpc;
 /*--- initializes the data structures---------------*/
-  syzstr->Tl = new intvec(*length);
+  syzstr->Tl = NewIntvec1(*length);
   temp = idInit(IDELEMS(arg),arg->rank);
   for (i=0;i<IDELEMS(arg);i++)
   {

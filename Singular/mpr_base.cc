@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.11 1999-10-14 14:27:22 obachman Exp $ */
+/* $Id: mpr_base.cc,v 1.12 1999-10-22 11:14:15 obachman Exp $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -1388,7 +1388,7 @@ int resMatrixSparse::createMatrix( pointSet *E )
   mprSTICKYPROT2(" size of matrix: %d\n", E->num);
   mprSTICKYPROT2("  resultant deg: %d\n", numSet0);
 
-  uRPos= new intvec( numSet0, pLength((gls->m)[0])+1, 0 );
+  uRPos= NewIntvec3( numSet0, pLength((gls->m)[0])+1, 0 );
 
   // sparse Matrix represented as a module where
   // each poly is column vector ( pSetComp(p,k) gives the row )

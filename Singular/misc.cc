@@ -319,7 +319,7 @@ BOOLEAN setOption(leftv res, leftv v)
 
     if(strcmp(n,"get")==0)
     {
-      intvec *w=new intvec(2);
+      intvec *w=NewIntvec1(2);
       (*w)[0]=test;
       (*w)[1]=verbose;
       res->rtyp=INTVEC_CMD;

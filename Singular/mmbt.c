@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmbt.c,v 1.13 1999-10-22 09:07:03 obachman Exp $ */
+/* $Id: mmbt.c,v 1.14 1999-10-22 11:14:14 obachman Exp $ */
 /*
 * ABSTRACT: backtrace: part of memory subsystem (for linux/elf)
 * needed programs: - mprpc to set the variable MPRPC
@@ -24,9 +24,11 @@
 #include "mmprivate.h"
 #include "febase.h"
 #include "mmbt.h"
+#include "febase.h"
+
 
 #ifdef MTRACK
-#ifndef __OPTIMIZE__
+// #ifndef __OPTIMIZE__
 /* does only work in debug mode: 
 * requires that -fomit-frame-pointer is not given
 */
@@ -89,15 +91,15 @@ struct
   char *name;
 } p2n[MAX_PROCS_BT];
 
-extern char* feResource(char what);
 static int mm_p2n_max = -1;
 void mmP2cNameInit()
 {
   FILE *f;
   int i,j;
   char n[128];
-  char s[1000];
-  sprintf(s, "./mprnm -p %s >nm.log", "Singularg");
+  char s[2000];
+  sprintf(s, "%s/mprnm -mprdem %s/mprdem -p %s >nm.log", 
+          feGetResource('b'), feGetResource('b'), feGetResource('S'));
   system(s);
   f=fopen("nm.log","r");
   i=0;
@@ -115,7 +117,7 @@ void mmP2cNameInit()
     }
   }
   fclose(f);
-//  unlink("nm.log");
+  unlink("nm.log");
   p2n[i].name="??";
   p2n[i].p=~1;
   mm_p2n_max=i;
@@ -206,5 +208,5 @@ void mmPrintStackFrames(FILE *fd, unsigned long *bt_stack, int start, int end, i
   fprintf( fd,"\n");
 }
 #endif /* linux, i386 */
-#endif /* not optimize */
+// #endif /* not optimize */
 #endif /* MTRACK */

@@ -4,7 +4,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.71 1999-10-19 13:39:42 Singular Exp $
+ *  Version: $Id: mod2.h.in,v 1.72 1999-10-22 11:14:15 obachman Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -397,11 +397,11 @@ extern int pShortOut;
 /* define MTRACK for allowing to keep track of Alloc/Free with a backtrace */
 /* works only under linux/elf */
 #define MTRACK
-/* the maximal level of stacks to remember in debug (MTRACK) mode */
-#define BT_MAXSTACK 10
-/* define to enable stack storing of free callss, as well */
+/* define to enable stack storing of free calls, as well */
 #undef MTRACK_FREE
-#endif
+
+#endif /* !NDEBUG  */
+
 
 /* #define PAGE_TEST */
 
@@ -411,23 +411,6 @@ extern int pShortOut;
 /* Undefine to disable debugging of MP stuff */
 #ifdef HAVE_MPSR
 #define MPSR_DEBUG
-#endif
-
-/* MLIST requires MDEBUG */
-#ifdef MLIST
-#ifndef MDEBUG
-#define MDEBUG 0
-#endif
-#endif
-
-/* MTRACK requires MDEBUG and MLIST*/
-#ifdef MTRACK
-#ifndef MDEBUG
-#define MDEBUG 1
-#endif
-#ifndef MLIST
-#define MLIST
-#endif
 #endif
 
 /* PDEBUG requires MDEBUG */
@@ -442,10 +425,6 @@ extern int pShortOut;
 #define buildin_rand 1
 #endif
 #endif
-
-#ifdef MTRACK
-#define BT_MAXSTACK 10
-#endif /* MTRACK */
 
 /* define SPECTRUM_DEBUG and SPECTRUM_PRINT for debugging the spectrum code */
 /* define SPECTRUM_IOSTREAM to use C++ iostream for error messages          */
@@ -488,6 +467,24 @@ extern int pShortOut;
 #define YYDEBUG 0
 
 #endif /* not NDEBUG */
+
+/* MLIST requires MDEBUG */
+#ifdef MLIST
+#ifndef MDEBUG
+#define MDEBUG 0
+#endif
+#endif
+
+/* MTRACK requires MDEBUG and MLIST*/
+#ifdef MTRACK
+#ifndef MDEBUG
+#define MDEBUG 0
+#endif
+#ifndef MLIST
+#define MLIST
+#endif
+#endif
+
 
 #ifdef HAVE_DYNAMIC_LOADING
 #   define HAVE_NAMESPACES 1

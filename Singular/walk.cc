@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: walk.cc,v 1.1 1999-09-27 15:05:35 obachman Exp $ */
+/* $Id: walk.cc,v 1.2 1999-10-22 11:14:20 obachman Exp $ */
 /*
 * ABSTRACT: Implementation of the Groebner walk
 */
@@ -157,7 +157,7 @@ intvec* walkNextWeight(intvec* curr_weight, intvec* target_weight, ideal G)
 
   if (nw != NULL && nw != (int*) 1)
   {
-    next_weight = new intvec(currRing->N);
+    next_weight = NewIntvec1(currRing->N);
     int *nw_i = next_weight->ivGetVec();
     int i;
 

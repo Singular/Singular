@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.27 1999-10-14 14:27:24 obachman Exp $ */
+/* $Id: mpsr_Get.cc,v 1.28 1999-10-22 11:14:16 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -500,7 +500,7 @@ mpsr_Status_t mpsr_GetOperatorLeftv(MP_Link_pt link,
 static mpsr_Status_t GetIntVecLeftv(MP_Link_pt link, MPT_Node_pt node,
                                   mpsr_leftv mlv)
 {
-  intvec *iv = new intvec(node->numchild);
+  intvec *iv = NewIntvec1(node->numchild);
   int *v = iv->ivGetVec();
 
   mp_failr(IMP_GetSint32Vector(link, &v, node->numchild));
@@ -530,7 +530,7 @@ static mpsr_Status_t GetIntMatLeftv(MP_Link_pt link, MPT_Node_pt node,
     }
   }
 
-  iv = new intvec(row, col, 0);
+  iv = NewIntvec3(row, col, 0);
   v = iv->ivGetVec();
   mp_failr(IMP_GetSint32Vector(link, &v, node->numchild));
   mlv->lv = mpsr_InitLeftv(INTMAT_CMD, (void *) iv);

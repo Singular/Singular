@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hdegree.cc,v 1.17 1999-10-14 14:27:04 obachman Exp $ */
+/* $Id: hdegree.cc,v 1.18 1999-10-22 11:14:08 obachman Exp $ */
 /*
 *  ABSTRACT -  dimension, multiplicity, HC, kbase
 */
@@ -209,7 +209,7 @@ static void hIndSolve(scmon pure, int Npure, scfmon rad, int Nrad,
 
 intvec * scIndIntvec(ideal S, ideal Q)
 {
-  intvec *Set=new intvec(pVariables);
+  intvec *Set=NewIntvec1(pVariables);
   Exponent_t  mc,i;
   hexist = hInit(S, Q, &hNexist);
   if (hNexist==0)
@@ -293,7 +293,7 @@ static void hIndep(scmon pure)
   int iv;
   intvec *Set;
 
-  Set = ISet->set = new intvec(pVariables);
+  Set = ISet->set = NewIntvec1(pVariables);
   for (iv=pVariables; iv!=0 ; iv--)
   {
     if (pure[iv])
@@ -453,7 +453,7 @@ static indset hCheck2(indset sm, scmon pure)
   else
   {
     hMu2++;
-    sm->set = new intvec(pVariables);
+    sm->set = NewIntvec1(pVariables);
     sm->nx = (indset)Alloc0SizeOf(indlist);
     return sm;
   }

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmbt.h,v 1.5 1999-10-22 09:07:04 obachman Exp $ */
+/* $Id: mmbt.h,v 1.6 1999-10-22 11:14:14 obachman Exp $ */
 /*
 * ABSTRACT: backtrace: part of memory subsystem (for linux/elf)
 * needed programs: - mprpc to set the variable MPRPC
@@ -14,7 +14,10 @@
 */
 
 #ifdef MTRACK
-#ifndef __OPTIMIZE__
+/* the maximal level of stacks to remember in debug (MTRACK) mode */
+#define BT_MAXSTACK 10
+
+// #ifndef __OPTIMIZE__
 /* does only work in debug mode: 
 * requires that -fomit-frame-pointer is not given
 */
@@ -31,7 +34,7 @@ void mmDBPrintStackFrames(FILE *fd, void* memblock, int start, int end);
 void mmPrintStackFrames(FILE *fd, unsigned long *bt_stack, int start, int end, int mm); 
 void mmDBPrintThisStack(FILE *fd, void* memblock, int all, int free);
 #endif /* linux, i386 */
-#endif /* not optimize */
+// #endif /* not optimize */
 #endif /* MTRACK */
 
 #endif /* MMBT_H */

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz2.cc,v 1.6 1999-10-20 13:30:02 obachman Exp $ */
+/* $Id: syz2.cc,v 1.7 1999-10-22 11:14:19 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -455,7 +455,7 @@ static intvec* syLinStrat2(SSet nextPairs, syStrategy syzstr,
 {
   ideal o_r=syzstr->res[index+1];
   int i=0,i1=0,i2=0,l,ll=IDELEMS(o_r);
-  intvec *result=new intvec(howmuch+1);
+  intvec *result=NewIntvec1(howmuch+1);
   BOOLEAN isDivisible;
   SObject tso;
 
@@ -493,7 +493,7 @@ Print("sPoly: ");pWrite(nextPairs[i].p);
 PrintLn();
 #endif
       //syDeletePair(&nextPairs[i]);
-      if (*secondpairs==NULL) *secondpairs = new intvec(howmuch);
+      if (*secondpairs==NULL) *secondpairs = NewIntvec1(howmuch);
       (**secondpairs)[i2] = i+1;
       i2++;
 #ifdef SHOW_CRIT
@@ -577,7 +577,7 @@ static poly syRed_Hilb(poly toRed,syStrategy syzstr,int index)
 intvec *ivStrip(intvec* arg)
 {
   int l=arg->rows()*arg->cols(),i=0,ii=0;
-  intvec *tempV=new intvec(l);
+  intvec *tempV=NewIntvec1(l);
 
   while (i+ii<l)
   {
@@ -596,7 +596,7 @@ intvec *ivStrip(intvec* arg)
     delete tempV;
     return NULL;
   }
-  intvec * result=new intvec(i+1);
+  intvec * result=NewIntvec1(i+1);
   for (ii=0;ii<i;ii++)
    (*result)[ii] = (*tempV)[ii];
   delete tempV;
@@ -620,11 +620,11 @@ static void syRedNextPairs_Hilb(SSet nextPairs, syStrategy syzstr,
   number coefgcd,n;
   SSet redset=syzstr->resPairs[index];
   poly p=NULL,q,tp;
-  intvec *spl1=new intvec(howmuch+1);
+  intvec *spl1=NewIntvec1(howmuch+1);
   SObject tso;
   intvec *spl3=NULL;
 #ifdef USE_HEURISTIC1
-  intvec *spl2=new intvec(howmuch+1,howmuch+1,0);
+  intvec *spl2=NewIntvec3(howmuch+1,howmuch+1,0);
   int there_are_superfluous=0;
   int step=1,jj,j1,j2;
 #endif
@@ -930,11 +930,11 @@ void sySetNewHilb(syStrategy syzstr, int toSub,int index,int actord)
   intvec * temp_hilb = hHstdSeries(syzstr->res[index+1],NULL,NULL,NULL);
   if (syzstr->hilb_coeffs[index+1]==NULL)
   {
-    syzstr->hilb_coeffs[index+1] = new intvec(16*((actord/16)+1));
+    syzstr->hilb_coeffs[index+1] = NewIntvec1(16*((actord/16)+1));
   }
   else if (actord>=syzstr->hilb_coeffs[index+1]->length())
   {
-    intvec * ttt=new intvec(16*((actord/16)+1));
+    intvec * ttt=NewIntvec1(16*((actord/16)+1));
     for (i=syzstr->hilb_coeffs[index+1]->length()-1;i>=0;i--)
     {
       (*ttt)[i] = (*(syzstr->hilb_coeffs[index+1]))[i];
@@ -1040,7 +1040,7 @@ static void syReOrdResult_Hilb(syStrategy syzstr,int maxindex,int maxdeg)
 {
   ideal reor,toreor;
   int i,j,k,l,m,togo;
-  syzstr->betti = new intvec(maxdeg,maxindex+1,0);
+  syzstr->betti = NewIntvec3(maxdeg,maxindex+1,0);
   (*syzstr->betti)[0] = 1;
   for (i=1;i<=syzstr->length;i++)
   {
@@ -1151,7 +1151,7 @@ syStrategy syHilb(ideal arg,int * length)
   crit_fails = 0;
 #endif
   syzstr->length = *length = pVariables+2;
-  syzstr->Tl = new intvec(*length+1);
+  syzstr->Tl = NewIntvec1(*length+1);
   temp = idInit(IDELEMS(arg),arg->rank);
   for (i=0;i<IDELEMS(arg);i++)
   {

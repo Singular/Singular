@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.111 1999-10-22 09:07:00 obachman Exp $ */
+/* $Id: extra.cc,v 1.112 1999-10-22 11:14:07 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -933,14 +933,14 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         //---<>--number of points------
         int anz = r.anz_punkte;    // number of points
         int dim = (currRing->N);     // dimension
-        intvec* v = new intvec( anz*dim );
+        intvec* v = NewIntvec1( anz*dim );
         for (i=0; i<anz*dim; i++)    // copy points
           (*v)[i] = r.pu[i];
         L->m[4].rtyp=INTVEC_CMD;
         L->m[4].data=(void *)v;
         //---<>--degenerations---------
         int deg = r.deg;    // number of points
-        intvec* w = new intvec( r.speicher );  // necessary memeory
+        intvec* w = NewIntvec1( r.speicher );  // necessary memeory
         i=0;               // start copying
         do
         {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.36 1999-10-20 13:30:02 obachman Exp $ */
+/* $Id: ipid.cc,v 1.37 1999-10-22 11:14:12 obachman Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -135,7 +135,7 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
     //the type with init routines:
       case INTVEC_CMD:
       case INTMAT_CMD:
-        IDINTVEC(h) = new intvec();
+        IDINTVEC(h) = NewIntvec0();
         break;
       case NUMBER_CMD:
         IDNUMBER(h) = nInit(0);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.72 1999-10-14 14:27:04 obachman Exp $ */
+/* $Id: grammar.y,v 1.73 1999-10-22 11:14:08 obachman Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -886,7 +886,7 @@ declare_ip_variable:
             //while (v->next!=NULL) { v=v->next; }
             idhdl h=(idhdl)v->data;
             delete IDINTVEC(h);
-            IDINTVEC(h) = new intvec(r,c,0);
+            IDINTVEC(h) = NewIntvec3(r,c,0);
             if (IDINTVEC(h)==NULL) YYERROR;
           }
         | INTMAT_CMD elemexpr
@@ -898,7 +898,7 @@ declare_ip_variable:
             {
                h=(idhdl)v->data;
                delete IDINTVEC(h);
-               IDINTVEC(h) = new intvec(1,1,0);
+               IDINTVEC(h) = NewIntvec3(1,1,0);
                v=v->next;
             } while (v!=NULL);
           }
@@ -958,7 +958,7 @@ orderelem:
         ordername
           {
             memset(&$$,0,sizeof($$));
-            intvec *iv = new intvec(2);
+            intvec *iv = NewIntvec1(2);
             (*iv)[0] = 1;
             (*iv)[1] = $1;
             $$.rtyp = INTVEC_CMD;
@@ -972,7 +972,7 @@ orderelem:
             {
               slLength =  exprlist_length(sl);
               int l = 2 +  slLength;
-              intvec *iv = new intvec(l);
+              intvec *iv = NewIntvec1(l);
               (*iv)[0] = slLength;
               (*iv)[1] = $1;
 

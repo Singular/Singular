@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.19 1999-10-14 14:27:08 obachman Exp $ */
+/* $Id: ipconv.cc,v 1.20 1999-10-22 11:14:12 obachman Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -112,7 +112,7 @@ static void * iiMa2Mo(void *data)
 
 static void * iiI2Iv(void *data)
 {
-  intvec *iv=new intvec((int)data,(int)data);
+  intvec *iv=NewIntvec2((int)data,(int)data);
   return (void *)iv;
 }
 

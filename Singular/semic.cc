@@ -179,9 +179,9 @@ lists   spectrum::thelist( void )
 
     L->Init( 6 );
 
-    intvec            *num  = new intvec( n );
-    intvec            *den  = new intvec( n );
-    intvec            *mult = new intvec( n );
+    intvec            *num  = NewIntvec1( n );
+    intvec            *den  = NewIntvec1( n );
+    intvec            *mult = NewIntvec1( n );
 
     for( int i=0; i<n; i++ )
     {

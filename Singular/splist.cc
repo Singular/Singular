@@ -457,9 +457,9 @@ spectrumState   spectrumPolyList::spectrum( lists *L,int fast )
     //  compute the spectrum numbers with their multiplicities
     // --------------------------------------------------------
 
-    intvec            *nom  = new intvec( n );
-    intvec            *den  = new intvec( n );
-    intvec            *mult = new intvec( n );
+    intvec            *nom  = NewIntvec1( n );
+    intvec            *den  = NewIntvec1( n );
+    intvec            *mult = NewIntvec1( n );
 
     int count         = 0;
     int multiplicity  = 1;
