@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.22 1999-03-11 15:58:08 Singular Exp $ */
+/* $Id: matpol.cc,v 1.23 1999-03-11 16:32:55 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -830,17 +830,19 @@ matrix mpCoeffProc (poly f, poly vars)
           break;
         }
       }
-      if (i == l) 
+      if (i == l)
       {
         // check monom 1 last:
-        h = mpExdiv(f, MATELEM(co,1,pos_of_1));
-        if (h!=NULL)
+        if (pos_of_1 != -1)
         {
-          MATELEM(co,2,pos_of_1) = pAdd(MATELEM(co,2,pos_of_1), h);
-          break;
+          h = mpExdiv(f, MATELEM(co,1,pos_of_1));
+          if (h!=NULL)
+          {
+            MATELEM(co,2,pos_of_1) = pAdd(MATELEM(co,2,pos_of_1), h);
+          }
         }
         break;
-      }	
+      }
       i ++;
     }
     pIter(f);
