@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmbt.c,v 1.3 1998-12-02 14:00:13 obachman Exp $ */
+/* $Id: mmbt.c,v 1.4 1998-12-02 14:08:34 obachman Exp $ */
 /*
 * ABSTRACT: backtrace: part of memory subsystem (for linux/elf)
 * needed programs: - mprpc to set the variable MPRPC
@@ -21,7 +21,7 @@
 #include <unistd.h>
 #include "mod2.h"
 #include "tok.h"
-#include "mmprivat.h"
+#include "mmprivate.h"
 
 #ifdef MTRACK
 #ifndef __OPTIMIZE__
