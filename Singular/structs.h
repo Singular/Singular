@@ -6,8 +6,7 @@
 /*
 * ABSTRACT
 */
-/* $Log: not supported by cvs2svn $
-*/
+/* $Id: structs.h,v 1.2 1997-03-24 14:25:57 Singular Exp $ */
 
 /* standard types */
 typedef unsigned char  uchar ;

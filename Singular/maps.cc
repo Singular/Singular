@@ -1,9 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/maps.cc,v 1.2 1997-03-20 16:59:39 obachman Exp $";
-/* $Log: not supported by cvs2svn $
-*/
+static char rcsid[] = "$Id: maps.cc,v 1.3 1997-03-24 14:25:18 Singular Exp $";
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */

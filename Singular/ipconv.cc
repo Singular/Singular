@@ -1,10 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/ipconv.cc,v 1.1.1.1 1997-03-19 13:18:47 obachman Exp $";
-/* $Log: not supported by cvs2svn $
-*/
-
+static char rcsid[] = "$Id: ipconv.cc,v 1.2 1997-03-24 14:24:54 Singular Exp $";
 /*
 * ABSTRACT: automatic type conversions
 */

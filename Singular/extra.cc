@@ -1,9 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/extra.cc,v 1.1.1.1 1997-03-19 13:18:42 obachman Exp $";
-/* $Log: not supported by cvs2svn $
-*/
+static char rcsid[] = "$Id: extra.cc,v 1.2 1997-03-24 14:24:35 Singular Exp $";
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */

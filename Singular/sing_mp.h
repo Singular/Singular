@@ -1,11 +1,12 @@
+#ifndef  SING_MP_H
+#define SING_MP_H
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /*
 * ABSTRACT
 */
-/* $Log: not supported by cvs2svn $
-*/
+/* $Id: sing_mp.h,v 1.2 1997-03-24 14:25:51 Singular Exp $ */
 
 #include "subexpr.h"
 #include "silink.h"
@@ -23,3 +24,4 @@ extern MP_Link_pt OpenMPFile(char *fn, short mode);
 #endif
 
 int Batch_do(int argc, char **argv);
+#endif

@@ -6,8 +6,7 @@
 /*
 * ABSTRACT
 */
-/* $Log: not supported by cvs2svn $
-*/
+/* $Id: silink.h,v 1.2 1997-03-24 14:25:46 Singular Exp $ */
 
 #include "structs.h"
 

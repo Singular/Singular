@@ -6,8 +6,8 @@
 /*
 * ABSTRACT
 */
-/* $Log: not supported by cvs2svn $
-*/
+/* $Id: timer.h,v 1.2 1997-03-24 14:26:05 Singular Exp $ */
+
 extern int timerv;
 void startTimer(void);
 void writeTime(void* s);

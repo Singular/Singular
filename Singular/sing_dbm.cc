@@ -1,9 +1,13 @@
+/****************************************
+*  Computer Algebra System SINGULAR     *
+****************************************/
+
 //**************************************************************************
 //
-// $Id: sing_dbm.cc,v 1.1.1.1 1997-03-19 13:18:50 obachman Exp $
+// $Id: sing_dbm.cc,v 1.2 1997-03-24 14:25:47 Singular Exp $
 //
 //**************************************************************************
-//  The module 'dbm.cc' containes command to handle dbm-files under
+//  'sing_dbm.cc' containes command to handle dbm-files under
 // Singular. Don't forget to compile Singular with the option -ldbm
 //
 //**************************************************************************

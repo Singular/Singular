@@ -1,10 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/hutil.cc,v 1.1.1.1 1997-03-19 13:18:45 obachman Exp $";
-/* $Log: not supported by cvs2svn $
-*/
-
+static char rcsid[] = "$Id: hutil.cc,v 1.2 1997-03-24 14:24:44 Singular Exp $";
 /*
 * ABSTRACT: Utilities for staircase operations
 */

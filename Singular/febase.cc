@@ -1,13 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/febase.cc,v 1.2 1997-03-21 14:40:18 Singular Exp $";
-/* $Log: not supported by cvs2svn $
-// Revision 1.1.1.1  1997/03/19  13:18:44  obachman
-// Imported Singular sources
-//
-*/
-
+static char rcsid[] = "$Id: febase.cc,v 1.3 1997-03-24 14:24:36 Singular Exp $";
 /*
 * ABSTRACT: i/o system, handling of 'voices'
 */

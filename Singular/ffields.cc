@@ -1,13 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/ffields.cc,v 1.2 1997-03-20 16:59:31 obachman Exp $";
-/* $Log: not supported by cvs2svn $
-// Revision 1.1.1.1  1997/03/19  13:18:44  obachman
-// Imported Singular sources
-//
-*/
-
+static char rcsid[] = "$Id: ffields.cc,v 1.3 1997-03-24 14:24:39 Singular Exp $";
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */

@@ -6,8 +6,7 @@
 /*
 * ABSTRACT
 */
-/* $Log: not supported by cvs2svn $
-*/
+/* $Id: spolys0.h,v 1.2 1997-03-24 14:25:55 Singular Exp $ */
 #include "polys.h"
 #include "binom.h"
 

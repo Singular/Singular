@@ -6,8 +6,8 @@
 /*
 * ABSTRACT
 */
-/* $Log: not supported by cvs2svn $
-*/
+/* $Id: subexpr.h,v 1.2 1997-03-24 14:25:59 Singular Exp $ */
+
 #include <string.h>
 #include "structs.h"
 

@@ -6,8 +6,6 @@
 /*
 * ABSTRACT
 */
-/* $Log: not supported by cvs2svn $
-*/
 #include "structs.h"
 
 poly maEval(map theMap, poly p, int varnum, matrix s=NULL);

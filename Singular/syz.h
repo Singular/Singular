@@ -6,8 +6,7 @@
 /*
 * ABSTRACT
 */
-/* $Log: not supported by cvs2svn $
-*/
+/* $Id: syz.h,v 1.2 1997-03-24 14:26:02 Singular Exp $ */
 #include "structs.h"
 
 void sySchreyersSyzygiesM(polyset F,int Fmax,polyset* Shdl,int* Smax,

@@ -1,9 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/ideals.cc,v 1.1.1.1 1997-03-19 13:18:46 obachman Exp $";
-/* $Log: not supported by cvs2svn $
-*/
+static char rcsid[] = "$Id: ideals.cc,v 1.2 1997-03-24 14:24:46 Singular Exp $";
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */

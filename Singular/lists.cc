@@ -4,8 +4,7 @@
 /*
 * ABSTRACT: handling of the list type
 */
-/* $Log: not supported by cvs2svn $
-*/
+/* $Id: lists.cc,v 1.2 1997-03-24 14:25:11 Singular Exp $ */
 #include "mod2.h"
 #include "tok.h"
 #include "febase.h"

@@ -4,11 +4,7 @@
 /*
 * ABSTRACT
 */
-/* $Log: not supported by cvs2svn $
-// Revision 1.1.1.1  1997/03/19  13:18:41  obachman
-// Imported Singular sources
-//
-*/
+/* $Id: sing_mp.cc,v 1.3 1997-03-24 14:25:50 Singular Exp $ */
 
 #include <stdio.h>
 #include <string.h>

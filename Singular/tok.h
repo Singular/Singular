@@ -6,8 +6,7 @@
 /*
 * ABSTRACT
 */
-/* $Log: not supported by cvs2svn $
-*/
+/* $Id: tok.h,v 1.2 1997-03-24 14:26:06 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"

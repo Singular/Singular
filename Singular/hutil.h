@@ -6,8 +6,6 @@
 /*
 * ABSTRACT
 */
-/* $Log: not supported by cvs2svn $
-*/
 
 typedef short * scmon;
 typedef scmon * scfmon;

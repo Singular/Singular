@@ -1,32 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/iparith.cc,v 1.5 1997-03-21 15:45:41 Singular Exp $";
-/* $Log: not supported by cvs2svn $
-// Revision 1.4  1997/03/21  15:30:34  Singular
-// * hannes: return an error for ring(..) and qring(...)
-//
-// Revision 1.3  1997/03/21  13:19:00  Singular
-// fixed assignment of lists, det(constants), comparision of intmats
-//
-// Revision 1.2  1997/03/20  16:59:36  obachman
-// Various minor bug-fixes in mpsr interface
-//
-// Thu Mar 20 11:57:00 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
-//
-// 	* sing_mp.cc (slInitBatchLink): initialized silink such that
-// 	  l->argv[0] == "MP:connect" (otherwise, slInitMP failed)
-//
-// Wed Mar 19 15:38:08 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
-//
-// 	* hannes fixed maFindPerm to reflect new names <->parameter scheme
-//
-// 	* sing_mp.cc (mpsr_IsMPLink): fixed it
-//
-// 	* Makefile (tags): added target tags
-//
-*/
-
+static char rcsid[] = "$Id: iparith.cc,v 1.6 1997-03-24 14:24:51 Singular Exp $";
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
 */

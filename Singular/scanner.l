@@ -2,6 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: scanner.l,v 1.2 1997-03-24 14:25:43 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

@@ -3,9 +3,10 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Header: /exports/cvsroot-2/cvsroot/Singular/stairc.h,v 1.1.1.1 1997-03-19 13:19:01 obachman Exp $ */
-/* $Log: not supported by cvs2svn $
+/*
+* ABSTRACT
 */
+/* $Id: stairc.h,v 1.2 1997-03-24 14:25:56 Singular Exp $ */
 
 #include "structs.h"
 

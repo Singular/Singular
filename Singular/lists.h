@@ -6,8 +6,6 @@
 /*
 * ABSTRACT: handling of the list type
 */
-/* $Log: not supported by cvs2svn $
-*/
 #include "structs.h"
 #include "mmemory.h"
 #include "subexpr.h"

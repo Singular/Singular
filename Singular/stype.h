@@ -6,6 +6,8 @@
 /*
 * ABSTRACT: flex/bison interface
 */
+/* $Id: stype.h,v 1.2 1997-03-24 14:25:58 Singular Exp $ */
+
 #include "structs.h"
 #include "subexpr.h"
 

@@ -6,8 +6,6 @@
 /*
 * ABSTRACT
 */
-/* $Log: not supported by cvs2svn $
-*/
 #include <stdio.h>
 #include "structs.h"
 

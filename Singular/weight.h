@@ -6,8 +6,8 @@
 /*
 * ABSTRACT
 */
-/* $Log: not supported by cvs2svn $
-*/
+/* $Id: weight.h,v 1.2 1997-03-24 14:26:09 Singular Exp $ */
+
 #include "structs.h"
 
 extern short * ecartWeights;

@@ -6,8 +6,6 @@
 /*
 * ABSTRACT
 */
-/* $Log: not supported by cvs2svn $
-*/
 #include "structs.h"
 
 #define VARS (100)   /*max. number of variables as constant*/

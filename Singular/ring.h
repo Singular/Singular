@@ -6,9 +6,7 @@
 /*
 * ABSTRACT
 */
-/* $Header: /exports/cvsroot-2/cvsroot/Singular/ring.h,v 1.1.1.1 1997-03-19 13:18:42 obachman Exp $ */
-/* $Log: not supported by cvs2svn $
-*/
+/* $Id: ring.h,v 1.2 1997-03-24 14:25:42 Singular Exp $ */
 
 /* includes */
 #include "structs.h"

@@ -1,11 +1,12 @@
 #ifndef SING_DBM_H
 #define SING_DBM_H
+/****************************************
+*  Computer Algebra System SINGULAR     *
+****************************************/
 /*
- * $Id: sing_dbm.h,v 1.1.1.1 1997-03-19 13:19:01 obachman Exp $
- *
- * Copyright (c) 1995 by Dep. Mathematic, Univ. Kaiserslautern.
- *      <krueger@mathematik.uni-kl.de>     All Rights Reserved
- */
+* ABSTRACT
+*/
+/* $Id: sing_dbm.h,v 1.2 1997-03-24 14:25:48 Singular Exp $ */
 
 #include "structs.h"
 

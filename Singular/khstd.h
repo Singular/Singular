@@ -3,8 +3,6 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Log: not supported by cvs2svn $
-*/
 /*
 * ABSTRACT:hilbert driven std
 */

@@ -6,8 +6,7 @@
 /*
 * ABSTRACT
 */
-/* $Log: not supported by cvs2svn $
-*/
+/* $Id: shortfl.h,v 1.2 1997-03-24 14:25:44 Singular Exp $ */
 #include "structs.h"
 
 BOOLEAN nrGreaterZero (number k);

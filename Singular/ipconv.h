@@ -6,8 +6,6 @@
 /*
 * ABSTRACT
 */
-/* $Log: not supported by cvs2svn $
-*/
 #include "structs.h"
 
 int iiTestConvert (int inputType, int outputType);

@@ -1,12 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Log: not supported by cvs2svn $
- * Revision 1.1.1.1  1997/03/19  13:18:55  obachman
- * Imported Singular sources
- *
-*/
-
+/* $Id: grammar.y,v 1.3 1997-03-24 14:24:41 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */

@@ -1,10 +1,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: silink.cc,v 1.2 1997-03-24 14:25:45 Singular Exp $ */
 /*
 * ABSTRACT
-*/
-/* $Log: not supported by cvs2svn $
 */
 
 #include <stdio.h>

@@ -1,9 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/kstd2.cc,v 1.1.1.1 1997-03-19 13:18:48 obachman Exp $";
-/* $Log: not supported by cvs2svn $
-*/
+static char rcsid[] = "$Id: kstd2.cc,v 1.2 1997-03-24 14:25:05 Singular Exp $";
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */

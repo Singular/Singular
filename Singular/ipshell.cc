@@ -1,13 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/ipshell.cc,v 1.2 1997-03-21 15:45:44 Singular Exp $";
-/* $Log: not supported by cvs2svn $
-// Revision 1.1.1.1  1997/03/19  13:18:47  obachman
-// Imported Singular sources
-//
-*/
-
+static char rcsid[] = "$Id: ipshell.cc,v 1.3 1997-03-24 14:25:00 Singular Exp $";
 /*
 * ABSTRACT:
 */

@@ -1,10 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/ipassign.cc,v 1.2 1997-03-21 13:19:03 Singular Exp $";
-/* $Log: not supported by cvs2svn $
-*/
-
+static char rcsid[] = "$Id: ipassign.cc,v 1.3 1997-03-24 14:24:53 Singular Exp $";
 /*
 * ABSTRACT: interpreter:
 *           assignment of expressions and lists to objects or lists

@@ -1,16 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/subexpr.cc,v 1.4 1997-03-21 14:58:56 obachman Exp $";
-/* $Log: not supported by cvs2svn $
-// Revision 1.3  1997/03/21  14:06:52  Singular
-// * hannes: changed return value for Eval(assignment) to 'nothing'
-//
-// Revision 1.2  1997/03/21  13:19:05  Singular
-// fixed assignment of lists, det(constants), comparision of intmats
-//
-*/
-
+static char rcsid[] = "$Id: subexpr.cc,v 1.5 1997-03-24 14:25:58 Singular Exp $";
 /*
 * ABSTRACT:
 */
