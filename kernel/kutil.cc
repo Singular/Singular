@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.6 2005-02-17 09:42:20 Singular Exp $ */
+/* $Id: kutil.cc,v 1.7 2005-03-17 14:15:13 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -676,7 +676,7 @@ BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
     // L->p2 either NULL or "normal" poly
     pFalseReturn(pp_Test(L->p2, currRing, L->tailRing));
   }
-  else if (tlength > 0 && T != NULL)
+  else if (tlength > 0 && T != NULL && (lpos >=0))
   {
     // now p1 and p2 must be != NULL and must be contained in T
     int i;
