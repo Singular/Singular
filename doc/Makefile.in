@@ -39,8 +39,10 @@ SINGULAR	= @SINGULAR@
 SINGULAR_LIB_DIR= ../Singular/LIB
 LIBPARSE	= ${bindir}/libparse
 D2T_SUBDIR      = ./d2t_singular
-DOC2TEX		= ./doc2tex.pl -subdir ${D2T_SUBDIR} -Singular ${SINGULAR} \
-			-libparse ${LIBPARSE} -I ../Singular/LIB 
+CHKSUM_DB       = ${D2T_SUBDIR}/chksum.db
+DOC2TEX		= ${PERL5} ./doc2tex.pl -subdir ${D2T_SUBDIR} \
+                  -Singular ${SINGULAR} -make
+PL2DOC		= ${PERL5} ./pl2doc.pl -db  ${CHKSUM_DB}
 
 # t2h stuff
 TMP_DIR		= @TMP_DIR@
@@ -56,7 +58,9 @@ HTML_TUTOR_TOP     = tutor.htm
 ## End configuration dependend stuff
 #################################################################
 
-# files
+###########################################################
+# File sets
+#
 TEX_FILES	= copyright.tex
 DOC2TEX_FILES	= \
 		examples.tex general.tex math.tex reference.tex \
@@ -74,7 +78,12 @@ IMAGES_HTML := $(IMAGES:%=${HTML_SUBDIR}/%)
 # prepend bindir to path so that programs from there are taken first
 export PATH := "${bindir}:${PATH}"
 
-.PHONY: info dvi ps 
+###########################################################
+# top targets
+#
+
+.PHONY: info dvi ps html
+
 # default target
 all: info dvi html
 
@@ -108,7 +117,46 @@ usercard.ps: usercard.dvi
 %.ps: %.dvi
 	${DVIPS} $< -o $@
 
-# html stuff
+###########################################################
+# texinfo targets
+#
+manual.tex:  ${MANUAL_FILES} doc2tex.pl ${SINGULAR} singular.doc
+	${DOC2TEX} -no_fun -o manual.tex singular.doc
+
+singular.tex: ${MANUAL_FILES} doc2tex.pl ${LIB_TEX_FILES} ${SINGULAR} ${LIBPARSE} singular.doc
+	${DOC2TEX} -o singular.tex singular.doc
+
+#pattern rule for tex files
+%_noEx.tex : %.doc doc2tex.pl ${SINGULAR}
+	${DOC2TEX} -o $@ -no_ex $<
+
+%.tex: %.doc doc2tex.pl ${SINGULAR} 
+	${DOC2TEX} -o $@ $<
+
+# pattern rules for lib docus
+${D2T_SUBDIR}/%_lib.pl : ${SINGULAR_LIB_DIR}/%.lib ${LIBPARSE}
+	test -d ${D2T_SUBDIR} || mkdir ${D2T_SUBDIR}
+	${LIBPARSE} -i $< > $@
+
+%_noFun.doc : %.pl pl2doc.pl
+	${PL2DOC}  -no_fun -o $@  $<
+
+%.doc : %.pl pl2doc.pl
+	${PL2DOC} -o $@ $<
+
+# do not delete intermediate .pl and .doc files
+.PRECIOUS: %.doc %_noFun.doc ${D2T_SUBDIR}/%_lib.pl
+
+singular.idx: singular.hlp ${D2T_SUBDIR}/idx.db ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx
+	doc2idx.pl singular.hlp ${D2T_SUBDIR}/idx.db ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx
+
+# targets which produce stand-alone documents
+COPYING: copyright.tex
+	${MAKEINFO} --no-header -o COPYING copyright.tex 
+
+###########################################################
+# html targets
+#
 html: ${HTML_SUBDIR}/${HTML_MANUAL_TOP} ${IMAGES_HTML}
 ${HTML_SUBDIR}/${HTML_MANUAL_TOP}: ${TEXI2HTML_INIT} ${TEXI2HTML} singular.tex
 	${PERL5} ${TEXI2HTML} ${TEXI2HTML_OPTS} -prefix ${HTML_MANUAL_PREFIX} \
@@ -120,31 +168,7 @@ ${HTML_SUBDIR}/${HTML_TUTOR_TOP}: ${TEXI2HTML_INIT} ${TEXI2HTML} tutor.tex
 	${PERL5} ${TEXI2HTML} ${TEXI2HTML_OPTS} -prefix ${HTML_TUTOR_PREFIX} \
         -top_file ${HTML_TUTOR_TOP} tutor.tex
 
-# how to create the texinfo files
-manual.tex:  ${MANUAL_FILES} doc2tex.pl ${SINGULAR} ${LIBPARSE} singular.doc
-	${PERL5} ${DOC2TEX} -o manual.tex singular.doc
-
-singular.tex: ${MANUAL_FILES} doc2tex.pl ${SINGULAR} ${LIBPARSE} singular.doc
-	${PERL5} ${DOC2TEX} -lib_fun -lib_ex -o singular.tex singular.doc
-
-%.tex: %.doc doc2tex.pl ${SINGULAR} ${LIBPARSE}
-	${PERL5} ${DOC2TEX} $*
-
-singular.idx: singular.hlp ${D2T_SUBDIR}/idx.db ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx
-	doc2idx.pl singular.hlp ${D2T_SUBDIR}/idx.db ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx
-
-# targets which produce stand-alone documents
-COPYING: copyright.tex
-	${MAKEINFO} --no-header -o COPYING copyright.tex 
-
-${IMAGES_HTML} : ${IMAGES_SRC}
-	test -d html || mkdir html
-	cp ${IMAGES_SRC} html
-
-${IMAGES_TUTOR} : ${IMAGES_SRC}
-	test -d html_tutor || mkdir html_tutor
-	cp ${IMAGES_SRC} html_tutor
-
+# pattern rules for images
 images/%.gif : images/%.gif.uu
 	uudecode $< -o $@
 
@@ -154,11 +178,21 @@ images/%.jpg : images/%.jpg.uu
 images/%.xbm : images/%.xbm.uu
 	uudecode $< -o $@
 
-# targets concerned with maintenance
+${IMAGES_HTML} : ${IMAGES_SRC}
+	test -d ${HTMLDIR} || mkdir ${HTMLDIR}
+	cp ${IMAGES_SRC} ${HTML_DIR}
+
+
+
+
+
+###########################################################
+# misc targets
+#
 install: singular.hlp html/index.htm
 	${MKINSTALLDIRS} ${infodir}
 	${INSTALL_DATA} singular.hlp ${infodir}
-	test -L ${htmldir} || (rm -rf ${htmldir}; ln -s `pwd`/html ${htmldir})
+	test -L ${htmldir} || (rm -rf ${htmldir}; ln -s `pwd`/${HTML_DIR} ${htmldir})
 
 uninstall: 
 	rm -f ${infodir}/singular.hlp
@@ -171,7 +205,7 @@ clean:
 	/bin/rm -f *.fn *.fns *.ky *.kys *.log *.pg *.pgs *.toc *.tp
 	/bin/rm -f *.tps *.vr *.vrs
 	/bin/rm -f singular.hlp *.dvi *.ps ${DOC2TEX_FILES} 
-	/bin/rm -rf singular.tex manual.tex  html ${D2T_SUBDIR}
+	/bin/rm -rf singular.tex manual.tex  ${HTML_DIR} ${D2T_SUBDIR}
 
 mostlyclean: clean
 

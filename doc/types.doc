@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.93 1999-07-17 14:49:16 obachman Exp $
+@comment $Id: types.doc,v 1.94 1999-07-21 19:53:28 obachman Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -1856,7 +1856,19 @@ free resolution of an ideal resp.@: module given by a standard base (see @ref{sr
 @cindex map
 
 Maps are ring maps from a preimage ring into the basering.
-Note that the target of a map is ALWAYS the actual basering.
+
+@strong{Note:}
+@itemize @bullet
+@item 
+the target of a map is ALWAYS the actual basering
+@item
+the preimage ring is stored "by name", that means, maps can only be
+used in such contexts, where the name of the preimage ring can be
+resolved (i.e., there might be problems for rings/maps defined in
+subprocedures). See also @ref{Identifier resolution}, @ref{Names in
+procedures}.
+@end itemize
+
 Maps between rings with different coefficient fields are
 possible, coefficients are mapped in the following way:
 @itemize @bullet

@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: doc2tex.pl,v 1.10 1999-07-20 14:36:36 obachman Exp $
+# $Id: doc2tex.pl,v 1.11 1999-07-21 19:53:23 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -35,7 +35,7 @@
 #    the text before first @ref.
 #
 ####
-# @c lib libname.lib[:proc] [no_ex, lib_fun, lib_ex]
+# @c lib libname.lib[:proc] [lib_fun, lib_ex, no_ex]
 #   Without :proc
 #   --> includes info of libname.lib in output file
 #   --> includes function names of info into function index
@@ -55,17 +55,16 @@
 # default settings of command-line arguments
 #
 $Singular = "../Singular/Singular"; # should be overwritten
-$libparse = "../Singular/libparse"; # change in final version
 $Singular_opts = " -teqr12345678";
 $clean = 0;
 $verbose = 1;
 $reuse = 1;
 $no_ex = 0;
-$lib_fun = 0;
-$lib_ex = 0;
+$no_fun = 0;
 $doc_subdir = "./d2t_singular";
 @include_dirs = (".", "../Singular/LIB");
 $doc_examples_db = "$doc_subdir/examples";
+$make = 0;
 
 #
 # misc. defaults
@@ -105,18 +104,17 @@ while (@ARGV && $ARGV[0] =~ /^-/)
 {
   $_ = shift(@ARGV);
   if (/^-S(ingular)?$/)  { $Singular = shift(@ARGV); next;}
-  if (/^-l(ibparse)?$/)  { $libparse = shift(@ARGV); next;}
   if (/^-o(output)?$/)   { $tex_file = shift(@ARGV); next;}
   if (/^-no_r(euse)?$/)  { $reuse = 0; next;}
   if (/^-c(lean)?$/)     { $clean = 1; next;}
   if (/^-no_e(x)?$/)     { $no_ex = 1; next;}
-  if (/^-lib_fu(n)?$/)   { $lib_fun = 1;next;}
-  if (/^-lib_e(x)?$/)    { $lib_ex = 1; next;}
+  if (/^-no_fu(n)?$/)    { $no_fun = 1;next;}
+  if (/^-m(ake)?$/)      { $make = 1;next;}
   if (/^-s(ubdir)?$/)    { $doc_subdir = shift(@ARGV); next;}
   if (/^-I$/)            { unshift(@include_dirs, shift(@ARGV)); next;}
   if (/^-v(erbose)?$/)   { $verbose = shift(@ARGV); next;}
   if (/^-h(elp)?$/)      { print &Usage; exit;}
-  die &Usage;
+  Error("Unknown Option $_\n" .&Usage);
 }
 $verbose = ($verbose < 0 ? 0 : $verbose);
 
@@ -134,8 +132,11 @@ else
   $doc = $doc_dir;
   $doc_dir = ".";
 }
-$tex_file = "$doc_dir/$doc.tex" unless ($tex_file);
-	       
+unless ($tex_file)
+{
+  $tex_file = ($no_ex ? "$doc_dir/${doc}_noEx.tex" : "$doc_dir/$doc.tex");
+}
+
 #
 # open files
 #
@@ -143,7 +144,6 @@ open(DOC, "<$doc_file")
   || Error("can't open $doc_file for reading: $!\n" . &Usage);
 open(TEX, ">$tex_file") || Error("can't open $tex_file for writing: $!\n");
 print "d2t: Generating $tex_file from $doc_file ...\n" if ($verbose > 1);
-print "d2t: $doc_file ==> $tex_file\n" if ($verbose == 1);
 if (-d $doc_subdir)
 {
   print "d2t: Using $doc_subdir for intermediate files\n"  
@@ -374,8 +374,8 @@ sub HandleRef
   # sort refs
   @refs = sort(keys(%refs));
   # put them out
-  print TEX "\@ifinfo\n\@menu\n";
   print TEX $header ? "$header\n" : "See also:\n";
+  print TEX "\@ifinfo\n\@menu\n";
   foreach $ref (@refs) {print TEX "* ".$ref."::\n";}
   print TEX "\@end menu\n\@end ifinfo\n\@iftex\n";
 
@@ -395,26 +395,23 @@ sub HandleRef
 
 ###################################################################
 #
-# @c lib libname.lib [no_ex, lib_fun, lib_ex]
-#   --> includes info of libname.lib in output file
-#   --> includes function names of info into function index
-#   --> if lib_fun is given, includes listing of functions and 
-#                      their help into output file
-#   --> if lib_ex is given, includes computed examples of functions, as well
-# 
-# Optional no_ex, lib_fun, lib_ex arguments overwrite respective
-# command-line arguments
-# 
+# @c lib libname.lib[:proc] [no_ex, no_fun, (\w*)section]
+#   --> replaced by @include $texfile where 
+#        $texfile = $subdir/libname_lib[_noFun,_noEx].tex
+#   --> if $make, calls "make $texfile" 
+#   --> Error, if $tex_file does not exist
+#   --> if [:proc] is given, then includes only of respective
+#       proc body
+#   --> if (\w*)section is given, replaces @subsection by @$1section
+#       and pastes in content of tex file directly
 
 sub HandleLib
 {
-  local($lib, $lib_name, $ltex_file, $l_ex, $l_fun, $no_node, $section);
-  my ($func);
+  my($lib, $proc, $n_fun, $n_ex, $section, $tex_file);
 
   if (/^\@c\s*lib\s+([^\.]+)\.lib(.*)/)
   {
     $lib = $1;
-    $lib_name = $lib.".lib";
     $_ = $2;
   }
   else
@@ -424,476 +421,99 @@ sub HandleLib
     return;
   }
 
-  $func = $1 if (/^:(.*?) /);
-  $l_fun = 1 if (($lib_fun || (/lib_fun/)) && !/no_fun/);
-  $l_ex = 1 if (($lib_ex || /lib_ex/) && !/no_ex/ && $l_fun);
-  if (/(\w+)section/)
-  {
-    $section = $1. 'section';
-  }
-  else
-  {
-    $section = "subsection";
-  }
-  $ltex_file = "$doc_subdir/$lib"."_lib";
-  unless ($l_ex)
-  {
-    if ($l_fun)
-    {
-      $ltex_file .= "_noEx";
-    }
-    else
-    {
-      $ltex_file .= "_noFun";
-    }
-  }
-  $ltex_file .= ".tex";
+  $proc = $1 if (/^:(.*?) /);
+  $n_fun = 1 if ($no_fun || /no_fun/);
+  $n_ex = 1 if ($no_ex || /no_ex/);
+  $section = $1 if /\w*section/;
   
-  Error("can't open $lib.lib for reading: $!\n") 
-    unless  ($lib_dir = &Open(*LIB, "<$lib.lib"));
-  close (LIB);
-  if ($reuse && open(LTEX, "<$ltex_file") && 
-      IsNewer($ltex_file, "$lib_dir/$lib.lib"))
+  # contruct tex file name
+  $tex_file = "$doc_subdir/$lib"."_lib";
+  if ($n_fun)
   {
-    unless ($func)
-    {
-      print "<lib $lib>" if ($verbose);
-      print TEX "\@c reused lib docu for $lib_name $doc_file:$line \n";
-    }
+    $tex_file .= "_noFun";
   }
-  elsif (&GenerateLibDoc($lib, $ltex_file, $l_fun, $l_ex))
+  elsif ($n_ex)
   {
-    print TEX "\@c generated lib docu for $lib_name $doc_file:$line \n"
-      unless $func;
-    open(LTEX, "<$ltex_file") 
-      || Error("can't open $ltex_file for reading: $!\n");
+    $tex_file .= "_noEx";
   }
-  if ($func)
+  $tex_file .= ".tex";
+
+  if ($make)
   {
-    print "<$lib:$func" if $verbose;
-    print TEX "\@c generated lib proc docu for $lib_name:$func $doc_file:$line \n";
-    my $found = 0;
-    while (<LTEX>)
+    print "<lib $lib" if ($verbose);
+    if ($verbose <= 1)
     {
-      $found = 1 if /c ---content $func---/;
-      print TEX $_ if $found;
-      last if $found && /c ---end content $func---/;
-    }
-    if ($found)
-    {
-      Error("no end content found for lib proc docu for $lib_name:$func $doc_file:$line \n")
-	unless (/c ---end content $func---/);
-      print TEX "\@c generated lib proc docu for $lib_name:$func $doc_file:$line \n";
+      System("make $tex_file > /dev/null") 
     }
     else
     {
-      Error("did not find lib proc docu for $lib_name:$func $doc_file:$line \n");
+      System("make $tex_file"); 
     }
-    print ">" if $verbose;
   }
-  else
-  {
-    while (<LTEX>) {print TEX $_;}
-    print TEX "\@c end generated lib docu for $lib_name $doc_file:$line \n";
-  }
-  close(LTEX);
-  unlink $ltex_file if ($clean);
-}
- 
-sub GenerateLibDoc
-{
-  my($lib, $tex_file, $l_fun, $l_ex) = @_;
-  my($lib_dir, $scall, $pl_file, $doc_file, $i, $example,$largs, $ref);
-  # vars from executing the library perl scrip
-  local($info, $libary, $version, @procs, %example, %help, $table_is_open);
   
-  print "(lib $lib: " if ($verbose == 1);
-  # construct doc/tex file name
-  $doc_file = "$doc_subdir/$lib"."_lib";
-  $doc_file .= "_noFun" unless ($l_fun);
-  $doc_file .= ".doc";
-
-  Error("can't open $lib.lib for reading: $!\n")
-    unless  ($lib_dir = &Open(*LIB, "<$lib.lib"));
-  close (LIB);
-  if (-r $doc_file && $reuse && IsNewer($doc_file, "$lib_dir/$lib.lib"))
+  # make sure file exists
+  if (-r $tex_file)
   {
-    print "<doc>" if ($verbose == 1);
+    if ($verbose)
+    {
+      print "<lib $lib" unless $make;
+      print ":$proc" if $proc;
+      print ">";
+    }
   }
   else
   {
-    # generate perl file, if necessary
-    $pl_file = "$doc_subdir/$lib"."_lib.pl";
-    if (-r $pl_file && $reuse && IsNewer($pl_file, "$lib_dir/$lib.lib"))
-    {
-      print "<pl>" if ($verbose == 1);
-    }
-    else
-    {
-      print "(pl" if ($verbose == 1);
-      &System("$libparse -i $lib_dir/$lib.lib > $pl_file");
-      print ")" if ($verbose == 1);
-    }
+    Error("Can't read $tex_file\n") unless -r $tex_file;
+  }
 
-    print "(doc" if ($verbose == 1);
-    
-    do $pl_file;
-    Error("error while executing $pl_file: $@\n") if ($@);
-    unlink ($pl_file) if ($clean);
-    
-    # generate doc file
-    open(LDOC, ">$doc_file") || die"$ERROR can't open $doc_file for writing: $!\n";
-    
-    # print header
-    print LDOC "\@c library version: $version\n";
-    print LDOC "\@c library file: $library\n";
-    undef @procs;
-    $ref = OutLibInfo(\*LDOC, $info, $l_fun);
-    OutRef(\*LDOC, $ref) if $ref;
-    # print menu of available functions 
-    if ($l_fun)
+  # see whether we have to paste something in
+  if ($proc || $section)
+  {
+    open(LTEX, "<$tex_file") 
+      || Error("Can't open $tex_file for reading: $!\n");
+
+    print TEX "\@c start include of docu for $lib.lib:$proc\n";
+    print TEX "\@c replaced \@subsection by \@$section\n" if ($section);
+    if ($proc)
     {
-      # print help and example of each function
-      for ($i = 0; $i <= $#procs; $i++)
+      my $found = 0;
+      while (<LTEX>)
       {
-	# print node and section heading
-	print LDOC "\n\@c ------------------- " . $procs[$i]." -------------\n";
-	print LDOC "\@node " . $procs[$i].",";
-	print LDOC " ".$procs[$i+1] if ($i < $#procs);
-	print LDOC ",";
-	print LDOC " ".$procs[$i-1] if ($i > 0);
-	print LDOC ", " . $lib ."_lib\n";
-	print LDOC "\@$section " . $procs[$i] . "\n";
-	print LDOC "\@cindex ". $procs[$i] . "\n";
-
-	print LDOC "\@c ---content $procs[$i]---\n";
-	print LDOC "Procedure from library \@code{$lib.lib} (\@pxref{${lib}_lib}).\n\n";
-	if ($help{$procs[$i]} =~ /^\@/)
+	$found = 1 if /c ---content $proc---/;
+	if ($found)
 	{
-	  print LDOC $help{$procs[$i]};
-	  $ref = '';
+	  s/subsection/$section/ if $section;
+	  print TEX $_; 
 	}
-	else
-	{
-	  print LDOC "\@table \@asis\n";
-	  $table_is_open = 1;
-	  # print help
-	  $ref = OutInfo(\*LDOC, $help{$procs[$i]});
-	  print LDOC "\@end table\n";
-	}
-	# print example 
-	if ($example = &CleanUpExample($lib, $example{$procs[$i]}))
-	{
-	  print LDOC "\@strong{Example:}\n";
-	  print LDOC "\@smallexample\n\@c example\n";
-	  print LDOC $example;
-	  print LDOC "\n\@c example\n\@end smallexample\n";
-	}
-	OutRef(\*LDOC, $ref) if $ref;
-	print LDOC "\@c ---end content $procs[$i]---\n";
+	last if $found && /c ---end content $proc---/;
       }
-    }
-    close(LDOC);
-    print ")" if ($verbose == 1);
-  }
-
-  $largs = "-no_ex" unless ($l_ex);
-  # call doc2tex on generated doc file
-  print "\n" if ($verbose == 1);
-  dbmclose(%EXAMPLES);
-  &System("$0 $args $largs -o $tex_file $doc_file");
-  dbmopen(%EXAMPLES, $doc_examples_db, oct(755)) 
-    || die "$ERROR: can't open examples data base: $!\n";
-  
-  unlink($doc_file) if ($clean);
-  return 1;
-}
-
-###########################################################################
-# parse and print-out libinfo
-sub OutLibInfo
-{
-  my ($FH, $info, $l_fun) = @_;
-  print $FH "\@c ---content LibInfo---\n";
-    if ($info =~ /^\@/)
-  {
-    print $FH $info;
-    return;
-  }
-  print $FH "\@table \@asis\n";
-  $table_is_open = 1;
-  
-  my ($ref) = OutInfo($FH, $info, $l_fun);
-
-  print $FH "\@end table\n" if $table_is_open;
-  print $FH "\@c ---end content LibInfo---\n";
-  $table_is_open = 0;
-  return $ref;
-}
-
-sub OutInfo
-{
-  my ($FH, $info, $l_fun) = @_;
-  if ($info =~ /^\s*\@/)
-  {
-    print $FH $info;
-    return;
-  }
-  $info =~ s/^\s*//;
-  $info =~ s/\s*$//;
-  $info .= "\n";
-
-  my ($item, $text, $line, $ref);
-  while ($info =~ m/(.*\n)/g)
-  {
-    $line = $1;
-    if ($1 =~ /^(\w.+?):(.*\n)/)
-    {
-      $ref .= OutInfoItem($FH, $item, $text, $l_fun) if $item && $text;
-      $item = $1;
-      $text = $2;
-    }
-    else
-    {
-      $text .= $line;
-    }
-  }
-  $ref .= OutInfoItem($FH, $item, $text, $l_fun) if $item && $text;
-  return $ref;
-}
-
-sub FormatInfoText
-{
-  my $length = shift;
-  $length = 0 unless $length;
-  # insert @* infront of all lines whose previous line is shorter than
-  # 60 characters
-  $_ = ' ' x $length . $_;
-  if (/^(.*)\n/)
-  {
-    $_ .= "\n";
-    my $pline;
-    my $line;
-    my $ptext = $_;
-    my $text = '';
-    while ($ptext =~ /(.*)\n/g)
-    {
-      $line = $1;
-      # break line if
-      $text .= '@*' 
-	if ($line =~ /\w/ && $pline =~ /\w/ # line and prev line are not empty
-	    && $line !~ /^\s*\@\*/  # line does not start with @*
-	    && $pline !~ /\@\*\s*/  # prev line does not end with @*
-	    &&
-	    ((length($pline) < 60  && # prev line is shorter than 60 chars
-	      $pline !~ /\@code{.*?}/ # and does not contain @code, @math
-	      && $pline !~ /\@math{.*?}/) 
-	     ||
-	     $line =~ /^\s*\w*\(.*?\)/ # $line starts with \w*(..)
-	     ||
-	     $pline =~ /^\s*\w*\(.*?\)[\s;:]*$/)); # prev line is only \w(..)
-      $line =~ s/\s*$//;
-      $text .= "$line\n";
-      $pline = $line;
-    }
-    $_ = $text;
-  }
-  s/\t/ /g;
-  s/\n +/\n/g;
-  s/\s*$//g;
-  s/ +/ /g;  # replace double whitespaces by one
-  s/(\w+\(.*?\))/\@code{$1}/g;
-  s/\@\*\s*/\@\*/g;
-  s/(\@[^\*])/\@$1/g; # escape @ signs, except @*
-  s/{/\@{/g; # escape {}
-  s/}/\@}/g;
-  # unprotect @@math@{@}, @code@{@}
-  while (s/\@\@math\@{(.*?)\@}/\@math{$1}/g) {} 
-  while (s/\@\@code\@{(.*?)\@}/\@code{$1}/g) {}
-  # remove @code{} inside @code{} and inside @math{}
-  while (s/\@math{([^}]*)\@code{(.*?)}(.*)?}/\@math{$1$2$3}/g) {}
-  while (s/\@code{([^}]*)\@code{(.*?)}(.*)?}/\@code{$1$2$3}/g) {}
-}
-
-sub OutInfoItem
-{
-  my ($FH, $item, $text, $l_fun) = @_;
-
-  $item = lc $item;
-  $item = ucfirst $item;
-
-  if ($item =~ /see also/i)
-  {
-    # return references
-    return $text;
-  }
-  elsif ($item =~ m/example/i)
-  {
-    # forget about example, since it comes explicitely
-    return '';
-  }
-  elsif ($item =~ m/procedure/i)
-  {
-    if ($l_fun && $table_is_open)
-    {
-      print $FH "\@end table\n\n";
-      $table_is_open = 0;
-    }
-    $text =~ s/^\s*//;
-    $text =~ s/\s*$//;
-    $text =~ s/.*$// if ($text=~/parameters.*brackets.*are.*optional.*$/);
-    $text .= "\n";
-    
-    my ($proc, $pargs, $pinfo, $line);
-    if ($l_fun)
-    {
-      print $FH "\@strong{$item:}\n\@menu\n";
-    }
-    else
-    {
-      print $FH "\@item \@strong{$item:}\n\@table \@asis\n";
-    }
-    while ($text =~ /(.*\n)/g)
-    {
-      $line = $1;
-      if ($1 =~ /^\s*(\w+)\((.*?)\)/)
+      if ($found)
       {
-	OutProcInfo($FH, $proc, $procargs, $pinfo, $l_fun) if $proc && $pinfo;
-	$proc = $1;
-	$procargs = $2;
-	$pinfo = $';
+	Error("no end content found for lib proc docu for $lib.lib:$proc $doc_file:$line \n")
+	  unless (/c ---end content $proc---/);
+	print TEX "\@c generated lib proc docu for $lib.lib:$proc $doc_file:$line \n";
       }
       else
       {
-	$pinfo .= $line; 
+	Error("did not find lib proc docu for $lib.lib:$proc $doc_file:$line \n");
       }
     }
-    OutProcInfo($FH, $proc, $procargs, $pinfo, $l_fun) if $proc && $pinfo;
-    print $FH ($l_fun ? "\@end menu\n" : "\@end table\n");
-    return '';
-  }
-
-  if (! $table_is_open)
-  {
-    print $FH "\@table \@asis\n";
-    $table_is_open = 1;
-  }
-  print $FH '@item @strong{'. "$item:}\n";
-  # prepare text:
-  local $_ = $text;
-  if (($item =~ m/^library/i)  && m/\s*(\w*)\.lib/)
-  {
-    print $FH "$1.lib\n";
-    $text = $';
-    if ($text =~ /\w/)
+    else
     {
-      print $FH '@item @strong{Purpose:'."}\n";
-      print $FH lc $text;
+      while (<LTEX>)
+      {
+	s/subsection/$section/;
+	print TEX $_;
+      }
     }
+    print TEX "\@c end include of docu for $lib.lib:$proc\n";
+    close(LTEX);
   }
   else
   {
-    # just print the text
-    FormatInfoText(length($item) + 1);
-    print $FH "$_\n";
+    print TEX "\@c include of docu for $lib.lib\n";
+    print TEX "\@include $tex_file\n";
   }
-  return '';
-}
-
-sub OutProcInfo
-{
-  my($FH, $proc, $procargs, $pinfo, $l_fun) = @_;
-  local $_ = $pinfo;
-  s/^[;\s]*//;
-  s/\n/ /g;
-  FormatInfoText();
-  
-  if ($l_fun)
-  {
-    print $FH "* ${proc}:: $_\n";
-    push @procs, $proc;
-  }
-  else
-  {
-    print $FH "\@item \@code{$proc($procargs)}  ";
-    print $FH "\n\@cindex $proc\n$_\n";
-  }
-}
-
-sub OutRef
-{
-  my ($FH, $refs) = @_;
-  $refs =~ s/^\s*//;
-  $refs =~ s/\s*$//;
-  $refs =~ s/\n/,/g;
-  my @refs = split (/[,;\.]+/, $refs);
-  my $ref;
-
-  print $FH "\@c ref\nSee also:\n";
-  $ref = shift @refs;
-  print $FH "\@ref{$ref}";
-  for $ref (@refs)
-  {
-    $ref =~ s/^\s*//;
-    $ref =~ s/\s*$//;
-    print $FH ", \@ref{$ref}"  if ($ref =~ /\w/);
-  }
-  print $FH "\n\@c ref\n";
-}
-
-sub CleanUpExample
-{
-  local($lib, $example) = @_;
-  
-  # find portion in {}
-  $example =~ s/^[^{]*{(.*)}[^}]*$/$1/s;
-
-  if ($example =~ /EXAMPLE: \(not executed\)/)
-  {
-    # erase first three lines
-    $example =~ s/^.*\n.*\n.*\n/\n/;
-    # erase enclosing " " in every line
-    $example =~ s/\n\s*"/\n/g;
-    $example =~  s/";\n/\n/g;
-  }
-  # erase EXAMPLE, echo and pause statements
-  $example =~ s/"EXAMPLE.*"[^;]*;//g;
-  $example .= "\n";
-  my ($mexample, $line);
-  while ($example =~ m/(.*)\n/g)
-  {
-    $line = $1;
-    $line =~ s|echo[^;]*;||g if $line !~ m|(.*)//(.*)echo[^;]*;|;
-    $line =~ s|pause\(.*?\)[^;]*;||g if $line !~ m|(.*)//(.*)pause\(.*?\)[^;]*;|;
-    $mexample .= "$line\n";
-  }
-  $example = $mexample;
-  
-  # prepend LIB command
-  $example = "LIB \"$lib.lib\";\n".$example 
-    if ($example && $lib ne "standard");
-  # erase empty lines
-  $example =~ s/^\s*\n//g;
-  # erase spaces from beginning of lines
-  $example =~ s/\n\s*/\n/g;
-  $example =~ s/\s*$//g;
-  return $example;
-}
-
-###################################################################
-#
-# Auxiallary functions
-# 
-sub IsNewer
-{
-  my $f1 = shift;
-  my $f2 = shift;
-  my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime)
-    = stat($f1);
-  my $m1 = $mtime;
-  ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime) = stat($f2);
-
-  return ($m1 > $mtime);
 }
 
 ####################################################################
@@ -950,15 +570,13 @@ To convert a doc file to texinfo: $0 [options] input_file.doc
 where options can be (abbreviated to shortest possible prefix):
   -Singular prog: use 'prog' as Singular program to generate ex output
                           (default: '../Singular/Singular')
-  -libparse prog: use 'prog' as libparse program to generate lib docu
-                          (default: '../Singular/libparse')
   -output file  : use 'file' as output file
                           (default: input_file.tex)
   -clean        : delete intermediate files
+  -make         : use make to generate tex files for libraries
   -no_reuse     : don't reuse intermediate files
   -no_ex        : skip computation of examples 
-  -lib_fun      : include help for library functions
-  -lib_ex       : include example for library functions
+  -no_fun       : don't include help for library functions
   -subdir  dir  : put intermediate files into 'dir'
                           (default: './d2t_singular')
   -I dir        : look also into 'dir' for include  and lib files

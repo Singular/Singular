@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: pl2doc.pl,v 1.1 1999-07-21 14:07:29 obachman Exp $
+# $Id: pl2doc.pl,v 1.2 1999-07-21 19:53:26 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -8,7 +8,7 @@
 ####
 $Usage = <<EOT;
 Usage:  
-$0 [-o out_file -no_ex -no_fun] library_perl_file.doc 
+$0 [-o out_file -db db_file -no_ex -no_fun] library_perl_file.doc 
 Convert library_perl_file.pl to library_perl_file.doc
 EOT
 
@@ -18,9 +18,9 @@ EOT
 while (@ARGV && $ARGV[0] =~ /^-/) 
 {
   $_ = shift(@ARGV);
-  if (/^-o(utput)?$/)    { $out_file = shift(@ARGV); next;}
-  if (/^-no_e(x)?$/)     { $no_ex = 1; next;}
-  if (/^-no_fu(n)?$/)    { $no_fun = 1;next;}
+  if (/^-o$/)    { $out_file = shift(@ARGV); next;}
+  if (/^-db$/) { $db_file = shift(@ARGV); next;}
+  if (/^-no_fun$/)    { $no_fun = 1;next;}
   if (/^-h(elp)?$/)      { print $Usage; exit;}
   die "Error: Unknown option: $_:$Usage\n";
 }
@@ -40,8 +40,9 @@ require $pl_file;
 #
 unless ($out_file)
 {
-  ($out_file = $pl_file) =~ s/\..*$/\.doc/;
-  $out_file .= ".doc" unless $out_file =~ /\.doc/;
+  ($out_file = $pl_file) =~ s/(.*)\..*$/$1/;
+  $out_file .= "_noFun" if ($no_fun);
+  $out_file .= ".doc";
 }
 open(LDOC, ">$out_file") || die"Error: can't open $out_file for writing: $!\n";
 print LDOC "\@c library version: $version\n";
@@ -58,6 +59,12 @@ OutRef(\*LDOC, $ref) if $ref;
 # print subsections for help of procs
 unless ($no_fun)
 {
+  if ($db_file)
+  {
+    $db_file = $1 if ($db_file =~ /(.*)\.db$/);
+    dbmopen(%CHECKSUMS, $db_file, oct(755)) ||
+      die "Error: can't open chksum data base $db_file";
+  }
   # print help and example of each function
   for ($i = 0; $i <= $#procs; $i++)
   {
@@ -70,7 +77,7 @@ unless ($no_fun)
     print LDOC ", " . $lib ."_lib\n";
     print LDOC "\@subsection " . $procs[$i] . "\n";
     print LDOC "\@cindex ". $procs[$i] . "\n";
-    
+    $CHECKSUMS{$procs[$i]} = $chksum{$procs[$i]} if ($db_file);
     print LDOC "\@c ---content $procs[$i]---\n";
     print LDOC "Procedure from library \@code{$lib.lib} (\@pxref{${lib}_lib}).\n\n";
     if ($help{$procs[$i]} =~ /^\@/)
@@ -87,7 +94,7 @@ unless ($no_fun)
       print LDOC "\@end table\n";
     }
     # print example
-    if ( (!$no_ex) && ($ex = &CleanUpExample($lib, $example{$procs[$i]})))
+    if ($ex = &CleanUpExample($lib, $example{$procs[$i]}))
     {
       print LDOC "\@strong{Example:}\n";
       print LDOC "\@smallexample\n\@c example\n";
@@ -97,6 +104,7 @@ unless ($no_fun)
     OutRef(\*LDOC, $ref) if $ref;
     print LDOC "\@c ---end content $procs[$i]---\n";
   }
+  dbmclose(%CHECKSUMS);
 }
 
 # 
@@ -132,7 +140,7 @@ sub OutLibInfo
 sub OutInfo
 {
   my ($FH, $info, $l_fun) = @_;
-  if ($info =~ /^\@/)
+  if ($info =~ /^\s*\@/)
   {
     print $FH $info;
     return;
@@ -206,8 +214,11 @@ sub FormatInfoText
   s/{/\@{/g; # escape {}
   s/}/\@}/g;
   # unprotect @@math@{@}, @code@{@}
-  s/\@\@math\@{(.*?)\@}/\@math{$1}/g;
-  s/\@\@code\@{(.*?)\@}/\@code{$1}/g;
+  while (s/\@\@math\@{(.*?)\@}/\@math{$1}/g) {} 
+  while (s/\@\@code\@{(.*?)\@}/\@code{$1}/g) {}
+  # remove @code{} inside @code{} and inside @math{}
+  while (s/\@math{([^}]*)\@code{(.*?)}(.*)?}/\@math{$1$2$3}/g) {}
+  while (s/\@code{([^}]*)\@code{(.*?)}(.*)?}/\@code{$1$2$3}/g) {}
 }
 
 sub OutInfoItem
@@ -324,7 +335,7 @@ sub OutRef
   my @refs = split (/[,;\.]+/, $refs);
   my $ref;
 
-  print $FH "\@c ref\nSee\n";
+  print $FH "\@c ref\nSee also:\n";
   $ref = shift @refs;
   print $FH "\@ref{$ref}";
   for $ref (@refs)

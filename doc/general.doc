@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.129 1999-07-19 14:07:37 obachman Exp $
+@comment $Id: general.doc,v 1.130 1999-07-21 19:53:24 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -2463,7 +2463,8 @@ If a line starts with a character and contains a colon, then the text up
 to the colon is taken to be the description-string of an item and the
 text following the colon is taken to be the content of the item.
 @item 
-Descritptio
+If the description-string of an item matches @code{EXAMPLE} then this
+item is ignored.
 @item 
 If the description-string of an item matches @code{SEE ALSO}, then the
 content of the item is assumed to be comma-separted words which are
