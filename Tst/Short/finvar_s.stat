@@ -1,11 +1,11 @@
 Status Output of tst_status.out
-init >> USER    :obachman
-init >> HOSTNAME:urmel
-init >> uname -a:HP-UX urmel A.09.01 A 9000/735 2007379207 two-user license
-init >> date    :Wed Aug 26 09:53:18 MESZ 1998
+init >> USER    :hannes
+init >> HOSTNAME:nepomuck.mathematik.uni-kl.de
+init >> uname -a:Linux nepomuck.mathematik.uni-kl.de 2.0.33 #1 Wed Jan 21 18:50:57 MET 1998 i686 unknown
+init >> date    :Wed Oct 14 12:51:27 MET DST 1998
 init >> version :1300
 init >> ticks   :100
-1 >> tst_memory_0 :: urmel:548134
-1 >> tst_memory_1 :: urmel:409638
-1 >> tst_memory_2 :: urmel:724992
-1 >> tst_timer_1 :: urmel:1605
+1 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:610885
+1 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:407061
+1 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:446464
+1 >> tst_timer_1 :: nepomuck.mathematik.uni-kl.de:622
