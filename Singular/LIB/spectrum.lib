@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: spectrum.lib,v 1.16 2001-08-27 14:48:00 Singular Exp $";
+version="$Id: spectrum.lib,v 1.17 2002-03-06 14:22:12 mschulze Exp $";
 category="Singularities";
 info="
 LIBRARY:  spectrum.lib  Singularity Spectrum for Nondegenerate Singularities
@@ -66,42 +66,5 @@ proc semicont(list #)
 proc semicontqh(list #)
 {
   ERROR("semicontqh was replaced by spsemicont in gaussman.lib");
-}
-///////////////////////////////////////////////////////////////////////////////
-
-proc spadd(list s1, list s2)
-"USAGE:   spadd(s1,s2); list s1, s2
-RETURN:  a list containing the sum of the two spectra s1 and s2
-EXAMPLE: example spadd; shows an example
-"
-{
-  return (system("spadd",s1,s2));
-}
-example
-{ "EXAMPLE:"; echo = 2;
-  ring r=0,(x,y),ds;
-  list s1=spectrumnd(x5+x2y2+y5);
-  s1;
-  list s2=spectrumnd(x2+y3);
-  s2;
-  spadd(s1,s2);
-}
-///////////////////////////////////////////////////////////////////////////////
-
-proc spmul(list s, int k)
-"USAGE:   spmul(s,k); list s, int k
-RETURN:  a list containing the product of the spectrum s with the integer k
-EXAMPLE: example spmul; shows an example
-"
-{
-  return (system("spmul",s,k));
-}
-example
-{ "EXAMPLE:"; echo = 2;
-  ring r=0,(x,y),ds;
-  list s=spectrumnd(x5+x2y2+y5);
-  s;
-  spmul(s,2);
->>>>>>> 1.12.2.1
 }
 ///////////////////////////////////////////////////////////////////////////////
