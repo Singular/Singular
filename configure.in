@@ -856,6 +856,9 @@ fi
 dnl if test -d rpm; then
 dnl  SUBDIRS="$SUBDIRS rpm"
 dnl fi
+if test -d modules; then
+  SUBDIRS="$SUBDIRS modules"
+fi
   
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Enough -- wrap it up
