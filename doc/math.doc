@@ -1,6 +1,25 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.22 1998-05-18 16:57:22 Singular Exp $
+@comment $Id: math.doc,v 1.23 1998-05-18 19:10:39 wichmann Exp $
 @comment this file contains the mathematical background of Singular
+
+@c The following directives are necessary for proper compilation
+@c with emacs (C-c C-e C-r).  Please keep it as it is.  Since it
+@c is wrapped in `@ignore' and `@end ignore' it does not harm `tex' or
+@c `makeinfo' but is a great help in editing this file (emacs
+@c ignores the `@ignore').
+@ignore
+%**start
+\input texinfo.tex
+@setfilename math.info
+@node Top, Mathematical background
+@menu
+* General concepts::
+@end menu
+@node Mathematical background, SINGULAR libraries, Examples, Top
+@chapter Mathematical background
+%**end
+@end ignore
+
 This chapter introduces some of the mathematical notions and definitions used
 throughout the manual. Most sections are only a collection of the
 most prominent definitions and properties and refer for details to
@@ -8,15 +27,15 @@ some articles or text books. However, monomial orderings are explained
 with all details (in the subsections of "Monomial orderings").
 
 @menu
-* Monomial orderings::
-* Standard bases::
-* Hilbert function::
-* Syzygies and resolutions::
-* Characteritic sets::
-* References::
+* Monomial orderings::          
+* Standard bases::              
+* Hilbert function::            
+* Syzygies and resolutions::    
+* Characteristic sets::         
+* References::                  
 @end menu
 @c ---------------------------------------------------------------------------
-@node Monomial orderings, Standard bases, , Mathematical background
+@node Monomial orderings, Standard bases, Mathematical background, Mathematical background
 @section Monomial orderings
 @cindex Monomial orderings
 @tex
@@ -78,8 +97,18 @@ computations has to be interpreted in Loc K[x].
 a definition of a ring includes the definition of its monomial ordering, see
 @ref{Rings and orderings}.
 in an effective way:
+
+@menu
+* Global orderings::            
+* Local orderings::             
+* Module orderings::            
+* Matrix orderings::            
+* Product orderings::           
+* Extra weight vector::         
+@end menu
+
 @c --------------------------------------------------------------------------
-@node Global orderings, Local orderings, , Monomial orderings
+@node Global orderings, Local orderings, Monomial orderings, Monomial orderings
 @subsection Global orderings
 @cindex Global orderings
 
@@ -493,16 +522,16 @@ The output of a vector $v$ in $K[x]^r$ with components $v_1,
 @end tex
 unless the ordering starts with @code{c}.
 @ifinfo
-In this case a vector will be written as [v_1, @dots{}, v_r].
+In this case a vector is written as [v_1, @dots{}, v_r].
 @end ifinfo
 @tex
-In this case a vector will be written as $[v_1, \ldots, v_r]$.
+In this case a vector is written as $[v_1, \ldots, v_r]$.
 @end tex
 In all cases @sc{Singular} can read the
 input in both formats.
 
 @c --------------------------------------------------------------------------
-@node Matrix orderings, Product orderings, Module orderings,Monomial orderings
+@node Matrix orderings, Product orderings, Module orderings, Monomial orderings
 @subsection Matrix orderings
 @cindex Matrix orderings
 
@@ -761,7 +790,7 @@ $\left(\matrix{
 
 If the ring has n variables and the matrix contains less than n x n entries
 an error message is given, if there are more entries,
-the last ones will be ignored.
+the last ones are ignored.
 
 @strong{WARNING:} @sc{Singular}
 does not check whether the matrix has full rank.   In such a case some
@@ -824,7 +853,7 @@ defines: @code{lp} on the first 3 variables, the matrix ordering
 @code{ws(1,2,3)} on the last 3 variables.
 
 @c --------------------------------------------------------------
-@node Extra weight vector, , Product orderings, Monomial orderings
+@node Extra weight vector,  , Product orderings, Monomial orderings
 @subsection Extra weight vector
 @cindex Extra weight vector
 
@@ -873,7 +902,7 @@ matrix.
   ring q=  0, (a,b,c,d),(lp(1),a(1,2,3),ds);
 @end example
 @c ---------------------------------------------------------------------------
-@node Standard bases, Hilbert function,Monomial orderings, Mathematical background
+@node Standard bases, Hilbert function, Monomial orderings, Mathematical background
 @section Standard bases
 @cindex Standard bases
 
@@ -975,7 +1004,7 @@ then H_M(s)=sum_(k=1)^N a_k binomial(d+n-k-1,d-1) (the Hilbert polynomial)
 for s >= N.
 @end ifinfo
 @c ---------------------------------------------------------------------------
-@node Syzygies and resolutions, Characteritic sets, Hilbert function, Mathematical background
+@node Syzygies and resolutions, Characteristic sets, Hilbert function, Mathematical background
 @section Syzygies and resolutions
 @cindex Syzygies and resolutions
 
@@ -1076,7 +1105,7 @@ The regularity is the smallest number $s$ with the property deg($e_{a,i})
  \leq s+i$ for all $i$.
 @end tex
 @c ---------------------------------------------------------------------------
-@node Characteristic sets,References,Syzygies and resolutions,Mathematical background
+@node Characteristic sets, References, Syzygies and resolutions, Mathematical background
 @section Characteristic sets
 @cindex Characteristic sets
 
@@ -1154,7 +1183,7 @@ where I_i=@{ini(f), f in T_i @}.
 @end example
 @end table
 @c ---------------------------------------------------------------------------
-@node References,,Characteritic sets,Mathematical background
+@node References,  , Characteristic sets, Mathematical background
 @section References
 @cindex References
 
