@@ -1,16 +1,16 @@
-// $Id: graphics.lib,v 1.4 1999-07-06 15:32:47 Singular Exp $
+// $Id: graphics.lib,v 1.5 1999-09-21 12:29:29 obachman Exp $
 //
 // author : Christian Gorzel email: gorzelc@math.uni-muenster.de
 //
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: graphics.lib,v 1.4 1999-07-06 15:32:47 Singular Exp $";
+version="$Id: graphics.lib,v 1.5 1999-09-21 12:29:29 obachman Exp $";
 info="
 LIBRARY: graphics.lib    PROCEDURES FOR GRAPHICS WITH MATHEMATICA
 
 PROCEDURES:
  staircase(fname,I);  Mathematica text for displaying staircase of I
  mathinit();          string for loading Mathematica's ImplicitPlot
- plot(fname,I[# s]);  Mathematica text for various plots
+ mplot(fname,I[# s]);  Mathematica text for various plots
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -150,8 +150,8 @@ static proc endstr(string filename)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-proc  plot(string fname,ideal I,list #)
-"USAGE:   plot(I[,#]); fname string; I ideal , # strings representing the
+proc  mplot(string fname,ideal I,list #)
+"USAGE:   mplot(I[,#]); fname string; I ideal , # strings representing the
                          plot region or further ideals
 RETURN:  string, text with Mathematica commands to display a plot
 NOTE:    The plotregion is defaulted to -1,1 around zero
@@ -168,7 +168,7 @@ NOTE:    The plotregion is defaulted to -1,1 around zero
          ideal with 1 generator (or one polynomial) in two variables means
           an implicit curve given as  f == 0
 
-EXAMPLE: example plot; shows an example
+EXAMPLE: example mplot; shows an example
 "
 {
   int i,j,k,mapping;
@@ -335,13 +335,13 @@ example
 
    ideal I = x1^3 + x1, x1^2;
    ideal J = x1^2,-x1+x1^3; "";
-   plot("",J); "";
-   plot("",I,"-2,2",J);
+   mplot("",J); "";
+   mplot("",I,"-2,2",J);
 
    ring rr1 = 0,x,dp;  export rr1;
    ideal I(1) = 2x2-1/2x3 +1, x-1;
    ideal I(2) = x3-x ,x; "";
-   plot("",I(1),I(2),"-2,4");
+   mplot("",I(1),I(2),"-2,4");
 
  // Paste the output into a Mathematica notebook
  // active evalutation of the cell with SHIFT RETURN
@@ -350,7 +350,7 @@ example
    // --------- space curves --------------
    I(1) = x3,-1/10x3+x2,x2;
    I(2) = x2,-x2+2,-2x2-x+1; "";
-   plot("",I(1),I(2));
+   mplot("",I(1),I(2));
 
  // Paste the output into a Mathematica notebook
  // active evalutation of the cell with SHIFT RETURN
@@ -370,16 +370,16 @@ example
    // adjust the plotregion properly to get a good picture
 
    poly f = (x-y)*(x2+y);
-   plot("",f); "";
+   mplot("",f); "";
    ideal J = jacob(f);
    J; "";
-   plot("",J[1],J[2]);     // bad resolution
+   mplot("",J[1],J[2]);     // bad resolution
    "";
-   plot("",J[1],J[2],"-10,10","-10,10");  // get better picture in this way
+   mplot("",J[1],J[2],"-10,10","-10,10");  // get better picture in this way
 
-   plot("",I(1),I(2),"-2.5,2.5"); "";
+   mplot("",I(1),I(2),"-2.5,2.5"); "";
 
-   plot("",I(3),"-2,2");
+   mplot("",I(3),"-2,2");
 
  // Paste the output into a Mathematica notebook
  // active evalutation of the cell with SHIFT RETURN
@@ -391,8 +391,8 @@ example
    // the Whitney-Umbrella
 
    ideal J(2) = xy,y,x2; "";
-   plot("",J(1),"-2,1","1,2");  "";
-   plot("",J(2),"-1.5,1.5","-2,2");
+   mplot("",J(1),"-2,1","1,2");  "";
+   mplot("",J(2),"-1.5,1.5","-2,2");
 
  // Paste the output into a Mathematica notebook
  // active evalutation of the cell with SHIFT RETURN
