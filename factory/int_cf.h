@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_cf.h,v 1.5 1997-07-16 10:18:23 schmidt Exp $ */
+/* $Id: int_cf.h,v 1.6 1997-10-10 10:33:31 schmidt Exp $ */
 
 #ifndef INCL_INT_CF_H
 #define INCL_INT_CF_H
@@ -88,6 +88,7 @@ public:
     virtual InternalCF* sqrt();
     virtual int ilog2();
     virtual CanonicalForm lc();
+    virtual CanonicalForm Lc();
     virtual CanonicalForm LC();
     virtual CanonicalForm coeff( int i );
     virtual int degree();
