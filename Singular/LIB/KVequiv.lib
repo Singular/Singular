@@ -1,0 +1,681 @@
+// $Id: KVequiv.lib,v 1.1 2001-11-27 15:56:15 anne Exp $
+// (anne, last modified 27.11.2001)
+/////////////////////////////////////////////////////////////////////////////
+// LIBRARY HEADER
+/////////////////////////////////////////////////////////////////////////////
+
+version="$Id: KVequiv.lib,v 1.1 2001-11-27 15:56:15 anne Exp $";
+info="
+LIBRARY:  KVequiv.lib    PROCEDURES RELATED TO K_V-EQUIVALENCE
+AUTHOR:   Anne Fruehbis-Krueger, anne@mathematik.uni-kl.de
+last modified: 27.11.2001
+SEE ALSO: sing_lib, deform_lib, spcurve_lib
+
+PROCEDURES:
+ derlogV(iV);                   derlog(V(iV))
+ KVtangent(I,rname,dername,k)   K_V tangent space to given singularity
+ KVversal(KVtan,I,rname,idname) K_V versal family 
+ KVvermap(KVtan,I)              section inducing K_V versal family
+ lft_vf(I,rname,idname)         liftable vector fields
+
+REMARKS:
+ * monomial ordering should be of type (c,...)
+ * monomial ordering should be local on the original (2) rings 
+";
+////////////////////////////////////////////////////////////////////////////
+// REQUIRED LIBRARIES
+////////////////////////////////////////////////////////////////////////////
+
+// first the ones written in Singular
+LIB "poly.lib";
+
+// then the ones written in C/C++
+LIB("loctriv.so"); 
+
+////////////////////////////////////////////////////////////////////////////
+// PROCEDURES
+////////////////////////////////////////////////////////////////////////////
+
+proc derlogV(ideal iV)
+"USAGE:  @code{derlogV(iV)};   @code{iV} ideal
+RETURN:  matrix whose columns generate derlog(V(iV)) 
+EXAMPLE: @code{example derlogV}; shows an example
+"
+{
+//--------------------------------------------------------------------------
+// Compute jacobian matrix of iV and add all iV[i]*gen(j) as extra columns
+//--------------------------------------------------------------------------
+  int j;
+  def jiV=jacob(iV);
+  module mmV=jiV;
+  for(int i=1;i<=size(iV);i++)
+  {
+    for(j=1;j<=size(iV);j++)
+    {
+      mmV=mmV,iV[i]*gen(j);
+    }
+  }
+//--------------------------------------------------------------------------
+// The generators of derlog(V) are given by the part of the syzygy matrix
+// of mmV which deals with the jacobian matrix
+//--------------------------------------------------------------------------
+  def smmV=syz(mmV);
+  matrix smaV=matrix(smmV);
+  matrix smV[nvars(basering)][ncols(smaV)]=
+                     smaV[1..nvars(basering),1..ncols(smaV)];
+  return(smV);
+}
+example
+{ "EXAMPLE:";echo=2;
+  ring r=0,(a,b,c,d,e,f),ds;
+  ideal i=ad-bc,af-be,cf-de;
+  def dV=derlogV(i);
+  print(dV);
+}
+////////////////////////////////////////////////////////////////////////////
+
+proc KVtangent(ideal mapi,string rname,string dername,list #)
+"USAGE:   @code{KVtangent(I,rname,dername[,k])}; @code{I} ideal
+                                                 @code{rname,dername} strings
+                                                 @code{[k]} int
+RETURN:   K_V tangent space to a singularity given as a section of a 
+          model singularity 
+NOTE:     The model singularity lives in the ring given by rname and 
+          its derlog(V) is given by dername in that ring. The section is
+          specified by the generators of mapi. If k is given, the first k 
+          variables are used as variables, the remaining ones as parameters
+EXAMPLE:  @code{example KVtangent}; shows an example
+"
+{
+//--------------------------------------------------------------------------
+// Sanity Checks
+//--------------------------------------------------------------------------
+  if(size(#)==0)
+  {
+    int k=nvars(basering);
+  }
+  else
+  {
+    if(typeof(#[1])=="int")
+    {
+      int k=#[1];
+    }
+    else
+    {
+      int k=nvars(basering);
+    }
+  }
+  def baser=basering;
+  string teststr="setring " + rname + ";";
+  execute(teststr);
+  if(nameof(basering)!=rname)
+  {
+    ERROR("rname not name of a ring");
+  }
+  teststr="string typeder=typeof(" + dername + ");";
+  execute(teststr);
+  if((typeder!="matrix")&&(typeder!="module"))
+  {
+    ERROR("dername not name of a matrix or module in rname");
+  }
+  setring(baser);
+  if((k > nvars(basering))||(k < 1))
+  {
+    ERROR("k should be between 1 and the number of variables");
+  }
+//--------------------------------------------------------------------------
+// Define the map giving the section and use it for substituting the
+// variables of the ring rname by the entries of mapi in the matrix
+// given by dername
+//--------------------------------------------------------------------------
+  setring baser;
+  string mapstr="map f0=" + rname + ",";
+  for(int i=1;i<ncols(mapi);i++)
+  {
+    mapstr=mapstr + string(mapi[i]) + ",";
+  }
+  mapstr=mapstr + string(mapi[ncols(mapi)]) + ";";
+  execute(mapstr);
+  string derstr="def derim=f0(" + dername + ");";
+  execute(derstr);
+//---------------------------------------------------------------------------
+// Form the derivatives of mapi by the first k variables
+//---------------------------------------------------------------------------
+  matrix jmapi[ncols(mapi)][k];
+  for(i=1;i<=k;i++)
+  {
+    jmapi[1..nrows(jmapi),i]=diff(mapi,var(i));
+  }
+//---------------------------------------------------------------------------
+// Put everything together to get the tangent space
+//---------------------------------------------------------------------------
+  string nvstr="int nvmodel=nvars(" + rname + ");";
+  execute(nvstr);
+  matrix M[nrows(derim)][ncols(derim)+k];
+  M[1..nrows(M),1..ncols(derim)]=derim[1..nrows(derim),1..ncols(derim)];
+  M[1..nrows(M),(ncols(derim)+1)..ncols(M)]=
+            jmapi[1..nrows(M),1..k];
+  return(M);
+}
+example
+{ "EXAMPLE:";echo=2;
+  ring ry=0,(a,b,c,d),ds;
+  ideal idy=ab,cd;
+  def dV=derlogV(idy);
+  echo=1; export ry; export dV; echo=2;
+  ring rx=0,(x,y,z),ds;
+  ideal mi=x-z+2y,x+y-z,y-x-z,x+2z-3y;
+  def M=KVtangent(mi,"ry","dV");
+  print(M);
+  M[1,5];
+  echo=1; kill ry;
+}
+/////////////////////////////////////////////////////////////////////////////
+
+proc KVversal(matrix KVtan, ideal mapi, string rname, string idname)
+"USAGE:   @code{KVversal(KVtan,I,rname,idname)};  @code{KVtan} matrix
+                                                  @code{I} ideal
+                                                  @code{rname,idname} strings
+RETURN:   list; The first entry of the list is the new ring in which the
+          K_V versal family lives, the second is the name of the ideal 
+          describing a K_V versal family of a singularity given as section 
+          of a model singularity (which was specified as idname in rname)
+NOTE:     The section is given by the generators of I, KVtan is the matrix
+          describing the K_V tangent space to the singularity (as returned
+          by KVtangent). rname denotes the ring in which the model 
+          singularity lives, and idname is the name of the ideal in this ring
+          defining the singularity.
+EXAMPLE:  @code{example KVversal}; shows an example
+"
+{
+//---------------------------------------------------------------------------
+// Sanity checks
+//---------------------------------------------------------------------------
+  def baser=basering;
+  string teststr="setring " + rname + ";";
+  execute(teststr);
+  if(nameof(basering)!=rname)
+  {
+    ERROR("rname not name of a ring");
+  }
+  teststr="string typeid=typeof(" + idname + ");";
+  execute(teststr);
+  if(typeid!="ideal")
+  {
+    ERROR("idname not name of an ideal in rname");
+  }
+  setring baser;
+//---------------------------------------------------------------------------
+// Find a monomial basis of the K_V normal space
+// and check whether we can define new variables A(i)
+//---------------------------------------------------------------------------
+  module KVt=KVtan;
+  module KVts=std(KVt);
+  module kbKVt=kbase(KVts);
+  for(int i=1; i<=size(kbKVt); i++)
+  {
+    if(rvar(A(i)))
+    {
+      int jj=-1;
+      break;
+    }
+  }
+  if (defined(jj)>1)
+  {
+    if (jj==-1)
+    {
+      ERROR("Your ring contains a variable A(i)!");
+    }
+  }
+//---------------------------------------------------------------------------
+// Extend our current ring by adjoining the correct number of variables
+// A(i) for the parameters and copy our objects to this ring
+//---------------------------------------------------------------------------  
+  def rbas=basering;
+  ring rtemp=0,(A(1..size(kbKVt))),(c,dp);
+  def rpert=rbas + rtemp;
+  setring rpert;
+  def mapi=imap(rbas,mapi);
+  def kbKVt=imap(rbas,kbKVt);
+  matrix mapv[ncols(mapi)][1]=mapi;   // I hate the conversion from ideal
+  vector mapV=mapv[1];                // to vector
+//---------------------------------------------------------------------------
+// Build up the map of the perturbed section and apply it to the ideal
+// idname
+//---------------------------------------------------------------------------
+  for(i=1;i<=size(kbKVt);i++)
+  {
+    mapV=mapV+A(i)*kbKVt[i];
+  }
+
+  string mapstr="map fpert=" + rname + ",";
+  for(int i=1;i<size(mapV);i++)
+  {
+    mapstr=mapstr + string(mapV[i]) + ",";
+  }
+  mapstr=mapstr + string(mapV[size(mapV)]) + ";";
+  execute(mapstr);
+  string idstr="ideal Ipert=fpert(" + idname + ");";
+  execute(idstr);
+//---------------------------------------------------------------------------
+// Return our new ring and the name of the perturbed ideal
+//---------------------------------------------------------------------------
+  export Ipert;
+  list retlist=rpert,"Ipert";
+  return(retlist);
+}
+example
+{ "EXAMPLE:";echo=2;
+  ring ry=0,(a,b,c,d),ds;
+  ideal idy=ab,cd;
+  def dV=derlogV(idy);
+  echo=1; 
+  export ry; export dV; export idy; echo=2;
+  ring rx=0,(x,y,z),ds;
+  ideal mi=x-z+2y,x+y-z,y-x-z,x+2z-3y;
+  def M=KVtangent(mi,"ry","dV");
+  list li=KVversal(M,mi,"ry","idy");
+  def rnew=li[1];
+  setring rnew;
+  `li[2]`;
+  echo=1; 
+  setring ry; kill idy; kill dV; setring rx; kill ry;
+}
+/////////////////////////////////////////////////////////////////////////////
+
+proc KVvermap(matrix KVtan, ideal mapi)
+"USAGE:   @code{KVvermap(KVtan,I)};  @code{KVtan} matrix, @code{I} ideal
+RETURN:   list; The first entry of the list is the new ring in which the 
+          versal object lives, the second specifies a map describing the 
+          section which yields a K_V versal family of the original 
+          singularity which was given as section of a model singularity
+NOTE:     The section is given by the generators of I, KVtan is the matrix
+          describing the K_V tangent space to the singularity (as returned
+          by KVtangent).
+EXAMPLE:  @code{example KVvermap}; shows an example
+"
+{
+//---------------------------------------------------------------------------
+// Find a monomial basis of the K_V normal space
+// and check whether we can define new variables A(i)
+//---------------------------------------------------------------------------
+  module KVt=KVtan;
+  module KVts=std(KVt);
+  module kbKVt=kbase(KVts);
+  for(int i=1; i<=size(kbKVt); i++)
+  {
+    if(rvar(A(i)))
+    {
+      int jj=-1;
+      break;
+    }
+  }
+  if (defined(jj)>1)
+  {
+    if (jj==-1)
+    {
+      ERROR("Your ring contains a variable A(i)!");
+    }
+  }
+//---------------------------------------------------------------------------
+// Extend our current ring by adjoining the correct number of variables
+// A(i) for the parameters and copy our objects to this ring
+//---------------------------------------------------------------------------  
+  def rbas=basering;
+  ring rtemp=0,(A(1..size(kbKVt))),(c,dp);
+  def rpert=rbas + rtemp;
+  setring rpert;
+  def mapi=imap(rbas,mapi);
+  def kbKVt=imap(rbas,kbKVt);
+  matrix mapv[ncols(mapi)][1]=mapi;
+  vector mapV=mapv[1];
+//---------------------------------------------------------------------------
+// Build up the map of the perturbed section
+//---------------------------------------------------------------------------
+  for(i=1;i<=size(kbKVt);i++)
+  {
+    mapV=mapV+A(i)*kbKVt[i];
+  }
+  ideal mappert=mapV[1..size(mapV)];
+//---------------------------------------------------------------------------
+// Return the new ring and the name of an ideal describing the perturbed map
+//---------------------------------------------------------------------------
+  export mappert;
+  list retlist=basering,"mappert";
+  return(retlist);
+}
+example
+{ "EXAMPLE:";echo=2;
+  ring ry=0,(a,b,c,d),ds;
+  ideal idy=ab,cd;
+  def dV=derlogV(idy);
+  echo=1; 
+  export ry; export dV; export idy; echo=2;
+  ring rx=0,(x,y,z),ds;
+  ideal mi=x-z+2y,x+y-z,y-x-z,x+2z-3y;
+  def M=KVtangent(mi,"ry","dV");
+  list li=KVvermap(M,mi);
+  def rnew=li[1];
+  setring rnew;
+  `li[2]`;
+  echo=1; 
+  setring ry; kill idy; kill dV; setring rx; kill ry;
+}
+/////////////////////////////////////////////////////////////////////////////
+
+proc lft_vf(ideal mapi, string rname, string idname, intvec wv, int b, list #)
+"USAGE: @code{lft_vf(I,rname,iname,wv,b[,any])}
+                                       @code{I} ideal
+                                       @code{wv} intvec
+                                       @code{b} int
+                                       @code{rname,iname} strings
+                                       @code{[any]} def
+RETURN: list
+        [1]: ring in which objects specified by the strings [2] and [3] live
+        [2]: name of ideal describing the liftable vector fields - 
+             computed up to order b in the parameters
+        [3]: name of basis of the K_V-normal space of the original singularity
+        [4]: (if 6th argument is given)
+             ring in which the reduction of the liftable vector fields has 
+             taken place.
+        [5]: name of liftable vector fields in ring [4]
+        [6]: name of ideal we are using for reduction of [5] in [4]
+ASSUME: input is assumed to be quasihomogeneous in the following sense:
+        there are weights for the variables in the current basering
+        such that, after plugging in mapi[i] for the i-th variable of the
+        ring rname in the ideal idname, the resulting expression is
+        quasihomogeneous; wv specifies the weight vector of the ring rname.
+	b is the degree bound up in the perturbation parameters up to which
+	computations are performed.
+NOTE:   the original ring should not contain any variables of name
+        A(i) or e(j)
+EXAMPLE:@code{example lft_vf;} gives an example 
+"
+{
+//---------------------------------------------------------------------------
+// Sanity checks
+//---------------------------------------------------------------------------
+  def baser=basering;
+  def qid=maxideal(1);
+  string teststr="setring " + rname + ";";
+  execute(teststr);
+  if(nameof(basering)!=rname)
+  {
+    ERROR("rname not name of a ring");
+  }
+  def ry=basering;
+  teststr="string typeid=typeof(" + idname + ");";
+  execute(teststr);
+  if(typeid!="ideal")
+  {
+    ERROR("idname not name of an ideal in rname");
+  }
+  setring baser;
+  for(int i=1; i<=ncols(mapi); i++)
+  {
+    if(rvar(e(i)))
+    {
+      int jj=-1;
+      break;
+    }
+  }
+  if (defined(jj)>1)
+  {
+    if (jj==-1)
+    {
+      ERROR("Your ring contains a variable e(j)!");
+    }
+  }
+  setring ry;
+//---------------------------------------------------------------------------
+// first prepare derlog(V) for the model singularity
+// and set the correct weights
+//---------------------------------------------------------------------------  
+  def @dV=derlogV(`idname`);
+  export(@dV);
+  setring baser;
+  map maptemp=`rname`,mapi;
+  def tempid=maptemp(`idname`);
+  intvec ivm=qhweight(tempid);
+  string ringstr="ring baserw=" + charstr(baser) + ",(" + varstr(baser) +
+                 "),(c,ws(" + string(ivm) + "));";
+  execute(ringstr);
+  def mapi=imap(baser,mapi);
+//---------------------------------------------------------------------------
+// compute the unperturbed K_V tangent space
+// and check K_V codimension
+//---------------------------------------------------------------------------
+  def KVt=KVtangent(mapi,rname,"@dV",nvars(basering));
+  def sKVt=std(KVt);
+  if(dim(sKVt)>0)
+  {
+    ERROR("K_V-codimension not finite");
+  }
+//---------------------------------------------------------------------------
+// Construction of the versal family 
+//---------------------------------------------------------------------------
+  list lilit=KVvermap(KVt,mapi);
+  def rpert=lilit[1];
+  setring rpert;
+  def mapipert=`lilit[2]`;
+  def KVt=imap(baserw,KVt);
+  def mapi=imap(baserw,mapi);
+  def KVtpert=KVtangent(mapipert,rname,"@dV",nvars(baser));
+//---------------------------------------------------------------------------
+// put the unperturbed and the perturbed tangent space into a module
+// (1st component unperturbed) and run a groebner basis computation 
+// which only considers spolys with non-vanishing first component
+//---------------------------------------------------------------------------
+  def rxa=basering;
+  string rchange="ring rexa=" + charstr(basering) + ",(e(1.." + 
+                 string(ncols(mapi)) + ")," + varstr(basering) + 
+                 "),(c,ws(" + string((-1)*wv) + "," + string(ivm) + "),dp);";
+  execute(rchange);
+  def mapi=imap(rxa,mapi);
+  ideal eid=e(1..ncols(mapi));            // for later use
+  def KVt=imap(rxa,KVt);
+  def KVtpert=imap(rxa,KVtpert);
+  intvec iv=1..ncols(mapi);
+  ideal KVti=mod2id(KVt,iv);
+//----------------------------------------------------------------------------
+// small intermezzo (here because we did not have all input any earlier)
+// get kbase of KVti for later use and determine an
+// integer l such that m_x^l*(e_1,\dots,e_r) lies in KVt
+//----------------------------------------------------------------------------
+  ideal sKVti=std(KVti);
+  ideal lsKVti=lead(sKVti);
+  module tmpmo=id2mod(lsKVti,iv);
+  setring baser;
+  def tmpmo=imap(rexa,tmpmo);
+  attrib(tmpmo,"isSB",1);
+  module kbKVt=kbase(tmpmo);
+  setring rexa;
+  def kbKVt=imap(baser,kbKVt);
+  ideal kbKVti=mod2id(kbKVt,iv);
+  def qid=imap(baser,qid);
+  intvec qiv;
+  for(i=1;i<=ncols(qid);i++)
+  {
+    qiv[rvar(qid[i])]=1;
+  }
+  int counter=1;
+  while(size(reduce(lsKVti,std(jet(lsKVti,i,qiv))))!=0)
+  {
+    counter++;
+  }
+//----------------------------------------------------------------------------
+// end of intermezzo
+// proceed to the previously announced Groebner basis computation
+//----------------------------------------------------------------------------
+  ideal KVtpi=mod2id(KVtpert,iv);
+  export(KVtpi);
+  matrix Eing[2][ncols(KVti)]=KVti,KVtpi;
+  module EinMo=Eing;
+  EinMo=EinMo,eid^2*gen(1),eid^2*gen(2);
+  module Ausg=Loctriv::kstd(EinMo,1);
+//---------------------------------------------------------------------------
+// * collect those elements of Ausg for which the first component is non-zero
+//   into mx and the others into mt
+// * cut off the first component
+// * find appropriate weights for the reduction
+//---------------------------------------------------------------------------
+  intvec eiv;
+  for(i=1;i<=ncols(eid);i++)
+  {
+    eiv[rvar(eid[i])]=1;
+  }
+  if(size(reduce(var(nvars(basering)),std(eid)))!=0)
+  {
+    eiv[nvars(basering)]=0;
+  }
+  module Aus2=jet(Ausg,1,eiv);
+  Aus2=simplify(Aus2,2);
+  ideal mx;
+  ideal mt;
+  int ordmax,ordmin;
+  int ordtemp;
+  for (i=1;i<=size(Aus2);i++)
+  {
+    if(Aus2[1,i]!=0)
+    {
+      mx=mx,Aus2[2,i];
+      ordtemp=ord(lead(Aus2[1,i]));
+      if(ordtemp>ordmax)
+      {
+        ordmax=ordtemp;
+      }
+      else
+      {
+        if(ordtemp<ordmin)
+        {
+          ordmin=ordtemp;
+        }
+      }
+    }
+    else
+    {
+      mt=mt,Aus2[2,i];
+    }
+  }  
+//---------------------------------------------------------------------------
+// * change weights of the A(i) such that Aus2[1,i] and Aus2[2,i] have the
+//   same leading term, if the first one is non-zero
+// * reduce mt by mx 
+// * find l such that (x_1,...,x_n)^l * eid can be used instead of noether
+//   which we have to avoid because we are playing with the weights
+//---------------------------------------------------------------------------
+  intvec oiv;
+  for(i=1;i<=(nvars(basering)-nvars(baser)-size(eid));i++)
+  {
+    oiv[i]=2*(abs(ordmax)+abs(ordmin));
+  }
+  mx=jet(mx,counter*(b+1),qiv);
+  rchange="ring rexaw=" + charstr(basering) + ",(" + varstr(basering) + 
+                      "),(c,ws(" + string((-1)*wv) + "," + string(ivm) +
+                      "," + string(oiv) + "));";
+  execute(rchange);
+  ideal qid=imap(rexa,qid);
+  def eid=imap(rexa,eid);
+  def mx=imap(rexa,mx);
+  attrib(mx,"isSB",1);
+  def mto=imap(rexa,mt);
+  ideal Aid=A(1..size(oiv));
+  intvec Aiv;
+  for(i=1;i<=ncols(Aid);i++)
+  {
+    Aiv[rvar(Aid[i])]=1;
+  }
+  intvec riv=(b+1)*qiv+(b+2)*counter*Aiv;
+  def mt=mto;
+  for(i=1;i<=counter+1;i++)
+  {
+    mt=mt,mto*qid^i;
+  }
+  mt=jet(mt,(b+1)*(b+2)*counter,riv);
+  mt=jet(mt,1,eiv);
+  mt=simplify(mt,10);
+  module mmx=module(mx);
+  attrib(mmx,"isSB",1);
+  for(i=1;i<=ncols(mt);i++)
+  {
+    if(defined(watchProgress))
+    {
+      "reducing mt[i], i="+string(i);
+    }
+   mt[i]=system("locNF",vector(mt[i]),mmx,
+                        (b+1)*(b+2)*counter,riv)[1][1,1];
+  }
+  mt=simplify(mt,10);
+//----------------------------------------------------------------------------
+// return the results by returning the ring and the names of the desired
+// modules in the ring
+// (if the list # is not empty, then we want to return this ring as well)
+//----------------------------------------------------------------------------
+  if(size(#)!=0)
+  {
+    export mt;
+    export mx;
+  }
+  setring rexa;
+  def mtout=imap(rexaw,mt);
+  kbKVti=jet(kbKVti,1,eiv);
+  kbKVti=simplify(kbKVti,2);
+  intvec rediv;
+  int j=1;
+  for(i=1;i<=size(qiv);i++)
+  {
+    if(qiv[i]!=0)
+    {
+      rediv[j]=i;
+      j++;
+    }
+  }
+  list templi=subrInterred(kbKVti,mtout,rediv);
+  mtout=jet(templi[3],b+1,Aiv);
+  export mtout;
+  export kbKVti;
+  list result;
+  result[1]=rexa;
+  result[2]="mtout";
+  result[3]="kbKVti";
+  if(size(#)!=0)
+  {
+    result[4]=rexaw;
+    result[5]="mt";
+    result[6]="mx";
+  }
+  export rexa;
+  keepring rexa;
+  return(result);
+}
+example
+{ "EXAMPLE:";echo=2;
+  ring ry=0,(a,b,c,d),ds;
+  ideal idy=ab,cd;
+  def dV=derlogV(idy);
+  echo=1; 
+  export ry; export dV; export idy; echo=2;
+  ring rx=0,(x,y,z),ds;
+  ideal mi=x-z+2y,x+y-z,y-x-z,x+2z-3y;
+  intvec wv=1,1,1,1;
+  def M=KVtangent(mi,"ry","dV");
+  list li=lft_vf(mi,"ry","idy",wv,5);
+  def rr=li[1];
+  setring rr;
+  `li[2]`;
+  `li[3]`;
+  echo=1; 
+  setring ry; kill idy; kill dV; setring rx; kill ry;
+}
+//////////////////////////////////////////////////////////////////////////////
+// STATIC PROCEDURES
+//////////////////////////////////////////////////////////////////////////////
+static
+proc abs(int c)
+"absolute value
+"
+{
+  if(c>=0){ return(c);}
+  else{ return(-c);}
+}
+////////////////////////////////////////////////////////////////////////////
