@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.86 2004-02-23 19:04:05 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.87 2004-04-16 17:15:53 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -990,14 +990,16 @@ void * sleftv::Data()
                        else
                          return (void *)nNULL;
       case VNOETHER:   return (void *) ppNoether;
-#ifndef HAVE_NAMESSPACES
 #ifndef HAVE_NS
       case LIB_CMD:    {
                          idhdl h = ggetid( "LIB" );
                          if(h==NULL) return (void *)sNoName;
                          return IDSTRING(h);
                        }
-#endif
+#else
+      case LIB_CMD:    {
+                         return (void *)sNoName;
+                       }
 #endif
       case IDHDL:
         return IDDATA((idhdl)data);
