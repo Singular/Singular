@@ -261,9 +261,9 @@ feOpt.inc: feOpt.cc mod2.h
 	/bin/rm -f feOpt feOpt.exe
 
 feOptES.inc: feOpt.cc
-	$(CXX) -DGENERATE_OPTION_INDEX  -DHAVE_ASO=0 -DESINGULAR feOpt.cc
-	./a.out
-	rm a.out
+	$(CXX) -DGENERATE_OPTION_INDEX  -DHAVE_ASO=0 -DESINGULAR feOpt.cc -o feOpt
+	./feOpt
+	rm -f feOpt feOpt.exe
 
 prCopy.cc : prCopy.inc
 
