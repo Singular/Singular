@@ -8,6 +8,8 @@ char type_conv[MAX_TOK][32];
 
 void init_type_conv() 
 {
+  strcpy(type_conv[NONE], "none");
+  strcpy(type_conv[NONE], "void");
   strcpy(type_conv[INT_CMD], "int");
   strcpy(type_conv[RING_CMD], "ring");
   strcpy(type_conv[QRING_CMD], "ring");

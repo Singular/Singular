@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.4 1999-03-24 13:04:20 krueger Exp $ */
+/* $Id: misc.cc,v 1.5 1999-03-31 22:03:22 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -27,7 +27,7 @@
 #define SYSTYP_HPUX9  2
 #define SYSTYP_HPUX10 3
 
-#if 0
+#if 1
 #  define logx printf
 #else
 #  define logx
@@ -74,6 +74,13 @@ int IsCmd(char *n, int & tok)
   
   if( strcmp(n, "SELF") == 0) {
     tok = SELF_CMD;
+    logx("IsCmd: [%d] %s\n", tok, n);
+    return tok;
+  }
+  
+  if( strcmp(n, "none") == 0) {
+    tok = NONE;
+    logx("IsCmd: [%d] %s\n", tok, n);
     return tok;
   }
   
@@ -224,7 +231,8 @@ void make_version(char *p, moddefv module)
     sscanf(p,"%*[^\"]\"%[^\"]\"",libnamebuf);
   }
   module->revision = (char *)malloc(strlen(libnamebuf)+1);
-  strcpy(module->revision, libnamebuf);
+  memset(module->revision, '\0', strlen(libnamebuf)+1);
+  memcpy(module->revision, libnamebuf, strlen(libnamebuf));
 }
 
 /*========================================================================*/
@@ -256,7 +264,6 @@ void Add2files(
 }
 
 /*========================================================================*/
-/*  procdefv Add2proclist(procdefv pi, char *name)*/
 void Add2proclist(
   moddefv module,
   char *name,
@@ -269,17 +276,22 @@ void Add2proclist(
   logx("Add2proclist(%s, %s)\n", name, ret_val);
   
   memset((void *)&pnew, '\0', sizeof(procdef));
+
   pnew.procname = (char *)malloc(strlen(name)+1);
   if(pnew.procname==NULL) printf("Error 1\n");
-  pnew.funcname = (char *)malloc(strlen(name)+1);
-  memset(pnew.funcname, '\0', strlen(name)+1);
   memset(pnew.procname, '\0', strlen(name)+1);
+  memcpy(pnew.procname, name, strlen(name));
+
+  pnew.funcname = (char *)malloc(strlen(name)+1);
+  if(pnew.funcname==NULL) printf("Error 1\n");
+  memset(pnew.funcname, '\0', strlen(name)+1);
+  memcpy(pnew.funcname, name, strlen(name));
+
   pnew.param = NULL;
   (pnew).is_static = 0;
   (pnew).paramcnt = 0;
-  strcpy(pnew.procname, name);
-  strcpy(pnew.funcname, name);
-
+  pnew.c_code = NULL;
+  
   pnew.return_val.name = (char *)malloc(strlen(ret_val)+1);
   memset(pnew.return_val.name, '\0', strlen(ret_val)+1);
   memcpy(pnew.return_val.name, ret_val, strlen(ret_val));
@@ -441,6 +453,25 @@ void generate_header(procdefv pi, FILE *fp)
   fprintf(fp, ");\n\n");
 }
 
+void gen_func_param_check(
+  FILE *fp,
+  procdefv pi,
+  int i
+  )
+{
+  fprintf(fp, "  if(v==NULL) goto mod_%s_error;\n", pi->funcname);
+  fprintf(fp, "  tok = v->Typ();\n");
+  fprintf(fp, "  if((index=iiTestConvert(tok, %s))==0)\n",
+          pi->param[i].typname);
+  fprintf(fp, "     goto mod_%s_error;\n", pi->funcname);
+  fprintf(fp, "  v_save = v->next;\n");
+  fprintf(fp, "  v->next = NULL;\n");
+  fprintf(fp, "  if(iiConvert(tok, %s, index, v, res%d))\n",
+          pi->param[i].typname, i);
+  fprintf(fp, "     goto mod_%s_error;\n", pi->funcname);
+  fprintf(fp, "  v = v_save;\n");
+}
+
 void generate_function(procdefv pi, FILE *fp)
 {
   int cnt = 0, i;
@@ -449,35 +480,25 @@ void generate_function(procdefv pi, FILE *fp)
   fprintf(fp, "BOOLEAN mod_%s(leftv res, leftv h)\n{\n", pi->funcname);
   if(pi->paramcnt>0) {
     if(pi->param[0].typ==SELF_CMD) {
+      if(pi->c_code != NULL) fprintf(fp, "%s\n", pi->c_code);
+  
       fprintf(fp, "  return(%s(res,h));\n", pi->funcname);
       fprintf(fp, "}\n\n");
     }
     else {
-      fprintf(fp, "  leftv v = h;\n");
+      fprintf(fp, "  leftv v = h, v_save;\n");
       fprintf(fp, "  int tok = NONE, index = 0;\n");
       for (i=0;i<pi->paramcnt; i++)
         fprintf(fp, "  leftv res%d = (leftv)Alloc0(sizeof(sleftv));\n", i);
 
       fprintf(fp, "\n");
     
-      for (i=0;i<pi->paramcnt; i++) {
-        fprintf(fp, "  if(v==NULL) goto mod_%s_error;\n", pi->funcname);
-        fprintf(fp, "  tok = v->Typ();\n");
-        fprintf(fp, "  printf(\"test %d.1\\n\");\n", i);
-        fprintf(fp, "  if((index=iiTestConvert(tok, %s))==0)\n",
-                pi->param[i].typname);
-        logx("==>'%s'\n", pi->param[i].typname);
-        fprintf(fp, "     goto mod_%s_error;\n", pi->funcname);
-        fprintf(fp, "  printf(\"test %d.2\\n\");\n", i);
-        fprintf(fp, "  if(iiConvert(tok, %s, index, v, res%d))\n",
-                pi->param[i].typname, cnt);
-        fprintf(fp, "     goto mod_%s_error;\n", pi->funcname);
-        fprintf(fp, "  printf(\"test %d.3\\n\");\n", i);
-        fprintf(fp, "  v = v->next;\n");
-      }
+      if(pi->c_code != NULL) fprintf(fp, "%s\n", pi->c_code);
+  
+      for (i=0;i<pi->paramcnt; i++) gen_func_param_check(fp, pi, i);
+
       fprintf(fp, "  if(v!=NULL) { tok = v->Typ(); goto mod_%s_error; }\n",
               pi->funcname);
-      fprintf(fp, "  printf(\"test before return\\n\");\n");
 
       fprintf(fp, "\n");
       switch( pi->return_val.typ) {
@@ -512,7 +533,24 @@ void generate_function(procdefv pi, FILE *fp)
       fprintf(fp, "    return TRUE;\n}\n\n");
     }
   } else {
-      fprintf(fp, "  return(%s(res));\n}\n\n", pi->funcname);
+      switch( pi->return_val.typ) {
+          case SELF_CMD:
+            fprintf(fp, "  return(%s(res));\n}\n\n", pi->funcname);
+           break;
+
+          case NONE:
+            fprintf(fp, "  res->rtyp = %s;\n", pi->return_val.typname);
+            fprintf(fp, "  res->data = NULL;\n");
+            fprintf(fp, "  %s();\n", pi->funcname);
+            fprintf(fp, "  return FALSE;\n}\n\n");
+            break;
+            
+          default:
+            fprintf(fp, "  res->rtyp = %s;\n", pi->return_val.typname);
+            fprintf(fp, "  res->data = (void *)%s();\n", pi->funcname);
+            fprintf(fp, "  return FALSE;\n}\n\n");
+      }
+    
   }
       
       
@@ -612,7 +650,7 @@ void mod_create_makefile(moddefv module)
   write_header(fp, module->name, "#");
   fprintf(fp, "CC\t= gcc\n");
   fprintf(fp, "CXX\t= gcc\n");
-  fprintf(fp, "CFLAGS\t= -DNDEBUG -I. -I../include\n");
+  fprintf(fp, "CFLAGS\t= -DNDEBUG -DBUILD_MODULE -I. -I../include\n");
   fprintf(fp, "#LD\t=\n");
   fprintf(fp, "\n");
   fprintf(fp, "SRCS\t= ");

@@ -1,5 +1,5 @@
 /*
- *  $Id: modgen.h,v 1.3 1999-03-24 13:04:21 krueger Exp $
+ *  $Id: modgen.h,v 1.4 1999-03-31 22:03:23 krueger Exp $
  *
  */
 
@@ -36,6 +36,7 @@ class procdef {
   paramdef  return_val;
   paramdefv param;
   int       paramcnt;
+  char *c_code;
 };
 
 class cfiles {
