@@ -5,14 +5,14 @@
      2xy+2yz+2zt-y, 
      y2+2xz+2yt-z, 
      x+2y+2z+2t-1;
-  decomp(i);
+  primdecGTZ(i);
   // We consider now the ideal J of the base space of the 
   // miniversal deformation of the cone over the rational
   // normal curve computed in section *11* and compute 
   // its primary decomposition.
   ring R = 0,(A,B,C,D),dp;
   ideal J = CD, BD+D2, AD;
-  decomp(J);
+  primdecGTZ(J);
   // We see that there are two components which are both
   // prime, even linear subspaces, one 3-dimensional,
   // the other 1-dimensional
@@ -27,6 +27,6 @@
   J = intersect(J,maxideal(3));
   primdecSY(J,1);    //shows that the maximal ideal is
                     //embedded (takes a few seconds)
-  min_ass_prim_charsets(J,1);  
+  minAssChar(J,1);  
   radical(J);
 LIB "tst.lib";tst_status(1);$
