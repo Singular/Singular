@@ -206,6 +206,12 @@ iparith.inc mpsr_Tok.inc: iparith.cc ipconv.cc tok.h mpsr_Tok.cc grammar.h mod2.
 	fi
 
 
+mmutil.inc: mmutil.c mmprivat.h
+	${CXX} ${CXXFLAGS}  ${CPPFLAGS} ${DEFS} \
+	       -DGENERATE_INDEX_TABLE -DHAVE_INDEX_TABLE mmutil.c -o mmutil
+	./mmutil > mmutil.inc
+	rm -rf mmutil
+
 version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in configure.in
 	echo "#define SINGULAR_VERSION_ID " `date '+%y%m%d%H'` >version.h
 

@@ -1,3 +1,8 @@
+1998-04-29  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+	* mmutil.c (mmGetIndex): new implementation: Use generated lookup
+	table (mmutil.inc) instead of "binary" search on size
+
 Tue Apr 28 19:56:46 MET DST 1998 hannes
   * ipassign.cc: fixed assignment of resolution to list: need ipMoveId
 1998-04-28  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
