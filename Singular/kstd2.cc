@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.19 1998-06-12 17:41:30 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.20 1998-07-01 14:40:28 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -294,7 +294,7 @@ static void redHomog (LObject* h,kStrategy strat)
             return;
           }
 #ifdef KDEBUG
-          if (TEST_OPT_DEBUG) 
+          if (TEST_OPT_DEBUG)
           {
             Print(" to %d:", pLength((*h).p));
             wrp((*h).p);
@@ -620,7 +620,7 @@ static void redHoney (LObject*  h,kStrategy strat)
       /*
       * end of search: have to reduce with pi
       */
-      if (ei > (*h).ecart)
+      if ((pass!=0) && (ei > (*h).ecart))
       {
         /*
         * It is not possible to reduce h with smaller ecart;
