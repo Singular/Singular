@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmgauss.cc,v 1.4 1997-12-03 16:58:36 obachman Exp $
+// $Id: fglmgauss.cc,v 1.5 1998-01-27 16:47:29 pohl Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -31,6 +31,17 @@ public:
 	newpdenom= NULL;
 	newfac= NULL;
     }
+#ifdef macintosh
+    void mac_gaussElem( const fglmVector newv, const fglmVector newp, number & newpdenom, number & newfac )
+    {
+    v= newv;
+    p= newp;
+    pdenom=newpdenom;
+    fac=newfac;
+	newpdenom= NULL;
+	newfac= NULL;
+    }
+#endif
     ~gaussElem() 
     {
 	nDelete( & pdenom );
@@ -158,7 +169,11 @@ gaussReducer::store()
     perm[size]= pivotcol;
     
     pivot= nCopy( v.getconstelem( pivotcol ) );
+#ifdef macintosh
+    elems[size].mac_gaussElem( v, p, pdenom, pivot );
+#else
     elems[size].gaussElem( v, p, pdenom, pivot );
+#endif
 }
 
 fglmVector 
