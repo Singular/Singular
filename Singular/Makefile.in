@@ -94,7 +94,7 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	subexpr.h clapsing.h ipid.h matpol.h polys.h syz.h \
 	cntrlc.h ipprint.h ring.h timer.h \
 	febase.h ipshell.h shortfl.h tok.h \
-	mmmemory.h mmprivate.h mmheap.h mmpage.h \
+	mmemory.h mmprivate.h mmheap.h mmpage.h \
 	ffields.h khstd.h silink.h \
 	fglm.h comm.h kstd1.h modulop.h sing_dbm.h weight.h \
 	fglmgauss.h fglmvec.h kstd2.h mpsr.h sing_mp.h \
