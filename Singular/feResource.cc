@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.6 1999-08-14 13:17:30 Singular Exp $ */
+/* $Id: feResource.cc,v 1.7 1999-08-16 15:09:47 obachman Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -11,6 +11,7 @@
 #include "mod2.h"
 #include "mmemory.h"
 #include "febase.h"
+#include "version.h"
 
 // define RESOURCE_DEBUG for chattering about resource management
 // #define RESOURCE_DEBUG
@@ -109,7 +110,7 @@ static char* feCleanResourceValue(feResourceType type, char* value);
 static char* feCleanUpFile(char* fname);
 static char* feCleanUpPath(char* path);
 static void mystrcpy(char* d, char* s);
-static char* feSprintf(char* s, const char* fmt);
+static char* feSprintf(char* s, const char* fmt, int warn = -1);
 extern "C" char* find_executable(const char* argv0);
 #if defined(WINNT) && defined(__GNUC__)
 // utility function of Cygwin32:
@@ -140,11 +141,13 @@ void feInitResources(char* argv0)
   feArgv0 = mstrdup(argv0);
 #ifdef RESOURCE_DEBUG
   printf("feInitResources: entering with argv0=%s=\n", argv0);
-  feResource('S');
+#endif
+  // init some Resources
   feResource('b');
   feResource('r');
-  feResource('s');
-#endif
+  // don't complain about stuff when initializing SingularPath
+  feResource('s',0);
+  
   
   
 #ifdef HAVE_SETENV
@@ -170,12 +173,13 @@ void feReInitResources()
     i++;
   }
 #ifdef RESOURCE_DEBUG
-  printf("feReInitResources: entering with feArgv0=%s=\n", feArgv0);
-  feResource('S');
+  printf("feInitResources: entering with argv0=%s=\n", argv0);
+#endif
+  // init some Resources
   feResource('b');
   feResource('r');
-  feResource('s');
-#endif
+  // don't complain about stuff when initializing SingularPath
+  feResource('s',0);
 }
 
 /*****************************************************************
@@ -274,7 +278,7 @@ static char* feInitResource(feResourceConfig config, int warn)
   
   if (*value == '\0' && config->fmt != NULL )
   {
-    feSprintf(value, config->fmt);
+    feSprintf(value, config->fmt, warn);
   }
   else if (config->fmt == NULL)
   {
@@ -320,7 +324,7 @@ static char* feInitResource(feResourceConfig config, int warn)
     Warn("Could not get %s.", config->key);
     Warn("Either set environment variable %s to the location of %s", 
          config->env, config->key);
-    feSprintf(value, config->fmt);
+    feSprintf(value, config->fmt, warn);
     Warn("or make sure that %s is at %s", config->key, value);
   }
 #ifdef RESOURCE_DEBUG
@@ -607,7 +611,7 @@ static void mystrcpy(char* d, char* s)
  * feSprintf
  *
  *****************************************************************/
-static char* feSprintf(char* s, const char* fmt)
+static char* feSprintf(char* s, const char* fmt, int warn)
 {
   char* s_in = s;
   if (fmt == NULL) return NULL;
@@ -619,7 +623,7 @@ static char* feSprintf(char* s, const char* fmt)
     if (*fmt == '%' && *(fmt + 1) != '\0')
     {
       fmt++;
-      char* r = feResource(*fmt);
+      char* r = feResource(*fmt, warn);
       if (r != NULL)
       {
         strcpy(s, r);
