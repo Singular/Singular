@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.330 2004-10-21 18:21:49 levandov Exp $ */
+/* $Id: iparith.cc,v 1.331 2004-10-22 17:43:36 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2620,7 +2620,6 @@ struct sValCmd2 dArith2[]=
 ,{jjBETTI2_ID, BETTI_CMD,      INTMAT_CMD,     MODUL_CMD,  INT_CMD ALLOW_PLURAL}
 #ifdef HAVE_PLURAL
 ,{jjBRACKET,   BRACKET_CMD,    POLY_CMD,       POLY_CMD,   POLY_CMD ALLOW_PLURAL}
-,{jjOPPOSE,    OPPOSE_CMD,     ANY_TYPE/*set by p*/, RING_CMD,   DEF_CMD ALLOW_PLURAL}
 #endif
 ,{jjCOEF,      COEF_CMD,       MATRIX_CMD,     POLY_CMD,   POLY_CMD ALLOW_PLURAL}
 ,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     IDEAL_CMD,  POLY_CMD ALLOW_PLURAL}
@@ -2719,6 +2718,9 @@ struct sValCmd2 dArith2[]=
 ,{jjPlural_num_mat,  NCALGEBRA_CMD,  NONE,  POLY_CMD,   MATRIX_CMD NO_PLURAL}
 ,{jjPlural_mat_poly, NCALGEBRA_CMD,  NONE,  MATRIX_CMD, POLY_CMD   NO_PLURAL}
 ,{jjPlural_mat_mat,  NCALGEBRA_CMD,  NONE,  MATRIX_CMD, MATRIX_CMD NO_PLURAL}
+#endif
+#ifdef HAVE_PLURAL
+,{jjOPPOSE,    OPPOSE_CMD,     ANY_TYPE/*set by p*/, RING_CMD,   DEF_CMD ALLOW_PLURAL}
 #endif
 ,{jjPARSTR2,   PARSTR_CMD,     STRING_CMD,     RING_CMD,   INT_CMD ALLOW_PLURAL}
 ,{jjPARSTR2,   PARSTR_CMD,     STRING_CMD,     QRING_CMD,  INT_CMD ALLOW_PLURAL}
