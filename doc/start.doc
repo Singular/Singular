@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.12 1998-05-18 09:13:28 gorzel Exp $
+@comment $Id: start.doc,v 1.13 1998-05-18 16:11:42 wichmann Exp $
 @comment this file contains the "Introduction" chapter.
 
 @c The following directives are necessary for proper compilation
@@ -22,9 +22,9 @@
 
 
 @menu
-* Background::
-* How to use this manual::
-* Getting started::
+* Background::                  
+* How to use this manual::      
+* Getting started::             
 @end menu
 
 @c ------------------------------------------------------------------
@@ -44,7 +44,7 @@ quotient rings with respect to an ideal.
 
 @sc{Singular} features one of the fastest and most general
 implementations of various algorithms for computing Groebner
-resp. standard bases. The implementation includes Buchberger's algorithm
+resp.@: standard bases. The implementation includes Buchberger's algorithm
 (if the ordering is a wellordering) and Mora's algorithm (if the
 ordering is a tangent cone ordering) as special cases.  Furthermore, it
 provides polynomial factorizations, resultant, characteristic set and
@@ -56,18 +56,24 @@ language, @sc{Singular}'s internal functionality is augmented and
 user-extendible by libraries written in the @sc{Singular} programming
 language. A general and efficient implementation of links as endpoints
 of communications allows @sc{Singular} to make its functionality
-available to and be easily incorporated into other programmes.
+available to and be easily incorporated into other programs.
 
 @sc{Singular}'s development started in 1984 with an implementation of
 Mora's Tangent Cone algorithms in Modula-2 on an Atari computer (K.P.
-Neuendorf, G. Pfister, H. Schoenemann; Humboldt-Universitaet zu
-Berlin).  The need for a new system arose from the investigation of
+Neuendorf, G. Pfister, H.@:
+@tex
+Sch\"onemann; Humboldt-Universit\"at
+@end tex
+@ifinfo
+Schoenemann; Humboldt-Universitaet
+@end ifinfo
+zu Berlin).  The need for a new system arose from the investigation of
 mathematical problems coming from singularity theory which none of the
-existing systems was able to compute. 
+existing systems was able to compute.
 
 In the early 1990s @sc{Singular}'s "home-town" moved to
 Kaiserslautern, a general standard basis algorithm was implemented in C
-and @sc{Singular} was ported to Unix, MS-DOS, and MacOS. 
+and @sc{Singular} was ported to Unix, MS-DOS, Windows NT, and MacOS. 
 
 Continuous extensions (like polynomial factorization, gcd computations,
 links) and refinements led in 1997 to the release of @sc{Singular}
@@ -76,7 +82,7 @@ version 1.0.
 The highlights of the new @sc{Singular} version 1.2. include: much
 faster standard and Groebner bases computations based on Hilbert series
 and on improved implementations of the algorithms and the addition of
-libraries for primary decomposition, ring normalization.
+libraries for primary decomposition, ring normalization, etc.
 
 @c Thus, we hope to offer a useful system
 @c for dealing with local and global computational aspects
@@ -92,16 +98,16 @@ In @ref{Getting started}, some simple examples are explained in a
 step-by-step manner to introduce into @sc{Singular}.
 
 @ref{Examples} should come next for real learning-by-doing or to quickly
-solve some given mathematical problem without dwelling to deeply into
+solve some given mathematical problems without dwelling to deeply into
 @sc{Singular}.  This chapter contains a lot of real-life examples and
-detailed instructions and explanations how to solve them using
-@sc{Singular}.
+detailed instructions and explanations on how to solve mathematical
+problems using @sc{Singular}.
 
 @subsubheading For the systematic user
-In @ref{General concepts}, all basic concepts important to use and
-understand @sc{Singular} are developed.  But even for users preferring the
-systematic it will be helpful to have a look at the examples in
-@ref{Getting started} every now and then.
+In @ref{General concepts}, all basic concepts which are important to use
+and understand @sc{Singular} are developed.  But even for users
+preferring the systematic it will be helpful to have a look at the
+examples in @ref{Getting started}, every now and then.
 
 The topics in this chapter are organized more or less in the order the
 novice user has to deal with them.
@@ -118,8 +124,8 @@ define a basering in @sc{Singular}.  This is explained in detail in
 @ref{Rings and orderings}.
 
 @item
-An overview of the algorithms implemented in @sc{Singular} is given in
-@ref{Implemented algorithms}.
+An overview of the algorithms implemented in the kernel of @sc{Singular}
+is given in @ref{Implemented algorithms}.
 
 @item
 In @ref{The SINGULAR language}, language specific concepts are
@@ -138,9 +144,10 @@ store and retrieve data are discussed.
 @end itemize
 
 @ref{Data types}, is a complete treatment for @sc{Singular}'s data types
-where each section corresponds to one data type.  Except from the syntax
-of declarations, expressions, and operations, in each section there is a
-subsection listing all functions related to that particular type.
+where each section corresponds to one data type, alphabetically sorted.
+For each data type, its purpose is explained, the syntax of its
+declaration is given, and related operations and functions are
+listed. Examples illustrate its usage.
 
 @ref{Functions and system variables}, is an alphabetically ordered
 reference list of all of @sc{Singular}'s functions, control structures,
@@ -148,11 +155,12 @@ and system variables.  Each entry includes a description of the syntax
 and semantics of the item being explained as well as one or more
 examples on how to use it.
 
-@subsubheading Miscellany
+@subsubheading Miscellay
 @ref{Tricks and pitfalls}, is a loose collection of limitations and
 features which may be unexpected by those who expect to be the
-@sc{Singular} language an exact copy of the C programming language.  But
-some mathematical tips are collected there, too.
+@sc{Singular} language an exact copy of the C programming language or of
+some Computer Algebra system languages.  But some mathematical tips are
+collected there ase well.
 
 @ref{Mathematical background} introduces some of the mathematical
 notions and definitions used throughout this manual.  For example, if in
@@ -173,17 +181,16 @@ them, resp.
 * Rings and standard bases::    
 * Procedures and libraries::    
 * Change of rings::             
-* Maps and elimination::        
-* Modules and their annilator::  
-* Resolution and Hilbert series::  
+* Modules and their annihilator::  
+* Resolution and Ext groups::   
 @end menu
 
 @c ------------------------------------------------------------------
-@node General concepts, Rings and standard bases, Getting started, Getting started
-@subsection General concepts
-@cindex General concepts
+@node Generalities, Rings and standard bases, Getting started, Getting started
+@subsection Generalities
+@cindex Generalities
 
-@c {{{ subsection General concepts }}}
+@c {{{ subsection Generalities }}}
 Once @sc{Singular} is started, it attends input after the promt @code{>}.
 Every statement has to be closed by an @code{;}
 @example
@@ -265,7 +272,7 @@ polynomials a ring has to be defined first.
 @end example   
 This gives a polynomial ring called @code{r} in characteristic zero and 
 ring variables @code{x,y,z}. The @code{dp} at the end determines the termorder
-of the polynomials and hence the standardbasis calculation.
+of the polynomials and hence the standard basis calculation.
 The @code{p} stands for @code{p}olynomial, so decreasing order of 
 exponents, whereas an @code{s} means power@code{s}eries and increasing order 
 of exponents.
@@ -305,9 +312,9 @@ Hence the point @code{(1,2,0)} is not lying on the variety @code{V(f,g)}.
 
 A second question is, to decide if some function vanishes on a variety,
 or in algebraic terms if a polynomial is included in a given ideal.
-This need a standardbasis calculatation  with the command 
+This need a standard basis calculatation  with the command 
 @code{std}, then calculate the normalform of the asked polynomial with respect
-to the standardbasis.
+to the standard basis.
 @example
   ideal sI = std(f);
   reduce(g,sI);
@@ -320,7 +327,7 @@ The command @code{kbase} calculates a basis of the polynomial ring modulo an
 ideal. As application calculate the Milnor number
 of a  hypersurface singularity in the global and local case. This is
 the vectorspace dimension of the polynomial ring modulo the Jacobian ideal
-in the global case resp. of the powerseries ring modulo the Jacobian ideal.
+in the global case resp.@: of the powerseries ring modulo the Jacobian ideal.
 
 The Jacobian ideal is obtained with the command @code{jacob}.
 @example
@@ -331,7 +338,7 @@ The Jacobian ideal is obtained with the command @code{jacob}.
   @expansion{J[3]=2z} 
 @end example
 To get a representing set of the quotient vectorspace 
-a standardbasis has to be calculated first.
+a standard basis has to be calculated first.
 @example
   J = std(J);
   J;
@@ -456,7 +463,7 @@ available for the user defined in the library.
 @end example
 
 @c ------------------------------------------------------------------
-@node Change of rings, Maps and elimination, Procedures and libraries, Getting started
+@node Change of rings, Modules and their annihilator, Procedures and libraries, Getting started
 @subsection Change of rings
 @cindex Change of rings
 
@@ -513,7 +520,7 @@ We may calculate the determinat and minors of differents size.
 @end example
 
 The variety defined by the one dimensional minors is empty.
-With the command @code{option} the algortihm of the standardbasis 
+With the command @code{option} the algortihm of the standard basis 
 may be affected. For instance a reduced standard basis is obtained 
 in the following way  
 @example
@@ -526,13 +533,14 @@ in the following way
 @c to calculate some ....
 
 @c ------------------------------------------------------------------
-@node Maps and elimination, Modules and their annihilator, Change of rings, Getting started
+@c REMEMBER TO EDIT NEXT AND PREVEIOUS NODE IF YOU UNCOMMENT THIS NODE!
+@c @node Maps and elimination, Modules and their annihilator, Change of rings, Getting started
 @c @subsection Maps and elimination
 @c @cindex Maps and elimination
 
 
 @c ------------------------------------------------------------------
-@node Modules and their annihilator, Resolution and ext groups, Maps and elimination, Getting started
+@node Modules and their annihilator, Resolution and Ext groups, Change of rings, Getting started
 @subsection Modules and their annihilator
 @cindex Modules and and their annihilator
 @sc{Singular} is able to calculate with modules over all the rings,
@@ -542,17 +550,17 @@ is defined as follows:
   ring rr;
   int n = 4;
   freemodule(4);
-  @expansion{}_[1]=1*gen(1)
-  @expansion{}_[2]=1*gen(2)
-  @expansion{}_[3]=1*gen(3)
-  @expansion{}_[4]=1*gen(4)
+  @expansion{} _[1]=1*gen(1)
+  @expansion{} _[2]=1*gen(2)
+  @expansion{} _[3]=1*gen(3)
+  @expansion{} _[4]=1*gen(4)
   typeof(_);
-  @expansion{}module
+  @expansion{} module
   print(freemodule(4));
-  @expansion{}1,0,0,0,
-  @expansion{}0,1,0,0,
-  @expansion{}0,0,1,0,
-  @expansion{}0,0,0,1 
+  @expansion{} 1,0,0,0,
+  @expansion{} 0,1,0,0,
+  @expansion{} 0,0,1,0,
+  @expansion{} 0,0,0,1 
 @end example
 
 There are two possibilities to define a module. First a submodule can be
@@ -564,9 +572,9 @@ For that reason in @sc{Singular} matrices and modules may be interchanged.
   module MD = [x,0,x],[y,z,-y];
   matrix MM = MD;
   print(MM);
-  @expansion{}x,-y,
-  @expansion{}0,z, 
-  @expansion{}x,-y 
+  @expansion{} x,-y,
+  @expansion{} 0,z, 
+  @expansion{} x,-y 
 @end example
  
 The second possibility, and this is what @sc{Singular} means when 
@@ -575,7 +583,7 @@ of the generators of a free module. To pass from  the first description
 to the second is done with the command @code{syz}.
 @example
   syz(MD);
-  @expansion{}_[1]=x*gen(2)+y*gen(1)
+  @expansion{} _[1]=x*gen(2)+y*gen(1)
 @end example
 
 We want to calculate as application the annihilator  of a given module.
@@ -607,7 +615,7 @@ the timer and redo the example.
   timer =0;
   ideal I = quotient(U,freemodule(nrows(U)));
   timer;
-  @expansion{}16
+  @expansion{} 16
 @end example
  
 
@@ -626,7 +634,7 @@ module with smaller rank, i.e. the matrix has less rows.
 
 
 @c ------------------------------------------------------------------
-@node Resolution and Ext groups,  , Modules and their annihillator, Getting started
+@node Resolution and Ext groups,  , Modules and their annihilator, Getting started
 @subsection Resolution and Ext groups
 @cindex Resolution and Ext groups
 This final example in the introduction shows how to calculate the @code{n-th Ext} group of an ideal.
@@ -644,19 +652,19 @@ its calculation process. This can be enabled with the @code{option} command.
 
   ring rr;      // the default ring in char 32003
   rr;
-  @expansion{}//   characteristic : 32003
-  @expansion{}//   number of vars : 3
-  @expansion{}//        block   1 : ordering dp
-  @expansion{}//                  : names    x y z 
-  @expansion{}//        block   2 : ordering C
+  @expansion{} //   characteristic : 32003
+  @expansion{} //   number of vars : 3
+  @expansion{} //        block   1 : ordering dp
+  @expansion{} //                  : names    x y z 
+  @expansion{} //        block   2 : ordering C
   ideal I = x4+x3y+x2yz,x2y2+xy2z+y2z2,x2z2+2xz3,2x2z2+xyz2;
   option(prot);
   resolution rs = mres(I,0);
-  @expansion{}v4(3)s-s.s.s5(3)s6-s.s-s7(2)s-s-s
-  @expansion{}product criterion:0 chain criterion:8
-  @expansion{}(6)(5).(4).(3)..(2)..(1).[1]
-  @expansion{}(7)(6)(5)(4).(3)(2).(1)[2]
-  @expansion{} // ....
+  @expansion{} v4(3)s-s.s.s5(3)s6-s.s-s7(2)s-s-s
+  @expansion{} product criterion:0 chain criterion:8
+  @expansion{} (6)(5).(4).(3)..(2)..(1).[1]
+  @expansion{} (7)(6)(5)(4).(3)(2).(1)[2]
+  @expansion{}  // ....
 @end example
 Disable this protocol with
 @example
@@ -668,10 +676,10 @@ description of the resolution where the exponents denote the rank of the
 free modules.
 @example
   rs;
-  @expansion{}  1       4       5       2       0
-  @expansion{}rr  <-- rr  <-- rr  <-- rr  <-- rr
-  @expansion{} 
-  @expansion{}0       1       2       3       4
+  @expansion{}   1       4       5       2       0
+  @expansion{} rr  <-- rr  <-- rr  <-- rr  <-- rr
+  @expansion{}  
+  @expansion{} 0       1       2       3       4
 @end example
 
 
@@ -679,11 +687,11 @@ A single module in this resolution is obtained as usual with the brackets
 @code{[ ]}.
 @example
   print(rs[3]);
-  @expansion{}y2z,  y3,    
-  @expansion{}-y2,  -y2,   
-  @expansion{}x+y-z,x+y-z, 
-  @expansion{}-2z,  x-y+4z,
-  @expansion{}-z,   -y+3z  
+  @expansion{} y2z,  y3,    
+  @expansion{} -y2,  -y2,   
+  @expansion{} x+y-z,x+y-z, 
+  @expansion{} -2z,  x-y+4z,
+  @expansion{} -z,   -y+3z  
 @end example
 
 
@@ -716,13 +724,13 @@ Now consider the following example:
   ring r5 = 32003,(a,b,c,d,e),dp;
   ideal I = a2b2+ab2c+b2cd, a2c2+ac2d+c2de,a2d2+ad2e+bd2e,a2e2+abe2+bce2;
   print(Ext(2,I));
-  @expansion{}1,0,0,0,0,0,0,
-  @expansion{}0,1,0,0,0,0,0,
-  @expansion{}0,0,1,0,0,0,0,
-  @expansion{}0,0,0,1,0,0,0,
-  @expansion{}0,0,0,0,1,0,0,
-  @expansion{}0,0,0,0,0,1,0,
-  @expansion{}0,0,0,0,0,0,1 
+  @expansion{} 1,0,0,0,0,0,0,
+  @expansion{} 0,1,0,0,0,0,0,
+  @expansion{} 0,0,1,0,0,0,0,
+  @expansion{} 0,0,0,1,0,0,0,
+  @expansion{} 0,0,0,0,1,0,0,
+  @expansion{} 0,0,0,0,0,1,0,
+  @expansion{} 0,0,0,0,0,0,1 
   Ext(3,I);   // too big to display here
 @end example
 
