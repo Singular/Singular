@@ -14,6 +14,7 @@
 #include "kInline.cc"
 #include "kstd1.h"
 #define FULLREDUCTIONS
+
 enum calc_state 
 {
   UNCALCULATED,
@@ -29,6 +30,7 @@ struct calc_dat
   int* lengths;
   long* short_Exps;
   kStrategy strat;
+  int** deg;
   int found_i;
   int found_j;
   int continue_i;
@@ -36,6 +38,8 @@ struct calc_dat
   int n;
   int skipped_i;
   int normal_forms;
+  int skipped_pairs;
+  int current_degree;
 };
 bool find_next_pair(calc_dat* c);
 void replace_pair(int & i, int & j, calc_dat* c);
@@ -43,9 +47,10 @@ void initial_data(calc_dat* c);
 void add_to_basis(poly h, calc_dat* c);
 void do_this_spoly_stuff(int i,int j,calc_dat* c);
 ideal t_rep_gb(ring r,ideal arg_I);
-bool has_t_rep(int arg_i, int arg_j, calc_dat* state);
+bool has_t_rep(const int & arg_i, const int & arg_j, calc_dat* state);
 int* make_connections(int from, poly bound, calc_dat* c);
 void now_t_rep(int arg_i, int arg_j, calc_dat* c);
+int pLcmDeg(poly a, poly b);
 
 bool find_next_pair(calc_dat* c)
 {
@@ -56,38 +61,64 @@ bool find_next_pair(calc_dat* c)
   start_i=c->continue_i;
   start_j=c->continue_j;
 
-  /*  for (int i=start_i;i<c->n;i++){
+    for (int i=start_i;i<c->n;i++){
+      if (pFDeg(c->S->m[i])>c->current_degree)
+      {
+	c->skipped_pairs++;
+	continue;
+      }
       for(int j=(i==start_i)?start_j+1:0;j<i;j++){
-      // printf("searching at %d,%d",i,j);
-      if (c->states[i][j]==UNCALCULATED){
-      c->continue_i=c->found_i=i;
-      c->continue_j=c->found_j=j;
-      return true;
+	// printf("searching at %d,%d",i,j);
+	if (c->states[i][j]==UNCALCULATED){
+	  if(c->deg[i][j]<=c->current_degree)
+	  {
+	    c->continue_i=c->found_i=i;
+	    c->continue_j=c->found_j=j;
+	    return true;
+	  }
+	  else
+	  {
+	    ++(c->skipped_pairs);
+	  }
+	}
       }
-      }
-      }*/
-  int z=0;
-  i=start_i;
-  j=start_j;
-  z=start_i+start_j;
-  while(z<=(2*c->n-3)){
-   
-    while(i>j){
-      if(i>=c->n) {
-        if (c->skipped_i<0) c->skipped_i=i;
-      } else{
-        if(c->states[i][j]==UNCALCULATED){
-          c->continue_i=c->found_i=i;
-          c->continue_j=c->found_j=j;
-          return true;
-        }
-      }
-      --i;
-      ++j;
     }
-    ++z;
-    i=z;
-    j=0;
+//   int z=0;
+//   i=start_i;
+//   j=start_j;
+//   z=start_i+start_j;
+//   while(z<=(2*c->n-3)){
+   
+//     while(i>j){
+//       if(i>=c->n) {
+//         if (c->skipped_i<0) c->skipped_i=i;
+//       } else{
+//         if(c->states[i][j]==UNCALCULATED){
+// 	  if (c->deg[i][j]<=c->current_degree)
+// 	  {
+// 	    c->continue_i=c->found_i=i;
+// 	    c->continue_j=c->found_j=j;
+// 	    return true;
+// 	  }
+// 	  else
+// 	  {
+// 	    ++(c->skipped_pairs);
+// 	  }
+//         }
+//       }
+//       --i;
+//       ++j;
+//     }
+//     ++z;
+//     i=z;
+//     j=0;
+//   }
+  if (c->skipped_pairs>0){
+    ++(c->current_degree);
+    c->skipped_pairs=0;
+    c->continue_i=0;
+    c->continue_j=0;
+    return find_next_pair(c);
   }
   return false;
 }
@@ -224,6 +255,8 @@ void initial_data(calc_dat* c){
   void* h;
   int i,j;
   c->normal_forms=0;
+  c->current_degree=1;
+  c->skipped_pairs=0;
   int n=c->S->idelems();
   c->n=n;
   c->continue_i=0;
@@ -235,6 +268,7 @@ void initial_data(calc_dat* c){
   } else {
     exit(1);
   }
+  c->deg=(int **) omalloc(n*sizeof(int*));
   h=omalloc(n*sizeof(int));
   if (h!=NULL){
     c->lengths=(int*) h;
@@ -256,6 +290,7 @@ void initial_data(calc_dat* c){
     } else {
       exit(1);
     }
+    c->deg[i]=(int*) omalloc(i*sizeof(int));
     for (j=0;j<i;j++){
       //check product criterion
       if (pHasNotCF(c->S->m[i],c->S->m[j])){
@@ -263,6 +298,7 @@ void initial_data(calc_dat* c){
       } else {
         c->states[i][j]=UNCALCULATED;
       }
+      c->deg[i][j]=pLcmDeg(c->S->m[i],c->S->m[j]);
     }
   
     c->rep[i]=i;
@@ -310,6 +346,7 @@ void add_to_basis(poly h, calc_dat* c){
   } else {
     exit(1);
   }
+  c->deg=(int**) omrealloc(c->deg, c->n * sizeof(int*));
   c->rep[i]=i;
   hp=omalloc(i*sizeof(int));
   if (hp!=NULL){
@@ -317,6 +354,7 @@ void add_to_basis(poly h, calc_dat* c){
   } else {
     exit(1);
   }
+  c->deg[i]=(int*) omalloc(i*sizeof(int));
   hp=omrealloc(c->S->m,c->n*sizeof(poly));
   if (hp!=NULL){
     c->S->m=(poly*) hp;
@@ -326,6 +364,7 @@ void add_to_basis(poly h, calc_dat* c){
   c->S->m[i]=h;
   c->short_Exps[i]=p_GetShortExpVector(h,c->r);
   for (j=0;j<i;j++){
+    c->deg[i][j]=pLcmDeg(c->S->m[i],c->S->m[j]);
     if (c->rep[j]==j){ 
       //check product criterion
       if (pHasNotCF(c->S->m[i],c->S->m[j])){
@@ -335,7 +374,7 @@ void add_to_basis(poly h, calc_dat* c){
       }
 
       //lies I[i] under I[j] ?
-      if(p_LmDivisibleBy(c->S->m[i],c->S->m[j],c->r)){
+      if(p_LmShortDivisibleBy(c->S->m[i],c->short_Exps[i],c->S->m[j],~(c->short_Exps[j]),c->r)){
         c->rep[j]=i;
         PrintS("R");
         for(int z=0;z<j;z++){
@@ -500,26 +539,28 @@ void now_t_rep(int arg_i, int arg_j, calc_dat* c){
   }
   c->states[j][i]=HASTREP;
 }
-bool has_t_rep(int arg_i, int arg_j, calc_dat* state){
-  int i,j;
-  if (arg_i==arg_j){
+bool has_t_rep(const int & arg_i, const  int & arg_j, calc_dat* state){
+
+  if (arg_i==arg_j)
+  {
     return (true);
   }
-  if (arg_i>arg_j){
-    i=arg_j;
-    j=arg_i;
-  } else {
-    i=arg_i;
-    j=arg_j;
+  if (arg_i>arg_j)
+  {
+    return (state->states[arg_i][arg_j]==HASTREP);
+  } else 
+  {
+    return (state->states[arg_j][arg_i]==HASTREP);
   }
-  return (state->states[j][i]==HASTREP);
-   
-//  if (j==state->rep[i]) return(false);
+}
+int pLcmDeg(poly a, poly b)
+{
+  int i;
+  int n=0;
+  for (i=pVariables; i; i--)
+  {
+    n+=max( pGetExp(a,i), pGetExp(b,i));
+  }
+  return n;
 
-//   if (state->rep[i]!=i) 
-//     return(has_t_rep(i,state->rep[i],state) && has_t_rep(state->rep[i],j,state));
-  
-//   if (state->rep[j]!=j)
-//     return(has_t_rep(j,state->rep[j],state) && has_t_rep(state->rep[j],i,state));
-//  return(false);
 }
