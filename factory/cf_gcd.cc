@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.25 2004-10-14 11:36:15 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.26 2004-11-25 15:43:36 Singular Exp $ */
 
 #include <config.h>
 
@@ -365,6 +365,7 @@ gcd_poly1( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
 // Used by gcd() and gcd_poly_univar0().
 //
 //}}}
+int si_factor_reminder=1;
 static CanonicalForm
 gcd_poly ( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
 {
@@ -375,14 +376,24 @@ gcd_poly ( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
         CFMap M, N;
         compress( f, g, M, N );
         CanonicalForm r=N( ezgcd( M(f), M(g) ) );
-        if ((f%r!=0) || (g % r !=0)) return gcd_poly1( f, g, modularflag);
+        if ((f%r!=0) || (g % r !=0))
+        {
+           if (si_factor_reminder)
+           printf("ezgcd failed, trying gcd_poly1\n");
+           return gcd_poly1( f, g, modularflag);
+        }
         else return r;
     }
     else if ( isOn( SW_USE_SPARSEMOD )
     && ! ( f.isUnivariate() && g.isUnivariate() ) )
     {
         CanonicalForm r=sparsemod( f, g );
-        if ((f%r!=0) || (g % r !=0)) return gcd_poly1( f, g, modularflag);
+        if ((f%r!=0) || (g % r !=0))
+        {
+           if (si_factor_reminder)
+           printf("sparsemod failed, trying gcd_poly1\n");
+           return gcd_poly1( f, g, modularflag);
+        }
         else return r;
     }
     else
