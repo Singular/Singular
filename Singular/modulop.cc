@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.23 2000-12-15 18:49:34 Singular Exp $ */
+/* $Id: modulop.cc,v 1.24 2000-12-21 13:22:01 pohl Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -14,6 +14,7 @@
 #include "omalloc.h"
 #include "numbers.h"
 #include "longrat.h"
+#include "mpr_complex.h"
 #include "ring.h"
 #include "modulop.h"
 
@@ -288,7 +289,6 @@ void npInitChar(int c, ring r)
   }
 }
 
-
 #ifdef LDEBUG
 BOOLEAN npDBTest (number a, char *f, int l)
 {
@@ -317,6 +317,76 @@ number npMapP(number from)
   return (number)i;
 }
 
+static number npMapLongR(number from)
+{
+  gmp_float *ff=(gmp_float*)from;
+  mpf_t *f=ff->_mpfp();
+  number res;
+  lint *dest,*ndest;
+  int size,i;
+  int e,al,bl,iz,in;
+  mp_ptr qp,dd,nn;
+
+  size = (*f)[0]._mp_size;
+  if (size == 0)
+    return npInit(0);
+  if(size<0)
+    size = -size;
+
+  qp = (*f)[0]._mp_d;
+  while(qp[0]==0)
+  {
+    qp++;
+    size--;
+  }
+
+  if(npPrimeM>2)
+    e=(*f)[0]._mp_exp-size;
+  else
+    e=0;
+  res = (number)omAllocBin(rnumber_bin);
+#if defined(LDEBUG)
+  res->debug=123456;
+#endif
+  dest = &(res->z);
+
+  if (e<0)
+  {
+    al = dest->_mp_size = size;
+    if (al<2) al = 2;
+    dd = (mp_ptr)omAlloc(sizeof(mp_limb_t)*al);
+    for (i=0;i<size;i++) dd[i] = qp[i];
+    bl = 1-e;
+    nn = (mp_ptr)omAlloc(sizeof(mp_limb_t)*bl);
+    nn[bl-1] = 1;
+    for (i=bl-2;i>=0;i--) nn[i] = 0;
+    ndest = &(res->n);
+    ndest->_mp_d = nn;
+    ndest->_mp_alloc = ndest->_mp_size = bl;
+    res->s = 0;
+    in=mpz_mmod_ui(NULL,ndest,npPrimeM);
+    mpz_clear(ndest);
+  }
+  else
+  {
+    al = dest->_mp_size = size+e;
+    if (al<2) al = 2;
+    dd = (mp_ptr)omAlloc(sizeof(mp_limb_t)*al);
+    for (i=0;i<size;i++) dd[i+e] = qp[i];
+    for (i=0;i<e;i++) dd[i] = 0;
+    res->s = 3;
+  }
+
+  dest->_mp_d = dd;
+  dest->_mp_alloc = al;
+  iz=mpz_mmod_ui(NULL,dest,npPrimeM);
+  mpz_clear(dest);
+  omFreeBin((ADDRESS)res, rnumber_bin);
+  if(res->s==0)
+    iz=(int)npDiv((number)iz,(number)in);
+  return (number)iz;
+}
+
 nMapFunc npSetMap(ring src, ring dst)
 {
   if (rField_is_Q(src))
@@ -334,6 +404,10 @@ nMapFunc npSetMap(ring src, ring dst)
       npMapPrime=rChar(src);
       return npMapP;
     }
+  }
+  if (rField_is_long_R(src))
+  {
+    return npMapLongR;
   }
   return NULL;      /* default */
 }

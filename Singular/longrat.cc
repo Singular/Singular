@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.34 2000-12-15 18:49:32 Singular Exp $ */
+/* $Id: longrat.cc,v 1.35 2000-12-21 13:22:00 pohl Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -120,7 +120,7 @@ static number nlMapP(number from)
   return to;
 }
 
-//static number nlMapLongR(number from);
+static number nlMapLongR(number from);
 static number nlMapR(number from);
 
 nMapFunc nlSetMap(ring src, ring dst)
@@ -138,11 +138,10 @@ nMapFunc nlSetMap(ring src, ring dst)
   {
     return nlMapR;
   }
-//  if (rField_is_long_R(r))
-//  {
-//    nMap = nlMapLongR; /* long R -> Q */
-//    return TRUE;
-//  }
+  if (rField_is_long_R(src))
+  {
+    return nlMapLongR; /* long R -> Q */
+  }
   return NULL;
 }
 
@@ -278,6 +277,89 @@ static number nlMapR(number from)
   r->s=0; /* not normalized */
   nlNormalize(r);
   return r;
+}
+
+static number nlMapLongR(number from)
+{
+  gmp_float *ff=(gmp_float*)from;
+  mpf_t *f=ff->_mpfp();
+  number res;
+  lint *dest,*ndest;
+  int size, i,negative;
+  int e,al,bl;
+  mp_ptr qp,dd,nn;
+
+  size = (*f)[0]._mp_size;
+  if (size == 0)
+    return nlInit(0);
+  if(size<0)
+  {
+    negative = 1;
+    size = -size;
+  }
+  else
+    negative = 0;
+
+  qp = (*f)[0]._mp_d;
+  while(qp[0]==0)
+  {
+    qp++;
+    size--;
+  }
+
+  e=(*f)[0]._mp_exp-size;
+  res = (number)omAllocBin(rnumber_bin);
+#if defined(LDEBUG)
+  res->debug=123456;
+#endif
+  dest = &(res->z);
+
+  if (e<0)
+  {
+    al = dest->_mp_size = size;
+    if (al<2) al = 2;
+    dd = (mp_ptr)omAlloc(sizeof(mp_limb_t)*al);
+    for (i=0;i<size;i++) dd[i] = qp[i];
+    bl = 1-e;
+    nn = (mp_ptr)omAlloc(sizeof(mp_limb_t)*bl);
+    nn[bl-1] = 1;
+    for (i=bl-2;i>=0;i--) nn[i] = 0;
+    ndest = &(res->n);
+    ndest->_mp_d = nn;
+    ndest->_mp_alloc = ndest->_mp_size = bl;
+    res->s = 0;
+  }
+  else
+  {
+    al = dest->_mp_size = size+e;
+    if (al<2) al = 2;
+    dd = (mp_ptr)omAlloc(sizeof(mp_limb_t)*al);
+    for (i=0;i<size;i++) dd[i+e] = qp[i];
+    for (i=0;i<e;i++) dd[i] = 0;
+    res->s = 3;
+  }
+
+  dest->_mp_d = dd;
+  dest->_mp_alloc = al;
+  if (negative) dest->_mp_size = -dest->_mp_size;
+
+  if (res->s==0)
+    nlNormalize(res);
+  else if (mpz_size1(&res->z)<=MP_SMALL)
+  {
+    int ui=(int)mpz_get_si(&res->z);
+    if ((((ui<<3)>>3)==ui)
+       && (mpz_cmp_si(&res->z,(long)ui)==0))
+    {
+       mpz_clear(&res->z);
+       omFreeBin((ADDRESS)res, rnumber_bin);
+       return INT_TO_SR(ui);
+    }
+  }
+#if defined(LDEBUG)
+  nlTest(res);
+#endif
+  return res;
 }
 
 //static number nlMapLongR(number from)
