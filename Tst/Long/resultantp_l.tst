@@ -1,4 +1,4 @@
-// $Id: resultantp_l.tst,v 1.1.1.1 1998-04-17 15:07:39 obachman Exp $
+// $Id: resultantp_l.tst,v 1.2 1998-04-22 07:53:31 schmidt Exp $
 
 //
 // resultantp_l.tst - long tests for resultant calculations mod p.
@@ -17,7 +17,7 @@
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID  : $Id: resultantp_l.tst,v 1.1.1.1 1998-04-17 15:07:39 obachman Exp $");
+tst_ignore("CVS ID  : $Id: resultantp_l.tst,v 1.2 1998-04-22 07:53:31 schmidt Exp $");
 
 //
 // - ring r1=32003,x,dp.
@@ -86,7 +86,7 @@ minpoly=a^4+8734*a^3+a^2+11817*a+1;
 poly f;
 poly g;
 
-// first, some of the above examples
+// first, some of the r1 examples
 
 f=3812*x^22-6874*x^21+12586*x^20+3003*x^19-9568*x^18+11117*x^17+7524*x^16+11138*x^15-9743*x^14+1892*x^13+12485*x^12-569*x^11-8265*x^10-5991*x^9+13701*x^8+2644*x^7-3936*x^6-15875*x^5+1289*x^4+3956*x^3-10099*x^2-6616*x+5401;
 
@@ -149,7 +149,7 @@ ring r3=(32003,t),x,dp;
 poly f;
 poly g;
 
-// first, some of the above examples
+// first, some of the r1 examples
 
 f=3812*x^22-6874*x^21+12586*x^20+3003*x^19-9568*x^18+11117*x^17+7524*x^16+11138*x^15-9743*x^14+1892*x^13+12485*x^12-569*x^11-8265*x^10-5991*x^9+13701*x^8+2644*x^7-3936*x^6-15875*x^5+1289*x^4+3956*x^3-10099*x^2-6616*x+5401;
 
