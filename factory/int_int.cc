@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_int.cc,v 1.9 1997-12-12 09:23:22 schmidt Exp $ */
+/* $Id: int_int.cc,v 1.10 1997-12-17 11:47:48 schmidt Exp $ */
 
 #include <config.h>
 
@@ -777,7 +777,7 @@ InternalInteger::sign () const
 InternalCF *
 InternalInteger::sqrt ()
 {
-    ASSERT( mpz_cmp_si( &thempi, 0 ) >= 0, "illegal instruction" );
+    ASSERT( mpz_cmp_si( &thempi, 0 ) >= 0, "sqrt() argument < 0" );
     MP_INT result;
     mpz_init( &result );
     mpz_sqrt( &result, &thempi );
@@ -796,7 +796,7 @@ InternalInteger::sqrt ()
 int
 InternalInteger::ilog2 ()
 {
-    ASSERT( mpz_cmp_si( &thempi, 0 ) > 0, "log arg <= 0" );
+    ASSERT( mpz_cmp_si( &thempi, 0 ) > 0, "log() argument <= 0" );
     return mpz_sizeinbase( &thempi, 2 ) - 1;
 }
 //}}}
