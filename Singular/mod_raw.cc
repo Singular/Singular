@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.cc,v 1.10 2000-12-12 08:44:48 obachman Exp $ */
+/* $Id: mod_raw.cc,v 1.11 2000-12-12 14:54:59 obachman Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -132,7 +132,10 @@ void *dynl_open(char *filename)
 void *dynl_sym(void *handle, char *symbol)
 {
   func_ptr        f;
-
+  
+  if (handle == DYNL_KERNEL_HANDLE)
+    handle = PROG_HANDLE;
+  
   if (shl_findsym((shl_t *) & handle, symbol, TYPE_PROCEDURE, &f) == -1)
   {
     if (shl_findsym((shl_t *) & handle, symbol, TYPE_UNDEFINED, &f) == -1)
