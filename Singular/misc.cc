@@ -7,11 +7,7 @@
 
 #include <string.h>
 #include "mod2.h"
-#ifdef macintosh
-  extern int mmIsInitialized;
-  extern int mmInit();
-#include <CursorCtl.h>
-#else
+#ifndef macintosh
 #include <unistd.h>
 #endif
 #include <stdio.h>
@@ -61,11 +57,6 @@ int inits(void)
 #ifdef HAVE_FACTORY
   factoryseed(t);
 #endif  
-/*4 inits for special machines */
-#ifdef macintosh
-  mmIsInitialized=mmInit();
-  InitCursorCtl(NULL);
-#endif
 /*4 private data of other modules*/
   I_FEbase();
   memset(&sLastPrinted,0,sizeof(sleftv));

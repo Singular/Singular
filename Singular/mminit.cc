@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mminit.cc,v 1.6 1997-06-17 10:59:34 Singular Exp $ */
+/* $Id: mminit.cc,v 1.7 1997-06-17 11:53:57 Singular Exp $ */
 /*
 * ABSTRACT: init of memory management
 */
@@ -15,11 +15,7 @@
 #include "mmprivat.h"
 #ifdef HAVE_GMP
 extern "C" {
-#ifdef macintosh
-#include "b_gmp.h"
-#else
-#include "gmp.h"
-#endif
+#include <gmp.h>
 }
 #endif
 
@@ -155,11 +151,7 @@ void * mgReallocBlock( void* a, size_t t1, size_t t2)
 #endif
 
 int mmInit();
-#ifndef macintosh
 static int mmIsInitialized=mmInit();
-#else
-int mmIsInitialized=0;
-#endif
 
 int mmInit( void )
 {
