@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: eigenval.cc,v 1.1.1.1 2003-10-06 12:15:51 Singular Exp $ */
+/* $Id: eigenval.cc,v 1.2 2004-03-03 16:49:19 bricken Exp $ */
 /*
 * ABSTRACT: eigenvalues of constant square matrices
 */
@@ -11,13 +11,13 @@
 #ifdef HAVE_EIGENVAL
 
 #include "febase.h"
-#include "tok.h"
-#include "ipid.h"
+#include "../Singular/tok.h"
+#include "../Singular/ipid.h"
 #include "intvec.h"
 #include "numbers.h"
 #include "polys.h"
 #include "ideals.h"
-#include "lists.h"
+#include "../Singular/lists.h"
 #include "matpol.h"
 #include "clapsing.h"
 #include "eigenval.h"
