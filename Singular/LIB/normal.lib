@@ -4,7 +4,7 @@
 // the criterion of Grauert/Remmert and ideas of De Jong & Vasconcelos
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: normal.lib,v 1.18 1999-08-03 11:43:08 obachman Exp $";
+version="$Id: normal.lib,v 1.19 1999-08-03 13:08:11 obachman Exp $";
 info="
 LIBRARY:  normal.lib     PROCEDURES FOR NORMALIZATION
 AUTHORS:  Gert-Martin Greuel, email: greuel@mathematik.uni-kl.de,
@@ -298,7 +298,7 @@ EXAMPLE: example HomJJ;  shows an example
          "   ";
          endphi;
          "   ";
-         pause;
+         pause();
          newline;
       }
       setring P;
