@@ -1,9 +1,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipprint.cc,v 1.3 1997-04-02 15:07:12 Singular Exp $ */
+/* $Id: ipprint.cc,v 1.4 1997-04-08 16:49:21 Singular Exp $ */
 /*
-* ABSTRACT:
+* ABSTRACT: interpreter: printing
 */
 
 #include "mod2.h"

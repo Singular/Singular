@@ -1,5 +1,12 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: clapconv.cc,v 1.2 1997-03-21 13:18:54 Singular Exp $
+/****************************************
+*  Computer Algebra System SINGULAR     *
+****************************************/
+// $Id: clapconv.cc,v 1.3 1997-04-08 16:49:16 Singular Exp $
+/*
+* ABSTRACT: convert data between Singular and factory
+*/
+
 
 #include "mod2.h"
 #ifdef HAVE_LIBFACTORY

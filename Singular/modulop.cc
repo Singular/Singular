@@ -1,9 +1,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.3 1997-04-02 15:07:35 Singular Exp $ */
+/* $Id: modulop.cc,v 1.4 1997-04-08 16:49:25 Singular Exp $ */
 /*
-* ABSTRACT:
+* ABSTRACT: numbers modulo p (<=32003)
 */
 
 #include <limits.h>

@@ -1,10 +1,10 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.cc,v 1.3 1997-04-02 15:06:53 Singular Exp $ */
+/* $Id: attrib.cc,v 1.4 1997-04-08 16:49:15 Singular Exp $ */
 
 /*
-* ABSTRACT:
+* ABSTRACT: attributes to leftv and idhdl
 */
 
 #include <stdlib.h>

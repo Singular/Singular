@@ -1,5 +1,12 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: claptmpl.cc,v 1.2 1997-03-26 17:07:14 Singular Exp $
+/****************************************
+*  Computer Algebra System SINGULAR     *
+****************************************/
+// $Id: claptmpl.cc,v 1.3 1997-04-08 16:49:19 Singular Exp $
+/*
+* ABSTRACT - instantiation of all templates
+*/
+
 #include "mod2.h"
 
 #ifdef HAVE_LIBFACTORY

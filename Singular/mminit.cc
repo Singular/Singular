@@ -1,9 +1,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mminit.cc,v 1.3 1997-04-02 15:07:32 Singular Exp $ */
+/* $Id: mminit.cc,v 1.4 1997-04-08 16:49:24 Singular Exp $ */
 /*
-* ABSTRACT:
+* ABSTRACT: init of memory management
 */
 
 #define _POSIX_SOURCE 1

@@ -1,9 +1,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.3 1997-04-02 15:07:11 Singular Exp $ */
+/* $Id: iplib.cc,v 1.4 1997-04-08 16:49:20 Singular Exp $ */
 /*
-* ABSTRACT:
+* ABSTRACT: interpreter: LIB and help
 */
 
 //#include <stdlib.h>

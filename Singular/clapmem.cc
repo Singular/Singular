@@ -1,5 +1,12 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: clapmem.cc,v 1.1.1.1 1997-03-19 13:18:44 obachman Exp $
+/****************************************
+*  Computer Algebra System SINGULAR     *
+****************************************/
+// $Id: clapmem.cc,v 1.2 1997-04-08 16:49:17 Singular Exp $
+/*
+* ABSTRACT: map new[]/delete[] to Singular memeory management
+*/
+
 
 #include "mod2.h"
 #ifdef HAVE_LIBFACTORY
