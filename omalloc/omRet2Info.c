@@ -3,7 +3,7 @@
  *  Purpose: translation of return addr to RetInfo
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omRet2Info.c,v 1.12 2000-12-14 17:24:31 obachman Exp $
+ *  Version: $Id: omRet2Info.c,v 1.13 2001-01-27 17:03:41 obachman Exp $
  *******************************************************************/
 #include <stdio.h>
 #include <string.h>
@@ -75,7 +75,7 @@ int omBackTrace_2_RetInfo(void** bt, omRetInfo info, int max)
       l+=sprintf(&command[l], " %p", info[i].addr);
       i++;
     }
-    fflush(stdin);
+    fflush(NULL);
     pipe = popen(command, "r");
     if (pipe != NULL)
     {

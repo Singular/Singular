@@ -3,7 +3,7 @@
  *  Purpose: routine which determines absolute pathname of executable
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omFindExec.c,v 1.7 2000-12-12 16:25:43 levandov Exp $
+ *  Version: $Id: omFindExec.c,v 1.8 2001-01-27 17:03:40 obachman Exp $
  *******************************************************************/
 
 #ifdef HAVE_CONFIG_H
@@ -218,8 +218,28 @@ static int full_readlink(const char* name, char* buf, size_t bufsize)
   return -1;
 }
   
+#ifdef WINNT
+char * _omFindExec (const char *name, char* exec);
+/* for windows, serch first for .exe */
+char* omFindExec(const char *name, char* exec)
+{
   
-char * omFindExec (const char *name, char* exec)
+  if (strstr(name, ".exe") == NULL)
+  {
+    char buf[MAXPATHLEN];
+    char* ret;
+    strcpy(buf, name);
+    strcat(buf, ".exe");
+    ret = _omFindExec(buf, exec);
+    if (ret != NULL) return ret;
+  }
+  return _omFindExec(name, exec);
+}
+#else
+#define _omFindExec omFindExec
+#endif
+
+char * _omFindExec (const char *name, char* exec)
 {
   char * link = omFindExec_link(name, exec);
   char buf[MAXPATHLEN];

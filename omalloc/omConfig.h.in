@@ -4,7 +4,7 @@
  *  Purpose: configuration for omalloc  
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omConfig.h.in,v 1.6 2000-09-12 16:02:18 obachman Exp $
+ *  Version: $Id: omConfig.h.in,v 1.7 2001-01-27 17:03:40 obachman Exp $
  *******************************************************************/
 #ifndef OM_CONFIG_H
 #define OM_CONFIG_H
@@ -176,3 +176,10 @@
 #define OM_PROVIDE_MALLOC 0
 #endif
 #endif /* OM_CONFIG_H  */
+/* define if omalloc depends on "external" malloc functions like
+   those provided by the system -- if this id defined, an application
+   linking with omalloc needs to assure that a library containing malloc
+   is linked, as well */
+#ifndef OMALLOC_USES_MALLOC
+#define OMALLOC_USES_MALLOC
+#endif

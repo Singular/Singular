@@ -3,7 +3,7 @@ dnl File: configure.in
 dnl Purpose: Process this file with autoconf to produce configure
 dnl Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
 dnl Created: 11/99
-dnl Version: $Id: configure.in,v 1.11 2000-12-21 14:26:06 obachman Exp $
+dnl Version: $Id: configure.in,v 1.12 2001-01-27 17:03:39 obachman Exp $
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 
 AC_INIT(om_Alloc.c)
@@ -238,6 +238,7 @@ dnl
 AC_MSG_CHECKING(which malloc to use)
 if test "${with_malloc}" = system; then
   OM_MALLOC_HEADER=omMallocSystem.h
+  AC_DEFINE(OMALLOC_USES_MALLOC)
   if test "${with_provide_malloc}" = yes || test "${with_provide_malloc}" = debug; then
     AC_MSG_ERROR("can not provide malloc for --with-malloc=system")
   fi
@@ -256,6 +257,7 @@ elif test "${with_malloc}" = external; then
   fi
   OM_MALLOC_HEADER=$with_external_malloc_h
   OM_MALLOC_SOURCE=$with_external_malloc_c
+  AC_DEFINE(OMALLOC_USES_MALLOC)
 else 
   with_malloc=dlmalloc
   OM_MALLOC_HEADER=dlmalloc.h
@@ -352,7 +354,7 @@ if test "${with_valloc+set}" != set || test "${with_valloc}" = mmap; then
   fi
 fi
 if test "${with_valloc}" = malloc; then
-  if test "{ac_cv_working_valloc}" != no; then
+  if test "${ac_cv_working_valloc}" != no; then
     AC_DEFINE(OM_HAVE_VALLOC_MALLOC)
   else
     with_valloc=emulate
