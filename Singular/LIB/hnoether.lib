@@ -1,9 +1,9 @@
-// $Id: hnoether.lib,v 1.16 1999-08-13 17:39:17 lamm Exp $
-// last change:           13.08.99
+// $Id: hnoether.lib,v 1.17 1999-08-31 14:58:38 lamm Exp $
+// last change:           31.08.99
 ///////////////////////////////////////////////////////////////////////////////
 // This library is for Singular 1-3-4 or newer
 
-version="$Id: hnoether.lib,v 1.16 1999-08-13 17:39:17 lamm Exp $";
+version="$Id: hnoether.lib,v 1.17 1999-08-31 14:58:38 lamm Exp $";
 info="
 LIBRARY:  hnoether.lib   PROCEDURES FOR THE HAMBURGER-NOETHER DEVELOPMENT
 
@@ -31,34 +31,56 @@ SUB-PROCEDURES:
  separateHNE(hne1,hne2);  number of quadratic transf. needed for separation
  squarefree(f);      returns a squarefree divisor of the poly f
  allsquarefree(f,l); returns the maximal squarefree divisor of the poly f
+ further_hn_proc();  show further procedures useful for interactive use
 ";
-///////////////////////////////////////////////////////////////////////////////
-// newtonpoly(f);      Newton polygon of polynom f
-// getnm(f);           intersection points of the Newton polygon with the axes
-// T_Transform(f,Q,N); returns f(y,xy^Q)/y^NQ (type f(x,y): poly, Q,N: int)
-// T1_Transform(f,d,M); returns f(x,y+d*x^M)  (type f(x,y): poly,d:number,M:int)
-// T2_Transform(f,d,M,N,ref);   a composition of T1 & T
-// koeff(f,I,J);       gets coefficient of indicated monomial of poly f (I,J:int)
-// redleit(f,S,E);     restriction of monomials of f to line (S-E)
-// leit(f,n,m);        special case of redleit (for irred. polynomials)
-//
-//           procedures (more or less) for internal use:
-// testreducible(f,n,m); tests whether f is reducible
-// polytest(f);        tests coefficients and exponents of poly f
-// charPoly(f,M,N);    characteristic polynomial of f
-// find_in_list(L,p);  find int p in list L
-// get_last_divisor(M,N); last divisor in Euclid's algorithm
-// factorfirst(f,M,N); try to factor f in a trivial way before using 'factorize'
-// factorlist(L);      factorize a list L of polynomials
-// extrafactor(f,M,N); try to factor charPoly(f,M,N) where 'factorize' cannot
-// referencepoly(D);   a polynomial f s.t. D is the Newton diagram of f
-// extractHNEs(H,t);   extracts output H of HN to output of reddevelop
-// HN(f,grenze);       recursive subroutine for reddevelop
-// constructHNEs(...); subroutine for HN
 ///////////////////////////////////////////////////////////////////////////////
 LIB "primitiv.lib";
 LIB "inout.lib";
 
+///////////////////////////////////////////////////////////////////////////////
+
+proc further_hn_proc()
+"USAGE: further_hn_proc();
+   The library `hnoether.lib' contains some more procedures which are not
+   shown when typing @code{help hnoether.lib}. They may be useful for
+   interactive use (e.g. if you want to do the calculation of a HNE
+   \"by hand\" to see the intermediate results), and they can be enumerated by
+   calling further_hn_proc. Use @code{help <procedure>;} for detailed
+   information about each of them.
+"
+{
+ "
+ The following procedures are also part of the library `hnoether.lib':
+
+ newtonpoly(f);      Newton polygon of polynom f
+ getnm(f);           intersection pts. of Newton polygon with the axes
+ T_Transform(f,Q,N); returns f(y,xy^Q)/y^NQ (f: poly, Q,N: int)
+ T1_Transform(f,d,M); returns f(x,y+d*x^M)  (f: poly,d:number,M:int)
+ T2_Transform(f,d,M,N,ref);   a composition of T1 & T
+ koeff(f,I,J);       gets coefficient of indicated monomial of poly f
+ redleit(f,S,E);     restriction of monomials of f to line (S-E)
+ leit(f,n,m);        special case of redleit (for irred. polynomials)
+ testreducible(f,n,m); tests whether f is reducible
+ charPoly(f,M,N);    characteristic polynomial of f
+ find_in_list(L,p);  find int p in list L
+ get_last_divisor(M,N); last divisor in Euclid's algorithm
+ factorfirst(f,M,N); try to factor f in a trivial way without `factorize'
+ factorlist(L);      factorize a list L of polynomials
+ referencepoly(D);   a polynomial f s.t. D is the Newton diagram of f";
+
+// extrafactor(f,M,N); try to factor charPoly(f,M,N) where 'factorize' cannot
+// (will hopefully become obsolete soon)
+//
+//       static procedures not useful for interactive use:
+// polytest(f);        tests coefficients and exponents of poly f
+// extractHNEs(H,t);   extracts output H of HN to output of reddevelop
+// HN(f,grenze);       recursive subroutine for reddevelop
+// constructHNEs(...); subroutine for HN
+}
+example
+{ echo=2;
+  further_hn_proc();
+}
 ///////////////////////////////////////////////////////////////////////////////
 
 proc getnm (poly f)
@@ -381,7 +403,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc is_irred (poly f)
-"USAGE :  is_irred(f); f a squarefree bivariate polynomial
+"USAGE:   is_irred(f); f a squarefree bivariate polynomial
 RETURN:  an integer:
  @*      is_irred(f) @math{= 1} if f is irreducible as a formal power series
          over the algebraic closure of its coefficient field (f defines an
