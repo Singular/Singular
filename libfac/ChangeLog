@@ -1,3 +1,8 @@
+Fri Feb 27 11:32:02 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* factor/tmpl_inst.cc: template names adapted (`*.cc' ->
+	  `ftmpl_*.cc')
+
 Tue May 13 11:32:11 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
 	* Makefile.in (uninstall): took out template installation
