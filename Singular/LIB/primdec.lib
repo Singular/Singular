@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.98 2001-02-21 10:08:16 Singular Exp $";
+version="$Id: primdec.lib,v 1.99 2001-03-29 11:34:59 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -1982,8 +1982,9 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 static proc decomp(ideal i,list #)
-"USAGE:   decomp(i); i ideal  (for primary decomposition)   (resp.
-         decomp(i,1);        (for the minimal associated primes) )
+"USAGE:  decomp(i); i ideal  (for primary decomposition)   (resp.
+         decomp(i,1);        (for the associated primes of dimension of i) )
+         decomp(i,2);        (for the minimal associated primes) )
 RETURN:  list = list of primary ideals and their associated primes
          (at even positions in the list)
          (resp. a list of the minimal associated primes)
@@ -2381,6 +2382,7 @@ EXAMPLE: example decomp; shows an example
         //the primary decomposition of j*K(var(nnp+1),..,var(nva))[..the rest..]
         op=option(get);
         option(redSB);
+
         list uprimary= zero_decomp(@j,ser,@wr);
         option(set,op);
      }
@@ -2503,7 +2505,8 @@ EXAMPLE: example decomp; shows an example
         @j=imap(@Phelp,jwork);
      }
   }
-  if((size(quprimary)==0)&&(@wr>0))
+
+  if((size(quprimary)==0)&&(@wr==1))
   {
      @j=ideal(1);
      quprimary[1]=ideal(1);
@@ -3151,7 +3154,10 @@ static proc radicalKL (ideal i,ideal ser,list #)
 proc radicalEHV(ideal i)
 "USAGE:   radicalEHV(i); i ideal.
 RETURN:  ideal, the radical of i.
-NOTE:    The algorithm of Eisenbud/Huneke/Vasconcelos is used.
+NOTE:    Uses the algorithm of Eisenbud/Huneke/Vasconcelos, which
+         reduces the computation to the complete intersection case, 
+         by taking, in the general case, a generic linear combination
+         of the input.
          Works only in characteristic 0 or p large.
 EXAMPLE: example radicalEHV; shows an example
 "
@@ -3167,27 +3173,52 @@ EXAMPLE: example radicalEHV; shows an example
       "WARNING: The characteristic is too small, the result may be wrong";
    }
    ideal J,I,I0,radI0,L,radI1,I2,radI2;
-   int l;
+   int l,n;
    intvec op=option(get);
-
+   matrix M;
+   
    option(redSB);
    list m=mstd(i);
         I=m[2];
    option(set,op);
 
    int cod=nvars(basering)-dim(m[1]);
-
+   //-------------------complete intersection case:----------------------
    if(cod==size(m[2]))
    {
      J=minor(jacob(I),cod);
      return(quotient(I,J));
    }
-
+   //-----first codim elements of I are a complete intersection:---------
    for(l=1;l<=cod;l++)
    {
       I0[l]=I[l];
    }
-   if(dim(std(I0))+cod==nvars(basering))
+   n=dim(std(I0))+cod-nvars(basering);
+   //-----last codim elements of I are a complete intersection:----------
+   if(n!=0)
+   {
+      for(l=1;l<=cod;l++)
+      {
+         I0[l]=I[size(I)-l+1];
+      }
+      n=dim(std(I0))+cod-nvars(basering);
+   }
+   //-----taking a generic linear combination of the input:--------------
+   if(n!=0)
+   {
+      M=transpose(sparsetriag(size(m[2]),cod,95,1));
+      I0=ideal(M*transpose(I));
+      n=dim(std(I0))+cod-nvars(basering);
+   }
+   //-----taking a more generic linear combination of the input:---------
+   if(n!=0)
+   {
+      M=transpose(sparsetriag(size(m[2]),cod,0,100));
+      I0=ideal(M*transpose(I));
+      n=dim(std(I0))+cod-nvars(basering);
+   }
+   if(n==0)
    {
       J=minor(jacob(I0),cod);
       radI0=quotient(I0,J);
@@ -3207,6 +3238,8 @@ EXAMPLE: example radicalEHV; shows an example
       }
       return(intersect(radI1,radicalEHV(I2)));
    }
+   //---------------------general case-------------------------------------
+   return(radical(I));
 }
 example
 { "EXAMPLE:";  echo = 2;
