@@ -1,22 +1,25 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: lieA.lib,v 1.6 2004-03-18 21:34:54 levandov Exp $";
-category="Plural: Lie Theory";
+version="$Id: ncalg.lib,v 1.1 2004-03-19 15:52:29 levandov Exp $";
+category="Noncommutative";
 info="
 LIBRARY:  lieA.lib      definitions of important G-algebras
 AUTHORS:  Viktor Levandovskyy,     levandov@mathematik.uni-kl.de,
-@*        Oleksandr Khomenko,      Oleksandr.Khomenko@math.uni-freiburg.de,
-@*        Oleksandr Motsak,        motsak@mathematik.uni-kl.de
-
+          Oleksandr Khomenko,      Oleksandr.Khomenko@math.uni-freiburg.de,
+          Oleksandr Motsak,        motsak@mathematik.uni-kl.de
 
 PROCEDURES:
- A (n[,p]);               returns U(A(n))=U(sl_{n+1}) in char p, if an integer p is given,
- sl(n[,p]);               returns U(sl_n) in char p, if an integer p is given,
- sl2([ p]);               returns U(sl_2) in the {e,f,h} presentation; in char p, if an integer p is given, 
- g2 ([ p]);               returns U(g_2) in the {x(i),y(i),Ha,Hb} presentation; in char p, if an integer p is given,
- gl3([ p]);               returns U(gl_3) in the {e_ij (1<i,j<3)} presentation; in char p, if an integer p is given,
+sl(n[,p]);   returns U(sl_n) in char p, if an integer p is given,
+sl2([p]);    returns U(sl_2) in the (e,f,h) presentation; in char p, if an integer p is given, 
+g2([p]);     returns U(g_2) in the (x(i),y(i),Ha,Hb) presentation; in char p, if an integer p is given,
+gl3([p]);    returns U(gl_3) in the (e_ij (1<i,j<3)) presentation; in char p, if an integer p is given,
+Qso3([n]);   returns U_q(so_3) in the presentation of Klimyk, if integer n is given, the quantum parameter will be specialized at the n-th root of unity, 
+Qsl3([n]);   returns ring, corresponding to the U_q(sl_3) as the factor algebra of V_q(sl3), if integer n is given, the quantum parameter q will be specialized at the n-th root of unity,
+
+ALIAS PROCEDURES:
+A(n[,p]);   returns U(A(n))=U(sl_(n+1)) in char p, if an integer p is given.
 ";
 
-
+LIB "nctools.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 // functions for debug/logging 
@@ -27,21 +30,22 @@ static proc mySetRing (string @baseName, list #)
   if (defined( @@@_RING_NAME ))
   {
     kill @@@_RING_NAME; 
-  };
+  }
   
   if (string(#) != "0")
   {
     string @@@_RING_NAME = @baseName + "_" + string(#);	
-  } else
+  } 
+  else
   {
     string @@@_RING_NAME = @baseName;
-  };
+  }
   export(@@@_RING_NAME);
   
   if (defined( @@@_RING ))
   {
     kill @@@_RING; 
-  };
+  }
   
   string @@@_RING = "" + @baseName +"(" + string(#) + ")";
   export(@@@_RING);
@@ -49,7 +53,7 @@ static proc mySetRing (string @baseName, list #)
   if( defined(@@@_CHAR))
   {
     kill @@@_CHAR;
-  };
+  }
   
   int @@@_CHAR = char(basering);
   export(@@@_CHAR);
@@ -61,8 +65,7 @@ static proc myGetRing ()
   if (defined( @@@_RING ))
   {
     return( @@@_RING );
-  };
-  
+  }
   return( "No lieA.lib ring defined" );
 }
 
@@ -72,7 +75,7 @@ static proc myGetRingName ()
   if (defined( @@@_RING_NAME ))
   {
     return( @@@_RING_NAME );
-  };
+  }
   
   return( "No lieA.lib ring defined" );
 }
@@ -83,7 +86,7 @@ static proc myGetRingChar ()
   if (defined( @@@_CHAR ))
   {
     return( @@@_CHAR );
-  };
+  }
   
   return( char(basering) ); 
 }
@@ -134,12 +137,8 @@ example
 proc sl(int n, list #)
 "USAGE:   sl(n,[p]); n an integer, n>1; p an optional integer (field characteristic)
 RETURN:  a ring, describing U(sl_n)
-NOTE:    You have to activate this ring with the "setring" command.
-         The presentation of U(sl_n) is derived from the 
-         standard representation of sl_n, positive
-         resp. negative roots are denoted by x(i) resp. y(i),
-         the Cartan elements are denoted by h(i).
-SEE ALSO: sl2
+NOTE:    You have to activate this ring with the "setring" command. The presentation of U(sl_n) is derived from the standard representation of sl_n, positive resp. negative roots are denoted by x(i) resp. y(i); Cartan elements are denoted by h(i).
+SEE ALSO: sl2, g2, gl3, Qsl3, Qso3
 EXAMPLE: example sl; shows examples
 "{
   if (n<2)
@@ -176,7 +175,6 @@ EXAMPLE: example sl; shows examples
       TMP=0;   
     }
   }
-  
   for(k=1; k<=n-1; k++)
   {
     TMP[k,k]=1;
@@ -203,15 +201,14 @@ EXAMPLE: example sl; shows examples
           {
 	    D[k,l]=D[k,l]+leadcoef(TMP[i,j])*x(buf);
           }
-          
           if (TMP[j,i]!=0)
           {          
 	    D[k,l]=D[k,l]+leadcoef(TMP[j,i])*y(buf);
           }
         }
-      } 
+      }
       i=1;
-      while ((TMP[i,i]==0)&&(i<n)) {i++;}
+      while ( (TMP[i,i]==0) && (i<n) ) { i++; }
       for(j=i; j<=n-1; j++)
       {
         p=leadcoef(TMP[j,j]);
@@ -220,11 +217,10 @@ EXAMPLE: example sl; shows examples
 	//        if ((j!=n-1)&&((p+q)!=0)) {D[k,l]=D[k,l]+(p+q)*h(j+1);}
         TMP[j+1,j+1]=TMP[j+1,j+1]+p; 
       }
-      
     }
   }
   ncalgebra(1,D);
-  mySetRing("sl", n, #);  
+  mySetRing("sl", n, #);
   return(@@@rr);
 }
 example
@@ -237,14 +233,10 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc A(int n, list #)
-"USAGE:   A(n,[p]); n an integer, n>1; , p an optional integer (field characteristic)
+"USAGE:   A(n,[p]); n an integer, n>1, p an optional integer (field characteristic)
 RETURN:  a ring, describing U(A(n))
-NOTE:    You have to activate this ring with the setring command.
-         The presentation of U(A(n)) is derived from the 
-         standard representation of sl(n+1), positive
-         resp. negative roots are denoted by x(i) resp. y(i),
-         the Cartan elements are denoted by h(i).
-SEE ALSO: sl2, g2, gl3
+NOTE:    You have to activate this ring with the setring command. The presentation of U(A(n)) is derived from the standard representation of sl(n+1), positive resp. negative roots are denoted by x(i) resp. y(i), the Cartan elements are denoted by h(i).
+SEE ALSO: sl2, g2, gl3, Qsl3, Qso3
 EXAMPLE: example A; shows examples
 "{
   if (n<1) 
@@ -253,12 +245,11 @@ EXAMPLE: example A; shows examples
     return(0);
   }
   def @@@a=sl(n+1, #);
-  mySetRing("A", n, #);
   return(@@@a);
 }
 example
 { "EXAMPLE:"; echo = 2;
- def a2=A(2);
+   def a2 = A(2);
    setring a2;
    a2;
 }
@@ -266,8 +257,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc g2(list #)
-
-"USAGE:   g2([p]), p an optional integer (field characteristic)
+"USAGE:  g2([p]), p an optional integer (field characteristic)
 RETURN:  ring, corresponding to the U(g_2) in (x(i),y(i),Ha,Hb) presentation
 NOTE:    you have to activate this ring with the "setring" command
 SEE ALSO: sl, gl3
@@ -393,43 +383,43 @@ example
 
 proc Qso3(list #)
 "USAGE:   Qso3([n]), n an optional integer
-RETURN:  ring, corresponding to the U'_q(so_3) in the presentation of Klimyk; 
-if n is specified, the quantum parameter Q will be specialized at the (2*n)-th root of unity
+RETURN:  ring, corresponding to the U_q(so_3) in the presentation of Klimyk; if n is specified, the quantum parameter Q will be specialized at the (2*n)-th root of unity
 NOTE:    you have to activate this ring with the "setring" command
-SEE ALSO: sl, Qsl3, g2, gl3
+SEE ALSO: sl, g2, gl3, Qsl3 
 EXAMPLE: example Qso3; shows examples
-"
-{
-  int @p = myInt(#);	
+"{
+  int @p = myInt(#); 
+  @p = 2*@p;
   ring @@@r=(0,Q),(x,y,z),dp;
-  minpoly = RootOfUnity(2*p);
+  minpoly = RootOfUnity(@p);
   matrix C[3][3];
-  matrix D[3][3];
-  
   C[1,2]=Q2;
   C[1,3]=1/Q2;
   C[2,3]=Q2;
-  
+  matrix D[3][3];
   D[1,2]=-Q*z;
   D[1,3]=1/Q*y;
   D[2,3]=-Q*x;
-  
   ncalgebra(C,D);
   mySetRing("Qso3", #);
   return(@@@r);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   def K = Qso3(3);
+   setring K;
+   K;
 }
 	
 ///////////////////////////////////////////////////////////////////////////////
 
 proc Qsl3(list #)
 "USAGE:   Qsl3([n]), n an optional integer
-RETURN:  ring, corresponding to the U_q(sl_3) as the factor algebra of
-V_q(sl3); if n is specified, the quantum parameter q will be specialized at the n-th root of unity
+RETURN:  ring, corresponding to the U_q(sl_3) as the factor algebra of V_q(sl3); if n is specified, the quantum parameter q will be specialized at the n-th root of unity
 NOTE:    you have to activate this ring with the "setring" command
 SEE ALSO: sl, Qso3, g2, gl3
 EXAMPLE: example Qso3; shows examples
-"
-{
+"{
   int @p = myInt(#);
   //   ring @@@rrr=(@p, q), (f12, f13, f23, k1, k2, l1, l2, e12, e13, e23), wp(7, 10, 11, 1, 1, 1, 1, 7, 10, 11);
   
@@ -515,6 +505,12 @@ EXAMPLE: example Qso3; shows examples
   qring @@qr = I;
   mySetRing("Qsl3", #);
   return(@@qr);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   def L = Qsl3(3);
+   setring L;
+   L;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
