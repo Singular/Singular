@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.h,v 1.5 1998-05-03 11:41:26 obachman Exp $ */
+/* $Id: libparse.h,v 1.6 1998-05-31 15:42:24 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -22,10 +22,24 @@ void reinit_yylp();
 
 extern char * text_buffer;
 
-#ifdef STANDALONE_PARSER
-#define myfread fread
-#define myfopen fopen
-#endif
+#  define YYLP_ERR_NONE    0
+#  define YYLP_DEF_BR2     1
+#  define YYLP_BODY_BR2    2
+#  define YYLP_BODY_BR3    3
+#  define YYLP_BODY_TMBR2  4
+#  define YYLP_BODY_TMBR3  5
+#  define YYLP_EX_BR2      6
+#  define YYLP_EX_BR3      7
+#  define YYLP_BAD_CHAR    8
+#  define YYLP_MISSQUOT    9
+#  define YYLP_MISS_BR1   10
+#  define YYLP_MISS_BR2   11
+#  define YYLP_MISS_BR3   12
+
+#  ifdef STANDALONE_PARSER
+#    define myfread fread
+#    define myfopen fopen
+#  endif
 
 #endif /* LIBPARSE_H */ 
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.27 1998-05-21 08:56:33 krueger Exp $ */
+/* $Id: iplib.cc,v 1.28 1998-05-31 15:42:24 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -527,7 +527,11 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
   if(yylp_errno) {
     Werror("Library %s: ERROR occured: in line %d, %d.", newlib, yylplineno,
          current_pos(0));
-    Werror(yylp_errlist[yylp_errno], yylplineno);
+    if(yylp_errno==YYLP_BAD_CHAR) {
+      Werror(yylp_errlist[yylp_errno], *text_buffer, yylplineno);
+      FreeL(text_buffer);
+    } else
+      Werror(yylp_errlist[yylp_errno], yylplineno);
     Werror("Cannot load library,... aborting.");
     reinit_yylp();
     fclose( yylpin );

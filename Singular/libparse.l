@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.23 1998-05-27 14:02:36 Singular Exp $ */
+/* $Id: libparse.l,v 1.24 1998-05-31 15:42:23 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -65,7 +65,7 @@ char *yylp_errlist[]= {
    "too many ']' closed brackets in line %d.",                   /*  5 */
    "missing close bracket ')' for example in line %d.",          /*  6 */
    "missing close bracket ']' for example in line %d.",          /*  7 */
-   "cannot assign charater in line %d to any group.",            /*  8 */
+   "cannot assign character '%c' in line %d to any group.",      /*  8 */
    "there must be a quote missing somewhere before line %d.",    /*  9 */
    "missing close bracket '}' at end of library in line %d.",    /* 10 */
    "missing close bracket ')' at end of library in line %d.",    /* 11 */
@@ -73,20 +73,6 @@ char *yylp_errlist[]= {
    NULL
 };
 int yylp_errno = 0;
-
-#  define YYLP_ERR_NONE    0
-#  define YYLP_DEF_BR2     1
-#  define YYLP_BODY_BR2    2
-#  define YYLP_BODY_BR3    3
-#  define YYLP_BODY_TMBR2  4
-#  define YYLP_BODY_TMBR3  5
-#  define YYLP_EX_BR2      6
-#  define YYLP_EX_BR3      7
-#  define YYLP_BAD_CHAR    8
-#  define YYLP_MISSQUOT    9
-#  define YYLP_MISS_BR1   10
-#  define YYLP_MISS_BR2   11
-#  define YYLP_MISS_BR3   12
 
 #  ifdef __MWERKS__
 #    ifdef __cplusplus
@@ -184,6 +170,7 @@ extern libstackv library_stack;
 <pbody>example[ \t]*\n   {
                            yylplineno++;
                            printf("MISSING: EXAMPLE-cmd found. ERROR!\n"); }
+info=+"\"" {
 #  endif
 %}
 
@@ -215,6 +202,7 @@ tnl            ([ \t\n]*)
 eos            ({quote}+{tnl}+"{")
 tos            ([ \t]*)
 eq             ([ \t]*+=[ \t]*)
+eqnl           ([ \t\n]*+=[ \t\n]*)
 
 /* %start START */
 
@@ -231,19 +219,18 @@ eq             ([ \t]*+=[ \t]*)
 %x pestr
 %x string
 %x comment
+%x info
+%x version
 
 %%
 (\/\/[^\n]*)|(^#![^\n]*)|([ \t]) { }
 \/\/*      { old_state = YYSTATE; BEGIN(comment); }
 
-info=+"\"" { old_state = YYSTATE; quote++; BEGIN(string);
-             found_info++;
-             string_start = current_pos(yyleng);
-             *lib_style = NEW_LIBSTYLE;
-             last_cmd = LP_INFO;
-           }
+(info+{eqnl}+{quote}+{strings}+{quote}) { 
+         yyless(4); old_state = YYSTATE; BEGIN(info);
+       }
 
-(version+{eq}+{quote}+{strings}+{quote}) {
+(version+{eqnl}+{quote}+{strings}+{quote}) {
              found_version++;
              if ( mode != GET_INFO ) {
                make_version(yytext,1);
@@ -334,7 +321,7 @@ LIB[ \t]+"\"" { quote++;
              BEGIN(INITIAL);
              yymore();
            }
-<header>(info+{eq}+\")|(version+{eq}+\") {
+<header>(info+{eqnl}+{quote})|(version+{eqnl}+{quote}) {
              yyless(0);
              *lib_style = NEW_LIBSTYLE;
              BEGIN(INITIAL);
@@ -363,7 +350,7 @@ LIB[ \t]+"\"" { quote++;
 #endif
              BEGIN(INITIAL);
            }
-<help>(info+{eq}+\")|(version+{eq}+\") {
+<help>(info+{eqnl}+{quote})|(version+{eqnl}+{quote}) {
              yyless(0);
              *lib_style = NEW_LIBSTYLE;
              BEGIN(INITIAL);
@@ -604,6 +591,16 @@ LIB[ \t]+"\"" { quote++;
 <pbody>\n                { yylplineno++; }
 <pbody>.                 { }
 
+<info>{quote} {
+             quote++; BEGIN(string);
+             found_info++;
+             string_start = current_pos(yyleng);
+             *lib_style = NEW_LIBSTYLE;
+             last_cmd = LP_INFO;
+       }
+<info>\n { yylplineno++; }
+<info>.  { }
+
 <string>"\""             { quote--;
                            copy_string(mode);
                            last_cmd = LP_NONE;
@@ -667,7 +664,11 @@ LIB[ \t]+"\"" { quote++;
                          }
 .                        { p_static = FALSE;
                            yylp_errno = YYLP_BAD_CHAR;
+#  ifdef STANDALONE_PARSER
                            printf("[%d]", *yytext);
+#  else
+                           text_buffer = mstrdup(yytext);
+#  endif
 #if YYLPDEBUG > 1
                            printf("[%s]", yytext);
 #endif
