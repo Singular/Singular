@@ -1,6 +1,6 @@
-//last change: 13.02.2001 (Eric Westenberger)
+//last change: 02.03.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surf.lib,v 1.18 2001-02-19 14:17:49 lossen Exp $";
+version="$Id: surf.lib,v 1.19 2001-03-02 13:41:19 westenb Exp $";
 category="Visualization";
 info="
 LIBRARY: surf.lib    Procedures for Graphics with Surf
@@ -17,7 +17,7 @@ NOTE:
  @end texinfo
 
 PROCEDURES:
- plot(I);  plots curves and surfaces
+ plot(I);  plots plane curves and surfaces
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -40,13 +40,14 @@ static proc num_of_vars(ideal I)
 
 proc  plot(ideal I,list #)
 "USAGE:   plot(I);  I ideal
-ASSUME: I involves only 2 or 3 variables
+ASSUME: I defines a plane curve or a surface
 RETURN: nothing
 NOTE: requires the external program 'surf' to be installed
 EXAMPLE: example plot; shows an example
 "
 {
   string l="/tmp/surf"+string(system("pid"));
+  string err_mes; // string containing error messages
   def base=basering;
   intvec v=num_of_vars(I);
   int i,j,n;
@@ -56,7 +57,7 @@ EXAMPLE: example plot; shows an example
   }
   if (n==0 or n>3)
   {
-    string err_mes="Cannot plot equations with "+string(n)+" variables";
+    err_mes="Cannot plot equations with "+string(n)+" variables";
     ERROR(err_mes);
   }
   ring r=0,(x,y,z),dp;
@@ -106,8 +107,9 @@ background_red=255; background_green=255; background_blue=255;");
     }
     else
     {
-      ERROR("cannot plot"+string(ncols(I))+"equations in"
-             +string(n)+"variables");
+      err_mes="cannot plot "+string(ncols(I))+" equations in "
+             +string(n)+" variables";
+      ERROR(err_mes);
     }
   }
   string surf_call = "surf ";
@@ -119,9 +121,10 @@ background_red=255; background_green=255; background_blue=255;");
   i=system("sh",surf_call + l +" >/dev/null 2>&1");
   if (i!=0)
   {
-    ERROR("calling `surf` failed. (the shell return the error code"
+    err_mes = "calling `surf` failed. (the shell return the error code "
           +string(i)+")."+newline+
-    "probably the executable `surf` is not found.");
+    "probably the executable `surf` is not found.";
+    ERROR(err_mes);
   }
   i=system("sh","/bin/rm "+l);
 }
