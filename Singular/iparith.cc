@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.326 2004-08-04 19:10:07 levandov Exp $ */
+/* $Id: iparith.cc,v 1.327 2004-08-05 09:00:09 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1484,7 +1484,9 @@ static BOOLEAN jjCALL2MANY(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjCOEF(leftv res, leftv u, leftv v)
 {
-  res->data=(char *)mpCoeffProc((poly)u->Data(),(poly)v->Data());
+  poly p=(poly)v->Data();
+  if ((p==NULL)||(pNext(p)!=NULL)) return TRUE;
+  res->data=(char *)mpCoeffProc((poly)u->Data(),p /*(poly)v->Data()*/);
   return FALSE;
 }
 static BOOLEAN jjCOEFFS_Id(leftv res, leftv u, leftv v)
@@ -1507,6 +1509,7 @@ static BOOLEAN jjCOEFFS2_KB(leftv res, leftv u, leftv v)
   {
     pSetExp(p, i, 1);
   }
+  pSetm(p);
   res->data = (void*)idCoeffOfKBase((ideal)(u->Data()),
                                     (ideal)(v->Data()), p);
   pDelete(&p);
