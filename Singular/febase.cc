@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.60 1998-07-10 17:03:43 Singular Exp $ */
+/* $Id: febase.cc,v 1.61 1998-07-23 15:44:40 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -909,21 +909,23 @@ void Werror(char *fmt, ...)
 
 void WarnS(const char *s)
 {
+  #define warn_str "// ** "
 #ifdef HAVE_TCL
   if (tclmode)
   {
+    PrintTCLS('W',warn_str);
     PrintTCLS('W',s);
   }
   else
 #endif
   {
-    fwrite("// ** ",1,6,stdout);
+    fwrite(warn_str,1,6,stdout);
     fwrite(s,1,strlen(s),stdout);
     fwrite("\n",1,1,stdout);
     fflush(stdout);
     if (feProt&PROT_O)
     {
-      fwrite("// ** ",1,6,feProtFile);
+      fwrite(warn_str,1,6,feProtFile);
       fwrite(s,1,strlen(s),feProtFile);
       fwrite("\n",1,1,feProtFile);
     }

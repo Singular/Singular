@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.65 1998-07-23 09:06:57 Singular Exp $ */
+/* $Id: extra.cc,v 1.66 1998-07-23 15:44:38 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -304,10 +304,10 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
           res->data = (void*) mstrdup( val );
         }
         else
-	{
+        {
           res->rtyp=INT_CMD;
           res->data=(void *)val;
-	}
+        }
         return FALSE;
       }
       else
@@ -400,21 +400,54 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 /*==================== latest ==================================*/
     if(strcmp((char*)(h->Data()),"la")==0)
     {
-      if ((h->next!=NULL) &&(h->next->Typ()==INT_CMD))
+      if (h->next!=NULL)
       {
-        laSet();
-	int i=(int)(h->next->Data());
-	Print(" i=%d .. p=",i);
-	poly p=laNumberMon(i);
-	wrp(p);
-	i=laMonNumber(p);
-	pDelete(&p);
-	Print(" .. i=%d\n",i);
-        laReset();
-        return FALSE;
+        int i0=-1, i1=-1;
+        leftv hh=h->next->next;
+        if ((hh!=NULL)&&(hh->Typ()==INT_CMD))
+        {
+          i0=(int)hh->Data();
+          if ((hh->next!=NULL) &&(hh->next->Typ()==INT_CMD))
+            i1=(int)hh->next->Data();
+        }
+        if(h->next->Typ()==IDEAL_CMD)
+        {
+        // "la",<ideal>[,<int d0>[,<int d1>]]:
+        // convert ideal from deg d0 to deg d1 to coeff-vectors
+          if (i1==(-1))
+          {
+            i1=1024;
+            if (i0==(-1)) i0=0;
+          }
+          ideal I=(ideal)(h->next->Data());
+          laSet();
+          ideal m=laI2Mo(I,i0,i1);
+          laReset();
+          res->rtyp=MODUL_CMD;
+          res->data=(void *)m;
+          return FALSE;
+        }
+        else
+        if(h->next->Typ()==MODUL_CMD)
+        {
+        // "la",<module>[,<int c0>[,<int c1>]]:
+        // convert module from comp c0 to comp c1 to ideal
+          if (i1==(-1))
+          {
+            i1=32767;
+            if (i0==(-1)) i0=1;
+          }
+          ideal M=(ideal)(h->next->Data());
+          laSet();
+          ideal I=laMo2I(M,i0,i1);
+          laReset();
+          res->rtyp=IDEAL_CMD;
+          res->data=(void *)I;
+          return FALSE;
+        }
       }
-      else
-         WerrorS("int expected");
+      WerrorS("<ideal/module>[,<int>[,<int>]] expected");
+      return TRUE;
     }
     else
 /*==================== naIdeal ==================================*/
@@ -598,7 +631,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         }
         res->rtyp=POLY_CMD;
         res->data=(void *) fglmLinearCombination(
-	                   (ideal)h->next->Data(),(poly)h->next->next->Data());
+                           (ideal)h->next->Data(),(poly)h->next->next->Data());
         return FALSE;
       }
       else
@@ -620,7 +653,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         }
         res->rtyp=POLY_CMD;
         res->data=(void *)fglmNewLinearCombination(
-	                    (ideal)h->next->Data(),(poly)h->next->next->Data());
+                            (ideal)h->next->Data(),(poly)h->next->next->Data());
         return FALSE;
       }
       else
@@ -701,7 +734,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       {
         res->rtyp=STRING_CMD;
         char *r=iiGetLibName(IDPROC(hh));
-	if (r==NULL) r="";
+        if (r==NULL) r="";
         res->data=mstrdup(r);
         return FALSE;
       }
@@ -765,12 +798,12 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         fprintf(stderr, "Loading %s\n", h->next->Data());
         res->data=(void *)mstrdup("");
         if((vp=dlopen(h->next->Data(),RTLD_LAZY))==(void *)NULL)
-	{
+        {
           WerrorS("dlopen failed");
           Werror("%s not found", h->next->Data());
         }
-	else
-	{
+        else
+        {
           fktn = dlsym(vp, "mod_init");
           if( fktn!= NULL) (*fktn)(iiAddCproc);
           else Werror("mod_init: %s\n", dlerror());
