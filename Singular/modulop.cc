@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.28 2003-01-31 09:12:10 Singular Exp $ */
+/* $Id: modulop.cc,v 1.29 2003-01-31 09:14:19 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -560,7 +560,7 @@ long nvInvMod(long a)
 
 inline number nvInversM (number c)
 {
-  long inv=InvMod((long)c);
+  long inv=nvInvMod((long)c);
   return (number)inv;
 }
 
