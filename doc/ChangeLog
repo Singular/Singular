@@ -1,6 +1,27 @@
+Wed May  6 12:06:41 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* .cvsignore: new file
+
+	* general.doc: `libraries.doc' textually included
+
+	* libraries.doc: file removed
+
+	* Makefile.in (SINGULAR_OBJS): `libraries.tex' removed
+
+	* general.doc (Control structures): ``Wohin damit??'' removed.
+	  (Editing input): conflict removed (who forgot it??)
+
 Mon May  4 15:01:13 MET DST 1998 hannes
        * update "Implemented algorithms"
 Mon May  4 12:23:12 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* general.doc (The SINGULAR language): prev-node updated
+	* libraries.doc (Debugging tools): next-node updated
+	* general.doc (Implemented algorithms): chapter moved.  Nodes not
+	  fully update yet.
+
+	* general.doc (Reuse of output): new example, new text.
+	  (Control parameters): `verbose' replaced by `option'
 
 	* start.doc (How to use this manual): new chapter.  Needs to be
 	  rewritten.
