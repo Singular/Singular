@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.19 2001-08-25 14:56:41 mschulze Exp $";
+version="$Id: linalg.lib,v 1.20 2001-11-05 09:17:05 mschulze Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib        Algorithmic Linear Algebra
@@ -25,8 +25,8 @@ PROCEDURES:
  U_D_O(A);            P*A=U*D*O, P,D,U,O=permutaion,diag,lower-,upper-triang
  pos_def(A,i);        test symmetric matrix for positive definiteness
  hessenberg(M);       transforms M to Hessenberg form
- spnormalize(a[,m]);  normalize spectrum
- eigenval(M);         eigenvalues of M with multiplicities
+ spnf(a[,m][,v|V]);   normalize spectrum
+ eigenvalues(M);      eigenvalues of M with multiplicities
  jordan(M);           Jordan data of constant square matrix M
  jordanbasis(M);      Jordan basis of constant square matrix M
  jordanmatrix(e,b);   Jordan matrix with eigenvalues e and Jordan block sizes b
@@ -1334,52 +1334,60 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc spappend(list l,number e,int m)
-{
-  if(size(l)==0)
-  {
-    l=list(ideal(e),intvec(m));
-  }
-  else
-  {
-    int n=ncols(l[1]);
-    l[1][n+1]=e;
-    l[2][n+1]=m;
-  }
-  return(l);
-}
-///////////////////////////////////////////////////////////////////////////////
-
-proc spnormalize(ideal e,list #)
-"USAGE:    spnormalize(a,w[,m]);
+proc spnf(ideal e,list #)
+"USAGE:   spnf(e[,m][,v|V]); ideal e, intvec m, module v, list V
 RETURN:
 @format
-list Sp: normalized spectrum (a,m)
+list Sp: normalized spectrum (e,m[,V])
   ideal Sp[1]: numbers in a in increasing order
   intvec Sp[2]:
-    int Sp[2][i]: multiplicity of number Sp[1][i] in a
+    int Sp[2][i]: multiplicity of number Sp[1][i] in e
+  list Spp[3]:
+    module Spp[3][i]: module associated to number Spp[1][i]
 @end format
-EXAMPLE:  example spnormalize; shows examples
+EXAMPLE: example spnf; shows examples
 "
 {
+  int n=ncols(e);
   intvec m;
+  module v;
+  list V;
   int i,j;
-  if(size(#)==0)
+  while(i<size(#))
   {
-    for(i=ncols(e);i>=1;i--)
+    i++;
+    if(typeof(#[i])=="intvec")
+    {
+      m=#[i];
+    }
+    if(typeof(#[i])=="module")
+    {
+      v=#[i];
+      for(j=n;j>=1;j--)
+      {
+        V[j]=module(v[j]);
+      }
+    }
+    if(typeof(#[i])=="list")
+    {
+      V=#[i];
+    }
+  }
+  if(m==0)
+  {
+    for(i=n;i>=1;i--)
     {
       m[i]=1;
     }
   }
-  else
-  {
-    m=#[1];
-  }
 
-  list l;
-  number e0;
-  int m0;
-  for(i=ncols(e);i>=1;i--)
+  int k;
+  ideal e0;
+  intvec m0;
+  list V0;
+  number e1;
+  int m1;
+  for(i=n;i>=1;i--)
   {
     if(m[i]!=0)
     {
@@ -1389,24 +1397,63 @@ EXAMPLE:  example spnormalize; shows examples
 	{
           if(number(e[i])>number(e[j]))
           {
-            e0=number(e[i]);
+            e1=number(e[i]);
             e[i]=e[j];
-            e[j]=e0;
-            m0=m[i];
+            e[j]=e1;
+            m1=m[i];
             m[i]=m[j];
-            m[j]=m0;
+            m[j]=m1;
+            if(size(V)>0)
+            {
+              v=V[i];
+              V[i]=V[j];
+              V[j]=v;
+            }
           }
           if(number(e[i])==number(e[j]))
           {
             m[i]=m[i]+m[j];
             m[j]=0;
+            if(size(V)>0)
+            {
+              V[i]=V[i]+V[j];
+            }
           }
         }
       }
-      l=spappend(l,number(e[i]),m[i]);
+      k++;
+      e0[k]=e[i];
+      m0[k]=m[i];
+      if(size(V)>0)
+      {
+        V0[k]=V[i];
+      }
     }
   }
 
+  if(size(V0)>0)
+  {
+    n=size(V0);
+    module U=std(V0[n]);
+    for(i=n-1;i>=1;i--)
+    {
+      V0[i]=simplify(reduce(V0[i],U),1);
+      if(i>=2)
+      {
+        U=std(U+V0[i]);
+      }
+    }
+  }
+
+  list l;
+  if(k>0)
+  {
+    l=e0,m0;
+    if(size(V0)>0)
+    {
+      l[3]=V0;
+    }
+  }
   return(l);
 }
 example
@@ -1424,15 +1471,18 @@ list l:
   intvec l[2]:
     int l[2][i]: multiplicity of eigenvalue l[1][i]
 @end format
-EXAMPLE: example eigenval; shows examples
+EXAMPLE: example eigenvalues; shows examples
 "
 {
   M=jet(hessenberg(M),0);
   int n=ncols(M);
+  int k;
+  ideal e;
+  intvec m;
   number e0;
   intvec v;
-  list l,f;
-  int i,j,k;
+  list l;
+  int i,j;
   j=1;
   while(j<=n)
   {
@@ -1453,22 +1503,26 @@ EXAMPLE: example eigenval; shows examples
     }
     if(size(v)==1)
     {
-      l=spappend(l,number(M[v,v]),1);
+      k++;
+      e[k]=M[v,v];
+      m[k]=1;
     }
     else
     {
-      f=factorize(det(submat(M,v,v)-var(1)));
-      for(i=size(f[1]);i>=1;i--)
+      l=factorize(det(submat(M,v,v)-var(1)));
+      for(i=size(l[1]);i>=1;i--)
       {
-        e0=number(jet(f[1][i]/var(1),0));
+        e0=number(jet(l[1][i]/var(1),0));
         if(e0!=0)
 	{
-          l=spappend(l,number((e0*var(1)-f[1][i])/e0),f[2][i]);
+          k++;
+          e[k]=(e0*var(1)-l[1][i])/e0;
+          m[k]=l[2][i];
 	}
       }
     }
   }
-  return(spnormalize(l[1],l[2]));
+  return(spnf(e,m));
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -1599,8 +1653,7 @@ EXAMPLE: example jordanbasis; shows examples
   }
   def e,m=#[1..2];
 
-  int i;
-  for(i=1;i<=ncols(e);i++)
+  for(int i=1;i<=ncols(e);i++)
   {
     if(deg(e[i]>0))
     {
@@ -1609,7 +1662,7 @@ EXAMPLE: example jordanbasis; shows examples
     }
   }
 
-  int j,k,l;
+  int j,k,l,n;
   matrix N0,N1;
   module K0,K1;
   list K;
@@ -1617,7 +1670,7 @@ EXAMPLE: example jordanbasis; shows examples
   module U;
   intvec w;
 
-  for(i=ncols(e);i>=1;i--)
+  for(i=1;i<=ncols(e);i++)
   {
     N0=M-e[i]*freemodule(ncols(M));
 
@@ -1647,14 +1700,15 @@ EXAMPLE: example jordanbasis; shows examples
         u=K[l][k];
         for(j=l;j>=1;j--)
         {
-          U=module(u)+U;
-          w=2*j-l-1,w;
+          U=U+module(u);
+          n++;
+          w[n]=2*j-l-1;
           u=N0*u;
         }
       }
     }
   }
-  w=w[1..size(w)-1];
+
   return(list(U,w));
 }
 example
@@ -1695,7 +1749,7 @@ EXAMPLE: example jordanmatrix; shows examples
       J[j,j]=e[k];
       for(i=s[k];i>=2;i--)
       {
-        J[j,j+1]=1;
+        J[j+1,j]=1;
         j++;
         J[j,j]=e[k];
       }

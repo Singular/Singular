@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.54 2001-08-31 18:18:08 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.55 2001-11-05 09:16:48 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -16,11 +16,12 @@ PROCEDURES:
  gmscoeffs(p,K[,Kmax]);     Gauss-Manin system basis representation
  monodromy(t);              Jordan data of monodromy of t
  spectrum(t);               spectrum of t
- sppnormalize(a,w[,m]);     normalize spectral pairs
  sppairs(t);                spectral pairs of t
+ sppnf(a,w[,m][,v|V]);      normalize spectral pairs
+ vfilt(t);                  V-filtration of t on H''/H'
+ vwfilt(t);                 weight refined V-filtration of t on H''/H'
  saito(t);                  matrix A0+A1*s of t on H''
- vfilt(t[,opt]);            V-filtration on H''/H' or spectrum of t
- endfilt(t,V);              endomorphism filtration of V-filtration V
+ endvfilt(V);               endomorphism V-filtration
  spprint(Sp);               print spectrum Sp
  sppprint(Spp);             print spectral pairs Spp
  spadd(Sp1,Sp2);            sum of spectra Sp1 and Sp2
@@ -412,22 +413,20 @@ static proc saturate(int K0)
   A0=A0-k*s;
   dbprint(printlevel-voice+2,"// compute basis of saturation of H''");
   H=std(H0);
-  int d0=maxdeg1(H);
 
   dbprint(printlevel-voice+2,"// transform H'' to saturation of H''");
   l=division(H,freemodule(mu)*s^k);
   H0=l[1];
 
-  return(A0,r,H,H0);
+  return(A0,r,H,H0,k);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc tmatrix(matrix A0,ideal r,module H,int K,int K0)
+static proc tmatrix(matrix A0,ideal r,module H,int k0,int K,int K0)
 {
   dbprint(printlevel-voice+2,"// compute matrix A of t");
-  int d0=maxdeg1(H);
-  dbprint(printlevel-voice+2,"// k="+string(K+d0+1));
-  list l=gmscoeffs(r,K+d0+1,K0+d0+1);
+  dbprint(printlevel-voice+2,"// k="+string(K+k0+1));
+  list l=gmscoeffs(r,K+k0+1,K0+k0+1);
   matrix C;
   C,r=l[1..2];
   A0=A0+C;
@@ -440,29 +439,31 @@ static proc tmatrix(matrix A0,ideal r,module H,int K,int K0)
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc eigenvals(matrix A0,ideal r,module H,int K0)
+static proc eigenvals(matrix A0,ideal r,module H,int k0,int K0)
 {
   dbprint(printlevel-voice+2,
     "// compute eigenvalues e with multiplicities m of A");
   matrix A;
-  A,A0,r=tmatrix(A0,r,H,0,K0);
+  A,A0,r=tmatrix(A0,r,H,k0,0,K0);
   list l=eigenvalues(A);
   def e,m=l[1..2];
   dbprint(printlevel-voice+2,"// e="+string(e));
   dbprint(printlevel-voice+2,"// m="+string(m));
 
-  return(e,m,A0,r);
+  return(e,m,A0,r,int(max(e)-min(e)));
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc transform(ideal e,intvec m,matrix A,matrix A0,ideal r,module H,module H0,int K,int K0)
+static proc transform(matrix A,matrix A0,ideal r,module H,module H0,ideal e,intvec m,int k0,int k1,int K,int K0)
 {
+  int mu=ncols(gmsbasis);
+
   dbprint(printlevel-voice+2,"// compute minimum e0 and maximum e1 of e");
   number e0,e1=min(e),max(e);
   dbprint(printlevel-voice+2,"// e0="+string(e0));
   dbprint(printlevel-voice+2,"// e1="+string(e1));
-  int d1=int(e1-e0);
-  A,A0,r=tmatrix(A0,r,H,K+d1,K0+d1);
+  A,A0,r=tmatrix(A0,r,H,k0,K+k1,K0+k1);
+  module U0=s^k0*freemodule(mu);
 
   if(e1>=e0+1)
   {
@@ -481,6 +482,7 @@ static proc transform(ideal e,intvec m,matrix A,matrix A0,ideal r,module H,modul
       V=inverse(U);
       A=V*A*U;
       H0=V*H0;
+      U0=U0*U;
 
       dbprint(printlevel-voice+2,"// transform to reduce e1 by 1");
       for(i0,i=1,1;i0<=ncols(e);i0++)
@@ -513,6 +515,7 @@ static proc transform(ideal e,intvec m,matrix A,matrix A0,ideal r,module H,modul
           {
             A[i,i]=A[i,i]-1;
             H0[i]=H0[i]*s;
+            U0[i]=U0[i]/s;
           }
           e[i0]=e[i0]-1;
         }
@@ -523,7 +526,7 @@ static proc transform(ideal e,intvec m,matrix A,matrix A0,ideal r,module H,modul
       }
       H0=transpose(H0);
 
-      l=spnormalize(e,m);
+      l=spnf(e,m);
       e,m=l[1..2];
 
       e1=e1-1;
@@ -533,7 +536,7 @@ static proc transform(ideal e,intvec m,matrix A,matrix A0,ideal r,module H,modul
     A=jet(A,K);
   }
 
-  return(e,m,A,A0,r,H0);
+  return(A,A0,r,H0,U0,e,m);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -552,20 +555,18 @@ EXAMPLE:  example monodromy; shows examples
   def G=gmsring(t,"s");
   setring(G);
 
-  int mu=ncols(gmsbasis);
   matrix A;
+  module U0;
   ideal e;
   intvec m;
+  int k1;
 
-  def A0,r,H,H0=saturate(n);
-  e,m,A0,r=eigenvals(A0,r,H,n);
-  e,m,A,A0,r,H0=transform(e,m,A,A0,r,H,H0,0,0);
+  def A0,r,H,H0,k0=saturate(n);
+  e,m,A0,r,k1=eigenvals(A0,r,H,k0,n);
+  A,A0,r,H0,U0,e,m=transform(A,A0,r,H,H0,e,m,k0,k1,0,0);
 
   setring(R);
-  matrix A=imap(G,A);
-  ideal e=imap(G,e);
-
-  return(jordan(A));
+  return(jordan(imap(G,A),imap(G,e),m));
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -582,17 +583,19 @@ ASSUME:   basering with characteristic 0 and local degree ordering,
 RETURN:
 @format
 list Sp: spectrum of t
-  ideal Sp[1]: spectral numbers in increasing order
-  intvec Sp[2]:
-    int Sp[2][i]: multiplicity of spectral number Sp[1][i]
+  ideal Sp[1]: V-filtration indices in increasing order
+  intvec Sp[2]: weight filtration indices in decreasing order
+  intvec Sp[3]:
+    int Sp[3][i]: multiplicity of spectral number Sp[1][i]
 @end format
 SEE ALSO: spectrum_lib
-KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice; spectrum
-EXAMPLE:  example spnumbers; shows examples
+KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice; 
+          mixed Hodge structure; spectrum
+EXAMPLE:  example spectrum; shows examples
 "
 {
-  list l=sppairs(t);
-  return(spnormalize(l[1],l[3]));
+  list l=vwfilt(t);
+  return(spnf(l[1],l[3]));
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -602,54 +605,89 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc sppappend(list l,number a,int w,int m)
+proc sppairs(poly t)
+"USAGE:    sppairs(t); poly t
+ASSUME:   basering with characteristic 0 and local degree ordering,
+          t with isolated citical point 0
+RETURN:
+@format
+list Spp: spectrum of t
+  ideal Spp[1],intvec Spp[2]: spectral pairs in in-/decreasing lex. order
+  intvec Spp[3]:
+    int Spp[3][i]: multiplicity of spectral pair (Spp[1][i],Spp[2][i])
+@end format
+SEE ALSO: spectrum_lib
+KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice;
+          mixed Hodge structure; spectrum; spectral pairs
+EXAMPLE:  example sppairs; shows examples
+"
 {
-  if(size(l)==0)
-  {
-    l=list(ideal(a),intvec(w),intvec(m));
-  }
-  else
-  {
-    int n=ncols(l[1]);
-    l[1][n+1]=a;
-    l[2][n+1]=w;
-    l[3][n+1]=m;
-  }
-  return(l);
+  list l=vwfilt(t);
+  return(list(l[1],l[2],l[3]));
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  poly t=x5+x2y2+y5;
+  sppprint(sppairs(t));
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc sppnormalize(ideal a,intvec w,list #)
-"USAGE:    sppnormalize(a,w[,m]);
+proc sppnf(ideal a,intvec w,list #)
+"USAGE:    sppnf(a,w[,m][,v|V]); ideal a, intvec w, intvec m, module v, list V
 RETURN:
 @format
-list Spp: normalized spectral pairs (a,w,m)
+list Spp: normalized spectral pairs (a,w,m[,V])
   ideal Spp[1]: numbers in a in increasing order
   intvec Spp[2]: integers in w in decreasing order
   intvec Spp[3]:
-    int Spp[3][i]: multiplicity of pair (Spp[1][i],Spp[2][i]) in a,w
+    int Spp[3][i]: multiplicity of pair (Spp[1][i],Spp[2][i]) in (a,w)
+  list Spp[4]:
+    module Spp[4][i]: module associated to pair (Spp[1][i],Spp[2][i])
 @end format
-EXAMPLE:  example sppnormalize; shows examples
+EXAMPLE:  example sppnorm; shows examples
 "
 {
+  int n=ncols(a);
   intvec m;
+  module v;
+  list V;
   int i,j;
-  if(size(#)==0)
+  while(i<size(#))
   {
-    for(i=ncols(a);i>=1;i--)
+    i++;
+    if(typeof(#[i])=="intvec")
+    {
+      m=#[i];
+    }
+    if(typeof(#[i])=="module")
+    {
+      v=#[i];
+      for(j=n;j>=1;j--)
+      {
+        V[j]=module(v[j]);
+      }
+    }
+    if(typeof(#[i])=="list")
+    {
+      V=#[i];
+    }
+  }
+  if(m==0)
+  {
+    for(i=n;i>=1;i--)
     {
       m[i]=1;
     }
   }
-  else
-  {
-    m=#[1];
-  }
 
-  list l;
-  number a0;
-  int w0,m0;
-  for(i=ncols(a);i>=1;i--)
+  int k;
+  ideal a0;
+  intvec w0,m0;
+  list V0;
+  number a1;
+  int w1,m1;
+  for(i=n;i>=1;i--)
   {
     if(m[i]!=0)
     {
@@ -660,27 +698,67 @@ EXAMPLE:  example sppnormalize; shows examples
           if(number(a[i])>number(a[j])||
             (number(a[i])==number(a[j])&&w[i]<w[j]))
           {
-            a0=number(a[i]);
+            a1=number(a[i]);
             a[i]=a[j];
-            a[j]=a0;
-            w0=w[i];
+            a[j]=a1;
+            w1=w[i];
             w[i]=w[j];
-            w[j]=w0;
-            m0=m[i];
+            w[j]=w1;
+            m1=m[i];
             m[i]=m[j];
-            m[j]=m0;
+            m[j]=m1;
+            if(size(V)>0)
+            {
+              v=V[i];
+              V[i]=V[j];
+              V[j]=v;
+            }
           }
           if(number(a[i])==number(a[j])&&w[i]==w[j])
           {
             m[i]=m[i]+m[j];
             m[j]=0;
+            if(size(V)>0)
+            {
+              V[i]=V[i]+V[j];
+            }
           }
         }
       }
-      l=sppappend(l,number(a[i]),w[i],m[i]);
+      k++;
+      a0[k]=a[i];
+      w0[k]=w[i];
+      m0[k]=m[i];
+      if(size(V)>0)
+      {
+        V0[k]=V[i];
+      }
     }
   }
 
+  if(size(V0)>0)
+  {
+    n=size(V0);
+    module U=std(V0[n]);
+    for(i=n-1;i>=1;i--)
+    {
+      V0[i]=simplify(reduce(V0[i],U),1);
+      if(i>=2)
+      {
+        U=std(U+V0[i]);
+      }
+    }
+  }
+
+  list l;
+  if(k>0)
+  {
+    l=a0,w0,m0;
+    if(size(V0)>0)
+    {
+      l[4]=V0;
+    }
+  }
   return(l);
 }
 example
@@ -688,22 +766,61 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc sppairs(poly t)
-"USAGE:    sppairs(t); poly t
+proc vfilt(poly t)
+"USAGE:    vfilt(t); poly t
 ASSUME:   basering with characteristic 0 and local degree ordering,
           t with isolated citical point 0
 RETURN:
 @format
-list Spp:
-  ideal Spp[1]: spectral numbers in increasing order
-  intvec Spp[2]: weight filtration indices in decreasing order
-  intvec Spp[3]:
-    int Spp[3][i]: multiplicity of spectral pair (Spp[1][i],Spp[2][i])
+list V: V-filtration on H''/H'
+  ideal V[1]: spectral numbers in increasing order
+  intvec V[2]:
+    int V[2][i]: multiplicity of spectral number V[1][i]
+  list V[4]:
+    module V[4][i]: vector space basis of V[1][i]-th graded part 
+                    in terms of V[4]
+  ideal V[4]: monomial vector space basis of H''/H'
+  ideal V[5]: standard basis of Jacobian ideal
 @end format
 SEE ALSO: spectrum_lib
 KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice;
+          mixed Hodge structure; V-filtration; spectrum
+EXAMPLE:  example vfilt; shows examples
+"
+{
+  list l=vwfilt(t);
+  return(spnf(l[1],l[3],l[4])+list(l[5],l[6]));
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  poly t=x5+x2y2+y5;
+  vfilt(t);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc vwfilt(poly t)
+"USAGE:    vwfilt(t); poly t
+ASSUME:   basering with characteristic 0 and local degree ordering,
+          t with isolated citical point 0
+RETURN:
+@format
+list VW: weight refined V-filtration on H''/H'
+  ideal VW[1]: spectral numbers in increasing order
+  intvec VW[2]: weights in decreasing order
+  intvec VW[3]:
+    int VW[3][i]: multiplicity of spectral pair (VW[1][i],VW[2][i])
+  list VW[4]:
+    module VW[4][i]: vector space basis of (VW[1][i],VW[2][i])-th graded part 
+                     in terms of VW[5]
+  ideal VW[5]: monomial vector space basis of H''/H'
+  ideal VW[6]: standard basis of Jacobian ideal
+@end format
+SEE ALSO: spectrum_lib
+KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice;
+          mixed Hodge structure; V-filtration; weight filtration;
           spectrum; spectral pairs
-EXAMPLE:  example sppairs; shows examples
+EXAMPLE:  example vwfilt; shows examples
 "
 {
   def R=basering;
@@ -713,22 +830,25 @@ EXAMPLE:  example sppairs; shows examples
 
   int mu=ncols(gmsbasis);
   matrix A;
+  module U0;
   ideal e;
   intvec m;
+  int k1;
 
-  def A0,r,H,H0=saturate(n);
-  e,m,A0,r=eigenvals(A0,r,H,n);
-  e,m,A,A0,r,H0=transform(e,m,A,A0,r,H,H0,0,0);
+  def A0,r,H,H0,k0=saturate(n);
+  e,m,A0,r,k1=eigenvals(A0,r,H,k0,n);
+  A,A0,r,H0,U0,e,m=transform(A,A0,r,H,H0,e,m,k0,k1,0,0);
 
   dbprint(printlevel-voice+2,"// compute weight filtration basis");
   list l=jordanbasis(A,e,m);
   def U,v=l[1..2];
+  kill l;
   vector u0;
   int v0;
-  int i,j,k,k0;
-  for(k,k0=1,1;k0<=ncols(e);k,k0=k+m[k0],k0+1)
+  int i,j,k,l;
+  for(k,l=1,1;l<=ncols(e);k,l=k+m[l],l+1)
   {
-    for(i=k+m[k0]-1;i>=k+1;i--)
+    for(i=k+m[l]-1;i>=k+1;i--)
     {
       for(j=i-1;j>=k;j--)
       {
@@ -746,6 +866,7 @@ EXAMPLE:  example sppairs; shows examples
   A=V*A*U;
   dbprint(printlevel-voice+2,"// compute normal form of H''");
   H0=std(V*H0);
+  U0=U0*U;
 
   dbprint(printlevel-voice+2,"// compute spectral pairs");
   ideal a;
@@ -753,162 +874,27 @@ EXAMPLE:  example sppairs; shows examples
   for(i=1;i<=mu;i++)
   {
     j=leadexp(H0[i])[nvars(basering)+1];
-    a[i]=A[j,j]+deg(lead(H0[i]))/deg(s)-1;
+    a[i]=A[j,j]+ord(H0[i])/deg(s)-1;
     w[i]=v[j]+n;
   }
+  kill v;
+  module v=simplify(grmat(H*U0*H0,2*k0),1);
 
   setring(R);
-
-  return(sppnormalize(imap(G,a),w));
+  ideal g=imap(G,gmsstd);
+  attrib(g,"isSB",1);
+  return(sppnf(imap(G,a),w,imap(G,v))+list(imap(G,gmsbasis),g));
 }
 example
 { "EXAMPLE:"; echo=2;
   ring R=0,(x,y),ds;
   poly t=x5+x2y2+y5;
-  sppprint(sppairs(t));
+  vwfilt(t);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc grmat(matrix A,int k)
-{
-  int i,j;
-  for(i=1;i<=ncols(A);i++)
-  {
-    for(j=1;j<=nrows(A);j++)
-    {
-      A[i,j]=jet(A[i,j]/var(1)^k,0);
-    }
-  }
-  return(A);
-}
-///////////////////////////////////////////////////////////////////////////////
-
-proc saito(poly t,list #)
-"USAGE:    saito(t); poly t
-ASSUME:   basering with characteristic 0 and local degree ordering,
-          t with isolated citical point 0
-RETURN:   list A: matrix A[1]+A[2]*s of t on H''
-SEE ALSO: spectrum_lib
-KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice;
-          monodromy; spectrum; spectral pairs
-EXAMPLE:  example saito; shows examples
-"
-{
-  def R=basering;
-  int n=nvars(R)-1;
-  def G=gmsring(t,"s");
-  setring(G);
-
-  int mu=ncols(gmsbasis);
-  matrix A;
-  ideal e;
-  intvec m;
-
-  def A0,r,H,H0=saturate(2*n+mu+1);
-  e,m,A0,r=eigenvals(A0,r,H,n+1);
-  int d0,d1=maxdeg1(H),int(max(e)-min(e));
-  e,m,A,A0,r,H0=transform(e,m,A,A0,r,H,H0,d0+d1+1,d0+d1+1);
-  d0=maxdeg1(H0);
-
-  dbprint(printlevel-voice+2,"// transform to Jordan basis");
-  module U=jordanbasis(A,e,m)[1];
-  module V=inverse(U);
-  A=V*A*U;
-  H=V*H0;
-
-  dbprint(printlevel-voice+2,"// compute splitting of V filtration");
-  int i,j,k;
-  U=freemodule(mu);
-  matrix U0[mu][mu];
-  matrix u0[mu^2][1];
-  A0=commutator(jet(A,0));
-  for(k=1;k<=d0+1;k++)
-  {
-    V=0;
-    for(j=0;j<k;j++)
-    {
-      U0=matrix(U0)-grmat(A,k-j)*grmat(U,j);
-    }
-    u0=U0[1..mu,1..mu];
-    u0=inverse(A0+k)*u0;
-    U0=u0[1..mu^2,1];
-    U=matrix(U)+s^k*U0;
-  }
-
-  dbprint(printlevel-voice+2,"// transform to splitting basis");
-  A=jet(A,0);
-  H=std(jet(division(U,H)[1],d0));
-
-  dbprint(printlevel-voice+2,"// compute N");
-  matrix N=A;
-  for(i=1;i<=ncols(N);i++)
-  {
-    N[i,i]=0;
-  }
-
-  dbprint(printlevel-voice+2,"// compute N splitting of Hodge filtration");
-  module F;
-  matrix K[mu][1];
-  U=0;
-  i=1;
-  for(k=1;k<=ncols(e);k++)
-  {
-    j=0;
-    K=matrix(0,mu,0);
-    while(j<m[k])
-    {
-      K=K+gen(i);
-      i++;
-      j++;
-    }
-    j=0;
-    F=grmat(H,0);
-    V=intersect(F,K);
-    while(size(V)==0)
-    {
-      j++;
-      V=V+grmat(H,j);
-      V=intersect(F,K)
-    }
-    while(size(V)>0)
-    {
-      U=U+V;
-      V=N*V;
-    }
-  }
-
-  dbprint(printlevel-voice+2,"// transform to N splitting basis");
-  V=inverse(U);
-  A=V*A*U;
-  H=V*H*U;
-
-  dbprint(printlevel-voice+2,"// compute matrix A0+sA1 of t");
-//  degBound=d0;
-//  option("redSB");
-//  H=std(H);
-H=simplify(lead(std(H)),1);
-//  degBound=0;
-  list l=division(H,s*A*H+s^2*diff(matrix(H),s));
-  A=jet(l[1],l[2],d0+1);
-  A0=grmat(A,0);
-  A=grmat(A,1);
-
-  setring(R);
-
-  return(list(imap(G,A0),imap(G,A)));
-}
-example
-{ "EXAMPLE:"; echo=2;
-  ring R=0,(x,y),ds;
-  poly t=x5+x2y2+y5;
-  list A=saito(t);
-  print(A[1]);
-  print(A[2]);
-}
-///////////////////////////////////////////////////////////////////////////////
-
-proc vfilt(poly t,list #)
-"USAGE:    vfilt(t[,opt]); poly t, int opt
+proc vfilt1(poly t,list #)
+"USAGE:    vfilt1(t[,opt]); poly t, int opt
 ASSUME:   basering with characteristic 0 and local degree ordering,
           t with isolated citical point 0
 RETURN:
@@ -929,7 +915,7 @@ NOTE:     H' and H'' denote the Brieskorn lattices
 SEE ALSO: spectrum_lib
 KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice;
           Hodge filtration; V-filtration; spectrum
-EXAMPLE:  example vfilt; shows examples
+EXAMPLE:  example vfilt1; shows examples
 "
 {
   int opt=1;
@@ -1189,28 +1175,229 @@ example
 { "EXAMPLE:"; echo=2;
   ring R=0,(x,y),ds;
   poly t=x5+x2y2+y5;
-  vfilt(t);
+  vfilt1(t);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc endfilt(list V)
-"USAGE:   endfilt(V); list V
+static proc grmat(matrix A,int k)
+{
+  int i,j;
+  for(i=1;i<=ncols(A);i++)
+  {
+    for(j=1;j<=nrows(A);j++)
+    {
+      A[i,j]=jet(A[i,j]/var(1)^k,0);
+    }
+  }
+  return(A);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc saito(poly t,list #)
+"USAGE:    saito(t); poly t
+ASSUME:   basering with characteristic 0 and local degree ordering,
+          t with isolated citical point 0
+RETURN:   list A: matrix A[1]+A[2]*s of t on H''
+SEE ALSO: spectrum_lib
+KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice;
+          mixed Hodge structure; V-filtration; weight filtration;
+          spectrum; spectral pairs
+EXAMPLE:  example saito; shows examples
+"
+{
+  def R=basering;
+  int n=nvars(R)-1;
+  def G=gmsring(t,"s");
+  setring(G);
+
+  int mu=ncols(gmsbasis);
+  matrix A;
+  module U0;
+  ideal e;
+  intvec m;
+  int k1;
+
+  def A0,r,H,H0,k0=saturate(2*n+mu-1);
+  e,m,A0,r,k1=eigenvals(A0,r,H,k0,n);
+  A,A0,r,H0,U0,e,m=transform(A,A0,r,H,H0,e,m,k0,k1,k0+k1,k0+k1);
+
+  dbprint(printlevel-voice+2,"// transform to Jordan basis");
+  module U=jordanbasis(A,e,m)[1];
+  matrix V=inverse(U);
+  A=V*A*U;
+  H=V*H0;
+
+  dbprint(printlevel-voice+2,"// compute splitting of V-filtration");
+  int i,j,k;
+  U=freemodule(mu);
+  V=matrix(0,mu,mu);
+  matrix v[mu^2][1];
+  A0=commutator(jet(A,0));
+  for(k=1;k<=k0+k1;k++)
+  {
+    for(j=0;j<k;j++)
+    {
+      V=matrix(V)-grmat(A,k-j)*grmat(U,j);
+    }
+    v=V[1..mu,1..mu];
+    v=inverse(A0+k)*v;
+    V=v[1..mu^2,1];
+    U=matrix(U)+s^k*V;
+  }
+
+  dbprint(printlevel-voice+2,"// transform to V-splitting basis");
+  A=jet(A,0);
+  H=jet(division(U,H)[1],k0+k1);
+  H=std(H);
+
+  dbprint(printlevel-voice+2,"// compute V-leading terms of H''");
+  int i0,j0;
+  module H1=H;
+  for(k=ncols(H1);k>=1;k--)
+  {
+    i0=leadexp(H1[k])[nvars(basering)+1];
+    j0=ord(H1[k])/deg(s);
+    H0[k]=lead(H1[k]);
+    H1[k]=H1[k]-lead(H1[k]);
+    if(H1[k]!=0)
+    {
+      i=leadexp(H1[k])[nvars(basering)+1];
+      j=ord(H1[k])/deg(s);
+      while(A[i,i]+j==A[i0,i0]+j0)
+      {
+        H0[k]=H0[k]+lead(H1[k]);
+        H1[k]=H1[k]-lead(H1[k]);
+        i=leadexp(H1[k])[nvars(basering)+1];
+        j=ord(H1[k])/deg(s);
+      }
+    }
+  }
+  H0=simplify(H0,1);
+
+  dbprint(printlevel-voice+2,"// compute N");
+  matrix N=A;
+  for(i=1;i<=ncols(N);i++)
+  {
+    N[i,i]=0;
+  }
+
+  dbprint(printlevel-voice+2,"// compute splitting of Hodge filtration");
+  U=0;
+  module U1;
+  module C;
+  list F,I;
+  module F0,I0;
+  for(i0,j0=1,1;i0<=ncols(e);i0++)
+  {
+    C=matrix(0,mu,1);
+    for(j=m[i0];j>=1;j,j0=j-1,j0+1)
+    {
+      C=C+gen(j0);
+    }
+    F0=intersect(C,H0);
+    F=list();
+    j=0;
+    while(size(F0)>0)
+    {
+      j++;
+      F[j]=matrix(0,mu,1);
+      if(size(jet(F0,0))>0)
+      {
+        for(i=ncols(F0);i>=1;i--)
+        {
+          if(ord(F0[i])==0)
+          {
+            F[j]=F[j]+F0[i];
+          }
+        }
+      }
+      for(i=ncols(F0);i>=1;i--)
+      {
+        F0[i]=F0[i]/s;
+      }
+    }
+
+    I=list();
+    I0=module();
+    U0=std(0);
+    for(i=size(F);i>=1;i--)
+    {
+      I[i]=module();
+    }
+    for(i=1;i<=size(F);i++)
+    {
+      I0=reduce(F[i],U0);
+      j=i;
+      while(size(I0)>0)
+      {
+        U0=std(U0+I0);
+        I[j]=I[j]+I0;
+        I0=reduce(N*I0,U0);
+        j++;
+      }
+    }
+
+    for(i=1;i<=size(I);i++)
+    {
+      U=U+I[i];
+    }
+  }
+
+  dbprint(printlevel-voice+2,"// transform to Hodge splitting basis");
+  V=inverse(U);
+  A=V*A*U;
+  H=V*H;
+
+  dbprint(printlevel-voice+2,"// compute reduced standard basis of H''");
+  ring S=0,s,ds;
+  module H=imap(G,H);
+  degBound=k0+k1+1;
+  option("redSB");
+  H=std(H);
+  degBound=0;
+  H=simplify(jet(H,k0+k1),1);
+  setring(G);
+  H=imap(S,H);
+
+  dbprint(printlevel-voice+2,"// compute matrix A0+sA1 of t");
+  list l=division(H,s*A*H+s^2*diff(matrix(H),s));
+  A=jet(l[1],l[2],k0+k1+1);
+  A0=grmat(A,0);
+  A=grmat(A,1);
+
+  setring(R);
+  return(list(imap(G,A0),imap(G,A)));
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  poly t=x5+x2y2+y5;
+  list A=saito(t);
+  print(A[1]);
+  print(A[2]);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc endvfilt(list V)
+"USAGE:   endvwfilt(V); list V
 ASSUME:  V computed by vfilt
 RETURN:
 @format
-list V1: endomorphim filtration of V on the Jacobian algebra
-  ideal V1[1]: spectral numbers in increasing order
-  intvec V1[2]:
-    int V1[2][i]: multiplicity of spectral number V1[1][i]
-  list V1[3]:
-    module V1[3][i]: vector space basis of the V1[1][i]-th graded part
-                     in terms of V1[4]
-  ideal V1[4]: monomial vector space basis
+list EV: endomorphism V-filtration on the Jacobian algebra
+  ideal EV[1]: spectral numbers in increasing order
+  intvec EV[2]:
+    int EV[2][i]: multiplicity of spectral pair (EV[1][i],EV[2][i])
+  list EV[3]:
+    module EV[3][i]: vector space basis of the (EV[1][i],EV[2][i])-th 
+                      graded part in terms of EV[4]
+  ideal EV[4]: monomial vector space basis
+  ideal EV[5]: standard basis of Jacobian ideal
 @end format
 SEE ALSO: spectrum_lib
-KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice; spectrum;
-          Hodge filtration; V-filtration
-EXAMPLE: example endfilt; shows examples
+KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice;
+          mixed Hodge structure; V-filtration; weight filtration;
+          endomorphism filtration
+EXAMPLE: example endvwfilt; shows examples
 "
 {
   def a,d,v,m,g=V[1..5];
@@ -1268,7 +1455,7 @@ EXAMPLE: example endfilt; shows examples
       l=l+list(ideal());
     }
 
-    dbprint(printlevel-voice+2,"// collect conditions for V1["+string(b0)+"]");
+    dbprint(printlevel-voice+2,"// collect conditions for EV["+string(b0)+"]");
     j=ncols(a);
     j0=mu;
     while(j>=1)
@@ -1337,13 +1524,13 @@ EXAMPLE: example endfilt; shows examples
     }
     i++;
   }
-  return(list(a1,d1,v1,m));
+  return(list(a1,d1,v1,m,g));
 }
 example
 { "EXAMPLE:"; echo=2;
   ring R=0,(x,y),ds;
   poly t=x5+x2y2+y5;
-  endfilt(vfilt(t));
+  endvfilt(vfilt(t));
 }
 ///////////////////////////////////////////////////////////////////////////////
 
