@@ -1,32 +1,49 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: spectrum.lib,v 1.12 2001-02-02 16:21:37 mschulze Exp $";
+version="$Id: spectrum.lib,v 1.13 2001-03-20 14:18:03 mschulze Exp $";
 category="Singularities";
 info="
 LIBRARY:  spectrum.lib  Singularity Spectrum for Nondegenerate Singularities
 AUTHOR:   S. Endrass
 
 PROCEDURES:
- spectrumnd(poly[,1]);   spectrum of a nondegenerate isolated singularity
- semicont(s1,s2[,1]);    tests if s2 is semicontinous for s1
- semicontqh(s1,s2);      semicontinuity test using open and half open intervals
- spadd(s1,s2);           sum of two spectra s1 and s2
- spmul(s,k);             product of spectrum s with integer k
+ spectrumnd(poly f[,1]);  spectrum of nondegenerate isolated singularity f
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc spectrumnd (poly f, list #)
-"USAGE:   spectrumnd(f[,1]);  f poly
-ASSUME:  f has nondegenerate principal part
-RETURN:  a list containing the spectrum of f
-NOTE     if a second argument 1 is given,
-         no test for a degenerate principal part will be done
-EXAMPLE: example spectrumnd; shows examples
+proc spectrumnd (poly f,list #)
+"USAGE:    spectrumnd(f[,1]); poly f
+ASSUME:   basering has local ordering, 
+          f has isolated singularity at 0 and nondegenerate principal part
+RETURN:
+@format
+list S:
+  ideal S[1]: spectral numbers
+  intvec S[2]:
+    int S[2][i]: multiplicity of spectral number S[1][i]
+@end format
+NOTE:     if a second argument 1 is given, 
+          no test for a degenerate principal part will be done
+SEE_ALSO: gaussman_lib
+KEYWORDS: singularities; Gauss-Manin connection; spectrum
+EXAMPLE:  example spectrumnd; shows an example
 "
 {
   if(size(#)==0)
-  {  return(system("spectrum",f)); }
-  return (system("spectrum",f,#[1]));
+  {
+    list l=system("spectrum",f);
+  }
+  else
+  {
+    list l=system("spectrum",f,#[1]);
+  }
+  ideal s=number(l[4][1])/l[5][1]-1;
+  int i;
+  for(i=l[3];i>1;i--)
+  {
+    s[i]=number(l[4][i])/l[5][i]-1;
+  }
+  return(list(s,l[6]));
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -36,55 +53,15 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc semicont (list s, list ss, list #)
-"USAGE:   semicont(s,ss[,1]);  s, ss list
-RETURN:  1 if ss is semicontinous for s using half open intervals, 0 otherwise
-NOTE:    if a third argument 1 is given, open intervals are used
-EXAMPLE: example semicont; shows examples
-"
+proc semicont(list #)
 {
-  if(size(#)==0)
-  {  return(system("semic",s,ss)); }
-  return (system("semic",s,ss,#[1]));
-}
-example
-{ "EXAMPLE:"; echo = 2;
+  ERROR("semicont was replaced by spsemicont in gaussman.lib");
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc semicontsqh (list s, list ss)
-"USAGE: semicontsqh(s,ss);  s, ss list
-RETURN: 1 if ss is semicontinous for s using open and half open intervals,
-        0 otherwise
-EXAMPLE: example semicontsqh; shows examples
-"
+
+proc semicontqh(list #)
 {
-  return (system("semic",s,ss,1));
-}
-example
-{ "EXAMPLE:"; echo = 2;
+  ERROR("semicontqh was replaced by spsemicont in gaussman.lib");
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc spadd (list s1, list s2)
-"USAGE:  spadd(s1,s2);  s1, s2 list
-RETURN:  a list containing the sum of the two spectra s1 and s2
-EXAMPLE: example spadd; shows examples
-"
-{
-  return (system("spadd",s1,s2));
-}
-example
-{ "EXAMPLE:"; echo = 2;
-}
-///////////////////////////////////////////////////////////////////////////////
-proc spmul (list s, int k)
-"USAGE:  spmul(s,k);  s list, k int
-RETURN:  a list containing the product of the spectrum s with the integer k
-EXAMPLE: example spmul; shows examples
-"
-{
-  return (system("spmul",s,k));
-}
-example
-{ "EXAMPLE:"; echo = 2;
-}
-///////////////////////////////////////////////////////////////////////////////
+
