@@ -636,11 +636,14 @@ static void heBrowserHelp(heEntry hentry)
   if (kchksum  && kchksum != hentry->chksum && heOnlineHelp(hentry->key))
     return;
 
-  if (heCurrentHelpBrowser == NULL) feHelpBrowser();
-  assume(heCurrentHelpBrowser != NULL);
-  Warn("Displaying help in browser '%s'.", heCurrentHelpBrowser->browser);
-  Warn("Use 'system(\"--browser\", \"<browser>\");' to change browser");
-  Warn("Use 'system(\"browsers\");'               for available browsers");
+  if (heCurrentHelpBrowser == NULL) 
+  {
+    feHelpBrowser();
+    assume(heCurrentHelpBrowser != NULL);
+    Warn("Displaying help in browser '%s'.", heCurrentHelpBrowser->browser);
+    Warn("Use 'system(\"--browser\", \"<browser>\");' to change browser");
+    Warn("Use 'system(\"browsers\");'               for available browsers");
+  }
   heCurrentHelpBrowser->help_proc(hentry);
 }
 
