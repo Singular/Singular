@@ -1,0 +1,368 @@
+// $Id: graphics.lib,v 1.1 1998-05-13 17:26:11 Singular Exp $
+//
+// author : Christian Gorzel email: gorzelc@math.uni-muenster.de
+//
+///////////////////////////////////////////////////////////////////////////////
+version="$Id: graphics.lib,v 1.1 1998-05-13 17:26:11 Singular Exp $";
+info="
+LIBRARY: graphics.lib    PROCEDURES FOR GRAPHICS WITH MATHEMATICA
+
+ staircase(ideal I);  string of Mathematica input for displaying staircase of I
+ mathinit();          string for loading Mathematica's ImplicitPlot
+ plot(ideal I,list #);string with Mathematica text for various plots
+";
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc staircase(ideal I)
+"USAGE:   staircase(); I ideal in two variables
+RETURN:  string with Mathematica input for displaying staircase (exponent
+         vectors of initial ideal) of I
+NOTE:    ideal I should be given by a standard basis
+         Copy and paste works only in a Mathematica notebook
+EXAMPLE: example staircase; shows an example
+"
+{
+  intvec v;
+  int maxx, maxy;
+  list l;
+  string s;
+  string el;
+
+ if(nvars(basering)!=2)
+ { "-- Error: need two variables ";
+   return();
+ }
+ if (not(attrib(I,"isSB")))
+ { " -- Warning: Ideal should be a standardbasis "; newline; }
+
+ for(int i=1; i<=ncols(I); i++)
+ {
+  if (i>1) { el = el + ",";}
+  v = leadexp(I[i]);
+  if (v[1] > maxx) { maxx = v[1];}
+  if (v[2] > maxy) { maxy = v[2];}
+  el = el + "{" + string(v) + "}";
+ }
+ el = "{" + el + "}";
+ maxx = maxx + 3;
+ maxy = maxy + 3;
+
+ s = newline +
+     "Show[Graphics[{" + newline +
+     "{GrayLevel[0.5],Map[Rectangle[#,{" +
+          string(maxx) + "," + string(maxy) + "}] &, " + el + "]}," + newline +
+     "{PointSize[0.03], Map[Point," + el + "]}," + newline +
+       "Table[Circle[{i,j},0.1],{i,0," +
+           string(maxx) + "},{j,0," + string(maxy) + "}]}," + newline +
+     "  Axes->True,AspectRatio->Automatic]]";
+
+ return(s);
+}
+example
+{ "EXAMPLE:"; echo =2;
+  ring r0 = 0,(x,y),ls;
+  ideal I = -1x2y6-1x4y2, 7x6y5+1/2x7y4+6x4y6;
+  staircase(std(I));
+
+  ring r1 = 0,(x,y),dp;
+  ideal I = fetch(r0,I);
+  staircase(std(I));
+
+  ring r2 = 0,(x,y),wp(2,3);
+  ideal I = fetch(r0,I);
+  staircase(std(I));
+
+  // Paste the output into a Mathematica notebook
+  // active evalutation of the cell with SHIFT RETURN
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc mathinit()
+"USAGE:   mathinit();
+RETURN:  initializing string for loading Mathematica's ImplicitPlot
+EXAMPLE: example mathinit; shows an example
+"
+{
+  // write("init.m","<< Graphics`ImplicitPlot`");
+  return("<< Graphics`ImplicitPlot`");
+}
+example
+{ "EXAMPLE:"; echo =2;
+  mathinit();
+
+  // Paste the output into a Mathematica notebook
+  // active evalutation of the cell with SHIFT RETURN
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc checkshort()
+{
+  ring @r;
+}
+static proc determvars(ideal I)
+// determine the variables which are in the ideal I
+{
+  intvec v;
+  int i,j,k;
+
+  k=1;
+  for(j=1;j<=size(I);j++)
+  { for(i=1;i<=nvars(basering);i++)
+    { if(I[j]!=subst(I[j],var(i),0)) {v[k] = i; k++;}
+    }
+  }
+  ring @r=0,x,ls;
+  poly f;
+  for(i=1;i<=size(v);i++)     // sort VARS
+  { f = f + x^v[i]; }
+  v=0;
+  for (i=1;i<=size(f);i++)
+  {v[i]=leadexp(f[i])[1];}
+ return(v);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc  plot(ideal I,list #)
+"USAGE:   plot(I[,#]); I ideal , #  strings representing the plot region or
+                                   further ideals
+RETURN:  string, text with Mathematica commands to display a plot
+NOTE:    The plotregion is defaulted to -1,1 around zero
+         (mostly interested in local situation in singularity theory)
+         For implicit given curves enter first the string returned by
+         proc mathinit into Mathematica in order to load ImplicitPlot
+
+         ideal with 2 entries in one variable means a parametrised plane curve
+         ideal with 3 entries in one variable means a parametrised space curve
+         ideal with 3 entries in two variables means a parametrised surface
+
+         ideal I with 2 generators in two variables means an implicit curve
+          given as I[1]==I[2]
+         ideal with 1 generator (or one polynomial) in two variables means
+          an implicit curve given as  f == 0
+
+EXAMPLE: example plot; shows an example
+"
+{
+  int i,j,k,mapping;
+  int planecurve,spacecurve,implcrv,surface;
+  intvec VARS,v;
+  string xpart,ypart,zpart = "-1,1","-1,1","All";
+  string pstring,actstring,xname,yname,str,closing;
+  string basr = nameof(basering);
+  ideal J;
+
+  ring @r = 0,(s,t),lp;
+  ideal @J,@I;
+
+  setring(`basr`);
+  // def d = basering;
+  // d;
+  // listvar(d);
+
+  str = newline;
+
+  VARS = determvars(I);
+   // "VARS: ";VARS;
+
+  if (size(matrix(I))==1 and size(VARS)==2)
+  { i =size(I[1]);
+   //I[2]=I[1][(i/ 2 + 1)..i]; I[2];
+   // I[1]=I[1][1..(i/ 2)]; I[1];
+   I[2]=0;
+  }
+  if (size(matrix(I))==2)
+  { if (size(VARS)==1) {planecurve=1; str = str + "ParametricPlot[";}
+    if (size(VARS)==2) {implcrv=1; str = str + "ImplicitPlot[";}
+  }
+  if (size(matrix(I))==3)
+  { if (size(VARS)==1) {spacecurve=1;}
+    if (size(VARS)==2) {surface=1;}
+    str =  str + "ParametricPlot3D[";
+  }
+
+  short = 0;
+
+  pstring = string(I);
+
+ // switch to another ring if necessary
+
+  checkshort();
+//  "short: "; short;
+
+  if (short!=1)      // construct a map
+  {
+    mapping = 1;
+    setring @r;
+    @J = 0;
+    for(i=1;i<=size(VARS);i++)
+    { @J[VARS[i]]=var(i);}
+    map phi = (`basr`,@J);
+    @I = phi(I);
+    short =0;
+    pstring = string(@I);
+    setring `basr`;
+  }
+
+  i = find(pstring,newline);
+  while(i)
+  {pstring[i]=" ";
+   i = find(pstring,newline,i);
+  }
+  if (implcrv)
+  { i = find(pstring,",");
+    pstring = pstring[1,i-1] + "==" + pstring[i+1,size(pstring)-i];
+  }
+  else
+  { pstring = "{" + pstring + "}";}
+//  "mapping "; mapping;
+  if (mapping)
+  { xname = "s";
+    if (size(VARS)==2) {yname="t";}
+  }
+  else
+  { xname = varstr(VARS[1]);
+    if (size(VARS)==2) {yname=varstr(VARS[2]);}
+  }
+
+  j =1;
+
+  for(k=1;k<=size(#);k++)
+  { if (typeof(#[k])=="ideal" or typeof(#[k])=="poly")
+    { //#[k] = ideal(#[k]);
+      v = determvars(#[k]);
+      J = #[k];
+      short =0;
+      if (size(matrix(J))==1 and size(VARS)==2 and implcrv)
+      { i =size(J[1]);
+      //  J[2]=J[1][(i/ 2 + 1)..i];
+      //  J[1]=J[1][1..(i/ 2)];
+        J[2] =0;
+      }
+      if ((v!= VARS) or (size(J)!=size(I)))
+      { print("--Error: ---- ");
+        return();
+      }
+      else
+      { if (mapping)
+        { setring @r;
+          short =0;
+          actstring = string(phi(J));
+          setring(`basr`);
+        }
+        else {actstring = string(J);}
+        i = find(actstring,newline);
+        while(i)
+        { actstring[i]=" ";
+         i = find(actstring,newline,i);
+        }
+        if (implcrv)
+        {i = find(actstring,",");
+         actstring = actstring[1,i-1]+ "==" + actstring[i+1,size(actstring)-i];
+         pstring = pstring + "," + actstring;
+        }
+        else
+        { pstring = pstring + ",{" + actstring +"}";
+        }
+
+      }
+    }
+    if (typeof(#[k])=="string")
+    {  if (j==3) {zpart = #[k];j++;}
+       if (j==2) {ypart = #[k];j++;}
+       if (j==1) {xpart = #[k];j++;}
+   }
+  }
+
+ if (spacecurve or planecurve or implcrv)
+ { str = str + "{" + pstring + "},{" + xname + "," + xpart + "}";}
+ if (implcrv and (j==3)) {str = str + ",{" + yname + "," + ypart + "}";}
+ if (surface)
+ { str = str + "{" + pstring + "},{" + xname + "," + xpart + "},{"
+                                     + yname + "," + ypart + "}";}
+
+  if (planecurve) {closing = "," + newline +" AspectRatio->Automatic";}
+  if (implcrv) {closing = "," + newline +
+   " AxesLabel->{\"" + varstr(VARS[1]) + "\",\"" + varstr(VARS[2]) + "\"}";}
+  if (spacecurve) { closing = "," + newline + " ViewPoint->{1.3,-2.4,2}";}
+  if (surface)
+  {closing = "," +newline +
+              " Boxed->True, Axes->True, ViewPoint->{1.3,-2.4,2}";}
+
+  str = str + closing + "];";
+
+  return(str);
+}
+example
+{ "EXAMPLE:"; echo =2;
+   // ---------  plane curves ------------
+   ring rr0 = 0,x1,dp; export rr0;
+
+   ideal I = x1^3 + x1, x1^2;
+   ideal J = x1^2,-x1+x1^3; "";
+   plot(J); "";
+   plot(I,"-2,2",J);
+
+   ring rr1 = 0,x,dp;  export rr1;
+   ideal I(1) = 2x2-1/2x3 +1, x-1;
+   ideal I(2) = x3-x ,x; "";
+   plot(I(1),I(2),"-2,4");
+
+ // Paste the output into a Mathematica notebook
+ // active evalutation of the cell with SHIFT RETURN
+
+ // Hit RETURN to continue
+ pause;
+   // --------- space curves --------------
+   I(1) = x3,-1/10x3+x2,x2;
+   I(2) = x2,-x2+2,-2x2-x+1; "";
+   plot(I(1),I(2));
+
+ // Paste the output into a Mathematica notebook
+ // active evalutation of the cell with SHIFT RETURN
+
+ // Hit RETURN to continue
+ pause;
+   // --------- implicit curves ------------
+   ring rr = 0,(x,y),ds;  export rr;
+   // implicit curves
+   ideal I(1) = y,-x2;
+   ideal I(2) = x2,-y2 +4; "";
+
+   //the lemniscate
+
+   ideal I(3) = x4+2x2y2 + y4, x2-y2;  "";
+
+   // a critical part
+   // adjust the plotregion properly to get a good picture
+
+   poly f = (x-y)*(x2+y);
+   plot(f); "";
+   ideal J = jacob(f);
+   J; "";
+   plot(J[1],J[2]);     // bad resolution
+   "";
+   plot(J[1],J[2],"-10,10","-10,10");  // get better picture in this way
+
+   plot(I(1),I(2),"-2.5,2.5"); "";
+
+   plot(I(3),"-2,2");
+
+ // Paste the output into a Mathematica notebook
+ // active evalutation of the cell with SHIFT RETURN
+
+ // Hit RETURN to continue
+ pause;
+   // ----------- surfaces -------------------
+   ideal J(1) = 3xy4 + 2xy2, x5y3 + x + y6,10x2;
+
+   // the Whitney-Umbrella
+
+   ideal J(2) = xy,y,x2; "";
+   plot(J(1),"-2,1","1,2");  "";
+   plot(J(2),"-1.5,1.5","-2,2");
+
+ // Paste the output into a Mathematica notebook
+ // active evalutation of the cell with SHIFT RETURN
+}
+///////////////////////////////////////////////////////////////////////////////
+
+
