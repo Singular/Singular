@@ -1,4 +1,4 @@
-version="$Id: control.lib,v 1.13 2004-08-11 09:59:59 plural Exp $";
+version="$Id: control.lib,v 1.14 2004-08-11 12:43:38 levandov Exp $";
 category="Miscellaneous";
 info="
 LIBRARY:  control.lib Procedures for System and Control Theory 
@@ -23,6 +23,30 @@ ncdetection(ring r);          computes an ideal, presenting an involution map on
 involution(m, map theta);    applies the involution, presented by theta to m of type poly, vector, ideal, module;
 declare(string NameOfRing, Variables[,string  Parameters, Ordering]);     defines the ring, optional parametes are strings of parameters and ordering,
 view();                      Well-formatted output of lists, modules and matrixes
+
+NOTE (EXAMPLES): In order to use examples below, execute the commands
+@* def A = exAntenna(); setring A; 
+@* Thus A will become a basering from the example with the predefined module R (transposed), corresponding to the system. 
+After that you can just type in 
+@* control(R); //respectively autonom(R); 
+and check the result.
+
+
+EXAMPLES (AUTONOMY):
+
+exCauchy();                  example of 1-dimensional Cauchy equation,
+exCauchy2();                 example of 2-dimensional Cauchy equation,
+exZerz();                    example from the lecture of Eva Zerz,
+
+EXAMPLES (CONTROLLABILITY):
+
+ex1();                       example of noncontrollable system,   
+ex2();                       example of controllable system ,
+exAntenna();                 Antenna,
+exEinstein();                Einstein equations,
+exFlexibleRod();             Flexible Rod,
+exTwoPendula();              Two Pendula,
+exWindTunnel();              Wind Tunnel. 
 ";
 
 // NOTE: static things should not be shown for end-user
@@ -536,27 +560,6 @@ example
 //----------------------------------------------------------------------------
 //autonomy:
 //
-proc exAut1()
-{  
-  ring @r=0,(s1,s2,s3),dp;
-  module R=[0,-s3,s2],
-           [s3,0,-s1];
-  R=transpose(R);	   
-  export R;
-  return(@r);
-};
-//----------------------------------------------------------------------------
-proc exAut2()
-{
-  ring @r=0,(s1,s2,s3),dp;
-  module R = [0,-s3,s2],
-             [s3,0,-s1],
-	     [-s2,s1,0];
-  R=transpose(R);
-  export R;
-  return(@r);	    
-};  
-
 //----------------------------------------------------------------------------
 proc exCauchy()
 {
@@ -580,7 +583,7 @@ proc exCauchy2()
   return(@r);	    
 }; 
 //----------------------------------------------------------------------------
-proc exEvasLecture()
+proc exZerz()
 { 
   ring @r=0,(d1,d2),dp;
   module R=[d1^2-d2],
