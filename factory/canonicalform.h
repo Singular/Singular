@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.h,v 1.8 1997-06-30 15:39:26 schmidt Exp $ */
+/* $Id: canonicalform.h,v 1.9 1997-07-16 10:17:10 schmidt Exp $ */
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
@@ -80,6 +80,7 @@ public:
     CanonicalForm deriv() const;
     CanonicalForm deriv( const Variable & x ) const;
     CanonicalForm sqrt() const;
+    int ilog2() const;
     static CanonicalForm genCoeff( int what, int i = 0 );
 
     CanonicalForm genZero() const;
@@ -249,6 +250,18 @@ sqrt ( const CanonicalForm & a )
     return a.sqrt();
 }
 
+//{{{ inline int ilog2 ( const CanonicalForm & a )
+//{{{ docu
+//
+// ilog2() - inline function version of method ilog().
+//
+//}}}
+inline int
+ilog2 ( const CanonicalForm & a )
+{
+    return a.ilog2();
+}
+//}}}
 
 CanonicalForm psr ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x  );
 
