@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.102 1999-09-20 17:45:55 Singular Exp $
+@comment $Id: types.doc,v 1.103 1999-09-20 19:41:23 obachman Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -2932,10 +2932,15 @@ defines a polynomial.
   poly s3  = 5/4x4y2+4/5*x*y^5+2x2y2z3+y7+11x10;
   int a,b,c,t=37,5,4,1;
   poly f=3*x^a+x*y^(b+c)+t*x^a*y^b*z^c;
+  f;
+  short = 0;
+  f;
 @c example
 @end smallexample
 @end table
-
+@c ref
+@ref{short}
+@c ref
 @c ------------------------------
 @node poly expressions, poly operations, poly declarations, poly
 @subsection poly expressions

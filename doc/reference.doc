@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.151 1999-09-20 18:21:22 obachman Exp $
+@comment $Id: reference.doc,v 1.152 1999-09-20 19:41:22 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -677,7 +677,6 @@ close(l); // shut down SINGULAR server
 @end smallexample
 @end table
 @c ref
-See
 @ref{link};
 @ref{open}.
 @c ref
@@ -1593,7 +1592,7 @@ resp.@: parameters.
 from a reduced Groebner basis with respect to a degree ordering. This
 can be much faster than computing a lexicographical Groebner basis
 directly.
-@c @item @strong{Example:}
+@item @strong{Example:}
 @smallexample
 @c example
   ring r=0,(x,y,z),dp;
@@ -1608,7 +1607,6 @@ directly.
 @end smallexample
 @end table
 @c ref
-See
 @ref{ring};
 @ref{qring};
 @ref{std};
@@ -1664,7 +1662,6 @@ in the string or 0 (if not found),
 @end smallexample
 @end table
 @c ref
-See
 @ref{string}.
 @c ref
 @c ---------------------------------------
@@ -5921,13 +5918,13 @@ execute "ideal k="+s+";"; // this defines an ideal k which
 @end smallexample
 @end table
 @c ref
-See
 @ref{read};
 @ref{link};
 @ref{Data types};
 @ref{quote};
 @ref{eval};
-@ref{dump}.
+@ref{dump};
+@ref{short}.
 @c ref
 
 

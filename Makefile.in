@@ -134,6 +134,7 @@ GFTABLESDIR_NAME= Singular/${S_VERSION}/LIB/gftables
 DOCDIR_NAME 	= Singular/${S_VERSION}/doc
 HTMLDIR_NAME	= Singular/${S_VERSION}/html
 INFODIR_NAME	= Singular/${S_VERSION}/info
+EMACSDIR_NAME	= Singular/${S_VERSION}/emacs
 
 BINDIST_NAME	= Singular-${S_VERSION}-${SINGUNAME}
 SHAREDIST_NAME  = Singular-${S_VERSION}-share
@@ -145,12 +146,14 @@ test_t:
 .PHONY: sharedist bindist static-bindist infodist win-sharedist
 sharedist: ${SINGULAR}
 	cd doc; ${MAKE} all ps
+	cd emacs; ${MAKE} all
 	rm -rf ${TMPDIR}/
 	${MKINSTALLDIRS} ${TMPDIR}/${LIBDIR_NAME}
 	${MKINSTALLDIRS} ${TMPDIR}/${GFTABLESDIR_NAME}
 	${MKINSTALLDIRS} ${TMPDIR}/${DOCDIR_NAME}
 	${MKINSTALLDIRS} ${TMPDIR}/${HTMLDIR_NAME}
 	${MKINSTALLDIRS} ${TMPDIR}/${INFODIR_NAME}
+	${MKINSTALLDIRS} ${TMPDIR}/${EMACSDIR_NAME}
 	cp Singular/LIB/*.lib ${TMPDIR}/${LIBDIR_NAME}
 	rm -f ${TMPDIR}/${LIBDIR_NAME}/tst.lib 
 	cp Singular/LIB/gftables/[0-9]* ${TMPDIR}/${GFTABLESDIR_NAME}
@@ -159,6 +162,7 @@ sharedist: ${SINGULAR}
            ${TMPDIR}/${DOCDIR_NAME}
 	cp doc/singular.hlp ${TMPDIR}/${INFODIR_NAME}
 	cp -R doc/html/* ${TMPDIR}/${HTMLDIR_NAME}
+	cp emacs/*.el ${TMPDIR}/${EMACSDIR_NAME}
 	chmod -R  a+rX  ${TMPDIR}/Singular
 	cd ${TMPDIR}; \
 	    ${ZIP} -r ${SHAREDIST_NAME} Singular; \
