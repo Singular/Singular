@@ -416,6 +416,12 @@ OBJB=$(OBJB1) $(OBJB2)
 OBJT=$(OBJT1) $(OBJT2)
 OBJA=$(OBJA1) $(OBJA2)
 
+ifeq ($(DL_KERNEL),1)
+OBJG 	:= $(OBJG) $(DL_KERNEL_SOURCES:.cc=.og)
+else
+OBJG := $(OBJG) $(STATIC_SOURCES:.cc=.og) 
+endif
+
 ##
 ## compiler and linker options for debug version
 ##
