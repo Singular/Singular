@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.13 1999-07-08 10:18:11 wenk Exp $ */
+/* $Id: mpr_complex.cc,v 1.14 1999-07-08 17:17:23 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -13,6 +13,7 @@
 
 #include "mod2.h"
 //#ifdef HAVE_MPR
+#include "tok.h"
 #include "structs.h"
 #include "febase.h"
 #include "mmemory.h"
@@ -278,12 +279,10 @@ char *nicifyFloatStr( char * in, mp_exp_t exponent, size_t oprec, int *size, int
   if ( strlen(in) == 0 )
   {
     *size= 2*sizeof(char);
-    out= (char*)AllocL( *size );
-    strcpy(out,"0");
-    return out;
+    return mstrdup("0");
   }
 
-  if ( ((unsigned int)abs(exponent) <= oprec)
+  if ( ((unsigned int)ABS(exponent) <= oprec)
        /*|| (exponent+sign >= (int)strlen(in))*/ )
   {
     if ( exponent+sign < (int)strlen(in) )
