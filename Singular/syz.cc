@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.6 1997-10-19 11:34:27 Singular Exp $ */
+/* $Id: syz.cc,v 1.7 1997-11-11 15:46:40 siebert Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -329,7 +329,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
     }
     else
       res[syzIndex+1] = idSyzygies(res[syzIndex],currQuotient,hom,&w1);
-    completeMinim=(syzIndex!=maxlength) || (maxlength ==-1);
+    completeMinim=(syzIndex!=maxlength) || (maxlength ==-1) || (hom!=isHomog);
     syzIndex++;
     if (TEST_OPT_PROT) Print("[%d]\n",syzIndex);
     if ((minim)||(syzIndex>1))

@@ -1712,7 +1712,7 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
     }
   }
   else
-    r=sySchreyerResolvente((ideal)u->Data(),maxl,&l);
+    r=sySchreyerResolvente((ideal)u->Data(),maxl+1,&l);
   if (r==NULL) return TRUE;
   res->data=(void *)liMakeResolv(r,l,wmaxl,u->Typ(),weights);
   return FALSE;
@@ -3801,7 +3801,7 @@ static BOOLEAN jjRES3(leftv res, leftv u, leftv v, leftv w)
     }
   }
   else
-    r=sySchreyerResolvente((ideal)u->Data(),maxl,&l);
+    r=sySchreyerResolvente((ideal)u->Data(),maxl+1,&l);
   if (r==NULL) return TRUE;
   int t3=u->Typ();
   iiMakeResolv(r,l,wmaxl,w->name,t3,weights);
