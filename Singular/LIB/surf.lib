@@ -1,6 +1,6 @@
 //last change: 02.03.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surf.lib,v 1.20 2001-08-27 14:48:01 Singular Exp $";
+version="$Id: surf.lib,v 1.21 2002-07-17 08:49:08 keilen Exp $";
 category="Visualization";
 info="
 LIBRARY: surf.lib    Procedures for Graphics with Surf
@@ -46,6 +46,7 @@ NOTE: requires the external program 'surf' to be installed
 EXAMPLE: example plot; shows an example
 "
 {
+  string extra_surf_opts=" -x "; // remove this line for surf 0.9
   string l="/tmp/surf"+string(system("pid"));
   string err_mes; // string containing error messages
   def base=basering;
@@ -75,7 +76,7 @@ EXAMPLE: example plot; shows an example
   }
   ideal I=simplify(phi(I),2);
   if (leadcoef(I[1]) <0) { I[1]=-I[1]; }
-  if (ncols(I)==1 and n<=2) // curve
+  if (ncols(I)==1 and n<=2 and nvars(base)!=3) // curve
   {
     write(":w "+l,"clip=none;");
       write(l, "width=500; height=500; set_size; do_background=yes;
@@ -92,7 +93,7 @@ background_red=255; background_green=255; background_blue=255;");
   }
   else
   {
-    if (ncols(I)==1 and n==3) // surface
+    if (ncols(I)==1 and (n==3 or nvars(base)==3)) // surface
     {
       write(":w "+l,
       "root_finder=d_chain_bisection;epsilon=0.0000000001;iterations=20000;");
