@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.4 1997-03-27 12:42:43 Singular Exp $ */
+/* $Id: grammar.y,v 1.5 1997-03-27 20:23:39 obachman Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -295,6 +295,17 @@ lines:
               writeTime("used time:");
               startTimer();
             }
+            #ifdef HAVE_RTIMER
+            if (rtimerv
+            #ifdef SIC
+            && (!sic)
+            #endif
+            )
+            {
+              writeRTime("used real time:");
+              startRTimer();
+            }
+            #endif
             prompt_char = '>';
             currid = NULL;
             if (errorreported)
@@ -332,7 +343,7 @@ pprompt:
         | EXIT_CMD
           {
             ifswitch[voice]=0;
-            /*Print("exit found\n");*/
+            /* Print("exit found\n"); */
             YYACCEPT;
           }
         | SYS_BREAK

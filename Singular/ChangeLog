@@ -1,6 +1,17 @@
+Thu Mar 27 21:20:20 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* added real time timer (rtimer) analog to timer
+
+	* added command-line option "-d ticks_per_second" and "-m
+	  min_displayed_time_in_sec" and chahnged timer accordingly
+
+	* added some #ifdef HAVE_FGLM in fglm*.cc 
+	
+
 Wed Mar 26 14:02:15 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
 	* added reference counter to links, updated slKill, slCopy, slInit
+	* various small bug fixes for Batch mode
 
 Mon Mar 24 14:27:26 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 

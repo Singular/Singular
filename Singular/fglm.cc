@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.cc,v 1.6 1997-03-27 16:09:55 Singular Exp $ 
+// $Id: fglm.cc,v 1.7 1997-03-27 20:23:36 obachman Exp $ 
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -18,6 +18,8 @@
 #include <iostream.h>
 #endif
 #include "mod2.h"
+
+#ifdef HAVE_FGLM
 #include "tok.h"
 #include "structs.h"
 #include "polys.h"
@@ -311,6 +313,7 @@ fglmProc( leftv result, leftv first, leftv second )
 	return TRUE;
 }
 
+#endif
 // ----------------------------------------------------------------------------
 // Local Variables: ***
 // compile-command: "make Singular" ***

@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmvec.cc,v 1.2 1997-03-26 17:07:21 Singular Exp $
+// $Id: fglmvec.cc,v 1.3 1997-03-27 20:23:37 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -13,6 +13,8 @@
 */
 
 #include "mod2.h"
+
+#ifdef HAVE_FGLM
 #include "mmemory.h"
 #include "structs.h"
 #include "numbers.h"
@@ -463,6 +465,7 @@ fglmVector::clearDenom()
     return theLcm;
 }
 
+#endif
 // ----------------------------------------------------------------------------
 // Local Variables: ***
 // compile-command: "make Singular" ***

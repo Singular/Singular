@@ -1,8 +1,15 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/ipassign.cc,v 1.4 1997-03-26 14:57:56 obachman Exp $";
+static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/ipassign.cc,v 1.5 1997-03-27 20:23:41 obachman Exp $";
 /* $Log: not supported by cvs2svn $
+// Revision 1.4  1997/03/26  14:57:56  obachman
+// Wed Mar 26 14:02:15 1997  Olaf Bachmann
+// <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+//
+// 	* added reference counter to links, updated slKill, slCopy, slInit
+// 	* various small bug fixes for Batch mode
+//
 // Revision 1.2  1997/03/21  13:19:03  Singular
 // fixed assignment of lists, det(constants), comparision of intmats
 //
@@ -79,6 +86,14 @@ static BOOLEAN jjTIMER(leftv res, leftv a)
   initTimer();
   return FALSE;
 }
+#ifdef HAVE_RTIMER
+static BOOLEAN jjRTIMER(leftv res, leftv a)
+{
+  rtimerv=(int)a->Data();
+  initRTimer();
+  return FALSE;
+}
+#endif
 static BOOLEAN jjMAXDEG(leftv res, leftv a)
 {
   Kstd1_deg=(int)a->Data();
@@ -462,6 +477,9 @@ struct sValAssign_sys dAssign_sys[]=
 ,{jjPRINTLEVEL, VPRINTLEVEL,    INT_CMD }
 ,{jjCOLMAX,     VCOLMAX,        INT_CMD }
 ,{jjTIMER,      VTIMER,         INT_CMD }
+#ifdef HAVE_RTIMER
+,{jjRTIMER,     VRTIMER,        INT_CMD }
+#endif 
 ,{jjMAXDEG,     VMAXDEG,        INT_CMD }
 ,{jjMAXMULT,    VMAXMULT,       INT_CMD }
 ,{jjTRACE,      TRACE,          INT_CMD }

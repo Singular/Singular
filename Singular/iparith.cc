@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: iparith.cc,v 1.11 1997-03-27 15:49:02 Singular Exp $";
+static char rcsid[] = "$Id: iparith.cc,v 1.12 1997-03-27 20:23:40 obachman Exp $";
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
@@ -294,6 +294,9 @@ cmdnames cmds[] =
   { "printlevel",  0, VPRINTLEVEL ,       SYSVAR},
   { "short",       0, VSHORTOUT ,         SYSVAR},
   { "timer",       0, VTIMER ,            SYSVAR},
+#ifdef HAVE_RTIMER
+  { "rtimer",      0, VRTIMER,            SYSVAR},
+#endif
   { "TRACE",       0, TRACE ,             SYSVAR},
   { "voice",       0, VOICE ,             SYSVAR},
 
@@ -1972,8 +1975,10 @@ struct sValCmd2 dArith2[]=
 #endif
 ,{jjFETCH,     FETCH_CMD,      ANY_TYPE/*set by p*/,RING_CMD,  ANY_TYPE }
 ,{jjFETCH,     FETCH_CMD,      ANY_TYPE/*set by p*/,QRING_CMD, ANY_TYPE }
+#ifdef HAVE_FGLM 
 ,{fglmProc,    FGLM_CMD,       IDEAL_CMD,      RING_CMD,   DEF_CMD }
 ,{fglmProc,    FGLM_CMD,       IDEAL_CMD,      QRING_CMD,  DEF_CMD }
+#endif 
 ,{jjFIND2,     FIND_CMD,       INT_CMD,        STRING_CMD, STRING_CMD }
 ,{jjGCD_I,     GCD_CMD,        INT_CMD,        INT_CMD,    INT_CMD }
 #ifdef HAVE_LIBFACTORY

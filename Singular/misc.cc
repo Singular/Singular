@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: misc.cc,v 1.2 1997-03-24 14:25:22 Singular Exp $";
+static char rcsid[] = "$Id: misc.cc,v 1.3 1997-03-27 20:23:42 obachman Exp $";
 /*
 * ABSTRACT:
 */
@@ -44,6 +44,9 @@ int inits(void)
 /*4 randomize: */
   t=initTimer();
   /*t=(int)time(NULL);*/
+#ifdef HAVE_RTIMER
+  initRTimer();
+#endif
 #ifdef buildin_rand
   siSeed=t;
 #else
