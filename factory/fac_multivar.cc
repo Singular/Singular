@@ -1,15 +1,18 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_multivar.cc,v 1.1 1996-07-23 09:18:35 stobbe Exp $
+// $Id: fac_multivar.cc,v 1.2 1996-12-05 18:24:54 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1996/07/23 09:18:35  stobbe
+Version in work.
+
 Revision 1.0  1996/05/17 10:59:45  stobbe
 Initial revision
 
 */
 
-#define TIMING
-#undef DEBUGOUTPUT
+#undef TIMING
+#define DEBUGOUTPUT
 
 #include "timing.h"
 
@@ -22,12 +25,13 @@ Initial revision
 #include "fac_util.h"
 #include "cf_binom.h"
 #include "cf_iter.h"
+#include "fac_distrib.h"
 
 
 TIMING_DEFINE_PRINT(fac_content);
 TIMING_DEFINE_PRINT(fac_findeval);
 TIMING_DEFINE_PRINT(fac_distrib);
-
+TIMING_DEFINE_PRINT(fac_hensel);
 
 static CFArray
 conv_to_factor_array( const CFFList & L )
@@ -83,35 +87,36 @@ coeffBound ( const CanonicalForm & f, int p )
     return modpk( p, k );
 }
 
-static bool
-nonDivisors ( CanonicalForm omega, CanonicalForm delta, const CFArray & F, CFArray & d )
-{
-    DEBOUTLN( cerr, "nondivisors omega = ", omega );
-    DEBOUTLN( cerr, "nondivisors delta = ", delta );
-    DEBOUTLN( cerr, "nondivisors F = ", F );
-    CanonicalForm q, r;
-    int k = F.size();
-    d = CFArray( 0, k );
-    d[0] = delta * omega;
-    for ( int i = 1; i <= k; i++ ) {
-	q = abs(F[i]);
-	for ( int j = i-1; j >= 0; j-- ) {
-	    r = d[j];
-	    do {
-		r = gcd( r, q );
-		q = q / r;
-	    } while ( r != 1 );
-	    if ( q == 1 )
-		return false;
-	}
-	d[i] = q;
-    }
-    return true;
-}
+// static bool
+// nonDivisors ( CanonicalForm omega, CanonicalForm delta, const CFArray & F, CFArray & d )
+// {
+//     DEBOUTLN( cerr, "nondivisors omega = ", omega );
+//     DEBOUTLN( cerr, "nondivisors delta = ", delta );
+//     DEBOUTLN( cerr, "nondivisors F = ", F );
+//     CanonicalForm q, r;
+//     int k = F.size();
+//     d = CFArray( 0, k );
+//     d[0] = delta * omega;
+//     for ( int i = 1; i <= k; i++ ) {
+// 	q = abs(F[i]);
+// 	for ( int j = i-1; j >= 0; j-- ) {
+// 	    r = d[j];
+// 	    do {
+// 		r = gcd( r, q );
+// 		q = q / r;
+// 	    } while ( r != 1 );
+// 	    if ( q == 1 )
+// 		return false;
+// 	}
+// 	d[i] = q;
+//     }
+//     return true;
+// }
 
 static void
 findEvaluation ( const CanonicalForm & U, const CanonicalForm & V, const CanonicalForm & omega, const CFFList & F, Evaluation & A, CanonicalForm & U0, CanonicalForm & delta, CFArray & D, int r )
 {
+    DEBINCLEVEL( cerr, "findEvaluation" );
     CanonicalForm Vn;
     CFFListIterator I;
     int j;
@@ -123,27 +128,28 @@ findEvaluation ( const CanonicalForm & U, const CanonicalForm & V, const Canonic
 	Vn = A( V );
 	if ( Vn != 0 ) {
 	    U0 = A( U );
-	    DEBOUTLN( cerr, "findev U0 = ", U0 );
+	    DEBOUTLN( cerr, "U0 = ", U0 );
 	    if ( isSqrFree( U0 ) ) {
 		delta = content( U0 );
-		DEBOUTLN( cerr, "findev content( U0 ) = ", delta );
+		DEBOUTLN( cerr, "content( U0 ) = ", delta );
 		for ( I = F, j = 1; I.hasItem(); I++, j++ )
 		    FF[j] = A( I.getItem().factor() );
 		found = nonDivisors( omega, delta, FF, D );
 	    }
 	    else {
-		DEBOUTLN( cerr, "findev not sqrfree :", sqrFree( U0 ) );
+		DEBOUTLN( cerr, "not sqrfree :", sqrFree( U0 ) );
 	    }
 	}
 	if ( ! found )
 	    A.nextpoint();
     }
+    DEBDECLEVEL( cerr, "findEvaluation" );
 }
 
 static CFArray
 ZFactorizeMulti ( const CanonicalForm & arg )
 {
-    DEBOUTLN( cerr, "MULTIFACTOR START ----------------------------------- level = ", arg.level() );
+    DEBINCLEVEL( cerr, "ZFactorizeMulti" );
     CFMap M;
     CanonicalForm UU, U = compress( arg, M );
     CanonicalForm delta, omega, V = LC( U, 1 );
@@ -158,14 +164,13 @@ ZFactorizeMulti ( const CanonicalForm & arg )
     modpk b;
     bool negate = false;
 
-#ifdef DEBUGOUTPUT
-    cerr << "fac U = " << U << endl;
-    for ( i = 1; i <= level( U ); i++ )
-	cerr << "fac deg(U," << Variable(i) << ") = "
-	     << degree( U, Variable(i) ) << endl
-	     << "fac lc(U," << Variable(i) << ") = "
-	     << LC( U, Variable(i) ) << endl;
-#endif
+    DEBOUTLN( cerr, "-----------------------------------------------------", ' ' );
+    DEBOUTLN( cerr, "trying to factorize U = ", U );
+    DEBOUTLN( cerr, "U is a polynomial of level = ", arg.level() );
+    DEBOUTLN( cerr, "U will be factorized with respect to variable ", Variable(1) );
+    DEBOUTLN( cerr, "the leading coefficient of U with respect to that variable is ", V );
+    DEBOUTLN( cerr, "which is factorized as ", F );
+
     maxdeg = 0;
     for ( i = 2; i <= t; i++ ) {
 	j = U.degree( Variable( i ) );
@@ -190,100 +195,63 @@ ZFactorizeMulti ( const CanonicalForm & arg )
 //    for ( i = 0; i < 10*t; i++ )
 //	A.nextpoint();
 
-    DEBOUTLN( cerr, "---------------------------------------", ' ' );
-
     while ( ! goodeval ) {
 	TIMING_START(fac_findeval);
 	findEvaluation( U, V, omega, F, A, U0, delta, D, r );
 	TIMING_END(fac_findeval);
-	DEBOUTLN( cerr, "fac evaluation = ", A );
+	DEBOUTLN( cerr, "the evaluation point to reduce to an univariate problem is ", A );
+	DEBOUTLN( cerr, "corresponding delta = ", delta );
+	DEBOUTLN( cerr, "              omega = ", omega );
+	DEBOUTLN( cerr, "              D     = ", D );
+	DEBOUTLN( cerr, "now factorize the univariate polynomial ", U0 );
 	G = conv_to_factor_array( factorize( U0, false ) );
-	DEBOUTLN( cerr, "fac fac(U0) = ", G );
+	DEBOUTLN( cerr, "which factorizes into ", G );
 	b = coeffBound( U, getZFacModulus().getp() );
-#ifdef DEBUGOUTPUT
-	cerr << "p^k(" << U.level() << ") = " << b.getp() << "^" << b.getk() << endl;
-	cerr << "(fac: U  = " << U << endl
-	     << "      U0 = " << U0 << endl
-	     << "      V  = " << V << endl
-	     << "      F  = " << F << endl
-	     << "      a  = " << A << endl
-	     << "      d  = " << delta << endl
-	     << "      b  = " << b.getp() << "^" << b.getk() << endl
-	     << "      ub = " << b.getp() << "^" << getZFacModulus().getk() << endl
-	     << "      G  = " << G << endl
-	     << "      D  = " << D << " )" << endl;
-#endif
-	r = G.size();
-	DEBOUTLN( cerr, "fac SIZE OF UNIFAC = ", r );
-	lcG = CFArray( 1, r );
-	for ( j = 1; j <= r; j ++ )
-	    lcG[j] = 1;
+	if ( getZFacModulus().getpk() > b.getpk() )
+	    b = getZFacModulus();
+	DEBOUTLN( cerr, "the coefficient bound of the factors of U is ", b.getpk() );
 
+	r = G.size();
+	lcG = CFArray( 1, r );
+	UU = U;
+	DEBOUTLN( cerr, "now trying to distribute the leading coefficients ...", ' ' );
 	TIMING_START(fac_distrib);
-	goodeval = true;
-	for ( I = F; goodeval && I.hasItem(); I++ ) {
-	    ft = A( I.getItem().factor() );
-	    m = I.getItem().exp();
-	    j = 1;
-	    while ( m > 0 && j <= r ) {
-		ut = lc( G[j] ) * delta;
-		while ( m > 0 && divides( ft, ut ) ) {
-		    m--; ut /= ft;
-		    lcG[j] *= I.getItem().factor();
-		}
-		j++;
-	    }
-	    goodeval = (m == 0);
-	}
+	goodeval = distributeLeadingCoeffs( UU, G, lcG, F, D, delta, omega, A, r );
 	TIMING_END(fac_distrib);
+#ifdef DEBUGOUTPUT
 	if ( goodeval ) {
-	    if ( delta != 1 ) {
-		for ( j = 1; j <= r; j++ ) {
-		    gt = A( lcG[j] );
-		    d = gcd( gt, lc( G[j] ) );
-		    lcG[j] *= lc( G[j] ) / d;
-		    gt /= d;
-		    G[j] *= gt;
-		    delta /= gt;
-		}
-		DEBOUTLN( cerr, "fac delta = ", delta );
-		if ( delta != 1 ) {
-		    for ( j = 1; j <= r; j++ ) {
-			G[j] *= delta;
-			lcG[j] *= delta;
-		    }
-		    UU = U * power( delta, r-1 );
-		}
-		else
-		    UU = U;
+	    DEBOUTLN( cerr, "the univariate factors after distribution are ", G );
+	    DEBOUTLN( cerr, "the distributed leading coeffs are ", lcG );
+	    DEBOUTLN( cerr, "U may have changed and is now ", UU );
+	    DEBOUTLN( cerr, "which has leading coefficient ", LC( UU, Variable(1) ) );
+
+	    if ( LC( UU, Variable(1) ) != prod( lcG ) || A(UU) != prod( G ) ) {
+		DEBOUTLN( cerr, "!!! distribution was not correct !!!", ' ' );
+		DEBOUTLN( cerr, "product of leading coeffs is ", prod( lcG ) );
+		DEBOUTLN( cerr, "product of univariate factors is ", prod( G ) );
+		DEBOUTLN( cerr, "the new U is evaluated as ", A(UU) );
 	    }
 	    else
-		UU = U;
-	    DEBOUTLN( cerr, "fac good evaluation, lcG = ", lcG );
-	    DEBOUTLN( cerr, "fac                    G = ", G );
-	    DEBOUTLN( cerr, "fac delta = ", delta );
-	    DEBOUTLN( cerr, "fac omega = ", omega );
-	    for ( j = 1; j <= r; j++ ) {
-		gt = A( lcG[j] );
-		if ( gt != lc( G[j] ) ) {
-		    gt = lc( G[j] ) / gt;
-		    lcG[j] *= gt;
-		    omega /= gt;
-		}
-	    }
-	    DEBOUTLN( cerr, "fac good evaluation, lcG = ", lcG );
-	    DEBOUTLN( cerr, "fac                    G = ", G );
-	    DEBOUTLN( cerr, "fac delta = ", delta );
-	    DEBOUTLN( cerr, "fac omega = ", omega );
+		DEBOUTLN( cerr, "leading coeffs correct", ' ' );
+	}
+	else {
+	    DEBOUTLN( cerr, "we have found a bad evaluation point", ' ' );
+	}
+#endif
+	if ( goodeval ) {
+	    TIMING_START(fac_hensel);
 	    goodeval = Hensel( UU, G, lcG, A, b, Variable(1) );
+	    TIMING_END(fac_hensel);
 	}
     }
-    for ( i = 1; i <= r; i++ )
+    for ( i = 1; i <= r; i++ ) {
 	G[i] /= icontent( G[i] );
+	G[i] = M(G[i]);
+    }
     // negate noch beachten !
     if ( negate )
 	G[1] = -G[1];
-    DEBOUTLN( cerr, "MULTIFACTOR END   ----------------------------------- level = ", arg.level() );
+    DEBDECLEVEL( cerr, "ZFactorMulti" );
     return G;
 }
 

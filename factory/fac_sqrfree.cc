@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_sqrfree.cc,v 1.2 1996-06-26 13:15:28 stobbe Exp $
+// $Id: fac_sqrfree.cc,v 1.3 1996-12-05 18:24:55 schmidt Exp $
 
 #include "assert.h"
 #include "cf_defs.h"
@@ -7,6 +7,10 @@
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.2  1996/06/26 13:15:28  stobbe
+"sqrFreeZ: Now handles the sign of the argument right.
+"
+
 Revision 1.1  1996/05/20 13:39:48  stobbe
 "sqrFree: Now the product of all factors found by sqrFree is equal to the
          parameter of sqrFree. The bug resulted from an incorrect handling
@@ -133,7 +137,7 @@ CFFList sqrFreeZ ( const CanonicalForm & a )
 	    F.append( CFFactor( -w, i ) );
 	else
 	    F.append( CFFactor( w, i ) );
-    if ( ! cont.isOne() && ! cont.inCoeffDomain() )
+    if ( ! cont.isOne() )
 	F = Union( F, sqrFreeZ( cont ) );
     if ( lc( a ).sign() < 0 ) {
 	if ( F.getFirst().exp() == 1 ) {

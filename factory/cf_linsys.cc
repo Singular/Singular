@@ -1,8 +1,12 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_linsys.cc,v 1.2 1996-07-15 08:33:18 stobbe Exp $
+// $Id: cf_linsys.cc,v 1.3 1996-12-05 18:24:54 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.2  1996/07/15 08:33:18  stobbe
+"changed interface to linearSystemSolve to use the class CFMatrix
+"
+
 Revision 1.1  1996/07/08 08:22:51  stobbe
 "New function determinant.
 "
@@ -12,6 +16,10 @@ Initial revision
 
 */
 
+#define TIMING
+
+#include "timing.h"
+
 #include "assert.h"
 #include "cf_defs.h"
 #include "cf_primes.h"
@@ -20,6 +28,13 @@ Initial revision
 #include "cf_chinese.h"
 #include "ffops.h"
 #include "cf_primes.h"
+
+
+TIMING_DEFINE_PRINT(det_mapping);
+TIMING_DEFINE_PRINT(det_determinant);
+TIMING_DEFINE_PRINT(det_chinese);
+TIMING_DEFINE_PRINT(det_bound);
+TIMING_DEFINE_PRINT(det_numprimes);
 
 
 static bool solve ( int **extmat, int nrows, int ncols );
@@ -183,6 +198,23 @@ linearSystemSolve( CFMatrix & M )
     }
 }
 
+static bool
+fill_int_mat( const CFMatrix & M, int ** m, int rows )
+{
+    int i, j;
+    bool ok = true;
+    for ( i = 0; i < rows && ok; i++ )
+	for ( j = 0; j < rows && ok; j++ ) {
+	    if ( M(i+1,j+1).isZero() )
+		m[i][j] = 0;
+	    else {
+		m[i][j] = mapinto( M(i+1,j+1) ).intval();
+//		ok = m[i][j] != 0;
+	    }
+	}
+    return ok;
+}
+	
 CanonicalForm
 determinant( const CFMatrix & M, int rows )
 {
@@ -193,9 +225,100 @@ determinant( const CFMatrix & M, int rows )
 	return M(1,1)*M(2,2)-M(2,1)*M(1,2);
     else  if ( matrix_in_Z( M, rows ) ) {
 	int ** mm = new (int*)[rows];
-	CanonicalForm Q, Qhalf, mnew, qnew, B;
-	CanonicalForm det, detnew;
-	int i, j, p, pno, intdet;
+	CanonicalForm x, q, Qhalf, B;
+	int n, i, intdet, p, pno;
+	for ( i = 0; i < rows; i++ ) {
+	    mm[i] = new int[rows];
+	}
+	pno = 0; n = 0;
+	TIMING_START(det_bound);
+	B = detbound( M, rows );
+	TIMING_END(det_bound);
+	q = 1;
+	TIMING_START(det_numprimes);
+	while ( B > q && n < cf_getNumBigPrimes() ) {
+	    q *= cf_getBigPrime( n );
+	    n++;
+	}
+	TIMING_END(det_numprimes);
+
+	CFArray X(1,n), Q(1,n);
+	
+	while ( pno < n ) {
+	    p = cf_getBigPrime( pno );
+	    setCharacteristic( p );
+	    // map matrix into char p
+	    TIMING_START(det_mapping);
+	    fill_int_mat( M, mm, rows );
+	    TIMING_END(det_mapping);
+	    pno++;
+	    cerr << "."; cerr.flush();
+	    TIMING_START(det_determinant);
+	    intdet = determinant( mm, rows );
+	    TIMING_END(det_determinant);
+	    setCharacteristic( 0 );
+	    X[pno] = intdet;
+	    Q[pno] = p;
+	}
+	TIMING_START(det_chinese);
+	chineseRemainder( X, Q, x, q );
+	TIMING_END(det_chinese);
+	Qhalf = q / 2;
+	if ( x > Qhalf )
+	    x = x - q;
+	for ( i = 0; i < rows; i++ )
+	    delete [] mm[i];
+	delete [] mm;
+	return x;
+    }
+    else {
+	CFMatrix m( M );
+	CanonicalForm divisor = 1, pivot, mji;
+	int i, j, k, sign = 1;
+	for ( i = 1; i <= rows; i++ ) {
+	    pivot = m(i,i); k = i;
+	    for ( j = i+1; j <= rows; j++ ) {
+		if ( betterpivot( pivot, m(j,i) ) ) {
+		    pivot = m(j,i);
+		    k = j;
+		}
+	    }
+	    if ( pivot.isZero() )
+		return 0;
+	    if ( i != k ) {
+		m.swapRow( i, k );
+		sign = -sign;
+	    }
+	    for ( j = i+1; j <= rows; j++ ) {
+		if ( ! m(j,i).isZero() ) {
+		    divisor *= pivot;
+		    mji = m(j,i);
+		    m(j,i) = 0;
+		    for ( k = i+1; k <= rows; k++ )
+			m(j,k) = m(j,k) * pivot - m(i,k)*mji;
+		}
+	    }
+	}
+	pivot = sign;
+	for ( i = 1; i <= rows; i++ )
+	    pivot *= m(i,i);
+	return pivot / divisor;
+    }
+}
+
+CanonicalForm
+determinant2( const CFMatrix & M, int rows )
+{
+    ASSERT( rows <= M.rows() && rows <= M.columns() && rows > 0, "undefined determinant" );
+    if ( rows == 1 )
+	return M(1,1);
+    else  if ( rows == 2 )
+	return M(1,1)*M(2,2)-M(2,1)*M(1,2);
+    else  if ( matrix_in_Z( M, rows ) ) {
+	int ** mm = new (int*)[rows];
+	CanonicalForm QQ, Q, Qhalf, mnew, q, qnew, B;
+	CanonicalForm det, detnew, qdet;
+	int i, p, pcount, pno, intdet;
 	bool ok;
 
 	// initialize room to hold the result and the result mod p
@@ -211,51 +334,64 @@ determinant( const CFMatrix & M, int rows )
 	do {
 	    p = cf_getBigPrime( pno );
 	    setCharacteristic( p );
-	    ok = true;
 	    // map matrix into char p
-	    for ( i = 0; i < rows && ok; i++ )
-		for ( j = 0; j < rows && ok; j++ ) {
-		    if ( M(i+1,j+1).isZero() )
-			mm[i][j] = 0;
-		    else {
-			mm[i][j] = mapinto( M(i+1,j+1) ).intval();
-			ok = mm[i][j] != 0;
-		    }
-		}
+	    ok = fill_int_mat( M, mm, rows );
 	    pno++;
 	} while ( ! ok && pno < cf_getNumPrimes() );
 	// initialize the result matrix with first solution
 	// solve mod p
+	cerr << "."; cerr.flush();
 	intdet = determinant( mm, rows );
 	setCharacteristic( 0 );
 	det = intdet;
 	// Q so far
 	Q = p;
+	QQ = p;
 	while ( Q < B && cf_getNumPrimes() > pno ) {
+	    // find a first solution mod p
 	    do {
 		p = cf_getBigPrime( pno );
 		setCharacteristic( p );
-		ok = true;
 		// map matrix into char p
-		for ( i = 0; i < rows && ok; i++ )
-		    for ( j = 0; j < rows && ok; j++ ) {
-			if ( M(i+1,j+1).isZero() )
-			    mm[i][j] = 0;
-			else {
-			    mm[i][j] = mapinto( M(i+1,j+1) ).intval();
-			    ok = mm[i][j] != 0;
-			}
-		    }
+		ok = fill_int_mat( M, mm, rows );
 		pno++;
-	    } while ( ! ok && cf_getNumPrimes() > pno );
+	    } while ( ! ok && pno < cf_getNumPrimes() );
+	    // initialize the result matrix with first solution
 	    // solve mod p
+	    cerr << "."; cerr.flush();
 	    intdet = determinant( mm, rows );
-	    // found a solution mod p
-	    // now chinese remainder it to a solution mod Q*p
 	    setCharacteristic( 0 );
-	    chineseRemainder( det, Q, intdet, p, detnew, qnew );
-	    det = detnew;
+	    qdet = intdet;
+	    // Q so far
+	    q = p;
+	    QQ *= p;
+	    pcount = 0;
+	    while ( QQ < B && cf_getNumPrimes() > pno && pcount < 500 ) {
+		do {
+		    p = cf_getBigPrime( pno );
+		    setCharacteristic( p );
+		    ok = true;
+		    // map matrix into char p
+		    ok = fill_int_mat( M, mm, rows );
+		    pno++;
+		} while ( ! ok && cf_getNumPrimes() > pno );
+		// solve mod p
+		cerr << "."; cerr.flush();
+		intdet = determinant( mm, rows );
+		// found a solution mod p
+		// now chinese remainder it to a solution mod Q*p
+		setCharacteristic( 0 );
+		chineseRemainder( qdet, q, intdet, p, detnew, qnew );
+		qdet = detnew;
+		q = qnew;
+		QQ *= p;
+		pcount++;
+	    }
+	    cerr << "*"; cerr.flush();
+	    chineseRemainder( det, Q, qdet, q, detnew, qnew );
 	    Q = qnew;
+	    QQ = Q;
+	    det = detnew;
 	}
 	if ( ! ok )
 	    fuzzy_result = true;
@@ -329,15 +465,15 @@ bound ( const CFMatrix & M )
 CanonicalForm
 detbound ( const CFMatrix & M, int rows )
 {
-    CanonicalForm sum = 0, prod = 1;
+    CanonicalForm sum = 0, prod = 2;
     int i, j;
     for ( i = 1; i <= rows; i++ ) {
 	sum = 0;
 	for ( j = 1; j <= rows; j++ )
 	    sum += M(i,j) * M(i,j);
-	prod *= sum;
+	prod *= 1 + sqrt(sum);
     }
-    return 2 * sqrt( prod );
+    return prod;
 }
 
 

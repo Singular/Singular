@@ -1,8 +1,12 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_gcd.cc,v 1.4 1996-07-08 08:21:10 stobbe Exp $
+// $Id: cf_gcd.cc,v 1.5 1996-12-05 18:24:53 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.4  1996/07/08 08:21:10  stobbe
+"gcd_poly: now uses ezgcd if the switch SW_USE_EZGCD is on.
+"
+
 Revision 1.3  1996/06/18 12:22:54  stobbe
 "gcd_poly_univar0: now uses getSmallPrimes (due to changes in the handling
                   of prime numbers in cf_primes.
@@ -378,7 +382,10 @@ gcd_poly1( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
 static CanonicalForm
 gcd_poly( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
 {
-    if ( isOn( SW_USE_EZGCD ) && ! ( f.isUnivariate() && g.isUnivariate() ) ) {
+    if ( getCharacteristic() != 0 ) {
+	return gcd_poly1( f, g, false );
+    }
+    else if ( isOn( SW_USE_EZGCD ) && ! ( f.isUnivariate() && g.isUnivariate() ) ) {
 	CFMap M, N;
 	compress( f, g, M, N );
 	return N( ezgcd( M(f), M(g) ) );
