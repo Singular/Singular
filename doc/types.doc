@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.6 1998-04-27 14:38:58 Singular Exp $
+@comment $Id: types.doc,v 1.7 1998-04-27 14:50:37 krueger Exp $
 @comment this file contains the type definitions
 @menu
 * boolean::
@@ -24,6 +24,12 @@
 @node boolean, ideal, Data types, Data types
 @section boolean
 @cindex boolean
+@menu
+* boolean declarations::
+* boolean expressions::
+* boolean operations::
+* boolean related functions::
+@end menu
 
 @c --> section boolean
 @c ------------------------------
@@ -131,7 +137,8 @@ example, determine the @code{(1 || a)} without evaluating @code{a}.
 @c <--
 
 @c ---------------------------------------
-@node ideal, int, Data types, Data types
+@c @node ideal, int, Data types, Data types
+@node ideal, int, boolean, Data types
 @section ideal
 @cindex ideal
 
@@ -343,7 +350,8 @@ Brackets may be used to access elements of ideals:
 @c <--
 
 @c ---------------------------------------
-@node int, intmat, Data types, Data types
+@c @node int, intmat, Data types, Data types
+@node int, intmat, ideal, Data types
 @section int
 @cindex int
 
