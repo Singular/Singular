@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.33 1998-05-08 14:55:27 wichmann Exp $
+@comment $Id: reference.doc,v 1.34 1998-05-08 15:49:45 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1811,6 +1811,12 @@ $I \cap K[U]=(0)$ is,
 I intersect K[U]=(0),
 @end ifinfo
 i.e. eliminating the remaining variables gives (0).
+@item @strong{Syntax:}
+@code{indepSet (} ideal_expression, int_expression @code{)}
+@item @strong{Type:}
+list
+@item @strong{Purpose:}
+computes a list of all (if the flag is 1) or of all maximal sets U of independent variables of the ideal given by the first argument
 @item @strong{Example:}
 @example
 @c example

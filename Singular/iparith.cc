@@ -171,7 +171,7 @@ cmdnames cmds[] =
   { "ideal",       0, IDEAL_CMD ,         IDEAL_CMD},
   { "if",          0, IF_CMD ,            IF_CMD},
   { "imap",        0, IMAP_CMD ,          CMD_2},
-  { "indepSet",    0, INDEPSET_CMD ,      CMD_1},
+  { "indepSet",    0, INDEPSET_CMD ,      CMD_12},
   { "insert",      0, INSERT_CMD ,        CMD_23},
   { "int",         0, INT_CMD ,           ROOT_DECL},
   { "interred",    0, INTERRED_CMD ,      CMD_1},
@@ -1516,6 +1516,13 @@ static BOOLEAN jjHOMOG_ID(leftv res, leftv u, leftv v)
   res->data = (char *)idHomogen((ideal)u->Data(),i);
   return FALSE;
 }
+static BOOLEAN jjINDEPSET2(leftv res, leftv u, leftv v)
+{
+  assumeStdFlag(u);
+  res->data=(void *)scIndIndset((ideal)(u->Data()),(int)(v->Data()),
+                    currQuotient);
+  return FALSE;
+}
 static BOOLEAN jjINTERSECT(leftv res, leftv u, leftv v)
 {
   res->data=(char *)idSect((ideal)u->Data(),(ideal)v->Data());
@@ -2031,6 +2038,7 @@ struct sValCmd2 dArith2[]=
 ,{jjCALL2MANY, IDEAL_CMD,      IDEAL_CMD,      DEF_CMD,    DEF_CMD PROFILER}
 ,{jjFETCH,     IMAP_CMD,       ANY_TYPE/*set by p*/,RING_CMD,  ANY_TYPE PROFILER}
 ,{jjFETCH,     IMAP_CMD,       ANY_TYPE/*set by p*/,QRING_CMD, ANY_TYPE PROFILER}
+,{jjINDEPSET2, INDEPSET_CMD,   LIST_CMD,       IDEAL_CMD,  INT_CMD PROFILER}
 ,{lInsert,     INSERT_CMD,     LIST_CMD,       LIST_CMD,   DEF_CMD PROFILER}
 ,{jjINTERSECT, INTERSECT_CMD,  IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD PROFILER}
 ,{jjINTERSECT, INTERSECT_CMD,  MODUL_CMD,      MODUL_CMD,  MODUL_CMD PROFILER}

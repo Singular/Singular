@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.13 1998-05-05 11:55:34 krueger Exp $
+// $Id: primdec.lib,v 1.14 1998-05-08 15:49:44 Singular Exp $
 ///////////////////////////////////////////////////////
 // primdec.lib
 // algorithms for primary decomposition based on
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann
 //////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.13 1998-05-05 11:55:34 krueger Exp $";
+version="$Id: primdec.lib,v 1.14 1998-05-08 15:49:44 Singular Exp $";
 info="
 LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION (I)
 
@@ -1464,7 +1464,7 @@ EXAMPLE: example independentSet; shows an example
    int n,k,di;
    list resu,hilf;
    string var1,var2;
-   list v=system("indsetall",j,1);
+   list v=indepSet(j,1);
 
    for(n=1;n<=size(v);n++)
    {
@@ -1532,7 +1532,7 @@ EXAMPLE: example maxIndependentSet; shows an example
    int n,k,di;
    list resu,hilf;
    string var1,var2;
-   list v=system("indsetall",j,0);
+   list v=indepSet(j,0);
 
    for(n=1;n<=size(v);n++)
    {
@@ -3995,7 +3995,7 @@ proc pseudo_prim_dec_i (ideal SI, list L)
 
 proc extraction (ideal SI, ideal SP)
 {
-  list indsets=system("indsetall",SP,0);
+  list indsets=indepSet(SP,0);
   poly f;
   if(size(indsets)!=0)      //check, whether dim P != 0
   {
