@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.124 2001-03-05 16:41:47 mschulze Exp $ */
+/* $Id: ideals.cc,v 1.125 2001-09-25 15:43:44 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2599,25 +2599,21 @@ ideal idVec2Ideal(poly vec)
 // converts mat to module, destroys mat
 ideal idMatrix2Module(matrix mat)
 {
-  ideal result = idInit(MATCOLS(mat),MATROWS(mat));
+  int mc=MATCOLS(mat);
+  int mr=MATROWS(mat);
+  ideal result = idInit(max(mc,1),max(mr,1));
   int i,j;
   poly h;
-#ifdef DRING
-  poly p;
-#endif
 
-  for(j=0;j<MATCOLS(mat);j++) /* j is also index in result->m */
+  for(j=0;j<mc /*MATCOLS(mat)*/;j++) /* j is also index in result->m */
   {
-    for (i=1;i<=MATROWS(mat);i++)
+    for (i=1;i<=mr /*MATROWS(mat)*/;i++)
     {
       h = MATELEM(mat,i,j+1);
       if (h!=NULL)
       {
         MATELEM(mat,i,j+1)=NULL;
         pSetCompP(h,i);
-#ifdef DRING
-        pdSetDFlagP(h,0);
-#endif
         result->m[j] = pAdd(result->m[j],h);
       }
     }
@@ -2633,15 +2629,17 @@ ideal idMatrix2Module(matrix mat)
 // converts mat to module, destroys mat
 ideal idMatrix2Module(matrix mat)
 {
-  ideal result = idInit(MATCOLS(mat),MATROWS(mat));
+  int mc=MATCOLS(mat);
+  int mr=MATROWS(mat);
+  ideal result = idInit(max(mc,1),max(mr,1));
   int i,j, l;
   poly h;
   poly p;
   sBucket_pt bucket = sBucketInit(currRing);
 
-  for(j=0;j<MATCOLS(mat);j++) /* j is also index in result->m */
+  for(j=0;j<mc /*MATCOLS(mat)*/;j++) /* j is also index in result->m */
   {
-    for (i=1;i<=MATROWS(mat);i++)
+    for (i=1;i<=mr /*MATROWS(mat)*/;i++)
     {
       h = MATELEM(mat,i,j+1);
       if (h!=NULL)
