@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.161 1999-11-29 20:15:43 wichmann Exp $
+@comment $Id: general.doc,v 1.162 1999-11-29 21:37:54 wichmann Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -1118,7 +1118,7 @@ appearance of the help window, or the default values for the
 @code{singular} command. For a first look at customization of the
 interface, this is probably the best group.
 
-@item Singular Demo mode
+@item Singular Demo Mode
 
 Here you can specify how chunks of the demo file are divided, or specify
 a default directory for demo files.
@@ -1140,16 +1140,111 @@ Olaf
 @cindex Singular, important commands of Emacs interface
 @cindex Top 20 Emacs commands
 
+Here is a list of the 20 probably most useful commands when using the
+@sc{Singular} Emacs interface.
+
+Starting and stopping of @sc{Singular}:
+
 @itemize @bullet
-@item @code{singular-toggle-truncate-lines} (key @code{C-c t} or menu
-@code{Commands} item @code{Truncate lines})
 
-Toggles wether long lines should be truncated or not.
+@item @code{singular} (menu @code{Singular->Start Default...}): starts
+@sc{Singular} using default arguments.
 
-@item @code{singular-demo-load} (key @code{C-c d l} or menu
-@code{Commands} item @code{Load library})
+@item @code{singular-other} (menu @code{Singular->Start}): starts
+@sc{Singular} asking for several arguments in the minibuffer area.
 
-Loads a @sc{Singular} library.
+@item @code{singular-exit} (key @code{C-c $} or menu
+@code{Singular->Exit}): kills the @sc{Singular} process running in the
+current buffer (but does not kill the buffer).
+
+@item @code{singular-restart} (key @code{C-c C-r} or menu
+@code{Singular->Restart}): kills the @sc{Singular} process running in
+the current buffer and starts a new @sc{Singular} process with exactly
+the same arguments as before.
+
+@end itemize
+
+Editing input and output:
+
+@itemize @bullet
+
+@item @code{singular-beginning-of-line} (key @code{C-a}): moves point to
+beginning of line, then skip past the @sc{Singular} prompt, if any.
+
+@item @code{singular-toggle-truncate-lines} (key @code{C-c C-t} or menu
+@code{Commands->Truncate lines}): toggles wether long lines should be
+truncated or not. If lines are not truncated, the commands
+@code{singular-scroll-left} and @code{singular-scroll-right} are useful
+to scroll left and right, resp.
+
+@item @code{singular-dynamic-complete} (key @code{TAB}): performs
+context specific completion. If point is inside a string, file name
+completion is done. If point is at the end of a help command (i.e.,
+@code{help} or @code{?}), completion on @sc{Singular} help topics is
+done. In all other cases, completion on @sc{Singular} commands is done.
+
+@c note: add space between Fold/ Unfold to avoid overfull line
+@item @code{singular-folding-toggle-fold-latest-output} (key @code{C-c
+C-o} or menu @code{Commands->Fold/ Unfold Latest Output}): toggles
+folding of the latest output section. If your last @sc{Singular} command
+produced a huge output, simply type @code{C-c C-o} and it will be
+replaced by a single line.
+
+@item @code{singular-folding-toggle-fold-at-point} (key @code{C-c C-f}
+or menu @code{Commands->Fold/Unfold At Point}): toggles folding of the
+section the point currently is in.
+
+@item @code{singular-folding-fold-all-output} (menu @code{Commands->Fold
+All Output}): folds all @sc{Singular} output, replacing each output
+section by a single line.
+
+@item @code{singular-folding-unfold-all-output} (menu
+@code{Commands->Unfold All Output}): unfolds all @sc{Singular} output
+sections showing their true contents.
+
+@end itemize
+
+Loading of files and @sc{Singular} demo mode:
+
+@itemize @bullet
+
+@item @code{singular-load-library} (key @code{C-c C-l} or menu
+@code{Commands->Libraries->other...}): asks for a standard library name
+or a library file in the minibuffer (hit @code{TAB} for completion) and
+loads the library into @sc{Singular}. The submenu @code{Libraries} of
+the @code{Commands} menu also provides a separate menu item for each
+standard library.
+
+@item @code{singular-load-file} (key @code{C-c <} or menu
+@code{Commands->Load File...}): asks for a file name in the minibuffer
+(which is expanded using @code{expand-file-name} if given a prefix
+argument) and loads the file into @sc{Singular}.
+
+@item @code{singular-demo-load} (key @code{C-c C-d} or menu
+@code{Commands->Load Demo...}): asks for a file name of a @sc{Singular}
+demo file in the minibuffer area (hit @code{RET} for completion) and
+enters the @sc{Singular} demo mode showing the first chunk of the demo.
+
+@item @code{singular-demo-exit} (menu @code{Commands->Exit Demo}):
+exitst from @sc{Singular} demo mode and cleans up everything that is
+left from the demo.
+
+@end itemize
+
+Help and Customization:
+
+@itemize @bullet
+
+@item @code{singular-help} (key @code{C-h C-s} or menu
+@code{Singular->Singular Help}): asks for a @sc{Singular} help topic in
+the minibuffer (hit @code{TAB} for completion) and shows the help text
+in a separate buffer.
+
+@item @code{customize-group} (menu @code{Singular->Preferences}): enters
+the customization group of the @sc{Singular} Emacs interface. (If called
+via @code{M-x customize-group} give argument @code{singular-interactive}
+in the minibuffer area.)
+
 @end itemize
 
 
