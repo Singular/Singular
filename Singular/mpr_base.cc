@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.20 2000-03-01 14:00:05 Singular Exp $ */
+/* $Id: mpr_base.cc,v 1.21 2000-08-14 12:56:39 obachman Exp $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -13,6 +13,8 @@
 
 #include "mod2.h"
 
+#include <omalloc.h>
+
 //-> includes
 #include "structs.h"
 #include "polys.h"
@@ -20,7 +22,6 @@
 #include "ipid.h"
 #include "ipshell.h"
 #include "febase.h"
-#include "mmemory.h"
 #include "intvec.h"
 #include "matpol.h"
 #include "numbers.h"
@@ -33,12 +34,6 @@
 #include "mpr_global.h"
 #include "mpr_base.h"
 #include "mpr_numeric.h"
-#if HAVE_ASO == 10
-#include "mpr_base.aso"
-#else
-#define AllocSizeOf(X) Alloc(sizeof(X))
-#define FreeSizeOf(X,Y) Free(X,sizeof(Y))
-#endif
 //<-
 
 extern void nPrint(number n);  // for debugging output
@@ -334,8 +329,6 @@ private:
 };
 //<-
 
-#ifndef ASO_GENERATE
-
 //-> debug output stuff
 #if defined(mprDEBUG_PROT) || defined(mprDEBUG_ALL)
 void print_mat(mprfloat **a, int maxrow, int maxcol)
@@ -423,11 +416,11 @@ pointSet::pointSet( const int _dim, const int _index, const int count )
   : num(0), max(count), dim(_dim), index(_index)
 {
   int i;
-  points = (onePointP *)Alloc( (count+1) * sizeof(onePointP) );
+  points = (onePointP *)omAlloc( (count+1) * sizeof(onePointP) );
   for ( i= 0; i <= max; i++ )
   {
-    points[i]= (onePointP)Alloc( sizeof(onePoint) );
-    points[i]->point= (Coord_t *)Alloc0( (dim+2) * sizeof(Coord_t) );
+    points[i]= (onePointP)omAlloc( sizeof(onePoint) );
+    points[i]->point= (Coord_t *)omAlloc0( (dim+2) * sizeof(Coord_t) );
   }
   lifted= false;
 }
@@ -438,10 +431,10 @@ pointSet::~pointSet()
   int fdim= lifted ? dim+1 : dim+2;
   for ( i= 0; i <= max; i++ )
   {
-    Free( (ADDRESS) points[i]->point, fdim * sizeof(Coord_t) );
-    Free( (ADDRESS) points[i], sizeof(onePoint) );
+    omFreeSize( (ADDRESS) points[i]->point, fdim * sizeof(Coord_t) );
+    omFreeSize( (ADDRESS) points[i], sizeof(onePoint) );
   }
-  Free( (ADDRESS) points, (max+1) * sizeof(onePointP) );
+  omFreeSize( (ADDRESS) points, (max+1) * sizeof(onePointP) );
 }
 
 inline const onePointP pointSet::operator[] ( const int index )
@@ -456,13 +449,13 @@ inline bool pointSet::checkMem()
   {
     int i;
     int fdim= lifted ? dim+1 : dim+2;
-    points= (onePointP*)ReAlloc( points,
+    points= (onePointP*)omReallocSize( points,
                                  (max+1) * sizeof(onePointP),
                                  (2*max + 1) * sizeof(onePointP) );
     for ( i= max+1; i <= max*2; i++ )
     {
-      points[i]= (onePointP)Alloc( sizeof(struct onePoint) );
-      points[i]->point= (Coord_t *)Alloc0( fdim * sizeof(Coord_t) );
+      points[i]= (onePointP)omAlloc( sizeof(struct onePoint) );
+      points[i]->point= (Coord_t *)omAlloc0( fdim * sizeof(Coord_t) );
     }
     max*= 2;
     mprSTICKYPROT(ST_SPARSE_MEM);
@@ -562,7 +555,7 @@ void pointSet::mergeWithPoly( const poly p )
   int i,j;
   poly piter= p;
   Exponent_t * vert;
-  vert= (Exponent_t *)Alloc( (dim+1) * sizeof(Exponent_t) );
+  vert= (Exponent_t *)omAlloc( (dim+1) * sizeof(Exponent_t) );
 
   while ( piter )
   {
@@ -582,7 +575,7 @@ void pointSet::mergeWithPoly( const poly p )
 
     pIter( piter );
   }
-  Free( (ADDRESS) vert, (dim+1) * sizeof(Exponent_t) );
+  omFreeSize( (ADDRESS) vert, (dim+1) * sizeof(Exponent_t) );
 }
 
 int pointSet::getExpPos( const poly p )
@@ -591,7 +584,7 @@ int pointSet::getExpPos( const poly p )
   int i,j;
 
   // hier unschoen...
-  vert= (Exponent_t *)Alloc( (dim+1) * sizeof(Exponent_t) );
+  vert= (Exponent_t *)omAlloc( (dim+1) * sizeof(Exponent_t) );
 
   pGetExpV( p, vert );
   for ( i= 1; i <= num; i++ )
@@ -600,7 +593,7 @@ int pointSet::getExpPos( const poly p )
       if ( points[i]->point[j] != (Coord_t) vert[j] ) break;
     if ( j > dim ) break;
   }
-  Free( (ADDRESS) vert, (dim+1) * sizeof(Exponent_t) );
+  omFreeSize( (ADDRESS) vert, (dim+1) * sizeof(Exponent_t) );
 
   if ( i > num ) return 0;
   else return i;
@@ -688,7 +681,7 @@ void pointSet::lift( int l[] )
   if ( l==NULL )
   {
     outerL= false;
-    l= (int *)Alloc( (dim+1) * sizeof(int) ); // [1..dim-1]
+    l= (int *)omAlloc( (dim+1) * sizeof(int) ); // [1..dim-1]
 
     for(i = 1; i < dim; i++)
     {
@@ -721,7 +714,7 @@ void pointSet::lift( int l[] )
 
   lifted= true;
 
-  if ( !outerL ) Free( (ADDRESS) l, (dim+1) * sizeof(int) );
+  if ( !outerL ) omFreeSize( (ADDRESS) l, (dim+1) * sizeof(int) );
 }
 //<-
 
@@ -791,9 +784,9 @@ pointSet ** convexHull::newtonPolytopesP( const ideal gls )
   Exponent_t * vert;
 
   n= pVariables;
-  vert= (Exponent_t *)Alloc( (idelem+1) * sizeof(Exponent_t) );
+  vert= (Exponent_t *)omAlloc( (idelem+1) * sizeof(Exponent_t) );
 
-  Q = (pointSet **)Alloc( idelem * sizeof(pointSet*) );        // support hulls
+  Q = (pointSet **)omAlloc( idelem * sizeof(pointSet*) );        // support hulls
   for ( i= 0; i < idelem; i++ )
     Q[i] = new pointSet( pVariables, i+1, pLength((gls->m)[i])+1 );
 
@@ -820,7 +813,7 @@ pointSet ** convexHull::newtonPolytopesP( const ideal gls )
     mprSTICKYPROT("\n");
   } // i
 
-  Free( (ADDRESS) vert, (idelem+1) * sizeof(Exponent_t) );
+  omFreeSize( (ADDRESS) vert, (idelem+1) * sizeof(Exponent_t) );
 
 #ifdef mprDEBUG_PROT
   PrintLn();
@@ -851,7 +844,7 @@ ideal convexHull::newtonPolytopesI( const ideal gls )
   Exponent_t * vert;
 
   n= pVariables;
-  vert= (Exponent_t *)Alloc( (idelem+1) * sizeof(Exponent_t) );
+  vert= (Exponent_t *)omAlloc( (idelem+1) * sizeof(Exponent_t) );
   id= idInit( idelem, 1 );
 
   for( i= 0; i < idelem; i++ )
@@ -884,7 +877,7 @@ ideal convexHull::newtonPolytopesI( const ideal gls )
     mprSTICKYPROT("\n");
   } // i
 
-  Free( (ADDRESS) vert, (idelem+1) * sizeof(Exponent_t) );
+  omFreeSize( (ADDRESS) vert, (idelem+1) * sizeof(Exponent_t) );
 
 #ifdef mprDEBUG_PROT
   PrintLn();
@@ -1353,7 +1346,7 @@ int resMatrixSparse::RC( pointSet **pQ, pointSet *E, int vert, mprfloat shift[] 
   for ( i= 0; i <= E->dim; i++ ) bucket[i]= 0;
   // remap results of LP to sets Qi
   c=0;
-  optSum= (setID*)Alloc( (LP->m) * sizeof(struct setID) );
+  optSum= (setID*)omAlloc( (LP->m) * sizeof(struct setID) );
   for ( i= 0; i < LP->m; i++ )
   {
     //Print("% .15f\n",LP->LiPM[i+2][1]);
@@ -1408,7 +1401,7 @@ int resMatrixSparse::RC( pointSet **pQ, pointSet *E, int vert, mprfloat shift[] 
 #endif
 
   // clean up
-  Free( (ADDRESS) optSum, (LP->m) * sizeof(struct setID) );
+  omFreeSize( (ADDRESS) optSum, (LP->m) * sizeof(struct setID) );
 
   mprSTICKYPROT(ST_SPARSE_RC);
 
@@ -1429,15 +1422,15 @@ int resMatrixSparse::createMatrix( pointSet *E )
   poly iterp;
   Exponent_t *epp_mon, *eexp;
 
-  epp_mon= (Exponent_t *)Alloc( (n+2) * sizeof(Exponent_t) );
-  eexp= (Exponent_t *)Alloc0((pVariables+1)*sizeof(Exponent_t));
+  epp_mon= (Exponent_t *)omAlloc( (n+2) * sizeof(Exponent_t) );
+  eexp= (Exponent_t *)omAlloc0((pVariables+1)*sizeof(Exponent_t));
 
   totDeg= numSet0;
 
   mprSTICKYPROT2(" size of matrix: %d\n", E->num);
   mprSTICKYPROT2("  resultant deg: %d\n", numSet0);
 
-  uRPos= NewIntvec3( numSet0, pLength((gls->m)[0])+1, 0 );
+  uRPos= new intvec( numSet0, pLength((gls->m)[0])+1, 0 );
 
   // sparse Matrix represented as a module where
   // each poly is column vector ( pSetComp(p,k) gives the row )
@@ -1488,8 +1481,8 @@ int resMatrixSparse::createMatrix( pointSet *E )
   } // for
 
   pDelete( &epp );
-  Free( (ADDRESS) epp_mon, (n+2) * sizeof(Exponent_t) );
-  Free( (ADDRESS) eexp, (pVariables+1)*sizeof(Exponent_t));
+  omFreeSize( (ADDRESS) epp_mon, (n+2) * sizeof(Exponent_t) );
+  omFreeSize( (ADDRESS) eexp, (pVariables+1)*sizeof(Exponent_t));
 
 #ifdef mprDEBUG_ALL
   if ( E->num <= 40 )
@@ -1535,7 +1528,7 @@ pointSet * resMatrixSparse::minkSumTwo( pointSet *Q1, pointSet *Q2, int dim )
   onePoint vert;
   int j,k,l;
 
-  vert.point=(Coord_t*)Alloc( (pVariables+2) * sizeof(Coord_t) );
+  vert.point=(Coord_t*)omAlloc( (pVariables+2) * sizeof(Coord_t) );
 
   vs= new pointSet( dim );
 
@@ -1552,7 +1545,7 @@ pointSet * resMatrixSparse::minkSumTwo( pointSet *Q1, pointSet *Q2, int dim )
     }
   }
 
-  Free( (ADDRESS) vert.point, (pVariables+2) * sizeof(Coord_t) );
+  omFreeSize( (ADDRESS) vert.point, (pVariables+2) * sizeof(Coord_t) );
 
   return vs;
 }
@@ -1724,7 +1717,7 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
   {
     delete Qi[i];
   }
-  Free( (ADDRESS) Qi, idelem * sizeof(pointSet*) );
+  omFreeSize( (ADDRESS) Qi, idelem * sizeof(pointSet*) );
 
   delete E;
 
@@ -2090,11 +2083,12 @@ resMatrixDense::~resMatrixDense()
     {
         nDelete( resVectorList[i].numColVector+j );
     }
-    Free( (ADDRESS)resVectorList[i].numColVector, numVectors*sizeof( number ) );
-    Free( (ADDRESS)resVectorList[i].numColParNr, (pVariables+1) * sizeof(int) );
+    // OB: ????? (solve_s.tst)
+    omfreeSize( (ADDRESS)resVectorList[i].numColVector, numVectors*sizeof( number ) );
+    omfreeSize( (ADDRESS)resVectorList[i].numColParNr, (pVariables+1) * sizeof(int) );
   }
 
-  Free( (ADDRESS)resVectorList, veclistmax*sizeof( resVector ) );
+  omFreeSize( (ADDRESS)resVectorList, veclistmax*sizeof( resVector ) );
 
   // free matrix m
   if ( m != NULL )
@@ -2102,8 +2096,8 @@ resMatrixDense::~resMatrixDense()
     for ( i= 1; i <= numVectors; i++ )
       for ( j= 1; j <= numVectors; j++ )
         pDelete( &MATELEM(m , i, j) );
-    Free( (ADDRESS)m->m, numVectors * numVectors * sizeof(poly) );
-    FreeSizeOf( (ADDRESS)m, ip_smatrix );
+    omfreeSize( (ADDRESS)m->m, numVectors * numVectors * sizeof(poly) );
+    omFreeBin((ADDRESS)m,  ip_smatrix_bin);
   }
 }
 
@@ -2185,7 +2179,7 @@ void resMatrixDense::generateMonoms( poly m, int var, int deg )
 
     if ( numVectors == veclistmax )
     {
-      resVectorList= (resVector * )ReAlloc( resVectorList,
+      resVectorList= (resVector * )omReallocSize( resVectorList,
                                             (veclistmax) * sizeof( resVector ),
                                             (veclistmax + veclistblock) * sizeof( resVector ) );
       int k;
@@ -2224,7 +2218,7 @@ void resMatrixDense::generateMonomData( int deg, intvec* polyDegs , intvec* iVO 
   // init monomData
   veclistblock= 512;
   veclistmax= veclistblock;
-  resVectorList= (resVector *)Alloc( veclistmax*sizeof( resVector ) );
+  resVectorList= (resVector *)omAlloc( veclistmax*sizeof( resVector ) );
 
   // Init resVector()s
   for ( j= veclistmax - 1; j >= 0; j-- ) resVectorList[j].init();
@@ -2386,7 +2380,7 @@ void resMatrixDense::generateBaseData()
       // init stuff
       resVectorList[k].numColParNr= NULL;
       resVectorList[k].numColVectorSize= numVectors;
-      resVectorList[k].numColVector= (number *)Alloc( numVectors*sizeof( number ) );
+      resVectorList[k].numColVector= (number *)omAlloc( numVectors*sizeof( number ) );
       for ( i= 0; i < numVectors; i++ ) resVectorList[k].numColVector[i]= nInit(0);
 
       // compute row poly
@@ -2420,7 +2414,7 @@ void resMatrixDense::generateBaseData()
       //mprPROTInl(" setup of numColParNr ",k);
       resVectorList[k].numColVectorSize= 0;
       resVectorList[k].numColVector= NULL;
-      resVectorList[k].numColParNr= (int *)Alloc0( (pVariables+1) * sizeof(int) );
+      resVectorList[k].numColParNr= (int *)omAlloc0( (pVariables+1) * sizeof(int) );
 
       pi= (gls->m)[ resVectorList[k].elementOfS ];
       factor= pDivideM( pCopy( resVectorList[k].mon ), pCopy( resVectorList[k].dividedBy ) );
@@ -2450,6 +2444,7 @@ void resMatrixDense::generateBaseData()
 
   // create the matrix M
   createMatrix();
+  
 }
 
 resVector *resMatrixDense::getMVector(int i)
@@ -2711,7 +2706,7 @@ uResultant::~uResultant( )
 ideal uResultant::extendIdeal( const ideal gls, poly linPoly, const resMatType rmt )
 {
   ideal newGls= idCopy( gls );
-  newGls->m= (poly *)ReAlloc( newGls->m,
+  newGls->m= (poly *)omReallocSize( newGls->m,
                               IDELEMS(gls) * sizeof(poly),
                               (IDELEMS(gls) + 1) * sizeof(poly) );
   IDELEMS(newGls)++;
@@ -2786,11 +2781,11 @@ poly uResultant::interpolateDense( const number subDetVal )
 
   // we need mdg results of D(p0,p1,...,pn)
   number *presults;
-  presults= (number *)Alloc( mdg * sizeof( number ) );
+  presults= (number *)omAlloc( mdg * sizeof( number ) );
   for (i=0; i < mdg; i++) presults[i]= nInit(0);
 
-  number *pevpoint= (number *)Alloc( n * sizeof( number ) );
-  number *pev= (number *)Alloc( n * sizeof( number ) );
+  number *pevpoint= (number *)omAlloc( n * sizeof( number ) );
+  number *pev= (number *)omAlloc( n * sizeof( number ) );
   for (i=0; i < n; i++) pev[i]= nInit(0);
 
   mprPROTnl("// initial evaluation point: ");
@@ -2929,17 +2924,17 @@ rootContainer ** uResultant::interpolateDenseSP( BOOLEAN matchUp, const number s
   // we need tdg+1 results of D(p0,1,0,...,0) =
   //              c(0)*u0^tdg + c(1)*u0^tdg-1 + ... + c(tdg-1)*u0 + c(tdg)
   number *presults;
-  presults= (number *)Alloc( (tdg + 1) * sizeof( number ) );
+  presults= (number *)omAlloc( (tdg + 1) * sizeof( number ) );
   for ( i=0; i <= tdg; i++ ) presults[i]= nInit(0);
 
   rootContainer ** roots;
-  roots= (rootContainer **) Alloc( loops * sizeof(rootContainer*) );
+  roots= (rootContainer **) omAlloc( loops * sizeof(rootContainer*) );
   for ( i=0; i < loops; i++ ) roots[i]= new rootContainer(); // 0..n-2
 
-  number *pevpoint= (number *)Alloc( n * sizeof( number ) );
+  number *pevpoint= (number *)omAlloc( n * sizeof( number ) );
   for (i=0; i < n; i++) pevpoint[i]= nInit(0);
 
-  number *pev= (number *)Alloc( n * sizeof( number ) );
+  number *pev= (number *)omAlloc( n * sizeof( number ) );
   for (i=0; i < n; i++) pev[i]= nInit(0);
 
   // now we evaluate D(u0,-1,0,...0), D(u0,0,-1,0,...,0), ..., D(u0,0,..,0,-1)
@@ -3045,10 +3040,10 @@ rootContainer ** uResultant::interpolateDenseSP( BOOLEAN matchUp, const number s
 
   // free some stuff: pev, presult
   for ( i=0; i < n; i++ ) nDelete( pev + i );
-  Free( (ADDRESS)pev, n * sizeof( number ) );
+  omFreeSize( (ADDRESS)pev, n * sizeof( number ) );
 
   for ( i=0; i <= tdg; i++ ) nDelete( presults+i );
-  Free( (ADDRESS)presults, (tdg + 1) * sizeof( number ) );
+  omFreeSize( (ADDRESS)presults, (tdg + 1) * sizeof( number ) );
 
   return roots;
 }
@@ -3065,10 +3060,10 @@ rootContainer ** uResultant::specializeInU( BOOLEAN matchUp, const number subDet
   tdg= resMat->getDetDeg();
 
   rootContainer ** roots;
-  roots= (rootContainer **) Alloc( loops * sizeof(rootContainer*) );
+  roots= (rootContainer **) omAlloc( loops * sizeof(rootContainer*) );
   for ( i=0; i < loops; i++ ) roots[i]= new rootContainer(); // 0..n-2
 
-  number *pevpoint= (number *)Alloc( n * sizeof( number ) );
+  number *pevpoint= (number *)omAlloc( n * sizeof( number ) );
   for (i=0; i < n; i++) pevpoint[i]= nInit(0);
 
   // now we evaluate D(u0,-1,0,...0), D(u0,0,-1,0,...,0), ..., D(u0,0,..,0,-1)
@@ -3105,7 +3100,7 @@ rootContainer ** uResultant::specializeInU( BOOLEAN matchUp, const number subDet
 
     pures= resMat->getUDet( pevpoint );
 
-    number *ncpoly= (number *)Alloc( (tdg+1) * sizeof(number) );
+    number *ncpoly= (number *)omAlloc( (tdg+1) * sizeof(number) );
 
 #ifdef MPR_MASI
     BOOLEAN masi=true;
@@ -3158,7 +3153,7 @@ rootContainer ** uResultant::specializeInU( BOOLEAN matchUp, const number subDet
 
   // free some stuff: pev, presult
   for ( i=0; i < n; i++ ) nDelete( pevpoint + i );
-  Free( (ADDRESS)pevpoint, n * sizeof( number ) );
+  omFreeSize( (ADDRESS)pevpoint, n * sizeof( number ) );
 
   return roots;
 }
@@ -3208,8 +3203,6 @@ ideal loNewtonPolytope( const ideal id )
 //%e
 
 //-----------------------------------------------------------------------------
-
-#endif // ! ASO_GENERATE
 
 // local Variables: ***
 // folded-file: t ***

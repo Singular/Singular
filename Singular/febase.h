@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.46 2000-04-27 10:07:07 obachman Exp $ */
+/* $Id: febase.h,v 1.47 2000-08-14 12:56:07 obachman Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -68,9 +68,6 @@ extern int    si_echo, printlevel;
 extern int    pagelength, colmax;
 extern int    yy_blocklineno;
 extern int    yy_noeof;
-#ifdef MTRACK
-extern BOOLEAN feRes_works;
-#endif
 extern char   prompt_char;
 extern const char feNotImplemented[];
 #ifdef HAVE_TCL

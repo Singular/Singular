@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.23 2000-03-10 13:40:43 Singular Exp $ */
+/* $Id: ipconv.cc,v 1.24 2000-08-14 12:56:23 obachman Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -10,7 +10,7 @@
 #include "tok.h"
 #include "ipid.h"
 #include "intvec.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "febase.h"
 #include "polys.h"
 #include "ideals.h"
@@ -112,7 +112,7 @@ static void * iiMa2Mo(void *data)
 
 static void * iiI2Iv(void *data)
 {
-  intvec *iv=NewIntvec2((int)data,(int)data);
+  intvec *iv=new intvec((int)data,(int)data);
   return (void *)iv;
 }
 
@@ -172,9 +172,9 @@ static void * iiN2Ma(void *data)
 
 static void * iiS2Link(void *data)
 {
-  si_link l=(si_link)Alloc0SizeOf(ip_link);
+  si_link l=(si_link)omAlloc0Bin(ip_link_bin);
   slInit(l, (char *) data);
-  FreeL((ADDRESS)data);
+  omFree((ADDRESS)data);
   return (void *)l;
 }
 
@@ -275,7 +275,7 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
     {
       if (input->rtyp==IDHDL)
       /* preserve name: copy it */
-        output->name=mstrdup(IDID((idhdl)(input->data)));
+        output->name=omStrDup(IDID((idhdl)(input->data)));
       else if (input->name!=NULL)
       {
         output->name=input->name;
@@ -290,11 +290,11 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
           {
             if (pGetExp((poly)input->data,nr)==1)
             {
-              output->name=mstrdup(currRing->names[nr-1]);
+              output->name=omStrDup(currRing->names[nr-1]);
             }
             else
             {
-              output->name=(char *)AllocL(4);
+              output->name=(char *)omAlloc(4);
               sprintf(output->name,"%c%d",*(currRing->names[nr-1]),
               (int)pGetExp((poly)input->data,nr));
             }
@@ -307,7 +307,7 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
           else
           {
             WerrorS("wrong name, should not happen");
-            output->name=mstrdup("?");
+            output->name=omStrDup("?");
           }
 #endif
         }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.cc,v 1.11 2000-06-27 12:07:00 pohl Exp $ */
+/* $Id: gnumpc.cc,v 1.12 2000-08-14 12:56:17 obachman Exp $ */
 /*
 * ABSTRACT: computations with GMP complex floating-point numbers
 *
@@ -11,7 +11,7 @@
 #include "mod2.h"
 #include "tok.h"
 #include "febase.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "numbers.h"
 #include "modulop.h"
 #include "longrat.h"
@@ -369,8 +369,8 @@ void ngcWrite (number &a)
     char *out;
     out= complexToStr(*(gmp_complex*)a,gmp_output_digits);
     StringAppend(out);
-    //    Free((ADDRESS)out, (strlen(out)+1)* sizeof(char) );
-    FreeL( (ADDRESS)out );
+    //    omFreeSize((ADDRESS)out, (strlen(out)+1)* sizeof(char) );
+    omFree( (ADDRESS)out );
   }
 }
 

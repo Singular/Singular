@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.15 2000-03-02 18:44:39 Singular Exp $ */
+/* $Id: modulop.cc,v 1.16 2000-08-14 12:56:39 obachman Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -11,7 +11,7 @@
 #include "mod2.h"
 #include "tok.h"
 #include "febase.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "numbers.h"
 #include "longrat.h"
 #include "ring.h"
@@ -207,16 +207,18 @@ void npSetChar(int c)
   if (c==npPrimeM) return;
   if (npPrimeM > 1)
   {
-    Free( (ADDRESS)npExpTable,npPrimeM*sizeof(CARDINAL) );
-    Free( (ADDRESS)npLogTable,npPrimeM*sizeof(CARDINAL) );
+    omFreeSize( (ADDRESS)npExpTable,npPrimeM*sizeof(CARDINAL) );
+    omFreeSize( (ADDRESS)npLogTable,npPrimeM*sizeof(CARDINAL) );
   }
   if ((c>1) || (c<(-1)))
   {
     if (c>1) npPrimeM = c;
     else     npPrimeM = -c;
     npPminus1M = npPrimeM - 1;
-    npExpTable= (CARDINAL *)Alloc( npPrimeM*sizeof(CARDINAL) );
-    npLogTable= (CARDINAL *)Alloc( npPrimeM*sizeof(CARDINAL) );
+    npExpTable= (CARDINAL *)omAlloc( npPrimeM*sizeof(CARDINAL) );
+    npLogTable= (CARDINAL *)omAlloc( npPrimeM*sizeof(CARDINAL) );
+    omMarkAsStaticAddr(npExpTable);
+    omMarkAsStaticAddr(npLogTable);
     npExpTable[0] = 1;
     npLogTable[1] = 0;
     if (npPrimeM > 2)

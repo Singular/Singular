@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.59 2000-05-26 11:23:33 siebert Exp $ */
+/* $Id: syz1.cc,v 1.60 2000-08-14 12:56:54 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -10,7 +10,7 @@
 #include "mod2.h"
 #include "tok.h"
 #include "attrib.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "polys.h"
 #include "febase.h"
 #include "kstd1.h"
@@ -391,8 +391,8 @@ static int syChMin(intvec * iv)
 SRes syInitRes(ideal arg,int * length, intvec * Tl, intvec * cw)
 {
   if (idIs0(arg)) return NULL;
-  SRes resPairs = (SRes)Alloc0(*length*sizeof(SSet));
-  resPairs[0] = (SSet)Alloc0(IDELEMS(arg)*sizeof(SObject));
+  SRes resPairs = (SRes)omAlloc0(*length*sizeof(SSet));
+  resPairs[0] = (SSet)omAlloc0(IDELEMS(arg)*sizeof(SObject));
   intvec * iv=NULL;
   int i,j;
 
@@ -408,7 +408,7 @@ SRes syInitRes(ideal arg,int * length, intvec * Tl, intvec * cw)
   }
   else
   {
-    iv = NewIntvec3(IDELEMS(arg),1,-1);
+    iv = new intvec(IDELEMS(arg),1,-1);
     for (i=0;i<IDELEMS(arg);i++)
     {
       (*iv)[i] = pTotaldegree(arg->m[i])+(*cw)[pGetComp(arg->m[i])-1];
@@ -458,7 +458,7 @@ long syReorderShiftedComponents(long * sc, int n)
 
   assume(new_space < SYZ_SHIFT_BASE && new_space >= 4);
 
-  long* tc = ( long*) Alloc(n*sizeof(long));
+  long* tc = ( long*) omAlloc(n*sizeof(long));
   tc[0] = sc[0];
   // rearrange things
   for (i=1; i<n; i++)
@@ -483,8 +483,8 @@ long syReorderShiftedComponents(long * sc, int n)
   }
 #endif
 
-  memcpyW(sc, tc, n);
-  Free(tc, n*sizeof(long));
+  omMemcpyW(sc, tc, n);
+  omFreeSize(tc, n*sizeof(long));
   return new_space;
 }
 
@@ -706,7 +706,7 @@ static intvec* syLinStrat(SSet nextPairs, syStrategy syzstr,
   int ** Hin=syzstr->Howmuch;
   int ** bin=syzstr->backcomponents;
   ideal o_r=syzstr->orderedRes[index+1];
-  intvec *result=NewIntvec1(howmuch+1);
+  intvec *result=new intvec(howmuch+1);
   BOOLEAN isDivisible;
   SObject tso;
 
@@ -757,8 +757,8 @@ static intvec* syLinStrat(SSet nextPairs, syStrategy syzstr,
   int ** Hin=syzstr->Howmuch;
   int ** bin=syzstr->backcomponents;
   ideal o_r=syzstr->orderedRes[index+1];
-  intvec *result=NewIntvec1(howmuch+1);
-  intvec *spl=NewIntvec3(howmuch,1,-1);
+  intvec *result=new intvec(howmuch+1);
+  intvec *spl=new intvec(howmuch,1,-1);
   BOOLEAN isDivisible;
   SObject tso;
 
@@ -838,26 +838,26 @@ static intvec* syLinStrat(SSet nextPairs, syStrategy syzstr,
 void syEnlargeFields(syStrategy syzstr,int index)
 {
   pEnlargeSet(&(syzstr->res[index]->m),IDELEMS(syzstr->res[index]),16);
-  syzstr->truecomponents[index]=(int*)ReAlloc0((ADDRESS)syzstr->truecomponents[index],
+  syzstr->truecomponents[index]=(int*)omRealloc0Size((ADDRESS)syzstr->truecomponents[index],
                                (IDELEMS(syzstr->res[index])+1)*sizeof(int),
                                (IDELEMS(syzstr->res[index])+17)*sizeof(int));
   syzstr->ShiftedComponents[index]
-    =(long*)ReAlloc0((ADDRESS)syzstr->ShiftedComponents[index],
+    =(long*)omRealloc0Size((ADDRESS)syzstr->ShiftedComponents[index],
                               (IDELEMS(syzstr->res[index])+1)*sizeof(long),
                               (IDELEMS(syzstr->res[index])+17)*sizeof(long));
-  syzstr->backcomponents[index]=(int*)ReAlloc0((ADDRESS)syzstr->backcomponents[index],
+  syzstr->backcomponents[index]=(int*)omRealloc0Size((ADDRESS)syzstr->backcomponents[index],
                                (IDELEMS(syzstr->res[index])+1)*sizeof(int),
                                (IDELEMS(syzstr->res[index])+17)*sizeof(int));
-  syzstr->Howmuch[index]=(int*)ReAlloc0((ADDRESS)syzstr->Howmuch[index],
+  syzstr->Howmuch[index]=(int*)omRealloc0Size((ADDRESS)syzstr->Howmuch[index],
                                (IDELEMS(syzstr->res[index])+1)*sizeof(int),
                                (IDELEMS(syzstr->res[index])+17)*sizeof(int));
-  syzstr->Firstelem[index]=(int*)ReAlloc0((ADDRESS)syzstr->Firstelem[index],
+  syzstr->Firstelem[index]=(int*)omRealloc0Size((ADDRESS)syzstr->Firstelem[index],
                                (IDELEMS(syzstr->res[index])+1)*sizeof(int),
                                (IDELEMS(syzstr->res[index])+17)*sizeof(int));
-  syzstr->elemLength[index]=(int*)ReAlloc0((ADDRESS)syzstr->elemLength[index],
+  syzstr->elemLength[index]=(int*)omRealloc0Size((ADDRESS)syzstr->elemLength[index],
                                (IDELEMS(syzstr->res[index])+1)*sizeof(int),
                                (IDELEMS(syzstr->res[index])+17)*sizeof(int));
-  syzstr->sev[index]=(unsigned long*)ReAlloc0((ADDRESS)syzstr->sev[index],
+  syzstr->sev[index]=(unsigned long*)omRealloc0Size((ADDRESS)syzstr->sev[index],
                                     (IDELEMS(syzstr->res[index])+1)*sizeof(unsigned long),
                                (IDELEMS(syzstr->res[index])+17)*sizeof(unsigned long));
   IDELEMS(syzstr->res[index]) += 16;
@@ -1141,7 +1141,7 @@ void syEnterPair(syStrategy syzstr, SObject * so, int * sPlength,int index)
 
   if (*sPlength>=(*syzstr->Tl)[index])
   {
-    SSet temp = (SSet)Alloc0(((*syzstr->Tl)[index]+16)*sizeof(SObject));
+    SSet temp = (SSet)omAlloc0(((*syzstr->Tl)[index]+16)*sizeof(SObject));
     for (ll=0;ll<(*syzstr->Tl)[index];ll++)
     {
       temp[ll].p = (syzstr->resPairs[index])[ll].p;
@@ -1157,7 +1157,8 @@ void syEnterPair(syStrategy syzstr, SObject * so, int * sPlength,int index)
       temp[ll].length = (syzstr->resPairs[index])[ll].length;
       temp[ll].reference = (syzstr->resPairs[index])[ll].reference;
     }
-    Free((ADDRESS)syzstr->resPairs[index],(*syzstr->Tl)[index]*sizeof(SObject));
+    if (syzstr->resPairs[index] != NULL) // OB: ?????
+      omFreeSize((ADDRESS)syzstr->resPairs[index],(*syzstr->Tl)[index]*sizeof(SObject));
     (*syzstr->Tl)[index] += 16;
     syzstr->resPairs[index] = temp;
   }
@@ -1234,7 +1235,7 @@ static void syCreateNewPairs(syStrategy syzstr, int index, int newEl)
       {
         if (l>=(*syzstr->Tl)[index])
         {
-          temp = (SSet)Alloc0(((*syzstr->Tl)[index]+16)*sizeof(SObject));
+          temp = (SSet)omAlloc0(((*syzstr->Tl)[index]+16)*sizeof(SObject));
           for (ll=0;ll<(*syzstr->Tl)[index];ll++)
           {
             temp[ll].p = (syzstr->resPairs[index])[ll].p;
@@ -1248,7 +1249,8 @@ static void syCreateNewPairs(syStrategy syzstr, int index, int newEl)
             temp[ll].order = (syzstr->resPairs[index])[ll].order;
             temp[ll].isNotMinimal = (syzstr->resPairs[index])[ll].isNotMinimal;
           }
-          Free((ADDRESS)syzstr->resPairs[index],(*syzstr->Tl)[index]*sizeof(SObject));
+          if (syzstr->resPairs[index] != NULL) // OB: ????
+            omFreeSize((ADDRESS)syzstr->resPairs[index],(*syzstr->Tl)[index]*sizeof(SObject));
           (*syzstr->Tl)[index] += 16;
           syzstr->resPairs[index] = temp;
         }
@@ -1561,8 +1563,8 @@ int syInitSyzMod(syStrategy syzstr, int index, int init)
   if (syzstr->res[index]==NULL)
   {
     syzstr->res[index] = idInit(init-1,1);
-    syzstr->truecomponents[index] = (int*)Alloc0(init*sizeof(int));
-    syzstr->ShiftedComponents[index] = (long*)Alloc0(init*sizeof(long));
+    syzstr->truecomponents[index] = (int*)omAlloc0(init*sizeof(int));
+    syzstr->ShiftedComponents[index] = (long*)omAlloc0(init*sizeof(long));
     if (index==0)
     {
       for (int i=0;i<init;i++)
@@ -1571,12 +1573,12 @@ int syInitSyzMod(syStrategy syzstr, int index, int init)
         syzstr->ShiftedComponents[0][i] = (i)*SYZ_SHIFT_BASE;
       }
     }
-    syzstr->backcomponents[index] = (int*)Alloc0(init*sizeof(int));
-    syzstr->Howmuch[index] = (int*)Alloc0(init*sizeof(int));
-    syzstr->Firstelem[index] = (int*)Alloc0(init*sizeof(int));
-    syzstr->elemLength[index] = (int*)Alloc0(init*sizeof(int));
+    syzstr->backcomponents[index] = (int*)omAlloc0(init*sizeof(int));
+    syzstr->Howmuch[index] = (int*)omAlloc0(init*sizeof(int));
+    syzstr->Firstelem[index] = (int*)omAlloc0(init*sizeof(int));
+    syzstr->elemLength[index] = (int*)omAlloc0(init*sizeof(int));
     syzstr->orderedRes[index] = idInit(init-1,1);
-    syzstr->sev[index] = (unsigned long*) Alloc0(init*sizeof(unsigned long));
+    syzstr->sev[index] = (unsigned long*) omAlloc0(init*sizeof(unsigned long));
     result = 0;
   }
   else
@@ -1613,7 +1615,7 @@ void syKillComputation(syStrategy syzstr)
         }
         idDelete(&(syzstr->minres[i]));
       }
-      Free((ADDRESS)syzstr->minres,(syzstr->length+1)*sizeof(ideal));
+      omFreeSize((ADDRESS)syzstr->minres,(syzstr->length+1)*sizeof(ideal));
     }
     if (syzstr->fullres!=NULL)
     {
@@ -1629,7 +1631,7 @@ void syKillComputation(syStrategy syzstr)
         }
         idDelete(&(syzstr->fullres[i]));
       }
-      Free((ADDRESS)syzstr->fullres,(syzstr->length+1)*sizeof(ideal));
+      omFreeSize((ADDRESS)syzstr->fullres,(syzstr->length+1)*sizeof(ideal));
     }
     if (syzstr->weights!=0)
     {
@@ -1640,7 +1642,7 @@ void syKillComputation(syStrategy syzstr)
           delete syzstr->weights[i];
         }
       }
-      Free((ADDRESS)syzstr->weights,syzstr->length*sizeof(intvec*));
+      omFreeSize((ADDRESS)syzstr->weights,syzstr->length*sizeof(intvec*));
     }
     ring origR = currRing;
 
@@ -1668,29 +1670,29 @@ void syKillComputation(syStrategy syzstr)
         idDelete(&(syzstr->orderedRes[i]));
         if (syzstr->truecomponents[i]!=NULL)
         {
-          Free((ADDRESS)syzstr->truecomponents[i],(IDELEMS(syzstr->res[i])+1)*sizeof(int));
+          omFreeSize((ADDRESS)syzstr->truecomponents[i],(IDELEMS(syzstr->res[i])+1)*sizeof(int));
           syzstr->truecomponents[i]=NULL;
-          Free((ADDRESS)syzstr->ShiftedComponents[i],(IDELEMS(syzstr->res[i])+1)*sizeof(long));
+          omFreeSize((ADDRESS)syzstr->ShiftedComponents[i],(IDELEMS(syzstr->res[i])+1)*sizeof(long));
           syzstr->ShiftedComponents[i]=NULL;
         }
         if (syzstr->backcomponents[i]!=NULL)
         {
-          Free((ADDRESS)syzstr->backcomponents[i],(IDELEMS(syzstr->res[i])+1)*sizeof(int));
+          omFreeSize((ADDRESS)syzstr->backcomponents[i],(IDELEMS(syzstr->res[i])+1)*sizeof(int));
           syzstr->backcomponents[i]=NULL;
         }
         if (syzstr->Howmuch[i]!=NULL)
         {
-          Free((ADDRESS)syzstr->Howmuch[i],(IDELEMS(syzstr->res[i])+1)*sizeof(int));
+          omFreeSize((ADDRESS)syzstr->Howmuch[i],(IDELEMS(syzstr->res[i])+1)*sizeof(int));
           syzstr->Howmuch[i]=NULL;
         }
         if (syzstr->Firstelem[i]!=NULL)
         {
-          Free((ADDRESS)syzstr->Firstelem[i],(IDELEMS(syzstr->res[i])+1)*sizeof(int));
+          omFreeSize((ADDRESS)syzstr->Firstelem[i],(IDELEMS(syzstr->res[i])+1)*sizeof(int));
           syzstr->Firstelem[i]=NULL;
         }
         if (syzstr->elemLength[i]!=NULL)
         {
-          Free((ADDRESS)syzstr->elemLength[i],(IDELEMS(syzstr->res[i])+1)*sizeof(int));
+          omFreeSize((ADDRESS)syzstr->elemLength[i],(IDELEMS(syzstr->res[i])+1)*sizeof(int));
           syzstr->elemLength[i]=NULL;
         }
         if (syzstr->res[i]!=NULL)
@@ -1705,23 +1707,24 @@ void syKillComputation(syStrategy syzstr)
         && (syzstr->hilb_coeffs[i]!=NULL))
           delete syzstr->hilb_coeffs[i];
         if (syzstr->sev[i] != NULL)
-          Free((ADDRESS)syzstr->sev[i], (IDELEMS(syzstr->res[i])+1)*sizeof(unsigned long));
+          omFreeSize((ADDRESS)syzstr->sev[i], (IDELEMS(syzstr->res[i])+1)*sizeof(unsigned long));
         idDelete(&(syzstr->res[i]));
-        Free((ADDRESS)syzstr->resPairs[i],(*syzstr->Tl)[i]*sizeof(SObject));
+        if (syzstr->resPairs[i] != NULL) // OB: ????
+          omFreeSize((ADDRESS)syzstr->resPairs[i],(*syzstr->Tl)[i]*sizeof(SObject));
       }
-      Free((ADDRESS)syzstr->resPairs,syzstr->length*sizeof(SObject*));
-      Free((ADDRESS)syzstr->res,(syzstr->length+1)*sizeof(ideal));
-      Free((ADDRESS)syzstr->orderedRes,(syzstr->length+1)*sizeof(ideal));
-      Free((ADDRESS)syzstr->elemLength,(syzstr->length+1)*sizeof(int*));
-      Free((ADDRESS)syzstr->truecomponents,(syzstr->length+1)*sizeof(int*));
-      Free((ADDRESS)syzstr->ShiftedComponents,(syzstr->length+1)*sizeof(long*));
+      omFreeSize((ADDRESS)syzstr->resPairs,syzstr->length*sizeof(SObject*));
+      omFreeSize((ADDRESS)syzstr->res,(syzstr->length+1)*sizeof(ideal));
+      omFreeSize((ADDRESS)syzstr->orderedRes,(syzstr->length+1)*sizeof(ideal));
+      omFreeSize((ADDRESS)syzstr->elemLength,(syzstr->length+1)*sizeof(int*));
+      omFreeSize((ADDRESS)syzstr->truecomponents,(syzstr->length+1)*sizeof(int*));
+      omFreeSize((ADDRESS)syzstr->ShiftedComponents,(syzstr->length+1)*sizeof(long*));
       if (syzstr->sev != NULL)
-        Free(((ADDRESS)syzstr->sev), (syzstr->length+1)*sizeof(unsigned long*));
-      Free((ADDRESS)syzstr->backcomponents,(syzstr->length+1)*sizeof(int*));
-      Free((ADDRESS)syzstr->Howmuch,(syzstr->length+1)*sizeof(int*));
-      Free((ADDRESS)syzstr->Firstelem,(syzstr->length+1)*sizeof(int*));
+        omFreeSize(((ADDRESS)syzstr->sev), (syzstr->length+1)*sizeof(unsigned long*));
+      omFreeSize((ADDRESS)syzstr->backcomponents,(syzstr->length+1)*sizeof(int*));
+      omFreeSize((ADDRESS)syzstr->Howmuch,(syzstr->length+1)*sizeof(int*));
+      omFreeSize((ADDRESS)syzstr->Firstelem,(syzstr->length+1)*sizeof(int*));
       if (syzstr->hilb_coeffs!=NULL)
-        Free((ADDRESS)syzstr->hilb_coeffs,(syzstr->length+1)*sizeof(intvec*));
+        omFreeSize((ADDRESS)syzstr->hilb_coeffs,(syzstr->length+1)*sizeof(intvec*));
     }
     if (syzstr->cw!=NULL)
       delete syzstr->cw;
@@ -1736,7 +1739,7 @@ void syKillComputation(syStrategy syzstr)
       rChangeCurrRing(origR, FALSE);
       rKill(syzstr->syRing);
     }
-    FreeSizeOf((ADDRESS)syzstr,ssyStrategy);
+    omFreeSize((ADDRESS)syzstr, sizeof(ssyStrategy));
   }
 }
 
@@ -1782,7 +1785,7 @@ intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim,int * row_shift)
     }
     j = j+sh;
     jj = jj+2;
-    result=NewIntvec3(j,jj-sh,0);
+    result=new intvec(j,jj-sh,0);
     if ((syzstr->syRing!=NULL) && (syzstr->syRing!=currRing))
     {
       ring origR=currRing;
@@ -1826,7 +1829,7 @@ BOOLEAN syBetti2(leftv res, leftv u, leftv w)
   int row_shift=0;
 
   res->data=(void *)syBettiOfComputation(syzstr,minim,&row_shift);
-  atSet(res,mstrdup("rowShift"),(void*)row_shift,INT_CMD);
+  atSet(res,omStrDup("rowShift"),(void*)row_shift,INT_CMD);
   return FALSE;
 }
 BOOLEAN syBetti1(leftv res, leftv u)
@@ -1967,7 +1970,7 @@ void syPrint(syStrategy syzstr)
     int j;
     if (syzstr->resPairs!=NULL)
     {
-      syzstr->resolution = NewIntvec1(syzstr->length+1);
+      syzstr->resolution = new intvec(syzstr->length+1);
       SRes rP=syzstr->resPairs;
       (*syzstr->resolution)[0] = max(1,idRankFreeModule(syzstr->res[1]));
       while ((l<syzstr->length) && (rP[l]!=NULL))
@@ -1986,7 +1989,7 @@ void syPrint(syStrategy syzstr)
     else
     {
       resolvente rr;
-      syzstr->resolution = NewIntvec1(syzstr->length+2);
+      syzstr->resolution = new intvec(syzstr->length+2);
       if (syzstr->minres!=NULL)
         rr = syzstr->minres;
       else
@@ -2056,7 +2059,7 @@ static resolvente syReorder(resolvente res,int length,
   polyset ri1;
   resolvente fullres;
   ring origR=syzstr->syRing;
-  fullres = (resolvente)Alloc0((length+1)*sizeof(ideal));
+  fullres = (resolvente)omAlloc0((length+1)*sizeof(ideal));
   if (totake==NULL)
     totake = res;
   for (i=length-1;i>0;i--)
@@ -2153,7 +2156,7 @@ static resolvente syReorder(resolvente res,int length,
     }
   }
   if (!toCopy)
-    Free((ADDRESS)res,(length+1)*sizeof(ideal));
+    omFreeSize((ADDRESS)res,(length+1)*sizeof(ideal));
   //syzstr->length = length;
   return fullres;
 }
@@ -2185,7 +2188,7 @@ lists syConvRes(syStrategy syzstr,BOOLEAN toDel)
   intvec ** w=NULL;
   if (syzstr->length>0)
   {
-    trueres=(resolvente)Alloc0((syzstr->length)*sizeof(ideal));
+    trueres=(resolvente)omAlloc0((syzstr->length)*sizeof(ideal));
     for (int i=(syzstr->length)-1;i>=0;i--)
     {
       if (tr[i]!=NULL)
@@ -2197,7 +2200,7 @@ lists syConvRes(syStrategy syzstr,BOOLEAN toDel)
       typ0 = MODUL_CMD;
     if (syzstr->weights!=NULL)
     {
-      w = (intvec**)Alloc0((syzstr->length)*sizeof(intvec*));
+      w = (intvec**)omAlloc0((syzstr->length)*sizeof(intvec*));
       for (int i=(syzstr->length)-1;i>=0;i--)
       {
         if (syzstr->weights[i]!=NULL) w[i] = ivCopy(syzstr->weights[i]);
@@ -2215,24 +2218,24 @@ lists syConvRes(syStrategy syzstr,BOOLEAN toDel)
 syStrategy syConvList(lists li,BOOLEAN toDel)
 {
   int typ0;
-  syStrategy result=(syStrategy)Alloc0SizeOf(ssyStrategy);
+  syStrategy result=(syStrategy)omAlloc0(sizeof(ssyStrategy));
 
   resolvente fr = liFindRes(li,&(result->length),&typ0,&(result->weights));
   if (fr != NULL)
   {
 
-    result->fullres = (resolvente)Alloc0((result->length+1)*sizeof(ideal));
+    result->fullres = (resolvente)omAlloc0((result->length+1)*sizeof(ideal));
     for (int i=result->length-1;i>=0;i--)
     {
       if (fr[i]!=NULL)
         result->fullres[i] = idCopy(fr[i]);
     }
     result->list_length=result->length;
-    Free((ADDRESS)fr,(result->length)*sizeof(ideal));
+    omFreeSize((ADDRESS)fr,(result->length)*sizeof(ideal));
   }
   else
   {
-    FreeSizeOf (result, ssyStrategy);
+    omFreeSize(result, sizeof(ssyStrategy));
     result = NULL;
   }
   if (toDel) li->Clean();
@@ -2245,16 +2248,16 @@ syStrategy syConvList(lists li,BOOLEAN toDel)
 syStrategy syForceMin(lists li)
 {
   int typ0;
-  syStrategy result=(syStrategy)Alloc0SizeOf(ssyStrategy);
+  syStrategy result=(syStrategy)omAlloc0(sizeof(ssyStrategy));
 
   resolvente fr = liFindRes(li,&(result->length),&typ0);
-  result->minres = (resolvente)Alloc0((result->length+1)*sizeof(ideal));
+  result->minres = (resolvente)omAlloc0((result->length+1)*sizeof(ideal));
   for (int i=result->length-1;i>=0;i--)
   {
     if (fr[i]!=NULL)
       result->minres[i] = idCopy(fr[i]);
   }
-  Free((ADDRESS)fr,(result->length)*sizeof(ideal));
+  omFreeSize((ADDRESS)fr,(result->length)*sizeof(ideal));
   return result;
 }
 
@@ -2431,7 +2434,7 @@ void syKillEmptyEntres(resolvente res,int length)
     if (ri!=NULL)
     {
       rj = IDELEMS(ri);
-      changes = NewIntvec3(rj+1,1,-1);
+      changes = new intvec(rj+1,1,-1);
       while ((rj>0) && (ri->m[rj-1]==NULL)) rj--;
       j = k = 0;
       while (j+k<rj)
@@ -2476,7 +2479,7 @@ static intvec * syToStrip(syStrategy syzstr, int index)
 
   if ((syzstr->resPairs[index-1]!=NULL) && (!idIs0(syzstr->res[index])))
   {
-    result=NewIntvec1(IDELEMS(syzstr->res[index])+1);
+    result=new intvec(IDELEMS(syzstr->res[index])+1);
     for (int i=(*syzstr->Tl)[index-1]-1;i>=0;i--)
     {
       if (syzstr->resPairs[index-1][i].isNotMinimal!=NULL)
@@ -2494,7 +2497,7 @@ static intvec * syToStrip(syStrategy syzstr, int index)
 */
 static intvec * syOrdPairs(SSet sPairs, int length)
 {
-  intvec * result=NewIntvec3(length,1,-1);
+  intvec * result=new intvec(length,1,-1);
   int i,j=0,k=-1,l,ii;
 
   loop
@@ -2534,7 +2537,7 @@ static resolvente syReadOutMinimalRes(syStrategy syzstr,
            BOOLEAN computeStd=FALSE)
 {
   intvec * Strip, * ordn;
-  resolvente tres=(resolvente)Alloc0((syzstr->length+1)*sizeof(ideal));
+  resolvente tres=(resolvente)omAlloc0((syzstr->length+1)*sizeof(ideal));
   ring tmpR = NULL;
   ring origR = currRing;
 
@@ -2653,13 +2656,13 @@ syStrategy syLaScala3(ideal arg,int * length)
   poly p;
   ideal temp;
   SSet nextPairs;
-  syStrategy syzstr=(syStrategy)Alloc0SizeOf(ssyStrategy);
+  syStrategy syzstr=(syStrategy)omAlloc0(sizeof(ssyStrategy));
   ring origR = currRing;
 
   if ((idIs0(arg)) ||
       ((idRankFreeModule(arg)>0) && (!idHomModule(arg,NULL,&(syzstr->cw)))))
   {
-    syzstr->minres = (resolvente)Alloc0SizeOf(ideal);
+    syzstr->minres = (resolvente)omAlloc0Bin(ideal_bin);
     syzstr->length = 1;
     syzstr->minres[0] = idInit(1,arg->rank);
     return syzstr;
@@ -2675,8 +2678,8 @@ syStrategy syLaScala3(ideal arg,int * length)
   assume(syzstr->syRing != origR);
 
   // set initial ShiftedComps
-  currcomponents = (int*)Alloc0((arg->rank+1)*sizeof(int));
-  currShiftedComponents = (long*)Alloc0((arg->rank+1)*sizeof(long));
+  currcomponents = (int*)omAlloc0((arg->rank+1)*sizeof(int));
+  currShiftedComponents = (long*)omAlloc0((arg->rank+1)*sizeof(long));
   for (i=0;i<=arg->rank;i++)
   {
     currShiftedComponents[i] = (i)*SYZ_SHIFT_BASE;
@@ -2684,7 +2687,7 @@ syStrategy syLaScala3(ideal arg,int * length)
   }
   rChangeSComps(currcomponents, currShiftedComponents, arg->rank);
 /*--- initializes the data structures---------------*/
-  syzstr->Tl = NewIntvec1(*length);
+  syzstr->Tl = new intvec(*length);
   temp = idInit(IDELEMS(arg),arg->rank);
   for (i=0;i<IDELEMS(arg);i++)
   {
@@ -2699,17 +2702,17 @@ syStrategy syLaScala3(ideal arg,int * length)
   idSkipZeroes(temp);
   idTest(temp);
   syzstr->resPairs = syInitRes(temp,length,syzstr->Tl,syzstr->cw);
-  Free((ADDRESS)currcomponents,(arg->rank+1)*sizeof(int));
-  Free((ADDRESS)currShiftedComponents,(arg->rank+1)*sizeof(long));
-  syzstr->res = (resolvente)Alloc0((*length+1)*sizeof(ideal));
-  syzstr->orderedRes = (resolvente)Alloc0((*length+1)*sizeof(ideal));
-  syzstr->elemLength = (int**)Alloc0((*length+1)*sizeof(int*));
-  syzstr->truecomponents = (int**)Alloc0((*length+1)*sizeof(int*));
-  syzstr->ShiftedComponents = (long**)Alloc0((*length+1)*sizeof(long*));
-  syzstr->backcomponents = (int**)Alloc0((*length+1)*sizeof(int*));
-  syzstr->Howmuch = (int**)Alloc0((*length+1)*sizeof(int*));
-  syzstr->Firstelem = (int**)Alloc0((*length+1)*sizeof(int*));
-  syzstr->sev = (unsigned long **) Alloc0((*length+1)*sizeof(unsigned long *));
+  omFreeSize((ADDRESS)currcomponents,(arg->rank+1)*sizeof(int));
+  omFreeSize((ADDRESS)currShiftedComponents,(arg->rank+1)*sizeof(long));
+  syzstr->res = (resolvente)omAlloc0((*length+1)*sizeof(ideal));
+  syzstr->orderedRes = (resolvente)omAlloc0((*length+1)*sizeof(ideal));
+  syzstr->elemLength = (int**)omAlloc0((*length+1)*sizeof(int*));
+  syzstr->truecomponents = (int**)omAlloc0((*length+1)*sizeof(int*));
+  syzstr->ShiftedComponents = (long**)omAlloc0((*length+1)*sizeof(long*));
+  syzstr->backcomponents = (int**)omAlloc0((*length+1)*sizeof(int*));
+  syzstr->Howmuch = (int**)omAlloc0((*length+1)*sizeof(int*));
+  syzstr->Firstelem = (int**)omAlloc0((*length+1)*sizeof(int*));
+  syzstr->sev = (unsigned long **) omAlloc0((*length+1)*sizeof(unsigned long *));
   syzstr->bucket = kBucketCreate();
   int len0=idRankFreeModule(arg)+1;
   startdeg = actdeg;

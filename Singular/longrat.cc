@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.29 2000-07-03 10:21:20 pohl Exp $ */
+/* $Id: longrat.cc,v 1.30 2000-08-14 12:56:36 obachman Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -10,7 +10,7 @@
 #include <float.h>
 #include "mod2.h"
 #include "tok.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "febase.h"
 #include "numbers.h"
 #include "modulop.h"
@@ -18,6 +18,8 @@
 #include "shortfl.h"
 #include "mpr_complex.h"
 #include "longrat.h"
+
+omBin rnumber_bin = omGetSpecBin(sizeof(rnumber));
 
 #ifndef BYTES_PER_MP_LIMB
 #ifdef HAVE_LIBGMP2
@@ -153,44 +155,37 @@ BOOLEAN nlDBTest(number a, char *f,int l)
     }
     return TRUE;
   }
-#ifdef MDEBUG
-  mmDBTestBlock(a,sizeof(*a),f,l);
-#endif
-#ifndef HAVE_ASO
+  omCheckIf(omCheckAddrSize(a,sizeof(*a)), return FALSE);
   if (a->debug!=123456)
   {
     Print("!!longrat:debug:%d in %s:%d\n",a->debug,f,l);
     a->debug=123456;
     return FALSE;
   }
-#endif
   if ((a->s<0)||(a->s>4))
   {
     Print("!!longrat:s=%d in %s:%d\n",a->s,f,l);
     return FALSE;
   }
-#ifdef MDEBUG
 #ifdef HAVE_LIBGMP2
-  mmDBTestBlock(a->z._mp_d,a->z._mp_alloc*BYTES_PER_MP_LIMB,f,l);
+  omCheckAddrSize(a->z._mp_d,a->z._mp_alloc*BYTES_PER_MP_LIMB);
   if (a->z._mp_alloc==0)
 #else
-  mmDBTestBlock(a->z.d,a->z.alloc*BYTES_PER_MP_LIMB,f,l);
+  omCheckIf(omCheckAddrSize(a->z.d,a->z.alloc*BYTES_PER_MP_LIMB), return FALSE);
   if(a->z.alloc==0)
 #endif
     Print("!!longrat:z->alloc=0 in %s:%l\n",f,l);
-#endif
+
   if (a->s<2)
   {
-#ifdef MDEBUG
 #ifdef HAVE_LIBGMP2
-    mmDBTestBlock(a->n._mp_d,a->n._mp_alloc*BYTES_PER_MP_LIMB,f,-l);
+    omCheckIf(omCheckAddrSize(a->n._mp_d,a->n._mp_alloc*BYTES_PER_MP_LIMB), return FALSE);
     if (a->z._mp_alloc==0)
 #else
-    mmDBTestBlock(a->n.d,a->n.alloc*BYTES_PER_MP_LIMB,f,-l);
+    omCheckIf(omCheckAddrSize(a->n.d,a->n.alloc*BYTES_PER_MP_LIMB), return FALSE);
     if(a->z.alloc==0)
 #endif
       Print("!!longrat:n->alloc=0 in %s:%l\n",f,l);
-#endif
     if (mpz_cmp_si(&a->n,(long)1)==0)
     {
       Print("!!longrat:integer as rational in %s:%d\n",f,l);
@@ -235,19 +230,10 @@ void nlNew (number * r)
 /*2
 * z := i
 */
-#ifdef MDEBUG
-#define nlRInit(A) nlRDBInit(A,__LINE__)
-static inline number nlRDBInit(int i, int n)
-#else
 static inline number nlRInit (int i)
-#endif
 {
-#ifdef MDEBUG
-  number z=(number)mmDBAllocBlock(sizeof(rnumber),"longrat.cc",n);
-#else
-  number z=(number)AllocSizeOf(rnumber);
-#endif
-#if defined(LDEBUG) && ! defined(HAVE_ASO)
+  number z=(number)omAllocBin(rnumber_bin);
+#if defined(LDEBUG) 
   z->debug=123456;
 #endif
   mpz_init_set_si(&z->z,(long)i);
@@ -276,7 +262,7 @@ number nlInit (number u)
         && (mpz_cmp_si(&u->z,(long)ui)==0))
     {
       mpz_clear(&u->z);
-      FreeSizeOf((ADDRESS)u,rnumber);
+      omFreeBin((ADDRESS)u, rnumber_bin);
       return INT_TO_SR(ui);
     }
   }
@@ -465,16 +451,9 @@ void nlDelete (number * a)
           mpz_clear(&(*a)->z);
 #ifdef LDEBUG
           (*a)->s=2;
-#ifndef HAVE_ASO
-          (*a)->debug=654321;
-#endif
 #endif
       }
-#if defined(MDEBUG) && defined(LDEBUG)
-      mmDBFreeBlock((ADDRESS) *a,sizeof(rnumber),f,l);
-#else
-      FreeSizeOf((ADDRESS) *a,rnumber);
-#endif
+      omFreeBin((ADDRESS) *a, rnumber_bin);
     }
     *a=NULL;
   }
@@ -493,8 +472,8 @@ number nlCopy(number a)
 #ifdef LDEBUG
   nlTest(a);
 #endif
-  b=(number)AllocSizeOf(rnumber);
-#if defined(LDEBUG) && ! defined(HAVE_ASO)
+  b=(number)omAllocBin(rnumber_bin);
+#if defined(LDEBUG) 
   b->debug=123456;
 #endif
   switch (a->s)
@@ -539,7 +518,7 @@ number nlNeg (number a)
       && (mpz_cmp_si(&a->z,(long)ui)==0))
       {
         mpz_clear(&a->z);
-        FreeSizeOf((ADDRESS)a,rnumber);
+        omFreeBin((ADDRESS)a, rnumber_bin);
         a=INT_TO_SR(ui);
       }
     }
@@ -570,8 +549,8 @@ number nlInvers(number a)
       WerrorS("div. 1/0");
       return INT_TO_SR(0);
     }
-    n=(number)AllocSizeOf(rnumber);
-#if defined(LDEBUG) && ! defined(HAVE_ASO)
+    n=(number)omAllocBin(rnumber_bin);
+#if defined(LDEBUG) 
     n->debug=123456;
 #endif
     n->s=1;
@@ -593,8 +572,8 @@ number nlInvers(number a)
 #endif
     return n;
   }
-  n=(number)AllocSizeOf(rnumber);
-#if defined(LDEBUG) && ! defined(HAVE_ASO)
+  n=(number)omAllocBin(rnumber_bin);
+#if defined(LDEBUG) 
   n->debug=123456;
 #endif
   {
@@ -621,7 +600,7 @@ number nlInvers(number a)
                   && (mpz_cmp_si(&n->z,(long)ui)==0))
                   {
                     mpz_clear(&n->z);
-                    FreeSizeOf((ADDRESS)n,rnumber);
+                    omFreeBin((ADDRESS)n, rnumber_bin);
                     n=INT_TO_SR(ui);
                   }
                 }
@@ -660,17 +639,17 @@ number nlAdd (number a, number b)
     {
       return (number)r;
     }
-    u=(number)AllocSizeOf(rnumber);
+    u=(number)omAllocBin(rnumber_bin);
     u->s=3;
     mpz_init_set_si(&u->z,(long)SR_TO_INT(r));
-#if defined(LDEBUG) && ! defined(HAVE_ASO)
+#if defined(LDEBUG) 
     u->debug=123456;
 #endif
     nlTest(u);
     return u;
   }
-  u=(number)AllocSizeOf(rnumber);
-#if defined(LDEBUG) && ! defined(HAVE_ASO)
+  u=(number)omAllocBin(rnumber_bin);
+#if defined(LDEBUG) 
   u->debug=123456;
 #endif
   mpz_init(&u->z);
@@ -704,13 +683,13 @@ number nlAdd (number a, number b)
         if (mpz_cmp_ui(&u->z,(long)0)==0)
         {
           mpz_clear(&u->z);
-          FreeSizeOf((ADDRESS)u,rnumber);
+          omFreeBin((ADDRESS)u, rnumber_bin);
           return INT_TO_SR(0);
         }
         if (mpz_cmp(&u->z,&b->n)==0)
         {
           mpz_clear(&u->z);
-          FreeSizeOf((ADDRESS)u,rnumber);
+          omFreeBin((ADDRESS)u, rnumber_bin);
           return INT_TO_SR(1);
         }
         mpz_init_set(&u->n,&b->n);
@@ -727,7 +706,7 @@ number nlAdd (number a, number b)
         if (mpz_cmp_ui(&u->z,(long)0)==0)
         {
           mpz_clear(&u->z);
-          FreeSizeOf((ADDRESS)u,rnumber);
+          omFreeBin((ADDRESS)u, rnumber_bin);
           return INT_TO_SR(0);
         }
         //u->s = 3;
@@ -738,7 +717,7 @@ number nlAdd (number a, number b)
           && (mpz_cmp_si(&u->z,(long)ui)==0))
           {
             mpz_clear(&u->z);
-            FreeSizeOf((ADDRESS)u,rnumber);
+            omFreeBin((ADDRESS)u, rnumber_bin);
             return INT_TO_SR(ui);
           }
         }
@@ -772,7 +751,7 @@ number nlAdd (number a, number b)
             if (mpz_cmp_ui(&u->z,(long)0)==0)
             {
               mpz_clear(&u->z);
-              FreeSizeOf((ADDRESS)u,rnumber);
+              omFreeBin((ADDRESS)u, rnumber_bin);
               return INT_TO_SR(0);
             }
             mpz_init(&u->n);
@@ -782,7 +761,7 @@ number nlAdd (number a, number b)
             {
                mpz_clear(&u->z);
                mpz_clear(&u->n);
-               FreeSizeOf((ADDRESS)u,rnumber);
+               omFreeBin((ADDRESS)u, rnumber_bin);
                return INT_TO_SR(1);
             }
             u->s = 0;
@@ -799,13 +778,13 @@ number nlAdd (number a, number b)
             if (mpz_cmp_ui(&u->z,(long)0)==0)
             {
               mpz_clear(&u->z);
-              FreeSizeOf((ADDRESS)u,rnumber);
+              omFreeBin((ADDRESS)u, rnumber_bin);
               return INT_TO_SR(0);
             }
             if (mpz_cmp(&u->z,&a->n)==0)
             {
               mpz_clear(&u->z);
-              FreeSizeOf((ADDRESS)u,rnumber);
+              omFreeBin((ADDRESS)u, rnumber_bin);
               return INT_TO_SR(1);
             }
             mpz_init_set(&u->n,&a->n);
@@ -831,13 +810,13 @@ number nlAdd (number a, number b)
             if (mpz_cmp_ui(&u->z,(long)0)==0)
             {
               mpz_clear(&u->z);
-              FreeSizeOf((ADDRESS)u,rnumber);
+              omFreeBin((ADDRESS)u, rnumber_bin);
               return INT_TO_SR(0);
             }
             if (mpz_cmp(&u->z,&b->n)==0)
             {
               mpz_clear(&u->z);
-              FreeSizeOf((ADDRESS)u,rnumber);
+              omFreeBin((ADDRESS)u, rnumber_bin);
               return INT_TO_SR(1);
             }
             mpz_init_set(&u->n,&b->n);
@@ -851,7 +830,7 @@ number nlAdd (number a, number b)
             if (mpz_cmp_ui(&u->z,(long)0)==0)
             {
               mpz_clear(&u->z);
-              FreeSizeOf((ADDRESS)u,rnumber);
+              omFreeBin((ADDRESS)u, rnumber_bin);
               return INT_TO_SR(0);
             }
             if (mpz_size1(&u->z)<=MP_SMALL)
@@ -861,7 +840,7 @@ number nlAdd (number a, number b)
               && (mpz_cmp_si(&u->z,(long)ui)==0))
               {
                 mpz_clear(&u->z);
-                FreeSizeOf((ADDRESS)u,rnumber);
+                omFreeBin((ADDRESS)u, rnumber_bin);
                 return INT_TO_SR(ui);
               }
             }
@@ -892,17 +871,17 @@ number nlSub (number a, number b)
     {
       return (number)r;
     }
-    u=(number)AllocSizeOf(rnumber);
+    u=(number)omAllocBin(rnumber_bin);
     u->s=3;
     mpz_init_set_si(&u->z,(long)SR_TO_INT(r));
-#if defined(LDEBUG) && ! defined(HAVE_ASO)
+#if defined(LDEBUG) 
     u->debug=123456;
 #endif
     nlTest(u);
     return u;
   }
-  u=(number)AllocSizeOf(rnumber);
-#if defined(LDEBUG) && ! defined(HAVE_ASO)
+  u=(number)omAllocBin(rnumber_bin);
+#if defined(LDEBUG) 
   u->debug=123456;
 #endif
   mpz_init(&u->z);
@@ -929,13 +908,13 @@ number nlSub (number a, number b)
         if (mpz_cmp_ui(&u->z,(long)0)==0)
         {
           mpz_clear(&u->z);
-          FreeSizeOf((ADDRESS)u,rnumber);
+          omFreeBin((ADDRESS)u, rnumber_bin);
           return INT_TO_SR(0);
         }
         if (mpz_cmp(&u->z,&b->n)==0)
         {
           mpz_clear(&u->z);
-          FreeSizeOf((ADDRESS)u,rnumber);
+          omFreeBin((ADDRESS)u, rnumber_bin);
           return INT_TO_SR(1);
         }
         mpz_init_set(&u->n,&b->n);
@@ -958,7 +937,7 @@ number nlSub (number a, number b)
         if (mpz_cmp_ui(&u->z,(long)0)==0)
         {
           mpz_clear(&u->z);
-          FreeSizeOf((ADDRESS)u,rnumber);
+          omFreeBin((ADDRESS)u, rnumber_bin);
           return INT_TO_SR(0);
         }
         //u->s = 3;
@@ -969,7 +948,7 @@ number nlSub (number a, number b)
           && (mpz_cmp_si(&u->z,(long)ui)==0))
           {
             mpz_clear(&u->z);
-            FreeSizeOf((ADDRESS)u,rnumber);
+            omFreeBin((ADDRESS)u, rnumber_bin);
             return INT_TO_SR(ui);
           }
         }
@@ -1001,13 +980,13 @@ number nlSub (number a, number b)
         if (mpz_cmp_ui(&u->z,(long)0)==0)
         {
           mpz_clear(&u->z);
-          FreeSizeOf((ADDRESS)u,rnumber);
+          omFreeBin((ADDRESS)u, rnumber_bin);
           return INT_TO_SR(0);
         }
         if (mpz_cmp(&u->z,&a->n)==0)
         {
           mpz_clear(&u->z);
-          FreeSizeOf((ADDRESS)u,rnumber);
+          omFreeBin((ADDRESS)u, rnumber_bin);
           return INT_TO_SR(1);
         }
         mpz_init_set(&u->n,&a->n);
@@ -1027,7 +1006,7 @@ number nlSub (number a, number b)
         if (mpz_cmp_ui(&u->z,(long)0)==0)
         {
           mpz_clear(&u->z);
-          FreeSizeOf((ADDRESS)u,rnumber);
+          omFreeBin((ADDRESS)u, rnumber_bin);
           return INT_TO_SR(0);
         }
         //u->s = 3;
@@ -1039,7 +1018,7 @@ number nlSub (number a, number b)
           && (mpz_cmp_si(&u->z,(long)ui)==0))
           {
             mpz_clear(&u->z);
-            FreeSizeOf((ADDRESS)u,rnumber);
+            omFreeBin((ADDRESS)u, rnumber_bin);
             return INT_TO_SR(ui);
           }
         }
@@ -1072,7 +1051,7 @@ number nlSub (number a, number b)
             if (mpz_cmp_ui(&u->z,(long)0)==0)
             {
               mpz_clear(&u->z);
-              FreeSizeOf((ADDRESS)u,rnumber);
+              omFreeBin((ADDRESS)u, rnumber_bin);
               return INT_TO_SR(0);
             }
             mpz_init(&u->n);
@@ -1081,7 +1060,7 @@ number nlSub (number a, number b)
             {
               mpz_clear(&u->z);
               mpz_clear(&u->n);
-              FreeSizeOf((ADDRESS)u,rnumber);
+              omFreeBin((ADDRESS)u, rnumber_bin);
               return INT_TO_SR(1);
             }
             u->s = 0;
@@ -1097,13 +1076,13 @@ number nlSub (number a, number b)
             if (mpz_cmp_ui(&u->z,(long)0)==0)
             {
               mpz_clear(&u->z);
-              FreeSizeOf((ADDRESS)u,rnumber);
+              omFreeBin((ADDRESS)u, rnumber_bin);
               return INT_TO_SR(0);
             }
             if (mpz_cmp(&u->z,&a->n)==0)
             {
               mpz_clear(&u->z);
-              FreeSizeOf((ADDRESS)u,rnumber);
+              omFreeBin((ADDRESS)u, rnumber_bin);
               return INT_TO_SR(1);
             }
             mpz_init_set(&u->n,&a->n);
@@ -1128,13 +1107,13 @@ number nlSub (number a, number b)
             if (mpz_cmp_ui(&u->z,(long)0)==0)
             {
               mpz_clear(&u->z);
-              FreeSizeOf((ADDRESS)u,rnumber);
+              omFreeBin((ADDRESS)u, rnumber_bin);
               return INT_TO_SR(0);
             }
             if (mpz_cmp(&u->z,&b->n)==0)
             {
               mpz_clear(&u->z);
-              FreeSizeOf((ADDRESS)u,rnumber);
+              omFreeBin((ADDRESS)u, rnumber_bin);
               return INT_TO_SR(1);
             }
             mpz_init_set(&u->n,&b->n);
@@ -1148,7 +1127,7 @@ number nlSub (number a, number b)
             if (mpz_cmp_ui(&u->z,(long)0)==0)
             {
               mpz_clear(&u->z);
-              FreeSizeOf((ADDRESS)u,rnumber);
+              omFreeBin((ADDRESS)u, rnumber_bin);
               return INT_TO_SR(0);
             }
             //u->s = 3;
@@ -1159,7 +1138,7 @@ number nlSub (number a, number b)
               && (mpz_cmp_si(&u->z,(long)ui)==0))
               {
                 mpz_clear(&u->z);
-                FreeSizeOf((ADDRESS)u,rnumber);
+                omFreeBin((ADDRESS)u, rnumber_bin);
                 return INT_TO_SR(ui);
               }
             }
@@ -1199,8 +1178,8 @@ number nlMult (number a, number b)
       if (((SR_HDL(u)<<1)>>1)==SR_HDL(u)) return (u);
       return nlRInit(SR_HDL(u)>>2);
     }
-    u=(number)AllocSizeOf(rnumber);
-#if defined(LDEBUG) && ! defined(HAVE_ASO)
+    u=(number)omAllocBin(rnumber_bin);
+#if defined(LDEBUG) 
     u->debug=123456;
 #endif
     u->s=3;
@@ -1226,8 +1205,8 @@ number nlMult (number a, number b)
   }
   else
   {
-    u=(number)AllocSizeOf(rnumber);
-#if defined(LDEBUG) && ! defined(HAVE_ASO)
+    u=(number)omAllocBin(rnumber_bin);
+#if defined(LDEBUG) 
     u->debug=123456;
 #endif
     mpz_init(&u->z);
@@ -1265,7 +1244,7 @@ number nlMult (number a, number b)
         if (mpz_cmp(&u->z,&b->n)==0)
         {
           mpz_clear(&u->z);
-          FreeSizeOf((ADDRESS)u,rnumber);
+          omFreeBin((ADDRESS)u, rnumber_bin);
           return INT_TO_SR(1);
         }
         mpz_init_set(&u->n,&b->n);
@@ -1279,7 +1258,7 @@ number nlMult (number a, number b)
           && (mpz_cmp_si(&u->z,(long)ui)==0))
           {
             mpz_clear(&u->z);
-            FreeSizeOf((ADDRESS)u,rnumber);
+            omFreeBin((ADDRESS)u, rnumber_bin);
             return INT_TO_SR(ui);
           }
         }
@@ -1300,7 +1279,7 @@ number nlMult (number a, number b)
           if (mpz_cmp(&u->z,&b->n)==0)
           {
             mpz_clear(&u->z);
-            FreeSizeOf((ADDRESS)u,rnumber);
+            omFreeBin((ADDRESS)u, rnumber_bin);
             return INT_TO_SR(1);
           }
           mpz_init_set(&u->n,&b->n);
@@ -1313,7 +1292,7 @@ number nlMult (number a, number b)
           if (mpz_cmp(&u->z,&a->n)==0)
           {
             mpz_clear(&u->z);
-            FreeSizeOf((ADDRESS)u,rnumber);
+            omFreeBin((ADDRESS)u, rnumber_bin);
             return INT_TO_SR(1);
           }
           mpz_init_set(&u->n,&a->n);
@@ -1326,7 +1305,7 @@ number nlMult (number a, number b)
           {
             mpz_clear(&u->z);
             mpz_clear(&u->n);
-            FreeSizeOf((ADDRESS)u,rnumber);
+            omFreeBin((ADDRESS)u, rnumber_bin);
             return INT_TO_SR(1);
           }
         }
@@ -1369,8 +1348,8 @@ number   nlExactDiv(number a, number b)
     bb=nlRInit(SR_TO_INT(b));
     b=bb;
   }
-  u=(number)AllocSizeOf(rnumber);
-#if defined(LDEBUG) && ! defined(HAVE_ASO)
+  u=(number)omAllocBin(rnumber_bin);
+#if defined(LDEBUG) 
   u->debug=123456;
 #endif
   mpz_init(&u->z);
@@ -1380,7 +1359,7 @@ number   nlExactDiv(number a, number b)
   if (bb!=NULL)
   {
     mpz_clear(&bb->z);
-    FreeSizeOf((ADDRESS)bb,rnumber);
+    omFreeBin((ADDRESS)bb, rnumber_bin);
   }
   if (mpz_size1(&u->z)<=MP_SMALL)
   {
@@ -1389,7 +1368,7 @@ number   nlExactDiv(number a, number b)
     && (mpz_cmp_si(&u->z,(long)ui)==0))
     {
       mpz_clear(&u->z);
-      FreeSizeOf((ADDRESS)u,rnumber);
+      omFreeBin((ADDRESS)u, rnumber_bin);
       u=INT_TO_SR(ui);
     }
   }
@@ -1465,8 +1444,8 @@ number nlIntDiv (number a, number b)
     bb=nlRInit(SR_TO_INT(b));
     b=bb;
   }
-  u=(number)AllocSizeOf(rnumber);
-#if defined(LDEBUG) && ! defined(HAVE_ASO)
+  u=(number)omAllocBin(rnumber_bin);
+#if defined(LDEBUG) 
   u->debug=123456;
 #endif
   mpz_init_set(&u->z,&a->z);
@@ -1507,7 +1486,7 @@ number nlIntDiv (number a, number b)
   if (bb!=NULL)
   {
     mpz_clear(&bb->z);
-    FreeSizeOf((ADDRESS)bb,rnumber);
+    omFreeBin((ADDRESS)bb, rnumber_bin);
   }
   if (mpz_size1(&u->z)<=MP_SMALL)
   {
@@ -1516,7 +1495,7 @@ number nlIntDiv (number a, number b)
     && (mpz_cmp_si(&u->z,(long)ui)==0))
     {
       mpz_clear(&u->z);
-      FreeSizeOf((ADDRESS)u,rnumber);
+      omFreeBin((ADDRESS)u, rnumber_bin);
       u=INT_TO_SR(ui);
     }
   }
@@ -1583,8 +1562,8 @@ number nlIntMod (number a, number b)
     bb=nlRInit(SR_TO_INT(b));
     b=bb;
   }
-  u=(number)AllocSizeOf(rnumber);
-#if defined(LDEBUG) && ! defined(HAVE_ASO)
+  u=(number)omAllocBin(rnumber_bin);
+#if defined(LDEBUG) 
   u->debug=123456;
 #endif
   mpz_init(&u->z);
@@ -1593,7 +1572,7 @@ number nlIntMod (number a, number b)
   if (bb!=NULL)
   {
     mpz_clear(&bb->z);
-    FreeSizeOf((ADDRESS)bb,rnumber);
+    omFreeBin((ADDRESS)bb, rnumber_bin);
   }
   if (mpz_isNeg(&u->z))
   {
@@ -1610,7 +1589,7 @@ number nlIntMod (number a, number b)
     && (mpz_cmp_si(&u->z,(long)ui)==0))
     {
       mpz_clear(&u->z);
-      FreeSizeOf((ADDRESS)u,rnumber);
+      omFreeBin((ADDRESS)u, rnumber_bin);
       u=INT_TO_SR(ui);
     }
   }
@@ -1631,9 +1610,9 @@ number nlDiv (number a, number b)
     WerrorS("div. by 0");
     return INT_TO_SR(0);
   }
-  u=(number)AllocSizeOf(rnumber);
+  u=(number)omAllocBin(rnumber_bin);
   u->s=0;
-#if defined(LDEBUG) && ! defined(HAVE_ASO)
+#if defined(LDEBUG) 
   u->debug=123456;
 #endif
 // ---------- short / short ------------------------------------
@@ -1644,7 +1623,7 @@ number nlDiv (number a, number b)
     int r=i%j;
     if (r==0)
     {
-      FreeSizeOf((ADDRESS)u,rnumber);
+      omFreeBin((ADDRESS)u, rnumber_bin);
       return INT_TO_SR(i/j);
     }
     mpz_init_set_si(&u->z,(long)i);
@@ -1675,7 +1654,7 @@ number nlDiv (number a, number b)
       if (mpz_cmp(&u->z,&b->z)==0)
       {
         mpz_clear(&u->z);
-        FreeSizeOf((ADDRESS)u,rnumber);
+        omFreeBin((ADDRESS)u, rnumber_bin);
         return INT_TO_SR(1);
       }
       mpz_init_set(&u->n,&b->z);
@@ -1728,7 +1707,7 @@ number nlDiv (number a, number b)
       && (mpz_cmp_si(&u->z,(long)ui)==0))
       {
         mpz_clear(&u->z);
-        FreeSizeOf((ADDRESS)u,rnumber);
+        omFreeBin((ADDRESS)u, rnumber_bin);
         return INT_TO_SR(ui);
       }
     }
@@ -1784,8 +1763,8 @@ void nlPower (number x,int exp,number * u)
       aa=nlRInit(SR_TO_INT(x));
       x=aa;
     }
-    *u=(number)AllocSizeOf(rnumber);
-#if defined(LDEBUG) && ! defined(HAVE_ASO)
+    *u=(number)omAllocBin(rnumber_bin);
+#if defined(LDEBUG) 
     (*u)->debug=123456;
 #endif
     mpz_init(&(*u)->z);
@@ -1807,7 +1786,7 @@ void nlPower (number x,int exp,number * u)
     if (aa!=NULL)
     {
       mpz_clear(&aa->z);
-      FreeSizeOf((ADDRESS)aa,rnumber);
+      omFreeBin((ADDRESS)aa, rnumber_bin);
     }
     if (((*u)->s<=2) && (mpz_cmp_si(&(*u)->n,(long)1)==0))
     {
@@ -1821,7 +1800,7 @@ void nlPower (number x,int exp,number * u)
       && (mpz_cmp_si(&(*u)->z,(long)ui)==0))
       {
         mpz_clear(&(*u)->z);
-        FreeSizeOf((ADDRESS)*u,rnumber);
+        omFreeBin((ADDRESS)*u, rnumber_bin);
         *u=INT_TO_SR(ui);
       }
     }
@@ -2013,8 +1992,8 @@ number nlGcd(number a, number b)
     aa=nlRInit(SR_TO_INT(b));
     b=aa;
   }
-  result=(number)AllocSizeOf(rnumber);
-#if defined(LDEBUG) && ! defined(HAVE_ASO)
+  result=(number)omAllocBin(rnumber_bin);
+#if defined(LDEBUG) 
   result->debug=123456;
 #endif
   mpz_init(&result->z);
@@ -2028,14 +2007,14 @@ number nlGcd(number a, number b)
     && (mpz_cmp_si(&result->z,(long)ui)==0))
     {
       mpz_clear(&result->z);
-      FreeSizeOf((ADDRESS)result,rnumber);
+      omFreeBin((ADDRESS)result, rnumber_bin);
       result=INT_TO_SR(ui);
     }
   }
   if (aa!=NULL)
   {
     mpz_clear(&aa->z);
-    FreeSizeOf((ADDRESS)aa,rnumber);
+    omFreeBin((ADDRESS)aa, rnumber_bin);
   }
 #ifdef LDEBUG
   nlTest(result);
@@ -2068,7 +2047,7 @@ void nlNormalize (number &x)
       && (mpz_cmp_si(&x->z,(long)ui)==0))
       {
         mpz_clear(&x->z);
-        FreeSizeOf((ADDRESS)x,rnumber);
+        omFreeBin((ADDRESS)x, rnumber_bin);
         x=INT_TO_SR(ui);
         return;
       }
@@ -2106,10 +2085,10 @@ void nlNormalize (number &x)
         && (mpz_cmp_si(&x->z,(long)ui)==0))
         {
           mpz_clear(&x->z);
-#if defined(LDEBUG) && ! defined(HAVE_ASO)
+#if defined(LDEBUG) 
           x->debug=654324;
 #endif
-          FreeSizeOf((ADDRESS)x,rnumber);
+          omFreeBin((ADDRESS)x, rnumber_bin);
           x=INT_TO_SR(ui);
           return;
         }
@@ -2149,8 +2128,8 @@ number nlLcm(number a, number b)
     aa=nlRInit(SR_TO_INT(a));
     a=aa;
   }
-  result=(number)AllocSizeOf(rnumber);
-#if defined(LDEBUG) && ! defined(HAVE_ASO)
+  result=(number)omAllocBin(rnumber_bin);
+#if defined(LDEBUG) 
   result->debug=123456;
 #endif
   result->s=3;
@@ -2172,7 +2151,7 @@ number nlLcm(number a, number b)
   if (aa!=NULL)
   {
     mpz_clear(&aa->z);
-    FreeSizeOf((ADDRESS)aa,rnumber);
+    omFreeBin((ADDRESS)aa, rnumber_bin);
   }
   nlGmpSimple(&result->z);
   if (mpz_size1(&result->z)<=MP_SMALL)
@@ -2182,7 +2161,7 @@ number nlLcm(number a, number b)
     && (mpz_cmp_si(&result->z,(long)ui)==0))
     {
       mpz_clear(&result->z);
-      FreeSizeOf((ADDRESS)result,rnumber);
+      omFreeBin((ADDRESS)result, rnumber_bin);
       return INT_TO_SR(ui);
     }
   }
@@ -2224,9 +2203,9 @@ number   nlGetDenom(number &n)
     {
       if (n->s!=3)
       {
-        number u=(number)AllocSizeOf(rnumber);
+        number u=(number)omAllocBin(rnumber_bin);
         u->s=3;
-#if defined(LDEBUG) && ! defined(HAVE_ASO)
+#if defined(LDEBUG) 
         u->debug=123456;
 #endif
 
@@ -2237,7 +2216,7 @@ number   nlGetDenom(number &n)
           && (mpz_cmp_si(&u->z,(long)ui)==0))
           {
             mpz_clear(&u->z);
-            FreeSizeOf((ADDRESS)u,rnumber);
+            omFreeBin((ADDRESS)u, rnumber_bin);
             return INT_TO_SR(ui);
           }
         }

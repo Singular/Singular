@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.31 2000-07-06 13:24:21 pohl Exp $ */
+/* $Id: polys.h,v 1.32 2000-08-14 12:56:46 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
@@ -116,15 +116,15 @@ int  pModuleOrder();
 
 /*-------------storage management:-------------------*/
 // allocates the space for a new monomial -- no initialization !!!
-#define pNew()          _pNew(mm_specHeap)
+#define pNew()          _pNew(currPolyBin)
 // allocates a new monomial and initializes everything to 0
-#define pInit()         _pInit(mm_specHeap)
+#define pInit()         _pInit(currPolyBin)
 // frees the space of the monomial m (coef is not freed)
-#define pFree1(m)       _pFree1(m, mm_specHeap)
+#define pFree1(m)       _pFree1(m, currPolyBin)
 // frees the space of monomial and frees coefficient
-#define pDelete1(m)     _pDelete1(m, mm_specHeap)
+#define pDelete1(m)     _pDelete1(m, currPolyBin)
 // deletes the whole polynomial p
-#define pDelete(p)      _pDelete(p, mm_specHeap)
+#define pDelete(p)      _pDelete(p, currPolyBin)
 
 // similar to routines above, except that monomials are assumed to be from heap h (resp. are allocated from heap h)
 #define pHeapNew(h)             _pNew(h)
@@ -143,7 +143,7 @@ int  pModuleOrder();
 #define pHead0(p)       _pHead0(p)
 // Returns a newly allocated copy of the monomial, copy includes copy of coeff
 // sets the next-field to NULL
-#define pHead(p)        _pHead(mm_specHeap, p)
+#define pHead(p)        _pHead(currPolyBin, p)
 // Similar to pHead, except that new monom is taken from heap dest_heap
 #define pHeapHead(dest_heap, p) _pHead(dest_heap, p)
 // Returns a shallow copy (i.e. only monomial is copied) of head of source_p
@@ -154,7 +154,7 @@ int  pModuleOrder();
 
 extern  poly pHeadProc(poly p);
 // Returns copy of the whole polynomial
-#define pCopy(p)        _pCopy(mm_specHeap, p)
+#define pCopy(p)        _pCopy(currPolyBin, p)
 // Returns copy of the whole poly, new monomials are taken from dest_heap
 #define pHeapCopy(dest_heap, p) _pCopy(dest_heap, p)
 
@@ -326,13 +326,13 @@ unsigned long pGetShortExpVector(poly p);
 
 #ifdef PDEBUG
 #define pHeapTest(A,B)  pDBTest(A, B, __FILE__,__LINE__)
-#define pTest(A) pDBTest(A, mm_specHeap, __FILE__,__LINE__)
+#define pTest(A) pDBTest(A, currPolyBin, __FILE__,__LINE__)
 #define prTest(p, r) prDBTest(p, r, __FILE__, __LINE__)
 
 BOOLEAN pDBTest(poly p, char *f, int l);
-BOOLEAN pDBTest(poly p, memHeap tail_heap, char *f, int l);
+BOOLEAN pDBTest(poly p, omBin tail_heap, char *f, int l);
 BOOLEAN prDBTest(poly p, ring r, char *f, int l);
-BOOLEAN pDBTest(poly p,  memHeap tail_heap, memHeap lm_heap, char *f, int l);
+BOOLEAN pDBTest(poly p,  omBin tail_heap, omBin lm_heap, char *f, int l);
 #else
 #define prTest(p, r)    (TRUE)
 #define pHeapTest(A,B)  (TRUE)

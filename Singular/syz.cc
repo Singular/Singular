@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.36 2000-03-22 08:56:04 siebert Exp $ */
+/* $Id: syz.cc,v 1.37 2000-08-14 12:56:53 obachman Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -10,7 +10,7 @@
 
 #include "mod2.h"
 #include "tok.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "polys.h"
 #include "febase.h"
 #include "kstd1.h"
@@ -35,7 +35,7 @@ void syDeleteRes(resolvente * res,int length)
     if (!idIs0((*res)[i]))
       idDelete(&((*res)[i]));
   }
-  Free((ADDRESS)res,length*sizeof(ideal));
+  omFreeSize((ADDRESS)res,length*sizeof(ideal));
   *res = NULL;
 }
 
@@ -52,7 +52,7 @@ static intvec * syPrepareModComp(ideal arg,intvec ** w)
     maxxx = 2;
     isIdeal = TRUE;
   }
-  w1 = NewIntvec1(maxxx+IDELEMS(arg));
+  w1 = new intvec(maxxx+IDELEMS(arg));
   if (!isIdeal)
   {
     for (i=0;i<maxxx;i++)
@@ -72,7 +72,7 @@ static intvec * syPrepareModComp(ideal arg,intvec ** w)
     }
   }
   delete (*w);
-  *w = NewIntvec1(IDELEMS(arg)+1);
+  *w = new intvec(IDELEMS(arg)+1);
   for (i=0;i<IDELEMS(arg);i++)
   {
      (**w)[i+1] = (*w1)[i+maxxx];
@@ -311,7 +311,7 @@ static void syMinStep1(resolvente res, int length)
       deg0 = idJet(res[index+1],0);
       reddeg0 = kInterRed(deg0);
       idDelete(&deg0);
-      have_del = NewIntvec1(IDELEMS(res[index]));
+      have_del = new intvec(IDELEMS(res[index]));
       for (i=0;i<IDELEMS(reddeg0);i++)
       {
         if (reddeg0->m[i]!=NULL)
@@ -415,12 +415,12 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
   else              *length = 5;
   if ((wlength!=0) && (*length!=wlength))
   {
-    intvec **wtmp = (intvec**)Alloc0((*length)*sizeof(intvec*));
+    intvec **wtmp = (intvec**)omAlloc0((*length)*sizeof(intvec*));
     wtmp[0]=(*weights)[0];
-    Free((ADDRESS)*weights,wlength*sizeof(intvec*));
+    omFreeSize((ADDRESS)*weights,wlength*sizeof(intvec*));
     *weights=wtmp;
   }
-  res = (resolvente)Alloc0((*length)*sizeof(ideal));
+  res = (resolvente)omAlloc0((*length)*sizeof(ideal));
 
 /*--- initialize the syzygy-ring -----------------------------*/
   ring origR = currRing;
@@ -442,7 +442,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
     hom=(tHomog)idHomModule(res[0],currQuotient,&w);
     if (hom==isHomog)
     {
-      *weights = (intvec**)Alloc0((*length)*sizeof(intvec*));
+      *weights = (intvec**)omAlloc0((*length)*sizeof(intvec*));
       if (w!=NULL) (*weights)[0] = ivCopy(w);
     }
   }
@@ -481,16 +481,16 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
     if (Kstd1_deg!=0) Kstd1_deg++;
     if (syzIndex+1==*length)
     {
-      newres = (resolvente)Alloc0((*length+5)*sizeof(ideal));
-      tempW = (intvec**)Alloc0((*length+5)*sizeof(intvec*));
+      newres = (resolvente)omAlloc0((*length+5)*sizeof(ideal));
+      tempW = (intvec**)omAlloc0((*length+5)*sizeof(intvec*));
       for (j=0;j<*length;j++)
       {
         newres[j] = res[j];
         if (*weights!=NULL) tempW[j] = (*weights)[j];
         /*else              tempW[j] = NULL;*/
       }
-      Free((ADDRESS)res,*length*sizeof(ideal));
-      Free((ADDRESS)*weights,*length*sizeof(intvec*));
+      omFreeSize((ADDRESS)res,*length*sizeof(ideal));
+      if (*weights != NULL) omFreeSize((ADDRESS)*weights,*length*sizeof(intvec*));
       *length += 5;
       res=newres;
       *weights = tempW;
@@ -541,8 +541,8 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
       if (w != NULL)
         w->resize(max_comp+IDELEMS(res[syzIndex]));
       else
-        w = NewIntvec1(max_comp+IDELEMS(res[syzIndex]));
-      (*weights)[syzIndex] = NewIntvec1(k);
+        w = new intvec(max_comp+IDELEMS(res[syzIndex]));
+      (*weights)[syzIndex] = new intvec(k);
       for (i=0;i<k;i++)
       {
         if (res[syzIndex-1]->m[i]!=NULL) // hs
@@ -598,23 +598,23 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
 syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim)
 {
   int typ0;
-  syStrategy result=(syStrategy)Alloc0SizeOf(ssyStrategy);
+  syStrategy result=(syStrategy)omAlloc0(sizeof(ssyStrategy));
 
   if (w!=NULL)
   {
-    result->weights = (intvec**)Alloc0SizeOf(void_ptr);
+    result->weights = (intvec**)omAlloc0Bin(void_ptr_bin);
     (result->weights)[0] = ivCopy(w);
     result->length = 1;
   }
   resolvente fr = syResolvente(arg,maxlength,&(result->length),&(result->weights),minim),fr1;
   if (minim)
   {
-    result->minres = (resolvente)Alloc0((result->length+1)*sizeof(ideal));
+    result->minres = (resolvente)omAlloc0((result->length+1)*sizeof(ideal));
     fr1 =  result->minres;
   }
   else
   {
-    result->fullres = (resolvente)Alloc0((result->length+1)*sizeof(ideal));
+    result->fullres = (resolvente)omAlloc0((result->length+1)*sizeof(ideal));
     fr1 =  result->fullres;
   }
   for (int i=result->length-1;i>=0;i--)
@@ -623,7 +623,7 @@ syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim)
       fr1[i] = fr[i];
     fr[i] = NULL;
   }
-  Free((ADDRESS)fr,(result->length)*sizeof(ideal));
+  omFreeSize((ADDRESS)fr,(result->length)*sizeof(ideal));
   return result;
 }
 
@@ -695,12 +695,12 @@ void syDetect(ideal id,int index,int rsmin, BOOLEAN homog,
               intvec * degrees,intvec * tocancel)
 {
   int * deg=NULL;
-  int * tocan=(int*) Alloc0(tocancel->length()*sizeof(int));
+  int * tocan=(int*) omAlloc0(tocancel->length()*sizeof(int));
   int i;
 
   if (homog)
   {
-    deg = (int*) Alloc0(degrees->length()*sizeof(int));
+    deg = (int*) omAlloc0(degrees->length()*sizeof(int));
     for (i=degrees->length();i>0;i--)
       deg[i-1] = (*degrees)[i-1]-rsmin;
   }
@@ -708,8 +708,8 @@ void syDetect(ideal id,int index,int rsmin, BOOLEAN homog,
   for (i=tocancel->length();i>0;i--)
     (*tocancel)[i-1] = tocan[i-1];
   if (homog)
-    Free((ADDRESS)deg,degrees->length()*sizeof(int));
-  Free((ADDRESS)tocan,tocancel->length()*sizeof(int));
+    omFreeSize((ADDRESS)deg,degrees->length()*sizeof(int));
+  omFreeSize((ADDRESS)tocan,tocancel->length()*sizeof(int));
 }
 
 /*2
@@ -742,9 +742,9 @@ intvec * syBetti(resolvente res,int length, int * regularity,
   if (idIs0(res[0]))
   {
     if (res[0]==NULL)
-      result = NewIntvec3(1,1,1);
+      result = new intvec(1,1,1);
     else
-      result = NewIntvec3(1,1,res[0]->rank);
+      result = new intvec(1,1,res[0]->rank);
     return result;
   }
   r0_len=IDELEMS(res[0]);
@@ -762,8 +762,8 @@ intvec * syBetti(resolvente res,int length, int * regularity,
     if (IDELEMS(res[i])>l) l = IDELEMS(res[i]);
     i++;
   }
-  temp1 = (int*)Alloc0((l+1)*sizeof(int));
-  temp2 = (int*)Alloc((l+1)*sizeof(int));
+  temp1 = (int*)omAlloc0((l+1)*sizeof(int));
+  temp2 = (int*)omAlloc((l+1)*sizeof(int));
   rows = 1;
   mr = 1;
   cols++;
@@ -779,8 +779,8 @@ intvec * syBetti(resolvente res,int length, int * regularity,
         || ((i>1) && (res[i-1]->m[pGetComp(res[i]->m[j])-1]==NULL)))
         {
           WerrorS("input not a resolvent");
-          Free((ADDRESS)temp1,(l+1)*sizeof(int));
-          Free((ADDRESS)temp2,(l+1)*sizeof(int));
+          omFreeSize((ADDRESS)temp1,(l+1)*sizeof(int));
+          omFreeSize((ADDRESS)temp2,(l+1)*sizeof(int));
           return NULL;
         }
         temp2[j+1] = pFDeg(res[i]->m[j])+temp1[pGetComp(res[i]->m[j])];
@@ -796,11 +796,11 @@ intvec * syBetti(resolvente res,int length, int * regularity,
   mr--;
   /*------ computation betti numbers --------------*/
   rows -= mr;
-  result = NewIntvec3(rows,cols,0);
+  result = new intvec(rows,cols,0);
   (*result)[(-mr)*cols] = /*idRankFreeModule(res[0])*/ rkl;
   if ((!idIs0(res[0])) && ((*result)[(-mr)*cols]==0))
     (*result)[(-mr)*cols] = 1;
-  tocancel = (int*)Alloc0((rows+1)*sizeof(int));
+  tocancel = (int*)omAlloc0((rows+1)*sizeof(int));
   memset(temp2,0,l*sizeof(int));
   memset(temp1,0,(l+1)*sizeof(int));
   int dummy = syDetect(res[0],0,TRUE,temp2,tocancel);
@@ -854,9 +854,9 @@ intvec * syBetti(resolvente res,int length, int * regularity,
     if ((i==0) && (weights!=NULL)) pSetModDeg(NULL);
   }
   /*------ clean up --------------*/
-  Free((ADDRESS)tocancel,(rows+1)*sizeof(int));
-  Free((ADDRESS)temp1,(l+1)*sizeof(int));
-  Free((ADDRESS)temp2,(l+1)*sizeof(int));
+  omFreeSize((ADDRESS)tocancel,(rows+1)*sizeof(int));
+  omFreeSize((ADDRESS)temp1,(l+1)*sizeof(int));
+  omFreeSize((ADDRESS)temp2,(l+1)*sizeof(int));
   if ((tomin) && (mr<0))  // deletes the first (zero) line
   {
     for (j=1;j<=rows+mr;j++)
@@ -884,7 +884,7 @@ intvec * syBetti(resolvente res,int length, int * regularity,
       if (i>k+(i/cols)*cols) k = i-(i/cols)*cols;
     }
   }
-  intvec * exactresult=NewIntvec3(j+1,k+1,0);
+  intvec * exactresult=new intvec(j+1,k+1,0);
   for (i=0;i<exactresult->rows();i++)
   {
     for (j=0;j<exactresult->cols();j++)
@@ -907,7 +907,7 @@ ideal syMinBase(ideal arg)
   if (idIs0(arg)) return idInit(1,arg->rank);
   resolvente res=syResolvente(arg,1,&leng,&weights,TRUE);
   ideal result=res[0];
-  Free((ADDRESS)res,leng*sizeof(ideal));
+  omFreeSize((ADDRESS)res,leng*sizeof(ideal));
   if (weights!=NULL)
   {
     if (*weights!=NULL)
@@ -971,8 +971,8 @@ intvec * syNewBetti(resolvente res, intvec ** weights, int length)
 //Print("rsmax = %d\n",rsmax);
 //Print("rsmin = %d\n",rsmin);
     rs = rsmax-rsmin+1;
-    result = NewIntvec3(rs,i+2,0);
-    tocancel = NewIntvec1(rs);
+    result = new intvec(rs,i+2,0);
+    tocancel = new intvec(rs);
 /*-----------enter the Betti numbers-------------------------------*/
     if (/*idRankFreeModule(res[0])*/ res[0]->rank==0)
     {
@@ -1005,10 +1005,10 @@ intvec * syNewBetti(resolvente res, intvec ** weights, int length)
   else                //-----the non-homgeneous case
   {
     homog = FALSE;
-    tocancel = NewIntvec1(1);
+    tocancel = new intvec(1);
     k = length;
     while ((k>0) && (idIs0(res[k-1]))) k--;
-    result = NewIntvec3(1,k+1,0);
+    result = new intvec(1,k+1,0);
     (*result)[0] = res[0]->rank;
     for (i=0;i<length;i++)
     {

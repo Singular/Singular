@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipprint.cc,v 1.17 2000-02-10 14:05:43 Singular Exp $ */
+/* $Id: ipprint.cc,v 1.18 2000-08-14 12:56:25 obachman Exp $ */
 /*
 * ABSTRACT: interpreter: printing
 */
@@ -9,7 +9,7 @@
 #include "mod2.h"
 #include "tok.h"
 #include "ipid.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "febase.h"
 #include "polys.h"
 #include "matpol.h"
@@ -59,29 +59,29 @@ static void ipPrint_MA0(matrix m, const char *name)
 {
   if (MATCOLS(m)>0)
   {
-    char **s=(char **)Alloc(MATCOLS(m)*MATROWS(m)*sizeof(char*));
+    char **s=(char **)omAlloc(MATCOLS(m)*MATROWS(m)*sizeof(char*));
     char *ss;
-    int *l=(int *)Alloc0(MATCOLS(m)*sizeof(int));
+    int *l=(int *)omAlloc0(MATCOLS(m)*sizeof(int));
     int i,j,k;
     int vl=max(colmax/MATCOLS(m),8);
 
     /* make enough space for the "largest" name*/
-    ss=(char *)AllocL(14+strlen(name));
+    ss=(char *)omAlloc(14+strlen(name));
     sprintf(ss,"%s[%d,%d]",name,MATCOLS(m),MATROWS(m));
     vl=max(vl,strlen(ss));
-    FreeL(ss);
+    omFree(ss);
 
     /* convert all polys to string */
     i=MATCOLS(m)*MATROWS(m)-1;
     ss=pString(m->m[i]);
     if ((int)strlen(ss)>colmax) s[i]=NULL;
-    else                        s[i]=mstrdup(ss);
+    else                        s[i]=omStrDup(ss);
     for(i--;i>=0;i--)
     {
       pString(m->m[i]);
       ss=StringAppendS(",");
       if ((int)strlen(ss)>colmax) s[i]=NULL;
-      else                        s[i]=mstrdup(ss);
+      else                        s[i]=omStrDup(ss);
     }
     /* look up the width of all columns, put it in l[col_nr] */
     /* insert names for very long entries */
@@ -91,7 +91,7 @@ static void ipPrint_MA0(matrix m, const char *name)
       {
         if (s[i*MATCOLS(m)+j]==NULL)
         {
-          ss=(char *)AllocL(14+strlen(name));
+          ss=(char *)omAlloc(14+strlen(name));
           s[i*MATCOLS(m)+j]=ss;
           ss[0]='\0';
           sprintf(ss,"%s[%d,%d]",name,i+1,j+1);
@@ -124,8 +124,8 @@ static void ipPrint_MA0(matrix m, const char *name)
           k=strlen(s[i*MATCOLS(m)+j]);
           if (/*strlen(s[i*MATCOLS(m)+j])*/ k > vl)
           {
-            FreeL((ADDRESS)s[i*MATCOLS(m)+j]);
-            ss=(char *)AllocL(14+strlen(name));
+            omFree((ADDRESS)s[i*MATCOLS(m)+j]);
+            ss=(char *)omAlloc(14+strlen(name));
             s[i*MATCOLS(m)+j]=ss;
             ss[0]='\0';
             sprintf(ss,"%s[%d,%d]",name,i+1,j+1);
@@ -155,7 +155,7 @@ static void ipPrint_MA0(matrix m, const char *name)
     {
       k=l[0];
       Print("%-*.*s",l[0],l[0],s[i*MATCOLS(m)]);
-      FreeL(s[i*MATCOLS(m)]);
+      omFree(s[i*MATCOLS(m)]);
       for(j=1;j<MATCOLS(m);j++)
       {
         if (k+l[j]>colmax)
@@ -165,13 +165,13 @@ static void ipPrint_MA0(matrix m, const char *name)
         }
         k+=l[j];
         Print("%-*.*s",l[j],l[j],s[i*MATCOLS(m)+j]);
-        FreeL(s[i*MATCOLS(m)+j]);
+        omFree(s[i*MATCOLS(m)+j]);
       }
       PrintLn();
     }
     /* clean up */
-    Free((ADDRESS)s,MATCOLS(m)*MATROWS(m)*sizeof(char*));
-    Free((ADDRESS)l,MATCOLS(m)*sizeof(int));
+    omFreeSize((ADDRESS)s,MATCOLS(m)*MATROWS(m)*sizeof(char*));
+    omFreeSize((ADDRESS)l,MATCOLS(m)*sizeof(int));
   }
 }
 
@@ -210,7 +210,7 @@ static BOOLEAN ipPrint_V(leftv u)
   }
   /* clean up */
   for(j=l-1;j>=0;j--) pDelete(&m[j]);
-  Free((ADDRESS)m,l*sizeof(poly));
+  omFreeSize((ADDRESS)m,l*sizeof(poly));
   return FALSE;
 }
 
@@ -232,7 +232,7 @@ BOOLEAN jjPRINT(leftv res, leftv u)
         char* s = u->String(NULL, FALSE, 2);
         PrintS(s);
         PrintLn();
-        FreeL(s);
+        omFree(s);
         return FALSE;
       }
 
@@ -339,7 +339,7 @@ BOOLEAN jjPRINT_FORMAT(leftv res, leftv u, leftv v)
   }
 /* ======================== end betti ================================= */
 
-  char* ns = mstrdup((char*) v->Data());
+  char* ns = omStrDup((char*) v->Data());
   int dim = 1;
   if (strlen(ns) == 3 && ns[1] == '2')
   {
@@ -352,9 +352,9 @@ BOOLEAN jjPRINT_FORMAT(leftv res, leftv u, leftv v)
     res->data = (char*) u->String(NULL, TRUE, dim);
     if (dim == 2)
     {
-      char* ns = (char*) AllocL(strlen((char*) res->data) + 2);
+      char* ns = (char*) omAlloc(strlen((char*) res->data) + 2);
       strcpy(ns, (char*) res->data);
-      FreeL(res->data);
+      omFree(res->data);
       strcat(ns, "\n");
       res->data = ns;
     }
@@ -396,15 +396,15 @@ BOOLEAN jjPRINT_FORMAT(leftv res, leftv u, leftv v)
     res->data = u->String(NULL, FALSE, dim);
     if (dim == 2)
     {
-      char* ns = (char*) AllocL(strlen((char*) res->data) + 2);
+      char* ns = (char*) omAlloc(strlen((char*) res->data) + 2);
       strcpy(ns, (char*) res->data);
-      FreeL(res->data);
+      omFree(res->data);
       strcat(ns, "\n");
       res->data = ns;
     }
   }
 
-  FreeL(ns);
+  omFree(ns);
   res->rtyp = STRING_CMD;
   return FALSE;
 }

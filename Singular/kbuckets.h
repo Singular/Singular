@@ -3,11 +3,8 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.h,v 1.8 2000-02-01 15:30:24 Singular Exp $ */
+/* $Id: kbuckets.h,v 1.9 2000-08-14 12:56:31 obachman Exp $ */
 #include "structs.h"
-#if HAVE_ASO == 1
-#include "kbuckets.aso"
-#endif
 
 /////////////////////////////////////////////////////////////////////////
 // configuration
@@ -35,7 +32,7 @@ void kBucketDestroy(kBucket_pt *bucket);
 // Assumes length <= 0 || pLength(p) == length
 //         Monoms of p are from heap
 //         Uses heap for intermediate monom allocations
-void kBucketInit(kBucket_pt bucket, poly p, int length, memHeap heap = NULL);
+void kBucketInit(kBucket_pt bucket, poly p, int length, omBin heap = NULL);
 
 // Converts Bpoly into a poly and clears bucket
 // i.e., afterwards Bpoly == 0
@@ -78,7 +75,6 @@ void kBucketTakeOutComp(kBucket_pt bucket,
                         Exponent_t comp,
                         poly *p, int *l);
 
-#if HAVE_ASO == 1
 // Here we only extract such monoms which have component == comp and
 // degree == order
 // ASSUME: monomial ordering is Order compatible, i.e., if m1, m2 Monoms then
@@ -86,7 +82,6 @@ void kBucketTakeOutComp(kBucket_pt bucket,
 void kBucketDecrOrdTakeOutComp(kBucket_pt bucket,
                                Exponent_t comp, Order_t order,
                                poly *p, int *l);
-#endif
 
 //////////////////////////////////////////////////////////////////////////
 ///
@@ -122,7 +117,7 @@ public:
   int  buckets_length[MAX_BUCKET + 1]; // length if i-th poly
   int buckets_used;                    // max number of used bucket
 #endif
-  memHeap heap;                        // used heap
+  omBin heap;                        // used heap
 };
 
 /***************************************************************
@@ -131,8 +126,8 @@ public:
  *
  *
  ***************************************************************/
-#define kb_pNew(p, heap)            p = AllocHeap(mm_specHeap)
-#define kb_pFree1(p, heap)          FreeHeap(p, mm_specHeap)
+#define kb_pNew(p, heap)            p = omAllocBin(currPolyBin)
+#define kb_pFree1(p, heap)          omFreeBin(p, currPolyBin)
 
 #define kb_pFree1AndAdvance(p, heap)            \
 do                                              \

@@ -1,13 +1,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: prProcs.h,v 1.2 2000-02-01 15:30:26 Singular Exp $ */
+/* $Id: prProcs.h,v 1.3 2000-08-14 12:56:47 obachman Exp $ */
 /*
 *  ABSTRACT -  Declaration of Routines for primitive poly arithmetic
 */
 
 #include "polys.h"
-#include "mmemory.h"
+#include <omalloc.h>
 
 // just as macros, for the time being
 #define pr_Mult_n            pr_Mult_n_General

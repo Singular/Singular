@@ -4,7 +4,7 @@
 do                                              \
 {                                               \
   PR_NDELETE(&pGetCoeff(src), r_src);           \
-  FreeHeap(src, r_src->mm_specHeap);            \
+  omFreeBin(src, r_src->PolyBin);            \
 }                                               \
 while (0)
 #else
@@ -19,13 +19,13 @@ while (0)
 #define PR_NO_SORT 1
 #define PR_INIT_EVECTOR_COPY(r_src, r_dest) ((void)0)
 #define PR_CPY_EVECTOR(dest, dest_r, src, src_r) \
-  memcpyW(&(dest->exp.l[0]), &(src->exp.l[0]), dest_r->ExpLSize)
-#define PR_ALLOC_MONOM(r) AllocHeap(r->mm_specHeap)
+  omMemcpyW(&(dest->exp.l[0]), &(src->exp.l[0]), dest_r->ExpLSize)
+#define PR_ALLOC_MONOM(r) omAllocBin(r->PolyBin)
 #else
 #define  PR_INIT_EVECTOR_COPY(r_src, r_dest) int _min = min(r_dest->N, r_src->N)
 #define  PR_CPY_EVECTOR(dest, dest_r, src, src_r) \
   prCopyEvector(dest, dest_r, src, src_r, _min)
-#define PR_ALLOC_MONOM(r) Alloc0Heap(r->mm_specHeap)
+#define PR_ALLOC_MONOM(r) omAlloc0Bin(r->PolyBin)
 #endif
 
 #undef PR_NCOPY

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.31 2000-02-10 16:09:04 Singular Exp $ */
+/* $Id: structs.h,v 1.32 2000-08-14 12:56:52 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -75,8 +75,6 @@ struct sip_command;
 struct sip_package;
 struct s_si_link_extension;
 struct reca;
-struct sip_memHeap;
-struct sip_memHeapPage;
 typedef struct _ssubexpr   sSubexpr;
 typedef struct _sssym      ssym;
 typedef struct spolyrec    polyrec;
@@ -87,7 +85,6 @@ typedef struct sip_sring   ip_sring;
 typedef struct sip_link    ip_link;
 typedef struct sip_command ip_command;
 typedef struct sip_package ip_package;
-typedef struct sip_memHeap ip_memHeap;
 
 /* the pointer types */
 typedef char *              char_ptr;
@@ -106,8 +103,6 @@ typedef union uutypes      utypes;
 typedef ip_command *       command;
 typedef struct s_si_link_extension *si_link_extension;
 typedef struct reca *      alg;
-typedef struct sip_memHeap * memHeap;
-typedef struct sip_memHeapPage * memHeapPage;
 
 
 #ifdef __cplusplus
@@ -225,6 +220,10 @@ struct sro_syz
 
 typedef struct sro_syz sro_syz;
 
+#ifndef OM_ALLOC_H
+struct omBin_s;
+#endif
+
 struct sro_ord
 {
   ro_typ  ord_typ;
@@ -271,7 +270,7 @@ struct sip_sring
   /* mapping exp. of var(i) -> p->exp.e[VarOffset[i]] */
 #endif
 
-  memHeap   mm_specHeap; /* Heap from where monoms are allocated */
+  struct omBin_s*   PolyBin; /* Bin from where monoms are allocated */
   short      ch;     /* characteristic */
   short      ch_flags; /* additional char-flags */
 
@@ -380,9 +379,23 @@ typedef libstack *  libstackv;
 #endif
 #endif /* HAVE_LIBPARSER */
 
-#if HAVE_ASO == 1
-#include "structs.aso"
-#endif
+extern struct omBin_s* MP_INT_bin;
+extern struct omBin_s* char_ptr_bin;
+extern struct omBin_s* ideal_bin;
+extern struct omBin_s* int_bin;
+extern struct omBin_s* poly_bin;
+extern struct omBin_s* void_ptr_bin;
+extern struct omBin_s* indlist_bin;
+extern struct omBin_s* naIdeal_bin;
+extern struct omBin_s* snaIdeal_bin;
+extern struct omBin_s* sm_prec_bin;
+extern struct omBin_s* smprec_bin;
+extern struct omBin_s* sip_sideal_bin;
+extern struct omBin_s* sip_smap_bin;
+extern struct omBin_s* sip_sring_bin;
+extern struct omBin_s* ip_sideal_bin;
+extern struct omBin_s* ip_smap_bin;
+extern struct omBin_s* ip_sring_bin;
 
 #endif
 

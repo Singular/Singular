@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.31 2000-05-16 12:42:46 obachman Exp $ */
+/* $Id: mpsr_Get.cc,v 1.32 2000-08-14 12:56:42 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -31,6 +31,7 @@
 
 #include <limits.h>
 
+omBin mpsr_sleftv_bin = omGetSpecBin(sizeof(mpsr_sleftv));
 
 /***************************************************************
  *
@@ -171,15 +172,15 @@ inline void InitIntLeftv(mpsr_leftv mlv, int i)
 
 inline void InitApIntLeftv(mpsr_leftv mlv, mpz_ptr apint)
 {
-  number n = (number) AllocSizeOf(rnumber);
-#if defined(LDEBUG) && ! defined(HAVE_ASO)
+  number n = (number) omAllocBin(rnumber_bin);
+#if defined(LDEBUG) 
     n->debug=123456;
 #endif
   mlv->r = mpsr_rDefault(0);
   n->s = 3;
   memcpy(&(n->z), apint, sizeof(MP_INT));
   n = nlInit(n);
-  FreeSizeOf(apint, MP_INT);
+  omFreeBin(apint, MP_INT_bin);
   mlv->lv = mpsr_InitLeftv(NUMBER_CMD, n);
 }
 
@@ -221,7 +222,7 @@ inline void InitIdentifierLeftv(mpsr_leftv mlv, char *name, short quote)
       pSetm(p);
       mlv->lv = mpsr_InitLeftv(POLY_CMD, (void *) p);
     }
-    FreeL(name);
+    omFree(name);
   }
   else
   {
@@ -264,7 +265,7 @@ inline mpsr_Status_t mpsr_GetIdentifierLeftv(MPT_Node_pt node, mpsr_leftv mlv,
   if (node->type == MP_CommonGreekIdentifierType ||
       node->type == MP_CommonGreekIdentifierType)
   {
-    id  = (char *) AllocL(2*sizeof(char));
+    id  = (char *) omAlloc(2*sizeof(char));
     id[1] = '\0';
     id[0] = MP_UINT8_T(node->nvalue);
   }
@@ -291,7 +292,7 @@ inline mpsr_Status_t mpsr_GetStringLeftv(MPT_Node_pt node, mpsr_leftv mlv)
 
 inline mpsr_Status_t GetQuitLeftv(mpsr_leftv mlv)
 {
-  mlv->lv = mpsr_InitLeftv(STRING_CMD, (void *) mstrdup(MPSR_QUIT_STRING));
+  mlv->lv = mpsr_InitLeftv(STRING_CMD, (void *) omStrDup(MPSR_QUIT_STRING));
   return mpsr_Success;
 }
 
@@ -478,16 +479,16 @@ mpsr_Status_t mpsr_GetOperatorLeftv(MP_Link_pt link,
     }
   }
 
-  command cmd = (command) Alloc0SizeOf(sip_command);
+  command cmd = (command) omAlloc0Bin(sip_command_bin);
   cmd->op = PROC_CMD;
   cmd->arg1.rtyp = STRING_CMD;
-  cmd->arg1.data = (void *) mstrdup(MP_STRING_T(node->nvalue));
+  cmd->arg1.data = (void *) omStrDup(MP_STRING_T(node->nvalue));
 
   if (node->numchild > 0)
   {
     cmd->argc = 2;
     memcpy(&(cmd->arg2), mlv->lv, sizeof(sleftv));
-    FreeSizeOf(mlv->lv, sleftv);
+    omFreeBin(mlv->lv, sleftv_bin);
   }
   else cmd->argc = 1;
 
@@ -506,7 +507,7 @@ mpsr_Status_t mpsr_GetOperatorLeftv(MP_Link_pt link,
 static mpsr_Status_t GetIntVecLeftv(MP_Link_pt link, MPT_Node_pt node,
                                   mpsr_leftv mlv)
 {
-  intvec *iv = NewIntvec1(node->numchild);
+  intvec *iv = new intvec(node->numchild);
   int *v = iv->ivGetVec();
 
   mp_failr(IMP_GetSint32Vector(link, &v, node->numchild));
@@ -536,7 +537,7 @@ static mpsr_Status_t GetIntMatLeftv(MP_Link_pt link, MPT_Node_pt node,
     }
   }
 
-  iv = NewIntvec3(row, col, 0);
+  iv = new intvec(row, col, 0);
   v = iv->ivGetVec();
   mp_failr(IMP_GetSint32Vector(link, &v, node->numchild));
   mlv->lv = mpsr_InitLeftv(INTMAT_CMD, (void *) iv);
@@ -673,7 +674,7 @@ static mpsr_Status_t GetMatrixLeftv(MP_Link_pt link, MPT_Node_pt node,
 static mpsr_Status_t GetPackageLeftv(MP_Link_pt link, MPT_Node_pt node,
                                      mpsr_leftv mlv)
 {
-  package pack = (package) Alloc0SizeOf(sip_package);
+  package pack = (package) omAlloc0Bin(sip_package_bin);
 
   pack->language = LANG_NONE;
 
@@ -731,19 +732,19 @@ static mpsr_Status_t GetMapLeftv(MP_Link_pt link, MPT_Node_pt node,
     IDROOT = h;
   }
 
-  map m = (map) Alloc0SizeOf(sip_smap);
-  m->preimage = mstrdup(name);
+  map m = (map) omAlloc0Bin(sip_smap_bin);
+  m->preimage = omStrDup(name);
   m->m = id->m;
   m->nrows = id->nrows;
   m->ncols = id->ncols;
 
-  FreeSizeOf(mlv->lv, sleftv);
+  omFreeBin(mlv->lv, sleftv_bin);
 
-  FreeL(mlv1->lv->data);
-  FreeSizeOf(mlv1->lv, sleftv);
+  omFree(mlv1->lv->data);
+  omFreeBin(mlv1->lv, sleftv_bin);
 
-  FreeSizeOf(id, sip_sideal);
-  FreeSizeOf(mlv2->lv, sleftv);
+  omFreeBin(id, sip_sideal_bin);
+  omFreeBin(mlv2->lv, sleftv_bin);
 
   mlv->r = mlv2->r;
   mlv->lv = mpsr_InitLeftv(MAP_CMD, (void *) m);
@@ -783,7 +784,7 @@ static mpsr_Status_t GetCopCommandLeftv(MP_Link_pt link, MPT_Node_pt node,
     failr(mpsr_MergeLeftv(mlv, mlv1));
   }
 
-  command cmd = (command) Alloc0SizeOf(sip_command);
+  command cmd = (command) omAlloc0Bin(sip_command_bin);
   cmd->op = tok;
   cmd->argc = nc;
 
@@ -800,12 +801,12 @@ static mpsr_Status_t GetCopCommandLeftv(MP_Link_pt link, MPT_Node_pt node,
       memcpy(&(c->arg1), lv, sizeof(sleftv));
       c->arg1.next = NULL;
 
-      c2 = (command) Alloc0SizeOf(sip_command);
+      c2 = (command) omAlloc0Bin(sip_command_bin);
       c->arg2.data = (void *) c2;
       c->arg2.rtyp = COMMAND;
       c = c2;
       lv2 = lv->next;
-      FreeSizeOf(lv, sleftv);
+      omFreeBin(lv, sleftv_bin);
       lv = lv2;
     }
     c->op = tok;
@@ -813,8 +814,8 @@ static mpsr_Status_t GetCopCommandLeftv(MP_Link_pt link, MPT_Node_pt node,
     memcpy(&(c->arg1), lv, sizeof(sleftv));
     c->arg1.next = NULL;
     memcpy(&(c->arg2), lv->next, sizeof(sleftv));
-    FreeSizeOf(lv->next, sleftv);
-    FreeSizeOf(lv, sleftv);
+    omFreeBin(lv->next, sleftv_bin);
+    omFreeBin(lv, sleftv_bin);
   }
   else if (nc >= 1)
   {
@@ -830,12 +831,12 @@ static mpsr_Status_t GetCopCommandLeftv(MP_Link_pt link, MPT_Node_pt node,
         if (nc == 3)
         {
           memcpy(&(cmd->arg3), mlv->lv->next->next, sizeof(sleftv));
-          FreeSizeOf(mlv->lv->next->next, sleftv);
+          omFreeBin(mlv->lv->next->next, sleftv_bin);
         }
-        FreeSizeOf(mlv->lv->next, sleftv);
+        omFreeBin(mlv->lv->next, sleftv_bin);
       }
     }
-    FreeSizeOf(mlv->lv, sleftv);
+    omFreeBin(mlv->lv, sleftv_bin);
   }
 
   // Now we perform some tree manipulations
@@ -843,7 +844,7 @@ static mpsr_Status_t GetCopCommandLeftv(MP_Link_pt link, MPT_Node_pt node,
     // Here we work around a Singular bug: It can not handle lists of 0 args
     // so we construct them explicitely
   {
-    lists l = (lists) AllocSizeOf(slists);
+    lists l = (lists) omAllocBin(slists_bin);
     l->Init(0);
     mlv->lv = mpsr_InitLeftv(LIST_CMD, (void *) l);
     return mpsr_Success;
@@ -884,7 +885,7 @@ MPT_Status_t mpsr_GetExternalData(MP_Link_pt link,
 
     if (status == mpsr_Success)
     {
-      mpsr_leftv mmlv = (mpsr_leftv) Alloc0SizeOf(mpsr_sleftv);
+      mpsr_leftv mmlv = (mpsr_leftv) omAlloc0Bin(mpsr_sleftv_bin);
       memcpy(mmlv, &mlv, sizeof(mpsr_sleftv));
       *odata = (MPT_ExternalData_t) mmlv;
       return MPT_Success;
@@ -925,7 +926,7 @@ mpsr_Status_t mpsr_GetDump(MP_Link_pt link)
       {
         mlv.lv->Eval();
         mlv.lv->CleanUp();
-        FreeSizeOf(mlv.lv, sleftv);
+        omFreeBin(mlv.lv, sleftv_bin);
       }
     }
     else

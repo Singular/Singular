@@ -1,19 +1,18 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: prCopy.cc,v 1.2 1999-12-03 11:50:25 obachman Exp $ */
+/* $Id: prCopy.cc,v 1.3 2000-08-14 12:56:46 obachman Exp $ */
 /*
 * ABSTRACT - implementation of functions for Copy/Move/Delete for Polys
 */
 
 #include "mod2.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "polys.h"
 #include "numbers.h"
 #include "tok.h"
 #include "ring.h"
 #include "ideals.h"
-#include "structs.aso"
 #include "polys-comp.h"
 
 
@@ -304,7 +303,7 @@ static inline void prDeleteR_NSimple(poly &p, ring r)
   while (p != NULL)
   {
     next = pNext(p);
-    mmFreeHeap(p, r->mm_specHeap);
+    omFreeBin(p, r->PolyBin);
     p = next;
   }
 }
@@ -317,7 +316,7 @@ static inline void prDeleteR_NoNSimple(poly &p, ring r)
   {
     next = pNext(p);
     nDelete(&pGetCoeff(p));
-    mmFreeHeap(p, r->mm_specHeap);
+    omFreeBin(p, r->PolyBin);
     p = next;
   }
 }
@@ -347,8 +346,8 @@ static inline void idrDelete(ideal &id, ring r,  prDeleteProc_t prproc)
   for (; i>=0; i--)
     prproc(id->m[i], r);
   
-  Free(id->m, IDELEMS(id)*sizeof(poly));
-  FreeSizeOf(id, sip_sideal);
+  omFreeSize(id->m, IDELEMS(id)*sizeof(poly));
+  omFreeBin(id, sip_sideal_bin);
   id = NULL;
 }
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.31 2000-08-02 13:40:28 obachman Exp $ */
+/* $Id: cntrlc.cc,v 1.32 2000-08-14 12:55:56 obachman Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -12,9 +12,9 @@
 #include <stdlib.h>
 #include <signal.h>
 #include "mod2.h"
+#include <omalloc.h>
 #include "tok.h"
 #include "ipshell.h"
-#include "mmemory.h"
 #include "febase.h"
 #include "cntrlc.h"
 #include "polys.h"

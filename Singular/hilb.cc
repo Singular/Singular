@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hilb.cc,v 1.13 2000-02-16 14:22:49 Singular Exp $ */
+/* $Id: hilb.cc,v 1.14 2000-08-14 12:56:19 obachman Exp $ */
 /*
 *  ABSTRACT -  Hilbert series
 */
@@ -9,7 +9,7 @@
 #include "mod2.h"
 #include "tok.h"
 #include "febase.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "polys.h"
 #include "intvec.h"
 #include "hutil.h"
@@ -51,12 +51,12 @@ static void hHilbEst(scfmon stc, int Nstc, varset var, int Nvar)
     j = i - 1;
     if (z > Ql[j])
     {
-      p = (int *)Alloc(z * sizeof(int));
+      p = (int *)omAlloc(z * sizeof(int));
       if (Ql[j]!=0)
       {
         if (j==0)
           memcpy(p, Qpol[j], Ql[j] * sizeof(int));
-        Free((ADDRESS)Qpol[j], Ql[j] * sizeof(int));
+        omFreeSize((ADDRESS)Qpol[j], Ql[j] * sizeof(int));
       }
       if (j==0)
       {
@@ -216,7 +216,7 @@ static intvec * hSeries(ideal S, intvec *modulweight,
   hexist = hInit(S, Q, &hNexist);
   if (hNexist==0)
   {
-    hseries1=NewIntvec1(2);
+    hseries1=new intvec(2);
     (*hseries1)[0]=1;
     (*hseries1)[1]=0;
     return hseries1;
@@ -225,22 +225,22 @@ static intvec * hSeries(ideal S, intvec *modulweight,
     hWeight();
   else
     hWDegree(wdegree);
-  p0 = (int *)AllocSizeOf(int);
+  p0 = (int *)omAllocBin(int_bin);
   *p0 = 1;
-  hwork = (scfmon)Alloc(hNexist * sizeof(scmon));
-  hvar = (varset)Alloc((pVariables + 1) * sizeof(int));
-  hpure = (scmon)Alloc((1 + (pVariables * pVariables)) * sizeof(Exponent_t));
+  hwork = (scfmon)omAlloc(hNexist * sizeof(scmon));
+  hvar = (varset)omAlloc((pVariables + 1) * sizeof(int));
+  hpure = (scmon)omAlloc((1 + (pVariables * pVariables)) * sizeof(Exponent_t));
   stcmem = hCreate(pVariables - 1);
-  Qpol = (int **)Alloc((pVariables + 1) * sizeof(int *));
-  Ql = (int *)Alloc0((pVariables + 1) * sizeof(int));
-  Q0 = (int *)Alloc((pVariables + 1) * sizeof(int));
+  Qpol = (int **)omAlloc((pVariables + 1) * sizeof(int *));
+  Ql = (int *)omAlloc0((pVariables + 1) * sizeof(int));
+  Q0 = (int *)omAlloc((pVariables + 1) * sizeof(int));
   *Qpol = NULL;
   hLength = k = j = 0;
   mc = hisModule;
   if (mc!=0)
   {
     mw = hMinModulweight(modulweight);
-    hstc = (scfmon)Alloc(hNexist * sizeof(scmon));
+    hstc = (scfmon)omAlloc(hNexist * sizeof(scmon));
   }
   else
   {
@@ -282,7 +282,7 @@ static intvec * hSeries(ideal S, intvec *modulweight,
         (**Qpol)++;
       else
       {
-        *Qpol = (int *)AllocSizeOf(int);
+        *Qpol = (int *)omAllocBin(int_bin);
         hLength = *Ql = **Qpol = 1;
       }
     }
@@ -296,7 +296,7 @@ static intvec * hSeries(ideal S, intvec *modulweight,
         l = i + j;
         if (l > k)
         {
-          work = NewIntvec1(l);
+          work = new intvec(l);
           for (ii=0; ii<k; ii++)
             (*work)[ii] = (*hseries1)[ii];
           if (hseries1 != NULL)
@@ -318,7 +318,7 @@ static intvec * hSeries(ideal S, intvec *modulweight,
   }
   if (k==0)
   {
-    hseries1=NewIntvec1(2);
+    hseries1=new intvec(2);
     (*hseries1)[0]=0;
     (*hseries1)[1]=0;
   }
@@ -328,7 +328,7 @@ static intvec * hSeries(ideal S, intvec *modulweight,
     while ((*hseries1)[l-2]==0) l--;
     if (l!=k)
     {
-      work = NewIntvec1(l);
+      work = new intvec(l);
       for (ii=l-2; ii>=0; ii--)
         (*work)[ii] = (*hseries1)[ii];
       delete hseries1;
@@ -339,19 +339,19 @@ static intvec * hSeries(ideal S, intvec *modulweight,
   for (i = 0; i <= pVariables; i++)
   {
     if (Ql[i]!=0)
-      Free((ADDRESS)Qpol[i], Ql[i] * sizeof(int));
+      omFreeSize((ADDRESS)Qpol[i], Ql[i] * sizeof(int));
   }
-  Free((ADDRESS)Q0, (pVariables + 1) * sizeof(int));
-  Free((ADDRESS)Ql, (pVariables + 1) * sizeof(int));
-  Free((ADDRESS)Qpol, (pVariables + 1) * sizeof(int *));
+  omFreeSize((ADDRESS)Q0, (pVariables + 1) * sizeof(int));
+  omFreeSize((ADDRESS)Ql, (pVariables + 1) * sizeof(int));
+  omFreeSize((ADDRESS)Qpol, (pVariables + 1) * sizeof(int *));
   hKill(stcmem, pVariables - 1);
-  Free((ADDRESS)hpure, (1 + (pVariables * pVariables)) * sizeof(Exponent_t));
-  Free((ADDRESS)hvar, (pVariables + 1) * sizeof(int));
-  Free((ADDRESS)hwork, hNexist * sizeof(scmon));
+  omFreeSize((ADDRESS)hpure, (1 + (pVariables * pVariables)) * sizeof(Exponent_t));
+  omFreeSize((ADDRESS)hvar, (pVariables + 1) * sizeof(int));
+  omFreeSize((ADDRESS)hwork, hNexist * sizeof(scmon));
   hDelete(hexist, hNexist);
-  FreeSizeOf((ADDRESS)p0, int);
+  omFreeBin((ADDRESS)p0,  int_bin);
   if (hisModule!=0)
-    Free((ADDRESS)hstc, hNexist * sizeof(scmon));
+    omFreeSize((ADDRESS)hstc, hNexist * sizeof(scmon));
   return hseries1;
 }
 
@@ -372,7 +372,7 @@ intvec * hSecondSeries(intvec *hseries1)
   int i, j, k, s, t, l;
   if (hseries1 == NULL)
     return NULL;
-  work = NewIntvec1(hseries1);
+  work = new intvec(hseries1);
   k = l = work->length()-1;
   s = 0;
   for (i = k-1; i >= 0; i--)
@@ -392,7 +392,7 @@ intvec * hSecondSeries(intvec *hseries1)
       t += j;
     }
   }
-  hseries2 = NewIntvec1(k+1);
+  hseries2 = new intvec(k+1);
   for (i = k-1; i >= 0; i--)
     (*hseries2)[i] = (*work)[i];
   (*hseries2)[k] = (*work)[l];

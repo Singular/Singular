@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.12 1999-11-15 17:20:19 obachman Exp $ */
+/* $Id: longalg.h,v 1.13 2000-08-14 12:56:35 obachman Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -96,7 +96,7 @@ poly naPermNumber(number z, int * par_perm, int P);
 #define napNext(p) (p->ne)
 #define napGetCoeff(p) (p->ko)
 #define napGetExp(p,i) (p->e[(i)-1])
-#define napNew() ((alg)Alloc0(napMonomSize))
+#define napNew() ((alg)omAlloc0(napMonomSize))
 #define nanumber lnumber
 #define naGetNom0(na)  (((nanumber)(na))->z)
 #define naGetDenom0(na)  (((nanumber)(na))->n)

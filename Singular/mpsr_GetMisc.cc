@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_GetMisc.cc,v 1.19 1999-11-15 17:20:33 obachman Exp $ */
+/* $Id: mpsr_GetMisc.cc,v 1.20 2000-08-14 12:56:42 obachman Exp $ */
 
 /***************************************************************
  *
@@ -71,17 +71,17 @@ ring mpsr_rDefault(short ch)
 
 static ring rDefault(short ch, char *name)
 {
-  ring r = (ring) Alloc0SizeOf(sip_sring);
+  ring r = (ring) omAlloc0Bin(sip_sring_bin);
   r->ch = ch;
   r->N = 1;
-  r->names = (char **) AllocSizeOf(char_ptr);
-  r->names[0] = mstrdup(name);
+  r->names = (char **) omAllocBin(char_ptr_bin);
+  r->names[0] = omStrDup(name);
 
-  r->wvhdl = (int **)Alloc0(3 * sizeof(int *));
+  r->wvhdl = (int **)omAlloc0(3 * sizeof(int *));
   /*order: dp,C,0*/
-  r->order = (int *) Alloc(3 * sizeof(int *));
-  r->block0 = (int *)Alloc(3 * sizeof(int *));
-  r->block1 = (int *)Alloc(3 * sizeof(int *));
+  r->order = (int *) omAlloc(3 * sizeof(int *));
+  r->block0 = (int *)omAlloc(3 * sizeof(int *));
+  r->block1 = (int *)omAlloc(3 * sizeof(int *));
   /* ringorder dp for the first block: var 1..3 */
   r->order[0]  = ringorder_unspec;
   r->block0[0] = 1;
@@ -223,7 +223,7 @@ void mpsr_MapLeftv(leftv l, ring from_ring, ring to_ring)
         {
           ideal id = (ideal) l->Data();
           n = IDELEMS(id);
-          poly *m = id->m, *m1 = (poly *) Alloc(n*sizeof(poly));
+          poly *m = id->m, *m1 = (poly *) omAlloc(n*sizeof(poly));
           mpsr_SetCurrRing(to_ring, TRUE);
           for (i=0; i<n; i++)
           {
@@ -232,7 +232,7 @@ void mpsr_MapLeftv(leftv l, ring from_ring, ring to_ring)
           }
           mpsr_SetCurrRing(from_ring, FALSE);
           for (i=0; i<n; i++) pDelete(&(m1[i]));
-          Free(m1, n*sizeof(poly));
+          omFreeSize(m1, n*sizeof(poly));
           break;
         }
 
@@ -401,11 +401,11 @@ void mpsr_DeleteExternalData(MPT_ExternalData_t edata)
     if (mlv->lv != NULL)
     {
       mlv->lv->CleanUp();
-      FreeSizeOf(mlv->lv, sleftv);
+      omFreeBin(mlv->lv, sleftv_bin);
     }
     if (mlv->r != NULL) rKill(mlv->r);
   }
-  FreeSizeOf(mlv, mpsr_sleftv);
+  omFreeBin(mlv, mpsr_sleftv_bin);
 }
 
 void mpsr_CopyExternalData(MPT_ExternalData_t *dest,
@@ -415,9 +415,9 @@ void mpsr_CopyExternalData(MPT_ExternalData_t *dest,
 
   if (slv != NULL)
   {
-    dlv = (mpsr_leftv) Alloc0SizeOf(mpsr_sleftv);
+    dlv = (mpsr_leftv) omAlloc0Bin(mpsr_sleftv_bin);
     dlv->r = rCopy(slv->r);
-    dlv->lv = (leftv) Alloc0SizeOf(sleftv);
+    dlv->lv = (leftv) omAlloc0Bin(sleftv_bin);
     if (slv->lv != NULL) dlv->lv->Copy(slv->lv);
     else dlv->lv = NULL;
 
@@ -432,42 +432,20 @@ void mpsr_CopyExternalData(MPT_ExternalData_t *dest,
  * mpsr initialization
  *
  ***************************************************************/
+#undef malloc
+#undef free
+#undef freeSize
 
-#ifdef MDEBUG
-void * mpAllocBlock( size_t t)
-{
-  return mmDBAllocBlock(t,"mp",0);
-}
-void mpFreeBlock( void* a, size_t t)
-{
-  mmDBFreeBlock(a,t,"mp",0);
-}
-
-void * mpAlloc( size_t t)
-{
-  return mmDBAlloc(t,"mp",0);
-}
-void mpFree(void* a)
-{
-  mmDBFree(a,"mp",0);
-}
-#endif
+#include "mmalloc.h"
 
 void mpsr_Init()
 {
 #ifndef EXTERNAL_MALLOC_H
   // memory management functions of MP (and MPT)
-#ifndef MDEBUG
-  IMP_RawMemAllocFnc = mmAlloc;
-  IMP_RawMemFreeFnc = mmFree;
-  IMP_MemAllocFnc = mmAllocBlock;
-  IMP_MemFreeFnc = mmFreeBlock;
-#else
-  IMP_RawMemAllocFnc = mpAlloc;
-  IMP_RawMemFreeFnc = mpFree;
-  IMP_MemAllocFnc = mpAllocBlock;
-  IMP_MemFreeFnc = mpFreeBlock;
-#endif
+  IMP_RawMemAllocFnc = malloc;
+  IMP_RawMemFreeFnc = free;
+  IMP_MemAllocFnc = malloc;
+  IMP_MemFreeFnc = freeSize;
 #endif
 
   // Init of the MPT External Data functions

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: intvec.cc,v 1.16 1999-11-15 17:20:07 obachman Exp $ */
+/* $Id: intvec.cc,v 1.17 2000-08-14 12:56:21 obachman Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -11,74 +11,16 @@
 #include "tok.h"
 #include "febase.h"
 #include "intvec.h"
-#include "mmemory.h"
+#include <omalloc.h>
 
 /*0 implementation*/
-
-#ifdef MDEBUG
-intvec::intvec(char* file, int line, int l)
-{
-  v = (int *)mmDBAllocBlock0(sizeof(int)*l, file, line);
-  row = l;
-  col = 1;
-}
-
-intvec::intvec(char* file, int line, intvec* iv)
-{
-  row = iv->rows();
-  col = iv->cols();
-  v   = (int *)mmDBAllocBlock(sizeof(int)*row*col, file, line);
-  for (int i=0; i<row*col; i++)
-  {
-    v[i] = (*iv)[i];
-  }
-}
-
-intvec::intvec(char* file, int line, int s, int e)
-{
-  int inc;
-  col = 1;
-  if (s<e)
-  {
-    row =  e-s+1;
-    inc =  1;
-  }
-  else
-  {
-    row = s-e+1;
-    inc = -1;
-  }
-  v = (int *)mmDBAllocBlock(sizeof(int)*row, file, line);
-  for (int i=0; i<row; i++)
-  {
-    v[i] = s;
-    s+=inc;
-  }
-}
-
-intvec::intvec(char* file, int line, int r, int c, int init)
-{
-  row = r;
-  col = c;
-  int l = r*c;
-  if ((r>0) && (c>0))
-    v = (int *)mmDBAllocBlock(sizeof(int)*l, file, line);
-  else
-    v = NULL;
-  for (int i=0; i<l; i++)
-  {
-    v[i] = init;
-  }
-}
-
-#endif // ! MDEBUG
 
 
 intvec::intvec(intvec* iv)
 {
   row = iv->rows();
   col = iv->cols();
-  v   = (int *)Alloc(sizeof(int)*row*col);
+  v   = (int *)omAlloc(sizeof(int)*row*col);
   for (int i=0; i<row*col; i++)
   {
     v[i] = (*iv)[i];
@@ -99,7 +41,7 @@ intvec::intvec(int s, int e)
     row = s-e+1;
     inc = -1;
   }
-  v = (int *)Alloc(sizeof(int)*row);
+  v = (int *)omAlloc(sizeof(int)*row);
   for (int i=0; i<row; i++)
   {
     v[i] = s;
@@ -113,7 +55,7 @@ intvec::intvec(int r, int c, int init)
   col = c;
   int l = r*c;
   if ((r>0) && (c>0))
-    v = (int *)Alloc(sizeof(int)*l);
+    v = (int *)omAlloc(sizeof(int)*l);
   else
     v = NULL;
   for (int i=0; i<l; i++)
@@ -168,13 +110,13 @@ char * intvec::ivString(int mat,int spaces, int dim)
 void intvec::resize(int new_length)
 {
   assume(new_length > 0 && col == 1);
-  v = (int*) ReAlloc0(v, row*sizeof(int), new_length*sizeof(int));
+  v = (int*) omRealloc0Size(v, row*sizeof(int), new_length*sizeof(int));
   row = new_length;
 }
 
 char * intvec::String(int dim)
 {
-  return mstrdup(ivString(0, 0, dim));
+  return omStrDup(ivString(0, 0, dim));
 }
 
 void intvec::show(int mat,int spaces)
@@ -259,7 +201,7 @@ int intvec::compare(int o)
 
 intvec * ivCopy(intvec * o)
 {
-  intvec * iv=NewIntvecIv(o);
+  intvec * iv=new intvec(o);
   return iv;
 }
 
@@ -272,7 +214,7 @@ intvec * ivAdd(intvec * a, intvec * b)
   ma = max(a->rows(),b->rows());
   if (a->cols() == 1)
   {
-    iv = NewIntvec1(ma);
+    iv = new intvec(ma);
     for (i=0; i<mn; i++) (*iv)[i] = (*a)[i] + (*b)[i];
     if (ma > mn)
     {
@@ -288,7 +230,7 @@ intvec * ivAdd(intvec * a, intvec * b)
     return iv;
   }
   if (mn != ma) return NULL;
-  iv = NewIntvec1(a);
+  iv = new intvec(a);
   for (i=0; i<mn*a->cols(); i++) { (*iv)[i] += (*b)[i]; }
   return iv;
 }
@@ -302,7 +244,7 @@ intvec * ivSub(intvec * a, intvec * b)
   ma = max(a->rows(),b->rows());
   if (a->cols() == 1)
   {
-    iv = NewIntvec1(ma);
+    iv = new intvec(ma);
     for (i=0; i<mn; i++) (*iv)[i] = (*a)[i] - (*b)[i];
     if (ma > mn)
     {
@@ -318,7 +260,7 @@ intvec * ivSub(intvec * a, intvec * b)
     return iv;
   }
   if (mn != ma) return NULL;
-  iv = NewIntvec1(a);
+  iv = new intvec(a);
   for (i=0; i<mn*a->cols(); i++) { (*iv)[i] -= (*b)[i]; }
   return iv;
 }
@@ -326,7 +268,7 @@ intvec * ivSub(intvec * a, intvec * b)
 intvec * ivTranp(intvec * o)
 {
   int i, j, r = o->rows(), c = o->cols();
-  intvec * iv= NewIntvec3(c, r, 0);
+  intvec * iv= new intvec(c, r, 0);
   for (i=0; i<r; i++)
   {
     for (j=0; j<c; j++)
@@ -352,7 +294,7 @@ intvec * ivMult(intvec * a, intvec * b)
       rb = b->rows(), cb = b->cols();
   intvec * iv;
   if (ca != rb) return NULL;
-  iv = NewIntvec3(ra, cb, 0);
+  iv = new intvec(ra, cb, 0);
   for (i=0; i<ra; i++)
   {
     for (j=0; j<cb; j++)
@@ -471,7 +413,7 @@ void ivCancelContent(intvec * imat,int from)
 */
 static intvec * ivIndepCols(intvec * imat)
 {
-  intvec * result=NewIntvec3(1,imat->cols(),0);
+  intvec * result=new intvec(1,imat->cols(),0);
   int i,j;
 
   for (i=1;i<=imat->rows();i++)
@@ -488,8 +430,8 @@ static intvec * ivIndepCols(intvec * imat)
 */
 static intvec * ivBasicSol(intvec * imat)
 {
-  intvec * result = NewIntvec3(2*imat->cols(),imat->cols(),0);
-  intvec * indep=ivIndepCols(imat),*actsol=NewIntvec1(imat->cols());
+  intvec * result = new intvec(2*imat->cols(),imat->cols(),0);
+  intvec * indep=ivIndepCols(imat),*actsol=new intvec(imat->cols());
   int actPosSol=1,actNegSol=imat->cols()+1,i=imat->cols(),j,k;
   int tgcd,tlcm;
   BOOLEAN isNeg;
@@ -551,7 +493,7 @@ static intvec * ivBasicSol(intvec * imat)
 */
 intvec * ivSolveIntMat(intvec * imat)
 {
-  intvec * result=NewIntvec1(imat->cols());
+  intvec * result=new intvec(imat->cols());
   intvec * basesol=ivBasicSol(imat);
   int i=imat->cols(),j,k,l,t;
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.54 2000-05-02 16:30:43 Singular Exp $ */
+/* $Id: polys.cc,v 1.55 2000-08-14 12:56:45 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -13,7 +13,7 @@
 #include <ctype.h>
 #include "mod2.h"
 #include "tok.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "febase.h"
 #include "numbers.h"
 #include "polys.h"
@@ -256,7 +256,7 @@ int pComp(poly p1, poly p2)
 static void newHeadsB(polyset actHeads,int length)
 {
   int i;
-  int* newOrder=(int*)Alloc(length*sizeof(int));
+  int* newOrder=(int*)omAlloc(length*sizeof(int));
 
   for (i=0;i<length;i++)
   {
@@ -269,7 +269,7 @@ static void newHeadsB(polyset actHeads,int length)
       newOrder[i]=0;
     }
   }
-  Free((ADDRESS)SchreyerOrd,maxSchreyer*sizeof(int));
+  omFreeSize((ADDRESS)SchreyerOrd,maxSchreyer*sizeof(int));
   SchreyerOrd = newOrder;
   maxSchreyer = length;
 /*
@@ -306,7 +306,7 @@ static void newHeadsM(polyset actHeads,int length)
 {
   int i;
   int* newOrder=
-    (int*)Alloc0((length+maxSchreyer-indexShift)*sizeof(int));
+    (int*)omAlloc0((length+maxSchreyer-indexShift)*sizeof(int));
 
   //for (i=0;i<length+maxSchreyer-indexShift;i++)
   //  newOrder[i]=0;
@@ -317,7 +317,7 @@ static void newHeadsM(polyset actHeads,int length)
   }
   for (i=maxSchreyer-indexShift;i<length+maxSchreyer-indexShift;i++)
     newOrder[i] = newOrder[pGetComp(actHeads[i-maxSchreyer+indexShift])-1];
-  Free((ADDRESS)SchreyerOrd,maxSchreyer*sizeof(int));
+  omFreeSize((ADDRESS)SchreyerOrd,maxSchreyer*sizeof(int));
   SchreyerOrd = newOrder;
   indexShift = maxSchreyer-indexShift;
   maxSchreyer = length+indexShift;
@@ -367,7 +367,7 @@ void pSetSchreyerOrdM(polyset nextOrder, int length,int comps)
     {
       indexShift = comps;
       if (indexShift==0) indexShift = 1;
-      SchreyerOrd = (int*)Alloc((indexShift+length)*sizeof(int));
+      SchreyerOrd = (int*)omAlloc((indexShift+length)*sizeof(int));
       maxSchreyer = length+indexShift;
       for (i=0;i<indexShift;i++)
         SchreyerOrd[i] = i;
@@ -383,7 +383,7 @@ void pSetSchreyerOrdM(polyset nextOrder, int length,int comps)
   {
     if (maxSchreyer!=0)
     {
-      Free((ADDRESS)SchreyerOrd,maxSchreyer*sizeof(int));
+      omFreeSize((ADDRESS)SchreyerOrd,maxSchreyer*sizeof(int));
       maxSchreyer = 0;
       indexShift = 0;
       //pComp0 = pCompOld;
@@ -675,7 +675,7 @@ void pSetGlobals(ring r, BOOLEAN complete)
   pMonomSizeW = pMonomSize/sizeof(void*);
 
   // Initialize memory management
-  mm_specHeap = r->mm_specHeap;
+  currPolyBin = r->PolyBin;
 
   pVarOffset = r->VarOffset;
 
@@ -1143,7 +1143,7 @@ poly pDehomogen (poly p1,poly p2,number n)
   poly    p;
   number  nn;
 
-  P = (polyset)Alloc0(5*sizeof(poly));
+  P = (polyset)omAlloc0(5*sizeof(poly));
   //for (i=0; i<5; i++)
   //{
   //  P[i] = NULL;
@@ -1162,7 +1162,7 @@ poly pDehomogen (poly p1,poly p2,number n)
       nDelete(&nn);
     }
   }
-  Free((ADDRESS)P,SizeOfSet*sizeof(poly));
+  omFreeSize((ADDRESS)P,SizeOfSet*sizeof(poly));
   return p;
 }
 
@@ -1197,7 +1197,7 @@ void pCancelPolyByMonom (poly p1,poly p2,polyset * P,int * SizeOfSet)
 
   if (*P == NULL)
   {
-    *P = (polyset) Alloc(5*sizeof(poly));
+    *P = (polyset) omAlloc(5*sizeof(poly));
     *SizeOfSet = 5;
   }
   p = pCopy(p1);
@@ -1509,6 +1509,8 @@ BOOLEAN pHasNotCF(poly p1, poly p2)
 }
 
 
+/* Hmm ... this should be inlined or made more efficient:
+   see Long/mregular.tst */
 /*2
 *should return 1 if p divides q and p<q,
 *             -1 if q divides p and q<p
@@ -1733,8 +1735,8 @@ poly pSubst(poly p, int n, poly e)
   Exponent_t *me,*ee;
   number nu,nu1;
 
-  me=(Exponent_t *)Alloc((pVariables+1)*sizeof(Exponent_t));
-  ee=(Exponent_t *)Alloc((pVariables+1)*sizeof(Exponent_t));
+  me=(Exponent_t *)omAlloc((pVariables+1)*sizeof(Exponent_t));
+  ee=(Exponent_t *)omAlloc((pVariables+1)*sizeof(Exponent_t));
   if (e!=NULL) pGetExpV(e,ee);
   res=NULL;
   h=p;
@@ -1760,8 +1762,8 @@ poly pSubst(poly p, int n, poly e)
     }
     pDelete1(&h);
   }
-  Free((ADDRESS)me,(pVariables+1)*sizeof(Exponent_t));
-  Free((ADDRESS)ee,(pVariables+1)*sizeof(Exponent_t));
+  omFreeSize((ADDRESS)me,(pVariables+1)*sizeof(Exponent_t));
+  omFreeSize((ADDRESS)ee,(pVariables+1)*sizeof(Exponent_t));
   return res;
 }
 

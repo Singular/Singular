@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.36 2000-05-19 15:45:48 Singular Exp $ */
+/* $Id: feread.cc,v 1.37 2000-08-14 12:56:10 obachman Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -10,7 +10,7 @@
 #include "mod2.h"
 #include "tok.h"
 #include "febase.h"
-#include "mmemory.h"
+#include <omalloc.h>
 
 #include "static.h"
 

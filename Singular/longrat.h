@@ -3,14 +3,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.h,v 1.16 2000-07-03 10:21:21 pohl Exp $ */
+/* $Id: longrat.h,v 1.17 2000-08-14 12:56:36 obachman Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers
 */
 #include "structs.h"
-#if HAVE_ASO == 1
-#include "longrat.aso"
-#endif
 
 extern "C" {
 #include <gmp.h>
@@ -48,7 +45,7 @@ struct snumber
 {
   lint z;
   lint n;
-#if defined(LDEBUG) && ! defined(HAVE_ASO)
+#if defined(LDEBUG)
   int debug;
 #endif
   BOOLEAN s;
@@ -92,6 +89,11 @@ void     nlDelete(number *a);
 #endif
 
 BOOLEAN nlSetMap(ring r);
+
+#ifndef OM_ALLOC_H
+struct omBin_s;
+#endif
+extern omBin_s* rnumber_bin;
 
 #endif
 

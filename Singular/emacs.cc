@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: emacs.cc,v 1.16 2000-08-02 13:40:28 obachman Exp $ */
+/* $Id: emacs.cc,v 1.17 2000-08-14 12:56:03 obachman Exp $ */
 /*
 * ABSTRACT: Esingular main file
 */
@@ -15,6 +15,7 @@
 #endif
 #include "mod2.h"
 #include "version.h"
+#include <omalloc.h>
 
 #if !defined(TSINGULAR) && !defined(ESINGULAR)
 #define ESINGULAR
@@ -24,13 +25,6 @@
 #undef system
 #endif
 
-#define Alloc   malloc
-#define AllocL  malloc
-#define mstrdup strdup
-#define Free    free
-#define FreeL   free
-#define Alloc   malloc
-#define AllocL  malloc
 #ifndef BOOLEAN
 #define BOOLEAN int
 #endif
@@ -92,9 +86,6 @@ void assume_violation(char* file, int line)
   error( "Internal assume violation: file %s line %d\n", file, line);
 }
    
-extern "C" {
-#include "find_exec.c"
-}
 #include "feResource.cc"
 #include "feOpt.cc"
 
@@ -213,7 +204,7 @@ int main(int argc, char** argv)
 #define EXTRA_XTERM_ARGS ""
 #endif
 
-  syscall = (char*) AllocL(strlen(emacs) + 
+  syscall = (char*) omAlloc(strlen(emacs) + 
                                  strlen(singular) + 
                                  length + 300);
   sprintf(syscall, "%s %s -e %s ", emacs, EXTRA_XTERM_ARGS, singular);
@@ -267,7 +258,7 @@ int main(int argc, char** argv)
       sprintf(cwd, "%s/.emacs-singular", emacs_load);
       if (! access(cwd, R_OK))
       {
-        emacs_load = mstrdup(cwd);
+        emacs_load = omStrDup(cwd);
       }
       else
       {
@@ -284,7 +275,7 @@ int main(int argc, char** argv)
     }
   }
   
-  syscall = (char*) AllocL(strlen(emacs) + 
+  syscall = (char*) omAlloc(strlen(emacs) + 
                            strlen(singular) + 
                            strlen(emacs_dir) + 
                            strlen(emacs_load) +

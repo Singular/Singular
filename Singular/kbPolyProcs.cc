@@ -1,5 +1,5 @@
 #include "mod2.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "polys.h"
 #include "febase.h"
 #include "kutil.h"
@@ -186,7 +186,7 @@ void kb_n_Mult_p_General(number n, poly p)
 
 void kb_p_Add_q_General(poly *p, int *lp,
                         poly *q, int *lq, 
-                        memHeap heap)
+                        omBin heap)
 {
 #ifdef KB_USE_HEAPS
   assume(heap != NULL);
@@ -303,7 +303,7 @@ void kb_p_Add_q_General(poly *p, int *lp,
 poly  kb_p_Mult_m_General(poly p,
                           poly m, 
                           poly spNoether,
-                          memHeap heap)
+                          omBin heap)
 {
 #ifdef KB_USE_HEAPS
   assume(heap != NULL);
@@ -355,7 +355,7 @@ void kb_p_Minus_m_Mult_q_General (poly *pp, int *lpp,
                                   poly m,
                                   poly q, int lq,
                                   poly spNoether,
-                                  memHeap heap)
+                                  omBin heap)
 { 
 #ifdef KB_USE_HEAPS
   assume(heap != NULL);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz3.cc,v 1.2 2000-07-09 16:22:41 siebert Exp $ */
+/* $Id: syz3.cc,v 1.3 2000-08-14 12:56:55 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -10,7 +10,7 @@
 #include "mod2.h"
 #include "tok.h"
 #include "attrib.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "polys.h"
 #include "febase.h"
 #include "kstd1.h"
@@ -425,7 +425,7 @@ static void updatePairs(SSet *resPairs,int *l_pairs,syStrategy syzstr,
       {
         if (l>=*l_pairs)
         {
-          SSet temp = (SSet)Alloc0((*l_pairs+16)*sizeof(SObject));
+          SSet temp = (SSet)omAlloc0((*l_pairs+16)*sizeof(SObject));
           for (ll=0;ll<*l_pairs;ll++)
           {
             temp[ll].p = (*resPairs)[ll].p;
@@ -439,7 +439,7 @@ static void updatePairs(SSet *resPairs,int *l_pairs,syStrategy syzstr,
             temp[ll].order = (*resPairs)[ll].order;
             temp[ll].isNotMinimal = (*resPairs)[ll].isNotMinimal;
           }
-          Free((ADDRESS)(*resPairs),*l_pairs*sizeof(SObject));
+          omFreeSize((ADDRESS)(*resPairs),*l_pairs*sizeof(SObject));
           *l_pairs += 16;
           (*resPairs) = temp;
         }
@@ -941,8 +941,8 @@ static BOOLEAN redPairs(SSet resPairs,int l_pairs, ideal syzygies,
 {
   if (resPairs[0].lcm==NULL) return TRUE;
   int i,j,actdeg=resPairs[0].order;
-  int * ogm_l=(int*)Alloc0(IDELEMS(syzstr->res[index])*sizeof(int));
-  int * orp_l=(int*)Alloc0(IDELEMS(syzstr->orderedRes[index])*sizeof(int));
+  int * ogm_l=(int*)omAlloc0(IDELEMS(syzstr->res[index])*sizeof(int));
+  int * orp_l=(int*)omAlloc0(IDELEMS(syzstr->orderedRes[index])*sizeof(int));
   int t1=IDELEMS(syzstr->res[index]),t2=IDELEMS(syzstr->orderedRes[index]);
  
   for (j=IDELEMS(syzstr->res[index])-1;j>=0;j--) 
@@ -975,16 +975,16 @@ static BOOLEAN redPairs(SSet resPairs,int l_pairs, ideal syzygies,
       break;
     else if (resPairs[0].lcm==NULL)  //there are no pairs left and no new_gens
     {
-      Free((ADDRESS)ogm_l,IDELEMS(syzstr->res[index])*sizeof(int));
-      Free((ADDRESS)orp_l,IDELEMS(syzstr->orderedRes[index])*sizeof(int));
+      omFreeSize((ADDRESS)ogm_l,IDELEMS(syzstr->res[index])*sizeof(int));
+      omFreeSize((ADDRESS)orp_l,IDELEMS(syzstr->orderedRes[index])*sizeof(int));
       return TRUE;
     }
     else
       actdeg = resPairs[0].order;
   }
   syTestPairs(resPairs,l_pairs,syzstr->res[index]);
-  Free((ADDRESS)ogm_l,IDELEMS(syzstr->res[index])*sizeof(int));
-  Free((ADDRESS)orp_l,IDELEMS(syzstr->orderedRes[index])*sizeof(int));
+  omFreeSize((ADDRESS)ogm_l,IDELEMS(syzstr->res[index])*sizeof(int));
+  omFreeSize((ADDRESS)orp_l,IDELEMS(syzstr->orderedRes[index])*sizeof(int));
   return FALSE;
 }
  
@@ -1009,7 +1009,7 @@ static ideal kosz_std(ideal new_generators,ideal new_repr,syStrategy syzstr,
     Werror("Hier ist was faul!\n");
     return result;
   }
-  SSet resPairs=(SSet)Alloc0(l_pairs*sizeof(SObject));
+  SSet resPairs=(SSet)omAlloc0(l_pairs*sizeof(SObject));
   loop
   {
     updatePairs(&resPairs,&l_pairs,syzstr,index,
@@ -1017,7 +1017,7 @@ static ideal kosz_std(ideal new_generators,ideal new_repr,syStrategy syzstr,
     if (redPairs(resPairs,l_pairs,syzygies, new_generators,new_repr,
                  next_comp,syzstr,index)) break;
   }
-  Free((SSet)resPairs,l_pairs*sizeof(SObject));
+  omFreeSize((SSet)resPairs,l_pairs*sizeof(SObject));
   return syzygies;
 }
  
@@ -1125,7 +1125,7 @@ static void updatePairsHIndex(SSet *resPairs,int *l_pairs,syStrategy syzstr,
       {
         if (l>=*l_pairs)
         {
-          SSet temp = (SSet)Alloc0((*l_pairs+16)*sizeof(SObject));
+          SSet temp = (SSet)omAlloc0((*l_pairs+16)*sizeof(SObject));
           for (ll=0;ll<*l_pairs;ll++)
           {
             temp[ll].p = (*resPairs)[ll].p;
@@ -1139,7 +1139,7 @@ static void updatePairsHIndex(SSet *resPairs,int *l_pairs,syStrategy syzstr,
             temp[ll].order = (*resPairs)[ll].order;
             temp[ll].isNotMinimal = (*resPairs)[ll].isNotMinimal;
           }
-          Free((ADDRESS)(*resPairs),*l_pairs*sizeof(SObject));
+          omFreeSize((ADDRESS)(*resPairs),*l_pairs*sizeof(SObject));
           *l_pairs += 16;
           (*resPairs) = temp;
         }
@@ -1334,7 +1334,7 @@ PrintLn();
     {
       pEnlargeSet(&add_generators->m,IDELEMS(add_generators),16);
       pEnlargeSet(&add_repr->m,IDELEMS(add_repr),16);
-      *g_l = (int*)ReAlloc0((ADDRESS)*g_l, IDELEMS(add_generators)*sizeof(int),
+      *g_l = (int*)omRealloc0Size((ADDRESS)*g_l, IDELEMS(add_generators)*sizeof(int),
                             (IDELEMS(add_generators)+16)*sizeof(int));
       IDELEMS(add_generators) += 16;
       IDELEMS(add_repr) += 16;
@@ -1415,10 +1415,10 @@ static void procedeNextGenerators(ideal temp_generators,ideal temp_repr,
   int next_place_add;
   int p_length,red_deg,l_pairs=IDELEMS(add_generators);
   poly next_p;
-  int * gen_length=(int*)Alloc0(IDELEMS(add_generators)*sizeof(int));
-  int * secgen_length=(int*)Alloc0(IDELEMS(syzstr->res[index])*sizeof(int));
+  int * gen_length=(int*)omAlloc0(IDELEMS(add_generators)*sizeof(int));
+  int * secgen_length=(int*)omAlloc0(IDELEMS(syzstr->res[index])*sizeof(int));
   BOOLEAN pairs_left;
-  SSet resPairs=(SSet)Alloc0(l_pairs*sizeof(SObject));
+  SSet resPairs=(SSet)omAlloc0(l_pairs*sizeof(SObject));
  
   for (j=IDELEMS(syzstr->res[index])-1;j>=0;j--)
   {
@@ -1472,7 +1472,7 @@ static void procedeNextGenerators(ideal temp_generators,ideal temp_repr,
           {
             pEnlargeSet(&add_generators->m,IDELEMS(add_generators),16);
             pEnlargeSet(&add_repr->m,IDELEMS(add_repr),16);
-            gen_length = (int*)ReAlloc0((ADDRESS)gen_length, IDELEMS(add_generators)*sizeof(int), 
+            gen_length = (int*)omRealloc0Size((ADDRESS)gen_length, IDELEMS(add_generators)*sizeof(int), 
                                         (IDELEMS(add_generators)+16)*sizeof(int));
             IDELEMS(add_generators) += 16;
             IDELEMS(add_repr) += 16;
@@ -1527,9 +1527,9 @@ static void procedeNextGenerators(ideal temp_generators,ideal temp_repr,
       }
     }
   }
-  Free((SSet)resPairs,l_pairs*sizeof(SObject));
-  Free((ADDRESS)gen_length,IDELEMS(add_generators)*sizeof(int));
-  Free((ADDRESS)secgen_length,IDELEMS(syzstr->res[index])*sizeof(int));
+  omFreeSize((SSet)resPairs,l_pairs*sizeof(SObject));
+  omFreeSize((ADDRESS)gen_length,IDELEMS(add_generators)*sizeof(int));
+  omFreeSize((ADDRESS)secgen_length,IDELEMS(syzstr->res[index])*sizeof(int));
 }
  
 /*3
@@ -1544,7 +1544,7 @@ static ideal normalizeOldPart(ideal new_generators,ideal new_repr,
   int i,j=0,ii=IDELEMS(old_generators)-1,dummy;
   poly p;
   number n;
-  int * g_l=(int*)Alloc0(IDELEMS(old_generators)*sizeof(int));
+  int * g_l=(int*)omAlloc0(IDELEMS(old_generators)*sizeof(int));
  
   for (i=0;i<IDELEMS(old_generators);i++)
   {
@@ -1590,7 +1590,7 @@ static ideal normalizeOldPart(ideal new_generators,ideal new_repr,
       pNorm(result->m[j]);
     new_repr->m[j] = NULL;
   }
-  Free((ADDRESS)g_l,IDELEMS(old_generators)*sizeof(int));
+  omFreeSize((ADDRESS)g_l,IDELEMS(old_generators)*sizeof(int));
   return result;
 }
  
@@ -1697,7 +1697,7 @@ static ideal syAppendSyz(ideal new_generators, syStrategy syzstr,int index,int c
  
   if (index==0)
   {
-    //int * og_l=(int*)Alloc0(IDELEMS(syzstr->res[0])*sizeof(int));
+    //int * og_l=(int*)omAlloc0(IDELEMS(syzstr->res[0])*sizeof(int));
     //for (i=IDELEMS(syzstr->res[0])-1;i>=0;i--)
     //{
       //if (syzstr->res[0]->m[i]!=NULL)
@@ -1735,7 +1735,7 @@ static ideal syAppendSyz(ideal new_generators, syStrategy syzstr,int index,int c
         pSetmComp(new_repr->m[i]);
       }
     }
-    //Free((ADDRESS)og_l,IDELEMS(syzstr->res[0])*sizeof(int));
+    //omFreeSize((ADDRESS)og_l,IDELEMS(syzstr->res[0])*sizeof(int));
 #ifdef SHOW_PROT
 Print("Add new generators: \n");
 idPrint(new_generators);
@@ -1771,7 +1771,7 @@ syStrategy syKosz(ideal arg,int * length)
   short_pairs = 0;
   if (idIs0(arg)) return NULL;
   rk_arg = idRankFreeModule(arg);
-  syStrategy syzstr=(syStrategy)Alloc0(sizeof(ssyStrategy));
+  syStrategy syzstr=(syStrategy)omAlloc0(sizeof(ssyStrategy));
 /*--- changes to a Cdp-ring ----------------------------*/
   syzstr->syRing = rCurrRingAssure_C_dp();
 /*--- initializes the data structures---------------*/
@@ -1831,9 +1831,9 @@ syStrategy syKosz(ideal arg,int * length)
   while ((last_generator>=0) && (temp->m[last_generator]==NULL))
     last_generator--;
 #endif
-  syzstr->res = (resolvente)Alloc0((*length+1)*sizeof(ideal));
-  syzstr->orderedRes = (resolvente)Alloc0((*length+1)*sizeof(ideal));
-  resolvente totake=(resolvente)Alloc0((*length+1)*sizeof(ideal));
+  syzstr->res = (resolvente)omAlloc0((*length+1)*sizeof(ideal));
+  syzstr->orderedRes = (resolvente)omAlloc0((*length+1)*sizeof(ideal));
+  resolvente totake=(resolvente)omAlloc0((*length+1)*sizeof(ideal));
   syzstr->Tl = new intvec(*length+1);
   syzstr->bucket = kBucketCreate();
   syzstr->syz_bucket = kBucketCreate();
@@ -1895,7 +1895,7 @@ syStrategy syKosz(ideal arg,int * length)
           {
             if (res[j]!=NULL) idDelete(&(res[j]));
           }
-          Free((ADDRESS)res,len*sizeof(ideal));
+          omFreeSize((ADDRESS)res,len*sizeof(ideal));
           idDelete(&initial);
           rChangeCurrRing(syzstr->syRing, TRUE);
           rKill(dp_C_ring);
@@ -2029,8 +2029,8 @@ syStrategy syKosz(ideal arg,int * length)
   syzstr->Tl = NULL;
   rKill(syzstr->syRing);
   syzstr->syRing = NULL;
-  Free((ADDRESS)totake,(*length+1)*sizeof(ideal));
-  Free((ADDRESS)syzstr->orderedRes,(*length+1)*sizeof(ideal));
+  omFreeSize((ADDRESS)totake,(*length+1)*sizeof(ideal));
+  omFreeSize((ADDRESS)syzstr->orderedRes,(*length+1)*sizeof(ideal));
 //Print("Pairs to discard: %d\n",discard_pairs);
 //Print("Pairs shorter reduced: %d\n",short_pairs);
 //discard_pairs = 0;

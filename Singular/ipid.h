@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.28 1999-11-15 17:20:10 obachman Exp $ */
+/* $Id: ipid.h,v 1.29 2000-08-14 12:56:24 obachman Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -152,10 +152,16 @@ BOOLEAN checkPackage(package pack);
 #define resetFlag(A,F) (A)->flag&=~Sy_bit(F)
 void ipListFlag(idhdl h);
 
-#if HAVE_ASO == 1
-#include "ipid.aso"
+#ifndef OM_ALLOC_H
+struct omBin_s;
 #endif
 
+extern omBin_s* sip_command_bin;
+extern omBin_s* ip_command_bin;
+extern omBin_s* sip_package_bin;
+extern omBin_s* ip_package_bin;
+extern omBin_s* idrec_bin;
+extern omBin_s* namerec_bin;
 #endif
 
 

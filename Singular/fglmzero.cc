@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmzero.cc,v 1.27 1999-11-24 12:29:37 wichmann Exp $
+// $Id: fglmzero.cc,v 1.28 2000-08-14 12:56:16 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -29,7 +29,7 @@
 #include "ipid.h"
 #include "febase.h"
 #include "maps.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "kstd1.h" // for kNF (see fglmquot)
 #include "fglm.h"
 #include "fglmvec.h"
@@ -95,13 +95,13 @@ idealFunctionals::idealFunctionals( int blockSize, int numFuncs )
     _size= 0;
     _nfunc= numFuncs;
 
-    currentSize= (int *)Alloc( _nfunc*sizeof( int ) );
+    currentSize= (int *)omAlloc( _nfunc*sizeof( int ) );
     for ( k= _nfunc-1; k >= 0; k-- )
         currentSize[k]= 0;
 
-    func= (matHeader **)Alloc( _nfunc*sizeof( matHeader * ) );
+    func= (matHeader **)omAlloc( _nfunc*sizeof( matHeader * ) );
     for ( k= _nfunc-1; k >= 0; k-- )
-        func[k]= (matHeader *)Alloc( _max*sizeof( matHeader ) );
+        func[k]= (matHeader *)omAlloc( _max*sizeof( matHeader ) );
 }
 
 idealFunctionals::~idealFunctionals()
@@ -116,13 +116,13 @@ idealFunctionals::~idealFunctionals()
             if ( ( colp->owner == TRUE ) && ( colp->size > 0 ) ) {
                 for ( row= colp->size-1, elemp= colp->elems; row >= 0; row--, elemp++ )
                     nDelete( & elemp->elem );
-                Free( (ADDRESS)colp->elems, colp->size*sizeof( matElem ) );
+                omFreeSize( (ADDRESS)colp->elems, colp->size*sizeof( matElem ) );
             }
         }
-        Free( (ADDRESS)func[k], _max*sizeof( matHeader ) );
+        omFreeSize( (ADDRESS)func[k], _max*sizeof( matHeader ) );
     }
-    Free( (ADDRESS)func, _nfunc*sizeof( matHeader * ) );
-    Free( (ADDRESS)currentSize, _nfunc*sizeof( int ) );
+    omFreeSize( (ADDRESS)func, _nfunc*sizeof( matHeader * ) );
+    omFreeSize( (ADDRESS)currentSize, _nfunc*sizeof( int ) );
 }
 
 void
@@ -140,14 +140,14 @@ idealFunctionals::map( ring source )
     matElem * elemp;
     number newelem;
 
-    int * perm = (int *)Alloc0( (_nfunc+1)*sizeof( int ) );
+    int * perm = (int *)omAlloc0( (_nfunc+1)*sizeof( int ) );
     maFindPerm( source->names, source->N, NULL, 0, currRing->names,
                 currRing->N, NULL, 0, perm, NULL , currRing->ch);
     //nSetMap( rInternalChar(source), source->parameter, source->P,
     //         source->minpoly );
     nSetMap( source);
 
-    matHeader ** temp = (matHeader **)Alloc( _nfunc*sizeof( matHeader * ));
+    matHeader ** temp = (matHeader **)omAlloc( _nfunc*sizeof( matHeader * ));
     for ( var= 0; var < _nfunc; var ++ ) {
         for ( col= 0, colp= func[var]; col < _size; col++, colp++ ) {
             if ( colp->owner == TRUE ) {
@@ -162,8 +162,8 @@ idealFunctionals::map( ring source )
         }
         temp[ perm[var+1]-1 ]= func[var];
     }
-    Free( (ADDRESS)func, _nfunc*sizeof( matHeader * ) );
-    Free( (ADDRESS)perm, (_nfunc+1)*sizeof( int ) );
+    omFreeSize( (ADDRESS)func, _nfunc*sizeof( matHeader * ) );
+    omFreeSize( (ADDRESS)perm, (_nfunc+1)*sizeof( int ) );
     func= temp;
 }
 
@@ -173,7 +173,7 @@ idealFunctionals::grow( int var )
     if ( currentSize[var-1] == _max ) {
         int k;
         for ( k= _nfunc; k > 0; k-- )
-            func[k-1]= (matHeader *)ReAlloc( func[k-1], _max*sizeof( matHeader ), (_max + _block)*sizeof( matHeader ) );
+            func[k-1]= (matHeader *)omReallocSize( func[k-1], _max*sizeof( matHeader ), (_max + _block)*sizeof( matHeader ) );
         _max+= _block;
     }
     currentSize[var-1]++;
@@ -186,7 +186,7 @@ idealFunctionals::insertCols( int * divisors, int to )
     fglmASSERT( 0 < divisors[0] && divisors[0] <= _nfunc, "wrong number of divisors" );
     int k;
     BOOLEAN owner = TRUE;
-    matElem * elems = (matElem *)Alloc( sizeof( matElem ) );
+    matElem * elems = (matElem *)omAlloc( sizeof( matElem ) );
     elems->row= to;
     elems->elem= nInit( 1 );
     for ( k= divisors[0]; k > 0; k-- ) {
@@ -211,7 +211,7 @@ idealFunctionals::insertCols( int * divisors, const fglmVector to )
     matElem * elemp;
     BOOLEAN owner = TRUE;
     if ( numElems > 0 ) {
-        elems= (matElem *)Alloc( numElems * sizeof( matElem ) );
+        elems= (matElem *)omAlloc( numElems * sizeof( matElem ) );
         for ( k= 1, l= 1, elemp= elems; k <= numElems; k++, elemp++ ) {
             while ( nIsZero( to.getconstelem(l) ) ) l++;
             elemp->row= l;
@@ -315,7 +315,7 @@ fglmSelem::fglmSelem( poly p, int var ) : monom( p ), numVars( 0 )
     for ( int k = pVariables; k > 0; k-- )
         if ( pGetExp( monom, k ) > 0 )
             numVars++;
-    divisors= (int *)Alloc( (numVars+1)*sizeof( int ) );
+    divisors= (int *)omAlloc( (numVars+1)*sizeof( int ) );
     divisors[0]= 0;
     newDivisor( var );
 }
@@ -323,7 +323,7 @@ fglmSelem::fglmSelem( poly p, int var ) : monom( p ), numVars( 0 )
 void
 fglmSelem::cleanup()
 {
-    Free( (ADDRESS)divisors, (numVars+1)*sizeof( int ) );
+    omFreeSize( (ADDRESS)divisors, (numVars+1)*sizeof( int ) );
 }
 
 //     The data-structure for the Functional-Finding-Algorithm.
@@ -372,7 +372,7 @@ fglmSdata::fglmSdata( const ideal thisIdeal )
     basisBS= 100;
     basisMax= basisBS;
     basisSize= 0;
-    basis= (polyset)Alloc( basisMax*sizeof( poly ) );
+    basis= (polyset)omAlloc( basisMax*sizeof( poly ) );
 
     borderBS= 100;
     borderMax= borderBS;
@@ -380,7 +380,7 @@ fglmSdata::fglmSdata( const ideal thisIdeal )
 #ifndef HAVE_EXPLICIT_CONSTR
     border= new borderElem[ borderMax ];
 #else
-    border= (borderElem *)Alloc( borderMax*sizeof( borderElem ) );
+    border= (borderElem *)omAlloc( borderMax*sizeof( borderElem ) );
 #endif
     // rem: the constructors are called in newBorderElem().
     _state= TRUE;
@@ -390,14 +390,14 @@ fglmSdata::~fglmSdata()
 {
     for ( int k = basisSize; k > 0; k-- )
         pDelete1( basis + k );  //. rem: basis runs from basis[1]..basis[basisSize]
-    Free( (ADDRESS)basis, basisMax*sizeof( poly ) );
+    omFreeSize( (ADDRESS)basis, basisMax*sizeof( poly ) );
 #ifndef HAVE_EXPLICIT_CONSTR
     delete [] border;
 #else
     for ( int l = borderSize; l > 0; l-- )
         // rem: the polys of borderElem are deleted via ~borderElem()
         border[l].~borderElem();
-    Free( (ADDRESS)border, borderMax*sizeof( borderElem ) );
+    omFreeSize( (ADDRESS)border, borderMax*sizeof( borderElem ) );
 #endif
 }
 
@@ -410,7 +410,7 @@ fglmSdata::newBasisElem( poly & m )
 {
     basisSize++;
     if ( basisSize == basisMax ) {
-        basis= (polyset)ReAlloc( basis, basisMax*sizeof( poly ), (basisMax + basisBS)*sizeof( poly ) );
+        basis= (polyset)omReallocSize( basis, basisMax*sizeof( poly ), (basisMax + basisBS)*sizeof( poly ) );
         basisMax+= basisBS;
     }
     basis[basisSize]= m;
@@ -436,7 +436,7 @@ fglmSdata::newBorderElem( poly & m, fglmVector v )
         delete [] border;
         border= tempborder;
 #else
-        border= (borderElem *)ReAlloc( border, borderMax*sizeof( borderElem ), (borderMax + borderBS)*sizeof( borderElem ) );
+        border= (borderElem *)omReallocSize( border, borderMax*sizeof( borderElem ), (borderMax + borderBS)*sizeof( borderElem ) );
 #endif
         borderMax+= borderBS;
     }
@@ -769,16 +769,16 @@ fglmDdata::fglmDdata( int dimension )
     int k;
     dimen= dimension;
     basisSize= 0;
-    //. All arrays run from [1]..[dimen], thus Alloc( dimen + 1 )!
+    //. All arrays run from [1]..[dimen], thus omAlloc( dimen + 1 )!
 #ifndef HAVE_EXPLICIT_CONSTR
     gauss= new oldGaussElem[ dimen+1 ];
 #else
-    gauss= (oldGaussElem *)Alloc( (dimen+1)*sizeof( oldGaussElem ) );
+    gauss= (oldGaussElem *)omAlloc( (dimen+1)*sizeof( oldGaussElem ) );
 #endif
-    isPivot= (BOOLEAN *)Alloc( (dimen+1)*sizeof( BOOLEAN ) );
+    isPivot= (BOOLEAN *)omAlloc( (dimen+1)*sizeof( BOOLEAN ) );
     for ( k= dimen; k > 0; k-- ) isPivot[k]= FALSE;
-    perm= (int *)Alloc( (dimen+1)*sizeof( int ) );
-    basis= (polyset)Alloc( (dimen+1)*sizeof( poly ) );
+    perm= (int *)omAlloc( (dimen+1)*sizeof( int ) );
+    basis= (polyset)omAlloc( (dimen+1)*sizeof( poly ) );
     groebnerBS= 16;
     groebnerSize= 0;
     destId= idInit( groebnerBS, 1 );
@@ -796,15 +796,15 @@ fglmDdata::~fglmDdata()
     // use basisSize instead of dimen because of fglmquot!
     for ( k= basisSize; k > 0; k-- )
         gauss[k].~oldGaussElem();
-    Free( (ADDRESS)gauss, (dimen+1)*sizeof( oldGaussElem ) );
+    omFreeSize( (ADDRESS)gauss, (dimen+1)*sizeof( oldGaussElem ) );
 #endif
-    Free( (ADDRESS)isPivot, (dimen+1)*sizeof( BOOLEAN ) );
-    Free( (ADDRESS)perm, (dimen+1)*sizeof( int ) );
+    omFreeSize( (ADDRESS)isPivot, (dimen+1)*sizeof( BOOLEAN ) );
+    omFreeSize( (ADDRESS)perm, (dimen+1)*sizeof( int ) );
     // use basisSize instead of dimen because of fglmquot!
     //. Remember: There is no poly in basis[0], thus k > 0
     for ( k= basisSize; k > 0; k-- )
         pDelete1( basis + k );
-    Free( (ADDRESS)basis, (dimen+1)*sizeof( poly ) );
+    omFreeSize( (ADDRESS)basis, (dimen+1)*sizeof( poly ) );
 }
 
 fglmDelem

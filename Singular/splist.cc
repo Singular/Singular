@@ -457,9 +457,9 @@ spectrumState   spectrumPolyList::spectrum( lists *L,int fast )
     //  compute the spectrum numbers with their multiplicities
     // --------------------------------------------------------
 
-    intvec            *nom  = NewIntvec1( n );
-    intvec            *den  = NewIntvec1( n );
-    intvec            *mult = NewIntvec1( n );
+    intvec            *nom  = new intvec( n );
+    intvec            *den  = new intvec( n );
+    intvec            *mult = new intvec( n );
 
     int count         = 0;
     int multiplicity  = 1;
@@ -524,7 +524,7 @@ spectrumState   spectrumPolyList::spectrum( lists *L,int fast )
             //  principal part
             // ---------------------------------------------
 
-            *L = (lists)AllocSizeOf( slists );
+            *L = (lists)omAllocBin( slists _bin);
             (*L)->Init( 1 );
             (*L)->m[0].rtyp = INT_CMD;    //  milnor number
             (*L)->m[0].data = (void*)mu;
@@ -533,7 +533,7 @@ spectrumState   spectrumPolyList::spectrum( lists *L,int fast )
         }
     }
 
-    *L = (lists)AllocSizeOf( slists );
+    *L = (lists)omAllocBin( slists _bin);
 
     (*L)->Init( 6 );
 

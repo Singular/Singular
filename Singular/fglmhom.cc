@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmhom.cc,v 1.15 1999-11-15 17:20:02 obachman Exp $
+// $Id: fglmhom.cc,v 1.16 2000-08-14 12:56:15 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -25,7 +25,7 @@
 #include "ipshell.h"
 #include "febase.h"
 #include "maps.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "fglm.h"
 #include "fglmvec.h"
 #include "fglmgauss.h"
@@ -166,7 +166,7 @@ generateMonoms( poly m, int var, int deg, homogData * dat )
 #ifdef HAVE_EXPLICIT_CONSTR
 		// Expand array using Singulars ReAlloc function
                 dat->monlist= 
-		    (homogElem * )ReAlloc( dat->monlist, 
+		    (homogElem * )omReallocSize( dat->monlist, 
 					   (dat->monlistmax)*sizeof( homogElem ), 
 					   (dat->monlistmax+dat->monlistblock) * sizeof( homogElem ) );
                 for ( k= dat->monlistmax; k < (dat->monlistmax+dat->monlistblock); k++ )
@@ -214,7 +214,7 @@ generateMonoms( poly m, int var, int deg, homogData * dat )
 void
 mapMonoms( ring oldRing, homogData & dat )
 {
-    int * vperm = (int *)Alloc( (currRing->N + 1)*sizeof(int) );
+    int * vperm = (int *)omAlloc( (currRing->N + 1)*sizeof(int) );
     maFindPerm( oldRing->names, oldRing->N, NULL, 0, currRing->names, currRing->N, NULL, 0, vperm, NULL );
     //nSetMap( oldRing->ch, oldRing->parameter, oldRing->P, oldRing->minpoly );
     nSetMap( oldRing );
@@ -352,7 +352,7 @@ fglmhomog( idhdl sourceRingHdl, ideal sourceIdeal, idhdl destRingHdl, ideal & de
     intvec * hilb = hHstdSeries( sourceIdeal, NULL, currQuotient );
     int s;
     dat.sourceIdeal= sourceIdeal;
-    dat.sourceHeads= (doublepoly *)Alloc( IDELEMS( sourceIdeal ) * sizeof( doublepoly ) );
+    dat.sourceHeads= (doublepoly *)omAlloc( IDELEMS( sourceIdeal ) * sizeof( doublepoly ) );
     for ( s= IDELEMS( sourceIdeal ) - 1; s >= 0; s-- ) {
         dat.sourceHeads[s].sm= pHead( (sourceIdeal->m)[s] );
     }
@@ -361,7 +361,7 @@ fglmhomog( idhdl sourceRingHdl, ideal sourceIdeal, idhdl destRingHdl, ideal & de
     ring destRing = currRing;
 
     // Map the sourceHeads to the destRing
-    int * vperm = (int *)Alloc( (sourceRing->N + 1)*sizeof(int) );
+    int * vperm = (int *)omAlloc( (sourceRing->N + 1)*sizeof(int) );
     maFindPerm( sourceRing->names, sourceRing->N, NULL, 0, currRing->names, 
                 currRing->N, NULL, 0, vperm, NULL, currRing->ch);
     //nSetMap( sourceRing->ch, sourceRing->parameter, sourceRing->P, sourceRing->minpoly );
@@ -380,7 +380,7 @@ fglmhomog( idhdl sourceRingHdl, ideal sourceIdeal, idhdl destRingHdl, ideal & de
         dat.monlistblock= 512;
         dat.monlistmax= dat.monlistblock;
 #ifdef HAVE_EXPLICIT_CONSTR
-        dat.monlist= (homogElem *)Alloc( dat.monlistmax*sizeof( homogElem ) );
+        dat.monlist= (homogElem *)omAlloc( dat.monlistmax*sizeof( homogElem ) );
         int j;
         for ( j= dat.monlistmax - 1; j >= 0; j-- ) dat.monlist[j].homogElem();
 #else
@@ -411,7 +411,7 @@ fglmhomog( idhdl sourceRingHdl, ideal sourceIdeal, idhdl destRingHdl, ideal & de
         gaussreduce( dat, numGBelems, groebnerBS );
 
 #ifdef HAVE_EXPLICIT_CONSTR
-        Free( (ADDRESS)dat.monlist, dat.monlistmax*sizeof( homogElem ) );
+        omFreeSize( (ADDRESS)dat.monlist, dat.monlistmax*sizeof( homogElem ) );
 #else
 	delete [] dat.monlist;
 #endif

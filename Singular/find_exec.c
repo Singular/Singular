@@ -19,7 +19,7 @@
 #include <string.h>
 
 #if !defined(ESINGULAR) && !defined(TSINGULAR)
-#include "mmemory.h"
+#include <omalloc.h>
 #endif
 
 
@@ -29,7 +29,7 @@
 
 /* Do not return copies of sth, but simply the strings
    -- we make copies later */
-#define copy_of(string) mstrdup(string)
+#define copy_of(string) omStrDup(string)
 
 /* ABSOLUTE_FILENAME_P (fname): True if fname is an absolute filename */
 #ifdef atarist
@@ -88,7 +88,7 @@ char * find_executable_link (const char *name)
     if (p == NULL || strlen(p) < 2)
     {
       /* we are under msdos display */
-      extra = (char*) AllocL((search != NULL ? strlen(search) : 0) + 3);
+      extra = (char*) omAlloc((search != NULL ? strlen(search) : 0) + 3);
       strcpy(extra, ".:");
       if (search != NULL) strcat(extra, search);
       search = extra;
@@ -128,7 +128,7 @@ char * find_executable_link (const char *name)
         {
 #ifdef WINNT
           if (extra != NULL)
-            FreeL(extra);
+            omFree(extra);
 #endif
           return copy_of (tbuf);
         }
@@ -239,7 +239,7 @@ char * find_executable (const char *name)
 
     if (buf[0] != '/')
     {
-      executable = (char*) AllocL(strlen(link) + ret + 1);
+      executable = (char*) omAlloc(strlen(link) + ret + 1);
       strcpy(executable, link);
       strcat(executable, buf);
     }
@@ -248,7 +248,7 @@ char * find_executable (const char *name)
       executable = copy_of(buf);
     }
 
-    FreeL(link);
+    omFree(link);
     return executable;
   }
 

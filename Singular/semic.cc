@@ -175,13 +175,13 @@ spectrum spectrum::operator = ( const spectrum &spec )
 
 lists   spectrum::thelist( void )
 {
-    lists   L  = (lists)AllocSizeOf( slists );
+    lists   L  = (lists)omAllocBin( slists _bin);
 
     L->Init( 6 );
 
-    intvec            *num  = NewIntvec1( n );
-    intvec            *den  = NewIntvec1( n );
-    intvec            *mult = NewIntvec1( n );
+    intvec            *num  = new intvec( n );
+    intvec            *den  = new intvec( n );
+    intvec            *mult = new intvec( n );
 
     for( int i=0; i<n; i++ )
     {

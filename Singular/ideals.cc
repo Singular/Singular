@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.97 2000-08-02 19:06:29 siebert Exp $ */
+/* $Id: ideals.cc,v 1.98 2000-08-14 12:56:20 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -9,7 +9,7 @@
 /* includes */
 #include "mod2.h"
 #include "tok.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "febase.h"
 #include "numbers.h"
 #include "polys.h"
@@ -47,21 +47,13 @@ ideal idInit(int idsize, int rank)
 #endif
 {
   /*- initialise an ideal -*/
-#if defined(MDEBUG) && defined(PDEBUG)
-  ideal hh = (ideal )mmDBAllocBlock(sizeof(sip_sideal),f,l);
-#else
-  ideal hh = (ideal )AllocSizeOf(sip_sideal);
-#endif
+  ideal hh = (ideal )omAllocBin(sip_sideal_bin);
   hh->nrows = 1;
   hh->rank = rank;
   IDELEMS(hh) = idsize;
   if (idsize>0)
   {
-#if defined(MDEBUG) && defined(PDEBUG)
-    hh->m = (poly *)mmDBAllocBlock0(idsize*sizeof(poly),f,l);
-#else
-    hh->m = (poly *)Alloc0(idsize*sizeof(poly));
-#endif
+    hh->m = (poly *)omAlloc0(idsize*sizeof(poly));
   }
   else
     hh->m=NULL;
@@ -119,24 +111,12 @@ void idDelete (ideal * h)
   {
     do
     {
-      #if defined(MDEBUG) && defined(PDEBUG)
-      pDBDelete(&((*h)->m[--j]),mm_specHeap, f,l);
-      #else
       pDelete(&((*h)->m[--j]));
-      #endif
     }
     while (j>0);
-    #if defined(MDEBUG) && defined(PDEBUG)
-    mmDBFreeBlock((ADDRESS)((*h)->m),sizeof(poly)*elems,f,l);
-    #else
-    Free((ADDRESS)((*h)->m),sizeof(poly)*elems);
-    #endif
+    omFreeSize((ADDRESS)((*h)->m),sizeof(poly)*elems);
   }
-  #if defined(MDEBUG) && defined(PDEBUG)
-  mmDBFreeBlock((ADDRESS)(*h),sizeof(sip_sideal),f,l);
-  #else
-  FreeSizeOf((ADDRESS)*h,sip_sideal);
-  #endif
+  omFreeBin((ADDRESS)*h, sip_sideal_bin);
   *h=NULL;
 }
 
@@ -360,11 +340,7 @@ ideal idCopy (ideal h1)
     h2=idInit(IDELEMS(h1),h1->rank);
 #endif
     for (i=IDELEMS(h1)-1; i>=0; i--)
-#if defined(PDEBUG) && defined(MDEBUG)
-      h2->m[i] = pDBCopy(h1->m[i],f,l);
-#else
       h2->m[i] = pCopy(h1->m[i]);
-#endif
   }
   return h2;
 }
@@ -376,11 +352,8 @@ void idDBTest(ideal h1,char *f,int l)
 
   if (h1 != NULL)
   {
-    #ifdef MDEBUG
-    mmDBTestBlock(h1,sizeof(*h1),f,l);
-    /* to be able to test matrices: */
-    mmDBTestBlock(h1->m,h1->ncols*h1->nrows*sizeof(poly),f,l);
-    #endif
+    omCheckAddrSize(h1,sizeof(*h1));
+    omdebugAddrSize(h1->m,h1->ncols*h1->nrows*sizeof(poly));
     /* to be able to test matrices: */
     for (i=(h1->ncols*h1->nrows)-1; i>=0; i--)
       pDBTest(h1->m[i],f,l);
@@ -423,7 +396,7 @@ static int pComp_RevLex(poly a, poly b,BOOLEAN nolex)
 intvec *idSort(ideal id,BOOLEAN nolex)
 {
   poly p,q;
-  intvec * result = NewIntvec1(IDELEMS(id));
+  intvec * result = new intvec(IDELEMS(id));
   int i, j, actpos=0, newpos, l;
   int diff, olddiff, lastcomp, newcomp;
   BOOLEAN notFound;
@@ -888,7 +861,7 @@ static poly pDivByT (poly * p,int size)
     pSetCoeff0(resultp,pGetCoeff(*p));
     pSetm(resultp);
     pp = (*p)->next;
-    Free((ADDRESS)*p,size);
+    omFreeSize((ADDRESS)*p,size);
     *p = pp;
   }
   return result;
@@ -1010,7 +983,7 @@ int idGetNumberOfChoise(int t, int d, int begin, int end, int * choise)
   BOOLEAN b=FALSE;
 
   if (d<=1) return 1;
-  localchoise=(int*)Alloc((d-1)*sizeof(int));
+  localchoise=(int*)omAlloc((d-1)*sizeof(int));
   idInitChoise(d-1,begin,end,&b,localchoise);
   while (!b)
   {
@@ -1023,13 +996,13 @@ int idGetNumberOfChoise(int t, int d, int begin, int end, int * choise)
       while ((i<d) && (localchoise[i-1]==choise[i])) i++;
       if (i>=d)
       {
-        Free((ADDRESS)localchoise,(d-1)*sizeof(int));
+        omFreeSize((ADDRESS)localchoise,(d-1)*sizeof(int));
         return result;
       }
     }
     idGetNextChoise(d-1,end,&b,localchoise);
   }
-  Free((ADDRESS)localchoise,(d-1)*sizeof(int));
+  omFreeSize((ADDRESS)localchoise,(d-1)*sizeof(int));
   return 0;
 }
 
@@ -1463,7 +1436,7 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
     {
       if (res[j]!=NULL) idDelete(&(res[j]));
     }
-    Free((ADDRESS)res,length*sizeof(ideal));
+    omFreeSize((ADDRESS)res,length*sizeof(ideal));
     idDelete(&e);
     if (dp_C_ring != syz_ring)
     {
@@ -2239,9 +2212,9 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
     if (currRing->order[k]!=0) ordersize++;
     else break;
   }
-  ord=(int*)Alloc0(ordersize*sizeof(int));
-  block0=(int*)Alloc(ordersize*sizeof(int));
-  block1=(int*)Alloc(ordersize*sizeof(int));
+  ord=(int*)omAlloc0(ordersize*sizeof(int));
+  block0=(int*)omAlloc(ordersize*sizeof(int));
+  block1=(int*)omAlloc(ordersize*sizeof(int));
   for (k=0;; k++)
   {
     if (currRing->order[k]!=0)
@@ -2255,9 +2228,9 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   }
   block0[0] = 1;
   block1[0] = pVariables;
-  wv=(int**) Alloc0(ordersize*sizeof(int**));
+  wv=(int**) omAlloc0(ordersize*sizeof(int**));
   memcpy4(wv+1,currRing->wvhdl,(ordersize-1)*sizeof(int**));
-  wv[0]=(int*)AllocL((pVariables+1)*sizeof(int));
+  wv[0]=(int*)omAlloc((pVariables+1)*sizeof(int));
   memset(wv[0],0,(pVariables+1)*sizeof(int));
   for (j=0;j<pVariables;j++)
     if (pGetExp(delVar,j+1)!=0) wv[0][j]=1;
@@ -2307,11 +2280,11 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   idDelete(&hh);
   rChangeCurrRing(origR, TRUE);
   idSkipZeroes(h3);
-  FreeL((ADDRESS)wv[0]);
-  Free((ADDRESS)wv,ordersize*sizeof(int**));
-  Free((ADDRESS)ord,ordersize*sizeof(int));
-  Free((ADDRESS)block0,ordersize*sizeof(int));
-  Free((ADDRESS)block1,ordersize*sizeof(int));
+  omFree((ADDRESS)wv[0]);
+  omFreeSize((ADDRESS)wv,ordersize*sizeof(int**));
+  omFreeSize((ADDRESS)ord,ordersize*sizeof(int));
+  omFreeSize((ADDRESS)block0,ordersize*sizeof(int));
+  omFreeSize((ADDRESS)block1,ordersize*sizeof(int));
   rUnComplete(&tmpR);
   if (w!=NULL)
     delete w;
@@ -2334,8 +2307,8 @@ ideal idMinors(matrix a, int ar, ideal R)
   i = binom(a->rows(),ar);
   j = binom(a->cols(),ar);
 
-  rowchoise=(int *)Alloc(ar*sizeof(int));
-  colchoise=(int *)Alloc(ar*sizeof(int));
+  rowchoise=(int *)omAlloc(ar*sizeof(int));
+  colchoise=(int *)omAlloc(ar*sizeof(int));
   if ((i>512) || (j>512) || (i*j >512)) size=512;
   else size=i*j;
   result=idInit(size,1);
@@ -2389,8 +2362,8 @@ ideal idMinors(matrix a, int ar, ideal R)
     k=1;
     result->m[0]=NULL;
   }
-  Free((ADDRESS)rowchoise,ar*sizeof(int));
-  Free((ADDRESS)colchoise,ar*sizeof(int));
+  omFreeSize((ADDRESS)rowchoise,ar*sizeof(int));
+  omFreeSize((ADDRESS)colchoise,ar*sizeof(int));
   pEnlargeSet(&result->m,size,k-size);
   IDELEMS(result) = k;
   return (result);
@@ -2563,7 +2536,7 @@ ideal idHomogen(ideal h, int varnum)
 ideal idVec2Ideal(poly vec)
 {
    ideal result=idInit(1,1);
-   FreeSizeOf((ADDRESS)result->m,poly);
+   omFree((ADDRESS)result->m);
    result->m=NULL; // remove later
    pVec2Polys(vec, &(result->m), &(IDELEMS(result)));
    return result;
@@ -2710,15 +2683,15 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
   poly p=NULL;
   int length=IDELEMS(m);
   polyset P=m->m;
-  polyset F=(polyset)Alloc(length*sizeof(poly));
+  polyset F=(polyset)omAlloc(length*sizeof(poly));
   for (i=length-1;i>=0;i--)
   {
     p=F[i]=P[i];
     cmax=max(cmax,pMaxComp(p)+1);
   }
-  diff = (int *)Alloc0(cmax*sizeof(int));
-  if (w!=NULL) *w=NewIntvec1(cmax-1);
-  iscom = (int *)Alloc0(cmax*sizeof(int));
+  diff = (int *)omAlloc0(cmax*sizeof(int));
+  if (w!=NULL) *w=new intvec(cmax-1);
+  iscom = (int *)omAlloc0(cmax*sizeof(int));
   i=0;
   while (i<=length)
   {
@@ -2782,9 +2755,9 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
 */
         if (order != ord+diff[pGetComp(p)])
         {
-          Free((ADDRESS) iscom,cmax*sizeof(int));
-          Free((ADDRESS) diff,cmax*sizeof(int));
-          Free((ADDRESS) F,length*sizeof(poly));
+          omFreeSize((ADDRESS) iscom,cmax*sizeof(int));
+          omFreeSize((ADDRESS) diff,cmax*sizeof(int));
+          omFreeSize((ADDRESS) F,length*sizeof(poly));
           delete *w;*w=NULL;
           return FALSE;
         }
@@ -2792,8 +2765,8 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
       pIter(p);
     }
   }
-  Free((ADDRESS) iscom,cmax*sizeof(int));
-  Free((ADDRESS) F,length*sizeof(poly));
+  omFreeSize((ADDRESS) iscom,cmax*sizeof(int));
+  omFreeSize((ADDRESS) F,length*sizeof(poly));
   for (i=1;i<cmax;i++) (**w)[i-1]=diff[i];
   for (i=1;i<cmax;i++)
   {
@@ -2806,7 +2779,7 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
       (**w)[i-1]=diff[i]-diffmin;
     }
   }
-  Free((ADDRESS) diff,cmax*sizeof(int));
+  omFreeSize((ADDRESS) diff,cmax*sizeof(int));
   return TRUE;
 }
 
@@ -2839,7 +2812,7 @@ ideal idJetW(ideal i,int d, intvec * iv)
     {
       r->m[k]=pJetW(i->m[k],d,w);
     }
-    Free((ADDRESS)w,(pVariables+1)*sizeof(short));
+    omFreeSize((ADDRESS)w,(pVariables+1)*sizeof(short));
   }
   return r;
 }
@@ -3040,10 +3013,10 @@ int idElem(ideal F)
 */
 intvec * idMWLift(ideal mod,intvec * weights)
 {
-  if (idIs0(mod)) return NewIntvec1(2);
+  if (idIs0(mod)) return new intvec(2);
   int i=IDELEMS(mod);
   while ((i>0) && (mod->m[i-1]==NULL)) i--;
-  intvec *result = NewIntvec1(i+1);
+  intvec *result = new intvec(i+1);
   while (i>0)
   {
     (*result)[i]=pFDeg(mod->m[i])+(*weights)[pGetComp(mod->m[i])];
@@ -3182,7 +3155,7 @@ matrix idCoeffOfKBase(ideal arg, ideal kbase, poly how)
 
 intvec * idQHomWeights(ideal id)
 {
-  intvec * imat=NewIntvec3(2*pVariables,pVariables,0);
+  intvec * imat=new intvec(2*pVariables,pVariables,0);
   poly actHead=NULL,wPoint=NULL;
   int actIndex,i=-1,j=1,k;
   BOOLEAN notReady=TRUE;

@@ -1,0 +1,58 @@
+/*******************************************************************
+ *  File:    omSingularConfig.h
+ *  Purpose: declaration of External Config stuff for omalloc 
+ *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
+ *  Created: 8/00
+ *  Version: $Id: omSingularConfig.h,v 1.1 2000-08-14 12:57:49 obachman Exp $
+ *******************************************************************/
+#ifndef OM_SINGULAR_CONFIG_H
+#define OM_SINGULAR_CONFIG_H
+
+#ifdef __cplusplus
+extern "C" 
+{
+#endif
+  
+#include <stdlib.h>
+#include <stdio.h>
+
+#define OM_MALLOC_HOOK(size)                OM_SINGULAR_HOOK
+#define OM_FREE_HOOK(size)                  OM_SINGULAR_HOOK
+#define OM_ALLOC_BINPAGE_HOOK               OM_SINGULAR_HOOK
+#define OM_FREE_BINPAGE_HOOK                OM_SINGULAR_HOOK
+
+#ifdef OM_ALLOC_SYSTEM_C
+int om_sing_opt_show_mem = 0;
+size_t om_sing_last_reported_size = 0;
+#else
+extern int om_sing_opt_show_mem;
+extern size_t om_sing_last_reported_size;
+#endif
+
+/* number of bytes for difference to report */
+#define SING_REPORT_THRESHOLD 100*1024 
+#define OM_SINGULAR_HOOK                                                        \
+do                                                                              \
+{                                                                               \
+  if (om_sing_opt_show_mem)                                                     \
+  {                                                                             \
+    size_t _current_bytes = om_Info.CurrentBytesFromMalloc +                    \
+                            (om_Info.UsedPages << LOG_BIT_SIZEOF_SYSTEM_PAGE);  \
+    size_t _diff = (_current_bytes > om_sing_last_reported_size ?               \
+                   _current_bytes - om_sing_last_reported_size :                \
+                   om_sing_last_reported_size - _current_bytes);                \
+    if (_diff >= SING_REPORT_THRESHOLD)                                         \
+    {                                                                           \
+      fprintf(stdout, "[%dk]", (_current_bytes + 1023)/1024);                   \
+      fflush(stdout);                                                           \
+      om_sing_last_reported_size = _current_bytes;                              \
+    }                                                                           \
+  }                                                                             \
+}                                                                               \
+while (0)
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* OM_SINGULAR_CONFIG_H */

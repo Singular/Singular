@@ -2,12 +2,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.68 2000-07-03 10:22:17 pohl Exp $
+// $Id: clapsing.cc,v 1.69 2000-08-14 12:55:55 obachman Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
 
 #include "mod2.h"
+#include <omalloc.h>
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include "tok.h"
@@ -438,7 +439,7 @@ lists singclap_extgcd ( poly f, poly g )
     WerrorS( feNotImplemented );
     return NULL;
   }
-  lists L=(lists)AllocSizeOf(slists);
+  lists L=(lists)omAllocBin(slists_bin);
   L->Init(3);
   L->m[0].rtyp=POLY_CMD;
   L->m[0].data=(void *)res;
@@ -591,7 +592,7 @@ void singclap_divide_content ( poly f )
         lnumber c=(lnumber)pGetCoeff(p);
         napDelete(&c->z);
         #ifdef LDEBUG
-        number nt=(number)Alloc0SizeOf(rnumber);
+        number nt=(number)omAlloc0Bin(rnumber_bin);
         lnumber nnt=(lnumber)nt;
         nnt->z=convClapPSingTr( i.getItem());
         nTest(nt);
@@ -629,7 +630,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     res=idInit(1,1);
     if (with_exps!=1)
     {
-      (*v)=NewIntvec1(1);
+      (*v)=new intvec(1);
       (**v)[0]=1;
     }
     return res;
@@ -761,7 +762,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
         n--;
         J++;
       }
-      *v = NewIntvec1( n );
+      *v = new intvec( n );
     }
     res = idInit( n ,1);
     for ( ; J.hasItem(); J++, j++ )
@@ -808,7 +809,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
         if ((v!=NULL) && ((*v)!=NULL))
         {
           intvec *w=*v;
-          *v = NewIntvec1( max(n-j,1) );
+          *v = new intvec( max(n-j,1) );
           for (i=0,j=0;i<w->length();i++)
           {
             if((*w)[i]!=0)
@@ -962,7 +963,7 @@ char* singclap_neworder ( ideal I)
   StringSetS("");
   Li = IL;
   int offs=rPar(currRing);
-  int* mark=(int*)Alloc0((pVariables+offs)*sizeof(int));
+  int* mark=(int*)omAlloc0((pVariables+offs)*sizeof(int));
   int cnt=pVariables+offs;
   loop
   {
@@ -999,7 +1000,7 @@ char* singclap_neworder ( ideal I)
       StringAppendS(",");
     }
   }
-  return mstrdup(StringAppendS(""));
+  return omStrDup(StringAppendS(""));
 #else
   return NULL;
 #endif
@@ -1142,10 +1143,8 @@ BOOLEAN jjFAC_P(leftv res, leftv u)
   intvec *v=NULL;
   ideal f=singclap_factorize((poly)(u->Data()), &v, 0);
   if (f==NULL) return TRUE;
-  #ifdef MDEBUG
-  v->ivTEST();
-  #endif
-  lists l=(lists)AllocSizeOf(slists);
+  ivTest(v);
+  lists l=(lists)omAllocBin(slists_bin);
   l->Init(2);
   l->m[0].rtyp=IDEAL_CMD;
   l->m[0].data=(void *)f;
@@ -1167,7 +1166,7 @@ BOOLEAN jjSQR_FREE_DEC(leftv res, leftv u,leftv dummy)
     case 0:
     case 2:
     {
-      lists l=(lists)AllocSizeOf(slists);
+      lists l=(lists)omAllocBin(slists_bin);
       l->Init(2);
       l->m[0].rtyp=IDEAL_CMD;
       l->m[0].data=(void *)f;

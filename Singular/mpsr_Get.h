@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Get.h,v 1.9 1999-11-15 17:20:33 obachman Exp $ */
+/* $Id: mpsr_Get.h,v 1.10 2000-08-14 12:56:42 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.h
@@ -22,9 +22,6 @@
 #include "ipid.h"
 
 #include"mpsr.h"
-#if HAVE_ASO == 1
-#include "mpsr_Get.aso"
-#endif
 
 
 
@@ -42,7 +39,7 @@ typedef struct mpsr_sleftv
 } mpsr_sleftv;
 
 typedef mpsr_sleftv * mpsr_leftv;
-
+extern omBin mpsr_sleftv_bin;
 
 /***************************************************************
  *
@@ -108,8 +105,8 @@ inline BOOLEAN NodeCheck(MPT_Node_pt node, MP_DictTag_t dtag, MP_Common_t cv)
 
 inline idhdl mpsr_InitIdhdl(short tok, void *data, char *name)
 {
-  idhdl h = (idhdl) Alloc0(sizeof(idrec));
-  IDID(h) = mstrdup(name);
+  idhdl h = (idhdl) omAlloc0Bin(idrec_bin);
+  IDID(h) = omStrDup(name);
   IDTYP(h) = tok;
   IDDATA(h) = (char *) data;
 

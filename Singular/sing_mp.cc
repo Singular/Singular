@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_mp.cc,v 1.31 1999-11-15 17:20:49 obachman Exp $ */
+/* $Id: sing_mp.cc,v 1.32 2000-08-14 12:56:50 obachman Exp $ */
 
 /*
 * ABSTRACT: interface to MP links
@@ -16,7 +16,7 @@
 #include <unistd.h>
 #include "mpsr.h"
 #include "tok.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "febase.h"
 #include "subexpr.h"
 #include "ipid.h"
@@ -40,9 +40,9 @@ static void FreeCmdArgs(int argc, char** argv)
 {
   int i;
   for (i=0; i<argc; i++)
-    FreeL(argv[i]);
+    omFree(argv[i]);
 
-  Free(argv, argc*sizeof(char *));
+  if (argv) omFreeSize(argv, argc*sizeof(char *));
 }
 
 static void GetCmdArgs(int *argc, char ***argv, char *str)
@@ -55,7 +55,7 @@ static void GetCmdArgs(int *argc, char ***argv, char *str)
   else
   {
     int i = 0, sl = strlen(str)+1, j;
-    char *s2=mstrdup(str);
+    char *s2=omStrDup(str);
 
     char *appl = strstr(s2, "--MPapplication");
     if (appl != NULL)
@@ -76,14 +76,14 @@ static void GetCmdArgs(int *argc, char ***argv, char *str)
     *argc = i;
     if (i>0)
     {
-      *argv = (char **) Alloc0(i*sizeof(char *));
+      *argv = (char **) omAlloc0(i*sizeof(char *));
       if (appl != NULL) i -= 2;
       if (i>0)
       {
         strcpy(s2,str);
-        *argv[0] = mstrdup(strtok(s2, " "));
+        *argv[0] = omStrDup(strtok(s2, " "));
         for(j = 1; j <i; j++)
-          (*argv)[j] = mstrdup(strtok(NULL, " "));
+          (*argv)[j] = omStrDup(strtok(NULL, " "));
       }
     }
     else
@@ -91,11 +91,11 @@ static void GetCmdArgs(int *argc, char ***argv, char *str)
 
     if (appl != NULL)
     {
-      (*argv)[*argc -2] = mstrdup("--MPapplication");
-      (*argv)[*argc -1] = mstrdup(&(appl[15]));
+      (*argv)[*argc -2] = omStrDup("--MPapplication");
+      (*argv)[*argc -1] = omStrDup(&(appl[15]));
     }
 
-    FreeL(s2);
+    omFree(s2);
   }
 
 }
@@ -121,7 +121,7 @@ static BOOLEAN slOpenMPFile(si_link l, short flag)
   }
 
   if (l->name[0] != '\0') argv[5] = l->name;
-  else l->name = mstrdup(argv[5]);
+  else l->name = omStrDup(argv[5]);
 
 
   if (flag == SI_LINK_READ)
@@ -154,8 +154,8 @@ static BOOLEAN slOpenMPFile(si_link l, short flag)
   MP_SET_LINK_OPTIONS(link);
   l->data = (void *) link;
   SI_LINK_SET_OPEN_P(l, flag);
-  FreeL(l->mode);
-  l->mode = mstrdup(mode);
+  omFree(l->mode);
+  l->mode = omStrDup(mode);
   return FALSE;
 }
 
@@ -219,7 +219,7 @@ static MP_Link_pt slOpenMPLaunch(int n_argc, char **n_argv)
 
     if (appl != NULL)
     {
-      nappl = (char*) Alloc(MAXPATHLEN + 50);
+      nappl = (char*) omAlloc(MAXPATHLEN + 50);
       strcpy(nappl, appl);
       strcat(nappl, " -bq --no-warn --no-out --no-rc");
       appl = nappl;
@@ -244,7 +244,7 @@ static MP_Link_pt slOpenMPLaunch(int n_argc, char **n_argv)
   }
 
   link = MP_OpenLink(mp_Env, argc, argv);
-  if (nappl != NULL) Free(nappl, MAXPATHLEN + 50);
+  if (nappl != NULL) omFreeSize(nappl, MAXPATHLEN + 50);
   return link;
 }
 
@@ -262,15 +262,15 @@ static MP_Link_pt slOpenMPFork(si_link l, int n_argc, char **n_argv)
     if (MP_GetLinkStatus(link, MP_LinkIsParent))
     {
     /* parent's business */
-      if (l->name != NULL) FreeL(l->name);
-      l->name = mstrdup("parent");
+      if (l->name != NULL) omFree(l->name);
+      l->name = omStrDup("parent");
       return link;
     }
     else
     {
       /* child's business -- go into batch mode */
-      if (l->name != NULL) FreeL(l->name);
-      l->name = mstrdup("child");
+      if (l->name != NULL) omFree(l->name);
+      l->name = omStrDup("child");
       MP_SET_LINK_OPTIONS(link);
       SI_LINK_SET_RW_OPEN_P(l);
       l->data = (void *) link;
@@ -311,8 +311,8 @@ static BOOLEAN slOpenMPTcp(si_link l, short flag)
   {
     if (strcmp(l->mode, "fork") != 0)
     {
-      if (l->mode != NULL) FreeL(l->mode);
-      l->mode = mstrdup("fork");
+      if (l->mode != NULL) omFree(l->mode);
+      l->mode = omStrDup("fork");
     }
     link = slOpenMPFork(l, argc, argv);
   }
@@ -381,12 +381,12 @@ leftv slReadMP(si_link l)
 
 static void SentQuitMsg(si_link l)
 {
-  leftv v = (leftv) Alloc0SizeOf(sleftv);
+  leftv v = (leftv) omAlloc0Bin(sleftv_bin);
 
   v->rtyp = STRING_CMD;
   v->data = MPSR_QUIT_STRING;
   slWriteMP(l, v);
-  FreeSizeOf(v, sleftv);
+  omFreeBin(v, sleftv_bin);
 }
 
 static BOOLEAN slCloseMP(si_link l)
@@ -459,7 +459,7 @@ int Batch_ReadEval(si_link silink)
 {
   leftv v = NULL;
   // establish top-level identifier for link
-  idhdl id = enterid(mstrdup("mp_ll"), 0, LINK_CMD, &IDROOT, FALSE);
+  idhdl id = enterid(omStrDup("mp_ll"), 0, LINK_CMD, &IDROOT, FALSE);
   IDLINK(id) = silink;
 
   // the main read-eval-write loop
@@ -470,7 +470,7 @@ int Batch_ReadEval(si_link silink)
     if (feErrors != NULL && *feErrors != '\0')
     {
       if (v != NULL) v->CleanUp();
-      v = mpsr_InitLeftv(STRING_CMD, (void *) mstrdup(feErrors));
+      v = mpsr_InitLeftv(STRING_CMD, (void *) omStrDup(feErrors));
       *feErrors = '\0';
     }
 
@@ -487,7 +487,7 @@ int Batch_ReadEval(si_link silink)
     if (v != NULL)
     {
       v->CleanUp();
-      FreeSizeOf(v, sleftv);
+      omFreeBin(v, sleftv_bin);
       v = NULL;
     }
   }
@@ -507,7 +507,7 @@ int Batch_do(const char* port, const char* host)
   fprintf(stderr, "Was started with pid %d\n", getpid());
   while (stop){};
 #endif
-  si_link silink = (si_link) Alloc0SizeOf(sip_link);
+  si_link silink = (si_link) omAlloc0Bin(sip_link_bin);
   char *istr;
 
   // parse argv to get port and host
@@ -525,10 +525,10 @@ int Batch_do(const char* port, const char* host)
   }
 
   // initialize si_link
-  istr = (char *) AllocL((strlen(port) + strlen(host) + 40)*sizeof(char));
+  istr = (char *) omAlloc((strlen(port) + strlen(host) + 40)*sizeof(char));
   sprintf(istr, "MPtcp:connect --MPport %s --MPhost %s", port, host);
   slInit(silink, istr);
-  FreeL(istr);
+  omFree(istr);
   // open link
   if (slOpen(silink, SI_LINK_OPEN))
   {

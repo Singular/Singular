@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.24 1999-11-15 17:19:58 obachman Exp $ */
+/* $Id: ffields.cc,v 1.25 2000-08-14 12:56:11 obachman Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -11,7 +11,7 @@
 #include "mod2.h"
 #include "tok.h"
 #include "febase.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "numbers.h"
 #include "ring.h"
 #include "ffields.h"
@@ -427,11 +427,11 @@ char * nfName(number a)
   if (((int)a==nfCharQ) || ((int)a==0)) return NULL;
   else if ((int)a==1)
   {
-    return mstrdup(nfParameter);
+    return omStrDup(nfParameter);
   }
   else
   {
-    s=(char *)AllocL(4+strlen(nfParameter));
+    s=(char *)omAlloc(4+strlen(nfParameter));
     sprintf(s,"%s%d",nfParameter,(int)a);
   }
   return s;
@@ -607,7 +607,7 @@ void nfSetChar(int c, char **param)
     return;
   if (nfCharQ > 1)
   {
-    Free( (ADDRESS)nfPlus1Table,nfCharQ*sizeof(CARDINAL) );
+    omFreeSize( (ADDRESS)nfPlus1Table,nfCharQ*sizeof(CARDINAL) );
     nfPlus1Table=NULL;
   }
   if ((c>1) || (c<0))
@@ -639,7 +639,7 @@ void nfSetChar(int c, char **param)
     nfReadMipo(buf);
     nfCharQ1=nfCharQ-1;
     //Print("nfCharQ=%d,nfCharQ1=%d,mipo=>>%s<<\n",nfCharQ,nfCharQ1,buf);
-    nfPlus1Table= (CARDINAL *)Alloc( (nfCharQ)*sizeof(CARDINAL) );
+    nfPlus1Table= (CARDINAL *)omAlloc( (nfCharQ)*sizeof(CARDINAL) );
     int digs = gf_tab_numdigits62( nfCharQ );
     char * bufptr;
     int i = 1;

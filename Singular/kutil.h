@@ -3,13 +3,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.25 2000-04-27 10:07:08 obachman Exp $ */
+/* $Id: kutil.h,v 1.26 2000-08-14 12:56:34 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
 #include <string.h>
 #include "structs.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "ring.h"
 
 #define setmax 16
@@ -21,9 +21,9 @@ class sTObject
 public:
   poly  p;
   int ecart,length, pLength;
-  memHeap heap;
+  omBin heap;
   unsigned long sev;
-  sTObject() { memset((void*) this, 0, sizeof(sTObject)); heap = mm_specHeap;}
+  sTObject() { memset((void*) this, 0, sizeof(sTObject)); heap = currPolyBin;}
   inline poly SetP(poly p_new);
 };
 
@@ -33,7 +33,7 @@ public:
   poly  p;
   poly  p1,p2; /*- the pair p comes from -*/
   poly  lcm;   /*- the lcm of p1,p2 -*/
-  memHeap heap;
+  omBin heap;
   int ecart,length, pLength;
   unsigned long sev;
   sLObject() { memset((void*) this, 0, sizeof(sLObject));}
@@ -80,7 +80,7 @@ public:
   leftv kIdeal;
   intvec * kModW;
   intvec * kHomW;
-  memHeap THeap;       // if != NULL, heap for monoms of T
+  omBin THeap;       // if != NULL, heap for monoms of T
   BOOLEAN use_redheap; // if TRUE, use extra heap for reductions
   BOOLEAN *pairtest;/*used for enterOnePair*/
   int cp,c3;
@@ -170,7 +170,7 @@ void kFreeStrat(kStrategy strat);
 BOOLEAN homogTest(polyset F, int Fmax);
 BOOLEAN newHEdge(polyset S, int ak,kStrategy strat);
 
-inline TSet initT () { return (TSet)Alloc0(setmax*sizeof(TObject)); }
+inline TSet initT () { return (TSet)omAlloc0(setmax*sizeof(TObject)); }
 
 #ifdef KDEBUG
 #define kTest(A) K_Test(__FILE__,__LINE__,A)

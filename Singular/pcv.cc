@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.28 1999-11-15 17:20:38 obachman Exp $ */
+/* $Id: pcv.cc,v 1.29 2000-08-14 12:56:43 obachman Exp $ */
 /*
 * ABSTRACT: conversion between polys and coef vectors
 */
@@ -29,7 +29,7 @@ static unsigned** pcvIndex=NULL;
 
 lists pcvLAddL(lists l1,lists l2)
 {
-  lists l0=(lists)AllocSizeOf(slists);
+  lists l0=(lists)omAllocBin(slists_bin);
   int i=l1->nr;
   if(l1->nr<l2->nr) i=l2->nr;
   l0->Init(i+1);
@@ -54,7 +54,7 @@ lists pcvLAddL(lists l1,lists l2)
 
 lists pcvPMulL(poly p,lists l1)
 {
-  lists l0=(lists)AllocSizeOf(slists);
+  lists l0=(lists)omAllocBin(slists_bin);
   l0->Init(l1->nr+1);
   for(int i=l1->nr;i>=0;i--)
   {
@@ -166,9 +166,9 @@ void pcvInit(int d)
   if(d<0) d=1;
   pcvMaxDegree=d+1;
   pcvTableSize=pVariables*pcvMaxDegree*sizeof(unsigned);
-  pcvTable=(unsigned*)Alloc0(pcvTableSize);
+  pcvTable=(unsigned*)omAlloc0(pcvTableSize);
   pcvIndexSize=pVariables*sizeof(unsigned*);
-  pcvIndex=(unsigned**)Alloc(pcvIndexSize);
+  pcvIndex=(unsigned**)omAlloc(pcvIndexSize);
   for(int i=0;i<pVariables;i++)
     pcvIndex[i]=pcvTable+i*pcvMaxDegree;
   for(int i=0;i<pcvMaxDegree;i++)
@@ -195,12 +195,12 @@ void pcvClean()
 {
   if(pcvTable)
   {
-    Free(pcvTable,pcvTableSize);
+    omFreeSize(pcvTable,pcvTableSize);
     pcvTable=NULL;
   }
   if(pcvIndex)
   {
-    Free(pcvIndex,pcvIndexSize);
+    omFreeSize(pcvIndex,pcvIndexSize);
     pcvIndex=NULL;
   }
 }
@@ -288,7 +288,7 @@ poly pcvCV2P(poly cv,int d0,int d1)
 
 lists pcvP2CV(lists pl,int d0,int d1)
 {
-  lists cvl=(lists)AllocSizeOf(slists);
+  lists cvl=(lists)omAllocBin(slists_bin);
   cvl->Init(pl->nr+1);
   pcvInit(d1);
   for(int i=pl->nr;i>=0;i--)
@@ -305,7 +305,7 @@ lists pcvP2CV(lists pl,int d0,int d1)
 
 lists pcvCV2P(lists cvl,int d0,int d1)
 {
-  lists pl=(lists)AllocSizeOf(slists);
+  lists pl=(lists)omAllocBin(slists_bin);
   pl->Init(cvl->nr+1);
   pcvInit(d1);
   for(int i=cvl->nr;i>=0;i--)
@@ -433,7 +433,7 @@ lists pcvBasis(int d0,int d1)
 {
   if(d0<0) d0=0;
   if(d1<0) d1=0;
-  lists b=(lists)AllocSizeOf(slists);
+  lists b=(lists)omAllocBin(slists_bin);
   b->Init(pcvDim(d0,d1));
   poly m=pOne();
   for(int d=d0,i=0;d<d1;d++)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sdb.cc,v 1.13 2000-05-02 14:21:15 Singular Exp $ */
+/* $Id: sdb.cc,v 1.14 2000-08-14 12:56:49 obachman Exp $ */
 /*
 * ABSTRACT: Singular debugger
 */
@@ -10,7 +10,7 @@
 #include <sys/wait.h> // for wait
 #include "mod2.h"
 #include "tok.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "febase.h"
 #include "ipshell.h"
 #include "ipid.h"
@@ -103,13 +103,13 @@ BOOLEAN sdb_set_breakpoint(const char *pp, int given_lineno)
 
 void sdb_edit(procinfo *pi)
 {
-  char * filename = mstrdup("/tmp/sd000000");
+  char * filename = omStrDup("/tmp/sd000000");
   sprintf(filename+7,"%d",getpid());
   FILE *fp=fopen(filename,"w");
   if (fp==NULL)
   {
     Print("cannot open %s\n",filename);
-    FreeL(filename);
+    omFree(filename);
     return;
   }
   if (pi->language!= LANG_SINGULAR)
@@ -125,7 +125,7 @@ void sdb_edit(procinfo *pi)
       editor=getenv("VISUAL");
     if (editor==NULL)
       editor="vi";
-    editor=mstrdup(editor);
+    editor=omStrDup(editor);
 
     if (pi->data.s.body==NULL)
     {
@@ -135,7 +135,7 @@ void sdb_edit(procinfo *pi)
         PrintS("cannot get the procedure body\n");
         fclose(fp);
         unlink(filename);
-        FreeL(filename);
+        omFree(filename);
         return;
       }
     }
@@ -157,7 +157,7 @@ void sdb_edit(procinfo *pi)
       }
       else
       {
-        char *p=(char *)Alloc(strlen(editor)+strlen(filename)+2);
+        char *p=(char *)omAlloc(strlen(editor)+strlen(filename)+2);
         sprintf(p,"%s %s",editor,filename);
         system(p);
       }
@@ -179,15 +179,15 @@ void sdb_edit(procinfo *pi)
       long len=ftell(fp);
       fseek(fp,0L,SEEK_SET);
 
-      FreeL((ADDRESS)pi->data.s.body);
-      pi->data.s.body=(char *)AllocL((int)len+1);
+      omFree((ADDRESS)pi->data.s.body);
+      pi->data.s.body=(char *)omAlloc((int)len+1);
       myfread( pi->data.s.body, len, 1, fp);
       pi->data.s.body[len]='\0';
       fclose(fp);
     }
   }
   unlink(filename);
-  FreeL(filename);
+  omFree(filename);
 }
 
 static char sdb_lastcmd='c';

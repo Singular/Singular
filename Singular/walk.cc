@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: walk.cc,v 1.2 1999-10-22 11:14:20 obachman Exp $ */
+/* $Id: walk.cc,v 1.3 2000-08-14 12:56:57 obachman Exp $ */
 /*
 * ABSTRACT: Implementation of the Groebner walk
 */
@@ -66,7 +66,7 @@ int* walkNextWeight(const int* curr_weight,
          G != NULL);
 
   int* diff_weight =
-    (int*)Alloc(currRing->N*sizeof(int));
+    (int*)omAlloc(currRing->N*sizeof(int));
   long j, t_zaehler = 0, t_nenner = 0;
 
   for (j=0; j<currRing->N; j++)
@@ -120,7 +120,7 @@ int* walkNextWeight(const int* curr_weight,
   // return if no t or if t == 1
   if (t_nenner == 0 || t_nenner == 1)
   {
-    Free(diff_weight, currRing->N*sizeof(int));
+    omFreeSize(diff_weight, currRing->N*sizeof(int));
     return  (int*) t_nenner;
   }
 
@@ -157,13 +157,13 @@ intvec* walkNextWeight(intvec* curr_weight, intvec* target_weight, ideal G)
 
   if (nw != NULL && nw != (int*) 1)
   {
-    next_weight = NewIntvec1(currRing->N);
+    next_weight = new intvec(currRing->N);
     int *nw_i = next_weight->ivGetVec();
     int i;
 
     for (i=0; i<currRing->N; i++)
       nw_i[i] = nw[i];
-    Free(nw, (currRing->N)*sizeof(int));
+    omFreeSize(nw, (currRing->N)*sizeof(int));
   }
   else
   {

@@ -1,14 +1,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.50 2000-05-09 14:35:10 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.51 2000-08-14 12:56:32 obachman Exp $ */
 /*
 * ABSTRACT:
 */
 
 #include "mod2.h"
 #include "tok.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "polys.h"
 #include "febase.h"
 #include "kutil.h"
@@ -1054,7 +1054,7 @@ void firstUpdate(kStrategy strat)
       pLDeg=pLDegOld;
       if (ecartWeights)
       {
-        Free((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
+        omFreeSize((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
         ecartWeights=NULL;
       }
     }
@@ -1096,16 +1096,16 @@ void enterSMora (LObject p,int atS,kStrategy strat)
   if (strat->sl == IDELEMS(strat->Shdl)-1)
   {
     pEnlargeSet(&strat->S,IDELEMS(strat->Shdl),setmax);
-    strat->sevS = (unsigned long*) ReAlloc0(strat->sevS,
+    strat->sevS = (unsigned long*) omRealloc0Size(strat->sevS,
                                     IDELEMS(strat->Shdl)*sizeof(unsigned long),
                                     (IDELEMS(strat->Shdl)+setmax)
                                            *sizeof(unsigned long));
-    strat->ecartS = (intset) ReAlloc(strat->ecartS,
+    strat->ecartS = (intset) omReallocSize(strat->ecartS,
                                      IDELEMS(strat->Shdl)*sizeof(int),
                                      (IDELEMS(strat->Shdl)+setmax)*sizeof(int));
     if (strat->fromQ)
     {
-      strat->fromQ = (intset)ReAlloc(strat->fromQ,
+      strat->fromQ = (intset)omReallocSize(strat->fromQ,
                                     IDELEMS(strat->Shdl)*sizeof(int),
                                     (IDELEMS(strat->Shdl)+setmax)*sizeof(int));
     }
@@ -1188,11 +1188,11 @@ void enterSMoraNF (LObject p, int atS,kStrategy strat)
   if (strat->sl == IDELEMS(strat->Shdl)-1)
   {
     pEnlargeSet(&strat->S,IDELEMS(strat->Shdl),setmax);
-    strat->sevS = (unsigned long*) ReAlloc0(strat->sevS,
+    strat->sevS = (unsigned long*) omRealloc0Size(strat->sevS,
                                     IDELEMS(strat->Shdl)*sizeof(unsigned long),
                                     (IDELEMS(strat->Shdl)+setmax)
                                            *sizeof(unsigned long));
-    strat->ecartS=(intset)ReAlloc(strat->ecartS,
+    strat->ecartS=(intset)omReallocSize(strat->ecartS,
                                   IDELEMS(strat->Shdl)*sizeof(intset),
                                   (IDELEMS(strat->Shdl)+setmax)*sizeof(intset));
     IDELEMS(strat->Shdl) += setmax;
@@ -1222,7 +1222,7 @@ void initMora(ideal F,kStrategy strat)
   int i,j;
   idhdl h;
 
-  strat->NotUsedAxis = (BOOLEAN *)Alloc((pVariables+1)*sizeof(BOOLEAN));
+  strat->NotUsedAxis = (BOOLEAN *)omAlloc((pVariables+1)*sizeof(BOOLEAN));
   for (j=pVariables; j>0; j--) strat->NotUsedAxis[j] = TRUE;
   strat->enterS = enterSMora;
   strat->initEcartPair = initEcartPairMora; /*- ecart approximation -*/
@@ -1264,7 +1264,7 @@ void initMora(ideal F,kStrategy strat)
     }
     else
     {
-      ecartWeights=(short *)Alloc((pVariables+1)*sizeof(short));
+      ecartWeights=(short *)omAlloc((pVariables+1)*sizeof(short));
       /*uses automatic computation of the ecartWeights to set them*/
       kEcartWeights(F->m,IDELEMS(F)-1,ecartWeights);
     }
@@ -1436,7 +1436,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   strat->update = TRUE; //???
   strat->lastAxis = 0; //???
   pDelete(&strat->kNoether);
-  Free((ADDRESS)strat->NotUsedAxis,(pVariables+1)*sizeof(BOOLEAN));
+  omFreeSize((ADDRESS)strat->NotUsedAxis,(pVariables+1)*sizeof(BOOLEAN));
   if (TEST_OPT_PROT) messageStat(srmax,lrmax,hilbcount,strat);
   if (TEST_OPT_WEIGHTM)
   {
@@ -1444,7 +1444,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     pLDeg=pLDegOld;
     if (ecartWeights)
     {
-      Free((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
+      omFreeSize((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
       ecartWeights=NULL;
     }
   }
@@ -1522,14 +1522,14 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   }
   /*- release temp data------------------------------- -*/
   cleanT(strat);
-  Free((ADDRESS)strat->T,strat->tmax*sizeof(TObject));
-  Free((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
-  Free((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
-  Free((ADDRESS)strat->NotUsedAxis,(pVariables+1)*sizeof(BOOLEAN));
+  omFreeSize((ADDRESS)strat->T,strat->tmax*sizeof(TObject));
+  omFreeSize((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
+  omFreeSize((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
+  omFreeSize((ADDRESS)strat->NotUsedAxis,(pVariables+1)*sizeof(BOOLEAN));
   if ((Q!=NULL)&&(strat->fromQ!=NULL))
   {
     i=((IDELEMS(Q)+IDELEMS(F)+15)/16)*16;
-    Free((ADDRESS)strat->fromQ,i*sizeof(int));
+    omFreeSize((ADDRESS)strat->fromQ,i*sizeof(int));
     strat->fromQ=NULL;
   }
   pDelete(&strat->kHEdge);
@@ -1540,7 +1540,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
     pLDeg=pLDegOld;
     if (ecartWeights)
     {
-      Free((ADDRESS *)&ecartWeights,(pVariables+1)*sizeof(short));
+      omFreeSize((ADDRESS *)&ecartWeights,(pVariables+1)*sizeof(short));
       ecartWeights=NULL;
     }
   }
@@ -1633,14 +1633,14 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
     //  res->m[i]=NULL;
   }
   /*- release temp data------------------------------- -*/
-  Free((ADDRESS)strat->T,strat->tmax*sizeof(TObject));
-  Free((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
-  Free((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
-  Free((ADDRESS)strat->NotUsedAxis,(pVariables+1)*sizeof(BOOLEAN));
+  omFreeSize((ADDRESS)strat->T,strat->tmax*sizeof(TObject));
+  omFreeSize((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
+  omFreeSize((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
+  omFreeSize((ADDRESS)strat->NotUsedAxis,(pVariables+1)*sizeof(BOOLEAN));
   if ((Q!=NULL)&&(strat->fromQ!=NULL))
   {
     i=((IDELEMS(Q)+IDELEMS(F)+15)/16)*16;
-    Free((ADDRESS)strat->fromQ,i*sizeof(int));
+    omFreeSize((ADDRESS)strat->fromQ,i*sizeof(int));
     strat->fromQ=NULL;
   }
   pDelete(&strat->kHEdge);
@@ -1651,7 +1651,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
     pLDeg=pLDegOld;
     if (ecartWeights)
     {
-      Free((ADDRESS *)&ecartWeights,(pVariables+1)*sizeof(short));
+      omFreeSize((ADDRESS *)&ecartWeights,(pVariables+1)*sizeof(short));
       ecartWeights=NULL;
     }
   }
@@ -1690,7 +1690,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   ideal r;
   BOOLEAN b=pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
-  kStrategy strat=(kStrategy)Alloc0SizeOf(skStrategy);
+  kStrategy strat=(kStrategy)omAlloc0(sizeof(skStrategy));
 
   if(!TEST_OPT_RETURN_SB)
     strat->syzComp = syzComp;
@@ -1790,7 +1790,7 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   BOOLEAN b=pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
   BOOLEAN oldDegBound=TEST_OPT_DEGBOUND;
-  kStrategy strat=(kStrategy)Alloc0SizeOf(skStrategy);
+  kStrategy strat=(kStrategy)omAlloc0(sizeof(skStrategy));
 
   if(!TEST_OPT_RETURN_SB)
      strat->syzComp = syzComp;
@@ -1803,7 +1803,7 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   strat->ak = idRankFreeModule(F);
   if (delete_w)
   {
-    temp_w=NewIntvec1((strat->ak)+1);
+    temp_w=new intvec((strat->ak)+1);
     w = &temp_w;
   }
   if ((h==testHomog)
@@ -1872,7 +1872,7 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   pLexOrder = b;
   HCord=strat->HCord;
   if ((delete_w)&&(temp_w!=NULL)) delete temp_w;
-  lists l=(lists)AllocSizeOf(slists);
+  lists l=(lists)omAllocBin(slists_bin);
   l->Init(2);
   if (strat->ak==0)
   {
@@ -1910,7 +1910,7 @@ poly kNF(ideal F, ideal Q, poly p,int syzComp, int lazyReduce)
 {
   if (p==NULL)
      return NULL;
-  kStrategy strat=(kStrategy)Alloc0SizeOf(skStrategy);
+  kStrategy strat=(kStrategy)omAlloc0(sizeof(skStrategy));
   strat->syzComp = syzComp;
   if (pOrdSgn==-1)
     p=kNF1(F,Q,p,strat,lazyReduce);
@@ -1927,7 +1927,7 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
   {
     Print("(S:%d)",IDELEMS(p));mflush();
   }
-  kStrategy strat=(kStrategy)Alloc0SizeOf(skStrategy);
+  kStrategy strat=(kStrategy)omAlloc0(sizeof(skStrategy));
   strat->syzComp = syzComp;
   if (pOrdSgn==-1)
     res=kNF1(F,Q,p,strat,lazyReduce);
@@ -1943,7 +1943,7 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
 ideal kInterRed (ideal F, ideal Q)
 {
   int j;
-  kStrategy strat = (kStrategy)Alloc0SizeOf(skStrategy);
+  kStrategy strat = (kStrategy)omAlloc0(sizeof(skStrategy));
 
 //  if (TEST_OPT_PROT)
 //  {
@@ -1955,7 +1955,7 @@ ideal kInterRed (ideal F, ideal Q)
   strat->kNoether=pCopy(ppNoether);
   strat->ak = idRankFreeModule(F);
   initBuchMoraCrit(strat);
-  strat->NotUsedAxis = (BOOLEAN *)Alloc((pVariables+1)*sizeof(BOOLEAN));
+  strat->NotUsedAxis = (BOOLEAN *)omAlloc((pVariables+1)*sizeof(BOOLEAN));
   for (j=pVariables; j>0; j--) strat->NotUsedAxis[j] = TRUE;
   strat->enterS      = enterSBba;
   strat->posInT      = posInT0;
@@ -1972,17 +1972,17 @@ ideal kInterRed (ideal F, ideal Q)
   if (TEST_OPT_REDSB && TEST_OPT_INTSTRATEGY)
     completeReduce(strat);
   pDelete(&strat->kHEdge);
-  Free((ADDRESS)strat->T,strat->tmax*sizeof(TObject));
-  Free((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
-  Free((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
-  Free((ADDRESS)strat->NotUsedAxis,(pVariables+1)*sizeof(BOOLEAN));
+  omFreeSize((ADDRESS)strat->T,strat->tmax*sizeof(TObject));
+  omFreeSize((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
+  omFreeSize((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
+  omFreeSize((ADDRESS)strat->NotUsedAxis,(pVariables+1)*sizeof(BOOLEAN));
   if (strat->fromQ)
   {
     for (j=0;j<IDELEMS(strat->Shdl);j++)
     {
       if(strat->fromQ[j]) pDelete(&strat->Shdl->m[j]);
     }
-    Free((ADDRESS)strat->fromQ,IDELEMS(strat->Shdl)*sizeof(int));
+    omFreeSize((ADDRESS)strat->fromQ,IDELEMS(strat->Shdl)*sizeof(int));
     strat->fromQ=NULL;
     idSkipZeroes(strat->Shdl);
   }

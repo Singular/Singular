@@ -3,17 +3,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.h,v 1.12 1999-11-15 17:20:19 obachman Exp $ */
+/* $Id: lists.h,v 1.13 2000-08-14 12:56:35 obachman Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
 #include "structs.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "subexpr.h"
 #include "tok.h"
-#if HAVE_ASO == 1
-#include "lists.aso"
-#endif
 
 #ifdef MDEBUG 
 #define INLINE_THIS 
@@ -35,10 +32,10 @@ class slists
           {
             if (m[i].rtyp!=DEF_CMD) m[i].CleanUp();
           }
-          Free((ADDRESS)m, (nr+1)*sizeof(sleftv));
+          omFreeSize((ADDRESS)m, (nr+1)*sizeof(sleftv));
           nr=-1;
         }
-        Free((ADDRESS)this, sizeof(slists));
+        omFreeSize((ADDRESS)this, sizeof(slists));
       }
     }
   INLINE_THIS void Init(int l=0);
@@ -66,13 +63,14 @@ resolvente liFindRes(lists L, int * len, int *typ0,intvec *** weights=NULL);
 
 #if ! defined(MDEBUG) || defined(LISTS_CC)
 INLINE_THIS void slists::Init(int l=0)
-      { nr=l-1; m=(sleftv *)((l>0) ? Alloc0(l*sizeof(sleftv)): NULL);
+      { nr=l-1; m=(sleftv *)((l>0) ? omAlloc0(l*sizeof(sleftv)): NULL);
 #ifdef HAVE_NAMESPACES_N
         src_packhdl = namespaceroot->get(namespaceroot->name, 0, TRUE);
 #endif /* HAVE_NAMESPACES */
       }
 #endif
 
+extern omBin slists_bin;
 #undef INLINE_THIS
 
 #endif

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.45 2000-02-02 18:04:18 Singular Exp $ */
+/* $Id: polys-impl.h,v 1.46 2000-08-14 12:56:44 obachman Exp $ */
 
 /***************************************************************
  *
@@ -17,7 +17,7 @@
  ***************************************************************/
 #include "tok.h"
 #include "structs.h"
-#include "mmemory.h"
+#include <omalloc.h>
 
 /***************************************************************
  *
@@ -76,7 +76,7 @@ extern int *pVarOffset;
 // extern int pVarLowIndex;
 // extern int pVarHighIndex;
 // extern int pVarCompIndex;
-extern memHeap mm_specHeap;
+extern omBin currPolyBin;
 
 /***************************************************************
  *
@@ -302,54 +302,23 @@ inline void _pSetExpV(poly p, Exponent_t *ev)
  * Storage Managament Routines
  *
  ***************************************************************/
-#define _pNew(h)            (poly) AllocHeap(h)
-#define _pInit(h)           (poly) Alloc0Heap(h)
-#define _pFree1(a, h)       FreeHeap((void*) a, h)
-#define _pRingFree1(r, a)   FreeHeap((void*) a, r->mm_specHeap)
+#define prAllocMonom(p, r)  omTypeAllocBin(poly, p, r->PolyBin)
+#define _pNew(h)            (poly) omAllocBin(h)
+#define _pInit(h)           (poly) omAlloc0Bin(h)
+#define _pFree1(a, h)       omFreeBin((void*) a, h)
+#define _pRingFree1(r, a)   omFreeBin((void*) a, r->PolyBin)
 
-#ifdef MDEBUG
-#define pDBNew(h, f, l)   (poly) mmDBAllocHeap(h, f, l)
-#define pDBInit(h, f, l)  (poly) mmDBAlloc0Heap(h, f, l)
-#define pDBFree1(a,h,f,l)   mmDBFreeHeap((void*)a, h, f, l)
-poly    pDBCopy(poly a, char *f, int l);
-poly    pDBCopy(memHeap h, poly a, char *f, int l);
-poly    pDBCopy1(poly a, char *f, int l);
-poly    pDBHead(memHeap h, poly a, char *f, int l);
-poly    pDBHead0(poly a, char *f, int l);
-
-void    pDBDelete(poly * a, memHeap h, char * f, int l);
-void    pDBDelete1(poly * a, memHeap h, char * f, int l);
-
-#define _pDelete(a, h)     pDBDelete((a),h, __FILE__,__LINE__)
-#define _pDelete1(a, h)    pDBDelete1((a),h, __FILE__,__LINE__)
-
-#define _pCopy(h, A)    pDBCopy(h,A,__FILE__,__LINE__)
-#define _pCopy1(A)      pDBCopy1(A, __FILE__,__LINE__)
-#define _pHead(h, A)    pDBHead(h, A,__FILE__,__LINE__)
-#define _pHead0(A)      pDBHead0(A, __FILE__,__LINE__)
-
-#define _pShallowCopyDeleteHead(dest_heap, source_p, source_heap) \
-  pDBShallowCopyDeleteHead(dest_heap, source_p, source_heap,__FILE__,__LINE__)
-#define _pShallowCopyDelete(dest_heap, source_p, source_heap) \
-  pDBShallowCopyDelete(dest_heap, source_p, source_heap,__FILE__,__LINE__)
-
-
-#else // ! MDEBUG
-
-extern void    _pDelete(poly * a, memHeap h);
-extern void    _pDelete1(poly * a, memHeap h);
+extern void    _pDelete(poly * a, omBin h);
+extern void    _pDelete1(poly * a, omBin h);
 
 extern poly    _pCopy(poly a);
-extern poly    _pCopy(memHeap h, poly a);
+extern poly    _pCopy(omBin h, poly a);
 extern poly    _pCopy1(poly a);
-extern poly    _pHead(memHeap h, poly a);
+extern poly    _pHead(omBin h, poly a);
 extern poly    _pHead0(poly a);
-extern poly    _pShallowCopyDeleteHead(memHeap d_h, poly *s_p, memHeap s_h);
-extern poly    _pShallowCopyDelete(memHeap d_h, poly *s_p, memHeap s_h);
-
-#endif // MDEBUG
-
-#define _pCopy2(p1, p2)     memcpyW(p1, p2, pMonomSizeW)
+extern poly    _pShallowCopyDeleteHead(omBin d_h, poly *s_p, omBin s_h);
+extern poly    _pShallowCopyDelete(omBin d_h, poly *s_p, omBin s_h);
+#define _pCopy2(p1, p2)     omMemcpyW(p1, p2, pMonomSizeW)
 
 
 /***************************************************************
@@ -376,8 +345,6 @@ extern poly    _pShallowCopyDelete(memHeap d_h, poly *s_p, memHeap s_h);
 
 #endif // DO_DEEP_PROFILE
 
-
-#ifndef ASO_GENERATE
 
 #if defined(PDEBUG) && PDEBUG > 1
 #define _pMonAddOn(p1, p2)  pDBMonAddOn(p1, p2, __FILE__, __LINE__)
@@ -640,5 +607,4 @@ DECLARE(int, _pExpQuerSum(poly p))
 }
 #endif
 
-#endif // ifndef ASO_GENERATE
 #endif // POLYS_IMPL_H

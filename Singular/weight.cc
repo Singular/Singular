@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: weight.cc,v 1.12 1999-11-15 17:20:56 obachman Exp $ */
+/* $Id: weight.cc,v 1.13 2000-08-14 12:56:57 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -10,7 +10,7 @@
 #include <math.h>
 #include "mod2.h"
 #include "tok.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "polys.h"
 #include "intvec.h"
 #include "febase.h"
@@ -24,11 +24,6 @@
 
 pFDegProc pFDegOld;
 pLDegProc pLDegOld;
-#ifdef ALIGN_8
-#define wDouble(A) ((double *)A)
-#else
-extern "C" double * wDouble(void *adr);
-#endif
 
 #ifndef __MWERKS__
 extern "C" double (*wFunctional)(int *degw, int *lpol, int npol,
@@ -88,7 +83,7 @@ static void wInit(polyset s, int sl, int mons, int *A)
   B = A;
   n = pVariables;
   a = (n + 1) * sizeof(Exponent_t);
-  pl = (Exponent_t * )Alloc(a);
+  pl = (Exponent_t * )omAlloc(a);
   for (i = 0; i <= sl; i++)
   {
     p = s[i];
@@ -120,7 +115,7 @@ static void wInit(polyset s, int sl, int mons, int *A)
       }
     }
   }
-  Free((ADDRESS)pl, a);
+  omFreeSize((ADDRESS)pl, a);
 }
 
 static void wCall(polyset s, int sl, int *x)
@@ -131,20 +126,20 @@ static void wCall(polyset s, int sl, int *x)
   void *adr;
 
   n = pVariables;
-  lpol = (int * )Alloc((sl + 1) * sizeof(int));
+  lpol = (int * )omAlloc((sl + 1) * sizeof(int));
   wDimensions(s, sl, lpol, &npol, &mons);
   xopt = x + (n + 1);
   for (i = n; i!=0; i--)
     xopt[i] = 1;
   if (mons==0)
   {
-    Free((ADDRESS)lpol, (sl + 1) * sizeof(int));
+    omFreeSize((ADDRESS)lpol, (sl + 1) * sizeof(int));
     return;
   }
-  adr = (void * )Alloc(npol * sizeof(double) + 8);
-  rel = wDouble(adr);
+  adr = (void * )omAllocAligned(npol * sizeof(double));
+  rel = (double*)adr;
   q = (n + 1) * mons * sizeof(int);
-  A = (int * )Alloc(q);
+  A = (int * )omAlloc(q);
   wInit(s, sl, mons, A);
   degw = A + (n * mons);
   memset(degw, 0, mons * sizeof(int));
@@ -191,9 +186,9 @@ static void wCall(polyset s, int sl, int *x)
 //      }
 //    }
   }
-  Free((ADDRESS)A, q);
-  Free((ADDRESS)lpol, (sl + 1) * sizeof(int));
-  Free((ADDRESS)adr, npol * sizeof(double) + 8);
+  omFreeSize((ADDRESS)A, q);
+  omFreeSize((ADDRESS)lpol, (sl + 1) * sizeof(int));
+  omFreeSize((ADDRESS)adr, npol * sizeof(double));
 }
 
 
@@ -209,18 +204,18 @@ void kEcartWeights(polyset s, int sl, short *eweight)
     wFunctional = wFunctionalMora;
   else
     wFunctional = wFunctionalBuch;
-  x = (int * )Alloc(2 * (n + 1) * sizeof(int));
+  x = (int * )omAlloc(2 * (n + 1) * sizeof(int));
   wCall(s, sl, x);
   for (i = n; i!=0; i--)
     eweight[i] = x[i + n + 1];
-  Free((ADDRESS)x, 2 * (n + 1) * sizeof(int));
+  omFreeSize((ADDRESS)x, 2 * (n + 1) * sizeof(int));
 }
 
 
 BOOLEAN kWeight(leftv res,leftv id)
 {
   ideal F=(ideal)id->Data();
-  intvec * iv = NewIntvec1(pVariables);
+  intvec * iv = new intvec(pVariables);
   polyset s;
   int  sl, n, i;
   int  *x;
@@ -231,11 +226,11 @@ BOOLEAN kWeight(leftv res,leftv id)
   n = pVariables;
   wNsqr = (double)2.0 / (double)n;
   wFunctional = wFunctionalBuch;
-  x = (int * )Alloc(2 * (n + 1) * sizeof(int));
+  x = (int * )omAlloc(2 * (n + 1) * sizeof(int));
   wCall(s, sl, x);
   for (i = n; i!=0; i--)
     (*iv)[i-1] = x[i + n + 1];
-  Free((ADDRESS)x, 2 * (n + 1) * sizeof(int));
+  omFreeSize((ADDRESS)x, 2 * (n + 1) * sizeof(int));
   return FALSE;
 }
 
@@ -243,13 +238,13 @@ BOOLEAN kQHWeight(leftv res,leftv v)
 {
   res->data=(char *)idQHomWeights((ideal)v->Data());
   if (res->data==NULL)
-    res->data=(char *)NewIntvec1(pVariables);
+    res->data=(char *)new intvec(pVariables);
   return FALSE;
 }
 
 short * iv2array(intvec * iv)
 {
-  short *s=(short *)Alloc((pVariables+1)*sizeof(short));
+  short *s=(short *)omAlloc((pVariables+1)*sizeof(short));
   int len=iv->length();
   int i;
 

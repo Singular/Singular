@@ -3,14 +3,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.h,v 1.12 1999-12-20 12:50:21 Singular Exp $ */
+/* $Id: matpol.h,v 1.13 2000-08-14 12:56:38 obachman Exp $ */
 /*
 * ABSTRACT
 */
 #include "structs.h"
-#if HAVE_ASO == 1
-#include "matpol.aso"
-#endif
 
 // THIS IS REALLY DIRTY: ip_smatrix HAS TO BE IDENTICAL TO ip_sideal
 // SO, DON'T CHANGE THE DECLARATION OF ip_smatrix
@@ -31,12 +28,7 @@ class ip_smatrix
   #define MATELEM(mat,i,j) ((mat)->m)[MATCOLS((mat)) * ((i)-1) + (j)-1]
 };
 
-#ifdef MDEBUG
-matrix mpDBNew(int r, int c, char *f, int l);
-#define mpNew(A,B) mpDBNew(A,B,__FILE__,__LINE__)
-#else
 matrix mpNew(int r, int c);
-#endif
 matrix mpCopy (matrix a);
 matrix mpInitP(int r, int c, poly p);
 matrix mpInitI(int r, int c, int v);
@@ -76,4 +68,5 @@ void mpCoef2(poly v, poly vars, matrix *c, matrix *m);
 void mpRecMin(int, ideal, int &, matrix, int, int, poly, ideal);
 void mpMinorToResult(ideal, int &, matrix, int, int, ideal);
 
+extern omBin ip_smatrix_bin;
 #endif

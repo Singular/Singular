@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmvec.cc,v 1.12 1999-11-15 17:20:02 obachman Exp $
+// $Id: fglmvec.cc,v 1.13 2000-08-14 12:56:15 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -15,7 +15,7 @@
 #include "mod2.h"
 
 #ifdef HAVE_FGLM
-#include "mmemory.h"
+#include <omalloc.h>
 #include "tok.h"
 #include "structs.h"
 #include "numbers.h"
@@ -43,7 +43,7 @@ public:
         if ( N == 0 )
             elems= 0;
         else {
-            elems= (number *)Alloc( N*sizeof( number ) );
+            elems= (number *)omAlloc( N*sizeof( number ) );
             for ( int i= N-1; i >= 0; i-- )
                 elems[i]= nInit( 0 );
         }
@@ -53,7 +53,7 @@ public:
         if ( N > 0 ) {
             for ( int i= N-1; i >= 0; i-- )
                 nDelete( elems + i );
-            Free( (ADDRESS)elems, N*sizeof( number ) );
+            omFreeSize( (ADDRESS)elems, N*sizeof( number ) );
         }
     }
 
@@ -61,7 +61,7 @@ public:
     {
         if ( N > 0 ) {
             number * elems_clone;
-            elems_clone= (number *)Alloc( N*sizeof( number ) );
+            elems_clone= (number *)omAlloc( N*sizeof( number ) );
             for ( int i= N-1; i >= 0; i-- )
                 elems_clone[i] = nCopy( elems[i] );
             return new fglmVectorRep( N, elems_clone );
@@ -207,7 +207,7 @@ fglmVector::nihilate( const number fac1, const number fac2, const fglmVector v )
     else
     {
         number* newelems;
-        newelems= (number *)Alloc( rep->size()*sizeof( number ) );
+        newelems= (number *)omAlloc( rep->size()*sizeof( number ) );
         for ( i= vsize; i > 0; i-- ) {
             term1= nMult( fac1, rep->getconstelem( i ) );
             term2= nMult( fac2, v.rep->getconstelem( i ) );
@@ -282,7 +282,7 @@ fglmVector::operator += ( const fglmVector & v )
     {
         int n = rep->size();
         number* newelems;
-        newelems= (number *)Alloc( n*sizeof( number ) );
+        newelems= (number *)omAlloc( n*sizeof( number ) );
         for ( i= n; i > 0; i-- )
             newelems[i-1]= nAdd( rep->getconstelem( i ), v.rep->getconstelem( i ) );
         rep->deleteObject();
@@ -304,7 +304,7 @@ fglmVector::operator -= ( const fglmVector & v )
     {
         int n = rep->size();
         number* newelems;
-        newelems= (number *)Alloc( n*sizeof( number ) );
+        newelems= (number *)omAlloc( n*sizeof( number ) );
         for ( i= n; i > 0; i-- )
             newelems[i-1]= nSub( rep->getconstelem( i ), v.rep->getconstelem( i ) );
         rep->deleteObject();
@@ -320,7 +320,7 @@ fglmVector::operator *= ( const number & n )
     int i;
     if ( ! rep->isUnique() ) {
         number * temp;
-        temp= (number *)Alloc( s*sizeof( number ) );
+        temp= (number *)omAlloc( s*sizeof( number ) );
         for ( i= s; i > 0; i-- )
             temp[i-1]= nMult( rep->getconstelem( i ), n );
         rep->deleteObject();
@@ -341,7 +341,7 @@ fglmVector::operator /= ( const number & n )
     int i;
     if ( ! rep->isUnique() ) {
         number * temp;
-        temp= (number *)Alloc( s*sizeof( number ) );
+        temp= (number *)omAlloc( s*sizeof( number ) );
         for ( i= s; i > 0; i-- ) {
             temp[i-1]= nDiv( rep->getconstelem( i ), n );
             nNormalize( temp[i-1] );

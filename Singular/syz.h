@@ -3,14 +3,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.h,v 1.26 2000-07-09 16:22:42 siebert Exp $ */
+/* $Id: syz.h,v 1.27 2000-08-14 12:56:53 obachman Exp $ */
 /*
 * ABSTRACT: Resolutions
 */
 #include "structs.h"
-#if HAVE_ASO == 1
-#include "syz.aso"
-#endif
 
 // Logarithm of estimate of maximal number of new components
 #define SYZ_SHIFT_MAX_NEW_COMP_ESTIMATE 8

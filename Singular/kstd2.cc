@@ -1,14 +1,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.42 2000-03-31 12:15:01 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.43 2000-08-14 12:56:32 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
 
 #include "mod2.h"
 #include "tok.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "polys.h"
 #include "ideals.h"
 #include "febase.h"
@@ -540,7 +540,7 @@ void initBba(ideal F,kStrategy strat)
     }
     else
     {
-      ecartWeights=(short *)Alloc((pVariables+1)*sizeof(short));
+      ecartWeights=(short *)omAlloc((pVariables+1)*sizeof(short));
       /*uses automatic computation of the ecartWeights to set them*/
       kEcartWeights(F->m,IDELEMS(F)-1,ecartWeights);
     }
@@ -690,7 +690,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     pLDeg=pLDegOld;
     if (ecartWeights)
     {
-      Free((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
+      omFreeSize((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
       ecartWeights=NULL;
     }
   }
@@ -733,9 +733,9 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   }
   /*- release temp data------------------------------- -*/
   if (strat->ecartS != NULL)
-    Free((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
+    omFreeSize((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
   if (strat->sevS != NULL)
-    Free((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
+    omFreeSize((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
   idDelete(&strat->Shdl);
   test=save_test;
   if (TEST_OPT_PROT) PrintLn();
@@ -788,9 +788,9 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
   }
   /*- release temp data------------------------------- -*/
   if (strat->ecartS != NULL)
-    Free((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
+    omFreeSize((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
   if (strat->sevS != NULL)
-    Free((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
+    omFreeSize((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
   idDelete(&strat->Shdl);
   test=save_test;
   if (TEST_OPT_PROT) PrintLn();
@@ -810,7 +810,7 @@ static ideal bbared (ideal F, ideal Q,kStrategy strat)
     pLDeg=pLDegOld;
     if (ecartWeights)
     {
-      Free((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
+      omFreeSize((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
       ecartWeights=NULL;
     }
   }
@@ -823,7 +823,7 @@ ideal stdred(ideal F, ideal Q, tHomog h,intvec ** w)
   ideal r;
   BOOLEAN b=pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
-  kStrategy strat=(kStrategy)Alloc0SizeOf(skStrategy);
+  kStrategy strat=(kStrategy)omAlloc0(sizeof(skStrategy));
 
   if (rField_has_simple_inverse())
     strat->LazyPass=20;

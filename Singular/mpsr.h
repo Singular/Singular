@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr.h,v 1.17 1999-11-15 17:20:32 obachman Exp $ */
+/* $Id: mpsr.h,v 1.18 2000-08-14 12:56:41 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr.h
@@ -25,7 +25,7 @@ extern "C"
 #include"MPT.h"
 #include"structs.h"
 #include"subexpr.h"
-#include"mmemory.h"
+#include<omalloc.h>
 #include"polys.h"
 #include"numbers.h"
 #include"ring.h"
@@ -83,7 +83,7 @@ extern mpsr_Status_t mpsr_PutDump(MP_Link_pt link);
  ***************************************************************/
 inline leftv mpsr_InitLeftv(short tok, void *data)
 {
-  leftv lv = (leftv) Alloc0(sizeof(sleftv));
+  leftv lv = (leftv) omAlloc0Bin(sleftv_bin);
   lv->data = data;
   lv->rtyp = tok;
   return lv;
@@ -119,8 +119,8 @@ inline void mpsr_InitTempArray(int length)
   if (gTa_Length < length)
     {
       if (gTa != NULL)
-        Free(gTa, gTa_Length*sizeof(MP_Sint32_t));
-      gTa = (MP_Sint32_t *) Alloc((length)*sizeof(MP_Sint32_t));
+        omFreeSize(gTa, gTa_Length*sizeof(MP_Sint32_t));
+      gTa = (MP_Sint32_t *) omAlloc((length)*sizeof(MP_Sint32_t));
       gTa_Length = length;
     }
 }

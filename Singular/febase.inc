@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.inc,v 1.30 2000-04-27 10:07:07 obachman Exp $ */
+/* $Id: febase.inc,v 1.31 2000-08-14 12:56:08 obachman Exp $ */
 /*
 * ABSTRACT: handling of 'voices'
 */
@@ -85,7 +85,7 @@ BOOLEAN newFile(char *fname,FILE* f)
   currentVoice->Next();
   //Print(":File%d(%s):%s(%x)\n",
   //  currentVoice->typ,BT_name[currentVoice->typ],fname,currentVoice);
-  currentVoice->filename   = mstrdup(fname);
+  currentVoice->filename   = omStrDup(fname);
   if (strcmp(fname,"STDIN") == 0)
   {
     currentVoice->files = stdin;
@@ -130,7 +130,7 @@ void newBuffer(char* s, feBufferTypes t, procinfo* pi, int lineno)
   {
     int l=strlen(pi->procname);
     if (pi->libname!=NULL) l+=strlen(pi->libname);
-    currentVoice->filename = (char *)AllocL(l+3);
+    currentVoice->filename = (char *)omAlloc(l+3);
     *currentVoice->filename='\0';
     if (pi->libname!=NULL) strcat(currentVoice->filename,pi->libname);
     strcat(currentVoice->filename,"::");
@@ -139,7 +139,7 @@ void newBuffer(char* s, feBufferTypes t, procinfo* pi, int lineno)
   }
   else
   {
-    currentVoice->filename = mstrdup(currentVoice->prev->filename);
+    currentVoice->filename = omStrDup(currentVoice->prev->filename);
     currentVoice->pi       = currentVoice->prev->pi;
   }
   currentVoice->buffer   = s;
@@ -333,12 +333,12 @@ BOOLEAN exitVoice()
       }
       if (currentVoice->filename!=NULL)
       {
-        FreeL((ADDRESS)currentVoice->filename);
+        omFree((ADDRESS)currentVoice->filename);
         currentVoice->filename=NULL;
       }
       if (currentVoice->buffer!=NULL)
       {
-        FreeL((ADDRESS)currentVoice->buffer);
+        omFree((ADDRESS)currentVoice->buffer);
         currentVoice->buffer=NULL;
       }
       yylineno=currentVoice->prev->curr_lineno;
@@ -485,11 +485,11 @@ int feReadLine(char* b, int l)
           int len;
           if (ss==NULL) len=strlen(anf);
           else          len=ss-anf;
-          char *s=(char *)AllocL(len+2);
+          char *s=(char *)omAlloc(len+2);
           strncpy(s,anf,len+2);
           s[len+1]='\0';
           fePrintEcho(s,b);
-          FreeL((ADDRESS)s);
+          omFree((ADDRESS)s);
         }
         else if (/*(startfptr>0) &&*/
         (currentVoice->buffer[startfptr-1]=='\n'))
@@ -499,12 +499,12 @@ int feReadLine(char* b, int l)
           int len;
           if (ss==NULL) len=strlen(anf);
           else          len=ss-anf;
-          char *s=(char *)AllocL(len+2);
+          char *s=(char *)omAlloc(len+2);
           strncpy(s,anf,len+2);
           s[len+1]='\0';
           yylineno++;
           fePrintEcho(s,b);
-          FreeL((ADDRESS)s);
+          omFree((ADDRESS)s);
         }
       }
       currentVoice->fptr++;
@@ -515,7 +515,10 @@ int feReadLine(char* b, int l)
     {
       currentVoice->fptr=0;
       if (currentVoice->buffer==NULL)
-        currentVoice->buffer=(char *)AllocL(4096-sizeof(ADDRESS));
+      {
+        currentVoice->buffer=(char *)omAlloc(4096-sizeof(ADDRESS));
+        omMarkAsStaticAddr(currentVoice->buffer);
+      }
     }
     offset=0;
   NewRead:
@@ -551,7 +554,7 @@ int feReadLine(char* b, int l)
     {
       s[rc]='\0';
       offset+=rc;
-      if (offset<(int)mmSizeL(currentVoice->buffer)) goto NewRead;
+      if (offset<(int)omSizeOfAddr(currentVoice->buffer)) goto NewRead;
     }
     goto NewBuff;
   }
@@ -616,7 +619,9 @@ Voice * feInitStdin()
   #else
   p->sw = (isatty(STDIN_FILENO)) ? BI_stdin : BI_file;
   #endif
-  p->filename   = mstrdup("STDIN");
+  p->filename   = omStrDup("STDIN");
   p->start_lineno   = 1;
+  omMarkAsStaticAddr(p);
+  omMarkAsStaticAddr(p->filename);
   return p;
 }

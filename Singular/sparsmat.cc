@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.30 2000-07-06 13:30:04 pohl Exp $ */
+/* $Id: sparsmat.cc,v 1.31 2000-08-14 12:56:51 obachman Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -138,9 +138,9 @@ ideal smRingCopy(ideal I, ring *ri, sip_sring &tmpR)
   {
     origR =currRing;
     tmpR=*origR;
-    int *ord=(int*)Alloc0(3*sizeof(int));
-    int *block0=(int*)Alloc(3*sizeof(int));
-    int *block1=(int*)Alloc(3*sizeof(int));
+    int *ord=(int*)omAlloc0(3*sizeof(int));
+    int *block0=(int*)omAlloc(3*sizeof(int));
+    int *block1=(int*)omAlloc(3*sizeof(int));
     ord[0]=ringorder_c;
     ord[1]=ringorder_dp;
     tmpR.order=ord;
@@ -167,9 +167,9 @@ void smRingClean(ring origR, ip_sring &tmpR)
 {
   rChangeCurrRing(origR,TRUE);
   rUnComplete(&tmpR);
-  Free((ADDRESS)tmpR.order,3*sizeof(int));
-  Free((ADDRESS)tmpR.block0,3*sizeof(int));
-  Free((ADDRESS)tmpR.block1,3*sizeof(int));
+  omFreeSize((ADDRESS)tmpR.order,3*sizeof(int));
+  omFreeSize((ADDRESS)tmpR.block0,3*sizeof(int));
+  omFreeSize((ADDRESS)tmpR.block1,3*sizeof(int));
 }
 
 /* ----------------- basics (used from 'C') ------------------ */
@@ -231,7 +231,7 @@ lists smCallBareiss(ideal I, int x, int y)
 {
   ring origR;
   sip_sring tmpR;
-  lists res=(lists)AllocSizeOf(slists);
+  lists res=(lists)omAllocBin(slists_bin);
   ideal II = smRingCopy(I,&origR,tmpR);
   sparse_mat *bareiss = new sparse_mat(II);
   ideal mm=II;
@@ -242,14 +242,14 @@ lists smCallBareiss(ideal I, int x, int y)
   {
     delete bareiss;
     if (origR!=NULL) smRingClean(origR,tmpR);
-    v=NewIntvec2(1,pVariables);
+    v=new intvec(1,pVariables);
   }
   else
   {
     idDelete(&II);
     bareiss->smBareiss(x, y);
     m = bareiss->smRes2Mod();
-    v = NewIntvec1(bareiss->smGetRed());
+    v = new intvec(bareiss->smGetRed());
     bareiss->smToIntvec(v);
     delete bareiss;
     if (origR!=NULL)
@@ -279,7 +279,7 @@ lists smCallNewBareiss(ideal I, int x, int y)
 {
   ring origR;
   sip_sring tmpR;
-  lists res=(lists)AllocSizeOf(slists);
+  lists res=(lists)omAllocBin(slists_bin);
   ideal II=smRingCopy(I,&origR,tmpR);
   sparse_mat *bareiss = new sparse_mat(II);
   ideal mm=II;
@@ -290,14 +290,14 @@ lists smCallNewBareiss(ideal I, int x, int y)
   {
     delete bareiss;
     if (origR!=NULL) smRingClean(origR,tmpR);
-    v=NewIntvec2(1,pVariables);
+    v=new intvec(1,pVariables);
   }
   else
   {
     idDelete(&II);
     bareiss->smNewBareiss(x, y);
     m = bareiss->smRes2Mod();
-    v = NewIntvec1(bareiss->smGetRed());
+    v = new intvec(bareiss->smGetRed());
     bareiss->smToIntvec(v);
     delete bareiss;
     if (origR!=NULL)
@@ -343,16 +343,16 @@ sparse_mat::sparse_mat(ideal smat)
   crd = 0;
   tored = nrows; // without border
   i = tored+1;
-  perm = (int *)Alloc(sizeof(int)*(i+1));
+  perm = (int *)omAlloc(sizeof(int)*(i+1));
   perm[i] = 0;
-  m_row = (smpoly *)Alloc0(sizeof(smpoly)*i);
-  wrw = (float *)Alloc(sizeof(float)*i);
+  m_row = (smpoly *)omAlloc0(sizeof(smpoly)*i);
+  wrw = (float *)omAlloc(sizeof(float)*i);
   i = ncols+1;
-  wcl = (float *)Alloc(sizeof(float)*i);
-  m_act = (smpoly *)Alloc(sizeof(smpoly)*i);
-  m_res = (smpoly *)Alloc0(sizeof(smpoly)*i);
-  dumm = (smpoly)AllocSizeOf(smprec);
-  m_res[0] = (smpoly)AllocSizeOf(smprec);
+  wcl = (float *)omAlloc(sizeof(float)*i);
+  m_act = (smpoly *)omAlloc(sizeof(smpoly)*i);
+  m_res = (smpoly *)omAlloc0(sizeof(smpoly)*i);
+  dumm = (smpoly)omAllocBin(smprec_bin);
+  m_res[0] = (smpoly)omAllocBin(smprec_bin);
   m_res[0]->m = NULL;
   pmat = smat->m;
   for(i=ncols; i; i--)
@@ -371,16 +371,16 @@ sparse_mat::~sparse_mat()
 {
   int i;
   if (m_act == NULL) return;
-  FreeSizeOf((ADDRESS)m_res[0], smprec);
-  FreeSizeOf((ADDRESS)dumm, smprec);
+  omFreeBin((ADDRESS)m_res[0],  smprec_bin);
+  omFreeBin((ADDRESS)dumm,  smprec_bin);
   i = ncols+1;
-  Free((ADDRESS)m_res, sizeof(smpoly)*i);
-  Free((ADDRESS)m_act, sizeof(smpoly)*i);
-  Free((ADDRESS)wcl, sizeof(float)*i);
+  omFreeSize((ADDRESS)m_res, sizeof(smpoly)*i);
+  omFreeSize((ADDRESS)m_act, sizeof(smpoly)*i);
+  omFreeSize((ADDRESS)wcl, sizeof(float)*i);
   i = nrows+1;
-  Free((ADDRESS)wrw, sizeof(float)*i);
-  Free((ADDRESS)m_row, sizeof(smpoly)*i);
-  Free((ADDRESS)perm, sizeof(int)*(i+1));
+  omFreeSize((ADDRESS)wrw, sizeof(float)*i);
+  omFreeSize((ADDRESS)m_row, sizeof(smpoly)*i);
+  omFreeSize((ADDRESS)perm, sizeof(int)*(i+1));
 }
 
 /*
@@ -423,7 +423,7 @@ poly sparse_mat::smDet()
   if (act < 2)
   {
     if (act != 0) res = m_act[1]->m;
-    FreeSizeOf((void *)m_act[1], smprec);
+    omFreeBin((void *)m_act[1],  smprec_bin);
     return res;
   }
   normalize = 0;
@@ -447,7 +447,7 @@ poly sparse_mat::smDet()
     this->smFinalMult();
     this->smPivDel();
     if (act != 0) res = m_act[1]->m;
-    FreeSizeOf((void *)m_act[1], smprec);
+    omFreeBin((void *)m_act[1],  smprec_bin);
     return res;
   }
   loop
@@ -474,7 +474,7 @@ poly sparse_mat::smDet()
       this->smFinalMult();
       this->smPivDel();
       if (act != 0) res = m_act[1]->m;
-      FreeSizeOf((void *)m_act[1], smprec);
+      omFreeBin((void *)m_act[1],  smprec_bin);
       return res;
     }
   }
@@ -2142,13 +2142,13 @@ static void smElemDelete(smpoly *r)
   smpoly a = *r, b = a->n;
 
   pDelete(&a->m);
-  FreeSizeOf((void *)a, smprec);
+  omFreeBin((void *)a,  smprec_bin);
   *r = b;
 }
 
 static smpoly smElemCopy(smpoly a)
 {
-  smpoly r = (smpoly)AllocSizeOf(smprec);
+  smpoly r = (smpoly)omAllocBin(smprec_bin);
   memcpy(r, a, sizeof(smprec));
 /*  r->m = pCopy(r->m); */
   return r;
@@ -2166,7 +2166,7 @@ static smpoly smPoly2Smpoly(poly q)
 
   if (q == NULL)
     return NULL;
-  a = res = (smpoly)AllocSizeOf(smprec);
+  a = res = (smpoly)omAllocBin(smprec_bin);
   a->pos = x = pGetComp(q);
   a->m = q;
   a->e = 0;
@@ -2182,7 +2182,7 @@ static smpoly smPoly2Smpoly(poly q)
     }
     if (pGetComp(q) != x)
     {
-      a = a->n = (smpoly)AllocSizeOf(smprec);
+      a = a->n = (smpoly)omAllocBin(smprec_bin);
       pNext(pp) = NULL;
       a->pos = x = pGetComp(q);
       a->m = q;
@@ -2217,7 +2217,7 @@ static poly smSmpoly2Poly(smpoly a)
   {
     b = a;
     a = a->n;
-    FreeSizeOf((void *)b, smprec);
+    omFreeBin((void *)b,  smprec_bin);
     if (a == NULL)
       return res;
     x = a->pos;
@@ -2324,6 +2324,8 @@ struct smnrec{
   number m;            // the element
 };
 
+static omBin smnrec_bin = omGetSpecBin(sizeof(smnrec));
+
 /* declare internal 'C' stuff */
 static void smNumberDelete(smnumber *);
 static smnumber smNumberCopy(smnumber);
@@ -2390,7 +2392,7 @@ lists smCallSolv(ideal I)
   }
   I->rank = idRankFreeModule(I);
   if (smCheckSolv(I)) return NULL;
-  res=(lists)AllocSizeOf(slists);
+  res=(lists)omAllocBin(slists_bin);
   rr=smRingCopy(I,&origR,tmpR);
   ss = NULL;
   linsolv = new sparse_number_mat(rr);
@@ -2433,21 +2435,21 @@ sparse_number_mat::sparse_number_mat(ideal smat)
   act = ncols = smat->ncols;
   tored = nrows = smat->rank;
   i = tored+1;
-  perm = (int *)Alloc(sizeof(int)*i);
-  m_row = (smnumber *)Alloc0(sizeof(smnumber)*i);
-  wrw = (int *)Alloc(sizeof(int)*i);
+  perm = (int *)omAlloc(sizeof(int)*i);
+  m_row = (smnumber *)omAlloc0(sizeof(smnumber)*i);
+  wrw = (int *)omAlloc(sizeof(int)*i);
   i = ncols+1;
-  wcl = (int *)Alloc(sizeof(int)*i);
-  m_act = (smnumber *)Alloc(sizeof(smnumber)*i);
-  m_res = (smnumber *)Alloc0(sizeof(smnumber)*i);
-  dumm = (smnumber)AllocSizeOf(smnrec);
+  wcl = (int *)omAlloc(sizeof(int)*i);
+  m_act = (smnumber *)omAlloc(sizeof(smnumber)*i);
+  m_res = (smnumber *)omAlloc0(sizeof(smnumber)*i);
+  dumm = (smnumber)omAllocBin(smnrec_bin);
   pmat = smat->m;
   for(i=ncols; i; i--)
   {
     m_act[i] = smPoly2Smnumber(pmat[i-1]);
   }
-  Free((ADDRESS)pmat,smat->ncols*sizeof(poly));
-  FreeSizeOf((ADDRESS)smat,sip_sideal);
+  omFreeSize((ADDRESS)pmat,smat->ncols*sizeof(poly));
+  omFreeBin((ADDRESS)smat, sip_sideal_bin);
   one = nInit(1);
 }
 
@@ -2457,15 +2459,15 @@ sparse_number_mat::sparse_number_mat(ideal smat)
 sparse_number_mat::~sparse_number_mat()
 {
   int i;
-  FreeSizeOf((ADDRESS)dumm, smnrec);
+  omFreeBin((ADDRESS)dumm,  smnrec_bin);
   i = ncols+1;
-  Free((ADDRESS)m_res, sizeof(smnumber)*i);
-  Free((ADDRESS)m_act, sizeof(smnumber)*i);
-  Free((ADDRESS)wcl, sizeof(int)*i);
+  omFreeSize((ADDRESS)m_res, sizeof(smnumber)*i);
+  omFreeSize((ADDRESS)m_act, sizeof(smnumber)*i);
+  omFreeSize((ADDRESS)wcl, sizeof(int)*i);
   i = nrows+1;
-  Free((ADDRESS)wrw, sizeof(int)*i);
-  Free((ADDRESS)m_row, sizeof(smnumber)*i);
-  Free((ADDRESS)perm, sizeof(int)*i);
+  omFreeSize((ADDRESS)wrw, sizeof(int)*i);
+  omFreeSize((ADDRESS)m_row, sizeof(smnumber)*i);
+  omFreeSize((ADDRESS)perm, sizeof(int)*i);
   nDelete(&one);
 }
 
@@ -2510,13 +2512,13 @@ void sparse_number_mat::smSolv()
   smnumber s, d, r = m_row[nrows];
 
   m_row[nrows] = NULL;
-  sol = (number *)Alloc0(sizeof(number)*(crd+1));
+  sol = (number *)omAlloc0(sizeof(number)*(crd+1));
   while (r != NULL)  // expand the rigth hand side
   {
     sol[r->pos] = r->m;
     s = r;
     r = r->n;
-    FreeSizeOf((ADDRESS)s, smnrec);
+    omFreeBin((ADDRESS)s,  smnrec_bin);
   }
   i = crd;  // solve triangular system
   if (sol[i] != NULL)
@@ -2590,7 +2592,7 @@ ideal sparse_number_mat::smRes2Ideal()
     j = perm[i]-1;
     res->m[j] = smSmnumber2Poly(sol[i]);
   }
-  Free((ADDRESS)sol, sizeof(number)*(crd+1));
+  omFreeSize((ADDRESS)sol, sizeof(number)*(crd+1));
   return res;
 }
 
@@ -2904,13 +2906,13 @@ static void smNumberDelete(smnumber *r)
   smnumber a = *r, b = a->n;
 
   nDelete(&a->m);
-  FreeSizeOf((ADDRESS)a, smnrec);
+  omFreeBin((ADDRESS)a,  smnrec_bin);
   *r = b;
 }
 
 static smnumber smNumberCopy(smnumber a)
 {
-  smnumber r = (smnumber)AllocSizeOf(smnrec);
+  smnumber r = (smnumber)omAllocBin(smnrec_bin);
   memcpy(r, a, sizeof(smnrec));
   return r;
 }
@@ -2926,7 +2928,7 @@ static smnumber smPoly2Smnumber(poly q)
 
   if (p == NULL)
     return NULL;
-  a = res = (smnumber)AllocSizeOf(smnrec);
+  a = res = (smnumber)omAllocBin(smnrec_bin);
   a->pos = pGetComp(p);
   a->m = pGetCoeff(p);
   nNew(&pGetCoeff(p));
@@ -2939,7 +2941,7 @@ static smnumber smPoly2Smnumber(poly q)
       a->n = NULL;
       return res;
     }
-    a = a->n = (smnumber)AllocSizeOf(smnrec);
+    a = a->n = (smnumber)omAllocBin(smnrec_bin);
     a->pos = pGetComp(p);
     a->m = pGetCoeff(p);
     nNew(&pGetCoeff(p));

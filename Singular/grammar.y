@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.81 2000-05-25 09:02:02 Singular Exp $ */
+/* $Id: grammar.y,v 1.82 2000-08-14 12:56:17 obachman Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -26,6 +26,7 @@
 #endif
 
 #include "mod2.h"
+#include <omalloc.h>
 #include "tok.h"
 #include "stype.h"
 #include "ipid.h"
@@ -34,7 +35,6 @@
 #include "matpol.h"
 #include "ring.h"
 #include "kstd1.h"
-#include "mmemory.h"
 #include "subexpr.h"
 #include "ipshell.h"
 #include "ipconv.h"
@@ -415,7 +415,7 @@ flowctrl: ifcmd
             {currentVoice->ifsw=0;}
         ;
 
-example_dummy : EXAMPLE_CMD BLOCKTOK { FreeL((ADDRESS)$2); }
+example_dummy : EXAMPLE_CMD BLOCKTOK { omFree((ADDRESS)$2); }
 
 command: assign
          | exportcmd
@@ -438,7 +438,7 @@ elemexpr:
         RINGVAR
           {
             if (currRing==NULL) MYYERROR("no ring active");
-            syMake(&$$,mstrdup($1));
+            syMake(&$$,omStrDup($1));
           }
         | extendedid
           {
@@ -460,7 +460,7 @@ elemexpr:
             }
             else
             {
-              $1.next=(leftv)AllocSizeOf(sleftv);
+              $1.next=(leftv)omAllocBin(sleftv_bin);
               memcpy($1.next,&$3,sizeof(sleftv));
               if(iiExprArithM(&$$,&$1,'(')) YYERROR;
             }
@@ -497,7 +497,7 @@ elemexpr:
           {
             memset(&$$,0,sizeof($$));
             int i = atoi($1);
-            /*remember not to FreeL($1)
+            /*remember not to omFree($1)
             *because it is a part of the scanner buffer*/
             $$.rtyp  = INT_CMD;
             $$.data = (void *)i;
@@ -516,7 +516,7 @@ elemexpr:
                          ,$1,MAX_INT_VAL);
                   YYERROR;
                 }
-                char *t1=mstrdup($1);
+                char *t1=omStrDup($1);
                 syMake(&$$,t1);
               }
             }
@@ -543,7 +543,7 @@ exprlist:
             {
               v=v->next;
             }
-            v->next = (leftv)AllocSizeOf(sleftv);
+            v->next = (leftv)omAllocBin(sleftv_bin);
             memcpy(v->next,&($3),sizeof(sleftv));
             $$ = $1;
           }
@@ -867,7 +867,7 @@ declare_ip_variable:
             //while (v->next!=NULL) { v=v->next; }
             idhdl h=(idhdl)v->data;
             delete IDINTVEC(h);
-            IDINTVEC(h) = NewIntvec3(r,c,0);
+            IDINTVEC(h) = new intvec(r,c,0);
             if (IDINTVEC(h)==NULL) YYERROR;
           }
         | INTMAT_CMD elemexpr
@@ -879,7 +879,7 @@ declare_ip_variable:
             {
                h=(idhdl)v->data;
                delete IDINTVEC(h);
-               IDINTVEC(h) = NewIntvec3(1,1,0);
+               IDINTVEC(h) = new intvec(1,1,0);
                v=v->next;
             } while (v!=NULL);
           }
@@ -898,7 +898,7 @@ declare_ip_variable:
             }
             leftv v=&$1;
             while (v->next!=NULL) v=v->next;
-            v->next=(leftv)AllocSizeOf(sleftv);
+            v->next=(leftv)omAllocBin(sleftv_bin);
             memcpy(v->next,&r,sizeof(sleftv));
             $$=$1;
           }
@@ -921,7 +921,7 @@ rlist:
             {
               v=v->next;
             }
-            v->next = (leftv)AllocSizeOf(sleftv);
+            v->next = (leftv)omAllocBin(sleftv_bin);
             memcpy(v->next,&($4),sizeof(sleftv));
             $$ = $2;
           }
@@ -939,7 +939,7 @@ orderelem:
         ordername
           {
             memset(&$$,0,sizeof($$));
-            intvec *iv = NewIntvec1(2);
+            intvec *iv = new intvec(2);
             (*iv)[0] = 1;
             (*iv)[1] = $1;
             $$.rtyp = INTVEC_CMD;
@@ -953,7 +953,7 @@ orderelem:
             {
               slLength =  exprlist_length(sl);
               int l = 2 +  slLength;
-              intvec *iv = NewIntvec1(l);
+              intvec *iv = new intvec(l);
               (*iv)[0] = slLength;
               (*iv)[1] = $1;
 
@@ -994,7 +994,7 @@ OrderingList:
         |  orderelem ',' OrderingList
           {
             $$ = $1;
-            $$.next = (sleftv *)AllocSizeOf(sleftv);
+            $$.next = (sleftv *)omAllocBin(sleftv_bin);
             memcpy($$.next,&$3,sizeof(sleftv));
           }
         ;
@@ -1030,7 +1030,7 @@ helpcmd:
         HELP_CMD STRINGTOK ';'
           {
             feHelp($2);
-            FreeL((ADDRESS)$2);
+            omFree((ADDRESS)$2);
           }
         | HELP_CMD ';'
           {
@@ -1042,7 +1042,7 @@ examplecmd:
         EXAMPLE_CMD STRINGTOK ';'
           {
             singular_example($2);
-            FreeL((ADDRESS)$2);
+            omFree((ADDRESS)$2);
           }
        ;
 
@@ -1061,7 +1061,7 @@ exportcmd:
           (($4.Typ()!=PACKAGE_CMD) && ($4.Typ()!=INT_CMD) &&
            ($4.Typ()!=STRING_CMD)))
             MYYERROR("export <id> to <package|int>");
-          FreeL((ADDRESS)$3);
+          omFree((ADDRESS)$3);
           if ($4.Typ()==INT_CMD)
           {
             if (iiExport(&$2,((int)$4.Data())-1)) YYERROR;
@@ -1295,7 +1295,7 @@ ringcmd:
                 do_pop = TRUE;
                 if( (((sleftv)$2).req_packhdl != NULL) &&
                     (((sleftv)$2).packhdl != ((sleftv)$2).req_packhdl))
-                  ring_name = mstrdup($2.name);
+                  ring_name = omStrDup($2.name);
               }
             #endif /* HAVE_NAMESPACES */
             ring b=
@@ -1308,7 +1308,7 @@ ringcmd:
               newRingHdl=enterid(ring_name, myynest, RING_CMD, &IDROOT);
               if (newRingHdl!=NULL)
               {
-                Free(IDRING(newRingHdl),sizeof(ip_sring));
+                omFreeSize(IDRING(newRingHdl),sizeof(ip_sring));
                 IDRING(newRingHdl)=b;
               }
               else
@@ -1340,7 +1340,7 @@ ringcmd:
                 do_pop = TRUE;
                 if( (((sleftv)$2).req_packhdl != NULL) &&
                   (((sleftv)$2).packhdl != ((sleftv)$2).req_packhdl))
-                  ring_name = mstrdup($2.name);
+                  ring_name = omStrDup($2.name);
               }
             #endif /* HAVE_NAMESPACES */
             if (!inerror) rDefault(ring_name);
@@ -1460,7 +1460,7 @@ typecmd:
                 if ($1.name!=NULL)
                 {
                   Werror("`%s` is undefined",$1.name);
-                  FreeL((ADDRESS)$1.name);
+                  omFree((ADDRESS)$1.name);
                 }
                 YYERROR;
               }
@@ -1486,7 +1486,7 @@ ifcmd: IF_CMD '(' expr ')' BLOCKTOK
             }
             else
             {
-              FreeL((ADDRESS)$5);
+              omFree((ADDRESS)$5);
               currentVoice->ifsw=1;
             }
           }
@@ -1503,7 +1503,7 @@ ifcmd: IF_CMD '(' expr ')' BLOCKTOK
               {
                 Warn("`else` without `if` in level %d",myynest);
               }
-              FreeL((ADDRESS)$2);
+              omFree((ADDRESS)$2);
             }
             currentVoice->ifsw=0;
           }
@@ -1532,11 +1532,11 @@ whilecmd:
         WHILE_CMD STRINGTOK BLOCKTOK
           {
             /* -> if(!$2) break; $3; continue;*/
-            char * s = (char *)AllocL( strlen($2) + strlen($3) + 36);
+            char * s = (char *)omAlloc( strlen($2) + strlen($3) + 36);
             sprintf(s,"whileif (!(%s)) break;\n%scontinue;\n " ,$2,$3);
             newBuffer(s,BT_break);
-            FreeL((ADDRESS)$2);
-            FreeL((ADDRESS)$3);
+            omFree((ADDRESS)$2);
+            omFree((ADDRESS)$3);
           }
         ;
 
@@ -1545,16 +1545,16 @@ forcmd:
           {
             /* $2 */
             /* if (!$3) break; $5; $4; continue; */
-            char * s = (char *)AllocL( strlen($3)+strlen($4)+strlen($5)+36);
+            char * s = (char *)omAlloc( strlen($3)+strlen($4)+strlen($5)+36);
             sprintf(s,"forif (!(%s)) break;\n%s%s;\ncontinue;\n "
                    ,$3,$5,$4);
-            FreeL((ADDRESS)$3);
-            FreeL((ADDRESS)$4);
-            FreeL((ADDRESS)$5);
+            omFree((ADDRESS)$3);
+            omFree((ADDRESS)$4);
+            omFree((ADDRESS)$5);
             newBuffer(s,BT_break);
-            s = (char *)AllocL( strlen($2) + 3);
+            s = (char *)omAlloc( strlen($2) + 3);
             sprintf(s,"%s;\n",$2);
-            FreeL((ADDRESS)$2);
+            omFree((ADDRESS)$2);
             newBuffer(s,BT_if);
           }
         ;
@@ -1564,48 +1564,48 @@ proccmd:
           {
             procinfov pi;
             idhdl h = enterid($2,myynest,PROC_CMD,&IDROOT,TRUE);
-            if (h==NULL) {FreeL((ADDRESS)$3); YYERROR;}
+            if (h==NULL) {omFree((ADDRESS)$3); YYERROR;}
             iiInitSingularProcinfo(IDPROC(h),"", $2, 0, 0);
-            IDPROC(h)->data.s.body = (char *)AllocL(strlen($3)+31);;
+            IDPROC(h)->data.s.body = (char *)omAlloc(strlen($3)+31);;
             sprintf(IDPROC(h)->data.s.body,"parameter list #;\n%s;return();\n\n",$3);
-            FreeL((ADDRESS)$3);
+            omFree((ADDRESS)$3);
           }
         | PROC_DEF STRINGTOK BLOCKTOK
           {
             idhdl h = enterid($1,myynest,PROC_CMD,&IDROOT,TRUE);
             if (h==NULL)
             {
-              FreeL((ADDRESS)$2);
-              FreeL((ADDRESS)$3);
+              omFree((ADDRESS)$2);
+              omFree((ADDRESS)$3);
               YYERROR;
             }
             char *args=iiProcArgs($2,FALSE);
-            FreeL((ADDRESS)$2);
+            omFree((ADDRESS)$2);
             procinfov pi;
             iiInitSingularProcinfo(IDPROC(h),"", $1, 0, 0);
-            IDPROC(h)->data.s.body = (char *)AllocL(strlen($3)+strlen(args)+14);;
+            IDPROC(h)->data.s.body = (char *)omAlloc(strlen($3)+strlen(args)+14);;
             sprintf(IDPROC(h)->data.s.body,"%s\n%s;return();\n\n",args,$3);
-            FreeL((ADDRESS)args);
-            FreeL((ADDRESS)$3);
+            omFree((ADDRESS)args);
+            omFree((ADDRESS)$3);
           }
         | PROC_DEF STRINGTOK STRINGTOK BLOCKTOK
           {
-            FreeL((ADDRESS)$3);
+            omFree((ADDRESS)$3);
             idhdl h = enterid($1,myynest,PROC_CMD,&IDROOT,TRUE);
             if (h==NULL)
             {
-              FreeL((ADDRESS)$2);
-              FreeL((ADDRESS)$4);
+              omFree((ADDRESS)$2);
+              omFree((ADDRESS)$4);
               YYERROR;
             }
             char *args=iiProcArgs($2,FALSE);
-            FreeL((ADDRESS)$2);
+            omFree((ADDRESS)$2);
             procinfov pi;
             iiInitSingularProcinfo(IDPROC(h),"", $1, 0, 0);
-            IDPROC(h)->data.s.body = (char *)AllocL(strlen($4)+strlen(args)+14);;
+            IDPROC(h)->data.s.body = (char *)omAlloc(strlen($4)+strlen(args)+14);;
             sprintf(IDPROC(h)->data.s.body,"%s\n%s;return();\n\n",args,$4);
-            FreeL((ADDRESS)args);
-            FreeL((ADDRESS)$4);
+            omFree((ADDRESS)args);
+            omFree((ADDRESS)$4);
           }
         ;
 

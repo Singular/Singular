@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.72 2000-04-17 13:58:38 Singular Exp $ */
+/* $Id: iplib.cc,v 1.73 2000-08-14 12:56:24 obachman Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -15,7 +15,7 @@
 #include "mod2.h"
 #include "tok.h"
 #include "ipid.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "febase.h"
 #include "ring.h"
 #include "subexpr.h"
@@ -88,18 +88,18 @@ char * iiProcArgs(char *e,BOOLEAN withParenth)
     if (withParenth)
     {
       // no argument list, allow list #
-      return mstrdup("parameter list #;");
+      return omStrDup("parameter list #;");
     }
     else
     {
       // empty list
-      return mstrdup("");
+      return omStrDup("");
     }
   }
   BOOLEAN in_args;
   BOOLEAN args_found;
   char *s;
-  char *argstr=(char *)AllocL(124);
+  char *argstr=(char *)omAlloc(124);
   int argstrlen=124;
   *argstr='\0';
   do
@@ -120,9 +120,9 @@ char * iiProcArgs(char *e,BOOLEAN withParenth)
       if ((int)strlen(argstr)+12 /* parameter + ;*/ +(int)strlen(s)>= argstrlen)
       {
         argstrlen*=2;
-        char *a=(char *)AllocL( argstrlen);
+        char *a=(char *)omAlloc( argstrlen);
         strcpy(a,argstr);
-        FreeL((ADDRESS)argstr);
+        omFree((ADDRESS)argstr);
         argstr=a;
       }
       // copy the result to argstr
@@ -165,7 +165,7 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
       return NULL; // help part does not exist
     //Print("Help=%ld-%ld=%d\n", pi->data.s.body_start,
     //    pi->data.s.proc_start, procbuflen);
-    s = (char *)AllocL(procbuflen+head+3);
+    s = (char *)omAlloc(procbuflen+head+3);
     myfread(s, head, 1, fp);
     s[head] = '\n';
     fseek(fp, pi->data.s.help_start, SEEK_SET);
@@ -200,7 +200,7 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
     assume(pi->data.s.body_end > pi->data.s.body_start);
 
     procbuflen = pi->data.s.body_end - pi->data.s.body_start;
-    pi->data.s.body = (char *)AllocL( strlen(argstr)+procbuflen+15+
+    pi->data.s.body = (char *)omAlloc( strlen(argstr)+procbuflen+15+
                                       strlen(pi->libname) );
     //Print("Body=%ld-%ld=%d\n", pi->data.s.body_end,
     //    pi->data.s.body_start, procbuflen);
@@ -209,7 +209,7 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
     strcpy(pi->data.s.body,argstr);
     myfread( pi->data.s.body+strlen(argstr), procbuflen, 1, fp);
     procbuflen+=strlen(argstr);
-    FreeL(argstr);
+    omFree(argstr);
     fclose( fp );
     pi->data.s.body[procbuflen] = '\0';
     strcat( pi->data.s.body+procbuflen, "\n;return();\n\n" );
@@ -228,7 +228,7 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
     procbuflen = pi->data.s.proc_end - pi->data.s.example_start - strlen(buf);
     //Print("Example=%ld-%ld=%d\n", pi->data.s.proc_end,
     //  pi->data.s.example_start, procbuflen);
-    s = (char *)AllocL(procbuflen+14);
+    s = (char *)omAlloc(procbuflen+14);
     myfread(s, procbuflen, 1, fp);
     s[procbuflen] = '\0';
     strcat(s+procbuflen-3, "\n;return();\n\n" );
@@ -266,14 +266,14 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
         iiGetLibProcBuffer(pi);
         if (pi->data.s.body==NULL) return TRUE;
       }
-      newBuffer( mstrdup(pi->data.s.body), BT_proc,
+      newBuffer( omStrDup(pi->data.s.body), BT_proc,
                  pi, pi->data.s.body_lineno-(v!=NULL) );
     }
   }
   /* generate argument list ======================================*/
   if (v!=NULL)
   {
-    iiCurrArgs=(leftv)AllocSizeOf(sleftv);
+    iiCurrArgs=(leftv)omAllocBin(sleftv_bin);
     memcpy(iiCurrArgs,v,sizeof(sleftv));
     memset(v,0,sizeof(sleftv));
   }
@@ -344,11 +344,11 @@ static void iiCheckNest()
 {
   if (myynest >= iiRETURNEXPR_len-1)
   {
-    iiRETURNEXPR=(sleftv *)ReAlloc(iiRETURNEXPR,
+    iiRETURNEXPR=(sleftv *)omreallocSize(iiRETURNEXPR,
                                    iiRETURNEXPR_len*sizeof(sleftv),
                                    (iiRETURNEXPR_len+16)*sizeof(sleftv));
 #ifdef USE_IILOCALRING
-    iiLocalRing=(ring *)ReAlloc(iiLocalRing,
+    iiLocalRing=(ring *)omreallocSize(iiLocalRing,
                                    iiRETURNEXPR_len*sizeof(ring),
                                    (iiRETURNEXPR_len+16)*sizeof(ring));
 #endif
@@ -374,18 +374,18 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
     {
       Werror("'%s::%s()' 1 is a local procedure and cannot be accessed by an user.",
              plib, pi->procname);
-      FreeL(plib);
+      omFree(plib);
       return NULL;
     }
     if(strcmp(plib, namespaceroot->name)!= 0)
     {
       Werror("'%s::%s()' 2 is a local procedure and cannot be accessed by an user.",
              plib, pi->procname);
-      FreeL(plib);
+      omFree(plib);
       return NULL;
     }
   }
-  FreeL((ADDRESS)plib);
+  omFree((ADDRESS)plib);
   if(ns != NULL)
   {
     namespaceroot->push(IDPACKAGE(ns), IDID(ns), myynest+1);
@@ -401,11 +401,11 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
   {
     Werror("'%s::%s()' is a local procedure and cannot be accessed by an user.",
            pi->libname, pi->procname);
-    FreeL((ADDRESS)plib);
+    omFree((ADDRESS)plib);
     return NULL;
   }
   namespaceroot->push(NULL, plib, myynest+1);
-  FreeL((ADDRESS)plib);
+  omFree((ADDRESS)plib);
 #endif /* HAVE_NAMESPACES */
   iiCheckNest();
 #ifdef USE_IILOCALRING
@@ -432,10 +432,10 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
                  err=iiPStart(pn,sl);
                  break;
     case LANG_C:
-                 leftv res = (leftv)Alloc0SizeOf(sleftv);
+                 leftv res = (leftv)omAlloc0Bin(sleftv_bin);
                  err = (pi->data.o.function)(res, sl);
                  iiRETURNEXPR[myynest+1].Copy(res);
-                 FreeSizeOf((ADDRESS)res, sleftv);
+                 omFreeBin((ADDRESS)res,  sleftv_bin);
                  break;
   }
   if ((traceit&TRACE_SHOW_PROC)
@@ -512,7 +512,7 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
   {
     if (!err) Warn("too many arguments for %s",IDID(pn));
     iiCurrArgs->CleanUp();
-    FreeSizeOf((ADDRESS)iiCurrArgs,sleftv);
+    omFreeBin((ADDRESS)iiCurrArgs, sleftv_bin);
     iiCurrArgs=NULL;
   }
   namespaceroot->pop(TRUE);
@@ -532,7 +532,7 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
 #ifdef HAVE_NAMESPACES
   char *plib = iiConvName(pi->libname);
   idhdl ns = namespaceroot->get(plib,0, TRUE);
-  FreeL((ADDRESS)plib);
+  omFree((ADDRESS)plib);
 #endif /* HAVE_NAMESPACES */
 
   newBuffer( example, BT_example, pi,
@@ -605,7 +605,7 @@ BOOLEAN iiTryLoadLib(leftv v, char *id)
   BOOLEAN LoadResult = TRUE;
 #ifdef HAVE_NAMESPACES
   char libnamebuf[128];
-  char *libname = (char *)AllocL(strlen(id)+5);
+  char *libname = (char *)omAlloc(strlen(id)+5);
   char *suffix[] = { "", ".lib", ".so", ".sl", NULL };
   int i = 0;
   FILE *fp;
@@ -619,14 +619,14 @@ BOOLEAN iiTryLoadLib(leftv v, char *id)
     *libname = mytolower(*libname);
     if((LT = type_of_LIB(libname, libnamebuf)) != LT_NONE)
     {
-      if(!(LoadResult = iiLibCmd(mstrdup(libname), FALSE)))
+      if(!(LoadResult = iiLibCmd(omStrDup(libname), FALSE)))
       {
         v->name = iiConvName(libname);
         break;
       }
     }
   }
-  FreeL(libname);
+  omFree(libname);
 #else /* HAVE_NAMESPACES */
 #endif /* HAVE_NAMESPACES */
   return LoadResult;
@@ -673,7 +673,7 @@ BOOLEAN iiLocateLib(const char* lib, char* where)
   }
   else
   {
-    char* tmp = mstrdup(IDSTRING(hl));
+    char* tmp = omStrDup(IDSTRING(hl));
     char* tok = strtok(tmp, ",");
     do
     {
@@ -683,7 +683,7 @@ BOOLEAN iiLocateLib(const char* lib, char* where)
     while (tok != NULL);
     assume(tok != NULL);
     strcpy(where, tok);
-    FreeL(tmp);
+    omFree(tmp);
   }
   return TRUE;
 }
@@ -728,12 +728,12 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
   if (hl==NULL)
   {
 #ifdef HAVE_NAMESPACES
-    hl = enterid( mstrdup("LIB"),0, STRING_CMD,
+    hl = enterid( omStrDup("LIB"),0, STRING_CMD,
                   &NSROOT(namespaceroot->root), FALSE );
 #else /* HAVE_NAMESPACES */
-    hl = enterid( mstrdup("LIB"),0, STRING_CMD, &idroot, FALSE );
+    hl = enterid( omStrDup("LIB"),0, STRING_CMD, &idroot, FALSE );
 #endif /* HAVE_NAMESPACES */
-    IDSTRING(hl) = mstrdup(newlib);
+    IDSTRING(hl) = omStrDup(newlib);
   }
   else
   {
@@ -741,7 +741,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
     if (IDSTRING(hl) != NULL)
 #endif
     {
-      char *s = (char *)AllocL( strlen(newlib) + strlen(IDSTRING(hl)) + 2 );
+      char *s = (char *)omAlloc( strlen(newlib) + strlen(IDSTRING(hl)) + 2 );
       strcpy(s,IDSTRING(hl));
       BOOLEAN f=FALSE;
       if(strchr(s,',')==NULL)
@@ -763,11 +763,11 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
         } while (p!=NULL);
       }
       if (f)
-        FreeL((ADDRESS)s);
+        omFree((ADDRESS)s);
       else
       {
         sprintf( s, "%s,%s", IDSTRING(hl), newlib);
-        FreeL((ADDRESS)IDSTRING(hl));
+        omFree((ADDRESS)IDSTRING(hl));
         IDSTRING(hl) = s;
       }
     }
@@ -775,7 +775,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
     else
     {
       PrintS("## empty LIB string\n");
-      IDSTRING(hl) = mstrdup(newlib);
+      IDSTRING(hl) = omStrDup(newlib);
     }
 #endif
   }
@@ -789,10 +789,10 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
   pl = namespaceroot->get(plib,0, TRUE);
   if (pl==NULL)
   {
-    pl = enterid( mstrdup(plib),0, PACKAGE_CMD,
+    pl = enterid( omStrDup(plib),0, PACKAGE_CMD,
                   &NSROOT(namespaceroot->root), TRUE );
     IDPACKAGE(pl)->language = LANG_SINGULAR;
-    IDPACKAGE(pl)->libname=mstrdup(newlib);
+    IDPACKAGE(pl)->libname=omStrDup(newlib);
   }
   else
   {
@@ -814,9 +814,9 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
   namespaceroot->pop();
 #endif /* HAVE_NAMESPACES */
 
-  FreeL((ADDRESS)newlib);
+  omFree((ADDRESS)newlib);
 #ifdef HAVE_NAMESPACES
-  FreeL((ADDRESS)plib);
+  omFree((ADDRESS)plib);
 #endif /* HAVE_LIBPARSER */
  return LoadResult;
 }
@@ -881,7 +881,7 @@ static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
     if(yylp_errno==YYLP_BAD_CHAR)
     {
       Werror(yylp_errlist[yylp_errno], *text_buffer, yylplineno);
-      FreeL((ADDRESS)text_buffer);
+      omFree((ADDRESS)text_buffer);
       text_buffer=NULL;
     }
     else
@@ -955,14 +955,14 @@ static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
 procinfo *iiInitSingularProcinfo(procinfov pi, char *libname, char *procname,
                                  int line, long pos, BOOLEAN pstatic)
 {
-  pi->libname = mstrdup(libname);
+  pi->libname = omStrDup(libname);
 
   if( strcmp(procname,"_init")==0)
   {
     pi->procname = iiConvName(libname);
   }
   else
-    pi->procname = mstrdup(procname);
+    pi->procname = omStrDup(procname);
   pi->language = LANG_SINGULAR;
   pi->ref = 1;
   pi->is_static = pstatic;
@@ -989,12 +989,12 @@ int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
   procinfov pi;
   idhdl h;
 
-  h = enterid(mstrdup(procname),0, PROC_CMD, &IDROOT, TRUE);
+  h = enterid(omStrDup(procname),0, PROC_CMD, &IDROOT, TRUE);
   if ( h!= NULL )
   {
     pi = IDPROC(h);
-    pi->libname = mstrdup(libname);
-    pi->procname = mstrdup(procname);
+    pi->libname = omStrDup(libname);
+    pi->procname = omStrDup(procname);
     pi->language = LANG_C;
     pi->ref = 1;
     pi->is_static = pstatic;
@@ -1036,10 +1036,10 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror)
   pl = namespaceroot->get(plib,0, TRUE);
   if (pl==NULL)
   {
-    pl = enterid( mstrdup(plib),0, PACKAGE_CMD,
+    pl = enterid( omStrDup(plib),0, PACKAGE_CMD,
                   &NSROOT(namespaceroot->root), TRUE );
     IDPACKAGE(pl)->language = LANG_C;
-    IDPACKAGE(pl)->libname=mstrdup(newlib);
+    IDPACKAGE(pl)->libname=omStrDup(newlib);
   }
   else
   {
@@ -1097,17 +1097,17 @@ char mytolower(char c)
 
 static char *iiConvName(char *libname)
 {
-  char *tmpname = mstrdup(libname);
+  char *tmpname = omStrDup(libname);
   char *p = strrchr(tmpname, DIR_SEP);
   char *r;
   if(p==NULL) p = tmpname;
   else p++;
   r = strchr(p, '.');
   if( r!= NULL) *r = '\0';
-  r = mstrdup(p);
+  r = omStrDup(p);
   *r = mytoupper(*r);
   // printf("iiConvName: '%s' '%s' => '%s'\n", libname, tmpname, r);
-  FreeL((ADDRESS)tmpname);
+  omFree((ADDRESS)tmpname);
 
   return(r);
 }
@@ -1141,10 +1141,10 @@ void piShowProcList()
       proc = IDPROC(h);
       if(strcmp(proc->procname, IDID(h))!=0)
       {
-        name = (char *)AllocL(strlen(IDID(h))+strlen(proc->procname)+4);
+        name = (char *)omAlloc(strlen(IDID(h))+strlen(proc->procname)+4);
         sprintf(name, "%s -> %s", IDID(h), proc->procname);
         Print( "%d %-15s  %20s ", proc->is_static ? 1 : 0, proc->libname, name);
-        FreeL((ADDRESS)name);
+        omFree((ADDRESS)name);
       }
       else
         Print( "%d %-15s  %20s ", proc->is_static ? 1 : 0, proc->libname,
@@ -1196,9 +1196,9 @@ void libstack::push(char *p, char *libname)
     }
     if(lp==NULL)
     {
-      libstackv ls = (libstack *)Alloc0SizeOf(libstack);
+      libstackv ls = (libstack *)omAlloc0Bin(libstack_bin);
       ls->next = this;
-      ls->libname = mstrdup(libname);
+      ls->libname = omStrDup(libname);
       ls->to_be_done = TRUE;
       if(this != NULL) ls->cnt = this->cnt+1; else ls->cnt = 0;
       library_stack = ls;
@@ -1209,9 +1209,9 @@ void libstack::push(char *p, char *libname)
 libstackv libstack::pop(char *p)
 {
   libstackv ls = this;
-  //FreeL((ADDRESS)ls->libname);
+  //omFree((ADDRESS)ls->libname);
   library_stack = ls->next;
-  FreeSizeOf((ADDRESS)ls, libstack);
+  omFreeBin((ADDRESS)ls,  libstack_bin);
   return(library_stack);
 }
 
@@ -1254,15 +1254,15 @@ lib_types type_of_LIB(char *newlib, char *libnamebuf)
   if( (strncmp(buf, "\177ELF\01\01\01", 7)==0) && buf[16]=='\03')
   {
     LT = LT_ELF;
-    FreeL(newlib);
-    newlib = mstrdup(libnamebuf);
+    omFree(newlib);
+    newlib = omStrDup(libnamebuf);
     goto lib_type_end;
   }
   if( (strncmp(buf, "\02\020\01\016\05\022@", 7)==0))
   {
     LT = LT_HPUX;
-    FreeL(newlib);
-    newlib = mstrdup(libnamebuf);
+    omFree(newlib);
+    newlib = omStrDup(libnamebuf);
     goto lib_type_end;
   }
   if(isprint(buf[0]) || buf[0]=='\n')

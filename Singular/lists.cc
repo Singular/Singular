@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.cc,v 1.21 2000-05-18 14:04:01 Singular Exp $ */
+/* $Id: lists.cc,v 1.22 2000-08-14 12:56:34 obachman Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -19,9 +19,11 @@
 #include "intvec.h"
 #include "lists.h"
 
+omBin slists_bin = omGetSpecBin(sizeof(slists));
+
 lists lCopy(lists L)
 {
-  lists N=(lists)Alloc0SizeOf(slists);
+  lists N=(lists)omAlloc0Bin(slists_bin);
   int n=L->nr;
   if (L->nr>=0)
     N->Init(n+1);
@@ -43,7 +45,7 @@ lists lCopy(lists L)
 */
 BOOLEAN lAdd(leftv res, leftv u, leftv v)
 {
-  lists l=(lists) AllocSizeOf(slists);
+  lists l=(lists) omAllocBin(slists_bin);
   lists ul=(lists)u->CopyD();
   lists vl=(lists)v->CopyD();
   l->Init(ul->nr+vl->nr+2);
@@ -61,10 +63,12 @@ BOOLEAN lAdd(leftv res, leftv u, leftv v)
     l->m[i+ul->nr+1].rtyp=vl->m[i].rtyp;
     l->m[i+ul->nr+1].data=vl->m[i].data;
   }
-  Free((ADDRESS)ul->m,(ul->nr+1)*sizeof(sleftv));
-  FreeSizeOf((ADDRESS)ul,slists);
-  Free((ADDRESS)vl->m,(vl->nr+1)*sizeof(sleftv));
-  FreeSizeOf((ADDRESS)vl,slists);
+  if (ul->m != NULL) // OB: ???
+    omFreeSize((ADDRESS)ul->m,(ul->nr+1)*sizeof(sleftv));
+  omFreeBin((ADDRESS)ul, slists_bin);
+  if (vl->m != NULL) // OB: ????
+    omFreeSize((ADDRESS)vl->m,(vl->nr+1)*sizeof(sleftv));
+  omFreeBin((ADDRESS)vl, slists_bin);
   memset(u,0,sizeof(*u));
   memset(v,0,sizeof(*v));
   res->data = (char *)l;
@@ -79,7 +83,7 @@ lists lInsert0(lists ul, leftv v, int pos)
 {
   if ((pos<0)||(v->rtyp==NONE))
     return NULL;
-  lists l=(lists) AllocSizeOf(slists);
+  lists l=(lists) omAllocBin(slists_bin);
   l->Init(max(ul->nr+2,pos+1));
   int i,j;
 
@@ -95,8 +99,9 @@ lists lInsert0(lists ul, leftv v, int pos)
   l->m[pos].data=v->CopyD();
   l->m[pos].flag=v->flag;
   l->m[pos].attribute=v->CopyA();
-  Free((ADDRESS)ul->m,(ul->nr+1)*sizeof(sleftv));
-  FreeSizeOf((ADDRESS)ul,slists);
+  if (ul->m != NULL) // OB: ?????
+    omFreeSize((ADDRESS)ul->m,(ul->nr+1)*sizeof(sleftv));
+  omFreeBin((ADDRESS)ul, slists_bin);
   return l;
 }
 
@@ -152,7 +157,7 @@ BOOLEAN lDelete(leftv res, leftv u, leftv v)
   if((0<=VIndex)&&(VIndex<=ul->nr))
   {
     int i,j;
-    lists l=(lists) AllocSizeOf(slists);
+    lists l=(lists) omAllocBin(slists_bin);
     l->Init(ul->nr);
 
     ul=(lists)u->CopyD();
@@ -199,7 +204,7 @@ BOOLEAN lRingDependend(lists L)
 lists liMakeResolv(resolvente r, int length, int reallen,
   int typ0, intvec ** weights)
 {
-  lists L=(lists)Alloc0SizeOf(slists);
+  lists L=(lists)omAlloc0Bin(slists_bin);
   if (length<=0)
   {
     // handle "empty" resolutions
@@ -248,7 +253,7 @@ lists liMakeResolv(resolvente r, int length, int reallen,
         L->m[i].data=(void *)r[i];
         if ((weights!=NULL) && (weights[i]!=NULL))
         {
-          atSet((idhdl)&L->m[i],mstrdup("isHomog"),weights[i],INTVEC_CMD);
+          atSet((idhdl)&L->m[i],omStrDup("isHomog"),weights[i],INTVEC_CMD);
           weights[i] = NULL;
         }
       }
@@ -262,7 +267,7 @@ lists liMakeResolv(resolvente r, int length, int reallen,
       #endif
       i++;
     }
-    Free((ADDRESS)r,oldlength*sizeof(ideal));
+    omFreeSize((ADDRESS)r,oldlength*sizeof(ideal));
     if (i==0)
     {
       L->m[0].rtyp=typ0;
@@ -302,8 +307,8 @@ resolvente liFindRes(lists L, int * len, int *typ0,intvec *** weights)
     WerrorS("empty list");
     return NULL;
   }
-  r=(ideal *)Alloc0((*len)*sizeof(ideal));
-  w=(intvec**)Alloc0((*len)*sizeof(intvec*));
+  r=(ideal *)omAlloc0((*len)*sizeof(ideal));
+  w=(intvec**)omAlloc0((*len)*sizeof(intvec*));
   int i=0;
   *typ0=MODUL_CMD;
   while (i<(*len))
@@ -313,7 +318,7 @@ resolvente liFindRes(lists L, int * len, int *typ0,intvec *** weights)
       if (L->m[i].rtyp!=IDEAL_CMD)
       {
         Werror("element %d is not of type module",i+1);
-        Free((ADDRESS)r,(*len)*sizeof(ideal));
+        omFreeSize((ADDRESS)r,(*len)*sizeof(ideal));
         return NULL;
       }
       *typ0=IDEAL_CMD;
@@ -324,7 +329,7 @@ resolvente liFindRes(lists L, int * len, int *typ0,intvec *** weights)
       break;
     }
     r[i]=(ideal)L->m[i].data;
-    tw=(intvec*)atGet((idhdl)&L->m[i],mstrdup("isHomog"));
+    tw=(intvec*)atGet((idhdl)&L->m[i],omStrDup("isHomog"));
     if (tw!=NULL)
     {
       w[i]=ivCopy(tw);
@@ -345,7 +350,7 @@ resolvente liFindRes(lists L, int * len, int *typ0,intvec *** weights)
     {
       if (w[j]!=NULL) delete w[j];
     }
-    Free((ADDRESS)w,(*len)*sizeof(intvec*));
+    omFreeSize((ADDRESS)w,(*len)*sizeof(intvec*));
   }
   else
   {
@@ -359,25 +364,25 @@ char* lString(lists l, BOOLEAN typed, int dim)
 {
   if (l->nr == -1)
   {
-    if (typed) return mstrdup("list()");
-    return mstrdup("");
+    if (typed) return omStrDup("list()");
+    return omStrDup("");
   }
 
-  char** slist = (char**) Alloc((l->nr+1) * sizeof(char*));
+  char** slist = (char**) omAlloc((l->nr+1) * sizeof(char*));
   int i, j, k;
   char *s;
   for (i=0, j = 0, k = 0; i<=l->nr; i++)
   {
     slist[i] = l->m[i].String(NULL, typed, dim);
     assume(slist[i] != NULL);
-    mmTestL(slist[i]);
+    omCheckAddr(slist[i]);
     if (*(slist[i]) != '\0')
     {
       j += strlen(slist[i]);
       k++;
     }
   }
-  s = (char*) AllocL(j+k+2+(typed ? 10 : 0) + (dim == 2 ? k : 0));
+  s = (char*) omAlloc(j+k+2+(typed ? 10 : 0) + (dim == 2 ? k : 0));
 
   if (typed)
     sprintf(s, "list(");
@@ -392,13 +397,13 @@ char* lString(lists l, BOOLEAN typed, int dim)
       strcat(s, ",");
       if (dim == 2) strcat(s, "\n");
     }
-    mmTestL(s);
-    FreeL(slist[i]);
+    omCheckAddr(s);
+    omFree(slist[i]);
   }
   if (k > 0) s[strlen(s) - (dim == 2 ? 2 : 1)] = '\0';
   if (typed) strcat(s, ")");
-  mmTestL(s);
-  Free(slist, (l->nr+1) * sizeof(char*));
+  omCheckAddr(s);
+  omFreeSize(slist, (l->nr+1) * sizeof(char*));
   return s;
 }
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.54 2000-05-09 14:34:49 Singular Exp $ */
+/* $Id: kutil.cc,v 1.55 2000-08-14 12:56:33 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -11,7 +11,7 @@
 #include "mod2.h"
 #include "tok.h"
 #include "febase.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "numbers.h"
 #include "polys.h"
 #include "ring.h"
@@ -146,17 +146,17 @@ void HEckeTest (poly pp,kStrategy strat)
 */
 inline static intset initec (int maxnr)
 {
-  return (intset)Alloc(maxnr*sizeof(int));
+  return (intset)omAlloc(maxnr*sizeof(int));
 }
 
 inline static unsigned long* initsevS (int maxnr)
 {
-  return (unsigned long*)Alloc0(maxnr*sizeof(unsigned long));
+  return (unsigned long*)omAlloc0(maxnr*sizeof(unsigned long));
 }
 
 static inline void enlargeT (TSet* T,int* length,int incr)
 {
-  *T = (TSet)ReAlloc0((ADDRESS)(*T),(*length)*sizeof(TObject),
+  *T = (TSet)omRealloc0Size((ADDRESS)(*T),(*length)*sizeof(TObject),
                       ((*length)+incr)*sizeof(TObject));
   (*length) += incr;
 }
@@ -187,7 +187,7 @@ void cleanT (kStrategy strat)
 #if 0
         if (strat->T[j].heap != NULL)
           strat->S[i]
-            = pShallowCopyDelete(mm_specHeap, &p, strat->T[j].heap);
+            = pShallowCopyDelete(currPolyBin, &p, strat->T[j].heap);
 #endif
         break;
       }
@@ -198,21 +198,21 @@ void cleanT (kStrategy strat)
 
 LSet initL ()
 {
-  return (LSet)Alloc(setmax*sizeof(LObject));
+  return (LSet)omAlloc(setmax*sizeof(LObject));
 }
 
 static inline void enlargeL (LSet* L,int* length,int incr)
 {
   LSet h;
 
-  *L = (LSet)ReAlloc((ADDRESS)(*L),(*length)*sizeof(LObject),
+  *L = (LSet)omReallocSize((ADDRESS)(*L),(*length)*sizeof(LObject),
                                    ((*length)+incr)*sizeof(LObject));
   (*length) += incr;
 }
 
 void initPairtest(kStrategy strat)
 {
-  strat->pairtest = (BOOLEAN *)Alloc0((strat->sl+2)*sizeof(BOOLEAN));
+  strat->pairtest = (BOOLEAN *)omAlloc0((strat->sl+2)*sizeof(BOOLEAN));
 }
 
 /*2
@@ -870,7 +870,7 @@ void chainCrit (poly p,int ecart,kStrategy strat)
         }
       }
     }
-    Free((ADDRESS)strat->pairtest,(strat->sl+2)*sizeof(BOOLEAN));
+    omFreeSize((ADDRESS)strat->pairtest,(strat->sl+2)*sizeof(BOOLEAN));
     strat->pairtest=NULL;
   }
   if (strat->Gebauer || strat->fromT)
@@ -3163,16 +3163,16 @@ void enterSBba (LObject p,int atS,kStrategy strat)
   /*- puts p to the standardbasis s at position at -*/
   if (strat->sl == IDELEMS(strat->Shdl)-1)
   {
-    strat->sevS = (unsigned long*) ReAlloc0(strat->sevS,
+    strat->sevS = (unsigned long*) omRealloc0Size(strat->sevS,
                                     IDELEMS(strat->Shdl)*sizeof(unsigned long),
                                     (IDELEMS(strat->Shdl)+setmax)
                                            *sizeof(unsigned long));
-    strat->ecartS = (intset)ReAlloc(strat->ecartS,
+    strat->ecartS = (intset)omReallocSize(strat->ecartS,
                                     IDELEMS(strat->Shdl)*sizeof(int),
                                     (IDELEMS(strat->Shdl)+setmax)*sizeof(int));
     if (strat->fromQ!=NULL)
     {
-      strat->fromQ = (intset)ReAlloc(strat->fromQ,
+      strat->fromQ = (intset)omReallocSize(strat->fromQ,
                                     IDELEMS(strat->Shdl)*sizeof(int),
                                     (IDELEMS(strat->Shdl)+setmax)*sizeof(int));
     }
@@ -3216,7 +3216,7 @@ void enterT (LObject p,kStrategy strat)
 {
   int i,atT;
 
-  pHeapTest(p.p, (p.heap == NULL ? mm_specHeap : p.heap));
+  pHeapTest(p.p, (p.heap == NULL ? currPolyBin : p.heap));
   assume(p.pLength == 0 || pLength(p.p) == p.pLength);
 
   strat->newt = TRUE;
@@ -3252,7 +3252,7 @@ void enterTBba (LObject p, int atT,kStrategy strat)
 {
   int i;
 
-  pHeapTest(p.p, (p.heap == NULL ? mm_specHeap : p.heap));
+  pHeapTest(p.p, (p.heap == NULL ? currPolyBin : p.heap));
   assume(p.pLength == 0 || pLength(p.p) == p.pLength);
 
   strat->newt = TRUE;
@@ -3438,7 +3438,7 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
     updateS(TRUE,strat);
     pairs(strat);
   }
-  if (strat->fromQ!=NULL) Free((ADDRESS)strat->fromQ,IDELEMS(strat->Shdl)*sizeof(int));
+  if (strat->fromQ!=NULL) omFreeSize((ADDRESS)strat->fromQ,IDELEMS(strat->Shdl)*sizeof(int));
   strat->fromQ=NULL;
 }
 
@@ -3446,18 +3446,18 @@ void exitBuchMora (kStrategy strat)
 {
   /*- release temp data -*/
   cleanT(strat);
-  Free((ADDRESS)strat->T,(strat->tmax)*sizeof(TObject));
-  Free((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
-  Free((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(int));
+  omFreeSize((ADDRESS)strat->T,(strat->tmax)*sizeof(TObject));
+  omFreeSize((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
+  omFreeSize((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(int));
   /*- set L: should be empty -*/
-  Free((ADDRESS)strat->L,(strat->Lmax)*sizeof(LObject));
+  omFreeSize((ADDRESS)strat->L,(strat->Lmax)*sizeof(LObject));
   /*- set B: should be empty -*/
-  Free((ADDRESS)strat->B,(strat->Bmax)*sizeof(LObject));
+  omFreeSize((ADDRESS)strat->B,(strat->Bmax)*sizeof(LObject));
   pDelete1(&strat->tail);
   strat->syzComp=0;
   if (strat->kIdeal!=NULL)
   {
-    FreeSizeOf((ADDRESS)strat->kIdeal,sleftv);
+    omFreeBin((ADDRESS)strat->kIdeal, sleftv_bin);
     strat->kIdeal=NULL;
   }
 }
@@ -3611,11 +3611,11 @@ void kFreeStrat(kStrategy strat)
 #if 0
   if (strat->THeap != NULL)
   {
-    mmMergeHeap(mm_specHeap, strat->THeap);
+    mmMergeHeap(currPolyBin, strat->THeap);
     mmUnGetTempHeap(&(strat->THeap));
   }
 #endif
-  FreeSizeOf(strat, skStrategy);
+  omFreeSize(strat, sizeof(skStrategy));
 }
 
 rOrderType_t spGetOrderType(ring r, int modrank, int syzcomp)

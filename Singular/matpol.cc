@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.32 2000-02-09 08:15:02 pohl Exp $ */
+/* $Id: matpol.cc,v 1.33 2000-08-14 12:56:37 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -18,7 +18,7 @@
 #include "ipid.h"
 #include "kstd1.h"
 #include "polys.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "febase.h"
 #include "numbers.h"
 #include "ideals.h"
@@ -28,6 +28,8 @@
 #include "sparsmat.h"
 #include "matpol.h"
 
+
+omBin ip_smatrix_bin = omGetSpecBin(sizeof(ip_smatrix));
 /*0 implementation*/
 
 static void ppp(matrix);
@@ -56,11 +58,7 @@ static void mpElimBar(matrix, matrix, poly, int, int);
 /*2
 * create a r x c zero-matrix
 */
-#ifdef MDEBUG
-matrix mpDBNew(int r, int c, char *f, int l)
-#else
 matrix mpNew(int r, int c)
-#endif
 {
   if (r<=0) r=1;
   if ( (((int)(INT_MAX/sizeof(poly))) / r) <= c)
@@ -68,22 +66,14 @@ matrix mpNew(int r, int c)
     Werror("internal error: creating matrix[%d][%d]",r,c);
     return NULL;
   }
-#ifdef MDEBUG
-  matrix rc = (matrix)mmDBAllocBlock(sizeof(ip_smatrix),f,l);
-#else
-  matrix rc = (matrix)AllocSizeOf(ip_smatrix);
-#endif
+  matrix rc = (matrix)omAllocBin(ip_smatrix_bin);
   rc->nrows = r;
   rc->ncols = c;
   rc->rank = r;
   if (c != 0)
   {
     int s=r*c*sizeof(poly);
-#ifdef MDEBUG
-    rc->m = (polyset)mmDBAllocBlock0(s,f,l);
-#else
-    rc->m = (polyset)Alloc0(s);
-#endif
+    rc->m = (polyset)omAlloc0(s);
     //if (rc->m==NULL)
     //{
     //  Werror("internal error: creating matrix[%d][%d]",r,c);
@@ -349,6 +339,9 @@ class mp_permmatrix
   void mpColReorder();
 };
 
+#ifndef SIZE_OF_SYSTEM_PAGE
+#define SIZE_OF_SYSTEM_PAGE 4096
+#endif
 /*2
 * entries of a are minors and go to result (only if not in R) 
 */
@@ -580,8 +573,8 @@ matrix mpWedge(matrix a, int ar)
   i = binom(a->nrows,ar);
   j = binom(a->ncols,ar);
 
-  rowchoise=(int *)Alloc(ar*sizeof(int));
-  colchoise=(int *)Alloc(ar*sizeof(int));
+  rowchoise=(int *)omAlloc(ar*sizeof(int));
+  colchoise=(int *)omAlloc(ar*sizeof(int));
   result =mpNew(i,j);
   tmp=mpNew(ar,ar);
   l = 1; /* k,l:the index in result*/
@@ -657,7 +650,7 @@ BOOLEAN mpKoszul(leftv res,leftv b/*in*/, leftv c/*ip*/,leftv id)
     res->data=(char *)mpNew(1,1);
     return FALSE;
   }
-  int *choise = (int*)Alloc(d*sizeof(int));
+  int *choise = (int*)omAlloc(d*sizeof(int));
   if (id==NULL)
     temp=idMaxIdeal(1);
   else
@@ -775,9 +768,9 @@ void   mpMonomials(matrix c, int r, int var, matrix m)
       pDelete(&MATELEM(m,k,l));
     }
   }
-  Free((ADDRESS)m->m,MATROWS(m)*MATCOLS(m)*sizeof(poly));
+  omfreeSize((ADDRESS)m->m,MATROWS(m)*MATCOLS(m)*sizeof(poly));
   /* allocate monoms in the right size r x MATROWS(c)*/
-  m->m=(polyset)Alloc0(r*MATROWS(c)*sizeof(poly));
+  m->m=(polyset)omAlloc0(r*MATROWS(c)*sizeof(poly));
   MATROWS(m)=r;
   MATCOLS(m)=MATROWS(c);
   m->rank=r;
@@ -993,16 +986,16 @@ row_col_weight::row_col_weight(int i, int j)
 {
   ym = i;
   yn = j;
-  wrow = (float *)Alloc(i*sizeof(float));
-  wcol = (float *)Alloc(j*sizeof(float));
+  wrow = (float *)omAlloc(i*sizeof(float));
+  wcol = (float *)omAlloc(j*sizeof(float));
 }
 
 row_col_weight::~row_col_weight()
 {
   if (ym!=0)
   {
-    Free((ADDRESS)wcol, yn*sizeof(float));
-    Free((ADDRESS)wrow, ym*sizeof(float));
+    omFreeSize((ADDRESS)wcol, yn*sizeof(float));
+    omFreeSize((ADDRESS)wrow, ym*sizeof(float));
   }
 }
 
@@ -1023,7 +1016,7 @@ mp_permmatrix::mp_permmatrix(mp_permmatrix *M)
   a_n = M->s_n;
   sign = M->sign;
   this->mpInitMat();
-  Xarray = (poly *)Alloc0(a_m*a_n*sizeof(poly));
+  Xarray = (poly *)omAlloc0(a_m*a_n*sizeof(poly));
   for (i=a_m-1; i>=0; i--)
   {
     athis = this->mpRowAdr(i);
@@ -1045,13 +1038,13 @@ mp_permmatrix::~mp_permmatrix()
 
   if (a_m != 0)
   {
-    Free((ADDRESS)qrow,a_m*sizeof(int));
-    Free((ADDRESS)qcol,a_n*sizeof(int));
+    omFreeSize((ADDRESS)qrow,a_m*sizeof(int));
+    omFreeSize((ADDRESS)qcol,a_n*sizeof(int));
     if (Xarray != NULL)
     {
       for (k=a_m*a_n-1; k>=0; k--)
         pDelete(&Xarray[k]);
-      Free((ADDRESS)Xarray,a_m*a_n*sizeof(poly));
+      omFreeSize((ADDRESS)Xarray,a_m*a_n*sizeof(poly));
     }
   }
 }
@@ -1354,8 +1347,8 @@ void mp_permmatrix::mpInitMat()
   s_m = a_m;
   s_n = a_n;
   piv_s = 0;
-  qrow = (int *)Alloc(a_m*sizeof(int));
-  qcol = (int *)Alloc(a_n*sizeof(int));
+  qrow = (int *)omAlloc(a_m*sizeof(int));
+  qcol = (int *)omAlloc(a_n*sizeof(int));
   for (k=a_m-1; k>=0; k--) qrow[k] = k;
   for (k=a_n-1; k>=0; k--) qcol[k] = k;
 }
@@ -1673,8 +1666,8 @@ static void mpPartClean(matrix a, int lr, int lc)
 
 static void mpFinalClean(matrix a)
 {
-  Free((ADDRESS)a->m,a->nrows*a->ncols*sizeof(poly));
-  FreeSizeOf((ADDRESS)a,ip_smatrix);
+  omFreeSize((ADDRESS)a->m,a->nrows*a->ncols*sizeof(poly));
+  omFreeBin((ADDRESS)a, ip_smatrix_bin);
 }
 
 /*2

@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(gmalloc.c)
+AC_INIT(mmemory.cc)
 AC_CONFIG_HEADER(mod2.h)
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
@@ -47,9 +47,9 @@ dnl here are some defaults
 
 SINGULAR_MAJOR_VERSION=${SINGULAR_MAJOR_VERSION:-1}
 SINGULAR_MINOR_VERSION=${SINGULAR_MINOR_VERSION:-3}
-SINGULAR_SUB_VERSION=${SINGULAR_SUB_VERSION:-8}
+SINGULAR_SUB_VERSION=${SINGULAR_SUB_VERSION:-9}
 SINGULAR_VERSION="${SINGULAR_VERSION:-$SINGULAR_MAJOR_VERSION${VERSION_SEP}$SINGULAR_MINOR_VERSION${VERSION_SEP}$SINGULAR_SUB_VERSION}"
-VERSION_DATE=${VERSION_DATE:-"May 2000"}
+VERSION_DATE=${VERSION_DATE:-"September 2000"}
 
 dnl pass them on into the Makefiles
 AC_SUBST(SINGULAR_VERSION)
@@ -197,7 +197,6 @@ CPPFLAGS="-I/usr/xpg4/include ${CPPFLAGS}"
 fi
 
 
-
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Checks for programs.
 dnl
@@ -260,7 +259,7 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(limits.h unistd.h,,
   AC_MSG_ERROR(Can not compile without limits.h unistd.h))
 
-AC_CHECK_HEADERS(malloc.h sys/file.h sys/ioctl.h sys/time.h sys/times.h sys/types.h sys/stat.h fcntl.h sys/param.h pwd.h asm/sigcontext.h pwd.h termcap.h termios.h term.h readline/readline.h)
+AC_CHECK_HEADERS(sys/file.h sys/ioctl.h sys/time.h sys/times.h sys/types.h sys/stat.h fcntl.h sys/param.h pwd.h asm/sigcontext.h pwd.h termcap.h termios.h term.h readline/readline.h)
 
 # typedefs, structures
 AC_C_CONST
@@ -275,7 +274,7 @@ AC_PROG_GCC_TRADITIONAL
 AC_FUNC_MMAP
 AC_TYPE_SIGNAL
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS(gettimeofday atexit bcopy getcwd getwd vsnprintf sbrk readlink sleep usleep valloc getpagesize setenv getpwnam)
+AC_CHECK_FUNCS(gettimeofday atexit bcopy getcwd getwd vsnprintf readlink sleep usleep setenv getpwnam)
 
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Find out more about particularity of the system
@@ -361,126 +360,6 @@ if test "$ac_cv_sizeof_voidp" != 4 && "$ac_cv_sizeof_voidp" != 8; then
   AC_MSG_ERROR(need void* to be 4 or 8 bytes long)
 fi
 
-dnl
-dnl
-dnl figure out the page size of your system
-dnl
-dnl
-AC_MSG_CHECKING(size of system page)
-AC_CACHE_VAL(ac_cv_pagesize,
-AC_TRY_RUN([#include <stdio.h>
-#define HAVE_GMALLOC
-#include "gmalloc.c"
-
-main()
-{
-  FILE *f=fopen("conftestval", "w");
-  if (!f) exit(1);
-  fprintf(f, "%d\n", getpagesize());
-  exit(0);
-}], ac_cv_pagesize=`cat conftestval`, ac_cv_pagesize=0, ac_cv_pagesize=0))
-AC_MSG_RESULT($ac_cv_pagesize)
-if test "$ac_cv_pagesize" != 0; then
-  AC_DEFINE_UNQUOTED(SIZE_OF_SYSTEM_PAGE, $ac_cv_pagesize)
-fi
-
-dnl
-dnl figure out what to do w.r.t. valloc
-dnl
-
-AC_MSG_CHECKING(for page aligned valloc)
-AC_CACHE_VAL(ac_cv_have_page_alignment,
-
-cat > _pagetest.c << EOF
-#include <stdio.h>
-#ifndef ADJUSTMENT
-#define ADJUSTMENT 0
-#endif
-#define REPEAT 1000
-main()
-{
-  long i;
-  unsigned long p1 = (unsigned long) valloc(SIZE_OF_SYSTEM_PAGE - ADJUSTMENT);
-  unsigned long p2;
-  unsigned long diffs = 0;
-
-  if ((p1 == 0) || (p1 & (SIZE_OF_SYSTEM_PAGE - 1))) exit(1);
-
-  for (i = 0; i<REPEAT; i++)
-  {
-    p2 = (unsigned long) valloc(SIZE_OF_SYSTEM_PAGE - ADJUSTMENT);
-    if ((p2 == 0) || (p2 & (SIZE_OF_SYSTEM_PAGE - 1))) exit(1);
-    diffs += (p2 - p1);
-    p1 = p2;
-  }
-
-  if ( ((double) diffs)/((double)REPEAT) < ((double) SIZE_OF_SYSTEM_PAGE)*1.05 )
-  {
-    FILE *f=fopen("conftestval", "w");
-    if (!f) exit(1);
-    fprintf(f, "%d\n", SIZE_OF_SYSTEM_PAGE - ADJUSTMENT);
-    exit(0);
-  }
-  exit(1);
-}
-EOF
-
-ac_cv_have_page_alignment=no
-if test "$with_gmalloc" != yes && \
-   test "$ac_cv_func_valloc" = yes && \
-   test "$ac_cv_pagesize" != 0; then
-AC_TRY_RUN([
-#define ADJUSTMENT 0
-#include "_pagetest.c"
-], ac_cv_have_page_alignment="ac_cv_usable_pagesize="`cat  conftestval`,
-ac_cv_have_page_alignment=no, ac_cv_have_page_alignment=no)
-  if test "$ac_cv_have_page_alignment" = no; then
-AC_TRY_RUN([
-#define ADJUSTMENT SIZEOF_VOIDP
-#include "_pagetest.c"
-], ac_cv_have_page_alignment="ac_cv_usable_pagesize="`cat  conftestval`,
-ac_cv_have_page_alignment=no, ac_cv_have_page_alignment=no)
-  fi
-fi
-
-if test "$ac_cv_have_page_alignment" = no && test "$ac_cv_pagesize" != 0; then
-AC_TRY_RUN([
-#define ADJUSTMENT 0
-#define HAVE_GMALLOC
-#include "gmalloc.c"
-#include "_pagetest.c"
-], ac_cv_have_page_alignment="ac_cv_have_gmalloc=yes; ac_cv_usable_pagesize="`cat  conftestval`,
-ac_cv_have_page_alignment=no, ac_cv_have_page_alignment=no)
-  if test "$ac_cv_have_page_alignment" = no; then
-AC_TRY_RUN([
-#define ADJUSTMENT SIZEOF_VOIDP
-#define HAVE_GMALLOC
-#include "gmalloc.c"
-#include "_pagetest.c"
-], ac_cv_have_page_alignment="ac_cv_have_gmalloc=yes; ac_cv_usable_pagesize="`cat  conftestval`,
-ac_cv_have_page_alignment=no, ac_cv_have_page_alignment=no)
-  fi
-fi
-rm -rf conftesteval _pagetest.c
-
-)
-
-if test "$ac_cv_have_page_alignment" != no && test "$ac_cv_with_gmalloc" != no; then
-  eval $ac_cv_have_page_alignment
-  AC_DEFINE_UNQUOTED(PALLOC, valloc)
-  AC_DEFINE_UNQUOTED(PFREE, free)
-  if test "$ac_cv_have_gmalloc" = yes; then
-    AC_DEFINE(HAVE_GMALLOC)
-    AC_MSG_RESULT(from gmalloc)
-  else
-    AC_MSG_RESULT(from system)
-  fi
-  AC_DEFINE_UNQUOTED(SIZE_OF_PAGE, $ac_cv_usable_pagesize)
-else
-  AC_MSG_RESULT(no)
-  AC_MSG_WARN(Advanced memory management disabled)
-fi
-
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl help for configure
 dnl
@@ -519,14 +398,6 @@ AC_ARG_WITH(
   [  --with-exp_type=TYPE    uses TYPE as type of exponents in polynomials
                              -- default type is short
 			     -- possible other types are char and int])
-AC_ARG_WITH(
-  gmalloc,
-  [  --with-gmalloc          use our own gmalloc routines, instead of the ones
-                             provided by the system])
-AC_ARG_WITH(
-  mtrack,
-  [  --with-mtrack           use mpr routines for extended memory tracking
-                             -- works only under ix86-Linux])
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl check for packages we need
 dnl for gmp, MP, factory and libfac, we built them in, even if the libs
@@ -637,8 +508,10 @@ AC_CHECK_LIB(MP, IMP_PutGmpInt)
 AC_CHECK_LIB(MPT, MPT_GetTree)
 AC_CHECK_LIB(singcf, atof)
 AC_CHECK_LIB(singfac, atof)
+AC_CHECK_LIB(omalloc, omTestAddr)
+AC_CHECK_LIB(omalloc_ndebug, main)
 
-AC_CHECK_HEADERS(gmp.h smallgmp.h MP.h  MPT.h factory.h factor.h)
+AC_CHECK_HEADERS(gmp.h smallgmp.h MP.h  MPT.h factory.h factor.h omalloc.h omalloc.c)
 
 if test "$ac_cv_lib_gmp_main" = yes && \
  test "$ac_cv_header_gmp_h" = yes; then
@@ -668,7 +541,22 @@ if test "$ac_cv_lib_singfac_atof" = yes && \
   ac_libfac_ok=yes
 fi
 
+if test "$ac_cv_lib_omalloc_omTestAddr" = yes && \
+   test "$ac_cv_lib_omalloc_ndebug_main" = yes && \
+   test "$ac_cv_header_omalloc_c" = yes && \
+   test "$ac_cv_header_omalloc_h" = yes; then
+  ac_cv_omalloc_ok=yes
+fi
+
+
 # evaluate results
+dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl make sure that omalloc is there
+dnl 
+if test "$ac_cv_omalloc_ok" != yes && test "$enable_omalloc" != yes; then
+  AC_MSG_ERROR(can not build without omalloc)
+fi
+
 AC_MSG_CHECKING(which apint package to use)
 if test "${with_apint}" != gmp && test "${with_apint}" != smallgmp; then
   if test "$ac_gmp_ok" = yes || test "$enable_gmp" = yes; then
@@ -775,6 +663,8 @@ elif  test "${with_libfac}" = yes; then
 else
   AC_MSG_RESULT(no)
 fi
+
+
 AC_SUBST(NEED_LIBS)
 
 AC_MSG_CHECKING(whether to have dbm links)
@@ -828,17 +718,6 @@ else
 fi
 
 AC_SUBST(LD_DYN_FLAGS)
-
-dnl
-dnl check for mtrack
-dnl
-AC_MSG_CHECKING(whether to use mtrack)
-if test "$with_mtrack" = yes && test "$ac_cv_singuname" = ix86-Linux; then
-  AC_MSG_RESULT(yes)
-  AC_DEFINE(HAVE_MTRACK)
-else
-  AC_MSG_RESULT(no)
-fi
 
 dnl
 dnl figure out Exponent_t and Order_t

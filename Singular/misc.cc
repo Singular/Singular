@@ -14,10 +14,11 @@
 #include <limits.h>
 
 #include "mod2.h"
+#include <omalloc.h>
+#include "structs.h"
 #include "tok.h"
 #include "febase.h"
 #include "cntrlc.h"
-#include "mmemory.h"
 #include "page.h"
 #include "ipid.h"
 #include "ipshell.h"
@@ -26,6 +27,7 @@
 #include "timer.h"
 #include "intvec.h"
 #include "ring.h"
+#include "omSingularConfig.h"
 
 #include "static.h"
 #ifdef HAVE_STATIC
@@ -53,6 +55,26 @@ extern "C" {
 #ifdef HAVE_MPSR
 #include <MP_Config.h>
 #endif
+
+/* init bins from structs.h */
+
+omBin MP_INT_bin = omGetSpecBin(sizeof(MP_INT));
+omBin char_ptr_bin = omGetSpecBin(sizeof(char_ptr));
+omBin ideal_bin = omGetSpecBin(sizeof(ideal));
+omBin int_bin = omGetSpecBin(sizeof(int));
+omBin poly_bin = omGetSpecBin(sizeof(poly));
+omBin void_ptr_bin = omGetSpecBin(sizeof(void_ptr));
+omBin indlist_bin = omGetSpecBin(sizeof(indlist));
+omBin naIdeal_bin = omGetSpecBin(sizeof(naIdeal));
+omBin snaIdeal_bin = omGetSpecBin(sizeof(snaIdeal));
+omBin sm_prec_bin = omGetSpecBin(sizeof(sm_prec));
+omBin smprec_bin = omGetSpecBin(sizeof(smprec));
+omBin sip_sideal_bin = omGetSpecBin(sizeof(sip_sideal));
+omBin sip_smap_bin = omGetSpecBin(sizeof(sip_smap));
+omBin sip_sring_bin = omGetSpecBin(sizeof(sip_sring));
+omBin ip_sideal_bin = omGetSpecBin(sizeof(ip_sideal));
+omBin ip_smap_bin = omGetSpecBin(sizeof(ip_smap));
+omBin ip_sring_bin = omGetSpecBin(sizeof(ip_sring));
 
 /*0 implementation*/
 
@@ -234,7 +256,7 @@ void singular_example(char *str)
           iiEStart(s,IDPROC(h));
           return;
         }
-        else FreeL((ADDRESS)s);
+        else omFree((ADDRESS)s);
       }
     }
   }
@@ -254,13 +276,13 @@ void singular_example(char *str)
       fseek(fd, 0, SEEK_END);
       length = ftell(fd);
       fseek(fd, 0, SEEK_SET);
-      s = (char*) AllocL((length+20)*sizeof(char));
+      s = (char*) omAlloc((length+20)*sizeof(char));
       got = fread(s, sizeof(char), length, fd);
       fclose(fd);
       if (got != length)
       {
         Werror("Error while reading file %s", sing_file);
-        FreeL(s);
+        omFree(s);
       }
       else
       {
@@ -356,7 +378,7 @@ BOOLEAN setOption(leftv res, leftv v)
       }
       else
       {
-        n=mstrdup(v->name);
+        n=omStrDup(v->name);
       }
     }
 
@@ -364,7 +386,7 @@ BOOLEAN setOption(leftv res, leftv v)
 
     if(strcmp(n,"get")==0)
     {
-      intvec *w=NewIntvec1(2);
+      intvec *w=new intvec(2);
       (*w)[0]=test;
       (*w)[1]=verbose;
       res->rtyp=INTVEC_CMD;
@@ -452,7 +474,7 @@ BOOLEAN setOption(leftv res, leftv v)
     }
     Werror("unknown option `%s`",n);
   okay:
-    FreeL((ADDRESS)n);
+    omFree((ADDRESS)n);
     v=v->next;
   } while (v!=NULL);
   #ifdef HAVE_TCL
@@ -496,6 +518,9 @@ BOOLEAN setOption(leftv res, leftv v)
       }
     }
   #endif
+    // set global variable to show memory usage
+    if (BVERBOSE(V_SHOW_MEM)) om_sing_opt_show_mem = 1;
+    else om_sing_opt_show_mem = 0;
   return FALSE;
 }
 
@@ -539,10 +564,10 @@ char * showOption()
         if (tmp & Sy_bit(i)) StringAppend(" %d",i+32);
       }
     }
-    return mstrdup(StringAppendS(""));
+    return omStrDup(StringAppendS(""));
   }
   else
-    return mstrdup(StringAppendS(" none"));
+    return omStrDup(StringAppendS(" none"));
 }
 
 char * versionString()
@@ -619,8 +644,14 @@ char * versionString()
 #ifdef MDEBUG
               StringAppend("MDEBUG=%d,",MDEBUG);
 #endif
-#ifdef MTRACK
-              StringAppendS("MTRACK,");
+#ifdef OM_CHECK
+              StringAppend("OM_CHECK=%d,",OM_CHECK);
+#endif
+#ifdef OM_TRACK
+              StringAppend("OM_TRACK=%d,",OM_TRACK);
+#endif
+#ifdef OM_NDEBUG
+              StringAppend("OM_NDEBUG,");
 #endif
 #ifdef PDEBUG
               StringAppendS("PDEBUG,");

@@ -1,12 +1,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: prProcs.cc,v 1.2 2000-04-27 10:07:10 obachman Exp $ */
+/* $Id: prProcs.cc,v 1.3 2000-08-14 12:56:47 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for primitive poly arithmetic
 */
 #include "mod2.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "polys.h"
 #include "polys-comp.h"
 #include "prProcs.h"
@@ -39,7 +39,7 @@ do                                              \
 {                                               \
   poly __p = p;                                 \
   p = pNext(__p);                               \
-  FreeHeap(__p, r->mm_specHeap);                \
+  omFreeBin(__p, r->PolyBin);                \
 }                                               \
 while(0)
 /***************************************************************
@@ -179,7 +179,7 @@ poly  pr_Mult_m_General(poly p,
   {
     while (p != NULL)
     {
-      pNext(q) = AllocHeapType(ri->mm_specHeap, poly);
+      prAllocMonom(pNext(q), ri);
       q = pNext(q);
       pSetCoeff0(q, nMult(ln, pGetCoeff(p)));
       prMonAdd(q, p, m, ri);
@@ -191,12 +191,12 @@ poly  pr_Mult_m_General(poly p,
     poly r;
     while (p != NULL)
     {
-      r = AllocHeapType(ri->mm_specHeap, poly);
+      prAllocMonom(r, ri);
       prMonAdd(r, p, m, ri);
 
       if (prComp0(r, spNoether, ri) == -1)
       {
-        FreeHeap(r, ri->mm_specHeap);
+        omFreeBin(r, ri->PolyBin);
         break;
       }
       q = pNext(q) = r;
@@ -261,7 +261,7 @@ poly pr_Minus_m_Mult_q_General (poly p,
 
   if (p == NULL) goto Finish;       // we are done if p is 0
   
-  qm = AllocHeapType(r->mm_specHeap,poly);
+  prAllocMonom(qm, r);
   assume(pGetComp(q) == 0 || pGetComp(m) == 0);
   prMonAdd(qm, q, m, r);
   
@@ -308,7 +308,7 @@ poly pr_Minus_m_Mult_q_General (poly p,
         goto Finish; 
       }
       // construct new qm 
-      qm = AllocHeapType(r->mm_specHeap,poly);
+      prAllocMonom(qm, r);
       assume(pGetComp(q) == 0 || pGetComp(m) == 0);
       prMonAdd(qm, q, m, r);
       goto Top;
@@ -333,7 +333,7 @@ poly pr_Minus_m_Mult_q_General (poly p,
    }
    
    nDelete(&tneg);
-   if (qm != NULL) FreeHeap(qm, r->mm_specHeap);
+   if (qm != NULL) omFreeBin(qm, r->PolyBin);
    if (lp != NULL) *lp = l;
    
    assume(prTest(pNext(&rp), r));

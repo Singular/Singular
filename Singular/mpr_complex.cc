@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.25 2000-06-30 11:27:21 pohl Exp $ */
+/* $Id: mpr_complex.cc,v 1.26 2000-08-14 12:56:40 obachman Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -9,14 +9,14 @@
 *
 */
 
-// WARNING! ALWAYS use AllocL and FreeL when alloc. memory for some char* !!
+// WARNING! ALWAYS use omAlloc and FreeL when alloc. memory for some char* !!
 
 #include "mod2.h"
 //#ifdef HAVE_MPR
 #include "tok.h"
 #include "structs.h"
 #include "febase.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "numbers.h"
 #include "longrat.h"
 #include <math.h>
@@ -39,6 +39,7 @@
 #define DEFPREC        20         // minimum number of digits (output operations)
 size_t gmp_output_digits= DEFPREC;
 
+extern int mmInit(void);
 int dummy=mmInit();
 static gmp_float gmpRel(0.0);
 static gmp_float diff(0.0);
@@ -79,12 +80,12 @@ void gmp_float::setFromStr( char * in )
   if (*in == '.')
   {
     int len = strlen(in)+2;
-    char* c_in = (char*) Alloc(len);
+    char* c_in = (char*) omAlloc(len);
     *c_in = '0';
     strcpy(&(c_in[1]), in);
     
     mpf_set_str( t, c_in, 10 );
-    Free((void*)c_in, len);
+    omFreeSize((void*)c_in, len);
   }
   else
   {
@@ -441,7 +442,7 @@ char *nicifyFloatStr( char * in, mp_exp_t exponent, size_t oprec, int *size, int
   if ( strlen(in) == 0 )
   {
     *size= 2*sizeof(char);
-    return mstrdup("0");
+    return omStrDup("0");
   }
 
   if ( ((unsigned int)ABS(exponent) <= oprec)
@@ -452,7 +453,7 @@ char *nicifyFloatStr( char * in, mp_exp_t exponent, size_t oprec, int *size, int
       int eexponent= (exponent >= 0) ? 0 : -exponent;
       int eeexponent= (exponent >= 0) ? exponent : 0;
       *size= (strlen(in)+15+eexponent) * sizeof(char);
-      out= (char*)AllocL(*size);
+      out= (char*)omAlloc(*size);
       memset(out,0,*size);
 
       strcpy(out,csign);
@@ -472,7 +473,7 @@ char *nicifyFloatStr( char * in, mp_exp_t exponent, size_t oprec, int *size, int
     else if ( exponent+sign > (int)strlen(in) )
     {
       *size= (strlen(in)+exponent+12)*sizeof(char);
-      out= (char*)AllocL(*size);
+      out= (char*)omAlloc(*size);
       memset(out,0,*size);
       sprintf(out,"%s%s",csign,in+sign);
       memset(out+strlen(out),'0',exponent-strlen(in)+sign);
@@ -480,7 +481,7 @@ char *nicifyFloatStr( char * in, mp_exp_t exponent, size_t oprec, int *size, int
     else
     {
       *size= (strlen(in)+2) * sizeof(char) + 10;
-      out= (char*)AllocL(*size);
+      out= (char*)omAlloc(*size);
       memset(out,0,*size);
       sprintf(out,"%s%s",csign,in+sign);
     }
@@ -496,14 +497,14 @@ char *nicifyFloatStr( char * in, mp_exp_t exponent, size_t oprec, int *size, int
         c++;
       }
       *size= (strlen(in)+12+c) * sizeof(char) + 10;
-      out= (char*)AllocL(*size);
+      out= (char*)omAlloc(*size);
       memset(out,0,*size);
       sprintf(out,"%s0.%se%s%d",csign,in+sign,exponent>=0?"+":"",(int)exponent);
 //      }
 //      else
 //      {
 //        *size=2;
-//        out= (char*)AllocL(*size);
+//        out= (char*)omAlloc(*size);
 //        strcpy(out,"0");
 //      }
   }
@@ -518,7 +519,7 @@ char *floatToStr( const gmp_float & r, const unsigned int oprec )
   char *nout,*out,*in;
 
   insize= (oprec+2) * sizeof(char) + 10;
-  in= (char*)AllocL( insize );
+  in= (char*)omAlloc( insize );
 
   mpf_get_str(in,&exponent,10,oprec,*(r.mpfp()));
 
@@ -526,22 +527,22 @@ char *floatToStr( const gmp_float & r, const unsigned int oprec )
   && (exponent < (int)oprec)
   && (strlen(in)-(in[0]=='-'?1:0) == oprec) )
   {
-    FreeL( (ADDRESS) in );
+    omFree( (ADDRESS) in );
     insize= (exponent+oprec+2) * sizeof(char) + 10;
-    in= (char*)AllocL( insize );
+    in= (char*)omAlloc( insize );
     int newprec= exponent+oprec;
     mpf_get_str(in,&exponent,10,newprec,*(r.mpfp()));
   }
   nout= nicifyFloatStr( in, exponent, oprec, &size, SIGN_EMPTY );
-  FreeL( (ADDRESS) in );
-  out= (char*)AllocL( (strlen(nout)+1) * sizeof(char) );
+  omFree( (ADDRESS) in );
+  out= (char*)omAlloc( (strlen(nout)+1) * sizeof(char) );
   strcpy( out, nout );
-  FreeL( (ADDRESS) nout );
+  omFree( (ADDRESS) nout );
 
   return out;
 #else
   // for testing purpose...
-  char *out= (char*)AllocL( (1024) * sizeof(char) );
+  char *out= (char*)omAlloc( (1024) * sizeof(char) );
   sprintf(out,"% .10f",(double)r);
   return out;
 #endif
@@ -644,7 +645,7 @@ char *complexToStr( gmp_complex & c, const unsigned int oprec )
     if (rField_is_long_C())
     {
       int len=(strlen(in_real)+strlen(in_imag)+7+strlen(currRing->parameter[0]))*sizeof(char);
-      out=(char*)AllocL(len);
+      out=(char*)omAlloc(len);
       memset(out,0,len);
       if (  !c.real().isZero() )  // (-23-i*5.43) or (15.1+i*5.3)
 	sprintf(out,"(%s%s%s*%s)",in_real,c.imag().sign()>=0?"+":"-",currRing->parameter[0],in_imag);
@@ -661,15 +662,15 @@ char *complexToStr( gmp_complex & c, const unsigned int oprec )
     else
     {
       int len=(strlen(in_real)+strlen(in_imag)+9) * sizeof(char);
-      out=(char*)AllocL( len );
+      out=(char*)omAlloc( len );
       memset(out,0,len);
       if ( !c.real().isZero() ) 
 	sprintf(out,"(%s%s%s)",in_real,c.imag().sign()>=0?"+I*":"-I*",in_imag);
       else
 	sprintf(out,"(%s%s)",c.imag().sign()>=0?"I*":"-I*",in_imag);
     }
-    FreeL( (ADDRESS) in_real );
-    FreeL( (ADDRESS) in_imag );
+    omFree( (ADDRESS) in_real );
+    omFree( (ADDRESS) in_imag );
   }
   else 
   {

@@ -500,7 +500,7 @@ static spectrumState   spectrumCompute( poly h,lists *L,int fast )
 
   if( hasLinearTerm( h ) )
   {
-    *L = (lists)AllocSizeOf( slists );
+    *L = (lists)omAllocBin( slists _bin);
     (*L)->Init( 1 );
     (*L)->m[0].rtyp = INT_CMD;    //  milnor number
     /* (*L)->m[0].data = (void*)0;a  -- done by Init */
@@ -588,7 +588,7 @@ static spectrumState   spectrumCompute( poly h,lists *L,int fast )
     //  return only the Milnor number
     // -------------------------------
 
-    *L = (lists)AllocSizeOf( slists );
+    *L = (lists)omAllocBin( slists _bin);
     (*L)->Init( 1 );
     (*L)->m[0].rtyp = INT_CMD;    //  milnor number
     /* (*L)->m[0].data = (void*)0;a  -- done by Init */

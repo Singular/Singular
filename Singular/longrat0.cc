@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat0.cc,v 1.10 1999-11-15 17:20:21 obachman Exp $ */
+/* $Id: longrat0.cc,v 1.11 2000-08-14 12:56:37 obachman Exp $ */
 /*
 * ABSTRACT -
 * IO for long rational numbers (Hubert Grassmann)
@@ -11,7 +11,7 @@
 #include <string.h>
 #include "mod2.h"
 #include "tok.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "febase.h"
 #include "longrat.h"
 
@@ -53,10 +53,10 @@ char * nlRead (char *s, number *a)
     *a = nlInit(1);
     return s;
   }
-  *a=(number)AllocSizeOf(rnumber);
+  *a=(number)omAllocBin(rnumber_bin);
   {
     (*a)->s = 3;
-#if defined(LDEBUG) && ! defined(HAVE_ASO)
+#if defined(LDEBUG)
     (*a)->debug=123456;
 #endif
     MP_INT *z=&((*a)->z);
@@ -93,7 +93,7 @@ char * nlRead (char *s, number *a)
       && (mpz_cmp_si(&(*a)->z,(long)ui)==0))
       {
         mpz_clear(&(*a)->z);
-        FreeSizeOf((ADDRESS)(*a),rnumber);
+        omFreeBin((ADDRESS)(*a), rnumber_bin);
         (*a)=INT_TO_SR(ui);
       }
     }
@@ -128,7 +128,7 @@ void nlWrite (number &a)
     int l=mpz_sizeinbase(&a->z,10);
     if (a->s<2) l=max(l,mpz_sizeinbase(&a->n,10));
     l+=2;
-    s=(char*)Alloc(l);
+    s=(char*)omAlloc(l);
     z=mpz_get_str(s,10,&a->z);
     StringAppendS(z);
     if (a->s!=3)
@@ -137,7 +137,7 @@ void nlWrite (number &a)
       z=mpz_get_str(s,10,&a->n);
       StringAppendS(z);
     }
-    Free((ADDRESS)s,l);
+    omFreeSize((ADDRESS)s,l);
   }
 }
 

@@ -2,21 +2,21 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.26 2000-01-11 17:51:14 Singular Exp $ */
+/* $Id: scanner.l,v 1.27 2000-08-14 12:56:48 obachman Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
 
 #include "mod2.h"
+#include <omalloc.h>
 #include "tok.h"
 #include "stype.h"
 #include "ipshell.h"
-#include "mmemory.h"
 #include "febase.h"
 
 int feReadLine(char* b, int l);
-#define ALLOC(a) Alloc((a))
+#define ALLOC(a) omAlloc((a))
 int yylineno  = 0;
 int blocknest = 0;
 extern char * yytext;
@@ -26,14 +26,18 @@ extern int inerror;
 
 static char * dupyytext()
 {
+  char* s;
   if (yyleng>0) yytext[yyleng-1] = '\0';
-  return mstrdup((char *)yytext);
+  s = omStrDup((char *)yytext);
+  omMarkAsStaticAddr(s);
+  return s;
 }
 
 static char * dupyytextNL()
 {
   int i = yyleng;//strlen((char *)yytext);
-  char * rc = (char*)AllocL( 3 + i );
+  char * rc = (char*)omAlloc( 3 + i );
+  omMarkAsStaticAddr(rc);
   if (i>0)
   {
     strncpy( rc, (char *)yytext, i-1 );
@@ -127,14 +131,14 @@ example[ \t\n]*          { yy_noeof = noeof_asstring;
 
 proc[ \t]+{name}[ \t]*\( {
                            char c; char *cp;
-                           lvalp->name = mstrdup(iiProcName((char *)yytext,c,cp));
+                           lvalp->name = omStrDup(iiProcName((char *)yytext,c,cp));
                            yy_noeof = noeof_procname;
                            blocknest = 1;
                            BEGIN(brace);
                            return PROC_DEF;
                          }
 <asstring>[^;\n]+        {
-                           lvalp->name = mstrdup((char *)yytext);
+                           lvalp->name = omStrDup((char *)yytext);
                            yy_noeof = 0; BEGIN(INITIAL);
                            return STRINGTOK;
                          }
@@ -177,11 +181,11 @@ proc[ \t]+{name}[ \t]*\( {
 <bracket>","             { return ','; }
 <bracket>[ \t\n]*        { ; }
 <bracket>[^\(\), \t\n]*  {
-                           lvalp->name = mstrdup((char *)yytext);
+                           lvalp->name = omStrDup((char *)yytext);
                            return STRINGTOK;
                          }
 <bracket>\"[^\"]*\"      {
-                           lvalp->name = mstrdup((char *)yytext);
+                           lvalp->name = omStrDup((char *)yytext);
                            return STRINGTOK;
                          }
 <bracket>")"             {
@@ -256,7 +260,7 @@ proc[ \t]+{name}[ \t]*\( {
 "**"                     { return '^'; }
 \\                       { return '\\'; }
 newline                  {
-                           lvalp->name = mstrdup("\n");
+                           lvalp->name = omStrDup("\n");
                            return STRINGTOK;
                          }
 {integer}                {
@@ -278,10 +282,8 @@ newline                  {
                            #ifdef MM_STAT
                            mmStat(-500);
                            #endif
-                           #ifdef MDEBUG
-                             #ifdef MLIST
-                             mmTestList(stdout, 0);
-                             #endif
+                           #ifdef OM_TRACK
+                             omPrintUsedTrackAddrs(stdout);
                            #endif
                            m2_end(0);
                          }
@@ -311,7 +313,7 @@ newline                  {
                              rc = IsCmd((char *)yytext,lvalp->i);
                              if (rc) return rc;
                            }
-                           lvalp->name = mstrdup((char *)yytext);
+                           lvalp->name = omStrDup((char *)yytext);
                            return UNKNOWN_IDENT;
                          }
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.40 2000-02-10 16:46:54 Singular Exp $ */
+/* $Id: longalg.cc,v 1.41 2000-08-14 12:56:35 obachman Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -11,7 +11,7 @@
 #include "mod2.h"
 #include "structs.h"
 #include "tok.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "febase.h"
 #include "longrat.h"
 #include "modulop.h"
@@ -85,8 +85,8 @@ void naSetChar(int i, BOOLEAN complete, char ** param, int pars)
     int j;
     for (j=naI->anz-1; j>=0; j--)
        napDelete (&naI->liste[j]);
-    Free((ADDRESS)naI->liste,naI->anz*sizeof(alg));
-    FreeSizeOf((ADDRESS)naI,snaIdeal);
+    omFreeSize((ADDRESS)naI->liste,naI->anz*sizeof(alg));
+    omFreeBin((ADDRESS)naI, snaIdeal_bin);
     naI=NULL;
   }
   naMap = naCopy;
@@ -176,7 +176,7 @@ void naSetChar(int i, BOOLEAN complete, char ** param, int pars)
 */
 static alg napInit(int i)
 {
-  alg a = (alg)Alloc0(napMonomSize);
+  alg a = (alg)omAlloc0(napMonomSize);
 
   a->ko = nacInit(i);
   if (!nacIsZero(a->ko))
@@ -185,7 +185,7 @@ static alg napInit(int i)
   }
   else
   {
-    Free((ADDRESS)a, napMonomSize);
+    omFreeSize((ADDRESS)a, napMonomSize);
     return NULL;
   }
 }
@@ -195,7 +195,7 @@ static alg napInit(int i)
 */
 alg napInitz(number z)
 {
-  alg a = (alg)Alloc0(napMonomSize);
+  alg a = (alg)omAlloc0(napMonomSize);
 
   a->ko = z;
   return a;
@@ -212,7 +212,7 @@ static void napDelete1(alg *p)
   {
     *p = h->ne;
     nacDelete(&(h->ko));
-    Free((ADDRESS)h, napMonomSize);
+    omFreeSize((ADDRESS)h, napMonomSize);
   }
 }
 
@@ -228,7 +228,7 @@ void napDelete(alg *p)
     w = h;
     h = h->ne;
     nacDelete(&(w->ko));
-    Free((ADDRESS)w, napMonomSize);
+    omFreeSize((ADDRESS)w, napMonomSize);
   }
   *p = NULL;
 }
@@ -243,16 +243,16 @@ static alg napCopy(alg p)
 
   alg w, a;
 
-  mmTestP(p,napMonomSize);
-  a = w = (alg)Alloc(napMonomSize);
+  omCheckAddrSize(p,napMonomSize);
+  a = w = (alg)omAlloc(napMonomSize);
   memcpy(w->e, p->e, naNumbOfPar * SIZEOF_PARAMETER);
   w->ko = nacCopy(p->ko);
   loop
   {
     p=p->ne;
     if (p==NULL) break;
-    mmTestP(p,napMonomSize);
-    a->ne = (alg)Alloc(napMonomSize);
+    omCheckAddrSize(p,napMonomSize);
+    a->ne = (alg)omAlloc(napMonomSize);
     a = a->ne;
     memcpy(a->e, p->e, naNumbOfPar * SIZEOF_PARAMETER);
     a->ko = nacCopy(p->ko);
@@ -269,16 +269,16 @@ static alg napCopyNeg(alg p)
   alg w, a;
 
   if (p==NULL) return NULL;
-  mmTestP(p,napMonomSize);
-  a = w = (alg)Alloc(napMonomSize);
+  omCheckAddrSize(p,napMonomSize);
+  a = w = (alg)omAlloc(napMonomSize);
   memcpy(w->e, p->e, naNumbOfPar * SIZEOF_PARAMETER);
   w->ko = nacNeg(nacCopy(p->ko));
   loop
   {
     p=p->ne;
     if (p==NULL) break;
-    mmTestP(p,napMonomSize);
-    a->ne = (alg)Alloc(napMonomSize);
+    omCheckAddrSize(p,napMonomSize);
+    a->ne = (alg)omAlloc(napMonomSize);
     a = a->ne;
     memcpy(a->e, p->e, naNumbOfPar * SIZEOF_PARAMETER);
     a->ko = nacNeg(nacCopy(p->ko));
@@ -294,8 +294,8 @@ static int  napComp(alg p, alg q)
 {
   int  i = 0;
 
-  mmTestP(p,napMonomSize);
-  mmTestP(q,napMonomSize);
+  omCheckAddrSize(p,napMonomSize);
+  omCheckAddrSize(q,napMonomSize);
   while (p->e[i] == q->e[i])
   {
     i++;
@@ -318,11 +318,11 @@ alg napAdd(alg p1, alg p2)
 
   if (p1==NULL) return p2;
   if (p2==NULL) return p1;
-  mmTestP(p1,napMonomSize);
-  mmTestP(p2,napMonomSize);
+  omCheckAddrSize(p1,napMonomSize);
+  omCheckAddrSize(p2,napMonomSize);
   a1 = p1;
   a2 = p2;
-  a = p  = (alg)Alloc(napMonomSize);
+  a = p  = (alg)omAlloc(napMonomSize);
   loop
   {
     c = napComp(a1, a2);
@@ -335,7 +335,7 @@ alg napAdd(alg p1, alg p2)
         a->ne= a2;
         break;
       }
-      mmTestP(a1,napMonomSize);
+      omCheckAddrSize(a1,napMonomSize);
     }
     else if (c == -1)
     {
@@ -346,7 +346,7 @@ alg napAdd(alg p1, alg p2)
         a->ne = a1;
         break;
       }
-      mmTestP(a2,napMonomSize);
+      omCheckAddrSize(a2,napMonomSize);
     }
     else
     {
@@ -374,12 +374,12 @@ alg napAdd(alg p1, alg p2)
         a->ne = a1;
         break;
       }
-      mmTestP(a1,napMonomSize);
-      mmTestP(a2,napMonomSize);
+      omCheckAddrSize(a1,napMonomSize);
+      omCheckAddrSize(a2,napMonomSize);
     }
   }
   a = p->ne;
-  Free((ADDRESS)p, napMonomSize);
+  omFreeSize((ADDRESS)p, napMonomSize);
   return a;
 }
 
@@ -393,7 +393,7 @@ static alg napNeg(alg a)
 
   while (p!=NULL)
   {
-    mmTestP(p,napMonomSize);
+    omCheckAddrSize(p,napMonomSize);
     p->ko = nacNeg(p->ko);
     p = p->ne;
   }
@@ -409,7 +409,7 @@ static void napMultN(alg p, number z)
 
   while (p!=NULL)
   {
-    mmTestP(p,napMonomSize);
+    omCheckAddrSize(p,napMonomSize);
     t = nacMult(p->ko, z);
     nacNormalize(t);
     nacDelete(&p->ko);
@@ -547,13 +547,13 @@ static alg napRemainder(alg f, const alg  g)
 {
   alg a, h, qq;
 
-  qq = (alg)Alloc(napMonomSize);
+  qq = (alg)omAlloc(napMonomSize);
   qq->ne = NULL;
   a = f;
   do
   {
-    mmTestP(a,napMonomSize);
-    mmTestP(g,napMonomSize);
+    omCheckAddrSize(a,napMonomSize);
+    omCheckAddrSize(g,napMonomSize);
     qq->e[0] = a->e[0] - g->e[0];
     qq->ko = nacDiv(a->ko, g->ko);
     qq->ko = nacNeg(qq->ko);
@@ -563,7 +563,7 @@ static alg napRemainder(alg f, const alg  g)
     a = napAdd(a, h);
   }
   while ((a!=NULL) && (a->e[0] >= g->e[0]));
-  Free((ADDRESS)qq, napMonomSize);
+  omFreeSize((ADDRESS)qq, napMonomSize);
   return a;
 }
 
@@ -574,13 +574,13 @@ static void napDivMod(alg f, alg  g, alg *q, alg *r)
 {
   alg a, h, b, qq;
 
-  qq = (alg)Alloc(napMonomSize);
+  qq = (alg)omAlloc(napMonomSize);
   qq->ne = b = NULL;
   a = f;
   do
   {
-    mmTestP(a,napMonomSize);
-    mmTestP(g,napMonomSize);
+    omCheckAddrSize(a,napMonomSize);
+    omCheckAddrSize(g,napMonomSize);
     qq->e[0] = a->e[0] - g->e[0];
     qq->ko = nacDiv(a->ko, g->ko);
     b = napAdd(b, napCopy(qq));
@@ -591,7 +591,7 @@ static void napDivMod(alg f, alg  g, alg *q, alg *r)
     a = napAdd(a, h);
   }
   while ((a!=NULL) && (a->e[0] >= g->e[0]));
-  Free((ADDRESS)qq, napMonomSize);
+  omFreeSize((ADDRESS)qq, napMonomSize);
   *q = b;
   *r = a;
 }
@@ -709,7 +709,7 @@ static int  napDeg(alg p)
 {
   int  d = 0, i;
 
-  mmTestP(p,napMonomSize);
+  omCheckAddrSize(p,napMonomSize);
   for (i = naNumbOfPar-1; i>=0; i--)
     d += p->e[i];
   return d;
@@ -721,9 +721,9 @@ static int  napDeg(alg p)
 static int  napMaxDeg(alg p)
 {
   int  d = 0;
-  mmTestP(p,napMonomSize);
   while(p!=NULL)
   {
+    omCheckAddrSize(p,napMonomSize);
     d=max(d,napDeg(p));
     p=p->ne;
   }
@@ -737,9 +737,9 @@ static int  napMaxDegLen(alg p, int &l)
 {
   int  d = 0;
   int ll=0;
-  mmTestP(p,napMonomSize);
   while(p!=NULL)
   {
+    omCheckAddrSize(p,napMonomSize);
     d=max(d,napDeg(p));
     p=p->ne;
     ll++;
@@ -767,7 +767,7 @@ void napWrite(alg p)
     loop
     {
       BOOLEAN wroteCoeff=FALSE;
-      mmTestP(p,napMonomSize);
+      omCheckAddrSize(p,napMonomSize);
       if ((napDeg(p)==0)
       || ((!nacIsOne(p->ko))
         && (!nacIsMOne(p->ko))))
@@ -830,7 +830,7 @@ static char  *napRead(char *s, alg *b)
 {
   alg a;
   int  i;
-  a = (alg)Alloc0(napMonomSize);
+  a = (alg)omAlloc0(napMonomSize);
   if ((*s >= '0') && (*s <= '9'))
   {
     s = nacRead(s, &(a->ko));
@@ -1065,7 +1065,7 @@ static alg napGcd(alg a, alg b)
     g->e[0] = napExp(a, b);
     return g;
   }
-  x = (alg)Alloc0(napMonomSize);
+  x = (alg)omAlloc0(napMonomSize);
   g=a;
   h=b;
   if (!naIsChar0) x = napInit(1);
@@ -1125,14 +1125,14 @@ BOOLEAN napDivPoly (alg p, alg q)
 */
 alg napRedp (alg q)
 {
-  alg h = (alg)Alloc0(napMonomSize);
+  alg h = (alg)omAlloc0(napMonomSize);
   int i=0,j;
 
   loop
   {
     if (napDivPoly (naI->liste[i], q))
     {
-      mmTestP((ADDRESS)q,napMonomSize);
+      omCheckAddrSize((ADDRESS)q,napMonomSize);
       //StringSetS("");
       //napWrite(q);
       //napWrite(naI->liste[i]);
@@ -1197,11 +1197,11 @@ number naInit(int i)
 {
   if (i!=0)
   {
-    lnumber l = (lnumber)AllocSizeOf(rnumber);
+    lnumber l = (lnumber)omAllocBin(rnumber_bin);
     l->z = napInit(i);
     if (l->z==NULL)
     {
-      FreeSizeOf((ADDRESS)l, rnumber);
+      omFreeBin((ADDRESS)l,  rnumber_bin);
       return NULL;
     }
     l->s = 2;
@@ -1214,7 +1214,7 @@ number naInit(int i)
 
 number  naPar(int i)
 {
-  lnumber l = (lnumber)AllocSizeOf(rnumber);
+  lnumber l = (lnumber)omAllocBin(rnumber_bin);
   l->s = 2;
   l->z = napInit(1);
   l->z->e[i-1]=1;
@@ -1272,11 +1272,7 @@ void naDelete(number *p)
   if (l==NULL) return;
   napDelete(&(l->z));
   napDelete(&(l->n));
-#if defined(MDEBUG) && defined(LDEBUG)
-  mmDBFreeBlock((ADDRESS)l, sizeof(rnumber),f,lno);
-#else
-  FreeSizeOf((ADDRESS)l, rnumber);
-#endif
+  omFreeBin((ADDRESS)l,  rnumber_bin);
   *p = NULL;
 }
 
@@ -1289,7 +1285,7 @@ number naCopy(number p)
   naTest(p);
   lnumber erg;
   lnumber src = (lnumber)p;
-  erg = (lnumber)Alloc0SizeOf(rnumber);
+  erg = (lnumber)omAlloc0Bin(rnumber_bin);
   erg->z = napCopy(src->z);
   erg->n = napCopy(src->n);
   erg->s = src->s;
@@ -1315,9 +1311,9 @@ number naAdd(number la, number lb)
   lnumber b = (lnumber)lb;
   if (a==NULL) return naCopy(lb);
   if (b==NULL) return naCopy(la);
-  mmTestP(a,sizeof(rnumber));
-  mmTestP(b,sizeof(rnumber));
-  lu = (lnumber)AllocSizeOf(rnumber);
+  omCheckAddrSize(a,sizeof(rnumber));
+  omCheckAddrSize(b,sizeof(rnumber));
+  lu = (lnumber)omAllocBin(rnumber_bin);
   if (b->n!=NULL) x = napMult(napCopy(a->z), napCopy(b->n));
   else            x = napCopy(a->z);
   if (a->n!=NULL) y = napMult(napCopy(b->z), napCopy(a->n));
@@ -1325,7 +1321,7 @@ number naAdd(number la, number lb)
   lu->z = napAdd(x, y);
   if (lu->z==NULL)
   {
-    FreeSizeOf((ADDRESS)lu, rnumber);
+    omFreeBin((ADDRESS)lu,  rnumber_bin);
     return (number)NULL;
   }
   if (a->n!=NULL)
@@ -1370,9 +1366,9 @@ number naSub(number la, number lb)
   lnumber a = (lnumber)la;
   lnumber b = (lnumber)lb;
 
-  mmTestP(a,sizeof(rnumber));
-  mmTestP(b,sizeof(rnumber));
-  lu = (lnumber)AllocSizeOf(rnumber);
+  omCheckAddrSize(a,sizeof(rnumber));
+  omCheckAddrSize(b,sizeof(rnumber));
+  lu = (lnumber)omAllocBin(rnumber_bin);
   if (b->n!=NULL) x = napMult(napCopy(a->z), napCopy(b->n));
   else            x = napCopy(a->z);
   if (a->n!=NULL) y = napMult(napCopy(b->z), napCopyNeg(a->n));
@@ -1380,7 +1376,7 @@ number naSub(number la, number lb)
   lu->z = napAdd(x, y);
   if (lu->z==NULL)
   {
-    FreeSizeOf((ADDRESS)lu, rnumber);
+    omFreeBin((ADDRESS)lu,  rnumber_bin);
     return (number)NULL;
   }
   if (a->n!=NULL)
@@ -1414,12 +1410,12 @@ number naMult(number la, number lb)
   lnumber lo;
   alg x;
 
-  mmTestP(a,sizeof(rnumber));
-  mmTestP(b,sizeof(rnumber));
+  omCheckAddrSize(a,sizeof(rnumber));
+  omCheckAddrSize(b,sizeof(rnumber));
   naTest(la);
   naTest(lb);
 
-  lo = (lnumber)AllocSizeOf(rnumber);
+  lo = (lnumber)omAllocBin(rnumber_bin);
   lo->z = napMult(napCopy(a->z), napCopy(b->z));
 
   if (a->n==NULL)
@@ -1467,7 +1463,7 @@ number naMult(number la, number lb)
   lo->s = 0;
   if(lo->z==NULL)
   {
-    FreeSizeOf((ADDRESS)lo,rnumber);
+    omFreeBin((ADDRESS)lo, rnumber_bin);
     lo=NULL;
   }
   naTest((number)lo);
@@ -1486,7 +1482,7 @@ number naIntDiv(number la, number lb)
     WerrorS("div. by 0");
     return NULL;
   }
-  res = (lnumber)AllocSizeOf(rnumber);
+  res = (lnumber)omAllocBin(rnumber_bin);
   res->z = napCopy(a->z);
   res->n = napCopy(b->z);
   res->s = 0;
@@ -1516,9 +1512,9 @@ number naDiv(number la, number lb)
     WerrorS("div. by 0");
     return NULL;
   }
-  mmTestP(a,sizeof(rnumber));
-  mmTestP(b,sizeof(rnumber));
-  lo = (lnumber)AllocSizeOf(rnumber);
+  omCheckAddrSize(a,sizeof(rnumber));
+  omCheckAddrSize(b,sizeof(rnumber));
+  lo = (lnumber)omAllocBin(rnumber_bin);
   if (b->n!=NULL)
     lo->z = napMult(napCopy(a->z), napCopy(b->n));
   else
@@ -1584,8 +1580,8 @@ number naInvers(number a)
     WerrorS("div. by 0");
     return NULL;
   }
-  mmTestP(b,sizeof(rnumber));
-  lo = (lnumber)Alloc0SizeOf(rnumber);
+  omCheckAddrSize(b,sizeof(rnumber));
+  lo = (lnumber)omAlloc0Bin(rnumber_bin);
   lo->s = b->s;
   if (b->n!=NULL)
     lo->z = napCopy(b->n);
@@ -1708,7 +1704,7 @@ char  *naRead(char *s, number *p)
     *p = NULL;
     return s;
   }
-  *p = (number)Alloc0SizeOf(rnumber);
+  *p = (number)omAlloc0Bin(rnumber_bin);
   a = (lnumber)*p;
   if ((naMinimalPoly!=NULL) && (x->e[0] >= naMinimalPoly->e[0]))
     a->z = napRemainder(x, naMinimalPoly);
@@ -1724,7 +1720,7 @@ char  *naRead(char *s, number *p)
     a->z = x;
   if(a->z==NULL)
   {
-    FreeSizeOf((ADDRESS)*p,rnumber);
+    omFreeBin((ADDRESS)*p, rnumber_bin);
     *p=NULL;
   }
   else
@@ -1745,8 +1741,8 @@ char * naName(number n)
   if ((ph==NULL)||(ph->z==NULL))
     return NULL;
   int i;
-  char *s=(char *)AllocL(4* naNumbOfPar);
-  char *t=(char *)Alloc(8);
+  char *s=(char *)omAlloc(4* naNumbOfPar);
+  char *t=(char *)omAlloc(8);
   s[0]='\0';
   for (i = 0; i <= naNumbOfPar - 1; i++)
   {
@@ -1763,10 +1759,10 @@ char * naName(number n)
       }
     }
   }
-  Free((ADDRESS)t,8);
+  omFreeSize((ADDRESS)t,8);
   if (s[0]=='\0')
   {
-    FreeL((ADDRESS)s);
+    omFree((ADDRESS)s);
     return NULL;
   }
   return s;
@@ -1802,7 +1798,7 @@ BOOLEAN naIsOne(number za)
   alg x, y;
   number t;
   if (a==NULL) return FALSE;
-  mmTestP(a,sizeof(rnumber));
+  omCheckAddrSize(a,sizeof(rnumber));
 #ifdef TEST
   if (a->z==NULL) WerrorS("internal zero error(4)");
 #endif
@@ -1850,7 +1846,7 @@ BOOLEAN naIsMOne(number za)
   alg x, y;
   number t;
   if (a==NULL) return FALSE;
-  mmTestP(a,sizeof(rnumber));
+  omCheckAddrSize(a,sizeof(rnumber));
 #ifdef TEST
   if (a->z==NULL)
   {
@@ -1887,7 +1883,7 @@ void naPower(number p, int i, number *rc)
 number naGcd(number a, number b)
 {
   lnumber x, y;
-  lnumber result = (lnumber)Alloc0SizeOf(rnumber);
+  lnumber result = (lnumber)omAlloc0Bin(rnumber_bin);
 
   x = (lnumber)a;
   y = (lnumber)b;
@@ -2184,7 +2180,7 @@ number naLcm(number la, number lb)
   lnumber result;
   lnumber a = (lnumber)la;
   lnumber b = (lnumber)lb;
-  result = (lnumber)Alloc0SizeOf(rnumber);
+  result = (lnumber)omAlloc0Bin(rnumber_bin);
   //if (((naMinimalPoly==NULL) && (naI==NULL)) || !naIsChar0)
   //{
   //  result->z = napInit(1);
@@ -2238,7 +2234,7 @@ void naSetIdeal(ideal I)
   {
     for (i=naI->anz-1; i>=0; i--)
       napDelete(&naI->liste[i]);
-    FreeSizeOf((ADDRESS)naI,snaIdeal);
+    omFreeBin((ADDRESS)naI, snaIdeal_bin);
     naI=NULL;
   }
   else
@@ -2247,9 +2243,9 @@ void naSetIdeal(ideal I)
     number a;
     alg x;
 
-    naI=(naIdeal)AllocSizeOf(snaIdeal);
+    naI=(naIdeal)omAllocBin(snaIdeal_bin);
     naI->anz=IDELEMS(I);
-    naI->liste=(alg*)Alloc(naI->anz*sizeof(alg));
+    naI->liste=(alg*)omAlloc(naI->anz*sizeof(alg));
     for (i=IDELEMS(I)-1; i>=0; i--)
     {
       h=(lnumber)pGetCoeff(I->m[i]);
@@ -2274,9 +2270,9 @@ void naSetIdeal(ideal I)
 number naMapP0(number c)
 {
   if (npIsZero(c)) return NULL;
-  lnumber l=(lnumber)AllocSizeOf(rnumber);
+  lnumber l=(lnumber)omAllocBin(rnumber_bin);
   l->s=2;
-  l->z=(alg)Alloc0(napMonomSize);
+  l->z=(alg)omAlloc0(napMonomSize);
   int i=(int)c;
   if (i>(naPrimeM>>2)) i-=naPrimeM;
   l->z->ko=nlInit(i);
@@ -2290,9 +2286,9 @@ number naMapP0(number c)
 number naMap00(number c)
 {
   if (nlIsZero(c)) return NULL;
-  lnumber l=(lnumber)AllocSizeOf(rnumber);
+  lnumber l=(lnumber)omAllocBin(rnumber_bin);
   l->s=0;
-  l->z=(alg)Alloc0(napMonomSize);
+  l->z=(alg)omAlloc0(napMonomSize);
   l->z->ko=nlCopy(c);
   l->n=NULL;
   return (number)l;
@@ -2304,9 +2300,9 @@ number naMap00(number c)
 number naMapPP(number c)
 {
   if (npIsZero(c)) return NULL;
-  lnumber l=(lnumber)AllocSizeOf(rnumber);
+  lnumber l=(lnumber)omAllocBin(rnumber_bin);
   l->s=2;
-  l->z=(alg)Alloc0(napMonomSize);
+  l->z=(alg)omAlloc0(napMonomSize);
   l->z->ko=c; /* omit npCopy, because npCopy is a no-op */
   l->n=NULL;
   return (number)l;
@@ -2322,9 +2318,9 @@ number naMapPP1(number c)
   if (i>naPrimeM) i-=naPrimeM;
   number n=npInit(i);
   if (npIsZero(n)) return NULL;
-  lnumber l=(lnumber)AllocSizeOf(rnumber);
+  lnumber l=(lnumber)omAllocBin(rnumber_bin);
   l->s=2;
-  l->z=(alg)Alloc0(napMonomSize);
+  l->z=(alg)omAlloc0(napMonomSize);
   l->z->ko=n;
   l->n=NULL;
   return (number)l;
@@ -2338,9 +2334,9 @@ number naMap0P(number c)
   if (nlIsZero(c)) return NULL;
   number n=npInit(nlInt(c));
   if (npIsZero(n)) return NULL;
-  lnumber l=(lnumber)AllocSizeOf(rnumber);
+  lnumber l=(lnumber)omAllocBin(rnumber_bin);
   l->s=2;
-  l->z=(alg)Alloc0(napMonomSize);
+  l->z=(alg)omAlloc0(napMonomSize);
   l->z->ko=n;
   l->n=NULL;
   return (number)l;
@@ -2353,14 +2349,14 @@ static alg napMap(alg p)
   alg w, a;
 
   if (p==NULL) return NULL;
-  a = w = (alg)Alloc0(napMonomSize);
+  a = w = (alg)omAlloc0(napMonomSize);
   memcpy(a->e, p->e, naParsToCopy * SIZEOF_PARAMETER);
   w->ko = nacMap(p->ko);
   loop
   {
     p=p->ne;
     if (p==NULL) break;
-    a->ne = (alg)Alloc0(napMonomSize);
+    a->ne = (alg)omAlloc0(napMonomSize);
     a = a->ne;
     memcpy(a->e, p->e, naParsToCopy * SIZEOF_PARAMETER);
     a->ko = nacMap(p->ko);
@@ -2375,7 +2371,7 @@ static alg napMap(alg p)
 number naMapQaQb(number c)
 {
   if (c==NULL) return NULL;
-  lnumber erg= (lnumber)Alloc0SizeOf(rnumber);
+  lnumber erg= (lnumber)omAlloc0Bin(rnumber_bin);
   lnumber src =(lnumber)c;
   erg->s=src->s;
   erg->z=napMap(src->z);
@@ -2504,7 +2500,7 @@ poly naPermNumber(number z, int * par_perm, int P)
     napoly pa=NULL;
     if (currRing->parameter!=NULL)
     {
-      pGetCoeff(p)=(number)Alloc0SizeOf(rnumber);
+      pGetCoeff(p)=(number)omAlloc0Bin(rnumber_bin);
       ((lnumber)pGetCoeff(p))->s=2;
       ((lnumber)pGetCoeff(p))->z=napInitz(nacCopy(napGetCoeff(za)));
       pa=((lnumber)pGetCoeff(p))->z;
@@ -2556,7 +2552,7 @@ number   naGetDenom(number &n)
   lnumber x=(lnumber)n;
   if (x->n!=NULL)
   {
-    lnumber r=(lnumber)Alloc0SizeOf(rnumber);
+    lnumber r=(lnumber)omAlloc0Bin(rnumber_bin);
     r->z=napCopy(naGetDenom0(x));
     r->s = 2;
     return (number)r;
@@ -2570,9 +2566,7 @@ BOOLEAN naDBTest(number a, char *f,int l)
   lnumber x=(lnumber)a;
   if (x == NULL)
     return TRUE;
-#ifdef MDEBUG
-  mmDBTestBlock(a,sizeof(rnumber),f,l);
-#endif
+  omCheckAddrSize(a, sizeof(rnumber));
   alg p = x->z;
   if (p==NULL)
   {
@@ -2600,9 +2594,7 @@ BOOLEAN naDBTest(number a, char *f,int l)
     //}
     if (naIsChar0 && !(nlDBTest(p->ko,f,l)))
       return FALSE;
-#ifdef MDEBUG
-    mmDBTestBlock(p,napMonomSize,f,l);
-#endif
+    if (omCheckAddrSize(p, napMonomSize)) return FALSE;
     p = p->ne;
   }
   p = naGetDenom0(x);
@@ -2610,10 +2602,7 @@ BOOLEAN naDBTest(number a, char *f,int l)
   {
     if (naIsChar0 && !(nlDBTest(p->ko,f,l)))
       return FALSE;
-#ifdef MDEBUG
-    if (!mmDBTestBlock(p,napMonomSize,f,l))
-      return FALSE;
-#endif
+    if (omCheckAddrSize(p, napMonomSize)) return FALSE;
     p = p->ne;
   }
   return TRUE;

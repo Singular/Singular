@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.34 2000-04-27 10:07:11 obachman Exp $ */
+/* $Id: silink.cc,v 1.35 2000-08-14 12:56:49 obachman Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -11,7 +11,7 @@
 #include <string.h>
 #include "mod2.h"
 #include "tok.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "febase.h"
 #include "subexpr.h"
 #include "ipid.h"
@@ -22,6 +22,10 @@
 #include "ideals.h"
 #include "numbers.h"
 #include "intvec.h"
+
+omBin s_si_link_extension_bin = omGetSpecBin(sizeof(s_si_link_extension));
+omBin sip_link_bin = omGetSpecBin(sizeof(sip_link));
+omBin ip_link_bin = omGetSpecBin(sizeof(ip_link));
 
 /* declarations */
 static BOOLEAN DumpAscii(FILE *fd, idhdl h);
@@ -51,7 +55,7 @@ BOOLEAN slInit(si_link l, char *istr)
       if (i > 0)
       {
         istr[i] = '\0';
-        type = mstrdup(istr);
+        type = omStrDup(istr);
         istr[i] = ':';
       }
       // and check for mode
@@ -59,18 +63,18 @@ BOOLEAN slInit(si_link l, char *istr)
       while (istr[j] != ' ' && istr[j] != '\0') j++;
       if (j > i)
       {
-        mode = mstrdup(&(istr[i]));
+        mode = omStrDup(&(istr[i]));
         mode[j - i] = '\0';
       }
       // and for the name
       while (istr[j] == ' '&& istr[j] != '\0') j++;
-      if (istr[j] != '\0') name = mstrdup(&(istr[j]));
+      if (istr[j] != '\0') name = omStrDup(&(istr[j]));
     }
     else // no colon find -- string is entire name
     {
       j=0;
       while (istr[j] == ' '&& istr[j] != '\0') j++;
-      if (istr[j] != '\0') name = mstrdup(&(istr[j]));
+      if (istr[j] != '\0') name = omStrDup(&(istr[j]));
     }
   }
 
@@ -89,13 +93,13 @@ BOOLEAN slInit(si_link l, char *istr)
       Warn("Use default link type: %s", si_link_root->type);
       l->m = si_link_root;
     }
-    FreeL(type);
+    omFree(type);
   }
   else
     l->m = si_link_root;
 
-  l->name = (name != NULL ? name : mstrdup(""));
-  l->mode = (mode != NULL ? mode : mstrdup(""));
+  l->name = (name != NULL ? name : omStrDup(""));
+  l->mode = (mode != NULL ? mode : omStrDup(""));
   l->ref = 1;
   return FALSE;
 }
@@ -110,8 +114,8 @@ void slCleanUp(si_link l)
       if (l->m->Kill != NULL) l->m->Kill(l);
       else if (l->m->Close != NULL) l->m->Close(l);
     }
-    FreeL((ADDRESS)l->name);
-    FreeL((ADDRESS)l->mode);
+    omFree((ADDRESS)l->name);
+    omFree((ADDRESS)l->mode);
     memset((void *) l, 0, sizeof(ip_link));
   }
 }
@@ -120,7 +124,7 @@ void slKill(si_link l)
 {
   slCleanUp(l);
   if (l->ref == 0)
-    FreeSizeOf((ADDRESS)l, ip_link);
+    omFreeBin((ADDRESS)l,  ip_link_bin);
 }
 
 char* slStatus(si_link l, char *request)
@@ -373,8 +377,8 @@ BOOLEAN slOpenAscii(si_link l, short flag)
       return TRUE;
   }
 
-  FreeL(l->mode);
-  l->mode = mstrdup(mode);
+  omFree(l->mode);
+  l->mode = omStrDup(mode);
   SI_LINK_SET_OPEN_P(l, flag);
   return FALSE;
 }
@@ -398,7 +402,7 @@ leftv slReadAscii2(si_link l, leftv pr)
     fseek(fp,0L,SEEK_END);
     long len=ftell(fp);
     fseek(fp,0L,SEEK_SET);
-    buf=(char *)AllocL((int)len+1);
+    buf=(char *)omAlloc((int)len+1);
     if (BVERBOSE(V_READING))
       Print("//Reading %d chars\n",len);
     myfread( buf, len, 1, fp);
@@ -410,24 +414,24 @@ leftv slReadAscii2(si_link l, leftv pr)
     if(tclmode)
     {
       WerrorS("reading from STDIN in TCL-mode not implemented");
-      buf=mstrdup("");
+      buf=omStrDup("");
     }
     else
   #endif
     {
       if (pr->Typ()==STRING_CMD)
       {
-        buf=(char *)AllocL(80);
+        buf=(char *)omAlloc(80);
         fe_fgets_stdin((char *)pr->Data(),buf,80);
       }
       else
       {
         WerrorS("read(<link>,<string>) expected");
-        buf=mstrdup("");
+        buf=omStrDup("");
       }
     }
   }
-  leftv v=(leftv)Alloc0SizeOf(sleftv);
+  leftv v=(leftv)omAlloc0Bin(sleftv_bin);
   v->rtyp=STRING_CMD;
   v->data=buf;
   return v;
@@ -454,7 +458,7 @@ BOOLEAN slWriteAscii(si_link l, leftv v)
     if (s!=NULL)
     {
       fprintf(outfile,"%s\n",s);
-      FreeL((ADDRESS)s);
+      omFree((ADDRESS)s);
     }
     else
     {
@@ -555,12 +559,12 @@ static BOOLEAN DumpAsciiMaps(FILE *fd, idhdl h, idhdl rhdl)
                 IDMAP(h)->preimage, rhs) == EOF)
 #endif
     {
-      FreeL(rhs);
+      omFree(rhs);
       return TRUE;
     }
     else
     {
-      FreeL(rhs);
+      omFree(rhs);
       return FALSE;
     }
   }
@@ -689,7 +693,7 @@ static BOOLEAN DumpQring(FILE *fd, idhdl h, char *type_str)
   if (fprintf(fd, "kill temp_ring;\n") == EOF) return TRUE;
   else
   {
-    FreeL(ring_str);
+    omFree(ring_str);
     return FALSE;
   }
 }
@@ -753,7 +757,7 @@ static int DumpRhs(FILE *fd, idhdl h)
     if (type_id == INTVEC_CMD) fprintf(fd, "intvec(");
 
     if (fprintf(fd, "%s", rhs) == EOF) return EOF;
-    FreeL(rhs);
+    omFree(rhs);
 
     if ((type_id == RING_CMD || type_id == QRING_CMD) &&
         IDRING(h)->minpoly != NULL)
@@ -815,7 +819,7 @@ BOOLEAN slGetDumpAscii(si_link l)
 void slStandardInit()
 {
   si_link_extension s;
-  si_link_root=(si_link_extension)Alloc0SizeOf(s_si_link_extension);
+  si_link_root=(si_link_extension)omAlloc0Bin(s_si_link_extension_bin);
   si_link_root->Open=slOpenAscii;
   si_link_root->Close=slCloseAscii;
   si_link_root->Kill=slCloseAscii;
@@ -829,16 +833,16 @@ void slStandardInit()
   s = si_link_root;
 #ifdef HAVE_DBM
 #ifndef HAVE_MODULE_DBM
-  s->next = (si_link_extension)Alloc0SizeOf(s_si_link_extension);
+  s->next = (si_link_extension)omAlloc0Bin(s_si_link_extension_bin);
   s = s->next;
   slInitDBMExtension(s);
 #endif
 #endif
 #ifdef HAVE_MPSR
-  s->next = (si_link_extension)Alloc0SizeOf(s_si_link_extension);
+  s->next = (si_link_extension)omAlloc0Bin(s_si_link_extension_bin);
   s = s->next;
   slInitMPFileExtension(s);
-  s->next = (si_link_extension)Alloc0SizeOf(s_si_link_extension);
+  s->next = (si_link_extension)omAlloc0Bin(s_si_link_extension_bin);
   s = s->next;
   slInitMPTcpExtension(s);
 #endif

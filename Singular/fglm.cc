@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.cc,v 1.20 1999-11-24 12:29:38 wichmann Exp $
+// $Id: fglm.cc,v 1.21 2000-08-14 12:56:12 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -28,7 +28,7 @@
 #include "ipshell.h"
 #include "febase.h"
 #include "maps.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "kstd1.h"
 #include "fglm.h"
 
@@ -143,7 +143,7 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
     int npar = rPar(sring);
     int * pperm;
     if ( npar > 0 )
-        pperm= (int *)Alloc0( (npar+1)*sizeof( int ) );
+        pperm= (int *)omAlloc0( (npar+1)*sizeof( int ) );
     else
         pperm= NULL;
     maFindPerm( sring->names, nvar, sring->parameter, npar, 
@@ -159,7 +159,8 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
             WerrorS( "paramater names do not agree" );
             state= FglmIncompatibleRings;
         }
-    Free( (ADDRESS)pperm, (npar+1)*sizeof( int ) );
+    if (pperm != NULL) // OB: ????
+      omFreeSize( (ADDRESS)pperm, (npar+1)*sizeof( int ) );
     if ( state != FglmOk ) return state;
     // check if both rings are qrings or not
     if ( sring->qideal != NULL ) {
@@ -185,7 +186,7 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
         rSetHdl( sringHdl, TRUE );
         if ( state != FglmOk ) return state;
         // check if dring->qideal is contained in sring->qideal:
-        int * dsvperm = (int *)Alloc0( (nvar+1)*sizeof( int ) );
+        int * dsvperm = (int *)omAlloc0( (nvar+1)*sizeof( int ) );
         maFindPerm( dring->names, nvar, NULL, 0, sring->names, nvar, NULL, 0, 
                     dsvperm, NULL, sring->ch);
         //nSetMap(rInternalChar(dring), dring->parameter, npar, dring->minpoly);
@@ -200,7 +201,7 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
         }
         idDelete( & dqins );
         idDelete( & dqinsred );
-        Free( (ADDRESS)dsvperm, (nvar+1)*sizeof( int ) );
+        omFreeSize( (ADDRESS)dsvperm, (nvar+1)*sizeof( int ) );
         if ( state != FglmOk ) return state;
     }
     else {
@@ -226,7 +227,7 @@ fglmIdealcheck( const ideal theIdeal )
     FglmState state = FglmOk;
     int power;
     int k;
-    BOOLEAN * purePowers = (BOOLEAN *)Alloc( pVariables*sizeof( BOOLEAN ) );
+    BOOLEAN * purePowers = (BOOLEAN *)omAlloc( pVariables*sizeof( BOOLEAN ) );
     for ( k= pVariables-1; k >= 0; k-- )
         purePowers[k]= FALSE;
 
@@ -246,7 +247,7 @@ fglmIdealcheck( const ideal theIdeal )
         for ( k= pVariables-1 ; (state == FglmOk) && (k >= 0); k-- )
             if ( purePowers[k] == FALSE ) state= FglmNotZeroDim;
     }
-    Free( (ADDRESS)purePowers, pVariables*sizeof( BOOLEAN ) );
+    omFreeSize( (ADDRESS)purePowers, pVariables*sizeof( BOOLEAN ) );
     return state;
 }
 
@@ -265,9 +266,9 @@ fglmProc( leftv result, leftv first, leftv second )
     rSetHdl( sourceRingHdl, TRUE );
     ring sourceRing = currRing;
 
-    int * vperm = (int *)Alloc0( (pVariables+1)*sizeof( int ) );
+    int * vperm = (int *)omAlloc0( (pVariables+1)*sizeof( int ) );
     state= fglmConsistency( sourceRingHdl, destRingHdl, vperm );
-    Free( (ADDRESS)vperm, (pVariables+1)*sizeof(int) );
+    omFreeSize( (ADDRESS)vperm, (pVariables+1)*sizeof(int) );
 
     if ( state == FglmOk ) {
         idhdl ih = currRing->idroot->get( second->Name(), myynest );

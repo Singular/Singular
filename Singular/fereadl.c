@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: fereadl.c,v 1.16 2000-03-09 13:18:58 Singular Exp $ */
+/* $Id: fereadl.c,v 1.17 2000-08-14 12:56:11 obachman Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -10,7 +10,7 @@
 #include "mod2.h"
 #include "tok.h"
 #include "febase.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "structs.h"
 #include "febase.h"
 
@@ -111,9 +111,9 @@ int     fe_cursor_line; /* 0..pagelength-1*/
       {
         for(i=fe_hist_max-1;i>=0;i--)
         {
-          FreeL((ADDRESS)fe_hist[i]);
+          if (fe_hist[i] != NULL) omFree((ADDRESS)fe_hist[i]);
         }
-        Free((ADDRESS)fe_hist,fe_hist_max*sizeof(char *));
+        omFreeSize((ADDRESS)fe_hist,fe_hist_max*sizeof(char *));
         fe_hist=NULL;
       }
       if (!fe_stdout_is_tty)
@@ -278,7 +278,9 @@ void fe_init (void)
       extern char *BC;
       extern char *UP;
       extern char PC;
-      char *t_buf=(char *)Alloc(128);
+      /* OB: why this ??? */
+      /* char *t_buf=(char *)omAlloc(128); */
+      char t_buf[128];
       char *temp;
 
       /* Extract information that termcap functions use.  */
@@ -305,7 +307,8 @@ void fe_init (void)
     fe_is_raw_tty=1;
 
     /* setup history */
-    fe_hist=(char **)Alloc0(fe_hist_max*sizeof(char *));
+    fe_hist=(char **)omAlloc0(fe_hist_max*sizeof(char *));
+    omMarkAsStaticAddr(fe_hist);
     fe_hist_pos=0;
   }
   else
@@ -369,10 +372,11 @@ static void fe_add_hist(char *s)
     /* first free the slot at position fe_hist_pos */
     if (fe_hist[fe_hist_pos]!=NULL)
     {
-      FreeL((ADDRESS)fe_hist[fe_hist_pos]);
+      omFree((ADDRESS)fe_hist[fe_hist_pos]);
     }
     /* and store a duplicate */
-    fe_hist[fe_hist_pos]=mstrdup(s);
+    fe_hist[fe_hist_pos]=omStrDup(s);
+    omMarkAsStaticAddr(fe_hist[fe_hist_pos]);
     /* increment fe_hist_pos in a circular manner */
     fe_hist_pos++;
     if (fe_hist_pos==fe_hist_max) fe_hist_pos=0;

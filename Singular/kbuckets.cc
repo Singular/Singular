@@ -1,12 +1,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.13 2000-03-31 12:15:01 Singular Exp $ */
+/* $Id: kbuckets.cc,v 1.14 2000-08-14 12:56:30 obachman Exp $ */
 
 #include "mod2.h"
 #include "tok.h"
 #include "structs.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "polys.h"
 #include "febase.h"
 #include "prProcs.h"
@@ -14,6 +14,7 @@
 #include "numbers.h"
 
 #ifdef HAVE_BUCKETS
+static omBin kBucket_bin = omGetSpecBin(sizeof(kBucket));
 
 //////////////////////////////////////////////////////////////////////////
 ///
@@ -110,13 +111,13 @@ void kbDBTests(kBucket_pt bucket, char* file, int line)
 
 kBucket_pt kBucketCreate()
 {
-  kBucket_pt bucket = (kBucket_pt) Alloc0SizeOf(kBucket);
+  kBucket_pt bucket = (kBucket_pt) omAlloc0Bin(kBucket_bin);
   return bucket;
 }
 
 void kBucketDestroy(kBucket_pt *bucket)
 {
-  FreeSizeOf(*bucket, kBucket);
+  omFreeBin(*bucket, kBucket_bin);
   *bucket = NULL;
 }
 
@@ -169,7 +170,7 @@ static BOOLEAN kBucketIsCleared(kBucket_pt bucket)
 }
 
 void kBucketInit(kBucket_pt bucket, poly lm, int length,
-                 memHeap heap)
+                 omBin heap)
 {
   int i;
   assume(bucket != NULL);
@@ -194,7 +195,7 @@ void kBucketInit(kBucket_pt bucket, poly lm, int length,
     bucket->buckets_used = 0;
     bucket->buckets_length[0] = 0;
   }
-  if (heap == NULL) bucket->heap = mm_specHeap;
+  if (heap == NULL) bucket->heap = currPolyBin;
   else bucket->heap = heap;
 }
 
@@ -343,7 +344,7 @@ void kBucketClear(kBucket_pt bucket, poly *p, int *length)
 #else // HAVE_PSEUDO_BUCKETS
 
 void kBucketInit(kBucket_pt bucket, poly lm, int length,
-                 memHeap heap)
+                 omBin heap)
 {
   int i;
 
@@ -435,7 +436,7 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
 void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
                             poly spNoether)
 {
-  assume (*l <= 0 || pLength(p) == *l);
+  assume(*l <= 0 || pLength(p) == *l);
   int i, l1;
   poly p1 = p;
 

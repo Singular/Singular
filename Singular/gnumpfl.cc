@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.cc,v 1.14 2000-06-27 12:07:01 pohl Exp $ */
+/* $Id: gnumpfl.cc,v 1.15 2000-08-14 12:56:17 obachman Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 *
@@ -11,7 +11,7 @@
 #include "mod2.h"
 #include "tok.h"
 #include "febase.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "numbers.h"
 #include "modulop.h"
 #include "longrat.h"
@@ -424,8 +424,8 @@ void ngfWrite (number &a)
   {
     out= floatToStr(*(gmp_float*)a,gmp_output_digits);
     StringAppend(out);
-    //Free((ADDRESS)out, (strlen(out)+1)* sizeof(char) );
-    FreeL( (ADDRESS)out );
+    //omFreeSize((ADDRESS)out, (strlen(out)+1)* sizeof(char) );
+    omFree( (ADDRESS)out );
   }
   else
   {

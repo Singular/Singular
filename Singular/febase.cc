@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.87 2000-06-05 12:23:10 Singular Exp $ */
+/* $Id: febase.cc,v 1.88 2000-08-14 12:56:06 obachman Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -28,7 +28,7 @@
 
 #include "tok.h"
 #include "febase.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "subexpr.h"
 #include "ipshell.h"
 
@@ -45,7 +45,7 @@ char fe_promptstr[]
 
 #define INITIAL_PRINT_BUFFER 24*1024
 static int feBufferLength=INITIAL_PRINT_BUFFER;
-static char * feBuffer=(char *)Alloc(INITIAL_PRINT_BUFFER);
+static char * feBuffer=(char *)omAlloc(INITIAL_PRINT_BUFFER);
 
 int     si_echo = 0;
 int     printlevel = 0;
@@ -155,7 +155,7 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror,
     char* spath = feResource('s');
     char *s;
 
-    if (where==NULL) s=(char *)AllocL(250);
+    if (where==NULL) s=(char *)omAlloc(250);
     else             s=where;
 
     if (spath!=NULL)
@@ -186,7 +186,7 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror,
       f=myfopen(s,mode);
       if (f!=NULL)
       {
-        if (where==NULL) FreeL((ADDRESS)s);
+        if (where==NULL) omFree((ADDRESS)s);
         return f;
       }
     }
@@ -195,7 +195,7 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror,
       if (where!=NULL) strcpy(s/*where*/,path);
       f=myfopen(path,mode);
     }
-    if (where==NULL) FreeL((ADDRESS)s);
+    if (where==NULL) omFree((ADDRESS)s);
   }
   if ((f==NULL)&&(useWerror))
     Werror("cannot open `%s`",path);
@@ -214,7 +214,7 @@ char * StringAppend(char *fmt, ...)
   {
     more = ((more + (4*1024-1))/(4*1024))*(4*1024);
     int l=s-feBuffer;
-    feBuffer=(char *)ReAlloc((ADDRESS)feBuffer,feBufferLength,
+    feBuffer=(char *)omReallocSize((ADDRESS)feBuffer,feBufferLength,
                                                      more);
     feBufferLength=more;
     s=feBuffer+l;
@@ -242,7 +242,7 @@ char * StringAppend(char *fmt, ...)
   feBufferStart += vsprintf(s, fmt, ap);
 #endif
 #endif
-  mmTest(feBuffer, feBufferLength);
+  omCheckAddrSize(feBuffer, feBufferLength);
   va_end(ap);
   return feBuffer;
 }
@@ -255,7 +255,7 @@ char * StringAppendS(char *st)
   if ((more=ll+2+(l=strlen(st)))>feBufferLength)
   {
     more = ((more + (4*1024-1))/(4*1024))*(4*1024);
-    feBuffer=(char *)ReAlloc((ADDRESS)feBuffer,feBufferLength,
+    feBuffer=(char *)omReallocSize((ADDRESS)feBuffer,feBufferLength,
                                                      more);
     feBufferLength=more;
     feBufferStart=feBuffer+ll;
@@ -271,7 +271,7 @@ char * StringSetS(char *st)
   if ((l=strlen(st))>feBufferLength)
   {
     more = ((l + (4*1024-1))/(4*1024))*(4*1024);
-    feBuffer=(char *)ReAlloc((ADDRESS)feBuffer,feBufferLength,
+    feBuffer=(char *)omReallocSize((ADDRESS)feBuffer,feBufferLength,
                                                      more);
     feBufferLength=more;
   }
@@ -300,7 +300,7 @@ void WerrorS(const char *s)
   {
     if (feErrors==NULL)
     {
-      feErrors=(char *)Alloc(256);
+      feErrors=(char *)omAlloc(256);
       feErrorsLen=256;
       *feErrors = '\0';
     }
@@ -308,7 +308,7 @@ void WerrorS(const char *s)
     {
       if (((int)(strlen((char *)s)+ 20 +strlen(feErrors)))>=feErrorsLen)
       {
-        feErrors=(char *)ReAlloc(feErrors,feErrorsLen,feErrorsLen+256);
+        feErrors=(char *)omReallocSize(feErrors,feErrorsLen,feErrorsLen+256);
         feErrorsLen+=256;
       }
     }
@@ -346,10 +346,10 @@ void Werror(char *fmt, ...)
 {
   va_list ap;
   va_start(ap, fmt);
-  char *s=(char *)Alloc(256);
+  char *s=(char *)omAlloc(256);
   vsprintf(s, fmt, ap);
   WerrorS(s);
-  Free(s,256);
+  omFreeSize(s,256);
   va_end(ap);
 }
 }
@@ -385,10 +385,10 @@ void Warn(const char *fmt, ...)
 {
   va_list ap;
   va_start(ap, fmt);
-  char *s=(char *)Alloc(256);
+  char *s=(char *)omAlloc(256);
   vsprintf(s, fmt, ap);
   WarnS(s);
-  Free(s,256);
+  omFreeSize(s,256);
   va_end(ap);
 }
 
@@ -447,32 +447,32 @@ void mwrite(uchar c)
 static char* sprint = NULL;
 void SPrintStart()
 {
-  sprint = mstrdup("");
+  sprint = omStrDup("");
 }
 
 static void SPrintS(char* s)
 {
-  mmTestL(sprint);
+  omCheckAddr(sprint);
   if (s == NULL) return;
   int ls = strlen(s);
   if (ls == 0) return;
 
   char* ns;
   int l = strlen(sprint);
-  ns = (char*) AllocL((l + ls + 1)*sizeof(char));
+  ns = (char*) omAlloc((l + ls + 1)*sizeof(char));
   if (l > 0) strcpy(ns, sprint);
 
   strcpy(&(ns[l]), s);
-  FreeL(sprint);
+  omFree(sprint);
   sprint = ns;
-  mmTestL(sprint);
+  omCheckAddr(sprint);
 }
 
 char* SPrintEnd()
 {
   char* ns = sprint;
   sprint = NULL;
-  mmTestL(ns);
+  omCheckAddr(ns);
   return ns;
 }
 
@@ -527,12 +527,12 @@ void Print(char *fmt, ...)
     int ls = strlen(fmt);
     va_list ap;
     va_start(ap, fmt);
-    mmTestL(sprint);
+    omCheckAddr(sprint);
     if (fmt != NULL && ls > 0)
     {
       char* ns;
       int l = strlen(sprint);
-      ns = (char*) AllocL(sizeof(char)*(ls + l + 256));
+      ns = (char*) omAlloc(sizeof(char)*(ls + l + 256));
       if (l > 0)  strcpy(ns, sprint);
 
 #ifdef HAVE_VSNPRINTF
@@ -541,8 +541,8 @@ void Print(char *fmt, ...)
 #else
       vsprintf(&(ns[l]), fmt, ap);
 #endif
-      mmTestL(ns);
-      FreeL(sprint);
+      omCheckAddr(ns);
+      omFree(sprint);
       sprint = ns;
     }
     va_end(ap);
@@ -557,7 +557,7 @@ void Print(char *fmt, ...)
 #endif
 #if (defined(HAVE_TCL) || defined(macintosh))
     {
-      char *s=(char *)Alloc(strlen(fmt)+256);
+      char *s=(char *)omAlloc(strlen(fmt)+256);
       vsprintf(s,fmt, ap);
 #ifdef HAVE_TCL
       PrintTCLS('N',s);
@@ -600,6 +600,7 @@ void monitor(char* s, int mode)
   if (feProt)
   {
     fclose(feProtFile);
+    feProt = 0;
   }
   if ((s!=NULL) && (*s!='\0'))
   {
@@ -607,6 +608,7 @@ void monitor(char* s, int mode)
     if (feProtFile==NULL)
     {
       Werror("cannot open %s",s);
+      feProt=0;
     }
     else
       feProt = (BOOLEAN)mode;

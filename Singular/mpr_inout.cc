@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_inout.cc,v 1.8 2000-02-29 16:47:13 Singular Exp $ */
+/* $Id: mpr_inout.cc,v 1.9 2000-08-14 12:56:40 obachman Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultant
@@ -21,7 +21,7 @@
 #include "ipid.h"
 #include "ipshell.h"
 #include "febase.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "numbers.h"
 #include "lists.h"
 #include "matpol.h"
@@ -208,7 +208,7 @@ BOOLEAN nuUResSolve( leftv res, leftv args )
   number smv= NULL;
   BOOLEAN interpolate_det= (mtype==uResultant::denseResMat)?TRUE:FALSE;
 
-  //emptylist= (lists)Alloc( sizeof(slists) );
+  //emptylist= (lists)omAlloc( sizeof(slists) );
   //emptylist->Init( 0 );
 
   //res->rtyp = LIST_CMD;
@@ -299,10 +299,10 @@ BOOLEAN nuUResSolve( leftv res, leftv args )
   // free everything
   count= iproots[0]->getAnzElems();
   for (i=0; i < count; i++) delete iproots[i];
-  Free( (ADDRESS) iproots, count * sizeof(rootContainer*) );
+  omFreeSize( (ADDRESS) iproots, count * sizeof(rootContainer*) );
   count= muiproots[0]->getAnzElems();
   for (i=0; i < count; i++) delete muiproots[i];
-  Free( (ADDRESS) muiproots, count * sizeof(rootContainer*) );
+  omFreeSize( (ADDRESS) muiproots, count * sizeof(rootContainer*) );
 
   delete ures;
   delete arranger;
@@ -311,7 +311,7 @@ BOOLEAN nuUResSolve( leftv res, leftv args )
   res->data= (void *)listofroots;
 
   //emptylist->Clean();
-  //  Free( (ADDRESS) emptylist, sizeof(slists) );
+  //  omFreeSize( (ADDRESS) emptylist, sizeof(slists) );
 
   TIMING_EPR(mpr_overall,"overall time\t\t")
 
@@ -380,7 +380,7 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   lists elist;
   lists rlist;
 
-  elist= (lists)Alloc( sizeof(slists) );
+  elist= (lists)omAlloc( sizeof(slists) );
   elist->Init( 0 );
 
   if ( pVariables > 1 )
@@ -405,7 +405,7 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   }
 
   rootContainer * roots= new rootContainer();
-  number * pcoeffs= (number *)Alloc( (deg+1) * sizeof( number ) );
+  number * pcoeffs= (number *)omAlloc( (deg+1) * sizeof( number ) );
   piter= gls;
   for ( i= deg; i >= 0; i-- )
   {
@@ -440,7 +440,7 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   char *dummy;
   int j;
 
-  rlist= (lists)Alloc( sizeof(slists) );
+  rlist= (lists)omAlloc( sizeof(slists) );
   rlist->Init( elem );
 
   if (rField_is_long_C())
@@ -463,10 +463,10 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   }
 
   elist->Clean();
-  //Free( (ADDRESS) elist, sizeof(slists) );
+  //omFreeSize( (ADDRESS) elist, sizeof(slists) );
 
   for ( i= deg; i >= 0; i-- ) nDelete( &pcoeffs[i] );
-  Free( (ADDRESS) pcoeffs, (deg+1) * sizeof( number ) );
+  omFreeSize( (ADDRESS) pcoeffs, (deg+1) * sizeof( number ) );
 
   res->rtyp= LIST_CMD;
   res->data= (void*)rlist;
@@ -522,7 +522,7 @@ BOOLEAN nuVanderSys( leftv res, leftv arg1, leftv arg2, leftv arg3)
   }
 
   number tmp;
-  number *pevpoint= (number *)Alloc( n * sizeof( number ) );
+  number *pevpoint= (number *)omAlloc( n * sizeof( number ) );
   for ( i= 0; i < n; i++ )
   {
     pevpoint[i]=nInit(0);
@@ -531,7 +531,7 @@ BOOLEAN nuVanderSys( leftv res, leftv arg1, leftv arg2, leftv arg3)
       tmp = pGetCoeff( (p->m)[i] );
       if ( nIsZero(tmp) || nIsOne(tmp) || nIsMOne(tmp) )
       {
-        Free( (ADDRESS)pevpoint, n * sizeof( number ) );
+        omFreeSize( (ADDRESS)pevpoint, n * sizeof( number ) );
         WerrorS("Elements of first input ideal must not be equal to -1, 0, 1!");
         return TRUE;
       }
@@ -540,7 +540,7 @@ BOOLEAN nuVanderSys( leftv res, leftv arg1, leftv arg2, leftv arg3)
     {
       if ( !pIsConstant((p->m)[i]))
       {
-        Free( (ADDRESS)pevpoint, n * sizeof( number ) );
+        omFreeSize( (ADDRESS)pevpoint, n * sizeof( number ) );
         WerrorS("Elements of first input ideal must be numbers!");
         return TRUE;
       }
@@ -548,7 +548,7 @@ BOOLEAN nuVanderSys( leftv res, leftv arg1, leftv arg2, leftv arg3)
     }
   }
 
-  number *wresults= (number *)Alloc( m * sizeof( number ) );
+  number *wresults= (number *)omAlloc( m * sizeof( number ) );
   for ( i= 0; i < m; i++ )
   {
     wresults[i]= nInit(0);
@@ -556,8 +556,8 @@ BOOLEAN nuVanderSys( leftv res, leftv arg1, leftv arg2, leftv arg3)
     {
       if ( !pIsConstant((w->m)[i]))
       {
-        Free( (ADDRESS)pevpoint, n * sizeof( number ) );
-        Free( (ADDRESS)wresults, m * sizeof( number ) );
+        omFreeSize( (ADDRESS)pevpoint, n * sizeof( number ) );
+        omFreeSize( (ADDRESS)wresults, m * sizeof( number ) );
         WerrorS("Elements of second input ideal must be numbers!");
         return TRUE;
       }
@@ -570,8 +570,8 @@ BOOLEAN nuVanderSys( leftv res, leftv arg1, leftv arg2, leftv arg3)
   // do not free ncpoly[]!!
   poly rpoly= vm.numvec2poly( ncpoly );
 
-  Free( (ADDRESS)pevpoint, n * sizeof( number ) );
-  Free( (ADDRESS)wresults, m * sizeof( number ) );
+  omFreeSize( (ADDRESS)pevpoint, n * sizeof( number ) );
+  omFreeSize( (ADDRESS)wresults, m * sizeof( number ) );
 
   res->data= (void*)rpoly;
   return FALSE;
@@ -700,7 +700,7 @@ BOOLEAN loSimplex( leftv res, leftv args )
 
   LP->compute();
 
-  lists lres= (lists)Alloc( sizeof(slists) );
+  lists lres= (lists)omAlloc( sizeof(slists) );
   lres->Init( 6 );
 
   lres->m[0].rtyp= MATRIX_CMD; // output matrix

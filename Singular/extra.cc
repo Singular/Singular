@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.136 2000-08-02 13:40:30 obachman Exp $ */
+/* $Id: extra.cc,v 1.137 2000-08-14 12:56:04 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -187,7 +187,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     if(strcmp(sys_cmd,"uname")==0)
     {
       res->rtyp=STRING_CMD;
-      res->data = mstrdup(S_UNAME);
+      res->data = omStrDup(S_UNAME);
       return FALSE;
     }
     else
@@ -197,7 +197,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       if (h==NULL)
       {
         res->rtyp=STRING_CMD;
-        res->data=(void *)mstrdup(versionString());
+        res->data=(void *)omStrDup(versionString());
         return FALSE;
       }
       else if (h->Typ()==STRING_CMD)
@@ -248,7 +248,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       res->rtyp = STRING_CMD;
       char* b = StringSetS("");
       feStringAppendBrowsers(0);
-      res->data = mstrdup(b);
+      res->data = omStrDup(b);
       return FALSE;
     }
     else
@@ -276,7 +276,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         res->rtyp=STRING_CMD;
         char *r=getenv((char *)h->Data());
         if (r==NULL) r="";
-        res->data=(void *)mstrdup(r);
+        res->data=(void *)omStrDup(r);
         return FALSE;
       }
       else
@@ -296,7 +296,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       {
         res->rtyp=STRING_CMD;
         setenv((char *)h->Data(), (char *)h->next->Data(), 1);
-        res->data=(void *)mstrdup((char *)h->next->Data());
+        res->data=(void *)omStrDup((char *)h->next->Data());
         feReInitResources();
         return FALSE;
       }
@@ -317,9 +317,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       res->rtyp=STRING_CMD;
       char *r=feResource("Singular");
       if (r != NULL)
-        res->data = (void*) mstrdup( r );
+        res->data = (void*) omStrDup( r );
       else
-        res->data = (void*) mstrdup("");
+        res->data = (void*) omStrDup("");
       return FALSE;
     }
     else
@@ -354,9 +354,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         {
           res->rtyp = STRING_CMD;
           if (feOptSpec[opt].value != NULL)
-            res->data = mstrdup((char*) feOptSpec[opt].value);
+            res->data = omStrDup((char*) feOptSpec[opt].value);
           else
-            res->data = mstrdup("");
+            res->data = omStrDup("");
         }
         else
         {
@@ -412,6 +412,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         siSeed=siRandomStart;
 #else
         srand((unsigned int)siRandomStart);
+#endif
+#ifdef HAVE_FACTORY
+        factoryseed(siRandomStart);
 #endif
         return FALSE;
       }
@@ -527,7 +530,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
    if(strcmp(sys_cmd,"contributors") == 0)
    {
      res->rtyp=STRING_CMD;
-     res->data=(void *)mstrdup(
+     res->data=(void *)omStrDup(
        "Olaf Bachmann, Hubert Grassmann, Kai Krueger, Wolfgang Neumann, Thomas Nuessler, Wilfred Pohl, Jens Schmidt, Thomas Siebert, Ruediger Stobbe, Moritz Wenk, Tim Wichmann");
      return FALSE;
    }
@@ -641,7 +644,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 /*==================== mtrack ==================================*/
     if(strcmp(sys_cmd,"mtrack")==0)
     {
-#ifdef MLIST
+#ifdef OM_TRACK
+      om_Opts.MarkAsStatic = 1;
       FILE *fd = NULL;
       if ((h!=NULL) &&(h->Typ()==STRING_CMD))
       {
@@ -649,11 +653,46 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         if (fd == NULL)
           Warn("Can not open %s for writing og mtrack. Using stdout");
       }
-      mmTestList((fd == NULL ? stdout: fd), 0);
+      omPrintUsedTrackAddrs((fd == NULL ? stdout : fd));
       if (fd != NULL) fclose(fd);
+      om_Opts.MarkAsStatic = 0;
       return FALSE;
 #else
-     WerrorS("mtrack not supported without MLIST");
+     WerrorS("mtrack not supported without OM_TRACK");
+     return TRUE;
+#endif
+    }
+/*==================== mtrack_all ==================================*/
+    if(strcmp(sys_cmd,"mtrack_all")==0)
+    {
+#ifdef OM_TRACK
+      om_Opts.MarkAsStatic = 1;
+      FILE *fd = NULL;
+      if ((h!=NULL) &&(h->Typ()==STRING_CMD))
+      {
+        fd = fopen((char*) h->Data(), "w");
+        if (fd == NULL)
+          Warn("Can not open %s for writing og mtrack. Using stdout");
+      }
+      // OB: TBC print to fd
+      omPrintUsedAddrs((fd == NULL ? stdout : fd));
+      if (fd != NULL) fclose(fd);
+      om_Opts.MarkAsStatic = 0;
+      return FALSE;
+#else
+     WerrorS("mtrack not supported without OM_TRACK");
+     return TRUE;
+#endif
+    }
+    else
+/*==================== backtrace ==================================*/
+    if(strcmp(sys_cmd,"backtrace")==0)
+    {
+#ifndef OM_NDEBUG
+      omPrintCurrentBackTrace(stdout);
+      return FALSE;
+#else
+     WerrorS("btrack not supported without OM_TRACK");
      return TRUE;
 #endif
     }
@@ -891,7 +930,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         res->rtyp=STRING_CMD;
         char *r=iiGetLibName(IDPROC(hh));
         if (r==NULL) r="";
-        res->data=mstrdup(r);
+        res->data=omStrDup(r);
         return FALSE;
       }
       else
@@ -951,7 +990,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       poly  p=(poly)(h->Data());
       int l=pLength(p);
-      short *points=(short *)Alloc(currRing->N*l*sizeof(short));
+      short *points=(short *)omAlloc(currRing->N*l*sizeof(short));
       int i,j,k;
       k=0;
       poly pp=p;
@@ -977,10 +1016,10 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 //  PrintS("Bin jetzt in extra.cc bei der Auswertung.\n"); // **********
 
 
-      lists L=(lists)AllocSizeOf(slists);
+      lists L=(lists)omAllocBin(slists_bin);
       L->Init(6);
       L->m[0].rtyp=STRING_CMD;               // newtonnumber;
-      L->m[0].data=(void *)mstrdup(r.nZahl);
+      L->m[0].data=(void *)omStrDup(r.nZahl);
       L->m[1].rtyp=INT_CMD;
       L->m[1].data=(void *)r.achse;          // flag for unoccupied axes
       L->m[2].rtyp=INT_CMD;
@@ -992,14 +1031,14 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         //---<>--number of points------
         int anz = r.anz_punkte;    // number of points
         int dim = (currRing->N);     // dimension
-        intvec* v = NewIntvec1( anz*dim );
+        intvec* v = new intvec( anz*dim );
         for (i=0; i<anz*dim; i++)    // copy points
           (*v)[i] = r.pu[i];
         L->m[4].rtyp=INTVEC_CMD;
         L->m[4].data=(void *)v;
         //---<>--degenerations---------
         int deg = r.deg;    // number of points
-        intvec* w = NewIntvec1( r.speicher );  // necessary memeory
+        intvec* w = new intvec( r.speicher );  // necessary memeory
         i=0;               // start copying
         do
         {
@@ -1024,7 +1063,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       delete[] r.pu;
       delete[] r.deg_tab;      // Ist das ein Problem??
 
-      Free((ADDRESS)points,currRing->N*l*sizeof(short));
+      omFreeSize((ADDRESS)points,currRing->N*l*sizeof(short));
       return FALSE;
     }
     else

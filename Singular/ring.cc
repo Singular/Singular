@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.102 2000-03-31 15:32:24 Singular Exp $ */
+/* $Id: ring.cc,v 1.103 2000-08-14 12:56:47 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -11,7 +11,7 @@
 #include <math.h>
 #include "mod2.h"
 #include "structs.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "tok.h"
 #include "ipid.h"
 #include "polys.h"
@@ -107,9 +107,6 @@ void rChangeCurrRing(ring r, BOOLEAN complete)
       {
         naMinimalPoly=((lnumber)r->minpoly)->z;
       }
-
-    /*------------ Garbage Collection -----------------------------------*/
-//      mmGarbageCollectHeaps(2);
     }
   }
 }
@@ -121,8 +118,9 @@ void rSetHdl(idhdl h, BOOLEAN complete)
   if (h!=NULL)
   {
     rg = IDRING(h);
-    mmTestP((ADDRESS)h,sizeof(idrec));
-    mmTestLP((ADDRESS)IDID(h));
+    omCheckAddrSize((ADDRESS)h,sizeof(idrec));
+    if (IDID(h))  // OB: ????
+      omCheckAddr((ADDRESS)IDID(h));
     rTest(rg);
   }
   else complete=FALSE;
@@ -199,16 +197,16 @@ idhdl rDefault(char *s)
   r->N     = 3;
   /*r->P     = 0; Alloc0 in idhdl::set, ipid.cc*/
   /*names*/
-  r->names = (char **) Alloc(3 * sizeof(char_ptr));
-  r->names[0]  = mstrdup("x");
-  r->names[1]  = mstrdup("y");
-  r->names[2]  = mstrdup("z");
+  r->names = (char **) omAlloc(3 * sizeof(char_ptr));
+  r->names[0]  = omStrDup("x");
+  r->names[1]  = omStrDup("y");
+  r->names[2]  = omStrDup("z");
   /*weights: entries for 3 blocks: NULL*/
-  r->wvhdl = (int **)Alloc0(3 * sizeof(int_ptr));
+  r->wvhdl = (int **)omAlloc0(3 * sizeof(int_ptr));
   /*order: dp,C,0*/
-  r->order = (int *) Alloc(3 * sizeof(int *));
-  r->block0 = (int *)Alloc0(3 * sizeof(int *));
-  r->block1 = (int *)Alloc0(3 * sizeof(int *));
+  r->order = (int *) omAlloc(3 * sizeof(int *));
+  r->block0 = (int *)omAlloc0(3 * sizeof(int *));
+  r->block1 = (int *)omAlloc0(3 * sizeof(int *));
   /* ringorder dp for the first block: var 1..3 */
   r->order[0]  = ringorder_dp;
   r->block0[0] = 1;
@@ -306,10 +304,10 @@ static BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
   }
 
   // initialize fields of R
-  R->order=(int *)Alloc0(n*sizeof(int));
-  R->block0=(int *)Alloc0(n*sizeof(int));
-  R->block1=(int *)Alloc0(n*sizeof(int));
-  R->wvhdl=(int**)Alloc0(n*sizeof(int_ptr));
+  R->order=(int *)omAlloc0(n*sizeof(int));
+  R->block0=(int *)omAlloc0(n*sizeof(int));
+  R->block1=(int *)omAlloc0(n*sizeof(int));
+  R->wvhdl=(int**)omAlloc0(n*sizeof(int_ptr));
 
   // init order, so that rBlocks works correctly
   for (j=0; j < n-1; j++)
@@ -343,7 +341,7 @@ static BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
           typ=-1;
         case ringorder_wp:
         case ringorder_Wp:
-          R->wvhdl[n]=(int*)AllocL((iv->length()-1)*sizeof(int));
+          R->wvhdl[n]=(int*)omAlloc((iv->length()-1)*sizeof(int));
           for (i=2; i<iv->length(); i++)
             R->wvhdl[n][i-2] = (*iv)[i];
           R->block0[n] = last+1;
@@ -371,7 +369,7 @@ static BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
         case ringorder_a:
           R->block0[n] = last+1;
           R->block1[n] = last + iv->length() - 2;
-          R->wvhdl[n] = (int*)AllocL((iv->length()-1)*sizeof(int));
+          R->wvhdl[n] = (int*)omAlloc((iv->length()-1)*sizeof(int));
           for (i=2; i<iv->length(); i++)
           {
             R->wvhdl[n][i-2]=(*iv)[i];
@@ -384,7 +382,7 @@ static BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
           if (Mtyp==0) return TRUE;
           if (Mtyp==-1) typ = -1;
 
-          R->wvhdl[n] =( int *)AllocL((iv->length()-1)*sizeof(int));
+          R->wvhdl[n] =( int *)omAlloc((iv->length()-1)*sizeof(int));
           for (i=2; i<iv->length();i++)
             R->wvhdl[n][i-2]=(*iv)[i];
 
@@ -448,7 +446,7 @@ static BOOLEAN rSleftvList2StringArray(sleftv* sl, char** p)
         sleftv s_sl;
         iiConvert(POLY_CMD,ANY_TYPE,-1,sl,&s_sl);
         if (s_sl.Name() != sNoName)
-          *p = mstrdup(s_sl.Name());
+          *p = omStrDup(s_sl.Name());
         else
           *p = NULL;
         sl->next = s_sl.next;
@@ -460,7 +458,7 @@ static BOOLEAN rSleftvList2StringArray(sleftv* sl, char** p)
         return TRUE;
     }
     else
-      *p = mstrdup(sl->Name());
+      *p = omStrDup(sl->Name());
     p++;
     sl=sl->next;
   }
@@ -508,8 +506,8 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     }
     if ((pn->next==NULL) && complex_flag)
     {
-      pn->next=(leftv)Alloc0SizeOf(sleftv);
-      pn->next->name=mstrdup("i");
+      pn->next=(leftv)omAlloc0Bin(sleftv_bin);
+      pn->next->name=omStrDup("i");
     }
   }
   else
@@ -559,7 +557,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       ch = IsPrime(ch);
   }
   // allocated ring and set ch
-  R = (ring) Alloc0SizeOf(sip_sring);
+  R = (ring) omAlloc0Bin(sip_sring_bin);
   R->ch = ch;
   if (ch == -1)
   {
@@ -576,7 +574,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
       WerrorS("too many parameters");
       goto rInitError;
     }
-    R->parameter=(char**)Alloc0(R->P*sizeof(char_ptr));
+    R->parameter=(char**)omAlloc0(R->P*sizeof(char_ptr));
     if (rSleftvList2StringArray(pn, R->parameter))
     {
       WerrorS("parameter expected");
@@ -599,7 +597,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 
   /* names and number of variables-------------------------------------*/
   R->N = rv->listLength();
-  R->names   = (char **)Alloc0(R->N * sizeof(char_ptr));
+  R->names   = (char **)omAlloc0(R->N * sizeof(char_ptr));
   if (rSleftvList2StringArray(rv, R->names))
   {
     WerrorS("name of ring variable expected");
@@ -643,7 +641,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 
   //memcpy(IDRING(tmp),R,sizeof(*R));
   // set current ring
-  //FreeSizeOf(R,  ip_sring);
+  //omFreeBin(R,  ip_sring_bin);
   //return tmp;
   return R;
 
@@ -686,12 +684,12 @@ void rWrite(ring r)
 
   int nblocks=rBlocks(r);
 
-  mmTestP(r,sizeof(ip_sring));
-  mmTestP(r->order,nblocks*sizeof(int));
-  mmTestP(r->block0,nblocks*sizeof(int));
-  mmTestP(r->block1,nblocks*sizeof(int));
-  mmTestP(r->wvhdl,nblocks*sizeof(int_ptr));
-  mmTestP(r->names,r->N*sizeof(char_ptr));
+  omCheckAddrSize(r,sizeof(ip_sring));
+  omCheckAddrSize(r->order,nblocks*sizeof(int));
+  omCheckAddrSize(r->block0,nblocks*sizeof(int));
+  omCheckAddrSize(r->block1,nblocks*sizeof(int));
+  omCheckAddrSize(r->wvhdl,nblocks*sizeof(int_ptr));
+  omCheckAddrSize(r->names,r->N*sizeof(char_ptr));
 
   nblocks--;
 
@@ -817,16 +815,16 @@ static void rDelete(ring r)
     i=rBlocks(r);
     assume(r->block0 != NULL && r->block1 != NULL && r->wvhdl != NULL);
     // delete order
-    Free((ADDRESS)r->order,i*sizeof(int));
-    Free((ADDRESS)r->block0,i*sizeof(int));
-    Free((ADDRESS)r->block1,i*sizeof(int));
+    omFreeSize((ADDRESS)r->order,i*sizeof(int));
+    omFreeSize((ADDRESS)r->block0,i*sizeof(int));
+    omFreeSize((ADDRESS)r->block1,i*sizeof(int));
     // delete weights
     for (j=0; j<i; j++)
     {
       if (r->wvhdl[j]!=NULL)
-        FreeL(r->wvhdl[j]);
+        omFree(r->wvhdl[j]);
     }
-    Free((ADDRESS)r->wvhdl,i*sizeof(short *));
+    omFreeSize((ADDRESS)r->wvhdl,i*sizeof(short *));
   }
   else
   {
@@ -838,9 +836,9 @@ static void rDelete(ring r)
   {
     for (i=0; i<r->N; i++)
     {
-      if (r->names[i] != NULL) FreeL((ADDRESS)r->names[i]);
+      if (r->names[i] != NULL) omFree((ADDRESS)r->names[i]);
     }
-    Free((ADDRESS)r->names,r->N*sizeof(char_ptr));
+    omFreeSize((ADDRESS)r->names,r->N*sizeof(char_ptr));
   }
 
   // delete parameter
@@ -850,13 +848,13 @@ static void rDelete(ring r)
     j = 0;
     while (j < rPar(r))
     {
-      if (*s != NULL) FreeL((ADDRESS)*s);
+      if (*s != NULL) omFree((ADDRESS)*s);
       s++;
       j++;
     }
-    Free((ADDRESS)r->parameter,rPar(r)*sizeof(char_ptr));
+    omFreeSize((ADDRESS)r->parameter,rPar(r)*sizeof(char_ptr));
   }
-  FreeSizeOf(r, ip_sring);
+  omFreeBin(r, ip_sring_bin);
 }
 
 void rKill(ring r)
@@ -1080,7 +1078,7 @@ int rOrderName(char * ordername)
     order--;
   }
   if (order==0) Werror("wrong ring order `%s`",ordername);
-  FreeL((ADDRESS)ordername);
+  omFree((ADDRESS)ordername);
   return order;
 }
 
@@ -1122,7 +1120,7 @@ char * rOrdStr(ring r)
       else
         StringAppend("(%d)",r->block1[l]-r->block0[l]+1);
     }
-    if (l==nblocks) return mstrdup(StringAppendS(""));
+    if (l==nblocks) return omStrDup(StringAppendS(""));
     StringAppendS(",");
   }
 }
@@ -1137,7 +1135,7 @@ char * rVarStr(ring r)
   {
     l+=strlen(r->names[i])+1;
   }
-  s=(char *)AllocL(l);
+  s=(char *)omAlloc(l);
   s[0]='\0';
   for (i=0; i<r->N-1; i++)
   {
@@ -1157,10 +1155,10 @@ char * rCharStr(ring r)
   {
     i=r->ch;
     if(i==-1)
-      s=mstrdup("real");                    /* R */
+      s=omStrDup("real");                    /* R */
     else
     {
-      s=(char *)AllocL(6);
+      s=(char *)omAlloc(6);
       sprintf(s,"%d",i);                   /* Q, Z/p */
     }
     return s;
@@ -1170,7 +1168,7 @@ char * rCharStr(ring r)
   {
     l+=(strlen(r->parameter[i])+1);
   }
-  s=(char *)AllocL(l+6);
+  s=(char *)omAlloc(l+6);
   s[0]='\0';
   if (r->ch<0)       sprintf(s,"%d",-r->ch); /* Fp(a) */
   else if (r->ch==1) sprintf(s,"0");         /* Q(a)  */
@@ -1192,7 +1190,7 @@ char * rCharStr(ring r)
 
 char * rParStr(ring r)
 {
-  if (r->parameter==NULL) return mstrdup("");
+  if (r->parameter==NULL) return omStrDup("");
 
   int i;
   int l=2;
@@ -1201,7 +1199,7 @@ char * rParStr(ring r)
   {
     l+=strlen(r->parameter[i])+1;
   }
-  char *s=(char *)AllocL(l);
+  char *s=(char *)omAlloc(l);
   s[0]='\0';
   for (i=0; i<rPar(r)-1; i++)
   {
@@ -1217,11 +1215,11 @@ char * rString(ring r)
   char *ch=rCharStr(r);
   char *var=rVarStr(r);
   char *ord=rOrdStr(r);
-  char *res=(char *)AllocL(strlen(ch)+strlen(var)+strlen(ord)+9);
+  char *res=(char *)omAlloc(strlen(ch)+strlen(var)+strlen(ord)+9);
   sprintf(res,"(%s),(%s),(%s)",ch,var,ord);
-  FreeL((ADDRESS)ch);
-  FreeL((ADDRESS)var);
-  FreeL((ADDRESS)ord);
+  omFree((ADDRESS)ch);
+  omFree((ADDRESS)var);
+  omFree((ADDRESS)ord);
   return res;
 }
 
@@ -1282,8 +1280,8 @@ int rSum(ring r1, ring r2, ring &sum)
       {
         if (strcmp(r1->parameter[0],r2->parameter[0])==0) /* 1 char */
         {
-          tmpR.parameter=(char **)AllocSizeOf(char_ptr);
-          tmpR.parameter[0]=mstrdup(r1->parameter[0]);
+          tmpR.parameter=(char **)omAllocBin(char_ptr_bin);
+          tmpR.parameter[0]=omStrDup(r1->parameter[0]);
           tmpR.P=1;
         }
         else
@@ -1303,8 +1301,8 @@ int rSum(ring r1, ring r2, ring &sum)
           if ((strcmp(r1->parameter[0],r2->parameter[0])==0) /* 1 char */
               && naEqual(r1->minpoly,r2->minpoly))
           {
-            tmpR.parameter=(char **)AllocSizeOf(char_ptr);
-            tmpR.parameter[0]=mstrdup(r1->parameter[0]);
+            tmpR.parameter=(char **)omAllocBin(char_ptr_bin);
+            tmpR.parameter[0]=omStrDup(r1->parameter[0]);
             tmpR.minpoly=naCopy(r1->minpoly);
             tmpR.P=1;
             nSetChar(currRing,TRUE);
@@ -1321,8 +1319,8 @@ int rSum(ring r1, ring r2, ring &sum)
           if ((strcmp(r1->parameter[0],r2->parameter[0])==0) /* 1 char */
               && (rPar(r2)==1))
           {
-            tmpR.parameter=(char **)Alloc0SizeOf(char_ptr);
-            tmpR.parameter[0]=mstrdup(r1->parameter[0]);
+            tmpR.parameter=(char **)omAlloc0Bin(char_ptr_bin);
+            tmpR.parameter[0]=omStrDup(r1->parameter[0]);
             tmpR.P=1;
             nSetChar(r1,TRUE);
             tmpR.minpoly=naCopy(r1->minpoly);
@@ -1342,8 +1340,8 @@ int rSum(ring r1, ring r2, ring &sum)
           if ((strcmp(r1->parameter[0],r2->parameter[0])==0) /* 1 char */
               && (rPar(r1)==1))
           {
-            tmpR.parameter=(char **)AllocSizeOf(char_ptr);
-            tmpR.parameter[0]=mstrdup(r1->parameter[0]);
+            tmpR.parameter=(char **)omAllocBin(char_ptr_bin);
+            tmpR.parameter[0]=omStrDup(r1->parameter[0]);
             tmpR.P=1;
             nSetChar(r2,TRUE);
             tmpR.minpoly=naCopy(r2->minpoly);
@@ -1358,11 +1356,11 @@ int rSum(ring r1, ring r2, ring &sum)
         else
         {
           int len=rPar(r1)+rPar(r2);
-          tmpR.parameter=(char **)Alloc(len*sizeof(char_ptr));
+          tmpR.parameter=(char **)omAlloc(len*sizeof(char_ptr));
           int i;
           for (i=0;i<rPar(r1);i++)
           {
-            tmpR.parameter[i]=mstrdup(r1->parameter[i]);
+            tmpR.parameter[i]=omStrDup(r1->parameter[i]);
           }
           int j,l;
           for(j=0;j<rPar(r2);j++)
@@ -1374,13 +1372,13 @@ int rSum(ring r1, ring r2, ring &sum)
             }
             if (l==i)
             {
-              tmpR.parameter[i]=mstrdup(r2->parameter[j]);
+              tmpR.parameter[i]=omStrDup(r2->parameter[j]);
               i++;
             }
           }
           if (i!=len)
           {
-            ReAlloc(tmpR.parameter,len*sizeof(char_ptr),i*sizeof(char_ptr));
+            omReallocSize(tmpR.parameter,len*sizeof(char_ptr),i*sizeof(char_ptr));
           }
         }
       }
@@ -1394,7 +1392,7 @@ int rSum(ring r1, ring r2, ring &sum)
           || (r2->ch==-r1->ch)) /* Z/p */
       {
         tmpR.ch=rInternalChar(r1);
-        tmpR.parameter=(char **)Alloc(rPar(r1)*sizeof(char_ptr));
+        tmpR.parameter=(char **)omAlloc(rPar(r1)*sizeof(char_ptr));
         tmpR.P=rPar(r1);
         memcpy(tmpR.parameter,r1->parameter,rPar(r1)*sizeof(char_ptr));
         if (r1->minpoly!=NULL)
@@ -1421,7 +1419,7 @@ int rSum(ring r1, ring r2, ring &sum)
       {
         tmpR.ch=rInternalChar(r2);
         tmpR.P=rPar(r2);
-        tmpR.parameter=(char **)Alloc(rPar(r2)*sizeof(char_ptr));
+        tmpR.parameter=(char **)omAlloc(rPar(r2)*sizeof(char_ptr));
         memcpy(tmpR.parameter,r2->parameter,rPar(r2)*sizeof(char_ptr));
         if (r2->minpoly!=NULL)
         {
@@ -1435,9 +1433,9 @@ int rSum(ring r1, ring r2, ring &sum)
         tmpR.ch=r2->ch;
         if (r2->parameter!=NULL)
         {
-          tmpR.parameter=(char **)AllocSizeOf(char_ptr);
+          tmpR.parameter=(char **)omAllocBin(char_ptr_bin);
           tmpR.P=1;
-          tmpR.parameter[0]=mstrdup(r2->parameter[0]);
+          tmpR.parameter[0]=omStrDup(r2->parameter[0]);
         }
       }
       else
@@ -1452,11 +1450,11 @@ int rSum(ring r1, ring r2, ring &sum)
       {
         tmpR.ch=rInternalChar(r1);
         tmpR.P=rPar(r1);
-        tmpR.parameter=(char **)Alloc0(rPar(r1)*sizeof(char_ptr));
+        tmpR.parameter=(char **)omAlloc0(rPar(r1)*sizeof(char_ptr));
         int i;
         for(i=0;i<rPar(r1);i++)
         {
-          tmpR.parameter[i]=mstrdup(r1->parameter[i]);
+          tmpR.parameter[i]=omStrDup(r1->parameter[i]);
         }
         if (r1->minpoly!=NULL)
         {
@@ -1481,11 +1479,11 @@ int rSum(ring r1, ring r2, ring &sum)
       {
         tmpR.ch=rInternalChar(r2);
         tmpR.P=rPar(r2);
-        tmpR.parameter=(char **)Alloc(rPar(r2)*sizeof(char_ptr));
+        tmpR.parameter=(char **)omAlloc(rPar(r2)*sizeof(char_ptr));
         int i;
         for(i=0;i<rPar(r2);i++)
         {
-          tmpR.parameter[i]=mstrdup(r2->parameter[i]);
+          tmpR.parameter[i]=omStrDup(r2->parameter[i]);
         }
         if (r2->minpoly!=NULL)
         {
@@ -1504,7 +1502,7 @@ int rSum(ring r1, ring r2, ring &sum)
   /* variable names ========================================================*/
   int i,j,k;
   int l=r1->N+r2->N;
-  char **names=(char **)Alloc0(l*sizeof(char_ptr));
+  char **names=(char **)omAlloc0(l*sizeof(char_ptr));
   k=0;
 
   // collect all varnames from r1, except those which are parameters
@@ -1530,7 +1528,7 @@ int rSum(ring r1, ring r2, ring &sum)
     if (b)
     {
       //Print("name : %d: %s\n",k,r1->names[i]);
-      names[k]=mstrdup(r1->names[i]);
+      names[k]=omStrDup(r1->names[i]);
       k++;
     }
     //else
@@ -1568,7 +1566,7 @@ int rSum(ring r1, ring r2, ring &sum)
       }
       if (b)
       {
-        names[k]=mstrdup(r2->names[i]);
+        names[k]=omStrDup(r2->names[i]);
         //Print("name : %d : %s\n",k,r2->names[i]);
         k++;
       }
@@ -1581,7 +1579,7 @@ int rSum(ring r1, ring r2, ring &sum)
   // check whether we found any vars at all
   if (k == 0)
   {
-    names[k]=mstrdup("");
+    names[k]=omStrDup("");
     k=1;
   }
   tmpR.N=k;
@@ -1591,10 +1589,10 @@ int rSum(ring r1, ring r2, ring &sum)
   if ((r1->order[0]==ringorder_unspec)
       && (r2->order[0]==ringorder_unspec))
   {
-    tmpR.order=(int*)Alloc(3*sizeof(int));
-    tmpR.block0=(int*)Alloc(3*sizeof(int));
-    tmpR.block1=(int*)Alloc(3*sizeof(int));
-    tmpR.wvhdl=(int**)Alloc0(3*sizeof(int_ptr));
+    tmpR.order=(int*)omAlloc(3*sizeof(int));
+    tmpR.block0=(int*)omAlloc(3*sizeof(int));
+    tmpR.block1=(int*)omAlloc(3*sizeof(int));
+    tmpR.wvhdl=(int**)omAlloc0(3*sizeof(int_ptr));
     tmpR.order[0]=ringorder_unspec;
     tmpR.order[1]=ringorder_C;
     tmpR.order[2]=0;
@@ -1624,10 +1622,10 @@ int rSum(ring r1, ring r2, ring &sum)
       b=rBlocks(r1)+rBlocks(r2)-2; /* for only one order C, only one 0 */
       rb=NULL;
     }
-    tmpR.order=(int*)Alloc0(b*sizeof(int));
-    tmpR.block0=(int*)Alloc0(b*sizeof(int));
-    tmpR.block1=(int*)Alloc0(b*sizeof(int));
-    tmpR.wvhdl=(int**)Alloc0(b*sizeof(int_ptr));
+    tmpR.order=(int*)omAlloc0(b*sizeof(int));
+    tmpR.block0=(int*)omAlloc0(b*sizeof(int));
+    tmpR.block1=(int*)omAlloc0(b*sizeof(int));
+    tmpR.wvhdl=(int**)omAlloc0(b*sizeof(int_ptr));
     /* weights not implemented yet ...*/
     if (rb!=NULL)
     {
@@ -1649,11 +1647,7 @@ int rSum(ring r1, ring r2, ring &sum)
         tmpR.block0[i]=r1->block0[i];
         tmpR.block1[i]=r1->block1[i];
         if (r1->wvhdl[i]!=NULL)
-        {
-          int l=mmSizeL(r1->wvhdl[i]);
-          tmpR.wvhdl[i]=(int *)AllocL(l);
-          memcpy(tmpR.wvhdl[i],r1->wvhdl[i],l);
-        }
+          tmpR.wvhdl[i] = (int*) omMemDup(r1->wvhdl[i]);
       }
       j=i;
       i--;
@@ -1673,9 +1667,7 @@ int rSum(ring r1, ring r2, ring &sum)
           tmpR.block1[j]=r2->block1[i]+r1->N;
           if (r2->wvhdl[i]!=NULL)
           {
-            int l=mmSizeL(r2->wvhdl[i]);
-            tmpR.wvhdl[j]=(int *)AllocL(l);
-            memcpy(tmpR.wvhdl[j],r2->wvhdl[i],l);
+            tmpR.wvhdl[j] = (int*) omMemDup(r2->wvhdl[i]);
           }
         }
       }
@@ -1688,10 +1680,10 @@ int rSum(ring r1, ring r2, ring &sum)
   {
     int b=rBlocks(r1);
 
-    tmpR.order=(int*)Alloc0(b*sizeof(int));
-    tmpR.block0=(int*)Alloc0(b*sizeof(int));
-    tmpR.block1=(int*)Alloc0(b*sizeof(int));
-    tmpR.wvhdl=(int**)Alloc0(b*sizeof(int_ptr));
+    tmpR.order=(int*)omAlloc0(b*sizeof(int));
+    tmpR.block0=(int*)omAlloc0(b*sizeof(int));
+    tmpR.block1=(int*)omAlloc0(b*sizeof(int));
+    tmpR.wvhdl=(int**)omAlloc0(b*sizeof(int_ptr));
     /* weights not implemented yet ...*/
     for (i=0;i<b;i++)
     {
@@ -1700,21 +1692,19 @@ int rSum(ring r1, ring r2, ring &sum)
       tmpR.block1[i]=r1->block1[i];
       if (r1->wvhdl[i]!=NULL)
       {
-        int l=mmSizeL(r1->wvhdl[i]);
-        tmpR.wvhdl[i]=(int *)AllocL(l);
-        memcpy(tmpR.wvhdl[i],r1->wvhdl[i],l);
+        tmpR.wvhdl[i] = (int*) omMemDup(r1->wvhdl[i]);
       }
     }
     tmpR.OrdSgn=r1->OrdSgn;
   }
   else
   {
-    for(i=0;i<k;i++) FreeL((ADDRESS)tmpR.names[i]);
-    Free((ADDRESS)names,tmpR.N*sizeof(char_ptr));
+    for(i=0;i<k;i++) omFree((ADDRESS)tmpR.names[i]);
+    omFreeSize((ADDRESS)names,tmpR.N*sizeof(char_ptr));
     Werror("difficulties with variables: %d,%d -> %d",r1->N,r2->N,k);
     return -1;
   }
-  sum=(ring)AllocSizeOf(ip_sring);
+  sum=(ring)omAllocBin(ip_sring_bin);
   memcpy(sum,&tmpR,sizeof(ip_sring));
   rComplete(sum);
   return 1;
@@ -1732,7 +1722,7 @@ static ring rCopy0(ring r, BOOLEAN copy_qideal = TRUE,
 {
   if (r == NULL) return NULL;
   int i,j;
-  ring res=(ring)AllocSizeOf(ip_sring);
+  ring res=(ring)omAllocBin(ip_sring_bin);
 
   memcpy4(res,r,sizeof(ip_sring));
   res->VarOffset = NULL;
@@ -1741,26 +1731,25 @@ static ring rCopy0(ring r, BOOLEAN copy_qideal = TRUE,
   {
     res->minpoly=nCopy(r->minpoly);
     int l=rPar(r);
-    res->parameter=(char **)Alloc(l*sizeof(char_ptr));
+    res->parameter=(char **)omAlloc(l*sizeof(char_ptr));
     int i;
     for(i=0;i<rPar(r);i++)
     {
-      res->parameter[i]=mstrdup(r->parameter[i]);
+      res->parameter[i]=omStrDup(r->parameter[i]);
     }
   }
   if (copy_ordering == TRUE)
   {
     i=rBlocks(r);
-    res->wvhdl   = (int **)Alloc(i * sizeof(int_ptr));
-    res->order   = (int *) Alloc(i * sizeof(int));
-    res->block0  = (int *) Alloc(i * sizeof(int));
-    res->block1  = (int *) Alloc(i * sizeof(int));
+    res->wvhdl   = (int **)omAlloc(i * sizeof(int_ptr));
+    res->order   = (int *) omAlloc(i * sizeof(int));
+    res->block0  = (int *) omAlloc(i * sizeof(int));
+    res->block1  = (int *) omAlloc(i * sizeof(int));
     for (j=0; j<i; j++)
     {
       if (r->wvhdl[j]!=NULL)
       {
-        res->wvhdl[j]=(int*)AllocL(mmSizeL((ADDRESS)r->wvhdl[j]));
-        memcpy(res->wvhdl[j],r->wvhdl[j],mmSizeL((ADDRESS)r->wvhdl[j]));
+        res->wvhdl[j] = (int*) omMemDup(r->wvhdl[j]);
       }
       else
         res->wvhdl[j]=NULL;
@@ -1777,10 +1766,10 @@ static ring rCopy0(ring r, BOOLEAN copy_qideal = TRUE,
     res->block1 = NULL;
   }
 
-  res->names   = (char **)Alloc(r->N * sizeof(char_ptr));
+  res->names   = (char **)omAlloc(r->N * sizeof(char_ptr));
   for (i=0; i<res->N; i++)
   {
-    res->names[i] = mstrdup(r->names[i]);
+    res->names[i] = omStrDup(r->names[i]);
   }
   res->idroot = NULL;
   if (r->qideal!=NULL)
@@ -1994,16 +1983,16 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
 
   if (r->N == 0) return TRUE;
 
-//  mmTestP(r,sizeof(ip_sring));
-#ifdef MDEBUG
+//  omCheckAddrSize(r,sizeof(ip_sring));
+#if OM_CHECK > 0
   i=rBlocks(r);
-  mmDBTestBlock(r->order,i*sizeof(int),fn,l);
-  mmDBTestBlock(r->block0,i*sizeof(int),fn,l);
-  mmDBTestBlock(r->block1,i*sizeof(int),fn,l);
-  mmDBTestBlock(r->wvhdl,i*sizeof(int *),fn,l);
+  omCheckAddrSize(r->order,i*sizeof(int));
+  omCheckAddrSize(r->block0,i*sizeof(int));
+  omCheckAddrSize(r->block1,i*sizeof(int));
+  omCheckAddrSize(r->wvhdl,i*sizeof(int *));
   for (j=0;j<i; j++)
   {
-    if (r->wvhdl[j] != NULL) mmDBTest(r->wvhdl[j], fn, l);
+    if (r->wvhdl[j] != NULL) omCheckAddr(r->wvhdl[j]);
   }
 #endif
   if (r->VarOffset == NULL)
@@ -2011,20 +2000,15 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
     Warn("Null ring VarOffset -- no rComplete (?) in n %s:%d\n", fn, l);
     return FALSE;
   }
-#ifdef MDEBUG
-  mmDBTestBlock(r->VarOffset,(r->N+1)*sizeof(int),fn,l);
-#endif
+  omCheckAddrSize(r->VarOffset,(r->N+1)*sizeof(int));
 
   if ((r->OrdSize==0)!=(r->typ==NULL))
   {
-    Warn("mismatch OrdSize and typ-pointer in %s:%d",fn,l);
+    Warn("mismatch OrdSize and typ-pointer in %s:%d");
     return FALSE;
   }
-#ifdef MDEBUG
-  if (r->typ!=NULL)
-    mmDBTestBlock(r->typ,r->OrdSize*sizeof(*(r->typ)),fn,l);
-  mmDBTestBlock(r->VarOffset,(r->N+1)*sizeof(*(r->VarOffset)),fn,l);
-#endif
+  omcheckAddrSize(r->typ,r->OrdSize*sizeof(*(r->typ)));
+  omCheckAddrSize(r->VarOffset,(r->N+1)*sizeof(*(r->VarOffset)));
   // test assumptions:
   for(i=0;i<=r->N;i++)
   {
@@ -2327,14 +2311,14 @@ BOOLEAN rComplete(ring r, int force)
   int bits;
   r->bitmask=rGetExpSize(r->bitmask,bits);
   // will be used for ordsgn:
-  long *tmp_ordsgn=(long *)Alloc0(2*(n+r->N)*sizeof(long));
+  long *tmp_ordsgn=(long *)omAlloc0(2*(n+r->N)*sizeof(long));
   // will be used for VarOffset:
-  int *v=(int *)Alloc((r->N+1)*sizeof(int));
+  int *v=(int *)omAlloc((r->N+1)*sizeof(int));
   for(i=r->N; i>=0 ; i--)
   {
     v[i]=-1;
   }
-  sro_ord *tmp_typ=(sro_ord *)Alloc0(2*(n+r->N)*sizeof(sro_ord));
+  sro_ord *tmp_typ=(sro_ord *)omAlloc0(2*(n+r->N)*sizeof(sro_ord));
   int typ_i=0;
   int prev_ordsgn=0;
   r->pVarLowIndex=0;
@@ -2562,8 +2546,8 @@ BOOLEAN rComplete(ring r, int force)
 
   r->ExpESize=j;
   r->ExpLSize=j;
-  r->mm_specHeap = mmGetSpecHeap(POLYSIZE + (r->ExpLSize)*sizeof(long));
-  assume(r->mm_specHeap != NULL);
+  r->PolyBin = omGetSpecBin(POLYSIZE + (r->ExpLSize)*sizeof(long));
+  assume(r->PolyBin != NULL);
 
   // ----------------------------
   // indices and ordsgn vector for comparison
@@ -2576,7 +2560,7 @@ BOOLEAN rComplete(ring r, int force)
   // r->pCompHighIndex already set
 #endif
   r->pCompLSize = r->pCompHighIndex - r->pCompLowIndex + 1;
-  r->ordsgn=(long *)Alloc0(r->pCompLSize*sizeof(long));
+  r->ordsgn=(long *)omAlloc0(r->pCompLSize*sizeof(long));
 
   for(j=r->pCompLowIndex;j<=r->pCompHighIndex;j++)
   {
@@ -2584,7 +2568,7 @@ BOOLEAN rComplete(ring r, int force)
       = tmp_ordsgn[j-r->pCompLowIndex];
   }
 
-  Free((ADDRESS)tmp_ordsgn,(2*(n+r->N)*sizeof(long)));
+  omFreeSize((ADDRESS)tmp_ordsgn,(2*(n+r->N)*sizeof(long)));
 
   // ----------------------------
   // description of orderings for setm:
@@ -2593,10 +2577,10 @@ BOOLEAN rComplete(ring r, int force)
   if (typ_i==0) r->typ=NULL;
   else
   {
-    r->typ=(sro_ord*)Alloc(typ_i*sizeof(sro_ord));
+    r->typ=(sro_ord*)omAlloc(typ_i*sizeof(sro_ord));
     memcpy(r->typ,tmp_typ,typ_i*sizeof(sro_ord));
   }
-  Free((ADDRESS)tmp_typ,(2*(n+r->N)*sizeof(sro_ord)));
+  omFreeSize((ADDRESS)tmp_typ,(2*(n+r->N)*sizeof(sro_ord)));
 
 #ifndef WORDS_BIGENDIAN
   // LITTLE_ENDIAN: revert some stuff in r->typ
@@ -2628,14 +2612,14 @@ BOOLEAN rComplete(ring r, int force)
   r->VarOffset=v;
 #else
   // LITTLE-Endian: revert
-  r->VarOffset=(int *)Alloc((r->N+1)*sizeof(int));
+  r->VarOffset=(int *)omAlloc((r->N+1)*sizeof(int));
   for(j=r->N;j>=0;j--)
   {
     int tmp=v[j];
     r->VarOffset[j] = r->ExpESize-(tmp & 0xffffff)-1;
     r->VarOffset[j] |= (tmp & (~0xffffff));
   }
-  Free((ADDRESS)v,(r->N+1)*sizeof(int));
+  omFreeSize((ADDRESS)v,(r->N+1)*sizeof(int));
   j=r->pVarLowIndex;
   r->pVarLowIndex=r->ExpESize-r->pVarHighIndex-1;
   r->pVarHighIndex=r->ExpESize-j-1;
@@ -2830,13 +2814,13 @@ BOOLEAN rComplete(ring r, int force)
   int i;
   int j=0;
   int prev_ordsgn=0;
-  long *tmp_ordsgn=(long *)Alloc0(2*(n+r->N)*sizeof(long)); // wil be used for ordsgn
-  int *v=(int *)Alloc((r->N+1)*sizeof(int)); // will be used for VarOffset
+  long *tmp_ordsgn=(long *)omAlloc0(2*(n+r->N)*sizeof(long)); // wil be used for ordsgn
+  int *v=(int *)omAlloc((r->N+1)*sizeof(int)); // will be used for VarOffset
   for(i=r->N; i>=0 ; i--)
   {
     v[i]=-1;
   }
-  sro_ord *tmp_typ=(sro_ord *)Alloc0(2*(n+r->N)*sizeof(sro_ord));
+  sro_ord *tmp_typ=(sro_ord *)omAlloc0(2*(n+r->N)*sizeof(sro_ord));
   int typ_i=0;
   r->pVarLowIndex=0;
 
@@ -3044,8 +3028,8 @@ BOOLEAN rComplete(ring r, int force)
 
   r->ExpESize=j;
   r->ExpLSize=j/(sizeof(long)/sizeof(Exponent_t));
-  r->mm_specHeap = mmGetSpecHeap(POLYSIZE + (r->ExpLSize)*sizeof(long));
-  assume(r->mm_specHeap != NULL);
+  r->PolyBin = omGetSpecBin(POLYSIZE + (r->ExpLSize)*sizeof(long));
+  assume(r->PolyBin != NULL);
 
   // ----------------------------
   // indices and ordsgn vector for comparison
@@ -3058,7 +3042,7 @@ BOOLEAN rComplete(ring r, int force)
   // r->pCompHighIndex already set
 #endif
   r->pCompLSize = r->pCompHighIndex - r->pCompLowIndex + 1;
-  r->ordsgn=(long *)Alloc0(r->pCompLSize*sizeof(long));
+  r->ordsgn=(long *)omAlloc0(r->pCompLSize*sizeof(long));
 
 #ifndef WORDS_BIGENDIAN
   for(j=r->pCompLowIndex;j<=r->pCompHighIndex;j++)
@@ -3074,7 +3058,7 @@ BOOLEAN rComplete(ring r, int force)
   }
 #endif
 
-  Free((ADDRESS)tmp_ordsgn,(2*(n+r->N)*sizeof(long)));
+  omFreeSize((ADDRESS)tmp_ordsgn,(2*(n+r->N)*sizeof(long)));
 
   // ----------------------------
   // description of orderings for setm:
@@ -3083,10 +3067,10 @@ BOOLEAN rComplete(ring r, int force)
   if (typ_i==0) r->typ=NULL;
   else
   {
-    r->typ=(sro_ord*)Alloc(typ_i*sizeof(sro_ord));
+    r->typ=(sro_ord*)omAlloc(typ_i*sizeof(sro_ord));
     memcpy(r->typ,tmp_typ,typ_i*sizeof(sro_ord));
   }
-  Free((ADDRESS)tmp_typ,(2*(n+r->N)*sizeof(sro_ord)));
+  omFreeSize((ADDRESS)tmp_typ,(2*(n+r->N)*sizeof(sro_ord)));
 
 #ifndef WORDS_BIGENDIAN
   // LITTLE_ENDIAN: revert some stuff in r->typ
@@ -3118,12 +3102,12 @@ BOOLEAN rComplete(ring r, int force)
   r->VarOffset=v;
 #else
   // LITTLE-Endian: revert
-  r->VarOffset=(int *)Alloc((r->N+1)*sizeof(int));
+  r->VarOffset=(int *)omAlloc((r->N+1)*sizeof(int));
   for(j=r->N;j>=0;j--)
   {
     r->VarOffset[j]=r->ExpESize-v[j]-1;
   }
-  Free((ADDRESS)v,(r->N+1)*sizeof(int));
+  omFreeSize((ADDRESS)v,(r->N+1)*sizeof(int));
   j=r->pVarLowIndex;
   r->pVarLowIndex=r->ExpESize-r->pVarHighIndex-1;
   r->pVarHighIndex=r->ExpESize-j-1;
@@ -3172,24 +3156,24 @@ void rUnComplete(ring r)
   if (r == NULL) return;
   if (r->VarOffset != NULL)
   {
-    if (r->mm_specHeap != NULL)
-      mmUnGetSpecHeap(&(r->mm_specHeap));
+    if (r->PolyBin != NULL)
+      omUnGetSpecBin(&(r->PolyBin));
 
-    Free((ADDRESS)r->VarOffset, (r->N +1)*sizeof(int));
+    omFreeSize((ADDRESS)r->VarOffset, (r->N +1)*sizeof(int));
     if (r->order != NULL)
     {
       if (r->order[0] == ringorder_s && r->typ[0].data.syz.limit > 0)
       {
-        Free(r->typ[0].data.syz.syz_index,
+        omFreeSize(r->typ[0].data.syz.syz_index,
              (r->typ[0].data.syz.limit +1)*sizeof(int));
       }
     }
     if (r->OrdSize!=0 && r->typ != NULL)
     {
-      Free((ADDRESS)r->typ,r->OrdSize*sizeof(sro_ord));
+      omFreeSize((ADDRESS)r->typ,r->OrdSize*sizeof(sro_ord));
     }
     if (r->ordsgn != NULL && r->pCompLSize != 0)
-      Free((ADDRESS)r->ordsgn,r->pCompLSize*sizeof(long));
+      omFreeSize((ADDRESS)r->ordsgn,r->pCompLSize*sizeof(long));
   }
 }
 
@@ -3389,23 +3373,22 @@ static ring rAssure_SyzComp(ring r, BOOLEAN complete = TRUE)
   int i=rBlocks(r);
   int j;
 
-  res->order=(int *)Alloc0((i+1)*sizeof(int));
+  res->order=(int *)omAlloc0((i+1)*sizeof(int));
   for(j=i;j>0;j--) res->order[j]=r->order[j-1];
   res->order[0]=ringorder_s;
 
-  res->block0=(int *)Alloc0((i+1)*sizeof(int));
+  res->block0=(int *)omAlloc0((i+1)*sizeof(int));
   for(j=i;j>0;j--) res->block0[j]=r->block0[j-1];
 
-  res->block1=(int *)Alloc0((i+1)*sizeof(int));
+  res->block1=(int *)omAlloc0((i+1)*sizeof(int));
   for(j=i;j>0;j--) res->block1[j]=r->block1[j-1];
 
-  int ** wvhdl =(int **)Alloc0((i+1)*sizeof(int**));
+  int ** wvhdl =(int **)omAlloc0((i+1)*sizeof(int**));
   for(j=i;j>0;j--)
   {
     if (r->wvhdl[j-1] != NULL)
     {
-      wvhdl[j] = (int*) AllocL(mmSizeL((ADDRESS)r->wvhdl[j-1]));
-      memcpy(wvhdl[j], r->wvhdl[j-1],mmSizeL((ADDRESS)r->wvhdl[j-1]));
+      wvhdl[j] = (int*) omMemDup(r->wvhdl[j-1]);
     }
   }
   res->wvhdl = wvhdl;
@@ -3505,10 +3488,10 @@ static ring rCurrRingAssure_Global(rRingOrder_t b1, rRingOrder_t b2)
       (currRing->order[2] == 0))
     return currRing;
   ring res = rCopy0(currRing, TRUE, FALSE);
-  res->order = (int*)Alloc0(3*sizeof(int));
-  res->block0 = (int*)Alloc0(3*sizeof(int));
-  res->block1 = (int*)Alloc0(3*sizeof(int));
-  res->wvhdl = (int**)Alloc0(3*sizeof(int*));
+  res->order = (int*)omAlloc0(3*sizeof(int));
+  res->block0 = (int*)omAlloc0(3*sizeof(int));
+  res->block1 = (int*)omAlloc0(3*sizeof(int));
+  res->wvhdl = (int**)omAlloc0(3*sizeof(int*));
   res->order[0] = b1;
   res->order[1] = b2;
   if (b1 == ringorder_c || b1 == ringorder_C)
@@ -3554,14 +3537,14 @@ void rSetSyzComp(int k)
     int i;
     if (currRing->typ[0].data.syz.limit == 0)
     {
-      currRing->typ[0].data.syz.syz_index = (int*) Alloc0((k+1)*sizeof(int));
+      currRing->typ[0].data.syz.syz_index = (int*) omAlloc0((k+1)*sizeof(int));
       currRing->typ[0].data.syz.syz_index[0] = 0;
       currRing->typ[0].data.syz.curr_index = 1;
     }
     else
     {
       currRing->typ[0].data.syz.syz_index = (int*)
-        ReAlloc(currRing->typ[0].data.syz.syz_index,
+        omReallocSize(currRing->typ[0].data.syz.syz_index,
                 (currRing->typ[0].data.syz.limit+1)*sizeof(int),
                 (k+1)*sizeof(int));
     }
@@ -3621,7 +3604,7 @@ BOOLEAN rRing_is_Homog(ring r)
       int length = r->block1[i] - r->block0[i];
       int* wvhdl = r->wvhdl[i];
       if (r->order[i] == ringorder_M) length *= length;
-      assume(mmSizeL(wvhdl) >= length*sizeof(int));
+      assume(omSizeOfAddr(wvhdl) >= length*sizeof(int));
 
       for (j=0; j< length; j++)
       {

@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.26 1999-11-15 17:20:33 obachman Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.27 2000-08-14 12:56:42 obachman Exp $ */
 
 /***************************************************************
  *
@@ -20,7 +20,7 @@
 #include "mpsr_Get.h"
 
 #include "gmp.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "tok.h"
 #include "ipid.h"
 #include "ring.h"
@@ -229,8 +229,8 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
   else if (node == MP_ApIntType)
   {
     mpz_ptr gnum;
-    y =  (number) Alloc0SizeOf(rnumber);
-#if defined(LDEBUG) && ! defined(HAVE_ASO)
+    y =  (number) omAlloc0Bin(rnumber_bin);
+#if defined(LDEBUG)
     y->debug = 123456;
 #endif
     y->s = 3;
@@ -249,9 +249,9 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
       mpt_failr(MPT_SkipAnnots(link, num_annots, &req));
       if (req) return mpsr_SetError(mpsr_ReqAnnotSkip);
     }
-    *x =  (number) Alloc0SizeOf(rnumber);
+    *x =  (number) omAlloc0Bin(rnumber_bin);
     y = (number) *x;
-#if defined(LDEBUG) && ! defined(HAVE_ASO)
+#if defined(LDEBUG) 
     y->debug = 123456;
 #endif
     y->s = 1;
@@ -274,9 +274,9 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
     else
     {
       // otherwise, make an apint out of it
-      *x =  (number) Alloc0SizeOf(rnumber);
+      *x =  (number) omAlloc0Bin(rnumber_bin);
       y = (number) *x;
-#if defined(LDEBUG) && ! defined(HAVE_ASO)
+#if defined(LDEBUG) 
       y->debug = 123456;
 #endif
       mpz_init_set_ui(&(y->z), ui);
@@ -365,7 +365,7 @@ static mpsr_Status_t GetAlgNumber(MP_Link_pt link, number *a)
   else if (ut == 1 || ut == 2)
   {
     // single number
-    b = (lnumber) Alloc0SizeOf(rnumber);
+    b = (lnumber) omAlloc0Bin(rnumber_bin);
     *a = (number) b;
     failr(GetAlgPoly(link, &(b->z)));
     if (ut == 2)
@@ -545,7 +545,7 @@ mpsr_Status_t mpsr_GetRingAnnots(MPT_Node_pt node, ring &r,
   failr(GetProtoTypeAnnot(node, &r1, mv, subring));
 
   // if we are still here, then we are successful in constructing the ring
-  r = (ring) AllocSizeOf(sip_sring);
+  r = (ring) omAllocBin(sip_sring_bin);
   memcpy(r, &r1, sizeof(sip_sring));
 
   if (GetVarNamesAnnot(node, r) != mpsr_Success)
@@ -677,8 +677,8 @@ static mpsr_Status_t GetProtoTypeAnnot(MPT_Node_pt node, ring r, BOOLEAN mv,
                                   MP_AnnotSingularGalois)) != NULL &&
            (annot->value != NULL) &&
            (annot->value->node->type == MP_StringType));
-        r->parameter = (char **)AllocSizeOf(char_ptr);
-        r->parameter[0] = mstrdup(MP_STRING_T(annot->value->node->nvalue));
+        r->parameter = (char **)omAllocBin(char_ptr_bin);
+        r->parameter[0] = omStrDup(MP_STRING_T(annot->value->node->nvalue));
         r->P = 1;
       }
     }
@@ -721,10 +721,10 @@ static mpsr_Status_t GetProtoTypeAnnot(MPT_Node_pt node, ring r, BOOLEAN mv,
 
     // Now do the coercion
     r->ch = (rField_is_Q(subring) ? 1 : - rChar(subring));
-    r->parameter = (char **) Alloc((subring->N)*sizeof(char*));
+    r->parameter = (char **) omAlloc((subring->N)*sizeof(char*));
     r->P = subring->N;
     for (i=0; i < subring->N; i++)
-      r->parameter[i] = mstrdup(subring->names[i]);
+      r->parameter[i] = omStrDup(subring->names[i]);
 
     // everything is ok
     return mpsr_Success;
@@ -738,7 +738,7 @@ static mpsr_Status_t GetVarNamesAnnot(MPT_Node_pt node, ring r)
 
   mpsr_assume(r != NULL);
   N = r->N;
-  r->names = (char **) Alloc(N * sizeof(char *));
+  r->names = (char **) omAlloc(N * sizeof(char *));
 
   // fill in varnames from the back
   if (annot != NULL && annot->value != NULL)
@@ -758,12 +758,12 @@ static mpsr_Status_t GetVarNamesAnnot(MPT_Node_pt node, ring r)
         if (offset < 0) offset = 0;
         for (; num_vars < lb; num_vars++)
           r->names[offset + num_vars] =
-            mstrdup(MP_STRING_T(arg_pt[num_vars]));
+            omStrDup(MP_STRING_T(arg_pt[num_vars]));
       }
     }
     else if (node->type == MP_IdentifierType)
     {
-      r->names[N-1] = mstrdup(MP_STRING_T(annot->value->node->nvalue));
+      r->names[N-1] = omStrDup(MP_STRING_T(annot->value->node->nvalue));
       num_vars = 1;
     }
   }
@@ -776,7 +776,7 @@ static mpsr_Status_t GetVarNamesAnnot(MPT_Node_pt node, ring r)
     for (nc = 0; nc < offset; nc++)
     {
       sprintf(vn, "x(%d)", nc);
-      r->names[nc] = mstrdup(vn);
+      r->names[nc] = omStrDup(vn);
     }
   }
 
@@ -813,10 +813,10 @@ static mpsr_Status_t GetOrderingAnnot(MPT_Node_pt node, ring r,
     MPT_Tree_pt *tarray = (MPT_Tree_pt *) annot->value->args, *tarray2, tree;
 
     if (! mv) nc += 2; else nc++;
-    r->block0 = (int *) Alloc0(nc*sizeof(int *));
-    r->block1 = (int *) Alloc0(nc*sizeof(int *));
-    r->wvhdl  = (int **) Alloc0(nc*sizeof(int *));
-    r->order  = (int *) Alloc0(nc*sizeof(int *));
+    r->block0 = (int *) omAlloc0(nc*sizeof(int *));
+    r->block1 = (int *) omAlloc0(nc*sizeof(int *));
+    r->wvhdl  = (int **) omAlloc0(nc*sizeof(int *));
+    r->order  = (int *) omAlloc0(nc*sizeof(int *));
 
     if (! mv)
     {
@@ -861,20 +861,20 @@ static mpsr_Status_t GetOrderingAnnot(MPT_Node_pt node, ring r,
     {
       if (mv) nc++;
       else nc += 2;
-      Free(r->block0, nc*sizeof(int *));
-      Free(r->block1, nc*sizeof(int *));
-      Free(r->order, nc*sizeof(int *));
-      Free(r->wvhdl, nc*sizeof(short *));
+      omFreeSize(r->block0, nc*sizeof(int *));
+      omFreeSize(r->block1, nc*sizeof(int *));
+      omFreeSize(r->order, nc*sizeof(int *));
+      omFreeSize(r->wvhdl, nc*sizeof(short *));
     }
     else
       return mpsr_Success;
   }
 
   // Either Simple Ordering, or sth failed from before
-  r->wvhdl = (int **)Alloc0(3 * sizeof(int *));
-  r->order = (int *) Alloc0(3 * sizeof(int *));
-  r->block0 = (int *)Alloc0(3 * sizeof(int *));
-  r->block1 = (int *)Alloc0(3 * sizeof(int *));
+  r->wvhdl = (int **)omAlloc0(3 * sizeof(int *));
+  r->order = (int *) omAlloc0(3 * sizeof(int *));
+  r->block0 = (int *)omAlloc0(3 * sizeof(int *));
+  r->block1 = (int *)omAlloc0(3 * sizeof(int *));
   r->order[1] = ringorder_C;
   r->block0[0] = 1;
   r->block1[0] = r->N;
@@ -936,7 +936,7 @@ static mpsr_Status_t GetSimpleOrdering(MPT_Node_pt node, ring r, short i)
 
   MP_Uint32_t nc = node->numchild, j;
   MP_Sint32_t *w = (MP_Sint32_t *) annot->value->args;
-  int *w2 = (int *) AllocL(nc*sizeof(int));
+  int *w2 = (int *) omAlloc(nc*sizeof(int));
 
   r->wvhdl[i] = w2;
   for (j = 0; j < nc ; j++)

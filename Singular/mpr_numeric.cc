@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_numeric.cc,v 1.8 2000-04-04 11:20:04 Singular Exp $ */
+/* $Id: mpr_numeric.cc,v 1.9 2000-08-14 12:56:41 obachman Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff
@@ -17,7 +17,7 @@
 //-> includes
 #include "structs.h"
 #include "febase.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "numbers.h"
 #include "polys.h"
 #include "ideals.h"
@@ -47,7 +47,7 @@ vandermonde::vandermonde( const long _cn, const long _n, const long _maxdeg,
 {
   long j;
   l= (long)pow((double)maxdeg+1,(int)n);
-  x= (number *)Alloc( cn * sizeof(number) );
+  x= (number *)omAlloc( cn * sizeof(number) );
   for ( j= 0; j < cn; j++ ) x[j]= nInit(1);
   init();
 }
@@ -56,7 +56,7 @@ vandermonde::~vandermonde()
 {
   int j;
   for ( j= 0; j < cn; j++ ) nDelete( x+j );
-  Free( (ADDRESS)x, cn * sizeof( number ) );
+  omFreeSize( (ADDRESS)x, cn * sizeof( number ) );
 }
 
 void vandermonde::init()
@@ -110,7 +110,7 @@ poly vandermonde::numvec2poly( const number * q )
   c=0;
   sum=0;
 
-  Exponent_t *exp= (Exponent_t *) Alloc( (n+1) * sizeof(Exponent_t) );
+  Exponent_t *exp= (Exponent_t *) omAlloc( (n+1) * sizeof(Exponent_t) );
 
   for ( j= 0; j < n+1; j++ ) exp[j]=0;
 
@@ -147,7 +147,7 @@ poly vandermonde::numvec2poly( const number * q )
     sum+= exp[n];
   }
 
-  Free( (ADDRESS) exp, (n+1) * sizeof(Exponent_t) );
+  omFreeSize( (ADDRESS) exp, (n+1) * sizeof(Exponent_t) );
 
   pOrdPolyMerge(pit);
   return pit;
@@ -163,8 +163,8 @@ number * vandermonde::interpolateDense( const number * q )
 
   b=t=xx=s=tmp1=NULL;
 
-  w= (number *)Alloc( cn * sizeof(number) );
-  c= (number *)Alloc( cn * sizeof(number) );
+  w= (number *)omAlloc( cn * sizeof(number) );
+  c= (number *)omAlloc( cn * sizeof(number) );
   for ( j= 0; j < cn; j++ )
   {
     w[j]= nInit(0);
@@ -241,7 +241,7 @@ number * vandermonde::interpolateDense( const number * q )
 
   // free mem
   for ( j= 0; j < cn; j++ ) nDelete( c+j );
-  Free( (ADDRESS)c, cn * sizeof( number ) );
+  omFreeSize( (ADDRESS)c, cn * sizeof( number ) );
 
   nDelete( &tmp1 );
   nDelete( &s );
@@ -292,15 +292,15 @@ rootContainer::~rootContainer()
   if ( ievpoint != NULL )
   {
     for ( i=0; i < anz+2; i++ ) nDelete( ievpoint + i );
-    Free( (ADDRESS)ievpoint, (anz+2) * sizeof( number ) );
+    omFreeSize( (ADDRESS)ievpoint, (anz+2) * sizeof( number ) );
   }
 
   for ( i=0; i <= tdg; i++ ) nDelete( coeffs + i );
-  Free( (ADDRESS)coeffs, (tdg+1) * sizeof( number ) );
+  omFreeSize( (ADDRESS)coeffs, (tdg+1) * sizeof( number ) );
 
   // theroots löschen
   for ( i=0; i < tdg; i++ ) delete theroots[i];
-  Free( (ADDRESS) theroots, (tdg)*sizeof(gmp_complex*) );
+  omFreeSize( (ADDRESS) theroots, (tdg)*sizeof(gmp_complex*) );
 
   mprPROTnl("~rootContainer()");
 }
@@ -330,7 +330,7 @@ void rootContainer::fillContainer( number *_coeffs, number *_ievpoint,
   nDelete( &nn );
 
   if ( rt == cspecialmu && _ievpoint ) { // copy ievpoint
-    ievpoint= (number *)Alloc( (anz+2) * sizeof( number ) );
+    ievpoint= (number *)omAlloc( (anz+2) * sizeof( number ) );
     for (i=0; i < anz+2; i++) ievpoint[i]= nCopy( _ievpoint[i] );
   }
 
@@ -447,11 +447,11 @@ bool rootContainer::solver( const int polishmode )
   int i;
 
   // there are maximal tdg roots, so *roots ranges form 0 to tdg-1.
-  theroots= (gmp_complex**)Alloc( (tdg)*sizeof(gmp_complex*) );
+  theroots= (gmp_complex**)omAlloc( (tdg)*sizeof(gmp_complex*) );
   for ( i=0; i < tdg; i++ ) theroots[i]= new gmp_complex();
 
   // copy the coefficients of type number to type gmp_complex
-  gmp_complex **ad= (gmp_complex**)Alloc( (tdg+1)*sizeof(gmp_complex*) );
+  gmp_complex **ad= (gmp_complex**)omAlloc( (tdg+1)*sizeof(gmp_complex*) );
   for ( i=0; i <= tdg; i++ )
   {
     ad[i]= new gmp_complex();
@@ -490,7 +490,7 @@ bool rootContainer::solver( const int polishmode )
 
  solverend:
   for ( i=0; i <= tdg; i++ ) delete ad[i];
-  Free( (ADDRESS) ad, (tdg+1)*sizeof(gmp_complex*) );
+  omFreeSize( (ADDRESS) ad, (tdg+1)*sizeof(gmp_complex*) );
 
   return found_roots;
 }
@@ -504,7 +504,7 @@ bool rootContainer::laguer_driver(gmp_complex ** a, gmp_complex ** roots, bool p
   gmp_complex x,b,c;
   bool ret= true;
 
-  gmp_complex ** ad= (gmp_complex**)Alloc( (tdg+1)*sizeof(gmp_complex*) );
+  gmp_complex ** ad= (gmp_complex**)omAlloc( (tdg+1)*sizeof(gmp_complex*) );
   for ( i=0; i <= tdg; i++ ) ad[i]= new gmp_complex( *a[i] );
 
   for ( j= tdg; j >= 1; j-- )
@@ -568,7 +568,7 @@ bool rootContainer::laguer_driver(gmp_complex ** a, gmp_complex ** roots, bool p
  theend:
   mprSTICKYPROT("\n");
   for ( i=0; i <= tdg; i++ ) delete ad[i];
-  Free( (ADDRESS) ad, (tdg+1)*sizeof( gmp_complex* ));
+  omFreeSize( (ADDRESS) ad, (tdg+1)*sizeof( gmp_complex* ));
 
   return ret;
 }
@@ -749,7 +749,7 @@ lists rootArranger::listOfRoots( const unsigned int oprec )
   int count= roots[0]->getAnzRoots(); // number of roots
   int elem= roots[0]->getAnzElems();  // number of koordinates per root
 
-  lists listofroots= (lists)Alloc( sizeof(slists) ); // must be done this way!
+  lists listofroots= (lists)omAlloc( sizeof(slists) ); // must be done this way!
 
   if ( found_roots )
   {
@@ -757,7 +757,7 @@ lists rootArranger::listOfRoots( const unsigned int oprec )
 
     for (i=0; i < count; i++)
     {
-      lists onepoint= (lists)Alloc(sizeof(slists)); // must be done this way!
+      lists onepoint= (lists)omAlloc(sizeof(slists)); // must be done this way!
       onepoint->Init(elem);
       for ( j= 0; j < elem; j++ )
       {
@@ -814,15 +814,15 @@ simplex::simplex( int rows, int cols )
   LiPM_rows=LiPM_rows+3;
   LiPM_cols=LiPM_cols+2;
 
-  LiPM = (mprfloat **)Alloc( LiPM_rows * sizeof(mprfloat *) );  // LP matrix
+  LiPM = (mprfloat **)omAlloc( LiPM_rows * sizeof(mprfloat *) );  // LP matrix
   for( i= 0; i < LiPM_rows; i++ )
   {
     // Mem must be allocated aligned, also for type double!
-    LiPM[i] = (mprfloat *)AllocAligned0( LiPM_cols * sizeof(mprfloat) );
+    LiPM[i] = (mprfloat *)omAlloc0Aligned( LiPM_cols * sizeof(mprfloat) );
   }
 
-  iposv = (int *)Alloc0( 2*LiPM_rows*sizeof(int) );
-  izrov = (int *)Alloc0( 2*LiPM_rows*sizeof(int) );
+  iposv = (int *)omAlloc0( 2*LiPM_rows*sizeof(int) );
+  izrov = (int *)omAlloc0( 2*LiPM_rows*sizeof(int) );
 
   m=n=m1=m2=m3=icase=0;
 
@@ -837,12 +837,12 @@ simplex::~simplex()
   int i;
   for( i= 0; i < LiPM_rows; i++ )
   {
-    FreeAligned( (ADDRESS) LiPM[i], LiPM_cols * sizeof(mprfloat) );
+    omFreeSize( (ADDRESS) LiPM[i], LiPM_cols * sizeof(mprfloat) );
   }
-  Free( (ADDRESS) LiPM, LiPM_rows * sizeof(mprfloat *) );
+  omFreeSize( (ADDRESS) LiPM, LiPM_rows * sizeof(mprfloat *) );
 
-  Free( (ADDRESS) iposv, 2*LiPM_rows*sizeof(int) );
-  Free( (ADDRESS) izrov, 2*LiPM_rows*sizeof(int) );
+  omFreeSize( (ADDRESS) iposv, 2*LiPM_rows*sizeof(int) );
+  omFreeSize( (ADDRESS) izrov, 2*LiPM_rows*sizeof(int) );
 }
 
 BOOLEAN simplex::mapFromMatrix( matrix m )
@@ -943,9 +943,9 @@ void simplex::compute()
     return;
   }
 
-  l1= (int *) Alloc0( (n+1) * sizeof(int) );
-  l2= (int *) Alloc0( (m+1) * sizeof(int) );
-  l3= (int *) Alloc0( (m+1) * sizeof(int) );
+  l1= (int *) omAlloc0( (n+1) * sizeof(int) );
+  l2= (int *) omAlloc0( (m+1) * sizeof(int) );
+  l3= (int *) omAlloc0( (m+1) * sizeof(int) );
 
   nl1= n;
   for ( k=1; k<=n; k++ ) l1[k]=izrov[k]=k;
@@ -959,9 +959,9 @@ void simplex::compute()
       error(Warn("simplex::compute: in input Matrix row %d, column 1, value %f",i+1,LiPM[i+1][1]);)
       icase=-2;
       // free mem l1,l2,l3;
-      Free( (ADDRESS) l3, (m+1) * sizeof(int) );
-      Free( (ADDRESS) l2, (m+1) * sizeof(int) );
-      Free( (ADDRESS) l1, (n+1) * sizeof(int) );
+      omFreeSize( (ADDRESS) l3, (m+1) * sizeof(int) );
+      omFreeSize( (ADDRESS) l2, (m+1) * sizeof(int) );
+      omFreeSize( (ADDRESS) l1, (n+1) * sizeof(int) );
       return;
     }
     l2[i]= i;
@@ -986,9 +986,9 @@ void simplex::compute()
       {
         icase= -1; // no solution found
         // free mem l1,l2,l3;
-        Free( (ADDRESS) l3, (m+1) * sizeof(int) );
-        Free( (ADDRESS) l2, (m+1) * sizeof(int) );
-        Free( (ADDRESS) l1, (n+1) * sizeof(int) );
+        omFreeSize( (ADDRESS) l3, (m+1) * sizeof(int) );
+        omFreeSize( (ADDRESS) l2, (m+1) * sizeof(int) );
+        omFreeSize( (ADDRESS) l1, (n+1) * sizeof(int) );
         return;
       }
       else if ( bmax <= SIMPLEX_EPS && LiPM[m+2][1] <= SIMPLEX_EPS )
@@ -1023,9 +1023,9 @@ void simplex::compute()
       {
         icase = -1; // no solution found
         // free mem l1,l2,l3;
-        Free( (ADDRESS) l3, (m+1) * sizeof(int) );
-        Free( (ADDRESS) l2, (m+1) * sizeof(int) );
-        Free( (ADDRESS) l1, (n+1) * sizeof(int) );
+        omFreeSize( (ADDRESS) l3, (m+1) * sizeof(int) );
+        omFreeSize( (ADDRESS) l2, (m+1) * sizeof(int) );
+        omFreeSize( (ADDRESS) l1, (n+1) * sizeof(int) );
         return;
       }
     one: simp3(LiPM,m+1,n,ip,kp);
@@ -1071,9 +1071,9 @@ void simplex::compute()
     {
       icase=0; // finite solution found
       // free mem l1,l2,l3
-      Free( (ADDRESS) l3, (m+1) * sizeof(int) );
-      Free( (ADDRESS) l2, (m+1) * sizeof(int) );
-      Free( (ADDRESS) l1, (n+1) * sizeof(int) );
+      omFreeSize( (ADDRESS) l3, (m+1) * sizeof(int) );
+      omFreeSize( (ADDRESS) l2, (m+1) * sizeof(int) );
+      omFreeSize( (ADDRESS) l1, (n+1) * sizeof(int) );
       return;
     }
     simp2(LiPM,n,l2,nl2,&ip,kp,&q1);
@@ -1085,9 +1085,9 @@ void simplex::compute()
       // #endif
       icase=1;                /* unbounded */
       // free mem
-      Free( (ADDRESS) l3, (m+1) * sizeof(int) );
-      Free( (ADDRESS) l2, (m+1) * sizeof(int) );
-      Free( (ADDRESS) l1, (n+1) * sizeof(int) );
+      omFreeSize( (ADDRESS) l3, (m+1) * sizeof(int) );
+      omFreeSize( (ADDRESS) l2, (m+1) * sizeof(int) );
+      omFreeSize( (ADDRESS) l1, (n+1) * sizeof(int) );
       return;
     }
     simp3(LiPM,m,n,ip,kp);

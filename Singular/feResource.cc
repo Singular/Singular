@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.26 2000-05-25 13:37:28 obachman Exp $ */
+/* $Id: feResource.cc,v 1.27 2000-08-14 12:56:06 obachman Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -11,9 +11,8 @@
 #include "mod2.h"
 #include "distrib.h"
 #if !defined(ESINGULAR) && !defined(TSINGULAR)
-#include "mmemory.h"
+#include <omalloc.h>
 #include "febase.h"
-extern "C" char* find_executable(const char* argv0);
 #endif
 
 // define RESOURCE_DEBUG for chattering about resource management
@@ -110,10 +109,6 @@ static feResourceConfig_s feResourceConfigs[25] =
 char* feArgv0=NULL;
 #define MAXRESOURCELEN 5*MAXPATHLEN
 
-#ifdef MTRACK
-BOOLEAN feRes_works=FALSE;
-#endif
-
 char fePathSep =
 #if defined(WINNT)
 ';'
@@ -177,7 +172,7 @@ void feInitResources(char* argv0)
   if (cygwin32_posix_path_list_p (getenv("PATH")))
     fePathSep = ':';
 #endif
-  feArgv0 = mstrdup(argv0);
+  feArgv0 = omStrDup(argv0);
 #ifdef RESOURCE_DEBUG
   printf("feInitResources: entering with argv0=%s=\n", argv0);
 #endif
@@ -194,9 +189,6 @@ void feInitResources(char* argv0)
 #endif
   if (path != NULL) setenv("PATH", path, 1);
 #endif
-#ifdef MTRACK
-  feRes_works=TRUE;
-#endif
 }
 
 void feReInitResources()
@@ -207,7 +199,7 @@ void feReInitResources()
     if (feResourceConfigs[i].value != "")
     {
       if (feResourceConfigs[i].value != NULL)
-        FreeL(feResourceConfigs[i].value);
+        omFree(feResourceConfigs[i].value);
       feResourceConfigs[i].value = "";
     }
     i++;
@@ -260,7 +252,7 @@ static char* feResource(feResourceConfig config, int warn)
 static char* feResourceDefault(feResourceConfig config)
 {
   if (config == NULL) return NULL;
-  char* value = (char*) AllocL(MAXRESOURCELEN);
+  char* value = (char*) omAlloc(MAXRESOURCELEN);
   feSprintf(value, config->fmt, -1);
   return value;
 }
@@ -292,7 +284,7 @@ static char* feInitResource(feResourceConfig config, int warn)
 #ifdef RESOURCE_DEBUG
         printf("feInitResource: Set value of %s to =%s=\n", config->key, value);
 #endif
-        config->value = mstrdup(value);
+        config->value = omStrDup(value);
         return config->value;
       }
     }
@@ -312,7 +304,7 @@ static char* feInitResource(feResourceConfig config, int warn)
 #ifdef RESOURCE_DEBUG
       printf("value:%s\n", value);
 #endif
-      FreeL(executable);
+      omFree(executable);
     }
   }
   // and bindir
@@ -352,21 +344,19 @@ static char* feInitResource(feResourceConfig config, int warn)
 #ifdef RESOURCE_DEBUG
     printf("feInitResource: Set value of %s to =%s=\n", config->key, value);
 #endif
-    config->value = mstrdup(value);
+    config->value = omStrDup(value);
     return config->value;
   }
   else if (config->type == feResBinary)
   {
     // for binaries, search through PATH once more
-    char* executable = find_executable(config->key);
+    char* executable = omFindExec(config->key, value);
     if (executable != NULL)
     {
-      strcpy(value, executable);
-      FreeL(executable);
       if (feVerifyResourceValue(config->type,
                                 feCleanResourceValue(config->type, value)))
       {
-        config->value = mstrdup(value);
+        config->value = omStrDup(value);
 #ifdef RESOURCE_DEBUG
         printf("feInitResource: Set value of %s to =%s=\n", config->key, config->value);
 #endif
@@ -415,18 +405,19 @@ static char* feGetExpandedExecutable()
 #ifdef RESOURCE_DEBUG
   printf("feGetExpandedExecutable: calling find_exec with =%s=\n", feArgv0);
 #endif
-  char* executable = find_executable(feArgv0);
+  char executable[MAXRESOURCELEN];
+  char* value = omFindExec(feArgv0, executable);
 #ifdef RESOURCE_DEBUG
   printf("feGetExpandedExecutable: find_exec exited with =%s=%d\n", executable, access(executable, X_OK));
 #endif
-  if (executable == NULL)
+  if (value == NULL)
   {
     char message[MAXRESOURCELEN];
     sprintf(message, "Could not get expanded executable from %s", feArgv0);
     feReportBug(message);
     return NULL;
   }
-  return executable;
+  return omStrDup(value);
 #else // macintosh
   return feArgv0;
 #endif
@@ -580,7 +571,7 @@ static char* feCleanUpPath(char* path)
     }
   }
 
-  path_comps = (char**) AllocL(n_comps*sizeof(char*));
+  path_comps = (char**) omAlloc(n_comps*sizeof(char*));
   path_comps[0]=opath;
   path=opath;
   i = 1;
@@ -660,7 +651,7 @@ static char* feCleanUpPath(char* path)
   {
     *opath = '\0';
   }
-  FreeL(path_comps);
+  omFree(path_comps);
 #ifdef RESOURCE_DEBUG
   Print("feCleanUpPath: leaving with path=%s=\n", opath);
 #endif

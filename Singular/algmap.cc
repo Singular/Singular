@@ -1,20 +1,20 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: algmap.cc,v 1.15 1999-11-15 17:19:47 obachman Exp $ */
+/* $Id: algmap.cc,v 1.16 2000-08-14 12:55:53 obachman Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials from rings with
 * 'alg' numbers
 */
 
 #include "mod2.h"
+#include <omalloc.h>
 #include "tok.h"
 #include "polys.h"
 #include "numbers.h"
 #include "longalg.h"
 #include "ipid.h"
 #include "ring.h"
-#include "mmemory.h"
 #include "febase.h"
 #include "maps.h"
 #include "algmap.h"
@@ -39,7 +39,7 @@ static poly maLongalg1Fetch(poly res, poly p0, ring r0, int n,
     pSetComp(q0,pRingGetComp(r0, p0));
     if (t!=0)
     {
-      pGetCoeff(q0) = (number)Alloc0SizeOf(rnumber);
+      pGetCoeff(q0) = (number)omAlloc0Bin(rnumber_bin);
       b0 = naGetNom0(pGetCoeff(q0)) = napNew();
       napGetCoeff(b0) = nacCopy(napGetCoeff(a0));
       for (i=1; i<=t; i++)
@@ -116,7 +116,7 @@ static poly maLongalg2Fetch(poly res, poly p0, ring r0, int n, int s,
     }
     if (s==0)
     {
-      pGetCoeff(q0)=(number)Alloc0SizeOf(rnumber);
+      pGetCoeff(q0)=(number)omAlloc0Bin(rnumber_bin);
       naGetNom0(pGetCoeff(q0)) = b0;
       return pAdd(res, q0);
     }
@@ -125,7 +125,7 @@ static poly maLongalg2Fetch(poly res, poly p0, ring r0, int n, int s,
   }
   while (a0 != NULL);
   if (pGetCoeff(q0)==NULL)
-    pGetCoeff(q0) = (number)Alloc0SizeOf(rnumber);
+    pGetCoeff(q0) = (number)omAlloc0Bin(rnumber_bin);
   naGetNom0(pGetCoeff(q0)) = b1;
   return pAdd(res, q0);
 }
@@ -238,7 +238,7 @@ static poly maLongalgMap(poly res, ring r, poly p0, int s, int t,
     q = pInit();
     if (t!=0)
     {
-      pGetCoeff(q) = (number)Alloc0SizeOf(rnumber);
+      pGetCoeff(q) = (number)omAlloc0Bin(rnumber_bin);
       b0 = naGetNom0(pGetCoeff(q)) = napNew();
       napGetCoeff(b0) = nacCopy(napGetCoeff(a0));
     }

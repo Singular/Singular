@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.219 2000-07-27 12:11:27 Singular Exp $ */
+/* $Id: iparith.cc,v 1.220 2000-08-14 12:56:21 obachman Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -18,7 +18,7 @@
 #include "tok.h"
 #include "ipid.h"
 #include "intvec.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "febase.h"
 #include "sdb.h"
 #include "longalg.h"
@@ -401,7 +401,7 @@ static BOOLEAN jjOP_I_IM(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjDOTDOT(leftv res, leftv u, leftv v)
 {
-  res->data=(char *)NewIntvec2((int)u->Data(),(int)v->Data());
+  res->data=(char *)new intvec((int)u->Data(),(int)v->Data());
   return FALSE;
 }
 static void jjEQUAL_REST(leftv res,leftv u,leftv v)
@@ -558,13 +558,13 @@ static BOOLEAN jjOP_REST(leftv res, leftv u, leftv v)
   if (u->Next()!=NULL)
   {
     u=u->next;
-    res->next = (leftv)AllocSizeOf(sleftv);
+    res->next = (leftv)omAllocBin(sleftv_bin);
     return iiExprArith2(res->next,u,iiOp,v);
   }
   else if (v->Next()!=NULL)
   {
     v=v->next;
-    res->next = (leftv)AllocSizeOf(sleftv);
+    res->next = (leftv)omAllocBin(sleftv_bin);
     return iiExprArith2(res->next,u,iiOp,v);
   }
   return FALSE;
@@ -646,7 +646,7 @@ static BOOLEAN jjPLUSMINUS_Gen(leftv res, leftv u, leftv v)
       do
       {
         if (res->next==NULL)
-          res->next = (leftv)Alloc0SizeOf(sleftv);
+          res->next = (leftv)omAlloc0Bin(sleftv_bin);
         leftv tmp_v=v->next;
         v->next=NULL;
         BOOLEAN b=iiExprArith1(res->next,v,'-');
@@ -660,7 +660,7 @@ static BOOLEAN jjPLUSMINUS_Gen(leftv res, leftv u, leftv v)
     }
     loop                            /* u==NULL, v<>NULL, iiOp=='+' */
     {
-      res->next = (leftv)Alloc0SizeOf(sleftv);
+      res->next = (leftv)omAlloc0Bin(sleftv_bin);
       res=res->next;
       res->data = v->CopyD();
       res->rtyp = v->Typ();
@@ -672,7 +672,7 @@ static BOOLEAN jjPLUSMINUS_Gen(leftv res, leftv u, leftv v)
   {
     do
     {
-      res->next = (leftv)Alloc0SizeOf(sleftv);
+      res->next = (leftv)omAlloc0Bin(sleftv_bin);
       leftv tmp_u=u->next; u->next=NULL;
       leftv tmp_v=v->next; v->next=NULL;
       BOOLEAN b=iiExprArith2(res->next,u,iiOp,v);
@@ -688,7 +688,7 @@ static BOOLEAN jjPLUSMINUS_Gen(leftv res, leftv u, leftv v)
   }
   loop                             /* u<>NULL, v==NULL */
   {
-    res->next = (leftv)Alloc0SizeOf(sleftv);
+    res->next = (leftv)omAlloc0Bin(sleftv_bin);
     res=res->next;
     res->data = u->CopyD();
     res->rtyp = u->Typ();
@@ -723,7 +723,7 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
         }
         if(v->rtyp == IDHDL)
         {
-          v->name = mstrdup(v->name);
+          v->name = omStrDup(v->name);
         }
         namespaceroot->push( IDPACKAGE(packhdl), IDID(packhdl));
         syMake(v, v->name, packhdl);
@@ -805,7 +805,7 @@ static BOOLEAN jjPLUS_S(leftv res, leftv u, leftv v)
 {
   char*    a = (char * )(u->Data());
   char*    b = (char * )(v->Data());
-  char*    r = (char * )AllocL(strlen(a) + strlen(b) + 1);
+  char*    r = (char * )omAlloc(strlen(a) + strlen(b) + 1);
   strcpy(r,a);
   strcat(r,b);
   res->data=r;
@@ -1212,7 +1212,7 @@ static BOOLEAN jjINDEX_IV(leftv res, leftv u, leftv v)
     }
     else
     {
-      p->next=(leftv)Alloc0SizeOf(sleftv);
+      p->next=(leftv)omAlloc0Bin(sleftv_bin);
       p=p->next;
     }
     p->rtyp=IDHDL;
@@ -1342,12 +1342,12 @@ static BOOLEAN jjINDEX_V_IV(leftv res, leftv u, leftv v)
 static BOOLEAN jjKLAMMER(leftv res, leftv u, leftv v)
 {
   if(u->name==NULL) return TRUE;
-  char * nn = (char *)AllocL(strlen(u->name) + 14);
+  char * nn = (char *)omAlloc(strlen(u->name) + 14);
   sprintf(nn,"%s(%d)",u->name,(int)v->Data());
-  FreeL((ADDRESS)u->name);
+  omFree((ADDRESS)u->name);
   u->name=NULL;
-  char *n=mstrdup(nn);
-  FreeL((ADDRESS)nn);
+  char *n=omStrDup(nn);
+  omFree((ADDRESS)nn);
 #ifdef HAVE_NAMESPACES
   if(u->req_packhdl != NULL)
   {
@@ -1366,7 +1366,7 @@ static BOOLEAN jjKLAMMER_IV(leftv res, leftv u, leftv v)
   leftv p=NULL;
   int i;
   int slen = strlen(u->name) + 14;
-  char *n = (char*) Alloc(slen);
+  char *n = (char*) omAlloc(slen);
 #ifdef HAVE_NAMESPACES
   BOOLEAN needpop=FALSE;
 
@@ -1385,15 +1385,15 @@ static BOOLEAN jjKLAMMER_IV(leftv res, leftv u, leftv v)
     }
     else
     {
-      p->next=(leftv)Alloc0SizeOf(sleftv);
+      p->next=(leftv)omAlloc0Bin(sleftv_bin);
       p=p->next;
     }
     sprintf(n,"%s(%d)",u->name,(*iv)[i]);
-    syMake(p,mstrdup(n));
+    syMake(p,omStrDup(n));
   }
-  FreeL((ADDRESS)u->name);
+  omFree((ADDRESS)u->name);
   u->name = NULL;
-  Free(n, slen);
+  omFreeSize(n, slen);
 #ifdef HAVE_NAMESPACES
   if(needpop) namespaceroot->pop();
 #endif /* HAVE_NAMESPACES */
@@ -1431,12 +1431,12 @@ static BOOLEAN jjMAP(leftv res, leftv u, leftv v)
   }
   if (sl==NULL) return TRUE;
   memcpy(res,sl,sizeof(sleftv));
-  FreeSizeOf((ADDRESS)sl,sleftv);
+  omFreeBin((ADDRESS)sl, sleftv_bin);
   return FALSE;
 }
 static BOOLEAN jjCALL2MANY(leftv res, leftv u, leftv v)
 {
-  u->next=(leftv)AllocSizeOf(sleftv);
+  u->next=(leftv)omAllocBin(sleftv_bin);
   memcpy(u->next,v,sizeof(sleftv));
   BOOLEAN r=iiExprArithM(res,u,iiOp);
   v->rtyp=0; v->data=NULL; // iiExprArithM did the CleanUp
@@ -1481,7 +1481,7 @@ static BOOLEAN jjDEG_IV(leftv res, leftv u, leftv v)
 {
   short *iv=iv2array((intvec *)v->Data());
   res->data = (char *)pDegW((poly)u->Data(),iv);
-  Free((ADDRESS)iv,(pVariables+1)*sizeof(short));
+  omFreeSize((ADDRESS)iv,(pVariables+1)*sizeof(short));
   return FALSE;
 }
 static BOOLEAN jjDIFF_P(leftv res, leftv u, leftv v)
@@ -1562,7 +1562,7 @@ static BOOLEAN jjDIVISION(leftv res, leftv u, leftv v)
     idDelete((ideal *)&U);
     U=UU;
   }
-  lists L=(lists)AllocSizeOf(slists);
+  lists L=(lists)omAllocBin(slists_bin);
   L->Init(3);
   L->m[0].rtyp=MATRIX_CMD;   L->m[0].data=(void *)T;
   L->m[1].rtyp=MATRIX_CMD;   L->m[1].data=(void *)U;
@@ -1589,7 +1589,7 @@ static BOOLEAN jjEXTGCD_I(leftv res, leftv u, leftv v)
   int b = g0;
   if ( (int)u->Data() < 0 ) a=-a;
   if ( (int)v->Data() < 0 ) b=-b;
-  lists L=(lists)AllocSizeOf(slists);
+  lists L=(lists)omAllocBin(slists_bin);
   L->Init(3);
   L->m[0].rtyp=INT_CMD;   L->m[0].data=(void *)p0;
   L->m[1].rtyp=INT_CMD;   L->m[1].data=(void *)a;
@@ -1649,9 +1649,9 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
     }
     if ((iiOp!=FETCH_CMD) || (r->N!=pVariables) || (rPar(r)!=rPar(currRing)))
     {
-      perm=(int *)Alloc0((r->N+1)*sizeof(int));
+      perm=(int *)omAlloc0((r->N+1)*sizeof(int));
       if (par_perm_size!=0)
-        par_perm=(int *)Alloc0(par_perm_size*sizeof(int));
+        par_perm=(int *)omAlloc0(par_perm_size*sizeof(int));
       op=IMAP_CMD;
       if (iiOp==IMAP_CMD)
       {
@@ -1690,9 +1690,9 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
       Werror("cannot map %s of type %s(%d)",v->name, Tok2Cmdname(w->typ),w->typ);
     }
     if (perm!=NULL)
-      Free((ADDRESS)perm,(r->N+1)*sizeof(int));
+      omFreeSize((ADDRESS)perm,(r->N+1)*sizeof(int));
     if (par_perm!=NULL)
-      Free((ADDRESS)par_perm,par_perm_size*sizeof(int));
+      omFreeSize((ADDRESS)par_perm,par_perm_size*sizeof(int));
     return bo;
   }
   else
@@ -1870,7 +1870,7 @@ static BOOLEAN jjPARSTR2(leftv res, leftv u, leftv v)
   if ((0<i)
   && (IDRING(h)->parameter!=NULL)
   && (i<=(p=rPar(IDRING(h)))))
-    res->data=mstrdup(IDRING(h)->parameter[i-1]);
+    res->data=omStrDup(IDRING(h)->parameter[i-1]);
   else
   {
     Werror("par number %d out of range 1..%d",i,p);
@@ -1909,7 +1909,7 @@ static BOOLEAN jjREAD2(leftv res, leftv u, leftv v)
     return TRUE;
   }
   memcpy(res,r,sizeof(sleftv));
-  FreeSizeOf((ADDRESS)r,sleftv);
+  omFreeBin((ADDRESS)r, sleftv_bin);
   return FALSE;
 }
 static BOOLEAN jjREDUCE_P(leftv res, leftv u, leftv v)
@@ -2043,7 +2043,7 @@ static BOOLEAN jjSIMPL_ID(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjSTATUS2(leftv res, leftv u, leftv v)
 {
-  res->data = mstrdup(slStatus((si_link) u->Data(), (char *) v->Data()));
+  res->data = omStrDup(slStatus((si_link) u->Data(), (char *) v->Data()));
   return FALSE;
 }
 static BOOLEAN jjSIMPL_P(leftv res, leftv u, leftv v)
@@ -2072,7 +2072,7 @@ static BOOLEAN jjSTD_HILB(leftv res, leftv u, leftv v)
   idSkipZeroes(result);
   res->data = (char *)result;
   setFlag(res,FLAG_STD);
-  if (w!=NULL) atSet(res,mstrdup("isHomog"),w,INTVEC_CMD);
+  if (w!=NULL) atSet(res,omStrDup("isHomog"),w,INTVEC_CMD);
   return FALSE;
 }
 static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
@@ -2099,7 +2099,7 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
   idSkipZeroes(result);
   res->data = (char *)result;
   setFlag(res,FLAG_STD);
-  if (w!=NULL) atSet(res,mstrdup("isHomog"),w,INTVEC_CMD);
+  if (w!=NULL) atSet(res,omStrDup("isHomog"),w,INTVEC_CMD);
   return FALSE;
 }
 static BOOLEAN jjVARSTR2(leftv res, leftv u, leftv v)
@@ -2107,7 +2107,7 @@ static BOOLEAN jjVARSTR2(leftv res, leftv u, leftv v)
   idhdl h=(idhdl)u->data;
   int i=(int)v->Data();
   if ((0<i) && (i<=IDRING(h)->N))
-    res->data=mstrdup(IDRING(h)->names[i-1]);
+    res->data=omStrDup(IDRING(h)->names[i-1]);
   else
   {
     Werror("var number %d out of range 1..%d",i,IDRING(h)->N);
@@ -2685,7 +2685,7 @@ static BOOLEAN jjE(leftv res, leftv v)
 static BOOLEAN jjEXECUTE(leftv res, leftv v)
 {
   char * d = (char *)v->Data();
-  char * s = (char *)AllocL(strlen(d) + 13);
+  char * s = (char *)omAlloc(strlen(d) + 13);
   strcpy( s, (char *)d);
   strcat( s, "\n;RETURN();\n");
   newBuffer(s,BT_execute);
@@ -2731,7 +2731,7 @@ static BOOLEAN jjHIGHCORNER_M(leftv res, leftv v)
   int rk=idRankFreeModule(I);
   if (w==NULL)
   {
-    w = NewIntvec1(rk);
+    w = new intvec(rk);
     delete_w=TRUE;
   }
   for(i=rk;i>0;i--)
@@ -2785,7 +2785,7 @@ static BOOLEAN jjHOMOG1(leftv res, leftv v)
   intvec *w;
   res->data=(void *)idHomModule((ideal)v->Data(),currQuotient,&w);
   if ((v->rtyp==IDHDL)&&(w!=NULL))
-    atSet((idhdl)v->data,mstrdup("isHomog"),w,INTVEC_CMD);
+    atSet((idhdl)v->data,omStrDup("isHomog"),w,INTVEC_CMD);
   return FALSE;
 }
 static BOOLEAN jjIDEAL_Ma(leftv res, leftv v)
@@ -2800,7 +2800,7 @@ static BOOLEAN jjIDEAL_Ma(leftv res, leftv v)
 static BOOLEAN jjIDEAL_Map(leftv res, leftv v)
 {
   map m=(map)v->CopyD(MAP_CMD);
-  FreeL((ADDRESS)m->preimage);
+  omFree((ADDRESS)m->preimage);
   m->preimage=NULL;
   ideal I=(ideal)m;
   I->rank=1;
@@ -2916,7 +2916,7 @@ static BOOLEAN jjLEADEXP(leftv res, leftv v)
   poly p=(poly)v->Data();
   int s=pVariables;
   if (v->Typ()==VECTOR_CMD) s++;
-  intvec *iv=NewIntvec1(s);
+  intvec *iv=new intvec(s);
   if (p!=NULL)
   {
     for(int i = pVariables;i;i--)
@@ -2950,29 +2950,28 @@ static BOOLEAN jjLIB(leftv res, leftv v)
 }
 static BOOLEAN jjMEMORY(leftv res, leftv v)
 {
-#ifdef MM_COUNT
+  omUpdateInfo();
   switch(((int)v->Data()))
   {
   case 0:
-    res->data = (char *)mmMemUsed();
+    res->data = (char *)om_Info.UsedBytes;
     break;
   case 1:
-    res->data = (char *)mmMemAlloc();
+    res->data = (char *)om_Info.CurrentBytesSystem;
     break;
-#ifdef HAVE_SBRK
   case 2:
-    res->data = (char *)mmMemPhysical();
+    res->data = (char *)om_Info.MaxBytesSystem;
     break;
-#endif
+
   default:
-    mmPrintStat();
+    omPrintStats(stdout);
+    omPrintInfo(stdout);
+    omPrintBinStats(stdout);
     res->data = (char *)0;
   }
   return FALSE;
-#else
   res->data = (char *)0;
   return FALSE;
-#endif
 }
 static BOOLEAN jjMONITOR1(leftv res, leftv v)
 {
@@ -2993,7 +2992,7 @@ static BOOLEAN jjMULT(leftv res, leftv v)
 static BOOLEAN jjNAMEOF(leftv res, leftv v)
 {
   res->data = (char *)v->name;
-  if (res->data==NULL) res->data=mstrdup("");
+  if (res->data==NULL) res->data=omStrDup("");
   v->name=NULL;
   return FALSE;
 }
@@ -3050,7 +3049,7 @@ static BOOLEAN jjPARSTR1(leftv res, leftv v)
   int i=(int)v->Data();
   int p=0;
   if ((0<i) && (currRing->parameter!=NULL) && (i<=(p=rPar(currRing))))
-    res->data=mstrdup(currRing->parameter[i-1]);
+    res->data=omStrDup(currRing->parameter[i-1]);
   else
   {
     Werror("par number %d out of range 1..%d",i,p);
@@ -3073,7 +3072,7 @@ static BOOLEAN jjP2I(leftv res, leftv v)
 static BOOLEAN jjPREIMAGE_R(leftv res, leftv v)
 {
   map mapping=(map)v->Data();
-  syMake(res,mstrdup(mapping->preimage));
+  syMake(res,omStrDup(mapping->preimage));
   return FALSE;
 }
 static BOOLEAN jjPRIME(leftv res, leftv v)
@@ -3162,7 +3161,7 @@ static BOOLEAN jjSTD(leftv res, leftv v)
   idSkipZeroes(result);
   res->data = (char *)result;
   setFlag(res,FLAG_STD);
-  if (w!=NULL) atSet(res,mstrdup("isHomog"),w,INTVEC_CMD);
+  if (w!=NULL) atSet(res,omStrDup("isHomog"),w,INTVEC_CMD);
   return FALSE;
 }
 static BOOLEAN jjSort_Id(leftv res, leftv v)
@@ -3191,27 +3190,27 @@ static BOOLEAN jjTYPEOF(leftv res, leftv v)
 {
   switch ((int)v->data)
   {
-    case INT_CMD:     res->data=mstrdup("int"); break;
-    case POLY_CMD:   res->data=mstrdup("poly"); break;
-    case VECTOR_CMD:  res->data=mstrdup("vector"); break;
-    case STRING_CMD:  res->data=mstrdup("string"); break;
-    case INTVEC_CMD:  res->data=mstrdup("intvec"); break;
-    case IDEAL_CMD:   res->data=mstrdup("ideal"); break;
-    case MATRIX_CMD: res->data=mstrdup("matrix"); break;
-    case MODUL_CMD:   res->data=mstrdup("module"); break;
-    case MAP_CMD:     res->data=mstrdup("map"); break;
-    case PROC_CMD:    res->data=mstrdup("proc"); break;
-    case RING_CMD:    res->data=mstrdup("ring"); break;
-    case QRING_CMD:   res->data=mstrdup("qring"); break;
-    case INTMAT_CMD:  res->data=mstrdup("intmat"); break;
-    case NUMBER_CMD:  res->data=mstrdup("number"); break;
-    case LIST_CMD:   res->data=mstrdup("list"); break;
-    case PACKAGE_CMD: res->data=mstrdup("package"); break;
-    case LINK_CMD:   res->data=mstrdup("link"); break;
-    case RESOLUTION_CMD:res->data=mstrdup("resolution");break;
+    case INT_CMD:     res->data=omStrDup("int"); break;
+    case POLY_CMD:   res->data=omStrDup("poly"); break;
+    case VECTOR_CMD:  res->data=omStrDup("vector"); break;
+    case STRING_CMD:  res->data=omStrDup("string"); break;
+    case INTVEC_CMD:  res->data=omStrDup("intvec"); break;
+    case IDEAL_CMD:   res->data=omStrDup("ideal"); break;
+    case MATRIX_CMD: res->data=omStrDup("matrix"); break;
+    case MODUL_CMD:   res->data=omStrDup("module"); break;
+    case MAP_CMD:     res->data=omStrDup("map"); break;
+    case PROC_CMD:    res->data=omStrDup("proc"); break;
+    case RING_CMD:    res->data=omStrDup("ring"); break;
+    case QRING_CMD:   res->data=omStrDup("qring"); break;
+    case INTMAT_CMD:  res->data=omStrDup("intmat"); break;
+    case NUMBER_CMD:  res->data=omStrDup("number"); break;
+    case LIST_CMD:   res->data=omStrDup("list"); break;
+    case PACKAGE_CMD: res->data=omStrDup("package"); break;
+    case LINK_CMD:   res->data=omStrDup("link"); break;
+    case RESOLUTION_CMD:res->data=omStrDup("resolution");break;
     case DEF_CMD:
-    case NONE:    res->data=mstrdup("none"); break;
-    default:       res->data=mstrdup("?unknown type?");
+    case NONE:    res->data=omStrDup("none"); break;
+    default:       res->data=omStrDup("?unknown type?");
   }
   return FALSE;
 }
@@ -3241,7 +3240,7 @@ static BOOLEAN jjVARSTR1(leftv res, leftv v)
   }
   int i=(int)v->Data();
   if ((0<i) && (i<=currRing->N))
-    res->data=mstrdup(currRing->names[i-1]);
+    res->data=omStrDup(currRing->names[i-1]);
   else
   {
     Werror("var number %d out of range 1..%d",i,currRing->N);
@@ -3263,7 +3262,7 @@ static BOOLEAN jjLOAD1(leftv res, leftv v)
 
 static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
 {
-  char * s=mstrdup((char *)v->Data());
+  char * s=omStrDup((char *)v->Data());
   char libnamebuf[256];
   lib_types LT = type_of_LIB(s, libnamebuf);
   BOOLEAN result = TRUE;
@@ -3770,7 +3769,7 @@ static BOOLEAN jjBRACK_S(leftv res, leftv u, leftv v,leftv w)
     Werror("wrong range[%d,%d] in string %s",r,c,u->Fullname());
     return TRUE;
   }
-  res->data = (char *)AllocL(c+1);
+  res->data = (char *)omAlloc(c+1);
   sprintf((char *)res->data,"%-*.*s",c,c,s+r-1);
   return FALSE;
 }
@@ -3862,7 +3861,7 @@ static BOOLEAN jjBRACK_Ma_I_IV(leftv res, leftv u, leftv v,leftv w)
     }
     else
     {
-      p->next=(leftv)Alloc0SizeOf(sleftv);
+      p->next=(leftv)omAlloc0Bin(sleftv_bin);
       p=p->next;
     }
     memcpy(u,&ut,sizeof(ut));
@@ -3875,7 +3874,7 @@ static BOOLEAN jjBRACK_Ma_I_IV(leftv res, leftv u, leftv v,leftv w)
       while (res->next!=NULL)
       {
         p=res->next->next;
-        FreeSizeOf((ADDRESS)res->next,sleftv);
+        omFreeBin((ADDRESS)res->next, sleftv_bin);
         // res->e aufraeumen !!!!
         res->next=p;
       }
@@ -3910,7 +3909,7 @@ static BOOLEAN jjBRACK_Ma_IV_I(leftv res, leftv u, leftv v,leftv w)
     }
     else
     {
-      p->next=(leftv)Alloc0SizeOf(sleftv);
+      p->next=(leftv)omAlloc0Bin(sleftv_bin);
       p=p->next;
     }
     memcpy(u,&ut,sizeof(ut));
@@ -3923,7 +3922,7 @@ static BOOLEAN jjBRACK_Ma_IV_I(leftv res, leftv u, leftv v,leftv w)
       while (res->next!=NULL)
       {
         p=res->next->next;
-        FreeSizeOf((ADDRESS)res->next,sleftv);
+        omFreeBin((ADDRESS)res->next, sleftv_bin);
         // res->e aufraeumen !!
         res->next=p;
       }
@@ -3964,7 +3963,7 @@ static BOOLEAN jjBRACK_Ma_IV_IV(leftv res, leftv u, leftv v,leftv w)
       }
       else
       {
-        p->next=(leftv)Alloc0SizeOf(sleftv);
+        p->next=(leftv)omAlloc0Bin(sleftv_bin);
         p=p->next;
       }
       memcpy(u,&ut,sizeof(ut));
@@ -3983,7 +3982,7 @@ static BOOLEAN jjBRACK_Ma_IV_IV(leftv res, leftv u, leftv v,leftv w)
 }
 static BOOLEAN jjPROC3(leftv res, leftv u, leftv v, leftv w)
 {
-  v->next=(leftv)AllocSizeOf(sleftv);
+  v->next=(leftv)omAllocBin(sleftv_bin);
   memcpy(v->next,w,sizeof(sleftv));
   BOOLEAN r=iiExprArith2(res,u,'(',v);
   v->rtyp=0; v->data=NULL;
@@ -3992,9 +3991,9 @@ static BOOLEAN jjPROC3(leftv res, leftv u, leftv v, leftv w)
 }
 static BOOLEAN jjCALL3MANY(leftv res, leftv u, leftv v, leftv w)
 {
-  u->next=(leftv)AllocSizeOf(sleftv);
+  u->next=(leftv)omAllocBin(sleftv_bin);
   memcpy(u->next,v,sizeof(sleftv));
-  u->next->next=(leftv)AllocSizeOf(sleftv);
+  u->next->next=(leftv)omAllocBin(sleftv_bin);
   memcpy(u->next->next,w,sizeof(sleftv));
   BOOLEAN r=iiExprArithM(res,u,iiOp);
   v->rtyp=0; v->data=NULL; // iiExprArithM did the CleanUp
@@ -4129,7 +4128,7 @@ static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
 }
 static BOOLEAN jjINTMAT3(leftv res, leftv u, leftv v,leftv w)
 {
-  intvec* im= NewIntvec3((int)v->Data(),(int)w->Data(), 0);
+  intvec* im= new intvec((int)v->Data(),(int)w->Data(), 0);
   intvec* arg = (intvec*) u->Data();
   int i, n = min(im->cols()*im->rows(), arg->cols()*arg->rows());
 
@@ -4145,7 +4144,7 @@ static BOOLEAN jjJET_P_IV(leftv res, leftv u, leftv v, leftv w)
 {
   short *iw=iv2array((intvec *)w->Data());
   res->data = (char *)pJetW((poly)u->Data(),(int)v->Data(),iw);
-  Free((ADDRESS)iw,(pVariables+1)*sizeof(short));
+  omFreeSize((ADDRESS)iw,(pVariables+1)*sizeof(short));
   return FALSE;
 }
 static BOOLEAN jjJET_ID_IV(leftv res, leftv u, leftv v, leftv w)
@@ -4227,7 +4226,7 @@ static BOOLEAN jjRANDOM_Im(leftv res, leftv u, leftv v, leftv w)
   int i=(int)u->Data();
   int r=(int)v->Data();
   int c=(int)w->Data();
-  intvec *iv = NewIntvec3(r, c, 0);
+  intvec *iv = new intvec(r, c, 0);
   if (iv->rows()==0)
   {
     delete iv;
@@ -4422,7 +4421,7 @@ static BOOLEAN jjRES3(leftv res, leftv u, leftv v, leftv w)
     intvec * iv=(intvec*)atGet(u,"isHomog");
     if (iv!=NULL)
     {
-      weights = (intvec**)Alloc0SizeOf(void_ptr);
+      weights = (intvec**)omAlloc0Bin(void_ptr_bin);
       weights[0] = ivCopy(iv);
       l=1;
     }
@@ -4447,7 +4446,7 @@ static BOOLEAN jjSTATUS3(leftv res, leftv u, leftv v, leftv w)
   int yes;
   jjSTATUS2(res, u, v);
   yes = (strcmp((char *) res->data, (char *) w->Data()) == 0);
-  FreeL((ADDRESS) res->data);
+  omFree((ADDRESS) res->data);
   res->data = (void *) yes;
   return FALSE;
 }
@@ -4471,7 +4470,7 @@ static BOOLEAN jjSTD_HILB_W(leftv res, leftv u, leftv v, leftv w)
   idSkipZeroes(result);
   res->data = (char *)result;
   setFlag(res,FLAG_STD);
-  if (ww!=NULL) atSet(res,mstrdup("isHomog"),ww,INTVEC_CMD);
+  if (ww!=NULL) atSet(res,omStrDup("isHomog"),ww,INTVEC_CMD);
   return FALSE;
 }
 
@@ -4706,8 +4705,8 @@ static BOOLEAN jjINTERSECT_PL(leftv res, leftv v)
 {
   leftv h=v;
   int l=v->listLength();
-  resolvente r=(resolvente)Alloc0(l*sizeof(ideal));
-  BOOLEAN *copied=(BOOLEAN *)Alloc0(l*sizeof(BOOLEAN));
+  resolvente r=(resolvente)omAlloc0(l*sizeof(ideal));
+  BOOLEAN *copied=(BOOLEAN *)omAlloc0(l*sizeof(BOOLEAN));
   int t=0;
   // try to convert to IDEAL_CMD
   while (h!=NULL)
@@ -4752,8 +4751,8 @@ static BOOLEAN jjINTERSECT_PL(leftv res, leftv v)
     }
     else if(iiConvert(h->Typ(),t,iiTestConvert(h->Typ(),t),h,&tmp))
     {
-      Free((ADDRESS)copied,l*sizeof(BOOLEAN));
-      Free((ADDRESS)r,l*sizeof(ideal));
+      omFreeSize((ADDRESS)copied,l*sizeof(BOOLEAN));
+      omFreeSize((ADDRESS)r,l*sizeof(ideal));
       Werror("cannot convert arg. %d to %s",i+1,Tok2Cmdname(t));
       return TRUE;
     }
@@ -4772,8 +4771,8 @@ static BOOLEAN jjINTERSECT_PL(leftv res, leftv v)
     i--;
     if (copied[i]) idDelete(&(r[i]));
   }
-  Free((ADDRESS)copied,l*sizeof(BOOLEAN));
-  Free((ADDRESS)r,l*sizeof(ideal));
+  omFreeSize((ADDRESS)copied,l*sizeof(BOOLEAN));
+  omFreeSize((ADDRESS)r,l*sizeof(ideal));
   return FALSE;
 }
 static BOOLEAN jjINTVEC_PL(leftv res, leftv v)
@@ -4781,7 +4780,7 @@ static BOOLEAN jjINTVEC_PL(leftv res, leftv v)
   int i=0;
   leftv h=v;
   if (h!=NULL) i=exprlist_length(h);
-  intvec *iv=NewIntvec1(i);
+  intvec *iv=new intvec(i);
   i=0;
   while (h!=NULL)
   {
@@ -4832,7 +4831,7 @@ static BOOLEAN jjLIST_PL(leftv res, leftv v)
   }
   else
   {
-    L=(lists)AllocSizeOf(slists);
+    L=(lists)omAllocBin(slists_bin);
     leftv h=NULL;
     int i;
     int rt;
@@ -4925,7 +4924,7 @@ static BOOLEAN jjSTRING_PL(leftv res, leftv v)
 {
   if (v == NULL)
   {
-    res->data = mstrdup("");
+    res->data = omStrDup("");
     return FALSE;
   }
   int n = v->listLength();
@@ -4935,7 +4934,7 @@ static BOOLEAN jjSTRING_PL(leftv res, leftv v)
     return FALSE;
   }
 
-  char** slist = (char**) Alloc(n*sizeof(char*));
+  char** slist = (char**) omAlloc(n*sizeof(char*));
   int i, j;
 
   for (i=0, j=0; i<n; i++, v = v ->next)
@@ -4944,14 +4943,14 @@ static BOOLEAN jjSTRING_PL(leftv res, leftv v)
     assume(slist[i] != NULL);
     j+=strlen(slist[i]);
   }
-  char* s = (char*) AllocL((j+1)*sizeof(char));
+  char* s = (char*) omAlloc((j+1)*sizeof(char));
   *s='\0';
   for (i=0;i<n;i++)
   {
     strcat(s, slist[i]);
-    FreeL(slist[i]);
+    omFree(slist[i]);
   }
-  Free(slist, n*sizeof(char*));
+  omFreeSize(slist, n*sizeof(char*));
   res->data = s;
   return FALSE;
 }
@@ -5168,11 +5167,7 @@ static Subexpr jjMakeSub(leftv e)
 #endif
 {
   // assume: e->Typ()==INT_CMD
-#ifdef MDEBUG
-  Subexpr r=(Subexpr)mmDBAllocBlock0(sizeof(*r),f,l);
-#else
-  Subexpr r=(Subexpr)Alloc0SizeOf(sSubexpr);
-#endif
+  Subexpr r=(Subexpr)omAlloc0Bin(sSubexpr_bin);
   r->start =(int)e->Data();
   return r;
 }
@@ -5188,7 +5183,7 @@ void ttGen1()
 {
   FILE *outfile = myfopen("iparith.inc","w");
   int i,j,l1=0,l2=0;
-  currRing=(ring)AllocSizeOf(sip_sring);
+  currRing=(ring)omAllocBin(sip_sring_bin);
   fprintf(outfile,
   "/****************************************\n"
   "*  Computer Algebra System SINGULAR     *\n"
@@ -5552,7 +5547,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
     if (siq>0)
     {
       //Print("siq:%d\n",siq);
-      command d=(command)Alloc0SizeOf(ip_command);
+      command d=(command)omAlloc0Bin(ip_command_bin);
       memcpy(&d->arg1,a,sizeof(sleftv));
       memcpy(&d->arg2,b,sizeof(sleftv));
       d->argc=2;
@@ -5589,8 +5584,8 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
     if (dArith2[i].cmd!=op)
     {
       int ai,bi;
-      leftv an = (leftv)Alloc0SizeOf(sleftv);
-      leftv bn = (leftv)Alloc0SizeOf(sleftv);
+      leftv an = (leftv)omAlloc0Bin(sleftv_bin);
+      leftv bn = (leftv)omAlloc0Bin(sleftv_bin);
       BOOLEAN failed=FALSE;
       i=index; /*iiTabIndex(dArithTab2,JJTAB2LEN,op);*/
       //Print("op: %c, type: %s %s\n",op,Tok2Cmdname(at),Tok2Cmdname(bt));
@@ -5616,8 +5611,8 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
               // everything ok, clean up and return
               an->CleanUp();
               bn->CleanUp();
-              FreeSizeOf((ADDRESS)an,sleftv);
-              FreeSizeOf((ADDRESS)bn,sleftv);
+              omFreeBin((ADDRESS)an, sleftv_bin);
+              omFreeBin((ADDRESS)bn, sleftv_bin);
               a->CleanUp();
               b->CleanUp();
               return FALSE;
@@ -5628,8 +5623,8 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
       }
       an->CleanUp();
       bn->CleanUp();
-      FreeSizeOf((ADDRESS)an,sleftv);
-      FreeSizeOf((ADDRESS)bn,sleftv);
+      omFreeBin((ADDRESS)an, sleftv_bin);
+      omFreeBin((ADDRESS)bn, sleftv_bin);
     }
     // error handling ---------------------------------------------------
     const char *s=NULL;
@@ -5700,7 +5695,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
     if (siq>0)
     {
       //Print("siq:%d\n",siq);
-      command d=(command)Alloc0SizeOf(ip_command);
+      command d=(command)omAlloc0Bin(ip_command_bin);
       memcpy(&d->arg1,a,sizeof(sleftv));
       d->op=op;
       d->argc=1;
@@ -5735,7 +5730,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
         }
         if (a->Next()!=NULL)
         {
-          res->next=(leftv)AllocSizeOf(sleftv);
+          res->next=(leftv)omAllocBin(sleftv_bin);
           failed=iiExprArith1(res->next,a->next,op);
         }
         a->CleanUp();
@@ -5746,7 +5741,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
     // implicite type conversion --------------------------------------------
     if (dArith1[i].cmd!=op)
     {
-      leftv an = (leftv)Alloc0SizeOf(sleftv);
+      leftv an = (leftv)omAlloc0Bin(sleftv_bin);
       i=ti;
       //Print("fuer %c , typ: %s\n",op,Tok2Cmdname(at));
       while (dArith1[i].cmd==op)
@@ -5784,12 +5779,12 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
           {
             if (an->Next() != NULL)
             {
-              res->next = (leftv)AllocSizeOf(sleftv);
+              res->next = (leftv)omAllocBin(sleftv_bin);
               failed=iiExprArith1(res->next,an->next,op);
             }
             // everything ok, clean up and return
             an->CleanUp();
-            FreeSizeOf((ADDRESS)an,sleftv);
+            omFreeBin((ADDRESS)an, sleftv_bin);
             a->CleanUp();
             return failed;
           }
@@ -5797,7 +5792,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
         i++;
       }
       an->CleanUp();
-      FreeSizeOf((ADDRESS)an,sleftv);
+      omFreeBin((ADDRESS)an, sleftv_bin);
     }
     // error handling
     if (!errorreported)
@@ -5845,7 +5840,7 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
     if (siq>0)
     {
       //Print("siq:%d\n",siq);
-      command d=(command)Alloc0SizeOf(ip_command);
+      command d=(command)omAlloc0Bin(ip_command_bin);
       memcpy(&d->arg1,a,sizeof(sleftv));
       memcpy(&d->arg2,b,sizeof(sleftv));
       memcpy(&d->arg3,c,sizeof(sleftv));
@@ -5885,9 +5880,9 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
     if (dArith3[i].cmd!=op)
     {
       int ai,bi,ci;
-      leftv an = (leftv)Alloc0SizeOf(sleftv);
-      leftv bn = (leftv)Alloc0SizeOf(sleftv);
-      leftv cn = (leftv)Alloc0SizeOf(sleftv);
+      leftv an = (leftv)omAlloc0Bin(sleftv_bin);
+      leftv bn = (leftv)omAlloc0Bin(sleftv_bin);
+      leftv cn = (leftv)omAlloc0Bin(sleftv_bin);
       BOOLEAN failed=FALSE;
       i=0;
       while ((dArith3[i].cmd!=op)&&(dArith3[i].cmd!=0)) i++;
@@ -5916,9 +5911,9 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
                 an->CleanUp();
                 bn->CleanUp();
                 cn->CleanUp();
-                FreeSizeOf((ADDRESS)an,sleftv);
-                FreeSizeOf((ADDRESS)bn,sleftv);
-                FreeSizeOf((ADDRESS)cn,sleftv);
+                omFreeBin((ADDRESS)an, sleftv_bin);
+                omFreeBin((ADDRESS)bn, sleftv_bin);
+                omFreeBin((ADDRESS)cn, sleftv_bin);
                 a->CleanUp();
                 b->CleanUp();
                 c->CleanUp();
@@ -5933,9 +5928,9 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
       an->CleanUp();
       bn->CleanUp();
       cn->CleanUp();
-      FreeSizeOf((ADDRESS)an,sleftv);
-      FreeSizeOf((ADDRESS)bn,sleftv);
-      FreeSizeOf((ADDRESS)cn,sleftv);
+      omFreeBin((ADDRESS)an, sleftv_bin);
+      omFreeBin((ADDRESS)bn, sleftv_bin);
+      omFreeBin((ADDRESS)cn, sleftv_bin);
     }
     // error handling ---------------------------------------------------
     if (!errorreported)
@@ -6018,7 +6013,7 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
     if (siq>0)
     {
       //Print("siq:%d\n",siq);
-      command d=(command)Alloc0SizeOf(ip_command);
+      command d=(command)omAlloc0Bin(ip_command_bin);
       d->op=op;
       res->data=(char *)d;
       if (a!=NULL)

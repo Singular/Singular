@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: weight0.c,v 1.5 1999-11-15 17:20:58 obachman Exp $ */
+/* $Id: weight0.c,v 1.6 2000-08-14 12:56:57 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -10,8 +10,8 @@
 #include <math.h>
 #include <string.h>
 #include "mod2.h"
+#include <omalloc.h>
 #include "tok.h"
-#include "mmemory.h"
 
 double wFunctionalMora(int *degw, int *lpol, int npol,
        double *rel, double wx);
@@ -28,16 +28,6 @@ void wGcd(int *x, int n);
 
 short * ecartWeights=NULL;
 extern int pVariables;
-
-#ifdef ALIGN_8
-#define wDouble(A) ((double *)A)
-#else
-double * wDouble(void *adr)
-{
-  long i = (long)adr;
-  return (double *)((i+7)&(~7));
-}
-#endif
 
 double wNsqr;
 double (*wFunctional)(int *degw, int *lpol, int npol,
@@ -174,11 +164,11 @@ void wFirstSearch(int *A, int *x, int mons,
   fy = *fopt;
   n = pVariables;
   xn = n + 6 + (21 / n);
-  a0 = n * sizeof(double) + 8;
+  a0 = n * sizeof(double);
   a = n * sizeof(int);
-  y = (int * )Alloc(a);
-  adr = (void * )Alloc(a0);
-  pr = wDouble(adr);
+  y = (int * )omAlloc(a);
+  adr = (void * )omAllocAligned(a0);
+  pr = adr;
   *pr = (double)1.0;
   *y = 0;
   degw = A + (n * mons);
@@ -210,8 +200,8 @@ void wFirstSearch(int *A, int *x, int mons,
         if (t==0)
         {
           *fopt = fy;
-          Free((ADDRESS)y, a);
-          Free((ADDRESS)adr, a0);
+          omFreeSize((ADDRESS)y, a);
+          omFreeSize((ADDRESS)adr, a0);
           return;
         }
       }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.cc,v 1.12 2000-05-08 15:25:25 obachman Exp $ */
+/* $Id: feOpt.cc,v 1.13 2000-08-14 12:56:05 obachman Exp $ */
 /*
 * ABSTRACT: Implementation of option buisness
 */
@@ -269,7 +269,7 @@ static void feOptHelp(const char* name);
 // Return: NULL -- everything ok
 //         "error-string" on error
 #if !defined(ESINGULAR) && !defined(TSINGULAR)
-#include "mmemory.h"
+#include <omalloc.h>
 #include "febase.h"
 #include "ipshell.h"
 #include "tok.h"
@@ -307,9 +307,9 @@ char* feSetOptValue(feOptIndex opt, char* optarg)
     {
       assume(feOptSpec[opt].type == feOptString);
       if (feOptSpec[opt].set && feOptSpec[opt].value != NULL)
-        FreeL(feOptSpec[opt].value);
+        omFree(feOptSpec[opt].value);
       if (optarg != NULL)
-        feOptSpec[opt].value = mstrdup(optarg);
+        feOptSpec[opt].value = omStrDup(optarg);
       else
         feOptSpec[opt].value = NULL;
       feOptSpec[opt].set = 1;

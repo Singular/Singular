@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.57 2000-07-03 10:21:21 pohl Exp $ */
+/* $Id: subexpr.cc,v 1.58 2000-08-14 12:56:52 obachman Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -16,7 +16,7 @@
 #include "tok.h"
 #include "ipid.h"
 #include "intvec.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "febase.h"
 #include "polys.h"
 #include "ideals.h"
@@ -33,6 +33,12 @@
 #include "silink.h"
 #include "syz.h"
 #include "subexpr.h"
+
+
+omBin sSubexpr_bin = omGetSpecBin(sizeof(sSubexpr));
+omBin sleftv_bin = omGetSpecBin(sizeof(sleftv));
+omBin procinfo_bin = omGetSpecBin(sizeof(procinfo));
+omBin libstack_bin = omGetSpecBin(sizeof(libstack));
 
 sleftv     sLastPrinted;
 const char sNoName[]="_";
@@ -202,7 +208,7 @@ void sleftv::Print(leftv store, int spaces)
           if (s==NULL) return;
           ::Print("%-*.*s",spaces,spaces," ");
           PrintS(s);
-          FreeL((ADDRESS)s);
+          omFree((ADDRESS)s);
           break;
         case LIST_CMD:
         {
@@ -276,7 +282,7 @@ void sleftv::CleanUp()
   if ((name!=NULL) && (name!=sNoName) && (rtyp!=IDHDL))
   {
     //::Print("free %x (%s)\n",name,name);
-    FreeL((ADDRESS)name);
+    omFree((ADDRESS)name);
   }
   name=NULL;
   flag=0;
@@ -293,7 +299,7 @@ void sleftv::CleanUp()
         delete (intvec *)data;
         break;
       case MAP_CMD:
-        FreeL((ADDRESS)((map)data)->preimage);
+        omFree((ADDRESS)((map)data)->preimage);
         ((map)data)->preimage=NULL;
         // no break: kill the image as an ideal
       case MATRIX_CMD:
@@ -302,7 +308,7 @@ void sleftv::CleanUp()
         idDelete((ideal *)(&data));
         break;
       case STRING_CMD:
-        FreeL((ADDRESS)data);
+        omFree((ADDRESS)data);
         break;
       case POLY_CMD:
       case VECTOR_CMD:
@@ -330,7 +336,7 @@ void sleftv::CleanUp()
         if (cmd->arg1.rtyp!=0) cmd->arg1.CleanUp();
         if (cmd->arg2.rtyp!=0) cmd->arg2.CleanUp();
         if (cmd->arg3.rtyp!=0) cmd->arg3.CleanUp();
-        FreeSizeOf((ADDRESS)data,ip_command);
+        omFreeBin((ADDRESS)data, ip_command_bin);
         break;
       }
       case RESOLUTION_CMD:
@@ -418,7 +424,7 @@ void sleftv::CleanUp()
   while (e!=NULL)
   {
     h=e->next;
-    FreeSizeOf((ADDRESS)e,sSubexpr);
+    omFreeBin((ADDRESS)e, sSubexpr_bin);
     e=h;
   }
   rtyp=NONE;
@@ -431,7 +437,7 @@ void sleftv::CleanUp()
       //next->name=NULL;
       next->next=NULL;
       next->CleanUp();
-      FreeSizeOf((ADDRESS)next,sleftv);
+      omFreeBin((ADDRESS)next, sleftv_bin);
       next=tmp_n;
     } while (next!=NULL);
   }
@@ -453,10 +459,10 @@ void * slInternalCopy(leftv source, int t, void *d, Subexpr e)
       if ((e==NULL)
       || (source->rtyp==LIST_CMD)
       || ((source->rtyp==IDHDL)&&(IDTYP((idhdl)source->data)==LIST_CMD)))
-        return (void *)mstrdup((char *)d);
+        return (void *)omStrDup((char *)d);
       else if (e->next==NULL)
       {
-        char *s=(char *)AllocL(2);
+        char *s=(char *)omAlloc(2);
         s[0]=*(char *)d;
         s[1]='\0';
         return s;
@@ -530,7 +536,7 @@ void sleftv::Copy(leftv source)
         data= (void *)idCopy((ideal)d);
         break;
       case STRING_CMD:
-        data= (void *)mstrdup((char *)d);
+        data= (void *)omStrDup((char *)d);
         break;
       case POINTER_CMD:
         data=d;
@@ -599,7 +605,7 @@ void sleftv::Copy(leftv source)
     //}
     if (source->next!=NULL)
     {
-      next=(leftv)AllocSizeOf(sleftv);
+      next=(leftv)omAllocBin(sleftv_bin);
       next->Copy(source->next);
     }
   }
@@ -613,7 +619,7 @@ void * sleftv::CopyD(int t)
     void *x=data;
     if (rtyp==VNOETHER) x=(void *)pCopy(ppNoether);
     else if (rtyp==LIB_CMD)
-      x=(void *)mstrdup((char *)Data());
+      x=(void *)omStrDup((char *)Data());
     else if ((rtyp==VMINPOLY)&& (currRing->minpoly!=NULL)&&(!rField_is_GF()))
       x=(void *)nCopy(currRing->minpoly);
     data=NULL;
@@ -657,7 +663,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
     if (((command)data)->arg3.rtyp==0)
       ((command)data)->arg3.Print(NULL,2);
     PrintS("##end\n");
-    return mstrdup("");
+    return omStrDup("");
   }
 #endif
   if (d==NULL) d=Data();
@@ -672,12 +678,12 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
         case INT_CMD:
           if (typed)
           {
-            s=(char *)AllocL(MAX_INT_LEN+7);
+            s=(char *)omAlloc(MAX_INT_LEN+7);
             sprintf(s,"int(%d)",(int)d);
           }
           else
           {
-            s=(char *)AllocL(MAX_INT_LEN+2);
+            s=(char *)omAlloc(MAX_INT_LEN+2);
             sprintf(s,"%d",(int)d);
           }
           return s;
@@ -685,18 +691,18 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
         case STRING_CMD:
           if (d == NULL)
           {
-            if (typed) return mstrdup("\"\"");
-            return mstrdup("");
+            if (typed) return omStrDup("\"\"");
+            return omStrDup("");
           }
           if (typed)
           {
-            s = (char*) AllocL(strlen((char*) d) + 3);
+            s = (char*) omAlloc(strlen((char*) d) + 3);
             sprintf(s,"\"%s\"", (char*) d);
             return s;
           }
           else
           {
-            return mstrdup((char*)d);
+            return omStrDup((char*)d);
           }
     
         case POLY_CMD:
@@ -704,12 +710,12 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           if (typed)
           {
             char* ps = pString((poly) d);
-            s = (char*) AllocL(strlen(ps) + 10);
+            s = (char*) omAlloc(strlen(ps) + 10);
             sprintf(s,"%s(%s)", (Typ() == POLY_CMD ? "poly" : "vector"), ps);
             return s;
           }
           else
-            return mstrdup(pString((poly)d));
+            return omStrDup(pString((poly)d));
 
         case NUMBER_CMD:
           StringSetS((char*) (typed ? "number(" : ""));
@@ -734,21 +740,21 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
             nDelete(&n);
           }
           s = StringAppendS((char*) (typed ? ")" : ""));
-          return mstrdup(s);
+          return omStrDup(s);
           
         case MATRIX_CMD:
           s= iiStringMatrix((matrix)d,dim);
           if (typed)
           {
-            char* ns = (char*) AllocL(strlen(s) + 40);
+            char* ns = (char*) omAlloc(strlen(s) + 40);
             sprintf(ns, "matrix(ideal(%s),%d,%d)", s, 
                     ((ideal) d)->nrows, ((ideal) d)->ncols);
-            mmTestL(ns);
+            omCheckAddr(ns);
             return ns;
           }
           else
           {
-            return mstrdup(s);
+            return omStrDup(s);
           }
 
         case MODUL_CMD:
@@ -757,12 +763,12 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           s= iiStringMatrix((matrix)d,dim);
           if (typed)
           {
-            char* ns = (char*) AllocL(strlen(s) + 10);
+            char* ns = (char*) omAlloc(strlen(s) + 10);
             sprintf(ns, "%s(%s)", (Typ()==MODUL_CMD ? "module" : "ideal"), s);
-            mmTestL(ns);
+            omCheckAddr(ns);
             return ns;
           }
-          return mstrdup(s);
+          return omStrDup(s);
 
         case INTVEC_CMD:
         case INTMAT_CMD:
@@ -774,16 +780,16 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
             char* ns;
             if (Typ() == INTMAT_CMD)
             {
-              ns = (char*) AllocL(strlen(s) + 40);
+              ns = (char*) omAlloc(strlen(s) + 40);
               sprintf(ns, "intmat(intvec(%s),%d,%d)", s, v->rows(), v->cols());
             }
             else
             {
-              ns = (char*) AllocL(strlen(s) + 10);
+              ns = (char*) omAlloc(strlen(s) + 10);
               sprintf(ns, "intvec(%s)", s);
             }
-            mmTestL(ns);
-            FreeL(s);
+            omCheckAddr(ns);
+            omFree(s);
             return ns;
           }
           else
@@ -800,16 +806,16 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
             if (Typ() == QRING_CMD)
             {
               char* id = iiStringMatrix((matrix) ((ring) d)->qideal, dim);
-              ns = (char*) AllocL(strlen(s) + strlen(id) + 20);
+              ns = (char*) omAlloc(strlen(s) + strlen(id) + 20);
               sprintf(ns, "\"%s\";%sideal(%s)", s,(dim == 2 ? "\n" : " "), id);
             }
             else
             {
-              ns = (char*) AllocL(strlen(s) + 4);
+              ns = (char*) omAlloc(strlen(s) + 4);
               sprintf(ns, "\"%s\"", s);
             }
-            FreeL(s);
-            mmTestL(ns);
+            omFree(s);
+            omCheckAddr(ns);
             return ns;
           }
           return s;
@@ -831,22 +837,22 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
             s = "";
           if (typed)
           {
-            char* ns = (char*) AllocL(strlen(s) + 4);
+            char* ns = (char*) omAlloc(strlen(s) + 4);
             sprintf(ns, "\"%s\"", s);
-            mmTestL(ns);
+            omCheckAddr(ns);
             return ns;
           }
-          return mstrdup(s);
+          return omStrDup(s);
         }
           
         case LINK_CMD:
           s = slString((si_link) d);
           if (typed)
           {
-            char* ns = (char*) AllocL(strlen(s) + 10);
+            char* ns = (char*) omAlloc(strlen(s) + 10);
             sprintf(ns, "link(\"%s\")", s);
-            FreeL(s);
-            mmTestL(ns);
+            omFree(s);
+            omCheckAddr(ns);
             return ns;
           }
           return s;
@@ -856,7 +862,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           return lString((lists) d, typed, dim);
     } /* end switch: (Typ()) */
   }
-  return mstrdup("");
+  return omStrDup("");
 }
 
     
@@ -1087,7 +1093,7 @@ void * sleftv::Data()
     }
     case STRING_CMD:
     {
-      r=(char *)AllocL(2);
+      r=(char *)omAlloc(2);
       if ((e->start>0)&& (e->start<=(int)strlen((char *)d)))
       {
         r[0]=*(((char *)d)+e->start-1);
@@ -1218,7 +1224,7 @@ BOOLEAN assumeStdFlag(leftv h)
 }
 
 /*2
-* transforms a name (as an string created by AllocL or mstrdup)
+* transforms a name (as an string created by omAlloc or omStrDup)
 * into an expression (sleftv), deletes the string
 * utility for grammar and iparith
 */
@@ -1262,7 +1268,7 @@ void syMake(leftv v,char * id, idhdl packhdl)
       {
         if (currRingHdl!=NULL)
         {
-          if (id!=IDID(currRingHdl)) FreeL((ADDRESS)id);
+          if (id!=IDID(currRingHdl)) omFree((ADDRESS)id);
           v->rtyp = IDHDL;
           v->data = (char *)currRingHdl;
           v->name = IDID(currRingHdl);
@@ -1279,7 +1285,7 @@ void syMake(leftv v,char * id, idhdl packhdl)
       if (strcmp(id,"Current")==0)
       {
         h = namespaceroot->get(namespaceroot->name,0, TRUE);
-        if (id!=IDID(h)) FreeL((ADDRESS)id);
+        if (id!=IDID(h)) omFree((ADDRESS)id);
         v->rtyp = IDHDL;
         v->data = (char *)h;
         v->flag = IDFLAG(h);
@@ -1290,10 +1296,10 @@ void syMake(leftv v,char * id, idhdl packhdl)
       if (strcmp(id,"Up")==0)
       { namehdl ns=namespaceroot;
         if (!ns->isroot) ns=ns->next;
-        if (id!=ns->name) FreeL((ADDRESS)id);
+        if (id!=ns->name) omFree((ADDRESS)id);
         v->rtyp = NSHDL;
         v->data = (char *)ns;
-        v->name = mstrdup(ns->name);
+        v->name = omStrDup(ns->name);
         return;
       }
       h=ggetid(id, packhdl==NULL ? FALSE : TRUE, &(v->packhdl));
@@ -1304,7 +1310,7 @@ void syMake(leftv v,char * id, idhdl packhdl)
       /* 3) existing identifier, local */
       if ((h!=NULL) && (IDLEV(h)==myynest))
       {
-        if (id!=IDID(h)) FreeL((ADDRESS)id);
+        if (id!=IDID(h)) omFree((ADDRESS)id);
         v->rtyp = IDHDL;
         v->data = (char *)h;
         v->flag = IDFLAG(h);
@@ -1331,7 +1337,7 @@ void syMake(leftv v,char * id, idhdl packhdl)
     /* 5. existing identifier, global */
     if (h!=NULL)
     {
-      if (id!=IDID(h)) FreeL((ADDRESS)id);
+      if (id!=IDID(h)) omFree((ADDRESS)id);
       v->rtyp = IDHDL;
       v->data = (char *)h;
       v->flag = IDFLAG(h);
@@ -1350,7 +1356,7 @@ void syMake(leftv v,char * id, idhdl packhdl)
         {
           v->data = (void *)nInit(0);
           v->rtyp = NUMBER_CMD;
-          FreeL((ADDRESS)id);
+          omFree((ADDRESS)id);
         }
         else
         if (pIsConstant(p))
@@ -1383,7 +1389,7 @@ void syMake(leftv v,char * id, idhdl packhdl)
         {
           v->data = (void *)nInit(0);
           v->rtyp = NUMBER_CMD;
-          FreeL((ADDRESS)id);
+          omFree((ADDRESS)id);
         }
         else
         if (pIsConstant(p))
@@ -1408,7 +1414,7 @@ void syMake(leftv v,char * id, idhdl packhdl)
     {
       if (strcmp(id,IDID(currRingHdl))==0)
       {
-        if (IDID(currRingHdl)!=id) FreeL((ADDRESS)id);
+        if (IDID(currRingHdl)!=id) omFree((ADDRESS)id);
         v->rtyp=IDHDL;
         v->data=currRingHdl;
         v->name=IDID(currRingHdl);
@@ -1424,7 +1430,7 @@ void syMake(leftv v,char * id, idhdl packhdl)
   /* 9: _ */
   if (strcmp(id,"_")==0)
   {
-    FreeL((ADDRESS)id);
+    omFree((ADDRESS)id);
     v->Copy(&sLastPrinted);
   }
   else
@@ -1490,17 +1496,17 @@ int sleftv::Eval()
         if (!nok)
         {
           int save_typ=d->arg1.rtyp;
-          mmTestLP(n);
+          omCheckAddr(n);
           if (d->arg1.rtyp!=IDHDL)
 #ifdef HAVE_NAMESPACES
             syMake(&d->arg1,n, d->arg1.req_packhdl); //assume  type of arg1==DEF_CMD
 #else
           syMake(&d->arg1,n);
 #endif          
-          mmTestLP(d->arg1.name);
+          omCheckAddr(d->arg1.name);
           if (d->arg1.rtyp==IDHDL)
           {
-            n=mstrdup(IDID((idhdl)d->arg1.data));
+            n=omStrDup(IDID((idhdl)d->arg1.data));
             killhdl((idhdl)d->arg1.data);
             d->arg1.data=NULL;
             d->arg1.name=n;
@@ -1514,9 +1520,10 @@ int sleftv::Eval()
           else
             nok=iiDeclCommand(&t,&d->arg1,0,save_typ,&IDROOT);
           memcpy(&d->arg1,&t,sizeof(sleftv));
-          mmTestLP(d->arg1.name);
+          omCheckAddr(d->arg1.name);
           nok=nok||iiAssign(&d->arg1,&d->arg2);
-          mmTestLP(d->arg1.name);
+          omDebugIf(d->arg1.name != NULL,  // OB: ????
+                   omCheckAddr(d->arg1.name));
           if (!nok)
           {
             memset(&d->arg1,0,sizeof(sleftv));
@@ -1577,7 +1584,7 @@ int sleftv::Eval()
     case MATRIX_CMD:
       {
         ideal id=(ideal)Data();
-        mmTest(id,sizeof(*id));
+        omCheckAddrSize(id,sizeof(*id));
         int i=id->ncols*id->nrows-1;
         for(;i>=0;i--) pTest(id->m[i]);
       }
@@ -1594,7 +1601,7 @@ char *iiSleftv2name(leftv v)
 #ifdef HAVE_NAMESPACES
   char *name;
   if(v->packhdl != NULL) {
-    name = (char *)AllocL(strlen(v->name) + strlen(IDID(v->packhdl)) + 3);
+    name = (char *)omAlloc(strlen(v->name) + strlen(IDID(v->packhdl)) + 3);
     sprintf(name, "%s::%s", IDID(v->packhdl), v->name);
     return(name);
   }

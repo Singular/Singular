@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.38 2000-07-06 13:30:04 pohl Exp $ */
+/* $Id: polys1.cc,v 1.39 2000-08-14 12:56:46 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -14,7 +14,7 @@
 #include "structs.h"
 #include "tok.h"
 #include "numbers.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "febase.h"
 #include "weight.h"
 #include "intvec.h"
@@ -244,7 +244,7 @@ static number* pnBin(int exp)
     return bin;
   }
   h = (exp >> 1) + 1;
-  bin = (number *)Alloc0(h*sizeof(number));
+  bin = (number *)omAlloc0(h*sizeof(number));
   bin[1] = x;
   if (exp < 4)
     return bin;
@@ -279,7 +279,7 @@ static void pnFreeBin(number *bin, int exp)
     for (e=1; e<h; e++)
       nDelete(&(bin[e]));
   }
-  Free((ADDRESS)bin, h*sizeof(number));
+  omFreeSize((ADDRESS)bin, h*sizeof(number));
 }
 
 /*3
@@ -369,7 +369,7 @@ static poly pTwoMonPower(poly p, int exp)
   }
   eh = exp >> 1;
   al = (exp + 1) * sizeof(poly);
-  a = (poly *)Alloc(al);
+  a = (poly *)omAlloc(al);
   a[1] = p;
   for (e=1; e<exp; e++)
   {
@@ -399,7 +399,7 @@ static poly pTwoMonPower(poly p, int exp)
   pNext(res) = b;
   pNext(b) = NULL;
   res = a[exp];
-  Free((ADDRESS)a, al);
+  omFreeSize((ADDRESS)a, al);
   pnFreeBin(bin, exp);
 //  tail=res;
 // while((tail!=NULL)&&(pNext(tail)!=NULL))
@@ -722,7 +722,7 @@ void pEnlargeSet(polyset *p, int l, int increment)
   int i;
   polyset h;
 
-  h=(polyset)ReAlloc((poly*)*p,l*sizeof(poly),(l+increment)*sizeof(poly));
+  h=(polyset)omReallocSize((poly*)*p,l*sizeof(poly),(l+increment)*sizeof(poly));
   if (increment>0)
   {
     //for (i=l; i<l+increment; i++)
@@ -1317,7 +1317,7 @@ void  pVec2Polys(poly v, polyset *p, int *len)
 
   *len=pMaxComp(v);
   if (*len==0) *len=1;
-  *p=(polyset)Alloc0((*len)*sizeof(poly));
+  *p=(polyset)omAlloc0((*len)*sizeof(poly));
   while (v!=NULL)
   {
     h=pHead(v);

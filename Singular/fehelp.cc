@@ -15,7 +15,7 @@
 
 #include "mod2.h"
 #include "tok.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "febase.h"
 #include "ipid.h"
 #include "ipshell.h"
@@ -272,10 +272,9 @@ char* feHelpBrowser(char* which, int warn)
       strcmp((char*) feOptSpec[FE_OPT_BROWSER].value,  
              heCurrentHelpBrowser->browser) != 0)
   {
-    if (feOptSpec[FE_OPT_BROWSER].value == NULL) 
-      FreeL(feOptSpec[FE_OPT_BROWSER].value);
+      omfree(feOptSpec[FE_OPT_BROWSER].value);
    feOptSpec[FE_OPT_BROWSER].value 
-     = (void*) mstrdup(heCurrentHelpBrowser->browser);
+     = (void*) omStrDup(heCurrentHelpBrowser->browser);
   }
   return heCurrentHelpBrowser->browser;
 }
@@ -559,7 +558,7 @@ static BOOLEAN heOnlineHelp(char* s)
       if (s!=NULL)
       {
         PrintS(s);
-        FreeL((ADDRESS)s);
+        omFree((ADDRESS)s);
       }
       return TRUE;
     }
@@ -575,7 +574,7 @@ static BOOLEAN heOnlineHelp(char* s)
     if (s[ls - 4] == '.') str = s;
     else
     {
-      str = mstrdup(s);
+      str = omStrDup(s);
       str[ls - 4] = '.';
     }
   }
@@ -608,7 +607,7 @@ static BOOLEAN heOnlineHelp(char* s)
       fseek(fp, 0, SEEK_SET);
       Warn( "library %s has an old format. Please fix it for the next time",
             str);
-      if (str != s) FreeL(str);
+      if (str != s) omFree(str);
       BOOLEAN found=FALSE;
       while (fgets( buf, sizeof(buf), fp))
       {
@@ -630,16 +629,16 @@ static BOOLEAN heOnlineHelp(char* s)
     }
     else
     {
-      if (str != s) FreeL(str);
+      if (str != s) omFree(str);
       fclose( yylpin );
       PrintS(text_buffer);
-      FreeL(text_buffer);
+      omFree(text_buffer);
       text_buffer=NULL;
     }
     return TRUE;
   }
 
-  if (str != s) FreeL(str);
+  if (str != s) omFree(str);
   return FALSE;
 }
 
@@ -961,10 +960,10 @@ static BOOLEAN heBuiltinInit(int warn)
 static int singular_manual(char *str);
 static void heBuiltinHelp(heEntry hentry)
 {
-  char* node = mstrdup(hentry != NULL && *(hentry->node) != '\0' ?
+  char* node = omStrDup(hentry != NULL && *(hentry->node) != '\0' ?
                        hentry->node : "Top");
   singular_manual(node);
-  FreeL(node);
+  omFree(node);
 }
 
 

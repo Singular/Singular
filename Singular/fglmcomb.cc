@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmcomb.cc,v 1.16 1999-11-15 17:20:01 obachman Exp $
+// $Id: fglmcomb.cc,v 1.17 2000-08-14 12:56:12 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -24,7 +24,7 @@
 #include "ipshell.h"
 #include "febase.h"
 #include "maps.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "fglmvec.h"
 #include "fglmgauss.h"
 #include "kstd1.h"
@@ -184,7 +184,7 @@ fglmNewLinearCombination( ideal source, poly monset )
     STICKYPROT2( "%i monoms\n", numMonoms );
 
     // Allcoate Memory and initialize sets
-    m= (polyset)Alloc( numMonoms * sizeof( poly ) );
+    m= (polyset)omAlloc( numMonoms * sizeof( poly ) );
     poly temp= monset;
     for ( k= 0; k < numMonoms; k++ ) {
 //         m[k]= pOne();
@@ -196,24 +196,24 @@ fglmNewLinearCombination( ideal source, poly monset )
         pIter( temp );
     }
 
-    nf= (polyset)Alloc( numMonoms * sizeof( poly ) );
+    nf= (polyset)omAlloc( numMonoms * sizeof( poly ) );
 
 #ifndef HAVE_EXPLICIT_CONSTR
     mv= new fglmVector[ numMonoms ];
 #else
-    mv= (fglmVector *)Alloc( numMonoms * sizeof( fglmVector ) );
+    mv= (fglmVector *)omAlloc( numMonoms * sizeof( fglmVector ) );
 #endif
 
 #ifndef HAVE_EXPLICIT_CONSTR
     v= new fglmVector[ numMonoms ];
 #else
-    v= (fglmVector *)Alloc( numMonoms * sizeof( fglmVector ) );
+    v= (fglmVector *)omAlloc( numMonoms * sizeof( fglmVector ) );
 #endif
 
     basisMax= basisBS;
-    basis= (polyset)Alloc( basisMax * sizeof( poly ) );
+    basis= (polyset)omAlloc( basisMax * sizeof( poly ) );
 
-    weights= (int *)Alloc( IDELEMS( source ) * sizeof( int ) );
+    weights= (int *)omAlloc( IDELEMS( source ) * sizeof( int ) );
     STICKYPROT( "weights: " );
     for ( k= 0; k < IDELEMS( source ); k++ ) {
         poly temp= (source->m)[k];
@@ -226,8 +226,8 @@ fglmNewLinearCombination( ideal source, poly monset )
         STICKYPROT2( "%i ", w );
     }
     STICKYPROT( "\n" );
-    lengthes= (int *)Alloc( numMonoms * sizeof( int ) );
-    order= (int *)Alloc( numMonoms * sizeof( int ) );
+    lengthes= (int *)omAlloc( numMonoms * sizeof( int ) );
+    order= (int *)omAlloc( numMonoms * sizeof( int ) );
 
     // calculate the NormalForm in a special way
     for ( k= 0; k < numMonoms; k++ )
@@ -254,7 +254,7 @@ fglmNewLinearCombination( ideal source, poly monset )
                 if ( basisSize == basisMax )
                 {
                     // Expand the basis
-                    basis= (polyset)ReAlloc( basis, basisMax * sizeof( poly ), (basisMax + basisBS ) * sizeof( poly ) );
+                    basis= (polyset)omReallocSize( basis, basisMax * sizeof( poly ), (basisMax + basisBS ) * sizeof( poly ) );
                     basisMax+= basisBS;
                 }
 //                 basis[basisSize]= pOne();
@@ -303,8 +303,8 @@ fglmNewLinearCombination( ideal source, poly monset )
         pDelete( nf + k );
     }
     // Free Memory not needed anymore
-    Free( (ADDRESS)nf, numMonoms * sizeof( poly ) );
-    Free( (ADDRESS)weights, IDELEMS( source ) * sizeof( int ) );
+    omFreeSize( (ADDRESS)nf, numMonoms * sizeof( poly ) );
+    omFreeSize( (ADDRESS)weights, IDELEMS( source ) * sizeof( int ) );
 
     STICKYPROT2( "\nbasis size: %i\n", basisSize );
     STICKYPROT( "(clear basis" );
@@ -394,31 +394,31 @@ fglmNewLinearCombination( ideal source, poly monset )
         if ( ! nGreaterZero( pGetCoeff( result ) ) ) result= pNeg( result );
     }
     // Free Memory
-    Free( (ADDRESS)lengthes, numMonoms * sizeof( int ) );
-    Free( (ADDRESS)order, numMonoms * sizeof( int ) );
+    omFreeSize( (ADDRESS)lengthes, numMonoms * sizeof( int ) );
+    omFreeSize( (ADDRESS)order, numMonoms * sizeof( int ) );
 //     for ( k= 0; k < numMonoms; k++ )
 //         v[k].~fglmVector();
 #ifndef HAVE_EXPLICIT_CONSTR
     delete [] v;
 #else
-    Free( (ADDRESS)v, numMonoms * sizeof( fglmVector ) );
+    omFreeSize( (ADDRESS)v, numMonoms * sizeof( fglmVector ) );
 #endif
 
     for ( k= 0; k < basisSize; k++ )
         pDelete( basis + k );
-    Free( (ADDRESS)basis, basisMax * sizeof( poly ) );
+    omFreeSize( (ADDRESS)basis, basisMax * sizeof( poly ) );
 
 #ifndef HAVE_EXPLICIT_CONSTR
     delete [] mv;
 #else
     for ( k= 0; k < numMonoms; k++ )
         mv[k].~fglmVector();
-    Free( (ADDRESS)mv, numMonoms * sizeof( fglmVector ) );
+    omFreeSize( (ADDRESS)mv, numMonoms * sizeof( fglmVector ) );
 #endif
 
     for ( k= 0; k < numMonoms; k++ )
         pDelete( m + k );
-    Free( (ADDRESS)m, numMonoms * sizeof( poly ) );
+    omFreeSize( (ADDRESS)m, numMonoms * sizeof( poly ) );
 
     STICKYPROT( "\n" );
     return result;
@@ -447,12 +447,12 @@ fglmLinearCombination( ideal source, poly monset )
         pIter( temp );
     }
     // Allocate Memory
-    m= (polyset)Alloc( numMonoms * sizeof( poly ) );
-    nf= (polyset)Alloc( numMonoms * sizeof( poly ) );
+    m= (polyset)omAlloc( numMonoms * sizeof( poly ) );
+    nf= (polyset)omAlloc( numMonoms * sizeof( poly ) );
     // Warning: The fglmVectors in v are yet not initialized
-    v= (fglmVector *)Alloc( numMonoms * sizeof( fglmVector ) );
+    v= (fglmVector *)omAlloc( numMonoms * sizeof( fglmVector ) );
     basisMax= basisBS;
-    basis= (polyset)Alloc( basisMax * sizeof( poly ) );
+    basis= (polyset)omAlloc( basisMax * sizeof( poly ) );
 
     // get the NormalForm and the basis monomials
     temp= monset;
@@ -477,7 +477,7 @@ fglmLinearCombination( ideal source, poly monset )
             if ( found == FALSE ) {
                 // Expand the basis
                 if ( basisSize == basisMax ) {
-                    basis= (polyset)ReAlloc( basis, basisMax * sizeof( poly ), (basisMax + basisBS ) * sizeof( poly ) );
+                    basis= (polyset)omReallocSize( basis, basisMax * sizeof( poly ), (basisMax + basisBS ) * sizeof( poly ) );
                     basisMax+= basisBS;
                 }
                 basis[basisSize]= pHead( sm );
@@ -549,14 +549,14 @@ fglmLinearCombination( ideal source, poly monset )
         pDelete( m + k );
         pDelete( nf + k );
     }
-    Free( (ADDRESS)m, numMonoms * sizeof( poly ) );
-    Free( (ADDRESS)nf, numMonoms * sizeof( poly ) );
+    omFreeSize( (ADDRESS)m, numMonoms * sizeof( poly ) );
+    omFreeSize( (ADDRESS)nf, numMonoms * sizeof( poly ) );
     // Warning: At this point all Vectors in v have to be initialized
     for ( k= numMonoms - 1; k >= 0; k-- ) v[k].~fglmVector();
-    Free( (ADDRESS)v, numMonoms * sizeof( fglmVector ) );
+    omFreeSize( (ADDRESS)v, numMonoms * sizeof( fglmVector ) );
     for ( k= 0; k < basisSize; k++ )
         pDelete( basis + k );
-    Free( (ADDRESS)basis, basisMax * sizeof( poly ) );
+    omFreeSize( (ADDRESS)basis, basisMax * sizeof( poly ) );
     STICKYPROT( "\n" );
     return comb;
 }

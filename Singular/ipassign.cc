@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.57 2000-07-27 12:11:29 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.58 2000-08-14 12:56:23 obachman Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -16,7 +16,7 @@
 #include "tok.h"
 #include "ipid.h"
 #include "intvec.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "febase.h"
 #include "polys.h"
 #include "ideals.h"
@@ -201,7 +201,7 @@ static BOOLEAN jiA_INT(leftv res, leftv a, Subexpr e)
     {
       if (i>=iv->length())
       {
-        intvec *iv1=NewIntvec1(i+1);
+        intvec *iv1=new intvec(i+1);
         (*iv1)[i]=(int)a->Data();
         intvec *ivn=ivAdd(iv,iv1);
         delete iv;
@@ -320,9 +320,11 @@ static BOOLEAN jiA_STRING(leftv res, leftv a, Subexpr e)
 {
   if (e==NULL)
   {
-    FreeL((ADDRESS)res->data);
+    void* tmp = res->data;
     res->data=(void *)a->CopyD(STRING_CMD);
     jiAssignAttr(res,a);
+    //OB: ???   
+    omfree(tmp);
   }
   else
   {
@@ -347,7 +349,7 @@ static BOOLEAN jiA_PROC(leftv res, leftv a, Subexpr e)
   if(res->data!=NULL) piCleanUp((procinfo *)res->data);
   if(a->rtyp==STRING_CMD)
   {
-    res->data = (void *)Alloc0SizeOf(procinfo);
+    res->data = (void *)omAlloc0Bin(procinfo_bin);
     ((procinfo *)(res->data))->language=LANG_NONE;
     iiInitSingularProcinfo((procinfo *)res->data,"",res->name,0,0);
     ((procinfo *)res->data)->data.s.body=(char *)a->CopyD(STRING_CMD);
@@ -407,14 +409,14 @@ static BOOLEAN jiA_LINK(leftv res, leftv a, Subexpr e)
   {
     if (l == NULL)
     {
-      l = (si_link) Alloc0SizeOf(sip_link);
+      l = (si_link) omAlloc0Bin(sip_link_bin);
       res->data = (void *) l;
     }
     return slInit(l, (char *) a->Data());
   }
   else if (a->Typ() == LINK_CMD)
   {
-    if (l != NULL) FreeSizeOf(l, sip_link);
+    if (l != NULL) omFreeBin(l, sip_link_bin);
     res->data = slCopy((si_link)a->Data());
     return FALSE;
   }
@@ -425,7 +427,7 @@ static BOOLEAN jiA_MAP(leftv res, leftv a, Subexpr e)
 {
   if (res->data!=NULL)
   {
-    FreeL((ADDRESS)((map)res->data)->preimage);
+    omFree((ADDRESS)((map)res->data)->preimage);
     ((map)res->data)->preimage=NULL;
     idDelete((ideal*)&res->data);
   }
@@ -462,7 +464,7 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
   qr=(ring)res->Data();
   ring qrr=rCopy(currRing);
   memcpy4(qr,qrr,sizeof(ip_sring));
-  FreeSizeOf((ADDRESS)qrr,ip_sring);
+  omFreeBin((ADDRESS)qrr, ip_sring_bin);
   if (qr->qideal!=NULL) idDelete(&qr->qideal);
   qr->qideal = (ideal)a->CopyD(IDEAL_CMD);
   //currRing=qr;
@@ -636,7 +638,7 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
   if (dAssign[i].res==0)
   {
     int ri;
-    leftv rn = (leftv)Alloc0SizeOf(sleftv);
+    leftv rn = (leftv)omAlloc0Bin(sleftv_bin);
     BOOLEAN failed=FALSE;
     i=0;
     while ((dAssign[i].res!=lt)
@@ -652,7 +654,7 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
         }
         // everything done, clean up temp. variables
         rn->CleanUp();
-        FreeSizeOf((ADDRESS)rn,sleftv);
+        omFreeBin((ADDRESS)rn, sleftv_bin);
         if (failed)
         {
           // leave loop, goto error handling
@@ -721,7 +723,7 @@ static BOOLEAN iiAssign_sys(leftv l, leftv r)
   if (dAssign_sys[i].res==0)
   {
     int ri;
-    leftv rn = (leftv)Alloc0SizeOf(sleftv);
+    leftv rn = (leftv)omAlloc0Bin(sleftv_bin);
     BOOLEAN failed=FALSE;
     i=0;
     while ((dAssign_sys[i].res!=lt)
@@ -734,7 +736,7 @@ static BOOLEAN iiAssign_sys(leftv l, leftv r)
             || (dAssign_sys[i].p(l,rn)));
         // everything done, clean up temp. variables
         rn->CleanUp();
-        FreeSizeOf((ADDRESS)rn,sleftv);
+        omFreeBin((ADDRESS)rn, sleftv_bin);
         if (failed)
         {
           // leave loop, goto error handling
@@ -839,7 +841,7 @@ static BOOLEAN jjA_L_LIST(leftv l, leftv r)
 */
 {
   int sl = r->listLength();
-  lists L=(lists)AllocSizeOf(slists);
+  lists L=(lists)omAllocBin(slists_bin);
   lists oldL;
   leftv h=NULL,o_r=r;
   int i;
@@ -953,7 +955,7 @@ static BOOLEAN jjA_L_STRING(leftv l,leftv r)
     sl += strlen((char *)hh->Data());
     hh = hh->next;
   }
-  s = (char * )AllocL(sl);
+  s = (char * )omAlloc(sl);
   sl=0;
   hh = r;
   while (hh!=NULL)
@@ -965,7 +967,7 @@ static BOOLEAN jjA_L_STRING(leftv l,leftv r)
     hh = hh->next;
   }
   s[sl]='\0';
-  FreeL((ADDRESS)IDDATA((idhdl)(l->data)));
+  omFree((ADDRESS)IDDATA((idhdl)(l->data)));
   IDDATA((idhdl)(l->data))=s;
   return FALSE;
 }
@@ -1084,7 +1086,7 @@ static BOOLEAN jiA_STRING_L(leftv l,leftv r)
   t.rtyp=STRING_CMD;
   while ((i<sl)&&(l!=NULL))
   {
-    ss=(char *)AllocL(2);
+    ss=(char *)omAlloc(2);
     ss[1]='\0';
     ss[0]=s[i];
     t.data=ss;
@@ -1127,7 +1129,7 @@ static BOOLEAN jiAssign_list(leftv l, leftv r)
   }
   if (i>li->nr)
   {
-    li->m=(leftv)ReAlloc(li->m,(li->nr+1)*sizeof(sleftv),(i+1)*sizeof(sleftv));
+    li->m=(leftv)omreallocSize(li->m,(li->nr+1)*sizeof(sleftv),(i+1)*sizeof(sleftv));
     memset(&(li->m[li->nr+1]),0,(i-li->nr)*sizeof(sleftv));
     int j=li->nr+1;
     for(;j<=i;j++)
@@ -1235,7 +1237,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
        while (l->e!=NULL)
        {
          h=l->e->next;
-         FreeSizeOf((ADDRESS)l->e,sSubexpr);
+         omFreeBin((ADDRESS)l->e, sSubexpr_bin);
          l->e=h;
        }
        return b;
@@ -1320,7 +1322,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
         while (l->e!=NULL)
         {
           h=l->e->next;
-          FreeSizeOf((ADDRESS)l->e,sSubexpr);
+          omFreeBin((ADDRESS)l->e, sSubexpr_bin);
           l->e=h;
         }
         return b;
@@ -1355,11 +1357,11 @@ BOOLEAN iiAssign(leftv l, leftv r)
   switch (lt)
   {
     case INTVEC_CMD:
-      nok=jjA_L_INTVEC(l,r,NewIntvec1(exprlist_length(r)));
+      nok=jjA_L_INTVEC(l,r,new intvec(exprlist_length(r)));
       break;
     case INTMAT_CMD:
     {
-      nok=jjA_L_INTVEC(l,r,NewIntvec1(IDINTVEC((idhdl)l->data)));
+      nok=jjA_L_INTVEC(l,r,new intvec(IDINTVEC((idhdl)l->data)));
       break;
     }
     case MAP_CMD:
@@ -1367,8 +1369,8 @@ BOOLEAN iiAssign(leftv l, leftv r)
       // first element in the list sl (r) must be a ring
       if (((rt == RING_CMD)||(rt == QRING_CMD))&&(r->e==NULL))
       {
-        FreeL((ADDRESS)IDMAP((idhdl)l->data)->preimage);
-        IDMAP((idhdl)l->data)->preimage = mstrdup (r->Fullname());
+        omFree((ADDRESS)IDMAP((idhdl)l->data)->preimage);
+        IDMAP((idhdl)l->data)->preimage = omStrDup (r->Fullname());
         /* advance the expressionlist to get the next element after the ring */
         hh = r->next;
         //r=hh;

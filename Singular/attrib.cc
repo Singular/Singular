@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.cc,v 1.17 1999-11-15 17:19:48 obachman Exp $ */
+/* $Id: attrib.cc,v 1.18 2000-08-14 12:55:53 obachman Exp $ */
 
 /*
 * ABSTRACT: attributes to leftv and idhdl
@@ -14,6 +14,7 @@
 #include <unistd.h>
 
 #include "mod2.h"
+#include <omalloc.h>
 #include "tok.h"
 #include "ipid.h"
 #include "intvec.h"
@@ -22,21 +23,22 @@
 #include "matpol.h"
 #include "ipshell.h"
 #include "attrib.h"
-#include "mmemory.h"
+
+static omBin sattr_bin = omGetSpecBin(sizeof(sattr));
 
 void sattr::Print()
 {
-  mmTestP(this,sizeof(sattr));
+  omCheckAddrSize(this,sizeof(sattr));
   ::Print("attr:%s, type %s \n",name,Tok2Cmdname(atyp));
   if (next!=NULL) next->Print();
 }
 
 attr sattr::Copy()
 {
-  mmTestP(this,sizeof(sattr));
-  attr n=(attr)Alloc0SizeOf(sattr);
+  omCheckAddrSize(this,sizeof(sattr));
+  attr n=(attr)omAlloc0Bin(sattr_bin);
   n->atyp=atyp;
-  if (name!=NULL) n->name=mstrdup(name);
+  if (name!=NULL) n->name=omStrDup(name);
   n->data=CopyA();
   if (next!=NULL)
   {
@@ -47,7 +49,7 @@ attr sattr::Copy()
 
 void * sattr::CopyA()
 {
-  mmTestP(this,sizeof(sattr));
+  omCheckAddrSize(this,sizeof(sattr));
   switch (atyp)
   {
     case INTVEC_CMD:
@@ -63,7 +65,7 @@ void * sattr::CopyA()
     case INT_CMD:
       return (void *)data;
     case STRING_CMD:
-      return (void *)mstrdup((char *)data);
+      return (void *)omStrDup((char *)data);
 #ifdef TEST
     default:
       ::Print("CopyA: unknown type %d\n",atyp);  /* DEBUG */
@@ -94,18 +96,18 @@ attr sattr::set(char * s, void * data, int t)
     case INT_CMD:
       break;
     case STRING_CMD:
-      FreeL((ADDRESS)h->data);
+      omFree((ADDRESS)h->data);
       break;
 #ifdef TEST
     default:
       ::Print("at-set: unknown type\n",atyp);  /* DEBUG */
 #endif
     } /* end switch: (atyp) */
-    FreeL((ADDRESS)s);
+    omFree((ADDRESS)s);
   }
   else
   {
-     h = (attr)Alloc0SizeOf(sattr);
+     h = (attr)omAlloc0Bin(sattr_bin);
      h->name = s;
      h->next = this;
      h->data = data;
@@ -186,7 +188,7 @@ void atSet(leftv root,char * name,void * data,int typ)
 
 void sattr::kill()
 {
-  FreeL((ADDRESS)name);
+  omFree((ADDRESS)name);
   name=NULL;
   switch (atyp)
   {
@@ -205,7 +207,7 @@ void sattr::kill()
   case INT_CMD:
     break;
   case STRING_CMD:
-    FreeL((ADDRESS)data);
+    omFree((ADDRESS)data);
     break;
 #ifdef TEST
   default:
@@ -213,7 +215,7 @@ void sattr::kill()
 #endif
   } /* end switch: (atyp) */
   data=NULL;
-  FreeSizeOf((ADDRESS)this,sattr);
+  omFreeBin((ADDRESS)this, sattr_bin);
 }
 
 void sattr::killAll()
@@ -305,7 +307,7 @@ BOOLEAN atATTRIB2(leftv res,leftv a,leftv b)
     else
     {
       res->rtyp=STRING_CMD;
-      res->data=mstrdup("");
+      res->data=omStrDup("");
     }
   }
   return FALSE;
@@ -353,7 +355,7 @@ BOOLEAN atATTRIB3(leftv res,leftv a,leftv b,leftv c)
   else
   {
     int typ=c->Typ();
-    atSet(v,mstrdup(name),c->CopyD(typ),typ/*c->T(yp()*/);
+    atSet(v,omStrDup(name),c->CopyD(typ),typ/*c->T(yp()*/);
     if (h!=NULL) IDATTR(h)=v->attribute;
   }
   return FALSE;

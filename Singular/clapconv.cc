@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.25 2000-07-03 10:22:17 pohl Exp $
+// $Id: clapconv.cc,v 1.26 2000-08-14 12:55:55 obachman Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -10,6 +10,7 @@
 
 #include "mod2.h"
 #ifdef HAVE_FACTORY
+#include <omalloc.h>
 #include "tok.h"
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include "clapconv.h"
@@ -17,7 +18,6 @@
 #include "longalg.h"
 #include "polys.h"
 #include "modulop.h"
-#include "mmemory.h"
 #include "febase.h"
 #include "ipid.h"
 #include "ring.h"
@@ -143,8 +143,8 @@ convRecPP ( const CanonicalForm & f, int * exp, poly & result )
         pGetCoeff( term ) = nInit( f.intval() );
       else
       {
-        number z=(number)AllocSizeOf(rnumber);
-#if defined(LDEBUG) && ! defined(HAVE_ASO)
+        number z=(number)omAllocBin(rnumber_bin);
+#if defined(LDEBUG) 
         z->debug=123456;
 #endif
         z->z = gmp_numerator( f );
@@ -277,8 +277,8 @@ convRecPTr ( const CanonicalForm & f, int * exp, alg & result )
         napGetCoeff( term ) = nlInit( f.intval() );
       else
       {
-        number z=(number)AllocSizeOf(rnumber);
-#if defined(LDEBUG) && ! defined(HAVE_ASO)
+        number z=(number)omAllocBin(rnumber_bin);
+#if defined(LDEBUG)
         z->debug=123456;
 #endif
         z->z = gmp_numerator( f );
@@ -369,7 +369,7 @@ convRecAP ( const CanonicalForm & f, int * exp, poly & result )
       pSetComp(term, 0);
       for ( i = 0; i < off; i++ )
         z->e[i]+=exp[i+1];
-      pGetCoeff(term)=(number)Alloc0SizeOf(rnumber);
+      pGetCoeff(term)=(number)omAlloc0Bin(rnumber_bin);
       ((lnumber)pGetCoeff(term))->z=z;
       pSetm( term );
       result = pAdd( result, term );
@@ -440,8 +440,8 @@ static number convClapNSingAN( const CanonicalForm &f)
     return nacInit( f.intval() );
   else
   {
-    number z=(number)AllocSizeOf(rnumber);
-#if defined(LDEBUG) && ! defined(HAVE_ASO)
+    number z=(number)omAllocBin(rnumber_bin);
+#if defined(LDEBUG) 
     z->debug=123456;
 #endif
     z->z = gmp_numerator( f );
@@ -538,7 +538,7 @@ convRecTrP ( const CanonicalForm & f, int * exp, poly & result , int offs)
     for ( int i = 1; i <= pVariables; i++ )
       pSetExp( term, i ,exp[i]);
     pSetComp(term, 0);
-    pGetCoeff(term)=(number)Alloc0SizeOf(rnumber);
+    pGetCoeff(term)=(number)omAlloc0Bin(rnumber_bin);
     ((lnumber)pGetCoeff(term))->z=convClapPSingTr( f );
     pSetm( term );
     result = pAdd( result, term );

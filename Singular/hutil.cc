@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hutil.cc,v 1.14 2000-02-29 16:31:52 Singular Exp $ */
+/* $Id: hutil.cc,v 1.15 2000-08-14 12:56:19 obachman Exp $ */
 /*
 * ABSTRACT: Utilities for staircase operations
 */
@@ -9,7 +9,7 @@
 #include "mod2.h"
 #include "tok.h"
 #include "febase.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "ipid.h"
 #include "ideals.h"
 #include "polys.h"
@@ -80,13 +80,13 @@ scfmon hInit(ideal S, ideal Q, int *Nexist)
   *Nexist = k;
   if (!k)
     return NULL;
-  ek = ex = (scfmon)Alloc(k * sizeof(scmon));
-  hsecure = (Exponent_t**) Alloc(k * sizeof(scmon));
+  ek = ex = (scfmon)omAlloc(k * sizeof(scmon));
+  hsecure = (Exponent_t**) omAlloc(k * sizeof(scmon));
   for (i = sl; i>0; i--)
   {
     if (*si!=NULL)
     {
-      *ek = (Exponent_t*) Alloc((pVariables+1)*sizeof(Exponent_t));
+      *ek = (Exponent_t*) omAlloc((pVariables+1)*sizeof(Exponent_t));
       pGetExpV(*si, *ek);
       ek++;
     }
@@ -96,7 +96,7 @@ scfmon hInit(ideal S, ideal Q, int *Nexist)
   {
     if (*qi!=NULL)
     {
-      *ek = (Exponent_t*) Alloc((pVariables+1)*sizeof(Exponent_t));
+      *ek = (Exponent_t*) omAlloc((pVariables+1)*sizeof(Exponent_t));
       pGetExpV(*qi, *ek);
       ek++;
     }
@@ -136,9 +136,9 @@ void hDelete(scfmon ev, int ev_length)
   int i;
 
   for (i=0;i<ev_length;i++)
-    Free(hsecure[i],(pVariables+1)*sizeof(Exponent_t));
-  Free(hsecure, ev_length*sizeof(scmon));
-  Free(ev,  ev_length*sizeof(scmon));
+    omFreeSize(hsecure[i],(pVariables+1)*sizeof(Exponent_t));
+  omFreeSize(hsecure, ev_length*sizeof(scmon));
+  omFreeSize(ev,  ev_length*sizeof(scmon));
 }
 
 
@@ -195,9 +195,9 @@ void hOrdSupp(scfmon stc, int Nstc, varset var, int Nvar)
   scmon temp, count;
   float o, h, g, *v1;
 
-  v1 = (float *)Alloc(Nvar * sizeof(float));
-  temp = (Exponent_t *)Alloc(Nstc * sizeof(Exponent_t));
-  count = (Exponent_t *)Alloc(Nstc * sizeof(Exponent_t));
+  v1 = (float *)omAlloc(Nvar * sizeof(float));
+  temp = (Exponent_t *)omAlloc(Nstc * sizeof(Exponent_t));
+  count = (Exponent_t *)omAlloc(Nstc * sizeof(Exponent_t));
   for (i = 1; i <= Nvar; i++)
   {
     i1 = var[i];
@@ -254,8 +254,8 @@ void hOrdSupp(scfmon stc, int Nstc, varset var, int Nvar)
     }
     v1[i-1] = h * (float)jj;
   }
-  Free((ADDRESS)count, Nstc * sizeof(Exponent_t));
-  Free((ADDRESS)temp, Nstc * sizeof(Exponent_t));
+  omFreeSize((ADDRESS)count, Nstc * sizeof(Exponent_t));
+  omFreeSize((ADDRESS)temp, Nstc * sizeof(Exponent_t));
   for (i = 1; i < Nvar; i++)
   {
     i1 = var[i+1];
@@ -279,7 +279,7 @@ void hOrdSupp(scfmon stc, int Nstc, varset var, int Nvar)
         break;
     }
   }
-  Free((ADDRESS)v1, Nvar * sizeof(float));
+  omFreeSize((ADDRESS)v1, Nvar * sizeof(float));
 }
 
 
@@ -981,10 +981,10 @@ monf hCreate(int Nvar)
 {
   monf xmem;
   int  i;
-  xmem = (monf)Alloc((Nvar + 1) * sizeof(monp));
+  xmem = (monf)omAlloc((Nvar + 1) * sizeof(monp));
   for (i = Nvar; i>0; i--)
   {
-    xmem[i] = (monp)Alloc(LEN_MON);
+    xmem[i] = (monp)omAlloc(LEN_MON);
     xmem[i]->mo = NULL;
   }
   return xmem;
@@ -997,10 +997,10 @@ void hKill(monf xmem, int Nvar)
   for (i = Nvar; i!=0; i--)
   {
     if (xmem[i]->mo!=NULL)
-      Free((ADDRESS)xmem[i]->mo, xmem[i]->a * sizeof(scmon));
-    Free((ADDRESS)xmem[i], LEN_MON);
+      omFreeSize((ADDRESS)xmem[i]->mo, xmem[i]->a * sizeof(scmon));
+    omFreeSize((ADDRESS)xmem[i], LEN_MON);
   }
-  Free((ADDRESS)xmem, (Nvar + 1) * sizeof(monp));
+  omFreeSize((ADDRESS)xmem, (Nvar + 1) * sizeof(monp));
 }
 
 
@@ -1010,8 +1010,8 @@ scfmon hGetmem(int lm, scfmon old, monp monmem)
   int  lx = monmem->a;
   if (!x || (lm > lx))
   {
-    Free((ADDRESS)x, lx * sizeof(scmon));
-    monmem->mo = x = (scfmon)Alloc(lm * sizeof(scmon));
+    if (x) omFreeSize((ADDRESS)x, lx * sizeof(scmon));
+    monmem->mo = x = (scfmon)omAlloc(lm * sizeof(scmon));
     monmem->a = lm;
   }
   memcpy(x, old, lm * sizeof(scmon));

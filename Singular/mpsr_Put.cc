@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Put.cc,v 1.21 2000-05-23 14:33:24 Singular Exp $ */
+/* $Id: mpsr_Put.cc,v 1.22 2000-08-14 12:56:43 obachman Exp $ */
 
 /***************************************************************
  *
@@ -580,7 +580,7 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
     {
 #ifdef HAVE_NAMESPACES
       cmd.arg1.name = (char*)
-        AllocL(strlen(IDID(h)) + strlen(namespaceroot->name) + 3);
+        omAlloc(strlen(IDID(h)) + strlen(namespaceroot->name) + 3);
       sprintf(cmd.arg1.name, "%s::%s", namespaceroot->name, IDID(h));
 #else
       cmd.arg1.name = IDID(h);
@@ -592,10 +592,10 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
 #ifdef HAVE_NAMESPACES
       if (mpsr_PutLeftv(link, lv , r) != mpsr_Success)
       {
-        FreeL(cmd.arg1.name);
+        omFree(cmd.arg1.name);
         break;
       }
-      FreeL(cmd.arg1.name);
+      omFree(cmd.arg1.name);
 #else
       if (mpsr_PutLeftv(link, lv, r) != mpsr_Success) break;
 #endif
@@ -623,7 +623,7 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
         {
 #ifdef HAVE_NAMESPACES
           cmd.arg1.name = (char*)
-            AllocL(strlen(IDID(h2)) + strlen(namespaceroot->name) + 3);
+            omAlloc(strlen(IDID(h2)) + strlen(namespaceroot->name) + 3);
           sprintf(cmd.arg1.name, "%s::%s", namespaceroot->name, IDID(h2));
 #else
           cmd.arg1.name = IDID(h2);
@@ -635,10 +635,10 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
 #ifdef HAVE_NAMESPACES
           if (mpsr_PutLeftv(link, lv , r) != mpsr_Success)
           {
-            FreeL(cmd.arg1.name);
+            omFree(cmd.arg1.name);
             break;
           }
-          FreeL(cmd.arg1.name);
+          omFree(cmd.arg1.name);
 #else
           if (mpsr_PutLeftv(link, lv, r) != mpsr_Success) break;
 #endif
@@ -657,7 +657,7 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
     h = h->next;
   }
   MP_EndMsg(link);
-  FreeSizeOf(lv, sleftv);
+  omFreeBin(lv, sleftv_bin);
   if (rh != NULL && rh != currRingHdl) rSetHdl(rh, TRUE);
 
   if (h == NULL && h2 == NULL)

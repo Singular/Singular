@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.39 2000-04-27 10:07:08 obachman Exp $ */
+/* $Id: libparse.l,v 1.40 2000-08-14 12:56:34 obachman Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -19,7 +19,7 @@
   #include "ipid.h"
   #include "tok.h"
   #include "febase.h"
-  #include "mmemory.h"
+  #include <omalloc.h>
 #endif
 #include "libparse.h"
 
@@ -291,15 +291,15 @@ eqnl           ([ \t\n]*+=[ \t\n]*)
                  printf("Version:%s;\n", libnamebuf);
                #else
                #ifdef HAVE_NAMESPACES
-               h0 = enterid( mstrdup("version"), myynest, STRING_CMD,
+               h0 = enterid( omStrDup("version"), myynest, STRING_CMD,
                                   &IDPACKAGE(pl)->idroot, FALSE );
                if (h0!=NULL)
                {
-                  IDSTRING(h0) = mstrdup(libnamebuf);
+                  IDSTRING(h0) = omStrDup(libnamebuf);
                }
                #else /* HAVE_NAMESPACES */
-               if (text_buffer!=NULL) FreeL((ADDRESS)text_buffer);
-               text_buffer = mstrdup(libnamebuf);
+               if (text_buffer!=NULL) omFree((ADDRESS)text_buffer);
+               text_buffer = omStrDup(libnamebuf);
                #endif /* HAVE_NAMESPACES */
                #endif
              }
@@ -330,17 +330,17 @@ static     { p_static=TRUE; }
              if( mode == LOAD_LIB)
              {
                 #ifdef HAVE_NAMESPACES
-                h0 = enterid( mstrdup(proc), 0 /*myynest*/, PROC_CMD,
+                h0 = enterid( omStrDup(proc), 0 /*myynest*/, PROC_CMD,
                                   &IDPACKAGE(pl)->idroot, TRUE);
                 if(!p_static && autoexport)
                 {
                    namespaceroot->push( NSPACK(namespaceroot->root) ,"");
-                   h_top = enterid( mstrdup(proc), myynest, PROC_CMD,
+                   h_top = enterid( omStrDup(proc), myynest, PROC_CMD,
                                   &NSROOT(namespaceroot->root), FALSE );
                    namespaceroot->pop();
                 }
                #else /* HAVE_NAMESPACES */
-               h0 = enterid( mstrdup(proc), 0 /*myynest*/, PROC_CMD,
+               h0 = enterid( omStrDup(proc), 0 /*myynest*/, PROC_CMD,
                                    &idroot, TRUE );
                #endif /* HAVE_NAMESPACES */
                if (h0!=NULL)
@@ -777,8 +777,8 @@ LIB[ \t]+"\"" { quote++;
                            #ifdef STANDALONE_PARSER
                            printf("[%d]", *yytext);
                            #else
-                           if (text_buffer!=NULL) FreeL((ADDRESS)text_buffer);
-                           text_buffer = mstrdup(yytext);
+                           if (text_buffer!=NULL) omFree((ADDRESS)text_buffer);
+                           text_buffer = omStrDup(yytext);
                            #endif
                            #if YYLPDEBUG > 1
                              printf("[%s]", yytext);
@@ -888,8 +888,8 @@ void copy_string(lp_modes mode)
     long current_location = ftell(yylpin);
     int len = (int)(current_pos(0) - string_start);
     fseek(yylpin, string_start, SEEK_SET);
-    if (text_buffer!=NULL) FreeL((ADDRESS)text_buffer);
-    text_buffer = (char *)AllocL(len+2);
+    if (text_buffer!=NULL) omFree((ADDRESS)text_buffer);
+    text_buffer = (char *)omAlloc(len+2);
     myfread(text_buffer, len, 1, yylpin);
     fseek(yylpin, current_location, SEEK_SET);
     text_buffer[len]='\0';
@@ -907,11 +907,11 @@ void copy_string(lp_modes mode)
     }
     #ifdef HAVE_NAMESPACES
     if( mode != GET_INFO ) {
-      h0 = enterid( mstrdup("info"), myynest, STRING_CMD,
+      h0 = enterid( omStrDup("info"), myynest, STRING_CMD,
                           &IDPACKAGE(pl)->idroot, FALSE );
       if (h0!=NULL)
       {
-         IDSTRING(h0) = mstrdup(text_buffer);
+         IDSTRING(h0) = omStrDup(text_buffer);
       }
     }
     #endif /* HAVE_NAMESPACES */

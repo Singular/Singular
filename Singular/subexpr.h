@@ -3,17 +3,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.h,v 1.24 1999-11-15 17:20:52 obachman Exp $ */
+/* $Id: subexpr.h,v 1.25 2000-08-14 12:56:53 obachman Exp $ */
 /*
 * ABSTRACT: handling of leftv
 */
 
 #include <string.h>
 #include "structs.h"
-
-#if HAVE_ASO == 1
-#include "subexpr.aso"
-#endif
 
 struct _ssubexpr
 {
@@ -178,4 +174,14 @@ class libstack
 
 typedef enum { LT_NONE, LT_SINGULAR, LT_ELF, LT_HPUX} lib_types;
 lib_types type_of_LIB(char *newlib, char *fullname);
+
+#ifndef OM_ALLOC_H
+struct omBin_s;
+#endif
+
+extern omBin_s* sSubexpr_bin;
+extern omBin_s* sleftv_bin;
+extern omBin_s* procinfo_bin;
+extern omBin_s* libstack_bin;
+
 #endif

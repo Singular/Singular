@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmgauss.cc,v 1.11 1999-11-15 17:20:01 obachman Exp $
+// $Id: fglmgauss.cc,v 1.12 2000-08-14 12:56:13 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -14,7 +14,7 @@
 #ifdef  HAVE_FACTORY
 #include "structs.h"
 #include "numbers.h"
-#include "mmemory.h"
+#include <omalloc.h>
 
 #include "fglmvec.h"
 #include "fglmgauss.h"
@@ -61,12 +61,12 @@ gaussReducer::gaussReducer( int dimen )
 #ifndef HAVE_EXPLICIT_CONSTR
     elems= new gaussElem[ max+1 ];
 #else
-    elems= (gaussElem *)Alloc( (max+1)*sizeof( gaussElem ) );
+    elems= (gaussElem *)omAlloc( (max+1)*sizeof( gaussElem ) );
 #endif
-    isPivot= (BOOLEAN *)Alloc( (max+1)*sizeof( BOOLEAN ) );
+    isPivot= (BOOLEAN *)omAlloc( (max+1)*sizeof( BOOLEAN ) );
     for ( k= max; k > 0; k-- )
             isPivot[k]= FALSE;
-    perm= (int *)Alloc( (max+1)*sizeof( int ) );
+    perm= (int *)omAlloc( (max+1)*sizeof( int ) );
 }
 
 gaussReducer::~gaussReducer()
@@ -78,11 +78,11 @@ gaussReducer::~gaussReducer()
 #else
     for ( k= size; k > 0; k-- )
         elems[k].~gaussElem();
-    Free( (ADDRESS)elems, (max+1)*sizeof( gaussElem ) );
+    omFreeSize( (ADDRESS)elems, (max+1)*sizeof( gaussElem ) );
 #endif
 
-    Free( (ADDRESS)isPivot, (max+1)*sizeof( BOOLEAN ) );
-    Free( (ADDRESS)perm, (max+1)*sizeof( int ) );
+    omFreeSize( (ADDRESS)isPivot, (max+1)*sizeof( BOOLEAN ) );
+    omFreeSize( (ADDRESS)perm, (max+1)*sizeof( int ) );
 }
 
 BOOLEAN

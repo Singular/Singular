@@ -4,7 +4,7 @@
 
 //**************************************************************************/
 //
-// $Id: sing_dbm.cc,v 1.12 1999-11-15 17:20:48 obachman Exp $
+// $Id: sing_dbm.cc,v 1.13 2000-08-14 12:56:50 obachman Exp $
 //
 //**************************************************************************/
 //  'sing_dbm.cc' containes command to handle dbm-files under
@@ -22,7 +22,7 @@
 
 #  include "tok.h"
 #  include "febase.h"
-#  include "mmemory.h"
+#  include <omalloc.h>
 #  include "ipid.h"
 #  include "silink.h"
 #  include "sing_dbm.h"
@@ -53,9 +53,9 @@ BOOLEAN dbOpen(si_link l, short flag)
     // request w- open, but mode is not "w" nor "rw" => fail
     return TRUE;
   }
-  //if (((db = (DBM_info *)Alloc(sizeof *db)) != NULL)
+  //if (((db = (DBM_info *)omAlloc(sizeof *db)) != NULL)
   //&&((db->db = dbm_open(l->name, dbm_flags, 0664 )) != NULL ))
-  db = (DBM_info *)Alloc(sizeof *db);
+  db = (DBM_info *)omAlloc(sizeof *db);
   if((db->db = dbm_open(l->name, dbm_flags, 0664 )) != NULL )
   {
     db->first=1;
@@ -64,8 +64,8 @@ BOOLEAN dbOpen(si_link l, short flag)
     else
       SI_LINK_SET_R_OPEN_P(l);
     l->data=(void *)(db);
-    FreeL(l->mode);
-    l->mode=mstrdup(mode);
+    omFree(l->mode);
+    l->mode=omStrDup(mode);
     return FALSE;
   }
   return TRUE;
@@ -77,7 +77,7 @@ BOOLEAN dbClose(si_link l)
   DBM_info *db = (DBM_info *)l->data;
 
   dbm_close(db->db);
-  Free((ADDRESS)db,(sizeof *db));
+  omFreeSize((ADDRESS)db,(sizeof *db));
   l->data=NULL;  
   SI_LINK_SET_CLOSE_P(l);
   return FALSE;
@@ -98,9 +98,9 @@ leftv dbRead2(si_link l, leftv key)
       d_key.dptr = (char*)key->Data();
       d_key.dsize = strlen(d_key.dptr)+1;
       d_value = dbm_fetch(db->db, d_key);
-      v=(leftv)Alloc0SizeOf(sleftv);
-      if (d_value.dptr!=NULL) v->data=mstrdup(d_value.dptr);
-      else                    v->data=mstrdup("");
+      v=(leftv)omAlloc0Bin(sleftv_bin);
+      if (d_value.dptr!=NULL) v->data=omStrDup(d_value.dptr);
+      else                    v->data=omStrDup("");
       v->rtyp=STRING_CMD;
     }
     else
@@ -115,16 +115,16 @@ leftv dbRead2(si_link l, leftv key)
     else
       d_value = dbm_nextkey((DBM *)db->db);
 
-    v=(leftv)Alloc0SizeOf(sleftv);
+    v=(leftv)omAlloc0Bin(sleftv_bin);
     v->rtyp=STRING_CMD;
     if (d_value.dptr!=NULL)
     {
-      v->data=mstrdup(d_value.dptr);
+      v->data=omStrDup(d_value.dptr);
       db->first = 0;
     }
     else
     {
-      v->data=mstrdup("");
+      v->data=omStrDup("");
       db->first = 1;
     }
 

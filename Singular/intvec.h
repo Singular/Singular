@@ -3,28 +3,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: intvec.h,v 1.12 1999-11-15 17:20:07 obachman Exp $ */
+/* $Id: intvec.h,v 1.13 2000-08-14 12:56:21 obachman Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
 #include <string.h>
-#include "mmemory.h"
+#include <omalloc.h>
 #include "febase.h"
-
-// Macros for getting new intvecs to enable debugging of memory
-#ifdef MDEBUG
-#define NewIntvec0()        new intvec(__FILE__, __LINE__)
-#define NewIntvec1(l)       new intvec(__FILE__, __LINE__, l)
-#define NewIntvec2(s, e)    new intvec(__FILE__, __LINE__, s, e)
-#define NewIntvec3(r, c, i) new intvec(__FILE__, __LINE__, r, c, i)
-#define NewIntvecIv(iv)     new intvec(__FILE__, __LINE__, iv)
-#else
-#define NewIntvec0  new intvec
-#define NewIntvec1  new intvec
-#define NewIntvec2  new intvec
-#define NewIntvec3  new intvec
-#define NewIntvecIv new intvec
-#endif
 
 class intvec
 {
@@ -34,16 +19,9 @@ private:
   int col;
 public:
 
-#ifdef MDEBUG
-  intvec(char* file, int line, int l = 1);
-  intvec(char* file, int line, int s, int e);
-  intvec(char* file, int line, int r, int c, int init);
-  intvec(char* file, int line, intvec* iv);
-#endif
-
   intvec(int l = 1)
     {
-      v = (int *)Alloc0(sizeof(int)*l);
+      v = (int *)omAlloc0(sizeof(int)*l);
       row = l;
       col = 1;
     }
@@ -87,17 +65,15 @@ public:
   char * ivString(int mat=0,int spaces=0, int dim=2);
   ~intvec()
     {
-      mmTestL(this);
       if (v!=NULL)
       {
-        Free((ADDRESS)v,sizeof(int)*row*col);
+        omFreeSize((ADDRESS)v,sizeof(int)*row*col);
         v=NULL;
       }
     }
   void ivTEST()
     {
-      mmTestL(this);
-      mmTest((ADDRESS)v,sizeof(int)*row*col);
+      omCheckAddrSize((ADDRESS)v,sizeof(int)*row*col);
     }
 };
 intvec * ivCopy(intvec * o);
@@ -111,6 +87,11 @@ int      ivFirstEmptyRow(intvec * imat);
 void     ivCancelContent(intvec * imat,int from=1);
 intvec * ivSolveIntMat(intvec * imat);
 
+#ifdef MDEBUG
+#define ivTest(v) v->ivTEST()
+#else
+#define ivTest(v)   ((void)0)
+#endif
 #undef INLINE_THIS
 
 #endif

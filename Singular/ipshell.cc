@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.54 2000-04-17 13:58:38 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.55 2000-08-14 12:56:26 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -15,7 +15,7 @@
 #include "tok.h"
 #include "ipid.h"
 #include "intvec.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "febase.h"
 #include "polys.h"
 #include "ideals.h"
@@ -613,7 +613,7 @@ leftv iiMap(map theMap, char * what)
     }
     if (IDELEMS(theMap)<IDRING(r)->N)
     {
-      theMap->m=(polyset)ReAlloc((ADDRESS)theMap->m,
+      theMap->m=(polyset)omReallocSize((ADDRESS)theMap->m,
                                  IDELEMS(theMap)*sizeof(poly),
                                  (IDRING(r)->N)*sizeof(poly));
       for(i=IDELEMS(theMap);i<IDRING(r)->N;i++)
@@ -626,7 +626,7 @@ leftv iiMap(map theMap, char * what)
     }
     else if ((w=IDRING(r)->idroot->get(what,myynest))!=NULL)
     {
-      v=(leftv)Alloc0SizeOf(sleftv);
+      v=(leftv)omAlloc0Bin(sleftv_bin);
       sleftv tmpW;
       memset(&tmpW,0,sizeof(sleftv));
       tmpW.rtyp=IDTYP(w);
@@ -634,7 +634,7 @@ leftv iiMap(map theMap, char * what)
       if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,IDRING(r),NULL,NULL,0))
       {
         Werror("cannot map %s(%d)",Tok2Cmdname(w->typ),w->typ);
-        FreeSizeOf((ADDRESS)v,sleftv);
+        omFreeBin((ADDRESS)v, sleftv_bin);
         return NULL;
       }
       return v;
@@ -658,15 +658,15 @@ void  iiMakeResolv(resolvente r, int length, int rlen, char * name, int typ0,
   lists L=liMakeResolv(r,length,rlen,typ0,weights);
   int i=0;
   idhdl h;
-  char * s=(char *)Alloc(strlen(name)+5);
+  char * s=(char *)omAlloc(strlen(name)+5);
 
   while (i<=L->nr)
   {
     sprintf(s,"%s(%d)",name,i+1);
     if (i==0)
-      h=enterid(mstrdup(s),myynest,typ0,&(currRing->idroot), FALSE);
+      h=enterid(omStrDup(s),myynest,typ0,&(currRing->idroot), FALSE);
     else
-      h=enterid(mstrdup(s),myynest,MODUL_CMD,&(currRing->idroot), FALSE);
+      h=enterid(omStrDup(s),myynest,MODUL_CMD,&(currRing->idroot), FALSE);
     if (h!=NULL)
     {
       h->data.uideal=(ideal)L->m[i].data;
@@ -684,15 +684,15 @@ void  iiMakeResolv(resolvente r, int length, int rlen, char * name, int typ0,
     //L->m[i].attribute=NULL;
     i++;
   }
-  Free((ADDRESS)L->m,(L->nr+1)*sizeof(sleftv));
-  FreeSizeOf((ADDRESS)L,slists);
-  Free((ADDRESS)s,strlen(name)+5);
+  omFreeSize((ADDRESS)L->m,(L->nr+1)*sizeof(sleftv));
+  omFreeBin((ADDRESS)L, slists_bin);
+  omFreeSize((ADDRESS)s,strlen(name)+5);
 }
 #endif
 
 //resolvente iiFindRes(char * name, int * len, int *typ0)
 //{
-//  char *s=(char *)Alloc(strlen(name)+5);
+//  char *s=(char *)omAlloc(strlen(name)+5);
 //  int i=-1;
 //  resolvente r;
 //  idhdl h;
@@ -707,10 +707,10 @@ void  iiMakeResolv(resolvente r, int length, int rlen, char * name, int typ0,
 //  if (*len<=0)
 //  {
 //    Werror("no objects %s(1),.. found",name);
-//    Free((ADDRESS)s,strlen(name)+5);
+//    omFreeSize((ADDRESS)s,strlen(name)+5);
 //    return NULL;
 //  }
-//  r=(ideal *)Alloc(/*(len+1)*/ i*sizeof(ideal));
+//  r=(ideal *)omAlloc(/*(len+1)*/ i*sizeof(ideal));
 //  memset(r,0,(*len)*sizeof(ideal));
 //  i=-1;
 //  *typ0=MODUL_CMD;
@@ -724,8 +724,8 @@ void  iiMakeResolv(resolvente r, int length, int rlen, char * name, int typ0,
 //      if ((i!=0) || (h->typ!=IDEAL_CMD))
 //      {
 //        Werror("%s is not of type module",s);
-//        Free((ADDRESS)r,(*len)*sizeof(ideal));
-//        Free((ADDRESS)s,strlen(name)+5);
+//        omFreeSize((ADDRESS)r,(*len)*sizeof(ideal));
+//        omFreeSize((ADDRESS)s,strlen(name)+5);
 //        return NULL;
 //      }
 //      *typ0=IDEAL_CMD;
@@ -737,14 +737,14 @@ void  iiMakeResolv(resolvente r, int length, int rlen, char * name, int typ0,
 //    }
 //    r[i]=IDIDEAL(h);
 //  }
-//  Free((ADDRESS)s,strlen(name)+5);
+//  omFreeSize((ADDRESS)s,strlen(name)+5);
 //  return r;
 //}
 
 static resolvente iiCopyRes(resolvente r, int l)
 {
   int i;
-  resolvente res=(ideal *)Alloc0((l+1)*sizeof(ideal));
+  resolvente res=(ideal *)omAlloc0((l+1)*sizeof(ideal));
 
   for (i=0; i<l; i++)
     res[i]=idCopy(r[i]);
@@ -760,7 +760,7 @@ BOOLEAN jjMINRES(leftv res, leftv v)
   resolvente r=iiCopyRes(rr,len);
 
   syMinimizeResolvente(r,len,0);
-  Free((ADDRESS)rr,len*sizeof(ideal));
+  omFreeSize((ADDRESS)rr,len*sizeof(ideal));
   len++;
   res->data=(char *)liMakeResolv(r,len,-1,typ0,NULL);
   return FALSE;
@@ -775,7 +775,7 @@ BOOLEAN jjBETTI(leftv res, leftv v)
   r=liFindRes((lists)v->Data(),&len,&typ0);
   if (r==NULL) return TRUE;
   res->data=(char *)syBetti(r,len,&reg);
-  Free((ADDRESS)r,(len)*sizeof(ideal));
+  omFreeSize((ADDRESS)r,(len)*sizeof(ideal));
   return FALSE;
 }
 
@@ -788,7 +788,7 @@ int iiRegularity(lists L)
   if (r==NULL)
     return -2;
   intvec * dummy=syBetti(r,len,&reg);
-  Free((ADDRESS)r,len*sizeof(ideal));
+  omFreeSize((ADDRESS)r,len*sizeof(ideal));
   delete dummy;
   return reg+1;
 }
@@ -801,7 +801,7 @@ void iiDebug()
   if (iiDebugMarker) VoiceBackTrack();
   char * s;
   iiDebugMarker=FALSE;
-  s = (char *)AllocL(BREAK_LINE_LENGTH+4);
+  s = (char *)omAlloc(BREAK_LINE_LENGTH+4);
   loop
   {
     memset(s,0,80);
@@ -850,7 +850,7 @@ int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN isrin
 #ifdef HAVE_NAMESPACES
     if(name->req_packhdl != NULL && name->packhdl != NULL &&
        name->req_packhdl != name->packhdl)
-      id = mstrdup(name->name);
+      id = omStrDup(name->name);
 
     //if(name->req_packhdl != NULL /*&& !isring*/) {
     if(name->req_packhdl != NULL && !isring &&
@@ -875,7 +875,7 @@ int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN isrin
       //sy->e = NULL;
       if (name->next!=NULL)
       {
-        sy->next=(leftv)AllocSizeOf(sleftv);
+        sy->next=(leftv)omAllocBin(sleftv_bin);
         res=iiDeclCommand(sy->next,name->next,lev,t,root, isring);
       }
     }
@@ -905,7 +905,7 @@ BOOLEAN iiParameter(leftv p)
     h->next=NULL;
   }
   BOOLEAN res=iiAssign(p,h);
-  FreeSizeOf((ADDRESS)h,sleftv);
+  omFreeBin((ADDRESS)h, sleftv_bin);
   return res;
 }
 
@@ -980,7 +980,7 @@ BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl)
       if(IDPACKAGE(roothdl) != NSPACK(namespaceroot)) {
         namespaceroot->push(rootpack, IDID(roothdl));
         //namespaceroot->push(NSPACK(namespaceroot->root), "Top");
-        idhdl rl=enterid(mstrdup(v->name), toLev, IDTYP(h),
+        idhdl rl=enterid(omStrDup(v->name), toLev, IDTYP(h),
                          &(rootpack->idroot), FALSE);
         namespaceroot->pop();
 
@@ -1113,7 +1113,7 @@ BOOLEAN iiCheckRing(int i)
 
 poly    iiHighCorner(ideal I, int ak)
 {
-  BOOLEAN *UsedAxis=(BOOLEAN *)Alloc0(pVariables*sizeof(BOOLEAN));
+  BOOLEAN *UsedAxis=(BOOLEAN *)omAlloc0(pVariables*sizeof(BOOLEAN));
   int i,n;
   poly po;
   for(i=IDELEMS(I)-1;i>=0;i--)

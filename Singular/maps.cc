@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.23 2000-05-02 16:30:44 Singular Exp $ */
+/* $Id: maps.cc,v 1.24 2000-08-14 12:56:37 obachman Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -15,7 +15,7 @@
 #include "ring.h"
 #include "ideals.h"
 #include "matpol.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "kstd1.h"
 #include "lists.h"
 #include "longalg.h"
@@ -36,7 +36,7 @@ map maCopy(map theMap)
   map m=(map)idInit(IDELEMS(theMap),0);
   for (i=IDELEMS(theMap)-1; i>=0; i--)
       m->m[i] = pCopy(theMap->m[i]);
-  m->preimage=mstrdup(theMap->preimage);
+  m->preimage=omStrDup(theMap->preimage);
   return m;
 }
 
@@ -134,7 +134,7 @@ poly maEval(map theMap, poly p,ring preimage_r,matrix s)
     poly* monoms;
     if (l>0)
     {
-      monoms = (poly*) Alloc(l*sizeof(poly));
+      monoms = (poly*) omAlloc(l*sizeof(poly));
 
       for (i=0; i<l; i++)
       {
@@ -149,7 +149,7 @@ poly maEval(map theMap, poly p,ring preimage_r,matrix s)
       {
         result=pAdd(result, monoms[i]);
       }
-      Free((ADDRESS)monoms,l*sizeof(poly));
+      omFreeSize((ADDRESS)monoms,l*sizeof(poly));
     }
     if (currRing->minpoly!=NULL) result=pMult(result,pOne());
   }
@@ -201,10 +201,10 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
   poly p,pp,q;
   ideal temp1;
   ideal temp2;
-  int *orders = (int*) Alloc0(sizeof(int)*(ordersize));
-  int *block0 = (int*) Alloc0(sizeof(int)*(ordersize));
-  int *block1 = (int*) Alloc0(sizeof(int)*(ordersize));
-  int **wv = (int **) Alloc0(ordersize * sizeof(int *));
+  int *orders = (int*) omAlloc0(sizeof(int)*(ordersize));
+  int *block0 = (int*) omAlloc0(sizeof(int)*(ordersize));
+  int *block1 = (int*) omAlloc0(sizeof(int)*(ordersize));
+  int **wv = (int **) omAlloc0(ordersize * sizeof(int *));
 
   int imagepvariables = theImageRing->N;
   ring sourcering = currRing;
@@ -308,10 +308,10 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
   idDelete(&temp2);
   rChangeCurrRing(sourcering, TRUE);
   idSkipZeroes(temp1);
-  Free(orders, sizeof(int)*(ordersize));
-  Free(block0, sizeof(int)*(ordersize));
-  Free(block1, sizeof(int)*(ordersize));
-  Free(wv, sizeof(int*)*(ordersize));
+  omFreeSize(orders, sizeof(int)*(ordersize));
+  omFreeSize(block0, sizeof(int)*(ordersize));
+  omFreeSize(block1, sizeof(int)*(ordersize));
+  omFreeSize(wv, sizeof(int*)*(ordersize));
   rUnComplete(&tmpR);
   return temp1;
 }
@@ -392,14 +392,14 @@ poly maIMap(ring r, poly p)
   if(r==currRing) return pCopy(p);
   //nSetMap(rInternalChar(r),r->parameter,rPar(r),r->minpoly);
   nSetMap(r);
-  int *perm=(int *)Alloc0((r->N+1)*sizeof(int));
-  //int *par_perm=(int *)Alloc0(rPar(r)*sizeof(int));
+  int *perm=(int *)omAlloc0((r->N+1)*sizeof(int));
+  //int *par_perm=(int *)omAlloc0(rPar(r)*sizeof(int));
   maFindPerm(r->names,r->N, r->parameter, r->P,
              currRing->names,currRing->N,currRing->parameter, currRing->P,
              perm,NULL, currRing->ch);
   poly res=pPermPoly(p,perm,r/*,par_perm,rPar(r)*/);
-  Free((ADDRESS)perm,(r->N+1)*sizeof(int));
-  //Free((ADDRESS)par_perm,rPar(r)*sizeof(int));
+  omFreeSize((ADDRESS)perm,(r->N+1)*sizeof(int));
+  //omFreeSize((ADDRESS)par_perm,rPar(r)*sizeof(int));
   return res;
 }
 
@@ -411,7 +411,7 @@ static int maMaxDeg_Ma(ideal a,ring preimage_r)
   int i,j;
   int N = preimage_r->N;
   poly p;
-  int *m=(int *)Alloc0(N*sizeof(int));
+  int *m=(int *)omAlloc0(N*sizeof(int));
 
   for (i=MATROWS(a)*MATCOLS(a)-1;i>=0;i--)
   {
@@ -437,7 +437,7 @@ static int maMaxDeg_Ma(ideal a,ring preimage_r)
     i=max(i,m[j]);
   }
 max_deg_fertig_id:
-  Free((ADDRESS)m,N*sizeof(int));
+  omFreeSize((ADDRESS)m,N*sizeof(int));
   return i;
 }
 
@@ -448,7 +448,7 @@ static int maMaxDeg_P(poly p,ring preimage_r)
 {
   int i,j;
   int N = preimage_r->N;
-  int *m=(int *)Alloc0(N*sizeof(int));
+  int *m=(int *)omAlloc0(N*sizeof(int));
 
 //  pTest(p);
   while(p!=NULL)
@@ -470,7 +470,7 @@ static int maMaxDeg_P(poly p,ring preimage_r)
     i=max(i,m[j]);
   }
 max_deg_fertig_p:
-  Free((ADDRESS)m,N*sizeof(int));
+  omFreeSize((ADDRESS)m,N*sizeof(int));
   return i;
 }
 
@@ -589,7 +589,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
       if(w->rtyp==MAP_CMD)
       {
         ((map)data)->preimage=tmpR;
-        ((map)m)->preimage=mstrdup(tmpR);
+        ((map)m)->preimage=omStrDup(tmpR);
       }
       else
       {
@@ -603,7 +603,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
     case LIST_CMD:
     {
       lists l=(lists)data;
-      lists ml=(lists)AllocSizeOf(slists);
+      lists ml=(lists)omAllocBin(slists_bin);
       ml->Init(l->nr+1);
       for(i=0;i<=l->nr;i++)
       {
@@ -614,7 +614,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
                            preimage_r,perm,par_perm,P))
           {
             ml->Clean();
-            FreeSizeOf((ADDRESS)ml,slists);
+            omFreeBin((ADDRESS)ml, slists_bin);
             res->rtyp=0;
             return TRUE;
           }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.43 2000-07-27 12:11:29 Singular Exp $ */
+/* $Id: polys-impl.cc,v 1.44 2000-08-14 12:56:44 obachman Exp $ */
 
 /***************************************************************
  *
@@ -19,10 +19,9 @@
 #include <stdio.h>
 #include <string.h>
 #include "mod2.h"
+#include <omalloc.h>
 #include "tok.h"
 #include "structs.h"
-#include "mmprivate.h"
-#include "mmemory.h"
 #include "febase.h"
 #include "numbers.h"
 #include "polys.h"
@@ -46,27 +45,7 @@ int pDBsyzComp=0;
 * delete a poly, resets pointer
 * put the monomials in the freelist
 */
-#ifdef MDEBUG
-void pDBDelete(poly * p, memHeap heap, char * f, int l)
-{
-  poly h = *p;
-
-  while (h!=NULL)
-  {
-#ifdef LDEBUG
-    nDBDelete(&(h->coef),f,l);
-#else
-    nDelete(&(h->coef));
-#endif
-    pIter(h);
-    pDBFree1((ADDRESS)*p, heap, f,l);
-    *p=h;
-    if (l>0) l= -l;
-  }
-  *p = NULL;
-}
-#else
-void _pDelete(poly* p, memHeap heap)
+void _pDelete(poly* p, omBin heap)
 {
   poly h = *p;
   poly pp;
@@ -80,23 +59,11 @@ void _pDelete(poly* p, memHeap heap)
   }
   *p = NULL;
 }
-#endif
 
 /*2
 * remove first monom
 */
-#ifdef MDEBUG
-void pDBDelete1(poly * p, memHeap heap, char * f, int l)
-{
-  poly h = *p;
-
-  if (h==NULL) return;
-  nDelete(&(h->coef));
-  *p = pNext(h);
-  pDBFree1((ADDRESS)h, heap, f,l);
-}
-#else
-void _pDelete1(poly* p, memHeap heap)
+void _pDelete1(poly* p, omBin heap)
 {
   poly h = *p;
 
@@ -105,7 +72,6 @@ void _pDelete1(poly* p, memHeap heap)
   *p = pNext(h);
   _pFree1((ADDRESS)h, heap);
 }
-#endif
 
 
 void ppDelete(poly* p, ring rg)
@@ -119,68 +85,41 @@ void ppDelete(poly* p, ring rg)
 /*2
 * creates a copy of p
 */
-#ifdef MDEBUG
-poly pDBCopy(memHeap d_h, poly s_p, char *f,int l)
-#else
-poly _pCopy(memHeap d_h, poly s_p)
-#endif
+poly _pCopy(omBin d_h, poly s_p)
 {
   spolyrec dp;
   poly d_p = &dp;
 
-  assume(d_h != NULL && (d_h == mm_specHeap) ||
-         d_h->size == mm_specHeap->size);
-#if defined(MDEBUG) && defined(PDEBUG)
-  pDBTest(s_p,f,l);
-#else
+  assume(d_h != NULL && (d_h == currPolyBin) ||
+         d_h->sizeW == currPolyBin->sizeW);
   pTest(s_p);
-#endif
   while (s_p != NULL)
   {
-#ifdef MDEBUG
-    d_p->next = (poly) mmDBAllocHeap(d_h, f, l);
-#else
-    mmAllocHeapType(d_p->next, d_h, poly);
-#endif
+    omTypeAllocBin( poly,d_p->next, d_h);
     d_p = d_p->next;
     pSetCoeff0(d_p, nCopy(pGetCoeff(s_p)));
-    memcpyW(&(d_p->exp.l[0]), &(s_p->exp.l[0]), currRing->ExpLSize);
+    omMemcpyW(&(d_p->exp.l[0]), &(s_p->exp.l[0]), currRing->ExpLSize);
     pIter(s_p);
   }
   pNext(d_p) = NULL;
-#if defined(MDEBUG) && defined(PDEBUG)
-  pDBTest(dp.next, d_h, f,l);
-#else
   pHeapTest(dp.next, d_h);
-#endif
   return dp.next;
 }
 
-#ifdef MDEBUG
-poly pDBCopy(poly s_p, char *f,int l)
-{
-  return pDBCopy(mm_specHeap, s_p, f, l);
-}
-#else
 poly _pCopy(poly s_p)
 {
-  return _pCopy(mm_specHeap, s_p);
+  return _pCopy(currPolyBin, s_p);
 }
-#endif
 
 
-#ifdef MDEBUG
-poly pDBShallowCopyDelete(memHeap d_h,poly *p,memHeap s_h, char *f,int l)
-#else
-poly _pShallowCopyDelete(memHeap d_h, poly *p, memHeap s_h)
-#endif
+poly _pShallowCopyDelete(omBin d_h, poly *p, omBin s_h)
 {
   spolyrec dp;
   poly d_p = &dp, tmp;
   poly s_p = *p;
 
   assume(d_h != NULL && s_h != NULL &&
-         d_h->size == s_h->size);
+         d_h->sizeW == s_h->sizeW);
 
   if (currRing->ExpLSize <= 2)
   {
@@ -188,22 +127,14 @@ poly _pShallowCopyDelete(memHeap d_h, poly *p, memHeap s_h)
     {
       while (s_p != NULL)
       {
-#ifdef MDEBUG
-        d_p->next = (poly) mmDBAllocHeap(d_h, f, l);
-#else
-        mmAllocHeapType(d_p->next, d_h, poly);
-#endif
+        omTypeAllocBin( poly,d_p->next, d_h);
         d_p = d_p->next;
 
         d_p->coef = s_p->coef;
         d_p->exp.l[0] = s_p->exp.l[0];
 
         tmp = pNext(s_p);
-#ifdef MDEBUG
-        mmDBFreeHeap(s_p, s_h, f, l);
-#else
-        mmFreeHeap(s_p, s_h);
-#endif
+        omFreeBin(s_p, s_h);
         s_p = tmp;
       }
     }
@@ -211,11 +142,7 @@ poly _pShallowCopyDelete(memHeap d_h, poly *p, memHeap s_h)
     {
       while (s_p != NULL)
       {
-#ifdef MDEBUG
-        d_p->next = (poly) mmDBAllocHeap(d_h, f, l);
-#else
-        mmAllocHeapType(d_p->next, d_h, poly);
-#endif
+        omTypeAllocBin( poly,d_p->next, d_h);
         d_p = d_p->next;
 
         d_p->coef = s_p->coef;
@@ -223,11 +150,7 @@ poly _pShallowCopyDelete(memHeap d_h, poly *p, memHeap s_h)
         d_p->exp.l[1] = s_p->exp.l[1];
 
         tmp = pNext(s_p);
-#ifdef MDEBUG
-        mmDBFreeHeap(s_p, s_h, f, l);
-#else
-        mmFreeHeap(s_p, s_h);
-#endif
+        omFreeBin(s_p, s_h);
         s_p = tmp;
       }
     }
@@ -239,22 +162,14 @@ poly _pShallowCopyDelete(memHeap d_h, poly *p, memHeap s_h)
       while (s_p != NULL)
       {
 
-#ifdef MDEBUG
-        d_p->next = (poly) mmDBAllocHeap(d_h, f, l);
-#else
-        mmAllocHeapType(d_p->next, d_h, poly);
-#endif
+        omTypeAllocBin( poly,d_p->next, d_h);
         d_p = d_p->next;
 
         d_p->coef = s_p->coef;
-        memcpy_nwODD(&(d_p->exp.l[0]), &(s_p->exp.l[1]), currRing->ExpLSize);
+        omMemcpy_nwODD(&(d_p->exp.l[0]), &(s_p->exp.l[1]), currRing->ExpLSize);
 
         tmp = pNext(s_p);
-#ifdef MDEBUG
-        mmDBFreeHeap(s_p, s_h, f, l);
-#else
-        mmFreeHeap(s_p, s_h);
-#endif
+        omFreeBin(s_p, s_h);
         s_p = tmp;
       }
     }
@@ -263,22 +178,14 @@ poly _pShallowCopyDelete(memHeap d_h, poly *p, memHeap s_h)
       while (s_p != NULL)
       {
 
-#ifdef MDEBUG
-        d_p->next = (poly) mmDBAllocHeap(d_h, f, l);
-#else
-        mmAllocHeapType(d_p->next, d_h,poly);
-#endif
+        omTypeAllocBin(poly,d_p->next, d_h);
         d_p = d_p->next;
 
         d_p->coef = s_p->coef;
-        memcpy_nwEVEN(&(d_p->exp.l[0]), &(s_p->exp.l[1]), currRing->ExpLSize);
+        omMemcpy_nwEVEN(&(d_p->exp.l[0]), &(s_p->exp.l[1]), currRing->ExpLSize);
 
         tmp = pNext(s_p);
-#ifdef MDEBUG
-        mmDBFreeHeap(s_p, s_h, f, l);
-#else
-        mmFreeHeap(s_p, s_h);
-#endif
+        omFreeBin(s_p, s_h);
         s_p = tmp;
       }
     }
@@ -294,18 +201,10 @@ poly _pShallowCopyDelete(memHeap d_h, poly *p, memHeap s_h)
 * creates a copy of the initial monomial of p
 * sets the coeff of the copy to a defined value
 */
-#ifdef MDEBUG
-poly pDBCopy1(poly p,char *f,int l)
-#else
 poly _pCopy1(poly p)
-#endif
 {
   poly w;
-#ifdef MDEBUG
-  w = pDBNew(mm_specHeap, f,l);
-#else
   w = pNew();
-#endif
   pCopy2(w,p);
   nNew(&(w->coef));
   pNext(w) = NULL;
@@ -315,36 +214,24 @@ poly _pCopy1(poly p)
 /*2
 * returns (a copy of) the head term of a
 */
-#ifdef MDEBUG
-poly pDBHead(memHeap heap, poly p,char *f, int l)
-#else
-poly _pHead(memHeap heap, poly p)
-#endif
+poly _pHead(omBin heap, poly p)
 {
   poly w=NULL;
 
   if (p!=NULL)
   {
-    assume(heap != NULL && (heap == mm_specHeap) ||
-           heap->size == mm_specHeap->size);
+    assume(heap != NULL && (heap == currPolyBin) ||
+           heap->sizeW == currPolyBin->sizeW);
 
-#ifdef MDEBUG
-    w = (poly) mmDBAllocHeap(heap, f, l);
-#else
-    mmAllocHeapType(w, heap, poly);
-#endif
-    memcpyW(&(w->exp.l[0]), &(p->exp.l[0]), currRing->ExpLSize);
+    omTypeAllocBin( poly,w, heap);
+    omMemcpyW(&(w->exp.l[0]), &(p->exp.l[0]), currRing->ExpLSize);
     pSetCoeff0(w,nCopy(pGetCoeff(p)));
     pNext(w) = NULL;
   }
   return w;
 }
 
-#ifdef MDEBUG
-poly pDBShallowCopyDeleteHead(memHeap d_h,poly *s_p,memHeap s_h, char *f,int l)
-#else
-poly _pShallowCopyDeleteHead(memHeap d_h, poly *s_p, memHeap s_h)
-#endif
+poly _pShallowCopyDeleteHead(omBin d_h, poly *s_p, omBin s_h)
 {
   poly w = NULL;
   poly p = *s_p;
@@ -352,23 +239,15 @@ poly _pShallowCopyDeleteHead(memHeap d_h, poly *s_p, memHeap s_h)
   if (p!=NULL)
   {
     assume(d_h != NULL && s_h != NULL &&
-           d_h->size == s_h->size);
+           d_h->sizeW == s_h->sizeW);
 
-#ifdef MDEBUG
-    w = (poly) mmDBAllocHeap(d_h, f, l);
-#else
-    mmAllocHeapType(w, d_h, poly);
-#endif
-    memcpyW(&(w->exp.l[0]), &(p->exp.l[0]), currRing->ExpLSize);
+    omTypeAllocBin( poly,w, d_h);
+    omMemcpyW(&(w->exp.l[0]), &(p->exp.l[0]), currRing->ExpLSize);
     pSetCoeff0(w,pGetCoeff(p));
     pNext(w) = NULL;
 
     *s_p = pNext(p);
-#ifdef MDEBUG
-    mmDBFreeHeap(p, s_h, f, l);
-#else
-    mmFreeHeap(p, s_h);
-#endif
+    omFreeBin(p, s_h);
   }
   return w;
 }
@@ -383,21 +262,13 @@ poly pHeadProc(poly p)
 /*2
 * returns (a copy of) the head term of a without the coef
 */
-#ifdef MDEBUG
-poly pDBHead0(poly p,char *f, int l)
-#else
 poly _pHead0(poly p)
-#endif
 {
   poly w=NULL;
 
   if (p!=NULL)
   {
-#if defined(PDEBUG) && defined(MDEBUG)
-    w = pDBNew(mm_specHeap, f,l);
-#else
     w = pNew();
-#endif
     pCopy2(w,p);
     pSetCoeff0(w,NULL);
     pNext(w) = NULL;
@@ -778,7 +649,7 @@ BOOLEAN prDBTest(poly p, ring r, char* f, int l)
     old_ring = currRing;
     rChangeCurrRing(r);
   }
-  res = pDBTest(p, currRing->mm_specHeap, f, l);
+  res = pDBTest(p, currRing->PolyBin, f, l);
   if (old_ring != NULL)
   {
     rChangeCurrRing(old_ring);
@@ -789,28 +660,18 @@ BOOLEAN prDBTest(poly p, ring r, char* f, int l)
 
 BOOLEAN pDBTest(poly p, char *f, int l)
 {
-  return pDBTest(p, mm_specHeap, f,l);
+  return pDBTest(p, currPolyBin, f,l);
 }
 
-BOOLEAN pDBTest(poly p, memHeap heap, char *f, int l)
+BOOLEAN pDBTest(poly p, omBin heap, char *f, int l)
 {
   poly old=NULL;
   BOOLEAN ismod=FALSE;
-  if (heap == NULL) heap = mm_specHeap;
+  if (heap == NULL) heap = currPolyBin;
 
   while (p!=NULL)
   {
-    if (heap != MM_UNKNOWN_HEAP)
-    {
-#ifdef MDEBUG
-    if (!mmDBTestHeapBlock(p, heap, f,l))
-      return FALSE;
-#elif defined(HEAP_DEBUG)
-      if (! mmDebugCheckHeapAddr(p, heap, MM_HEAP_ADDR_USED_FLAG, f, l))
-        return FALSE;
-#endif
-    }
-
+    omCheckIf(omCheckAddrBin(p, heap), return FALSE);
 #ifdef LDEBUG
     if (!nDBTest(p->coef,f,l))
       return FALSE;

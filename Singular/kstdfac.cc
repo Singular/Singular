@@ -1,14 +1,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.35 2000-02-10 14:11:42 Singular Exp $ */
+/* $Id: kstdfac.cc,v 1.36 2000-08-14 12:56:33 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
 
 #include "mod2.h"
 #include "tok.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "polys.h"
 #include "ideals.h"
 #include "febase.h"
@@ -35,7 +35,7 @@ static void copyT (kStrategy o,kStrategy n)
 {
   int i,j;
   poly  p;
-  TSet t=(TSet)Alloc0(o->tmax*sizeof(TObject));
+  TSet t=(TSet)omAlloc0(o->tmax*sizeof(TObject));
 
   for (j=0; j<=o->tl; j++)
   {
@@ -70,7 +70,7 @@ static void copyL (kStrategy o,kStrategy n)
 {
   int i,j;
   poly  p;
-  LSet l=(LSet)Alloc(o->Lmax*sizeof(LObject));
+  LSet l=(LSet)omAlloc(o->Lmax*sizeof(LObject));
 
   for (j=0; j<=o->Ll; j++)
   {
@@ -149,7 +149,7 @@ static void copyL (kStrategy o,kStrategy n)
 kStrategy kStratCopy(kStrategy o)
 {
   kTest_TS(o);
-  kStrategy s=(kStrategy)Alloc0SizeOf(skStrategy);
+  kStrategy s=(kStrategy)omAlloc0(sizeof(skStrategy));
   s->next=NULL;
   s->red=o->red;
   s->initEcart=o->initEcart;
@@ -163,13 +163,13 @@ kStrategy kStratCopy(kStrategy o)
   s->S=s->Shdl->m;
   if (o->D!=NULL) s->D=idCopy(o->D);
   else            s->D=NULL;
-  s->ecartS=(int *)Alloc(IDELEMS(o->Shdl)*sizeof(int));
+  s->ecartS=(int *)omAlloc(IDELEMS(o->Shdl)*sizeof(int));
   memcpy(s->ecartS,o->ecartS,IDELEMS(o->Shdl)*sizeof(int));
-  s->sevS=(unsigned long *)Alloc(IDELEMS(o->Shdl)*sizeof(unsigned long));
+  s->sevS=(unsigned long *)omAlloc(IDELEMS(o->Shdl)*sizeof(unsigned long));
   memcpy(s->sevS,o->sevS,IDELEMS(o->Shdl)*sizeof(unsigned long));
   if(o->fromQ!=NULL)
   {
-    s->fromQ=(int *)Alloc(IDELEMS(o->Shdl)*sizeof(int));
+    s->fromQ=(int *)omAlloc(IDELEMS(o->Shdl)*sizeof(int));
     memcpy(s->fromQ,o->fromQ,IDELEMS(o->Shdl)*sizeof(int));
   }
   else
@@ -182,7 +182,7 @@ kStrategy kStratCopy(kStrategy o)
   s->kNoether=pCopy(o->kNoether);
   if (o->NotUsedAxis!=NULL)
   {
-    s->NotUsedAxis=(BOOLEAN *)Alloc(currRing->N*sizeof(BOOLEAN));
+    s->NotUsedAxis=(BOOLEAN *)omAlloc(currRing->N*sizeof(BOOLEAN));
     memcpy(s->NotUsedAxis,o->NotUsedAxis,currRing->N*sizeof(BOOLEAN));
   }
   s->kIdeal=NULL;
@@ -751,7 +751,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
     pLDeg=pLDegOld;
     if (ecartWeights)
     {
-      Free((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
+      omFreeSize((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
       ecartWeights=NULL;
     }
   }
@@ -767,9 +767,9 @@ lists kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
   ideal r;
   BOOLEAN b=pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
-  kStrategy strat=(kStrategy)Alloc0SizeOf(skStrategy);
+  kStrategy strat=(kStrategy)omAlloc0(sizeof(skStrategy));
   kStrategy orgstrat=strat;
-  lists L=(lists)AllocSizeOf(slists); L->Init(0);
+  lists L=(lists)omAllocBin(slists_bin); L->Init(0);
   sleftv v; memset(&v,0,sizeof(v));
 
   if (rField_has_simple_inverse())

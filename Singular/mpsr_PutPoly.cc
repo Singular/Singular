@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_PutPoly.cc,v 1.18 1999-11-15 17:20:34 obachman Exp $ */
+/* $Id: mpsr_PutPoly.cc,v 1.19 2000-08-14 12:56:43 obachman Exp $ */
 
 /***************************************************************
  *
@@ -22,7 +22,7 @@
 #include "mpsr_Put.h"
 #include "mpsr_Tok.h"
 #include "longalg.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "ring.h"
 #include "polys.h"
 //#include "ipid.h"
@@ -427,11 +427,11 @@ static mpsr_Status_t PutProtoTypeAnnot(MP_Link_pt link, ring r,
   {
     // alg numbers
     // create temporary ring for describing the coeeficient domain
-    ring alg_r = (ring) Alloc0SizeOf(sip_sring);
+    ring alg_r = (ring) omAlloc0Bin(sip_sring_bin);
 
     alg_r->N = rPar(r);
     alg_r->ch = rChar(r);
-    alg_r->order = (int *) Alloc(3*sizeof(int));
+    alg_r->order = (int *) omAlloc(3*sizeof(int));
     alg_r->order[2] = ringorder_no;
     alg_r->order[1] = ringorder_C;
     alg_r->order[0] = ringorder_lp;
@@ -457,8 +457,8 @@ static mpsr_Status_t PutProtoTypeAnnot(MP_Link_pt link, ring r,
     failr(mpsr_PutRingAnnots(link, alg_r, 0));
 
     // destroy temporary ring
-    Free(alg_r->order, 3*sizeof(int));
-    FreeSizeOf(alg_r, sip_sring);
+    omFreeSize(alg_r->order, 3*sizeof(int));
+    omFreeBin(alg_r, sip_sring_bin);
   }
 
   // second element is the exponent vector

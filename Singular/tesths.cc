@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.80 2000-04-27 10:07:12 obachman Exp $ */
+/* $Id: tesths.cc,v 1.81 2000-08-14 12:56:56 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -20,7 +20,7 @@
 #include "sing_dld.h"
 #include "febase.h"
 #include "cntrlc.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "silink.h"
 #include "ipid.h"
 #include "timer.h"
@@ -55,6 +55,10 @@ int main(          /* main entry to Singular */
   ttGen1();
   ttGen2();
 #else
+  // Don't worry: ifdef OM_NDEBUG, then all these calls are undef'ed
+  omInitRet_2_Info(argv[0]);
+  omInitGetBackTrace();
+
   /* initialize components */
   siRandomStart=inits();
   feOptSpec[FE_OPT_RANDOM].value = (void*) siRandomStart;
@@ -67,7 +71,6 @@ int main(          /* main entry to Singular */
   // parse command line options
   while((optc = fe_getopt_long(argc, argv,
                                SHORT_OPTS_STRING, feOptSpec, &option_index))
-//                               "", feOptSpec, &option_index))
         != EOF)
   {
     if (optc == '?' || optc == 0)
@@ -107,7 +110,7 @@ int main(          /* main entry to Singular */
     idhdl h;
     namespaceroot->push(NULL, "Top", 0, TRUE);
 #ifdef HAVE_NAMESPACES
-    h=enterid(mstrdup("Top"), 0, PACKAGE_CMD, &IDROOT, TRUE);
+    h=enterid(omStrDup("Top"), 0, PACKAGE_CMD, &IDROOT, TRUE);
     IDPACKAGE(h) = NSPACK(namespaceroot);
     IDPACKAGE(h)->language = LANG_TOP;
 #endif /* HAVE_NAMESPACES */
@@ -143,18 +146,22 @@ int main(          /* main entry to Singular */
     int vv=verbose;
     verbose &= ~Sy_bit(V_LOAD_LIB);
 #ifdef HAVE_NAMESPACES
-    iiLibCmd(mstrdup("standard.lib"),TRUE, TRUE);
+    iiLibCmd(omStrDup("standard.lib"),TRUE, TRUE);
 #else /* HAVE_NAMESPACES */
-    iiLibCmd(mstrdup("standard.lib"), TRUE);
+    iiLibCmd(omStrDup("standard.lib"), TRUE);
 #endif /* HAVE_NAMESPACES */
     verbose=vv;
   }
   errorreported = 0;
-  mmMarkInitDBMCB();
+
+  // and again, ifdef OM_NDEBUG this call is undef'ed
+  // otherwise, it marks all memory allocated so far as static
+  // i.e. as memory which is not mention on omPrintUsedAddr:
+  omMarkMemoryAsStatic();
+
   setjmp(si_start_jmpbuf);
 
   // Now, put things on the stack of stuff to do
-
   // Last thing to do is to execute given scripts
   if (fe_optind < argc)
   {
@@ -181,7 +188,7 @@ int main(          /* main entry to Singular */
 
   // before scripts, we execute -c, if it was given
   if (feOptValue(FE_OPT_EXECUTE) != NULL)
-    newBuffer(mstrdup((char*) feOptValue(FE_OPT_EXECUTE)), BT_execute);
+    newBuffer(omStrDup((char*) feOptValue(FE_OPT_EXECUTE)), BT_execute);
 
   // first thing, however, is to load .singularrc from Singularpath
   // and cwd/$HOME (in that order).

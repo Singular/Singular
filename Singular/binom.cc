@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: binom.cc,v 1.15 1999-11-15 17:19:49 obachman Exp $ */
+/* $Id: binom.cc,v 1.16 2000-08-14 12:55:54 obachman Exp $ */
 
 /*
 * ABSTRACT - set order (=number of monomial) for dp
@@ -9,12 +9,13 @@
 
 /* includes */
 #include "mod2.h"
+
+#ifdef TEST_MAC_ORDER
+#include <omalloc.h>
 #include "structs.h"
 #include "binom.h"
 
-#ifdef TEST_MAC_ORDER
 #include "tok.h"
-#include "mmemory.h"
 #include "febase.h"
 #include "polys.h"
 #include "polys-comp.h"
@@ -304,9 +305,9 @@ void bBinomSet(int * orders)
     bHighdeg_1=bbHighdeg;
     bHighdeg--;
 
-    if(bBinomials!=NULL) Free((ADDRESS)bBinomials,bSize);
+    if(bBinomials!=NULL) omFreeSize((ADDRESS)bBinomials,bSize);
     bSize = pVariables*bHighdeg_1*sizeof(int);
-    bBinomials = (int*)Alloc(bSize);
+    bBinomials = (int*)omAlloc(bSize);
 
     //Print("max deg=%d, table size=%d bytes\n",bHighdeg,bSize);
 
@@ -344,9 +345,9 @@ void bBinomSet(int * orders)
   bHighdeg_1=bHighdeg;
   bHighdeg--;
 
-  if(bBinomials!=NULL) Free((ADDRESS)bBinomials,bSize);
+  if(bBinomials!=NULL) omFreeSize((ADDRESS)bBinomials,bSize);
   bSize = (pVariables+1)*bHighdeg_1*sizeof(int);
-  bBinomials = (int*)Alloc(bSize);
+  bBinomials = (int*)omAlloc(bSize);
 
   // Print("max deg=%d, table size=%d bytes\n",bHighdeg,bSize);
 

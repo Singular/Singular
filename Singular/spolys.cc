@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: spolys.cc,v 1.22 1999-09-27 15:05:32 obachman Exp $ */
+/* $Id: spolys.cc,v 1.23 2000-08-14 12:56:52 obachman Exp $ */
 
 /*
 * ABSTRACT - s-polynomials and reduction for char p
@@ -9,8 +9,8 @@
 
 #include <string.h>
 #include "mod2.h"
+#include <ommemory
 #include "tok.h"
-#include "mmemory.h"
 #include "kstd1.h"
 #include "numbers.h"
 #include "modulop.h"

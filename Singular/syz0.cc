@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.29 2000-03-31 12:15:02 Singular Exp $ */
+/* $Id: syz0.cc,v 1.30 2000-08-14 12:56:54 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -9,7 +9,7 @@
 
 #include "mod2.h"
 #include "tok.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "polys.h"
 #include "febase.h"
 #include "kstd1.h"
@@ -40,8 +40,8 @@ static void syInitSort(ideal arg,intvec **modcomp)
 
   while ((Fl!=0) && (oldF[Fl-1]==NULL)) Fl--;
   if (*modcomp!=NULL) delete modcomp;
-  *modcomp = NewIntvec1(rkF+2);
-  F=(polyset)Alloc0(IDELEMS(arg)*sizeof(poly));
+  *modcomp = new intvec(rkF+2);
+  F=(polyset)omAlloc0(IDELEMS(arg)*sizeof(poly));
   j=0;
   for(i=0;i<=rkF;i++)
   {
@@ -71,7 +71,7 @@ static void syInitSort(ideal arg,intvec **modcomp)
   }
   (**modcomp)[rkF+1] = Fl;
   arg->m = F;
-  Free((ADDRESS)oldF,IDELEMS(arg)*sizeof(poly));
+  omFreeSize((ADDRESS)oldF,IDELEMS(arg)*sizeof(poly));
 #ifndef __OPTIMIZE__
 //Print("Neue Anordnung: ");
 //idPrint(arg);
@@ -187,20 +187,20 @@ static ideal sySchreyersSyzygiesFM(ideal arg,intvec ** modcomp)
   polyset pairs,S,T,ST,oldF;
   poly p,q,toRed;
   BOOLEAN notFound = FALSE;
-  intvec * newmodcomp = NewIntvec1(Fl+2);
+  intvec * newmodcomp = new intvec(Fl+2);
   intvec * tempcomp;
 
 //Print("Naechster Modul\n");
 //idPrint(arg);
 /*-------------initializing the sets--------------------*/
-  ST=(polyset)Alloc0(Fl*sizeof(poly));
-  S=(polyset)Alloc0(Fl*sizeof(poly));
-  ecartS=(int*)Alloc(Fl*sizeof(int));
-  totalS=(int*)Alloc(Fl*sizeof(int));
-  T=(polyset)Alloc0(2*Fl*sizeof(poly));
-  ecartT=(int*)Alloc(2*Fl*sizeof(int));
-  totalT=(int*)Alloc(2*Fl*sizeof(int));
-  pairs=(polyset)Alloc0(Fl*sizeof(poly));
+  ST=(polyset)omAlloc0(Fl*sizeof(poly));
+  S=(polyset)omAlloc0(Fl*sizeof(poly));
+  ecartS=(int*)omAlloc(Fl*sizeof(int));
+  totalS=(int*)omAlloc(Fl*sizeof(int));
+  T=(polyset)omAlloc0(2*Fl*sizeof(poly));
+  ecartT=(int*)omAlloc(2*Fl*sizeof(int));
+  totalT=(int*)omAlloc(2*Fl*sizeof(int));
+  pairs=(polyset)omAlloc0(Fl*sizeof(poly));
 
   smax = Fl;
   tmax = 2*Fl;
@@ -380,14 +380,14 @@ static ideal sySchreyersSyzygiesFM(ideal arg,intvec ** modcomp)
             WerrorS("ideal not a standardbasis");//no polynom for reduction
             pDelete(&toRed);
             for(k=j;k<Fl;k++) pDelete(&(pairs[k]));
-            Free((ADDRESS)pairs,Fl*sizeof(poly));
-            Free((ADDRESS)ST,Fl*sizeof(poly));
-            Free((ADDRESS)S,Fl*sizeof(poly));
-            Free((ADDRESS)T,tmax*sizeof(poly));
-            Free((ADDRESS)ecartT,tmax*sizeof(int));
-            Free((ADDRESS)totalT,tmax*sizeof(int));
-            Free((ADDRESS)ecartS,Fl*sizeof(int));
-            Free((ADDRESS)totalS,Fl*sizeof(int));
+            omFreeSize((ADDRESS)pairs,Fl*sizeof(poly));
+            omFreeSize((ADDRESS)ST,Fl*sizeof(poly));
+            omFreeSize((ADDRESS)S,Fl*sizeof(poly));
+            omFreeSize((ADDRESS)T,tmax*sizeof(poly));
+            omFreeSize((ADDRESS)ecartT,tmax*sizeof(int));
+            omFreeSize((ADDRESS)totalT,tmax*sizeof(int));
+            omFreeSize((ADDRESS)ecartS,Fl*sizeof(int));
+            omFreeSize((ADDRESS)totalS,Fl*sizeof(int));
             for(k=0;k<IDELEMS(result);k++) pDelete(&((*Shdl)[k]));
             return result;
           }
@@ -400,10 +400,10 @@ static ideal sySchreyersSyzygiesFM(ideal arg,intvec ** modcomp)
               {
                 pEnlargeSet(&T,tmax,16);
                 tmax += 16;
-                temp = (int*)Alloc((tmax+16)*sizeof(int));
+                temp = (int*)omAlloc((tmax+16)*sizeof(int));
                 for(l=0;l<tmax;l++) temp[l]=totalT[l];
                 totalT = temp;
-                temp = (int*)Alloc((tmax+16)*sizeof(int));
+                temp = (int*)omAlloc((tmax+16)*sizeof(int));
                 for(l=0;l<tmax;l++) temp[l]=ecartT[l];
                 ecartT = temp;
               }
@@ -464,14 +464,14 @@ static ideal sySchreyersSyzygiesFM(ideal arg,intvec ** modcomp)
     for(k=lini;k<wend;k++) pDelete(&(pairs[k]));
   }
   (*newmodcomp)[Fl+1] = Sl;
-  Free((ADDRESS)pairs,Fl*sizeof(poly));
-  Free((ADDRESS)ST,Fl*sizeof(poly));
-  Free((ADDRESS)S,Fl*sizeof(poly));
-  Free((ADDRESS)T,tmax*sizeof(poly));
-  Free((ADDRESS)ecartT,tmax*sizeof(int));
-  Free((ADDRESS)totalT,tmax*sizeof(int));
-  Free((ADDRESS)ecartS,Fl*sizeof(int));
-  Free((ADDRESS)totalS,Fl*sizeof(int));
+  omFreeSize((ADDRESS)pairs,Fl*sizeof(poly));
+  omFreeSize((ADDRESS)ST,Fl*sizeof(poly));
+  omFreeSize((ADDRESS)S,Fl*sizeof(poly));
+  omFreeSize((ADDRESS)T,tmax*sizeof(poly));
+  omFreeSize((ADDRESS)ecartT,tmax*sizeof(int));
+  omFreeSize((ADDRESS)totalT,tmax*sizeof(int));
+  omFreeSize((ADDRESS)ecartS,Fl*sizeof(int));
+  omFreeSize((ADDRESS)totalS,Fl*sizeof(int));
   delete *modcomp;
   *modcomp = newmodcomp;
   return result;
@@ -544,18 +544,18 @@ idPrint(arg);
 idDelete(&twr);
 if (modcomp!=NULL) (*modcomp)->show(0,0);
 #endif
-  newmodcomp = NewIntvec1(Fl+2);
+  newmodcomp = new intvec(Fl+2);
 //for (j=0;j<Fl;j++) pWrite(F[j]);
 //PrintLn();
   if (currQuotient==NULL)
-    pairs=(polyset)Alloc0(Fl*sizeof(poly));
+    pairs=(polyset)omAlloc0(Fl*sizeof(poly));
   else
   {
     gencQ = IDELEMS(currQuotient);
-    pairs=(polyset)Alloc0((Fl+gencQ)*sizeof(poly));
+    pairs=(polyset)omAlloc0((Fl+gencQ)*sizeof(poly));
   }
   rkF=idRankFreeModule(arg);
-  Flength = (int*)Alloc0(Fl*sizeof(int));
+  Flength = (int*)omAlloc0(Fl*sizeof(int));
   for(j=0;j<Fl;j++)
   {
     Flength[j] = pLength(F[j]);
@@ -682,7 +682,7 @@ if (modcomp!=NULL) (*modcomp)->show(0,0);
               pDelete(&toRed);
               pDelete(&syz);
               for(k=j;k<Fl;k++) pDelete(&(pairs[k]));
-              Free((ADDRESS)pairs,(Fl + gencQ)*sizeof(poly));
+              omFreeSize((ADDRESS)pairs,(Fl + gencQ)*sizeof(poly));
               for(k=0;k<IDELEMS(result);k++) pDelete(&((*Shdl)[k]));
               return result;
             }
@@ -743,10 +743,10 @@ if (modcomp!=NULL) (*modcomp)->show(0,0);
   }
   (*newmodcomp)[Fl+1] = Sl;
   if (currQuotient==NULL)
-    Free((ADDRESS)pairs,Fl*sizeof(poly));
+    omFreeSize((ADDRESS)pairs,Fl*sizeof(poly));
   else
-    Free((ADDRESS)pairs,(Fl+IDELEMS(currQuotient))*sizeof(poly));
-  Free((ADDRESS)Flength,Fl*sizeof(int));
+    omFreeSize((ADDRESS)pairs,(Fl+IDELEMS(currQuotient))*sizeof(poly));
+  omFreeSize((ADDRESS)Flength,Fl*sizeof(int));
   delete *modcomp;
   *modcomp = newmodcomp;
   return result;
@@ -890,7 +890,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
     return NULL;
   }
   *length = 4;
-  resolvente res = (resolvente)Alloc0(4*sizeof(ideal)),newres;
+  resolvente res = (resolvente)omAlloc0(4*sizeof(ideal)),newres;
   res[0] = idCopy(arg);
   while ((!idIs0(res[syzIndex])) && ((maxlength==-1) || (syzIndex<maxlength)))
   {
@@ -899,10 +899,10 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
     sy0buck = kBucketCreate();
     if (syzIndex+1==*length)
     {
-      newres = (resolvente)Alloc((*length+4)*sizeof(ideal));
+      newres = (resolvente)omAlloc((*length+4)*sizeof(ideal));
       for (j=0;j<*length+4;j++) newres[j] = NULL;
       for (j=0;j<*length;j++) newres[j] = res[j];
-      Free((ADDRESS)res,*length*sizeof(ideal));
+      omFreeSize((ADDRESS)res,*length*sizeof(ideal));
       *length += 4;
       res=newres;
     }
@@ -1022,17 +1022,17 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
 syStrategy sySchreyer(ideal arg, int maxlength)
 {
   int typ0;
-  syStrategy result=(syStrategy)Alloc0SizeOf(ssyStrategy);
+  syStrategy result=(syStrategy)omAlloc0(sizeof(ssyStrategy));
 
   resolvente fr = sySchreyerResolvente(arg,maxlength,&(result->length));
-  result->fullres = (resolvente)Alloc0((result->length+1)*sizeof(ideal));
+  result->fullres = (resolvente)omAlloc0((result->length+1)*sizeof(ideal));
   for (int i=result->length-1;i>=0;i--)
   {
     if (fr[i]!=NULL)
       result->fullres[i] = fr[i];
       fr[i] = NULL;
   }
-  Free((ADDRESS)fr,(result->length)*sizeof(ideal));
+  omFreeSize((ADDRESS)fr,(result->length)*sizeof(ideal));
   return result;
 }
 

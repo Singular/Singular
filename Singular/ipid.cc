@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.40 2000-05-23 14:33:24 Singular Exp $ */
+/* $Id: ipid.cc,v 1.41 2000-08-14 12:56:24 obachman Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -10,11 +10,11 @@
 #include <string.h>
 
 #include "mod2.h"
+#include <omalloc.h>
 #include "tok.h"
 #include "ipshell.h"
 #include "intvec.h"
 #include "febase.h"
-#include "mmemory.h"
 #include "numbers.h"
 #include "polys.h"
 #include "ring.h"
@@ -26,6 +26,14 @@
 #include "syz.h"
 #include "ipid.h"
 
+
+omBin sip_command_bin = omGetSpecBin(sizeof(sip_command));
+omBin ip_command_bin = omGetSpecBin(sizeof(ip_command));
+omBin sip_package_bin = omGetSpecBin(sizeof(sip_package));
+omBin ip_package_bin = omGetSpecBin(sizeof(ip_package));
+omBin idrec_bin = omGetSpecBin(sizeof(idrec));
+omBin namerec_bin = omGetSpecBin(sizeof(namerec));
+
 namehdl namespaceroot = NULL;
 #define TEST
 #ifndef HAVE_NAMESPACES
@@ -34,6 +42,7 @@ idhdl idroot = NULL;
 idhdl currRingHdl = NULL;
 ring  currRing = NULL;
 ideal currQuotient = NULL;
+omBin currPolyBin = NULL;
 char* iiNoName="_";
 
 void paCleanUp(package pack);
@@ -51,7 +60,7 @@ idhdl idrec::get(const char * s, int lev)
   char *id;
   while (h!=NULL)
   {
-    mmTestLP(IDID(h));
+    omCheckAddr(IDID(h));
 // =============================================================
 #if 0
 // timings: ratchwum: 515 s, wilde13: 373 s, nepomuck: 267 s, lukas 863 s
@@ -110,7 +119,7 @@ idhdl idrec::get(const char * s, int lev)
 //{
 //  if (id!=NULL)
 //  {
-//    FreeL((ADDRESS)id);
+//    omFree((ADDRESS)id);
 //    id=NULL;
 //  }
 //  /* much more !! */
@@ -119,7 +128,7 @@ idhdl idrec::get(const char * s, int lev)
 idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
 {
   //printf("define %s, %x, lev: %d, typ: %d\n", s,s,lev,t);
-  idhdl h = (idrec *)Alloc0SizeOf(idrec);
+  idhdl h = (idrec *)omAlloc0Bin(idrec_bin);
   int   len = 0;
   IDID(h)   = s;
   IDTYP(h)  = t;
@@ -132,10 +141,10 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
   {
     switch (t)
     {
-    //the type with init routines:
+      //the type with init routines:
       case INTVEC_CMD:
       case INTMAT_CMD:
-        IDINTVEC(h) = NewIntvec0();
+        IDINTVEC(h) = new intvec();
         break;
       case NUMBER_CMD:
         IDNUMBER(h) = nInit(0);
@@ -148,37 +157,37 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
         break;
       case MAP_CMD:
         IDIDEAL(h) = idInit(1,1);
-        IDMAP(h)->preimage = mstrdup(IDID(currRingHdl));
+        IDMAP(h)->preimage = omStrDup(IDID(currRingHdl));
         break;
       case STRING_CMD:
-        IDSTRING(h) = mstrdup("");
+        IDSTRING(h) = omStrDup("");
         break;
       case LIST_CMD:
-        IDLIST(h)=(lists)AllocSizeOf(slists);
+        IDLIST(h)=(lists)omAllocBin(slists_bin);
         IDLIST(h)->Init();
         break;
-    //the types with the standard init: set the struct to zero
       case LINK_CMD:
-        len=sizeof(ip_link);
+        IDLINK(h)=(si_link) omAlloc0Bin(sip_link_bin);
         break;
       case RING_CMD:
       case QRING_CMD:
-        len = sizeof(ip_sring);
+        IDRING(h) = (ring) omAlloc0Bin(sip_sring_bin);
         break;
       case PACKAGE_CMD:
-        len = sizeof(ip_package);
-        break;
-      case RESOLUTION_CMD:
-        len=sizeof(ssyStrategy);
+        IDPACKAGE(h) = (package) omAlloc0Bin(sip_package_bin);
         break;
       case PROC_CMD:
-        len=sizeof(procinfo);
+        IDPROC(h) = (procinfo*) omAlloc0Bin(procinfo_bin);
+        break;
+        //the types with the standard init: set the struct to zero
+      case RESOLUTION_CMD:
+        len=sizeof(ssyStrategy);
         break;
     //other types: without init (int,script,poly,def,package)
     }
     if (len!=0)
     {
-      IDSTRING(h) = (char *)Alloc0(len);
+      IDSTRING(h) = (char *)omAlloc0(len);
     }
     // additional settings:--------------------------------------
     if (t == QRING_CMD)
@@ -195,7 +204,6 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
       IDPACKAGE(h)->language=LANG_NONE;
       IDPACKAGE(h)->loaded = FALSE;
     }
-
   }
   // --------------------------------------------------------
   return  h;
@@ -223,14 +231,14 @@ idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
   &&(IDLEV(currRingHdl)!=lev)
   &&(s==IDID(currRingHdl)))
   {
-    s=mstrdup(s);
+    s=omStrDup(s);
   }
   // is it already defined in root ?
   else if ((h=(*root)->get(s,lev))!=NULL)
   {
     if (IDLEV(h)!=lev)
     {
-      s=mstrdup(s);
+      s=omStrDup(s);
     }
     else if ((IDTYP(h) == t)||(t==DEF_CMD))
     {
@@ -260,7 +268,7 @@ idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
     {
       if (IDLEV(h)!=lev)
       {
-        s=mstrdup(s);
+        s=omStrDup(s);
       }
       else if ((IDTYP(h) == t)||(t==DEF_CMD))
       {
@@ -285,7 +293,7 @@ idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
   {
     if ((h=topnsroot->get(s,lev))!=NULL)
     {
-        s=mstrdup(s);
+        s=omStrDup(s);
     }
   }
 #endif /* HAVE_NAMESPACES */
@@ -296,7 +304,7 @@ idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
     {
       if (IDLEV(h)!=lev)
       {
-        s=mstrdup(s);
+        s=omStrDup(s);
       }
       else if ((IDTYP(h) == t)||(t==DEF_CMD))
       {
@@ -401,6 +409,17 @@ void killhdl(idhdl h, idhdl * ih)
         rSetHdl(h,FALSE);
         /* no complete init*/
       }
+      else
+      {
+        // we are killing the basering, so: make sure that
+        // sLastPrinted is killed before this ring is destroyed
+        if (((sLastPrinted.rtyp>BEGIN_RING) && (sLastPrinted.rtyp<END_RING))
+        || ((sLastPrinted.rtyp==LIST_CMD)&&(lRingDependend((lists)sLastPrinted.data))))
+        {
+          sLastPrinted.CleanUp();
+          memset(&sLastPrinted,0,sizeof(sleftv));
+        }
+      }
       while (hdh!=NULL)
       {
         temp = IDNEXT(hdh);
@@ -467,14 +486,14 @@ void killhdl(idhdl h, idhdl * ih)
     if (IDTYP(h) == MAP_CMD)
     {
       map im = IDMAP(h);
-      FreeL((ADDRESS)im->preimage);
+      omFree((ADDRESS)im->preimage);
     }
     idDelete(&iid);
   }
   // string -------------------------------------------------------------
   else if (IDTYP(h) == STRING_CMD)
   {
-    FreeL((ADDRESS)IDSTRING(h));
+    omFree((ADDRESS)IDSTRING(h));
     //IDSTRING(h)=NULL;
   }
   // proc ---------------------------------------------------------------
@@ -496,8 +515,8 @@ void killhdl(idhdl h, idhdl * ih)
   else if (IDTYP(h)==LIST_CMD)
   {
     IDLIST(h)->Clean();
-    //Free((ADDRESS)IDLIST(h)->m, (IDLIST(h)->nr+1)*sizeof(sleftv));
-    //FreeSizeOf((ADDRESS)IDLIST(h), slists);
+    //omFreeSize((ADDRESS)IDLIST(h)->m, (IDLIST(h)->nr+1)*sizeof(sleftv));
+    //omFreeBin((ADDRESS)IDLIST(h),  slists_bin);
   }
   // link  -------------------------------------------------------------
   else if (IDTYP(h)==LINK_CMD)
@@ -522,7 +541,8 @@ void killhdl(idhdl h, idhdl * ih)
     Print("=======>%s(%x)<====\n", IDID(h), IDID(h));
 #endif
 
-  FreeL((ADDRESS)IDID(h));
+  if (IDID(h)) // OB: ?????
+    omFree((ADDRESS)IDID(h));
   //IDID(h)=NULL;
   if (h == (*ih))
   {
@@ -544,7 +564,7 @@ void killhdl(idhdl h, idhdl * ih)
       hh = hhh;
     }
   }
-  FreeSizeOf((ADDRESS)h,idrec);
+  omFreeBin((ADDRESS)h, idrec_bin);
 }
 
 idhdl ggetid(const char *n, BOOLEAN local, idhdl *packhdl)
@@ -623,7 +643,7 @@ lists ipNameList(idhdl root)
   int l=0;
   while (h!=NULL) { l++; h=IDNEXT(h); }
   /* allocate list */
-  lists L=(lists)AllocSizeOf(slists);
+  lists L=(lists)omAllocBin(slists_bin);
   L->Init(l);
   /* copy names */
   h=root;
@@ -632,7 +652,7 @@ lists ipNameList(idhdl root)
   {
     /* list is initialized with 0 => no need to clear anything */
     L->m[l].rtyp=STRING_CMD;
-    L->m[l].data=mstrdup(IDID(h));
+    L->m[l].data=omStrDup(IDID(h));
     l++;
     h=IDNEXT(h);
   }
@@ -699,7 +719,7 @@ char * piProcinfo(procinfov pi, char *request)
   } else if (strcmp(request, "ref")      == 0) {
     char p[8];
     sprintf(p, "%d", pi->ref);
-    return mstrdup(p);  // MEMORY-LEAK
+    return omStrDup(p);  // MEMORY-LEAK
   }
   return "??";
 }
@@ -709,11 +729,15 @@ void piCleanUp(procinfov pi)
   (pi->ref)--;
   if (pi->ref <= 0)
   {
-    FreeL((ADDRESS)pi->libname);
-    FreeL((ADDRESS)pi->procname);
+    if (pi->libname != NULL) // OB: ????
+      omFree((ADDRESS)pi->libname);
+    if (pi->procname != NULL) // OB: ????
+      omFree((ADDRESS)pi->procname);
+
     if( pi->language == LANG_SINGULAR)
     {
-      FreeL((ADDRESS)pi->data.s.body);
+      if (pi->data.s.body != NULL) // OB: ????
+        omFree((ADDRESS)pi->data.s.body);
     }
     if( pi->language == LANG_C)
     {
@@ -737,7 +761,7 @@ BOOLEAN piKill(procinfov pi)
   }
   piCleanUp(pi);
   if (pi->ref <= 0)
-    FreeSizeOf((ADDRESS)pi, procinfo);
+    omFreeBin((ADDRESS)pi,  procinfo_bin);
   return FALSE;
 }
 
@@ -754,7 +778,7 @@ void paCleanUp(package pack)
       dynl_close (pack->handle);
 #endif /* HAVE_DYNAMIC_LOADING */
     }
-    FreeL((ADDRESS)pack->libname);
+    omFree((ADDRESS)pack->libname);
     memset((void *) pack, 0, sizeof(sip_package));
     pack->language=LANG_NONE;
   }
@@ -778,7 +802,7 @@ BOOLEAN paKill(package pack, BOOLEAN force_top)
     }
     if(checkPackage(pack)) {
       paCleanUp(pack);
-      FreeSizeOf((ADDRESS)pack, sip_package);
+      omFreeBin((ADDRESS)pack,  sip_package_bin);
     } else return FALSE;
   } else paCleanUp(pack);
   return TRUE;
@@ -787,7 +811,7 @@ BOOLEAN paKill(package pack, BOOLEAN force_top)
 
 char *idhdl2id(idhdl pck, idhdl h)
 {
-  char *name = (char *)AllocL(strlen(pck->id) + strlen(h->id) + 3);
+  char *name = (char *)omAlloc(strlen(pck->id) + strlen(h->id) + 3);
   sprintf(name, "%s::%s", pck->id, h->id);
   return(name);
 }
@@ -799,8 +823,8 @@ void iiname2hdl(const char *name, idhdl *pck, idhdl *h)
 
   if(q==NULL)
   {
-    p = mstrdup("");
-    i = (char *)AllocL(strlen(name)+1);
+    p = omStrDup("");
+    i = (char *)omAlloc(strlen(name)+1);
     *i = '\0';
     sscanf(name, "%s", i);
 #ifdef HAVE_NAMESPACES
@@ -811,11 +835,11 @@ void iiname2hdl(const char *name, idhdl *pck, idhdl *h)
   }
   else {
     if( *(q+1) != ':') return;
-    i = (char *)AllocL(strlen(name)+1);
+    i = (char *)omAlloc(strlen(name)+1);
     *i = '\0';
     if(name == q)
     {
-      p = mstrdup("");
+      p = omStrDup("");
       sscanf(name, "::%s", i);
 #ifdef HAVE_NAMESPACES
       *h =namespaceroot->get(i, myynest, TRUE); // search in toplevel namespace
@@ -824,7 +848,7 @@ void iiname2hdl(const char *name, idhdl *pck, idhdl *h)
     }
     else
     {
-      p = (char *)AllocL(strlen(name)+1);
+      p = (char *)omAlloc(strlen(name)+1);
       sscanf(name, "%[^:]::%s", p, i);
 #ifdef HAVE_NAMESPACES
       *pck =namespaceroot->get(p, myynest, TRUE); // search in toplevel namespace
@@ -837,8 +861,8 @@ void iiname2hdl(const char *name, idhdl *pck, idhdl *h)
   }
   //printf("Package: '%s'\n", p);
   //printf("Id Rec : '%s'\n", i);
-  FreeL(p);
-  FreeL(i);
+  omFree(p);
+  omFree(i);
 }
 
 #if 0
@@ -854,7 +878,7 @@ char *getnamelev()
 namehdl namerec::push(package pack, char *name, int nesting, BOOLEAN init)
 {
   //printf("PUSH: put entry (%s) on stack\n", name);
-  namehdl ns = (namerec *)Alloc0SizeOf(namerec);
+  namehdl ns = (namerec *)omAlloc0Bin(namerec_bin);
   extern int myynest;
   if(nesting<0) nesting = myynest;
   ns->next   = this;
@@ -867,7 +891,7 @@ namehdl namerec::push(package pack, char *name, int nesting, BOOLEAN init)
   {
     ns->next    = NULL;
 #ifdef HAVE_NAMESPACES
-    ns->pack    = (ip_package *)Alloc0SizeOf(ip_package);
+    ns->pack    = (ip_package *)omAlloc0Bin(ip_package_bin);
 #endif /* HAVE_NAMESPACES */
     ns->isroot  = TRUE;
     ns->lev     = 1;
@@ -884,7 +908,7 @@ namehdl namerec::push(package pack, char *name, int nesting, BOOLEAN init)
     this->currRing = currRing;
     //printf("Saving Ring %x, %x\n", this->currRing, currRing);
   }
-  ns->name    = mstrdup(name);
+  ns->name    = omStrDup(name);
   ns->myynest = nesting;
 
   //ns->currRing = currRing;
@@ -893,10 +917,10 @@ namehdl namerec::push(package pack, char *name, int nesting, BOOLEAN init)
   namespaceroot = ns;
 #if 0
   if(init && ns->isroot) {
-    idhdl pl = enterid( mstrdup("Top"),0, PACKAGE_CMD,
+    idhdl pl = enterid( omStrDup("Top"),0, PACKAGE_CMD,
                       &NSROOT(namespaceroot), TRUE );
     if(pl != NULL) {
-      FreeSizeOf((ADDRESS)IDPACKAGE(pl), ip_package);
+      omFreeBin((ADDRESS)IDPACKAGE(pl),  ip_package_bin);
       IDPACKAGE(pl) = ns->pack;
     }
   }
@@ -919,8 +943,8 @@ namehdl namerec::pop(BOOLEAN change_nesting)
   }
   ns = this;
   namespaceroot = this->next;
-  FreeL((ADDRESS)ns->name);
-  FreeSizeOf((ADDRESS)ns, namerec);
+  omFree((ADDRESS)ns->name);
+  omFreeBin((ADDRESS)ns,  namerec_bin);
   return(namespaceroot);
 }
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz2.cc,v 1.15 2000-03-31 12:15:03 Singular Exp $ */
+/* $Id: syz2.cc,v 1.16 2000-08-14 12:56:55 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -9,7 +9,7 @@
 
 #include "mod2.h"
 #include "tok.h"
-#include "mmemory.h"
+#include <omalloc.h>
 #include "syz.h"
 #include "polys.h"
 #include "febase.h"
@@ -158,7 +158,7 @@ Print("Hier: %d, %d\n",j,i);
 #endif
                     if (i>rr)
                     {
-                      tcp=(crit_pairs)Alloc0(sizeof(sopen_pairs));
+                      tcp=(crit_pairs)omAlloc0(sizeof(sopen_pairs));
                       tcp->next = cp;
                       tcp->first_poly = j;
                       tcp->second_poly = i;
@@ -273,7 +273,7 @@ PrintLn();
   {
     tcp = cp;
     cp = cp->next;
-    Free((ADDRESS)tcp,sizeof(sopen_pairs));
+    omFreeSize((ADDRESS)tcp,sizeof(sopen_pairs));
   }
 #endif
 }
@@ -337,7 +337,7 @@ static intvec* syLinStrat2(SSet nextPairs, syStrategy syzstr,
 {
   ideal o_r=syzstr->res[index+1];
   int i=0,i1=0,i2=0,l,ll=IDELEMS(o_r);
-  intvec *result=NewIntvec1(howmuch+1);
+  intvec *result=new intvec(howmuch+1);
   BOOLEAN isDivisible;
   SObject tso;
 
@@ -375,7 +375,7 @@ Print("sPoly: ");poly_write(nextPairs[i].p);
 PrintLn();
 #endif
       //syDeletePair(&nextPairs[i]);
-      if (*secondpairs==NULL) *secondpairs = NewIntvec1(howmuch);
+      if (*secondpairs==NULL) *secondpairs = new intvec(howmuch);
       (**secondpairs)[i2] = i+1;
       i2++;
 #ifdef SHOW_CRIT
@@ -460,7 +460,7 @@ static poly syRed_Hilb(poly toRed,syStrategy syzstr,int index)
 intvec *ivStrip(intvec* arg)
 {
   int l=arg->rows()*arg->cols(),i=0,ii=0;
-  intvec *tempV=NewIntvec1(l);
+  intvec *tempV=new intvec(l);
 
   while (i+ii<l)
   {
@@ -479,7 +479,7 @@ intvec *ivStrip(intvec* arg)
     delete tempV;
     return NULL;
   }
-  intvec * result=NewIntvec1(i+1);
+  intvec * result=new intvec(i+1);
   for (ii=0;ii<i;ii++)
    (*result)[ii] = (*tempV)[ii];
   delete tempV;
@@ -508,7 +508,7 @@ static void syRedNextPairs_Hilb(SSet nextPairs, syStrategy syzstr,
   SObject tso;
   intvec *spl3=NULL;
 #ifdef USE_HEURISTIC1
-  intvec *spl2=NewIntvec3(howmuch+1,howmuch+1,0);
+  intvec *spl2=new intvec(howmuch+1,howmuch+1,0);
   int there_are_superfluous=0;
   int step=1,jj,j1,j2;
 #endif
@@ -793,11 +793,11 @@ void sySetNewHilb(syStrategy syzstr, int toSub,int index,int actord)
   intvec * cont_hilb = hHstdSeries(syzstr->res[index],NULL,NULL,NULL);
   if ((index+1<syzstr->length) && (syzstr->hilb_coeffs[index+1]==NULL))
   {
-    syzstr->hilb_coeffs[index+1] = NewIntvec1(16*((actord/16)+1));
+    syzstr->hilb_coeffs[index+1] = new intvec(16*((actord/16)+1));
   }
   else if (actord>=syzstr->hilb_coeffs[index+1]->length())
   {
-    intvec * ttt=NewIntvec1(16*((actord/16)+1));
+    intvec * ttt=new intvec(16*((actord/16)+1));
     for (i=syzstr->hilb_coeffs[index+1]->length()-1;i>=0;i--)
     {
       (*ttt)[i] = (*(syzstr->hilb_coeffs[index+1]))[i];
@@ -911,7 +911,7 @@ static void syReOrdResult_Hilb(syStrategy syzstr,int maxindex,int maxdeg)
 {
   ideal reor,toreor;
   int i,j,k,l,m,togo;
-  syzstr->betti = NewIntvec3(maxdeg,maxindex+1,0);
+  syzstr->betti = new intvec(maxdeg,maxindex+1,0);
   (*syzstr->betti)[0] = 1;
   for (i=1;i<=syzstr->length;i++)
   {
@@ -960,11 +960,11 @@ syStrategy syHilb(ideal arg,int * length)
   ideal temp=NULL;
   SSet nextPairs;
   ring origR = currRing;
-  syStrategy syzstr=(syStrategy)Alloc0SizeOf(ssyStrategy);
+  syStrategy syzstr=(syStrategy)omAlloc0(sizeof(ssyStrategy));
 
   if ((idIs0(arg)) || (idRankFreeModule(arg)>0))
   {
-    syzstr->minres = (resolvente)Alloc0(sizeof(ideal));
+    syzstr->minres = (resolvente)omAlloc0(sizeof(ideal));
     syzstr->length = 1;
     syzstr->minres[0] = idInit(1,arg->rank);
     return syzstr;
@@ -974,8 +974,8 @@ syStrategy syHilb(ideal arg,int * length)
   syzstr->syRing = rCurrRingAssure_dp_C();
 
   // set initial ShiftedComps
-  currcomponents = (int*)Alloc0((arg->rank+1)*sizeof(int));
-  currShiftedComponents = (long*)Alloc0((arg->rank+1)*sizeof(long));
+  currcomponents = (int*)omAlloc0((arg->rank+1)*sizeof(int));
+  currShiftedComponents = (long*)omAlloc0((arg->rank+1)*sizeof(long));
 
 /*--- initializes the data structures---------------*/
 #ifdef SHOW_CRIT
@@ -986,7 +986,7 @@ syStrategy syHilb(ideal arg,int * length)
   crit_fails = 0;
 #endif
   syzstr->length = *length = pVariables+2;
-  syzstr->Tl = NewIntvec1(*length+1);
+  syzstr->Tl = new intvec(*length+1);
   temp = idInit(IDELEMS(arg),arg->rank);
   for (i=0;i<IDELEMS(arg);i++)
   {
@@ -1003,18 +1003,18 @@ syStrategy syHilb(ideal arg,int * length)
   idTest(temp);
   idSkipZeroes(temp);
   syzstr->resPairs = syInitRes(temp,length,syzstr->Tl,syzstr->cw);
-  Free((ADDRESS)currcomponents,(arg->rank+1)*sizeof(int));
-  Free((ADDRESS)currShiftedComponents,(arg->rank+1)*sizeof(int));
-  syzstr->res = (resolvente)Alloc0((*length+1)*sizeof(ideal));
-  syzstr->orderedRes = (resolvente)Alloc0((*length+1)*sizeof(ideal));
-  syzstr->elemLength = (int**)Alloc0((*length+1)*sizeof(int*));
-  syzstr->truecomponents = (int**)Alloc0((*length+1)*sizeof(int*));
-  syzstr->backcomponents = (int**)Alloc0((*length+1)*sizeof(int*));
-  syzstr->ShiftedComponents = (long**)Alloc0((*length+1)*sizeof(long*));
-  syzstr->Howmuch = (int**)Alloc0((*length+1)*sizeof(int*));
-  syzstr->Firstelem = (int**)Alloc0((*length+1)*sizeof(int*));
-  syzstr->hilb_coeffs = (intvec**)Alloc0((*length+1)*sizeof(intvec*));
-  syzstr->sev = (unsigned long **)Alloc0((*length+1)*sizeof(unsigned long*));
+  omFreeSize((ADDRESS)currcomponents,(arg->rank+1)*sizeof(int));
+  omFreeSize((ADDRESS)currShiftedComponents,(arg->rank+1)*sizeof(int));
+  syzstr->res = (resolvente)omAlloc0((*length+1)*sizeof(ideal));
+  syzstr->orderedRes = (resolvente)omAlloc0((*length+1)*sizeof(ideal));
+  syzstr->elemLength = (int**)omAlloc0((*length+1)*sizeof(int*));
+  syzstr->truecomponents = (int**)omAlloc0((*length+1)*sizeof(int*));
+  syzstr->backcomponents = (int**)omAlloc0((*length+1)*sizeof(int*));
+  syzstr->ShiftedComponents = (long**)omAlloc0((*length+1)*sizeof(long*));
+  syzstr->Howmuch = (int**)omAlloc0((*length+1)*sizeof(int*));
+  syzstr->Firstelem = (int**)omAlloc0((*length+1)*sizeof(int*));
+  syzstr->hilb_coeffs = (intvec**)omAlloc0((*length+1)*sizeof(intvec*));
+  syzstr->sev = (unsigned long **)omAlloc0((*length+1)*sizeof(unsigned long*));
   syzstr->bucket = kBucketCreate();
   syzstr->syz_bucket = kBucketCreate();
   startdeg = actdeg;
