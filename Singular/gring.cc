@@ -2,23 +2,20 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /***************************************************************
- *  File:    pp_Mult_mm__Template.cc
- *  Purpose: template for p_Mult_n
- *  Author:  obachman (Olaf Bachmann) / levandov (Viktor Levandovsky)
+ *  File:    gring.cc
+ *  Purpose: pMult family of procedures
+ *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.1 2000-11-13 14:50:23 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.2 2000-11-20 16:02:03 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "gring.h"
+#include "polys.h"
 #ifdef HAVE_PLURAL
-/***************************************************************
- *
- *   Returns:  p*m
- *   Const:    p, m
- *   If spNoether != NULL, then monoms which are smaller
- *   then spNoether are cut
- *
- ***************************************************************/
+
+//global nc_macros :
+#define freeT(A) omFree((ADDRESS)A,(pVariables+1)*sizeof(Exponent_t))
+#define freeN(A,k) omFree((ADDRESS)A,k*sizeof(number))
 
 poly nc_pp_Mult_mm(poly p, const poly m, const poly spNoether, const ring ri)
 {
@@ -51,7 +48,7 @@ poly nc_pp_Mult_mm(poly p, const poly m, const poly spNoether, const ring ri)
   return pNext(&rp);
 }
 
-poly nc_mm_Mult_mm(Exponent_t *F, Exponent_t *G, const ring ri)
+poly nc_mm_Mult_nn(Exponent_t *F, Exponent_t *G, const ring ri)
 
 /* destroys both f and g , f,g are monomials with the coefficient */
 //poly pMultTT(poly f, poly g)
@@ -80,7 +77,7 @@ poly nc_mm_Mult_mm(Exponent_t *F, Exponent_t *G, const ring ri)
   {
     out=pOne();
     for (i=1;i<=nv;i++) { F[i]=F[i]+G[i];}
-    F[0]=exp;
+//    F[0]=exp;
     pSetExpV(out,F);
     pSetCoeff(out,cOut);
     pSetm(out);
@@ -225,7 +222,7 @@ poly nc_mm_Mult_mm(Exponent_t *F, Exponent_t *G, const ring ri)
 }
 
 //----------pMultUU--------- 
-poly pMultUU (int i, int a, int j, int b)
+poly nc_uu_Mult_ww (int i, int a, int j, int b,const ring r)
 {
   int nv=pVariables;
   poly out=NULL;
@@ -233,10 +230,10 @@ poly pMultUU (int i, int a, int j, int b)
   if (i<=j)        /* usual expression fg */
   {
       out=pOne();
-      pSetExp(out,j,b);
-      pSetExp(out,i,a);
-      if (i==j) pSetExp(out,j,a+b);
-      pSetm(out);
+      p_SetExp(out,j,b,r);
+      p_SetExp(out,i,a,r);
+      if (i==j) p_SetExp(out,j,a+b,r);
+      p_Setm(out,r);
       return(out);
    }
    else    /* when i>j */
@@ -251,7 +248,7 @@ poly pMultUU (int i, int a, int j, int b)
          else
          {
             out=pOne();
-            pSetExp(out,j,b);pSetm(out);
+            p_SetExp(out,j,b,r);p_Setm(out,r);
             return(out);
           }
       }
@@ -260,7 +257,7 @@ poly pMultUU (int i, int a, int j, int b)
          if (b==0)
          {
             out=pOne();
-            pSetExp(out,i,a);pSetm(out);
+            p_SetExp(out,i,a,r);p_Setm(out,r);
             return(out);
          }
       }
@@ -269,48 +266,49 @@ poly pMultUU (int i, int a, int j, int b)
 // is it already computed ?
 
   int vik = UPMATELEM(j,i);
-  if ((ri->nc->type==nc_skew)||(ri->nc->MF[vik]==0)) // ???
-  {
-    out=pOne();
-    pSetExp(out,j,b); pSetExp(out,i,a);
-    pSetm(out);
-    number tmp_number=NULL;
-    nPower(c,a*b,&tmp_number);
-    pSetCoeff(out,tmp_number);
-    return (out);
-  }
-  matrix cMT=currRing->MT[vik];
-  int cMTsize=currRing->MTsize[vik];
+// FOR future nc_skew case  
+//  if ((ri->nc->type==nc_skew)||(ri->nc->MF[vik]==0))
+//   {
+//     out=pOne();
+//     pSetExp(out,j,b); pSetExp(out,i,a);
+//     pSetm(out);
+//     number tmp_number=NULL;
+//     nPower(c,a*b,&tmp_number);
+//     pSetCoeff(out,tmp_number);
+//     return (out);
+//   }
+  matrix cMT=r->MT[vik];
+  int cMTsize=r->MTsize[vik];
 
   if (((a<cMTsize)&&(b<cMTsize))&&(MATELEM(cMT,a,b)!=NULL))
   {
-     out=pCopy(MATELEM(cMT,a,b));
+     out=p_Copy(MATELEM(cMT,a,b),r);
      return (out);
   }
 
-//End(Zero_Exceptions = (0,0),(0,b),(a,0) )
+//End(Zero_Exceptions = (0,0),(0,b),(a,0),(a==b) )
 //in fact, now a>=1 and b>=1; and j<i
 
-  poly C=MATELEM(currRing->C,j,i);
-  number c=pGetCoeff(C); //coeff
-  poly D=MATELEM(currRing->D,j,i);       //rest
+  poly C=MATELEM(r->C,j,i);
+  number c=p_GetCoeff(C,r); //coeff
+  poly D=MATELEM(r->D,j,i);       //rest
 
-  int newcMTsize;
+  int newcMTsize=0;
 
   if (D==NULL)                   /* (skew)-commutativity check */
   {
      out=pOne();
-     pSetExp(out,j,b); pSetExp(out,i,a);
-     pSetm(out);
+     p_SetExp(out,j,b,r); p_SetExp(out,i,a,r);
+     p_Setm(out,r);
      number tmp_number=NULL;
      nPower(c,a*b,&tmp_number);
-     pSetCoeff(out,tmp_number);
+     p_SetCoeff(out,tmp_number,r);
      return(out);
   }
 
   if ((a==1)&&(b==1))
   {
-     out= pCopy(MATELEM(cMT,1,1));  /* already computed */
+     out= p_Copy(MATELEM(cMT,1,1),r);  /* already computed */
      return(out);
   }
   D=NULL;
@@ -324,19 +322,19 @@ poly pMultUU (int i, int a, int j, int b)
      {
         for (int q=p;q<=nv;q++)
         {
-           MATELEM(tmp,p,q) = MATELEM(currRing->MT[UPMATELEM(j,i)],p,q);
-           MATELEM(currRing->MT[UPMATELEM(j,i)],p,q)=NULL;
+           MATELEM(tmp,p,q) = MATELEM(r->MT[UPMATELEM(j,i)],p,q);
+           MATELEM(r->MT[UPMATELEM(j,i)],p,q)=NULL;
         }
      }
-     idDelete((ideal *)&(currRing->MT[UPMATELEM(j,i)]));
-     currRing->MT[UPMATELEM(j,i)] = tmp;
-     currRing->MTsize[UPMATELEM(j,i)] = newcMTsize;
-  }  /* update of multiplication matrix is finished */
+     id_Delete((ideal *)&(r->MT[UPMATELEM(j,i)]),r);
+     r->MT[UPMATELEM(j,i)] = tmp;
+     r->MTsize[UPMATELEM(j,i)] = newcMTsize;
+  }  /* The update of multiplication matrix is finished */
 
-  cMT=currRing->MT[UPMATELEM(j,i)];         //cMT=current MT
+  cMT=r->MT[UPMATELEM(j,i)];         //cMT=current MT
 
-  poly x=pOne();pSetExp(x,j,1);pSetm(x);//var(j);
-  poly y=pOne();pSetExp(y,i,1);pSetm(y);//var(i);  for convenience
+  poly x=pOne();p_SetExp(x,j,1,r);p_Setm(x,r);//var(j);
+  poly y=pOne();p_SetExp(y,i,1,r);pSetm(y,r);//var(i);  for convenience
 
   int k,m;
   poly t=NULL;
@@ -348,8 +346,9 @@ poly pMultUU (int i, int a, int j, int b)
 
      if (t==NULL)   /* not computed yet */
      {
-        t=pCopy(MATELEM(cMT,k-1,1));
-        t = pMultT2(y,t);
+        t=p_Copy(MATELEM(cMT,k-1,1),r);
+//        t = pMultT2(y,t);
+        t = nc_m_Mult_pp(y,t,,r);
         MATELEM(cMT,k,1) = t;
      }
      t=NULL;
@@ -362,14 +361,15 @@ poly pMultUU (int i, int a, int j, int b)
 
      if (t==NULL)   //not computed yet
      {
-        t=pCopy(MATELEM(cMT,a,m-1));
-        t = pMultT(t,x);
+        t=p_Copy(MATELEM(cMT,a,m-1),r);
+//        t = pMultT(t,x);
+        t = nc_p_Mult_q(t,x,,r);
         MATELEM(cMT,a,m) = t;
      }
      t=NULL;
   }
-  pDelete(&x); pDelete(&y);
+  p_Delete(&x,r); p_Delete(&y,r);
   t=MATELEM(cMT,a,b);
-  return(pCopy(t));  /* as last computed element was cMT[a,b] */
+  return(p_Copy(t,r));  /* as last computed element was cMT[a,b] */
 }
 #endif
