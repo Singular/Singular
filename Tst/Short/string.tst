@@ -116,11 +116,16 @@ MyPrint(qr);
 list l = 1, qr, list(2, qr);
 MyPrint(l);
 
+
 map phi = r, maxideal(2);
 MyPrint(phi);
 
 l[5] = phi;
 MyPrint(l);
+
+example sprintf;
+example printf;
+example fprintf;
 
 tst_status(1);$
 
