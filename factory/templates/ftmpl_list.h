@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_list.h,v 1.7 2001-06-18 11:33:14 Singular Exp $ */
+/* $Id: ftmpl_list.h,v 1.8 2005-01-13 15:10:23 Singular Exp $ */
 
 #ifndef INCL_LIST_H
 #define INCL_LIST_H
@@ -15,6 +15,11 @@ class ListIterator;
 
 template <class T>
 class List;
+
+#ifndef NOSTREAMIO
+template <class T>
+std::ostream& operator<< ( std::ostream &, const List<T> &);
+#endif
 
 template <class T>
 class ListItem
@@ -65,7 +70,7 @@ public:
     void sort ( int (*) ( const T&, const T& ) );
 #ifndef NOSTREAMIO
     void print ( ostream & ) const;
-    friend ostream& operator<< <>( ostream & os, const List<T> & l );
+    friend ostream& operator<< <T>( ostream & os, const List<T> & l );
 #endif /* NOSTREAMIO */
     friend class ListIterator<T>;
 };

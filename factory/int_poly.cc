@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_poly.cc,v 1.15 2003-06-20 10:00:33 Singular Exp $ */
+/* $Id: int_poly.cc,v 1.16 2005-01-13 15:10:22 Singular Exp $ */
 
 #include <config.h>
 
@@ -8,7 +8,12 @@
 #if defined(WINNT) && ! defined(__GNUC__)
 #include <strstrea.h>
 #else
+#if __GNUC__ < 3
 #include <strstream.h>
+#else
+#include <strstream>
+using namespace std;
+#endif
 #endif
 #endif /* NOSTREAMIO */
 
