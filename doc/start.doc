@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.11 1998-05-18 02:42:14 gorzel Exp $
+@comment $Id: start.doc,v 1.12 1998-05-18 09:13:28 gorzel Exp $
 @comment this file contains the "Introduction" chapter.
 
 @c The following directives are necessary for proper compilation
@@ -537,7 +537,7 @@ in the following way
 @cindex Modules and and their annihilator
 @sc{Singular} is able to calculate with modules over all the rings,
 which can be defined as @code{basering}. A free module of rank @code{n}
-is defined as follows, 
+is defined as follows:
 @example
   ring rr;
   int n = 4;
@@ -555,9 +555,9 @@ is defined as follows,
   @expansion{}0,0,0,1 
 @end example
 
-There are two possibilities to define a module. First A submodule may be
+There are two possibilities to define a module. First a submodule can be
 defined by a generating set of vectors. Then this set of vectors, and the
-module itself my be identified with the columns of matrix.
+module itself may be identified with the columns of matrix.
 For that reason in @sc{Singular} matrices and modules may be interchanged.
 @example
   ring r =0,(x,y,z),dp;
@@ -572,25 +572,26 @@ For that reason in @sc{Singular} matrices and modules may be interchanged.
 The second possibility, and this is what @sc{Singular} means when 
 a @code{module} is defined, is to describe the module by the relations 
 of the generators of a free module. To pass from  the first description
-to the second is done with the command @code{syz}
+to the second is done with the command @code{syz}.
 @example
   syz(MD);
   @expansion{}_[1]=x*gen(2)+y*gen(1)
 @end example
 
 We want to calculate as application the annihilator  of a given module.
-Let the module M = Rk/U,  where U is our defining module. 
+Let M = Rk/U,  where U is our defining module of relations. 
 @example
   module U = [z3,xy2,x3],[yz2,1,xy5z+z3],[y2z,0,x3],[xyz+x2,y2,0],[xyz,x2y,1];
   print(U);
   @expansion{}
 @end example
 
-then by definition
+Then by definition
 the annihilator of M is the ideal ann(M) = @{a | aM = 0 @} which is by the 
 description of M the same as @{ a | aRk contained in U @}.
 Hence we have to calculate using the command @code{quotient} the
-quotient @{ a | a in U:Rk@}. The rank of the freemodule is determined by the 
+quotient @{ a | a in U:Rk@}. 
+@* The rank of the freemodule is determined by the 
 choice of @code{U} and is the number of rows of the corresponding matrix.
 This may be determined by the @code{nrows}. All we have to do now is to
 apply the following statement.
@@ -601,7 +602,7 @@ apply the following statement.
 @end example
 
 As this calculation may take a while, let us mesure the time. Reset
-the timer and redo it.
+the timer and redo the example.
 @example
   timer =0;
   ideal I = quotient(U,freemodule(nrows(U)));
@@ -629,16 +630,16 @@ module with smaller rank, i.e. the matrix has less rows.
 @subsection Resolution and Ext groups
 @cindex Resolution and Ext groups
 This final example in the introduction shows how to calculate the @code{n-th Ext} group of an ideal.
-The ingredients to do this are by definition of @code{Ext}: calculate a (minimal) resolution
+The ingredients to do this, are by the definition of @code{Ext} the following: calculate a (minimal) resolution
 at least up to length @code{n}, apply the @code{Hom}-functor, and calculate the
 @code{n-th} Homology group, so form the quotient of @code{ker} and @code{Im}
 in the sequenze.
-@* The corresponding commands in @sc{Singular} are the following:
-the command @code{mres( ,n)} calculates a minimal free resolution
+@* The corresponding commands in @sc{Singular} are first
+the command @code{mres( ,n)} which calculates a minimal free resolution
 with the standard basis method.
 
 Here we mention that @sc{Singular} gives the possibility to inspect 
-its calculation process. This can be enable with the @code{option} command.
+its calculation process. This can be enabled with the @code{option} command.
 @example
 
   ring rr;      // the default ring in char 32003
@@ -662,7 +663,7 @@ Disable this protocol with
   option(prot);
 @end example
 
-When we enter the name of the calculated resolution, we get a pictorial,
+When we enter the name of the calculated resolution, we get a pictorial
 description of the resolution where the exponents denote the rank of the
 free modules.
 @example
@@ -700,16 +701,16 @@ same as ker/im.
 @* We collect these statements in this short procedure.
 @example
   proc Ext(int n, ideal I)
-  {
+  @{
     resolution rs = mres(I,n+1);
     module tAn    = transpose(rs[n+1]);
     module tAn_1  = transpose(rs[n]);
     module ext_n  = modulo(syz(tAn),tAn_1); 
     return(ext_n);
-  }
+  @}
 @end example  
 
-Now we consider the following example:
+Now consider the following example:
 
 @example
   ring r5 = 32003,(a,b,c,d,e),dp;
@@ -725,5 +726,5 @@ Now we consider the following example:
   Ext(3,I);   // too big to display here
 @end example
 
-Finally we mention, that in the library @code{homolog.lib} more general
-procs to calculate Ext groups are implemented.
+Finally we mention, that  more general procs to calculate 
+Ext groups are implemented in the library @code{homolog.lib}.
