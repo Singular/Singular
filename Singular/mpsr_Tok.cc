@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Tok.cc,v 1.9 1997-05-21 13:05:15 obachman Exp $ */
+/* $Id: mpsr_Tok.cc,v 1.10 1997-06-17 10:12:11 obachman Exp $ */
 
 /***************************************************************
  *
@@ -290,8 +290,8 @@ cmd_dictcop cmd_dictcops[] =
       {IDEAL_CMD, MP_CopPolyIdeal},
       {KBASE_CMD, MP_CopPolyKbase},
       {LEAD_CMD, MP_CopPolyLead},
-      {LEADCOEF_CMD, MP_CopPolyDictLeadCoef},
-      {LEADEXP_CMD, MP_CopPolyDictLeadExp},
+      {LEADCOEF_CMD, MP_CopPolyLeadCoef},
+      {LEADEXP_CMD, MP_CopPolyLeadExp},
       {MAXID_CMD, MP_CopPolyMaxIdeal},
       {MINBASE_CMD, MP_CopPolyMinBase},
       {MINRES_CMD, MP_CopPolyMinRes},

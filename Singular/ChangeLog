@@ -1,4 +1,10 @@
+Tue Jun 17 11:47:47 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* tok.h: no discrimination of mac for inline definition any more
+
 Wed Jun 11 09:56:05 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* mpsr_Tok.cc (cmd_dictcops): changed names of some MP_Cops
 
 	* longrat.[cc,h], tesths.cc, Makefile.in, configure.in: 
 	  added support for smallgmp
