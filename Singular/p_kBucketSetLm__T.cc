@@ -6,9 +6,24 @@
  *  Purpose: template for setting the Lm of a bucket
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_kBucketSetLm__T.cc,v 1.2 2001-08-27 14:47:31 Singular Exp $
+ *  Version: $Id: p_kBucketSetLm__T.cc,v 1.3 2003-03-03 15:25:27 Singular Exp $
  *******************************************************************/
+#undef USE_COEF_BUCKETS
+#ifdef HAVE_COEF_BUCKETS
+#define USE_COEF_BUCKETS
+#endif
 
+#ifdef USE_COEF_BUCKETS
+#define MULTIPLY_BUCKET(B,I) do                                        \
+  { if (B->coef[I]!=NULL)                                              \
+    {                                                                  \
+      B->buckets[I]=p_Mult_q(B->buckets[I],B->coef[I],B->bucket_ring); \
+      B->coef[I]=NULL;                                                 \
+    }                                                                  \
+  } while(0)
+#else
+#define MULTIPLY_BUCKET(B,I)
+#endif
 LINKAGE void p_kBucketSetLm(kBucket_pt bucket)
 {
   int j = 0;
@@ -27,6 +42,7 @@ LINKAGE void p_kBucketSetLm(kBucket_pt bucket)
     {
       if (bucket->buckets[i] != NULL)
       {
+        MULTIPLY_BUCKET(bucket,i);
         p =  bucket->buckets[j];
         if (j == 0)
         {
@@ -52,6 +68,7 @@ LINKAGE void p_kBucketSetLm(kBucket_pt bucket)
 
         Equal:
         {
+          MULTIPLY_BUCKET(bucket,i);
           number tn = pGetCoeff(p);
           pSetCoeff0(p, n_Add(pGetCoeff(bucket->buckets[i]), tn, r));
           n_Delete(&tn, r);

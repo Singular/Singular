@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.24 2001-10-09 16:36:06 Singular Exp $ */
+/* $Id: kbuckets.cc,v 1.25 2003-03-03 15:24:28 Singular Exp $ */
 
 #include "mod2.h"
 #include "tok.h"
@@ -14,6 +14,21 @@
 #include "numbers.h"
 #include "p_Procs.h"
 
+#ifdef HAVE_COEF_BUCKETS
+#define USE_COEF_BUCKETS
+#endif
+
+#ifdef USE_COEF_BUCKETS
+#define MULTIPLY_BUCKET(B,I) do                                        \
+  { if (B->coef[I]!=NULL)                                              \
+    {                                                                  \
+      B->buckets[I]=p_Mult_q(B->buckets[I],B->coef[I],B->bucket_ring); \
+      B->coef[I]=NULL;                                                 \
+    }                                                                  \
+  } while(0)
+#else
+#define MULTIPLY_BUCKET(B,I)
+#endif
 static omBin kBucket_bin = omGetSpecBin(sizeof(kBucket));
 
 //////////////////////////////////////////////////////////////////////////
@@ -47,6 +62,15 @@ inline unsigned int pLogLength(poly p)
 #ifndef HAVE_PSEUDO_BUCKETS
 BOOLEAN kbTest_i(kBucket_pt bucket, int i)
 {
+  #ifdef USE_COEF_BUCKETS
+  assume(bucket->coef[0]==NULL);
+  if ((bucket->coef[i]!=NULL) && (bucket->buckets[i]==NULL))
+  {
+    dReportError("Bucket %d coef not NULL", i);
+  }
+  if (bucket->coef[i]!=NULL)
+    _p_Test(bucket->coef[i],bucket->bucket_ring,PDEBUG);
+  #endif
   pFalseReturn(p_Test(bucket->buckets[i], bucket->bucket_ring));
   if (bucket->buckets_length[i] != pLength(bucket->buckets[i]))
   {
@@ -80,6 +104,11 @@ BOOLEAN kbTest(kBucket_pt bucket)
         && p_LmCmp(lm, bucket->buckets[i], bucket->bucket_ring) != 1)
     {
       dReportError("Bucket %d larger than lm", i);
+      return FALSE;
+    }
+    if (!p_Test(bucket->buckets[i],bucket->bucket_ring))
+    {
+      dReportError("Bucket %d is not =0(4)", i);
       return FALSE;
     }
   }
@@ -130,7 +159,13 @@ void kBucketDeleteAndDestroy(kBucket_pt *bucket_pt)
   for (i=0; i<= bucket->buckets_used; i++)
   {
     if (bucket->buckets[i] != NULL)
+    {
       p_Delete(&(bucket->buckets[i]), bucket->bucket_ring);
+#ifdef USE_COEF_BUCKETS
+      if (bucket->coef[i]!=NULL)
+        p_Delete(&(bucket->coef[i]), bucket->bucket_ring);
+#endif
+    }
   }
   omFreeBin(bucket, kBucket_bin);
   *bucket_pt = NULL;
@@ -162,6 +197,7 @@ inline void kBucketMergeLm(kBucket_pt bucket)
       l = l << 2;
     }
 #endif
+    MULTIPLY_BUCKET(bucket,i);
     pNext(lm) = bucket->buckets[i];
     bucket->buckets[i] = lm;
     bucket->buckets_length[i]++;
@@ -213,17 +249,32 @@ void kBucketInit(kBucket_pt bucket, poly lm, int length)
 
 int kBucketCanonicalize(kBucket_pt bucket)
 {
+  kbTest(bucket);
   poly p = bucket->buckets[1];
   poly lm;
   int pl = bucket->buckets_length[1], i;
   bucket->buckets[1] = NULL;
   bucket->buckets_length[1] = 0;
+  ring r=bucket->bucket_ring;
 
 
   for (i=2; i<=bucket->buckets_used; i++)
   {
+  #ifdef USE_COEF_BUCKETS
+    if (bucket->coef[i]!=NULL)
+    {
+      p = p_Plus_mm_Mult_qq(p, bucket->coef[i], bucket->buckets[i],
+                 pl, bucket->buckets_length[i], r);
+      p_Delete(&bucket->coef[i],r);
+      p_Delete(&bucket->buckets[i],r);
+    }
+    else
     p = p_Add_q(p, bucket->buckets[i],
-                 pl, bucket->buckets_length[i], bucket->bucket_ring);
+                 pl, bucket->buckets_length[i], r);
+  #else
+    q = p_Add_q(q, bucket->buckets[i],
+                 pl, bucket->buckets_length[i], r);
+  #endif
     bucket->buckets[i] = NULL;
     bucket->buckets_length[i] = 0;
   }
@@ -249,6 +300,7 @@ int kBucketCanonicalize(kBucket_pt bucket)
   }
   bucket->buckets_used = i;
   assume(pLength(p) == (int) pl);
+  kbTest(bucket);
   return i;
 }
 
@@ -262,6 +314,9 @@ void kBucketClear(kBucket_pt bucket, poly *p, int *length)
     bucket->buckets[i] = NULL;
     bucket->buckets_length[i] = 0;
     bucket->buckets_used = 0;
+#ifdef USE_COEF_BUCKETS
+    bucket->coef[i]=NULL;
+#endif
   }
   else
   {
@@ -332,10 +387,13 @@ void kBucketShallowCopyDelete(kBucket_pt bucket,
   kBucketCanonicalize(bucket);
   for (i=0; i<= bucket->buckets_used; i++)
     if (bucket->buckets[i] != NULL)
+    {
+      MULTIPLY_BUCKET(bucket,i);
       bucket->buckets[i] = p_shallow_copy_delete(bucket->buckets[i],
                                                  bucket->bucket_ring,
                                                  new_tailRing,
                                                  new_tailBin);
+    }
 #else
   bucket->p = p_shallow_copy_delete(p,
                                     bucket_ring,
@@ -354,11 +412,32 @@ void kBucketShallowCopyDelete(kBucket_pt bucket,
 void kBucket_Mult_n(kBucket_pt bucket, number n)
 {
 #ifndef HAVE_PSEUDO_BUCKETS
+  kbTest(bucket);
+  ring r=bucket->bucket_ring;
   int i;
 
   for (i=0; i<= bucket->buckets_used; i++)
+  {
     if (bucket->buckets[i] != NULL)
-      bucket->buckets[i] = p_Mult_nn(bucket->buckets[i], n, bucket->bucket_ring);
+    {
+#ifdef USE_COEF_BUCKETS
+      if (i<2)
+        bucket->buckets[i] = p_Mult_nn(bucket->buckets[i], n, r);
+      else
+      if (bucket->coef[i]!=NULL)
+      {
+        bucket->coef[i] = p_Mult_nn(bucket->coef[i],n,r);
+      }
+      else
+      {
+        bucket->coef[i] = p_NSet(n_Copy(n,bucket->bucket_ring),r);
+      }
+#else
+      bucket->buckets[i] = p_Mult_nn(bucket->buckets[i], n, r);
+#endif
+    }
+  }
+  kbTest(bucket);
 #else
   bucket->p = p_Mult_nn(bucket->p, n, bucket->bucket_ring);
 #endif
@@ -391,8 +470,22 @@ void kBucket_Add_q(kBucket_pt bucket, poly q, int *l)
 
   while (bucket->buckets[i] != NULL)
   {
+    //MULTIPLY_BUCKET(bucket,i);
+  #ifdef USE_COEF_BUCKETS
+    if (bucket->coef[i]!=NULL)
+    {
+      q = p_Plus_mm_Mult_qq(q, bucket->coef[i], bucket->buckets[i],
+                 l1, bucket->buckets_length[i], r);
+      p_Delete(&bucket->coef[i],r);
+      p_Delete(&bucket->buckets[i],r);
+    }
+    else
     q = p_Add_q(q, bucket->buckets[i],
                  l1, bucket->buckets_length[i], r);
+  #else
+    q = p_Add_q(q, bucket->buckets[i],
+                 l1, bucket->buckets_length[i], r);
+  #endif
     bucket->buckets[i] = NULL;
     bucket->buckets_length[i] = 0;
     i = pLogLength(l1);
@@ -438,8 +531,21 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
   kbTest(bucket);
   i = pLogLength(l1);
 
-  if (i <= bucket->buckets_used && bucket->buckets[i] != NULL)
+  if ((i <= bucket->buckets_used) && (bucket->buckets[i] != NULL))
   {
+    assume(pLength(bucket->buckets[i])==bucket->buckets_length[i]);
+//#ifdef USE_COEF_BUCKETS
+//     if(bucket->coef[i]!=NULL)
+//     {
+//       poly mult=p_Mult_mm(bucket->coef[i],m,r);
+//       bucket->coef[i]=NULL;
+//       p1 = p_Minus_mm_Mult_qq(bucket->buckets[i], mult, p1,
+//                               bucket->buckets_length[i], l1,
+//                             spNoether, r);
+//     }
+//     else
+//#endif
+    MULTIPLY_BUCKET(bucket,i);
     p1 = p_Minus_mm_Mult_qq(bucket->buckets[i], m, p1,
                             bucket->buckets_length[i], l1,
                             spNoether, r);
@@ -464,6 +570,8 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
 
   while (bucket->buckets[i] != NULL)
   {
+    //kbTest(bucket);
+    MULTIPLY_BUCKET(bucket,i);
     p1 = p_Add_q(p1, bucket->buckets[i],
                  l1, bucket->buckets_length[i], r);
     bucket->buckets[i] = NULL;
@@ -482,12 +590,11 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
                                bucket->l, l1,
                                spNoether, r);
 #endif
-  kbTest(bucket);
 }
 
 //////////////////////////////////////////////////////////////////////////
 ///
-/// Bpoly == Bpoly - m*p; where m is a monom
+/// Bpoly == Bpoly + m*p; where m is a monom
 /// Does not destroy p and m
 /// assume (l <= 0 || pLength(p) == l)
 void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
@@ -514,6 +621,7 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
 
   if (i <= bucket->buckets_used && bucket->buckets[i] != NULL)
   {
+    MULTIPLY_BUCKET(bucket,i);
     p1 = p_Plus_mm_Mult_qq(bucket->buckets[i], m, p1,
                            bucket->buckets_length[i], l1, r);
     l1 = bucket->buckets_length[i];
@@ -528,6 +636,7 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
 
   while (bucket->buckets[i] != NULL)
   {
+    MULTIPLY_BUCKET(bucket,i);
     p1 = p_Add_q(p1, bucket->buckets[i],
                  l1, bucket->buckets_length[i], r);
     bucket->buckets[i] = NULL;
@@ -549,7 +658,7 @@ poly kBucket_ExtractLarger(kBucket_pt bucket, poly q, poly append)
 {
   if (q == NULL) return append;
   poly lm;
-  do
+  loop
   {
     lm = kBucketGetLm(bucket);
     if (lm == NULL) return append;
@@ -564,7 +673,6 @@ poly kBucket_ExtractLarger(kBucket_pt bucket, poly q, poly append)
       return append;
     }
   }
-  while (1);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -572,7 +680,7 @@ poly kBucket_ExtractLarger(kBucket_pt bucket, poly q, poly append)
 // Extract all monomials from bucket with component comp
 // Return as a polynomial *p with length *l
 // In other words, afterwards
-// Bpoly == Bpoly - (poly consisting of all monomials with component comp)
+// Bpoly = Bpoly - (poly consisting of all monomials with component comp)
 // and components of monomials of *p are all 0
 //
 
@@ -595,6 +703,7 @@ void kBucketTakeOutComp(kBucket_pt bucket,
   {
     if (bucket->buckets[i] != NULL)
     {
+      MULTIPLY_BUCKET(bucket,i);
       pTakeOutComp(&(bucket->buckets[i]), comp, &q, &lq);
       if (q != NULL)
       {
@@ -629,6 +738,7 @@ void kBucketDecrOrdTakeOutComp(kBucket_pt bucket,
   {
     if (bucket->buckets[i] != NULL)
     {
+      MULTIPLY_BUCKET(bucket,i);
       pDecrOrdTakeOutComp(&(bucket->buckets[i]), comp, order, &q, &lq);
       if (q != NULL)
       {
