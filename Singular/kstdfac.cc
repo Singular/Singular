@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.32 1999-11-18 13:07:53 obachman Exp $ */
+/* $Id: kstdfac.cc,v 1.33 2000-02-07 17:21:30 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -186,7 +186,8 @@ kStrategy kStratCopy(kStrategy o)
     memcpy(s->NotUsedAxis,o->NotUsedAxis,currRing->N*sizeof(BOOLEAN));
   }
   s->kIdeal=NULL;
-  s->P=s->L[s->Ll+1];
+  //s->P=s->L[s->Ll+1];
+  memset(&s->P,0,sizeof(s->P));
   s->update=o->update;
   s->posInLOldFlag=o->posInLOldFlag;
   s->kModW = o->kModW;
@@ -287,11 +288,10 @@ static void completeReduceFac (kStrategy strat, lists FL)
       kStrategy n=strat;
       if (i>=1)
       {
-        n=kStratCopy(strat);
+        n=kStratCopy(strat); // includes: memset(&n->P,0,sizeof(n->P));
         n->next=strat->next;
         strat->next=n;
       }
-      memset(&n->P,0,sizeof(n->P));
 
       n->P.p=fac->m[i];
       n->initEcart(&n->P);
@@ -569,11 +569,10 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
         kStrategy n=strat;
         if (i>=1)
         {
-          n=kStratCopy(strat);
+          n=kStratCopy(strat); // includes memset(&n->P,0,sizeof(n->P));
           n->next=strat->next;
           strat->next=n;
         }
-        memset(&n->P,0,sizeof(n->P));
 
         n->P.p=fac->m[i];
         n->initEcart(&n->P);
@@ -729,6 +728,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
 #ifdef KDEBUG
     strat->P.lcm=NULL;
 #endif
+    kTest_TS(strat);
     if ((strat->Ll==-1) && (strat->sl>=0))
     {
       if (TEST_OPT_REDSB) completeReduceFac(strat,FL);
