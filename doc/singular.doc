@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.32 1998-05-19 14:32:12 Singular Exp $
+@comment $Id: singular.doc,v 1.33 1998-05-19 15:59:51 wichmann Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -60,17 +60,18 @@ q:quit, m:menu item, n:next node, p:previous node, u:up, g:goto node
 @center Centre for Computer Algebra
 @end ifinfo
 @menu
-* Preface::
-* Introduction::
-* General concepts::
-* Data types::
-* Functions and system variables::
-* Tricks and pitfalls::
-* Examples::
-* Mathematical background::
-* SINGULAR libraries::
-* Library function index::
-* Index::
+* Preface::                     
+* Introduction::                
+* General concepts::            
+* Data types::                  
+* Functions and system variables::  
+* Tricks and pitfalls::         
+* Examples::                    
+* Polynomial data::             
+* Mathematical background::     
+* SINGULAR libraries::          
+* Library function index::      
+* Index::                       
 @end menu
 @c ----------------------------------------------------------------------------
 @node Preface, Introduction, Top, Top
