@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys0.cc,v 1.5 1997-07-02 16:44:14 Singular Exp $ */
+/* $Id: polys0.cc,v 1.6 1997-11-19 13:08:11 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to convert polynomials to strings
@@ -26,10 +26,13 @@ static void writemon(poly p, int ko)
 {
   BOOLEAN wroteCoef=FALSE,writeGen=FALSE;
 
-  if ((pIsConstantComp(p))
+  nNormalize(pGetCoeff(p));
+
+  if (((pGetComp(p) == (short)ko)
+    &&(pIsConstantComp(p)))
   || ((!nIsOne(pGetCoeff(p)))
-      && (!nIsMOne(pGetCoeff(p)))
-    )
+    && (!nIsMOne(pGetCoeff(p)))
+  )
 #ifdef DRING
   || (pDRING && pdIsConstantComp(p))
 #endif
@@ -51,7 +54,7 @@ static void writemon(poly p, int ko)
     if ((!pDRING)||(i!=2*pdN))
 #endif
     {
-      short ee = p->exp[i+1];
+      short ee = pGetExp(p,i+1);
       if (ee!=0)
       {
         if (wroteCoef)
@@ -78,10 +81,10 @@ static void writemon(poly p, int ko)
       }
     }
   }
-  if (p->exp[0] != (short)ko)
+  if (pGetComp(p) != (short)ko)
   {
     if (writeGen) StringAppendS("*");
-    StringAppend("gen(%d)", p->exp[0]);
+    StringAppend("gen(%d)", pGetComp(p));
   }
 }
 
