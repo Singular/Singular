@@ -137,6 +137,9 @@ char *strstr(const char *haystack, const char *needle);
 /*******************************************************************
  * Miscellanous Defines 
  ******************************************************************/
+/* define YYDEBUG 1 for debugging bison texts, 0 otherwise */
+#define YYDEBUG 0
+
 #ifndef FALSE
 #define FALSE       0
 #endif
@@ -161,6 +164,9 @@ char *strstr(const char *haystack, const char *needle);
 
 #define memcpy4 memcpy
 
+/* define OLD_RES for res/sres/mres(i,j,k) */
+#undef OLD_RES
+
 /* the maximal ascii length of an int number + 1 = 11 for 32 bit int */
 #define MAX_INT_LEN 11
 extern int pShortOut;
@@ -172,8 +178,6 @@ extern int pShortOut;
  ******************************************************************/
 #ifndef NDEBUG 
 
-/* define YYDEBUG 1 for debugging bison texts, 0 otherwise */
-#define YYDEBUG 0
 /* define MDEBUG 0 for checking Alloc/Free */
 #define MDEBUG 0
 /* define MDEBUG 1 for allowing to keep track of Alloc/Free */
@@ -194,8 +198,6 @@ extern int pShortOut;
 #define RDEBUG 
 /* define TEST for non time critical tests, undefine otherwise */
 #define TEST
-/* define OLD_RES for res/sres/mres(i,j,k) */
-#define OLD_RES
 /* define MM_COUNT 1 for use of "memory(0/1)", undefine otherwise */
 #define MM_COUNT 1
 /* define MM_STAT for printing block stats */
