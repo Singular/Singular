@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: gcd.m4,v 1.5 1997-11-05 16:26:23 schmidt Exp $ */
+/* $Id: gcd.m4,v 1.6 1997-11-21 11:22:42 schmidt Exp $ */
 
 ftestSetNameOfGame( gcd, `"
 Usage: gcd [<options>] [<envSpec>] <f> <g> [<realResult>]
@@ -43,22 +43,30 @@ gcdCheck ( const CanonicalForm & f, const CanonicalForm & g, const CanonicalForm
 	    return Passed;
 	else if ( -realResult == result )
 	    return Passed;
-	else
+	else {
+	    ftestError( CheckError, "result and real result differ\n" );
 	    return Failed;
+	}
 
     if ( result.isZero() )
 	if ( f.isZero() && g.isZero() )
 	    return Passed;
-	else
+	else {
+	    ftestError( CheckError, "result is zero but f and g are not\n" );
 	    return Failed;
+	}
 
     if ( divides( result, f ) && divides( result, g ) )
 	if ( gcd( f/result, g/result ).isOne() )
 	    return Passed;
-	else
+	else {
+	    ftestError( CheckError, "result is not greatest common divisor\n" );
 	    return Failed;
-    else
+	}
+    else {
+	ftestError( CheckError, "result is not a common divisor\n" );
 	return Failed;
+    }
 }
 //}}}
 
@@ -89,7 +97,8 @@ main ( int argc, char ** argv )
 	result = gcd( f, g ); );
 
     // do the check
-    ftestCheck( gcdCheck( f, g, result, realResult ) );
+    ftestCheck(
+	gcdCheck( f, g, result, realResult ) );
 
     // print results
     ftestOutput( "gcd(f, g)", result );
