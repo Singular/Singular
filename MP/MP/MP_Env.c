@@ -56,7 +56,7 @@
  ***************************************************************************/
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_Env.c,v 1.2 1997-06-05 16:38:52 obachman Exp $";
+static char vcid[] = "@(#) $Id: MP_Env.c,v 1.3 1997-06-28 13:30:25 obachman Exp $";
 #endif /*lint */
 
 #include <values.h>  /* to figure out if we use IEEE or not */
@@ -69,6 +69,14 @@ static char vcid[] = "@(#) $Id: MP_Env.c,v 1.2 1997-06-05 16:38:52 obachman Exp 
 #ifndef __WIN32__
 #include <unistd.h>
 #include <stdlib.h>
+#ifdef __cplusplus
+extern "C" 
+{
+#endif  
+#include <sys/stat.h>
+#ifdef __cplusplus
+}
+#endif
 #endif  /* __WIN32__ */
 
 #ifdef __WIN32__
@@ -155,7 +163,6 @@ MP_Status_t open_logfile(env)
     {
       fclose(env->logfd);
 #else
-#include <sys/stat.h>      
       struct stat buf;
       
       while ((stat(fname, &buf) == 0) && (ext < 100000))

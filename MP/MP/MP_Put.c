@@ -77,7 +77,7 @@
 
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_Put.c,v 1.1.1.1 1997-05-25 20:31:46 obachman Exp $";
+static char vcid[] = "@(#) $Id: MP_Put.c,v 1.2 1997-06-28 13:30:27 obachman Exp $";
 #endif /* lint */
 
 #include "MP.h"
@@ -981,22 +981,22 @@ MP_Status_t MP_PutApRealPacket(link, apreal, num_annots)
 
 #ifdef __STDC__
 MP_Status_t MP_PutBooleanPacket(MP_Link_pt    link,
-                                MP_Boolean_t  bool,
+                                MP_Boolean_t  mbool,
                                 MP_NumAnnot_t num_annots)
 #else
-MP_Status_t MP_PutBooleanPacket(link, bool, num_annots)
+MP_Status_t MP_PutBooleanPacket(link, mbool, num_annots)
     MP_Link_pt    link;
-    MP_Boolean_t  bool;
+    MP_Boolean_t  mbool;
     MP_NumAnnot_t num_annots;
 #endif
 {
-    if (!imp_put_node_header(link, MP_BooleanType, 0, bool, num_annots, 0))
+    if (!imp_put_node_header(link, MP_BooleanType, 0, mbool, num_annots, 0))
         return MP_SetError(link, MP_CantPutNodePacket);
 
 #ifndef NO_LOGGING
     if (link->logmask & MP_LOG_WRITE_EVENTS)
         log_fixnum(link, MP_WRITE_EVENT, "Boolean_NP", MP_BooleanType,
-                   num_annots, &bool);
+                   num_annots, &mbool);
 #endif
 
     return MP_ClearError(link);
@@ -1004,20 +1004,20 @@ MP_Status_t MP_PutBooleanPacket(link, bool, num_annots)
 
 
 #ifdef __STDC__
-MP_Status_t IMP_PutBoolean(MP_Link_pt link, MP_Boolean_t bool)
+MP_Status_t IMP_PutBoolean(MP_Link_pt link, MP_Boolean_t mbool)
 #else
-MP_Status_t IMP_PutBoolean(link, bool)
+MP_Status_t IMP_PutBoolean(link, mbool)
     MP_Link_pt   link;
-    MP_Boolean_t bool;
+    MP_Boolean_t mbool;
 #endif
 {
-    if (!imp_put_node_header(link, MP_BooleanType, 0, bool, 0, 0))
+    if (!imp_put_node_header(link, MP_BooleanType, 0, mbool, 0, 0))
         return MP_SetError(link, MP_CantPutDataPacket);
 
 #ifndef NO_LOGGING
     if (link->logmask & MP_LOG_WRITE_EVENTS)
         log_fixnum(link, MP_WRITE_EVENT, "Boolean_DP", MP_BooleanType, 0,
-                   &bool);
+                   &mbool);
 #endif
 
     return MP_ClearError(link);

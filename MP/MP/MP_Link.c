@@ -138,7 +138,7 @@
  */
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_Link.c,v 1.1.1.1 1997-05-25 20:31:46 obachman Exp $";
+static char vcid[] = "@(#) $Id: MP_Link.c,v 1.2 1997-06-28 13:30:26 obachman Exp $";
 #endif /* lint */
 
 #include "MP.h"
@@ -541,6 +541,7 @@ int MP_SetLinkOption(link, option, value)
         break;
 
     case MP_LINK_LOG_MASK_OPT:
+        oldval = link->logmask;
         switch (value) {
         case MP_LOG_READ_EVENTS:
         case MP_LOG_WRITE_EVENTS:
