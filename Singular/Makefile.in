@@ -208,7 +208,7 @@ endif
 
 SLIB0 = COPYING \
 	ainvar.lib   alexpoly.lib  algebra.lib   all.lib       brnoeth.lib \
-        classify.lib \
+        classify.lib control.lib \
         deform.lib   elim.lib      equising.lib  finvar.lib    gmspoly.lib \
         gmssing.lib \
         general.lib  graphics.lib  groups.lib    hnoether.lib  homolog.lib  \
