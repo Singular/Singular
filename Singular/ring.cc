@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.167 2001-07-30 08:02:39 mschulze Exp $ */
+/* $Id: ring.cc,v 1.168 2001-07-30 08:48:36 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -127,6 +127,7 @@ void rSetHdl(idhdl h)
   if (sLastPrinted.RingDependend())
   {
     sLastPrinted.CleanUp();
+    memset(&sLastPrinted,0,sizeof(sleftv));
   }
 
    /*------------ change the global ring -----------------------*/
@@ -145,6 +146,7 @@ idhdl rDefault(char *s)
   if (sLastPrinted.RingDependend())
   {
     sLastPrinted.CleanUp();
+    memset(&sLastPrinted,0,sizeof(sleftv));
   }
 
   ring r = IDRING(tmp);
@@ -2029,7 +2031,7 @@ BOOLEAN rOrd_SetCompRequiresSetm(ring r)
 }
 
 // return TRUE if p->exp[r->pOrdIndex] holds total degree of p */
-BOOLEAN rOrd_is_Totaldegree_Ordering(ring r =currRing)
+BOOLEAN rOrd_is_Totaldegree_Ordering(ring r)
 {
   // Hmm.... what about Syz orderings?
   return (r->N > 1 &&
@@ -2736,13 +2738,11 @@ static void rHighSet(ring r, int o_r, int o)
       break;
     case ringorder_ws:
     case ringorder_Ws:
+      if (r->wvhdl[o]!=NULL)
       {
-        if (r->wvhdl[o]!=NULL)
-        {
-          int i;
-          for(i=r->block1[o]-r->block0[o];i>=0;i--)
-            if (r->wvhdl[o][i]<0) { r->MixedOrder=TRUE; break; }
-        }
+        int i;
+        for(i=r->block1[o]-r->block0[o];i>=0;i--)
+          if (r->wvhdl[o][i]<0) { r->MixedOrder=TRUE; break; }
       }
       break;
     case ringorder_c:
@@ -3441,9 +3441,9 @@ void rDebugPrint(ring r)
   PrintS("varoffset:\n");
   if (r->VarOffset==NULL) PrintS(" NULL\n");
   else
-     for(j=0;j<=r->N;j++) 
-       Print("  v%d at e-pos %d, bit %d\n",
-             j,r->VarOffset[j] & 0xffffff, r->VarOffset[j] >>24);
+    for(j=0;j<=r->N;j++)
+      Print("  v%d at e-pos %d, bit %d\n",
+            j,r->VarOffset[j] & 0xffffff, r->VarOffset[j] >>24);
   Print("divmask=%p\n", r->divmask);
   PrintS("ordsgn:\n");
   for(j=0;j<r->CmpL_Size;j++)
@@ -3925,7 +3925,7 @@ lists rDecompose(ring r)
   {
     LL->m[i].rtyp=STRING_CMD;
     LL->m[i].data=(void *)omStrDup(r->names[i]);
-  }  
+  }
   // ----------------------------------------
   LL=(lists)omAlloc0Bin(slists_bin);
   L->m[2].rtyp=LIST_CMD;
@@ -3962,7 +3962,7 @@ lists rDecompose(ring r)
           break;
         default: /* do nothing */;
       }
-    }  
+    }
     LL->m[i].data=(void *)LLL;
   }
   // ----------------------------------------
