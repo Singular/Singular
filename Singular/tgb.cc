@@ -95,7 +95,7 @@ static int red_object_better_gen(const void* ap, const void* bp)
 {
 
 
-  return(pLmCmp(((red_object*) ap)->lt,((red_object*) bp)->lt));
+  return(pLmCmp(((red_object*) ap)->p,((red_object*) bp)->p));
 }
 static int pair_better_gen2(const void* ap,const void* bp){
   return(-pair_better_gen(ap,bp));
@@ -103,7 +103,7 @@ static int pair_better_gen2(const void* ap,const void* bp){
 static int kFindDivisibleByInS_easy(kStrategy strat,const red_object & obj){
   int i;
   long not_sev=~obj.sev;
-  poly p=obj.lt;
+  poly p=obj.p;
   for(i=0;i<=strat->sl;i++){
     if (pLmShortDivisibleBy(strat->S[i],strat->sevS[i],p,not_sev))
       return i;
@@ -327,18 +327,6 @@ BOOLEAN good_has_t_rep(int i, int j,calc_dat* c){
 
   pLcm(c->S->m[i], c->S->m[j], lm);
   pSetm(lm);
-  int z;
-//chain criterion
-//   unsigned long sev=pGetShortExpVector(lm);
-//   for(z=0;z<c->n;z++)
-//   {
-//     if ((has_t_rep(z,i,c) &&(has_t_rep(z,j,c))) && (p_LmShortDivisibleBy(c->S->m[z],c->short_Exps[z],lm,~sev,c->r)))
-//     {
-      
-//       pDelete(&lm);
-//       return TRUE;
-//     }
-//   }
   assume(lm!=NULL);
   int deciding_deg= pTotaldegree(lm);
   int* i_con =make_connections(i,j,lm,c);
@@ -1259,7 +1247,7 @@ int mac_length(mac_poly p){
 BOOLEAN is_valid_ro(red_object & ro){
   red_object r2=ro;
   ro.validate();
-  if ((r2.lt!=ro.lt)||(r2.sev!=ro.sev)||(r2.sum!=ro.sum)) return FALSE;
+  if ((r2.p!=ro.p)||(r2.sev!=ro.sev)||(r2.sum!=ro.sum)) return FALSE;
   return TRUE;
 }
 void pre_comp(poly* p,int & pn,calc_dat* c){
@@ -1452,15 +1440,12 @@ static void go_on (calc_dat* c){
   c->normal_forms+=i;
   int j;
   for(j=0;j<i;j++){
- 
+    buf[j].p=p[j];
     buf[j].sev=pGetShortExpVector(p[j]);
-    
     buf[j].sum=NULL;
     buf[j].bucket = kBucketCreate(currRing);
     int len=pLength(p[j]);
-    kBucketInit(buf[j].bucket,p[j],len);
-    // buf[j].coef=nInit(1);
-    buf[j].lt=kBucketGetLm(buf[j].bucket);
+    kBucketInit(buf[j].bucket,buf[j].p,len);
   }
   omfree(p);
   qsort(buf,i,sizeof(red_object),red_object_better_gen);
@@ -2238,7 +2223,7 @@ static poly kBucketGcd(kBucket* b, ring r)
 
 
 static int guess_quality(const red_object & p, calc_dat* c){
-  //looks only on bucket //why???????????????????????????????????????????
+  //looks only on bucket
   if (c->is_char0) return kSBucketLength(p.bucket);
   return (bucket_guess(p.bucket));
 }
@@ -2248,18 +2233,26 @@ static int quality_of_pos_in_strat_S(int pos, calc_dat* c){
 }
 static int quality(poly p, int len, calc_dat* c){
   if (c->is_char0) return pSLength(p,len);
-  return len;
+  return pLength(p);
 }
 static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find_erg & erg){
   erg.expand=NULL;
   BOOLEAN swap_roles; //from reduce_by, to_reduce_u if fromS
   if(erg.fromS){
-    if(pLmEqual(c->strat->S[erg.reduce_by],los[erg.to_reduce_u].lt))
+    if(pLmEqual(c->strat->S[erg.reduce_by],los[erg.to_reduce_u].p))
     {
       int i;
       int quality_a=quality_of_pos_in_strat_S(erg.reduce_by,c);
       int best=erg.to_reduce_u+1;
-
+/*
+      for (i=erg.to_reduce_u;i>=erg.to_reduce_l;i--){
+	int qc=los[i].guess_quality(c);
+	if (qc<quality_a){
+	  best=i;
+	  quality_a=qc;
+	}
+      }
+      if(best!=erg.to_reduce_u+1){*/
       int qc;
       best=find_best(los,erg.to_reduce_l,erg.to_reduce_u,qc,c);
       assume(qc==los[best].guess_quality(c));
@@ -2353,13 +2346,13 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
     }
     else
     {
-      assume(!pLmEqual(los[erg.reduce_by].lt,los[erg.to_reduce_l].lt));
+      assume(!pLmEqual(los[erg.reduce_by].p,los[erg.to_reduce_l].p));
       //further assume, that reduce_by is the above all other polys
       //with same leading term
       int il=erg.reduce_by;
       int quality_a =los[erg.reduce_by].guess_quality(c);
       int qc;
-      while((il>0) && pLmEqual(los[il-1].lt,los[il].lt)){
+      while((il>0) && pLmEqual(los[il-1].p,los[il].p)){
 	il--;
 	qc=los[il].guess_quality(c);
 	if (qc<quality_a){
@@ -2379,11 +2372,11 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
     int bp=erg.to_reduce_u;//bucket_positon
     //kBucketClear(los[bp].bucket,&clear_into,&new_length);
     new_length=los[bp].clear_to_poly();
-    clear_into=los[bp].lt;
+    clear_into=los[bp].p;
     poly p=c->strat->S[erg.reduce_by];
     int j=erg.reduce_by;
     int old_length=c->strat->lenS[j];// in view of S
-    los[bp].lt=p;
+    los[bp].p=p;
     kBucketInit(los[bp].bucket,p,old_length);
     int qal=quality(clear_into,new_length,c);
     int pos_in_c=-1;    
@@ -2426,12 +2419,12 @@ static void multi_reduction_find(red_object* los, int losl,calc_dat* c,int start
   kStrategy strat=c->strat;
 
   assume(startf<=losl);
-  assume((startf==losl-1)||(pLmCmp(los[startf].lt,los[startf+1].lt)==-1));
+  assume((startf==losl-1)||(pLmCmp(los[startf].p,los[startf+1].p)==-1));
   int i=startf;
   
   int j;
   while(i>=0){
-    assume((i==losl-1)||(pLmCmp(los[i].lt,los[i+1].lt)<=0));
+    assume((i==losl-1)||(pLmCmp(los[i].p,los[i+1].p)<=0));
     assume(is_valid_ro(los[i]));
     j=kFindDivisibleByInS_easy(strat,los[i]);
     if(j>=0){
@@ -2441,15 +2434,12 @@ static void multi_reduction_find(red_object* los, int losl,calc_dat* c,int start
       erg.fromS=TRUE;
       int i2;
       for(i2=i-1;i2>=0;i2--){
-	if(!pLmEqual(los[i].lt,los[i2].lt))
+	if(!pLmEqual(los[i].p,los[i2].p))
 	  break;
       }
       
       erg.to_reduce_l=i2+1;
-      assume((i==losl-1)||(pLmCmp(los[i].lt,los[i+1].lt)==-1));
-      int z;
-      for(z=erg.to_reduce_u+1;z<=startf;z++)
-	los[i].flatten();
+      assume((i==losl-1)||(pLmCmp(los[i].p,los[i+1].p)==-1));
       return;
     }
     if (j<0){
@@ -2457,7 +2447,7 @@ static void multi_reduction_find(red_object* los, int losl,calc_dat* c,int start
       //not reduceable, try to use this for reducing higher terms
       int i2;
       i2=i;
-      while((i2>0)&&(pLmEqual(los[i].lt,los[i2-1].lt)))
+      while((i2>0)&&(pLmEqual(los[i].p,los[i2-1].p)))
 	i2--;
       if(i2!=i){
 	
@@ -2465,27 +2455,21 @@ static void multi_reduction_find(red_object* los, int losl,calc_dat* c,int start
 	erg.to_reduce_l=i2;
 	erg.reduce_by=i;
 	erg.fromS=FALSE;
-	assume((i==losl-1)||(pLmCmp(los[i].lt,los[i+1].lt)==-1));
-	int z;
-	for(z=erg.to_reduce_u+1;z<=startf;z++)
-	  los[i].flatten();
+	assume((i==losl-1)||(pLmCmp(los[i].p,los[i+1].p)==-1));
 	return;
       }
  
       for (i2=i+1;i2<losl;i2++){
-	if (p_LmShortDivisibleBy(los[i].lt,los[i].sev,los[i2].lt,~los[i2].sev,
+	if (p_LmShortDivisibleBy(los[i].p,los[i].sev,los[i2].p,~los[i2].sev,
 				c->r)){
 	  int i3=i2;
-	  while((i3+1<losl) && (pLmEqual(los[i2].lt, los[i3+1].lt)))
+	  while((i3+1<losl) && (pLmEqual(los[i2].p, los[i3+1].p)))
 	    i3++;
 	  erg.to_reduce_u=i3;
 	  erg.to_reduce_l=i2;
 	  erg.reduce_by=i;
 	  erg.fromS=FALSE;
-	  assume((i==losl-1)||(pLmCmp(los[i].lt,los[i+1].lt)==-1));
-	  int z;
-	  for(z=erg.to_reduce_u+1;z<=startf;z++)
-	    los[i].flatten();
+	  assume((i==losl-1)||(pLmCmp(los[i].p,los[i+1].p)==-1));
 	  return;
 	}
 //	else {assume(!p_LmDivisibleBy(los[i].p, los[i2].p,c->r));}
@@ -2512,7 +2496,7 @@ static int multi_reduction_clear_zeroes(red_object* los, int  losl, int l, int u
   while(i<=u)
   {
     
-    if(los[i].lt==NULL){
+    if(los[i].p==NULL){
       kBucketDestroy(&los[i].bucket);
 //      delete los[i];//here we assume los are constructed with new
       //destroy resources, must be added here   
@@ -2542,7 +2526,7 @@ static void sort_region_down(red_object* los, int l, int u, calc_dat* c)
     int j;
     for(j=i;j;j--)
     {
-      if(pLmCmp(los[j].lt,los[j-1].lt)==-1){
+      if(pLmCmp(los[j].p,los[j-1].p)==-1){
 	red_object h=los[j];
 	los[j]=los[j-1];
 	los[j-1]=h;
@@ -2563,9 +2547,9 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c)
   assume(losl>0);
   int i;
   for(i=0;i<losl;i++){
-    los[i].sev=pGetShortExpVector(los[i].lt);
+    los[i].sev=pGetShortExpVector(los[i].p);
 //SetShortExpVector();
-    los[i].lt=kBucketGetLm(los[i].bucket);
+    los[i].p=kBucketGetLm(los[i].bucket);
   }
 
   kStrategy strat=c->strat;
@@ -2590,8 +2574,40 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c)
     erg.expand=NULL;
     int d=erg.to_reduce_u-erg.to_reduce_l+1;
     //if ((!erg.fromS)&&(d>100)){
-    
-    
+    if (0){
+      PrintS("L");
+      if(!erg.fromS){
+	erg.to_reduce_u=max(erg.to_reduce_u,erg.reduce_by);
+	if (pLmEqual(los[erg.reduce_by].p,los[erg.to_reduce_l].p))
+	  erg.to_reduce_l=min(erg.to_reduce_l,erg.reduce_by);
+      }
+      int pn=erg.to_reduce_u+1-erg.to_reduce_l;
+      poly* p=(poly*) omalloc((pn)*sizeof(poly));
+      int i;
+      for(i=0;i<pn;i++){
+	int len;
+	los[erg.to_reduce_l+i].flatten();
+	kBucketClear(los[erg.to_reduce_l+i].bucket,&p[i],&len);
+	
+	redTailShort(p[i],c->strat);
+      }
+      pre_comp(p,pn,c);
+      int j;
+      for(j=0;j<pn;j++){
+	los[erg.to_reduce_l+j].p=p[j];
+	los[erg.to_reduce_l+j].sev=pGetShortExpVector(p[j]);
+	los[erg.to_reduce_l+j].sum=NULL;
+	int len=pLength(p[j]);
+	kBucketInit(los[erg.to_reduce_l+j].bucket,los[erg.to_reduce_l+j].p,len);
+      }
+      for(j=erg.to_reduce_l+pn;j<=erg.to_reduce_u;j++){
+	los[j].p=NULL;
+	
+      }
+
+      omfree(p);
+    }
+    else {
     multi_reduction_lls_trick(los,losl,c,erg);
     int sum=0;
 
@@ -2600,7 +2616,7 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c)
     int len;
     
     multi_reduce_step(erg,los,c);
-    
+    }
 //     reduction_step *rs=create_reduction_step(erg, los, c);
 //     rs->reduce(los,erg.to_reduce_l,erg.to_reduce_u);
 //     finalize_reduction_step(rs);
@@ -2620,190 +2636,94 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c)
   return;
 }
 void red_object::flatten(){
-//momentan in Bearbeitung
-
-  formal_sum_descriptor* s=sum;
-  if(sum!=NULL){
-    number mult_my=nInit(1);//coef;
-    while(s!=NULL){
-      number n_m_m=nMult(mult_my,s->ac->multiplied);
-      nDelete(&mult_my);
-      mult_my=n_m_m;
-      s=s->next;
-    }
-
-    if(!nIsOne(mult_my))
-      kBucket_Mult_n(bucket,mult_my);
-    
-  }
-  s=sum;
-  while (s!=NULL)
+  if (sum!=NULL)
   {
-    number mult_my=s->c_ac;
-    formal_sum_descriptor* s2 =sum;
-    while(s2!=NULL){
-      if(s==s2) {s2=s2->next;continue;}
-      number n_m_m=nMult(mult_my,s2->ac->multiplied);
-      nDelete(&mult_my);
-      mult_my=n_m_m;
-      s2=s2->next;
 
-    }
-    if(kBucketGetLm(s->ac->bucket)!=NULL){
-
+ 
+    if(kBucketGetLm(sum->ac->bucket)!=NULL){
+      number mult_my=n_Mult(sum->c_my,sum->ac->multiplied,currRing);
       poly add_this;
-   
+      if(!nIsOne(mult_my))
+	kBucket_Mult_n(bucket,mult_my);
       int len;
       poly clear_into;
-      kBucketClear(s->ac->bucket,&clear_into,&len);
-      if(s->ac->counter>1){
+      kBucketClear(sum->ac->bucket,&clear_into,&len);
+      if(sum->ac->counter>1){
 	add_this=pCopy(clear_into);
-	kBucketInit(s->ac->bucket,clear_into,len);
+	kBucketInit(sum->ac->bucket,clear_into,len);
       }
       else
 	add_this=clear_into;
-      pMult_nn(add_this, mult_my);
+      pMult_nn(add_this, sum->c_ac);
       
       kBucket_Add_q(bucket,add_this, &len);
-      nDelete(&mult_my);
+       nDelete(&mult_my);
      
     }
-
-
+    nDelete(&sum->c_ac);
+    nDelete(&sum->c_my);
    
-    s=s->next;
+    sum->ac->decrease_counter();
+    delete sum;
+    p=kBucketGetLm(bucket);
+    sum=NULL;
   }
-  s=sum;
-  while(s!=NULL){
-    formal_sum_descriptor* s2 =s;
-    s->ac->decrease_counter();
-    s=s->next;
-    
-    delete s2;
-
-    //coeff was deleted earlier in this procedure
-  }
-  sum=NULL;
-
- 
-   
-
-
-  lt=kBucketGetLm(bucket);
-  assume(lt==kBucketGetLm(bucket));
+  assume(p==kBucketGetLm(bucket));
   assume(sum==NULL);
-  //coef=nInit(1);
- 
-}
-void red_object::execute_addition(formal_sum_descriptor* s2){
-	
-	  
-  poly add_this;
-  
-  int len;
-  poly clear_into;
-  kBucketClear(s2->ac->bucket,&clear_into,&len);
-  if(s2->ac->counter>1){
-    add_this=pCopy(clear_into);
-	    kBucketInit(s2->ac->bucket,clear_into,len);
-  }
-  else
-    add_this=clear_into;
-  pMult_nn(add_this, s2->c_ac);
-  kBucket_Mult_n(bucket,s2->ac->multiplied);
-  formal_sum_descriptor* s3 =sum;
-  while(s3){
-
-    if(s3==s2){s3=s3->next; continue;}
-    number ns3=s3->c_ac;
-    s3->c_ac=nMult(ns3,s2->ac->multiplied);
-    nDelete(&ns3);
-    s3=s3->next;
-  }
-//  kBucket_Mult_n(bucket,coef);
-  //nDelete(&coef);
-  //coef=nInit(1);
-  kBucket_Add_q(bucket,add_this, &len);
-
-  
-  formal_sum_descriptor** s_p;
-  s_p=&sum;
-  while(1)
-  {
-    if(*s_p==s2)
-      {
-      *s_p=s2->next;
-      break;
-      }
-    else s_p=&((*s_p)->next);
-  }
-  nDelete(&s2->c_ac);
-  s2->ac->decrease_counter();
-  delete s2;
-//  validate();
 }
 void red_object::validate(){
-  //new implementation start
-  BOOLEAN inc=TRUE;
-  formal_sum_descriptor* s =sum;
-  while(s)
+  BOOLEAN flattened=FALSE;
+  if(sum!=NULL)
   {
-    
-    inc=TRUE;
-    formal_sum_descriptor* s2 =s->next;
-    if((kBucketGetLm(s->ac->bucket)==NULL)||(pLmEqual(kBucketGetLm(s->ac->bucket),kBucketGetLm(bucket))))
+    poly lm=kBucketGetLm(bucket);
+    poly lm_ac=kBucketGetLm(sum->ac->bucket);
+    if ((lm_ac==NULL)||((lm!=NULL) && (pLmCmp(lm,lm_ac)!=-1))){
+      flatten();
+      assume(sum==NULL);
+      flattened=TRUE;
+      p=kBucketGetLm(bucket);
+      if (p!=NULL)
+	sev=pGetShortExpVector(p);
+    } 
+    else
     {
-      execute_addition(s);
-      s=sum; continue;
+ 
+      p=lm_ac;
+      assume(sum->ac->sev==pGetShortExpVector(p));
+      sev=sum->ac->sev;
     }
     
-      s2=s->next;
-    
-    while(s2)
-    {
-      
-      if(pLmEqual(kBucketGetLm(s2->ac->bucket),kBucketGetLm(s->ac->bucket)))
-      {
-	execute_addition(s2);
-	s=sum;
-	s2=s->next;
-	inc=FALSE;
-	break;
-      }
-      else
-	s2=s2->next;
-    }
-    if (inc)
-    s=s->next;
   }
-  lt=kBucketGetLm(bucket);
-  s=sum;
-  while(s)
-  {
-    if ((lt==NULL)||(pLmCmp(lt,kBucketGetLm(s->ac->bucket))==-1))
-    {  
-      lt=kBucketGetLm(s->ac->bucket);
-      sev=s->ac->sev;
-    }
-   
-    s=s->next;
+  else{
+    p=kBucketGetLm(bucket);
+    if(p)
+    sev=pGetShortExpVector(p);
   }
-  if((lt!=NULL)&&(lt==kBucketGetLm(bucket))){
-    sev=pGetShortExpVector(lt);
-  }
+  assume((sum==NULL)||(kBucketGetLm(sum->ac->bucket)!=NULL));
 }
-  //new implementation end
-
 int red_object::clear_to_poly(){
   flatten();
   int l;
-  kBucketClear(bucket,&lt,&l);
+  kBucketClear(bucket,&p,&l);
   return l;
 }
 
   
 
+void red_object::adjust_coefs(number c_r, number c_ac_r){
+  assume(this->sum!=NULL);
+  number n1=nMult(sum->c_my, c_ac_r);
+  number n2=nMult(sum->c_ac,c_r);
+  nDelete(&sum->c_my);
+  nDelete(&sum->c_ac);
+ 
+  int ct = ksCheckCoeff(&n1, &n2);
+  sum->c_my=n1;
+  sum->c_ac=nNeg(n2);
+  nDelete(&n2);
+  
 
+}
 int red_object::guess_quality(calc_dat* c){
     //works at the moment only for lenvar 1, because in different
     //case, you have to look on coefs
@@ -2812,64 +2732,41 @@ int red_object::guess_quality(calc_dat* c){
       s=kSBucketLength(bucket);
     else 
       s=bucket_guess(bucket);
-    formal_sum_descriptor* si =sum;
-    while(si){
+    if (sum!=NULL){
       if (c->is_char0)
-	s+=kSBucketLength(si->ac->bucket);
-      else 
-	s+=bucket_guess(si->ac->bucket);
-      si=si->next;
+      s+=kSBucketLength(sum->ac->bucket);
+    else 
+      s+=bucket_guess(sum->ac->bucket);
     }
     return s;
 }
 void reduction_step::reduce(red_object* r, int l, int u){}
-void simple_reducer::target_lt_lies_in_privat(red_object & ro){
-  number n=kBucketPolyRed(ro.bucket,p,
+void simple_reducer::target_is_no_sum_reduce(red_object & ro){
+  kBucketPolyRed(ro.bucket,p,
 		 p_len,
 		 c->strat->kNoether);
-  formal_sum_descriptor* s =ro.sum;
-  while(s)
-  {
-    number n2=s->c_ac;
-    s->c_ac=nMult(n2,n);
-    nDelete(&n2);
-    s=s->next;
-  }
 }
 
 void simple_reducer::target_is_a_sum_reduce(red_object & ro){
   pTest(p);
   kbTest(ro.bucket);
-  formal_sum_descriptor* s=ro.sum;
-  while(s)
-  {
-    kbTest(ro.sum->ac->bucket);
-
-    if(pLmCmp(kBucketGetLm(s->ac->bucket),ro.lt)==0){
-    
-      // assume(ro.sum!=NULL);
-//  assume(s->ac!=NULL);
-      if(s->ac->last_reduction_id!=reduction_id){
-	number n1=kBucketPolyRed(s->ac->bucket,p, p_len, c->strat->kNoether);
-	number n2=nMult(n1,s->ac->multiplied);
-	nDelete(&s->ac->multiplied);
-	nDelete(&n1);
-	s->ac->multiplied=n2;
-	poly lm=kBucketGetLm(s->ac->bucket);
-	if (lm)
-	  s->ac->sev=pGetShortExpVector(lm);
-	s->ac->last_reduction_id=reduction_id;
-      }
-    }
-//  ro.sev=ro.sum->ac->sev;
-//ro.p=kBucketGetLm(ro.sum->ac->bucket);
-    
-  s=s->next;
+  kbTest(ro.sum->ac->bucket);
+  assume(ro.sum!=NULL);
+  assume(ro.sum->ac!=NULL);
+  if(ro.sum->ac->last_reduction_id!=reduction_id){
+    number n1=kBucketPolyRed(ro.sum->ac->bucket,p, p_len, c->strat->kNoether);
+    number n2=nMult(n1,ro.sum->ac->multiplied);
+    nDelete(&ro.sum->ac->multiplied);
+    nDelete(&n1);
+    ro.sum->ac->multiplied=n2;
+    poly lm=kBucketGetLm(ro.sum->ac->bucket);
+    if (lm)
+      ro.sum->ac->sev=pGetShortExpVector(lm);
+    ro.sum->ac->last_reduction_id=reduction_id;
   }
-  ro.validate();
-      
+  ro.sev=ro.sum->ac->sev;
+  ro.p=kBucketGetLm(ro.sum->ac->bucket);
 }
-
 void simple_reducer::reduce(red_object* r, int l, int u){
   this->pre_reduce(r,l,u);
   int i;
@@ -2884,14 +2781,14 @@ void simple_reducer::reduce(red_object* r, int l, int u){
   for(i=l;i<=u;i++){
   
 
-    if(r[i].lt==kBucketGetLm(r[i].bucket))
-      this->target_lt_lies_in_privat(r[i]);
+    if(r[i].sum==NULL)
+      this->target_is_no_sum_reduce(r[i]);
 
     else 
     {
       this->target_is_a_sum_reduce(r[i]);
       //reduce and adjust multiplied
-      //  r[i].sum->ac->last_reduction_id=reduction_id;
+      r[i].sum->ac->last_reduction_id=reduction_id;
       
     }
     //most elegant would be multimethods at this point and subclassing
@@ -2900,14 +2797,10 @@ void simple_reducer::reduce(red_object* r, int l, int u){
   }
   for(i=l;i<=u;i++){
     r[i].validate();
-   
-    red_object r2=r[i];      
-  r[i].validate();
+    #ifdef TGB_DEBUG
+    if (r[i].sum) r[i].sev=r[i].sum->ac->sev;
 
-assume(r2.lt==r[i].lt);
-assume(r2.sev==r[i].sev);
-assume(r2.sum==r[i].sum);
-  //   assume( is_valid_ro(r[i]));
+    #endif
       }
 }
 reduction_step::~reduction_step(){}
@@ -2950,7 +2843,7 @@ void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
     woc=TRUE;
     poly m=pOne();
     for(int i=1;i<=pVariables;i++)
-      pSetExp(m,i,(pGetExp(r[erg.to_reduce_l].lt, i)-pGetExp(red,i)));
+      pSetExp(m,i,(pGetExp(r[erg.to_reduce_l].p, i)-pGetExp(red,i)));
     pSetm(m);
     poly red_cp=ppMult_mm(red,m);
     
@@ -2977,11 +2870,11 @@ void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
   int red_c=0;
   if(red_len>2*c->average_length){
     for(i=erg.to_reduce_l;i<=erg.to_reduce_u;i++){
-      if(kBucketGetLm(r[i].bucket)==r[i].lt) red_c++;
+      if((r[i].sum==NULL) ||(r[i].sum->ac->counter<=AC_FLATTEN)) red_c++;
     }
   }
   if (red_c>=AC_NEW_MIN)
-    pointer=new join_simple_reducer(red,red_len,r[erg.to_reduce_l].lt);
+    pointer=new join_simple_reducer(red,red_len,r[erg.to_reduce_l].p);
   else
     pointer=new simple_reducer(red,red_len,c);
 
@@ -2998,12 +2891,10 @@ void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
   
 };
 
-void join_simple_reducer::target_lt_lies_in_privat(red_object & ro){
-  formal_sum_descriptor* s =ro.sum;
+void join_simple_reducer::target_is_no_sum_reduce(red_object & ro){
+  
   ro.sum=new formal_sum_descriptor();
-  ro.sum->next=s;
   ro.sum->ac=ac;
-
   ac->counter++;
   kBucket_pt bucket=ro.bucket;
   poly a1 = pNext(p), lm = kBucketExtractLm(bucket);
@@ -3014,16 +2905,8 @@ void join_simple_reducer::target_lt_lies_in_privat(red_object & ro){
   lm->next=NULL;
   int ct = ksCheckCoeff(&an, &bn);
   ro.sum->c_ac=nNeg(bn);
-  //ro.sum->c_my=an;
-  kBucket_Mult_n(bucket,an);
-  while(s!=NULL)
-  {
-    number ns=s->c_ac;
-    s->c_ac=nMult(ns,an);
-    nDelete(&ns);
-    s=s->next;
-  }
-//  assume(nIsZero(nAdd(nMult(ro.sum->c_my,lm->coef),nMult(p->coef,ro.sum->c_ac) )));
+  ro.sum->c_my=an;
+  assume(nIsZero(nAdd(nMult(ro.sum->c_my,lm->coef),nMult(p->coef,ro.sum->c_ac) )));
   if (p_GetComp(p, bucket->bucket_ring) != p_GetComp(lm, bucket->bucket_ring))
   {
     p_SetCompP(a1, p_GetComp(lm, bucket->bucket_ring), bucket->bucket_ring);
@@ -3044,13 +2927,15 @@ void join_simple_reducer::target_lt_lies_in_privat(red_object & ro){
   reduction_accumulator::reduction_accumulator(poly p, int p_len, poly high_to){
     //sev needs to be removed from interfaces,makes no sense
     
-
+    degbound(p);
+    degbound(p->next);
+    degbound(high_to);
     poly my=pOne();
     counter=0;
    
     for(int i=1;i<=pVariables;i++)
       pSetExp(my,i,(pGetExp(high_to, i)-pGetExp(p,i)));
-    
+    degbound(my);
    
    
     pSetm(my);
@@ -3058,7 +2943,7 @@ void join_simple_reducer::target_lt_lies_in_privat(red_object & ro){
     multiplied=nInit(1);
     bucket=kBucketCreate(currRing);
     poly a=pMult_mm(pCopy(p->next),my);
-    
+    degbound(a);
     this->sev=pGetShortExpVector(a);
     kBucketInit(bucket, a,p_len-1);
     pDelete(&my);
@@ -3067,26 +2952,8 @@ void simple_reducer:: pre_reduce(red_object* r, int l, int u){}
 void join_simple_reducer:: pre_reduce(red_object* r, int l, int u){
   for(int i=l;i<=u;i++)
     {
-      formal_sum_descriptor* s =r[i].sum;
-      if(kBucketGetLm(r[i].bucket)!=r[i].lt)
-      {
-	while(s)
-	{
-	  if(kBucketGetLm(s->ac->bucket)==r[i].lt)
-	  {
-	    if (s->ac->counter<=AC_FLATTEN)
-	    {
-	      r[i].execute_addition(s);
-	      r[i].validate();
-	    
-	   
-	    break;
-	    }
-	 
-	  }
-	   s=s->next;
-	}
-	
+      if (r[i].sum){
+	if(r[i].sum->ac->counter<=AC_FLATTEN) r[i].flatten();
 	
       }
     }
