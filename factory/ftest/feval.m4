@@ -1,8 +1,8 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: feval.m4,v 1.5 1998-01-06 11:11:36 schmidt Exp $ */
+/* $Id: feval.m4,v 1.6 1998-07-03 10:04:29 schmidt Exp $ */
 
 ftestSetNameOfGame( feval, `"
-Usage: feval [<options>] [<envSpec>] <f>
+Usage: feval [<options>] [<envSpec>] [expand=<n>] <f>
   evaluates canonical form <f>.
   In contrast to the other programs of the Factory Test
   Environment, f may span more than one argument.  More
@@ -10,6 +10,12 @@ Usage: feval [<options>] [<envSpec>] <f>
   then evaluated as one canonical form.  If there are not any
   arguments (except options), neither time nor status nor result
   nor data information is printed.
+
+  If the optional argument `expand' is given, <f> is printed
+  in a format dependent on <n>:
+  <n> = 0: print <f> in standard format (default)
+  <n> = 1: print <f> in NTL format, i.e., as a dense vector of
+           coefficients (for univariate polynomials only)
 "'`' )
 dnl // the trailing quotes at the end of the second argument
 dnl // are for font-lock only (another font-lock-trick)
@@ -49,11 +55,13 @@ Long usage not yet written, sorry.
     }
 
     // declare input and output variables
+    ftestInVar( int, expand );
     ftestOutVar( CanonicalForm, f );
 
     // process argument list and set environment
     ftestGetOpts();
     ftestGetEnv();
+    ftestGetInVar( expand, 0, "expand" );
 
     if ( argv[optind] ) {
 	int i = optind;
@@ -73,7 +81,7 @@ Long usage not yet written, sorry.
 	    optind++;
 	}
 	
-	f = ftestGetCanonicalForm( argString );
+	ftestReadString( argString, f );
 	delete [] argString;
 	ftestOutput( "f", f );
     }

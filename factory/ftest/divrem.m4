@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: divrem.m4,v 1.3 1998-07-03 09:28:03 schmidt Exp $ */
+/* $Id: divrem.m4,v 1.4 1998-07-03 10:04:15 schmidt Exp $ */
 
 ftestSetNameOfGame( divrem, `"
 Usage: divrem [<options>] [<envSpec>] <f> <g> [<divisionCheck>]
@@ -46,12 +46,12 @@ divremCheck ( const CanonicalForm & f, const CanonicalForm & g, const CanonicalF
 	    ftestError( CheckError, "q != f/g\n" );
 	    return Failed;
 	} else if ( r != f % g ) {
-	    ftestError( CheckError, "r != f%g\n" );
+	    ftestError( CheckError, "r != f%%g\n" );
 	    return Failed;
 	} else if ( f.inBaseDomain() && g.inBaseDomain() && getCharacteristic() == 0
 		    && (r < 0 || r > abs( g )) ) {
 	    // check euclidean division in Z
-	    ftestError( CheckError, "!(0 <= f%g < abs(g))\n" );
+	    ftestError( CheckError, "!(0 <= f%%g < abs(g))\n" );
 	    return Failed;
 	} else if ( f != g*q+r ) {
 	    ftestError( CheckError, "f != g*q+r\n" );
