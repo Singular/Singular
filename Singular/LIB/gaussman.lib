@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.79 2002-03-20 19:55:38 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.80 2002-03-26 12:57:54 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -21,7 +21,7 @@ PROCEDURES:
  sppnf(a,w[,m][,V]);        spectral pairs normal form of (a,w,m,V)
  vfilt(t);                  V-filtration of t on Brieskorn lattice
  vwfilt(t);                 weighted V-filtration of t on Brieskorn lattice
- tmatrix(t);                C{{s}}-matrix of t on Brieskorn lattice
+ tmatrix(t);                C[[s]]-matrix of t on Brieskorn lattice
  endvfilt(V);               endomorphism V-filtration on Jacobian algebra
  spprint(sp);               print spectrum sp
  sppprint(spp);             print spectral pairs spp
@@ -120,7 +120,7 @@ ring G;  Gauss-Manin system of t with variable s
   ideal gmsbasis;  monomial vector space basis of Jacobian algebra
   int gmsmaxdeg;  maximal weight of variables
 @end format
-NOTE:     gmsbasis is a C{{s}}-basis of H'' and [t,s]=s^2
+NOTE:     gmsbasis is a C[[s]]-basis of H'' and [t,s]=s^2
 KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice
 EXAMPLE:  example gmsring; shows examples
 "
@@ -218,7 +218,7 @@ ASSUME:   basering returned by gmsring
 RETURN:
 @format
 list nf;
-  ideal nf[1];  projection of p to C{{s}}*gmsbasis mod s^(K+1)
+  ideal nf[1];  projection of p to C[[s]]*gmsbasis mod s^(K+1)
   ideal nf[2];  p==nf[1]+nf[2]
 @end format
 NOTE:     computation can be continued by setting p=nf[2]
@@ -298,7 +298,7 @@ ASSUME:   basering constructed by gmsring
 RETURN:
 @format
 list l;
-  matrix l[1];  C{{s}}-basis representation of p mod s^(K+1)
+  matrix l[1];  C[[s]]-basis representation of p mod s^(K+1)
   ideal l[2];  p==matrix(gmsbasis)*l[1]+l[2]
 @end format
 NOTE:     computation can be continued by setting p=l[2]
@@ -1070,7 +1070,7 @@ ASSUME:   characteristic 0; local degree ordering;
           isolated critical point 0 of t
 RETURN:
 @format
-list A;  C{{s}}-matrix A[1]+s*A[2] of t on H''
+list A;  C[[s]]-matrix A[1]+s*A[2] of t on H''
   matrix A[1];
   matrix A[2];
 @end format
