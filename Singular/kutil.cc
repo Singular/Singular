@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.111 2002-06-17 16:46:54 Singular Exp $ */
+/* $Id: kutil.cc,v 1.112 2002-07-23 12:22:40 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -3062,22 +3062,15 @@ void initS (ideal F, ideal Q,kStrategy strat)
         cancelunit(&h);  /*- tries to cancel a unit -*/
         deleteHC(&h, strat);
       }
-      if (TEST_OPT_DEGBOUND
-          && (((strat->honey) && (h.ecart+pFDeg(h.p)>Kstd1_deg))
-              || ((!(strat->honey)) && (pFDeg(h.p)>Kstd1_deg))))
-        pDelete(&h.p);
-      else
-        if (h.p!=NULL)
-        {
-          if (strat->sl==-1)
-            pos =0;
-          else
-          {
-            pos = posInS(strat,strat->sl,h.p,h.ecart);
-          }
-          h.sev = pGetShortExpVector(h.p);
-          strat->enterS(h,pos,strat);
-        }
+      if (h.p!=NULL)
+      {
+        if (strat->sl==-1)
+          pos =0;
+        else
+          pos = posInS(strat,strat->sl,h.p,h.ecart);
+        h.sev = pGetShortExpVector(h.p);
+        strat->enterS(h,pos,strat);
+      }
     }
   }
   /*- test, if a unit is in F -*/
@@ -3160,22 +3153,15 @@ void initSL (ideal F, ideal Q,kStrategy strat)
         cancelunit(&h);  /*- tries to cancel a unit -*/
         deleteHC(&h, strat);
       }
-      if (TEST_OPT_DEGBOUND
-          && (((strat->honey) && (h.ecart+pFDeg(h.p)>Kstd1_deg))
-              || ((!(strat->honey)) && (pFDeg(h.p)>Kstd1_deg))))
-        pDelete(&h.p);
-      else
-        if (h.p!=NULL)
-        {
-          if (strat->Ll==-1)
-            pos =0;
-          else
-          {
+      if (h.p!=NULL)
+      {
+        if (strat->Ll==-1)
+          pos =0;
+        else
             pos = strat->posInL(strat->L,strat->Ll,&h,strat);
-          }
-          h.sev = pGetShortExpVector(h.p);
-          enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
-        }
+        h.sev = pGetShortExpVector(h.p);
+        enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
+      }
     }
   }
   /*- test, if a unit is in F -*/
@@ -3261,19 +3247,12 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
       {
         deleteHC(&h,strat);
       }
-      if (TEST_OPT_DEGBOUND
-      && (((strat->honey) && (h.ecart+pFDeg(h.p)>Kstd1_deg))
-        || ((!(strat->honey)) && (pFDeg(h.p)>Kstd1_deg))))
-        pDelete(&h.p);
-      else
       if (h.p!=NULL)
       {
         if (strat->sl==-1)
           pos =0;
         else
-        {
           pos = posInS(strat,strat->sl,h.p,h.ecart);
-        }
         h.sev = pGetShortExpVector(h.p);
         strat->enterS(h,pos,strat, strat->tl+1);
         h.length = pLength(h.p);
