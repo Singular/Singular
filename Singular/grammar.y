@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.10 1997-06-04 19:45:14 obachman Exp $ */
+/* $Id: grammar.y,v 1.11 1997-06-11 13:26:10 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -315,7 +315,6 @@ lines:
             lastreserved=NULL;
             expected_parms=FALSE;
             noringvars = FALSE;
-            test_int();
           }
         ;
 
