@@ -1,8 +1,13 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_univar.cc,v 1.1 1996-06-13 10:34:04 stobbe Exp $
+// $Id: fac_univar.cc,v 1.2 1996-06-13 10:43:49 stobbe Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1996/06/13 10:34:04  stobbe
+"ZFactorizeUnivariate: do not use Berlekamp-Algorithm since there is a
+                      bug in the Factory-Implementation of Berlekamp
+"
+
 Revision 1.0  1996/05/17 10:59:45  stobbe
 Initial revision
 
@@ -404,7 +409,7 @@ ZFactorizeUnivariate( const CanonicalForm& ff, bool issqrfree )
 	    for ( i = 0; i < MAX_FP_FAC; i++ ) {
 		setCharacteristic( p[i] );
 		fp = mapinto( f );
-		FpFactorizeUnivariateCZ( fp, true );
+		F[i] = FpFactorizeUnivariateCZ( fp, true );
 //		if ( p[i] < 23 && fp.degree() < 10 )
 //		    F[i] = FpFactorizeUnivariateB( fp, true );
 //		else
