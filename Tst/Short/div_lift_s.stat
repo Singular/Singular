@@ -2,10 +2,10 @@ Status Output of tst_status.out
 init >> USER    :siebert
 init >> HOSTNAME:pitti
 init >> uname -a:Linux pitti 2.0.35 #130 Mon Jul 27 11:06:31 MEST 1998 i586 unknown
-init >> date    :Fri Jan 28 13:56:44 MET 2000
-init >> version :1307
+init >> date    :Sun May 14 16:41:37 MEST 2000
+init >> version :1308
 init >> ticks   :100
-1 >> tst_memory_0 :: pitti:246906
+1 >> tst_memory_0 :: pitti:248878
 1 >> tst_memory_1 :: pitti:316338
-1 >> tst_memory_2 :: pitti:229376
+1 >> tst_memory_2 :: pitti:225280
 1 >> tst_timer_1 :: pitti:10
