@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.71 2000-05-25 10:07:19 pfister Exp $
+// $Id: primdec.lib,v 1.72 2000-05-25 11:22:19 pfister Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                               //
 // algorithms for primary decomposition based on                             //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                            //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.71 2000-05-25 10:07:19 pfister Exp $";
+version="$Id: primdec.lib,v 1.72 2000-05-25 11:22:19 pfister Exp $";
 info="
 LIBRARY: primdec.lib   PROCEDURES FOR PRIMARY DECOMPOSITION
 AUTHORS:  Gerhard Pfister, email: pfister@mathematik.uni-kl.de (GTZ)
@@ -1999,7 +1999,7 @@ EXAMPLE: example decomp; shows an example
   def  @P = basering;
   list primary,indep,ltras;
   intvec @vh,isat;
-  int @wr,@k,@n,@m,@n1,@n2,@n3,homo,seri,keepdi;
+  int @wr,@k,@n,@m,@n1,@n2,@n3,homo,seri,keepdi,@w;
   ideal peek=i;
   ideal ser,tras;
 
@@ -2024,11 +2024,6 @@ EXAMPLE: example decomp; shows an example
   }
 
   homo=homog(i);
-  if((find(ordstr(basering),"w")!=0)||(find(ordstr(basering),"W")!=0))
-  {
-     homo=0;
-  }
-
   if(homo==1)
   {
     if(attrib(i,"isSB")!=1)
@@ -2054,7 +2049,11 @@ EXAMPLE: example decomp; shows an example
         }
         return(primary);
      }
-     intvec @hilb=hilb(tras,1);
+     for(n=1;n<=nvars(basering);n++)
+     {
+        @w[n]=ord(var(n));
+     }
+     intvec @hilb=hilb(tras,1,@w);
      intvec keephilb=@hilb;
   }
 
@@ -2081,7 +2080,7 @@ EXAMPLE: example decomp; shows an example
   {
      if((ordstr(@P)[1]!="(C,lp)")&&(ordstr(@P)[3]!="(C,lp)"))
      {
-       ideal @j=std(fetch(@P,i),@hilb);
+       ideal @j=std(fetch(@P,i),@hilb,@w);
      }
      else
      {
@@ -2278,7 +2277,7 @@ EXAMPLE: example decomp; shows an example
     }
     else
     {
-      ideal jwork=std(imap(gnir,@j),@hilb);
+      ideal jwork=std(imap(gnir,@j),@hilb,@w);
     }
 
   }
@@ -2317,7 +2316,7 @@ EXAMPLE: example decomp; shows an example
         execute("map phi=gnir,"+@va+";");
         if(homo==1)
         {
-           ideal @j=std(phi(@j),@hilb);
+           ideal @j=std(phi(@j),@hilb,@w);
         }
         else
         {
@@ -2499,7 +2498,7 @@ EXAMPLE: example decomp; shows an example
         }
         if(homo==1)
         {
-              @hilb=hilb(jwork,1);
+              @hilb=hilb(jwork,1,@w);
         }
 
         setring gnir;
@@ -2583,7 +2582,7 @@ EXAMPLE: example decomp; shows an example
               execute("map phi=gnir,"+@va+";");
               if(homo==1)
               {
-                 ideal @j=std(phi(jkeep),keephilb);
+                 ideal @j=std(phi(jkeep),keephilb,@w);
               }
               else
               {
