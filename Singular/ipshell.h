@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.21 1999-10-25 18:21:52 Singular Exp $ */
+/* $Id: ipshell.h,v 1.22 1999-11-06 15:07:56 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -62,6 +62,11 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport=TRUE, BOOLEAN tellerror=TRUE 
 #else /* HAVE_NAMESPACES */
 BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror=TRUE );
 #endif /* HAVE_NAMESPACES */
+/* sees wheter library lib has already been loaded
+   if yes, writes filename of lib into where and returns TRUE,
+   if  no, returns FALSE
+*/
+BOOLEAN iiLocateLib(const char* lib, char* where);
 leftv   iiMap(map theMap, char * what);
 void    iiMakeResolv(resolvente r, int length, int rlen, char * name, int typ0,
            intvec ** weights=NULL);

@@ -574,7 +574,11 @@ static BOOLEAN heOnlineHelp(char* s)
 
   char libnamebuf[128];
   FILE *fp=NULL;
-  if ((str[1]!='\0') && ((fp=feFopen(str,"rb", libnamebuf))!=NULL))
+  // first, search for library of that name in LIB string
+  if ((str[1]!='\0') && 
+      ((iiLocateLib(str, libnamebuf) && (fp=feFopen(libnamebuf, "rb")) !=NULL)
+       ||
+       ((fp=feFopen(str,"rb", libnamebuf))!=NULL)))
   {
     extern FILE *yylpin;
     lib_style_types lib_style; // = OLD_LIBSTYLE;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.66 1999-10-14 14:27:09 obachman Exp $ */
+/* $Id: iplib.cc,v 1.67 1999-11-06 15:07:56 obachman Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -652,6 +652,39 @@ BOOLEAN iiReLoadLib(idhdl packhdl)
 }
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+/* sees wheter library lib has already been loaded
+   if yes, writes filename of lib into where and returns TRUE,
+      no, returns FALSE
+*/
+BOOLEAN iiLocateLib(const char* lib, char* where)
+{
+  idhdl hl;
+  
+  hl = idroot->get("LIB", 0);
+  if (hl == NULL || strstr(IDSTRING(hl), lib) == NULL) return FALSE;
+  
+  if (strstr(IDSTRING(hl), ",") == NULL)
+  {
+    strcpy(where, IDSTRING(hl));
+  }
+  else
+  {
+    char* tmp = mstrdup(IDSTRING(hl));
+    char* tok = strtok(tmp, ",");
+    do
+    {
+      if (strstr(tok, lib) != NULL) break;
+      tok = strtok(NULL, ",");
+    }
+    while (tok != NULL);
+    assume(tok != NULL);
+    strcpy(where, tok);
+    FreeL(tmp);
+  }
+  return TRUE;
+}
+    
+  
 #ifdef HAVE_NAMESPACES
 BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport, BOOLEAN tellerror )
 #else /* HAVE_NAMESPACES */
