@@ -14,7 +14,7 @@ OVERVIEW:
 
 PROCEDURES:
  ReesAlgebra(I);	computes the Rees Algebra of an ideal I
- NormalI(I[,p[,r]]);	computes the integral closure of an ideal I using R[It]
+ normalI(I[,p[,r]]);	computes the integral closure of an ideal I using R[It]
 ";
 
 LIB "normal.lib";       // for HomJJ
@@ -24,11 +24,11 @@ LIB "standard.lib";     // for groebner
 
 proc ReesAlgebra (ideal I)
 "USAGE:    ReesAlgebra (I); I = ideal
-COMPUTE:  The Rees algebra R[I*t] as an affine ring, where I is an ideal in R
+COMPUTE:  The Rees algebra R[It] as an affine ring, where I is an ideal in R
 RETURN:   a list containing two rings:
-          [1]: a ring, say RR; in the ring an ideal ker such that R[I*t]=RR/ker
-          [2]: a ring, say Kxt; the basering with additional variable t con-
-               taining an ideal mapI defining the map RR-->Kxt
+          [1]: a ring, say RR; in the ring an ideal ker such that R[It]=RR/ker.
+          [2]: a ring, say Kxt; the basering with additional variable t 
+               containing an ideal mapI defining the map RR-->Kxt
 EXAMPLE:  example ReesAlgebra; shows an example
 "
 {
@@ -85,8 +85,8 @@ example
   ring R = 0,(x,y),dp;
   ideal I = x2,xy4,y5;
   list L = ReesAlgebra(I);
-  def Rees = L[1];       // defines the ring Rees, containing the ideal ker
-  setring Rees;          // passes to the ring Rees
+  def Rees = L[1];       // define the ring Rees, containing the ideal ker
+  setring Rees;          // pass to the ring Rees
   Rees;
   ker;                   // R[I*t] is isomorphic to Rees/ker
 }
