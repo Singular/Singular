@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: variable.cc,v 1.2 1997-03-27 10:24:37 schmidt Exp $
+// $Id: variable.cc,v 1.3 1997-04-15 09:44:26 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.2  1997/03/27 10:24:37  schmidt
+stream-io wrapped by NOSTREAMIO
+
 Revision 1.1  1996/12/05 18:24:56  schmidt
 ``Unconditional'' check-in.
 Now it is my turn to develop factory.
@@ -12,12 +15,13 @@ Now it is my turn to develop factory.
 //
 */
 
+#include <config.h>
+
 #include <string.h>
 
 #include "assert.h"
 
 #include "cf_defs.h"
-
 #include "variable.h"
 #include "canonicalform.h"
 #include "cf_factory.h"
@@ -97,7 +101,7 @@ Variable::Variable( char name )
 		    newvarnames[i] = var_names[i];
 		newvarnames[n] = name;
 		newvarnames[n+1] = 0;
-		delete var_names;
+		delete [] var_names;
 		var_names = newvarnames;
 		_level = n;
 	    }
@@ -109,7 +113,7 @@ Variable::Variable( int l, char name ) : _level(l)
 {
     ASSERT( l > 0 && l != LEVELQUOT, "illegal level" );
     int n;
-    if ( (n=(var_names == 0 ? 0 : strlen( var_names ))) <= l ) {
+    if ( (n = (var_names == 0 ? 0 : strlen( var_names ))) <= l ) {
 	char * newvarnames = new char [l+2];
 	int i;
 	for ( i = 0; i < n; i++ )
@@ -118,7 +122,7 @@ Variable::Variable( int l, char name ) : _level(l)
 	    newvarnames[i] = '@';
 	newvarnames[l] = name;
 	newvarnames[l+1] = 0;
-	delete var_names;
+	delete [] var_names;
 	var_names = newvarnames;
     }
     else {
@@ -130,9 +134,9 @@ Variable::Variable( int l, char name ) : _level(l)
 char
 Variable::name() const
 {
-    if ( _level > 0 && _level < strlen( var_names ) )
+    if ( _level > 0 && _level < (int)strlen( var_names ) )
 	return( var_names[_level] );
-    else if ( _level < 0 && -_level < strlen( var_names_ext ) )
+    else if ( _level < 0 && -_level < (int)strlen( var_names_ext ) )
 	return( var_names_ext[-_level] );
     else
 	return '@';
@@ -201,7 +205,7 @@ Variable rootOf( const CanonicalForm & mipo, char name )
 	    newvarnames[i] = var_names_ext[i];
 	newvarnames[n] = name;
 	newvarnames[n+1] = 0;
-	delete var_names_ext;
+	delete [] var_names_ext;
 	var_names_ext = newvarnames;
 	l = n;
 	Variable result( -l, true );
@@ -209,7 +213,7 @@ Variable rootOf( const CanonicalForm & mipo, char name )
 	for ( i = 0; i < n; i++ )
 	    newalgext[i] = algextensions[i];
 	newalgext[n] = ext_entry( 0, false );
-	delete algextensions;
+	delete [] algextensions;
 	algextensions = newalgext;
 	algextensions[n] = ext_entry( (InternalPoly*)(conv2mipo( mipo, result ).getval()), true );
 	return result;
