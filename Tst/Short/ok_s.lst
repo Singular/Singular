@@ -18,8 +18,7 @@ bug_8
 bug_9
 bug_c_dp
 dbm_s
-; DIFF deform_s
-deform_new_s
+deform_s
 fetch_s
 fglm1_s
 finduni_s
