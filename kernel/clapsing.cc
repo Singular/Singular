@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.4 2005-01-27 16:41:12 Singular Exp $
+// $Id: clapsing.cc,v 1.5 2005-03-30 13:17:08 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -731,7 +731,6 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
   // use factory/liffac in general ==============================
   Off(SW_RATIONAL);
   On(SW_SYMMETRIC_FF);
-  On(SW_USE_NTL);
   #ifdef HAVE_NTL
   extern int prime_number;
   if(rField_is_Q()) prime_number=0;
@@ -992,8 +991,6 @@ matrix singclap_irrCharSeries ( ideal I)
   int i;
   Off(SW_RATIONAL);
   On(SW_SYMMETRIC_FF);
-  On(SW_USE_NTL);
-  //Off(SW_USE_NTL);
   CFList L;
   ListCFList LL;
   if (((nGetChar() == 0) || (nGetChar() > 1) )

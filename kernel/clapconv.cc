@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.2 2005-01-27 16:35:30 Singular Exp $
+// $Id: clapconv.cc,v 1.3 2005-03-30 13:17:07 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -45,7 +45,6 @@ convSingNClapN( number n )
   /* does only work for Zp, Q */
   if ( getCharacteristic() != 0 )
   {
-    Off(SW_USE_EZGCD);
     term = npInt( n );
   }
   else
@@ -117,7 +116,6 @@ CanonicalForm conv_SingPClapP( poly p, ring r )
     /* does only work for finite fields */
     if ( getCharacteristic() != 0 )
     {
-      Off(SW_USE_EZGCD);
       term = npInt( pGetCoeff( p ) );
     }
     else
@@ -320,12 +318,10 @@ convSingTrClapP( napoly p )
     /* does only work for finite fields */
     if ( getCharacteristic() != 0 )
     {
-      Off(SW_USE_EZGCD);
       term = npInt( napGetCoeff( p ) );
     }
     else
     {
-      On(SW_USE_EZGCD);
       //if ( (!(int)(napGetCoeff( p )) & 1 )
       //&&  ( napGetCoeff( p )->s == 0))
       //  naNormalize( naGetCoeff( p ) );
@@ -526,12 +522,10 @@ CanonicalForm convSingAClapA ( napoly p , const Variable & a )
     /* does only work for finite fields:Z/p */
     if ( rField_is_Zp_a() )
     {
-      Off(SW_USE_EZGCD);
       term = npInt( napGetCoeff( p ) );
     }
     else
     {
-      On(SW_USE_EZGCD);
       //if ( (!(int)(napGetCoeff( p )) & 1 )
       //&&  ( napGetCoeff( p )->s == 0))
       //  naNormalize( naGetCoeff( p ) );
