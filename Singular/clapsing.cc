@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.74 2000-11-14 16:04:50 obachman Exp $
+// $Id: clapsing.cc,v 1.75 2000-12-08 12:50:30 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -129,7 +129,7 @@ TIMING_DEFINE_PRINT( algLcmTimer );
 #ifdef FACTORY_GCD_DEBOUT
 #include "longalg.h"
 #include "febase.h"
-// alg f
+// napoly f
 #define FACTORY_ALGOUT_POLY( tag, f ) \
   StringSetS( tag ); \
   napWrite( f ); \
@@ -137,20 +137,20 @@ TIMING_DEFINE_PRINT( algLcmTimer );
 // CanonicalForm f, represents transcendent extension
 #define FACTORY_CFTROUT_POLY( tag, f ) \
   { \
-    alg F=convClapPSingTr( f ); \
+    napoly F=convClapPSingTr( f ); \
     StringSetS( tag ); \
     napWrite( F ); \
     PrintS(StringAppendS("\n")); \
-    napDelete( &F ); \
+    napDelete(&F); \
   }
 // CanonicalForm f, represents algebraic extension
 #define FACTORY_CFAOUT_POLY( tag, f ) \
   { \
-    alg F=convClapASingA( f ); \
+    napoly F=convClapASingA( f ); \
     StringSetS( tag ); \
     napWrite( F ); \
     PrintS(StringAppendS("\n")); \
-    napDelete( &F ); \
+    napDelete(&F); \
   }
 #else /* ! FACTORY_GCD_DEBOUT */
 #define FACTORY_ALGOUT_POLY( tag, f )
@@ -159,7 +159,7 @@ TIMING_DEFINE_PRINT( algLcmTimer );
 #endif /* ! FACTORY_GCD_DEBOUT */
 
 #ifdef FACTORY_GCD_DEBOUT_PATTERN
-// alg f
+// napoly f
 #define FACTORY_ALGOUT_PAT( tag, f ) \
   if (currRing->minpoly!=NULL) \
   { \
@@ -1224,7 +1224,7 @@ BOOLEAN jjCHARSERIES(leftv res, leftv u)
   return (res->data==NULL);
 }
 
-alg singclap_alglcm ( alg f, alg g )
+napoly singclap_alglcm ( napoly f, napoly g )
 {
  FACTORY_ALGOUT( "f", f );
  FACTORY_ALGOUT( "g", g );
@@ -1232,7 +1232,7 @@ alg singclap_alglcm ( alg f, alg g )
  // over Q(a) / Fp(a)
  if (nGetChar()==1) setCharacteristic( 0 );
  else               setCharacteristic( -nGetChar() );
- alg res;
+ napoly res;
 
  if (currRing->minpoly!=NULL)
  {
@@ -1280,7 +1280,7 @@ alg singclap_alglcm ( alg f, alg g )
  return res;
 }
 
-void singclap_algdividecontent ( alg f, alg g, alg &ff, alg &gg )
+void singclap_algdividecontent ( napoly f, napoly g, napoly &ff, napoly &gg )
 {
  FACTORY_ALGOUT( "f", f );
  FACTORY_ALGOUT( "g", g );
