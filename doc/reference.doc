@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.184 2000-03-15 17:16:16 siebert Exp $
+@comment $Id: reference.doc,v 1.185 2000-04-04 07:52:43 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4243,7 +4243,7 @@ shows correct usage in error messages (set by default)
 
 @item @tab @code{facstd}
 @tab @code{F} @tab found a new factor
-@item @tab @tab @tab all other characters: like the output of @code{std}
+@item @tab @tab @tab all other characters: like the output of @code{std} and @code{reduce}
 @item @tab @tab @tab
 @item @tab @code{fglm}
 @tab @code{.} @tab basis monomial found
