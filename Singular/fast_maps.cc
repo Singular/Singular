@@ -6,7 +6,7 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id: fast_maps.cc,v 1.22 2002-01-19 19:52:13 obachman Exp $
+ *  Version: $Id: fast_maps.cc,v 1.23 2002-01-19 20:04:30 obachman Exp $
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>
@@ -22,7 +22,7 @@
 // define if you want to use special src_ring
 #define HAVE_SRC_R 1
 // define if you want to use optimization step
-// #define HAVE_MAP_OPTIMIZATION 1
+#define HAVE_MAP_OPTIMIZATION 1
 
 /*******************************************************************************
 **
@@ -277,7 +277,7 @@ void maMap_CreateRings(ideal map_id, ring map_r,
                        ring &src_r, ring &dest_r)
 {
 #if HAVE_SRC_R > 0
-  int* weights = (int*) omAlloc0(map_r->N);
+  int* weights = (int*) omAlloc0(map_r->N*sizeof(int));
   int i;
   int n = min(map_r->N, IDELEMS(image_id));
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.177 2002-01-19 17:20:59 obachman Exp $ */
+/* $Id: ring.cc,v 1.178 2002-01-19 20:04:31 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2652,7 +2652,6 @@ ring rModifyRing_Wp(ring r, int* weights)
   int tmpref=r->cf->ref;
   rComplete(res, 1);
   r->cf->ref=tmpref;
-  
   return res;
 }
 
