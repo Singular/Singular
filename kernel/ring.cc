@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.8 2004-04-29 17:21:18 Singular Exp $ */
+/* $Id: ring.cc,v 1.9 2004-05-12 11:24:37 levandov Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -345,6 +345,7 @@ void rWrite(ring r)
 #ifdef PDEBUG
     Print("\n//   noncommutative type:%d",r->nc->type);
     Print("\n//   is skew constant:%d",r->nc->IsSkewConstant);
+    Print("\n//   ref:%d",r->nc->ref);
 #endif
   }
 #endif
@@ -366,6 +367,19 @@ void rDelete(ring r)
 
   if (r == NULL) return;
 
+#ifdef HAVE_PLURAL
+  if (r->nc != NULL)
+  {
+    if (r->nc->ref>1) /* in use by somebody else */
+    {
+      r->nc->ref--;
+    }
+    else
+    {
+      ncKill(r);
+    }
+  }
+#endif
   rUnComplete(r);
   // delete order stuff
   if (r->order != NULL)

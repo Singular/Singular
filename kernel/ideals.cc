@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.3 2004-04-16 17:18:34 levandov Exp $ */
+/* $Id: ideals.cc,v 1.4 2004-05-12 11:24:37 levandov Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1951,8 +1951,8 @@ void idLiftW(ideal P,ideal Q,int n,matrix &T, ideal &R,short *w)
 }
 
 /*2
-*computes the quotient of h1,h2 : interanl routine for idQuot
-*BEWARE: the returned ideals may contain incorrected orderd polys !
+*computes the quotient of h1,h2 : internal routine for idQuot
+*BEWARE: the returned ideals may contain incorrectly ordered polys !
 *
 */
 static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb,

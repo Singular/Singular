@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.8 2004-04-29 17:21:30 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.9 2004-05-12 11:24:36 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -1574,18 +1574,21 @@ void ncKill(ring r)
 {
   int i,j;
   int rN=r->N;
-  for(i=1;i<rN;i++)
+  if ( rN > 1 )
   {
-    for(j=i+1;j<=rN;j++)
+    for(i=1;i<rN;i++)
     {
-      id_Delete((ideal *)&(r->nc->MT[UPMATELEM(i,j,rN)]),r->nc->basering);
+      for(j=i+1;j<=rN;j++)
+      {
+	id_Delete((ideal *)&(r->nc->MT[UPMATELEM(i,j,rN)]),r->nc->basering);
+      }
     }
+    omFreeSize((ADDRESS)r->nc->MT,rN*(rN-1)/2*sizeof(matrix));
+    omFreeSize((ADDRESS)r->nc->MTsize,rN*(rN-1)/2*sizeof(int));
+    id_Delete((ideal *)&(r->nc->COM),r->nc->basering);
   }
-  omFreeSize((ADDRESS)r->nc->MT,rN*(rN-1)/2*sizeof(matrix));
-  omFreeSize((ADDRESS)r->nc->MTsize,rN*(rN-1)/2*sizeof(int));
   id_Delete((ideal *)&(r->nc->C),r->nc->basering);
   id_Delete((ideal *)&(r->nc->D),r->nc->basering);
-  id_Delete((ideal *)&(r->nc->COM),r->nc->basering);
   omFreeSize((ADDRESS)r->nc,sizeof(nc_struct));
   r->nc=NULL;
 }
@@ -1891,6 +1894,12 @@ BOOLEAN nc_InitMultiplication(ring r)
   /* initialize the multiplication: */
   /*  r->nc->MTsize, r->nc->MT, r->nc->COM, */
   /* and r->nc->IsSkewConstant for the skew case */
+  if (r->N==1)
+  {
+    r->nc->type=nc_comm;
+    r->nc->IsSkewConstant=1;
+    return FALSE;
+  }
   int i,j;
   matrix COM;
   r->nc->MT = (matrix *)omAlloc0(r->N*(r->N-1)/2*sizeof(matrix));
