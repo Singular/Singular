@@ -60,7 +60,7 @@ dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl compiler stuff
 dnl is needed to check for libs and headers, later on
 dnl
-dnl we do not want to have "-g -O" for CFLAGS  
+dnl we do not want to have "-g -O" for CFLAGS
 if test "${CXXFLAGS+set}" != set; then
   ac_cxxflags_set=no
   CXXFLAGS="-O"
@@ -85,7 +85,7 @@ AC_AIX
 # not overwrite it explicitely
 if test "${GXX}" = yes && test "${ac_cxx_set}" = no; then
   CXX=gcc
-fi  
+fi
 
 # check whether the compiler accepts -pipe
 AC_MSG_CHECKING(whether compiler accepts -pipe)
@@ -150,9 +150,9 @@ dnl
 AC_PREFIX_DEFAULT(`pwd`/..)
 
 dnl set exec_prefix, bindir, libdir, includedir to some sensible values
-dnl if they are not yet already set 
+dnl if they are not yet already set
 
-# expand prefix 
+# expand prefix
 test "x$prefix" = xNONE && prefix=$ac_default_prefix
 if test "${with_rootdir+set}" != set; then
   AC_DEFINE_UNQUOTED(S_ROOT_DIR, "${prefix}")
@@ -166,7 +166,7 @@ if test "x$exec_prefix" = xNONE; then
 fi
 
 # expand bindir
-test "x$bindir" = 'x${exec_prefix}/bin' && bindir="${exec_prefix}/bin" 
+test "x$bindir" = 'x${exec_prefix}/bin' && bindir="${exec_prefix}/bin"
 SINGULAR=${SINGULAR:-$bindir/Singular-$SINGULAR_MAJOR_VERSION${VERSION_SEP}$SINGULAR_MINOR_VERSION${VERSION_SEP}$SINGULAR_SUB_VERSION}
 AC_SUBST(SINGULAR)
 AC_DEFINE_UNQUOTED(S_BIN_DIR, "${bindir}")
@@ -193,7 +193,7 @@ if test "${with_lex+set}" != set; then
   AC_CACHE_VAL(ac_cv_prog_flex,
   if (flex --version >/dev/null 2>&1)
   then
-    if (flex --version | egrep "[2-9]\.[5-9]" >/dev/null 2>&1) 
+    if (flex --version | egrep "[2-9]\.[5-9]" >/dev/null 2>&1)
     then
       ac_cv_prog_flex=flex
     fi
@@ -215,16 +215,16 @@ else
   AC_CHECK_PROGS(LEX, ${with_lex})
   if test "x${LEX}" = x; then
     AC_MSG_WARN(building without lex -- make might fail)
-  fi 
+  fi
 fi
-   
+
 # bison
 AC_CHECK_PROGS(BISON, bison)
 if test "${BISON+set}" != set; then
   AC_MSG_WARN(did not find bison -- make might fail)
 fi
 
-# ln -s  
+# ln -s
 AC_PROG_LN_S
 
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
@@ -237,7 +237,7 @@ AC_CHECK_LIB(socket, listen)
 AC_CHECK_LIB(nsl, gethostbyname)
 AC_CHECK_LIB(ucb, index)
 
-# heder file checks 
+# heder file checks
 AC_HEADER_STDC
 AC_CHECK_HEADERS(limits.h unistd.h,,
   AC_MSG_ERROR(Can not compile without limits.h unistd.h))
@@ -269,14 +269,14 @@ AC_CACHE_VAL(ac_cv_shift, AC_TRY_RUN(
   [ int main() { if (-2 >> 1 == -1) exit(0); else exit(1); } ],
    ac_cv_shift=yes,
    ac_cv_shift=no,
-   if test "$ac_c_cross_dos" = yes; then 
-     ac_cv_shift=yes; 
-   else 
+   if test "$ac_c_cross_dos" = yes; then
+     ac_cv_shift=yes;
+   else
      AC_MSG_RESULT(no)
      AC_MSG_ERROR(cross compilation without default value)
    fi))
 
-if test "$ac_cv_shift" = yes; then   
+if test "$ac_cv_shift" = yes; then
   AC_MSG_RESULT(yes)
 else
   AC_MSG_RESULT(no)
@@ -288,8 +288,8 @@ fi
 AC_MSG_CHECKING(whether explicit C++ constructor calls are allowed)
 AC_LANG_SAVE
 AC_LANG_CPLUSPLUS
-AC_CACHE_VAL(ac_cv_explicit_const,AC_TRY_COMPILE(, 
-  class testclass 
+AC_CACHE_VAL(ac_cv_explicit_const,AC_TRY_COMPILE(,
+  class testclass
   {
   public:
     int value;
@@ -297,7 +297,7 @@ AC_CACHE_VAL(ac_cv_explicit_const,AC_TRY_COMPILE(,
     testclass( int i ) : value(i) {}
     ~testclass() { value = 0; }
   };
-  
+
   testclass ptr;
   ptr.testclass(1);
 , ac_cv_explicit_const=yes, ac_cv_explicit_const=no))
@@ -309,8 +309,8 @@ fi
 
 # sprintf returns number of printed chars
 AC_MSG_CHECKING(whether vsprintf returns number of printed chars)
-AC_CACHE_VAL(ac_cv_returns_n_of_chars, AC_TRY_RUN( 
- [#include <stdio.h> 
+AC_CACHE_VAL(ac_cv_returns_n_of_chars, AC_TRY_RUN(
+ [#include <stdio.h>
  main() { char *str=(char*)malloc(20); if (((int) sprintf(str,"123456789")) == 9) exit(0); else exit(1); }],
    ac_cv_returns_n_of_chars=yes,
    ac_cv_returns_n_of_chars=no,
@@ -349,7 +349,7 @@ dnl figure out the page size of your system
 dnl
 dnl
 AC_MSG_CHECKING(size of system page)
-AC_CACHE_VAL(ac_cv_pagesize, 
+AC_CACHE_VAL(ac_cv_pagesize,
 AC_TRY_RUN([#include <stdio.h>
 #define HAVE_GMALLOC
 #include "gmalloc.c"
@@ -385,9 +385,9 @@ main()
   unsigned long p1 = (unsigned long) valloc(SIZE_OF_SYSTEM_PAGE - ADJUSTMENT);
   unsigned long p2;
   unsigned long diffs = 0;
-  
+
   if ((p1 == 0) || (p1 & (SIZE_OF_SYSTEM_PAGE - 1))) exit(1);
-  
+
   for (i = 0; i<REPEAT; i++)
   {
     p2 = (unsigned long) valloc(SIZE_OF_SYSTEM_PAGE - ADJUSTMENT);
@@ -395,7 +395,7 @@ main()
     diffs += (p2 - p1);
     p1 = p2;
   }
-  
+
   if ( ((double) diffs)/((double)REPEAT) < ((double) SIZE_OF_SYSTEM_PAGE)*1.05 )
   {
     FILE *f=fopen("conftestval", "w");
@@ -447,7 +447,7 @@ rm -rf conftesteval _pagetest.c
 
 )
 
-if test "$ac_cv_have_page_alignment" != no; then
+if test "$ac_cv_have_page_alignment" != no && test "$ac_cv_with_gmalloc" != no; then
   eval $ac_cv_have_page_alignment
   AC_DEFINE(HAVE_PAGE_ALIGNMENT)
   AC_DEFINE_UNQUOTED(PALLOC, valloc)
@@ -469,8 +469,8 @@ dnl help for configure
 dnl
 AC_ARG_WITH(
   rootdir,
-  [  --with-rootdir=DIR      use DIR ass compiled-in root directory 
-                             (default is PREFIX)]) 
+  [  --with-rootdir=DIR      use DIR ass compiled-in root directory
+                             (default is PREFIX)])
 AC_ARG_WITH(
   lex,
   [  --with-lex=[LEX,no]     uses LEX as lex program, default is flex])
@@ -498,12 +498,12 @@ AC_ARG_WITH(
 AC_ARG_WITH(
   dl,
   [  --with-dl               do use dl (dynamic linking)])
-AC_ARG_WITH(apint, 
+AC_ARG_WITH(apint,
   [  --with-apint=PACKAGE    use PACKAGE for arbitary integer arithmetic])
 AC_ARG_WITH(
   exp_type,
-  [  --with-exp_type=TYPE    uses TYPE as type of exponents in polynomials 
-                             -- default type is short 
+  [  --with-exp_type=TYPE    uses TYPE as type of exponents in polynomials
+                             -- default type is short
 			     -- possible other types are char and int])
 AC_ARG_WITH(
   gmalloc,
@@ -520,16 +520,16 @@ dnl
 if test "${with_perl5+set}" != set; then
   AC_MSG_CHECKING(for perl5)
   changequote(<<,>>)dnl
-  AC_CACHE_VAL(ac_cv_prog_perl5, 
+  AC_CACHE_VAL(ac_cv_prog_perl5,
   if (perl5 -v >/dev/null 2>&1)
   then
-   if (perl5 -v | egrep "version 5\.[0-9]" >/dev/null 2>&1 ) 
+   if (perl5 -v | egrep "version 5\.[0-9]" >/dev/null 2>&1 )
     then
     ac_cv_prog_perl5=perl5
    fi
   elif (perl -v >/dev/null 2>&1)
   then
-    if (perl -v | egrep "version 5\.[0-9]" >/dev/null 2>&1 ) 
+    if (perl -v | egrep "version 5\.[0-9]" >/dev/null 2>&1 )
     then
       ac_cv_prog_perl5=perl
     fi
@@ -551,7 +551,7 @@ else
   AC_CHECK_PROGS(PERL5, ${with_perl5})
   if test "x${PERL5}" = x; then
     AC_MSG_WARN(building without perl5 -- make might fail)
-  fi 
+  fi
 fi
 
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
@@ -560,7 +560,7 @@ dnl for gmp, MP, factory and libfac, we built them in, even if the libs
 dnl and headers were not found under the condition that the respective
 dnl  --enable argument was given
 dnl
-  
+
 # readline
 if test "$with_readline" != no; then
   AC_CHECK_LIB(ncurses,tgetent,,\
@@ -725,7 +725,7 @@ else
   fi
 fi
 
-#   
+#
 # dl
 if test "$with_dl" != no; then
   AC_CHECK_LIB(dl, dlopen)
@@ -793,7 +793,7 @@ elif  test "${with_factory}" = yes; then
 else
   AC_MSG_RESULT(no)
 fi
-     
+
 AC_MSG_CHECKING(whether to have libfac)
 if test "${with_libfac}" != yes && test "${with_libfac}" != no; then
   if (test "${will_have_factory}" = yes) && \
@@ -821,7 +821,7 @@ AC_SUBST(NEED_LIBS)
 
 AC_MSG_CHECKING(whether to have dbm links)
 if test "$with_dbm" != no; then
-  AC_DEFINE(HAVE_DBM) 
+  AC_DEFINE(HAVE_DBM)
   AC_MSG_RESULT(yes)
 else
   AC_MSG_RESULT(no)
@@ -831,7 +831,7 @@ AC_MSG_CHECKING(whether to have namespaces)
 if test "$with_namespaces" != yes; then
   AC_MSG_RESULT(no)
 else
-  AC_DEFINE(HAVE_NAMESPACES) 
+  AC_DEFINE(HAVE_NAMESPACES)
   AC_MSG_RESULT(yes)
 fi
 
@@ -839,7 +839,7 @@ AC_MSG_CHECKING(whether to have dynamic loading)
 if test "$with_dl" != yes; then
   AC_MSG_RESULT(no)
 else
-  AC_DEFINE(HAVE_DYNAMIC_LOADING) 
+  AC_DEFINE(HAVE_DYNAMIC_LOADING)
   AC_MSG_RESULT(yes)
   case "$ac_cv_singuname" in
 	unknown) ;;
@@ -861,7 +861,7 @@ else
   AC_SUBST(LD_DYN_FLAGS)
 fi
 
-dnl 
+dnl
 dnl check for mtrack
 dnl
 AC_MSG_CHECKING(whether to use mtrack)
@@ -872,7 +872,7 @@ else
   AC_MSG_RESULT(no)
 fi
 
- 
+
 
 dnl
 dnl figure out Exponent_t and Order_t
