@@ -1,7 +1,7 @@
-// $Id: standard.lib,v 1.32 1999-06-02 16:21:25 obachman Exp $
+// $Id: standard.lib,v 1.33 1999-06-30 14:14:31 Singular Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.32 1999-06-02 16:21:25 obachman Exp $";
+version="$Id: standard.lib,v 1.33 1999-06-30 14:14:31 Singular Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
@@ -430,6 +430,13 @@ proc res(list #)
                //if size(#)>2 a minimal resolution is computed
 
    string varstr_P = varstr(P);
+
+   if(size(ideal(basering)) > 0)
+   {
+     // the quick hack for qrings - seems to fit most needs
+     // (lres is not implemented for qrings, sres is not so efficient)
+     return(nres(m,i));
+   }
 
    //LaScala for the homogeneous case
    if(homog(m)==1)
