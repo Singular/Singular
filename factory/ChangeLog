@@ -203,49 +203,52 @@ Before Mon Jun  4 1997 Jens Schmidt <schmidt@mathematik.uni-kl.de>
 	* assert.h (__ASSERT, __STICKYASSERT): the preprocessor instead of
  	  fprintf() pastes the message into the format string now
 
-	* cf_factor.cc (factorize, MULTIFACTOR): removed dependency on
-	  #define MULTIFACTOR
-
-	* cf_defs.h (incl_cf_defs_H, INCL_CF_DEFS_H): #define renamed so
-	  cf_defs.h is included only once
-
-	* cf_gcd.cc (DEBOUT): debug output changed to calls of DEBOUT
-	  macros
-	* cf_linsys.cc (DEBOUT): debug output rewritten and changed to
-	  calls of DEBOUT macros
-	* fac_berlekamp.cc (QPrintFF, QPrintGF, DEBOUT): debug output
-	  changed to calls of DEBOUT macros
-	* fac_univar.cc (DEBOUT, DEBOUTLN, DEBINCLEVEL, DEBDECLEVEL):
-	  debug output rewritten
-	  (hprint, DEBOUTHPRINT, NDEBUG): calls to function hprint()
-	  wrapped by macro DEBOUTHPRINT, which definitions depends on
-	  DEBUGOUTPUT (instead of NDEBUG, as before).  All callers
-	  changed.
-	* timing.h (iostream.h stdio.h): stream IO changed to std IO
-
-	* cf_linsys.cc (TIMING): #define TIMING removed
-	* fac_distrib.cc (DEBUGOUTPUT): #undef DEBUGOUTPUT removed
-	* fac_ezgcd.cc (DEBUGOUTPUT, TIMING, timing.h): some spurious
-	  #define's and #include's removed
-	* fac_multihensel.cc (DEBUGOUTPUT, TIMING): some spurious
-	  #define's removed
-	* fac_multivar.cc (DEBUGOUTPUT, TIMING): some spurious
-	  #define's removed
-	* fac_univar.cc (DEBUGOUTPUT, TIMING, sys/times.h): some spurious
-	  #define's and #include's removed
-
 --------
 nochmal checken
 
+	* cf_factor.cc (factorize): dependency on #define MULTIFACTOR
+	  removed
+
+	* cf_defs.h (INCL_CF_DEFS_H, incl_cf_defs_H): #define
+	  incl_cf_defs_H renamed to #define INCL_CF_DEFS_H so
+	  cf_defs.h is included only once
+
+	* cf_gcd.cc: debug output changed to calls of DEBOUT macros
+	* cf_linsys.cc: debug output rewritten and changed to calls of
+	  DEBOUT macros
+	* fac_berlekamp.cc (QPrintFF, QPrintGF): definition and calls of
+	  QPrintFF(), QPrintGF() wrapped by #ifdef DEBUGOUTPUT
+	* fac_univar.cc: debug output rewritten
+	  (hprint): calls to hprint() wrapped by calls to #define
+ 	  DEBOUTHPRINT, which definition depends on #define DEBUGOUTPUT
+	  (instead of NDEBUG, as before).  All callers changed.
+
+	* timing.h (TIMING_DEFINE_PRINT, TIMING_END_AND_PRINT): stream IO
+	  changed to std IO
+
+	* cf_linsys.cc: superfluous #define TIMING removed
+	* fac_distrib.cc: superfluous #undef DEBUGOUTPUT removed
+	* fac_ezgcd.cc: some superfluous #defines (DEBUGOUTPUT, TIMING)
+	  and #includes removed
+	* fac_multihensel.cc: some superfluous #defines (DEBUGOUTPUT, TIMING)
+	  removed
+	* fac_multivar.cc: some superfluous #defines (DEBUGOUTPUT, TIMING)
+	  removed
+	* fac_univar.cc: some superfluous #defines (DEBUGOUTPUT, TIMING)
+	  and #includes removed
+
+========
+ab hier fertig
+
 	* config.h.in (GFTABLEDIR): new #define
-	* gfops.cc (gf_get_table): uses #define GFTABLEDIR to get the path
+	* gfops.cc (gf_get_table): uses #define GFTABLEDIR to get path
 	  to the GF(q) tables
 
 	* config.h.in (MDEBUG, NOASSERT, TIMING, DEBUGOUTPUT): new
 	  #defines
 
 	* config.h.in (MULTIPROTOCOL): #define MULTIPROTOCOL removed.  No
-	  more MULTIPROTOCOL support.
+	  more MP support.
 	* int_int.h (class InternalInteger): declarations dependent on
 	  #define MULTIPROTOCOL removed
 	* int_rat.h (class InternalRational): declarations dependent on
@@ -253,7 +256,7 @@ nochmal checken
 
 	* config.h.in (NOSTREAMIO): new #define NOSTREAMIO to switch off
 	  stream IO.  Operators <<, >>, and related stuff wrapped by
- 	  #ifndef.
+ 	  #ifndef NOSTREAMIO.
 
 	* cf_factory.cc (CFFactory::basic( int, int )): error message
 	  changed to call of ASSERT macros
@@ -273,9 +276,6 @@ nochmal checken
 
 	* templates/matrix.cc (ASSERT): definition of ASSERT macros
 	  replaced by inclusion of factoryconf.h
-
-========
-ab hier fertig
 
 	* fac_univar.cc (ZFactorizeUnivariate): timing stuff changed to
 	  calls of TIMING macros
