@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.22 1997-04-18 11:24:55 obachman Exp $ */
+/* $Id: iparith.cc,v 1.23 1997-04-25 15:03:58 obachman Exp $ */
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
@@ -14,7 +14,6 @@
 #include <time.h>
 
 #ifndef macintosh
-#include <sys/time.h>
 #include <unistd.h>
 #endif
 
@@ -42,7 +41,7 @@
 #include "ipprint.h"
 #include "attrib.h"
 #include "silink.h"
-#ifdef HAVE_LIBFACTORY
+#ifdef HAVE_FACTORY
 #include "clapsing.h"
 #include "kstdfac.h"
 #endif
@@ -928,7 +927,7 @@ static BOOLEAN jjDIV_P(leftv res, leftv u, leftv v)
   }
   if (pNext(q)!=NULL)
   {
-#ifdef HAVE_LIBFACTORY
+#ifdef HAVE_FACTORY
     res->data=(void*)(singclap_pdivide((poly)(u->Data()),
                                        (poly)(v->Data())));
 #else
@@ -1370,7 +1369,7 @@ static BOOLEAN jjEXTGCD_I(leftv res, leftv u, leftv v)
   res->data=(char *)L;
   return FALSE;
 }
-#ifdef HAVE_LIBFACTORY
+#ifdef HAVE_FACTORY
 static BOOLEAN jjFACSTD2(leftv res, leftv v, leftv w)
 {
   res->data=(void *)stdfac((ideal)v->Data(),NULL,testHomog,NULL,
@@ -1991,7 +1990,7 @@ struct sValCmd2 dArith2[]=
 ,{jjELIMIN,    ELIMINATION_CMD,IDEAL_CMD,      IDEAL_CMD,  POLY_CMD }
 ,{jjELIMIN,    ELIMINATION_CMD,MODUL_CMD,      MODUL_CMD,  POLY_CMD }
 ,{jjEXTGCD_I,  EXTGCD_CMD,     LIST_CMD,       INT_CMD,    INT_CMD }
-#ifdef HAVE_LIBFACTORY
+#ifdef HAVE_FACTORY
 ,{jjEXTGCD_P,  EXTGCD_CMD,     LIST_CMD,       POLY_CMD,   POLY_CMD }
 ,{jjSQR_FREE_DEC,FAC_CMD,      IDEAL_CMD,      POLY_CMD,   INT_CMD }
 ,{jjFACSTD2,    FACSTD_CMD,    LIST_CMD,       IDEAL_CMD,  IDEAL_CMD }
@@ -2011,7 +2010,7 @@ struct sValCmd2 dArith2[]=
 #endif
 ,{jjFIND2,     FIND_CMD,       INT_CMD,        STRING_CMD, STRING_CMD }
 ,{jjGCD_I,     GCD_CMD,        INT_CMD,        INT_CMD,    INT_CMD }
-#ifdef HAVE_LIBFACTORY
+#ifdef HAVE_FACTORY
 ,{jjGCD_P,     GCD_CMD,        POLY_CMD,       POLY_CMD,   POLY_CMD }
 #else
 ,{jjWRONG2,    GCD_CMD,        POLY_CMD,       POLY_CMD,   POLY_CMD }
@@ -2256,7 +2255,7 @@ static BOOLEAN jjDEFINED(leftv res, leftv v)
   else if (v->rtyp!=0) res->data=(void *)(-1);
   return FALSE;
 }
-#ifdef HAVE_LIBFACTORY
+#ifdef HAVE_FACTORY
 static BOOLEAN jjDET(leftv res, leftv v)
 {
   int i,j;
@@ -2330,7 +2329,7 @@ static BOOLEAN jjGETDUMP(leftv res, leftv v)
   else
     return FALSE;
 }
-#ifdef HAVE_LIBFACTORY
+#ifdef HAVE_FACTORY
 static BOOLEAN jjFACSTD(leftv res, leftv v)
 {
   res->data=(void *)stdfac((ideal)v->Data(),NULL,testHomog,NULL);
@@ -2821,7 +2820,7 @@ void jjInitTab1()
         case (int)jjpLength:      dArith1[i].p=(proc1)pLength; break;
         case (int)jjidElem:       dArith1[i].p=(proc1)idElem; break;
         case (int)jjidVec2Ideal:  dArith1[i].p=(proc1)idVec2Ideal; break;
-#ifndef HAVE_LIBFACTORY
+#ifndef HAVE_FACTORY
         case (int)jjmpDet:        dArith1[i].p=(proc1)mpDet; break;
 #endif
         case (int)jjidFreeModule: dArith1[i].p=(proc1)idFreeModule; break;
@@ -2904,7 +2903,7 @@ struct sValCmd1 dArith1[]=
 ,{jjBETTI,      BETTI_CMD,       INTMAT_CMD,     LIST_CMD }
 ,{jjCHAR,       CHARACTERISTIC_CMD, INT_CMD,     RING_CMD }
 ,{jjCHAR,       CHARACTERISTIC_CMD, INT_CMD,     QRING_CMD }
-#ifdef HAVE_LIBFACTORY
+#ifdef HAVE_FACTORY
 ,{jjCHARSERIES, CHAR_SERIES_CMD, MATRIX_CMD,     IDEAL_CMD }
 #else
 ,{jjWRONG,      CHAR_SERIES_CMD, MATRIX_CMD,     IDEAL_CMD }
@@ -2937,7 +2936,7 @@ struct sValCmd1 dArith1[]=
 ,{jjDEGREE,     DEGREE_CMD,      NONE,           IDEAL_CMD }
 ,{jjDEGREE,     DEGREE_CMD,      NONE,           MODUL_CMD }
 ,{jjDEFINED,    DEFINED_CMD,     INT_CMD,        DEF_CMD }
-#ifdef HAVE_LIBFACTORY
+#ifdef HAVE_FACTORY
 ,{jjDET_I,      DET_CMD,         INT_CMD,        INTMAT_CMD }
 ,{jjDET,        DET_CMD,         POLY_CMD,       MATRIX_CMD }
 #else
@@ -2948,13 +2947,13 @@ struct sValCmd1 dArith1[]=
 ,{jjDIM,        DIM_CMD,         INT_CMD,        MODUL_CMD }
 ,{jjDUMP,       DUMP_CMD,        NONE,           LINK_CMD }
 ,{jjE,          E_CMD,           VECTOR_CMD,     INT_CMD }
-#ifdef HAVE_LIBFACTORY
+#ifdef HAVE_FACTORY
 ,{jjFAC_P,      FAC_CMD,         LIST_CMD,       POLY_CMD }
 #else
 ,{jjWRONG,      FAC_CMD,         LIST_CMD,       POLY_CMD }
 #endif
 ,{jjidFreeModule,FREEMODULE_CMD,-((s)MODUL_CMD), INT_CMD }
-#ifdef HAVE_LIBFACTORY
+#ifdef HAVE_FACTORY
 ,{jjFACSTD,     FACSTD_CMD,      LIST_CMD,       IDEAL_CMD }
 #else
 ,{jjWRONG,      FACSTD_CMD,      LIST_CMD,       IDEAL_CMD }
@@ -3702,7 +3701,7 @@ struct sValCmd3 dArith3[]=
 ,{jjREDUCE3_ID,     REDUCE_CMD, MODUL_CMD,  MODUL_CMD,  IDEAL_CMD,  INT_CMD }
 ,{jjRES3,           RES_CMD,    NONE,       IDEAL_CMD,  INT_CMD,    ANY_TYPE }
 ,{jjRES3,           RES_CMD,    NONE,       MODUL_CMD,  INT_CMD,    ANY_TYPE }
-#ifdef HAVE_LIBFACTORY
+#ifdef HAVE_FACTORY
 ,{jjRESULTANT,      RESULTANT_CMD, POLY_CMD,POLY_CMD,   POLY_CMD,   POLY_CMD }
 #else
 ,{jjWRONG3,         RESULTANT_CMD, POLY_CMD,POLY_CMD,   POLY_CMD,   POLY_CMD }

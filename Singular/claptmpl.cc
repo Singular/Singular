@@ -2,19 +2,19 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.3 1997-04-08 16:49:19 Singular Exp $
+// $Id: claptmpl.cc,v 1.4 1997-04-25 15:03:53 obachman Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
 
 #include "mod2.h"
 
-#ifdef HAVE_LIBFACTORY
+#ifdef HAVE_FACTORY
 #define SINGULAR 1
 #include <singfactory.h>
 #endif
 
-#if defined(HAVE_LIBFACTORY) || defined(HAVE_FGLM)
+#if defined(HAVE_FACTORY) || defined(HAVE_FGLM)
 #include <templates/list.cc>
 #endif
 
@@ -22,7 +22,7 @@
 #include "fglm.h"
 #endif
 
-#ifdef HAVE_LIBFACTORY
+#ifdef HAVE_FACTORY
 #include <templates/array.cc>
 #include <templates/factor.cc>
 #include <templates/functions.h>

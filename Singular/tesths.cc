@@ -1,14 +1,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.7 1997-04-12 16:04:49 Singular Exp $ */
+/* $Id: tesths.cc,v 1.8 1997-04-25 15:04:07 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
 */
-
-#define S_VERSION1 "version: 0.9.9"
-#define S_VERSION2 "April  1997"
 
 #ifndef macintosh
 #include <unistd.h>
@@ -19,20 +16,18 @@
 #include <stdlib.h>
 #include <time.h>
 #include <errno.h>
-
+#include "version.h"
 #include "mod2.h"
 #include "tok.h"
 #include "ipshell.h"
 #include "febase.h"
 #include "cntrlc.h"
 #include "mmemory.h"
-#include "version.h"
 #include "silink.h"
 #include "timer.h"
 
+
 /*0 implementation*/
-int sVERSION=VERSION;
-int sS_SUBVERSION=S_SUBVERSION;
 int main(          /* main entry to Singular */
     int argc,      /* number of parameter */
     char** argv)   /* parameter array */
@@ -63,8 +58,14 @@ int main(          /* main entry to Singular */
         if (argc > 2)
         {
           char* ptr = NULL;
+#ifdef HAVE_STRTOD          
           double mintime = strtod(argv[2], &ptr);
           if (errno != ERANGE && ptr != argv[2])
+#else
+          double mintime = 0.0;
+          sscanf(argv[2],"%f", &mintime);
+          if (mintime != 0.0)
+#endif
           {
             argc--;
             argv++;
@@ -84,8 +85,14 @@ int main(          /* main entry to Singular */
       if (argc > 2)
       {
         char* ptr = NULL;
+#ifdef HAVE_STRTOL        
         long res = strtol(argv[2], &ptr, 10);
         if (errno != ERANGE && ptr != argv[2])
+#else
+        long res = 0;
+        sscanf(argv[2],"%d", &res);
+        if (res != 0)
+#endif          
         {
           argc--;
           argv++;
@@ -110,14 +117,14 @@ int main(          /* main entry to Singular */
         {
             case 'V':
             case 'v':{
-              printf("Singular %s%c %s(%d) %s %s\n",
-                     S_VERSION1,(VERSION%10)+'a',S_VERSION2,
-                     S_SUBVERSION,__DATE__,__TIME__);
+              printf("Singular %s %s(%d) %s %s\n",
+                     S_VERSION1,S_VERSION2,
+                     VERSION_ID,__DATE__,__TIME__);
               printf("with ");
-#ifdef HAVE_LIBFACTORY
+#ifdef HAVE_FACTORY
               printf("factory,");
 #endif
-#ifdef HAVE_LIBFACTORY
+#ifdef HAVE_FACTORY
               printf("fac(p),");
 #endif
 #ifdef SRING
@@ -135,7 +142,7 @@ int main(          /* main entry to Singular */
 #ifdef HAVE_MPSR
               printf("MP,");
 #endif
-#ifdef HAVE_READLINE
+#if defined(HAVE_READLINE) && !defined(FEREAD)
               printf("RL,");
 #endif
 #ifdef HAVE_FEREAD
@@ -157,12 +164,12 @@ int main(          /* main entry to Singular */
 #ifdef MSDOS
               char *p=getenv("SPATH");
 #else
-              char *p=getenv("SingularPath");
+              char *p=getenv("SINGULARPATH");
 #endif
               if (p!=NULL)
-                printf("search path:%s\n\n",p);
+                printf("search path:%s:%s\n\n",p,SINGULAR_DATADIR);
               else
-                printf("standard search path:/usr/local/Singular\n\n");
+                printf("search path:%s\n\n", SINGULAR_DATADIR);
               break;
             }
             case 'e': if ((argv[1][i+1]>'0') && (argv[1][i+1]<='9'))
@@ -219,7 +226,7 @@ int main(          /* main entry to Singular */
     printf("%s%c %s",S_VERSION1,VERSION%10+'a',S_VERSION2);
     printf(" (%d)\n\nPlease note:  EVERY COMMAND MUST END WITH A SEMICOLON \";"
            "\"\n(e.g. help; help command; help General syntax; help ring; quit;)\n\n",
-           S_SUBVERSION);
+           VERSION_ID);
   }
   else
   if (!feBatch)

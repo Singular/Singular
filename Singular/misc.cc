@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.6 1997-04-13 12:43:02 Singular Exp $ */
+/* $Id: misc.cc,v 1.7 1997-04-25 15:04:03 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -103,7 +103,7 @@ void m2_end(short i)
 *
 *#ifndef MSDOS
 *#ifndef macintosh
-*#include <sys/time.h>
+*#include <sys/times.h>
 *#include <sys/resource.h>
 *extern "C" int setpriority(int,int,int);
 *void very_nice()

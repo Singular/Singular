@@ -3,15 +3,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.h,v 1.3 1997-04-09 12:19:41 Singular Exp $ */
+/* $Id: cntrlc.h,v 1.4 1997-04-25 15:03:55 obachman Exp $ */
 /*
 * ABSTRACT - interupt and signal handling
 */
 #include "structs.h"
 
 extern int siRandomStart;
-extern int sVERSION;
-extern int sS_SUBVERSION;
 void init_signals();
 #ifndef MSDOS
 #define test_int_std(A) test_int()

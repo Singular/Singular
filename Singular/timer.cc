@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: timer.cc,v 1.6 1997-04-02 15:07:59 Singular Exp $ */
+/* $Id: timer.cc,v 1.7 1997-04-25 15:04:08 obachman Exp $ */
 
 /*
 *  ABSTRACT - get the computing time
@@ -15,11 +15,7 @@
 #endif
 
 int        timerv = 0;
-#ifdef TIME_SEC
-static double timer_resolution = 1.0;
-#else
-static double timer_resolution = 10.0;
-#endif
+static double timer_resolution = TIMER_RESOLUTION;
 
 static double mintime = 0.5;
 
@@ -37,14 +33,24 @@ void SetMinDisplayTime(double mtime)
 #ifndef MSDOS
 
 /*tested on HP9000/700, HP9000/300, Linux 0.99, SUN Sparc*/
-#include <time.h>
 #include <stdio.h>
 #include <math.h>
 #include <unistd.h>
 #include <float.h>
 #include <limits.h>
 #include <sys/types.h>
-#include <sys/times.h>
+
+#ifdef TIME_WITH_SYS_TIME
+# include <time.h>
+# include <sys/times.h>
+#else
+# if HAVE_SYS_TIME_H
+#   include <sys/times.h>
+# else
+#   include <time.h>
+# endif
+#endif
+
 // need to be adjusted on your machine: the number of ticks per second: HZ
 #ifndef HZ
 #include <sys/param.h>
@@ -122,7 +128,6 @@ void writeTime(void* v)
 }
 
 #ifdef HAVE_RTIMER
-#include <sys/time.h>
 /*0 Real timer implementation*/
 int rtimerv = 0;
 static struct timeval  startRl;

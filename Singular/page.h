@@ -8,7 +8,7 @@ extern "C" {
 #include <unistd.h>
 #include <stddef.h>
 #include <sys/types.h>
-#include <sys/time.h>
+#include <sys/times.h>
 
 void * Page_Create(size_t size);
 void Page_AllowAccess(void * address, size_t size);

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.7 1997-04-15 10:08:42 obachman Exp $ */
+/* $Id: extra.cc,v 1.8 1997-04-25 15:03:55 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -10,10 +10,19 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include <time.h>
 
 #ifndef macintosh
-#include <sys/time.h>
+#if TIME_WITH_SYS_TIME
+# include <time.h>
+# include <sys/times.h>
+#else
+# if HAVE_SYS_TIME_H
+#   include <sys/times.h>
+# else
+#   include <time.h>
+# endif
+#endif
+
 #include <unistd.h>
 #endif
 
@@ -32,7 +41,7 @@
 #include "ideals.h"
 #include "kstd1.h"
 
-#ifdef HAVE_LIBFACTORY
+#ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include "clapsing.h"
 #include "clapconv.h"
@@ -144,7 +153,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
           fe_use_fgets=(int)h->next->Data();
           fe_set_input_mode();
         }
-        #elif HAVE_LIBREADLINE
+        #elif HAVE_READLINE
         system("stty sane");
         #endif
       return FALSE;
@@ -190,7 +199,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     }
     else
 /*==================== isSqrFree =============================*/
-#ifdef HAVE_LIBFACTORY
+#ifdef HAVE_FACTORY
     if(strcmp((char*)(h->Data()),"isSqrFree")==0)
     {
       if ((h->next!=NULL) &&(h->next->Typ()==POLY_CMD))
@@ -245,7 +254,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
 #endif
 /*==================== std =============================*/
 #if 0
-#ifdef HAVE_LIBFACTORY
+#ifdef HAVE_FACTORY
     if(strcmp((char*)(h->Data()),"std")==0)
     {
       if ((h->next!=NULL) &&(h->next->Typ()==IDEAL_CMD))
@@ -331,7 +340,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
         WerrorS("matrix expected");
     }
     else
-#ifdef HAVE_LIBFACTORY
+#ifdef HAVE_FACTORY
 /*==================== pdivide ====================*/
     if (strcmp((char*)(h->Data()),"pdivide")==0)
     {

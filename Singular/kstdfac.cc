@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.4 1997-04-02 15:07:17 Singular Exp $ */
+/* $Id: kstdfac.cc,v 1.5 1997-04-25 15:04:01 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -22,7 +22,7 @@
 #include "ipid.h"
 #include "ipshell.h"
 #include "intvec.h"
-#ifdef HAVE_LIBFACTORY
+#ifdef HAVE_FACTORY
 #include "clapsing.h"
 #endif
 #include "lists.h"
@@ -30,7 +30,7 @@
 #include "timer.h"
 #include "kstdfac.h"
 
-#ifdef HAVE_LIBFACTORY
+#ifdef HAVE_FACTORY
 /*3
 * copy o->T to n->T, assumes that n->S is already copied
 */
@@ -667,7 +667,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
 
 lists stdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
 {
-#ifdef HAVE_LIBFACTORY
+#ifdef HAVE_FACTORY
   ideal r;
   BOOLEAN b=pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);

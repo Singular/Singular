@@ -2,14 +2,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.5 1997-04-12 16:04:34 Singular Exp $
+// $Id: clapconv.cc,v 1.6 1997-04-25 15:03:51 obachman Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
 
 
 #include "mod2.h"
-#ifdef HAVE_LIBFACTORY
+#ifdef HAVE_FACTORY
 #include "tok.h"
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include "clapconv.h"

@@ -1,3 +1,13 @@
+Fri Apr 25 16:59:31 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* Various changes to reflect new configure (versions defined in
+	  configure.in, changed HAVE_LIBFACTORY into HAVE_FACTORY, data
+	  dir is pasted from configure into mod2.h and used from there in
+	  feFopen. 
+
+	* Added configure facility, repalced mod2.h by mod2.h.in Makefile
+	  by Makefile.in 
+
 Fri Apr 18 09:47:22 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
 	* silink.cc (DumpAsciiIdhdl): LIB string is dumped without type

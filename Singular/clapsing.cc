@@ -2,14 +2,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.4 1997-04-23 12:14:34 Singular Exp $
+// $Id: clapsing.cc,v 1.5 1997-04-25 15:03:53 obachman Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
 
 
 #include "mod2.h"
-#ifdef HAVE_LIBFACTORY
+#ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include "tok.h"
 #include "clapsing.h"

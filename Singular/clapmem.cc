@@ -2,14 +2,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapmem.cc,v 1.2 1997-04-08 16:49:17 Singular Exp $
+// $Id: clapmem.cc,v 1.3 1997-04-25 15:03:52 obachman Exp $
 /*
 * ABSTRACT: map new[]/delete[] to Singular memeory management
 */
 
 
 #include "mod2.h"
-#ifdef HAVE_LIBFACTORY
+#ifdef HAVE_FACTORY
 #include "mmemory.h"
 
 void *

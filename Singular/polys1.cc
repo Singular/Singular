@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.4 1997-04-12 16:04:44 Singular Exp $ */
+/* $Id: polys1.cc,v 1.5 1997-04-25 15:04:07 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -22,7 +22,7 @@
 #include "ring.h"
 #include "ideals.h"
 #include "polys.h"
-#ifdef HAVE_LIBFACTORY
+#ifdef HAVE_FACTORY
 #include "clapsing.h"
 #endif
 
@@ -808,7 +808,7 @@ void pContent(poly ph)
   {
     pSetCoeff(p,nInit(1));
   }
-#ifdef HAVE_LIBFACTORY
+#ifdef HAVE_FACTORY
   else if ( (nGetChar() == 1) || (nGetChar() < 0) )
   {
     pTest(ph);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.3 1997-04-02 15:06:59 Singular Exp $ */
+/* $Id: feread.cc,v 1.4 1997-04-25 15:03:57 obachman Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -565,7 +565,7 @@ char * fe_fgets_stdin(char *s, int size)
 //}
 #endif
 /*=======================================================================*/
-#ifdef HAVE_READLINE
+#if defined(HAVE_READLINE) && !defined(HAVE_FEREAD) 
 
 #include <unistd.h>
 #include <stdio.h>

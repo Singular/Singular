@@ -10,7 +10,7 @@
 #include <stddef.h>
 #include <signal.h>
 #include <sys/types.h>
-#include <sys/time.h>
+#include <sys/times.h>
 
 unsigned long page_tab[2048];
 char          use_tab [2048];

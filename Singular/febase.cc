@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.7 1997-04-24 18:01:30 Singular Exp $ */
+/* $Id: febase.cc,v 1.8 1997-04-25 15:03:56 obachman Exp $ */
 /*
 * ABSTRACT: i/o system, handling of 'voices'
 */
@@ -195,9 +195,24 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror)
 #ifndef macintosh
   if (f==NULL)
   {
-    strcpy(s,"/usr/local/Singular/");
-    strcat(s,path);
-    f=fopen(s,mode);
+    char* ss = s;
+    int need_len = strlen(path) + strlen(SINGULAR_DATADIR) + 2;
+    
+    if (where == NULL)
+    {
+      if (need_len > 250) ss = (char *) AllocL(need_len);
+      strcpy(ss,s);
+    }
+    else
+    {
+      if (need_len > strlen(where)) ss = AllocL(need_len);
+      strcpy(ss, s);
+    }
+    strcpy(ss,SINGULAR_DATADIR);
+    strcat(s, DIR_SEPP);
+    strcat(ss,path);
+    f=fopen(ss,mode);
+    if (ss != s) FreeL((ADDRESS)ss);
   }
 #endif
   if (where==NULL) FreeL((ADDRESS)s);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.7 1997-04-16 18:38:05 Singular Exp $ */
+/* $Id: cntrlc.cc,v 1.8 1997-04-25 15:03:54 obachman Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -17,6 +17,7 @@
 #include "mmemory.h"
 #include "febase.h"
 #include "cntrlc.h"
+#include "version.h"
 #ifdef PAGE_TEST
 #include "page.h"
 #endif
@@ -25,7 +26,17 @@
 #ifndef hpux
 #include <unistd.h>
 #include <sys/types.h>
-#include <sys/time.h>
+
+#if TIME_WITH_SYS_TIME
+# include <time.h>
+# include <sys/times.h>
+#else
+# if HAVE_SYS_TIME_H
+#   include <sys/times.h>
+# else
+#   include <time.h>
+# endif
+#endif
 
 #define INTERACTIVE 0
 #define STACK_TRACE 1
@@ -84,7 +95,7 @@ typedef struct sigcontext_struct sigcontext;
 */
 void sigsegv_handler(int sig, sigcontext s)
 {
-  fprintf(stderr,"Singular : signal %d (v: %d/%d):\n",sig,sVERSION,sS_SUBVERSION);
+  fprintf(stderr,"Singular : signal %d (v: %d/%d):\n",sig,VERSION,VERSION_ID);
   if (sig!=SIGINT)
   {
     fprintf(stderr,"Segment fault/Bus error occurred at %x because of %x (r:%d)\n"
@@ -182,7 +193,7 @@ void init_signals()
 void sigsegv_handler(int sig, int code, struct sigcontext *scp, char *addr)
 {
   fprintf(stderr,"Singular : signal %d, code %d (v: %d/%d):\n",
-    sig,code,sVERSION,sS_SUBVERSION);
+    sig,code,VERSION,VERSION_ID);
   if ((sig!=SIGINT)&&(sig!=SIGABRT))
   {
     fprintf(stderr,"Segment fault/Bus error occurred at %x (r:%d)\n"
@@ -220,7 +231,7 @@ void init_signals()
 void sigsegv_handler(int sig)
 {
   fprintf(stderr,"Singular : signal %d (v: %d/%d):\n",
-    sig,sVERSION,sS_SUBVERSION);
+    sig,VERSION,VERSION_ID);
   if (sig!=SIGINT)
   {
     fprintf(stderr,"Segment fault/Bus error occurred (r:%d)\n"
