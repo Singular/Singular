@@ -4,7 +4,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_numeric.h,v 1.6 2001-10-09 16:36:11 Singular Exp $ */
+/* $Id: mpr_numeric.h,v 1.7 2001-11-12 10:58:52 pohl Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff
@@ -106,6 +106,12 @@ private:
    * polished by other means.
    */
   bool laguer_driver( gmp_complex ** a, gmp_complex ** roots, bool polish = true );
+  bool isfloat(gmp_complex **a);
+  void divlin(gmp_complex **a, gmp_complex x, int j);
+  void divquad(gmp_complex **a, gmp_complex x, int j);
+  void solvequad(gmp_complex **a, gmp_complex **r, int &k, int &j);
+  void sortroots(gmp_complex **roots, int r, int c, bool isf);
+  void sortre(gmp_complex **r, int l, int u, int inc);
 
   /** Given the degree m and the m+1 complex coefficients a[0..m] of the
    * polynomial, and given the complex value x, this routine improves x by
@@ -113,7 +119,14 @@ private:
    * to a root of the given polynomial. The number of iterations taken is
    * returned at its.
    */
-  void laguer(gmp_complex ** a, int m, gmp_complex * x, int * its);
+  void laguer(gmp_complex ** a, int m, gmp_complex * x, int * its, bool type);
+  void computefx(gmp_complex **a, gmp_complex x, int m,
+                gmp_complex &f0, gmp_complex &f1, gmp_complex &f2,
+                gmp_float &ex, gmp_float &ef);
+  void computegx(gmp_complex **a, gmp_complex x, int m,
+                gmp_complex &f0, gmp_complex &f1, gmp_complex &f2,
+                gmp_float &ex, gmp_float &ef);
+  void checkimag(gmp_complex *x, gmp_float &e);
 
   int var;
   int tdg;

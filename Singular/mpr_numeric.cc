@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_numeric.cc,v 1.16 2001-08-27 14:47:15 Singular Exp $ */
+/* $Id: mpr_numeric.cc,v 1.17 2001-11-12 10:58:55 pohl Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff
@@ -264,12 +264,10 @@ number * vandermonde::interpolateDense( const number * q )
 
 //-> definitions
 #define MR       8        // never change this value
-#define MT      20
-#define MAXIT   (MT*MR)   // max number of iterations in laguer root finder
+#define MT      5
+#define MMOD    (MT*MR)
+#define MAXIT   (5*MMOD)   // max number of iterations in laguer root finder
 
-// set these values according to gmp_default_prec_bits and gmp_equalupto_bits!
-#define EPS     2.0e-34   // used by rootContainer::laguer_driver(), imag() == 0.0 ???
-//<-
 
 //-> rootContainer::rootContainer()
 rootContainer::rootContainer()
@@ -461,36 +459,11 @@ bool rootContainer::solver( const int polishmode )
   }
 
   // now solve
-  switch (polishmode)
-  {
-  case PM_NONE:
-  case PM_POLISH:
-    found_roots= laguer_driver( ad, theroots, polishmode == PM_POLISH );
-    if (!found_roots)
-    {
-      WarnS("rootContainer::solver: No roots found!");
-      goto solverend;
-    }
-    break;
-  case PM_CORRUPT:
-    found_roots= laguer_driver( ad, theroots, false );
-    // corrupt the roots
-    for ( i= 0; i < tdg; i++ )
-      *theroots[i]= *theroots[i] * (gmp_float)(1.0+0.01*(mprfloat)i);
-    // and interpolate again
-    found_roots= laguer_driver( ad, theroots, true );
-    if (!found_roots)
-    {
-      WarnS("rootContainer::solver: No roots found!");
-      goto solverend;
-    }
-    break;
-  default:
-    Warn("rootContainer::solver: Unsupported polish mode %d! Valid are [0,1,2].",polishmode);
-    found_roots= false;
-  } // switch
-
- solverend:
+  found_roots= laguer_driver( ad, theroots, polishmode != 0 );
+  if (!found_roots)
+    WarnS("rootContainer::solver: No roots found!");
+ 
+  // free memory
   for ( i=0; i <= tdg; i++ ) delete ad[i];
   omFreeSize( (ADDRESS) ad, (tdg+1)*sizeof(gmp_complex*) );
 
@@ -501,73 +474,78 @@ bool rootContainer::solver( const int polishmode )
 //-> gmp_complex* rootContainer::laguer_driver( bool polish )
 bool rootContainer::laguer_driver(gmp_complex ** a, gmp_complex ** roots, bool polish )
 {
-  int i,j,jj;
-  int its;
-  gmp_complex x,b,c;
-  bool ret= true;
+  int i,j,k,its;
+  gmp_float zero(0.0);
+  gmp_complex x(0.0),o(1.0);
+  bool ret= true, isf=isfloat(a), type=true;
 
   gmp_complex ** ad= (gmp_complex**)omAlloc( (tdg+1)*sizeof(gmp_complex*) );
   for ( i=0; i <= tdg; i++ ) ad[i]= new gmp_complex( *a[i] );
 
-  for ( j= tdg; j >= 1; j-- )
+  k = 0;
+  i = tdg;
+  j = i-1;
+  while (i>2)
   {
-    x= gmp_complex();
-
     // run laguer alg
-    laguer(ad, j, &x, &its);
+    x = zero;
+    laguer(ad, i, &x, &its, type);
+    if ( its > MAXIT )
+    {
+      type = !type;
+      x = zero;
+      laguer(ad, i, &x, &its, type);
+    }
 
     mprSTICKYPROT(ST_ROOTS_LGSTEP);
-    if ( its > MAXIT ) {  // error
+    if ( its > MAXIT )
+    {  // error
       WarnS("rootContainer::laguer_driver: To many iterations!");
       ret= false;
       goto theend;
     }
-    if ( abs(x.imag()) <= (gmp_float)(2.0*EPS)*abs(x.real()))
+    if ( polish )
     {
-      x= gmp_complex( x.real() );
-    }
-    *roots[j-1]= x;
-    b= *ad[j];
-    for ( jj= j-1; jj >= 0; jj-- )
-    {
-      c= *ad[jj];
-      *ad[jj]= b;
-      b= ( x * b ) + c;
-    }
-  }
-
-  if ( polish )
-  {
-    mprSTICKYPROT(ST_ROOTS_LGPOLISH);
-    for ( i=0; i <= tdg; i++ ) *ad[i]=*a[i];
-
-    for ( j= 1; j <= tdg; j++ )
-    {
-      // run laguer alg with corrupted roots
-      laguer( ad, tdg, roots[j-1], &its );
-
-      mprSTICKYPROT(ST_ROOTS_LGSTEP);
+      laguer( a, tdg, &x, &its , type);
       if ( its > MAXIT )
       {  // error
-        WarnS("rootContainer::laguer_driver: To many iterations!");
+        WarnS("rootContainer::laguer_driver: To many iterations in polish!");
         ret= false;
         goto theend;
       }
     }
-    for ( j= 2; j <= tdg; j++ )
+    if (!type) x = o/x;
+    if (x.imag() == zero)
     {
-      // sort root by their absolute real parts by straight insertion
-      x= *roots[j-1];
-      for ( i= j-1; i >= 1; i-- )
-      {
-        if ( abs(roots[i-1]->real()) <= abs(x.real()) ) break;
-        *roots[i]= *roots[i-1];
-      }
-      *roots[i]= x;
+      *roots[k] = x;
+      k++;
+      divlin(ad,x,i);
+      i--;
     }
+    else
+    {
+      if(isf)
+      {
+        *roots[j] = x;
+        *roots[j-1]= gmp_complex(x.real(),-x.imag());
+        j -= 2;
+        divquad(ad,x,i);
+        i -= 2;
+      }
+      else
+      {
+        *roots[j] = x;
+        j--;
+        divlin(ad,x,i);
+        i--;
+      }
+    }
+    type = !type;
   }
+  solvequad(ad,roots,k,j);
+  sortroots(roots,k,j,isf);
 
- theend:
+theend:
   mprSTICKYPROT("\n");
   for ( i=0; i <= tdg; i++ ) delete ad[i];
   omFreeSize( (ADDRESS) ad, (tdg+1)*sizeof( gmp_complex* ));
@@ -577,72 +555,290 @@ bool rootContainer::laguer_driver(gmp_complex ** a, gmp_complex ** roots, bool p
 //<-
 
 //-> void rootContainer::laguer(...)
-void rootContainer::laguer(gmp_complex ** a, int m, gmp_complex *x, int *its)
+void rootContainer::laguer(gmp_complex ** a, int m, gmp_complex *x, int *its, bool type)
 {
   int iter,j;
-  gmp_float abx_g, abp_g, abm_g, err_g;
+  gmp_float zero(0.0),one(1.0),deg(m);
+  gmp_float abx_g, err_g, fabs;
   gmp_complex dx, x1, b, d, f, g, h, sq, gp, gm, g2;
-  static gmp_float frac_g[MR+1] = { 0.0, 0.5, 0.25, 0.75, 0.13, 0.38, 0.62, 0.88, 1.0 };
+  gmp_float frac_g[MR+1] = { 0.0, 0.5, 0.25, 0.75, 0.125, 0.375, 0.625, 0.875, 1.0 };
 
-  gmp_float epss(1.0/pow(10.0,(int)(gmp_output_digits+gmp_output_digits/4)));
+  gmp_float epss(0.1);
+  mpf_pow_ui(*epss._mpfp(),*epss.mpfp(),getGMPFloatDigits());
 
   for ( iter= 1; iter <= MAXIT; iter++ )
   {
     mprSTICKYPROT(ST_ROOTS_LG);
-
     *its=iter;
-
-    b= *a[m];
-    err_g= abs(b);
-    d= gmp_complex();
-    f= gmp_complex();
-    abx_g= abs(*x);
-
-// gcc 2.95.2 on the dec alpha chokes on this
-#if defined(__GNUC__)
-#if ! (defined(__alpha) && __GNUC__ == 2 && __GNUC_MINOR__ == 95)
-    for ( j= m-1; j >= 0; j-- )
-    {
-      f= ( *x * f ) + d;
-      d= ( *x * d ) + b;
-      b= ( *x * b ) + *a[j];
-      err_g= abs( b ) + ( abx_g * err_g );
-    }
-
+    if (type)
+      computefx(a,*x,m,b,d,f,abx_g,err_g);
+    else
+      computegx(a,*x,m,b,d,f,abx_g,err_g);
     err_g *= epss; // EPSS;
 
-    if ( abs(b) <= err_g ) return;
+    fabs = abs(b);
+    if (fabs <= err_g)
+    {
+      if ((fabs==zero) || (abs(d)==zero)) return;
+      *x -= (b/d); // a last newton-step
+      goto ende;
+    }
 
     g= d / b;
     g2 = g * g;
-    h= g2 - ( ( f / b ) * (gmp_float)2.0 );
-    sq= sqrt(( ( h * (gmp_float)m ) - g2 ) * (gmp_float)(m - 1));
+    h= g2 - (((f+f) / b ));
+    sq= sqrt(( ( h * deg ) - g2 ) * (deg - one));
     gp= g + sq;
     gm= g - sq;
-    abp_g= abs( gp );
-    abm_g= abs( gm );
-
-    if ( abp_g < abm_g ) gp= gm;
-
-    dx = ( (max(abp_g,abm_g) > (gmp_float)0.0)
-           ? ( gmp_complex( (mprfloat)m ) / gp )
-           : ( gmp_complex( cos((mprfloat)iter),sin((mprfloat)iter))
-               * exp(log((gmp_float)1.0+abx_g))) );
-
+    if (abs(gp)<abs(gm))
+    {
+      dx = deg/gm;
+    }
+    else
+    {
+      if((gp.real()==zero)&&(gp.imag()==zero))
+      {
+        dx.real(cos((mprfloat)iter));
+        dx.imag(sin((mprfloat)iter));
+        dx = dx*(one+abx_g);
+      }
+      else
+      {
+        dx = deg/gp;
+      }
+    }
     x1= *x - dx;
 
-    if ( (*x == x1) ) return;
+    if (*x == x1) goto ende;
 
-    if ( iter % MT ) *x= x1;
-    else *x -= ( dx * frac_g[ iter / MT ] );
-#endif
-#endif
+    j = iter%MMOD;
+    if (j==0) j=MT;
+    if ( j % MT ) *x= x1;
+    else *x -= ( dx * frac_g[ j / MT ] );
   }
 
   *its= MAXIT+1;
-  return;
+ende:
+  checkimag(x,epss);
 }
-//<-
+
+void rootContainer::checkimag(gmp_complex *x, gmp_float &e)
+{
+  if(abs(x->imag())<abs(x->real())*e)
+  {
+    x->imag(0.0);
+  }
+}
+
+bool rootContainer::isfloat(gmp_complex **a)
+{
+  gmp_float z(0.0);
+  gmp_complex *b;
+  for (int i=tdg; i >= 0; i-- )
+  {
+    b = &(*a[i]);
+    if (!(b->imag()==z))
+      return false;
+  }
+  return true;
+}
+
+void rootContainer::divlin(gmp_complex **a, gmp_complex x, int j)
+{
+  int i;
+  gmp_float o(1.0);
+
+  if (abs(x)<o)
+  {
+    for (i= j-1; i > 0; i-- )
+      *a[i] += (*a[i+1]*x);
+    for (i= 0; i < j; i++ )
+      *a[i] = *a[i+1];
+  }
+  else
+  {
+    gmp_complex y(o/x);
+    for (i= 1; i < j; i++)
+      *a[i] += (*a[i-1]*y);
+  }
+}
+
+void rootContainer::divquad(gmp_complex **a, gmp_complex x, int j)
+{
+  int i;
+  gmp_float o(1.0),p(x.real()+x.real()),
+            q((x.real()*x.real())+(x.imag()*x.imag()));
+
+  if (abs(x)<o)
+  {
+    *a[j-1] += (*a[j]*p);
+    for (i= j-2; i > 1; i-- )
+      *a[i] += ((*a[i+1]*p)-(*a[i+2]*q));
+    for (i= 0; i < j-1; i++ )
+      *a[i] = *a[i+2];
+  }
+  else
+  {
+    p = p/q;
+    q = o/q;
+    *a[1] += (*a[0]*p);
+    for (i= 2; i < j-1; i++)
+      *a[i] += ((*a[i-1]*p)-(*a[i-2]*q));
+  }
+}
+
+void rootContainer::solvequad(gmp_complex **a, gmp_complex **r, int &k, int &j)
+{
+  gmp_float zero(0.0);
+
+  if (j>k)
+  {
+    gmp_complex sq(zero);
+    gmp_complex h1(*a[1]/(*a[2] + *a[2])), h2(*a[0] / *a[2]);
+    gmp_complex disk((h1 * h1) - h2);
+    if (disk.imag()==zero)
+    {
+      if (disk.real()<zero)
+      {
+        sq.real(zero);
+        sq.imag(sqrt(-disk.real()));
+      }
+      else
+        sq = (gmp_complex)sqrt(disk.real());
+    }
+    else
+      sq = sqrt(disk);
+    *r[k+1] = sq - h1;
+    sq += h1;
+    *r[k] = (gmp_complex)0.0-sq;
+    if(sq.imag()==zero)
+    {
+      k = j;
+      j++;
+    }
+    else
+    {
+      j = k;
+      k--;
+    }
+  }
+  else
+  {
+    *r[k]= (gmp_complex)0.0-(*a[0] / *a[1]);
+    if(r[k]->imag()==zero)
+      j++;
+    else
+      k--;
+  }
+}
+
+void rootContainer::sortroots(gmp_complex **ro, int r, int c, bool isf)
+{
+  int j;
+
+  for (j=0; j<r; j++) // the real roots
+    sortre(ro, j, r, 1);
+  if (c>=tdg) return;
+  if (isf)
+  {
+    for (j=c; j+2<tdg; j+=2) // the complex roots for a real poly
+      sortre(ro, j, tdg-1, 2);
+  }
+  else
+  {
+    for (j=c; j+1<tdg; j++) // the complex roots for a general poly
+      sortre(ro, j, tdg-1, 1);
+  }
+}
+
+void rootContainer::sortre(gmp_complex **r, int l, int u, int inc)
+{
+  int pos,i;
+  gmp_complex *x,*y;
+
+  pos = l;
+  x = r[pos];
+  for (i=l+inc; i<=u; i+=inc)
+  {
+    if (r[i]->real()<x->real())
+    {
+      pos = i;
+      x = r[pos];
+    }
+  }
+  if (pos>l)
+  {
+    if (inc==1)
+    {
+      for (i=pos; i>l; i--)
+        r[i] = r[i-1];
+      r[l] = x;
+    }
+    else
+    {
+      y = r[pos+1];
+      for (i=pos+1; i+1>l; i--)
+        r[i] = r[i-2];
+      if (x->imag()>y->imag())
+      {
+        r[l] = x;
+        r[l+1] = y;
+      }
+      else
+      {
+        r[l] = y;
+        r[l+1] = x;
+      }
+    }
+  }
+  else if ((inc==2)&&(x->imag()<r[l+1]->imag()))
+  {
+    r[l] = r[l+1];
+    r[l+1] = x;
+  }
+}
+
+void rootContainer::computefx(gmp_complex **a, gmp_complex x, int m,
+                  gmp_complex &f0, gmp_complex &f1, gmp_complex &f2,
+                  gmp_float &ex, gmp_float &ef)
+{
+  int k;
+
+  f0= *a[m];
+  ef= abs(f0);
+  f1= gmp_complex(0.0);
+  f2= f1;
+  ex= abs(x);
+
+  for ( k= m-1; k >= 0; k-- )
+  {
+    f2 = ( x * f2 ) + f1;
+    f1 = ( x * f1 ) + f0;
+    f0 = ( x * f0 ) + *a[k];
+    ef = abs( f0 ) + ( ex * ef );
+  }
+}
+
+void rootContainer::computegx(gmp_complex **a, gmp_complex x, int m,
+                  gmp_complex &f0, gmp_complex &f1, gmp_complex &f2,
+                  gmp_float &ex, gmp_float &ef)
+{
+  int k;
+
+  f0= *a[0];
+  ef= abs(f0);
+  f1= gmp_complex(0.0);
+  f2= f1;
+  ex= abs(x);
+
+  for ( k= 1; k <= m; k++ )
+  {
+    f2 = ( x * f2 ) + f1;
+    f1 = ( x * f1 ) + f0;
+    f0 = ( x * f0 ) + *a[k];
+    ef = abs( f0 ) + ( ex * ef );
+  }
+}
 
 //-----------------------------------------------------------------------------
 //-------------- rootArranger -------------------------------------------------
