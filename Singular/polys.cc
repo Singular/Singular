@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.25 1998-04-24 16:51:43 Singular Exp $ */
+/* $Id: polys.cc,v 1.26 1998-05-06 12:44:08 pohl Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -1718,31 +1718,6 @@ poly pMultCopyN(poly a, number c)
   }
   return result;
 }
-
-/*2
-* returns TRUE if the head term of b is a multiple of the head term of a
-*/
-#if defined(macintosh)
-BOOLEAN pDivisibleBy(poly a, poly b)
-{
-  if ((a!=NULL)&&(( pGetComp(a)==0) || ( pGetComp(a) ==  pGetComp(b))))
-  {
-    int i=pVariables;
-    Exponent_t *e1=&( pGetExp(a,1));
-    Exponent_t *e2=&( pGetExp(b,1));
-    if ((*e1) > (*e2)) return FALSE;
-    do
-    {
-      i--;
-      if (i == 0) return TRUE;
-      e1++;
-      e2++;
-     } while ((*e1) <= (*e2));
-   }
-   return FALSE;
-}
-#endif
-
 
 /*2
 * assumes that the head term of b is a multiple of the head term of a
