@@ -635,6 +635,7 @@ AC_CHECK_LIB(singcf, atof)
 AC_CHECK_LIB(singfac, atof)
 AC_CHECK_LIB(omalloc, omTestAddr)
 AC_CHECK_LIB(omalloc_ndebug, main)
+AC_CHECK_LIB(ntl,main)
 
 AC_CHECK_HEADERS(gmp.h smallgmp.h MP.h  MPT.h factory.h factor.h omalloc.h omalloc.c)
 
@@ -673,6 +674,9 @@ if test "$ac_cv_lib_omalloc_omTestAddr" = yes && \
   ac_cv_omalloc_ok=yes
 fi
 
+if test "$ac_cv_lib_ntl_main" = yes; then
+  ac_cv_ntl_ok=yes
+fi
 
 # evaluate results
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
@@ -744,6 +748,14 @@ else
 fi
 AC_SUBST(HAVE_MPSR)
 AC_SUBST(MP_LIBS)
+
+AC_MSG_CHECKING(whether to have NTL)
+if test "${with_NTL}" = yes ; then
+  AC_MSG_RESULT(yes)
+  NEED_LIBS="-lntl ${NEED_LIBS}"
+else
+  AC_MSG_RESULT(no)
+fi
 
 AC_MSG_CHECKING(whether to have factory)
 if test "${with_factory}" != yes && test "${with_factory}" != no; then
