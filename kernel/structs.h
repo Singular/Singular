@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.5 2005-02-25 17:07:26 Singular Exp $ */
+/* $Id: structs.h,v 1.6 2005-03-14 16:17:19 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -386,6 +386,7 @@ struct sip_sring
   int*       block1; /* ending pos.*/
   char**     parameter; /* names of parameters */
   number     minpoly;
+  ideal      minideal;
   int**      wvhdl;  /* array of weight vectors */
   char **    names;  /* array of variable names */
 
