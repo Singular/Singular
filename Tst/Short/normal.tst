@@ -18,7 +18,7 @@ list pr=normal(i);
 pr;
 def r1=pr[1];
 setring r1;
-KK; PP;
+norid; normap;
 kill r,r1;
 
 ring r=32003,(x,y,z),wp(2,3,6);
@@ -27,7 +27,7 @@ list pr=normal(i);
 pr;
 def r1=pr[1];
 setring r1;
-KK; PP;
+norid; normap;
 kill r,r1;
 
 ring r=32003,(x,y,z),dp;
@@ -38,7 +38,7 @@ pr;
 def r1=pr[1];
 def r2=pr[2];
 setring r1;
-KK; PP;
+norid; normap;
 kill r,r1;
 
 ring r=32003,(b,s,t,u,v,w,x,y,z),dp;
@@ -56,9 +56,9 @@ pr;
 def r1=pr[1];
 def r4=pr[4];
 setring r1;
-KK; PP;
+norid; normap;
 setring r4;
-KK; PP;
+norid; normap;
 
 kill r,r1;
 
@@ -71,5 +71,5 @@ list pr=normal(i);
 pr;
 def r1=pr[1];
 setring r1;
-KK; PP;
+norid; normap;
 kill r, r1;
