@@ -1,16 +1,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.69 2000-12-12 08:44:45 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.70 2000-12-14 16:38:50 obachman Exp $ */
 /*
 * ABSTRACT:
 */
 
-// define if LDEG should not be used in inner reduction loops
-// #define NO_LDEG
-
 // define if buckets should be used
-// #define MORA_USE_BUCKETS
+#define MORA_USE_BUCKETS
 
 // define if tailrings should be used
 // #define HAVE_TAIL_RING
@@ -42,6 +39,7 @@ BITSET kOptions=Sy_bit(OPT_PROT)           /*  0 */
                 |Sy_bit(OPT_NOT_SUGAR)     /*  3 */
                 |Sy_bit(OPT_INTERRUPT)     /*  4 */
                 |Sy_bit(OPT_SUGARCRIT)     /*  5 */
+                |Sy_bit(OPT_REDTHROUGH)
                 |Sy_bit(OPT_FASTHC)        /* 10 */
                 |Sy_bit(OPT_KEEPVARS)      /* 21 */
                 |Sy_bit(OPT_INTSTRATEGY)   /* 26 */
@@ -57,7 +55,8 @@ BITSET validOpts=Sy_bit(0)
                 |Sy_bit(4)
                 |Sy_bit(5)
                 |Sy_bit(6)
-//                |Sy_bit(7) obachman 11/00 tossed
+//                |Sy_bit(7) obachman 11/00 tossed: 12/00 used for redThrough
+  |Sy_bit(OPT_REDTHROUGH)
 //                |Sy_bit(8) obachman 11/00 tossed
                 |Sy_bit(9)
                 |Sy_bit(10)
@@ -401,7 +400,7 @@ int redFirst (LObject* h,kStrategy strat)
     }
     if (!strat->homog)
     {
-#ifdef NO_LDEG
+#ifndef HAVE_OLD_STD
       if (strat->honey)
       {
         h->SetpFDeg();
@@ -908,11 +907,8 @@ void firstUpdate(kStrategy strat)
     }
     if (BTEST1(27))
       return;
-    if (!BTEST1(20))        /*- take the first possible -*/
-    {
-      strat->red = redFirst;
-      strat->use_buckets = kMoraUseBucket(strat);
-    }
+    strat->red = redFirst;
+    strat->use_buckets = kMoraUseBucket(strat);
     updateT(strat);
     strat->posInT = posInT2;
     reorderT(strat);
@@ -1529,11 +1525,11 @@ intvec * kModW, * kHomW;
 
 long kModDeg(poly p, ring r)
 {
-  // Hmm obachman: on 1-2, this is pTotalDegree
-  // I think that I had changed this to pWDegree sometime in 10/2000
-  // However, this breaks eliminate, etc
-  // long o=pWDegree(p, r);
-  long o=pTotaldegree(p, r);
+#ifndef HAVE_OLD_STD
+  long o=pWDegree(p, r);
+#else
+  long o = pTotaldegree(p,r);
+#endif
   long i=p_GetComp(p, r);
   if (i==0) return o;
   return o+(*kModW)[i-1];
@@ -1559,6 +1555,10 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   BOOLEAN delete_w=(w==NULL);
   kStrategy strat=new skStrategy;
 
+#ifdef HAVE_OLD_STD
+  test &= ~Sy_bit(OPT_REDTHROUGH);
+#endif
+  
   if(!TEST_OPT_RETURN_SB)
     strat->syzComp = syzComp;
   if (TEST_OPT_SB_1)
@@ -1595,7 +1595,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   pLexOrder=b;
   if (h==isHomog)
   {
-    if ((w!=NULL) && (*w!=NULL))
+    if (strat->ak > 0 && (w!=NULL) && (*w!=NULL))
     {
       strat->kModW = kModW = *w;
       if (vw == NULL)
@@ -1688,7 +1688,7 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   }
   if (h==isHomog)
   {
-    if ((w!=NULL) && (*w!=NULL))
+    if (strat->ak > 0 && (w!=NULL) && (*w!=NULL))
     {
       kModW = *w;
       strat->kModW = *w;

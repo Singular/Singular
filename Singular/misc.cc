@@ -324,6 +324,7 @@ struct soptionStruct optionStruct[]=
   {"degBound",     Sy_bit(OPT_DEGBOUND),       ~Sy_bit(OPT_DEGBOUND)  },
   /* 25 no redTail(p)/redTail(s) */
   {"redTail",      Sy_bit(OPT_REDTAIL),        ~Sy_bit(OPT_REDTAIL)  },
+  {"redThrough",   Sy_bit(OPT_REDTHROUGH),  ~Sy_bit(OPT_REDTHROUGH)  },
   {"intStrategy",  Sy_bit(OPT_INTSTRATEGY),    ~Sy_bit(OPT_INTSTRATEGY)  },
   {"infRedTail",   Sy_bit(OPT_INFREDTAIL),     ~Sy_bit(OPT_INFREDTAIL)  },
   /* 30: use not regularity for syz */

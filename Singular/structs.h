@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.47 2000-12-13 17:49:40 Singular Exp $ */
+/* $Id: structs.h,v 1.48 2000-12-14 16:38:55 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -317,6 +317,7 @@ struct omBin_s;
 struct sro_ord
 {
   ro_typ  ord_typ;
+  int     order_index; // comes from r->order[order_index] 
   union
   {
      sro_dp dp;

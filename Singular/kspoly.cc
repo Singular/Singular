@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.22 2000-11-28 11:50:52 obachman Exp $ */
+/* $Id: kspoly.cc,v 1.23 2000-12-14 16:38:50 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -208,15 +208,10 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   }
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Reduces PR at Current->next with PW
-// Assumes PR != NULL, Current contained in PR 
-//         Current->next != NULL, LM(PW) devides LM(Current->next)
-// Changes: PR
-// Const:   PW
 int ksReducePolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
 {
   BOOLEAN ret;
+  number coef;
   poly Lp =     PR->GetLmCurrRing();
   poly Save =   PW->GetLmCurrRing();
   
@@ -229,7 +224,6 @@ int ksReducePolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
 
   LObject Red(pNext(Current), PR->tailRing);
   TObject With(PW, Lp == Save);
-  number coef;
 
   pAssume(!pHaveCommonMonoms(Red.p, With.p));
   ret = ksReducePoly(&Red, &With, spNoether, &coef);

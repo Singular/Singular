@@ -600,7 +600,7 @@ p_Procs_%.sog: p_Procs_Lib_%.dl_og
 	${CXXG} ${CXXFLAGSG} ${SFLAGS} ${SLDFLAGS} $< -o $@
 
 p_Procs_Lib_%.dl_og : p_Procs_Lib.cc  p_Procs_Dynamic.og
-	${CXX} ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} ${SFLAGS} -Dp_Procs_$* -c $< -o $@
+	${CXXG} ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} ${SFLAGS} -Dp_Procs_$* -c $< -o $@
 
 %.dl_og: %.cc
 	${CXXG} ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} ${SFLAGS} -c $< -o $@
@@ -681,7 +681,7 @@ p_Procs_%.sop: p_Procs_Lib_%.dl_op
 	${CXXP} ${CXXFLAGSP} ${SFLAGS} ${SLDFLAGS} $< -o $@
 
 p_Procs_Lib_%.dl_op : p_Procs_Lib.cc p_Procs_Dynamic.op
-	${CXX} ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} ${SFLAGS} -Dp_Procs_$* -c $< -o $@
+	${CXXP} ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} ${SFLAGS} -Dp_Procs_$* -c $< -o $@
 
 %.dl_op: %.cc
 	${CXXP} ${CXXFLAGSP} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSP} ${SFLAGS} -c $< -o $@
@@ -720,7 +720,7 @@ p_Procs_%.sob: p_Procs_Lib_%.dl_ob
 	${CXXP} ${CXXFLAGSB} ${SFLAGS} ${SLDFLAGS} $< -o $@
 
 p_Procs_Lib_%.dl_ob : p_Procs_Lib.cc  p_Procs_Dynamic.ob
-	${CXX} ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} ${SFLAGS} -Dp_Procs_$* -c $< -o $@
+	${CXXP} ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} ${SFLAGS} -Dp_Procs_$* -c $< -o $@
 
 %.dl_ob: %.cc
 	${CXXP} ${CXXFLAGSB} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSB} ${SFLAGS} -c $< -o $@
@@ -755,16 +755,16 @@ mpsr_Tok.ob: iparith.inc mpsr_Tok.cc
 # for mtrack
 # 
 p_Procs_%.sot: p_Procs_Lib_%.dl_ot 
-	${CXX} ${CXXFLAGST} ${SFLAGS} ${SLDFLAGS} $< -o $@
+	${CXXP} ${CXXFLAGST} ${SFLAGS} ${SLDFLAGS} $< -o $@
 
 p_Procs_Lib_%.dl_ot : p_Procs_Lib.cc p_Procs_Dynamic.ot
-	${CXX} ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} ${SFLAGS} -Dp_Procs_$* -c $< -o $@
+	${CXXP} ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} ${SFLAGS} -Dp_Procs_$* -c $< -o $@
 
 %.dl_ot: %.cc
 	${CXXP} ${CXXFLAGST} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFST} ${SFLAGS} -c $< -o $@
 
 mpsr.sot: $(MPSR_SOURCES:.cc=.dl_ot)
-	${CXX} ${CXXFLAGST} ${SFLAGS} ${SLDFLAGS} ${LDFLAGS} -o $@ $^ ${MP_LIBS}
+	${CXXP} ${CXXFLAGST} ${SFLAGS} ${SLDFLAGS} ${LDFLAGS} -o $@ $^ ${MP_LIBS}
 
 dbmsr.sot: $(DBMSR_SOURCES:.cc=.dl_ot)
 	${CXX} ${CXXFLAGST} ${SFLAGS} ${SLDFLAGS} ${LDFLAGS} -o $@ $^ ${MP_LIBS}
@@ -820,18 +820,18 @@ claptmpl.oa: claptmpl.cc mod2.h
 	$(CXX) ${CXXFLAGSA} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSA} -c $< -o $@
 
 $(OBJA2) : %.oa: %.c
-	$(CCP)  ${CFLAGSA} ${CPPFLAGS} ${DEFSA} -c $< -o $@
+	$(CC)  ${CFLAGSA} ${CPPFLAGS} ${DEFSA} -c $< -o $@
 
 Singulara${S_EXT}: scanner.cc   $(OBJA) iparith.oa mpsr_Tok.oa claptmpl.oa tesths.cc version.h  mmalloc.oa $(DL_LIBSA)
-	$(CXXP) ${CXXFLAGSA} ${CPPFLAGS} ${DEFSA} -o Singulara${S_EXT} \
+	$(CXX) ${CXXFLAGSA} ${CPPFLAGS} ${DEFSA} -o Singulara${S_EXT} \
 	tesths.cc iparith.oa mpsr_Tok.oa claptmpl.oa $(OBJA) ${LDFLAGS} ${LIBS} -lomalloc mmalloc.oa \
 	${LD_DYN_FLAGS} 
 
 iparith.oa: iparith.inc iparith.cc
-	$(CXXP)  ${CXXFLAGSA} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSA} -c iparith.cc -o iparith.oa
+	$(CXX)  ${CXXFLAGSA} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSA} -c iparith.cc -o iparith.oa
 
 mpsr_Tok.oa: iparith.inc mpsr_Tok.cc
-	$(CXXP) ${CXXFLAGAT} ${CXXTEMPLFLAGSB} ${CPPFLAGS} ${DEFSA} -c mpsr_Tok.cc -o mpsr_Tok.oa
+	$(CXX) ${CXXFLAGAT} ${CXXTEMPLFLAGSB} ${CPPFLAGS} ${DEFSA} -c mpsr_Tok.cc -o mpsr_Tok.oa
 
 #
 # for Macro expansion

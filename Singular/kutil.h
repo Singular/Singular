@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.46 2000-11-28 11:50:54 obachman Exp $ */
+/* $Id: kutil.h,v 1.47 2000-12-14 16:38:52 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -19,7 +19,10 @@
 
 #define setmax 16
 
-// #define HAVE_REDTAIL_WITH_T 
+// define if you want std computations as in Singular version < 2
+// This disbales RedThrough and tailReductions against T
+#define HAVE_OLD_STD
+
 #undef NO_KINLINE
 #if !defined(KDEBUG) && !defined(NO_INLINE)
 #define KINLINE inline
@@ -132,6 +135,7 @@ public:
 
   // Iterations
   KINLINE void LmDeleteAndIter();
+  KINLINE poly LmExtractAndIter();
 
   // spoly related things
   // preparation for reduction if not spoly
@@ -142,6 +146,9 @@ public:
   KINLINE void Tail_Mult_nn(number n);
   // deletes bucket, makes sure that p and t_p exists
   KINLINE poly GetP(omBin lmBin = NULL);
+  // similar, except that only t_p exists
+  KINLINE poly GetTP();
+
   // does not delete bucket, just canonicalizes it
   // returned poly is such that Lm(p) \in currRing, Tail(p) \in tailRing
   KINLINE poly CanonicalizeP();
@@ -302,7 +309,7 @@ int posInL17 (const LSet set, const int length,
 int posInL10 (const LSet set, const int length,
              LObject* L,const kStrategy strat);
 KINLINE poly redtailBba (poly p,int pos,kStrategy strat);
-poly redtailBba (LObject *L, int pos,kStrategy strat);
+poly redtailBba (LObject *L, int pos,kStrategy strat, BOOLEAN withT = FALSE);
 poly redtail (poly p,int pos,kStrategy strat);
 poly redtail (LObject *L,int pos,kStrategy strat);
 void enterpairs (poly h, int k, int ec, int pos,kStrategy strat, int atR = -1);
@@ -439,6 +446,8 @@ int ksReducePolyTail(LObject* PR,
                      poly Current,
                      poly spNoether = NULL);
 
+KINLINE int ksReducePolyTail(LObject* PR, TObject* PW, LObject* Red);
+
 // Creates S-Poly of Pair
 // Const:   Pair->p1, Pair->p2
 // Changes: Pair->p == S-Poly of p1, p2
@@ -446,7 +455,6 @@ int ksReducePolyTail(LObject* PR,
 void ksCreateSpoly(LObject* Pair, poly spNoether = NULL, 
                    int use_buckets=0, ring tailRing=currRing, 
                    poly m1 = NULL, poly m2 = NULL, TObject** R = NULL);
-
 
 /*2
 * creates the leading term of the S-polynomial of p1 and p2

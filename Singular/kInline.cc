@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.18 2000-11-28 11:50:51 obachman Exp $
+ *  Version: $Id: kInline.cc,v 1.19 2000-12-14 16:38:49 obachman Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -532,6 +532,32 @@ KINLINE void sLObject::LmDeleteAndIter()
   }
 }
 
+KINLINE poly sLObject::LmExtractAndIter()
+{
+  poly ret = GetLmTailRing();
+  poly pn;
+  
+  assume(p != NULL || t_p != NULL);
+  
+  if (bucket != NULL)
+  {
+    pn = kBucketExtractLm(bucket);
+    if (pn == NULL)
+      kBucketDestroy(&bucket);
+  }
+  else
+  {
+    pn = pNext(ret);
+  }
+  pLength--;
+  pNext(ret) = NULL;
+  if (p != NULL && t_p != NULL)
+    p_LmFree(p, currRing);
+    
+  Set(pn, tailRing);
+  return ret;
+}
+
 KINLINE poly sLObject::CanonicalizeP()
 {
   kTest_L(this);
@@ -547,6 +573,22 @@ KINLINE poly sLObject::CanonicalizeP()
   return p;
 }
 
+KINLINE poly sLObject::GetTP()
+{
+  kTest_L(this);
+  poly tp = GetLmTailRing();
+  assume(tp != NULL);
+
+  if (bucket != NULL)
+  {
+    kBucketClear(bucket, &pNext(tp), &pLength);
+    kBucketDestroy(&bucket);
+    pLength++;
+  }
+  return tp;
+}
+
+    
 KINLINE poly sLObject::GetP(omBin lmBin = NULL)
 {
   kTest_L(this);
@@ -870,6 +912,29 @@ KINLINE BOOLEAN k_GetLeadTerms(const poly p1, const poly p2, const ring p_r,
 
 /***************************************************************
  *
+ * Misc things
+ * 
+ ***************************************************************/
+KINLINE int ksReducePolyTail(LObject* PR, TObject* PW, LObject* Red)
+{
+  BOOLEAN ret;
+  number coef;
+
+  assume(PR->GetLmCurrRing() != PW->GetLmCurrRing());
+  ret = ksReducePoly(Red, PW, NULL, &coef);
+  
+  if (!ret)
+  {
+    if (! n_IsOne(coef, currRing))
+      PR->Mult_nn(coef);
+      
+    n_Delete(&coef, currRing);
+  }
+  return ret;
+}
+
+/***************************************************************
+ *
  * Routines for backwards-Compatibility
  * 
  * 
@@ -918,6 +983,7 @@ KINLINE poly redtailBba (poly p,int pos,kStrategy strat)
   return redtailBba(&L, pos, strat);
 }
 
+  
 #endif // defined(KINLINE) || defined(KUTIL_CC)
 #endif // KINLINE_CC
 

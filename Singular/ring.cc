@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.149 2000-12-12 08:44:51 obachman Exp $ */
+/* $Id: ring.cc,v 1.150 2000-12-14 16:38:54 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -52,6 +52,7 @@ static const char * const ringorder_name[] =
   "ws", //ringorder_ws,
   "Ws", //ringorder_Ws,
   "L", //ringorder_L,
+  "aa", //ringorder_aa
   " _" //ringorder_unspec
 };
 
@@ -357,6 +358,7 @@ static BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
           case ringorder_C:
             if (rCheckIV(iv)) return TRUE;
             break;
+          case ringorder_aa:
           case ringorder_a:
             R->block0[n] = last+1;
             R->block1[n] = last + iv->length() - 2;
@@ -746,7 +748,8 @@ void rWrite(ring r)
 
     if ((r->order[l] >= ringorder_lp)
     ||(r->order[l] == ringorder_M)
-    ||(r->order[l] == ringorder_a))
+    ||(r->order[l] == ringorder_a)    
+    ||(r->order[l] == ringorder_aa))
     {
       PrintS("\n//                  : names    ");
       for (i = r->block0[l]-1; i<r->block1[l]; i++)
@@ -1971,14 +1974,25 @@ BOOLEAN rOrder_is_WeightedOrdering(rRingOrder_t order)
   }
 }
 
+BOOLEAN rHasSimpleOrderAA(ring r)
+{
+  int blocks = rBlocks(r) - 1;
+  if (blocks != 3) return FALSE;
+  return ((r->order[0] == ringorder_aa && r->order[1] != ringorder_M) ||
+          (r->order[1] == ringorder_aa && r->order[2] != ringorder_M));
+}
+
 // return TRUE if p->exp[r->pOrdIndex] holds total degree of p */
 BOOLEAN rOrd_is_Totaldegree_Ordering(ring r =currRing)
 {
   // Hmm.... what about Syz orderings?
   return (r->N > 1 &&
-          rHasSimpleOrder(r) &&
-          (rOrder_is_DegOrdering((rRingOrder_t)r->order[0]) ||
-           rOrder_is_DegOrdering(( rRingOrder_t)r->order[1])));
+          ((rHasSimpleOrder(r) &&
+           (rOrder_is_DegOrdering((rRingOrder_t)r->order[0]) ||
+            rOrder_is_DegOrdering(( rRingOrder_t)r->order[1]))) ||
+           (rHasSimpleOrderAA(r) &&
+            (rOrder_is_DegOrdering((rRingOrder_t)r->order[1]) ||
+             rOrder_is_DegOrdering((rRingOrder_t)r->order[2])))));
 }
 
 // return TRUE if p->exp[r->pOrdIndex] holds a weighted degree of p */
@@ -2657,6 +2671,7 @@ static void rHighSet(ring r, int o_r)
     case ringorder_Wp:
     case ringorder_rp:
     case ringorder_a:
+    case ringorder_aa:
       if (r->OrdSgn==-1) r->MixedOrder=TRUE;
       break;
     case ringorder_ls:
@@ -2681,6 +2696,16 @@ static void rHighSet(ring r, int o_r)
   }
 }
 
+static void rSetFirstWv(ring r, int i, int* order, int* block1, int** wvhdl)
+{
+  // cheat for ringorder_aa
+  if (order[i] == ringorder_aa)
+    i++;
+  if(block1[i]!=r->N) r->LexOrder=TRUE;
+  r->firstBlockEnds=block1[i];
+  r->firstwv = wvhdl[i];
+}
+  
 // set pFDeg, pLDeg, MixOrder, ComponentOrder, etc
 static void rSetDegStuff(ring r)
 {
@@ -2755,16 +2780,11 @@ static void rSetDegStuff(ring r)
   {
     if ((r->VectorOut)||(order[0]==ringorder_C)||(order[0]==ringorder_S)||(order[0]==ringorder_s))
     {
-      if(block1[1]!=r->N) r->LexOrder=TRUE;
-      r->firstBlockEnds=block1[1];
-      r->firstwv = wvhdl[1];
+      rSetFirstWv(r, 1, order, block1, wvhdl);
     }
     else
-    {
-      if(block1[0]!=r->N) r->LexOrder=TRUE;
-      r->firstBlockEnds=block1[0];
-      r->firstwv = wvhdl[0];
-    }
+      rSetFirstWv(r, 0, order, block1, wvhdl);
+
     /*the number of orderings:*/
     int i = 0;
     while (order[++i] != 0);
@@ -2854,9 +2874,11 @@ BOOLEAN rComplete(ring r, int force)
   BOOLEAN need_to_add_comp=FALSE;
   for(i=0;i<n;i++)
   {
+    tmp_typ[typ_i].order_index=i;
     switch (r->order[i])
     {
       case ringorder_a:
+      case ringorder_aa:
         rO_WDegree(j,j_bits,r->block0[i],r->block1[i],tmp_ordsgn,tmp_typ[typ_i],
                    r->wvhdl[i]);
         typ_i++;
@@ -3112,7 +3134,9 @@ BOOLEAN rComplete(ring r, int force)
   j=0; // index in r->typ
   if (i==r->pCompIndex) i++;
   while ((j < r->OrdSize)
-  && ((r->typ[j].ord_typ==ro_syzcomp) || (r->typ[j].ord_typ==ro_syz)))
+         && ((r->typ[j].ord_typ==ro_syzcomp) || 
+             (r->typ[j].ord_typ==ro_syz) ||
+             (r->order[r->typ[j].order_index] == ringorder_aa)))
   {
     i++; j++;
   }

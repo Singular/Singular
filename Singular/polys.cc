@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.70 2000-12-01 14:07:49 Singular Exp $ */
+/* $Id: polys.cc,v 1.71 2000-12-14 16:38:53 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -59,6 +59,11 @@ void pSetGlobals(ring r, BOOLEAN complete)
   {
     if ((r->LexOrder) || (r->OrdSgn==-1))
       test &= ~Sy_bit(OPT_REDTAIL); /* noredTail */
+
+    if (r->OrdSgn == 1 && ! r->LexOrder)
+      test |= Sy_bit(OPT_REDTHROUGH);
+    else
+      test &= ~Sy_bit(OPT_REDTHROUGH);
   }
 }
 

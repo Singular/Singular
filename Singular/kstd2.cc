@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.66 2000-12-12 08:44:46 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.67 2000-12-14 16:38:51 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -213,7 +213,6 @@ static int redLazy (LObject* h,kStrategy strat)
 #ifdef KDEBUG
         if (TEST_OPT_DEBUG) Print(" ->L[%d]\n",at);
 #endif
-        h->CanonicalizeP();
         enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
         h->Clear();
         return -1;
@@ -282,7 +281,7 @@ static int redHoney (LObject* h, kStrategy strat)
     /*
      * end of search: have to reduce with pi
      */
-    if ((pass!=0) && (ei > h->ecart))
+    if (!TEST_OPT_REDTHROUGH && (pass!=0) && (ei > h->ecart))
     {
       h->SetLmCurrRing();
       /*
@@ -352,7 +351,7 @@ static int redHoney (LObject* h, kStrategy strat)
      */
     pass++;
     d = h_d + h->ecart;
-    if ((strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
+    if (!TEST_OPT_REDTHROUGH && (strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
     {
       h->SetLmCurrRing();
       at = strat->posInL(strat->L,strat->Ll,h,strat);
@@ -497,10 +496,8 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   int   srmax,lrmax, red_result;
   int   olddeg,reduc;
   int hilbeledeg=1,hilbcount=0,minimcnt=0;
-#ifdef PROT_LENGTH
-  int length;
-#endif
-
+  BOOLEAN withT = FALSE;
+  
   initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
   initBuchMoraPos(strat);
   initHilbCrit(F,Q,&hilb,strat);
@@ -514,6 +511,11 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   if (!TEST_OPT_NOT_BUCKETS)
     strat->use_buckets = 1;
 
+  // redtailBBa against T for inhomogenous input
+#ifndef HAVE_OLD_STD
+  withT = ! strat->homog;
+#endif
+  
   kTest_TS(strat);
   
 #ifdef HAVE_TAIL_RING
@@ -597,7 +599,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         strat->P.pCleardenom();
         if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
         {
-          strat->P.p = redtailBba(&(strat->P),pos-1,strat);
+          strat->P.p = redtailBba(&(strat->P),pos-1,strat, withT);
           strat->P.pCleardenom();
         }
       }
@@ -605,7 +607,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       {
         strat->P.pNorm();
         if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
-          strat->P.p = redtailBba(&(strat->P),pos-1,strat);
+          strat->P.p = redtailBba(&(strat->P),pos-1,strat, withT);
       }
 
 #ifdef KDEBUG
@@ -634,13 +636,6 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       }
 
       // enter into S, L, and T
-#ifdef PROT_LENGTH
-      if (TEST_OPT_PROT)
-      {
-        length += strat->P.GetpLength();
-        Print("[%d:%d]", strat->P.GetpLength(), length);
-      }
-#endif
       enterT(strat->P, strat);
       enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
       // posInS only depends on the leading term

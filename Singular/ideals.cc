@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.117 2000-12-12 08:44:44 obachman Exp $ */
+/* $Id: ideals.cc,v 1.118 2000-12-14 16:38:48 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2284,7 +2284,9 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   memset(wv[0],0,(pVariables+1)*sizeof(int));
   for (j=0;j<pVariables;j++)
     if (pGetExp(delVar,j+1)!=0) wv[0][j]=1;
-  ord[0] = ringorder_a;
+  // use this special ordering: like ringorder_a, except that pFDeg, pWeights 
+  // ignore it
+  ord[0] = ringorder_aa;
 
   // fill in tmp ring to get back the data later on
   tmpR  = *origR;
@@ -2325,9 +2327,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
       h3->m[j] = prCopyR( hh->m[k], &tmpR);
     }
   }
-  rChangeCurrRing(&tmpR);
-  idDelete(&hh);
-  rChangeCurrRing(origR);
+  id_Delete(&hh, &tmpR);
   idSkipZeroes(h3);
   omFree((ADDRESS)wv[0]);
   omFreeSize((ADDRESS)wv,ordersize*sizeof(int**));

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.82 2000-12-12 08:44:46 obachman Exp $ */
+/* $Id: kutil.cc,v 1.83 2000-12-14 16:38:51 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -27,6 +27,9 @@
 // define, if the my_memmove inlines should be used instead of 
 // system memmove -- it does not seem to pay off, though
 // #define ENTER_USE_MYMEMMOVE
+
+// define if redtailBba should use buckets
+#define HAVE_REDTAIL_BUCKETS
 
 #include "tok.h"
 #include "kutil.h"
@@ -2656,75 +2659,89 @@ poly redtail (LObject* L, int pos, kStrategy strat)
   return p;
 }
 
-// #define OLD_RED_TAIL
-#ifdef OLD_RED_TAIL
-/*2
-* reduces h using the set S
-* procedure used in redtail
-*/
-/*2
-*compute the normalform of the tail p->next of p
-*with respect to S
-*/
-poly redtail (poly p, int pos, kStrategy strat)
-{
-  if ((!strat->noTailReduction) && (pNext(p)!=NULL))
-  {
-    int j, e, l;
-    unsigned long not_sev;
-
-    poly h = p;
-    poly hn = pNext(h); // !=NULL
-    int op = pFDeg(hn);
-    BOOLEAN save_HE=strat->kHEdgeFound;
-    strat->kHEdgeFound |= ((Kstd1_deg>0) && (op<=Kstd1_deg))
-                          || TEST_OPT_INFREDTAIL;
-    loop
-    {
-      not_sev = ~ pGetShortExpVector(hn);
-      e = pLDeg(hn,&l)-op;
-      j = 0;
-      while (j <= pos)
-      {
-        if (pLmShortDivisibleBy(strat->S[j], strat->sevS[j], hn, not_sev)
-            && 
-            ((e >= strat->ecartS[j]) || strat->kHEdgeFound))
-        {
-          strat->redTailChange=TRUE;
-          ksOldSpolyTail(strat->S[j], p, h, strat->kNoether);
-          hn = pNext(h);
-          if (hn == NULL) goto all_done;
-          not_sev = ~ pGetShortExpVector(hn);
-          op = pFDeg(hn);
-          if ((Kstd1_deg>0)&&(op>Kstd1_deg)) goto all_done;
-          e = pLDeg(hn,&l)-op;
-          j = 0;
-        }
-        else
-        {
-          j++;
-        }
-      } /* while (j <= pos) */
-      h = hn; /* better for: pIter(h); */
-      hn = pNext(h);
-      if (hn==NULL) break;
-      op = pFDeg(hn);
-      if ((Kstd1_deg>0)&&(op>Kstd1_deg)) break;
-    }
-all_done:
-    strat->kHEdgeFound = save_HE;
-  }
-  return p;
-}
-#else
 poly redtail (poly p, int pos, kStrategy strat)
 {
   LObject L(p, currRing);
   return redtail(&L, pos, strat);
 }
+
+
+#ifndef OLD_REDTAIL_BBA
+poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT)
+{
+  strat->redTailChange=FALSE;
+  if (strat->noTailReduction) return L->GetLmCurrRing();
+  poly h, p;
+
+  TObject* With;
+  // placeholder in case strat->tl < 0
+  TObject  With_s(strat->tailRing);
+  
+  h = L->GetLmTailRing();
+  p = h;
+  LObject Ln(pNext(h), strat->tailRing);
+  Ln.pLength = L->GetpLength() - 1;
+
+  pNext(h) = NULL;
+  if (L->p != NULL) pNext(L->p) = NULL;
+  L->pLength = 1;
+
+#ifdef HAVE_REDTAIL_BUCKETS  
+  Ln.PrepareRed(strat->use_buckets);
 #endif
 
-poly redtailBba (LObject* L, int pos, kStrategy strat)
+  while(!Ln.IsNull())
+  {
+    while (1)
+    {
+      Ln.SetShortExpVector();
+      if (! withT)
+      {
+        With = kFindDivisibleByInS(strat, pos, &Ln, &With_s);
+        if (With == NULL) break;
+      }
+      else
+      {
+        int j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, &Ln);
+        if (j < 0) break;
+        With = &(strat->T[j]);
+      }
+      if (ksReducePolyTail(L, With, &Ln))
+      {
+        // reducing the tail would violate the exp bound
+        pNext(h) = Ln.GetTP();
+        L->pLength += Ln.GetpLength();
+        if (L->p != NULL) pNext(L->p) = pNext(p);
+        if (kStratChangeTailRing(strat, L))
+          return redtailBba(L, pos, strat, withT);
+        else
+        { // should never get here -- need to fix this
+          assume(0);
+          return NULL;
+        }
+      }
+      strat->redTailChange=TRUE;
+      if (Ln.IsNull()) goto all_done;
+    }
+    pNext(h) = Ln.LmExtractAndIter();
+    pIter(h);
+    L->pLength++;
+  }
+
+  all_done:
+  if (L->p != NULL) pNext(L->p) = pNext(p);
+  assume(pLength(L->p != NULL ? L->p : L->t_p) == L->pLength);
+
+  if (strat->redTailChange)
+  {
+    L->last = NULL;
+    L->length = 0;
+  }
+  kTest_L(L);
+  return L->GetLmCurrRing();
+}
+#else
+poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT)
 {
   poly h, hn;
   int j;
@@ -2746,8 +2763,17 @@ poly redtailBba (LObject* L, int pos, kStrategy strat)
     {
       Ln.Set(hn, strat->tailRing);
       Ln.sev = p_GetShortExpVector(hn, strat->tailRing);
-      With = kFindDivisibleByInS(strat, pos, &Ln, &With_s);
-      if (With == NULL) break;
+      if (! withT)
+      {
+        With = kFindDivisibleByInS(strat, pos, &Ln, &With_s);
+        if (With == NULL) break;
+      }
+      else
+      {
+        int j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, &Ln);
+        if (j < 0) break;
+        With = &(strat->T[j]);
+      }
       if (ksReducePolyTail(L, With, h, strat->kNoether))
       {
         // reducing the tail would violate the exp bound
@@ -2779,7 +2805,7 @@ poly redtailBba (LObject* L, int pos, kStrategy strat)
   }
   return p;
 }
-
+#endif
 /*2
 *checks the change degree and write progress report
 */
