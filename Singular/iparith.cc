@@ -2287,9 +2287,9 @@ static BOOLEAN jjDET(leftv res, leftv v)
   matrix m=(matrix)v->Data();
   if (currRing->parameter==NULL)
   {
-    for(i=1;i<=m->rows();i++)
+    for(i=m->rows();i>0;i--)
     {
-      for(j=1;j<=m->cols();j++)
+      for(j=m->cols();j>0;j--)
       {
         if((MATELEM(m,i,j)!=NULL)
         && (!pIsConstant(MATELEM(m,i,j))))
@@ -2298,7 +2298,6 @@ static BOOLEAN jjDET(leftv res, leftv v)
         }
       }
     }
-
     res->data = (char *)singclap_det(m);
     return FALSE;
   }
@@ -2466,9 +2465,9 @@ static BOOLEAN jjJACOB_P(leftv res, leftv v)
 {
   ideal i=idInit(pVariables,1);
   int k;
-  for (k=0;k<pVariables;k++)
+  for (k=pVariables;k>0;k--)
   {
-    i->m[k]=pDiff(pCopy((poly)(v->Data())),k+1);
+    i->m[k-1]=pDiff(pCopy((poly)(v->Data())),k);
   }
   res->data = (char *)i;
   return FALSE;
@@ -3758,11 +3757,13 @@ static BOOLEAN jjMATRIX_Id(leftv res, leftv u, leftv v,leftv w)
   matrix m=mpNew((int)v->Data(),(int)w->Data());
   ideal I=(ideal)u->CopyD(IDEAL_CMD);
   int i=min(IDELEMS(I),(int)v->Data()*(int)w->Data());
-  for(i=i-1;i>=0;i--)
-  {
-    m->m[i]=I->m[i];
-    I->m[i]=NULL;
-  }
+  //for(i=i-1;i>=0;i--)
+  //{
+  //  m->m[i]=I->m[i];
+  //  I->m[i]=NULL;
+  //}
+  memcpy4(m->m,I->m,i*sizeof(poly));
+  memset(I->m,0,i*sizeof(poly));
   idDelete(&I);
   res->data = (char *)m;
   return FALSE;
