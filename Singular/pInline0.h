@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly Level 0 functions
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline0.h,v 1.3 2000-09-20 12:56:36 obachman Exp $
+ *  Version: $Id: pInline0.h,v 1.4 2000-11-08 15:34:59 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE0_H
 #define PINLINE0_H
@@ -58,16 +58,16 @@ PINLINE0 int p_MinComp(poly p, ring r)
 }
 
 // returns maximal column number in the modul element a (or 0)
-PINLINE0 int p_MaxComp(poly p, ring r)
+PINLINE0 long p_MaxComp(poly p, ring lmRing, ring tailRing)
 {
   int result,i;
 
   if(p==NULL) return 0;
-  result = p_GetComp(p, r);
+  result = p_GetComp(p, lmRing);
   while (pNext(p)!=NULL)
   {
     pIter(p);
-    i = p_GetComp(p, r);
+    i = p_GetComp(p, tailRing);
     if (i>result) result = i;
   }
   return result;

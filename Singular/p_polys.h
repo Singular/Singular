@@ -7,7 +7,7 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: p_polys.h,v 1.12 2000-11-03 14:50:22 obachman Exp $
+ *  Version: $Id: p_polys.h,v 1.13 2000-11-08 15:34:59 obachman Exp $
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -294,7 +294,8 @@ p_SetmProc p_GetSetmProc(ring r);
 // reverses the monomials of p
 PINLINE0   void p_SetCompP(poly a, int i, ring r);
 PINLINE0   void p_SetCompP(poly a, int i, ring lmRing, ring tailRing);
-PINLINE0   int  p_MaxComp(poly p, ring r);
+PINLINE0   long p_MaxComp(poly p, ring lmRing, ring tailRing);
+inline long p_MaxComp(poly p,ring lmRing) {return p_MaxComp(p,lmRing,lmRing);}
 PINLINE0   int  p_MinComp(poly p, ring r);
 
 /***************************************************************

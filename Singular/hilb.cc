@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hilb.cc,v 1.15 2000-09-18 09:19:00 obachman Exp $ */
+/* $Id: hilb.cc,v 1.16 2000-11-08 15:34:55 obachman Exp $ */
 /*
 *  ABSTRACT -  Hilbert series
 */
@@ -207,13 +207,13 @@ static void hWDegree(intvec *wdegree)
 }
 
 static intvec * hSeries(ideal S, intvec *modulweight,
-                int notstc, intvec *wdegree, ideal Q)
+                int notstc, intvec *wdegree, ideal Q, ring tailRing)
 {
   intvec *work, *hseries1=NULL;
   Exponent_t  mc;
   int  *p0;
   int  i, j, k, l, ii, mw;
-  hexist = hInit(S, Q, &hNexist);
+  hexist = hInit(S, Q, &hNexist, tailRing);
   if (hNexist==0)
   {
     hseries1=new intvec(2);
@@ -356,14 +356,14 @@ static intvec * hSeries(ideal S, intvec *modulweight,
 }
 
 
-intvec * hHstdSeries(ideal S, intvec *modulweight, intvec *wdegree, ideal Q)
+intvec * hHstdSeries(ideal S, intvec *modulweight, intvec *wdegree, ideal Q, ring tailRing)
 {
-  return hSeries(S, modulweight, 0, wdegree, Q);
+  return hSeries(S, modulweight, 0, wdegree, Q, tailRing);
 }
 
-intvec * hFirstSeries(ideal S, intvec *modulweight, ideal Q, intvec *wdegree)
+intvec * hFirstSeries(ideal S, intvec *modulweight, ideal Q, intvec *wdegree, ring tailRing)
 {
-  return hSeries(S, modulweight, 1, wdegree, Q);
+  return hSeries(S, modulweight, 1, wdegree, Q, tailRing);
 }
 
 intvec * hSecondSeries(intvec *hseries1)

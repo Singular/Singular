@@ -28,7 +28,7 @@ extern int hNexist, hNstc, hNrad, hNvar, hNpure;
 extern Exponent_t hisModule;
 extern monf stcmem, radmem;
 
-scfmon hInit(ideal S, ideal Q, int * Nexist);
+scfmon hInit(ideal S, ideal Q, int * Nexist, ring tailRing = currRing);
 void hWeight();
 void hDelete(scfmon ev, int ev_length);
 void hComp(scfmon exist, int Nexist, Exponent_t ak, scfmon stc, int * Nstc);

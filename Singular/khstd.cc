@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: khstd.cc,v 1.11 2000-10-23 16:32:23 obachman Exp $ */
+/* $Id: khstd.cc,v 1.12 2000-11-08 15:34:57 obachman Exp $ */
 /*
 * ABSTRACT:utils for hilbert driven kStd
 */
@@ -52,7 +52,7 @@ void khCheck( ideal Q, intvec *w, intvec *hilb, int &eledeg, int &count,
     if ((degp!=kModDeg) && (degp!=kHomModDeg)) degp=pTotaldegree;
     l = hilb->length()-1;
     mw = (*hilb)[l];
-    newhilb = hHstdSeries(strat->Shdl,w,strat->kHomW,Q);
+    newhilb = hHstdSeries(strat->Shdl,w,strat->kHomW,Q,strat->tailRing);
     ln = newhilb->length()-1;
     deg = degp(strat->P.p)-mw;
     loop // compare the series in degree deg, try to increase deg -----------

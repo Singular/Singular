@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: stairc.h,v 1.8 2000-02-16 14:23:18 Singular Exp $ */
+/* $Id: stairc.h,v 1.9 2000-11-08 15:35:01 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -22,8 +22,8 @@ void scDegree(ideal  s,ideal Q=NULL);
 ideal scKBase(int deg, ideal  s, ideal Q=NULL);
 
 intvec * hHstdSeries(ideal S, intvec *modulweight, intvec *wdegree,
-                     ideal Q=NULL);
-intvec * hFirstSeries(ideal S, intvec *modulweight, ideal Q=NULL, intvec *wdegree=NULL);
+                     ideal Q=NULL, ring tailRing = currRing);
+intvec * hFirstSeries(ideal S, intvec *modulweight, ideal Q=NULL, intvec *wdegree=NULL, ring tailRing = currRing);
 intvec * hSecondSeries(intvec *hseries1);
 
 void hLookSeries(ideal S, intvec *modulweight, ideal Q=NULL);

@@ -1,13 +1,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.17 2000-11-06 14:47:33 obachman Exp $ */
+/* $Id: kspoly.cc,v 1.18 2000-11-08 15:34:57 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
 
 // #define PDEBUG 2
-
 #include "mod2.h"
 #include "kutil.h"
 #include "numbers.h"
@@ -65,7 +64,7 @@ BOOLEAN ksReducePoly(LObject* PR,
   if (tailRing != currRing)
   {
     // check that reduction does not violate exp bound
-    while (! p_LmExpVectorAddIsOk(lm, PW->max, tailRing))
+    while (PW->max != NULL && !p_LmExpVectorAddIsOk(lm, PW->max, tailRing))
     {
       // undo changes of lm
       p_ExpVectorAdd(lm, p2, tailRing);
@@ -113,7 +112,8 @@ BOOLEAN ksReducePoly(LObject* PR,
  *
  ***************************************************************/
 void ksCreateSpoly(LObject* Pair,   poly spNoether, 
-                   int use_buckets, ring tailRing, poly m1, poly m2)
+                   int use_buckets, ring tailRing, 
+                   poly m1, poly m2, TObject** R)
 {
   kTest_L(Pair);
   poly p1 = Pair->p1;
@@ -127,8 +127,9 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   poly a1 = pNext(p1), a2 = pNext(p2);
   number lc1 = pGetCoeff(p1), lc2 = pGetCoeff(p2);
   int co=0, ct = ksCheckCoeff(&lc1, &lc2);
-  int x, l1;
 
+  int l1=0, l2=0;
+  
   if (p_GetComp(p1, currRing)!=p_GetComp(p2, currRing))
   {
     if (p_GetComp(p1, currRing)==0)
@@ -151,12 +152,18 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   pSetCoeff0(m1, lc2);
   pSetCoeff0(m2, lc1);  // and now, m1 * LT(p1) == m2 * LT(p2)
 
+  if (use_buckets && R != NULL)
+  {
+    l1 = (R[Pair->i_r1])->pLength - 1;
+    l2 = (R[Pair->i_r2])->pLength - 1;
+  }
+  
   // get m2 * a2
   a2 = tailRing->p_Procs->pp_Mult_mm(a2, m2, spNoether, tailRing);
-  Pair->SetLmTail(m2, a2, use_buckets, tailRing);
+  Pair->SetLmTail(m2, a2, l2, use_buckets, tailRing);
 
   // get m2*a2 - m1*a1
-  Pair->Tail_Minus_mm_Mult_qq(m1, a1, 0, spNoether);
+  Pair->Tail_Minus_mm_Mult_qq(m1, a1, l1, spNoether);
   
   // Clean-up time
   Pair->LmDeleteAndIter();
@@ -205,11 +212,15 @@ BOOLEAN ksReducePolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
     if (! n_IsOne(coef, currRing))
     {
       pNext(Current) = NULL;
+      if (Current == PR->p && PR->t_p != NULL)
+        pNext(PR->t_p) = NULL;
       PR->Mult_nn(coef);
     }
 
     n_Delete(&coef, currRing);
     pNext(Current) = Red.GetLmTailRing();
+    if (Current == PR->p && PR->t_p != NULL)
+      pNext(PR->t_p) = pNext(Current);
   }
 
   if (Lp == Save) With.Delete();

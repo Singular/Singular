@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.51 2000-10-30 13:40:25 obachman Exp $ */
+/* $Id: polys1.cc,v 1.52 2000-11-08 15:34:59 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -558,9 +558,6 @@ void pContent(poly ph)
   }
   else
   {
-#ifdef PDEBUG
-    if (!pTest(ph)) return;
-#endif
     nNormalize(pGetCoeff(ph));
     if(!nGreaterZero(pGetCoeff(ph))) ph = pNeg(ph);
     h=nCopy(pGetCoeff(ph));
@@ -606,7 +603,6 @@ void pContent(poly ph)
     }
 #endif
   }
-  pTest(ph);
 }
 
 //void pContent(poly ph)

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.41 2000-11-06 14:47:36 obachman Exp $ */
+/* $Id: kutil.h,v 1.42 2000-11-08 15:34:59 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -82,8 +82,8 @@ public:
   // arithmetic
   KINLINE void Mult_nn(number n);
   KINLINE void ShallowCopyDelete(ring new_tailRing, omBin new_tailBin,
-                                 pShallowCopyDeleteProc p_shallow_copy_delete);
-
+                                 pShallowCopyDeleteProc p_shallow_copy_delete,
+                                 BOOLEAN set_max = TRUE);
   // manipulations
   KINLINE void pNorm();
   KINLINE void pCleardenom();
@@ -115,7 +115,8 @@ public:
   KINLINE void LmDeleteAndIter();
 
   // spoly related things
-  KINLINE void SetLmTail(poly lm, poly new_p, int use_bucket, ring r);
+  KINLINE void SetLmTail(poly lm, poly new_p, int length, 
+                         int use_bucket, ring r);
   KINLINE void Tail_Minus_mm_Mult_qq(poly m, poly qq, int lq, poly spNoether);
   KINLINE void Tail_Mult_nn(number n);
   KINLINE poly GetP(omBin lmBin = NULL);
@@ -123,6 +124,7 @@ public:
 
   KINLINE void ShallowCopyDelete(ring new_tailRing,  
                                  pShallowCopyDeleteProc p_shallow_copy_delete);
+  
   // sets sev
   KINLINE void SetShortExpVector();
 
@@ -371,7 +373,7 @@ BOOLEAN ksReducePolyTail(LObject* PR,
 // Assume:  Pair->p1 != NULL && Pair->p2
 void ksCreateSpoly(LObject* Pair, poly spNoether = NULL, 
                    int use_buckets=0, ring tailRing=currRing, 
-                   poly m1 = NULL, poly m2 = NULL);
+                   poly m1 = NULL, poly m2 = NULL, TObject** R = NULL);
 
 
 /*2

@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.72 2000-11-03 13:02:59 Singular Exp $
+// $Id: clapsing.cc,v 1.73 2000-11-08 15:34:48 obachman Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -581,7 +581,7 @@ void singclap_divide_content ( poly f )
     FACTORY_CONTSTAT( "cont:", g );
     if (( g == 1 ) || (g == 0))
     {
-      pTest(f);
+      // pTest(f);
       return;
     }
     else
@@ -606,7 +606,7 @@ void singclap_divide_content ( poly f )
         //#endif
       }
     }
-    pTest(f);
+    // pTest(f);
   }
 }
 

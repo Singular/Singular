@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.13 2000-11-06 14:47:33 obachman Exp $
+ *  Version: $Id: kInline.cc,v 1.14 2000-11-08 15:34:56 obachman Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -215,7 +215,7 @@ KINLINE void sTObject::GetLm(poly &p_r, ring &r_r) const
 {
   if (t_p != NULL)
   {
-    p_r = p;
+    p_r = t_p;
     r_r = tailRing;
   }
   else
@@ -274,7 +274,8 @@ KINLINE void sTObject::Mult_nn(number n)
 
 KINLINE void 
 sTObject::ShallowCopyDelete(ring new_tailRing, omBin new_tailBin,
-                            pShallowCopyDeleteProc p_shallow_copy_delete)
+                            pShallowCopyDeleteProc p_shallow_copy_delete, 
+                            BOOLEAN set_max)
 {
   if (new_tailBin == NULL) new_tailBin = new_tailRing->PolyBin;
   if (t_p != NULL)
@@ -310,7 +311,11 @@ sTObject::ShallowCopyDelete(ring new_tailRing, omBin new_tailBin,
       max = NULL;
     }
     else
-      max = p_shallow_copy_delete(max,tailRing,new_tailRing,tailRing->PolyBin);
+      max = p_shallow_copy_delete(max,tailRing,new_tailRing,new_tailBin);
+  }
+  else if (set_max && new_tailRing != currRing && pNext(t_p) != NULL)
+  {
+    max = p_GetMaxExpP(pNext(t_p), new_tailRing);
   }
   tailRing = new_tailRing;
 }
@@ -372,18 +377,20 @@ KINLINE sLObject::sLObject(poly p_in, ring c_r, ring t_r)
   Set(p_in, c_r, t_r);
 }
 
-KINLINE void sLObject::SetLmTail(poly lm, poly p_tail, int use_bucket, ring tailRing)
+KINLINE void sLObject::SetLmTail(poly lm, poly p_tail, int p_Length, int use_bucket, ring tailRing)
 {
   Set(lm, tailRing);
   if (use_bucket)
   {
     bucket = kBucketCreate(tailRing);
-    kBucketInit(bucket, p_tail, 0);
+    kBucketInit(bucket, p_tail, p_Length);
     pNext(lm) = NULL;
+    pLength = 0;
   }
   else
   {
     pNext(lm) = p_tail;
+    pLength = p_Length;
   }
 }
 
@@ -472,7 +479,8 @@ sLObject::ShallowCopyDelete(ring new_tailRing,
     kBucketShallowCopyDelete(bucket, new_tailRing, new_tailRing->PolyBin,
                              p_shallow_copy_delete);
   sTObject::ShallowCopyDelete(new_tailRing, 
-                              new_tailRing->PolyBin,p_shallow_copy_delete);
+                              new_tailRing->PolyBin,p_shallow_copy_delete, 
+                              FALSE);
 }
 
 KINLINE void sLObject::SetShortExpVector()

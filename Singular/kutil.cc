@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.73 2000-11-06 14:47:35 obachman Exp $ */
+/* $Id: kutil.cc,v 1.74 2000-11-08 15:34:58 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -10,12 +10,15 @@
 #define KUTIL_CC
 
 // #define PDEBUG 2
-// #define PDEBUG 2
 // #define PDIV_DEBUG
 
 #include <stdlib.h>
 #include <string.h>
 #include "mod2.h"
+#ifdef KDEBUG
+#undef KDEBUG
+#define KDEBUG 2
+#endif
 #include "tok.h"
 #include "kutil.h"
 #include "febase.h"
@@ -476,7 +479,7 @@ BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
     L->GetLm(p, r);
     if (L->sev != 0 && p_GetShortExpVector(p, r) != L->sev)
     {
-      return dReportError("%L[%d] wrong sev: has %o, specified to have %o",
+      return dReportError("L[%d] wrong sev: has %o, specified to have %o",
                           lpos, p_GetShortExpVector(p, r), L->sev);
     }
   }
@@ -3479,8 +3482,10 @@ void enterT(LObject p, kStrategy strat, int atT = -1)
   if (strat->use_buckets && p.pLength <= 0)
     strat->T[atT].pLength = pLength(p.p);
 
-  if (strat->tailRing != currRing)
+  if (strat->tailRing != currRing && pNext(p.p) != NULL)
     strat->T[atT].max = p_GetMaxExpP(pNext(p.p), strat->tailRing);
+  else
+    strat->T[atT].max = NULL;
 
   strat->tl++;
   strat->R[strat->tl] = &(strat->T[atT]);
@@ -3832,62 +3837,40 @@ BOOLEAN kCheckSpolyCreation(kStrategy strat,
 {
   assume(pNext(strat->P.p) == strat->tail);
   assume(strat->P.p1 != NULL && strat->P.p2 != NULL);
+  assume(strat->P.i_r1 >= 0 && strat->P.i_r1 <= strat->tl);
+  assume(strat->P.i_r2 >= 0 && strat->P.i_r2 <= strat->tl);
   assume(strat->tailRing != currRing);
   
   if (! k_GetLeadTerms(strat->P.p1, strat->P.p2, currRing,
                        m1, m2, strat->tailRing))
     return FALSE;
+  poly p1_max = (strat->R[strat->P.i_r1])->max;
+  poly p2_max = (strat->R[strat->P.i_r2])->max;
   
-  int i =0;
-  BOOLEAN 
-    m1_ok = (pNext(strat->P.p1) == NULL), 
-    m2_ok = (pNext(strat->P.p2) == NULL);
-  
-  if (m1_ok && m2_ok) return TRUE;
-  
-  for (i=0; i<=strat->tl; i++)
+  if ((p1_max != NULL && !p_LmExpVectorAddIsOk(m1, p1_max, strat->tailRing)) ||
+      (p2_max != NULL && !p_LmExpVectorAddIsOk(m2, p2_max, strat->tailRing)))
   {
-    if (!m1_ok)
-    {
-      if (strat->T[i].p == strat->P.p1)
-      {
-        // check that m1*tail(p1) is ok
-        if (! p_LmExpVectorAddIsOk(m1, strat->T[i].max, strat->tailRing))
-          goto false_return;
-        if (m2_ok) return TRUE;
-        m1_ok = TRUE;
-      }
-    }
-    if (!m2_ok)
-    {
-      if (strat->T[i].p == strat->P.p2)
-      {
-        // check that m2*tail(p2) is ok
-        if (! p_LmExpVectorAddIsOk(m2, strat->T[i].max, strat->tailRing))
-          goto false_return;
-        if (m1_ok) return TRUE;
-        m2_ok = TRUE;
-      }
-    }
+    p_LmFree(m1, strat->tailRing);
+    p_LmFree(m2, strat->tailRing);
+    return FALSE;
   }
-  // should never get here
-  dReportError("ksCheckSpolyCreation: p1 or p2 not in T");
   return TRUE;
-
-  false_return:
-  p_LmFree(m1, strat->tailRing);
-  p_LmFree(m2, strat->tailRing);
-  return FALSE;
 }
                        
 BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned long expbound)
 {
   if (expbound == 0) expbound = strat->tailRing->bitmask << 1;
   if (expbound >= currRing->bitmask) return FALSE;
-  ring new_tailRing = rModifyRing(currRing,strat->homog, !strat->ak, expbound);
-  
+  ring new_tailRing = rModifyRing(currRing,
+                                  // Hmmm .. the condition pFDeg == pDeg
+                                  // might be too strong
+                                  (strat->homog && pFDeg == pDeg), 
+                                  !strat->ak, 
+                                  expbound);
+
+  if (new_tailRing == currRing) return TRUE;
   if (TEST_OPT_PROT)
-    Print("[%d", (long) new_tailRing->bitmask);
+    Print("[%d:%d", (long) new_tailRing->bitmask, new_tailRing->ExpL_Size);
   kTest_TS(strat);
   assume(new_tailRing != strat->tailRing);
   pShallowCopyDeleteProc p_shallow_copy_delete 
@@ -3946,6 +3929,7 @@ void kStratInitChangeTailRing(kStrategy strat)
   }
   for (i=0; i<=strat->tl; i++)
   {
+    // Hmm ... this we could do in one Step
     l = p_GetMaxExpL(strat->T[i].p, currRing, l);
   }
   e = p_GetMaxExp(l, currRing);

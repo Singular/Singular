@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.137 2000-11-07 15:08:56 Singular Exp $ */
+/* $Id: ring.cc,v 1.138 2000-11-08 15:35:00 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1877,11 +1877,17 @@ rOrderType_t rGetOrderType(ring r)
 
 BOOLEAN rHasSimpleOrder(ring r)
 {
-  return
-    (r->order[0] == ringorder_unspec) ||
-    ((r->order[2] == 0) &&
-     (r->order[1] != ringorder_M &&
-      r->order[0] != ringorder_M));
+  if (r->order[0] == ringorder_unspec) return TRUE;
+  int blocks = rBlocks(r);
+  assume(blocks >= 1);
+  if (blocks == 1) return TRUE;
+  if (blocks > 2)  return FALSE;
+  if (r->order[0] != ringorder_c && r->order[0] != ringorder_C &&
+      r->order[1] != ringorder_c && r->order[1] != ringorder_C)
+    return FALSE;
+  if (r->order[1] == ringorder_M || r->order[0] == ringorder_M)
+    return FALSE;
+  return TRUE;
 }
 
 // returns TRUE, if simple lp or ls ordering
@@ -2481,10 +2487,8 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
     return r;
   }
   ring res=(ring)omAlloc0Bin(ip_sring_bin);
-  memcpy(res,r,sizeof(*r));
-  res->names   = r->names;
-  // res->idroot = NULL;
-  res->qideal =  r->qideal; // ?? or NULL
+  *res = *r;
+  // res->qideal, res->idroot ???
   res->wvhdl=wvhdl;
   res->order=order;
   res->block0=block0;
@@ -2495,8 +2499,20 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
   // adjust res->pFDeg: if it was changed gloabbly, then
   // it must also be changed for new ring
   if (pFDeg != r->pFDeg)
-    res->pFDeg = r->pFDeg;
-  
+    res->pFDeg = pFDeg;
+
+  // set syzcomp
+  if (res->typ != NULL && res->typ[0].ord_typ == ro_syz)
+  {
+    res->typ[0] = r->typ[0];
+    if (r->typ[0].data.syz.limit > 0)
+    {
+      res->typ[0].data.syz.syz_index 
+        = (int*) omAlloc((r->typ[0].data.syz.limit +1)*sizeof(int));
+      memcpy(res->typ[0].data.syz.syz_index, r->typ[0].data.syz.syz_index,
+             (r->typ[0].data.syz.limit +1)*sizeof(int));
+    }
+  }
   return res;
 }
 
@@ -3278,24 +3294,29 @@ void rDebugPrint(ring r)
   }
 }
 
-void pDebugPrint(poly p)
+void pDebugPrintR(poly p, ring r)
 {
   int i,j;
   pWrite(p);
-  j=10;
+  j=2;
   while(p!=NULL)
   {
-    Print("\nexp[0..%d]\n",currRing->ExpL_Size-1);
-    for(i=0;i<currRing->ExpL_Size;i++)
+    Print("\nexp[0..%d]\n",r->ExpL_Size-1);
+    for(i=0;i<r->ExpL_Size;i++)
       Print("%d ",p->exp[i]);
     PrintLn();
-    Print("v0:%d ",pGetComp(p));
-    for(i=1;i<=pVariables;i++) Print(" v%d:%d",i,pGetExp(p,i));
+    Print("v0:%d ",p_GetComp(p, r));
+    for(i=1;i<=r->N;i++) Print(" v%d:%d",i,p_GetExp(p,i, r));
     PrintLn();
     pIter(p);
     j--;
     if (j==0) { PrintS("...\n"); break; }
   }
+}
+
+void pDebugPrint(poly p)
+{
+  pDebugPrintR(p, currRing);
 }
 #endif // RDEBUG
 

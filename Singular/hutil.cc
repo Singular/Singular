@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hutil.cc,v 1.17 2000-10-23 16:32:22 obachman Exp $ */
+/* $Id: hutil.cc,v 1.18 2000-11-08 15:34:55 obachman Exp $ */
 /*
 * ABSTRACT: Utilities for staircase operations
 */
@@ -30,12 +30,15 @@ monf stcmem, radmem;
 // global variables, so we might do that here, as well.
 static Exponent_t **hsecure= NULL;
 
-scfmon hInit(ideal S, ideal Q, int *Nexist)
+scfmon hInit(ideal S, ideal Q, int *Nexist, ring tailRing)
 {
   int  sl, ql, i, k = 0;
   polyset si, qi, ss;
   scfmon ex, ek;
-  hisModule = idRankFreeModule(S);
+  if (tailRing != currRing)
+    hisModule = idRankFreeModule(S, currRing, tailRing);
+  else
+    hisModule = idRankFreeModule(S);
   if (hisModule < 0)
     hisModule = 0;
   if (S)

@@ -1,15 +1,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.58 2000-11-06 14:47:34 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.59 2000-11-08 15:34:57 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
 
+// #define PDEBUG 2
 // define to enable tailRings
 // #define HAVE_TAIL_RING
-
-// #define PDEBUG 2
 
 #include "mod2.h"
 #include "kutil.h"
@@ -146,12 +145,12 @@ static int redHomog (LObject* h,kStrategy strat)
     if (j < 0) return 1;
     
     // now we found one which is divisible -- reduce it
-    ksReducePoly(h, &(strat->T[j]), strat->kNoether);
+    ksReducePoly(h, &(strat->T[j]), strat->kNoether, NULL, strat);
 
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
-      PrintS("\nto ");
+      Print("\n%pto ", h->t_p);
       h->wrp();
       PrintLn();
     }
@@ -196,7 +195,7 @@ static int redLazy (LObject* h,kStrategy strat)
     }
 #endif
 
-    ksReducePoly(h, &(strat->T[j]), strat->kNoether);
+    ksReducePoly(h, &(strat->T[j]), strat->kNoether, NULL, strat);
 
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
@@ -347,7 +346,7 @@ static int redHoney (LObject* h, kStrategy strat)
       h->p = p_Copy(h->p, currRing, strat->tailRing);
     }
 
-    ksReducePoly(h, &(strat->T[ii]), strat->kNoether);
+    ksReducePoly(h, &(strat->T[ii]), strat->kNoether, NULL, strat);
 
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
@@ -655,7 +654,8 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   kTest_TS(strat);
   
 #ifdef HAVE_TAIL_RING
-  kStratInitChangeTailRing(strat);
+  if (strat->minim <= 0)
+    kStratInitChangeTailRing(strat);
 #endif  
   
   /* compute------------------------------------------------------- */
@@ -691,8 +691,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       {
         assume(m1 == NULL && m2 == NULL);
         // if not, change to a ring where exponents are at least
-        // twice as large as current ones -- should be enough to
-        // get through ksCreateSpoly correctly
+        // large enough
         kStratChangeTailRing(strat);
       }
       /* deletes the short spoly and computes */
@@ -700,7 +699,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       strat->P.p=NULL;
       /* create the real one */
       ksCreateSpoly(&(strat->P), strat->kNoether, strat->use_buckets, 
-                    strat->tailRing, m1, m2);
+                    strat->tailRing, m1, m2, strat->R);
     }
 
     if  ((strat->P.p1==NULL) && (strat->minim>0)) 
