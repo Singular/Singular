@@ -422,16 +422,26 @@ static void notice_miss(int i, int j, calc_dat* c){
  
 }
 
-static void cleanS(kStrategy strat){
+static void cleanS(kStrategy strat, calc_dat* c){
   int i=0;
   LObject P;
   while(i<=strat->sl){
     P.p=strat->S[i];
     P.sev=strat->sevS[i];
-    if(kFindDivisibleByInS(strat->S,strat->sevS,strat->sl,&P)!=i){
+    if(kFindDivisibleByInS(strat->S,strat->sevS,strat->sl,&P)!=i)
+    {
       deleteInS(i,strat);
       //remember destroying poly
-
+      BOOLEAN found=FALSE;
+      int j;
+      for(j=0;j<c->n;j++)
+	if(c->S->m[j]==P.p)
+	{
+	  found=TRUE;
+	  break;
+	}
+      if (!found)
+	pDelete(&P.p);
       //remember additional reductors
     }
     else i++;
@@ -982,7 +992,7 @@ static sorted_pair_node** add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c,
   //  if(c->strat->lenS[i]<c->strat->lenS[i-1]) printf("fehler bei %d\n",i);
   if (c->Rcounter>50) {
     c->Rcounter=0;
-    cleanS(c->strat);
+    cleanS(c->strat,c);
   }
   if(!ip){
     qsort(nodes,spc,sizeof(sorted_pair_node*),pair_better_gen2);
