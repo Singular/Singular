@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.104 1999-09-27 11:22:15 Singular Exp $
+@comment $Id: types.doc,v 1.105 1999-10-14 14:42:26 obachman Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -1967,7 +1967,7 @@ Z/p -> R
 
 @item
 @tex
-R \rightarrow Q$
+$R \rightarrow Q$
 @end tex
 @ifinfo
 R -> Q
@@ -3403,11 +3403,11 @@ an expression_list of the name @code{complex}, an optional int_expression
 and a name.
 @end enumerate
 
-For the definition of the coefficient_field, see @ref{Rings and orderings}.
+For the definition of the 'coefficient_field', see @ref{Rings and orderings}.
 
-The names_of_ring_variables is a list of names or indexed names.
+'names_of_ring_variables' must be a list of names or indexed names.
 
-The ordering is a list of block orderings where each block ordering is either
+'ordering' is a list of block orderings where each block ordering is either
 
 @enumerate
 @item

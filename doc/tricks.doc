@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: tricks.doc,v 1.3 1999-09-27 11:36:38 obachman Exp $
+@comment $Id: tricks.doc,v 1.4 1999-10-14 14:42:25 obachman Exp $
 @comment this file contains the "Tricks and pittfals" sections
 
 @c The following directives are necessary for proper compilation
@@ -41,9 +41,7 @@ the (weighted) degree of a monomial must be smaller than 2147483648
 @item
 the exponent of a ring variable and the rank of any free module
 must be smaller than 32768
-@item
-a ring must have at most 505 variables (501 on a DEC Alpha)
-@c TBC -- number of parameters
+@c TBC -- number of max parameters
 @item
 the precision of long floating point numbers (for ground field @code{real})
 must be smaller than 32768
@@ -54,7 +52,7 @@ from -2147483647 to 2147483647
 floating point numbers (type @code{number} from field @code{real}) have
 a limited range which is machine dependent. A typical range is -1.0e-38
 to 1.0e+38.  The string representation of overflow and underflow is
-machine dependent, too, for example "@code{Inf}" on Linux or 
+machine dependent, as well. For example "@code{Inf}" on Linux, or 
 "@code{+.+00e+00}" on HPUX.
 @c @item
 @c a token (in the input) must have 16383 characters or less.
