@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.23 1998-10-28 12:05:29 Singular Exp $ */
+/* $Id: ipid.cc,v 1.24 1998-10-28 18:12:55 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -52,16 +52,23 @@ idhdl idrec::get(const char * s, int lev)
   while (h!=NULL)
   {
     mmTestLP(IDID(h));
-//    id=IDID(h);
-//    l=IDLEV(h);
-//    if ((l==0) && (*(short *)s==*(short *)id) && (0 == strcmp(s+1,id+1)))
-//    {
-//      found=h;
-//    }
-//    else if ((l==lev) && (*(short *)s==*(short *)id) && (0 == strcmp(s+1,id+1)))
-//    {
-//      return h;
-//    }  
+// =============================================================
+#if 0
+// timings: ratchwum: 515 s, wilde13: 373 s, nepomuck: 267 s, lukas 863 s
+    id=IDID(h);
+    l=IDLEV(h);
+    if ((l==0) && (*(short *)s==*(short *)id) && (0 == strcmp(s+1,id+1)))
+    {
+      found=h;
+    }
+    else if ((l==lev) && (*(short *)s==*(short *)id) && (0 == strcmp(s+1,id+1)))
+    {
+      return h;
+    }  
+#endif
+// =============================================================
+#if 0
+// timings: ratchwum: 515 s, wilde13: 398 s, nepomuck: 269 s, lukas 834 s
     id=IDID(h);
     if (*(short *)s==*(short *)id)
     {
@@ -75,19 +82,25 @@ idhdl idrec::get(const char * s, int lev)
         return h;
       }
     }
-//    l=IDLEV(h);
-//    if ((l==0)||(l==lev))
-//    { 
-//      id=IDID(h);
-//      if (*(short *)s==*(short *)id)
-//      {
-//        if (0 == strcmp(s+1,id+1))
-//        {
-//          if (l==lev) return h;
-//          found=h;
-//        }
-//      }
-//    }
+#endif
+// =============================================================
+#if 1
+// timings: ratchwum: 501 s, wilde13: 357 s, nepomuck: 267 s, lukas 816 s
+    l=IDLEV(h);
+    if ((l==0)||(l==lev))
+    { 
+      id=IDID(h);
+      if (*(short *)s==*(short *)id)
+      {
+        if (0 == strcmp(s+1,id+1))
+        {
+          if (l==lev) return h;
+          found=h;
+        }
+      }
+    }
+#endif
+// =============================================================
     h = IDNEXT(h);
   }
   return found;
