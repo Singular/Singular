@@ -1,9 +1,9 @@
-// $Id: random.lib,v 1.5 1998-05-05 11:55:36 krueger Exp $
+// $Id: random.lib,v 1.6 1999-07-02 09:06:02 obachman Exp $
 //system("random",787422842);
 //(GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: random.lib,v 1.5 1998-05-05 11:55:36 krueger Exp $";
+version="$Id: random.lib,v 1.6 1999-07-02 09:06:02 obachman Exp $";
 info="
 LIBRARY:  random.lib    PROCEDURES OF RANDOM MATRIX AND POLY OPERATIONS
 
@@ -14,6 +14,7 @@ LIBRARY:  random.lib    PROCEDURES OF RANDOM MATRIX AND POLY OPERATIONS
  sparsemat(n,m[,p,b]);  nxm sparse integer matrix with random coefficients
  sparsepoly(u[,o,p,b]); random sparse polynomial with terms of degree in [u,o]
  sparsetriag(n,m[..]);  nxm sparse lower-triag intmat with random coefficients
+ randomLast(b);         random transformation of the last variable
            (parameters in square brackets [] are optional)
 ";
 
@@ -244,5 +245,29 @@ example
    sparsetriag(7,5,90);"";
    sparsetriag(5,5,0);"";
    sparsetriag(5,5,50,100);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc randomLast(int b)
+"USAGE:   randomLast(b);  b int
+RETURN:  ideal = maxideal(1), but the last variable is exchanged by
+         a sum of it with a linear random combination of the other
+         variables. The coefficients are in the interval [-b,b].
+EXAMPLE: example randomLast; shows an example
+"
+{
+  ideal i=maxideal(1);
+  int k=size(i);
+  i[k]=0;
+  i=randomid(i,size(i),b);
+  ideal ires=maxideal(1);
+  ires[k]=i[1]+var(k);
+  return(ires);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring  r = 0,(x,y,z),lp;
+   ideal i = randomLast(10);
+   i;
 }
 ///////////////////////////////////////////////////////////////////////////////

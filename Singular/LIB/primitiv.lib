@@ -1,45 +1,22 @@
-// $Id: primitiv.lib,v 1.8 1999-04-14 12:11:53 Singular Exp $
+// $Id: primitiv.lib,v 1.9 1999-07-02 09:06:01 obachman Exp $
 // author:  Martin Lamm,  email: lamm@mathematik.uni-kl.de
 // last change:            19.03.99
 ///////////////////////////////////////////////////////////////////////////////
 // This library is for Singular 1.2 or newer
 
-version="$Id: primitiv.lib,v 1.8 1999-04-14 12:11:53 Singular Exp $";
+version="$Id: primitiv.lib,v 1.9 1999-07-02 09:06:01 obachman Exp $";
 info="
 LIBRARY:    primitiv.lib    PROCEDURES FOR FINDING A PRIMITIVE ELEMENT
 
  primitive(ideal i);   find minimal polynomial for a primitive element
  primitive_extra(i);   find primitive element for two generators
  splitring(f,R[,L]);   define ring extension with name R and switch to it
- randomLast(b);        random transformation of the last variable
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
 LIB "random.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
-proc randomLast(int b)
-"USAGE:   randomLast(b);  b int
-RETURN:  ideal = maxideal(1), but the last variable is exchanged by
-         a sum of it with a linear random combination of the other
-         variables. The coefficients are in the interval [-b,b].
-EXAMPLE: example randomLast; shows an example
-"
-{
-  ideal i=maxideal(1);
-  int k=size(i);
-  i[k]=0;
-  i=randomid(i,size(i),b);
-  ideal ires=maxideal(1);
-  ires[k]=i[1]+var(k);
-  return(ires);
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   ring  r = 0,(x,y,z),lp;
-   ideal i = randomLast(10);
-   i;
-}
 ///////////////////////////////////////////////////////////////////////////////
 
 proc primitive(ideal i)

@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.35 1999-06-09 12:04:24 Singular Exp $
+// $Id: primdec.lib,v 1.36 1999-07-02 09:06:00 obachman Exp $
 ////////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                                //
 // algorithms for primary decomposition based on                              //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                             //
 ////////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.35 1999-06-09 12:04:24 Singular Exp $";
+version="$Id: primdec.lib,v 1.36 1999-07-02 09:06:00 obachman Exp $";
 info="
 LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION
 
@@ -419,36 +419,6 @@ proc stdIdealsEqual( ideal k1, ideal k2)
    }
    return(0);
 }
-
-
-
-
-proc randomLast(int b)
-"USAGE:   randomLast
-RETURN:  ideal = maxideal(1) but the last variable exchanged by
-         a sum of it with a linear random combination of the other
-         variables
-NOTE:
-EXAMPLE: example randomLast; shows an example
-"
-{
-
-  ideal i=maxideal(1);
-  int k=size(i);
-  i[k]=0;
-  i=randomid(i,size(i),b);
-  ideal ires=maxideal(1);
-  ires[k]=i[1]+var(k);
-  return(ires);
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   ring  r = 0,(x,y,z),lp;
-   ideal i = randomLast(10);
-   i;
-}
-
-
 ////////////////////////////////////////////////////////////////////////////////
 
 
