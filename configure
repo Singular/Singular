@@ -5112,9 +5112,6 @@ fi
 if test -d emacs; then
   SUBDIRS="$SUBDIRS emacs"
 fi
-if test -d rpm; then
-  SUBDIRS="$SUBDIRS rpm"
-fi
 
 echo "$as_me:$LINENO: checking whether ${MAKE-make} sets \${MAKE}" >&5
 echo $ECHO_N "checking whether ${MAKE-make} sets \${MAKE}... $ECHO_C" >&6

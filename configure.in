@@ -853,9 +853,9 @@ fi
 if test -d emacs; then
   SUBDIRS="$SUBDIRS emacs"
 fi
-if test -d rpm; then
-  SUBDIRS="$SUBDIRS rpm"
-fi
+dnl if test -d rpm; then
+dnl  SUBDIRS="$SUBDIRS rpm"
+dnl fi
   
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Enough -- wrap it up
