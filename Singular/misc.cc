@@ -563,6 +563,9 @@ char * versionString()
 #if YYDEBUG
               StringAppendS("YYDEBUG=1,");
 #endif
+#ifdef HAVE_ASSUME
+             StringAppendS("ASSUME,"); 
+#endif
 #ifdef MDEBUG
               StringAppend("MDEBUG=%d,",MDEBUG);
 #endif
@@ -574,9 +577,6 @@ char * versionString()
 #endif
 #ifdef KDEBUG
               StringAppendS("KDEBUG,");
-#endif
-#ifdef TEST_MAC_ORDER
-              StringAppendS("mac_order,");
 #endif
 #ifndef __OPTIMIZE__
 #ifdef __MWERKS__
