@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.8 1998-04-27 15:06:59 Singular Exp $
+@comment $Id: types.doc,v 1.9 1998-04-27 15:30:16 Singular Exp $
 @comment this file contains the type definitions
 @menu
 * boolean::                     
@@ -17,7 +17,7 @@
 * proc::                        
 * ring::                        
 * string::                      
-* Untyped expressions::         
+* def::         
 * vector::                      
 @end menu
 
@@ -242,7 +242,7 @@ multiplication (with ideal, poly, vector, module)
 power, exponentiation (by an integer)
 @end table
 
-@c @strong{Example}
+@c @strong{Example:}
 @c @example
 @c @end example
 @c <--
@@ -349,7 +349,7 @@ optimal weights (see @ref{weight})
 Brackets may be used to access elements of ideals:
 @emph{ideal expressions} @code{[} @emph{position} @code{]} is a generator of the ideal.
 
-@c @strong{Example}
+@c @strong{Example:}
 @c @example
 @c @end example
 @c <--
@@ -450,7 +450,7 @@ Variables of type int represent the compiler integers  and are, therefore,
 limited  in their range. If this range is too small the expression
 must be converted to the type number over a ring with characteristic 0.
 
-@strong{Example}
+@strong{Example:}
 @example
 @c example
   ring r=0,x,dp;
@@ -505,7 +505,7 @@ power, exponentiation
 comparison
 @end table
 
-@strong{Example}
+@strong{Example:}
 @example
 @c example
   int i=1;
@@ -642,7 +642,7 @@ intmat operations: @code{+}, @code{-}, @code{*}
 intmat comparison (yielding int): @code{<>}, @code{==}
 @end enumerate
 
-@strong{Example}
+@strong{Example:}
 @example
 @c example
   intmat m[2][3]=1,0,2,4,5,1;
@@ -780,7 +780,7 @@ intvec comparison (done lexicographically, yielding int):
 See @ref{intvec functions}.
 @end iftex
 
-@strong{Example}
+@strong{Example:}
 @example
 @c example
   intvec iv=1,3,5,7,8;
@@ -973,7 +973,7 @@ concatenation
 construct a new list whose elements are the parts of the expression list
 @end table
 
-@c @strong{Example}
+@c @strong{Example:}
 @c @example
 @c @end example
 @c <--
@@ -1010,7 +1010,7 @@ free resolution of an ideal/module given by a standard base (see @ref{sres})
 Brackets may be used to access elements of lists:
 @emph{list expressions} @code{[} @emph{int expressions} @code{]} is a list entry.
 
-@c @strong{Example}
+@c @strong{Example:}
 @c @example
 @c @end example
 @c <--
@@ -1163,7 +1163,7 @@ multiplication (with poly, matrix)
 comparison
 @end table
 
-@c @strong{Example}
+@c @strong{Example:}
 @c @example
 @c @end example
 @c <--
@@ -1213,7 +1213,7 @@ wedge product (see @ref{wedge})
 Brackets may be used to access elements of matrices:
 @emph{matrix expressions} @code{[} @emph{row}@code{,} @emph{column} @code{]} is a matrix entry.
 
-@c @strong{Example}
+@c @strong{Example:}
 @c @example
 @c @end example
 @c <--
@@ -1353,7 +1353,7 @@ addition (concatenation of the generators and simplification)
 multiplication with ideal or poly, but not `module` * `module`
 @end table
 
-@c @strong{Example}
+@c @strong{Example:}
 @c @example
 @c @end example
 @c <--
@@ -1441,7 +1441,7 @@ vector space dimension of free module over the basering modulo module (see @ref{
 "optimal" weights (see @ref{weight})
 @end table
 
-@c @strong{Example}
+@c @strong{Example:}
 @c @example
 @c @end example
 @c <--
@@ -1531,7 +1531,7 @@ number s combined by arithmetic operations @code{+,-,*,/} or @code{^,**}.
 (see @ref{number operations}).
 @end enumerate
 
-@strong{Example}
+@strong{Example:}
 @example
   2/3, 4/8, 2/2 ; // are numbers
   2 / 3, 4/ 8,  2 /2 ; // are int expressions (of value 0, 0 and 1)
@@ -1573,7 +1573,7 @@ comparison
 coefficient of the leading term (see @ref{leadcoef})
 @end table
 
-@c @strong{Example}
+@c @strong{Example:}
 @c @example
 @c @end example
 @c <--
@@ -1661,7 +1661,7 @@ poly expressions combined by arithmetic operations +,-,*,/ or ^.
 (see @ref{poly operations}).
 @end enumerate
 
-@strong{Example}
+@strong{Example:}
 @example
   2x, x3, 2x2y3, xyz, 2xy2; //  are monomials
   2*x, x^3, 2*x^2*y^3, x*y*z, 2*x*y^2; // are poly expressions
@@ -1706,8 +1706,12 @@ comparison
 @item @code{[}, @code{]}
 choice of the monomial at the indicated place w.r.t. the monomial order
 @end table
+@*
+Brackets may be used to access elements of ideals and matrices:
+@emph{ideal expressions} @code{[} @emph{position} @code{]} is a generator of the ideal,
+@emph{matrix expressions} @code{[} @emph{row}@code{,} @emph{column} @code{]} is a matrix entry.
 
-@strong{Example}
+@strong{Example:}
 @example
 @c example
   ring R=0,(x,y),dp;
@@ -1769,11 +1773,8 @@ trace of a matrix (see @ref{trace})
 @item @code{var}
 the indicated variable of the ring (see @ref{var})
 @end table
-Brackets may be used to access elements of ideals and matrices:
-@emph{ideal expressions} @code{[} @emph{position} @code{]} is a generator of the ideal,
-@emph{matrix expressions} @code{[} @emph{row}@code{,} @emph{column} @code{]} is a matrix entry.
 
-@c @strong{Example}
+@c @strong{Example:}
 @c @example
 @c @end example
 @c <--
@@ -1848,7 +1849,7 @@ Brackets may be used to access elements of ideals and matrices:
 @c <--
 
 @c ---------------------------------------
-@node string, Untyped expressions, ring, Data types
+@node string, def, ring, Data types
 @section string 
 @cindex string
 
@@ -1937,7 +1938,7 @@ a typecast to string (from any type)
 string expressions combined by the operation @code{+}.
 @end enumerate
 
-@strong{Example}
+@strong{Example:}
 @example
   // a string constant
   "@dots{}";
@@ -1975,12 +1976,41 @@ See @ref{implicit type conversions}; @ref{type casting}.
 @subsection string operations
 @cindex string operations
 @c --> subsection string operations
-There are the following operations and functions for strings:
+There are the following operations for strings:
 @table @asis
 @item @code{+}
 concatenation
 @item @code{<=}, @code{>=}, @code{==}, @code{<>}
 comparison (lexicographic with respect to the ASCII coding)
+@end table
+@*
+Brackets may be used to access parts of a string:
+@emph{string expressions} @code{[} @emph{position} @code{]} is a character of the string,
+@emph{string expressions} @code{[} @emph{position}@code{,} @emph{length} @code{]} is a substring
+and @emph{string expressions} @code{[} @emph{intvec} @code{]} is a list of characters
+from the string.
+
+@strong{Example:}
+@example
+@c example
+  string s="abcde";
+  s[2];
+  s[3,2];
+  ">>"+s[1,10]+"<<";
+  s[2]="BC"; s;
+  intvec v=1,3,5;
+  s=s[v]; s;
+  s="123456"; s=s[3..5]; s;
+@c example
+@end example
+@c <--
+
+@c ------------------------------
+@node string related functions, ,string operations, string
+@subsection string related functions
+@cindex string related functions
+@c --> subsection string related functions
+@table @asis
 @item @code{nameof}
 name of an object (see @ref{nameof})
 @item @code{read}
@@ -2002,70 +2032,49 @@ name of the n-th ring parameter (see @ref{parstr})
 names of all ring variables or the
 name of the n-th ring variable (see @ref{varstr})
 @end table
-@*
-Brackets may be used to access parts of a string:
-@emph{string expressions} @code{[} @emph{position} @code{]} is a character of the string,
-@emph{string expressions} @code{[} @emph{position}@code{,} @emph{length} @code{]} is a substring
-and @emph{string expressions} @code{[} @emph{intvec} @code{]} ist a list of characters
-from the string.
 
-@strong{Example}
-@example
-@c example
-  string s="abcde";
-  s[2];
-  s[3,2];
-  ">>"+s[1,10]+"<<";
-  s[2]="BC"; s;
-  intvec v=1,3,5;
-  s=s[v]; s;
-  s="123456"; s=s[3..5]; s;
-@c example
-@end example
+@c @strong{Example:}
+@c @example
+@c @end example
 @c <--
-
-@c ------------------------------
-@node string related functions, ,string operations, string
-@subsection string related functions
-@cindex string related functions
 @c <--
 
 @c ---------------------------------------
-@node Untyped expressions, vector, string, Data types
-@section Untyped expressions 
-@cindex Untyped expressions
+@node def, vector, string, Data types
+@section def 
+@cindex def
 
-@c --> section Untyped expressions
+@c --> section def
 @c ------------------------------
 @menu
-* Untyped expressions declarations::  
-* Untyped expressions expressions::  
-* Untyped expressions operations::  
-* Untyped expressions related functions::  
+* def declarations::  
+* def expressions::  
+* def operations::  
+* def related functions::  
 @end menu
 
-@node Untyped expressions declarations, Untyped expressions expressions, Untyped expressions, Untyped expressions
-@subsection Untyped expressions declarations
-@cindex Untyped expressions declarations
+@node def declarations, def expressions, def, def
+@subsection def declarations
+@cindex def declarations
 
 @c ------------------------------
-@node Untyped expressions expressions, Untyped expressions operations, Untyped expressions declarations, Untyped expressions
-@subsection Untyped expressions expressions
-@cindex Untyped expressions expressions
+@node def expressions, def operations, def declarations, def
+@subsection def expressions
+@cindex def expressions
 
 @c ------------------------------
-@node Untyped expressions operations, Untyped expressions related functions, Untyped expressions expressions, Untyped expressions 
-@subsection Untyped expressions operations
-@cindex Untyped expressions operations
+@node def operations, def related functions, def expressions, def 
+@subsection def operations
+@cindex def operations
 
 @c ------------------------------
-@node Untyped expressions related functions, ,Untyped expressions operations, Untyped expressions
-@subsection Untyped expressions related functions
-@cindex Untyped expressions related functions
+@node def related functions, ,def operations, def
+@subsection def related functions
+@cindex def related functions
 @c <--
 
 @c ---------------------------------------
-@node vector,  , Untyped expressions, Data types
+@node vector,  , def, Data types
 @section vector 
 @cindex vector
 
@@ -2135,7 +2144,7 @@ vector expressions combined by arithmetic operations @code{+} or @code{-}
 combined by arithmetic operation @code{*}.
 @end enumerate
 
-@strong{Example}
+@strong{Example:}
 @example
 @c example
   // ordering gives priority to components:
@@ -2180,7 +2189,7 @@ comparison
 choice of a component
 @end table
 
-@strong{Example}
+@strong{Example:}
 @example
 @c example
   ring R=0,(x,y),(c,dp);
@@ -2231,7 +2240,7 @@ number of monomials (see @ref{size})
 substitute a ring variable (see @ref{subst})
 @end table
 
-@c @strong{Example}
+@c @strong{Example:}
 @c @example
 @c @end example
 @c <--
