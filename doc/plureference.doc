@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.23 2004-08-12 17:03:07 levandov Exp $
+@comment $Id: plureference.doc,v 1.24 2004-10-19 16:32:34 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -40,6 +40,7 @@ The general syntax of a function is
 * betti @value{PSUFFIX}::
 * bracket::
 * eliminate @value{PSUFFIX}::
+* envelope::
 * fetch @value{PSUFFIX}::
 * imap @value{PSUFFIX}::
 * intersect @value{PSUFFIX}::
@@ -52,6 +53,8 @@ The general syntax of a function is
 * mres @value{PSUFFIX}::
 * ncalgebra::
 * nres @value{PSUFFIX}::
+* oppose::
+* opposite::
 * option @value{PSUFFIX}::
 * preimage @value{PSUFFIX}::
 * quotient @value{PSUFFIX}::
@@ -209,7 +212,7 @@ bracket(p,q);
 @end table
 
 @c ---------------------------------------
-@node eliminate @value{PSUFFIX}, fetch @value{PSUFFIX}, bracket, Functions @value{PSUFFIX}
+@node eliminate @value{PSUFFIX}, envelope, bracket, Functions @value{PSUFFIX}
 @section eliminate @value{PSUFFIX}
 @cindex eliminate @value{PSUFFIX}
 
@@ -264,9 +267,48 @@ See
 @ref{std @value{PSUFFIX}}.
 @c ref
 
+@c ---------------------------------------
+@node  envelope, fetch @value{PSUFFIX}, eliminate @value{PSUFFIX}, Functions @value{PSUFFIX}
+@section envelope
+@cindex envelope
+
+@table @code
+@item @strong{Syntax:}
+@code{envelope (} ring_name @code{)}
+@item @strong{Type:}
+ring
+@item @strong{Purpose:}
+creates an enveloping algebra of a given algebra, that is 
+@ifinfo
+A_env = A tensor A_opp, where A_opp is the
+opposite algebra of A.
+@end ifinfo
+@tex
+$A^{env} = A \otimes_K A^{opp}$, where $A^{opp}$ is the
+opposite algebra of $A$.
+@end tex
+@item @strong{Remark:}
+You have to activate the ring with the @code{setring} command.
+For the presentation, see explanation of @code{opposite}.
+@smallexample
+@c example 
+LIB "ncalg.lib";
+def A = sl2();
+setring A; A;
+def Aenv = envelope(A);
+setring Aenv; 
+Aenv;
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{oppose};
+@ref{opposite}.
+@c ref
 
 @c ---------------------------------------
-@node fetch @value{PSUFFIX}, imap @value{PSUFFIX}, eliminate @value{PSUFFIX}, Functions @value{PSUFFIX}
+@node fetch @value{PSUFFIX}, imap @value{PSUFFIX}, envelope, Functions @value{PSUFFIX}
 @section fetch @value{PSUFFIX}
 @cindex fetch @value{PSUFFIX}
 
@@ -936,13 +978,9 @@ d_@{ij@}
 @end ifinfo
  from @code{r}.
 
-
-
 @item @strong{Remark:}
 At present, we do not perform checks of leading monomial condition
 and non-degeneracy conditions (@pxref{G-algebras}), while setting an algebra. 
-
-
 
 @item @strong{Example:}
 @smallexample
@@ -995,7 +1033,7 @@ kill r4;
 
 
 @c ---------------------------------------
-@node  nres @value{PSUFFIX}, option @value{PSUFFIX}, ncalgebra, Functions @value{PSUFFIX}
+@node  nres @value{PSUFFIX}, oppose, ncalgebra, Functions @value{PSUFFIX}
 @section nres @value{PSUFFIX}
 @cindex nres @value{PSUFFIX}
 @table @code
@@ -1093,9 +1131,107 @@ See
 @ref{mres @value{PSUFFIX}};
 @c ref
 
+@c ---------------------------------------
+@node  oppose, opposite, nres @value{PSUFFIX}, Functions @value{PSUFFIX}
+@section oppose
+@cindex oppose
+
+@table @code
+@item @strong{Syntax:}
+@code{oppose (} ring_name, name @code{)}
+@item @strong{Type:}
+poly, vector, ideal or module
+(the same type as the second argument)
+@item @strong{Purpose:}
+for a given object in the given ring, creates its opposite object
+in the opposite ring (the last one is assumed to be the current ring).
+@item @strong{Remark:}
+for an object O, (O^opp)^opp = O. 
+@smallexample
+@c example 
+LIB "ncalg.lib";
+def r = sl2();
+setring r;
+poly   p = (h^2-1)*f*e;
+vector v = [1,e*h,0,p];
+ideal  i = h*e, f^2*e,h*f*e;
+matrix m[3][4]=e,f,h,1,0,h^2, p,0,0,1,e^2,e*f*h+1;
+module mm =module(m); 
+def b = opposite(r);
+setring b; b;   // we will oppose this collection of objects
+poly P = oppose(r,p); 
+vector V = oppose(r,v);
+ideal I = oppose(r,i);
+module MM = oppose(r,mm);
+// now let's check the correctness:
+setring r;
+print(matrix(oppose(b,P)-p));
+print(matrix(oppose(b,V)-v));
+print(matrix(oppose(b,I)-i));
+print(matrix(oppose(b,MM)-mm));
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{envelope};
+@ref{opposite}.
+@c ref
 
 @c ---------------------------------------
-@node option @value{PSUFFIX},preimage @value{PSUFFIX}, nres @value{PSUFFIX}, Functions @value{PSUFFIX}
+@node opposite, option @value{PSUFFIX}, oppose, Functions @value{PSUFFIX}
+@section opposite
+@cindex opposite
+
+@table @code
+@item @strong{Syntax:}
+@code{opposite (} ring_name @code{)}
+@item @strong{Type:}
+ring
+@item @strong{Purpose:}
+creates an opposite algebra of a given algebra.
+@item @strong{Note:}
+You have to activate the ring with the @code{setring} command.
+@* An opposite algebra of a given algebra is
+an algebra with the same vectorspace but with the opposite
+multiplication, i.e.
+@tex
+$\forall \; f,g \in A^{opp}$, a new multiplication $*$ on $A^{opp}$ 
+is defined to be $f*g := g \cdot f$.
+@end tex
+
+@ifinfo
+for any f,g in A_opp, a multiplication @code{*} on A_opp is defined to
+be f @code{*} g := gf.
+@end ifinfo
+
+@item @strong{Remark:}
+Starting from the variables x_1,...,x_N and the ordering @code{<}
+of the given algebra,
+an opposite algebra will have variables X_N,...,X_1 
+(where the case and the position are reverted). Moreover, it is
+equipped with an opposed ordering @code{<_opp} (it is given
+by the matrix, obtained from the matrix ordering of @code{<}
+with the reverse order of columns).
+@smallexample
+@c example 
+LIB "ncalg.lib";
+def B = Qso3(3);
+setring B; B;
+def Bopp = opposite(B);
+setring Bopp; 
+Bopp;
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{envelope};
+@ref{oppose}.
+@c ref
+
+@c ---------------------------------------
+@node option @value{PSUFFIX},preimage @value{PSUFFIX}, opposite, Functions @value{PSUFFIX}
 @section option @value{PSUFFIX}
 @cindex option @value{PSUFFIX}
 @table @code
@@ -1248,7 +1384,7 @@ and the ideal has to be an ideal in the given ring.
 @item @strong{Note:}
 To compute the kernel of a map, the preimage of zero has to be determined.
 Hence there is no special command for computing the kernel of a map in
-@sc{Singular}.
+@sc{Singular}. 
 @item @strong{Note:}
 at the moment it could be computed 
 only for maps A -> B, where A is commutative
