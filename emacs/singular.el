@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.43 1999-09-16 11:06:45 wichmann Exp $
+;; $Id: singular.el,v 1.44 1999-09-17 08:32:27 obachman Exp $
 
 ;;; Commentary:
 
@@ -3380,7 +3380,7 @@ notes on input and output\" in singular.el."
 
 ;;{{{ Sending input interactive
 (defcustom singular-move-on-send 'eob
-  "*Where to move point to before sending input to Singular.
+  "*Where to move point before sending input to Singular.
 Should be one of:
 `eob' which means to move point to end of buffer,
 `eol' which means to move point to end of line, or
