@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.29 1999-11-15 17:20:51 obachman Exp $ */
+/* $Id: structs.h,v 1.30 1999-11-18 11:19:16 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -273,10 +273,11 @@ struct sip_sring
                             /* pVarLow to pVarHigh */
   // contains component, but no weight fields in E */
   // better: pVarLowIndexE / pVarLowIndexL
+  #ifdef LONG_MONOMS
   short      pDivLow;
   short      pDivHigh; /* the same as pVarLow..pVarHigh, */
                        /* but as index in the 'long' field */
-
+  #endif
   short      pCompLowIndex; // better: use pCompareLowIndexL
   short      pCompHighIndex; /* use p->exp.l[pCompLowIndex..ppCompHighIndex] */
                              /* for comparing monomials */

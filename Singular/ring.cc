@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.84 1999-11-17 18:22:55 Singular Exp $ */
+/* $Id: ring.cc,v 1.85 1999-11-18 11:19:15 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2599,8 +2599,10 @@ BOOLEAN rComplete(ring r, int force)
 
   // ----------------------------
   // other indicies
+#ifdef LONG_MONOMS
   r->pDivLow=r->pVarLowIndex/(sizeof(long)/sizeof(Exponent_t));
   r->pDivHigh=r->pVarHighIndex/(sizeof(long)/sizeof(Exponent_t));
+#endif
   r->pCompIndex=r->VarOffset[0];
 #ifdef WORDS_BIGENDIAN
   // HANNES--think of s,c,dp; s, dp, C,
@@ -3062,8 +3064,10 @@ BOOLEAN rComplete(ring r, int force)
 
   // ----------------------------
   // other indicies
+#ifdef LONG_MONOMS
   r->pDivLow=r->pVarLowIndex/(sizeof(long)/sizeof(Exponent_t));
   r->pDivHigh=r->pVarHighIndex/(sizeof(long)/sizeof(Exponent_t));
+#endif
   r->pCompIndex=r->VarOffset[0];
   // HANNES--think of s,c,dp; s, dp, C,
 #ifdef WORDS_BIGENDIAN
@@ -3110,15 +3114,16 @@ void rUnComplete(ring r)
 
 void rDebugPrint(ring r)
 {
-  int j;
+  char *TYP[]={"ro_dp","ro_wp","ro_cp","ro_syzcomp", "ro_syz", "ro_none"};
+  int i,j;
   PrintS("varoffset:\n");
   #ifdef HAVE_SHIFTED_EXPONENTS
-  for(j=0;j<=r->N;j++) Print("  v%d at pos %d, bit %d\n",
+  for(j=0;j<=r->N;j++) Print("  v%d at e-pos %d, bit %d\n",
      j,r->VarOffset[j] & 0xffffff, r->VarOffset[j] >>24);
   Print("bitmask=0x%x\n",r->bitmask);
   #else
   for(j=0;j<=r->N;j++)
-    Print("  v%d at pos %d\n",j,r->VarOffset[j]);
+    Print("  v%d at e-pos %d\n",j,r->VarOffset[j]);
   #endif
   PrintS("ordsgn:\n");
   for(j=0;j<r->pCompLSize;j++)
@@ -3127,7 +3132,6 @@ void rDebugPrint(ring r)
   PrintS("ordrec:\n");
   for(j=0;j<r->OrdSize;j++)
   {
-    char *TYP[]={"ro_dp","ro_wp","ro_cp","ro_syzcomp", "ro_syz", "ro_none"};
     Print("  typ %s",TYP[r->typ[j].ord_typ]);
     Print("  place %d",r->typ[j].data.dp.place);
     if (r->typ[j].ord_typ!=ro_syzcomp)
@@ -3146,14 +3150,52 @@ void rDebugPrint(ring r)
   }
   Print("pVarLowIndex:%d ",r->pVarLowIndex);
   Print("pVarHighIndex:%d\n",r->pVarHighIndex);
+#ifdef LONG_MONOMS
   Print("pDivLow:%d ",r->pDivLow);
   Print("pDivHigh:%d\n",r->pDivHigh);
+#endif
   Print("pCompLowIndex:%d ",r->pCompLowIndex);
   Print("pCompHighIndex:%d\n",r->pCompHighIndex);
   Print("pOrdIndex:%d pCompIndex:%d\n", r->pOrdIndex, r->pCompIndex);
   Print("ExpESize:%d ",r->ExpESize);
   Print("ExpLSize:%d ",r->ExpLSize);
   Print("OrdSize:%d\n",r->OrdSize);
+  PrintS("--------------------\n");
+  for(j=0;j<r->ExpLSize;j++)
+  {
+    Print("L[%d]: ",j);
+    #ifdef HAVE_SHIFTED_EXPONENTS
+    i=1;
+    #else
+    i=0;
+    #endif
+    for(;i<=r->N;i++)
+    {
+      #ifdef HAVE_SHIFTED_EXPONENTS
+      if( (r->VarOffset[i] & 0xffffff)*sizeof(Exponent_t)/sizeof(long) == j )
+      {  Print("v%d at e[%d], bit %d; ", i,r->VarOffset[i] & 0xffffff, 
+                                         r->VarOffset[i] >>24 ); }
+      #else
+      if( r->VarOffset[i]*sizeof(Exponent_t)/sizeof(long) == j )
+      {  Print("v%d at e[%d]; ", i, r->VarOffset[i]); }
+      #endif
+    }
+    #ifdef HAVE_SHIFTED_EXPONENTS
+    if( r->pCompIndex==j ) Print("v0; ");
+    #endif
+    for(i=0;i<r->OrdSize;i++)
+    {
+      if (r->typ[i].data.dp.place == j)
+      {
+        Print("ordrec:%s (start:%d, end:%d) ",TYP[r->typ[i].ord_typ],
+          r->typ[i].data.dp.start, r->typ[i].data.dp.end);
+      }
+    }
+    if (j<r->pCompLSize)
+      Print("ordsgn %d\n", r->ordsgn[j]);
+    else
+      PrintLn();
+  }
 }
 
 void pDebugPrint(poly p)
