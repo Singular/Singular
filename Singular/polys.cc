@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.11 1997-12-16 18:24:00 obachman Exp $ */
+/* $Id: polys.cc,v 1.12 1998-01-05 16:39:26 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -1925,6 +1925,9 @@ BOOLEAN pDivisibleBy(poly a, poly b)
 void pChangeRing(int n, int Sgn, int * orders, int * b0, int * b1,
          short ** wv)
 {
+#ifdef TEST_MAC_ORDER
+  bNoAdd=FALSE;
+#endif
   int i;
   pComponentOrder=1;
   if (ppNoether!=NULL) pDelete(&ppNoether);
@@ -1998,7 +2001,7 @@ void pChangeRing(int n, int Sgn, int * orders, int * b0, int * b1,
     SetpSetm(orders[0],0);
 #ifdef TEST_MAC_ORDER
     if (orders[0]==ringorder_dp)
-       bBinomSet();
+       bBinomSet(orders);
 #endif
   }
   /*======== ordering type is (c,_) =========================*/
@@ -2015,6 +2018,10 @@ void pChangeRing(int n, int Sgn, int * orders, int * b0, int * b1,
     SimpleChooseC(orders[1],&pComp0);
 #endif    
     SetpSetm(orders[1],1);
+#ifdef TEST_MAC_ORDER
+    if (orders[1]==ringorder_dp)
+       bBinomSet(orders);
+#endif
   }
   /*------- more than one block ----------------------*/
   else
@@ -2146,11 +2153,12 @@ poly pMultT(poly a, poly exp )
         {
            pAddExp(a,i, pGetExp(exp,i));
         }
-        #ifndef TEST_MAC_ORDER
-        a->Order += exp->Order;
-        #else
-        pSetm(a);
+        #ifdef TEST_MAC_ORDER
+        if (bNoAdd)
+          pSetm(a);
+        else
         #endif
+          a->Order += exp->Order;
         if (pMultT_nok)
         {
           if (pGetComp(a) == 0)

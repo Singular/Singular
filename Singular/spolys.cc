@@ -514,7 +514,8 @@ static poly spPSpolyCreate(poly p1, poly p2,poly spNoether)
 *   1. the coefficient is undefined
 *   2. pNext is undefined
 */
-#ifndef TEST_MAC_ORDER
+//#ifndef TEST_MAC_ORDER
+#if 1
 static poly spPSpolyShortBba(poly p1, poly p2)
 {
   poly a1 = pNext(p1), a2 = pNext(p2);

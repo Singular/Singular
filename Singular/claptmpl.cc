@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.10 1997-12-19 16:25:09 schmidt Exp $
+// $Id: claptmpl.cc,v 1.11 1998-01-05 16:39:17 Singular Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -51,12 +51,12 @@
     template class List<CanonicalForm>;
     template class ListIterator<CanonicalForm>;
     template class Array<CanonicalForm>;
-    template class Array<REvaluation>;
     template class List<MapPair>;
     template class ListItem<MapPair>;
     template class ListIterator<MapPair>;
     template class Matrix<CanonicalForm>;
     template class SubMatrix<CanonicalForm>;
+    template class Array<REvaluation>;
 
     #ifndef macintosh
       template List<CFFactor> Union ( const List<CFFactor>&, const List<CFFactor>& );

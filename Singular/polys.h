@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.6 1997-12-15 22:46:37 obachman Exp $ */
+/* $Id: polys.h,v 1.7 1998-01-05 16:39:27 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
@@ -190,7 +190,6 @@ extern  poly pHeadProc(poly p);
 #define pCopyAddFast1(p1, p2, p3)    _pCopyAddFast1(p1, p2, p3)
 
 poly      pmInit(char *s, BOOLEAN &ok);   /* monom -> poly */
-poly      pOne(void);
 void      ppDelete(poly * a, ring r);
 
 /*-------------operations on polynomials:------------*/
@@ -246,6 +245,7 @@ void      wrp(poly p);
 
 void      pEnlargeSet(polyset *p, int length, int increment);
 poly      pISet(int i);
+#define   pOne()   pISet(1)
 
 void      pContent(poly p);
 void      pCleardenom(poly p);

@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.6 1997-12-15 22:46:39 obachman Exp $ */
+/* $Id: ring.h,v 1.7 1998-01-05 16:39:29 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -41,7 +41,7 @@ int    rSum(ring r1, ring r2, ring &sum);
 #ifdef COMP_FAST
 void   rComplete(ring r);
 #else
-#define rComplete(r)    ((void*)0)
+#define rComplete(r)
 #endif
 
 

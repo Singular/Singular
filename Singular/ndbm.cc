@@ -4,7 +4,7 @@
 
 //**************************************************************************/
 //
-// $Id: ndbm.cc,v 1.6 1997-12-04 15:21:14 krueger Exp $
+// $Id: ndbm.cc,v 1.7 1998-01-05 16:39:24 Singular Exp $
 //
 //**************************************************************************/
 // 'ndbm.cc' containes all low-level functions to manipulate dbm-files
@@ -49,7 +49,7 @@ static char sccsid[] = "@(#)ndbm.c        5.3 (Berkeley) 3/9/86";
 #   include <fcntl.h>
 #endif /* macintosh */
 #ifndef HAVE_BCOPY
-#   define bcopy(a,b,c) memcpy(b,a,c)
+#   define bcopy(a,b,c) memmove(b,a,c)
 #endif /* not HAVE_BCOPY */
 #include "ndbm.h"
 

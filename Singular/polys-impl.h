@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.4 1997-12-16 18:24:00 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.5 1998-01-05 16:39:25 Singular Exp $ */
 
 /***************************************************************
  *
@@ -17,6 +17,7 @@
  ***************************************************************/
 #include "structs.h"
 #include "mmemory.h"
+#include "binom.h"
 
 /***************************************************************
  *
@@ -68,7 +69,8 @@ struct  spolyrec
     Like COMP_FAST, except that it turns off "vector techniques" of
     monomial operations, i.e. does everything exponent-wise. 
  ***************************************************************/
-// #define COMP_FAST
+//#define COMP_FAST
+// #define COMP_DEBUG
 // #define COMP_NO_EXP_VECTOR_OPS
 #define COMP_TRADITIONAL
 
@@ -165,6 +167,9 @@ extern int pVarHighIndex;
 
 #else // ! WORDS_BIGENDIAN
 #define _pHasReverseExp    (pVarOffset > (SIZEOF_LONG / SIZEOF_EXPONENT) - 1)
+#define _pExpIndex(i)                           \
+  (pVarOffset > (SIZEOF_LONG / SIZEOF_EXPONENT) - 1 ?   \
+   pVarOffset - (i) : pVarOffset + (i))
 #define _pRingExpIndex(r, i)                                   \
   ((r)->VarOffset > (SIZEOF_LONG / SIZEOF_EXPONENT) - 1 ?   \
    (r)->VarOffset - (i) : (r)->VarOffset + (i))
@@ -765,11 +770,21 @@ DECLARE(BOOLEAN, _pDivisibleBy(poly a, poly b))
 #define _pDivisibleBy1(a,b) _pDivisibleBy(a,b)
 #define _pDivisibleBy2(a,b) _pDivisibleBy(a,b)
 
+#ifdef TEST_MAC_ORDER
+extern pSetmProc pSetm;
+DECLARE(void, pMonAddFast(poly a, poly m))
+{
+  for(int ii =pVariables; ii; ii--) (a)->exp[ii] += (m)->exp[ii];\
+  if (bNoAdd) pSetm(a);
+  else _pGetOrder(a) += _pGetOrder(m);
+}
+#else
 DECLARE(void, pMonAddFast(poly a, poly m))
 {
   for(int ii =pVariables; ii; ii--) (a)->exp[ii] += (m)->exp[ii];\
   _pGetOrder(a) += _pGetOrder(m);
 }
+#endif
 
 DECLARE(BOOLEAN, _pEqual(poly p1, poly p2))
 {

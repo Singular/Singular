@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.12 1997-12-12 16:55:23 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.13 1998-01-05 16:39:21 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1017,6 +1017,7 @@ int posInL10 (LSet set, int length, LObject p,kStrategy strat)
   if (length<0) return 0;
   if (hasPurePower(p.p,strat->lastAxis,&dp,strat))
   {
+    int op= pFDeg(p.p)+p.ecart;
     for (j=length; j>=0; j--)
     {
       if (!hasPurePower(set[j].p,strat->lastAxis,&dL,strat))
@@ -1024,7 +1025,7 @@ int posInL10 (LSet set, int length, LObject p,kStrategy strat)
       if (dp < dL)
         return j+1;
       if ((dp == dL)
-      && (pFDeg(set[j].p)+set[j].ecart >= pFDeg(p.p)+p.ecart))
+      && (pFDeg(set[j].p)+set[j].ecart >= op))
         return j+1;
     }
   }
@@ -1582,7 +1583,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   /*- polynomials used for HECKE: HC, noether -*/
   if (BTEST1(27))
   {
-    if (strat->kHEdge)
+    if (strat->kHEdge!=NULL)
       Kstd1_mu=pFDeg(strat->kHEdge);
     else
       Kstd1_mu=-1;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys0.cc,v 1.7 1997-12-03 16:59:00 obachman Exp $ */
+/* $Id: polys0.cc,v 1.8 1998-01-05 16:39:27 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to convert polynomials to strings
@@ -81,6 +81,7 @@ static void writemon(poly p, int ko)
       }
     }
   }
+  //StringAppend("{%d}",p->Order);
   if (pGetComp(p) != (Exponent_t)ko)
   {
     if (writeGen) StringAppendS("*");

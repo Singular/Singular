@@ -3,14 +3,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.5 1997-12-15 22:46:28 obachman Exp $ */
+/* $Id: ipid.h,v 1.6 1998-01-05 16:39:20 Singular Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
 #include <string.h>
 #include "structs.h"
 #include "subexpr.h"
-#include "polys-impl.h"
+//#include "polys-impl.h"
 
 struct sip_sring
 {

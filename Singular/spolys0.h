@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: spolys0.h,v 1.5 1997-12-17 15:11:48 pohl Exp $ */
+/* $Id: spolys0.h,v 1.6 1998-01-05 16:39:30 Singular Exp $ */
 /*
 * ABSTRACT: s-polynomials, internal header
 */
@@ -18,10 +18,10 @@
         {for(int ii=pVariables; ii; ii--) (a)->exp[ii] += (m)->exp[ii];}
 #define spMonAdd(a,m)  \
         {for(int ii =pVariables; ii; ii--) (a)->exp[ii] += (m)->exp[ii];\
-        pSetm(a);}
+        if (bNoAdd) pSetm(a);else pGetOrder(a) += pGetOrder(m);}
 #define spMonSub(a,b)  \
         {for(int ii =pVariables; ii; ii--) (a)->exp[ii] -= (b)->exp[ii];\
-        pSetm(a);}
+        if (bNoAdd) pSetm(a);else pGetOrder(a) -= pGetOrder(b);}
 #else
 #ifdef COMP_FAST
 #define spMonAdd(a,m)  \

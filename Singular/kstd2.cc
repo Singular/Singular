@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.8 1997-12-03 16:58:47 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.9 1998-01-05 16:39:22 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1365,6 +1365,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       /* the real one */
       strat->P.p = spSpolyCreate(strat->P.p1,strat->P.p2,strat->kNoether);
     }
+    kTest(strat);
     if((strat->P.p1==NULL) && (strat->minim>0))
       strat->P.p2=pCopy(strat->P.p);
 #ifdef SDRING
@@ -1379,9 +1380,11 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       {
         if (TEST_OPT_PROT) message(pFDeg(strat->P.p),&olddeg,&reduc,strat);
       }
+      kTest(strat);
       /* reduction of the element choosen from L */
       strat->red(&strat->P,strat);
     }
+    kTest(strat);
     if (strat->P.p != NULL)
     {
 #ifdef SDRING

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.10 1997-12-16 18:24:01 obachman Exp $ */
+/* $Id: polys1.cc,v 1.11 1998-01-05 16:39:28 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -74,16 +74,6 @@ int pIsPurePower(poly p)
     }
   }
   return k;
-}
-
-/*2
-* create a new polynomial and init it as 1
-*/
-poly pOne(void)
-{
-  poly p=pInit();
-  p->coef = nInit(1);
-  return p;
 }
 
 /*-----------------------------------------------------------*/
@@ -282,7 +272,12 @@ static poly pMonPower(poly p, int exp)
   {
     pMultExp(p,i, exp);
   }
-  p->Order *= exp;
+  #ifdef TEST_MAC_ORDER
+  if (bNoAdd)
+    pSetm(p);
+  else  
+  #endif
+    p->Order *= exp;
   return p;
 }
 
@@ -704,9 +699,26 @@ poly pISet(int i)
     pSetCoeff0(rc,nInit(i));
     if (nIsZero(pGetCoeff(rc)))
       pDelete1(&rc);
+#ifdef TEST_MAC_ORDER
+    else if (bNoAdd)
+      pSetm(rc);
+#endif
   }
   return rc;
 }
+
+// /*2
+// * create a new polynomial and init it as 1
+// */
+// poly pOne(void)
+// {
+//   poly p=pInit();
+//   pSetCoeff0(p,nInit(1));
+// #ifdef TEST_MAC_ORDER
+//   pSetm(p);
+// #endif
+//   return p;
+// }
 
 void pContent(poly ph)
 {
