@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.207 2000-04-11 15:36:37 Singular Exp $ */
+/* $Id: iparith.cc,v 1.208 2000-04-11 15:40:22 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1490,6 +1490,7 @@ static BOOLEAN jjDIVISION(leftv res, leftv u, leftv v)
   int vl= IDELEMS(vi);
   ideal R; matrix U;
   ideal m = idLift(ui,vi,&R, FALSE,hasFlag(u,FLAG_STD),TRUE,&U);
+  // now make sure that all matices have the corect size:
   matrix T = idModule2formatedMatrix(m,ul,vl);
   if (MATCOLS(U) != vl)
   {
@@ -1501,7 +1502,7 @@ static BOOLEAN jjDIVISION(leftv res, leftv u, leftv v)
       for(j=mvl;j>0;j--)
       {
         MATELEM(UU,i,j)=MATELEM(U,i,j);
-	MATELEM(U,i,j)=NULL;
+        MATELEM(U,i,j)=NULL;
       }
     }
     idDelete((ideal *)&U);
@@ -1509,12 +1510,9 @@ static BOOLEAN jjDIVISION(leftv res, leftv u, leftv v)
   }
   lists L=(lists)AllocSizeOf(slists);
   L->Init(3);
-  L->m[0].rtyp=MATRIX_CMD;
-  L->m[0].data=(void *)T;
-  L->m[1].rtyp=MATRIX_CMD;
-  L->m[1].data=(void *)U;
-  L->m[2].rtyp=u->Typ();
-  L->m[2].data=(void *)R;
+  L->m[0].rtyp=MATRIX_CMD;   L->m[0].data=(void *)T;
+  L->m[1].rtyp=MATRIX_CMD;   L->m[1].data=(void *)U;
+  L->m[2].rtyp=u->Typ();     L->m[2].data=(void *)R;
   res->data=(char *)L;
   return FALSE;
 }
@@ -1539,12 +1537,9 @@ static BOOLEAN jjEXTGCD_I(leftv res, leftv u, leftv v)
   if ( (int)v->Data() < 0 ) b=-b;
   lists L=(lists)AllocSizeOf(slists);
   L->Init(3);
-  L->m[0].rtyp=INT_CMD;
-  L->m[0].data=(void *)p0;
-  L->m[1].rtyp=INT_CMD;
-  L->m[1].data=(void *)a;
-  L->m[2].rtyp=INT_CMD;
-  L->m[2].data=(void *)b;
+  L->m[0].rtyp=INT_CMD;   L->m[0].data=(void *)p0;
+  L->m[1].rtyp=INT_CMD;   L->m[1].data=(void *)a;
+  L->m[2].rtyp=INT_CMD;   L->m[2].data=(void *)b;
   res->rtyp=LIST_CMD;
   res->data=(char *)L;
   return FALSE;
@@ -4731,8 +4726,7 @@ static BOOLEAN jjLIST_PL(leftv res, leftv v)
       }
       if ((rt==RING_CMD)||(rt==QRING_CMD))
       {
-        L->m[i].rtyp=rt;
-        L->m[i].data=h->Data();
+        L->m[i].rtyp=rt;  L->m[i].data=h->Data();
         ((ring)L->m[i].data)->ref++;
       }
       else
