@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: factory.template,v 1.14 2002-11-05 11:00:12 Singular Exp $ */
+/* $Id: factory.template,v 1.15 2003-10-29 10:53:50 Singular Exp $ */
 
 #ifndef INCL_FACTORY_H
 #define INCL_FACTORY_H
@@ -32,7 +32,7 @@
 extern "C" {
 #undef __cplusplus
 #include <gmp.h>
-#define __cplusplus
+#define __cplusplus 1
 }
 #else
 #include <gmp.h>

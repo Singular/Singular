@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gmp.h,v 1.4 2002-11-05 11:00:12 Singular Exp $ */
+/* $Id: cf_gmp.h,v 1.5 2003-10-29 10:53:50 Singular Exp $ */
 
 #ifndef INCL_CF_GMP_H
 #define INCL_CF_GMP_H
@@ -8,7 +8,7 @@
 extern "C" {
 #undef __cplusplus
 #include <gmp.h>
-#define __cplusplus
+#define __cplusplus 1
 }
 #else
 #include <gmp.h>
