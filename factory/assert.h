@@ -1,8 +1,11 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: assert.h,v 1.0 1996-05-17 10:59:37 stobbe Exp $ */
+/* $Id: assert.h,v 1.1 1996-12-05 18:19:31 schmidt Exp $ */
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:37  stobbe
+Initial revision
+
 */
 
 /* It should be possible to include this file multiple times for different */
@@ -32,11 +35,23 @@ $Log: not supported by cvs2svn $
  message, file, line, expression ), abort(), 0 )
 
 #ifdef DEBUGOUTPUT
+void deb_inc_level();
+void deb_dec_level();
+extern char * deb_level_msg;
+#define DEBINCLEVEL(stream,msg) \
+(stream << deb_level_msg << "entering << " << msg << " >>" << endl, deb_inc_level())
+#define DEBDECLEVEL(stream,msg) \
+(deb_dec_level(), stream << deb_level_msg << "leaving <<" << msg << " >>" << endl)
+#define DEBOUTSL(stream) \
+(stream << deb_level_msg, stream.flush())
 #define DEBOUT(stream,msg,object) \
 (stream << msg << object, stream.flush())
 #define DEBOUTLN(stream,msg,object) \
-(stream << msg << object << endl)
+(stream << deb_level_msg << msg << object << endl)
 #else
+#define DEBINCLEVEL(stream,msg)
+#define DEBDECLEVEL(stream,msg)
+#define DEBOUTSL(stream)
 #define DEBOUT(stream,msg,object)
 #define DEBOUTLN(stream,msg,object)
 #endif
