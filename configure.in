@@ -6,9 +6,9 @@ dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Version business -- should be the same as in Singular subdir 
 dnl
 SINGULAR_MAJOR_VERSION=1
-SINGULAR_MINOR_VERSION=1
-SINGULAR_SUB_VERSION=8
-VERSION_DATE="April 1998"
+SINGULAR_MINOR_VERSION=2
+SINGULAR_SUB_VERSION=0
+VERSION_DATE="May 1998"
 AC_SUBST(SINGULAR_MAJOR_VERSION)
 AC_SUBST(SINGULAR_MINOR_VERSION)
 AC_SUBST(SINGULAR_SUB_VERSION)

@@ -1,19 +1,24 @@
-// $Id: tst.lib,v 1.6 1998-05-15 16:18:19 obachman Exp $
+// $Id: tst.lib,v 1.7 1998-05-24 09:04:13 obachman Exp $
 //(obachman, last modified 2/13/98)
-///////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 
-version="$Id: tst.lib,v 1.6 1998-05-15 16:18:19 obachman Exp $";
+version="$Id: tst.lib,v 1.7 1998-05-24 09:04:13 obachman Exp $";
 info="
 LIBRARY:  tst.lib      PROCEDURES FOR RUNNING AUTOMATIC TST TESTS
+
 
  tst_system(s)          returns string which is stdout of system(\"sh\", s)
  tst_ignore(any,[keyword], [link]) writes string(any) to link (or stdout),
                                    prepending prefix \"// ignore:\"
  tst_init()             writes some identification data to stdout
                         with tst_ignore
+ tst_groebnerTest(ideal i)  
+                        tests groebner command 
+ tst_stdEqual(ideal i1, ideal i2) 
+                        test whether two std's are \"equal\"
 ";
 
-///////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 
 proc tst_system(string s)
 "USAGE:    tst_system(s); s string
@@ -148,5 +153,182 @@ example
   tst_init();
 }
 
+///////////////////////////////////////////////////////////////////////
+
+proc tst_groebnerTest(ideal i, list #)
+"USAGE: tst_groebnerTesti,[v]) : ideal i, [int v]
+RETURN: 1, if groebner command produced \"equal\" std as std command
+        0, otherwise
+        Two std's are \"equal\" here, if their redSB's are element-wise equal,
+        and if they reduce each other to zero, and if their leading ideals 
+        are equal
+        On success, times of std - groebner is written with tst_ignore, and
+        times are added to global variables tst_std_time and 
+        tst_groebner_time. If v given, and <= 0, short ideal 
+        characteristic is print, if v > 0, ideals are printed.
+        On failure, Error message and ideals are printed.
+EXAMPLE: example tst_groebner; shows an example
+"
+{
+  int st = timer;
+  ideal si = std(i);
+  st = timer - st;
+  
+  int gt = timer;
+  ideal gi = groebner(i);
+  gt = timer - gt;
+
+  if (tst_stdEqual(si, gi))
+  {
+    tst_ignore(string(st) + " - " + string(gt) + " == " + string(st - gt));
+    if (! defined(tst_groebner_time))
+    {
+      int tst_groebner_time;
+      int tst_std_time;
+      export tst_groebner_time, tst_std_time;
+    }
+    tst_std_time = tst_std_time + st;
+    tst_groebner_time = tst_groebner_time + gt;
+    if (size(#))
+    {
+      if (typeof(#[1] == "int"))
+      {
+        if (#[1] <= 0)
+        {
+          idPrintShort(si, "si");
+          idPrintShort(gi, "gi");
+        }
+        else
+        {
+          si;
+          gi;
+        }
+      }
+    }
+    return (1);
+  }
+  return (0);
+}
+example
+{
+  "EXAMPLE: "; echo = 2;
+  ring r = 0, (a,b,c,d), lp;
+  ideal i = a+b+c+d, ab+ad+bc+cd, abc+abd+acd+bcd, abcd-1; // cyclic 4
+  tst_groebnerTest(i);
+  tst_groebnerTest(i, 0);
+  tst_groebnerTest(i, 1);
+}
+
+  
+//
+// A routine which test for equality of "std-bases"
+// 
+proc tst_stdEqual(ideal i1, ideal i2)
+"USAGE: tst_stdEqual(i1, i2)  ideal i1, i2
+RETURN 1, if i1 \"equald\" i2 as a std bases
+       0, otherwise
+       Two std's are \"equal\" here, if their redSB's are element-wise equal,
+       and if they reduce each other to zero, and if their leading ideals 
+       are equal
+       On failure, error message is printed.
+EXAMPLE: example tst_stdEqual; shows an example
+"
+{
+  int i;
+  int back;
+  intvec opts = option(get);
+  option(redSB);
+  
+  ideal ri1 = simplify(interred(i1), 1);
+  ideal ri2 = simplify(interred(i2), 1);
+  
+  option(set, opts);
+
+  if (size(ri1) != size(ri2))
+  {
+    "Error in tst_stdEqual: Reduced sizes differ";
+    size(ri1);
+    size(ri2);
+    return(0);
+  }
+
+  for (i=1; i<=size(ri1); i++)
+  {
+    if (ri1[i] != ri2[i])
+    {
+      "Error in tst_stdEqual: " + string(i) + " th poly differ";
+      ri1[i];
+      ri2[i];
+      return(0);
+    }
+  }
+
+  // reduced SB are now equal
+  if (size(reduce(i1, i2, 1)) == 0)
+  {
+    if (size(reduce(i2, i1, 1)) == 0)
+    {
+      poly p1, p2;
+      
+      ideal si1 = simplify(i1, 7);
+      ideal si2 = simplify(i2, 7);
+      
+      if (size(si1) == size(si2))
+      {
+        for (i=1; i<=size(si1); i++)
+        {
+          p1 = p1 + lead(si1[i]);
+          p2 = p2 + lead(si2[i]);
+        }
+        if (p1 != p2)
+        {
+          "Error in tst_stdEqual: Lead monoms differ:";
+          p1;
+          p2;
+          return(0);
+        }
+      }
+      else
+      {
+        "Error in tst_stdEqual: size differs:";
+        size(si1);
+        size(si2);
+        return(0);
+      }
+    }
+    else
+    {
+      "Error in tst_stdEqual: reduce(i2, i1) != 0";
+      return(0);
+    }
+  }
+  else
+  {
+    back = 1; "Error in tst_stdEqual: reduce(i1, i2) != 0";
+    return(0);
+  }
+
+  return (1);
+}
+example
+{
+  "EXAMPLE: "; echo = 2;
+  ring r = 0, (a,b,c,d), lp;
+  ideal i = a+b+c+d, ab+ad+bc+cd, abc+abd+acd+bcd, abcd-1; // cyclic 4
+  tst_stdEqual(groebner(i), std(i));
+  tst_stdEqual(std(i), i);
+}
+
+static proc idPrintShort(ideal id, string name)
+{
+  "Summary of " + name + " (leading monoms and size of polys):";
+  int i;
+  for (i = 1; i<=size(id); i++)
+  {
+    "[" + string(i) + "]: #" + string(size(id[i])) + ":" + string(lead(id[i]));
+  }
+}
+
+  
 
 
