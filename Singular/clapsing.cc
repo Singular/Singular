@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.23 1998-02-09 11:29:02 Singular Exp $
+// $Id: clapsing.cc,v 1.24 1998-02-09 12:10:16 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -626,7 +626,7 @@ char* singclap_neworder ( ideal I)
   On(SW_SYMMETRIC_FF);
   CFList L;
   if (((nGetChar() == 0) || (nGetChar() > 1) )
-  && (currRing->paramyer==NULL))
+  && (currRing->parameter==NULL))
   {
     setCharacteristic( nGetChar() );
     for(i=0;i<IDELEMS(I);i++)
