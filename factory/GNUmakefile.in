@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.38 1998-11-05 10:57:43 Singular Exp $
+# $Id: GNUmakefile.in,v 1.39 1999-02-16 17:59:20 schmidt Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -302,12 +302,14 @@ hdrtempldep :=	$(hdrtemplsrc:.template=.d)
 # FTE source files
 ftestsrc :=	\
 		ftest_io.cc \
-		ftest_util.cc
+		ftest_util.cc \
+		ntl_util.cc
 
 # FTE header files
 ftestincl :=	\
 		ftest_io.h \
-		ftest_util.h
+		ftest_util.h \
+		ntl_util.h
 
 # FTE m4 source files (exported for `GNUmakefile' in `ftest/').
 # The variable `$(ftestm4develsrc)' may be already initialized
@@ -322,9 +324,11 @@ ftestm4src :=	$(ftestm4develsrc) \
 		fbinops.m4 \
 		feval.m4 \
 		gcd.m4 \
+		gcd.ntl.m4 \
 		insert.m4 \
 		norm.m4 \
 		resultant.m4 \
+		revert.m4 \
 		size.m4 \
 		totaldegree.m4
 export ftestm4src
