@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.134 1999-03-11 15:58:05 Singular Exp $ */
+/* $Id: iparith.cc,v 1.135 1999-03-12 10:16:21 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2514,12 +2514,15 @@ static BOOLEAN jjHIGHCORNER(leftv res, leftv v)
 static BOOLEAN jjHIGHCORNER_M(leftv res, leftv v)
 {
   assumeStdFlag(v);
-  intvec *module_w=new intvec(*(intvec*)atGet(v,"isHomog"));
+  intvec *w=(intvec*)atGet(v,"isHomog");
+  intvec *module_w=NULL;
   ideal I=(ideal)v->Data();
   int i;
   poly p=NULL,po=NULL;
   int rk=idRankFreeModule(I);
-  if (module_w==NULL)
+  if (w!=NULL)
+    module_w=new intvec(*w);
+  else
     module_w = new intvec(rk);
   for(i=rk;i>0;i--)
   {
@@ -2535,7 +2538,7 @@ static BOOLEAN jjHIGHCORNER_M(leftv res, leftv v)
     else
     {
       // now po!=NULL, p!=NULL
-      int d=(pFDeg(po)+(*module_w)[pGetComp(po)] - pFDeg(p)+ (*module_w)[i]);
+      int d=(pFDeg(po)+(*module_w)[pGetComp(po)-1] - pFDeg(p)+(*module_w)[i-1]);
       if (d==0)
         d=pComp0(po,p);
       if (d < 0)
