@@ -195,8 +195,8 @@ spSpolyLoop.inc: spSpolyLoop.pl
 	fi
 	${PERL5} spSpolyLoop.pl > spSpolyLoop.inc
 
-libparse: libparse_main.o utils.o
-	${CXX} -o libparse libparse_main.o utils.o
+libparse: libparse_main.o utils.o getopt.o
+	${CXX} -o libparse libparse_main.o utils.o getopt.o
 
 libparse_main.o: libparse.cc
 	${CXX} -c -o libparse_main.o libparse.cc -DSTANDALONE_PARSER
