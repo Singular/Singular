@@ -33,7 +33,17 @@ else
   singulardatadir=${datadir}/Singular;
 fi
 
+if test "x$infodir" = 'x${prefix}/info'; then
+  if test "x${prefix}" = xNONE; then
+    singularinfodir=${ac_default_prefix}/info;
+  else
+    singularinfodir=${prefix}/info;
+  fi
+else
+  singularinfodir=$infodir;
+fi
 AC_DEFINE_UNQUOTED(SINGULAR_DATADIR, "${singulardatadir}")
+AC_DEFINE_UNQUOTED(SINGULAR_INFODIR, "${singularinfodir}")
 
 AC_SUBST(singulardatadir)
 
