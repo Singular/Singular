@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.39 2001-08-24 13:41:35 Singular Exp $ */
+/* $Id: longrat.cc,v 1.40 2001-08-24 14:09:06 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -108,8 +108,6 @@ BOOLEAN nlDBTest(number a, char *f,int l);
 #ifndef P_NUMBERS_H
 
 omBin rnumber_bin = omGetSpecBin(sizeof(rnumber));
-
-number nlOne=nlInit(1);
 
 static int nlPrimeM;
 static number nlMapP(number from)
@@ -508,8 +506,6 @@ int nlInt(number &i)
   mpz_clear(&tmp);
   return ul;
 }
-
-
 
 /*
 * 1/a
@@ -2200,22 +2196,6 @@ number nlRInit (int i)
   return z;
 }
 
-/*2
-* z := i/j
-*/
-number nlInit2 (int i, int j)
-{
-  number z=(number)omAllocBin(rnumber_bin);
-#if defined(LDEBUG)
-  z->debug=123456;
-#endif
-  mpz_init_set_si(&z->z,(long)i);
-  mpz_init_set_si(&z->n,(long)j);
-  z->s = 0;
-  nlNormalize(z);
-  return z;
-}
-
 #else // DO_LINLINE
 
 // declare immedate routines
@@ -2290,6 +2270,15 @@ LINLINE BOOLEAN nlIsZero (number a)
 * copy a to b
 */
 LINLINE number nlCopy(number a)
+{
+  if ((SR_HDL(a) & SR_INT)||(a==NULL))
+  {
+    return a;
+  }
+  return _nlCopy_NoImm(a);
+}
+
+LINLINE number nl_Copy(number a, ring r)
 {
   if ((SR_HDL(a) & SR_INT)||(a==NULL))
   {

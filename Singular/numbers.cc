@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.42 2001-08-24 13:54:03 Singular Exp $ */
+/* $Id: numbers.cc,v 1.43 2001-08-24 14:10:09 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -89,6 +89,7 @@ int    nGetChar() { return nChar; }
 int ndSize(number a) { return (int)nIsZero(a)==FALSE; }
 
 number ndCopy(number a) { return a; }
+number nd_Copy(number a, ring r) { return a; }
 
 /*2
 * init operations for characteristic c (complete==TRUE)
@@ -222,6 +223,8 @@ void nInitChar(ring r)
   r->cf->nImPart=ndReturn0;
   r->cf->cfDelete= ndDelete;
   r->cf->nNew=nDummy1;
+  r->cf->nCopy  = ndCopy;
+  r->cf->cfCopy  = nd_Copy;
   if (rField_is_Extension(r))
   {
     //naInitChar(c,TRUE,r);
@@ -242,6 +245,7 @@ void nInitChar(ring r)
     r->cf->nNeg        = naNeg;
     r->cf->nInvers     = naInvers;
     r->cf->nCopy       = naCopy;
+    r->cf->cfCopy      = na_Copy;
     r->cf->nGreater    = naGreater;
     r->cf->nEqual      = naEqual;
     r->cf->nIsZero     = naIsZero;
@@ -278,6 +282,7 @@ void nInitChar(ring r)
     r->cf->nNeg   = nlNeg;
     r->cf->nInvers= nlInvers;
     r->cf->nCopy  = nlCopy;
+    r->cf->cfCopy  = nl_Copy;
     r->cf->nGreater = nlGreater;
     r->cf->nEqual = nlEqual;
     r->cf->nIsZero = nlIsZero;
@@ -312,7 +317,6 @@ void nInitChar(ring r)
     r->cf->nIntMod= ndIntMod; /* dummy !! */
     r->cf->nNeg   = npNeg;
     r->cf->nInvers= npInvers;
-    r->cf->nCopy  = ndCopy;
     r->cf->nGreater = npGreater;
     r->cf->nEqual = npEqual;
     r->cf->nIsZero = npIsZero;
@@ -349,7 +353,6 @@ void nInitChar(ring r)
     r->cf->nIntMod= ndIntMod; /* dummy !! */
     r->cf->nNeg   = nfNeg;
     r->cf->nInvers= nfInvers;
-    r->cf->nCopy  = ndCopy;
     r->cf->nGreater = nfGreater;
     r->cf->nEqual = nfEqual;
     r->cf->nIsZero = nfIsZero;
@@ -384,7 +387,6 @@ void nInitChar(ring r)
     r->cf->nIntMod= ndIntMod; /* dummy !! */
     r->cf->nNeg   = nrNeg;
     r->cf->nInvers= nrInvers;
-    r->cf->nCopy  = ndCopy;
     r->cf->nGreater = nrGreater;
     r->cf->nEqual = nrEqual;
     r->cf->nIsZero = nrIsZero;
@@ -421,6 +423,7 @@ void nInitChar(ring r)
     r->cf->nNeg   = ngfNeg;
     r->cf->nInvers= ngfInvers;
     r->cf->nCopy  = ngfCopy;
+    r->cf->cfCopy  = ngf_Copy;
     r->cf->nGreater = ngfGreater;
     r->cf->nEqual = ngfEqual;
     r->cf->nIsZero = ngfIsZero;
@@ -457,6 +460,7 @@ void nInitChar(ring r)
     r->cf->nNeg   = ngcNeg;
     r->cf->nInvers= ngcInvers;
     r->cf->nCopy  = ngcCopy;
+    r->cf->cfCopy = ngc_Copy;
     r->cf->nGreater = ngcGreater;
     r->cf->nEqual = ngcEqual;
     r->cf->nIsZero = ngcIsZero;

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.h,v 1.24 2001-08-24 13:54:03 Singular Exp $ */
+/* $Id: longrat.h,v 1.25 2001-08-24 14:10:09 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers
 */
@@ -40,7 +40,6 @@ typedef MP_INT lint;
 
 struct snumber;
 typedef struct snumber rnumber;
-typedef rnumber * number;
 struct snumber
 {
   lint z;
@@ -65,6 +64,7 @@ LINLINE number   nlInit(int i);
 LINLINE BOOLEAN  nlIsOne(number a);
 LINLINE BOOLEAN  nlIsZero(number za);
 LINLINE number   nlCopy(number a);
+LINLINE number   nl_Copy(number a, ring r);
 LINLINE void     nlNew(number *r);
 LINLINE void     nlDelete(number *a, const ring r);
 LINLINE number   nlNeg(number za);
@@ -72,7 +72,6 @@ LINLINE number   nlAdd(number la, number li);
 LINLINE number   nlSub(number la, number li);
 LINLINE number   nlMult(number a, number b);
 
-number   nlInit2 (int i, int j);
 number   nlGcd(number a, number b, const ring r);
 number   nlLcm(number a, number b, const ring r);   /*special routine !*/
 BOOLEAN  nlGreater(number a, number b);
@@ -95,7 +94,6 @@ number   nlGetDenom(number &n);
 #ifdef LDEBUG
 BOOLEAN  nlDBTest(number a, char *f, int l);
 #endif
-extern number nlOne;
 
 nMapFunc nlSetMap(ring src, ring dst);
 
