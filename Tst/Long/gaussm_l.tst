@@ -75,15 +75,7 @@ for(i=1;i<=size(d);i=i+4)
   s="poly f="+d[i+3]+";";
   execute(s);
 
-  print(monomat(f));
-  print(monospec(f));
-  list l=vfilt(f);
-  l;
-  vjacob(l);
-  l=singspec(f);
-  l;
-  gamma(l);
-  gamma4(l);
+  tst_gaussm(f);
 
   kill R;
 }
