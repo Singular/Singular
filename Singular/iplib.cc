@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.103 2003-07-25 14:04:08 levandov Exp $ */
+/* $Id: iplib.cc,v 1.104 2003-11-04 16:43:29 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -130,13 +130,18 @@ char * iiProcArgs(char *e,BOOLEAN withParenth)
   char *argstr=(char *)omAlloc(127); // see ../omalloc/omTables.inc
   int argstrlen=127;
   *argstr='\0';
+  int par=0;
   do
   {
     args_found=FALSE;
     s=e; // set s to the starting point of the arg
          // and search for the end
-    while ((*e!=',')&&(*e!=')')&&(*e!='\0'))
+    while ((*e!=',')
+    &&((par!=0) || (*e!=')'))
+    &&(*e!='\0'))
     {
+      if (*e=='(') par++;
+      else if (*e==')') par--;
       args_found=args_found || (*e>' ');
       e++;
     }

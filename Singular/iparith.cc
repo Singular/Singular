@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.305 2003-07-18 16:59:54 Singular Exp $ */
+/* $Id: iparith.cc,v 1.306 2003-11-04 16:43:26 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1553,18 +1553,6 @@ static BOOLEAN jjDIFF_ID_ID(leftv res, leftv u, leftv v)
   res->data=(char *)idDiffOp((ideal)u->Data(),(ideal)v->Data());
   return FALSE;
 }
-
-static BOOLEAN jjELIMIN(leftv res, leftv u, leftv v)
-{
-  res->data=(char *)idElimination((ideal)u->Data(),(poly)v->Data());
-  setFlag(res,FLAG_STD);
-  return FALSE;
-}
-static BOOLEAN jjERROR(leftv res, leftv u)
-{
-  WerrorS((char *)u->Data());
-  return TRUE;
-}
 static BOOLEAN jjDIM2(leftv res, leftv v, leftv w)
 {
   assumeStdFlag(v);
@@ -1612,6 +1600,17 @@ static BOOLEAN jjDIVISION(leftv res, leftv u, leftv v)
   res->data=(char *)L;
   return FALSE;
 }
+static BOOLEAN jjELIMIN(leftv res, leftv u, leftv v)
+{
+  res->data=(char *)idElimination((ideal)u->Data(),(poly)v->Data());
+  setFlag(res,FLAG_STD);
+  return FALSE;
+}
+static BOOLEAN jjERROR(leftv res, leftv u)
+{
+  WerrorS((char *)u->Data());
+  return TRUE;
+}
 static BOOLEAN jjEXTGCD_I(leftv res, leftv u, leftv v)
 {
   int uu=(int)u->Data();int vv=(int)v->Data();
@@ -1642,11 +1641,42 @@ static BOOLEAN jjEXTGCD_I(leftv res, leftv u, leftv v)
   return FALSE;
 }
 #ifdef HAVE_FACTORY
+static BOOLEAN jjEXTGCD_P(leftv res, leftv u, leftv v)
+{
+  poly r,pa,pb;
+  BOOLEAN ret=singclap_extgcd((poly)u->Data(),(poly)v->Data(),r,pa,pb);
+  if (ret) return TRUE;
+  lists L=(lists)omAllocBin(slists_bin);
+  L->Init(3);
+  res->data=(char *)L;
+  L->m[0].data=(void *)r;
+  L->m[0].rtyp=POLY_CMD;
+  L->m[1].data=(void *)pa;
+  L->m[1].rtyp=POLY_CMD;
+  L->m[2].data=(void *)pb;
+  L->m[2].rtyp=POLY_CMD;
+  return FALSE;
+}
 static BOOLEAN jjFACSTD2(leftv res, leftv v, leftv w)
 {
-  res->data=(void *)kStdfac((ideal)v->Data(),NULL,testHomog,NULL,
-           (ideal)w->Data());
-  setFlag(res,FLAG_STD);
+  ideal_list p,h;
+  h=kStdfac((ideal)v->Data(),NULL,testHomog,NULL,(ideal)w->Data());
+  p=h;
+  int l=0;
+  while (p!=NULL) { p=p->next;l++; }
+  lists L=(lists)omAllocBin(slists_bin);
+  L->Init(l);
+  l=0;
+  while(h!=NULL) 
+  {
+    L->m[l].data=(char *)h->d;
+    L->m[l].rtyp=IDEAL_CMD;
+    p=h->next;
+    omFreeSize(h,sizeof(*h));
+    h=p;
+    l++;
+  }
+  res->data=(void *)L;
   return FALSE;
 }
 #endif
@@ -1796,6 +1826,14 @@ static BOOLEAN jjGCD_N(leftv res, leftv u, leftv v)
   }
   return FALSE;
 }
+#ifdef HAVE_FACTORY
+static BOOLEAN jjGCD_P(leftv res, leftv u, leftv v)
+{
+  res->data=(void *)singclap_gcd((poly)(u->CopyD(POLY_CMD)),
+                                 (poly)(v->CopyD(POLY_CMD)));
+  return FALSE;
+}
+#endif
 static BOOLEAN jjHILBERT2(leftv res, leftv u, leftv v)
 {
   assumeStdFlag(u);
@@ -2110,6 +2148,54 @@ static BOOLEAN jjSIMPL_ID(leftv res, leftv u, leftv v)
   res->data = (char * )id;
   return FALSE;
 }
+#ifdef HAVE_FACTORY
+static BOOLEAN jjSQR_FREE_DEC(leftv res, leftv u,leftv dummy)
+{
+  intvec *v=NULL;
+  int sw=(int)dummy->Data();
+  int fac_sw=sw;
+  if ((sw<0)||(sw>2)) fac_sw=1;
+  ideal f=singclap_factorize((poly)(u->Data()), &v, fac_sw);
+  if (f==NULL)
+    return TRUE;
+  switch(sw)
+  {
+    case 0:
+    case 2:
+    {
+      lists l=(lists)omAllocBin(slists_bin);
+      l->Init(2);
+      l->m[0].rtyp=IDEAL_CMD;
+      l->m[0].data=(void *)f;
+      l->m[1].rtyp=INTVEC_CMD;
+      l->m[1].data=(void *)v;
+      res->data=(void *)l;
+      res->rtyp=LIST_CMD;
+      return FALSE;
+    }
+    case 1:
+      res->data=(void *)f;
+      return FALSE;
+    case 3:
+      {
+        poly p=f->m[0];
+        int i=IDELEMS(f);
+        f->m[0]=NULL;
+        while(i>1)
+        {
+          i--;
+          p=pMult(p,f->m[i]);
+          f->m[i]=NULL;
+        }
+        res->data=(void *)p;
+        res->rtyp=POLY_CMD;
+      }
+      return FALSE;
+  }
+  WerrorS("invalid switch");
+  return TRUE;
+}
+#endif
 static BOOLEAN jjSTATUS2(leftv res, leftv u, leftv v)
 {
   res->data = omStrDup(slStatus((si_link) u->Data(), (char *) v->Data()));
@@ -2580,7 +2666,15 @@ static BOOLEAN jjBAREISS(leftv res, leftv v)
 {
   //matrix m=(matrix)v->Data();
   //lists l=mpBareiss(m,FALSE);
-  lists l=smCallNewBareiss((ideal)v->Data(),0,0);
+  intvec *iv;
+  ideal m;
+  smCallNewBareiss((ideal)v->Data(),0,0,m,&iv);
+  lists l=(lists)omAllocBin(slists_bin);
+  l->Init(2);
+  l->m[0].rtyp=MODUL_CMD;
+  l->m[1].rtyp=INTVEC_CMD;
+  l->m[0].data=(void *)m;
+  l->m[1].data=(void *)iv;
   res->data = (char *)l;
   return FALSE;
 }
@@ -2774,6 +2868,21 @@ static BOOLEAN jjFACSTD(leftv res, leftv v)
 {
   res->data=(void *)kStdfac((ideal)v->Data(),NULL,testHomog,NULL);
   setFlag(res,FLAG_STD);
+  return FALSE;
+}
+static BOOLEAN jjFAC_P(leftv res, leftv u)
+{
+  intvec *v=NULL;
+  ideal f=singclap_factorize((poly)(u->Data()), &v, 0);
+  if (f==NULL) return TRUE;
+  ivTest(v);
+  lists l=(lists)omAllocBin(slists_bin);
+  l->Init(2);
+  l->m[0].rtyp=IDEAL_CMD;
+  l->m[0].data=(void *)f;
+  l->m[1].rtyp=INTVEC_CMD;
+  l->m[1].data=(void *)v;
+  res->data=(void *)l;
   return FALSE;
 }
 #endif
@@ -3071,7 +3180,17 @@ static BOOLEAN jjMONITOR1(leftv res, leftv v)
 }
 static BOOLEAN jjMSTD(leftv res, leftv v)
 {
-  res->data=(void *)min_std((ideal)v->Data(),currQuotient,testHomog,NULL);
+  int t=v->Typ();
+  ideal r,m;
+  r=kMin_std((ideal)v->Data(),currQuotient,testHomog,NULL,m);
+  lists l=(lists)omAllocBin(slists_bin);
+  l->Init(2);
+  l->m[0].rtyp=t;
+  l->m[0].data=(char *)r;
+  setFlag(&(l->m[0]),FLAG_STD);
+  l->m[1].rtyp=t;
+  l->m[1].data=(char *)m;
+  res->data=(char *)l;
   return FALSE;
 }
 static BOOLEAN jjMULT(leftv res, leftv v)
@@ -4098,15 +4217,25 @@ static BOOLEAN jjCALL3MANY(leftv res, leftv u, leftv v, leftv w)
 }
 static BOOLEAN jjBAREISS3(leftv res, leftv u, leftv v, leftv w)
 {
-  lists l;
+  intvec *iv;
+  ideal m;
+  lists l=(lists)omAllocBin(slists_bin);
   int k=(int)w->Data();
   if (k>=0)
   {
-    l=smCallNewBareiss((ideal)u->Data(),(int)v->Data(),(int)w->Data());
+    smCallNewBareiss((ideal)v->Data(),(int)v->Data(),(int)w->Data(),m,&iv);
+    l->Init(2);
+    l->m[0].rtyp=MODUL_CMD;
+    l->m[1].rtyp=INTVEC_CMD;
+    l->m[0].data=(void *)m;
+    l->m[1].data=(void *)iv;
   }
   else
   {
-    l=smCallSolv((ideal)u->Data());
+    m=smCallSolv((ideal)u->Data());
+    l->Init(1);
+    l->m[0].rtyp=IDEAL_CMD;
+    l->m[0].data=(void *)m;
   }
   res->data = (char *)l;
   return FALSE;
@@ -4827,13 +4956,15 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
       WarnS("not all weights are positive!");
   }
 
-  lists L=idLiftW(P,Q,n,w);
+  matrix T;
+  ideal R;
+  idLiftW(P,Q,n,T,R,w);
 
   if(w!=NULL)
     omFree(w);
-
+  lists L=(lists) omAllocBin(slists_bin);
+  L->Init(2);
   L->m[1].rtyp=v1->Typ();
-  ideal R=(ideal)L->m[1].data;
   if(v1->Typ()==POLY_CMD||v1->Typ()==VECTOR_CMD)
   {
     if(v1->Typ()==POLY_CMD)
@@ -4847,8 +4978,11 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
     L->m[1].data=(void *)idModule2Matrix(R);
   else
     L->m[1].rtyp=MODUL_CMD;
+  L->m[0].rtyp=MATRIX_CMD;
+  L->m[0].data=(char *)T;
+
   res->data=L;
-  res->rtyp=LIST_CMD;
+  //res->rtyp=LIST_CMD;
 
   return FALSE;
 }

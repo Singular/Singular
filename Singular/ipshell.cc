@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.79 2003-01-31 09:04:38 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.80 2003-11-04 16:43:29 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -32,6 +32,14 @@
 #include "ipconv.h"
 #include "silink.h"
 #include "stairc.h"
+#include "weight.h"
+#include "semic.h"
+#include "splist.h"
+#include "spectrum.h"
+#include "gnumpfl.h"
+#include "mpr_base.h"
+#include "clapsing.h"
+#include "hutil.h"
 #include "ipshell.h"
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
@@ -530,47 +538,6 @@ int exprlist_length(leftv v)
   return rc;
 }
 
-void iiWriteMatrix(matrix im, const char *n, int dim,int spaces)
-{
-  int i,ii = MATROWS(im)-1;
-  int j,jj = MATCOLS(im)-1;
-  poly *pp = im->m;
-
-  for (i=0; i<=ii; i++)
-  {
-    for (j=0; j<=jj; j++)
-    {
-      if (spaces>0)
-        Print("%-*.*s",spaces,spaces," ");
-      if (dim == 2) Print("%s[%u,%u]=",n,i+1,j+1);
-      else if (dim == 1) Print("%s[%u]=",n,j+1);
-      else if (dim == 0) Print("%s=",n);
-      if ((i<ii)||(j<jj)) pWrite(*pp++);
-      else                pWrite0(*pp);
-    }
-  }
-}
-
-char * iiStringMatrix(matrix im, int dim,char ch)
-{
-  int i,ii = MATROWS(im);
-  int j,jj = MATCOLS(im);
-  poly *pp = im->m;
-  char *s=StringSetS("");
-
-  for (i=0; i<ii; i++)
-  {
-    for (j=0; j<jj; j++)
-    {
-      pString0(*pp++);
-      s=StringAppend("%c",ch);
-      if (dim > 1) s = StringAppendS("\n");
-    }
-  }
-  s[strlen(s)- (dim > 1 ? 2 : 1)]='\0';
-  return s;
-}
-
 int IsPrime(int p)  /* brute force !!!! */
 {
   int i,j;
@@ -910,6 +877,97 @@ void iiDebug()
   }
 }
 
+lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
+{
+  int i;
+  indset save;
+  lists res=(lists)omAlloc0Bin(slists_bin);
+
+  hexist = hInit(S, Q, &hNexist);
+  if ((hNexist == 0) || (hisModule!=0))
+  {
+    res->Init(0);
+    return res;
+  }
+  save = ISet = (indset)omAlloc0Bin(indlist_bin);
+  hMu = 0;
+  hwork = (scfmon)omAlloc(hNexist * sizeof(scmon));
+  hvar = (varset)omAlloc((pVariables + 1) * sizeof(int));
+  hpure = (scmon)omAlloc((1 + (pVariables * pVariables)) * sizeof(Exponent_t));
+  hrad = hexist;
+  hNrad = hNexist;
+  radmem = hCreate(pVariables - 1);
+  hCo = pVariables + 1;
+  hNvar = pVariables;
+  hRadical(hrad, &hNrad, hNvar);
+  hSupp(hrad, hNrad, hvar, &hNvar);
+  if (hNvar)
+  {
+    hCo = hNvar;
+    memset(hpure, 0, (pVariables + 1) * sizeof(Exponent_t));
+    hPure(hrad, 0, &hNrad, hvar, hNvar, hpure, &hNpure);
+    hLexR(hrad, hNrad, hvar, hNvar);
+    hDimSolve(hpure, hNpure, hrad, hNrad, hvar, hNvar);
+  }
+  if (hCo && (hCo < pVariables))
+  {
+    hIndMult(hpure, hNpure, hrad, hNrad, hvar, hNvar);
+  }
+  if (hMu!=0)
+  {
+    ISet = save;
+    hMu2 = 0;
+    if (all && (hCo+1 < pVariables))
+    {
+      JSet = (indset)omAlloc0Bin(indlist_bin);
+      hIndAllMult(hpure, hNpure, hrad, hNrad, hvar, hNvar);
+      i=hMu+hMu2;
+      res->Init(i);
+      if (hMu2 == 0)
+      {
+        omFreeBin((ADDRESS)JSet, indlist_bin);
+      }
+    }
+    else
+    {
+      res->Init(hMu);
+    }
+    for (i=0;i<hMu;i++)
+    {
+      res->m[i].data = (void *)save->set;
+      res->m[i].rtyp = INTVEC_CMD;
+      ISet = save;
+      save = save->nx;
+      omFreeBin((ADDRESS)ISet, indlist_bin);
+    }
+    omFreeBin((ADDRESS)save, indlist_bin);
+    if (hMu2 != 0)
+    {
+      save = JSet;
+      for (i=hMu;i<hMu+hMu2;i++)
+      {
+        res->m[i].data = (void *)save->set;
+        res->m[i].rtyp = INTVEC_CMD;
+        JSet = save;
+        save = save->nx;
+        omFreeBin((ADDRESS)JSet, indlist_bin);
+      }
+      omFreeBin((ADDRESS)save, indlist_bin);
+    }
+  }
+  else
+  {
+    res->Init(0);
+    omFreeBin((ADDRESS)ISet,  indlist_bin);
+  }
+  hKill(radmem, pVariables - 1);
+  omFreeSize((ADDRESS)hpure, (1 + (pVariables * pVariables)) * sizeof(Exponent_t));
+  omFreeSize((ADDRESS)hvar, (pVariables + 1) * sizeof(int));
+  omFreeSize((ADDRESS)hwork, hNexist * sizeof(scmon));
+  hDelete(hexist, hNexist);
+  return res;
+}
+
 int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN isring, BOOLEAN init_b)
 {
   BOOLEAN res=FALSE;
@@ -1208,3 +1266,2384 @@ void iiCheckPack(package &p)
   return;
 }
 #endif
+
+idhdl rDefault(char *s)
+{
+  idhdl tmp=NULL;
+
+  if (s!=NULL) tmp = enterid(s, myynest, RING_CMD, &IDROOT);
+  if (tmp==NULL) return NULL;
+
+  if (ppNoether!=NULL) pDelete(&ppNoether);
+  if (sLastPrinted.RingDependend())
+  {
+    sLastPrinted.CleanUp();
+    memset(&sLastPrinted,0,sizeof(sleftv));
+  }
+
+  ring r = IDRING(tmp);
+
+  r->ch    = 32003;
+  r->N     = 3;
+  /*r->P     = 0; Alloc0 in idhdl::set, ipid.cc*/
+  /*names*/
+  r->names = (char **) omAlloc0(3 * sizeof(char_ptr));
+  r->names[0]  = omStrDup("x");
+  r->names[1]  = omStrDup("y");
+  r->names[2]  = omStrDup("z");
+  /*weights: entries for 3 blocks: NULL*/
+  r->wvhdl = (int **)omAlloc0(3 * sizeof(int_ptr));
+  /*order: dp,C,0*/
+  r->order = (int *) omAlloc(3 * sizeof(int *));
+  r->block0 = (int *)omAlloc0(3 * sizeof(int *));
+  r->block1 = (int *)omAlloc0(3 * sizeof(int *));
+  /* ringorder dp for the first block: var 1..3 */
+  r->order[0]  = ringorder_dp;
+  r->block0[0] = 1;
+  r->block1[0] = 3;
+  /* ringorder C for the second block: no vars */
+  r->order[1]  = ringorder_C;
+  /* the last block: everything is 0 */
+  r->order[2]  = 0;
+  /*polynomial ring*/
+  r->OrdSgn    = 1;
+
+  /* complete ring intializations */
+  rComplete(r);
+  rSetHdl(tmp);
+  return currRingHdl;
+}
+
+idhdl rFindHdl(ring r, idhdl n, idhdl w)
+{
+  idhdl h=rSimpleFindHdl(r,IDROOT,n);
+  if (h!=NULL)  return h;
+#ifdef HAVE_NS
+  if (IDROOT!=basePack->idroot) h=rSimpleFindHdl(r,basePack->idroot,n);
+  if (h!=NULL)  return h;
+  proclevel *p=procstack;
+  while(p!=NULL)
+  {
+    if ((p->cPack!=basePack)
+    && (p->cPack!=currPack))
+      h=rSimpleFindHdl(r,p->cPack->idroot,n);
+    if (h!=NULL)  return h;
+    p=p->next;
+  }
+  idhdl tmp=basePack->idroot;
+  while (tmp!=NULL)
+  {
+    if (IDTYP(tmp)==PACKAGE_CMD)
+      h=rSimpleFindHdl(r,IDPACKAGE(tmp)->idroot,n);
+    if (h!=NULL)  return h;
+    tmp=IDNEXT(tmp);
+  }
+#endif
+  return NULL;
+}
+
+lists rDecompose(ring r)
+{
+  // 0: char/ cf - ring
+  // 1: list (var)
+  // 2: list (ord)
+  // 3: qideal
+  lists L=(lists)omAlloc0Bin(slists_bin);
+  L->Init(4);
+  // ----------------------------------------
+  // 0: char/ cf - ring
+  #if 0 /* TODO */
+  if (rIsExtension(r))
+    rDecomposeCF(&(L->m[0]),r);
+  else
+  #endif
+  {
+    L->m[0].rtyp=INT_CMD;
+    L->m[0].data=(void *)r->ch;
+  }
+  // ----------------------------------------
+  // 1: list (var)
+  lists LL=(lists)omAlloc0Bin(slists_bin);
+  LL->Init(r->N);
+  int i;
+  for(i=0; i<r->N; i++)
+  {
+    LL->m[i].rtyp=STRING_CMD;
+    LL->m[i].data=(void *)omStrDup(r->names[i]);
+  }
+  L->m[1].rtyp=LIST_CMD;
+  L->m[1].data=(void *)LL;
+  // ----------------------------------------
+  // 2: list (ord)
+  LL=(lists)omAlloc0Bin(slists_bin);
+  i=rBlocks(r)-1;
+  LL->Init(i);
+  i--;
+  lists LLL;
+  for(; i>=0; i--)
+  {
+    intvec *iv;
+    int j;
+    LL->m[i].rtyp=LIST_CMD;
+    LLL=(lists)omAlloc0Bin(slists_bin);
+    LLL->Init(2);
+    LLL->m[0].rtyp=STRING_CMD;
+    LLL->m[0].data=(void *)omStrDup(rSimpleOrdStr(r->order[i]));
+    if (r->block1[i]-r->block0[i] >=0 )
+    {
+      j=r->block1[i]-r->block0[i];
+      iv=new intvec(j+1);
+      if ((r->wvhdl!=NULL) && (r->wvhdl[i]!=NULL))
+      {
+        for(;j>=0; j--) (*iv)[j]=r->wvhdl[i][j];
+      }
+      else switch (r->order[i])
+      {
+        case ringorder_dp:
+        case ringorder_Dp:
+        case ringorder_ds:
+        case ringorder_Ds:
+        case ringorder_lp:
+          for(;j>=0; j--) (*iv)[j]=1;
+          break;
+        default: /* do nothing */;
+      }
+    }
+    else
+    {
+      iv=new intvec(1);
+    }
+    LLL->m[1].rtyp=INTVEC_CMD;
+    LLL->m[1].data=(void *)iv;
+    LL->m[i].data=(void *)LLL;
+  }
+  L->m[2].rtyp=LIST_CMD;
+  L->m[2].data=(void *)LL;
+  // ----------------------------------------
+  // 3: qideal
+  L->m[3].rtyp=IDEAL_CMD;
+  if (r->qideal==NULL)
+    L->m[3].data=(void *)idInit(1,1);
+  else
+    L->m[3].data=(void *)idCopy(r->qideal);
+  // ----------------------------------------
+  return L;
+}
+
+ring rCompose(lists  L)
+{
+  if (L->nr!=3) return NULL;
+  // 0: char/ cf - ring
+  // 1: list (var)
+  // 2: list (ord)
+  // 3: qideal
+  ring R=(ring) omAlloc0Bin(sip_sring_bin);
+  if (L->m[0].Typ()==INT_CMD)
+  {
+    R->ch=(int)L->m[0].Data();
+  }
+  else if (L->m[0].Typ()==LIST_CMD)
+  {
+    R->algring=rCompose((lists)L->m[0].Data());
+    if (R->algring==NULL)
+    {
+      WerrorS("could not create rational function coefficient field");
+      goto rCompose_err;
+    }
+    R->ch=R->algring->ch;
+    R->parameter=R->algring->names;
+    R->P=R->algring->N;
+  }
+  else
+  {
+    WerrorS("coefficient field must be described by `int` or `list`");
+    goto rCompose_err;
+  }
+  // ------------------------- VARS ---------------------------
+  if (L->m[1].Typ()==LIST_CMD)
+  {
+    lists v=(lists)L->m[1].Data();
+    R->N = v->nr+1;
+    R->names   = (char **)omAlloc0(R->N * sizeof(char_ptr));
+    int i;
+    for(i=0;i<R->N;i++)
+    {
+      if (v->m[i].Typ()==STRING_CMD)
+        R->names[i]=omStrDup((char *)v->m[i].Data());
+      else if (v->m[i].Typ()==POLY_CMD)
+      {
+        poly p=(poly)v->m[i].Data();
+        int nr=pIsPurePower(p);
+        if (nr>0)
+          R->names[i]=omStrDup(currRing->names[nr-1]);
+        else
+        {
+          Werror("var name %d must be a string or a ring variable",i+1);
+          goto rCompose_err;
+        }
+      }
+      else
+      {
+        Werror("var name %d must be `string`",i+1);
+        goto rCompose_err;
+      }
+    }
+  }
+  else
+  {
+    WerrorS("variable must be given as `list`");
+    goto rCompose_err;
+  }
+  // ------------------------ ORDER ------------------------------
+  if (L->m[2].Typ()==LIST_CMD)
+  {
+    lists v=(lists)L->m[2].Data();
+    int n= v->nr+2;
+    int j;
+    // initialize fields of R
+    R->order=(int *)omAlloc0(n*sizeof(int));
+    R->block0=(int *)omAlloc0(n*sizeof(int));
+    R->block1=(int *)omAlloc0(n*sizeof(int));
+    R->wvhdl=(int**)omAlloc0(n*sizeof(int_ptr));
+    // init order, so that rBlocks works correctly
+    for (j=0; j < n-2; j++)
+      R->order[j] = (int) ringorder_unspec;
+    // orderings
+    R->OrdSgn=1;
+    for(j=0;j<n-1;j++)
+    {
+    // todo: a(..), M
+      if (v->m[j].Typ()!=LIST_CMD)
+      {
+        WerrorS("ordering must be list of lists");
+        goto rCompose_err;
+      }
+      lists vv=(lists)v->m[j].Data();
+      if ((vv->nr!=1)
+      || (vv->m[0].Typ()!=STRING_CMD)
+      || ((vv->m[1].Typ()!=INTVEC_CMD) && (vv->m[1].Typ()!=INT_CMD)))
+      {
+        WerrorS("ordering name must be a (string,intvec)");
+        goto rCompose_err;
+      }
+      R->order[j]=rOrderName(omStrDup((char*)vv->m[0].Data())); // assume STRING
+      if (j==0) R->block0[0]=1;
+      else      R->block0[j]=R->block1[j-1]+1;
+      intvec *iv;
+      if (vv->m[1].Typ()==INT_CMD)
+        iv=new intvec((int)vv->m[1].Data(),(int)vv->m[1].Data());
+      else
+        iv=ivCopy((intvec*)vv->m[1].Data()); //assume INTVEC
+      R->block1[j]=max(R->block0[j],R->block0[j]+iv->length()-1);
+      int i;
+      switch (R->order[j])
+      {
+         case ringorder_ws:
+         case ringorder_Ws:
+            R->OrdSgn=-1;
+         case ringorder_wp:
+         case ringorder_Wp:
+           R->wvhdl[j] =( int *)omAlloc((iv->length())*sizeof(int));
+           for (i=0; i<iv->length();i++) R->wvhdl[j][i]=(*iv)[i];
+           break;
+         case ringorder_ls:
+         case ringorder_ds:
+         case ringorder_Ds:
+           R->OrdSgn=-1;
+         case ringorder_lp:
+         case ringorder_dp:
+         case ringorder_Dp:
+         case ringorder_rp:
+           break;
+         case ringorder_S:
+           break;
+         case ringorder_c:
+         case ringorder_C:
+           R->block1[j]=R->block0[j]-1;
+           break;
+         case ringorder_aa:
+         case ringorder_a:
+           R->wvhdl[j] =( int *)omAlloc((iv->length())*sizeof(int));
+           for (i=1; i<iv->length();i++) R->wvhdl[n][i-1]=(*iv)[i];
+         // todo
+           break;
+         case ringorder_M:
+         // todo
+           break;
+      }
+    }
+    // sanity check
+    j=n-2;
+    if ((R->order[j]==ringorder_c)
+    || (R->order[j]==ringorder_C)) j--;
+    if (R->block1[j] != R->N)
+    {
+      if (((R->order[j]==ringorder_dp) ||
+           (R->order[j]==ringorder_ds) ||
+           (R->order[j]==ringorder_Dp) ||
+           (R->order[j]==ringorder_Ds) ||
+           (R->order[j]==ringorder_rp) ||
+           (R->order[j]==ringorder_lp) ||
+           (R->order[j]==ringorder_ls))
+          &&
+            R->block0[j] <= R->N)
+      {
+        R->block1[j] = R->N;
+      }
+      else
+      {
+        Werror("ordering incomplete: size (%d) should be %d",R->block1[j],R->N);
+        goto rCompose_err;
+      }
+    }
+  }
+  else
+  {
+    WerrorS("ordering must be given as `list`");
+    goto rCompose_err;
+  }
+  // ------------------------ Q-IDEAL ------------------------
+  if (L->m[3].Typ()==IDEAL_CMD)
+  {
+    ideal q=(ideal)L->m[3].Data();
+    if (q->m[0]!=NULL)
+      R->qideal=idCopy(q);
+  }
+  else
+  {
+    WerrorS("q-ideal must be given as `ideal`");
+    goto rCompose_err;
+  }
+
+  // todo
+  rComplete(R);
+  return R;
+
+rCompose_err:
+  if (R->N>0)
+  {
+    int i;
+    if (R->names!=NULL)
+    {
+      i=R->N;
+      while (i>=0) { if (R->names[i]!=NULL) omFree(R->names[i]); i--; }
+      omFree(R->names);
+    }
+  }
+  if (R->order!=NULL) omFree(R->order);
+  if (R->block0!=NULL) omFree(R->block0);
+  if (R->block1!=NULL) omFree(R->block1);
+  if (R->wvhdl!=NULL) omFree(R->wvhdl);
+  omFree(R);
+  return NULL;
+}
+
+// from matpol.cc
+
+/*2
+* compute the jacobi matrix of an ideal
+*/
+BOOLEAN mpJacobi(leftv res,leftv a)
+{
+  int     i,j;
+  matrix result;
+  ideal id=(ideal)a->Data();
+
+  result =mpNew(IDELEMS(id),pVariables);
+  for (i=1; i<=IDELEMS(id); i++)
+  {
+    for (j=1; j<=pVariables; j++)
+    {
+      MATELEM(result,i,j) = pDiff(id->m[i-1],j);
+    }
+  }
+  res->data=(char *)result;
+  return FALSE;
+}
+
+/*2
+* returns the Koszul-matrix of degree d of a vectorspace with dimension n
+* uses the first n entrees of id, if id <> NULL
+*/
+BOOLEAN mpKoszul(leftv res,leftv c/*ip*/, leftv b/*in*/, leftv id)
+{
+  int n=(int)b->Data();
+  int d=(int)c->Data();
+  int     k,l,sign,row,col;
+  matrix  result;
+  ideal temp;
+  BOOLEAN bo;
+  poly    p;
+
+  if ((d>n) || (d<1) || (n<1))
+  {
+    res->data=(char *)mpNew(1,1);
+    return FALSE;
+  }
+  int *choise = (int*)omAlloc(d*sizeof(int));
+  if (id==NULL)
+    temp=idMaxIdeal(1);
+  else
+    temp=(ideal)id->Data();
+
+  k = binom(n,d);
+  l = k*d;
+  l /= n-d+1;
+  result =mpNew(l,k);
+  col = 1;
+  idInitChoise(d,1,n,&bo,choise);
+  while (!bo)
+  {
+    sign = 1;
+    for (l=1;l<=d;l++)
+    {
+      if (choise[l-1]<=IDELEMS(temp))
+      {
+        p = pCopy(temp->m[choise[l-1]-1]);
+        if (sign == -1) p = pNeg(p);
+        sign *= -1;
+        row = idGetNumberOfChoise(l-1,d,1,n,choise);
+        MATELEM(result,row,col) = p;
+      }
+    }
+    col++;
+    idGetNextChoise(d,n,&bo,choise);
+  }
+  if (id==NULL) idDelete(&temp);
+
+  res->data=(char *)result;
+  return FALSE;
+}
+
+// from syz1.cc
+/*2
+* read out the Betti numbers from resolution
+* (interpreter interface)
+*/
+BOOLEAN syBetti2(leftv res, leftv u, leftv w)
+{
+  syStrategy syzstr=(syStrategy)u->Data();
+  BOOLEAN minim=(int)w->Data();
+  int row_shift=0;
+
+  res->data=(void *)syBettiOfComputation(syzstr,minim,&row_shift);
+  atSet(res,omStrDup("rowShift"),(void*)row_shift,INT_CMD);
+  return FALSE;
+}
+BOOLEAN syBetti1(leftv res, leftv u)
+{
+  syStrategy syzstr=(syStrategy)u->Data();
+
+  res->data=(void *)syBettiOfComputation(syzstr);
+  return FALSE;
+}
+
+/*3
+* converts a resolution into a list of modules
+*/
+lists syConvRes(syStrategy syzstr,BOOLEAN toDel)
+{
+  if ((syzstr->fullres==NULL) && (syzstr->minres==NULL))
+  {
+    if (syzstr->hilb_coeffs==NULL)
+    {
+      syzstr->fullres = syReorder(syzstr->res,syzstr->length,syzstr);
+    }
+    else
+    {
+      syzstr->minres = syReorder(syzstr->orderedRes,syzstr->length,syzstr);
+      syKillEmptyEntres(syzstr->minres,syzstr->length);
+    }
+  }
+  resolvente tr;
+  int typ0=IDEAL_CMD;
+  if (syzstr->minres!=NULL)
+    tr = syzstr->minres;
+  else
+    tr = syzstr->fullres;
+  resolvente trueres=NULL;
+  intvec ** w=NULL;
+  if (syzstr->length>0)
+  {
+    trueres=(resolvente)omAlloc0((syzstr->length)*sizeof(ideal));
+    for (int i=(syzstr->length)-1;i>=0;i--)
+    {
+      if (tr[i]!=NULL)
+      {
+        trueres[i] = idCopy(tr[i]);
+      }
+    }
+    if (idRankFreeModule(trueres[0]) > 0)
+      typ0 = MODUL_CMD;
+    if (syzstr->weights!=NULL)
+    {
+      w = (intvec**)omAlloc0((syzstr->length)*sizeof(intvec*));
+      for (int i=(syzstr->length)-1;i>=0;i--)
+      {
+        if (syzstr->weights[i]!=NULL) w[i] = ivCopy(syzstr->weights[i]);
+      }
+    }
+  }
+  lists li = liMakeResolv(trueres,syzstr->length,syzstr->list_length,typ0,w);
+  if (w != NULL) omFreeSize(w, (syzstr->length)*sizeof(intvec*));
+  if (toDel) syKillComputation(syzstr);
+  return li;
+}
+
+/*3
+* converts a list of modules into a resolution
+*/
+syStrategy syConvList(lists li,BOOLEAN toDel)
+{
+  int typ0;
+  syStrategy result=(syStrategy)omAlloc0(sizeof(ssyStrategy));
+
+  resolvente fr = liFindRes(li,&(result->length),&typ0,&(result->weights));
+  if (fr != NULL)
+  {
+
+    result->fullres = (resolvente)omAlloc0((result->length+1)*sizeof(ideal));
+    for (int i=result->length-1;i>=0;i--)
+    {
+      if (fr[i]!=NULL)
+        result->fullres[i] = idCopy(fr[i]);
+    }
+    result->list_length=result->length;
+    omFreeSize((ADDRESS)fr,(result->length)*sizeof(ideal));
+  }
+  else
+  {
+    omFreeSize(result, sizeof(ssyStrategy));
+    result = NULL;
+  }
+  if (toDel) li->Clean();
+  return result;
+}
+
+/*3
+* converts a list of modules into a minimal resolution
+*/
+syStrategy syForceMin(lists li)
+{
+  int typ0;
+  syStrategy result=(syStrategy)omAlloc0(sizeof(ssyStrategy));
+
+  resolvente fr = liFindRes(li,&(result->length),&typ0);
+  result->minres = (resolvente)omAlloc0((result->length+1)*sizeof(ideal));
+  for (int i=result->length-1;i>=0;i--)
+  {
+    if (fr[i]!=NULL)
+      result->minres[i] = idCopy(fr[i]);
+  }
+  omFreeSize((ADDRESS)fr,(result->length)*sizeof(ideal));
+  return result;
+}
+// from weight.cc
+BOOLEAN kWeight(leftv res,leftv id)
+{
+  ideal F=(ideal)id->Data();
+  intvec * iv = new intvec(pVariables);
+  polyset s;
+  int  sl, n, i;
+  int  *x;
+
+  res->data=(char *)iv;
+  s = F->m;
+  sl = IDELEMS(F) - 1;
+  n = pVariables;
+  wNsqr = (double)2.0 / (double)n;
+  wFunctional = wFunctionalBuch;
+  x = (int * )omAlloc(2 * (n + 1) * sizeof(int));
+  wCall(s, sl, x);
+  for (i = n; i!=0; i--)
+    (*iv)[i-1] = x[i + n + 1];
+  omFreeSize((ADDRESS)x, 2 * (n + 1) * sizeof(int));
+  return FALSE;
+}
+
+BOOLEAN kQHWeight(leftv res,leftv v)
+{
+  res->data=(char *)idQHomWeight((ideal)v->Data());
+  if (res->data==NULL)
+    res->data=(char *)new intvec(pVariables);
+  return FALSE;
+}
+/*==============================================================*/
+// from clapsing.cc
+#if 0
+BOOLEAN jjIS_SQR_FREE(leftv res, leftv u)
+{
+  BOOLEAN b=singclap_factorize((poly)(u->Data()), &v, 0);
+  res->data=(void *)b;
+}
+#endif
+
+BOOLEAN jjRESULTANT(leftv res, leftv u, leftv v, leftv w)
+{
+  res->data=singclap_resultant((poly)u->Data(),(poly)v->Data(), (poly)w->Data());
+  return errorreported;
+}
+BOOLEAN jjCHARSERIES(leftv res, leftv u)
+{
+  res->data=singclap_irrCharSeries((ideal)u->Data());
+  return (res->data==NULL);
+}
+
+// from semic.cc
+#ifdef HAVE_SPECTRUM
+
+// ----------------------------------------------------------------------------
+//  Initialize a  spectrum  deep from another  spectrum
+// ----------------------------------------------------------------------------
+
+void spectrum::copy_deep( const spectrum &spec )
+{
+    mu = spec.mu;
+    pg = spec.pg;
+    n  = spec.n;
+
+    copy_new( n );
+
+    for( int i=0; i<n; i++ )
+    {
+        s[i] = spec.s[i];
+        w[i] = spec.w[i];
+    }
+}
+
+// ----------------------------------------------------------------------------
+//  Initialize a  spectrum  deep from a  singular  lists
+// ----------------------------------------------------------------------------
+
+void spectrum::copy_deep( lists l )
+{
+    mu = (int)(l->m[0].Data( ));
+    pg = (int)(l->m[1].Data( ));
+    n  = (int)(l->m[2].Data( ));
+
+    copy_new( n );
+
+    intvec  *num = (intvec*)l->m[3].Data( );
+    intvec  *den = (intvec*)l->m[4].Data( );
+    intvec  *mul = (intvec*)l->m[5].Data( );
+
+    for( int i=0; i<n; i++ )
+    {
+        s[i] = (Rational)((*num)[i])/(Rational)((*den)[i]);
+        w[i] = (*mul)[i];
+    }
+}
+
+// ----------------------------------------------------------------------------
+//  singular lists  constructor for  spectrum
+// ----------------------------------------------------------------------------
+
+spectrum::spectrum( lists l )
+{
+    copy_deep( l );
+}
+
+// ----------------------------------------------------------------------------
+//  generate a Singular  lists  from a spectrum
+// ----------------------------------------------------------------------------
+
+lists   spectrum::thelist( void )
+{
+    lists   L  = (lists)omAllocBin( slists_bin);
+
+    L->Init( 6 );
+
+    intvec            *num  = new intvec( n );
+    intvec            *den  = new intvec( n );
+    intvec            *mult = new intvec( n );
+
+    for( int i=0; i<n; i++ )
+    {
+        (*num) [i] = s[i].get_num_si( );
+        (*den) [i] = s[i].get_den_si( );
+        (*mult)[i] = w[i];
+    }
+
+    L->m[0].rtyp = INT_CMD;    //  milnor number
+    L->m[1].rtyp = INT_CMD;    //  geometrical genus
+    L->m[2].rtyp = INT_CMD;    //  # of spectrum numbers
+    L->m[3].rtyp = INTVEC_CMD; //  numerators
+    L->m[4].rtyp = INTVEC_CMD; //  denomiantors
+    L->m[5].rtyp = INTVEC_CMD; //  multiplicities
+
+    L->m[0].data = (void*)mu;
+    L->m[1].data = (void*)pg;
+    L->m[2].data = (void*)n;
+    L->m[3].data = (void*)num;
+    L->m[4].data = (void*)den;
+    L->m[5].data = (void*)mult;
+
+    return  L;
+}
+// from spectrum.cc
+// ----------------------------------------------------------------------------
+//  print out an error message for a spectrum list
+// ----------------------------------------------------------------------------
+
+void    list_error( semicState state )
+{
+    switch( state )
+    {
+        case semicListTooShort:
+            WerrorS( "the list is too short" );
+            break;
+        case semicListTooLong:
+            WerrorS( "the list is too long" );
+            break;
+
+        case semicListFirstElementWrongType:
+            WerrorS( "first element of the list should be int" );
+            break;
+        case semicListSecondElementWrongType:
+            WerrorS( "second element of the list should be int" );
+            break;
+        case semicListThirdElementWrongType:
+            WerrorS( "third element of the list should be int" );
+            break;
+        case semicListFourthElementWrongType:
+            WerrorS( "fourth element of the list should be intvec" );
+            break;
+        case semicListFifthElementWrongType:
+            WerrorS( "fifth element of the list should be intvec" );
+            break;
+        case semicListSixthElementWrongType:
+            WerrorS( "sixth element of the list should be intvec" );
+            break;
+
+        case semicListNNegative:
+            WerrorS( "first element of the list should be positive" );
+            break;
+        case semicListWrongNumberOfNumerators:
+            WerrorS( "wrong number of numerators" );
+            break;
+        case semicListWrongNumberOfDenominators:
+            WerrorS( "wrong number of denominators" );
+            break;
+        case semicListWrongNumberOfMultiplicities:
+            WerrorS( "wrong number of multiplicities" );
+            break;
+
+        case semicListMuNegative:
+            WerrorS( "the Milnor number should be positive" );
+            break;
+        case semicListPgNegative:
+            WerrorS( "the geometrical genus should be nonnegative" );
+            break;
+        case semicListNumNegative:
+            WerrorS( "all numerators should be positive" );
+            break;
+        case semicListDenNegative:
+            WerrorS( "all denominators should be positive" );
+            break;
+        case semicListMulNegative:
+            WerrorS( "all multiplicities should be positive" );
+            break;
+
+        case semicListNotSymmetric:
+            WerrorS( "it is not symmetric" );
+            break;
+        case semicListNotMonotonous:
+            WerrorS( "it is not monotonous" );
+            break;
+
+        case semicListMilnorWrong:
+            WerrorS( "the Milnor number is wrong" );
+            break;
+        case semicListPGWrong:
+            WerrorS( "the geometrical genus is wrong" );
+            break;
+
+        default:
+            WerrorS( "unspecific error" );
+            break;
+    }
+}
+// ----------------------------------------------------------------------------
+//  this is the main spectrum computation function
+// ----------------------------------------------------------------------------
+
+spectrumState   spectrumCompute( poly h,lists *L,int fast )
+{
+  int i,j;
+
+  #ifdef SPECTRUM_DEBUG
+  #ifdef SPECTRUM_PRINT
+  #ifdef SPECTRUM_IOSTREAM
+    cout << "spectrumCompute\n";
+    if( fast==0 ) cout << "    no optimization" << endl;
+    if( fast==1 ) cout << "    weight optimization" << endl;
+    if( fast==2 ) cout << "    symmetry optimization" << endl;
+  #else
+    fprintf( stdout,"spectrumCompute\n" );
+    if( fast==0 ) fprintf( stdout,"    no optimization\n" );
+    if( fast==1 ) fprintf( stdout,"    weight optimization\n" );
+    if( fast==2 ) fprintf( stdout,"    symmetry optimization\n" );
+  #endif
+  #endif
+  #endif
+
+  // ----------------------
+  //  check if  h  is zero
+  // ----------------------
+
+  if( h==(poly)NULL )
+  {
+    return  spectrumZero;
+  }
+
+  // ----------------------------------
+  //  check if  h  has a constant term
+  // ----------------------------------
+
+  if( hasConstTerm( h ) )
+  {
+    return  spectrumBadPoly;
+  }
+
+  // --------------------------------
+  //  check if  h  has a linear term
+  // --------------------------------
+
+  if( hasLinearTerm( h ) )
+  {
+    *L = (lists)omAllocBin( slists_bin);
+    (*L)->Init( 1 );
+    (*L)->m[0].rtyp = INT_CMD;    //  milnor number
+    /* (*L)->m[0].data = (void*)0;a  -- done by Init */
+
+    return  spectrumNoSingularity;
+  }
+
+  // ----------------------------------
+  //  compute the jacobi ideal of  (h)
+  // ----------------------------------
+
+  ideal J = NULL;
+  J = idInit( pVariables,1 );
+
+  #ifdef SPECTRUM_DEBUG
+  #ifdef SPECTRUM_PRINT
+  #ifdef SPECTRUM_IOSTREAM
+    cout << "\n   computing the Jacobi ideal...\n";
+  #else
+    fprintf( stdout,"\n   computing the Jacobi ideal...\n" );
+  #endif
+  #endif
+  #endif
+
+  for( i=0; i<pVariables; i++ )
+  {
+    J->m[i] = pDiff( h,i+1); //j );
+
+    #ifdef SPECTRUM_DEBUG
+    #ifdef SPECTRUM_PRINT
+    #ifdef SPECTRUM_IOSTREAM
+      cout << "        ";
+    #else
+      fprintf( stdout,"        " );
+    #endif
+      pWrite( J->m[i] );
+    #endif
+    #endif
+  }
+
+  // --------------------------------------------
+  //  compute a standard basis  stdJ  of  jac(h)
+  // --------------------------------------------
+
+  #ifdef SPECTRUM_DEBUG
+  #ifdef SPECTRUM_PRINT
+  #ifdef SPECTRUM_IOSTREAM
+    cout << endl;
+    cout << "    computing a standard basis..." << endl;
+  #else
+    fprintf( stdout,"\n" );
+    fprintf( stdout,"    computing a standard basis...\n" );
+  #endif
+  #endif
+  #endif
+
+  ideal stdJ = kStd(J,currQuotient,isNotHomog,NULL);
+  idSkipZeroes( stdJ );
+
+  #ifdef SPECTRUM_DEBUG
+  #ifdef SPECTRUM_PRINT
+    for( i=0; i<IDELEMS(stdJ); i++ )
+    {
+      #ifdef SPECTRUM_IOSTREAM
+        cout << "        ";
+      #else
+        fprintf( stdout,"        " );
+      #endif
+
+      pWrite( stdJ->m[i] );
+    }
+  #endif
+  #endif
+
+  idDelete( &J );
+
+  // ------------------------------------------
+  //  check if the  h  has a singularity
+  // ------------------------------------------
+
+  if( hasOne( stdJ ) )
+  {
+    // -------------------------------
+    //  h is smooth in the origin
+    //  return only the Milnor number
+    // -------------------------------
+
+    *L = (lists)omAllocBin( slists_bin);
+    (*L)->Init( 1 );
+    (*L)->m[0].rtyp = INT_CMD;    //  milnor number
+    /* (*L)->m[0].data = (void*)0;a  -- done by Init */
+
+    return  spectrumNoSingularity;
+  }
+
+  // ------------------------------------------
+  //  check if the singularity  h  is isolated
+  // ------------------------------------------
+
+  for( i=pVariables; i>0; i-- )
+  {
+    if( hasAxis( stdJ,i )==FALSE )
+    {
+      return  spectrumNotIsolated;
+    }
+  }
+
+  // ------------------------------------------
+  //  compute the highest corner  hc  of  stdJ
+  // ------------------------------------------
+
+  #ifdef SPECTRUM_DEBUG
+  #ifdef SPECTRUM_PRINT
+  #ifdef SPECTRUM_IOSTREAM
+    cout << "\n    computing the highest corner...\n";
+  #else
+    fprintf( stdout,"\n    computing the highest corner...\n" );
+  #endif
+  #endif
+  #endif
+
+  poly hc = (poly)NULL;
+
+  scComputeHC( stdJ,currQuotient, 0,hc );
+
+  if( hc!=(poly)NULL )
+  {
+    pGetCoeff(hc) = nInit(1);
+
+    for( i=pVariables; i>0; i-- )
+    {
+      if( pGetExp( hc,i )>0 ) pDecrExp( hc,i );
+    }
+    pSetm( hc );
+  }
+  else
+  {
+    return  spectrumNoHC;
+  }
+
+  #ifdef SPECTRUM_DEBUG
+  #ifdef SPECTRUM_PRINT
+  #ifdef SPECTRUM_IOSTREAM
+    cout << "       ";
+  #else
+    fprintf( stdout,"       " );
+  #endif
+    pWrite( hc );
+  #endif
+  #endif
+
+  // ----------------------------------------
+  //  compute the Newton polygon  nph  of  h
+  // ----------------------------------------
+
+  #ifdef SPECTRUM_DEBUG
+  #ifdef SPECTRUM_PRINT
+  #ifdef SPECTRUM_IOSTREAM
+    cout << "\n    computing the newton polygon...\n";
+  #else
+    fprintf( stdout,"\n    computing the newton polygon...\n" );
+  #endif
+  #endif
+  #endif
+
+  newtonPolygon nph( h );
+
+  #ifdef SPECTRUM_DEBUG
+  #ifdef SPECTRUM_PRINT
+    cout << nph;
+  #endif
+  #endif
+
+  // -----------------------------------------------
+  //  compute the weight corner  wc  of  (stdj,nph)
+  // -----------------------------------------------
+
+  #ifdef SPECTRUM_DEBUG
+  #ifdef SPECTRUM_PRINT
+  #ifdef SPECTRUM_IOSTREAM
+    cout << "\n    computing the weight corner...\n";
+  #else
+    fprintf( stdout,"\n    computing the weight corner...\n" );
+  #endif
+  #endif
+  #endif
+
+  poly    wc = ( fast==0 ? pCopy( hc ) :
+               ( fast==1 ? computeWC( nph,(Rational)pVariables ) :
+              /* fast==2 */computeWC( nph,((Rational)pVariables)/(Rational)2 ) ) );
+
+  #ifdef SPECTRUM_DEBUG
+  #ifdef SPECTRUM_PRINT
+  #ifdef SPECTRUM_IOSTREAM
+    cout << "        ";
+  #else
+    fprintf( stdout,"        " );
+  #endif
+    pWrite( wc );
+  #endif
+  #endif
+
+  // -------------
+  //  compute  NF
+  // -------------
+
+  #ifdef SPECTRUM_DEBUG
+  #ifdef SPECTRUM_PRINT
+  #ifdef SPECTRUM_IOSTREAM
+    cout << "\n    computing NF...\n" << endl;
+  #else
+    fprintf( stdout,"\n    computing NF...\n" );
+  #endif
+  #endif
+  #endif
+
+  spectrumPolyList NF( &nph );
+
+  computeNF( stdJ,hc,wc,&NF );
+
+  #ifdef SPECTRUM_DEBUG
+  #ifdef SPECTRUM_PRINT
+    cout << NF;
+  #ifdef SPECTRUM_IOSTREAM
+    cout << endl;
+  #else
+    fprintf( stdout,"\n" );
+  #endif
+  #endif
+  #endif
+
+  // ----------------------------
+  //  compute the spectrum of  h
+  // ----------------------------
+
+  return  NF.spectrum( L,fast );
+}
+
+// ----------------------------------------------------------------------------
+//  this procedure is called from the interpreter
+// ----------------------------------------------------------------------------
+//  first  = polynomial
+//  result = list of spectrum numbers
+// ----------------------------------------------------------------------------
+
+BOOLEAN spectrumProc( leftv result,leftv first )
+{
+  spectrumState state = spectrumOK;
+
+  // -------------------
+  //  check consistency
+  // -------------------
+
+  //  check for a local ring
+
+  if( !ringIsLocal( ) )
+  {
+    WerrorS( "only works for local orderings" );
+    state = spectrumWrongRing;
+  }
+
+  //  no quotient rings are allowed
+
+  else if( currRing->qideal != NULL )
+  {
+    WerrorS( "does not work in quotient rings" );
+    state = spectrumWrongRing;
+  }
+  else
+  {
+    lists   L    = (lists)NULL;
+    int     flag = 1; // weight corner optimization is safe
+
+    state = spectrumCompute( (poly)first->Data( ),&L,flag );
+
+    if( state==spectrumOK )
+    {
+      result->rtyp = LIST_CMD;
+      result->data = (char*)L;
+    }
+    else
+    {
+      spectrumPrintError(state);
+    }
+  }
+
+  return  (state!=spectrumOK);
+}
+
+// ----------------------------------------------------------------------------
+//  this procedure is called from the interpreter
+// ----------------------------------------------------------------------------
+//  first  = polynomial
+//  result = list of spectrum numbers
+// ----------------------------------------------------------------------------
+
+BOOLEAN spectrumfProc( leftv result,leftv first )
+{
+  spectrumState state = spectrumOK;
+
+  // -------------------
+  //  check consistency
+  // -------------------
+
+  //  check for a local polynomial ring
+
+  if( currRing->OrdSgn != -1 )
+  // ?? HS: the test above is also true for k[x][[y]], k[[x]][y]
+  // or should we use:
+  //if( !ringIsLocal( ) )
+  {
+    WerrorS( "only works for local orderings" );
+    state = spectrumWrongRing;
+  }
+  else if( currRing->qideal != NULL )
+  {
+    WerrorS( "does not work in quotient rings" );
+    state = spectrumWrongRing;
+  }
+  else
+  {
+    lists   L    = (lists)NULL;
+    int     flag = 2; // symmetric optimization
+
+    state = spectrumCompute( (poly)first->Data( ),&L,flag );
+
+    if( state==spectrumOK )
+    {
+      result->rtyp = LIST_CMD;
+      result->data = (char*)L;
+    }
+    else
+    {
+      spectrumPrintError(state);
+    }
+  }
+
+  return  (state!=spectrumOK);
+}
+
+// ----------------------------------------------------------------------------
+//  check if a list is a spectrum
+//  check for:
+//      list has 6 elements
+//      1st element is int (mu=Milnor number)
+//      2nd element is int (pg=geometrical genus)
+//      3rd element is int (n =number of different spectrum numbers)
+//      4th element is intvec (num=numerators)
+//      5th element is intvec (den=denomiantors)
+//      6th element is intvec (mul=multiplicities)
+//      exactly n numerators
+//      exactly n denominators
+//      exactly n multiplicities
+//      mu>0
+//      pg>=0
+//      n>0
+//      num>0
+//      den>0
+//      mul>0
+//      symmetriy with respect to numberofvariables/2
+//      monotony
+//      mu = sum of all multiplicities
+//      pg = sum of all multiplicities where num/den<=1
+// ----------------------------------------------------------------------------
+
+semicState  list_is_spectrum( lists l )
+{
+    // -------------------
+    //  check list length
+    // -------------------
+
+    if( l->nr < 5 )
+    {
+        return  semicListTooShort;
+    }
+    else if( l->nr > 5 )
+    {
+        return  semicListTooLong;
+    }
+
+    // -------------
+    //  check types
+    // -------------
+
+    if( l->m[0].rtyp != INT_CMD )
+    {
+        return  semicListFirstElementWrongType;
+    }
+    else if( l->m[1].rtyp != INT_CMD )
+    {
+        return  semicListSecondElementWrongType;
+    }
+    else if( l->m[2].rtyp != INT_CMD )
+    {
+        return  semicListThirdElementWrongType;
+    }
+    else if( l->m[3].rtyp != INTVEC_CMD )
+    {
+        return  semicListFourthElementWrongType;
+    }
+    else if( l->m[4].rtyp != INTVEC_CMD )
+    {
+        return  semicListFifthElementWrongType;
+    }
+    else if( l->m[5].rtyp != INTVEC_CMD )
+    {
+        return  semicListSixthElementWrongType;
+    }
+
+    // -------------------------
+    //  check number of entries
+    // -------------------------
+
+    int     mu = (int)(l->m[0].Data( ));
+    int     pg = (int)(l->m[1].Data( ));
+    int     n  = (int)(l->m[2].Data( ));
+
+    if( n <= 0 )
+    {
+        return  semicListNNegative;
+    }
+
+    intvec  *num = (intvec*)l->m[3].Data( );
+    intvec  *den = (intvec*)l->m[4].Data( );
+    intvec  *mul = (intvec*)l->m[5].Data( );
+
+    if( n != num->length( ) )
+    {
+        return  semicListWrongNumberOfNumerators;
+    }
+    else if( n != den->length( ) )
+    {
+        return  semicListWrongNumberOfDenominators;
+    }
+    else if( n != mul->length( ) )
+    {
+        return  semicListWrongNumberOfMultiplicities;
+    }
+
+    // --------
+    //  values
+    // --------
+
+    if( mu <= 0 )
+    {
+        return  semicListMuNegative;
+    }
+    if( pg < 0 )
+    {
+        return  semicListPgNegative;
+    }
+
+    int i;
+
+    for( i=0; i<n; i++ )
+    {
+        if( (*num)[i] <= 0 )
+        {
+            return  semicListNumNegative;
+        }
+        if( (*den)[i] <= 0 )
+        {
+            return  semicListDenNegative;
+        }
+        if( (*mul)[i] <= 0 )
+        {
+            return  semicListMulNegative;
+        }
+    }
+
+    // ----------------
+    //  check symmetry
+    // ----------------
+
+    int     j;
+
+    for( i=0, j=n-1; i<=j; i++,j-- )
+    {
+        if( (*num)[i] != pVariables*((*den)[i]) - (*num)[j] ||
+            (*den)[i] != (*den)[j] ||
+            (*mul)[i] != (*mul)[j] )
+        {
+            return  semicListNotSymmetric;
+        }
+    }
+
+    // ----------------
+    //  check monotony
+    // ----------------
+
+    for( i=0, j=1; i<n/2; i++,j++ )
+    {
+        if( (*num)[i]*(*den)[j] >= (*num)[j]*(*den)[i] )
+        {
+            return  semicListNotMonotonous;
+        }
+    }
+
+    // ---------------------
+    //  check Milnor number
+    // ---------------------
+
+    for( mu=0, i=0; i<n; i++ )
+    {
+        mu += (*mul)[i];
+    }
+
+    if( mu != (int)(l->m[0].Data( )) )
+    {
+        return  semicListMilnorWrong;
+    }
+
+    // -------------------------
+    //  check geometrical genus
+    // -------------------------
+
+    for( pg=0, i=0; i<n; i++ )
+    {
+        if( (*num)[i]<=(*den)[i] )
+        {
+            pg += (*mul)[i];
+        }
+    }
+
+    if( pg != (int)(l->m[1].Data( )) )
+    {
+        return  semicListPGWrong;
+    }
+
+    return  semicOK;
+}
+
+// ----------------------------------------------------------------------------
+//  this procedure is called from the interpreter
+// ----------------------------------------------------------------------------
+//  first  = list of spectrum numbers
+//  second = list of spectrum numbers
+//  result = sum of the two lists
+// ----------------------------------------------------------------------------
+
+BOOLEAN spaddProc( leftv result,leftv first,leftv second )
+{
+    semicState  state;
+
+    // -----------------
+    //  check arguments
+    // -----------------
+
+    lists l1 = (lists)first->Data( );
+    lists l2 = (lists)second->Data( );
+
+    if( (state=list_is_spectrum( l1 )) != semicOK )
+    {
+        WerrorS( "first argument is not a spectrum:" );
+        list_error( state );
+    }
+    else if( (state=list_is_spectrum( l2 )) != semicOK )
+    {
+        WerrorS( "second argument is not a spectrum:" );
+        list_error( state );
+    }
+    else
+    {
+        spectrum s1( l1 );
+        spectrum s2( l2 );
+        spectrum sum( s1+s2 );
+
+        result->rtyp = LIST_CMD;
+        result->data = (char*)(sum.thelist( ));
+    }
+
+    return  (state!=semicOK);
+}
+
+// ----------------------------------------------------------------------------
+//  this procedure is called from the interpreter
+// ----------------------------------------------------------------------------
+//  first  = list of spectrum numbers
+//  second = integer
+//  result = the multiple of the first list by the second factor
+// ----------------------------------------------------------------------------
+
+BOOLEAN spmulProc( leftv result,leftv first,leftv second )
+{
+    semicState  state;
+
+    // -----------------
+    //  check arguments
+    // -----------------
+
+    lists   l = (lists)first->Data( );
+    int     k = (int)second->Data( );
+
+    if( (state=list_is_spectrum( l ))!=semicOK )
+    {
+        WerrorS( "first argument is not a spectrum" );
+        list_error( state );
+    }
+    else if( k < 0 )
+    {
+        WerrorS( "second argument should be positive" );
+        state = semicMulNegative;
+    }
+    else
+    {
+        spectrum s( l );
+        spectrum product( k*s );
+
+        result->rtyp = LIST_CMD;
+        result->data = (char*)product.thelist( );
+    }
+
+    return  (state!=semicOK);
+}
+
+// ----------------------------------------------------------------------------
+//  this procedure is called from the interpreter
+// ----------------------------------------------------------------------------
+//  first  = list of spectrum numbers
+//  second = list of spectrum numbers
+//  result = semicontinuity index
+// ----------------------------------------------------------------------------
+
+BOOLEAN    semicProc3   ( leftv res,leftv u,leftv v,leftv w )
+{
+  semicState  state;
+  BOOLEAN qh=(((int)w->Data())==1);
+
+  // -----------------
+  //  check arguments
+  // -----------------
+
+  lists l1 = (lists)u->Data( );
+  lists l2 = (lists)v->Data( );
+
+  if( (state=list_is_spectrum( l1 ))!=semicOK )
+  {
+    WerrorS( "first argument is not a spectrum" );
+    list_error( state );
+  }
+  else if( (state=list_is_spectrum( l2 ))!=semicOK )
+  {
+    WerrorS( "second argument is not a spectrum" );
+    list_error( state );
+  }
+  else
+  {
+    spectrum s1( l1 );
+    spectrum s2( l2 );
+
+    res->rtyp = INT_CMD;
+    if (qh)
+      res->data = (void*)(s1.mult_spectrumh( s2 ));
+    else
+      res->data = (void*)(s1.mult_spectrum( s2 ));
+  }
+
+  // -----------------
+  //  check status
+  // -----------------
+
+  return  (state!=semicOK);
+}
+BOOLEAN    semicProc   ( leftv res,leftv u,leftv v )
+{
+  sleftv tmp;
+  memset(&tmp,0,sizeof(tmp));
+  tmp.rtyp=INT_CMD;
+  /* tmp.data = (void *)0;  -- done by memset */
+
+  return  semicProc3(res,u,v,&tmp);
+}
+// from splist.cc
+// ----------------------------------------------------------------------------
+//  Compute the spectrum of a  spectrumPolyList
+// ----------------------------------------------------------------------------
+
+spectrumState   spectrumPolyList::spectrum( lists *L,int fast )
+{
+    spectrumPolyNode  **node = &root;
+    spectrumPolyNode  *search;
+
+    poly              f,tmp;
+    int               found,cmp;
+
+    Rational smax( ( fast==0 ? 0 : pVariables ),
+                   ( fast==2 ? 2 : 1 ) );
+
+    Rational weight_prev( 0,1 );
+
+    int     mu = 0;          // the milnor number
+    int     pg = 0;          // the geometrical genus
+    int     n  = 0;          // number of different spectral numbers
+    int     z  = 0;          // number of spectral number equal to smax
+
+    int     k = 0;
+
+    while( (*node)!=(spectrumPolyNode*)NULL &&
+           ( fast==0 || (*node)->weight<=smax ) )
+    {
+        // ---------------------------------------
+        //  determine the first normal form which
+        //  contains the monomial  node->mon
+        // ---------------------------------------
+
+        found  = FALSE;
+        search = *node;
+
+        while( search!=(spectrumPolyNode*)NULL && found==FALSE )
+        {
+            if( search->nf!=(poly)NULL )
+            {
+                f = search->nf;
+
+                do
+                {
+                    // --------------------------------
+                    //  look for  (*node)->mon  in   f
+                    // --------------------------------
+
+                    cmp = pCmp( (*node)->mon,f );
+
+                    if( cmp<0 )
+                    {
+                        f = pNext( f );
+                    }
+                    else if( cmp==0 )
+                    {
+                        // -----------------------------
+                        //  we have found a normal form
+                        // -----------------------------
+
+                        found = TRUE;
+
+                        //  normalize coefficient
+
+                        number inv = nInvers( pGetCoeff( f ) );
+                        pMult_nn( search->nf,inv );
+                        nDelete( &inv );
+
+                        //  exchange  normal forms
+
+                        tmp         = (*node)->nf;
+                        (*node)->nf = search->nf;
+                        search->nf  = tmp;
+                    }
+                }
+                while( cmp<0 && f!=(poly)NULL );
+            }
+            search = search->next;
+        }
+
+        if( found==FALSE )
+        {
+            // ------------------------------------------------
+            //  the weight of  node->mon  is a spectrum number
+            // ------------------------------------------------
+
+            mu++;
+
+            if( (*node)->weight<=(Rational)1 )              pg++;
+            if( (*node)->weight==smax )           z++;
+            if( (*node)->weight>weight_prev )     n++;
+
+            weight_prev = (*node)->weight;
+            node = &((*node)->next);
+        }
+        else
+        {
+            // -----------------------------------------------
+            //  determine all other normal form which contain
+            //  the monomial  node->mon
+            //  replace for  node->mon  its normal form
+            // -----------------------------------------------
+
+            while( search!=(spectrumPolyNode*)NULL )
+            {
+                    if( search->nf!=(poly)NULL )
+                {
+                    f = search->nf;
+
+                    do
+                    {
+                        // --------------------------------
+                        //  look for  (*node)->mon  in   f
+                        // --------------------------------
+
+                        cmp = pCmp( (*node)->mon,f );
+
+                        if( cmp<0 )
+                        {
+                            f = pNext( f );
+                        }
+                        else if( cmp==0 )
+                        {
+                            search->nf = pSub( search->nf,
+                                ppMult_nn( (*node)->nf,pGetCoeff( f ) ) );
+                            pNorm( search->nf );
+                        }
+                    }
+                    while( cmp<0 && f!=(poly)NULL );
+                }
+                search = search->next;
+            }
+            delete_node( node );
+        }
+
+    }
+
+    // --------------------------------------------------------
+    //  fast computation exploits the symmetry of the spectrum
+    // --------------------------------------------------------
+
+    if( fast==2 )
+    {
+        mu = 2*mu - z;
+        n  = ( z > 0 ? 2*n - 1 : 2*n );
+    }
+
+    // --------------------------------------------------------
+    //  compute the spectrum numbers with their multiplicities
+    // --------------------------------------------------------
+
+    intvec            *nom  = new intvec( n );
+    intvec            *den  = new intvec( n );
+    intvec            *mult = new intvec( n );
+
+    int count         = 0;
+    int multiplicity  = 1;
+
+    for( search=root; search!=(spectrumPolyNode*)NULL &&
+                     ( fast==0 || search->weight<=smax );
+                     search=search->next )
+    {
+        if( search->next==(spectrumPolyNode*)NULL ||
+            search->weight<search->next->weight )
+        {
+            (*nom) [count] = search->weight.get_num_si( );
+            (*den) [count] = search->weight.get_den_si( );
+            (*mult)[count] = multiplicity;
+
+            multiplicity=1;
+            count++;
+        }
+        else
+        {
+            multiplicity++;
+        }
+    }
+
+    // --------------------------------------------------------
+    //  fast computation exploits the symmetry of the spectrum
+    // --------------------------------------------------------
+
+    if( fast==2 )
+    {
+        int n1,n2;
+        for( n1=0, n2=n-1; n1<n2; n1++, n2-- )
+        {
+            (*nom) [n2] = pVariables*(*den)[n1]-(*nom)[n1];
+            (*den) [n2] = (*den)[n1];
+            (*mult)[n2] = (*mult)[n1];
+        }
+    }
+
+    // -----------------------------------
+    //  test if the spectrum is symmetric
+    // -----------------------------------
+
+    if( fast==0 || fast==1 )
+    {
+        int symmetric=TRUE;
+
+        for( int n1=0, n2=n-1 ; n1<n2 && symmetric==TRUE; n1++, n2-- )
+        {
+            if( (*mult)[n1]!=(*mult)[n2] ||
+                (*den) [n1]!= (*den)[n2] ||
+                (*nom)[n1]+(*nom)[n2]!=pVariables*(*den) [n1] )
+            {
+                symmetric = FALSE;
+            }
+        }
+
+        if( symmetric==FALSE )
+        {
+            // ---------------------------------------------
+            //  the spectrum is not symmetric => degenerate
+            //  principal part
+            // ---------------------------------------------
+
+            *L = (lists)omAllocBin( slists_bin);
+            (*L)->Init( 1 );
+            (*L)->m[0].rtyp = INT_CMD;    //  milnor number
+            (*L)->m[0].data = (void*)mu;
+
+            return spectrumDegenerate;
+        }
+    }
+
+    *L = (lists)omAllocBin( slists_bin);
+
+    (*L)->Init( 6 );
+
+    (*L)->m[0].rtyp = INT_CMD;    //  milnor number
+    (*L)->m[1].rtyp = INT_CMD;    //  geometrical genus
+    (*L)->m[2].rtyp = INT_CMD;    //  number of spectrum values
+    (*L)->m[3].rtyp = INTVEC_CMD; //  nominators
+    (*L)->m[4].rtyp = INTVEC_CMD; //  denomiantors
+    (*L)->m[5].rtyp = INTVEC_CMD; //  multiplicities
+
+    (*L)->m[0].data = (void*)mu;
+    (*L)->m[1].data = (void*)pg;
+    (*L)->m[2].data = (void*)n;
+    (*L)->m[3].data = (void*)nom;
+    (*L)->m[4].data = (void*)den;
+    (*L)->m[5].data = (void*)mult;
+
+    return  spectrumOK;
+}
+
+#endif
+
+//from mpr_inout.cc
+BOOLEAN loNewtonP( leftv res, leftv arg1 )
+{
+  res->data= (void*)loNewtonPolytope( (ideal)arg1->Data() );
+  return FALSE;
+}
+
+BOOLEAN loSimplex( leftv res, leftv args )
+{
+  if ( !(rField_is_long_R()) )
+  {
+    WerrorS("Ground field not implemented!");
+    return TRUE;
+  }
+
+  simplex * LP;
+  matrix m;
+
+  leftv v= args;
+  if ( v->Typ() != MATRIX_CMD ) // 1: matrix
+    return TRUE;
+  else
+    m= (matrix)(v->CopyD());
+
+  LP = new simplex(MATROWS(m),MATCOLS(m));
+  LP->mapFromMatrix(m);
+
+  v= v->next;
+  if ( v->Typ() != INT_CMD )    // 2: m = number of constraints
+    return TRUE;
+  else
+    LP->m= (int)(v->Data());
+
+  v= v->next;
+  if ( v->Typ() != INT_CMD )    // 3: n = number of variables
+    return TRUE;
+  else
+    LP->n= (int)(v->Data());
+
+  v= v->next;
+  if ( v->Typ() != INT_CMD )    // 4: m1 = number of <= constraints
+    return TRUE;
+  else
+    LP->m1= (int)(v->Data());
+
+  v= v->next;
+  if ( v->Typ() != INT_CMD )    // 5: m2 = number of >= constraints
+    return TRUE;
+  else
+    LP->m2= (int)(v->Data());
+
+  v= v->next;
+  if ( v->Typ() != INT_CMD )    // 6: m3 = number of == constraints
+    return TRUE;
+  else
+    LP->m3= (int)(v->Data());
+
+#ifdef mprDEBUG_PROT
+  Print("m (constraints) %d\n",LP->m);
+  Print("n (columns) %d\n",LP->n);
+  Print("m1 (<=) %d\n",LP->m1);
+  Print("m2 (>=) %d\n",LP->m2);
+  Print("m3 (==) %d\n",LP->m3);
+#endif
+
+  LP->compute();
+
+  lists lres= (lists)omAlloc( sizeof(slists) );
+  lres->Init( 6 );
+
+  lres->m[0].rtyp= MATRIX_CMD; // output matrix
+  lres->m[0].data=(void*)LP->mapToMatrix(m);
+
+  lres->m[1].rtyp= INT_CMD;   // found a solution?
+  lres->m[1].data=(void*)LP->icase;
+
+  lres->m[2].rtyp= INTVEC_CMD;
+  lres->m[2].data=(void*)LP->posvToIV();
+
+  lres->m[3].rtyp= INTVEC_CMD;
+  lres->m[3].data=(void*)LP->zrovToIV();
+
+  lres->m[4].rtyp= INT_CMD;
+  lres->m[4].data=(void*)LP->m;
+
+  lres->m[5].rtyp= INT_CMD;
+  lres->m[5].data=(void*)LP->n;
+
+  res->data= (void*)lres;
+
+  return FALSE;
+}
+
+BOOLEAN nuMPResMat( leftv res, leftv arg1, leftv arg2 )
+{
+  ideal gls = (ideal)(arg1->Data());
+  int imtype= (int)arg2->Data();
+
+  uResultant::resMatType mtype= determineMType( imtype );
+
+  // check input ideal ( = polynomial system )
+  if ( mprIdealCheck( gls, arg1->Name(), mtype, true ) != mprOk )
+  {
+    return TRUE;
+  }
+
+  uResultant *resMat= new uResultant( gls, mtype, false );
+
+  res->rtyp = MODUL_CMD;
+  res->data= (void*)resMat->accessResMat()->getMatrix();
+
+  delete resMat;
+
+  return FALSE;
+}
+
+BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
+{
+
+  poly gls;
+  gls= (poly)(arg1->Data());
+  int howclean= (int)arg3->Data();
+
+  if ( !(rField_is_R() ||
+         rField_is_Q() ||
+         rField_is_long_R() ||
+         rField_is_long_C()) )
+  {
+    WerrorS("Ground field not implemented!");
+    return TRUE;
+  }
+
+  if ( !(rField_is_R()||rField_is_long_R()||rField_is_long_C()) )
+  {
+    unsigned long int ii = (unsigned long int)arg2->Data();
+    setGMPFloatDigits( ii, ii );
+  }
+
+  if ( gls == NULL || pIsConstant( gls ) )
+  {
+    WerrorS("Input polynomial is constant!");
+    return TRUE;
+  }
+
+  int ldummy;
+  int deg= pLDeg( gls, &ldummy );
+  //  int deg= pDeg( gls );
+  int len= pLength( gls );
+  int i,vpos;
+  poly piter;
+  lists elist;
+  lists rlist;
+
+  elist= (lists)omAlloc( sizeof(slists) );
+  elist->Init( 0 );
+
+  if ( pVariables > 1 )
+  {
+    piter= gls;
+    for ( i= 1; i <= pVariables; i++ )
+      if ( pGetExp( piter, i ) )
+      {
+        vpos= i;
+        break;
+      }
+    while ( piter )
+    {
+      for ( i= 1; i <= pVariables; i++ )
+        if ( (vpos != i) && (pGetExp( piter, i ) != 0) )
+        {
+          WerrorS("The input polynomial must be univariate!");
+          return TRUE;
+        }
+      pIter( piter );
+    }
+  }
+
+  rootContainer * roots= new rootContainer();
+  number * pcoeffs= (number *)omAlloc( (deg+1) * sizeof( number ) );
+  piter= gls;
+  for ( i= deg; i >= 0; i-- )
+  {
+    //if ( piter ) Print("deg %d, pDeg(piter) %d\n",i,pTotaldegree(piter));
+    if ( piter && pTotaldegree(piter) == i )
+    {
+      pcoeffs[i]= nCopy( pGetCoeff( piter ) );
+      //nPrint( pcoeffs[i] );PrintS("  ");
+      pIter( piter );
+    }
+    else
+    {
+      pcoeffs[i]= nInit(0);
+    }
+  }
+
+#ifdef mprDEBUG_PROT
+  for (i=deg; i >= 0; i--)
+  {
+    nPrint( pcoeffs[i] );PrintS("  ");
+  }
+  PrintLn();
+#endif
+
+  roots->fillContainer( pcoeffs, NULL, 1, deg, rootContainer::onepoly, 1 );
+  roots->solver( howclean );
+
+  int elem= roots->getAnzRoots();
+  char *out;
+  char *dummy;
+  int j;
+
+  rlist= (lists)omAlloc( sizeof(slists) );
+  rlist->Init( elem );
+
+  if (rField_is_long_C())
+  {
+    for ( j= 0; j < elem; j++ )
+    {
+      rlist->m[j].rtyp=NUMBER_CMD;
+      rlist->m[j].data=(void *)nCopy((number)(roots->getRoot(j)));
+      //rlist->m[j].data=(void *)(number)(roots->getRoot(j));
+    }
+  }
+  else
+  {
+    for ( j= 0; j < elem; j++ )
+    {
+      dummy = complexToStr( (*roots)[j], gmp_output_digits );
+      rlist->m[j].rtyp=STRING_CMD;
+      rlist->m[j].data=(void *)dummy;
+    }
+  }
+
+  elist->Clean();
+  //omFreeSize( (ADDRESS) elist, sizeof(slists) );
+
+  for ( i= deg; i >= 0; i-- ) nDelete( &pcoeffs[i] );
+  omFreeSize( (ADDRESS) pcoeffs, (deg+1) * sizeof( number ) );
+
+  res->rtyp= LIST_CMD;
+  res->data= (void*)rlist;
+
+  return FALSE;
+}
+
+BOOLEAN nuVanderSys( leftv res, leftv arg1, leftv arg2, leftv arg3)
+{
+  int i;
+  ideal p,w;
+  p= (ideal)arg1->Data();
+  w= (ideal)arg2->Data();
+
+  // w[0] = f(p^0)
+  // w[1] = f(p^1)
+  // ...
+  // p can be a vector of numbers (multivariate polynom)
+  //   or one number (univariate polynom)
+  // tdg = deg(f)
+
+  int n= IDELEMS( p );
+  int m= IDELEMS( w );
+  int tdg= (int)arg3->Data();
+
+  res->data= (void*)NULL;
+
+  // check the input
+  if ( tdg < 1 )
+  {
+    WerrorS("Last input parameter must be > 0!");
+    return TRUE;
+  }
+  if ( n != pVariables )
+  {
+    Werror("Size of first input ideal must be equal to %d!",pVariables);
+    return TRUE;
+  }
+  if ( m != (int)pow((double)tdg+1,(int)n) )
+  {
+    Werror("Size of second input ideal must be equal to %d!",
+      (int)pow((double)tdg+1,(int)n));
+    return TRUE;
+  }
+  if ( !(rField_is_Q() /* ||
+         rField_is_R() || rField_is_long_R() ||
+         rField_is_long_C()*/ ) )
+         {
+    WerrorS("Ground field not implemented!");
+    return TRUE;
+  }
+
+  number tmp;
+  number *pevpoint= (number *)omAlloc( n * sizeof( number ) );
+  for ( i= 0; i < n; i++ )
+  {
+    pevpoint[i]=nInit(0);
+    if (  (p->m)[i] )
+    {
+      tmp = pGetCoeff( (p->m)[i] );
+      if ( nIsZero(tmp) || nIsOne(tmp) || nIsMOne(tmp) )
+      {
+        omFreeSize( (ADDRESS)pevpoint, n * sizeof( number ) );
+        WerrorS("Elements of first input ideal must not be equal to -1, 0, 1!");
+        return TRUE;
+      }
+    } else tmp= NULL;
+    if ( !nIsZero(tmp) )
+    {
+      if ( !pIsConstant((p->m)[i]))
+      {
+        omFreeSize( (ADDRESS)pevpoint, n * sizeof( number ) );
+        WerrorS("Elements of first input ideal must be numbers!");
+        return TRUE;
+      }
+      pevpoint[i]= nCopy( tmp );
+    }
+  }
+
+  number *wresults= (number *)omAlloc( m * sizeof( number ) );
+  for ( i= 0; i < m; i++ )
+  {
+    wresults[i]= nInit(0);
+    if ( (w->m)[i] && !nIsZero(pGetCoeff((w->m)[i])) )
+    {
+      if ( !pIsConstant((w->m)[i]))
+      {
+        omFreeSize( (ADDRESS)pevpoint, n * sizeof( number ) );
+        omFreeSize( (ADDRESS)wresults, m * sizeof( number ) );
+        WerrorS("Elements of second input ideal must be numbers!");
+        return TRUE;
+      }
+      wresults[i]= nCopy(pGetCoeff((w->m)[i]));
+    }
+  }
+
+  vandermonde vm( m, n, tdg, pevpoint, FALSE );
+  number *ncpoly= vm.interpolateDense( wresults );
+  // do not free ncpoly[]!!
+  poly rpoly= vm.numvec2poly( ncpoly );
+
+  omFreeSize( (ADDRESS)pevpoint, n * sizeof( number ) );
+  omFreeSize( (ADDRESS)wresults, m * sizeof( number ) );
+
+  res->data= (void*)rpoly;
+  return FALSE;
+}
+
+BOOLEAN nuUResSolve( leftv res, leftv args )
+{
+  leftv v= args;
+
+  ideal gls;
+  int imtype;
+  int howclean;
+
+  // get ideal
+  if ( v->Typ() != IDEAL_CMD )
+    return TRUE;
+  else gls= (ideal)(v->Data());
+  v= v->next;
+
+  // get resultant matrix type to use (0,1)
+  if ( v->Typ() != INT_CMD )
+    return TRUE;
+  else imtype= (int)v->Data();
+  v= v->next;
+
+  // get and set precision in digits ( > 0 )
+  if ( v->Typ() != INT_CMD )
+    return TRUE;
+  else if ( !(rField_is_R()||rField_is_long_R()||rField_is_long_C()) )
+  {
+    unsigned long int ii=(unsigned long int)v->Data();
+    setGMPFloatDigits( ii, ii );
+  }
+  v= v->next;
+
+  // get interpolation steps (0,1,2)
+  if ( v->Typ() != INT_CMD )
+    return TRUE;
+  else howclean= (int)v->Data();
+
+  uResultant::resMatType mtype= determineMType( imtype );
+  int i,c,count;
+  lists listofroots= NULL;
+  lists emptylist;
+  number smv= NULL;
+  BOOLEAN interpolate_det= (mtype==uResultant::denseResMat)?TRUE:FALSE;
+
+  //emptylist= (lists)omAlloc( sizeof(slists) );
+  //emptylist->Init( 0 );
+
+  //res->rtyp = LIST_CMD;
+  //res->data= (void *)emptylist;
+
+  // check input ideal ( = polynomial system )
+  if ( mprIdealCheck( gls, args->Name(), mtype ) != mprOk )
+  {
+    return TRUE;
+  }
+
+  uResultant * ures;
+  rootContainer ** iproots;
+  rootContainer ** muiproots;
+  rootArranger * arranger;
+
+  // main task 1: setup of resultant matrix
+  ures= new uResultant( gls, mtype );
+  if ( ures->accessResMat()->initState() != resMatrixBase::ready )
+  {
+    WerrorS("Error occurred during matrix setup!");
+    return TRUE;
+  }
+
+  // if dense resultant, check if minor nonsingular
+  if ( mtype == uResultant::denseResMat )
+  {
+    smv= ures->accessResMat()->getSubDet();
+#ifdef mprDEBUG_PROT
+    PrintS("// Determinant of submatrix: ");nPrint(smv);PrintLn();
+#endif
+    if ( nIsZero(smv) )
+    {
+      WerrorS("Unsuitable input ideal: Minor of resultant matrix is singular!");
+      return TRUE;
+    }
+  }
+
+  // main task 2: Interpolate specialized resultant polynomials
+  if ( interpolate_det )
+    iproots= ures->interpolateDenseSP( false, smv );
+  else
+    iproots= ures->specializeInU( false, smv );
+
+  // main task 3: Interpolate specialized resultant polynomials
+  if ( interpolate_det )
+    muiproots= ures->interpolateDenseSP( true, smv );
+  else
+    muiproots= ures->specializeInU( true, smv );
+
+#ifdef mprDEBUG_PROT
+  c= iproots[0]->getAnzElems();
+  for (i=0; i < c; i++) pWrite(iproots[i]->getPoly());
+  c= muiproots[0]->getAnzElems();
+  for (i=0; i < c; i++) pWrite(muiproots[i]->getPoly());
+#endif
+
+  // main task 4: Compute roots of specialized polys and match them up
+  arranger= new rootArranger( iproots, muiproots, howclean );
+  arranger->solve_all();
+
+  // get list of roots
+  if ( arranger->success() )
+  {
+    arranger->arrange();
+    listofroots= arranger->listOfRoots( gmp_output_digits );
+  }
+  else
+  {
+    WerrorS("Solver was unable to find any roots!");
+    return TRUE;
+  }
+
+  // free everything
+  count= iproots[0]->getAnzElems();
+  for (i=0; i < count; i++) delete iproots[i];
+  omFreeSize( (ADDRESS) iproots, count * sizeof(rootContainer*) );
+  count= muiproots[0]->getAnzElems();
+  for (i=0; i < count; i++) delete muiproots[i];
+  omFreeSize( (ADDRESS) muiproots, count * sizeof(rootContainer*) );
+
+  delete ures;
+  delete arranger;
+  nDelete( &smv );
+
+  res->data= (void *)listofroots;
+
+  //emptylist->Clean();
+  //  omFreeSize( (ADDRESS) emptylist, sizeof(slists) );
+
+  return FALSE;
+}
+
+// from mpr_numeric.cc
+lists rootArranger::listOfRoots( const unsigned int oprec )
+{
+  int i,j,tr;
+  int count= roots[0]->getAnzRoots(); // number of roots
+  int elem= roots[0]->getAnzElems();  // number of koordinates per root
+
+  lists listofroots= (lists)omAlloc( sizeof(slists) ); // must be done this way!
+
+  if ( found_roots )
+  {
+    listofroots->Init( count );
+
+    for (i=0; i < count; i++)
+    {
+      lists onepoint= (lists)omAlloc(sizeof(slists)); // must be done this way!
+      onepoint->Init(elem);
+      for ( j= 0; j < elem; j++ )
+      {
+        if ( !rField_is_long_C() )
+        {
+          onepoint->m[j].rtyp=STRING_CMD;
+          onepoint->m[j].data=(void *)complexToStr((*roots[j])[i],oprec);
+        }
+        else
+        {
+          onepoint->m[j].rtyp=NUMBER_CMD;
+          onepoint->m[j].data=(void *)nCopy((number)(roots[j]->getRoot(i)));
+        }
+        onepoint->m[j].next= NULL;
+        onepoint->m[j].name= NULL;
+      }
+      listofroots->m[i].rtyp=LIST_CMD;
+      listofroots->m[i].data=(void *)onepoint;
+      listofroots->m[j].next= NULL;
+      listofroots->m[j].name= NULL;
+    }
+
+  }
+  else
+  {
+    listofroots->Init( 0 );
+  }
+
+  return listofroots;
+}
+
+#ifdef PDEBUG
+
+#if (OM_TRACK > 2) && defined(OM_TRACK_CUSTOM)
+
+void p_SetRingOfPoly(poly p, ring r)
+{
+  while (p != NULL)
+  {
+    p_SetRingOfLm(p, r);
+    pIter(p);
+  }
+}
+
+void p_SetRingOfIdeal(ideal id, ring r)
+{
+  if (id == NULL) return;
+
+  int i, n = id->ncols*id->nrows;
+
+  for (i=0; i<n; i++)
+  {
+    p_SetRingOfPoly(id->m[i], r);
+  }
+}
+
+void p_SetRingOfList(lists L, ring r)
+{
+  int i;
+  for (i=0; i<L->nr; i++)
+  {
+    p_SetRingOfLeftv(&(L->m[i]), r);
+  }
+}
+
+void p_SetRingOfCommand(command cmd, ring r)
+{
+  if (cmd->op == PROC_CMD && cmd->argc == 2)
+    p_SetRingOfLeftv(&(cmd->arg2), r);
+  else if (cmd->argc > 0)
+  {
+    p_SetRingOfLeftv(&(cmd->arg1), r);
+    if (cmd->argc > 1)
+    {
+      p_SetRingOfLeftv(&(cmd->arg2), r);
+      if (cmd->argc > 2)
+        p_SetRingOfLeftv(&(cmd->arg3), r);
+    }
+  }
+}
+
+void p_SetRingOfLeftv(leftv l, ring r)
+{
+  while (l != NULL)
+  {
+    switch(l->rtyp)
+    {
+        case POLY_CMD:
+        case VECTOR_CMD:
+          p_SetRingOfPoly((poly) l->data, r);
+      break;
+
+      case IDEAL_CMD:
+      case MODUL_CMD:
+      case MATRIX_CMD:
+      case MAP_CMD:
+        p_SetRingOfIdeal((ideal) l->data, r);
+        break;
+
+        case LIST_CMD:
+          p_SetRingOfList((lists) l->data, r);
+          break;
+
+        case COMMAND:
+          p_SetRingOfCommand((command)l->data, r);
+        default:
+          break;
+    }
+    l = l->next;
+  }
+}
+#endif // (OM_TRACK > 2) && defined(OM_TRACK_CUSTOM)
+
+#endif // PDEBUG
+

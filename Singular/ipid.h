@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.38 2003-03-10 16:43:51 Singular Exp $ */
+/* $Id: ipid.h,v 1.39 2003-11-04 16:43:29 Singular Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -41,68 +41,6 @@ inline void paKill(package pack)
   pack->ref--;
 }
 
-union uutypes;
-
-union uutypes
-{
-  int           i;
-  ring          uring;
-  poly          p;
-  number        n;
-  ideal         uideal;
-  map           umap;
-  matrix        umatrix;
-  char *        ustring;
-  intvec *      iv;
-  lists         l;
-  si_link       li;
-  package       pack;
-  procinfo *    pinf;
-};
-
-class idrec
-{
-  public:
-  /* !! do not change the first 6 entries !! (see subexpr.h: sleftv) */
-  idhdl      next;
-  char *     id;
-  utypes     data;
-  attr       attribute;
-  BITSET     flag;
-  idtyp      typ;
-
-  short      lev;
-  short      ref;
-
-#define IDNEXT(a)    ((a)->next)
-#define IDTYP(a)     ((a)->typ)
-#define IDFLAG(a)    ((a)->flag)
-#define IDLEV(a)     ((a)->lev)
-#define IDID(a)      ((a)->id)
-#define IDATTR(a)    ((a)->attribute)
-
-#define IDINT(a)    ((a)->data.i)
-#define IDDATA(a)   ((a)->data.ustring)
-#define IDRING(a)   ((a)->data.uring)
-#define IDINTVEC(a) ((a)->data.iv)
-#define IDPOLY(a)   ((a)->data.p)
-#define IDNUMBER(a) ((a)->data.n)
-#define IDIDEAL(a)  (((a)->data).uideal)
-#define IDMATRIX(a) (((a)->data).umatrix)
-#define IDMAP(a)    (((a)->data).umap)
-#define IDSTRING(a) ((a)->data.ustring)
-#define IDLIST(a)   ((a)->data.l)
-#define IDLINK(a)   ((a)->data.li)
-#define IDPACKAGE(a) ((a)->data.pack)
-#define IDPROC(a)   ((a)->data.pinf)
-
-  idrec() { memset(this,0,sizeof(*this)); }
-  idhdl get(const char * s, int lev);
-  idhdl set(char * s, int lev, idtyp t, BOOLEAN init=TRUE);
-  char * String();
-//  ~idrec();
-};
-
 class proclevel {
   public:
   proclevel * next;
@@ -119,22 +57,9 @@ class proclevel {
 };
 extern proclevel *procstack;
 
-#ifndef HAVE_NS
-extern idhdl      idroot;
-#define IDROOT idroot
-#endif /* HAVE_NS */
-
-#ifdef HAVE_NS
-extern idhdl currPackHdl;
-extern idhdl basePackHdl;
-extern package currPack;
-extern package basePack;
-#define IDROOT (currPack->idroot)
-#endif /* HAVE_NS */
-
-extern idhdl      currRingHdl;
+/*extern idhdl      currRingHdl; in structs.h */
 /*extern ring     currRing;  in structs.h */
-extern ideal      currQuotient;
+/*extern ideal      currQuotient; in structs.h */
 
 char *idhdl2id(idhdl pck, idhdl h);
 void  iiname2hdl(const char *name, idhdl *pck, idhdl *id);

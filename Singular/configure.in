@@ -1,6 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(mmalloc.cc)
 AC_CONFIG_HEADER(mod2.h)
+AC_CONFIG_HEADER(../kernel/mod2.h)
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl determine singuname
@@ -870,7 +871,7 @@ else
 fi
 
 
-OUTPUT_MAKEFILES=Makefile
+OUTPUT_MAKEFILES="Makefile ../kernel/Makefile"
 
 if test "$ac_cv_singuname" = "ix86-Win"; then
   OUTPUT_MAKEFILES="${OUTPUT_MAKEFILES} Singular.rc"
