@@ -1,17 +1,17 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.40 2001-02-22 09:40:17 Singular Exp $ */
+/* $Id: matpol.cc,v 1.41 2001-04-05 15:41:09 Singular Exp $ */
 
 /*
 * ABSTRACT:
 */
 
 #include <stdio.h>
-#include <limits.h>
 #include <math.h>
 
 #include "mod2.h"
+#include <mylimits.h>
 #include "structs.h"
 #include "tok.h"
 #include "lists.h"

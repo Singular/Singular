@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.99 2001-03-14 15:51:53 Singular Exp $ */
+/* $Id: kutil.cc,v 1.100 2001-04-05 15:41:07 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -11,10 +11,10 @@
 
 // #define PDEBUG 2
 // #define PDIV_DEBUG
-#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 #include "mod2.h"
+#include <mylimits.h>
 #ifdef KDEBUG
 #undef KDEBUG
 #define KDEBUG 2

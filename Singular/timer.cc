@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: timer.cc,v 1.14 2000-04-27 10:07:12 obachman Exp $ */
+/* $Id: timer.cc,v 1.15 2001-04-05 15:41:07 Singular Exp $ */
 
 /*
 *  ABSTRACT - get the computing time
@@ -37,7 +37,7 @@ void SetMinDisplayTime(double mtime)
 #include <math.h>
 #include <unistd.h>
 #include <float.h>
-#include <limits.h>
+#include <mylimits.h>
 #include <sys/types.h>
 
 #ifdef TIME_WITH_SYS_TIME

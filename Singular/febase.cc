@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.93 2001-01-31 13:39:05 levandov Exp $ */
+/* $Id: febase.cc,v 1.94 2001-04-05 15:41:11 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -12,7 +12,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <limits.h>
+#include <mylimits.h>
 #include <stdarg.h>
 #include <sys/stat.h>
 #ifndef __MWERKS__

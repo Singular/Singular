@@ -1,14 +1,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.24 2000-12-21 13:22:01 pohl Exp $ */
+/* $Id: modulop.cc,v 1.25 2001-04-05 15:41:10 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
 
-#include <limits.h>
 #include <string.h>
 #include "mod2.h"
+#include <mylimits.h>
 #include "tok.h"
 #include "febase.h"
 #include "omalloc.h"

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.50 2001-03-05 11:48:55 Singular Exp $ */
+/* $Id: febase.h,v 1.51 2001-04-05 15:41:12 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -29,7 +29,7 @@ extern char fePathSep;
 #include <sys/param.h>
 #endif
 
-#include <limits.h>
+#include <mylimits.h>
 
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 1024

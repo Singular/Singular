@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.17 2001-02-08 13:13:03 Singular Exp $
+ *  Version: $Id: pInline1.h,v 1.18 2001-04-05 15:41:13 Singular Exp $
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H
@@ -15,7 +15,7 @@
 // define to enable debugging/statistics of pLmShortDivisibleBy
 // #define PDIV_DEBUG
 #endif
-#include <limits.h>
+#include <mylimits.h>
 #include "p_MemCmp.h"
 #include "tok.h"
 #include "numbers.h"

@@ -1,13 +1,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz3.cc,v 1.7 2001-01-09 15:40:15 Singular Exp $ */
+/* $Id: syz3.cc,v 1.8 2001-04-05 15:41:06 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
  
-#include <limits.h>
 #include "mod2.h"
+#include <mylimits.h>
 #include "tok.h"
 #include "attrib.h"
 #include "omalloc.h"
@@ -21,7 +21,6 @@
 #include "ipid.h"
 #include "intvec.h"
 #include "ipshell.h"
-#include "limits.h"
 #include "numbers.h"
 #include "modulop.h"
 #include "ideals.h"

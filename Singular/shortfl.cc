@@ -1,15 +1,15 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shortfl.cc,v 1.17 2001-01-31 18:39:27 Singular Exp $ */
+/* $Id: shortfl.cc,v 1.18 2001-04-05 15:41:07 Singular Exp $ */
 
 /*
 * ABSTRACT:
 */
 
-#include <limits.h>
 #include <string.h>
 #include "mod2.h"
+#include <mylimits.h>
 #include "tok.h"
 #include "febase.h"
 #include "numbers.h"

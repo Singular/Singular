@@ -18,7 +18,7 @@
 #endif
 #endif
 
-#include <limits.h>
+#include <mylimits.h>
 
 #include "numbers.h"
 #include "polys.h"

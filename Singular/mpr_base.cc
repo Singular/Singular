@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.25 2001-01-17 18:16:31 Singular Exp $ */
+/* $Id: mpr_base.cc,v 1.26 2001-04-05 15:41:10 Singular Exp $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -9,10 +9,10 @@
  */
 
 #include <math.h>
-#include <limits.h>
 
 #include "mod2.h"
 
+#include <mylimits.h>
 #include "omalloc.h"
 
 //-> includes

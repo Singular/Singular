@@ -11,9 +11,9 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <time.h>
-#include <limits.h>
 
 #include "mod2.h"
+#include <mylimits.h>
 #include "omalloc.h"
 #include "structs.h"
 #include "tok.h"

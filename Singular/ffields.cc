@@ -1,14 +1,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.29 2000-12-15 18:49:27 Singular Exp $ */
+/* $Id: ffields.cc,v 1.30 2001-04-05 15:41:11 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
 
-#include <limits.h>
 #include <string.h>
 #include "mod2.h"
+#include <mylimits.h>
 #include "tok.h"
 #include "febase.h"
 #include "omalloc.h"
