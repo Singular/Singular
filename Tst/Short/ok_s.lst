@@ -1,0 +1,62 @@
+allres_s
+barei_s
+bug_1
+bug_10
+bug_11
+bug_12
+bug_13
+bug_14
+bug_15
+; INFINITE bug_16
+bug_17
+bug_3
+bug_5
+bug_6
+bug_7
+bug_8
+bug_9
+bug_c_dp
+dbm_s
+; DIFF deform_s
+fetch_s
+fglm1_s
+finduni_s
+finvar_s
+finvarlb
+gcd0_s
+gcdp_s
+graphics
+highcorner_s
+hres_s
+hnoether_s
+; DIFF homolog_s
+imap
+intdet_s
+intersect_s
+invar
+invarlib
+latex
+; DIFF lift_s
+liftstd_s
+lres_s
+minor_s
+modulo_s
+monodromy_s
+mpsr_s
+; INFINITE normal
+; INFINITE paramet
+; DIFF polylib_s
+primdec_s
+primitiv_s
+quotient_s
+rInit
+res_s
+resultantp_s
+ringsum
+sing_s
+; NON-ZERO spcurve
+; DIFF sres_s
+std_s
+string
+triang_s
+tst_s
