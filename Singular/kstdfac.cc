@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.28 1999-11-02 15:19:08 Singular Exp $ */
+/* $Id: kstdfac.cc,v 1.29 1999-11-02 17:15:31 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -250,8 +250,9 @@ static void completeReduceFac (kStrategy strat, lists FL)
     }
     int facdeg=pFDeg(strat->S[si]);
 
-    kTest_S(strat);
+    kTest(strat);
     ideal fac=singclap_factorize(strat->S[si],NULL,1);
+    kTest(strat);
 #ifndef HAVE_LIBFAC_P
     if (fac==NULL)
     {
@@ -370,7 +371,21 @@ static void completeReduceFac (kStrategy strat, lists FL)
                 messageSets(n);
               }
               while (n->Ll >= 0) deleteInL(n->L,&n->Ll,n->Ll,n);
-              while (n->tl >= 0) { pDelete(&n->T[n->tl].p); n->tl--; }
+              while (n->tl >= 0)
+              {
+                int i=n->sl;
+                while (i>=0)
+                {
+                  if (n->S[i]==n->T[n->tl].p)
+                  {
+                    n->T[n->tl].p=NULL; n->S[i]=NULL;
+                    break;
+                  }
+                  i--;
+                }
+                pDelete(&n->T[n->tl].p);
+                n->tl--;
+              }
               memset(n->Shdl->m,0,IDELEMS(n->Shdl)*sizeof(poly));
               n->sl=-1;
               if (strat==n) si=-1;
@@ -399,7 +414,21 @@ static void completeReduceFac (kStrategy strat, lists FL)
                 Print("empty set because:L[%d]\n",j);
               }
               while (n->Ll >= 0) deleteInL(n->L,&n->Ll,n->Ll,n);
-              while (n->tl >= 0) { pDelete(&n->T[n->tl].p); n->tl--; }
+              while (n->tl >= 0)
+              {
+                int i=n->sl;
+                while (i>=0)
+                {
+                  if (n->S[i]==n->T[n->tl].p)
+                  {
+                    n->T[n->tl].p=NULL; n->S[i]=NULL;
+                    break;
+                  }
+                  i--;
+                }
+                pDelete(&n->T[n->tl].p);
+                n->tl--;
+              }
               memset(n->Shdl->m,0,IDELEMS(n->Shdl)*sizeof(poly));
               n->sl=-1;
               if (strat==n) si=-1;
@@ -439,7 +468,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
     //test_int_std(strat->kIdeal);
     if (strat->Ll== 0) strat->interpt=TRUE;
     if (TEST_OPT_DEGBOUND
-    && ((strat->honey 
+    && ((strat->honey
         && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p)>Kstd1_deg))
       || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p)>Kstd1_deg))))
     {
@@ -642,7 +671,21 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
                 //if (n->Ll >=0) Print("Ll:%d|",n->Ll);
                 while (n->Ll >= 0) deleteInL(n->L,&n->Ll,n->Ll,n);
                 //if (n->tl >=0) Print("tl:%d|",n->tl);
-                while (n->tl >= 0) { pDelete(&n->T[n->tl].p); n->tl--; }
+                while (n->tl >= 0)
+                {
+                  int i=n->sl;
+                  while (i>=0)
+                  {
+                    if (n->S[i]==n->T[n->tl].p)
+                    {
+                      n->T[n->tl].p=NULL; n->S[i]=NULL;
+                      break;
+                    }
+                    i--;
+                  }
+                  pDelete(&n->T[n->tl].p);
+                  n->tl--;
+                }
                 memset(n->Shdl->m,0,IDELEMS(n->Shdl)*sizeof(poly));
                 n->sl=-1;
                 break;
@@ -671,7 +714,21 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
                   Print("empty set because:L[%d]\n",j);
                 }
                 while (n->Ll >= 0) deleteInL(n->L,&n->Ll,n->Ll,n);
-                while (n->tl >= 0) { pDelete(&n->T[n->tl].p); n->tl--; }
+                while (n->tl >= 0)
+                {
+                  int i=n->sl;
+                  while (i>=0)
+                  {
+                    if (n->S[i]==n->T[n->tl].p)
+                    {
+                      n->T[n->tl].p=NULL; n->S[i]=NULL;
+                      break;
+                    }
+                    i--;
+                  }
+                  pDelete(&n->T[n->tl].p);
+                  n->tl--;
+                }
                 memset(n->Shdl->m,0,IDELEMS(n->Shdl)*sizeof(poly));
                 n->sl=-1;
                 idDelete(&r);
@@ -683,6 +740,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
           }
         }
       } /* for */
+    kTest(strat);
       for(i=0;i<IDELEMS(fac);i++) fac->m[i]=NULL;
       idDelete(&fac);
       idDelete(&fac_copy);

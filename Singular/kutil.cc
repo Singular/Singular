@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.47 1999-10-27 15:08:20 obachman Exp $ */
+/* $Id: kutil.cc,v 1.48 1999-11-02 17:15:31 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -478,12 +478,12 @@ void deleteInL (LSet set, int *length, int j,kStrategy strat)
       {
         if (i < 0)
         {
-          //if (strat->next!=NULL)
-          //{
-          //  strat=strat->next;
-          //  i=strat->tl;
-          //}
-          //else
+          if (strat->next!=NULL)
+          {
+            strat=strat->next;
+            i=strat->tl;
+          }
+          else
           {
             /* not found : */
             pDelete(&p);
