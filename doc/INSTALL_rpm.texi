@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_rpm.texi,v 1.13 2002-07-04 16:32:41 Singular Exp $
+@comment $Id: INSTALL_rpm.texi,v 1.14 2003-06-30 06:34:27 mschulze Exp $
 @c FILE: INSTALL_rpm.texi
 @c PURPOSE: Installation instruction for Singular on RPM based Linux systems
 @c
@@ -18,7 +18,7 @@ The installation of @sc{Singular} on a general @sc{Unix} system is described in 
 
 @heading @sc{Singular} @sc{rpm} packages
 
-There are the following @sc{Singular} @sc{rpm} packages.
+The following @sc{Singular} @sc{rpm} packages are available.
 
 @table @code
 @item @uref{Singular-@value{RPM_VERSION}-1.i386.rpm}
@@ -31,7 +31,7 @@ contains architecture independend data like documentation and libraries.
 contains icons and menues for @sc{gnome} and @sc{kde}.
 @end table
 
-The above @sc{rpm} packages are available at
+The above @sc{rpm} packages can be downloaded from
 @display
 @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/UNIX}.
 @end display
@@ -41,7 +41,7 @@ The above @sc{rpm} packages are available at
 @heading Usage of @sc{rpm} packages
 @enumerate
 @item
-You can only use the @sc{Singular} @sc{rpm} packages for an @sc{rpm} based @sc{Linux} system like @sc{RedHat Linux} or @sc{SuSE Linux}.
+You can only use the @sc{Singular} @sc{rpm} packages on an @sc{rpm} based @sc{Linux} system like @sc{RedHat Linux} or @sc{SuSE Linux}.
 You can check this by typing 
 @smallexample
 rpm
@@ -79,7 +79,7 @@ Alternatively, you can use a graphical @sc{rpm} frontend like e.g. @code{gnorpm}
 
 @enumerate
 @item
-The installation requires about 20MB of free disk space under @code{/opt}.
+The installation requires about 26MB of free disk space under @code{/usr/local}.
 You can check the free disk space by typing
 @smallexample
 df -h
@@ -88,39 +88,24 @@ in a command shell.
 @item
 Different versions of @sc{Singular} @sc{rpm} packages coexist without conflicts.
 @item
-To install the @sc{Singular} binary @sc{rpm} package, type
+To install the @sc{Singular} @value{RPM_VERSION} @sc{rpm} packages, type
 @smallexample
-rpm -ivh Singular-@value{RPM_VERSION}-1.i386.rpm
-@end smallexample
-in a command shell.
-
-This requires several shared libraries.
-If these are not present in your system, @code{rpm} will give an error report.
-In this case, you have to install @sc{rpm} packages providing these shared libraries and retry.
-Alternatively, you can install the @sc{Singular} static binary @sc{rpm} package by typing
-@smallexample
-rpm -ivh Singular-static-@value{RPM_VERSION}-1.i386.rpm
+rpm -ivh \
+Singular-@value{RPM_VERSION}-1.i386.rpm \
+Singular-share-@value{RPM_VERSION}-1.noarch.rpm \
+Singular-desktop-@value{RPM_VERSION}-1.noarch.rpm
 @end smallexample
 in a command shell.
 @item
-To install the @sc{Singular} shared @sc{rpm} package, type
+To deinstall the @sc{Singular} @value{RPM_VERSION} @sc{rpm} packages, type
 @smallexample
-rpm -ivh Singular-share-@value{RPM_VERSION}-1.noarch.rpm
+rpm -e \
+Singular-@value{RPM_VERSION}-1.i386.rpm \
+Singular-share-@value{RPM_VERSION}-1.noarch.rpm \
+Singular-desktop-@value{RPM_VERSION}-1.noarch.rpm
 @end smallexample
 in a command shell.
-@item
-To install a @sc{Singular} menu @sc{rpm} package, @sc{gnome} or @sc{kde} have to be installed.
-Type
-@smallexample
-rpm -ivh Singular-desktop-@value{RPM_VERSION}-1.noarch.rpm
-@end smallexample
-in a command shell.
-@item
-To deinstall a @sc{Singular} @sc{rpm} package, type
-@smallexample
-rpm -e Singular-...-@value{RPM_VERSION}
-@end smallexample
-in a command shell.
+@item The @sc{Singular} binary  @sc{rpm} package @code{Singular-@value{RPM_VERSION}-1.i386.rpm} can be replaced by the @sc{Singular} static binary @sc{rpm} package @code{Singular-static-@value{RPM_VERSION}-1.i386.rpm}.
 @end enumerate
 
 @heading Starting @sc{Singular}
@@ -136,9 +121,9 @@ To run @sc{Singular} @value{RPM_VERSION} under @sc{Emacs}, type
 ESingular-@value{VERSION}
 @end smallexample
 in a command shell.
+@item To read the @sc{Singular} @value{RPM_VERSION} manual, direct your web browser to @code{/usr/local/Singular/@value{VERSION}/html/index.htm}. 
 @item
-There is a menu @code{Singular @value{RPM_VERSION}} in the @sc{gnome} and @sc{kde} menu with menu items @code{TSingular}, @code{ESingular}, and @code{Manual}.
-Click on the menu item @code{TSingular} to run @sc{Singular} @value{RPM_VERSION} in a terminal, on the menu item @code{ESingular} to run @sc{Singular} @value{RPM_VERSION} under @sc{Emacs}, and on the menu item @code{Manual} to read the @sc{Singular} @value{RPM_VERSION} manual.
+Under @sc{gnome} or @sc{kde}, click on the menu item @code{TSingular} to run @sc{Singular} @value{RPM_VERSION} in a terminal, on the menu item @code{ESingular} to run @sc{Singular} @value{RPM_VERSION} under @sc{Emacs}, or on the menu item @code{Manual} to read the @sc{Singular} @value{RPM_VERSION} manual.
 @end enumerate
 
 
