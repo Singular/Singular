@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.45 1999-08-17 11:27:40 pfister Exp $
+// $Id: primdec.lib,v 1.46 1999-09-01 12:43:03 pfister Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                               //
 // algorithms for primary decomposition based on                             //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                            //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.45 1999-08-17 11:27:40 pfister Exp $";
+version="$Id: primdec.lib,v 1.46 1999-09-01 12:43:03 pfister Exp $";
 info="
 LIBRARY: primdec.lib:   PROCEDURES FOR PRIMARY DECOMPOSITION
 AUTHORS:  Gerhard Pfister, email: pfister@mathematik.uni-kl.de (GTZ)
@@ -1801,6 +1801,10 @@ EXAMPLE: example decomp; shows an example
   }
 
   homo=homog(i);
+   if((find(ordstr(basering),"w")!=0)||(find(ordstr(basering),"W")!=0))
+   {
+      homo=0;
+   }
 
   if(homo==1)
   {
@@ -2547,7 +2551,10 @@ proc radicalKL (list m,ideal ser,list #)
    poly @p,@q;
    string @va,quotring;
    int  homo=homog(i);
-
+   if((find(ordstr(basering),"w")!=0)||(find(ordstr(basering),"W")!=0))
+   {
+      homo=0;
+   }
    if(size(#)>0)
    {
       @wr=#[1];
@@ -2720,7 +2727,9 @@ proc radicalKL (list m,ideal ser,list #)
          }
         //the primary decomposition of j*K(var(nnp+1),..,var(nva))[..rest..]
          option(redSB);
+
          @j=interred(@j);
+
          attrib(@j,"isSB",1);
          list  @mo=@j,@j;
          ideal zero_rad= radicalKL(@mo,ideal(1));
