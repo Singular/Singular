@@ -1,7 +1,7 @@
-// $Id: all.lib,v 1.16 1999-06-01 12:07:52 obachman Exp $
+// $Id: all.lib,v 1.17 1999-06-22 10:42:23 obachman Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: all.lib,v 1.16 1999-06-01 12:07:52 obachman Exp $";
+version="$Id: all.lib,v 1.17 1999-06-22 10:42:23 obachman Exp $";
 info="
 LIBRARY:  all.lib   Load all libraries
 
@@ -28,8 +28,8 @@ LIBRARY:  all.lib   Load all libraries
   standard.lib  PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
   latex.lib     PROCEDURES FOR TYPESET OF SINGULAROBJECTS IN TEX
   paramet.lib   PROCEDURES FOR PARAMETRIZATION OF PRIMARY DECOMPOSITION
-  monodrmy.lib  PROCEDURES TO COMPUTE THE MONODROMY OF A SINGULARITY
-  jordan.lib     PROCEDURES TO COMPUTE THE JORDAN NORMAL FORM
+  mondromy.lib  PROCEDURES TO COMPUTE THE MONODROMY OF A SINGULARITY
+  jordan.lib    PROCEDURES TO COMPUTE THE JORDAN NORMAL FORM
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -57,7 +57,7 @@ LIB "ring.lib";
 LIB "sing.lib";
 LIB "latex.lib";
 LIB "paramet.lib";
-LIB "monodrmy.lib"
+LIB "mondromy.lib"
 LIB "jordan.lib";
 
 // LIB "tools.lib";
