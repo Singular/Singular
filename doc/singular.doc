@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.93 2000-04-27 10:07:25 obachman Exp $
+@comment $Id: singular.doc,v 1.94 2000-05-16 08:30:06 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -176,7 +176,7 @@ Use the @ref{LIB} command for loading of single libraries, and the
 command @code{LIB "all.lib";} for loading all libraries.
 
 @menu
-* standard_lib:: extensions of singular kernel
+* standard_lib:: extensions of Singular kernel
 * General purpose::
 * Linear algebra::
 * Commutative algebra::
@@ -283,6 +283,8 @@ LIB "all.lib";
 * normal_lib:: procedure for normalization
 * primdec_lib:: procedures for primary decomposition
 * primitiv_lib:: procedures for finding a primitive element
+* IP_lib:: Integer Programming
+* toric_lib:: toric ideals
 @end menu
 
 @c ---------------------------------------------------------
@@ -310,9 +312,17 @@ LIB "all.lib";
 @subsection primdec_lib
 @c lib primdec.lib
 @c ---------------------------------------------------------
-@node primitiv_lib, , primdec_lib, Commutative algebra
+@node primitiv_lib, IP_lib, primdec_lib, Commutative algebra
 @subsection primitiv_lib
 @c lib primitiv.lib
+@c ---------------------------------------------------------
+@node IP_lib, toric_lib, primitiv_lib, Commutative algebra
+@subsection IP_lib
+@c lib IP.lib
+@c ---------------------------------------------------------
+@node toric_lib, ,IP_lib, Commutative algebra
+@subsection toric_lib
+@c lib toric.lib
 @c ----------------------------------------------------------------------------
 @node Singularities, Invariant theory, Commutative algebra, SINGULAR libraries
 @section Singularities
