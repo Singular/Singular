@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: intvec.cc,v 1.7 1998-04-07 17:51:50 Singular Exp $ */
+/* $Id: intvec.cc,v 1.8 1998-05-19 21:03:55 obachman Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -81,9 +81,13 @@ char * intvec::ivString(int mat,int spaces)
   StringSetS("");
   if ((col == 1)&&(mat!=INTMAT_CMD))
   {
-    for (int i=0; i<row; i++)
+    for (int i=0; i<row-1; i++)
     {
-      StringAppend("%d%c",v[i],i<row-1 ? ',' : ' ');
+      StringAppend("%d,",v[i]);
+    }
+    if (i<row)
+    {
+      StringAppend("%d",v[i]);
     }
   }
   else
