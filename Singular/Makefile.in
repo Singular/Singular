@@ -95,21 +95,18 @@ endif
 ###
 
 # normal C++ source files
-CXXSOURCES=grammar.cc scanner.cc attrib.cc clapconv.cc \
+CXXSOURCES=grammar.cc scanner.cc attrib.cc \
     eigenval.cc\
-    extra.cc febase.cc fehelp.cc feResource.cc feOpt.cc \
-    intvec.cc \
+    extra.cc fehelp.cc feResource.cc feOpt.cc \
     ipassign.cc ipconv.cc ipid.cc iplib.cc \
     ipprint.cc ipshell.cc \
     lists.cc \
-    longalg.cc longrat.cc longrat0.cc \
-    sdb.cc gnumpfl.cc gnumpc.cc \
+    sdb.cc \
     fglm.cc \
-    numbers.cc polys.cc p_polys.cc polys0.cc polys1.cc polys-impl.cc \
-    shortfl.cc silink.cc kspoly.cc \
-    subexpr.cc syz.cc syz0.cc \
-    timer.cc janet.cc wrapper.cc\
-    multicnt.cc npolygon.cc \
+    p_polys.cc \
+    silink.cc \
+    subexpr.cc \
+    janet.cc wrapper.cc\
     libparse.cc sing_win.cc\
     gms.cc pcv.cc maps_ip.cc\
     pDebug.cc pInline2.cc pInline1.cc pInline0.cc \
