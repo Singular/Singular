@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.13 1997-08-29 07:26:37 schmidt Exp $ */
+/* $Id: cf_gcd.cc,v 1.14 1997-09-12 15:27:25 schmidt Exp $ */
 
 #include <config.h>
 
@@ -22,22 +22,6 @@
 #endif
 
 static CanonicalForm gcd_poly( const CanonicalForm & f, const CanonicalForm& g, bool modularflag );
-
-
-static int
-isqrt ( int a )
-{
-    int h, x0, x1 = a;
-    do {
-	x0 = x1;
-	h = x0 * x0 + a - 1;
-	if ( h % (2 * x0) == 0 )
-	    x1 = h / (2 * x0);
-	else
-	    x1 = (h - 1)  / (2 * x0);
-    } while ( x1 < x0 );
-    return x1;
-}
 
 bool
 gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap )
@@ -396,11 +380,18 @@ cf_content ( const CanonicalForm & f, const CanonicalForm & g )
 	    return f;
 }
 
+//{{{ CanonicalForm content ( const CanonicalForm & f )
+//{{{ docu
+//
+// content() - return content(f) with respect to main variable.
+//
+//}}}
 CanonicalForm
 content ( const CanonicalForm & f )
 {
     return cf_content( f, 0 );
 }
+//}}}
 
 CanonicalForm
 content ( const CanonicalForm & f, const Variable & x )
@@ -427,6 +418,12 @@ vcontent ( const CanonicalForm & f, const Variable & x )
     }
 }
 
+//{{{ CanonicalForm pp ( const CanonicalForm & f )
+//{{{ docu
+//
+// pp() - return primitive part of f.
+//
+//}}}
 CanonicalForm
 pp ( const CanonicalForm & f )
 {
@@ -435,6 +432,7 @@ pp ( const CanonicalForm & f )
     else
 	return f / content( f );
 }
+//}}}
 
 CanonicalForm
 gcd ( const CanonicalForm & f, const CanonicalForm & g )
