@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.7 2004-04-29 17:10:21 levandov Exp $ */
+/* $Id: ring.cc,v 1.8 2004-04-29 17:21:18 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -673,7 +673,7 @@ int rSum(ring r1, ring r2, ring &sum)
           if ((strcmp(r1->parameter[0],r2->parameter[0])==0) /* 1 char */
               && (rPar(r2)==1))
           {
-            tmpR.parameter=(char **)omAlloc0Bin(char_ptr_bin);
+            tmpR.parameter=(char **)omAllocBin(char_ptr_bin);
             tmpR.parameter[0]=omStrDup(r1->parameter[0]);
             tmpR.P=1;
             tmpR.minpoly=n_Copy(r1->minpoly, r1);
@@ -706,7 +706,7 @@ int rSum(ring r1, ring r2, ring &sum)
         else
         {
           int len=rPar(r1)+rPar(r2);
-          tmpR.parameter=(char **)omAlloc(len*sizeof(char_ptr));
+          tmpR.parameter=(char **)omAlloc0(len*sizeof(char_ptr));
           int i;
           for (i=0;i<rPar(r1);i++)
           {
@@ -742,9 +742,13 @@ int rSum(ring r1, ring r2, ring &sum)
           || (r2->ch==-r1->ch)) /* Z/p */
       {
         tmpR.ch=rInternalChar(r1);
-        tmpR.parameter=(char **)omAlloc(rPar(r1)*sizeof(char_ptr));
         tmpR.P=rPar(r1);
-        memcpy(tmpR.parameter,r1->parameter,rPar(r1)*sizeof(char_ptr));
+        tmpR.parameter=(char **)omAlloc(rPar(r1)*sizeof(char_ptr));
+        int i;
+        for (i=0;i<rPar(r1);i++)
+        {
+          tmpR.parameter[i]=omStrDup(r1->parameter[i]);
+        }
         if (r1->minpoly!=NULL)
         {
           tmpR.minpoly=n_Copy(r1->minpoly, r1);
@@ -768,7 +772,11 @@ int rSum(ring r1, ring r2, ring &sum)
         tmpR.ch=rInternalChar(r2);
         tmpR.P=rPar(r2);
         tmpR.parameter=(char **)omAlloc(rPar(r2)*sizeof(char_ptr));
-        memcpy(tmpR.parameter,r2->parameter,rPar(r2)*sizeof(char_ptr));
+        int i;
+        for (i=0;i<rPar(r2);i++)
+        {
+          tmpR.parameter[i]=omStrDup(r2->parameter[i]);
+        }
         if (r2->minpoly!=NULL)
         {
           tmpR.minpoly=n_Copy(r2->minpoly, r2);
@@ -796,7 +804,7 @@ int rSum(ring r1, ring r2, ring &sum)
       {
         tmpR.ch=rInternalChar(r1);
         tmpR.P=rPar(r1);
-        tmpR.parameter=(char **)omAlloc0(rPar(r1)*sizeof(char_ptr));
+        tmpR.parameter=(char **)omAlloc(rPar(r1)*sizeof(char_ptr));
         int i;
         for(i=0;i<rPar(r1);i++)
         {
