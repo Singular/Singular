@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.74 2000-05-25 12:29:34 pfister Exp $
+// $Id: primdec.lib,v 1.75 2000-05-30 12:31:44 pfister Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                               //
 // algorithms for primary decomposition based on                             //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                            //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.74 2000-05-25 12:29:34 pfister Exp $";
+version="$Id: primdec.lib,v 1.75 2000-05-30 12:31:44 pfister Exp $";
 info="
 LIBRARY: primdec.lib   PROCEDURES FOR PRIMARY DECOMPOSITION
 AUTHORS:  Gerhard Pfister, email: pfister@mathematik.uni-kl.de (GTZ)
@@ -715,6 +715,81 @@ example
    list l1=splitPrimary(l,ideal(0),0);
    l1;
 }
+///////////////////////////////////////////////////////////////////////////////
+proc splitCharp(list l)
+{
+  if((char(basering)==0)||(npars(basering)>0))
+  {
+     return(l);
+  }
+  def P=basering;
+  int i,j,k,m,q,d;
+  int n=nvars(basering);
+  ideal s,t,u,sact;
+  poly ni;
+  string minp,gnir,va;
+  list sa,keep;
+  for(i=1;i<=size(l)/2;i++)
+  {
+    if(size(l[2*i])==0)
+    {
+       if(deg(l[2*i-1][1])==vdim(l[2*i-1]))
+       {
+          l[2*i]=l[2*i-1];
+       }
+    }
+  }
+  for(i=1;i<=size(l)/2;i++)
+  {
+    if(size(l[2*i])==0)
+    {
+      s=factorize(l[2*i-1][1],1);
+      t=l[2*i-1];
+      m=size(t);
+      ni=s[1];
+      if(deg(ni)>1)
+      {
+        va=varstr(P);
+        j=size(va);
+        while(va[j]!=","){j--;}
+        va=va[1..j-1];
+        gnir="ring RL=("+string(char(P))+","+string(var(n))+"),("+va+"),dp;";
+        execute(gnir);
+        minpoly=leadcoef(imap(P,ni));
+        ideal act;
+        ideal t=imap(P,t);
+        for(k=2;k<=m;k++)
+        { 
+           act=factorize(t[k],1);
+           if(size(act)>1)
+           {
+
+             break;
+           }
+        }
+        setring P;
+        sact=imap(RL,act);
+        kill RL;
+        if(size(sact)>1)
+        {
+           sa=sat1(l[2*i-1],sact[1]);
+           keep[size(keep)+1]=std(l[2*i-1],sa[2]);
+           l[2*i-1]=std(sa[1]);
+           l[2*i]=primaryTest(sa[1],sa[1][1]);
+        }
+      }
+    }
+  }
+  if(size(keep)>0)
+  {
+    for(i=1;i<=size(keep);i++)
+    {
+       l[size(l)+1]=keep[i];
+       l[size(l)+1]=primaryTest(keep[i],keep[i][1]);
+    }
+  }
+  return(l);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -868,7 +943,7 @@ EXAMPLE: example zero_decomp; shows an example
   {
      primary=splitPrimary(primary,ser,@wr,act);
   }
-
+  primary=splitCharp(primary);
 //test whether all ideals in the decomposition are primary and
 //in general position
 //if not after a random coordinate transformation of the last
@@ -934,7 +1009,6 @@ EXAMPLE: example zero_decomp; shows an example
        }
        psi=@P,jmap;
        psi1=@P,jmap2;
-
        @qh=phi(@qht);
        if(npars(@P)>0)
        {
@@ -965,10 +1039,8 @@ EXAMPLE: example zero_decomp; shows an example
        @qh=clearSB(@qh);
        attrib(@qh,"isSB",1);
        ser1=phi1(ser);
-
        @lh=zero_decomp (@qh,phi(ser1),@wr);
 //       @lh=zero_decomp (@qh,psi(ser),@wr);
-
 
        kill lres0;
        list lres0;
@@ -1848,9 +1920,8 @@ proc equidim(ideal i,list #)
     kill gnir;
     return(eq);
   }
-
   option(returnSB);  
-  j=quotient(i,k);
+  j=quotient(j,k);
   option(noreturnSB);
 
   list equi=equidim(j);  
@@ -2173,7 +2244,8 @@ EXAMPLE: example decomp; shows an example
   if (dim(@j)==-1)
   {
     setring @P;
-    return(ideal(0));
+    primary=ideal(1),ideal(1);
+    return(primary);
   }
 
   //----------------------------------------------------------------
@@ -4619,7 +4691,8 @@ proc zerodec(ideal I)
 "USAGE:   zerodec(I); I ideal
  RETURN:  a list of primary ideals, the zero-dimensional decomposition of I
  NOTE:    the algorithm of C. Monico, works only good for small vdim(std(I))
-          (<=100) and without parameters
+          (<=100) and without parameters 
+          in characteristic p>0 it may be wrong
  EXAMPLE: example zerodec; shows an example
 "
 {
