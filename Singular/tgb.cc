@@ -1498,6 +1498,13 @@ static void go_on (calc_dat* c){
   omfree(sbuf);
   omfree(ibuf);
   omfree(buf);
+#ifdef TGB_DEBUG
+  int z;
+  for(z=1;z<=c->pair_top;z++)
+  {
+    assume(pair_better(c->apairs[z],c->apairs[z-1],c));
+  }
+#endif
   return;
 }
 
@@ -2094,7 +2101,7 @@ static BOOLEAN pair_better(sorted_pair_node* a,sorted_pair_node* b, calc_dat* c)
   if (-1==comp) return TRUE;
   if (a->i<b->i) return TRUE;
   if (a->j<b->j) return TRUE;
-  return FALSE;
+  return TRUE;
 }
 
 static int pair_better_gen(const void* ap,const void* bp){
@@ -2927,15 +2934,13 @@ void join_simple_reducer::target_is_no_sum_reduce(red_object & ro){
   reduction_accumulator::reduction_accumulator(poly p, int p_len, poly high_to){
     //sev needs to be removed from interfaces,makes no sense
     
-    degbound(p);
-    degbound(p->next);
-    degbound(high_to);
+
     poly my=pOne();
     counter=0;
    
     for(int i=1;i<=pVariables;i++)
       pSetExp(my,i,(pGetExp(high_to, i)-pGetExp(p,i)));
-    degbound(my);
+
    
    
     pSetm(my);
@@ -2943,7 +2948,7 @@ void join_simple_reducer::target_is_no_sum_reduce(red_object & ro){
     multiplied=nInit(1);
     bucket=kBucketCreate(currRing);
     poly a=pMult_mm(pCopy(p->next),my);
-    degbound(a);
+
     this->sev=pGetShortExpVector(a);
     kBucketInit(bucket, a,p_len-1);
     pDelete(&my);

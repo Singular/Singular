@@ -17,7 +17,7 @@
 #include "kInline.cc"
 #include "kstd1.h"
 #include "kbuckets.h"
-//#define TGB_DEBUG
+#define TGB_DEBUG
 #define FULLREDUCTIONS
 #define HANS_IDEA
 //#define HALFREDUCTIONS
