@@ -346,14 +346,14 @@ maintainer-clean: distclean srcclean
 ## miscellanous targets
 ##
 
-Singular-bindist: $(HEADERS) $(SOURCES) Makefile
+Singular-bindist ESingular-bindist: $(HEADERS) $(SOURCES) Makefile depend
 	echo "#define MAKE_DISTRIBUTION	" > distrib.h
 	${MAKE} Singular ESingular
 	${INSTALL_PROGRAM} -s Singular Singular-bindist
 	${INSTALL_PROGRAM} -s ESingular ESingular-bindist
 	echo "#undef MAKE_DISTRIBUTION " > distrib.h
 
-Singular-static-bindist: $(HEADERS) $(SOURCES) Makefile
+Singular-static-bindist ESingular-static-bindist: $(HEADERS) $(SOURCES) Makefile depend
 	echo "#define MAKE_DISTRIBUTION	" > distrib.h
 	${MAKE} Singular-static ESingular-static 
 	${INSTALL_PROGRAM} -s Singular-static Singular-static-bindist
