@@ -91,7 +91,7 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	kutil.h mpsr_Put.h spolys0.h
 
 DISTFILES=${SOURCES} ${HEADERS} Makefile.in configure.in configure \
-	mod2.h.in grammar.h testgh
+	mod2.h.in grammar.h testgh install-sh mkinstalldirs
 
 OBJS=grammar.o scanner.o matpol.o binom.o\
      febase.o feread.o timer.o intvec.o attrib.o lists.o\

@@ -1,5 +1,9 @@
 Fri Apr 25 16:59:31 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
+	* fixed configure.in s.t. sprintf test is correct
+
+	* Changed SingularPath to SINGULARPATH
+
 	* fixed sys/times.h and sys/time.h confusion
 
 	* Various changes to reflect new configure (versions defined in

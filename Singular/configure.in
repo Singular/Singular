@@ -343,7 +343,7 @@ dnl sprintf returns number of printed chars
 AC_MSG_CHECKING(whether vsprintf returns number of printed chars)
 AC_CACHE_VAL(ac_cv_returns_n_of_chars, AC_TRY_RUN( 
  [#include <stdio.h> 
- main() { char str[21]; if (((int) sprintf(str,"123456789")) == 9) exit(0); else exit(1); }],
+ main() { char *str=(char*)malloc(20); if (((int) sprintf(str,"123456789")) == 9) exit(0); else exit(1); }],
    ac_cv_returns_n_of_chars=yes,
    ac_cv_returns_n_of_chars=no,
    1))

@@ -3074,7 +3074,7 @@ cat > conftest.$ac_ext <<EOF
 #line 3075 "configure"
 #include "confdefs.h"
 #include <stdio.h> 
- main() { char str21; if (((int) sprintf(str,"123456789")) == 9) exit(0); else exit(1); }
+ main() { char *str=(char*)malloc(20); if (((int) sprintf(str,"123456789")) == 9) exit(0); else exit(1); }
 EOF
 { (eval echo configure:3080: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }
 if test -s conftest && (./conftest; exit) 2>/dev/null; then
