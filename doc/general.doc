@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.15 1998-04-30 09:29:24 Singular Exp $
+@comment $Id: general.doc,v 1.16 1998-04-30 13:17:13 Singular Exp $
 @comment this file contains the general information about Singular
 
 @menu
@@ -401,15 +401,11 @@ The other types do not belong to a ring and can be accessed within every ring.
 
 @table @code
 @item @strong{Syntax:}
-@example
-  @code{ring} name @code{=} field@code{,}
-              @code{(} names_of_ring_variables @code{),}
-              @code{(} ordering @code{);}
-@end example
+@code{ring} name @code{=} field@code{,}
+  @code{(} names_of_ring_variables @code{),}
+  @code{(} ordering @code{);}
 @item @strong{Default:}
-@example
-  32003,(x,y,z),dp;
-@end example
+@code{32003,(x,y,z),(dp,C);}
 @item @strong{Purpose:}
 defines a base ring for polynomials, ideals, vectors, modules, resolutions
 and matrices and set it as the actual basering
@@ -420,7 +416,7 @@ or until it is changed with @code{setring} or @code{keepring} or
 it gets killed.
 
 The coefficient field is given by either
-@table @bullet
+@enumerate
 @item
 the characteristic (0 or a prime <= 32003)
 @item
@@ -438,7 +434,8 @@ They define the finite field with p^n elements.
 @item
 the name @code{real}. The field elements will be the machine floating
 point numbers.
-@end table
+@end enumerate
+
 @*If you write a  characteristic which is not a prime,
 it is automatically converted
 to the next lower prime or you receive an error message.
@@ -446,14 +443,22 @@ to the next lower prime or you receive an error message.
 The names of ring variables
 are like variable names (comma separated).
 
-The ordering is a list
-of blockorderings which have an order keyword
-(lp, ls, dp, ds, Dp, Ds, wp, ws, Wp, Ws, M, c, a) and an optional number of variables
-(for lp, ls, dp, ds, Dp, Ds) or a list of
-weights (for wp, ws, Wp, Ws, a and M).
-If none of the orderings C or c (order by components) is given,
-C will be appended at the end of the list of orderings.
-@*
+The ordering is a list of blockorderings which have an order keyword and
+a weight vector or an optional size.
+
+Possible order keywords are:
+@itemize @bullet
+@item @code{lp}, @code{dp}, @code{Dp}, @code{ls}, @code{ds}, @code{Ds}, @code{M}
+with optional size parameter
+
+@item @code{wp}, @code{Wp}, @code{ws}, @code{Ws}
+with weight vector
+
+@item @code{c}, @code{C}
+for components orders
+
+@end itemize
+
 If one element of the list consists of only one entry, the parentheses may
 be omitted.
 @item @strong{Example:}
