@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: gaussman.lib,v 1.6 2000-11-09 10:29:51 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.7 2000-11-09 13:43:05 mschulze Exp $";
 info="
 LIBRARY:  gaussman.lib  GAUSS-MANIN CONNECTION OF A SINGULARITY
 
@@ -854,5 +854,22 @@ example
   ring R=0,(x,y),ds;
   poly f=x5+x2y2+y5;
   vjacob(vfilt(f));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc tst_gaussm(poly f)
+{
+  echo=2;
+  basering;
+  f;
+  print(monomat(f));
+  print(monospec(f));
+  list l=vfilt(f);
+  l;
+  vjacob(l);
+  l=singspec(f);
+  l;
+  gamma(l);
+  gamma4(l);
 }
 ///////////////////////////////////////////////////////////////////////////////
