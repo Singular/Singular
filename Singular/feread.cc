@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.13 1998-06-03 10:04:22 obachman Exp $ */
+/* $Id: feread.cc,v 1.14 1998-06-03 20:38:21 obachman Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -579,7 +579,7 @@ char * fe_fgets_stdin(char *s, int size)
 
 extern "C" {
 #include <readline/readline.h>
-#ifndef WINNT
+#ifdef HAVE_READLINE_HISTORY_H
 #include <readline/history.h>
 #endif
 }

@@ -429,6 +429,7 @@ if test "$with_readline" != no; then
      AC_CHECK_HEADERS(readline/readline.h sys/file.h,ac_readline_ok=yes,ac_readline_ok=no; break)
    fi
    if test "$ac_readline_ok" = yes; then
+     AC_CHECK_HEADERS(readline/history.h)
      AC_DEFINE(HAVE_READLINE)
    else
      AC_MSG_WARN(building without readline: disabling fancy display);
