@@ -1,5 +1,5 @@
 /*
- * $Id: proc.cc,v 1.13 2000-05-01 19:14:48 krueger Exp $
+ * $Id: proc.cc,v 1.14 2000-05-12 12:24:44 krueger Exp $
  */
 
 #include <stdio.h>
@@ -66,6 +66,7 @@ void setup_proc(
         break;
         
       case LANG_SINGULAR:
+        fprintf(module->modfp,"#if 0\n");
         fprintf(module->modfp,
                 "  h = add_singular_proc(\"%s\", %d, %ld, %ld, %s);\n",
                 proc->procname, proc->lineno,
@@ -217,7 +218,7 @@ void write_function_result(
   void *arg
   )
 {
-  fprintf(module->fmtfp, "  res->data =%s\n", arg);
+  fprintf(module->fmtfp, "  __res->data =%s\n", arg);
   pi->flags.result_done = 1;
   write_procedure_return(module, pi, module->fmtfp);
 }
@@ -449,8 +450,8 @@ void write_procedure_return(
           break;
 
         case NONE:
-          if(!pi->flags.result_done) fprintf(fmtfp, "  res->data = NULL;\n");
-          fprintf(fmtfp, "  res->rtyp = %s;\n", pi->return_val.typname);
+          if(!pi->flags.result_done) fprintf(fmtfp, "  __res->data = NULL;\n");
+          fprintf(fmtfp, "  __res->rtyp = %s;\n", pi->return_val.typname);
           fprintf(fmtfp, "  return(%s(", pi->funcname);
           for (i=0;i<pi->paramcnt; i++) {
             fprintf(fmtfp, "(%s) __%s->Data()",
@@ -461,8 +462,8 @@ void write_procedure_return(
           break;
           
         default:
-          fprintf(fmtfp, "  res->rtyp = %s;\n", pi->return_val.typname);
-          fprintf(fmtfp, "  res->data = (void *)%s(", pi->funcname);
+          fprintf(fmtfp, "  __res->rtyp = %s;\n", pi->return_val.typname);
+          fprintf(fmtfp, "  __res->data = (void *)%s(", pi->funcname);
           for (i=0;i<pi->paramcnt; i++) {
             fprintf(fmtfp, "%s", pi->param[i].varname);
 //            fprintf(fmtfp, "(%s) %s->Data()",
@@ -470,7 +471,7 @@ void write_procedure_return(
             if(i<pi->paramcnt-1) fprintf(fmtfp, ", ");
           }
           fprintf(fmtfp, ");\n");
-          fprintf(fmtfp, "  if(res->data != NULL) return FALSE;\n");
+          fprintf(fmtfp, "  if(__res->data != NULL) return FALSE;\n");
           fprintf(fmtfp, "  else return TRUE;\n\n");
     }
 }
@@ -501,7 +502,7 @@ void write_function_errorhandling(
           if(pi->flags.typecheck_done) {
             if(trace)printf("\n\t\terror handling..."); fflush(stdout);
             fprintf(module->fmtfp, "  mod_%s_error:\n", pi->procname);
-            fprintf(module->fmtfp, "    Werror(\"%s(`%%s`) is not supported\", Tok2Cmdname(tok));\n",
+            fprintf(module->fmtfp, "    Werror(\"%s(`%%s`) is not supported\", Tok2Cmdname(__tok));\n",
                     pi->procname);
             fprintf(module->fmtfp, "    Werror(\"expected %s(", pi->procname);
             for (i=0;i<pi->paramcnt; i++) {

@@ -1,5 +1,5 @@
 /*
- * $Id: proc_setup.cc,v 1.6 2000-05-01 19:14:49 krueger Exp $
+ * $Id: proc_setup.cc,v 1.7 2000-05-12 12:24:44 krueger Exp $
  */
 
 #include <stdio.h>
@@ -213,12 +213,12 @@ void proc_set_var(
 
 /*========================================================================*/
 char *ReservedVarnames[] = {
-  "v",
-  "h"
-  "res",
-  "v_save"
-  "tok",
-  "index",
+  "__v",
+  "__h"
+  "__res",
+  "__v_save"
+  "__tok",
+  "__index",
   NULL 
 };
 
