@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ffops.h,v 1.3 1997-06-19 12:23:04 schmidt Exp $ */
+/* $Id: ffops.h,v 1.4 1997-09-09 07:06:29 schmidt Exp $ */
 
 #ifndef INCL_FFOPS_H
 #define INCL_FFOPS_H
@@ -7,7 +7,6 @@
 #include <config.h>
 
 #include "cf_globals.h"
-#include "cf_switches.h"
 
 extern int ff_prime;
 extern int ff_halfprime;
