@@ -4524,15 +4524,19 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
       if(best!=erg.to_reduce_u+1){*/
       int qc;
       best=find_best(los,erg.to_reduce_l,erg.to_reduce_u,qc,c);
-      los[best].flatten();
-      int b_pos=kBucketCanonicalize(los[best].bucket);
-      los[best].p=los[best].bucket->buckets[b_pos];
-      qc==pQuality(los[best].bucket->buckets[b_pos],c);
       if(qc<quality_a){
-	red_object h=los[erg.to_reduce_u];
-	los[erg.to_reduce_u]=los[best];
-	los[best]=h;
-	swap_roles=TRUE;
+	los[best].flatten();
+	int b_pos=kBucketCanonicalize(los[best].bucket);
+	los[best].p=los[best].bucket->buckets[b_pos];
+	qc==pQuality(los[best].bucket->buckets[b_pos],c);
+	if(qc<quality_a){
+	  red_object h=los[erg.to_reduce_u];
+	  los[erg.to_reduce_u]=los[best];
+	  los[best]=h;
+	  swap_roles=TRUE;
+	}
+	else
+	  swap_roles=FALSE;
       }
       else{
 	
