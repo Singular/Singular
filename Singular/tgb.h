@@ -186,6 +186,7 @@ struct calc_dat
   int* T_deg;
   poly tmp_lm;
   poly* tmp_pair_lm;
+  sorted_pair_node** tmp_spn;
   poly* expandS;
   poly* gcd_of_terms;
   int_pair_node* soon_free;

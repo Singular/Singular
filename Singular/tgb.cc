@@ -917,6 +917,8 @@ static sorted_pair_node** add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c,
   c->T_deg[i]=pTotaldegree(h);
   c->tmp_pair_lm=(poly*) omrealloc(c->tmp_pair_lm,c->n*sizeof(poly));
   c->tmp_pair_lm[i]=pOne_Special(c->r);
+  c->tmp_spn=(sorted_pair_node**) omrealloc(c->tmp_spn,c->n*sizeof(sorted_pair_node*));
+  c->tmp_spn[i]=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
   hp=omrealloc(c->rep, c->n *sizeof(int));
   if (hp!=NULL){
     c->rep=(int*) hp;
@@ -1102,6 +1104,9 @@ static sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_p
   c->T_deg[i]=pTotaldegree(h);
   c->tmp_pair_lm=(poly*) omrealloc(c->tmp_pair_lm,c->n*sizeof(poly));
   c->tmp_pair_lm[i]=pOne_Special(c->r);
+  c->tmp_spn=(sorted_pair_node**) omrealloc(c->tmp_spn,c->n*sizeof(sorted_pair_node*));
+  c->tmp_spn[i]=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
+
   hp=omrealloc(c->rep, c->n *sizeof(int));
   if (hp!=NULL){
     c->rep=(int*) hp;
@@ -1169,9 +1174,10 @@ static sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_p
 //      poly short_s=ksCreateShortSpoly(c->S->m[i],c->S->m[j],c->r);
       //    if (short_s)
       //    {
-    sorted_pair_node* s=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
+    sorted_pair_node* s=c->tmp_spn[j];//(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
     s->i=max(i,j);
     s->j=min(i,j);
+    assume(s->j==j);
     s->expected_length=c->lengths[i]+c->lengths[j]-2;
       
     poly lm=c->tmp_pair_lm[j];//=pOne_Special();
@@ -1231,7 +1237,7 @@ static sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_p
       for(;lower<=upper;lower++)
       {
 	//free_sorted_pair_node(nodes[lower],c->r);
-	omfree(nodes[lower]);
+	//omfree(nodes[lower]);
 	nodes[lower]=NULL;
       }
       j=upper+1;
@@ -1241,12 +1247,12 @@ static sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_p
     {
       nodes[lower]->lcm_of_lm=pCopy(nodes[lower]->lcm_of_lm);
       nodes_final[spc_final++]=nodes[lower];
-      
+      c->tmp_spn[nodes[lower]->j]=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
       nodes[lower]=NULL;
       for(lower=lower+1;lower<=upper;lower++)
       {
 	//	free_sorted_pair_node(nodes[lower],c->r);
-	omfree(nodes[lower]);
+	//omfree(nodes[lower]);
 	nodes[lower]=NULL;
       }
       j=upper+1;
@@ -3795,6 +3801,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   c->n=0;
   c->T_deg=(int*) omalloc(n*sizeof(int));
   c->tmp_pair_lm=(poly*) omalloc(n*sizeof(poly));
+  c->tmp_spn=(sorted_pair_node**) omalloc(n*sizeof(sorted_pair_node*));
   lm_bin=omGetSpecBin(POLYSIZE + (r->ExpL_Size)*sizeof(long));
 #ifdef HEAD_BIN
   c->HeadBin=omGetSpecBin(POLYSIZE + (currRing->ExpL_Size)*sizeof(long));
@@ -3908,9 +3915,10 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   for(int z=0;z<c->n;z++)
   {
     pDelete(&c->tmp_pair_lm[z]);
+    omfree(c->tmp_spn[z]);
   }
   omfree(c->tmp_pair_lm);
-
+  omfree(c->tmp_spn);
   omfree(c->short_Exps);
   omfree(c->T_deg);
 
