@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.h,v 1.10 2002-03-07 18:48:58 Singular Exp $ */
+/* $Id: maps.h,v 1.11 2003-03-31 12:26:39 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -23,4 +23,5 @@ void maFindPerm(char **preim_names, int preim_n, char **preim_par, int preim_p,
                 char **names,       int n,       char **par,       int nop,
                 int * perm, int *par_perm, int ch);
 poly pSubstPoly(poly p, int var, poly image);
+ideal  idSubstPoly(ideal id, int n, poly e);
 #endif

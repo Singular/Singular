@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.40 2003-03-12 12:27:42 Singular Exp $ */
+/* $Id: maps.cc,v 1.41 2003-03-31 12:26:39 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -671,6 +671,10 @@ static poly pMinPolyNormalize(poly p)
   return rp.next;
 }
 
+/*2
+* substitutes the variable var (from 1..N) by image,
+* does not destroy p and  image
+*/
 poly pSubstPoly(poly p, int var, poly image)
 {
   map theMap=(map)idMaxIdeal(1);
@@ -695,3 +699,19 @@ poly pSubstPoly(poly p, int var, poly image)
   return res;
 }
 
+/*2
+* substitute the n-th variable by the poly e in id
+* does not destroy id and e
+*/
+ideal  idSubstPoly(ideal id, int n, poly e)
+{
+  int k=MATROWS((matrix)id)*MATCOLS((matrix)id);
+  ideal res=(ideal)mpNew(MATROWS((matrix)id),MATCOLS((matrix)id));
+
+  res->rank = id->rank;
+  for(k--;k>=0;k--)
+  {
+    res->m[k]=pSubstPoly(id->m[k],n,e);
+  }
+  return res;
+}

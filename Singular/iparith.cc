@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.293 2003-03-28 10:50:38 Singular Exp $ */
+/* $Id: iparith.cc,v 1.294 2003-03-31 12:27:00 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4356,12 +4356,14 @@ static BOOLEAN jjSUBST_Test(leftv v,leftv w,
   int &ringvar, poly &monomexpr)
 {
   monomexpr=(poly)w->Data();
+  #if 0
   if (pLength(monomexpr)>1)
   {
     Werror("`%s` substitutes a ringvar only by a term",
       Tok2Cmdname(SUBST_CMD));
     return TRUE;
   }
+  #endif
   if (!(ringvar=pVar((poly)v->Data())))
   {
     WerrorS("ringvar expected");
@@ -4375,7 +4377,10 @@ static BOOLEAN jjSUBST_P(leftv res, leftv u, leftv v,leftv w)
   poly monomexpr;
   BOOLEAN nok=jjSUBST_Test(v,w,ringvar,monomexpr);
   if (nok) return TRUE;
-  res->data = pSubst((poly)u->CopyD(res->rtyp),ringvar,monomexpr);
+  if ((monomexpr==NULL)||(pNext(monomexpr)==NULL))
+    res->data = pSubst((poly)u->CopyD(res->rtyp),ringvar,monomexpr);
+  else
+    res->data = idSubstPoly((ideal)u->Data(),ringvar,monomexpr);
   return FALSE;
 }
 static BOOLEAN jjSUBST_Id(leftv res, leftv u, leftv v,leftv w)
@@ -4384,7 +4389,10 @@ static BOOLEAN jjSUBST_Id(leftv res, leftv u, leftv v,leftv w)
   poly monomexpr;
   BOOLEAN nok=jjSUBST_Test(v,w,ringvar,monomexpr);
   if (nok) return TRUE;
-  res->data = idSubst((ideal)u->CopyD(res->rtyp),ringvar,monomexpr);
+  if ((monomexpr==NULL)||(pNext(monomexpr)==NULL))
+    res->data = idSubst((ideal)u->CopyD(res->rtyp),ringvar,monomexpr);
+  else
+    res->data = idSubstPoly((ideal)u->Data(),ringvar,monomexpr);
   return FALSE;
 }
 // we do not want to have jjSUBST_Id_X inlined:
