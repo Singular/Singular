@@ -410,8 +410,9 @@ void singular_help(char *str,BOOLEAN example)
   {
   /* --------- is it a library ? --------------------------------*/
     char libnamebuf[128];
-    FILE *fp=feFopen(str,"rb", libnamebuf);
-    if (fp!=NULL)
+    FILE *fp=NULL;
+    if ((str[1]!='\0')
+    && ((fp=feFopen(str,"rb", libnamebuf))!=NULL))
     {
 #ifdef HAVE_LIBPARSER
       extern FILE *yylpin;
