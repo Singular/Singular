@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.64 2002-01-07 17:22:10 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.65 2002-01-21 09:39:39 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -1186,6 +1186,7 @@ static BOOLEAN jiAssign_rec(leftv l, leftv r)
 }
 BOOLEAN iiAssign(leftv l, leftv r)
 {
+  if (errorreported) return TRUE;
   int ll=l->listLength();
   int rl;
   int lt=l->Typ();
