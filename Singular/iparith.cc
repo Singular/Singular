@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.203 2000-02-04 14:53:33 Singular Exp $ */
+/* $Id: iparith.cc,v 1.204 2000-02-04 16:47:19 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2480,6 +2480,18 @@ static BOOLEAN jjCOUNT_IV(leftv res, leftv v)
   res->data = (char *)((intvec*)(v->Data()))->length();
   return FALSE;
 }
+static BOOLEAN jjCOUNT_RG(leftv res, leftv v)
+{
+  ring r=(ring)v->Data();
+  int elems=-1;
+  if (rField_is_Zp(r)||rField_is_GF(r)) elems=rInternalChar(r);
+  else if (rField_is_Zp_a(r) && (r->minpoly!=NULL))
+  {
+    elems=rInternalChar(r)*naParDeg(r->minpoly);
+  }
+  res->data = (char *)elems;
+  return FALSE;
+}
 static BOOLEAN jjDEG(leftv res, leftv v)
 {
   int dummy;
@@ -3222,10 +3234,10 @@ static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
 #define jjrOrdStr      (proc1)16
 #define jjrVarStr      (proc1)18
 #define jjrParStr      (proc1)19
-#define jjCOUNT_R        (proc1)22
-#define jjDIM_R          (proc1)23
-#define jjMINRES_R       (proc1)24
-#define jjidTransp       (proc1)25
+#define jjCOUNT_RES    (proc1)22
+#define jjDIM_R        (proc1)23
+#define jjMINRES_R     (proc1)24
+#define jjidTransp     (proc1)25
 
 extern struct sValCmd1 dArith1[];
 void jjInitTab1()
@@ -3259,7 +3271,7 @@ void jjInitTab1()
         case (int)jjrOrdStr:      dArith1[i].p=(proc1)rOrdStr; break;
         case (int)jjrVarStr:      dArith1[i].p=(proc1)rVarStr; break;
         case (int)jjrParStr:      dArith1[i].p=(proc1)rParStr; break;
-        case (int)jjCOUNT_R:      dArith1[i].p=(proc1)syLength; break;
+        case (int)jjCOUNT_RES:    dArith1[i].p=(proc1)syLength; break;
         case (int)jjDIM_R:        dArith1[i].p=(proc1)syDim; break;
         case (int)jjMINRES_R:     dArith1[i].p=(proc1)syMinimize; break;
         case (int)jjidTransp:     dArith1[i].p=(proc1)idTransp; break;
@@ -3365,7 +3377,7 @@ static BOOLEAN jjrParStr(leftv res, leftv v)
   res->data = rParStr((ring)v->Data());
   return FALSE;
 }
-static BOOLEAN jjCOUNT_R(leftv res, leftv v)
+static BOOLEAN jjCOUNT_RES(leftv res, leftv v)
 {
   res->data=(char *)syLength((syStrategy)v->Data());
   return FALSE;
@@ -3407,7 +3419,7 @@ static BOOLEAN jjidTransp(leftv res, leftv v)
 #define jjrOrdStr      (proc1)rOrdStr
 #define jjrVarStr      (proc1)rVarStr
 #define jjrParStr      (proc1)rParStr
-#define jjCOUNT_R        (proc1)syLength
+#define jjCOUNT_RES    (proc1)syLength
 #define jjDIM_R        (proc1)syDim
 #define jjMINRES_R     (proc1)syMinimize
 #define jjidTransp     (proc1)idTransp
@@ -3463,7 +3475,7 @@ struct sValCmd1 dArith1[]=
 ,{jjCONTENT,    CONTENT_CMD,     POLY_CMD,       POLY_CMD }
 ,{jjCONTENT,    CONTENT_CMD,     VECTOR_CMD,     VECTOR_CMD }
 ,{jjCOUNT_N,    COUNT_CMD,       INT_CMD,        NUMBER_CMD }
-,{jjCOUNT_R,    COUNT_CMD,       XS(INT_CMD),    RESOLUTION_CMD }
+,{jjCOUNT_RES,  COUNT_CMD,       XS(INT_CMD),    RESOLUTION_CMD }
 ,{jjstrlen,     COUNT_CMD,       XS(INT_CMD),    STRING_CMD }
 ,{jjpLength,    COUNT_CMD,       XS(INT_CMD),    POLY_CMD }
 ,{jjpLength,    COUNT_CMD,       XS(INT_CMD),    VECTOR_CMD }
@@ -3473,6 +3485,7 @@ struct sValCmd1 dArith1[]=
 ,{jjCOUNT_IV,   COUNT_CMD,       INT_CMD,        INTVEC_CMD }
 ,{jjCOUNT_IV,   COUNT_CMD,       INT_CMD,        INTMAT_CMD }
 ,{jjCOUNT_L,    COUNT_CMD,       INT_CMD,        LIST_CMD }
+,{jjCOUNT_RG,   COUNT_CMD,       INT_CMD,        RING_CMD }
 ,{jjNULL,       DEF_CMD,         DEF_CMD,        INT_CMD }
 ,{jjWRONG,      DEF_CMD,         0,              ANY_TYPE }
 ,{jjDEG,        DEG_CMD,         INT_CMD,        POLY_CMD }
@@ -5509,10 +5522,10 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
     {
       if (at==dArith1[i].arg)
       {
-        res->rtyp=dArith1[i].res;
-        if (dArith1[i].res<0)
+        int r=res->rtyp=dArith1[i].res;
+        if (r<0)
         {
-          res->rtyp=-res->rtyp;
+          res->rtyp=-r;
           #ifdef PROC_BUG
           dArith1[i].p(res,a);
           #else
@@ -5536,19 +5549,19 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
     // implicite type conversion --------------------------------------------
     if (dArith1[i].cmd!=op)
     {
-      int ai;
       leftv an = (leftv)Alloc0SizeOf(sleftv);
       i=ti;
       //Print("fuer %c , typ: %s\n",op,Tok2Cmdname(at));
       while (dArith1[i].cmd==op)
       {
+        int ai;
         //Print("test %s\n",Tok2Cmdname(dArith1[i].arg));
         if ((ai=iiTestConvert(at,dArith1[i].arg))!=0)
         {
-          res->rtyp=dArith1[i].res;
-          if (dArith1[i].res<0)
+	  int r=res->rtyp=dArith1[i].res;
+          if (r<0)
           {
-            res->rtyp=-res->rtyp;
+            res->rtyp=-r;
             failed= iiConvert(at,dArith1[i].arg,ai,a,an);
             if (!failed)
             {
