@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: emacs.cc,v 1.5 1999-08-30 14:18:48 obachman Exp $ */
+/* $Id: emacs.cc,v 1.6 1999-09-07 08:23:04 Singular Exp $ */
 /*
 * ABSTRACT: Esingular main file
 */
@@ -58,10 +58,14 @@ void assume_violation(char* file, int line)
   fprintf(stderr, "Internal assume violation: file %s line %d\n", file, line);
 }
    
+extern "C" {
 #include "find_exec.c"
+}
 #include "feResource.cc"
 #include "feCmdLineOptions.cc"
+extern "C" {
 #include "getopt.c"
+}
 
 int main(int argc, char** argv)
 {
