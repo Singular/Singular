@@ -184,6 +184,7 @@ class simple_reducer:public reduction_step{
     this->p=p;
     this->p_len=p_len;
   }
+  virtual void pre_reduce(red_object* r, int l, int u);
   virtual void reduce(red_object* r, int l, int u);
   ~simple_reducer();
 
@@ -194,10 +195,10 @@ class join_simple_reducer:public simple_reducer{
  public:
   join_simple_reducer(poly p, int p_len, poly high_to):simple_reducer(p,p_len){
     ac=new reduction_accumulator( p, p_len, high_to);
-    
+   
     
   }
-
+   void pre_reduce(red_object* r, int l, int u);
   void target_is_no_sum_reduce(red_object & ro);
   reduction_accumulator* ac;
 };

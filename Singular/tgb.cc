@@ -2457,6 +2457,7 @@ void simple_reducer::target_is_a_sum_reduce(red_object & ro){
   ro.sev=ro.sum->ac->sev;
 }
 void simple_reducer::reduce(red_object* r, int l, int u){
+  this->pre_reduce(r,l,u);
   int i;
   for(i=l;i<=u;i++){
     if(r[i].sum==NULL)
@@ -2554,7 +2555,7 @@ reduction_step* create_reduction_step(find_erg & erg, red_object* r, calc_dat* c
 };
 
 void join_simple_reducer::target_is_no_sum_reduce(red_object & ro){
-
+  
   ro.sum=new formal_sum_descriptor();
   ro.sum->ac=ac;
   ac->counter++;
@@ -2568,7 +2569,7 @@ void join_simple_reducer::target_is_no_sum_reduce(red_object & ro){
   int ct = ksCheckCoeff(&an, &bn);
   ro.sum->c_ac=nNeg(bn);
   ro.sum->c_my=an;
-
+  assume(nIsZero(nAdd(nMult(ro.sum->c_my,lm->coef),nMult(p->coef,ro.sum->c_ac) )));
   if (p_GetComp(p, bucket->bucket_ring) != p_GetComp(lm, bucket->bucket_ring))
   {
     p_SetCompP(a1, p_GetComp(lm, bucket->bucket_ring), bucket->bucket_ring);
@@ -2609,3 +2610,13 @@ void join_simple_reducer::target_is_no_sum_reduce(red_object & ro){
     kBucketInit(bucket, a,p_len-1);
     pDelete(&my);
   }
+void simple_reducer:: pre_reduce(red_object* r, int l, int u){}
+void join_simple_reducer:: pre_reduce(red_object* r, int l, int u){
+  for(int i=l;i<=u;i++)
+    {
+      if (r[i].sum){
+	if(r[i].sum->ac->counter<=2) r[i].flatten();
+	
+      }
+    }
+}
