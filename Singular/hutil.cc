@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hutil.cc,v 1.20 2001-08-27 14:47:02 Singular Exp $ */
+/* $Id: hutil.cc,v 1.21 2003-02-18 15:35:05 Singular Exp $ */
 /*
 * ABSTRACT: Utilities for staircase operations
 */
@@ -548,6 +548,7 @@ void hLexS(scfmon stc, int Nstc, varset var, int Nvar)
     else
     {
       k--;
+      if (k<=0) return;
     }
   }
 }
@@ -1015,9 +1016,9 @@ scfmon hGetmem(int lm, scfmon old, monp monmem)
 {
   scfmon x = monmem->mo;
   int  lx = monmem->a;
-  if (!x || (lm > lx))
+  if ((x==NULL) || (lm > lx))
   {
-    if (x) omFreeSize((ADDRESS)x, lx * sizeof(scmon));
+    if ((x!=NULL)&&(lx>0)) omFreeSize((ADDRESS)x, lx * sizeof(scmon));
     monmem->mo = x = (scfmon)omAlloc(lm * sizeof(scmon));
     monmem->a = lm;
   }
