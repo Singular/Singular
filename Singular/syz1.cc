@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.30 1998-06-30 14:48:20 obachman Exp $ */
+/* $Id: syz1.cc,v 1.31 1998-08-05 11:40:58 siebert Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -1035,29 +1035,20 @@ static void syOrder(poly p,syStrategy syzstr,int index,
   trind[realcomp] = j+1;
 }
 
-/*3
-* reduces all pairs of degree deg in the module index
-* put the reduced generators to the resolvente which contains
-* the truncated kStd 
-*/
-static void syRedNextPairs(SSet nextPairs, syStrategy syzstr,
-               int howmuch, int index)
+//#define OLD_PAIR_ORDER
+#ifdef OLD_PAIR_ORDER
+static intvec* syLinStrat(SSet nextPairs, syStrategy syzstr,
+                          int howmuch, int index)
 {
-  int i=howmuch-1,j,k=IDELEMS(syzstr->res[index]);
-  int ks=IDELEMS(syzstr->res[index+1]),kk,l,ll;
+  int i=howmuch-1,i1=0,l,ll;
   int ** Fin=syzstr->Firstelem;
   int ** Hin=syzstr->Howmuch;
   int ** bin=syzstr->backcomponents;
-  number coefgcd,n;
   ideal o_r=syzstr->orderedRes[index+1];
-  polyset redset=syzstr->orderedRes[index]->m;
-  poly p=NULL,q;
+  intvec *result=new intvec(howmuch+1);
   BOOLEAN isDivisible;
   SObject tso;
 
-  if ((nextPairs==NULL) || (howmuch==0)) return;
-  while ((k>0) && (syzstr->res[index]->m[k-1]==NULL)) k--;
-  while ((ks>0) && (syzstr->res[index+1]->m[ks-1]==NULL)) ks--;
   while (i>=0)
   {
     tso = nextPairs[i];
@@ -1079,12 +1070,138 @@ static void syRedNextPairs(SSet nextPairs, syStrategy syzstr,
         }
       }
     }
-    if (!isDivisible)
+    if (isDivisible)
     {
-      tso.p = 
+      syDeletePair(&nextPairs[i]);
+      //crit++;
+    }
+    else
+    {
+      nextPairs[i].p =
         sySPoly(tso.p1, tso.p2,tso.lcm);
+      (*result)[i1] = i+1;
+      i1++;
+    }
+    i--;
+  }
+  return result;
+}
+#else
+static intvec* syLinStrat(SSet nextPairs, syStrategy syzstr,
+                          int howmuch, int index)
+{
+  int i=howmuch-1,i1=0,i2,i3,l,ll;
+  int ** Fin=syzstr->Firstelem;
+  int ** Hin=syzstr->Howmuch;
+  int ** bin=syzstr->backcomponents;
+  ideal o_r=syzstr->orderedRes[index+1];
+  intvec *result=new intvec(howmuch+1);
+  intvec *spl=new intvec(howmuch,1,-1);
+  BOOLEAN isDivisible;
+  SObject tso;
+
+  while (i>=0)
+  {
+    tso = nextPairs[i];
+    isDivisible = FALSE;
+    if (syzstr->res[index+1]!=NULL)
+    {
+      l = Fin[index][pGetComp(tso.lcm)]-1;
+      if (l>=0)
+      {
+        ll = l+Hin[index][pGetComp(tso.lcm)];
+        while ((l<ll) && (!isDivisible))
+        {
+          if (o_r->m[l]!=NULL)
+          {
+            isDivisible = isDivisible || 
+              pDivisibleBy2(o_r->m[l],tso.lcm);
+          }
+          l++;
+        }
+      }
+    }
+    if (isDivisible)
+    {
+      syDeletePair(&nextPairs[i]);
+      //crit++;
+    }
+    else
+    {
+      nextPairs[i].p = 
+        sySPoly(tso.p1, tso.p2,tso.lcm);
+      (*spl)[i] = pLength(nextPairs[i].p);
+    }
+    i--;
+  }
+//Print("\n");Print("Laengenvektor: ");spl->show(1,1);Print("\n");
+  i3 = 0;
+  loop
+  {
+    i2 = -1;
+    for (i1=0;i1<howmuch;i1++)
+    {
+      if (i2==-1) 
+      {
+        if ((*spl)[i1]!=-1)
+        {
+          i2 = i1;
+        }
+      }
+      else
+      {
+        if (((*spl)[i1]>=0) && ((*spl)[i1]<(*spl)[i2]))
+        {
+          i2 = i1;
+        }
+      }
+    }
+    if (i2>=0)
+    {
+      (*result)[i3] = i2+1;
+      (*spl)[i2] = -1;
+      i3++;
+    }
+    else
+    {
+      break;
+    }
+  }
+  return result;
+}
+#endif
+/*3
+* reduces all pairs of degree deg in the module index
+* put the reduced generators to the resolvente which contains
+* the truncated kStd 
+*/
+static void syRedNextPairs(SSet nextPairs, syStrategy syzstr,
+               int howmuch, int index)
+{
+  int i,j,k=IDELEMS(syzstr->res[index]);
+  int ks=IDELEMS(syzstr->res[index+1]),kk,l,ll;
+  int ** Fin=syzstr->Firstelem;
+  int ** Hin=syzstr->Howmuch;
+  int ** bin=syzstr->backcomponents;
+  number coefgcd,n;
+  polyset redset=syzstr->orderedRes[index]->m;
+  poly p=NULL,q;
+  intvec *spl1=new intvec(howmuch+1);
+  SObject tso;
+
+  if ((nextPairs==NULL) || (howmuch==0)) return;
+  while ((k>0) && (syzstr->res[index]->m[k-1]==NULL)) k--;
+  while ((ks>0) && (syzstr->res[index+1]->m[ks-1]==NULL)) ks--;
+  spl1 = syLinStrat(nextPairs,syzstr,howmuch,index);
+//Print("\n");Print("Ordnungsvektor: ");spl1->show(1,1);Print("\n");
+  i=0;
+  while ((*spl1)[i]>0)
+  {
+    tso = nextPairs[(*spl1)[i]-1];
+    if ((tso.p1!=NULL) && (tso.p2!=NULL))
+    {
       coefgcd = 
-        nGcd(pGetCoeff(tso.p1),pGetCoeff(tso.p1));
+        nGcd(pGetCoeff(tso.p1),pGetCoeff(tso.p2));
       tso.syz = pHead(tso.lcm);
       pSetm(tso.syz);
       p = tso.syz;
@@ -1231,15 +1348,11 @@ static void syRedNextPairs(SSet nextPairs, syStrategy syzstr,
       syOrder(syzstr->res[index+1]->m[ks],syzstr,index+1,ks+1);
       ks++;
       p = NULL;
-      nextPairs[i] = tso;
+      nextPairs[(*spl1)[i]-1] = tso;
     }
-    else
-    {
-      syDeletePair(&nextPairs[i]);
-      //crit++;
-    }
-    i--;
+    i++;
   }
+  delete spl1;
 } 
 
 /*3
@@ -1436,7 +1549,7 @@ static void syCreateNewPairs(syStrategy syzstr, int index, int newEl)
           else if (pDivisibleBy2(p,nPm[j1]))
           {
             pDelete(&(nPm[j1]));
-            break;
+            //break;
           }
         }
         ii++;
@@ -1501,6 +1614,10 @@ static void syCreateNewPairs(syStrategy syzstr, int index, int newEl)
   idDelete(&nP);
 }
 
+/*2
+* tail reduction for the LaScala algorithm
+* takes care of the special ordering
+*/
 static void sySyzTail(syStrategy syzstr, int index, int newEl)
 {
   int j,ll,k=IDELEMS((syzstr->res)[index]);
@@ -1818,6 +1935,9 @@ static int syInitSyzMod(syStrategy syzstr, int index, int init=17)
   return result;
 }
 
+/*3
+* deletes a resolution
+*/
 void syKillComputation(syStrategy syzstr)
 {
 //Print("ref: %d\n",syzstr->references);
@@ -1934,6 +2054,10 @@ void syKillComputation(syStrategy syzstr)
   }
 }
 
+/*3
+* read out the Betti numbers from resolution
+* (if not LaScala calls the traditional Betti procedure)
+*/
 intvec * syBettiOfComputation(syStrategy syzstr)
 {
   int dummy;
@@ -1985,11 +2109,17 @@ intvec * syBettiOfComputation(syStrategy syzstr)
     return syBetti(syzstr->minres,syzstr->length,&dummy);
 }
 
+/*3
+* computes the allocated length of the resolution
+*/
 int syLength(syStrategy syzstr)
 {
   return syzstr->length;
 }
 
+/*3
+* computes the real length of the resolution
+*/
 int sySize(syStrategy syzstr)
 {
   resolvente r=syzstr->res;
@@ -2007,6 +2137,9 @@ int sySize(syStrategy syzstr)
   return i;
 }
 
+/*3
+* computes the cohomological dimension of res[1]
+*/
 int syDim(syStrategy syzstr)
 {
   int i,j=-1,l;
@@ -2039,6 +2172,9 @@ int syDim(syStrategy syzstr)
     return sySize(syzstr);
 }
 
+/*3
+* copies the resolution (by increment the reference counter)
+*/
 syStrategy syCopy(syStrategy syzstr)
 {
   syStrategy result=syzstr;
@@ -2046,6 +2182,9 @@ syStrategy syCopy(syStrategy syzstr)
   return result;
 }
 
+/*2
+* local print procedure used in syPrint
+*/
 static void syPrintEmptySpaces(int i)
 {
   if (i!=0)
@@ -2055,6 +2194,9 @@ static void syPrintEmptySpaces(int i)
   }
 }
 
+/*2
+* local print procedure used in syPrint
+*/
 static void syPrintEmptySpaces1(int i)
 {
   if (i!=0)
@@ -2064,6 +2206,9 @@ static void syPrintEmptySpaces1(int i)
   }
 }
 
+/*2
+* local print procedure used in syPrint
+*/
 static int syLengthInt(int i)
 {
   int j=0;
@@ -2077,6 +2222,9 @@ static int syLengthInt(int i)
   return j;
 }
 
+/*3
+* prints the resolution as sequence of free modules
+*/
 void syPrint(syStrategy syzstr)
 {
   if ((syzstr->resPairs==NULL) && (syzstr->fullres==NULL) 
@@ -2168,6 +2316,10 @@ void syPrint(syStrategy syzstr)
   }
 }
 
+/*2
+* divides out the weight monomials (given by the Schreyer-ordering)
+* fronm the LaScala-resolution
+*/
 static resolvente syReorder(resolvente res,int length,
         syStrategy syzstr,BOOLEAN toCopy=TRUE,resolvente totake=NULL)
 {
@@ -2230,6 +2382,9 @@ static resolvente syReorder(resolvente res,int length,
   return fullres;
 }
 
+/*3
+* converts a resolution into a list of modules
+*/
 lists syConvRes(syStrategy syzstr)
 {
   if ((syzstr->fullres==NULL) && (syzstr->minres==NULL))
@@ -2268,6 +2423,9 @@ lists syConvRes(syStrategy syzstr)
   return liMakeResolv(trueres,syzstr->length,syzstr->list_length,typ0,w);
 }
 
+/*3
+* converts a list of modules into a resolution
+*/
 syStrategy syConvList(lists li)
 {
   int typ0;
@@ -2285,6 +2443,9 @@ syStrategy syConvList(lists li)
   return result;
 }
 
+/*3
+* converts a list of modules into a minimal resolution
+*/
 syStrategy syForceMin(lists li)
 {
   int typ0;
@@ -2301,6 +2462,10 @@ syStrategy syForceMin(lists li)
   return result;
 }
 
+/*2
+* deleting all monomials the component of which correspond
+* to non-minimal generators
+*/
 static poly syStripOut(poly p,intvec * toStrip)
 {
   if (toStrip==NULL) return p;
@@ -2322,48 +2487,51 @@ static poly syStripOut(poly p,intvec * toStrip)
   return p;
 }
 
-static poly syMinimizeP(poly toMin,syStrategy syzstr,int pNum,int index,
+static poly syMinimizeP(int toMin,syStrategy syzstr,intvec * ordn,int index,
                         intvec * toStrip)
 {
-  int i,j,tc,lastin,newin=pNum-1;
-  poly p,pp=pCopy(toMin),q=NULL,tq,pisN;
+  int ii=0,i,j,tc;
+  poly p,pp,q=NULL,tq,pisN;
   SSet sPairs=syzstr->resPairs[index];
+  poly tempStripped=NULL;
 
+  pp=pCopy(syzstr->res[index+1]->m[toMin]);
   pp = syStripOut(pp,toStrip);
-  while (newin>=0)
+  while ((ii<ordn->length()) && ((*ordn)[ii]!=-1) && (sPairs[(*ordn)[ii]].syzind!=toMin))
   {
-    lastin = newin;
-    while ((newin>=0) && (sPairs[lastin].order==sPairs[newin].order))
-      newin--;
-//Print("Hier lastin:%d newin:%d\n",lastin,newin);
-    for (i=newin+1;i<=lastin;i++)
+    ii++;
+  }
+  while (ii>=0)
+  {
+    i = (*ordn)[ii];
+    if (sPairs[i].isNotMinimal!=NULL)
     {
-      if (sPairs[i].isNotMinimal!=NULL)
+      tempStripped = syStripOut(pCopy(syzstr->res[index+1]->m[sPairs[i].syzind]),toStrip);
+      pisN = sPairs[i].isNotMinimal;
+      tc = pGetComp(pisN);
+      p = pp;
+      while (p!=NULL)
       {
-        pisN = sPairs[i].isNotMinimal;
-        tc = pGetComp(pisN);
-        p = pp;
-        while (p!=NULL)
+        if (pGetComp(p)==tc)
         {
-          if (pGetComp(p)==tc)
-          {
-            tq = pInit();
-            for(j=pVariables; j>0; j--)
-              pSetExp(tq,j, pGetExp(p,j)-pGetExp(pisN,j));
-            pSetComp(tq, 0);
-            pSetCoeff0(tq,nDiv(pGetCoeff(p),pGetCoeff(pisN)));
-            pGetCoeff(tq) = nNeg(pGetCoeff(tq));
-            q = syAdd(q,syStripOut(syMultT1(syzstr->res[index+1]->m[sPairs[i].syzind],tq),toStrip));
-          }  
-          pIter(p);
-        }
-        if (q!=NULL)
-        {
-          pp = syAdd(pp,q);
-          q = NULL;
-        }
+          tq = pInit();
+          for(j=pVariables; j>0; j--)
+            pSetExp(tq,j, pGetExp(p,j)-pGetExp(pisN,j));
+          pSetComp(tq, 0);
+          pSetCoeff0(tq,nDiv(pGetCoeff(p),pGetCoeff(pisN)));
+          pGetCoeff(tq) = nNeg(pGetCoeff(tq));
+          q = syAdd(q,syMultT1(tempStripped,tq));
+        }  
+        pIter(p);
       }
+      if (q!=NULL)
+      {
+        pp = syAdd(pp,q);
+        q = NULL;
+      }
+      pDelete(&tempStripped);
     }
+    ii--;
   }
   return pp;
 }
@@ -2434,10 +2602,45 @@ static intvec * syToStrip(syStrategy syzstr, int index)
   return result;
 }
 
+static intvec * syOrdPairs(SSet sPairs, int length)
+{
+  intvec * result=new intvec(length,1,-1);
+  int i,j=0,k=-1,l,ii;
+
+  loop
+  {
+    l = -1;
+    for(i=0;i<length;i++)
+    {
+      if (sPairs[i].syzind>k)
+      {
+        if (l==-1)
+        {
+          l = sPairs[i].syzind;
+          ii = i;
+        }
+        else
+        {
+          if (sPairs[i].syzind<l) 
+          {
+            l = sPairs[i].syzind;
+            ii = i;
+          }
+        }
+      }
+    }
+    if (l==-1) break;
+    (*result)[j] = ii;
+    j++;
+    k = l;
+  } 
+  return result;
+}
+
 static resolvente syReadOutMinimalRes(syStrategy syzstr, 
            BOOLEAN computeStd=FALSE)
 {
-  intvec * Strip;
+  intvec * Strip, * ordn;
   resolvente tres=(resolvente)Alloc0((syzstr->length+1)*sizeof(ideal));
   sip_sring tmpR;
   ring origR = currRing;
@@ -2448,7 +2651,7 @@ static resolvente syReadOutMinimalRes(syStrategy syzstr,
     syzstr->res[1] = idInit(IDELEMS(tres[0]),tres[0]->rank);
     return tres;
   }
-  int i,j,l,index,o1,ii,i1;
+  int i,j,l,index,ii,i1;
   poly p;
   ideal rs;
   SSet sPairs;
@@ -2495,17 +2698,14 @@ static resolvente syReadOutMinimalRes(syStrategy syzstr,
       Strip = syToStrip(syzstr,index);
       tres[index+1] = idInit(IDELEMS(syzstr->res[index+1]),syzstr->res[index+1]->rank);
       i1 = (*syzstr->Tl)[index];
+      ordn = syOrdPairs(sPairs,i1);
       for (i=0;i<i1;i++)
       {
         if ((sPairs[i].isNotMinimal==NULL) && (sPairs[i].lcm!=NULL))
         {
-          o1 = sPairs[i].order;
-          ii = i;
-          while ((ii<i1) && (sPairs[ii].lcm!=NULL) && (sPairs[ii].order==o1))
-            ii++;
           l = sPairs[i].syzind;
           tres[index+1]->m[l] =
-            syMinimizeP(syzstr->res[index+1]->m[l],syzstr,ii,index,Strip);
+            syMinimizeP(l,syzstr,ordn,index,Strip);
         }
       }
       delete Strip;
