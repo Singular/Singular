@@ -1,8 +1,8 @@
 ////////////////////////////////////////////////////////////////////
 // version string automatically expanded by CVS
-version="$Id: template.lib,v 1.7 2000-12-19 15:05:44 anne Exp $";
+version="$Id: template.lib,v 1.8 2000-12-19 18:31:48 obachman Exp $";
 // summary description of the library
-category="Utilities";
+category="Miscellaneous";
 info="
 LIBRARY:   template.lib  A TEMPLATE FOR A SINGULAR LIBRARY
 

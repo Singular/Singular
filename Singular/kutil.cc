@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.86 2000-12-18 17:47:18 obachman Exp $ */
+/* $Id: kutil.cc,v 1.87 2000-12-19 18:31:41 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -646,7 +646,6 @@ BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
                           lpos, pLast(p), L->last);
     }
   }
-  r_assume(L->max == NULL);
   if (L->p1 == NULL)
   {
     // L->p2 either NULL or "normal" poly
@@ -775,6 +774,8 @@ BOOLEAN kTest_TS(kStrategy strat)
       if (strat->L[i].i_r2 != -1)
         return dReportError("L[%d].i_r2 out of sync", i);
     }
+    if (strat->L[i].i_r != -1)
+      return dReportError("L[%d].i_r out of sync", i);
   }
   return TRUE;
 }
@@ -3990,8 +3991,24 @@ void completeReduce (kStrategy strat)
   {
     for (i=strat->sl; i>0; i--)
     {
-      //if (strat->interpt) test_int_std(strat->kIdeal);
-      strat->S[i] = redtailBba(strat->S[i],i-1,strat);
+      TObject* T_j = strat->s_2_t(i);
+      if (T_j != NULL)
+      {
+        assume(strat->S[i] == T_j->p);
+        strat->S[i] = redtailBba(T_j, i-1, strat);
+        assume(strat->S[i] == T_j->p);
+        if (strat->redTailChange && strat->tailRing != currRing)
+        {
+          if (T_j->max != NULL) p_LmFree(T_j->max, strat->tailRing);
+          if (pNext(T_j->p) != NULL) 
+            T_j->max = p_GetMaxExpP(pNext(T_j->p), strat->tailRing);
+          else
+            T_j->max = NULL;
+        }
+      }
+      else
+        strat->S[i] = redtailBba(strat->S[i],i-1,strat);
+
       if (TEST_OPT_INTSTRATEGY)
       {
         //if (strat->redTailChange)
@@ -4129,8 +4146,22 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
     strat->P.ShallowCopyDelete(new_tailRing, p_shallow_copy_delete);
   
   if (L != NULL && L->tailRing != new_tailRing)
-    L->ShallowCopyDelete(new_tailRing, p_shallow_copy_delete);
-  if (T != NULL && T->tailRing != new_tailRing)
+  {
+    if (L->i_r < 0)    
+      L->ShallowCopyDelete(new_tailRing, p_shallow_copy_delete);
+    else
+    {
+      assume(L->i_r <= strat->tl);
+      TObject* t_l = strat->R[L->i_r];
+      assume(t_l != NULL);
+      L->tailRing = new_tailRing;
+      L->p = t_l->p;
+      L->t_p = t_l->t_p;
+      L->max = t_l->max;
+    }
+  }
+      
+  if (T != NULL && T->tailRing != new_tailRing && T->i_r < 0)
     T->ShallowCopyDelete(new_tailRing, new_tailBin, p_shallow_copy_delete);
     
   omMergeStickyBinIntoBin(strat->tailBin, strat->tailRing->PolyBin);
@@ -4171,7 +4202,6 @@ void kStratInitChangeTailRing(kStrategy strat)
   kStratChangeTailRing(strat, NULL, NULL, e);
 }
 
-#endif // KUTIL_CC
 
 #if 0
 Timings for the different possibilities of posInT:
@@ -4324,3 +4354,5 @@ int posInT_pLength(const TSet set,const int length,LObject &p)
 }
 
 #endif
+
+#endif // KUTIL_CC

@@ -473,6 +473,8 @@ BOOLEAN setOption(leftv res, leftv v)
     }
     Werror("unknown option `%s`",n);
   okay:
+    if (currRing != NULL)
+      currRing->options = test & TEST_RINGDEP_OPTS;
     omFree((ADDRESS)n);
     v=v->next;
   } while (v!=NULL);

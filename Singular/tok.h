@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id: tok.h,v 1.48 2000-12-18 13:30:39 obachman Exp $ */
+/* $Id: tok.h,v 1.49 2000-12-19 18:31:46 obachman Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -201,6 +201,10 @@ enum {
 #define OPT_SB_1          29
 #define OPT_NOTREGULARITY 30
 #define OPT_WEIGHTM       31
+
+/* define ring dependent options */ 
+#define TEST_RINGDEP_OPTS \
+ (Sy_bit(OPT_INTSTRATEGY) | Sy_bit(OPT_REDTHROUGH) | Sy_bit(OPT_REDTAIL))
 
 #define TEST_OPT_PROT              BTEST1(OPT_PROT)
 #define TEST_OPT_REDSB             BTEST1(OPT_REDSB)

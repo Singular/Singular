@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.33 2000-12-15 18:49:34 Singular Exp $ */
+/* $Id: numbers.cc,v 1.34 2000-12-19 18:31:44 obachman Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -110,23 +110,15 @@ void nSetChar(ring r)
   if (rField_is_Extension(r))
   {
     naSetChar(c,r);
-    test |= Sy_bit(OPT_INTSTRATEGY); /*intStrategy*/
-    test &= ~Sy_bit(OPT_REDTAIL); /*noredTail*/
-  }
-  else if (rField_is_Q(r))
-  {
-    test |= Sy_bit(OPT_INTSTRATEGY); /*26*/
   }
   else if (rField_is_Zp(r))
   /*----------------------char. p----------------*/
   {
     npSetChar(c, r);
-    test &= ~Sy_bit(OPT_INTSTRATEGY); /*26*/
   }
   /* -------------- GF(p^m) -----------------------*/
   else if (rField_is_GF(r))
   {
-    test &= ~Sy_bit(OPT_INTSTRATEGY); /*26*/
     nfSetChar(c,r->parameter);
   }
   /* -------------- R -----------------------*/

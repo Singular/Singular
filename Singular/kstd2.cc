@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.68 2000-12-18 13:30:36 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.69 2000-12-19 18:31:41 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -785,87 +785,4 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
   return res;
 }
 
-static ideal bbared (ideal F, ideal Q,kStrategy strat)
-{
 
-  /* complete reduction of the standard basis--------- */
-  completeReduce(strat);
-  /* release temp data-------------------------------- */
-  exitBuchMora(strat);
-  if (TEST_OPT_WEIGHTM)
-  {
-    pFDeg=pFDegOld;
-    pLDeg=pLDegOld;
-    if (ecartWeights)
-    {
-      omFreeSize((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
-      ecartWeights=NULL;
-    }
-  }
-  if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
-  return (strat->Shdl);
-}
-
-ideal stdred(ideal F, ideal Q, tHomog h,intvec ** w)
-{
-  ideal r;
-  BOOLEAN b=pLexOrder,toReset=FALSE;
-  BOOLEAN delete_w=(w==NULL);
-  kStrategy strat=new skStrategy;
-
-  if (rField_has_simple_inverse())
-    strat->LazyPass=20;
-  else
-   strat->LazyPass=2;
-  strat->LazyDegree = 1;
-  strat->ak = idRankFreeModule(F);
-  if ((h==testHomog))
-  {
-    if (strat->ak==0)
-    {
-      h = (tHomog)idHomIdeal(F,Q);
-      w=NULL;
-    }
-    else
-      h = (tHomog)idHomModule(F,Q,w);
-  }
-  if (h==isHomog)
-  {
-    if ((w!=NULL) && (*w!=NULL))
-    {
-      kModW = *w;
-      strat->kModW = *w;
-      pOldFDeg = pFDeg;
-      pFDeg = kModDeg;
-      toReset = TRUE;
-    }
-    pLexOrder = TRUE;
-    strat->LazyPass*=2;
-  }
-  strat->homog=h;
-  initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
-  initBuchMoraPos(strat);
-  if (pOrdSgn==1)
-    initBba(F,strat);
-  else
-    initMora(F,strat);
-  initBuchMora(F, Q,strat);
-  //initS(F,Q,strat);
-// Ende der Initalisierung
-  r=bbared(F,Q,strat);
-#ifdef KDEBUG
-  int i;
-  for (i=0; i<IDELEMS(r); i++) pTest(r->m[i]);
-#endif
-// Ende: aufraeumen
-  if (toReset)
-  {
-    kModW = NULL;
-    pFDeg = pOldFDeg;
-  }
-  pLexOrder = b;
-  delete(strat);
-  if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
-  idSkipZeroes(r);
-  return r;
-}

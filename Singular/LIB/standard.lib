@@ -1,8 +1,8 @@
-// $Id: standard.lib,v 1.50 2000-12-19 15:05:39 anne Exp $
+// $Id: standard.lib,v 1.51 2000-12-19 18:31:47 obachman Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.50 2000-12-19 15:05:39 anne Exp $";
-category="Utilities";
+version="$Id: standard.lib,v 1.51 2000-12-19 18:31:47 obachman Exp $";
+category="Miscellaneous";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 

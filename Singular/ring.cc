@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.150 2000-12-14 16:38:54 obachman Exp $ */
+/* $Id: ring.cc,v 1.151 2000-12-19 18:31:45 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -94,8 +94,6 @@ void rChangeCurrRing(ring r)
     rTest(r);
     /*------------ set global ring vars --------------------------------*/
     currQuotient=r->qideal;
-    /*------------ set redTail, except reset by nSetChar or pSetGlobals */
-    test |= Sy_bit(OPT_REDTAIL);
 
     /*------------ global variables related to coefficients ------------*/
     nSetChar(r);
@@ -2842,12 +2840,34 @@ static void rSetNegWeight(ring r)
   }
 }
 
+static void rSetOption(ring r)
+{
+  // set redthrough
+  if (!TEST_OPT_OLDSTD && r->OrdSgn == 1 && ! r->LexOrder)
+    r->options |= Sy_bit(OPT_REDTHROUGH);
+  else
+    r->options &= ~Sy_bit(OPT_REDTHROUGH);
+
+  // set intStrategy
+  if (rField_is_Extension(r) || rField_is_Q(r))
+    r->options |= Sy_bit(OPT_INTSTRATEGY);
+  else
+    r->options &= ~Sy_bit(OPT_INTSTRATEGY);
+  
+  // set redTail
+  if (r->LexOrder || r->OrdSgn == -1 || rField_is_Extension(r))
+    r->options &= ~Sy_bit(OPT_REDTAIL);
+  else
+    r->options |= Sy_bit(OPT_REDTAIL);
+}
+
 BOOLEAN rComplete(ring r, int force)
 {
   if (r->VarOffset!=NULL && force == 0) return FALSE;
   nInitChar(r);
   rSetOutParams(r);
   rSetDegStuff(r);
+  rSetOption(r);
   int n=rBlocks(r)-1;
   int i;
   int bits;

@@ -14,6 +14,7 @@ extern char *optarg;
 extern int optind, opterr, optopt;
 extern int lpverbose, check;
 extern int texinfo_out;
+extern int category_out;
 extern int found_version, found_info, found_oldhelp, found_proc_in_proc;
 int warning_info = 0, warning_version = 0;
 
@@ -26,6 +27,7 @@ static void usage(char *progname)
   printf("   -d [digit]            : digit=1,..,4 increases the verbosity of the checks\n");
   printf("   -s                    : turns on reporting about violations of unenforced syntax rules\n");
   printf("   -i                    : perl output of examples and help of procs\n");
+  printf("   -c                    : print category of lib to stdout and exit\n");
   printf("   -h                    : print this message\n");
   exit(1);
 }
@@ -38,7 +40,7 @@ void main_init(int argc, char *argv[])
 {
   char c;
 
-  while((c=fe_getopt(argc, argv, "ihd:sf:"))>=0) {
+  while((c=fe_getopt(argc, argv, "ihdc:sf:"))>=0) {
     switch(c) {
         case 'd':
           lpverbose = 1;
@@ -53,10 +55,13 @@ void main_init(int argc, char *argv[])
         case 'i':
           texinfo_out = 1;
           break;
+        case 'c':
+          category_out = 1;
+          break;
+
         case 'h' :
           usage(argv[0]);
           break;
-          
         case -1 : printf("no such option:%s\n", argv[fe_optind]);
           usage(argv[0]);
           break;
@@ -64,13 +69,13 @@ void main_init(int argc, char *argv[])
           usage(argv[0]);
     }
   }
-  if (texinfo_out) lpverbose = 0;
+  if (texinfo_out || category_out) lpverbose = 0;
     
   if(lib_file!=NULL) {
     yylpin = fopen( lib_file, "rb" );
-    if (! texinfo_out) 
+    if (! (texinfo_out || category_out)) 
       printf("Checking library '%s'\n", lib_file);
-    else
+    else if (! category_out)
       printf("$library = \"%s\";\n", lib_file);
   } else {
     while(argc>fe_optind && yylpin==NULL) {
@@ -78,9 +83,9 @@ void main_init(int argc, char *argv[])
       if(yylpin!=NULL) 
       {
         lib_file = argv[fe_optind];
-        if (! texinfo_out) 
+        if (! (texinfo_out || category_out) )
           printf("Checking library '%s'\n", argv[fe_optind]);
-        else
+        else if (! category_out)
           printf("$library = \"%s\";\n", lib_file);
       }
       else fe_optind++;
@@ -206,7 +211,7 @@ void printpi(procinfov pi)
       printf("$chksum{\"%s\"} = %d;\n", pi->procname, pi->data.s.help_chksum);
     }
   }
-  else
+  else if (! category_out)
   {
     if(lpverbose) printf("//     ");
     printf( "%c %-15s  %20s ", pi->is_static ? 'l' : 'g', pi->libname,

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.32 2000-12-15 18:49:33 Singular Exp $ */
+/* $Id: maps.cc,v 1.33 2000-12-19 18:31:43 obachman Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -214,6 +214,7 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
   char** names = (char**) omAlloc0(N*sizeof(char*));
 
   memcpy(names, currRing->names, currRing->N*sizeof(char*));
+  memcpy(&(names[currRing->N]), theImageRing->names, (theImageRing->N*sizeof(char*)));
   sip_sring tmpR;
 
   if (theImageRing->OrdSgn == 1) orders[0] = ringorder_dp;

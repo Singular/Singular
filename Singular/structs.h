@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.49 2000-12-15 18:49:36 Singular Exp $ */
+/* $Id: structs.h,v 1.50 2000-12-19 18:31:46 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -350,6 +350,8 @@ struct sip_sring
   number     minpoly;
   int**      wvhdl;  /* array of weight vectors */
   char **    names;  /* array of variable names */
+
+  unsigned long options; /* ring dependent options */
 
   // what follows below here should be set by rComplete, _only_
   long      *ordsgn;  /* array of +/- 1 (or 0) for comparing monomials */

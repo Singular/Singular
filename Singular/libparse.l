@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.43 2000-12-12 11:06:00 anne Exp $ */
+/* $Id: libparse.l,v 1.44 2000-12-19 18:31:43 obachman Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -104,6 +104,7 @@ int    _isatty(int filedes);
 
 #ifdef STANDALONE_PARSER
 procinfov pi;
+int category_out = 0;
 void printpi(procinfov pi);
 void pi_clear(procinfov pi);
 extern "C" {
@@ -292,7 +293,7 @@ eqnl           ([ \t\n]*+=[ \t\n]*)
                  }
                  printf("\";\n");
                }
-               else
+               else if (!category_out)
                  printf("Version:%s;\n", libnamebuf);
                #else
                #ifdef HAVE_NAMESPACES
@@ -895,17 +896,21 @@ void copy_string(lp_modes mode)
 #endif /* HAVE_NAMESPACES */
 {
 #ifdef STANDALONE_PARSER
-  if (texinfo_out && (last_cmd == LP_INFO || last_cmd == LP_CATEGORY))
+  if ((texinfo_out && (last_cmd == LP_INFO || last_cmd == LP_CATEGORY)) ||
+      (category_out && last_cmd == LP_CATEGORY))
   {
     long current_location = ftell(yylpin), i = string_start, quote = 0;
     char c;
-    if (last_cmd == LP_INFO)
+    if (texinfo_out)
     {
-      printf("$info = <<EOT;\n");
-    }
-    else
-    {
-      printf("$category = <<EOT;\n");
+     if (last_cmd == LP_INFO)
+     {
+       printf("$info = <<EOT;\n");
+     }
+     else
+     {
+       printf("$category = <<EOT;\n");
+     }
     }
     fseek (yylpin, i, SEEK_SET);
     while (i< current_location)
@@ -925,6 +930,7 @@ void copy_string(lp_modes mode)
       if (c != '\r') putchar(c);
       i++;
     }
+    if (category_out) exit(0);
     fseek (yylpin, current_location, SEEK_SET);
     printf("\nEOT\n");
   }
@@ -994,7 +1000,7 @@ main( int argc, char *argv[] )
     fprintf(stderr, "No library found to parse.\n");
     exit(1);
   }
-  if (! texinfo_out)
+  if (! (texinfo_out || category_out))
   {
     if(lpverbose)printf("Verbose level=%d\n", lpverbose);
     if(check)printf("Reporting most possible annomalies.\n");

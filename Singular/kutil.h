@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.50 2000-12-18 17:47:17 obachman Exp $ */
+/* $Id: kutil.h,v 1.51 2000-12-19 18:31:42 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -59,8 +59,8 @@ public:
   int ecart, 
     length,     // as of pLDeg
     pLength,    // either == 0, or == pLength(p)
-    i_r;        // index of TObject in R set
-  BOOLEAN is_normalized; // true, if pNoram was called on p, false otherwise
+    i_r;        // index of TObject in R set, or -1 if not in T
+  BOOLEAN is_normalized; // true, if pNorm was called on p, false otherwise
 
   // initialization
   KINLINE void Init(ring r = currRing);
@@ -283,8 +283,11 @@ public:
   KINLINE skStrategy();
   KINLINE ~skStrategy();
 
-  // return TObject corresponding to S[i]
+  // return TObject corresponding to S[i]: assume that it exists 
+  // i.e. no error checking is done
   KINLINE TObject* S_2_T(int i);
+  // like S_2_T, except that NULL is returned if it can not be found
+  KINLINE TObject* s_2_t(int i);
 };
 
 void deleteHC(poly *p, int *e, int *l, kStrategy strat);
@@ -330,6 +333,7 @@ int posInL10 (const LSet set, const int length,
              LObject* L,const kStrategy strat);
 KINLINE poly redtailBba (poly p,int pos,kStrategy strat);
 poly redtailBba (LObject *L, int pos,kStrategy strat, BOOLEAN withT = FALSE);
+poly redtailBba (TObject *T, int pos,kStrategy strat, BOOLEAN withT = FALSE);
 poly redtail (poly p,int pos,kStrategy strat);
 poly redtail (LObject *L,int pos,kStrategy strat);
 void enterpairs (poly h, int k, int ec, int pos,kStrategy strat, int atR = -1);

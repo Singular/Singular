@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.19 2000-12-14 16:38:49 obachman Exp $
+ *  Version: $Id: kInline.cc,v 1.20 2000-12-19 18:31:40 obachman Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -62,7 +62,26 @@ KINLINE TObject* skStrategy::S_2_T(int i)
   assume(T != NULL && T->p == S[i]);
   return T;
 }
-  
+
+KINLINE TObject* skStrategy::s_2_t(int i)
+{
+  if (i >= 0 && i <= sl)
+  {
+    int sri= S_2_R[i];
+    if (sri >= 0 && sri <= tl)
+    {
+      TObject* t = R[sri];
+      if (t != NULL && t->p == S[i])
+        return t;
+    }
+    // last but not least, try kFindInT
+    sri = kFindInT(S[i], T, tl);
+    if (sri >= 0) 
+      return &(T[sri]);
+  }
+  return NULL;
+}
+
 /***************************************************************
  *
  * Operation on TObjects
@@ -983,6 +1002,16 @@ KINLINE poly redtailBba (poly p,int pos,kStrategy strat)
   return redtailBba(&L, pos, strat);
 }
 
+KINLINE poly redtailBba(TObject *T, int pos,kStrategy strat, BOOLEAN withT)
+{
+  LObject L;
+  L = *T;
+  poly p = redtailBba(&L, pos, strat, FALSE);
+  *T = L;
+  kTest_T(T);
+  assume( p == T->p);
+  return p;
+}
   
 #endif // defined(KINLINE) || defined(KUTIL_CC)
 #endif // KINLINE_CC
