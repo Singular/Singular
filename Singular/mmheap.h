@@ -3,9 +3,8 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmheap.h,v 1.3 1998-12-02 14:04:03 obachman Exp $ */
+/* $Id: mmheap.h,v 1.4 1998-12-16 18:43:41 Singular Exp $ */
 #include <stdlib.h>
-#include "mod2.h"
 #include "structs.h"
 #include "mmpage.h"
 
@@ -30,7 +29,7 @@ struct sip_memHeap
  * Basic routines
  *
  *****************************************************************/
-  
+
 /* Initializes Heap, assumes size < SIZE_OF_HEAP_PAGE */
 extern void mmInitHeap(memHeap heap, size_t size);
 /* UNCONDITIONALLY frees all pages of heap */
@@ -44,7 +43,7 @@ void mmDestroyHeap(memHeap *heap);
 /* Merges what is free in Heap "what" into free list of heap "into" */
 void mmMergeHeap(memHeap into, memHeap what);
 
-#define MM_HEAP_ADDR_UNKNOWN_FLAG 0  
+#define MM_HEAP_ADDR_UNKNOWN_FLAG 0
 #define MM_HEAP_ADDR_USED_FLAG   1
 #define MM_HEAP_ADDR_FREE_FLAG   2
 
@@ -55,13 +54,13 @@ void mmMergeHeap(memHeap into, memHeap what);
 
 #define mmCheckHeap(heap)           1
 #define mmCheckHeapAddr(addr, heap) 1
-  
+
 #else
 
 /* use this variables to control level of HEAP_DEBUG at run-time
    (see mod2.h for details) */
 extern int mm_HEAP_DEBUG;
-  
+
 #define mmAllocHeap(res, heap)\
   ((void*)(res)) = mmDebugAllocHeap(heap, __FILE__, __LINE__)
 void * mmDebugAllocHeap(memHeap heap, const char*, int );
@@ -75,10 +74,10 @@ void   mmDebugFreeHeap(void* addr, memHeap heap, const char*, int );
 int mmDebugCheckHeap(memHeap heap, const char* fn, int line);
 
 #define mmCheckHeapAddr(addr, heap) \
-  mmDebugCheckHeapAdr(addr, heap, MM_HEAP_ADDR_USED_FLAG, __FILE__, __LINE__)  
+  mmDebugCheckHeapAdr(addr, heap, MM_HEAP_ADDR_USED_FLAG, __FILE__, __LINE__)
 int mmDebugCheckHeapAddr(void* addr, memHeap heap, int flag,
                          const char* fn, int l);
-  
+
 #endif
 
 /*****************************************************************
@@ -86,7 +85,7 @@ int mmDebugCheckHeapAddr(void* addr, memHeap heap, int flag,
  * Low-level allocation routines
  *
  *****************************************************************/
-  
+
 /* Allocates memory block from a heap */
 #define _mmAllocHeap(what, heap)                            \
 do                                                          \
@@ -97,7 +96,7 @@ do                                                          \
 }                                                           \
 while (0)
 
-/* Frees addr into heap, assumes  addr was previously allocated from heap */ 
+/* Frees addr into heap, assumes  addr was previously allocated from heap */
 #define _mmFreeHeap(addr, heap)                  \
 do                                              \
 {                                               \

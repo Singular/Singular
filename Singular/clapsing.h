@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.h,v 1.4 1997-09-18 14:08:19 Singular Exp $
+// $Id: clapsing.h,v 1.5 1998-12-16 18:43:36 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -11,7 +11,6 @@
 #ifndef INCL_FACTORYSING_H
 #define INCL_FACTORYSING_H
 
-#include "mod2.h"
 #include "structs.h"
 #include "polys.h"
 #include "ideals.h"

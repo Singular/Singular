@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.27 1998-12-14 15:32:31 Singular Exp $ */
+/* $Id: polys-impl.h,v 1.28 1998-12-16 18:43:44 Singular Exp $ */
 
 /***************************************************************
  *
@@ -15,7 +15,6 @@
  * encapsulations in polys.h should be used, instead.
  *
  ***************************************************************/
-#include "mod2.h"
 #include "structs.h"
 #include "mmemory.h"
 #include "mmheap.h"
@@ -78,7 +77,7 @@ extern int pVarCompIndex;
 #define _pCompIndex        pVarOffset[0]
 #define _pRingCompIndex(r)  ((r)->VarOffset[0])
 
-// for simple, lex orderings  
+// for simple, lex orderings
 extern void pGetVarIndicies_Lex(int nvars, int* VarOffset, int &VarCompIndex,
                                 int &VarLowIndex, int &VarHighIndex);
 // for simple, revlex orderings
@@ -87,7 +86,7 @@ extern void pGetVarIndicies_RevLex(int nvars,int *VarOffset,int &VarCompIndex,
 // for all non-simple orderings
 extern void pGetVarIndicies(int nvars, int *VarOffset, int &VarCompIndex,
                             int &VarLowIndex, int &VarHighIndex);
-// gets var indicies w.r.t. the ring r -- 
+// gets var indicies w.r.t. the ring r --
 // determines which one of three pGetVarIndicies((int nvars, ...) to use
 // based on properties of r
 extern void pGetVarIndicies(ring r, int *VarOffset, int &VarCompIndex,
@@ -518,7 +517,7 @@ inline int _pExpQuerSum1(poly p, int to)
 {
   int ei_to = _pExpIndex(to);
   int ei_1 = _pExpIndex(1);
-  
+
   if (ei_1 > ei_to)
     return __pExpQuerSum2(p, ei_to, ei_1);
   else
@@ -530,7 +529,7 @@ inline int _pExpQuerSum2(poly p,int from,int to)
 {
   int ei_to = _pExpIndex(to);
   int ei_from = _pExpIndex(from);
-  
+
   if (ei_from > ei_to)
     return __pExpQuerSum2(p, ei_to, ei_from);
   else

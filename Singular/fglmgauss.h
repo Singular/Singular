@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmgauss.h,v 1.3 1998-06-02 15:29:54 Singular Exp $
+// $Id: fglmgauss.h,v 1.4 1998-12-16 18:43:37 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -11,7 +11,6 @@
 #ifndef FGLMGAUSS_H
 #define FGLMGAUSS_H
 
-#include "mod2.h"
 #include "structs.h"
 #include "fglmvec.h"
 

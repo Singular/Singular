@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmprivate.h,v 1.2 1998-12-07 08:48:25 Singular Exp $ */
+/* $Id: mmprivate.h,v 1.3 1998-12-16 18:43:42 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -63,7 +63,7 @@ extern void * mm_minAddr;
 void mmPrintFL( const char* fname, const int lineno );
 void mmDBInitNewHeapPage(memHeap heap);
 int mmCheckDBMCB ( DBMCB * what, int size , int flags);
-void mmFillDBMCB(DBMCB* what, size_t size, memHeap heap, 
+void mmFillDBMCB(DBMCB* what, size_t size, memHeap heap,
                  int flags, char* fname, int lineno);
 #endif /* MDEBUG */
 

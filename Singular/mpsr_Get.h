@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Get.h,v 1.4 1998-10-15 11:46:03 obachman Exp $ */
+/* $Id: mpsr_Get.h,v 1.5 1998-12-16 18:43:42 Singular Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.h
@@ -11,8 +11,6 @@
  * Change History (most recent first):
  *
  ***************************************************************/
-#include"mod2.h"
-
 #ifdef HAVE_MPSR
 
 #ifndef __MPSR_GET__
@@ -57,7 +55,7 @@ extern void mpsr_SetCurrRingHdl(ring r);
 extern idhdl mpsr_FindIdhdl(char *name, ring &r);
 
 // from mpsr_GetPoly.cc
-extern mpsr_Status_t mpsr_GetRingAnnots(MPT_Node_pt node, ring &r, 
+extern mpsr_Status_t mpsr_GetRingAnnots(MPT_Node_pt node, ring &r,
                                         BOOLEAN &mv, BOOLEAN &IsUnOrdered);
 extern mpsr_Status_t mpsr_GetPoly(MP_Link_pt link, poly &p, MP_Uint32_t nmon,
                                 ring cring);

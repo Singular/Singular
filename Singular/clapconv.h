@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.h,v 1.5 1998-02-09 11:29:05 Singular Exp $
+// $Id: clapconv.h,v 1.6 1998-12-16 18:43:35 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -11,7 +11,6 @@
 #ifndef INCL_SINGCONV_H
 #define INCL_SINGCONV_H
 
-#include "mod2.h"
 #include "structs.h"
 #include "longalg.h"
 #include <factory.h>

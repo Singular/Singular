@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmemory.h,v 1.12 1998-12-02 13:58:31 obachman Exp $ */
+/* $Id: mmemory.h,v 1.13 1998-12-16 18:43:40 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -13,7 +13,6 @@
 extern "C" {
 #endif
 
-#include "mod2.h"
 #include "structs.h"
 #include "mmheap.h"
 
@@ -88,7 +87,7 @@ char * mmDBStrdup( const char * s, char *fname, int lineno);
 /* use this variables to control level of MDEBUG at run-time
    (see mod2.h for details) */
 extern int mm_MDEBUG;
-  
+
 BOOLEAN mmDBTestHeapBlock(const void* adr, const memHeap heap,
                           const char * fname, const int lineno );
 BOOLEAN mmDBTestBlock(const void* adr, const size_t size,
@@ -96,7 +95,7 @@ BOOLEAN mmDBTestBlock(const void* adr, const size_t size,
 BOOLEAN mmDBTest(const void* adr, const char * fname, const int lineno);
 
 #define mmTestHeap(a, h)\
-  mmDBTestHeapBlock(a, h, __FILE__, __LINE__) 
+  mmDBTestHeapBlock(a, h, __FILE__, __LINE__)
 #define mmTest(A,B)     mmDBTestBlock(A,B,__FILE__,__LINE__)
 #define mmTestL(A)      mmDBTest(A,__FILE__,__LINE__)
 #define mmTestP(A,B)    mmDBTestBlock(A,B,__FILE__,__LINE__)
@@ -104,7 +103,7 @@ BOOLEAN mmDBTest(const void* adr, const char * fname, const int lineno);
 
 int mmTestMemory();
 int mmTestHeaps();
-    
+
 void mmPrintUsedList();
 
 #else
@@ -117,7 +116,7 @@ void mmPrintUsedList();
 #define mmTestLP(A)
 #define mmTestMemory 1
 #define mmTestHeaps 1
-  
+
 #endif /* MDEBUG */
 
 
@@ -139,16 +138,16 @@ int mmMemUsed( void );
 int mmMemPhysical( void );
 #endif
 void mmPrintStat();
-  
+
 size_t mmSizeL( void* );
 
 /**********************************************************************
  *
- * Some operations on linked lists of memory 
+ * Some operations on linked lists of memory
  *
  **********************************************************************/
 /* The following routines assume that Next(list) == *((void**) list) */
-  
+
 /* Returns the length of a memory list; assumes list has no cycles */
 int mmListLength(void* list);
 /* Returns last non-NULL element of list; assumes list has no cycles */
@@ -162,7 +161,7 @@ int mmIsAddrOnList(void* addr, void* list);
 void* mmListHasCycle(void* list);
 
 /* The following routines assume that Next(list) == *((void**) list + next) */
-  
+
 /* Returns the length of a memory list; assumes list has no cycles */
 int mmGListLength(void* list, int next);
 /* Returns last non-NULL element of list; assumes list has no cycles */
@@ -174,7 +173,7 @@ int mmIsAddrOnGList(void* addr, void* list, int next);
  * first element of list which is contained at least twice in memory
  * list. If no, NULL is returned */
 void* mmGListHasCycle(void* list, int next);
-  
+
 /**********************************************************************
  *
  * some fast macros for basic memory operations
@@ -185,7 +184,7 @@ extern void _memcpyW(void* p1, void* p2, long l);
 #define memcpy_nwEVEN(p1, p2, l)    _memcpyW((void*) p1, (void*) p2, (long) l)
 #define memcpy_nwODD(p1, p2, l)     _memcpyW((void*) p1, (void*) p2, (long) l)
 #define memcpyW(p1, p2, l)          _memcpyW((void*) p1, (void*) p2, (long) l)
- 
+
 extern void _memaddW(void* p1, void* p2, void* p3, long l);
 #define memaddW(p1, p2, p3, l)          _memaddW(p1, p2, p3, l)
 #define memadd_nwODD(p1, p2, p3, l)     _memaddW(p1, p2, p3, l)
@@ -288,7 +287,7 @@ do                                              \
   while(l);                                     \
 }                                               \
 while(0)
-          
+
 #define memadd_nwEVEN(P1, P2, P3, L)            \
 do                                              \
 {                                               \
@@ -306,7 +305,7 @@ do                                              \
   while(l);                                     \
 }                                               \
 while(0)
-  
+
 #define memadd_nwONE(P1, P2, P3)                \
 do                                              \
 {                                               \

@@ -10,7 +10,7 @@
 
 /***********************************************************************
  *
- * declarations of procedures 
+ * declarations of procedures
  */
 
 void* mmGetPage();
@@ -44,7 +44,7 @@ int mmGetNumberOfAllocatedPages();
 
 int mmIsAddrOnFreePage(void* addr);
 
-#define mmIsNotAddrOnFreePage(addr) (!mmIsAddrOnFreePage(addr)) 
+#define mmIsNotAddrOnFreePage(addr) (!mmIsAddrOnFreePage(addr))
 
 #else /* ! HAVE_PAGE_ALIGNMENT */
 

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.h,v 1.9 1998-10-21 10:25:37 krueger Exp $ */
+/* $Id: libparse.h,v 1.10 1998-12-16 18:43:39 Singular Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -17,7 +17,7 @@ procinfo *iiInitSingularProcinfo(procinfov pi, char *libname,
                                  char *procname, int line, long pos,
 				 BOOLEAN pstatic = FALSE);
 #ifdef HAVE_NAMESPACES
-int yylplex(char *libname, char *libfile, lib_style_types *lib_style, 
+int yylplex(char *libname, char *libfile, lib_style_types *lib_style,
            idhdl pl, BOOLEAN autoexport=FALSE, lp_modes=LOAD_LIB);
 #else /* HAVE_NAMESPACES */
 int yylplex(char *libname, char *libfile, lib_style_types *lib_style,

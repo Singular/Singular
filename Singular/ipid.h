@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.23 1998-12-10 13:14:23 krueger Exp $ */
+/* $Id: ipid.h,v 1.24 1998-12-16 18:43:39 Singular Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -39,7 +39,7 @@ struct sip_sring
   short     VarCompIndex; /* location of component in exp vector */
   short     VarLowIndex;  /* lowest index of an exponent */
   short     VarHighIndex; /* Highest index of an expoentn */
-  
+
 #ifdef RDEBUG
   short      no; /* unique id for rings */
 #endif
