@@ -1,16 +1,24 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.39 1998-05-12 14:43:21 Singular Exp $
+@comment $Id: reference.doc,v 1.40 1998-05-12 14:50:38 schmidt Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
-@c with emacs (C-c C-e C-b).
-@c @setfilename reference.info
-@c @node Top, Functions and variables
-@c @menu
-@c * Functions and variables::
-@c @end menu
-@c @node Functions and variables, Tricks and pitfalls, Data types, Top
-@c @chapter Functions and variables
+@c with emacs (C-c C-e C-r).  Please keep it as it is.  Since it
+@c is wrapped in `@ifset' and `@end' it does not harm `tex' or
+@c `makeinfo' but is a great help in editing this file (emacs
+@c ignores the conditionals).
+@ifset thisVariableShouldNeverBeSet
+%**start
+\input texinfo.tex
+@setfilename reference.info
+@node Top, Functions and system variables
+@menu
+* Functions and system variables::
+@end menu
+@node Functions and system variables, Tricks and pitfalls, Data types, Top
+@chapter Functions and system variables
+%**end
+@end ifset
 
 
 @c ---------------------------------------
@@ -22,7 +30,7 @@
 
 
 @c ---------------------------------------
-@node Functions, Control structures, Functions and variables, Functions and variables
+@node Functions, Control structures, Functions and system variables, Functions and system variables
 @section Functions
 @cindex Functions
 
@@ -5103,7 +5111,7 @@ See @ref{read}, @ref{link}, @ref{Data types};
 
 
 @c ---------------------------------------
-@node Control structures, System variables, Functions, Functions and variables
+@node Control structures, System variables, Functions, Functions and system variables
 @section Control structures
 @cindex Control structures
 @cindex block
@@ -5452,7 +5460,7 @@ See @ref{Break points}.
 @c ref
 
 @c ---------------------------------------
-@node System variables,  , Control structures, Functions and variables
+@node System variables,  , Control structures, Functions and system variables
 @section System variables
 @cindex System variables
 @ifinfo
