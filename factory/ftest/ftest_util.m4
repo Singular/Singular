@@ -1,4 +1,4 @@
-dnl $Id: ftest_util.m4,v 1.3 1997-09-29 13:08:46 schmidt Exp $
+dnl $Id: ftest_util.m4,v 1.4 1997-10-01 10:49:41 schmidt Exp $
 dnl
 dnl ftest_util.m4 - m4 macros used by the factory test environment.
 dnl
@@ -9,7 +9,6 @@ dnl Note: mind the ';'!
 dnl
 dnl do not output anything of this library
 divert(-1)
-
 
 #
 # - internal macros.
@@ -198,6 +197,9 @@ ifelse(`$#', `0', ,
 define(`ftestOutput', `dnl
 `ftestPrintTimer( timing_ftestTimer_time );
     ftestPrintCheck( check )'_ftestOutput($@)')
+
+# set comment character
+changecom(`//');
 
 dnl switch on output again
 divert`'dnl
