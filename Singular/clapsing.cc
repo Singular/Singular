@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.32 1998-04-23 10:00:49 schmidt Exp $
+// $Id: clapsing.cc,v 1.33 1998-04-23 10:17:03 schmidt Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -82,8 +82,8 @@ TIMING_DEFINE_PRINT( algLcmTimer );
   }
 #else
 #define FACTORY_ALGOUT( tag, f )
-#define FACTORY_CFTROUT( tag, f );
-#define FACTORY_CFAOUT( tag, f );
+#define FACTORY_CFTROUT( tag, f )
+#define FACTORY_CFAOUT( tag, f )
 #endif
 
 poly singclap_gcd ( poly f, poly g )
