@@ -54,7 +54,7 @@ ring r    = 0,(x,y,z),ds;
 //pause;
    f=x3+y3+z4;
    intvec w=4,4,3;
-   spectrum(f,w);
+   qhspectrum(f,w);
 //pause;
    kill r;
    ring r=0,(x,y,z),(c,ds);
