@@ -1,3 +1,29 @@
+1999-08-18  T. Wichmann  <wichmann@arboretum.itwm.uni-kl.de>
+        * singular.el singular-help-file-name variable introduced
+	  added section for singular-*-alists
+	  some defvars changed to defconsts
+	  (singular-scan-header-exit) introduced
+	  fancier calculation of singular-scan-header-scan-for
+	  (singular-scan-header-got-emacs-home) introduced
+	  singular-executable-default, ... are now defcustom
+	  (singular-exit-sentinel) now call (singular-scan-header-exit)
+	
+	* singular.el: added (singular-comint-init)
+	  improved dynamical generation of library menu
+	  scan header functionality improved
+	  scan header now gets initialized on every start of Singular
+	  singular-completion-* variables renamed
+	  (singular) renamed to (singular-internal)
+	  new functions (singular), (singular-restart), (singular-other)
+	  new variables for last singular arguments incl. history
+	  
+
+1999-08-11  T. Wichmann  <wichmann@arboretum.itwm.uni-kl.de>
+
+	* singular.el: code for menu support rewritten
+	  scanning of singular header implemented
+	  dynamic completion implemented
+
 1999-08-09  Jens Schmidt  <schmidt@de.oracle.com>
 
 	* singular.el: doc fixes
