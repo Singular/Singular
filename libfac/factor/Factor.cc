@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.4 1997-11-18 16:39:04 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.5 1999-06-15 12:54:55 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -19,6 +19,7 @@ static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) mi
 #ifdef SINGULAR
 #  define HAVE_SINGULAR
    extern "C" { void WerrorS(char *); }
+   extern  void WarnS(const char *);
 #endif
 
 #ifdef FACTORDEBUG
@@ -601,8 +602,8 @@ Factorized( const CanonicalForm & F, const Variable & alpha, int Mainvar){
     success= specializePoly(ffuni,Extension,degree(ff),Substitutionlist,1,getNumVars(compress(ff,m)));
     DEBOUTLN(cout,  "Returned from specializePoly: success: ", success);
     if (success == 0 ){ // No spezialisation could be found
-#ifdef HAVE_SINGULAR
-      WerrorS("libfac: Factorize: ERROR: Not able to find a valid specialization!");    
+#ifdef SINGULAR
+      WarnS("libfac: Factorize: ERROR: Not able to find a valid specialization!");    
 #else
       cerr << "libfac: Factorize: ERROR: Not able to find a valid specialization!\n" 
 	   << rcsid << errmsg << endl; 
@@ -802,6 +803,10 @@ Factorize( const CanonicalForm & F, int is_SqrFree ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.4  1997/11/18 16:39:04  Singular
+* hannes: moved WerrorS from C++ to C
+     (Factor.cc MVMultiHensel.cc SqrFree.cc Truefactor.cc)
+
 Revision 1.3  1997/09/12 07:19:46  Singular
 * hannes/michael: libfac-0.3.0
 

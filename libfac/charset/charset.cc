@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: charset.cc,v 1.3 1997-09-12 07:19:40 Singular Exp $";
+static char * rcsid = "$Id: charset.cc,v 1.4 1999-06-15 12:54:54 Singular Exp $";
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -36,6 +36,15 @@ static CFList     irras(CFList & AS, int &ja, CanonicalForm & reducible);
 #  undef DEBUGOUTPUT
 #endif
 #include "debug.h"
+
+#ifdef SINGULAR
+       extern void WarnS(const char *);
+       #include "../../Singular/mod2.h"
+       #include "../../Singular/structs.h"
+       #include "../../Singular/polys.h"
+       #include "../../Singular/febase.h"
+       #include "../../Singular/clapconv.h"
+#endif
 
 // the next computes a characteristic set (a basic set in Wang's sense)
 CFList
@@ -553,12 +562,6 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible){
       DEBOUTLN(cout, "as is irreducible. as= ", AS);
     }
     else {
-//#ifdef HAVE_SINGULAR
-//      extern void WerrorS(char *);
-//      WerrorS("libfac: Factoring over algebraic function field!");
-//#else 
-//      cerr << "libfac: Factoring over algebraic function field!" << endl;
-//#endif
       i=AS;
       for ( nr=1; nr< AS.length(); nr++){
 	as.append(i.getItem());
@@ -576,6 +579,17 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible){
 	    ja=nr+1;
 	    break;
 	  }
+	  else
+	  {
+#ifdef SINGULAR
+            //WarnS("libfac: Factoring over algebraic function field required!");
+	    //pWrite(convClapPSingP(elem));
+#else 
+#ifndef NOSTREAMIO
+            cerr << "libfac: Factoring over algebraic function field!" << endl;
+#endif
+#endif
+	  }
 	}
       }
     }
@@ -587,6 +601,9 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible){
 ///////////////////////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1997/09/12 07:19:40  Singular
+* hannes/michael: libfac-0.3.0
+
 Revision 1.2  1997/04/25 22:52:28  michael
 changed cerr and cout messages for use with Singular
 Version for libfac-0.2.1
