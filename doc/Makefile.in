@@ -1,7 +1,7 @@
 #####################################################################
 ###
 ### Makefile for Singular documentation
-### $Id: Makefile.in,v 1.87 2003-05-20 17:47:15 levandov Exp $
+### $Id: Makefile.in,v 1.88 2003-07-25 18:23:50 levandov Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -98,6 +98,9 @@ STANDALONE_TEXI_FILES	= COPYING.texi INSTALL_unix.texi NEWS.texi \
 			  README_distribution.texi README_src.texi \
 			  INSTALL_win.texi
 
+PLU_STANDALONE_TEXI_FILES = COPYING.plural.texi INSTALL_unix.plural.texi \
+                            NEWS.plural.texi README_download.plural.texi
+
 DOC2TEX_FILES	= \
 		examples.tex general.tex ti_ip.tex math.tex reference.tex \
 		start.tex types.tex pdata.tex tricks.tex platform.tex
@@ -172,7 +175,7 @@ manual.tex:  ${MANUAL_FILES} doc2tex.pl ${SINGULAR} singular.doc $(STANDALONE_TE
 singular.tex: ${MANUAL_FILES} doc2tex.pl ${LIB_TEX_FILES} ${SINGULAR} ${LIBPARSE} singular.doc $(STANDALONE_TEXI_FILES) ${PLU_MANUAL_FILES}
 	${DOC2TEX} -o singular.tex singular.doc
 
-pluralmain.tex: ${PLU_MANUAL_FILES} doc2tex.pl ${PLU_LIB_TEX_FILES} ${SINGULAR} ${LIBPARSE} pluralmain.doc $(STANDALONE_TEXI_FILES)
+pluralmain.tex: ${PLU_MANUAL_FILES} doc2tex.pl ${PLU_LIB_TEX_FILES} ${SINGULAR} ${LIBPARSE} pluralmain.doc $(PLU_STANDALONE_TEXI_FILES)
 	${DOC2TEX} -o pluralmain.tex pluralmain.doc
 
 #pattern rule for tex files
@@ -211,6 +214,10 @@ STANDALONE_TXT_FILES := $(STANDALONE_TEXI_FILES:.texi=.txt)
 STANDALONE_HTML_FILES := $(STANDALONE_TEXI_FILES:.texi=.html)
 STANDALONE_FILES      := $(STANDALONE_TEXI_FILES:.texi=)
 
+PLU_STANDALONE_TXT_FILES := $(PLU_STANDALONE_TEXI_FILES:.texi=.txt)
+PLU_STANDALONE_HTML_FILES := $(PLU_STANDALONE_TEXI_FILES:.texi=.html)
+PLU_STANDALONE_FILES      := $(PLU_STANDALONE_TEXI_FILES:.texi=)
+
 ifeq ($(SINGUNAME),@SINGUNAME@)
 UNAME_OPT = -D UNAME
 endif
@@ -236,6 +243,12 @@ standalone: standalone-txt standalone-html ${STANDALONE_FILES}
 standalone-html: ${STANDALONE_HTML_FILES}
 standalone-txt:  ${STANDALONE_TXT_FILES}
 
+standalone-plural: standalone-txt-plural standalone-html-plural ${PLU_STANDALONE_FILES}
+
+standalone-html-plural: ${PLU_STANDALONE_HTML_FILES}
+standalone-txt-plural:  ${PLU_STANDALONE_TXT_FILES}
+
+
 WWW_DIR	= /singular/www/2-0/
 FTP_DIR = /ftp/pub/Math/Singular/Development
 
@@ -260,7 +273,7 @@ ${HTML_SUBDIR}/${HTML_MANUAL_TOP}: ${TEXI2HTML_INIT} ${TEXI2HTML} singular.tex
 	${PERL} ${TEXI2HTML} ${TEXI2HTML_OPTS} -prefix ${HTML_MANUAL_PREFIX} \
         -top_file ${HTML_MANUAL_TOP} singular.tex
 
-plu_html: pluralmain.tex ${PLU_MANUAL_FILES} ${TMP_DIR} ${PLU_HTML_SUBDIR}/${HTML_MANUAL_TOP} ${PLU_IMAGES_HTML} 
+plu_html: pluralmain.tex ${PLU_MANUAL_FILES} ${TMP_DIR} ${PLU_HTML_SUBDIR}/${HTML_MANUAL_TOP} ${PLU_IMAGES_HTML} $(PLU_STANDALONE_TEXI_FILES)
 ${PLU_HTML_SUBDIR}/${HTML_MANUAL_TOP}: ${TEXI2HTML_INIT} ${TEXI2HTML} plural.tex
 	${PERL} ${TEXI2HTML} ${PLU_TEXI2HTML_OPTS} -prefix ${PLU_HTML_MANUAL_PREFIX} \
         -top_file ${HTML_MANUAL_TOP} pluralmain.tex
@@ -272,6 +285,8 @@ ${HTML_SUBDIR}/${HTML_TUTOR_TOP}: ${TEXI2HTML_INIT} ${TEXI2HTML} tutor.tex
         -top_file ${HTML_TUTOR_TOP} tutor.tex
 
 ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx: ${HTML_SUBDIR}/${HTML_MANUAL_TOP}
+
+${PLU_HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx: ${PLU_HTML_SUBDIR}/${HTML_MANUAL_TOP}
 
 ${TMP_DIR}:
 	${MKINSTALLDIRS} ${TMP_DIR}
@@ -303,6 +318,12 @@ install: singular.hlp html singular.idx standalone
 	${MKINSTALLDIRS} ${infodir}
 	${INSTALL_DATA} singular.hlp ${infodir}
 	test -r ${htmldir} || ln -s `pwd`/${HTML_SUBDIR} ${htmldir}
+	test -r ${exdir} || ln -s `pwd`/${EX_SUBDIR} ${exdir}
+
+install-plural: plural.hlp pluhtml plural.idx standalone-plural
+	${MKINSTALLDIRS} ${infodir}
+	${INSTALL_DATA} plural.hlp ${infodir}
+	test -r ${htmldir} || ln -s `pwd`/${{PLU_HTML_SUBDIR} ${htmldir}
 	test -r ${exdir} || ln -s `pwd`/${EX_SUBDIR} ${exdir}
 
 uninstall:
@@ -340,12 +361,47 @@ install-sharedist: singular.hlp html singular.idx \
 	/bin/rm -f ${install_prefix}/examples/*.inc
 	chmod -R +rX ${install_prefix}/
 
+install-sharedist-plural: plural.hlp ${PLU_HTML_SUBDIR}/${HTML_MANUAL_TOP} plural.idx \
+                   ${PLU_STANDALONE_HTML_FILES} ${PLU_STANDALONE_TXT_FILES}
+	${MKINSTALLDIRS} ${install_prefix}
+	${MKINSTALLDIRS} ${install_infodir}
+	${INSTALL_DATA} plural.hlp ${install_infodir}
+	cp plural.hlp singular.hlp
+	chmod -R +rX ${install_infodir}
+	${MKINSTALLDIRS} ${install_htmldir}
+	cp ${PLU_HTML_SUBDIR}/*.htm ${install_htmldir}
+	cp ${PLU_HTML_SUBDIR}/*.gif ${install_htmldir}
+	- cp ${PLU_HTML_SUBDIR}/*.jpg ${install_htmldir}
+	chmod -R +rX ${install_htmldir}
+	${MKINSTALLDIRS} ${install_docdir}
+	${INSTALL_DATA} plural.idx ${install_docdir}
+	${INSTALL_DATA} ../GPL ${install_prefix}/GPL
+	${INSTALL_DATA} COPYING.plural.txt ${install_prefix}/COPYING
+	${INSTALL_DATA} COPYING.plural.html ${install_prefix}/COPYING.html
+	${INSTALL_DATA} NEWS.plural.txt ${install_prefix}/NEWS
+	${INSTALL_DATA} NEWS.plural.html ${install_prefix}/NEWS.html
+	chmod -R +rX ${install_docdir}
+	chmod -R +rX ${install_prefix}
+	if test -f examples; then \
+		${MKINSTALLDIRS} ${install_exdir}; \
+		cp -R examples ${install_prefix}; \
+		/bin/rm -f ${install_prefix}/examples/[A-Z]*.res; \
+		/bin/rm -f ${install_prefix}/examples/*.res; \
+		/bin/rm -f ${install_prefix}/examples/[A-Z]*.inc; \
+		/bin/rm -f ${install_prefix}/examples/*.inc; \
+	fi
+	chmod -R +rX ${install_prefix}/
+
+
 # use 'make INSTALL_unix.olaf.txt INSTALL_unix.olaf.html SINGUNAME=olaf'
 # to generate these files for uname 'olaf'
 install-bindist: INSTALL_unix.${SINGUNAME}.txt INSTALL_unix.${SINGUNAME}.html
 	${MKINSTALLDIRS} ${install_prefix}
 	${INSTALL_DATA} INSTALL_unix.${SINGUNAME}.txt ${install_prefix}/INSTALL
 	${INSTALL_DATA} INSTALL_unix.${SINGUNAME}.html ${install_prefix}/INSTALL.html
+
+install-bindist-plural:
+	${MAKE} install-bindist SINGUNAME=plural
 
 install-ftp: ${STANDALONE_HTML_FILES} ${STANDALONE_TXT_FILES}
 	${INSTALL_DATA} NEWS.txt ${ftpdir}/NEWS

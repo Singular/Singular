@@ -54,3 +54,12 @@ install-sharedist: all
 	${INSTALL_DATA} .emacs-general ${emacsdir}
 	${INSTALL_DATA} singular.xpm	${emacsdir}
 
+install-sharedist-plural: cmd-cmpl.el hlp-cmpl.el lib-cmpl.el
+	${MKINSTALLDIRS} ${emacsdir}
+	${INSTALL_DATA} cmd-cmpl.el ${emacsdir}
+	${INSTALL_DATA} lib-cmpl.el ${emacsdir}
+	${INSTALL_DATA} hlp-cmpl.el ${emacsdir}
+	${INSTALL_DATA} singular.el ${emacsdir}
+	${INSTALL_DATA} .emacs-singular ${emacsdir}
+	${INSTALL_DATA} .emacs-general ${emacsdir}
+	${INSTALL_DATA} singular.xpm	${emacsdir}
