@@ -1,4 +1,4 @@
-// $Id: all.lib,v 1.5 1997-12-12 16:55:25 Singular Exp $
+// $Id: all.lib,v 1.6 1998-03-10 13:02:33 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
 LIBRARY:  all.lib   Load all libraries
@@ -16,9 +16,8 @@ LIBRARY:  all.lib   Load all libraries
   matrix.lib    PROCEDURES FOR MATRIX OPERATIONS
   poly.lib      PROCEDURES FOR MANIPULATING POLYS, IDEALS, MODULES        
   presolve.lib  PROCEDURES FOR PRE-SOLVING POLYNOMIAL EQUATIONS
-  primdec.lib   PROCEDURES FOR PRIMARY DECOMPOSITION (G/T/Z)
+  primdec.lib   PROCEDURES FOR PRIMARY DECOMPOSITION
   primitiv.lib  PROCEDURES FOR FINDING A PRIMITIVE ELEMENT
-  prim_dec.lib  PROCEDURES FOR PRIMARY DECOMPOSITION (S/Y)
   random.lib    PROCEDURES OF RANDOM MATRIX AND POLY OPERATIONS
   ring.lib      PROCEDURES FOR MANIPULATING RINGS AND MAPS
   sing.lib      PROCEDURES FOR SINGULARITIES
@@ -42,7 +41,6 @@ LIB "poly.lib";
 LIB "presolve.lib";
 LIB "primdec.lib";
 LIB "primitiv.lib";
-LIB "prim_dec.lib";
 LIB "random.lib";
 LIB "ring.lib";
 LIB "sing.lib";
