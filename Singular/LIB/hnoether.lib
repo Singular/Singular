@@ -1,10 +1,10 @@
-// $Id: hnoether.lib,v 1.14 1999-07-07 16:38:25 obachman Exp $
+// $Id: hnoether.lib,v 1.15 1999-07-19 10:32:45 obachman Exp $
 // author:  Martin Lamm,  email: lamm@mathematik.uni-kl.de
 // last change:           09.03.99
 ///////////////////////////////////////////////////////////////////////////////
 // This library is for Singular 1.2 or newer
 
-version="$Id: hnoether.lib,v 1.14 1999-07-07 16:38:25 obachman Exp $";
+version="$Id: hnoether.lib,v 1.15 1999-07-19 10:32:45 obachman Exp $";
 info="
 LIBRARY:  hnoether.lib   PROCEDURES FOR THE HAMBURGER-NOETHER DEVELOPMENT
 
@@ -1542,20 +1542,30 @@ proc displayHNE(list ldev,list #)
          (output list of develop(f) or reddevelop(f)), n=int
 RETURN:  - if only one argument is given, no return value, but
          display an ideal HNE of the following form:
+
             HNE[1]=-y+[]*z(0)^1+[]*z(0)^2+...+z(0)^<>*z(1)
+
             HNE[2]=-x+          []*z(1)^2+...+z(1)^<>*z(2)
+
             HNE[3]=             []*z(2)^2+...+z(2)^<>*z(3)
+
             .......             ..........................
+
             HNE[r+1]=           []*z(r)^2+[]*z(r)^3+......
+
      where x,y are the indeterminates of the basering. The values of [] are
      the coefficients of the Hamburger-Noether matrix, the values of <> are
      represented in the HN-matrix as 'x'
+
          the 1st line (HNE[1]) means that y==[]*z(0)^1+... ,
+
          the 2nd line (HNE[2]) means that x==[]*z(1)^2+...
+
      so you can see which indeterminate corresponds to which line
      (it's also possible that x corresponds to the 1st line and y to the 2nd)
          - if a second argument is given, create and export a new ring with
          name 'displayring' containing an ideal 'HNE' as described above
+
 
      If ldev contains the output of reddevelop(f), displayHNE shows the HNE's
      of all branches of f in the form described above.
@@ -1956,7 +1966,8 @@ example
    kill HNEring;
   }
   ring exring=0,(x,y),dp;
-  list hne=reddevelop(x14-3y2x11-y3x10-y2x9+3y4x8+y5x7+3y4x6+x5*(-y6+y5)-3y6x3-y7x2+y8);
+  list hne=reddevelop(x14-3y2x11-y3x10-y2x9+3y4x8+y5x7+3y4x6+x5*(-y6+y5)
+                      -3y6x3-y7x2+y8);
   print(hne[1][1]); // finite HNE
   print(extdevelop(hne[1],5)[1]);
   pause("Hit RETURN to continue");
@@ -1973,9 +1984,9 @@ example
   print(extdevelop(develop(x-y2-2y3-3y4),10)[1]);
   kill HNEring,exring;
   echo = 0;
-  if (defined(rettering)) { // wenn aktueller Ring vor Aufruf von example
-   setring rettering;       // HNEring war, muss dieser erst wieder restauriert
-   def HNEring=rettering;   // werden
+  if (defined(rettering)) { 
+   setring rettering;       
+   def HNEring=rettering;   
    export HNEring;
   }
 }
@@ -2434,9 +2445,9 @@ example
   HNEring;
   kill HNEring,r;
   echo = 0;
-  if (defined(rettering)) { // wenn aktueller Ring vor Aufruf von example
-   setring rettering;       // HNEring war, muss dieser erst wieder restauriert
-   def HNEring=rettering;   // werden
+  if (defined(rettering)) { 
+   setring rettering;       
+   def HNEring=rettering;   
    export HNEring;
   }
 }

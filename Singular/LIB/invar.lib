@@ -1,4 +1,4 @@
-// $Id: invar.lib,v 1.11 1999-07-07 16:38:26 obachman Exp $
+// $Id: invar.lib,v 1.12 1999-07-19 10:32:46 obachman Exp $
 ///////////////////////////////////////////////////////
 // invar.lib
 // algorithm for computing the ring of invariants under
@@ -6,7 +6,7 @@
 // written by Gerhard Pfister
 //////////////////////////////////////////////////////
 
-version="$Id: invar.lib,v 1.11 1999-07-07 16:38:26 obachman Exp $";
+version="$Id: invar.lib,v 1.12 1999-07-19 10:32:46 obachman Exp $";
 info="
 LIBRARY: invar.lib  PROCEDURES FOR COMPUTING INVARIANTS OF (C,+)-ACTIONS
 
@@ -622,9 +622,6 @@ example
   n[5,1]=1+x(1)*y(2)^2;
 
   der(n,disc);
-
-  //x(1)^3*y(2)^6-6*x(1)^2*y(1)*y(2)^3*z+6*x(1)^2*y(2)^4+9*x(1)*y(1)^2*z^2-18*x(1)*y(1)*y(2)*z+9*x(1)*y(2)^2+4
-
 
   //constructive approach to Weizenbcks theorem
 

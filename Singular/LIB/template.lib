@@ -1,0 +1,91 @@
+////////////////////////////////////////////////////////////////////
+// version string automatically expanded by CVS
+version="$Id: template.lib,v 1.1 1999-07-19 10:32:47 obachman Exp $";
+// summary descriptionof the library
+info="
+LIBRARY:   template.lib  A TEMPLATE FOR A SINGULAR LIBRARY
+
+AUTHOR:    Olaf Bachmann, email: obachman@mathematik.uni-kl.de
+
+SEE ALSO:  standard_lib, Guidelines for writing a library, 
+           Typesetting of help strings
+
+PROCEDURES:
+  mdouble(int)           return double of int argument
+  mtripple(int)          return three times int argument
+  msum([int,..,int])     sum of int arguments
+";
+////////////////////////////////////////////////////////////////////
+proc mdouble(int i)
+"USAGE:  mdouble(i); i int
+RETURN:  int: i+i 
+NOTE:    Help string is in pure ASCII
+         this line starts on a new line since previous line is short
+         mdouble(i): also starts on a new line since it starts with a 
+         function, notice that function is typeset in typewriter font.
+SEE ALSO: msum, mtripple, Typesetting of help strings
+EXAMPLE: example mdouble; shows an example"
+{
+  return (i + i);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  mdouble(0);
+  mdouble(-1);
+}
+////////////////////////////////////////////////////////////////////
+proc mtripple(int i)
+"@c we do texinfo here
+@table @asis
+@item @strong{Usage:}
+@code{mtripple(i)}; @code{i} int
+
+@item @strong{Return:}
+int: @math{i+i+i}
+@item @strong{Note:}
+Help is in pure Texinfo
+@*This help string is written in texinfo, which enables you to use,
+among others, the @@math command for mathematical typesetting (like
+@math{\alpha, \beta}).
+@*It also gives more control over the layout, but is, admittingly, 
+more cumbersome to write.
+@end table
+@c use @c ref contstuct for references
+@c ref
+mdouble, msum, Typesetting of help strings
+@c ref
+"
+{
+  return (i + i + i);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  mtripple(0);
+  mtripple(-1);
+}
+////////////////////////////////////////////////////////////////////
+proc msum(list #)
+"USAGE:  msum([i_1,..,i_n]); @code{i_1,..,i_n} def
+RETURN:  Sum of int arguments
+NOTE:    This help string is written in a mixture of ASCII and texinfo
+         @* Use @code  for typewriter font (like @code{i_1})
+         @* Use @math  for math mode typesetting (like @math{i_1}).
+SEE ALSO: mdouble, mtripple, Typesetting of help strings
+EXAMPLE: example msum; shows an example"
+{
+  if (size(#) == 0) { return (0);}
+  if (size(#) == 1) { return (#[1]);}
+  int i;
+  def s = #[1];
+  for (i=2; i<=size(#); i++)
+  {
+    s = s + #[i];
+  }
+  return (s);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  msum();
+  msum(4);
+  msum(1,2,3,4);
+}
