@@ -1,7 +1,7 @@
-// $Id: all.lib,v 1.9 1998-05-13 17:26:11 Singular Exp $
+// $Id: all.lib,v 1.10 1998-05-14 18:26:51 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: all.lib,v 1.9 1998-05-13 17:26:11 Singular Exp $";
+version="$Id: all.lib,v 1.10 1998-05-14 18:26:51 Singular Exp $";
 info="
 LIBRARY:  all.lib   Load all libraries
           
@@ -9,7 +9,7 @@ LIBRARY:  all.lib   Load all libraries
   deform.lib    PROCEDURES FOR COMPUTING MINIVERSAL DEFORMATION
   elim.lib      PROCEDURES FOR ELIMINATION, SATURATION AND BLOWING UP
   factor.lib    PROCEDURES FOR CALLING EXTERNAL FACTORIZER
-  fastsolv.lib
+  fastsolv.lib  PROCEDURES FOR SIMPLIFICATION, etc.
   finvar.lib    PROCEDURES TO CALCULATE INVARIANT RINGS & MORE
   general.lib   PROCEDURES OF GENERAL TYPE
   graphics.lib  PROCEDURES TO DRAW WITH MATHEMATICA
@@ -18,7 +18,7 @@ LIBRARY:  all.lib   Load all libraries
   inout.lib     PROCEDURES FOR MANIPULATING IN- AND OUTPUT
   invar.lib     PROCEDURES FOR COMPUTING INVARIANTS OF (C,+)-ACTIONS
   matrix.lib    PROCEDURES FOR MATRIX OPERATIONS
-  normal.lib
+  normal.lib    PROCEDURES FOR COMPUTING THE NORMALIZATION
   poly.lib      PROCEDURES FOR MANIPULATING POLYS, IDEALS, MODULES        
   presolve.lib  PROCEDURES FOR PRE-SOLVING POLYNOMIAL EQUATIONS
   primdec.lib   PROCEDURES FOR PRIMARY DECOMPOSITION
