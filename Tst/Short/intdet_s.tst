@@ -1,12 +1,15 @@
-// $Id: intdet_s.tst,v 1.1.1.1 1998-04-17 15:07:40 obachman Exp $
+// $Id: intdet_s.tst,v 1.2 1998-04-21 14:10:06 schmidt Exp $
 
 //
 // indet_s.tst - short tests for integer determinant.
 //
+// Most of the examples have been generated using the `sparsemat()'
+// function from `random.lib'.
+//
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID  : $Id: intdet_s.tst,v 1.1.1.1 1998-04-17 15:07:40 obachman Exp $");
+tst_ignore("CVS ID  : $Id: intdet_s.tst,v 1.2 1998-04-21 14:10:06 schmidt Exp $");
 
 ring r=0,x,dp;
 
