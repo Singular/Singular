@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.16 1997-09-30 08:23:00 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.17 1997-10-21 11:29:17 schmidt Exp $
 
 #
 # GNUmakefile.in - used by configure to create GNUmakefile, the
@@ -296,7 +296,8 @@ hdrtempldep :=	$(hdrtemplsrc:.template=.d)
 distsrc :=	\
 		$(distfactorysrc) $(distmemmansrc) \
 		$(addprefix templates/,$(templatesrc)) \
-		readcf.cc ftmpl_inst.cc gengftables.cc
+		readcf.cc ftmpl_inst.cc \
+		gengftables.cc test_install.cc
 
 # all the C/C++ include files in the distribution
 distincl :=	\
@@ -316,7 +317,7 @@ distfiles :=	\
 #
 .PHONY:		all cf mem dist depend \
 		clean mostlyclean distclean maintainer-clean \
-		install installcf installmem installgftables \
+		install installcf installmem installgftables installtest \
 		uninstall uninstallcf uninstallmem uninstallgftables
 
 #
@@ -373,7 +374,17 @@ ftmpl_inst.o:	ftmpl_inst.cc factoryconf.h factory.h \
 		$(addprefix templates/,$(templateincl))
 		$(CXX) -c $< $(TMPLCXXFLAGS) -o $@
 
-# this are not all dependencies, but the most important ones
+# specify dependency in case user does not 'make depend'
+factoryconf.h:	config.h
+
+TAGS:
+		etags $(addprefix $(srcdir)/, $(distsrc) $(distincl))
+
+#
+# - GF(q) table generation.
+#
+
+# these are not all dependencies, but the most important ones
 gengftables.o:	gengftables.cc factory.h gf_tabutil.h \
 		factoryconf.h config.h
 		@if test -z "$(filter mem,$(alltargets))" \
@@ -394,11 +405,32 @@ gftables:	gengftables
 		$(MKINSTALLDIRS) gftables
 		./gengftables
 
-# specify dependency in case user does not 'make depend'
-factoryconf.h:	config.h
+#
+# - installation test program.
+#
 
-TAGS:
-		etags $(addprefix $(srcdir)/, $(distsrc) $(distincl))
+# compile installation test program.  do not look up
+# header files in current directory or in $(srcdir), but use
+# the header files from the directory where they should be
+# after installation.
+test_install.o: test_install.cc
+		$(CXX) -c $< $(TESTCXXFLAGS) -I- -I$(includedir) -o $@
+
+# the same we do for ftmpl_inst.o which for this reason is named
+# iftmpl_inst.o
+iftmpl_inst.o:
+		$(CXX) -c $(templatedir)/ftmpl_inst.cc $(TMPLCXXFLAGS) -I- -I$(includedir) -o $@
+
+# link installation test program
+test_install:	test_install.o iftmpl_inst.o
+		$(CXX) $^ -L$(libdir) -lcf -lcfmem $(TESTLDFLAGS) -o $@
+
+installtest:	test_install
+		@-if ./test_install; then \
+		  echo "Installation seems ok."; \
+		else \
+		  echo "Please check path of your GF(q) tables in config.h."; \
+		fi
 
 #
 # - install targets.
@@ -484,7 +516,8 @@ dist:		$(srcdir)/readcf.cc $(srcdir)/configure
 # - cleaning up.
 #
 clean:		
-		-rm -f $(libfactory) libcfmem.a gengftables \
+		-rm -f $(libfactory) libcfmem.a \
+		  gengftables test_install \
 		  factoryconf.h factory.h *.o *.d
 
 # remove gftables only if we built them
