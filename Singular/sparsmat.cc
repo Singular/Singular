@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.42 2000-10-19 15:00:22 obachman Exp $ */
+/* $Id: sparsmat.cc,v 1.43 2000-11-16 15:02:53 obachman Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -737,10 +737,10 @@ void sparse_mat::smNewWeights()
 */
 void sparse_mat::smNewPivot()
 {
-  float wopt = 1.0e30, hp = piv->f;
-  float wc, wr, wp, w;
+  double wopt = 1.0e30, hp = piv->f;
+  double wc, wr, wp, w;
   smpoly a;
-  int i, copt, ropt, f, e = crd;
+  int i, copt=0, ropt=0, f, e = crd;
 
   this->smNewWeights();
   for (i=act; i; i--)
