@@ -1,8 +1,8 @@
-// $Id: deform.lib,v 1.7 1998-04-03 22:46:59 krueger Exp $
+// $Id: deform.lib,v 1.8 1998-04-23 17:25:20 Singular Exp $
 //(bm, last modified 12/97)   
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: deform.lib,v 1.7 1998-04-03 22:46:59 krueger Exp $";
+version="$Id: deform.lib,v 1.8 1998-04-23 17:25:20 Singular Exp $";
 info="
 LIBRARY:  deform.lib       PROCEDURES FOR COMPUTING MINIVERSAL DEFORMATION
                             (new version)
@@ -137,7 +137,6 @@ setring  Po;
   matrix homR = transpose(Ro);
   matrix homFR= concat(homR,homF);
   print(homFR);
-  test(6);
   module hom' = std(homFR);
   matrix Js[1][@t2]; 
   matrix F_R,Fs,Rs,Fn,Rn; 
