@@ -1,36 +1,36 @@
-// $Id: IP.lib,v 1.1.1.1 2000-05-02 12:58:31 Singular Exp $
+// $Id: IP.lib,v 1.2 2000-05-11 09:04:05 Singular Exp $
 //
 // author : Christine Theis
 //
 
-//version="$Id: IP.lib,v 1.1.1.1 2000-05-02 12:58:31 Singular Exp $";
+//version="$Id: IP.lib,v 1.2 2000-05-11 09:04:05 Singular Exp $";
 
 ///////////////////////////////////////////////////////////////////////////////
 
 info="
-LIBRARY: IP.lib		PROCEDURES FOR INTEGER PROGRAMMING USING GROEBNER BASIS METHODS    
+LIBRARY: IP.lib                PROCEDURES FOR INTEGER PROGRAMMING USING GROEBNER BASIS METHODS
 
 
 Let A an integral (mxn)-matrix, b a vector with m integral
 coefficients and c a vector with n nonnegative integral coefficients. The
-solution of the IP-problem 
-          
+solution of the IP-problem
+
 (*)    minimize{ cx | Ax=b, all components of x are nonnegative integers }
-              
+
 proceeds in two steps:
-           
+
 1. We compute the toric ideal of A and its Groebner basis with respect
    to a term ordering refining the cost function c (such an ordering
    exists because c is nonnegative).
-            
+
 2. We reduce the right hand vector b or an initial solution of the problem
    modulo this ideal.
-              
+
 For these purposes, we can use seven different algorithms:
 The algorithm of Conti/Traverso (ct) can compute an optimal solution
 of the IP-problem directly from the right hand vector b. The same is
 true for its `positive' variant (pct) which can only be applied if A
-and b have nonnegative entries, but should be faster in that case. 
+and b have nonnegative entries, but should be faster in that case.
 All other algorithms need initial solutions of the IP-problem. Except
 from the Conti-Traverso algorithm with elimination (ect),
 they should be more efficient than the algorithm mentionned before.
@@ -39,56 +39,54 @@ These are the algorithms of Pottier (pt), Bigatti/La Scala/Robbiano
 seem to be the fastest in the actual implementation.
 
 
-solve_IP(intmat A, intvec bx, intvec c, string alg);	
+solve_IP(intmat A, intvec bx, intvec c, string alg);
 solve_IP(intmat A, list bx, intvec c, string alg);
-solve_IP(intmat A, intvec bx, intvec c, string alg, intvec prsv);	
+solve_IP(intmat A, intvec bx, intvec c, string alg, intvec prsv);
 solve_IP(intmat A, list bx, intvec c, string alg, intvec prsv);
-	
-	procedures for solving the IP-problem (*) 
-    They return the solution(s) of the given problem(s) or the 
+
+        procedures for solving the IP-problem (*)
+    They return the solution(s) of the given problem(s) or the
     message `not solvable'.
     `alg' may be one of the algorithm abbreviations as above.
-    If `alg' is chosen to be `ct' or `pct', bx is read as the right 
+    If `alg' is chosen to be `ct' or `pct', bx is read as the right
     hand vector b of the system Ax=b. b should then be an intvec of
     size m where m is the number of rows of A. Furthermore, bx and
-    A should be nonnegative if `pct' is used. 
-	If `alg' is chosen to be `ect',`pt',`blr',`hs' or `du', bx is
-	read as an initial solution x of the system Ax=b. bx should
-	then be a nonnegative intvec of size n where n is the number
-	of columns of A.
+    A should be nonnegative if `pct' is used.
+        If `alg' is chosen to be `ect',`pt',`blr',`hs' or `du', bx is
+        read as an initial solution x of the system Ax=b. bx should
+        then be a nonnegative intvec of size n where n is the number
+        of columns of A.
     If `alg' is chosen to be `blr' or `hs', the algorithm needs a
     vector with positive coefficcients in the row space of A. If
     no row of A contains only positive entries, one must use the
     versions of solve_IP which take such a vector prsv as
-    argument. 
-	solve_IP may also be called with a list bx of intvecs instead
-	of a single intvec.       
-    
-                          
+    argument.
+        solve_IP may also be called with a list bx of intvecs instead
+        of a single intvec.
+
+
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
-
 static proc solve_IP_1(intmat A, intvec bx, intvec c, string alg)
-{	
+{
   intvec v;
   // to be returned
 
   // check arguments as far as necessary
-  // other inconsistencies are detected by the external program	
+  // other inconsistencies are detected by the external program
   if(size(c)!=ncols(A))
   {
     "ERROR: number of matrix columns must equal size of cost vector";
     return(v);
-  }	
+  }
 
   // create first temporary file with that the external program is
-  // called 
+  // called
 
   int process=system("pid");
-  string matrixfile="temp_MATRIX"+string(process);	
+  string matrixfile="temp_MATRIX"+string(process);
   link MATRIX=":w "+matrixfile;
   open(MATRIX);
 
@@ -106,12 +104,12 @@ static proc solve_IP_1(intmat A, intvec bx, intvec c, string alg)
       write(MATRIX,A[i,j]);
     }
   }
- 
+
   // search for positive row space vector, if required by the
-  // algorithm    
+  // algorithm
   int found=0;
   if((alg=="blr") || (alg=="hs"))
-  { 
+  {
     for(i=1;i<=nrows(A);i++)
     {
       found=i;
@@ -129,14 +127,14 @@ static proc solve_IP_1(intmat A, intvec bx, intvec c, string alg)
     }
     if(found==0)
     {
-      "ERROR: algorithm needs positive vector in the row space of the matrix";     
+      "ERROR: algorithm needs positive vector in the row space of the matrix";
       close(MATRIX);
       system("sh","rm -f "+matrixfile);
       return(v);
-    } 
+    }
     write(MATRIX,"positive row space vector:");
     for(j=1;j<=ncols(A);j++)
-    { 
+    {
       write(MATRIX,A[found,j]);
     }
   }
@@ -144,11 +142,11 @@ static proc solve_IP_1(intmat A, intvec bx, intvec c, string alg)
 
   // create second temporary file for the external program
 
-  string problemfile="temp_PROBLEM"+string(process);	
+  string problemfile="temp_PROBLEM"+string(process);
   link PROBLEM=":w "+problemfile;
   open(PROBLEM);
 
-  write(PROBLEM,"PROBLEM","vector size:",size(bx),"number of instances:",1,"right hand or initial solution vectors:"); 
+  write(PROBLEM,"PROBLEM","vector size:",size(bx),"number of instances:",1,"right hand or initial solution vectors:");
   for(i=1;i<=size(bx);i++)
   {
     write(PROBLEM,bx[i]);
@@ -164,7 +162,7 @@ static proc solve_IP_1(intmat A, intvec bx, intvec c, string alg)
   int pos;
   string s;
   if(alg=="ct" || alg=="pct")
-  { 
+  {
     pos=find(solution,"NO");
     if(pos!=0)
     {
@@ -192,7 +190,7 @@ static proc solve_IP_1(intmat A, intvec bx, intvec c, string alg)
     }
   }
   else
-  { 
+  {
     pos=find(solution,"optimal");
     pos=find(solution,":",pos);
     pos++;
@@ -211,7 +209,7 @@ static proc solve_IP_1(intmat A, intvec bx, intvec c, string alg)
       execute("v[j]="+s+";");
     }
   }
-     
+
   // delete all created files
   dummy=system("sh","rm -f "+matrixfile);
   dummy=system("sh","rm -f "+matrixfile+".GB."+alg);
@@ -221,20 +219,18 @@ static proc solve_IP_1(intmat A, intvec bx, intvec c, string alg)
   return(v);
 }
 
-
-
 static proc solve_IP_2(intmat A, list bx, intvec c, string alg)
-{	
+{
   list l;;
   // to be returned
 
   // check arguments as far as necessary
-  // other inconsistencies are detected by the external program	
+  // other inconsistencies are detected by the external program
   if(size(c)!=ncols(A))
   {
     "ERROR: number of matrix columns must equal size of cost vector";
     return(l);
-  }	
+  }
 
   int k;
   for(k=2;k<=size(bx);k++)
@@ -247,10 +243,10 @@ static proc solve_IP_2(intmat A, list bx, intvec c, string alg)
   }
 
   // create first temporary file with that the external program is
-  // called 
+  // called
 
   int process=system("pid");
-  string matrixfile="temp_MATRIX"+string(process);	
+  string matrixfile="temp_MATRIX"+string(process);
   link MATRIX=":w "+matrixfile;
   open(MATRIX);
 
@@ -268,12 +264,12 @@ static proc solve_IP_2(intmat A, list bx, intvec c, string alg)
       write(MATRIX,A[i,j]);
     }
   }
- 
+
   // search for positive row space vector, if required by the
-  // algorithm    
+  // algorithm
   int found=0;
   if((alg=="blr") || (alg=="hs"))
-  { 
+  {
     for(i=1;i<=nrows(A);i++)
     {
       found=i;
@@ -291,14 +287,14 @@ static proc solve_IP_2(intmat A, list bx, intvec c, string alg)
     }
     if(found==0)
     {
-      "ERROR: algorithm needs positive vector in the row space of the matrix";     
+      "ERROR: algorithm needs positive vector in the row space of the matrix";
       close(MATRIX);
       system("sh","rm -f "+matrixfile);
       return(l);
-    } 
+    }
     write(MATRIX,"positive row space vector:");
     for(j=1;j<=ncols(A);j++)
-    { 
+    {
       write(MATRIX,A[found,j]);
     }
   }
@@ -306,11 +302,11 @@ static proc solve_IP_2(intmat A, list bx, intvec c, string alg)
 
   // create second temporary file for the external program
 
-  string problemfile="temp_PROBLEM"+string(process);	
+  string problemfile="temp_PROBLEM"+string(process);
   link PROBLEM=":w "+problemfile;
   open(PROBLEM);
 
-  write(PROBLEM,"PROBLEM","vector size:",size(bx[1]),"number of instances:",size(bx),"right hand or initial solution vectors:"); 
+  write(PROBLEM,"PROBLEM","vector size:",size(bx[1]),"number of instances:",size(bx),"right hand or initial solution vectors:");
   for(k=1;k<=size(bx);k++)
   {
     for(i=1;i<=size(bx[1]);i++)
@@ -330,10 +326,10 @@ static proc solve_IP_2(intmat A, list bx, intvec c, string alg)
   int pos,pos1,pos2;
   string s;
   if(alg=="ct" || alg=="pct")
-  { 
+  {
     pos=1;
     for(k=1;k<=size(bx);k++)
-    {      
+    {
       pos1=find(solution,"NO",pos);
       pos2=find(solution,"YES",pos);
       if(pos1!=0 && (pos1<pos2 || pos2==0))
@@ -358,7 +354,7 @@ static proc solve_IP_2(intmat A, list bx, intvec c, string alg)
           {
             s=s+solution[pos];
             pos++;
-          }  
+          }
           execute("v[j]="+s+";");
         }
         l=insert(l,v,size(l));
@@ -366,7 +362,7 @@ static proc solve_IP_2(intmat A, list bx, intvec c, string alg)
     }
   }
   else
-  { 
+  {
     pos=1;
     for(k=1;k<=size(bx);k++)
     {
@@ -384,13 +380,13 @@ static proc solve_IP_2(intmat A, list bx, intvec c, string alg)
         {
           s=s+solution[pos];
           pos++;
-        }  
+        }
         execute("v[j]="+s+";");
       }
       l=insert(l,v,size(l));
     }
   }
-     
+
   // delete all created files
   dummy=system("sh","rm -f "+matrixfile);
   dummy=system("sh","rm -f "+matrixfile+".GB."+alg);
@@ -400,32 +396,30 @@ static proc solve_IP_2(intmat A, list bx, intvec c, string alg)
   return(l);
 }
 
-
-
 static proc solve_IP_3(intmat A, intvec bx, intvec c, string alg, intvec prsv)
-{	
+{
   intvec v;
   // to be returned
 
   // check arguments as far as necessary
-  // other inconsistencies are detected by the external program	
+  // other inconsistencies are detected by the external program
   if(size(c)!=ncols(A))
   {
     "ERROR: number of matrix columns must equal size of cost vector";
     return(v);
-  }	
+  }
 
   if(size(prsv)!=ncols(A))
   {
     "ERROR: number of matrix columns must equal size of positive row space vector";
     return(v);
-  }	
+  }
 
   // create first temporary file with that the external program is
-  // called 
+  // called
 
   int process=system("pid");
-  string matrixfile="temp_MATRIX"+string(process);	
+  string matrixfile="temp_MATRIX"+string(process);
   link MATRIX=":w "+matrixfile;
   open(MATRIX);
 
@@ -443,13 +437,13 @@ static proc solve_IP_3(intmat A, intvec bx, intvec c, string alg, intvec prsv)
       write(MATRIX,A[i,j]);
     }
   }
- 
+
   // enter positive row space vector, if required by the algorithm
   if((alg=="blr") || (alg=="hs"))
-  { 
+  {
     write(MATRIX,"positive row space vector:");
     for(j=1;j<=ncols(A);j++)
-    { 
+    {
       write(MATRIX,prsv[j]);
     }
   }
@@ -457,11 +451,11 @@ static proc solve_IP_3(intmat A, intvec bx, intvec c, string alg, intvec prsv)
 
   // create second temporary file for the external program
 
-  string problemfile="temp_PROBLEM"+string(process);	
+  string problemfile="temp_PROBLEM"+string(process);
   link PROBLEM=":w "+problemfile;
   open(PROBLEM);
 
-  write(PROBLEM,"PROBLEM","vector size:",size(bx),"number of instances:",1,"right hand or initial solution vectors:"); 
+  write(PROBLEM,"PROBLEM","vector size:",size(bx),"number of instances:",1,"right hand or initial solution vectors:");
   for(i=1;i<=size(bx);i++)
   {
     write(PROBLEM,bx[i]);
@@ -477,7 +471,7 @@ static proc solve_IP_3(intmat A, intvec bx, intvec c, string alg, intvec prsv)
   int pos;
   string s;
   if(alg=="ct" || alg=="pct")
-  { 
+  {
     pos=find(solution,"NO");
     if(pos!=0)
     {
@@ -499,13 +493,13 @@ static proc solve_IP_3(intmat A, intvec bx, intvec c, string alg, intvec prsv)
         {
           s=s+solution[pos];
           pos++;
-        }  
+        }
         execute("v[j]="+s+";");
       }
     }
   }
   else
-  { 
+  {
     pos=find(solution,"optimal");
     pos=find(solution,":",pos);
     pos++;
@@ -520,11 +514,11 @@ static proc solve_IP_3(intmat A, intvec bx, intvec c, string alg, intvec prsv)
       {
         s=s+solution[pos];
         pos++;
-      }  
+      }
       execute("v[j]="+s+";");
     }
   }
-     
+
   // delete all created files
   dummy=system("sh","rm -f "+matrixfile);
   dummy=system("sh","rm -f "+matrixfile+".GB."+alg);
@@ -534,26 +528,24 @@ static proc solve_IP_3(intmat A, intvec bx, intvec c, string alg, intvec prsv)
   return(v);
 }
 
-
-
 static proc solve_IP_4(intmat A, list bx, intvec c, string alg, intvec prsv)
-{	
+{
   list l;
   // to be returned
 
   // check arguments as far as necessary
-  // other inconsistencies are detected by the external program	
+  // other inconsistencies are detected by the external program
   if(size(c)!=ncols(A))
   {
     "ERROR: number of matrix columns must equal size of cost vector";
     return(l);
-  }	
+  }
 
   if(size(prsv)!=ncols(A))
   {
     "ERROR: number of matrix columns must equal size of positive row space vector";
     return(v);
-  }	
+  }
 
   int k;
   for(k=2;k<=size(bx);k++)
@@ -566,10 +558,10 @@ static proc solve_IP_4(intmat A, list bx, intvec c, string alg, intvec prsv)
   }
 
   // create first temporary file with that the external program is
-  // called 
+  // called
 
   int process=system("pid");
-  string matrixfile="temp_MATRIX"+string(process);	
+  string matrixfile="temp_MATRIX"+string(process);
   link MATRIX=":w "+matrixfile;
   open(MATRIX);
 
@@ -587,13 +579,13 @@ static proc solve_IP_4(intmat A, list bx, intvec c, string alg, intvec prsv)
       write(MATRIX,A[i,j]);
     }
   }
- 
+
   // enter positive row space vector if required by the algorithm
   if((alg=="blr") || (alg=="hs"))
-  { 
+  {
     write(MATRIX,"positive row space vector:");
     for(j=1;j<=ncols(A);j++)
-    { 
+    {
       write(MATRIX,prsv[j]);
     }
   }
@@ -601,11 +593,11 @@ static proc solve_IP_4(intmat A, list bx, intvec c, string alg, intvec prsv)
 
   // create second temporary file for the external program
 
-  string problemfile="temp_PROBLEM"+string(process);	
+  string problemfile="temp_PROBLEM"+string(process);
   link PROBLEM=":w "+problemfile;
   open(PROBLEM);
 
-  write(PROBLEM,"PROBLEM","vector size:",size(bx[1]),"number of instances:",size(bx),"right hand or initial solution vectors:"); 
+  write(PROBLEM,"PROBLEM","vector size:",size(bx[1]),"number of instances:",size(bx),"right hand or initial solution vectors:");
   for(k=1;k<=size(bx);k++)
   {
     for(i=1;i<=size(bx[1]);i++)
@@ -625,10 +617,10 @@ static proc solve_IP_4(intmat A, list bx, intvec c, string alg, intvec prsv)
   int pos,pos1,pos2;
   string s;
   if(alg=="ct" || alg=="pct")
-  { 
+  {
     pos=1;
     for(k=1;k<=size(bx);k++)
-    {      
+    {
       pos1=find(solution,"NO",pos);
       pos2=find(solution,"YES",pos);
       if(pos1!=0 && (pos1<pos2 || pos2==0))
@@ -653,7 +645,7 @@ static proc solve_IP_4(intmat A, list bx, intvec c, string alg, intvec prsv)
           {
             s=s+solution[pos];
             pos++;
-          }  
+          }
           execute("v[j]="+s+";");
         }
         l=insert(l,v,size(l));
@@ -661,7 +653,7 @@ static proc solve_IP_4(intmat A, list bx, intvec c, string alg, intvec prsv)
     }
   }
   else
-  { 
+  {
     pos=1;
     for(k=1;k<=size(bx);k++)
     {
@@ -685,7 +677,7 @@ static proc solve_IP_4(intmat A, list bx, intvec c, string alg, intvec prsv)
       l=insert(l,v,size(l));
     }
   }
-     
+
   // delete all created files
   dummy=system("sh","rm -f "+matrixfile);
   dummy=system("sh","rm -f "+matrixfile+".GB."+alg);
@@ -695,22 +687,17 @@ static proc solve_IP_4(intmat A, list bx, intvec c, string alg, intvec prsv)
   return(l);
 }
 
-
-
-
-
-
 proc solve_IP
-"USAGE:   
+"USAGE:
 solve_IP(A,bx,c,alg);       A intmat, bx intvec, c intvec, alg string
-solve_IP(A,bx,c,alg);       A intmat, bx list of intvec, c intvec, alg string 
+solve_IP(A,bx,c,alg);       A intmat, bx list of intvec, c intvec, alg string
 solve_IP(A,bx,c,alg,prsv);  A intmat, bx intvec, c intvec, alg string,
-                            prsv intvec  
+                            prsv intvec
 solve_IP(A,bx,c,alg,prsv);  A intmat, bx list of intvec, c intvec, alg string,
-                            prsv intvec  
-RETURN:  solution of the associated integer programming problem as explained 
+                            prsv intvec
+RETURN:  solution of the associated integer programming problem as explained
          in IP.lib
-         return type = type of bx 
+         return type = type of bx
 EXAMPLE: example solve_IP;  shows an example"
 {
   if(size(#)==4)
@@ -736,53 +723,47 @@ EXAMPLE: example solve_IP;  shows an example"
     }
   }
 }
-
-
-
 example
 {
-"EXAMPLE"; echo=2;
+  "EXAMPLE"; echo=2;
 
-// call with single right hand vector
-intmat A[2][3]=1,1,0,0,1,1;
-A;
-intvec b1=1,1;
-b1;
-intvec c=2,2,1;
-c;
-intvec solution_vector=solve_IP(A,b1,c,"pct");
-solution_vector;
- 
-// call with list of right hand vectors
-intvec b2=-1,1;
-list l=b1,b2;
-l;
-list solution_list=solve_IP(A,l,c,"ct");
-solution_list;			
+  // call with single right hand vector
+  intmat A[2][3]=1,1,0,0,1,1;
+  A;
+  intvec b1=1,1;
+  b1;
+  intvec c=2,2,1;
+  c;
+  intvec solution_vector=solve_IP(A,b1,c,"pct");
+  solution_vector;
 
-// call with single initial solution vector
-A=2,1,-1,-1,1,2;
-A;
-b1=3,4,5; 
-solution_vector=solve_IP(A,b1,c,"du");
+  // call with list of right hand vectors
+  intvec b2=-1,1;
+  list l=b1,b2;
+  l;
+  list solution_list=solve_IP(A,l,c,"ct");
+  solution_list;
 
-// call with single initial solution vector and algorithm needing a positive
-// row space vector
-solution_vector=solve_IP(A,b1,c,"hs");
+  // call with single initial solution vector
+  A=2,1,-1,-1,1,2;
+  A;
+  b1=3,4,5;
+  solution_vector=solve_IP(A,b1,c,"du");
 
-// call with single initial solution vector and positive row space vector
-intvec prsv=1,2,1;
-prsv;
-solution_vector=solve_IP(A,b1,c,"hs",prsv);
-solution_vector;
- 
-// call with list of initial solution vectors and positive row space vector
-b2=7,8,0;
-l=b1,b2;
-l;
-solution_list=solve_IP(A,l,c,"blr",prsv);
-solution_list;
+  // call with single initial solution vector and algorithm needing a positive
+  // row space vector
+  solution_vector=solve_IP(A,b1,c,"hs");
+
+  // call with single initial solution vector and positive row space vector
+  intvec prsv=1,2,1;
+  prsv;
+  solution_vector=solve_IP(A,b1,c,"hs",prsv);
+  solution_vector;
+
+  // call with list of initial solution vectors and positive row space vector
+  b2=7,8,0;
+  l=b1,b2;
+  l;
+  solution_list=solve_IP(A,l,c,"blr",prsv);
+  solution_list;
 }
-
-
-
