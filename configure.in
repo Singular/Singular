@@ -58,6 +58,9 @@ fi
 if test -d "IntegerProgramming"; then
    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" IntegerProgramming/Makefile"
 fi
+if test -d "Plural"; then
+   OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" Plural/Makefile"
+fi
 if test -d "InstallShield"; then
    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" InstallShield/Makefile InstallShield/Etc/Makefile InstallShield/Cygwin/Makefile InstallShield/Singular/Makefile InstallShield/Xemacs/Makefile"
 fi
@@ -276,6 +279,8 @@ AC_ARG_ENABLE(Singular, \
  [    Singular             CAS for Polynomial Computations])
 AC_ARG_ENABLE(IntegerProgramming, \
  [    IntegerProgramming   IntegerProgramming])
+AC_ARG_ENABLE(Plural, \
+ [    Plural               Plural])
 AC_ARG_ENABLE(Texinfo, \
  [    Texinfo              Texinfo for info, texi2dvi, makeinfo])
 AC_ARG_ENABLE(Texi2html, \
@@ -569,6 +574,17 @@ if test "$enable_IntegerProgramming" != no && test -d "IntegerProgramming"; then
    AC_MSG_RESULT(yes)
    if test "$enable_IntegerProgramming" != yes; then
      ac_configure_args="$ac_configure_args --enable-IntegerProgramming"
+   fi
+else
+   AC_MSG_RESULT(no)
+fi
+
+AC_MSG_CHECKING(whether to build Plural)
+if test "$enable_Plural" != no && test -d "Plural"; then
+   BUILD_SUBDIRS="$BUILD_SUBDIRS Plural"
+   AC_MSG_RESULT(yes)
+   if test "$enable_Plural" != yes; then
+     ac_configure_args="$ac_configure_args --enable-Plural"
    fi
 else
    AC_MSG_RESULT(no)
