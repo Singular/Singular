@@ -1,3 +1,12 @@
+Mon Jun 30 17:53:17 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* INSTALL: Updated installation instructions by new options
+
+	* manipulate CFLAGS only if they were not set in environment
+
+	* configure.in: added --with-rsh and --with-extra_cflags options
+
+
 Tue Jun 24 11:54:31 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
 	* configure.in (BUILD_SUBDIRS): took out condition that default

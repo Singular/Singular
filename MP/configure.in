@@ -7,7 +7,7 @@ AC_INIT(MP/MP_Put.c)
 AC_CONFIG_HEADER(MP/MP_Config.h:MP/h/MP_Config.h.in)
 
 PRODUCT=MP
-VERSION=1.1.2
+VERSION=1.1.2.1
 AC_SUBST(PRODUCT)
 AC_SUBST(VERSION)
 AC_DEFINE_UNQUOTED(MP_VERSION, "$VERSION")
@@ -49,11 +49,13 @@ dnl we do not want to have "-g -O" for CFLAGS
 if test "$with_debug" = yes; then
   if test "${CFLAGS+set}" != set; then  
     CFLAGS="-g"
+    ac_cv_cflags_not_set=yes
   fi
   AC_DEFINE(MPT_DEBUG)
 else
   if test "${CFLAGS+set}" != set; then
     CFLAGS="-O"
+    ac_cv_cflags_not_set=yes
   fi
   AC_DEFINE(NO_LOGGING)
 fi
@@ -111,7 +113,7 @@ dnl add to  CPPFLAGS and LDFLAGS if PVM_ROOT and PVM_ARCH are set
 if test "${PVM_ROOT+set}" = set; then
   if test "$enable_mppvm" = yes || test "$with_pvm" = yes; then
     CPPFLAGS="${CPPFLAGS} -I${PVM_ROOT}/include"
-    if test ${PVM_ARCH+set} = set; then
+    if test "${PVM_ARCH+set}" = set; then
       LDFLAGS="${LDFLAGS} -L{PVM_ROOT}/lib/${PVM_ARCH}"
     fi
   fi
@@ -281,6 +283,13 @@ AC_ARG_WITH(pvm, \
 AC_ARG_WITH(debug, \
  [  --with-debug            build with debug options and logging])
 
+AC_ARG_WITH(extra_cflags, \
+ [  --with-extra_cflags=cflags   build with 'cflags' appended to
+                                 CFLAGS given to the compiler])
+
+AC_ARG_WITH(rsh, \
+ [ --with-rsh=command	   use 'command' as remote shell command])
+
 dnl evaluate specifications
 AC_DEFINE(MP_DUMMY, 0)
 AC_DEFINE(MP_GMP, 1)
@@ -400,6 +409,27 @@ if test "$with_pvm" = yes; then
   fi
 fi
 
+if test "${with_extra_cflags+set}" = set; then
+  CFLAGS="$CFLAGS ${with_extra_cflags}"
+fi
+
+if test "${with_rsh+set}" = set; then
+  ac_cv_rsh_program=${with_rsh}
+else
+  AC_CHECK_PROGS(ac_cv_rsh_program,remsh rsh ssh, none)
+fi
+AC_MSG_CHECKING(which remote shell command to use)
+AC_DEFINE_UNQUOTED(MP_RSH_COMMAND, "$ac_cv_rsh_program")
+AC_MSG_RESULT($ac_cv_rsh_program)
+
+AC_MSG_CHECKING(whether remote shell command works)
+if $ac_cv_rsh_program `hostname` -n uname >\& /dev/null; then
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+  AC_MSG_WARN(Remote shell does not work. Check your .rhosts file)
+fi
+
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_BIGENDIAN
 AC_C_CONST
@@ -419,11 +449,11 @@ CLEAN="rm -f *~ a.out core *.o .log"
 AC_SUBST(CLEAN)
 
 dnl if we use GCC, then we know CFLAGS best and do not let user overwrite it
-if test "${GCC}" = yes; then
+if test "${GCC}" = yes && test "$ac_cv_cflags_not_set" = yes; then
   if test "$with_debug" = yes; then
-    CFLAGS="-g -Wall -Wno-unused"
+    CFLAGS="-g -Wall -Wno-unused ${with_extra_cflags}"
   else
-    CFLAGS="-O3 -w -fomit-frame-pointer"
+    CFLAGS="-O3 -w -fomit-frame-pointer ${with_extra_cflags}"
   fi
 fi
 
@@ -431,21 +461,6 @@ dnl check for args to pass to subconfigure
 if test "$prefix" = NONE; then
   ac_configure_args="$ac_configure_args --prefix=$ac_default_prefix"
 fi
-if test "$libdir" = '${prefix}/lib/'$ac_cv_arch; then
-  if test "$prefix" = NONE; then
-    ac_configure_args="$ac_configure_args --libdir=$ac_default_prefix/lib/$ac_cv_arch"
-  else
-    ac_configure_args="${prefix}/lib/$ac_cv_arch"
-  fi
-fi
-if test "$bindir" = '${prefix}/bin/'$ac_cv_arch; then
-  if test "$prefix" = NONE; then
-    ac_configure_args="$ac_configure_args --bindir=$ac_default_prefix/bin/$ac_cv_arch"
-  else
-    ac_configure_args="${prefix}/bin/$ac_cv_arch"
-  fi
-fi
-
     
 AC_CONFIG_SUBDIRS($CONFIG_SUBDIRS)
 
