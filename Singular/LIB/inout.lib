@@ -1,13 +1,12 @@
 // (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: inout.lib,v 1.19 2000-12-22 14:06:55 greuel Exp $";
+version="$Id: inout.lib,v 1.20 2000-12-30 15:44:31 greuel Exp $";
 category="General purpose";
 info="
 LIBRARY:  inout.lib     Printing and Manipulating In- and Output
 
 PROCEDURES:
  allprint(list);        print list if ALLprint is defined, with pause if >0
- dbpri(n,list);         print objects of list if int n<=printlevel
  lprint(poly/...[,n]);  display poly/... fitting to pagewidth [size n]
  pmat(matrix[,n]);      print form-matrix [first n chars of each colum]
  rMacaulay(string);     read Macaulay_1 output and return its Singular format
@@ -15,7 +14,7 @@ PROCEDURES:
  showrecursive(id,p);   display id recursively with respect to variables in p
  split(string,n);       split given string into lines of length n
  tab(n);                string of n space tabs
- writelist(fil,nam,L);  write the list L into a file `fil` and call it `nam`
+ writelist(...);        write a list into a file and keep the list structure
  pause([prompt]);       stop the computation until user input
            (parameters in square brackets [] are optional)
 ";
@@ -24,9 +23,9 @@ PROCEDURES:
 
 proc allprint (list #)
 "USAGE:   allprint(L);  L list
-CREATE:  display L[1], L[2], ... if an integer with name ALLprint is defined,
-         makes \"pause\",   if ALLprint > 0
-         listvar(matrix), if ALLprint = 2
+DISPLAY: prints L[1], L[2], ... if an integer with name ALLprint is defined.
+@*       makes \"pause\",   if ALLprint > 0
+@*       listvar(matrix), if ALLprint = 2
 RETURN:  no return value
 EXAMPLE: example allprint; shows an example
 "
@@ -50,40 +49,14 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc dbpri (int n ,list #)
-"USAGE:   dbpri(n,L);  n integer, L list
-CREATE:  display L[1], L[2], ... if an integer with name printlevel is defined
-         and if n<=printlevel, set printlevel to 0 if it is not defined
-RETURN:  no return value
-NOTE:    this is uesful to control the printing of comments or partial results
-         in a procedure, e.g. for debugging a procedure.
-         It is similair but not the same as the internal function dbprint
-EXAMPLE: example dbpri; shows an example
-"
-{
-   int i;
-   if( defined(printlevel)==0 ) { int printlevel; export printlevel; }
-   if( n<=printlevel )
-   {
-      for( i=1; i<=size(#); i=i+1 ) {  print(#[i]); }
-   }
-   return();
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   ring s;
-   module M=freemodule(3);
-   dbpri(0,"M =",M);
-}
-///////////////////////////////////////////////////////////////////////////////
-
 proc lprint
 "USAGE:   lprint(id[,n]);  id poly/ideal/vector/module/matrix, n integer
-RETURN:  string of id in a format fitting into lines of size n; if only one
-         argument is present, n = pagewidth
+RETURN:  string of id in a format fitting into lines of size n, such that no
+         monomial gests destroyed, i.e. the new line starts with + or -;
+         (default: n = pagewidth).
 NOTE:    id is printed columnwise, each column separated by a blank line;
          hence lprint(transpose(id)); displays a matrix id in a format which
-         can be used as input to reproduce id
+         can be used as input.
 EXAMPLE: example lprint; shows an example
 "
 {
@@ -128,25 +101,19 @@ example
 { "EXAMPLE:"; echo = 2;
    ring r= 0,(x,y,z),ds;
    poly f=((x+y)*(x-y)*(x+z)*(y+z)^2);
-   short = 0;    // no short output, use * and ^
-   lprint(f,40); newline;
-   ideal i = f^2,x-y,(x+y)^2*f;
-   short = 1;    // short output, omit * and ^
-   lprint(i); newline;
-   module m = [f^2,x-y,(x+y)^2*f],[0,x-y,f^2];
+   lprint(f,40); 
+   module m = [f*(x-y)],[0,f*(x-y)];
    string s=lprint(m); s;"";
-   // the following commands show how to use the string s=lprint(m) (defined
-   // above) as input in order to reproduce m (by defining m1):
-   execute("matrix M[2][3]="+s+";");
-   module m1 = transpose(M);
-   m-m1;
+   execute("matrix M[2][2]="+s+";");      //use the string s as input
+   module m1 = transpose(M);	          //should be the same as m
+   print(m-m1);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc pmat (matrix m, list #)
 "USAGE:   pmat(M,[n]);  M matrix, n integer
-CREATE:  display M in array format if it fits into pagewidth, no return value;
-         if n is given, only the first n characters of each colum are shown
+DISPLAY: display M in array format if it fits into pagewidth; if n is given,
+         only the first n characters of each colum are shown
 RETURN:  no return value
 EXAMPLE: example pmat; shows an example
 "
@@ -216,13 +183,12 @@ example
 
 proc rMacaulay
 "USAGE:   rMacaulay(s[,n]);  s string, n integer
-RETURN:  a string which should be readable by Singular if s is a string read
-         by Singular from a file which was produced by Macaulay_1 (='Macaulay
-         classic'). If a second argument is present the first n lines of the
-         file are deleted (which is useful if the file was prodeuced e.g. by
-         the putstd command of Macaulay)
-NOTE:    This does not always work with 'cut and paste' since, coming
-         from the screen, the character \ is treated differently
+RETURN:  A string which should be readable by Singular if s is a string which 
+         was produced by Macaulay. If a second argument is present the first 
+         n lines of the file are deleted (which is useful if the file was 
+         produced e.g. by the putstd command of Macaulay).
+NOTE:    This does not always work with 'cut and paste' since the character 
+         \ is treated differently
 EXAMPLE: example rMacaulay; shows an example
 "
 {
@@ -307,23 +273,22 @@ EXAMPLE: example rMacaulay; shows an example
 }
 example
 {  "EXAMPLE:"; echo = 2;
-   // Assume there exists a file 'Macid' with the following ideal in Macaulay
-   // format:"
+   // Assume there exists a file 'Macid' with the following ideal in
+   // Macaulay format:"
    // x[0]3-101/74x[0]2x[1]+7371x[0]x[1]2-13/83x[1]3-x[0]2x[2] \
-   //     -4/71x[0]x[1]x[2]-65/64x[1]2x[2]-49/111x[0]x[2]2-x[1]x[2]2 \
-   //     -747x[2]3+6072x[0]2x[3]
-   // You can read this file into Singular and assign it to the string s1 by:
+   //     -4/71x[0]x[1]x[2]
+   // Read this file into Singular and assign it to the string s1 by:
    // string s1 = read("Macid");
    // This is equivalent to";
    string s1 =
-   "x[0]3-101/74x[0]2x[1]+7371x[0]x[1]2-13/83x[1]3-x[0]2x[2]-4/71x[0]x[1]x[2]-65/64x[1]2x[2]-49/111x[0]x[2]2-x[1]x[2]2-747x[2]3+6072x[0]2x[3]";
+   "x[0]3-101/74x[0]2x[1]+7371x[0]x[1]2-13/83x[1]3-x[0]2x[2]-4/71x[0]x[1]x[2]";
    rMacaulay(s1);
    // You may wish to assign s1 to a Singular ideal id:
    string sid = "ideal id =",rMacaulay(s1),";";
    ring r = 0,x(0..3),dp;
    execute(sid);
    id; "";
-   // The next example treats a matrix in Macaulay format. Using the execute
+   // Now treat a matrix in Macaulay format. Using the execute
    // command, this could be assinged to a Singular matrix as above.
    string s2 = "
    0  0  0  0  0
@@ -339,14 +304,14 @@ example
 
 proc show (id, list #)
 "USAGE:   show(id);   id any object of basering or of type ring/qring
-         show(R,s);  R=ring, s=string (s = name of an object belonging to R)
+@*       show(R,s);  R=ring, s=string (s = name of an object belonging to R)
 DISPLAY: display id/s in a compact format together with some information
 RETURN:  no return value
 NOTE:    objects of type string, int, intvec, intmat belong to any ring.
          id may be a ring or a qring. In this case the minimal polynomial is
-         displayed, and, for a qring, also the defining ideal
-         id may be of type list but the list must not contain a ring
-CAUTION: show(R,s) does not work inside a procedure
+         displayed, and, for a qring, also the defining ideal.
+         id may be of type list but the list must not contain a ring.
+@*       show(R,s) does not work inside a procedure!
 EXAMPLE: example show; shows an example
 "
 {
@@ -536,12 +501,13 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc showrecursive (id,poly p,list #)
-"USAGE:   showrecursive(id,p[ord]); id=any object of basering, p=product of
+"USAGE:   showrecursive(id,p[ord]); id= any object of basering, p= product of
          variables and ord=string (any allowed ordstr)
 DISPLAY: display 'id' in a recursive format as a polynomial in the variables
-         occuring in p with coefficients in the remaining variables. Do this
-         by mapping in a ring with parameters [and ordering 'ord', if a 3rd
-         argument is present (default: ord=\"dp\")] and applying procedure 'show'
+         occuring in p with coefficients in the remaining variables. This is
+         done by mapping to a ring with parameters [and ordering 'ord', 
+         if a 3rd argument is present (default: ord=\"dp\")] and applying 
+         procedure 'show'
 RETURN:  no return value
 EXAMPLE: example showrecursive; shows an example
 "
@@ -611,9 +577,8 @@ EXAMPLE:  example split; shows an example
 example
 {  "EXAMPLE:"; echo = 2;
    ring r= 0,(x,y,z),ds;
-   poly f = (x+y+z)^9;
-   split(string(f),40);
-   string s=split(lprint(f,40),40); s;
+   poly f = (x+y+z)^4;
+   split(string(f),50);
    split(lprint(f));
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -636,19 +601,20 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc writelist (string fil, string nam, list L)
-"USAGE:   writelist(fil,nam,L);  fil,nam=strings (file-name, list-name), L=list
-CREATE:  a file with name `fil`, write the content of the list L into it and
-         call the list `nam`.
+"USAGE:   writelist(file,name,L);  file,name strings (file-name, list-name), 
+          L a list.
+CREATE:  a file with name `file`, write the content of the list L into it and
+         call the list `name`, keeping the list structure
 RETURN:  no return value
 NOTE:    The syntax of writelist uses and is similar to the syntax of the
          write command of Singular which does not manage lists properly.
-         If, say, (fil,nam) = (\"listfile\",\"L1\"),  writelist creates (resp.
+         If (file,name) = (\"listfile\",\"L1\"),  writelist creates (resp.
          appends if listfile exists) a file with name listfile and stores
          there the list L under the name L1. The Singular command
          execute(read(\"listfile\")); assignes the content of L (stored in
          listfile) to a list L1.
-         On a UNIX system, overwrite an existing file if fil=\">...\", resp.
-         append if fil=\">>...\".
+@*       On a UNIX system, write(\">file\",...) overwrites an existing file 
+         `file` while write(\"file\",...) and write(\">>file\",...) append.
 EXAMPLE: example writelist; shows an example
 "
 {
@@ -669,22 +635,27 @@ example
    list k="Hi",nameof(basering),i,37;
    writelist("zumSpass","lustig",k);
    read("zumSpass");
-   list L=res(i,0);       //resolution of the maximal ideal
-   writelist("L","L",L);
-   read("L");
-   system("sh","/bin/rm L zumSpass");
-   // Under UNIX, this removes the files 'L' and 'zumSpass'
+   list L=res(i,0);                    //resolution of the ideal i
+   writelist("res_list","res-name",L); "";
+   read("res_list");                   
+   // execute(read("res_list")); would create a list with name res-name,
+   // which is the resolution of i (the same content as L)
+
+   system("sh","/bin/rm res_list zumSpass");
+   // Under UNIX, this removes the files 'res_list' and 'zumSpass'
    // Type help system; to get more information about the shell escape
    // If your operating system does not accept the shell escape, you
-   // have to remove the just created files 'zumSpass' and 'L' directly
+   // must remove the just created files 'zumSpass' and 'res_list' directly
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc pause(list #)
 "USAGE:    pause([ prompt ])  prompt string
 RETURN:   none
-PURPOSE:  pause in the computation till user input
-SEE ALSO: read
+PURPOSE:  interrupt the execution of commands until user input
+NOTE:     pause is useful in procedures in connection with printlevel to 
+          interrupt the computation and to display intermediate results.
+SEE ALSO: read, printlevel
 EXAMPLE : example pause; shows an example
 "
 {
@@ -697,7 +668,22 @@ EXAMPLE : example pause; shows an example
 }
 example
 { "EXAMPLE:"; echo=2;
-  // cannot be shown non-interactively, try the follwing commands without //
+  // can only be shown interactively, try the following commands:
   // pause("press <return> to continue");
   // pause();
+  // In the following pocedure TTT, xxx is printed and the execution of
+  // TTT is stopped until the return-key is pressed, if printlevel>0. 
+  // xxx may be any result of a previous computation or a comment, etc:
+  //
+  // proc TTT
+  // { int pp = printlevel-voice+2;  //pp=0 if printlevel=0 and if TTT is
+  //    ....                         //not called from another procedure
+  //    if( pp>0 )
+  //    { 
+  //       print( xxx );
+  //       pause("press <return> to continue");
+  //    } 
+  //     ....
+  // } 
 }
+///////////////////////////////////////////////////////////////////////////////
