@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: gaussman.lib,v 1.10 2000-12-05 09:50:28 Singular Exp $";
+version="$Id: gaussman.lib,v 1.11 2000-12-05 21:12:22 mschulze Exp $";
 info="
 LIBRARY:  gaussman.lib  GAUSS-MANIN CONNECTION OF A SINGULARITY
 
@@ -136,8 +136,8 @@ static proc redNF(module M,module N,list #)
 
 proc monomat(poly f,list #)
 "USAGE:   <matrix> M=monomat(<poly> f);
+ASSUME:  f isolated singularity
 RETURN:  exp(-2*pi*i*M) is a monodromy matrix
-NOTE:    f isolated singularity
 EXAMPLE: example monomat; shows an example
 "
 {
@@ -346,8 +346,8 @@ example
 
 proc monospec(poly f)
 "USAGE:   <matrix> M=monospec(<poly> f);
+ASSUME:  f isolated singularity
 RETURN:  the spectrum of exp(-2*pi*i*M) is the spectrum of monodromy
-NOTE:    f isolated singularity
 EXAMPLE: example monospec; shows an example
 "
 {
@@ -364,6 +364,7 @@ example
 
 proc vfilt(poly f,list #)
 "USAGE:   <list> l=vfilt(<poly> f);
+ASSUME:  f isolated singularity
 RETURN:  <ideal> l[1] : spectral numbers in increasing order
          <intvec> l[2] :
            <int> l[2][i] : multiplicity of spectral number l[1][i]
@@ -372,7 +373,6 @@ RETURN:  <ideal> l[1] : spectral numbers in increasing order
                               of the V-filtration on H''/H' in terms of l[4]
          <ideal> l[4] : monomial vector space basis of H''/H'
          <ideal> l[5] : standard basis of Jacobian ideal
-NOTE:    f isolated singularity
 EXAMPLE: example vfilt; shows an example
 "
 {
@@ -715,10 +715,10 @@ example
 
 proc singspec(poly f)
 "USAGE:   <list> l=singspec(<poly> f);
+ASSUME:  f isolated singularity
 RETURN:  <ideal> l[1] : spectral numbers in increasing order
          <intvec> l[2] :
            <int> l[2][i] : multiplicity of spectral number l[1][i]
-NOTE:    f isolated singularity
 EXAMPLE: example singspec; shows an example
 "
 {
@@ -735,8 +735,8 @@ example
 
 proc gamma(list l)
 "USAGE:   <number> g=gamma(singspec(<poly> f));
+ASSUME:  f isolated singularity
 RETURN:  Hertling's gamma invariant
-NOTE:    f defines an isolated singularity
 EXAMPLE: example gamma; shows an example
 "
 {
@@ -765,8 +765,8 @@ example
 
 proc gamma4(list l)
 "USAGE:   <number> g4=gamma4(singspec(<poly> f));
+ASSUME:  f isolated singularity
 RETURN:  Hertling's gamma4 invariant
-NOTE:    f defines an isolated singularity
 EXAMPLE: example gamma4; shows an example
 "
 {
@@ -796,6 +796,7 @@ example
 
 proc vjacob(list l)
 "USAGE:   <list> l=vjacob(vfilt(<poly> f));
+ASSUME:  f isolated singularity
 RETURN:  <ideal> l[1] : spectral numbers of the V-filtration on the 
                         Jacobian algebra in increasing order
          <intvec> l[2] :
@@ -806,7 +807,6 @@ RETURN:  <ideal> l[1] : spectral numbers of the V-filtration on the
                               in terms of l[4]
          <ideal> l[4] : monomial vector space basis of the Jacobian algebra
          <ideal> l[5] : standard basis of Jacobian ideal
-NOTE:    f defines an isolated singularity
 EXAMPLE: example vjacob; shows an example
 "
 {
@@ -823,8 +823,7 @@ EXAMPLE: example vjacob; shows an example
   list M;
   for(i=ncols(m);i>=1;i--)
   {
-    //M[i]=lift(V,coeffs(redNF(m[i]*m,sJ),m)*V,product(maxideal(1)));
-    M[i]=lift(V,coeffs(redNF(m[i]*m,sJ),m)*V);
+    M[i]=lift(V,coeffs(redNF(m[i]*m,sJ),m)*V,product(maxideal(1)));
   }
 
   int i0,j0,i1,j1;
