@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_win.texi,v 1.7 2000-06-13 07:38:07 obachman Exp $
+@comment $Id: INSTALL_win.texi,v 1.8 2000-06-13 11:37:27 obachman Exp $
 @c FILE:    INSTALL.texi
 @c PURPOSE: Installation instructions for Singular on MSWindows
 @c          This file is displayed during installation and copied to
@@ -10,7 +10,7 @@
 @end ifclear
 
 @ifclear singularmanual
-@majorheading Installation innstructions for Singular on MSWINDOWS.
+@majorheading Installation instructions for Singular on MSWINDOWS.
 @end ifclear
 
 @heading For the impatient:
@@ -24,15 +24,14 @@ If you have Cygwin already installed on your system, uninstall it.
 Execute the self-extracting installation archive and accept all default
 answers.
 @item 
-In case of troubles, see the installed files @code{C:\etc\INSTALL} or
-@code{C:\etc\FAQ}.
+In case of troubles, see the installed file @code{C:\etc\INSTALL}.
 @end itemize
 
 @heading Installation preliminaries
 
 To run @sc{Singular} on MSWINDOWS requires that the Cygwin DLL
 (dynamically linked library) version 1.0 or higher is installed on your
-system (see @uref{???} for details about 
+system (see @uref{http://sourceware.cygnus.com/cygwin} for details about 
 Cygwin).
 
 To run @sc{ESingular} (i.e. @sc{Singular} within its Emacs interface) on
@@ -42,10 +41,10 @@ your system.
 @cindex Windows installation, components
 @cindex Components of Windows installation
 
-Therefore, the @sc{Singular} installation is devided into the following
+Therefore, the @sc{Singular} installation is divided into the following
 components: 
 @table @code
-@item Singular-@value{version}
+@item Singular-@value{VERSION}
 Contains the @sc{Singular} program and all documentation and example
 files.
 @*All files of this component are installed under the directory
@@ -54,7 +53,7 @@ files.
 Contains the Cygwin DLL and basic tools/programs (like @code{bash} or
 @code{info}) of the  Cygwin environment.
 @*The Cygwin DLL and programs are installed in the directory
-@code{/bin}. Miscellanous documentation and configuration files are
+@code{/bin}. Miscellaneous documentation and configuration files are
 installed into the directory @code{/etc}.
 @item Xemacs-21.10
 Contains the Cygwin port of the Xemacs editor (see
@@ -63,7 +62,7 @@ Contains the Cygwin port of the Xemacs editor (see
 @code{/usr/local}.
 @item AdditionalCygwin
 Contains additional Cygwin development tools (like @code{gcc},
-@code{gdb}, @code{make}, @code{perl}, etc). Roughly speaking, togehter
+@code{gdb}, @code{make}, @code{perl}, etc). Roughly speaking, together
 with the @code{BasicCygwin} component, this component contains the
 development environment we use to build/compile/develop @sc{Singular}
 under MSWINDOWS.
@@ -132,7 +131,7 @@ Execute the self-extracting archive (e.g., double-click on it) and
 @strong{carefully} follow the instructions given there.
 @item 
 When asked for the installation folder, you should simply choose a drive
-(you may choose a subfolder, but this is not as convenient as a drive).
+(you may choose a sub-folder, but this is not as convenient as a drive).
 @strong{Important:} If you have Cygwin already installed on your system, 
 make sure that the folder you choose is mounted to the root of your
 (Cygwin) file system.
@@ -149,10 +148,10 @@ de-select the @code{BasicCygwin} component, unless you already have
 Cygwin version 1.0 (or higher) installed on your system. 
 @item
 If you have the @emph{Cygwin} port of XEmacs version 21.1.10 (or higher)
-already installed on your system, you can safely de-selct the
-@code{XEmacs} component. All other version of Emacs (resp. XEmacs) have
+already installed on your system, you can safely de-select the
+@code{XEmacs} component. All other versions of Emacs (resp. XEmacs) have
 some quirks and do not work right together with @sc{Singular} (i.e.,
-running @code{Esingular} results in problems).
+running @code{ESingular} results in problems).
 @item
 You only need to install the @code{AdditionalCygwin} component, if you 
 plan on doing software-development with Cygwin. 
@@ -195,7 +194,7 @@ Create a directory (folder), say, @code{C:\home\MyHome}.
 Copy all files from @code{/home/Singular} to @code{C:\home\MyHome}.
 @item
 Set the environment variable @code{HOME} to @code{C:\home\MyHome}:
-@*On Windows 95/98, edit the respective line ine the @code{AUTOEXEC.BAT}
+@*On Windows 95/98, edit the respective line the @code{AUTOEXEC.BAT}
 file.
 @*On Windows NT/2K add an entry in your @code{Environment} control
 panel.
@@ -224,14 +223,14 @@ follow the instructions given there.
 @itemize
 @item 
 Make sure that (1) the @code{BasicCygwin} component was not de-selected
-during a custom installation; (2) the destination folder choosen during
+during a custom installation; (2) the destination folder chosen during
 the installation does not contain folder names which are longer than 8
 characters, or contain spaces or periods; (3) the installation did not
-generate any error messages; and (3) you have rebooted your machine after a
+generate any error messages; and (4) you have rebooted your machine after a
 successful installation.
 @item 
 Make sure the DLL @code{cygwin1.dll} is installed on your
-system: Say, @code{C:\} is the folder which you have choosen as the
+system: Say, @code{C:\} is the folder which you have chosen as the
 destination folder during the installation, then the  @code{cygwin1.dll}
 should be located at  @code{C:\bin\cygwin1.dll}.
 @item 
@@ -240,10 +239,10 @@ problem as explained below, and, in any event, @emph{please send} an email
 to  @email{singular@@mathematik.uni-kl-de} with a description of your problem.
 @item 
 Make sure the directories @code{C:\bin} and @code{C:\usr\local\bin}(if
-you have choosen another destination folder, substitute @code{C:} by
+you have chosen another destination folder, substitute @code{C:} by
 this folder) are contained in your @code{PATH} environment variable. To
 check this, open an MS-DOS shell and type in @code{PATH}. If these
-directories are not contained in the listings of diroctories of the
+directories are not contained in the listings of directories of the
 @code{PATH} variable, set them as follows and then @emph{restart} your
 computer:
 @*On Windows 95/98, add the following line to your @code{AUTOEXEC.BAT}
@@ -254,9 +253,9 @@ SET PATH=C:\BIN;%PATH%;C:\USR\LOCAL\BIN
 On Windows NT/2000 add a similar statements in your @code{Environment}
 control panel.
 @item 
-Make sure your choosen destination folder is correctly mounted to the
+Make sure your chosen destination folder is correctly mounted to the
 root of your (Cygwin) file system: Open an MS-DOS shell, @code{cd}
-(change directory) to your choosen destination folder, and type in
+(change directory) to your chosen destination folder, and type in
 @example
 mount
 @end example
@@ -272,7 +271,7 @@ mount -s -f -t C:\ /
 @end example
 @end itemize
 
-@item During the installation, an errror is displayed complaining that an environment variable can not be set.
+@item During the installation, an error is displayed complaining that an environment variable can not be set.
 Repeat the installation, and make sure that:
 @*On Windows 95/98, the file @code{C:\AUTOEXEC.BAT} is not
 hidden and not write-protected.
@@ -283,11 +282,11 @@ hidden and not write-protected.
 @*Make sure that (1) the folder @code{C:\usr\local\bin} is contained in your
 @code{PATH} (see above for details) and (2) that the file
 @code{C:\usr\local\bin\xemacs} exists (as above, substitute @code{C:\}
-by the destination folder choosen during the installation).
+by the destination folder chosen during the installation).
 @*Open a Bash shell and type in @code{/usr/local/bin/xemacs}. If this
 fails, make sure your root is correctly mounted (see above).
 
-@item On a Labtop which is not connected to the network, Xemacs hangs.
+@item On a Laptop which is not connected to the network, Xemacs hangs.
 Remove your network card and restart Xemacs.
 
 @item How do I cut and paste with the mouse?
