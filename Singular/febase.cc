@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.40 1998-06-03 18:15:48 pohl Exp $ */
+/* $Id: febase.cc,v 1.41 1998-06-04 15:31:17 obachman Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -24,6 +24,23 @@
 #include "mmemory.h"
 #include "subexpr.h"
 #include "ipshell.h"
+
+// Define or pass as argument to compiler, if you are building a distribution
+// #define MAKE_DISTRIBUTION
+
+#if defined(MAKE_DISTRIBUTION)
+#undef SINGULAR_ROOT_DIR
+#undef SINGULAR_BIN_DIR
+
+#ifdef WINNT
+#define SINGULAR_ROOT_DIR "/Singular"
+#define SINGULAR_BIN_DIR "/Singular/Intel-Win"
+#else
+#define SINGULAR_ROOT_DIR "/usr/local"
+#define SINGULAR_BIN_DIR "/usr/local/bin"
+#endif
+
+#endif // defined(MAKE_DISTRIBUTION)
 
 
 #ifndef MAXPATHLEN
@@ -92,17 +109,14 @@ BOOLEAN tclmode=FALSE;
 #include "febase.inc"
 
 #ifdef macintosh
-#  define  FS_SEP ','
 #  define  DIR_SEP ':'
 #  define  DIR_SEPP ":"
 #else
 #ifdef MSDOS
-#  define  FS_SEP ';'
 #  define  DIR_SEP '\\'
 #  define  DIR_SEPP "\\"
 #else
 #ifdef atarist
-#  define  FS_SEP ';'
 #  define  DIR_SEP '\\'
 #  define  DIR_SEPP "\\"
 #else  /* unix */
@@ -113,6 +127,13 @@ BOOLEAN tclmode=FALSE;
 #endif  /* MSDOS */
 #endif  /* macintosh */
 
+#if defined(WINNT)
+#  define  FS_SEP ';'
+#elsif defined(macintosh)
+#define FS_SEP ','
+#else
+#define FS_SEP ':'
+#endif
 
 
 /*****************************************************************
@@ -120,6 +141,9 @@ BOOLEAN tclmode=FALSE;
  * PATH STUFF
  *
  *****************************************************************/
+
+// Define to chatter about path stuff
+// #define PATH_DEBUG
 static char* feArgv0 = NULL;
 static char* feExpandedExecutable = NULL;
 static char* feBinDir = NULL;
@@ -163,7 +187,9 @@ static char* feGetSearchPath(const char* bindir)
 #else
     env=getenv("SINGULARPATH");
 #endif
-  
+#ifdef PATH_DEBUG
+    printf("I'm going to chatter about the Search path:\n");
+#endif
     if (env != NULL)
       plength = strlen(env);
 
@@ -184,6 +210,10 @@ static char* feGetSearchPath(const char* bindir)
       path += strlen(path);
       *path=FS_SEP;
       path++;
+#ifdef PATH_DEBUG
+      *(path +1) = '\0';
+      printf("Got from env var: %s\n", opath);
+#endif      
     }
   
     if (bindir != NULL)
@@ -195,13 +225,18 @@ static char* feGetSearchPath(const char* bindir)
         bindir, S_VERSION1, FS_SEP,
         bindir, FS_SEP,
         bindir, S_VERSION1, FS_SEP);
+#ifdef PATH_DEBUG
+      printf("From bindir: %s\n", path);
+#endif
       path += strlen(path);
     }
     
     sprintf(path, "%s/Singular/LIB%c%sSingular/LIB/%s",
             SINGULAR_ROOT_DIR, FS_SEP,
             SINGULAR_ROOT_DIR, S_VERSION1);
-    
+#ifdef PATH_DEBUG
+    printf("From rootdir: %s\n", path);
+#endif    
     return CleanUpPath(opath);
 }
 
@@ -355,6 +390,9 @@ static char* feRemovePathnameHead(const char* ef)
 // remove duplicates dir resp. those which do not exist
 static char* CleanUpPath(char* path)
 {
+#ifdef PATH_DEBUG
+  printf("Entered CleanUpPath with: %s\n", path);
+#endif  
   if (path == NULL) return path;
 
   int n_comps = 1, i, j;
@@ -389,10 +427,19 @@ static char* CleanUpPath(char* path)
   
   for (i=0; i<n_comps; i++)
     path_comps[i] = CleanUpName(path_comps[i]);
-
+#ifdef PATH_DEBUG
+  printf("After CleanUpName: ");
+  for (i=0; i<n_comps; i++)
+    printf("%s:", path_comps[i]);
+  printf("\n");
+#endif
   
   for (i=0; i<n_comps;)
   {
+#ifdef PATH_DEBUG
+    if (access(path_comps[i], X_OK))
+      printf("remove %d:%s -- can not access\n", i, path_comps[i]);
+#endif    
     if ( ! access(path_comps[i], X_OK))
     {
       // x- permission is granted -- we assume that it is a dir
@@ -401,6 +448,9 @@ static char* CleanUpPath(char* path)
         if (strcmp(path_comps[j], path_comps[i]) == 0)
         {
           // found a duplicate
+#ifdef PATH_DEBUG
+          printf("remove %d:%s -- equal to %d:%s\n", j, path_comps[j], i, path_comps[i]);
+#endif          
           j = i+1;
           break;
         }
@@ -428,6 +478,9 @@ static char* CleanUpPath(char* path)
   }
   if (n_comps) strcpy(path, path_comps[i]);
   FreeL(path_comps);
+#ifdef PATH_DEBUG
+  printf("SearchPath is: %s\n", opath);
+#endif
   return opath;
 }
 
@@ -456,7 +509,7 @@ static char* CleanUpName(char* fname)
         if (fname != fn) *fn = '\0';
         break;
       }
-      if (*(fn + 1) == '/')
+      if (*(fn + 1) == '/' && (fname != fn))
       {
         mystrcpy(fn, fn+1);
         fn--;
