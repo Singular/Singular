@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_cf.cc,v 1.3 1997-06-19 12:22:51 schmidt Exp $ */
+/* $Id: int_cf.cc,v 1.4 1997-07-16 10:18:04 schmidt Exp $ */
 
 #include <config.h>
 
@@ -97,3 +97,13 @@ InternalCF::sqrt()
     ASSERT1( 0, "fatal error: not implemented for class %s", this->classname() );
     return 0;
 }
+
+//{{{ int InternalCF::ilog2()
+// docu: see CanonicalForm::ilog2()
+int
+InternalCF::ilog2()
+{
+    ASSERT1( 0, "fatal error: not implemented for class %s", this->classname() );
+    return 0;
+}
+//}}}
