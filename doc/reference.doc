@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.201 2001-01-15 19:03:37 lossen Exp $
+@comment $Id: reference.doc,v 1.202 2001-01-16 14:36:27 lossen Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -42,11 +42,11 @@ in the  @sc{Singular} programming language.
 
 The general syntax of a function is
 @format
-                        [target =] function_name (<arguments>);
+                   [target =] function_name (<arguments>);
 @end format 
 If no target is specified, the result is printed.
-In some cases (e.g., @code{export, keepring, kill, setring,
-type}) the brackets are optional. For the commands
+In some cases (e.g., @code{export}, @code{keepring}, @code{kill}, 
+@code{setring}, @code{type}) the brackets are optional. For the commands
 @code{help}, @code{break}, @code{quit}, @code{exit} and @code{LIB} no
 brackets are allowed.
 
@@ -381,8 +381,8 @@ $R^n/M$.
 @tex
 The entry d of the intmat at place (i,j) is the minimal number of
 generators in degree i+j of the j-th syzygy module (= module of
-relations) of $R^n/M$ (the 0th (resp.@: 1st) syzygy module of $R^n/M$ is
-$R^n$ (resp.@: $M$)).
+relations) of $R^n/M$ (the 0th (resp.\ 1st) syzygy module of $R^n/M$ is
+$R^n$ (resp.\ $M$)).
 @end tex
 @ifinfo
 R^n/M, if R denotes the basering and
@@ -770,7 +770,7 @@ such that matrix(J) = T*M.
 @end ifinfo
 @tex
 The third argument is used to return the matrix T of coefficients
-such that @code{matrix}(J) = T*M.
+such that {\tt matrix}(J) = T*M.
 @end tex
 @item @strong{Note:}
 @code{coeffs} returns the coefficient 0 at the appropriate place if a monomial
@@ -787,7 +787,7 @@ then the j-th generator of an ideal J is equal to
 @tex
 $$J_j = z^0 \cdot m_{1j} + z^1 \cdot m_{2j} + ... + z^{d-1} \cdot m_{dj},$$
 while for a module J the i-th component of the j-th generator is 
-equal to the entry [i,j] of @code{matrix}(J), and we get
+equal to the entry [i,j] of {\tt matrix}(J), and we get
 @end tex
 @ifinfo
 
@@ -2085,17 +2085,17 @@ generators. If the generators are a standard basis,
 this is also the smallest monomial not contained in the ideal, resp.@: module.
 @*If the ideal, resp.@: module, is not zero-dimensional, 0 is returned.
 @item @strong{Note:}
-Let the ideal I be given by a standard basis and 
+Let the ideal I be given by a standard basis. Then
+@code{highcorner(I)} returns 0 iff @code{dim(I)>0} or @code{dim(I)=-1}. 
+Otherwise it returns the smallest monomial m not in I which has the following 
+properties (with 
 @ifinfo
 x(i) 
 @end ifinfo
 @tex
 $x_i$ 
 @end tex
-the variables of the basering. Then
-@code{highcorner(I)} returns 0 iff @code{dim(I)>0} or @code{dim(I)=-1}. 
-Otherwise it returns the smallest monomial m not in I which has the following 
-properties:
+the variables of the basering):
 @itemize @bullet
 @item
 if 
@@ -2265,7 +2265,7 @@ $$...\longrightarrow F_2 \buildrel{A_2}\over{\longrightarrow} F_1
 If the int_expression k is not zero then the computation stops after 
 k steps and returns a list of modules
 @tex
-$M_i={\tt module}(A_i)$, i=1..k.
+$M_i={\tt module} (A_i)$, i=1..k.
 @end tex
 @ifinfo
 Mi=module(Ai), i=1...k.
@@ -2291,7 +2291,7 @@ computations have to be finished and may therefore take some time.
   ideal I=xz,yz,x3-y3;
   def L=hres(I,0); 
   print(betti(L),"betti");
-  L[2];     // the first syzygy module of R/I
+  L[2];     // the first syzygy module of r/I
 @c example
 @end smallexample
 @end table
@@ -2485,7 +2485,7 @@ output: g_1,@dots{},g_s with s<=n and the properties
 @*
 @end ifinfo
 @tex
-output: $g_1,\dots,g_s$ with $s \leq n$ and the properties @*
+output: $g_1,\dots,g_s$ with $s \leq n$ and the properties 
 @end tex
 @itemize @bullet
 @item
@@ -3324,7 +3324,7 @@ computations have to be finished and may therefore take some time.
   ideal I=xz,yz,x3-y3;
   def L=lres(I,0); 
   print(betti(L),"betti");
-  L[2];     // the first syzygy module of R/I
+  L[2];     // the first syzygy module of r/I
 @c example
 @end smallexample
 @end table
@@ -3543,15 +3543,15 @@ R^l
 @end ifinfo
 (l=1 for ideals). Let
 @tex
-$H_1$, resp.@: $H_2$,
+$H_1$, resp.\ $H_2$,
 @end tex
 @ifinfo
 H1 and H2
 be the matrices of size l x k, resp.@: l x m, having the columns of
 @end ifinfo
 @tex
-be the matrices of size $l \times k$, resp.@: $l \times m$, having the 
-generators of $h_1$, resp.@: $h_2$,
+be the matrices of size $l \times k$, resp.\ $l \times m$, having the 
+generators of $h_1$, resp.\ $h_2$,
 @end tex
 @ifinfo
 h1, resp.@: h2,
@@ -4679,10 +4679,10 @@ i+j of the j-th
 @end ifinfo
  syzygy module of
 @tex
-$R^n/M$ (the 0th and 1st syzygy module of $R^n/M$ is $R^n$ and $M$, resp).
+$R^n/M$ (the 0th and 1st syzygy module of $R^n/M$ is $R^n$ and $M$, resp.).
 @end tex
 @ifinfo
-R^n/M (the 0th and 1st syzygy module of R^n/M are R^n and M, resp).
+R^n/M (the 0th and 1st syzygy module of R^n/M are R^n and M, resp.).
 @end ifinfo
 @item "%s"
 returns @code{string(} expression @code{)}
@@ -4866,7 +4866,7 @@ basering, @code{I,J} ideals and @code{M} a module in
 R^n.
 @end ifinfo
 @tex
-@code{R}$^n$.
+${\tt R}^n$.
 @end tex
 Then  
 @itemize
@@ -5421,10 +5421,10 @@ See
 intvec
 @item @strong{Purpose:}
 @tex
-computes the permutation @code{v}
-which orders the ideal, resp.@: module, @code{I} by its initial terms,
-starting with the smallest, that is, @code{I(v[i]) < I(v[i+1])} for all 
-@code{i}.
+computes the permutation {\tt v}
+which orders the ideal, resp.\ module, {\tt I} by its initial terms,
+starting with the smallest, that is, {\tt I(v[i]) < I(v[i+1])} for all 
+{\tt i}.
 @end tex
 @ifinfo
 computes the permutation v
@@ -5481,7 +5481,7 @@ coker(A1)=F0/M
 @end format
 @end ifinfo
 @tex
-coker$(A_1)=F_0/M$
+$coker(A_1)=F_0/M$
 $$...\longrightarrow F_2 \buildrel{A_2}\over{\longrightarrow} F_1 \buildrel{A_1}\over{\longrightarrow} F_0\longrightarrow F_0/M\longrightarrow 0,$$
 @end tex
 If the int expression k is not zero then the computation stops after k steps
@@ -6142,8 +6142,8 @@ k=1,@dots{},N.
 @end format   
 @end ifinfo
 @tex
-@code{vandermonde(p,v,d)} computes the (unique) polynomial of degree 
-@code{d} with prescribed values @code{v[1],...,v[N]} at the points
+{\tt vandermonde(p,v,d)} computes the (unique) polynomial of degree 
+@code{d} with prescribed values {\tt v[1],...,v[N]} at the points
 {\tt p}$^0,\dots,$ {\tt p}$^{N-1}$, {\tt N=(d+1)}$^n$, $n$ the 
 number of ring variables.     
 
@@ -6166,9 +6166,9 @@ to be numbers.
 @end ifinfo
 @tex
 the ground field has to be the field of rational
-numbers. Moreover, @code{ncols(p)==}$n$, the number of variables in the 
+numbers. Moreover, {\tt ncols(p)==}$n$, the number of variables in the 
 basering, and all the given generators have to be numbers different from 
-0,1 or -1. Finally, @code{ncols(v)==(d+1)$^n$}, and all given generators have 
+0,1 or -1. Finally, {\tt ncols(v)==(d+1)$^n$}, and all given generators have 
 to be numbers.
 @end tex 
 @item @strong{Example:}
