@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.20 1998-06-15 15:47:58 obachman Exp $ */
+/* $Id: febase.h,v 1.21 1998-07-03 10:13:51 pohl Exp $ */
 /*
 * ABSTRACT
 */
@@ -97,7 +97,7 @@ void    Print(char* fmt, ...);
 void    PrintS(char* s);
 void     PrintLn();
 void    PrintTCLS(char c, char * s);
-#ifndef macintosh
+#ifndef __MWERKS__
 inline void PrintTCL(char c, int l,char *s)
 {
 #ifdef HAVE_TCL
