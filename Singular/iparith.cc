@@ -644,8 +644,11 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
   switch(u->Typ())
   {
       case PACKAGE_CMD:
-        packhdl = u->data;
-        //if(!IDPACKAGE(packhdl)->loaded) iiReLoadLib(packhdl);
+        packhdl = (idhdl)u->data;
+        if(!IDPACKAGE(packhdl)->loaded) iiReLoadLib(packhdl);
+        if(v->packhdl != NULL) {
+          v->name = mstrdup(v->name);
+        }
         namespaceroot->push( IDPACKAGE(packhdl), IDID(packhdl));
         syMake(v, v->name, packhdl);
         memcpy(res, v, sizeof(sleftv));
@@ -656,7 +659,10 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
         Print("%s of type 'ANY'. Trying load.\n", v->name);
         if(!iiTryLoadLib(u, u->name)) {
           syMake(u, u->name);
-          packhdl = u->data;
+          packhdl = (idhdl)u->data;
+          if(v->packhdl != NULL) {
+            v->name = mstrdup(v->name);
+          }
           namespaceroot->push( IDPACKAGE(packhdl), IDID(packhdl));
           syMake(v, v->name, packhdl);
           memcpy(res, v, sizeof(sleftv));
@@ -4538,6 +4544,8 @@ static BOOLEAN jjSTATUS_M(leftv res, leftv v)
 #endif
 
 #ifdef HAVE_NAMESPACES
+static BOOLEAN jjIMPORTFROM(leftv res, leftv v);
+
 static BOOLEAN jjEXPORTTO(leftv res, leftv v)
 {
   BOOLEAN nok=TRUE;
