@@ -3,30 +3,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.h,v 1.30 2002-11-04 16:52:23 bricken Exp $ */
+/* $Id: longrat.h,v 1.31 2002-11-26 13:54:40 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers
 */
 #include "structs.h"
 
-extern "C" {
-#ifdef __cplusplus
-#undef __cplusplus
-#include <gmp.h>
-#define __cplusplus
-#else
-#include <gmp.h>
-#endif
-}
-#ifdef HAVE_SMALLGMP
-#  define HAVE_LIBGMP2
-#else
-#if (__GNU_MP_VERSION > 1) && (__GNU_MP_VERSION_MINOR >= 0)
-#  define HAVE_LIBGMP2
-#else
-#  define HAVE_LIBGMP1
-#endif
-#endif
+#include "si_gmp.h"
 
 typedef MP_INT lint;
 
@@ -37,13 +20,11 @@ typedef MP_INT lint;
 
 #define MP_SMALL 1
 
-#ifdef HAVE_LIBGMP1
-#define mpz_size1(A) (ABS((A)->size))
-#else
 #define mpz_size1(A) (ABS((A)->_mp_size))
-#endif
 //#define mpz_size1(A) mpz_size(A)
 
+struct snumber;
+typedef struct snumber  *number;
 struct snumber
 {
   lint z;
@@ -68,7 +49,6 @@ LINLINE number   nlInit(int i);
 LINLINE BOOLEAN  nlIsOne(number a);
 LINLINE BOOLEAN  nlIsZero(number za);
 LINLINE number   nlCopy(number a);
-LINLINE number   nl_Copy(number a, ring r);
 LINLINE void     nlNew(number *r);
 LINLINE void     nlDelete(number *a, const ring r);
 LINLINE number   nlNeg(number za);
@@ -95,6 +75,7 @@ void     nlWrite(number &a);
 int      nlModP(number n, int p);
 int      nlSize(number n);
 number   nlGetDenom(number &n, const ring r);
+number   nlGetNom(number &n, const ring r);
 #ifdef LDEBUG
 BOOLEAN  nlDBTest(number a, char *f, int l);
 #endif
@@ -106,6 +87,12 @@ nMapFunc nlSetMap(ring src, ring dst);
 struct omBin_s;
 #endif
 extern omBin_s* rnumber_bin;
+
+// in-place operations
+void nlInpGcd(number &a, number b, ring r);
+void nlInpIntDiv(number &a, number b, ring r);
+void nlInpAdd(number &a, number b, ring r);
+void nlInpMult(number &a, number b, ring r);
 
 #endif
 

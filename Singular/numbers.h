@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.29 2002-07-23 13:09:37 Singular Exp $ */
+/* $Id: numbers.h,v 1.30 2002-11-26 13:54:44 Singular Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
@@ -17,7 +17,8 @@
 #define n_Equal(n1, n2, r)    (r)->cf->nEqual(n1, n2)
 #define n_Neg(n, r)           (r)->cf->nNeg(n)
 #define n_Sub(n1, n2, r)      (r)->cf->nSub(n1, n2)
-#define n_GetChar(r)          ((r)->cf->nChar)
+//#define n_GetChar(r)          ((r)->cf->nChar)
+#define n_GetChar(r)          ((r)->ch)
 #define n_Init(i, r)          (r)->cf->nInit(i)
 #define n_IsOne(n, r)         (r)->cf->nIsOne(n)
 #define n_IsMOne(n, r)        (r)->cf->nIsMOne(n)
@@ -26,6 +27,7 @@
 #define n_Normalize(n, r)     (r)->cf->nNormalize(n)
 #define n_Gcd(a, b, r)        (r)->cf->nGcd(a,b,r)
 #define n_IntDiv(a, b, r)     (r)->cf->nIntDiv(a,b)
+#define n_InpMult(a, b, r)    (r)->cf->nInpMult(a,b,r)
 
 /* variables */
 extern short fftable[];
@@ -69,14 +71,14 @@ extern char *  (*nName)(number n);
 void nDummy1(number* d);
 void ndDelete(number* d, const ring r);
 void nDummy2(number &d);
-number ndGcd(number a, number b, const ring r);
+number ndGcd(number a, number b, const ring);
 number ndCopy(number a);
-number nd_Copy(number a, ring r);
 
 #ifdef LDEBUG
 void nDBDummy1(number* d,char *f, int l);
 #endif
-int  nGetChar();
+#define nGetChar() n_GetChar(currRing)
+
 void nInitChar(ring r);
 void nKillChar(ring r);
 void nSetChar(ring r);

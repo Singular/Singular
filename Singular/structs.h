@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.66 2002-07-23 13:09:34 Singular Exp $ */
+/* $Id: structs.h,v 1.67 2002-11-26 13:54:44 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -206,17 +206,14 @@ typedef number (*nMapFunc)(number a);
 struct n_Procs_s
 {
    n_Procs_s* next;
-   int     nChar;
-   n_coeffType type;
-   int     char_flag;
-   int     ref;
    // the union stuff
    // Zp:
    int npPrimeM;
    int npPminus1M;
    #ifdef HAVE_DIV_MOD
    CARDINAL *npInvTable;
-   #else
+   #endif
+   #if !defined(HAVE_DIV_MOD) || !defined(HAVE_MULT_MOD)
    CARDINAL *npExpTable;
    CARDINAL *npLogTable;
    #endif
@@ -252,9 +249,14 @@ struct n_Procs_s
    void    (*cfDelete)(number * a, const ring r);
    nMapFunc (*cfSetMap)(ring src, ring dst);
    char *  (*nName)(number n);
+   void    (*nInpMult)(number &a, number b, ring r);
 //extern number  (*nMap)(number from);
 
    number nNULL; /* the 0 as constant */
+   int     char_flag;
+   int     ref;
+   short   nChar;
+   n_coeffType type;
 };
 
 /* the function pointer types */
