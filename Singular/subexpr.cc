@@ -1336,15 +1336,20 @@ int sleftv::Eval()
     }
     else if (d->op=='=') //assume d->argc==2
     {
-      char *n=d->arg1.name;
-      if (n!=NULL)
+      if ((d->arg1.rtyp!=IDHDL)&&(d->arg1.rtyp!=DEF_CMD))
       {
+        nok=d->arg1.Eval();
+      }
+      if (!nok)
+      {
+        char *n=d->arg1.name;
         nok=d->arg2.Eval();
         if (!nok)
         {
           int save_typ=d->arg1.rtyp;
           mmTestLP(n);
-          syMake(&d->arg1,n); //assume  type of arg1==DEF_CMD
+          if (d->arg1.rtyp!=IDHDL)
+            syMake(&d->arg1,n); //assume  type of arg1==DEF_CMD
           mmTestLP(d->arg1.name);
           if (d->arg1.rtyp==IDHDL)
           {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.32 1998-11-04 17:34:29 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.33 1998-12-15 13:35:05 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1022,10 +1022,10 @@ BOOLEAN iiExport (leftv v, int toLev, idhdl root)
       {
         if (IDTYP(old)==v->Typ())
         {
-	  if (BVERBOSE(V_REDEFINE))
-	  {
+          if (BVERBOSE(V_REDEFINE))
+          {
             Warn("redefining %s",IDID(old));
-	  }  
+          }
           killhdl(old,&root);
         }
         else
