@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.15 2002-07-12 13:48:28 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.16 2002-12-06 20:51:38 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -862,26 +862,62 @@ poly nc_spShort(poly p1, poly p2, const ring r)
   return(m);
 }
 
-void nc_kBucketPolyRed(kBucket_pt b, poly p)
+void nc_kBucketPolyRed(kBucket_pt b, poly p, number *c)
 {
+  // b will not by multiplied by any constant in this impl.
+  // ==> *c=1
+  *c=nInit(1);
   poly m=pOne();
   pExpVectorDiff(m,kBucketGetLm(b),p);
   pSetm(m);
   pTest(m);
-  p=nc_mm_Mult_p(m,pCopy(p),currRing);
+  poly pp=nc_mm_Mult_p(m,pCopy(p),currRing);
   pDelete(&m);
-  number n=pGetCoeff(p);
+  number n=pGetCoeff(pp);
   number MinusOne=nInit(-1);
+  number nn;
   if (!nEqual(n,MinusOne))
   {
-    n=nNeg(nInvers(n));    
+    nn=nNeg(nInvers(n));    
   }
-  n=nMult(n,pGetCoeff(kBucketGetLm(b)));
-  p=p_Mult_nn(p,n,currRing);
+  else nn=nInit(1);
+  nDelete(&n);
+  n=nMult(nn,pGetCoeff(kBucketGetLm(b)));
+  nDelete(&nn);
+  pp=p_Mult_nn(pp,n,currRing);
   nDelete(&n);
   nDelete(&MinusOne);
-  int l=pLength(p);
-  kBucket_Add_q(b,p,&l);
+  int l=pLength(pp);
+  kBucket_Add_q(b,pp,&l);
+}
+
+void nc_PolyPolyRed(poly &b, poly p, number *c)
+  // reduces b with p, do not delete both
+{
+  // b will not by multiplied by any constannt in this impl.
+  // ==> *c=1
+  *c=nInit(1);
+  poly m=pOne();
+  pExpVectorDiff(m,pHead(b),p);
+  pSetm(m);
+  pTest(m);
+  poly pp=nc_mm_Mult_p(m,pCopy(p),currRing);
+  pDelete(&m);
+  number n=pGetCoeff(pp);
+  number MinusOne=nInit(-1);
+  number nn;
+  if (!nEqual(n,MinusOne))
+  {
+    nn=nNeg(nInvers(n));    
+  }
+  else nn=nInit(1);
+  nDelete(&n);
+  n=nMult(nn,pGetCoeff(b));
+  nDelete(&nn);
+  pp=p_Mult_nn(pp,n,currRing);
+  nDelete(&n);
+  nDelete(&MinusOne);
+  b=p_Add_q(b,pp,currRing);
 }
 
 poly nc_p_Bracket_qq(poly p, poly q)

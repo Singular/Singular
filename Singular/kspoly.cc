@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.26 2001-10-23 14:04:23 Singular Exp $ */
+/* $Id: kspoly.cc,v 1.27 2002-12-06 20:51:39 levandov Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -12,7 +12,7 @@
 #include "numbers.h"
 #include "p_polys.h"
 #include "p_Procs.h"
-
+#include "gring.h"
 
 #ifdef KDEBUG
 int red_count = 0;
@@ -24,7 +24,7 @@ int create_count = 0;
 /***************************************************************
  *
  * Reduces PR with PW
- * Assumes PR != NULL, PW != NULL, Lm(PR) divides Lm(PW)
+ * Assumes PR != NULL, PW != NULL, Lm(PW) divides Lm(PR)
  *
  ***************************************************************/
 int ksReducePoly(LObject* PR,
@@ -61,6 +61,26 @@ int ksReducePoly(LObject* PR,
   pAssume1(p_GetComp(p1, tailRing) == p_GetComp(p2, tailRing) ||
            (p_GetComp(p2, tailRing) == 0 &&
             p_MaxComp(pNext(p2),tailRing) == 0));
+
+  if (rIsPluralRing(currRing))
+  {
+    // for the time being: we know currRing==strat->tailRing
+    // no exp-bound checking needed 
+    // (only needed if exp-bound(tailring)<exp-b(currRing))
+    number c;
+    if (PR->bucket!=NULL)  nc_kBucketPolyRed(PR->bucket, p2,&c);
+    else 
+    {
+      poly _p = (PR->t_p != NULL ? PR->t_p : PR->p);
+      assume(_p != NULL);
+      nc_PolyPolyRed(_p, p2,&c);
+      if (PR->t_p!=NULL) PR->t_p=_p; else PR->p=_p;
+      PR->pLength=pLength(_p);
+    }
+    if (coef!=NULL) *coef=c;
+    else nDelete(&c);
+    return 0;
+  }
 
   if (t2==NULL)
   {

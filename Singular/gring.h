@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.13 2002-07-12 13:49:05 levandov Exp $ */
+/* $Id: gring.h,v 1.14 2002-12-06 20:51:42 levandov Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -39,6 +39,16 @@ poly nc_mm_Bracket_nn(poly m1, poly m2);
 //twostd:
 
 ideal twostd(ideal I);
+
+// complete reduction routines
+
+void nc_kBucketPolyRed(kBucket_pt b, poly p, number *c);
+void nc_PolyPolyRed(poly &b, poly p, number *c);
+
+#else
+// dummy definition to make gcc happy
+#define nc_kBucketPolyRed(A,B,C) 0
+#define nc_PolyPolyRed(A,B,C) 0
 
 #endif /* HAVE_PLURAL */
 #endif

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.9 2002-07-12 13:48:28 levandov Exp $ */
+/* $Id: gr_kstd2.cc,v 1.10 2002-12-06 20:51:39 levandov Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -859,7 +859,8 @@ ideal gr_bba (ideal F, ideal Q,kStrategy strat)
               {
                 if ((strat->syzComp==0)||(!strat->homog))
                 {
-                  /* strat->P.p = redtailBba(strat->P.p,pos-1,strat);   */                     }
+                  strat->P.p = redtailBba(strat->P.p,pos-1,strat);
+		}
 		pCleardenom(strat->P.p);
               }
               else
@@ -867,12 +868,13 @@ ideal gr_bba (ideal F, ideal Q,kStrategy strat)
                 pNorm(strat->P.p);
                 if ((strat->syzComp==0)||(!strat->homog))
                 {
-                  //strat->P.p = redtailBba(strat->P.p,pos-1,strat);
+                  strat->P.p = redtailBba(strat->P.p,pos-1,strat);
                 }
               }
 	      // PLURAL debug
 	      /* should be used only internally!!! */
-              pWrite(strat->P.p);
+
+              //pWrite(strat->P.p);
 
               if (TEST_OPT_DEBUG)
               {
@@ -880,6 +882,8 @@ ideal gr_bba (ideal F, ideal Q,kStrategy strat)
                 wrp(strat->P.p);
                 PrintLn();
               }
+	      // kTest(strat); 
+	      // 
               enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat);
               if (strat->sl==-1) pos=0;
               else pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
