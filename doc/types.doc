@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.2 1998-04-27 09:28:19 Singular Exp $
+@comment $Id: types.doc,v 1.3 1998-04-27 11:42:23 Singular Exp $
 @comment this file contains the type definitions
 @menu
 * boolean::
@@ -107,7 +107,8 @@ boolean expressions combined by boolean operations:
 @*@code{and} may also be written as @code{&&}, @code{or} as @code{||},
 @code{not} as @code{!}
 (see @ref{Evaluation of logical expressions}).
-@*strong{Remark:} All arguments of a logical expressions are first
+
+@strong{Remark:} All arguments of a logical expressions are first
 evaluated and then the value of the logical expression is
 determined. For example, the logical expressions @code{(1 || a)} is
 evaluated by first evaluating @code{a}, even though the value of
@@ -145,7 +146,7 @@ example, determine the @code{(1 || a)} without evaluating @code{a}.
 @code{ideal} name @code{=} list_of_poly_expressions @code{;}
 @*@code{ideal} name @code{=} ideal_expression @code{;}
 @item @strong{Purpose:}
-define an ideal
+defines an ideal.
 @item @strong{Default:}
 0
 @item @strong{Example:}
@@ -356,7 +357,7 @@ Brackets may be used to access elements of ideals:
 @item @strong{Syntax:}
 @code{int} name @code{=} int_expression @code{;}
 @item @strong{Purpose:}
-define an integer variable
+defines an integer variable.
 @item @strong{Default:}
 0
 @item @strong{Example:}
@@ -428,7 +429,7 @@ Variables of type int represent the compiler integers  and are, therefore,
 limited  in their range. If this range is too small the expression
 must be converted to the type number over a ring with characteristic 0.
 
-@strong{Example:}
+@strong{Example}
 @example
 @c example
   ring r=0,x,dp;
@@ -482,8 +483,8 @@ power, exponentiation
 @item @code{<}, @code{>}, @code{<=}, @code{>=}, @code{==}, @code{<>}
 comparison
 @end table
-@*
-@*@strong{Example}
+
+@strong{Example}
 @example
 @c example
   int i=1;
@@ -566,12 +567,12 @@ module (see @ref{vdim})
 @*@code{intmat} name @code{[} rows @code{] [} cols @code{] =} intmat_expression @code{;}
 @*@code{intmat} name @code{[} rows @code{] [} cols @code{] =} list_of_int_expressions @code{;}
 @item @strong{Purpose:}
-define an intmat variable
-@* The int_list fills up the matrix beginning with the first row
+defines an intmat variable.
+@* Given a list of integers, the matrix is filled up with the first row
 from the left to the right, then the second row and so on.
 If the int_list contains less than rows*cols elements,
 the matrix is filled up with zeros; if it contains more
-elements, then only the first rows*cols elements are used.
+elements, only the first rows*cols elements are used.
 @item @strong{Default:}
 0 (1 x 1 matrix)
 @item @strong{Example:}
@@ -591,7 +592,7 @@ elements, then only the first rows*cols elements are used.
 @cindex intmat expressions
 @c--> subsection intmat expressions
 Integer matrices are matrices with entries of integers.
-For the range of integers see @ref{int expression}.
+For the range of integers see @ref{int expressions}.
 @example
 @c example
   intmat m[2][3]=1,2,3,4,5,6;
@@ -681,7 +682,8 @@ trace of an intmat (see @ref{trace})
 @item @strong{Syntax:}
 @code{intvec} name @code{=} intvec_expression @code{;}
 @item @strong{Purpose:}
-define an intvec variable
+defines an intvec variable.
+@* An intvec consists of an ordered list of integers.
 @item @strong{Default:}
 0
 @item @strong{Example:}
@@ -702,7 +704,7 @@ define an intvec variable
 @cindex intvec expressions
 @c--> intvec expressions
 Variables of type intvec are lists of integers.
-For the range of integers see @ref{int expression}.
+For the range of integers see @ref{int expressions}.
 They can be used for simulating integers sets
 (and other sets if the intvec entry is used as an index for other objects).
 They are also return values of certain interpreter related functions
@@ -844,7 +846,7 @@ returns weights for the weigted ecart method (see @ref{weight})
 @code{list} name @code{=} expression_list@code{;}
 @*@code{list} name @code{=} list_expression@code{;}
 @item @strong{Purpose:}
-define a list
+defines a list (of objects of possibly different types).
 @item @strong{Default:}
 empty list
 @item @strong{Example:}
@@ -1008,9 +1010,9 @@ Brackets may be used to access elements of lists:
 @code{matrix} name@code{[}rows@code{][}cols@code{] =} list_of_poly_expressions @code{;}
 @*@code{matrix} name = matrix_expression @code{;}
 @item @strong{Purpose:}
-define a matrix
+defines a matrix (of polynomials).
 
-The poly_list fills up the matrix beginning with the first row
+The given poly_list fills up the matrix beginning with the first row
 from the left to the right, then the second row and so on.
 If the poly_list contains less than rows*cols elements,
 the matrix is filled up with zeros; if it contains more
@@ -1170,7 +1172,7 @@ Brackets may be used to access elements of matrices:
 @code{module} name @code{=} list_of_vector_expressions @code{;}
 @*@code{module} name @code{=} module_expression @code{;}
 @item @strong{Purpose:}
-define a module
+defines a module.
 @item @strong{Default:}
 [0]
 @item @strong{Example:}
@@ -1390,7 +1392,7 @@ vector space dimension of free module over the basering modulo module (see @ref{
 @item @strong{Syntax:}
 @code{number} name @code{=} number_expression @code{;}
 @item @strong{Purpose:}
-define a number
+defines a number.
 @item @strong{Default:}
 0
 @item @strong{Example:}
@@ -1437,7 +1439,7 @@ A number expression is:
 @enumerate
 @item
 a rational number (there are NO spaces allowed inside a rational number,
-see @ref{int expression})
+see @ref{int expressions})
 @item
 a floating point number (if the coefficient field is @code{real}):
 @*<digits>@code{.}<digits>@code{e}<sign><digits>
@@ -1451,7 +1453,8 @@ an int expression (see @ref{implicit type conversions})
 number s combined by arithmetic operations @code{+,-,*,/} or @code{^,**}.
 (see @ref{number operations}).
 @end enumerate
-@strong{Example:}
+
+@strong{Example}
 @example
   2/3, 4/8, 2/2 ; // are numbers
   2 / 3, 4/ 8,  2 /2 ; // are int expressions (of value 0, 0 and 1)
@@ -1519,7 +1522,7 @@ coefficient of the leading term (see @ref{leadcoef})
 @item @strong{Syntax:}
 @code{poly} name @code{=} poly_expression @code{;}
 @item @strong{Purpose:}
-define a polynomial
+defines a polynomial.
 @item @strong{Default:}
 0
 @item @strong{Example:}
@@ -1542,7 +1545,7 @@ define a polynomial
 Polynomials are the basic data for all main algorithms in @code{@sc{Singular}}.
 They consist of finitely many terms (coefficient*power product)
 which are combined by the usual
-polynomial operations (see @ref{poly expression}).
+polynomial operations (see @ref{poly expressions}).
 Polynomials can only be defined or accessed with respect to a base ring
 which determines the coefficient type, the names of the indeterminants and the
 monomial ordering.
@@ -1573,7 +1576,8 @@ an int expression (see @ref{implicit type conversions})
 poly expressions combined by arithmetic operations +,-,*,/ or ^.
 (see @ref{poly operations}).
 @end enumerate
-@strong{Example:}
+
+@strong{Example}
 @example
   2x, x3, 2x2y3, xyz, 2xy2; //  are monomials
   2*x, x^3, 2*x^2*y^3, x*y*z, 2*x*y^2; // are poly expressions
@@ -1619,7 +1623,7 @@ comparison
 choice of the monomial at the indicated place w.r.t. the monomial order
 @end table
 
-@strong{Example:}
+@strong{Example}
 @example
 @c example
   ring R=0,(x,y),dp;
@@ -1760,7 +1764,7 @@ Brackets may be used to access elements of ideals and matrices:
 @item @strong{Syntax:}
 @code{string} name @code{=} string_expression @code{;}
 @item @strong{Purpose:}
-define a string variable
+defines a string variable.
 @item @strong{Default:}
 "" (the empty string)
 @item @strong{Example:}
@@ -1827,7 +1831,8 @@ a typecast to string (from any type)
 @item
 string expressions combined by the operation @code{+}.
 @end enumerate
-@*@strong{Example:}
+
+@strong{Example}
 @example
   // a string constant
   "@dots{}";
@@ -1898,8 +1903,8 @@ Brackets may be used to access parts of a string:
 @emph{string expression} @code{[} @emph{position}@code{,} @emph{length} @code{]} is a substring
 and @emph{string expression} @code{[} @emph{intvec} @code{]} ist a list of characters
 from the string.
-@*
-@*@strong{Example}
+
+@strong{Example}
 @example
 @c example
   string s="abcde";
@@ -1962,7 +1967,7 @@ from the string.
 @item @strong{Syntax:}
 @code{vector} name @code{=} vector_expression @code{;}
 @item @strong{Purpose:}
-define a vector of polynomials (an element of a sub-module of a free module)
+defines a vector of polynomials (an element of a free module).
 @item @strong{Default:}
 [0]
 @item @strong{Example:}
@@ -1993,7 +1998,7 @@ coefficients need not be written any vector may be considered
 also as an element of a free module of higher rank.
 Like polynomials they
 can only be defined or accessed with respect to this base ring.
-(E.g. if f and g are polynomials then
+(E.g. if @code{f} and @code{g} are polynomials then
 @code{f*gen(1)+g*gen(3)+gen(4)} can also be written as @code{[f,0,g,1]}
 or as @code{[f,0,g,1,0]}.)
 
@@ -2010,7 +2015,8 @@ vector expressions combined by arithmetic operations @code{+} or @code{-}
 @item a poly expression and a vector expression
 combined by arithmetic operation @code{*}.
 @end enumerate
-@strong{Example:}
+
+@strong{Example}
 @example
 @c example
   // ordering gives priority to components:
@@ -2055,7 +2061,7 @@ comparison
 choice of a component
 @end table
 
-@strong{Example:}
+@strong{Example}
 @example
 @c example
   ring R=0,(x,y),(c,dp);
