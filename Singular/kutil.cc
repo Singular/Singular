@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.117 2003-02-21 10:30:31 Singular Exp $ */
+/* $Id: kutil.cc,v 1.118 2003-02-24 16:29:34 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -261,6 +261,7 @@ void cancelunit (LObject* L)
       if (h==NULL)
       {
         p_Delete(&pNext(p), r);
+        number eins=nInit(1);
 	if (L->p != NULL)  pSetCoeff(L->p,eins);
 	else if (L->t_p != NULL) nDelete(&pGetCoeff(L->t_p));
 	if (L->t_p != NULL) pSetCoeff0(L->t_p,eins);
