@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.1 1999-04-29 11:38:50 Singular Exp $ */
+/* $Id: mpr_complex.cc,v 1.2 1999-05-04 13:49:49 wenk Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -669,14 +669,14 @@ complex sqrt( const complex & x )
 {
   mprfloat_g r = abs(x);
   mprfloat_g nr, ni;
-  if (r == 0.0) {
+  if (r == (mprfloat_g) 0.0) {
     nr = ni = r;
-  } else if ( x.real() > 0) {
+  } else if ( x.real() > (mprfloat_g)0) {
     nr = sqrt((mprfloat_g)0.5 * (r + x.real()));
     ni = x.imag() / nr / (mprfloat_g)2;
   } else {
     ni = sqrt((mprfloat_g)0.5 * (r - x.real()));
-    if (x.imag() < 0) {
+    if (x.imag() < (mprfloat_g)0) {
       ni = - ni;
     }
     nr = x.imag() / ni / (mprfloat_g)2;
