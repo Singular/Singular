@@ -1728,10 +1728,6 @@ Such rings can be defined with @code{ring} and @code{alternating}
 @section links
 @cindex links
 
-Links describe the communication channels of Singular, i.e.
-something @sc{Singular} can write to and/or read from. Currently,
-Singular supports four different link types: @ref{Ascii links},  @ref{MPfile links},
-@ref{MPtcp links}, and @ref{DBM links}.
 @table @code
 @item @strong{Defintion:}
 @*link_expression = previously declared link
@@ -1743,33 +1739,6 @@ Singular supports four different link types: @ref{Ascii links},  @ref{MPfile lin
 @*type_string = @code{""}, or @code{"Ascii"}, or @code{"MPfile"}, or
 @code{"MPtcp"}, or @code{"DBM"}
 @end table
-
-A link is described by a string which starts with a property_string
-(specifying the type and mode of the link) and is followed by a
-name_string (specifying, for example, a filename).
-
-@*A property string
-must always contain the colon (":") character and may not contain space
-characters. The string before the colon denotes the type of the link and
-the string after the colon denotes its mode. If no type is specified,
-then the link type is set to @code{Ascii}, by default. If no mode is
-specified, then the default mode of the respective link type is used. If
-no property string is specified, then by default, the link type is set
-to @code{Ascii} and the mode is left unspecified.
-
-The name_string following the property_string specifies a filename for
-@code{Ascii}, @code{MPfile}, and @code{DBM} links and a network
-connection for @code{MPtcp} links.
-
-A link is opened by the command @code{open} or by the first
-@code{read} or @code{write} command and closed by @code{close} or
-@code{kill} (either explicitly by the user or implicitly by leaving the
-local scope of the identifier). Status information about a link can be
-obtained using the command @code{status}. The state of a @sc{Singular}
-session (i.e. all variables and their values) can be dumped and
-retrieved using the commands @code{dump} and @code{getdump}. See
-@ref{read}, @ref{write}, @ref{open}, @ref{close}, @ref{status},
-@ref{dump}, @ref{getdump}.
 
 @menu
 * Link operations::
@@ -1785,22 +1754,6 @@ See @ref{Ascii links}; @ref{MP links};  @ref{DBM links};
 @node Link operations, Ascii links, links, links
 @subsection Link operations
 @cindex Link operations
-@table @asis
-@item @code{close}
-see @ref{close}
-@item @code{dump}
-see @ref{dump}
-@item @code{getdump}
-see @ref{getdump}
-@item @code{open}
-see @ref{open}
-@item @code{read}
-see @ref{read}
-@item @code{status}
-see @ref{status}
-@item @code{write}
-see @ref{write}
-@end table
 @c ---------------------------------------
 @node Ascii links, MP links, Link operations, links
 @subsection Ascii links
@@ -1866,22 +1819,6 @@ Types without a conversion to @code{string} cannot be written.
 @node MP links, DBM links, Ascii links, links
 @subsection MP links
 @cindex MP links
-MP (Multi Protocol) links give the possibility to store and communicate
-data in the binary MP format format: read and write access is very fast
-compared to Ascii links. MP links can be established using files (link
-type is @code{MPfile}) or using TCP sockets (link type is
-@code{MPtcp}). All data (including such data that can not be converted
-to a string) can be written to an MP link. For ring-dependent data, a
-ring description is written together with the data. Reading from an MP
-link returns an expression (not a string) which was evaluated after the
-read operation. If the expression read from an MP link is not from the
-same ring as the current ring, then a @code{read} changes the current
-ring.  Currently, data is written without attributes (which is likely to
-change in future versions). For a general description of MP, see
-@code{http://symbolicnet.mcs.kent.edu:/areas/mp.html}.
-@*@strong{Restrictions:} MP links are currently only implemented for
-Unix platforms. Objects of type @code{number} are always communicated as
-objects of type @code{poly}.
 @menu
 * MPfile links::
 * MPtcp links::
