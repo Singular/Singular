@@ -96,9 +96,8 @@ endif
 
 # normal C++ source files
 CXXSOURCES=grammar.cc scanner.cc attrib.cc clapconv.cc \
-    mminit.cc eigenval.cc\
+    eigenval.cc\
     extra.cc febase.cc fehelp.cc feResource.cc feOpt.cc \
-    gring.cc gr_kstd2.cc\
     intvec.cc \
     ipassign.cc ipconv.cc ipid.cc iplib.cc \
     ipprint.cc ipshell.cc \
@@ -110,7 +109,7 @@ CXXSOURCES=grammar.cc scanner.cc attrib.cc clapconv.cc \
     shortfl.cc silink.cc kspoly.cc \
     subexpr.cc syz.cc syz0.cc \
     timer.cc janet.cc wrapper.cc\
-    GMPrat.cc multicnt.cc npolygon.cc \
+    multicnt.cc npolygon.cc \
     libparse.cc sing_win.cc\
     gms.cc pcv.cc maps_ip.cc\
     pDebug.cc pInline2.cc pInline1.cc pInline0.cc \
