@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.13 1997-05-06 18:14:26 Singular Exp $ */
+/* $Id: tesths.cc,v 1.14 1997-05-20 08:52:11 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -165,6 +165,11 @@ int main(          /* main entry to Singular */
 #endif
 #ifdef HAVE_FEREAD
               printf("\temulated libreadline,\n");
+#endif
+#ifdef HAVE_INFO
+              printf("\tinfo,\n");
+#else              
+              printf("\twithout info,\n");
 #endif
 #ifdef TEST
               printf("\tTESTs,\n");

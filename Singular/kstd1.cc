@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.5 1997-04-02 15:07:15 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.6 1997-05-20 08:52:08 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1877,6 +1877,7 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   l->Init(2);
   l->m[0].rtyp=IDEAL_CMD;
   l->m[0].data=(void *)r;
+  setFlag(&(l->m[0]),FLAG_STD);
   l->m[1].rtyp=IDEAL_CMD;
   if (strat->M==NULL)
   {

@@ -97,6 +97,13 @@
 /* works around a quirk in the generation of parser tables */
 #define INIT_BUG
 
+#define PROFILING
+#ifdef PROFILING
+#define PROFILER 0,0
+#else
+#define PROFILER 0,0
+#endif
+
 /*******************************************************************
  * Evaluate the set defines
  ******************************************************************/

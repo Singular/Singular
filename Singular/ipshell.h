@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.5 1997-04-28 17:47:16 Singular Exp $ */
+/* $Id: ipshell.h,v 1.6 1997-05-20 08:52:07 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -91,6 +91,10 @@ struct sValCmd2
   short res;
   short arg1;
   short arg2;
+#ifdef PROFILING
+  short cnt;
+  int   t;
+#endif    
 };
 
 typedef BOOLEAN (*proc3)(leftv,leftv,leftv,leftv);

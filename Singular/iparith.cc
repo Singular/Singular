@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.26 1997-04-30 17:44:39 Singular Exp $ */
+/* $Id: iparith.cc,v 1.27 1997-05-20 08:52:05 Singular Exp $ */
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
@@ -1831,253 +1831,253 @@ struct sValCmd2 dArith2[]=
 {
 // operations:
 // proc        cmd              res             arg1        arg2
- {jjPLUS_I,    '+',            INT_CMD,        INT_CMD,    INT_CMD }
-,{jjPLUS_N,    '+',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD }
-,{jjPLUS_P,    '+',            POLY_CMD,       POLY_CMD,   POLY_CMD }
-,{jjPLUS_P,    '+',            VECTOR_CMD,     VECTOR_CMD, VECTOR_CMD }
-,{jjPLUS_ID,   '+',            IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD }
-,{jjPLUS_ID,   '+',            MODUL_CMD,      MODUL_CMD,  MODUL_CMD }
-,{jjPLUS_P_MA, '+',            MATRIX_CMD,     POLY_CMD,   MATRIX_CMD }
-,{jjPLUS_MA_P, '+',            MATRIX_CMD,     MATRIX_CMD, POLY_CMD }
-,{jjPLUS_MA,   '+',            MATRIX_CMD,     MATRIX_CMD, MATRIX_CMD }
-,{jjPLUS_S,    '+',            STRING_CMD,     STRING_CMD, STRING_CMD }
-,{jjOP_IV_I,   '+',            INTVEC_CMD,     INTVEC_CMD, INT_CMD }
-,{jjOP_I_IV,   '+',            INTVEC_CMD,     INT_CMD,    INTVEC_CMD }
-,{jjOP_IM_I,   '+',            INTMAT_CMD,     INTMAT_CMD, INT_CMD }
-,{jjOP_I_IM,   '+',            INTMAT_CMD,     INT_CMD,    INTMAT_CMD }
-,{jjPLUS_IV,   '+',            INTVEC_CMD,     INTVEC_CMD, INTVEC_CMD }
-,{jjPLUS_IV,   '+',            INTMAT_CMD,     INTMAT_CMD, INTMAT_CMD }
-,{lAdd,        '+',            LIST_CMD,       LIST_CMD,   LIST_CMD }
-,{jjRSUM,      '+',            RING_CMD,       RING_CMD,   RING_CMD }
-,{jjMINUS_I,   '-',            INT_CMD,        INT_CMD,    INT_CMD }
-,{jjMINUS_N,   '-',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD }
-,{jjMINUS_P,   '-',            POLY_CMD,       POLY_CMD,   POLY_CMD }
-,{jjMINUS_P,   '-',            VECTOR_CMD,     VECTOR_CMD, VECTOR_CMD }
-,{jjPLUS_MA_P, '-',            MATRIX_CMD,     MATRIX_CMD, POLY_CMD }
-,{jjMINUS_MA,  '-',            MATRIX_CMD,     MATRIX_CMD, MATRIX_CMD }
-,{jjOP_IV_I,   '-',            INTVEC_CMD,     INTVEC_CMD, INT_CMD }
-,{jjOP_IM_I,   '-',            INTMAT_CMD,     INTMAT_CMD, INT_CMD }
-,{jjMINUS_IV,  '-',            INTVEC_CMD,     INTVEC_CMD, INTVEC_CMD }
-,{jjMINUS_IV,  '-',            INTMAT_CMD,     INTMAT_CMD, INTMAT_CMD }
-,{jjTIMES_I,   '*',            INT_CMD,        INT_CMD,    INT_CMD }
-,{jjTIMES_N,   '*',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD }
-,{jjTIMES_P,   '*',            POLY_CMD,       POLY_CMD,   POLY_CMD }
-,{jjTIMES_P,   '*',            VECTOR_CMD,     POLY_CMD,   VECTOR_CMD }
-,{jjTIMES_P,   '*',            VECTOR_CMD,     VECTOR_CMD, POLY_CMD}
-,{jjTIMES_MA_P1,'*',           IDEAL_CMD,      IDEAL_CMD,  POLY_CMD }
-,{jjTIMES_MA_P2,'*',           IDEAL_CMD,      POLY_CMD,   IDEAL_CMD }
-,{jjTIMES_ID,  '*',            IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD }
-,{jjTIMES_MA_P1,'*',           MODUL_CMD,      IDEAL_CMD,  VECTOR_CMD }
-,{jjTIMES_MA_P2,'*',           MODUL_CMD,      VECTOR_CMD, IDEAL_CMD }
-,{jjTIMES_ID,  '*',            MODUL_CMD,      IDEAL_CMD,  MODUL_CMD }
-,{jjTIMES_ID,  '*',            MODUL_CMD,      MODUL_CMD,  IDEAL_CMD }
-,{jjTIMES_MA_P1,'*',           MATRIX_CMD,     MATRIX_CMD, POLY_CMD }
-,{jjTIMES_MA_P2,'*',           MATRIX_CMD,     POLY_CMD,   MATRIX_CMD }
-,{jjTIMES_MA_N1,'*',           MATRIX_CMD,     MATRIX_CMD, NUMBER_CMD }
-,{jjTIMES_MA_N2,'*',           MATRIX_CMD,     NUMBER_CMD, MATRIX_CMD }
-,{jjTIMES_MA_I1,'*',           MATRIX_CMD,     MATRIX_CMD, INT_CMD }
-,{jjTIMES_MA_I2,'*',           MATRIX_CMD,     INT_CMD,    MATRIX_CMD }
-,{jjTIMES_MA,  '*',            MATRIX_CMD,     MATRIX_CMD, MATRIX_CMD }
-,{jjOP_IV_I,   '*',            INTVEC_CMD,     INTVEC_CMD, INT_CMD }
-,{jjOP_I_IV,   '*',            INTVEC_CMD,     INT_CMD,    INTVEC_CMD }
-,{jjOP_IV_I,   '*',            INTMAT_CMD,     INTMAT_CMD, INT_CMD }
-,{jjOP_I_IV,   '*',            INTMAT_CMD,     INT_CMD,    INTMAT_CMD }
-,{jjTIMES_IV,  '*',            INTVEC_CMD,     INTMAT_CMD, INTVEC_CMD }
-,{jjTIMES_IV,  '*',            INTMAT_CMD,     INTMAT_CMD, INTMAT_CMD }
-,{jjDIV_I,     '/',            INT_CMD,        INT_CMD,    INT_CMD }
-,{jjDIV_N,     '/',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD }
-,{jjDIV_P,     '/',            POLY_CMD,       POLY_CMD,   POLY_CMD }
-,{jjDIV_P,     '/',            VECTOR_CMD,     VECTOR_CMD, POLY_CMD }
-,{jjOP_IV_I,   '/',            INTVEC_CMD,     INTVEC_CMD, INT_CMD }
-,{jjOP_IV_I,   '/',            INTMAT_CMD,     INTMAT_CMD, INT_CMD }
-,{jjMOD_I,     '%',            INT_CMD,        INT_CMD,    INT_CMD }
-,{jjOP_IV_I,   '%',            INTVEC_CMD,     INTVEC_CMD, INT_CMD }
-,{jjOP_IV_I,   '%',            INTMAT_CMD,     INTMAT_CMD, INT_CMD }
-,{jjPOWER_I,   '^',            INT_CMD,        INT_CMD,    INT_CMD }
-,{jjPOWER_N,   '^',            NUMBER_CMD,     NUMBER_CMD, INT_CMD }
-,{jjPOWER_P,   '^',            POLY_CMD,       POLY_CMD,   INT_CMD }
-,{jjPOWER_ID,  '^',            IDEAL_CMD,      IDEAL_CMD,  INT_CMD }
-,{jjLE_I,      LE,             INT_CMD,        INT_CMD,    INT_CMD }
-,{jjLE_N,      LE,             INT_CMD,        NUMBER_CMD, NUMBER_CMD }
-,{jjCOMPARE_S, LE,             INT_CMD,        STRING_CMD, STRING_CMD }
-,{jjCOMPARE_IV_I,LE,           INT_CMD,        INTVEC_CMD, INT_CMD }
-,{jjCOMPARE_IV,LE,             INT_CMD,        INTVEC_CMD, INTVEC_CMD }
-,{jjCOMPARE_P, LE,             INT_CMD,        POLY_CMD,   POLY_CMD }
-,{jjCOMPARE_P, LE,             INT_CMD,        VECTOR_CMD, VECTOR_CMD }
-,{jjLT_I,      '<',            INT_CMD,        INT_CMD,    INT_CMD }
-,{jjLT_N,      '<',            INT_CMD,        NUMBER_CMD, NUMBER_CMD }
-,{jjCOMPARE_IV_I,'<',           INT_CMD,        INTVEC_CMD, INT_CMD }
-,{jjCOMPARE_IV,'<',            INT_CMD,        INTVEC_CMD, INTVEC_CMD }
-,{jjCOMPARE_S, '<',            INT_CMD,        STRING_CMD, STRING_CMD }
-,{jjCOMPARE_P, '<',            INT_CMD,        POLY_CMD,   POLY_CMD }
-,{jjCOMPARE_P, '<',            INT_CMD,        VECTOR_CMD, VECTOR_CMD }
-,{jjGE_I,      GE,             INT_CMD,        INT_CMD,    INT_CMD }
-,{jjGE_N,      GE,             INT_CMD,        NUMBER_CMD, NUMBER_CMD }
-,{jjCOMPARE_S, GE,             INT_CMD,        STRING_CMD, STRING_CMD }
-,{jjCOMPARE_IV_I,GE,           INT_CMD,        INTVEC_CMD, INT_CMD }
-,{jjCOMPARE_IV,GE,             INT_CMD,        INTVEC_CMD, INTVEC_CMD }
-,{jjCOMPARE_P, GE,             INT_CMD,        POLY_CMD,   POLY_CMD }
-,{jjCOMPARE_P, GE,             INT_CMD,        VECTOR_CMD, VECTOR_CMD }
-,{jjGT_I,      '>',            INT_CMD,        INT_CMD,    INT_CMD }
-,{jjGT_N,      '>',            INT_CMD,        NUMBER_CMD, NUMBER_CMD }
-,{jjCOMPARE_S, '>',            INT_CMD,        STRING_CMD, STRING_CMD }
-,{jjCOMPARE_IV_I,'>',          INT_CMD,        INTVEC_CMD, INT_CMD }
-,{jjCOMPARE_IV,'>',            INT_CMD,        INTVEC_CMD, INTVEC_CMD }
-,{jjCOMPARE_P, '>',            INT_CMD,        POLY_CMD,   POLY_CMD }
-,{jjCOMPARE_P, '>',            INT_CMD,        VECTOR_CMD, VECTOR_CMD }
-,{jjAND_I,     '&',            INT_CMD,        INT_CMD,    INT_CMD }
-,{jjOR_I,      '|',            INT_CMD,        INT_CMD,    INT_CMD }
-,{jjEQUAL_I,   EQUAL_EQUAL,    INT_CMD,        INT_CMD,    INT_CMD }
-,{jjEQUAL_N,   EQUAL_EQUAL,    INT_CMD,        NUMBER_CMD, NUMBER_CMD }
-,{jjCOMPARE_S, EQUAL_EQUAL,    INT_CMD,        STRING_CMD, STRING_CMD }
-,{jjEQUAL_P,   EQUAL_EQUAL,    INT_CMD,        POLY_CMD,   POLY_CMD }
-,{jjEQUAL_P,   EQUAL_EQUAL,    INT_CMD,        VECTOR_CMD, VECTOR_CMD }
-,{jjCOMPARE_IV_I,EQUAL_EQUAL,  INT_CMD,        INTVEC_CMD, INT_CMD }
-,{jjCOMPARE_IV,EQUAL_EQUAL,    INT_CMD,        INTVEC_CMD, INTVEC_CMD }
-,{jjCOMPARE_IV,EQUAL_EQUAL,    INT_CMD,        INTMAT_CMD, INTMAT_CMD }
-,{jjEQUAL_Ma,  EQUAL_EQUAL,    INT_CMD,        MATRIX_CMD, MATRIX_CMD }
-,{jjWRONG2,    EQUAL_EQUAL,    0,              IDEAL_CMD,  IDEAL_CMD }
-,{jjWRONG2,    EQUAL_EQUAL,    0,              MODUL_CMD,  MODUL_CMD }
-,{jjEQUAL_I,   NOTEQUAL,       INT_CMD,        INT_CMD,    INT_CMD }
-,{jjEQUAL_N,   NOTEQUAL,       INT_CMD,        NUMBER_CMD, NUMBER_CMD }
-,{jjCOMPARE_S, NOTEQUAL,       INT_CMD,        STRING_CMD, STRING_CMD }
-,{jjEQUAL_P,   NOTEQUAL,       INT_CMD,        POLY_CMD,   POLY_CMD }
-,{jjEQUAL_P,   NOTEQUAL,       INT_CMD,        VECTOR_CMD, VECTOR_CMD }
-,{jjCOMPARE_IV,NOTEQUAL,       INT_CMD,        INTVEC_CMD, INTVEC_CMD }
-,{jjCOMPARE_IV,NOTEQUAL,       INT_CMD,        INTMAT_CMD, INTMAT_CMD }
-,{jjEQUAL_Ma,  NOTEQUAL,       INT_CMD,        MATRIX_CMD, MATRIX_CMD }
-,{jjWRONG2,    NOTEQUAL,       0,              IDEAL_CMD,  IDEAL_CMD }
-,{jjWRONG2,    NOTEQUAL,       0,              MODUL_CMD,  MODUL_CMD }
-,{jjDOTDOT,    DOTDOT,         INTVEC_CMD,     INT_CMD,    INT_CMD }
-,{jjINDEX_I,   '[',            INT_CMD,        INTVEC_CMD, INT_CMD }
-,{jjINDEX_IV,  '[',            INT_CMD,        INTVEC_CMD, INTVEC_CMD }
-,{jjINDEX_I,   '[',            POLY_CMD,       IDEAL_CMD,  INT_CMD }
-,{jjINDEX_I,   '[',            POLY_CMD,       MAP_CMD,    INT_CMD }
-,{jjINDEX_IV,  '[',            POLY_CMD,       IDEAL_CMD,  INTVEC_CMD }
-,{jjINDEX_I,   '[',            VECTOR_CMD,     MODUL_CMD,  INT_CMD }
-,{jjINDEX_IV,  '[',            VECTOR_CMD,     MODUL_CMD,  INTVEC_CMD }
-,{jjINDEX_I,   '[',            STRING_CMD,     STRING_CMD, INT_CMD }
-,{jjINDEX_IV,  '[',            STRING_CMD,     STRING_CMD, INTVEC_CMD }
-,{jjINDEX_I,   '[',            ANY_TYPE/*set by p*/,LIST_CMD, INT_CMD }
-,{jjINDEX_IV,  '[',            ANY_TYPE/*set by p*/,LIST_CMD, INTVEC_CMD }
-,{jjINDEX_P,   '[',            POLY_CMD,       POLY_CMD,   INT_CMD }
-,{jjINDEX_P_IV,'[',            POLY_CMD,       POLY_CMD,   INTVEC_CMD }
-,{jjINDEX_V,   '[',            POLY_CMD,       VECTOR_CMD, INT_CMD }
-,{jjINDEX_V_IV,'[',            VECTOR_CMD,     VECTOR_CMD, INTVEC_CMD }
-,{jjPROC,      '(',            ANY_TYPE/*set by p*/,PROC_CMD, DEF_CMD }
+ {jjPLUS_I,    '+',            INT_CMD,        INT_CMD,    INT_CMD        PROFILER}
+,{jjPLUS_N,    '+',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD     PROFILER}
+,{jjPLUS_P,    '+',            POLY_CMD,       POLY_CMD,   POLY_CMD PROFILER}
+,{jjPLUS_P,    '+',            VECTOR_CMD,     VECTOR_CMD, VECTOR_CMD PROFILER}
+,{jjPLUS_ID,   '+',            IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD PROFILER}
+,{jjPLUS_ID,   '+',            MODUL_CMD,      MODUL_CMD,  MODUL_CMD PROFILER}
+,{jjPLUS_P_MA, '+',            MATRIX_CMD,     POLY_CMD,   MATRIX_CMD PROFILER}
+,{jjPLUS_MA_P, '+',            MATRIX_CMD,     MATRIX_CMD, POLY_CMD PROFILER}
+,{jjPLUS_MA,   '+',            MATRIX_CMD,     MATRIX_CMD, MATRIX_CMD PROFILER}
+,{jjPLUS_S,    '+',            STRING_CMD,     STRING_CMD, STRING_CMD PROFILER}
+,{jjOP_IV_I,   '+',            INTVEC_CMD,     INTVEC_CMD, INT_CMD PROFILER}
+,{jjOP_I_IV,   '+',            INTVEC_CMD,     INT_CMD,    INTVEC_CMD PROFILER}
+,{jjOP_IM_I,   '+',            INTMAT_CMD,     INTMAT_CMD, INT_CMD PROFILER}
+,{jjOP_I_IM,   '+',            INTMAT_CMD,     INT_CMD,    INTMAT_CMD PROFILER}
+,{jjPLUS_IV,   '+',            INTVEC_CMD,     INTVEC_CMD, INTVEC_CMD PROFILER}
+,{jjPLUS_IV,   '+',            INTMAT_CMD,     INTMAT_CMD, INTMAT_CMD PROFILER}
+,{lAdd,        '+',            LIST_CMD,       LIST_CMD,   LIST_CMD PROFILER}
+,{jjRSUM,      '+',            RING_CMD,       RING_CMD,   RING_CMD PROFILER}
+,{jjMINUS_I,   '-',            INT_CMD,        INT_CMD,    INT_CMD PROFILER}
+,{jjMINUS_N,   '-',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD PROFILER}
+,{jjMINUS_P,   '-',            POLY_CMD,       POLY_CMD,   POLY_CMD PROFILER}
+,{jjMINUS_P,   '-',            VECTOR_CMD,     VECTOR_CMD, VECTOR_CMD PROFILER}
+,{jjPLUS_MA_P, '-',            MATRIX_CMD,     MATRIX_CMD, POLY_CMD PROFILER}
+,{jjMINUS_MA,  '-',            MATRIX_CMD,     MATRIX_CMD, MATRIX_CMD PROFILER}
+,{jjOP_IV_I,   '-',            INTVEC_CMD,     INTVEC_CMD, INT_CMD PROFILER}
+,{jjOP_IM_I,   '-',            INTMAT_CMD,     INTMAT_CMD, INT_CMD PROFILER}
+,{jjMINUS_IV,  '-',            INTVEC_CMD,     INTVEC_CMD, INTVEC_CMD PROFILER}
+,{jjMINUS_IV,  '-',            INTMAT_CMD,     INTMAT_CMD, INTMAT_CMD PROFILER}
+,{jjTIMES_I,   '*',            INT_CMD,        INT_CMD,    INT_CMD PROFILER}
+,{jjTIMES_N,   '*',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD PROFILER}
+,{jjTIMES_P,   '*',            POLY_CMD,       POLY_CMD,   POLY_CMD PROFILER}
+,{jjTIMES_P,   '*',            VECTOR_CMD,     POLY_CMD,   VECTOR_CMD PROFILER}
+,{jjTIMES_P,   '*',            VECTOR_CMD,     VECTOR_CMD, POLY_CMD PROFILER}
+,{jjTIMES_MA_P1,'*',           IDEAL_CMD,      IDEAL_CMD,  POLY_CMD PROFILER}
+,{jjTIMES_MA_P2,'*',           IDEAL_CMD,      POLY_CMD,   IDEAL_CMD PROFILER}
+,{jjTIMES_ID,  '*',            IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD PROFILER}
+,{jjTIMES_MA_P1,'*',           MODUL_CMD,      IDEAL_CMD,  VECTOR_CMD PROFILER}
+,{jjTIMES_MA_P2,'*',           MODUL_CMD,      VECTOR_CMD, IDEAL_CMD PROFILER}
+,{jjTIMES_ID,  '*',            MODUL_CMD,      IDEAL_CMD,  MODUL_CMD PROFILER}
+,{jjTIMES_ID,  '*',            MODUL_CMD,      MODUL_CMD,  IDEAL_CMD PROFILER}
+,{jjTIMES_MA_P1,'*',           MATRIX_CMD,     MATRIX_CMD, POLY_CMD PROFILER}
+,{jjTIMES_MA_P2,'*',           MATRIX_CMD,     POLY_CMD,   MATRIX_CMD PROFILER}
+,{jjTIMES_MA_N1,'*',           MATRIX_CMD,     MATRIX_CMD, NUMBER_CMD PROFILER}
+,{jjTIMES_MA_N2,'*',           MATRIX_CMD,     NUMBER_CMD, MATRIX_CMD PROFILER}
+,{jjTIMES_MA_I1,'*',           MATRIX_CMD,     MATRIX_CMD, INT_CMD PROFILER}
+,{jjTIMES_MA_I2,'*',           MATRIX_CMD,     INT_CMD,    MATRIX_CMD PROFILER}
+,{jjTIMES_MA,  '*',            MATRIX_CMD,     MATRIX_CMD, MATRIX_CMD PROFILER}
+,{jjOP_IV_I,   '*',            INTVEC_CMD,     INTVEC_CMD, INT_CMD PROFILER}
+,{jjOP_I_IV,   '*',            INTVEC_CMD,     INT_CMD,    INTVEC_CMD PROFILER}
+,{jjOP_IV_I,   '*',            INTMAT_CMD,     INTMAT_CMD, INT_CMD PROFILER}
+,{jjOP_I_IV,   '*',            INTMAT_CMD,     INT_CMD,    INTMAT_CMD PROFILER}
+,{jjTIMES_IV,  '*',            INTVEC_CMD,     INTMAT_CMD, INTVEC_CMD PROFILER}
+,{jjTIMES_IV,  '*',            INTMAT_CMD,     INTMAT_CMD, INTMAT_CMD PROFILER}
+,{jjDIV_I,     '/',            INT_CMD,        INT_CMD,    INT_CMD PROFILER}
+,{jjDIV_N,     '/',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD PROFILER}
+,{jjDIV_P,     '/',            POLY_CMD,       POLY_CMD,   POLY_CMD PROFILER}
+,{jjDIV_P,     '/',            VECTOR_CMD,     VECTOR_CMD, POLY_CMD PROFILER}
+,{jjOP_IV_I,   '/',            INTVEC_CMD,     INTVEC_CMD, INT_CMD PROFILER}
+,{jjOP_IV_I,   '/',            INTMAT_CMD,     INTMAT_CMD, INT_CMD PROFILER}
+,{jjMOD_I,     '%',            INT_CMD,        INT_CMD,    INT_CMD PROFILER}
+,{jjOP_IV_I,   '%',            INTVEC_CMD,     INTVEC_CMD, INT_CMD PROFILER}
+,{jjOP_IV_I,   '%',            INTMAT_CMD,     INTMAT_CMD, INT_CMD PROFILER}
+,{jjPOWER_I,   '^',            INT_CMD,        INT_CMD,    INT_CMD PROFILER}
+,{jjPOWER_N,   '^',            NUMBER_CMD,     NUMBER_CMD, INT_CMD PROFILER}
+,{jjPOWER_P,   '^',            POLY_CMD,       POLY_CMD,   INT_CMD PROFILER}
+,{jjPOWER_ID,  '^',            IDEAL_CMD,      IDEAL_CMD,  INT_CMD PROFILER}
+,{jjLE_I,      LE,             INT_CMD,        INT_CMD,    INT_CMD PROFILER}
+,{jjLE_N,      LE,             INT_CMD,        NUMBER_CMD, NUMBER_CMD PROFILER}
+,{jjCOMPARE_S, LE,             INT_CMD,        STRING_CMD, STRING_CMD PROFILER}
+,{jjCOMPARE_IV_I,LE,           INT_CMD,        INTVEC_CMD, INT_CMD PROFILER}
+,{jjCOMPARE_IV,LE,             INT_CMD,        INTVEC_CMD, INTVEC_CMD PROFILER}
+,{jjCOMPARE_P, LE,             INT_CMD,        POLY_CMD,   POLY_CMD PROFILER}
+,{jjCOMPARE_P, LE,             INT_CMD,        VECTOR_CMD, VECTOR_CMD PROFILER}
+,{jjLT_I,      '<',            INT_CMD,        INT_CMD,    INT_CMD PROFILER}
+,{jjLT_N,      '<',            INT_CMD,        NUMBER_CMD, NUMBER_CMD PROFILER}
+,{jjCOMPARE_IV_I,'<',           INT_CMD,        INTVEC_CMD, INT_CMD PROFILER}
+,{jjCOMPARE_IV,'<',            INT_CMD,        INTVEC_CMD, INTVEC_CMD PROFILER}
+,{jjCOMPARE_S, '<',            INT_CMD,        STRING_CMD, STRING_CMD PROFILER}
+,{jjCOMPARE_P, '<',            INT_CMD,        POLY_CMD,   POLY_CMD PROFILER}
+,{jjCOMPARE_P, '<',            INT_CMD,        VECTOR_CMD, VECTOR_CMD PROFILER}
+,{jjGE_I,      GE,             INT_CMD,        INT_CMD,    INT_CMD PROFILER}
+,{jjGE_N,      GE,             INT_CMD,        NUMBER_CMD, NUMBER_CMD PROFILER}
+,{jjCOMPARE_S, GE,             INT_CMD,        STRING_CMD, STRING_CMD PROFILER}
+,{jjCOMPARE_IV_I,GE,           INT_CMD,        INTVEC_CMD, INT_CMD PROFILER}
+,{jjCOMPARE_IV,GE,             INT_CMD,        INTVEC_CMD, INTVEC_CMD PROFILER}
+,{jjCOMPARE_P, GE,             INT_CMD,        POLY_CMD,   POLY_CMD PROFILER}
+,{jjCOMPARE_P, GE,             INT_CMD,        VECTOR_CMD, VECTOR_CMD PROFILER}
+,{jjGT_I,      '>',            INT_CMD,        INT_CMD,    INT_CMD PROFILER}
+,{jjGT_N,      '>',            INT_CMD,        NUMBER_CMD, NUMBER_CMD PROFILER}
+,{jjCOMPARE_S, '>',            INT_CMD,        STRING_CMD, STRING_CMD PROFILER}
+,{jjCOMPARE_IV_I,'>',          INT_CMD,        INTVEC_CMD, INT_CMD PROFILER}
+,{jjCOMPARE_IV,'>',            INT_CMD,        INTVEC_CMD, INTVEC_CMD PROFILER}
+,{jjCOMPARE_P, '>',            INT_CMD,        POLY_CMD,   POLY_CMD PROFILER}
+,{jjCOMPARE_P, '>',            INT_CMD,        VECTOR_CMD, VECTOR_CMD PROFILER}
+,{jjAND_I,     '&',            INT_CMD,        INT_CMD,    INT_CMD PROFILER}
+,{jjOR_I,      '|',            INT_CMD,        INT_CMD,    INT_CMD PROFILER}
+,{jjEQUAL_I,   EQUAL_EQUAL,    INT_CMD,        INT_CMD,    INT_CMD PROFILER}
+,{jjEQUAL_N,   EQUAL_EQUAL,    INT_CMD,        NUMBER_CMD, NUMBER_CMD PROFILER}
+,{jjCOMPARE_S, EQUAL_EQUAL,    INT_CMD,        STRING_CMD, STRING_CMD PROFILER}
+,{jjEQUAL_P,   EQUAL_EQUAL,    INT_CMD,        POLY_CMD,   POLY_CMD PROFILER}
+,{jjEQUAL_P,   EQUAL_EQUAL,    INT_CMD,        VECTOR_CMD, VECTOR_CMD PROFILER}
+,{jjCOMPARE_IV_I,EQUAL_EQUAL,  INT_CMD,        INTVEC_CMD, INT_CMD PROFILER}
+,{jjCOMPARE_IV,EQUAL_EQUAL,    INT_CMD,        INTVEC_CMD, INTVEC_CMD PROFILER}
+,{jjCOMPARE_IV,EQUAL_EQUAL,    INT_CMD,        INTMAT_CMD, INTMAT_CMD PROFILER}
+,{jjEQUAL_Ma,  EQUAL_EQUAL,    INT_CMD,        MATRIX_CMD, MATRIX_CMD PROFILER}
+,{jjWRONG2,    EQUAL_EQUAL,    0,              IDEAL_CMD,  IDEAL_CMD PROFILER}
+,{jjWRONG2,    EQUAL_EQUAL,    0,              MODUL_CMD,  MODUL_CMD PROFILER}
+,{jjEQUAL_I,   NOTEQUAL,       INT_CMD,        INT_CMD,    INT_CMD PROFILER}
+,{jjEQUAL_N,   NOTEQUAL,       INT_CMD,        NUMBER_CMD, NUMBER_CMD PROFILER}
+,{jjCOMPARE_S, NOTEQUAL,       INT_CMD,        STRING_CMD, STRING_CMD PROFILER}
+,{jjEQUAL_P,   NOTEQUAL,       INT_CMD,        POLY_CMD,   POLY_CMD PROFILER}
+,{jjEQUAL_P,   NOTEQUAL,       INT_CMD,        VECTOR_CMD, VECTOR_CMD PROFILER}
+,{jjCOMPARE_IV,NOTEQUAL,       INT_CMD,        INTVEC_CMD, INTVEC_CMD PROFILER}
+,{jjCOMPARE_IV,NOTEQUAL,       INT_CMD,        INTMAT_CMD, INTMAT_CMD PROFILER}
+,{jjEQUAL_Ma,  NOTEQUAL,       INT_CMD,        MATRIX_CMD, MATRIX_CMD PROFILER}
+,{jjWRONG2,    NOTEQUAL,       0,              IDEAL_CMD,  IDEAL_CMD PROFILER}
+,{jjWRONG2,    NOTEQUAL,       0,              MODUL_CMD,  MODUL_CMD PROFILER}
+,{jjDOTDOT,    DOTDOT,         INTVEC_CMD,     INT_CMD,    INT_CMD PROFILER}
+,{jjINDEX_I,   '[',            INT_CMD,        INTVEC_CMD, INT_CMD PROFILER}
+,{jjINDEX_IV,  '[',            INT_CMD,        INTVEC_CMD, INTVEC_CMD PROFILER}
+,{jjINDEX_I,   '[',            POLY_CMD,       IDEAL_CMD,  INT_CMD PROFILER}
+,{jjINDEX_I,   '[',            POLY_CMD,       MAP_CMD,    INT_CMD PROFILER}
+,{jjINDEX_IV,  '[',            POLY_CMD,       IDEAL_CMD,  INTVEC_CMD PROFILER}
+,{jjINDEX_I,   '[',            VECTOR_CMD,     MODUL_CMD,  INT_CMD PROFILER}
+,{jjINDEX_IV,  '[',            VECTOR_CMD,     MODUL_CMD,  INTVEC_CMD PROFILER}
+,{jjINDEX_I,   '[',            STRING_CMD,     STRING_CMD, INT_CMD PROFILER}
+,{jjINDEX_IV,  '[',            STRING_CMD,     STRING_CMD, INTVEC_CMD PROFILER}
+,{jjINDEX_I,   '[',            ANY_TYPE/*set by p*/,LIST_CMD, INT_CMD PROFILER}
+,{jjINDEX_IV,  '[',            ANY_TYPE/*set by p*/,LIST_CMD, INTVEC_CMD PROFILER}
+,{jjINDEX_P,   '[',            POLY_CMD,       POLY_CMD,   INT_CMD PROFILER}
+,{jjINDEX_P_IV,'[',            POLY_CMD,       POLY_CMD,   INTVEC_CMD PROFILER}
+,{jjINDEX_V,   '[',            POLY_CMD,       VECTOR_CMD, INT_CMD PROFILER}
+,{jjINDEX_V_IV,'[',            VECTOR_CMD,     VECTOR_CMD, INTVEC_CMD PROFILER}
+,{jjPROC,      '(',            ANY_TYPE/*set by p*/,PROC_CMD, DEF_CMD PROFILER}
 #ifdef HAVE_DLD
-,{jjBIN,       '(',            ANY_TYPE/*set by p*/,BIN_CMD, DEF_CMD }
+,{jjBIN,       '(',            ANY_TYPE/*set by p*/,BIN_CMD, DEF_CMD PROFILER}
 #endif
-,{jjMAP,       '(',            ANY_TYPE/*set by p*/,MAP_CMD, DEF_CMD }
-,{jjKLAMMER,   '(',            ANY_TYPE/*set by p*/,ANY_TYPE, INT_CMD }
-,{jjKLAMMER_IV,'(',            ANY_TYPE/*set by p*/,ANY_TYPE, INTVEC_CMD }
+,{jjMAP,       '(',            ANY_TYPE/*set by p*/,MAP_CMD, DEF_CMD PROFILER}
+,{jjKLAMMER,   '(',            ANY_TYPE/*set by p*/,ANY_TYPE, INT_CMD PROFILER}
+,{jjKLAMMER_IV,'(',            ANY_TYPE/*set by p*/,ANY_TYPE, INTVEC_CMD PROFILER}
 // and the procedures with 2 arguments:
-,{atATTRIB2,   ATTRIB_CMD,     NONE/*set by p*/,DEF_CMD,   STRING_CMD }
-,{jjCOEF,      COEF_CMD,       MATRIX_CMD,     POLY_CMD,   POLY_CMD }
-,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     IDEAL_CMD,  POLY_CMD }
-,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     MODUL_CMD,  POLY_CMD }
-,{jjCONTRACT,  CONTRACT_CMD,   MATRIX_CMD,     IDEAL_CMD,  IDEAL_CMD }
-,{jjDEG_IV,    DEG_CMD,        INT_CMD,        POLY_CMD,   INTVEC_CMD }
-,{lDelete,     DELETE_CMD,     LIST_CMD,       LIST_CMD,   INT_CMD }
-,{jjDIFF_P,    DIFF_CMD,       POLY_CMD,       POLY_CMD,   POLY_CMD }
-,{jjDIFF_P,    DIFF_CMD,       VECTOR_CMD,     VECTOR_CMD, POLY_CMD }
-,{jjDIFF_ID,   DIFF_CMD,       IDEAL_CMD,      IDEAL_CMD,  POLY_CMD }
-,{jjDIFF_ID_ID,DIFF_CMD,       MATRIX_CMD,     IDEAL_CMD,  IDEAL_CMD }
-,{jjDIFF_ID,   DIFF_CMD,       MODUL_CMD,      MODUL_CMD,  POLY_CMD }
-,{jjDIFF_ID,   DIFF_CMD,       MATRIX_CMD,     MATRIX_CMD, POLY_CMD }
-,{jjDIM2,      DIM_CMD,        INT_CMD,        IDEAL_CMD,  IDEAL_CMD }
-,{jjDIM2,      DIM_CMD,        INT_CMD,        MODUL_CMD,  IDEAL_CMD }
-,{jjELIMIN,    ELIMINATION_CMD,IDEAL_CMD,      IDEAL_CMD,  POLY_CMD }
-,{jjELIMIN,    ELIMINATION_CMD,MODUL_CMD,      MODUL_CMD,  POLY_CMD }
-,{jjEXTGCD_I,  EXTGCD_CMD,     LIST_CMD,       INT_CMD,    INT_CMD }
+,{atATTRIB2,   ATTRIB_CMD,     NONE/*set by p*/,DEF_CMD,   STRING_CMD PROFILER}
+,{jjCOEF,      COEF_CMD,       MATRIX_CMD,     POLY_CMD,   POLY_CMD PROFILER}
+,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     IDEAL_CMD,  POLY_CMD PROFILER}
+,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     MODUL_CMD,  POLY_CMD PROFILER}
+,{jjCONTRACT,  CONTRACT_CMD,   MATRIX_CMD,     IDEAL_CMD,  IDEAL_CMD PROFILER}
+,{jjDEG_IV,    DEG_CMD,        INT_CMD,        POLY_CMD,   INTVEC_CMD PROFILER}
+,{lDelete,     DELETE_CMD,     LIST_CMD,       LIST_CMD,   INT_CMD PROFILER}
+,{jjDIFF_P,    DIFF_CMD,       POLY_CMD,       POLY_CMD,   POLY_CMD PROFILER}
+,{jjDIFF_P,    DIFF_CMD,       VECTOR_CMD,     VECTOR_CMD, POLY_CMD PROFILER}
+,{jjDIFF_ID,   DIFF_CMD,       IDEAL_CMD,      IDEAL_CMD,  POLY_CMD PROFILER}
+,{jjDIFF_ID_ID,DIFF_CMD,       MATRIX_CMD,     IDEAL_CMD,  IDEAL_CMD PROFILER}
+,{jjDIFF_ID,   DIFF_CMD,       MODUL_CMD,      MODUL_CMD,  POLY_CMD PROFILER}
+,{jjDIFF_ID,   DIFF_CMD,       MATRIX_CMD,     MATRIX_CMD, POLY_CMD PROFILER}
+,{jjDIM2,      DIM_CMD,        INT_CMD,        IDEAL_CMD,  IDEAL_CMD PROFILER}
+,{jjDIM2,      DIM_CMD,        INT_CMD,        MODUL_CMD,  IDEAL_CMD PROFILER}
+,{jjELIMIN,    ELIMINATION_CMD,IDEAL_CMD,      IDEAL_CMD,  POLY_CMD PROFILER}
+,{jjELIMIN,    ELIMINATION_CMD,MODUL_CMD,      MODUL_CMD,  POLY_CMD PROFILER}
+,{jjEXTGCD_I,  EXTGCD_CMD,     LIST_CMD,       INT_CMD,    INT_CMD PROFILER}
 #ifdef HAVE_FACTORY
-,{jjEXTGCD_P,  EXTGCD_CMD,     LIST_CMD,       POLY_CMD,   POLY_CMD }
-,{jjSQR_FREE_DEC,FAC_CMD,      IDEAL_CMD,      POLY_CMD,   INT_CMD }
-,{jjFACSTD2,    FACSTD_CMD,    LIST_CMD,       IDEAL_CMD,  IDEAL_CMD }
+,{jjEXTGCD_P,  EXTGCD_CMD,     LIST_CMD,       POLY_CMD,   POLY_CMD PROFILER}
+,{jjSQR_FREE_DEC,FAC_CMD,      IDEAL_CMD,      POLY_CMD,   INT_CMD PROFILER}
+,{jjFACSTD2,    FACSTD_CMD,    LIST_CMD,       IDEAL_CMD,  IDEAL_CMD PROFILER}
 #else
-,{jjWRONG2,    EXTGCD_CMD,     LIST_CMD,       POLY_CMD,   POLY_CMD }
-,{jjWRONG2,    FAC_CMD,        IDEAL_CMD,      POLY_CMD,   INT_CMD }
-,{jjWRONG2,    FACSTD_CMD,     LIST_CMD,       IDEAL_CMD,  IDEAL_CMD }
+,{jjWRONG2,    EXTGCD_CMD,     LIST_CMD,       POLY_CMD,   POLY_CMD PROFILER}
+,{jjWRONG2,    FAC_CMD,        IDEAL_CMD,      POLY_CMD,   INT_CMD PROFILER}
+,{jjWRONG2,    FACSTD_CMD,     LIST_CMD,       IDEAL_CMD,  IDEAL_CMD PROFILER}
 #endif
-,{jjFETCH,     FETCH_CMD,      ANY_TYPE/*set by p*/,RING_CMD,  ANY_TYPE }
-,{jjFETCH,     FETCH_CMD,      ANY_TYPE/*set by p*/,QRING_CMD, ANY_TYPE }
+,{jjFETCH,     FETCH_CMD,      ANY_TYPE/*set by p*/,RING_CMD,  ANY_TYPE PROFILER}
+,{jjFETCH,     FETCH_CMD,      ANY_TYPE/*set by p*/,QRING_CMD, ANY_TYPE PROFILER}
 #ifdef HAVE_FGLM
-,{fglmProc,    FGLM_CMD,       IDEAL_CMD,      RING_CMD,   DEF_CMD }
-,{fglmProc,    FGLM_CMD,       IDEAL_CMD,      QRING_CMD,  DEF_CMD }
+,{fglmProc,    FGLM_CMD,       IDEAL_CMD,      RING_CMD,   DEF_CMD PROFILER}
+,{fglmProc,    FGLM_CMD,       IDEAL_CMD,      QRING_CMD,  DEF_CMD PROFILER}
 #else 
-,{jjWRONG2,    FGLM_CMD,       IDEAL_CMD,      RING_CMD,   DEF_CMD }
-,{jjWRONG2,    FGLM_CMD,       IDEAL_CMD,      QRING_CMD,  DEF_CMD }
+,{jjWRONG2,    FGLM_CMD,       IDEAL_CMD,      RING_CMD,   DEF_CMD PROFILER}
+,{jjWRONG2,    FGLM_CMD,       IDEAL_CMD,      QRING_CMD,  DEF_CMD PROFILER}
 #endif
-,{jjFIND2,     FIND_CMD,       INT_CMD,        STRING_CMD, STRING_CMD }
-,{jjGCD_I,     GCD_CMD,        INT_CMD,        INT_CMD,    INT_CMD }
+,{jjFIND2,     FIND_CMD,       INT_CMD,        STRING_CMD, STRING_CMD PROFILER}
+,{jjGCD_I,     GCD_CMD,        INT_CMD,        INT_CMD,    INT_CMD PROFILER}
 #ifdef HAVE_FACTORY
-,{jjGCD_P,     GCD_CMD,        POLY_CMD,       POLY_CMD,   POLY_CMD }
+,{jjGCD_P,     GCD_CMD,        POLY_CMD,       POLY_CMD,   POLY_CMD PROFILER}
 #else
-,{jjWRONG2,    GCD_CMD,        POLY_CMD,       POLY_CMD,   POLY_CMD }
+,{jjWRONG2,    GCD_CMD,        POLY_CMD,       POLY_CMD,   POLY_CMD PROFILER}
 #endif
-,{jjHILBERT2,  HILBERT_CMD,    INTVEC_CMD,     IDEAL_CMD,  INT_CMD }
-,{jjHILBERT2,  HILBERT_CMD,    INTVEC_CMD,     MODUL_CMD,  INT_CMD }
-,{jjHOMOG_P,   HOMOG_CMD,      POLY_CMD,       POLY_CMD,   POLY_CMD }
-,{jjHOMOG_P,   HOMOG_CMD,      VECTOR_CMD,     VECTOR_CMD, POLY_CMD }
-,{jjHOMOG_ID,  HOMOG_CMD,      IDEAL_CMD,      IDEAL_CMD,  POLY_CMD }
-,{jjHOMOG_ID,  HOMOG_CMD,      MODUL_CMD,      MODUL_CMD,  POLY_CMD }
-,{jjCALL2MANY, IDEAL_CMD,      IDEAL_CMD,      DEF_CMD,    DEF_CMD }
-,{jjFETCH,     IMAP_CMD,       ANY_TYPE/*set by p*/,RING_CMD,  ANY_TYPE }
-,{jjFETCH,     IMAP_CMD,       ANY_TYPE/*set by p*/,QRING_CMD, ANY_TYPE }
-,{lInsert,     INSERT_CMD,     LIST_CMD,       LIST_CMD,   DEF_CMD }
-,{jjINTERSECT, INTERSECT_CMD,  IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD }
-,{jjINTERSECT, INTERSECT_CMD,  MODUL_CMD,      MODUL_CMD,  MODUL_CMD }
-,{jjJET_P,     JET_CMD,        POLY_CMD,       POLY_CMD,   INT_CMD }
-,{jjJET_ID,    JET_CMD,        IDEAL_CMD,      IDEAL_CMD,  INT_CMD }
-,{jjJET_P,     JET_CMD,        VECTOR_CMD,     VECTOR_CMD, INT_CMD }
-,{jjJET_ID,    JET_CMD,        MODUL_CMD,      MODUL_CMD,  INT_CMD }
-,{atKILLATTR2, KILLATTR_CMD,   NONE,           IDHDL,      STRING_CMD }
-,{jjKoszul,    KOSZUL_CMD,     MATRIX_CMD,     INT_CMD,    INT_CMD }
-,{jjKoszul_Id, KOSZUL_CMD,     MATRIX_CMD,     INT_CMD,    IDEAL_CMD }
-,{jjLIFT,      LIFT_CMD,       MATRIX_CMD,     IDEAL_CMD,  IDEAL_CMD }
-,{jjLIFT,      LIFT_CMD,       MATRIX_CMD,     MODUL_CMD,  MODUL_CMD }
-,{jjLIFTSTD,   LIFTSTD_CMD,    IDEAL_CMD,      IDEAL_CMD,  MATRIX_CMD }
-,{jjLIFTSTD,   LIFTSTD_CMD,    MODUL_CMD,      MODUL_CMD,  MATRIX_CMD }
-,{jjCALL2MANY, LIST_CMD,       LIST_CMD,       DEF_CMD,    DEF_CMD }
-,{jjMINOR,     MINOR_CMD,      IDEAL_CMD,      MATRIX_CMD, INT_CMD }
-,{jjCALL2MANY, MODUL_CMD,      MODUL_CMD,      DEF_CMD,    DEF_CMD }
-,{jjMODULO,    MODULO_CMD,     MODUL_CMD,      IDEAL_CMD,  IDEAL_CMD }
-,{jjMODULO,    MODULO_CMD,     MODUL_CMD,      MODUL_CMD,  MODUL_CMD }
-,{jjMONITOR2,  MONITOR_CMD,    NONE,           STRING_CMD, STRING_CMD }
-,{jjRES,       MRES_CMD,       LIST_CMD,       IDEAL_CMD,  INT_CMD }
-,{jjRES,       MRES_CMD,       LIST_CMD,       MODUL_CMD,  INT_CMD }
-,{jjPARSTR2,   PARSTR_CMD,     STRING_CMD,     RING_CMD,   INT_CMD }
-,{jjPARSTR2,   PARSTR_CMD,     STRING_CMD,     QRING_CMD,  INT_CMD }
-,{jjPRINT_FORMAT, PRINT_CMD,   NONE,           DEF_CMD,    STRING_CMD }
-,{jjQUOT,      QUOTIENT_CMD,   IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD }
-,{jjQUOT,      QUOTIENT_CMD,   MODUL_CMD,      MODUL_CMD,  IDEAL_CMD }
-,{jjQUOT,      QUOTIENT_CMD,   IDEAL_CMD,      MODUL_CMD,  MODUL_CMD }
-,{jjRANDOM,    RANDOM_CMD,     INT_CMD,        INT_CMD,    INT_CMD }
-,{jjREAD2,     READ_CMD,       STRING_CMD,     LINK_CMD,   STRING_CMD }
-,{jjREDUCE_P,  REDUCE_CMD,     POLY_CMD,       POLY_CMD,   IDEAL_CMD }
-,{jjREDUCE_P,  REDUCE_CMD,     VECTOR_CMD,     VECTOR_CMD, IDEAL_CMD }
-,{jjREDUCE_P,  REDUCE_CMD,     VECTOR_CMD,     VECTOR_CMD, MODUL_CMD }
-,{jjREDUCE_ID, REDUCE_CMD,     IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD }
-,{jjREDUCE_ID, REDUCE_CMD,     MODUL_CMD,      MODUL_CMD,  MODUL_CMD }
-,{jjREDUCE_ID, REDUCE_CMD,     MODUL_CMD,      MODUL_CMD,  IDEAL_CMD }
-,{jjRES,       RES_CMD,        LIST_CMD,       IDEAL_CMD,  INT_CMD }
-,{jjRES,       RES_CMD,        LIST_CMD,       MODUL_CMD,  INT_CMD }
-,{jjSTATUS2,   STATUS_CMD,     STRING_CMD,     LINK_CMD,   STRING_CMD}
-,{jjSIMPL_P,   SIMPLIFY_CMD,   POLY_CMD,       POLY_CMD,   INT_CMD }
-,{jjSIMPL_P,   SIMPLIFY_CMD,   VECTOR_CMD,     VECTOR_CMD, INT_CMD }
-,{jjSIMPL_ID,  SIMPLIFY_CMD,   IDEAL_CMD,      IDEAL_CMD,  INT_CMD }
-,{jjSIMPL_ID,  SIMPLIFY_CMD,   MODUL_CMD,      MODUL_CMD,  INT_CMD }
-,{jjRES,       SRES_CMD,       LIST_CMD,       IDEAL_CMD,  INT_CMD }
-,{jjRES,       SRES_CMD,       LIST_CMD,       MODUL_CMD,  INT_CMD }
-,{jjCALL2MANY, SYSTEM_CMD,     ANY_TYPE/*set by p*/,STRING_CMD, DEF_CMD }
-,{jjSTD_1,     STD_CMD,        IDEAL_CMD,      IDEAL_CMD,  POLY_CMD }
-,{jjSTD_1,     STD_CMD,        MODUL_CMD,      MODUL_CMD,  VECTOR_CMD }
-,{jjSTD_HILB,  STD_CMD,        IDEAL_CMD,      IDEAL_CMD,  INTVEC_CMD }
-,{jjSTD_HILB,  STD_CMD,        MODUL_CMD,      MODUL_CMD,  INTVEC_CMD }
-,{jjVARSTR2,   VARSTR_CMD,     STRING_CMD,     RING_CMD,   INT_CMD }
-,{jjVARSTR2,   VARSTR_CMD,     STRING_CMD,     QRING_CMD,  INT_CMD }
-,{jjWEDGE,     WEDGE_CMD,      MATRIX_CMD,     MATRIX_CMD, INT_CMD }
-,{NULL,        0,              0,              0,          0 }
+,{jjHILBERT2,  HILBERT_CMD,    INTVEC_CMD,     IDEAL_CMD,  INT_CMD PROFILER}
+,{jjHILBERT2,  HILBERT_CMD,    INTVEC_CMD,     MODUL_CMD,  INT_CMD PROFILER}
+,{jjHOMOG_P,   HOMOG_CMD,      POLY_CMD,       POLY_CMD,   POLY_CMD PROFILER}
+,{jjHOMOG_P,   HOMOG_CMD,      VECTOR_CMD,     VECTOR_CMD, POLY_CMD PROFILER}
+,{jjHOMOG_ID,  HOMOG_CMD,      IDEAL_CMD,      IDEAL_CMD,  POLY_CMD PROFILER}
+,{jjHOMOG_ID,  HOMOG_CMD,      MODUL_CMD,      MODUL_CMD,  POLY_CMD PROFILER}
+,{jjCALL2MANY, IDEAL_CMD,      IDEAL_CMD,      DEF_CMD,    DEF_CMD PROFILER}
+,{jjFETCH,     IMAP_CMD,       ANY_TYPE/*set by p*/,RING_CMD,  ANY_TYPE PROFILER}
+,{jjFETCH,     IMAP_CMD,       ANY_TYPE/*set by p*/,QRING_CMD, ANY_TYPE PROFILER}
+,{lInsert,     INSERT_CMD,     LIST_CMD,       LIST_CMD,   DEF_CMD PROFILER}
+,{jjINTERSECT, INTERSECT_CMD,  IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD PROFILER}
+,{jjINTERSECT, INTERSECT_CMD,  MODUL_CMD,      MODUL_CMD,  MODUL_CMD PROFILER}
+,{jjJET_P,     JET_CMD,        POLY_CMD,       POLY_CMD,   INT_CMD PROFILER}
+,{jjJET_ID,    JET_CMD,        IDEAL_CMD,      IDEAL_CMD,  INT_CMD PROFILER}
+,{jjJET_P,     JET_CMD,        VECTOR_CMD,     VECTOR_CMD, INT_CMD PROFILER}
+,{jjJET_ID,    JET_CMD,        MODUL_CMD,      MODUL_CMD,  INT_CMD PROFILER}
+,{atKILLATTR2, KILLATTR_CMD,   NONE,           IDHDL,      STRING_CMD PROFILER}
+,{jjKoszul,    KOSZUL_CMD,     MATRIX_CMD,     INT_CMD,    INT_CMD PROFILER}
+,{jjKoszul_Id, KOSZUL_CMD,     MATRIX_CMD,     INT_CMD,    IDEAL_CMD PROFILER}
+,{jjLIFT,      LIFT_CMD,       MATRIX_CMD,     IDEAL_CMD,  IDEAL_CMD PROFILER}
+,{jjLIFT,      LIFT_CMD,       MATRIX_CMD,     MODUL_CMD,  MODUL_CMD PROFILER}
+,{jjLIFTSTD,   LIFTSTD_CMD,    IDEAL_CMD,      IDEAL_CMD,  MATRIX_CMD PROFILER}
+,{jjLIFTSTD,   LIFTSTD_CMD,    MODUL_CMD,      MODUL_CMD,  MATRIX_CMD PROFILER}
+,{jjCALL2MANY, LIST_CMD,       LIST_CMD,       DEF_CMD,    DEF_CMD PROFILER}
+,{jjMINOR,     MINOR_CMD,      IDEAL_CMD,      MATRIX_CMD, INT_CMD PROFILER}
+,{jjCALL2MANY, MODUL_CMD,      MODUL_CMD,      DEF_CMD,    DEF_CMD PROFILER}
+,{jjMODULO,    MODULO_CMD,     MODUL_CMD,      IDEAL_CMD,  IDEAL_CMD PROFILER}
+,{jjMODULO,    MODULO_CMD,     MODUL_CMD,      MODUL_CMD,  MODUL_CMD PROFILER}
+,{jjMONITOR2,  MONITOR_CMD,    NONE,           STRING_CMD, STRING_CMD PROFILER}
+,{jjRES,       MRES_CMD,       LIST_CMD,       IDEAL_CMD,  INT_CMD PROFILER}
+,{jjRES,       MRES_CMD,       LIST_CMD,       MODUL_CMD,  INT_CMD PROFILER}
+,{jjPARSTR2,   PARSTR_CMD,     STRING_CMD,     RING_CMD,   INT_CMD PROFILER}
+,{jjPARSTR2,   PARSTR_CMD,     STRING_CMD,     QRING_CMD,  INT_CMD PROFILER}
+,{jjPRINT_FORMAT, PRINT_CMD,   NONE,           DEF_CMD,    STRING_CMD PROFILER}
+,{jjQUOT,      QUOTIENT_CMD,   IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD PROFILER}
+,{jjQUOT,      QUOTIENT_CMD,   MODUL_CMD,      MODUL_CMD,  IDEAL_CMD PROFILER}
+,{jjQUOT,      QUOTIENT_CMD,   IDEAL_CMD,      MODUL_CMD,  MODUL_CMD PROFILER}
+,{jjRANDOM,    RANDOM_CMD,     INT_CMD,        INT_CMD,    INT_CMD PROFILER}
+,{jjREAD2,     READ_CMD,       STRING_CMD,     LINK_CMD,   STRING_CMD PROFILER}
+,{jjREDUCE_P,  REDUCE_CMD,     POLY_CMD,       POLY_CMD,   IDEAL_CMD PROFILER}
+,{jjREDUCE_P,  REDUCE_CMD,     VECTOR_CMD,     VECTOR_CMD, IDEAL_CMD PROFILER}
+,{jjREDUCE_P,  REDUCE_CMD,     VECTOR_CMD,     VECTOR_CMD, MODUL_CMD PROFILER}
+,{jjREDUCE_ID, REDUCE_CMD,     IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD PROFILER}
+,{jjREDUCE_ID, REDUCE_CMD,     MODUL_CMD,      MODUL_CMD,  MODUL_CMD PROFILER}
+,{jjREDUCE_ID, REDUCE_CMD,     MODUL_CMD,      MODUL_CMD,  IDEAL_CMD PROFILER}
+,{jjRES,       RES_CMD,        LIST_CMD,       IDEAL_CMD,  INT_CMD PROFILER}
+,{jjRES,       RES_CMD,        LIST_CMD,       MODUL_CMD,  INT_CMD PROFILER}
+,{jjSTATUS2,   STATUS_CMD,     STRING_CMD,     LINK_CMD,   STRING_CMD PROFILER}
+,{jjSIMPL_P,   SIMPLIFY_CMD,   POLY_CMD,       POLY_CMD,   INT_CMD PROFILER}
+,{jjSIMPL_P,   SIMPLIFY_CMD,   VECTOR_CMD,     VECTOR_CMD, INT_CMD PROFILER}
+,{jjSIMPL_ID,  SIMPLIFY_CMD,   IDEAL_CMD,      IDEAL_CMD,  INT_CMD PROFILER}
+,{jjSIMPL_ID,  SIMPLIFY_CMD,   MODUL_CMD,      MODUL_CMD,  INT_CMD PROFILER}
+,{jjRES,       SRES_CMD,       LIST_CMD,       IDEAL_CMD,  INT_CMD PROFILER}
+,{jjRES,       SRES_CMD,       LIST_CMD,       MODUL_CMD,  INT_CMD PROFILER}
+,{jjCALL2MANY, SYSTEM_CMD,     ANY_TYPE/*set by p*/,STRING_CMD, DEF_CMD PROFILER}
+,{jjSTD_1,     STD_CMD,        IDEAL_CMD,      IDEAL_CMD,  POLY_CMD PROFILER}
+,{jjSTD_1,     STD_CMD,        MODUL_CMD,      MODUL_CMD,  VECTOR_CMD PROFILER}
+,{jjSTD_HILB,  STD_CMD,        IDEAL_CMD,      IDEAL_CMD,  INTVEC_CMD PROFILER}
+,{jjSTD_HILB,  STD_CMD,        MODUL_CMD,      MODUL_CMD,  INTVEC_CMD PROFILER}
+,{jjVARSTR2,   VARSTR_CMD,     STRING_CMD,     RING_CMD,   INT_CMD PROFILER}
+,{jjVARSTR2,   VARSTR_CMD,     STRING_CMD,     QRING_CMD,  INT_CMD PROFILER}
+,{jjWEDGE,     WEDGE_CMD,      MATRIX_CMD,     MATRIX_CMD, INT_CMD PROFILER}
+,{NULL,        0,              0,              0,          0 PROFILER}
 };
 /*=================== operations with 1 arg.: static proc =================*/
 static BOOLEAN jjDUMMY(leftv res, leftv u)
