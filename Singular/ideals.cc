@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.55 1999-09-07 18:15:31 Singular Exp $ */
+/* $Id: ideals.cc,v 1.56 1999-09-27 13:51:05 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -114,8 +114,8 @@ void idDelete (ideal * h)
   {
     do
     {
-      #ifdef PDEBUG
-      pDBDelete(&((*h)->m[--j]),f,l);
+      #if defined(MDEBUG) && defined(PDEBUG)
+      pDBDelete(&((*h)->m[--j]),mm_specHeap, f,l);
       #else
       pDelete(&((*h)->m[--j]));
       #endif
@@ -342,7 +342,7 @@ ideal idCopy (ideal h1)
     h2=idInit(IDELEMS(h1),h1->rank);
 #endif
     for (i=IDELEMS(h1)-1; i>=0; i--)
-#ifdef PDEBUG
+#if defined(PDEBUG) && defined(MDEBUG)
       h2->m[i] = pDBCopy(h1->m[i],f,l);
 #else
       h2->m[i] = pCopy(h1->m[i]);
@@ -360,9 +360,11 @@ void idDBTest(ideal h1,char *f,int l)
   {
     #ifdef MDEBUG
     mmDBTestBlock(h1,sizeof(*h1),f,l);
+    /* to be able to test matrices: */
+    mmDBTestBlock(h1->m,h1->ncols*h1->nrows*sizeof(poly),f,l);
     #endif
     /* to be able to test matrices: */
-    for (i=(IDELEMS(h1)*h1->nrows)-1; i>=0; i--)
+    for (i=(h1->ncols*h1->nrows)-1; i>=0; i--)
       pDBTest(h1->m[i],f,l);
     int new_rk=idRankFreeModule(h1);
     if(new_rk > h1->rank)
@@ -2028,6 +2030,7 @@ static void makemonoms(int vars,int actvar,int deg,int monomdeg)
     {
       pSetExp(idpower[idpowerpoint],actvar,deg-monomdeg);
       pSetm(idpower[idpowerpoint]);
+      pTest(idpower[idpowerpoint]);
       idpowerpoint++;
       return;
     }
@@ -2040,6 +2043,7 @@ static void makemonoms(int vars,int actvar,int deg,int monomdeg)
     monomdeg++;
     pSetExp(idpower[idpowerpoint],actvar,pGetExp(idpower[idpowerpoint],actvar)+1);
     pSetm(idpower[idpowerpoint]);
+    pTest(idpower[idpowerpoint]);
     i++;
   }
 }
@@ -2197,7 +2201,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   ideal  h,hh, h3;
   int    *ord,*block0,*block1;
   int    ordersize=2;
-  short  **wv;
+  int    **wv;
   tHomog hom;
   intvec * w;
   sip_sring tmpR;
@@ -2236,9 +2240,10 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   }
   block0[0] = 1;
   block1[0] = pVariables;
-  wv=(short**) Alloc0(ordersize*sizeof(short**));
-  memcpy4(wv+1,currRing->wvhdl,(ordersize-1)*sizeof(short**));
-  wv[0]=(short*)Alloc0((pVariables+1)*sizeof(short));
+  wv=(int**) Alloc0(ordersize*sizeof(int**));
+  memcpy4(wv+1,currRing->wvhdl,(ordersize-1)*sizeof(int**));
+  wv[0]=(int*)AllocL((pVariables+1)*sizeof(int));
+  memset(wv[0],0,(pVariables+1)*sizeof(int));
   for (j=0;j<pVariables;j++)
     if (pGetExp(delVar,j+1)!=0) wv[0][j]=1;
   ord[0] = ringorder_a;
@@ -2249,7 +2254,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   tmpR.block0 = block0;
   tmpR.block1 = block1;
   tmpR.wvhdl = wv;
-  rComplete(&tmpR);
+  rComplete(&tmpR, 1);
 
   // change into the new ring
   //pChangeRing(pVariables,currRing->OrdSgn,ord,block0,block1,wv);
@@ -2283,13 +2288,16 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
       h3->m[j] = pFetchCopy(&tmpR, hh->m[k]);
     }
   }
+  rChangeCurrRing(&tmpR, FALSE);
   idDelete(&hh);
+  rChangeCurrRing(origR, TRUE);
   idSkipZeroes(h3);
-  Free((ADDRESS)wv[0],(pVariables+1)*sizeof(short));
-  Free((ADDRESS)wv,ordersize*sizeof(short**));
+  FreeL((ADDRESS)wv[0]);
+  Free((ADDRESS)wv,ordersize*sizeof(int**));
   Free((ADDRESS)ord,ordersize*sizeof(int));
   Free((ADDRESS)block0,ordersize*sizeof(int));
   Free((ADDRESS)block1,ordersize*sizeof(int));
+  rUnComplete(&tmpR);
   if (w!=NULL)
     delete w;
   return h3;

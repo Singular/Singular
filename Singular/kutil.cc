@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.34 1999-09-06 15:43:33 Singular Exp $ */
+/* $Id: kutil.cc,v 1.35 1999-09-27 13:51:31 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -15,7 +15,7 @@
 #include "mmemory.h"
 #include "numbers.h"
 #include "polys.h"
-#include "ipid.h"
+//#include "ipid.h"
 #include "ring.h"
 #include "ideals.h"
 #include "timer.h"
@@ -214,8 +214,8 @@ inline static intset initec (int maxnr)
 
 static inline void enlargeT (TSet* T,int* length,int incr)
 {
-  *T = (TSet)ReAlloc((ADDRESS)(*T),(*length)*sizeof(TObject),
-                                   ((*length)+incr)*sizeof(TObject));
+  *T = (TSet)ReAlloc0((ADDRESS)(*T),(*length)*sizeof(TObject),
+                      ((*length)+incr)*sizeof(TObject));
   (*length) += incr;
 }
 
@@ -227,7 +227,6 @@ void cleanT (kStrategy strat)
   for (j=0; j<=strat->tl; j++)
   {
     p = strat->T[j].p;
-//    pTest(p);
     strat->T[j].p=NULL;
     i = -1;
     loop
@@ -235,11 +234,17 @@ void cleanT (kStrategy strat)
       i++;
       if (i>strat->sl)
       {
-        pDelete(&p);
+        if (strat->T[j].heap != NULL)
+          pHeapDelete(&p, strat->T[j].heap);
+        else
+          pDelete(&p);
         break;
       }
       if (p == strat->S[i])
       {
+        if (strat->T[j].heap != NULL)
+          strat->S[i]
+            = pShallowCopyDelete(mm_specHeap, &p, strat->T[j].heap);
         break;
       }
     }
@@ -307,106 +312,105 @@ BOOLEAN isInPairsetB(poly q,int*  k,kStrategy strat)
 }
 
 #ifdef KDEBUG
-void K_Test (char *f, int l,kStrategy strat)
+static void L_Test(LObject *L, BOOLEAN testp, int lpos, TSet T, int tlength,
+                   char *f , int l)
 {
-/*2
-*tests, if there is some wrong (deleted) in the set s or in pairs from L
-*/
-  int i;
-  /*- test pair P -*/
-  pDBTest(strat->P.p1,f,l);
-  pDBTest(strat->P.p2,f,l);
-  // pDBTest(strat->P.lcm,f,l);
-  /*- test set s -*/
-  if ((strat->S!=NULL) && (strat->sl>=0))
+  if (testp) pDBTest(L->p, L->heap, f, l);
+  if (L->pLength != 0 && L->pLength != pLength(L->p))
   {
-    for (i=0; i<=strat->sl; i++)
+    Print("L[%d] length error: has %d, specified to have %d\n",
+          lpos, pLength(L->p), L->pLength);
+    assume(0);
+  }
+  if (L->p1 == NULL)
+  {
+    // L->p2 either NULL or poly from global heap
+    pDBTest(L->p2, f, l);
+  }
+  else if (tlength > 0)
+  {
+    // now p1 and p2 must be != NULL and must be contained in T
+    int i;
+    for (i=0; i<tlength; i++)
+      if (L->p1 == T[i].p) break;
+    if (i>=tlength)
     {
-      pDBTest(strat->S[i],f,l);
-//      if(currQuotient==NULL)
-//      {
-//        if ((strat->ak!=0)
-//        && (pGetComp(strat->S[i])==0))
-//        {
-//          Print("wrong comp. S (0) in %s:%d\n",f,l);
-//        }
-//        else
-//        {
-//          if (pGetComp(strat->S[i])!=0)
-//            Print("wrong comp. S (%d) in %s:%d\n",pGetComp(strat->S[i]),f,l);
-//        }
-//      }
+      Print("L[%d].p1 not in T \n",lpos);
+      assume(0);
+    }
+    for (i=0; i<tlength; i++)
+      if (L->p2 == T[i].p) break;
+    if (i>=tlength)
+    {
+      Print("L[%d].p2 not in T \n",lpos);
+      assume(0);
     }
   }
-  /*- test set L -*/
-  if ((strat->L!=NULL) && (strat->Ll>=0))
+}
+
+void K_Test (char *f, int l, kStrategy strat)
+{
+  int i;
+
+  // test P
+  L_Test(&(strat->P),
+         (strat->P.p != NULL && pNext(strat->P.p) != strat->tail),
+         -1, strat->T, strat->tl+1, f, l);
+
+  // test L
+  if (strat->L != NULL)
   {
     for (i=0; i<=strat->Ll; i++)
     {
-      pDBTest(strat->L[i].p1,f,l);
-      pDBTest(strat->L[i].p2,f,l);
-      int j,f=0;
-      for(j=0;j<=strat->tl;j++)
+      if (strat->L[i].p == NULL)
       {
-
-        if((strat->L[i].p1==NULL)
-        ||(strat->L[i].p1==strat->T[j].p))
-        {
-          f=1;
-          break;
-        }
+        Print("L[%d].p is NULL\n", i);
+        assume(0);
       }
-      if((f==0)&&(strat->L[i].p1!=NULL))
-        Print("L[%d].p1(%x) not in T ?\n",i,strat->L[i].p1);
-      f=0;
-      for(j=0;j<=strat->tl;j++)
-      {
-        if((strat->L[i].p2==NULL)
-        ||(strat->L[i].p2==strat->T[j].p))
-        {
-          f=1;
-          break;
-        }
-      }
-      if((f==0)&&(strat->L[i].p2!=NULL))
-        Print("L[%d].p2(%x) not in T ?\n",i,strat->L[i].p2);
-      //pDBTest(strat->L[i].lcm,f,l);
+      L_Test(&(strat->L[i]), (pNext(strat->L[i].p) != strat->tail), i,
+             strat->T, strat->tl + 1, f, l);
     }
   }
-/*
-*  #*- test set B -*#
-*  for (i=0; i<=strat->Bl; i++)
-*  {
-*    if (strat->B[i].p1 == (*p)) return ;
-*    if (strat->B[i].p2 == (*p)) return ;
-*  }
-*/
-  /*- test set T -*/
-  if ((strat->T!=NULL) && (strat->tl>=0))
+
+  // test T
+  if (strat->T != NULL)
   {
     for (i=0; i<=strat->tl; i++)
     {
-      pDBTest(strat->T[i].p,f,l);
-//      if(currQuotient==NULL)
-//      {
-//        if ((strat->ak!=0)
-//        && (pGetComp(strat->T[i].p)==0))
-//        {
-//          Print("wrong comp. T (0) in %s:%d\n",f,l);
-//        }
-//        else
-//        {
-//          if (pGetComp(strat->T[i].p)!=0)
-//            Print("wrong comp. T (%d) in %s:%d\n",pGetComp(strat->T[i].p),f,l);
-//        }
-//      }
+      pDBTest(strat->T[i].p, strat->T[i].heap, f, l);
+      if (strat->T[i].pLength != 0 &&
+          strat->T[i].pLength != pLength(strat->T[i].p))
+      {
+        Print("T[%d] length error: has %d, specified to have %d\n",
+              i , pLength(strat->T[i].p), strat->T[i].pLength);
+        assume(0);
+      }
     }
   }
-#ifdef PDEBUG
-  idDBTest(strat->Shdl,f,l);
-  if (strat->D!=NULL) idDBTest(strat->D,f,l);
-#endif
 }
+
+void K_Test_TS(char *f, int l, kStrategy strat)
+{
+  int i, j;
+
+  K_Test(f, l, strat);
+
+  // test S
+  if (strat->S != NULL)
+  {
+    for (i=0; i<=strat->sl; i++)
+    {
+      for (j=0; j<=strat->tl; j++)
+        if (strat->S[i] == strat->T[j].p) break;
+      if (j > strat->tl)
+      {
+        Print("S[%d] not in T\n", i);
+        assume(0);
+      }
+    }
+  }
+}
+
 #endif
 
 /*2
@@ -576,7 +580,6 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
 
 #ifdef KDEBUG
   Lp.ecart=0; Lp.length=0;
-  pTest(p);
 #endif
   /*- computes the lcm(s[i],p) -*/
   Lp.lcm = pInit();
@@ -754,10 +757,6 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
   else
 #endif
   {
-#ifdef KDEBUG
-    pTest(strat->S[i]);
-    pTest(p);
-#endif
     Lp.p = spSpolyShortBba(strat->S[i],p);
   }
   if (Lp.p == NULL)
@@ -799,17 +798,9 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
     pdLcm(strat->S[i],p,Lp.lcm);
     Lp.p1 = strat->S[i];
     Lp.p2 = p;
-#ifdef KDEBUG
-    pTest(p);
-    pTest(strat->S[i]);
-#endif
     Lp.p = pdSpolyCreate(strat->S[i],p);
     if (Lp.p!=NULL)
     {
-#ifdef KDEBUG
-      pTest(p);
-      pTest(strat->S[i]);
-#endif
       /*spoly of p and S[i] bzgl Lp.lcm*/
       strat->initEcartPair(&Lp,strat->S[i],p,strat->ecartS[i],ecart);
       l = strat->posInL(strat->B,strat->Bl,Lp,strat);
@@ -897,17 +888,9 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat)
     pdLcm(strat->S[i],p,Lp.lcm);
     Lp.p1 = strat->S[i];
     Lp.p2 = p;
-#ifdef KDEBUG
-    pTest(p);
-    pTest(strat->S[i]);
-#endif
     Lp.p = pdSpolyCreate(strat->S[i],p);
     if (Lp.p!=NULL)
     {
-#ifdef KDEBUG
-      pTest(p);
-      pTest(strat->S[i]);
-#endif
       /*spoly of p and S[i] bzgl Lp.lcm*/
       strat->initEcartPair(&Lp,strat->S[i],p,strat->ecartS[i],ecart);
       l = strat->posInL(strat->B,strat->Bl,Lp,strat);
@@ -1370,8 +1353,6 @@ void reorderS (int* suc,kStrategy strat)
 int posInS (polyset set,int length,poly p)
 {
   if(length==-1) return 0;
-//  pTest(set[length]);
-//  pTest(p);
   int i;
   int an = 0;
   int en= length;
@@ -2613,7 +2594,7 @@ void initS (ideal F, ideal Q,kStrategy strat)
       {
         h.p=aug[--augl];
 #ifdef KDEBUG
-        pTest(h.p);
+        pHeapTest(h.p, h.heap);
 #endif
 #ifdef KDEBUG
         if (TEST_OPT_DEBUG && pSDRING)
@@ -2667,8 +2648,6 @@ void initS (ideal F, ideal Q,kStrategy strat)
 #ifdef SDRING
   Free((ADDRESS)aug,augmax*sizeof(poly));
 #endif
-//  for(augl=0;augl<=strat->sl;augl++)
-//    pTest(strat->S[augl]);
 }
 
 void initSL (ideal F, ideal Q,kStrategy strat)
@@ -2803,8 +2782,6 @@ void initSL (ideal F, ideal Q,kStrategy strat)
 #ifdef SDRING
   Free((ADDRESS)aug,augmax*sizeof(poly));
 #endif
-//  for(augl=0;augl<=strat->sl;augl++)
-//    pTest(strat->S[augl]);
 }
 
 
@@ -3061,17 +3038,12 @@ static poly redBba (poly h,int maxIndex,kStrategy strat)
   {
     if (pDivisibleBy(strat->S[j],h))
     {
-      pTest(strat->S[j]);
-      pTest(h);
       h = spSpolyRed(strat->S[j],h,strat->kNoether, strat->spSpolyLoop);
       if (h==NULL) return NULL;
       j = 0;
     }
     else j++;
   }
-#ifdef KDEBUG
-  pTest(h);
-#endif
   return h;
 }
 
@@ -3110,9 +3082,6 @@ static poly redMora (poly h,int maxIndex,kStrategy strat)
     }
     while (j <= maxIndex);
   }
-#ifdef KDEBUG
-  pTest(h);
-#endif
   return h;
 }
 
@@ -3149,7 +3118,6 @@ void updateS(BOOLEAN toT,kStrategy strat)
       i=suc+1;
       while (i<=strat->sl)
       {
-        pTest(strat->S[i]);
         if (((strat->syzComp==0) || (pGetComp(strat->S[i])<=strat->syzComp))
         && ((strat->fromQ==NULL) || (strat->fromQ[i]==0)))
         {
@@ -3183,7 +3151,6 @@ void updateS(BOOLEAN toT,kStrategy strat)
             pDelete(&redSi);
             redSi=strat->S[i];
             strat->S[i]=NULL;
-            pTest(redSi);
             deleteInS(i,strat);
             suc=0;
             i=0;
@@ -3200,7 +3167,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
             while (augl >= 0)
             {
               h.p=aug[augl];
-              pTest(h.p);
+              pHeapTest(h.p, p.heap);
               if (h.p!=NULL)
               {
                 if (TEST_OPT_DEBUG)
@@ -3392,15 +3359,6 @@ void updateS(BOOLEAN toT,kStrategy strat)
   Free((ADDRESS)aug,augmax*sizeof(poly));
   if (recursiv) updateS(FALSE,strat);
 #endif
-//  for(augl=0;augl<=strat->sl;augl++)
-//    pTest(strat->S[augl]);
-//Print("nach  updateS start mit sl=%d\n",strat->sl);
-//  for (i=0; i<=strat->sl; i++)
-//  {
-//    Print("s%d:",i);
-//    if (strat->fromQ) Print("(Q:%d) ",strat->fromQ[i]);
-//    pWrite(strat->S[i]);
-//  }
 #ifdef KDEBUG
   kTest(strat);
 #endif
@@ -3486,44 +3444,24 @@ void enterT (LObject p,kStrategy strat)
 {
   int i,atT;
 
-#ifdef KDEBUG
-  pTest(p.p);
-  for (i=0; i<=strat->tl ;i++)
-  {
-    pTest(strat->T[i].p);
-  }
-#endif
+  pHeapTest(p.p, (p.heap == NULL ? mm_specHeap : p.heap));
+  assume(p.pLength == 0 || pLength(p.p) == p.pLength);
+
   strat->newt = TRUE;
   if (strat->tl >= 0)
   {
     /*- puts p to the standardbasis s at position atT -*/
     atT = strat->posInT(strat->T,strat->tl,p);
-//    if ((atT<=strat->tl)
-//    && (p.p==strat->T[atT].p))
-//    {
-//      PrintS("?");
-//      return;
-//    }
-//    if ((atT<strat->tl)
-//    && (p.p==strat->T[atT+1].p))
-//    {
-//      PrintS("?");
-//      return;
-//    }
-//    if ((atT>0)
-//    && (p.p==strat->T[atT-1].p))
-//    {
-//      PrintS("?");
-//      return;
-//    }
     if (strat->tl == strat->tmax-1) enlargeT(&strat->T,&strat->tmax,setmax);
-    for (i=strat->tl+1; i>=atT+1; i--)
-      strat->T[i] = strat->T[i-1];
+    for (i=strat->tl+1; i>=atT+1; i--) strat->T[i] = strat->T[i-1];
   }
   else atT = 0;
   strat->T[atT].p = p.p;
   strat->T[atT].ecart = p.ecart;
   strat->T[atT].length = p.length;
+  strat->T[atT].pLength = p.pLength;
+  strat->T[atT].heap = p.heap;
+  strat->T[atT].sev = pGetShortExpVector(p.p);
   strat->tl++;
 }
 
@@ -3534,6 +3472,9 @@ void enterTBba (LObject p, int atT,kStrategy strat)
 {
   int i;
 
+  pHeapTest(p.p, (p.heap == NULL ? mm_specHeap : p.heap));
+  assume(p.pLength == 0 || pLength(p.p) == p.pLength);
+
   strat->newt = TRUE;
   if (strat->tl == strat->tmax-1) enlargeT(&strat->T,&strat->tmax,setmax);
   for (i=strat->tl+1; i>=atT+1; i--)
@@ -3543,11 +3484,12 @@ void enterTBba (LObject p, int atT,kStrategy strat)
     strat->T[atT].ecart = p.ecart;
   if (TEST_OPT_INTSTRATEGY)
     strat->T[atT].length = p.length;
+
+  strat->T[atT].heap = p.heap;
+  strat->T[atT].pLength = p.pLength;
+  strat->T[atT].sev = pGetShortExpVector(p.p);
+
   strat->tl++;
-//    for (i=0; i<=strat->tl ;i++)
-//    {
-//      pTest(strat->T[i].p);
-//    }
 }
 
 void initHilbCrit(ideal F, ideal Q, intvec **hilb,kStrategy strat)
@@ -3706,7 +3648,7 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
         pDRING ||
     #endif
         0)
-         /*Shdl=*/initS(F, Q,strat); /*sets also S, ecartS, fromQ */
+         initS(F, Q,strat); /*sets also S, ecartS, fromQ */
     else
     #endif
     /*Shdl=*/initSL(F, Q,strat); /*sets also S, ecartS, fromQ */
