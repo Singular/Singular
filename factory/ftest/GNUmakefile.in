@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.1 1997-11-05 16:36:52 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.2 1997-11-13 08:38:14 schmidt Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -119,7 +119,7 @@ all:		feval
 
 # do not create ftest_util.cc from ftest_util.m4!
 ftest_util.cc:
-		@:
+		touch $@
 
 ftest_util.o:	ftest_util.cc ftest_util.h ftest_io.h ../factory.h
 		$(CXX) -c $< $(LIBCXXFLAGS) -o $@
