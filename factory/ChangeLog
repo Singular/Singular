@@ -44,8 +44,8 @@ Thu Jun  5 15:03:48 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 	* GNUmakefile.in ($(srcdir)/configure): make will not complain
 	  about a missing autoconf any longer
 
-	* canonicalform.cc (operator >>): returns 0 now when compiled with
-	  Singular and with stream IO enabled
+	* canonicalform.cc (operator >>, SINGULAR): returns 0 again when
+	  compiled with Singular and with stream IO enabled
 
 Before Mon Jun  4 1997 Jens Schmidt <schmidt@mathematik.uni-kl.de>
 
@@ -97,13 +97,22 @@ Before Mon Jun  4 1997 Jens Schmidt <schmidt@mathematik.uni-kl.de>
 	  rewritten GNUmakefile.in
 
 	* mpext.cc, mpext.h, mpfactory.h: removed from distribution.  No
-	  more MP support.
+	  more MULTIPROTOCOL support.
 
 	* readcf.cc: added to distribution since not all users have
 	  bison available
 
 
 	Now for the changes at organization level:
+
+	* canonicalform.cc (operator >>, SINGULAR): removed dependency on
+	  #define SINGULAR
+
+	* cf_factor.cc (factorize, MULTIFACTOR): removed dependency on
+	  #define MULTIFACTOR
+
+	* cf_defs.h (incl_cf_defs_H, INCL_CF_DEFS_H): #define renamed so
+	  cf_defs.h is included only once
 
 	* cf_gcd.cc (DEBOUT): debug output changed to calls of DEBOUT
 	  macros
@@ -117,6 +126,7 @@ Before Mon Jun  4 1997 Jens Schmidt <schmidt@mathematik.uni-kl.de>
 	  wrapped by macro DEBOUTHPRINT, which definitions depends on
 	  DEBUGOUTPUT (instead of NDEBUG, as before).  All callers
 	  changed.
+	* timing.h (iostream.h stdio.h): stream IO changed to std IO
 
 	* cf_linsys.cc (TIMING): #define TIMING removed
 	* fac_distrib.cc (DEBUGOUTPUT): #undef DEBUGOUTPUT removed
@@ -129,26 +139,82 @@ Before Mon Jun  4 1997 Jens Schmidt <schmidt@mathematik.uni-kl.de>
 	* fac_univar.cc (DEBUGOUTPUT, TIMING, sys/times.h): some spurious
 	  #define's and #include's removed
 
+	* config.h.in (MDEBUG, NOASSERT, TIMING, DEBUGOUTPUT): new
+	  #defines
+
+	* config.h.in (MULTIPROTOCOL): #define removed.  No more
+	  MULTIPROTOCOL support.
+	* int_int.h (class InternalInteger, MULTIPROTOCOL): removed
+	  declarations dependent on #define MULTIPROTOCOL
+	* int_rat.h (class InternalRational, MULTIPROTOCOL): removed
+	  declarations dependent on #define MULTIPROTOCOL
+
 	* config.h.in (NOSTREAMIO): new define NOSTREAMIO to switch off
 	  stream IO.  Operators <<, >>, and related stuff wrapped by
  	  #ifndef where necessary
 
-	* fac_univar.cc (TIMING, timing.h): timing stuff changed to calls
-	  of TIMING macros
+	* cf_factory.cc (CFFactory::basic ( int, int ), ASSERT1): error
+	  message changed to call of ASSERT1 macro
+	* fac_util.cc: (crossprod, ASSERT): error message changed to
+	  call of ASSERT macro
+	* int_cf.cc: (ASSERT, ASSERT1): error messages changed to calls of
+	  ASSERT1 macro
+	* int_cf.h (InternalCF::InternalCF( InternalCF& ), ASSERT): error
+	  message changed to call of ASSERT macro
+	* int_poly.cc (InternalPoly::InternalPoly( InternalPoly& ),
+	  ASSERT): error message changed to call of ASSERT macro
+
+	* fac_univar.cc (TIMING, TIMING_END_AND_PRINT, timing.h): timing
+	  stuff changed to calls of TIMING macros
+
+	* initgmp.cc (initializeGMP, SINGULAR): dependency on
+	  #define SINGULAR removed
+
+	* int_cf.h (PVIRT_VOID, PVIRT_INTCF, PVIRT_BOOL, PVIRT_INT,
+	  PVIRT_CHARCC): PVIRT_-*functionality moved to assert.h
+
+	* mmallocb.c (TEST, MM_TEST): references to #define TEST changed
+	  to MM_TEST
+
+	* timing.h (TIMING_END_AND_PRINT): new macro
+
+	* timing.h (HZ, CLOCKS_PER_SEC, time.h): ticks per second
+	  calculated in a hopefully more portable way
+
+	* timing.h: doc fix
 
 
 	Last not least, changes at source code level:
 
+	* canonicalform.cc (mapinto): fixed mapping from int to GF
+
+	* cf_defs.h (SW_USE_SPARSEMOD): new switch
+
+	* cf_factor.cc, cf_factor.h (sqrFree( CanonicalForm, boolean )):
+	  new function which sorts output if desired
+	* cf_factor.cc (sqrFree): simply calls the new function now
+
+	* cf_globals.cc (factoryVersion, FACTORYVERSION): version string
+	  added
+	* cf_globals.h (factoryVersion): version string added
+	* config.h.in (FACTORYVERSION): new #define to initialize
+	  factoryVersion
+
 	* cf_linsys.cc (linearSystemSolve, determinant, determinant2):
-	  typedefs int_ptr introduced and used
+	  typedef int_ptr introduced and used
 
 	* cf_random.cc (RandomGenerator, RanGen): new class
 	  RandomGenerator and new static RanGen which replace calls to the
  	  poorly programmed stdlib-random generator
 
+	* cf_iter.h (iostream.h): spurious #include <iostream.h> removed
+	* cf_factor.h (iostream.h): spurious #include <iostream.h> removed
 	* cf_reval.h (iostream.h): spurious #include <iostream.h> removed
-
 	* cf_switches.h (RATTIONAL): spurious #define RATIONAL removed
+	* int_int.cc (IntInt): spurious #define IntInt removed
+	* int_pp.cc (IntPP): spurious #define IntPP removed
+	* memutil.c (stdio.h): spurious #include <stdio.h> removed
+	* mmalloc.c (stdio.h): spurious #include <stdio.h> removed
 
 	* fac_univar.cc (MAX_FP_FAC, max_fp_fac): #define changed to const int
 
@@ -166,6 +232,9 @@ Before Mon Jun  4 1997 Jens Schmidt <schmidt@mathematik.uni-kl.de>
   	  Removed test on D != 0 before deleting D.
 
 	* fac_univar.cc: doc fix
+
+	* int_int.cc (InternalInteger::genOne): Ruedigers last fryday
+	  afternoon fix
 
 	* variable.cc (Variable::Variable( char ), Variable::Variable( int, char ),
 	  rootOf): delete changed to delete [] where necessary
