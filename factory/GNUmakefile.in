@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.4 1997-06-30 16:08:10 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.5 1997-07-01 13:53:44 schmidt Exp $
 
 #
 # GNUmakefile.in - used by configure to create GNUmakefile, the
@@ -450,11 +450,9 @@ dist:		$(srcdir)/readcf.cc $(srcdir)/configure
 		rm -rf $(distname)
 		$(MKINSTALLDIRS) $(distname)/templates
 		$(MKINSTALLDIRS) $(distname)/bin
-#! better use ln instead of cp
 		for file in $(distfiles); do \
-		  cp $(srcdir)/$$file $(distname)/$$file; \
+		  ln $(srcdir)/$$file $(distname)/$$file; \
 		done
-		chmod -R u+w,o+r $(distname)
 		chmod 777 $(distname)
 		tar cf $(distname).tar $(distname)
 		gzip $(distname).tar
