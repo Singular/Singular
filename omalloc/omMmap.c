@@ -3,7 +3,7 @@
  *  Purpose: implementing valloc via mmap
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omMmap.c,v 1.3 2000-08-14 12:26:47 obachman Exp $
+ *  Version: $Id: omMmap.c,v 1.4 2001-01-24 16:44:10 levandov Exp $
  *******************************************************************/
 #include <unistd.h>
 #include <fcntl.h>
@@ -20,7 +20,9 @@ static void* omVallocMmap(size_t size)
   static int fd = -1;
 #endif
 
-#ifdef MAP_ANONYMOUS
+#ifdef ix86_Win
+  addr = mmap(0, size, PROT_READ|PROT_WRITE, MAP_PRIVATE, -1, 0);
+#elif defined(MAP_ANONYMOUS)
   addr = mmap(0, size, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
 #else /* !MAP_ANONYMOUS */
   if (fd < 0) 

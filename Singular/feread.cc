@@ -1,13 +1,15 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.39 2000-09-25 14:46:55 obachman Exp $ */
+/* $Id: feread.cc,v 1.40 2001-01-24 16:45:40 levandov Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
 
-
 #include "mod2.h"
+#ifdef ix86_Win
+#define READLINE_STATIC
+#endif
 #include "tok.h"
 #include "febase.h"
 #include "omalloc.h"
@@ -105,6 +107,7 @@ extern "C" {
   extern int read_history();
   extern int history_total_bytes();
  #endif /* READLINE_READLINE_H_OK */
+ typedef char * (*PROC)();
 }
 
 
@@ -124,8 +127,8 @@ char ** singular_completion (char *text, int start, int end)
      to complete.  Otherwise it may be the name of a file in the current
      directory. */
   if (rl_line_buffer[start-1]=='"')
-    return completion_matches (text, filename_completion_function);
-  char **m=completion_matches (text, command_generator);
+    return completion_matches (text, (PROC)filename_completion_function);
+  char **m=completion_matches (text, (PROC)command_generator);
   if (m==NULL)
   {
     m=(char **)malloc(2*sizeof(char*));
