@@ -1,7 +1,7 @@
-// $Id: all.lib,v 1.24 1999-12-13 17:32:37 obachman Exp $
+// $Id: all.lib,v 1.25 2000-05-25 13:37:30 obachman Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: all.lib,v 1.24 1999-12-13 17:32:37 obachman Exp $";
+version="$Id: all.lib,v 1.25 2000-05-25 13:37:30 obachman Exp $";
 info="
 LIBRARY:  all.lib   Load all libraries
 
@@ -62,9 +62,13 @@ LIB "random.lib";
 LIB "ring.lib";
 LIB "sing.lib";
 LIB "latex.lib";
-LIB "paramet.lib";
+// paramet.lib is not in the official distribution
+// LIB "paramet.lib";
 LIB "mondromy.lib"
 LIB "jordan.lib";
 LIB "spcurve.lib";
 LIB "algebra.lib";
-// LIB "tools.lib";
+LIB "ip.lib";
+LIB "toric.lib";
+LIB "Mregular.lib"
+

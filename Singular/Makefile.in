@@ -145,6 +145,10 @@ DISTFILES=${SOURCES} ${HEADERS} Makefile.in configure.in configure \
 
 OBJS := $(CXXSOURCES:.cc=.o) $(CSOURCES:.c=.o)
 
+ifeq ($(SINGUNAME),ix86-Win)
+OBJS := $(OBJS) Singular_res.o
+endif
+
 ASO_OBJS := $(ASO_SOURCES:.aso.cc=.aso) 
 
 #
@@ -306,33 +310,41 @@ configure: configure.in
 	@touch configure
 #	autoconf
 
+ifeq ($(SINGUNAME),ix86-Win)
 ##
 ## windows only targets
 ##
+
+## resources
+Singular.rc: Singular.rc.in config.status
+	CONFIG_FILES="Singular.rc" CONFIG_HEADERS= ./config.status
+
+ESingular_res.o: Singular.rc
+	windres -DESINGULAR -i Singular.rc -o ESingular_res.o
+
+TSingular_res.o: Singular.rc
+	windres -DTSINGULAR -i Singular.rc -o TSingular_res.o
+
+Singular_res.o: Singular.rc
+	windres -DSINGULAR -i Singular.rc -o Singular_res.o
+
+## run
 run.o: run.c run.h
 	gcc -c -I. -O2 run.c -o run.o
 
-runTSingular : run.c run.h run.rc run.o
-	windres -DTSINGULAR -i run.rc -o run_res.o
-	gcc -mwindows -e _mainCRTStartup run.o run_res.o -o runTSingular.exe
+runTSingular : run.o TSingular_res.o
+	gcc -mwindows -e _mainCRTStartup run.o TSingular_res.o -o runTSingular.exe
 
-runESingular : run.c run.h run.rc run.o
-	windres -DESINGULAR -i run.rc -o run_res.o
-	gcc -mwindows -e _mainCRTStartup run.o run_res.o -o runESingular.exe
+runESingular : run.o ESingular_res.o
+	gcc -mwindows -e _mainCRTStartup run.o ESingular_res.o -o runESingular.exe
 
-run_res.o : run.rc
-	windres -i run.rc -o run_res.o
+RUN_SINGULARS=runESingular runTSingular
 
-run: run.c run.h run_res.o run.o
-	gcc -mwindows -e _mainCRTStartup run.o run_res.o -o run.exe
+endif
 
 ##
 ## install targets
 ##
-ifeq ($(SINGUNAME),ix86-Win)
-RUN_SINGULARS=runESingular runTSingular
-endif
-
 install: all installbin installslib
 
 installbin: ${SING_EXEC} libparse ESingular TSingular ${RUN_SINGULARS}

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.25 2000-05-23 14:40:47 obachman Exp $ */
+/* $Id: feResource.cc,v 1.26 2000-05-25 13:37:28 obachman Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -738,6 +738,7 @@ void feStringAppendResources(int warn = -1)
 {
   int i = 0;
   char* r;
+  StringAppend("%-10s:\t%s\n", "argv[0]", feArgv0);
   while (feResourceConfigs[i].key != NULL)
   {
     r = feResource(feResourceConfigs[i].key, warn);
