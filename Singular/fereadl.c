@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: fereadl.c,v 1.18 2000-09-18 09:18:56 obachman Exp $ */
+/* $Id: fereadl.c,v 1.19 2001-01-31 13:44:19 levandov Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -22,7 +22,7 @@
   #include <sys/types.h>
   #include <string.h>
 
-  #ifdef MSDOS
+  #if 0
     #include <pc.h>
   #else
     #ifdef SunOS_5
@@ -30,14 +30,18 @@
       #define _XOPEN_SOURCE_EXTENDED
       #include "/usr/xpg4/include/term.h"
     #endif
-    #ifdef HAVE_TERM_H
+    #if 0
       #ifndef SunOS_5
         #include <term.h>
       #endif
     #elif HAVE_TERMCAP_H
       #include <termcap.h>
-    #elif HAVE_TERMIOS_H
+    #endif
+    #if defined(HAVE_TERMIOS_H) && ! defined(TCSANOW)
       #include <termios.h>
+    #endif
+    #if defined(HAVE_TERM_H) && ! defined(TCSANOW)
+      #include <term.h>
     #endif
 
     #ifdef atarist
@@ -275,9 +279,11 @@ void fe_init (void)
     }
     else
     {
+      #ifndef ix86_Win
       extern char *BC;
       extern char *UP;
       extern char PC;
+      #endif
       /* OB: why this ??? */
       /* char *t_buf=(char *)omAlloc(128); */
       char t_buf[128];

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.40 2001-01-24 16:45:40 levandov Exp $ */
+/* $Id: feread.cc,v 1.41 2001-01-31 13:45:30 levandov Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -12,6 +12,9 @@
 #endif
 #include "tok.h"
 #include "febase.h"
+#ifdef ix86_Win
+#define OM_NO_MALLOC_MACROS
+#endif
 #include "omalloc.h"
 
 #include "static.h"
