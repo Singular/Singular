@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.69 2002-02-21 17:52:23 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.70 2002-02-25 18:14:39 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -41,7 +41,7 @@ KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice;
           mixed Hodge structure; V-filtration; weight filtration
 ";
 
-LIB "linalg.lib";
+LIB "linalg2.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -311,20 +311,6 @@ static proc max(ideal e)
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc liftbound(module U,module H,int k,int K)
-{
-  def R=basering;
-  ring T=0,s,ds;
-  module U=imap(R,U);
-  module H=imap(R,H);
-  degBound=k+K+1;
-  H=jet(lift(U,H),K);
-  degBound=0;
-  setring(R);
-  return(imap(T,H));
-}
-///////////////////////////////////////////////////////////////////////////////
-
 static proc saturate()
 {
   int mu=ncols(gmsbasis);
@@ -355,7 +341,7 @@ static proc saturate()
   H=std(H0);
 
   dbprint(printlevel-voice+2,"// transform H'' to saturation of H''");
-  H0=liftbound(H,freemodule(mu)*s^k,k,k);
+  H0=division(freemodule(mu)*s^k,H,k,intvec(1))[1];
 
   return(A0,r,H,H0,k);
 }
@@ -371,7 +357,7 @@ static proc basisrep(matrix A0,ideal r,module H,int k0,int K)
   A0=A0+C;
 
   dbprint(printlevel-voice+2,"// transform A to saturation of H''");
-  matrix A=liftbound(H*s,A0*H+s^2*diff(matrix(H),s),k0+1,K);
+  matrix A=division(module(A0*H+s^2*diff(matrix(H),s)),H,K+1,intvec(1))[1]/s;
 
   return(A,A0,r);
 }
@@ -380,7 +366,7 @@ static proc basisrep(matrix A0,ideal r,module H,int k0,int K)
 static proc eigvals(matrix A0,ideal r,module H,int k0)
 {
   dbprint(printlevel-voice+2,
-    "// compute eigenvalues e with multiplicities m of A");
+    "// compute eigenvalues e with multiplicities m of A0");
   matrix A;
   A,A0,r=basisrep(A0,r,H,k0,0);
   list l=eigenvals(A);
@@ -1098,10 +1084,11 @@ EXAMPLE:  example tmatrix; shows examples
     V=v[1..mu^2,1];
     U=matrix(U)+s^k*V;
   }
+  attrib(U,"isSB",1);
 
   dbprint(printlevel-voice+2,"// transform to V-splitting basis");
   A=jet(A,0);
-  H=std(liftbound(U,H,0,k0+k1));
+  H=std(division(H,U,k0+k1,intvec(1))[1]);
 
   dbprint(printlevel-voice+2,"// compute V-leading terms of H''");
   int i0,j0;
@@ -1209,9 +1196,10 @@ EXAMPLE:  example tmatrix; shows examples
   option(noredSB);
   degBound=0;
   H=simplify(jet(H,k0+k1),1);
+  attrib(H,"isSB",1);
 
   dbprint(printlevel-voice+2,"// compute matrix A0+sA1 of t");
-  A=liftbound(H,s*A*H+s^2*diff(matrix(H),s),k0+k1,1);
+  A=division(module(s*A*H+s^2*diff(matrix(H),s)),H,1,intvec(1))[1];
   A0=jet(A,0);
   A=jet(A,1)/s;
 
