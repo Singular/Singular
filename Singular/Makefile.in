@@ -462,6 +462,7 @@ install-bindist: $(HEADERS) $(SOURCES) Makefile depend
 	${MAKE} ${SING_EXEC} ESingular TSingular libparse ${RUN_SINGULARS}
 	${MKINSTALLDIRS} ${install_bindir} 
 	${INSTALL_PROGRAM} -s  ${SING_EXEC} ${install_bindir}/Singular
+	-${INSTALL_PROGRAM} *.so ${install_bindir}
 	${INSTALL_PROGRAM} -s  libparse ${RUN_SINGULARS} ESingular TSingular ${DL_LIBS} ${install_bindir}
 	echo "#undef MAKE_DISTRIBUTION " > distrib.h
 
