@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hutil.cc,v 1.13 2000-02-22 18:06:57 Singular Exp $ */
+/* $Id: hutil.cc,v 1.14 2000-02-29 16:31:52 Singular Exp $ */
 /*
 * ABSTRACT: Utilities for staircase operations
 */
@@ -524,7 +524,7 @@ void hLexS(scfmon stc, int Nstc, varset var, int Nvar)
       }
     }
     else if (o[k1] > n[k1])
-    { 
+    {
       int tmp_k;
       for (tmp_k = j; tmp_k > i; tmp_k--)
         stc[tmp_k] = stc[tmp_k - 1];
