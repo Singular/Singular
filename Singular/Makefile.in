@@ -112,7 +112,7 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc clapconv.cc \
     timer.cc weight.cc \
     GMPrat.cc multicnt.cc npolygon.cc semic.cc spectrum.cc splist.cc \
     libparse.cc mod_raw.cc sing_win.cc\
-    pcv.cc units.cc eigenval.cc kbuckets.cc sbuckets.cc\
+    gms.cc pcv.cc units.cc eigenval.cc kbuckets.cc sbuckets.cc\
     mpr_inout.cc mpr_base.cc mpr_numeric.cc \
     prCopy.cc p_Mult_q.cc \
     pDebug.cc pInline2.cc pInline1.cc pInline0.cc \
@@ -174,7 +174,7 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	kutil.h mpsr_Put.h\
 	ndbm.h dbm_sl.h polys-impl.h libparse.h \
         GMPrat.h multicnt.h npolygon.h semic.h spectrum.h splist.h multicnt.h \
-	pcv.h units.h eigenval.h mod_raw.h kbuckets.h sbuckets.h\
+	gms.h pcv.h units.h eigenval.h mod_raw.h kbuckets.h sbuckets.h\
 	mpr_global.h mpr_inout.h mpr_base.h mpr_numeric.h \
 	feOpt.h fegetopt.h distrib.h walk.h \
 	prCopy.h prCopyMacros.h \
