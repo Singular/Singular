@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.35 1998-08-27 12:32:41 Singular Exp $ */
+/* $Id: ideals.cc,v 1.36 1998-09-04 16:04:51 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -343,7 +343,8 @@ void idDBTest(ideal h1,char *f,int l)
     #ifdef MDEBUG
     mmDBTestBlock(h1,sizeof(*h1),f,l);
     #endif
-    for (i=IDELEMS(h1)-1; i>=0; i--)
+    /* to be able to test matrices: */
+    for (i=(IDELEMS(h1)*h1->nrows)-1; i>=0; i--)
       pDBTest(h1->m[i],f,l);
   }
 }
