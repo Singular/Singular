@@ -1,11 +1,13 @@
-// $Id: general.lib,v 1.4 1997-08-12 14:01:07 Singular Exp $
+// $Id: general.lib,v 1.5 1998-04-03 22:47:04 krueger Exp $
 //system("random",787422842);
 //(GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
+version="$Id: general.lib,v 1.5 1998-04-03 22:47:04 krueger Exp $";
+info="
 LIBRARY:  general.lib   PROCEDURES OF GENERAL TYPE
 
- A_Z("a",n);            string a,b,... of n comma seperated letters
+ A_Z(\"a\",n);            string a,b,... of n comma seperated letters
  binomial(n,m[,../..]); n choose m (type int), [type string/type number]
  factorial(n[,../..]);  n factorial (=n!) (type int), [type string/number]
  fibonacci(n[,p]);      nth Fibonacci number [char p]
@@ -21,6 +23,8 @@ LIBRARY:  general.lib   PROCEDURES OF GENERAL TYPE
            (parameters in square brackets [] are optional)
  which(command);	searches for command and returns absolute
                         path, if found
+";
+
 LIB "inout.lib";
 ///////////////////////////////////////////////////////////////////////////////
 

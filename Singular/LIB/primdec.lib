@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.10 1998-03-06 11:52:57 krueger Exp $
+// $Id: primdec.lib,v 1.11 1998-04-03 22:47:10 krueger Exp $
 ///////////////////////////////////////////////////////
 // primdec.lib
 // algorithms for primary decomposition based on
@@ -10,6 +10,8 @@
 // written by Wolfram Decker and Hans Schoenemann
 //////////////////////////////////////////////////////
 
+version="$Id: primdec.lib,v 1.11 1998-04-03 22:47:10 krueger Exp $";
+info="
 LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION (I)
 
   minAssPrimes (ideal I)
@@ -32,7 +34,7 @@ LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION (I)
   // package written by Michael Messollen.
   // The integer choose must be either 0 or 1.
   // If choose=0, the given ordering of the variables is used.
-  // If choose=1, the system tries to find an "optimal ordering",
+  // If choose=1, the system tries to find an \"optimal ordering\",
   // which in some cases may considerably speed up the algorithm
 
   // You may also may want to try one of the algorithms for
@@ -49,10 +51,11 @@ LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION (I)
   // The integer choose must be either 0, 1, 2 or 3.
   // If choose=0, min_ass_prim_charsets with the given
   // ordering of the variables is used.
-  // If choose=1, min_ass_prim_charsets with the "optimized"
+  // If choose=1, min_ass_prim_charsets with the \"optimized\"
   // ordering of the variables is used.
   // If choose=2, minAssPrimes from primdec.lib is used
   // If choose=3, minAssPrimes+factorizing Buchberger from primdec.lib is used
+";
 
 LIB "general.lib";
 LIB "elim.lib";

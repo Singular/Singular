@@ -1,8 +1,10 @@
-// $Id: random.lib,v 1.3 1997-08-12 14:01:11 Singular Exp $
+// $Id: random.lib,v 1.4 1998-04-03 22:47:12 krueger Exp $
 //system("random",787422842);
 //(GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
+version="$Id: random.lib,v 1.4 1998-04-03 22:47:12 krueger Exp $";
+info="
 LIBRARY:  random.lib    PROCEDURES OF RANDOM MATRIX AND POLY OPERATIONS
 
  genericid(id[,p,b]);   generic sparse linear combinations of generators of id
@@ -13,6 +15,7 @@ LIBRARY:  random.lib    PROCEDURES OF RANDOM MATRIX AND POLY OPERATIONS
  sparsepoly(u[,o,p,b]); random sparse polynomial with terms of degree in [u,o]
  sparsetriag(n,m[..]);  nxm sparse lower-triag intmat with random coefficients
            (parameters in square brackets [] are optional)
+";
 
 LIB "inout.lib";
 LIB "general.lib";

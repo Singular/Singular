@@ -1,3 +1,7 @@
+Sat Apr  4 00:52:58 MET DST 1998 Kai Krueger <krueger@mathematik.uni-kl.de>
+	* iplib.cc libparse.cc libparse.h libparse.l misc.cc LIB/*.lib
+	  Changed help for libraries.
+	
 Wed Apr  1 20:55:15 MET DST 1998 hannes
 	* mpsr_Tok.cc,tok.h: minor fix, removed VERBOSE_CMD
 	* iparith.cc ipconv.cc: added conversion list <-> resolution

@@ -1,6 +1,8 @@
-// $Header: /exports/cvsroot-2/cvsroot/Singular/LIB/finvar.lib,v 1.7 1998-03-06 11:52:53 krueger Exp $
+// $Header: /exports/cvsroot-2/cvsroot/Singular/LIB/finvar.lib,v 1.8 1998-04-03 22:47:02 krueger Exp $
 ////////////////////////////////////////////////////////////////////////////////
 
+version="$Id: finvar.lib,v 1.8 1998-04-03 22:47:02 krueger Exp $";
+info="
 LIBRARY:  finvar.lib       LIBRARY TO CALCULATE INVARIANT RINGS & MORE
                            (c) Agnes Eileen Heydtmann,
                            send bugs and comments to agnes@math.uni-sb.de
@@ -39,6 +41,7 @@ LIBRARY:  finvar.lib       LIBRARY TO CALCULATE INVARIANT RINGS & MORE
   orbit_variety(...)                     ideal of the orbit variety
   relative_orbit_variety(...)            ideal of a relative orbit variety
   image_of_variety(...)                  ideal of the image of a variety
+";
 
 ////////////////////////////////////////////////////////////////////////////////
 LIB "matrix.lib";

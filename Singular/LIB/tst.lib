@@ -1,14 +1,18 @@
-// $Id: tst.lib,v 1.2 1998-02-16 13:23:25 obachman Exp $
+// $Id: tst.lib,v 1.3 1998-04-03 22:47:15 krueger Exp $
 //(obachman, last modified 2/13/98)
 ///////////////////////////////////////////////////////////////////////////////
 
+version="$Id: tst.lib,v 1.3 1998-04-03 22:47:15 krueger Exp $";
+info="
 LIBRARY:  tst.lib      PROCEDURES FOR RUNNING AUTOMATIC TST TESTS
 
- tst_system(s)          returns string which is stdout of system("sh", s)
+ tst_system(s)          returns string which is stdout of system(\"sh\", s)
  tst_ignore(any,[keyword], [link]) writes string(any) to link (or stdout), 
-                                   prepending prefix "// ignore:"
+                                   prepending prefix \"// ignore:\"
  tst_init()             writes some identification data to stdout 
                         with tst_ignore
+";
+
 ///////////////////////////////////////////////////////////////////////////////
 
 proc tst_system(string s)

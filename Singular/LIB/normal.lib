@@ -5,11 +5,14 @@
 // written by Gert-Martin Greuel and Gerhard Pfister
 ///////////////////////////////////////////////////////////////////////////////
 
+version="$Id: normal.lib,v 1.4 1998-04-03 22:47:08 krueger Exp $";
+info="
 LIBRARY: normal.lib: PROCEDURE FOR NORMALIZATION (I)
 
   normal(ideal I)
   // computes a set of rings such that their product is the 
   // normalization of the reduced basering/I 
+";
 
 LIB "sing.lib"; 
 LIB "primdec.lib";

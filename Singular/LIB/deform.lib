@@ -1,18 +1,23 @@
-// $Id: deform.lib,v 1.6 1998-03-06 11:52:52 krueger Exp $
+// $Id: deform.lib,v 1.7 1998-04-03 22:46:59 krueger Exp $
 //(bm, last modified 12/97)   
 ///////////////////////////////////////////////////////////////////////////////
+
+version="$Id: deform.lib,v 1.7 1998-04-03 22:46:59 krueger Exp $";
+info="
 LIBRARY:  deform.lib       PROCEDURES FOR COMPUTING MINIVERSAL DEFORMATION
                             (new version)
  versal(Fo[,d,any])       miniversal deformation of isolated singularity Fo
  mod_versal(Mo,I,[,d,any])
                           miniversal deformation of module Mo modulo ideal I
  lift_rel_kb(N,M[,kbM,p]) lifting N into a kbase of M
- kill_rings(["prefix"])   kills the exported rings from above
+ kill_rings([\"prefix\"])   kills the exported rings from above
  lift_kbase(N,M);         coef-matrix expressing N as lin. comb. of k-basis of M
  
   SUB-PROCEDURES            used by main procedure:
                   get_rings,compute_ext,get_inf_def,interact1,
                   interact2,negative_part,homog_test
+";
+
 LIB "inout.lib";
 LIB "general.lib";
 LIB "matrix.lib";

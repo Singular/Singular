@@ -1,6 +1,9 @@
-// $Id: matrix.lib,v 1.4 1997-09-18 09:58:24 Singular Exp $
+// $Id: matrix.lib,v 1.5 1998-04-03 22:47:08 krueger Exp $
 // (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
+
+version="$Id: matrix.lib,v 1.5 1998-04-03 22:47:08 krueger Exp $";
+info="
 LIBRARY:  matrix.lib    PROCEDURES FOR MATRIX OPERATIONS
 
  compress(A);           matrix, zero columns from A deleted
@@ -26,6 +29,7 @@ LIBRARY:  matrix.lib    PROCEDURES FOR MATRIX OPERATIONS
  permcol(A,i,j);        permute i-th and j-th columns
  permrow(A,i,j);        permute i-th and j-th rows
            (parameters in square brackets [] are optional)
+";
 
 LIB "inout.lib";
 LIB "ring.lib";

@@ -1,7 +1,9 @@
-// $Id: homolog.lib,v 1.4 1997-09-12 07:40:34 Singular Exp $
+// $Id: homolog.lib,v 1.5 1998-04-03 22:47:06 krueger Exp $
 //(BM/GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
+version="$Id: homolog.lib,v 1.5 1998-04-03 22:47:06 krueger Exp $";
+info="
 LIBRARY:  homolog.lib   PROCEDURES FOR HOMOLOGICAL ALGEBRA
 
  cup(M);                cup: Ext^1(M',M') x Ext^1() --> Ext^2()
@@ -13,6 +15,7 @@ LIBRARY:  homolog.lib   PROCEDURES FOR HOMOLOGICAL ALGEBRA
  kernel(A,M,N);         ker(M'--A->N')  M,N modules, A matrix
  kohom(A,k);            Hom(R^k,A),     A matrix over basering R
  kontrahom(A,k);        Hom(A,R^k),     A matrix over basering R
+";
 
 LIB "general.lib";
 LIB "deform.lib";

@@ -1,6 +1,8 @@
-// $Id: primitiv.lib,v 1.2 1997-08-13 14:13:29 Singular Exp $
+// $Id: primitiv.lib,v 1.3 1998-04-03 22:47:11 krueger Exp $
 // This library requires Singular 1.0
 
+version="$Id: primitiv.lib,v 1.3 1998-04-03 22:47:11 krueger Exp $";
+info="
 LIBRARY:    primitiv.lib    PROCEDURES FOR FINDING A PRIMITIVE ELEMENT
 
  primitivE(ideal i); finds minimal polynomial for a primitive element
@@ -8,6 +10,7 @@ LIBRARY:    primitiv.lib    PROCEDURES FOR FINDING A PRIMITIVE ELEMENT
  splitring(poly f,string R[,list L]);  define ring extension with name R
                                        and switch to it
  randomLast(int b);       random transformation of the last variable
+";
 
 LIB "random.lib";
 ///////////////////////////////////////////////////////////////////////////////

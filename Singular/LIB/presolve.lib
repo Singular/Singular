@@ -1,8 +1,10 @@
-// $Id: presolve.lib,v 1.2 1998-03-06 11:52:57 krueger Exp $
+// $Id: presolve.lib,v 1.3 1998-04-03 22:47:10 krueger Exp $
 //system("random",787422842);
 //(GMG), last modified 97/10/07 by GMG
 ///////////////////////////////////////////////////////////////////////////////
 
+version="$Id: presolve.lib,v 1.3 1998-04-03 22:47:10 krueger Exp $";
+info="
 LIBRARY:  presolve.lib     PROCEDURES FOR PRE-SOLVING POLYNOMIAL EQUATIONS
 
  degreepart(id,d1,d2);  elements of id of total degree >= d1 and <= d2
@@ -19,6 +21,7 @@ LIBRARY:  presolve.lib     PROCEDURES FOR PRE-SOLVING POLYNOMIAL EQUATIONS
  sortvars(id[n1,p1..]); sort vars w.r.t. complexity in id [different blocks]
  valvars(id[..]);       valuation of vars w.r.t. to their complexity in id 
            (parameters in square brackets [] are optional)
+";
 
 LIB "inout.lib";
 LIB "general.lib";

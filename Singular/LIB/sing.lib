@@ -1,8 +1,10 @@
-// $Id: sing.lib,v 1.8 1998-01-28 18:47:59 Singular Exp $
+// $Id: sing.lib,v 1.9 1998-04-03 22:47:13 krueger Exp $
 //system("random",787422842);
 //(GMG/BM, last modified 26.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
+version="$Id: sing.lib,v 1.9 1998-04-03 22:47:13 krueger Exp $";
+info="
 LIBRARY:  sing.lib      PROCEDURES FOR SINGULARITIES
 
  codim (id1, id2);      vector space dimension of of id2/id1 if finite
@@ -22,6 +24,7 @@ LIBRARY:  sing.lib      PROCEDURES FOR SINGULARITIES
  T1(i);                 T1-module of ideal i
  T2((i);                T2-module of ideal i
  T12(i);                T1- and T2-module of ideal i
+";
 
 LIB "inout.lib";
 LIB "random.lib";

@@ -1,10 +1,11 @@
-// $Id: tex.lib,v 1.4 1998-03-06 11:52:59 krueger Exp $   
+// $Id: tex.lib,v 1.5 1998-04-03 22:47:15 krueger Exp $   
 //
 // author : Christian Gorzel email: gorzelc@math.uni-muenster.de
 // created ....18.4.97 (lastchange 13.6.97)
 ///////////////////////////////////////////////////////////////////////////////
 
-
+version="$Id: tex.lib,v 1.5 1998-04-03 22:47:15 krueger Exp $";
+info="
 LIBRARY: tex.lib      PROCEDURES FOR TYPESET OF SINGULAROBJECTS IN TEX
                         by Christian Gorzel, send bugs and
                         comments to gorzelc@math.uni-muenster.de
@@ -37,8 +38,8 @@ LIBRARY: tex.lib      PROCEDURES FOR TYPESET OF SINGULAROBJECTS IN TEX
   TeXproj       : (int) flag, write : instead of , in intvecs and vectors
   TeXaligned    : (int) flag, write mappings (and ideals) aligned
   TeXreplace    : list, entries twoelemented list for replacing symbols
-  NoDollars     : (int) flag, suppresses surrounding "$" signs
-
+  NoDollars     : (int) flag, suppresses surrounding \"$\" signs
+";
 
 ///////////////////////////////////////////////////////////////////////////////
 

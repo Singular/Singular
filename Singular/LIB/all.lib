@@ -1,12 +1,15 @@
-// $Id: all.lib,v 1.6 1998-03-10 13:02:33 Singular Exp $
+// $Id: all.lib,v 1.7 1998-04-03 22:46:58 krueger Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
+version="$Id: all.lib,v 1.7 1998-04-03 22:46:58 krueger Exp $";
+info="
 LIBRARY:  all.lib   Load all libraries
           
   classify.lib  PROCEDURES FOR THE ARNOLD-CLASSIFIER OF SINGULARITIES  
   deform.lib    PROCEDURES FOR COMPUTING MINIVERSAL DEFORMATION
   elim.lib      PROCEDURES FOR ELIMINATION, SATURATION AND BLOWING UP
   factor.lib    PROCEDURES FOR CALLING EXTERNAL FACTORIZER
+  fastsolv.lib
   finvar.lib    PROCEDURES TO CALCULATE INVARIANT RINGS & MORE
   general.lib   PROCEDURES OF GENERAL TYPE
   hnoether.lib  PROCEDURES FOR THE HAMBURGER-NOETHER-DEVELOPMENT
@@ -14,6 +17,7 @@ LIBRARY:  all.lib   Load all libraries
   inout.lib     PROCEDURES FOR MANIPULATING IN- AND OUTPUT
   invar.lib     PROCEDURES FOR COMPUTING INVARIANTS OF (C,+)-ACTIONS
   matrix.lib    PROCEDURES FOR MATRIX OPERATIONS
+  normal.lib
   poly.lib      PROCEDURES FOR MANIPULATING POLYS, IDEALS, MODULES        
   presolve.lib  PROCEDURES FOR PRE-SOLVING POLYNOMIAL EQUATIONS
   primdec.lib   PROCEDURES FOR PRIMARY DECOMPOSITION
@@ -23,6 +27,8 @@ LIBRARY:  all.lib   Load all libraries
   sing.lib      PROCEDURES FOR SINGULARITIES
   standard.lib  PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
   tex.lib       PROCEDURES FOR TYPESET OF SINGULAROBJECTS IN TEX
+  tst.lib
+";
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -30,6 +36,7 @@ LIB "classify.lib";
 LIB "deform.lib";
 LIB "elim.lib";
 LIB "factor.lib";
+LIB "fastsolv.lib";
 LIB "finvar.lib";
 LIB "general.lib";
 LIB "hnoether.lib";
@@ -37,6 +44,7 @@ LIB "homolog.lib";
 LIB "inout.lib";
 LIB "invar.lib";
 LIB "matrix.lib";
+LIB "normal.lib";
 LIB "poly.lib";
 LIB "presolve.lib";
 LIB "primdec.lib";
@@ -45,4 +53,4 @@ LIB "random.lib";
 LIB "ring.lib";
 LIB "sing.lib";
 LIB "tex.lib";
-LIB "tools.lib";
+// LIB "tools.lib";

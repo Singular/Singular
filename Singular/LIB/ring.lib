@@ -1,21 +1,24 @@
-// $Id: ring.lib,v 1.4 1997-09-12 08:18:04 Singular Exp $
+// $Id: ring.lib,v 1.5 1998-04-03 22:47:13 krueger Exp $
 //(GMG, last modified 03.11.95)
 ///////////////////////////////////////////////////////////////////////////////
 
+version="$Id: ring.lib,v 1.5 1998-04-03 22:47:13 krueger Exp $";
+info="
 LIBRARY:  ring.lib      PROCEDURES FOR MANIPULATING RINGS AND MAPS
 
- changechar("R",c[,r]); make a copy R of basering [ring r] with new char c
- changeord("R",o[,r]);  make a copy R of basering [ring r] with new ord o
- changevar("R",v[,r]);  make a copy R of basering [ring r] with new vars v
- defring("R",c,n,v,o);  define a ring R in specified char c, n vars v, ord o
+ changechar(\"R\",c[,r]); make a copy R of basering [ring r] with new char c
+ changeord(\"R\",o[,r]);  make a copy R of basering [ring r] with new ord o
+ changevar(\"R\",v[,r]);  make a copy R of basering [ring r] with new vars v
+ defring(\"R\",c,n,v,o);  define a ring R in specified char c, n vars v, ord o
  defrings(n[,p]);       define ring Sn in n vars, char 32003 [p], ord ds
  defringp(n[,p]);       define ring Pn in n vars, char 32003 [p], ord dp
- extendring("R",n,v,o); extend given ring by n vars v, ord o and name it R
+ extendring(\"R\",n,v,o); extend given ring by n vars v, ord o and name it R
  fetchall(R[,str]);     fetch all objects of ring R to basering
  imapall(R[,str]);      imap all objects of ring R to basering
  mapall(R,i[,str]);     map all objects of ring R via ideal i to basering
- ringtensor("R",s,t,..);create ring R, tensor product of rings s,t,...
+ ringtensor(\"R\",s,t,..);create ring R, tensor product of rings s,t,...
            (parameters in square brackets [] are optional)
+";
 
 LIB "inout.lib";
 LIB "general.lib";

@@ -1,8 +1,10 @@
-// $Id: inout.lib,v 1.3 1997-09-12 07:40:35 Singular Exp $
+// $Id: inout.lib,v 1.4 1998-04-03 22:47:06 krueger Exp $
 // system("random",787422842);
 // (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
+version="$Id: inout.lib,v 1.4 1998-04-03 22:47:06 krueger Exp $";
+info="
 LIBRARY:  inout.lib     PROCEDURES FOR MANIPULATING IN- AND OUTPUT
 
  allprint(list);        print list if ALLprint is defined, with pause if >0
@@ -16,6 +18,7 @@ LIBRARY:  inout.lib     PROCEDURES FOR MANIPULATING IN- AND OUTPUT
  tab(n);                string of n space tabs
  writelist(fil,nam,L);  write the list L into a file `fil` and call it `nam`
            (parameters in square brackets [] are optional)
+";
 
 ///////////////////////////////////////////////////////////////////////////////
 

@@ -1,8 +1,10 @@
-// $Id: elim.lib,v 1.2 1997-04-28 19:27:16 obachman Exp $
+// $Id: elim.lib,v 1.3 1998-04-03 22:47:00 krueger Exp $
 // system("random",787422842);
 // (GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
+version="$Id: elim.lib,v 1.3 1998-04-03 22:47:00 krueger Exp $";
+info="
 LIBRARY:  elim.lib      PROCEDURES FOR ELIMINATIOM, SATURATION AND BLOWING UP
 
  blowup0(j[,s1,s2]);    create presentation of blownup ring of ideal j
@@ -12,6 +14,7 @@ LIBRARY:  elim.lib      PROCEDURES FOR ELIMINATIOM, SATURATION AND BLOWING UP
  sat(id,j);             saturated quotient of ideal/module id by ideal j
  select(id,n[,m]);      select generators containing nth [..mth] variable
            (parameters in square brackets [] are optional)
+";
 
 LIB "inout.lib";
 LIB "general.lib";

@@ -1,8 +1,10 @@
-// $Id: hnoether.lib,v 1.3 1998-03-17 15:06:35 Singular Exp $
+// $Id: hnoether.lib,v 1.4 1998-04-03 22:47:05 krueger Exp $
 // author:  Martin Lamm,  email: lamm@mathematik.uni-kl.de
 // last change:           13.03.98
 ///////////////////////////////////////////////////////////////////////////////
 
+version="$Id: hnoether.lib,v 1.4 1998-04-03 22:47:05 krueger Exp $";
+info="
 LIBRARY:  hnoether.lib   PROCEDURES FOR THE HAMBURGER-NOETHER-DEVELOPMENT
 
            Important procedures:
@@ -44,6 +46,7 @@ LIBRARY:  hnoether.lib   PROCEDURES FOR THE HAMBURGER-NOETHER-DEVELOPMENT
  extractHNEs(H,t);   extracts output H of HN to output of reddevelop
  HN(f,grenze);       recursive subroutine for reddevelop
  constructHNEs(...); subroutine for HN
+";
 
 LIB "primitiv.lib";
 ///////////////////////////////////////////////////////////////////////////////

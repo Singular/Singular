@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.13 1998-04-03 17:38:40 Singular Exp $ */
+/* $Id: iplib.cc,v 1.14 1998-04-03 22:46:53 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -20,19 +20,20 @@
 #include "subexpr.h"
 #include "ipshell.h"
 #include "lists.h"
+#ifdef HAVE_LIBPARSER
+#  include "libparse.h"
+#endif /* HAVE_LIBPARSER */
 
 procinfo *iiInitSingularProcinfo(procinfo *pi, char *libname, char *procname,
                                  int line, long pos, BOOLEAN pstatic=FALSE);
 char *iiConvName(char *p);
 #ifdef HAVE_LIBPARSER
-int yylplex(char *libname, char *libfile);
 void yylprestart (FILE *input_file );
 int current_pos(int i=0);
 extern int yylp_errno;
 extern int yylplineno;
 extern char *yylp_errlist[];
 void print_init();
-void reinit_yylp();
 libstackv library_stack;
 #endif
 
@@ -297,6 +298,11 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
 {
   int err;
   procinfov pi = IDPROC(pn);
+  if(pi->is_static && myynest==0) {
+    Werror("'%s::%s()' is a local procedure and cannot be accessed by an user.",
+	   pi->libname, pi->procname);
+    return NULL;
+  }
   iiCheckNest();
   iiLocalRing[myynest]=currRing;
   iiRETURNEXPR[myynest+1].Init();
@@ -489,12 +495,21 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
 #ifdef HAVE_LIBPARSER
   extern FILE *yylpin;
   libstackv ls_start = library_stack;
+  lib_style_types lib_style;
 
   yylpin = fp;
 # if YYLPDEBUG > 1
   print_init();
 #  endif
-  yylplex(newlib, libnamebuf);
+  Warn( "loading %s...", libnamebuf);
+  yylplex(newlib, libnamebuf, &lib_style);
+  if(lib_style == OLD_LIBSTYLE)
+    Warn( "library %s has an old format. Please fix it for the next time",
+	  newlib);
+  else {
+    Warn( "loading %s done, version: %s", newlib, text_buffer);
+    FreeL(text_buffer);
+  }
   if(yylp_errno) {
     Werror("Library %s: ERROR occured: in line %d, %d.", newlib, yylplineno,
          current_pos(0));

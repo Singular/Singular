@@ -28,6 +28,10 @@
 #include "intvec.h"
 #define SI_DONT_HAVE_GLOBAL_VARS
 
+#ifdef HAVE_LIBPARSER
+#  include "libparse.h"
+#endif /* HAVE_LIBPARSER */
+
 #ifdef HAVE_FACTORY
 #include <factory.h>
 #endif
@@ -361,27 +365,47 @@ void singular_help(char *str,BOOLEAN example)
   else
   {
   /* --------- is it a library ? --------------------------------*/
-    FILE *fp=feFopen(str,"rb");
+    char libnamebuf[128];
+    FILE *fp=feFopen(str,"rb", libnamebuf);
     if (fp!=NULL)
     {
-      char buf[256];
-      BOOLEAN found=FALSE;
-      while (fgets( buf, sizeof(buf), fp))
-      {
-        if (strncmp(buf,"//",2)==0)
-        {
-          if (found) return;
-        }
-        else if ((strncmp(buf,"proc ",5)==0)||(strncmp(buf,"LIB ",4)==0))
-        {
-          if (!found) Warn("no help part in library found");
-          return;
-        }
-        else
-        {
-          found=TRUE;
-          PrintS(buf);
-        }
+#ifdef HAVE_LIBPARSER
+      extern FILE *yylpin;
+      lib_style_types lib_style; // = OLD_LIBSTYLE;
+      
+      yylpin = fp;
+      yylplex(str, libnamebuf, &lib_style, GET_INFO);
+      reinit_yylp();
+      if(lib_style == OLD_LIBSTYLE) {
+	char buf[256];
+	fseek(fp, 0, SEEK_SET);
+#else /* HAVE_LIBPARSER */
+	{ char buf[256];
+#endif /* HAVE_LIBPARSER */
+	Warn( "library %s has an old format. Please fix it for the next time",
+	      str);
+	BOOLEAN found=FALSE;
+	while (fgets( buf, sizeof(buf), fp))
+	  {
+	    if (strncmp(buf,"//",2)==0)
+	      {
+		if (found) return;
+	      }
+	    else if ((strncmp(buf,"proc ",5)==0)||(strncmp(buf,"LIB ",4)==0))
+	      {
+		if (!found) Warn("no help part in library found");
+		return;
+	      }
+	    else
+	      {
+		found=TRUE;
+		PrintS(buf);
+	      }
+	  }
+      } else {
+	fclose( yylpin );
+	PrintS(text_buffer);
+	FreeL(text_buffer);
       }
     }
   /* --------- everything else is for the manual ----------------*/

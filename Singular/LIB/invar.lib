@@ -1,4 +1,4 @@
-// $Id: invar.lib,v 1.4 1998-02-16 12:07:01 pfister Exp $
+// $Id: invar.lib,v 1.5 1998-04-03 22:47:07 krueger Exp $
 ///////////////////////////////////////////////////////
 // invar.lib
 // algorithm for computing the ring of invariants under
@@ -6,6 +6,8 @@
 // written by Gerhard Pfister
 //////////////////////////////////////////////////////
 
+version="$Id: invar.lib,v 1.5 1998-04-03 22:47:07 krueger Exp $";
+info="
 LIBRARY: invar.lib PROCEDURES FOR COMPUTING INVARIANTS OF (C,+)-ACTIONS
 
   invariantRing(matrix m,poly p,poly q,int choose)
@@ -22,6 +24,7 @@ LIBRARY: invar.lib PROCEDURES FOR COMPUTING INVARIANTS OF (C,+)-ACTIONS
   actionIsProper(matrix m)
   // returns 1 if the action of the additive group defined by the
   // matrix m as above i proper and 0 if not.
+";
 
 ///////////////////////////////////////////////////////////////////////////////
 
