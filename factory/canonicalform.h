@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.h,v 1.15 1997-09-04 15:31:22 schmidt Exp $ */
+/* $Id: canonicalform.h,v 1.16 1997-09-09 08:40:54 schmidt Exp $ */
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
@@ -201,7 +201,9 @@ den ( const CanonicalForm & f ) { return f.den(); }
 inline CanonicalForm
 mapinto ( const CanonicalForm & f ) { return f.mapinto(); }
 
-CanonicalForm swapvar ( const CanonicalForm&, const Variable&, const Variable& );
+CanonicalForm swapvar ( const CanonicalForm &, const Variable &, const Variable & );
+
+CanonicalForm replacevar ( const CanonicalForm &, const Variable &, const Variable & );
 
 CanonicalForm gcd ( const CanonicalForm&, const CanonicalForm& );
 
