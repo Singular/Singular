@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.1.1.1 2003-10-06 12:15:54 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.2 2003-12-10 14:34:28 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -26,7 +26,7 @@
 //#include "cntrlc.h"
 #include "intvec.h"
 #include "ideals.h"
-#include "../Singular/ipid.h"
+//#include "../Singular/ipid.h"
 #include "timer.h"
 
 //#include "ipprint.h"
@@ -1015,12 +1015,12 @@ void initBba(ideal F,kStrategy strat)
     //interred  machen   Aenderung
     pFDegOld=pFDeg;
     pLDegOld=pLDeg;
-    h=ggetid("ecart");
-    if ((h!=NULL) /*&& (IDTYP(h)==INTVEC_CMD)*/)
-    {
-      ecartWeights=iv2array(IDINTVEC(h));
-    }
-    else
+    //h=ggetid("ecart");
+    //if ((h!=NULL) /*&& (IDTYP(h)==INTVEC_CMD)*/)
+    //{
+    //  ecartWeights=iv2array(IDINTVEC(h));
+    //}
+    //else
     {
       ecartWeights=(short *)omAlloc((pVariables+1)*sizeof(short));
       /*uses automatic computation of the ecartWeights to set them*/
@@ -1073,12 +1073,12 @@ void initMora(ideal F,kStrategy strat)
     //interred  machen   Aenderung
     pFDegOld=pFDeg;
     pLDegOld=pLDeg;
-    h=ggetid("ecart");
-    if ((h!=NULL) /*&& (IDTYP(h)==INTVEC_CMD)*/)
-    {
-      ecartWeights=iv2array(IDINTVEC(h));
-    }
-    else
+    //h=ggetid("ecart");
+    //if ((h!=NULL) /*&& (IDTYP(h)==INTVEC_CMD)*/)
+    //{
+    //  ecartWeights=iv2array(IDINTVEC(h));
+    //}
+    //else
     {
       ecartWeights=(short *)omAlloc((pVariables+1)*sizeof(short));
       /*uses automatic computation of the ecartWeights to set them*/
