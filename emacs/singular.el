@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.37 1999-08-30 19:08:18 wichmann Exp $
+;; $Id: singular.el,v 1.38 1999-08-30 20:05:14 wichmann Exp $
 
 ;;; Commentary:
 
@@ -3704,12 +3704,13 @@ This variable is buffer-local.")
 (defvar singular-switches-history nil
   "History list of Singular switches.")
 
-(defvar singular-switches-magic '("--emacs")
+(defvar singular-switches-magic '("-t" "--emacs")
   "Additional magic switches for Singular process.
 List of switch-strings which are automagically added when new Singular
-processes are started. 
-This list should at least contain the option \"--emacs\". If you are
-running an older version of Singular, remove this option from the list.")
+processes are started, one string for each command line argument. 
+This list should at least contain the options \"--emacs\" and \"-t\". If
+you are running an older version of Singular, remove option \"--emacs\"
+from the list.")
 
 (defcustom singular-name-default "singular"
   "*Default process name for Singular process.
@@ -3900,10 +3901,19 @@ exists."
     new-name))
 
 (defun singular ()
-  "Start Singular using default values.
-Starts Singular using the values of `singular-executable-default',
-`singular-directory-default', `singular-switches-default', and
-`singular-name-default'."
+  "Run an inferior Singular process using default arguments.  
+Starts a Singular process, with I/O through an Emacs buffer, using the
+values of `singular-executable-default', `singular-directory-default',
+`singular-switches-default', and `singular-name-default'.
+
+For more information on starting a Singular process and on the arguments
+see the documentation of `singular-other'. To restart a previously started
+Singular process use `singular-restart'.
+
+Every time `singular' starts a new Singular process it runs the hooks
+on `singular-exec-hook'.
+
+Type \\[describe-mode] in the Singular buffer for a list of commands."
   (interactive)
   (singular-internal singular-executable-default
 		     singular-directory-default
@@ -3911,12 +3921,23 @@ Starts Singular using the values of `singular-executable-default',
 		     singular-name-default))
 
 (defun singular-restart ()
-  "Start Singular using the last values used.
-If called within a Singular buffer, uses the buffer local values last used
-in this buffer.
-If called outside a Singular buffer, uses the last values used by any
-Singular buffer.
-If no last values are available, uses the default values."
+  "Run an inferior Singular process using the last arguments used.
+Starts a Singular process, with I/O through an Emacs buffer, using the
+previously used arguments.
+If called within a Singular buffer, uses the arguments of the most recent
+Singular process started in this buffer.
+If called outside a Singular buffer, uses the arguments of the most recent
+Singular process started in any Singular buffer.
+If no last values are available, uses the default values (see documentation
+of `singular').
+
+For more information on starting a Singular process and on the arguments
+see the documentation of `singular-other'.
+
+Every time `singular-restarts' starts a new Singular process it runs the
+hooks on `singular-exec-hook'.
+
+Type \\[describe-mode] in the Singular buffer for a list of commands."
   (interactive)
   (singular-internal singular-executable-last
 		     singular-directory-last
@@ -3924,48 +3945,79 @@ If no last values are available, uses the default values."
 		     singular-name-last))
 
 (defun singular-other ()
-  "Ask for arguments and start Singular.
-Interactively asks values for the executable, the default directory, the
-buffer name and the command line switches, and starts Singular."
-  (interactive)
-  (let* ((executable (read-file-name "Singular executable: "))
+  "Run an inferior Singular process.
+Starts a Singular process, with I/O through an Emacs buffer.
+
+If called interactively, the user is asked in the minibuffer area for an
+existing executable (with or without path), an exisiting directory or nil
+(if non-nil, sets the buffers default directory to this directory), the
+complete command line arguments to be passed to Singular (as a single
+string) and the buffer name of the singular buffer, which is surrounded by
+\"*\", if not already. (The process name of the singular process is then
+given by the buffer name with the surrounding stars stripped.)
+
+If called non-interactiveley, EXECUTABLE is the name of an existing
+Singular executable (with or without path), DIRECTORY is the name of an
+existing directory or nil. If non-nil, sets the buffers default directory
+to DIRECTORY. SWITCHES is a list of strings where each string contains one
+command line argument which is passed to Singular, and NAME is the process
+name of the Singular process (that is, the singular buffer name is given by
+NAME surrounded by \"*\").
+
+If buffer exists but Singular is not running, starts new Singular.
+If buffer exists and Singular is running, just switches to buffer.
+If a file `~/.emacs_singularrc' exists, it is given as initial input.
+Note that this may lose due to a timing error if Singular discards
+input when it starts up.
+
+If a new buffer is created it is put in Singular interactive mode,
+giving commands for sending input and handling output of Singular.  See
+`singular-interactive-mode'.
+
+Every time `singular-other' starts a new Singular process it runs the hooks
+on `singular-exec-hook'.
+
+Type \\[describe-mode] in the Singular buffer for a list of commands."
+  (interactive 
+   (let* ((exec (read-file-name "Singular executable: "))
 	 ;; Remark: Do NOT call `expand-file-name' after the 
 	 ;; above read-file-name! It has to be possible to enter a command
 	 ;; without path which should be searched for in $PATH.
 	 ;; `start-process' is intelligent enough to start commands with
 	 ;; not-expanded name.
-	 (directory (file-name-directory (read-file-name "Default directory: "
-							 nil 
-							 (or singular-directory-default
-							     default-directory)
-							 t)))
-	 (switches "")
-	 (name (singular-generate-new-buffer-name 
-		(downcase (file-name-nondirectory executable)))))
+	  (dir (file-name-directory (read-file-name "Default directory: "
+						    nil 
+						    (or singular-directory-default
+							default-directory)
+						    t)))
+	 (switch "")
+	 (bufname (singular-generate-new-buffer-name 
+		   (downcase (file-name-nondirectory exec)))))
 
-    ;; Get command line arguments and append magic switches
-    ;; TODO: Think about default value: Up to now:
-    ;; Use singular-switches-default as init value for read-from-minibuffer
-    (let ((switches-default singular-switches-default))
-      (while switches-default
-	(setq switches (concat switches (car switches-default) " "))
-	(setq switches-default (cdr switches-default))))
-    ;; note: magic switches are appended by `singular-internal'
-    (setq switches (split-string (read-from-minibuffer "Singular options: "
-						       switches nil nil 
-						       singular-switches-history)
-				 " "))
+     ;; Get command line arguments and append magic switches
+     ;; TODO: Think about default value: Up to now:
+     ;; Use singular-switches-default as init value for read-from-minibuffer
+     (let ((switches-default singular-switches-default))
+       (while switches-default
+	 (setq switch (concat switch (car switches-default) " "))
+	 (setq switches-default (cdr switches-default))))
+     ;; note: magic switches are appended by `singular-internal'
+     (setq switch (split-string (read-from-minibuffer "Singular options: "
+						      switch nil nil 
+						      singular-switches-history)
+				" "))
+     
+     ;; Generate new buffer name
+     (let (done)
+       (while (not done)
+	 (setq bufname (read-from-minibuffer "Singular buffer name: " bufname))
+	 (setq done (or (not (get-buffer bufname))
+			(y-or-n-p "Buffer exists. Switch to that buffer? ")))))
+     (if (string-match "^\\*\\(.*\\)\\*$" bufname)
+	 (setq bufname (substring bufname (match-beginning 1) (match-end 1))))
+     (list exec dir switch bufname)))
 
-    ;; Generate new buffer name
-    (let (done)
-      (while (not done)
-	(setq name (read-from-minibuffer "Singular buffer name: " name))
-	(setq done (or (not (get-buffer name))
-		       (y-or-n-p "Buffer exists. Switch to that buffer? ")))))
-    (if (string-match "^\\*\\(.*\\)\\*$" name)
-	(setq name (substring name (match-beginning 1) (match-end 1))))
-
-    (singular-internal executable directory switches name)))
+  (singular-internal executable directory switches name))
 
 (defun singular-exit-singular ()
   "Exit Singular and kill Singular buffer.
