@@ -700,28 +700,6 @@ else
 fi
 
 #
-# dl
-if test "$with_dl" != no; then
-  AC_CHECK_LIB(dl, dlopen)
-  if test "$ac_cv_lib_dl_dlopen" = yes; then
-    NEED_LIBS="-ldl ${NEED_LIBS}"
-    case "$ac_cv_singuname" in
-    *-Linux | HPUX-* ) LD_DYN_FLAGS="-Xlinker -E" ;;
-    esac
-    LD_LIBC="-lc"
-    AC_SUBST(LD_LIBC)
-    AC_DEFINE(HAVE_DL)
-  fi
-  AC_CHECK_LIB(dld, shl_load)
-  if test "$ac_cv_lib_dld_shl_load" = yes; then
-    NEED_LIBS="-ldld ${NEED_LIBS}"
-    LD_DYN_FLAGS="-Xlinker -E"
-    LD_LIBC="-lc"
-    AC_SUBST(LD_LIBC)
-    AC_DEFINE(HAVE_DL)
-  fi
-fi
-
 AC_MSG_CHECKING(whether to have MP)
 if test "${with_MP}" != yes && test "${with_MP}" != no; then
   if (test "${will_have_gmp}" = yes) && \
@@ -811,31 +789,41 @@ else
   AC_MSG_RESULT(yes)
 fi
 
+AC_MSG_CHECKING(whether to have dl lib)
+
+case "$ac_cv_singuname" in
+	HPUX-9)
+          AC_MSG_RESULT(dld)
+	  AC_CHECK_LIB(dld, shl_load)
+	  LD_DYN_FLAGS="-ldld -Xlinker -E"
+          AC_DEFINE(HAVE_DL)
+	;;
+	HPUX-10)
+          AC_MSG_RESULT(dld)
+	  AC_CHECK_LIB(dld, shl_load)
+	  LD_DYN_FLAGS="-ldld -Xlinker -E"
+          AC_DEFINE(HAVE_DL)
+	;;
+	*Linux*)
+          AC_MSG_RESULT(dl)
+	  AC_CHECK_LIB(dl, dlopen)
+	  LD_DYN_FLAGS="-ldl -rdynamic"
+          AC_DEFINE(HAVE_DL)
+	;;
+	*) 
+          AC_MSG_RESULT(no)
+	  ;;
+esac
+
 AC_MSG_CHECKING(whether to have dynamic loading)
 if test "$with_dl" != yes; then
   AC_MSG_RESULT(no)
 else
   AC_DEFINE(HAVE_DYNAMIC_LOADING)
   AC_MSG_RESULT(yes)
-  case "$ac_cv_singuname" in
-	unknown) ;;
-	HPUX-9)
-	  AC_CHECK_LIB(dld, shl_load)
-	  NEED_LIBS="-ldld ${NEED_LIBS}"
-	  LD_DYN_FLAGS="-Xlinker -E"
-	;;
-	HPUX-10)
-	  AC_CHECK_LIB(dld, shl_load)
-	  NEED_LIBS="-ldld ${NEED_LIBS}"
-	  LD_DYN_FLAGS="-Xlinker -E"
-	;;
-	ix86-Linux)
-	  NEED_LIBS="-ldl ${NEED_LIBS}"
-	  LD_DYN_FLAGS="-rdynamic"
-	;;
-  esac
-  AC_SUBST(LD_DYN_FLAGS)
 fi
+
+AC_SUBST(LD_DYN_FLAGS)
 
 dnl
 dnl check for mtrack
@@ -847,8 +835,6 @@ if test "$with_mtrack" = yes && test "$ac_cv_singuname" = ix86-Linux; then
 else
   AC_MSG_RESULT(no)
 fi
-
-
 
 dnl
 dnl figure out Exponent_t and Order_t
@@ -871,7 +857,3 @@ fi
 
 AC_OUTPUT(Makefile, \
  if test "$CONFIG_HEADERS"; then echo timestamp > stamp-h; fi)
-
-
-
-

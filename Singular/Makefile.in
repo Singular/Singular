@@ -54,7 +54,7 @@ CPPFLAGS	= -I${srcdir} @CPPFLAGS@
 DEFS		= -DNDEBUG -D@SING_UNAME@ @DEFS@
 LDFLAGS		= @LDFLAGS@
 LD_DYN_FLAGS	= @LD_DYN_FLAGS@
-LD_LIBC	        = @LD_LIBC@
+LD_LIBC	        = -lc
 STATIC_LDFLAGS	= @STATIC_LDFLAGS@
 LIBS		= -lm @NEED_LIBS@
 
@@ -62,6 +62,7 @@ ifdef LD_STATIC
 LDFLAGS  := ${STATIC_LDFLAGS} ${LDFLAGS} 
 SING_EXEC = Singular-static
 else
+LDFLAGS  := ${LD_DYN_FLAGS} ${LDFLAGS} 
 SING_EXEC = Singular
 endif
 
@@ -195,15 +196,23 @@ GFTABLES = $(wildcard LIB/gftables/[1-9]*)
 %.aso: %.aso.o
 	./$< > $@
 
-all:	${SING_EXEC}
+all:	Singular
 
-${SING_EXEC}: mod2.h Makefile version.h scanner.cc gmalloc.o \
+Singular-static: mod2.h Makefile version.h scanner.cc gmalloc.o \
+          ${ASO_OBJS} ${OBJS} \
+          iparith.o tesths.cc libparse.cc claptmpl.o mpsr_Tok.o
+	echo "#define HAVE_STATIC" > static.h
+	${MAKE} LD_STATIC=1 Singular
+	echo "#undef HABE_STATIC" > static.h
+	${INSTALL_PROGRAM} Singular Singular-static
+
+Singular: mod2.h Makefile version.h scanner.cc gmalloc.o \
           ${ASO_OBJS} ${OBJS} \
           iparith.o tesths.cc libparse.cc claptmpl.o mpsr_Tok.o
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} \
-	  -o ${SING_EXEC} \
+	  -o Singular \
 	  tesths.cc iparith.o mpsr_Tok.o claptmpl.o\
-	  ${OBJS} ${LDFLAGS} ${LIBS} ${LD_DYN_FLAGS} \
+	  ${OBJS} ${LDFLAGS} ${LIBS} \
 	  gmalloc.o ${LD_LIBC}
 
 iparith.o mpsr_Tok.o : iparith.inc mpsr_Tok.inc
