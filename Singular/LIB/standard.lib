@@ -1,7 +1,7 @@
-// $Id: standard.lib,v 1.18 1998-06-03 10:04:26 obachman Exp $
+// $Id: standard.lib,v 1.19 1998-06-12 09:33:33 obachman Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.18 1998-06-03 10:04:26 obachman Exp $";
+version="$Id: standard.lib,v 1.19 1998-06-12 09:33:33 obachman Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
@@ -214,7 +214,7 @@ EXAMPLE: example groebner; shows an example"
     }
     else
     {
-      "// ** groebner with two args not supported in this configuration";
+      "// ** groebner with two args is not supported in this configuration";
     }
   }
 
@@ -237,7 +237,7 @@ EXAMPLE: example groebner; shows an example"
   int npars_P = npars(P);
 
   // return std if no parameters and (dp or wp)
-  if ((npars_P == 0) && IsSimple_P)
+  if ((npars_P <= 1) && IsSimple_P)
   {
     if (find(ordstr_P, "d") > 0)
     {
@@ -268,18 +268,26 @@ EXAMPLE: example groebner; shows an example"
   // construct ring in which first std computation is done
   string varstr_P = varstr(P);
   string parstr_P = parstr(P);
-  int is_homog = (homog(i) && (npars_P == 0));
-
-  string ri = "ring Phelp =" + string(char(P)) + ",(" + varstr_P;
-  // parameters are converted to ring variables
-  if (npars_P > 0)
+  int is_homog = (homog(i) && (npars_P <= 1));
+  int add_vars = 0;
+  string ri = "ring Phelp =";
+  
+  // more than one parameters are converted to ring variables
+  if (npars_P > 1)
   {
-    ri = ri + "," + parstr_P;
+    ri = ri + string(char(P)) + ",(" + varstr_P + "," + parstr_P;
+    add_vars = npars_P;
   }
+  else
+  {
+    ri = ri + "(" + charstr(P) + "),(" + varstr_P;
+  }
+
   // a homogenizing variable is added, if necessary
   if (! is_homog)
   {
     ri = ri + ",@t";
+    add_vars = add_vars + 1;
   }
   // ordering is set to (dp, C)
   ri = ri + "),(dp,C);";
@@ -306,7 +314,7 @@ EXAMPLE: example groebner; shows an example"
   ideal qh1=std(qh);
   intvec hi=hilb(qh1,1);
 
-  if (is_homog && (npars_P == 0))
+  if (add_vars == 0)
   {
     // no additional variables were introduced
     setring P; // can immediately change to original ring
@@ -321,14 +329,14 @@ EXAMPLE: example groebner; shows an example"
   {
     // additional variables were introduced
     // need another intermediate ring
-    ri = "ring Phelp1 =" + string(char(P))
-      + ",(" + varstr(Phelp) + "),(" + ordstr_P;
+    ri = "ring Phelp1 = (" + charstr(Phelp) 
+      + "),(" + varstr(Phelp) + "),(" + ordstr_P;
 
-    // for lp without parameters, we do not need a block ordering
-    if ( ! (IsSimple_P && (npars_P + is_homog < 2) && find(ordstr_P, "l")))
+    // for lp wit at most one parameter, we do not need a block ordering
+    if ( ! (IsSimple_P && (add_vars <2) && find(ordstr_P, "l")))
     {
       // need block ordering
-      ri = ri + ", dp(" + string(npars_P + is_homog) + ")";
+      ri = ri + ", dp(" + string(add_vars) + ")";
     }
     ri = ri + ");";
 
