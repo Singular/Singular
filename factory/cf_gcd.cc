@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.14 1997-09-12 15:27:25 schmidt Exp $ */
+/* $Id: cf_gcd.cc,v 1.15 1997-10-24 16:46:20 schmidt Exp $ */
 
 #include <config.h>
 
@@ -60,61 +60,51 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap )
     return gcd( e( F ), e( G ) ).degree() < 1;
 }
 
+//{{{ static CanonicalForm maxnorm ( const CanonicalForm & f )
+//{{{ docu
+//
+// maxnorm() - return the maximum of the absolute values of all
+//   coefficients of f.
+//
+// The absolute value and the maximum are calculated with respect
+// to operator < on canonical forms which is most meaningful for
+// rational numbers and integers.
+//
+// Used by gcd_poly_univar0().
+//
+//}}}
 static CanonicalForm
 maxnorm ( const CanonicalForm & f )
 {
-    CanonicalForm m = 0, h;
+    CanonicalForm m = 0;
     CFIterator i;
     for ( i = f; i.hasTerms(); i++ )
 	m = tmax( m, abs( i.coeff() ) );
     return m;
 }
+//}}}
 
-static void
-chinesePoly ( const CanonicalForm & f1, const CanonicalForm & q1, const CanonicalForm & f2, const CanonicalForm & q2, CanonicalForm & f, CanonicalForm & q )
-{
-    CFIterator i1 = f1, i2 = f2;
-    CanonicalForm c;
-    Variable x = f1.mvar();
-    f = 0;
-    while ( i1.hasTerms() && i2.hasTerms() ) {
-	if ( i1.exp() == i2.exp() ) {
-	    chineseRemainder( i1.coeff(), q1, i2.coeff(), q2, c, q );
-	    f += power( x, i1.exp() ) * c;
-	    i1++; i2++;
-	}
-	else if ( i1.exp() > i2.exp() ) {
-	    chineseRemainder( 0, q1, i2.coeff(), q2, c, q );
-	    f += power( x, i2.exp() ) * c;
-	    i2++;
-	}
-	else {
-	    chineseRemainder( i1.coeff(), q1, 0, q2, c, q );
-	    f += power( x, i1.exp() ) * c;
-	    i1++;
-	}
-    }
-    while ( i1.hasTerms() ) {
-	chineseRemainder( i1.coeff(), q1, 0, q2, c, q );
-	f += power( x, i1.exp() ) * c;
-	i1++;
-    }
-    while ( i2.hasTerms() ) {
-	chineseRemainder( 0, q1, i2.coeff(), q2, c, q );
-	f += power( x, i2.exp() ) * c;
-	i2++;
-    }
-}
-
+//{{{ static CanonicalForm balance ( const CanonicalForm & f, const CanonicalForm & q )
+//{{{ docu
+//
+// balance() - map f from positive to symmetric representation
+//   mod q.
+//
+// This makes sense for univariate polynomials over Z only.
+// q should be an integer.
+//
+// Used by gcd_poly_univar0().
+//
+//}}}
 static CanonicalForm
 balance ( const CanonicalForm & f, const CanonicalForm & q )
 {
-    CFIterator i;
+    Variable x = f.mvar();
     CanonicalForm result = 0, qh = q / 2;
     CanonicalForm c;
-    Variable x = f.mvar();
+    CFIterator i;
     for ( i = f; i.hasTerms(); i++ ) {
-	c = i.coeff() % q;
+	c = mod( i.coeff(), q );
 	if ( c > qh )
 	    result += power( x, i.exp() ) * (c - q);
 	else
@@ -122,7 +112,18 @@ balance ( const CanonicalForm & f, const CanonicalForm & q )
     }
     return result;
 }
+//}}}
 
+//{{{ CanonicalForm igcd ( const CanonicalForm & f, const CanonicalForm & g )
+//{{{ docu
+//
+// igcd() - return integer gcd of f and g.
+//
+// Calculates the integer gcd of f and g using the euclidean
+// algorithm if f and g are integers and we are not calculating
+// in Q.  Returns one in all other cases.  Normalizes result.
+//
+//}}}
 CanonicalForm
 igcd ( const CanonicalForm & f, const CanonicalForm & g )
 {
@@ -141,7 +142,17 @@ igcd ( const CanonicalForm & f, const CanonicalForm & g )
     else
 	return 1;
 }
+//}}}
 
+//{{{ static CanonicalForm icontent ( const CanonicalForm & f, const CanonicalForm & c )
+//{{{ docu
+//
+// icontent() - return gcd of c and all coefficients of f which
+//   are in a coefficient domain.
+//
+// Used by icontent().
+//
+//}}}
 static CanonicalForm
 icontent ( const CanonicalForm & f, const CanonicalForm & c )
 {
@@ -154,13 +165,34 @@ icontent ( const CanonicalForm & f, const CanonicalForm & c )
 	return g;
     }
 }
+//}}}
 
+//{{{ CanonicalForm icontent ( const CanonicalForm & f )
+//{{{ docu
+//
+// icontent() - return gcd over all coefficients of f which are
+//   in a coefficient domain.
+//
+//}}}
 CanonicalForm
 icontent ( const CanonicalForm & f )
 {
     return icontent( f, 0 );
 }
+//}}}
 
+//{{{ CanonicalForm iextgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, CanonicalForm & b )
+//{{{ docu
+//
+// iextgcd() - calculate extended integer gcd.
+//
+// Returns gcd(f, g) and a and b sucht that f*a+g*b=gcd(f, g).
+// The gcd is calculated using an extended euclidean polynomial
+// remainder sequence.  Normalizes result.
+//
+// Note: be sure you are calculating in Z, and not in Q!
+//
+//}}}
 CanonicalForm
 iextgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, CanonicalForm & b )
 {
@@ -184,7 +216,21 @@ iextgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, C
     }
     return p0;
 }
+//}}}
 
+//{{{ CanonicalForm extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, CanonicalForm & b )
+//{{{ docu
+//
+// extgcd() - returns polynomial extended gcd of f and g.
+//
+// Returns gcd(f, g) and a and b sucht that f*a+g*b=gcd(f, g).
+// The gcd is calculated using an extended euclidean polynomial
+// remainder sequence, so f and g should be polynomials over an
+// euclidean domain.  Normalizes result.
+//
+// Note: be sure that f and g have the same level!
+//
+//}}}
 CanonicalForm
 extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, CanonicalForm & b )
 {
@@ -213,6 +259,7 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
     }
     return p0;
 }
+//}}}
 
 static CanonicalForm
 gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primitive )
@@ -262,7 +309,7 @@ gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primiti
 	    }
 	    else {
 		if ( Dp.degree() == D.degree() ) {
-		    chinesePoly( D, q, mapinto( Dp ), p, newD, newq );
+		    chineseRemainder( D, q, mapinto( Dp ), p, newD, newq );
 		    q = newq;
 		    D = newD;
 		}
@@ -289,7 +336,6 @@ gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primiti
 	DEBOUTLN( cerr, "another try ..." );
     }
 }
-
 
 static CanonicalForm
 gcd_poly1( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
@@ -340,9 +386,23 @@ gcd_poly1( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
     }
 }
 
-
+//{{{ static CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
+//{{{ docu
+//
+// gcd_poly() - calculate polynomial gcd.
+//
+// This is the dispatcher for polynomial gcd calculation.  We call either
+// ezgcd(), sparsemod() or gcd_poly1() in dependecy on the current
+// characteristic and settings of SW_USE_EZGCD and SW_USE_SPARSEMOD, resp.
+//
+// modularflag is reached down to gcd_poly1() without change in case of
+// zero characteristic.
+//
+// Used by gcd() and gcd_poly_univar0().
+//
+//}}}
 static CanonicalForm
-gcd_poly( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
+gcd_poly ( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
 {
     if ( getCharacteristic() != 0 ) {
 	return gcd_poly1( f, g, false );
@@ -352,15 +412,25 @@ gcd_poly( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
 	compress( f, g, M, N );
 	return N( ezgcd( M(f), M(g) ) );
     }
-    else if ( isOn( SW_USE_SPARSEMOD ) ) {
+    else if ( isOn( SW_USE_SPARSEMOD ) && ! ( f.isUnivariate() && g.isUnivariate() ) ) {
 	return sparsemod( f, g );
     }
     else {
 	return gcd_poly1( f, g, modularflag );
     }
 }
+//}}}
 
-
+//{{{ static CanonicalForm cf_content ( const CanonicalForm & f, const CanonicalForm & g )
+//{{{ docu
+//
+// cf_content() - return gcd(g, content(f)).
+//
+// content(f) is calculated with respect to f's main variable.
+//
+// Used by gcd(), content(), content( CF, Variable ).
+//
+//}}}
 static CanonicalForm
 cf_content ( const CanonicalForm & f, const CanonicalForm & g )
 {
@@ -379,11 +449,14 @@ cf_content ( const CanonicalForm & f, const CanonicalForm & g )
 	else
 	    return f;
 }
+//}}}
 
 //{{{ CanonicalForm content ( const CanonicalForm & f )
 //{{{ docu
 //
 // content() - return content(f) with respect to main variable.
+//
+// Normalizes result.
 //
 //}}}
 CanonicalForm
@@ -393,20 +466,44 @@ content ( const CanonicalForm & f )
 }
 //}}}
 
+//{{{ CanonicalForm content ( const CanonicalForm & f, const Variable & x )
+//{{{ docu
+//
+// content() - return content(f) with respect to x.
+//
+// x should be a polynomial variable.
+//
+//}}}
 CanonicalForm
 content ( const CanonicalForm & f, const Variable & x )
 {
-    if ( f.mvar() == x )
+    ASSERT( x.level() > 0, "cannot calculate content with respect to algebraic variable" );
+    Variable y = f.mvar();
+
+    if ( y == x )
 	return cf_content( f, 0 );
-    else  if ( f.mvar() < x )
+    else  if ( y < x )
 	return f;
     else
-	return swapvar( content( swapvar( f, f.mvar(), x ), f.mvar() ), f.mvar(), x );
+	return swapvar( content( swapvar( f, y, x ), y ), y, x );
 }
+//}}}
 
+//{{{ CanonicalForm vcontent ( const CanonicalForm & f, const Variable & x )
+//{{{ docu
+//
+// vcontent() - return content of f with repect to variables >= x.
+//
+// The content is recursively calculated over all coefficients in
+// f having level less than x.  x should be a polynomial
+// variable.
+//
+//}}}
 CanonicalForm
 vcontent ( const CanonicalForm & f, const Variable & x )
 {
+    ASSERT( x.level() > 0, "cannot calculate vcontent with respect to algebraic variable" );
+
     if ( f.mvar() <= x )
 	return content( f, x );
     else {
@@ -417,11 +514,14 @@ vcontent ( const CanonicalForm & f, const Variable & x )
 	return d;
     }
 }
+//}}}
 
 //{{{ CanonicalForm pp ( const CanonicalForm & f )
 //{{{ docu
 //
 // pp() - return primitive part of f.
+//
+// Returns zero if f equals zero, otherwise f / content(f).
 //
 //}}}
 CanonicalForm
@@ -469,8 +569,10 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
 		else
 		    return g;
 	    if ( getCharacteristic() == 0 && isOn( SW_RATIONAL ) ) {
+		CanonicalForm cdF = common_den( f );
+		CanonicalForm cdG = common_den( g );
 		Off( SW_RATIONAL );
-		CanonicalForm l = lcm( common_den( f ), common_den( g ) );
+		CanonicalForm l = lcm( cdF, cdG );
 		On( SW_RATIONAL );
 		CanonicalForm F = f * l, G = g * l;
 		Off( SW_RATIONAL );
@@ -495,8 +597,22 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
 	return cf_content( g, f );
 }
 
+//{{{ CanonicalForm lcm ( const CanonicalForm & f, const CanonicalForm & g )
+//{{{ docu
+//
+// lcm() - return least common multiple of f and g.
+//
+// The lcm is calculated using the formula lcm(f, g) = f * g / gcd(f, g).
+//
+// Returns zero if one of f or g equals zero.
+//
+//}}}
 CanonicalForm
 lcm ( const CanonicalForm & f, const CanonicalForm & g )
 {
-    return ( f / gcd( f, g ) ) * g;
+    if ( f.isZero() || g.isZero() )
+	return f;
+    else
+	return ( f / gcd( f, g ) ) * g;
 }
+//}}}
