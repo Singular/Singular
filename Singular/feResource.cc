@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.5 1999-08-12 10:57:32 Singular Exp $ */
+/* $Id: feResource.cc,v 1.6 1999-08-14 13:17:30 Singular Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -17,7 +17,7 @@
 
 #if defined(MAKE_DISTRIBUTION)
 #if defined(WINNT) 
-#define SINGULAR_DEFAULT_DIR "/Singular/"S_VERSION_1
+#define SINGULAR_DEFAULT_DIR "/Singular/"S_VERSION1
 #elif defined(macintosh)
 #define SINGULAR_DEFAULT_DIR "Macintosh HD:Singular:"S_VERSION1
 #else // unix
