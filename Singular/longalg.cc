@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.9 1997-08-20 18:48:59 Singular Exp $ */
+/* $Id: longalg.cc,v 1.10 1997-09-15 08:51:47 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -2021,11 +2021,11 @@ number naLcm(number la, number lb)
   alg x;
   number t, bt, r;
   result = (lnumber)Alloc0(sizeof(rnumber));
-  if (((naMinimalPoly==NULL) && (naI==NULL)) || !naIsChar0)
-  {
-    result->z = napInit(1);
-    return (number)result;
-  }
+  //if (((naMinimalPoly==NULL) && (naI==NULL)) || !naIsChar0)
+  //{
+  //  result->z = napInit(1);
+  //  return (number)result;
+  //}
   naNormalize(lb);
   x = napCopy(a->z);
   t = napLcm(b->z);

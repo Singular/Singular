@@ -4207,7 +4207,7 @@ static BOOLEAN jjSTRING_PL(leftv res, leftv v)
       char *s=(char *)AllocL(sl+nl+1);
       memcpy(s,sum,sl);
       memcpy(s+sl,(char *)tmpR.data,nl);
-      s[sl+nl+1]='\0';
+      s[sl+nl]='\0';
       sl+=nl;
       FreeL(sum);
       sum=s;
