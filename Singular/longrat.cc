@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.36 2001-01-09 15:40:10 Singular Exp $ */
+/* $Id: longrat.cc,v 1.37 2001-01-18 16:53:54 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -1132,7 +1132,7 @@ BOOLEAN nlIsMOne (number a)
 /*2
 * result =gcd(a,b)
 */
-number nlGcd(number a, number b, ring r)
+number nlGcd(number a, number b, const ring r)
 {
   number result;
 #ifdef LDEBUG
@@ -1291,7 +1291,7 @@ void nlNormalize (number &x)
 /*2
 * returns in result->z the lcm(a->z,b->n)
 */
-number nlLcm(number a, number b, ring r)
+number nlLcm(number a, number b, const ring r)
 {
   number result;
 #ifdef LDEBUG
@@ -1503,7 +1503,7 @@ number _nlCopy_NoImm(number a)
   return b;
 }
 
-void _nlDelete_NoImm(number *a, ring r)
+void _nlDelete_NoImm(number *a, const ring r)
 {
   switch ((*a)->s)
   {
@@ -2189,7 +2189,7 @@ number nlRInit (int i)
 number nlRInit (int i);
 BOOLEAN _nlEqual_aNoImm_OR_bNoImm(number a, number b);
 number  _nlCopy_NoImm(number a);
-void    _nlDelete_NoImm(number *a, ring r);
+void    _nlDelete_NoImm(number *a, const ring r);
 number  _nlNeg_NoImm(number a);
 number  _nlAdd_aNoImm_OR_bNoImm(number a, number b);
 number  _nlSub_aNoImm_OR_bNoImm(number a, number b);
@@ -2274,7 +2274,7 @@ LINLINE void nlNew (number * r)
 /*2
 * delete a
 */
-LINLINE void nlDelete (number * a, ring r)
+LINLINE void nlDelete (number * a, const ring r)
 {
   if (*a!=NULL)
   {

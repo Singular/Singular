@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.cc,v 1.18 2001-01-09 15:40:07 Singular Exp $ */
+/* $Id: gnumpfl.cc,v 1.19 2001-01-18 16:53:57 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 *
@@ -89,7 +89,7 @@ int ngfInt(number &i)
 /*2
 * delete a
 */
-void ngfDelete (number * a, ring r)
+void ngfDelete (number * a, const ring r)
 {
   if ( *a != NULL )
   {

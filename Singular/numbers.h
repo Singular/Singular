@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.24 2001-01-09 15:40:12 Singular Exp $ */
+/* $Id: numbers.h,v 1.25 2001-01-18 16:54:19 Singular Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
@@ -54,12 +54,12 @@ extern BOOLEAN (*nGreater)(number a,number b),
                (*nGreaterZero)(number a);
 extern void    (*nPower)(number a, int i, number * result);
 extern number  (*nGetDenom)(number &n);
-extern number (*nGcd)(number a, number b, ring r);
-extern number (*nLcm)(number a, number b, ring r);
+extern number (*nGcd)(number a, number b, const ring r);
+extern number (*nLcm)(number a, number b, const ring r);
 
 extern number nNULL; /* the 0 as constant */
 
-extern void    (*n__Delete)(number * a, ring r);
+extern void    (*n__Delete)(number * a, const ring r);
 #define nTest(a) (1)
 #define nDelete(A) (currRing)->cf->cfDelete(A,currRing)
 
@@ -67,7 +67,7 @@ extern void    (*n__Delete)(number * a, ring r);
 extern char *  (*nName)(number n);
 
 void nDummy1(number* d);
-void ndDelete(number* d, ring r);
+void ndDelete(number* d, const ring r);
 void nDummy2(number &d);
 number ndGcd(number a, number b);
 number ndCopy(number a);

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.h,v 1.21 2001-01-12 15:26:54 Singular Exp $ */
+/* $Id: longrat.h,v 1.22 2001-01-18 16:53:54 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers
 */
@@ -66,14 +66,14 @@ LINLINE BOOLEAN  nlIsOne(number a);
 LINLINE BOOLEAN  nlIsZero(number za);
 LINLINE number   nlCopy(number a);
 LINLINE void     nlNew(number *r);
-LINLINE void     nlDelete(number *a, ring r);
+LINLINE void     nlDelete(number *a, const ring r);
 LINLINE number   nlNeg(number za);
 LINLINE number   nlAdd(number la, number li);
 LINLINE number   nlSub(number la, number li);
 LINLINE number   nlMult(number a, number b);
 
-number   nlGcd(number a, number b, ring r);
-number   nlLcm(number a, number b, ring r);   /*special routine !*/
+number   nlGcd(number a, number b, const ring r);
+number   nlLcm(number a, number b, const ring r);   /*special routine !*/
 BOOLEAN  nlGreater(number a, number b);
 BOOLEAN  nlIsMOne(number a);
 number   nlInit(number i);
