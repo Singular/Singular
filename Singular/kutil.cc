@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.106 2002-05-22 13:41:19 levandov Exp $ */
+/* $Id: kutil.cc,v 1.107 2002-05-22 13:52:28 levandov Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -969,10 +969,13 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
     *This should be done here because the
     *case lcm(s,r)=lcm(s,p) is not covered by chainCrit.
     */
-      strat->cp++;
-      pLmFree(Lp.lcm);
-      Lp.lcm=NULL;
-      return;
+      if (!rIsPluralRing(currRing))
+      {
+	strat->cp++;
+	pLmFree(Lp.lcm);
+	Lp.lcm=NULL;
+	return;
+      }
     }
     else
       Lp.ecart = max(ecart,strat->ecartS[i]);
@@ -1040,10 +1043,13 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
     *This should be done here because the
     *case lcm(s,r)=lcm(s,p) is not covered by chainCrit.
     */
-      strat->cp++;
-      pLmFree(Lp.lcm);
-      Lp.lcm=NULL;
-      return;
+      if (!rIsPluralRing(currRing))
+      {
+	strat->cp++;
+	pLmFree(Lp.lcm);
+	Lp.lcm=NULL;
+	return;
+      }
     }
     if (strat->fromT && (strat->ecartS[i]>ecart))
     {
@@ -1178,8 +1184,11 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat, int atR = -1)
   if(pHasNotCF(p,strat->S[i]))
   {
     //PrintS("prod-crit\n");
-    strat->cp++;
-    return;
+      if (!rIsPluralRing(currRing))
+      {
+	strat->cp++;
+	return;
+      }
   }
 
   int      l,j,compare;
