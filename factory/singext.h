@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: singext.h,v 1.4 1998-06-03 11:47:57 Singular Exp $ */
+/* $Id: singext.h,v 1.5 1998-06-08 15:40:54 schmidt Exp $ */
 
 #ifndef INCL_SINGEXT_H
 #define INCL_SINGEXT_H
@@ -10,15 +10,14 @@
 
 #include "canonicalform.h"
 
-
 // we need this to copy singulars GF(q) table to ours
 extern int nfCharQ;
 extern int nfM1;
 extern int nfMinPoly[];
 extern short nfPlus1Table[];
-extern FILE *  feFopen(char *path, char *mode,
-                                  char *where=0, int useWerror=0);
 
+// used to open the GF(q) tables from Singular
+extern FILE * feFopen ( char * path, char * mode, char *where = 0, int useWerror = 0 );
 
 /*BEGINPUBLIC*/
 
