@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.131 1999-07-22 15:51:12 pohl Exp $
+@comment $Id: general.doc,v 1.132 1999-07-23 08:32:34 pohl Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -1734,11 +1734,11 @@ A block is a sequence of commands surrounded by @{ and @}.
 @end smallexample
 Blocks are used whenever @sc{Singular} is used as a structured programming
 language. The @code{if} and @code{else} structures allow conditional
-execution of blocks (See @ref{if}, @ref{else}). @code{for} and @code{while}
-loops are available for repeated execution of blocks (See @ref{for},
+execution of blocks (see @ref{if}, @ref{else}). @code{for} and @code{while}
+loops are available for repeated execution of blocks (see @ref{for},
 @ref{while}).
 In procedure definitions the main part and the example section are blocks
-as well(See @ref{proc}).
+as well(see @ref{proc}).
 @menu
 * break::
 * quit::
@@ -1766,7 +1766,7 @@ Links are the communication channels of @sc{Singular}, i.e., something
 @sc{Singular} can write to and read from.  In this section, a short
 overview of the usage of links and of the different link types is given.
 
-Even though library loading may be considered an I/O operation, too,
+Even though library loading may be considered to be an I/O operation, too,
 this section does not treat loading of libraries
 (@pxref{LIB}).
 
@@ -1782,7 +1782,7 @@ useful to create a protocol of a @sc{Singular} session.  The
 @subheading How to use links
 Besides the usual I/O functions @code{write} and @code{read}, there are
 also the functions @code{dump} and @code{getdump} which store resp.@:
-retrieve the content of an entire @sc{Singular} session to resp.@: from
+retrieve the content of an entire @sc{Singular} session to, resp.@: from,
 a link.  The @code{dump} and @code{getdump} commands are not available
 for DBM links.
 
@@ -1803,8 +1803,8 @@ For more information, see @ref{write}, @ref{read}, @ref{dump},
 
 Specifying a link can be as easy as specifying a filename as a string.
 Except for MPtcp links, links even do not need to be explicitly opened
-or closed before resp.@: after they are used.  To explicitly open or
-close a link, the @code{open} resp.@: @code{close} commands may be
+or closed before, resp.@: after, they are used.  To explicitly open or
+close a link, the @code{open}, resp.@: @code{close}, commands may be
 used (see @ref{open}, @ref{close}).
 
 Links have various properties which can be checked for using the
@@ -1824,7 +1824,7 @@ Links have various properties which can be checked for using the
 
 @subheading ASCII links
 Data that can be converted to a string can be written into files for
-storage or communication with other programs. The data is written in
+storage or communication with other programs. The data are written in
 plain ASCII format. Reading from an ASCII link returns a string ---
 conversion into other data is up to the user. This can be done, for
 example, using the command @code{execute} (@pxref{execute}).
@@ -1936,9 +1936,10 @@ data bases).
 @section Procedures
 @cindex Procedures
 
-Procedures contain sequences of @sc{Singular}.  They are used to extend
+Procedures contain sequences of commands of the @sc{Singular} language.
+They are used to extend
 the set of commands with user defined commands.  Procedures are defined
-by either typing them in on the command line or by loading them from a
+by either typing them on the command line or by loading them from a
 so-called library file with the @ref{LIB} command.  Procedures are
 invoked like normal built-in commands, i.e., by typing their name
 followed by the list of arguments in parentheses. The invocation then
@@ -2069,7 +2070,7 @@ the procedure.
 
 Internally, local variables are stored using the nesting level. A variable
 is said to have nesting level 1, if it is local to a procedure that was
-called interactively, nesting level 2, if is local to a procedure that
+called interactively, nesting level 2, if it is local to a procedure that
 was called by a procedure of nesting level 1 etc. @code{listvar()} also
 displays the nesting level, nesting level 0 is used for global objects
 (see @ref{listvar}). A ring may be 'moved up' by one nesting level
