@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: doc2tex.pl,v 1.16 1999-07-28 11:36:31 obachman Exp $
+# $Id: doc2tex.pl,v 1.17 1999-09-02 14:24:45 Singular Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -42,7 +42,7 @@
 #   --> Error, if $tex_file does not exist
 #   --> if [:proc] is given, then includes only of respective
 #       proc body
-#   --> if (\w*)section is given, replaces @subsection by @$1section
+#   --> if (\w*)section is given, replaces @subsubsection by @$1section
 #       and pastes in content of tex file directly
 # 
 #
@@ -425,7 +425,7 @@ sub HandleRef
 #   --> Error, if $tex_file does not exist
 #   --> if [:proc] is given, then includes only of respective
 #       proc body
-#   --> if (\w*)section is given, replaces @subsection by @$1section
+#   --> if (\w*)section is given, replaces @subsubsection by @$1section
 #       and pastes in content of tex file directly
 
 sub HandleLib
@@ -488,7 +488,7 @@ sub HandleLib
       || Error("Can't open $tex_file for reading: $!\n");
 
     print TEX "\@c start include of docu for $lib.lib:$proc\n";
-    print TEX "\@c replaced \@subsection by \@$section\n" if ($section);
+    print TEX "\@c replaced \@subsubsection by \@$section\n" if ($section);
     if ($proc)
     {
       my $found = 0;
@@ -497,7 +497,7 @@ sub HandleLib
 	$found = 1 if /c ---content $proc---/;
 	if ($found)
 	{
-	  s/subsection/${section}section/ if $section;
+	  s/subsubsection/${section}section/ if $section;
 	  print TEX $_; 
 	}
 	last if $found && /c ---end content $proc---/;
@@ -517,7 +517,7 @@ sub HandleLib
     {
       while (<LTEX>)
       {
-	s/subsection/${section}section/;
+	s/subsubsection/${section}section/;
 	print TEX $_;
       }
     }

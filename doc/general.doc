@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.148 1999-08-25 16:03:18 Singular Exp $
+@comment $Id: general.doc,v 1.149 1999-09-02 14:24:46 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -3033,7 +3033,7 @@ First, we show the source-code of a template library:
 After typesetting, the library appears in the document as follows (with
 one subsection for each procedure):
 
-@c lib template.lib  lib_fun lib_ex subsubsection
+@c lib template.lib  lib_fun lib_ex
 
 @c ----------------------------------------------------------------------
 @node Debugging tools,  , Guidelines for writing a library, General concepts

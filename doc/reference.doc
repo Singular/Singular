@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.145 1999-09-02 13:06:09 Singular Exp $
+@comment $Id: reference.doc,v 1.146 1999-09-02 14:24:48 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1706,7 +1706,7 @@ See
 @node fprintf, freemodule, finduni, Functions
 @subsection fprintf
 @cindex fprintf
-@c lib standard.lib:fprintf lib_fun lib_ex
+@c lib standard.lib:fprintf lib_fun lib_ex subsection
 
 @c ---------------------------------------
 @node freemodule, gcd, fprintf, Functions
@@ -1836,7 +1836,7 @@ See
 @node groebner, help, getdump, Functions
 @subsection groebner
 @cindex groebner
-@c lib standard.lib:groebner lib_fun lib_ex
+@c lib standard.lib:groebner lib_fun lib_ex subsection
 
 @c @table @code
 @c @item @strong{Syntax:}
@@ -4375,7 +4375,7 @@ See
 @node printf, prune, print, Functions
 @subsection printf
 @cindex printf
-@c lib standard.lib:printf lib_fun lib_ex
+@c lib standard.lib:printf lib_fun lib_ex subsection
 
 @c ---------------------------------------
 @node prune, qhweight, printf, Functions
@@ -4435,7 +4435,7 @@ See
 @node quot, quote, qhweight, Functions
 @subsection quot
 @cindex quot
-@c lib standard.lib:quot lib_fun lib_ex
+@c lib standard.lib:quot lib_fun lib_ex subsection
 
 
 @c ---------------------------------------
@@ -4742,7 +4742,7 @@ See
 @node  res, reservedName, regularity, Functions
 @subsection res
 @cindex res
-@c lib standard.lib:res lib_fun lib_ex
+@c lib standard.lib:res lib_fun lib_ex subsection
 
 @c ---------------------------------------
 @node reservedName, resultant, res, Functions
@@ -5032,7 +5032,7 @@ See
 @node sprintf, sres, sortvec, Functions
 @subsection sprintf
 @cindex sprintf
-@c lib standard.lib:sprintf lib_fun lib_ex
+@c lib standard.lib:sprintf lib_fun lib_ex subsection
 
 @c ---------------------------------------
 @node sres, status, sprintf, Functions
@@ -5276,13 +5276,13 @@ See
 @node stdfglm, stdhilb, std, Functions
 @subsection stdfglm
 @cindex stdfglm
-@c lib standard.lib:stdfglm lib_fun lib_ex
+@c lib standard.lib:stdfglm lib_fun lib_ex subsection
 
 @c ---------------------------------------
 @node stdhilb, subst, stdfglm, Functions
 @subsection stdhilb
 @cindex stdhilb
-@c lib standard.lib:stdhilb lib_fun lib_ex
+@c lib standard.lib:stdhilb lib_fun lib_ex subsection
 
 @c ---------------------------------------
 @node subst, system, stdhilb, Functions

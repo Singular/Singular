@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: pl2doc.pl,v 1.10 1999-09-02 13:06:08 Singular Exp $
+# $Id: pl2doc.pl,v 1.11 1999-09-02 14:24:48 Singular Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -64,7 +64,7 @@ print LDOC "\@c ---end content LibInfo---\n";
 ###################################################################
 # print  summary
 #
-# print subsections for help of procs
+# print subsubsections for help of procs
 unless ($no_fun)
 {
   if ($db_file)
