@@ -169,7 +169,7 @@ configured and built).
 
 Giving an '--with-PACKAGE' (resp. `--without-PACKAGE') option means
 that Singular itself is built with (resp. without)  PACKAGE and the
-functionality provided by this PACKAGE.
+functionality provided by PACKAGE.
 
 Without explicit options, configure runs as if it had given all
 '--enable-PACKAGE' options except for:
