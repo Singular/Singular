@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.32 2001-02-26 13:11:28 Singular Exp $
+@comment $Id: NEWS.texi,v 1.33 2001-02-26 13:15:33 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -202,13 +202,21 @@ new options: @code{oldStd}, @code{redThrough}, @code{notBuckets}
 @heading Changes of command-line options and system resources
 @table @asis
 @item @code{--browser}, @code{--allow-net}, @code{--emacs}, @code{--sdb}
-new command-line options (@pxref{Command line options}).
+new command-line options
+@ifset singularmanual
+(@pxref{Command line options})
+@end ifset
+.
 @item @nref{system}
 values of command-line options can be inspected/set at run-time with
 @code{system(<option>[,<new_value])}.
 @item @code{.singularrc}
 system administrators can put a "global" @code{.singularrc} file into
-the directories where @sc{Singular} libraries reside (@pxref{Startup sequence}).
+the directories where @sc{Singular} libraries reside
+@ifset singularmanual
+(@pxref{Startup sequence})
+@end ifset
+.
 @item @code{libreadline}
 if found, a shared version of the @code{readline} library is linked-in
 dynamically at run-time. If not found, @code{readline} is emulated.
