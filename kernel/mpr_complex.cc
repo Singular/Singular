@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.1.1.1 2003-10-06 12:15:55 Singular Exp $ */
+/* $Id: mpr_complex.cc,v 1.2 2005-02-03 16:43:37 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -624,8 +624,8 @@ gmp_complex sqrt( const gmp_complex & x )
     }
     nr = x.imag() / ni / (gmp_float)2;
   }
-  gmp_complex *tmp= new gmp_complex(nr, ni);
-  return *tmp;
+  gmp_complex tmp(nr, ni);
+  return tmp;
 }
 
 // converts a gmp_complex to a string ( <real part> + I * <imaginary part> )
