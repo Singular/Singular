@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_rpm.texi,v 1.2 2002-03-08 16:14:30 mschulze Exp $
+@comment $Id: INSTALL_rpm.texi,v 1.3 2002-03-12 14:57:41 mschulze Exp $
 @c FILE: INSTALL_rpm.texi
 @c PURPOSE: Installation instruction for Singular on RPM based Linux systems
 @c
@@ -57,15 +57,15 @@ Usage: rpm {--help}
        rpm {--version}
 @end smallexample
 @item
-To deal with @sc{rpm} packages you can either use the @sc{rpm} command line tool @code{rpm} or a graphical @sc{rpm} frontend like e.g. @code{kpackage} under @sc{kde}.
+To deal with @sc{rpm} packages, you can either use the @sc{rpm} command line tool @code{rpm} or a graphical @sc{rpm} frontend like e.g. @code{kpackage} under @sc{kde}.
 For a description of the usage of @code{rpm}, type 
 @smallexample
 rpm -h
 @end smallexample
 in a command shell.
 @item
-To install or deinstall @sc{rpm} packages you have to be superuser.
-To become superuser type
+To install or deinstall @sc{rpm} packages, you have to be superuser.
+To become superuser, type
 @smallexample
 su
 @end smallexample
@@ -93,7 +93,7 @@ rpm -ivh Singular-@value{RPM_VERSION}-1.i386.rpm
 in a command shell.
 This requires several shared libraries.
 If these are not present in your system, @code{rpm} will give an error report.
-Then you have to install @sc{rpm} packages providing these shared libraries and retry.
+In this case, you have to install @sc{rpm} packages providing these shared libraries and retry.
 Alternatively, you can install the @sc{Singular} static binary @sc{rpm} package by typing
 @smallexample
 rpm -ivh Singular-static-@value{RPM_VERSION}-1.i386.rpm
