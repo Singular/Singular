@@ -475,7 +475,11 @@ align (size)
 {
   __ptr_t result;
   unsigned long int adj;
-
+ 
+  /* 9/99 obachman@mathematik.uni-kl.de: prevent calling morecore
+     with negative arguments here */
+  if ((ptrdiff_t) size < 0) return NULL;
+  
   result = (*__morecore) (size);
   adj = (unsigned long int) ((unsigned long int) ((char *) result -
                                                   (char *) NULL)) % BLOCKSIZE;
