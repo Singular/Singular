@@ -1,0 +1,244 @@
+% $Id: singcard.tex,v 1.1 1998-05-12 07:24:04 schmidt Exp $
+
+%
+% singcard.tex - common macros for Singular reference cards.
+%
+% Some of the macros/settings ripped from gdb reference card.
+%
+
+%
+% - declare configurable parameters.
+%
+\newdimen\totalwidth
+\newdimen\totalheight
+\newdimen\hmargin
+\newdimen\vmargin
+
+\newdimen\barwidth
+\newdimen\barheight
+
+%%% START CONFIGURABLE SECTION
+
+%
+% - configure your papersize.
+%
+
+% US letter paper (8.5x11in)
+%\totalwidth=11in		% total width of paper
+%\totalheight=8.5in		% total height of paper
+%\hmargin=.25in			% horizontal margin width
+%\vmargin=.25in			% vertical margin width
+
+% A4 paper
+\totalwidth=29.7cm
+\totalheight=21cm
+\hmargin=6mm
+\vmargin=6mm
+
+%
+% - configure your folding guides.
+%
+\barwidth=.1pt			% width of the folding guide
+\barheight=2pt			% height of the folding guide
+
+% For NO printed folding guide,
+% comment out other \def\vdecor's and uncomment:
+%\def\vdecor{\hskip\hmargin plus1fil\hskip\barwidth plus1fil\hskip\hmargin plus1fil}
+
+% For SOLID LINE folding guide,
+% comment out other \def\vdecor's and uncomment:
+%\def\vdecor{\hskip\hmargin plus1fil \vrule width \barwidth \hskip\hmargin plus1fil}
+
+% For SMALL MARKS NEAR TOP AND BOTTOM as folding guide,
+% comment out other \def\vdecor's and uncomment:
+\def\vdecor{\hskip\hmargin plus1fil
+\vbox to \vsize{\hbox to \barwidth{\vrule height\barheight width\barwidth}\vfill
+\hbox to \barwidth{\vrule height\barheight width\barwidth}}%THIS PERCENT SIGN IS ESSENTIAL
+\hskip\hmargin plus1fil}
+
+%%% END CONFIGURABLE SECTION
+
+%
+% - compute parameters of three column format.
+%
+\newdimen\fullhsize		% width of area without margins
+\newdimen\itemwidth		% width of item column
+\newdimen\definitionwidth	% width of definition column
+\newdimen\temp			% only for temporary use
+
+% adjust the offsets so the margins are measured *from paper edge*
+\hoffset=-1in \advance \hoffset by \hmargin
+\voffset=-1in \advance \voffset by \vmargin
+
+% fullhsize = totalwidth - (2 * hmargin)
+\fullhsize=\totalwidth
+\temp=\hmargin \multiply \temp by 2 \advance \fullhsize by -\temp
+
+% hsize = (fullhsize - (4 * hmargin) - (2 * barwidth)) / 3
+\hsize=\fullhsize
+\temp=\hmargin \multiply \temp by 4 \advance \hsize by -\temp
+\temp=\barwidth \multiply \temp by 2 \advance \hsize by -\temp
+\divide \hsize by 3
+
+% vsize = totalheight - (2 * vmargin)
+\vsize=\totalheight
+\temp=\vmargin \multiply \temp by 2 \advance \vsize by -\temp
+
+% default itemwidth = hsize * 1/4
+% default definitionwidth = hsize * 3/4
+\temp=\hsize \divide \temp by 4
+\itemwidth=\temp
+\definitionwidth=\hsize \advance \definitionwidth by -\itemwidth
+
+%
+% - miscellaneous parameters.
+%
+\tolerance=2000
+\hyphenpenalty=500
+
+\parindent=0pt
+\parskip=0pt
+\baselineskip=9pt
+
+\footline={\vbox to0pt{\hss}}
+
+%
+% - font definitions.
+%
+\font\rm=cmr7
+\font\bf=cmbx7
+\font\it=cmti7
+\font\bit=cmbxti10 at 7pt
+\font\tt=cmtt8			% cmtt7 seems too small
+\font\sc=cmcsc10 at 7pt
+
+% huge fonts
+\font\hbf=cmbx12
+
+% large fonts
+\font\lbf=cmbx10
+
+% small fonts
+\font\srm=cmr6
+\font\ssc=cmcsc10 at 6pt
+
+% tiny fonts
+\font\tit=cmti7 at 5pt
+
+% math fonts
+\font\mathrm=cmr7
+\font\smathrm=cmr5
+\font\mathit=cmmi7
+\font\smathit=cmmi5
+\font\mathsy=cmsy7
+\font\smathsy=cmsy5
+\font\mathex=cmex7
+
+\textfont0=\mathrm \scriptfont0=\smathrm
+\textfont1=\mathit \scriptfont1=\smathit
+\textfont2=\mathsy \scriptfont2=\smathsy
+\textfont3=\mathex \scriptfont3=\mathex
+
+%
+% - macros for tree column format.
+%
+\def\fulline{\hbox to \fullhsize}
+\def\columnbox{\leftline{\pagebody}}
+\def\tripleformat{\shipout
+		  \vbox{\fulline{\box\leftcolumn\vdecor
+				 \box\centercolumn\vdecor
+				 \columnbox}}%
+		  \advancepageno}
+\def\bye{\par\vfill
+	 \supereject
+	 \if R\currentcolumn\null\vfill\eject\fi
+	 \end}
+
+%
+% - miscellaneous macros.
+%
+% \Singular: for sake of corporate identity
+% \ctl: print control keys
+% \opt: print optional arguments
+% \rmslash: print a slash in roman type face
+% \eg, \ie: obvious
+% \verysmallskip: skip a very small amount (used between \sec entries).
+%   Extra skip does not harm in the applications of \verysmallskip,
+%   so we choose a large stretch for it.
+% \strut: redefinition of TeX's \strut macro
+%
+\def\Singular{{\sc Singular}}
+\def\ctl#1{{\tt C-#1}}
+\def\opt#1{{\rm[{\tt #1}]}}
+\def\rmslash{{\rm /}}
+\def\eg{e.g.~}
+\def\ie{i.e.~}
+
+\newskip\verysmallskipamount
+\verysmallskipamount=1pt plus 3pt minus 0.333333pt
+\def\verysmallskip{\vskip \verysmallskipamount}
+
+\newbox\sevenptstrutbox
+\setbox\sevenptstrutbox=\hbox{\vrule height6pt depth3pt width0pt}
+\def\strut{\relax\ifmmode\copy\sevenptstrutbox\else\unhcopy\sevenptstrutbox\fi}
+
+%
+% \sec - insert a new section into the card.
+%
+% First argument is section title, second argument the item column
+% width (defaults to 1/4*hsize), third the section itself.
+%
+% \setitemwidth: auxiliary macro
+%
+\def\setitemwidth#1{\itemwidth=#1
+		    \definitionwidth=\hsize
+		    \advance\definitionwidth by -\itemwidth}
+\long\def\sec#1(#2)#3\endsec{{%
+	\def\\{#2}\ifx\empty\\ \else\setitemwidth{#2}\fi
+	\halign{% column 1
+		\vtop{\hsize=\itemwidth\strut\tt##\strut}&
+		% column 2
+		\vtop{\hsize=\definitionwidth\strut\rm##\strut}\cr
+		% tail of \long\def fills in halign body with argument
+		\noalign{\bigskip\lbf #1\verysmallskip}%
+		#3}}}
+
+%
+% - macros to use inside a \sec.
+%
+% \subsec: insert a sub heading into a \sec
+% \sectext: insert non-aligned text into a \sec
+% \longentry: insert an entry with a long item field into a \sec
+% \longitem: insert an entry with a long item field and no
+%   definition field into a \sec
+%
+\def\subsec#1{\noalign{\smallskip\bf #1}}
+\long\def\sectext#1\cr{\noalign{\strut\hyphenpenalty=50 #1\strut}}
+% the `\ ' forces a non empty item field
+\long\def\longentry#1&#2\cr{\noalign{\strut\tt #1\strut}\ &#2\cr}
+\long\def\longitem#1\cr{\noalign{\strut\tt #1\strut}}
+
+%
+% - initialization.
+%
+
+% set output routine
+\newbox\leftcolumn
+\newbox\centercolumn
+\let\currentcolumn=L
+\output={\if L\currentcolumn
+	    \global\setbox\leftcolumn=\columnbox \global\let\currentcolumn=C%
+	 \else
+	    \if C\currentcolumn
+	       \global\setbox\centercolumn=\columnbox \global\let\currentcolumn=R%
+	    \else
+	       \tripleformat \global\let\currentcolumn=L%
+	    \fi
+	 \fi}
+
+% switch to our default font
+\rm
+
+% ragged format
+\raggedbottom
+\raggedright
