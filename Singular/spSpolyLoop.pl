@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl
 ###########################################################################
-# $Id: spSpolyLoop.pl,v 1.8 1998-06-12 17:41:37 obachman Exp $
+# $Id: spSpolyLoop.pl,v 1.9 1998-12-16 12:04:15 Singular Exp $
 
 ###########################################################################
 ##
@@ -391,7 +391,7 @@ sub INITORDER
 {
   local($order, $p, $argv) = @_;
   
-  return "$order = $p->Order" if (&GetHomog($argv) eq "homYES");
+  return "$order = pGetOrder($p)" if (&GetHomog($argv) eq "homYES");
   return "";
 }
 

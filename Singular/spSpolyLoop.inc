@@ -374,7 +374,7 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwEVEN
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
   b = pNew();   
 
-  order = a2->Order;              // inits order for homog case
+  order = pGetOrder(a2);              // inits order for homog case
   
 
   pCopyAddFastHomog(b, a1, monom, order);  // now a2 != NULL -- set up b
@@ -461,7 +461,7 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwODD
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
   b = pNew();   
 
-  order = a2->Order;              // inits order for homog case
+  order = pGetOrder(a2);              // inits order for homog case
   
 
   pCopyAddFastHomog(b, a1, monom, order);  // now a2 != NULL -- set up b
@@ -548,7 +548,7 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwONE
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
   b = pNew();   
 
-  order = a2->Order;              // inits order for homog case
+  order = pGetOrder(a2);              // inits order for homog case
   
 
   pCopyAddFastHomog(b, a1, monom, order);  // now a2 != NULL -- set up b
@@ -635,7 +635,7 @@ static void spSpolyLoop_chMODP_otCOMPEXP_homYES_nwTWO
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
   b = pNew();   
 
-  order = a2->Order;              // inits order for homog case
+  order = pGetOrder(a2);              // inits order for homog case
   
 
   pCopyAddFastHomog(b, a1, monom, order);  // now a2 != NULL -- set up b
@@ -1070,7 +1070,7 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwEVEN
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
   b = pNew();   
 
-  order = a2->Order;              // inits order for homog case
+  order = pGetOrder(a2);              // inits order for homog case
   
 
   pCopyAddFastHomog(b, a1, monom, order);  // now a2 != NULL -- set up b
@@ -1155,7 +1155,7 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwODD
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
   b = pNew();   
 
-  order = a2->Order;              // inits order for homog case
+  order = pGetOrder(a2);              // inits order for homog case
   
 
   pCopyAddFastHomog(b, a1, monom, order);  // now a2 != NULL -- set up b
@@ -1240,7 +1240,7 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwONE
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
   b = pNew();   
 
-  order = a2->Order;              // inits order for homog case
+  order = pGetOrder(a2);              // inits order for homog case
   
 
   pCopyAddFastHomog(b, a1, monom, order);  // now a2 != NULL -- set up b
@@ -1325,7 +1325,7 @@ static void spSpolyLoop_chMODP_otEXPCOMP_homYES_nwTWO
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
   b = pNew();   
 
-  order = a2->Order;              // inits order for homog case
+  order = pGetOrder(a2);              // inits order for homog case
   
 
   pCopyAddFastHomog(b, a1, monom, order);  // now a2 != NULL -- set up b
@@ -1758,7 +1758,7 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwEVEN
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
   b = pNew();   
 
-  order = a2->Order;              // inits order for homog case
+  order = pGetOrder(a2);              // inits order for homog case
   
 
   pCopyAddFastHomog(b, a1, monom, order);  // now a2 != NULL -- set up b
@@ -1843,7 +1843,7 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwODD
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
   b = pNew();   
 
-  order = a2->Order;              // inits order for homog case
+  order = pGetOrder(a2);              // inits order for homog case
   
 
   pCopyAddFastHomog(b, a1, monom, order);  // now a2 != NULL -- set up b
@@ -1928,7 +1928,7 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwONE
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
   b = pNew();   
 
-  order = a2->Order;              // inits order for homog case
+  order = pGetOrder(a2);              // inits order for homog case
   
 
   pCopyAddFastHomog(b, a1, monom, order);  // now a2 != NULL -- set up b
@@ -2013,7 +2013,7 @@ static void spSpolyLoop_chMODP_otEXP_homYES_nwTWO
   if (a2==NULL) goto Finish;              // we are done if a2 is 0
   b = pNew();   
 
-  order = a2->Order;              // inits order for homog case
+  order = pGetOrder(a2);              // inits order for homog case
   
 
   pCopyAddFastHomog(b, a1, monom, order);  // now a2 != NULL -- set up b

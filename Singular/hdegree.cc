@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hdegree.cc,v 1.15 1998-12-08 16:37:38 pohl Exp $ */
+/* $Id: hdegree.cc,v 1.16 1998-12-16 12:04:13 Singular Exp $ */
 /*
 *  ABSTRACT -  dimension, multiplicity, HC, kbase
 */
@@ -988,7 +988,7 @@ static void hHedge(poly hEdge)
   {
     for (int i = hNvar; i>0; i--)
       pSetExp(hEdge,i, pGetExp(pWork,i));
-    pGetOrder(hEdge) = pGetOrder(pWork);
+    pSetm(hEdge);
   }
 }
 
