@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.24 2000-06-02 07:46:57 Singular Exp $
+// $Id: clapconv.cc,v 1.25 2000-07-03 10:22:17 pohl Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -43,6 +43,7 @@ convSingPClapP( poly p )
 {
   CanonicalForm result = 0;
   int e, n = pVariables;
+  assume( rPar(currRing)==0);
 
   while ( p != NULL )
   {
@@ -310,6 +311,7 @@ CanonicalForm convSingAPClapAP ( poly p , const Variable & a)
 {
   CanonicalForm result = 0;
   int e, n = pVariables;
+  int off=rPar(currRing);
 
   On(SW_RATIONAL);
   while ( p!=NULL)
@@ -318,7 +320,7 @@ CanonicalForm convSingAPClapAP ( poly p , const Variable & a)
     for ( int i = 1; i <= n; i++ )
     {
       if ( (e = pGetExp( p, i )) != 0 )
-        term *= power( Variable( i+1 ), e );
+        term *= power( Variable( i + off), e );
     }
     result += term;
     p = pNext( p );
@@ -328,8 +330,7 @@ CanonicalForm convSingAPClapAP ( poly p , const Variable & a)
 
 poly convClapAPSingAP ( const CanonicalForm & f )
 {
-  int n = pVariables+1+1 /* =rPar(currRing)*/;
-  /* ASSERT( level( f ) <= pVariables, "illegal number of variables" ); */
+  int n = pVariables+1+1/*rPar(currRing)*/;
   int * exp = new int[n];
   // for ( int i = 0; i < n; i++ ) exp[i] = 0;
   memset(exp,0,n*sizeof(int));
@@ -344,16 +345,16 @@ convRecAP ( const CanonicalForm & f, int * exp, poly & result )
 {
   if (f == 0)
     return;
+  int off=rPar(currRing);
   if ( ! f.inCoeffDomain() )
   {
     int l = f.level();
-    if (l==1) PrintS("f.inCoeffDomain()=FALSE and level=1 ?\n");
     for ( CFIterator i = f; i.hasTerms(); i++ )
     {
-      exp[l-1] = i.exp();
+      exp[l] = i.exp();
       convRecAP( i.coeff(), exp, result );
     }
-    exp[l-1] = 0;
+    exp[l] = 0;
   }
   else
   {
@@ -362,9 +363,12 @@ convRecAP ( const CanonicalForm & f, int * exp, poly & result )
     {
       poly term = pInit();
       pNext( term ) = NULL;
-      for ( int i = 1; i <= pVariables; i++ )
-        pSetExp( term, i , exp[i]);
+      int i;
+      for ( i = 1; i <= pVariables; i++ )
+        pSetExp( term, i , exp[i+off]);
       pSetComp(term, 0);
+      for ( i = 0; i < off; i++ )
+        z->e[i]+=exp[i+1];
       pGetCoeff(term)=(number)Alloc0SizeOf(rnumber);
       ((lnumber)pGetCoeff(term))->z=z;
       pSetm( term );
@@ -381,8 +385,8 @@ CanonicalForm convSingAClapA ( alg p , const Variable & a )
   while ( p!=NULL )
   {
     CanonicalForm term;
-    /* does only work for finite fields */
-    if ( getCharacteristic() != 0 )
+    /* does only work for finite fields:Z/p */
+    if ( rField_is_Zp_a() )
     {
       Off(SW_USE_EZGCD);
       term = npInt( napGetCoeff( p ) );
@@ -393,8 +397,9 @@ CanonicalForm convSingAClapA ( alg p , const Variable & a )
       //if ( (!(int)(napGetCoeff( p )) & 1 )
       //&&  ( napGetCoeff( p )->s == 0))
       //  naNormalize( naGetCoeff( p ) );
-      if ( (int)(napGetCoeff( p )) & 1 )
+      if ( (int)(napGetCoeff( p )) & SR_INT )
         term = nlInt( napGetCoeff( p ) );
+        //term = SR_TO_INT(napGetCoeff( p )) ;
       else
       {
         if ( napGetCoeff( p )->s == 3 )
@@ -502,7 +507,6 @@ CanonicalForm convSingTrPClapP ( poly p )
 poly convClapPSingTrP ( const CanonicalForm & f )
 {
   int n = pVariables+1;
-  /* ASSERT( level( f ) <= pVariables, "illegal number of variables" ); */
   int * exp = new int[n];
   // for ( int i = 0; i < n; i++ ) exp[i] = 0;
   memset(exp,0,n*sizeof(int));

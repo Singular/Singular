@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.28 2000-05-02 14:55:41 Singular Exp $ */
+/* $Id: longrat.cc,v 1.29 2000-07-03 10:21:20 pohl Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -105,7 +105,7 @@ BOOLEAN nlSetMap(ring r)
 #define SR_HDL(A) ((long)(A))
 /*#define SR_INT    1*/
 /*#define INT_TO_SR(INT)  ((number) (((long)INT << 2) + SR_INT))*/
-#define SR_TO_INT(SR)   (((long)SR) >> 2)
+// #define SR_TO_INT(SR)   (((long)SR) >> 2)
 
 #define MP_SMALL 1
 //#define mpz_isNeg(A) (mpz_cmp_si(A,(long)0)<0)

@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.67 2000-06-14 07:29:59 Singular Exp $
+// $Id: clapsing.cc,v 1.68 2000-07-03 10:22:17 pohl Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -132,7 +132,7 @@ TIMING_DEFINE_PRINT( algLcmTimer );
 #define FACTORY_ALGOUT_POLY( tag, f ) \
   StringSetS( tag ); \
   napWrite( f ); \
-  PrintS(StringAppendS("\n"));
+  pRINtS(StringAppendS("\n"));
 // CanonicalForm f, represents transcendent extension
 #define FACTORY_CFTROUT_POLY( tag, f ) \
   { \
@@ -293,7 +293,7 @@ poly singclap_resultant ( poly f, poly g , poly x)
     poly res;
     if (currRing->minpoly!=NULL)
     {
-      Variable X(i+rPar(currRing));
+      Variable X(i);
       CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingAPClapAP( f,a ) ), G( convSingAPClapAP( g,a ) );

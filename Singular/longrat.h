@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.h,v 1.15 1999-11-15 17:20:20 obachman Exp $ */
+/* $Id: longrat.h,v 1.16 2000-07-03 10:21:21 pohl Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers
 */
@@ -29,6 +29,8 @@ typedef MP_INT lint;
 
 #define SR_INT    1
 #define INT_TO_SR(INT)  ((number) (((long)INT << 2) + SR_INT))
+#define SR_TO_INT(SR)   (((long)SR) >> 2)
+
 
 #define MP_SMALL 1
 

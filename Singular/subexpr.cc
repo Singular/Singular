@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.56 2000-04-27 10:07:11 obachman Exp $ */
+/* $Id: subexpr.cc,v 1.57 2000-07-03 10:21:21 pohl Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -977,7 +977,7 @@ void sleftv::SetData(void* what)
 {
   if (rtyp == IDHDL)
   {
-    (void*) IDDATA((idhdl)data) = what;
+    IDDATA((idhdl)data) = (char *)what;
   }
   else
   {
