@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.h,v 1.18 2001-10-09 16:36:10 Singular Exp $ */
+/* $Id: mpr_complex.h,v 1.19 2002-11-04 17:37:03 bricken Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -14,7 +14,13 @@
 //-> include & define stuff
 // must have gmp version >= 2
 extern "C" {
+#ifdef __cplusplus
+#undef __cplusplus
 #include <gmp.h>
+#define __cplusplus
+#else
+#include <gmp.h>
+#endif
 }
 #include "numbers.h"
 #include "ring.h"
