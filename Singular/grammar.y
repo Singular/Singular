@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.25 1998-03-31 09:00:46 Singular Exp $ */
+/* $Id: grammar.y,v 1.26 1998-04-08 13:47:03 pohl Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -13,12 +13,16 @@
 #include <stdarg.h>
 #include <string.h>
 #include <limits.h>
-#ifdef macintosh
-#ifdef __POWERPC__
-#include <alloca.h>
-#else
-#define alloca malloc /* this is not corect! */
-#endif
+#ifdef __MWERKS__
+  #ifdef __POWERPC__
+    #include <alloca.h>
+  #else
+    #ifdef macintosh
+      #define alloca malloc /* this is not corect! */
+    #else
+      #include <malloc.h>
+    #endif
+  #endif
 #endif
 
 #include "mod2.h"
