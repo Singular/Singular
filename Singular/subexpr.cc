@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.cc,v 1.13 1997-04-18 11:25:03 obachman Exp $ */
+/* $Id: subexpr.cc,v 1.14 1997-04-18 15:49:41 Singular Exp $ */
 
 /*
 * ABSTRACT: handling of leftv
@@ -29,6 +29,7 @@
 #include "kstd1.h"
 #include "timer.h"
 #include "ring.h"
+#include "ffields.h"
 #include "numbers.h"
 #include "ipshell.h"
 #include "lists.h"
@@ -631,6 +632,10 @@ char *  sleftv::String(void *d)
           nWrite(n);
           data=(char *)n;
         }
+        else if((rtyp==VMINPOLY)&&(currRing->ch>2))
+        {
+          nfShowMipo();
+        }
         else
         {
           number n=nCopy((number)d);
@@ -804,7 +809,8 @@ void * sleftv::Data()
       case VMAXMULT:   return (void *)Kstd1_mu;
       case TRACE:      return (void *)traceit;
       case VSHORTOUT:  return (void *)pShortOut;
-      case VMINPOLY:   if (currRing->minpoly!=NULL)
+      case VMINPOLY:   if ((currRing->minpoly!=NULL)&&(currRing->ch<2))
+                       /* Q(a), Fp(a), but not GF(q) */
                          return (void *)currRing->minpoly;
                        else
                          return (void *)nNULL;

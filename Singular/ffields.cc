@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.7 1997-04-16 18:38:06 Singular Exp $ */
+/* $Id: ffields.cc,v 1.8 1997-04-18 15:49:40 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -25,15 +25,15 @@ char * nfParameter;          /*  the name of the primitive element */
 short fftable[]={
     4,  8, 16, 32, 64, 128, 256, 512,1024,2048,4096,8192,16384,
 /*2^2 2^3 2^4 2^5 2^6  2^7  2^8  2^9 2^10 2^11 2^12 2^13  2^14*/
-    9, 27, 81,243,729,2187,6561,19683,
+    9, 27, 81,243,729,2187, 6561,19683,
 /*3^2 3^3 3^4 3^5 3^6  3^7  3^8   3^9*/
    25,125,625,3125,15625,
 /*5^2 5^3 5^4 5^5  5^6*/
    49,343,2401,16807,
 /*7^2 7^3  7^4 7^5*/
-   121,1331,14641,
+   121,1331, 14641,
 /*11^2 11^3  11^4*/
-  169, 2197,28561,
+  169, 2197, 28561,
 /*13^2 13^3  13^4*/
   289, 4913,
 /*17^2 17^3*/
@@ -116,11 +116,40 @@ short fftable[]={
 * Z^i will be represented by the int i, 1 by the int 0, 0 by the int q=nfChar
 */
 
+#ifdef LDEBUG
+/*2
+* debugging: is a a valid representation of a number ?
+*/
+BOOLEAN nfDBTest (number a, char *f, int l)
+{
+  if (((int)a<0) || ((int)a>nfCharQ))
+  {
+    Print("wrong %d in %s:%d\n",(int)a,f,l);
+    return FALSE;
+  }
+  int i=0;
+  do
+  {
+    if (nfPlus1Table[i]>nfCharQ)
+    {
+      Print("wrong table %d=%d in %s:%d\n",i,nfPlus1Table[i],f,l);
+      return FALSE;
+    }
+    i++;
+  } while (i<nfCharQ);
+  return TRUE;
+}
+#define nfTest(N) nfDBTest(N,__FILE__,__LINE__)
+#endif
+            
 /*2
 * k >= 0 ?
 */
 BOOLEAN nfGreaterZero (number k)
 {
+#ifdef LDEBUG
+  nfTest(k);
+#endif
   return !nfIsZero(k);
 }
 
@@ -129,11 +158,18 @@ BOOLEAN nfGreaterZero (number k)
 */
 number nfMult (number a,number b)
 {
+#ifdef LDEBUG
+  nfTest(a);
+  nfTest(b);
+#endif
   if (((int)a == nfCharQ) || ((int)b == nfCharQ))
     return (number)nfCharQ;
   /*else*/
   int i=(int)a+(int)b;
   if (i>=nfCharQ1) i-=nfCharQ1;
+#ifdef LDEBUG
+  nfTest((number)i);
+#endif
   return (number)i;
 }
 
@@ -151,6 +187,9 @@ number nfInit (int i)
     c=nfPlus1Table[c];
     i--;
   }
+#ifdef LDEBUG
+  nfTest((number)c);
+#endif
   return (number)c;
 }
 
@@ -167,6 +206,9 @@ number nfPar (int i)
 */
 int nfParDeg(number n)
 {
+#ifdef LDEBUG
+  nfTest(n);
+#endif
   if(nfCharQ == (int)n) return -1;
   return (int)n;
 }
@@ -182,9 +224,12 @@ int nfInt (number &n)
 /*2
 * copy a number
 */
-number nfCopy (number  k1)
+number nfCopy (number  k)
 {
-  return k1;
+#ifdef LDEBUG
+  nfTest(k);
+#endif
+  return k;
 }
 
 /*2
@@ -194,6 +239,10 @@ number nfAdd (number a, number b)
 {
 /*4 z^a+z^b=z^b*(z^(a-b)+1), if a>=b; *
 *          =z^a*(z^(b-a)+1)  if a<b  */
+#ifdef LDEBUG
+  nfTest(a);
+  nfTest(b);
+#endif
   int zb,zab,r;
   if ((int)a >= (int)b)
   {
@@ -205,12 +254,18 @@ number nfAdd (number a, number b)
     zb = (int)a;
     zab = (int)b-(int)a;
   }
+#ifdef LDEBUG
+  nfTest((number)zab);
+#endif
   if (nfPlus1Table[zab]==nfCharQ) r=nfCharQ; /*if z^(a-b)+1 =0*/
   else
   {
     r= zb+nfPlus1Table[zab];
     if(r>=nfCharQ1) r-=nfCharQ1;
   }
+#ifdef LDEBUG
+  nfTest((number)r);
+#endif
   return (number)r;
 }
 
@@ -228,6 +283,9 @@ number nfSub (number a, number b)
 */
 BOOLEAN nfIsZero (number  a)
 {
+#ifdef LDEBUG
+  nfTest(a);
+#endif
   return nfCharQ == (int)a;
 }
 
@@ -236,6 +294,9 @@ BOOLEAN nfIsZero (number  a)
 */
 BOOLEAN nfIsOne (number a)
 {
+#ifdef LDEBUG
+  nfTest(a);
+#endif
   return 0 == (int)a;
 }
 
@@ -244,6 +305,9 @@ BOOLEAN nfIsOne (number a)
 */
 BOOLEAN nfIsMOne (number a)
 {
+#ifdef LDEBUG
+  nfTest(a);
+#endif
   return nfM1 == (int)a;
 }
 
@@ -252,17 +316,26 @@ BOOLEAN nfIsMOne (number a)
 */
 number nfDiv (number a,number b)
 {
+#ifdef LDEBUG
+  nfTest(b);
+#endif
   if ((int)b==nfCharQ)
   {
     WerrorS("div. by 0");
     return (number)nfCharQ;
   }
+#ifdef LDEBUG
+  nfTest(a);
+#endif
   if ((int)a==nfCharQ)
     return (number)nfCharQ;
   /*else*/
   int s = (int)a - (int)b;
   if (s < 0)
     s += nfCharQ1;
+#ifdef LDEBUG
+  nfTest((number)s);
+#endif
   return (number)s;
 }
 
@@ -271,11 +344,17 @@ number nfDiv (number a,number b)
 */
 number  nfInvers (number c)
 {
+#ifdef LDEBUG
+  nfTest(c);
+#endif
   if ((int)c==nfCharQ)
   {
     WerrorS("div. 1/0");
     return (number)nfCharQ;
   }
+#ifdef LDEBUG
+  nfTest(((number)(nfCharQ1-(int)c)));
+#endif
   return (number)(nfCharQ1-(int)c);
 }
 
@@ -285,8 +364,14 @@ number  nfInvers (number c)
 number nfNeg (number c)
 {
 /*4 -z^c=z^c*(-1)=z^c*nfM1*/
+#ifdef LDEBUG
+  nfTest(c);
+#endif
   int i=(int)c+nfM1;
   if (i>=nfCharQ1) i-=nfCharQ1;
+#ifdef LDEBUG
+  nfTest((number)i);
+#endif
   return (number)i;
 }
 
@@ -295,6 +380,10 @@ number nfNeg (number c)
 */
 BOOLEAN nfGreater (number a,number b)
 {
+#ifdef LDEBUG
+  nfTest(a);
+  nfTest(b);
+#endif
   return (int)a != (int)b;
 }
 
@@ -303,6 +392,10 @@ BOOLEAN nfGreater (number a,number b)
 */
 BOOLEAN nfEqual (number a,number b)
 {
+#ifdef LDEBUG
+  nfTest(a);
+  nfTest(b);
+#endif
   return (int)a == (int)b;
 }
 
@@ -311,6 +404,9 @@ BOOLEAN nfEqual (number a,number b)
 */
 void nfWrite (number &a)
 {
+#ifdef LDEBUG
+  nfTest(a);
+#endif
   if ((int)a==nfCharQ)  StringAppendS("0");
   else if ((int)a==0)   StringAppendS("1");
   else                  
@@ -329,6 +425,9 @@ void nfWrite (number &a)
 */
 char * nfName(number a)
 {
+#ifdef LDEBUG
+  nfTest(a);
+#endif
   char *s;
   if (((int)a==nfCharQ) || ((int)a==0)) return NULL;
   else if ((int)a==1)
@@ -347,10 +446,13 @@ char * nfName(number a)
 */
 void nfPower (number a, int i, number * result)
 {
+#ifdef LDEBUG
+  nfTest(a);
+#endif
   if (i==0)
   {
     //*result=nfInit(1);
-    *(int *)result = 0;
+    *result = (number)0;
   }
   else if (i==1)
   {
@@ -362,6 +464,9 @@ void nfPower (number a, int i, number * result)
     nfPower(a,i-1,result);
     *result = nfMult(a,*result);
   }
+#ifdef LDEBUG
+  nfTest(*result);
+#endif
 }
 
 /*4
@@ -417,6 +522,9 @@ char * nfRead (char *s, number *a)
     z=(number)i;
     *a=nfMult(*a,z);
   }
+#ifdef LDEBUG
+  nfTest(*a);
+#endif
   return s;
 }
 
@@ -441,7 +549,7 @@ static int convback62 ( char c )
         return int(c) - int('a') + 36;
 }
 
-static int convertback62 ( char * p, int n )
+static int convertback62 ( char * p, int n , int q)
 {
     int r = 0;
     for ( int j = 0; j < n; j++ )
@@ -450,7 +558,7 @@ static int convertback62 ( char * p, int n )
 }
 #endif
 
-int nfMinPoly[]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+int nfMinPoly[16];
 
 void nfShowMipo()
 {
@@ -460,12 +568,12 @@ void nfShowMipo()
   {
     j++;
     if (nfMinPoly[j]!=0)
-      Print("%d*%s^%d",nfMinPoly[j],nfParameter,i);
+      StringAppend("%d*%s^%d",nfMinPoly[j],nfParameter,i);
     i--;
     if(i<0) break;
     if (nfMinPoly[j]!=0)
-      PrintS("+");
-  }  
+      StringAppendS("+");
+  }
 }
 
 static void nfReadMipo(char *s)
@@ -511,7 +619,7 @@ void nfSetChar(int c, char **param)
   {
     if (c>1) nfCharQ = c;
     else     nfCharQ = -c;
-    char buf[80];
+    char buf[100];
     sprintf(buf,"gftables/%d",nfCharQ);
     FILE * fp = feFopen(buf,"r",NULL,FALSE);
     if (fp==NULL)
@@ -551,32 +659,36 @@ void nfSetChar(int c, char **param)
       while ( (i < nfCharQ) && (k < 30) )
       {
         nfPlus1Table[i] = convertback62( bufptr, digs );
+        if(nfPlus1Table[i]>nfCharQ)
+        {
+          Print("wrong entry %d: %d(%c%c%c)\n",i,nfPlus1Table[i],bufptr[0],bufptr[1],bufptr[2]);
+        }  
         bufptr += digs;
+        if (nfPlus1Table[i]==nfCharQ)
+        {
+          if(i==nfCharQ1)
+          {
+            nfM1=0;
+          }
+          else
+          {
+            nfM1=i;
+          }
+        }
         i++; k++;
       }
-      nfPlus1Table[0]=nfPlus1Table[nfCharQ1];
     }
+    nfPlus1Table[0]=nfPlus1Table[nfCharQ1];
   }
   else
     nfCharQ=0;
+#ifdef LDEBUG
+  nfTest((number)0);  
+#endif
   return;
 err:
   Werror("illegal GF-table %d",nfCharQ);
 }
-
-#ifdef LDEBUG
-/*2
-* debugging: is a a valid representation of a number ?
-*/
-BOOLEAN nfDBTest (number a, char *f, int l)
-{
-  if (((int)a<0) || ((int)a>nfCharQ))
-  {
-    return FALSE;
-  }
-  return TRUE;
-}
-#endif
 
 /*2
 * map Z/p -> GF(p,n)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.7 1997-04-17 17:52:21 Singular Exp $ */
+/* $Id: ring.cc,v 1.8 1997-04-18 15:49:40 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -714,8 +714,8 @@ void rWrite(ring r)
       Print("//   primitive element : %s\n", r->parameter[0]);
       if (r==currRing) 
       {
-        PrintS("//   minpoly        : ");
-        nfShowMipo();PrintLn();
+        StringSetS("//   minpoly        : ");
+        nfShowMipo();PrintS(StringAppend("\n"));
       }  
     }  
   }
