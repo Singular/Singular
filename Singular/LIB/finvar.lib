@@ -1,5 +1,4 @@
-// $Header: /usr/local/Singular/cvsroot/Singular/LIB/finvar.lib,v 1.1.4.1 1997/0
-7/03 15:32:03 Singular Exp $
+// $Header: /exports/cvsroot-2/cvsroot/Singular/LIB/finvar.lib,v 1.7 1998-03-06 11:52:53 krueger Exp $
 ////////////////////////////////////////////////////////////////////////////////
 
 LIBRARY:  finvar.lib       LIBRARY TO CALCULATE INVARIANT RINGS & MORE
@@ -5204,7 +5203,7 @@ THEORY:  Bases of homogeneous invariants are generated successively and those
           }
           molien(L[3..size(L)],newring,L[2],intvec(0,interval,v));
           matrix P=primary_charp(L[1],newring,v);
-          matrix S,IS=secondary_charp(P,L[1],newring,v];
+          matrix S,IS=secondary_charp(P,L[1],newring,v);
           if (voice==2)
           { kill aksldfalkdsflkj;
           }

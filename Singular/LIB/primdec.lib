@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.9 1998-02-16 12:07:04 pfister Exp $
+// $Id: primdec.lib,v 1.10 1998-03-06 11:52:57 krueger Exp $
 ///////////////////////////////////////////////////////
 // primdec.lib
 // algorithms for primary decomposition based on
@@ -595,7 +595,7 @@ proc hilfe(ideal i,ideal prm,int m)
       {
            t=leadcoef(i[m])*e*var(n)+(i[m]-lead(i[m]))/var(n)^(e-1);
            i[m]=poly(e)^e*leadcoef(i[m])^(e-1)*i[m];
-      {
+      }
       else
       {
          i[m]=i[m]/leadcoef(i[m]);

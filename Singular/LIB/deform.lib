@@ -1,4 +1,4 @@
-// $Id: deform.lib,v 1.5 1998-01-24 13:06:00 Singular Exp $
+// $Id: deform.lib,v 1.6 1998-03-06 11:52:52 krueger Exp $
 //(bm, last modified 12/97)   
 ///////////////////////////////////////////////////////////////////////////////
 LIBRARY:  deform.lib       PROCEDURES FOR COMPUTING MINIVERSAL DEFORMATION
@@ -804,7 +804,7 @@ RETURNS intvec of indices of jv having negative entries (or iv, if non)
         jv[k]=l;
      }
    }
-   if (jv==0) {jv=1; dbprint(printlevel-1,"// empty negative part, return all ";}
+   if (jv==0) {jv=1; dbprint(printlevel-1,"// empty negative part, return all ");}
    return(jv);
 }
 ///////////////////////////////////////////////////////////////////////////////

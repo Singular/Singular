@@ -1,4 +1,4 @@
-// $Id: tex.lib,v 1.3 1998-02-13 15:49:02 obachman Exp $   
+// $Id: tex.lib,v 1.4 1998-03-06 11:52:59 krueger Exp $   
 //
 // author : Christian Gorzel email: gorzelc@math.uni-muenster.de
 // created ....18.4.97 (lastchange 13.6.97)
@@ -1021,7 +1021,7 @@ EXAMPLE: example rmx; shows an example
   fname = fname[i,size(fname)-i+1];
 
   if (!(size(fname))) { return();}
-  if (size(fname)>4))
+  if (size(fname)>4)
   { if (fname[size(fname)-3,4]==".tex") { suffix = 2;}
     if (fname[size(fname)-3,4]==".dvi") { suffix = 1; }
     fname = fname[1,size(fname)-4];

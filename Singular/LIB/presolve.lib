@@ -1,4 +1,4 @@
-// $Id: presolve.lib,v 1.1 1998-02-16 12:44:23 pfister Exp $
+// $Id: presolve.lib,v 1.2 1998-03-06 11:52:57 krueger Exp $
 //system("random",787422842);
 //(GMG), last modified 97/10/07 by GMG
 ///////////////////////////////////////////////////////////////////////////////
@@ -493,7 +493,7 @@ EXAMPLE: example faststd; shows an example.
    {
       if ( typeof(#[@ii]) != "string" ) 
       { 
-         "// wrong syntax! type: help faststd; 
+         "// wrong syntax! type: help faststd"; 
          return();
       }
       else
@@ -1134,7 +1134,7 @@ example
    show(v6);
 }
 ///////////////////////////////////////////////////////////////////////////////
-
+/*
 
  ring s=31991,(e,f,x,y,z,t,u,v,w,a,b,c,d),dp;
  ring s=31991,(x,y,z,t,u,v,w,a,b,c,d,f,e,h),dp; //standard
@@ -1184,3 +1184,4 @@ e: 3,1,2
 probier mal:
  ring s=31991,(f,u,y,z,t,a,b,c,v,w,d,e,h),dp; //standard
 
+*/

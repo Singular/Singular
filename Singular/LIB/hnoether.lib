@@ -1,4 +1,4 @@
-// $Id: hnoether.lib,v 1.1 1997-08-13 14:13:29 Singular Exp $
+// $Id: hnoether.lib,v 1.2 1998-03-06 11:52:55 krueger Exp $
 // This library requires Singular 1.0
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -96,7 +96,7 @@ proc T1_Transform (poly f, number d, int M)
 
 proc T2_Transform (poly f, number d, int M, int N)
 USAGE: T2_Transform(f,d,M,N); f poly, d number; M,N int
-RETURN: list: poly T2(f,d',M,N), number d' in { d, 1/d }
+RETURN: list: poly T2(f,d',M,N), number d' in \{ d, 1/d \}
 {
  //---------------------- compute gcd and extgcd of N,M -----------------------
   int ggt=gcd(M,N);
@@ -972,13 +972,13 @@ proc displayHNE
 USAGE:   displayHNE(l) takes the output of develop(f)
          (list l (matrix m, intvec v, int s[,poly g]))
 RETURN:  an ideal of the following form:
-         _[1]=-y+[]*z(0)^1+[]*z(0)^2+...+z(0)^{}*z(1)
-         _[2]=-x+          []*z(1)^2+...+z(1)^{}*z(2)
-         _[3]=             []*z(2)^2+...+z(2)^{}*z(3)
+         _[1]=-y+[]*z(0)^1+[]*z(0)^2+...+z(0)^\{\}*z(1)
+         _[2]=-x+          []*z(1)^2+...+z(1)^\{\}*z(2)
+         _[3]=             []*z(2)^2+...+z(2)^\{\}*z(3)
           ...              ..........................
          _[r+1]=           []*z(r)^2+...
      where x,y are the indeterminants of the basering. The values of [] are
-     the coefficients of the Hamburger-Noether-matrix, the values of {} are
+     the coefficients of the Hamburger-Noether-matrix, the values of \{\} are
      represented in the HN-matrix as 'x'
          the 1st line (_[1]) means that y==[]*z(0)^1+... ,
          the 2nd line (_[2]) means that x==[]*z(1)^1+...
