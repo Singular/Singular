@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: mondromy.lib,v 1.4 1999-06-22 15:47:35 mschulze Exp $";
+version="$Id: mondromy.lib,v 1.5 1999-06-30 09:32:49 mschulze Exp $";
 info="
 LIBRARY: mondromy.lib  PROCEDURES TO COMPUTE THE MONODROMY OF A SINGULARITY
 AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
@@ -711,7 +711,7 @@ static proc nonqhmonodromy(poly f,int mu,int opt)
   if(opt==0)
   {
     dbprint(printlevel-voice+2,
-      "//...computing maximal integer difference delta of eigenvalues of M0");
+      "//computing maximal integer difference delta of eigenvalues of M0...");
     t=timer;
     list jd=jordan(M);
     def eM0,bM0=jd[1..2];
