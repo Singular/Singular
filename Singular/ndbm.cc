@@ -4,7 +4,7 @@
 
 //**************************************************************************/
 //
-// $Id: ndbm.cc,v 1.10 1998-06-02 15:30:00 Singular Exp $
+// $Id: ndbm.cc,v 1.11 1999-07-14 15:30:51 Singular Exp $
 //
 //**************************************************************************/
 // 'ndbm.cc' containes all low-level functions to manipulate dbm-files
@@ -157,7 +157,7 @@ dbm_forder(register DBM *db, datum key)
 datum
 dbm_fetch(register DBM *db, datum key)
 {
-  register i;
+  register int i;
   datum item;
 
   if (dbm_error(db))
@@ -176,7 +176,7 @@ err:
 
 int dbm_delete(register DBM *db, datum key)
 {
-  register i;
+  register int i;
   datum item;
 
   if (dbm_error(db))
@@ -202,7 +202,7 @@ int dbm_delete(register DBM *db, datum key)
 
 int dbm_store(register DBM *db, datum key, datum dat, int replace)
 {
-  register i;
+  register int i;
   int ret;
   datum item, item1;
   char ovfbuf[PBLKSIZ];
@@ -346,7 +346,7 @@ static
 int getbit(register DBM *db)
 {
   long bn;
-  register b, i, n;
+  register int b, i, n;
 
 
   if (db->dbm_bitno > db->dbm_maxbno)
@@ -368,7 +368,7 @@ static void
 setbit(register DBM *db)
 {
   long bn;
-  register i, n, b;
+  register int i, n, b;
 
   if (db->dbm_bitno > db->dbm_maxbno)
     db->dbm_maxbno = db->dbm_bitno;
@@ -393,7 +393,7 @@ static datum
 makdatum(char buf[PBLKSIZ], int n)
 {
   register short *sp;
-  register t;
+  register int t;
   datum item;
 
   sp = (short *)buf;
@@ -536,7 +536,7 @@ static
 int additem(char buf[PBLKSIZ], datum item, datum item1)
 {
   register short *sp;
-  register i1, i2, tmp;
+  register int i1, i2, tmp;
 
   sp = (short *)buf;
   i1 = PBLKSIZ;
