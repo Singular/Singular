@@ -236,7 +236,7 @@ INFO_PROGRAM 	= /bin/info
 CYGWIN_DLL	= /bin/cygwin1.dll
 
 windist: ${SINGULAR}
-	cd Singular; ${MAKE} Singular-bindist libparse
+	cd Singular; ${MAKE} install-bindist
 	rm -rf ${TMPDIR}
 	${MKINSTALLDIRS} ${TMPDIR}/${BINDIR_NAME}
 	${INSTALL} Singular/Singular-bindist \

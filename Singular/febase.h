@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.49 2001-01-31 13:39:04 levandov Exp $ */
+/* $Id: febase.h,v 1.50 2001-03-05 11:48:55 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -174,7 +174,7 @@ void feStringAppendBrowsers(int warn = -1);
  * version Id
  *
  *****************************************************************/
-extern unsigned long feVersionId;
+/* extern unsigned long feVersionId; */
 
 /*****************************************************************
  *

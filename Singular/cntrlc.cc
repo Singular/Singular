@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.36 2000-12-18 15:44:39 obachman Exp $ */
+/* $Id: cntrlc.cc,v 1.37 2001-03-05 11:48:54 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -19,6 +19,7 @@
 #include "cntrlc.h"
 #include "polys.h"
 #include "feOpt.h"
+#include "version.h"
 #ifdef PAGE_TEST
 #include "page.h"
 #endif

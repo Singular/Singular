@@ -6,7 +6,7 @@
  *  Purpose: implementation for debug error handling
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: dError.c,v 1.7 2001-03-01 16:14:18 hannes Exp $
+ *  Version: $Id: dError.c,v 1.8 2001-03-05 11:48:55 Singular Exp $
  *******************************************************************/
 #ifndef DERROR_C
 #define DERROR_C
@@ -25,8 +25,6 @@
 extern "C" 
 {
 #endif
-
-extern unsigned long feVersionId;
 
 int dReportError(const char* fmt, ...)
 {

@@ -299,7 +299,7 @@ iparith.inc mpsr_Tok.inc: claptmpl.o iparith.cc mmalloc.o\
 
 version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in \
            configure.in
-	echo unsigned long feVersionId =  `date '+%Y%m%d%H'`\; >version.h
+	echo "#define feVersionId "  `date '+%Y%m%d%H'` >version.h
 
 libparse: libparse_main.o utils.o fegetopt.o febase.cc
 	${CXX}  -DSTANDALONE_PARSER -o libparse febase.cc libparse_main.o utils.o fegetopt.o
@@ -485,9 +485,9 @@ install-bindist: $(HEADERS) $(SOURCES) Makefile depend
 	${MAKE} ${SING_EXEC} ESingular TSingular libparse ${RUN_SINGULARS}
 	${MKINSTALLDIRS} ${install_bindir} 
 	${INSTALL_PROGRAM} -s  ${SING_EXEC} ${install_bindir}/Singular
-	${INSTALL_PROGRAM} ${DL_LIBS} ${install_bindir}
 	${INSTALL_PROGRAM} -s  libparse ${RUN_SINGULARS} ESingular TSingular ${install_bindir}
 	echo "#undef MAKE_DISTRIBUTION " > distrib.h
+	${INSTALL_PROGRAM} ${DL_LIBS} ${install_bindir}
 
 install-sharedist: ${SLIBS_FILES} LIB/gftables
 	${MKINSTALLDIRS} ${install_slibdir}
