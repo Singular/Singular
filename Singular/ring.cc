@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.193 2002-06-06 16:02:12 levandov Exp $ */
+/* $Id: ring.cc,v 1.194 2002-06-10 15:40:34 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -909,6 +909,7 @@ void rKill(ring r)
       id_Delete(&r->qideal, r);
       r->qideal = NULL;
     }
+    #ifdef HAVE_PLURAL
     // delete noncommutative extension
     if (r->nc!=NULL)
     {
@@ -927,6 +928,7 @@ void rKill(ring r)
       id_Delete((ideal *)&(r->nc->COM),r);    
       omFreeSize((ADDRESS)r->nc,sizeof(nc_struct));
     }
+    #endif
     nKillChar(r);
     int i=1;
     int j;
