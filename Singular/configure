@@ -4716,7 +4716,7 @@ echo "configure:4716: checking whether to have namespaces" >&5
 if test "$with_namespaces" != no; then
   echo "$ac_t""yes" 1>&6
   cat >> confdefs.h <<\EOF
-#define HAVE_NAMESPACES 1
+#define HAVE_NS 1
 EOF
 
 else
