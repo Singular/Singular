@@ -189,6 +189,63 @@ static int get_tcp_mode(argc, argv)
  *            <host> is first checked to see if it is identical to the
  *            local host.
  ***********************************************************************/
+
+/* Returns a dupliucate of string `str' in which string `replace_this'
+   is replaced by string `replace_by_that' provided all strings are !=
+   NULL */
+#ifdef __STDC__
+static char* strdup_replace(const char* str,
+                            const char* replace_this,
+                            const char* replace_by_that)
+#else
+static char* strdup_replace(str, replace_this, replace_by_that)
+  const char* str;
+  const char* replace_this;
+  const char* replace_by_that;
+#endif
+{
+  char *sub, *ret;
+  
+  if (str == NULL) return NULL;
+  
+  if (replace_this != NULL && 
+      (sub = strstr(str, replace_this)) != NULL &&
+      replace_by_that != NULL)
+  {
+    ret = IMP_RawMemAllocFnc((strlen(str)  
+                              + strlen(replace_by_that) - strlen(replace_this)
+                              + 1)*sizeof(char));
+    strcpy(ret, str);
+    sprintf((void*) ret + ((void*) sub - (void*) str), 
+            "%s%s", replace_by_that, &sub[strlen(replace_this)]);
+  }
+  else
+  {
+    ret = IMP_RawMemAllocFnc((strlen(str) + 1)*sizeof(char));
+    strcpy(ret, str);
+  }
+  return ret;
+}
+
+#ifdef __STDC__
+static int UsesLongOpt(int argc, char** argv, const char* opt)
+#else
+static int UsesLongOpt(argc, argv, opt)
+  int argc; 
+  char** argv; 
+  const char* opt;
+#endif
+{
+  int i=0;
+  if (opt == NULL) return -1;
+  
+  while (i < argc && (argv[i][0] != '-' || strstr(argv[i], opt))) i++;
+  
+  if (i >= argc) return -1;
+  if (argv[i][1] == '-') return 1;
+  return 0;
+}
+
 #ifdef __STDC__
 MP_Status_t open_tcp_launch_mode(MP_Link_pt   link,
                                  int          argc,
@@ -371,7 +428,7 @@ MP_Status_t open_tcp_launch_mode(link, argc, argv)
 
 #else /*  not __WIN32__ */
 
-    char     *rsh_argv[5], myhost[64], cport[5], **dmy_args, *appstr;
+    char     *rsh_argv[5], myhost[64], cport[5], **dmy_args, *appstr, *sub;
     int       rsh_pid = -1, i;
     MP_TCP_t *tcp_rec;
 
@@ -444,13 +501,35 @@ MP_Status_t open_tcp_launch_mode(link, argc, argv)
         }
 
     sprintf(cport, "%hd", tcp_rec->peerport);
-
-    appstr = (char*)IMP_RawMemAllocFnc(strlen(rsh_argv[3]) + 105);
-    strcpy(appstr, rsh_argv[3]);
-    strcat(appstr, " -MPtransp TCP -MPmode connect -MPhost ");
-    strcat(appstr, myhost);
-    strcat(appstr, " -MPport ");
-    strcat(appstr, cport);
+    
+    if (strstr(rsh_argv[3], "$MPport") != NULL ||
+        strstr(rsh_argv[3], "$MPhost") != NULL)
+    {
+      sub = strdup_replace(rsh_argv[3], "$MPport", cport);
+      appstr = strdup_replace(sub, "$MPhost", myhost);
+      IMP_RawMemFreeFnc(sub);
+    }
+    else
+    {
+      appstr = (char*)IMP_RawMemAllocFnc(strlen(rsh_argv[3]) + 110);
+      strcpy(appstr, rsh_argv[3]);
+      
+      if (UsesLongOpt(argc, argv, "MPapplication") > 0)
+      {
+        strcat(appstr, " --MPtransp TCP --MPmode connect --MPhost ");
+        strcat(appstr, myhost);
+        strcat(appstr, " --MPport ");
+        strcat(appstr, cport);
+      }
+      else
+      {
+        strcat(appstr, " -MPtransp TCP -MPmode connect -MPhost ");
+        strcat(appstr, myhost);
+        strcat(appstr, " -MPport ");
+        strcat(appstr, cport);
+      }
+      
+    }
 
     rsh_argv[3] = appstr;
     rsh_argv[4] = NULL;

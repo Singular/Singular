@@ -1,3 +1,11 @@
+1998-04-16  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+	* MP_Util.c (IMP_GetCmdlineArg): Allow long option names
+
+	* MP_TcpTransp.c (open_tcp_launch_mode): When long option names
+	were used for specification of MPapplication, use long option
+	names for MP options which are appended to application. 
+
 Mon Jun 30 17:46:17 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
 	* if no -MPhost spec is given, use env->thishost as default

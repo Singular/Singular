@@ -37,10 +37,12 @@
  **********************************************************************/
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_Util.c,v 1.1.1.1 1997-05-25 20:31:47 obachman Exp $";
+static char vcid[] = "@(#) $Id: MP_Util.c,v 1.2 1998-04-16 16:17:06 obachman Exp $";
 #endif /* lint */
 
 #include "MP.h"
+
+#include <string.h>
 
 #ifndef __WIN32__
 #include <unistd.h>
@@ -173,18 +175,19 @@ char* IMP_GetCmdlineArg(argc, argv, cmd)
 #endif
 {
     int i;
-
+    
 #ifdef MP_DEBUG
     fprintf(stderr, "IMP_GetCmdlineArg: entering\n");
     fflush(stderr);
 #endif
+    while (*cmd == '-') cmd++;
 
     for (i = 0; i < argc; i++)
-        if (strcmp(argv[i], cmd) == 0)
+        if (strstr(argv[i], cmd) != NULL  && (*(argv[i]) == '-'))
             if (i+1 == argc)
-                return NULL;
+              return NULL;
             else
-                return argv[i+1];
+              return argv[i+1];
 
 #ifdef MP_DEBUG
     fprintf(stderr, "IMP_GetCmdlineArg: exiting\n");fflush(stderr);
