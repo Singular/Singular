@@ -1,4 +1,4 @@
-/* $Id: NTLconvert.cc,v 1.2 2002-07-30 15:19:56 Singular Exp $ */
+/* $Id: NTLconvert.cc,v 1.3 2002-08-19 11:10:41 Singular Exp $ */
 #include <config.h>
 
 #include "cf_gmp.h"
@@ -413,10 +413,10 @@ CFFList convertNTLvec_pair_GF2X_long2FacCFFList
 CanonicalForm convertZZ2CF(ZZ coefficient)
 {
   long coeff_long;
-  CanonicalForm tmp=0;
-  //char stringtemp[5000]="";
-  //char stringtemp2[5000]="";
-  //char dummy[2];
+  //CanonicalForm tmp=0;
+  char stringtemp[5000]="";
+  char stringtemp2[5000]="";
+  char dummy[2];
   int minusremainder=0;
 
   coeff_long=to_long(coefficient);
@@ -434,7 +434,7 @@ CanonicalForm convertZZ2CF(ZZ coefficient)
     // coefficient is not immediate (gmp-number)
 
     // convert coefficient to char* (input for gmp)
-    //dummy[1]='\0';
+    dummy[1]='\0';
 
     if (coefficient<0)
     {
@@ -448,36 +448,37 @@ CanonicalForm convertZZ2CF(ZZ coefficient)
       ZZ quotient,remaind;
       ZZ ten;ten=10;
       DivRem(quotient,remaind,coefficient,ten);
-      //dummy[0]=(char)(to_long(remaind)+'0');
-      tmp*=10; tmp+=to_long(remaind);
+      dummy[0]=(char)(to_long(remaind)+'0');
+      //tmp*=10; tmp+=to_long(remaind);
 
-      //strcat(stringtemp,dummy);
+      strcat(stringtemp,dummy);
 
       coefficient=quotient;
     }
     //built up the string in dummy[0]
-    //dummy[0]=(char)(to_long(coefficient)+'0');
-    //strcat(stringtemp,dummy);
-    tmp*=10; tmp+=to_long(coefficient);
+    dummy[0]=(char)(to_long(coefficient)+'0');
+    strcat(stringtemp,dummy);
+    //tmp*=10; tmp+=to_long(coefficient);
 
     if (minusremainder==1)
     {
       //Check whether coefficient has been negative at the start of the procedure
-      //stringtemp2[0]='-';
-      tmp*=(-1);
+      stringtemp2[0]='-';
+      //tmp*=(-1);
     }
 
     //reverse the list to obtain the correct string
-    //for (int i=strlen(stringtemp)-1;i>=0;i--)
-    //{
-    //  stringtemp2[strlen(stringtemp)-i-1+minusremainder]=stringtemp[i];
-    //}
-    //stringtemp2[strlen(stringtemp)+minusremainder]='\0';
+    int len=strlen(stringtemp);
+    for (int i=len-1;i>=0;i--)
+    {
+      stringtemp2[len-i-1+minusremainder]=stringtemp[i];
+    }
+    stringtemp2[len+minusremainder]='\0';
   }
 
   //convert the string to canonicalform using the char*-Constructor
-  //return CanonicalForm(stringtemp2);
-  return tmp;
+  return CanonicalForm(stringtemp2);
+  //return tmp;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -668,7 +669,7 @@ CFFList convertNTLvec_pair_ZZpEX_long2FacCFFList(vec_pair_ZZ_pEX_long e,ZZ_pE mu
 
   // Start by appending the multiplicity
   if (!IsOne(multi))
-    rueckgabe.append(CFFactor(convertNTLZZpE2CF(multi,x),1));
+    rueckgabe.append(CFFactor(convertNTLZZpE2CF(multi,alpha),1));
 
 
   // Go through the vector e and build up the CFFList

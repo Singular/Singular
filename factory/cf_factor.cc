@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.13 2002-07-30 15:23:51 Singular Exp $ */
+/* $Id: cf_factor.cc,v 1.14 2002-08-19 11:10:41 Singular Exp $ */
 
 //{{{ docu
 //
@@ -83,29 +83,48 @@ void out_cf(char *s1,const CanonicalForm &f,char *s2)
 {
   printf("%s",s1);
   if (f==0) printf("+0");
-  else if (! f.inCoeffDomain() )
+  //else if (! f.inCoeffDomain() )
+  else if (! f.inBaseDomain() )
   {
     int l = f.level();
     for ( CFIterator i = f; i.hasTerms(); i++ )
     {
       int e=i.exp();
-      printf("+(");out_cf("+(",i.coeff(),")*v(");printf("%d)^%d",l,e);
+      if (i.coeff().isOne())
+      {
+        printf("+");
+	if (e==0) printf("1");
+	else 
+	{
+	  printf("v(%d)",l);
+	  if (e!=1) printf("^%d",e);
+        }
+      }	
+      else
+      {
+        out_cf("+(",i.coeff(),")");
+        if (e!=0)
+	{
+	  printf("*v(%d)",l);
+	  if (e!=1) printf("^%d",e);
+	}  
+      }	
     }
   }
   else
   {
     if ( f.isImm() )
     {
-      printf("+%d(",f.intval());
+      printf("+%d",f.intval());
     }
-    else printf("+...(");
-    if (f.inZ()) printf("Z)");
-    else if (f.inQ()) printf("Q)");
-    else if (f.inFF()) printf("FF)");
-    else if (f.inPP()) printf("PP)");
-    else if (f.inGF()) printf("PP)");
-    else if (f.inExtension()) printf("E(%d))",f.level());
-
+    else printf("+...");
+    //if (f.inZ()) printf("(Z)");
+    //else if (f.inQ()) printf("(Q)");
+    //else if (f.inFF()) printf("(FF)");
+    //else if (f.inPP()) printf("(PP)");
+    //else if (f.inGF()) printf("(PP)");
+    //else
+    if (f.inExtension()) printf("E(%d)",f.level());
   }
   printf("%s",s2);
 }
@@ -297,6 +316,11 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
   }
   return F;
 }
+CanonicalForm fntl ( const CanonicalForm & f, int j )
+{
+  ZZX f1=convertFacCF2NTLZZX(f);
+  return convertZZ2CF(coeff(f1,j));
+}  
 
 CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
 {
@@ -318,8 +342,9 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
         ccc.restore();
 
         // set minimal polynomial in NTL
-        ZZ_pX minPo=convertFacCF2NTLZZpX(getMipo(alpha,f.mvar()));
+        ZZ_pX minPo=convertFacCF2NTLZZpX(getMipo(alpha));
         ZZ_pEContext c(minPo);
+
         c.restore();
 
         // convert to NTL
@@ -365,6 +390,7 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
     else
     #endif
     {
+	printf("factorize without NTL: alg. ext.\n");
       F=FpFactorizeUnivariateCZ( f, false, 1, alpha, Variable() );
     }
     return F;
