@@ -1380,6 +1380,7 @@ static poly redNF2 (poly h,calc_dat* c , int &len, number&  m,int n)
 	
 	if (h==NULL) {
 	  len=0;
+	  kBucketDestroy(&P.bucket);
 	  return 
 	  NULL;}
         P.p=h;
@@ -2037,6 +2038,7 @@ static poly redNFTail (poly h,const int sl,kStrategy strat, int len)
 #ifdef REDTAIL_PROT
         PrintS(" ");
 #endif
+	kBucketDestroy(&P.bucket);
         return res;
       }
       pTest(h);
