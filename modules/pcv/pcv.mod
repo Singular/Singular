@@ -1,10 +1,9 @@
 module="pcv";
 
-version="$Id: pcv.mod,v 1.1 1998-12-17 11:59:42 mschulze Exp $";
+version="$Id: pcv.mod,v 1.2 1999-02-11 11:39:29 mschulze Exp $";
 info="
 LIBRARY: pcv.so  CONVERSION BETWEEN POLYS AND COEF VECTORS
-                 by Mathias Schulze
-                 email: mschulze@mathematik.uni-kl.de
+AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
 
  MinDeg(p);      min deg of monomials of poly p
  MaxDeg(p);      max deg of monomials of poly p
