@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.12 1998-04-29 10:02:33 anne Exp $
+@comment $Id: reference.doc,v 1.13 1998-04-29 11:26:50 krueger Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2363,7 +2363,8 @@ the memory consumption of unused procedures.
 * LIB in a library::
 * string expressions::
 * proc::
-* procedures and Libraries::
+* Procedures::
+* Libraries::
 * SINGULAR libraries:: all standard libraries.
 @end menu
 @iftex

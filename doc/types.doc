@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.14 1998-04-29 07:02:32 Singular Exp $
+@comment $Id: types.doc,v 1.15 1998-04-29 11:26:52 krueger Exp $
 @comment this file contains the type definitions
 @cindex expression list
 An expression list is any comma separated list of expressions.
@@ -447,7 +447,8 @@ See @ref{implicit type conversions}; @ref{type casting}; @ref{int related functi
 @c <--
 
 @c ------------------------------
-@node int operations, int related functions, int expressions, int
+@c @node int operations, int related functions, int expressions, int
+@node int operations, boolean expressions, int expressions, int
 @subsection int operations
 @cindex int operations
 @cindex mod
@@ -1586,7 +1587,8 @@ map expressions combined by composition
 @c
 
 @c ------------------------------
-@node map related functions, ,map operations, map
+@c @node map related functions, ,map operations, map
+@node map related functions,  , map expressions, map
 @subsection map related functions
 @cindex map related functions
 
