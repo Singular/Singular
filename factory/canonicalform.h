@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.h,v 1.21 1998-01-27 10:04:50 pohl Exp $ */
+/* $Id: canonicalform.h,v 1.22 1998-02-02 08:57:59 schmidt Exp $ */
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
@@ -168,8 +168,6 @@ CanonicalForm power ( const Variable & v, int n );
 CanonicalForm gcd ( const CanonicalForm&, const CanonicalForm& );
 
 CanonicalForm extgcd ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, CanonicalForm& );
-
-CanonicalForm iextgcd ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, CanonicalForm& );
 
 CanonicalForm lcm ( const CanonicalForm&, const CanonicalForm& );
 
