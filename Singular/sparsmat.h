@@ -7,7 +7,7 @@
  *          (bareis, ...)
  *
  *******************************************************************/
-/* $Id: sparsmat.h,v 1.4 2000-02-09 08:15:10 pohl Exp $ */
+/* $Id: sparsmat.h,v 1.5 2000-02-09 08:45:16 pohl Exp $ */
 
 
 poly smMult(poly, poly);
@@ -15,9 +15,7 @@ void smPolyDiv(poly, poly);
 poly smMultDiv(poly, poly, const poly);
 void smSpecialPolyDiv(poly, poly);
 /* ----------------- macros ------------------ */
-#ifdef HAVE_SHIFTED_EXPONENTS
 #define OLD_DIV 1
-#endif
 
 #ifdef OLD_DIV
 #define SM_MULT(A,B,C) smMult(A,B)
