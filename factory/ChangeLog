@@ -1,3 +1,92 @@
+Tue Sep  9 09:06:17 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* README: doc fix
+
+	* INSTALL: doc fix
+
+	* cf_globals.h: doc checked
+	
+	* cf_globals.h: doc fix
+
+	* cf_globals.cc: doc checked
+
+	* cf_globals.cc: #include fix, doc fix
+
+	* cf_primes.cc, fac_cantzass.cc, int_pp.cc, int_rat.cc: #include
+	  fix
+
+	* cf_factor.cc: #include fix
+	  (factorize): cf_glob_switches.isOn() replaced by isOn() for
+	  sake of uniformity
+
+	* cf_ops.cc (swapvar_between): arguments to operator * swapped
+
+	* cf_ops.cc (swapvar_between, swapvar_rec): functions reordered
+	  and declarations removed
+
+	* cf_ops.cc (swapvar_between1, swapvar_rec1, swapvar1): new
+	  experimental functions, to be removed in future
+
+	* cf_chinese.cc: doc fix
+
+	* fac_multihensel.cc: #include fix
+
+	* fac_berlekamp.cc: #include fix
+
+	* cf_util.cc: #include fix
+
+	* ffops.h: #include fix
+
+Mon Sep  8 12:39:09 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* cf_algorithm.cc: doc checked
+
+	* cf_algorithm.cc (psr, psq, psqr): assertions added
+
+	* cf_algorithm.cc (psq, psqr): return correct values now if deg(f)
+	  < deg(g)
+	  (psr, psq, psqr): return correct values now if f = 0
+
+	* cf_algorithm.cc (cden): recursion terminates now for f in base
+	  domain instead for f in coefficient domain
+
+	* cf_map.h: doc fix
+
+	* cf_map.cc: doc fix
+
+	* cf_algorithm.h: doc fix
+
+	* cf_switches.h: doc fix
+
+	* cf_switches.cc: doc fix
+
+Thu Sep  4 10:19:25 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* cf_ops.cc: doc checked
+
+	* cf_ops.cc: (replacevar, replacevar_between): new functions
+	* canonicalform.h (replacevar): new declaration
+
+	* cf_algorithm.cc: doc fix
+
+	* cf_resultant.cc: doc fix
+
+	* cf_algorithm.cc: new file
+	  (psr, psq, psqr, cden, common_den): functions moved from
+	  cf_ops.cc to cf_algorithm.cc
+	* cf_ops.cc (psr, psq, psqr, cden, common_den): functions moved
+	  to cf_algorithm.cc
+	* cf_algorithm.h: declarations of functions from cf_algorithm.cc
+	  moved from canonicalform.h to cf_algorithm.h
+	* canonicalform.h: declarations of functions from cf_algorithm.cc
+	  moved to cf_algorithm.h.  In all files which refer to these
+ 	  functions #include of cf_algorithm.h added.
+	* GNUmakefile.in (basefactorysrc): cf_algorithm.cc added to
+	  distribution
+
+	* cf_ops.cc (apply): bug fix.  In case f.inCoeffDomain() result is
+	  now initialized to f.
+
 Mon Sep  1 10:47:41 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* cf_algorithm.h: doc checked
