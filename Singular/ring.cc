@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.199 2003-01-31 09:23:39 Singular Exp $ */
+/* $Id: ring.cc,v 1.200 2003-02-07 12:34:02 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1175,15 +1175,25 @@ char * rString(ring r)
   return res;
 }
 
+int  rIsExtension(ring r)
+{
+  return (r->parameter!=NULL); /* R, Q, Fp: FALSE */
+}
+
+int  rIsExtension()
+{
+  return rIsExtension( currRing );
+} 
+
 int rChar(ring r)
 {
-  if (r->ch==-1)
+  if (rField_is_numeric(r))
     return 0;
-  if (r->parameter==NULL) /* Q, Fp */
+  if (!rIsExtension(r)) /* Q, Fp */
     return r->ch;
-  if (r->ch<0)           /* Fp(a)  */
+  if (rField_is_Zp_a(r))  /* Fp(a)  */
     return -r->ch;
-  if (r->ch==1)          /* Q(a)  */
+  if (rField_is_Q_a(r))   /* Q(a)  */
     return 0;
   /*else*/               /* GF(p,n) */
   {
@@ -1192,19 +1202,6 @@ int rChar(ring r)
     while ((r->ch % i)!=0) i+=2;
     return i;
   }
-}
-
-int    rIsExtension(ring r)
-{
-  if (r->parameter==NULL) /* Q, Fp */
-    return FALSE;
-  else
-    return TRUE;
-}
-
-int    rIsExtension()
-{
-  return rIsExtension( currRing );
 }
 
 /*2
