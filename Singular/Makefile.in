@@ -783,7 +783,7 @@ claptmpl.ot: claptmpl.cc mod2.h
 $(OBJT2) : %.ot: %.c
 	$(CCP)  ${CFLAGST} ${CPPFLAGS} ${DEFST} -c $< -o $@
 
-Singulart${S_EXT}: scanner.cc   $(OBJT) iparith.ot mpsr_Tok.ot claptmpl.ot tesths.cc version.h  mmalloc.ot
+Singulart${S_EXT}: scanner.cc   $(OBJT) iparith.ot mpsr_Tok.ot claptmpl.ot tesths.cc version.h  mmalloc.ot $(DL_LIBST)
 	$(CXXP) ${CXXFLAGST} ${CPPFLAGS} ${DEFST} -o Singulart${S_EXT} \
 	tesths.cc iparith.ot mpsr_Tok.ot claptmpl.ot $(OBJT) ${LDFLAGST} ${LIBS} -lomalloc mmalloc.ot \
 	${LD_DYN_FLAGS} 
