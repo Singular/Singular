@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.6 1997-07-11 10:28:50 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.7 1997-07-14 12:50:23 schmidt Exp $
 
 #
 # GNUmakefile.in - used by configure to create GNUmakefile, the
@@ -302,7 +302,7 @@ distincl :=	\
 distfiles :=	\
 		$(distsrc) $(distincl) $(hdrtemplsrc) \
 		GNUmakefile.in configure.in config.h.in configure \
-		ChangeLog \
+		ChangeLog README \
 		bin/install-sh bin/makeheader bin/mkinstalldirs
 
 #
@@ -456,7 +456,6 @@ dist:		$(srcdir)/readcf.cc $(srcdir)/configure
 		for file in $(distfiles); do \
 		  ln $(srcdir)/$$file $(distname)/$$file; \
 		done
-		chmod 777 $(distname)
 		tar cf $(distname).tar $(distname)
 		gzip $(distname).tar
 
