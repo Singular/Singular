@@ -37,7 +37,7 @@ static int Mask[8]={0x80,0x40,0x20,0x10,0x8,0x4,0x2,0x1};
 //#define pow_(x) pTotaldegree((x))
 //#define pow_(x) pDeg((x))
 pFDegProc jDeg;
-#define pow_(x) jDeg((x))
+#define pow_(x) jDeg((x),currRing)
 
 void Debug()
 {

@@ -633,7 +633,7 @@ static int add_to_reductors(calc_dat* c, poly h, int len){
   pNormalize(P.p);
   int pq=pQuality(h,c,len);
   i=simple_posInS(c->strat,h,pq);
-  c->strat->enterS(P,i,c->strat);
+  c->strat->enterS(P,i,c->strat,-1);
  
  
 

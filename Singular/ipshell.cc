@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.96 2005-02-03 17:52:26 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.97 2005-02-17 09:49:20 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -3478,7 +3478,7 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   }
 
   int ldummy;
-  int deg= pLDeg( gls, &ldummy );
+  int deg= pLDeg( gls, &ldummy, currRing );
   //  int deg= pDeg( gls );
   int len= pLength( gls );
   int i,vpos;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.339 2005-02-11 20:18:34 levandov Exp $ */
+/* $Id: iparith.cc,v 1.340 2005-02-17 09:49:18 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2939,7 +2939,7 @@ static BOOLEAN jjDEG(leftv res, leftv v)
 {
   int dummy;
   poly p=(poly)v->Data();
-  if (p!=NULL) res->data = (char *)pLDeg(p,&dummy);
+  if (p!=NULL) res->data = (char *)pLDeg(p,&dummy,currRing);
   else res->data=(char *)-1;
   return FALSE;
 }
@@ -2950,7 +2950,7 @@ static BOOLEAN jjDEG_M(leftv res, leftv u)
   int dummy;
   int i;
   for(i=IDELEMS(I);i>=0;i--)
-    if (I->m[i]!=NULL) d=max(d,pLDeg(I->m[i],&dummy));
+    if (I->m[i]!=NULL) d=max(d,pLDeg(I->m[i],&dummy,currRing));
   res->data = (char *)d;
   return FALSE;
 }
@@ -3142,7 +3142,7 @@ static BOOLEAN jjHIGHCORNER_M(leftv res, leftv v)
     else
     {
       // now po!=NULL, p!=NULL
-      int d=(pFDeg(po)-(*w)[pGetComp(po)-1] - pFDeg(p)+(*w)[i-1]);
+      int d=(pFDeg(po,currRing)-(*w)[pGetComp(po)-1] - pFDeg(p,currRing)+(*w)[i-1]);
       if (d==0)
         d=pLmCmp(po,p);
       if (d > 0)
@@ -3429,7 +3429,7 @@ static BOOLEAN jjOpenClose(leftv res, leftv v)
 static BOOLEAN jjORD(leftv res, leftv v)
 {
   poly p=(poly)v->Data();
-  res->data=(char *)( p==NULL ? -1 : pFDeg(p) );
+  res->data=(char *)( p==NULL ? -1 : pFDeg(p,currRing) );
   return FALSE;
 }
 static BOOLEAN jjPAR1(leftv res, leftv v)
