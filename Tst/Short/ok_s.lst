@@ -19,6 +19,7 @@ bug_9
 bug_barei
 bug_c_dp
 bug_mres
+; CORE bug_primdec
 cyc_5
 ; CORE bug_res
 ; CORE bug_sres
