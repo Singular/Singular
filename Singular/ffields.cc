@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.22 1999-09-22 13:28:43 Singular Exp $ */
+/* $Id: ffields.cc,v 1.23 1999-10-26 16:40:44 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -220,17 +220,6 @@ int nfParDeg(number n)
 int nfInt (number &n)
 {
   return 0;
-}
-
-/*2
-* copy a number
-*/
-number nfCopy (number  k)
-{
-#ifdef LDEBUG
-  nfTest(k);
-#endif
-  return k;
 }
 
 /*2
@@ -462,7 +451,6 @@ void nfPower (number a, int i, number * result)
   }
   else if (i==1)
   {
-    //*result = nfCopy(a);
     *result = a;
   }
   else
@@ -711,7 +699,7 @@ BOOLEAN nfSetMap(ring r)
 {
   if (rField_is_GF(r,nfCharQ))
   {
-    nMap=nfCopy;   /* GF(p,n) -> GF(p,n) */
+    nMap=ndCopy;   /* GF(p,n) -> GF(p,n) */
     return TRUE;
   }
   if (rField_is_Zp(r,nfCharP))

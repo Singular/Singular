@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shortfl.cc,v 1.12 1999-09-24 12:23:26 Singular Exp $ */
+/* $Id: shortfl.cc,v 1.13 1999-10-26 16:40:47 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -64,11 +64,6 @@ int nrInt(number &n)
   else
     i = 0;
   return i;
-}
-
-number nrCopy (number  k1)
-{
-  return k1;
 }
 
 number nrAdd (number a, number b)
@@ -430,7 +425,7 @@ BOOLEAN nrSetMap(ring r)
 {
   if (rField_is_R(r))
   {
-    nMap=nrCopy;
+    nMap=ndCopy;
     return TRUE;
   }
   if (rField_is_Q(r))

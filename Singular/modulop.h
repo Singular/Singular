@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.h,v 1.7 1999-09-27 14:42:31 obachman Exp $ */
+/* $Id: modulop.h,v 1.8 1999-10-26 16:40:46 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -17,7 +17,6 @@ BOOLEAN npGreaterZero (number k);
 number  npMult        (number a, number b);
 number  npInit        (int i);
 int     npInt         (number &n);
-number  npCopy        (number k1);
 number  npAdd         (number a, number b);
 number  npSub         (number a, number b);
 void    npPower       (number a, int i, number * result);

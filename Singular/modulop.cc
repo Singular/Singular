@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.12 1999-09-16 12:34:00 Singular Exp $ */
+/* $Id: modulop.cc,v 1.13 1999-10-26 16:40:45 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -58,11 +58,6 @@ int npInt(number &n)
 {
   if ((int)n > (npPrimeM >>1)) return ((int)n -npPrimeM);
   else                     return (int)n;
-}
-
-number npCopy (number  k1)
-{
-  return k1;
 }
 
 number npAdd (number a, number b)
@@ -155,7 +150,6 @@ void npPower (number a, int i, number * result)
   }
   else if (i==1)
   {
-    //*result = npCopy(a);
     *result = a;
   }
   else
@@ -305,7 +299,7 @@ BOOLEAN npSetMap(ring r)
   {
     if (rChar(r) == npPrimeM)
     {
-      nMap = npCopy;  /* Z/p -> Z/p*/
+      nMap = ndCopy;  /* Z/p -> Z/p*/
       return TRUE;
     }
     else

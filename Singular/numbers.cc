@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.20 1999-09-29 10:59:34 obachman Exp $ */
+/* $Id: numbers.cc,v 1.21 1999-10-26 16:40:46 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -85,6 +85,8 @@ number ndGetDenom(number &n) { return nInit(1); }
 int    nGetChar() { return nChar; }
 
 int ndSize(number a) { return (int)nIsZero(a)==FALSE; }
+
+number ndCopy(number a) { return a; }
 
 /*2
 * init operations for characteristic c (complete==TRUE)
@@ -225,7 +227,7 @@ void nSetChar(ring r, BOOLEAN complete)
       nIntMod= ndIntMod; /* dummy !! */
       nNeg   = npNeg;
       nInvers= npInvers;
-      nCopy  = npCopy;
+      nCopy  = ndCopy;
       nGreater = npGreater;
       nEqual = npEqual;
       nIsZero = npIsZero;
@@ -272,7 +274,7 @@ void nSetChar(ring r, BOOLEAN complete)
       nIntMod= ndIntMod; /* dummy !! */
       nNeg   = nfNeg;
       nInvers= nfInvers;
-      nCopy  = nfCopy;
+      nCopy  = ndCopy;
       nGreater = nfGreater;
       nEqual = nfEqual;
       nIsZero = nfIsZero;
@@ -316,7 +318,7 @@ void nSetChar(ring r, BOOLEAN complete)
       nIntMod= ndIntMod; /* dummy !! */
       nNeg   = nrNeg;
       nInvers= nrInvers;
-      nCopy  = nrCopy;
+      nCopy  = ndCopy;
       nGreater = nrGreater;
       nEqual = nrEqual;
       nIsZero = nrIsZero;

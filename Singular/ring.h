@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.36 1999-10-14 12:50:28 Singular Exp $ */
+/* $Id: ring.h,v 1.37 1999-10-26 16:40:46 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -68,44 +68,62 @@ int    rBlocks(ring r);
 #ifndef ABS
 #define ABS(x) ((x) < 0 ? (-(x)) : (x))
 #endif
+
 inline BOOLEAN rField_is_Zp(ring r=currRing)
 { return (r->ch > 1) && (r->parameter==NULL); }
+
 inline BOOLEAN rField_is_Zp(ring r, int p)
 { return (r->ch > 1 && r->ch == ABS(p) && r->parameter==NULL); }
+
 inline BOOLEAN rField_is_Q(ring r=currRing)
 { return (r->ch == 0) && (r->parameter==NULL); }
+
 inline BOOLEAN rField_is_numeric(ring r=currRing) /* R, long R, long C */
 { return (r->ch ==  -1); }
+
 inline BOOLEAN rField_is_R(ring r=currRing)
 {
   if (rField_is_numeric(r) && (r->ch_flags <= (short)SHORT_REAL_LENGTH))
     return (r->parameter==NULL);
   return FALSE;
 }
+
 inline BOOLEAN rField_is_GF(ring r=currRing)
 { return (r->ch > 1) && (r->parameter!=NULL); }
+
 inline BOOLEAN rField_is_GF(ring r, int q)
 { return (r->ch == q); }
+
 inline BOOLEAN rField_is_Zp_a(ring r=currRing)
 { return (r->ch < -1); }
+
 inline BOOLEAN rField_is_Zp_a(ring r, int p)
 { return (r->ch < -1 ) && (-(r->ch) == ABS(p)); }
+
 inline BOOLEAN rField_is_Q_a(ring r=currRing)
 { return (r->ch == 1); }
+
 inline BOOLEAN rField_is_long_R(ring r=currRing)
 {
   if (rField_is_numeric(r) && (r->ch_flags >(short)SHORT_REAL_LENGTH))
     return (r->parameter==NULL);
   return FALSE;
 }
+
 inline BOOLEAN rField_is_long_C(ring r=currRing)
 {
   if (rField_is_numeric(r))
     return (r->parameter!=NULL);
   return FALSE;
 }
+
 inline BOOLEAN rField_has_simple_inverse(ring r=currRing)
 { return (r->ch>1) || (r->ch== -1); } /* Z/p, GF(p,n), R, long_R, long_C*/
+
+inline BOOLEAN rField_has_simple_Alloc(ring r=currRing)
+{ return (rField_is_Zp(r) || rField_is_GF(r) || rField_is_R(r)); }
+/* Z/p, GF(p,n), R: nCopy, nNew, nDelete are dummies*/
+
 inline BOOLEAN rField_is_Extension(ring r=currRing)
 { return (rField_is_Q_a(r)) || (rField_is_Zp_a(r)); } /* Z/p(a) and Q(a)*/
 
