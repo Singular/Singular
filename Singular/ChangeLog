@@ -1,3 +1,7 @@
+Mon Mar  2 16:18:25 MET 1998 hannes
+   * changed handling of "echo" in examples: do not report file + lineno
+     (febase.inc,lib0lib.res, inoutlib.res, mem.res, homlib.res)
+
 Fri Feb 27 15:02:10 MET 1998 hannes
    * new input scheme: many modifications to febase.h, febase.inc,
      febase.cc, scanner.l, grammar.y, iplib.cc

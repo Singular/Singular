@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.inc,v 1.3 1998-02-27 16:27:57 Singular Exp $ */
+/* $Id: febase.inc,v 1.4 1998-03-02 15:22:48 Singular Exp $ */
 /*
 * ABSTRACT: handling of 'voices'
 */
@@ -150,15 +150,16 @@ void newBuffer(char* s, feBufferTypes t, procinfo* pi, int lineno)
                      currentVoice->oldb=myynewbuffer();
                      yylineno = lineno+1;
                      break;
-    case BT_file:
-                     yylineno = 1;
-                     break;
     case BT_if:
     case BT_else:
                      yylineno = blocklineno;
                      break;
     case BT_break:
                      yylineno = blocklineno-1;
+                     break;
+    //case BT_file:
+    default:
+                     yylineno = 1;
                      break;
   }
   //Print("start body (%s) at line %d\n",BT_name[t],yylineno);
@@ -377,7 +378,6 @@ static void feShowPrompt(void)
 */
 static int fePrintEcho(char *anf)
 {
-  prompt_char = '.';
   char *ss=strchr(anf,'\n');
   int len_s;
   if (ss==NULL)
@@ -395,20 +395,23 @@ static int fePrintEcho(char *anf)
   mrc--;
   // handle echo:
   if (((si_echo>myynest)
-    && (((currentVoice->typ==BT_proc)
-         && (strncmp(anf,";return();",10)!=0))
+    && ((currentVoice->typ==BT_proc)
       || (currentVoice->typ==BT_example)
       || (currentVoice->typ==BT_file)
       || (currentVoice->typ==BT_none)
-      )
-  )
+    )
+    && (strncmp(anf,";return();",10)!=0)
+   )
   || (traceit&TRACE_SHOW_LINE)
   || (traceit&TRACE_SHOW_LINE1))
   {
-    if (currentVoice->filename==NULL)
-      Print("(none) %3d%c ",yylineno,prompt_char);
-    else
-      Print("%s %3d%c ",currentVoice->filename,yylineno,prompt_char);
+    if (currentVoice->typ!=BT_example)
+    {
+      if (currentVoice->filename==NULL)
+        Print("(none) %3d%c ",yylineno,prompt_char);
+      else
+        Print("%s %3d%c ",currentVoice->filename,yylineno,prompt_char);
+    }
     fwrite(anf,1,len_s,stdout);
     mflush();
     if (traceit&TRACE_SHOW_LINE)
@@ -421,6 +424,7 @@ static int fePrintEcho(char *anf)
     printf("{%d}",yylineno);
     mflush();
   }
+  prompt_char = '.';
   return len_s;
 }
 
