@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.10 1998-05-14 13:04:20 Singular Exp $ */
+/* $Id: maps.cc,v 1.11 1998-09-24 09:59:49 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -41,7 +41,7 @@ poly maEval(map theMap, poly p,ring preimage_r,matrix s)
   poly result = NULL,q,pp;
   int i,modulComp;
   int varnum = preimage_r->N;
-  
+
 //  for(i=1; i<=varnum; i++)
 //  {
 //    pTest(theMap->m[i-1]);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.19 1998-07-30 17:49:15 Singular Exp $ */
+/* $Id: cntrlc.cc,v 1.20 1998-09-24 09:59:36 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -61,12 +61,13 @@ int siRandomStart;
 short si_restart=0;
 BOOLEAN siCntrlc = FALSE;
 
+typedef void (*si_hdl_typ)(int);
+
 /*0 implementation*/
 #ifndef MSDOS
 /* signals are not implemented in DJGCC */
 #ifndef macintosh
 /* signals are not right implemented in macintosh */
-typedef void (*si_hdl_typ)(int);
 void sigint_handler(int sig);
 #endif
 #endif
@@ -122,9 +123,6 @@ void sigsegv_handler(int sig, sigcontext s)
     init_signals();
     longjmp(si_start_jmpbuf,1);
   }
-#endif
-#ifdef HAVE_FEREAD
-  fe_reset_input_mode();
 #endif
 #ifndef __OPTIMIZE__
   if (sig!=SIGINT) debug(INTERACTIVE);
@@ -215,10 +213,12 @@ void init_signals()
   {
     PrintS("cannot set signal handler for IOT\n");
   }
+#ifndef macintosh
   if (SIG_ERR==signal(SIGINT ,sigint_handler))
   {
     PrintS("cannot set signal handler for INT\n");
   }
+#endif
 }
 
 #else
@@ -244,9 +244,6 @@ void sigsegv_handler(int sig, int code, struct sigcontext *scp, char *addr)
     init_signals();
     longjmp(si_start_jmpbuf,1);
   }
-#endif
-#ifdef HAVE_FEREAD
-  fe_reset_input_mode(0,NULL);
 #endif
 #ifndef __OPTIMIZE__
   if (sig!=SIGINT) debug(STACK_TRACE);
@@ -291,13 +288,6 @@ void sigsegv_handler(int sig)
     init_signals();
     longjmp(si_start_jmpbuf,1);
   }
-#endif
-#ifdef HAVE_FEREAD
-#ifdef HAVE_ATEXIT
-  fe_reset_input_mode();
-#else
-  fe_reset_input_mode(0,NULL);
-#endif
 #endif
 #ifdef unix
 #ifndef hpux
@@ -438,33 +428,6 @@ void sigint_handler(int sig)
 //  SpinCursor(10);
 //}
 //#endif
-
-#ifndef MSDOS
-// /*2
-// * test for SIGINT, start an interpreter
-// */
-// void test_int_std(leftv v)
-// {
-// #ifndef macintosh
-// //#ifdef macintosh
-// //  beachball();
-// //#endif
-//   if (siCntrlc>1)
-//   {
-//     int saveecho = si_echo;
-//     siCntrlc = FALSE;
-//     signal(SIGINT ,sigint_handler);
-// //#ifdef macintosh
-// //    flush_intr();
-// //#endif
-//     //si_echo = 2;
-//     printf("\n//inside a computation, continue with `exit;`\n");
-//     iiPStart("STDIN","STDIN",NULL);
-//     si_echo = saveecho;
-//   }
-// #endif
-// }
-#endif
 
 #ifndef MSDOS
 //void test_int()

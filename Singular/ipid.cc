@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.16 1998-09-09 13:10:26 Singular Exp $ */
+/* $Id: ipid.cc,v 1.17 1998-09-24 09:59:44 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -125,7 +125,7 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
         break;
       case PROC_CMD:
         len=sizeof(procinfo);
-	break;
+        break;
     //other types: without init (int,script,poly,def,package)
     }
     if (len!=0)
@@ -420,7 +420,7 @@ void killhdl(idhdl h, idhdl * ih)
   if(h->next != NULL)Print("=======>%s(%x) -> %s<====\n", IDID(h), IDID(h), IDID(h->next));
   else Print("=======>%s(%x)<====\n", IDID(h), IDID(h));
 #endif
-  
+
   FreeL((ADDRESS)IDID(h));
   //IDID(h)=NULL;
   if (h == (*ih))
@@ -721,7 +721,7 @@ namehdl namerec::push(package pack, char *name, BOOLEAN init)
   namespaceroot = ns;
 #if 0
   if(init && ns->isroot) {
-    idhdl pl = enterid( mstrdup("Top"),0, PACKAGE_CMD, 
+    idhdl pl = enterid( mstrdup("Top"),0, PACKAGE_CMD,
                       &NSROOT(namespaceroot), TRUE );
     if(pl != NULL) {
       Free((ADDRESS)IDPACKAGE(pl), sizeof(ip_package));

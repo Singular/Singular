@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: khstd.cc,v 1.6 1998-05-14 13:04:15 Singular Exp $ */
+/* $Id: khstd.cc,v 1.7 1998-09-24 09:59:46 Singular Exp $ */
 /*
 * ABSTRACT:utils for hilbert driven kStd
 */
@@ -74,7 +74,7 @@ void khCheck( ideal Q, intvec *w, intvec *hilb, int &eledeg, int &count,
             {
               PrintS("h");
               mflush();
-            }  
+            }
             deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
           }
           return;
@@ -92,7 +92,7 @@ void khCheck( ideal Q, intvec *w, intvec *hilb, int &eledeg, int &count,
       {
         PrintS("h");
         mflush();
-      }  
+      }
       deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
     }
   }

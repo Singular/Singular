@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hutil.cc,v 1.7 1998-04-27 10:19:04 pohl Exp $ */
+/* $Id: hutil.cc,v 1.8 1998-09-24 09:59:43 Singular Exp $ */
 /*
 * ABSTRACT: Utilities for staircase operations
 */
@@ -116,7 +116,7 @@ void hDelete(scfmon ev, int ev_length)
   Free(ev,  ev_length*sizeof(scmon));
 }
 
-  
+
 void hComp(scfmon exist, int Nexist, Exponent_t ak, scfmon stc, int *Nstc)
 {
   int  i = Nexist, k = 0;
@@ -223,7 +223,7 @@ void hOrdSupp(scfmon stc, int Nstc, varset var, int Nvar)
        if (g > o)
          g -= o;
        else
-	 g = o - g;
+         g = o - g;
        if (g > h)
          h = g;
     }

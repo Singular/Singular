@@ -1,14 +1,14 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmvec.cc,v 1.10 1998-06-04 13:39:14 wichmann Exp $
+// $Id: fglmvec.cc,v 1.11 1998-09-24 09:59:40 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* 
+/*
 * ABSTRACT - The FGLM-Algorithm
 *   Implementation of number-vectors for the fglm algorithm.
 *   (See fglm.cc). Based on a letter-envelope implementation, mainly
-*   written to be used by the fglm algorithm. Hence they are 
+*   written to be used by the fglm algorithm. Hence they are
 *   specialized for this purpose.
 */
 
@@ -16,7 +16,7 @@
 
 #ifdef HAVE_FGLM
 #include "mmemory.h"
-#include "tok.h" 
+#include "tok.h"
 #include "structs.h"
 #include "numbers.h"
 #include "fglm.h"
@@ -37,36 +37,36 @@ private:
 public:
     fglmVectorRep() : ref_count(1), N(0), elems(0) {}
     fglmVectorRep( int n, number * e ) : ref_count(1), N(n), elems(e) {}
-    fglmVectorRep( int n ) : ref_count(1), N(n) 
+    fglmVectorRep( int n ) : ref_count(1), N(n)
     {
-	fglmASSERT( N >= 0, "illegal Vector representation" );
-	if ( N == 0 ) 
-	    elems= 0;
-	else {
-	    elems= (number *)Alloc( N*sizeof( number ) );
-	    for ( int i= N-1; i >= 0; i-- )
-		elems[i]= nInit( 0 );
-	}
+        fglmASSERT( N >= 0, "illegal Vector representation" );
+        if ( N == 0 )
+            elems= 0;
+        else {
+            elems= (number *)Alloc( N*sizeof( number ) );
+            for ( int i= N-1; i >= 0; i-- )
+                elems[i]= nInit( 0 );
+        }
     }
     ~fglmVectorRep()
     {
-	if ( N > 0 ) {
-	    for ( int i= N-1; i >= 0; i-- )
-		nDelete( elems + i );
-	    Free( (ADDRESS)elems, N*sizeof( number ) );
-	}
+        if ( N > 0 ) {
+            for ( int i= N-1; i >= 0; i-- )
+                nDelete( elems + i );
+            Free( (ADDRESS)elems, N*sizeof( number ) );
+        }
     }
 
     fglmVectorRep* clone() const
     {
-	if ( N > 0 ) {
-	    number * elems_clone;
-	    elems_clone= (number *)Alloc( N*sizeof( number ) );
-	    for ( int i= N-1; i >= 0; i-- )
-		elems_clone[i] = nCopy( elems[i] );
-	    return new fglmVectorRep( N, elems_clone );
-	} else
-	    return new fglmVectorRep( N, 0 );
+        if ( N > 0 ) {
+            number * elems_clone;
+            elems_clone= (number *)Alloc( N*sizeof( number ) );
+            for ( int i= N-1; i >= 0; i-- )
+                elems_clone[i] = nCopy( elems[i] );
+            return new fglmVectorRep( N, elems_clone );
+        } else
+            return new fglmVectorRep( N, 0 );
     }
     BOOLEAN deleteObject() { return --ref_count == 0; }
     fglmVectorRep * copyObject() { ref_count++; return this; }
@@ -74,44 +74,44 @@ public:
     BOOLEAN isUnique() const { return ref_count == 1; }
 
     int size() const { return N; }
-    int isZero() const 
+    int isZero() const
     {
-	int k;
-	for ( k= N; k > 0; k-- )
-	    if ( ! nIsZero( getconstelem( k ) ) )
-		return 0;
-	return 1;
+        int k;
+        for ( k= N; k > 0; k-- )
+            if ( ! nIsZero( getconstelem( k ) ) )
+                return 0;
+        return 1;
     }
-    int numNonZeroElems() const 
+    int numNonZeroElems() const
     {
-	int num = 0;
-	int k;
-	for ( k= N; k > 0; k-- )
-	    if ( ! nIsZero( getconstelem( k ) ) ) num++;
-	return num;
+        int num = 0;
+        int k;
+        for ( k= N; k > 0; k-- )
+            if ( ! nIsZero( getconstelem( k ) ) ) num++;
+        return num;
     }
     void setelem( int i, number n )
     {
-	fglmASSERT( 0 < i && i <= N, "setelem: wrong index" );
-	nDelete( elems + i-1 );
-	elems[i-1]= n;
+        fglmASSERT( 0 < i && i <= N, "setelem: wrong index" );
+        nDelete( elems + i-1 );
+        elems[i-1]= n;
     }
-    number ejectelem( int i, number n ) 
+    number ejectelem( int i, number n )
     {
-	fglmASSERT( isUnique(), "should only be called if unique!" );
-	number temp= elems[i-1];
-	elems[i-1]= n;
-	return temp;
+        fglmASSERT( isUnique(), "should only be called if unique!" );
+        number temp= elems[i-1];
+        elems[i-1]= n;
+        return temp;
     }
     number & getelem( int i )
     {
-	fglmASSERT( 0 < i && i <= N, "getelem: wrong index" );
-	return elems[i-1];
+        fglmASSERT( 0 < i && i <= N, "getelem: wrong index" );
+        return elems[i-1];
     }
     const number getconstelem( int i) const
     {
-	fglmASSERT( 0 < i && i <= N, "getconstelem: wrong index" );
-	return elems[i-1];
+        fglmASSERT( 0 < i && i <= N, "getconstelem: wrong index" );
+        return elems[i-1];
     }
     friend class fglmVector;
 };
@@ -140,7 +140,7 @@ fglmVector::fglmVector( const fglmVector & v )
 fglmVector::~fglmVector()
 {
     if ( rep->deleteObject() )
-	delete rep;
+        delete rep;
 }
 
 #ifndef HAVE_EXPLICIT_CONSTR
@@ -157,23 +157,23 @@ fglmVector::mac_constr_i( int size )
 }
 
 void
-fglmVector::clearelems() 
+fglmVector::clearelems()
 {
     if ( rep->deleteObject() )
       delete rep;
 }
 #endif
 
-void 
+void
 fglmVector::makeUnique()
 {
     if ( rep->refcount() != 1 ) {
-	rep->deleteObject();
-	rep= rep->clone();
+        rep->deleteObject();
+        rep= rep->clone();
     }
 }
 
-int 
+int
 fglmVector::size() const
 {
     return rep->size();
@@ -186,50 +186,50 @@ fglmVector::numNonZeroElems() const
 }
 
 void
-fglmVector::nihilate( const number fac1, const number fac2, const fglmVector v ) 
+fglmVector::nihilate( const number fac1, const number fac2, const fglmVector v )
 {
     int i;
     int vsize= v.size();
     number term1, term2;
     fglmASSERT( vsize <= rep->size(), "v has to be smaller oder equal" );
     if ( rep->isUnique() ) {
-	for ( i= vsize; i > 0; i-- ) {
-	    term1= nMult( fac1, rep->getconstelem( i ) );
-	    term2= nMult( fac2, v.rep->getconstelem( i ) );
-	    rep->setelem( i, nSub( term1, term2 ) );
-	    nDelete( &term1 );
-	    nDelete( &term2 );
-	}
-	for ( i= rep->size(); i > vsize; i-- ) {
-	    rep->setelem( i, nMult( fac1, rep->getconstelem( i ) ) );
-	}
+        for ( i= vsize; i > 0; i-- ) {
+            term1= nMult( fac1, rep->getconstelem( i ) );
+            term2= nMult( fac2, v.rep->getconstelem( i ) );
+            rep->setelem( i, nSub( term1, term2 ) );
+            nDelete( &term1 );
+            nDelete( &term2 );
+        }
+        for ( i= rep->size(); i > vsize; i-- ) {
+            rep->setelem( i, nMult( fac1, rep->getconstelem( i ) ) );
+        }
     }
-    else 
+    else
     {
-	number* newelems;
-	newelems= (number *)Alloc( rep->size()*sizeof( number ) );
-	for ( i= vsize; i > 0; i-- ) {
-	    term1= nMult( fac1, rep->getconstelem( i ) );
-	    term2= nMult( fac2, v.rep->getconstelem( i ) );
-	    newelems[i-1]= nSub( term1, term2 );
-	    nDelete( &term1 );
-	    nDelete( &term2 );
-	}
-	for ( i= rep->size(); i > vsize; i-- ) {
-	    newelems[i-1]= nMult( fac1, rep->getconstelem( i ) );
-	}
-	rep->deleteObject();
-	rep= new fglmVectorRep( rep->size(), newelems );
+        number* newelems;
+        newelems= (number *)Alloc( rep->size()*sizeof( number ) );
+        for ( i= vsize; i > 0; i-- ) {
+            term1= nMult( fac1, rep->getconstelem( i ) );
+            term2= nMult( fac2, v.rep->getconstelem( i ) );
+            newelems[i-1]= nSub( term1, term2 );
+            nDelete( &term1 );
+            nDelete( &term2 );
+        }
+        for ( i= rep->size(); i > vsize; i-- ) {
+            newelems[i-1]= nMult( fac1, rep->getconstelem( i ) );
+        }
+        rep->deleteObject();
+        rep= new fglmVectorRep( rep->size(), newelems );
     }
 }
 
-fglmVector & 
+fglmVector &
 fglmVector::operator = ( const fglmVector & v )
 {
     if ( this != &v ) {
-	if ( rep->deleteObject() )
-	    delete rep;
-	rep = v.rep->copyObject();
+        if ( rep->deleteObject() )
+            delete rep;
+        rep = v.rep->copyObject();
     }
     return *this;
 }
@@ -238,14 +238,14 @@ int
 fglmVector::operator == ( const fglmVector & v )
 {
     if ( rep->size() == v.rep->size() ) {
-	if ( rep == v.rep ) return 1;
-	else {
-	    int i;
-	    for ( i= rep->size(); i > 0; i-- )
-		if ( ! nEqual( rep->getconstelem( i ), v.rep->getconstelem( i ) ) )
-		    return 0;
-	    return 1;
-	}
+        if ( rep == v.rep ) return 1;
+        else {
+            int i;
+            for ( i= rep->size(); i > 0; i-- )
+                if ( ! nEqual( rep->getconstelem( i ), v.rep->getconstelem( i ) ) )
+                    return 0;
+            return 1;
+        }
     }
     return 0;
 }
@@ -256,13 +256,13 @@ fglmVector::operator != ( const fglmVector & v )
     return !( *this == v );
 }
 
-int 
+int
 fglmVector::isZero()
 {
     return rep->isZero();
 }
 
-int 
+int
 fglmVector::elemIsZero( int i )
 {
     return nIsZero( rep->getconstelem( i ) );
@@ -275,18 +275,18 @@ fglmVector::operator += ( const fglmVector & v )
     // ACHTUNG : Das Verhalten hier mit gcd genau ueberpruefen!
     int i;
     if ( rep->isUnique() ) {
-	for ( i= rep->size(); i > 0; i-- ) 
-	    rep->setelem( i, nAdd( rep->getconstelem( i ), v.rep->getconstelem( i ) ) );
+        for ( i= rep->size(); i > 0; i-- )
+            rep->setelem( i, nAdd( rep->getconstelem( i ), v.rep->getconstelem( i ) ) );
     }
-    else 
+    else
     {
-	int n = rep->size();
-	number* newelems;
-	newelems= (number *)Alloc( n*sizeof( number ) );
-	for ( i= n; i > 0; i-- )
-	    newelems[i-1]= nAdd( rep->getconstelem( i ), v.rep->getconstelem( i ) );
-	rep->deleteObject();
-	rep= new fglmVectorRep( n, newelems );
+        int n = rep->size();
+        number* newelems;
+        newelems= (number *)Alloc( n*sizeof( number ) );
+        for ( i= n; i > 0; i-- )
+            newelems[i-1]= nAdd( rep->getconstelem( i ), v.rep->getconstelem( i ) );
+        rep->deleteObject();
+        rep= new fglmVectorRep( n, newelems );
     }
     return *this;
 }
@@ -297,18 +297,18 @@ fglmVector::operator -= ( const fglmVector & v )
     fglmASSERT( size() == v.size(), "incompatible vectors" );
     int i;
     if ( rep->isUnique() ) {
-	for ( i= rep->size(); i > 0; i-- ) 
-	    rep->setelem( i, nSub( rep->getconstelem( i ), v.rep->getconstelem( i ) ) );
+        for ( i= rep->size(); i > 0; i-- )
+            rep->setelem( i, nSub( rep->getconstelem( i ), v.rep->getconstelem( i ) ) );
     }
-    else 
+    else
     {
-	int n = rep->size();
-	number* newelems;
-	newelems= (number *)Alloc( n*sizeof( number ) );
-	for ( i= n; i > 0; i-- )
-	    newelems[i-1]= nSub( rep->getconstelem( i ), v.rep->getconstelem( i ) );
-	rep->deleteObject();
-	rep= new fglmVectorRep( n, newelems );
+        int n = rep->size();
+        number* newelems;
+        newelems= (number *)Alloc( n*sizeof( number ) );
+        for ( i= n; i > 0; i-- )
+            newelems[i-1]= nSub( rep->getconstelem( i ), v.rep->getconstelem( i ) );
+        rep->deleteObject();
+        rep= new fglmVectorRep( n, newelems );
     }
     return *this;
 }
@@ -319,17 +319,17 @@ fglmVector::operator *= ( const number & n )
     int s= rep->size();
     int i;
     if ( ! rep->isUnique() ) {
-	number * temp;
-	temp= (number *)Alloc( s*sizeof( number ) );
-	for ( i= s; i > 0; i-- ) 
-	    temp[i-1]= nMult( rep->getconstelem( i ), n );
-	rep->deleteObject();
-	rep= new fglmVectorRep( s, temp );
+        number * temp;
+        temp= (number *)Alloc( s*sizeof( number ) );
+        for ( i= s; i > 0; i-- )
+            temp[i-1]= nMult( rep->getconstelem( i ), n );
+        rep->deleteObject();
+        rep= new fglmVectorRep( s, temp );
     }
-    else 
+    else
     {
-	for (i= s; i > 0; i-- ) 
-	    rep->setelem( i, nMult( rep->getconstelem( i ), n ) );
+        for (i= s; i > 0; i-- )
+            rep->setelem( i, nMult( rep->getconstelem( i ), n ) );
     }
     return *this;
 }
@@ -340,48 +340,48 @@ fglmVector::operator /= ( const number & n )
     int s= rep->size();
     int i;
     if ( ! rep->isUnique() ) {
-	number * temp;
-	temp= (number *)Alloc( s*sizeof( number ) );
-	for ( i= s; i > 0; i-- ) {
-	    temp[i-1]= nDiv( rep->getconstelem( i ), n );
-	    nNormalize( temp[i-1] );
-	}
-	rep->deleteObject();
-	rep= new fglmVectorRep( s, temp );
+        number * temp;
+        temp= (number *)Alloc( s*sizeof( number ) );
+        for ( i= s; i > 0; i-- ) {
+            temp[i-1]= nDiv( rep->getconstelem( i ), n );
+            nNormalize( temp[i-1] );
+        }
+        rep->deleteObject();
+        rep= new fglmVectorRep( s, temp );
     }
-    else 
+    else
     {
-	for (i= s; i > 0; i-- ) {
-	    rep->setelem( i, nDiv( rep->getconstelem( i ), n ) );
-	    nNormalize( rep->getelem( i ) );
-	}
+        for (i= s; i > 0; i-- ) {
+            rep->setelem( i, nDiv( rep->getconstelem( i ), n ) );
+            nNormalize( rep->getelem( i ) );
+        }
     }
     return *this;
 }
 
-fglmVector 
-operator - ( const fglmVector & v ) 
+fglmVector
+operator - ( const fglmVector & v )
 {
     fglmVector temp( v.size() );
     int i;
     number n ;
     for ( i= v.size(); i > 0; i-- ) {
-	n= nCopy( v.getconstelem( i ) );
-	n= nNeg( n );
-	temp.setelem( i, n );
+        n= nCopy( v.getconstelem( i ) );
+        n= nNeg( n );
+        temp.setelem( i, n );
     }
     return temp;
 }
 
-fglmVector 
-operator + ( const fglmVector & lhs, const fglmVector & rhs ) 
+fglmVector
+operator + ( const fglmVector & lhs, const fglmVector & rhs )
 {
     fglmVector temp= lhs;
     temp+= rhs;
     return temp;
 }
 
-fglmVector 
+fglmVector
 operator - ( const fglmVector & lhs, const fglmVector & rhs )
 {
     fglmVector temp= lhs;
@@ -389,7 +389,7 @@ operator - ( const fglmVector & lhs, const fglmVector & rhs )
     return temp;
 }
 
-fglmVector 
+fglmVector
 operator * ( const fglmVector & v, const number n )
 {
     fglmVector temp= v;
@@ -412,7 +412,7 @@ fglmVector::getelem( int i )
     return rep->getelem( i );
 }
 
-const number 
+const number
 fglmVector::getconstelem( int i ) const
 {
     return rep->getconstelem( i );
@@ -426,69 +426,69 @@ fglmVector::setelem( int i, number & n )
     n= nNULL;
 }
 
-number 
+number
 fglmVector::gcd() const
-{ 
+{
     int i= rep->size();
     BOOLEAN found = FALSE;
     BOOLEAN gcdIsOne = FALSE;
     number theGcd;
     number current;
     while( i > 0 && ! found ) {
-	current= rep->getconstelem( i );
-	if ( ! nIsZero( current ) ) {
-	    theGcd= nCopy( current );
-	    found= TRUE;
-	    if ( ! nGreaterZero( theGcd ) ) {
-		theGcd= nNeg( theGcd );
-	    }
-	    if ( nIsOne( theGcd ) ) gcdIsOne= TRUE;
-	}
-	i--;
+        current= rep->getconstelem( i );
+        if ( ! nIsZero( current ) ) {
+            theGcd= nCopy( current );
+            found= TRUE;
+            if ( ! nGreaterZero( theGcd ) ) {
+                theGcd= nNeg( theGcd );
+            }
+            if ( nIsOne( theGcd ) ) gcdIsOne= TRUE;
+        }
+        i--;
     }
     if ( found ) {
-	while ( i > 0 && ! gcdIsOne ) {
-	    current= rep->getconstelem( i );
-	    if ( ! nIsZero( current ) ) {
-		number temp= nGcd( theGcd, current );
-		nDelete( &theGcd );
-		theGcd= temp;
-		if ( nIsOne( theGcd ) ) gcdIsOne= TRUE;
-	    }
-	    i--;
-	}
+        while ( i > 0 && ! gcdIsOne ) {
+            current= rep->getconstelem( i );
+            if ( ! nIsZero( current ) ) {
+                number temp= nGcd( theGcd, current );
+                nDelete( &theGcd );
+                theGcd= temp;
+                if ( nIsOne( theGcd ) ) gcdIsOne= TRUE;
+            }
+            i--;
+        }
     }
-    else 
-	theGcd= nInit( 0 );
+    else
+        theGcd= nInit( 0 );
     return theGcd;
 }
 
 number
-fglmVector::clearDenom() 
+fglmVector::clearDenom()
 {
     number theLcm = nInit( 1 );
     number current;
     BOOLEAN isZero = TRUE;
     int i;
     for ( i= size(); i > 0; i-- ) {
-	if ( ! nIsZero( rep->getconstelem(i) ) ) {
-	    isZero= FALSE;
-	    number temp= nLcm( theLcm, rep->getconstelem( i ) );
-	    nDelete( &theLcm );
-	    theLcm= temp;
-	}
+        if ( ! nIsZero( rep->getconstelem(i) ) ) {
+            isZero= FALSE;
+            number temp= nLcm( theLcm, rep->getconstelem( i ) );
+            nDelete( &theLcm );
+            theLcm= temp;
+        }
     }
     if ( isZero ) {
-	nDelete( &theLcm );
-	theLcm= nInit( 0 );
+        nDelete( &theLcm );
+        theLcm= nInit( 0 );
     }
     else {
-	if ( ! nIsOne( theLcm ) ) {
-	    *this *= theLcm;
-	    for ( i= size(); i > 0; i-- ) {
-		nNormalize( rep->getelem( i ) );
-	    }
-	}
+        if ( ! nIsOne( theLcm ) ) {
+            *this *= theLcm;
+            for ( i= size(); i > 0; i-- ) {
+                nNormalize( rep->getelem( i ) );
+            }
+        }
     }
     return theLcm;
 }

@@ -51,7 +51,7 @@ void skstdLink::Kill()
       res->~skintarray();
       delete(res);
     }
-    
+
   Free((ADDRESS)Warteliste,(Wartelistemax)*sizeof(LObject));
 }
 
@@ -134,17 +134,17 @@ BOOLEAN skstdLink::Restore(kStrategy strat)
 {
 //   PrintS("Restore\n");
   if(DEBUG) PrintS("Restore\n");
-  
+
   int i = 0;
   int l = 0;
   if(aktuell>0)
     {
       while(i<aktuell)
-	{
-	  l = strat->posInL(strat->L,strat->Ll,Warteliste[i],strat);
-	  enterL(&(strat->L),&(strat->Ll),&(strat->Lmax),Warteliste[i++],l);
-	}
-      
+        {
+          l = strat->posInL(strat->L,strat->Ll,Warteliste[i],strat);
+          enterL(&(strat->L),&(strat->Ll),&(strat->Lmax),Warteliste[i++],l);
+        }
+
       aktuell=0;
       return TRUE;
     }
@@ -179,46 +179,46 @@ void skstdLink::SendMsg(kStrategy strat, stdMsg msg,int li)
       lv->next=NULL;
       lv->rtyp = INTVEC_CMD;
       switch(msg)
-	{
+        {
 
-	case MsgTupel:
-	  for(i=0; i<pVariables; i++)
-	    exp[i+1]=pGetExp(strat->P.p, i+1);
-	  break;
+        case MsgTupel:
+          for(i=0; i<pVariables; i++)
+            exp[i+1]=pGetExp(strat->P.p, i+1);
+          break;
 
-	case MsgTupelPosition:
-	  for(i=0; i<pVariables; i++)
-	    exp[i+1]=0;
+        case MsgTupelPosition:
+          for(i=0; i<pVariables; i++)
+            exp[i+1]=0;
 
-	  // Neue Position von strat->P.p bestimmen
-	  pos=-1;
-	  for(i=strat->Ll-1; i>=0; i--)
-	    {
-	      if((strat->L[i].p1 == strat->P.p1) && (strat->L[i].p2 == strat->P.p2))
-		{ 
-		  pos = i;
-		  continue;
-		}
-	    }
-	  exp[1]=pos;
-	  break;
+          // Neue Position von strat->P.p bestimmen
+          pos=-1;
+          for(i=strat->Ll-1; i>=0; i--)
+            {
+              if((strat->L[i].p1 == strat->P.p1) && (strat->L[i].p2 == strat->P.p2))
+                {
+                  pos = i;
+                  continue;
+                }
+            }
+          exp[1]=pos;
+          break;
 
-	default:
-	  for(i=0; i<pVariables; i++)
-	    exp[i+1]=0;
-	  break;
-	}
+        default:
+          for(i=0; i<pVariables; i++)
+            exp[i+1]=0;
+          break;
+        }
       lv->data=ivCopy(&exp);
       if(li==-1)
-	{
-	  for(i=0; i< procnum; i++)
-	    if((*links)[i]!=NULL)
-	      slWrite((*links)[i], lv);
-	}
+        {
+          for(i=0; i< procnum; i++)
+            if((*links)[i]!=NULL)
+              slWrite((*links)[i], lv);
+        }
       else
-	{
-	  slWrite((*links)[li], lv);
-	}
+        {
+          slWrite((*links)[li], lv);
+        }
       lv->CleanUp();
       Free(lv,sizeof(sleftv));
       if(DEBUG) PrintS(" Ende\n");
@@ -234,31 +234,31 @@ BOOLEAN skstdLink::ReceiveMsg()
     {
       intvec *rec = NULL;
       if(DEBUG) PrintS("ReceiveMsg\n");
-  
+
       leftv lv = NULL;
       for(int i=0; i<procnum;i++)
-	{
-	  lv=slRead((*links)[i]);
-	  rec=ivCopy((intvec *) lv->Data());
- 	  if((*res)[i]!=NULL)
- 	    {
- 	      delete (*res)[i];
- 	      (*res)[i]=NULL;
- 	    }
-	  (*msg)[i] = (*rec)[0];
-	  if((stdMsg)(*msg)[i]==MsgTupel)
-	    {
-	      (*res)[i] = new intvec(pVariables,1,0);
-	      for(int j = 0; j<pVariables ; j++)
-		(*(*res)[i])[j]=(*rec)[j+1];
-	    }
-	}
+        {
+          lv=slRead((*links)[i]);
+          rec=ivCopy((intvec *) lv->Data());
+           if((*res)[i]!=NULL)
+             {
+               delete (*res)[i];
+               (*res)[i]=NULL;
+             }
+          (*msg)[i] = (*rec)[0];
+          if((stdMsg)(*msg)[i]==MsgTupel)
+            {
+              (*res)[i] = new intvec(pVariables,1,0);
+              for(int j = 0; j<pVariables ; j++)
+                (*(*res)[i])[j]=(*rec)[j+1];
+            }
+        }
         lv->CleanUp();
         Free(lv, sizeof(sleftv));
 
       delete rec;
       if(DEBUG) PrintS("ReceiveMsg Ende\n");
-      return TRUE;  
+      return TRUE;
     }
 }
 
@@ -285,55 +285,55 @@ void skstdLink::SetModus(stdModus NeuerModus, kStrategy strat=NULL)
        break;
     case ModWrite:
     case ModRun:  // Berechne und sende Tupel
-      Verwaltung  = TRUE;     
-      Receive     = FALSE;    
-      TupelL      = TRUE;     
-      SPoly       = TRUE;     
-      Reduzieren  = TRUE;     
-      TupelMelden = TRUE;     
-      TupelTesten = FALSE;    
+      Verwaltung  = TRUE;
+      Receive     = FALSE;
+      TupelL      = TRUE;
+      SPoly       = TRUE;
+      Reduzieren  = TRUE;
+      TupelMelden = TRUE;
+      TupelTesten = FALSE;
       TupelPosition = TRUE;
-      ResultSend  = FALSE;    
-      TupelStore  = FALSE;    
+      ResultSend  = FALSE;
+      TupelStore  = FALSE;
       break;
     case ModStep:  // Warte auf MsgStep, berechne und sende
-      Verwaltung  = TRUE;     
-      Receive     = TRUE;    
-      TupelL      = TRUE;     
-      SPoly       = TRUE;     
-      Reduzieren  = TRUE;     
-      TupelMelden = TRUE;     
+      Verwaltung  = TRUE;
+      Receive     = TRUE;
+      TupelL      = TRUE;
+      SPoly       = TRUE;
+      Reduzieren  = TRUE;
+      TupelMelden = TRUE;
       TupelPosition = TRUE;
-      TupelTesten = FALSE;    
-      ResultSend  = TRUE;    
-      TupelStore  = FALSE;    
+      TupelTesten = FALSE;
+      ResultSend  = TRUE;
+      TupelStore  = FALSE;
       break;
     case ModCalc: // Warte auf Tupel und berechne
-      Verwaltung  = TRUE; 
-      Receive     = TRUE;    
-      TupelL      = TRUE;     
-      TupelMelden = FALSE;    
+      Verwaltung  = TRUE;
+      Receive     = TRUE;
+      TupelL      = TRUE;
+      TupelMelden = FALSE;
       TupelPosition = FALSE;
       ResultSend  = TRUE;
       TupelStore  = (*msg)[0]==MsgTupelisZero;
       if(TupelStore)
-	{
- 	  SPoly      = FALSE; 
- 	  Reduzieren = FALSE;
- 	  TupelTesten = FALSE;
-	}
+        {
+           SPoly      = FALSE;
+           Reduzieren = FALSE;
+           TupelTesten = FALSE;
+        }
       else
-	{
-	  SPoly      = TRUE;  
-	  Reduzieren = TRUE;  
-	  TupelTesten = TRUE;
-	}
+        {
+          SPoly      = TRUE;
+          Reduzieren = TRUE;
+          TupelTesten = TRUE;
+        }
       break;
     case ModPosition: // Tupel neu positionieren
-      Verwaltung  = TRUE; 
-      Receive     = TRUE;    
-      TupelL      = TRUE;     
-      TupelMelden = FALSE;    
+      Verwaltung  = TRUE;
+      Receive     = TRUE;
+      TupelL      = TRUE;
+      TupelMelden = FALSE;
       TupelPosition = FALSE;
       ResultSend  = TRUE;
       TupelStore  = FALSE;
@@ -344,34 +344,34 @@ void skstdLink::SetModus(stdModus NeuerModus, kStrategy strat=NULL)
     case ModCheck: // Nachrechnen
       Restore(strat);
       if(strat->Ll>=0)
-	{
-	  Verwaltung  = TRUE;
-	  Receive     = FALSE;
-	  TupelL      = TRUE;
-	  TupelStore  = FALSE;    
-	  SPoly       = TRUE;
-	  TupelMelden = FALSE;
-	  TupelPosition = FALSE;
-	  TupelTesten = FALSE;
-	  ResultSend  = TRUE;
-	  Reduzieren  = TRUE;
-	}
+        {
+          Verwaltung  = TRUE;
+          Receive     = FALSE;
+          TupelL      = TRUE;
+          TupelStore  = FALSE;
+          SPoly       = TRUE;
+          TupelMelden = FALSE;
+          TupelPosition = FALSE;
+          TupelTesten = FALSE;
+          ResultSend  = TRUE;
+          Reduzieren  = TRUE;
+        }
       else
-	{
-	  SetModus(ModEnde,strat);
-	}
+        {
+          SetModus(ModEnde,strat);
+        }
       break;
     case ModEnde:  //sofort beenden
       Verwaltung  = FALSE;
-      Receive     = FALSE;    
-      TupelWarte  = FALSE;    
-      TupelL      = FALSE;    
-      TupelStore  = FALSE;    
-      TupelTesten = FALSE;    
-      SPoly       = FALSE;    
-      Reduzieren  = FALSE;    
-      TupelMelden = FALSE;    
-      ResultSend  = FALSE;    
+      Receive     = FALSE;
+      TupelWarte  = FALSE;
+      TupelL      = FALSE;
+      TupelStore  = FALSE;
+      TupelTesten = FALSE;
+      SPoly       = FALSE;
+      Reduzieren  = FALSE;
+      TupelMelden = FALSE;
+      ResultSend  = FALSE;
       break;
     }
   if(DEBUG) PrintS("SetModus Ende\n");
@@ -395,18 +395,18 @@ BOOLEAN skstdLink::CheckEnd(kStrategy strat)
       break;
     case ModCalc:   // Beenden erst dann, wenn Calc2 erreicht ist.
       SetModus(ModCalc);
-      if(strat->Ll<0) 
-	{
-	  if(BTEST1(OPT_INTERRUPT))
-	    return TRUE;
-	  if(TEST_OPT_PROT)
+      if(strat->Ll<0)
+        {
+          if(BTEST1(OPT_INTERRUPT))
+            return TRUE;
+          if(TEST_OPT_PROT)
             {
-	      PrintS("\n<C>\n");
+              PrintS("\n<C>\n");
               writeTime("used time: #");
             }
- 	  SetModus(ModCheck,strat);
-	}
-	return FALSE;
+           SetModus(ModCheck,strat);
+        }
+        return FALSE;
       break;
     case ModCheck:
       SetModus(ModCheck,strat);
@@ -435,12 +435,12 @@ void skstdLink::CheckPosition(kStrategy strat, int oldLl)
   if(lnModus == lnWrite)
     {
       if(strat->Ll != oldLl )
-	{
-	  SendMsg(strat, MsgTupelPosition);
-	  TupelMelden = FALSE;
-	}
+        {
+          SendMsg(strat, MsgTupelPosition);
+          TupelMelden = FALSE;
+        }
     }
-  
+
 }
 
 //###################################################################
@@ -459,13 +459,13 @@ void skstdLink::ParseMessage(kStrategy strat)
 {
 //   PrintS("ParseMessage\n");
   if(DEBUG) PrintS("ParseMessage\n");
-  BOOLEAN err=FALSE; 
+  BOOLEAN err=FALSE;
   // Testen, ob alle Nachrichten korrekt sind,
   // wenn ja, dann ParseMessageFinal
   // sonst die richtige finden, andere Prozesse killen
-  
+
   // Ist nur ein proc vorhanden, dann automatisch weiter
-  for(int i=1; i< procnum; i++)  
+  for(int i=1; i< procnum; i++)
     err = err || ((*msg)[i] != (*msg)[0]);
   if(!err)
     ParseMessageFinal(strat);
@@ -476,11 +476,11 @@ void skstdLink::ParseMessage(kStrategy strat)
       // TupelNull + Tupel      : Alle "TupelNull" löschen
       // Unterschiedliche Tupel : In TupelDifferent alle abweichler killen
       for(int i=0; i<procnum; i++)
-	if(((stdMsg)(*msg)[i]) == MsgTupelisZero)
-	  {
-	    PrintS(" AAA ");
- 	    KillChild(strat,i);
-	  }
+        if(((stdMsg)(*msg)[i]) == MsgTupelisZero)
+          {
+            PrintS(" AAA ");
+             KillChild(strat,i);
+          }
       ParseMessageFinal(strat);
     }
   if(DEBUG) PrintS("ParseMessage Ende\n");
@@ -492,28 +492,28 @@ void skstdLink::ParseMessageFinal(kStrategy strat, int i)
 {
 //   PrintS("ParseMessageFinal\n");
   if(DEBUG) PrintS("ParseMessageFinal\n");
-  
+
   switch(((stdMsg) (*msg)[i]))
     {
-    case MsgTupel:  // In Step-Modus schalten bzw. bleiben.     
+    case MsgTupel:  // In Step-Modus schalten bzw. bleiben.
     case MsgTupelisZero:
 
        if(procnum>0)
- 	{
- 	  SetModus(ModCalc,strat);
- 	}
+         {
+           SetModus(ModCalc,strat);
+         }
        else
- 	{
- 	  SetModus(ModCheck,strat);
- 	}
+         {
+           SetModus(ModCheck,strat);
+         }
       break;
     case MsgTupelPosition:
       // aktuelles Tupel neu positionieren
       if(TEST_OPT_PROT)
-	PrintS("P");
+        PrintS("P");
       SetModus(ModPosition);
       break;
-     case MsgEnd:  // In Calc1-Modus schalten bzw. bleiben.     
+     case MsgEnd:  // In Calc1-Modus schalten bzw. bleiben.
        SetModus(ModCheck,strat);
        if (TEST_OPT_PROT) PrintS("\n<E>");
        break;
@@ -533,31 +533,31 @@ void skstdLink::TupelDifferent(kStrategy strat)
   for(int i=procnum-1; i>=0; i--)
     {
       if(strat->P.p==NULL)
-	{
-	  PrintS(" BBB ");
- 	  KillChild(strat,i);
-	}
+        {
+          PrintS(" BBB ");
+           KillChild(strat,i);
+        }
       else
-	{
-	  if((*res)[i]==NULL)
-	    {
-	      PrintS(" CCC ");
- 	      KillChild(strat,i);
-	    }
-	  else
-	    {
-	      Different = FALSE;
-	      for(int j=0; j< pVariables; j++)
-		{
-		  Different = Different || ((*(*res)[i])[j]!=pGetExp(strat->P.p,j+1));
-		}
-	      if(Different)
-		{
-		  PrintS(" DDD ");
- 		  KillChild(strat,i);
-		}
-	    }
-	}
+        {
+          if((*res)[i]==NULL)
+            {
+              PrintS(" CCC ");
+               KillChild(strat,i);
+            }
+          else
+            {
+              Different = FALSE;
+              for(int j=0; j< pVariables; j++)
+                {
+                  Different = Different || ((*(*res)[i])[j]!=pGetExp(strat->P.p,j+1));
+                }
+              if(Different)
+                {
+                  PrintS(" DDD ");
+                   KillChild(strat,i);
+                }
+            }
+        }
     }
   if(procnum<=0)
     SetModus(ModCheck,strat);
@@ -586,30 +586,30 @@ void skstdLink::KillChild(kStrategy strat, int li,BOOLEAN Cancled)
   if(li>=0)
      {
        if(procnum>=2)
- 	{
-  	  si_link swaplink = (*links)[li];
-  	  intvec *swapres = (*res)[li];
-  	  (*msg)[li]   = (*msg)[procnum-1];
-  	  (*links)[li] = (*links)[procnum-1];
-  	  (*res)[li]   = (*res)[procnum-1];
-  	  (*links)[procnum-1] = swaplink;
-  	  (*res)[procnum-1]   = swapres;
- 	}
+         {
+            si_link swaplink = (*links)[li];
+            intvec *swapres = (*res)[li];
+            (*msg)[li]   = (*msg)[procnum-1];
+            (*links)[li] = (*links)[procnum-1];
+            (*res)[li]   = (*res)[procnum-1];
+            (*links)[procnum-1] = swaplink;
+            (*res)[procnum-1]   = swapres;
+         }
         else
-	  {
-	    if(TEST_OPT_PROT)
-	      {
-		PrintS("\n<K>\n");
-		writeTime("used time: #");
-	      }
-	    SetModus(ModCheck,strat);
-	  }
+          {
+            if(TEST_OPT_PROT)
+              {
+                PrintS("\n<K>\n");
+                writeTime("used time: #");
+              }
+            SetModus(ModCheck,strat);
+          }
        procnum--;
      }
    else
      {
        for(int i=procnum - 1 ; i>=0 ; i--)
- 	KillChild(strat,i,Cancled);
+         KillChild(strat,i,Cancled);
      }
  }
 
@@ -619,11 +619,11 @@ void skstdLink::Start(kStrategy strat)
 {
     if(lnModus==lnRead)
       {
-	SetModus(ModCalc);
+        SetModus(ModCalc);
       }
     else
       {
-	SetModus(ModRun  );
+        SetModus(ModRun  );
       }
 }
 
@@ -645,20 +645,20 @@ lists skstdLink::RestTupel()
     {
       l->Init(aktuell);
       for(i=0; i<aktuell; i++)
-	{
- 	  I=idInit(2,1);
-	  l->m[i].rtyp = IDEAL_CMD;
-	  if(Warteliste[i].p1==NULL)
-	    I->m[0]=NULL;
-	  else
-	    I->m[0]=pCopy(Warteliste[i].p1);
-	  if(Warteliste[i].p2==NULL)
-	    I->m[1]=NULL;
-	  else
-	    I->m[1]=pCopy(Warteliste[i].p2);
- 	  l->m[i].data = (void *) idCopy(I);
-  	  idDelete(&I);
-	}
+        {
+           I=idInit(2,1);
+          l->m[i].rtyp = IDEAL_CMD;
+          if(Warteliste[i].p1==NULL)
+            I->m[0]=NULL;
+          else
+            I->m[0]=pCopy(Warteliste[i].p1);
+          if(Warteliste[i].p2==NULL)
+            I->m[1]=NULL;
+          else
+            I->m[1]=pCopy(Warteliste[i].p2);
+           l->m[i].data = (void *) idCopy(I);
+            idDelete(&I);
+        }
       return l;
     }
   else
@@ -666,7 +666,7 @@ lists skstdLink::RestTupel()
       l->Init(0);
       return l;
     }
-  
+
 }
 
 //###################################################################
@@ -676,44 +676,44 @@ void skstdLink::DispMsg(stdMsg msg)
     {
 //       Print("r(%.5i) Msg =",-1);
       switch(msg) {
-      case MsgTupelisZero:  // In Step-Modus schalten bzw. bleiben.     
-	PrintS("MsgTupelisZero ");
-	break;
-      case MsgTupel:  // In Step-Modus schalten bzw. bleiben.     
-	PrintS("MsgTupel       ");
-	break;
+      case MsgTupelisZero:  // In Step-Modus schalten bzw. bleiben.
+        PrintS("MsgTupelisZero ");
+        break;
+      case MsgTupel:  // In Step-Modus schalten bzw. bleiben.
+        PrintS("MsgTupel       ");
+        break;
       case MsgEnd:
-	PrintS("MsgEnd         ");
-	break;
+        PrintS("MsgEnd         ");
+        break;
       }
     }
 }
- 
+
 void skstdLink::DispMod(int i)
 {
   if(i==-1 )
     {
       Print("r(%.5i) Mod = ",-1);
-      
+
       switch(Modus) {
       case ModCheck:
-	PrintS("Check ");
-	break;
+        PrintS("Check ");
+        break;
       case ModRun:
-	PrintS("Run   ");
-	break;
+        PrintS("Run   ");
+        break;
       case ModStep:
-	PrintS("Step  ");
-	break;
+        PrintS("Step  ");
+        break;
       case ModCalc:
-	PrintS("Calc  ");
-	break;
+        PrintS("Calc  ");
+        break;
       case ModRead:
-	PrintS("Read ");
-	break;
+        PrintS("Read ");
+        break;
       case ModWrite:
-	PrintS("Write  ");
-	break;
+        PrintS("Write  ");
+        break;
       }
       PrintS("\n");
     }

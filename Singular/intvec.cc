@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: intvec.cc,v 1.9 1998-05-24 09:51:50 obachman Exp $ */
+/* $Id: intvec.cc,v 1.10 1998-09-24 09:59:43 Singular Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -109,11 +109,11 @@ char * intvec::ivString(int mat,int spaces)
           StringAppend("%d%c",v[j*col+i],i<col-1 ? ',' : ' ');
         }
       }
-      if (j+1<row) 
+      if (j+1<row)
       {
         StringAppend("\n");
         if (spaces>0) StringAppend("%-*.*s",spaces,spaces," ");
-      }  
+      }
     }
   }
   return StringAppend("");
@@ -157,18 +157,18 @@ void intvec::operator%=(int intop)
 {
   if (intop == 0) return;
   if (intop<0) intop*=(-1);
-  for (int i=0; i<row*col; i++) 
+  for (int i=0; i<row*col; i++)
   { v[i] %= intop; if (v[i]<0) v[i] += intop; }
 }
 
 int intvec::compare(intvec* op)
 {
-  if ((col!=1) ||(op->cols()!=1)) 
+  if ((col!=1) ||(op->cols()!=1))
   {
     if((col!=op->cols())
     || (row!=op->rows()))
       return -2;
-  }    
+  }
   int i;
   for (i=0; i<min(length(),op->length()); i++)
   {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.10 1998-05-28 16:50:49 Singular Exp $ */
+/* $Id: ipconv.cc,v 1.11 1998-09-24 09:59:44 Singular Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -170,12 +170,12 @@ static void * iiS2Link(void *data)
 #if defined(INIT_BUG) || defined(PROC_BUG)
 static void * iiR2L(void * data)
 {
-  return (void *)syConvRes((syStrategy)data);  
+  return (void *)syConvRes((syStrategy)data);
 }
 
 static void * iiL2R(void * data)
 {
-  return (void *)syConvList((lists)data);  
+  return (void *)syConvList((lists)data);
 }
 #else
 #define iiR2L (iiConvertProc)syConvRes
@@ -236,7 +236,7 @@ struct sConvertTypes dConvertTypes[] =
 //  intvec
 //  link
    { STRING_CMD,      LINK_CMD,       iiS2Link },
-// resolution -> list   
+// resolution -> list
    { RESOLUTION_CMD,  LIST_CMD,       iiR2L },
 // list -> resolution
    { LIST_CMD,        RESOLUTION_CMD, iiL2R },

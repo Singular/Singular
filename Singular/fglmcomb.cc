@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmcomb.cc,v 1.12 1998-06-04 13:38:48 wichmann Exp $
+// $Id: fglmcomb.cc,v 1.13 1998-09-24 09:59:38 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -191,9 +191,9 @@ fglmNewLinearCombination( ideal source, poly monset )
 //         m[k]= pOne();
 //         pSetExpV( m[k], temp->exp );
 //         pSetm( m[k] );
-	m[k]= pNew();
-	pCopy2( m[k], temp );
-	pSetCoeff( m[k], nInit(1) );
+        m[k]= pNew();
+        pCopy2( m[k], temp );
+        pSetCoeff( m[k], nInit(1) );
         pIter( temp );
     }
 
@@ -241,19 +241,19 @@ fglmNewLinearCombination( ideal source, poly monset )
         poly temp = current;
         int b;
         while ( temp != NULL )
-	{
+        {
             BOOLEAN found = FALSE;
             for ( b= 0; (b < basisSize) && (found == FALSE); b++ )
-	    {
+            {
                 if ( pEqual( temp, basis[b] ) )
-		{
+                {
                     found= TRUE;
                 }
             }
             if ( found == FALSE )
-	    {
+            {
                 if ( basisSize == basisMax )
-		{
+                {
                     // Expand the basis
                     basis= (polyset)ReAlloc( basis, basisMax * sizeof( poly ), (basisMax + basisBS ) * sizeof( poly ) );
                     basisMax+= basisBS;
@@ -261,9 +261,9 @@ fglmNewLinearCombination( ideal source, poly monset )
 //                 basis[basisSize]= pOne();
 //                 pSetExpV( basis[basisSize], temp->exp );
 //                 pSetm( basis[basisSize] );
-		basis[basisSize]= pNew();
-		pCopy2( basis[basisSize], temp );
-		pSetCoeff( basis[basisSize], nInit(1) );
+                basis[basisSize]= pNew();
+                pCopy2( basis[basisSize], temp );
+                pSetCoeff( basis[basisSize], nInit(1) );
                 basisSize++;
             }
             pIter( temp );
@@ -279,7 +279,7 @@ fglmNewLinearCombination( ideal source, poly monset )
     // get the vector representation
     for ( k= 0; k < numMonoms; k++ ) {
         STICKYPROT( "." );
- 
+
 #ifndef HAVE_EXPLICIT_CONSTR
         v[k].mac_constr_i( basisSize );
 #else
@@ -351,7 +351,7 @@ fglmNewLinearCombination( ideal source, poly monset )
             act++;
         }
 #ifndef HAVE_EXPLICIT_CONSTR
-	v[best-1].clearelems();
+        v[best-1].clearelems();
 #else
         v[best-1].~fglmVector();
 #endif

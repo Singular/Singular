@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.25 1998-08-05 11:12:32 Singular Exp $
+// $Id: primdec.lib,v 1.26 1998-09-24 09:59:51 Singular Exp $
 ////////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                                //
 // algorithms for primary decomposition based on                              //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                             //
 ////////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.25 1998-08-05 11:12:32 Singular Exp $";
+version="$Id: primdec.lib,v 1.26 1998-09-24 09:59:51 Singular Exp $";
 info="
 LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION
 
@@ -382,7 +382,7 @@ proc specialIdealsEqual( ideal k1, ideal k2)
 
    if(size(k1)==size(k2))
    {
-      for(j=1;j<=size(k1);j++)
+      for(j=size(k1);j>0;j--)
       {
          if(leadexp(k1[j])!=leadexp(k2[j]))
          {
@@ -400,7 +400,7 @@ proc stdIdealsEqual( ideal k1, ideal k2)
 
    if(size(k1)==size(k2))
    {
-      for(j=1;j<=size(k1);j++)
+      for(j=size(k1);j>0;j--)
       {
          if(leadexp(k1[j])!=leadexp(k2[j]))
          {

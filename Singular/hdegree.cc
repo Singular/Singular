@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hdegree.cc,v 1.12 1998-04-08 10:01:58 pohl Exp $ */
+/* $Id: hdegree.cc,v 1.13 1998-09-24 09:59:42 Singular Exp $ */
 /*
 *  ABSTRACT -  dimension, multiplicity, HC, kbase
 */
@@ -1157,8 +1157,8 @@ static Exponent_t scRestrict( int &Nstc, scfmon stc, int Nvar)
     {
       if (stc[i] && (stc[i][Nvar] >= y))
       {
-	Istc--;
-	stc[i] = NULL;
+        Istc--;
+        stc[i] = NULL;
       }
     }
     j = 0;
@@ -1266,7 +1266,7 @@ static void scDegKbase( scfmon stc, int Nstc, int Nvar, Exponent_t deg)
       if (ideg < sn[i][Nvar])
       {
         Istc--;
-	sn[i] = NULL;
+        sn[i] = NULL;
       }
     }
     if (Istc == 0)
@@ -1281,8 +1281,8 @@ static void scDegKbase( scfmon stc, int Nstc, int Nvar, Exponent_t deg)
     {
       if (sn[i])
       {
-	sn[j] = sn[i];
-	j++;
+        sn[j] = sn[i];
+        j++;
       }
     }
     Nstc = Istc;
@@ -1327,7 +1327,7 @@ static void scInKbase( scfmon stc, int Nstc, int Nvar)
       if (ideg < sn[i][Nvar])
       {
         Istc--;
-	sn[i] = NULL;
+        sn[i] = NULL;
       }
     }
     j = 0;
@@ -1337,8 +1337,8 @@ static void scInKbase( scfmon stc, int Nstc, int Nvar)
     {
       if (sn[i])
       {
-	sn[j] = sn[i];
-	j++;
+        sn[j] = sn[i];
+        j++;
       }
     }
     Nstc = Istc;

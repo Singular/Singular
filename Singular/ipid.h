@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.15 1998-08-25 13:33:18 krueger Exp $ */
+/* $Id: ipid.h,v 1.16 1998-09-24 09:59:45 Singular Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -149,7 +149,7 @@ class namerec {
   BOOLEAN    isroot;
 #define NSROOT(a) ((a)->pack->idroot)
 #define NSPACK(a) ((a)->pack)
-  
+
 
  namerec()  { memset(this,0,sizeof(*this)); }
   //namehdl    Set(idhdl root);

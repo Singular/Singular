@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.24 1998-04-23 09:52:14 Singular Exp $ */
+/* $Id: longalg.cc,v 1.25 1998-09-24 09:59:47 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1016,16 +1016,10 @@ static alg napGcd(alg a, alg b)
   h=b;
   if (!naIsChar0) x = napInit(1);
   else            x = napGcd0(g,h);
-  //int huhu=0;
   for (i=(naNumbOfPar-1); i>=0; i--)
   {
     x->e[i] = napExpi(i,a,b);
-    //huhu+=x->e[i];
   }
-  //if (huhu!=0) 
-  //{
-  //  Print("{%d}",huhu);
-  //}
   return x;
 }
 

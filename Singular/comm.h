@@ -85,12 +85,12 @@ public:
    ~skintarray() {
      if(vec!=NULL)
        {
-  	for(int i=0; i<nr; i++)
- 	  {
- 	    if((vec[i])!=NULL)
- 	      delete (vec[i]);
- 	    vec[i]=NULL;
- 	  }
+          for(int i=0; i<nr; i++)
+           {
+             if((vec[i])!=NULL)
+               delete (vec[i]);
+             vec[i]=NULL;
+           }
        }
      Free((ADDRESS)vec,sizeof(intvec*)*nr);
      vec=NULL;

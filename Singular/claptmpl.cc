@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.17 1998-06-30 16:30:05 schmidt Exp $
+// $Id: claptmpl.cc,v 1.18 1998-09-24 09:59:35 Singular Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -93,8 +93,8 @@ template <class T>
 Substitution<T>& Substitution<T>::operator= ( const Substitution<T>& f )
 {
     if ( this != &f ) {
-	_factor = f._factor;
-	_exp = f._exp;
+        _factor = f._factor;
+        _exp = f._exp;
     }
     return *this;
 }

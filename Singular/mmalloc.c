@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmalloc.c,v 1.5 1998-01-24 17:22:06 Singular Exp $ */
+/* $Id: mmalloc.c,v 1.6 1998-09-24 09:59:49 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -91,18 +91,18 @@ void * mmDBRealloc( void* adr, size_t newsize, char* fname, int lineno )
 #ifdef DO_DEEP_PROFILE
 void _memcpyW(void* p1, void* p2, long l)
 {
-  long _i = l;                                  
-  long* _s1 = (long*) p1;                       
-  const long* _s2 = (long*) p2;                 
-                                                
-  for (;;)                                      
-  {                                             
-    *_s1 = *_s2;                                
-    _i--;                                       
-    if (_i == 0) break;                         
-    _s1++;                                      
-    _s2++;                                      
-  }                                             
-}                                               
-#endif  
+  long _i = l;
+  long* _s1 = (long*) p1;
+  const long* _s2 = (long*) p2;
+
+  for (;;)
+  {
+    *_s1 = *_s2;
+    _i--;
+    if (_i == 0) break;
+    _s1++;
+    _s2++;
+  }
+}
+#endif
 
