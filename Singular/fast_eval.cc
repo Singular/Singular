@@ -127,7 +127,7 @@ void maPoly_Eval(mapoly root, ring src_r, ideal dest_id, ring dest_r, int total_
     if (total_cost)
     {
       assume(TEST_OPT_PROT);
-      cost += pDeg(p->src, src_r);
+      cost++;
       if (cost > next_print_cost)
       {
         Print("-");

@@ -6,7 +6,7 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id: fast_maps.cc,v 1.25 2002-01-19 20:21:19 obachman Exp $
+ *  Version: $Id: fast_maps.cc,v 1.26 2002-01-19 20:55:17 obachman Exp $
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>
@@ -383,9 +383,11 @@ ideal fast_map(ideal map_id, ring map_r, ideal image_id, ring image_r)
       
   // do the actual evaluation
   maPoly_Eval(mp, src_r, dest_id, dest_r, length);
-
+  if (TEST_OPT_PROT) Print(".");
+  
   // collect the results back into an ideal
   ideal res_dest_id = maIdeal_2_Ideal(mideal, dest_r);
+  if (TEST_OPT_PROT) Print(".");
 
   // convert result back to image_r
   ideal res_image_id;
@@ -397,6 +399,7 @@ ideal fast_map(ideal map_id, ring map_r, ideal image_id, ring image_r)
   else
     res_image_id = res_dest_id;
   
+  if (TEST_OPT_PROT) Print(".");
   // clean-up the rings
   maMap_KillRings(map_r, image_r, src_r, dest_r);
 
