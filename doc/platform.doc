@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: platform.doc,v 1.9 2000-12-12 11:30:42 Singular Exp $
+@comment $Id: platform.doc,v 1.10 2001-02-02 16:17:53 Singular Exp $
 @comment this file contains Release notes and various howto's
 
 @c The following directives are necessary for proper compilation
@@ -85,7 +85,5 @@ Development version can be downloaded from
 @cindex instructions, Macintosh installation
 @cindex howto, install on Macintosh
 
-TBC
-
-
-
+@c TBC
+The port of @sc{Singular} will be aviable soon.

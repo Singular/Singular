@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.202 2001-01-16 14:36:27 lossen Exp $
+@comment $Id: reference.doc,v 1.203 2001-02-02 16:17:53 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -3629,7 +3629,6 @@ The second argument describes what to log: @code{"i"} means input,
 and opens the file given by the first string expression.
 @*@code{monitor ("")} turns off recording.
 @item @strong{Example:}
-@c TBC geht nicht
 @smallexample
 @c example no_comp
   monitor("doe.tmp","io"); // log input and output to doe.tmp

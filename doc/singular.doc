@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.107 2001-01-19 10:38:22 keilen Exp $
+@comment $Id: singular.doc,v 1.108 2001-02-02 16:17:56 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -431,8 +431,7 @@ LIB "all.lib";
 @c ---------------------------------------------------------
 @node solve_lib, triang_lib, presolve_lib, Symbolic-numerical solving
 @subsection solve_lib
-@c TBC
-@c lib solve.lib no_ex
+@c lib solve.lib
 @c ---------------------------------------------------------
 @node triang_lib, ntsolve_lib,  solve_lib, Symbolic-numerical solving
 @subsection triang_lib
