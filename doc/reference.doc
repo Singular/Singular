@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.190 2000-06-05 12:58:51 obachman Exp $
+@comment $Id: reference.doc,v 1.191 2000-06-05 14:58:27 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4555,8 +4555,9 @@ below).
 the description of the format string @code{"betti"} below for more
 details.
 @*The last form returns the printed output as a string. The format
-string determines, which format to use to generate the string. The
-following format strings are supported:
+string determines, which format to use to generate the string. 
+
+The following format strings are supported:
 @table @code
 @item "betti"
 The Betti numbers are printed in a matrix like format where the entry
@@ -4587,9 +4588,8 @@ returns @code{string(} expression @code{)}
 similar to @code{"%s"}, except that newlines are inserted after every
 comma and at the end
 @item "%l"
-similar to @code{"%s"}, except that embracing explicite type casts are
-inserted as much as possible (this is mostly useful for "cutting and
-pasting")
+similar to @code{"%s"}, except that each object is embraced by its type
+such that it can be directly used for "cutting and pasting"
 @item "%2l"
 similar to @code{"%l"}, except that newlines are inserted after every
 comma and at the end
@@ -4606,19 +4606,35 @@ returns the string equivalent to typing @code{print(expression, "betti");}
 @smallexample
 @c example
   ring r=0,(x,y,z),dp;
-  module m=[1,y],[0,x+z];
+  module m=[1,y],[0,x+z]; 
+
   m;
+
   print(m);  // the columns generate m
-  intmat M=betti(mres(m,0));
-  print(M,"betti");
-  string s = print(m, "%;"); s;
+
+  string s = print(m, "%s"); s;
+
+  s = print(m, "%2s"); s;
+
+  s = print(m, "%l"); s;
+ 
+  s = print(m, "%;"); s;
+
+  s = print(m, "%t"); s;
+
   s = print(m, "%p"); s;
-  s = print(M, "%b"); s;
-  s = print(M, "%t"); s;
+
+
+  intmat M=betti(mres(m,0)); print(M,"betti");
+     
+   
   list l = r, m, M;
   s = print(l, "%s"); s;
+
   s = print(l, "%2s"); s;
+
   s = print(l, "%l"); s;
+
 @c example
 @end smallexample
 @end table
@@ -6196,22 +6212,37 @@ base.
 specified by the string from the data base.
 @item @strong{Example:}
 @smallexample
-//write the lines with the values of the variables f and i
-//then the value of m+a into the file "outfile"
-write(":w outfile",f,i,m+a);
-string filename=":a outfile";
-//now append the string "that was f,i,m+a" (without the quotes)
+// write the values of the variables f and i as strings into the file
+// "outfile" (overwrite it, if it exists)
+write(":w outfile",f,i);
+
+// now append the string "that was f,i" (without the quotes)
 // at the end of the file "outfile"
-write(filename,"that was f,i,m+a");
-// saving and retrieving data:
+write(":a outfile", "that was f,i");
+// alternatively, links could be used:
+link l = ":a outfile"; l;
+// type : ASCII
+// mode : a
+// name : outfile
+// open : no
+// read : not ready
+// write: not ready
+write(l, " that was f,i");
+
+
+// saving and retrieving data (ASCII format):
 ring r=32003,(x,y,z),dp;
 ideal i=x+y,z3+22y;
 write(":w save_i",i);// this writes x+y,z3+22y to the file save_i
-
 ring r=32003,(x,y,z),dp;
 string s=read("save_i");   //creates the string x+y,z3+22y
 execute("ideal k="+s+";"); // this defines an ideal k which
                            // is equal to i.
+
+// for large objects, the MP format and MPfile links are better:
+write("MPfile:w save_i.mp", i);
+def j = read("MPfile:r save_i.mp");
+
 @end smallexample
 @end table
 @c ref
@@ -6222,6 +6253,8 @@ See
 @ref{quote};
 @ref{eval};
 @ref{dump};
+@ref{print};
+@ref{printf};
 @ref{short}.
 @c ref
 
