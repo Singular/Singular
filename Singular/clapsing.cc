@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.81 2003-01-30 14:55:01 Singular Exp $
+// $Id: clapsing.cc,v 1.82 2003-02-04 18:17:26 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -698,7 +698,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
   On(SW_USE_NTL);
   #ifdef HAVE_NTL
   extern int prime_number;
-  //if(rField_is_Q()) prime_number=0;
+  if(rField_is_Q()) prime_number=0;
   #endif
   CFFList L;
   number N=NULL;
@@ -914,11 +914,14 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
   if (rField_is_Q_a() && (currRing->minpoly!=NULL))
   {
     int i=IDELEMS(res)-1;
-    for(;i>=1;i--)
+    int stop=1;
+    if (with_exps!=0) stop=0;
+    for(;i>=stop;i--)
     {
       pNorm(res->m[i]);
     }
-    pSetCoeff(res->m[0],old_lead_coeff);
+    if (with_exps==0) pSetCoeff(res->m[0],old_lead_coeff);
+    else nDelete(&old_lead_coeff);
   }
   else
     nDelete(&old_lead_coeff);
