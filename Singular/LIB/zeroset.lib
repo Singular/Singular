@@ -18,7 +18,7 @@
 // Universitaet Kaiserslautern
 ///////////////////////////////////////////////////////////////////////////////
 
-version="Id: zeroset.lib,v 1.0 2000/05/19 12:32:15 Singular Exp $";
+version="$Id: zeroset.lib,v 1.2 2000-12-11 13:15:38 Singular Exp $";
 info="
 LIBRARY:  zeroset.lib      PROCEDURES FOR ROOTS AND FACTORIZATION
 
