@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.59 1998-05-20 07:40:40 wichmann Exp $
+@comment $Id: types.doc,v 1.60 1998-05-20 09:00:42 schmidt Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -2852,6 +2852,11 @@ in form of a standard basis.
 @subsection qring declaration
 @cindex qring declaration
 
+@c ------------------------------------------------------------
+@c   This piece of text exists also in the file general.doc,
+@c   chapter "General syntax of a ring declaration".
+@c   If you change something here, change it there, too!
+@c ------------------------------------------------------------
 @table @strong
 @item Syntax:
 @code{qring} name @code{=} ideal_expression @code{;}
