@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.46 1999-10-27 15:04:45 Singular Exp $ */
+/* $Id: kutil.cc,v 1.47 1999-10-27 15:08:20 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -309,7 +309,7 @@ BOOLEAN K_Test (char *f, int l, kStrategy strat, int pref)
   BOOLEAN ret = TRUE;
   // test P
 #ifdef MDEBUG
-  if (pref) mmStartReferenceWatch();
+  if (pref >= 2) mmStartReferenceWatch();
 #endif
   ret = K_Test_L(f, l, &(strat->P),
                  (strat->P.p != NULL && pNext(strat->P.p) != strat->tail),
@@ -324,7 +324,7 @@ BOOLEAN K_Test (char *f, int l, kStrategy strat, int pref)
   if (strat->T != NULL)
   {
 #ifdef MDEBUG
-    if (! pref) mmStartReferenceWatch();
+    if (pref && pref <= 1) mmStartReferenceWatch();
 #endif
     for (i=0; i<=strat->tl; i++)
     {
@@ -335,7 +335,7 @@ BOOLEAN K_Test (char *f, int l, kStrategy strat, int pref)
     }
   }
 #ifdef MDEBUG
-  mmStopReferenceWatch();
+  if (pref) mmStopReferenceWatch();
 #endif
   // test L
   if (strat->L != NULL)
