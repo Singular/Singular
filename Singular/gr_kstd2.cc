@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.10 2002-12-06 20:51:39 levandov Exp $ */
+/* $Id: gr_kstd2.cc,v 1.11 2003-03-05 14:35:31 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -78,7 +78,7 @@ int redGrFirst (LObject* h,kStrategy strat)
       }
       (*h).p = nc_spGSpolyRed(strat->S[j],(*h).p, NULL, currRing);
       //spSpolyRed(strat->T[j].p,(*h).p,strat->kNoether);
-      
+
       if (TEST_OPT_DEBUG)
       {
         PrintS(" to ");
@@ -91,7 +91,7 @@ int redGrFirst (LObject* h,kStrategy strat)
       }
       if (TEST_OPT_INTSTRATEGY)
       {
-	pCleardenom((*h).p);
+        pCleardenom((*h).p);
       }
       /*computes the ecart*/
       d = pLDeg((*h).p,&((*h).length));
@@ -636,10 +636,10 @@ static int redBest (LObject*  h,kStrategy strat)
                 pLmFree(p);
                 pDelete(&((*h).p));
                 if (h->lcm!=NULL)
-		{
-		  pLmFree((*h).lcm);
+                {
+                  pLmFree((*h).lcm);
                   (*h).lcm=NULL;
-		}
+                }
                 return 0;
               }
               else if (pLmCmp(ph,p) == -1)
@@ -661,10 +661,10 @@ static int redBest (LObject*  h,kStrategy strat)
       else
       {
         if (h->lcm!=NULL)
-	{
-	  pLmFree((*h).lcm);
+        {
+          pLmFree((*h).lcm);
           (*h).lcm=NULL;
-	}  
+        }
         (*h).p = NULL;
         return 0;
       }
@@ -799,6 +799,7 @@ ideal gr_bba (ideal F, ideal Q,kStrategy strat)
   initBuchMoraPos(strat);
   /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
   /*Shdl=*/initBuchMora(F, Q,strat);
+  strat->posInT=posInT110;
   srmax = strat->sl;
   reduc = olddeg = lrmax = 0;
   /* compute------------------------------------------------------- */
@@ -830,8 +831,8 @@ ideal gr_bba (ideal F, ideal Q,kStrategy strat)
       /* the real one */
       if ((currRing->nc->type==nc_lie) && pHasNotCF(strat->P.p1,strat->P.p2)) /* prod crit */
       {
-	strat->cp++;
-	/* prod.crit itself in nc_spGSpolyCreate */
+        strat->cp++;
+        /* prod.crit itself in nc_spGSpolyCreate */
       }
       strat->P.p = nc_spGSpolyCreate(strat->P.p1,strat->P.p2,strat->kNoether,currRing);
     }
@@ -846,10 +847,10 @@ ideal gr_bba (ideal F, ideal Q,kStrategy strat)
     if (strat->P.p != NULL)
     {
           /* statistic */
-          if (TEST_OPT_PROT) 
-	  {
-	    PrintS("s\n");
-	  }
+          if (TEST_OPT_PROT)
+          {
+            PrintS("s\n");
+          }
           /* enter P.p into s and L */
           {
             strat->P.sev=0;
@@ -860,8 +861,8 @@ ideal gr_bba (ideal F, ideal Q,kStrategy strat)
                 if ((strat->syzComp==0)||(!strat->homog))
                 {
                   strat->P.p = redtailBba(strat->P.p,pos-1,strat);
-		}
-		pCleardenom(strat->P.p);
+                }
+                pCleardenom(strat->P.p);
               }
               else
               {
@@ -871,8 +872,8 @@ ideal gr_bba (ideal F, ideal Q,kStrategy strat)
                   strat->P.p = redtailBba(strat->P.p,pos-1,strat);
                 }
               }
-	      // PLURAL debug
-	      /* should be used only internally!!! */
+              // PLURAL debug
+              /* should be used only internally!!! */
 
               //pWrite(strat->P.p);
 
@@ -882,8 +883,8 @@ ideal gr_bba (ideal F, ideal Q,kStrategy strat)
                 wrp(strat->P.p);
                 PrintLn();
               }
-	      // kTest(strat); 
-	      // 
+              // kTest(strat);
+              //
               enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat);
               if (strat->sl==-1) pos=0;
               else pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
