@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.26 1998-05-14 19:01:50 Singular Exp $
+@comment $Id: singular.doc,v 1.27 1998-05-15 11:57:39 schmidt Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -375,7 +375,7 @@ int i,j = tworeturn();
 @enumerate
 @item integer division
 @cindex integer division
-@cindex mod
+@cindex div
 
 A sequence of digits and @code{/} without spaces is of type number.
 With spaces it is an expression of type int
