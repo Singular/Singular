@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.1 1997-04-03 12:16:50 Singular Exp $ */
+/* $Id: syz1.cc,v 1.2 1997-04-04 12:32:53 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -275,7 +275,7 @@ static void syzSetm(poly p)
     pGetOrder(p) = j;
   }
   else
-   pGetOrder(p)=i;
+    pGetOrder(p)=i;
 }
 
 static inline poly syMultT(poly p,poly m)
@@ -1286,7 +1286,7 @@ static void syRedNextPairs(SSet nextPairs, resolvente res, resolvente orderedRes
       currcomponents = truecomponents[index];
       res[index+1]->m[ks] = syRedtail(nextPairs[i].syz,orderedRes[index+1],index+1);
       currcomponents = truecomponents[index-1];
-      res[index+1]->m[ks] = nextPairs[i].syz;
+      //res[index+1]->m[ks] = nextPairs[i].syz;
       pNorm(res[index+1]->m[ks]);
       nextPairs[i].syz =NULL;
       syOrder(res[index+1]->m[ks],res,orderedRes,index+1,ks+1);
@@ -1965,6 +1965,7 @@ resolvente syLaScala1(ideal arg,int * length)
   resolvente res,orderedRes;
   SSet nextPairs;
   SRes resPairs;
+  pSetmProc oldSetm=pSetm;
 
   //crit = 0;
   //zeroRed = 0;
@@ -1975,15 +1976,24 @@ resolvente syLaScala1(ideal arg,int * length)
   //orderingdepth = new intvec(pVariables+1);
   if (*length<=0) *length = pVariables+2;
   if (idIs0(arg)) return NULL;
-/*--- changes to a dpc-ring with special comp0------*/
-  ord = (int*)Alloc0(3*sizeof(int));
-  b0 = (int*)Alloc0(3*sizeof(int));
-  b1 = (int*)Alloc0(3*sizeof(int));
-  ord[0] = ringorder_dp;
-  ord[1] = ringorder_C;
-  b0[1] = 1;
-  b1[0] = pVariables;
-  pChangeRing(pVariables,1,ord,b0,b1,currRing->wvhdl);
+  if ((currRing->order[0]==ringorder_dp)
+  &&  (currRing->order[1]==ringorder_C)
+  &&  (currRing->order[2]==0))
+  {
+    ord=NULL;
+  }  
+/*--- changes to a dpC-ring with special comp0------*/
+  else
+  {
+    ord = (int*)Alloc0(3*sizeof(int));
+    b0 = (int*)Alloc0(3*sizeof(int));
+    b1 = (int*)Alloc0(3*sizeof(int));
+    ord[0] = ringorder_dp;
+    ord[1] = ringorder_C;
+    b0[1] = 1;
+    b1[0] = pVariables;
+    pChangeRing(pVariables,1,ord,b0,b1,currRing->wvhdl);
+  }  
 /*--- initializes the data structures---------------*/
   Tl = new intvec(*length);
   temp = idInit(IDELEMS(arg),arg->rank);
@@ -2117,8 +2127,15 @@ resolvente syLaScala1(ideal arg,int * length)
   if (BTEST1(6)) syStatistics(res,(*length+1));
   (*length)++;
 /*--- changes to the original ring------------------*/
-  pChangeRing(pVariables,currRing->OrdSgn,currRing->order,
+  if (ord!=NULL)
+  {
+    pChangeRing(pVariables,currRing->OrdSgn,currRing->order,
     currRing->block0,currRing->block1,currRing->wvhdl);
+  }
+  else
+  {
+    pSetm=oldSetm;
+  }
   syReOrderResolventFB(res,*length,2);
   for (i=0;i<*length-1;i++)
   {
@@ -2137,20 +2154,18 @@ resolvente syLaScala1(ideal arg,int * length)
       {
         for (j=0;j<IDELEMS(res[i]);j++)
         {
-          p = res[i]->m[j];
-          while (p!=NULL)
-          {
-            pSetm(p);
-            pIter(p);
-          }
+          res[i]->m[j] = pOrdPoly(res[i]->m[j]);
         }
       }
     }
   }
   res[*length-1] = NULL;
-  Free((ADDRESS)ord,3*sizeof(int));
-  Free((ADDRESS)b0,3*sizeof(int));
-  Free((ADDRESS)b1,3*sizeof(int));
+  if (ord!=NULL)
+  {
+    Free((ADDRESS)ord,3*sizeof(int));
+    Free((ADDRESS)b0,3*sizeof(int));
+    Free((ADDRESS)b1,3*sizeof(int));
+  }  
   Free((ADDRESS)binomials,pVariables*(highdeg_1)*sizeof(int));
   pDelete1(&redpol);
   if (TEST_OPT_PROT) 
@@ -2159,8 +2174,6 @@ resolvente syLaScala1(ideal arg,int * length)
     //Print("dsim: %d\n",dsim);
     //Print("crit %d-times used \n",crit); 
     //Print("%d reductions to zero \n",zeroRed);
-    Print("depth of ordering calls\n");
-    //orderingdepth->show();
   }
   //delete orderingdepth;
   return res;
@@ -2375,8 +2388,6 @@ resolvente syLaScala2(ideal arg,int * length)
     //Print("dsim: %d\n",dsim);
     //Print("crit %d-times used \n",crit); 
     //Print("%d reductions to zero \n",zeroRed);
-    Print("depth of ordering calls\n");
-    //orderingdepth->show();
   }
   //delete orderingdepth;
   return res;
