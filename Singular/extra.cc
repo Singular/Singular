@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.146 2000-09-25 12:26:30 obachman Exp $ */
+/* $Id: extra.cc,v 1.147 2000-10-16 12:06:34 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -740,7 +740,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     else
 #endif
 /*==================== pDivStat =============================*/
-#ifdef PDEBUG
+#if defined(PDEBUG) || defined(PDIV_DEBUG)
     if(strcmp(sys_cmd,"pDivStat")==0)
     {
       extern void pPrintDivisbleByStat();

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.11 2000-10-04 13:12:01 obachman Exp $ */
+/* $Id: kspoly.cc,v 1.12 2000-10-16 12:06:34 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -21,9 +21,6 @@
 #endif
 
 
-#define NEW_STUFF
-
-#ifdef NEW_STUFF
 /***************************************************************
  *
  * Reduces PR with PW
@@ -98,7 +95,6 @@ void ksReducePoly(LObject* PR,
   
   p_LmDelete(lm, tailRing);
 }
-#endif
 
 /***************************************************************
  *
@@ -106,7 +102,6 @@ void ksReducePoly(LObject* PR,
  * 
  *
  ***************************************************************/
-#ifdef NEW_STUFF
 void ksCreateSpoly(LObject* Pair,poly spNoether, 
                    int use_buckets, ring tailRing)
 {
@@ -188,7 +183,6 @@ void ksCreateSpoly(LObject* Pair,poly spNoether,
     }
   }
 }
-#endif
 
 //////////////////////////////////////////////////////////////////////////
 // Reduces PR at Current->next with PW
@@ -196,7 +190,6 @@ void ksCreateSpoly(LObject* Pair,poly spNoether,
 //         Current->next != NULL, LM(PW) devides LM(Current->next)
 // Changes: PR
 // Const:   PW
-#ifdef NEW_STUFF
 void ksSpolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
 {
   poly Lp = PR->p;
@@ -231,189 +224,6 @@ void ksSpolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
     PW->p = Save; // == Lp
   }
 }
-
-#endif
-
-#ifndef NEW_STUFF
-
-void ksReducePoly(LObject* PR,
-                  TObject* PW,
-                  poly spNoether,
-                  number *coef)
-{
-  poly p1 = PR->p;
-  poly p2 = PW->p;
-
-  assume(p2 != NULL && p1 != NULL && pDivisibleBy(p2,  p1));
-  assume(pGetComp(p1) == pGetComp(p2) || 
-         (pMaxComp(p2) == 0));
-  
-  poly a2 = pNext(p2), lm = p1;
-
-  p1 = pNext(p1);
-
-  if (a2==NULL)
-  {
-    pDeleteLm(&lm);
-    PR->p = p1;
-    if (coef != NULL) *coef = nInit(1);
-    return;
-  }
-
-  if (! nIsOne(pGetCoeff(p2)))
-  {
-    number bn = pGetCoeff(lm);
-    number an = pGetCoeff(p2);
-    int ct = ksCheckCoeff(&an, &bn);
-    pSetCoeff(lm, bn);
-    if ((ct == 0) || (ct == 2)) 
-      p1 = pMult_nn(p1, an);
-    if (coef != NULL) *coef = an;
-    else nDelete(&an);
-  }
-  else
-  {
-    if (coef != NULL) *coef = nInit(1);
-  }
-  
-  
-  // pMonSubFrom(lm, p2);
-  pExpVectorSub(lm, p2);
-  int dummy;
-  PR->p = currRing->p_Procs->p_Minus_mm_Mult_qq(p1, lm, a2, 
-                                                dummy, spNoether, currRing);
-
-  pDeleteLm(&lm);
-}
-#endif
-
-#ifndef NEW_STUFF
-
-/***************************************************************
- *
- * Creates S-Poly of p1 and p2
- * 
- *
- ***************************************************************/
-void ksCreateSpoly(LObject* Pair, 
-                   poly spNoether,
-                   int use_buckets, ring tailRing)
-{
-  assume(kTest_L(Pair));
-  poly p1 = Pair->p1;
-  poly p2 = Pair->p2;
-
-  assume(p1 != NULL);
-  assume(p2 != NULL);
-
-  poly a1 = pNext(p1), a2 = pNext(p2);
-  number lc1 = pGetCoeff(p1), lc2 = pGetCoeff(p2);
-  poly m1, m2;
-  int co=0, ct = ksCheckCoeff(&lc1, &lc2);
-  int x, l1;
-
-  if (pGetComp(p1)!=pGetComp(p2))
-  {
-    if (pGetComp(p1)==0)
-    {
-      co=1;
-      pSetCompP(p1,pGetComp(p2));
-    }
-    else
-    {
-      co=2;
-      pSetCompP(p2,pGetComp(p1));
-    }
-  }
-
-  // get m1 = LCM(LM(p1), LM(p2))/LM(p1)
-  //     m2 = LCM(LM(p1), LM(p2))/LM(p2)
-  m1 = pInit();
-  m2 = pInit();
-  for (int i = pVariables; i; i--)
-  {
-    x = pGetExpDiff(p1, p2, i);
-    if (x > 0)
-    {
-      pSetExp(m2,i,x);
-      pSetExp(m1,i,0);
-    }
-    else
-    {
-      pSetExp(m1,i,-x);
-      pSetExp(m2,i,0);
-    }
-  }
-  pSetm(m1);
-  pSetm(m2);           // now we have m1 * LM(p1) == m2 * LM(p2)
-  pSetCoeff0(m1, lc2);
-  pSetCoeff0(m2, lc1); // and now, m1 * LT(p1) == m2 * LT(p2)
-
-  // get m2 * a2
-  a2 = currRing->p_Procs->pp_Mult_mm(a2, m2, spNoether, currRing);
-
-  // and, finally, the spoly
-  int dummy;
-  Pair->p = currRing->p_Procs->p_Minus_mm_Mult_qq(a2, m1, a1, 
-                                                  dummy, spNoether,
-                                                  currRing);
-  
-  // Clean-up time
-  pDeleteLm(&m1);
-  pDeleteLm(&m2);
-  
-  if (co != 0)
-  {
-    if (co==1)
-    {
-      pSetCompP(p1,0);
-    }
-    else
-    {
-      pSetCompP(p2,0);
-    }
-  }
-}
-#endif
-
-#ifndef NEW_STUFF
-//////////////////////////////////////////////////////////////////////////
-// Reduces PR at Current->next with PW
-// Assumes PR != NULL, Current contained in PR 
-//         Current->next != NULL, LM(PW) devides LM(Current->next)
-// Changes: PR
-// Const:   PW
-void ksSpolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
-{
-  poly Lp = PR->p;
-  number coef;
-  poly Save = PW->p;
-  
-  if (Lp == Save)
-    PW->p = pCopy(Save);
-    
-  assume(Lp != NULL && Current != NULL && pNext(Current) != NULL);
-  assume(pIsMonomOf(Lp, Current));
-  
-  PR->p = pNext(Current);
-  ksReducePoly(PR, PW, spNoether, &coef);
-  
-  if (! nIsOne(coef))
-  {
-    pNext(Current) = NULL;
-    pMult_nn(Lp, coef);
-  }
-  nDelete(&coef);
-  pNext(Current) = PR->p;
-  PR->p = Lp;
-  if (PW->p != Save)
-  {
-    pDelete(&(PW->p));
-    PW->p = Save; // == Lp
-  }
-}
-
-#endif
 
 /***************************************************************
  *

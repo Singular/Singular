@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.49 2000-10-04 13:12:02 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.50 2000-10-16 12:06:35 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -187,7 +187,7 @@ static int redHoney (LObject*  h,kStrategy strat)
   if (strat->tl<0) return 1;
 
   poly pi;
-  int i,j,at,reddeg,d,pass,ei, ii;
+  int i,j,at,reddeg,d,pass,ei, ii, h_d;
   unsigned long not_sev;
 
   pass = j = 0;
@@ -299,11 +299,12 @@ static int redHoney (LObject*  h,kStrategy strat)
     }
     h->sev = pGetShortExpVector(h->p);
     not_sev = ~ h->sev;
+    h_d = pFDeg(h->p);
     /* compute the ecart */
     if (ei <= (*h).ecart)
-      (*h).ecart = d-pFDeg((*h).p);
+      (*h).ecart = d-h_d;
     else
-      (*h).ecart = d-pFDeg((*h).p)+ei-(*h).ecart;
+      (*h).ecart = d-h_d+ei-(*h).ecart;
     /*
      * try to reduce the s-polynomial h
      *test first whether h should go to the lazyset L
@@ -311,7 +312,7 @@ static int redHoney (LObject*  h,kStrategy strat)
      *-if the number of pre-defined reductions jumps
      */
     pass++;
-    d = pFDeg((*h).p)+(*h).ecart;
+    d = h_d +(*h).ecart;
     if ((strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
     {
       at = strat->posInL(strat->L,strat->Ll,*h,strat);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.62 2000-09-18 09:19:29 obachman Exp $ */
+/* $Id: polys.cc,v 1.63 2000-10-16 12:06:38 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -779,7 +779,17 @@ void pSetGlobals(ring r, BOOLEAN complete)
       test &= ~Sy_bit(OPT_REDTAIL); /* noredTail */
     }
   }
-  if (pFDeg!=pWTotaldegree) pFDeg=pTotaldegree;
+  if (pFDeg!=pWTotaldegree) 
+  {
+    if (rOrd_is_Totaldegree_Ordering(r))
+    {
+      pFDeg = pDeg;
+    }
+    else
+    {
+      pFDeg=pTotaldegree;
+    }
+  }
 }
 
 

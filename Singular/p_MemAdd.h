@@ -6,7 +6,7 @@
  *  Purpose: macros for memory addition
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_MemAdd.h,v 1.2 2000-09-12 16:01:06 obachman Exp $
+ *  Version: $Id: p_MemAdd.h,v 1.3 2000-10-16 12:06:37 obachman Exp $
  *******************************************************************/
 #ifndef P_MEM_ADD_H
 #define P_MEM_ADD_H
@@ -365,4 +365,26 @@ do                                                  \
 }                                                   \
 while (0)
 
+#define _p_MemAddSub_Declare(r, s, t)                \
+  const unsigned long* _s = ((unsigned long*) s); \
+  const unsigned long* _t = ((unsigned long*) t); \
+  unsigned long* _r = ((unsigned long*) r)
+
+#define p_MemAddSub_LengthGeneral(r, s, t, length)  \
+do                                                  \
+{                                                   \
+  _p_MemAddSub_Declare(r,s, t);                     \
+  const unsigned long _l = (unsigned long) length;  \
+  unsigned long _i = 0;                             \
+                                                    \
+  do                                                \
+  {                                                 \
+    _r[_i] += _s[_i] - _t[_i];                      \
+    _i++;                                           \
+  }                                                 \
+  while (_i != _l);                                 \
+}                                                   \
+while (0)
+
 #endif P_MEM_ADD_H
+

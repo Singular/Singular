@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.40 2000-09-25 14:07:59 pohl Exp $ */
+/* $Id: sparsmat.cc,v 1.41 2000-10-16 12:06:41 obachman Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -34,11 +34,16 @@ struct smprec{
   float f;             // complexity of the element
 };
 */
+
+#if OLD > 0
+static poly smSelectCopy(poly, const poly);
+#else
+#define smSelectCopy ppMult_Coeff_mm_DivSelect
+#endif
+
 /* declare internal 'C' stuff */
 static void smExactPolyDiv(poly, poly);
 static BOOLEAN smIsNegQuot(poly, const poly, const poly);
-static BOOLEAN smCheckLead(const poly, const poly);
-static poly smSelectCopy(poly, const poly);
 static void smExpMultDiv(poly, const poly, const poly);
 static void smPolyDivN(poly, const number);
 static BOOLEAN smSmaller(poly, poly);
@@ -1804,7 +1809,7 @@ poly smMultDiv(poly a, poly b, const poly c)
     pSetCoeff0(e,pGetCoeff(b));
     if (smIsNegQuot(e, b, c))
     {
-      lead = smCheckLead(a, e);
+      lead = pLmDivisibleByNoComp(e, a);
       r = smSelectCopy(a, e);
       smExpMultDiv(r, b, c);
     }
@@ -1842,7 +1847,7 @@ poly smMultDiv(poly a, poly b, const poly c)
     {
       r = smSelectCopy(a, e);
       smExpMultDiv(r, b, c);
-      if (smCheckLead(a, e))
+      if (pLmDivisibleByNoComp(e, a))
         smCombineChain(&pa, r);
       else
         pa = pAdd(pa,r);
@@ -1901,13 +1906,19 @@ static void smExactPolyDiv(poly a, poly b)
   pLmFree(e);
 }
 
+// obachman --> Wilfried: check the following
 static BOOLEAN smIsNegQuot(poly a, const poly b, const poly c)
 {
-  int i=pVariables;
-
-  while ((i>0) && (pGetExp(b,i) >= pGetExp(c,i))) i--;
-  if(i!=0)
+  if (pLmDivisibleByNoComp(c, b))
   {
+    pExpVectorDiff(a, b, c);
+    // Hmm: here used to be a pSetm(a): but it is unnecessary,
+    // if b and c are correct
+    return FALSE;
+  }
+  else
+  {
+    int i;
     for (i=pVariables; i>0; i--)
     {
       if(pGetExp(c,i) > pGetExp(b,i))
@@ -1915,78 +1926,21 @@ static BOOLEAN smIsNegQuot(poly a, const poly b, const poly c)
       else
         pSetExp(a,i,0);
     }
+    // here we actually might need a pSetm, if a is to be used in
+    // comparisons
     return TRUE;
-  }
-  else
-  {
-    for (i=pVariables; i>0; i--)
-    {
-      pSetExp(a,i, pGetExp(b,i)-pGetExp(c,i));
-    }
-    pSetm(a);
-    return FALSE;
-  }
-}
-
-static BOOLEAN smCheckLead(const poly t, const poly e)
-{
-  int i;
-  Exponent_t w;
-  for (i=pVariables; i; i--)
-  {
-    w = pGetExp(e,i);
-    if (w&&(w>pGetExp(t,i)))
-      return FALSE;
-  }
-  return TRUE;
-}
-
-/*
-* e is a monomial with exponents e(i)
-* t is a polynom with monomials t_j and
-*   exponents t_j(i)
-* make a copy of a part of t:
-*   for the monomials t_j of t in the copy
-*   we have
-*     ((e(i)!=0)&&(e(i)<=t_j(i)) == TRUE
-*/
-static poly smSelectCopy(poly t, const poly e)
-{
-  const number y = pGetCoeff(e);
-  poly res, h;
-
-  loop
-  {
-    if(smCheckLead(t,e)) break;
-    pIter(t);
-    if(t==NULL) return NULL;
-  }
-  h = res = pNew();
-  loop
-  {
-    pExpVectorCopy(h,t);
-    pSetCoeff0(h,nMult(y,pGetCoeff(t)));
-    loop
-    {
-      pIter(t);
-      if(t==NULL)
-      {
-        pNext(h)=NULL;
-        return res;
-      }
-      if(smCheckLead(t,e)) break;
-    }
-    h=pNext(h)=pNew();
   }
 }
 
 static void smExpMultDiv(poly t, const poly b, const poly c)
 {
   int i;
+  pTest(t);
+  pLmTest(b);
+  pLmTest(c);
   while(t!=NULL)
   {
-    pExpVectorAdd(t,b);
-    pExpVectorSub(t,c);
+    pExpVectorAddSub(t, b, c);
     pIter(t);
   }
 }

@@ -6,7 +6,7 @@
  *  Purpose: implementation of debug related poly routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pDebug.cc,v 1.5 2000-09-25 12:26:35 obachman Exp $
+ *  Version: $Id: pDebug.cc,v 1.6 2000-10-16 12:06:36 obachman Exp $
  *******************************************************************/
 
 #ifndef PDEBUG_CC
@@ -99,34 +99,20 @@ BOOLEAN p_CheckRing(ring r)
  * Debugging/statistics of pDivisibleBy
  *
  ***************************************************************/
-static int pDivisibleBy_number = 1;
-static int pDivisibleBy_FALSE = 1;
-static int pDivisibleBy_ShortFalse = 1;
-BOOLEAN pDebugLmShortDivisibleBy(poly p1, unsigned long sev_1, ring r_1,
-                               poly p2, unsigned long not_sev_2, ring r_2)
+BOOLEAN p_DebugLmDivisibleByNoComp(poly a, poly b, ring r)
 {
-  _pPolyAssume(p_GetShortExpVector(p1, r_1) == sev_1, p1, r_1);
-  _pPolyAssume(p_GetShortExpVector(p2, r_2) == ~ not_sev_2, p2, r_2);
+  int i=r->N;
 
-  pDivisibleBy_number++;
-  BOOLEAN ret = p_LmDivisibleBy(p1, r_1, p2, r_2);
-  if (! ret) pDivisibleBy_FALSE++;
-  if (sev_1 & not_sev_2)
+  do
   {
-    pDivisibleBy_ShortFalse++;
-    if (ret)
-      dReportError("p1 divides p2, but sev's are wrong");
+    if (p_GetExp(a,i,r) > p_GetExp(b,i,r))
+      return FALSE;
+    i--;
   }
-  return ret;
+  while (i);
+  return TRUE;
 }
 
-void pPrintDivisbleByStat()
-{
-  Print("#Tests: %d; #FALSE %d(%d); #SHORT %d(%d)\n",
-        pDivisibleBy_number,
-        pDivisibleBy_FALSE, pDivisibleBy_FALSE*100/pDivisibleBy_number,
-        pDivisibleBy_ShortFalse, pDivisibleBy_ShortFalse*100/pDivisibleBy_FALSE);
-}
 
 /***************************************************************
  *
@@ -296,5 +282,44 @@ BOOLEAN _pp_Test(poly p, ring lmRing, ring tailRing, int level)
 }
   
 #endif // PDEBUG
+
+#include "pInline1.h"
+
+#if defined(PDEBUG) || defined(PDIV_DEBUG)
+static unsigned long pDivisibleBy_number = 1;
+static unsigned long pDivisibleBy_FALSE = 1;
+static unsigned long pDivisibleBy_ShortFalse = 1;
+BOOLEAN pDebugLmShortDivisibleBy(poly p1, unsigned long sev_1, ring r_1,
+                               poly p2, unsigned long not_sev_2, ring r_2)
+{
+  _pPolyAssume(p_GetShortExpVector(p1, r_1) == sev_1, p1, r_1);
+  _pPolyAssume(p_GetShortExpVector(p2, r_2) == ~ not_sev_2, p2, r_2);
+
+  pDivisibleBy_number++;
+  BOOLEAN ret;
+  if (r_1 == r_2)
+    ret = p_LmDivisibleBy(p1, p2, r_1);
+  else
+    ret = p_LmDivisibleBy(p1, r_1, p2, r_2);
+
+  if (! ret) pDivisibleBy_FALSE++;
+  if (sev_1 & not_sev_2)
+  {
+    pDivisibleBy_ShortFalse++;
+    if (ret)
+      dReportError("p1 divides p2, but sev's are wrong");
+  }
+  return ret;
+}
+
+void pPrintDivisbleByStat()
+{
+  Print("#Tests: %d; #FALSE %d(%d); #SHORT %d(%d)\n",
+        pDivisibleBy_number,
+        pDivisibleBy_FALSE, (unsigned long) ((double)pDivisibleBy_FALSE*((double) 100)/(double)pDivisibleBy_number),
+        pDivisibleBy_ShortFalse, (unsigned long) ((double)pDivisibleBy_ShortFalse*((double)100)/(double)pDivisibleBy_FALSE));
+}
+#endif
+
 #endif // PDEBUG_CC
 

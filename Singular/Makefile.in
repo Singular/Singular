@@ -115,7 +115,8 @@ SOURCES=${CSOURCES} ${CXXSOURCES} ${ESOURCES} mmalloc.cc\
         p_Copy__Template.cc p_Mult_nn__Template.cc  pp_Mult_nn__Template.cc \
         pp_Mult_mm__Template.cc p_Mult_mm__Template.cc \
         p_Minus_mm_Mult_qq__Template.cc p_Add_q__Template.cc \
-	p_Neg__Template.cc kInline.cc
+	p_Neg__Template.cc pp_Mult_Coeff_mm_DivSelect__Template.cc \
+	kInline.cc utils.cc utils.h 
 
 
 HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
@@ -128,7 +129,7 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	ffields.h khstd.h silink.h sparsmat.h gnumpfl.h gnumpc.h \
 	fglm.h kstd1.h modulop.h sing_dbm.h weight.h \
 	fglmgauss.h fglmvec.h mpsr.h sing_mp.h \
-	kstdfac.h mpsr_Get.h \
+	kstdfac.h mpsr_Get.h kmatrix.h\
 	kutil.h mpsr_Put.h sing_dld.h\
 	ndbm.h polys-impl.h libparse.h \
         GMPrat.h multicnt.h npolygon.h semic.h spectrum.h splist.h multicnt.h \

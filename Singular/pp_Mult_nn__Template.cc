@@ -2,11 +2,11 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /***************************************************************
- *  File:    pp_Mult_n__Template.cc
- *  Purpose: template for pp_Mult_n
+ *  File:    pp_Mult_nn__Template.cc
+ *  Purpose: template for pp_Mult_nn
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pp_Mult_nn__Template.cc,v 1.3 2000-09-18 09:19:31 obachman Exp $
+ *  Version: $Id: pp_Mult_nn__Template.cc,v 1.4 2000-10-16 12:06:39 obachman Exp $
  *******************************************************************/
 
 /***************************************************************

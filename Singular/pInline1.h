@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.5 2000-10-04 13:12:04 obachman Exp $
+ *  Version: $Id: pInline1.h,v 1.6 2000-10-16 12:06:36 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H
@@ -43,7 +43,11 @@ while(0)
 
 #ifdef PDIV_DEBUG
 BOOLEAN pDebugLmShortDivisibleBy(poly p1, unsigned long sev_1, ring r_1,
-                               poly p2, unsigned long not_sev_2, ring r_2);
+                                 poly p2, unsigned long not_sev_2, ring r_2);
+BOOLEAN p_DebugLmDivisibleByNoComp(poly a, poly b, ring r);
+#define pDivAssume  pAssume
+#else
+#define pDivAssume(x)   ((void)0)
 #endif
 
 #if !defined(NO_PINLINE1) || defined(PINLINE1_CC)
@@ -148,6 +152,22 @@ PINLINE1 void p_ExpVectorSub(poly p1, poly p2, ring r)
  
   p_MemSub_LengthGeneral(p1->exp, p2->exp, r->ExpLSize);
 }
+// ExpVector(p1) += ExpVector(p2) - ExpVector(p3)
+PINLINE1 void p_ExpVectorAddSub(poly p1, poly p2, poly p3, ring r)
+{
+  p_CheckPolyRing1(p1, r);
+  p_CheckPolyRing1(p2, r);
+  p_CheckPolyRing1(p3, r);
+#if PDEBUG >= 1
+  for (int i=1; i<=r->N; i++)
+    pAssume1(p_GetExp(p1, i, r) + p_GetExp(p2, i, r) >= p_GetExp(p3, i, r));
+  pAssume1(p_GetComp(p1, r) == 0 || 
+           (p_GetComp(p2, r) - p_GetComp(p3, r) == 0) ||
+           (p_GetComp(p1, r) == p_GetComp(p2, r) - p_GetComp(p3, r)));
+#endif 
+ 
+  p_MemAddSub_LengthGeneral(p1->exp, p2->exp, p3->exp, r->ExpLSize);
+}
 // ExpVector(pr) = ExpVector(p1) + ExpVector(p2)
 PINLINE1 void p_ExpVectorSum(poly pr, poly p1, poly p2, ring r)
 {
@@ -248,19 +268,57 @@ PINLINE1 int p_LmCmp(poly p, poly q, ring r)
  * divisibility
  *
  ***************************************************************/
+// return: FALSE, if there exists i, such that a->exp[i] > b->exp[i]
+//         TRUE, otherwise
+// (1) Consider long vars, instead of single exponents
+// (2) Clearly, if la > lb, then FALSE
+// (3) Suppose la <= lb, and consider first bits of single exponents in l: 
+//     if TRUE, then value of these bits is la ^ lb
+//     if FALSE, then la-lb causes an "overflow" into one of those bits, i.e.,
+//               la ^ lb != la - lb
 static inline BOOLEAN _p_LmDivisibleByNoComp(poly a, poly b, ring r)
 {
-  int i=r->N;
-
-  do
+  int i=r->VarL_Size - 1;
+  unsigned long divmask = r->divmask;
+  unsigned long la, lb;
+  
+  if (r->VarL_LowIndex >= 0)
   {
-    if (p_GetExp(a,i,r) > p_GetExp(b,i,r))
-      return FALSE;
-    i--;
+    i += r->VarL_LowIndex;
+    do
+    {
+      la = a->exp[i];
+      lb = b->exp[i];
+      if ((la > lb) || 
+          (((la & divmask) ^ (lb & divmask)) != ((lb - la) & divmask)))
+      {
+        pDivAssume(p_DebugLmDivisibleByNoComp(a, b, r) == FALSE);
+        return FALSE;
+      }
+      i--;
+    }
+    while (i>=r->VarL_LowIndex);
   }
-  while (i);
+  else
+  {
+    do
+    {
+      la = a->exp[r->VarL_Offset[i]];
+      lb = b->exp[r->VarL_Offset[i]];
+      if ((la > lb) || 
+          (((la & divmask) ^ (lb & divmask)) != ((lb - la) & divmask)))
+      {
+        pDivAssume(p_DebugLmDivisibleByNoComp(a, b, r) == FALSE);
+        return FALSE;
+      }
+      i--;
+    }
+    while (i>=0);
+  }
+  pDivAssume(p_DebugLmDivisibleByNoComp(a, b, r) == TRUE);
   return TRUE;
 }
+
 static inline BOOLEAN _p_LmDivisibleByNoComp(poly a, ring r_a, poly b, ring r_b)
 {
   int i=r_a->N;

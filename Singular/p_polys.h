@@ -7,7 +7,7 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: p_polys.h,v 1.3 2000-10-04 13:12:05 obachman Exp $
+ *  Version: $Id: p_polys.h,v 1.4 2000-10-16 12:06:38 obachman Exp $
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -121,6 +121,8 @@ PINLINE1 void p_ExpVectorCopy(poly d_p, poly s_p, ring r);
 PINLINE1 void p_ExpVectorAdd(poly p1, poly p2, ring r);
 // ExpVector(p1) -= ExpVector(p2)
 PINLINE1 void p_ExpVectorSub(poly p1, poly p2, ring r);
+// ExpVector(p1) += ExpVector(p2) - ExpVector(p3)
+PINLINE1 void p_ExpVectorAddSub(poly p1, poly p2, poly p3, ring r);
 // ExpVector(pr) = ExpVector(p1) + ExpVector(p2)
 PINLINE1 void p_ExpVectorSum(poly pr, poly p1, poly p2, ring r);
 // ExpVector(pr) = ExpVector(p1) + ExpVector(p2)
@@ -230,6 +232,9 @@ PINLINE2 poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, const ring r);
 PINLINE2 poly p_Mult_q(poly p, poly q, const ring r);
 // returns p*q, does neither destroy p nor q
 PINLINE2 poly pp_Mult_qq(poly p, poly q, const ring r);
+
+// returns p*Coeff(m) for such monomials pm of p, for which m is divisble by pm
+PINLINE2 poly pp_Mult_Coeff_mm_DivSelect(poly p, const poly m, const ring r);
 
 /***************************************************************
  *

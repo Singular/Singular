@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.37 2000-09-19 15:22:25 Singular Exp $ */
+/* $Id: structs.h,v 1.38 2000-10-16 12:06:41 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -251,7 +251,6 @@ struct sip_sring
 
   ideal      qideal; /* extension to the ring structure: qring */
 
-  unsigned long bitmask;
 
   int      *VarOffset;
   /* mapping exp. of var(i) -> p->exp */
@@ -282,9 +281,27 @@ struct sip_sring
   short      ExpESize; /* size of exponent vector in Exponent_t */
   short      ExpLSize; /* size of exponent vector in long */
   short      OrdSize; /* size of ord vector (in sro_ord) */
+  short      BitsPerExp; /* number of bits per exponent */
+
+  short      ref; /* reference counter to the ring */
+
+  /* number of long vars in exp vector: 
+     long vars are those longs in the exponent vector which are 
+     occupied by variables, only */
+  short     VarL_Size;   
+  /* if >= 0, long vars in exp vector are consecutive and start there
+     if <  0, long vars in exp vector are not consecutive */
+  short     VarL_LowIndex;
+  /* array of size VarL_Size, 
+     VarL_Offset[i] gets i-th long var in exp vector */
+  int*      VarL_Offset;
+
+  /* mask for getting single exponents */
+  unsigned long bitmask;
+  /* mask used for divisiblity tests */
+  unsigned long divmask;
 
   p_Procs_s* p_Procs;
-  short      ref; /* reference counter to the ring */
 };
 
 struct sip_sideal

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.119 2000-09-20 12:33:29 obachman Exp $ */
+/* $Id: ring.cc,v 1.120 2000-10-16 12:06:39 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -62,6 +62,10 @@ static inline const char * rSimpleOrdStr(int ord)
 
 // unconditionally deletes fields in r
 static void rDelete(ring r);
+// set r->VarL_Size, r->VarL_Offset, r->VarL_LowIndex
+static void rSetVarL(ring r);
+// get r->divmask depending on bits per exponent
+static unsigned long rGetDivMask(int bits);
 
 /*0 implementation*/
 //BOOLEAN rField_is_R(ring r=currRing)
@@ -1934,6 +1938,31 @@ BOOLEAN rHasSimpleLexOrder(ring r)
      r->order[1] == ringorder_lp);
 }
 
+BOOLEAN rOrder_is_DegOrdering(rRingOrder_t order)
+{
+  switch(order)
+  {
+      case ringorder_dp:
+      case ringorder_Dp:
+      case ringorder_ds:
+      case ringorder_Ds:
+        return TRUE;
+        
+      default:
+        return FALSE;
+  }
+}
+
+// return TRUE if p->exp[r->pOrdIndex] holds total degree of p */
+BOOLEAN rOrd_is_Totaldegree_Ordering(ring r =currRing)
+{
+  // Hmm.... what about Syz orderings?
+  return (r->N > 1 &&
+          rHasSimpleOrder(r) &&
+          (rOrder_is_DegOrdering((rRingOrder_t)r->order[0]) ||
+           rOrder_is_DegOrdering(( rRingOrder_t)r->order[1])));
+}
+                             
 BOOLEAN rIsPolyVar(int v)
 {
   int  i=0;
@@ -2209,7 +2238,7 @@ static void rO_Syz(int &place, int &bitplace, int &prev_ord,
   place++;
 }
 
-unsigned long rGetExpSize(unsigned long bitmask, int & bits)
+static unsigned long rGetExpSize(unsigned long bitmask, int & bits)
 {
   if (bitmask == 0)
   {
@@ -2294,7 +2323,7 @@ unsigned long rGetExpSize(unsigned long bitmask, int & bits)
 /*2
 * optimize rGetExpSize for a block of N variables, exp <=bitmask
 */
-unsigned long rGetExpSize(unsigned long bitmask, int & bits, int N)
+static unsigned long rGetExpSize(unsigned long bitmask, int & bits, int N)
 {
 #if SIZEOF_LONG == 8
 #define BITS_FOR_EXPS 64
@@ -2448,6 +2477,9 @@ BOOLEAN rComplete(ring r, int force)
   int i;
   int bits;
   r->bitmask=rGetExpSize(r->bitmask,bits);
+  r->BitsPerExp = bits;
+  r->divmask=rGetDivMask(bits);
+  
   // will be used for ordsgn:
   long *tmp_ordsgn=(long *)omAlloc0(2*(n+r->N)*sizeof(long));
   // will be used for VarOffset:
@@ -2783,6 +2815,10 @@ BOOLEAN rComplete(ring r, int force)
   // p_Procs
   r->p_Procs = (p_Procs_s*)omAlloc(sizeof(p_Procs_s));
   p_SetProcs(r, r->p_Procs);
+
+  // ----------------------------
+  // set VarL_*
+  rSetVarL(r);
   return FALSE;
 }
 
@@ -2811,7 +2847,51 @@ void rUnComplete(ring r)
       omFreeSize((ADDRESS)r->ordsgn,r->ExpLSize*sizeof(long));
     if (r->p_Procs != NULL)
       omFreeSize(r->p_Procs, sizeof(p_Procs_s));
+    omfreeSize(r->VarL_Offset, r->VarL_Size*sizeof(int));
   }
+}
+
+// set r->VarL_Size, r->VarL_Offset, r->VarL_LowIndex
+static void rSetVarL(ring r)
+{
+  poly p = p_Init(r);
+  int* VarL_Offset = (int*) omAlloc0(r->ExpLSize*sizeof(int));
+  int i,j;
+  
+  for (i=1; i<=r->N; i++)
+    p_SetExp(p, i, 1, r);
+
+  r->VarL_LowIndex = 0;
+  for (i=0, j=0; i<r->ExpLSize; i++)
+  {
+    if (p->exp[i] != 0)
+    {
+      VarL_Offset[j] = i;
+      if (j > 0 && VarL_Offset[j-1] != VarL_Offset[j] - 1)
+        r->VarL_LowIndex = -1;
+      j++;
+    }
+  }
+  r->VarL_Size = j;
+  if (r->VarL_LowIndex >= 0)
+    r->VarL_LowIndex = VarL_Offset[0];
+  r->VarL_Offset = (int*) omReallocSize(VarL_Offset,r->ExpLSize*sizeof(int),
+                                        j*sizeof(int));
+  p_LmFree(p, r);
+}
+    
+// get r->divmask depending on bits per exponent
+static unsigned long rGetDivMask(int bits)
+{
+  unsigned long divmask = 1;
+  int i = bits;
+  
+  while (i < BIT_SIZEOF_LONG)
+  {
+    divmask |= (1 << (unsigned long) i);
+    i += bits;
+  }
+  return divmask;
 }
 
 #ifdef RDEBUG
@@ -2827,7 +2907,9 @@ void rDebugPrint(ring r)
   PrintS("varoffset:\n");
   for(j=0;j<=r->N;j++) Print("  v%d at e-pos %d, bit %d\n",
      j,r->VarOffset[j] & 0xffffff, r->VarOffset[j] >>24);
+  Print("BitsPerExp=%d\n", r->BitsPerExp);
   Print("bitmask=0x%x\n",r->bitmask);
+  Print("divmask=%p\n", r->divmask);
   PrintS("ordsgn:\n");
   for(j=0;j<r->pCompLSize;j++)
     Print("  ordsgn %d at pos %d\n",r->ordsgn[j],j);
@@ -2853,6 +2935,7 @@ void rDebugPrint(ring r)
   }
   Print("pVarLowIndex:%d ",r->pVarLowIndex);
   Print("pVarHighIndex:%d\n",r->pVarHighIndex);
+  Print("VarL_Size:%d\nVarL_LowIndex:%d\n", r->VarL_Size, r->VarL_LowIndex);
 #ifdef LONG_MONOMS
   Print("pDivLow:%d ",r->pDivLow);
   Print("pDivHigh:%d\n",r->pDivHigh);

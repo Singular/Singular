@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.39 2000-09-20 12:56:37 obachman Exp $ */
+/* $Id: polys.h,v 1.40 2000-10-16 12:06:39 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing
@@ -124,6 +124,7 @@ extern poly pHeadProc(poly p);
 #define pExpVectorCopy(d_p, s_p)    p_ExpVectorCopy(d_p, s_p, currRing)
 #define pExpVectorAdd(p1, p2)       p_ExpVectorAdd(p1, p2, currRing)
 #define pExpVectorSub(p1, p2)       p_ExpVectorSub(p1, p2, currRing)
+#define pExpVectorAddSub(p1, p2, p3)p_ExpVectorAddSub(p1, p2, p3, currRing)
 #define pExpVectorSum(pr, p1, p2)   p_ExpVectorSum(pr, p1, p2, currRing)
 #define pExpVectorDiff(pr, p1, p2)  p_ExpVectorDiff(pr, p1, p2, currRing)
 #define pExpVectorEqual(p1, p2)     p_ExpVectorEqual(p1, p2, currRing)
@@ -205,6 +206,8 @@ extern poly pHeadProc(poly p);
 #define pPlus_mm_Mult_qq(p, m, q)   p_Plus_mm_Mult_qq(p, m, q, currRing)
 #define pMult(p, q)                 p_Mult_q(p, q, currRing)
 #define ppMult_qq(p, q)             pp_Mult_qq(p, q, currRing)
+// p*Coeff(m) for such monomials pm of p, for which m is divisble by pm
+#define ppMult_Coeff_mm_DivSelect(p, m)   pp_Mult_Coeff_mm_DivSelect(p, m, currRing)
 
 /***************************************************************
  *

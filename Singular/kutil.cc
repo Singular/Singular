@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.64 2000-10-04 13:12:03 obachman Exp $ */
+/* $Id: kutil.cc,v 1.65 2000-10-16 12:06:35 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -26,45 +26,46 @@
 #include "kstd1.h"
 #include "kutil.h"
 
-/* Hmm ... this should be inlined or made more efficient:
-   see Long/mregular.tst */
-/*2
-*should return 1 if p divides q and p<q,
-*             -1 if q divides p and q<p
-*              0 otherwise
-*/
-static inline int     pDivComp(poly p, poly q)
+
+static poly redMora (poly h,int maxIndex,kStrategy strat);
+static poly redBba (poly h,int maxIndex,kStrategy strat);
+
+static inline int pDivComp(poly p, poly q)
 {
   if (pGetComp(p) == pGetComp(q))
   {
-    int i=pVariables;
-    long d;
     BOOLEAN a=FALSE, b=FALSE;
-    for (; i>0; i--)
+    int i;
+    unsigned long la, lb;
+    unsigned long divmask = currRing->divmask;
+    for (i=0; i<currRing->VarL_Size; i++)
     {
-      d = pGetExpDiff(p, q, i);
-      if (d)
+      la = p->exp[currRing->VarL_Offset[i]];
+      lb = q->exp[currRing->VarL_Offset[i]];
+      if (la != lb)
       {
-        if (d < 0)
+        if (la < lb)
         {
           if (b) return 0;
-          a =TRUE;
+          if (((la & divmask) ^ (lb & divmask)) != ((lb - la) & divmask))
+            return 0;
+          a = TRUE;
         }
         else
         {
           if (a) return 0;
+          if (((la & divmask) ^ (lb & divmask)) != ((la - lb) & divmask))
+            return 0;
           b = TRUE;
         }
       }
     }
     if (a) return 1;
-    else if (b)  return -1;
+    if (b) return -1;
   }
   return 0;
 }
 
-static poly redMora (poly h,int maxIndex,kStrategy strat);
-static poly redBba (poly h,int maxIndex,kStrategy strat);
 
 BITSET  test=(BITSET)0;
 int     HCord;

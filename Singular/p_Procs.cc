@@ -6,7 +6,7 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.cc,v 1.14 2000-10-04 15:37:54 obachman Exp $
+ *  Version: $Id: p_Procs.cc,v 1.15 2000-10-16 12:06:37 obachman Exp $
  *******************************************************************/
 #include <string.h>
 
@@ -45,7 +45,7 @@
 //   4 -- plus FieldGeneral_Length*_OrdGeneral procs
 //   5 -- all Field*_Length*_Ord* procs
 #ifdef NDEBUG
-const int HAVE_FAST_P_PROCS = 2;
+const int HAVE_FAST_P_PROCS = 3;
 #else
 const int HAVE_FAST_P_PROCS = 0;
 #endif
@@ -63,7 +63,7 @@ const int HAVE_FAST_FIELD = 2;
 //   2 -- special cases for length <= 2
 //   3 -- special cases for length <= 4
 //   4 -- special cases for length <= 8
-const int HAVE_FAST_LENGTH = 4;
+const int HAVE_FAST_LENGTH = 3;
 
 // Set HAVE_FAST_ORD to:
 //  0  -- only OrdGeneral
@@ -179,6 +179,7 @@ typedef enum p_Proc
   p_Add_q_Proc,
   p_Minus_mm_Mult_qq_Proc,
   p_Neg_Proc,
+  pp_Mult_Coeff_mm_DivSelect_Proc,
   p_Unknown_Proc
 };
 
@@ -267,6 +268,7 @@ char* p_ProcEnum_2_String(p_Proc proc)
       case p_Add_q_Proc: return "p_Add_q_Proc";
       case p_Minus_mm_Mult_qq_Proc: return "p_Minus_mm_Mult_qq_Proc";
       case p_Neg_Proc: return "p_Neg_Proc";
+      case pp_Mult_Coeff_mm_DivSelect_Proc: return "pp_Mult_Coeff_mm_DivSelect_Proc";
       case p_Unknown_Proc: return "p_Unknown_Proc";
   }
   return "NoProc_2_String";
@@ -482,6 +484,7 @@ static inline int index(p_Proc proc, p_Field field, p_Length length, p_Ord ord)
       case pp_Mult_mm_Proc:
       case p_Mult_mm_Proc:
       case pp_Mult_nn_Proc:
+      case pp_Mult_Coeff_mm_DivSelect_Proc:
         return index(field, length);
 
       case p_Add_q_Proc:
@@ -635,6 +638,7 @@ void p_SetProcs(ring r, p_Procs_s* p_Procs)
     (p_Procs->p_Mult_mm != NULL) &&
     (p_Procs->p_Add_q != NULL) &&
     (p_Procs->p_Neg != NULL) &&
+    (p_Procs->pp_Mult_Coeff_mm_DivSelect != NULL) &&
     (p_Procs->p_Minus_mm_Mult_qq != NULL));
 }
 
@@ -900,6 +904,7 @@ static void SetProcs(p_Field field, p_Length length, p_Ord ord)
   SetProc(p_Add_q, field, length, ord);
   SetProc(p_Minus_mm_Mult_qq, field, length, ord);
   SetProc(p_Neg, field, LengthGeneral, OrdGeneral);
+  SetProc(pp_Mult_Coeff_mm_DivSelect, field, length, OrdGeneral);
 }
 
 

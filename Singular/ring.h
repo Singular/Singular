@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.51 2000-09-19 15:22:25 Singular Exp $ */
+/* $Id: ring.h,v 1.52 2000-10-16 12:06:40 obachman Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -209,10 +209,10 @@ int rGetMaxSyzComp(int i);
 BOOLEAN rHasSimpleOrder(ring r);
 // returns TRUE, if simple lp or ls ordering
 BOOLEAN rHasSimpleLexOrder(ring r);
+// return TRUE if p->exp[r->pOrdIndex] holds total degree of p */
+BOOLEAN rOrd_is_Totaldegree_Ordering(ring r =currRing);
 rOrderType_t    rGetOrderType(ring r);
 BOOLEAN rIsPolyVar(int i); /* returns TRUE if var(i) belongs to p-block */
-
-void rOptimizeOrder(ring r);
 
 #ifdef RDEBUG
 #define rTest(r)    rDBTest(r, __FILE__, __LINE__)
@@ -221,8 +221,6 @@ extern BOOLEAN rDBTest(ring r, char* fn, int l);
 #define rTest(r)
 #endif
 
-unsigned long rGetExpSize(unsigned long bitmask, int & bits);
-unsigned long rGetExpSize(unsigned long bitmask, int & bits, int N);
 ring rModifyRing(ring r, BOOLEAN omit_degree,
                          BOOLEAN omit_comp,
                          unsigned long exp_limit);

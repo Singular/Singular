@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.32 2000-10-04 13:12:03 obachman Exp $ */
+/* $Id: kutil.h,v 1.33 2000-10-16 12:06:36 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -34,6 +34,11 @@ public:
     { 
       memset((void*) this, 0, sizeof(sTObject)); 
     }
+  sTObject(poly _p)
+    {
+      memset((void*) this, 0, sizeof(sTObject)); 
+      p = _p;
+    }
 };
 
 class sLObject
@@ -51,6 +56,12 @@ public:
     { 
       memset((void*) this, 0, sizeof(sLObject));
       lmRing = tailRing = currRing;
+    }
+  sLObject(poly _p) 
+    { 
+      memset((void*) this, 0, sizeof(sLObject));
+      lmRing = tailRing = currRing;
+      p = _p;
     }
   // spoly related things
   KINLINE void SetLmTail(poly lm, poly new_p, int use_bucket);
