@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.130 1999-07-21 19:53:24 obachman Exp $
+@comment $Id: general.doc,v 1.131 1999-07-22 15:51:12 pohl Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -265,7 +265,7 @@ all input coming from a file. By default, the value of @code{echo} is
 0. @xref{echo}.
 
 @item @code{-h}, @code{--help}
-Print a one-line description of each command line option and exit.
+Print an one-line description of each command line option and exit.
 
 @item @code{--no-rc}
 Do not execute the @code{.singularrc} file on start-up.  By default,
@@ -956,7 +956,7 @@ resultant and gcd computations.
 @item facstd
 @ref{facstd}
 @*computes a list of Groebner bases via the Factorizing Groebner Basis
-Algorithm, i.e., has the same radical as the original ideal. It need not
+Algorithm, i.e., which has the same radical as the original ideal. It need not
 be a Groebner basis of the given ideal.
 
 The intersection of the zero-sets is the zero-set of the given ideal.
@@ -1013,7 +1013,7 @@ computes the smallest monomial not contained in the ideal.
 The ideal has to be zero-dimensional.
 @item hilb
 @ref{hilb}@*
-computes the first and resp.@: or second Hilbert series of an ideal
+computes the first, and resp.@: or, second Hilbert series of an ideal
 resp.@: module.
 @item kbase
 @ref{kbase}@* computes a vector space basis (consisting of monomials) of
@@ -1100,7 +1100,7 @@ irreducible factors.
 
 The most basic algorithm is univariate factorization in prime
 characteristic.  The Cantor-Zassenhaus Algorithm is used in this case.
-For characteristic 0, an univariate Hensel-lifting is done to lift from
+For characteristic 0, a univariate Hensel-lifting is done to lift from
 prime characteristic to characteristic 0.  For multivariate
 factorization in any characteristic, the problem is reduced to the
 univariate case first, then a multivariate Hensel-lifting is used to
@@ -1110,22 +1110,21 @@ Note that there is no factorization of polynomials over algebraic
 extensions of Q.
 @item gcd
 @ref{gcd}@*
-computes univariate and multivariate polynomial greatest common
-divisors.
+computes greatest common divisors of univariate and multivariate polynomials.
 
 For prime characteristic, a subresultant gcd is used.  In characteristic 0, a
 modular algorithm is used for the univariate case.  For the multivariate case,
 the EZGCD is used.
 
-Note that there is no gcd calculation of polynomials over algebraic
+Note that there is no gcd calculation for polynomials over algebraic
 extensions of Q.
 @item resultant
 @ref{resultant}@*
 computes the resultant of two univariate polynomials using the subresultant
 algorithm.
 
-Multivariate polynomials are considered univariate polynomials in a
-main variable to be specified by the user.
+Multivariate polynomials are considered as univariate polynomials in the
+main variable (which has to be specified by the user).
 @end table
 
 @c ----------------------------------------------------------------------
@@ -1133,14 +1132,14 @@ main variable to be specified by the user.
 @table @code
 @item bareiss
 @ref{bareiss}@*
-implements Gauss-Bareiss method for elimination (matrix
+implements sparse Gauss-Bareiss method for elimination (matrix
 triangularization) in arbitrary integral domains.
 @item det
 @ref{det}@*
 computes the determinant of a square matrix.
 
 For matrices with integer entries a modular algorithm is used.  For
-other domains, elementary algorithms are used.
+other domains the Gauss-Bareiss method is used.
 @item minor
 @ref{minor}@*
 computes all minors (=subdeterminants) of a given size for a matrix.
@@ -1195,7 +1194,7 @@ differences, see @ref{Major differences to the C programming language}.
 @subsubheading Elements of the language
 
 The major building blocks of the @sc{Singular} language  are
-expressions, commands, and control structures.  The notion of expression
+expressions, commands, and control structures.  The notion of expressions
 in the @sc{Singular} and the C programming language are identical,
 whereas the notion of commands and control structures only roughly
 corresponds to the C statements.
@@ -1204,7 +1203,7 @@ corresponds to the C statements.
 
 @item
 An ``expression'' is a sequence of operators, functions, and operands
-that specifies a computation.  An expressions always results in a
+that specifies a computation.  An expression always results in a
 value of a specific type.  @xref{Data types}, and its subsections (e.g.,
 @ref{poly expressions}), for information on how to build expressions.
 
@@ -1280,7 +1279,7 @@ int i=2;                  // the integer i=2
 @end smallexample
 
 @subsubheading Assignment
-@enumerate 3
+@enumerate 4
 @item
 name @code{=} expression @code{;}
 @* assigns expression to name.
@@ -1307,7 +1306,7 @@ f,g = I[1],x^2+y^2 ; // overwrites the old values of f and g
 @end smallexample
 
 @subsubheading Function without return value
-@enumerate 5
+@enumerate 6
 @item
 function_name [ @code{(} argument_list @code{)} ] @code{;}
 @* calls function function_name with arguments argument_list.
@@ -1330,7 +1329,7 @@ Some of these functions have to be called without parentheses, e.g.,
 @end smallexample
 
 @subsubheading Print command
-@enumerate 6
+@enumerate 7
 @item
 expression @code{;}
 @* prints the value of an expression, for smallexample, of a variable.
