@@ -1,11 +1,4 @@
-Status Output of tst_status.out
-init >> USER    :obachman
-init >> HOSTNAME:nepomuck.mathematik.uni-kl.de
-init >> uname -a:Linux nepomuck.mathematik.uni-kl.de 2.0.33 #1 Wed Jan 21 18:50:57 MET 1998 i686 unknown
-init >> date    :Fri Oct 22 17:41:30 MET DST 1999
-init >> version :1305
-init >> ticks   :100
-1 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:252690
-1 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:324474
-1 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:237568
-1 >> tst_timer_1 :: nepomuck.mathematik.uni-kl.de:17
+1 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:252518 966250135:2000081016:1-3-8:ix86-Linux-libc5:nepomuck.mathematik.uni-kl.de:252502
+1 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:328566 966250135:2000081016:1-3-8:ix86-Linux-libc5:nepomuck.mathematik.uni-kl.de:328566
+1 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:241664 966250135:2000081016:1-3-8:ix86-Linux-libc5:nepomuck.mathematik.uni-kl.de:249856
+1 >> tst_timer_1 :: nepomuck.mathematik.uni-kl.de:19 966250135:2000081016:1-3-8:ix86-Linux-libc5:nepomuck.mathematik.uni-kl.de:11

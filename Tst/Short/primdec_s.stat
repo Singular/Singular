@@ -1,11 +1,4 @@
-Status Output of tst_status.out
-init >> USER    :obachman
-init >> HOSTNAME:ratchwum
-init >> uname -a:HP-UX ratchwum A.09.01 A 9000/735 2012372006 two-user license
-init >> date    :Tue Jun 27 16:52:24 METDST 2000
-init >> version :1308
-init >> ticks   :100
-1 >> tst_memory_0 :: ratchwum:1064709
-1 >> tst_memory_1 :: ratchwum:1614249
-1 >> tst_memory_2 :: ratchwum:1986560
-1 >> tst_timer_1 :: ratchwum:5232
+1 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:1064537  ratchwum:1064709 966250135:2000081016:1-3-8:ix86-Linux-libc5:nepomuck.mathematik.uni-kl.de:1064529
+1 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:1612841  ratchwum:1614249 966250135:2000081016:1-3-8:ix86-Linux-libc5:nepomuck.mathematik.uni-kl.de:1612841
+1 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:1982464  ratchwum:1986560 966250135:2000081016:1-3-8:ix86-Linux-libc5:nepomuck.mathematik.uni-kl.de:1982464
+1 >> tst_timer_1 :: nepomuck.mathematik.uni-kl.de:9261  ratchwum:5232 966250135:2000081016:1-3-8:ix86-Linux-libc5:nepomuck.mathematik.uni-kl.de:2545

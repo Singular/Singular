@@ -1,11 +1,4 @@
-Status Output of tst_status.out
-init >> USER    :lamm
-init >> HOSTNAME:schlupp
-init >> uname -a:HP-UX schlupp A.09.01 A 9000/735
-init >> date    :Thu Apr 27 22:06:49 MESZ 2000
-init >> version :1307
-init >> ticks   :100
-1 >> tst_memory_0 :: schlupp:237006
-1 >> tst_memory_1 :: schlupp:348090
-1 >> tst_memory_2 :: schlupp:761856
-1 >> tst_timer_1 :: schlupp:897
+1 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:236184  schlupp:237006 966250135:2000081016:1-3-8:ix86-Linux-libc5:nepomuck.mathematik.uni-kl.de:236176
+1 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:347940  schlupp:348090 966250135:2000081016:1-3-8:ix86-Linux-libc5:nepomuck.mathematik.uni-kl.de:347940
+1 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:638976  schlupp:761856 966250135:2000081016:1-3-8:ix86-Linux-libc5:nepomuck.mathematik.uni-kl.de:638976
+1 >> tst_timer_1 :: nepomuck.mathematik.uni-kl.de:2239  schlupp:897 966250135:2000081016:1-3-8:ix86-Linux-libc5:nepomuck.mathematik.uni-kl.de:392
