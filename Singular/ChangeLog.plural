@@ -6,13 +6,48 @@
 6.12.02
 	DONE: option(redTail) is implemented and tested
 	file: exterior2.tst
-	todo: in twostd, running from qring should be
+	DONE(11.12.02) todo: in twostd, running from qring should be
 	done another std() in order to get reduced result
 	
 	DONE: buckets in multiplication (p_Mult_mm, mm_Mult_p)
 	version 1.17 - add cvs -m "buckets added", not
 	just nCopy
-	todo: syz(i) withthe canonical method, think about
+	todo: syz(i) with the canonical method, think about
 	Schreyer and LaScala (double homogenization)
 	Print(p) at gr_kstd2.cc:877 is commented out
 	
+23.01.03
+	Updated multiplication: now we search for the shortest path.
+	Here is an old code :
+  for (k=2;k<=a;k++)
+  {	
+     t=MATELEM(cMT,k,1);
+     if (t==NULL)   /* not computed yet */
+     {
+        t=p_Copy(MATELEM(cMT,k-1,1),r);
+        t = nc_mm_Mult_p(y,t,r);
+        MATELEM(cMT,k,1) = t;
+	//	omCheckAddr(cMT->m);
+     }
+     t=NULL;
+  }
+  for (m=2;m<=b;m++)
+  {
+     t=MATELEM(cMT,a,m);
+     if (t==NULL)   //not computed yet
+     {
+        t=p_Copy(MATELEM(cMT,a,m-1),r);
+        t = nc_p_Mult_mm(t,x,r);
+        MATELEM(cMT,a,m) = t;
+	//	omCheckAddr(cMT->m);
+     }
+     t=NULL;
+  }
+	
+	Further on, we should compute metrics.
+
+	A function added:
+	matrix ncMatPrint(int a, int b, ring r, int metric)
+  	/* returns matrix with the info on noncomm multiplication */
+
+Before these changes, we copied the exec to Singular.Jan.

@@ -6,7 +6,7 @@ Here is a first short HowTo on how to locate memory holes in Singular:
    address are printed (default is 5 -- 0 only prints a summary)
  * <filename> is name of file where report should be output to
    (defaults to stdout).
-3.) Runing 'regress.cmd -tt <level> file.tst' creates the file
+3.) Running 'regress.cmd -tt <level> file.tst' creates the file
     'file.mtrack.unused' with report of not freed addresses (<level> has 
     same meaning as above).
 4.) Within the C/C++ sources, Use 'omMarkAsStatic(addr)' to mark an
