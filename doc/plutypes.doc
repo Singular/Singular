@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plutypes.doc,v 1.6 2003-03-06 11:42:58 levandov Exp $
+@comment $Id: plutypes.doc,v 1.7 2003-03-13 17:33:13 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -223,6 +223,26 @@ generator.
 @cindex ideal related functions@value{PSUFFIX}
 
 
+@table @code
+
+@item mres 
+minimal free resolution of an ideal resp.@: module w.r.t. a minimal set
+of generators of the given ideal resp.@: module
+(see @ref{mres@value{PSUFFIX}})
+@item nres 
+computes a free resolution of an ideal resp.@: module M which is
+minimized from the second module on
+(see @ref{nres@value{PSUFFIX}})          
+@item reduce
+normalform with respect to a standard basis (see @ref{reduce@value{PSUFFIX}})
+@c@item res
+@c free resolution of an ideal resp.@: module but not changing the given ideal resp.@: module(see @ref{res@value{PSUFFIX}})
+@item std
+standard basis computation (see @ref{std@value{PSUFFIX}})
+@item twostd
+two-sided standard basis computation (see @ref{twostd})
+@end table
+
 
 
         
@@ -377,6 +397,7 @@ a type cast to module
 @subsection module operations@value{PSUFFIX}
 @cindex module operations@value{PSUFFIX}
 
+
 @table @asis
 @item @code{+}
 addition (concatenation of the generators and simplification)
@@ -386,9 +407,20 @@ multiplication with ideal or poly, but not `module` * `module`
 
 @item module_expression @code{[} int_expression @code{,} int_expression @code{]}
 is a module entry, where the first index indicates the row and
-the
-????????
+the second the column
+
+@item module_expressions @code{[} int_expression @code{]}
+is a vector, where the index indicates the column
 @end table
+
+@*@strong{Example:}
+@smallexample
+@c example
+@c example
+@end smallexample
+
+
+
 
 
 @c ------------------------------
@@ -396,6 +428,24 @@ the
 @subsection module related functions@value{PSUFFIX}
 @cindex module related functions@value{PSUFFIX}
 
+
+
+@table @code
+@item mres 
+computes minimal free resolution of an ideal resp. 
+module w.r.t. a minimal set of generators of the given ideal
+resp. module (see @ref{mres@value{PSUFFIX}})
+@item nres 
+computes a free resolution of an ideal resp.@: module M which is
+minimized from the second module on
+(see @ref{nres@value{PSUFFIX}})          
+@item reduce
+normalform with respect to a standard basis (see @ref{reduce@value{PSUFFIX}})
+@item std
+standard basis computation (see @ref{std@value{PSUFFIX}})
+@item syz
+computation of the first syzygy module (see @ref{syz@value{PSUFFIX}})
+@end table
 
 
 
@@ -573,6 +623,12 @@ the monomial at the indicated place w.r.t.@: the monomial ordering
 @cindex poly related functions@value{PSUFFIX}
 
 
+@table @code
+@item bracket 
+Computes the Lie bracket of two polinomials
+(see @ref{bracket})
+@end table
+
 @c ---------------------------------------
 
 @node qring@value{PSUFFIX}, resolution@value{PSUFFIX}, poly@value{PSUFFIX}, Data types@value{PSUFFIX}
@@ -684,6 +740,20 @@ a type cast to resolution from a list of ideals, resp.@: modules..
 @subsection resolution related functions@value{PSUFFIX}
 @cindex resolution related functions@value{PSUFFIX}
 
+@table @code
+@item minres 
+minimize a free resolution  (see @ref{minres@value{PSUFFIX}})
+@item mres 
+computes minimal free resolution of an ideal resp. 
+module w.r.t. a minimal set of generators of the given ideal
+resp. module (see @ref{mres@value{PSUFFIX}})
+@item nres 
+computes a free resolution of an ideal resp.@: module M which is
+minimized from the second module on (see @ref{nres@value{PSUFFIX}})          
+@c@@item res
+@c free resolution of an ideal resp.@: module but not changing the given ideal resp.@: module(see @ref{res@value{PSUFFIX}})
+@end table
+
 
 @c ---------------------------------------
 
@@ -694,11 +764,20 @@ a type cast to resolution from a list of ideals, resp.@: modules..
 Rings are used to describe properties of polynomials, ideals etc.
 Almost all computations in @sc{Plural} require a basering.
 For a detailed description of the concept of rings see
+@ifset singularmanual
+@ref{Rings and orderings}.
+@end ifset 
+@ifclear singularmanual
+@sc{Singular} manual chapter: general concepts, section: Rings and orderings.
+@end ifclear
+@*@strong{Note:} @sc{Plural} works with global orderings
+only 
+(@pxref{PLURAL conventions}).
 
 @menu
 * ring declarations@value{PSUFFIX}::
-* ring related functions@value{PSUFFIX}::
 * ring operations@value{PSUFFIX}::
+* ring related functions@value{PSUFFIX}::
 @end menu
 
 @c ---------------------------------------
@@ -739,11 +818,11 @@ and a name.
 'ordering' is a list of block orderings where each block ordering is either
 @enumerate
 @item
-@code{lp}, @code{dp}, @code{Dp}, @code{ls}, @code{ds}, or @code{Ds}
+@code{lp}, @code{dp}, @code{Dp}, 
 optionally followed by a size parameter in parentheses.
 
 @item
-@code{wp}, @code{Wp}, @code{ws}, @code{Ws}, or @code{a} followed by a
+@code{wp}, @code{Wp}, or @code{a} followed by a
 weight vector given as an intvec_expression in parentheses.
 
 @item
@@ -805,3 +884,8 @@ following guide lines into consideration:
 @node ring related functions@value{PSUFFIX},  , ring operations@value{PSUFFIX}, ring@value{PSUFFIX}
 @subsection ring related functions@value{PSUFFIX}
 @cindex ring related functions@value{PSUFFIX}
+
+@table @code
+@item qring
+quotient ring (see @ref{ qring}) 
+@end table

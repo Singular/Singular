@@ -1,8 +1,5 @@
-@ifclear singularmanual
-see also @code{vector} in @sc{Singular} manual.
-@end ifclear
 @comment -*-texinfo-*-
-@comment $Id: pluconventions.doc,v 1.1 2003-03-06 11:43:39 levandov Exp $
+@comment $Id: pluconventions.doc,v 1.2 2003-03-13 17:33:12 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -41,9 +38,9 @@ see also @code{vector} in @sc{Singular} manual.
 @item *-multiplication@value{PSUFFIX}
 @itemize 
 
-in the non-commutative case:
+in the non-commutative case,
 one should use @code{y*x} for the multiplication while @code{yx} is interpreted as
-commutative expression.
+commutative expression. See example in  @ref{poly expressions}. 
  
 
 @end itemize
@@ -68,6 +65,13 @@ For more information see @ref{module@value{PSUFFIX}}.
 @item ordering@value{PSUFFIX}
 @itemize
 @sc{Plural} works with @strong{global} orderings  only.  
+@ifset singularmanual
+See @ref{ General definitions for orderings }
+@end ifset
+@ifclear singularmanual 
+See @sc{Singular} manual section General definitions for orderings. 
+@end ifclear
+
 @end itemize
 
 @item @code{qring}@value{PSUFFIX}
