@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.36 1998-12-02 08:41:56 obachman Exp $ */
+/* $Id: polys.cc,v 1.37 1999-04-30 10:39:54 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -798,6 +798,7 @@ int pTotaldegree(poly p)
 */
 int pWTotaldegree(poly p)
 {
+  assume(p != NULL);
   int i, k;
   int j =0;
 

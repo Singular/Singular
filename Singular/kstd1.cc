@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.33 1999-04-29 16:57:14 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.34 1999-04-30 10:39:53 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -402,6 +402,7 @@ void redFirst (LObject* h,kStrategy strat)
   int pass = 0;
   int j = 0;
 
+  if (h->p == NULL) return;
   if (TEST_OPT_CANCELUNIT) cancelunit(h);
   d = pFDeg((*h).p)+(*h).ecart;
   reddeg = strat->LazyDegree+d;
