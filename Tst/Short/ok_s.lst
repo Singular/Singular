@@ -65,7 +65,7 @@ hilb_weights
 hnoether_s
 homolog_s
 hres_s
-; CHECK: imap
+imap
 intdet_s
 intersect_s
 invar
