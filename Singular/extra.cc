@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.131 1999-12-21 15:51:44 Singular Exp $ */
+/* $Id: extra.cc,v 1.132 2000-01-22 12:04:06 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1161,14 +1161,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
-/*==================== test =================*/
-    if (strcmp(sys_cmd, "test") == 0)
-    {
-      intvec v(3);
-      
-      v[4] = 1;
-      
-    }
 /*==================== Error =================*/
       Werror( "system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.50 1999-11-17 12:09:26 obachman Exp $ */
+/* $Id: kutil.cc,v 1.51 2000-01-22 12:04:08 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -396,7 +396,7 @@ BOOLEAN K_Test_T(char* f, int l, TObject * T, int i)
 int kFindInT(poly p, TSet T, int tlength)
 {
   int i;
-  
+
   for (i=0; i<=tlength; i++)
   {
     if (T[i].p == p) return i;
@@ -1284,18 +1284,19 @@ int posInS (polyset set,int length,poly p)
   int en= length;
   if (pMixedOrder)
   {
+    int cmp_int=pOrdSgn;
     int o=pWTotaldegree(p);
     int oo=pWTotaldegree(set[length]);
 
     if ((oo<o)
-    || ((o==oo) && (pComp0(set[length],p)!= pOrdSgn)))
+    || ((o==oo) && (pComp0(set[length],p)!= cmp_int)))
       return length+1;
 
     loop
     {
       if (an >= en-1)
       {
-        if ((pWTotaldegree(set[an])>=o) && (pComp0(set[an],p) == pOrdSgn))
+        if ((pWTotaldegree(set[an])>=o) && (pComp0(set[an],p) == cmp_int))
         {
           return an;
         }
@@ -1303,7 +1304,7 @@ int posInS (polyset set,int length,poly p)
       }
       i=(an+en) / 2;
       if ((pWTotaldegree(set[an])>=o)
-      && (pComp0(set[i],p) == pOrdSgn)) en=i;
+      && (pComp0(set[i],p) == cmp_int)) en=i;
       else                              an=i;
     }
   }

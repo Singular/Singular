@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.40 1999-11-17 12:09:25 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.41 2000-01-22 12:04:07 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -633,13 +633,17 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         if (TEST_OPT_INTSTRATEGY)
         {
           pCleardenom(strat->P.p);
-          strat->P.p = redtailBba(strat->P.p,pos-1,strat);
-          pCleardenom(strat->P.p);
+	  if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
+	  {
+            strat->P.p = redtailBba(strat->P.p,pos-1,strat);
+            pCleardenom(strat->P.p);
+	  }
         }
         else
         {
           pNorm(strat->P.p);
-          strat->P.p = redtailBba(strat->P.p,pos-1,strat);
+	  if ((TEST_OPT_REDSB)||(TEST_OPT_REDTAIL))
+            strat->P.p = redtailBba(strat->P.p,pos-1,strat);
         }
 
         if (TEST_OPT_DEBUG){PrintS("new s:");wrp(strat->P.p);PrintLn();}
