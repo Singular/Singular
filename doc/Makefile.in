@@ -1,7 +1,7 @@
 #####################################################################
 ###
 ### Makefile for Singular documentation
-### $Id: Makefile.in,v 1.96 2004-12-17 20:47:10 levandov Exp $
+### $Id: Makefile.in,v 1.97 2005-03-22 13:51:59 levandov Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -393,7 +393,7 @@ install-sharedist-plural: plural.hlp plu_html plural.idx \
                    ${PLU_STANDALONE_HTML_FILES} ${PLU_STANDALONE_TXT_FILES}
 	${MKINSTALLDIRS} ${install_prefix}
 	${MKINSTALLDIRS} ${install_infodir}
-	${INSTALL_DATA} plural.hlp ${install_infodir}
+	${INSTALL_DATA} plural.hlp ${install_infodir}/singular.hlp
 	cp plural.hlp singular.hlp
 	chmod -R +rX ${install_infodir}
 	${MKINSTALLDIRS} ${install_htmldir}
@@ -402,7 +402,7 @@ install-sharedist-plural: plural.hlp plu_html plural.idx \
 	- cp ${PLU_HTML_SUBDIR}/*.jpg ${install_htmldir}
 	chmod -R +rX ${install_htmldir}
 	${MKINSTALLDIRS} ${install_docdir}
-	${INSTALL_DATA} plural.idx ${install_docdir}
+	${INSTALL_DATA} plural.idx ${install_docdir}/singular.idx
 	${INSTALL_DATA} ../GPL ${install_prefix}/GPL
 	${INSTALL_DATA} COPYING.plural.txt ${install_prefix}/COPYING
 	${INSTALL_DATA} COPYING.plural.html ${install_prefix}/COPYING.html
