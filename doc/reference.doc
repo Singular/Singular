@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.48 1998-05-14 17:55:39 Singular Exp $
+@comment $Id: reference.doc,v 1.49 1998-05-15 11:42:08 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -69,6 +69,7 @@ the brackets are optional. In the syntax of the commands @code{help},
 * eliminate::
 * eval::
 * execute::
+* exit::
 * extgcd::
 * facstd::
 * factorize::
@@ -1089,17 +1090,22 @@ none
 @item @strong{Purpose:}
 dumps (i.e. writes in one "message" or "block") the state of the @sc{Singular}
 session (i.e., all defined variables and their values) to the specified
-link (which must be either an ASCII or MP link).
+link (which must be either an ASCII or MP link) such that a
+@code{getdump} can later retrieve it.
 @item @strong{Example:}
 @example
 @c example
-  int i=3;
-  dump("");
+  ring r;
+  dump("dump.ascii");
+  kill r;
+  getdump("dump.ascii");
+  r;
 @c example
 @end example
 @item @strong{Restrictions:}
 For ASCII links, integer matrices contained in lists are  dumped as
-integer list elements (and not as integer matrices). Furthermore, links
+integer list elements (and not as integer matrices), and lists of list
+are dumped as one flatted list. Furthermore, links
 themselves are not dumped.
 @end table
 @menu
@@ -1108,7 +1114,7 @@ themselves are not dumped.
 * write::
 @end menu
 @iftex
-See @ref{link}, @ref{getdump}, @ref{write}, .
+See @ref{getdump}; @ref{link}; @ref{write}.
 @end iftex
 @c ---------------------------------------
 @node eliminate, eval, dump, Functions
@@ -1172,7 +1178,8 @@ none
 @item @strong{Purpose:}
 evaluates (quoted) expressions. Within a quoted expression, the
 quote can be "undone" by an @code{eval} (i.e., each eval "undoes" the
-effect of exactly one quote). Used with @code{quote} and @code{write}.
+effect of exactly one quote). Used with @code{quote} and @code{write} to 
+prevent local evaluations  when writing to an MPtcp link.
 @item @strong{Example:}
 @example
 @c @c example
@@ -1197,10 +1204,10 @@ effect of exactly one quote). Used with @code{quote} and @code{write}.
 * write::
 @end menu
 @iftex
-See @ref{quote}; @ref{write}.
+See @ref{MPtcp link}; @ref{quote}; @ref{write}.
 @end iftex
 @c ---------------------------------------
-@node execute, extgcd, eval, Functions
+@node execute, exit, eval, Functions 
 @subsection execute
 @cindex execute
 @table @code
@@ -1210,7 +1217,8 @@ See @ref{quote}; @ref{write}.
 none
 @item @strong{Purpose:}
 executes a string containing a sequence of @sc{Singular} commands.
-@*@strong{Note:} The string will be inserted into your input
+
+@item @strong{Note:} The string will be inserted into your input
 stream at the next line break, @emph{NOT} after the @code{;} !  Hence, execute
 should be the only command on a line.   execute should be avoided in
 procedures whenever possible since it may give rise to name conflicts.
@@ -1231,7 +1239,18 @@ Moreover, such procedures cannot be precompiled (something
 @end example
 @end table
 @c ---------------------------------------
-@node extgcd, facstd, execute, Functions
+@node exit, extgcd, execute, Functions
+@subsection exit
+@cindex exit
+@table @code
+@item @strong{Syntax:}
+@code{exit;}
+@item @strong{Purpose:}
+exits (quits) @sc{Singular},
+works also from inside a procedure or from an interrupt.
+@end table
+@c ---------------------------------------
+@node extgcd, facstd, exit, Functions
 @subsection extgcd
 @cindex extgcd
 
@@ -1289,6 +1308,9 @@ of the ideal. (Note however, that, in general, no inclusion holds.)
 non-zero constraints. Hence, the intersection of the output ideals
 has a zero set which is the (closure of the) complement of the zero set
 of the second argument in the zero set of the first argument.
+@item @strong{Note:}
+Not implemented for basering of characteristic 0 with algebraic
+extensions.
 @item @strong{Example:}
 @example
 @c example
@@ -1368,7 +1390,8 @@ identity map between rings and qrings with the same
 coefficient field and the same number of variables (but possibly with
 different orderings), the i-th variable of the source ring is mapped to
 the i-th variable of the basering.
-This offers a convenient way to change variable names or map objects from a
+This offers a convenient way to change variable names or orderings or to 
+map objects from a
 ring to a quotient ring of that ring or vice versa.
 @item @strong{Example:}
 @example
@@ -1401,8 +1424,7 @@ ring to a quotient ring of that ring or vice versa.
 * imap::
 @end menu
 @iftex
-See @ref{ring}; @ref{qring};
-@ref{imap}.
+See @ref{imap}; @ref{map}; @ref{ring}; @ref{qring}.
 @end iftex
 @c ---------------------------------------
 @node fglm, filecmd, fetch, Functions
@@ -1416,7 +1438,8 @@ See @ref{ring}; @ref{qring};
 ideal
 @item @strong{Purpose:}
 calculates for the given ideal ideal_name in the given ring ring_name
-a Groebner basis in the current ring.
+a Groebner basis in the current ring. Implements the so-called FGLM
+(Faugere, Gianni, Lazard, Mora)  algorithm. 
 @*The ideal must be zero dimensional and given as a reduced Groebner
 basis in the given ring.
 The result will be a reduced Groebner basis.
@@ -1463,12 +1486,18 @@ See @ref{ring}; @ref{qring};
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-input will come from new file @file{filename}.
+input will come from new file @file{filename}. This is shorthand
+@code{execute read(filename)}.
 @item @strong{Example:}
 @example
-  < "lib"; //read in the file lib
+  < "example"; //read in the file example and execute it
 @end example
 @end table
+@c ref
+See
+@ref{execute},
+@ref{read}.
+@c ref
 @c ---------------------------------------
 @node find, finduni, filecmd, Functions
 @subsection find
@@ -1624,13 +1653,9 @@ returns the i-th free generator of a free module.
 @c example
 @end example
 @end table
-@menu
-* int expressions::
-* vector::
-@end menu
-@iftex
-See @ref{int expressions}; @ref{vector}.
-@end iftex
+@c ref
+See @ref{free module}; @ref{int expressions}; @ref{vector}.
+@c ref
 @c ---------------------------------------
 @node getdump, help, gen, Functions
 @subsection getdump
@@ -1690,6 +1715,9 @@ provides help information, using the texinfo facility.
   help;
 @end example
 @end table
+@c ref
+See @ref{The online help system}.
+@c ref
 @c ---------------------------------------
 @node hilb, homog, help, Functions
 @subsection hilb
@@ -1743,16 +1771,13 @@ where Q(t) and P(t) are polynomials from Z[t].
 Q(t) is called first Hilbert series, and P(t) the second Hilbert series.
 @end ifinfo
 @end table
-@menu
-* ideal expressions::
-* module expressions::
-* std::
-@end menu
-@iftex
+@c ref
 See @ref{ideal expressions};
+@ref{intvec};
 @ref{module expressions};
 @ref{std}.
-@end iftex
+@ref{stdhilb};
+@c ref
 @c ---------------------------------------
 @node homog, imap, hilb, Functions
 @subsection homog
@@ -1818,27 +1843,24 @@ identity map on common subrings.
 @code{imap} is the
 map between rings, and qrings with the same
 coefficient field which is the identity on variables of
-the same name and 0 otherwise.
+the same name and 0 otherwise. Useful for mapping from homogenizing ring 
+to original ring.
 @item @strong{Example:}
 @example
 @c example
   ring r=0,(x,y,z),dp;
-  ideal i=x,y+z,2xz;
-  ring R=0,(a,b,x,y,c),lp;
-  ideal i=imap(r,i);
-  i;
+  ideal i=x,y + y2;
+  ideal j = homog(i, z); j;
+  ring R=0,(x,y),lp;
+  ideal i, j = imap(r,i), imap(r, j);
+  i; j;
 @c example
 @end example
 @end table
-@menu
-* ring::
-* qring::
-* fetch::
-@end menu
-@iftex
-See @ref{ring}; @ref{qring};
+@c ref
+See @ref{homog}; @ref{map}; @ref{ring}; @ref{qring};
 @ref{fetch}.
-@end iftex
+@c ref
 @c ---------------------------------------
 @node indepSet, insert, imap, Functions
 @subsection indepSet
@@ -2034,8 +2056,8 @@ See
 ideal resp. module
 @item @strong{Purpose:}
 ideal or module intersection.
-@*If the option @code{computeSB} is in effect
-the result will be a standard basis.
+@item @strong{Note:}
+If the option @code{computeSB} is in effect the result will is a standard basis.
 @item @strong{Example:}
 @example
 @c example
@@ -2054,13 +2076,11 @@ the result will be a standard basis.
 @menu
 * ideal expressions::
 * module expressions::
-* Data types::
 * option::
 @end menu
 @iftex
 See @ref{ideal expressions};
 @ref{module expressions};
-@ref{Data types};
 @ref{option}.
 @end iftex
 @c ---------------------------------------
@@ -2207,7 +2227,7 @@ See @ref{ideal expressions}; @ref{module expressions}; @ref{vdim}.
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-deletes variables.
+deletes objects.
 @item @strong{Example:}
 @example
 @c example
@@ -2320,6 +2340,7 @@ to the monomial ordering.
   lead(v);
   lead(i);
   lead(m);
+  lead(0);
 @c example
 @end example
 @end table
@@ -2330,7 +2351,8 @@ to the monomial ordering.
 * module expressions::
 @end menu
 @iftex
-See @ref{poly expressions};
+See
+@ref{poly expressions};
 @ref{vector expressions};
 @ref{ideal expressions};
 @ref{module expressions}.
@@ -2356,17 +2378,16 @@ with respect to the monomial ordering.
   vector v=[2*x^10,f];
   leadcoef(f);
   leadcoef(v);
+  leadcoef(0);
 @c example
 @end example
 @end table
-@menu
-* poly expressions::
-* vector expressions::
-@end menu
-@iftex
-See @ref{poly expressions};
+@c ref
+See 
+@ref{number} 
+@ref{poly expressions};
 @ref{vector expressions}.
-@end iftex
+@c ref
 @c -------------------------------------------------
 @node leadexp, LIB, leadcoef, Functions
 @subsection leadexp
@@ -2387,17 +2408,16 @@ returns the exponent vector of the leading monomial of a polynomial or a vector.
   vector v=[2*x^10,f];
   leadexp(f);
   leadexp(v);
+  leadexp(0);
 @c example
 @end example
 @end table
-@menu
-* poly expressions::
-* vector expressions::
-@end menu
-@iftex
-See @ref{poly expressions};
+@c ref
+See 
+@ref{intvec};
+@ref{poly expressions};
 @ref{vector expressions}.
-@end iftex
+@c ref
 @c ---------------------------------------
 @node LIB, lift, leadexp, Functions
 @subsection LIB
@@ -2413,29 +2433,36 @@ filename does not start with @kbd{.} or @kbd{/}, the following directories are
 searched for the file: the current directory,
 the directories given in the environment variable
 @code{SINGULARPATH}@footnote{@code{SPATH} on MS-DOS},
-@code{usr/local/share/Singular}.
+and finally some default directory (like @code{/usr/local/share/Singular}).
 Only the names of the procedures in the library are loaded, the body of
 the proc
 is read during the first call of this proc. This minimizes
-the memory consumption by unused procedures.
+the memory consumption by unused procedures. When @sc{Singular} is
+started with the @code{-q} or @code{--quiet} option, no message about
+the loading of a library is displayed.
+@item @strong{Syntax:}
+@code{LIB;}
+@item @strong{Type:}
+string
+@item @strong{Purpose:}
+shows all loaded libraries.
 @item @strong{Example:}
 @example
-  LIB "lib"; // the names of the procedures in the
-             // file lib are now known to @sc{Singular}
+  LIB "inout.lib"; // the names of the procedures of inout.lib
+                   // are now known to Singular
+  @expansion{}// ** loaded ./inout.lib (1.5,1998/05/05)
+  LIB;
+  @expansion{} standard.lib,inout.lib
 @end example
 @end table
-@menu
-* LIB in a library::
-* string expressions::
-* proc::
-* Procedures::
-* Libraries::
-* SINGULAR libraries:: all standard libraries.
-@end menu
-@iftex
-See @ref{LIB in a library}; @ref{proc}; @ref{procedures and Libraries};
-@ref{string expressions}; @ref{SINGULAR libraries}.
-@end iftex
+@c ref
+See @ref{Commandline options}; 
+@ref{LIB in a library}; 
+@ref{proc}; 
+@ref{Procedures and libraries};
+@ref{string expressions}; 
+@ref{SINGULAR libraries}.
+@c ref
 @c -------------------------------------------------
 @node lift, liftstd, LIB, Functions
 @subsection lift
