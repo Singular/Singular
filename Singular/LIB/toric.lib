@@ -1,4 +1,4 @@
-// version="$Id: toric.lib,v 1.3 2000-07-28 12:54:45 theis Exp $";
+// version="$Id: toric.lib,v 1.4 2000-07-28 13:32:43 theis Exp $";
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -697,7 +697,7 @@ For the mathematical background, see
 @ref{Toric ideals and integer programming}. 
 @end texinfo
 EXAMPLE:  example toric_ideal; shows an example
-SEE ALSO: toric_std, toric_lib, IP_lib, toric ideals
+SEE ALSO: toric_std, toric_lib, ip_lib, toric ideals
 "
 {
   if(size(#)==2)
@@ -746,7 +746,7 @@ For the mathematical background, see
 @ref{Toric ideals and integer programming}. 
 @end texinfo
 EXAMPLE:  example toric_std; shows an example
-SEE ALSO: toric_ideal, toric_lib, IP_lib, toric ideals
+SEE ALSO: toric_ideal, toric_lib, ip_lib, toric ideals
 "
 {
   ideal J;
