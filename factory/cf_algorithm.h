@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_algorithm.h,v 1.2 1997-08-29 08:40:35 schmidt Exp $ */
+/* $Id: cf_algorithm.h,v 1.3 1997-08-29 11:30:38 schmidt Exp $ */
 
 #ifndef INCL_CF_ALGORITHM_H
 #define INCL_CF_ALGORITHM_H
@@ -13,7 +13,7 @@
 // on canonical forms (factorization, gcd, etc.).
 //
 // This header file corresponds to:
-// cf_chinese.cc, cf_factor.cc
+// cf_chinese.cc, cf_factor.cc, cf_linsys.cc
 //
 //}}}
 
@@ -38,6 +38,12 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha );
 CFFList sqrFree ( const CanonicalForm & f, bool sort = false );
 
 bool isSqrFree ( const CanonicalForm & f );
+//}}}
+
+//{{{ declarations from cf_linsys.cc
+bool linearSystemSolve( CFMatrix & M );
+
+CanonicalForm determinant( const CFMatrix & M, int n );
 //}}}
 
 /*ENDPUBLIC*/
