@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.146 1999-09-02 14:24:48 Singular Exp $
+@comment $Id: reference.doc,v 1.147 1999-09-03 11:56:02 pohl Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1677,8 +1677,8 @@ See
 @item @strong{Type:}
 ideal
 @item @strong{Purpose:}
-returns an ideal which is contained in the ideal_expression such that the ith
-generator is a univariate polynomial in the ith ring variable.
+returns an ideal which is contained in the ideal_expression such that the i-th
+generator is a univariate polynomial in the i-th ring variable.
 @* The polynomials have minimal degree w.r.t.@: this property.  The
 ideal must be zero-dimensional and given as a reduced Groebner basis in
 the current ring.
