@@ -2,7 +2,7 @@
 ###
 ### Makefile for Singular-modules
 ###
-### $Id: Makefile.in,v 1.8 2002-06-27 14:02:34 anne Exp $
+### $Id: Makefile.in,v 1.9 2003-06-09 09:42:23 krueger Exp $
 ###
 #################################################################
 
@@ -84,10 +84,10 @@ modules: mod_prepare
 		if test -d $${SUBDIR}; then \
 		   echo ${MAKE} $@ in $${SUBDIR}; \
 		   ( cd $${SUBDIR} && ${MAKE} ;) \
-                fi;\
+		fi;\
 		if test !-d $${SUBDIR}; then \
 		   echo directory $${SUBDIR} does not exist!; \
-                fi;\
+		fi;\
 	done
 
 clean:
@@ -95,25 +95,25 @@ clean:
 	( cd modgen && make $@; )
 	for SUBDIR in ${MOD_DIRS} ${MOD_FILES}; \
 	do \
-	        if test -d $${SUBDIR}; then \
+		if test -d $${SUBDIR}; then \
 		   echo ${MAKE} $@ in $${SUBDIR}; \
 		   ( cd $${SUBDIR} && ${MAKE} $@; ) \
-	        fi; \
+		fi; \
 	done
 
 mod_clean:
-        for SUBDIR in ${MOD_FILES}; \
+	for SUBDIR in ${MOD_FILES}; \
 	do \
 		if test -d $${SUBDIR}; then \
-                   echo removing $${SUBDIR};\
+		echo removing $${SUBDIR};\
 		   rm -rf $${SUBDIR}; \
 		fi; \
-        done 
+	done 
 
-        for SUBDIR in ${MOD_DIRS}; \
+	for SUBDIR in ${MOD_DIRS}; \
 	do \
 		if test -d $${SUBDIR}; then \
-	           echo ${MAKE} clean in $${SUBDIR}; \
+		   echo ${MAKE} clean in $${SUBDIR}; \
 		   ( cd $${SUBDIR} && ${MAKE} clean; )\
 		fi; \
 	done
