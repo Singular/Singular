@@ -29,7 +29,7 @@ INSTALL_DATA    = ${INSTALL} -m 644
 MODGEN		= $(bindir)/modgen
 BISON		= bison
 
-CFLAGS	+= -g -I${includedir}-I../include -I../../Singular -DNDEBUG -DMODULE_GENERATOR \
+CFLAGS	+= -g -I${includedir} -I../include -I../../Singular -DNDEBUG -DMODULE_GENERATOR \
 	-D${SING_UNAME}
 LIBS	+= -L/usr/local/lib -lgmp
 
