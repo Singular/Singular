@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.53 1998-05-18 18:03:13 Singular Exp $
+@comment $Id: types.doc,v 1.54 1998-05-18 19:10:01 wichmann Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -75,7 +75,7 @@ is not a copy but another reference to the same ring.
 defines a ring @code{s} which is just another reference (or name)
 for the @code{basering}. This is useful if the basering
 is not local to the procedure (so it cannot be accessed by its name)
-but you need a name for it (e.g. for a use with @code{setring} or @code{map}).
+but one needs a name for it (e.g. for a use with @code{setring} or @code{map}).
 @code{setring r;} does not work in this case, because
 @code{r} may not be local to the procedure.
 
@@ -397,9 +397,6 @@ defines an integer variable.
 @subsection int expressions
 @cindex int expressions
 
-@example
-@end example
-
 An int expression is:
 @enumerate
 @item
@@ -470,24 +467,26 @@ See
 @cindex mod
 @cindex div
 
-@table @code
-@item ++
+@c remark: the following table should have style @asis, since the
+@c   commas below should not by set in style @code.
+@table @asis
+@item @code{++}
 changes its operand to its successor, is itself no int expression
-@item --
+@item @code{--}
 changes its operand to its predecessor, is itself no int expression
-@item +
+@item @code{+}
 addition
-@item -
+@item @code{-}
 negation or subtraction
-@item *
+@item @code{*}
 multiplication
-@item div, /
+@item @code{div}, @code{/}
 division in the integers (omitting the remainder)
-@item %, mod
+@item @code{%}, @code{mod}
 modulo (the remainder of the division)
-@item ^, **
+@item @code{^}, @code{**}
 power, exponentiation
-@item <, >, <=, >=, ==, <>
+@item @code{<}, @code{>}, @code{<=}, @code{>=}, @code{==}, @code{<>}
 comparison
 @end table
 
@@ -644,7 +643,7 @@ determined by evaluating @code{a}, even though the value of
 this is different from the left-to-right evaluation of logical
 expressions (as found in most programming languages) which
 determine the value of @code{(1 || a)} without evaluating @code{a}.
-See @ref{Evaluation of logical expressions}.
+See @ref{Major differences to the C programming language}.
 @end enumerate
 
 @c ------------------------------
@@ -1350,7 +1349,7 @@ specification. The client "listens" at the given port until the server
 application does a connect call. If @sc{Singular} is used as server
 application it has to be started with the command line option @code{-b}.
 Since launching is done using @code{rsh}, the host on which the
-application should run must have an entry in your @code{.rhosts}
+application should run must have an entry in the @code{.rhosts}
 file. Even the local machine must have an entry if applications should
 be launched locally.
 
@@ -1488,14 +1487,11 @@ qring). If one element belongs to a ring the whole list belongs to that
 ring. (This applies also to the special list @code{#}.) The expression
 @code{list()} is the empty list, see @ref{Type conversion and casting}.
 
-Note that a list stores the objects itself and not the names.
-Hence, if @code{L} is a list, @code{L[1]} for example has no name.
-You can create a name, say @code{R}, for @code{L[1]} by @code{def R=L[1];}.
-If you want to store also the name of an object,
-say @code{r}, you may add it to the list with @code{nameof(r);}.
-Objects of a list may be rings. If @code{L[1]} is a ring, you may
-define @code{L[1]} to be the basering for instance by
-@code{setring L[1];}.
+Note that a list stores the objects itself and not the names.  Hence, if
+@code{L} is a list, @code{L[1]} for example has no name.  A name, say
+@code{R}, can be created for @code{L[1]} by @code{def R=L[1];}. To store
+also the name of an object, say @code{r}, it can be added to the list
+with @code{nameof(r);}. Objects of a list may also be rings.
 
 @strong{Note}: Unlike other assignments a ring as an element of a list
 is not a copy but another reference to the same ring.
@@ -1839,7 +1835,7 @@ elements, then only the first rows*cols elements are used.
 If the right-hand side is a matrix expression
 the matrix on the left-hand side becomes the same size as the right-hand side,
 otherwise the size is determined by the left-hand side.
-If the size is omitted a 1x1 matrix will be created.
+If the size is omitted a 1x1 matrix is created.
 @item Default:
 0 (1 x 1 matrix)
 @item Example:
@@ -2865,16 +2861,16 @@ name of the n-th ring variable (see @ref{varstr})
 @cindex string
 
 Variables of type @code{string} are used for output (almost every type
-can be "converted" to @code{string}) and for building your own commands
-at runtime (see @ref{execute}).  They are also return values of certain
-interpreter related functions (see @ref{Functions}).  String constants
-consist of a sequence of ANY characters (including newline!) between a
-starting @code{"} and a closing @code{"}.  There is also a string
-constant @code{newline}, which is the newline character.  The @code{+}
-sign "adds" strings, @code{""} is the empty string (hence strings form a
-semigroup). Strings may be used to comment the output of a computation
-or to give it a nice format. Strings may also be used for intermidiate
-conversion of one type into another.
+can be "converted" to @code{string}) and for building user defined
+commands at runtime (see @ref{execute}).  They are also return values of
+certain interpreter related functions (see @ref{Functions}).  String
+constants consist of a sequence of ANY characters (including newline!) 
+between a starting @code{"} and a closing @code{"}.  There is also a
+string constant @code{newline}, which is the newline character.  The
+@code{+} sign "adds" strings, @code{""} is the empty string (hence
+strings form a semigroup). Strings may be used to comment the output of
+a computation or to give it a nice format. Strings may also be used for
+intermidiate conversion of one type into another.
 @example
 @c example
   string s="Hi";
