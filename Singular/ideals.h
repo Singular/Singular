@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.32 2001-02-22 09:40:16 Singular Exp $ */
+/* $Id: ideals.h,v 1.33 2001-02-27 18:06:34 mschulze Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -128,6 +128,7 @@ ideal   idSubst(ideal i, int n, poly e);
 
 ideal   idJet(ideal i,int d);
 ideal   idJetW(ideal i,int d, intvec * iv);
+int idMinDegW(ideal M,intvec *w);
 ideal   idSeries(int n,ideal M,matrix U=NULL);
 
 BOOLEAN idIsZeroDim(ideal i);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.122 2001-02-22 09:40:15 Singular Exp $ */
+/* $Id: ideals.cc,v 1.123 2001-02-27 18:06:34 mschulze Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2902,6 +2902,18 @@ ideal idJetW(ideal i,int d, intvec * iv)
     omFreeSize((ADDRESS)w,(pVariables+1)*sizeof(short));
   }
   return r;
+}
+
+int idMinDegW(ideal M,intvec *w)
+{
+  int d=-1;
+  for(int i=0;i<IDELEMS(M);i++)
+  {
+    int d0=pMinDegW(M->m[i],w);
+    if(-1<d0&&(d0<d||d==-1))
+      d=d0;
+  }
+  return d;
 }
 
 ideal idSeries(int n,ideal M,matrix U=NULL)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.64 2001-02-08 13:46:36 Singular Exp $ */
+/* $Id: polys1.cc,v 1.65 2001-02-27 18:06:35 mschulze Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -1184,6 +1184,28 @@ poly ppJetW(poly p, int m, short *w)
   return r;
 }
 
+int pMinDegW(poly p,intvec *w)
+{
+  if(p==NULL)
+    return -1;
+  int n=0;
+  if(w!=NULL)
+    n=w->length();
+  if(pVariables<n)
+    n=pVariables;
+  int d=-1;
+  while(p!=NULL)
+  {
+    int d0=0;
+    for(int j=0;j<n;j++)
+      d0+=(*w)[j]*pGetExp(p,j+1);
+    if(d0<d||d==-1)
+      d=d0;
+    pIter(p);
+  }
+  return d;
+}
+
 poly pSeries(int n,poly p,poly u=NULL)
 {
   if(p!=NULL)
@@ -1204,7 +1226,6 @@ poly pInvers(int n,poly u)
   poly v=pNSet(u0);
   if(n==0)
     return v;
-  /* u0 is pGetCoeff(v) */  
   poly u1=pJet(pSub(pOne(),pMult_nn(u,u0)),n);
   if(u1==NULL)
     return v;
