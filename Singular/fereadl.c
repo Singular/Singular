@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: fereadl.c,v 1.5 1999-11-18 16:26:59 Singular Exp $ */
+/* $Id: fereadl.c,v 1.6 1999-12-06 18:29:51 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -637,7 +637,7 @@ char * fe_fgets_stdin_fe(char *pr,char *s, int size)
         case feCTRL('K'): /* delete up to the end of the line */
         {
           fe_ctrl_k(s,i);
-	  memset(&(s[i]),'\0',size-i);
+          memset(&(s[i]),'\0',size-i);
           /* s[i]='\0';*/
           change=1;
           break;
