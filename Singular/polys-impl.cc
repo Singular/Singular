@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.54 2001-02-22 12:50:13 Singular Exp $ */
+/* $Id: polys-impl.cc,v 1.55 2001-02-23 12:43:14 Singular Exp $ */
 
 /***************************************************************
  *
@@ -103,19 +103,24 @@ unsigned long p_GetShortExpVector(poly p, ring r)
   unsigned int i = 0, j=1;
 
   if (n == 0)
-  {  
-    n=1;
-    m1=0;
-  }  
-  //{
-  //  for (; j<=(unsigned long) r->N; j++)
-  //  {
-  //    if (p_GetExp(p,j,r) > 0) i++;
-  //    if (i == BIT_SIZEOF_LONG) break;
-  //  }
-  //  ev = ~((unsigned long)0) >> ((unsigned long) (BIT_SIZEOF_LONG - i));
-  //  return ev;
-  //}
+  {
+    if (r->N <2*BIT_SIZEOF_LONG)
+    {
+      n=1;
+      m1=0;
+    }
+    else
+    {
+      for (; j<=(unsigned long) r->N; j++)
+      {
+        if (p_GetExp(p,j,r) > 0) i++;
+        if (i == BIT_SIZEOF_LONG) break;
+      }
+      if (i>0)
+      ev = ~((unsigned long)0) >> ((unsigned long) (BIT_SIZEOF_LONG - i));
+      return ev;
+    }
+  }
   else
   {
     m1 = (n+1)*(BIT_SIZEOF_LONG - n*r->N);
