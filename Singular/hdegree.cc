@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hdegree.cc,v 1.11 1998-04-07 18:13:57 Singular Exp $ */
+/* $Id: hdegree.cc,v 1.12 1998-04-08 10:01:58 pohl Exp $ */
 /*
 *  ABSTRACT -  dimension, multiplicity, HC, kbase
 */
@@ -72,13 +72,13 @@ int  scDimInt(ideal S, ideal Q)
 {
   Exponent_t  mc;
   hexist = hInit(S, Q, &hNexist);
-  if (hNexist==0)
+  if (!hNexist)
     return pVariables;
   hwork = (scfmon)Alloc(hNexist * sizeof(scmon));
   hvar = (varset)Alloc((pVariables + 1) * sizeof(int));
   hpure = (scmon)Alloc((1 + (pVariables * pVariables)) * sizeof(Exponent_t));
   mc = hisModule;
-  if (mc==0)
+  if (!mc)
   {
     hrad = hexist;
     hNrad = hNexist;
@@ -89,14 +89,14 @@ int  scDimInt(ideal S, ideal Q)
   hCo = pVariables + 1;
   loop
   {
-    if (mc!=0)
+    if (mc)
       hComp(hexist, hNexist, mc, hrad, &hNrad);
-    if (hNrad!=0)
+    if (hNrad)
     {
       hNvar = pVariables;
       hRadical(hrad, &hNrad, hNvar);
       hSupp(hrad, hNrad, hvar, &hNvar);
-      if (hNvar!=0)
+      if (hNvar)
       {
         memset(hpure, 0, (pVariables + 1) * sizeof(Exponent_t));
         hPure(hrad, 0, &hNrad, hvar, hNvar, hpure, &hNpure);
@@ -118,7 +118,7 @@ int  scDimInt(ideal S, ideal Q)
   Free((ADDRESS)hvar, (pVariables + 1) * sizeof(int));
   Free((ADDRESS)hwork, hNexist * sizeof(scmon));
   hDelete(hexist, hNexist);
-  if (hisModule!=0)
+  if (hisModule)
     Free((ADDRESS)hrad, hNexist * sizeof(scmon));
   return pVariables - hCo;
 }
@@ -138,21 +138,21 @@ static void hIndSolve(scmon pure, int Npure, scfmon rad, int Nrad,
     if (dn < hCo)
     {
       hCo = dn;
-      for (iv=pVariables; iv>0; iv--)
+      for (iv=pVariables; iv; iv--)
       {
-        if (pure[iv]!=0)
+        if (pure[iv])
           hInd[iv] = 0;
         else
           hInd[iv] = 1;
       }
-      if (Nrad!=0)
+      if (Nrad)
       {
         pn = *rad;
         iv = Nvar;
         loop
         {
           x = var[iv];
-          if (pn[x]!=0)
+          if (pn[x])
           {
             hInd[x] = 0;
             break;
@@ -168,7 +168,7 @@ static void hIndSolve(scmon pure, int Npure, scfmon rad, int Nrad,
   iv = Nvar;
   while(pure[var[iv]]) iv--;
   hStepR(rad, Nrad, var, iv, &rad0);
-  if (rad0!=0)
+  if (rad0)
   {
     iv--;
     if (rad0 < Nrad)
@@ -194,9 +194,9 @@ static void hIndSolve(scmon pure, int Npure, scfmon rad, int Nrad,
   else
   {
     hCo = Npure + 1;
-    for (x=pVariables; x>0; x--)
+    for (x=pVariables; x; x--)
     {
-      if (pure[x]!=0)
+      if (pure[x])
         hInd[x] = 0;
       else
         hInd[x] = 1;
@@ -264,7 +264,7 @@ intvec * scIndIntvec(ideal S, ideal Q)
   Free((ADDRESS)hvar, (pVariables + 1) * sizeof(int));
   Free((ADDRESS)hwork, hNexist * sizeof(scmon));
   hDelete(hexist, hNexist);
-  if (hisModule!=0)
+  if (hisModule)
     Free((ADDRESS)hrad, hNexist * sizeof(scmon));
   return Set;
 }
@@ -302,7 +302,7 @@ static void hIndep(scmon pure)
   Set = ISet->set = new intvec(pVariables);
   for (iv=pVariables; iv!=0 ; iv--)
   {
-    if (pure[iv]!=0)
+    if (pure[iv])
       (*Set)[iv-1] = 0;
     else
       (*Set)[iv-1] = 1;
@@ -330,7 +330,7 @@ static void hIndMult(scmon pure, int Npure, scfmon rad, int Nrad,
         for (iv = Nvar; iv!=0; iv--)
         {
           x = var[iv];
-          if (pn[x]!=0)
+          if (pn[x])
           {
             pure[x] = 1;
             hIndep(pure);
@@ -349,7 +349,7 @@ static void hIndMult(scmon pure, int Npure, scfmon rad, int Nrad,
       return;
     loop
     {
-      if(pure[var[iv]]==0)
+      if(!pure[var[iv]])
       {
         if(hNotZero(rad, Nrad, var, iv))
         {
@@ -359,11 +359,11 @@ static void hIndMult(scmon pure, int Npure, scfmon rad, int Nrad,
         }
       }
       iv--;
-      if (iv==0)
+      if (!iv)
         return;
     }
   }
-  while(pure[var[iv]]!=0) iv--;
+  while(pure[var[iv]]) iv--;
   hStepR(rad, Nrad, var, iv, &rad0);
   iv--;
   if (rad0 < Nrad)
@@ -485,7 +485,7 @@ static void hCheckIndep(scmon pure)
       Set = res->set;
       for (iv=pVariables; iv; iv--)
       {
-        if (pure[iv]!=0)
+        if (pure[iv])
           (*Set)[iv-1] = 0;
         else
           (*Set)[iv-1] = 1;
@@ -505,15 +505,15 @@ static void hIndAllMult(scmon pure, int Npure, scfmon rad, int Nrad,
     dn = Npure + Nrad;
     if (dn > hCo)
     {
-      if (Nrad==0)
+      if (!Nrad)
         hCheckIndep(pure);
       else
       {
         pn = *rad;
-        for (iv = Nvar; iv>0; iv--)
+        for (iv = Nvar; iv; iv--)
         {
           x = var[iv];
-          if (pn[x]!=0)
+          if (pn[x])
           {
             pure[x] = 1;
             hCheckIndep(pure);
@@ -525,7 +525,7 @@ static void hIndAllMult(scmon pure, int Npure, scfmon rad, int Nrad,
     return;
   }
   iv = Nvar;
-  while(pure[var[iv]]!=0) iv--;
+  while(pure[var[iv]]) iv--;
   hStepR(rad, Nrad, var, iv, &rad0);
   iv--;
   if (rad0 < Nrad)
@@ -573,7 +573,7 @@ lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
   hNvar = pVariables;
   hRadical(hrad, &hNrad, hNvar);
   hSupp(hrad, hNrad, hvar, &hNvar);
-  if (hNvar!=0)
+  if (hNvar)
   {
     hCo = hNvar;
     memset(hpure, 0, (pVariables + 1) * sizeof(Exponent_t));
@@ -581,7 +581,7 @@ lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
     hLexR(hrad, hNrad, hvar, hNvar);
     hDimSolve(hpure, hNpure, hrad, hNrad, hvar, hNvar);
   }
-  if ((hCo!=0) && (hCo < pVariables))
+  if (hCo && (hCo < pVariables))
   {
     hIndMult(hpure, hNpure, hrad, hNrad, hvar, hNvar);
   }
@@ -648,12 +648,12 @@ static int hZeroMult(scmon pure, scfmon stc, int Nstc, varset var, int Nvar)
   Exponent_t  x, x0;
   scmon pn;
   scfmon sn;
-  if (iv==0)
+  if (!iv)
     return pure[var[1]];
-  else if (Nstc==0)
+  else if (!Nstc)
   {
     sum = 1;
-    for (i = Nvar; i>0; i--)
+    for (i = Nvar; i; i--)
       sum *= pure[var[i]];
     return sum;
   }
@@ -694,7 +694,7 @@ static void hProject(scmon pure, varset sel)
   i0 = 0;
   for (i = 1; i <= pVariables; i++)
   {
-    if (pure[i]!=0)
+    if (pure[i])
     {
       i0++;
       sel[i0] = i;
@@ -722,15 +722,15 @@ static void hDimMult(scmon pure, int Npure, scfmon rad, int Nrad,
     dn = Npure + Nrad;
     if (dn == hCo)
     {
-      if (Nrad==0)
+      if (!Nrad)
         hProject(pure, hsel);
       else
       {
         pn = *rad;
-        for (iv = Nvar; iv>0; iv--)
+        for (iv = Nvar; iv; iv--)
         {
           x = var[iv];
-          if (pn[x]!=0)
+          if (pn[x])
           {
             pure[x] = 1;
             hProject(pure, hsel);
@@ -749,7 +749,7 @@ static void hDimMult(scmon pure, int Npure, scfmon rad, int Nrad,
       return;
     loop
     {
-      if(pure[var[iv]]==0)
+      if(!pure[var[iv]])
       {
         if(hNotZero(rad, Nrad, var, iv))
         {
@@ -759,7 +759,7 @@ static void hDimMult(scmon pure, int Npure, scfmon rad, int Nrad,
         }
       }
       iv--;
-      if (iv==0)
+      if (!iv)
         return;
     }
   }
@@ -792,7 +792,7 @@ static void hDegree(ideal S, ideal Q)
   int  di;
   Exponent_t  mc;
   hexist = hInit(S, Q, &hNexist);
-  if (hNexist==0)
+  if (!hNexist)
   {
     hCo = 0;
     hMu = 1;
@@ -805,7 +805,7 @@ static void hDegree(ideal S, ideal Q)
   hpur0 = (scmon)Alloc((1 + (pVariables * pVariables)) * sizeof(Exponent_t));
   mc = hisModule;
   hrad = (scfmon)Alloc(hNexist * sizeof(scmon));
-  if (mc==0)
+  if (!mc)
   {
     memcpy(hrad, hexist, hNexist * sizeof(scmon));
     hstc = hexist;
@@ -819,18 +819,18 @@ static void hDegree(ideal S, ideal Q)
   di = hCo + 1;
   loop
   {
-    if (mc!=0)
+    if (mc)
     {
       hComp(hexist, hNexist, mc, hrad, &hNrad);
       hNstc = hNrad;
       memcpy(hstc, hrad, hNrad * sizeof(scmon));
     }
-    if (hNrad!=0)
+    if (hNrad)
     {
       hNvar = pVariables;
       hRadical(hrad, &hNrad, hNvar);
       hSupp(hrad, hNrad, hvar, &hNvar);
-      if (hNvar!=0)
+      if (hNvar)
       {
         hCo = hNvar;
         memset(hpure, 0, (pVariables + 1) * sizeof(Exponent_t));
@@ -849,11 +849,11 @@ static void hDegree(ideal S, ideal Q)
       di = hCo;
       hMu = 0;
     }
-    if ((hNvar!=0) && (hCo == di))
+    if (hNvar && (hCo == di))
     {
-      if ((di!=0) && (di < pVariables))
+      if (di && (di < pVariables))
         hDimMult(hpure, hNpure, hrad, hNrad, hvar, hNvar);
-      else if (di==0)
+      else if (!di)
         hMu++;
       else
       {
@@ -1375,8 +1375,8 @@ extern ideal scKBase(int deg, ideal s, ideal Q)
     di = scDimInt(s, Q);
     if (di != 0)
     {
-      Werror("KBase not finite");
-      return idInit(1,1);
+      //Werror("KBase not finite");
+      return idInit(1,s->rank);
     }
   }
   stcmem = hCreate(pVariables - 1);
