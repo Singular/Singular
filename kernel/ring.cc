@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.5 2004-02-26 17:09:40 Singular Exp $ */
+/* $Id: ring.cc,v 1.6 2004-04-29 14:53:56 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1565,6 +1565,8 @@ static void rO_WDegree(int &place, int &bitplace, int start, int end,
     long *o, sro_ord &ord_struct, int *weights)
 {
   // weighted degree (aligned) of variables v_start..v_end, ordsgn 1
+  while((start<end) && (weights[0]==0)) { start++; weights++; }
+  while((start<end) && (weights[end-start]==0)) { end--; }
   rO_Align(place,bitplace);
   ord_struct.ord_typ=ro_wp;
   ord_struct.data.wp.start=start;
@@ -1589,6 +1591,8 @@ static void rO_WDegree_neg(int &place, int &bitplace, int start, int end,
     long *o, sro_ord &ord_struct, int *weights)
 {
   // weighted degree (aligned) of variables v_start..v_end, ordsgn -1
+  while((start<end) && (weights[0]==0)) { start++; weights++; }
+  while((start<end) && (weights[end-start]==0)) { end--; }
   rO_Align(place,bitplace);
   ord_struct.ord_typ=ro_wp;
   ord_struct.data.wp.start=start;
