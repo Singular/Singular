@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: fereadl.c,v 1.13 2000-03-02 17:44:53 Singular Exp $ */
+/* $Id: fereadl.c,v 1.14 2000-03-08 13:33:42 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -22,7 +22,10 @@
  #include <unistd.h>
  #include <stdio.h>
  #include <stdlib.h>
+ #include <sys/time.h>
+ #include <sys/types.h>
  #include <string.h>
+ 
  #ifdef MSDOS
   #include <pc.h>
  #else
@@ -484,12 +487,27 @@ char * fe_fgets_stdin_fe(char *pr,char *s, int size)
         case feCTRL('M'):
         case feCTRL('J'):
         {
+	  fd_set fdset;
+	  struct timeval tv;
+	  int sel;
+
           fe_add_hist(s);
           i=strlen(s);
           if (i<size-1) s[i]='\n';
           fputc('\n',fe_echo);
           fflush(fe_echo);
-          fe_temp_reset();
+
+	  FD_ZERO (&fdset);
+	  FD_SET(STDIN_FILENO, &fdset);
+	  tv.tv_sec = 0;
+	  tv.tv_usec = 0;
+	  #ifdef hpux
+	    sel = select (STDIN_FILENO+1, (int *)fdset.fds_bits, NULL, NULL, &tv);
+	  #else
+	    sel = select (STDIN_FILENO+1, &fdset, NULL, NULL, &tv);
+	  #endif
+	  if (sel==0)
+            fe_temp_reset();
           return s;
         }
         #ifdef MSDOS
