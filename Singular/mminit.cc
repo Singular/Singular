@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mminit.cc,v 1.17 1999-11-15 17:20:25 obachman Exp $ */
+/* $Id: mminit.cc,v 1.18 1999-11-17 12:09:27 obachman Exp $ */
 /*
 * ABSTRACT: init of memory management
 */
@@ -28,7 +28,12 @@ memHeap mm_specHeap = NULL;
 void* operator new ( size_t size )
 {
 #ifdef MDEBUG
-  return mmDBAlloc( size, "new",0);
+  extern int mm_no_mtrack;
+  void* addr;
+  mm_no_mtrack = 1;
+  addr = mmDBAlloc( size, "new",0);
+  mm_no_mtrack = 0;
+  return addr;
 #else
   return AllocL( size );
 #endif

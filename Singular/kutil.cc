@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.49 1999-11-15 17:20:16 obachman Exp $ */
+/* $Id: kutil.cc,v 1.50 1999-11-17 12:09:26 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -308,9 +308,6 @@ BOOLEAN K_Test (char *f, int l, kStrategy strat, int pref)
   int i;
   BOOLEAN ret = TRUE;
   // test P
-#ifdef MDEBUG
-  if (pref >= 2) mmStartReferenceWatch();
-#endif
   ret = K_Test_L(f, l, &(strat->P),
                  (strat->P.p != NULL && pNext(strat->P.p) != strat->tail),
                  -1, strat->T, strat->tl+1);
@@ -323,9 +320,6 @@ BOOLEAN K_Test (char *f, int l, kStrategy strat, int pref)
   // test T
   if (strat->T != NULL)
   {
-#ifdef MDEBUG
-    if (pref && pref <= 1) mmStartReferenceWatch();
-#endif
     for (i=0; i<=strat->tl; i++)
     {
       if (K_Test_T(f, l, &(strat->T[i]), i) == FALSE)
@@ -334,9 +328,6 @@ BOOLEAN K_Test (char *f, int l, kStrategy strat, int pref)
       }
     }
   }
-#ifdef MDEBUG
-  if (pref) mmStopReferenceWatch();
-#endif
   // test L
   if (strat->L != NULL)
   {
@@ -402,6 +393,17 @@ BOOLEAN K_Test_T(char* f, int l, TObject * T, int i)
 }
 
 
+int kFindInT(poly p, TSet T, int tlength)
+{
+  int i;
+  
+  for (i=0; i<=tlength; i++)
+  {
+    if (T[i].p == p) return i;
+  }
+  return -1;
+}
+
 
 BOOLEAN K_Test_TS(char *f, int l, kStrategy strat)
 {
@@ -414,9 +416,7 @@ BOOLEAN K_Test_TS(char *f, int l, kStrategy strat)
   {
     for (i=0; i<=strat->sl; i++)
     {
-      for (j=0; j<=strat->tl; j++)
-        if (strat->S[i] == strat->T[j].p) break;
-      if (j > strat->tl)
+      if (kFindInT(strat->S[i], strat->T, strat->tl) < 0)
       {
         Warn("S[%d] not in T", i);
         ret = FALSE;
@@ -592,6 +592,8 @@ BOOLEAN sugarDivisibleBy(int ecart1, int ecart2)
 */
 void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
 {
+  assume(i<=strat->sl);
+
   int      l,j,compare;
   LObject  Lp;
 
@@ -600,6 +602,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
 #endif
   /*- computes the lcm(s[i],p) -*/
   Lp.lcm = pInit();
+
   pLcm(p,strat->S[i],Lp.lcm);
   pSetm(Lp.lcm);
   if (strat->sugarCrit)
@@ -2705,6 +2708,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
           }
           h.sev = pGetShortExpVector(h.p);
           strat->enterS(h,pos,strat);
+          enterT(h, strat);
           strat->fromQ[pos]=1;
         }
       }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmbt.c,v 1.21 1999-11-15 17:20:23 obachman Exp $ */
+/* $Id: mmbt.c,v 1.22 1999-11-17 12:09:27 obachman Exp $ */
 /*
 * ABSTRACT: backtrace: part of memory subsystem (for linux/elf)
 * needed programs: - mprpc to set the variable MPRPC
@@ -110,6 +110,8 @@ void mmTrack_sig11_handler(int sig)
   fflush(stdout);
 }
 
+int mm_no_mtrack = 0;
+
 void mmTrack (unsigned long *bt_stack)
 {
   unsigned long pc, *fp = getfp ((unsigned long *) &bt_stack);
@@ -120,15 +122,18 @@ void mmTrack (unsigned long *bt_stack)
 #endif
 
   if (mm_lowpc==0) mmTrackInit();
-
-  while ((fp!=NULL) && ((unsigned long)fp>4095)
-  && ((unsigned long)fp < ((unsigned long)0xff000000))
-  && *fp && (pc = getpc (fp))
-  && !entrypc (pc) && (i<BT_MAXSTACK))
+  
+  if (! mm_no_mtrack)
   {
-    if ( mmTrack_sig11_caught) break;
-    bt_stack[i]=pc; i++;
-    fp = (unsigned long *) *fp;
+    while ((fp!=NULL) && ((unsigned long)fp>4095)
+           && ((unsigned long)fp < ((unsigned long)0xff000000))
+           && *fp && (pc = getpc (fp))
+           && !entrypc (pc) && (i<BT_MAXSTACK))
+    {
+      if ( mmTrack_sig11_caught) break;
+      bt_stack[i]=pc; i++;
+      fp = (unsigned long *) *fp;
+    }
   }
 /*  signal(SIGSEGV, (si_hdl_typ) sig11_handler); */
   while(i<BT_MAXSTACK)

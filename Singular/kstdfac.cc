@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.30 1999-11-15 17:20:15 obachman Exp $ */
+/* $Id: kstdfac.cc,v 1.31 1999-11-17 12:09:25 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -101,7 +101,7 @@ static void copyL (kStrategy o,kStrategy n)
       i++;
       if(i>o->tl)
       {
-        PrintS("poly p1 not found in T:");wrp(p);PrintLn();
+        Warn("poly p1 not found in T:");wrp(p);PrintLn();
         l[j].p1=pCopy(p);
         break;
       }
@@ -121,7 +121,7 @@ static void copyL (kStrategy o,kStrategy n)
       i++;
       if(i>o->tl)
       {
-        PrintS("poly p2 not found in T:");wrp(p);PrintLn();
+        Warn("poly p2 not found in T:");wrp(p);PrintLn();
         l[j].p2=pCopy(p);
         break;
       }
@@ -148,6 +148,7 @@ static void copyL (kStrategy o,kStrategy n)
 
 kStrategy kStratCopy(kStrategy o)
 {
+  kTest_TS(o);
   kStrategy s=(kStrategy)Alloc0SizeOf(skStrategy);
   s->next=NULL;
   s->red=o->red;
@@ -219,6 +220,7 @@ kStrategy kStratCopy(kStrategy o)
   s->noTailReduction=o->noTailReduction;
   s->fromT=o->fromT;
   s->noetherSet=o->noetherSet;
+  kTest_TS(s);
   return s;
 }
 
@@ -250,9 +252,7 @@ static void completeReduceFac (kStrategy strat, lists FL)
     }
     int facdeg=pFDeg(strat->S[si]);
 
-    kTest(strat);
     ideal fac=singclap_factorize(strat->S[si],NULL,1);
-    kTest(strat);
 #ifndef HAVE_LIBFAC_P
     if (fac==NULL)
     {
@@ -461,6 +461,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
   {
     if (TEST_OPT_REDSB) completeReduceFac(strat,FL);
   }
+  kTest_TS(strat);
   while (strat->Ll >= 0)
   {
     if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
@@ -483,7 +484,6 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
     /* picks the last element from the lazyset L */
     strat->P = strat->L[strat->Ll];
     strat->Ll--;
-    kTest(strat);
     if (pNext(strat->P.p) == strat->tail)
     {
       /* deletes the short spoly and computes */
@@ -740,7 +740,6 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
           }
         }
       } /* for */
-    kTest(strat);
       for(i=0;i<IDELEMS(fac);i++) fac->m[i]=NULL;
       idDelete(&fac);
       idDelete(&fac_copy);
@@ -752,7 +751,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
     {
       if (TEST_OPT_REDSB) completeReduceFac(strat,FL);
     }
-    kTest(strat);
+    kTest_TS(strat);
   }
   if (TEST_OPT_DEBUG) messageSets(strat);
   /* complete reduction of the standard basis--------- */

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.74 1999-11-16 12:39:27 obachman Exp $ */
+/* $Id: ideals.cc,v 1.75 1999-11-17 12:09:24 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2917,13 +2917,14 @@ ideal idModulo (ideal h2,ideal h1)
   
   if (syz_ring != orig_ring)
   {
-    s_temp = idrCopyR_NoSort(temp, orig_ring);
+    s_temp = idrMoveR_NoSort(temp, orig_ring);
   }
   else
   {
     s_temp = temp;
   }
   
+  idTest(s_temp);
   ideal s_temp1 = kStd(s_temp,currQuotient,testHomog,&w,NULL,length);
   if (w!=NULL) delete w;
 
@@ -2945,10 +2946,14 @@ ideal idModulo (ideal h2,ideal h1)
   if (syz_ring!=orig_ring)
   {
     rChangeCurrRing(orig_ring,TRUE);
-    s_temp = idrMoveR_NoSort(s_temp, syz_ring);
-    idDelete(&temp);
+    s_temp1 = idrMoveR_NoSort(s_temp1, syz_ring);
     rKill(syz_ring);
   }
+  else
+  {
+    idDelete(&temp);
+  }
+  idTest(s_temp1);
   return s_temp1;
 }
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.39 1999-11-15 17:20:15 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.40 1999-11-17 12:09:25 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -581,6 +581,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   srmax = strat->sl;
   reduc = olddeg = lrmax = 0;
   /* compute------------------------------------------------------- */
+  kTest_TS(strat);
   while (strat->Ll >= 0)
   {
     if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
@@ -616,12 +617,14 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       message((strat->honey ? strat->P.ecart : 0) + pFDeg(strat->P.p),
               &olddeg,&reduc,strat);
 
+    kTest_TS(strat);
     /* reduction of the element choosen from L */
     red_result = strat->red(&strat->P,strat);
 
     // reduktion to non-zero new poly
     if (red_result == 1)
     {
+      kTest_TS(strat);
       /* statistic */
       if (TEST_OPT_PROT) PrintS("s");
       /* enter P.p into s and L */
