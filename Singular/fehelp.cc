@@ -807,6 +807,9 @@ static void heNetscapeHelp(heEntry hentry)
           feResource('N' /*"netscape"*/), url);
 
   // --remote exits with status != 0 if netscaep isn't already running
+ #ifdef HPUX_9
+ signal(SIGCHLD, (void (*)(int))SIG_DFL);
+ #endif
   if (system(sys) != 0)
   {
     sprintf(sys, "%s %s &", feResource('N' /*"netscape"*/), url);
@@ -819,6 +822,9 @@ static void heNetscapeHelp(heEntry hentry)
       Warn("Help is displayed in already running 'netscape'.");
     }
   }
+ #ifdef HPUX_9
+ signal(SIGCHLD, (void (*)(int))SIG_IGN);
+ #endif
 }
 
 #ifdef WINNT
