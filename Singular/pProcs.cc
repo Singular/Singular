@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: pProcs.cc,v 1.8 1999-10-15 16:07:09 obachman Exp $ */
+/* $Id: pProcs.cc,v 1.9 1999-10-19 17:19:38 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for primitive poly arithmetic
 */
@@ -54,18 +54,6 @@ poly p_Mult_n_General(poly p, number n)
   return q;
 }
 
-#if 1
-#undef _pMonCmp
-#define _pMonCmp(p1, p2, ae, ag, as)            \
-do                                              \
-{                                               \
-  int __j = pComp0(p1, p2);                     \
-  if (__j == 0) ae;                             \
-  if (__j > 0) ag;                              \
-  as;                                           \
-}                                               \
-while (0)
-#endif
 
 /***************************************************************
  *

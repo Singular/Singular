@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz2.cc,v 1.4 1999-10-19 14:55:41 obachman Exp $ */
+/* $Id: syz2.cc,v 1.5 1999-10-19 17:19:38 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -36,7 +36,7 @@
 //#define SHOW_HILB
 //#define SHOW_RESULT
 //#define INVERT_PAIRS
-#define SHOW_CRIT
+//#define SHOW_CRIT
 //#define SHOW_SPRFL
 #define USE_CHAINCRIT
 /*--- some heuristics to optimize the pair sets---*/
