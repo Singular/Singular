@@ -133,6 +133,8 @@
 #define PFREE  free
 /* define if result of PALLOC is aligned on SIZE_OF_SYSTEM_PAGE */
 #undef HAVE_PAGE_ALIGNMENT
+/* define if you have the MTRACK utilities (only on linux/elf) */
+#undef HAVE_MTRACK
 
 /*******************************************************************
  * Defines which are not set by configure
@@ -280,9 +282,6 @@
 #define MAX_INT_VAL 0x7fffffff
 extern int pShortOut;
 
-/* the maximal level of stacks to remembre in debug (MTRACK) mode */
-#define BT_MAXSTACK 10
-
 #ifdef DO_PROFILE
 /* define to enable explicit profiling of some crucial inline
  * routines and defines  */
@@ -355,8 +354,14 @@ extern int pShortOut;
 #define TEST
 /* define MLIST for printing block of used memory on exit */
 #define MLIST 1
+
+#ifdef HAVE_MTRACK 
 /* define MTRACK for allowing to keep track of Alloc/Free with a backtrace */
-/* #define MTRACK */
+/* works only under linux/elf
+#define MTRACK
+/* the maximal level of stacks to remembre in debug (MTRACK) mode */
+#define BT_MAXSTACK 10
+#endif
 
 /* #define PAGE_TEST */
 

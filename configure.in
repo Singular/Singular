@@ -2,9 +2,6 @@ dnl Process this file with autoconf to produce a configure script
 AC_INIT(Singular/matpol.h)
 AC_PREFIX_DEFAULT(`pwd`)
 OUTPUT_MAKEFILES="Makefile doc/Makefile doc/version.texi"
-if test -d "mpr"; then
-   OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" mpr/Makefile"
-fi
 if test -d "rpm"; then
    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" rpm/Makefile"
    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" rpm/rpmrc rpm/Singular.spec"
@@ -603,6 +600,14 @@ else
   ac_configure_args="$ac_configure_args --without-libfac"
 fi
 
+AC_MSG_CHECKING(whether to use mtrack)
+if test -d mpr && test "$ac_cv_singuname" = ix86-Linux; then
+   AC_MSG_RESULT(yes)
+   ac_configure_args="$ac_configure_args --with-mtrack"
+   OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" mpr/Makefile"
+   BUILD_SUBDIRS="$BUILD_SUBDIRS mpr"
+fi
+
 AC_MSG_CHECKING(whether to use with Singular)
 if test "$with_Singular" != no && test "$with_Singular" != yes; then
   if test "$enable_Singular" = yes; then
@@ -642,18 +647,14 @@ fi
 if test -d libfac; then
   SUBDIRS="$SUBDIRS libfac"
 fi
-if test -d sgroup; then
-  SUBDIRS="$SUBDIRS sgroup"
-fi
-if test -d Singular; then
-  SUBDIRS="$SUBDIRS Singular"
-fi
 if test -d rpm; then
   SUBDIRS="$SUBDIRS rpm"
 fi
 if test -d mpr; then
-  CONFIG_SUBDIRS="$CONFIG_SUBDIRS mpr"
   SUBDIRS="$SUBDIRS mpr"
+fi
+if test -d Singular; then
+  SUBDIRS="$SUBDIRS Singular"
 fi
 if test -d emacs; then
   SUBDIRS="$SUBDIRS emacs"
@@ -662,6 +663,9 @@ fi
 if test -d Texi2html; then
   SUBDIRS="$SUBDIRS Texi2html"
   BUILD_SUBDIRS="$BUILD_SUBDIRS Texi2html"
+fi
+if test -d sgroup; then
+  SUBDIRS="$SUBDIRS sgroup"
 fi
   
 

@@ -528,6 +528,10 @@ AC_ARG_WITH(
   gmalloc,
   [  --with-gmalloc          use our own gmalloc routines, instead of the ones
                              provided by the system])
+AC_ARG_WITH(
+  mtrack,
+  [  --with-mtrack           use mpr routines for extended memory tracking
+                             -- works only under ix86-Linux])
 
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl check for packages we need
@@ -822,6 +826,19 @@ else
   AC_SUBST(LD_DYN_FLAGS)
 fi
 
+dnl 
+dnl check for mtrack
+dnl
+AC_MSG_CHECKING(whether to use mtrack)
+if test "$with_mtrack" = yes && test "$ac_cv_singuname" = ix86-Linux; then
+  AC_MSG_RESULT(yes)
+  AC_DEFINE(HAVE_MTRACK)
+else
+  AC_MSG_RESULT(no)
+fi
+
+ 
+
 dnl
 dnl figure out Exponent_t and Order_t
 dnl make sure that 2*sizeof(Exponent_t) + sizeof(Order_t) is aligned
@@ -841,8 +858,6 @@ else
   AC_DEFINE(SIZEOF_TYPE, SIZEOF_SHORT)
 fi
 
-
- 
 AC_OUTPUT(Makefile, \
  if test "$CONFIG_HEADERS"; then echo timestamp > stamp-h; fi)
 
