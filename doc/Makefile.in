@@ -1,7 +1,7 @@
 #####################################################################
 ###
 ### Makefile for Singular documentation
-### $Id: Makefile.in,v 1.86 2003-03-06 11:44:15 levandov Exp $
+### $Id: Makefile.in,v 1.87 2003-05-20 17:47:15 levandov Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -63,7 +63,7 @@ CHKSUM_DB       = ${DOC_SUBDIR}/chksum
 DOC2TEX         = ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
                   -Singular ${SINGULAR} -verbose ${VERBOSE} -make ${MAKE} \
 		  -exdir ${EX_SUBDIR}
-PL2DOC		= ${PERL} ./pl2doc.pl -db  ${CHKSUM_DB}
+PL2DOC		= ${PERL} ./pl2doc.pl -db ${CHKSUM_DB}
 
 # t2h stuff
 TMP_DIR		= @TMP_DIR@
@@ -82,7 +82,7 @@ PLU_TEXI2HTML_OPTS  = -init_file ${TEXI2HTML_INIT} @TEXI2HTML_OPTS@ \
 	          -short_ext -l2h_tmp ${TMP_DIR} -subdir ${PLU_HTML_SUBDIR} \
                   ${T2H_VERBOSE}
 HTML_MANUAL_PREFIX = sing
-PLU_HTML_MANUAL_PREFIX = plu
+PLU_HTML_MANUAL_PREFIX = sing
 HTML_TUTOR_PREFIX  = tut
 HTML_MANUAL_TOP    = index.htm
 HTML_TUTOR_TOP     = tutor.htm
