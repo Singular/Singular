@@ -42,6 +42,11 @@ then
     then
         echo ${prefix}-Win
         exit 0
+    # FreeBSD ###############
+    elif (echo $uname_a | $egrep "FreeBSD" > $devnull)
+    then
+        echo ${prefix}-freebsd
+        exit 0
     # Linux ###############
     elif (echo $uname_a | $egrep "Linux" > $devnull)
     then

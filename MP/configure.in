@@ -227,7 +227,18 @@ AC_HEADER_CHECK(stdio.h,:, echo "*** no stdio.h";exit)
 AC_HEADER_CHECK(stdlib.h,:, echo "*** no stdlib.h";exit)
 AC_HEADER_CHECK(string.h,:, echo "*** no string.h";exit)
 AC_HEADER_CHECK(stddef.h,:, echo "*** no stddef.h";exit)
-AC_HEADER_CHECK(values.h,:, echo "*** no values.h";exit)
+
+dnl Wrong preprocessor statement in /usr/include/values.h causes
+dnl problems on FreeBSD
+AC_HEADER_CHECK(values.h, freebsd_problem=no, 
+                AC_CHECK_FILE(/usr/include/values.h,freebsd_problem=yes, 
+                              echo "*** no values.h";exit)) 
+if test "$freebsd_problem" != no; then
+  grep -v "#warning" /usr/include/values.h > ./values.h
+  AC_TRY_CPP( #include "values.h" , 
+              CPPFLAGS="-I. ${CPPFLAGS}",
+              echo "*** no values.h";exit)
+fi
 
 AC_HEADER_CHECK(fcntl.h,:, echo "*** no fcntl.h";exit)
 AC_HEADER_CHECK(sys/ioctl.h,:, echo "*** no sys/ioctl.h";exit)
