@@ -1,0 +1,20 @@
+I used ispell from cygwin, since /usr/bin/ispell on monty
+does not support HTML file type.
+The main dictionary is 2-0/doc/singular.dic.
+First, make install in 2-0/doc, then go to the
+directory 2-0/doc/html and run it like this:
+
+ispell -p ../singular.dic -H -B -khtmlcheck  sing_82[0-9].htm
+
+-H option tells ispell interpret input as html,
+-khtmlcheck disables checkins spelling in ALT-flags (there's
+plenty of TeX code and it nerves)
+-B option tells that ispell should report run-together words
+
+In order to fill the dictionary with Singular commands,
+I started from the very end of the Manual and proceed
+in "10 files" portions. The libraries (in huge quantities!)
+are sitting also in the second part of the Manual.
+
+Best luck,
+Viktor Levandovskyy.
