@@ -1,4 +1,4 @@
-version="$Id: brnoeth.lib,v 1.2 2000-12-11 14:16:01 Singular Exp $";
+version="$Id: brnoeth.lib,v 1.3 2000-12-15 11:51:55 Singular Exp $";
 info="
 LIBRARY:   brnoeth.lib
 
@@ -55,7 +55,7 @@ LIB "hnoether.lib";
 
 
 proc closed_points (ideal I)
-"SYNTAX:    closed_points( ideal_expression )
+"USAGE:    closed_points( ideal_expression )
 
 TYPE:       list
 
@@ -1881,7 +1881,7 @@ static proc deg_D (intvec D,list PP)
 
 
 proc Adj_div (poly f,list #)
-"SYNTAX:      Adj_div( poly_expression [, list_expression] )
+"USAGE:      Adj_div( poly_expression [, list_expression] )
 
 TYPE:       list
 
@@ -2106,7 +2106,7 @@ example
 
 
 proc NSplaces (int h,list CURVE)
-"SYNTAX:      NSplaces( int_expression, list_expression )
+"USAGE:      NSplaces( int_expression, list_expression )
 
 TYPE:       list 
 
@@ -3203,7 +3203,7 @@ static proc min_wt_rmat (matrix M)
 
 
 proc BrillNoether (intvec G,list CURVE)
-"SYNTAX:    BrillNoether( intvec_expression, list_expression )
+"USAGE:    BrillNoether( intvec_expression, list_expression )
 
 TYPE:       list
 
@@ -3465,7 +3465,7 @@ NOTE:       F represents a rational function, thus the procedure must be called 
 
 
 proc Weierstrass (int P,int m,list CURVE)
-"SYNTAX:    Weierstrass( int_expression, int_expression, list_expression )
+"USAGE:    Weierstrass( int_expression, int_expression, list_expression )
 
 TYPE:       list
 
@@ -3606,7 +3606,7 @@ example
 
 
 proc permute_L (L,P)
-"SYNTAX:    permute_L( intvec_expression, intvec_expression )
+"USAGE:    permute_L( intvec_expression, intvec_expression )
             permute_L( intvec_expression, list_expression )
             permute_L( list_expression, intvec_expression )
             permute_L( list_expression, list_expression )
@@ -3724,7 +3724,7 @@ NOTE:       Rational places are searched in local ring RP
 
 
 proc dual_code (matrix G)
-"SYNTAX:    dual_code( matrix_expression )
+"USAGE:    dual_code( matrix_expression )
 
 TYPE:       matrix
 
@@ -3842,7 +3842,7 @@ static proc disj_divs (intvec H,intvec P,list EC)
 
 
 proc AGcode_L (intvec G,intvec D,list EC)
-"SYNTAX:    AGcode_L( intvec_expression, intvec_expression, list_expression )
+"USAGE:    AGcode_L( intvec_expression, intvec_expression, list_expression )
 
 TYPE:       matrix
 
@@ -3926,7 +3926,7 @@ example
 
 
 proc AGcode_Omega (intvec G,intvec D,list EC)
-"SYNTAX:    AGcode_Omega( intvec_expression, intvec_expression, list_expression )
+"USAGE:    AGcode_Omega( intvec_expression, intvec_expression, list_expression )
 
 TYPE:       matrix
 
@@ -3986,7 +3986,7 @@ example
 
 
 proc extcurve (int d,list CURVE)
-"SYNTAX:    extcurve( int_expression, list_expression )
+"USAGE:    extcurve( int_expression, list_expression )
 
 TYPE:       list
 
@@ -4259,7 +4259,7 @@ RETURN:     the Hamming weight (number of non-zero entries) of the matrix A
 
 
 proc prepSV (intvec G,intvec D,intvec F,list EC)
-"SYNTAX:    prepSV( intvec_expression, intvec_expression, intvec_expression, list_expression ) 
+"USAGE:    prepSV( intvec_expression, intvec_expression, intvec_expression, list_expression ) 
 
 TYPE:       list 
 
@@ -4382,7 +4382,7 @@ example
 
 
 proc decodeSV (matrix y,list K)
-"SYNTAX:    decodeSV( matrix_expression, list_expression )
+"USAGE:    decodeSV( matrix_expression, list_expression )
 
 TYPE:       matrix
 
@@ -4539,7 +4539,7 @@ example
 
 
 proc sys_code (matrix C)
-"SYNTAX:    sys_code( matrix_expression )
+"USAGE:    sys_code( matrix_expression )
 
 TYPE:       list
 
