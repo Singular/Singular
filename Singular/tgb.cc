@@ -31,6 +31,7 @@ struct calc_dat
   long* short_Exps;
   kStrategy strat;
   int** deg;
+  int* misses;
   int found_i;
   int found_j;
   int continue_i;
@@ -40,6 +41,7 @@ struct calc_dat
   int normal_forms;
   int skipped_pairs;
   int current_degree;
+  
 };
 bool find_next_pair(calc_dat* c);
 void replace_pair(int & i, int & j, calc_dat* c);
@@ -268,6 +270,7 @@ void initial_data(calc_dat* c){
   } else {
     exit(1);
   }
+  c->misses=(int*) omalloc(n*sizeof(int));
   c->deg=(int **) omalloc(n*sizeof(int*));
   h=omalloc(n*sizeof(int));
   if (h!=NULL){
@@ -340,6 +343,8 @@ void add_to_basis(poly h, calc_dat* c){
   } else {
     exit(1);
   }
+  c->misses=(int*) omrealloc(c->misses,c->n*sizeof(int));
+  c->lengths[i]=pLength(h);
   hp=omrealloc(c->states, c->n * sizeof(int*));
   if (hp!=NULL){
     c->states=(int**) hp;
