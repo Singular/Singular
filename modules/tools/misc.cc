@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.3 1999-03-19 14:12:08 krueger Exp $ */
+/* $Id: misc.cc,v 1.4 1999-03-24 13:04:20 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -26,6 +26,12 @@
 #define SYSTYP_LINUX  1
 #define SYSTYP_HPUX9  2
 #define SYSTYP_HPUX10 3
+
+#if 0
+#  define logx printf
+#else
+#  define logx
+#endif
 
 char *DYNAinclude[] = {
    "",
@@ -133,7 +139,7 @@ int IsCmd(char *n, int & tok)
     }
   }
 #endif
-  printf("IsCmd: [%d] %s\n", tok, n);
+  logx("IsCmd: [%d] %s\n", tok, n);
   
   if( (cmds[i].toktype==ROOT_DECL) ||
       (cmds[i].toktype==ROOT_DECL_LIST) ||
@@ -180,6 +186,22 @@ static int iiTabIndex(const jjValCmdTab dArithTab, const int len, const int op)
 #endif
 
 /*========================================================================*/
+void PrintProc(
+  procdef pi
+  )
+{
+  int i;
+  
+  printf("proc: %s(", pi.procname);
+  
+  for(i=0; i<pi.paramcnt; i++) {
+    printf("%s", pi.param[i].name);
+    if(i < (pi.paramcnt-1)) printf(",");
+  }
+  printf(")\n");
+}
+
+/*========================================================================*/
 void make_version(char *p, moddefv module)
 {
   char ver[10];
@@ -206,116 +228,143 @@ void make_version(char *p, moddefv module)
 }
 
 /*========================================================================*/
-cfilesv Add2files(cfilesv cf, char *name)
+void Add2files(
+  moddefv module,
+  char *name
+  )
 {
-  cfilesv cfnew = (cfilesv)malloc(sizeof(cfiles));
-  cfnew->filename = (char *)malloc(strlen(name+1));
-  cfnew->next = NULL;
-  strcpy(cfnew->filename, name);
-  if(cf == NULL) cf = cfnew;
-  else cfnew->next = cf;
-  return(cfnew);
+  cfiles cfnew;
+  memset((void *)&cfnew, '\0', sizeof(cfiles));
+
+  cfnew.filename = (char *)malloc(strlen(name)+1);
+  memset(cfnew.filename, '\0', strlen(name)+1);
+  memcpy(cfnew.filename, name, strlen(name));
+
+  if(module->filecnt==0) {
+    module->files = (cfilesv)malloc(sizeof(cfiles)+1);
+  }
+  else {
+    module->files = (cfilesv)realloc(module->files,
+                                   (module->filecnt+1)*sizeof(cfiles));
+  }
+  if(module->files == NULL) { printf("ERROR\n"); return; }
+  
+  memset((void *) &module->files[module->filecnt], '\0', sizeof(cfiles));
+  memcpy((void *)(&(module->files[module->filecnt])),
+         (void *)&cfnew, sizeof(cfiles));
+  (module->filecnt)++;
 }
 
 /*========================================================================*/
-procdefv Add2proclist(procdefv pi, char *name)
+/*  procdefv Add2proclist(procdefv pi, char *name)*/
+void Add2proclist(
+  moddefv module,
+  char *name,
+  char *ret_val,
+  char *ret_typname,
+  int ret_typ
+  )
 {
-  procdefv pnew = (procdefv)malloc(sizeof(procdef));
-  pnew->procname = (char *)malloc(strlen(name+1));
-  pnew->funcname = (char *)malloc(strlen(name+1));
-  pnew->param = NULL;
-  pnew->next = NULL;
-  pnew->is_static = 0;
-  pnew->paramcnt = 0;
-  strcpy(pnew->procname, name);
-  strcpy(pnew->funcname, name);
-  if(pi==NULL) pi = pnew;
-  else pnew->next = pi;
-  return(pnew);
+  procdef pnew;
+  logx("Add2proclist(%s, %s)\n", name, ret_val);
+  
+  memset((void *)&pnew, '\0', sizeof(procdef));
+  pnew.procname = (char *)malloc(strlen(name)+1);
+  if(pnew.procname==NULL) printf("Error 1\n");
+  pnew.funcname = (char *)malloc(strlen(name)+1);
+  memset(pnew.funcname, '\0', strlen(name)+1);
+  memset(pnew.procname, '\0', strlen(name)+1);
+  pnew.param = NULL;
+  (pnew).is_static = 0;
+  (pnew).paramcnt = 0;
+  strcpy(pnew.procname, name);
+  strcpy(pnew.funcname, name);
+
+  pnew.return_val.name = (char *)malloc(strlen(ret_val)+1);
+  memset(pnew.return_val.name, '\0', strlen(ret_val)+1);
+  memcpy(pnew.return_val.name, ret_val, strlen(ret_val));
+  
+  pnew.return_val.typname = (char *)malloc(strlen(ret_typname)+1);
+  memset(pnew.return_val.typname, '\0', strlen(ret_typname)+1);
+  memcpy(pnew.return_val.typname, ret_typname, strlen(ret_typname));
+  pnew.return_val.typ = ret_typ;
+  
+  if(module->proccnt==0) {
+    module->procs = (procdefv)malloc(sizeof(procdef)+1);
+  }
+  else {
+    module->procs = (procdefv)realloc(module->procs,
+                                   (module->proccnt+1)*sizeof(procdef));
+  }
+  if(module->procs == NULL) { printf("ERROR\n"); return; }
+  
+  memset((void *) &module->procs[module->proccnt], '\0', sizeof(procdef));
+  memcpy((void *)(&(module->procs[module->proccnt])),
+         (void *)&pnew, sizeof(procdef));
+  (module->proccnt)++;
 }
 
 /*========================================================================*/
-void AddParam(procdefv pi, char *name, char *typname, int typ)
+void AddParam(
+  moddefv module,
+  char *name,
+  char *typname,
+  int typ
+  )
 {
-
-#ifdef NEW_PARAM
   paramdef pnew;
-  pnew.name = (char *)malloc(strlen(name+1));
+  int proccnt = module->proccnt-1;
+  int paramcnt = 0;
+
+  logx("AddParam(%d, %s, %s, %d)\n", module->procs[proccnt].paramcnt,
+       module->procs[proccnt].procname,
+       typname, typ);
+  memset((void *)&pnew, '\0', sizeof(paramdef));
+  pnew.name = (char *)malloc(strlen(name)+1);
+  memset(pnew.name, '\0', strlen(name)+1);
   pnew.next = NULL;
-  strcpy(pnew.name, name);
-  pnew.typname = (char *)malloc(strlen(typname+1));
-  strcpy(pnew.typname, typname);
+  memcpy(pnew.name, name, strlen(name));
+  pnew.typname = (char *)malloc(strlen(typname)+1);
+  memset(pnew.typname, '\0', strlen(typname)+1);
+  memcpy(pnew.typname, typname, strlen(typname));
   pnew.typ = typ;
 
-  if(pi->paramcnt==0) {
-    pi->param = (paramdefv)malloc(sizeof(paramdef));
-  }
+  paramcnt = module->procs[proccnt].paramcnt;
+ if(module->procs[proccnt].paramcnt==0) {
+    module->procs[proccnt].param = (paramdefv)malloc(sizeof(paramdef));
+ }
   else {
-    pi->param = (paramdefv)realloc(pi->param,
-                                   (pi->paramcnt+1)*sizeof(paramdef));
+    module->procs[proccnt].param =
+      (paramdefv)realloc(module->procs[proccnt].param,
+                         (paramcnt+1)*sizeof(paramdef));
   }
-  memcpy((void *)(&pi->param[pi->paramcnt]), (void *)&pnew, sizeof(paramdef));
-#else
-  paramdefv pnew = (paramdefv)malloc(sizeof(paramdef));
-  pnew->name = (char *)malloc(strlen(name+1));
-  pnew->next = NULL;
-  strcpy(pnew->name, name);
-  pnew->typname = (char *)malloc(strlen(typname+1));
-  strcpy(pnew->typname, typname);
-  pnew->typ = typ;
-
-  if(pi->param==NULL) pi->param = pnew;
-  else {
-    paramdefv pp = pi->param;
-    while(pp->next != NULL) pp = pp->next;
-    pp->next = pnew;
-  }
-#endif
-  (pi->paramcnt)++;
+  
+  memcpy((void *)(&module->procs[proccnt].param[paramcnt]),
+         (void *)&pnew, sizeof(paramdef));
+  (module->procs[proccnt].paramcnt)++;
+  logx("AddParam() done\n");
 }
 
 /*========================================================================*/
-void PrintProclist(procdefv pi)
+void PrintProclist(
+  moddefv module
+  )
 {
-  procdefv v = pi;
-#ifdef NEW_PARAM
-  int i;
-  for(v=pi; v!=NULL; v = v->next) {
-    printf("proc: %s(", v->procname);
-    for(i=0; i<v->paramcnt; i++) {
-      printf("%s", v->param[i].name);
-      if(i < (v->paramcnt-1)) printf(",");
-    }
-    
-    printf(")\n");
+  logx("PrintProclist()\n");
+  int j;
+  for(j=0; j<module->proccnt; j++) {
+    PrintProc(module->procs[j]);
   }
-#else
-  paramdefv pp;
-  for(v=pi; v!=NULL; v = v->next) {
-//  while(v!=NULL) {
-    pp = v->param;
-    printf("proc: %s(", v->procname);
-    if(pp!= NULL) {
-      printf("%s", pp->name);
-      while(pp->next!= NULL) {
-	pp = pp->next;
-	printf(",%s", pp->name);
-      }
-    }
-    printf(")\n");
-//    v =v ->next;
-  }
-#endif
 }
 
 /*========================================================================*/
 void generate_mod(
-  procdefv pi,
-  moddefv module,
-  cfilesv c_filelist
+  moddefv module
   )
 {
   procdefv v = NULL;
+  cfilesv c_filelist = NULL;
+  int proccnt;
   FILE *fp_c, *fp_h;
   char *filename;
   
@@ -349,21 +398,21 @@ void generate_mod(
   if(module->version != NULL) enter_id(fp_c, "version", module->version);
   if(module->info != NULL) enter_id(fp_c, "info", module->info);
   if(module->helpfile != NULL) enter_id(fp_c, "helpfile", module->helpfile);
-  for(v=pi; v!=NULL; v = v->next) {
-//  while(v!=NULL) {
-    printf("->%s, %s\n", v->procname, v->funcname);
+  
+  for(proccnt=0; proccnt<module->proccnt; proccnt++) {
+    printf("->%s, %s\n", module->procs[proccnt].procname,
+           module->procs[proccnt].funcname);
     fprintf(fp_c, "  iiAddCproc(\"%s\",\"%s\",%s, mod_%s);\n",
-	    module->name, v->procname, 
-	    v->is_static ? "TRUE" : "FALSE", v->funcname);
-//    v =v ->next;
+	    module->name, module->procs[proccnt].procname, 
+	    module->procs[proccnt].is_static ? "TRUE" : "FALSE",
+            module->procs[proccnt].funcname);
   }
   fprintf(fp_c, "  return 0;\n}\n\n");
-  v = pi;
 
   /* building entry-functions */
-  for(v=pi; v!=NULL; v = v->next) {
-    generate_function(v, fp_c);
-    generate_header(v, fp_h);
+  for(proccnt=0; proccnt<module->proccnt; proccnt++) {
+    generate_function(&module->procs[proccnt], fp_c);
+    generate_header(&module->procs[proccnt], fp_h);
   }
   printf("  done.\n");fflush(stdout);
   fclose(fp_c);
@@ -376,14 +425,20 @@ void generate_header(procdefv pi, FILE *fp)
   int i;
   
   fprintf(fp, "BOOLEAN mod_%s(leftv res, leftv h);\n", pi->funcname);
-#if 1
-  fprintf(fp, "BOOLEAN %s(leftv res", pi->funcname);
-  for (i=0;i<pi->paramcnt; i++)
-    fprintf(fp, ", %s res%d", type_conv[pi->param[i].typ], i);
+  switch( pi->return_val.typ) {
+      case SELF_CMD:
+        fprintf(fp, "BOOLEAN %s(res, ", pi->funcname);
+        break;
+
+      default:
+        fprintf(fp, "%s %s(", type_conv[pi->return_val.typ],
+                pi->funcname);
+  }
+  for (i=0;i<pi->paramcnt; i++) {
+    fprintf(fp, "%s res%d", type_conv[pi->param[i].typ], i);
+    if(i<pi->paramcnt-1) fprintf(fp, ", ");
+  }
   fprintf(fp, ");\n\n");
-#else
-  fprintf(fp, "BOOLEAN %s(leftv res, leftv h);\n\n", pi->funcname);
-#endif
 }
 
 void generate_function(procdefv pi, FILE *fp)
@@ -391,9 +446,7 @@ void generate_function(procdefv pi, FILE *fp)
   int cnt = 0, i;
   printf("%s has %d paramters\n", pi->funcname, pi->paramcnt);
   
-  paramdefv pp = pi->param;
   fprintf(fp, "BOOLEAN mod_%s(leftv res, leftv h)\n{\n", pi->funcname);
-#if 1
   if(pi->paramcnt>0) {
     if(pi->param[0].typ==SELF_CMD) {
       fprintf(fp, "  return(%s(res,h));\n", pi->funcname);
@@ -413,6 +466,7 @@ void generate_function(procdefv pi, FILE *fp)
         fprintf(fp, "  printf(\"test %d.1\\n\");\n", i);
         fprintf(fp, "  if((index=iiTestConvert(tok, %s))==0)\n",
                 pi->param[i].typname);
+        logx("==>'%s'\n", pi->param[i].typname);
         fprintf(fp, "     goto mod_%s_error;\n", pi->funcname);
         fprintf(fp, "  printf(\"test %d.2\\n\");\n", i);
         fprintf(fp, "  if(iiConvert(tok, %s, index, v, res%d))\n",
@@ -426,10 +480,26 @@ void generate_function(procdefv pi, FILE *fp)
       fprintf(fp, "  printf(\"test before return\\n\");\n");
 
       fprintf(fp, "\n");
-      fprintf(fp, "    return(%s(res", pi->funcname);
-      for (i=0;i<pi->paramcnt; i++)
-        fprintf(fp, ", (%s) res%d->Data()", type_conv[pi->param[i].typ], i);
-      fprintf(fp, "));\n\n");
+      switch( pi->return_val.typ) {
+          case SELF_CMD:
+            fprintf(fp, "    return(%s(res", pi->funcname);
+            for (i=0;i<pi->paramcnt; i++)
+              fprintf(fp, ", (%s) res%d->Data()",
+                      type_conv[pi->param[i].typ], i);
+            fprintf(fp, "));\n\n");
+           break;
+
+          default:
+            fprintf(fp, "  res->rtyp = %s;\n", pi->return_val.typname);
+            fprintf(fp, "  res->data = (void *)%s(", pi->funcname);
+            for (i=0;i<pi->paramcnt; i++) {
+              fprintf(fp, "(%s) res%d->Data()",
+                      type_conv[pi->param[i].typ], i);
+              if(i<pi->paramcnt-1) fprintf(fp, ", ");
+            }
+            fprintf(fp, ");\n  return FALSE;\n\n");
+      }
+      
       fprintf(fp, "  mod_%s_error:\n", pi->funcname);
       fprintf(fp, "    Werror(\"%s(`%%s`) is not supported\", Tok2Cmdname(tok));\n",
               pi->procname);
@@ -445,54 +515,6 @@ void generate_function(procdefv pi, FILE *fp)
       fprintf(fp, "  return(%s(res));\n}\n\n", pi->funcname);
   }
       
-#else
-  if(pp!= NULL && pp->typ!=SELF_CMD) {
-    fprintf(fp, "  leftv v = h;\n");
-    fprintf(fp, "  int tok = NONE, index = 0;\n");
-    for (i=0;i<pi->paramcnt; i++)
-      fprintf(fp, "  leftv res%d = (leftv)Alloc0(sizeof(sleftv));\n", i);
-
-    fprintf(fp, "\n");
-    
-    while(pp!=NULL) {
-      fprintf(fp, "  if(v==NULL) goto mod_%s_error;\n", pi->funcname);
-      fprintf(fp, "  tok = v->Typ();\n");
-      fprintf(fp, "  printf(\"test %d.1\\n\");\n", cnt);
-      fprintf(fp, "  if((index=iiTestConvert(tok, %s))==0)\n", pp->typname);
-      fprintf(fp, "     goto mod_%s_error;\n", pi->funcname);
-      fprintf(fp, "  printf(\"test %d.2\\n\");\n", cnt);
-      fprintf(fp, "  if(iiConvert(tok, %s, index, v, res%d))\n",
-              pp->typname, cnt);
-      fprintf(fp, "     goto mod_%s_error;\n", pi->funcname);
-      fprintf(fp, "  printf(\"test %d.3\\n\");\n", cnt);
-      fprintf(fp, "  v = v->next;\n");
-      pp = pp->next;
-      cnt++;
-    }
-    fprintf(fp, "  if(v!=NULL) { tok = v->Typ(); goto mod_%s_error; }\n", pi->funcname);
-    fprintf(fp, "  printf(\"test before return\\n\");\n");
-
-    fprintf(fp, "\n");
-    fprintf(fp, "    return(%s(res", pi->funcname);
-    for (i=0;i<pi->paramcnt; i++)
-      fprintf(fp, ", res%d", i);
-    fprintf(fp, "));\n\n");
-    fprintf(fp, "  mod_%s_error:\n", pi->funcname);
-    fprintf(fp, "    Werror(\"%s(`%%s`) is not supported\", Tok2Cmdname(tok));\n",
-            pi->procname);
-    fprintf(fp, "    Werror(\"expected %s(", pi->procname);
-    for(pp = pi->param; pp != NULL; pp = pp->next) {
-      fprintf(fp, "'%s'", pp->name);
-      if(pp->next != NULL) fprintf(fp, ",");
-    }
-    fprintf(fp, ")\");\n");
-    fprintf(fp, "    return TRUE;\n}\n\n");
-  }
-  else {
-    fprintf(fp, "  return(%s(res,h));\n", pi->funcname);
-    fprintf(fp, "}\n\n");
-  }
-#endif
       
 }
 
@@ -579,11 +601,12 @@ static char *object_name(char *p)
 }
 
 /*========================================================================*/
-void mod_create_makefile(moddefv module, cfilesv c_filelist)
+void mod_create_makefile(moddefv module)
 {
   FILE *fp;
   fp = fopen("Makefile", "w");
-  cfilesv cf = c_filelist;
+  cfilesv cf = module->files;
+  int i;
   
   printf("Creating Makefile  ...");fflush(stdout);
   write_header(fp, module->name, "#");
@@ -593,12 +616,13 @@ void mod_create_makefile(moddefv module, cfilesv c_filelist)
   fprintf(fp, "#LD\t=\n");
   fprintf(fp, "\n");
   fprintf(fp, "SRCS\t= ");
-  for(cf = c_filelist; cf != NULL; cf = cf->next)
-    fprintf(fp, "%s ", cf->filename);
+  
+  for(i=0; i<module->filecnt; i++)
+    fprintf(fp, "%s ", cf[i].filename);
 
   fprintf(fp, "\nOBJS\t= ");
-  for(cf = c_filelist; cf != NULL; cf = cf->next)
-    fprintf(fp, "%s ", object_name(cf->filename));
+  for(i=0; i<module->filecnt; i++)
+    fprintf(fp, "%s ", object_name(cf[i].filename));
 
   fprintf(fp, "\n\n");
   switch(systyp) {

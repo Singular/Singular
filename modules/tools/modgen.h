@@ -1,5 +1,5 @@
 /*
- *  $Id: modgen.h,v 1.2 1999-03-17 12:41:31 krueger Exp $
+ *  $Id: modgen.h,v 1.3 1999-03-24 13:04:21 krueger Exp $
  *
  */
 
@@ -33,8 +33,9 @@ class procdef {
   char *procname;
   char *funcname;
   int is_static;
+  paramdef  return_val;
   paramdefv param;
-  int paramcnt;
+  int       paramcnt;
 };
 
 class cfiles {
@@ -51,6 +52,10 @@ class moddef {
   char * revision;
   char * info;
   char * helpfile;
+  procdefv procs;
+  int      proccnt;
+  cfilesv  files;
+  int      filecnt;
 };
 
 /*
@@ -59,15 +64,17 @@ class moddef {
 extern int IsCmd(char *n, int & tok);
 extern char * decl2str(int n, char *name);
 
-extern procdefv Add2proclist(procdefv pi, char *name);
-extern void AddParam(procdefv pi, char *name, char *typname, int typ);
-extern void generate_mod(procdefv pi, moddefv module, cfilesv c_filelist);
+extern void PrintProclist(moddefv module);
+extern void Add2proclist(moddefv module, char *name, char *ret_val,
+                           char *ret_typname, int ret_typ);
+extern void generate_mod(moddefv module);
+extern void AddParam(moddefv module, char *name, char *typname, int typ);
+extern void mod_create_makefile(moddefv module);
+extern void Add2files(moddefv module, char *buff);
+
 extern void generate_function(procdefv pi, FILE *fp);
 extern void mod_write_header(FILE *fp, char *module);
 extern void generate_header(procdefv pi, FILE *fp);
 extern void write_header(FILE *fp, char *module, char *comment="");
-extern void mod_create_makefile(moddefv module, cfilesv c_filelist);
 extern void make_version(char *p, moddefv module);
-extern cfilesv Add2files(cfilesv cf, char *buff);
-extern void PrintProclist(procdefv pi);
 
