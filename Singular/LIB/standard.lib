@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.57 2001-01-17 14:07:25 Singular Exp $";
+version="$Id: standard.lib,v 1.58 2001-02-22 16:02:55 westenb Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -69,8 +69,10 @@ proc stdhilb(ideal i,list #)
          @code{stdhilb (} ideal_expression@code{,} intvec_expression @code{)}
 TYPE:    ideal
 PURPOSE: computes the standard basis of the homogeneous ideal in the basering,
-         via a Hilbert driven standard basis computation.
-         An optional second argument will be used as Hilbert function.
+         via a Hilbert driven standard basis computation.@*
+         An optional second argument will be used as 1-st Hilbert function.
+ASSUME:  The optional second argument is the first Hilbert series as computed
+         by @code{hilb}.
 SEE ALSO: stdfglm, std, groebner
 KEYWORDS: Hilbert function
 EXAMPLE: example stdhilb;  shows an example"
@@ -126,12 +128,12 @@ EXAMPLE: example stdhilb;  shows an example"
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring  r=0,(x,y,z),lp;
+   ring  r=0,(x,y,z),dp;
    ideal i=y3+x2,x2y+x2,x3-x2,z4-x2-y;
    ideal i1=stdhilb(i); i1;
-   // is in this case equivalent to:
-   intvec v=1,0,0,-3,0,1,0,3,-1,-1;
-   ideal i2=stdhilb(i,v);
+   // the latter computation is equivalent to:
+   intvec v=hilb(i,1);
+   ideal i2=stdhilb(i,v); i2;
 }
 //////////////////////////////////////////////////////////////////////////
 
