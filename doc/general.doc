@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.11 1998-04-29 07:06:27 Singular Exp $
+@comment $Id: general.doc,v 1.12 1998-04-29 10:26:27 obachman Exp $
 @comment this file contains the general information about Singular
 
 @menu
@@ -49,6 +49,7 @@ Spaces and commas are always considered as separators.
 @sc{Singular} may also be started with command-line options and with 
 filenames as arguments. More generally, the synopsis of @sc{Singular} is
 @*@code{  Singular  [options] [file1 [file2 ...]] }
+
 @ref{Commandline options}
 @menu
 * Commandline options::
@@ -231,6 +232,10 @@ under the special name @code{_}, e.g.
 @node Commandline options, ,Reuse of output,Interactive use
 @subsection Commandline options
 @cindex Commandline options
+
+The synopsis of @sc{Singular} is
+
+@*@code{  Singular  [options] [file1 [file2 ...]] }
 
 @*with the options (which can be given in both, their long and
 short format):
