@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.18 1998-11-02 09:05:42 Singular Exp $ */
+/* $Id: syz0.cc,v 1.19 1999-09-27 14:04:39 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -11,6 +11,7 @@
 #include "tok.h"
 #include "mmemory.h"
 #include "polys.h"
+#include "spolys.h"
 #include "febase.h"
 #include "kstd1.h"
 #include "kutil.h"
@@ -26,7 +27,10 @@
 #include "intvec.h"
 #include "ring.h"
 #include "syz.h"
+#include "kbuckets.h"
 
+static kBucket_pt sy0buck;
+static kbPolyProcs sy0pProcs;
 
 static polyset syInitSort(polyset oldF,int rkF,int Fmax,
          int syComponentOrder,intvec **modcomp)
@@ -137,7 +141,7 @@ static poly syRedtail2(poly p, polyset redWith, intvec *modcomp, spSpolyLoopProc
     {
       if (pDivisibleBy2(redWith[j], hn))
       {
-        //if (TEST_OPT_PROT) PrintS("r");
+        //if (TEST_OPT_PROT) Print("r");
         hn = spSpolyRed(redWith[j],hn,NULL, SpolyLoop);
         if (hn == NULL)
         {
@@ -476,8 +480,9 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
    BOOLEAN noSort,intvec ** modcomp, int * length,ideal mW)
 {
   int i,j,l,k,kkk,rkF,Sl=0,Fl=Fmax,syComponentOrder=pModuleOrder();
-  int fstart,wend,lini;
+  int fstart,wend,lini,ltR;
   intvec *newmodcomp;
+  int *Flength;
   polyset pairs,oldF,F=*FF;
   poly p,q,toRed,syz,lastmonom,multWith;
   ideal idF=(ideal)Alloc(sizeof(*idF)),null;
@@ -503,6 +508,11 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
   else
   {
     F = *FF;
+  }
+  Flength = (int*)Alloc0(Fl*sizeof(int));
+  for(j=0;j<Fl;j++)
+  {
+    Flength[j] = pLength(F[j]);
   }
   for(j=0;j<Fl;j++)
   {
@@ -538,18 +548,24 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
         //begins to construct the syzygy
         if (k<Fl)
         {
+          number an=nCopy(pGetCoeff(F[k])),bn=nCopy(pGetCoeff(F[j]));
+          int ct = spCheckCoeff(&an, &bn);
           syz = pCopy(pairs[k]);
-          syz->coef = nCopy(F[k]->coef);
-          syz->coef = nNeg(syz->coef);
+          //syz->coef = nCopy(F[k]->coef);
+          syz->coef = an;
+          //syz->coef = nNeg(syz->coef);
           pNext(syz) = pairs[k];
           lastmonom = pNext(syz);
-          lastmonom->coef = nCopy(F[j]->coef);
+          //lastmonom->coef = nCopy(F[j]->coef);
+          lastmonom->coef = bn;
+          lastmonom->coef = nNeg(lastmonom->coef);
           pSetComp(lastmonom,k+1);
         }
         else
         {
           syz = pairs[k];
           syz->coef = nCopy(currQuotient->m[k-Fl]->coef);
+          syz->coef = nNeg(syz->coef);
           lastmonom = syz;
           multWith = pDivide(syz,F[j]);
           multWith->coef = nCopy(currQuotient->m[k-Fl]->coef);
@@ -577,6 +593,8 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
           toRed = sySpecNormalize(q,mW, NULL);
           pDelete(&multWith);
         }
+        kBucketInit(sy0buck,toRed,-1,&sy0pProcs);
+        toRed = kBucketGetLm(sy0buck);
         isNotReduced = TRUE;
         while (toRed!=NULL)
         {
@@ -590,11 +608,26 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
           l = (**modcomp)[pGetComp(toRed)+1]-1;
           kkk = (**modcomp)[pGetComp(toRed)];
           while ((l>=kkk) && (!pDivisibleBy(F[l],toRed))) l--;
+//#define WRITE_BUCKETS
+#ifdef WRITE_BUCKETS
+          kBucketClear(sy0buck,&toRed,&ltR);
+          printf("toRed in Pair[%d, %d]:", j, k);
+          pWrite(toRed);
+          kBucketInit(sy0buck,toRed,-1,&sy0pProcs);
+#endif
+
           if (l<kkk)
           {
             if ((currQuotient!=NULL) && (isNotReduced))
             {
+              kBucketClear(sy0buck,&toRed,&ltR);
               toRed = sySpecNormalize(toRed,mW, NULL);
+#ifdef WRITE_BUCKETS
+              printf("toRed in Pair[%d, %d]:", j, k);
+              pWrite(toRed);
+#endif
+              kBucketInit(sy0buck,toRed,-1,&sy0pProcs);
+              toRed = kBucketGetLm(sy0buck);
               isNotReduced = FALSE;
             }
             else
@@ -622,25 +655,29 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
             {
               PrintS("reduced with: ");pWrite(F[l]);
             }
-            multWith = pDivide(toRed,F[l]);
-            multWith->coef = nDiv(toRed->coef,F[l]->coef);
-            multWith->coef = nNeg(multWith->coef);
-            pNext(lastmonom) = toRed;
+            pNext(lastmonom) = pHead(toRed);
             pIter(lastmonom);
-            pIter(toRed);
-            pNext(lastmonom) = NULL;
             lastmonom->coef = nDiv(lastmonom->coef,F[l]->coef);
-            lastmonom->coef = nNeg(lastmonom->coef);
+            //lastmonom->coef = nNeg(lastmonom->coef);
             pSetComp(lastmonom,l+1);
             //computes the new toRed
-            p = pCopy(pNext(F[l]));
-            p = pMultT(p,multWith);
-            pDelete(&multWith);
-            toRed = pAdd(toRed,p);
+            number up = kBucketPolyRed(sy0buck,F[l],Flength[l],NULL);
+            if (! nIsOne(up))
+            {
+              // Thomas: Now do whatever you need to do
+#ifdef WRITE_BUCKETS
+              Print("multiplied with: ");nWrite(up);PrintLn();
+#endif
+              pMultN(syz,up);
+            }
+            nDelete(&up);
+
+            toRed = kBucketGetLm(sy0buck);
             //the module component of the new monom
 //pWrite(toRed);
           }
         }
+        kBucketClear(sy0buck,&toRed,&ltR); //Zur Sichereheit
 //PrintLn();
         if (syz!=NULL)
         {
@@ -674,6 +711,7 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
     Free((ADDRESS)oldF,Fmax*sizeof(poly));
     *FF = F;
   }
+  Free((ADDRESS)Flength,Fl*sizeof(int));
   delete *modcomp;
   *length = Fl+2;
   *modcomp = newmodcomp;
@@ -690,6 +728,7 @@ void syReOrderResolventFB(resolvente res,int length, int initial)
     for(i=0;i<IDELEMS(res[syzIndex]);i++)
     {
       p = res[syzIndex]->m[i];
+
       while (p!=NULL)
       {
         if (res[syzIndex-1]->m[pGetComp(p)-1]!=NULL)
@@ -710,6 +749,61 @@ void syReOrderResolventFB(resolvente res,int length, int initial)
   }
 }
 
+static void syMergeSortResolventFB(resolvente res,int length, int initial=1)
+{
+  int syzIndex=length-1,i,j;
+  poly qq,pp,result=NULL;
+  poly p;
+
+  while ((syzIndex!=0) && (res[syzIndex]==NULL)) syzIndex--;
+  while (syzIndex>=initial)
+  {
+    for(i=0;i<IDELEMS(res[syzIndex]);i++)
+    {
+      p = res[syzIndex]->m[i];
+      if (p != NULL)
+      {
+        for (;;)
+        {
+          qq = p;
+          for(j=1;j<=pVariables;j++)
+          {
+            pSetExp(p,j,pGetExp(p,j)
+                        -pGetExp(res[syzIndex-1]->m[pGetComp(p)-1],j));
+          }
+          pSetm(p);
+          for (;;)
+          {
+            if (pNext(p) == NULL)
+            {
+              pAdd(result, qq);
+              break;
+            }
+            pp = pNext(p);
+            for(j=1;j<=pVariables;j++)
+            {
+              pSetExp(pp,j,pGetExp(pp,j)
+                          -pGetExp(res[syzIndex-1]->m[pGetComp(pp)-1],j));
+            }
+            pSetm(pp);
+            if (pComp(p,pNext(p)) != 1)
+            {
+              pp = p;
+              pIter(p);
+              pNext(pp) = NULL;
+              result = pAdd(result, qq);
+              break;
+            }
+            pIter(p);
+          }
+        }
+      }
+      res[syzIndex]->m[i] = p;
+    }
+    syzIndex--;
+  }
+}
+
 BOOLEAN syTestOrder(ideal M)
 {
   int i=idRankFreeModule(M);
@@ -725,12 +819,12 @@ BOOLEAN syTestOrder(ideal M)
 }
 
 resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
-  BOOLEAN isMonomial,BOOLEAN notReplace)
+                                BOOLEAN isMonomial,BOOLEAN notReplace)
 {
   ideal mW=NULL;
   int i,syzIndex = 0,j=0,lgth,*ord=NULL,*bl0=NULL,*bl1=NULL;
   intvec * modcomp=NULL,*w=NULL;
-  short ** wv=NULL;
+  int ** wv=NULL;
   BOOLEAN sort = TRUE;
   tHomog hom=(tHomog)idHomModule(arg,NULL,&w);
   ring origR = currRing;
@@ -748,6 +842,8 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
   {
     i = IDELEMS(res[syzIndex]);
     //while ((i!=0) && (!res[syzIndex]->m[i-1])) i--;
+    sy0buck = kBucketCreate();
+    kbSetPolyProcs(&sy0pProcs,currRing,spGetOrderType(currRing,1,0));
     if (syzIndex+1==*length)
     {
       newres = (resolvente)Alloc((*length+4)*sizeof(ideal));
@@ -771,16 +867,18 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
     if ((syzIndex==0) && (currRing->OrdSgn==1))
     {
       j = 0;
+      // Thomas: I do not understand why you change the ring here
+      // (after the first Syzygies computation)
       while ((currRing->order[j]!=ringorder_c)
               && (currRing->order[j]!=ringorder_C))
         j++;
       if ((!notReplace) && (currRing->order[j]!=0))
       {
         while (currRing->order[j]!=0) j++;
-        ord = (int*)Alloc0((j+2)*sizeof(int));
-        wv = (short**)Alloc0((j+2)*sizeof(short*));
-        bl0 = (int*)Alloc0((j+2)*sizeof(int));
-        bl1 = (int*)Alloc0((j+2)*sizeof(int));
+        ord = (int*)Alloc0((j+1)*sizeof(int));
+        wv = (int**)Alloc0((j+1)*sizeof(int*));
+        bl0 = (int*)Alloc0((j+1)*sizeof(int));
+        bl1 = (int*)Alloc0((j+1)*sizeof(int));
         j = 0;
         while ((currRing->order[j]!=ringorder_c)
                 && (currRing->order[j]!=ringorder_C))
@@ -809,37 +907,58 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
         tmpR.block0 = bl0;
         tmpR.block1 = bl1;
         tmpR.wvhdl = wv;
-        rComplete(&tmpR);
+        rComplete(&tmpR, 1);
         rChangeCurrRing(&tmpR, TRUE);
+        // Thomas: Now you might have to pFetchCopy any data which you
+        // later need -- see below on how to do it (e.g., res[0] ?!)
       }
     }
     if (sort) sort=FALSE;
     syzIndex++;
     if (TEST_OPT_PROT) Print("[%d]\n",syzIndex);
+    kBucketDestroy(&(sy0buck));
   }
+  syReOrderResolventFB(res,*length);
   if (currRing->OrdSgn == -1)
     pSetSchreyerOrdM(NULL,0,0);
-  syReOrderResolventFB(res,*length);
   syzIndex = 1;
   if (/*ringOrderChanged:*/ ord!=NULL)
   {
+    rChangeCurrRing(origR, TRUE);
+    // Thomas: Here I assume that all (!) polys of res live in tmpR
+    while ((syzIndex < *length) && (res[syzIndex]))
+    {
+      for (i=0;i<IDELEMS(res[syzIndex]);i++)
+      {
+        if (res[syzIndex]->m[i])
+        {
+          res[syzIndex]->m[i] = pFetchCopyDelete(&tmpR, res[syzIndex]->m[i]);
+        }
+      }
+      syzIndex++;
+    }
     j = 0;
     while (currRing->order[j]!=0) j++;
-    Free((ADDRESS)ord,(j+2)*sizeof(int));
-    Free((ADDRESS)bl0,(j+2)*sizeof(int));
-    Free((ADDRESS)bl1,(j+2)*sizeof(int));
-    Free((ADDRESS)wv,(j+2)*sizeof(short*));
-    rChangeCurrRing(origR, TRUE);
+    Free((ADDRESS)ord,(j+1)*sizeof(int));
+    Free((ADDRESS)bl0,(j+1)*sizeof(int));
+    Free((ADDRESS)bl1,(j+1)*sizeof(int));
+    Free((ADDRESS)wv,(j+1)*sizeof(int*));
   }
-  while ((syzIndex < *length) && (res[syzIndex]))
+  else
   {
-    for (i=0;i<IDELEMS(res[syzIndex]);i++)
+    // Thomas -- are you sure that you have to "reorder" here?
+    while ((syzIndex < *length) && (res[syzIndex]))
     {
-      if (res[syzIndex]->m[i])
-        res[syzIndex]->m[i] = pOrdPolyMerge(res[syzIndex]->m[i]);
+      for (i=0;i<IDELEMS(res[syzIndex]);i++)
+      {
+        if (res[syzIndex]->m[i])
+          res[syzIndex]->m[i] = pOrdPolyMerge(res[syzIndex]->m[i]);
+      }
+      syzIndex++;
     }
-    syzIndex++;
   }
+
+  //syMergeSortResolventFB(res,*length);
   if (modcomp!=NULL) delete modcomp;
   if (w!=NULL) delete w;
   return res;
