@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.9 1998-03-16 14:56:41 obachman Exp $ */
+/* $Id: ring.h,v 1.10 1998-03-19 16:05:51 obachman Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -71,7 +71,9 @@ typedef enum rOrderType_t
   rOrderType_General = 0, // non-simple ordering as specified by currRing
   rOrderType_CompExp,     // simple ordering, component has priority 
   rOrderType_ExpComp,     // simple ordering, exponent vector has priority
-  rOrderType_Exp,         // simple ordering, no components involved
+                          // component not compatible with exp-vector order
+  rOrderType_Exp,         // simple ordering, exponent vector has priority
+                          // component is compatible with exp-vector order
   rOrderType_Syz,         // syzygy ordering
   rOrderType_Schreyer     // Schreyer ordering
 } rOrderType_t;

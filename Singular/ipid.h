@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.8 1998-01-16 14:29:53 krueger Exp $ */
+/* $Id: ipid.h,v 1.9 1998-03-19 16:05:43 obachman Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -36,10 +36,7 @@ struct sip_sring
   short      ref;
 
   // what follows below here should be set by rComplete, _only_
-#ifdef COMP_FAST
   short     VarOffset; /* controls indexing of exponents */
-  short     CompIndex; /* index of component in exponent vector */
-#endif    
 
 #ifdef RDEBUG
   short      no;

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.5 1998-03-16 14:56:35 obachman Exp $ */
+/* $Id: kutil.h,v 1.6 1998-03-19 16:05:48 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for std
 */
@@ -172,7 +172,19 @@ void updateResult(ideal r,ideal Q,kStrategy strat);
 void completeReduce (kStrategy strat);
 BOOLEAN homogTest(polyset F, int Fmax);
 BOOLEAN newHEdge(polyset S, int ak,kStrategy strat);
-rOrderType_t spGetOrderType(ring r, kStrategy strat);
+
+rOrderType_t spGetOrderType(ring r, int modrank, int syzcomp);
+inline rOrderType_t spGetOrderType(ring r, kStrategy strat)
+{
+  return spGetOrderType(r, strat->ak, strat->syzComp);
+}
+
+inline int MAX(int a, int b)
+{
+  if (a > b) return a;
+  else return b;
+}
+
 
 inline TSet initT () { return (TSet)Alloc0(setmax*sizeof(TObject)); }
 #ifdef KDEBUG

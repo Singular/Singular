@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.10 1998-03-18 14:28:48 obachman Exp $ */
+/* $Id: polys-impl.cc,v 1.11 1998-03-19 16:05:49 obachman Exp $ */
 
 /***************************************************************
  *
@@ -28,32 +28,12 @@
 #include "ring.h"
 #include "ipid.h"
 
-/***************************************************************
- *
- * definition of global variables
- *
- ***************************************************************/
-
-int pVariables;
-int pMonomSize;
-int pMonomSizeW;
-
 #ifdef COMP_FAST
-int pVariables1W;
-int pVariablesW;
-int pVarOffset;
-int pCompIndex;
-int pVarLowIndex;
-int pVarHighIndex;
-#endif
-int pLexSgn;
-
 /***************************************************************
  *
  * Low - level routines for which deal with var indicies
  *
  ***************************************************************/
-#ifdef COMP_FAST
 // gets var indicies w.r.t. the ring r
 void pGetVarIndicies(ring r, int &VarOffset, 
                      int &VarLowIndex, int &VarHighIndex)
@@ -104,20 +84,8 @@ void pGetVarIndicies(ring r, int &VarOffset,
 }
 
 
-// assumes that pVarOffset != src_r->VarOffset
 inline void RingCopy2ExpV(poly dest, poly src, ring src_r)
 {
-#if 0
-  if (_pHasReverseExp)
-  {
-#ifdef WORDS_BIGENDIAN
-    for (int i=0, offset = src_r->VarOffset - 1; i<pVariables; i++)
-      dest->exp[i] = src->exp[offset - i];
-#else
-#endif
-  }
-
-#endif
   for (int i=pVariables; i; i--)
     pSetExp(dest, i, pRingGetExp(src_r, src, i));
   pSetComp(dest, pRingGetComp(src_r, src));
@@ -143,7 +111,7 @@ poly _pFetchCopy(ring r, poly p)
 #endif
   if (r->VarOffset == pVarOffset)
   {
-    memcpy(a,p,pMonomSize);
+    pCopy2(a,p);
     a->coef=nCopy(p->coef);
     pSetm(a);
     if (pNext(p)!=NULL)
@@ -156,7 +124,7 @@ poly _pFetchCopy(ring r, poly p)
 #else
         a = pNext(a) = pNew();
 #endif
-        memcpy(a,p,pMonomSize);
+        pCopy2(a,p);
         a->coef=nCopy(p->coef);
         pSetm(a);
         pIter(p);
@@ -593,7 +561,7 @@ void pDBMonAddFast(poly p1, poly p2, char* f, int l)
   poly ptemp = pNew();
   pCopy2(ptemp, p1);
 
-  _pMonAddFast(p1, p2);
+  __pMonAddFast(p1, p2);
 
   for (int i=1; i<=pVariables; i++)
   {

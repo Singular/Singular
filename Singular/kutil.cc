@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.12 1998-03-16 14:56:34 obachman Exp $ */
+/* $Id: kutil.cc,v 1.13 1998-03-19 16:05:47 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for std
 */
@@ -3807,16 +3807,16 @@ BOOLEAN newHEdge(polyset S, int ak,kStrategy strat)
   return FALSE;
 }
 
-rOrderType_t spGetOrderType(ring r, kStrategy strat)
+rOrderType_t spGetOrderType(ring r, int modrank, int syzcomp)
 {
-  if (strat->syzComp > 0)
+  if (syzcomp > 0)
     return rOrderType_Syz;
   else
   {
     rOrderType_t rot = rGetOrderType(r);
   
     if ((rot == rOrderType_CompExp || rot == rOrderType_ExpComp) &&
-        (strat->ak == 0))
+        (modrank == 0))
       return rOrderType_Exp;
     else
       return rot;

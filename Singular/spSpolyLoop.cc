@@ -30,7 +30,6 @@
  * do not destroy a1, but a2
  *
  ***************************************************************/
-#if 1
 void spSpolyLoop_General 
 (poly a1, poly a2, poly monom, poly spNoether)
 { 
@@ -99,14 +98,6 @@ void spSpolyLoop_General
    nDelete(&tneg);
    pFree1(b);
 } 
-#else
-extern void spGSpolyLoop(poly a1, poly a2, poly m,poly spNoether);
-void spSpolyLoop_General 
-(poly a1, poly a2, poly m,poly spNoether)
-{
-  spGSpolyLoop(a1, a2, m, spNoether);
-}
-#endif
 
 
 /***************************************************************
@@ -153,17 +144,17 @@ spSpolyLoopProc spGetSpolyLoop(ring r, rOrderType_t rot, BOOLEAN homog)
   // set Ordering Type
   switch (rot)
   {   
-    rOrderType_Exp:
-    ot = otEXP;
-    break;
+      case rOrderType_Exp:
+        ot = otEXP;
+        break;
     
-    rOrderType_CompExp:
-    ot = otCOMPEXP;
-    break;
+      case rOrderType_CompExp:
+        ot = otCOMPEXP;
+        break;
     
-    rOrderType_ExpComp:
-    ot = otEXPCOMP;
-    break;
+      case rOrderType_ExpComp:
+        ot = otEXPCOMP;
+        break;
 
       default:
         ot = otGEN;
@@ -180,17 +171,13 @@ spSpolyLoopProc spGetSpolyLoop(ring r, rOrderType_t rot, BOOLEAN homog)
     Variables1W = ((r->N+1)*sizeof(Exponent_t) / sizeof(void*)) + 1;
   if (Variables1W > 2)
   {
-    if (Variables1W & 1)
-      nw = nwODD;
-    else
-      nw = nwEVEN;
+    if (Variables1W & 1) nw = nwODD;
+    else nw = nwEVEN;
   }
   else 
   {
-    if (Variables1W == 2)
-      nw = nwTWO;
-    else
-      nw = nwONE;
+    if (Variables1W == 2) nw = nwTWO;
+    else nw = nwONE;
   }
   
   // GetSpolyLoop   

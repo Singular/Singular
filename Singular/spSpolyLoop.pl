@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl
 ###########################################################################
-# $Id: spSpolyLoop.pl,v 1.1 1998-03-17 10:59:57 obachman Exp $
+# $Id: spSpolyLoop.pl,v 1.2 1998-03-19 16:05:53 obachman Exp $
 
 ###########################################################################
 ##
@@ -239,7 +239,7 @@ $spSpolyLoopBodyTemplate = <<_EOT_
        b = pNew(),                        // stores a1*monom
        c;                                 // used for temporary storage
   number tm   = pGetCoeff(monom),         // coefficient of monom
-         tneg = CALL_NCOPYNEG(tm), // - (coefficient of monom)
+         tneg = CALL_NCOPYNEG(tm),        // - (coefficient of monom)
          tb;                              // used for tm*coeff(a1)
 
   
@@ -253,6 +253,7 @@ $spSpolyLoopBodyTemplate = <<_EOT_
     CALL_COMPARE(b, a2, d);
 
   Equal:   // b equals a2
+    assume(pComp0(b, a2) == 0);
     tb = CALL_NMULT("pGetCoeff(a1)",tm);
     if (!CALL_NEQUAL("pGetCoeff(a2)",tb))
     {
@@ -276,6 +277,7 @@ $spSpolyLoopBodyTemplate = <<_EOT_
   NotEqual:     // b != a2 
     if (d < 0)  // b < a2: 
     {
+      assume(pComp0(b, a2) == -1);
       a = pNext(a) = a2;// append a2 to result and advance a2
       pIter(a2);
       if (a2==NULL) goto Finish;;
@@ -283,6 +285,7 @@ $spSpolyLoopBodyTemplate = <<_EOT_
     }
     else // now d >= 0, i.e., b > a2
     {
+      assume(pComp0(b, a2) == 1);
       pSetCoeff0(b,CALL_NMULT("pGetCoeff(a1)",tneg));
       a = pNext(a) = b;       // append b to result and advance a1
       pIter(a1);
@@ -293,6 +296,7 @@ $spSpolyLoopBodyTemplate = <<_EOT_
     }
  
  Finish: // a1 or a2 is NULL: Clean-up time
+   assume(a1 == NULL || a2 == NULL);
    if (a1 == NULL) // append rest of a2 to result
      pNext(a) = a2;
    else  // append (- a1*monom) to result 

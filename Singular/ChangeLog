@@ -1,6 +1,9 @@
 1998-03-18  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* polys-impl.h: Cleaned up COMP_FAST and related #defines
+	* Makefile.in: added Singularb target for bprof
+
+	* polys-impl.h, polys-comp.h: Cleaned up COMP_FAST and related
+	#defines 
 
 1998-03-16  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
