@@ -1,13 +1,13 @@
 
 
-       --- This README file corresponds to Factory version 1.2c ---
+       --- This README file corresponds to Factory version 1.3a ---
 
 
 			  README file for Factory
 			  =======================
 
-!! IMPORTANT: copyright notice still missing
-
+NOTE: The copyright state of Factory is still unclear.  Sooner or later it
+will be free software, but by now please do *not* distribute the sources.
 
 Overview
 --------
@@ -64,7 +64,7 @@ The Factory distribution consists of three archives:
 
 o the Factory source code (factory-<version>.tgz);
 o some preliminary documentation on Factory (factory-doc-prelim.tgz);
-o Factory GF(q) addition tables (see below).
+o Factory GF(q) addition tables (factory-gftables.tgz, see below).
 
 
 Prerequisites
@@ -85,7 +85,7 @@ Configure options:
                           in process, be graceful when there is no gmp.h
 
   If <gmp_lib_path> is not given, but <gmp_inc_path> is,
-'<gmp_inc_path>../lib/' is used as <gmp_lib_path>.  If neither
+'<gmp_inc_path>/../lib/' is used as <gmp_lib_path>.  If neither
 <gmp_lib_path> nor <gmp_inc_path> is specified, configure looks in the
 standard system locations for GMP.
 
@@ -94,13 +94,13 @@ standard system locations for GMP.
 
   --with-gmp='$(includedir)'
 
-  This is useful when Factory is delivered as a part of a larger package
+  This is useful when Factory is delivered as part of a larger package
 which also provides the GMP library.  In this case, at configuration time
-there will not be any gmp.h.  Without this option, Factory's configure
-script will exit with an error message.  If this symbolic directory is
-given, the configure script will not look for gmp.h and libgmp.a.  Rather,
-it will add the option '-I$(includedir)' to its $(CXXFLAGS) and the option
-'-L$(libdir)' to its $(LDFLAGS) assuming that at compilation time gmp.h and
+there would not be any gmp.h.  Without this option, Factory's configure
+script would exit with an error message.  If this symbolic directory is
+given, the configure script does not look for gmp.h and libgmp.a.  Rather,
+it adds the option '-I$(includedir)' to its $(CXXFLAGS) and the option
+'-L$(libdir)' to its $(LDFLAGS) assuming that at compilation-time gmp.h and
 libgmp.a will reside in these directories.
   The option --enable-gmp does the same, but it is a special (and ugly)
 gift to Singular, so it may be used with option --with-Singular only.
@@ -113,7 +113,7 @@ There are the 'new' and the 'old' memory manager.  In fact, on some systems
 the 'old' memory managment seems to be faster then the new one, but so far
 there have not been systematic timings.
   You may trace the actions (alloc/free) of the new memory manager by
-enabling memory managment.  This produces a *lot* of output.
+enabling memory managment debugging.  This produces a *lot* of output.
 
 Configure options:
 ~~~~~~~~~~~~~~~~~~
@@ -127,8 +127,8 @@ Configure options:
 Stream IO
 ---------
   For use with other systems which have there own IO routines to print
-polynomials it is possible to switch of Factory's stream IO.  In this case,
-you do not need to link libg++ or libiostream with Factory.
+polynomials it is possible to switch off Factory's stream IO.  In this
+case, you do not need to link libg++ or libiostream with Factory.
 
 Configure options:
 ~~~~~~~~~~~~~~~~~~
@@ -144,12 +144,13 @@ Factory has three types of diagnostic messages:
 - Debugoutput (implemented by the DEBOUT macros in debug.h/debug.cc) is
   used to trace complex algorithms, e.g. factorization.
 - Timing information may be accumulated and printed using the TIMING macros
-  in timing.h
+  in timing.h.
 
   Since all diagnostic messages are implemented using preprocessor macros,
-they will completely cease when disbled, thus avoiding any impact on speed.
-For more information, see section 'Configuring and building Factory for
- different configurations' in the INSTALL file.
+they will completely cease when disabled, thus avoiding any impact on
+speed.  For more information, see section 'Configuring and building Factory
+for different configurations' in the INSTALL file.  By default, all
+diagnostic messages are disabled.
 
 Configure options:
 ~~~~~~~~~~~~~~~~~~
@@ -206,19 +207,19 @@ defaults to: '--with-memman=no --disable-streamio'.
 
 Configure options, dependencies
 -------------------------------
-- do not configure --with-Singular --with-memman.  In this case
+- do not configure '--with-Singular --with-memman'.  In this case
   both Singular and the library will try to initialize memory
   managment.
 
-- do not configure --disable-streamio --enable-debugoutput.  The
+- do not configure '--disable-streamio --enable-debugoutput'.  The
   DEBOUT macros need stream IO.
 
-- you may configure --with-Singular --enable-streamio, but this
+- you may configure '--with-Singular --enable-streamio', but this
   is not supported by Singular.  You will have to change manually
-  Singular's Makefile.  The same is true for --with-Singular
-  --enable-debugoutput.
+  Singular's Makefile.  The same is true for '--with-Singular
+  --enable-streamio --enable-debugoutput'.
 
-- you may configure --with-Singular --enable-timing, but this
+- you may configure '--with-Singular --enable-timing', but this
   will not have any visible effect (except from a slightly slower
   running time) because Singular will not print the timing
   results.
