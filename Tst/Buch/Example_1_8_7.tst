@@ -16,7 +16,7 @@ triang_solve(triangMH(J),6);
 rlist;
 
 setring A;
-kill AC;
+kill Solve::AC;
 vdim(J);
 LIB "sing.lib";
 ideal sJ=groebner(slocus(I));
