@@ -313,7 +313,7 @@ BOOLEAN setOption(leftv res, leftv v)
   {
     if (v->Typ()==STRING_CMD)
     {
-      n=(char *)v->CopyD();
+      n=(char *)v->CopyD(STRING_CMD);
     }
     else
     {

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.h,v 1.20 1999-08-03 16:33:44 obachman Exp $ */
+/* $Id: subexpr.h,v 1.21 1999-09-17 11:42:26 Singular Exp $ */
 /*
 * ABSTRACT: handling of leftv
 */
@@ -61,9 +61,9 @@ class sleftv
     void CleanUp();
     char * String(void *d=NULL, BOOLEAN typed = FALSE, int dim = 1);
     void Copy(leftv e);
-    void * CopyD();
     attr CopyA();
     void * CopyD(int t);
+    void * CopyD() { return CopyD(Typ()); }
     inline const char * Name()
     {
       if ((name!=NULL) && (e==NULL)) return name;

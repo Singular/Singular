@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.68 1999-08-03 16:33:42 obachman Exp $ */
+/* $Id: grammar.y,v 1.69 1999-09-17 11:42:23 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -483,7 +483,7 @@ elemexpr:
                 $2.CleanUp();
                 MYYERROR("expected '[poly,...'");
               }
-              poly p = (poly)tmp.CopyD();
+              poly p = (poly)tmp.CopyD(POLY_CMD);
               pSetCompP(p,++j);
               $$.data = (void *)pAdd((poly)$$.data,p);
               v->next=tmp.next;tmp.next=NULL;
@@ -826,7 +826,7 @@ extendedid:
             {
               MYYERROR("string expression expected");
             }
-            $$ = (char *)$2.CopyD();
+            $$ = (char *)$2.CopyD(STRING_CMD);
             $2.CleanUp();
           }
         ;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.cc,v 1.13 1999-04-20 17:02:45 Singular Exp $ */
+/* $Id: attrib.cc,v 1.14 1999-09-17 11:42:22 Singular Exp $ */
 
 /*
 * ABSTRACT: attributes to leftv and idhdl
@@ -379,7 +379,8 @@ BOOLEAN atATTRIB3(leftv res,leftv a,leftv b,leftv c)
 #endif
   else
   {
-    atSet(v,mstrdup(name),c->CopyD(),c->Typ());
+    int typ=c->Typ();
+    atSet(v,mstrdup(name),c->CopyD(typ),typ/*c->T(yp()*/);
     if (h!=NULL) IDATTR(h)=v->attribute;
   }
   return FALSE;

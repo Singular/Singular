@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.52 1999-07-09 14:58:30 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.53 1999-09-17 11:42:25 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -624,8 +624,8 @@ void * sleftv::CopyD(int t)
   return NULL;
 }
 
-void * sleftv::CopyD()
-{
+//void * sleftv::CopyD()
+//{
   //if ((rtyp!=IDHDL)&&(e==NULL)
   //&&(rtyp!=VNOETHER)&&(rtyp!=LIB_CMD)&&(rtyp!=VMINPOLY))
   //{
@@ -633,8 +633,8 @@ void * sleftv::CopyD()
   //  data=NULL;
   //  return x;
   //}
-  return CopyD(Typ());
-}
+//  return CopyD(Typ());
+//}
 
 attr sleftv::CopyA()
 {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.48 1999-04-19 13:04:56 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.49 1999-09-17 11:42:24 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -236,7 +236,7 @@ static BOOLEAN jiA_NUMBER(leftv res, leftv a, Subexpr e)
 }
 static BOOLEAN jiA_LIST_RES(leftv res, leftv a,Subexpr e)
 {
-  syStrategy r=(syStrategy)a->CopyD();
+  syStrategy r=(syStrategy)a->CopyD(RESOLUTION_CMD);
   if (res->data!=NULL) ((lists)res->data)->Clean();
   res->data=(void *)syConvRes(r);
   //jiAssignAttr(res,a);
@@ -244,7 +244,7 @@ static BOOLEAN jiA_LIST_RES(leftv res, leftv a,Subexpr e)
 }
 static BOOLEAN jiA_LIST(leftv res, leftv a,Subexpr e)
 {
-  lists l=(lists)a->CopyD();
+  lists l=(lists)a->CopyD(LIST_CMD);
   if (res->data!=NULL) ((lists)res->data)->Clean();
   res->data=(void *)l;
   jiAssignAttr(res,a);
@@ -382,7 +382,7 @@ static BOOLEAN jiA_MODUL_P(leftv res, leftv a, Subexpr e)
 {
   if (res->data!=NULL) idDelete((ideal*)&res->data);
   ideal I=idInit(1,1);
-  I->m[0]=(poly)a->CopyD();
+  I->m[0]=(poly)a->CopyD(POLY_CMD);
   if (I->m[0]!=NULL) pSetComp(I->m[0],1);
   res->data=(void *)I;
   return FALSE;
@@ -420,6 +420,7 @@ static BOOLEAN jiA_LINK(leftv res, leftv a, Subexpr e)
   }
   return TRUE;
 }
+// assign map -> map
 static BOOLEAN jiA_MAP(leftv res, leftv a, Subexpr e)
 {
   if (res->data!=NULL)
@@ -428,10 +429,11 @@ static BOOLEAN jiA_MAP(leftv res, leftv a, Subexpr e)
     ((map)res->data)->preimage=NULL;
     idDelete((ideal*)&res->data);
   }
-  res->data=(void *)a->CopyD();
+  res->data=(void *)a->CopyD(MAP_CMD);
   jiAssignAttr(res,a);
   return FALSE;
 }
+// assign ideal -> map
 static BOOLEAN jiA_MAP_ID(leftv res, leftv a, Subexpr e)
 {
   map f=(map)res->data;

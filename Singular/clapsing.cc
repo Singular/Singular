@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.53 1999-06-28 16:06:22 Singular Exp $
+// $Id: clapsing.cc,v 1.54 1999-09-17 11:42:22 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -1128,7 +1128,8 @@ int singclap_det_i( intvec * m )
 /* interpreter interface : */
 BOOLEAN jjGCD_P(leftv res, leftv u, leftv v)
 {
-  res->data=(void *)singclap_gcd((poly)(u->CopyD()),((poly)v->CopyD()));
+  res->data=(void *)singclap_gcd((poly)(u->CopyD(POLY_CMD)),
+                                 (poly)(v->CopyD(POLY_CMD)));
   return FALSE;
 }
 

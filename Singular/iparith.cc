@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.175 1999-09-16 12:33:56 Singular Exp $ */
+/* $Id: iparith.cc,v 1.176 1999-09-17 11:42:23 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -597,7 +597,7 @@ static BOOLEAN jjPOWER_I(leftv res, leftv u, leftv v)
 static BOOLEAN jjPOWER_N(leftv res, leftv u, leftv v)
 {
   int e=(int)v->Data();
-  number n=(number)u->CopyD();
+  number n=(number)u->CopyD(NUMBER_CMD);
   if (e<0)
   {
     number m=nInvers(n);
@@ -777,7 +777,7 @@ static BOOLEAN jjPLUS_MA(leftv res, leftv u, leftv v)
 static BOOLEAN jjPLUS_MA_P(leftv res, leftv u, leftv v)
 {
   matrix m=(matrix)u->Data();
-  matrix p= mpInitP(m->nrows,m->ncols,(poly)(v->CopyD()));
+  matrix p= mpInitP(m->nrows,m->ncols,(poly)(v->CopyD(POLY_CMD)));
   if (iiOp=='+')
     res->data = (char *)mpAdd(m , p);
   else
@@ -872,10 +872,10 @@ static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
 
   if (v->next==NULL)
   {
-    a=(poly)u->CopyD();
+    a=(poly)u->CopyD(POLY_CMD); // works also for VECTOR_CMD
     if (u->next==NULL)
     {
-      b=(poly)v->CopyD();
+      b=(poly)v->CopyD(POLY_CMD); // works also for VECTOR_CMD
       res->data = (char *)(pMult( a, b));
       return FALSE;
     }
@@ -886,7 +886,7 @@ static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
   }
   // v->next exists: copy u
   a=pCopy((poly)u->Data());
-  b=(poly)v->CopyD();
+  b=(poly)v->CopyD(POLY_CMD); // works also for VECTOR_CMD
   res->data = (char *)(pMult( a, b));
   return jjOP_REST(res,u,v);
 }
@@ -1205,7 +1205,7 @@ static BOOLEAN jjINDEX_P_IV(leftv res, leftv u, leftv v)
 {
   poly p=(poly)u->Data();
   poly r=NULL;
-  intvec *iv=(intvec *)v->CopyD();
+  intvec *iv=(intvec *)v->CopyD(INTVEC_CMD);
   int i;
   int sum=0;
   for(i=iv->length()-1;i>=0;i--)
@@ -1232,7 +1232,7 @@ static BOOLEAN jjINDEX_P_IV(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjINDEX_V(leftv res, leftv u, leftv v)
 {
-  poly p=(poly)u->CopyD();
+  poly p=(poly)u->CopyD(VECTOR_CMD);
   poly r=p; // pointer to the beginning of component i
   poly o=NULL;
   int i=(int)v->Data();
@@ -1261,7 +1261,7 @@ static BOOLEAN jjINDEX_V(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjINDEX_V_IV(leftv res, leftv u, leftv v)
 {
-  poly p=(poly)u->CopyD();
+  poly p=(poly)u->CopyD(VECTOR_CMD);
   if (p!=NULL)
   {
     poly r=pOne();
@@ -1745,7 +1745,8 @@ static BOOLEAN jjLIFTSTD(leftv res, leftv u, leftv v)
 {
   if ((v->rtyp!=IDHDL)||(v->e!=NULL)) return TRUE;
   idhdl h=(idhdl)v->data;
-  res->data = (char *)idLiftStd((ideal)u->CopyD(), currQuotient,
+  // CopyD for IDEAL_CMD and MODUL_CMD are identical:
+  res->data = (char *)idLiftStd((ideal)u->CopyD(IDEAL_CMD), currQuotient,
               &(h->data.umatrix),testHomog);
   setFlag(res,FLAG_STD);
   return FALSE;
@@ -1908,7 +1909,8 @@ static BOOLEAN jjRSUM(leftv res, leftv u, leftv v)
 static BOOLEAN jjSIMPL_ID(leftv res, leftv u, leftv v)
 {
   int sw = (int)v->Data();
-  ideal id = (ideal)u->CopyD();
+  // CopyD for IDEAL_CMD and MODUL_CMD are identical:
+  ideal id = (ideal)u->CopyD(IDEAL_CMD);
   if (sw & SIMPL_LMDIV)
   {
     idDelDiv(id);
@@ -1944,7 +1946,8 @@ static BOOLEAN jjSTATUS2(leftv res, leftv u, leftv v)
 static BOOLEAN jjSIMPL_P(leftv res, leftv u, leftv v)
 {
   int sw = (int)v->Data();
-  poly p = (poly)u->CopyD();
+  // CopyD for POLY_CMD and VECTOR_CMD are identical:
+  poly p = (poly)u->CopyD(POLY_CMD);
   if (sw & SIMPL_NORM)
   {
     pNorm(p);
@@ -2343,7 +2346,7 @@ static BOOLEAN jjUMINUS_I(leftv res, leftv u)
 }
 static BOOLEAN jjUMINUS_N(leftv res, leftv u)
 {
-  number n=(number)u->CopyD();
+  number n=(number)u->CopyD(NUMBER_CMD);
   n=nNeg(n);
   res->data = (char *)n;
   return FALSE;
@@ -2395,7 +2398,7 @@ static BOOLEAN jjBAREISS(leftv res, leftv v)
 }
 static BOOLEAN jjBAREISS_IM(leftv res, leftv v)
 {
-  intvec *m=(intvec *)v->CopyD();
+  intvec *m=(intvec *)v->CopyD(INTMAT_CMD);
   ivTriangMat(m,1,1);
   res->data = (char *)m;
   return FALSE;
@@ -2421,7 +2424,8 @@ static BOOLEAN jjCOLS_IV(leftv res, leftv v)
 }
 static BOOLEAN jjCONTENT(leftv res, leftv v)
 {
-  poly p=(poly)v->CopyD();
+  // CopyD for POLY_CMD and VECTOR_CMD are identical:
+  poly p=(poly)v->CopyD(POLY_CMD);
   if (p!=NULL) pCleardenom(p);
   res->data = (char *)p;
   return FALSE;
@@ -2656,7 +2660,7 @@ static BOOLEAN jjHOMOG1(leftv res, leftv v)
 }
 static BOOLEAN jjIDEAL_Ma(leftv res, leftv v)
 {
-  matrix mat=(matrix)v->CopyD();
+  matrix mat=(matrix)v->CopyD(MATRIX_CMD);
   IDELEMS((ideal)mat)=MATCOLS(mat)*MATROWS(mat);
   MATROWS(mat)=1;
   mat->rank=1;
@@ -2665,7 +2669,7 @@ static BOOLEAN jjIDEAL_Ma(leftv res, leftv v)
 }
 static BOOLEAN jjIDEAL_Map(leftv res, leftv v)
 {
-  map m=(map)v->CopyD();
+  map m=(map)v->CopyD(MAP_CMD);
   FreeL((ADDRESS)m->preimage);
   m->preimage=NULL;
   ideal I=(ideal)m;
@@ -2692,7 +2696,7 @@ static BOOLEAN jjIDEAL_R(leftv res, leftv v)
 }
 static BOOLEAN jjIm2Iv(leftv res, leftv v)
 {
-  intvec *iv = (intvec *)v->CopyD();
+  intvec *iv = (intvec *)v->CopyD(INTMAT_CMD);
   iv->makeVector();
   res->data = iv;
   return FALSE;
@@ -2812,7 +2816,7 @@ static BOOLEAN jjLEADMONOM(leftv res, leftv v)
 }
 static BOOLEAN jjLIB(leftv res, leftv v)
 {
-  return iiLibCmd((char *)v->CopyD());
+  return iiLibCmd((char *)v->CopyD(STRING_CMD));
 }
 static BOOLEAN jjMEMORY(leftv res, leftv v)
 {
@@ -3389,9 +3393,9 @@ static BOOLEAN jjidTransp(leftv res, leftv v)
 #define jjidTransp     (proc1)idTransp
 #endif
 #endif
-BOOLEAN jjnInt(leftv res, leftv u)
+static BOOLEAN jjnInt(leftv res, leftv u)
 {
-  number n=(number)u->CopyD();
+  number n=(number)u->CopyD(NUMBER_CMD);
   res->data=(char *)nInt(n);
   nDelete(&n);
   return FALSE;
@@ -3902,7 +3906,8 @@ static BOOLEAN jjCOEFFS3_P(leftv res, leftv u, leftv v, leftv w)
     WerrorS("3rd argument must be a name of a matrix");
     return TRUE;
   }
-  poly p=(poly)u->CopyD();
+  // CopyD for POLY_CMD and VECTOR_CMD are identical:
+  poly p=(poly)u->CopyD(POLY_CMD);
   ideal i=idInit(1,1);
   i->m[0]=p;
   sleftv t;
@@ -4097,7 +4102,7 @@ static BOOLEAN jjSUBST_P(leftv res, leftv u, leftv v,leftv w)
   poly monomexpr;
   BOOLEAN nok=jjSUBST_Test(v,w,ringvar,monomexpr);
   if (nok) return TRUE;
-  res->data = pSubst((poly)u->CopyD(POLY_CMD),ringvar,monomexpr);
+  res->data = pSubst((poly)u->CopyD(res->rtyp),ringvar,monomexpr);
   return FALSE;
 }
 static BOOLEAN jjSUBST_Id(leftv res, leftv u, leftv v,leftv w)
@@ -4106,8 +4111,29 @@ static BOOLEAN jjSUBST_Id(leftv res, leftv u, leftv v,leftv w)
   poly monomexpr;
   BOOLEAN nok=jjSUBST_Test(v,w,ringvar,monomexpr);
   if (nok) return TRUE;
-  res->data = idSubst((ideal)u->CopyD(IDEAL_CMD),ringvar,monomexpr);
+  res->data = idSubst((ideal)u->CopyD(res->rtyp),ringvar,monomexpr);
   return FALSE;
+}
+// we do not want to have jjSUBST_Id_X inlined:
+static BOOLEAN jjSUBST_Id_X(leftv res, leftv u, leftv v,leftv w,
+                            int input_type);
+static BOOLEAN jjSUBST_Id_I(leftv res, leftv u, leftv v,leftv w)
+{
+  return jjSUBST_Id_X(res,u,v,w,INT_CMD);
+}
+static BOOLEAN jjSUBST_Id_N(leftv res, leftv u, leftv v,leftv w)
+{
+  return jjSUBST_Id_X(res,u,v,w,NUMBER_CMD);
+}
+static BOOLEAN jjSUBST_Id_X(leftv res, leftv u, leftv v,leftv w, int input_type)
+{
+  sleftv tmp;
+  memset(&tmp,0,sizeof(tmp));
+  // do not check the result, conversion form int/number to poly works always
+  iiConvert(input_type,POLY_CMD,iiTestConvert(input_type,POLY_CMD),w,&tmp);
+  BOOLEAN b=jjSUBST_Id(res,u,v,&tmp);
+  tmp.CleanUp();
+  return b;
 }
 static BOOLEAN jjMATRIX_Id(leftv res, leftv u, leftv v,leftv w)
 {
@@ -4330,10 +4356,13 @@ struct sValCmd3 dArith3[]=
 ,{jjSTD_HILB_W,     STD_CMD,    IDEAL_CMD,  IDEAL_CMD,  INTVEC_CMD, INTVEC_CMD}
 ,{jjSTD_HILB_W,     STD_CMD,    MODUL_CMD,  MODUL_CMD,  INTVEC_CMD, INTVEC_CMD}
 ,{jjSUBST_P,        SUBST_CMD,  POLY_CMD,   POLY_CMD,   POLY_CMD,   POLY_CMD }
+,{jjSUBST_P,        SUBST_CMD,  POLY_CMD,   POLY_CMD,   POLY_CMD,   POLY_CMD }
 ,{jjSUBST_P,        SUBST_CMD,  VECTOR_CMD, VECTOR_CMD, POLY_CMD,   POLY_CMD }
 ,{jjSUBST_Id,       SUBST_CMD,  IDEAL_CMD,  IDEAL_CMD,  POLY_CMD,   POLY_CMD }
 ,{jjSUBST_Id,       SUBST_CMD,  MODUL_CMD,  MODUL_CMD,  POLY_CMD,   POLY_CMD }
 ,{jjSUBST_Id,       SUBST_CMD,  MATRIX_CMD, MATRIX_CMD, POLY_CMD,   POLY_CMD }
+,{jjSUBST_Id_I,     SUBST_CMD,  MATRIX_CMD, MATRIX_CMD, POLY_CMD,   INT_CMD }
+,{jjSUBST_Id_N,     SUBST_CMD,  MATRIX_CMD, MATRIX_CMD, POLY_CMD,   NUMBER_CMD }
 ,{jjCALL3MANY,      SYSTEM_CMD, NONE,       STRING_CMD, DEF_CMD,    DEF_CMD  }
 ,{nuLagSolve,       LAGSOLVE_CMD,LIST_CMD,  POLY_CMD,   INT_CMD,    INT_CMD  }
 ,{nuVanderSys,      VANDER_CMD, POLY_CMD,   IDEAL_CMD,  IDEAL_CMD,  INT_CMD  }
@@ -4396,7 +4425,7 @@ static BOOLEAN jjIDEAL_PL(leftv res, leftv v)
     {
       case POLY_CMD:
       {
-        p=(poly)h->CopyD();
+        p=(poly)h->CopyD(POLY_CMD);
         break;
       }
       case INT_CMD:
@@ -4416,7 +4445,7 @@ static BOOLEAN jjIDEAL_PL(leftv res, leftv v)
       }
       case NUMBER_CMD:
       {
-        number n=(number)h->CopyD();
+        number n=(number)h->CopyD(NUMBER_CMD);
         if (!nIsZero(n))
         {
           p=pOne();
@@ -4431,7 +4460,7 @@ static BOOLEAN jjIDEAL_PL(leftv res, leftv v)
       }
       case VECTOR_CMD:
       {
-        p=(poly)h->CopyD();
+        p=(poly)h->CopyD(VECTOR_CMD);
         if (iiOp!=MODUL_CMD)
         {
           idDelete(&id);
@@ -4757,7 +4786,7 @@ static BOOLEAN jjSUBST_M(leftv res, leftv u)
   }
   u->next = v;
   v->next = w;
-  w->next = rest;
+  // rest was w->next, but is already cleaned
   return b;
 }
 
