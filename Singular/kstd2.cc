@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.67 2000-12-14 16:38:51 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.68 2000-12-18 13:30:36 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -202,7 +202,8 @@ static int redLazy (LObject* h,kStrategy strat)
     d = h->SetpFDeg();
     /*- try to reduce the s-polynomial -*/
     pass++;
-    if ((strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
+    if (!K_TEST_OPT_REDTHROUGH &&
+        (strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
     {
       h->SetLmCurrRing();
       at = posInL11(strat->L,strat->Ll,h,strat);
@@ -281,7 +282,7 @@ static int redHoney (LObject* h, kStrategy strat)
     /*
      * end of search: have to reduce with pi
      */
-    if (!TEST_OPT_REDTHROUGH && (pass!=0) && (ei > h->ecart))
+    if (!K_TEST_OPT_REDTHROUGH && (pass!=0) && (ei > h->ecart))
     {
       h->SetLmCurrRing();
       /*
@@ -351,7 +352,7 @@ static int redHoney (LObject* h, kStrategy strat)
      */
     pass++;
     d = h_d + h->ecart;
-    if (!TEST_OPT_REDTHROUGH && (strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
+    if (!K_TEST_OPT_REDTHROUGH && (strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
     {
       h->SetLmCurrRing();
       at = strat->posInL(strat->L,strat->Ll,h,strat);
@@ -493,7 +494,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   int loop_count = 0;
 #endif
   om_Opts.MinTrack = 5;
-  int   srmax,lrmax, red_result;
+  int   srmax,lrmax, red_result = 1;
   int   olddeg,reduc;
   int hilbeledeg=1,hilbcount=0,minimcnt=0;
   BOOLEAN withT = FALSE;
@@ -512,10 +513,10 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     strat->use_buckets = 1;
 
   // redtailBBa against T for inhomogenous input
-#ifndef HAVE_OLD_STD
-  withT = ! strat->homog;
-#endif
+  if (!K_TEST_OPT_OLDSTD)
+    withT = ! strat->homog;
   
+  // strat->posInT = posInT_pLength;
   kTest_TS(strat);
   
 #ifdef HAVE_TAIL_RING
@@ -577,7 +578,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     
     if (TEST_OPT_PROT)
       message((strat->honey ? strat->P.ecart : 0) + strat->P.pFDeg(),
-              &olddeg,&reduc,strat);
+              &olddeg,&reduc,strat, red_result);
 
     /* reduction of the element choosen from L */
     red_result = strat->red(&strat->P,strat);

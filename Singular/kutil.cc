@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.83 2000-12-14 16:38:51 obachman Exp $ */
+/* $Id: kutil.cc,v 1.84 2000-12-18 13:30:37 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1885,6 +1885,157 @@ int posInT13 (const TSet set,const int length,const LObject &p)
   }
 }
 
+// determines the position based on: 1.) Ecart 2.) FDeg 3.) pLength
+int posInT_EcartFDegpLength(const TSet set,const int length,const LObject &p)
+{
+
+  if (length==-1) return 0;
+
+  int o = p.ecart;
+  int op=p.GetpFDeg();
+  int ol = p.GetpLength();
+
+  if (set[length].ecart < o)
+    return length+1;
+  if (set[length].ecart == o)
+  {
+     int oo=set[length].GetpFDeg();
+     if ((oo < op) || ((oo==op) && (set[length].length < ol)))
+       return length+1;
+  }
+
+  int i;
+  int an = 0;
+  int en= length;
+  loop
+  {
+    if (an >= en-1)
+    {
+      if (set[an].ecart > o)
+        return an;
+      if (set[an].ecart == o)
+      {
+         int oo=set[an].GetpFDeg();
+         if((oo > op)
+         || ((oo==op) && (set[an].pLength > ol)))
+           return an;
+      }
+      return en;
+    }
+    i=(an+en) / 2;
+    if (set[i].ecart > o)
+      en=i;
+    else if (set[i].ecart == o)
+    {
+       int oo=set[i].GetpFDeg();
+       if ((oo > op)
+       || ((oo == op) && (set[i].pLength > ol)))
+         en=i;
+       else
+        an=i;
+    }
+    else
+      an=i;
+  }
+}
+
+// determines the position based on: 1.) FDeg 2.) pLength
+int posInT_FDegpLength(const TSet set,const int length,const LObject &p)
+{
+
+  if (length==-1) return 0;
+
+  int op=p.GetpFDeg();
+  int ol = p.GetpLength();
+
+  int oo=set[length].GetpFDeg();
+  if ((oo < op) || ((oo==op) && (set[length].length < ol)))
+    return length+1;
+
+  int i;
+  int an = 0;
+  int en= length;
+  loop
+    {
+      if (an >= en-1)
+      {
+        int oo=set[an].GetpFDeg();
+        if((oo > op)
+           || ((oo==op) && (set[an].pLength > ol)))
+          return an;
+        return en;
+      }
+      i=(an+en) / 2;
+      int oo=set[i].GetpFDeg();
+      if ((oo > op)
+          || ((oo == op) && (set[i].pLength > ol)))
+        en=i;
+      else
+        an=i;
+    }
+}
+
+// determines the position based on: 1.) Ecart 2.) pLength
+int posInT_EcartpLength(const TSet set,const int length,const LObject &p)
+{
+  if (length==-1) return 0;
+
+  int op=p.ecart;
+  int ol = p.GetpLength();
+
+  int oo=set[length].ecart;
+  if ((oo < op) || ((oo==op) && (set[length].length < ol)))
+    return length+1;
+
+  int i;
+  int an = 0;
+  int en= length;
+  loop
+    {
+      if (an >= en-1)
+      {
+        int oo=set[an].ecart;
+        if((oo > op)
+           || ((oo==op) && (set[an].pLength > ol)))
+          return an;
+        return en;
+      }
+      i=(an+en) / 2;
+      int oo=set[i].ecart;
+      if ((oo > op)
+          || ((oo == op) && (set[i].pLength > ol)))
+        en=i;
+      else
+        an=i;
+    }
+}
+
+// determines the position based on: 1.) Ecart 2.) FDeg 3.) pLength
+int posInT_pLength(const TSet set,const int length,const LObject &p)
+{
+  if (length==-1)
+    return 0;
+  if (set[length].length<p.length)
+    return length+1;
+
+  int i;
+  int an = 0;
+  int en= length;
+  int ol = p.GetpLength();
+
+  loop
+  {
+    if (an >= en-1)
+    {
+      if (set[an].pLength>ol) return an;
+      return en;
+    }
+    i=(an+en) / 2;
+    if (set[i].pLength>ol) en=i;
+    else                        an=i;
+  }
+}
+  
 /*2
 * looks up the position of p in set
 * set[0] is the smallest with respect to the ordering-procedure
@@ -2809,24 +2960,42 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT)
 /*2
 *checks the change degree and write progress report
 */
-void message (int i,int* reduc,int* olddeg,kStrategy strat)
+void message (int i,int* reduc,int* olddeg,kStrategy strat, int red_result)
 {
   if (i != *olddeg)
   {
     Print("%d",i);
     *olddeg = i;
   }
-  if (strat->Ll != *reduc)
+  if (K_TEST_OPT_OLDSTD)
   {
-    if (strat->Ll != *reduc-1)
-      Print("(%d)",strat->Ll+1);
+    if (strat->Ll != *reduc)
+    {
+      if (strat->Ll != *reduc-1)
+        Print("(%d)",strat->Ll+1);
+      else
+        PrintS("-");
+      *reduc = strat->Ll;
+    }
     else
-      PrintS("-");
-    *reduc = strat->Ll;
+      PrintS(".");
+    mflush();
   }
   else
-    PrintS(".");
-  mflush();
+  {
+    if (red_result == 0)
+      PrintS("-");
+    else if (red_result < 0)
+      PrintS(".");
+    else
+    {
+      if (strat->Ll != *reduc)
+      {
+        Print("(%d)",strat->Ll+1);
+        *reduc = strat->Ll;
+      }
+    }
+  }
 }
 
 /*2

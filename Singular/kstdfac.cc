@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.47 2000-11-09 16:32:51 obachman Exp $ */
+/* $Id: kstdfac.cc,v 1.48 2000-12-18 13:30:36 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -459,8 +459,8 @@ static void completeReduceFac (kStrategy strat, lists FL)
 ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
 {
   int   srmax,lrmax;
-  int   olddeg,reduc;
-
+  int   olddeg,reduc=0;
+  int red_result = 1;
   srmax = strat->sl;
   reduc = olddeg = lrmax = 0;
   /* compute------------------------------------------------------- */
@@ -503,16 +503,16 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
     if (strat->honey)
     {
       if (TEST_OPT_PROT)
-        message(strat->P.ecart+pFDeg(strat->P.p),&olddeg,&reduc,strat);
+        message(strat->P.ecart+pFDeg(strat->P.p),&olddeg,&reduc,strat, red_result);
     }
     else
     {
       if (TEST_OPT_PROT)
-        message(pFDeg(strat->P.p),&olddeg,&reduc,strat);
+        message(pFDeg(strat->P.p),&olddeg,&reduc,strat, red_result);
     }
     /* reduction of the element choosen from L */
     kTest_TS(strat);
-    strat->red(&strat->P,strat);
+    red_result = strat->red(&strat->P,strat);
     if (strat->P.p != NULL)
     {
       int facdeg=pFDeg(strat->P.p);

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.47 2000-12-14 16:38:52 obachman Exp $ */
+/* $Id: kutil.h,v 1.48 2000-12-18 13:30:38 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -15,13 +15,23 @@
 #include "structs.h"
 #include "omalloc.h"
 #include "ring.h"
+#include "tok.h"
 #include "pShallowCopyDelete.h"
 
 #define setmax 16
 
 // define if you want std computations as in Singular version < 2
-// This disbales RedThrough and tailReductions against T
-#define HAVE_OLD_STD
+// This disbales RedThrough, tailReductions against T (bba), 
+// sets posInT = posInT15 (bba, strat->honey), and enables redFirst with LDeg
+#define HAVE_OLD_STD 
+
+#ifdef HAVE_OLD_STD
+#define K_TEST_OPT_REDTHROUGH 0
+#define K_TEST_OPT_OLDSTD 1
+#else
+#define K_TEST_OPT_REDTHROUGH TEST_OPT_REDTHROUGH
+#define K_TEST_OPT_OLDSTD     TEST_OPT_OLDSTD
+#endif
 
 #undef NO_KINLINE
 #if !defined(KDEBUG) && !defined(NO_INLINE)
@@ -295,6 +305,11 @@ int posInT13 (const TSet set,const int length,const LObject &p);
 int posInT15 (const TSet set,const int length,const LObject &p);
 int posInT17 (const TSet set,const int length,const LObject &p);
 int posInT19 (const TSet set,const int length,const LObject &p);
+int posInT_EcartFDegpLength(const TSet set,const int length,const LObject &p);
+int posInT_FDegpLength(const TSet set,const int length,const LObject &p);
+int posInT_EcartpLength(const TSet set,const int length,const LObject &p);
+int posInT_pLength(const TSet set,const int length,const LObject &p);
+
 void reorderS (int* suc,kStrategy strat);
 int posInL0 (const LSet set, const int length,
              LObject* L,const kStrategy strat);
@@ -315,7 +330,7 @@ poly redtail (LObject *L,int pos,kStrategy strat);
 void enterpairs (poly h, int k, int ec, int pos,kStrategy strat, int atR = -1);
 void entersets (LObject h);
 void pairs ();
-void message (int i,int* reduc,int* olddeg,kStrategy strat);
+void message (int i,int* reduc,int* olddeg,kStrategy strat,int red_result);
 void messageStat (int srmax,int lrmax,int hilbcount,kStrategy strat);
 #ifdef KDEBUG
 void messageSets (kStrategy strat);

@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id: tok.h,v 1.47 2000-12-14 16:38:55 obachman Exp $ */
+/* $Id: tok.h,v 1.48 2000-12-18 13:30:39 obachman Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -190,6 +190,7 @@ enum {
 #define OPT_REDTHROUGH     7
 #define OPT_RETURN_SB      9
 #define OPT_FASTHC        10
+#define OPT_OLDSTD        20
 #define OPT_KEEPVARS      21
 #define OPT_STAIRCASEBOUND 22
 #define OPT_MULTBOUND     23
@@ -220,6 +221,7 @@ enum {
 #define TEST_OPT_NOTREGULARITY     BTEST1(OPT_NOTREGULARITY)
 #define TEST_OPT_WEIGHTM           BTEST1(OPT_WEIGHTM)
 #define TEST_OPT_REDTHROUGH        BTEST1(OPT_REDTHROUGH)
+#define TEST_OPT_OLDSTD            BTEST1(OPT_OLDSTD)
 
 #define TEST_VERB_NSB              BVERBOSE(V_NSB)
 #define TEST_V_DEG_STOP            BVERBOSE(V_DEG_STOP)

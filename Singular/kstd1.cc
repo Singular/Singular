@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.72 2000-12-15 11:33:58 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.73 2000-12-18 13:30:35 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -40,6 +40,7 @@ BITSET kOptions=Sy_bit(OPT_PROT)           /*  0 */
                 |Sy_bit(OPT_INTERRUPT)     /*  4 */
                 |Sy_bit(OPT_SUGARCRIT)     /*  5 */
                 |Sy_bit(OPT_REDTHROUGH)
+                |Sy_bit(OPT_OLDSTD)
                 |Sy_bit(OPT_FASTHC)        /* 10 */
                 |Sy_bit(OPT_KEEPVARS)      /* 21 */
                 |Sy_bit(OPT_INTSTRATEGY)   /* 26 */
@@ -69,7 +70,8 @@ BITSET validOpts=Sy_bit(0)
                 |Sy_bit(17)
                 |Sy_bit(18)
                 |Sy_bit(19)
-//                |Sy_bit(20) obachman 11/00 tossed
+//                |Sy_bit(20) obachman 11/00 tossed: 12/00 used for redOldStd
+  |Sy_bit(OPT_OLDSTD)
                 |Sy_bit(21)
                 |Sy_bit(22)
                 /*|Sy_bit(23)*/
@@ -224,7 +226,7 @@ int redEcart (LObject* h,kStrategy strat)
     }
 
     // end of search: have to reduce with pi
-    if (ei > h->ecart)
+    if (!K_TEST_OPT_REDTHROUGH && ei > h->ecart)
     {
       // It is not possible to reduce h with smaller ecart;
       // if possible h goes to the lazy-set L,i.e
@@ -297,7 +299,7 @@ int redEcart (LObject* h,kStrategy strat)
      *-if the degree jumps
      *-if the number of pre-defined reductions jumps
      */
-    if ((strat->Ll >= 0)
+    if (!K_TEST_OPT_REDTHROUGH && (strat->Ll >= 0)
         && ((d >= reddeg) || (pass > strat->LazyPass)))
     {
       h->SetLmCurrRing();
@@ -400,8 +402,7 @@ int redFirst (LObject* h,kStrategy strat)
     }
     if (!strat->homog)
     {
-#ifndef HAVE_OLD_STD
-      if (strat->honey)
+      if (!K_TEST_OPT_OLDSTD && strat->honey)
       {
         h->SetpFDeg();
         if (strat->T[j].ecart <= h->ecart)
@@ -412,8 +413,7 @@ int redFirst (LObject* h,kStrategy strat)
         d = h->GetpFDeg() + h->ecart;
       }
       else
-#endif
-      d = h->SetDegStuffReturnLDeg(strat->LDegLast);
+        d = h->SetDegStuffReturnLDeg(strat->LDegLast);
       /*- try to reduce the s-polynomial -*/
       pass++;
       /*
@@ -421,7 +421,7 @@ int redFirst (LObject* h,kStrategy strat)
        *-if the degree jumps
        *-if the number of pre-defined reductions jumps
        */
-      if ((strat->Ll >= 0)
+      if (!K_TEST_OPT_REDTHROUGH && (strat->Ll >= 0)
           && ((d >= reddeg) || (pass > strat->LazyPass)))
       {
         h->SetLmCurrRing();
@@ -1070,6 +1070,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   int lrmax = 0;
   int olddeg = 0;
   int reduc = 0;
+  int red_result = 1;
   int hilbeledeg=1,hilbcount=0;
 
   strat->update = TRUE;
@@ -1173,9 +1174,9 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     {
       // might be NULL from noether !!!
       if (TEST_OPT_PROT) 
-        message(strat->P.ecart+strat->P.GetpFDeg(),&olddeg,&reduc,strat);
+        message(strat->P.ecart+strat->P.GetpFDeg(),&olddeg,&reduc,strat, red_result);
       // reduce
-      strat->red(&strat->P,strat);
+      red_result = strat->red(&strat->P,strat);
     }
 
     if (! strat->P.IsNull())
@@ -1551,10 +1552,6 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   BOOLEAN delete_w=(w==NULL);
   kStrategy strat=new skStrategy;
 
-#ifdef HAVE_OLD_STD
-  test &= ~Sy_bit(OPT_REDTHROUGH);
-#endif
-  
   if(!TEST_OPT_RETURN_SB)
     strat->syzComp = syzComp;
   if (TEST_OPT_SB_1)

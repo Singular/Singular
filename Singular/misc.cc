@@ -324,7 +324,8 @@ struct soptionStruct optionStruct[]=
   {"degBound",     Sy_bit(OPT_DEGBOUND),       ~Sy_bit(OPT_DEGBOUND)  },
   /* 25 no redTail(p)/redTail(s) */
   {"redTail",      Sy_bit(OPT_REDTAIL),        ~Sy_bit(OPT_REDTAIL)  },
-  {"redThrough",   Sy_bit(OPT_REDTHROUGH),  ~Sy_bit(OPT_REDTHROUGH)  },
+  {"redThrough",   Sy_bit(OPT_REDTHROUGH),     ~Sy_bit(OPT_REDTHROUGH)  },
+  {"oldStd",       Sy_bit(OPT_OLDSTD),         ~Sy_bit(OPT_OLDSTD)  },
   {"intStrategy",  Sy_bit(OPT_INTSTRATEGY),    ~Sy_bit(OPT_INTSTRATEGY)  },
   {"infRedTail",   Sy_bit(OPT_INFREDTAIL),     ~Sy_bit(OPT_INFREDTAIL)  },
   /* 30: use not regularity for syz */
@@ -419,6 +420,9 @@ BOOLEAN setOption(leftv res, leftv v)
         if (optionStruct[i].setval & validOpts)
         {
           test |= optionStruct[i].setval;
+          // optOldStd disables redthrough
+          if (optionStruct[i].setval == Sy_bit(OPT_OLDSTD))
+            test &= ~Sy_bit(OPT_REDTHROUGH);
         }
         else
           Warn("cannot set option");
