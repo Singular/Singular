@@ -1,4 +1,4 @@
-dnl $Id: ftest_util.m4,v 1.12 1997-11-21 11:10:00 schmidt Exp $
+dnl $Id: ftest_util.m4,v 1.13 1997-11-21 11:37:51 schmidt Exp $
 dnl
 dnl ftest_util.m4 - m4 macros used by the factory test environment.
 dnl
@@ -218,7 +218,8 @@ define(`ftestRun', `dnl
 # $1: check function (with parameters) to call
 #
 define(`ftestCheck', `dnl
-`check = '_qstripTWS(`$1')')
+`if ( ftestCheckFlag )
+	check = '_qstripTWS(`$1')')
 
 #
 # ftestOuput() - print results.
