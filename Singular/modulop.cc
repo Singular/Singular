@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.18 2000-11-16 16:54:25 Singular Exp $ */
+/* $Id: modulop.cc,v 1.19 2000-11-16 17:01:33 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -253,6 +253,51 @@ void npSetChar(int c, ring r)
     npPrimeM=0;
     npExpTable=NULL;
     npLogTable=NULL;
+  }
+}
+
+void npInitChar(int c, ring r)
+{
+  int i, w;
+
+  if ((c>1) || (c<(-1)))
+  {
+    if (c>1) r->cf->npPrimeM = c;
+    else     r->cf->npPrimeM = -c;
+    r->cf->npPminus1M = r->cf->npPrimeM - 1;
+    r->cf->npExpTable= (CARDINAL *)omAlloc( r->cf->npPrimeM*sizeof(CARDINAL) );
+    r->cf->npLogTable= (CARDINAL *)omAlloc( r->cf->npPrimeM*sizeof(CARDINAL) );
+    r->cf->npExpTable[0] = 1;
+    r->cf->npLogTable[1] = 0;
+    if (r->cf->npPrimeM > 2)
+    {
+      w = 1;
+      loop
+      {
+        r->cf->npLogTable[1] = 0;
+        w++;
+        i = 0;
+        loop
+        {
+          i++;
+          r->cf->npExpTable[i] = (int)(((long)w * (long)r->cf->npExpTable[i-1])
+                                 % r->cf->npPrimeM);
+          r->cf->npLogTable[r->cf->npExpTable[i]] = i;
+          if (/*(i == npPrimeM - 1 ) ||*/ (r->cf->npExpTable[i] == 1))
+            break;
+        }
+        if (i == r->cf->npPrimeM - 1)
+          break;
+      }
+    }
+    else
+    {
+      r->cf->npExpTable[1] = 1;
+    }
+  }
+  else
+  {
+    WarnS("nInitChar failed");
   }
 }
 
