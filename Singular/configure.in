@@ -319,11 +319,14 @@ fi
 
 # check for a peculiar constructor initialization
 AC_MSG_CHECKING(whether explicit C++ constructor calls are allowed)
+AC_LANG_SAVE
+AC_LANG_CPLUSPLUS
 AC_CACHE_VAL(ac_cv_explicit_const,AC_TRY_COMPILE(, 
   class testclass 
   {
   public:
     int value;
+    testclass() : value(0) {}
     testclass( int i ) : value(i) {}
     ~testclass() { value = 0; }
   };
@@ -331,6 +334,7 @@ AC_CACHE_VAL(ac_cv_explicit_const,AC_TRY_COMPILE(,
   testclass ptr;
   ptr.testclass(1);
 , ac_cv_explicit_const=yes, ac_cv_explicit_const=no))
+AC_LANG_RESTORE
 AC_MSG_RESULT($ac_cv_explicit_const)
 if test "$ac_cv_explicit_const" = yes; then
   AC_DEFINE(HAVE_EXPLICIT_CONSTR)
@@ -424,19 +428,84 @@ if test "$with_readline" != no; then
   AC_CHECK_LIB(ncurses,tgetent,,\
    AC_CHECK_LIB(curses,tgetent,,\
    AC_CHECK_LIB(termcap,tgetent)))
-  AC_CHECK_LIB(readline, rl_abort)
-  if test "$ac_cv_lib_readline_rl_abort" = yes; then
-     AC_CHECK_HEADERS(readline/readline.h sys/file.h,ac_readline_ok=yes,ac_readline_ok=no; break)
-   fi
-   if test "$ac_readline_ok" = yes; then
-     AC_CHECK_HEADERS(readline/history.h)
-     AC_DEFINE(HAVE_READLINE)
-   else
-     AC_MSG_WARN(building without readline: disabling fancy display);
-     AC_DEFINE(HAVE_FEREAD)
-   fi
- else
-   AC_DEFINE(HAVE_FEREAD)
+   AC_CHECK_LIB(readline, rl_abort)
+   if test "$ac_cv_lib_readline_rl_abort" = yes && \
+      test "$ac_cv_header_readline_readline_h" = yes; then
+     AC_MSG_CHECKING(whether readline.h is ok)
+     AC_CACHE_VAL(ac_cv_header_readline_readline_h_ok,
+     AC_TRY_LINK(
+#include<unistd.h>
+#include<stdio.h>
+#include<readline/readline.h>
+#ifdef HAVE_READLINE_HISTORY_H
+#include<readline/history.h>
+#endif
+,
+#ifndef NULL
+#define NULL 0
+#endif
+rl_readline_name=NULL;
+*rl_line_buffer=1;
+completion_matches(NULL, filename_completion_function);
+rl_attempted_completion_function = (CPPFunction *) NULL;
+rl_outstream=NULL;
+readline(NULL);
+add_history(NULL);
+read_history(NULL);
+write_history(NULL);
+,
+ac_cv_header_readline_readline_h_ok="yes",
+ac_cv_header_readline_readline_h_ok="no",
+))
+    AC_MSG_RESULT($ac_cv_header_readline_readline_h_ok)
+    if test "$ac_cv_header_readline_readline_h_ok" != yes; then
+#not ok -- try once more with explicitly declaring everything
+      AC_MSG_CHECKING(whether or not we nevertheless can use readline)
+      AC_CACHE_VAL(ac_cv_have_readline,
+      AC_TRY_LINK(
+#include <stdio.h>
+,
+extern char * rl_readline_name;
+extern char *rl_line_buffer;
+char *filename_completion_function();
+typedef char **CPPFunction ();
+extern char ** completion_matches ();
+extern CPPFunction * rl_attempted_completion_function;
+extern FILE * rl_outstream;
+char * readline ();
+void add_history ();
+int write_history ();
+#ifndef NULL
+#define NULL 0
+#endif
+ rl_readline_name=NULL;
+*rl_line_buffer=1;
+completion_matches(NULL, filename_completion_function);
+rl_attempted_completion_function = (CPPFunction *) NULL;
+rl_outstream=NULL;
+readline(NULL);
+add_history(NULL);
+read_history(NULL);
+write_history(NULL);
+,
+ac_cv_have_readline="yes"
+,
+ac_cv_have_readline="no"
+))
+      AC_MSG_RESULT($ac_cv_have_readline)
+    else
+      AC_DEFINE(READLINE_READLINE_H_OK)
+      ac_cv_have_readline="yes"
+    fi
+  fi
+  if test "$ac_cv_have_readline" = yes; then
+    AC_DEFINE(HAVE_READLINE)
+  else
+    AC_MSG_WARN(building without readline: disabling fancy display)
+    AC_DEFINE(HAVE_FEREAD)
+  fi
+else
+  AC_DEFINE(HAVE_FEREAD)
 fi
 
 #   

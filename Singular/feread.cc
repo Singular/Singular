@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.14 1998-06-03 20:38:21 obachman Exp $ */
+/* $Id: feread.cc,v 1.15 1998-06-13 13:27:04 obachman Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -578,10 +578,23 @@ char * fe_fgets_stdin(char *s, int size)
 #include <sys/errno.h>
 
 extern "C" {
+#ifdef READLINE_READLINE_H_OK
 #include <readline/readline.h>
 #ifdef HAVE_READLINE_HISTORY_H
 #include <readline/history.h>
 #endif
+#else /* declare everything we need explicitely and do not rely on includes */
+extern char * rl_readline_name;
+extern char *rl_line_buffer;
+char *filename_completion_function();
+typedef char **CPPFunction ();
+extern char ** completion_matches ();
+extern CPPFunction * rl_attempted_completion_function;
+extern FILE * rl_outstream;
+char * readline ();
+void add_history ();
+int write_history ();
+#endif /* READLINE_READLINE_H_OK */
 }
 
 #ifndef STDOUT_FILENO

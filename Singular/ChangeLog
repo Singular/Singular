@@ -1,3 +1,8 @@
+1998-06-13  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+	* feread.cc: explicit declaration of stuff we need from readline.h
+	
+
 1998-06-12  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
 	* polys.cc: pComp for simple orderings based on only three
