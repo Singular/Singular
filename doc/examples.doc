@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.49 1999-07-23 12:32:36 obachman Exp $
+@comment $Id: examples.doc,v 1.50 1999-07-26 12:43:30 Singular Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -487,6 +487,7 @@ computation of the coefficients (in char 0).
 The representation of long integers with real is demonstrated.
 
 @smallexample
+@c example
 timer = 1;                              // activate the timer
 option(prot);
 ring R0 = 0,(x,y),lp;
@@ -495,102 +496,27 @@ ideal i = jacob(f);
 ideal i1 = i,i[1]*i[2];                 // undeformed ideal
 ideal i2 = i,i[1]*i[2]+1/1000000*x5y8;  // deformation of i1
 i1; i2;
-@expansion{} i1[1]=5x4+3x2y9+y9
-@expansion{} i1[2]=9x3y8+9xy8+11y10
-@expansion{} i1[3]=45x7y8+27x5y17+45x5y8+55x4y10+36x3y17+33x2y19+9xy17+11y19
-@expansion{} i2[1]=5x4+3x2y9+y9
-@expansion{} i2[2]=9x3y8+9xy8+11y10
-@expansion{} i2[3]=45x7y8+27x5y17+45000001/1000000x5y8+55x4y10+36x3y17
-@expansion{} +33x2y19+9xy17+11y19
 ideal j = std(i1);
-@expansion{} V19-s20.s21(1)s22(2)23-s27.s28.s29.s30.s31.s32.s33.s34.s35.s36
-@expansion{} .s37.s38.s39.s40.s.70-
-@expansion{} product criterion:1 chain criterion:30
-@expansion{} //used time: 1.9 sec
 j;
-@expansion{} j[1]=264627y39+26244y35-1323135y30-131220y26+1715175y21
-@expansion{} +164025y17+1830125y16
-@expansion{} j[2]=-12103947791971846719838321886393392913750065060875xy8
-@expansion{} +286391521141683198701331939250003266767738632875y38
-@expansion{} +3195440220690902692676462287757356578554430672591y37
-@expansion{} -57436621420822663849721381265738895282846320y36
-@expansion{} -1657764214948799497573918210031067353932439400y35
-@expansion{} -21301848158930819119567722389898682697001205500y34
-@expansion{} -1822194158663066565585991976961565719648069806148y33
-@expansion{} +4701709279892816135156972313196394005220175y32
-@expansion{} +135187226968819226760078697600850686824231975y31
-@expansion{} +3873063305929810816961516976025038053001141375y30
-@expansion{} -1325886675843874047990382005421144061861290080000y29
-@expansion{} -15977201954760631419467945895542406089526966887310y28
-@expansion{} +262701813363090926606333480026253304267126525y27
-@expansion{} +7586082690893335269027136248944859544727953125y26
-@expansion{} +86785307410649464602285843351672148965395945625y25
-@expansion{} +5545808143273594102173252331151835700278863924745y24
-@expansion{} -19075563013460437364679153779038394895638325y23
-@expansion{} -548562322715501761058348996776922561074021125y22
-@expansion{} -15746545267764838607395746471568100780933983125y21
-@expansion{} +1414279129721176222978654235817359505555191156250y20
-@expansion{} +20711190069445893615213399650035715378169943423125y19
-@expansion{} -272942733337472665573418092977905322984009750y18
-@expansion{} -7890651158453345058018472946774133657209553750y17
-@expansion{} -63554897038491686787729656061044724651089803125y16
-@expansion{} +22099251729923906699732244761028266074350255961625y14
-@expansion{} -14793713967965590435357948972258591339027857296625y10
-@expansion{} j[3]=5x4+3x2y9+y9
-
 // Compute average coefficient length (=51) by
 //   - converting j[2] to a string in order to compute the number
 //   of characters
 //   - divide this by the number of monomials:
 size(string(j[2]))/size(j[2]);
-@expansion{} 51
 vdim(j);
-@expansion{} 63
-
 // For a better representation normalize the long coefficients
 // of the polynomial j[2] and map it  to real:
-poly p=-(1/12103947791971846719838321886393392913750065060875)*j[2];
+poly p=(1/12103947791971846719838321886393392913750065060875)*j[2];
 ring R1=real,(x,y),lp;
+short=0; // force the long output format
 poly p=imap(R0,p);
 p;
-@expansion{} xy8
-@expansion{} -2.366e-02y38
-@expansion{} -2.640e-01y37
-@expansion{} +4.745e-06y36
-@expansion{} +1.370e-04y35
-@expansion{} +1.760e-03y34
-@expansion{} +1.505e-01y33
-@expansion{} -3.884e-07y32
-@expansion{} -1.117e-05y31
-@expansion{} -3.200e-04y30
-@expansion{} +1.095e-01y29
-@expansion{} +1.320e+00y28
-@expansion{} -2.170e-05y27
-@expansion{} -6.267e-04y26
-@expansion{} +7.170e-03y25
-@expansion{} +4.582e-01y24
-@expansion{} +1.576e-06y23
-@expansion{} -4.532e-05y22
-@expansion{} -1.301e-03y21
-@expansion{} +1.168e-01y20
-@expansion{} +1.711e+00y19
-@expansion{} +2.255e-05y18
-@expansion{} -6.519e-04y17
-@expansion{} -5.251e-03y16
-@expansion{} +1.826e+00y14
-@expansion{} -1.222e+00y10
-
 // Compute a standard basis for the deformed ideal:
 setring R0;
 j = std(i2);
-@expansion{} v13.s14(2)s15.s16.19-s.s20.s21.23-
-@expansion{} product criterion:3 chain criterion:7
 j;
-@expansion{} j[1]=y16
-@expansion{} j[2]=-729xy8+1331y14-891y10
-@expansion{} j[3]=5x4+3x2y9+y9
 vdim(j);
-@expansion{} 40
+@c example
 @end smallexample
 @end ifset
 @c ----------------------------------------------------------------------------

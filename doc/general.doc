@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.135 1999-07-23 12:42:05 Singular Exp $
+@comment $Id: general.doc,v 1.136 1999-07-26 12:43:31 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -257,6 +257,10 @@ Singular  [options] [file1 [file2 @dots{}]]
 Options can be given in both, their long and short format. The following
 options control the general behavior of @sc{Singular}:
 @table @asis
+
+@item @code{-d}, @code{--sdb}
+Enable the use of the source code debugger.
+@xref{Source code debugger}.
 
 @item @code{-e}, @code{--echo[=VAL]}
 Set value of variable @code{echo} to @code{VAL} (integer in the range
