@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.160 1999-11-24 14:34:29 wichmann Exp $
+@comment $Id: reference.doc,v 1.161 1999-11-24 17:09:39 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -6765,14 +6765,14 @@ See
 
 @c ---------------------------------------
 @node ~, , while, Control structures
-@subsection ~ (breakpoint)
+@subsection ~ (break point)
 @cindex ~
-@cindex breakpoint
+@cindex break point
 @table @code
 @item @strong{Syntax:}
 @code{~;}
 @item @strong{Purpose:}
-sets a breakpoint. Whenever @sc{Singular} reaches the command @code{~;}
+sets a break point. Whenever @sc{Singular} reaches the command @code{~;}
 in a sequence of commands it prompts for input. The user may now input
 lines of @sc{Singular} commands. The line length can not exceed 80
 characters.

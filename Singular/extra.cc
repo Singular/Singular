@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.118 1999-11-19 16:42:39 obachman Exp $ */
+/* $Id: extra.cc,v 1.119 1999-11-24 17:09:34 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1002,30 +1002,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
-/*==================== sdb-debugger =================*/
-    if (strcmp(sys_cmd, "breakpoint") == 0)
-    {
-      if (h==NULL)
-      {
-       sdb_show_bp();
-       return FALSE;
-      }
-      else if (h->Typ()==PROC_CMD)
-      {
-        int lineno=0;
-        if ((h->next!=NULL) && (h->next->Typ()==INT_CMD))
-        {
-          lineno=(int)h->next->Data();
-        }
-        return sdb_set_breakpoint(h->Name(),lineno);
-      }
-      else
-      {
-        WerrorS("system(\"breakpoint\",`proc`[,`int`]) expected");
-        return TRUE;
-      }
-    }
-    else
 /*==================== sdb_flags =================*/
     if (strcmp(sys_cmd, "sdb_flags") == 0)
     {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.189 1999-11-24 14:07:22 obachman Exp $ */
+/* $Id: iparith.cc,v 1.190 1999-11-24 17:09:35 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -20,6 +20,7 @@
 #include "intvec.h"
 #include "mmemory.h"
 #include "febase.h"
+#include "sdb.h"
 #include "longalg.h"
 #include "polys.h"
 #include "ideals.h"
@@ -129,6 +130,7 @@ cmdnames cmds[] =
   { "bareiss",     0, BAREISS_CMD ,       CMD_123},
   { "betti",       0, BETTI_CMD ,         CMD_12},
   { "break",       0, BREAK_CMD ,         BREAK_CMD},
+  { "breakpoint",  0, BREAKPOINT_CMD ,    CMD_M},
   { "char",        0, CHARACTERISTIC_CMD ,CMD_1},
   { "char_series", 0, CHAR_SERIES_CMD ,   CMD_1},
   { "charstr",     0, CHARSTR_CMD ,       CMD_1},
@@ -4365,6 +4367,24 @@ struct sValCmd3 dArith3[]=
 ,{NULL,             0,          0,          0,          0,          0 }
 };
 /*=================== operations with many arg.: static proc =================*/
+static BOOLEAN jjBREAK0(leftv res, leftv v)
+{
+  sdb_show_bp();
+  return FALSE;
+}
+static BOOLEAN jjBREAK1(leftv res, leftv v)
+{
+  if(v->Typ()==PROC_CMD)
+  {
+    int lineno=0;
+    if((v->next!=NULL) && (v->next->Typ()==INT_CMD))
+    {
+      lineno=(int)v->next->Data();
+    }
+    return sdb_set_breakpoint(v->Name(),lineno);
+  }
+  return TRUE;
+}
 static BOOLEAN jjCALL1ARG(leftv res, leftv v)
 {
   return iiExprArith1(res,v,iiOp);
@@ -4876,6 +4896,8 @@ struct sValCmdM dArithM[]=
 // operations:
 // proc         cmd               res            number_of_args
  {jjKLAMMER_PL,  '(',           ANY_TYPE,           -2  }
+,{jjBREAK0,    BREAKPOINT_CMD,  NONE,               0  }
+,{jjBREAK1,    BREAKPOINT_CMD,  NONE,               -2  }
 ,{jjCALL2ARG,  COEF_CMD,        MATRIX_CMD,         2  }
 ,{jjCOEF_M,    COEF_CMD,        NONE,               4  }
 ,{jjDBPRINT,   DBPRINT_CMD,     NONE,               -2 }
