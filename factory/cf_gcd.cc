@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.11 1997-06-30 15:30:41 schmidt Exp $ */
+/* $Id: cf_gcd.cc,v 1.12 1997-07-19 08:15:32 schmidt Exp $ */
 
 #include <config.h>
 
@@ -13,6 +13,7 @@
 #include "cf_primes.h"
 #include "cf_chinese.h"
 #include "cf_map.h"
+#include "sm_sparsemod.h"
 #include "fac_util.h"
 #ifdef macintosh
 #include <::templates:ftmpl_functions.h>
@@ -366,6 +367,9 @@ gcd_poly( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
 	CFMap M, N;
 	compress( f, g, M, N );
 	return N( ezgcd( M(f), M(g) ) );
+    }
+    else if ( isOn( SW_USE_SPARSEMOD ) ) {
+	return sparsemod( f, g );
     }
     else {
 	return gcd_poly1( f, g, modularflag );
