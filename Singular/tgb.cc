@@ -1823,7 +1823,21 @@ static void go_on (calc_dat* c){
     c->modifiedS[z2]=FALSE;
 #endif
   multi_reduction(buf, i, c);
-
+#ifdef TGB_DEBUG
+ {
+   int k;
+   for(k=0;k<i;k++)
+   {
+     assume(kFindDivisibleByInS_easy(c->strat,buf[k])<0);
+     int k2;
+     for(k2=0;k2<i;k2++)
+     {
+       if(k==k2) continue;
+       assume((!(p_LmDivisibleBy(buf[k].p,buf[k2].p,c->r)))||(wrp(buf[k].p),Print(" k %d k2 %d ",k,k2),wrp(buf[k2].p),FALSE));
+     }
+   }
+ }
+#endif
   //resort S
 #ifdef FIND_DETERMINISTIC
   for(z2=0;z2<=c->strat->sl;z2++)
@@ -4601,7 +4615,10 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c)
 //     finalize_reduction_step(rs);
 		 
     int deleted=multi_reduction_clear_zeroes(los, losl, erg.to_reduce_l, erg.to_reduce_u);
-    curr_pos=erg.to_reduce_u;
+    if(erg.fromS==FALSE)
+      curr_pos=max(erg.to_reduce_u,erg.reduce_by);
+    else
+      curr_pos=erg.to_reduce_u;
     losl -= deleted;
     curr_pos -= deleted;
 
