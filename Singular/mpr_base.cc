@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.29 2003-03-11 16:57:25 Singular Exp $ */
+/* $Id: mpr_base.cc,v 1.30 2003-06-02 07:35:38 Singular Exp $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -1779,7 +1779,8 @@ const ideal resMatrixSparse::getMatrix()
     //pSetComp( phelp, IMATELEM(*uRPos,i,idelem+1) );
     pSetComp( phelp, IMATELEM(*uRPos,i,pLength((gls->m)[0])+1) );
     pSetmComp( phelp );
-    pNext(piter)= phelp;
+    if (piter!=NULL) pNext(piter)= phelp;
+    else pp= phelp;
     (rmat_out->m)[IMATELEM(*uRPos,i,1)]= pp;
   }
 
