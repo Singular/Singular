@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.43 2000-01-26 18:10:53 Singular Exp $ */
+/* $Id: polys-impl.h,v 1.44 2000-02-02 14:27:01 Singular Exp $ */
 
 /***************************************************************
  *
@@ -31,8 +31,13 @@
 #endif
 union s_exp
 {
+#ifdef HAVE_SHIFTED_EXPONENTS
+   long           e[VARS +1];
+   unsigned long  l[VARS +1];
+#else
    Exponent_t     e[VARS +1];
    unsigned long  l[(VARS +1)/(sizeof(long)/sizeof(Exponent_t))];
+#endif
 };
 
 typedef s_exp  monomial;
@@ -539,7 +544,7 @@ DECLARE(BOOLEAN, __pEqual(poly p1, poly p2))
 /***************************************************************
  *
  * Misc. things
- * 
+ *
  *
  ***************************************************************/
 // Divisiblity tests based on Short Exponent Vectors
@@ -553,7 +558,7 @@ DECLARE(BOOLEAN, __pEqual(poly p1, poly p2))
 #define _pShortDivisibleBy(a, sev_a, b, not_sev_b) \
   pDBShortDivisibleBy(a, sev_a, b, not_sev_b, __FILE__, __LINE__)
 BOOLEAN pDBShortDivisibleBy(poly p1, unsigned long sev_1,
-                            poly p2, unsigned long not_sev_2, 
+                            poly p2, unsigned long not_sev_2,
                             char* f, int l);
 #else
 #define _pShortDivisibleBy(a, sev_a, b, not_sev_b) \

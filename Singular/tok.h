@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id: tok.h,v 1.37 2000-02-01 15:29:27 Singular Exp $ */
+/* $Id: tok.h,v 1.38 2000-02-02 14:27:10 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -44,6 +44,7 @@ inline int min(const int a, const int b)  { return (a<b) ? a : b; }
 #undef EXPONENT_T 
 #define EXPONENT_T long
 /* Define the size of exponent */
+#undef SIZEOF_EXPONENT
 #define SIZEOF_EXPONENT SIZEOF_LONG
 #endif
 
