@@ -1,0 +1,88 @@
+@comment -*-texinfo-*-
+@comment $Id: pluplatform.doc,v 1.1 2003-07-31 19:55:11 levandov Exp $
+@comment this file contains Release notes and various howto's
+
+@c The following directives are necessary for proper compilation
+@c with emacs (C-c C-e C-r).  Please keep it as it is.  Since it
+@c is wrapped in `@ignore' and `@end ignore' it does not harm `tex' or
+@c `makeinfo' but is a great help in editing this file (emacs
+@c ignores the `@ignore').
+@ignore
+%**start
+\input texinfo.tex
+@setfilename platform.info
+@node Installation and Platform Specifics
+@menu
+* Installation and Platform Specifics::
+@end menu
+@node Installation and Platform Specifics, Index, SINGULAR libraries, Top
+@chapter Installation and Platform Specifics
+%**end
+@end ignore
+
+@menu
+* News and changes::
+* Downloading instructions::
+* Unix installation instructions::
+* Windows installation instructions::
+* Macintosh installation instructions::
+@end menu
+
+@c ----------------------------------------------------------
+@node News and changes, Downloading instructions,,Release Notes
+@section News and changes
+@cindex news
+@cindex changes
+
+@include NEWS.plural.texi
+
+@c ----------------------------------------------------------
+@node Downloading instructions, Unix installation instructions, News and changes, Release Notes
+@section Downloading instructions
+@cindex downloading
+@cindex instructions, downloading
+@cindex howto, download
+
+@sc{Singular::Plural} is available as binary program for most common hard-
+and software platforms. Release versions of @sc{Singular::Plural} can be
+downloaded with ftp from our FTP site
+@display
+@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/non-commutative/Plural/},
+@end display
+or, using your favourite WWW browser, from
+@display
+@uref{http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/non-commutative/Plural/}.
+@end display
+Development version can be downloaded from
+@display
+@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Development}
+@end display
+
+@include README_download.plural.texi
+
+@c ----------------------------------------------------------
+@node Unix installation instructions, Windows installation instructions,Downloading instructions, Release Notes
+@section Unix installation instructions
+@cindex Unix installation
+@cindex instructions, Unix installation
+@cindex howto, install on Unix
+
+@include INSTALL_unix.plural.texi
+
+@c ----------------------------------------------------------
+@node Windows installation instructions, Macintosh installation instructions, Unix installation instructions, Release Notes
+@section Windows installation instructions
+@cindex Windows installation
+@cindex instructions, Windows installation
+@cindex howto, install on Windows
+
+@include INSTALL_win.plural.texi
+
+@c ----------------------------------------------------------
+@node Macintosh installation instructions,,Windows installation instructions, Release Notes
+@section Macintosh installation instructions
+@cindex Macintosh installation
+@cindex instructions, Macintosh installation
+@cindex howto, install on Macintosh
+
+For the SINGULAR version for Mac OS X refer to the Unix section.

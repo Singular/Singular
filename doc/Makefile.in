@@ -1,7 +1,7 @@
 #####################################################################
 ###
 ### Makefile for Singular documentation
-### $Id: Makefile.in,v 1.89 2003-07-29 17:50:01 levandov Exp $
+### $Id: Makefile.in,v 1.90 2003-07-31 19:55:10 levandov Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -99,14 +99,15 @@ STANDALONE_TEXI_FILES	= COPYING.texi INSTALL_unix.texi NEWS.texi \
 			  INSTALL_win.texi
 
 PLU_STANDALONE_TEXI_FILES = COPYING.plural.texi INSTALL_unix.plural.texi \
-                            NEWS.plural.texi README_download.plural.texi
+                            NEWS.plural.texi README_download.plural.texi \
+                            INSTALL_win.plural.texi
 
 DOC2TEX_FILES	= \
 		examples.tex general.tex ti_ip.tex math.tex reference.tex \
 		start.tex types.tex pdata.tex tricks.tex platform.tex
 
 PLU_DOC2TEX_FILES	= \
-		plural.tex plumath.tex plureference.tex plutypes.tex pluconventions.tex
+		plural.tex plumath.tex plureference.tex plutypes.tex pluconventions.tex pluplatform.tex
 
 MANUAL_FILES	= ${TEX_FILES} ${DOC2TEX_FILES}
 
