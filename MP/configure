@@ -2748,9 +2748,9 @@ fi
 fi
  
 if test "${freebsd_problem}" != no; then
-  grep -v "#warning" /usr/include/values.h > ./values.h
+  grep -v "#warning" /usr/include/values.h > ./MP/h/values.h
 elif test "${no_values_h}" != no; then
-  cp ./values.h.subst ./values.h
+  cp ./values.h.subst ./MP/h/values.h
   CPPFLAGS="-I. ${CPPFLAGS}"
 fi
 
