@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_util.cc,v 1.8 1997-10-07 07:58:10 schmidt Exp $ */
+/* $Id: ftest_util.cc,v 1.9 1997-10-08 09:19:17 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -863,28 +863,37 @@ ftestPrintEnv ()
 	    ftestPrint( "char  : %d\n", "%d\n", ftestEnv.characteristic );
 
 	// switches
+	bool switchSet = false;
 	ftestPrint( "switch: ", (char *)0 );
 	for ( int i = 0; i < CFSwitchesMax; i++ )
-	    if ( ftestEnv.switches[i] )
+	    if ( ftestEnv.switches[i] ) {
+		switchSet = true;
 		printf( "%s ", ftestSwitchNames[i] );
-	printf( "\n" );
+	    }
+	if ( ! switchSet )
+	    printf( "(not set)\n" );
+	else
+	    printf( "\n" );
 
 	// variables
 	varSpecT * varSpec = ftestEnv.varSpec;
 	ftestPrint( "vars  : ", (char *)0 );
-	while ( varSpec ) {
-	    if ( varSpec->mipo.isZero() )
-		printf( "%c(%d) ",
-			varSpec->variable,
-			Variable( varSpec->variable ).level() );
-	    else {
-		printf( "%c(%d)",
-			varSpec->variable,
-			Variable( varSpec->variable ).level() );
-		cout << "(" << varSpec->mipo << ") ";
+	if ( ! varSpec )
+	    printf( "(not specified)" );
+	else
+	    while ( varSpec ) {
+		if ( varSpec->mipo.isZero() )
+		    printf( "%c(%d) ",
+			    varSpec->variable,
+			    Variable( varSpec->variable ).level() );
+		else {
+		    printf( "%c(%d)",
+			    varSpec->variable,
+			    Variable( varSpec->variable ).level() );
+		    cout << "(" << varSpec->mipo << ") ";
+		}
+		varSpec = varSpec->next;
 	    }
-	    varSpec = varSpec->next;
-	}
 	printf( "\n" );
 
 	// number of repetitions
@@ -894,7 +903,7 @@ ftestPrintEnv ()
 	if ( ftestEnv.seedSet )
 	    ftestPrint( "seed  : %d\n", "%d\n", ftestEnv.seed );
 	else
-	    ftestPrint( "seed  : not set\n", "not set\n" );
+	    ftestPrint( "seed  : (not set)\n", "(not set)\n" );
 
 	// factory version
 	const char * version;
