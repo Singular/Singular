@@ -39,8 +39,8 @@ geometry, and singularity theory. The main features of Singular are:
 
  * Polynomial factorization, resultant, and gcd computations
 
- * Large variety of implemented related algorithm: FGLM,
-   Hilbert-driven, factorizing Buchberger, minimal resolutions,
+ * Large variety of implemented related algorithms: FGLM,
+   Hilbert-driven and factorizing Buchberger, minimal resolutions,
    primary decomposition, ring normalization, usual ideal theoretic
    operations; standard combinatorial algorithms.
 
@@ -76,7 +76,7 @@ Here are the highlights:
    hnoether.lib Hamburger-Noether development
    finvar.lib   Invariant rings
    classify.lib Classification of singularities
-   deform.lib   miniversal deformations
+   deform.lib   Miniversal deformations
    latex.lib    Typesetting Singular objects in latex
 
  * New library format and tools to debug libraries.
@@ -100,11 +100,11 @@ and Tim Wichmann.
 
 Singular libraries have furthermore been contributed by  Wolfram
 Decker, Christian Gorzel, Agnes Eileen Heydtmann, Ulrich Klein, Martin
-Lamm,  and Bernd Martin.
+Lamm, and Bernd Martin.
 
 Singular 1.2.0 is linked with the following libraries: 
   readline--  The Gnu readline library (v. 2.0) 
-	      C) Free Software Foundation
+	      (C) Free Software Foundation
   gmp	  --  The Gnu Multiple precision library (v: 2.0.2) distribution
               (C) Free Software Foundation
   MP      --  The Multi Protocol library (v: 1.1.2.1) distribution
