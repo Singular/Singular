@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_poly.cc,v 1.11 1998-06-03 12:51:22 pohl Exp $ */
+/* $Id: int_poly.cc,v 1.12 1998-06-26 16:15:28 schmidt Exp $ */
 
 #include <config.h>
 
@@ -201,19 +201,21 @@ InternalPoly::print(ostream &aStream, char * aString )
 }
 #endif /* NOSTREAMIO */
 
-InternalCF*
-InternalPoly::neg()
+//{{{ InternalCF * InternalPoly::neg ()
+// docu: see CanonicalForm::operator -()
+InternalCF *
+InternalPoly::neg ()
 {
     if ( getRefCount() == 1 ) {
 	negateTermList( firstTerm );
 	return this;
-    }
-    else {
+    } else {
 	decRefCount();
 	termList last, first = copyTermList( firstTerm, last, true );
 	return new InternalPoly( first, last, var );
     }
 }
+//}}}
 
 InternalCF*
 InternalPoly::invert()
