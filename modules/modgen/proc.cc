@@ -1,5 +1,5 @@
 /*
- * $Id: proc.cc,v 1.20 2002-07-03 14:11:24 anne Exp $
+ * $Id: proc.cc,v 1.21 2002-07-04 14:18:37 anne Exp $
  */
 
 #include <stdio.h>
@@ -67,11 +67,13 @@ void setup_proc(
         break;
         
       case LANG_SINGULAR:
+	fprintf(module->modfp,"  if(ret!=-1) {\n");
         fprintf(module->modfp,
-                "  h = add_singular_proc(binfp,\"%s\", %d, %ld, %ld, %s);\n",
+                "    h = add_singular_proc(binfp,\"%s\", %d, %ld, %ld, %s);\n",
                 proc->procname, proc->lineno,
                 proc->sing_start, proc->sing_end,
                 proc->is_static ? "TRUE" : "FALSE");
+        fprintf(module->modfp,"  }\n");
         modlineno+=1;
         break;
   }
@@ -589,7 +591,7 @@ int write_helpfile_help(
     fprintf(module->docfp, "$library = \"%s.so\";\n", 
            (module->targetname!=NULL) ? module->targetname : module->name);
     fprintf(module->docfp, "$version = \"%s\";\n",
-           (module->version!=NULL) ? module->version : "none");  
+           (module->revision!=NULL) ? module->revision : "none");  
     fprintf(module->docfp, "$category = <<EOT;\n");
     fprintf(module->docfp, "%s\nEOT\n",
            (module->category!=NULL) ? module->category : "none");
@@ -600,14 +602,15 @@ int write_helpfile_help(
 
   /* */
   fprintf(module->docfp, "push(@procs, \"%s\");\n",proc->procname);
-  fprintf(module->docfp, "$help{\"%s\"} = << EOT;\n",proc->procname);
+  fprintf(module->docfp, "$help{\"%s\"} = <<EOT;\n",proc->procname);
   fprintf(module->docfp, "%s\nEOT\n",
             (proc->help_string!=NULL) ? proc->help_string :
 	    "No help available for this command");
   if(proc->example_string!=NULL) {
-    fprintf(module->docfp, "$example{\"%s\"} = << EOT;\n",proc->procname);
-    fprintf(module->docfp, "%s\nEOT\n\n",proc->example_string);
+    fprintf(module->docfp, "$example{\"%s\"} = <<EOT;\n",proc->procname);
+    fprintf(module->docfp, "%s\nEOT\n",proc->example_string);
   }
+  fprintf(module->docfp, "$chksum{\"%s\"} = 0;\n", proc->procname);
 
   return 0;
 }  

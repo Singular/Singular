@@ -111,6 +111,7 @@ main( int argc, char *argv[] )
   int i;
   int c;
   int option_index = 0;
+  unsigned long cksm;
 
   while( (c=getopt_long (argc, argv, "dmvi:",
                          long_options, &option_index))>=0) {
@@ -162,8 +163,18 @@ main( int argc, char *argv[] )
   //mod_create_makefile(&module_def);
   if(module_def.fmtfp   != NULL) fclose(module_def.fmtfp);
   if(module_def.modfp   != NULL) fclose(module_def.modfp);
-  if(module_def.binfp   != NULL) fclose(module_def.binfp);
-  if(module_def.modfp_h != NULL) fclose(module_def.modfp_h);
-  if(module_def.docfp   != NULL) fclose(module_def.docfp);
+  if(module_def.docfp   != NULL) {
+    fprintf(module_def.docfp,"1;");
+    fclose(module_def.docfp);
+  }
+  if(module_def.binfp   != NULL) {
+    fclose(module_def.binfp);
+    cksm = crccheck(build_filename(&module_def,module_def.targetname,3));
+  }
+  if(module_def.modfp_h != NULL) { 
+    fprintf(module_def.modfp_h,"unsigned long crcsum=%lu;\n",cksm);
+    write_crctable(module_def.modfp_h);
+    fclose(module_def.modfp_h);
+  }
   return 0;
 }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.18 2002-07-03 14:11:23 anne Exp $ */
+/* $Id: misc.cc,v 1.19 2002-07-04 14:18:36 anne Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -271,7 +271,7 @@ void write_main_variable(
     case VAR_VERSION:
           module->version = (char *)malloc(strlen((char *)arg2)+1);
 	  memset(module->version, '\0', strlen((char *)arg2)+1);
-	  memcpy(module->version,(char *)arg2,strlen((char *)arg2));
+          memcpy(module->version,(char *)arg2,strlen((char *)arg2));
 	  break;
     case VAR_CATEGORY:
           module->category = (char *)malloc(strlen((char *)arg2)+1);
@@ -315,7 +315,6 @@ void make_version(char *p, moddefv module)
   
   ver[0]='0'; ver[1]='.'; ver[2]='0'; ver[3]='.'; ver[4]='0'; ver[5]='\0';
   date[0]='?'; date[1]='\0';
-  //if(what) sscanf(p,"%*[^=]= %*s %*s %10s %16s",ver,date);
   sscanf(p,"%*s %*s %10s %16s",ver,date);
   sscanf(ver, "%d.%d.%d", &module->major, &module->minor, &module->level);
   
@@ -502,6 +501,8 @@ void  mod_write_header(FILE *fp, char *module, char what)
     fprintf(fp, "#include <string.h>\n");
     fprintf(fp, "#include <ctype.h>\n");
     fprintf(fp, "%s\n", DYNAinclude[systyp]);
+    fprintf(fp, "#include <unistd.h>\n");
+    fprintf(fp, "#include <sys/stat.h>");
     fprintf(fp, "\n");
     fprintf(fp, "#include <mod2.h>\n");
     fprintf(fp, "#include <tok.h>\n");
@@ -517,6 +518,7 @@ void  mod_write_header(FILE *fp, char *module, char what)
     fprintf(fp, "\n");    modlineno+=1;
     fprintf(fp, "#line %d \"%s.cc\"\n", modlineno++, module);
     write_add_singular_proc(fp);
+    write_crccheck(fp);
     fprintf(fp, "\n");
     
     fprintf(fp, "void fill_help_package();\n");
