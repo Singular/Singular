@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.62 2000-11-23 17:34:09 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.63 2000-11-24 19:30:48 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -293,11 +293,9 @@ static int redHoney (LObject* h, kStrategy strat)
       if (strat->Ll >= 0) /* L is not empty */
       {
         at = strat->posInL(strat->L,strat->Ll,h,strat);
-
         if(at <= strat->Ll)
           /*- h will not become the next element to reduce -*/
         {
-          h->CanonicalizeP();
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
 #ifdef KDEBUG
           if (TEST_OPT_DEBUG) Print(" ecart too big: -> L%d\n",at);
@@ -362,7 +360,6 @@ static int redHoney (LObject* h, kStrategy strat)
       {
         if (kFindDivisibleByInS(strat->S, strat->sevS, strat->sl, h) < 0)
           return 1;
-        h->CanonicalizeP();
         enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
 #ifdef KDEBUG
         if (TEST_OPT_DEBUG)

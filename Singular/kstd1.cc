@@ -1,10 +1,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.66 2000-11-23 17:34:08 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.67 2000-11-24 19:30:47 obachman Exp $ */
 /*
 * ABSTRACT:
 */
+
+// define if LDEG should not be used in inner reduction loops
+#define NO_LDEG
 
 #include "mod2.h"
 #include "tok.h"
@@ -231,7 +234,6 @@ int redEcart (LObject* h,kStrategy strat)
         at = strat->posInL(strat->L,strat->Ll,h,strat);
         if (at <= strat->Ll)
         {
-          h->CanonicalizeP();
           /*- h will not become the next element to reduce -*/
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
 #ifdef KDEBUG
@@ -244,7 +246,7 @@ int redEcart (LObject* h,kStrategy strat)
       }
     }
 
-    // now we fianlly can reduce
+    // now we finally can reduce
     doRed(h,&(strat->T[ii]),strat->fromT,strat);
     strat->fromT=FALSE;
 
@@ -305,7 +307,6 @@ int redEcart (LObject* h,kStrategy strat)
             h->SetLength(strat->length_pLength);
           return 1;
         }
-        h->CanonicalizeP();
         enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
 #ifdef KDEBUG
         if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
@@ -345,8 +346,9 @@ int redFirst (LObject* h,kStrategy strat)
     j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
     if (j < 0)
     {
-      if (strat->homog) 
-        h->SetDegStuffReturnLDeg(strat->LDegLast);
+      if (strat->kNoether)
+        h->pLength = NULL;
+      h->SetDegStuffReturnLDeg(strat->LDegLast);
       return 1;
     }
 
@@ -393,7 +395,19 @@ int redFirst (LObject* h,kStrategy strat)
     }
     if (!strat->homog)
     {
+#ifdef NO_LDEG
+      h->SetpFDeg();
+      if (strat->T[j].ecart <= h->ecart)
+        h->ecart = d - h->GetpFDeg();
+      else
+        h->ecart = d - h->GetpFDeg() + strat->T[j].ecart - h->ecart;
+      
+      d = h->GetpFDeg() + h->ecart;
+#else
+      if (strat->kNoether != NULL)
+        h->pLength = 0;
       d = h->SetDegStuffReturnLDeg(strat->LDegLast);
+#endif
       /*- try to reduce the s-polynomial -*/
       pass++;
       /*
@@ -405,6 +419,10 @@ int redFirst (LObject* h,kStrategy strat)
           && ((d >= reddeg) || (pass > strat->LazyPass)))
       {
         h->SetLmCurrRing();
+        if (strat->kNoether != NULL)
+          h->pLength = NULL;
+        if (strat->posInLDependsOnLength)
+          h->SetLength(strat->length_pLength);
         at = strat->posInL(strat->L,strat->Ll,h,strat);
         if (at <= strat->Ll)
         {
@@ -1843,10 +1861,15 @@ static BOOLEAN kMoraUseBucket(kStrategy strat)
     return FALSE;
   if (strat->red == redFirst)
   {
+#ifdef NO_LDEG
+    if (!strat->syzComp)
+      return TRUE;
+#else    
     if (strat->homog && !strat->syzComp) 
       return TRUE;
     else
       return FALSE;
+#endif
   }
   else
   {

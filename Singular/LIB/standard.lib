@@ -1,7 +1,7 @@
-// $Id: standard.lib,v 1.48 2000-05-12 12:17:18 krueger Exp $
+// $Id: standard.lib,v 1.49 2000-11-24 19:30:51 obachman Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.48 2000-05-12 12:17:18 krueger Exp $";
+version="$Id: standard.lib,v 1.49 2000-11-24 19:30:51 obachman Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
@@ -330,8 +330,7 @@ EXAMPLE: example groebner;  shows an example"
   {
     "std in " + ri[13, size(ri) - 13];
   }
-  ideal qh1=std(qh);
-  intvec hi=hilb(qh1,1);
+  intvec hi=hilb(std(qh),1);
 
   if (add_vars == 0)
   {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.20 2000-11-23 17:34:08 obachman Exp $ */
+/* $Id: kspoly.cc,v 1.21 2000-11-24 19:30:47 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -160,7 +160,10 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   }
   
   // get m2 * a2
-  a2 = tailRing->p_Procs->pp_Mult_mm(a2, m2, shorter,spNoether,tailRing,last);
+  if (spNoether != NULL)
+    a2 = tailRing->p_Procs->pp_Mult_mm_Noether(a2, m2, spNoether, l2, tailRing,last);
+  else
+    a2 = tailRing->p_Procs->pp_Mult_mm(a2, m2, tailRing,last);
   Pair->SetLmTail(m2, a2, l2-shorter, use_buckets, tailRing, last);
 
   // get m2*a2 - m1*a1

@@ -6,18 +6,16 @@
  *  Purpose: template for p_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pp_Mult_mm__Template.cc,v 1.7 2000-11-23 17:34:13 obachman Exp $
+ *  Version: $Id: pp_Mult_mm__Template.cc,v 1.8 2000-11-24 19:30:50 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
  *
  *   Returns:  p*m
  *   Const:    p, m
- *   If spNoether != NULL, then monoms which are smaller
- *   then spNoether are cut
  *
  ***************************************************************/
-poly pp_Mult_mm(poly p, const poly m, int& Shorter, const poly spNoether, const ring ri, poly &last)
+poly pp_Mult_mm(poly p, const poly m, const ring ri, poly &last)
 {
   p_Test(p, ri);
   p_LmTest(m, ri);
@@ -36,40 +34,17 @@ poly pp_Mult_mm(poly p, const poly m, int& Shorter, const poly spNoether, const 
   pAssume1(p_GetComp(m, ri) == 0 || p_MaxComp(p, ri) == 0);
 
 
-  if (spNoether == NULL)
+  do
   {
-    do
-    {
-      p_AllocBin( pNext(q), bin, ri);
-      q = pNext(q);
-      pSetCoeff0(q, n_Mult(ln, pGetCoeff(p), ri));
-      p_MemSum(q->exp, p->exp, m_e, length);
-      p_MemAddAdjust(q, ri);
-      p = pNext(p);
-    }
-    while (p != NULL);
-    last = q;
+    p_AllocBin( pNext(q), bin, ri);
+    q = pNext(q);
+    pSetCoeff0(q, n_Mult(ln, pGetCoeff(p), ri));
+    p_MemSum(q->exp, p->exp, m_e, length);
+    p_MemAddAdjust(q, ri);
+    p = pNext(p);
   }
-  else
-  {
-    poly r;
-    while (p != NULL)
-    {
-      p_AllocBin( r, bin, ri);
-      p_MemSum(r->exp, p->exp, m_e, length);
-      p_MemAddAdjust(r, ri);
-      if (p_LmCmp(r, spNoether, ri) == -1)
-      {
-        Shorter += pLength(p);
-        p_FreeBinAddr(r, ri);
-        break;
-      }
-      q = pNext(q) = r;
-      pSetCoeff0(q, n_Mult(ln, pGetCoeff(p), ri));
-      pIter(p);
-    }
-    if (q  != &rp) last = q;
-  }
+  while (p != NULL);
+  last = q;
   pNext(q) = NULL;
 
   p_Test(pNext(&rp), ri);

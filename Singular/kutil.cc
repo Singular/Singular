@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.79 2000-11-23 17:34:09 obachman Exp $ */
+/* $Id: kutil.cc,v 1.80 2000-11-24 19:30:48 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2360,7 +2360,6 @@ int posInL15 (const LSet set, const int length,
       en=i;
   }
 }
-
 
 /*2
 * looks up the position of polynomial p in set

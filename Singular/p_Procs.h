@@ -7,7 +7,7 @@
  *  Purpose: declaration of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.h,v 1.8 2000-11-23 17:34:12 obachman Exp $
+ *  Version: $Id: p_Procs.h,v 1.9 2000-11-24 19:30:50 obachman Exp $
  *******************************************************************/
 #ifndef P_PROCS_H
 #define P_PROCS_H
@@ -21,9 +21,12 @@ typedef poly (*p_Mult_nn_Proc_Ptr)(poly p, number n, const ring r);
 typedef poly (*pp_Mult_nn_Proc_Ptr)(poly p, number n, const ring r);
 typedef poly (*p_Mult_mm_Proc_Ptr)(poly p, poly m, const ring r);
 typedef poly (*pp_Mult_mm_Proc_Ptr)(poly p, poly m, 
-                                    int &shorter, poly spNoether, 
                                     const ring r, 
                                     poly &last);
+typedef poly (*pp_Mult_mm_Noether_Proc_Ptr)(poly p, poly m, 
+                                            poly spNoether, int &length,
+                                            const ring r, 
+                                            poly &last);
 typedef poly (*p_Add_q_Proc_Ptr)(poly p, poly q, int & shorter, const ring r);
 typedef poly (*p_Minus_mm_Mult_qq_Proc_Ptr)(poly p, poly m, poly q, 
                                             int &shorter, poly spNoether, 
@@ -40,6 +43,7 @@ typedef struct p_Procs_s
   p_Mult_nn_Proc_Ptr            p_Mult_nn;
   pp_Mult_nn_Proc_Ptr           pp_Mult_nn;
   pp_Mult_mm_Proc_Ptr           pp_Mult_mm;
+  pp_Mult_mm_Noether_Proc_Ptr   pp_Mult_mm_Noether;
   p_Mult_mm_Proc_Ptr            p_Mult_mm;
   p_Add_q_Proc_Ptr              p_Add_q;
   p_Minus_mm_Mult_qq_Proc_Ptr   p_Minus_mm_Mult_qq;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.20 2000-11-23 17:34:08 obachman Exp $ */
+/* $Id: kbuckets.cc,v 1.21 2000-11-24 19:30:46 obachman Exp $ */
 
 #include "mod2.h"
 #include "tok.h"
@@ -482,11 +482,14 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
   }
   else
   {
-    int shorter = 0;
     pSetCoeff0(m, nNeg(pGetCoeff(m)));
-    p1 = bucket->bucket_ring->p_Procs->pp_Mult_mm(p1, m, shorter, spNoether, bucket->bucket_ring, last);
+    if (spNoether != NULL)
+      p1 = bucket->bucket_ring->p_Procs->pp_Mult_mm_Noether(p1, m, spNoether, l1, bucket->bucket_ring, last);
+    else
+      p1 = bucket->bucket_ring->p_Procs->pp_Mult_mm(p1, m, 
+                                                    bucket->bucket_ring, 
+                                                    last);
     pSetCoeff0(m, nNeg(pGetCoeff(m)));
-    l1 -= shorter;
   }
 
   bucket->buckets[i] = p1;

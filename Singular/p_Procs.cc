@@ -6,7 +6,7 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.cc,v 1.21 2000-11-08 17:12:33 obachman Exp $
+ *  Version: $Id: p_Procs.cc,v 1.22 2000-11-24 19:30:50 obachman Exp $
  *******************************************************************/
 #include <string.h>
 
@@ -54,6 +54,8 @@ const int HAVE_FAST_P_PROCS = 3;
 const int HAVE_FAST_P_PROCS = 0;
 #endif
 
+#define inline
+
 // Set HAVE_FAST_FIELD to:
 //   0 -- only FieldGeneral
 //   1 -- special cases for FieldZp
@@ -67,7 +69,7 @@ const int HAVE_FAST_FIELD = 2;
 //   2 -- special cases for length <= 2
 //   3 -- special cases for length <= 4
 //   4 -- special cases for length <= 8
-const int HAVE_FAST_LENGTH = 4;
+const int HAVE_FAST_LENGTH = 3;
 
 // Set HAVE_FAST_ORD to:
 //  0  -- only OrdGeneral
@@ -179,6 +181,7 @@ typedef enum p_Proc
   p_Mult_nn_Proc,
   pp_Mult_nn_Proc,
   pp_Mult_mm_Proc,
+  pp_Mult_mm_Noether_Proc,
   p_Mult_mm_Proc,
   p_Add_q_Proc,
   p_Minus_mm_Mult_qq_Proc,
@@ -269,6 +272,7 @@ char* p_ProcEnum_2_String(p_Proc proc)
       case p_Mult_nn_Proc: return "p_Mult_nn_Proc";
       case pp_Mult_nn_Proc: return "pp_Mult_nn_Proc";
       case pp_Mult_mm_Proc: return "pp_Mult_mm_Proc";
+      case pp_Mult_mm_Noether_Proc: return "pp_Mult_mm_Noether_Proc";
       case p_Mult_mm_Proc: return "p_Mult_mm_Proc";
       case p_Add_q_Proc: return "p_Add_q_Proc";
       case p_Minus_mm_Mult_qq_Proc: return "p_Minus_mm_Mult_qq_Proc";
@@ -418,8 +422,29 @@ static inline void p_Add_q__Filter(p_Length &length, p_Ord &ord)
   }
 }
 
-static inline void FastProcFilter(p_Proc proc, p_Field &field, p_Length &length, 
-                                   p_Ord &ord)
+static inline void pp_Mult_mm_Noether_Filter(p_Field &field, 
+                                             p_Length &length, p_Ord &ord)
+{
+  // filter out all orderings which are not local degree orderings
+  if (! (ord == OrdNomog ||        // (ds, c)
+         ord == OrdNegPomog ||     // (Ds, c)
+         ord == OrdPosNomog ||    // (C, ds)
+         ord == OrdNomogPos ||    // (ds, C)
+         ord == OrdGeneral 
+#ifdef HAVE_LENGTH_DIFF
+         || ord == OrdNegPomogZero ||
+         ord == OrdNomogZero    // (ds, c) even vars
+#endif
+         ))
+  {
+    field = FieldGeneral;
+    ord = OrdGeneral;
+    length = LengthGeneral;
+  }
+}
+      
+static inline void FastProcFilter(p_Proc proc, p_Field &field, 
+                                  p_Length &length, p_Ord &ord)
 {
   switch(proc)
   {
@@ -433,10 +458,15 @@ static inline void FastProcFilter(p_Proc proc, p_Field &field, p_Length &length,
         NCopy__Filter(field);
         break;
         
+      case pp_Mult_mm_Noether_Proc:
+        pp_Mult_mm_Noether_Filter(field, length, ord);
+        break;
+
       default: break;
   }
 
   FastOrdFilter(ord);
+  FastOrdZeroFilter(ord);
   FastLengthFilter(length);
   FastFieldFilter(field);
   FastP_ProcsFilter(field, length, ord, proc);
@@ -503,6 +533,7 @@ static inline int index(p_Proc proc, p_Field field, p_Length length, p_Ord ord)
 
       case p_Add_q_Proc:
       case p_Minus_mm_Mult_qq_Proc:
+      case pp_Mult_mm_Noether_Proc:
         return index(field, length, ord);
         
       case p_Merge_q_Proc:
@@ -654,12 +685,14 @@ void p_SetProcs(ring r, p_Procs_s* p_Procs)
     (p_Procs->pp_Mult_nn != NULL) &&
     (p_Procs->p_Copy != NULL) &&
     (p_Procs->pp_Mult_mm != NULL) &&
+    (p_Procs->pp_Mult_mm_Noether != NULL) &&
     (p_Procs->p_Mult_mm != NULL) &&
     (p_Procs->p_Add_q != NULL) &&
     (p_Procs->p_Neg != NULL) &&
     (p_Procs->pp_Mult_Coeff_mm_DivSelect != NULL) &&
     (p_Procs->p_Merge_q != NULL) &&
     (p_Procs->p_Minus_mm_Mult_qq != NULL));
+  assume(p_Procs->pp_Mult_mm_Noether != pp_Mult_mm_Noether__FieldGeneral_LengthGeneral_OrdGeneral || r->OrdSgn == 1 || r->LexOrder);
 }
 
 #ifdef RDEBUG 
@@ -786,7 +819,7 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
 
   printf("#undef %s\n#define %s %s\n", s_what, s_what, s_full_proc_name);
   printf("#include \"%s__Template.cc\"\n", s_what);
-  printf("#undef %s\n#undef pp_Mult_mm\n", s_what);
+  printf("#undef %s\n", s_what);
 }
 
 void GenerateProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_Ord ord)
@@ -902,13 +935,13 @@ int main()
  *
  ***************************************************************/
 
-#define SetProc(what, field, length, ord)                   \
+#define SetProc(what, field, length, ord)              \
 do                                                          \
 {                                                           \
   p_Field t_field = field;                                  \
   p_Ord t_ord = ord;                                        \
   p_Length t_length = length;                               \
-  FastProcFilter(what##_Proc, t_field, t_length, t_ord);    \
+  FastProcFilter(what##_Proc, t_field, t_length, t_ord);\
   _SetProc(what, t_field, t_length, t_ord);                 \
 }                                                           \
 while (0)
@@ -921,6 +954,7 @@ static void SetProcs(p_Field field, p_Length length, p_Ord ord)
   SetProc(p_ShallowCopyDelete, FieldGeneral, length, OrdGeneral);
   SetProc(p_Copy, field, length, OrdGeneral);
   SetProc(pp_Mult_mm, field, length, OrdGeneral);
+  SetProc(pp_Mult_mm_Noether, field, length, ord);
   SetProc(p_Mult_mm, field, length, OrdGeneral);
   SetProc(p_Add_q, field, length, ord);
   SetProc(p_Minus_mm_Mult_qq, field, length, ord);
