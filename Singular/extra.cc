@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.37 1998-04-16 16:10:13 obachman Exp $ */
+/* $Id: extra.cc,v 1.38 1998-04-21 10:43:22 schmidt Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -64,6 +64,21 @@
 
 #include "silink.h"
 #include "mpsr.h"
+
+// see clapsing.cc for a description of the `FACTORY_*' options
+
+#ifdef FACTORY_GCD_STAT
+#define FACTORY_GCD_TEST
+#endif
+
+#ifdef FACTORY_GCD_TIMING
+#define FACTORY_GCD_TEST
+#define TIMING
+#include "timing.h"
+TIMING_DEFINE_PRINTPROTO( contentTimer );
+TIMING_DEFINE_PRINTPROTO( algContentTimer );
+TIMING_DEFINE_PRINTPROTO( algLcmTimer );
+#endif
 
 //void emStart();
 /*2
@@ -699,6 +714,31 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
         WerrorS("matrix expected");
     }
     else
+#ifdef FACTORY_GCD_TEST
+/*=======================gcd Testerei ================================*/
+    if ( ! strcmp( (char*)(h->Data()), "setgcd" ) ) {
+	if ( (h->next != NULL) && (h->next->Typ() == INT_CMD) ) {
+	    CFPrimitiveGcdUtil::setAlgorithm( (int)h->next->Data() );
+	    return FALSE;
+	} else
+	    WerrorS("int expected");
+    }
+    else
+#endif
+
+#ifdef FACTORY_GCD_TIMING
+    if ( ! strcmp( (char*)(h->Data()), "gcdtime" ) ) {
+	TIMING_PRINT( contentTimer, "time used for content: " );
+	TIMING_PRINT( algContentTimer, "time used for algContent: " );
+	TIMING_PRINT( algLcmTimer, "time used for algLcm: " );
+	TIMING_RESET( contentTimer );
+	TIMING_RESET( algContentTimer );
+	TIMING_RESET( algLcmTimer );
+	return FALSE;
+    }
+    else
+#endif
+      
 /*============================================================*/
       WerrorS( feNotImplemented );
   }
