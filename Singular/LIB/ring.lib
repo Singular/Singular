@@ -1,6 +1,6 @@
 //(GMG, last modified 03.11.95)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ring.lib,v 1.18 2004-04-20 15:55:22 Singular Exp $";
+version="$Id: ring.lib,v 1.19 2005-04-01 11:53:31 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  ring.lib      Manipulating Rings and Maps
@@ -19,6 +19,7 @@ PROCEDURES:
  ord_test(R);             test wether ordering of R is global, local or mixed
  ringtensor(\"R\",s,t,..);create ring R, tensor product of rings s,t,...
  ringweights(r);          intvec of weights of ring variables of ring r
+ preimageLoc(R,phi,Q)     computes preimage for non-global orderings
              (parameters in square brackets [] are optional)
 ";
 
@@ -785,3 +786,110 @@ example
   ordstr(R);
 }
 ///////////////////////////////////////////////////////////////////////////////
+proc preimageLoc(string R_name,string phi_name,string Q_name )
+"SYNTAX: @code{preimageLoc (} ring_name, map_name, ideal_name  @code{)}
+        all input parameters of type string
+TYPE:    ideal
+PURPOSE: computes the preimage of an ideal under a given map for non-global 
+         orderings.
+         The second argument has to be the name of a map from the basering to 
+         the given ring (or the name of an ideal defining such a map), and 
+         the ideal has to be an ideal in the given ring.
+SEE ALSO: preimage
+KEYWORDS: 
+EXAMPLE: example preimageLoc ; shows an example"
+{
+  def S=basering;
+  int i;
+  string newRing,minpoly_string;
+  if(attrib(S,"global")!=1)
+  {
+    if(typeof(S)=="qring")
+    {
+      ideal I=ideal(S);
+      newRing="ring S0=("+charstr(S)+"),("+varstr(S)+"),dp;";
+      minpoly_string=string(minpoly);
+      execute(newRing);
+      execute("minpoly="+minpoly_string+";");
+      ideal I=imap(S,I);
+      list pr=primdecGTZ(I);
+      newRing="ring SL=("+charstr(S)+"),("+varstr(S)+"),("+ordstr(S)+");";
+      execute(newRing);
+      execute("minpoly="+minpoly_string+";");
+      list pr=imap(S0,pr);
+      ideal I0=std(pr[1][1]);
+      for(i=2;i<=size(pr);i++)
+      {
+         I0=intersect(I0,std(pr[i][1]));
+      }
+      setring S0;
+      ideal I0=imap(SL,I0);
+      qring S1=std(I0);
+    }
+    else
+    {
+      def S1=S;
+    }
+  }
+  else
+  {
+    def S1=S;
+  }
+  def @R=`R_name`;
+  setring @R;
+  def @phi=`phi_name`;
+  ideal phiId=ideal(@phi);
+  def Q=`Q_name`;
+  if(attrib(@R,"global")!=1)
+  {
+    if(typeof(@R)=="qring")
+    {
+      ideal J=ideal(@R);
+      newRing="ring R0=("+charstr(@R)+"),("+varstr(@R)+"),dp;";
+      minpoly_string=string(minpoly);
+      execute(newRing);
+      execute("minpoly="+minpoly_string+";");
+      ideal J=imap(@R,J);
+      list pr=primdecGTZ(J);
+      newRing="ring RL=("+charstr(@R)+"),("+varstr(@R)+"),("+ordstr(@R)+");";
+      execute(newRing);
+      execute("minpoly="+minpoly_string+";");
+      list pr=imap(R0,pr);
+      ideal J0=std(pr[1][1]);
+      for(i=2;i<=size(pr);i++)
+      {
+         J0=intersect(J0,std(pr[i][1]));
+      }
+      setring R0;
+      ideal J0=imap(RL,J0);
+      qring R1=std(J0);
+      ideal Q=imap(@R,Q);
+      map @phi=S1,imap(@R,phiId);
+    }
+    else
+    {
+      def R1=@R;
+    }
+  }
+  else
+  {
+    def R1=@R;
+  }
+  setring S1;
+  ideal preQ=preimage(R1,@phi,Q);
+  setring S;
+  ideal prQ=imap(S1,preQ);
+  return(prQ);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring S =0,(x,y,z),dp;
+  ring R0=0,(x,y,z),ds;
+  qring R=std(x+x2);
+  map psi=S,x,y,z;
+  ideal null;
+  setring S;
+  ideal nu=preimageLoc("R","psi","null");
+  nu;
+}
+
