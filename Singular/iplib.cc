@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.42 1998-11-19 15:02:40 krueger Exp $ */
+/* $Id: iplib.cc,v 1.43 1998-11-19 16:19:54 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -35,6 +35,7 @@
 void *dynl_open(char *filename);
 void *dynl_sym(void *handle, char *symbol);
 int dynl_close (void *handle);
+char *dynl_error();
 #endif /* HAVE_DYNAMIC_LOADING */
 
 char *iiConvName(char *p);
@@ -1054,7 +1055,7 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN tellerror)
   {
     fktn = dynl_sym(IDPACKAGE(pl)->handle, "mod_init");
     if( fktn!= NULL) (*fktn)(iiAddCproc);
-    else Werror("mod_init: %s\n", dlerror());
+    else Werror("mod_init: %s\n", dynl_error());
     if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loaded %s \n", fullname);
   }
   RET=FALSE;
