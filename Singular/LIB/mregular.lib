@@ -1,11 +1,11 @@
-// $Id: mregular.lib,v 1.1 2000-08-03 16:24:42 greuel Exp $
+// $Id: mregular.lib,v 1.2 2000-12-04 12:13:05 mschulze Exp $
 // IB/PG/GMG, last modified:  21.7.2000
 //////////////////////////////////////////////////////////////////////////////
-version = "$Id: mregular.lib,v 1.1 2000-08-03 16:24:42 greuel Exp $";
+version = "$Id: mregular.lib,v 1.2 2000-12-04 12:13:05 mschulze Exp $";
 
 info="
 LIBRARY: mregular.lib       PROCEDURES FOR THE CASTELNUOVO-MUMFORD REGULARITY
-AUTHORS: I.Bermejo, email: ibermejo@ull.es;
+AUTHORS: I.Bermejo, email: ibermejo@ull.es
          Ph.Gimenez, email: pgimenez@agt.uva.es
          G.-M.Greuel, email: greuel@mathematik.uni-kl.de
 
