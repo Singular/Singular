@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.17 1998-11-05 08:37:46 obachman Exp $ */
+/* $Id: polys-impl.cc,v 1.18 1998-11-06 14:44:13 obachman Exp $ */
 
 /***************************************************************
  *
@@ -677,7 +677,6 @@ void pDBCopyAddFast(poly p1, poly p2, poly p3, char* f, int l)
   if (! pEqual(ptemp, p1))
     Print("Error in pCopyMonAddFast in %s:%d\n", f, l);
   pFree1(ptemp);
-  pTest(p1);
 }
 
 void pDBCopyAddFastHomog(poly p1, poly p2, poly p3, Order_t Order,

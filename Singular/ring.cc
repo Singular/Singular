@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.36 1998-11-04 17:32:25 obachman Exp $ */
+/* $Id: ring.cc,v 1.37 1998-11-06 14:44:16 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -51,13 +51,12 @@ void rChangeCurrRing(ring r, BOOLEAN complete)
 #endif
 {
   /*------------ set global ring vars --------------------------------*/
-  rTest(r);
   currRing = r;
   currQuotient=NULL;
 
   if (r != NULL)
   {
-
+    rTest(r);
     if (complete)
     {
       /*------------ set global ring vars --------------------------------*/
@@ -1910,7 +1909,7 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
   
   if (r->VarOffset == NULL)
   {
-    Werror("Null ring VarOffset -- no rComplete (?) in n %s:%l\n", fn, l);
+    Werror("Null ring VarOffset -- no rComplete (?) in n %s:%d\n", fn, l);
     assume(0);
     return false;
   }
@@ -1929,7 +1928,7 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
          VarLowIndex  != r->VarLowIndex ||
          VarHighIndex != r->VarHighIndex)
   {
-    Werror("Wrong ring VarIndicies -- no rComplete (?) in n %s:%l\n", fn, l);
+    Werror("Wrong ring VarIndicies -- no rComplete (?) in n %s:%d\n", fn, l);
     assume(0);
     ok = FALSE;
   }
@@ -1938,12 +1937,13 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
   {
     if (VarOffset[i] != r->VarOffset[i])
     {
-      Werror("Wrong VarOffset value at %d in %s:%l\n", i, fn, l);
+      Werror("Wrong VarOffset value at %d in %s:%d\n", i, fn, l);
       assume(0);
       ok = FALSE;
     }
   }
-  Free(VarOffset, (r->N + 1)*sizeof(int));
+  Free(r->VarOffset, (r->N + 1)*sizeof(int));
+  r->VarOffset = VarOffset;
   return ok;
 }
 #endif
