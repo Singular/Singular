@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.24 1998-05-09 14:34:29 krueger Exp $ */
+/* $Id: iplib.cc,v 1.25 1998-05-13 14:53:45 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -24,8 +24,8 @@
 #  include "libparse.h"
 #else /* HAVE_LIBPARSER */
    procinfo *iiInitSingularProcinfo(procinfov pi, char *libname,
-				    char *procname, int line, long pos,
-				    BOOLEAN pstatic = FALSE);
+                                    char *procname, int line, long pos,
+                                    BOOLEAN pstatic = FALSE);
 #endif /* HAVE_LIBPARSER */
 
 char *iiConvName(char *p);
@@ -307,7 +307,7 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
   procinfov pi = IDPROC(pn);
   if(pi->is_static && myynest==0) {
     Werror("'%s::%s()' is a local procedure and cannot be accessed by an user.",
-	   pi->libname, pi->procname);
+           pi->libname, pi->procname);
     return NULL;
   }
   iiCheckNest();
@@ -525,10 +525,10 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
     return TRUE;
   }
   if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loaded %s %s", libnamebuf,
-				   text_buffer);
+                                   text_buffer);
   if( (lib_style == OLD_LIBSTYLE) && (BVERBOSE(V_LOAD_LIB)))
     Warn( "library %s has an old format. Please fix it for the next time",
-	  newlib);
+          newlib);
   else {
     if (BVERBOSE(V_LOAD_LIB)) Print("\n");
   }
@@ -736,7 +736,7 @@ procinfo *iiInitSingularProcinfo(procinfov pi, char *libname, char *procname,
 #ifdef HAVE_DYNAMIC_LOADING
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
-	       BOOLEAN(*func)(leftv res, leftv v))
+               BOOLEAN(*func)(leftv res, leftv v))
 {
   procinfov pi;
   idhdl h;
@@ -762,16 +762,17 @@ int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 char *iiConvName(char *libname)
 {
-  char *p = (char *)AllocL(strlen(libname)+7);
-  char *q = mstrdup(libname);
-  char *r = q;
-  for(; *r!='\0'; r++)
+  int l=strlen(libname)+7;
+  char *p = (char *)AllocL(l);
+  char *r;
+
+  memset(p,0,l);
+  sprintf(p, "%s_init", libname);
+  for(r=p; *r!='\0'; r++)
   {
     if(*r=='.') *r='_';
     if(*r==':') *r='_';
   }
-  sprintf(p, "%s_init\0", q);
-  FreeL((ADDRESS)q);
   return(p);
 }
 

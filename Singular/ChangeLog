@@ -1,3 +1,5 @@
+Wed May 13 16:52:09 MET DST 1998 hannes
+	* changed syntax of NOT (does not require () any more)
 Tue May 12 16:58:13 MET DST 1998 hannes
 	* changed return type of option(): none -> string
 Tue May 12 11:57:50 MET DST 1998 hannes

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.32 1998-05-11 16:55:29 Singular Exp $ */
+/* $Id: grammar.y,v 1.33 1998-05-13 14:53:44 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -282,7 +282,7 @@ void yyerror(char * fmt)
 %left '<' '>' GE LE
 %left '+' '-'
 %left '*' '/' '%' INTDIV
-%left UMINUS
+%left UMINUS NOT
 %left  '^'
 %left '[' ']'
 %left '(' ')'
@@ -780,10 +780,10 @@ expr_arithmetic:
           {
             if(iiExprArith2(&$$,&$1,DOTDOT,&$3)) YYERROR;
           }
-        | NOT '(' expr ')'
+        | NOT expr 
           {
             memset(&$$,0,sizeof($$));
-            int i; TESTSETINT($3,i);
+            int i; TESTSETINT($2,i);
             $$.rtyp  = INT_CMD;
             $$.data = (void *)(i == 0 ? 1 : 0);
           }
