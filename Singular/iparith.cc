@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.210 2000-05-09 14:35:11 Singular Exp $ */
+/* $Id: iparith.cc,v 1.211 2000-05-15 12:47:44 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -161,7 +161,7 @@ cmdnames cmds[] =
   { "else",        0, ELSE_CMD ,          ELSE_CMD},
   { "eval",        0, EVAL ,              EVAL},
   { "example",     0, EXAMPLE_CMD ,       EXAMPLE_CMD},
-  { "execute",     0, EXECUTE_CMD ,       EXECUTE_CMD},
+  { "execute",     0, EXECUTE_CMD ,       CMD_1},
   { "export",      0, EXPORT_CMD ,        EXPORT_CMD},
 #ifdef HAVE_NAMESPACES
   { "exportto",    0, EXPORTTO_CMD ,      CMD_M},
@@ -2646,6 +2646,15 @@ static BOOLEAN jjE(leftv res, leftv v)
   pSetm((poly)res->data);
   return FALSE;
 }
+static BOOLEAN jjEXECUTE(leftv res, leftv v)
+{
+  char * d = (char *)v->Data();
+  char * s = (char *)AllocL(strlen(d) + 13);
+  strcpy( s, (char *)d);
+  strcat( s, "\n;RETURN();\n");
+  newBuffer(s,BT_execute);
+  return yyparse();
+}
 #ifdef HAVE_FACTORY
 static BOOLEAN jjFACSTD(leftv res, leftv v)
 {
@@ -3556,6 +3565,7 @@ struct sValCmd1 dArith1[]=
 ,{jjDIM_R,      DIM_CMD,         XS(INT_CMD),    RESOLUTION_CMD }
 ,{jjDUMP,       DUMP_CMD,        NONE,           LINK_CMD }
 ,{jjE,          E_CMD,           VECTOR_CMD,     INT_CMD }
+,{jjEXECUTE,    EXECUTE_CMD,     NONE,           STRING_CMD }
 ,{jjERROR,      ERROR_CMD,       NONE,           STRING_CMD }
 #ifdef HAVE_FACTORY
 ,{jjFAC_P,      FAC_CMD,         LIST_CMD,       POLY_CMD }

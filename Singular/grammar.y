@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.79 2000-01-27 16:53:45 Singular Exp $ */
+/* $Id: grammar.y,v 1.80 2000-05-15 12:47:43 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -246,7 +246,6 @@ void yyerror(char * fmt)
 %token <i> RING_DECL
         /* put variables of this type into the currRing list */
 %token <i> EXAMPLE_CMD
-%token <i> EXECUTE_CMD
 %token <i> EXPORT_CMD
 %token <i> EXPORTTO_CMD
 %token <i> IMPORTFROM_CMD
@@ -417,7 +416,6 @@ flowctrl: ifcmd
 example_dummy : EXAMPLE_CMD BLOCKTOK { FreeL((ADDRESS)$2); }
 
 command: assign
-         | executecmd
          | exportcmd
          | killcmd
          | listcmd
@@ -1017,24 +1015,6 @@ cmdeq:  '='
 /* --------------------------------------------------------------------*/
 /* section of pure commands                                            */
 /* --------------------------------------------------------------------*/
-
-executecmd:
-        EXECUTE_CMD expr
-          {
-            if ($2.Typ() == STRING_CMD)
-            {
-              char * s = (char *)AllocL(strlen((char *)$2.Data()) + 4);
-              strcpy( s, (char *)$2.Data());
-              strcat( s, "\n;\n");
-              $2.CleanUp();
-              newBuffer(s,BT_execute);
-            }
-            else
-            {
-              MYYERROR("string expected");
-            }
-          }
-        ;
 
 filecmd:
         '<' stringexpr
