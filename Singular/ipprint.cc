@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipprint.cc,v 1.13 1999-05-26 16:23:55 obachman Exp $ */
+/* $Id: ipprint.cc,v 1.14 1999-08-19 11:56:28 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: printing
 */
@@ -219,10 +219,10 @@ BOOLEAN jjPRINT(leftv res, leftv u)
   {
       case INTVEC_CMD:
         return ipPrint_INTVEC(u);
-        
+
       case INTMAT_CMD:
         return ipPrint_INTMAT(u);
-        
+
       case MATRIX_CMD:
         return ipPrint_MA(u);
 
@@ -234,7 +234,7 @@ BOOLEAN jjPRINT(leftv res, leftv u)
         FreeL(s);
         return FALSE;
       }
-      
+
       case MODUL_CMD:
       {
         matrix m = idModule2Matrix(idCopy((ideal) u->Data()));
@@ -242,10 +242,10 @@ BOOLEAN jjPRINT(leftv res, leftv u)
         idDelete((ideal *) &m);
         return FALSE;
       }
-      
+
       case VECTOR_CMD:
         return ipPrint_V(u);
-        
+
       default:
         u->Print();
         return FALSE;
@@ -297,7 +297,11 @@ static void ipPrintBetti(leftv u)
     Print("%5d:",i);
     for(j=1;j<=betti->cols();j++)
     {
-      Print(" %5d",IMATELEM(*betti,i+1,j));
+      int m=IMATELEM(*betti,i+1,j);
+      if (m==0)
+        PrintS("     -");
+      else
+        Print(" %5d",m);
     }
     PrintLn();
   }
@@ -356,12 +360,12 @@ BOOLEAN jjPRINT_FORMAT(leftv res, leftv u, leftv v)
   else if (strcmp(ns,"%t") == 0)
   {
     SPrintStart();
-    if (u->rtyp==IDHDL) 
+    if (u->rtyp==IDHDL)
       type_cmd((idhdl) (u->data));
-    else 
+    else
       type_cmd((idhdl) u);
     res->data = SPrintEnd();
-    if (dim != 2) 
+    if (dim != 2)
       ((char*)res->data)[strlen((char*)res->data) -1] = '\0';
   }
   else if (strcmp(ns,"%;") == 0)
@@ -385,7 +389,7 @@ BOOLEAN jjPRINT_FORMAT(leftv res, leftv u, leftv v)
     if (dim == 2) PrintLn();
     res->data = SPrintEnd();
   }
-  else 
+  else
   {
     res->data = u->String(NULL, FALSE, dim);
     if (dim == 2)
@@ -397,7 +401,7 @@ BOOLEAN jjPRINT_FORMAT(leftv res, leftv u, leftv v)
       res->data = ns;
     }
   }
-    
+
   FreeL(ns);
   res->rtyp = STRING_CMD;
   return FALSE;
