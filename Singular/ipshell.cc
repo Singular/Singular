@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.81 2003-12-10 16:57:15 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.82 2003-12-16 18:29:28 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -3036,6 +3036,14 @@ spectrumState   spectrumPolyList::spectrum( lists *L,int fast )
 #endif
 
 //from mpr_inout.cc
+void nPrint(number n)
+{
+  poly o=pOne();
+  pSetCoeff(o, nCopy(n) );
+  pWrite0( o );
+  pDelete( &o );
+}
+
 BOOLEAN loNewtonP( leftv res, leftv arg1 )
 {
   res->data= (void*)loNewtonPolytope( (ideal)arg1->Data() );
