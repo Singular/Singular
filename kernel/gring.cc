@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.5 2004-03-25 21:19:12 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.6 2004-04-08 21:12:05 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -1956,11 +1956,13 @@ poly nc_pSubst(poly p, int n, poly e)
   int *PRE = (int *)omAlloc0((rN+1)*sizeof(int));
   int *SUF = (int *)omAlloc0((rN+1)*sizeof(int));
   int i,j,pow;
+  number C;
   poly suf,pre;
   poly res = NULL;
   poly out = NULL;
   while ( p!= NULL )
   {
+    C =  pGetCoeff(p);
     pGetExpV(p, PRE); /* faster splitting? */
     pow = PRE[n]; PRE[n]=0;
     res = NULL;
@@ -1984,6 +1986,7 @@ poly nc_pSubst(poly p, int n, poly e)
       pSetm(suf);
       pSetComp(suf,PRE[0]);
       res = nc_p_Mult_mm(res,suf,currRing);
+      res = p_Mult_nn(res,C,currRing);
     }
     else /* pow==0 */
     {
