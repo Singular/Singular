@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.44 2000-11-16 09:54:52 obachman Exp $ */
+/* $Id: kutil.h,v 1.45 2000-11-23 17:34:10 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -118,6 +118,7 @@ public:
   poly  p1,p2; /*- the pair p comes from -*/
   
   poly  lcm;   /*- the lcm of p1,p2 -*/
+  poly last;   // pLast(p) during reductions
   kBucket_pt bucket;
   int   i_r1, i_r2;
 
@@ -133,16 +134,29 @@ public:
   KINLINE void LmDeleteAndIter();
 
   // spoly related things
+  // preparation for reduction if not spoly
+  KINLINE void PrepareRed(BOOLEAN use_bucket);
   KINLINE void SetLmTail(poly lm, poly new_p, int length, 
-                         int use_bucket, ring r);
+                         int use_bucket, ring r, poly last);
   KINLINE void Tail_Minus_mm_Mult_qq(poly m, poly qq, int lq, poly spNoether);
   KINLINE void Tail_Mult_nn(number n);
+  // deletes bucket, makes sure that p and t_p exists
   KINLINE poly GetP(omBin lmBin = NULL);
-  KINLINE void CanonicalizeP();
+  // does not delete bucket, just canonicalizes it
+  // returned poly is such that Lm(p) \in currRing, Tail(p) \in tailRing
+  KINLINE poly CanonicalizeP();
   
+  // makes a copy of the poly of L
+  KINLINE void Copy();
+  // gets the poly and makes a copy of it
+  KINLINE poly CopyGetP();
+
+  KINLINE int GetpLength();
+  KINLINE long pLDeg(BOOLEAN use_last);
   KINLINE long pLDeg();
-  KINLINE long SetLength();
+  KINLINE int SetLength(BOOLEAN lengt_pLength = FALSE);
   KINLINE long SetDegStuffReturnLDeg();
+  KINLINE long SetDegStuffReturnLDeg(BOOLEAN use_last);
 
   KINLINE long MinComp();
 
@@ -175,11 +189,13 @@ public:
   void (*initEcart)(LObject * L);
   int (*posInT)(const TSet T,const int tl,const LObject &h);
   int (*posInL)(const LSet set, const int length,
-                const LObject &L,const kStrategy strat);
+                LObject* L,const kStrategy strat);
   void (*enterS)(LObject h, int pos,kStrategy strat, int atR = -1);
   void (*initEcartPair)(LObject * h, poly f, poly g, int ecartF, int ecartG);
   int (*posInLOld)(const LSet Ls,const int Ll,
-                   const LObject &Lo,const kStrategy strat);
+                   LObject* Lo,const kStrategy strat);
+  pFDegProc pOrigFDeg;
+  pLDegProc pOrigLDeg;
   pFDegProc pOldFDeg;
   ideal Shdl;
   ideal D; /*V(S) is in D(D)*/
@@ -203,6 +219,12 @@ public:
   // procedure for ShalloCopy from tailRing  to currRing
   pShallowCopyDeleteProc p_shallow_copy_delete;
   BOOLEAN *pairtest;/*used for enterOnePair*/
+  // if set, pLDeg(p, l) == (pFDeg(pLast(p), pLength)
+  BOOLEAN LDegLast;
+  // if set, then L.length == L.pLength
+  BOOLEAN length_pLength;
+  // if set, then posInL does not depend on L.length
+  BOOLEAN posInLDependsOnLength;
   int cp,c3;
   int sl,mu;
   int tl,tmax;
@@ -245,6 +267,7 @@ public:
 };
 
 void deleteHC(poly *p, int *e, int *l, kStrategy strat);
+void deleteHC(LObject* L, kStrategy strat, BOOLEAN fromNext = FALSE);
 void deleteInS (int i,kStrategy strat);
 void cleanT (kStrategy strat);
 LSet initL ();
@@ -264,18 +287,21 @@ int posInT17 (const TSet set,const int length,const LObject &p);
 int posInT19 (const TSet set,const int length,const LObject &p);
 void reorderS (int* suc,kStrategy strat);
 int posInL0 (const LSet set, const int length,
-             const LObject &L,const kStrategy strat);
+             LObject* L,const kStrategy strat);
 int posInL11 (const LSet set, const int length,
-             const LObject &L,const kStrategy strat);
+             LObject* L,const kStrategy strat);
 int posInL13 (const LSet set, const int length,
-             const LObject &L,const kStrategy strat);
+             LObject* L,const kStrategy strat);
 int posInL15 (const LSet set, const int length,
-             const LObject &L,const kStrategy strat);
+             LObject* L,const kStrategy strat);
 int posInL17 (const LSet set, const int length,
-             const LObject &L,const kStrategy strat);
+             LObject* L,const kStrategy strat);
+int posInL10 (const LSet set, const int length,
+             LObject* L,const kStrategy strat);
 KINLINE poly redtailBba (poly p,int pos,kStrategy strat);
 poly redtailBba (LObject *L, int pos,kStrategy strat);
 poly redtail (poly p,int pos,kStrategy strat);
+poly redtail (LObject *L,int pos,kStrategy strat);
 void enterpairs (poly h, int k, int ec, int pos,kStrategy strat, int atR = -1);
 void entersets (LObject h);
 void pairs ();
@@ -295,8 +321,6 @@ void updateS(BOOLEAN toT,kStrategy strat);
 void enterT (LObject p,kStrategy strat, int atT = -1);
 void cancelunit (LObject* p);
 void HEckeTest (poly pp,kStrategy strat);
-void redtailS (poly* h,int maxIndex);
-void redtailMora (poly* h,int maxIndex);
 void initBuchMoraCrit(kStrategy strat);
 void initHilbCrit(ideal F, ideal Q, intvec **hilb,kStrategy strat);
 void initBuchMoraPos(kStrategy strat);
@@ -313,7 +337,7 @@ int kFindInT(poly p, TSet T, int tlength);
 // return -1 if no divisor is found
 //        number of first divisor, otherwise
 int kFindDivisibleByInT(const TSet &T, const unsigned long* sevT, 
-                        const int tl, const LObject* L);
+                        const int tl, const LObject* L, const int start=0);
 // same with S
 int kFindDivisibleByInS(const polyset &S, const unsigned long* sev, 
                         const int sl, LObject* L);
@@ -459,7 +483,7 @@ KINLINE void ksOldSpolyTail(poly p1, poly q, poly q2, poly spNoether, ring r = c
 //             if spoly creation of strat->P does not violate 
 //             exponent bound of strat->tailRing
 //      FALSE, otherwise
-BOOLEAN kCheckSpolyCreation(kStrategy strat, poly &m1, poly &m2);
+BOOLEAN kCheckSpolyCreation(LObject* L, kStrategy strat, poly &m1, poly &m2);
 // change strat->tailRing and adjust all data in strat, L, and T: 
 // new tailRing has larger exponent bound 
 // do nothing and return FALSE if exponent bound increase would result in

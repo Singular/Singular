@@ -6,7 +6,7 @@
  *  Purpose: template for p_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pp_Mult_mm__Template.cc,v 1.6 2000-10-30 16:54:56 obachman Exp $
+ *  Version: $Id: pp_Mult_mm__Template.cc,v 1.7 2000-11-23 17:34:13 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -17,11 +17,15 @@
  *   then spNoether are cut
  *
  ***************************************************************/
-poly pp_Mult_mm(poly p, const poly m, const poly spNoether, const ring ri)
+poly pp_Mult_mm(poly p, const poly m, int& Shorter, const poly spNoether, const ring ri, poly &last)
 {
   p_Test(p, ri);
   p_LmTest(m, ri);
-  if (p == NULL) return NULL;
+  if (p == NULL) 
+  {
+    last = NULL;
+    return NULL;
+  }
   spolyrec rp;
   poly q = &rp, r;
   number ln = pGetCoeff(m);
@@ -44,6 +48,7 @@ poly pp_Mult_mm(poly p, const poly m, const poly spNoether, const ring ri)
       p = pNext(p);
     }
     while (p != NULL);
+    last = q;
   }
   else
   {
@@ -55,6 +60,7 @@ poly pp_Mult_mm(poly p, const poly m, const poly spNoether, const ring ri)
       p_MemAddAdjust(r, ri);
       if (p_LmCmp(r, spNoether, ri) == -1)
       {
+        Shorter += pLength(p);
         p_FreeBinAddr(r, ri);
         break;
       }
@@ -62,9 +68,10 @@ poly pp_Mult_mm(poly p, const poly m, const poly spNoether, const ring ri)
       pSetCoeff0(q, n_Mult(ln, pGetCoeff(p), ri));
       pIter(p);
     }
+    if (q  != &rp) last = q;
   }
   pNext(q) = NULL;
-  
+
   p_Test(pNext(&rp), ri);
   return pNext(&rp);
 }

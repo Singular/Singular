@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.53 2000-11-14 16:05:00 obachman Exp $ */
+/* $Id: polys1.cc,v 1.54 2000-11-23 17:34:13 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -61,23 +61,6 @@ BOOLEAN   pIsConstantPoly(poly p)
   return TRUE;
 }
 
-/*2
-*test if a monomial /head term is a pure power
-*/
-int pIsPurePower(const poly p)
-{
-  int i,k=0;
-
-  for (i=pVariables;i;i--)
-  {
-    if (pGetExp(p,i)!=0)
-    {
-      if(k!=0) return 0;
-      k=i;
-    }
-  }
-  return k;
-}
 
 
 /*-----------------------------------------------------------*/

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.65 2000-11-22 17:35:33 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.66 2000-11-23 17:34:08 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -76,40 +76,41 @@ BITSET validOpts=Sy_bit(0)
 
 //static BOOLEAN posInLOldFlag;
            /*FALSE, if posInL == posInL10*/
+// returns TRUE if mora should use buckets, false otherwise
+static BOOLEAN kMoraUseBucket(kStrategy strat);
 
-/*0 implementation*/
-
-/*2
-*p is a polynomial in the set s;
-*recompute p and its ecart e with respect to the new noether
-*(cut every monomial of pNext(p) above noether)
-*/
-void deleteHCs (TObject* p,kStrategy strat)
+static void kOptimizeLDeg(pFDegProc fdeg, pLDegProc ldeg, kStrategy strat)
 {
-  poly p1;
-  int o;
-
-  if (strat->kHEdgeFound)
+  if (fdeg == pDeg)
   {
-    p1 = (*p).p;
-    o = pFDeg(p1);
-    while (pNext(p1) != NULL)
-    {
-      if (pLmCmp(pNext(p1),strat->kNoether) == -1)
-      {
-        pDelete(&(pNext(p1)));
-        (*p).ecart = pLDeg((*p).p,&((*p).length))-o;
-        p->pLength = 0;
-      }
-      else
-      {
-        pIter(p1);
-      }
-    }
+    if (ldeg == pLDeg1) 
+      pLDeg = pLDeg1_Deg;
+    if (ldeg == pLDeg1c)
+      pLDeg = pLDeg1c_Deg;
+  }
+  else if (fdeg == pTotaldegree)
+  {
+    if (ldeg == pLDeg1) 
+      pLDeg = pLDeg1_Totaldegree;
+    if (ldeg == pLDeg1c)
+      pLDeg = pLDeg1c_Totaldegree;
+  }
+
+  if (strat->ak == 0 && !rIsSyzIndexRing(currRing))
+    strat->length_pLength = TRUE;
+    
+  if ((ldeg == pLDeg0c && !rIsSyzIndexRing(currRing)) ||
+      (ldeg == pLDeg0 && strat->ak == 0))
+  {
+    strat->LDegLast = TRUE;
+  }
+  else
+  {
+    strat->LDegLast = FALSE;
   }
 }
 
-
+  
 static int doRed (LObject* h, TObject* with,BOOLEAN intoT,kStrategy strat)
 {
   poly hp;
@@ -134,6 +135,7 @@ static int doRed (LObject* h, TObject* with,BOOLEAN intoT,kStrategy strat)
     LObject L= *h;
     L.Copy();
     h->GetP();
+    h->SetLength(strat->length_pLength);
     ret = ksReducePoly(&L, with, strat->kNoether, NULL, strat);
     if (ret)
     {
@@ -157,162 +159,6 @@ static int doRed (LObject* h, TObject* with,BOOLEAN intoT,kStrategy strat)
   return ret;
 }
 
-#if 0
-/*2
-* reduces h with elements from T choosing first possible
-* element in T with respect to the given ecart
-*/
-int redEcart (LObject* h,kStrategy strat)
-{
-  poly pi;
-  int i,at,reddeg,d,ei,li,ii;
-  int j = 0;
-  int pass = 0;
-  unsigned long not_sev;
-
-  d = pFDeg((*h).p)+(*h).ecart;
-  reddeg = strat->LazyDegree+d;
-  h->sev = pGetShortExpVector(h->p);
-  not_sev = ~ h->sev;
-  loop
-  {
-    if (j > strat->tl)
-    {
-      if (strat->honey) pLDeg((*h).p,&((*h).length));
-      return 1;
-    }
-    if (pLmShortDivisibleBy(strat->T[j].p, strat->sevT[j], (*h).p, not_sev))
-    {
-      //if (strat->interpt) test_int_std(strat->kIdeal);
-      /*- compute the s-polynomial -*/
-      pi = strat->T[j].p;
-      ei = strat->T[j].ecart;
-      li = strat->T[j].length;
-      ii = j;
-      /*
-      * the polynomial to reduce with (up to the moment) is;
-      * pi with ecart ei and length li
-      */
-      i = j;
-      loop
-      {
-      /*- takes the first possible with respect to ecart -*/
-        if (ei <= (*h).ecart) break;
-        i++;
-        if (i > strat->tl) break;
-        if ((((strat->T[i]).ecart < ei)
-          || (((strat->T[i]).ecart == ei)
-          && ((strat->T[i]).length < li)))
-          && pLmShortDivisibleBy(strat->T[i].p, strat->sevT[i],
-                               (*h).p, not_sev))
-        {
-          /*
-           * the polynomial to reduce with is now;
-           */
-          pi = strat->T[i].p;
-          ei = strat->T[i].ecart;
-          li = strat->T[i].length;
-          ii = i;
-        }
-      }
-      /*
-      * end of search: have to reduce with pi
-      */
-      if (ei > (*h).ecart)
-      {
-        /*
-        * It is not possible to reduce h with smaller ecart;
-        * if possible h goes to the lazy-set L,i.e
-        * if its position in L would be not the last one
-        */
-        strat->fromT = TRUE;
-        if (strat->Ll >= 0) /*- L is not empty -*/
-        {
-          if (strat->honey) pLDeg((*h).p,&((*h).length));
-          at = strat->posInL(strat->L,strat->Ll,(*h),strat);
-          if (at <= strat->Ll)
-          {
-            /*- h will not become the next element to reduce -*/
-            enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
-            if (TEST_OPT_DEBUG) Print(" ecart too big; -> L%d\n",at);
-            (*h).p = NULL;
-            strat->fromT = FALSE;
-            return -1;
-          }
-        }
-      }
-      doRed(h,&(strat->T[ii]),strat->fromT,strat);
-      strat->fromT=FALSE;
-      if ((*h).p == NULL)
-      {
-        if (h->lcm!=NULL) pLmFree((*h).lcm);
-        return 0;
-      }
-      h->sev = pGetShortExpVector(h->p);
-      not_sev = ~ h->sev;
-      /*computes the ecart*/
-      if (strat->honey)
-      {
-        if (ei <= (*h).ecart)
-          (*h).ecart = d-pFDeg((*h).p);
-        else
-          (*h).ecart = d-pFDeg((*h).p)+ei-(*h).ecart;
-        // pLDeg((*h).p,&((*h).length));
-        //(*h).length = pLength((*h).p);
-      }
-      else
-        (*h).ecart = pLDeg((*h).p,&((*h).length))-pFDeg((*h).p);
-      if (strat->syzComp!=0)
-      {
-        if ((strat->syzComp>0) && (pMinComp((*h).p) > strat->syzComp))
-        {
-          if (TEST_OPT_DEBUG) PrintS(" > syzComp\n");
-          return -2;
-        }
-
-      }
-      /*- try to reduce the s-polynomial -*/
-      pass++;
-      d = pFDeg((*h).p)+(*h).ecart;
-      /*
-      *test whether the polynomial should go to the lazyset L
-      *-if the degree jumps
-      *-if the number of pre-defined reductions jumps
-      */
-      if ((strat->Ll >= 0)
-      && ((d >= reddeg) || (pass > strat->LazyPass)))
-      {
-        if (strat->honey) pLDeg((*h).p,&((*h).length));
-        at = strat->posInL(strat->L,strat->Ll,*h,strat);
-        if (at <= strat->Ll)
-        {
-          i=strat->sl+1;
-          do
-          {
-            i--;
-            if (i<0) return 1;
-          } while (!pLmShortDivisibleBy(strat->S[i], strat->sevS[i],
-                                      (*h).p, not_sev));
-          enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
-          if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
-          (*h).p = NULL;
-          return -1;
-        }
-      }
-      else if ((TEST_OPT_PROT) && (strat->Ll < 0) && (d >= reddeg))
-      {
-        Print(".%d",d);mflush();
-        reddeg = d+1;
-      }
-      j = 0;
-    }
-    else
-    {
-      j++;
-    }
-  }
-}
-#else
 int redEcart (LObject* h,kStrategy strat)
 {
   poly pi;
@@ -328,7 +174,7 @@ int redEcart (LObject* h,kStrategy strat)
     j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
     if (j < 0)
     {
-      if (strat->honey) h->SetLength();
+      if (strat->honey) h->SetLength(strat->length_pLength);
       return 1;
     }
 
@@ -346,12 +192,19 @@ int redEcart (LObject* h,kStrategy strat)
       {
         /*- takes the first possible with respect to ecart -*/
         i++;
-//        i = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h, i);
+#if 1
         if (i > strat->tl) break;
         if ((strat->T[i].ecart < ei || (strat->T[i].ecart == ei &&
                                         strat->T[i].length < li))
             &&
             pLmShortDivisibleBy(strat->T[i].p, strat->sevT[i], h->p, ~h->sev))
+#else
+          j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h, i);
+        if (j < 0) break;
+        i = j;
+        if (strat->T[i].ecart < ei || (strat->T[i].ecart == ei &&
+                                        strat->T[i].length < li))
+#endif
         {
           // the polynomial to reduce with is now
           ii = i;
@@ -372,13 +225,14 @@ int redEcart (LObject* h,kStrategy strat)
       if (strat->Ll >= 0) /*- L is not empty -*/
       {
         h->SetLmCurrRing();
-        if (strat->honey) h->SetLength();
+        if (strat->honey && strat->posInLDependsOnLength)
+          h->SetLength(strat->length_pLength);
         assume(h->FDeg == h->pFDeg());
-        at = strat->posInL(strat->L,strat->Ll,(*h),strat);
+        at = strat->posInL(strat->L,strat->Ll,h,strat);
         if (at <= strat->Ll)
         {
-          /*- h will not become the next element to reduce -*/
           h->CanonicalizeP();
+          /*- h will not become the next element to reduce -*/
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
 #ifdef KDEBUG
           if (TEST_OPT_DEBUG) Print(" ecart too big; -> L%d\n",at);
@@ -414,7 +268,7 @@ int redEcart (LObject* h,kStrategy strat)
     }
     else
       // this has the side effect of setting h->length
-      h->ecart = h->pLDeg() - h->GetpFDeg();
+      h->ecart = h->pLDeg(strat->LDegLast) - h->GetpFDeg();
 
     if (strat->syzComp!=0)
     {
@@ -439,13 +293,18 @@ int redEcart (LObject* h,kStrategy strat)
         && ((d >= reddeg) || (pass > strat->LazyPass)))
     {
       h->SetLmCurrRing();
-      if (strat->honey) h->SetLength();
+      if (strat->honey && strat->posInLDependsOnLength) 
+        h->SetLength(strat->length_pLength);
       assume(h->FDeg == h->pFDeg());
-      at = strat->posInL(strat->L,strat->Ll,*h,strat);
+      at = strat->posInL(strat->L,strat->Ll,h,strat);
       if (at <= strat->Ll)
       {
         if (kFindDivisibleByInS(strat->S, strat->sevS, strat->sl, h) < 0)
+        {
+          if (strat->honey && !strat->posInLDependsOnLength) 
+            h->SetLength(strat->length_pLength);
           return 1;
+        }
         h->CanonicalizeP();
         enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
 #ifdef KDEBUG
@@ -462,7 +321,6 @@ int redEcart (LObject* h,kStrategy strat)
     }
   }
 }
-#endif
 
 /*2
 *reduces h with elements from T choosing  the first possible
@@ -487,8 +345,8 @@ int redFirst (LObject* h,kStrategy strat)
     j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
     if (j < 0)
     {
-      if (! strat->homog)
-        h->SetDegStuffReturnLDeg();
+      if (strat->homog) 
+        h->SetDegStuffReturnLDeg(strat->LDegLast);
       return 1;
     }
 
@@ -528,12 +386,14 @@ int redFirst (LObject* h,kStrategy strat)
 #ifdef KDEBUG
         if (TEST_OPT_DEBUG) PrintS(" > syzComp\n");
 #endif
+        if (strat->homog) 
+          h->SetDegStuffReturnLDeg(strat->LDegLast);
         return -2;
       }
     }
     if (!strat->homog)
     {
-      d = h->SetDegStuffReturnLDeg();
+      d = h->SetDegStuffReturnLDeg(strat->LDegLast);
       /*- try to reduce the s-polynomial -*/
       pass++;
       /*
@@ -545,7 +405,7 @@ int redFirst (LObject* h,kStrategy strat)
           && ((d >= reddeg) || (pass > strat->LazyPass)))
       {
         h->SetLmCurrRing();
-        at = strat->posInL(strat->L,strat->Ll,*h,strat);
+        at = strat->posInL(strat->L,strat->Ll,h,strat);
         if (at <= strat->Ll)
         {
           if (kFindDivisibleByInS(strat->S, strat->sevS, strat->sl, h) < 0)
@@ -578,7 +438,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
   H.p = h;
   int j = 0;
   int z = 10;
-  int o = pFDeg(h);
+  int o = H.SetpFDeg();
   H.ecart = pLDeg(H.p,&H.length)-o;
   if (flag==0) cancelunit(&H);
   H.sev = pGetShortExpVector(H.p);
@@ -656,7 +516,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
           return NULL;
       }
       /*- try to reduce the s-polynomial -*/
-      o = pFDeg(H.p);
+      o = H.SetpFDeg();
       cancelunit(&H);
       H.ecart = pLDeg(H.p,&(H.length))-o;
       j = 0;
@@ -680,7 +540,7 @@ void reorderL(kStrategy strat)
 
   for (i=1; i<=strat->Ll; i++)
   {
-    at = strat->posInL(strat->L,i-1,strat->L[i],strat);
+    at = strat->posInL(strat->L,i-1,&(strat->L[i]),strat);
     if (at != i)
     {
       p = strat->L[i];
@@ -761,20 +621,27 @@ void missingAxis (int* last,kStrategy strat)
 *(*length) gives the length between the pure power and the leading term
 *(should be minimal)
 */
-BOOLEAN hasPurePower (poly p,int last, int *length,kStrategy strat)
+BOOLEAN hasPurePower (const poly p,int last, int *length,kStrategy strat)
 {
   poly h;
   int i;
 
   if (pNext(p) == strat->tail)
     return FALSE;
-  if (pMinComp(p) == strat->ak)
+  pp_Test(p, currRing, strat->tailRing);
+  if (p_MinComp(p, currRing, strat->tailRing) == strat->ak)
   {
-    *length = 0;
-    h = p;
+    i = p_IsPurePower(p, currRing);
+    if (i == last) 
+    {
+      *length = 0;
+      return TRUE;
+    }
+    *length = 1;
+    h = pNext(p);
     while (h != NULL)
     {
-      i = pIsPurePower(h);
+      i = p_IsPurePower(h, strat->tailRing);
       if (i==last) return TRUE;
       (*length)++;
       pIter(h);
@@ -783,26 +650,41 @@ BOOLEAN hasPurePower (poly p,int last, int *length,kStrategy strat)
   return FALSE;
 }
 
+BOOLEAN hasPurePower (LObject *L,int last, int *length,kStrategy strat)
+{
+  if (L->bucket != NULL)
+  {
+    poly p = L->CanonicalizeP();
+    BOOLEAN ret = hasPurePower(p, last, length, strat);
+    pNext(p) = NULL;
+    return ret;
+  }
+  else 
+  {
+    return hasPurePower(L->p, last, length, strat);
+  }
+}
+
 /*2
 * looks up the position of polynomial p in L
 * in the case of looking for the pure powers
 */
-int posInL10 (LSet const set, int length, const LObject &p,kStrategy const strat)
+int posInL10 (LSet const set, int length, LObject* p,kStrategy const strat)
 {
   int j,dp,dL;
 
   if (length<0) return 0;
-  if (hasPurePower(p.p,strat->lastAxis,&dp,strat))
+  if (hasPurePower(p,strat->lastAxis,&dp,strat))
   {
-    int op= pFDeg(p.p)+p.ecart;
+    int op= p->GetpFDeg() +p->ecart;
     for (j=length; j>=0; j--)
     {
-      if (!hasPurePower(set[j].p,strat->lastAxis,&dL,strat))
+      if (!hasPurePower(&(set[j]),strat->lastAxis,&dL,strat))
         return j+1;
       if (dp < dL)
         return j+1;
       if ((dp == dL)
-      && (pFDeg(set[j].p)+set[j].ecart >= op))
+          && (set[j].GetpFDeg()+set[j].ecart >= op))
         return j+1;
     }
   }
@@ -810,11 +692,12 @@ int posInL10 (LSet const set, int length, const LObject &p,kStrategy const strat
   loop
   {
     if (j<0) break;
-    if (!hasPurePower(set[j].p,strat->lastAxis,&dL,strat)) break;
+    if (!hasPurePower(&(set[j]),strat->lastAxis,&dL,strat)) break;
     j--;
   }
   return strat->posInLOld(set,j,p,strat);
 }
+
 
 /*2
 * computes the s-polynomials L[ ].p in L
@@ -827,7 +710,7 @@ void updateL(kStrategy strat)
   loop
   {
     if (j<0) break;
-    if (hasPurePower(strat->L[j].p,strat->lastAxis,&dL,strat))
+    if (hasPurePower(&(strat->L[j]),strat->lastAxis,&dL,strat))
     {
       p=strat->L[strat->Ll];
       strat->L[strat->Ll]=strat->L[j];
@@ -845,14 +728,30 @@ void updateL(kStrategy strat)
       if (pNext(strat->L[j].p) == strat->tail)
       {
         pLmFree(strat->L[j].p);    /*deletes the short spoly and computes*/
-        strat->L[j].p=ksOldCreateSpoly(strat->L[j].p1,
-                                    strat->L[j].p2,
-                                    strat->kNoether);   /*the real one*/
+        poly m1 = NULL, m2 = NULL;
+        // check that spoly creation is ok 
+        while (strat->tailRing != currRing && 
+               !kCheckSpolyCreation(&(strat->L[j]), strat, m1, m2))
+        {
+          assume(m1 == NULL && m2 == NULL);
+          // if not, change to a ring where exponents are at least
+          // large enough
+          kStratChangeTailRing(strat);
+        }
+        /* create the real one */
+        ksCreateSpoly(&(strat->L[j]), strat->kNoether, FALSE, 
+                      strat->tailRing, m1, m2, strat->R);
+
         if (!strat->honey)
           strat->initEcart(&strat->L[j]);
         else
-          strat->L[j].length = pLength(strat->L[j].p);
-        if (hasPurePower(strat->L[j].p,strat->lastAxis,&dL,strat))
+          strat->L[j].SetLength(strat->length_pLength);
+        
+        BOOLEAN pp = hasPurePower(&(strat->L[j]),strat->lastAxis,&dL,strat);
+        
+        if (strat->use_buckets) strat->L[j].PrepareRed(TRUE);
+        
+        if (pp)
         {
           p=strat->L[strat->Ll];
           strat->L[strat->Ll]=strat->L[j];
@@ -872,6 +771,7 @@ void updateL(kStrategy strat)
 void updateLHC(kStrategy strat)
 {
   int i = 0;
+  kTest_TS(strat);
   while (i <= strat->Ll)
   {
     if (pNext(strat->L[i].p) == strat->tail)
@@ -885,21 +785,38 @@ void updateLHC(kStrategy strat)
       else
       {
         pLmFree(strat->L[i].p);
-        strat->L[i].p = ksOldCreateSpoly(strat->L[i].p1,
-                                         strat->L[i].p2,
-                                         strat->kNoether);
+        poly m1 = NULL, m2 = NULL;
+        // check that spoly creation is ok 
+        while (strat->tailRing != currRing && 
+               !kCheckSpolyCreation(&(strat->L[i]), strat, m1, m2))
+        {
+          assume(m1 == NULL && m2 == NULL);
+          // if not, change to a ring where exponents are at least
+          // large enough
+          kStratChangeTailRing(strat);
+        }
+        /* create the real one */
+        ksCreateSpoly(&(strat->L[i]), strat->kNoether, FALSE, 
+                      strat->tailRing, m1, m2, strat->R);
         strat->L[i].SetpFDeg();
-        strat->L[i].ecart = pLDeg(strat->L[i].p,&strat->L[i].length)
-                           -strat->L[i].GetpFDeg();
+        strat->L[i].ecart 
+          = strat->L[i].pLDeg(strat->LDegLast) - strat->L[i].GetpFDeg();
+        if (strat->use_buckets) strat->L[i].PrepareRed(TRUE);
       }
     }
     else
-      deleteHC(&strat->L[i].p,&strat->L[i].ecart,&strat->L[i].length,strat);
-   if (strat->L[i].p == NULL)
+      deleteHC(&(strat->L[i]), strat);
+   if (strat->L[i].IsNull())
       deleteInL(strat->L,&strat->Ll,i,strat);
     else
+    {
+#ifdef KDEBUG
+      kTest_L(&(strat->L[i]), strat->tailRing, TRUE, i, strat->T, strat->tl);
+#endif
       i++;
+    }
   }
+  kTest_TS(strat);
 }
 
 /*2
@@ -913,7 +830,7 @@ void updateT(kStrategy strat)
   while (i <= strat->tl)
   {
     p = strat->T[i];
-    deleteHCs(&p,strat);
+    deleteHC(&p,strat, TRUE);
     /*- tries to cancel a unit: -*/
     cancelunit(&p);
     if (p.p != strat->T[i].p)
@@ -933,6 +850,7 @@ void firstUpdate(kStrategy strat)
 {
   if (strat->update)
   {
+    kTest_TS(strat);
     strat->update = (strat->tl == -1);
     if (TEST_OPT_WEIGHTM)
     {
@@ -950,6 +868,7 @@ void firstUpdate(kStrategy strat)
         }
       }
       pLDeg=pLDegOld;
+      kOptimizeLDeg(pFDeg, pLDeg, strat);
       if (ecartWeights)
       {
         omFreeSize((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
@@ -964,11 +883,15 @@ void firstUpdate(kStrategy strat)
     if (BTEST1(27))
       return;
     if (!BTEST1(20))        /*- take the first possible -*/
+    {
       strat->red = redFirst;
+      strat->use_buckets = kMoraUseBucket(strat);
+    }
     updateT(strat);
     strat->posInT = posInT2;
     reorderT(strat);
   }
+  kTest_TS(strat);
 }
 
 /*2
@@ -1021,6 +944,7 @@ void enterSMora (LObject p,int atS,kStrategy strat, int atR = -1)
         strat->posInLOld = strat->posInL;
         strat->posInLOldFlag = FALSE;
         strat->posInL = posInL10;
+        strat->posInLDependsOnLength = TRUE;
         updateL(strat);
         reorderL(strat);
       }
@@ -1103,10 +1027,23 @@ void initMora(ideal F,kStrategy strat)
     PrintLn();
     mflush();
   }
+  kOptimizeLDeg(pFDeg, pLDeg, strat);
 }
+
+#ifdef HAVE_ASSUME
+static int mora_count = 0;
+static int mora_loop_count;
+#endif
 
 ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 {
+#ifdef HAVE_ASSUME
+  mora_count++;
+  mora_loop_count = 0;
+#endif
+#ifdef KDEBUG
+  om_Opts.MinTrack = 5;
+#endif
   int srmax;
   int lrmax = 0;
   int olddeg = 0;
@@ -1142,15 +1079,19 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     reorderL(strat);
   }
   srmax = strat->sl;
+  kTest_TS(strat);
+  strat->use_buckets = kMoraUseBucket(strat);
   /*- compute-------------------------------------------*/
   while (strat->Ll >= 0)
   {
-    kTest_TS(strat);
+#ifdef HAVE_ASSUME
+    mora_loop_count++;
+#endif
     if (lrmax< strat->Ll) lrmax=strat->Ll; /*stat*/
     //test_int_std(strat->kIdeal);
     if (TEST_OPT_DEBUG) messageSets(strat);
     if (TEST_OPT_DEGBOUND
-    && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p)> Kstd1_deg))
+    && (strat->L[strat->Ll].ecart+strat->L[strat->Ll].GetpFDeg()> Kstd1_deg))
     {
       /*
       * stops computation if
@@ -1158,7 +1099,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       *   && upper degree is bigger than Kstd1_deg
       */
       while ((strat->Ll >= 0)
-        && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p)> Kstd1_deg)
+        && (strat->L[strat->Ll].ecart+strat->L[strat->Ll].GetpFDeg()> Kstd1_deg)
         && (strat->L[strat->Ll].p1!=NULL) && (strat->L[strat->Ll].p2!=NULL))
       {
         deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
@@ -1172,61 +1113,81 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     strat->P = strat->L[strat->Ll];/*- picks the last element from the lazyset L -*/
     if (strat->Ll==0) strat->interpt=TRUE;
     strat->Ll--;
+
+    // create the real Spoly
     if (pNext(strat->P.p) == strat->tail)
     {
-      pLmFree(strat->P.p);/*- deletes the short spoly and computes -*/
-      strat->P.p = ksOldCreateSpoly(strat->P.p1,
-                                    strat->P.p2,
-                                    strat->kNoether);/*- the real one -*/
-      if (!strat->honey)
-        strat->initEcart(&strat->P);
-      else
-        strat->P.length = pLength(strat->P.p);
+      /*- deletes the short spoly and computes -*/
+      pLmFree(strat->P.p);
+      strat->P.p = NULL;
+      poly m1 = NULL, m2 = NULL;
+      // check that spoly creation is ok 
+      while (strat->tailRing != currRing && 
+             !kCheckSpolyCreation(&(strat->P), strat, m1, m2))
+      {
+        assume(m1 == NULL && m2 == NULL);
+        // if not, change to a ring where exponents are large enough
+        kStratChangeTailRing(strat);
+      }
+      /* create the real one */
+      ksCreateSpoly(&(strat->P), strat->kNoether, strat->use_buckets, 
+                    strat->tailRing, m1, m2, strat->R);
+      if (!strat->use_buckets)
+        strat->P.SetLength(strat->length_pLength);
     }
+    else if (strat->P.p1 == NULL)
     {
-      if (TEST_OPT_PROT) message(strat->P.ecart+(strat->P.p == NULL ? 0 : pFDeg(strat->P.p)),&olddeg,&reduc,strat);
-      strat->red(&strat->P,strat);/*- reduction of the element choosen from L -*/
+      // for input polys, prepare reduction
+      strat->P.SetLength(strat->length_pLength);
+      strat->P.PrepareRed(strat->use_buckets);
     }
+    
+
+    if (TEST_OPT_PROT) 
+      message(strat->P.ecart+strat->P.GetpFDeg(),&olddeg,&reduc,strat);
+
+    strat->red(&strat->P,strat);/*- reduction of the element choosen from L -*/
+
     if (strat->P.p != NULL)
     {
+      strat->P.GetP();
       assume(strat->P.sev == 0 || strat->P.sev == pGetShortExpVector(strat->P.p));
-          if (TEST_OPT_PROT) PrintS("s");/*- statistic -*/
-          /*- enter P.p into s and b: -*/
-          if (!TEST_OPT_INTSTRATEGY)
-          {
-            pNorm(strat->P.p);
-          }
-          strat->P.p = redtail(strat->P.p,strat->sl,strat);
-          if ((!strat->noTailReduction) && (!strat->honey))
-          {
-            strat->initEcart(&strat->P);
-          }
-          if (TEST_OPT_INTSTRATEGY)
-          {
-            //pContent(strat->P.p);
-            pCleardenom(strat->P.p);// also does a pContent
-          }
-          cancelunit(&strat->P);/*- tries to cancel a unit -*/
-          enterT(strat->P,strat);
-          {
-            int pos;
-            {
-              enterpairs(strat->P.p,strat->sl,strat->P.ecart,0,strat);
-              if (strat->sl==-1)
-              {
-                pos=0;
-              }
-              else
-              {
-                pos = posInS(strat->S,strat->sl,strat->P.p);
-              }
-              strat->enterS(strat->P,pos,strat, strat->tl);
-            }
-            if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
-          }
-          kTest_TS(strat);
-          if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
-          strat->P.lcm=NULL;
+      if (TEST_OPT_PROT) PrintS("s");/*- statistic -*/
+      /*- enter P.p into s and b: -*/
+      if (!TEST_OPT_INTSTRATEGY)
+        strat->P.pNorm();
+
+      strat->P.p = redtail(strat->P.p,strat->sl,strat);
+      if (strat->redTailChange) 
+      {
+        strat->P.pLength = 0;
+        strat->P.last = NULL;
+      }
+      
+      if ((!strat->noTailReduction) && (!strat->honey))
+      {
+        strat->initEcart(&strat->P);
+      }
+      if (TEST_OPT_INTSTRATEGY)
+        strat->P.pCleardenom();
+      cancelunit(&strat->P);/*- tries to cancel a unit -*/
+      enterT(strat->P,strat);
+      int pos;
+      {
+        enterpairs(strat->P.p,strat->sl,strat->P.ecart,0,strat, strat->tl);
+        if (strat->sl==-1)
+        {
+          pos=0;
+        }
+        else
+        {
+          pos = posInS(strat->S,strat->sl,strat->P.p);
+        }
+        strat->enterS(strat->P,pos,strat, strat->tl);
+      }
+      if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
+      if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
+      strat->P.lcm=NULL;
 #ifdef KDEBUG
       memset(&strat->P,0,sizeof(strat->P));
 #endif
@@ -1249,6 +1210,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         while (strat->Ll >= 0) deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
       }
     }
+    kTest_TS(strat);
   }
   /*- complete reduction of the standard basis------------------------ -*/
   if (TEST_OPT_REDSB) completeReduce(strat);
@@ -1355,6 +1317,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
     else assume(strat->sevS[i] == pGetShortExpVector(h.p));
     h.length = pLength(h.p);
     h.sev = strat->sevS[i];
+    h.SetpFDeg();
     enterT(h,strat);
   }
   /*- compute------------------------------------------- -*/
@@ -1479,11 +1442,11 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
         {
           h.p = strat->S[j];
           h.ecart = strat->ecartS[j];
-          h.length = pLength(h.p);
+          h.pLength = h.length = pLength(h.p);
           if (strat->sevS[j] == 0) strat->sevS[j] = pGetShortExpVector(h.p);
           else assume(strat->sevS[j] == pGetShortExpVector(h.p));
           h.sev = strat->sevS[j];
-          h.length = pLength(h.p);
+          h.SetpFDeg();
           enterT(h,strat);
         }
         if (TEST_OPT_PROT) { PrintS("r"); mflush(); }
@@ -1871,4 +1834,26 @@ ideal kInterRed (ideal F, ideal Q)
   ideal shdl=strat->Shdl;
   delete(strat);
   return shdl;
+}
+
+// returns TRUE if mora should use buckets, false otherwise
+static BOOLEAN kMoraUseBucket(kStrategy strat)
+{
+  if (TEST_OPT_NOT_BUCKETS) 
+    return FALSE;
+  if (strat->red == redFirst)
+  {
+    if (strat->homog && !strat->syzComp) 
+      return TRUE;
+    else
+      return FALSE;
+  }
+  else
+  {
+    assume(strat->red == redEcart);
+    if (strat->honey && !strat->syzComp)
+      return TRUE;
+    else
+      return FALSE;
+  }
 }

@@ -6,7 +6,7 @@
  *  Purpose: template for p_Minus_m_Mult_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Minus_mm_Mult_qq__Template.cc,v 1.6 2000-11-03 14:50:21 obachman Exp $
+ *  Version: $Id: p_Minus_mm_Mult_qq__Template.cc,v 1.7 2000-11-23 17:34:11 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -17,7 +17,7 @@
  * Const:    m, q
  * 
  ***************************************************************/
-poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly spNoether, const ring r)
+poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly spNoether, const ring r, poly &last)
 {
   p_Test(p, r);
   p_Test(q, r);
@@ -104,17 +104,21 @@ poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly spNoeth
   Smaller:     
   a = pNext(a) = p;// append p to result and advance p
   pIter(p);
-  if (p == NULL) goto Finish;;
+  if (p == NULL) goto Finish;
   goto CmpTop;
  
 
   Finish: // q or p is NULL: Clean-up time
   if (q == NULL) // append rest of p to result
+  {
     pNext(a) = p;
+    if (p == NULL) last = a;
+  }
   else  // append (- m*q) to result
   {
     pSetCoeff0(m, tneg);
-    pNext(a) = r->p_Procs->pp_Mult_mm(q, m, spNoether, r);
+    last = a;
+    pNext(a) = r->p_Procs->pp_Mult_mm(q, m, shorter, spNoether, r, last);
     pSetCoeff0(m, tm);
   }
    

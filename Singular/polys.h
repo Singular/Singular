@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.45 2000-11-14 16:05:00 obachman Exp $ */
+/* $Id: polys.h,v 1.46 2000-11-23 17:34:12 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing
@@ -236,7 +236,7 @@ extern BOOLEAN  pVectorOut;
 /*-------------predicate on polys ----------------------*/
 BOOLEAN   pIsConstant(const poly p);
 BOOLEAN   pIsConstantPoly(poly p);
-int       pIsPurePower(const poly p);
+#define   pIsPurePower(p)   p_IsPurePower(p, currRing)
 #define   pIsVector(p)     (pGetComp(p)!=0)
 BOOLEAN   pHasNotCF(poly p1, poly p2);   /*has no common factor ?*/
 void      pSplit(poly p, poly * r);   /*p => IN(p), r => REST(p) */
@@ -269,6 +269,10 @@ long pLDeg0c(poly p,int *l, ring r = currRing);
 long pLDegb(poly p,int *l, ring r = currRing);
 long pLDeg1(poly p,int *l, ring r = currRing);
 long pLDeg1c(poly p,int *l, ring r = currRing);
+long pLDeg1_Deg(poly p,int *l, ring r = currRing);
+long pLDeg1c_Deg(poly p,int *l, ring r = currRing);
+long pLDeg1_Totaldegree(poly p,int *l, ring r = currRing);
+long pLDeg1c_Totaldegree(poly p,int *l, ring r = currRing);
 
 /*-------------pComp for syzygies:-------------------*/
 

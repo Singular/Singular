@@ -7,7 +7,7 @@
  *  Purpose: declaration of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.h,v 1.7 2000-11-03 14:50:22 obachman Exp $
+ *  Version: $Id: p_Procs.h,v 1.8 2000-11-23 17:34:12 obachman Exp $
  *******************************************************************/
 #ifndef P_PROCS_H
 #define P_PROCS_H
@@ -21,11 +21,13 @@ typedef poly (*p_Mult_nn_Proc_Ptr)(poly p, number n, const ring r);
 typedef poly (*pp_Mult_nn_Proc_Ptr)(poly p, number n, const ring r);
 typedef poly (*p_Mult_mm_Proc_Ptr)(poly p, poly m, const ring r);
 typedef poly (*pp_Mult_mm_Proc_Ptr)(poly p, poly m, 
-                                   poly spNoether, const ring r);
+                                    int &shorter, poly spNoether, 
+                                    const ring r, 
+                                    poly &last);
 typedef poly (*p_Add_q_Proc_Ptr)(poly p, poly q, int & shorter, const ring r);
 typedef poly (*p_Minus_mm_Mult_qq_Proc_Ptr)(poly p, poly m, poly q, 
-                                                int &shorter, poly spNoether, 
-                                                const ring r);
+                                            int &shorter, poly spNoether, 
+                                            const ring r, poly &last);
 typedef poly (*p_Neg_Proc_Ptr)(poly p, const ring r);
 typedef poly (*pp_Mult_Coeff_mm_DivSelect_Proc_Ptr)(poly p, const poly m, const ring r);
 typedef poly (*p_Merge_q_Proc_Ptr)(poly p, poly q, const ring r);

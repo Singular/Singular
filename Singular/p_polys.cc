@@ -6,7 +6,7 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_polys.cc,v 1.9 2000-11-14 16:04:59 obachman Exp $
+ *  Version: $Id: p_polys.cc,v 1.10 2000-11-23 17:34:12 obachman Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -168,11 +168,16 @@ p_SetmProc p_GetSetmProc(ring r)
 * compute the degree of the leading monomial of p
 * the ordering is compatible with degree, use a->order
 */
-long pDeg(poly a, ring r)
+inline long _pDeg(poly a, ring r)
 {
   p_LmCheckPolyRing(a, r);
   assume(p_GetOrder(a, r) == pWTotaldegree(a, r));
   return p_GetOrder(a, r);
+}
+
+long pDeg(poly a, ring r)
+{
+  return _pDeg(a, r);
 }
 
 /*2
@@ -181,10 +186,14 @@ long pDeg(poly a, ring r)
 * (all are 1 so save multiplications or they are of different signs)
 * the ordering is not compatible with degree so do not use p->Order
 */
-long pTotaldegree(poly p, ring r)
+inline long _pTotaldegree(poly p, ring r)
 {
   p_LmCheckPolyRing(p, r);
   return (long) p_ExpVectorQuerSum(p, r);
+}
+long pTotaldegree(poly p, ring r)
+{
+  return (long) _pTotaldegree(p, r);
 }
 
 // pWTotalDegree for weighted orderings 
@@ -294,10 +303,21 @@ long pLDeg0(poly p,int *l, ring r)
   Exponent_t k= p_GetComp(p, r);
   int ll=1;
 
-  while ((pNext(p)!=NULL) && (p_GetComp(pNext(p), r)==k))
+  if (k > 0)
   {
-    pIter(p);
-    ll++;
+    while ((pNext(p)!=NULL) && (p_GetComp(pNext(p), r)==k))
+    {
+      pIter(p);
+      ll++;
+    }
+  }
+  else
+  {
+     while (pNext(p)!=NULL)
+     {
+       pIter(p);
+       ll++;
+     }
   }
   *l=ll;
   return p_GetOrder(p, r);
@@ -353,9 +373,19 @@ long pLDegb(poly p,int *l, ring r)
   long o = pFDeg(p, r);
   int ll=1;
 
-  while (((p=pNext(p))!=NULL) && (p_GetComp(p, r)==k))
+  if (k != 0)
   {
-    ll++;
+    while (((p=pNext(p))!=NULL) && (p_GetComp(p, r)==k))
+    {
+      ll++;
+    }
+  }
+  else
+  {
+    while ((p=pNext(p)) !=NULL)
+    {
+      ll++;
+    }
   }
   *l=ll;
   return o;
@@ -373,12 +403,24 @@ long pLDeg1(poly p,int *l, ring r)
   int ll=1;
   long  t,max;
 
-  max=pFDeg(p);
-  while (((p=pNext(p))!=NULL) && (p_GetComp(p, r)==k))
+  max=pFDeg(p, r);
+  if (k > 0)
   {
-    t=pFDeg(p, r);
-    if (t>max) max=t;
-    ll++;
+    while (((p=pNext(p))!=NULL) && (p_GetComp(p, r)==k))
+    {
+      t=pFDeg(p, r);
+      if (t>max) max=t;
+      ll++;
+    }
+  }
+  else
+  {
+    while ((p=pNext(p))!=NULL)
+    {
+      t=pFDeg(p, r);
+      if (t>max) max=t;
+      ll++;
+    }
   }
   *l=ll;
   return max;
@@ -397,15 +439,152 @@ long pLDeg1c(poly p,int *l, ring r)
   long  t,max;
 
   max=pFDeg(p, r);
-  while ((p=pNext(p))!=NULL)
+  if (rIsSyzIndexRing(r))
   {
-    if (! rIsSyzIndexRing(r) ||
-        (p_GetComp(p, r)<=rGetCurrSyzLimit(r)))
+    long limit = rGetCurrSyzLimit(r);
+    while ((p=pNext(p))!=NULL)
     {
-       if ((t=pFDeg(p, r))>max) max=t;
-       ll++;
+      if (p_GetComp(p, r)<=limit)
+      {
+        if ((t=pFDeg(p, r))>max) max=t;
+        ll++;
+      }
+      else break;
     }
-    else break;
+  }
+  else
+  {
+    while ((p=pNext(p))!=NULL)
+    {
+      if ((t=pFDeg(p, r))>max) max=t;
+      ll++;
+    }
+  }
+  *l=ll;
+  return max;
+}
+
+// like pLDeg1, only pFDeg == Deg
+long pLDeg1_Deg(poly p,int *l, ring r)
+{
+  p_CheckPolyRing(p, r);
+  Exponent_t k= p_GetComp(p, r);
+  int ll=1;
+  long  t,max;
+
+  max=_pDeg(p, r);
+  if (k > 0)
+  {
+    while (((p=pNext(p))!=NULL) && (p_GetComp(p, r)==k))
+    {
+      t=_pDeg(p, r);
+      if (t>max) max=t;
+      ll++;
+    }
+  }
+  else
+  {
+    while ((p=pNext(p))!=NULL)
+    {
+      t=_pDeg(p, r);
+      if (t>max) max=t;
+      ll++;
+    }
+  }
+  *l=ll;
+  return max;
+}
+
+long pLDeg1c_Deg(poly p,int *l, ring r)
+{
+  p_CheckPolyRing(p, r);
+  int ll=1;
+  long  t,max;
+
+  max=_pDeg(p, r);
+  if (rIsSyzIndexRing(r))
+  {
+    long limit = rGetCurrSyzLimit(r);
+    while ((p=pNext(p))!=NULL)
+    {
+      if (p_GetComp(p, r)<=limit)
+      {
+        if ((t=_pDeg(p, r))>max) max=t;
+        ll++;
+      }
+      else break;
+    }
+  }
+  else
+  {
+    while ((p=pNext(p))!=NULL)
+    {
+      if ((t=_pDeg(p, r))>max) max=t;
+      ll++;
+    }
+  }
+  *l=ll;
+  return max;
+}
+
+// like pLDeg1, only pFDeg == pTotoalDegree
+long pLDeg1_Totaldegree(poly p,int *l, ring r)
+{
+  p_CheckPolyRing(p, r);
+  Exponent_t k= p_GetComp(p, r);
+  int ll=1;
+  long  t,max;
+
+  max=_pTotaldegree(p, r);
+  if (k > 0)
+  {
+    while (((p=pNext(p))!=NULL) && (p_GetComp(p, r)==k))
+    {
+      t=_pTotaldegree(p, r);
+      if (t>max) max=t;
+      ll++;
+    }
+  }
+  else
+  {
+    while ((p=pNext(p))!=NULL)
+    {
+      t=_pTotaldegree(p, r);
+      if (t>max) max=t;
+      ll++;
+    }
+  }
+  *l=ll;
+  return max;
+}
+
+long pLDeg1c_Totaldegree(poly p,int *l, ring r)
+{
+  p_CheckPolyRing(p, r);
+  int ll=1;
+  long  t,max;
+
+  max=_pTotaldegree(p, r);
+  if (rIsSyzIndexRing(r))
+  {
+    long limit = rGetCurrSyzLimit(r);
+    while ((p=pNext(p))!=NULL)
+    {
+      if (p_GetComp(p, r)<=limit)
+      {
+        if ((t=_pTotaldegree(p, r))>max) max=t;
+        ll++;
+      }
+      else break;
+    }
+  }
+  else
+  {
+    while ((p=pNext(p))!=NULL)
+    {
+      if ((t=_pTotaldegree(p, r))>max) max=t;
+      ll++;
+    }
   }
   *l=ll;
   return max;
@@ -531,4 +710,22 @@ BOOLEAN p_OneComp(poly p, ring r)
     }
   }
   return TRUE;
+}
+
+/*2
+*test if a monomial /head term is a pure power
+*/
+int p_IsPurePower(const poly p, const ring r)
+{
+  int i,k=0;
+
+  for (i=r->N;i;i--)
+  {
+    if (p_GetExp(p,i, r)!=0)
+    {
+      if(k!=0) return 0;
+      k=i;
+    }
+  }
+  return k;
 }

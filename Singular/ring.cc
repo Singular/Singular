@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.144 2000-11-23 14:06:50 Singular Exp $ */
+/* $Id: ring.cc,v 1.145 2000-11-23 17:34:13 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2630,8 +2630,8 @@ static void rSetOutParams(ring r)
     if (r->ShortOut)
     {
       // Hmm... sometimes (e.g., from maGetPreimage) new variables
-      // are intorduced, but their name is never set
-      // hence, do the following awkward trick
+      // are intorduced, but their names are never set
+      // hence, we do the following awkward trick
       int N = omSizeWOfAddr(r->names);
       if (r->N < N) N = r->N;
 
@@ -2706,7 +2706,7 @@ static void rSetDegStuff(ring r)
   r->MixedOrder = FALSE;
   r->ComponentOrder = 1;
   r->pFDeg = pTotaldegree;
-  r->pLDeg = (r->OrdSgn == 1 ? r->pLDeg = pLDegb : pLDeg0);
+  r->pLDeg = (r->OrdSgn == 1 ? pLDegb : pLDeg0);
 
   /*======== ordering type is (_,c) =========================*/
   if ((order[0]==ringorder_unspec) || (order[1] == 0)
@@ -2742,7 +2742,6 @@ static void rSetDegStuff(ring r)
   && (order[1]!=ringorder_M)
   &&  (order[2]==0))
   {
-    /* pLDeg = ldeg0; is standard*/
     if ((order[0]==ringorder_C)||(order[0]==ringorder_S)||
         order[0]==ringorder_s)
       r->ComponentOrder=-1;

@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.17 2000-11-13 14:50:24 levandov Exp $
+ *  Version: $Id: pInline2.h,v 1.18 2000-11-23 17:34:11 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -464,7 +464,9 @@ PINLINE2 poly pp_Mult_nn(poly p, number n, const ring r)
 // returns Copy(p)*m, does neither destroy p nor m
 PINLINE2 poly pp_Mult_mm(poly p, poly m, const ring r)
 {
-  return r->p_Procs->pp_Mult_mm(p, m, NULL, r);
+  poly last;
+  int shorter;
+  return r->p_Procs->pp_Mult_mm(p, m, shorter, NULL, r, last);
 }
 
 // returns p*m, destroys p, const: m
@@ -477,13 +479,15 @@ PINLINE2 poly p_Mult_mm(poly p, poly m, const ring r)
 PINLINE2 poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, const ring r)
 {
   int shorter;
-  return r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r);
+  poly last;
+  return r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r, last);
 }
 PINLINE2 poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
                                  poly spNoether, const ring r)
 {
   int shorter;
-  poly res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, spNoether, r);
+  poly last;
+  poly res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, spNoether, r, last);
   lp = (lp + lq) - shorter;
   return res;
 }
@@ -537,13 +541,15 @@ PINLINE2 poly p_Mult_q(poly p, poly q, const ring r)
 // returns p*q, does neither destroy p nor q
 PINLINE2 poly pp_Mult_qq(poly p, poly q, const ring r)
 {
+  poly last;
+  int shorter;
   if (p == NULL || q == NULL) return NULL;
 
   if (pNext(p) == NULL)
-    return r->p_Procs->pp_Mult_mm(q, p, NULL, r);
+    return r->p_Procs->pp_Mult_mm(q, p, shorter, NULL, r, last);
 
   if (pNext(q) == NULL)
-    return r->p_Procs->pp_Mult_mm(p, q, NULL, r);
+    return r->p_Procs->pp_Mult_mm(p, q, shorter, NULL, r, last);
 
   poly qq = q;
   if (p == q)
@@ -559,14 +565,14 @@ PINLINE2 poly pp_Mult_qq(poly p, poly q, const ring r)
 // this should be implemented more efficiently
 PINLINE2 poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, const ring r)
 {
-  poly res;
+  poly res, last;
   int shorter;
   number n_old = pGetCoeff(m);
   number n_neg = n_Copy(n_old, r);
   n_neg = n_Neg(n_neg, r);
   pSetCoeff0(m, n_neg);
 
-  res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r);
+  res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r, last);
   pSetCoeff0(m, n_old);
   n_Delete(&n_neg, r);
   return res;

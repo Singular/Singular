@@ -7,7 +7,7 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: p_polys.h,v 1.14 2000-11-14 16:05:00 obachman Exp $
+ *  Version: $Id: p_polys.h,v 1.15 2000-11-23 17:34:12 obachman Exp $
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -213,6 +213,8 @@ PINLINE2 unsigned long p_GetTotalDegree(const unsigned long l, const ring r, con
 
 // return TRUE if all monoms have the same component
 BOOLEAN   p_OneComp(poly p, ring r);
+int       p_IsPurePower(const poly p, const ring r);
+
 /***************************************************************
  *
  * Copying/Deletion of polys: args may be NULL
@@ -298,7 +300,8 @@ PINLINE0   void p_SetCompP(poly a, int i, ring r);
 PINLINE0   void p_SetCompP(poly a, int i, ring lmRing, ring tailRing);
 PINLINE0   long p_MaxComp(poly p, ring lmRing, ring tailRing);
 inline long p_MaxComp(poly p,ring lmRing) {return p_MaxComp(p,lmRing,lmRing);}
-PINLINE0   int  p_MinComp(poly p, ring r);
+PINLINE0   long p_MinComp(poly p, ring lmRing, ring tailRing);
+inline long p_MinComp(poly p,ring lmRing) {return p_MinComp(p,lmRing,lmRing);}
 
 /***************************************************************
  *
@@ -306,6 +309,8 @@ PINLINE0   int  p_MinComp(poly p, ring r);
  *
  ***************************************************************/
 PINLINE0 int       pLength(poly a);
+PINLINE0 poly      pLast(poly a, int &length);
+inline   poly      pLast(poly a) { int l; return pLast(a, l);}
 PINLINE0 poly pReverse(poly p);
 
 
@@ -345,6 +350,10 @@ long pLDeg0c(poly p,int *l, ring r);
 long pLDegb(poly p,int *l, ring r);
 long pLDeg1(poly p,int *l, ring r);
 long pLDeg1c(poly p,int *l, ring r);
+long pLDeg1_Deg(poly p,int *l, ring r);
+long pLDeg1c_Deg(poly p,int *l, ring r);
+long pLDeg1_Totaldegree(poly p,int *l, ring r);
+long pLDeg1c_Totaldegree(poly p,int *l, ring r);
 
 /***************************************************************
  *

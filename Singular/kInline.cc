@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.16 2000-11-16 09:54:49 obachman Exp $
+ *  Version: $Id: kInline.cc,v 1.17 2000-11-23 17:34:07 obachman Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -36,6 +36,8 @@ KINLINE skStrategy::skStrategy()
 #ifdef HAVE_TAIL_BIN
   tailBin = omGetStickyBinOfBin(currRing->PolyBin);
 #endif
+  pOrigFDeg = pFDeg;
+  pOrigLDeg = pLDeg;
 }
 
 KINLINE skStrategy::~skStrategy()
@@ -48,6 +50,8 @@ KINLINE skStrategy::~skStrategy()
                              currRing->PolyBin));
   if (currRing != tailRing)
     rKillModifiedRing(tailRing);
+  pLDeg = pOrigLDeg;
+  pFDeg = pOrigFDeg;
 }
 
 KINLINE TObject* skStrategy::S_2_T(int i)
@@ -283,6 +287,7 @@ KINLINE void sTObject::LmDeleteAndIter()
   {
     p = p_LmDeleteAndNext(p, currRing);
   }
+  is_normalized = FALSE;
 }
 
 
@@ -435,8 +440,26 @@ KINLINE sLObject::sLObject(poly p_in, ring c_r, ring t_r)
   Set(p_in, c_r, t_r);
 }
 
-KINLINE void sLObject::SetLmTail(poly lm, poly p_tail, int p_Length, int use_bucket, ring tailRing)
+KINLINE void sLObject::PrepareRed(BOOLEAN use_bucket)
 {
+  if (bucket == NULL)
+  {
+    int l = GetpLength();
+    if (use_bucket && l > 1)
+    {
+      poly tp = GetLmTailRing();
+      bucket = kBucketCreate(tailRing);
+      kBucketInit(bucket, pNext(tp), l-1);
+      pNext(tp) = NULL;
+      if (p != NULL) pNext(p) = NULL;
+      pLength = 0;
+    }
+  }
+}
+
+KINLINE void sLObject::SetLmTail(poly lm, poly p_tail, int p_Length, int use_bucket, ring tailRing, poly _last)
+{
+  
   Set(lm, tailRing);
   if (use_bucket)
   {
@@ -448,8 +471,10 @@ KINLINE void sLObject::SetLmTail(poly lm, poly p_tail, int p_Length, int use_buc
   else
   {
     pNext(lm) = p_tail;
-    pLength = p_Length;
+    pLength = p_Length + 1;
+    last = _last;
   }
+  
 }
 
 KINLINE void sLObject::Tail_Mult_nn(number n)
@@ -477,9 +502,11 @@ KINLINE void sLObject::Tail_Minus_mm_Mult_qq(poly m, poly q, int lq,
   {
     poly _p = (t_p != NULL ? t_p : p);
     assume(_p != NULL);
-    int dummy;
+    int shorter;
     pNext(_p) = tailRing->p_Procs->p_Minus_mm_Mult_qq(pNext(_p), m, q, 
-                                                      dummy,spNoether,tailRing);
+                                                      shorter,spNoether,
+                                                      tailRing, last);
+    pLength += lq - shorter;
   }
 }
 
@@ -492,21 +519,30 @@ KINLINE void sLObject::LmDeleteAndIter()
     if (_p == NULL)
     {
       kBucketDestroy(&bucket);
+      p = t_p = NULL;
       return;
     }
     Set(_p, tailRing);
   }
+  else
+  {
+    pLength--;
+  }
 }
 
-KINLINE void sLObject::CanonicalizeP()
+KINLINE poly sLObject::CanonicalizeP()
 {
   kTest_L(this);
+  int i = -1;
 
   if (bucket != NULL)
-    kBucketCanonicalize(bucket);
+    i = kBucketCanonicalize(bucket);
 
   if (p == NULL)
     p = k_LmInit_tailRing_2_currRing(t_p, tailRing);
+
+  if (i >= 0) pNext(p) = bucket->buckets[i];
+  return p;
 }
 
 KINLINE poly sLObject::GetP(omBin lmBin = NULL)
@@ -553,6 +589,43 @@ KINLINE void sLObject::SetShortExpVector()
   }
 }
 
+KINLINE void sLObject::Copy()
+{
+  if (bucket != NULL)
+  {
+    int i = kBucketCanonicalize(bucket);
+    kBucket_pt new_bucket = kBucketCreate(tailRing);
+    kBucketInit(new_bucket, 
+                p_Copy(bucket->buckets[i], tailRing), 
+                bucket->buckets_length[i]);
+    bucket = new_bucket;
+    if (t_p != NULL) pNext(t_p) = NULL;
+    if (p != NULL) pNext(p) = NULL;
+  }
+  TObject::Copy();
+  last = NULL;
+}
+
+KINLINE poly sLObject::CopyGetP()
+{
+  last = NULL;
+  if (bucket != NULL)
+  {
+    int i = kBucketCanonicalize(bucket);
+    poly bp = p_Copy(bucket->buckets[i], tailRing);
+    pLength = bucket->buckets_length[i] + 1;
+    if (bp != NULL)
+    {
+      assume(t_p != NULL || p != NULL);
+      if (t_p != NULL) pNext(t_p) = bp;
+      else pNext(p) = bp;
+    }
+    bucket = NULL;
+  }
+  return sLObject::GetP();
+}
+
+
 KINLINE long sLObject::pLDeg()
 {
   poly tp = GetLmTailRing();
@@ -568,6 +641,23 @@ KINLINE long sLObject::pLDeg()
   else
     return ::pLDeg(tp, &length, tailRing);
 }
+KINLINE long sLObject::pLDeg(BOOLEAN deg_last)
+{
+  if (! deg_last || bucket != NULL) return sLObject::pLDeg();
+  
+  if (last == NULL || pLength == 0) 
+    last = pLast((t_p != NULL ? t_p : p), pLength);
+#ifdef HAVE_ASSUME
+  long fdeg;
+  fdeg = ::pLDeg(GetLmTailRing(), &length, tailRing);
+  assume (pLength == length && fdeg == ::pFDeg(last, tailRing));
+  return fdeg;
+#else
+  length = pLength;
+  return ::pFDeg(last, tailRing);
+#endif
+}
+
 KINLINE long sLObject::SetDegStuffReturnLDeg()
 {
   FDeg = this->pFDeg();
@@ -575,10 +665,26 @@ KINLINE long sLObject::SetDegStuffReturnLDeg()
   ecart = d - FDeg;
   return d;
 }
-KINLINE long sLObject::SetLength()
+KINLINE long sLObject::SetDegStuffReturnLDeg(BOOLEAN use_last)
 {
-  // this can be improved
-  this->pLDeg();
+  FDeg = this->pFDeg();
+  long d = this->pLDeg(use_last);
+  ecart = d - FDeg;
+  return d;
+}
+KINLINE int sLObject::GetpLength()
+{
+  if (bucket == NULL) 
+    return sTObject::GetpLength();
+  int i = kBucketCanonicalize(bucket);
+  return bucket->buckets_length[i] + 1;
+}
+KINLINE int sLObject::SetLength(BOOLEAN length_pLength)
+{
+  if (length_pLength) 
+    length = this->GetpLength();
+  else
+    this->pLDeg();
   return length;
 }
 KINLINE long sLObject::MinComp()

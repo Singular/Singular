@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.19 2000-11-14 16:04:53 obachman Exp $ */
+/* $Id: kspoly.cc,v 1.20 2000-11-23 17:34:08 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -100,9 +100,7 @@ int ksReducePoly(LObject* PR,
   
   
   // and finally, 
-  PR->Tail_Minus_mm_Mult_qq(lm, t2, 
-                            (PR->bucket != NULL ? PW->GetpLength() - 1 : 0), 
-                            spNoether);
+  PR->Tail_Minus_mm_Mult_qq(lm, t2, PW->GetpLength() - 1, spNoether);
   PR->LmDeleteAndIter();
   return ret;
 }
@@ -120,6 +118,7 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   kTest_L(Pair);
   poly p1 = Pair->p1;
   poly p2 = Pair->p2;
+  poly last;
   Pair->tailRing = tailRing;
   
   assume(p1 != NULL);
@@ -130,7 +129,7 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   number lc1 = pGetCoeff(p1), lc2 = pGetCoeff(p2);
   int co=0, ct = ksCheckCoeff(&lc1, &lc2);
 
-  int l1=0, l2=0;
+  int l1=0, l2=0, shorter=0;
   
   if (p_GetComp(p1, currRing)!=p_GetComp(p2, currRing))
   {
@@ -154,15 +153,15 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   pSetCoeff0(m1, lc2);
   pSetCoeff0(m2, lc1);  // and now, m1 * LT(p1) == m2 * LT(p2)
 
-  if (use_buckets && R != NULL)
+  if (R != NULL)
   {
-    l1 = (R[Pair->i_r1])->pLength - 1;
-    l2 = (R[Pair->i_r2])->pLength - 1;
+    l1 = (R[Pair->i_r1])->GetpLength() - 1;
+    l2 = (R[Pair->i_r2])->GetpLength() - 1;
   }
   
   // get m2 * a2
-  a2 = tailRing->p_Procs->pp_Mult_mm(a2, m2, spNoether, tailRing);
-  Pair->SetLmTail(m2, a2, l2, use_buckets, tailRing);
+  a2 = tailRing->p_Procs->pp_Mult_mm(a2, m2, shorter,spNoether,tailRing,last);
+  Pair->SetLmTail(m2, a2, l2-shorter, use_buckets, tailRing, last);
 
   // get m2*a2 - m1*a1
   Pair->Tail_Minus_mm_Mult_qq(m1, a1, l1, spNoether);
@@ -207,6 +206,7 @@ int ksReducePolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
   TObject With(PW, Lp == Save);
   number coef;
 
+  pAssume(!pHaveCommonMonoms(Red.p, With.p));
   ret = ksReducePoly(&Red, &With, spNoether, &coef);
   
   if (!ret)

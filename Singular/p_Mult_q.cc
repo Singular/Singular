@@ -6,7 +6,7 @@
  *  Purpose: multiplication of polynomials
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Mult_q.cc,v 1.5 2000-09-18 09:19:26 obachman Exp $
+ *  Version: $Id: p_Mult_q.cc,v 1.6 2000-11-23 17:34:11 obachman Exp $
  *******************************************************************/
 #include "mod2.h"
 
@@ -94,49 +94,3 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
   return res;
 }
 
-#if 0
-poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
-{
-  pAssume (p != NULL && pNext(p) != NULL && q != NULL && pNext(q) != NULL);
-  
-  // to minimize the number of polynomial comparisons
-  // we reverse p and should arrange p and q such that
-  // pLast(p)*pHead(q) > pHead(p)*pLast(q)
-  // as a first approximation, we just compare the head terms
-#if 0  
-  if (p_LmCmp(p, q, r) == -1)
-  {
-    poly tmp = q;
-    q = p;
-    p = tmp;
-  }
-  p = r->p_Procs->p_ReverseNeg(p, r);
-#endif
-
-  poly pp = p;
-  int shorter;
-  p_Minus_mm_Mult_qq_Proc_Ptr p_minus_mm_mult_qq 
-    =  r->p_Procs->p_Minus_mm_Mult_qq;
-  poly pr = NULL;
-
-  while (pp != NULL)
-  {
-    pr = p_minus_mm_mult_qq(pr, pp, q, shorter, NULL, r);
-    pIter(pp);
-  }
-  
-  if (copy)
-  {
-    r->p_Procs->p_ReverseNeg(p, r);
-  }
-  else
-  {
-    r->p_Procs->p_Delete(&q, r);
-    r->p_Procs->p_Delete(&p, r);
-  }
-  return pr;
-}
-
-  
-  
-#endif

@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly Level 0 functions
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline0.h,v 1.4 2000-11-08 15:34:59 obachman Exp $
+ *  Version: $Id: pInline0.h,v 1.5 2000-11-23 17:34:11 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE0_H
 #define PINLINE0_H
@@ -40,19 +40,21 @@ PINLINE0 void p_SetCompP(poly p, int i, ring lmRing, ring tailRing)
   }
 }
 
-
 // returns minimal column number in the modul element a (or 0)
-PINLINE0 int p_MinComp(poly p, ring r)
+PINLINE0 long p_MinComp(poly p, ring lmRing, ring tailRing)
 {
-  int result,i;
+  long result,i;
 
   if(p==NULL) return 0;
-  result = p_GetComp(p,r);
-  while (pNext(p)!=NULL)
+  result = p_GetComp(p,lmRing);
+  if (result != 0)
   {
-    pIter(p);
-    i = p_GetComp(p,r);
-    if (i<result) result = i;
+    while (pNext(p)!=NULL)
+    {
+      pIter(p);
+      i = p_GetComp(p,tailRing);
+      if (i<result) result = i;
+    }
   }
   return result;
 }
@@ -60,15 +62,18 @@ PINLINE0 int p_MinComp(poly p, ring r)
 // returns maximal column number in the modul element a (or 0)
 PINLINE0 long p_MaxComp(poly p, ring lmRing, ring tailRing)
 {
-  int result,i;
+  long result,i;
 
   if(p==NULL) return 0;
   result = p_GetComp(p, lmRing);
-  while (pNext(p)!=NULL)
+  if (result != 0) 
   {
-    pIter(p);
-    i = p_GetComp(p, tailRing);
-    if (i>result) result = i;
+    while (pNext(p)!=NULL)
+    {
+      pIter(p);
+      i = p_GetComp(p, tailRing);
+      if (i>result) result = i;
+    }
   }
   return result;
 }
@@ -110,6 +115,25 @@ PINLINE0 int pLength(poly a)
     l++;
   }
   return l;
+}
+
+/*2
+* returns the length of a (numbers of monomials)
+*/
+PINLINE0 poly pLast(poly a, int &l)
+{
+  if (a == NULL) 
+  {
+    l = 0;
+    return NULL;
+  }
+  l = 1;
+  while (pNext(a)!=NULL)
+  {
+    pIter(a);
+    l++;
+  }
+  return a;
 }
 
 #endif // PINLINE_CC
