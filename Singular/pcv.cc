@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.3 1998-11-12 13:34:48 hannes Exp $ */
+/* $Id: pcv.cc,v 1.4 1998-11-18 13:00:12 mschulze Exp $ */
 /*
 * ABSTRACT: conversion between polys and coeff vectors
 */
@@ -305,7 +305,7 @@ BOOLEAN iiPcvConv(leftv res, leftv h)
     int i0=0,i1;
     short* w=(short*)Alloc(currRing->N*sizeof(short));
     BOOLEAN defi1=FALSE,defw=FALSE;
-    while(hh!=NULL)
+    while(hh)
     {
       if(hh->Typ()==INT_CMD)
       {
@@ -365,9 +365,9 @@ BOOLEAN iiPcvConv(leftv res, leftv h)
 /*2
 * interface to interpreter
 */
-BOOLEAN iiPcvBasis(leftv res, leftv h)
+BOOLEAN iiPcvDim(leftv res, leftv h)
 {
-  if(currRingHdl==NULL)
+  if(!currRingHdl)
   {
     WerrorS("no ring active");
     return TRUE;
@@ -375,7 +375,66 @@ BOOLEAN iiPcvBasis(leftv res, leftv h)
   int i0=0,i1;
   short* w=(short*)Alloc(currRing->N*sizeof(short));
   BOOLEAN defi1=FALSE,defw=FALSE;
-  while(h!=NULL)
+  while(h)
+  {
+    if(h->Typ()==INT_CMD)
+    {
+      if(defi1)
+      {
+        i0=i1;
+        i1=(int)h->Data();
+      }
+      else
+      {
+        i1=(int)h->Data();
+        defi1=TRUE;
+      }
+    }
+    else
+    if(h->Typ()==INTVEC_CMD)
+    {
+      intvec *iv=(intvec*)h->Data();
+      if(iv->rows()==currRing->N&&iv->cols()==1)
+      {
+        int i;
+        for(i=0;i<currRing->N;i++) w[i]=(*iv)[i];
+        defw=TRUE;
+      }
+    }
+    h=h->next;
+  }
+  if(!defw)
+  {
+    int i;
+    for(i=0;i<currRing->N;i++) w[i]=1;
+  }
+  if(defi1)
+  {
+    // "pcvDim"[,<int d0>],<int d1>[,<intvec w>]:
+    // number of monomials m with d0<=w-deg(m)<d1
+    res->rtyp=INT_CMD;
+    res->data=(void*)pcvDimW(i0,i1,w);
+    return FALSE;
+  }
+  Free((ADDRESS)w,(currRing->N)*sizeof(short));
+  WerrorS("[<int>],<int>[,<intvec>] expected");
+  return TRUE;
+}
+
+/*2
+* interface to interpreter
+*/
+BOOLEAN iiPcvBasis(leftv res, leftv h)
+{
+  if(!currRingHdl)
+  {
+    WerrorS("no ring active");
+    return TRUE;
+  }
+  int i0=0,i1;
+  short* w=(short*)Alloc(currRing->N*sizeof(short));
+  BOOLEAN defi1=FALSE,defw=FALSE;
+  while(h)
   {
     if(h->Typ()==INT_CMD)
     {

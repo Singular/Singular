@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: pcv.h,v 1.1 1998-11-12 13:06:12 Singular Exp $ */
+/* $Id: pcv.h,v 1.2 1998-11-18 13:00:12 mschulze Exp $ */
 /*
 * ABSTRACT: conversion between polys and coeff vectors
 */
@@ -24,8 +24,9 @@ int pcvDimW(int d0,int d1,short w[]);
 int pcvDegBasisW(ideal I,int i,poly m,int d,int j,short w[]);
 ideal pcvBasisW(int d0,int d1,short w[]);
 
-// interface to interpreter:
+// interface to interpreter
 BOOLEAN iiPcvConv(leftv res, leftv h);
+BOOLEAN iiPcvDim(leftv res, leftv h);
 BOOLEAN iiPcvBasis(leftv res, leftv h);
 BOOLEAN iiPcvOrd(leftv res, leftv h);
 
