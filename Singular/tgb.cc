@@ -106,10 +106,9 @@ static int monom_poly_crit(const void* ap1, const void* ap2){
   p2=((monom_poly*)ap2);
   if(p1->f>p2->f) return 1;
   if(p1->f<p2->f) return -1;  
-  int c=pLmCmp(p1->f,p2->f);
-  if (c !=0) return c;
-  c=pLmCmp(p1->m,p2->m);
-  return c;
+
+  return pLmCmp(p1->m,p2->m);
+ 
 }
 static int pLmCmp_func(const void* ap1, const void* ap2){
     poly p1,p2;
@@ -2774,17 +2773,17 @@ static void go_on_F4 (calc_dat* c){
   int F_minus_index=0;
 
   //better algorithm replace p by its monoms, qsort,delete duplicates and binary search for testing if monom is contained in array
- 
+  qsort(p, p_index,sizeof(poly),pLmCmp_func);
+  for(i=0;i<p_index;i++)
+    pDelete(&p[i]->next);
   for(i=m_index-1;i>=0;--i)
   {
     int j;
+    int pos=posInPolys (p,p_index, m[i],c);
     BOOLEAN minus=FALSE;
-    for(j=0;j<p_index;j++)
-      if (pLmEqual(p[j],m[i]))
-      {
-	minus=TRUE;
-	break;
-      }
+    if(((p_index>pos)&&(pLmEqual(m[i],p[pos]))) ||(pos>0) &&(pLmEqual(m[i],p[pos-1])))
+      minus=TRUE;
+   
     if(minus)
     {
       F_minus[F_minus_index++]=m[i];
@@ -2796,6 +2795,28 @@ static void go_on_F4 (calc_dat* c){
       m[i]=NULL;
     }
   }
+
+//   for(i=m_index-1;i>=0;--i)
+//   {
+//     int j;
+//     BOOLEAN minus=FALSE;
+//     for(j=0;j<p_index;j++)
+//       if (pLmEqual(p[j],m[i]))
+//       {
+// 	minus=TRUE;
+// 	break;
+//       }
+//     if(minus)
+//     {
+//       F_minus[F_minus_index++]=m[i];
+//       m[i]=NULL;
+//     }
+//     else
+//     {
+//       F_plus[F_plus_index++]=m[i];
+//       m[i]=NULL;
+//     }
+//   }
   //in this order F_minus will be automatically ascending sorted
   //to make this sure for foreign gauss
   //uncomment the following line
