@@ -1,14 +1,24 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: imm.h,v 1.0 1996-05-17 10:59:41 stobbe Exp $
+// $Id: imm.h,v 1.1 1997-03-27 10:00:31 schmidt Exp $
 
 #ifndef INCL_IMMEDIATE_H
 #define INCL_IMMEDIATE_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:41  stobbe
+Initial revision
+
 */
 
+#ifndef NOSTREAMIO
+#include <iostream.h>
+#endif /* NOSTREAMIO */
+
+#include "assert.h"
+
 #include "cf_defs.h"
+
 #include "cf_globals.h"
 #include "ffops.h"
 #include "gfops.h"
@@ -306,6 +316,7 @@ inline InternalCF * imm_neg_gf ( const InternalCF * const op )
     return int2imm_gf( gf_neg( imm2int( op ) ) );
 }
 
+#ifndef NOSTREAMIO
 inline void imm_print ( ostream & os, const InternalCF * const op, const char * const str )
 {
     if ( is_imm( op ) == FFMARK )
@@ -320,6 +331,7 @@ inline void imm_print ( ostream & os, const InternalCF * const op, const char * 
     else
 	os << imm2int( op ) << str;
 }
+#endif /* NOSTREAMIO */
 
 inline int imm_intval ( const InternalCF* const op )
 {
@@ -335,7 +347,7 @@ inline int imm_intval ( const InternalCF* const op )
     else
 	return imm2int( op );
 }
-	
+
 inline int imm_sign ( const InternalCF * const op )
 {
     if ( imm2int( op ) == 0 )
@@ -355,6 +367,6 @@ inline int imm_sign ( const InternalCF * const op )
     else
 	return -1;
 }
-	
+
 
 #endif

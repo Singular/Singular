@@ -1,16 +1,22 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: gfops.h,v 1.0 1996-05-17 10:59:40 stobbe Exp $
+// $Id: gfops.h,v 1.1 1997-03-27 09:59:25 schmidt Exp $
 
 #ifndef INCL_GFOPS_H
 #define INCL_GFOPS_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:40  stobbe
+Initial revision
+
 */
 
+#ifndef NOSTREAMIO
 #include <iostream.h>
+#endif /* NOSTREAMIO */
 
 #include "assert.h"
+
 #include "cf_defs.h"
 
 extern int gf_q;
@@ -137,6 +143,7 @@ inline int gf_inv ( int a )
     return gf_q1 - a;
 }
 
+#ifndef NOSTREAMIO
 inline void gf_print ( ostream & os, int a )
 {
     if ( a == gf_q )
@@ -148,6 +155,7 @@ inline void gf_print ( ostream & os, int a )
     else
 	os << gf_name << "^" << a;
 }
+#endif /* NOSTREAMIO */
 
 inline int gf_power ( int a, int n )
 {
@@ -166,4 +174,3 @@ int gf_gf2ff ( int a );
 bool gf_isff ( int a );
 
 #endif /* INCL_GFOPS_H */
-
