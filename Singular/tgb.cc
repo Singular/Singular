@@ -38,7 +38,7 @@ sorted_pair_node**  merge(sorted_pair_node** p, int pn,sorted_pair_node **q, int
 
   int lastpos=0;
   for(i=0;i<qn;i++){
-    lastpos=posInPairs(p,pn-1,q[i],c, max(lastpos-1,0));
+    lastpos=posInPairs(p,pn,q[i],c, max(lastpos-1,0));
     //   cout<<lastpos<<"\n";
     a[i]=lastpos;
 
