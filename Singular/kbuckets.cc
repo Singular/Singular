@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.15 2000-09-12 16:00:58 obachman Exp $ */
+/* $Id: kbuckets.cc,v 1.16 2000-09-14 13:04:36 obachman Exp $ */
 
 #include "mod2.h"
 #include "tok.h"
@@ -38,48 +38,42 @@ inline unsigned int pLogLength(poly p)
 
 #if defined(PDEBUG) && ! defined(HAVE_PSEUDO_BUCKETS)
 
-#define kbTests(bucket) kbDBTests(bucket, __FILE__, __LINE__)
-#define kbTest(bucket, i) kbDBTest(bucket, i, __FILE__, __LINE__)
-
-void kbDBTest(kBucket_pt bucket, int i, char* file, int line)
+void kbTest(kBucket_pt bucket, int i)
 {
-  if (pDBTest(bucket->buckets[i], file, line))
+  if (_p_Test(bucket->buckets[i], bucket->bucket_ring, PDEBUG))
   {
     if (bucket->buckets_length[i] != pLength(bucket->buckets[i]))
     {
-      Warn("Bucket %d lengths difference should:%d has:%d in %s:%d",
-            i, bucket->buckets_length[i], pLength(bucket->buckets[i]),
-            file, line);
-      assume(0);
+      dReportError("Bucket %d lengths difference should:%d has:%d",
+                   i, bucket->buckets_length[i], pLength(bucket->buckets[i]));
     }
     else if (i > 0 && (int) pLogLength(bucket->buckets_length[i]) > i)
     {
-      Warn("Bucket %d too long %d in %s:%d",
-            i, bucket->buckets_length[i], file, line);
-      assume(0);
+      dReportError("Bucket %d too long %d",
+                   i, bucket->buckets_length[i]);
     }
   }
   if (i==0 && bucket->buckets_length[0] > 1)
   {
-    Warn("Bucket 0 too long");
+    dReportError("Bucket 0 too long");
   }
 }
 
 
-void kbDBTests(kBucket_pt bucket, char* file, int line)
+void kbTests(kBucket_pt bucket)
 {
   int i;
   poly lm = bucket->buckets[0];
 
-  kbDBTest(bucket, 0, file, line);
+  omCheckAddrBin(bucket, kBucket_bin);
+  kbTest(bucket, 0);
   for (i=1; i<= (int) bucket->buckets_used; i++)
   {
-    kbDBTest(bucket, i, file, line);
+    kbTest(bucket, i);
     if (lm != NULL &&  bucket->buckets[i] != NULL
         && pLmCmp(lm, bucket->buckets[i]) != 1)
     {
-      Warn("Bucket %d larger than lm in %s:%d", i, file, line);
-      assume(0);
+      dReportError("Bucket %d larger than lm", i);
     }
   }
 
@@ -87,8 +81,7 @@ void kbDBTests(kBucket_pt bucket, char* file, int line)
   {
     if (bucket->buckets[i] != NULL || bucket->buckets_length[i] != 0)
     {
-      Warn("Bucket %d not zero in %s:%d", i, file, line);
-      assume(0);
+      dReportError("Bucket %d not zero", i);
     }
   }
 }

@@ -6,13 +6,15 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.1 2000-09-12 16:01:04 obachman Exp $
+ *  Version: $Id: pInline1.h,v 1.2 2000-09-14 13:04:38 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H
 
+#ifndef PDIV_DEBUG
 // define to enable debugging/statistics of pShortDivisibleBy
 #undef PDIV_DEBUG
+#endif
 
 #include "mod2.h"
 #include "structs.h"
@@ -48,10 +50,9 @@ BOOLEAN pDebugShortDivisibleBy(poly p1, unsigned long sev_1, ring r_1,
 
 #include "omalloc.h"
 #include "numbers.h"
-#include "pInline2.h"
+#include "polys.h"
 #include "p_MemAdd.h"
 #include "p_MemCopy.h"
-#include "polys.h"
 
 /***************************************************************
  *
@@ -60,7 +61,7 @@ BOOLEAN pDebugShortDivisibleBy(poly p1, unsigned long sev_1, ring r_1,
  ***************************************************************/
 PINLINE1 poly p_Init(ring r)
 {
-  p_CheckRing(r);
+  p_CheckRing1(r);
   poly p;
   omTypeAlloc0Bin(poly, p, r->PolyBin);
   p_SetRingOfPoly(p, r);
@@ -68,7 +69,7 @@ PINLINE1 poly p_Init(ring r)
 }
 PINLINE1 poly p_Init(poly p, ring r)
 {
-  p_CheckPolyRing(p, r);
+  p_CheckPolyRing1(p, r);
   poly np;
   omTypeAllocBin(poly, np, r->PolyBin);
   p_ExpVectorCopy(np, p, r);
@@ -87,7 +88,7 @@ PINLINE1 poly pInit(poly p)
 PINLINE1 poly p_Head(poly p, ring r)
 {
   if (p == NULL) return NULL;
-  p_CheckPolyRing(p, r);
+  p_CheckPolyRing1(p, r);
   poly np;
   omTypeAllocBin(poly, np, r->PolyBin);
   p_ExpVectorCopy(np, p, r);
@@ -104,19 +105,19 @@ PINLINE1 poly p_Head(poly p, ring r)
 // ExpVextor(d_p) = ExpVector(s_p)
 PINLINE1 void p_ExpVectorCopy(poly d_p, poly s_p, ring r)
 {
-  p_CheckPolyRing(d_p, r);
-  p_CheckPolyRing(s_p, r);
+  p_CheckPolyRing1(d_p, r);
+  p_CheckPolyRing1(s_p, r);
   p_MemCopy_LengthGeneral(d_p->exp, s_p->exp, r->ExpLSize);
 }
 // ExpVector(p1) += ExpVector(p2)
 PINLINE1 void p_ExpVectorAdd(poly p1, poly p2, ring r)
 {
-  p_CheckPolyRing(p1, r);
-  p_CheckPolyRing(p2, r);
-#if PDEBUG >= 2
+  p_CheckPolyRing1(p1, r);
+  p_CheckPolyRing1(p2, r);
+#if PDEBUG >= 1
   for (int i=1; i<=r->N; i++)
-    passume2((unsigned long) (p_GetExp(p1, i, r) + p_GetExp(p2, i, r)) <= r->bitmask);
-  passume2(!rRing_has_Comp(r) || p_GetComp(p1, r) == 0 || p_GetComp(p2, r) == 0);
+    pAssume1((unsigned long) (p_GetExp(p1, i, r) + p_GetExp(p2, i, r)) <= r->bitmask);
+  pAssume1(p_GetComp(p1, r) == 0 || p_GetComp(p2, r) == 0);
 #endif 
  
   p_MemAdd_LengthGeneral(p1->exp, p2->exp, r->ExpLSize);
@@ -124,12 +125,13 @@ PINLINE1 void p_ExpVectorAdd(poly p1, poly p2, ring r)
 // ExpVector(p1) -= ExpVector(p2)
 PINLINE1 void p_ExpVectorSub(poly p1, poly p2, ring r)
 {
-  p_CheckPolyRing(p1, r);
-  p_CheckPolyRing(p2, r);
-#if PDEBUG >= 2
+  p_CheckPolyRing1(p1, r);
+  p_CheckPolyRing1(p2, r);
+#if PDEBUG >= 1
   for (int i=1; i<=r->N; i++)
-    passume2(p_GetExp(p1, i, r) >= p_GetExp(p2, i, r));
-  passume2(!rRing_has_Comp(r) || p_GetComp(p1, r) == p_GetComp(p2, r));
+    pAssume1(p_GetExp(p1, i, r) >= p_GetExp(p2, i, r));
+  pAssume1(p_GetComp(p1, r) == 0 || p_GetComp(p2, r) == 0 ||
+          p_GetComp(p1, r) == p_GetComp(p2, r));
 #endif 
  
   p_MemSub_LengthGeneral(p1->exp, p2->exp, r->ExpLSize);
@@ -137,13 +139,13 @@ PINLINE1 void p_ExpVectorSub(poly p1, poly p2, ring r)
 // ExpVector(pr) = ExpVector(p1) + ExpVector(p2)
 PINLINE1 void p_ExpVectorSum(poly pr, poly p1, poly p2, ring r)
 {
-  p_CheckPolyRing(p1, r);
-  p_CheckPolyRing(p2, r);
-  p_CheckPolyRing(pr, r);
-#if PDEBUG >= 2
+  p_CheckPolyRing1(p1, r);
+  p_CheckPolyRing1(p2, r);
+  p_CheckPolyRing1(pr, r);
+#if PDEBUG >= 1
   for (int i=1; i<=r->N; i++)
-    passume2((unsigned long) (p_GetExp(p1, i, r) + p_GetExp(p2, i, r)) <= r->bitmask);
-  passume2(!rRing_has_Comp(r) || p_GetComp(p1, r) == 0 || p_GetComp(p2, r) == 0);
+    pAssume1((unsigned long) (p_GetExp(p1, i, r) + p_GetExp(p2, i, r)) <= r->bitmask);
+  pAssume1(p_GetComp(p1, r) == 0 || p_GetComp(p2, r) == 0);
 #endif  
 
   p_MemSum_LengthGeneral(pr->exp, p1->exp, p2->exp, r->ExpLSize);
@@ -151,13 +153,13 @@ PINLINE1 void p_ExpVectorSum(poly pr, poly p1, poly p2, ring r)
 // ExpVector(pr) = ExpVector(p1) - ExpVector(p2)
 PINLINE1 void p_ExpVectorDiff(poly pr, poly p1, poly p2, ring r)
 {
-  p_CheckPolyRing(p1, r);
-  p_CheckPolyRing(p2, r);
-  p_CheckPolyRing(pr, r);
+  p_CheckPolyRing1(p1, r);
+  p_CheckPolyRing1(p2, r);
+  p_CheckPolyRing1(pr, r);
 #if PDEBUG >= 2
   for (int i=1; i<=r->N; i++)
-    passume2(p_GetExp(p1, i, r) >= p_GetExp(p2, i, r));
-  passume2(!rRing_has_Comp(r) || p_GetComp(p1, r) == p_GetComp(p2, r));
+    pAssume1(p_GetExp(p1, i, r) >= p_GetExp(p2, i, r));
+  pAssume1(!rRing_has_Comp(r) || p_GetComp(p1, r) == p_GetComp(p2, r));
 #endif 
  
   p_MemDiff_LengthGeneral(pr->exp, p1->exp, p2->exp, r->ExpLSize);
@@ -165,8 +167,8 @@ PINLINE1 void p_ExpVectorDiff(poly pr, poly p1, poly p2, ring r)
 
 PINLINE1 BOOLEAN p_ExpVectorEqual(poly p1, poly p2, ring r)
 {
-  p_CheckPolyRing(p1, r);
-  p_CheckPolyRing(p2, r);
+  p_CheckPolyRing1(p1, r);
+  p_CheckPolyRing1(p2, r);
  
   int i = r->ExpLSize;
   unsigned long *ep = p1->exp;
@@ -183,7 +185,7 @@ PINLINE1 BOOLEAN p_ExpVectorEqual(poly p1, poly p2, ring r)
 
 PINLINE1 unsigned long p_ExpVectorQuerSum(poly p, ring r)
 {
-  p_CheckPolyRing(p, r);
+  p_CheckPolyRing1(p, r);
   unsigned long s = 0;
   unsigned long i = r->N;
   
@@ -198,7 +200,7 @@ PINLINE1 unsigned long p_ExpVectorQuerSum(poly p, ring r)
 
 PINLINE1 void p_GetExpV(poly p, Exponent_t *ev, ring r)
 {
-  p_CheckPolyRing(p, r);
+  p_CheckPolyRing1(p, r);
   for (int j = r->N; j; j--)
       ev[j] = p_GetExp(p, j, r);
 
@@ -206,7 +208,7 @@ PINLINE1 void p_GetExpV(poly p, Exponent_t *ev, ring r)
 }
 PINLINE1 void p_SetExpV(poly p, Exponent_t *ev, ring r)
 {
-  p_CheckPolyRing(p, r);
+  p_CheckPolyRing1(p, r);
   for (int j = r->N; j; j--)
       p_SetExp(p, j, ev[j], r);
 
@@ -221,8 +223,8 @@ PINLINE1 void p_SetExpV(poly p, Exponent_t *ev, ring r)
  ***************************************************************/
 PINLINE1 int p_LmCmp(poly p, poly q, ring r)
 {
-  p_CheckPolyRing(p, r);
-  p_CheckPolyRing(q, r);
+  p_CheckPolyRing1(p, r);
+  p_CheckPolyRing1(q, r);
 
   p_MemCmp_LengthGeneral_OrdGeneral(p->exp, q->exp, r->pCompLSize, r->ordsgn, 
                                     return 0, return 1, return -1);
@@ -230,8 +232,8 @@ PINLINE1 int p_LmCmp(poly p, poly q, ring r)
 
 PINLINE1 BOOLEAN p_LmEqual(poly p, poly q, ring r)
 {
-  p_CheckPolyRing(p, r);
-  p_CheckPolyRing(q, r);
+  p_CheckPolyRing1(p, r);
+  p_CheckPolyRing1(q, r);
   int i = r->ExpLSize;
   unsigned long *ep = p->exp;
   unsigned long *eq = q->exp;
@@ -266,7 +268,7 @@ static inline BOOLEAN _p_DivisibleBy2(poly a, poly b, ring r)
 static inline BOOLEAN _p_DivisibleBy2(poly a, ring r_a, poly b, ring r_b)
 {
   int i=r_a->N;
-  passume1(r_a->N == r_b->N);
+  pAssume1(r_a->N == r_b->N);
 
   do
   {
@@ -277,24 +279,37 @@ static inline BOOLEAN _p_DivisibleBy2(poly a, ring r_a, poly b, ring r_b)
   while (i);
   return TRUE;
 }
+static inline BOOLEAN _p_DivisibleBy1(poly a, poly b, ring r)
+{
+  if (p_GetComp(a, r) == 0 || p_GetComp(a,r) == p_GetComp(b,r))
+    return _p_DivisibleBy2(a, b, r);
+  return FALSE;
+}
+static inline BOOLEAN _p_DivisibleBy1(poly a, ring r_a, poly b, ring r_b)
+{
+  if (p_GetComp(a, r_a) == 0 || p_GetComp(a,r_a) == p_GetComp(b,r_b))
+    return _p_DivisibleBy2(a, r_a, b, r_b);
+  return FALSE;
+}
+
 PINLINE1 BOOLEAN p_DivisibleBy2(poly a, poly b, ring r)
 {
-  p_CheckPolyRing(a, r);
-  p_CheckPolyRing(b, r);
+  p_CheckPolyRing1(a, r);
+  p_CheckPolyRing1(b, r);
   return _p_DivisibleBy2(a, b, r);
 }
 PINLINE1 BOOLEAN p_DivisibleBy1(poly a, poly b, ring r)
 {
-  p_CheckPolyRing(b, r);
-  p_CheckIf(a != NULL, p_CheckPolyRing(b, r));
+  p_CheckPolyRing1(b, r);
+  pIfThen1(a != NULL, p_CheckPolyRing1(b, r));
   if (p_GetComp(a, r) == 0 || p_GetComp(a,r) == p_GetComp(b,r))
     return _p_DivisibleBy2(a, b, r);
   return FALSE;
 }
 PINLINE1 BOOLEAN p_DivisibleBy(poly a, poly b, ring r)
 {
-  p_CheckPolyRing(b, r);
-  p_CheckIf(a!=NULL, p_CheckPolyRing(a, r));
+  p_CheckPolyRing1(b, r);
+  pIfThen1(a!=NULL, p_CheckPolyRing1(a, r));
   
   if (a != NULL && (p_GetComp(a, r) == 0 || p_GetComp(a,r) == p_GetComp(b,r)))
     return _p_DivisibleBy2(a,b,r);
@@ -304,20 +319,40 @@ PINLINE1 BOOLEAN p_DivisibleBy(poly a, poly b, ring r)
 PINLINE1 BOOLEAN p_ShortDivisibleBy(poly a, unsigned long sev_a, 
                                     poly b, unsigned long not_sev_b, ring r)
 {
-  p_CheckPolyRing(a, r);
-  p_CheckPolyRing(b, r);
+  p_CheckPolyRing1(a, r);
+  p_CheckPolyRing1(b, r);
 #ifndef PDIV_DEBUG
-  passume2(p_GetShortExpVector(a, r) == sev_a);
-  passume2(p_GetShortExpVector(b, r) == ~ not_sev_b);
+  _pPolyAssume2(p_GetShortExpVector(a, r) == sev_a, a, r);
+  _pPolyAssume2(p_GetShortExpVector(b, r) == ~ not_sev_b, b, r);
   
   if (sev_a & not_sev_b) 
   {
-    passume2(p_DivisibleBy2(a, b, r) == FALSE);
+    pAssume1(p_DivisibleBy2(a, b, r) == FALSE);
     return FALSE;
   }
   return p_DivisibleBy1(a, b, r);
 #else
   return pDebugShortDivisibleBy(a, sev_a, r, b, not_sev_b, r);
+#endif
+}
+
+PINLINE1 BOOLEAN p_ShortDivisibleBy(poly a, unsigned long sev_a, ring r_a,
+                                    poly b, unsigned long not_sev_b, ring r_b)
+{
+  p_CheckPolyRing1(a, r_a);
+  p_CheckPolyRing1(b, r_b);
+#ifndef PDIV_DEBUG
+  _pPolyAssume2(p_GetShortExpVector(a, r_a) == sev_a, a, r_a);
+  _pPolyAssume2(p_GetShortExpVector(b, r_b) == ~ not_sev_b, b, r_b);
+  
+  if (sev_a & not_sev_b) 
+  {
+    pAssume1(_p_DivisibleBy2(a, r_a, b, r_b) == FALSE);
+    return FALSE;
+  }
+  return _p_DivisibleBy1(a, r_a, b, r_b);
+#else
+  return pDebugShortDivisibleBy(a, sev_a, r_a, b, not_sev_b, r_b);
 #endif
 }
 

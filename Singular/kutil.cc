@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.58 2000-09-12 16:01:00 obachman Exp $ */
+/* $Id: kutil.cc,v 1.59 2000-09-14 13:04:36 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -184,11 +184,6 @@ void cleanT (kStrategy strat)
       }
       if (p == strat->S[i])
       {
-#if 0
-        if (strat->T[j].heap != NULL)
-          strat->S[i]
-            = pShallowCopyDelete(currPolyBin, &p, strat->T[j].heap);
-#endif
         break;
       }
     }
@@ -264,7 +259,7 @@ BOOLEAN K_Test_L(char *f , int l, LObject *L,
   #ifdef PDEBUG
   if (testp)
   {
-    if (! pDBTest(L->p, f, l))
+    if (! _pp_Test(L->p, L->lmRing, L->tailRing, PDEBUG))
     {
       Warn("for L->p");
       ret = FALSE;
@@ -274,14 +269,14 @@ BOOLEAN K_Test_L(char *f , int l, LObject *L,
 
   if (L->pLength != 0 && L->pLength != pLength(L->p))
   {
-    Warn("L[%d] length error: has %d, specified to have %d",
+    dReportError("L[%d] length error: has %d, specified to have %d",
           lpos, pLength(L->p), L->pLength);
     ret = FALSE;
   }
   if (L->p1 == NULL)
   {
     // L->p2 either NULL or poly from global heap
-    ret &= pDBTest(L->p2, f, l);
+    ret &= _pp_Test(L->p2, L->lmRing, L->tailRing, PDEBUG);
   }
   else if (tlength > 0 && T != NULL)
   {
@@ -291,14 +286,14 @@ BOOLEAN K_Test_L(char *f , int l, LObject *L,
       if (L->p1 == T[i].p) break;
     if (i>=tlength)
     {
-      Warn("L[%d].p1 not in T",lpos);
+      dReportError("L[%d].p1 not in T",lpos);
       ret = FALSE;
     }
     for (i=0; i<tlength; i++)
       if (L->p2 == T[i].p) break;
     if (i>=tlength)
     {
-      Warn("L[%d].p2 not in T",lpos);
+      dReportError("L[%d].p2 not in T",lpos);
       ret &= FALSE;
     }
   }
@@ -337,14 +332,14 @@ BOOLEAN K_Test (char *f, int l, kStrategy strat, int pref)
     {
       if (strat->L[i].p == NULL)
       {
-        Warn("L[%d].p is NULL", i);
+        dReportError("L[%d].p is NULL", i);
         ret = FALSE;
       }
       if (K_Test_L(f, l, &(strat->L[i]),
                    (pNext(strat->L[i].p) != strat->tail), i,
                    strat->T, strat->tl + 1) == FALSE)
       {
-        Warn("for strat->L[%d]", i);
+        dReportError("for strat->L[%d]", i);
         ret = FALSE;
       }
     }
@@ -365,7 +360,7 @@ BOOLEAN K_Test_S(char* f, int l, kStrategy strat)
     if (strat->S[i] != NULL && strat->sevS[i] != 0 && strat->sevS[i] !=
         pGetShortExpVector(strat->S[i]))
     {
-      Warn("S[%d] wrong sev: has %o, specified to have %o in %s:%d",
+      dReportError("S[%d] wrong sev: has %o, specified to have %o in %s:%d",
            i , pGetShortExpVector(strat->S[i]), strat->sevS[i],f, l);
       ret = FALSE;
     }
@@ -377,7 +372,7 @@ BOOLEAN K_Test_S(char* f, int l, kStrategy strat)
 BOOLEAN K_Test_T(char* f, int l, TObject * T, int i)
 {
   #ifdef PDEBUG
-  BOOLEAN ret = pDBTest(T->p, f, l);
+  BOOLEAN ret = _pp_Test(T->p, T->lmRing, T->tailRing, PDEBUG);
   #else
   BOOLEAN ret=FALSE;
   #endif
@@ -385,14 +380,14 @@ BOOLEAN K_Test_T(char* f, int l, TObject * T, int i)
   if (T->pLength != 0 &&
       T->pLength != pLength(T->p))
   {
-    Warn("T[%d] length error: has %d, specified to have %d in %s:%d",
+    dReportError("T[%d] length error: has %d, specified to have %d in %s:%d",
           i , pLength(T->p), T->pLength,f, l);
     ret = FALSE;
   }
-  if (T->sev != 0 && pGetShortExpVector(T->p) != T->sev)
+  if (T->sev != 0 && p_GetShortExpVector(T->p, T->lmRing) != T->sev)
   {
-    Warn("T[%d] wrong sev: has %o, specified to have %o in %s:%d",
-          i , pGetShortExpVector(T->p), T->sev,f, l);
+    dReportError("T[%d] wrong sev: has %o, specified to have %o in %s:%d",
+          i , p_GetShortExpVector(T->p, T->lmRing), T->sev,f, l);
     ret = FALSE;
   }
   return ret;
@@ -424,7 +419,7 @@ BOOLEAN K_Test_TS(char *f, int l, kStrategy strat)
     {
       if (kFindInT(strat->S[i], strat->T, strat->tl) < 0)
       {
-        Warn("S[%d] not in T", i);
+        dReportError("S[%d] not in T", i);
         ret = FALSE;
       }
     }

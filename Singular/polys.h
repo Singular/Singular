@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.36 2000-09-12 16:01:11 obachman Exp $ */
+/* $Id: polys.h,v 1.37 2000-09-14 13:04:40 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
@@ -13,13 +13,15 @@
 /***************************************************************
  Some general remarks:
  We divide poly operations into roughly 4 categories:
- Level 2: operations on monomials/polynomials with constant time
+ Level 2: operations on monomials/polynomials with constant time,
+          or operations which are just dispatchers to other
+          poly routines
           - implemented in: pInline2.h
           - debugging only if PDEBUG >= 2
           - normally inlined, unless PDEBUG >= 2 || NO_INLINE2
  Level 1: operations on monomials with time proportional to length 
-          - implemented in: pInline2.h
-          - debugging only if PDEBUG >= 2
+          - implemented in: pInline1.h
+          - debugging only if PDEBUG >= 1
           - normally inlined, unless PDEBUG >= 1 || NO_INLINE1 
  Level 0: short operations on polynomials with time proportional to
           length of poly
@@ -28,7 +30,6 @@
           - normally _not_ inlined: can be forced with
             #define DO_PINLINE0
             #include "pInline0.h"
-          - debugging only if PDEBUG >= 0
  Misc   : operations on polynomials which do not fit in any of the 
           above categories
           - implemented in: polys*.cc
@@ -36,7 +37,7 @@
           - debugging if PDEBUG >= 0
 
  You can set PDEBUG on a per-file basis, before including "mod2.h"
- However, PDEBUG will only be in effect, if ! NDEBUG.
+ However, PDEBUG will only be in effect, if !NDEBUG.
 
  All p_* operations take as last argument a ring 
  and are ring independent. Their corresponding p* operations are usually 
@@ -332,15 +333,6 @@ int       pIsPurePower(const poly p);
 BOOLEAN   pHasNotCF(poly p1, poly p2);   /*has no common factor ?*/
 void      pSplit(poly p, poly * r);   /*p => IN(p), r => REST(p) */
 
-#ifdef PDEBUG
-// Returns TRUE if m is monom of p, FALSE otherwise
-BOOLEAN pIsMonomOf(poly p, poly m);
-// Returns TRUE if p and q have common monoms
-BOOLEAN pHaveCommonMonoms(poly p, poly q);
-#else
-#define pIsMonomOf(p, q) TRUE
-#define pHaveCommonMonoms(p, q) TRUE
-#endif
 
 
 /*-------------ring management:----------------------*/
@@ -349,8 +341,11 @@ extern void pSetGlobals(ring r, BOOLEAN complete = TRUE);
 
 /*-----------the ordering of monomials:-------------*/
 #define pSetm(p)    p_Setm(p, currRing)
-#define pSetmComp pSetm
 extern void p_Setm(poly p, ring r);
+// TODO:
+#define pSetmComp   pSetm
+#define p_SetmComp  p_Setm
+
 extern pLDegProc pLDeg;
 extern pFDegProc pFDeg;
 int pDeg(poly p);
@@ -477,23 +472,58 @@ BOOLEAN pComparePolys(poly p1,poly p2);
 PINLINE0 poly pReverse(poly p);
 
 
-
+/***************************************************************
+ *
+ * PDEBUG stuff
+ *
+ ***************************************************************/
 #ifdef PDEBUG
-#define pHeapTest(A,B)  pDBTest(A, B, __FILE__,__LINE__)
-#define pTest(A) pDBTest(A, currPolyBin, __FILE__,__LINE__)
-#define prTest(p, r) prDBTest(p, r, __FILE__, __LINE__)
+// Returns TRUE if m is monom of p, FALSE otherwise
+BOOLEAN pIsMonomOf(poly p, poly m);
+// Returns TRUE if p and q have common monoms
+BOOLEAN pHaveCommonMonoms(poly p, poly q);
 
-BOOLEAN pDBTest(poly p, char *f, int l);
-BOOLEAN pDBTest(poly p, omBin tail_heap, char *f, int l);
-BOOLEAN prDBTest(poly p, ring r, char *f, int l);
-BOOLEAN pDBTest(poly p,  omBin tail_heap, omBin lm_heap, char *f, int l);
-#else
-#define prTest(p, r)    ((void)0)
-#define pHeapTest(A,B)  ((void)0)
-#define pTest(A)        ((void)0)
-#define pDBTest(A,B,C)  ((void)0)
+// p_Check* routines return TRUE if everything is ok,
+// else, they report error message and return false
+
+// check if poly p is from ring r
+BOOLEAN p_CheckIsFromRing(poly p, ring r);
+// check if p != NULL, r != NULL and initialized && p is from r 
+BOOLEAN p_CheckPolyRing(poly p, ring r);
+// check if r != NULL and initialized
+BOOLEAN p_CheckRing(ring r);
+// only do check if cond
+#define pIfThen(cond, check) do {if (cond) {check;}} while (0)
+
+BOOLEAN _p_Test(poly p, ring r, int level);
+BOOLEAN _p_LmTest(poly p, ring r, int level);
+BOOLEAN _pp_Test(poly p, ring lmRing, ring tailRing, int level);
+
+#define pTest(p)        _p_Test(p, currRing, PDEBUG)
+#define p_Test(p,r)     _p_Test(p, r, PDEBUG)
+#define pLmTest(p)      _p_LmTest(p, currRing, PDEBUG)
+#define p_LmTest(p,r)   _p_LmTest(p, r, PDEBUG)
+#define pp_Test(p, lmRing, tailRing)    _pp_Test(p, lmRing, tailRing, PDEBUG)
+
+#else // ! PDEBUG
+
+
+#define pIsMonomOf(p, q)        (TRUE)
+#define pHaveCommonMonoms(p, q) (TRUE)
+#define p_CheckIsFromRing(p,r)  ((void)0)
+#define p_CheckPolyRing(p,r)    ((void)0)
+#define p_CheckRing(r)          ((void)0)
+#define P_CheckIf(cond, check)  ((void)0)
+
+#define pTest(p)        ((void)0)
+#define p_Test(p,r)     ((void)0)
+#define pLmTest(p)      ((void)0)
+#define p_LmTest(p,r)   ((void)0)
+#define pp_Test(p, lmRing, tailRing) ((void)0)
+
 #endif
-#endif
+
+#endif // POLYS_H
 
 #include "pInline2.h"
 #include "pInline1.h"

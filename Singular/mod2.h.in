@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.87 2000-09-12 16:01:02 obachman Exp $
+ *  Version: $Id: mod2.h.in,v 1.88 2000-09-14 13:04:37 obachman Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -335,16 +335,26 @@ extern int pShortOut;
 #define HAVE_ASSUME
 
 /* undef PDEBUG to disable checks of polys
- *
- * define PDEBUG to
- * 0 for 
- * 1 for tests in pProcs
- * 2 for low-level tests (Exponent access, primitive monom operations)
- * NOTE: for PDEBUG > 1 it gets very slow
- *       You can locally enable tests in pProcs by setting the 
- *       define at the beginning of pProcs.cc
- */
+
+ define PDEBUG to
+  0 for enabling pTest
+  1 plus tests in Level 1 poly routines 
+  2 plus tests in Level 2 poly routines
+ -- see also polys.h for more info
+
+ NOTE: you can set the value of PDEBUG on a per-file basis, before
+       including mod2.h, provided ! PDEBUG is defined in mod2.h E.g:
+
+       #define PDEBUG 2
+       #include "mod2.h"
+       ...
+
+       makes sure that all poly operations in your file are done with 
+       PDEBUG == 2
+*/
 #ifndef PDEBUG
+// do this to disable poly debugging
+// #undef PDEBUG 
 #define PDEBUG 0
 #endif
 
@@ -406,7 +416,7 @@ extern int pShortOut;
    + to find out where "memory corruption" occured, increase value of 
      OM_CHECK - the higher this value is, the more consistency checks are 
      done (However a value > 3 checks the entire memory each time an omalloc 
-     routin is used!)
+     routine is used!)
    
    Some more tips on the usage of omalloc:
    + omAlloc*, omRealloc*, omFree*, omCheck* omDebug* omTest* rotuines 
@@ -417,7 +427,7 @@ extern int pShortOut;
      routine (including the debug versions): E.g., an address allocated with
      omAllocBin can be freed with omfree, or an adress allocated with 
      om(Debug)Alloc can be freed with omfree, or omFree, or omFreeSize, etc.
-     However, keep in mind that the efficincy decreases from 
+     However, keep in mind that the efficiency decreases from 
      Bin over Size to General routines (i.e., omFreeBin is more efficient than
      omFreeSize which is more efficient than omFree, likewise wqith the alloc
      routines).
@@ -539,7 +549,11 @@ extern int pShortOut;
 #ifdef __cplusplus
 extern "C" {
 #endif
+// routine which is used to report the error
 extern void dReportError(const char* fmt, ...);
+// within a debugger, set a breakpoint on dErrorBreak
+// which is called after the error has been reported
+extern void dErrorBreak();
 #ifdef __cplusplus
 }
 #endif

@@ -3,12 +3,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.52 2000-09-13 10:57:34 Singular Exp $ */
+/* $Id: polys-impl.h,v 1.53 2000-09-14 13:04:40 obachman Exp $ */
 
 /***************************************************************
  *
  * File:       polys-impl.h
- * Purpose:    low-level definition and declarations for polys
+ * Purpose:    low-level and macro definition of polys
  *
  * If you touch anything here, you better know what you are doing.
  * What is here should not be used directly from other routines -- the
@@ -17,15 +17,6 @@
  ***************************************************************/
 #include "structs.h"
 #include "omalloc.h"
-
-/***************************************************************
- *
- * TODO:
- *
- ***************************************************************/
-#define rRing_has_Comp(r)   (r->pCompIndex >= 0)
-extern void p_Setm(poly p, ring r);
-#define p_SetmComp(p, r) p_Setm(p, r)
 
 /***************************************************************
  *
@@ -42,10 +33,12 @@ extern void p_Setm(poly p, ring r);
 typedef Exponent_t* Exponent_pt;
 struct  spolyrec
 {
-  poly      next; // next needs to be the first field
-  number    coef; // and coef the second --- do not change this !!!
+  poly      next;           // next needs to be the first field
+  number    coef;           // and coef the second --- do not change this !!!
   unsigned long exp[VARS];  // make sure that exp is aligned
 };
+#define POLYSIZE (sizeof(poly) + sizeof(number))
+#define POLYSIZEW (POLYSIZE / sizeof(long))
 
 /***************************************************************
  *
@@ -93,69 +86,138 @@ struct  spolyrec
  ***************************************************************/
 
 #if defined(PDEBUG)
-#define passume assume
-PINLINE3 int p_IsFromRing(poly p, ring r);
 
-#if !defined(NO_PINLINE3) || defined(POLYS_IMPL_CC)
-PINLINE3 int p_IsFromRing(poly p, ring r)
-{
-  void* custom = omGetCustomOfAddr(p);
-  if (custom != NULL)
-  {
-    return custom == r;
-  }
-  else
-  {
-    if (omIsBinPageAddr(p) && omSizeWOfAddr(p) == r->PolyBin->sizeW)
-      return 1;
-  }
-  return 0;
-}
-#endif
-#else
-#define passume(x) ((void)0)
-#define p_IsFromRing(p, r)  (1)
-#endif
+extern BOOLEAN dPolyReportError(poly p, ring r, const char* fmt, ...);
 
-#if PDEBUG > 1 || P_CHECK_RING
-PINLINE3 void p_CheckPolyRing(poly p, ring r);
-PINLINE3 void p_CheckRing(ring r);
-#if !defined(NO_PINLINE3) || defined(POLYS_IMPL_CC)
-PINLINE3 void p_CheckPolyRing(poly p, ring r)
-{
-  passume(r != NULL && r->PolyBin != NULL);
-  passume(p != NULL);
-  passume(p_IsFromRing(p, r));
-}
-PINLINE3 void p_CheckRing(ring r)
-{
-  passume(r != NULL && r->PolyBin != NULL);
-}
-#endif
-#define p_CheckIf(cond, what) do{ if (cond) {what;}} while(0)
-#else
-#define p_CheckPolyRing(p, r)   ((void)0)
-#define p_CheckRing(r)          ((void)0)
-#define p_CheckIf(cond, what)   ((void)0)
-#endif
+// macros for checking of polys
+#define pAssumeReturn(cond)                                  \
+do                                                          \
+{                                                           \
+  if (! (cond))                                             \
+  {                                                         \
+    dPolyReportError(NULL, NULL, "pAssume violation of: %s", \
+                 #cond);                                    \
+    return FALSE;                                           \
+  }                                                         \
+}                                                           \
+while (0)
 
-#if OM_TRACK > 2 && (PDEBUG > 1 || P_CHECK_RING > 0)
+#define pAssume(cond)                                        \
+do                                                          \
+{                                                           \
+  if (! (cond))                                             \
+  {                                                         \
+    dPolyReportError(NULL, NULL, "pAssume violation of: %s", \
+                 #cond);                                    \
+  }                                                         \
+}                                                           \
+while (0)
+
+#define _pPolyAssumeReturn(cond, p, r)                       \
+do                                                          \
+{                                                           \
+  if (! (cond))                                             \
+  {                                                         \
+    dPolyReportError(p, r, "pPolyAssume violation of: %s",   \
+                 #cond);                                    \
+    return FALSE;                                           \
+  }                                                         \
+}                                                           \
+while (0)
+
+#define _pPolyAssume(cond,p,r)                                   \
+do                                                              \
+{                                                               \
+  if (! (cond))                                                 \
+  {                                                             \
+    dPolyReportError(p, r, "pPolyAssume violation of: %s\n ",    \
+                 #cond);                                        \
+  }                                                             \
+}                                                               \
+while (0)
+
+#define _pPolyAssumeReturnMsg(cond, msg, p, r)   \
+do                                              \
+{                                               \
+  if (! (cond))                                 \
+  {                                             \
+    dPolyReportError(p, r, "%s ",  msg);        \
+    return FALSE;                               \
+  }                                             \
+}                                               \
+while (0)
+
+#define pPolyAssume(cond)        _pPolyAssume(cond, p, r)
+#define pPolyAssumeReturn(cond)  _pPolyAssumeReturn(cond, p, r)
+#define pPolyAssumeReturnMsg(cond, msg)  _pPolyAssumeReturnMsg(cond, msg, p, r)
+
+#define pFalseReturn(cond)  do {if (! (cond)) return FALSE;} while (0)
+  
+
+#if OM_TRACK > 2 
 #define p_SetRingOfPoly(p, r) omSetCustomOfAddr(p, r)
 #else
 #define p_SetRingOfPoly(p, r) ((void)0)
 #endif
 
-#if PDEBUG > 0
-#define passume1 assume
-#else
-#define passume1(x) ((void)0)
-#endif
+#else // ! defined(PDEBUG)
+#define pFalseReturn(cond)           ((void)0)
+#define pAssume(cond)                ((void)0)
+#define pPolyAssume(cond)            ((void)0)
+#define _pPolyAssume(cond, p,r)      ((void)0)
+#define pAssumeReturn(cond)          ((void)0)
+#define pPolyAssumeReturn(cond)      ((void)0)
+#define _pPolyAssumeReturn(cond,p,r) ((void)0)
+#define p_SetRingOfPoly(p, r)        ((void)0)
+#endif // defined(PDEBUG)
 
-#if PDEBUG > 1
-#define passume2 assume
+#if PDEBUG >= 1
+#define pAssume1             pAssume
+#define pPolyAssume1         pPolyAssume
+#define _pPolyAssume1        _pPolyAssume
+#define pAssumeReturn1       pAssumeReturn
+#define pPolyAssumeReturn1   pPolyAssumeReturn
+#define _pPolyAssumeReturn1  _pPolyAssumeReturn
+#define p_SetRingOfPoly1    p_SetRingOfPoly
+#define p_CheckPolyRing1    p_CheckPolyRing
+#define p_CheckRing1        p_CheckRing
+#define pIfThen1          pIfThen
 #else
-#define passume2(x) ((void)0)
-#endif
+#define pAssume1(cond)               ((void)0)
+#define pPolyAssume1(cond)           ((void)0)
+#define _pPolyAssume1(cond,p,r)      ((void)0)
+#define pAssumeReturn1(cond)         ((void)0)
+#define pPolyAssumeReturn1(cond)     ((void)0)
+#define _pPolyAssumeReturn1(cond,p,r)((void)0)
+#define p_SetRingOfPoly1(p,r)       ((void)0)
+#define p_CheckPolyRing1(p,r)       ((void)0)
+#define p_CheckRing1(r)             ((void)0)
+#define pIfThen1(cond, check)     ((void)0)
+#endif // PDEBUG >= 1
+
+#if PDEBUG >= 2
+#define pAssume2             pAssume
+#define pPolyAssume2         pPolyAssume
+#define _pPolyAssume2        _pPolyAssume
+#define pAssumeReturn2       pAssumeReturn
+#define pPolyAssumeReturn2   pPolyAssumeReturn
+#define _pPolyAssumeReturn2  _pPolyAssumeReturn
+#define p_SetRingOfPoly2    p_SetRingOfPoly
+#define p_CheckPolyRing2    p_CheckPolyRing
+#define p_CheckRing2        p_CheckRing
+#define pIfThen2          pIfThen
+#else
+#define pAssume2(cond)               ((void)0)
+#define pPolyAssume2(cond)           ((void)0)
+#define _pPolyAssume2(cond,p,r)      ((void)0)
+#define pAssumeReturn2(cond)         ((void)0)
+#define pPolyAssumeReturn2(cond)     ((void)0)
+#define _pPolyAssumeReturn2(cond,p,r)((void)0)
+#define p_SetRingOfPoly2(p,r)       ((void)0)
+#define p_CheckPolyRing2(p,r)       ((void)0)
+#define p_CheckRing2(r)             ((void)0)
+#define pIfThen2(cond, check)     ((void)0)
+#endif // PDEBUG >= 2
 
 /***************************************************************
  *
@@ -173,9 +235,14 @@ PINLINE3 void p_CheckRing(ring r)
 
 
 
-#define POLYSIZE (sizeof(poly) + sizeof(number))
-#define POLYSIZEW (POLYSIZE / sizeof(long))
-#define MAX_EXPONENT_NUMBER ((MAX_BLOCK_SIZE - POLYSIZE) / SIZEOF_EXPONENT)
+
+
+/***************************************************************
+ *
+ * Misc macros
+ *
+ ***************************************************************/
+#define rRing_has_Comp(r)   (r->pCompIndex >= 0)
 
 // number of Variables
 extern int pVariables;

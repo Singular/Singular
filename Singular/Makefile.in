@@ -100,7 +100,7 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc clapconv.cc \
     pcv.cc kbuckets.cc\
     mpr_inout.cc mpr_base.cc mpr_numeric.cc \
     prCopy.cc p_Procs.cc p_Mult_q.cc \
-    pInline2.cc pInline1.cc pInline0.cc
+    pDebug.cc pInline2.cc pInline1.cc pInline0.cc
 
 
 # normal C source files

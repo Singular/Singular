@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.13 2000-09-12 16:01:04 obachman Exp $ */
+/* $Id: numbers.h,v 1.14 2000-09-14 13:04:38 obachman Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
@@ -21,6 +21,16 @@
 #define p_nEqual(n1, n2, r)    nEqual(n1, n2)
 #define p_nNeg(n, r)	       nNeg(n)
 #define p_nSub(n1, n2, r)      nSub(n1, n2)
+
+#define n_Copy(n, r)          nCopy(n)
+#define n_Delete(n, r)        nDelete(n)
+#define n_Mult(n1, n2, r)     nMult(n1, n2)
+#define n_Add(n1, n2, r)      nAdd(n1, n2)
+#define n_IsZero(n, r)	      nIsZero(n)
+#define n_Equal(n1, n2, r)    nEqual(n1, n2)
+#define n_Neg(n, r)	          nNeg(n)
+#define n_Sub(n1, n2, r)      nSub(n1, n2)
+#define n_GetChar(r)          nGetChar()
 
 /* variables */
 extern short fftable[];

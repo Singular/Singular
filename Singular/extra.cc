@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.143 2000-09-12 16:00:52 obachman Exp $ */
+/* $Id: extra.cc,v 1.144 2000-09-14 13:04:34 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -629,6 +629,20 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   {
     char *sys_cmd=(char *)(h->Data());
     h=h->next;
+    if (strcmp(sys_cmd, "pTest") == 0)
+    {
+      poly lm = (poly)h->Data();
+      poly p = lm;
+      poly tail = lm->next;
+      if (tail != NULL)
+      {
+        pNext(lm) = pNext(tail);
+        pNext(tail) = lm;
+        pTest(tail);
+      }
+      return FALSE;
+    }
+    else
 #ifdef RDEBUG
 /*==================== poly debug ==================================*/
     if(strcmp(sys_cmd,"p")==0)
@@ -731,7 +745,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     else
 #endif
 /*==================== pDivStat =============================*/
-#ifdef PDIV_DEBUG
+#ifdef PDEBUG
     if(strcmp(sys_cmd,"pDivStat")==0)
     {
       extern void pPrintDivisbleByStat();
@@ -1228,6 +1242,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
+
 /*==================== Error =================*/
       Werror( "system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }

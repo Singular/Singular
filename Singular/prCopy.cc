@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: prCopy.cc,v 1.5 2000-09-12 16:01:13 obachman Exp $ */
+/* $Id: prCopy.cc,v 1.6 2000-09-14 13:04:40 obachman Exp $ */
 /*
 * ABSTRACT - implementation of functions for Copy/Move/Delete for Polys
 */
@@ -25,8 +25,8 @@ poly prMergeR(poly p1, poly p2, ring r)
   
   spolyrec rp;
   poly p = &rp;
-  prTest(p1, r);
-  prTest(p2, r);
+  p_Test(p1, r);
+  p_Test(p2, r);
   
   Top:
   p_LmCmpAction(p1, p2, r, goto Equal, goto Greater, goto Smaller);
@@ -58,7 +58,7 @@ poly prMergeR(poly p1, poly p2, ring r)
   goto Finish;
   
   Finish:
-  prTest(pNext(&rp), r);
+  p_Test(pNext(&rp), r);
   return pNext(&rp);
 }
   
@@ -93,7 +93,7 @@ poly prSortR(poly p, ring r, BOOLEAN revert)
     qq->next = NULL;
     result = prMergeR(result, qq, r);
   }
-  prTest(result, r);
+  p_Test(result, r);
   return result;
 }
 

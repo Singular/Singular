@@ -6,7 +6,7 @@
  *  Purpose: multiplication of polynomials
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Mult_q.cc,v 1.3 2000-09-12 16:01:07 obachman Exp $
+ *  Version: $Id: p_Mult_q.cc,v 1.4 2000-09-14 13:04:39 obachman Exp $
  *******************************************************************/
 #include "mod2.h"
 
@@ -24,16 +24,17 @@
 poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
 {
   assume(p != NULL && pNext(p) != NULL && q != NULL && pNext(q) != NULL);
-  assume(! pHaveCommonMonoms(p, q));
+  pAssume(! pHaveCommonMonoms(p, q));
   pTest(p);
   pTest(q);
-  poly res = pp_Mult_mm(p,q,r);  // holds initially q1*p
-  poly qq = pNext(q);           // we iter of this
-  poly qn = pp_Mult_mm(qq, p,r); // holds p1*qi
-  poly pp = pNext(p);           // used for Lm(qq)*pp
-  poly rr = res;                // last monom which is surely not NULL
-  poly rn = pNext(res);         // pNext(rr)
-  number n, n1, n2;
+
+  poly res = pp_Mult_mm(p,q,r);     // holds initially q1*p
+  poly qq = pNext(q);               // we iter of this
+  poly qn = pp_Mult_mm(qq, p,r);    // holds p1*qi
+  poly pp = pNext(p);               // used for Lm(qq)*pp
+  poly rr = res;                    // last monom which is surely not NULL
+  poly rn = pNext(res);             // pNext(rr)
+  number n, n1;
   
   // now the main loop
   Top:
@@ -51,7 +52,7 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
   pNext(rr) = qn;
   rr = qn;
   pIter(qn);
-  Work: // now we compute Lm(qq)*pp
+  Work: // compute res + Lm(qq)*pp
   if (rn == NULL)
     pNext(rr) = pp_Mult_mm(pp, qq, r);
   else
@@ -96,7 +97,7 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
 #if 0
 poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
 {
-  assume (p != NULL && pNext(p) != NULL && q != NULL && pNext(q) != NULL);
+  pAssume (p != NULL && pNext(p) != NULL && q != NULL && pNext(q) != NULL);
   
   // to minimize the number of polynomial comparisons
   // we reverse p and should arrange p and q such that

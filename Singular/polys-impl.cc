@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.50 2000-09-12 16:01:09 obachman Exp $ */
+/* $Id: polys-impl.cc,v 1.51 2000-09-14 13:04:39 obachman Exp $ */
 
 /***************************************************************
  *
@@ -45,31 +45,6 @@ int pDBsyzComp=0;
  * Storage Managament Routines
  *
  ***************************************************************/
-#ifdef PDEBUG
-BOOLEAN pIsMonomOf(poly p, poly m)
-{
-  if (m == NULL) return TRUE;
-  while (p != NULL)
-  {
-    if (p == m) return TRUE;
-    pIter(p);
-  }
-  return FALSE;
-}
-
-BOOLEAN pHaveCommonMonoms(poly p, poly q)
-{
-  while (p != NULL)
-  {
-    if (pIsMonomOf(q, p))
-    {
-      return TRUE;
-    }
-    pIter(p);
-  }
-  return FALSE;
-}
-#endif
 
 
 void ppDelete(poly* p, ring rg)
@@ -80,232 +55,12 @@ void ppDelete(poly* p, ring rg)
   rChangeCurrRing(origRing, FALSE);
 }
 
-poly _pShallowCopyDelete(omBin d_h, poly *p, omBin s_h)
-{
-  spolyrec dp;
-  poly d_p = &dp, tmp;
-  poly s_p = *p;
-
-  assume(d_h != NULL && s_h != NULL &&
-         d_h->sizeW == s_h->sizeW);
-
-  if (currRing->ExpLSize <= 2)
-  {
-    if (currRing->ExpLSize == 1)
-    {
-      while (s_p != NULL)
-      {
-        omTypeAllocBin( poly,d_p->next, d_h);
-        d_p = d_p->next;
-
-        d_p->coef = s_p->coef;
-        d_p->exp[0] = s_p->exp[0];
-
-        tmp = pNext(s_p);
-        omFreeBin(s_p, s_h);
-        s_p = tmp;
-      }
-    }
-    else
-    {
-      while (s_p != NULL)
-      {
-        omTypeAllocBin( poly,d_p->next, d_h);
-        d_p = d_p->next;
-
-        d_p->coef = s_p->coef;
-        d_p->exp[0] = s_p->exp[0];
-        d_p->exp[1] = s_p->exp[1];
-
-        tmp = pNext(s_p);
-        omFreeBin(s_p, s_h);
-        s_p = tmp;
-      }
-    }
-  }
-  else
-  {
-    if (currRing->ExpLSize & 1)
-    {
-      while (s_p != NULL)
-      {
-
-        omTypeAllocBin( poly,d_p->next, d_h);
-        d_p = d_p->next;
-
-        d_p->coef = s_p->coef;
-        omMemcpy_nwODD(&(d_p->exp[0]), &(s_p->exp[1]), currRing->ExpLSize);
-
-        tmp = pNext(s_p);
-        omFreeBin(s_p, s_h);
-        s_p = tmp;
-      }
-    }
-    else
-    {
-      while (s_p != NULL)
-      {
-
-        omTypeAllocBin(poly,d_p->next, d_h);
-        d_p = d_p->next;
-
-        d_p->coef = s_p->coef;
-        omMemcpy_nwEVEN(&(d_p->exp[0]), &(s_p->exp[1]), currRing->ExpLSize);
-
-        tmp = pNext(s_p);
-        omFreeBin(s_p, s_h);
-        s_p = tmp;
-      }
-    }
-  }
-  pNext(d_p) = NULL;
-  pHeapTest(dp.next, d_h);
-  *p = NULL;
-  return pNext(dp.next);
-}
 
 poly pHeadProc(poly p)
 {
   return pHead(p);
 }
 
-#ifdef PDEBUG
-BOOLEAN prDBTest(poly p, ring r, char* f, int l)
-{
-  ring old_ring = NULL;
-  BOOLEAN res;
-
-  if (r != currRing)
-  {
-    old_ring = currRing;
-    rChangeCurrRing(r);
-  }
-  res = pDBTest(p, currRing->PolyBin, f, l);
-  if (old_ring != NULL)
-  {
-    rChangeCurrRing(old_ring);
-  }
-  return res;
-}
-
-
-BOOLEAN pDBTest(poly p, char *f, int l)
-{
-  return pDBTest(p, currPolyBin, f,l);
-}
-
-BOOLEAN pDBTest(poly p, omBin heap, char *f, int l)
-{
-  poly old=NULL;
-  BOOLEAN ismod=FALSE;
-  if (heap == NULL) heap = currPolyBin;
-
-  while (p!=NULL)
-  {
-    omCheckIf(omCheckAddrBin(p, heap), return FALSE);
-#ifdef LDEBUG
-    if (!nDBTest(p->coef,f,l))
-      return FALSE;
-#endif
-    if ((p->coef==NULL)&&(nGetChar()<2))
-    {
-      dReportError("NULL coef in poly in %s:%d",f,l);
-      return FALSE;
-    }
-    if (nIsZero(p->coef))
-    {
-      dReportError("zero coef in poly in %s:%d",f,l);
-      return FALSE;
-    }
-    int i=pVariables;
-    if (ismod==0)
-    {
-      if (pGetComp(p)>0) ismod=1;
-      else               ismod=2;
-    }
-    else if (ismod==1)
-    {
-      if (pGetComp(p)==0)
-      {
-        dReportError("mix vec./poly in %s:%d",f,l);
-        return FALSE;
-      }
-    }
-    else if (ismod==2)
-    {
-      if (pGetComp(p)!=0)
-      {
-        dReportError("mix poly/vec. in %s:%d",f,l);
-        return FALSE;
-      }
-    }
-    if (currRing->order[1] == ringorder_S)
-    {
-      long c1, cc1, ccc1, ec1;
-      sro_ord* o = &(currRing->typ[1]);
-
-      c1 = pGetComp(p);
-      cc1 = o->data.syzcomp.Components[c1];
-      ccc1 = o->data.syzcomp.ShiftedComponents[cc1];
-      if (! (c1 == 0 || cc1 != 0))
-      {
-        dReportError("Component <-> TrueComponent zero mismatch", f, l);
-        return FALSE;
-      }
-      if (! (c1 == 0 || ccc1 != 0))
-      {
-        dReportError("Component <-> ShiftedComponent zero mismatch", f, l);
-        return FALSE;
-      }
-      ec1 = p->exp[currRing->typ[1].data.syzcomp.place];
-      if (ec1 != ccc1)
-      {
-        dReportError("Shifted comp out of sync. should %d, is %d", ccc1, ec1);
-        return FALSE;
-      }
-    }
-    if (currRing->order[0] == ringorder_s)
-    {
-      unsigned long syzindex = p->exp[currRing->typ[0].data.syz.place];
-      pSetm(p);
-      if (p->exp[currRing->typ[0].data.syz.place] != syzindex)
-      {
-        dReportError("Syzindex wrong: Was %dl but should be %d in %s:%d",
-             syzindex, p->exp[currRing->typ[0].data.syz.place], f, l);
-      }
-    }
-    old=p;
-    pIter(p);
-    if (pCmp(old,p)!=1)
-    {
-      dReportError("wrong order (");
-      wrp(old);
-      Print(") in %s:%d (pComp=%d)\n",f,l,pCmp(old,p));
-      return FALSE;
-    }
-    if (p != NULL)
-    {
-      if (pGetComp(old) == pGetComp(p))
-      {
-        i = pVariables;
-        for (i=pVariables;i; i--)
-        {
-          if (pGetExp(old, i) != pGetExp(p, i)) break;
-        }
-        if (i == 0)
-        {
-          dReportError("different Compare, but same exponent vector for");
-          wrp(old);
-          Print(" in %s%d\n", f, l);
-          return FALSE;
-        }
-      }
-    }
-  }
-  return TRUE;
-}
-
-#endif // PDEBUG
 
 static inline unsigned long GetBitFields(Exponent_t e,
                                          unsigned int s, unsigned int n)
@@ -380,50 +135,6 @@ unsigned long p_GetShortExpVector(poly p, ring r)
   return ev;
 }
 
-#ifdef PDIV_DEBUG
-static int pDivisibleBy_number = 1;
-static int pDivisibleBy_FALSE = 1;
-static int pDivisibleBy_ShortFalse = 1;
-static int pDivisibleBy_Null = 1;
-BOOLEAN pDebugShortDivisibleBy(poly p1, unsigned long sev_1, ring r_1,
-                               poly p2, unsigned long not_sev_2, ring r_2)
-{
-  if (sev_1 != 0 && pGetShortExpVector(p1, r_1) != sev_1)
-  {
-    dReportError("sev1 is %o but should be %o", sev_1,
-          pGetShortExpVector(p1, r_1));
-  }
-  if (~ pGetShortExpVector(p2, r_2) != not_sev_2)
-  {
-    dReportError("not_sev2 is %o but should be %o", not_sev_2,
-          ~ pGetShortExpVector(p2, r_2));
-  }
-  if (sev_1 == 0) pDivisibleBy_Null++;
-  pDivisibleBy_number++;
-  BOOLEAN ret = _p_DivisibleBy1(p1, r1, p2, r2);
-  if (! ret) pDivisibleBy_FALSE++;
-  if (sev_1 & not_sev_2)
-  {
-    pDivisibleBy_ShortFalse++;
-    if (ret)
-    {
-      dReportError("p1 divides p2, but sev's are wrong");
-      assume(0);
-    }
-  }
-  return ret;
-}
-
-void pPrintDivisbleByStat()
-{
-  Print("#Tests: %d; #FALSE %d(%d); #SHORT %d(%d) #NULL:%d(%d)\n",
-        pDivisibleBy_number,
-        pDivisibleBy_FALSE, pDivisibleBy_FALSE*100/pDivisibleBy_number,
-        pDivisibleBy_ShortFalse, pDivisibleBy_ShortFalse*100/pDivisibleBy_FALSE,
-        pDivisibleBy_Null, pDivisibleBy_Null*100/pDivisibleBy_number);
-
-}
-#endif
 
 int rComp0_Func(poly p1,poly p2)
 {

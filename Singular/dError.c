@@ -6,7 +6,7 @@
  *  Purpose: implementation for debug error handling
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: dError.c,v 1.2 2000-09-12 16:00:52 obachman Exp $
+ *  Version: $Id: dError.c,v 1.3 2000-09-14 13:04:34 obachman Exp $
  *******************************************************************/
 #ifndef DERROR_C
 #define DERROR_C
@@ -32,8 +32,9 @@ void dReportError(const char* fmt, ...)
   vfprintf(stderr, fmt, ap);
   fprintf(stderr, " occured at: \n");
 #ifdef HAVE_CONFIG_H
-  omPrintCurrentBackTrace(stderr);
+  omPrintCurrentBackTraceMax(stderr, 8);
 #endif
+  dErrorBreak();
 #else
   fprintf(stderr, "// !!! YOU HAVE FOUND A BUG IN SINGULAR.");
   fprintf(stderr, "// !!! Please, email the following output to singular@mathematik.uni-kl.de");
@@ -42,6 +43,14 @@ void dReportError(const char* fmt, ...)
   vfprintf(stderr, fmt, ap);
 #endif
 }
+
+
+#ifndef MAKE_DISTRIBUTION
+// dummy procedure for setting a breakpoint
+// within the debugger
+void dErrorBreak()
+{}
+#endif
 
 #ifdef __cplusplus
 }

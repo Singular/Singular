@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.101 2000-09-12 16:00:54 obachman Exp $ */
+/* $Id: ideals.cc,v 1.102 2000-09-14 13:04:35 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -320,7 +320,7 @@ ideal idCopy (ideal h1)
   ideal h2;
 
 #ifdef PDEBUG
-  idDBTest(h1,f,l);
+  idDBTest(h1,PDEBUG,f,l);
 #endif
 //#ifdef TEST
   if (h1 == NULL)
@@ -346,7 +346,7 @@ ideal idCopy (ideal h1)
 }
 
 #ifdef PDEBUG
-void idDBTest(ideal h1,char *f,int l)
+void idDBTest(ideal h1, int level, char *f,int l)
 {
   int i;
 
@@ -356,12 +356,13 @@ void idDBTest(ideal h1,char *f,int l)
     omdebugAddrSize(h1->m,h1->ncols*h1->nrows*sizeof(poly));
     /* to be able to test matrices: */
     for (i=(h1->ncols*h1->nrows)-1; i>=0; i--)
-      pDBTest(h1->m[i],f,l);
+      _p_Test(h1->m[i], currRing, level);
     int new_rk=idRankFreeModule(h1);
     if(new_rk > h1->rank)
     {
-      Print("wrong rank %d (should be %d) in %s:%d\n",
-      h1->rank, new_rk, f,l);
+      dReportError("wrong rank %d (should be %d) in %s:%d\n",
+                   h1->rank, new_rk, f,l);
+      omPrintAddrInfo(stderr, h1, " for ideal");
       h1->rank=new_rk;
     }
   }
