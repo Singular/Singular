@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.16 1998-08-07 16:17:35 obachman Exp $ */
+/* $Id: matpol.cc,v 1.17 1998-08-26 15:57:52 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -30,12 +30,12 @@ typedef int perm[100];
 static poly mpDivide(poly a, poly b);
 static void mpReplace(int j, int n, int &sign, int *perm);
 static float mpPolyWeight(poly p);
-static int nextperm(perm * z, int max);
+static int mpNextperm(perm * z, int max);
 static poly mpLeibnitz(matrix a);
 static poly minuscopy (poly p);
 static poly pInsert(poly p1, poly p2);
 static poly mpSelect (poly fro, poly what);
-static poly exdiv ( poly m, poly d);
+static poly mpExdiv ( poly m, poly d);
 
 /*2
 * create a r x c zero-matrix
@@ -819,7 +819,7 @@ matrix mpCoeffProc (poly f, poly vars)
     i = 1;
     loop
     {
-      h = exdiv(f, MATELEM(co,1,i));
+      h = mpExdiv(f, MATELEM(co,1,i));
       if (h!=NULL)
       {
         MATELEM(co,2,i) = pAdd(MATELEM(co,2,i), h);
@@ -860,8 +860,8 @@ void mpCoef2(poly v, poly mon, matrix *c, matrix *m)
     }
     else
     {
-      i=1;
       isConst=1;
+      i=1;
     }
     while(p!=NULL)
     {
@@ -877,12 +877,16 @@ void mpCoef2(poly v, poly mon, matrix *c, matrix *m)
     j = pGetComp(v);
     loop
     {
-      h = exdiv(v, MATELEM(*m,j,i));
-      if (h!=NULL)
+      poly mp=MATELEM(*m,j,i);
+      if (mp!=NULL)
       {
-        pSetComp(h,0);
-        MATELEM(*c,j,i) = pAdd(MATELEM(*c,j,i), h);
-        break;
+        h = mpExdiv(v, mp /*MATELEM(*m,j,i)*/);
+        if (h!=NULL)
+        {
+          pSetComp(h,0);
+          MATELEM(*c,j,i) = pAdd(MATELEM(*c,j,i), h);
+          break;
+        }
       }
       if (i < l)
         i++;
@@ -1489,7 +1493,7 @@ static float mpPolyWeight(poly p)
   return res;
 }
 
-static int nextperm(perm * z, int max)
+static int mpNextperm(perm * z, int max)
 {
   int s, i, k, t;
   s = max;
@@ -1561,7 +1565,7 @@ static poly mpLeibnitz(matrix a)
   {
     while (e)
     {
-      e = nextperm((perm *)&z, n);
+      e = mpNextperm((perm *)&z, n);
       p = pOne();
       for (i = 1; i <= n; i++)
         p = pMult(p, pCopy(MATELEM(a, i, z[i])));
@@ -1669,7 +1673,7 @@ static poly mpSelect (poly fro, poly what)
 *exact divisor: let d  == x^i*y^j, m is thought to have only one term;
 *    return m/d iff d divides m, and no x^k*y^l (k>i or l>j) divides m
 */
-static poly exdiv ( poly m, poly d)
+static poly mpExdiv ( poly m, poly d)
 {
   int i;
   poly h = pHead(m);
