@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: units.cc,v 1.3 2001-02-01 15:54:45 mschulze Exp $ */
+/* $Id: units.cc,v 1.4 2001-02-02 11:34:53 mschulze Exp $ */
 /*
 * ABSTRACT: procedures to compute with units
 */
@@ -206,6 +206,7 @@ BOOLEAN rednf(leftv res,leftv h)
 {
   if(h!=NULL)
   {
+    assumeStdFlag(h);
     if(h->Typ()==IDEAL_CMD||h->Typ()==MODUL_CMD)
     {
       int typ=h->Typ();
