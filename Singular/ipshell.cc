@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.52 1999-11-15 17:20:12 obachman Exp $ */
+/* $Id: ipshell.cc,v 1.53 1999-12-21 15:10:47 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -519,14 +519,15 @@ char * iiStringMatrix(matrix im, int dim,char ch)
 int IsPrime(int p)  /* brute force !!!! */
 {
   int i,j;
-  if      (p == 0) return 0;
-  else if (p == 1) return 1/*1*/;
-  else if (p == 2) return p;
-  else if (p <  0) return (-IsPrime(-p));
+  if      (p == 0)    return 0;
+  else if (p == 1)    return 1/*1*/;
+  else if (p == 2)    return p;
+  else if (p < 0)     return (-IsPrime(-p));
+  else if (p > 32002) return 32003; // without this line, max prime is 32749
   else if (!(p & 1)) return IsPrime(p-1);
 #ifdef HAVE_FACTORY
   int a=0;
-  int e=cf_getNumSmallPrimes();
+  int e=cf_getNumSmallPrimes()-1;
   i=e/2;
   do
   {
