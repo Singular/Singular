@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.64 1998-05-20 12:26:32 pohl Exp $
+@comment $Id: types.doc,v 1.65 1998-05-25 09:03:19 schmidt Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -721,12 +721,17 @@ boolean expressions combined by boolean operations (@code{and},
 @code{or}, @code{not})
 
 @strong{Note:}
+@c ------------------------------------------------------------
+@c   This piece of text exists also in the file singular.doc,
+@c   chapter "Evaluation of logical expressions".
+@c   If you change something here, change it there, too!
+@c ------------------------------------------------------------
 All arguments of a logical expressions are first evaluated and
 then the value of the logical expression is determined. For example, the
 logical expressions @code{(a || b)} is evaluated by first evaluating
 @code{a} @emph{and} @code{b}, even though the value of @code{b} has no
 influence on the value of @code{(a || b)}, if @code{a} evaluates to
-@i{true}.
+true.
 
 Note that this evaluation is different from the left-to-right, conditional
 evaluation of logical expressions (as found in most programming
