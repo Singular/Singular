@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(gmalloc.c)
-AC_CONFIG_HEADER(mod2.h si_paths.h)
+AC_CONFIG_HEADER(mod2.h)
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl determine singuname
@@ -224,22 +224,6 @@ if test "${BISON+set}" != set; then
   AC_MSG_WARN(did not find bison -- make might fail)
 fi
 
-if test "${with_info+set}" != set; then
-  AC_CHECK_PROGS(INFO, info, notfound)
-  if test "${INFO}" = notfound; then
-    AC_MSG_ERROR(did not find info)
-  fi
-  AC_DEFINE_UNQUOTED(HAVE_INFO, "info")
-elif test "$with_info" != no; then
-  unset INFO
-  unset ac_cv_prog_INFO
-  AC_CHECK_PROGS(INFO, ${with_info}, notfound)
-  if test "${INFO}" = notfound; then
-    AC_MSG_ERROR(did not find ${with_info})
-  fi
-  AC_DEFINE_UNQUOTED(HAVE_INFO, "${with_info}")
-fi
-
 # ln -s  
 AC_PROG_LN_S
 
@@ -273,7 +257,7 @@ AC_PROG_GCC_TRADITIONAL
 AC_FUNC_MMAP
 AC_TYPE_SIGNAL
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS(gettimeofday atexit bcopy getcwd getwd vsnprintf sbrk readlink sleep usleep valloc getpagesize)
+AC_CHECK_FUNCS(gettimeofday atexit bcopy getcwd getwd vsnprintf sbrk readlink sleep usleep valloc getpagesize setenv)
 
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Find out more about particularity of the system
@@ -493,9 +477,6 @@ AC_ARG_WITH(
 AC_ARG_WITH(
   perl5,
   [  --with-perl5=[PERL5,no] uses PERL5 as perl5 program, default is perl5])
-AC_ARG_WITH(
-  info,
-  [  --with-info=[INFO,no]   uses INFO as info program, default is info])
 AC_ARG_WITH(
   readline,
   [  --without-readline      do not use readline for fancy display])

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.67 1999-07-28 17:51:06 Singular Exp $ */
+/* $Id: grammar.y,v 1.68 1999-08-03 16:33:42 obachman Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -31,7 +31,6 @@
 #include "ipid.h"
 #include "intvec.h"
 #include "febase.h"
-#include "fehelp.h"
 #include "matpol.h"
 #include "ring.h"
 #include "kstd1.h"
@@ -1071,15 +1070,12 @@ filecmd:
 helpcmd:
         HELP_CMD STRINGTOK ';'
           {
-            singular_help($2);
+            feHelp($2);
             FreeL((ADDRESS)$2);
           }
         | HELP_CMD ';'
           {
-            char *s=(char *)Alloc(10);
-            strcpy(s,"index");
-            singular_help(s);
-            Free((ADDRESS)s,10);
+            feHelp(NULL);
           }
         ;
 

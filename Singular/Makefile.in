@@ -66,7 +66,7 @@ LIBS		= -lm @NEED_LIBS@
 
 CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     clapmem.cc clapsing.cc claptmpl.cc cntrlc.cc \
-    extra.cc febase.cc feread.cc fehelp.cc \
+    extra.cc febase.cc feread.cc fehelp.cc feResource.cc \
     ffields.cc hdegree.cc hilb.cc hutil.cc \
     ideals.cc intvec.cc iparith.cc \
     ipassign.cc ipconv.cc ipid.cc iplib.cc \
@@ -96,7 +96,7 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	longalg.h mpsr_Tok.h structs.h binom.h intvec.h longrat.h \
 	numbers.h stype.h clapconv.h ipconv.h maps.h page.h \
 	subexpr.h clapsing.h ipid.h matpol.h polys.h syz.h \
-	cntrlc.h ipprint.h ring.h timer.h sdb.h fehelp.h \
+	cntrlc.h ipprint.h ring.h timer.h sdb.h \
 	febase.h ipshell.h shortfl.h tok.h mpr_complex.h mpr_global.h \
 	mmemory.h mmprivate.h mmheap.h mmpage.h page.h \
 	ffields.h khstd.h silink.h sparsmat.h gnumpfl.h gnumpc.h \
@@ -106,7 +106,7 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	kutil.h mpsr_Put.h spolys0.h sing_dld.h\
 	ndbm.h spSpolyLoop.h polys-impl.h polys-comp.h getopt.h libparse.h \
 	pcv.h mod_raw.h kbuckets.h kbPolyProcs.h \
-	mpr_global.h mpr_inout.h mpr_base.h mpr_numeric.h	
+	mpr_global.h mpr_inout.h mpr_base.h mpr_numeric.h 
 
 INCS=febase.inc polys.inc iparith.inc mpsr_Tok.inc spSpolyLoop.inc
 
@@ -116,11 +116,11 @@ TESTS=${testdir}/comparecheck ${testdir}/fac_test.in ${testdir}/fac_test.out\
 	${testdir}/dbm_test.in ${testdir}/dbm_test.out
 
 DISTFILES=${SOURCES} ${HEADERS} Makefile.in configure.in configure \
-	mod2.h.in si_paths.h.in grammar.h testgh install-sh mkinstalldirs \
+	mod2.h.in grammar.h testgh install-sh mkinstalldirs \
 	${INCS}
 
 OBJS=grammar.o scanner.o matpol.o binom.o mpr_complex.o gnumpfl.o gnumpc.o \
-     febase.o feread.o fehelp.o timer.o intvec.o attrib.o lists.o\
+     febase.o feread.o fehelp.o feResource.o timer.o intvec.o attrib.o lists.o\
      longrat.o longrat0.o misc.o ring.o numbers.o maps.o\
      hilb.o comm.o kstd1.o kstd2.o kutil.o khstd.o kstdfac.o modulop.o spolys.o\
      ideals.o subexpr.o hdegree.o hutil.o ffields.o shortfl.o \
@@ -162,13 +162,13 @@ OBJS=grammar.o scanner.o matpol.o binom.o mpr_complex.o gnumpfl.o gnumpc.o \
 
 all:	Singular
 
-Singular: mod2.h si_paths.h Makefile version.h scanner.cc gmalloc.o \
+Singular: mod2.h Makefile version.h scanner.cc gmalloc.o \
           ${OBJS} iparith.o mpsr_Tok.o tesths.cc libparse.cc 
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} -o Singular \
 	tesths.cc iparith.o mpsr_Tok.o ${OBJS} ${LDFLAGS} ${LIBS} \
 	${LD_DYN_FLAGS} gmalloc.o
 
-Singular-static: mod2.h si_paths.h Makefile version.h scanner.cc  gmalloc.o \
+Singular-static: mod2.h Makefile version.h scanner.cc  gmalloc.o \
 	        ${OBJS} iparith.o mpsr_Tok.o tesths.cc
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} \
 	-o Singular-static \
@@ -196,7 +196,7 @@ mmtables.inc: mmtables.c mmprivate.h mod2.h
 
 mmtables.o mmtables.d: mmtables.inc
 
-version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in si_paths.h.in \
+version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in \
            configure.in
 	echo "#define SINGULAR_VERSION_ID " `date '+%y%m%d%H'` >version.h
 
@@ -233,10 +233,10 @@ libparse.cc: libparse.l
 
 src: scanner.cc grammar.h grammar.cc libparse.cc spSpolyLoop.inc
 
-mod2.h si_paths.h: stamp-h
+mod2.h: stamp-h
 
-stamp-h : config.status mod2.h.in  si_paths.h.in
-	CONFIG_FILES= CONFIG_HEADERS="mod2.h si_paths.h" ./config.status
+stamp-h : config.status mod2.h.in  
+	CONFIG_FILES= CONFIG_HEADERS="mod2.h" ./config.status
 
 Makefile: Makefile.in config.status 
 	CONFIG_FILES="Makefile" CONFIG_HEADERS= ./config.status
@@ -306,18 +306,18 @@ maintainer-clean: distclean srcclean
 ##
 
 Singular-bindist: mod2.h Makefile version.h scanner.cc ${OBJS} iparith.o \
-                  mpsr_Tok.o tesths.cc libparse.cc si_paths.h depend
-	touch si_paths.h
-	${MAKE} CXXFLAGS="${CXXFLAGS} -DMAKE_DISTRIBUTION" Singular
+                  mpsr_Tok.o tesths.cc libparse.cc depend 
+	${MAKE} CXXFLAGS="${CXXFLAGS} -DMAKE_DISTRIBUTION" -W feResource.cc Singular
 	${INSTALL} -s Singular Singular-bindist
+	rm feResource.o
 
 Singular-static-bindist: mod2.h Makefile version.h scanner.cc si_paths.h \
                          ${OBJS} iparith.o mpsr_Tok.o tesths.cc \
-                         libparse.cc depend
-	touch si_paths.h
-	${MAKE} CXXFLAGS="${CXXFLAGS} -DMAKE_DISTRIBUTION" Singular-static
+                         libparse.cc depend 
+	${MAKE} CXXFLAGS="${CXXFLAGS} -DMAKE_DISTRIBUTION" -W feResource.cc Singular-static
 	strip Singular-static
 	mv Singular-static Singular-static-bindist
+	rm feResource.o
 
 tar:
 	tar cf Singular-${SINGULAR_VERSION}-src.tar ${DISTFILES}
@@ -353,7 +353,7 @@ DEFSG		= -D@SING_UNAME@ @DEFS@
 ## 
 
 OBJG1=	grammar.og scanner.og matpol.og binom.og gnumpfl.og mpr_complex.og \
-     febase.og feread.og fehelp.og timer.og intvec.og attrib.og lists.og \
+     febase.og feread.og fehelp.og feResource.og timer.og intvec.og attrib.og lists.og \
      gnumpc.og longrat.og longrat0.og misc.og ring.og numbers.og maps.og\
      hilb.og comm.og kstd1.og kstd2.og kutil.og khstd.og kstdfac.og modulop.og \
      spolys.og ideals.og subexpr.og hdegree.og hutil.og ffields.og shortfl.og \
@@ -429,7 +429,7 @@ BPROFOBJ	= /usr/local/lib/bmon.o
 ## 
 
 OBJP1=	grammar.op scanner.op matpol.op binom.op gnumpfl.op mpr_complex.op \
-     febase.op feread.op fehelp.op timer.op intvec.op attrib.op lists.op \
+     febase.op feread.op fehelp.op feResource.op timer.op intvec.op attrib.op lists.op \
      gnumpc.op longrat.op longrat0.op misc.op ring.op numbers.op maps.op\
      hilb.op comm.op kstd1.op kstd2.op kutil.op khstd.op kstdfac.op modulop.op \
      spolys.op ideals.op subexpr.op hdegree.op hutil.op ffields.op shortfl.op \

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.31 1999-07-28 17:51:05 Singular Exp $ */
+/* $Id: febase.h,v 1.32 1999-08-03 16:33:41 obachman Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -11,30 +11,28 @@
 #include <string.h>
 #include "structs.h"
 
+/* define DIR_SEPP, etc */
 #ifdef macintosh
 #  define  DIR_SEP ':'
 #  define  DIR_SEPP ":"
-#else
-#ifdef MSDOS
-#  define  DIR_SEP '\\'
-#  define  DIR_SEPP "\\"
-#else
-#ifdef atarist
-#  define  DIR_SEP '\\'
-#  define  DIR_SEPP "\\"
-#else  /* unix */
+#  define  UP_DIR ""
+#else  /* unix , WINNT */
 #  define  DIR_SEP '/'
 #  define  DIR_SEPP "/"
-#endif  /* atarist */
-#endif  /* MSDOS */
+#  define  UP_DIR ".."
 #endif  /* macintosh */
+// this might still get reset by feInitResources
+extern char fePathSep;
 
-#if defined(WINNT)
-#  define  FS_SEP ';'
-#elif defined(macintosh)
-#define FS_SEP ','
-#else
-#define FS_SEP ':'
+/* define MAXPATHLEN */
+#ifdef HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif
+
+#include <limits.h>
+
+#ifndef MAXPATHLEN
+#define MAXPATHLEN 1024
 #endif
 
 /*
@@ -97,6 +95,8 @@ void   PrintTCLS(const char c, const char * s);
 #define PrintTCLS(A,B) Print("TCL-ErrS:%s",B)
 #endif
 void   PrintS(char* s);
+#define feReportBug(s) fePrintReportBug(s, __FILE__, __LINE__)
+void fePrintReportBug(char* msg, char* file, int line);
 
 #ifdef __cplusplus
 }
@@ -121,13 +121,39 @@ enum   feBufferInputs
   BI_file
 };
 
-void    feInitPaths(const char* argv0);
-char*   feGetSearchPath();
-char*   feGetExpandedExecutable();
-char*   feGetBinDir();
-char*   feGetInfoCall(const char* index);
-char*   feGetInfoProgram();
-char*   feGetInfoFile();
+/*****************************************************************
+ *
+ * Resource management (feResources.cc)
+ *
+ *****************************************************************/
+// returns value of Resource as read-only string, or NULL
+// if Resource not found
+// issues warning, if explicitely requested (warn > 0), or 
+// if warn < 0 and Resource is gotten for the first time
+// Always quiet if warn == 0
+char* feResource(const char id, int warn = -1);
+char* feResource(const char* key, int warn = -1);
+// This needs to be called before the first call to feResource
+// Initializes Resources, SearchPath, and extends PATH
+void feInitResources(char* argv0);
+// Prints resources int string with StringAppend, etc
+void feStringAppendResources();
+
+/*****************************************************************
+ *
+ * help system (fehelp.cc)
+ *
+ *****************************************************************/
+// if str != NULL display help for str
+// display general help, otherwise
+void feHelp(char* str = NULL);
+// if browser != NULL or OptionValue("browser") != NULL 
+//    set HelpBrowser to browser 
+// otherwise, if browser was already set, leave as is, 
+//            if not, choose first available browser
+// return string identifying current browser
+// keeps OptionValue("browser") up-to-date
+char* feHelpBrowser(char* browser = NULL);
 
 FILE *  feFopen(char *path, char *mode, char *where=NULL, int useWerror=FALSE);
 #ifndef __MWERKS__

@@ -17,42 +17,488 @@
 #include "tok.h"
 #include "mmemory.h"
 #include "febase.h"
-#include "fehelp.h"
 #include "ipid.h"
 #include "ipshell.h"
+#include "libparse.h"
 
-#ifdef HAVE_LIBPARSER
-#  include "libparse.h"
-#endif /* HAVE_LIBPARSER */
-
-
-/*0 implementation*/
-
-void singular_help(char *str)
+/*****************************************************************
+ *
+ * Declarations: Data  structures
+ *
+ *****************************************************************/
+#define MAX_HE_ENTRY_LENGTH 60
+typedef struct 
 {
-  /* cut leading and trailing white spaces: --------------------------------*/
+  char key[MAX_HE_ENTRY_LENGTH];
+  char node[MAX_HE_ENTRY_LENGTH];
+  char url[MAX_HE_ENTRY_LENGTH];
+  long  chksum;
+} heEntry_s;
+typedef  heEntry_s * heEntry;
+
+typedef void (*heBrowserHelpProc)(heEntry hentry);
+typedef BOOLEAN (*heBrowserInitProc)();
+
+typedef struct
+{
+  char* browser;
+  heBrowserInitProc init_proc;
+  heBrowserHelpProc help_proc;
+} heBrowser_s;
+typedef heBrowser_s * heBrowser;
+
+/*****************************************************************
+ *
+ * Declarations: Local functions
+ *
+ *****************************************************************/
+static char* strclean(char* str); 
+static BOOLEAN heKey2Entry(char* filename, char* key, heEntry hentry);
+static int heReKey2Entry (char* filename, char* key, heEntry hentry);
+static BOOLEAN strmatch(char* s, char* re);
+static BOOLEAN heOnlineHelp(char* s);
+static void heBrowserHelp(heEntry hentry);
+static long heKeyChksum(char* key);
+
+// browser functions
+static BOOLEAN heInfoInit();    static void heInfoHelp(heEntry hentry);
+#if ! defined(WINNT) && ! defined(macintosh)
+static BOOLEAN heNetscapeInit();static void heNetscapeHelp(heEntry hentry);
+static BOOLEAN heXinfoInit();   static void heXinfoHelp(heEntry hentry);
+static BOOLEAN heTkinfoInit();  static void heTkinfoHelp(heEntry hentry);
+#endif
+static BOOLEAN heBuildinInit(); static void heBuildinHelp(heEntry hentry);
+static BOOLEAN heDummyInit();   static void heDummyHelp(heEntry hentry);
+static BOOLEAN heEmacsInit();   static void heEmacsHelp(heEntry hentry);
+
+static heBrowser heCurrentHelpBrowser = NULL;
+
+
+/*****************************************************************
+ *
+ * Definition: available help browsers
+ *
+ *****************************************************************/
+// order is improtant -- first possible help is choosen
+static heBrowser_s heHelpBrowsers[] =
+{
+  { "info",     heInfoInit,     heInfoHelp},
+#if ! defined(WINNT) && ! defined(macintosh)
+  { "netscape", heNetscapeInit, heNetscapeHelp},
+  { "xinfo",    heXinfoInit,    heXinfoHelp},
+  { "tkinfo",   heTkinfoInit,   heTkinfoHelp},
+#endif
+  { "buildin",  heBuildinInit,  heBuildinHelp},
+  { "dummy",    heDummyInit,    heDummyHelp},
+  { "emacs",    heEmacsInit,    heEmacsHelp},
+  { NULL, NULL, NULL} // must be the last record
+};
+
+/*****************************************************************
+ *
+ * Implementation: public function
+ *
+ *****************************************************************/
+void feHelp(char *str)
+{
+  str = strclean(str);
+  if (str == NULL) {heBrowserHelp(NULL); return;}
+
+  if (strlen(str) > MAX_HE_ENTRY_LENGTH - 2)  // need room for extra **
+    str[MAX_HE_ENTRY_LENGTH - 3] = '\0';
+
+  BOOLEAN key_is_regexp = (strchr(str, '*') != NULL);
+  heEntry_s hentry;
+  char* idxfile = feResource("IdxFile");
+  
+  // Try exact match of help string with key in index
+  if (!key_is_regexp && idxfile != NULL && heKey2Entry(idxfile, str, &hentry))
+  {
+    heBrowserHelp(&hentry);
+    return;
+  }
+
+  if (! key_is_regexp && heOnlineHelp(str)) return;
+  
+  // Try to match approximately with key in index file
+  if (idxfile != NULL)
+  {
+    char* matches = StringSetS("");
+    int found = heReKey2Entry(idxfile, str, &hentry);
+
+    // Try to match with str*
+    if (found == 0)
+    {
+      char mkey[MAX_HE_ENTRY_LENGTH];
+      strcpy(mkey, str);
+      strcat(mkey, "*");
+      found = heReKey2Entry(idxfile, mkey, &hentry);
+      // Try to match with *str*
+      if (found == 0)
+      {
+        mkey[0] = '*';
+        strcpy(mkey + 1, str);
+        strcat(mkey, "*");
+        found = heReKey2Entry(idxfile, mkey, &hentry);
+      }
+      
+      // Print warning and return if nothing found
+      if (found == 0)
+      {
+        Warn("No help for topic '%s' (not even for '*%s*')", str, str);
+        WarnS("Try '?;'       for general help");
+        WarnS("or  '?Index;'  for all available help topics");
+        return;
+      }
+    }
+
+    // do help if unique match was found
+    if (found == 1)
+    {
+      heBrowserHelp(&hentry);
+      return;
+    }
+    // Print warning about multiple matches and return
+    if (key_is_regexp)
+      Warn("No unique help for '%s'", str);
+    else
+      Warn("No help for topic '%s'", str);
+    Warn("Try one of");
+    PrintS(matches);
+    PrintS("\n");
+    return;
+  }
+  
+  // no idx file, let Browsers deal with it, if they can
+  strcpy(hentry.key, str);
+  *hentry.node = '\0';
+  *hentry.url = '\0';
+  hentry.chksum = 0;
+  heBrowserHelp(&hentry);
+}
+
+char* feHelpBrowser(char* which)
+{
+  int i = 0;
+  extern void mainSetSingOptionValue(const char* name, char* value);
+  char* mainGetSingOptionValue(const char* name);
+
+  // if no argument, see what we have as value to the option
+  if (which == NULL || *which == '\0') which = mainGetSingOptionValue("browser");
+  
+  // if no argument, choose first available help browser
+  if (which == NULL || *which == '\0')
+  {
+    // unles one is already set
+    if (heCurrentHelpBrowser != NULL) goto Finish;
+    
+    while (heHelpBrowsers[i].browser != NULL)
+    {
+      if (heHelpBrowsers[i].init_proc()) 
+      {
+        heCurrentHelpBrowser = &(heHelpBrowsers[i]);
+        return heCurrentHelpBrowser->browser;
+      }
+      i++;
+    }
+    // should never get here
+    feReportBug("");
+  }
+
+  // with argument, find matching help browser
+  while (heHelpBrowsers[i].browser != NULL &&
+         strcmp(heHelpBrowsers[i].browser, which) != 0)
+  {i++;}
+  
+  if (heHelpBrowsers[i].browser == NULL) 
+  {
+    Warn("No help browser '%s' available", which);
+  }
+  else
+  {
+    // see whether we can init it
+    if (heHelpBrowsers[i].init_proc())
+    {
+      heCurrentHelpBrowser = &(heHelpBrowsers[i]);
+      goto Finish;
+    }
+  }
+      
+  // something went wrong
+  if (heCurrentHelpBrowser == NULL) 
+  {
+    // choose first available help browser
+    mainSetSingOptionValue("browser", "");
+    feHelpBrowser();
+    assume(heCurrentHelpBrowser != NULL);
+    Warn("Setting help browser to '%s'", heCurrentHelpBrowser->browser);
+    return heCurrentHelpBrowser->browser;
+  }
+  else
+  {
+    // or, leave as is
+    Warn("Help browser stays at '%s'",  heCurrentHelpBrowser->browser);
+  }
+
+  Finish:
+  mainSetSingOptionValue("browser", heCurrentHelpBrowser->browser);
+  return heCurrentHelpBrowser->browser;
+}
+
+/*****************************************************************
+ *
+ * Implementation: local function
+ *
+ *****************************************************************/
+// Remove whitspaces from beginning and end, return NULL if only whitespaces
+static char* strclean(char* str)
+{
+  if (str == NULL) return NULL;
   char *s=str;
-  while (*s==' ') s++;
+  while (*s <= ' ' && *s != '\0') s++;
+  if (*s == '\0') return NULL;
   char *ss=s;
   while (*ss!='\0') ss++;
-  while (*ss<=' ')
+  ss--;
+  while (*ss <= ' ' && *ss != '\0')
   {
     *ss='\0';
     ss--;
   }
-  /* try to find the help string >>s<<  in the index: ----------------------*/
-  /* if found, call external help browser and return */
+  if (*ss == '\0') return NULL;
+  return s;
+}
 
-  /* try to find the help string as a loaded procedure: --------------------*/
-  /* if found, display the help and return */
-  #ifdef HAVE_NAMESPACES
+// Finds help entry for key:
+// returns filled-in hentry and TRUE, on success
+// FALSE, on failure
+// Assumes that lines of idx file have the following form
+// key\tnode\turl\tchksum\n (chksum ma be empty, then it is set to -1)
+// and that lines are sorted alpahbetically w.r.t. index entries
+static BOOLEAN heKey2Entry(char* filename, char* key, heEntry hentry)
+{
+  FILE* fd;
+  char c, k;
+  int kl, i;
+  *(hentry->key) = '\0';
+  *(hentry->url) = '\0';
+  *(hentry->node) = '\0';
+  hentry->chksum = 0;
+  if (filename == NULL || key == NULL)  return FALSE;
+  fd = fopen(filename, "r");
+  if (fd == NULL) return FALSE;
+  kl = strlen(key);
+
+  k = key[0];
+  i = 0;
+  while ((c = getc(fd)) != EOF)
+  {
+    if (c < k) 
+    {
+      /* Skip line */
+      while (getc(fd) != '\n') {};
+      if (i) 
+      {
+        i=0;
+        k=key[0];
+      }
+    }
+    else if (c == k)
+    {
+      i++;
+      if (i == kl)
+      {
+        // \t must follow, otherwise only substring match
+        if (getc(fd) != '\t') goto Failure;
+
+        // Now we found an exact match
+        if (hentry->key != key) strcpy(hentry->key, key);
+        // get node
+        i = 0;
+        while ((c = getc(fd)) != '\t' && c != EOF)
+        {
+          hentry->node[i] = c;
+          i++;
+        }
+        if (c == EOF) goto Failure;
+        
+        // get url
+        hentry->node[i] = '\0';
+        i = 0;
+        while ((c = getc(fd)) != '\t' && c != EOF)
+        {
+          hentry->url[i] = c;
+          i++;
+        }
+        if (c == EOF) goto Failure;
+
+        // get chksum
+        hentry->url[i] = '\0';
+
+        if (fscanf(fd, "%ld\n", &(hentry->chksum)) != 1)
+        {
+          hentry->chksum = -1;
+        }
+        fclose(fd);
+        return TRUE;
+      }
+      else if (i > kl) 
+      {
+        goto Failure;
+      }
+      else
+      {
+        k = key[i];
+      }
+    }
+    else
+    {
+      goto Failure;
+    }
+  }
+  Failure:
+  fclose(fd);
+  return FALSE;
+}
+
+// return TRUE if s matches re
+// FALSE, otherwise
+// does not distinguish lower and upper cases
+// inteprets * as wildcard
+static BOOLEAN strmatch(char* s, char* re)
+{
+  if (s == NULL || *s == '\0') 
+    return (re == NULL || *re == '\0' || strcmp(re, "*") == 0);
+  if (re == NULL || *re == '\0') return FALSE;
+
+  int i;
+  char ls[MAX_HE_ENTRY_LENGTH + 1];
+  char rs[MAX_HE_ENTRY_LENGTH + 1];
+  char *l, *r, *ll, *rr;
+  
+  // make everything to lower case
+  i=1;
+  ls[0] = '\0';
+  do
+  {
+    if (*s >= 'A' && *s <= 'Z') ls[i] = *s + ('a' - 'A');
+    else ls[i] = *s;
+    i++;
+    s++;
+  } while (*s != '\0');
+  ls[i] = '\0';
+  l = &(ls[1]);
+  
+  i=1;
+  rs[0] = '\0';
+  do
+  {
+    if (*re >= 'A' && *re <= 'Z') rs[i]= *re + ('a' - 'A');
+    else rs[i] = *re;
+    i++;
+    re++;
+  } while (*re != '\0');
+  rs[i] = '\0';
+  r = &(rs[1]);
+  
+  // chopp of exact matches from beginning and end
+  while (*r != '*' && *r != '\0' && *l != '\0')
+  {
+    if (*r != *l) return FALSE;
+    *r = '\0';
+    *s = '\0';
+    r++;
+    l++;
+  }
+  if (*r == '\0') return (*l == '\0');
+  if (*r == '*' && r[1] == '\0') return TRUE;
+  if (*l == '\0') return FALSE;
+
+  rr = &r[strlen(r) - 1];
+  ll = &l[strlen(l) - 1];
+  while (*rr != '*' && *rr != '\0' && *ll != '\0')
+  {
+    if (*rr != *ll) return FALSE;
+    *rr = '\0';
+    *ll = '\0';
+    rr--;
+    ll--;
+  }
+  if (*rr == '\0') return (*ll == '\0');
+  if (*rr == '*' && rr[-1] == '\0') return TRUE;
+  if (*ll == '\0') return FALSE;
+  
+  // now *r starts with a * and ends with a *
+  r++;
+  *rr = '\0'; rr--;
+  while (*r != '\0')
+  {
+    rr = r + 1;
+    while (*rr != '*' && *rr != '\0') rr++;
+    if (*rr == '*') 
+    {
+      *rr = '\0';
+      rr++;
+    }
+    l = strstr(l, r);
+    if (l == NULL) return FALSE;
+    r = rr;
+  }
+  return TRUE;
+}
+
+// similar to heKey2Entry, excpet that
+// key is taken as regexp (see above)
+// and number of matches is returned
+// if number of matches > 0, then hentry contains entry for first match
+// if number of matches > 1, matches are printed as komma-separated
+// into global string
+static int heReKey2Entry (char* filename, char* key, heEntry hentry)
+{
+  int i = 0;
+  FILE* fd;
+  char index_key[MAX_HE_ENTRY_LENGTH];
+  
+  if (filename == NULL || key == NULL)  return 0;
+  fd = fopen(filename, "r");
+  if (fd == NULL) return 0;
+  while (fscanf(fd, "%[^\t]\t%*[^\n]\n", index_key) == 1)
+  {
+    if (strmatch(index_key, key))
+    {
+      i++;
+      if (i == 1)
+      {
+        heKey2Entry(filename, index_key, hentry);
+      }
+      else if (i == 2)
+      {
+        StringAppend("?%s; ?%s;", hentry->key, index_key);
+      }
+      else
+      {
+        StringAppend(" ?%s;", index_key);
+      }
+    }
+  }
+  fclose(fd);
+  return i;
+}
+
+// try to find the help string as a loaded procedure or library
+// if found, display the help and return TRUE
+// otherwise, return FALSE
+static BOOLEAN heOnlineHelp(char* s)
+{
+#ifdef HAVE_NAMESPACES
   idhdl h, ns;
   iiname2hdl(s, &ns, &h);
-  #else /* HAVE_NAMESPACES */
+#else /* HAVE_NAMESPACES */
   idhdl h=idroot->get(s,myynest);
-  #endif /* HAVE_NAMESPACES */
-  if ((h!=NULL) && (IDTYP(h)==PROC_CMD)
-  && (strcmp(IDPROC(h)->libname, "standard.lib")!=0))
+#endif /* HAVE_NAMESPACES */
+
+  // try help for a procedure
+  if ((h!=NULL) && (IDTYP(h)==PROC_CMD))
   {
     char *lib=iiGetLibName(IDPROC(h));
     if((lib!=NULL)&&(*lib!='\0'))
@@ -61,112 +507,353 @@ void singular_help(char *str)
       s=iiGetLibProcBuffer(IDPROC(h), 0);
       PrintS(s);
       FreeL((ADDRESS)s);
+      return TRUE;
     }
-    return;
+    return FALSE;
+  }
+  
+  // try help for a library
+  int ls = strlen(s);
+  char* str = NULL;
+  // chekc that it ends with "[.,_]lib"
+  if (strlen(s) >=4 &&  strcmp(&s[ls-3], "lib") == 0)
+  {
+    if (s[ls - 4] == '.') str = s;
+    else
+    {
+      str = mstrdup(s);
+      str[ls - 4] = '.';
+    }
+  }
+  else
+  {
+    return FALSE;
   }
 
-  /* try to find the help string as a library: ------------------------------*/
   char libnamebuf[128];
   FILE *fp=NULL;
-  if ((str[1]!='\0')
-  && ((fp=feFopen(str,"rb", libnamebuf))!=NULL))
+  if ((str[1]!='\0') && ((fp=feFopen(str,"rb", libnamebuf))!=NULL))
   {
-    #ifdef HAVE_LIBPARSER
-      extern FILE *yylpin;
-      lib_style_types lib_style; // = OLD_LIBSTYLE;
+    extern FILE *yylpin;
+    lib_style_types lib_style; // = OLD_LIBSTYLE;
   
-      yylpin = fp;
-      #ifdef HAVE_NAMESPACES
-      yylplex(str, libnamebuf, &lib_style, IDROOT, FALSE, GET_INFO);
-      #else /* HAVE_NAMESPACES */
-      yylplex(str, libnamebuf, &lib_style, GET_INFO);
-      #endif /* HAVE_NAMESPACES */
-      reinit_yylp();
-      if(lib_style == OLD_LIBSTYLE)
+    yylpin = fp;
+#ifdef HAVE_NAMESPACES
+    yylplex(str, libnamebuf, &lib_style, IDROOT, FALSE, GET_INFO);
+#else /* HAVE_NAMESPACES */
+    yylplex(str, libnamebuf, &lib_style, GET_INFO);
+#endif /* HAVE_NAMESPACES */
+    reinit_yylp();
+    if(lib_style == OLD_LIBSTYLE)
+    {
+      char buf[256];
+      fseek(fp, 0, SEEK_SET);
+      Warn( "library %s has an old format. Please fix it for the next time",
+            str);
+      if (str != s) FreeL(str);
+      BOOLEAN found=FALSE;
+      while (fgets( buf, sizeof(buf), fp))
       {
-        char buf[256];
-        fseek(fp, 0, SEEK_SET);
-    #else /* HAVE_LIBPARSER */
-      { char buf[256];
-    #endif /* HAVE_LIBPARSER */
-        Warn( "library %s has an old format. Please fix it for the next time",
-              str);
-        BOOLEAN found=FALSE;
-        while (fgets( buf, sizeof(buf), fp))
+        if (strncmp(buf,"//",2)==0)
         {
-          if (strncmp(buf,"//",2)==0)
-          {
-            if (found) return;
-          }
-          else if ((strncmp(buf,"proc ",5)==0)||(strncmp(buf,"LIB ",4)==0))
-          {
-            if (!found) WarnS("no help part in library found");
-            return;
-          }
-          else
-          {
-            found=TRUE;
-            PrintS(buf);
-          }
+          if (found) return TRUE;
+        }
+        else if ((strncmp(buf,"proc ",5)==0)||(strncmp(buf,"LIB ",4)==0))
+        {
+          if (!found) WarnS("no help part in library found");
+          return TRUE;
+        }
+        else
+        {
+          found=TRUE;
+          PrintS(buf);
         }
       }
-    #ifdef HAVE_LIBPARSER
-      else
-      {
-        fclose( yylpin );
-        PrintS(text_buffer);
-        FreeL(text_buffer);
-        text_buffer=NULL;
-      }
-    #endif /* HAVE_LIBPARSER */
-    return;
+    }
+    else
+    {
+      if (str != s) FreeL(str);
+      fclose( yylpin );
+      PrintS(text_buffer);
+      FreeL(text_buffer);
+      text_buffer=NULL;
+    }
+    return TRUE;
   }
-  /* try to find the help string as a substring: -----------------------------*/
-  /* if found, call external help browser and return */
 
-  /* the catch-all is: help index; -------------------------------------------*/
-  /* find "index", call external help browser */
+  if (str != s) FreeL(str);
+  return FALSE;
+}
 
-  #ifdef HAVE_TCL
-  if(!tclmode)
-  #endif
+static long heKeyChksum(char* key)
+{
+  if (key == NULL || *key == '\0') return 0;
+#ifdef HAVE_NAMESPACES
+  idhdl h, ns;
+  iiname2hdl(key, &ns, &h);
+#else /* HAVE_NAMESPACES */
+  idhdl h=idroot->get(key,myynest);
+#endif /* HAVE_NAMESPACES */
+  if ((h!=NULL) && (IDTYP(h)==PROC_CMD))
   {
-    #ifdef buildin_help
-    singular_manual(str);
-    #else
-    system(feGetInfoCall(str));
-    #endif
+    procinfo *pi = IDPROC(h);
+    if (pi != NULL) return pi->data.s.help_chksum;
+  }
+  return 0;
+}
+
+/*****************************************************************
+ *
+ * Implementation : Help Browsers
+ *
+ *****************************************************************/
+   
+static void heBrowserHelp(heEntry hentry)
+{
+  // check checksums of procs
+  int kchksum = (hentry != NULL && hentry->chksum > 0 ? 
+                 heKeyChksum(hentry->key) : 0);
+  if (kchksum  && kchksum != hentry->chksum && heOnlineHelp(hentry->key)) 
+    return;
+  
+  if (heCurrentHelpBrowser == NULL) feHelpBrowser();
+
+  assume(heCurrentHelpBrowser != NULL);
+  heCurrentHelpBrowser->help_proc(hentry);
+}
+
+#define MAX_SYSCMD_LEN MAXPATHLEN*2
+// browser functions
+static BOOLEAN heInfoInit()
+{
+  if (feResource('i') == NULL)
+  {
+    WarnS("'info' help browser not available: no InfoFile");
+    return FALSE;
+  }
+  if (feResource('I') == NULL)
+  {
+    WarnS("'info' help browser not available: no 'info' program found");
+    return FALSE;
+  }
+  return TRUE;
+}
+static void heInfoHelp(heEntry hentry)
+{
+  char sys[MAX_SYSCMD_LEN];
+
+  if (hentry != NULL && *(hentry->key) != '\0')
+  {
+    if (*(hentry->node) != '\0') 
+      sprintf(sys, "%s -f %s --node='%s'", 
+              feResource('I'), feResource('i'), hentry->node);
+    else
+      sprintf(sys, "%s -f %s Index '%s'", 
+              feResource('I'), feResource('i'), hentry->key);
+  }
+  else
+    sprintf(sys, "%s -f %s --node=Top", feResource('I'), feResource('i'));
+  system(sys);
+}
+
+#if ! defined(WINNT) && ! defined(macintosh)
+static BOOLEAN heNetscapeInit()
+{
+  if (feResource("netscape" == NULL))
+  {
+    WarnS("'netscape' help browser not available: no 'netscape' program found");
+    return FALSE;
+  }
+  if (getenv("DISPLAY") == NULL)
+  {
+    WarnS("'netscape' help browser not available:");
+    WarnS("Environment variable DISPLAY not set");
+    return FALSE;
+  }
+  
+  if (feResource("HtmlDir") == NULL)
+  {
+    WarnS("no local HtmlDir found");
+    Warn("using %s instead", feResource("ManualUrl"));
+  }
+  return TRUE;
+}
+static void heNetscapeHelp(heEntry hentry)
+{
+  char sys[MAX_SYSCMD_LEN];
+  char url[MAXPATHLEN];
+  char* htmldir = feResource("HtmlDir");
+  char* urltype;
+  
+  if (htmldir == NULL) 
+  {
+    urltype = "";
+    htmldir = feResource("ManualUrl");
+  }
+  else
+  {
+    urltype = "file:";
+  }
+
+  if (hentry != NULL && *(hentry->url) != '\0')
+  {
+    sprintf(url, "%s%s/%s", urltype, htmldir, hentry->url);
+  }
+  else
+  {
+    sprintf(url, "%s%s/index.htm", urltype, htmldir);
+  }
+  sprintf(sys, "%s --remote 'OpenUrl(%s)' > /dev/null 2>&1", 
+          feResource("netscape"), url);
+  
+  // --remote exits with status != 0 if netscaep isn't already running
+  if (system(sys) != 0)
+  {
+    sprintf(sys, "%s %s &", feResource("netscape"), url);
+    system(sys);
   }
 }
 
+static BOOLEAN heXinfoInit()
+{
+  if (getenv("DISPLAY") == NULL)
+  {
+    WarnS("'xinfo' help browser not available:");
+    WarnS("Environment variable DISPLAY not set");
+    return FALSE;
+  }
+  if (feResource('i') == NULL)
+  {
+    WarnS("'xinfo' help browser not available: no InfoFile");
+    return FALSE;
+  }
+  if (feResource('I') == NULL)
+  {
+    WarnS("'xinfo' help browser not available: no 'info' program found");
+    return FALSE;
+  }
+  if (feResource('X') == NULL)
+  {
+    WarnS("'xinfo' help browser not available: no 'xterm' program found");
+    return FALSE;
+  }
+  return TRUE;
+}
+static void heXinfoHelp(heEntry hentry)
+{
+  char sys[MAX_SYSCMD_LEN];
+
+  if (hentry != NULL && *(hentry->key) != '\0')
+  {
+    if (*(hentry->node) != '\0') 
+      sprintf(sys, "%s -e %s -f %s --node='%s' &", 
+              feResource('X'), feResource('I'), feResource('i'), hentry->node);
+    else
+      sprintf(sys, "%s -e %s -f %s Index '%s' &", 
+              feResource('X'), feResource('I'), feResource('i'), hentry->key);
+  }
+  else
+    sprintf(sys, "%s -e %s -f %s --node=Top &", 
+            feResource('X'), feResource('I'), feResource('i'));
+  system(sys);
+}
+
+static BOOLEAN heTkinfoInit()
+{
+  if (getenv("DISPLAY") == NULL)
+  {
+    WarnS("'tkinfo' help browser not available:");
+    WarnS("Environment variable DISPLAY not set");
+    return FALSE;
+  }
+  if (feResource('i') == NULL)
+  {
+    WarnS("'tkinfo' help browser not available: no InfoFile");
+    return FALSE;
+  }
+  if (feResource('T') == NULL)
+  {
+    WarnS("'tkinfo' help browser not available: no 'tkinfo' program found");
+    return FALSE;
+  }
+  return TRUE;
+}
+static void heTkinfoHelp(heEntry hentry)
+{
+  char sys[MAX_SYSCMD_LEN];
+  if (hentry != NULL && *(hentry->node) != '\0')
+  {
+    sprintf(sys, "%s '(%s)%s' &", 
+            feResource('T'), feResource('i'), hentry->node);
+  }
+  else
+  {
+    sprintf(sys, "%s %s &", 
+            feResource('T'), feResource('i'));
+  }
+  system(sys);
+}
+#endif // ! defined(WINNT) && ! defined(macintosh)
+
+static BOOLEAN heDummyInit()
+{
+  return TRUE;
+}
+static void heDummyHelp(heEntry hentry)
+{
+  Werror("No functioning help browser available.");
+  Werror("Use 'system(\"--bowser\", <browser>);' to set help browser.");
+  Werror("Make sure file singular.hlp is found");
+}
+
+static BOOLEAN heEmacsInit()
+{
+  if (feResource('i') == NULL)
+  {
+    WarnS("'emacs' help browser not available: no InfoFile");
+    return FALSE;
+  }
+  return TRUE;
+}
+static void heEmacsHelp(heEntry hentry)
+{
+  WarnS("Your help command could not be executed. Use");
+  Warn("C-h C-s %s", 
+       (hentry != NULL && *(hentry->node) != '\0' ? hentry->node : "Top"));
+  Warn("to enter the Singular online help.");
+  Warn("For more information on singular-mode under Emacs, type C-h m");
+}
+static BOOLEAN heBuildinInit()
+{
+  if (feResource('i') == NULL)
+  {
+    WarnS("'buildin' help browser not available: no InfoFile");
+    return FALSE;
+  }
+  return TRUE;
+}
+static int singular_manual(char *str);
+static void heBuildinHelp(heEntry hentry)
+{
+  char* node = mstrdup(hentry != NULL && *(hentry->node) != '\0' ? 
+                       hentry->node : "Top");
+  singular_manual(node);
+  FreeL(node);
+}
+
+  
 /* ========================================================================== */
-
-
-#ifdef buildin_help
-
+// old, stupid buildin_help
+// This could be implemented much more clever, but I'm too lazy to do this now
+//
 #define HELP_OK        0
-
 #define FIN_INDEX    '\037'
 #define not  !
 #define HELP_NOT_OPEN  1
 #define HELP_NOT_FOUND 2
-#ifndef macintosh
-#define Index_File     SINGULAR_INFODIR "/singular.hlp"
-#define Help_File      SINGULAR_INFODIR "/singular.hlp"
-#else
-#define Index_File     SINGULAR_INFODIR "singular.hlp"
-#define Help_File      SINGULAR_INFODIR "singular.hlp"
-#endif
-#define BUF_LEN        128
+#define BUF_LEN        256
 #define IDX_LEN        64
 #define MAX_LINES      21
-
-//static int compare(char *s1,char *s2)
-//{
-//  for(;*s1==*s2;s1++,s2++)
-//     if(*s2=='\0') return(0);
-//  return(*s2);
-//}
 
 #ifdef macintosh
 static char tolow(char p)
@@ -184,7 +871,7 @@ static int show(unsigned long offset,FILE *help, char *close)
   int  lines = 0;
 
   if( help== NULL)
-    if( (help = feFopen(Help_File, "r")) == NULL)
+    if( (help = fopen(feResource('i'), "rb")) == NULL)
       return HELP_NOT_OPEN;
 
   fseek(help,  (long)(offset+1), (int)0);
@@ -226,7 +913,7 @@ static int show(unsigned long offset,FILE *help, char *close)
 }
 
 /*************************************************/
-int singular_manual(char *str)
+static int singular_manual(char *str)
 { FILE *index=NULL,*help=NULL;
   unsigned long offset;
   char *p,close;
@@ -235,7 +922,7 @@ int singular_manual(char *str)
        Index[IDX_LEN+1],
        String[IDX_LEN+1];
 
-  if( (index = feFopen(Index_File, "r",NULL,TRUE)) == NULL)
+  if( (index = fopen(feResource('i'), "rb")) == NULL)
   {
     return HELP_NOT_OPEN;
   }
@@ -268,8 +955,8 @@ int singular_manual(char *str)
     if(close=='x')
     break;
   }
-  (void)fclose(index);
-  (void)fclose(help);
+  if (index != NULL) (void)fclose(index);
+  if (help != NULL) (void)fclose(help);
   if(not done)
   {
     Warn("`%s` not found",String);
@@ -277,5 +964,4 @@ int singular_manual(char *str)
   }
   return HELP_OK;
 }
-#endif // buildin_help
 /*************************************************/

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.62 1999-05-29 11:58:26 Singular Exp $ */
+/* $Id: tesths.cc,v 1.63 1999-08-03 16:33:44 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -32,12 +32,9 @@
 #endif
 #include "getopt.h"
 
-#ifndef MAXPATHLEN
-#define MAXPATHLEN 1024
-#endif
-
 // define the long option names here
 #define LON_BATCH           "batch"
+#define LON_BROWSER         "browser"
 #define LON_EXECUTE         "execute"
 #define LON_ECHO            "echo"
 #define LON_HELP            "help"
@@ -80,6 +77,7 @@ static struct option longopts[] =
 #ifdef HAVE_TCL
   {LON_TCLMODE,           0,  0,  'x'},
 #endif
+  {LON_BROWSER,           1,  0,  LONG_OPTION_RETURN},
   {LON_NO_STDLIB,         0,  0,  LONG_OPTION_RETURN},
   {LON_NO_RC,             0,  0,  LONG_OPTION_RETURN},
   {LON_NO_WARN,           0,  0,  LONG_OPTION_RETURN},
@@ -116,8 +114,9 @@ static struct sing_option sing_longopts[] =
 #ifdef HAVE_MPSR
   {LON_BATCH,       0,          "Run in MP batch mode",                                 0},
 #endif
+  {LON_BROWSER,     "BROWSER",  "Display help in BROWSER ([x,tk]info, netscape)",       ""},
   {LON_HELP,        0,          "Print help message and exit",                          0},
-  {LON_QUIET,       0,          "Do not print start-up banner and library load messages",            0},
+  {LON_QUIET,       0,          "Do not print start-up banner and library load messages", 0},
   {LON_SDB,         0,          "Enable sdb debugger (experimental)",            0},
   {LON_NO_TTY,      0,          "Do not redefine the terminal characteristics",         0},
   {LON_VERSION,     0,          "Print extended version and configuration info",        0},
@@ -153,7 +152,7 @@ static struct sing_option* mainGetSingOption(const char* name)
   return NULL;
 }
 
-static void mainSetSingOptionValue(const char* name, char* value)
+void mainSetSingOptionValue(const char* name, char* value)
 {
   sing_option* sopt = mainGetSingOption(name);
   if (sopt != NULL)
@@ -162,8 +161,7 @@ static void mainSetSingOptionValue(const char* name, char* value)
   }
 }
 
-
-static char* mainGetSingOptionValue(const char* name)
+char* mainGetSingOptionValue(const char* name)
 {
   sing_option* sopt = mainGetSingOption(name);
   if (sopt!=NULL)
@@ -294,9 +292,7 @@ int main(          /* main entry to Singular */
   int optc, option_index;
 
   // do this first, because -v might print version path
-#ifndef __MWERKS__
-  feInitPaths(thisfile);
-#endif
+  feInitResources(thisfile);
 
   // parse command line options
   while((optc = getopt_long(argc, argv,
@@ -419,6 +415,10 @@ int main(          /* main entry to Singular */
           {
             load_std_lib = FALSE;
             mainSetSingOptionValue(LON_NO_STDLIB, (char*) 1);
+          }
+          else if (strcmp(longopts[option_index].name, LON_BROWSER) == 0)
+          {
+            mainSetSingOptionValue(LON_BROWSER, optarg);
           }
           else if (strcmp(longopts[option_index].name, LON_NO_RC) == 0)
           {

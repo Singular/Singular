@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.58 1999-07-22 17:52:20 Singular Exp $ */
+/* $Id: iplib.cc,v 1.59 1999-08-03 16:33:42 obachman Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -33,7 +33,7 @@
 
 #include "mod_raw.h"
 
-char *iiConvName(char *p);
+static char *iiConvName(char *p);
 #ifdef HAVE_LIBPARSER
 void yylprestart (FILE *input_file );
 int current_pos(int i=0);
@@ -1019,10 +1019,10 @@ char mytolower(char c)
 //#  define FS_SEP '/'
 //#endif
 
-char *iiConvName(char *libname)
+static char *iiConvName(char *libname)
 {
   char *tmpname = mstrdup(libname);
-  char *p = strrchr(tmpname, FS_SEP);
+  char *p = strrchr(tmpname, DIR_SEP);
   char *r;
   if(p==NULL) p = tmpname;
   else p++;

@@ -551,9 +551,6 @@ char * versionString()
 #else
               StringAppendS("\n\t");
 #endif
-#ifdef HAVE_INFO
-              StringAppendS("info,");
-#endif
 #ifdef HAVE_NAMESPACES
               StringAppendS("Namespaces,");
 #endif
@@ -589,12 +586,7 @@ char * versionString()
 #endif
 #endif
               StringAppend("random=%d\n",siRandomStart);
-#ifndef __MWERKS__
-#ifdef HAVE_INFO
-              StringAppend("InfoFile   : %s\n", feGetInfoFile());
-              StringAppend("InfoProgram: %s\n", feGetInfoProgram());
-#endif
-              StringAppend("Singular   : %s\n",feGetExpandedExecutable());
-              return StringAppend("SearchPath : %s", feGetSearchPath());
-#endif
+
+              feStringAppendResources();
+              return StringAppend("HelpBrowser: %s", feHelpBrowser());
 }

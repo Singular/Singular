@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.96 1999-07-12 11:05:57 pohl Exp $ */
+/* $Id: extra.cc,v 1.97 1999-08-03 16:33:39 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -286,7 +286,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     if (strcmp(sys_cmd, "Singular") == 0)
     {
       res->rtyp=STRING_CMD;
-      char *r=feGetExpandedExecutable();
+      char *r=feResource("Singular");
       if (r != NULL)
         res->data = (void*) mstrdup( r );
       else
@@ -300,6 +300,32 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     {
       BOOLEAN mainGetSingOptionValue(const char* name, char** result);
       char* val;
+
+      if (h != NULL)
+      {
+        if (strcmp(sys_cmd, "--browser") == 0)
+        {
+          if (h->Typ() == STRING_CMD)
+          {
+            if (strcmp(feHelpBrowser((char*) h->Data()), 
+                       (char*) h->Data()) != 0)
+            {
+              Werror("Can not set HelpBrowser to '%s'", (char*) h->Data());
+              return TRUE;
+            }
+          }
+          else
+          {
+            Werror("Need string to set HelpBrowser");
+            return TRUE;
+          }
+        }
+        else
+        {
+          Werror("Can not set value of option %s", sys_cmd);
+          return TRUE;
+        }
+      }
 
       if (mainGetSingOptionValue(&(sys_cmd)[2], &val))
       {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.76 1999-07-20 12:29:48 Singular Exp $ */
+/* $Id: febase.cc,v 1.77 1999-08-03 16:33:40 obachman Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -24,16 +24,8 @@
 #include "mmemory.h"
 #include "subexpr.h"
 #include "ipshell.h"
+#include "version.h"
 
-#include "si_paths.h"
-
-#ifndef MAXPATHLEN
-#define MAXPATHLEN 1024
-#endif
-
-#ifndef MAXNAMLEN
-#define MAXNAMLEN MAXPATHLEN
-#endif
 
 #define fePutChar(c) fputc((uchar)(c),stdout)
 /*0 implementation */
@@ -99,524 +91,6 @@ BOOLEAN tclmode=FALSE;
 
 #include "febase.inc"
 
-#ifndef __MWERKS__
-/*****************************************************************
- *
- * PATH STUFF
- *
- *****************************************************************/
-
-// Define to chatter about path stuff
-// #define PATH_DEBUG
-static char* feArgv0 = NULL;
-static char* feExpandedExecutable = NULL;
-static char* feBinDir = NULL;
-static char* feSearchPath = NULL;
-static char* feInfoProgram = NULL;
-static char* feInfoFile = NULL;
-static char* feInfoCall = NULL;
-
-extern "C" char* find_executable(const char* argv0);
-static char* feRemovePathnameHead(const char* expanded_executable);
-static char* CleanUpPath(char* path);
-static char* CleanUpName(char* filename);
-
-inline char* feGetExpandedExecutable(const char* argv0)
-{
-  return (argv0 != NULL ? find_executable(argv0) : (char* ) NULL);
-}
-
-inline char* feGetBinDir(const char* expanded_executable)
-{
-  return feRemovePathnameHead(expanded_executable);
-}
-
-// Return the file search path for singular w.r.t. the following steps:
-// 1.) SINGULARPATH Env Variable
-// 2.) bindir/LIB
-// 3.) bindir/LIB/VERSION
-// 4.) bindir/../../Singular/LIB
-// 5.) bindir/../../Singular/LIB/VERSION
-// 6.) ROOT_DIR/Singular/LIB/
-// 7.) ROOT_DIR/Singular/LIB/VERSION
-// 8.) Go through all dirs and remove duplicates dirs resp.
-//     those which do not exist
-static char* feGetSearchPath(const char* bindir)
-{
-  char *env = NULL, *path, *opath;
-  int plength = 0, tmp;
-
-#ifdef MSDOS
-    env=getenv("SPATH");
-#else
-    env=getenv("SINGULARPATH");
-#endif
-#ifdef PATH_DEBUG
-    PrintS("I'm going to chatter about the Search path:\n");
-#endif
-    if (env != NULL)
-      plength = strlen(env);
-
-    if (bindir != NULL)
-      plength += 4*strlen(bindir);
-
-    plength += 2*strlen(SINGULAR_ROOT_DIR)
-      + 3*(strlen(S_VERSION1) + 1)
-      + 24         + 36          + 12       + 6          + 7;
-      // == 6*/LIB + 4*/Singular + 2*/../.. + for colons + some room to breath
-
-    opath = (char*) AllocL(plength*sizeof(char));
-    path = opath;
-
-    if (env != NULL)
-    {
-      strcpy(path, env);
-      path += strlen(path);
-      *path=FS_SEP;
-      path++;
-#ifdef PATH_DEBUG
-      *(path +1) = '\0';
-      Print("Got from env var: %s\n", opath);
-#endif
-    }
-
-    if (bindir != NULL)
-    {
-      sprintf(
-        path,
-        "%s/LIB%c%s/LIB/%s%c%s/../../Singular/LIB%c%s/../../Singular/LIB/%s%c",
-        bindir, FS_SEP,
-        bindir, S_VERSION1, FS_SEP,
-        bindir, FS_SEP,
-        bindir, S_VERSION1, FS_SEP);
-#ifdef PATH_DEBUG
-      Print("From bindir: %s\n", path);
-#endif
-      path += strlen(path);
-    }
-
-    sprintf(path, "%s/Singular/LIB%c%s/Singular/LIB/%s",
-            SINGULAR_ROOT_DIR, FS_SEP,
-            SINGULAR_ROOT_DIR, S_VERSION1);
-#ifdef PATH_DEBUG
-    Print("From rootdir: %s\n", path);
-#endif
-    return CleanUpPath(opath);
-}
-
-static void mystrcpy(char* d, char* s)
-{
-  assume(d != NULL && s != NULL);
-  while (*s != '\0')
-  {
-    *d = *s;
-    d++;
-    s++;
-  }
-  *d = '\0';
-}
-
-// Return location of file singular.hlp. Search for it as follows:
-// bindir/../doc/singular.hlp
-// bindir/../info/singular.hlp
-// bindir/../../Singular/doc/$version/singular.hlp
-// bindir/../../Singular/doc/singular.hlp
-// bindir/../../info/singular.hlp
-// ROOTDIR/Singular/doc/$version/singular.hlp
-// ROOTDIR/Singular/doc/singular.hlp
-// ROOTDIR/doc/singular.hlp
-// ROOTDIR/info/singular.hlp
-// Singular search path
-#ifdef WINNT
-static char * feFixFileName(char *hlpdir)
-{
-  if(strncmp(hlpdir,"//",2)==0)
-  {
-    hlpdir[0]=hlpdir[2];
-    hlpdir[1]=':';
-    mystrcpy(hlpdir+2,hlpdir+3);
-  }
-  return hlpdir;
-}
-#else
-#define  feFixFileName(A) (A)
-#endif
-
-static char* feGetInfoFile(const char* bindir)
-{
-  char* hlpfile = (char*) AllocL(max((bindir != NULL ? strlen(bindir) : 0),
-                                     strlen(SINGULAR_ROOT_DIR))
-                                  + 50);
-
-#ifdef PATH_DEBUG
-  PrintS("Search for singular.hlp\n");
-#endif
-
-  if (bindir != NULL)
-  {
-    // bindir/../doc/singular.hlp
-    sprintf(hlpfile,"%s/../doc/singular.hlp", bindir);
-#ifdef PATH_DEBUG
-    Print("trying %s -- %s\n", hlpfile, ( access(CleanUpName(hlpfile), R_OK) ? "no" : "yes"));
-#endif
-    if (! access(CleanUpName(hlpfile), R_OK)) return feFixFileName(hlpfile);
-
-    // bindir/../info/singular.hlp
-    sprintf(hlpfile,"%s/../info/singular.hlp", bindir);
-#ifdef PATH_DEBUG
-    Print("trying %s -- %s\n", hlpfile, ( access(CleanUpName(hlpfile), R_OK) ? "no" : "yes"));
-#endif
-    if (! access(CleanUpName(hlpfile), R_OK)) return feFixFileName(hlpfile);
-
-    // bindir/../../Singular/doc/$version/singular.hlp
-    sprintf(hlpfile,"%s/../../Singular/doc/%s/singular.hlp",bindir,S_VERSION1);
-#ifdef PATH_DEBUG
-    Print("trying %s -- %s\n", hlpfile, ( access(CleanUpName(hlpfile), R_OK) ? "no" : "yes"));
-#endif
-    if (! access(CleanUpName(hlpfile), R_OK)) return feFixFileName(hlpfile);
-
-    // bindir/../../Singular/doc/singular.hlp
-    sprintf(hlpfile,"%s/../../Singular/doc/singular.hlp", bindir);
-#ifdef PATH_DEBUG
-    Print("trying %s -- %s\n", hlpfile, ( access(CleanUpName(hlpfile), R_OK) ? "no" : "yes"));
-#endif
-    if (! access(CleanUpName(hlpfile), R_OK)) return feFixFileName(hlpfile);
-
-    // bindir/../../info/singular.hlp
-    sprintf(hlpfile,"%s/../../info/singular.hlp", bindir);
-#ifdef PATH_DEBUG
-    Print("trying %s -- %s\n", hlpfile, ( access(CleanUpName(hlpfile), R_OK) ? "no" : "yes"));
-#endif
-    if (! access(CleanUpName(hlpfile), R_OK)) return feFixFileName(hlpfile);
-
-    // ROOTDIR/Singular/doc/$version/singular.hlp
-    sprintf(hlpfile,"%s/Singular/doc/%s/singular.hlp", SINGULAR_ROOT_DIR, S_VERSION1);
-#ifdef PATH_DEBUG
-    Print("trying %s -- %s\n", hlpfile, ( access(CleanUpName(hlpfile), R_OK) ? "no" : "yes"));
-#endif
-    if (! access(CleanUpName(hlpfile), R_OK)) return feFixFileName(hlpfile);
-
-    // ROOTDIR/Singular/doc/singular.hlp
-    sprintf(hlpfile,"%s/Singular/doc/singular.hlp", SINGULAR_ROOT_DIR);
-#ifdef PATH_DEBUG
-    Print("trying %s -- %s\n", hlpfile, ( access(CleanUpName(hlpfile), R_OK) ? "no" : "yes"));
-#endif
-    if (! access(CleanUpName(hlpfile), R_OK)) return feFixFileName(hlpfile);
-
-    // ROOTDIR/doc/singular.hlp
-    sprintf(hlpfile,"%s/doc/singular.hlp", SINGULAR_ROOT_DIR);
- #ifdef PATH_DEBUG
-    Print("trying %s -- %s\n", hlpfile, ( access(CleanUpName(hlpfile), R_OK) ? "no" : "yes"));
-#endif
-   if (! access(CleanUpName(hlpfile) , R_OK)) return feFixFileName(hlpfile);
-
-    // ROOTDIR/info/singular.hlp
-    sprintf(hlpfile,"%s/info/singular.hlp", SINGULAR_ROOT_DIR);
- #ifdef PATH_DEBUG
-    Print("trying %s -- %s\n", hlpfile, ( access(CleanUpName(hlpfile), R_OK) ? "no" : "yes"));
-#endif
-   if (! access(CleanUpName(hlpfile) , R_OK)) return feFixFileName(hlpfile);
-  }
-
-  // still here? Try all dirs in the search path
-  FILE *file = feFopen("singular.hlp", "r", hlpfile, 0);
-  if (file != NULL)
-  {
-    fclose(file);
-    return feFixFileName(hlpfile);
-  }
-  *hlpfile = '\0';
-  return hlpfile;
-}
-
-#ifdef WINNT
-#define INFOPROG "info.exe"
-#else
-#define INFOPROG "info"
-#endif
-
-// we first look into bindir, if nothing found there, we use HAVE_INFO
-static char* feGetInfoProgram(const char* bindir)
-{
-  char infoprog[MAXPATHLEN];
-  if (bindir != NULL)
-  {
-    sprintf(infoprog, "%s/%s", bindir, INFOPROG);
-    if (! access(infoprog, X_OK)) return mstrdup(infoprog);
-  }
-
-  sprintf(infoprog, "%s/%s", SINGULAR_BIN_DIR, INFOPROG);
-  if (! access(infoprog, X_OK)) return mstrdup(infoprog);
-
-#ifdef HAVE_INFO
-  sprintf(infoprog, "%s", HAVE_INFO);
-  if (! access(infoprog, X_OK)) return mstrdup(infoprog);
-#endif
-  // nothing found, let's try "info"
-  sprintf(infoprog, "info");
-  return mstrdup(infoprog);
-}
-
-#if defined(WINNT) && defined(__GNUC__)
-// add utility function of Cygwin32:
-extern "C" int cygwin32_posix_path_list_p (const char *path);
-#endif
-
-#ifdef WINNT
-static void feExpandPath(char *dir)
-{
-  char *path=getenv("PATH");
-  char buf[MAXNAMLEN];
-  if (path==NULL)
-  {
-    strcpy(buf,dir);
-  }
-  else
-  {
-    #if defined(WINNT) && defined(__GNUC__)
-    char path_delim = cygwin32_posix_path_list_p (path) ? ':' : ';';
-    #else
-    char path_delim=FS_SEP;
-    #endif
-    sprintf(buf,"%s%c%s",path,path_delim,dir);
-  }
-  setenv("PATH",buf,1);
-}
-#endif
-
-//
-// public routines
-//
-void feInitPaths(const char* argv0)
-{
-  feArgv0 = mstrdup(argv0);
-  #ifdef WINNT
-  // add the bindir and the BIN_DIR to the current PATH:
-  feExpandPath(feGetBinDir()); // can only be called after setting feArgv0
-  feExpandPath(SINGULAR_BIN_DIR);
-  #endif
-}
-
-char* feGetExpandedExecutable()
-{
-  if (feExpandedExecutable == NULL)
-    feExpandedExecutable = feGetExpandedExecutable(feArgv0);
-  return feExpandedExecutable;
-}
-
-char* feGetBinDir()
-{
-  if (feBinDir == NULL)
-    feBinDir = feGetBinDir(feGetExpandedExecutable());
-  return feBinDir;
-}
-
-char* feGetSearchPath()
-{
-  if (feSearchPath == NULL)
-    feSearchPath = feGetSearchPath(feGetBinDir());
-  return feSearchPath;
-}
-
-char* feGetInfoProgram()
-{
-  if (feInfoProgram == NULL)
-    feInfoProgram = feGetInfoProgram(feGetBinDir());
-  return feInfoProgram;
-}
-
-char* feGetInfoFile()
-{
-  if (feInfoFile == NULL)
-    feInfoFile = feGetInfoFile(feGetBinDir());
-  return feInfoFile;
-}
-
-char* feGetInfoCall(const char* what)
-{
-  if (feInfoCall == NULL)
-    feInfoCall = (char*) AllocL(strlen(feGetInfoProgram())
-                                + strlen(feGetInfoFile())
-                                + 100);
-  char *infofile = feGetInfoFile();
-
-  if (what != NULL && strcmp(what, "index") != 0)
-    sprintf(feInfoCall,
-            "%s %s %s Index %s",
-            feGetInfoProgram(),
-            (*infofile != '\0' ? "-f" : ""),
-            (*infofile != '\0' ? infofile : "Singular"),
-            what);
-  else
-    sprintf(feInfoCall,
-            "%s %s %s",
-            feGetInfoProgram(),
-            (*infofile != '\0' ? "-f" : ""),
-            (*infofile != '\0' ? infofile : "Singular"));
-
-#ifdef PATH_DEBUG
-  Print("Info call with: %s \n", feInfoCall);
-#endif
-  return feInfoCall;
-}
-
-//
-// auxillary routines
-//
-static char* feRemovePathnameHead(const char* ef)
-{
-  if (ef != NULL)
-  {
-    char* ret = mstrdup(ef);
-    char* p = strrchr(ret, DIR_SEP);
-    if (p != NULL) *p = '\0';
-    return ret;
-  }
-  return NULL;
-}
-
-// remove duplicates dir resp. those which do not exist
-static char* CleanUpPath(char* path)
-{
-#ifdef PATH_DEBUG
-  Print("Entered CleanUpPath with: %s\n", path);
-#endif
-  if (path == NULL) return path;
-
-  int n_comps = 1, i, j;
-  char* opath = path;
-  char** path_comps;
-
-  for (; *path != '\0'; path++)
-  {
-    if (*path == FS_SEP) n_comps++;
-  }
-
-
-  path_comps = (char**) AllocL(n_comps*sizeof(char*));
-  path_comps[0]=opath;
-  path=opath;
-  i = 1;
-
-  if (i < n_comps)
-  {
-    while (1)
-    {
-      if (*path == FS_SEP)
-      {
-        *path = '\0';
-        path_comps[i] = path+1;
-        i++;
-        if (i == n_comps) break;
-      }
-      path++;
-    }
-  }
-
-  for (i=0; i<n_comps; i++)
-    path_comps[i] = CleanUpName(path_comps[i]);
-#ifdef PATH_DEBUG
-  PrintS("After CleanUpName: ");
-  for (i=0; i<n_comps; i++)
-    Print("%s:", path_comps[i]);
-  Print("\n");
-#endif
-
-  for (i=0; i<n_comps;)
-  {
-#ifdef PATH_DEBUG
-    if (access(path_comps[i], X_OK))
-      Print("remove %d:%s -- can not access\n", i, path_comps[i]);
-#endif
-    if ( ! access(path_comps[i], X_OK))
-    {
-      // x- permission is granted -- we assume that it is a dir
-      for (j=0; j<i; j++)
-      {
-        if (strcmp(path_comps[j], path_comps[i]) == 0)
-        {
-          // found a duplicate
-#ifdef PATH_DEBUG
-          Print("remove %d:%s -- equal to %d:%s\n", j, path_comps[j], i, path_comps[i]);
-#endif
-          j = i+1;
-          break;
-        }
-      }
-      if (j == i)
-      {
-        i++;
-        continue;
-      }
-    }
-    // now we can either not access or found a duplicate
-    path_comps[i] = NULL;
-    for (j=i+1; j<n_comps; j++)
-        path_comps[j-1] = path_comps[j];
-    n_comps--;
-  }
-
-  // assemble everything again
-  for (path=opath, i=0;i<n_comps-1;i++)
-  {
-    strcpy(path, path_comps[i]);
-    path += strlen(path);
-    *path = FS_SEP;
-    path++;
-  }
-  if (n_comps) strcpy(path, path_comps[i]);
-  FreeL(path_comps);
-#ifdef PATH_DEBUG
-  Print("SearchPath is: %s\n", opath);
-#endif
-  return opath;
-}
-
-static char* CleanUpName(char* fname)
-{
-  char* fn, *s;
-
-  for (fn = fname; *fn != '\0'; fn++)
-  {
-    if (*fn == '/')
-    {
-      if (*(fn+1) == '\0')
-      {
-        if (fname != fn) *fn = '\0';
-        break;
-      }
-      if (*(fn + 1) == '/' && (fname != fn))
-      {
-        mystrcpy(fn, fn+1);
-        fn--;
-      }
-      else if (*(fn+1) == '.')
-      {
-        if (*(fn+2) == '.' && (*(fn + 3) == '/' || *(fn + 3) == '\0'))
-        {
-          *fn = '\0';
-          s = strrchr(fname, '/');
-          if (s != NULL)
-          {
-            mystrcpy(s+1, fn + (*(fn + 3) != '\0' ? 4 : 3));
-            fn = s-1;
-          }
-          else
-          {
-            *fn = '/';
-          }
-        }
-        else if (*(fn+2) == '/' || *(fn+2) == '\0')
-        {
-          mystrcpy(fn+1, fn+3);
-          fn--;
-        }
-      }
-    }
-  }
-  return fname;
-}
-#endif
 /*****************************************************************
  *
  * File handling
@@ -625,66 +99,6 @@ static char* CleanUpName(char* fname)
 
 FILE * feFopen(char *path, char *mode, char *where,int useWerror)
 {
-#ifdef __MWERKS__
-  FILE * f=myfopen(path,mode);
-  if (f!=NULL)
-  {
-    if (where!=NULL) strcpy(where,path);
-    return f;
-  }
-  char *res;
-  int idat=strlen(SINGULAR_DATADIR),
-      ilib=strlen(VERSION_DIR),
-      ipath=strlen(path);
-  int ialloc = idat+ilib+ipath+1;
-  char *env=getenv("SINGULARPATH");
-  int ienv=0, ii=0;
-  if (env!=NULL)
-  {
-    ienv=strlen(env);
-    ii=ienv;
-  }
-  if (ii<idat) ii = idat;
-  if (ii==0)
-  {
-    if (useWerror)
-      Werror("cannot open `%s`",path);
-    return f;
-  }
-  res=(char*) AllocL(ialloc);
-  if (ienv!=0)
-  {
-    memcpy(res,env,ienv);
-    memcpy(res+ienv,path,ipath);
-    res[ienv+ipath]='\0';
-    f=myfopen(res,mode);
-  }
-  if ((f==NULL)&&(idat!=0))
-  {
-    memcpy(res,SINGULAR_DATADIR,idat);
-    memcpy(res+idat,path,ipath);
-    res[idat+ipath]='\0';
-    f=myfopen(res,mode);
-  }
-  if ((f==NULL)&&(idat!=0))
-  {
-    memcpy(res,SINGULAR_DATADIR,idat);
-    memcpy(res+idat,VERSION_DIR,ilib);
-    idat += ilib;
-    memcpy(res+idat,path,ipath);
-    res[idat+ipath]='\0';
-    f=myfopen(res,mode);
-  }
-  if (f==NULL)
-  {
-    if (useWerror)
-      Werror("cannot open `%s`",res);
-  }
-  else if (where!=NULL)
-    strcpy(where,res);
-  FreeL(res);
-#else
-  BOOLEAN tilde = FALSE;
   char longpath[MAXPATHLEN];
   if (path[0]=='~')
   {
@@ -702,7 +116,7 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror)
   &&(f==NULL))
   {
     char found = 0;
-    char* spath = feGetSearchPath();
+    char* spath = feResource('s');
     char *s;
 
     if (where==NULL) s=(char *)AllocL(250);
@@ -712,11 +126,11 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror)
     {
       char *p,*q;
       p = spath;
-      while( (q=strchr(p, FS_SEP)) != NULL)
+      while( (q=strchr(p, fePathSep)) != NULL)
       {
         *q = '\0';
         strcpy(s,p);
-        *q = FS_SEP;
+        *q = fePathSep;
         strcat(s, DIR_SEPP);
         strcat(s, path);
         #ifndef macintosh
@@ -749,7 +163,6 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror)
   }
   if ((f==NULL)&&(useWerror))
     Werror("cannot open `%s`",path);
-#endif
   return f;
 }
 
@@ -941,6 +354,16 @@ void Warn(const char *fmt, ...)
   WarnS(s);
   Free(s,256);
   va_end(ap);
+}
+
+void fePrintReportBug(char* msg, char* file, int line)
+{
+  WarnS("YOU HAVE FOUND A BUG IN SINGULAR.");
+  WarnS("Please, email the following output to singular@mathematik.uni-kl.de");
+  Warn("Bug occured at %s:%d", file, line);
+  Warn("Message: %s", msg);
+  Warn("Version: %s %s (%d) %s %s", S_UNAME, S_VERSION1,
+       SINGULAR_VERSION_ID,__DATE__,__TIME__);
 }
 
 extern "C" {

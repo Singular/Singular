@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.h,v 1.19 1999-07-21 19:58:40 obachman Exp $ */
+/* $Id: subexpr.h,v 1.20 1999-08-03 16:33:44 obachman Exp $ */
 /*
 * ABSTRACT: handling of leftv
 */
@@ -113,7 +113,7 @@ public:
   int    body_lineno;
   int    example_lineno;
   char   *body;
-  unsigned long help_chksum;
+  long help_chksum;
 };
 
 struct proc_object

@@ -11,8 +11,6 @@
 /*******************************************************************
  * Defines which are set by configure
  ******************************************************************/
-/* Define the info program to use, if you have TeXInfo, undef otherwise */
-#undef HAVE_INFO
 /* Define to use readline lib for fancy display */
 #undef HAVE_READLINE
 /* Define to use built-in command line parser */
@@ -92,6 +90,8 @@
 #undef HAVE_USLEEP
 /* Define if you have sleep */
 #undef HAVE_SLEEP
+/* Define if you have setenv */
+#undef HAVE_SETENV
 /* Define sizeof(char) */
 #define SIZEOF_CHAR 1
 /* Define sizeof(short) */
@@ -122,6 +122,8 @@
 #define S_VERSION2 ""
 /* Define uname identifier as a string */
 #define S_UNAME ""
+/* Absolute pathname of root directory of Singular source */
+#define S_ROOT_DIR ""
 /* Define if our gmalloc is to be used */
 #undef HAVE_GMALLOC
 /* Define pagesize of your system */
@@ -220,10 +222,6 @@
 
 #ifdef SRING
 #define SDRING
-#endif
-
-#ifndef HAVE_INFO
-#define buildin_help 1
 #endif
 
 #if SIZEOF_EXPONENT == 1

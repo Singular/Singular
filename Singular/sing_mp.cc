@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_mp.cc,v 1.24 1999-07-28 12:42:51 Singular Exp $ */
+/* $Id: sing_mp.cc,v 1.25 1999-08-03 16:33:44 obachman Exp $ */
 
 /*
 * ABSTRACT: interface to MP links
@@ -23,10 +23,6 @@
 #include "silink.h"
 
 static int Batch_ReadEval(si_link silink);
-
-#ifndef MAXPATHLEN
-#define MAXPATHLEN 1024
-#endif
 
 #ifdef MPSR_DEBUG
 #define MP_SET_LINK_OPTIONS(link) \
@@ -220,7 +216,7 @@ static MP_Link_pt slOpenMPLaunch(int n_argc, char **n_argv)
   if (appl == NULL && (host == NULL ||
                        strcmp(host, "localhost") == 0))
   {
-    appl = feGetExpandedExecutable();
+    appl = feResource("Singular");
 
     if (appl != NULL)
     {
