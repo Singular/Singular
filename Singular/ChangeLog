@@ -1,3 +1,6 @@
+Wed Jul 16 12:57:22 MET DST 1997: hannes
+        * introduced '.singularrc', modified loading of satndard.lib 
+          (tesths.cc)
 Tue Jul 15 13:57:46 MET DST 1997: hannes
         * added call to proc in from standard.lib in tesths.cc
 

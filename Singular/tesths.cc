@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.26 1997-07-15 11:58:52 Singular Exp $ */
+/* $Id: tesths.cc,v 1.27 1997-07-16 10:58:58 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -25,6 +25,7 @@
 #include "cntrlc.h"
 #include "mmemory.h"
 #include "silink.h"
+#include "ipid.h"
 #include "timer.h"
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
@@ -111,6 +112,7 @@ int main(          /* main entry to Singular */
               if (argc > 2)
               {
                 char* ptr = NULL;
+                // OLAF: try to avoid using long:
 #ifdef HAVE_STRTOL
                 long res = strtol(argv[2], &ptr, 10);
                 if (errno != ERANGE && ptr != argv[2] && res > 0)
@@ -130,8 +132,14 @@ int main(          /* main entry to Singular */
               }
               else
               {
-                fprintf(stderr,"Need an integer to set timer resolution");
+                long res=0;
+                while ((argv[1][i+1]>='0') && (argv[1][i+1]<='9'))
+                {
+                  i++;
+                  res = res*10+(int)(argv[1][i] - '0');
+                }
               }
+              break;
             }
             case 'e': if ((argv[1][i+1]>'0') && (argv[1][i+1]<='9'))
             {
@@ -210,12 +218,15 @@ int main(          /* main entry to Singular */
   if (load_std_lib)
   {
     iiLibCmd(mstrdup("standard.lib"),TRUE);
-    idhdl h=idroot->get("init",0);
-    if ((h!=NULL) && (IDTYP(h)==PROC_CMD))
-    {
-      leftv r=iiMake_proc(h,NULL);
-      r->CleanUp();
-    }
+    //idhdl h=idroot->get("init",0);
+    //if ((h!=NULL) && (IDTYP(h)==PROC_CMD))
+    //{
+    //  IDSTRING(h)=iiGetLibProcBuffer( IDSTRING(h), IDID(h));
+    //  newBuffer( mstrdup(IDSTRING(h)), BT_execute, IDID(h) );
+      //leftv r=iiMake_proc(h,NULL);
+      //r->CleanUp();
+      //iiPStart(h,NULL,NULL);
+    //}
   }  
   errorreported = 0;
 #ifndef macintosh
@@ -224,6 +235,16 @@ int main(          /* main entry to Singular */
 #endif
 #endif
   setjmp(si_start_jmpbuf);
+  {
+    char * where=(char *)AllocL(256);
+    FILE * rc=feFopen(".singularrc","r",where,FALSE);
+    if (rc!=NULL)
+    {
+      fclose(rc);
+      iiPStart(NULL,where,NULL);
+    }
+    FreeL((ADDRESS)where);
+  }
   /* if script is given */
   if ((argc > 1)&&(argv[1][0]!='-'))
   {
