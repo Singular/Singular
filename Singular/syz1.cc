@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.9 1997-06-17 14:30:03 pohl Exp $ */
+/* $Id: syz1.cc,v 1.10 1997-06-18 16:09:20 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -1983,6 +1983,7 @@ resolvente syLaScala1(ideal arg,int * length)
   SSet nextPairs;
   SRes resPairs;
   pSetmProc oldSetm=pSetm;
+  pCompProc oldpComp=pComp0;
 
   //crit = 0;
   //zeroRed = 0;
@@ -2141,6 +2142,7 @@ resolvente syLaScala1(ideal arg,int * length)
   else
   {
     pSetm=oldSetm;
+    pComp0=oldpComp;
   }
   syReOrderResolventFB(res,*length,2);
   for (i=0;i<*length-1;i++)

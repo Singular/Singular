@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.5 1997-06-17 09:44:32 Singular Exp $ */
+/* $Id: polys.cc,v 1.6 1997-06-18 16:09:18 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -2279,7 +2279,7 @@ poly pOrdPolySchreyer(poly p)
   poly qq,result=p;
 
   if (p == NULL) return NULL;
-  while ((pNext(p)) && (pComp(p,pNext(p))==1)) pIter(p);
+  while ((pNext(p) != NULL) && (pComp(p,pNext(p))==1)) pIter(p);
   if (pNext(p)==NULL) return result;
   qq = pNext(p);
   pNext(p) = NULL;
