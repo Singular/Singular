@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_int.cc,v 1.14 1998-06-26 16:16:33 schmidt Exp $ */
+/* $Id: int_int.cc,v 1.15 2000-09-04 13:31:29 obachman Exp $ */
 
 #include <config.h>
 
@@ -10,6 +10,10 @@
 #include "cf_gmp.h"
 #include "gmpext.h"
  
+#ifdef HAVE_OMALLOC
+const omBin InternalInteger::InternalInteger_bin = omGetSpecBin(sizeof(InternalInteger));
+#endif
+
 InternalInteger::InternalInteger()
 {
     mpz_init( &thempi );

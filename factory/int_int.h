@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_int.h,v 1.9 1998-06-26 16:16:40 schmidt Exp $ */
+/* $Id: int_int.h,v 1.10 2000-09-04 13:31:30 obachman Exp $ */
 
 #ifndef INCL_INT_INT_H
 #define INCL_INT_INT_H
@@ -16,6 +16,11 @@
 #include "cf_gmp.h"
 #include "gmpext.h"
 
+
+#ifdef HAVE_OMALLOC
+#include <omalloc.h>
+#endif
+
 class InternalInteger : public InternalCF
 {
 private:
@@ -29,8 +34,23 @@ private:
     static inline InternalCF * uiNormalizeMPI ( MP_INT & );
 
     static inline MP_INT & MPI ( const InternalCF * const c );
-
+#ifdef HAVE_OMALLOC
+  static const omBin InternalInteger_bin;
+#endif
 public:
+#ifdef HAVE_OMALLOC
+  void* operator new(size_t size)
+    {
+      void* addr;
+      omTypeAllocBin(void*, addr, InternalInteger_bin);
+      return addr;
+    }
+  void operator delete(void* addr, size_t size)
+    {
+      omFreeBin(addr, InternalInteger_bin);
+    }
+#endif
+
     InternalInteger();
     InternalInteger( const InternalCF& )
     {

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C -*- */
-/* $Id: config.h.in,v 1.9 1998-07-01 09:26:12 pohl Exp $ */
+/* $Id: config.h.in,v 1.10 2000-09-04 13:31:26 obachman Exp $ */
 
 #ifndef INCL_CONFIG_H
 #define INCL_CONFIG_H
@@ -51,6 +51,9 @@
 
 /* define if linked to Singular */
 #undef SINGULAR
+
+/* define if build with OMALLOC */
+#undef HAVE_OMALLOC
 
 /* define if linked with factory memory manager */
 #undef USE_MEMUTIL

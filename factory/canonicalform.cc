@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.30 2000-05-29 15:05:19 Singular Exp $ */
+/* $Id: canonicalform.cc,v 1.31 2000-09-04 13:31:25 obachman Exp $ */
 
 #include <config.h>
 
@@ -26,7 +26,7 @@ CanonicalForm readCF( istream& );
 int initializeGMP();
 int initializeCharacteristic();
 #ifdef SINGULAR
-int mmInit(void);
+extern int mmInit(void);
 #endif
 
 int

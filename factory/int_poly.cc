@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_poly.cc,v 1.12 1998-06-26 16:15:28 schmidt Exp $ */
+/* $Id: int_poly.cc,v 1.13 2000-09-04 13:31:29 obachman Exp $ */
 
 #include <config.h>
 
@@ -22,6 +22,10 @@
 #include "variable.h"
 #include "imm.h"
 
+#ifdef HAVE_OMALLOC
+const omBin term::term_bin = omGetSpecBin(sizeof(term));
+const omBin InternalPoly::InternalPoly_bin = omGetSpecBin(sizeof(InternalPoly));
+#endif
 
 InternalPoly::InternalPoly( termList first, termList last, const Variable & v )
 {
@@ -1452,3 +1456,4 @@ InternalPoly::reduceTermList ( termList first, termList redterms, termList & las
     }
     return first;
 }
+

@@ -1,3 +1,7 @@
+2000-09-02  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+	* configure.in, etc: support for omalloc
+
 2000-08-04  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
 	* ffops.cc: initialize ff_prime to 0, so that first call to

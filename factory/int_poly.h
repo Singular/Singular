@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_poly.h,v 1.6 1998-06-26 16:15:08 schmidt Exp $ */
+/* $Id: int_poly.h,v 1.7 2000-09-04 13:31:31 obachman Exp $ */
 
 #ifndef INCL_INT_POLY_H
 #define INCL_INT_POLY_H
@@ -15,17 +15,35 @@
 #include "variable.h"
 #include "canonicalform.h"
 
+#ifdef HAVE_OMALLOC
+#include <omalloc.h>
+#endif
 
 class term {
 private:
     term * next;
     CanonicalForm coeff;
     int exp;
+#ifdef HAVE_OMALLOC
+  static const omBin term_bin;
+#endif
 public:
     term() : next(0), coeff(0), exp(0) {}
     term( term * n, const CanonicalForm & c, int e ) : next(n), coeff(c), exp(e) {}
     friend class InternalPoly;
     friend class CFIterator;
+#ifdef HAVE_OMALLOC
+  void* operator new(size_t size)
+    {
+      void* addr;
+      omTypeAllocBin(void*, addr, term_bin);
+      return addr;
+    }
+  void operator delete(void* addr, size_t size)
+    {
+      omFreeBin(addr, term_bin);
+    }
+#endif
 };
 
 typedef term * termList;
@@ -107,6 +125,19 @@ public:
 
     int sign() const;
 
+#ifdef HAVE_OMALLOC
+  static const omBin InternalPoly_bin;
+  void* operator new(size_t size)
+    {
+      void* addr;
+      omTypeAllocBin(void*, addr, InternalPoly_bin);
+      return addr;
+    }
+  void operator delete(void* addr, size_t size)
+    {
+      omFreeBin(addr, InternalPoly_bin);
+    }
+#endif
     friend class CFIterator;
 };
 
