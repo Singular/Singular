@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.80 1999-12-16 13:35:20 pohl Exp $ */
+/* $Id: ideals.cc,v 1.81 2000-01-04 15:17:15 siebert Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1576,11 +1576,45 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
   return s_h3;
 }
 
+static void idPrepareStd(ideal s_temp, int k)
+{
+  int j,rk=idRankFreeModule(s_temp);
+  poly p,q;
+
+  if (rk == 0)
+  {
+    for (j=0; j<IDELEMS(s_temp); j++)
+    {
+      if (s_temp->m[j]!=NULL) pSetCompP(s_temp->m[j],1);
+    }
+    k = max(k,1);
+  }
+  for (j=0; j<IDELEMS(s_temp); j++)
+  {
+    if (s_temp->m[j]!=NULL)
+    {
+      p = s_temp->m[j];
+      q = pOne();
+      //pGetCoeff(q)=nNeg(pGetCoeff(q));   //set q to -1
+      pSetComp(q,k+1+j);
+      pSetmComp(q);
+      while (pNext(p)) pIter(p);
+      pNext(p) = q;
+    }
+  }
+}
+
 /*2
 *computes a representation of the generators of submod with respect to those
 * of mod
 */
-ideal idLiftNonStB (ideal  mod, ideal submod,BOOLEAN goodShape)
+ideal idLiftNonStB(ideal  mod, ideal submod,BOOLEAN goodShape)
+{
+  return idLift(mod, submod, goodShape, FALSE);
+}
+
+
+ideal idLift(ideal mod,ideal submod,BOOLEAN goodShape, BOOLEAN isSB)
 {
   int   lsmod =idRankFreeModule(submod), i, j, k;
 
@@ -1606,9 +1640,16 @@ ideal idLiftNonStB (ideal  mod, ideal submod,BOOLEAN goodShape)
     s_mod = mod;
     s_temp = idCopy(submod);
   }
-
-  ideal s_h3=idPrepare(s_mod,(tHomog)FALSE,k,NULL);
-
+  ideal s_h3;
+  if (isSB)
+  {
+    s_h3 = idCopy(s_mod);
+    idPrepareStd(s_h3, k);
+  }
+  else
+  {
+    s_h3 = idPrepare(s_mod,(tHomog)FALSE,k,NULL);
+  }
   if (!goodShape)
   {
     for (j=0;j<IDELEMS(s_h3);j++)
@@ -1637,9 +1678,15 @@ ideal idLiftNonStB (ideal  mod, ideal submod,BOOLEAN goodShape)
     {
       if (pGetComp(s_result->m[j])<=k)
       {
-        WerrorS("2nd module lies not in the first");
+        if (isSB)
+        {
+          WarnS("first module not a standardbasis\n"
+            "// ** or second not a proper submodule");
+        }
+        else
+          WerrorS("2nd module lies not in the first");
         idDelete(&s_result);
-        s_result=idInit(1,1);
+        s_result=idInit(IDELEMS(submod),submod->rank);
         break;
       }
       else
@@ -1659,104 +1706,6 @@ ideal idLiftNonStB (ideal  mod, ideal submod,BOOLEAN goodShape)
   }
   return s_result;
 }
-
-/*2
-*computes a representation of the generators of submod with respect to those
-* of mod which is given as standardbasis,
-* uses currQuotient as the quotient ideal (if not NULL)
-*/
-ideal  idLift (ideal  mod,ideal submod)
-{
-  int   j,k;
-  poly  p,q;
-  BOOLEAN reported=FALSE;
-
-  if (idIs0(mod)) return idInit(1,mod->rank);
-
-  k = idRankFreeModule(mod);
-
-
-  ring orig_ring=currRing;
-  ring syz_ring=rCurrRingAssure_SyzComp();
-  rSetSyzComp(max(k,1));
-
-  ideal s_result=idInit(IDELEMS(submod),submod->rank);
-  ideal s_temp;
-  
-  if (syz_ring != orig_ring)
-  {
-    s_temp = idrCopyR_NoSort(mod,orig_ring);
-  }
-  else
-  {
-    s_temp = idCopy(mod);
-  }
-  
-  if (k == 0)
-  {
-    for (j=0; j<IDELEMS(s_temp); j++)
-    {
-      if (s_temp->m[j]!=NULL) pSetCompP(s_temp->m[j],1);
-    }
-    k = 1;
-  }
-  for (j=0; j<IDELEMS(s_temp); j++)
-  {
-    if (s_temp->m[j]!=NULL)
-    {
-      p = s_temp->m[j];
-      q = pOne();
-      pGetCoeff(q)=nNeg(pGetCoeff(q));   //set q to -1
-      pSetComp(q,k+1+j);
-      pSetmComp(q);
-      while (pNext(p)) pIter(p);
-      pNext(p) = q;
-    }
-  }
-
-  for (j=0; j<IDELEMS(submod); j++)
-  {
-    if (submod->m[j]!=NULL)
-    {
-      if (syz_ring==orig_ring)
-        p = pCopy(submod->m[j]);
-      else
-        p=prCopyR(submod->m[j], orig_ring);
-      if (pGetComp(p)==0) pSetCompP(p,1);
-      q = kNF(s_temp,currQuotient,p,k);
-      pDelete(&p);
-      if (q!=NULL)
-      {
-        if (pMinComp(q)<=k)
-        {
-          if (!reported)
-          {
-            WarnS("first module not a standardbasis\n"
-            "// ** or second not a proper submodule");
-            reported=TRUE;
-          }
-          pDelete(&q);
-        }
-        else
-        {
-          pShift(&q,-k);
-          s_result->m[j] = q;
-        }
-      }
-    }
-  }
-  idDelete(&s_temp);
-
-  if(syz_ring!=orig_ring)
-  {
-    rChangeCurrRing(orig_ring,TRUE);
-    s_result = idrMoveR_NoSort(s_result, syz_ring);
-    rKill(syz_ring);
-  }
-
-  return s_result;
-}
-
 
 /*2
 *computes the quotient of h1,h2
