@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.184 2002-02-06 13:55:46 Singular Exp $ */
+/* $Id: ring.cc,v 1.185 2002-02-06 14:01:02 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3958,7 +3958,7 @@ lists rDecompose(ring r)
   // ----------------------------------------
   // 2: list (ord)
   LL=(lists)omAlloc0Bin(slists_bin);
-  LL->Init((i=rBlocks(r)-1));
+  LL->Init(i=rBlocks(r));
   lists LLL;
   for(; i>=0; i--)
   {
