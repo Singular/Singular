@@ -1344,6 +1344,17 @@ int mac_length(mac_poly p){
   }
   return l;
 }
+//contrary to delete on the mac_poly_r, the coefficients are also destroyed here
+void mac_destroy(mac_poly p){
+  mac_poly iter=p;
+  while(iter)
+  {
+    mac_poly next=iter->next;
+    nDelete(&iter->coef);
+    delete iter;
+    iter=next;
+  }
+}
 BOOLEAN is_valid_ro(red_object & ro){
   red_object r2=ro;
   ro.validate();
@@ -1442,22 +1453,11 @@ void pre_comp(poly* p,int & pn,calc_dat* c){
       }
     }
   
-
-
-
-
-
-
-
     row++;
   }
 
 
 //gaus reduction end  
-
-
-
-
 
   for(i=0;i<pn;i++){
     poly pa;
@@ -2055,7 +2055,206 @@ void tgb_matrix::free_row(int row, BOOLEAN free_non_zeros){
   omfree(n[row]);
   n[row]=NULL;
 }
-void simple_gauss(tgb_matrix* mat){
+
+
+tgb_sparse_matrix::tgb_sparse_matrix(int i, int j){
+  mp=(mac_poly*) omalloc(i*sizeof (mac_poly));;
+  int z;
+  int z2;
+  for(z=0;z<i;z++)
+  {
+    mp[z]=NULL;
+  }
+  this->columns=j;
+  this->rows=i;
+  free_numbers=FALSE;
+}
+tgb_sparse_matrix::~tgb_sparse_matrix(){
+  int z;
+  for(z=0;z<rows;z++)
+  {
+    if(mp[z])
+    {
+      if(free_numbers)
+      {
+	mac_destroy(mp[z]);
+      }
+      else {
+	while(mp[z])
+	{
+	 
+	  mac_poly next=mp[z]->next;
+	  delete mp[z];
+	  mp[z]=next;
+	}
+      }
+    }
+  }
+  omfree(mp);
+}
+void tgb_sparse_matrix::print(){
+  int i;
+  int j;
+  Print("\n");
+  for(i=0;i<rows;i++)
+  {
+    Print("(");
+    for(j=0;j<columns;j++)
+    {
+      StringSetS("");
+      number n=get(i,j);
+      n_Write(n,currRing);
+      Print(StringAppendS(""));
+      Print("\t");
+    }
+    Print(")\n");
+  }
+}
+//transfers ownership of n to the matrix
+void tgb_sparse_matrix::set(int i, int j, number n){
+  assume(i<rows);
+  assume(j<columns);
+  mac_poly* set_this=&mp[i];
+  //  while(((*set_this)!=NULL)&&((*set_this)­>exp<j))
+  while(((*set_this)!=NULL) && ((*set_this)->exp<j))
+    set_this=&((*set_this)->next);
+
+  if (((*set_this)==NULL)||((*set_this)->exp>j))
+  {
+    mac_poly old=(*set_this);
+    (*set_this)=new mac_poly_r();
+    (*set_this)->exp=j;
+    (*set_this)->coef=n;
+    (*set_this)->next=old;
+    return;
+  }
+  assume((*set_this)->exp==j);
+
+  nDelete(&(*set_this)->coef);
+  (*set_this)->coef=n;
+
+  return;
+}
+
+
+
+int tgb_sparse_matrix::get_rows(){
+  return rows;
+}
+int tgb_sparse_matrix::get_columns(){
+  return columns;
+}
+number tgb_sparse_matrix::get(int i, int j){
+  assume(i<rows);
+  assume(j<columns);
+  mac_poly r=mp[i];
+  while((r!=NULL)&&(r->exp<j))
+    r=r->next;
+  if ((r==NULL)||(r->exp>j))
+  {
+    number n=nInit(0);
+    return n;
+  }
+  assume(r->exp==j);
+  return r->coef;
+}
+BOOLEAN tgb_sparse_matrix::is_zero_entry(int i, int j){
+  assume(i<rows);
+  assume(j<columns);
+  mac_poly r=mp[i];
+  while((r!=NULL)&&(r->exp<j))
+    r=r->next;
+  if ((r==NULL)||(r->exp>j))
+  {
+    return TRUE;
+  }
+  assume(!nIsZero(r->coef));
+  assume(r->exp==j);
+  return FALSE;
+  
+}
+void tgb_sparse_matrix::perm_rows(int i, int j){
+  mac_poly h;
+  h=mp[i];
+  mp[i]=mp[j];
+  mp[j]=h;
+}
+int tgb_sparse_matrix::min_col_not_zero_in_row(int row){
+  if(mp[row]!=NULL)
+  {
+    assume(!nIsZero(mp[row]->coef));
+    return mp[row]->exp;
+  }
+ 
+  return columns;//error code
+}
+int tgb_sparse_matrix::next_col_not_zero(int row,int pre){  
+  mac_poly r=mp[row];
+  while((r!=NULL)&&(r->exp<=pre))
+    r=r->next;
+  if(r!=NULL)
+  {
+    assume(!nIsZero(r->coef));
+    return r->exp;
+  }
+  return columns;//error code
+}
+BOOLEAN tgb_sparse_matrix::zero_row(int row){
+  assume((mp[row]==NULL)||(!nIsZero(mp[row]->coef)));
+  if (mp[row]==NULL)
+    return TRUE;
+  else
+    return FALSE;
+}
+int tgb_sparse_matrix::non_zero_entries(int row){
+
+  return mac_length(mp[row]);
+}
+//row add_to=row add_to +row summand*factor
+void tgb_sparse_matrix::add_lambda_times_row(int add_to,int summand,number factor){
+  mp[add_to]= mac_p_add_ff_qq(mp[add_to], factor,mp[summand]);
+
+}
+void tgb_sparse_matrix::mult_row(int row,number factor){
+  mac_mult_cons(mp[row],factor);
+}
+void tgb_sparse_matrix::free_row(int row, BOOLEAN free_non_zeros){
+  if(free_non_zeros)
+    mac_destroy(mp[row]);
+  else
+  {
+    while(mp[row])
+    {
+      
+      mac_poly next=mp[row]->next;
+      delete mp[row];
+      mp[row]=next;
+    }
+  }
+  
+}
+//transfers ownership of m to mat
+void init_with_mac_poly(tgb_sparse_matrix* mat, int row, mac_poly m){
+  assume(mat->mp[z]==NULL);
+  mat->mp[row]=m;
+}
+poly free_row_to_poly(tgb_sparse_matrix* mat, int row, poly* monoms, int monom_index){
+  poly p=NULL;
+  poly* set_this=&p;
+  mac_poly r=mat->mp[row];
+  mat->mp[row]=NULL;
+  while(r)
+  {
+    (*set_this)=pLmInit(monoms[monom_index-1-r->exp]);
+    pSetCoeff((*set_this),r->coef);
+    set_this=&((*set_this)->next);
+    
+  }
+  return p;
+
+}
+
+void simple_gauss(tgb_sparse_matrix* mat){
   int col, row;
   col=0;
   row=0;
@@ -2272,6 +2471,72 @@ static tgb_matrix* build_matrix(poly* p,int p_index,poly* done, int done_index, 
     }
   }
   return t;
+}
+static tgb_sparse_matrix* build_sparse_matrix(poly* p,int p_index,poly* done, int done_index, calc_dat* c){
+  tgb_sparse_matrix* t=new tgb_sparse_matrix(p_index,done_index);
+  int i, pos;
+  //  Print("\n 0:%s\n",pString(done[done_index-1]));
+  //Print("\n 1:%s\n",pString(done[done_index-2]));
+  //  assume((!(pLmEqual(done[done_index-1],done[done_index-2]))));
+#ifdef TGB_DEGUG
+  for(i=0;i<done_index;i++)
+  {
+    int j;
+    for(j=0;j<i;j++)
+    {
+      assume((!(pLmEqual(done[i],done[j]))));
+    }
+  }
+#endif
+  for(i=0;i<p_index;i++)
+  { 
+    // Print("%i ter Eintrag:%s\n",i,pString(p[i]));
+    mac_poly m=NULL;
+    mac_poly* set_this=&m;
+    poly p_i=p[i];
+    while(p_i)
+    {
+
+      int v=-1;
+      pos=posInPolys (done, done_index, p_i,c);
+      if((done_index>pos)&&(pLmEqual(p_i,done[pos])))
+	v=pos;
+      if((pos>0) &&(pLmEqual(p_i,done[pos-1])))
+	v=pos-1;
+      assume(v!=-1);
+      //v is ascending ordered, we need descending order
+      v=done_index-1-v;
+      (*set_this)=new mac_poly_r();
+      (*set_this)->exp=v;
+       
+      (*set_this)->coef=nCopy(p_i->coef);
+       set_this=&(*set_this)->next;
+       p_i=p_i->next;
+
+    }
+    init_with_mac_poly(t,i,m);
+  }
+  return t;
+}
+
+
+static int retranslate(poly* m,tgb_sparse_matrix* mat,poly* done, calc_dat* c){
+  int i;
+  int m_index=0;
+  for(i=0;i<mat->get_rows();i++)
+  {
+    if(mat->zero_row(i))
+    {
+      mat->free_row(i);
+      continue;
+    }
+    m[m_index++]= free_row_to_poly(mat, i, done, mat->get_columns());
+
+  }
+
+  delete mat;
+  return m_index;
+
 }
 
 //returns m_index and destroys mat
@@ -2738,21 +3003,15 @@ static void go_on_F4 (calc_dat* c){
 #endif
   assume(p_index==chosen_index);
   
-  tgb_matrix* mat=build_matrix(p,p_index,done, done_index,c);
-  //mat->print();
-  //next Step Gauss
-  simple_gauss2(mat);
-  //  PrintS("Zeilenstufenform:\n");
-  //mat->print();
-  //PrintS("\n");
-  //mat->print();
-  //next Step retranslate
-
+ //  tgb_matrix* mat=build_matrix(p,p_index,done, done_index,c);
  
-  //new meaning of m
+//   simple_gauss2(mat);
+  tgb_sparse_matrix* mat=build_sparse_matrix(p,p_index,done, done_index,c);
+  simple_gauss(mat);
   m_size=mat->get_rows();
   m=(poly*) omalloc(m_size*sizeof(poly));
   m_index=retranslate(m,mat,done,c);
+  
   mat=NULL;
   for(i=0;i<done_index;i++)
     pDelete(&done[i]);
