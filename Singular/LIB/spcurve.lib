@@ -1,6 +1,6 @@
 // (anne, last modified 31.5.99)
 /////////////////////////////////////////////////////////////////////////////
-version="$Id: spcurve.lib,v 1.16 2001-08-27 14:48:00 Singular Exp $";
+version="$Id: spcurve.lib,v 1.17 2002-05-17 12:20:44 anne Exp $";
 category="Singularities";
 info="
 LIBRARY: spcurve.lib    Deformations and Invariants of CM-codim 2 Singularities
@@ -182,13 +182,15 @@ example
 }
 /////////////////////////////////////////////////////////////////////////////
 
-proc semiCMcod2(matrix M, module t1)
-"USAGE:   semiCMcod2(M,t1); M matrix, t1 module
+proc semiCMcod2(matrix M, module t1,list #)
+"USAGE:   semiCMcod2(M,t1[,s]); M matrix, t1 module, s any
 ASSUME:  M is a presentation matrix of an ideal i, CM of codimension 2,
          and t1 is a presentation of the space of first order deformations
          of i ((M,t1) as returned by the procedure matrixT1)
 CREATE:  new basering with name rneu
-RETURN:  ideal in rneu describing the semiuniversal deformation of i
+RETURN:  ideal in rneu describing the semiuniversal deformation of i;
+         if the optional third argument is given, the perturbation matrix
+         of the semiuniversal deformation is returned.
 NOTE:    The current basering should not contain any variables named
          A(j) where j is some integer!
 EXAMPLE: example semiCMcod2; shows an example"
@@ -245,7 +247,14 @@ EXAMPLE: example semiCMcod2; shows an example"
 //---------------------------------------------------------------------------
 // Construction of the return value
 //---------------------------------------------------------------------------
-  ideal result=minor(O,gt);
+  if(size(#)>0)
+  {
+    matrix result=O;
+  }
+  else
+  {
+    ideal result=minor(O,gt);
+  }
   export rneu;
   keepring rneu;
   return(result);
