@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: fereadl.c,v 1.7 1999-12-08 16:58:13 Singular Exp $ */
+/* $Id: fereadl.c,v 1.8 1999-12-14 17:28:15 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -13,6 +13,10 @@
 #include "mmemory.h"
 #include "structs.h"
 #include "febase.h"
+
+#ifdef SunOS_5
+#define _XOPEN_SOURCE_EXTENDED
+#endif
 
 #ifdef HAVE_FEREAD
  #include <unistd.h>
@@ -202,10 +206,9 @@ void fe_init (void)
         #ifdef atarist
           fe_echo = fopen( "/dev/tty", "w" );
         #else
-          fe_echo = fopen( ttyname(fileno(stdin)), "w" );
+	  fe_echo = fopen( ttyname(fileno(stdin)), "w" );
         #endif
       }
-
       /* Save the terminal attributes so we can restore them later. */
       {
         #if defined( atarist ) || defined( NeXT )
@@ -280,9 +283,16 @@ void fe_init (void)
       pagelength=tgetnum("li");
       fe_cursor_line=pagelength-1;
 
+      #if 0
+      /* --------------------------------------------------------------
+      * put the following code back in, if cursor motion 
+      * shows unexpected behavior
+      * it's commented out because it clears the screen (sometimes)
+      * --------------------------------------------------------------*/
       /* init screen */
       temp = tgetstr ("ti", &t_buf);
       if (temp!=NULL) tputs(temp,1,fe_out_char);
+      #endif
 
       /* printf("TERM=%s, co=%d, li=%d\n",term,colmax,pagelength);*/
     }
