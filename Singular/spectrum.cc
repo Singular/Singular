@@ -869,6 +869,7 @@ BOOLEAN spectrumfProc( leftv result,leftv first )
 
   if( currRing->OrdSgn != -1 )
   // ?? HS: the test above is also true for k[x][[y]], k[[x]][y]
+  // or should we use:
   //if( !ringIsLocal( ) )
   {
     WerrorS( "only works for local orderings" );
@@ -1286,43 +1287,43 @@ BOOLEAN    spectrumOp3  ( leftv res, leftv u, leftv v, leftv w )
 
 BOOLEAN    semicProc3   ( leftv res,leftv u,leftv v,leftv w )
 {
-    semicState  state;
-    BOOLEAN qh=((int)w->Data())==1);
+  semicState  state;
+  BOOLEAN qh=((int)w->Data())==1);
 
-    // -----------------
-    //  check arguments
-    // -----------------
+  // -----------------
+  //  check arguments
+  // -----------------
 
-    lists l1 = (lists)first->Data( );
-    lists l2 = (lists)second->Data( );
+  lists l1 = (lists)first->Data( );
+  lists l2 = (lists)second->Data( );
 
-    if( (state=list_is_spectrum( l1 ))!=semicOK )
-    {
-        WerrorS( "first argument is not a spectrum" );
-        list_error( state );
-    }
-    else if( (state=list_is_spectrum( l2 ))!=semicOK )
-    {
-        WerrorS( "second argument is not a spectrum" );
-        list_error( state );
-    }
+  if( (state=list_is_spectrum( l1 ))!=semicOK )
+  {
+    WerrorS( "first argument is not a spectrum" );
+    list_error( state );
+  }
+  else if( (state=list_is_spectrum( l2 ))!=semicOK )
+  {
+    WerrorS( "second argument is not a spectrum" );
+    list_error( state );
+  }
+  else
+  {
+    spectrum s1( l1 );
+    spectrum s2( l2 );
+
+    result->rtyp = INT_CMD;
+    if (qh)
+      result->data = (void*)(s1.mult_spectrumh( s2 ));
     else
-    {
-        spectrum s1( l1 );
-        spectrum s2( l2 );
+      result->data = (void*)(s1.mult_spectrum( s2 ));
+  }
 
-        result->rtyp = INT_CMD;
-        if (qh)
-          result->data = (void*)(s1.mult_spectrumh( s2 ));
-        else
-          result->data = (void*)(s1.mult_spectrum( s2 ));
-    }
+  // -----------------
+  //  check status
+  // -----------------
 
-    // -----------------
-    //  check status
-    // -----------------
-
-    return  (state!=semicOK);
+  return  (state!=semicOK);
 }
 BOOLEAN    semicProc   ( leftv res,leftv u,leftv v )
 {
