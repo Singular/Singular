@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hdegree.cc,v 1.2 2004-07-20 15:11:09 Singular Exp $ */
+/* $Id: hdegree.cc,v 1.3 2004-10-05 11:25:39 pohl Exp $ */
 /*
 *  ABSTRACT -  dimension, multiplicity, HC, kbase
 */
@@ -1133,6 +1133,11 @@ static void scDegKbase( scfmon stc, int Nstc, int Nvar, int deg)
 
   if (deg == 0)
   {
+    for (i=Nstc-1; i>=0; i--)
+    {
+      for (j=Nvar;j;j--){ if(stc[i][j]) break; }
+      if (j==0){return;}
+    }
     for (i=Nvar; i; i--) act[i] = 0;
     scElKbase();
     return;
