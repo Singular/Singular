@@ -85,7 +85,8 @@ find_executable (const char *name)
       getwd (tbuf);
 # endif
 #endif
-      strcat (tbuf, name + (name[1] == '.' ? 2 : 1));
+      strcat (tbuf, "/");
+      strcat (tbuf, name);
       return copy_of (tbuf);
     }
 
