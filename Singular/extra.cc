@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.127 1999-12-03 13:26:21 obachman Exp $ */
+/* $Id: extra.cc,v 1.128 1999-12-08 16:47:04 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -420,6 +420,49 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       res->data=(void*) siRandomStart;
       return FALSE;
     }
+/*==================== complexNearZero ======================*/
+    if(strcmp(sys_cmd,"complexNearZero")==0)
+    {
+      if (h->Typ()==NUMBER_CMD )
+      {
+        if ( h->next!=NULL && h->next->Typ()==INT_CMD )
+        {
+          if ( !rField_is_long_C() )
+            {
+              Werror( "unsupported ground field!");
+              return TRUE;
+            }
+          else
+            {
+              res->rtyp=INT_CMD;
+              res->data=(void*)complexNearZero((gmp_complex*)h->Data(),(int)h->next->Data());
+              return FALSE;
+            }
+        }
+        else
+        {
+          Werror( "expected <int> as third parameter!");
+          return TRUE;
+        }
+      }
+      else
+      {
+        Werror( "expected <number> as second parameter!");
+        return TRUE;
+      }
+    }
+/*==================== getPrecDigits ======================*/
+    if(strcmp(sys_cmd,"getPrecDigits")==0)
+    {
+      if ( !rField_is_long_C() && !rField_is_long_R() )
+      {
+        Werror( "unsupported ground field!");
+        return TRUE;
+      }
+      res->rtyp=INT_CMD;
+      res->data=(void*)getGMPFloatDigits();
+      return FALSE;
+    }
 /*==================== neworder =============================*/
 // should go below
 #ifdef HAVE_LIBFAC_P
@@ -579,49 +622,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   {
     char *sys_cmd=(char *)(h->Data());
     h=h->next;
-/*==================== complexNearZero ======================*/
-    if(strcmp(sys_cmd,"complexNearZero")==0)
-    {
-      if (h->Typ()==NUMBER_CMD )
-      {
-        if ( h->next!=NULL && h->next->Typ()==INT_CMD )
-        {
-          if ( !rField_is_long_C() )
-            {
-              Werror( "unsupported ground field!");
-              return TRUE;
-            }
-          else
-            {
-              res->rtyp=INT_CMD;
-              res->data=(void*)complexNearZero((gmp_complex*)h->Data(),(int)h->next->Data());
-              return FALSE;
-            }
-        }
-        else
-        {
-          Werror( "expected <int> as third parameter!");
-          return TRUE;
-        }
-      }
-      else
-      {
-        Werror( "expected <number> as second parameter!");
-        return TRUE;
-      }
-    }
-/*==================== getPrecDigits ======================*/
-    if(strcmp(sys_cmd,"getPrecDigits")==0)
-    {
-      if ( !rField_is_long_C() && !rField_is_long_R() )
-      {
-        Werror( "unsupported ground field!");
-        return TRUE;
-      }
-      res->rtyp=INT_CMD;
-      res->data=(void*)getGMPFloatDigits();
-      return FALSE;
-    }
 /*==================== poly debug ==================================*/
     if(strcmp(sys_cmd,"p")==0)
     {
