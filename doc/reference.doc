@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.129 1999-07-23 15:07:06 Singular Exp $
+@comment $Id: reference.doc,v 1.130 1999-07-26 17:28:38 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1490,14 +1490,16 @@ See
 number, poly, vector, ideal, module, matrix or list
 (the same type as the second argument)
 @item @strong{Purpose:}
-maps objects between "almost identical" rings.  @code{fetch} is the
-identity map between rings and qrings with the same coefficient field
-and the same number of variables (but possibly with different
-orderings), the i-th variable of the source ring is mapped to the i-th
-variable of the basering.  This offers a convenient way to change
+maps objects between rings.
+@code{fetch} is the identity map between rings and qrings,
+the i-th variable of the source ring is mapped to the i-th
+variable of the basering.  The coefficient fields must be compatible.
+(See @ref{map} for a description of possible mapping between
+different ground fields).
+@*@code{fetch} offers a convenient way to change
 variable names or orderings, or to map objects from a ring to a quotient
 ring of that ring or vice versa. Compared with @code{imap},
-@code{fetch} is much more efficient, but less general.
+@code{fetch} uses the position of the ring variables, not their names.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -2018,7 +2020,8 @@ variables and parameters of the same name and 0 otherwise.
 different ground fields).
 Useful for mapping from a homogenizing ring to the original ring or
 for mappings from/to rings with/without parameters. Compared with
-@code{fetch}, @code{imap} is more general, but less efficient.
+@code{fetch}, @code{imap} uses the name of variables and parameters.
+Unlike @code{map} and @code{fetch} @code{imap} can map parameters to variables.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -2490,7 +2493,7 @@ See
 @node laguerre, lead, koszul, Functions
 @subsection laguerre
 @cindex laguerre
-TBC
+TBC (wenk)
 @table @code
 @item @strong{Syntax:}
 @item @strong{Type:}
@@ -4068,8 +4071,9 @@ The second argument has to be a map from the basering to the given ring
 (or an ideal defining such a map),
 and the ideal has to be an ideal in the given ring.
 @item @strong{Note:}
-To compute the kernel of a map, the preimage of zero has to be determined. Hence there is no
-special command for computing the kernel of a map in @sc{Singular}.
+To compute the kernel of a map, the preimage of zero has to be determined.
+Hence there is no special command for computing the kernel of a map in
+@sc{Singular}.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -5464,7 +5468,7 @@ See
 @node uressolve, vandermonde, typeof, Functions
 @subsection uressolve
 @cindex uressolve
-TBC
+TBC (wenk)
 @table @code
 @item @strong{Syntax:}
 @item @strong{Type:}
@@ -5474,7 +5478,7 @@ TBC
 @node vandermonde, var, uressolve, Functions
 @subsection vandermonde
 @cindex vandermonde
-TBC
+TBC (wenk)
 @table @code
 @item @strong{Syntax:}
 @item @strong{Type:}
