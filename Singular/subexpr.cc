@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.cc,v 1.17 1997-05-18 11:13:15 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.18 1997-05-23 15:00:03 Singular Exp $ */
 
 /*
 * ABSTRACT: handling of leftv
@@ -487,8 +487,8 @@ void sleftv::Copy(leftv source)
 #endif
   }
   flag=source->flag;
-  if (source->attribute!=NULL)
-    attribute=source->attribute->Copy();
+  if ((source->attribute!=NULL)||(source->e!=NULL))
+    attribute=source->CopyA();
   if (source->next!=NULL)
   {
     next=(leftv)Alloc(sizeof(sleftv));
@@ -554,12 +554,17 @@ void * sleftv::CopyD(int t)
       return (void *)lCopy((lists)d);
     case LINK_CMD:
       return (void *)slCopy((si_link) d);
+    case RING_CMD:
+    case QRING_CMD:
+      {
+        ring r=(ring)d;
+        r->ref++;
+        return d;
+      }
     case 0:
     case DEF_CMD:
       break;
 #ifdef TEST
-    //case RING_CMD:
-    //case QRING_CMD:
     //case COMMAND:
     default:
       Warn("CopyD: cannot copy type %s(%d)",Tok2Cmdname(t),t);
@@ -582,15 +587,10 @@ void * sleftv::CopyD()
 
 attr sleftv::CopyA()
 {
-  if ((rtyp!=IDHDL)&&(e==NULL))
-  {
-    attr x=attribute;
-    attribute=NULL;
-    return x;
-  }
-  if (attribute==NULL)
-    return NULL;
-  return attribute->Copy();
+  attr *a=Attribute();
+  if (a!=NULL)
+    return (*a)->Copy();
+  return NULL;  
 }
 
 char *  sleftv::String(void *d)
@@ -943,7 +943,8 @@ void * sleftv::Data()
 attr * sleftv::Attribute()
 {
   if (e==NULL) return &attribute;
-  if (Typ()==LIST_CMD)
+  if ((rtyp==LIST_CMD)
+  ||((rtyp==IDHDL)&&(IDTYP((idhdl)data)==LIST_CMD)))
   {
     leftv v=LData();
     return &(v->attribute);
