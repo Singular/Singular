@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.28 1999-10-14 17:59:33 Singular Exp $ */
+/* $Id: polys-impl.cc,v 1.29 1999-10-19 12:04:29 Singular Exp $ */
 
 /***************************************************************
  *
@@ -29,9 +29,14 @@
 #include "ring.h"
 #include "polys-impl.h"
 
+/*3
+* copies all exponents (and the component number) from src (in src_r)
+* to dest (in currRing)
+* DOES NOT call pSetm
+*/
 inline void pRingCopy2ExpV(poly dest, poly src, ring src_r)
 {
-  for (int i=pVariables; i; i--)
+  for (int i=pVariables; i != 0; i--)
     pSetExp(dest, i, pRingGetExp(src_r, src, i));
   pSetComp(dest, pRingGetComp(src_r, src));
 }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.74 1999-10-19 09:50:42 Singular Exp $ */
+/* $Id: ring.cc,v 1.75 1999-10-19 12:04:29 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -77,8 +77,6 @@ int rBlocks(ring r)
   return i+1;
 }
 
-static ring o1_ring=NULL;
-static ring o2_ring=NULL;
 // internally changes the gloabl ring and resets the relevant
 // global variables:
 // complete == FALSE : only delete operations are enabled
@@ -114,13 +112,10 @@ void rChangeCurrRing(ring r, BOOLEAN complete)
       {
         naMinimalPoly=((lnumber)r->minpoly)->z;
       }
-    }
 
     /*------------ Garbage Collection -----------------------------------*/
-    if ((r!=o1_ring) && (r!=o2_ring))
       mmGarbageCollectHeaps(2);
-    o1_ring=o2_ring;
-    o2_ring=r;
+    }
   }
 }
 
@@ -782,6 +777,12 @@ void rWrite(ring r)
         Print("%s ",r->names[i]);
       }
     }
+#ifndeg NDEBUG
+    else if (r->order[l] == ringorder_s)
+    {
+      Print("  syzcomp at %d",r->typ[l].data.syz.limit);
+    }
+#endif
 
     if (r->wvhdl[l]!=NULL)
     {
