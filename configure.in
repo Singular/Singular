@@ -5,6 +5,9 @@ OUTPUT_MAKEFILES="Makefile doc/Makefile doc/version.texi"
 if test -d "mpr"; then
    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" mpr/Makefile"
 fi
+if test -d "textutils"; then
+   OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" textutils/Makefile"
+fi
 if test -d "rpm"; then
    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" rpm/Makefile"
    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" rpm/rpmrc rpm/Singular.spec"
@@ -654,6 +657,10 @@ fi
 if test -d mpr; then
   CONFIG_SUBDIRS="$CONFIG_SUBDIRS mpr"
   SUBDIRS="$SUBDIRS mpr"
+fi
+if test -d textutils; then
+  CONFIG_SUBDIRS="$CONFIG_SUBDIRS textutils"
+  SUBDIRS="$SUBDIRS textutils"
 fi
 if test -d emacs; then
   SUBDIRS="$SUBDIRS emacs"
