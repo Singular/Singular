@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sdb.cc,v 1.6 1999-05-29 11:57:42 Singular Exp $ */
+/* $Id: sdb.cc,v 1.7 1999-06-08 12:38:46 Singular Exp $ */
 /*
 * ABSTRACT: Singular debugger
 */
@@ -58,6 +58,14 @@ void sdb_edit(procinfo *pi)
       editor=getenv("VISUAL");
     if (editor==NULL)
       editor="vi";
+    editor=mstrdup(editor);
+
+    // remove arguments...
+    if (strchr(editor,' ')!=NULL)
+    {
+      char *p=strchr(editor,' ');
+      *p='\0';
+    }
 
     if (pi->data.s.body==NULL)
     {
@@ -84,6 +92,7 @@ void sdb_edit(procinfo *pi)
     {
       execlp(editor,editor,filename,NULL);
       Print("cannot exec %s\n",editor);
+      exit(0);
     }
     else
     {
@@ -146,7 +155,7 @@ void sdb(Voice * currentVoice, const char * currLine, int len)
       Print("(%s,%d) >>",currentVoice->filename,yylineno);
       fwrite(currLine,1,len,stdout);
       Print("<<\nbreakpoint %d (press ? for list of commands)\n",bp);
-      p=fe_fgets_stdin("!",gdb,80);
+      p=fe_fgets_stdin(">>",gdb,80);
       while (*p==' ') p++;
       if (*p >' ')
       {
