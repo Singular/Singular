@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.18 2004-06-01 12:46:40 levandov Exp $
+@comment $Id: plureference.doc,v 1.19 2004-08-05 14:50:19 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -44,8 +44,11 @@ The general syntax of a function is
 * imap@value{PSUFFIX}::
 * intersect @value{PSUFFIX}::
 * kbase @value{PSUFFIX}::
+* lift @value{PSUFFIX}::
+* liftstd @value{PSUFFIX}::
 * memory @value{PSUFFIX}::
 * minres @value{PSUFFIX}::
+* modulo @value{PSUFFIX}::
 * mres @value{PSUFFIX}::
 * ncalgebra::
 * nres @value{PSUFFIX}::
@@ -420,7 +423,7 @@ H;
 
 
 @c ------------------------------------------------
-@node kbase @value{PSUFFIX}, memory @value{PSUFFIX}, intersect @value{PSUFFIX}, Functions @value{PSUFFIX}
+@node kbase @value{PSUFFIX}, lift @value{PSUFFIX}, intersect @value{PSUFFIX}, Functions @value{PSUFFIX}
 @section kbase @value{PSUFFIX}
 @cindex kbase @value{PSUFFIX}
 @table @code
@@ -473,8 +476,112 @@ See
 @ref{module @value{PSUFFIX}};
 @ref{vdim @value{PSUFFIX}}.
 @c ref
+
+
+@c -------------------------------------------------
+@node lift @value{PSUFFIX}, liftstd @value{PSUFFIX}, kbase @value{PSUFFIX}, Functions @value{PSUFFIX}
+@section lift @value{PSUFFIX}
+@cindex lift @value{PSUFFIX}
+@table @code
+@item @strong{Syntax:}
+@code{lift (} ideal_expression@code{,} subideal_expression @code{)}
+@*@code{lift (} module_expression@code{,} submodule_expression @code{)}
+@*@code{lift (} ideal_expression@code{,} subideal_expression@code{,} matrix_name @code{)}
+@*@code{lift (} module_expression@code{,} submodule_expression@code{,} matrix_name @code{)}
+@item @strong{Type:}
+matrix
+@item @strong{Purpose:}
+computes the left transformation matrix which expresses the generators of a
+submodule in terms of the generators of a module.  Uses different
+algorithms for modules which are, resp.@: are not, represented by a
+standard basis.
+@* More precisely, if  @code{m} is the
+module (or ideal), @code{sm} the submodule (or ideal),
+and @code{T} the transformation matrix returned by
+lift, then @code{transpose(matrix(sm)) = transpose(T)*transpose(m)}
+and @code{module(transpose(sm)) = module(transpose(T)*transpose(m))}
+(resp.@: @code{ideal(sm) = ideal(transpose(T)*transpose(m))}).
+@c where @code{U} is a diagonal matrix of units.
+@*@code{U} is always the unity matrix if the basering is a polynomial ring
+(not power series ring). @code{U} is stored in the optional third argument.
+@item @strong{Note:}
+Gives a warning if @code{sm} is not a submodule.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r = (0,a),(e,f,h),(c,dp);
+  matrix @D[3][3];
+  @D[1,2]=-h;
+  @D[1,3]=2*e;
+  @D[2,3]=-2*f;
+  ncalgebra(1,@D); // parametric U(sl_2)
+  ideal i = e,h-a;
+  i = std(i);
+  i;
+  poly Z = 4*e*f+h^2-2*h; // central element
+  Z = Z - NF(Z,i); //cen. character
+  ideal j = std(Z);
+  matrix T = lift(i,j);
+  print(T);
+  ideal tj = ideal(transpose(T)*transpose(matrix(i)));
+  std(ideal(j-tj)); // test
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{liftstd @value{PSUFFIX}};
+@ref{ideal @value{PSUFFIX}};
+@ref{module @value{PSUFFIX}}.
+@c ref
+
+
+@c -----------------------------------------
+@node liftstd @value{PSUFFIX}, memory @value{PSUFFIX}, lift @value{PSUFFIX}, Functions @value{PSUFFIX}
+@section liftstd @value{PSUFFIX}
+@cindex liftstd @value{PSUFFIX}
+@table @code
+@item @strong{Syntax:}
+@code{liftstd (} ideal_expression@code{,} matrix_name @code{)}
+@*@code{liftstd (} module_expression@code{,} matrix_name @code{)}
+@item @strong{Type:}
+ideal or module
+@item @strong{Purpose:}
+returns a standard basis of an ideal or module and the transformation
+matrix from the given ideal, resp.@: module, to the standard basis.
+@*That is, if @code{m} is the ideal or module, @code{sm} the standard
+basis returned by @code{liftstd}, and @code{T} the transformation matrix
+then @code{transpose(matrix(sm))=transpose(T)*transpose(matrix(m))} and @code{sm=ideal(transpose(T)*transpose(matrix(m)))}, 
+resp.@: @code{sm=module(transpose(transpose(T)*transpose(matrix(m))))}.
+@item @strong{Example:}
+@smallexample
+@c example
+  LIB "ncalg.lib";
+  def A = sl2();
+  setring A;
+  ideal i = e2,f;
+  option(redSB);
+  option(redTail);
+  matrix T;
+  ideal j = liftstd(i,T);
+  print(T);
+  ideal tj = ideal(transpose(T)*transpose(matrix(i)));
+  std(ideal(j-tj)); // test
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{ideal @value{PSUFFIX}};
+@ref{ring @value{PSUFFIX}};
+@ref{option @value{PSUFFIX}};
+@ref{std @value{PSUFFIX}};
+@ref{matrix @value{PSUFFIX}}.
+@c ref
+
+
 @c ---------------------------------------
-@node  memory @value{PSUFFIX}, minres @value{PSUFFIX}, kbase @value{PSUFFIX}, Functions @value{PSUFFIX}
+@node  memory @value{PSUFFIX}, minres @value{PSUFFIX}, liftstd @value{PSUFFIX}, Functions @value{PSUFFIX}
 @section memory @value{PSUFFIX}
 @cindex memory @value{PSUFFIX}
 @cindex memory managment
@@ -525,7 +632,7 @@ kill r;
 
 
 @c ---------------------------------------
-@node  minres @value{PSUFFIX}, mres @value{PSUFFIX}, memory @value{PSUFFIX}, Functions @value{PSUFFIX}
+@node  minres @value{PSUFFIX}, modulo @value{PSUFFIX}, memory @value{PSUFFIX}, Functions @value{PSUFFIX}
 @section minres @value{PSUFFIX}
 @cindex minres @value{PSUFFIX}
 
@@ -579,10 +686,109 @@ See
 @c ref
 
 
+@c ---------------------------------------
+@node modulo @value{PSUFFIX}, mres @value{PSUFFIX}, minres @value{PSUFFIX}, Functions @value{PSUFFIX}
+@section modulo @value{PSUFFIX}
+@cindex modulo @value{PSUFFIX}
+@table @code
+@item @strong{Syntax:}
+@code{modulo (} ideal_expression@code{,} ideal_expression @code{)}
+@*@code{modulo (} module_expression@code{,} module_expression @code{)}
+@item @strong{Type:}
+module
+@item @strong{Purpose:}
+@code{modulo(h1,h2)}
+@ifinfo
+represents h1/(h1 intersect h2) (isomorphic to (h1+h2)/h2)
+@end ifinfo
+@tex
+represents $h_1/(h_1 \cap h_2) \cong (h_1+h_2)/h_2$
+@end tex
+where
+@tex
+$h_1$ and $h_2$
+@end tex
+@ifinfo
+h1 and h2
+@end ifinfo
+are considered as submodules of the same free module
+@tex
+$R^l$
+@end tex
+@ifinfo
+R^l
+@end ifinfo
+(l=1 for ideals). Let
+@tex
+$H_1$, resp.\ $H_2$,
+@end tex
+@ifinfo
+H1 and H2
+be the matrices of size l x k, resp.@: l x m, having the columns of
+@end ifinfo
+@tex
+be the matrices of size $l \times k$, resp.\ $l \times m$, having the
+generators of $h_1$, resp.\ $h_2$,
+@end tex
+@ifinfo
+h1, resp.@: h2,
+@end ifinfo
+as columns.
+Then
+@tex
+$h_1/(h_1 \cap h_2) \cong R^k / ker(\overline{H_1})$
+@end tex
+@ifinfo
+@format
+                                                    __
+      h1/(h1 intersect h2) is isomorphic to R^k/ker(H1)
+
+@*
+@end format
+@end ifinfo
+where
+@tex
+$\overline{H_1}: R^k \rightarrow R^l/Im(H_2)=R^l/h_2$
+is the induced map.
+@end tex
+@ifinfo
+@format
+         __
+         H1: R^k ----> R^l/Im(H2)=R^l/h2 is the induced map.
+
+@*
+@end format
+@end ifinfo
+@*@code{modulo(h1,h2)} returns generators of
+the kernel of this induced map.
+@item @strong{Example:}
+@smallexample
+@c example
+  LIB "ncalg.lib";
+  def A = sl2();
+  setring A;
+  option(redSB);
+  option(redTail);
+
+  ideal I = e2,f2,h2-1;
+  I = twostd(I);
+  I;
+  ideal E = std(e);
+  ideal T = modulo(E,I);
+  T = NF(std(I+T),I);
+  T = std(T);
+  T;
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{syz @value{PSUFFIX}}.
+@c ref
 
 
 @c ---------------------------------------
-@node  mres @value{PSUFFIX}, ncalgebra, minres @value{PSUFFIX}, Functions @value{PSUFFIX}
+@node  mres @value{PSUFFIX}, ncalgebra, modulo @value{PSUFFIX}, Functions @value{PSUFFIX}
 @section mres @value{PSUFFIX}
 @cindex mres @value{PSUFFIX}
 @table @code
