@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.37 2000-03-22 16:56:52 Singular Exp $ */
+/* $Id: polys-impl.cc,v 1.38 2000-03-22 17:07:25 Singular Exp $ */
 
 /***************************************************************
  *
@@ -938,11 +938,11 @@ int rComp_a(poly p1, poly p2, int i)
   }
   if (o1>o2)
   {
-    return  -1;
+    return  1;
   }
   if (o1<o2)
   {
-    return 1;
+    return -1;
   }
   return 0;
 }
@@ -1031,19 +1031,19 @@ int rComp0(poly p1, poly p2)
     {
       case ringorder_a:
         r=rComp_a(p1,p2,i);
-        if (r!=0) { assume(r==rr);return r;}
+        if (r!=0) { assume(r==rr);return rr;}
         break;
 
       case ringorder_c:
         if (pGetComp(p1) < pGetComp(p2))
         {
           assume(rr==1);
-          return 1;
+          return rr;
         }
         if (pGetComp(p1) > pGetComp(p2))
         {
           assume(rr==-1);
-          return -1;
+          return rr;
         }
         break;
 
@@ -1051,98 +1051,102 @@ int rComp0(poly p1, poly p2)
         if (pGetComp(p1) > pGetComp(p2))
         {
           assume(rr==1);
-          return 1;
+          return rr;
         }
         if (pGetComp(p1) < pGetComp(p2))
         {
           assume(rr==-1);
-          return -1;
+          return rr;
         }
         break;
 
       case ringorder_M:
         {
           assume(0); // not yet implemented
-          break;
+          return rr;
         }
 
       case ringorder_lp:
         r=rComp_lex(p1,p2,i);
-        if (r!=0) { assume(r==rr);return r;}
+        if (r!=0) { assume(r==rr);return rr;}
         break;
 
       case ringorder_ls:
-        r=rComp_lex(p1,p2,i);
-        if (r!=0) { assume(r== -rr);return -r;}
+        r= -rComp_lex(p1,p2,i);
+        if (r!=0) { assume(r==rr);return rr;}
         break;
 
       case ringorder_dp:
         r=rComp_deg(p1,p2,i);
-        if (r!=0) { assume(r==rr);return r;}
+        if (r!=0) { assume(r==rr);return rr;}
         r=rComp_revlex(p1,p2,i);
-        if (r!=0) { assume(r==rr);return r;}
+        if (r!=0) { assume(r==rr);return rr;}
         break;
 
       case ringorder_Dp:
         r=rComp_deg(p1,p2,i);
-        if (r!=0) { assume(r==rr);return r;}
+        if (r!=0) { assume(r==rr);return rr;}
 	r=rComp_lex(p1,p2,i);
-        if (r!=0) { assume(r==rr);return r;}
+        if (r!=0) { assume(r==rr);return rr;}
         break;
 
       case ringorder_ds:
         r= -rComp_deg(p1,p2,i);
-        if (r!=0) { assume(r==rr);return r;}
+        if (r!=0) { assume(r==rr);return rr;}
         r=rComp_revlex(p1,p2,i);
-        if (r!=0) { assume(r==rr);return r;}
+        if (r!=0) { assume(r==rr);return rr;}
         break;
 
       case ringorder_Ds:
         r= -rComp_deg(p1,p2,i);
-        if (r!=0) { assume(r==rr);return r;}
+        if (r!=0) { assume(r==rr);return rr;}
 	r=rComp_lex(p1,p2,i);
-        if (r!=0) { assume(r==rr);return r;}
+        if (r!=0) { assume(r==rr);return rr;}
         break;
 
       case ringorder_wp:
         r=rComp_a(p1,p2,i);
-        if (r!=0) { assume(r==rr);return r;}
+        if (r!=0) { assume(r==rr);return rr;}
         r=rComp_revlex(p1,p2,i);
-        if (r!=0) { assume(r==rr);return r;}
+        if (r!=0) { assume(r==rr);return rr;}
         break;
 
       case ringorder_Wp:
         r=rComp_a(p1,p2,i);
-        if (r!=0) { assume(r==rr);return r;}
+        if (r!=0) { assume(r==rr);return rr;}
 	r=rComp_lex(p1,p2,i);
-        if (r!=0) { assume(r==rr);return r;}
+        if (r!=0) { assume(r==rr);return rr;}
         break;
 
       case ringorder_ws:
         r= -rComp_a(p1,p2,i);
-        if (r!=0) { assume(r==rr);return r;}
+        if (r!=0) { assume(r==rr);return rr;}
         r=rComp_revlex(p1,p2,i);
-        if (r!=0) { assume(r==rr);return r;}
+        if (r!=0) { assume(r==rr);return rr;}
         break;
 
       case ringorder_Ws:
         r= -rComp_a(p1,p2,i);
-        if (r!=0) { assume(r==rr);return r;}
+        if (r!=0) { assume(r==rr);return rr;}
 	r=rComp_lex(p1,p2,i);
-        if (r!=0) { assume(r==rr);return r;}
+        if (r!=0) { assume(r==rr);return rr;}
         break;
 
       case ringorder_S:
         assume(0);
-        break;
+        return rr;
 
       case ringorder_s:
         /*  ro_syz */
+	// shall not appear:
+	assume(0);
+	#if 0
 	if ((pGetComp(p1) > pDBsyzComp) && (pGetComp(p2) > pDBsyzComp)) break;
 	if ((pGetComp(p1) <= pDBsyzComp) && (pGetComp(p2) <= pDBsyzComp)) break;
-	if (pGetComp(p1) <= pDBsyzComp) { assume(rr==1); return 1;}
-	/* if (pGetComp(p2) <= pDBsyzComp) */ { assume (rr== -1); return -1; }
-        break;
+	if (pGetComp(p1) <= pDBsyzComp) { assume(rr==1); return rr;}
+	/* if (pGetComp(p2) <= pDBsyzComp) */ { assume (rr== -1); return rr; }
+	#endif
+	return rr;
 
       case ringorder_unspec:
       case ringorder_no:
