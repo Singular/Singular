@@ -13,9 +13,10 @@
 #include "kutil.h"
 #include "kInline.cc"
 #include "kstd1.h"
+#include "kbuckets.h"
 
 #define FULLREDUCTIONS
-//#define HOMOGENEOUS_EXAMPLE
+#define HOMOGENEOUS_EXAMPLE
 //#define QUICK_SPOLY_TEST
 //#define DIAGONAL_GOING
 //#define RANDOM_WALK
@@ -501,8 +502,12 @@ void initial_data(calc_dat* c){
   c->strat->enterS = enterSBba;
   c->strat->sl = -1;
   initS(c->S,NULL,c->strat);
+  c->strat->lenS=(int*)omAlloc0(IDELEMS(c->strat->Shdl)*sizeof(int)); 
   for (i=c->strat->sl;i>=0;i--)
+  {
     pNorm(c->strat->S[i]);
+    c->strat->lenS[i]=pLength(c->strat->S[i]);
+  }  
 }
 void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c){
   
@@ -600,13 +605,17 @@ void add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c){
 
   LObject P; memset(&P,0,sizeof(P));
   P.tailRing=c->r;
-  P.p=pCopy(h);
+  P.p=p_Copy(h,c->r);
   P.FDeg=pFDeg(P.p,c->r);
-  pCleardenom(P.p);
+  if (!rField_is_Zp(c->r)) pCleardenom(P.p);
   enterT(P,c->strat,-1);
   c->strat->enterS(P,i,c->strat);
   pNorm(c->strat->S[i]);
+  c->strat->lenS[i]=/*pLength(c->strat->S[i]);*/ c->lengths[c->n-1];
+  //for(i=c->strat->sl; i>=0;i--)
+  //  c->strat->lenS[i]=pLength(c->strat->S[i]);
 }
+#if 0
 static poly redNF (poly h,kStrategy strat)
 {
   int j = 0;
@@ -619,47 +628,105 @@ static poly redNF (poly h,kStrategy strat)
   }
   not_sev = ~ pGetShortExpVector(h);
   loop
+  {
+    if (pLmShortDivisibleBy(strat->S[j], strat->sevS[j], h, not_sev))
     {
-      if (pLmShortDivisibleBy(strat->S[j], strat->sevS[j], h, not_sev))
-      {
-        //if (strat->interpt) test_int_std(strat->kIdeal);
-        /*- compute the s-polynomial -*/
+      //if (strat->interpt) test_int_std(strat->kIdeal);
+      /*- compute the s-polynomial -*/
 #ifdef KDEBUG
-        if (TEST_OPT_DEBUG)
-        {
-          PrintS("red:");
-          wrp(h);
-          PrintS(" with ");
-          wrp(strat->S[j]);
-        }
-#endif
-        h = ksOldSpolyRed(strat->S[j],h,strat->kNoether);
-#ifdef KDEBUG
-        if (TEST_OPT_DEBUG)
-        {
-          PrintS("\nto:");
-          wrp(h);
-          PrintLn();
-        }
-#endif
-        if (h == NULL) return NULL;
-        z++;
-        if (z>=10)
-        {
-          z=0;
-          pNormalize(h);
-        }
-        /*- try to reduce the s-polynomial -*/
-        j = 0;
-        not_sev = ~ pGetShortExpVector(h);
-      }
-      else
+      if (TEST_OPT_DEBUG)
       {
-        if (j >= strat->sl) return h;
-        j++;
+        PrintS("red:");
+        wrp(h);
+        PrintS(" with ");
+        wrp(strat->S[j]);
       }
+#endif
+      h = ksOldSpolyRed(strat->S[j],h,strat->kNoether);
+#ifdef KDEBUG
+      if (TEST_OPT_DEBUG)
+      {
+        PrintS("\nto:");
+        wrp(h);
+        PrintLn();
+      }
+#endif
+      if (h == NULL) return NULL;
+      z++;
+      if (z>=10)
+      {
+        z=0;
+        pNormalize(h);
+      }
+      /*- try to reduce the s-polynomial -*/
+      j = 0;
+      not_sev = ~ pGetShortExpVector(h);
     }
+    else
+    {
+      if (j >= strat->sl) return h;
+      j++;
+    }
+  }
 }
+#else
+static poly redNF (poly h,kStrategy strat)
+{
+  if (h==NULL) return NULL;
+  int j;
+
+  if (0 > strat->sl)
+  {
+    return h;
+  }
+  LObject P(h);
+  P.SetShortExpVector();
+  P.bucket = kBucketCreate(currRing);
+  kBucketInit(P.bucket,P.p,pLength(P.p));
+  loop
+  {
+    //int max_pos=min(posInS(strat,strat->sl,P.p,0),strat->sl);
+    j=kFindDivisibleByInS(strat->S,strat->sevS,strat->sl,&P);
+    if (j>=0)
+    {
+      nNormalize(pGetCoeff(P.p));
+#ifdef KDEBUG
+      if (TEST_OPT_DEBUG)
+      {
+        PrintS("red:");
+        wrp(h);
+        PrintS(" with ");
+        wrp(strat->S[j]);
+      }
+#endif
+      number coef=kBucketPolyRed(P.bucket,strat->S[j],
+                          strat->lenS[j]/*pLength(strat->S[j])*/,
+			  strat->kNoether);
+      nDelete(&coef);			  
+      h = kBucketGetLm(P.bucket);
+      if (h==NULL) return NULL;
+      P.p=h;
+      P.t_p=NULL;
+      P.SetShortExpVector();
+#ifdef KDEBUG
+      if (TEST_OPT_DEBUG)
+      {
+        PrintS("\nto:");
+        wrp(h);
+        PrintLn();
+      }
+#endif
+    }
+    else
+    {
+      P.p=kBucketClear(P.bucket);
+      kBucketDestroy(&P.bucket);
+      pNormalize(P.p);
+      return P.p;
+    }
+  }
+}
+#endif
 
 void do_this_spoly_stuff(int i,int j,calc_dat* c){
   poly f=c->S->m[i];
