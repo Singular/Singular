@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.h,v 1.18 1997-10-10 10:39:52 schmidt Exp $ */
+/* $Id: canonicalform.h,v 1.19 1997-12-17 08:57:49 schmidt Exp $ */
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
@@ -117,8 +117,6 @@ public:
     int sign() const;
     CanonicalForm sqrt() const;
     int ilog2() const;
-    bool hasGcd() const { return false; }
-    CanonicalForm gcd( const CanonicalForm & f ) const;
 
     // comparison operators
     friend bool operator == ( const CanonicalForm&, const CanonicalForm& );
