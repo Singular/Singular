@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmspoly.lib,v 1.6 2003-11-20 16:53:59 mschulze Exp $";
+version="$Id: gmspoly.lib,v 1.7 2003-11-21 09:47:43 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -440,6 +440,11 @@ EXAMPLE:  example gbasis; shows examples
   def @X=basering;
   int n=nvars(@X);
   ideal J=jacob(f);
+
+  if(vdim(std(J))<=0)
+  {
+    ERROR("input is not cohomologically tame");
+  }
 
   int i,j,k,l;
 
