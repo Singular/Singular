@@ -194,4 +194,24 @@ pr4;
 m;
 testPrimary(pr2,i);
 kill r;
+
+// new example from Gerhard/Agnes
+ring R=3,(x,y),lp;
+ideal i=y4-x3-x,x9-x,y9-y;
+list pr1=minAssGTZ(i);
+ideal i1=radical(i);
+ideal i2=equiRadical(i);
+list pr2= primdecGTZ(i);
+list pr3=minAssChar(i,1);
+list pr4=primdecSY(i,1);
+matrix m=char_series(i);
+pr1;
+i1;
+i2;
+pr2;
+pr3;
+pr4;
+m;
+testPrimary(pr2,i);
+
 tst_status(1);$

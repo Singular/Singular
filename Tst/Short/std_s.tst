@@ -1,4 +1,4 @@
-// $Id: std_s.tst,v 1.2 1998-07-01 10:20:55 obachman Exp $
+// $Id: std_s.tst,v 1.3 1999-09-27 12:51:45 obachman Exp $
 
 // std_s.tst -- long tests for std
 // uses rcyclic examples from ISSAC'98 paper
@@ -224,26 +224,29 @@ proc extend_orderings(list olist, int j)
 
 proc mystd
 {
+  basering;
+  print(#[1]);	
   int t1 = timer;
   def id_res = std(#[1]);
-  t1 = timer - t1;
-  int i;
-  def id_poly = id_res[1];
-  for (i=1; i<=size(id_res); i++)
-  {
-    id_poly = id_poly + id_res[i];
-    if (size(id_res[i]) > 2)
-    {   
-      lead(id_res[i]), lead(id_res[i] - lead(id_res[i])), size(id_res[i]);
-    }
-    else
-    {
-      id_res[i];
-    }
-  }
-  id_poly;
-  tst_ignore(t1, "time");
-  tst_ignore(memory(1), "memory");
+   id_res;
+//   t1 = timer - t1;
+//   int i;
+//   def id_poly = id_res[1];
+//   for (i=1; i<=size(id_res); i++)
+//   {
+//     id_poly = id_poly + id_res[i];
+//     if (size(id_res[i]) > 2)
+//     {   
+//       lead(id_res[i]), lead(id_res[i] - lead(id_res[i])), size(id_res[i]);
+//     }
+//     else
+//     {
+//       id_res[i];
+//     }
+//   }
+//   id_poly;
+//  tst_ignore(t1, "time");
+//  tst_ignore(memory(1), "memory");
 }
 
 proc gencopy
