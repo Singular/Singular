@@ -1,7 +1,7 @@
-// $Id: standard.lib,v 1.29 1999-04-22 08:35:12 obachman Exp $
+// $Id: standard.lib,v 1.30 1999-05-19 11:28:55 Singular Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.29 1999-04-22 08:35:12 obachman Exp $";
+version="$Id: standard.lib,v 1.30 1999-05-19 11:28:55 Singular Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
@@ -413,6 +413,8 @@ proc res(list #)
    int i=#[2]; //the length of the resolution
                //if size(#)>2 a minimal resolution is computed
 
+   string varstr_P = varstr(P);
+
    //LaScala for the homogeneous case
    if(homog(m)==1)
    {
@@ -726,18 +728,18 @@ static proc intersect1(ideal i,ideal j)
 ///
 proc sprintf(string fmt, list #)
 "USAGE:    sprintf(fmt, ...) fmt string
-RETURN:   string 
-PURPOSE:  sprintf performs output formatting. The first argument is a format 
-          control string. Additional arguments may be required, depending on 
-          the contents of the control string. A series of output characters is 
-          generated as directed by the control string; these characters are 
+RETURN:   string
+PURPOSE:  sprintf performs output formatting. The first argument is a format
+          control string. Additional arguments may be required, depending on
+          the contents of the control string. A series of output characters is
+          generated as directed by the control string; these characters are
           returned as a string. The control string is simply text to be copied,
           except that the string may contain conversion specifications. Do
           'help print:' for a listing of valid conversion specifications.
-          As an addition to the conversions of 'print', the '%n' and '%2' 
+          As an addition to the conversions of 'print', the '%n' and '%2'
           conversion specification does not consume an additional argument,
           but simply generates a newline character.
-NOTE:     If one of the additional arguments is a list, then it should be 
+NOTE:     If one of the additional arguments is a list, then it should be
           enclosed once more into a list() command, since passing a list
           as an argument flattens the list by one level.
 SEE ALSO: fprintf, printf, print, string
@@ -813,19 +815,19 @@ example
 proc printf(string fmt, list #)
 "USAGE:    printf(fmt, ...) fmt string
 RETURN:   none
-PURPOSE:  printf performs output formatting. The first argument is a format 
-          control string. Additional arguments may be required, depending on 
-          the contents of the control string. A series of output characters is 
-          generated as directed by the control string; these characters are 
-          displayed (i.e. printed to standard out). 
-          The control string is simply text to be copied, except that the 
-          string may contain conversion specifications. 
+PURPOSE:  printf performs output formatting. The first argument is a format
+          control string. Additional arguments may be required, depending on
+          the contents of the control string. A series of output characters is
+          generated as directed by the control string; these characters are
+          displayed (i.e. printed to standard out).
+          The control string is simply text to be copied, except that the
+          string may contain conversion specifications.
           Do 'help print:' for a listing of valid conversion specifications.
-          As an addition to the conversions of 'print', the '%n' and '%2' 
+          As an addition to the conversions of 'print', the '%n' and '%2'
           conversion specification does not consume an additional argument,
           but simply generates a newline character.
 
-NOTE:     If one of the additional arguments is a list, then it should be 
+NOTE:     If one of the additional arguments is a list, then it should be
           enclosed once more into a list() command, since passing a list
           as an argument flattens the list by one level.
 SEE ALSO: sprintf, fprintf, print, string
@@ -853,19 +855,19 @@ example
 proc fprintf(link l, string fmt, list #)
 "USAGE:    fprintf(l, fmt, ...) l link; fmt string
 RETURN:   none
-PURPOSE:  fprintf performs output formatting. The second argument is a format 
-          control string. Additional arguments may be required, depending on 
-          the contents of the control string. A series of output characters is 
-          generated as directed by the control string; these characters are 
+PURPOSE:  fprintf performs output formatting. The second argument is a format
+          control string. Additional arguments may be required, depending on
+          the contents of the control string. A series of output characters is
+          generated as directed by the control string; these characters are
           written to the link l.
-          The control string is simply text to be copied, except that the 
-          string may contain conversion specifications. 
+          The control string is simply text to be copied, except that the
+          string may contain conversion specifications.
           Do 'help print:' for a listing of valid conversion specifications.
-          As an addition to the conversions of 'print', the '%n' and '%2' 
+          As an addition to the conversions of 'print', the '%n' and '%2'
           conversion specification does not consume an additional argument,
           but simply generates a newline character.
 
-NOTE:     If one of the additional arguments is a list, then it should be 
+NOTE:     If one of the additional arguments is a list, then it should be
           enclosed once more into a list() command, since passing a list
           as an argument flattens the list by one level.
 SEE ALSO: sprintf, printf, print, string
@@ -889,11 +891,11 @@ example
   fprintf(li, "%;", list(l));
   fprintf(li, "%b", M);
 }
-  
-   
-  
-  
-  
+
+
+
+
+
 
 /*
 proc minres(list #)
