@@ -27,7 +27,7 @@
  *
  *****************************************************************/
 #define MAX_HE_ENTRY_LENGTH 60
-typedef struct 
+typedef struct
 {
   char key[MAX_HE_ENTRY_LENGTH];
   char node[MAX_HE_ENTRY_LENGTH];
@@ -52,7 +52,7 @@ typedef heBrowser_s * heBrowser;
  * Declarations: Local functions
  *
  *****************************************************************/
-static char* strclean(char* str); 
+static char* strclean(char* str);
 static BOOLEAN heKey2Entry(char* filename, char* key, heEntry hentry);
 static int heReKey2Entry (char* filename, char* key, heEntry hentry);
 static BOOLEAN strmatch(char* s, char* re);
@@ -110,7 +110,7 @@ void feHelp(char *str)
   BOOLEAN key_is_regexp = (strchr(str, '*') != NULL);
   heEntry_s hentry;
   char* idxfile = feResource('x' /*"IdxFile"*/);
-  
+
   // Try exact match of help string with key in index
   if (!key_is_regexp && idxfile != NULL && heKey2Entry(idxfile, str, &hentry))
   {
@@ -119,7 +119,7 @@ void feHelp(char *str)
   }
 
   if (! key_is_regexp && heOnlineHelp(str)) return;
-  
+
   // Try to match approximately with key in index file
   if (idxfile != NULL)
   {
@@ -141,7 +141,7 @@ void feHelp(char *str)
         strcat(mkey, "*");
         found = heReKey2Entry(idxfile, mkey, &hentry);
       }
-      
+
       // Print warning and return if nothing found
       if (found == 0)
       {
@@ -168,7 +168,7 @@ void feHelp(char *str)
     PrintS("\n");
     return;
   }
-  
+
   // no idx file, let Browsers deal with it, if they can
   strcpy(hentry.key, str);
   *hentry.node = '\0';
@@ -184,18 +184,18 @@ char* feHelpBrowser(char* which, int warn)
   char* mainGetSingOptionValue(const char* name);
 
   // if no argument, see what we have as value to the option
-  if (which == NULL || *which == '\0') 
+  if (which == NULL || *which == '\0')
     which = mainGetSingOptionValue("browser");
-  
+
   // if no argument, choose first available help browser
   if (which == NULL || *which == '\0')
   {
     // unles one is already set
     if (heCurrentHelpBrowser != NULL) goto Finish;
-    
+
     while (heHelpBrowsers[i].browser != NULL)
     {
-      if (heHelpBrowsers[i].init_proc(0)) 
+      if (heHelpBrowsers[i].init_proc(0))
       {
         heCurrentHelpBrowser = &(heHelpBrowsers[i]);
         return heCurrentHelpBrowser->browser;
@@ -210,8 +210,8 @@ char* feHelpBrowser(char* which, int warn)
   while (heHelpBrowsers[i].browser != NULL &&
          strcmp(heHelpBrowsers[i].browser, which) != 0)
   {i++;}
-  
-  if (heHelpBrowsers[i].browser == NULL) 
+
+  if (heHelpBrowsers[i].browser == NULL)
   {
     if (warn) Warn("No help browser '%s' available", which);
   }
@@ -224,22 +224,22 @@ char* feHelpBrowser(char* which, int warn)
       goto Finish;
     }
   }
-      
+
   // something went wrong
-  if (heCurrentHelpBrowser == NULL) 
+  if (heCurrentHelpBrowser == NULL)
   {
     // choose first available help browser
     mainSetSingOptionValue("browser", "");
     feHelpBrowser();
     assume(heCurrentHelpBrowser != NULL);
-    if (warn) 
+    if (warn)
       Warn("Setting help browser to '%s'", heCurrentHelpBrowser->browser);
     return heCurrentHelpBrowser->browser;
   }
   else
   {
     // or, leave as is
-    if (warn) 
+    if (warn)
       Warn("Help browser stays at '%s'",  heCurrentHelpBrowser->browser);
   }
 
@@ -252,17 +252,17 @@ void  feStringAppendBrowsers(int warn)
 {
   int i;
   StringAppendS("Available HelpBrowsers: ");
-  
+
   i = 0;
   while (heHelpBrowsers[i].browser != NULL)
   {
-    if (heHelpBrowsers[i].init_proc(warn)) 
+    if (heHelpBrowsers[i].init_proc(warn))
       StringAppend("%s, ", heHelpBrowsers[i].browser);
     i++;
   }
   StringAppend("\nCurrent HelpBrowser: %s ", feHelpBrowser());
 }
-  
+
 
 /*****************************************************************
  *
@@ -312,11 +312,11 @@ static BOOLEAN heKey2Entry(char* filename, char* key, heEntry hentry)
   i = 0;
   while ((c = getc(fd)) != EOF)
   {
-    if (c < k) 
+    if (c < k)
     {
       /* Skip line */
       while (getc(fd) != '\n') {};
-      if (i) 
+      if (i)
       {
         i=0;
         k=key[0];
@@ -340,7 +340,7 @@ static BOOLEAN heKey2Entry(char* filename, char* key, heEntry hentry)
           i++;
         }
         if (c == EOF) goto Failure;
-        
+
         // get url
         hentry->node[i] = '\0';
         i = 0;
@@ -361,7 +361,7 @@ static BOOLEAN heKey2Entry(char* filename, char* key, heEntry hentry)
         fclose(fd);
         return TRUE;
       }
-      else if (i > kl) 
+      else if (i > kl)
       {
         goto Failure;
       }
@@ -386,7 +386,7 @@ static BOOLEAN heKey2Entry(char* filename, char* key, heEntry hentry)
 // inteprets * as wildcard
 static BOOLEAN strmatch(char* s, char* re)
 {
-  if (s == NULL || *s == '\0') 
+  if (s == NULL || *s == '\0')
     return (re == NULL || *re == '\0' || strcmp(re, "*") == 0);
   if (re == NULL || *re == '\0') return FALSE;
 
@@ -394,7 +394,7 @@ static BOOLEAN strmatch(char* s, char* re)
   char ls[MAX_HE_ENTRY_LENGTH + 1];
   char rs[MAX_HE_ENTRY_LENGTH + 1];
   char *l, *r, *ll, *rr;
-  
+
   // make everything to lower case
   i=1;
   ls[0] = '\0';
@@ -407,7 +407,7 @@ static BOOLEAN strmatch(char* s, char* re)
   } while (*s != '\0');
   ls[i] = '\0';
   l = &(ls[1]);
-  
+
   i=1;
   rs[0] = '\0';
   do
@@ -419,7 +419,7 @@ static BOOLEAN strmatch(char* s, char* re)
   } while (*re != '\0');
   rs[i] = '\0';
   r = &(rs[1]);
-  
+
   // chopp of exact matches from beginning and end
   while (*r != '*' && *r != '\0' && *l != '\0')
   {
@@ -446,7 +446,7 @@ static BOOLEAN strmatch(char* s, char* re)
   if (*rr == '\0') return (*ll == '\0');
   if (*rr == '*' && rr[-1] == '\0') return TRUE;
   if (*ll == '\0') return FALSE;
-  
+
   // now *r starts with a * and ends with a *
   r++;
   *rr = '\0'; rr--;
@@ -454,7 +454,7 @@ static BOOLEAN strmatch(char* s, char* re)
   {
     rr = r + 1;
     while (*rr != '*' && *rr != '\0') rr++;
-    if (*rr == '*') 
+    if (*rr == '*')
     {
       *rr = '\0';
       rr++;
@@ -477,7 +477,7 @@ static int heReKey2Entry (char* filename, char* key, heEntry hentry)
   int i = 0;
   FILE* fd;
   char index_key[MAX_HE_ENTRY_LENGTH];
-  
+
   if (filename == NULL || key == NULL)  return 0;
   fd = fopen(filename, "r");
   if (fd == NULL) return 0;
@@ -530,7 +530,7 @@ static BOOLEAN heOnlineHelp(char* s)
     }
     return FALSE;
   }
-  
+
   // try help for a library
   int ls = strlen(s);
   char* str = NULL;
@@ -555,7 +555,7 @@ static BOOLEAN heOnlineHelp(char* s)
   {
     extern FILE *yylpin;
     lib_style_types lib_style; // = OLD_LIBSTYLE;
-  
+
     yylpin = fp;
 #ifdef HAVE_NAMESPACES
     yylplex(str, libnamebuf, &lib_style, IDROOT, FALSE, GET_INFO);
@@ -626,15 +626,15 @@ static long heKeyChksum(char* key)
  * Implementation : Help Browsers
  *
  *****************************************************************/
-   
+
 static void heBrowserHelp(heEntry hentry)
 {
   // check checksums of procs
-  int kchksum = (hentry != NULL && hentry->chksum > 0 ? 
+  int kchksum = (hentry != NULL && hentry->chksum > 0 ?
                  heKeyChksum(hentry->key) : 0);
-  if (kchksum  && kchksum != hentry->chksum && heOnlineHelp(hentry->key)) 
+  if (kchksum  && kchksum != hentry->chksum && heOnlineHelp(hentry->key))
     return;
-  
+
   if (heCurrentHelpBrowser == NULL) feHelpBrowser();
   assume(heCurrentHelpBrowser != NULL);
   Warn("Displaying help in browser '%s'.", heCurrentHelpBrowser->browser);
@@ -654,7 +654,7 @@ static BOOLEAN heInfoInit(int warn)
   }
   if (feResource('I') == NULL)
   {
-    if (warn) 
+    if (warn)
       WarnS("'info' help browser not available: no 'info' program found");
     return FALSE;
   }
@@ -666,11 +666,11 @@ static void heInfoHelp(heEntry hentry)
 
   if (hentry != NULL && *(hentry->key) != '\0')
   {
-    if (*(hentry->node) != '\0') 
-      sprintf(sys, "%s -f %s --node='%s'", 
+    if (*(hentry->node) != '\0')
+      sprintf(sys, "%s -f %s --node='%s'",
               feResource('I'), feResource('i'), hentry->node);
     else
-      sprintf(sys, "%s -f %s Index '%s'", 
+      sprintf(sys, "%s -f %s Index '%s'",
               feResource('I'), feResource('i'), hentry->key);
   }
   else
@@ -692,7 +692,7 @@ static BOOLEAN heNetscapeInit(int warn)
     if (warn) WarnS("Environment variable DISPLAY not set");
     return FALSE;
   }
-  
+
   if (feResource('h' /*"HtmlDir"*/, warn) == NULL)
   {
     if (warn) WarnS("no local HtmlDir found");
@@ -706,8 +706,8 @@ static void heNetscapeHelp(heEntry hentry)
   char url[MAXPATHLEN];
   char* htmldir = feResource('h' /*"HtmlDir"*/);
   char* urltype;
-  
-  if (htmldir == NULL) 
+
+  if (htmldir == NULL)
   {
     urltype = "";
     htmldir = feResource('u' /*"ManualUrl"*/);
@@ -725,9 +725,9 @@ static void heNetscapeHelp(heEntry hentry)
   {
     sprintf(url, "%s%s/index.htm", urltype, htmldir);
   }
-  sprintf(sys, "%s --remote 'OpenUrl(%s)' > /dev/null 2>&1", 
+  sprintf(sys, "%s --remote 'OpenUrl(%s)' > /dev/null 2>&1",
           feResource('N' /*"netscape"*/), url);
-  
+
   // --remote exits with status != 0 if netscaep isn't already running
   if (system(sys) != 0)
   {
@@ -767,15 +767,15 @@ static void heXinfoHelp(heEntry hentry)
 
   if (hentry != NULL && *(hentry->key) != '\0')
   {
-    if (*(hentry->node) != '\0') 
-      sprintf(sys, "%s -e %s -f %s --node='%s' &", 
+    if (*(hentry->node) != '\0')
+      sprintf(sys, "%s -e %s -f %s --node='%s' &",
               feResource('X'), feResource('I'), feResource('i'), hentry->node);
     else
-      sprintf(sys, "%s -e %s -f %s Index '%s' &", 
+      sprintf(sys, "%s -e %s -f %s Index '%s' &",
               feResource('X'), feResource('I'), feResource('i'), hentry->key);
   }
   else
-    sprintf(sys, "%s -e %s -f %s --node=Top &", 
+    sprintf(sys, "%s -e %s -f %s --node=Top &",
             feResource('X'), feResource('I'), feResource('i'));
   system(sys);
 }
@@ -805,12 +805,12 @@ static void heTkinfoHelp(heEntry hentry)
   char sys[MAX_SYSCMD_LEN];
   if (hentry != NULL && *(hentry->node) != '\0')
   {
-    sprintf(sys, "%s '(%s)%s' &", 
+    sprintf(sys, "%s '(%s)%s' &",
             feResource('T'), feResource('i'), hentry->node);
   }
   else
   {
-    sprintf(sys, "%s %s &", 
+    sprintf(sys, "%s %s &",
             feResource('T'), feResource('i'));
   }
   system(sys);
@@ -833,7 +833,7 @@ static BOOLEAN heEmacsInit(int warn)
 static void heEmacsHelp(heEntry hentry)
 {
   WarnS("Your help command could not be executed. Use");
-  Warn("C-h C-s %s", 
+  Warn("C-h C-s %s",
        (hentry != NULL && *(hentry->node) != '\0' ? hentry->node : "Top"));
   Warn("to enter the Singular online help. For general");
   Warn("information on Singular running under Emacs, type C-h m");
@@ -850,13 +850,13 @@ static BOOLEAN heBuiltinInit(int warn)
 static int singular_manual(char *str);
 static void heBuiltinHelp(heEntry hentry)
 {
-  char* node = mstrdup(hentry != NULL && *(hentry->node) != '\0' ? 
+  char* node = mstrdup(hentry != NULL && *(hentry->node) != '\0' ?
                        hentry->node : "Top");
   singular_manual(node);
   FreeL(node);
 }
 
-  
+
 /* ========================================================================== */
 // old, stupid builtin_help
 // This could be implemented much more clever, but I'm too lazy to do this now
