@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.2 1998-04-28 07:55:30 Singular Exp $
+@comment $Id: start.doc,v 1.3 1998-05-04 10:24:19 schmidt Exp $
 @comment this file contains the "Introduction" chapter.
 @menu
 * Background::                  
@@ -14,6 +14,76 @@
 @node How to use this manual, Getting started, Background, Introduction
 @section How to use this manual
 @cindex How to use this manual
+Generally speaking, the manual starts as a user manual and becomes more
+and more a reference manual in the later chapters.
+Somewhat outstanding from this rule is @ref{Mathematical background}.  It
+introduces some of the mathematical notions and definitions used
+throughout this manual.  For example, if in doubt what exactly
+@sc{Singular} means by a ``negative degree reverse lexicographical
+ordering'' one should refer to this chapter.
+
+In @ref{Getting started}, some simple examples are explained in a
+step-by-step manner to introduce into @sc{Singular}.  This includes the
+most important steps: how to enter and exit.
+
+For real learning-by-doing or to quickly solve some given mathematical
+problem without dwelling to deeply into @sc{Singular} one should
+continue with @ref{Examples} (which is the last exception to the
+rule stated in the first paragraph).  This chapter contains a lot of
+real-life examples and detailed instructions and explanations how to
+solve them using @sc{Singular}.
+
+Users preferring the systematic approach maybe would like to continue
+with @ref{General concepts}, instead of/in addition to running the
+examples.  All basic concepts important to use and understand
+@sc{Singular} are developed there more or less in the order the novice
+user has to deal with them.
+
+@itemize @bullet
+@item
+In @ref{Interactive use}, and its subsections there are again some words
+on entering and exiting @sc{Singular}, followed by a number of other
+aspects concerning the interactive user-interface.
+
+@item
+To do anything more than trivial integer computations, one needs to
+define a basering in @sc{Singular}.  This is explained in detail in
+@ref{Rings and orderings}.
+
+@item
+In @ref{The SINGULAR language}, language specific concepts are
+introduced such as the notions of names and objects, data types and
+conversion between them, etc.
+
+@item
+The more complex concepts of procedures and libraries of procedures as
+well as tools to debug them are considered in the following sections:
+@ref{Procedures}, @ref{Libraries}, and @ref{Debugging tools}.
+
+@item
+An overview of the algorithms implemented in @sc{Singular} is given in
+@ref{Implemented algorithms}.
+@end itemize
+
+@ref{Data types}, is a complete treatment for @sc{Singular}'s data types
+where each section corresponds to one data type.  Except from the syntax
+of declarations, expressions, and operations, in each section there is a
+subsection listing all functions related to that particular type.
+
+@ref{Functions and variables}, is a large alphabetically ordered list of
+all of @sc{Singular}'s functions, control structures, and system
+variables.  Each entry includes a description of the syntax and
+semantics of the item being explained as well as one or more examples
+how to use it.
+
+@ref{Tricks and pitfalls}, is a loose collection of limitations and
+features which may be unexpected by those who expect to be the
+@sc{Singular} language an exact copy of the C programming language.  But
+some mathematical tips are collected there, too.
+
+The libraries which come with @sc{Singular} and the functions contained
+in them are listed in @ref{SINGULAR libraries}, and @ref{Library function
+index}, resp.
 
 @node Getting started,  , How to use this manual, Introduction
 @section Getting started
