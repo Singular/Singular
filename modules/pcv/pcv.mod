@@ -1,6 +1,6 @@
 module="pcv";
 
-version="$Id: pcv.mod,v 1.2 1999-02-11 11:39:29 mschulze Exp $";
+version="$Id: pcv.mod,v 1.3 1999-03-31 22:08:13 krueger Exp $";
 info="
 LIBRARY: pcv.so  CONVERSION BETWEEN POLYS AND COEF VECTORS
 AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
@@ -15,9 +15,60 @@ AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
 
 cxxsource = pcv/pcv.cc
 
-proc MinDeg(poly) = pcvMinDeg;
-proc MaxDeg(poly) = pcvMaxDeg;
-proc P2CV(list,int,int) = pcvP2CV;
-proc CV2P(list,int,int) = pcvCV2P;
-proc Dim(int,int) = pcvDim;
-proc Basis(int,int) = pcvBasis;
+proc int MinDeg(poly) {
+   function=pcvMinDeg;
+}
+
+proc int MaxDeg(poly) {
+   function=pcvMaxDeg;
+}
+
+proc list P2CV(list,int,int) {
+C={ 
+  /* check if current RingHandle is set */
+  if(currRingHdl == NULL)
+  {
+    WerrorS("no ring active");
+    return TRUE;
+  }
+};
+function=pcvP2CV;
+}
+
+proc list CV2P(list,int,int)
+{
+C={  /* check if current RingHandle is set */
+  if(currRingHdl == NULL)
+  {
+    WerrorS("no ring active");
+    return TRUE;
+  }
+};
+function=pcvCV2P;}
+
+proc int Dim(int,int)
+{
+C = {
+  /* check if current RingHandle is set */
+  if(currRingHdl == NULL)
+  {
+    WerrorS("no ring active");
+    return TRUE;
+  }
+};
+function=pcvDim;
+
+}
+
+proc list Basis(int,int)
+{
+C = {
+  /* check if current RingHandle is set */
+  if(currRingHdl == NULL)
+  {
+    WerrorS("no ring active");
+    return TRUE;
+  }
+};
+function=pcvBasis;}
+
