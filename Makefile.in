@@ -92,13 +92,13 @@ Tst-All: Tst-Old Tst-Short Tst-Long
 Tst: Tst-Old Tst-Short
 
 Tst-Old: ${SINGULAR} Tst/Old/universal.lst Tst/regress.cmd
-	${PERL} Tst/regress.cmd -s ${SINGULAR} Tst/Old/universal.lst
+	${PERL} Tst/regress.cmd -e -s ${SINGULAR} Tst/Old/universal.lst
 
 Tst-Short: ${SINGULAR} Tst/Short Tst/regress.cmd
-	${PERL} Tst/regress.cmd -s ${SINGULAR} Tst/Short/*.tst
+	${PERL} Tst/regress.cmd -e -s ${SINGULAR} Tst/Short/*.tst
 
 Tst-Long:  ${SINGULAR} Tst/Short Tst/regress.cmd
-	${PERL} Tst/regress.cmd -s ${SINGULAR} Tst/Long/*.tst
+	${PERL} Tst/regress.cmd -e -s ${SINGULAR} Tst/Long/*.tst
 
 
 
