@@ -2278,8 +2278,11 @@ static void go_on_F4 (calc_dat* c){
       done[++pos]=done[i];
     else pDelete(&(done[i]));
   }
-  done_index=pos;
-
+  done_index=pos+1;
+#ifdef TGB_DEBUG
+  for(i=0;i<done_index;i++)
+    pTest(done[i]);
+#endif
   poly* m;
   int m_index=0;
   int m_size=0;
@@ -2309,12 +2312,12 @@ static void go_on_F4 (calc_dat* c){
     qsort(m, m_index,sizeof(poly),pLmCmp_func);
 
     
-    pos;
+    pos=0;
     for(i=1;i<m_index;i++)
     {
       if((!(pLmEqual(m[i],m[pos]))))
 	m[++pos]=m[i];
-      else pDelete(&(done[i]));
+      else pDelete(&(m[i]));
     }
     m_index=pos;
     if(done_size<done_index+m_index)
