@@ -2427,6 +2427,8 @@ int tgb_sparse_matrix::min_col_not_zero_in_row(int row){
     assume(!nIsZero(mp[row]->coef));
     return mp[row]->exp;
   }
+  else
+
  
   return columns;//error code
 }
@@ -2479,6 +2481,13 @@ void tgb_sparse_matrix::free_row(int row, BOOLEAN free_non_zeros){
 void init_with_mac_poly(tgb_sparse_matrix* mat, int row, mac_poly m){
   assume(mat->mp[row]==NULL);
   mat->mp[row]=m;
+#ifdef TGB_DEBUG
+  mac_poly r=m;
+  while(r){
+    assume(r->exp<mat->columns);
+    r=r->next;
+  }
+#endif
 }
 poly free_row_to_poly(tgb_sparse_matrix* mat, int row, poly* monoms, int monom_index){
   poly p=NULL;
@@ -2499,10 +2508,12 @@ poly free_row_to_poly(tgb_sparse_matrix* mat, int row, poly* monoms, int monom_i
 
 void simple_gauss(tgb_sparse_matrix* mat){
   int col, row;
+  int* row_cache=(int*) omalloc(mat->get_rows()*sizeof(int));
   col=0;
   row=0;
   int i;
   int pn=mat->get_rows();
+  int matcol=mat->get_columns();
   assume(pn>0);
   //first clear zeroes
   for(i=0;i<pn;i++)
@@ -2510,9 +2521,12 @@ void simple_gauss(tgb_sparse_matrix* mat){
     if(mat->zero_row(i))
     {
       mat->perm_rows(i,pn-1);
+      row_cache[pn-1]=matcol;
       pn--;
       if(i!=pn){i--;}
     }
+    else
+      row_cache[i]=mat->min_col_not_zero_in_row(i);
   }
   while(row<pn-1){
     //row is the row where pivot should be
@@ -2521,14 +2535,21 @@ void simple_gauss(tgb_sparse_matrix* mat){
     
     //select column
    
-    col=mat->min_col_not_zero_in_row(row);
-    assume(col!=mat->get_columns());
+    //col=mat->min_col_not_zero_in_row(row);
+    assume(row_cache[row]==mat->min_col_not_zero_in_row(row));
+    col=row_cache[row];
+
+    
+    assume(col!=matcol);
     int found_in_row;
     
     found_in_row=row;
     assume(pn<=mat->get_rows());
     for(i=row+1;i<pn;i++){
-      int first=mat->min_col_not_zero_in_row(i);
+      int first;//=mat->min_col_not_zero_in_row(i);
+      assume(row_cache[i]==mat->min_col_not_zero_in_row(i));
+      first=row_cache[i];
+      assume(first!=matcol);
       if(first<col)
       {
 	col=first;
@@ -2537,22 +2558,69 @@ void simple_gauss(tgb_sparse_matrix* mat){
     }
     //select pivot
     int act_l=mat->non_zero_entries(found_in_row);
-    for(i=row+1;i<pn;i++){
+    for(i=found_in_row+1;i<pn;i++){
       assume(mat->min_col_not_zero_in_row(i)>=col);
-      if((!(mat->is_zero_entry(i,col)))&&(mat->non_zero_entries(i)<act_l))
+      int first;
+      assume(row_cache[i]==mat->min_col_not_zero_in_row(i));
+      first=row_cache[i];
+      assume(first!=matcol);
+      //      if((!(mat->is_zero_entry(i,col)))&&(mat->non_zero_entries(i)<act_l))
+      int nz;
+      if((row_cache[i]==col)&&((nz=mat->non_zero_entries(i))<act_l))
       {
 	found_in_row=i;
-	act_l=mat->non_zero_entries(i);//should be optimized here
+	act_l=nz;
       }
 
     }
-    mat->perm_rows(row,found_in_row);
-
+#ifdef TGB_DEBUG
+  {
+  int last=-1;
+  for(i=0;i<pn;i++)
+  {
+    int act=mat->min_col_not_zero_in_row(i);
+    assume(act>last);
     
+  }
+  for(i=pn;i<mat->get_rows();i++)
+  {
+    assume(mat->zero_row(i));
+    
+  }
+  
+
+  }
+#endif
+    mat->perm_rows(row,found_in_row);
+    int h=row_cache[row];
+    row_cache[row]=row_cache[found_in_row];
+    row_cache[found_in_row]=h;
+#ifdef TGB_DEBUG
+  {
+  int last=-1;
+  for(i=0;i<pn;i++)
+  {
+    int act=mat->min_col_not_zero_in_row(i);
+    assume(act>last);
+    
+  }
+  for(i=pn;i<mat->get_rows();i++)
+  {
+    assume(mat->zero_row(i));
+    
+  }
+  
+
+  }
+#endif  
     //reduction
     for(i=row+1;i<pn;i++){
       assume(mat->min_col_not_zero_in_row(i)>=col);
-      if(!(mat->is_zero_entry(i,col)))
+      int first;
+      assume(row_cache[i]==mat->min_col_not_zero_in_row(i));
+      first=row_cache[i];
+      assume(first!=matcol);
+      if(row_cache[i]==col)
       {
 	
 	number c1=nNeg(mat->get(i,col));
@@ -2565,21 +2633,83 @@ void simple_gauss(tgb_sparse_matrix* mat){
 	mat->mult_row(i,n2);
 	mat->add_lambda_times_row(i,row,n1);
 	assume(mat->is_zero_entry(i,col));
+	row_cache[i]=mat->min_col_not_zero_in_row(i);
 
       } 
       assume(mat->min_col_not_zero_in_row(i)>col);
     }
+#ifdef TGB_DEBUG
+  {
+  int last=-1;
+  for(i=0;i<pn;i++)
+  {
+    int act=mat->min_col_not_zero_in_row(i);
+    assume(act>last);
+    
+  }
+  for(i=pn;i<mat->get_rows();i++)
+  {
+    assume(mat->zero_row(i));
+    
+  }
+  
+
+  }
+#endif
     for(i=row+1;i<pn;i++)
     {
-      if(mat->zero_row(i))
+      assume(mat->min_col_not_zero_in_row(i)==row_cache[i]);
+      // if(mat->zero_row(i))
+      assume(matcol==mat->get_columns());
+      if(row_cache[i]==matcol)
       {
+	assume(mat->zero_row(i));
 	mat->perm_rows(i,pn-1);
+	row_cache[i]=row_cache[pn-1];
+	row_cache[pn-1]=matcol;
 	pn--;
 	if(i!=pn){i--;}
       }
     }
+#ifdef TGB_DEBUG
+  {
+  int last=-1;
+  for(i=0;i<pn;i++)
+  {
+    int act=mat->min_col_not_zero_in_row(i);
+    assume(act>last);
+    
+  }
+  for(i=pn;i<mat->get_rows();i++)
+  {
+    assume(mat->zero_row(i));
+    
+  }
+  
+
+  }
+#endif
     row++;
   }
+#ifdef TGB_DEBUG
+  {
+  int last=-1;
+  for(i=0;i<pn;i++)
+  {
+    int act=mat->min_col_not_zero_in_row(i);
+    assume(act>last);
+    
+  }
+  for(i=pn;i<mat->get_rows();i++)
+  {
+    assume(mat->zero_row(i));
+    
+  }
+  
+
+  }
+#endif
+  omfree(row_cache);
 }
 void simple_gauss2(tgb_matrix* mat){
   int col, row;
