@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_util.h,v 1.10 1997-11-21 11:37:31 schmidt Exp $ */
+/* $Id: ftest_util.h,v 1.11 1997-11-21 14:06:30 schmidt Exp $ */
 
 #ifndef INCL_FTEST_UTIL_H
 #define INCL_FTEST_UTIL_H
@@ -47,7 +47,6 @@ extern int ftestPrintResultFlag;
 const char * ftestSkipBlancs ( const char * string );
 void ftestError ( const ftestErrorT errno, const char * format ... );
 void ftestUsagePrint ( const char * additionalUsage = 0 );
-void ftestPrint ( const char * longFormat, const char * shortFormat ... );
 
 void ftestSignalCatch ( bool block = false );
 
