@@ -1,0 +1,420 @@
+version="$Id: nchomolog.lib,v 1.1 2004-12-22 21:14:12 levandov Exp $";
+category="Noncommutative";
+info="
+LIBRARY:  nchomolog.lib   Procedures for Noncommutative Homological Algebra
+AUTHORS:  Viktor Levandovskyy  levandov@mathematik.uni-kl.de,
+Gerhard Pfister, pfister@mathematik.uni-kl.de
+
+PROCEDURES:
+ ncExt_R(k,M);            Ext^k(M',R),    M module, R basering, M'=coker(M)
+ ncExt(k,M,N);            Ext^k(M',N'),   M,N modules, M'=coker(M), N'=coker(N)
+ ncHom(M,N);              Hom(M',N'),     M,N modules, M'=coker(M), N'=coker(N)
+ coHom(A,k);            Hom(R^k,A),     A matrix over basering R
+ contraHom(A,k);        Hom(A,R^k),     A matrix over basering R
+ tensorMaps(M,N);       tensor product of  matrices
+ ncTensorMod(M,N);        Tensor product of modules M'=coker(M), N'=coker(N)
+ ncTor(k,M,N);            Tor_k(M',N'),   M,N modules, M'=coker(M), N'=coker(N)
+";
+
+LIB "gkdim.lib";
+LIB "involution.lib";
+
+proc contraHom(matrix M, int s)
+{
+   int n,m=ncols(M),nrows(M);
+   int a,b,c;
+   matrix R[s*n][s*m];
+   for(b=1; b<=m; b++)
+   {
+      for(a=1; a<=s; a++)
+      {
+         for(c=1; c<=n; c++)
+         {
+            R[(a-1)*n+c,(a-1)*m+b] = M[b,c];
+         }
+      }
+   }
+   return(R);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring A=0,(x,y,z),dp;
+  matrix M[3][3]=1,2,3,
+               4,5,6,
+               7,8,9;
+  module cM = contraHom(M,2);
+  print(cM);
+}
+
+proc coHom(matrix M, int s)
+{
+   int n,m=ncols(M),nrows(M);
+   int a,b,c;
+   matrix R[s*m][s*n];
+   for(b=1; b<=s; b++)
+   {
+      for(a=1; a<=m; a++)
+      {
+         for(c=1; c<=n; c++)
+         {
+            R[(a-1)*s+b,(c-1)*s+b] = M[a,c];
+         }
+      }
+   }
+   return(R);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring A=0,(x,y,z),dp;
+  matrix M[3][3]=1,2,3,
+                 4,5,6,
+                 7,8,9;
+  module cM = coHom(M,2);
+  print(cM);
+}
+
+proc ncHom(matrix M, matrix N)
+"USAGE:   ncHom(M,N);  M,N modules
+COMPUTE: A presentation of Hom(M',N'), M'=coker(M), N'=coker(N)
+ASSUME: M' is a left module, N' is a centralizing bimodule
+NOTE: ncHom(M,N) is a right module, hence a right presentation matrix 
+is returned
+EXAMPLE: example ncHom;  shows examples
+"
+{
+  // assume: M is left module
+  // assume: N is centralizing bimodule
+  // returns a right presentation matrix 
+  // for a right module
+  matrix F  = contraHom(M,nrows(N));
+  matrix B  = coHom(N,ncols(M));
+  matrix C  = coHom(N,nrows(M));
+  def Rbase = basering;
+  def Rop   = opposite(Rbase);
+  setring Rop;
+  matrix Bop = oppose(Rbase, B);
+  matrix Cop = oppose(Rbase, C);
+  matrix Fop = oppose(Rbase, F);
+  matrix Dop = modulo(Fop, Bop);
+  matrix Eop = modulo(Dop, Cop);
+  setring Rbase;
+  matrix E   = oppose(Rop, Eop);
+  kill Rop;
+  return(E);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring A=0,(x,y,z),dp;
+  matrix M[3][3]=1,2,3,
+                 4,5,6,
+                 7,8,9;
+  matrix N[2][2]=x,y,
+                 z,0;
+  module H = ncHom(M,N);
+  print(H);
+}
+
+proc ncExt(int i, matrix Ps, matrix Ph)
+"USAGE:   Ext(i,M,N);  i int, M,N modules
+COMPUTE: A presentation of Ext^i(M',N');  for M'=coker(M) and N'=coker(N).
+NOTE: ncExt(M,N) is a right module, hence a right presentation matrix 
+is returned
+EXAMPLE: example ncExt;  shows examples
+"
+{
+  if(i==0) { return(module(ncHom(Ps,Ph))); }  
+  list Phi   = mres(Ps,i+1);  
+  module Im  = coHom(Ph,ncols(Phi[i+1]));
+  module f   = contraHom(matrix(Phi[i+1]),nrows(Ph));
+  module Im1 = coHom(Ph,ncols(Phi[i]));
+  module Im2 = contraHom(matrix(Phi[i]),nrows(Ph));
+  def Rbase = basering;
+  def Rop   = opposite(Rbase);
+  setring Rop;
+  module fop    = oppose(Rbase,f);
+  module Imop   = oppose(Rbase,Im);
+  module Im1op  = oppose(Rbase,Im1);
+  module Im2op  = oppose(Rbase,Im2);
+  module ker_op = modulo(fop,Imop);           
+  module ext_op = modulo(ker_op,Im1op+Im2op); 
+  //  ext        = prune(ext); 
+ // to be discussed and done prune_from_the_left
+  setring Rbase;
+  module ext = oppose(Rop,ext_op);
+  kill Rop;
+  return(ext);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring R     = 0,(x,y),dp;
+  ideal I    = x2-y3;
+  qring S    = std(I);
+  module M   = [-x,y],[-y2,x];
+  module E1  = ncExt(1,M,M);
+  E1;
+}
+
+
+proc ncExt_R(int i, matrix Ps)
+"USAGE:   ncExt_R(i, M);  i int, M module
+COMPUTE:  a presentation of Ext^i(M',R); for M'=coker(M).
+RETURN:   right module Ext, a presentation of Ext^i(M',R)
+EXAMPLE: example ncExt_R; shows an example
+"
+{
+  if (i==0) 
+  { // return the formal adjoint (== the dual)
+    matrix Ret = transpose(Ps);
+    def Rbase = basering;
+    def Rop   = opposite(Rbase);
+    setring Rop;
+    module Retop = oppose(Rbase,Ret);
+    //    "Computing prune of Hom";
+    //    Retop = prune(Retop);
+    //    Retop = std(Retop);
+    setring Rbase;
+    Ret = oppose(Rop, Retop);
+    kill Rop;
+    return(Ret); 
+  }  
+  list Phi   = mres(Ps,i+1);  
+  module f   = transpose(matrix(Phi[i+1]));
+  module Im2 = transpose(matrix(Phi[i]));
+  def Rbase = basering;
+  def Rop   = opposite(Rbase);
+  setring Rop;
+  module fop    = oppose(Rbase,f);
+  module Im2op  = oppose(Rbase,Im2);
+  module ker_op = modulo(fop,std(0));
+  module ext_op = modulo(ker_op,Im2op); 
+  //  ext        = prune(ext); 
+  // to be discussed and done prune_from_the_left
+  // necessary: compute SB!
+  // "Computing SB of Ext";
+  option(redSB);
+  option(redTail);
+  ext_op = std(ext_op);
+  int dimop = GKdim(ext_op);
+  printf("Ext has dimension %s",dimop);
+  if (dimop==0)
+  {
+      printf("of K-dimension %s",vdim(ext_op));
+  }
+  setring Rbase;
+  module ext = oppose(Rop,ext_op); // a right module!
+  kill Rop;
+  return(ext);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring R     = 0,(x,y),dp;
+  ideal I    = x2-y3;
+  qring S    = std(I);
+  module M   = [-x,y],[-y2,x];
+  module E1  = ncExt(1,M,M);
+  E1;
+}
+
+proc altExt_R(int i, matrix Ps, map Invo)
+  // TODO!!!!!!!!
+  // matrix Ph
+  // work thru Involutions;
+{
+  if(i==0) 
+  { // return the formal adjoint
+    matrix Ret   = transpose(Ps);
+    matrix Retop = involution(Ret, Invo);
+    //    "Computing prune of Hom";
+    //    Retop = prune(Retop);
+    //    Retop = std(Retop);
+    return(Retop); 
+  }  
+  list Phi   = mres(Ps,i+1);  
+  //  module Im  = coHom(Ph,ncols(Phi[i+1]));
+  module f   = transpose(matrix(Phi[i+1]));
+  f = involution(f, Invo);
+  //= contraHom(matrix(Phi[i+1]),nrows(Ph));
+  //  module Im1 = coHom(Ph,ncols(Phi[i]));
+  module Im2 = transpose(matrix(Phi[i]));
+  Im2 = involution(Im2, Invo);
+  //contraHom(matrix(Phi[i]),nrows(Ph));
+  module ker_op = modulo(f,std(0));
+  module ext_op = modulo(ker_op,Im2); 
+  //  ext        = prune(ext); 
+ // to be discussed and done prune_from_the_left
+  // optionally: compute SB!
+  //  "Computing prune of Ext";
+  ext_op = std(ext_op);
+  int dimop = GKdim(ext_op);
+  printf("Ext has dimension %s",dimop);
+  if (dimop==0)
+  {
+      printf("of K-dimension %s",vdim(ext_op));
+  }
+  module ext = involution(ext_op, Invo); // what about transpose?
+  return(ext);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring R     = 0,(x,y),dp;
+  ideal I    = x2-y3;
+  qring S    = std(I);
+  module M   = [-x,y],[-y2,x];
+  module E1  = ncExt(1,M,M);
+  E1;
+}
+
+proc tensorMaps(matrix M, matrix N)
+{
+   int r = ncols(M);
+   int s = nrows(M);
+   int p = ncols(N);
+   int q = nrows(N);
+   int a,b,c,d;
+   matrix R[s*q][r*p];
+   for(b=1;b<=p;b++)
+   {
+      for(d=1;d<=q;d++)
+      {
+         for(a=1;a<=r;a++)
+         {
+            for(c=1;c<=s;c++)
+            {
+               R[(c-1)*q+d,(a-1)*p+b]=M[c,a]*N[d,b];
+            }
+         }
+      }
+   }
+   return(R);
+}
+
+proc ncTensorMod(matrix Phi, matrix Psi)
+{
+   int s=nrows(Phi);
+   int q=nrows(Psi);
+   matrix A=tensorMaps(unitmat(s),Psi);  //I_s tensor Psi
+   matrix B=tensorMaps(Phi,unitmat(q));  //Phi tensor I_q
+   matrix R=concat(A,B);                 //sum of A and B
+   return(R);     
+}
+
+
+proc ncTor(int i, matrix Ps, matrix Ph)
+{
+  if(i==0) { return(module(ncTensorMod(Ps,Ph))); }  
+                               // the tensor product
+  list Phi   = mres(Ph,i+1);     // a resolution of Ph
+  module Im  = tensorMaps(unitmat(nrows(Phi[i])),Ps);
+  module f   = tensorMaps(matrix(Phi[i]),unitmat(nrows(Ps)));
+  module Im1 = tensorMaps(unitmat(ncols(Phi[i])),Ps);
+  module Im2 = tensorMaps(matrix(Phi[i+1]),unitmat(nrows(Ps)));
+  module ker = modulo(f,Im);            
+  module tor = modulo(ker,Im1+Im2);
+  //  tor        = prune(tor);
+  return(tor);
+}
+
+proc Hochschild()
+{
+  ring A    = 0,(x,y),dp;
+  ideal I   = x2-y3;
+  qring B   = std(I);
+  module M  = [-x,y],[-y2,x];
+  ring C    = 0,(x,y,z,w),dp; // x->z, y->w
+  ideal I   = x2-y3,z3-w2;
+  qring Be  = std(I);   //the enveloping algebra
+  matrix AA[1][2]  = x-z,y-w;  //the presentation of the algebra B as Be-module
+  module MM = imap(B,M);
+  module E = ncExt(1,AA,MM);
+  print(E);  //the presentation of the H^1(A,M)
+
+
+ring A          = 0,(x,y),dp;
+ideal I         = x2-y3;
+qring B         = std(I);
+ring C          = 0,(x,y,z,w),dp; 
+ideal I         = x2-y3,z3-w2;
+qring Be        = std(I);   //the enveloping algebra
+matrix AA[1][2] = x-z,y-w;  //the presentation of B as Be-module
+matrix AAA[1][2] = z,w; // equivalent? pres. of B
+print(ncExt(1,AA,AA));  //the presentation of the H^1(A,A)
+print(ncExt(1,AAA,AAA));
+}
+
+proc Lie()
+{
+// consider U(sl2)* U(sl2)^opp;
+LIB "ncalg.lib";
+ring A = 0,(e,f,h,H,F,E),Dp; // any degree ordering
+int N = 6; // nvars(A);
+matrix @D[N][N];
+@D[1,2] = -h;
+@D[1,3] = 2*e;
+@D[2,3] = -2*f;
+@D[4,5] = 2*F;
+@D[4,6] = -2*E;
+@D[5,6] = H;
+ncalgebra(1,@D);
+ideal Q = E,F,H;
+poly Z = 4*e*f+h^2-2*h; // center
+poly Zo = 4*F*E+H^2+2*H;  // center opposed
+ideal Qe = Z,Zo;
+//qring B = twostd(Qe);
+//ideal T = e-E,f-F,h-H;
+//ideal T2 = e-H,f-F,h-E;
+//Q = twostd(Q); // U is U(sl2) as left U(sl2)* U(sl2)^opp -- module
+matrix M[1][3] = E,F,H;
+module X0 = ncExt(0,M,M);
+print(X0);
+
+module X1 = ncExt(1,M,M);
+print(X1);
+module X2 = ncExt(2,M,M); // equal to Tor^Z_1(K,K)
+print(X2);
+
+
+// compute  Tor^Z_1(K,K)
+
+ring r = 0,(z),dp;
+ideal i = z;
+matrix I[1][1]=z;
+Tor(1,I,I);
+}
+
+
+proc AllExts(module N, list #)
+  // computes and shows everything
+  // assumes we are in the opposite
+  // and N is dual of some M
+  // if # is given, map Invo and Ext_Invo are used 
+{
+  int UseInvo = 0;
+  int sl = size(#);
+  if (sl >0)
+  {
+    ideal I = ideal(#[1]);  
+    map Invo = basering, I;
+    UseInvo  = 1;
+    "Using the involution";
+  }
+  int nv = nvars(basering);
+  int i,d;
+  module E;
+  list EE;
+  print("--- module:"); print(matrix(N));
+  for (i=1; i<=nv; i++)
+  {
+    if (UseInvo)
+    {
+      E = altExt_R(i,N,Invo);
+    }
+    else
+    {
+      E = ncExt_R(i,N);
+    }
+    printf("--- Ext %s",i);
+    print(matrix(E));
+    EE[i] = E;
+  }
+  //  return(E);
+}
