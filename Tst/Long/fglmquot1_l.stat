@@ -1,0 +1,11 @@
+Status Output of tst_status.out
+init >> USER    :wichmann
+init >> HOSTNAME:arboretum.itwm.uni-kl.de
+init >> uname -a:Linux arboretum.itwm.uni-kl.de 2.0.35 #1 Mon Sep 14 22:45:14 CEST 1998 i686 unknown
+init >> date    :Wed Nov 24 14:38:36 CET 1999
+init >> version :1306
+init >> ticks   :100
+1 >> tst_memory_0 :: arboretum.itwm.uni-kl.de:418652
+1 >> tst_memory_1 :: arboretum.itwm.uni-kl.de:8263968
+1 >> tst_memory_2 :: arboretum.itwm.uni-kl.de:12685312
+1 >> tst_timer_1 :: arboretum.itwm.uni-kl.de:3818
