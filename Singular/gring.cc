@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.5 2001-02-23 15:41:10 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.6 2001-02-23 16:40:08 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "gring.h"
@@ -39,9 +39,10 @@ poly _nc_p_Mult_q(poly p, poly q, const int copy, const ring r)
   /* destroy p,q */
 {
   poly res=0;
+  poly ghost;
   while (q!=NULL)
     {
-      res=res+nc_pp_Mult_mm(p,p_Head(q,r),r);
+      res=p_Add_q(res,nc_pp_Mult_mm(p,p_Head(q,r),r,ghost),r);
       p_LmDeleteAndNext(q,r);
     }
   p_Delete(&p,r);
@@ -603,9 +604,9 @@ poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
       p_Setm(out,r);
       if ((a==0)||(b==0)||(i<=j)) return(out);//zero exeptions and usual case
       
-      if (r->nc->COM[UPMATELEM(i,j,r->N)]!=NULL) //commutative or quasicommutative case
+      if (r->nc->COM[UPMATELEM(i,j,r->N)]!=0) //commutative or quasicommutative case
       {
-        if (r->nc->COM[UPMATELEM(i,j,r->N)]!=n_Init(1,r)) //commutative case
+        if (pGetCoeff(r->nc->COM[UPMATELEM(i,j,r->N)])!=n_Init(1,r)) //commutative case
         {
           return(out);
         }     
