@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.cc,v 1.18 1997-05-23 15:00:03 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.19 1997-05-23 18:08:27 Singular Exp $ */
 
 /*
 * ABSTRACT: handling of leftv
@@ -588,7 +588,7 @@ void * sleftv::CopyD()
 attr sleftv::CopyA()
 {
   attr *a=Attribute();
-  if (a!=NULL)
+  if ((a!=NULL) && (*a!=NULL))
     return (*a)->Copy();
   return NULL;  
 }
