@@ -1,6 +1,8 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: iparith.cc,v 1.131 1999-03-09 12:26:20 obachman Exp $ */
+
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
@@ -1489,37 +1491,34 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
     {
       if (!nSetMap(rInternalChar(r),r->parameter,rPar(r),r->minpoly))
       {
-        if (iiOp!=IMAP_CMD)
+        if (iiOp != IMAP_CMD) goto err_fetch;
+        // Allow imap to be make an exception only for:
+        if ( (rField_is_Q_a(r) &&  // Q(a..) -> Q(a..) || Q || Zp || Zp(a)
+              (rField_is_Q() || rField_is_Q_a() || 
+               (rField_is_Zp() || rField_is_Zp_a())))
+             ||
+             (rField_is_Zp_a(r) &&  // Zp(a..) -> Zp(a..) || Zp
+              (rField_is_Zp(currRing, rInternalChar(r)) || 
+               rField_is_Zp_a(currRing, rInternalChar(r)))) )
+        {
+          par_perm_size=rPar(r);
+          BITSET save_test=test;
+          naSetChar(rInternalChar(r),TRUE,r->parameter,rPar(r));
+          nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,
+                   rPar(currRing));
+          test=save_test;
+        }
+        else
+        {
           goto err_fetch;
-        par_perm_size=rPar(r);
-	if (rChar(r)!=rChar(currRing))
-	  goto err_fetch;
-        if (rField_is_Q_a(r))
-        {
-          if ((!rField_is_Q_a(currRing))
-          && (!rField_is_Q(currRing)))
-            goto err_fetch;
         }
-        else if (rField_is_Zp_a(r))
-        {
-          if ((!rField_is_Zp_a(currRing))
-          && (!rField_is_Zp(currRing)))
-            goto err_fetch;
-        }
-        BITSET save_test=test;
-        naSetChar(rInternalChar(r),TRUE,r->parameter,rPar(r));
-        nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,
-	  rPar(currRing));
-        test=save_test;
       }
       perm=(int *)Alloc0((r->N+1)*sizeof(int));
       if (par_perm_size!=0)
         par_perm=(int *)Alloc0(par_perm_size*sizeof(int));
-      maFindPerm(r->names,       r->N,       
-                      r->parameter,        rPar(r),
-                 currRing->names,currRing->N,
-		      currRing->parameter, rPar(currRing),
-                 perm,par_perm);
+      maFindPerm(r->names,       r->N,       r->parameter,        r->P,
+                 currRing->names,currRing->N,currRing->parameter, currRing->P,
+                 perm,par_perm, currRing->ch);
     }
     sleftv tmpW;
     memset(&tmpW,0,sizeof(sleftv));
