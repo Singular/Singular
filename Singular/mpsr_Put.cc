@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Put.cc,v 1.9 1998-06-13 12:44:46 krueger Exp $ */
+/* $Id: mpsr_Put.cc,v 1.10 1998-08-24 14:39:09 obachman Exp $ */
 
 
 /***************************************************************
@@ -408,7 +408,7 @@ mpsr_Status_t mpsr_PutModule(MP_Link_pt link, ideal id, ring cring)
   mp_failr(MP_PutCommonOperatorPacket(link,
                                       MP_PolyDict,
                                       MP_CopPolyModule,
-                                      1,
+                                      2,
                                       idn));
   mp_failr(MP_PutAnnotationPacket(link,
                                   MP_ProtoDict,
@@ -420,7 +420,13 @@ mpsr_Status_t mpsr_PutModule(MP_Link_pt link, ideal id, ring cring)
                                           mpsr_GetNumOfRingAnnots(cring, 1),
                                           0));
   failr(mpsr_PutRingAnnots(link, cring, 1));
-
+  
+  mp_failr(MP_PutAnnotationPacket(link,
+                                    MP_PolyDict,
+                                    MP_AnnotPolyModuleRank,
+                                    MP_AnnotValuated));
+  mp_failr(MP_PutUint32Packet(link, id->rank, 0));
+  
   for (i=0; i < idn; i++)
   {
     IMP_PutUint32(link, pLength(id->m[i]));

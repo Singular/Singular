@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.17 1998-06-13 12:44:44 krueger Exp $ */
+/* $Id: mpsr_Get.cc,v 1.18 1998-08-24 14:39:08 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -595,15 +595,24 @@ static mpsr_Status_t GetModuleLeftv(MP_Link_pt link, MPT_Node_pt node,
 {
   MP_NumChild_t nc = node->numchild, i;
   ring r = mlv->r;
-  MP_Uint32_t nmon;
+  MP_Uint32_t nmon, rank = 1;
+  MPT_Annot_pt annot = MPT_FindAnnot(node, MP_PolyDict,
+                                     MP_AnnotPolyModuleRank);
+  if (annot != NULL && 
+      annot->value != NULL &&
+      annot->value->node->type == MP_Uint32Type 
+      )
+    rank = MP_UINT32_T(annot->value->node->nvalue);
 
   mpsr_assume(r != NULL);
-  ideal id = idInit(nc,1);
+  ideal id = idInit(nc,rank);
   for (i=0; i<nc; i++)
   {
     mp_failr(IMP_GetUint32(link, &nmon));
     failr(mpsr_GetPolyVector(link, id->m[i], nmon, r));
   }
+  if (rank == 1)
+    id->rank = idRankFreeModule(id);
 
   mlv->lv = mpsr_InitLeftv(MODUL_CMD, (void *) id);
   return mpsr_Success;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.65 1998-08-05 16:05:30 Singular Exp $ */
+/* $Id: febase.cc,v 1.66 1998-08-24 14:39:07 obachman Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -67,10 +67,9 @@ BITSET  verbose = 1
 /*                  | Sy_bit(V_DEBUG_MEM) */
 ;}
 BOOLEAN errorreported = FALSE;
-BOOLEAN feBatch;
+BOOLEAN feBatch=FALSE;
 char *  feErrors=NULL;
 int     feErrorsLen=0;
-
 #ifdef macintosh
 static  int lines = 0;
 static  int cols = 0;
