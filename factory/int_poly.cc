@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_poly.cc,v 1.7 1997-12-09 09:05:44 schmidt Exp $ */
+/* $Id: int_poly.cc,v 1.8 1997-12-17 14:09:05 schmidt Exp $ */
 
 #include <config.h>
 
@@ -229,29 +229,6 @@ InternalPoly::invert()
     }
     else
 	return CFFactory::basic( 0 );
-}
-
-int
-InternalPoly::comparesame ( InternalCF* acoeff )
-{
-    InternalPoly* apoly = (InternalPoly*)acoeff;
-    if ( this == apoly )
-	return 0;
-    else {
-	termList cur1 = firstTerm;
-	termList cur2 = apoly->firstTerm;
-	for ( ; cur1 && cur2; cur1 = cur1->next, cur2 = cur2->next )
-	    if ( ( cur1->exp != cur2->exp ) || ( cur1->coeff != cur2->coeff ) )
-		if ( cur1->exp > cur2->exp )
-		    return 1;
-		else  if ( cur1->exp < cur2->exp )
-		    return -1;
-		else  if ( cur1->coeff > cur2->coeff )
-		    return 1;
-		else
-		    return -1;
-	return cur1 != cur2;
-    }
 }
 
 InternalCF*
@@ -627,11 +604,74 @@ InternalPoly::divremsamet( InternalCF* acoeff, InternalCF*& quot, InternalCF*& r
     return divideok;
 }
 
+//{{{ int InternalPoly::comparesame, comparecoeff ( InternalCF * acoeff )
+//{{{ docu
+//
+// comparesame(), comparecoeff() - compare with an
+//   InternalPoly.
+//
+// comparecoeff() always returns 1 since CO is defined to be
+// larger than anything which is a coefficient w.r.t. CO.
+//
+// comparesame() compares the coefficient vectors of f=CO and
+// g=acoeff w.r.t to a lexicographic order in the following way:
+// f < g iff there exists an 0 <= i <= max(deg(f),deg(g)) s.t. 
+// i) f[j] = g[j] for all i < j <= max(deg(f),deg(g)) and
+// ii) g[i] occurs in g (i.e. is not equal to zero) and
+//     f[i] does not occur in f or f[i] < g[i] if f[i] occurs
+// where f[i] denotes the coefficient to the power x^i of f.
+//
+// As usual, comparesame() returns 1 if CO is larger than c, 0 if
+// CO equals c, and -1 if CO is less than c.  However, this
+// function is optimized to test on equality since this is its
+// most important and frequent usage.
+//
+// See the respective `CanonicalForm'-methods for an explanation
+// why we define such a strange (but total) ordering on
+// polynomials.
+//
+//}}}
 int
-InternalPoly::comparecoeff ( InternalCF* )
+InternalPoly::comparesame ( InternalCF * acoeff )
+{
+    ASSERT( ! ::is_imm( acoeff ) && acoeff->level() > LEVELBASE, "incompatible base coefficients" );
+    InternalPoly* apoly = (InternalPoly*)acoeff;
+    // check on triviality
+    if ( this == apoly )
+	return 0;
+    else {
+	termList cursor1 = firstTerm;
+	termList cursor2 = apoly->firstTerm;
+	for ( ; cursor1 && cursor2; cursor1 = cursor1->next, cursor2 = cursor2->next )
+	    // we test on inequality of coefficients at this
+	    // point instead of testing on "less than" at the
+	    // last `else' in the enclosed `if' statement since a
+	    // test on inequaltiy in general is cheaper
+	    if ( (cursor1->exp != cursor2->exp) || (cursor1->coeff != cursor2->coeff) )
+		if ( cursor1->exp > cursor2->exp )
+		    return 1;
+		else  if ( cursor1->exp < cursor2->exp )
+		    return -1;
+		else  if ( cursor1->coeff > cursor2->coeff )
+		    return 1;
+		else
+		    return -1;
+	// check trailing terms
+	if ( cursor1 == cursor2 )
+	    return 0;
+	else if ( cursor1 != 0 )
+	    return 1;
+	else
+	    return -1;
+    }
+}
+
+int
+InternalPoly::comparecoeff ( InternalCF * )
 {
     return 1;
 }
+//}}}
 
 InternalCF*
 InternalPoly::addcoeff( InternalCF* cc )
