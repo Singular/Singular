@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.68 2002-02-16 10:59:11 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.69 2002-02-21 17:52:23 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -325,7 +325,7 @@ static proc liftbound(module U,module H,int k,int K)
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc saturate(int K0)
+static proc saturate()
 {
   int mu=ncols(gmsbasis);
   ideal r=gmspoly*gmsbasis;
@@ -361,7 +361,7 @@ static proc saturate(int K0)
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc basisrep(matrix A0,ideal r,module H,int k0,int K,int K0)
+static proc basisrep(matrix A0,ideal r,module H,int k0,int K)
 {
   dbprint(printlevel-voice+2,"// compute matrix A of t");
   dbprint(printlevel-voice+2,"// k="+string(K+k0+1));
@@ -377,39 +377,83 @@ static proc basisrep(matrix A0,ideal r,module H,int k0,int K,int K0)
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc eigvals(matrix A0,ideal r,module H,int k0,int K0)
+static proc eigvals(matrix A0,ideal r,module H,int k0)
 {
   dbprint(printlevel-voice+2,
     "// compute eigenvalues e with multiplicities m of A");
   matrix A;
-  A,A0,r=basisrep(A0,r,H,k0,0,K0);
+  A,A0,r=basisrep(A0,r,H,k0,0);
   list l=eigenvals(A);
   def e,m=l[1..2];
   dbprint(printlevel-voice+2,"// e="+string(e));
   dbprint(printlevel-voice+2,"// m="+string(m));
 
-  return(e,m,A0,r,int(max(e)-min(e)));
+  return(e,m,A0,r);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc transf(matrix A,matrix A0,ideal r,module H,module H0,ideal e,intvec m,int k0,int k1,int K,int K0)
+static proc transf(matrix A,matrix A0,ideal r,module H,module H0,ideal e,intvec m,int k0,int K,int opt)
 {
   int mu=ncols(gmsbasis);
 
-  dbprint(printlevel-voice+2,"// compute minimum e0 and maximum e1 of e");
   number e0,e1=min(e),max(e);
-  dbprint(printlevel-voice+2,"// e0="+string(e0));
-  dbprint(printlevel-voice+2,"// e1="+string(e1));
-  A,A0,r=basisrep(A0,r,H,k0,K+k1,K0+k1);
+
+  int i,j,k;
+  int k1;
+  intvec d;
+  d[ncols(e)]=0;
+  if(opt)
+  {
+    dbprint(printlevel-voice+2,
+      "// compute maximal differences d of e");
+    for(i=1;i<=ncols(e);i++)
+    {
+      d[i]=int(e[i]-e0);
+    }
+  }
+  else
+  {
+    dbprint(printlevel-voice+2,
+      "// compute maximal integer differences d of e");
+    for(i=1;i<ncols(e);i++)
+    {
+      for(j=i+1;i<=ncols(e);i++)
+      {
+        k=int(e[i]-e[j]);
+        if(number(e[i]-e[j])==k)
+        {
+          if(k>d[i])
+          {
+            d[i]=k;
+          }
+          if(-k>d[j])
+          {
+            d[j]=-k;
+          }
+        }
+      }
+    }
+  }
+  dbprint(printlevel-voice+2,"// d="+string(d));
+
+  for(i,k=1,0;i<=size(d);i++)
+  {
+    if(k<d[i])
+    {
+      k=d[i];
+    }
+  }
+
+  A,A0,r=basisrep(A0,r,H,k0,K+k1);
   module U0=s^k0*freemodule(mu);
 
-  if(e1>=e0+1)
+  if(k>0)
   {
-    int i,j,i0,j0,i1,j1;
+    int i0,j0,i1,j1;
     module U,V;
     list l;
 
-    while(e1>=e0+1)
+    while(k>0)
     {
       dbprint(printlevel-voice+2,"// transform to separate eigenvalues");
       U=0;
@@ -422,7 +466,8 @@ static proc transf(matrix A,matrix A0,ideal r,module H,module H0,ideal e,intvec 
       H0=V*H0;
       U0=U0*U;
 
-      dbprint(printlevel-voice+2,"// transform to reduce e1 by 1");
+      dbprint(printlevel-voice+2,
+        "// transform to reduce d by 1");
       for(i0,i=1,1;i0<=ncols(e);i0++)
       {
         for(i1=1;i1<=m[i0];i1,i=i1+1,i+1)
@@ -431,11 +476,11 @@ static proc transf(matrix A,matrix A0,ideal r,module H,module H0,ideal e,intvec 
           {
             for(j1=1;j1<=m[j0];j1,j=j1+1,j+1)
             {
-              if(number(e[i0])<e0+1&&number(e[j0])>=e0+1)
+              if(d[i0]==0&&d[j0]>0)
               {
                 A[i,j]=A[i,j]/s;
               }
-              if(number(e[i0])>=e0+1&&number(e[j0])<e0+1)
+              if(d[i0]>0&&d[j0]==0)
               {
                 A[i,j]=A[i,j]*s;
               }
@@ -447,7 +492,7 @@ static proc transf(matrix A,matrix A0,ideal r,module H,module H0,ideal e,intvec 
       H0=transpose(H0);
       for(i0,i=1,1;i0<=ncols(e);i0++)
       {
-        if(number(e[i0])>=e0+1)
+        if(d[i0]>0)
         {
           for(i1=1;i1<=m[i0];i1,i=i1+1,i+1)
           {
@@ -456,6 +501,7 @@ static proc transf(matrix A,matrix A0,ideal r,module H,module H0,ideal e,intvec 
             U0[i]=U0[i]/s;
           }
           e[i0]=e[i0]-1;
+          d[i0]=d[i0]-1;
         }
         else
         {
@@ -464,11 +510,10 @@ static proc transf(matrix A,matrix A0,ideal r,module H,module H0,ideal e,intvec 
       }
       H0=transpose(H0);
 
-      l=spnf(e,m);
-      e,m=l[1..2];
+      l=sppnf(e,d,m);
+      e,d,m=l[1..3];
 
-      e1=e1-1;
-      dbprint(printlevel-voice+2,"// e1="+string(e1));
+      k--;
     }
 
     A=jet(A,K);
@@ -497,11 +542,10 @@ EXAMPLE:  example monodromy; shows examples
   module U0;
   ideal e;
   intvec m;
-  int k1;
 
-  def A0,r,H,H0,k0=saturate(n);
-  e,m,A0,r,k1=eigvals(A0,r,H,k0,n);
-  A,A0,r,H0,U0,e,m=transf(A,A0,r,H,H0,e,m,k0,k1,0,0);
+  def A0,r,H,H0,k0=saturate();
+  e,m,A0,r=eigvals(A0,r,H,k0);
+  A,A0,r,H0,U0,e,m=transf(A,A0,r,H,H0,e,m,k0,0,0);
 
   list l=jordan(A,e,m);
   setring(R);
@@ -915,11 +959,10 @@ EXAMPLE:  example vwfilt; shows examples
   module U0;
   ideal e;
   intvec m;
-  int k1;
 
-  def A0,r,H,H0,k0=saturate(n);
-  e,m,A0,r,k1=eigvals(A0,r,H,k0,n);
-  A,A0,r,H0,U0,e,m=transf(A,A0,r,H,H0,e,m,k0,k1,0,0);
+  def A0,r,H,H0,k0=saturate();
+  e,m,A0,r=eigvals(A0,r,H,k0);
+  A,A0,r,H0,U0,e,m=transf(A,A0,r,H,H0,e,m,k0,0,1);
 
   dbprint(printlevel-voice+2,"// compute weight filtration basis");
   list l=jordanbasis(A,e,m);
@@ -1020,11 +1063,11 @@ EXAMPLE:  example tmatrix; shows examples
   module U0;
   ideal e;
   intvec m;
-  int k1;
 
-  def A0,r,H,H0,k0=saturate(2*n+mu-1);
-  e,m,A0,r,k1=eigvals(A0,r,H,k0,n);
-  A,A0,r,H0,U0,e,m=transf(A,A0,r,H,H0,e,m,k0,k1,k0+k1,k0+k1);
+  def A0,r,H,H0,k0=saturate();
+  e,m,A0,r=eigvals(A0,r,H,k0);
+  int k1=int(max(e)-min(e));
+  A,A0,r,H0,U0,e,m=transf(A,A0,r,H,H0,e,m,k0,k0+k1,1);
 
   ring S=0,s,(ds,c);
   matrix A=imap(G,A);
