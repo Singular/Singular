@@ -98,7 +98,7 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     mpsr_Get.cc mpsr_GetMisc.cc mpsr_Error.cc \
     ndbm.cc spSpolyLoop.cc libparse.cc
 
-CSOURCES=mmalloc.c mmallocb.c mmallocs.c mmblock.c mmheap.c mmspec.c mmutil.c weight0.c find_exec.c
+CSOURCES=mmalloc.c mmallocb.c mmallocs.c mmblock.c mmheap.c mmspec.c mmutil.c weight0.c find_exec.c getopt.c
 
 SOURCES=${CSOURCES} ${CXXSOURCES} grammar.y scanner.l libparse.l spSpolyLoop.pl
 
@@ -113,7 +113,7 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	fglmgauss.h fglmvec.h kstd2.h mpsr.h sing_mp.h \
 	kstdfac.h mpsr_Get.h spolys.h \
 	kutil.h mpsr_Put.h spolys0.h \
-	ndbm.h spSpolyLoop.h polys-impl.h polys-comp.h
+	ndbm.h spSpolyLoop.h polys-impl.h polys-comp.h getopt.h
 
 TESTS=${testdir}/comparecheck ${testdir}/fac_test.in ${testdir}/fac_test.out\
 	${testdir}/general_test.in ${testdir}/general_test.out \
@@ -143,7 +143,7 @@ OBJS=grammar.o scanner.o matpol.o binom.o\
      algmap.o clapconv.o  clapmem.o clapsing.o claptmpl.o\
      mpsr_Error.o mpsr_Put.o mpsr_PutPoly.o mpsr_GetPoly.o \
      mpsr_Get.o mpsr_GetMisc.o ndbm.o spSpolyLoop.o libparse.o \
-     find_exec.o
+     find_exec.o getopt.o
 
 ##
 ## PRIMARY Targets
@@ -397,7 +397,7 @@ OBJG1=	grammar.og scanner.og matpol.og binom.og\
      ndbm.og spSpolyLoop.og libparse.og \
 
 OBJG2= mmalloc.og mmallocb.og mmallocs.og mmblock.og mmheap.og \
-     mmspec.og mmutil.og weight0.og find_exec.og
+     mmspec.og mmutil.og weight0.og find_exec.og getopt.og
 
 
 OBJG=$(OBJG1) $(OBJG2) claptmpl.og
@@ -471,7 +471,7 @@ OBJP1=	grammar.op scanner.op matpol.op binom.op\
      ndbm.op spSpolyLoop.op libparse.op
 
 OBJP2= mmalloc.op mmallocb.op mmallocs.op mmblock.op mmheap.op \
-     mmspec.op mmutil.op weight0.op find_exec.op
+     mmspec.op mmutil.op weight0.op find_exec.op getopt.op
 
 OBJP=$(OBJP1) $(OBJP2) claptmpl.op
 
@@ -496,7 +496,7 @@ OBJB1=	grammar.ob scanner.ob matpol.ob binom.ob\
      ndbm.ob spSpolyLoop.ob libparse.ob 
 
 OBJB2= mmalloc.ob mmallocb.ob mmallocs.ob mmblock.ob mmheap.ob \
-     mmspec.ob mmutil.ob weight0.ob find_exec.ob
+     mmspec.ob mmutil.ob weight0.ob find_exec.ob getopt.ob
 
 OBJB=$(OBJB1) $(OBJB2) claptmpl.ob
 

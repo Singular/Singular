@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_mp.cc,v 1.14 1997-06-11 08:00:15 obachman Exp $ */
+/* $Id: sing_mp.cc,v 1.15 1998-04-16 16:10:23 obachman Exp $ */
 
 /*
 * ABSTRACT: interface to MP links
@@ -23,6 +23,12 @@
 #include"mpsr.h"
 
 static int Batch_ReadEval(si_link silink);
+
+#ifndef MAXPATHLEN
+#define MAXPATHLEN 1024
+#endif
+
+#define MPSR_DEBUG
 
 #ifdef MPSR_DEBUG
 #define MP_SET_LINK_OPTIONS(link) \
@@ -56,7 +62,7 @@ static void GetCmdArgs(int *argc, char ***argv, char *str)
     int i = 0, sl = strlen(str)+1, j;
     char *s2=mstrdup(str);
 
-    char *appl = strstr(s2, "-MPapplication");
+    char *appl = strstr(s2, "--MPapplication");
     if (appl != NULL)
     {
       if (appl != s2) *(appl-1) = '\0';
@@ -90,7 +96,7 @@ static void GetCmdArgs(int *argc, char ***argv, char *str)
 
     if (appl != NULL)
     {
-      (*argv)[*argc -2] = mstrdup("-MPapplication");
+      (*argv)[*argc -2] = mstrdup("--MPapplication");
       (*argv)[*argc -1] = mstrdup(&(appl[15]));
     }
 
@@ -106,8 +112,8 @@ static void GetCmdArgs(int *argc, char ***argv, char *str)
  ***************************************************************/
 static BOOLEAN slOpenMPFile(si_link l, short flag)
 {
-  char *argv[] = {"-MPtransp", "FILE", "-MPmode", "append",
-                  "-MPfile", "/tmp/mpout"};
+  char *argv[] = {"--MPtransp", "FILE", "--MPmode", "append",
+                  "--MPfile", "/tmp/mpout"};
   char *mode;
   
   MP_Link_pt link = NULL;
@@ -163,31 +169,37 @@ static BOOLEAN slOpenMPFile(si_link l, short flag)
  * MPtcp  specific stuff
  *
  ***************************************************************/
+extern BOOLEAN mainGetSingOptionValue(const char* name, char** val);
+
 
 static MP_Link_pt slOpenMPConnect(int n_argc, char **n_argv)
 {
-  char *argv[] = {"-MPtransp", "TCP", "-MPmode", "connect", "-MPport",
-                  "1025",  "-MPhost", "localhost"};
-  char *port = IMP_GetCmdlineArg(n_argc, n_argv, "-MPport");
-  char *host = IMP_GetCmdlineArg(n_argc, n_argv, "-MPhost");
+  char *argv[] = {"--MPtransp", "TCP", "--MPmode", "connect", "--MPport",
+                  "1025",  "--MPhost", "localhost"};
 
+  char *port = IMP_GetCmdlineArg(n_argc, n_argv, "--MPport");
+  char *host = IMP_GetCmdlineArg(n_argc, n_argv, "--MPhost");
 
-  if (port != NULL) argv[5] = port;
+  if (port == NULL) mainGetSingOptionValue("--MPport", &port);
+  if (host == NULL) mainGetSingOptionValue("--MPhost", &host);
 
-  if (host == NULL)
-  {
-    argv[7] = mp_Env->thishost;
-  }
-  else
+  if (port != NULL) 
+    argv[5] = port;
+  if (host != NULL)
     argv[7] = host;
-
+  else
+    argv[7] = mp_Env->thishost;
+    
   return MP_OpenLink(mp_Env, 8, argv);
 }
 
 static MP_Link_pt slOpenMPListen(int n_argc, char **n_argv)
 {
-  char *argv[] = {"-MPtransp", "TCP", "-MPmode", "listen", "-MPport", "1025"};
-  char *port = IMP_GetCmdlineArg(n_argc, n_argv, "-MPport");
+  char *argv[] = {"--MPtransp", "TCP", "--MPmode", "listen", 
+                  "--MPport", "1025"};
+  char *port = IMP_GetCmdlineArg(n_argc, n_argv, "--MPport");
+
+  if (port == NULL) mainGetSingOptionValue("--MPport", &port);
 
   if (port != NULL) argv[5] = port;
 
@@ -196,13 +208,31 @@ static MP_Link_pt slOpenMPListen(int n_argc, char **n_argv)
 
 static MP_Link_pt slOpenMPLaunch(int n_argc, char **n_argv)
 {
-  char *argv[] = {"-MPtransp", "TCP", "-MPmode", "launch",
-                  "-MPhost", "localhost", "-MPapplication", "Singular -b"};
-  char *appl = IMP_GetCmdlineArg(n_argc, n_argv, "-MPapplication");
-  char *host = IMP_GetCmdlineArg(n_argc, n_argv, "-MPhost");
+  char *argv[] = {"--MPtransp", "TCP", "--MPmode", "launch",
+                  "--MPhost", "localhost", 
+                  "--MPapplication", "Singular -bq  --no-stdlib --no-rc"};
+  char *appl = IMP_GetCmdlineArg(n_argc, n_argv, "--MPapplication");
+  char *host = IMP_GetCmdlineArg(n_argc, n_argv, "--MPhost");
+  char* nappl = NULL;
+  MP_Link_pt link;
 
 
-  if (appl != NULL) argv[7] = appl;
+  if (appl == NULL && (host == NULL || 
+                       strcmp(host, "localhost") == 0))
+  {
+    appl = feGetExpandedExecutable();
+    
+    if (appl != NULL)
+    {
+      nappl = (char*) Alloc(MAXPATHLEN + 24);
+      strcpy(nappl, appl);
+      strcat(nappl, " -bq --no-stdlib --no-rc");
+      appl = nappl;
+    }
+  }
+  
+  if (appl != NULL)  
+    argv[7] = appl;
 
   if (host == NULL)
   {
@@ -211,14 +241,16 @@ static MP_Link_pt slOpenMPLaunch(int n_argc, char **n_argv)
   else
     argv[5] = host;
 
-  return MP_OpenLink(mp_Env, 8, argv);
+  link = MP_OpenLink(mp_Env, 8, argv);
+  if (nappl != NULL) Free(nappl, MAXPATHLEN + 24);
+  return link;
 }
 
 static MP_Link_pt slOpenMPFork(si_link l, int n_argc, char **n_argv)
 {
   MP_Link_pt link = NULL;
-  char *argv[] = {"-MPtransp", "TCP", "-MPmode", "fork", "-MPport", "1703"};
-  char *port = IMP_GetCmdlineArg(n_argc, n_argv, "-MPport");
+  char *argv[] = {"--MPtransp", "TCP", "--MPmode", "fork", "--MPport", "1703"};
+  char *port = IMP_GetCmdlineArg(n_argc, n_argv, "--MPport");
 
   if (port != NULL) argv[5] = port;
 
@@ -459,34 +491,33 @@ int Batch_ReadEval(si_link silink)
 static BOOLEAN stop = 1;
 #endif
 
-int Batch_do(int argc, char **argv)
+  
+int Batch_do(const char* port, const char* host)
 {
 #ifdef MPSR_BATCH_DEBUG
   fprintf(stderr, "Was started with pid %d\n", getpid());
   while (stop){};
 #endif
   si_link silink = (si_link) Alloc0(sizeof(sip_link));
-  char *port = IMP_GetCmdlineArg(argc, argv, "-MPport");
-  char *host = IMP_GetCmdlineArg(argc, argv, "-MPhost");
   char *istr;
 
   // parse argv to get port and host
   if (port == NULL)
   {
     fprintf(stderr,
-            "Need '-MPport portnumber' command line argument in batch modus\n");
+            "Need '--MPport portnumber' command line argument in batch modus\n");
     return 1;
   }
   if (host == NULL)
   {
     fprintf(stderr,
-            "Need '-MPhost hostname' command line argument in batch modus\n");
+            "Need '--MPhost hostname' command line argument in batch modus\n");
     return 1;
   }
 
   // initialize si_link
   istr = (char *) AllocL((strlen(port) + strlen(host) + 40)*sizeof(char));
-  sprintf(istr, "MPtcp:connect -MPport %s -MPhost %s", port, host);
+  sprintf(istr, "MPtcp:connect --MPport %s --MPhost %s", port, host);
   slInit(silink, istr);
   FreeL(istr);
   // open link
@@ -499,7 +530,6 @@ int Batch_do(int argc, char **argv)
 
   return Batch_ReadEval(silink);
 }
-
 
 /***************************************************************
  *

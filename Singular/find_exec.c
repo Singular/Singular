@@ -8,7 +8,7 @@
    Copyright (C) 1990 by W. Wilson Ho.
    This file is part of the GNU Dld Library. */
 
-/* Adapted for use with Singular by obachman */
+/* Adapted for use with Singular by obachman@mathematik.uni-kl.de  4/98*/
 
 #include "mod2.h"
 
@@ -30,6 +30,9 @@
 
 #include "mmemory.h"
 
+#ifndef MAXPATHLEN
+#define MAXPATHLEN 1024
+#endif
 
 
 /* Do not return copies of sth, but simply the strings 

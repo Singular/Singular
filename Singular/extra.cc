@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.36 1998-04-16 11:45:39 Singular Exp $ */
+/* $Id: extra.cc,v 1.37 1998-04-16 16:10:13 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -250,11 +250,47 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
       res->rtyp=STRING_CMD;
       res->data=(void*)feGetExpandedExecutable();
       if (res->data != NULL)
-        res->data = mstrdup((char*) res->data);
+        res->data = (void*) mstrdup((char*) res->data);
       else
-        res->data = mstrdup("");
+        res->data = (void*) mstrdup("");
       return FALSE;
     }
+    else
+/*==================== options ==================================*/
+    if (strstr((char*)(h->data), "--") == (char*)(h->data))
+    {
+      BOOLEAN mainGetSingOptionValue(const char* name, char** result);
+      char* val;
+      
+      if (mainGetSingOptionValue(&((char*)(h->data))[2], &val))
+      {
+        res->data = (void*) val;
+        if ((int) val > 1)
+        {
+          res->rtyp=STRING_CMD;
+          res->data = (void*) mstrdup((char*) res->data);
+        }
+        else
+          res->rtyp=INT_CMD;
+        return FALSE;
+      }
+      else
+      {
+        Werror("Unknown option %s\n", (char*)(h->data));
+        return TRUE;
+      }
+    }
+    else
+/*==================== print all option values =================*/
+#ifndef NDEBUG
+    if (strcmp((char*)(h->data), "OptionValues") == 0)
+    {
+      void mainOptionValues();
+      mainOptionValues();
+      return FALSE;
+    }
+    else
+#endif
 /*==================== HC ==================================*/
     if (strcmp((char*)(h->data),"HC")==0)
     {

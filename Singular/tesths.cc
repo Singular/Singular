@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.32 1998-04-06 17:59:37 obachman Exp $ */
+/* $Id: tesths.cc,v 1.33 1998-04-16 16:10:24 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -32,6 +32,227 @@
 #include <factory.h>
 #endif
 
+#include <getopt.h>
+
+// define the long option names here
+#define LON_BATCH           "batch"
+#define LON_EXECUTE         "execute"
+#define LON_ECHO            "echo"
+#define LON_HELP            "help"
+#define LON_RANDOM          "random"
+#define LON_QUIET           "quiet"
+#define LON_NO_TTY          "no-tty"
+#define LON_USER_OPTION     "user-option"
+#define LON_VERSION         "version"
+#define LON_MIN_TIME        "min-time"
+#define LON_NO_STDLIB       "no-stdlib"
+#define LON_NO_RC           "no-rc"
+#define LON_TICKS_PER_SEC   "ticks-per-sec"
+#define LON_TCLMODE         "tclmode"
+#define LON_MP_PORT         "MPport"
+#define LON_MP_HOST         "MPhost"
+// undocumented options
+#ifdef HAVE_MPSR
+#define LON_MP_TRANSP       "MPtransp"
+#define LON_MP_MODE         "MPmode"
+#endif
+
+static struct option longopts[] =
+{
+#ifdef HAVE_MPSR
+  {LON_BATCH,             0,  0,  'b'},   
+#endif
+  {LON_HELP,              0,  0,  'h'},
+  {LON_QUIET,             0,  0,  'q'},   
+  {LON_NO_TTY,            0,  0,  't'},
+  {LON_VERSION,           0,  0,  'v'},
+#ifdef HAVE_TCL
+  {LON_TCLMODE,           0,  0,  'x'},
+#endif
+  {LON_ECHO,              2,  0,  'e'},
+  {LON_EXECUTE,           1,  0,  'c'},
+  {LON_RANDOM,            1,  0,  'r'},
+  {LON_USER_OPTION,       1,  0,  'u'},
+  {LON_NO_STDLIB,         0,  0,  0},
+  {LON_NO_RC,             0,  0,  0},
+  {LON_MIN_TIME,          1,  0,  0},
+#ifdef HAVE_MPSR
+  {LON_MP_PORT,           1,  0,  0},
+  {LON_MP_HOST,           1,  0,  0},
+#endif
+  {LON_TICKS_PER_SEC,     1,  0,  0},
+// undocumented options
+#ifdef HAVE_MPSR
+  {LON_MP_TRANSP,         1,  0,  0},
+  {LON_MP_MODE,           1,  0,  0},
+#endif
+// terminator
+  { 0, 0, 0, 0 }
+};
+// #define SHORT_OPTS_STRING "bc:e::hqr:tu:v"
+#define SHORT_OPTS_STRING "bhqtvxe::c:r:u:"
+
+struct sing_option
+{
+  const char*   name;    // as in option
+  const char*   arg_name;// name of argument, if has_arg > 0
+  const char*   help;    // (short) help string
+  char*         val;     // (default) value of option: 0: not set 1:set 
+                         // string:"" if has_arg > 0
+};
+
+// mention only documented options here
+static struct sing_option sing_longopts[] = 
+{
+#ifdef HAVE_MPSR
+  {LON_BATCH,       0,          "Run in MP batch mode",                                 0},   
+#endif
+  {LON_HELP,        0,          "Print help message and exit",                          0},
+  {LON_QUIET,       0,          "Do not print start-up banner and warnings",            0},   
+  {LON_NO_TTY,      0,          "Do not redefine the terminal characteristics",         0},
+  {LON_VERSION,     0,          "Print extended version and configuration info",        0},
+#ifdef HAVE_TCL
+  {LON_TCLMODE      0,          "Run in TCL mode, i.e., with TCL user interface",       0},
+#endif  
+  {LON_ECHO,        "VAL",      "Set value of variable `echo' to (integer) VAL",        ""},
+  {LON_EXECUTE,     "STRING",   "Execute STRING on start-up",                           ""},
+  {LON_RANDOM,      "SEED",     "Seed random generator with integer (integer) SEED",    ""},
+  {LON_USER_OPTION, "STRING",   "Return STRING on `system(\"--user-option\")'",         ""},
+  {LON_NO_STDLIB,   0,          "Do not load `standard.lib' on start-up",               0},
+  {LON_NO_RC,       0,          "Do not execute `.singularrc' file on start-up",        0},
+  {LON_MIN_TIME,    "SECS",     "Do not display times smaller than SECS (in seconds)",  "0.5"},
+#ifdef HAVE_MPSR
+  {LON_MP_PORT,     "PORT",     "Use PORT number for MP conections",                    ""},
+  {LON_MP_HOST,     "HOST",     "Use HOST for MP connections",                          ""},
+#endif
+  {LON_TICKS_PER_SEC, "TICKS",    "Sets unit of timer to TICKS per second",             "1"},
+  { 0, 0, 0, 0 }
+};
+
+static struct sing_option* mainGetSingOption(const char* name)
+{
+  int i = 0;
+  while (sing_longopts[i].name != 0)
+  {
+    if (strcmp(name, sing_longopts[i].name) == 0)
+      return &(sing_longopts[i]);
+    i++;
+  }
+  return NULL;
+}
+
+static void mainSetSingOptionValue(const char* name, char* value)
+{
+  sing_option* sopt = mainGetSingOption(name);
+  if (sopt != NULL)
+  {
+    sopt->val = value;
+  }
+}
+
+
+static char* mainGetSingOptionValue(const char* name)
+{
+  sing_option* sopt = mainGetSingOption(name);
+  if (sopt!=NULL)
+    return sopt->val;
+  return NULL;
+}
+
+
+// Prints help message
+static void mainHelp(const char* name)
+{
+  int i = 0;
+  struct sing_option *sopt;
+  char tmp[20];
+
+  printf("Singular %s -- a CAS for polynomial computations. Usage:\n", S_VERSION1);
+  printf("   %s [options] [file1 [file2 ...]]\n", name);
+  printf("Options:\n");
+  
+  while (longopts[i].name != 0)
+  {
+    sopt = mainGetSingOption(longopts[i].name);
+    if (sopt != NULL)
+    {
+      if (longopts[i].has_arg > 0)
+      {
+        if  (longopts[i].has_arg > 1)
+          sprintf(tmp, "%s[=%s]", longopts[i].name, sopt->arg_name);
+        else
+          sprintf(tmp, "%s=%s", longopts[i].name, sopt->arg_name);
+
+        printf(" %c%c --%-19s %s\n",
+               (longopts[i].val != 0 ? '-' : ' '),
+               (longopts[i].val != 0 ? longopts[i].val : ' '),
+               tmp,
+               sopt->help);
+      }
+      else
+      {
+        printf(" %c%c --%-19s %s\n",
+               (longopts[i].val != 0 ? '-' : ' '),
+               (longopts[i].val != 0 ? longopts[i].val : ' '),
+               longopts[i].name,
+               sopt->help);
+      }
+    }
+#ifndef NDEBUG      
+    else
+      printf("--%s Undocumented\n", longopts[i].name);
+#endif
+    i++;
+  }
+
+  printf("\nFor more information, type `help;' from within Singular or visit\n");
+  printf("http://www.mathematik.uni-kl.de/~zca/Singular or consult the\n");
+  printf("Singular manual (available as on-line info or printed manual).\n");
+}
+
+// Prints usage message
+static void mainUsage(char* argv0)
+{
+  printf("Use `%s --help' for a complete list of options\n", argv0);
+}
+
+#ifndef NDEBUG
+void mainOptionValues()
+{
+  int i = 0;
+  struct sing_option *sopt;
+
+  while (longopts[i].name != 0)
+  {
+    sopt = mainGetSingOption(longopts[i].name);
+    if (sopt != NULL)
+    {
+      if (sopt->val == NULL || sopt->val == (char*) 1)
+        Print("// --%-10s %d\n", sopt->name, sopt->val);
+      else
+        Print("// --%-10s %s\n", sopt->name, sopt->val); 
+    }
+    else
+      Print("// --%s Undocumented \n", longopts[i].name);
+    i++;
+  }
+}
+#endif // NDEBUG
+
+BOOLEAN mainGetSingOptionValue(const char* name, char** val)
+{
+  sing_option* sopt = mainGetSingOption(name);
+  if (sopt == NULL)
+  {
+    *val = NULL;
+    return FALSE;
+  }
+  else
+  {
+    *val = sopt->val;
+    return TRUE;
+  }
+}
 
 /*0 implementation*/
 int main(          /* main entry to Singular */
@@ -57,143 +278,193 @@ int main(          /* main entry to Singular */
   int i;
   thisfile = argv[0];
   BOOLEAN load_std_lib=TRUE;
+  BOOLEAN load_rc = TRUE;
+  char* execute_string = NULL;
+  int optc, option_index;
+
+  // do this first, because -v might print version path
   feGetSearchPath(thisfile);
-  
-  /*. process parameters */
-  for (;(argc > 1) && (!feBatch); --argc, ++argv)
+
+  // parse command line options
+  while((optc = getopt_long(argc, argv,
+                            SHORT_OPTS_STRING, longopts, &option_index)) 
+        != EOF)
   {
-    if (strcmp(argv[1], "-m") == 0)
+    switch(optc)
     {
-      {
-        if (argc > 2)
-        {
-          char* ptr = NULL;
-#ifdef HAVE_STRTOD
-          double mintime = strtod(argv[2], &ptr);
-          if (errno != ERANGE && ptr != argv[2])
+          
+        case 'b':
+#ifdef HAVE_MPSR          
+          feBatch=TRUE;
+          mainSetSingOptionValue(LON_BATCH, (char*) 1);
+          break;
 #else
-          double mintime = 0;
-          sscanf(argv[2],"%f", &mintime);
-          if (mintime != 0.0)
+          printf("%s: Option `-b' not supported in this configuration\n", argv[0]);
+          mainUsage(argv[0]);
+          exit(1);
 #endif
+
+        case 'h':
+          mainHelp(argv[0]);
+          exit(0);
+
+        case 'q':
+          verbose &= ~(Sy_bit(0)|Sy_bit(V_LOAD_LIB));
+          mainSetSingOptionValue(LON_QUIET, (char*) 1);
+          break;
+
+        case 't':
+#if defined(HAVE_FEREAD) || defined(HAVE_READLINE)
+          fe_use_fgets=TRUE;
+#endif
+          mainSetSingOptionValue(LON_NO_TTY, (char*) 1);
+          break;
+
+        case 'v':
+          printf("Singular %s  %s  (%d)  %s %s\n",
+                 S_VERSION1,S_VERSION2,
+                 SINGULAR_VERSION_ID,__DATE__,__TIME__);
+          printf("with\n");
+          printf(versionString());
+          printf("\n\n");
+          mainSetSingOptionValue(LON_VERSION, (char*) 1);
+          break;
+
+        case 'x':
+#ifdef HAVE_TCL
+          tclmode = TRUE;
+          mainSetSingOptionValue(LON_TCL-MODE, (char*) 1);
+          break;
+#else
+          printf("%s: Option `-x' not supported in this configuration\n", argv[0]);
+          mainUsage(argv[0]);
+          exit(1);
+#endif
+
+        case 'e':
+          if (optarg != NULL)
           {
-            argc--;
-            argv++;
-            SetMinDisplayTime(mintime);
+            errno = 0;
+            si_echo = strtol(optarg, NULL, 10);
+            if (errno)
+            {
+              printf("%s: `%s' invalid integer argument for option `--%s'\n", argv[0], optarg, LON_ECHO);
+              mainUsage(argv[0]);
+              exit(1);
+            }
+            if (si_echo < 0 || si_echo > 9)
+            {
+              printf("%s: `%s' argument for option `--%s' is not in valid range 0..9\n",
+                     argv[0], optarg, LON_ECHO);
+              mainUsage(argv[0]);
+              exit(1);
+            }
+            mainSetSingOptionValue(LON_ECHO, optarg);
           }
           else
-            fprintf(stderr, "Can not convert %s to a float\n", argv[2]);
-        }
-        else
-        {
-          fprintf(stderr, "Need a float to set mintime");
-        }
-      }
-    }
-    else if (strcmp(argv[1], "-d") == 0)
-    {
-      
-      if (argc > 2)
-      {
-        char* ptr = NULL;
-        // OLAF: try to avoid using long:
-#ifdef HAVE_STRTOL
-        long res = strtol(argv[2], &ptr, 10);
-        if (errno != ERANGE && ptr != argv[2] && res > 0)
-#else
-          long res = 0;
-        sscanf(argv[2],"%d", &res);
-        if (res > 0)
-#endif
-        {
-          argc--;
-          argv++;
-          i=0;
-          SetTimerResolution(res);
-        }
-        else
-          fprintf(stderr,"Can not convert %s to an integer > 0\n", argv[2]);
-      }
-      else
-      {
-        long res=0;
-        while ((argv[1][i+1]>='0') && (argv[1][i+1]<='9'))
-        {
-          i++;
-          res = res*10+(int)(argv[1][i] - '0');
-          SetTimerResolution(res);
-        }
-      }
-    }
-    else
-    {
+          {
+            si_echo = 1;
+            mainSetSingOptionValue(LON_ECHO, "1");
+          }
+          break;
 
-      if ((argv[1][0] != '-') ||(argv[1][1] == '-'))
-        break;
-      for (i=1;argv[1][i]!='\0';i++)
-      {
-        switch (argv[1][i])
-        {
-            case 'V':
-            case 'v':{
-              printf("Singular %s  %s  (%d)  %s %s\n",
-                     S_VERSION1,S_VERSION2,
-                     SINGULAR_VERSION_ID,__DATE__,__TIME__);
-              printf("with\n");
-              printf(versionString());
-              printf("\n\n");
-              break;
-            }
-            case 'e': if ((argv[1][i+1]>'0') && (argv[1][i+1]<='9'))
+        case 'c':
+          execute_string = optarg;
+          mainSetSingOptionValue(LON_EXECUTE, optarg);
+          break;
+          
+        case 'r':
+          errno = 0;
+          siRandomStart = strtol(optarg, NULL, 10);
+          if (errno)
+          {
+            printf("%s: `%s' invalid integer argument for option `--%s'\n", argv[0], optarg, LON_RANDOM);
+            mainUsage(argv[0]);
+            exit(1);
+          }
+          #ifdef buildin_rand
+          siSeed=siRandomStart;
+          #else
+          srand((unsigned int)siRandomStart);
+          #endif
+          #ifdef HAVE_FACTORY
+          factoryseed(siRandomStart);
+          #endif
+          mainSetSingOptionValue(LON_RANDOM, optarg);
+          break;
+          
+        case 'u':
+          mainSetSingOptionValue(LON_USER_OPTION, optarg);
+          break;
+
+        case 0:
+          if (strcmp(longopts[option_index].name, LON_NO_STDLIB) == 0)
+          {
+            load_std_lib = FALSE;
+            mainSetSingOptionValue(LON_NO_STDLIB, (char*) 1);
+          }
+          else if (strcmp(longopts[option_index].name, LON_NO_RC) == 0)
+          {
+            load_rc = FALSE;
+            mainSetSingOptionValue(LON_NO_RC, (char*) 1);
+          }
+          else if (strcmp(longopts[option_index].name, LON_MIN_TIME) == 0)
+          {
+            double mintime = atof(optarg);
+            if (mintime <= 0)
             {
-              i++;
-              si_echo = (int)(argv[1][i] - '0');
-            }
-            else si_echo = 1;
-            break;
-            case 'r': siRandomStart = 0;
-              while((argv[1][i+1]>='0') && (argv[1][i+1]<='9'))
-              {
-                i++;
-                siRandomStart = siRandomStart*10+(int)(argv[1][i] - '0');
-              }
-              #ifdef buildin_rand
-                siSeed=siRandomStart;
-              #else
-                srand((unsigned int)siRandomStart);
-              #endif
-              #ifdef HAVE_FACTORY
-                factoryseed(siRandomStart);
-              #endif
-              break;
-#ifdef HAVE_TCL	      
-            case 'x': tclmode=TRUE;
-              break;
-#endif	      
-#ifdef HAVE_MPSR
-            case 'b': feBatch=TRUE;
-#endif
-            case 'q': verbose &= ~(Sy_bit(0)|Sy_bit(V_LOAD_LIB));
-              break;
-            case 't':
-#if defined(HAVE_FEREAD) || defined(HAVE_READLINE)
-              fe_use_fgets=TRUE;
-#endif
-              break;
-            case 'n':
-              load_std_lib=FALSE;
-              break;
-            default : printf("Unknown option -%c\n",argv[1][i]);
-              printf("Usage: %s [-bemqtvx] [file]\n",thisfile);
+              printf("%s: `%s' invalid float argument for option `--%s'\n",  
+                     argv[0], optarg, LON_MIN_TIME);
+              mainUsage(argv[0]);
               exit(1);
-        }
-      }
+            }
+            SetMinDisplayTime(mintime);
+            mainSetSingOptionValue(LON_MIN_TIME, optarg);
+          }
+#ifdef HAVE_MPSR
+          else if (strcmp(longopts[option_index].name, LON_MP_PORT) == 0)
+          {
+            mainSetSingOptionValue(LON_MP_PORT, optarg);
+          }
+          else if (strcmp(longopts[option_index].name, LON_MP_HOST) == 0)
+          {
+            mainSetSingOptionValue(LON_MP_HOST, optarg);
+          }
+#endif          
+          else if (strcmp(longopts[option_index].name, LON_TICKS_PER_SEC) == 0)
+          {
+            int ticks = atoi(optarg);
+            if (ticks <= 0)
+            {
+              printf("%s: `%s' invalid integer argument for option `--%s'\n",
+                     argv[0], optarg, LON_TICKS_PER_SEC);
+              mainUsage(argv[0]);
+              exit(1);
+            }
+            SetTimerResolution(ticks);
+            mainSetSingOptionValue(LON_TICKS_PER_SEC, optarg);
+          }
+          else
+            // undocumented options
+#ifdef HAVE_MPSR
+            if (strcmp(longopts[option_index].name, LON_MP_MODE) == 0 ||
+                strcmp(longopts[option_index].name, LON_MP_TRANSP) == 0)
+            {
+              /* ignore */
+            }
+          else
+#endif
+            assume(0);
+          break;
+
+        default:
+          // Error message already emmited by getopt_long
+          mainUsage(argv[0]);
+          exit(1);
     }
   }
-
-
   /*. say hello */
-  if (BVERBOSE(0))
+  if (BVERBOSE(0) && !feBatch)
   {
     printf(
 "              Welcome to SINGULAR                  /\n"
@@ -206,7 +477,7 @@ int main(          /* main entry to Singular */
 "e-mail: singular@mathematik.uni-kl.de\n");
     printf("%s  %s  (%d)",S_VERSION1,S_VERSION2, SINGULAR_VERSION_ID);
     printf("\n\nPlease note:  EVERY COMMAND MUST END WITH A SEMICOLON \";"
-           "\"\n(e.g. help; help command; help General syntax; help ring; quit;)\n\n");
+           "\"\n(e.g., help; help command; help General syntax; help ring; quit;)\n\n");
   }
   else
   if (!feBatch)
@@ -231,19 +502,33 @@ int main(          /* main entry to Singular */
 #endif
 #endif
   setjmp(si_start_jmpbuf);
-  /* if script is given */
-  if ((argc > 1)&&(argv[1][0]!='-'))
+
+  // Now, put things on the stack of stuff to do
+
+  // Last thing to do is to execute given scripts
+  if (optind < argc)
   {
-    /* read and run the Script */
-    argc=1;
-    newFile(argv[1]);
+    int i = argc - 1;
+    while (i >= optind)
+    {
+      newFile(argv[i]);
+      i--;
+    }
   }
   else
   {
     currentVoice=feInitStdin();
   }
-  // set up voice for .singularc
+
+  // before scripts, we execute -c, if it was given
+  // now execute -c, if it was given
+  if (execute_string != NULL)
+    newBuffer(mstrdup(execute_string), BT_execute);
+
+  // first thing, however, is to load .singularrc
+  if (load_rc)
   {
+    // Hmm, we should look into $cwd and then into $HOME, only
     char * where=(char *)AllocL(256);
     FILE * rc=feFopen(".singularrc","r",where,FALSE);
     if (rc!=NULL)
@@ -253,16 +538,17 @@ int main(          /* main entry to Singular */
     }
     FreeL((ADDRESS)where);
   }
+
   /* start shell */
   if (feBatch)
   {
 #ifdef HAVE_MPSR
-    extern int Batch_do(int argc, char **argv);
-    return Batch_do(argc,argv);
+    extern int Batch_do(const char* port, const char* host);
+    return Batch_do(mainGetSingOptionValue(LON_MP_PORT),
+                    mainGetSingOptionValue(LON_MP_HOST));
 #else
-    fprintf(stderr, "Option -b not supported in this version");
-    return 1;
-#endif // HAVE_MPSR
+    assume(0);
+#endif
   }
   setjmp(si_start_jmpbuf);
   yyparse();
