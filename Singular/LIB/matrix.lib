@@ -1,6 +1,6 @@
 // GMG/BM, last modified: 8.10.98
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: matrix.lib,v 1.15 2000-12-22 14:15:05 greuel Exp $";
+version="$Id: matrix.lib,v 1.16 2000-12-23 17:17:28 greuel Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -284,8 +284,8 @@ example
 
 proc power ( A, int n)
 "USAGE:   power(A,n);  A a square-matrix of type intmat or matrix, n=integer
-RETURN:  inmat resp. matrix, the n-th power of A
-NOTE:    for A=intamt and big n the result may be wrong because of int overflow
+RETURN:  intmat resp. matrix, the n-th power of A
+NOTE:    for A=intmat and big n the result may be wrong because of int overflow
 EXAMPLE: example power; shows an example
 "
 {
