@@ -1,8 +1,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/subexpr.cc,v 1.2 1997-03-21 13:19:05 Singular Exp $";
+static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/subexpr.cc,v 1.3 1997-03-21 14:06:52 Singular Exp $";
 /* $Log: not supported by cvs2svn $
+// Revision 1.2  1997/03/21  13:19:05  Singular
+// fixed assignment of lists, det(constants), comparision of intmats
+//
 */
 
 /*
@@ -1243,8 +1246,10 @@ int sleftv::Eval()
           mmTestLP(d->arg1.name);
           if (!nok)
           {
-            memcpy(this,&d->arg1,sizeof(sleftv));
             memset(&d->arg1,0,sizeof(sleftv));
+            this->CleanUp();
+            memset(this,0,sizeof(sleftv));
+            rtyp=NONE;
           }
         }
       }
