@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: mondromy.lib,v 1.13 1999-12-16 17:06:23 mschulze Exp $";
+version="$Id: mondromy.lib,v 1.14 1999-12-17 11:19:32 mschulze Exp $";
 info="
 LIBRARY:  mondromy.lib  PROCEDURES TO COMPUTE THE MONODROMY OF A SINGULARITY
 AUTHOR:   Mathias Schulze, email: mschulze@mathematik.uni-kl.de
@@ -167,9 +167,8 @@ EXAMPLE: example invunit; shows an example.
     u=jet(1-u/u0,n);
     poly ui=u;
     poly v=1+u;
-    int m=n div pcvmindeg(u);
     int i;
-    for(i=1;i<m;i++)
+    for(i=n div pcvmindeg(u);i>1;i--)
     {
       ui=jet(ui*u,n);
       v=v+ui;
