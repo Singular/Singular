@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.5 1999-06-30 10:34:34 Singular Exp $ */
+/* $Id: mpr_base.cc,v 1.6 1999-06-30 11:54:31 Singular Exp $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -695,10 +695,9 @@ void pointSet::lift( int l[] )
     outerL= false;
     l= (int *)Alloc( (dim+1) * sizeof(int) ); // [1..dim-1]
 
-    srand48( (long)(seed*(index+MAXSEED*18)) );  // index+MAXSEED*MAXVARS
     for(i = 1; i < dim; i++)
     {
-      l[i]= 1 + ((unsigned int) mrand48()) % LIFT_COOR;
+      l[i]= 1 + siRand() % LIFT_COOR;
     }
   }
   for ( j=1; j <= num; j++ )
@@ -1458,12 +1457,9 @@ void resMatrixSparse::randomVector( const int dim, mprfloat shift[] )
   i= 1;
   time_t *tp = NULL;
 
-  //srand((long)(((int)time(tp) % MAXSEED)+MAXSEED*18));
-
   while ( i <= dim )
   {
-    //shift[i]= (mprfloat) (RVMULT*rand()/(RAND_MAX+1.0));
-    shift[i]= (mprfloat) (RVMULT*siRand()/(INT_MAX+1.0));
+    shift[i]= (mprfloat) (RVMULT*siRand()/(MAX_INT_VAL+1.0));
     i++;
     for ( j= 1; j < i-1; j++ )
     {
@@ -2934,8 +2930,7 @@ rootContainer ** uResultant::interpolateDenseSP( BOOLEAN matchUp, const number s
         }
         else if ( i <= uvar + 2 )
         {
-//          pevpoint[i]=nInit(IsPrime(1+(int) (MAXEVPOINT*rand()/(RAND_MAX+1.0))));
-          pevpoint[i]=nInit(IsPrime(1+(int) (MAXEVPOINT*siRand()/(INT_MAX+1.0))));
+          pevpoint[i]=nInit(IsPrime(1+(int) (MAXEVPOINT*siRand()/(MAX_INT_VAL+1.0))));
           //pevpoint[i]=nInit(383);
         }
         else
@@ -3055,7 +3050,7 @@ rootContainer ** uResultant::specializeInU( BOOLEAN matchUp, const number subDet
         nDelete( &pevpoint[i] );
         if ( i <= uvar + 2 )
         {
-          pevpoint[i]=nInit(IsPrime(1+(int) (MAXEVPOINT*siRand()/(INT_MAX+1.0))));
+          pevpoint[i]=nInit(IsPrime(1+(int) (MAXEVPOINT*siRand()/(MAX_INT_VAL+1.0))));
           //pevpoint[i]=nInit(383);
         } else pevpoint[i]=nInit(0);
         mprPROTNnl(" ",pevpoint[i]);
