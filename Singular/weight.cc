@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: weight.cc,v 1.13 2000-08-14 12:56:57 obachman Exp $ */
+/* $Id: weight.cc,v 1.14 2000-09-18 09:19:38 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -10,7 +10,7 @@
 #include <math.h>
 #include "mod2.h"
 #include "tok.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "polys.h"
 #include "intvec.h"
 #include "febase.h"

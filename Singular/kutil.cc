@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.60 2000-09-14 14:07:23 obachman Exp $ */
+/* $Id: kutil.cc,v 1.61 2000-09-18 09:19:09 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -14,7 +14,7 @@
 #include "mod2.h"
 #include "tok.h"
 #include "febase.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "numbers.h"
 #include "polys.h"
 #include "ring.h"
@@ -25,6 +25,43 @@
 #include "subexpr.h"
 #include "kstd1.h"
 #include "kutil.h"
+
+/* Hmm ... this should be inlined or made more efficient:
+   see Long/mregular.tst */
+/*2
+*should return 1 if p divides q and p<q,
+*             -1 if q divides p and q<p
+*              0 otherwise
+*/
+static inline int     pDivComp(poly p, poly q)
+{
+  if (pGetComp(p) == pGetComp(q))
+  {
+    int i=pVariables;
+    long d;
+    BOOLEAN a=FALSE, b=FALSE;
+    for (; i>0; i--)
+    {
+      d = pGetExpDiff(p, q, i);
+      if (d)
+      {
+        if (d < 0)
+        {
+          if (b) return 0;
+          a =TRUE;
+        }
+        else
+        {
+          if (a) return 0;
+          b = TRUE;
+        }
+      }
+    }
+    if (a) return 1;
+    else if (b)  return -1;
+  }
+  return 0;
+}
 
 static poly redMora (poly h,int maxIndex,kStrategy strat);
 static poly redBba (poly h,int maxIndex,kStrategy strat);
@@ -461,12 +498,12 @@ void deleteInL (LSet set, int *length, int j,kStrategy strat)
   int i;
 
   if (set[j].lcm!=NULL)
-    pFree(set[j].lcm);
+    pLmFree(set[j].lcm);
   if (set[j].p!=NULL)
   {
     if (pNext(set[j].p) == strat->tail)
     {
-      pFree(set[j].p);
+      pLmFree(set[j].p);
       /*- tail belongs to several int spolys -*/
     }
     else
@@ -524,7 +561,7 @@ inline void clearS (poly p, unsigned long p_sev, int* at, int* k,
                     kStrategy strat)
 {
   assume(p_sev == pGetShortExpVector(p));
-  if (!pShortDivisibleBy(p,p_sev, strat->S[*at], ~ strat->sevS[*at])) return;
+  if (!pLmShortDivisibleBy(p,p_sev, strat->S[*at], ~ strat->sevS[*at])) return;
   deleteInS((*at),strat);
   (*at)--;
   (*k)--;
@@ -626,7 +663,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
     *case lcm(s,r)=lcm(s,p) is not covered by chainCrit.
     */
       strat->cp++;
-      pFree(Lp.lcm);
+      pLmFree(Lp.lcm);
       Lp.lcm=NULL;
       return;
     }
@@ -634,7 +671,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
       Lp.ecart = max(ecart,strat->ecartS[i]);
     if (strat->fromT && (strat->ecartS[i]>ecart))
     {
-      pFree(Lp.lcm);
+      pLmFree(Lp.lcm);
       Lp.lcm=NULL;
       return;
       /*the pair is (s[i],t[.]), discard it if the ecart is too big*/
@@ -657,7 +694,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
           strat->c3++;
           if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
           {
-            pFree(Lp.lcm);
+            pLmFree(Lp.lcm);
             return;
           }
           break;
@@ -691,13 +728,13 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
     *case lcm(s,r)=lcm(s,p) is not covered by chainCrit.
     */
       strat->cp++;
-      pFree(Lp.lcm);
+      pLmFree(Lp.lcm);
       Lp.lcm=NULL;
       return;
     }
     if (strat->fromT && (strat->ecartS[i]>ecart))
     {
-      pFree(Lp.lcm);
+      pLmFree(Lp.lcm);
       Lp.lcm=NULL;
       return;
       /*the pair is (s[i],t[.]), discard it if the ecart is too big*/
@@ -716,7 +753,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
         strat->c3++;
         if ((strat->fromQ==NULL) || (isFromQ==0) || (strat->fromQ[i]==0))
         {
-          pFree(Lp.lcm);
+          pLmFree(Lp.lcm);
           return;
         }
         break;
@@ -759,7 +796,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
     *the case lcm(s,p) == lcm(s,r) is not covered in chainCrit)
     *the first case is handeled in chainCrit
     */
-    if (Lp.lcm!=NULL) pFree(Lp.lcm);
+    if (Lp.lcm!=NULL) pLmFree(Lp.lcm);
   }
   else
   {
@@ -792,17 +829,17 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat)
   if(pHasNotCF(p,strat->S[i]))
   {
     strat->cp++;
-    pFree(Lp.lcm);
+    pLmFree(Lp.lcm);
     Lp.lcm=NULL;
     return;
   }
   for(j = strat->Ll;j>=0;j--)
   {
     compare=pDivComp(strat->L[j].lcm,Lp.lcm);
-    if ((compare==1) || (pEqual(strat->L[j].lcm,Lp.lcm)))
+    if ((compare==1) || (pLmEqual(strat->L[j].lcm,Lp.lcm)))
     {
       strat->c3++;
-      pFree(Lp.lcm);
+      pLmFree(Lp.lcm);
       return;
     }
     else if (compare ==-1)
@@ -816,7 +853,7 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat)
   Lp.p = ksCreateShortSpoly(strat->S[i],p);
   if (Lp.p == NULL)
   {
-     pFree(Lp.lcm);
+     pLmFree(Lp.lcm);
   }
   else
   {
@@ -904,7 +941,7 @@ void chainCrit (poly p,int ecart,kStrategy strat)
         loop
         {
           if (i <  0) break;
-          if (pEqual(strat->B[j].lcm,strat->B[i].lcm))
+          if (pLmEqual(strat->B[j].lcm,strat->B[i].lcm))
           {
             strat->c3++;
             if (sugarDivisibleBy(strat->B[j].ecart,strat->B[i].ecart))
@@ -952,7 +989,7 @@ void chainCrit (poly p,int ecart,kStrategy strat)
         if (j <= 0) break;
         for(i=j-1; i>=0; i--)
         {
-          if (pEqual(strat->B[j].lcm,strat->B[i].lcm))
+          if (pLmEqual(strat->B[j].lcm,strat->B[i].lcm))
           {
             strat->c3++;
             deleteInL(strat->B,&strat->Bl,i,strat);
@@ -1024,13 +1061,13 @@ void chainCrit (poly p,int ecart,kStrategy strat)
         loop
         {
           if (i < 0)  break;
-          if ((strat->L[i].p2 == p) && pEqual(strat->L[j].lcm,strat->L[i].lcm))
+          if ((strat->L[i].p2 == p) && pLmEqual(strat->L[j].lcm,strat->L[i].lcm))
           {
             /*L[i] could be canceled but we search for a better one to cancel*/
             strat->c3++;
             if (isInPairsetL(i-1,strat->L[j].p1,strat->L[i].p1,&l,strat)
             && (pNext(strat->L[l].p) == strat->tail)
-            && (!pEqual(strat->L[i].p,strat->L[l].p))
+            && (!pLmEqual(strat->L[i].p,strat->L[l].p))
             && pDivisibleBy(p,strat->L[l].lcm))
             {
               /*
@@ -1210,7 +1247,7 @@ void pairs (kStrategy strat)
       {
         j++;
         if (j > strat->sl) break;
-        if (pShortDivisibleBy(strat->S[i], strat->sevS[i],
+        if (pLmShortDivisibleBy(strat->S[i], strat->sevS[i],
                               strat->S[j], ~ strat->sevS[j]))
         {
         //  Print("delete %d=",j);
@@ -2255,7 +2292,7 @@ poly redtail (poly p, int pos, kStrategy strat)
       j = 0;
       while (j <= pos)
       {
-        if (pShortDivisibleBy(strat->S[j], strat->sevS[j], hn, not_sev)
+        if (pLmShortDivisibleBy(strat->S[j], strat->sevS[j], hn, not_sev)
         && ((e >= strat->ecartS[j])
           || strat->kHEdgeFound)
         )
@@ -2310,7 +2347,7 @@ poly redtailBba (poly p, int pos, kStrategy strat)
     not_sev = ~ pGetShortExpVector(hn);
     while (j <= pos)
     {
-      if (pShortDivisibleBy(strat->S[j], strat->sevS[j], hn, not_sev))
+      if (pLmShortDivisibleBy(strat->S[j], strat->sevS[j], hn, not_sev))
       {
         strat->redTailChange=TRUE;
         assume(p != strat->S[j]);
@@ -2356,8 +2393,8 @@ poly redtailSyz (poly p, int pos, kStrategy strat)
     not_sev = ~ pGetShortExpVector(hn);
     while (j <= pos)
     {
-      if (pShortDivisibleBy(strat->S[j], strat->sevS[j], hn, not_sev)
-          && (!pEqual(strat->S[j],h)))
+      if (pLmShortDivisibleBy(strat->S[j], strat->sevS[j], hn, not_sev)
+          && (!pLmEqual(strat->S[j],h)))
       {
         ksOldSpolyTail(strat->S[j], p, h, strat->kNoether);
         hn = pNext(h);
@@ -2821,7 +2858,7 @@ static poly redBba1 (poly h,int maxIndex,kStrategy strat)
 
   while (j <= maxIndex)
   {
-    if (pShortDivisibleBy(strat->S[j],strat->sevS[j],h, not_sev))
+    if (pLmShortDivisibleBy(strat->S[j],strat->sevS[j],h, not_sev))
        return ksOldSpolyRedNew(strat->S[j],h,strat->kNoether);
     else j++;
   }
@@ -2893,7 +2930,7 @@ static poly redQ (poly h, int j, kStrategy strat)
   start=j;
   while (j<=strat->sl)
   {
-    if (pShortDivisibleBy(strat->S[j],strat->sevS[j], h, not_sev))
+    if (pLmShortDivisibleBy(strat->S[j],strat->sevS[j], h, not_sev))
     {
       h = ksOldSpolyRed(strat->S[j],h,strat->kNoether);
       if (h==NULL) return NULL;
@@ -2916,7 +2953,7 @@ static poly redBba (poly h,int maxIndex,kStrategy strat)
 
   while (j <= maxIndex)
   {
-    if (pShortDivisibleBy(strat->S[j],strat->sevS[j], h, not_sev))
+    if (pLmShortDivisibleBy(strat->S[j],strat->sevS[j], h, not_sev))
     {
       h = ksOldSpolyRed(strat->S[j],h,strat->kNoether);
       if (h==NULL) return NULL;
@@ -2944,7 +2981,7 @@ static poly redMora (poly h,int maxIndex,kStrategy strat)
     e = pLDeg(h,&l)-pFDeg(h);
     do
     {
-      if (pShortDivisibleBy(strat->S[j],strat->sevS[j], h, not_sev)
+      if (pLmShortDivisibleBy(strat->S[j],strat->sevS[j], h, not_sev)
       && ((e >= strat->ecartS[j]) || strat->kHEdgeFound))
       {
         h1 = ksOldSpolyRedNew(strat->S[j],h,strat->kNoether);
@@ -3143,7 +3180,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
       enterT(h,strat);
     }
   }
-  if (redSi!=NULL) pDelete1(&redSi);
+  if (redSi!=NULL) pDeleteLm(&redSi);
 #ifdef KDEBUG
   kTest(strat);
 #endif
@@ -3448,7 +3485,7 @@ void exitBuchMora (kStrategy strat)
   omFreeSize((ADDRESS)strat->L,(strat->Lmax)*sizeof(LObject));
   /*- set B: should be empty -*/
   omFreeSize((ADDRESS)strat->B,(strat->Bmax)*sizeof(LObject));
-  pDelete1(&strat->tail);
+  pDeleteLm(&strat->tail);
   strat->syzComp=0;
   if (strat->kIdeal!=NULL)
   {
@@ -3488,7 +3525,7 @@ void updateResult(ideal r,ideal Q,kStrategy strat)
         for(q=IDELEMS(Q)-1; q>=0;q--)
         {
           if ((Q->m[q]!=NULL)
-          &&(pEqual(r->m[l],Q->m[q])))
+          &&(pLmEqual(r->m[l],Q->m[q])))
           {
             if (TEST_OPT_REDSB)
             {
@@ -3569,7 +3606,7 @@ BOOLEAN newHEdge(polyset S, int ak,kStrategy strat)
 
   scComputeHC(strat->Shdl,ak,strat->kHEdge);
   /* compare old and new noether*/
-  newNoether = pInit(strat->kHEdge);
+  newNoether = pLmInit(strat->kHEdge);
   j = pFDeg(newNoether);
   for (i=1; i<=pVariables; i++)
   {
@@ -3597,7 +3634,7 @@ BOOLEAN newHEdge(polyset S, int ak,kStrategy strat)
     strat->kNoether=newNoether;
     return TRUE;
   }
-  pFree(newNoether);
+  pLmFree(newNoether);
   return FALSE;
 }
 

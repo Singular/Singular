@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.61 2000-09-13 13:16:40 Singular Exp $ */
+/* $Id: polys.cc,v 1.62 2000-09-18 09:19:29 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -13,7 +13,7 @@
 #include <ctype.h>
 #include "mod2.h"
 #include "tok.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "febase.h"
 #include "numbers.h"
 #include "polys.h"
@@ -826,12 +826,12 @@ poly pDivideM(poly a, poly b)
     {
       if (prev==NULL)
       {
-        pDelete1(&result);
+        pDeleteLm(&result);
         a=result;
       }
       else
       {
-        pDelete1(&pNext(prev));
+        pDeleteLm(&pNext(prev));
         a=pNext(prev);
       }
     }
@@ -901,7 +901,7 @@ poly pmInit(char *st, BOOLEAN &ok)
   }
 done:
   ok=!errorreported;
-  if (nIsZero(pGetCoeff(rc))) pDelete1(&rc);
+  if (nIsZero(pGetCoeff(rc))) pDeleteLm(&rc);
   else
   {
     pSetm(rc);
@@ -1285,7 +1285,7 @@ void pDeleteComp(poly * p,int k)
 {
   poly q;
 
-  while ((*p!=NULL) && (pGetComp(*p)==k)) pDelete1(p);
+  while ((*p!=NULL) && (pGetComp(*p)==k)) pDeleteLm(p);
   if (*p==NULL) return;
   q = *p;
   if (pGetComp(q)>k)
@@ -1296,7 +1296,7 @@ void pDeleteComp(poly * p,int k)
   while (pNext(q)!=NULL)
   {
     if (pGetComp(pNext(q))==k)
-      pDelete1(&(pNext(q)));
+      pDeleteLm(&(pNext(q)));
     else
     {
       pIter(q);
@@ -1328,42 +1328,6 @@ BOOLEAN pHasNotCF(poly p1, poly p2)
 }
 
 
-/* Hmm ... this should be inlined or made more efficient:
-   see Long/mregular.tst */
-/*2
-*should return 1 if p divides q and p<q,
-*             -1 if q divides p and q<p
-*              0 otherwise
-*/
-int     pDivComp(poly p, poly q)
-{
-  if (pGetComp(p) == pGetComp(q))
-  {
-    int i=pVariables;
-    long d;
-    BOOLEAN a=FALSE, b=FALSE;
-    for (; i>0; i--)
-    {
-      d = pGetExpDiff(p, q, i);
-      if (d)
-      {
-        if (d < 0)
-        {
-          if (b) return 0;
-          a =TRUE;
-        }
-        else
-        {
-          if (a) return 0;
-          b = TRUE;
-        }
-      }
-    }
-    if (a) return 1;
-    else if (b)  return -1;
-  }
-  return 0;
-}
 /*2
 *divides p1 by its leading monomial
 */
@@ -1524,7 +1488,7 @@ poly pSubst0(poly p, int n)
   {
     if (pGetExp(pNext(h),n)!=0)
     {
-      pDelete1(&pNext(h));
+      pDeleteLm(&pNext(h));
     }
     else
     {
@@ -1579,7 +1543,7 @@ poly pSubst(poly p, int n, poly e)
       }
       res=pAdd(res,m);
     }
-    pDelete1(&h);
+    pDeleteLm(&h);
   }
   omFreeSize((ADDRESS)me,(pVariables+1)*sizeof(Exponent_t));
   omFreeSize((ADDRESS)ee,(pVariables+1)*sizeof(Exponent_t));

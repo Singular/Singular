@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmhom.cc,v 1.16 2000-08-14 12:56:15 obachman Exp $
+// $Id: fglmhom.cc,v 1.17 2000-09-18 09:18:58 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -25,7 +25,7 @@
 #include "ipshell.h"
 #include "febase.h"
 #include "maps.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "fglm.h"
 #include "fglmvec.h"
 #include "fglmgauss.h"
@@ -246,7 +246,7 @@ getVectorRep( homogData & dat )
                     int t;
                     for ( t= dat.numMonoms - 1; t >= 0; t-- ) {
                         if ( dat.monlist[t].basis > 0 ) {
-                            if ( pEqual( dat.monlist[t].mon.sm, temp ) ) {
+                            if ( pLmEqual( dat.monlist[t].mon.sm, temp ) ) {
                                 number coeff= nCopy( pGetCoeff( temp ) );
                                 v.setelem( dat.monlist[t].basis, coeff );
                             }

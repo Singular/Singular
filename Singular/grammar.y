@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.82 2000-08-14 12:56:17 obachman Exp $ */
+/* $Id: grammar.y,v 1.83 2000-09-18 09:18:59 obachman Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -26,7 +26,7 @@
 #endif
 
 #include "mod2.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "tok.h"
 #include "stype.h"
 #include "ipid.h"

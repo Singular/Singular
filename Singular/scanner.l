@@ -2,14 +2,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.28 2000-09-04 13:39:06 obachman Exp $ */
+/* $Id: scanner.l,v 1.29 2000-09-18 09:19:32 obachman Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
 
 #include "mod2.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "tok.h"
 #include "stype.h"
 #include "ipshell.h"
@@ -309,7 +309,7 @@ newline                  {
                            mmStat(-500);
                            #endif
                            #ifdef OM_TRACK
-                             omPrintUsedTrackAddrs(stdout);
+                             omPrintUsedTrackAddrs(stdout, 1);
                            #endif
                            m2_end(0);
                          }

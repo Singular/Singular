@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.90 2000-09-04 13:38:56 obachman Exp $ */
+/* $Id: febase.cc,v 1.91 2000-09-18 09:18:55 obachman Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -28,7 +28,7 @@
 
 #include "tok.h"
 #include "febase.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "subexpr.h"
 #include "ipshell.h"
 #include "dError.h"

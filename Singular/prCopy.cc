@@ -1,13 +1,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: prCopy.cc,v 1.6 2000-09-14 13:04:40 obachman Exp $ */
+/* $Id: prCopy.cc,v 1.7 2000-09-18 09:19:31 obachman Exp $ */
 /*
 * ABSTRACT - implementation of functions for Copy/Move/Delete for Polys
 */
 
 #include "mod2.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "polys.h"
 #include "numbers.h"
 #include "tok.h"

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.24 2000-08-14 12:56:23 obachman Exp $ */
+/* $Id: ipconv.cc,v 1.25 2000-09-18 09:19:04 obachman Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -10,7 +10,7 @@
 #include "tok.h"
 #include "ipid.h"
 #include "intvec.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "febase.h"
 #include "polys.h"
 #include "ideals.h"

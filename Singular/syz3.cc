@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz3.cc,v 1.4 2000-09-12 16:01:23 obachman Exp $ */
+/* $Id: syz3.cc,v 1.5 2000-09-18 09:19:37 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -10,7 +10,7 @@
 #include "mod2.h"
 #include "tok.h"
 #include "attrib.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "polys.h"
 #include "febase.h"
 #include "kstd1.h"
@@ -378,12 +378,12 @@ static void updatePairs(SSet *resPairs,int *l_pairs,syStrategy syzstr,
         {
           if (prs[j1]!=NULL)
           {
-            if (pDivisibleBy2(prs[j1],p))
+            if (pLmDivisibleByNoComp(prs[j1],p))
             {
               pDelete(&p);
               break;
             }
-            else if (pDivisibleBy2(p,prs[j1]))
+            else if (pLmDivisibleByNoComp(p,prs[j1]))
             {
               pDelete(&(prs[j1]));
             }
@@ -700,14 +700,14 @@ static void redOnePair(SSet resPairs,int itso,int l, ideal syzygies,
       poly pp;
       pp = pMult_mm(pCopy(old_repr->m[tso.ind2]),p);
       kBucketInit(syzstr->syz_bucket,pp,-1);
-      pDelete1(&p);
+      pDeleteLm(&p);
       p = pNeg(p);
       pp = pCopy(old_repr->m[tso.ind2]);
       int il=-1;
       while (p!=NULL)
       {
         kBucket_Minus_m_Mult_p(syzstr->syz_bucket,p,pp,&il,NULL);
-        pDelete1(&p);
+        pDeleteLm(&p);
       }
       pDelete(&pp);
       p = pCopy(tso.p2);
@@ -717,7 +717,7 @@ static void redOnePair(SSet resPairs,int itso,int l, ideal syzygies,
       while (p!=NULL)
       {
         kBucket_Minus_m_Mult_p(syzstr->syz_bucket,p,pp,&il,NULL);
-        pDelete1(&p);
+        pDeleteLm(&p);
       }
       pDelete(&pp);
       kBucketClear(syzstr->syz_bucket,&tso.syz,&j);
@@ -1078,12 +1078,12 @@ static void updatePairsHIndex(SSet *resPairs,int *l_pairs,syStrategy syzstr,
         {
           if (prs[j1]!=NULL)
           {
-            if (pDivisibleBy2(prs[j1],p))
+            if (pLmDivisibleByNoComp(prs[j1],p))
             {
               pDelete(&p);
               break;
             }
-            else if (pDivisibleBy2(p,prs[j1]))
+            else if (pLmDivisibleByNoComp(p,prs[j1]))
             {
               pDelete(&(prs[j1]));
             }
@@ -1985,7 +1985,7 @@ syStrategy syKosz(ideal arg,int * length)
           j=0;
           while ((j<IDELEMS(syzstr->fullres[index])) &&
             ((syzstr->fullres[index]->m[j]==NULL) ||
-            (!pEqual(syzstr->fullres[index]->m[j],totake[index]->m[i])))) j++;
+            (!pLmEqual(syzstr->fullres[index]->m[j],totake[index]->m[i])))) j++;
           if (j<IDELEMS(syzstr->fullres[index]))
           {
             pDelete(&totake[index]->m[i]);

@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmgauss.cc,v 1.12 2000-08-14 12:56:13 obachman Exp $
+// $Id: fglmgauss.cc,v 1.13 2000-09-18 09:18:58 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -14,7 +14,7 @@
 #ifdef  HAVE_FACTORY
 #include "structs.h"
 #include "numbers.h"
-#include <omalloc.h>
+#include "omalloc.h"
 
 #include "fglmvec.h"
 #include "fglmgauss.h"

@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_inout.cc,v 1.9 2000-08-14 12:56:40 obachman Exp $ */
+/* $Id: mpr_inout.cc,v 1.10 2000-09-18 09:19:20 obachman Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultant
@@ -21,7 +21,7 @@
 #include "ipid.h"
 #include "ipshell.h"
 #include "febase.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "numbers.h"
 #include "lists.h"
 #include "matpol.h"

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.74 2000-09-04 13:38:57 obachman Exp $ */
+/* $Id: iplib.cc,v 1.75 2000-09-18 09:19:05 obachman Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -15,7 +15,7 @@
 #include "mod2.h"
 #include "tok.h"
 #include "ipid.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "febase.h"
 #include "ring.h"
 #include "subexpr.h"

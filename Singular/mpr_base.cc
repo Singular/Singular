@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.22 2000-09-12 16:01:03 obachman Exp $ */
+/* $Id: mpr_base.cc,v 1.23 2000-09-18 09:19:18 obachman Exp $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -13,7 +13,7 @@
 
 #include "mod2.h"
 
-#include <omalloc.h>
+#include "omalloc.h"
 
 //-> includes
 #include "structs.h"
@@ -2251,7 +2251,7 @@ void resMatrixDense::generateMonomData( int deg, intvec* polyDegs , intvec* iVO 
   {
     divCount= 0;
     for ( k= 0; k < IDELEMS(pDegDiv); k++ )
-      if ( pDivisibleBy2( (pDegDiv->m)[k], resVectorList[j].mon ) )
+      if ( pLmDivisibleByNoComp( (pDegDiv->m)[k], resVectorList[j].mon ) )
         divCount++;
     resVectorList[j].isReduced= (divCount == 1);
   }
@@ -2270,14 +2270,14 @@ void resMatrixDense::generateMonomData( int deg, intvec* polyDegs , intvec* iVO 
       if ( resVectorList[j].elementOfS == SFREE )
       {
         //mprPROTnl("\tfree");
-        if ( pDivisibleBy2( (pDegDiv->m)[ (*iVO)[k] ], resVectorList[j].mon ) )
+        if ( pLmDivisibleByNoComp( (pDegDiv->m)[ (*iVO)[k] ], resVectorList[j].mon ) )
         {
           //mprPROTPnl("\tdivisible by ",(pDegDiv->m)[ (*iVO)[k] ]);
           doInsert=TRUE;
           for ( i= 0; i < k; i++ )
           {
             //mprPROTPnl("\tchecking db ",(pDegDiv->m)[ (*iVO)[i] ]);
-            if ( pDivisibleBy2( (pDegDiv->m)[ (*iVO)[i] ], resVectorList[j].mon ) )
+            if ( pLmDivisibleByNoComp( (pDegDiv->m)[ (*iVO)[i] ], resVectorList[j].mon ) )
             {
               //mprPROTPnl("\t and divisible by",(pDegDiv->m)[ (*iVO)[i] ]);
               doInsert=FALSE;
@@ -2391,11 +2391,11 @@ void resMatrixDense::generateBaseData()
       while ( pi != NULL )
       {
         matEntry= nCopy(pGetCoeff(pi));
-        pmatchPos= pInit( pi );
+        pmatchPos= pLmInit( pi );
         pSetCoeff0( pmatchPos, nInit(1) );
 
         for ( i= 0; i < numVectors; i++)
-          if ( pEqual( pmatchPos, resVectorList[i].mon ) )
+          if ( pLmEqual( pmatchPos, resVectorList[i].mon ) )
             break;
 
         resVectorList[k].numColVector[numVectors - i - 1] = nCopy(matEntry);
@@ -2426,7 +2426,7 @@ void resMatrixDense::generateBaseData()
         pTest( pmp );
 
         for ( i= 0; i < numVectors; i++)
-          if ( pEqual( pmp, resVectorList[i].mon ) )
+          if ( pLmEqual( pmp, resVectorList[i].mon ) )
             break;
 
         resVectorList[k].numColParNr[j]= i;

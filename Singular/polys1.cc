@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.45 2000-09-12 16:01:12 obachman Exp $ */
+/* $Id: polys1.cc,v 1.46 2000-09-18 09:19:30 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -14,7 +14,7 @@
 #include "structs.h"
 #include "tok.h"
 #include "numbers.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "febase.h"
 #include "weight.h"
 #include "intvec.h"
@@ -301,7 +301,7 @@ static poly pTwoMonPower(poly p, int exp)
     res = pNext(res) = h;
     pMonMult(b,tail);
   }
-  pDelete1(&tail);
+  pDeleteLm(&tail);
   pNext(res) = b;
   pNext(b) = NULL;
   res = a[exp];
@@ -312,7 +312,7 @@ static poly pTwoMonPower(poly p, int exp)
 // {
 //   if(nIsZero(pGetCoeff(pNext(tail))))
 //   {
-//     pDelete1(&pNext(tail));
+//     pDeleteLm(&pNext(tail));
 //   }
 //   else
 //     pIter(tail);
@@ -454,12 +454,12 @@ poly pDiff(poly a, int k)
   {
     if (pGetExp(a,k)!=0)
     {
-      f = pInit(a);
+      f = pLmInit(a);
       t = nInit(pGetExp(a,k));
       pSetCoeff0(f,nMult(t,pGetCoeff(a)));
       nDelete(&t);
       if (nIsZero(pGetCoeff(f)))
-        pDelete1(&f);
+        pDeleteLm(&f);
       else
       {
         pDecrExp(f,k);
@@ -492,7 +492,7 @@ static poly pDiffOpM(poly a, poly b,BOOLEAN multiply)
     if (s<pGetExp(a,i))
     {
       nDelete(&n);
-      pDelete1(&p);
+      pDeleteLm(&p);
       return NULL;
     }
     if (multiply)
@@ -652,7 +652,7 @@ poly pISet(int i)
     rc = pInit();
     pSetCoeff0(rc,nInit(i));
     if (nIsZero(pGetCoeff(rc)))
-      pDelete1(&rc);
+      pDeleteLm(&rc);
   }
   return rc;
 }
@@ -1015,7 +1015,7 @@ poly pPermPoly (poly p, int * perm, ring oldRing,
     pSetComp(qq, p_GetComp(p,oldRing));
     if (nIsZero(pGetCoeff(qq)))
     {
-      pDelete1(&qq);
+      pDeleteLm(&qq);
     }
     else
     {
@@ -1041,7 +1041,7 @@ poly pPermPoly (poly p, int * perm, ring oldRing,
           else
           {
             /* this variable maps to 0 !*/
-            pDelete1(&qq);
+            pDeleteLm(&qq);
             break;
           }
         }
@@ -1332,9 +1332,10 @@ BOOLEAN pEqualPolys(poly p1,poly p2)
 {
   while ((p1 != NULL) && (p2 != NULL))
   {
-    /* p1 and p2 are non-NULL, so we may use pLmCmp instead of pComp */
     if (! pLmEqual(p1, p2))
-       return FALSE;
+      return FALSE;
+    if (! nEqual(pGetCoeff(p1), pGetCoeff(p2)))
+      return FALSE;
     pIter(p1);
     pIter(p2);
   }
@@ -1349,8 +1350,9 @@ BOOLEAN pComparePolys(poly p1,poly p2)
 {
   number n,nn;
   int i;
-
-  if (!pEqual(p1,p2)) //compare leading mons
+  pAssume(p1 != NULL && p2 != NULL);
+  
+  if (!pLmEqual(p1,p2)) //compare leading mons
       return FALSE;
   if ((pNext(p1)==NULL) && (pNext(p2)!=NULL))
      return FALSE;
@@ -1361,7 +1363,7 @@ BOOLEAN pComparePolys(poly p1,poly p2)
   n=nDiv(pGetCoeff(p1),pGetCoeff(p2));
   while ((p1 != NULL) /*&& (p2 != NULL)*/)
   {
-    if ( ! pEqual(p1, p2))
+    if ( ! pLmEqual(p1, p2))
     {
         nDelete(&n);
         return FALSE;

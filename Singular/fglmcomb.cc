@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmcomb.cc,v 1.18 2000-09-12 16:00:53 obachman Exp $
+// $Id: fglmcomb.cc,v 1.19 2000-09-18 09:18:57 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -24,7 +24,7 @@
 #include "ipshell.h"
 #include "febase.h"
 #include "maps.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "fglmvec.h"
 #include "fglmgauss.h"
 #include "kstd1.h"
@@ -70,7 +70,7 @@ fglmEliminateMonomials( poly * pptr, fglmVector & v, polyset monomials, int numM
             number newelem = nAdd( pGetCoeff( todelete ), v.getconstelem( point+1 ) );
             v.setelem( point+1, newelem );
             nDelete( & pGetCoeff( todelete ) );
-            pFree( todelete );
+            pLmFree( todelete );
             point++;
         }
         else if ( state < 0 )
@@ -116,8 +116,8 @@ fglmReductionStep( poly * pptr, ideal source, int * w )
         number n2 = pGetCoeff( p2 );
 
         p2= pCopy( p2 );
-        pDelete1(pptr);
-        pDelete1( & p2 );
+        pDeleteLm(pptr);
+        pDeleteLm( & p2 );
         p2= pMult( m, p2 );
 
         number temp = nDiv( n1, n2 );
@@ -190,7 +190,7 @@ fglmNewLinearCombination( ideal source, poly monset )
 //         m[k]= pOne();
 //         pSetExpV( m[k], temp->exp );
 //         pSetm( m[k] );
-        m[k]=pInit(temp);
+        m[k]=pLmInit(temp);
         pSetCoeff( m[k], nInit(1) );
         pIter( temp );
     }
@@ -243,7 +243,7 @@ fglmNewLinearCombination( ideal source, poly monset )
             BOOLEAN found = FALSE;
             for ( b= 0; (b < basisSize) && (found == FALSE); b++ )
             {
-                if ( pEqual( temp, basis[b] ) )
+                if ( pLmEqual( temp, basis[b] ) )
                 {
                     found= TRUE;
                 }
@@ -259,7 +259,7 @@ fglmNewLinearCombination( ideal source, poly monset )
 //                 basis[basisSize]= pOne();
 //                 pSetExpV( basis[basisSize], temp->exp );
 //                 pSetm( basis[basisSize] );
-                basis[basisSize]=pInit(temp);
+                basis[basisSize]=pLmInit(temp);
                 pSetCoeff( basis[basisSize], nInit(1) );
                 basisSize++;
             }
@@ -287,7 +287,7 @@ fglmNewLinearCombination( ideal source, poly monset )
             BOOLEAN found = FALSE;
             int b= 0;
             while ( found == FALSE ) {
-                if ( pEqual( mon, basis[b] ) ) {
+                if ( pLmEqual( mon, basis[b] ) ) {
                     found= TRUE;
                 }
                 else {
@@ -471,7 +471,7 @@ fglmLinearCombination( ideal source, poly monset )
             BOOLEAN found = FALSE;
             int b;
             for ( b= 0; (b < basisSize) && (found == FALSE); b++ )
-                if ( pEqual( sm, basis[b] ) ) found= TRUE;
+                if ( pLmEqual( sm, basis[b] ) ) found= TRUE;
             if ( found == FALSE ) {
                 // Expand the basis
                 if ( basisSize == basisMax ) {
@@ -503,7 +503,7 @@ fglmLinearCombination( ideal source, poly monset )
             BOOLEAN found = FALSE;
             int b= 0;
             while ( found == FALSE ) {
-                if ( pEqual( mon, basis[b] ) )
+                if ( pLmEqual( mon, basis[b] ) )
                     found= TRUE;
                 else
                     b++;

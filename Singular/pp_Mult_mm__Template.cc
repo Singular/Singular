@@ -6,7 +6,7 @@
  *  Purpose: template for p_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pp_Mult_mm__Template.cc,v 1.2 2000-09-12 16:01:12 obachman Exp $
+ *  Version: $Id: pp_Mult_mm__Template.cc,v 1.3 2000-09-18 09:19:31 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -19,6 +19,8 @@
  ***************************************************************/
 poly pp_Mult_mm(poly p, const poly m, const poly spNoether, const ring ri)
 {
+  p_Test(p, ri);
+  p_LmTest(p, ri);
   if (p == NULL) return NULL;
   spolyrec rp;
   poly q = &rp, r;
@@ -26,15 +28,15 @@ poly pp_Mult_mm(poly p, const poly m, const poly spNoether, const ring ri)
   omBin bin = ri->PolyBin;
   DECLARE_LENGTH(const unsigned long length = ri->ExpLSize);
   const unsigned long* m_e = m->exp;
-  assume(!p_nIsZero(ln,r));
+  pAssume(!n_IsZero(ln,r));
 
   if (spNoether == NULL)
   {
     do
     {
-      omTypeAllocBin(poly, pNext(q), bin);
+      p_AllocBin( pNext(q), bin, ri);
       q = pNext(q);
-      pSetCoeff0(q, p_nMult(ln, pGetCoeff(p), ri));
+      pSetCoeff0(q, n_Mult(ln, pGetCoeff(p), ri));
       p_MemSum(q->exp, p->exp, m_e, length);
       p = pNext(p);
     }
@@ -45,21 +47,22 @@ poly pp_Mult_mm(poly p, const poly m, const poly spNoether, const ring ri)
     poly r;
     while (p != NULL)
     {
-      omTypeAllocBin(poly, r, bin);
+      p_AllocBin( r, bin, ri);
       p_MemSum(r->exp, p->exp, m_e, length);
 
       if (p_LmCmp(r, spNoether, ri) == -1)
       {
-        omFreeBinAddr(r);
+        p_FreeBinAddr(r, ri);
         break;
       }
       q = pNext(q) = r;
-      pSetCoeff0(q, p_nMult(ln, pGetCoeff(p), ri));
+      pSetCoeff0(q, n_Mult(ln, pGetCoeff(p), ri));
       pIter(p);
     }
   }
   pNext(q) = NULL;
-
+  
+  p_Test(pNext(&rp), ri);
   return pNext(&rp);
 }
 

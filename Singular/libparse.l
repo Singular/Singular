@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.41 2000-09-04 13:39:00 obachman Exp $ */
+/* $Id: libparse.l,v 1.42 2000-09-18 09:19:11 obachman Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -19,7 +19,7 @@
   #include "ipid.h"
   #include "tok.h"
   #include "febase.h"
-  #include <omalloc.h>
+  #include "omalloc.h"
 #endif
 #include "libparse.h"
 

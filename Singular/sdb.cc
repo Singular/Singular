@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sdb.cc,v 1.14 2000-08-14 12:56:49 obachman Exp $ */
+/* $Id: sdb.cc,v 1.15 2000-09-18 09:19:33 obachman Exp $ */
 /*
 * ABSTRACT: Singular debugger
 */
@@ -10,7 +10,7 @@
 #include <sys/wait.h> // for wait
 #include "mod2.h"
 #include "tok.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "febase.h"
 #include "ipshell.h"
 #include "ipid.h"

@@ -6,13 +6,13 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.2 2000-09-14 13:04:38 obachman Exp $
+ *  Version: $Id: pInline1.h,v 1.3 2000-09-18 09:19:24 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H
 
 #ifndef PDIV_DEBUG
-// define to enable debugging/statistics of pShortDivisibleBy
+// define to enable debugging/statistics of pLmShortDivisibleBy
 #undef PDIV_DEBUG
 #endif
 
@@ -42,7 +42,7 @@ while(0)
 #endif
 
 #ifdef PDIV_DEBUG
-BOOLEAN pDebugShortDivisibleBy(poly p1, unsigned long sev_1, ring r_1,
+BOOLEAN pDebugLmShortDivisibleBy(poly p1, unsigned long sev_1, ring r_1,
                                poly p2, unsigned long not_sev_2, ring r_2);
 #endif
 
@@ -50,7 +50,7 @@ BOOLEAN pDebugShortDivisibleBy(poly p1, unsigned long sev_1, ring r_1,
 
 #include "omalloc.h"
 #include "numbers.h"
-#include "polys.h"
+#include "p_polys.h"
 #include "p_MemAdd.h"
 #include "p_MemCopy.h"
 
@@ -67,23 +67,16 @@ PINLINE1 poly p_Init(ring r)
   p_SetRingOfPoly(p, r);
   return p;
 }
-PINLINE1 poly p_Init(poly p, ring r)
+PINLINE1 poly p_LmInit(poly p, ring r)
 {
   p_CheckPolyRing1(p, r);
   poly np;
   omTypeAllocBin(poly, np, r->PolyBin);
+  p_SetRingOfPoly(np, r);
   p_ExpVectorCopy(np, p, r);
   _pNext(np) = NULL;
   _pSetCoeff0(np, NULL);
   return np;
-}
-PINLINE1 poly pInit()
-{
-  return p_Init(currRing);
-}
-PINLINE1 poly pInit(poly p)
-{
-  return p_Init(p, currRing);
 }
 PINLINE1 poly p_Head(poly p, ring r)
 {
@@ -91,9 +84,10 @@ PINLINE1 poly p_Head(poly p, ring r)
   p_CheckPolyRing1(p, r);
   poly np;
   omTypeAllocBin(poly, np, r->PolyBin);
+  p_SetRingOfPoly(np, r);
   p_ExpVectorCopy(np, p, r);
   _pNext(np) = NULL;
-  _pSetCoeff0(np, p_nCopy(_pGetCoeff(p), r));
+  _pSetCoeff0(np, n_Copy(_pGetCoeff(p), r));
   return np;
 }
 
@@ -230,29 +224,13 @@ PINLINE1 int p_LmCmp(poly p, poly q, ring r)
                                     return 0, return 1, return -1);
 }
 
-PINLINE1 BOOLEAN p_LmEqual(poly p, poly q, ring r)
-{
-  p_CheckPolyRing1(p, r);
-  p_CheckPolyRing1(q, r);
-  int i = r->ExpLSize;
-  unsigned long *ep = p->exp;
-  unsigned long *eq = q->exp;
-
-  do
-  {
-    i--;
-    if (ep[i] != eq[i]) return FALSE;
-  }
-  while (i);
-  return p_nEqual(pGetCoeff(p), pGetCoeff(q), r);
-}
 
 /***************************************************************
  *
  * divisibility
  *
  ***************************************************************/
-static inline BOOLEAN _p_DivisibleBy2(poly a, poly b, ring r)
+static inline BOOLEAN _p_LmDivisibleByNoComp(poly a, poly b, ring r)
 {
   int i=r->N;
 
@@ -265,7 +243,7 @@ static inline BOOLEAN _p_DivisibleBy2(poly a, poly b, ring r)
   while (i);
   return TRUE;
 }
-static inline BOOLEAN _p_DivisibleBy2(poly a, ring r_a, poly b, ring r_b)
+static inline BOOLEAN _p_LmDivisibleByNoComp(poly a, ring r_a, poly b, ring r_b)
 {
   int i=r_a->N;
   pAssume1(r_a->N == r_b->N);
@@ -279,44 +257,48 @@ static inline BOOLEAN _p_DivisibleBy2(poly a, ring r_a, poly b, ring r_b)
   while (i);
   return TRUE;
 }
-static inline BOOLEAN _p_DivisibleBy1(poly a, poly b, ring r)
+static inline BOOLEAN _p_LmDivisibleBy(poly a, poly b, ring r)
 {
   if (p_GetComp(a, r) == 0 || p_GetComp(a,r) == p_GetComp(b,r))
-    return _p_DivisibleBy2(a, b, r);
+    return _p_LmDivisibleByNoComp(a, b, r);
   return FALSE;
 }
-static inline BOOLEAN _p_DivisibleBy1(poly a, ring r_a, poly b, ring r_b)
+static inline BOOLEAN _p_LmDivisibleBy(poly a, ring r_a, poly b, ring r_b)
 {
   if (p_GetComp(a, r_a) == 0 || p_GetComp(a,r_a) == p_GetComp(b,r_b))
-    return _p_DivisibleBy2(a, r_a, b, r_b);
+    return _p_LmDivisibleByNoComp(a, r_a, b, r_b);
   return FALSE;
 }
-
-PINLINE1 BOOLEAN p_DivisibleBy2(poly a, poly b, ring r)
+PINLINE1 BOOLEAN p_LmDivisibleByNoComp(poly a, poly b, ring r)
 {
   p_CheckPolyRing1(a, r);
   p_CheckPolyRing1(b, r);
-  return _p_DivisibleBy2(a, b, r);
+  return _p_LmDivisibleByNoComp(a, b, r);
 }
-PINLINE1 BOOLEAN p_DivisibleBy1(poly a, poly b, ring r)
+PINLINE1 BOOLEAN p_LmDivisibleBy(poly a, poly b, ring r)
 {
   p_CheckPolyRing1(b, r);
   pIfThen1(a != NULL, p_CheckPolyRing1(b, r));
   if (p_GetComp(a, r) == 0 || p_GetComp(a,r) == p_GetComp(b,r))
-    return _p_DivisibleBy2(a, b, r);
+    return _p_LmDivisibleByNoComp(a, b, r);
   return FALSE;
 }
 PINLINE1 BOOLEAN p_DivisibleBy(poly a, poly b, ring r)
 {
-  p_CheckPolyRing1(b, r);
+  pIfThen1(b!=NULL, p_CheckPolyRing1(b, r));
   pIfThen1(a!=NULL, p_CheckPolyRing1(a, r));
   
   if (a != NULL && (p_GetComp(a, r) == 0 || p_GetComp(a,r) == p_GetComp(b,r)))
-    return _p_DivisibleBy2(a,b,r);
+    return _p_LmDivisibleByNoComp(a,b,r);
   return FALSE;
 }
-
-PINLINE1 BOOLEAN p_ShortDivisibleBy(poly a, unsigned long sev_a, 
+PINLINE1 BOOLEAN p_LmDivisibleBy(poly a, ring r_a, poly b, ring r_b)
+{
+  p_CheckPolyRing(a, r_a);
+  p_CheckPolyRing(b, r_b);
+  return _p_LmDivisibleBy(a, r_a, b, r_b);
+}
+PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a, 
                                     poly b, unsigned long not_sev_b, ring r)
 {
   p_CheckPolyRing1(a, r);
@@ -327,16 +309,16 @@ PINLINE1 BOOLEAN p_ShortDivisibleBy(poly a, unsigned long sev_a,
   
   if (sev_a & not_sev_b) 
   {
-    pAssume1(p_DivisibleBy2(a, b, r) == FALSE);
+    pAssume1(p_LmDivisibleByNoComp(a, b, r) == FALSE);
     return FALSE;
   }
-  return p_DivisibleBy1(a, b, r);
+  return p_LmDivisibleBy(a, b, r);
 #else
-  return pDebugShortDivisibleBy(a, sev_a, r, b, not_sev_b, r);
+  return pDebugLmShortDivisibleBy(a, sev_a, r, b, not_sev_b, r);
 #endif
 }
 
-PINLINE1 BOOLEAN p_ShortDivisibleBy(poly a, unsigned long sev_a, ring r_a,
+PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a, ring r_a,
                                     poly b, unsigned long not_sev_b, ring r_b)
 {
   p_CheckPolyRing1(a, r_a);
@@ -347,12 +329,12 @@ PINLINE1 BOOLEAN p_ShortDivisibleBy(poly a, unsigned long sev_a, ring r_a,
   
   if (sev_a & not_sev_b) 
   {
-    pAssume1(_p_DivisibleBy2(a, r_a, b, r_b) == FALSE);
+    pAssume1(_p_LmDivisibleByNoComp(a, r_a, b, r_b) == FALSE);
     return FALSE;
   }
-  return _p_DivisibleBy1(a, r_a, b, r_b);
+  return _p_LmDivisibleBy(a, r_a, b, r_b);
 #else
-  return pDebugShortDivisibleBy(a, sev_a, r_a, b, not_sev_b, r_b);
+  return pDebugLmShortDivisibleBy(a, sev_a, r_a, b, not_sev_b, r_b);
 #endif
 }
 

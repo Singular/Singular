@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.7 2000-09-12 16:00:58 obachman Exp $ */
+/* $Id: kspoly.cc,v 1.8 2000-09-18 09:19:07 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -9,6 +9,7 @@
 #include "kutil.h"
 #include "polys.h"
 #include "numbers.h"
+#include "p_Procs.h"
 
 // Define to enable tests in this file 
 #define DEBUG_THIS
@@ -46,7 +47,7 @@ void ksReducePoly(LObject* PR,
 
   if (a2==NULL)
   {
-    pDelete1(&lm);
+    pDeleteLm(&lm);
     PR->p = p1;
     if (coef != NULL) *coef = nInit(1);
     return;
@@ -73,9 +74,9 @@ void ksReducePoly(LObject* PR,
   pExpVectorSub(lm, p2);
   int dummy;
   PR->p = currRing->p_Procs->p_Minus_mm_Mult_qq(p1, lm, a2, 
-                                                 dummy, spNoether, currRing);
+                                                dummy, spNoether, currRing);
 
-  pDelete1(&lm);
+  pDeleteLm(&lm);
 }
 
 /***************************************************************
@@ -147,8 +148,8 @@ void ksCreateSpoly(LObject* Pair,
                                                   currRing);
   
   // Clean-up time
-  pDelete1(&m1);
-  pDelete1(&m2);
+  pDeleteLm(&m1);
+  pDeleteLm(&m2);
   
   if (co != 0)
   {
@@ -372,13 +373,13 @@ x1:
     {
       if(cm==1)
       {
-        pFree(m2);
+        pLmFree(m2);
         nNew(&(pGetCoeff(m1)));
         return m1;
       }
       else
       {
-        pFree(m1);
+        pLmFree(m1);
         nNew(&(pGetCoeff(m2)));
         return m2;
       }
@@ -390,7 +391,7 @@ x1:
     nDelete(&t1);
     if (!equal)
     {
-      pFree(m2);
+      pLmFree(m2);
       nNew(&(pGetCoeff(m1)));
       return m1;
     }
@@ -398,17 +399,17 @@ x1:
     pIter(a2);
     if (a2==NULL)
     {
-      pFree(m2);
+      pLmFree(m2);
       if (a1==NULL)
       {
-        pFree(m1);
+        pLmFree(m1);
         return NULL;
       }
       goto x1;
     }
     if (a1==NULL)
     {
-      pFree(m1);
+      pLmFree(m1);
       goto x2;
     }
   }

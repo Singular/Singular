@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmvec.cc,v 1.13 2000-08-14 12:56:15 obachman Exp $
+// $Id: fglmvec.cc,v 1.14 2000-09-18 09:18:58 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -15,7 +15,7 @@
 #include "mod2.h"
 
 #ifdef HAVE_FGLM
-#include <omalloc.h>
+#include "omalloc.h"
 #include "tok.h"
 #include "structs.h"
 #include "numbers.h"

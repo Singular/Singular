@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.30 2000-08-14 12:56:36 obachman Exp $ */
+/* $Id: longrat.cc,v 1.31 2000-09-18 09:19:13 obachman Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -10,7 +10,7 @@
 #include <float.h>
 #include "mod2.h"
 #include "tok.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "febase.h"
 #include "numbers.h"
 #include "modulop.h"

@@ -6,7 +6,7 @@
  *  Purpose: template for p_Add_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Add_q__Template.cc,v 1.2 2000-09-12 16:01:05 obachman Exp $
+ *  Version: $Id: p_Add_q__Template.cc,v 1.3 2000-09-18 09:19:25 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -18,9 +18,9 @@
  ***************************************************************/
 poly p_Add_q(poly p, poly q, int &Shorter, const ring r)
 {
-  pTest(p);
-  pTest(q);
-#ifdef PDEBUG
+  p_Test(p, r);
+  p_Test(q, r);
+#if PDEBUG > 0
   int l = pLength(p) + pLength(q);
 #endif
   
@@ -37,21 +37,21 @@ poly p_Add_q(poly p, poly q, int &Shorter, const ring r)
   DECLARE_ORDSGN(const long* ordsgn = r->ordsgn);
 
   Top:     // compare p and q w.r.t. monomial ordering
-  p_MemCmp(p->exp, q->exp, length, ordsgn, goto Equal, goto Greater , goto Smaller );
+  p_MemCmp(p->exp, q->exp, length, ordsgn, goto Equal, goto Greater , goto Smaller);
 
   Equal:
   n1 = pGetCoeff(p);
   n2 = pGetCoeff(q);
-  t = p_nAdd(n1,n2, r);
-  p_nDelete(&n1, r);
-  p_nDelete(&n2, r);
-  FreeAndAdvance(q);
+  t = n_Add(n1,n2, r);
+  n_Delete(&n1, r);
+  n_Delete(&n2, r);
+  q = p_LmFreeAndNext(q, r);
   
-  if (p_nIsZero(t, r))
+  if (n_IsZero(t, r))
   {
     shorter += 2;
-    p_nDelete(&t, r);
-    FreeAndAdvance(p);
+    n_Delete(&t, r);
+    p = p_LmFreeAndNext(p, r);
   }
   else
   {
@@ -80,9 +80,9 @@ poly p_Add_q(poly p, poly q, int &Shorter, const ring r)
   Finish:
   Shorter = shorter;
 
-  pTest(pNext(&rp));
-#ifdef PDEBUG  
-  assume(l - pLength(pNext(&rp)) == Shorter);
+  p_Test(pNext(&rp), r);
+#if PDEBUG > 0
+  pAssume1(l - pLength(pNext(&rp)) == Shorter);
 #endif  
   return pNext(&rp);
 }

@@ -6,7 +6,7 @@
  *  Purpose: template for p_Minus_m_Mult_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Minus_mm_Mult_qq__Template.cc,v 1.2 2000-09-12 16:01:06 obachman Exp $
+ *  Version: $Id: p_Minus_mm_Mult_qq__Template.cc,v 1.3 2000-09-18 09:19:26 obachman Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -19,20 +19,26 @@
  ***************************************************************/
 poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly spNoether, const ring r)
 {
-  pTest(p);
-  pTest(q);
+  p_Test(p, r);
+  p_Test(q, r);
+  p_LmTest(m, r);
+
+#if PDEBUG > 0
+  int l_debug = pLength(p) + pLength(q);
+#endif
+
   Shorter = 0;
   // we are done if q == NULL || m == NULL
   if (q == NULL || m == NULL) return p;
   
   spolyrec rp;
-  poly a = &rp,                       // collects the result
+  poly a = &rp,                    // collects the result
     qm = NULL,                     // stores q*m
     c;                             // used for temporary storage
 
 
   number tm   = pGetCoeff(m),           // coefficient of m
-    tneg = p_nNeg(p_nCopy(tm, r), r),    // - (coefficient of m)
+    tneg = n_Neg(n_Copy(tm, r), r),    // - (coefficient of m)
     tb,                            // used for tm*coeff(a1)
     tc;                            // used as intermediate number
 
@@ -46,23 +52,24 @@ poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly spNoeth
   
   if (p == NULL) goto Finish;           // return tneg*q if (p == NULL)
   
-  omTypeAllocBin(poly, qm, bin);
-  assume(pGetComp(q) == 0 || pGetComp(m) == 0);
+  pAssume(p_GetComp(q, r) == 0 || p_GetComp(m, r) == 0);
+
+  AllocTop:
+  p_AllocBin(qm, bin, r);
+  SumTop:
   p_MemSum(qm->exp, q->exp, m_e, length);
-  
-  // MAIN LOOP:
-  Top:     
+  CmpTop:     
   // compare qm = m*q and p w.r.t. monomial ordering
   p_MemCmp(qm->exp, p->exp, length, ordsgn, goto Equal, goto Greater, goto Smaller );
   
   Equal:   // qm equals p
-  tb = p_nMult(pGetCoeff(q), tm, r);
+  tb = n_Mult(pGetCoeff(q), tm, r);
   tc = pGetCoeff(p);
-  if (!p_nEqual(tc, tb, r))
+  if (!n_Equal(tc, tb, r))
   {
     shorter++;
-    tc = p_nSub(tc, tb, r);
-    p_nDelete(&(pGetCoeff(p)), r);
+    tc = n_Sub(tc, tb, r);
+    n_Delete(&(pGetCoeff(p)), r);
     pSetCoeff0(p,tc); // adjust coeff of p
     a = pNext(a) = p; // append p to result and advance p
     pIter(p);
@@ -70,19 +77,18 @@ poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly spNoeth
   else
   { // coeffs are equal, so their difference is 0: 
     shorter += 2;
-    p_nDelete(&tc, r);
-    FreeAndAdvance(p);
+    n_Delete(&tc, r);
+    p = p_LmFreeAndNext(p, r);
   }
-  p_nDelete(&tb, r);
+  n_Delete(&tb, r);
   pIter(q);
   if (q == NULL || p == NULL) goto Finish; // are we done ?
   // no, so update qm
-  p_MemSum(qm->exp, q->exp, m_e, length);
-  goto Top;
-
+  goto SumTop;
+  
 
   Greater:
-  pSetCoeff0(qm, p_nMult(pGetCoeff(q), tneg, r));
+  pSetCoeff0(qm, n_Mult(pGetCoeff(q), tneg, r));
   a = pNext(a) = qm;       // append qm to result and advance q
   pIter(q);
   if (q == NULL) // are we done?
@@ -91,19 +97,16 @@ poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly spNoeth
     goto Finish; 
   }
   // construct new qm 
-  omTypeAllocBin(poly, qm, bin);
-  p_MemSum(qm->exp, q->exp, m_e, length);
-  goto Top;
+  goto AllocTop;
     
   Smaller:     
   a = pNext(a) = p;// append p to result and advance p
   pIter(p);
   if (p == NULL) goto Finish;;
-  goto Top;
+  goto CmpTop;
  
 
   Finish: // q or p is NULL: Clean-up time
-
   if (q == NULL) // append rest of p to result
     pNext(a) = p;
   else  // append (- m*q) to result
@@ -113,9 +116,9 @@ poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly spNoeth
     pSetCoeff0(m, tm);
   }
    
-  p_nDelete(&tneg, r);
-  if (qm != NULL) omFreeBinAddr(qm);
+  n_Delete(&tneg, r);
+  if (qm != NULL) p_FreeBinAddr(qm, r);
   Shorter = shorter;
-  pTest(pNext(&rp));
+  p_Test(pNext(&rp), r);
   return pNext(&rp);
 } 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.37 2000-08-14 12:56:53 obachman Exp $ */
+/* $Id: syz.cc,v 1.38 2000-09-18 09:19:35 obachman Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -10,7 +10,7 @@
 
 #include "mod2.h"
 #include "tok.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "polys.h"
 #include "febase.h"
 #include "kstd1.h"

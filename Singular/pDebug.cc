@@ -6,7 +6,7 @@
  *  Purpose: implementation of debug related poly routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pDebug.cc,v 1.3 2000-09-14 14:20:44 obachman Exp $
+ *  Version: $Id: pDebug.cc,v 1.4 2000-09-18 09:19:23 obachman Exp $
  *******************************************************************/
 
 #ifndef PDEBUG_CC
@@ -17,10 +17,11 @@
 #include "mod2.h"
 #ifdef PDEBUG
 
-#include "polys.h"
+#include "p_polys.h"
 #include "febase.h"
 #include "omalloc.h"
 #include "ring.h"
+#include "numbers.h"
 
 
 /***************************************************************
@@ -67,7 +68,8 @@ BOOLEAN p_CheckIsFromRing(poly p, ring r)
     void* custom = omGetCustomOfAddr(p);
     if (custom != NULL)
     {
-      pPolyAssumeReturn(custom == r);
+      pPolyAssumeReturnMsg(custom == r || rEqual((ring) custom, r, FALSE), 
+                           "monomial not from specified ring");
       return TRUE;
     }
     else
@@ -100,14 +102,14 @@ BOOLEAN p_CheckRing(ring r)
 static int pDivisibleBy_number = 1;
 static int pDivisibleBy_FALSE = 1;
 static int pDivisibleBy_ShortFalse = 1;
-BOOLEAN pDebugShortDivisibleBy(poly p1, unsigned long sev_1, ring r_1,
+BOOLEAN pDebugLmShortDivisibleBy(poly p1, unsigned long sev_1, ring r_1,
                                poly p2, unsigned long not_sev_2, ring r_2)
 {
   _pPolyAssume(p_GetShortExpVector(p1, r_1) == sev_1, p1, r_1);
   _pPolyAssume(p_GetShortExpVector(p2, r_2) == ~ not_sev_2, p2, r_2);
 
   pDivisibleBy_number++;
-  BOOLEAN ret = _p_DivisibleBy1(p1, r_1, p2, r_2);
+  BOOLEAN ret = p_LmDivisibleBy(p1, r_1, p2, r_2);
   if (! ret) pDivisibleBy_FALSE++;
   if (sev_1 & not_sev_2)
   {
@@ -204,17 +206,17 @@ BOOLEAN _p_Test(poly p, ring r, int level)
     pPolyAssumeReturnMsg(ismod == (p_GetComp(p, r) > 0), "mixed poly/vector");
 
     // special check for ringorder_s/S
-    if (currRing->order[1] == ringorder_S)
+    if (r->order[1] == ringorder_S)
     {
       long c1, cc1, ccc1, ec1;
-      sro_ord* o = &(currRing->typ[1]);
+      sro_ord* o = &(r->typ[1]);
 
-      c1 = pGetComp(p);
+      c1 = p_GetComp(p, r);
       cc1 = o->data.syzcomp.Components[c1];
       ccc1 = o->data.syzcomp.ShiftedComponents[cc1];
       pPolyAssumeReturnMsg(c1 == 0 || cc1 != 0, "Component <-> TrueComponent zero mismatch");
       pPolyAssumeReturnMsg(c1 == 0 || ccc1 != 0,"Component <-> ShiftedComponent zero mismatch");
-      ec1 = p->exp[currRing->typ[1].data.syzcomp.place];
+      ec1 = p->exp[r->typ[1].data.syzcomp.place];
       pPolyAssumeReturnMsg(ec1 == ccc1, "Shifted comp out of sync. should %d, is %d");
     }
     
@@ -223,7 +225,7 @@ BOOLEAN _p_Test(poly p, ring r, int level)
     {
       poly p_should_equal = p_DebugInit(p, r, r);
       pPolyAssumeReturnMsg(p_ExpVectorEqual(p, p_should_equal, r), "p_Setm field(s) out of sync");
-      p_Free(p_should_equal, r);
+      p_LmFree(p_should_equal, r);
     }
     
     // check order
@@ -279,7 +281,7 @@ BOOLEAN _pp_Test(poly p, ring lmRing, ring tailRing, int level)
     poly tail = p_DebugInit(pNext(p), lmRing, tailRing);
     poly pnext = pNext(lm);
     pNext(lm) = tail;
-    BOOLEAN cmp = p_LmCmp(lm, tail);
+    BOOLEAN cmp = p_LmCmp(lm, tail, lmRing);
     if (cmp != 1)
       dPolyReportError(lm, lmRing, "wrong order: lm <= Lm(tail)");
     pNext(lm) = pnext;

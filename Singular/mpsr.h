@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr.h,v 1.18 2000-08-14 12:56:41 obachman Exp $ */
+/* $Id: mpsr.h,v 1.19 2000-09-18 09:19:21 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr.h
@@ -25,7 +25,7 @@ extern "C"
 #include"MPT.h"
 #include"structs.h"
 #include"subexpr.h"
-#include<omalloc.h>
+#include"omalloc.h"
 #include"polys.h"
 #include"numbers.h"
 #include"ring.h"

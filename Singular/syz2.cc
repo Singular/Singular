@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz2.cc,v 1.17 2000-09-12 16:01:22 obachman Exp $ */
+/* $Id: syz2.cc,v 1.18 2000-09-18 09:19:37 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -9,7 +9,7 @@
 
 #include "mod2.h"
 #include "tok.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "syz.h"
 #include "polys.h"
 #include "febase.h"
@@ -131,13 +131,13 @@ static void syCreateNewPairs_Hilb(syStrategy syzstr, int index,
             { 
               if (nP->m[j]!=NULL)
               {
-                if (pDivisibleBy2(nP->m[j],p))
+                if (pLmDivisibleByNoComp(nP->m[j],p))
                 {
                   pDelete(&p);
                   p = NULL;
                   break;
                 }
-                else if (pDivisibleBy2(p,nP->m[j]))
+                else if (pLmDivisibleByNoComp(p,nP->m[j]))
                 {
                   pDelete(&(nP->m[j]));
                   nP->m[j] = NULL;
@@ -359,7 +359,7 @@ static intvec* syLinStrat2(SSet nextPairs, syStrategy syzstr,
       if (o_r->m[l]!=NULL)
       {
         isDivisible = isDivisible ||
-          pDivisibleBy1(o_r->m[l],tso.lcm);
+          pLmDivisibleBy(o_r->m[l],tso.lcm);
       }
       l++;
     }
@@ -422,7 +422,7 @@ static poly syRed_Hilb(poly toRed,syStrategy syzstr,int index)
     i = 0;
     loop
     {
-      if (pDivisibleBy1(redWith->m[i],q))
+      if (pLmDivisibleBy(redWith->m[i],q))
       {
         number up = kBucketPolyRed(syzstr->bucket,redWith->m[i],
                          pLength(redWith->m[i]), NULL);
@@ -614,7 +614,7 @@ Print("sPoly: ");poly_write(tso.p);
         j = 0;
         while (j<kres) 
         {
-          if ((redset[j].p!=NULL) && (pDivisibleBy1(redset[j].p,q)) 
+          if ((redset[j].p!=NULL) && (pLmDivisibleBy(redset[j].p,q)) 
               && ((redset[j].ind1!=tso.ind1) || (redset[j].ind2!=tso.ind2)))
           {
 #ifdef SHOW_RED

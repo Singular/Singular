@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.16 2000-08-14 12:56:39 obachman Exp $ */
+/* $Id: modulop.cc,v 1.17 2000-09-18 09:19:18 obachman Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -11,7 +11,7 @@
 #include "mod2.h"
 #include "tok.h"
 #include "febase.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "numbers.h"
 #include "longrat.h"
 #include "ring.h"

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.116 2000-09-13 13:43:44 Singular Exp $ */
+/* $Id: ring.cc,v 1.117 2000-09-18 09:19:31 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -11,7 +11,7 @@
 #include <math.h>
 #include "mod2.h"
 #include "structs.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "tok.h"
 #include "ipid.h"
 #include "polys.h"

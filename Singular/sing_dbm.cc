@@ -4,7 +4,7 @@
 
 //**************************************************************************/
 //
-// $Id: sing_dbm.cc,v 1.13 2000-08-14 12:56:50 obachman Exp $
+// $Id: sing_dbm.cc,v 1.14 2000-09-18 09:19:33 obachman Exp $
 //
 //**************************************************************************/
 //  'sing_dbm.cc' containes command to handle dbm-files under
@@ -22,7 +22,7 @@
 
 #  include "tok.h"
 #  include "febase.h"
-#  include <omalloc.h>
+#  include "omalloc.h"
 #  include "ipid.h"
 #  include "silink.h"
 #  include "sing_dbm.h"

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.14 2000-09-14 13:04:38 obachman Exp $ */
+/* $Id: numbers.h,v 1.15 2000-09-18 09:19:23 obachman Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
@@ -12,15 +12,6 @@
 /* typedefs */
 /*typedef void (*numberproc)(number a,number b,number * c);*/
 /*typedef number (*numberfunc)(number a,number b);*/
-
-#define p_nCopy(n, r)          nCopy(n)
-#define p_nDelete(n, r)        nDelete(n)
-#define p_nMult(n1, n2, r)     nMult(n1, n2)
-#define p_nAdd(n1, n2, r)      nAdd(n1, n2)
-#define p_nIsZero(n, r)	       nIsZero(n)
-#define p_nEqual(n1, n2, r)    nEqual(n1, n2)
-#define p_nNeg(n, r)	       nNeg(n)
-#define p_nSub(n1, n2, r)      nSub(n1, n2)
 
 #define n_Copy(n, r)          nCopy(n)
 #define n_Delete(n, r)        nDelete(n)

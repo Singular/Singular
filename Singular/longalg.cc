@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.42 2000-09-12 16:01:01 obachman Exp $ */
+/* $Id: longalg.cc,v 1.43 2000-09-18 09:19:12 obachman Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -11,7 +11,7 @@
 #include "mod2.h"
 #include "structs.h"
 #include "tok.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "febase.h"
 #include "longrat.h"
 #include "modulop.h"

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: weight0.c,v 1.6 2000-08-14 12:56:57 obachman Exp $ */
+/* $Id: weight0.c,v 1.7 2000-09-18 09:19:39 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -10,7 +10,7 @@
 #include <math.h>
 #include <string.h>
 #include "mod2.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "tok.h"
 
 double wFunctionalMora(int *degw, int *lpol, int npol,

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.29 2000-09-14 15:06:33 obachman Exp $ */
+/* $Id: feResource.cc,v 1.30 2000-09-18 09:18:55 obachman Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -13,7 +13,7 @@
 #include "distrib.h"
 #include "dError.h"
 #if !defined(ESINGULAR) && !defined(TSINGULAR)
-#include <omalloc.h>
+#include "omalloc.h"
 #include "febase.h"
 #else
 #include "dError.c"

@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.28 2000-09-12 16:01:03 obachman Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.29 2000-09-18 09:19:22 obachman Exp $ */
 
 /***************************************************************
  *
@@ -20,7 +20,7 @@
 #include "mpsr_Get.h"
 
 #include "gmp.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "tok.h"
 #include "ipid.h"
 #include "ring.h"
@@ -568,7 +568,7 @@ mpsr_Status_t mpsr_GetRingAnnots(MPT_Node_pt node, ring &r,
       mpsr_SetCurrRing(r, TRUE);
       minpoly = maIMap(subring, minpoly);
       r->minpoly = minpoly->coef;
-      pFree(minpoly);
+      pLmFree(minpoly);
     }
     rKill(subring);
   }

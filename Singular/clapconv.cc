@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.26 2000-08-14 12:55:55 obachman Exp $
+// $Id: clapconv.cc,v 1.27 2000-09-18 09:18:53 obachman Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -10,7 +10,7 @@
 
 #include "mod2.h"
 #ifdef HAVE_FACTORY
-#include <omalloc.h>
+#include "omalloc.h"
 #include "tok.h"
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include "clapconv.h"

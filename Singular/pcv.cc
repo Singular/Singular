@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.30 2000-09-12 16:01:08 obachman Exp $ */
+/* $Id: pcv.cc,v 1.31 2000-09-18 09:19:28 obachman Exp $ */
 /*
 * ABSTRACT: conversion between polys and coef vectors
 */
@@ -243,7 +243,7 @@ poly pcvN2M(int n)
   }
   else
   {
-    pDelete1(&m);
+    pDeleteLm(&m);
     return NULL;
   }
 }
@@ -438,7 +438,7 @@ lists pcvBasis(int d0,int d1)
   poly m=pOne();
   for(int d=d0,i=0;d<d1;d++)
     i=pcvBasis(b,i,m,d,1);
-  pDelete1(&m);
+  pDeleteLm(&m);
   return b;
 }
 

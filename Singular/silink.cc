@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.35 2000-08-14 12:56:49 obachman Exp $ */
+/* $Id: silink.cc,v 1.36 2000-09-18 09:19:33 obachman Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -11,7 +11,7 @@
 #include <string.h>
 #include "mod2.h"
 #include "tok.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "febase.h"
 #include "subexpr.h"
 #include "ipid.h"

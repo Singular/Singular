@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hilb.cc,v 1.14 2000-08-14 12:56:19 obachman Exp $ */
+/* $Id: hilb.cc,v 1.15 2000-09-18 09:19:00 obachman Exp $ */
 /*
 *  ABSTRACT -  Hilbert series
 */
@@ -9,7 +9,7 @@
 #include "mod2.h"
 #include "tok.h"
 #include "febase.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "polys.h"
 #include "intvec.h"
 #include "hutil.h"

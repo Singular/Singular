@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hutil.cc,v 1.15 2000-08-14 12:56:19 obachman Exp $ */
+/* $Id: hutil.cc,v 1.16 2000-09-18 09:19:01 obachman Exp $ */
 /*
 * ABSTRACT: Utilities for staircase operations
 */
@@ -9,7 +9,7 @@
 #include "mod2.h"
 #include "tok.h"
 #include "febase.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "ipid.h"
 #include "ideals.h"
 #include "polys.h"

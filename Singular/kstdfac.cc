@@ -1,14 +1,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.39 2000-09-14 14:07:23 obachman Exp $ */
+/* $Id: kstdfac.cc,v 1.40 2000-09-18 09:19:09 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
 
 #include "mod2.h"
 #include "tok.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "polys.h"
 #include "ideals.h"
 #include "febase.h"
@@ -84,7 +84,7 @@ static void copyL (kStrategy o,kStrategy n)
     }
     // copy .lcm ----------------------------------------------
     if (o->L[j].lcm!=NULL)
-      l[j].lcm=pInit(o->L[j].lcm);
+      l[j].lcm=pLmInit(o->L[j].lcm);
     else
       l[j].lcm=NULL;
     l[j].ecart=o->L[j].ecart;
@@ -482,7 +482,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
     if (pNext(strat->P.p) == strat->tail)
     {
       /* deletes the short spoly and computes */
-      pFree(strat->P.p);
+      pLmFree(strat->P.p);
       /* the real one */
       strat->P.p = ksOldCreateSpoly(strat->P.p1,
                                     strat->P.p2,
@@ -562,7 +562,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
           fac->m[0]=strat->P.p;
         }
       }
-      if (strat->P.lcm!=NULL) pFree(strat->P.lcm);
+      if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
       int i;
 
       for(i=IDELEMS(fac)-1;i>=0;i--)

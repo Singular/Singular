@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hdegree.cc,v 1.21 2000-09-12 16:00:54 obachman Exp $ */
+/* $Id: hdegree.cc,v 1.22 2000-09-18 09:19:00 obachman Exp $ */
 /*
 *  ABSTRACT -  dimension, multiplicity, HC, kbase
 */
@@ -12,7 +12,7 @@
 #include "tok.h"
 #include "lists.h"
 #include "febase.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "ipid.h"
 #include "ideals.h"
 #include "polys.h"
@@ -1071,7 +1071,7 @@ void scComputeHC(ideal S, int ak, poly &hEdge)
   hPure(hexist, 0, &hNstc, hvar, hNvar, hpure, &hNpure);
   hLexS(hexist, hNstc, hvar, hNvar);
   if (hEdge!=NULL)
-    pFree(hEdge);
+    pLmFree(hEdge);
   hEdge = pInit();
   pWork = pInit();
   hHedgeStep(hpure, hexist, hNstc, hvar, hNvar,hEdge);
@@ -1081,7 +1081,7 @@ void scComputeHC(ideal S, int ak, poly &hEdge)
   omFreeSize((ADDRESS)hvar, (hNvar + 1) * sizeof(int));
   omFreeSize((ADDRESS)hpure, (1 + (hNvar * hNvar)) * sizeof(Exponent_t));
   hDelete(hexist, hNexist);
-  pFree(pWork);
+  pLmFree(pWork);
 }
 
 
@@ -1411,7 +1411,7 @@ ende:
   hDelete(hexist, hNexist);
   omFreeSize((ADDRESS)act, (pVariables + 1) * sizeof(Exponent_t));
   hKill(stcmem, pVariables - 1);
-  pDelete1(&p);
+  pDeleteLm(&p);
   if (p == NULL)
     return idInit(1,s->rank);
   else

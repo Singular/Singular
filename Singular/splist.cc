@@ -270,7 +270,7 @@ void    spectrumPolyList::delete_monomial( poly m )
 
     while( *node!=(spectrumPolyNode*)NULL )
     {
-        if( pCmp( m,(*node)->mon )>=0 && pDivisibleBy2( m,(*node)->mon ) )
+        if( pCmp( m,(*node)->mon )>=0 && pLmDivisibleByNoComp( m,(*node)->mon ) )
         {
             delete_node( node );
         }
@@ -280,9 +280,9 @@ void    spectrumPolyList::delete_monomial( poly m )
 
             while( *f!=(poly)NULL )
             {
-                if( pCmp( m,*f )>=0 && pDivisibleBy2( m,*f ) )
+                if( pCmp( m,*f )>=0 && pLmDivisibleByNoComp( m,*f ) )
                 {
-                    pDelete1(f);
+                    pDeleteLm(f);
                 }
                 else
                     {

@@ -1,14 +1,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: algmap.cc,v 1.17 2000-09-12 16:00:48 obachman Exp $ */
+/* $Id: algmap.cc,v 1.18 2000-09-18 09:18:52 obachman Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials from rings with
 * 'alg' numbers
 */
 
 #include "mod2.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "tok.h"
 #include "polys.h"
 #include "numbers.h"

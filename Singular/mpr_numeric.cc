@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_numeric.cc,v 1.9 2000-08-14 12:56:41 obachman Exp $ */
+/* $Id: mpr_numeric.cc,v 1.10 2000-09-18 09:19:20 obachman Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff
@@ -17,7 +17,7 @@
 //-> includes
 #include "structs.h"
 #include "febase.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "numbers.h"
 #include "polys.h"
 #include "ideals.h"

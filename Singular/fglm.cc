@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.cc,v 1.21 2000-08-14 12:56:12 obachman Exp $
+// $Id: fglm.cc,v 1.22 2000-09-18 09:18:57 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -28,7 +28,7 @@
 #include "ipshell.h"
 #include "febase.h"
 #include "maps.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "kstd1.h"
 #include "fglm.h"
 

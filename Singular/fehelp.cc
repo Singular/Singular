@@ -15,7 +15,7 @@
 
 #include "mod2.h"
 #include "tok.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "febase.h"
 #include "ipid.h"
 #include "ipshell.h"

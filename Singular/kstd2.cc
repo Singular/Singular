@@ -1,14 +1,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.46 2000-09-14 14:07:22 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.47 2000-09-18 09:19:08 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
 
 #include "mod2.h"
 #include "tok.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "polys.h"
 #include "ideals.h"
 #include "febase.h"
@@ -65,7 +65,7 @@ static int redHomog (LObject* h,kStrategy strat)
     while (1)
     {
       if (j > strat->tl) return 1;
-      if (pShortDivisibleBy(strat->T[j].p, strat->T[j].sev, 
+      if (pLmShortDivisibleBy(strat->T[j].p, strat->T[j].sev, 
                             h->p, not_sev)) break;
       j++;
     }
@@ -82,7 +82,7 @@ static int redHomog (LObject* h,kStrategy strat)
 #endif
     if (h->p == NULL)
     {
-      if (h->lcm!=NULL) pFree((*h).lcm);
+      if (h->lcm!=NULL) pLmFree((*h).lcm);
 #ifdef KDEBUG
       (*h).lcm=NULL;
 #endif
@@ -112,7 +112,7 @@ static int redLazy (LObject* h,kStrategy strat)
     j = 0;
     while (j <= strat->tl)
     {
-      if (pShortDivisibleBy(strat->T[j].p,strat->T[j].sev,
+      if (pLmShortDivisibleBy(strat->T[j].p,strat->T[j].sev,
                             h->p, not_sev))
           break;
       j++;
@@ -139,7 +139,7 @@ static int redLazy (LObject* h,kStrategy strat)
 
     if ((*h).p == NULL)
     {
-      if (h->lcm!=NULL) pFree((*h).lcm);
+      if (h->lcm!=NULL) pLmFree((*h).lcm);
 #ifdef KDEBUG
       (*h).lcm=NULL;
 #endif
@@ -161,7 +161,7 @@ static int redLazy (LObject* h,kStrategy strat)
           i--;
           if (i<0) return 1;
         }
-        while (!pShortDivisibleBy(strat->S[i], strat->sevS[i], 
+        while (!pLmShortDivisibleBy(strat->S[i], strat->sevS[i], 
                                   h->p, not_sev));
         if (TEST_OPT_DEBUG) Print(" ->L[%d]\n",at);
         enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
@@ -199,7 +199,7 @@ static int redHoney (LObject*  h,kStrategy strat)
     j = 0;
     while (j<= strat->tl)
     {
-      if (pShortDivisibleBy(strat->T[j].p, strat->T[j].sev, 
+      if (pLmShortDivisibleBy(strat->T[j].p, strat->T[j].sev, 
                             h->p, not_sev)) break;
       j++;
     }
@@ -227,7 +227,7 @@ static int redHoney (LObject*  h,kStrategy strat)
       if ((!TEST_OPT_REDBEST) && (ei <= (*h).ecart))
         break;
       if ((strat->T[i].ecart < ei) && 
-          pShortDivisibleBy(strat->T[i].p, strat->T[i].sev,
+          pLmShortDivisibleBy(strat->T[i].p, strat->T[i].sev,
                             h->p, not_sev))
       {
         /*
@@ -290,7 +290,7 @@ static int redHoney (LObject*  h,kStrategy strat)
     }
     if ((*h).p == NULL)
     {
-      if (h->lcm!=NULL) pFree((*h).lcm);
+      if (h->lcm!=NULL) pLmFree((*h).lcm);
 #ifdef KDEBUG
       (*h).lcm=NULL;
 #endif
@@ -322,7 +322,7 @@ static int redHoney (LObject*  h,kStrategy strat)
         {
           i--;
           if (i<0) return 1;
-        } while (!pShortDivisibleBy(strat->S[i], strat->sevS[i], 
+        } while (!pLmShortDivisibleBy(strat->S[i], strat->sevS[i], 
                                     h->p, not_sev));
         enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
         if (TEST_OPT_DEBUG)
@@ -379,9 +379,9 @@ static int redBest (LObject*  h,kStrategy strat)
               ph = ksCreateShortSpoly(strat->T[j].p,(*h).p);
               if (ph==NULL)
               {
-                pFree(p);
+                pLmFree(p);
                 pDelete(&((*h).p));
-                if (h->lcm!=NULL) pFree((*h).lcm);
+                if (h->lcm!=NULL) pLmFree((*h).lcm);
 #ifdef KDEBUG
                 (*h).lcm=NULL;
 #endif
@@ -389,23 +389,23 @@ static int redBest (LObject*  h,kStrategy strat)
               }
               else if (pLmCmp(ph,p) == -1)
               {
-                pFree(p);
+                pLmFree(p);
                 p = ph;
                 jbest = j;
               }
               else
               {
-                pFree(ph);
+                pLmFree(ph);
               }
             }
           }
         }
-        pFree(p);
+        pLmFree(p);
         (*h).p = ksOldSpolyRed(strat->T[jbest].p,(*h).p,strat->kNoether);
       }
       else
       {
-        if (h->lcm!=NULL) pFree((*h).lcm);
+        if (h->lcm!=NULL) pLmFree((*h).lcm);
 #ifdef KDEBUG
         (*h).lcm=NULL;
 #endif
@@ -464,7 +464,7 @@ static poly redNF (poly h,kStrategy strat)
   not_sev = ~ pGetShortExpVector(h);
   loop
   {
-    if (pShortDivisibleBy(strat->S[j], strat->sevS[j], h, not_sev))
+    if (pLmShortDivisibleBy(strat->S[j], strat->sevS[j], h, not_sev))
     {
       //if (strat->interpt) test_int_std(strat->kIdeal);
       /*- compute the s-polynomial -*/
@@ -605,7 +605,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     if (pNext(strat->P.p) == strat->tail)
     {
       /* deletes the short spoly and computes */
-      pFree(strat->P.p);
+      pLmFree(strat->P.p);
       /* the real one */
       ksCreateSpoly(&(strat->P),
                     strat->kNoether);
@@ -668,7 +668,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         strat->enterS(strat->P, pos, strat);
         if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
       }
-      if (strat->P.lcm!=NULL) pFree(strat->P.lcm);
+      if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
       if (strat->sl>srmax) srmax = strat->sl;
     }
 #ifdef KDEBUG

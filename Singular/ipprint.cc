@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipprint.cc,v 1.18 2000-08-14 12:56:25 obachman Exp $ */
+/* $Id: ipprint.cc,v 1.19 2000-09-18 09:19:05 obachman Exp $ */
 /*
 * ABSTRACT: interpreter: printing
 */
@@ -9,7 +9,7 @@
 #include "mod2.h"
 #include "tok.h"
 #include "ipid.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "febase.h"
 #include "polys.h"
 #include "matpol.h"

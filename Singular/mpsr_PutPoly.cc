@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_PutPoly.cc,v 1.19 2000-08-14 12:56:43 obachman Exp $ */
+/* $Id: mpsr_PutPoly.cc,v 1.20 2000-09-18 09:19:22 obachman Exp $ */
 
 /***************************************************************
  *
@@ -22,7 +22,7 @@
 #include "mpsr_Put.h"
 #include "mpsr_Tok.h"
 #include "longalg.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "ring.h"
 #include "polys.h"
 //#include "ipid.h"

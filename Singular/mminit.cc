@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mminit.cc,v 1.20 2000-08-14 12:56:39 obachman Exp $ */
+/* $Id: mminit.cc,v 1.21 2000-09-18 09:19:17 obachman Exp $ */
 /*
 * ABSTRACT: init of memory management
 */
@@ -11,10 +11,11 @@
 
 #include "mod2.h"
 #include "mmalloc.h"
+#include "structs.h"
 // this prevents the definition of malloc/free ad macros
 // by omalloc
 #define OMALLOC_C
-#include <omalloc.h>
+#include "omalloc.h"
 
 extern "C"
 {
@@ -41,6 +42,9 @@ int mmInit( void )
   {
     mp_set_memory_functions(malloc,reallocSize,freeSize);
     om_Opts.OutOfMemoryFunc = omSingOutOfMemoryFunc;
+#ifndef OM_NDEBUG
+    om_Opts.ErrorHook = dErrorBreak;
+#endif    
     omInitInfo();
 #ifdef OM_SING_KEEP
     om_Opts.Keep = OM_SING_KEEP;

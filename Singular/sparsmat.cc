@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.35 2000-09-14 14:20:45 obachman Exp $ */
+/* $Id: sparsmat.cc,v 1.36 2000-09-18 09:19:34 obachman Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -1765,7 +1765,7 @@ void smPolyDiv(poly a, poly b)
     pNext(h) = NULL;
     a = pNext(a) = pAdd(pNext(a), pNext(dummy));
   } while (a!=NULL);
-  pFree(dummy);
+  pLmFree(dummy);
 }
 
 /*
@@ -1836,7 +1836,7 @@ poly smMultDiv(poly a, poly b, const poly c)
     pIter(b);
     if (b == NULL)
     {
-      pFree(e);
+      pLmFree(e);
       return res;
     }
   }
@@ -1859,7 +1859,7 @@ poly smMultDiv(poly a, poly b, const poly c)
     }
     pIter(b);
   } while (b != NULL);
-  pFree(e);
+  pLmFree(e);
   return res;
 }
 
@@ -1903,7 +1903,7 @@ static void smExactPolyDiv(poly a, poly b)
     nDelete(&yn);
     a = pNext(a) = pAdd(pNext(a), h);
   } while (a!=NULL);
-  pFree(e);
+  pLmFree(e);
 }
 
 // orginal text:
@@ -2091,10 +2091,10 @@ static void smCombineChain(poly *px, poly r)
       if (i == 0)
       {
         x = nAdd(pGetCoeff(pb), pGetCoeff(r));
-        pDelete1(&r);
+        pDeleteLm(&r);
         if (nIsZero(x))
         {
-          pDelete1(&pb);
+          pDeleteLm(&pb);
           pNext(pa) = pAdd(pb,r);
         }
         else
@@ -2139,10 +2139,10 @@ static void smFindRef(poly *ref, poly *px, poly r)
       if (i == 0)
       {
         x = nAdd(pGetCoeff(pa), pGetCoeff(r));
-        pDelete1(&r);
+        pDeleteLm(&r);
         if (nIsZero(x))
         {
-          pDelete1(&pa);
+          pDeleteLm(&pa);
           if (pp!=NULL)
             pNext(pp) = pAdd(pa,r);
           else

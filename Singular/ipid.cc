@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.42 2000-08-18 15:42:06 Singular Exp $ */
+/* $Id: ipid.cc,v 1.43 2000-09-18 09:19:05 obachman Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -10,7 +10,7 @@
 #include <string.h>
 
 #include "mod2.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "tok.h"
 #include "ipshell.h"
 #include "intvec.h"

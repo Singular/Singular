@@ -115,7 +115,7 @@ int     isMultiple( poly f,poly m )
 
     if( pLmCmp( f,m )>=0 )
     {
-      if( pDivisibleBy2( f,m ) )
+      if( pLmDivisibleByNoComp( f,m ) )
       {
         return  TRUE;
       }
@@ -213,7 +213,7 @@ static inline  poly    normalFormZ( poly f,poly Z )
     }
     else
     {
-      pDelete1(ptr);
+      pDeleteLm(ptr);
     }
   }
 

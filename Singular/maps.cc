@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.27 2000-09-12 16:01:02 obachman Exp $ */
+/* $Id: maps.cc,v 1.28 2000-09-18 09:19:15 obachman Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -14,7 +14,7 @@
 #include "ring.h"
 #include "ideals.h"
 #include "matpol.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "kstd1.h"
 #include "lists.h"
 #include "longalg.h"
@@ -652,7 +652,7 @@ static poly pMinPolyNormalize(poly p)
     number product = nMult(pGetCoeff(p), one);
     if (product == NULL)
     {
-      pDelete1(&p);
+      pDeleteLm(&p);
     }
     else
     {

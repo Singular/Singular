@@ -3,12 +3,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: intvec.h,v 1.13 2000-08-14 12:56:21 obachman Exp $ */
+/* $Id: intvec.h,v 1.14 2000-09-18 09:19:02 obachman Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
 #include <string.h>
-#include <omalloc.h>
+#include "omalloc.h"
 #include "febase.h"
 
 class intvec

@@ -6,7 +6,7 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.cc,v 1.7 2000-09-14 15:06:33 obachman Exp $
+ *  Version: $Id: p_Procs.cc,v 1.8 2000-09-18 09:19:27 obachman Exp $
  *******************************************************************/
 #include <string.h>
 #include "mod2.h"
@@ -498,27 +498,13 @@ static void SetProcs(p_Field field, p_Length length, p_Ord ord);
  *
  ***************************************************************/
 #include "structs.h"
+#include "p_polys.h"
 #include "ring.h"
-#include "polys.h"
-#include "polys-impl.h"
 #include "p_Procs.h"
 #include "p_Numbers.h"
 #include "p_MemCmp.h"
 #include "p_MemAdd.h"
 #include "p_MemCopy.h"
-#ifndef TEST_P_PROCS
-#undef pTest
-#define pTest(p) ((void)0)
-#endif
-
-#define FreeAndAdvance(p)                       \
-do                                              \
-{                                               \
-  poly _pn = pNext(p);                          \
-  omFreeBinAddr(p);                             \
-  p = _pn;                                      \
-}                                               \
-while (0)
 
 #include "p_Procs.inc"
 
@@ -697,7 +683,7 @@ inline int AlreadyHaveProc(p_Proc proc, p_Field field, p_Length length, p_Ord or
   return (generated_p_procs[proc])[index(proc, field, length, ord)] != 0;
 }
 
-const char* macros_field[] = {"p_nCopy","p_nDelete", "p_nMult", "p_nAdd", "p_nSub", "p_nIsZero", "p_nEqual" , "p_nNeg", NULL};
+const char* macros_field[] = {"n_Copy","n_Delete", "n_Mult", "n_Add", "n_Sub", "n_IsZero", "n_Equal" , "n_Neg", NULL};
 
 const char* macros_length[] =
 {"p_MemCopy", "p_MemAdd", "p_MemSum", NULL};

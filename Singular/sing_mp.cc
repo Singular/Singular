@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_mp.cc,v 1.32 2000-08-14 12:56:50 obachman Exp $ */
+/* $Id: sing_mp.cc,v 1.33 2000-09-18 09:19:33 obachman Exp $ */
 
 /*
 * ABSTRACT: interface to MP links
@@ -16,7 +16,7 @@
 #include <unistd.h>
 #include "mpsr.h"
 #include "tok.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "febase.h"
 #include "subexpr.h"
 #include "ipid.h"

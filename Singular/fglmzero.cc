@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmzero.cc,v 1.29 2000-09-12 16:00:53 obachman Exp $
+// $Id: fglmzero.cc,v 1.30 2000-09-18 09:18:59 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -29,7 +29,7 @@
 #include "ipid.h"
 #include "febase.h"
 #include "maps.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "kstd1.h" // for kNF (see fglmquot)
 #include "fglm.h"
 #include "fglmvec.h"
@@ -297,7 +297,7 @@ public:
     fglmVector nf;
     borderElem() : monom(NULL), nf() {}
     borderElem( poly p, fglmVector n ) : monom( p ), nf( n ) {}
-    ~borderElem() { pDelete1(&monom); }
+    ~borderElem() { pDeleteLm(&monom); }
 #ifndef HAVE_EXPLICIT_CONSTR
     void insertElem( poly p, fglmVector n )
     {
@@ -389,7 +389,7 @@ fglmSdata::fglmSdata( const ideal thisIdeal )
 fglmSdata::~fglmSdata()
 {
     for ( int k = basisSize; k > 0; k-- )
-        pDelete1( basis + k );  //. rem: basis runs from basis[1]..basis[basisSize]
+        pDeleteLm( basis + k );  //. rem: basis runs from basis[1]..basis[basisSize]
     omFreeSize( (ADDRESS)basis, basisMax*sizeof( poly ) );
 #ifndef HAVE_EXPLICIT_CONSTR
     delete [] border;
@@ -486,7 +486,7 @@ fglmSdata::updateCandidates()
         }
         if ( state == 0 ) {
             list.getItem().newDivisor( k );
-            pDelete1(&newmonom);
+            pDeleteLm(&newmonom);
         }
         else {
             list.insert( fglmSelem( newmonom, k ) );
@@ -502,13 +502,13 @@ fglmSdata::updateCandidates()
 }
 
 //     if p == pHead( (theIdeal->m)[k] ) return k, 0 otherwise
-//     (Assumes that pEqual just checks the leading monomials without
+//     (Assumes that pLmEqual just checks the leading monomials without
 //      coefficients.)
 int
 fglmSdata::getEdgeNumber( const poly m ) const
 {
     for ( int k = idelems; k > 0; k-- )
-        if ( pEqual( m, (theIdeal->m)[k-1] ) )
+        if ( pLmEqual( m, (theIdeal->m)[k-1] ) )
             return k;
     return 0;
 }
@@ -604,7 +604,7 @@ internalCalculateFunctionals( const ideal & theIdeal, idealFunctionals & l,
                 // NF(p) = - ( tail(p)/LC(p) )
                 poly nf = data.getSpanPoly( edge );
                 pNorm( nf );
-                pDelete1(&nf);  //. deletes the leadingmonomial
+                pDeleteLm(&nf);  //. deletes the leadingmonomial
                 nf= pNeg( nf );
                 fglmVector nfv = data.getVectorRep( nf );
                 l.insertCols( candidate.divisors, nfv );
@@ -690,7 +690,7 @@ void
 fglmDelem::cleanup()
 {
     if ( monom != NULL ) {
-        pDelete1(&monom);
+        pDeleteLm(&monom);
     }
 }
 
@@ -876,7 +876,7 @@ fglmDdata::updateCandidates( poly m, const fglmVector v )
         }
         if ( state == 0 ) {
             list.getItem().newDivisor();
-            pDelete1( & newmonom );
+            pDeleteLm( & newmonom );
         }
         else {
             list.insert( fglmDelem( newmonom, v, k ) );

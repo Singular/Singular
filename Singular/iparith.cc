@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.224 2000-09-15 16:44:29 Singular Exp $ */
+/* $Id: iparith.cc,v 1.225 2000-09-18 09:19:02 obachman Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -15,10 +15,11 @@
 #include <unistd.h>
 
 #include "mod2.h"
+
 #include "tok.h"
 #include "ipid.h"
 #include "intvec.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "polys.h"
 #include "febase.h"
 #include "sdb.h"
@@ -1288,11 +1289,11 @@ static BOOLEAN jjINDEX_V(leftv res, leftv u, leftv v)
       if (r==p) r=pNext(p);
       if (o!=NULL)
       {
-        pDelete1(&pNext(o));
+        pDeleteLm(&pNext(o));
         p=pNext(o);
       }
       else
-        pDelete1(&p);
+        pDeleteLm(&p);
     }
     else
     {
@@ -1330,11 +1331,11 @@ static BOOLEAN jjINDEX_V_IV(leftv res, leftv u, leftv v)
       if (p==NULL) break;
       if (i==iv->length())
       {
-        pDelete1(&p);
+        pDeleteLm(&p);
         if (p==NULL) break;
       }
     }
-    pDelete1(&r);
+    pDeleteLm(&r);
     res->data=(char *)r;
   }
   return FALSE;
@@ -2938,7 +2939,7 @@ static BOOLEAN jjLEADMONOM(leftv res, leftv v)
   }
   else
   {
-    poly lm = pInit(p);
+    poly lm = pLmInit(p);
     pSetCoeff(lm, nInit(1));
     res->data = (char*) lm;
   }

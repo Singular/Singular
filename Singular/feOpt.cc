@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.cc,v 1.13 2000-08-14 12:56:05 obachman Exp $ */
+/* $Id: feOpt.cc,v 1.14 2000-09-18 09:18:54 obachman Exp $ */
 /*
 * ABSTRACT: Implementation of option buisness
 */
@@ -269,7 +269,7 @@ static void feOptHelp(const char* name);
 // Return: NULL -- everything ok
 //         "error-string" on error
 #if !defined(ESINGULAR) && !defined(TSINGULAR)
-#include <omalloc.h>
+#include "omalloc.h"
 #include "febase.h"
 #include "ipshell.h"
 #include "tok.h"

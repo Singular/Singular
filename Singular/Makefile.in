@@ -121,7 +121,7 @@ SOURCES=${CSOURCES} ${CXXSOURCES} ${ESOURCES} mmalloc.cc\
 HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	longalg.h mpsr_Tok.h structs.h intvec.h longrat.h \
 	numbers.h stype.h clapconv.h ipconv.h maps.h page.h \
-	subexpr.h clapsing.h ipid.h matpol.h polys.h syz.h \
+	subexpr.h clapsing.h ipid.h matpol.h polys.h p_polys.h syz.h \
 	cntrlc.h ipprint.h ring.h timer.h sdb.h dError.h \
 	febase.h ipshell.h shortfl.h tok.h mpr_complex.h mpr_global.h \
 	page.h \

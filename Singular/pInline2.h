@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.3 2000-09-14 13:04:39 obachman Exp $
+ *  Version: $Id: pInline2.h,v 1.4 2000-09-18 09:19:24 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -21,7 +21,7 @@
 #include "mod2.h"
 #include "omalloc.h"
 #include "structs.h"
-#include "polys.h"
+#include "p_polys.h"
 #include "numbers.h"
 #include "p_Procs.h"
 
@@ -29,7 +29,7 @@
 PINLINE2 number p_SetCoeff(poly p, number n, ring r)
 {
   p_CheckPolyRing2(p, r);
-  p_nDelete(&(p->coef), r);
+  n_Delete(&(p->coef), r);
   (p)->coef=n;
   return n;
 }
@@ -177,41 +177,64 @@ PINLINE2 poly p_New(ring r)
   return p;
 }
 
-PINLINE2 void p_Delete1(poly *p, ring r)
+PINLINE2 void p_DeleteLm(poly *p, ring r)
 {
   pIfThen2(*p != NULL, p_CheckPolyRing2(*p, r));
   poly h = *p;
   if (h != NULL)
   {
-    p_nDelete(&_pGetCoeff(h), r);
+    n_Delete(&_pGetCoeff(h), r);
     *p = _pNext(h);
     omFreeBinAddr(h);
   }
-
 }
-PINLINE2 void p_Free(poly p, ring r)
+PINLINE2 void p_DeleteLm(poly p, ring r)
+{
+  pIfThen2(p != NULL, p_CheckPolyRing2(p, r));
+  if (p != NULL)
+  {
+    n_Delete(&_pGetCoeff(p), r);
+    omFreeBinAddr(p);
+  }
+}
+PINLINE2 void p_LmFree(poly p, ring r)
 {
   p_CheckPolyRing2(p, r);
   omFreeBinAddr(p);
 }
-PINLINE2 poly p_FreeAndNext(poly p, ring r)
+PINLINE2 void p_LmFree(poly *p, ring r)
+{
+  p_CheckPolyRing2(*p, r);
+  poly h = *p;
+  *p = pNext(h);
+  omFreeBinAddr(h);
+}
+PINLINE2 poly p_LmFreeAndNext(poly p, ring r)
 {
   p_CheckPolyRing2(p, r);
-  poly pnext = _pNext(p);
+  poly pnext = pNext(p);
   omFreeBinAddr(p);
   return pnext;
 }
 PINLINE2 void p_LmDelete(poly p, ring r)
 {
   p_CheckPolyRing2(p, r);
-  p_nDelete(&_pGetCoeff(p), r);
+  n_Delete(&_pGetCoeff(p), r);
   omFreeBinAddr(p);
+}
+PINLINE2 void p_LmDelete(poly *p, ring r)
+{
+  p_CheckPolyRing2(*p, r);
+  poly h = *p;
+  *p = pNext(h);
+  n_Delete(&pGetCoeff(h), r);
+  omFreeBinAddr(h);
 }
 PINLINE2 poly p_LmDeleteAndNext(poly p, ring r)
 {
   p_CheckPolyRing2(p, r);
   poly pnext = _pNext(p);
-  p_nDelete(&_pGetCoeff(p), r);
+  n_Delete(&_pGetCoeff(p), r);
   omFreeBinAddr(p);
   return pnext;
 }
@@ -368,13 +391,13 @@ PINLINE2 poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, const ring r)
   poly res;
   int shorter;
   number n_old = pGetCoeff(m);
-  number n_neg = p_nCopy(n_old, r);
-  n_neg = p_nNeg(n_neg, r);
+  number n_neg = n_Copy(n_old, r);
+  n_neg = n_Neg(n_neg, r);
   pSetCoeff0(m, n_neg);
 
   res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r);
   pSetCoeff0(m, n_old);
-  p_nDelete(&n_neg, r);
+  n_Delete(&n_neg, r);
   return res;
 }
 

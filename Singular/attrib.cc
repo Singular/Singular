@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.cc,v 1.18 2000-08-14 12:55:53 obachman Exp $ */
+/* $Id: attrib.cc,v 1.19 2000-09-18 09:18:52 obachman Exp $ */
 
 /*
 * ABSTRACT: attributes to leftv and idhdl
@@ -14,7 +14,7 @@
 #include <unistd.h>
 
 #include "mod2.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "tok.h"
 #include "ipid.h"
 #include "intvec.h"

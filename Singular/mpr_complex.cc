@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.26 2000-08-14 12:56:40 obachman Exp $ */
+/* $Id: mpr_complex.cc,v 1.27 2000-09-18 09:19:19 obachman Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -16,7 +16,7 @@
 #include "tok.h"
 #include "structs.h"
 #include "febase.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "numbers.h"
 #include "longrat.h"
 #include <math.h>

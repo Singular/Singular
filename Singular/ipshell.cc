@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.55 2000-08-14 12:56:26 obachman Exp $ */
+/* $Id: ipshell.cc,v 1.56 2000-09-18 09:19:06 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -15,7 +15,7 @@
 #include "tok.h"
 #include "ipid.h"
 #include "intvec.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "febase.h"
 #include "polys.h"
 #include "ideals.h"

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.81 2000-08-14 12:56:56 obachman Exp $ */
+/* $Id: tesths.cc,v 1.82 2000-09-18 09:19:38 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -20,7 +20,7 @@
 #include "sing_dld.h"
 #include "febase.h"
 #include "cntrlc.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "silink.h"
 #include "ipid.h"
 #include "timer.h"

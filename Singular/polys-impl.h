@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.55 2000-09-14 15:06:34 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.56 2000-09-18 09:19:29 obachman Exp $ */
 
 /***************************************************************
  *
@@ -182,7 +182,6 @@ while (0)
 #define pAssumeReturn1       pAssumeReturn
 #define pPolyAssumeReturn1   pPolyAssumeReturn
 #define _pPolyAssumeReturn1  _pPolyAssumeReturn
-#define p_SetRingOfPoly1    p_SetRingOfPoly
 #define p_CheckPolyRing1    p_CheckPolyRing
 #define p_CheckRing1        p_CheckRing
 #define pIfThen1          pIfThen
@@ -193,7 +192,6 @@ while (0)
 #define pAssumeReturn1(cond)         ((void)0)
 #define pPolyAssumeReturn1(cond)     ((void)0)
 #define _pPolyAssumeReturn1(cond,p,r)((void)0)
-#define p_SetRingOfPoly1(p,r)       ((void)0)
 #define p_CheckPolyRing1(p,r)       ((void)0)
 #define p_CheckRing1(r)             ((void)0)
 #define pIfThen1(cond, check)     ((void)0)
@@ -206,7 +204,6 @@ while (0)
 #define pAssumeReturn2       pAssumeReturn
 #define pPolyAssumeReturn2   pPolyAssumeReturn
 #define _pPolyAssumeReturn2  _pPolyAssumeReturn
-#define p_SetRingOfPoly2    p_SetRingOfPoly
 #define p_CheckPolyRing2    p_CheckPolyRing
 #define p_CheckRing2        p_CheckRing
 #define pIfThen2          pIfThen
@@ -217,7 +214,6 @@ while (0)
 #define pAssumeReturn2(cond)         ((void)0)
 #define pPolyAssumeReturn2(cond)     ((void)0)
 #define _pPolyAssumeReturn2(cond,p,r)((void)0)
-#define p_SetRingOfPoly2(p,r)       ((void)0)
 #define p_CheckPolyRing2(p,r)       ((void)0)
 #define p_CheckRing2(r)             ((void)0)
 #define pIfThen2(cond, check)     ((void)0)
@@ -237,9 +233,24 @@ while (0)
 #define __p_GetComp(p, r)   (p)->exp[r->pCompIndex]
 #define _p_GetComp(p, r)    ((long) (r->pCompIndex >= 0 ? __p_GetComp(p, r) : 0))
 
-
-
-
+/***************************************************************
+ *
+ * Macros for low-level allocation
+ *
+ ***************************************************************/
+#ifdef PDEBUG
+#define p_AllocBin(p, bin, r)                   \
+do                                              \
+{                                               \
+  omTypeAllocBin(poly, p, bin);                 \
+  p_SetRingOfPoly(p, r);                        \
+}                                               \
+while (0)
+#define p_FreeBinAddr(p, r) p_LmFree(p, r)
+#else
+#define p_AllocBin(p, bin, r)   omTypeAllocBin(poly, p, bin)
+#define p_FreeBinAddr(p, r)     omFreeBinAddr(p)
+#endif
 
 /***************************************************************
  *

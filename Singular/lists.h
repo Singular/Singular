@@ -3,12 +3,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.h,v 1.13 2000-08-14 12:56:35 obachman Exp $ */
+/* $Id: lists.h,v 1.14 2000-09-18 09:19:12 obachman Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
 #include "structs.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "subexpr.h"
 #include "tok.h"
 

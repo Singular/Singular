@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.31 2000-09-12 16:01:20 obachman Exp $ */
+/* $Id: syz0.cc,v 1.32 2000-09-18 09:19:36 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -9,7 +9,7 @@
 
 #include "mod2.h"
 #include "tok.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "polys.h"
 #include "febase.h"
 #include "kstd1.h"
@@ -143,7 +143,7 @@ static poly syRedtail2(poly p, polyset redWith, intvec *modcomp)
     nxt = (*modcomp)[hncomp+1];
     while (j < nxt)
     {
-      if (pDivisibleBy2(redWith[j], hn))
+      if (pLmDivisibleByNoComp(redWith[j], hn))
       {
         //if (TEST_OPT_PROT) Print("r");
         hn = ksOldSpolyRed(redWith[j],hn);

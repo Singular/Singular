@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.102 2000-09-14 13:04:35 obachman Exp $ */
+/* $Id: ideals.cc,v 1.103 2000-09-18 09:19:01 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -9,7 +9,7 @@
 /* includes */
 #include "mod2.h"
 #include "tok.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "febase.h"
 #include "numbers.h"
 #include "polys.h"
@@ -247,7 +247,7 @@ void idDelLmEquals(ideal id)
   {
     for (j=l-1; j>i; j--)
     {
-      if (id->m[i] != NULL && id->m[j] != NULL && pEqual(id->m[i], id->m[j]))
+      if (id->m[i] != NULL && id->m[j] != NULL && pLmEqual(id->m[i], id->m[j]))
       {
         pDelete(&id->m[j]);
         l--;
@@ -912,14 +912,14 @@ void pShift (poly * p,int i)
       if (qp2 == *p)
       {
         pIter(*p);
-        pDelete1(&qp2);
+        pDeleteLm(&qp2);
         qp2 = *p;
         qp1 = *p;
       }
       else
       {
         qp2->next = qp1->next;
-        pDelete1(&qp1);
+        pDeleteLm(&qp1);
         qp1 = qp2->next;
       }
     }

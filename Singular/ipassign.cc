@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.58 2000-08-14 12:56:23 obachman Exp $ */
+/* $Id: ipassign.cc,v 1.59 2000-09-18 09:19:04 obachman Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -16,7 +16,7 @@
 #include "tok.h"
 #include "ipid.h"
 #include "intvec.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "febase.h"
 #include "polys.h"
 #include "ideals.h"

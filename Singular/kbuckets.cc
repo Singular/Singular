@@ -1,16 +1,17 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.16 2000-09-14 13:04:36 obachman Exp $ */
+/* $Id: kbuckets.cc,v 1.17 2000-09-18 09:19:06 obachman Exp $ */
 
 #include "mod2.h"
 #include "tok.h"
 #include "structs.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "polys.h"
 #include "febase.h"
 #include "kbuckets.h"
 #include "numbers.h"
+#include "p_Procs.h"
 
 static omBin kBucket_bin = omGetSpecBin(sizeof(kBucket));
 
@@ -212,7 +213,7 @@ static void kBucketSetLm(kBucket_pt bucket)
               bucket->buckets[j] != NULL &&
               nIsZero(pGetCoeff(bucket->buckets[j])))
           {
-            p_Delete1(&(bucket->buckets[j]), bucket->bucket_ring);
+            p_DeleteLm(&(bucket->buckets[j]), bucket->bucket_ring);
             (bucket->buckets_length[j])--;
           }
           j = i;
@@ -223,14 +224,14 @@ static void kBucketSetLm(kBucket_pt bucket)
           pSetCoeff0(bucket->buckets[j],
                      nAdd(pGetCoeff(bucket->buckets[i]), tn));
           nDelete(&tn);
-          p_Delete1(&(bucket->buckets[i]), bucket->bucket_ring);
+          p_DeleteLm(&(bucket->buckets[i]), bucket->bucket_ring);
           (bucket->buckets_length[i])--;
         }
       }
     }
     if (j > 0 && nIsZero(pGetCoeff(bucket->buckets[j])))
     {
-      p_Delete1(&(bucket->buckets[j]), bucket->bucket_ring);
+      p_DeleteLm(&(bucket->buckets[j]), bucket->bucket_ring);
       (bucket->buckets_length[j])--;
       j = -1;
     }
@@ -547,7 +548,7 @@ number kBucketPolyRed(kBucket_pt bucket,
 
   if(a1==NULL)
   {
-    p_Delete1(&lm, bucket->bucket_ring);
+    p_DeleteLm(&lm, bucket->bucket_ring);
     return nInit(1);
   }
 
@@ -577,7 +578,7 @@ number kBucketPolyRed(kBucket_pt bucket,
 
   kBucket_Minus_m_Mult_p(bucket, lm, a1, &l1, spNoether);
 
-  p_Delete1(&lm, bucket->bucket_ring);
+  p_DeleteLm(&lm, bucket->bucket_ring);
   if (reset_vec) pSetCompP(a1, 0);
   kbTests(bucket);
   return rn;
@@ -629,7 +630,7 @@ void kBucketRedHomog (LObject* h,kStrategy strat)
     {
       while(j <= strat->tl)
       {
-        if (pDivisibleBy1(strat->T[j].p,lm)) goto Found;
+        if (pLmDivisibleBy(strat->T[j].p,lm)) goto Found;
         j++;
       }
     }
@@ -638,12 +639,12 @@ void kBucketRedHomog (LObject* h,kStrategy strat)
       while(j <= strat->tl)
       {
 #ifdef KB_HAVE_SHORT_EVECTORS
-        if ((strat->T[j].sev & ev) || ! pDivisibleBy2(strat->T[j].p,lm))
+        if ((strat->T[j].sev & ev) || ! pLmDivisibleByNoComp(strat->T[j].p,lm))
           j++;
         else
           goto Found;
 #else
-        if (pDivisibleBy2(strat->T[j].p,lm)) goto Found;
+        if (pLmDivisibleByNoComp(strat->T[j].p,lm)) goto Found;
         j++;
 #endif
       }
@@ -684,7 +685,7 @@ void kBucketRedHomog (LObject* h,kStrategy strat)
 #ifdef KDEBUG
       if (TEST_OPT_DEBUG) PrintS(" to 0\n");
 #endif
-      if (h->lcm!=NULL) pFree((*h).lcm);
+      if (h->lcm!=NULL) pLmFree((*h).lcm);
 #ifdef KDEBUG
       (*h).lcm=NULL;
 #endif
@@ -744,7 +745,7 @@ void kBucketRedHoney (LObject*  h,kStrategy strat)
     {
       while(j <= strat->tl)
       {
-        if (pDivisibleBy1(strat->T[j].p,lm)) goto Found;
+        if (pLmDivisibleBy(strat->T[j].p,lm)) goto Found;
         j++;
       }
     }
@@ -753,12 +754,12 @@ void kBucketRedHoney (LObject*  h,kStrategy strat)
       while(j <= strat->tl)
       {
 #ifdef KB_HAVE_SHORT_EVECTORS
-        if ((strat->T[j].sev & ev) || ! pDivisibleBy2(strat->T[j].p,lm))
+        if ((strat->T[j].sev & ev) || ! pLmDivisibleByNoComp(strat->T[j].p,lm))
           j++;
         else
           goto Found;
 #else
-        if (pDivisibleBy2(strat->T[j].p,lm)) goto Found;
+        if (pLmDivisibleByNoComp(strat->T[j].p,lm)) goto Found;
         j++;
 #endif
       }
@@ -800,7 +801,7 @@ void kBucketRedHoney (LObject*  h,kStrategy strat)
           break;
         if ((!TEST_OPT_REDBEST) && (ei <= (*h).ecart))
           break;
-        if ((strat->T[i].ecart < ei) && pDivisibleBy1(strat->T[i].p,lm))
+        if ((strat->T[i].ecart < ei) && pLmDivisibleBy(strat->T[i].p,lm))
         {
 #ifdef KDEBUG
           if (TEST_OPT_DEBUG) Print(" T[%d]",i);
@@ -873,7 +874,7 @@ void kBucketRedHoney (LObject*  h,kStrategy strat)
 #endif
     if (lm == NULL)
     {
-      if (h->lcm!=NULL) pFree((*h).lcm);
+      if (h->lcm!=NULL) pLmFree((*h).lcm);
 #ifdef KDEBUG
       (*h).lcm=NULL;
 #endif
@@ -912,7 +913,7 @@ void kBucketRedHoney (LObject*  h,kStrategy strat)
             // we actually should do a pCleardenom(h->p) here
             return;
           }
-        } while (!pDivisibleBy1(strat->S[i], h->p));
+        } while (!pLmDivisibleBy(strat->S[i], h->p));
 
         // enter in Lazyset and return
         enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);

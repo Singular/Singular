@@ -14,7 +14,7 @@
 #include <limits.h>
 
 #include "mod2.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "structs.h"
 #include "tok.h"
 #include "febase.h"

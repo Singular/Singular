@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: fereadl.c,v 1.17 2000-08-14 12:56:11 obachman Exp $ */
+/* $Id: fereadl.c,v 1.18 2000-09-18 09:18:56 obachman Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -10,7 +10,7 @@
 #include "mod2.h"
 #include "tok.h"
 #include "febase.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "structs.h"
 #include "febase.h"
 

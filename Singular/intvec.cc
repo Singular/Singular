@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: intvec.cc,v 1.17 2000-08-14 12:56:21 obachman Exp $ */
+/* $Id: intvec.cc,v 1.18 2000-09-18 09:19:02 obachman Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -11,7 +11,7 @@
 #include "tok.h"
 #include "febase.h"
 #include "intvec.h"
-#include <omalloc.h>
+#include "omalloc.h"
 
 /*0 implementation*/
 

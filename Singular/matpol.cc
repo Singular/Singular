@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.34 2000-09-12 16:01:02 obachman Exp $ */
+/* $Id: matpol.cc,v 1.35 2000-09-18 09:19:15 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -18,7 +18,7 @@
 #include "ipid.h"
 #include "kstd1.h"
 #include "polys.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "febase.h"
 #include "numbers.h"
 #include "ideals.h"
@@ -1595,7 +1595,7 @@ static poly pInsert(poly p1, poly p2)
     }
     else
     {
-      pDelete1(&a2);
+      pDeleteLm(&a2);
       a = pNext(a) = a1;
       pIter(a1);
       if (a1==NULL)
@@ -1610,7 +1610,7 @@ static poly pInsert(poly p1, poly p2)
       }
     }
   }
-  pDelete1(&p);
+  pDeleteLm(&p);
   return p;
 }
 

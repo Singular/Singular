@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.1 2000-09-12 16:09:55 obachman Exp $
+ *  Version: $Id: kInline.cc,v 1.2 2000-09-18 09:19:06 obachman Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -43,7 +43,7 @@ KINLINE poly k_LmShallowCopyDelete_lmRing_2_tailRing(poly p, ring lmRing, ring t
     p_SetComp(np, p_GetComp(p,lmRing), tailRing);
   }
   p_Setm(np, tailRing);
-  p_Free(p, lmRing);
+  p_LmFree(p, lmRing);
   return np;
 }
 

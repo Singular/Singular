@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.64 2000-09-15 16:44:31 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.65 2000-09-18 09:19:35 obachman Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -1156,7 +1156,7 @@ void * sleftv::Data()
         && (l->m[index-1].rtyp==STRING_CMD))
 	// string[..].Data() modifies sleftv, so let's do it ourself
 	{
-	  char *dd=l->m[index-1].data;
+	  char *dd=(char*)l->m[index-1].data;
 	  int j=e->next->start-1;
 	  r=(char *)omAllocBin(size_two_bin);
           if ((j>=0)&& (j<(int)strlen((char *)dd)))
@@ -1409,7 +1409,7 @@ void syMake(leftv v,char * id, idhdl packhdl)
         {
           v->data = pGetCoeff(p);
           pGetCoeff(p)=NULL;
-          pFree(p);
+          pLmFree(p);
           v->rtyp = NUMBER_CMD;
           v->name = id;
         }
@@ -1442,7 +1442,7 @@ void syMake(leftv v,char * id, idhdl packhdl)
         {
           v->data = pGetCoeff(p);
           pGetCoeff(p)=NULL;
-          pFree(p);
+          pLmFree(p);
           v->rtyp = NUMBER_CMD;
           v->name = id;
         }

@@ -3,13 +3,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.29 2000-09-14 14:07:24 obachman Exp $ */
+/* $Id: kutil.h,v 1.30 2000-09-18 09:19:10 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
 #include <string.h>
 #include "structs.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "ring.h"
 
 #define setmax 16

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.62 2000-09-12 16:01:21 obachman Exp $ */
+/* $Id: syz1.cc,v 1.63 2000-09-18 09:19:36 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -10,7 +10,7 @@
 #include "mod2.h"
 #include "tok.h"
 #include "attrib.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "polys.h"
 #include "febase.h"
 #include "kstd1.h"
@@ -336,7 +336,7 @@ poly syRedtail (poly p, syStrategy syzstr, int index)
       pos = j+syzstr->Howmuch[index-1][pGetComp(hn)];
       while (j < pos)
       {
-        if (pDivisibleBy2(redWith->m[j], hn))
+        if (pLmDivisibleByNoComp(redWith->m[j], hn))
         {
           //hn = sySPolyRed(hn,redWith->m[j]);
           hn = ksOldSpolyRed(redWith->m[j],hn);
@@ -724,7 +724,7 @@ static intvec* syLinStrat(SSet nextPairs, syStrategy syzstr,
           if (o_r->m[l]!=NULL)
           {
             isDivisible = isDivisible ||
-              pDivisibleBy2(o_r->m[l],tso.lcm);
+              pLmDivisibleByNoComp(o_r->m[l],tso.lcm);
           }
           l++;
         }
@@ -776,7 +776,7 @@ static intvec* syLinStrat(SSet nextPairs, syStrategy syzstr,
           if (o_r->m[l]!=NULL)
           {
             isDivisible = isDivisible ||
-              pDivisibleBy2(o_r->m[l],tso.lcm);
+              pLmDivisibleByNoComp(o_r->m[l],tso.lcm);
           }
           l++;
         }
@@ -921,7 +921,7 @@ static void syRedNextPairs(SSet nextPairs, syStrategy syzstr,
         loop
         {
           if (j<0) break;
-          if (pDivisibleBy2(redset[j],q))
+          if (pLmDivisibleByNoComp(redset[j],q))
           {
             pNext(p) = pHead(q);
             pIter(p);
@@ -1033,7 +1033,7 @@ static void syRedGenerOfCurrDeg(syStrategy syzstr, int deg, int index)
       while ((j>=0) && (res->m[j]!=NULL) &&
              ((sPairs)[i].syz!=NULL))
       {
-        if (pDivisibleBy1(res->m[j],(sPairs)[i].syz))
+        if (pLmDivisibleBy(res->m[j],(sPairs)[i].syz))
         {
           (sPairs)[i].syz =
             ksOldSpolyRed(res->m[j],(sPairs)[i].syz);
@@ -1208,12 +1208,12 @@ static void syCreateNewPairs(syStrategy syzstr, int index, int newEl)
         j1 = bci[ii];
         if (nPm[j1]!=NULL)
         {
-          if (pDivisibleBy2(nPm[j1],p))
+          if (pLmDivisibleByNoComp(nPm[j1],p))
           {
             pDelete(&p);
             break;
           }
-          else if (pDivisibleBy2(p,nPm[j1]))
+          else if (pLmDivisibleByNoComp(p,nPm[j1]))
           {
             pDelete(&(nPm[j1]));
             //break;
@@ -2276,14 +2276,14 @@ static poly syStripOut(poly p,intvec * toStrip)
   poly pp=p;
 
   while ((pp!=NULL) && ((*toStrip)[pGetComp(pp)]!=0))
-    pDelete1(&pp);
+    pDeleteLm(&pp);
   p = pp;
   if (pp!=NULL)
   {
     while (pNext(pp)!=NULL)
     {
       if ((*toStrip)[pGetComp(pNext(pp))]!=0)
-        pDelete1(&pNext(pp));
+        pDeleteLm(&pNext(pp));
       else
         pIter(pp);
     }
@@ -2758,7 +2758,7 @@ syStrategy syLaScala3(ideal arg,int * length)
   kBucketDestroy(&(syzstr->bucket));
   if (origR != syzstr->syRing)
     rChangeCurrRing(origR,TRUE);
-  pDelete1(&redpol);
+  pDeleteLm(&redpol);
   if (TEST_OPT_PROT) PrintLn();
   return syzstr;
 }

@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly Level 0 functions
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline0.h,v 1.1 2000-09-12 16:01:04 obachman Exp $
+ *  Version: $Id: pInline0.h,v 1.2 2000-09-18 09:19:24 obachman Exp $
  *******************************************************************/
 #ifndef PINLINE0_H
 #define PINLINE0_H
@@ -18,7 +18,7 @@
 #endif
 
 #include "mod2.h"
-#include "polys.h"
+#include "p_polys.h"
   
 PINLINE0 void p_SetCompP(poly p, int i, ring r)
 {

@@ -1,14 +1,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.53 2000-09-14 14:07:22 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.54 2000-09-18 09:19:07 obachman Exp $ */
 /*
 * ABSTRACT:
 */
 
 #include "mod2.h"
 #include "tok.h"
-#include <omalloc.h>
+#include "omalloc.h"
 #include "polys.h"
 #include "febase.h"
 #include "kutil.h"
@@ -161,7 +161,7 @@ int redEcart19 (LObject* h,kStrategy strat)
     {
       return 1;
     }
-    if (pShortDivisibleBy(strat->T[j].p, strat->T[j].sev, (*h).p, not_sev))
+    if (pLmShortDivisibleBy(strat->T[j].p, strat->T[j].sev, (*h).p, not_sev))
     {
       //if (strat->interpt) test_int_std(strat->kIdeal);
       /*- compute the s-polynomial -*/
@@ -198,7 +198,7 @@ int redEcart19 (LObject* h,kStrategy strat)
       strat->fromT=FALSE;
       if ((*h).p == NULL)
       {
-        if (h->lcm!=NULL) pFree((*h).lcm);
+        if (h->lcm!=NULL) pLmFree((*h).lcm);
         return 0;
       }
       h->sev = pGetShortExpVector(h->p);
@@ -242,7 +242,7 @@ int redEcart19 (LObject* h,kStrategy strat)
           {
             i--;
             if (i<0) return 1;
-          } while (!pShortDivisibleBy(strat->S[i], strat->sevS[i],
+          } while (!pLmShortDivisibleBy(strat->S[i], strat->sevS[i],
                                       (*h).p, not_sev));
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
           if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
@@ -287,7 +287,7 @@ int redEcart (LObject* h,kStrategy strat)
     {
       return 1;
     }
-    if (pShortDivisibleBy(strat->T[j].p, strat->T[j].sev, (*h).p, not_sev))
+    if (pLmShortDivisibleBy(strat->T[j].p, strat->T[j].sev, (*h).p, not_sev))
     {
       //if (strat->interpt) test_int_std(strat->kIdeal);
       /*- compute the s-polynomial -*/
@@ -308,7 +308,7 @@ int redEcart (LObject* h,kStrategy strat)
         if ((((strat->T[i]).ecart < ei)
           || (((strat->T[i]).ecart == ei)
           && ((strat->T[i]).length < li)))
-          && pShortDivisibleBy(strat->T[i].p, strat->T[i].sev,
+          && pLmShortDivisibleBy(strat->T[i].p, strat->T[i].sev,
                                (*h).p, not_sev))
         {
           /*
@@ -355,7 +355,7 @@ int redEcart (LObject* h,kStrategy strat)
       strat->fromT=FALSE;
       if ((*h).p == NULL)
       {
-        if (h->lcm!=NULL) pFree((*h).lcm);
+        if (h->lcm!=NULL) pLmFree((*h).lcm);
         return 0;
       }
       h->sev = pGetShortExpVector(h->p);
@@ -401,7 +401,7 @@ int redEcart (LObject* h,kStrategy strat)
           {
             i--;
             if (i<0) return 1;
-          } while (!pShortDivisibleBy(strat->S[i], strat->sevS[i],
+          } while (!pLmShortDivisibleBy(strat->S[i], strat->sevS[i],
                                       (*h).p, not_sev));
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
           if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
@@ -447,7 +447,7 @@ int redFirst (LObject* h,kStrategy strat)
       assume(h->sev == pGetShortExpVector(h->p));
       return 1;
     }
-    if (pShortDivisibleBy(strat->T[j].p, strat->T[j].sev, (*h).p, not_sev))
+    if (pLmShortDivisibleBy(strat->T[j].p, strat->T[j].sev, (*h).p, not_sev))
     {
       //if (strat->interpt) test_int_std(strat->kIdeal);
       /*
@@ -472,7 +472,7 @@ int redFirst (LObject* h,kStrategy strat)
       }
       if ((*h).p == NULL)
       {
-        if (h->lcm!=NULL) pFree((*h).lcm);
+        if (h->lcm!=NULL) pLmFree((*h).lcm);
         h->sev = 0;
         return 0;
       }
@@ -509,7 +509,7 @@ int redFirst (LObject* h,kStrategy strat)
           {
             i--;
             if (i<0) return 1;
-          } while (!pShortDivisibleBy(strat->S[i],strat->sevS[i],
+          } while (!pLmShortDivisibleBy(strat->S[i],strat->sevS[i],
                                       (*h).p, not_sev));
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
           if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
@@ -555,7 +555,7 @@ int redMoraBest (LObject* h,kStrategy strat)
     {
       return 1;
     }
-    if (pShortDivisibleBy(strat->T[j].p, strat->T[j].sev, (*h).p, not_sev))
+    if (pLmShortDivisibleBy(strat->T[j].p, strat->T[j].sev, (*h).p, not_sev))
     {
       //if (strat->interpt) test_int_std(strat->kIdeal);
       /*- compute the s-polynomial -*/
@@ -575,7 +575,7 @@ int redMoraBest (LObject* h,kStrategy strat)
         if (((strat->T[i].ecart < ei)
           || ((strat->T[i].ecart == ei)
         && (strat->T[i].length < li)))
-            && pShortDivisibleBy(strat->T[i].p, strat->T[i].sev,
+            && pLmShortDivisibleBy(strat->T[i].p, strat->T[i].sev,
                                  (*h).p, not_sev))
         {
           /*
@@ -622,7 +622,7 @@ int redMoraBest (LObject* h,kStrategy strat)
       strat->fromT=FALSE;
       if ((*h).p == NULL)
       {
-        if (h->lcm!=NULL) pFree((*h).lcm);
+        if (h->lcm!=NULL) pLmFree((*h).lcm);
         return 0;
       }
       h->sev = pGetShortExpVector(h->p);
@@ -666,7 +666,7 @@ int redMoraBest (LObject* h,kStrategy strat)
           {
             i--;
             if (i<0) return 1;
-          } while (!pShortDivisibleBy(strat->S[i],strat->sevS[i],
+          } while (!pLmShortDivisibleBy(strat->S[i],strat->sevS[i],
                                       (*h).p, not_sev));
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
           if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
@@ -712,10 +712,10 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
     }
     if (TEST_V_DEG_STOP)
     {
-      if (kModDeg(H.p)>Kstd1_deg) pDelete1(&H.p);
+      if (kModDeg(H.p)>Kstd1_deg) pDeleteLm(&H.p);
       if (H.p==NULL) return NULL;
     }
-    if (pShortDivisibleBy(strat->T[j].p, strat->T[j].sev, H.p, not_sev))
+    if (pLmShortDivisibleBy(strat->T[j].p, strat->T[j].sev, H.p, not_sev))
     {
       //if (strat->interpt) test_int_std(strat->kIdeal);
       /*- remember the found T-poly -*/
@@ -736,7 +736,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
         if (((strat->T[j].ecart < ei)
           || ((strat->T[j].ecart == ei)
         && (strat->T[j].length < li)))
-        && pShortDivisibleBy(strat->T[j].p,strat->T[j].sev, H.p, not_sev))
+        && pLmShortDivisibleBy(strat->T[j].p,strat->T[j].sev, H.p, not_sev))
         {
           /*
           * the polynomial to reduce with is now;
@@ -960,7 +960,7 @@ void updateL(kStrategy strat)
       if (j<0) break;
       if (pNext(strat->L[j].p) == strat->tail)
       {
-        pFree(strat->L[j].p);    /*deletes the short spoly and computes*/
+        pLmFree(strat->L[j].p);    /*deletes the short spoly and computes*/
         strat->L[j].p=ksOldCreateSpoly(strat->L[j].p1,
                                     strat->L[j].p2,
                                     strat->kNoether);   /*the real one*/
@@ -995,12 +995,12 @@ void updateLHC(kStrategy strat)
        /*- deletes the int spoly and computes -*/
       if (pLmCmp(strat->L[i].p,strat->kNoether) == -1)
       {
-        pFree(strat->L[i].p);
+        pLmFree(strat->L[i].p);
         strat->L[i].p = NULL;
       }
       else
       {
-        pFree(strat->L[i].p);
+        pLmFree(strat->L[i].p);
         strat->L[i].p = ksOldCreateSpoly(strat->L[i].p1,
                                          strat->L[i].p2,
                                          strat->kNoether);
@@ -1345,7 +1345,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     strat->Ll--;
     if (pNext(strat->P.p) == strat->tail)
     {
-      pFree(strat->P.p);/*- deletes the short spoly and computes -*/
+      pLmFree(strat->P.p);/*- deletes the short spoly and computes -*/
       strat->P.p = ksOldCreateSpoly(strat->P.p1,
                                     strat->P.p2,
                                     strat->kNoether);/*- the real one -*/
@@ -1395,7 +1395,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
             }
             if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
           }
-          if (strat->P.lcm!=NULL) pFree(strat->P.lcm);
+          if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
           strat->P.lcm=NULL;
 #ifdef KDEBUG
       memset(&strat->P,0,sizeof(strat->P));
