@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.6 1999-06-02 14:09:34 pohl Exp $ */
+/* $Id: sparsmat.cc,v 1.7 1999-06-04 13:06:28 pohl Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -118,6 +118,7 @@ private:
   void smColDel();
   void smPivDel();
   void smSign();
+  void smInitPerm();
 public:
   sparse_mat(ideal);
   ~sparse_mat();
@@ -394,11 +395,13 @@ poly sparse_mat::smDet()
     Free((void *)m_act[1], sizeof(smprec));
     return res;
   }
+  this->smInitPerm();
   this->smPivot();
   this->smSign();
   this->smSelectPR();
   this->sm1Elim();
   crd++;
+  m_res[crd] = piv;
   this->smColDel();
   act--;
   this->smZeroElim();
@@ -409,19 +412,21 @@ poly sparse_mat::smDet()
   }
   if (act < 2)
   {
+    this->smFinalMult();
+    this->smPivDel();
     if (act != 0) res = m_act[1]->m;
     Free((void *)m_act[1], sizeof(smprec));
     return res;
   }
   loop
   {
-    m_res[crd] = piv;
     this->smNewPivot();
     this->smSign();
     this->smSelectPR();
     this->smMultCol();
     this->smHElim();
     crd++;
+    m_res[crd] = piv;
     this->smColDel();
     act--;
     this->smZeroElim();
@@ -433,6 +438,7 @@ poly sparse_mat::smDet()
     }
     if (act < 2)
     {
+      this->smFinalMult();
       this->smPivDel();
       if (act != 0) res = m_act[1]->m;
       Free((void *)m_act[1], sizeof(smprec));    
@@ -1375,10 +1381,10 @@ void sparse_mat::smMultCol()
 */
 void sparse_mat::smFinalMult()
 {
-  smpoly a = m_act[act];
-  int e = crd;
+  smpoly a;
   poly ha;
   int i, f;
+  int e = crd;
 
   for (i=act; i; i--)
   {
@@ -1455,7 +1461,7 @@ void sparse_mat::smColDel()
 */
 void sparse_mat::smPivDel()
 {
-  int i=crd-1;
+  int i=crd;
 
   while (i != 0)
   {
@@ -1469,21 +1475,36 @@ void sparse_mat::smPivDel()
 */
 void sparse_mat::smSign()
 {
-  int j,i=1;
-  if (cpiv!=act) sign=-sign;
-  if ((act%2)==0) sign=-sign;
-  j=perm[1];
-  while(j<rpiv)
+  int j,i;
+  if (act > 2)
   {
-    sign=-sign;
-    i++;
-    j=perm[i];
+    if (cpiv!=act) sign=-sign;
+    if ((act%2)==0) sign=-sign;
+    i=1;
+    j=perm[1];
+    while(j<rpiv)
+    {
+      sign=-sign;
+      i++;
+      j=perm[i];
+    }
+    while(perm[i]!=0)
+    {
+      perm[i]=perm[i+1];
+      i++;
+    }
   }
-  while(perm[i]!=0)
+  else
   {
-    perm[i]=perm[i+1];
-    i++;
+    if (cpiv!=1) sign=-sign;
+    if (rpiv!=perm[1]) sign=-sign;
   }
+}
+
+void sparse_mat::smInitPerm()
+{
+  int i;
+  for (i=act;i;i--) perm[i]=i;
 }
 
 /* ----------------- arithmetic ------------------ */
@@ -2070,3 +2091,4 @@ static float smPolyWeight(smpoly a)
     return res+(float)i;
   }
 }
+
