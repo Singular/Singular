@@ -1,8 +1,10 @@
-// "$Id: triang.lib,v 1.2 1999-09-22 14:58:37 obachman Exp $";
+// "$Id: triang.lib,v 1.3 1999-12-10 16:43:34 obachman Exp $";
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: triang.lib,v 1.2 1999-09-22 14:58:37 obachman Exp $";
+version="$Id: triang.lib,v 1.3 1999-12-10 16:43:34 obachman Exp $";
 info="
 LIBRARY: triang.lib   PROCEDURES FOR DECOMPOSING ZERO-DIMENSIONAL IDEALS
+
+AUTHOR:	D. Hillebrand 
 
 PROCEDURES:
  triangL(G);          Decomposition of (G) into triangular systems (Lazard).

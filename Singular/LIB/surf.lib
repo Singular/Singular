@@ -1,11 +1,22 @@
-// $Id: surf.lib,v 1.6 1999-09-20 17:45:43 Singular Exp $
+// $Id: surf.lib,v 1.7 1999-12-10 16:43:34 obachman Exp $
 //
 // author : Hans Schoenemann
 //
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surf.lib,v 1.6 1999-09-20 17:45:43 Singular Exp $";
+version="$Id: surf.lib,v 1.7 1999-12-10 16:43:34 obachman Exp $";
 info="
-LIBRARY: surf.lib    PROCEDURES FOR GRAPHICS WITH SURF (by Stephan Endrass)
+LIBRARY: surf.lib    PROCEDURES FOR GRAPHICS WITH SURF
+
+AUTHOR: surf is written by Stefan Endrass
+
+NOTE: 
+@texinfo 
+To use this library requires the program @code{surf} to be installed. 
+@code{surf} is only available for Linux PCs and Sun workstations.
+You can download @code{surf} either from 
+ @uref{http://www.mathematik.uni-mainz.de/AlgebraischeGeometrie/surf/surf.shtml}
+ or from @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils/}. 
+@end texinfo
 
 PROCEDURES:
  plot(I);  plots curves and surfaces
@@ -32,7 +43,7 @@ static proc num_of_vars(ideal I)
 proc  plot(ideal I)
 "USAGE:   plot(I);  I ideal
 RETURN: nothing
-NOTE: requires the external program 'surf'
+NOTE: requires the external program 'surf' to be installed
 EXAMPLE: example plot; shows an example
 "
 {

@@ -1,10 +1,10 @@
-// $Id: finvar.lib,v 1.23 1999-09-03 07:58:02 Singular Exp $
+// $Id: finvar.lib,v 1.24 1999-12-10 16:43:31 obachman Exp $
 // author: Agnes Eileen Heydtmann, email:agnes@math.uni-sb.de
 // last change: 98/11/05
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.23 1999-09-03 07:58:02 Singular Exp $"
+version="$Id: finvar.lib,v 1.24 1999-12-10 16:43:31 obachman Exp $"
 info="
-LIBRARY:  finvar.lib       LIBRARY TO CALCULATE INVARIANT RINGS & MORE
+LIBRARY:  finvar.lib       LIBRARY TO CALCULATE INVARIANT RINGS OF FINITE GROUPS
 AUTHOR: Agnes E. Heydtmann, email: agnes@math.uni-sb.de
 
  A library for computing polynomial invariants of finite matrix groups and
