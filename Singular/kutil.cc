@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.119 2003-04-09 21:07:50 levandov Exp $ */
+/* $Id: kutil.cc,v 1.120 2003-05-26 13:09:34 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -4280,7 +4280,7 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
   }
 
   if (TEST_OPT_PROT)
-    Print("[%d:%d", (long) new_tailRing->bitmask, new_tailRing->ExpL_Size);
+    Print("[%lu:%d", (unsigned long) new_tailRing->bitmask, new_tailRing->ExpL_Size);
   kTest_TS(strat);
   assume(new_tailRing != strat->tailRing);
   pShallowCopyDeleteProc p_shallow_copy_delete
