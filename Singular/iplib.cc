@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.99 2002-07-04 15:54:12 levandov Exp $ */
+/* $Id: iplib.cc,v 1.100 2002-11-28 17:15:23 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -215,11 +215,12 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
   else if(part==1)
   { // load proc part - must exist
     procbuflen = pi->data.s.def_end - pi->data.s.proc_start;
+    char *ss=(char *)omAlloc(procbuflen+2);
     //fgets(buf, sizeof(buf), fp);
-    myfread( buf, procbuflen, 1, fp);
+    myfread( ss, procbuflen, 1, fp);
     char ct;
     char *e;
-    s=iiProcName(buf,ct,e);
+    s=iiProcName(ss,ct,e);
     char *argstr=NULL;
     *e=ct;
     argstr=iiProcArgs(e,TRUE);
@@ -237,6 +238,7 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
     myfread( pi->data.s.body+strlen(argstr), procbuflen, 1, fp);
     procbuflen+=strlen(argstr);
     omFree(argstr);
+    omFree(ss);
     fclose( fp );
     pi->data.s.body[procbuflen] = '\0';
     strcat( pi->data.s.body+procbuflen, "\n;return();\n\n" );
@@ -436,9 +438,12 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
                    currPack=pack;
 		   iiCheckPack(currPack);
                    currPackHdl=packFindHdl(currPack);
+                   //Print("set pack=%s\n",IDID(currPackHdl));
                  }
                  #endif
                  err=iiPStart(pn,sl);
+                 #ifdef HAVE_NS
+                 #endif
                  break;
     case LANG_C:
                  leftv res = (leftv)omAlloc0Bin(sleftv_bin);
