@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmhom.cc,v 1.12 1999-03-09 12:28:46 obachman Exp $
+// $Id: fglmhom.cc,v 1.13 1999-07-15 13:37:33 wichmann Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -66,6 +66,22 @@ public:
         mon.dm= m;
         mon.sm= NULL;
     }
+#ifndef HAVE_EXPLICIT_CONSTR
+    void initialize( poly m, int b, BOOLEAN ind ) 
+    {
+	basis = b;
+	inDest = ind;
+	mon.dm = m;
+	mon.sm = NULL;
+    }
+    void initialize( const homogElem h ) 
+    {
+	basis = h.basis;
+	inDest = h.inDest;
+	mon.dm = h.mon.dm;
+	mon.sm = h.mon.sm;
+    }
+#endif
 };
 
 struct homogData
@@ -146,13 +162,32 @@ generateMonoms( poly m, int var, int deg, homogData * dat )
             if ( !inDest )
                 ++dat->numberofdestbasismonoms;
             if ( dat->numMonoms == dat->monlistmax ) {
-                dat->monlist= (homogElem * )ReAlloc( dat->monlist, (dat->monlistmax)*sizeof( homogElem ), (dat->monlistmax+dat->monlistblock) * sizeof( homogElem ) );
                 int k;
+#ifdef HAVE_EXPLICIT_CONSTR
+		// Expand array using Singulars ReAlloc function
+                dat->monlist= 
+		    (homogElem * )ReAlloc( dat->monlist, 
+					   (dat->monlistmax)*sizeof( homogElem ), 
+					   (dat->monlistmax+dat->monlistblock) * sizeof( homogElem ) );
                 for ( k= dat->monlistmax; k < (dat->monlistmax+dat->monlistblock); k++ )
                     dat->monlist[k].homogElem();
+#else
+		// Expand array by generating new one and copying
+		int newsize = dat->monlistmax  + dat->monlistblock;
+		homogElem * tempelem = new homogElem[ newsize ];
+		// Copy old elements
+		for ( k= dat->monlistmax - 1; k >= 0; k-- ) 
+		    tempelem[k].initialize( dat->monlist[k] );
+		delete [] homogElem;
+		homogElem = tempelem;
+#endif
                 dat->monlistmax+= dat->monlistblock;
             }
+#ifdef HAVE_EXPLICIT_CONSTR
             dat->monlist[dat->numMonoms]= homogElem( mon, basis, inDest );
+#else
+	    dat->monlist[dat->numMonoms].initialize( mon, basis, inDest );
+#endif
             dat->numMonoms++;
             if ( inSource && ! inDest ) PROT( "\\" );
             if ( ! inSource && inDest ) PROT( "/" );
@@ -341,9 +376,13 @@ fglmhomog( idhdl sourceRingHdl, ideal sourceIdeal, idhdl destRingHdl, ideal & de
         PROT2( "num= %i\ngen>", numGBelems );
         dat.monlistblock= 512;
         dat.monlistmax= dat.monlistblock;
+#ifdef HAVE_EXPLICIT_CONSTR
         dat.monlist= (homogElem *)Alloc( dat.monlistmax*sizeof( homogElem ) );
         int j;
         for ( j= dat.monlistmax - 1; j >= 0; j-- ) dat.monlist[j].homogElem();
+#else
+	dat.monlist = new homogElem[ dat.monlistmax ];
+#endif
         dat.numMonoms= 0;
         dat.basisSize= 0;
         dat.overall= 0;
@@ -368,7 +407,11 @@ fglmhomog( idhdl sourceRingHdl, ideal sourceIdeal, idhdl destRingHdl, ideal & de
         // now do gaussian reduction
         gaussreduce( dat, numGBelems, groebnerBS );
 
+#ifdef HAVE_EXPLICIT_CONSTR
         Free( (ADDRESS)dat.monlist, dat.monlistmax*sizeof( homogElem ) );
+#else
+	delete [] dat.monlist;
+#endif
         PROT( "<\n" );
     }
     PROT( "\n" );
