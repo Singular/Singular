@@ -1,8 +1,8 @@
-// $Id: matrix.lib,v 1.9 1998-09-30 17:24:32 Singular Exp $
-// GMG/BM, last modified: 30.9.98
+// $Id: matrix.lib,v 1.10 1998-10-09 12:28:57 Singular Exp $
+// GMG/BM, last modified: 08.10.98
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: matrix.lib,v 1.9 1998-09-30 17:24:32 Singular Exp $";
+version="$Id: matrix.lib,v 1.10 1998-10-09 12:28:57 Singular Exp $";
 info="
 LIBRARY:  matrix.lib    PROCEDURES FOR MATRIX OPERATIONS
                         Authors: GMG/BM
@@ -692,15 +692,23 @@ EXAMPLE: example rowred; shows an example
       k  = findfirst(ideal(d[l]),rk+1);
       if (k)
       {  rk = rk+1;
-         b  = permrow(b,rk,k); d = permrow(d,rk,k);
+         b  = permrow(b,rk,k);
          p  = b[rk,l];         p = 1/p;
-         b  = multrow(b,rk,p); d = multrow(d,rk,p);
+         b  = multrow(b,rk,p);
          for (i=1;i<=m;i=i+1)
          {
-            if (rk-i) { b = addrow(b,rk,-b[i,l],i);
-                        d = addrow(d,rk,-d[i,l],i);
-                      }
+            if (rk-i) { b = addrow(b,rk,-b[i,l],i);}
          }
+         d = 0;
+         for (i=rk+1;i<=m;i=i+1)
+         {  for (j=l+1;j<=n;j=j+1)
+            {  p = b[i,j];
+               if (ord(p)==0)
+               {  if (deg(p)==0) { d[i,j]=p; }
+               }
+            }
+         }
+
       }
    }
    d = submat(b,1..m,1..n);

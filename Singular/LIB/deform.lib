@@ -1,8 +1,8 @@
-// $Id: deform.lib,v 1.12 1998-05-29 15:01:55 Singular Exp $
+// $Id: deform.lib,v 1.13 1998-10-09 12:28:56 Singular Exp $
 // author: Bernd Martin email: martin@math.tu-cottbus.de
 //(bm, last modified 4/98)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: deform.lib,v 1.12 1998-05-29 15:01:55 Singular Exp $";
+version="$Id: deform.lib,v 1.13 1998-10-09 12:28:56 Singular Exp $";
 info="
 LIBRARY:  deform.lib       PROCEDURES FOR COMPUTING MINIVERSAL DEFORMATION
                            by Bernd Martin (martin@math.tu-cottbus.de)
@@ -22,11 +22,7 @@ LIB "inout.lib";
 LIB "general.lib";
 LIB "matrix.lib";
 LIB "homolog.lib";
-LIB "inout.lib";
-LIB "general.lib";
 LIB "sing.lib";
-LIB "matrix.lib";
-LIB "homolog.lib";
 ///////////////////////////////////////////////////////////////////////////////
 proc versal (ideal Fo,list #)
 "USAGE:   versal(Fo[,d,any]); Fo=ideal, d=int, any=list
@@ -937,3 +933,4 @@ Sub-procedure: Computing relative (with respect to flatten(Fo)) weight_vec
    kill nr;
    return(dv);
 }
+

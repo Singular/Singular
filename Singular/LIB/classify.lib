@@ -1,14 +1,14 @@
-// $Id: classify.lib,v 1.26 1998-05-19 17:20:31 pohl Exp $
+// $Id: classify.lib,v 1.27 1998-10-09 12:28:54 Singular Exp $
+// KK, last modified: 04.04.1998
 ///////////////////////////////////////////////////////////////////////////////
 
-version  = "$Id: classify.lib,v 1.26 1998-05-19 17:20:31 pohl Exp $";
+version  = "$Id: classify.lib,v 1.27 1998-10-09 12:28:54 Singular Exp $";
 info="
 LIBRARY:  classify.lib  PROCEDURES FOR THE ARNOLD-CLASSIFIER OF SINGULARITIES
 
    A library for classifying isolated hypersurface singularities w.r.t. right
    equivalence, based on the determinator of singularities by V.I. Arnold.
    Author: Kai Krueger, krueger@mathematik.uni-kl.de
-   last modified: 04.04.1998
 
 basicinvariants(f);  computes Milnor number, determinacy-bound and corank of f
 classify(f);         normal form of poly f determined with Arnold's method
@@ -2922,3 +2922,4 @@ EXAMPLE: no example"
 }
 ///////////////////////////////////////////////////////////////////////////////
 // E n d   O f   F i l e
+
