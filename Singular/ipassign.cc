@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.26 1998-04-06 16:27:15 krueger Exp $ */
+/* $Id: ipassign.cc,v 1.27 1998-04-07 17:52:19 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -346,7 +346,8 @@ static BOOLEAN jiA_PROC(leftv res, leftv a, Subexpr e)
   extern void piCleanUp(procinfov pi);
 
   if(res->data!=NULL) piCleanUp((procinfo *)res->data);
-  if(a->rtyp==STRING_CMD) {
+  if(a->rtyp==STRING_CMD)
+  {
     res->data = (void *)Alloc0(sizeof(procinfo));
     ((procinfo *)(res->data))->language=LANG_NONE;
     iiInitSingularProcinfo((procinfo *)res->data,"",res->name,0,0);
