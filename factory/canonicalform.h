@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.h,v 1.24 1998-03-12 10:28:35 schmidt Exp $ */
+/* $Id: canonicalform.h,v 1.25 1998-06-29 14:37:00 schmidt Exp $ */
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
@@ -19,6 +19,23 @@
 
 /*BEGINPUBLIC*/
 
+#undef CF_INLINE
+#define CF_INLINE
+#undef CF_NO_INLINE
+#define CF_NO_INLINE
+
+/*ENDPUBLIC*/
+
+#ifdef CF_USE_INLINE
+#undef CF_INLINE
+#define CF_INLINE inline
+#else
+#undef CF_INLINE
+#define CF_INLINE
+#endif
+
+/*BEGINPUBLIC*/
+
 int initCanonicalForm( void );
 
 static int cf_is_initialized_now = initCanonicalForm();
@@ -32,23 +49,23 @@ private:
     InternalCF *value;
 public:
     // constructors, destructors, selectors
-    CanonicalForm();
-    CanonicalForm( const CanonicalForm& );
-    CanonicalForm( InternalCF* );
-    CanonicalForm( const int );
-    CanonicalForm( const Variable & );
-    CanonicalForm( const Variable &, int );
+    CF_INLINE CanonicalForm();
+    CF_INLINE CanonicalForm( const CanonicalForm& );
+    CF_INLINE CanonicalForm( InternalCF* );
+    CF_INLINE CanonicalForm( const int );
+    CF_INLINE CanonicalForm( const Variable & );
+    CF_INLINE CanonicalForm( const Variable &, int );
     CanonicalForm( const char * ); // use with caution - does only handle integers !!!
 
-    ~CanonicalForm();
+    CF_NO_INLINE ~CanonicalForm();
 
     InternalCF* getval() const; // use with caution !!!
 
     CanonicalForm deepCopy() const;
 
     // predicates
-    bool isOne() const;
-    bool isZero() const;
+    CF_NO_INLINE bool isOne() const;
+    CF_NO_INLINE bool isZero() const;
     bool isImm() const;
 
     bool inZ() const;
@@ -87,8 +104,8 @@ public:
     CanonicalForm den () const;
 
     // assignment operators
-    CanonicalForm& operator = ( const CanonicalForm& );
-    CanonicalForm& operator = ( const int );
+    CF_NO_INLINE CanonicalForm& operator = ( const CanonicalForm& );
+    CF_NO_INLINE CanonicalForm& operator = ( const int );
 
     CanonicalForm& operator += ( const CanonicalForm& );
     CanonicalForm& operator -= ( const CanonicalForm& );
@@ -118,16 +135,7 @@ public:
     friend bool operator < ( const CanonicalForm&, const CanonicalForm& );
 
     // arithmetic operators
-    friend CanonicalForm operator - ( const CanonicalForm& );
-
-    friend CanonicalForm operator + ( const CanonicalForm&, const CanonicalForm& );
-    friend CanonicalForm operator - ( const CanonicalForm&, const CanonicalForm& );
-    friend CanonicalForm operator * ( const CanonicalForm&, const CanonicalForm& );
-    friend CanonicalForm operator / ( const CanonicalForm&, const CanonicalForm& );
-    friend CanonicalForm operator % ( const CanonicalForm&, const CanonicalForm& );
-
-    friend CanonicalForm div ( const CanonicalForm&, const CanonicalForm& );
-    friend CanonicalForm mod ( const CanonicalForm&, const CanonicalForm& );
+    friend CF_NO_INLINE CanonicalForm operator - ( const CanonicalForm& );
 
     friend void divrem ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, CanonicalForm& );
     friend bool divremt ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, CanonicalForm& );
@@ -150,6 +158,35 @@ public:
     friend class CFIterator;
 };
 //}}}
+
+CF_INLINE CanonicalForm
+operator + ( const CanonicalForm&, const CanonicalForm& );
+
+CF_NO_INLINE CanonicalForm
+operator - ( const CanonicalForm&, const CanonicalForm& );
+
+CF_INLINE CanonicalForm
+operator * ( const CanonicalForm&, const CanonicalForm& );
+
+CF_NO_INLINE CanonicalForm
+operator / ( const CanonicalForm&, const CanonicalForm& );
+
+CF_NO_INLINE CanonicalForm
+operator % ( const CanonicalForm&, const CanonicalForm& );
+
+CF_NO_INLINE CanonicalForm
+div ( const CanonicalForm&, const CanonicalForm& );
+
+CF_NO_INLINE CanonicalForm
+mod ( const CanonicalForm&, const CanonicalForm& );
+
+/*ENDPUBLIC*/
+
+#ifdef CF_USE_INLINE
+#include "cf_inline.cc"
+#endif
+
+/*BEGINPUBLIC*/
 
 //{{{ function declarations from canonicalform.cc
 CanonicalForm blcm ( const CanonicalForm & f, const CanonicalForm & g );
