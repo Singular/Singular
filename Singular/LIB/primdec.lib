@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.46 1999-09-01 12:43:03 pfister Exp $
+// $Id: primdec.lib,v 1.47 1999-09-13 07:46:30 pfister Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                               //
 // algorithms for primary decomposition based on                             //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                            //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.46 1999-09-01 12:43:03 pfister Exp $";
+version="$Id: primdec.lib,v 1.47 1999-09-13 07:46:30 pfister Exp $";
 info="
 LIBRARY: primdec.lib:   PROCEDURES FOR PRIMARY DECOMPOSITION
 AUTHORS:  Gerhard Pfister, email: pfister@mathematik.uni-kl.de (GTZ)
@@ -456,7 +456,6 @@ proc primaryTest (ideal i, poly p)
       //if not (0) is returned, else var(n)+h is added to prm
 
       e=deg(lead(i[m]));
-
       if(char(basering)!=0)
       {
          f=1;
@@ -486,6 +485,10 @@ proc primaryTest (ideal i, poly p)
          {       
             act=factorize(t);
             if(size(act[1])>2)
+            {
+              return(ideal(0));   
+            }
+            if(deg(act[1][2])>1)
             {
               return(ideal(0));   
             }
