@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.28 1998-05-08 07:49:26 wichmann Exp $
+@comment $Id: types.doc,v 1.29 1998-05-08 14:02:38 wichmann Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -1157,14 +1157,14 @@ reading ring-dependent data might change the current ring.
 The MPfile link describing string has to be one of the following:
 
 @enumerate
-@item @code{"MPFile: "} + filename
+@item @code{"MPfile: "} + filename
 @*the mode (read or append) is set by the first @code{read} or
 @code{write} command. 
-@item @code{"MPFile:r "} + filename
+@item @code{"MPfile:r "} + filename
 @*opens the file for reading.
-@item @code{"MPFile:w "} + filename
+@item @code{"MPfile:w "} + filename
 @*opens the file for overwriting.
-@item @code{"MPFile:a "} + filename
+@item @code{"MPfile:a "} + filename
 @*opens the file for appending.
 @end enumerate
 
