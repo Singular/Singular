@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.74 1998-05-15 08:53:51 wichmann Exp $
+@comment $Id: general.doc,v 1.75 1998-05-15 11:49:45 schmidt Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -19,7 +19,6 @@
 @chapter General concepts
 %**end
 @end ignore
-
 
 @menu
 * Interactive use::
@@ -564,6 +563,7 @@ the ring
   ring r9=real,(x,y,z),dp;
 @end example
 @end itemize
+>>>>>>> 1.74
 
 @c ---------------------------------------------------------------------------
 @node General syntax of a ring declaration, Term orderings, Examples of ring declarations, Rings and orderings
@@ -585,7 +585,6 @@ the ring
 @item @strong{Purpose:}
 defines a basering and sets it as the actual basering.
 @end table
-
 The coefficient_field is given by one of the following:
 @enumerate
 @item
@@ -630,7 +629,6 @@ exact.
 @end enumerate
 
 The names_of_ring_variables is a list of names or indexed names.
-
 The ordering is a list of block orderings where each block ordering is either
 
 @enumerate
@@ -659,7 +657,6 @@ For the definition of these orderings, see @ref{Term orderings} and
 If one of coefficient_field, names_of_ring_variables, and ordering
 consists of only one entry, the parentheses around this entry may be
 omitted.
-
 @c ---------------------------------------------------------------------------
 @node Term orderings,  , General syntax of a ring declaration, Rings and orderings
 @subsection Term orderings
@@ -1244,12 +1241,12 @@ results:
 @subsection Objects
 @cindex Objects
 
-
 Every object in @sc{Singular} has a type and a value.  In most cases it
 has also a name and in some cases an attribute list.  You may examine the
 value of an object simply by printing it with object@code{;}.  The type
-of an object you may determine by means of the @code{typeof} function,
-the attributes by means of @code{attrib}:
+of an object may be determined by means of the @code{typeof} function,
+the attributes by means of the @code{attrib} function (@ref{typeof},
+@ref{attrib}):
 
 @example
 @c example
@@ -1257,7 +1254,7 @@ the attributes by means of @code{attrib}:
   typeof(10); typeof(10000000000000000);
   typeof(r);
   attrib(x);
-  attrib(std(x));
+  attrib(std(ideal(x)));
 @c example
 @end example
 
@@ -1270,110 +1267,130 @@ Each object of type
 @code{matrix},
 @code{number},
 @code{resolution}
-belongs to a specific ring.  Also @code{list}, if one of the objects
-belong to a ring.  These objects are local to the ring.  Their names can
-be used for other objects in other rings.  Objects from one ring can be
-mapped to another ring with an object of type @code{map} (or with the
-commands @code{fetch} or @code{imap}).  @xref{map}.
+belongs to a specific ring.  Also @code{list}, if at least one of the
+objects contained in the list belongs to a ring.  These objects are local
+to the ring.  Their names can be used for other objects in other rings.
+Objects from one ring can be mapped to another ring using maps or with the
+commands @code{fetch} or @code{imap}.  @xref{map}, @ref{fetch}, @ref{imap}.
 
 The other types do not belong to a ring and can be accessed within every
-ring and across rings.
+ring and across rings.  They can be declared even if there is no active
+basering.
 
 @c ------------------------------------------------------------
 @node Type conversion and casting, Flow control, Objects, The SINGULAR language
 @subsection Type conversion and casting
+
+@subsubheading Type conversion
 @cindex Type conversion
-Assignments convert the type of an expression to the type
-of the left-hand side of the assignment.
-Operations, which require certain
-types of operands can also implicitly convert the type of an
-expression (e.g. it is possible to multiply a polynomial by an integer because
-the integer is automatically converted to polynomial).
-Possible conversions are:
-@* @sp 1
-@enumerate
-@item
-@code{int} @expansion{} @code{poly}
-@item
-@code{int} @expansion{} @code{number}
-@item
-@code{number} @expansion{} @code{poly}
-@item
-@code{int} @expansion{} @code{vector}
-  (i @expansion{} i*gen(1))
-@item
-@code{poly} @expansion{} @code{vector}
-  (p @expansion{} p*gen(1))
-@item
-@code{int} @expansion{} @code{intvec}
-@item
-@code{intvec} @expansion{} @code{intmat}
-@item
-@code{matrix} @expansion{} @code{module}
-@item
-@code{vector} @expansion{} @code{module}
-@item
-@code{ideal} @expansion{} @code{module}
-@item
-@code{ideal} @expansion{} @code{matrix}
-@item
-@code{vector} @expansion{} @code{matrix}
-@item
-@code{module} @expansion{} @code{matrix}
-@item
-@code{intvec} @expansion{} @code{matrix}
-@item
-@code{intmat} @expansion{} @code{matrix}
-@item
-@code{string} @expansion{} @code{proc}
-@item
-@code{resolution} @expansion{} @code{list}
-@item
-@code{list} @expansion{} @code{resolution}.
-@end enumerate
+Assignments convert the type of the right-hand side to the type of the
+left-hand side of the assignment, if possible.  Operators and functions
+which require certain types of operands can also implicitly convert the
+type of an expression.  It is, for example, possible to multiply a
+polynomial by an integer because the integer is automatically converted to
+a polynomial.  Type conversions do not act transitively.  Possible
+conversions are:
 
-Note that type conversions do not act transitively.
+@c ------------------------------------------------
+@c Do not delete the leading `@ ' for indentation of the whole table.  The
+@c table is indented since regular @tables are indented by a small amount,
+@c too.
+@c ------------------------------------------------
+@multitable @columnfractions .05 .18 .81
+@item
+@   1. @tab @code{intvec}  @tab @expansion{} @code{intmat}
+@item
+@   2. @tab @code{int}  @tab @expansion{} @code{intvec}
+@item
+@   3. @tab @code{resolution} @tab @expansion{} @code{list}
+@item
+@   4. @tab @code{ideal}  @tab @expansion{} @code{matrix}
+@item
+@   5. @tab @code{intmat}  @tab @expansion{} @code{matrix}
+@item
+@   6. @tab @code{intvec}  @tab @expansion{} @code{matrix}
+@item
+@   7. @tab @code{module}  @tab @expansion{} @code{matrix}
+@item
+@   8. @tab @code{vector}  @tab @expansion{} @code{matrix}
+@item
+@   9. @tab @code{ideal}  @tab @expansion{} @code{module}
+@item
+@  10. @tab @code{matrix}  @tab @expansion{} @code{module}
+@item
+@  11. @tab @code{vector}  @tab @expansion{} @code{module}
+@item
+@  12. @tab @code{int}  @tab @expansion{} @code{number}
+@item
+@  13. @tab @code{int}  @tab @expansion{} @code{poly}
+@item
+@  14. @tab @code{number}  @tab @expansion{} @code{poly}
+@item
+@  15. @tab @code{string}  @tab @expansion{} @code{proc}
+@item
+@  16. @tab @code{list}  @tab @expansion{} @code{resolution}.
+@item
+@  17. @tab @code{int}  @tab @expansion{} @code{vector}
+  (i @expansion{} i*@code{gen(1)})
+@item
+@  18. @tab @code{poly}  @tab @expansion{} @code{vector}
+  (p @expansion{} p*@code{gen(1)})
+@end multitable
 
+@subsubheading Type casting
 @cindex Type casting
-An expression can be casted to another type by using a type name
-as a function returning this type.
-Possible type castings are:
-@enumerate
+An expression can be casted to another type by using a type cast
+expression:
+@* type @code{(} expression @code{)}.
+
+Possible type casts are:
+
+@c ------------------------------------------------
+@c Do not delete the leading `@ ' for indentation of the whole table.  The
+@c table is indented since regular @tables are indented by a small amount,
+@c too.
+@c ------------------------------------------------
+@multitable @columnfractions .05 .15 .83
 @item
-to @code{string} from @code{int}, @code{number}, @code{poly}, @code{vector},
- @code{ideal}, @code{matrix}, @code{module}, @code{map}, @code{proc}
+@   1. @tab to @code{ideal} @tab  from expression lists of @code{int}, @code{number}, @code{poly}
 @item
-to @code{int} from @code{number}, @code{poly}
+@   2. @tab to @code{ideal} @tab  from @code{int}, @code{matrix}, @code{module}, @code{number},
+@code{poly}, @code{vector}
 @item
-to @code{number} from @code{poly}
+@   3. @tab to @code{int} @tab    from @code{number}, @code{poly}
 @item
-to @code{poly} from @code{int}, @code{number}
+@   4. @tab to @code{intvec} @tab from expression lists of @code{int}
 @item
-to @code{ideal} from @code{vector}, @code{poly},
-@code{matrix}, @code{int}, @code{number}
+@   5. @tab to @code{list} @tab   from expression lists of any type
 @item
-to @code{ideal} from expression lists of @code{poly},
-@code{int}, @code{number}. (The list may be empty)
+@   6. @tab to @code{matrix} @tab from @code{module}, @code{ideal}, @code{vector}.
+@* There are two forms to convert something to a matrix: if @code{matrix(}
+expression @code{)} is used then the size of the matrix will be determined
+by the size of expression.
+@* But @code{matrix(} expression @code{,} m @code{,} n @code{)} may also be
+used - the result is a
+@tex
+$ m @times n $
+@end tex
+@ifinfo
+m x n
+@end ifinfo
+matrix.
 @item
-to @code{ideal} from @code{matrix}, @code{vector}, @code{poly}, @code{module}
+@   7. @tab to @code{module} @tab from expression lists of @code{int}, @code{number},
+@code{poly}, @code{vector}
 @item
-to @code{matrix} from @code{module}, @code{ideal}, @code{vector}.
-@* There are two forms to convert something to a matrix:
-if @code{matrix(xx)} is used then the size of the matrix will
-be determined by xx.
-But @code{matrix(xx,a,b)} may also be used - the result is
-an a x b matrix.
+@   8. @tab to @code{module} @tab from @code{ideal}, @code{matrix}, @code{vector}
 @item
-to @code{intvec} from expression lists of @code{int}. (The list may be empty)
+@   9. @tab to @code{number} @tab from @code{poly}
 @item
-to @code{module} from expression lists of @code{vector},
-@code{int}, @code{number}, @code{poly}. (The list may be empty)
+@  10. @tab to @code{poly} @tab   from @code{int}, @code{number}
 @item
-to @code{module} from @code{matrix}, @code{vector}, @code{ideal}.
-@item
-to @code{list} from expression lists of any type. (The list may be empty)
-@end enumerate
-@strong{Examples:}
+@  11. @tab to @code{string} @tab from @code{ideal}, @code{int}, @code{map}, @code{matrix},
+@code{module}, @code{number}, @code{poly}, @code{proc}, @code{vector}
+@end multitable
+
+@strong{Example:}
 @example
 @c example
   ring r=0,x,(c,dp);
@@ -1387,7 +1404,6 @@ to @code{list} from expression lists of any type. (The list may be empty)
   module(matrix(i,3,2));
 @c example
 @end example
-
 
 
 @c ------------------------------------------------------------
