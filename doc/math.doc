@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.5 1998-05-04 17:41:07 Singular Exp $
+@comment $Id: math.doc,v 1.6 1998-05-06 11:49:30 Singular Exp $
 @comment this file contains the mathematical background of Singular
 
 @menu
@@ -914,6 +914,30 @@ f_1, @dots{}, f_s in I is called a @strong{standard basis} of I if
 @{ L(f_1), @dots{}, L(f_s) @} generates the ideal L(I) in Loc K[x].
 @end ifinfo
 @item @strong{Properties:}
+@table @asis
+@item Normalform:
+@tex
+A function $NF : K[\underline{x}]^r \times \{G | G\  standard basis\} \to K[\underline{x}]^r, (p,G) \mapsto NF(p|G)$, is called a {\bf normal form}
+if for any $p \in K[\underline{x}]^r$ and any $G$ the following holds:  if $NF(p|G)
+\not= 0$ then $L(g) \not| L(NF(p|G))$ for all $g \in G$.   $NF(g|G)$ is called
+the {\bf normal form of} $\bf p$ {\bf with respect to} $\bf G$.
+@end tex
+@ifinfo
+A function NF : K[x]^r x @{G | G  standard basis@} -> K[x]^r, (p,G) -> NF(p|G),
+is called a  @strong{normal form}
+if for any p in K[x]^r and any G the following holds:  if NF(p|G) <> 0
+then L(g) does not divide L(NF(p|G)) for all g in G.   NF(g|G) is called
+the @strong{normal form} of p with respect to G.
+@end ifinfo
+@item ideal membership:
+@tex
+$f \in I$ iff $NF(f,std(I)) = 0$ for $I \subseteq R$ resp. $I \subseteq R^r$.
+@end tex
+@ifinfo
+f in I iff NF(f,std(I)) = 0 for I in R resp. I in R^r.
+@end ifinfo
+@end table
+
 @item @strong{Example:}
 @end table
 
