@@ -58,7 +58,7 @@ static void MPT_DeleteDummyApInt(MPT_Arg_t apint);
 #define MPT_DeleteDefaultApInt   MPT_DeletePariApInt
 void (*MPT_InitCopyApInt)(MPT_Arg_t *dest, MPT_Arg_t src)
   =  MPT_InitCopyPariApInt;
-void (*MPT_DeleteApInt)(MPT_Arg_t *apint) 
+void (*MPT_DeleteApInt)(MPT_Arg_t apint) 
   = MPT_DeletePariApInt;
 static int MPT_ApIntFormat = MP_PARI;
 

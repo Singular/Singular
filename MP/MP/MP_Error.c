@@ -46,7 +46,7 @@
  ***************************************************************************/
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_Error.c,v 1.2 1998-10-14 16:44:38 obachman Exp $";
+static char vcid[] = "@(#) $Id: MP_Error.c,v 1.3 1998-11-10 08:22:10 obachman Exp $";
 #endif /* lint */
 
 #include "MP.h"
@@ -82,7 +82,8 @@ char *MP_errlist[]={
         "MP: Illegal element type for a Basic Vector",
         "MP: Can't put/get dummy bignum",
         "MP: Can't skip message (end of stream)",
-        "MP: Can't init message (end of stream)"
+        "MP: Can't init message (end of stream)",
+        "MP: Error of external application",
         };
 
 

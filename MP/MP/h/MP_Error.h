@@ -52,10 +52,11 @@ enum MP_Errors { MP_Failure,
                  MP_CantWriteLink,
                  MP_CantReadLink,
                  MP_NotCommonIdentifier,
-		 MP_WrongBasicVectorType,
+		         MP_WrongBasicVectorType,
                  MP_DummyBigNum,
                  MP_CantSkipMsg,
                  MP_CantInitMsg,
+                 MP_ExternalError,
                  MP_MaxError };
 
 typedef enum MP_Errors  MP_Status_t;
