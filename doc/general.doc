@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.167 1999-12-06 17:02:13 obachman Exp $
+@comment $Id: general.doc,v 1.168 1999-12-06 19:10:32 wichmann Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -1293,7 +1293,9 @@ to scroll left and right, resp.
 context specific completion. If point is inside a string, file name
 completion is done. If point is at the end of a help command (i.e.,
 @code{help} or @code{?}), completion on @sc{Singular} help topics is
-done. In all other cases, completion on @sc{Singular} commands is done.
+done. If point is at the end of a example command (i.e.,
+@code{example}), completion is done on @sc{Singular} examples. In all
+other cases, completion on @sc{Singular} commands is done.
 
 @c note: add space between Fold/ Unfold to avoid overfull line
 @item @code{singular-folding-toggle-fold-latest-output} (key @code{C-c
@@ -1351,6 +1353,11 @@ Help and Customization:
 @code{Singular->Singular Help}): asks for a @sc{Singular} help topic in
 the minibuffer (hit @code{TAB} for completion) and shows the help text
 in a separate buffer.
+
+@item @code{singular-example} (key @code{C-c C-e} or menu
+@code{Singular->Singular Example}): asks for a @sc{Singular} command in
+the minibuffer (hit @code{TAB} for completion) and executes the example
+of this command in the current @sc{Singular} buffer.
 
 @item @code{customize-group} (menu @code{Singular->Preferences}): enters
 the customization group of the @sc{Singular} Emacs interface. (If called
