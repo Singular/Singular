@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.308 2003-12-16 18:14:29 levandov Exp $ */
+/* $Id: iparith.cc,v 1.309 2003-12-17 19:39:00 levandov Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1980,9 +1980,9 @@ static BOOLEAN jjPARSTR2(leftv res, leftv u, leftv v)
 }
 
 #ifdef HAVE_PLURAL
-static BOOLEAN jjPlural_mat_mat(leftv res, leftv a, leftv b)
+static BOOLEAN jjPlural_num_poly(leftv res, leftv a, leftv b)
 {
-  return nc_CallPlural((matrix)a->Data(),(matrix)b->Data(),NULL,NULL,currRing);
+  return nc_CallPlural(NULL,NULL,(poly)a->Data(),(poly)b->Data(),currRing);
 }
 
 static BOOLEAN jjPlural_num_mat(leftv res, leftv a, leftv b)
@@ -1995,9 +1995,9 @@ static BOOLEAN jjPlural_mat_poly(leftv res, leftv a, leftv b)
   return nc_CallPlural((matrix)a->Data(),NULL,NULL,(poly)b->Data(),currRing);
 }
 
-static BOOLEAN jjPlural_num_poly(leftv res, leftv a, leftv b)
+static BOOLEAN jjPlural_mat_mat(leftv res, leftv a, leftv b)
 {
-  return nc_CallPlural(NULL,NULL,(poly)a->Data(),(poly)b->Data(),currRing);
+  return nc_CallPlural((matrix)a->Data(),(matrix)b->Data(),NULL,NULL,currRing);
 }
 #endif
 
@@ -2558,10 +2558,10 @@ struct sValCmd2 dArith2[]=
 ,{jjLIFTSTD,   LIFTSTD_CMD,    IDEAL_CMD,      IDEAL_CMD,  MATRIX_CMD NO_PLURAL}
 ,{jjLIFTSTD,   LIFTSTD_CMD,    MODUL_CMD,      MODUL_CMD,  MATRIX_CMD NO_PLURAL}
 #ifdef HAVE_PLURAL
-,{jjPlural_mat_mat,  NCALGEBRA_CMD,  NONE,  MATRIX_CMD, MATRIX_CMD NO_PLURAL}
+,{jjPlural_num_poly, NCALGEBRA_CMD,  NONE,  POLY_CMD,   POLY_CMD   NO_PLURAL}
 ,{jjPlural_num_mat,  NCALGEBRA_CMD,  NONE,  POLY_CMD,   MATRIX_CMD NO_PLURAL}
 ,{jjPlural_mat_poly, NCALGEBRA_CMD,  NONE,  MATRIX_CMD, POLY_CMD   NO_PLURAL}
-,{jjPlural_num_poly, NCALGEBRA_CMD,  NONE,  POLY_CMD,   POLY_CMD   NO_PLURAL}
+,{jjPlural_mat_mat,  NCALGEBRA_CMD,  NONE,  MATRIX_CMD, MATRIX_CMD NO_PLURAL}
 #endif
 ,{jjCALL2MANY, LIST_CMD,       LIST_CMD,       DEF_CMD,    DEF_CMD ALLOW_PLURAL}
 ,{jjRES,       LRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD NO_PLURAL}
