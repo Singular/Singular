@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.36 1998-05-20 10:13:02 wichmann Exp $
+@comment $Id: singular.doc,v 1.37 1998-05-25 09:02:47 schmidt Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -157,7 +157,7 @@ differences. Most notably:
 @menu
 * No rvalue of increments and assignments::
 * Evaluation of logical expressions::
-* No case/switch statement::
+* No case or switch statement::
 * Usage of commas::
 * Usage of brackets::
 * Behaviour of continue::
@@ -169,8 +169,8 @@ differences. Most notably:
 @cindex rvalue
 
 The increment @code{++} (resp.@: decrement operator @code{--}) has no
-rvalue, i.e. can not be used on the right-hand sides of 
-assignments. So, instead of 
+rvalue, i.e., cannot be used on the right-hand sides of assignments.
+So, instead of
 
 @example
 j = i++;  // WRONG!!!
@@ -182,23 +182,28 @@ j = i++;  // WRONG!!!
 i++; j = i;
 @end example
 
-Likewise, an assignment expression does not have a result, i.e., does
-not have an rvalue.  Therefore, compound assignments like @code{i = j =
-k;} are not allowed and result in an error.
+Likewise, an assignment expression does not have a result.  Therefore,
+compound assignments like @code{i = j = k;} are not allowed and result
+in an error.
 
 @c ---------------------------------------
-@node Evaluation of logical expressions, No case/switch statement, No rvalue of increments and assignments, Major differences to the C programming language
+@node Evaluation of logical expressions, No case or switch statement, No rvalue of increments and assignments, Major differences to the C programming language
 @heading Evaluation of logical expressions
 @cindex Evaluation of logical expressions
 @cindex and
 @cindex or
 
+@c ------------------------------------------------------------
+@c   This piece of text partially exists also in the file types.doc,
+@c   chapter "boolean expressions".
+@c   If you change something here, change it there, too!
+@c ------------------------------------------------------------
 @strong{All} arguments of a logical expressions are first evaluated and
 then the value of the logical expression is determined. For example, the
 logical expressions @code{(a || b)} is evaluated by first evaluating
 @code{a} @emph{and} @code{b}, even though the value of @code{b} has no
 influence on the value of @code{(a || b)}, if @code{a} evaluates to
-@i{true}. Therefore, the following results in a syntax error
+true. Therefore, the following results in a syntax error
 
 @example
 if (defined(i) && i > 0) @{@} // WRONG!!!
@@ -218,6 +223,9 @@ Note that this evaluation is different from the left-to-right, conditional
 evaluation of logical expressions (as found in most programming
 languages). For example, in these other languages, the value of @code{(1
 || b)} is determined without ever evaluating @code{b}.
+@c ------------------------------------------------------------
+@c end of duplicate text
+@c ------------------------------------------------------------
 
 However, there are several short work-arounds for this problem:
 @enumerate
@@ -252,8 +260,8 @@ value is overwritten by its global one.
 @end enumerate
 
 @c ---------------------------------------
-@node No case/switch statement,  Usage of commas, Evaluation of logical expressions, Major differences to the C programming language
-@heading No case/switch statement
+@node No case or switch statement,  Usage of commas, Evaluation of logical expressions, Major differences to the C programming language
+@heading No case or switch statement
 @cindex case
 @cindex switch
 
@@ -272,7 +280,7 @@ while (1)
 @end example
 
 @c ---------------------------------------
-@node Usage of commas, Usage of brackets, No case/switch statement, Major differences to the C programming language
+@node Usage of commas, Usage of brackets, No case or switch statement, Major differences to the C programming language
 @heading Usage of commas
 @cindex comma
 
@@ -296,13 +304,14 @@ for (i,j = 1,5; i<5 || j<10; i++, j++) @{@dots{}@}
 @heading Usage of brackets
 @cindex bracket
 
-In @sc{Singular}, curly brackets (i.e. "@code{@{@}}") @strong{must always} be
-used to enclose the (statement) body following such constructs like
-@code{if, else, for, while}, even if this block consists of only a
-single statement. Similarly, in the return statement a procedure round
-brackets (i.e. "@code{()}") @strong{must always} be used to enclose the
-return value.
-For example,
+In @sc{Singular}, curly brackets (@code{@{} @code{@}}) @strong{must
+always} be used to enclose the statement body following such constructs
+like @code{if}, @code{else}, @code{for}, @code{while}, even if this
+block consists of only a single statement. Similarly, in the return
+statement of a procedure parentheses (@code{(} @code{)}) @strong{must
+always} be used to enclose the return value.  Even if there is no value
+to return, parentheses have to be used after a return statement
+(i.e., @code{return();}).  For example,
 
 @example
 if (i == 1) return i;    // WRONG!!!!!
