@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.228 2000-10-26 07:19:14 pohl Exp $ */
+/* $Id: iparith.cc,v 1.229 2000-10-26 11:58:35 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1462,7 +1462,7 @@ static BOOLEAN jjCOEFFS2_KB(leftv res, leftv u, leftv v)
 {
   poly p = pInit();
   int i;
-  
+
   for (i=1; i<=pVariables; i++)
   {
     pSetExp(p, i, 1);
@@ -2792,8 +2792,17 @@ static BOOLEAN jjIDEAL_Ma(leftv res, leftv v)
 {
   matrix mat=(matrix)v->CopyD(MATRIX_CMD);
   IDELEMS((ideal)mat)=MATCOLS(mat)*MATROWS(mat);
-  MATROWS(mat)=1;
-  mat->rank=1;
+  if (IDELEMS((ideal)mat)==0)
+  {
+    idDelete((ideal *)&mat);
+    mat=(matrix)idInit(1,1);
+  }
+  else
+  {
+    MATROWS(mat)=1;
+    mat->rank=1;
+    idTest((ideal)mat);
+  }
   res->data=(char *)mat;
   return FALSE;
 }
@@ -4322,7 +4331,7 @@ static BOOLEAN jjMATRIX_Id(leftv res, leftv u, leftv v,leftv w)
 }
 static BOOLEAN jjSUBST_Par_N(leftv res, leftv u, leftv v,leftv w)
 {
-  // u: to change poly 
+  // u: to change poly
   // v: number (parameter)
   // w: image of u (number)
   int i;

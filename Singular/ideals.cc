@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.110 2000-10-26 11:12:06 pohl Exp $ */
+/* $Id: ideals.cc,v 1.111 2000-10-26 11:58:34 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -352,6 +352,7 @@ void idDBTest(ideal h1, int level, char *f,int l)
 
   if (h1 != NULL)
   {
+    // assume(IDELEMS(h1) > 0); for ideal/module, does not apply to matrix
     omCheckAddrSize(h1,sizeof(*h1));
     omdebugAddrSize(h1->m,h1->ncols*h1->nrows*sizeof(poly));
     /* to be able to test matrices: */
