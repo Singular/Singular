@@ -1853,12 +1853,12 @@ static void simplify(monom_poly h, calc_dat* c){
   assume(F_minus==NULL);
 }
 tgb_matrix::tgb_matrix(int i, int j){
-  n=omalloc(i*sizeof (number*));;
+  n=(number**) omalloc(i*sizeof (number*));;
   int z;
   int z2;
   for(z=0;z<i;z++)
   {
-    n[z]=omalloc(j*sizeof(number));
+    n[z]=(number*)omalloc(j*sizeof(number));
     for(z2=0;z2<j;z2++)
     {
       n[z][z2]=nInit(0);
@@ -1882,12 +1882,172 @@ tgb_matrix::~tgb_matrix(){
     }
     omfree(n[z]);
   }
+  omfree(n);
 }
+
+//transfers ownership of n to the matrix
 void tgb_matrix::set(int i, int j, number n){
   assume(i<rows);
   assume(j<columns);
   this->n[i][j]=n;
 }
+int tgb_matrix::get_rows(){
+  return rows;
+}
+int tgb_matrix::get_columns(){
+  return columns;
+}
+number tgb_matrix::get(int i, int j){
+  assume(i<rows);
+  assume(j<columns);
+  return n[i][j];
+}
+BOOLEAN tgb_matrix::is_zero_entry(int i, int j){
+  return (nIsZero(n[i][j]));
+}
+void tgb_matrix::perm_rows(int i, int j){
+  number* h;
+  h=n[i];
+  n[i]=n[j];
+  n[j]=h;
+}
+BOOLEAN tgb_matrix::min_col_not_zero_in_row(int row){
+  int i;
+  for(i=0;i<columns;i++)
+  {
+    if(!(nIsZero(n[row][i])))
+      return i;
+  }
+  return columns;//error code
+}
+BOOLEAN tgb_matrix::zero_row(int row){
+  int i;
+  for(i=0;i<columns;i++)
+  {
+    if(!(nIsZero(n[row][i])))
+      return FALSE;
+  }
+  return TRUE;
+}
+int tgb_matrix::non_zero_entries(int row){
+  int i;
+  int z=0;
+  for(i=0;i<columns;i++)
+  {
+    if(!(nIsZero(n[row][i])))
+      z++;
+  }
+  return z;
+}
+//row add_to=row add_to +row summand*factor
+void tgb_matrix::add_lambda_times_row(int add_to,int summand,number factor){
+  int i;
+  for(i=0;i<columns;i++){
+    if(!(nIsZero(n[summand][i])))
+    {
+      number n1=n[add_to][i];
+      number n2=nMult(factor,n[summand][i]);
+      n[add_to][i]=nAdd(n1,n2);
+      nDelete(&n1);
+      nDelete(&n2);
+    }
+  }
+}
+void tgb_matrix::mult_row(int row,number factor){
+  int i;
+  for(i=0;i<columns;i++){
+    if(!(nIsZero(n[row][i])))
+    {
+      number n1=n[row][i];
+      n[row][i]=nMult(n1,factor);
+      nDelete(&n1);
+    }
+  }
+}
+void simple_gauss(tgb_matrix* mat){
+  int col, row;
+  col=0;
+  row=0;
+  int i;
+  int pn=mat->get_rows();
+  assume(pn>0);
+  //first clear zeroes
+  for(i=0;i<pn;i++)
+  {
+    if(mat->zero_row(i))
+    {
+      mat->perm_rows(i,pn-1);
+      pn--;
+      //if(i!=pn){i--;}
+    }
+  }
+  while(row<pn-1){
+    //row is the row where pivot should be
+    // row== pn-1 means we have only to act on one row so no red nec.
+    //we assume further all rows till the pn-1 row are non-zero
+    
+    //select column
+   
+    col=mat->min_col_not_zero_in_row(row);
+    assume(col!=mat->get_columns());
+    int found_in_row;
+    
+    found_in_row=row;
+    assume(pn<mat->get_rows());
+    for(i=row+1;i<pn;i++){
+      int first=mat->min_col_not_zero_in_row(i);
+      if(first<col)
+      {
+	col=first;
+	found_in_row=i;
+      }
+    }
+    //select pivot
+    int act_l=mat->non_zero_entries(found_in_row);
+    for(i=row+1;i<pn;i++){
+      assume(mat->min_col_not_zero_in_row(i)>=col);
+      if((!(mat->is_zero_entry(i,col)))&&(mat->non_zero_entries(i)<act_l))
+      {
+	found_in_row=i;
+	act_l=mat->non_zero_entries(i);//should be optimized here
+      }
+
+    }
+    mat->perm_rows(row,found_in_row);
+
+    
+    //reduction
+    for(i=row+1;i<pn;i++){
+      assume(mat->min_col_not_zero_in_row(i)>=col);
+      if(!(mat->is_zero_entry(i,col)))
+      {
+	
+	number c1=nNeg(mat->get(i,col));
+	number c2=mat->get(row,col);
+	number n1=c1;
+	number n2=c2;
+
+	ksCheckCoeff(&n1,&n2);
+	nDelete(&c1);
+	mat->mult_row(i,n2);
+	mat->add_lambda_times_row(i,row,n1);
+	assume(mat->is_zero_entry(i,col));
+
+      } 
+      assume(mat->min_col_not_zero_in_row(i)>col);
+    }
+    for(i=row+1;i<pn;i++)
+    {
+      if(mat->zero_row(i))
+      {
+	mat->perm_rows(i,pn-1);
+	pn--;
+      }
+    }
+    row++;
+  }
+}
+
 static tgb_matrix* build_matrix(poly* p,int p_index,poly* done, int done_index, calc_dat* c){
   tgb_matrix* t=new tgb_matrix(p_index,done_index);
   int i, pos;
@@ -2119,7 +2279,7 @@ static void go_on_F4 (calc_dat* c){
 	  monom_poly h;
 	  h.f=c->strat->S[pos];
 	  h.m=pOne();
-	  int* ev=omalloc((c->r->N+1)*sizeof(int));
+	  int* ev=(int*) omalloc((c->r->N+1)*sizeof(int));
 	  pGetExpV(m[i],ev);
 	  pSetExpV(h.m,ev);
 	  omfree(ev);
@@ -2378,7 +2538,6 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   }
   while(c->to_destroy)
   {
-    assume(c->to_destroy->i<0);
     pDelete(&c->to_destroy->p);
     poly_list_node* old=c->to_destroy;
     c->to_destroy=c->to_destroy->next;

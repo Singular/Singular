@@ -106,7 +106,17 @@ class tgb_matrix{
  public:
   tgb_matrix(int i, int j);
   ~tgb_matrix();
+  int get_rows();
+  int get_columns();
+  void perm_rows(int i, int j);
   void set(int i, int j, number n);
+  number get(int i, int j);
+  BOOLEAN is_zero_entry(int i, int j);
+  BOOLEAN min_col_not_zero_in_row(int row);
+  BOOLEAN zero_row(int row);
+  void mult_row(int row,number factor);
+  void add_lambda_times_row(int add_to,int summand,number factor);
+  int non_zero_entries(int row);
 };
 struct poly_array_list{
   poly* p;
