@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.65 2002-01-21 09:39:39 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.66 2002-06-03 12:14:08 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -886,17 +886,7 @@ static BOOLEAN jjA_L_LIST(leftv l, leftv r)
   if (l->rtyp==IDHDL)
   {
     IDLIST((idhdl)l->data)=L;
-#ifdef HAVE_NAMESPACES
-    if (l->req_packhdl != NULL)
-    {
-      //Print("jjA_L_LIST: -1 \n");
-      namespaceroot->push( IDPACKAGE(l->req_packhdl), IDID((idhdl)l));
-      ipMoveId((idhdl)l->data);
-      namespaceroot->pop();
-    }
-    else
-#endif /* HAVE_NAMESPACES */
-      ipMoveId((idhdl)l->data);
+    ipMoveId((idhdl)l->data);
   }
   else
   {
@@ -1221,17 +1211,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
          //Print("jjA_L_LIST: - 2 \n");
          if((l->rtyp==IDHDL) && (l->data!=NULL))
          {
-#ifdef HAVE_NAMESPACES
-           //if (IDTYP((idhdl)l->data)==LIST_CMD)
-           if ((l->req_packhdl)!= NULL)
-           {
-             namespaceroot->push( IDPACKAGE(l->req_packhdl) , IDID(l->req_packhdl));
-             ipMoveId((idhdl)l->data);
-             namespaceroot->pop();
-           }
-           else
-#endif /* HAVE_NAMESPACES */
-             ipMoveId((idhdl)l->data);
+           ipMoveId((idhdl)l->data);
            l->attribute=IDATTR((idhdl)l->data);
            l->flag=IDFLAG((idhdl)l->data);
          }
@@ -1269,18 +1249,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
         {
           if ((lt==DEF_CMD)||(lt==LIST_CMD))
           {
-#ifdef HAVE_NAMESPACES
-            //Print("jjA_L_LIST: - 3 \n");
-            if (lt==LIST_CMD && (l->req_packhdl)!= NULL)
-            {
-              namespaceroot->push( IDPACKAGE(l->req_packhdl) ,
-                                   IDID(l->req_packhdl));
-              ipMoveId((idhdl)l->data);
-              namespaceroot->pop();
-            }
-            else
-#endif /* HAVE_NAMESPACES */
-              ipMoveId((idhdl)l->data);
+            ipMoveId((idhdl)l->data);
           }
           l->attribute=IDATTR((idhdl)l->data);
           l->flag=IDFLAG((idhdl)l->data);
@@ -1304,19 +1273,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
           if ((lt==DEF_CMD) || (lt==LIST_CMD))
           {
             //Print("ipAssign - 3.0\n");
-#ifdef HAVE_NAMESPACES
-            //Print("jjA_L_LIST: - 4 \n");
-            if (lt==LIST_CMD && (l->req_packhdl)!= NULL)
-            {
-              // Print("==========>ipAssign() - 3\n");
-              namespaceroot->push( IDPACKAGE(l->req_packhdl) ,
-                                   IDID(l->req_packhdl));
-              ipMoveId((idhdl)l->data);
-              namespaceroot->pop();
-            }
-            else
-#endif /* HAVE_NAMESPACES */
-              ipMoveId((idhdl)l->data);
+            ipMoveId((idhdl)l->data);
           }
           l->attribute=IDATTR((idhdl)l->data);
           l->flag=IDFLAG((idhdl)l->data);

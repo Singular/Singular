@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.33 2002-01-23 13:09:48 Singular Exp $ */
+/* $Id: ipid.h,v 1.34 2002-06-03 12:14:47 Singular Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -36,12 +36,10 @@ inline package paCopy(package pack)
   return pack;
 }
 
-#ifndef HAVE_NAMESPACES
 inline void paKill(package pack)
 {
   pack->ref--;
 }
-#endif
 
 union uutypes;
 
@@ -121,37 +119,10 @@ class proclevel {
 };
 extern proclevel *procstack;
 
-#ifdef HAVE_NAMESPACES
-class namerec {
-  public:
-  namehdl    next;
-  namehdl    root;
-  package    pack;
-  char *     name;
-  int        lev;
-  BOOLEAN    isroot;
-#define NSROOT(a) ((a)->pack->idroot)
-#define NSPACK(a) ((a)->pack)
-
-  int        myynest;
-  idhdl      currRingHdl;
-  ring       currRing;
-
- namerec()  { memset(this,0,sizeof(*this)); }
-  //namehdl    Set(idhdl root);
-  namehdl    pop(BOOLEAN change_nesting=FALSE);
-  namehdl    push(package pack, char *name, int nesting=-1, BOOLEAN init=FALSE);
-  idhdl      get(const char * s, int lev, BOOLEAN root=FALSE);
-};
-
-extern namehdl namespaceroot;
-#define IDROOT (NSROOT(namespaceroot))
-#else /* HAVE_NAMESPACES */
 #ifndef HAVE_NS
 extern idhdl      idroot;
 #define IDROOT idroot
 #endif /* HAVE_NS */
-#endif /* HAVE_NAMESPACES */
 
 #ifdef HAVE_NS
 extern idhdl currPackHdl;

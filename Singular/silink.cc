@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.42 2001-10-09 16:36:22 Singular Exp $ */
+/* $Id: silink.cc,v 1.43 2002-06-03 12:15:51 Singular Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -558,16 +558,6 @@ static BOOLEAN DumpAscii(FILE *fd, idhdl h)
   if (IDTYP(h) == RING_CMD || IDTYP(h) == QRING_CMD)
     return DumpAscii(fd, IDRING(h)->idroot);
   else
-#ifdef HAVE_NAMESPACES
-    if (IDTYP(h) == PACKAGE_CMD && strcmp(IDID(h), "Top") != 0)
-    {
-      namespaceroot->push(IDPACKAGE(h), IDID(h));
-      int ret_it = DumpAscii(fd, IDPACKAGE(h)->idroot);
-      namespaceroot->pop();
-      return ret_it;
-    }
-  else
-#endif
     return FALSE;
 }
 
@@ -584,17 +574,9 @@ static BOOLEAN DumpAsciiMaps(FILE *fd, idhdl h, idhdl rhdl)
     rSetHdl(rhdl);
     rhs = h->String();
 
-#ifdef HAVE_NAMESPACES
-    if (fprintf(fd, "setring %s::%s;\n",
-                namespaceroot->name, IDID(rhdl)) == EOF) return TRUE;
-    if (fprintf(fd, "%s %s::%s = %s, %s;\n", Tok2Cmdname(MAP_CMD),
-                 namespaceroot->name, IDID(h),
-                IDMAP(h)->preimage, rhs) == EOF)
-#else
     if (fprintf(fd, "setring %s;\n", IDID(rhdl)) == EOF) return TRUE;
     if (fprintf(fd, "%s %s = %s, %s;\n", Tok2Cmdname(MAP_CMD), IDID(h),
                 IDMAP(h)->preimage, rhs) == EOF)
-#endif
     {
       omFree(rhs);
       return TRUE;
@@ -613,10 +595,6 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
   char *type_str = GetIdString(h);
   idtyp type_id = IDTYP(h);
 
-#ifdef HAVE_NAMESPACES
-  if ((type_id == PACKAGE_CMD) &&(strcmp(IDID(h), "Top") == 0))
-    return FALSE;
-#endif
 #ifdef HAVE_NS
   if ((type_id == PACKAGE_CMD) &&(strcmp(IDID(h), "Top") == 0))
     return FALSE;
@@ -630,22 +608,15 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
   if (type_id == QRING_CMD)
     return DumpQring(fd, h, type_str);
 
-#ifndef HAVE_NAMESPACES
 #ifndef HAVE_NS
   // do not dump LIB string
   if (type_id == STRING_CMD && strcmp("LIB", IDID(h)) == 0)
     return FALSE;
 #endif
-#endif
 
   // put type and name
-#ifdef HAVE_NAMESPACES
-  if (fprintf(fd, "%s %s::%s", type_str, namespaceroot->name, IDID(h)) == EOF)
-    return TRUE;
-#else
   if (fprintf(fd, "%s %s", type_str, IDID(h)) == EOF)
     return TRUE;
-#endif
   // for matricies, append the dimension
   if (type_id == MATRIX_CMD)
   {
@@ -658,13 +629,6 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
         == EOF) return TRUE;
   }
 
-#ifdef HAVE_NAMESPACES
-  if (type_id == PACKAGE_CMD)
-  {
-    if (fprintf(fd, ";\n") == EOF) return TRUE;
-    else return FALSE;
-  }
-#endif
 #ifdef HAVE_NS
   if (type_id == PACKAGE_CMD)
   {
@@ -734,12 +698,7 @@ static BOOLEAN DumpQring(FILE *fd, idhdl h, char *type_str)
               iiStringMatrix((matrix) IDRING(h)->qideal, 1))
       == EOF) return TRUE;
   if (fprintf(fd, "attrib(temp_ideal, \"isSB\", 1);\n") == EOF) return TRUE;
-#ifdef HAVE_NAMESPACES
-  if (fprintf(fd, "%s %s::%s = temp_ideal;\n",
-              type_str,  namespaceroot->name, IDID(h)) == EOF)
-#else
   if (fprintf(fd, "%s %s = temp_ideal;\n", type_str, IDID(h)) == EOF)
-#endif
     return TRUE;
   if (fprintf(fd, "kill temp_ring;\n") == EOF) return TRUE;
   else

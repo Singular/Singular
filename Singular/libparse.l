@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.49 2001-10-23 14:04:23 Singular Exp $ */
+/* $Id: libparse.l,v 1.50 2002-06-03 12:15:08 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -31,11 +31,7 @@ typedef enum { LP_NONE, LP_INFO, LP_CATEGORY, LP_VERSION} lib_cmds;
 int libread(FILE* f, char* buf, int max_size);
 int current_pos(int i);
 void print_version(lp_modes mode, char *p);
-#ifdef HAVE_NAMESPACES
-void copy_string(lp_modes mode, idhdl pl);
-#else /* HAVE_NAMESPACES */
 void copy_string(lp_modes mode);
-#endif /* HAVE_NAMESPACES */
 extern void piCleanUp(procinfov pi);
 void make_version(char *p, int what);
 
@@ -114,10 +110,6 @@ void main_init(int argc, char *argv[]);
 void main_result(char *libname);
 #else /* STANDALONE_PARSER */
 idhdl h0;
-#ifdef HAVE_NAMESPACES
-idhdl h_top;
-extern namehdl namespaceroot;
-#endif /* HAVE_NAMESPACES */
 #ifdef HAVE_NS
 idhdl h_top;
 #endif
@@ -177,11 +169,6 @@ do                                            \
 while(0)
 
 #undef YY_DECL
-#ifdef HAVE_NAMESPACES
-#define YY_DECL int yylex(char *newlib, char *libfile, \
-                           lib_style_types *lib_style, \
-                           idhdl pl, BOOLEAN autoexport, lp_modes mode)
-#else /* HAVE_NAMESPACES */
 #ifdef HAVE_NS
 #define YY_DECL int yylex(char *newlib, char *libfile, \
                            lib_style_types *lib_style, \
@@ -191,7 +178,6 @@ while(0)
                            lib_style_types *lib_style, \
                            lp_modes mode)
 #endif /* HAVE_NS */
-#endif /* HAVE_NAMESPACES */
 
 #undef YY_INPUT
 #define YY_INPUT(buf,result,max_size) \
@@ -305,18 +291,9 @@ eqnl           ([ \t\n]*+=[ \t\n]*)
                else if (!category_out)
                  printf("Version:%s;\n", libnamebuf);
                #else
-               //#ifdef HAVE_NAMESPACES
-               //h0 = enterid( "version", myynest, STRING_CMD,
-               //                   &IDPACKAGE(pl)->idroot, FALSE );
-               //if (h0!=NULL)
-               //{
-               //   IDSTRING(h0) = omStrDup(libnamebuf);
-               //}
-               //#else /* HAVE_NAMESPACES */
                if (text_buffer!=NULL) omFree((ADDRESS)text_buffer);
                text_buffer = omStrDup(libnamebuf);
                omMarkAsStaticAddr(text_buffer);
-               //#endif /* HAVE_NAMESPACES */
                #endif
              }
            }
@@ -349,17 +326,6 @@ static     { p_static=TRUE; }
              #else STANDALONE_PARSER
              if( mode == LOAD_LIB)
              {
-               #ifdef HAVE_NAMESPACES
-               h0 = enterid( proc, 0 /*myynest*/, PROC_CMD,
-                                 &IDPACKAGE(pl)->idroot, TRUE);
-               if(!p_static && autoexport)
-               {
-                  namespaceroot->push( NSPACK(namespaceroot->root) ,"");
-                  h_top = enterid( proc, myynest, PROC_CMD,
-                                 &NSROOT(namespaceroot->root), FALSE );
-                  namespaceroot->pop();
-               }
-               #else /* HAVE_NAMESPACES */
                #ifdef HAVE_NS
                h0 = enterid( proc, 0 /*myynest*/, PROC_CMD,
                                  &(IDPACKAGE(pl)->idroot), TRUE);
@@ -372,20 +338,11 @@ static     { p_static=TRUE; }
                h0 = enterid( proc, 0 /*myynest*/, PROC_CMD,
                                    &IDROOT, TRUE );
                #endif /* HAVE_NS */
-               #endif /* HAVE_NAMESPACES */
                /* omCheckAddr(IDID(h0)); */
                if (h0!=NULL)
                {
                  iiInitSingularProcinfo(IDPROC(h0), newlib, proc,
                                 yylplineno, current_pos(0),p_static);
-                 #ifdef HAVE_NAMESPACES
-                 if (!p_static && h_top != NULL && autoexport)
-                 {
-                   if(IDPROC(h_top)!=NULL) piCleanUp((procinfo *)IDPROC(h_top));
-                   IDPROC(h_top)=IDPROC(h0);
-                   IDPROC(h_top)->ref++;
-                 }
-                 #endif /* HAVE_NAMESPACES */
                  #ifdef HAVE_NS
                  if (!p_static && h_top != NULL && autoexport)
                  {
@@ -779,11 +736,7 @@ LIB[ \t]*"(\"" { quote++; brace2++;
 <category>.  { }
 
 <string>"\""             { quote--;
-                           #ifdef HAVE_NAMESPACES
-                             copy_string(mode, pl);
-                           #else /* HAVE_NAMESPACES */
-                             copy_string(mode);
-                           #endif /* HAVE_NAMESPACES */
+                           copy_string(mode);
                            last_cmd = LP_NONE;
                            if(old_state==phelp)
                            {
@@ -922,11 +875,7 @@ void make_version(char *p,int what)
   //printf("ID=(%d)%s; \n", what, p);
 }
 
-#ifdef HAVE_NAMESPACES
-void copy_string(lp_modes mode, idhdl pl)
-#else /* HAVE_NAMESPACES */
 void copy_string(lp_modes mode)
-#endif /* HAVE_NAMESPACES */
 {
 #ifdef STANDALONE_PARSER
   if ((texinfo_out && (last_cmd == LP_INFO || last_cmd == LP_CATEGORY)) ||
@@ -992,16 +941,6 @@ void copy_string(lp_modes mode)
       }
       if(offset>0) text_buffer[i-offset] = text_buffer[i];
     }
-    #ifdef HAVE_NAMESPACES
-    if( mode != GET_INFO ) {
-      h0 = enterid( "info", myynest, STRING_CMD,
-                          &IDPACKAGE(pl)->idroot, FALSE );
-      if (h0!=NULL)
-      {
-         IDSTRING(h0) = omStrDup(text_buffer);
-      }
-    }
-    #endif /* HAVE_NAMESPACES */
   }
 #endif /* STANDALONE_PARSER */
 }
