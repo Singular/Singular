@@ -117,6 +117,7 @@ OBJS=grammar.o scanner.o matpol.o binom.o\
 
 .y.cc:
 	${BISON} -d -t -o grammar.cc $<
+	chmod +x testgh
 	./testgh
 
 .cc.o:	

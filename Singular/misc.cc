@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.7 1997-04-25 15:04:03 obachman Exp $ */
+/* $Id: misc.cc,v 1.8 1997-04-28 09:57:56 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -30,6 +30,7 @@
 #include "kstd1.h"
 #include "subexpr.h"
 #include "timer.h"
+#include "intvec.h"
 
 /*0 implementation*/
 
@@ -452,107 +453,86 @@ BOOLEAN setOption(leftv res, leftv v)
 
     int i;
 
-    if (iiOp==OPTION_CMD)
+    if(strcmp(n,"get")==0)
     {
-      if(strcmp(n,"get")==0)
+      intvec *w=new intvec(2);
+      (*w)[0]=test;
+      (*w)[1]=verbose;
+      res->rtyp=INTVEC_CMD;
+      res->data=(void *)w;
+      goto okay;
+    }
+    if(strcmp(n,"set")==0)
+    {
+      if((v->next!=NULL)
+      &&(v->next->Typ()==INTVEC_CMD))
       {
-        res->rtyp=INT_CMD;
-        res->data=(void *)test;
+        v=v->next;
+        intvec *w=(intvec*)v->Data();  
+        test=(*w)[0];
+        verbose=(*w)[1];
+        
+        if (TEST_OPT_INTSTRATEGY && (currRing!=NULL) && (currRing->ch>=2))
+        {
+          test &=~Sy_bit(OPT_INTSTRATEGY);
+        }
+        goto okay;
+      }  
+    }
+    for (i=0; (i==0) || (optionStruct[i-1].setval!=0); i++)
+    {
+      if (strcmp(n,optionStruct[i].name)==0)
+      {
+        if (optionStruct[i].setval & validOpts)
+          test |= optionStruct[i].setval;
+        else
+          Warn("cannot set option");
+        if (TEST_OPT_INTSTRATEGY && (currRing!=NULL) && (currRing->ch>=2))
+        {
+          test &=~Sy_bit(OPT_INTSTRATEGY);
+        }
         goto okay;
       }
-      if(strcmp(n,"set")==0)
+      else if ((strncmp(n,"no",2)==0)
+      && (strcmp(n+2,optionStruct[i].name)==0))
       {
-        if((v->next!=NULL)
-        &&(v->next->Typ()==INT_CMD))
+        if ((optionStruct[i].setval & validOpts)
+        || (strcmp(n+2,"ne")==0))
         {
-          v=v->next;
-          test=(int)v->Data();
-          if (TEST_OPT_INTSTRATEGY && (currRing!=NULL) && (currRing->ch>=2))
-          {
-            test &=~Sy_bit(OPT_INTSTRATEGY);
-          }
-          goto okay;
-        }  
-      }
-      for (i=0; (i==0) || (optionStruct[i-1].setval!=0); i++)
-      {
-        if (strcmp(n,optionStruct[i].name)==0)
-        {
-          if (optionStruct[i].setval & validOpts)
-            test |= optionStruct[i].setval;
-          else
-            Warn("cannot set option");
-          if (TEST_OPT_INTSTRATEGY && (currRing!=NULL) && (currRing->ch>=2))
-          {
-            test &=~Sy_bit(OPT_INTSTRATEGY);
-          }
-          goto okay;
+          test &= optionStruct[i].resetval;
         }
-        else if ((strncmp(n,"no",2)==0)
-        && (strcmp(n+2,optionStruct[i].name)==0))
-        {
-          if ((optionStruct[i].setval & validOpts)
-          || (strcmp(n+2,"ne")==0))
-          {
-            test &= optionStruct[i].resetval;
-          }
-          else
-            Warn("cannot clear option");
-          goto okay;
-        }
-      }
-      if(v->Typ()==INT_CMD)
-      {
-        test=(int)v->Data();
-        return FALSE;
+        else
+          Warn("cannot clear option");
+        goto okay;
       }
     }
-    else
+    for (i=0; (i==0) || (verboseStruct[i-1].setval!=0); i++)
     {
-      if(strcmp(n,"get")==0)
+      if (strcmp(n,verboseStruct[i].name)==0)
       {
-        res->rtyp=INT_CMD;
-        res->data=(void *)verbose;
+        verbose |= verboseStruct[i].setval;
+        #ifdef YYDEBUG
+        #if YYDEBUG
+        if (BVERBOSE(V_YACC)) yydebug=1;
+        else                  yydebug=0;
+        #endif
+        #endif
         goto okay;
       }
-      if(strcmp(n,"set")==0)
+      else if ((strncmp(n,"no",2)==0)
+      && (strcmp(n+2,verboseStruct[i].name)==0))
       {
-        if((v->next!=NULL)
-        &&(v->next->Typ()==INT_CMD))
-        {
-          v=v->next;
-          verbose=(int)v->Data();
-          goto okay;
-        }  
+        verbose &= verboseStruct[i].resetval;
+        #ifdef YYDEBUG
+        #if YYDEBUG
+        if (BVERBOSE(V_YACC)) yydebug=1;
+        else                  yydebug=0;
+        #endif
+        #endif
+        goto okay;
       }
-      for (i=0; (i==0) || (verboseStruct[i-1].setval!=0); i++)
-      {
-        if (strcmp(n,verboseStruct[i].name)==0)
-        {
-          verbose |= verboseStruct[i].setval;
-#ifdef YYDEBUG
-#if YYDEBUG
-          if (BVERBOSE(V_YACC)) yydebug=1;
-          else                  yydebug=0;
-#endif
-#endif
-          goto okay;
-        }
-        else if ((strncmp(n,"no",2)==0)
-        && (strcmp(n+2,verboseStruct[i].name)==0))
-        {
-          verbose &= verboseStruct[i].resetval;
-#ifdef YYDEBUG
-#if YYDEBUG
-          if (BVERBOSE(V_YACC)) yydebug=1;
-          else                  yydebug=0;
-#endif
-#endif
-          goto okay;
-       }
-     }
-   }
-   Werror("unknown option `%s`",n);
+    }
+    Werror("unknown option `%s`",n);
   okay:
     FreeL((ADDRESS)n);
     v=v->next;
@@ -560,16 +540,16 @@ BOOLEAN setOption(leftv res, leftv v)
   return FALSE;
 }
 
-void showOption(int cmd)
+void showOption()
 {
   int i;
   BITSET tmp;
 
-  if (cmd==OPTION_CMD)
+  PrintS("//options:");
+  if ((test!=0)||(verbose!=0))
   {
     tmp=test;
-    PrintS("//options for 'std'-command:");
-    if (tmp)
+    if(tmp)
     {
       for (i=0; optionStruct[i].setval!=0; i++)
       {
@@ -583,15 +563,8 @@ void showOption(int cmd)
       {
         if (tmp & Sy_bit(i)) Print(" %d",i);
       }
-      PrintLn();
     }
-    else
-      PrintS(" none\n");
-  }
-  else
-  {
     tmp=verbose;
-    PrintS("//verbose:");
     if (tmp)
     {
       for (i=0; verboseStruct[i].setval!=0; i++)
@@ -604,13 +577,13 @@ void showOption(int cmd)
       }
       for (i=1; i<32; i++)
       {
-        if (tmp & Sy_bit(i)) Print(" %d",i);
+        if (tmp & Sy_bit(i)) Print(" %d",i+32);
       }
-      PrintLn();
     }
-    else
-      PrintS(" minimum\n");
+    PrintLn();
   }
+  else
+    PrintS(" none\n");
 }
 
 #ifndef HAVE_STRSTR

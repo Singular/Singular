@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.3 1997-04-09 12:19:51 Singular Exp $ */
+/* $Id: ipshell.h,v 1.4 1997-04-28 09:57:55 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -140,7 +140,7 @@ int     iiDeclCommand(leftv sy, leftv name, int lev, int t, idhdl* root,
   BOOLEAN init_b=TRUE);
 sleftv * iiMake_proc(idhdl pn, sleftv* sl);
 // from misc.cc:
-void   showOption(int cmd);
+void   showOption();
 BOOLEAN setOption(leftv res, leftv v);
 /* ================================================================== */
 // from sing_dld.cc:

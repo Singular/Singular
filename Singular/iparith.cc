@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.23 1997-04-25 15:03:58 obachman Exp $ */
+/* $Id: iparith.cc,v 1.24 1997-04-28 09:57:54 Singular Exp $ */
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
@@ -273,7 +273,6 @@ cmdnames cmds[] =
   { "varstr",      0, VARSTR_CMD ,        CMD_12},
   { "vdim",        0, VDIM_CMD ,          CMD_1},
   { "vector",      0, VECTOR_CMD ,        RING_DECL},
-  { "verbose",     0, VERBOSE_CMD ,       CMD_M},
   { "wedge",       0, WEDGE_CMD ,         CMD_2},
   { "weight",      0, WEIGHT_CMD ,        CMD_1},
   { "whileif",     0, IF_CMD ,            IF_CMD},
@@ -282,6 +281,7 @@ cmdnames cmds[] =
   { "IN",          1, LEAD_CMD ,          CMD_1},
   { "NF",          1, REDUCE_CMD ,        CMD_23},
   { "multiplicity",1, MULTIPLICITY_CMD ,  CMD_1},
+  { "verbose",     1, OPTION_CMD ,        CMD_M},
 //  { "rank",        1, ROWS_CMD ,          CMD_1},
 
 /* set sys vars*/
@@ -3986,7 +3986,7 @@ static BOOLEAN jjOPTION_PL(leftv res, leftv v)
 {
   if(v==NULL)
   {
-    showOption(iiOp);
+    showOption();
     return FALSE;
   }
   return setOption(res,v);
@@ -4090,7 +4090,6 @@ struct sValCmdM dArithM[]=
 ,{jjSTRING_PL, STRING_CMD,      STRING_CMD,         -1 }
 ,{jjSYSTEM,    SYSTEM_CMD,      NONE/*or set by p*/,-2 }
 ,{jjTEST,      TEST_CMD,        NONE,               -2 }
-,{jjOPTION_PL, VERBOSE_CMD,     NONE/*or set by p*/,-1 }
 ,{iiWRITE,     WRITE_CMD,       NONE,               -2 }
 ,{NULL,        0,               0,                  0  }
 };
