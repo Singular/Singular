@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.19 1999-06-21 16:46:38 Singular Exp $ */
+/* $Id: longrat.cc,v 1.20 1999-06-22 08:09:18 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -2101,16 +2101,41 @@ int nlModP(number n, int p)
   return iz;
 }
 
-number   nlGetDenom(number n)
+/*2
+* acces to denominator, other 1 for integers
+*/
+number   nlGetDenom(number &n)
 {
   if (!(SR_HDL(n) & SR_INT))
   {
-    if (n->s!=3)
+    if (n->s==0)
     {
-      number r=nlRInit(1);
-      mpz_set(&r->z,&n->n);
-      return r;
+      nlNormalize(n);
+    }
+    if (!(SR_HDL(n) & SR_INT))
+    {
+      if (n->s!=3)
+      {
+        number u=(number)Alloc(sizeof(rnumber));
+	u->s=3;
+	#ifdef LDEBUG
+	u->debug=123456;
+	#endif
+
+        mpz_init_set(&u->z,&n->n);
+        {
+          int ui=(int)mpz_get_si(&u->z);
+          if ((((ui<<3)>>3)==ui)
+          && (mpz_cmp_si(&u->z,(long)ui)==0))
+          {
+            mpz_clear(&u->z);
+            Free((ADDRESS)u,sizeof(rnumber));
+            return INT_TO_SR(ui);
+          }
+        }
+        return u;
+      }
     }
   }
-  return nlInit(1);
+  return INT_TO_SR(1);
 }

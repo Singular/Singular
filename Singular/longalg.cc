@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.33 1999-06-21 16:46:36 Singular Exp $ */
+/* $Id: longalg.cc,v 1.34 1999-06-22 08:09:14 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -2536,8 +2536,9 @@ poly naPermNumber(number z, int * par_perm, int P)
   return res;
 }
 
-number   naGetDenom(number n)
+number   naGetDenom(number &n)
 {
+  naNormalize(n);
   lnumber x=(lnumber)n;
   if (x->n!=NULL)
   {
