@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_GetMisc.cc,v 1.8 1998-03-23 22:51:01 obachman Exp $ */
+/* $Id: mpsr_GetMisc.cc,v 1.9 1998-06-13 12:44:45 krueger Exp $ */
 
 /***************************************************************
  *
@@ -349,7 +349,7 @@ void mpsr_MapLeftv(leftv l, ring from_ring, ring to_ring)
 // otherwise, a ring name is generated, and a new idhdl is created
 void mpsr_SetCurrRingHdl(ring r)
 {
-  idhdl h = idroot, rh = NULL;
+  idhdl h = IDROOT, rh = NULL;
 
   if (r == NULL)
   {
@@ -395,8 +395,8 @@ void mpsr_SetCurrRingHdl(ring r)
     // reset currRing for reasons explained above
     if (currRingHdl != NULL) mpsr_SetCurrRing(IDRING(currRingHdl), TRUE);
     rSetHdl(rh, TRUE);
-    rh->next = idroot;
-    idroot = rh;
+    rh->next = IDROOT;
+    IDROOT = rh;
     r->ref = 0;
   }
 }
@@ -415,7 +415,11 @@ static char* GenerateRingName()
 // the first found is returned together witht the respective ring
 idhdl mpsr_FindIdhdl(char *name, ring &r)
 {
+#ifdef HAVE_NAMESPACES
+  idhdl h = (NSROOT(namespaceroot) != NULL ? namespaceroot->get(name, 0): (idhdl) NULL), h2;
+#else /* HAVE_NAMESPACES */
   idhdl h = (idroot != NULL ? idroot->get(name, 0): (idhdl) NULL), h2;
+#endif /* HAVE_NAMESPACES */
   r = NULL;
   
   if (h != NULL)
@@ -424,7 +428,7 @@ idhdl mpsr_FindIdhdl(char *name, ring &r)
     return h;
   }
 
-  h = idroot;
+  h = IDROOT;
   while ( h != NULL)
   {
     if (IDTYP(h) == RING_CMD || IDTYP(h) == QRING_CMD)

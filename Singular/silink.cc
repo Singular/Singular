@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.19 1998-06-03 10:04:24 obachman Exp $ */
+/* $Id: silink.cc,v 1.20 1998-06-13 12:44:47 krueger Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -452,7 +452,7 @@ char* slStatusAscii(si_link l, char* request)
 BOOLEAN slDumpAscii(si_link l)
 {
   FILE *fd = (FILE *) l->data;
-  idhdl h = idroot, rh = currRingHdl;
+  idhdl h = IDROOT, rh = currRingHdl;
   BOOLEAN status = DumpAscii(fd, h);
 
   if (! status ) status = DumpAsciiMaps(fd, h, NULL);

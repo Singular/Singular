@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.38 1998-05-28 16:50:46 Singular Exp $ */
+/* $Id: grammar.y,v 1.39 1998-06-13 12:44:37 krueger Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -80,7 +80,7 @@ void yyerror(char * fmt)
   errorreported = TRUE;
   if (currid!=NULL)
   {
-    killid(currid,&idroot);
+    killid(currid,&IDROOT);
     currid = NULL;
   }
   if(!oldInError)
@@ -443,11 +443,18 @@ elemexpr:
           }
         | elemexpr COLONCOLON extendedid
           {
-            idhdl r=idroot;
+            idhdl r=IDROOT;
             if ($1.Typ()!=PACKAGE_CMD) MYYERROR("<package>::<id> expected");
+#ifdef HAVE_NAMESPACES
+            namespaceroot->push( IDPACKAGE((idhdl)$1.data),
+                                 ((sleftv)$1).name);
+            syMake(&$$,$3);
+            namespaceroot->pop();
+#else /* HAVE_NAMESPACES */
             idroot=IDPACKAGE((idhdl)$1.data)->idroot;
             syMake(&$$,$3);
             idroot=r;
+#endif /* HAVE_NAMESPACES */
           }
         | '[' exprlist ']'
           {
@@ -827,11 +834,11 @@ currring_lists:
 declare_ip_variable:
         ROOT_DECL elemexpr
           {
-            if (iiDeclCommand(&$$,&$2,myynest,$1,&idroot)) YYERROR;
+            if (iiDeclCommand(&$$,&$2,myynest,$1,&IDROOT)) YYERROR;
           }
         | ROOT_DECL_LIST elemexpr
           {
-            if (iiDeclCommand(&$$,&$2,myynest,$1,&idroot)) YYERROR;
+            if (iiDeclCommand(&$$,&$2,myynest,$1,&IDROOT)) YYERROR;
           }
         | RING_DECL elemexpr
           {
@@ -863,7 +870,7 @@ declare_ip_variable:
           }
         | INTMAT_CMD elemexpr '[' expr ']' '[' expr ']'
           {
-            if (iiDeclCommand(&$$,&$2,myynest,$1,&idroot)) YYERROR;
+            if (iiDeclCommand(&$$,&$2,myynest,$1,&IDROOT)) YYERROR;
             int r; TESTSETINT($4,r);
             int c; TESTSETINT($7,c);
             if (r < 1)
@@ -879,7 +886,7 @@ declare_ip_variable:
           }
         | INTMAT_CMD elemexpr
           {
-            if (iiDeclCommand(&$$,&$2,myynest,$1,&idroot)) YYERROR;
+            if (iiDeclCommand(&$$,&$2,myynest,$1,&IDROOT)) YYERROR;
             leftv v=&$$;
             idhdl h;
             do
@@ -901,7 +908,7 @@ declare_ip_variable:
             }
             else
             {
-              if (iiDeclCommand(&r,&$3,myynest,t,&idroot)) YYERROR;
+              if (iiDeclCommand(&r,&$3,myynest,t,&IDROOT)) YYERROR;
             }
             leftv v=&$1;
             while (v->next!=NULL) v=v->next;
@@ -911,7 +918,7 @@ declare_ip_variable:
           }
         | PROC_CMD elemexpr
           {
-            if (iiDeclCommand(&$$,&$2,myynest,PROC_CMD,&idroot,TRUE)) YYERROR;
+            if (iiDeclCommand(&$$,&$2,myynest,PROC_CMD,&IDROOT,TRUE)) YYERROR;
           }
         ;
 
@@ -1078,7 +1085,8 @@ exportcmd:
         | EXPORT_CMD exprlist extendedid expr
         {
           if ((strcmp($3,"to")!=0) ||
-          (($4.Typ()!=PACKAGE_CMD) && ($4.Typ()!=INT_CMD)))
+          (($4.Typ()!=PACKAGE_CMD) && ($4.Typ()!=INT_CMD) &&
+           ($4.Typ()!=STRING_CMD)))
             MYYERROR("export <id> to <package|int>");
           FreeL((ADDRESS)$3);
           if ($4.Typ()==INT_CMD)
@@ -1087,8 +1095,14 @@ exportcmd:
           }
           else
           {
-            if (iiExport(&$2,0,IDPACKAGE((idhdl)$4.data)->idroot))
-              YYERROR;
+            if ($4.Typ()==PACKAGE_CMD) {
+              if (iiExport(&$2,0,IDPACKAGE((idhdl)$4.data)->idroot))
+                YYERROR;
+            }
+            else
+            {
+             printf("String: %s;\n", (char *)$4.data);
+            }
           }
         }
         ;
@@ -1243,7 +1257,15 @@ setringcmd:
                 {
                   if (IDLEV(h)!=0)
                   {
+#ifdef HAVE_NAMESPACES
+                    if(namespaceroot->isroot) {
+                      if (iiExport(&$2,myynest-1)) YYERROR;
+                    } else {
+                      if (iiExport(&$2,myynest-1, NSROOT(namespaceroot->next))) YYERROR;
+                    }
+#else /* HAVE_NAMESPACES */
                     if (iiExport(&$2,myynest-1)) YYERROR;
+#endif /* HAVE_NAMESPACES */
                     //if (TEST_OPT_KEEPVARS)
                     //{
                       idhdl p=IDRING(h)->idroot;
@@ -1417,7 +1439,7 @@ proccmd:
         PROC_CMD extendedid BLOCKTOK
           {
             procinfov pi;
-            idhdl h = enterid($2,myynest,PROC_CMD,&idroot,FALSE);
+            idhdl h = enterid($2,myynest,PROC_CMD,&IDROOT,FALSE);
             if (h==NULL) {FreeL((ADDRESS)$3); YYERROR;}
             iiInitSingularProcinfo(IDPROC(h),"", $2, 0, 0);
             IDPROC(h)->data.s.body = (char *)AllocL(strlen($3)+31);;
@@ -1426,7 +1448,7 @@ proccmd:
           }
         | PROC_DEF STRINGTOK BLOCKTOK
           {
-            idhdl h = enterid($1,myynest,PROC_CMD,&idroot,FALSE);
+            idhdl h = enterid($1,myynest,PROC_CMD,&IDROOT,FALSE);
             if (h==NULL)
             {
               FreeL((ADDRESS)$2);
@@ -1446,7 +1468,7 @@ proccmd:
         | PROC_DEF STRINGTOK STRINGTOK BLOCKTOK
           {
             FreeL((ADDRESS)$3);
-            idhdl h = enterid($1,myynest,PROC_CMD,&idroot,FALSE);
+            idhdl h = enterid($1,myynest,PROC_CMD,&IDROOT,FALSE);
             if (h==NULL)
             {
               FreeL((ADDRESS)$2);
@@ -1477,7 +1499,7 @@ parametercmd:
             //Print("par:%s, %d\n",$2.Name(),$2.Typ());
             sleftv tmp_expr;
             //yylineno--;
-            if ((iiDeclCommand(&tmp_expr,&$2,myynest,DEF_CMD,&idroot))
+            if ((iiDeclCommand(&tmp_expr,&$2,myynest,DEF_CMD,&IDROOT))
             || (iiParameter(&tmp_expr)))
               YYERROR;
           }

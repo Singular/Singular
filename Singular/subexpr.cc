@@ -147,6 +147,13 @@ void sleftv::Print(leftv store, int spaces)
 	   //   piProcinfo(pi, "ref"));
 	   break;
          }
+       case POINTER_CMD:
+         { package pack = (package)d;
+         ::Print("%-*.*s// %s\n",spaces,spaces," ","PointerTest");
+         ::Print("%-*.*s// %s",spaces,spaces," ",IDID(pack->idroot));
+         //::Print(((char *)(pack->idroot)->data), spaces);
+         break;
+         }
        case LINK_CMD:
           {
             si_link l=(si_link)d;
@@ -215,6 +222,7 @@ void sleftv::Print(leftv store, int spaces)
     && (t/*Typ()*/!=LINK_CMD)
     && (t/*Typ()*/!=RING_CMD)
     && (t/*Typ()*/!=QRING_CMD)
+    && (t/*Typ()*/!=POINTER_CMD)
     && (t/*Typ()*/!=PACKAGE_CMD)
     && (t/*Typ()*/!=PROC_CMD)
     && (t/*Typ()*/!=DEF_CMD)
@@ -326,6 +334,7 @@ void sleftv::CleanUp()
   {
     switch (rtyp)
     {
+      case POINTER_CMD:
       case PACKAGE_CMD:
       case IDHDL:
       case ANY_TYPE:
@@ -411,6 +420,8 @@ void * slInternalCopy(leftv source, int t, void *d, Subexpr e)
         return NULL;
       }
       #endif
+    case POINTER_CMD:
+      return d;
     case PROC_CMD:
       return  (void *)piCopy((procinfov) d);
     case POLY_CMD:
@@ -469,6 +480,9 @@ void sleftv::Copy(leftv source)
       break;
     case STRING_CMD:
       data= (void *)mstrdup((char *)d);
+      break;
+    case POINTER_CMD:
+      data=d;
       break;
     case PROC_CMD:
       data= (void *)piCopy((procinfov) d);
@@ -810,6 +824,8 @@ void * sleftv::Data()
                          return IDSTRING(h);
                        }  
       case IDHDL:
+        return IDDATA((idhdl)data);
+      case POINTER_CMD:
         return IDDATA((idhdl)data);
       case COMMAND:
         //return NULL;
@@ -1255,7 +1271,7 @@ int sleftv::Eval()
           /*&&(QRING_CMD!=d->arg2.rtyp)*/)
             nok=iiDeclCommand(&t,&d->arg1,0,save_typ,&currRing->idroot);
           else
-            nok=iiDeclCommand(&t,&d->arg1,0,save_typ,&idroot);
+            nok=iiDeclCommand(&t,&d->arg1,0,save_typ,&IDROOT);
           memcpy(&d->arg1,&t,sizeof(sleftv));
           mmTestLP(d->arg1.name);
           nok=nok||iiAssign(&d->arg1,&d->arg2);

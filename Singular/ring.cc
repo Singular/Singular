@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.25 1998-05-28 16:50:53 Singular Exp $ */
+/* $Id: ring.cc,v 1.26 1998-06-13 12:44:47 krueger Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -188,7 +188,7 @@ idhdl rDefault(char *s)
 {
   idhdl tmp=NULL;
 
-  if (s!=NULL) tmp = enterid(s, myynest, RING_CMD, &idroot);
+  if (s!=NULL) tmp = enterid(s, myynest, RING_CMD, &IDROOT);
   if (tmp==NULL) return NULL;
 
   if (ppNoether!=NULL) pDelete(&ppNoether);
@@ -648,7 +648,7 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
   // Complete the initialization
   rComplete(&tmpR);
   /* try to enter the ring into the name list*/
-  if ((tmp = enterid(s, myynest, RING_CMD, &idroot))==NULL)
+  if ((tmp = enterid(s, myynest, RING_CMD, &IDROOT))==NULL)
   {
     return NULL;
   }
@@ -919,7 +919,7 @@ void rKill(idhdl h)
   if (r!=NULL) rKill(r);
   if (h==currRingHdl)
   {
-    currRingHdl=idroot;
+    currRingHdl=IDROOT;
     while (currRingHdl!=NULL)
     {
       if ((currRingHdl!=h)
@@ -933,7 +933,7 @@ void rKill(idhdl h)
 
 idhdl rFindHdl(ring r, idhdl n)
 {
-  idhdl h=idroot;
+  idhdl h=IDROOT;
   while (h!=NULL)
   {
     if (((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_mp.cc,v 1.18 1998-06-03 10:04:25 obachman Exp $ */
+/* $Id: sing_mp.cc,v 1.19 1998-06-13 12:44:48 krueger Exp $ */
 
 /*
 * ABSTRACT: interface to MP links
@@ -451,7 +451,7 @@ int Batch_ReadEval(si_link silink)
 {
   leftv v = NULL;
   // establish top-level identifier for link
-  idhdl id = enterid(mstrdup("mp_ll"), 0, LINK_CMD, &idroot, FALSE);
+  idhdl id = enterid(mstrdup("mp_ll"), 0, LINK_CMD, &IDROOT, FALSE);
   IDLINK(id) = silink;
 
   // the main read-eval-write loop

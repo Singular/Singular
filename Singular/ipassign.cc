@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.30 1998-05-28 16:50:48 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.31 1998-06-13 12:44:40 krueger Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -591,7 +591,7 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
     else if (l->name!=NULL)
     {
       sleftv ll;
-      iiDeclCommand(&ll,l,myynest,rt,&idroot);
+      iiDeclCommand(&ll,l,myynest,rt,&IDROOT);
       memcpy(l,&ll,sizeof(sleftv));
     }
     else

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.29 1998-06-03 08:47:15 obachman Exp $ */
+/* $Id: iplib.cc,v 1.30 1998-06-13 12:44:42 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -315,11 +315,24 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
 {
   int err;
   procinfov pi = IDPROC(pn);
+#ifdef HAVE_NAMESPACES
+  char *plib = iiConvName(pi->libname);
+  idhdl ns = namespaceroot->get(plib,0, TRUE);
+  FreeL(plib);
+  if(ns != NULL) {
+    namespaceroot->push(IDPACKAGE(ns), IDID(ns));
+    //printf("iiMake_proc: namespace found.\n");
+  } else {
+    namespaceroot->push(namespaceroot->root->pack, "toplevel");
+    //printf("iiMake_proc: staying in TOP-LEVEL\n");
+  }
+#else /* HAVE_NAMESPACES */
   if(pi->is_static && myynest==0) {
     Werror("'%s::%s()' is a local procedure and cannot be accessed by an user.",
            pi->libname, pi->procname);
     return NULL;
   }
+#endif /* HAVE_NAMESPACES */
   iiCheckNest();
   iiLocalRing[myynest]=currRing;
   iiRETURNEXPR[myynest+1].Init();
@@ -399,6 +412,9 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
     Free((ADDRESS)iiCurrArgs,sizeof(sleftv));
     iiCurrArgs=NULL;
   }
+#ifdef HAVE_NAMESPACES
+  namespaceroot->pop();
+#endif /* HAVE_NAMESPACES */
   if (err) return NULL;
   return &iiRETURNEXPR[myynest+1];
 }
@@ -452,18 +468,33 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
   char buf[256];
   char libnamebuf[128];
   idhdl h,hl;
+#ifdef HAVE_NAMESPACES
+  idhdl pl;
+#endif /* HAVE_NAMESPACES */
   int lines = 1;
   long pos = 0L;
   procinfov pi;
+#ifdef HAVE_NAMESPACES
+  char *plib = iiConvName(newlib);
+#endif /* HAVE_NAMESPACES */
   FILE * fp = feFopen( newlib, "r", libnamebuf, tellerror );
   if (fp==NULL)
   {
     return TRUE;
   }
+#ifdef HAVE_NAMESPACES
+  hl = namespaceroot->get("LIB",0, TRUE);
+#else /* HAVE_NAMESPACES */
   hl = idroot->get("LIB",0);
+#endif /* HAVE_NAMESPACES */
   if (hl==NULL)
   {
+#ifdef HAVE_NAMESPACES
+    hl = enterid( mstrdup("LIB"),0, STRING_CMD,
+                  &NSROOT(namespaceroot->root), FALSE );
+#else /* HAVE_NAMESPACES */
     hl = enterid( mstrdup("LIB"),0, STRING_CMD, &idroot, FALSE );
+#endif /* HAVE_NAMESPACES */
     IDSTRING(hl) = mstrdup(newlib);
   }
   else
@@ -510,6 +541,18 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
     }
 #endif
   }
+#ifdef HAVE_NAMESPACES
+  pl = namespaceroot->get(plib,0, TRUE);
+  if (pl==NULL)
+  {
+    pl = enterid( mstrdup(plib),0, PACKAGE_CMD,
+                  &NSROOT(namespaceroot->root), TRUE );
+  } else {
+    Print("Found.\n");
+    if(IDTYP(pl)!=PACKAGE_CMD) Print("not of typ package.\n");
+  }
+  namespaceroot->push(IDPACKAGE(pl), IDID(pl));
+#endif /* HAVE_NAMESPACES */
 
 #ifdef HAVE_LIBPARSER
   extern FILE *yylpin;
@@ -523,7 +566,11 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
 //  if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loading %s...", libnamebuf);
   extern int lpverbose;
   if (BVERBOSE(V_DEBUG_LIB)) lpverbose=1; else lpverbose=0;
+# ifdef HAVE_NAMESPACES
+   yylplex(newlib, libnamebuf, &lib_style, pl);
+# else /* HAVE_NAMESPACES */
   yylplex(newlib, libnamebuf, &lib_style);
+# endif /* HAVE_NAMESPACES */
   if(yylp_errno) {
     Werror("Library %s: ERROR occured: in line %d, %d.", newlib, yylplineno,
          current_pos(0));
@@ -549,6 +596,9 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
 //   }
   reinit_yylp();
   fclose( yylpin );
+#ifdef HAVE_NAMESPACES
+   namespaceroot->pop();
+#endif /* HAVE_NAMESPACES */
   {
     libstackv ls;
     for(ls = library_stack; (ls != NULL) && (ls != ls_start); ) {
@@ -641,11 +691,20 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
           {
             char *p =  iiConvName(newlib);
             Print("Init found:%s;\n", p);
-            h = enterid( mstrdup(p), myynest, PROC_CMD, &idroot, FALSE );
+#ifdef HAVE_NAMESPACES
+             h = enterid( mstrdup(p), myynest, PROC_CMD, IDPACKAGE(pl), FALSE );
+#else /* HAVE_NAMESPACES */
+             h = enterid( mstrdup(p), myynest, PROC_CMD, &idroot, FALSE );
+#endif /* HAVE_NAMESPACES */
             FreeL((ADDRESS)p);
           } else
 #endif
-            h = enterid( mstrdup(proc), myynest, PROC_CMD, &idroot, FALSE );
+#ifdef HAVE_NAMESPACES
+            h = enterid(mstrdup(proc), myynest, PROC_CMD,
+                      &IDPACKAGE(pl)->idroot, FALSE);
+#else /* HAVE_NAMESPACES */
+            h = enterid( mstrdup(proc), myynest, PROC_CMD, &idroot, FALSE);
+#endif /* HAVE_NAMESPACES */
           if (h!=NULL)
           {
             iiInitSingularProcinfo(IDPROC(h),newlib,proc,lines,pos);
@@ -704,6 +763,9 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
     pos = ftell(fp);
   } while (fgets( buf, sizeof(buf), fp));
   fclose( fp );
+#ifdef HAVE_NAMESPACES
+  namespaceroot->pop();
+#endif /* HAVE_NAMESPACES */
 
   //if (h!=NULL) IDPROC(h) = pi;
   if (BVERBOSE(V_DEBUG_LIB))
@@ -717,6 +779,9 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
   }
 #endif /* HAVE_LIBPARSER */
   FreeL((ADDRESS)newlib);
+#ifdef HAVE_NAMESPACES
+   FreeL((ADDRESS)plib);
+#endif /* HAVE_LIBPARSER */
   return FALSE;
 }
 
@@ -736,6 +801,7 @@ procinfo *iiInitSingularProcinfo(procinfov pi, char *libname, char *procname,
   pi->ref = 1;
   pi->is_static = pstatic;
   pi->data.s.proc_start = pos;
+  pi->data.s.def_end    = 0L;
   pi->data.s.help_start = 0L;
   pi->data.s.help_end   = 0L;
   pi->data.s.body_start = 0L;
@@ -756,7 +822,7 @@ int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
   procinfov pi;
   idhdl h;
 
-  h = enterid(mstrdup(procname),0, PROC_CMD, &idroot, FALSE);
+  h = enterid(mstrdup(procname),0, PROC_CMD, &IDROOT, FALSE);
   if ( h!= NULL ) {
     Print("register binary proc: %s::%s\n", libname, procname);
     pi = IDPROC(h);
@@ -782,7 +848,8 @@ char *iiConvName(char *libname)
   char *r;
 
   memset(p,0,l);
-  sprintf(p, "%s_init", libname);
+  //sprintf(p, "%s_init", libname);
+  sprintf(p, "%s", libname);
   for(r=p; *r!='\0'; r++)
   {
     if(*r=='.') *r='_';
@@ -795,12 +862,21 @@ char *iiConvName(char *libname)
 void piShowProcList()
 {
   idhdl h;
+#ifdef HAVE_NAMESPACES
+  idhdl pl;
+#endif /* HAVE_NAMESPACES */
   procinfo *proc;
   char *name;
 
   Print( "%-15s  %20s      %s,%s  %s,%s   %s,%s\n", "Library", "function",
          "line", "start", "line", "body", "line", "example");
-  for(h = idroot; h != NULL; h = IDNEXT(h))
+#ifdef HAVE_NAMESPACES
+  for(pl = IDROOT; pl != NULL; pl = IDNEXT(pl)) {
+    if(IDTYP(pl) == PACKAGE_CMD) {
+      for(h = IDPACKAGE(pl)->idroot; h != NULL; h = IDNEXT(h))
+#else /* HAVE_NAMESPACES */
+  for(h = IDROOT; h != NULL; h = IDNEXT(h))
+#endif /* HAVE_NAMESPACES */
   {
     if(IDTYP(h) == PROC_CMD)
     {
@@ -809,11 +885,12 @@ void piShowProcList()
       {
         name = (char *)AllocL(strlen(IDID(h))+strlen(proc->procname)+4);
         sprintf(name, "%s -> %s", IDID(h), proc->procname);
-        Print( "%-15s  %20s ", proc->libname, name);
+        Print( "%d %-15s  %20s ", proc->is_static ? 1 : 0, proc->libname, name);
         FreeL(name);
       }
       else
-        Print( "%-15s  %20s ", proc->libname, proc->procname);
+        Print( "%d %-15s  %20s ", proc->is_static ? 1 : 0, proc->libname,
+               proc->procname);
       if(proc->language==LANG_SINGULAR)
         Print("line %4d,%-5ld  %4d,%-5ld  %4d,%-5ld\n",
               proc->data.s.proc_lineno, proc->data.s.proc_start,
@@ -821,7 +898,10 @@ void piShowProcList()
               proc->data.s.example_lineno, proc->data.s.example_start);
       else if(proc->language==LANG_C)
         Print("type: object\n");
-
+#ifdef HAVE_NAMESPACES
+          }
+      }
+#endif /* HAVE_NAMESPACES */
     }
   }
 }
@@ -842,7 +922,11 @@ void piShowProcList()
 #ifdef HAVE_LIBPARSER
 void libstack::push(char *p, char *libname)
 {
+#  ifdef HAVE_NAMESPACES
+  idhdl hl = namespaceroot->get("LIB",0, TRUE);
+#  else /* HAVE_NAMESPACES */
   idhdl hl = idroot->get("LIB",0);
+#  endif /* HAVE_NAMESPACES */
   libstackv lp;
   char *f = NULL;
   if(hl!=NULL) f = strstr(IDSTRING(hl),libname);

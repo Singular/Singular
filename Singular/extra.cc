@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.55 1998-06-12 10:13:32 Singular Exp $ */
+/* $Id: extra.cc,v 1.56 1998-06-13 12:44:36 krueger Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -207,6 +207,12 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
         #endif
         #ifdef TEST_MAC_ORDER
           TEST_FOR("MAC_ORDER");
+        #endif
+        #ifdef HAVE_NAMESPACES
+          TEST_FOR("Namespaces");
+        #endif
+        #ifdef HAVE_DYNAMIC_LOADING
+          TEST_FOR("DynamicLoading");
         #endif
           ;
         return FALSE;

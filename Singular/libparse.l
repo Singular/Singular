@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.24 1998-05-31 15:42:23 krueger Exp $ */
+/* $Id: libparse.l,v 1.25 1998-06-13 12:44:44 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -32,7 +32,11 @@ typedef enum { LP_NONE, LP_INFO, LP_VERSION} lib_cmds;
 int libread(FILE* f, char* buf, int max_size);
 int current_pos(int i);
 void print_version(lp_modes mode, char *p);
+#ifdef HAVE_NAMESPACES
+void copy_string(lp_modes mode, idhdl pl);
+#else /* HAVE_NAMESPACES */
 void copy_string(lp_modes mode);
+#endif /* HAVE_NAMESPACES */
 void make_version(char *p, int what);
 
 int brace1 = 0;  /* { } */
@@ -146,9 +150,15 @@ extern libstackv library_stack;
      }
 
 #  undef YY_DECL
-#  define YY_DECL int yylex(char *newlib, char *libfile, \
+#  ifdef HAVE_NAMESPACES
+#    define YY_DECL int yylex(char *newlib, char *libfile, \
+			       lib_style_types *lib_style, \
+			       idhdl pl, lp_modes mode)
+#  else /* HAVE_NAMESPACES */
+#    define YY_DECL int yylex(char *newlib, char *libfile, \
                                  lib_style_types *lib_style, \
                                  lp_modes mode)
+#  endif /* HAVE_NAMESPACES */
 
 #  undef YY_INPUT
 #  define YY_INPUT(buf,result,max_size) \
@@ -237,7 +247,15 @@ eqnl           ([ \t\n]*+=[ \t\n]*)
 #ifdef STANDALONE_PARSER
                printf("Version:%s;\n", libnamebuf);
 #else
+#  ifdef HAVE_NAMESPACES
+               h0 = enterid( mstrdup("version"), myynest, STRING_CMD,
+                                  &IDPACKAGE(pl)->idroot, FALSE );
+                if (h0!=NULL) {
+                   IDSTRING(h0) = mstrdup(libnamebuf);
+                }
+#  else /* HAVE_NAMESPACES */
                text_buffer = mstrdup(libnamebuf);
+#  endif /* HAVE_NAMESPACES */
 #endif
              }
            }
@@ -264,8 +282,13 @@ static     { p_static=TRUE; }
                                         current_pos(0), p_static);
 #else STANDALONE_PARSER
              if( mode == LOAD_LIB) {
+#  ifdef HAVE_NAMESPACES
+                h0 = enterid( mstrdup(proc), myynest, PROC_CMD,
+                                  &IDPACKAGE(pl)->idroot, FALSE );
+#  else /* HAVE_NAMESPACES */
                h0 = enterid( mstrdup(proc), myynest, PROC_CMD,
                                    &idroot, FALSE );
+#  endif /* HAVE_NAMESPACES */
                if (h0!=NULL) {
                  iiInitSingularProcinfo(IDPROC(h0), newlib, proc,
                                 yylplineno, current_pos(0),p_static);
@@ -602,7 +625,11 @@ LIB[ \t]+"\"" { quote++;
 <info>.  { }
 
 <string>"\""             { quote--;
+#ifdef HAVE_NAMESPACES
+                            copy_string(mode, pl);
+#else /* HAVE_NAMESPACES */
                            copy_string(mode);
+#endif /* HAVE_NAMESPACES */
                            last_cmd = LP_NONE;
                            if(old_state==phelp)
                               SET_HELP_END(mode, pi, current_pos(0));
@@ -735,7 +762,11 @@ void make_version(char *p,int what)
   //printf("ID=(%d)%s; \n", what, p);
 }
 
+#ifdef HAVE_NAMESPACES
+void copy_string(lp_modes mode, idhdl pl)
+#else /* HAVE_NAMESPACES */
 void copy_string(lp_modes mode)
+#endif /* HAVE_NAMESPACES */
 {
 #  ifndef STANDALONE_PARSER
   if((last_cmd == LP_INFO)&&(mode == GET_INFO))
@@ -751,13 +782,20 @@ void copy_string(lp_modes mode)
     offset=0;
     for(i=0;i<=len; i++) {
       if(text_buffer[i]=='\\' &&
-         (text_buffer[i+1]=='"' || text_buffer[i+1]=='{' ||
+         (text_buffer[i+1]=='\"' || text_buffer[i+1]=='{' ||
           text_buffer[i+1]=='}' || text_buffer[i+1]=='\\')) {
         i++;
         offset++;
       }
       if(offset>0) text_buffer[i-offset] = text_buffer[i];
     }
+#    ifdef HAVE_NAMESPACES
+    h0 = enterid( mstrdup("info"), myynest, STRING_CMD,
+                        &IDPACKAGE(pl)->idroot, FALSE );
+    if (h0!=NULL) {
+       IDSTRING(h0) = mstrdup(text_buffer);
+    }
+#    endif /* HAVE_NAMESPACES */
   }
 #  endif /* STANDALONE_PARSER */
 }

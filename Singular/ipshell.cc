@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.21 1998-05-12 10:01:07 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.22 1998-06-13 12:44:42 krueger Exp $ */
 /*
 * ABSTRACT:
 */
@@ -228,9 +228,9 @@ static void killlocals0(int v, idhdl * localhdl)
 
 void killlocals(int v)
 {
-  killlocals0(v,&idroot);
+  killlocals0(v,&IDROOT);
 
-  idhdl h = idroot;
+  idhdl h = IDROOT;
   idhdl sh=currRingHdl;
   BOOLEAN changed=FALSE;
 
@@ -264,7 +264,7 @@ void list_cmd(int typ, const char* what, char *prefix,BOOLEAN iterate)
     if (strcmp(what,"all")==0)
     {
       really_all=TRUE;
-      h=idroot;
+      h=IDROOT;
     }
     else
     {
@@ -273,10 +273,14 @@ void list_cmd(int typ, const char* what, char *prefix,BOOLEAN iterate)
       {
         if (iterate) list1(prefix,h,TRUE);
         if ((IDTYP(h)==RING_CMD)
-            || (IDTYP(h)==QRING_CMD)
-            || (IDTYP(h)==PACKAGE_CMD))
+            || (IDTYP(h)==QRING_CMD))
         {
           h=IDRING(h)->idroot;
+        }
+        else if((IDTYP(h)==PACKAGE_CMD) || (IDTYP(h)==POINTER_CMD))
+        {
+          //Print("list_cmd:package or pointer\n");
+          h=IDPACKAGE(h)->idroot;
         }
         else
           return;
@@ -294,7 +298,7 @@ void list_cmd(int typ, const char* what, char *prefix,BOOLEAN iterate)
     h = currRing->idroot;
   }
   else
-    h = idroot;
+    h = IDROOT;
   start=h;
   while (h!=NULL)
   {
@@ -302,13 +306,20 @@ void list_cmd(int typ, const char* what, char *prefix,BOOLEAN iterate)
     || ((IDTYP(h)==QRING_CMD) && (typ==RING_CMD)))
     {
       list1(prefix,h,start==currRingHdl);
-      if ((((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))
+      if (((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))
         && (really_all || (all && (h==currRingHdl)))
         && ((IDLEV(h)==0)||(IDLEV(h)==myynest)))
-      ||(IDTYP(h)==PACKAGE_CMD))
       {
         list_cmd(0,IDID(h),"//      ",FALSE);
       }
+#ifdef HAVE_NAMESPACES
+      if (IDTYP(h)==PACKAGE_CMD)
+      {
+        namespaceroot->push(IDPACKAGE(h), IDID(h));
+        list_cmd(0,IDID(h),"//      ",FALSE);
+        namespaceroot->pop();
+      }
+#endif /* HAVE_NAMESPACES */
     }
     h = IDNEXT(h);
   }
@@ -473,7 +484,11 @@ leftv iiMap(map theMap, char * what)
   leftv v;
   int i;
 
+#ifdef HAVE_NAMESPACES
+  r=namespaceroot->get(theMap->preimage,myynest);
+#else
   r=idroot->get(theMap->preimage,myynest);
+#endif /* HAVE_NAMESPACES */
   if ((r!=NULL) && ((r->typ == RING_CMD) || (r->typ== QRING_CMD)))
   {
     if (!nSetMap(IDRING(r)->ch,
@@ -762,8 +777,12 @@ BOOLEAN iiExport (leftv v, int toLev)
       if (IDLEV(h)==0) Warn("`%s` is already global",IDID(h));
       else
       {
+#ifdef HAVE_NAMESPACES
+        h=namespaceroot->get(v->name,toLev);
+#else /* HAVE_NAMESPACES */
         h=idroot->get(v->name,toLev);
-        idhdl *root=&idroot;
+#endif /* HAVE_NAMESPACES */
+        idhdl *root=&IDROOT;
         if ((h==NULL)&&(currRing!=NULL))
         {
           h=currRing->idroot->get(v->name,toLev);
@@ -824,13 +843,13 @@ BOOLEAN iiExport (leftv v, int toLev, idhdl &root)
         }
       }
       idhdl h=(idhdl)v->data;
-      if (h==idroot)
+      if (h==IDROOT)
       {
-        idroot=h->next;
+        IDROOT=h->next;
       }
       else
       {
-        idhdl hh=idroot;
+        idhdl hh=IDROOT;
         while ((hh->next!=h)&&(hh->next!=NULL))
           hh=hh->next;
         if (hh->next==h)

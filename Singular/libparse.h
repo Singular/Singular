@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.h,v 1.7 1998-06-02 15:29:56 Singular Exp $ */
+/* $Id: libparse.h,v 1.8 1998-06-13 12:44:43 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -16,8 +16,14 @@ typedef enum { OLD_LIBSTYLE, NEW_LIBSTYLE } lib_style_types;
 procinfo *iiInitSingularProcinfo(procinfov pi, char *libname,
                                  char *procname, int line, long pos,
 				 BOOLEAN pstatic = FALSE);
+#ifdef HAVE_NAMESPACES
+int yylplex(char *libname, char *libfile, lib_style_types *lib_style, 
+           idhdl pl, lp_modes=LOAD_LIB);
+#else /* HAVE_NAMESPACES */
 int yylplex(char *libname, char *libfile, lib_style_types *lib_style,
 	    lp_modes=LOAD_LIB);
+#endif /* HAVE_NAMESPACES */
+
 void reinit_yylp();
 
 extern char * text_buffer;

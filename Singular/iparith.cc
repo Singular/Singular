@@ -4232,7 +4232,7 @@ static BOOLEAN jjLIST_PL(leftv res, leftv v)
 }
 static BOOLEAN jjNAMES0(leftv res, leftv v)
 {
-  res->data=(void *)ipNameList(idroot);
+  res->data=(void *)ipNameList(IDROOT);
   return FALSE;
 }
 static BOOLEAN jjOPTION_PL(leftv res, leftv v)

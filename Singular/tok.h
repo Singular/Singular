@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: token for interpreter, as types; general macros
 */
-/* $Id: tok.h,v 1.18 1998-06-02 15:30:06 Singular Exp $ */
+/* $Id: tok.h,v 1.19 1998-06-13 12:44:51 krueger Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -85,6 +85,7 @@ enum {
   ORDSTR_CMD,
   PACKAGE_CMD,
   PARSTR_CMD,
+  POINTER_CMD,
   PRIME_CMD,
   PRINT_CMD,
   PRUNE_CMD,

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Put.cc,v 1.8 1998-04-07 18:35:27 obachman Exp $ */
+/* $Id: mpsr_Put.cc,v 1.9 1998-06-13 12:44:46 krueger Exp $ */
 
 
 /***************************************************************
@@ -492,7 +492,11 @@ mpsr_Status_t mpsr_PutMap(MP_Link_pt link, map m, ring cring)
                                       0,
                                       3));
   // First, is the ring
+#ifdef HAVE_NAMESPACES
+  failr(mpsr_PutRingLeftv(link, (leftv) namespaceroot->get(m->preimage, 1)));
+#else /* HAVE_NAMESPACES */
   failr(mpsr_PutRingLeftv(link, (leftv) idroot->get(m->preimage, 1)));
+#endif /* HAVE_NAMESPACES */
 
   // Second, the name of the ring
   mp_failr(MP_PutStringPacket(link, m->preimage,0));
@@ -510,7 +514,7 @@ mpsr_Status_t mpsr_PutMap(MP_Link_pt link, map m, ring cring)
  ***************************************************************/
 mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
 {
-  idhdl h = idroot, h2 = NULL, rh = currRingHdl;
+  idhdl h = IDROOT, h2 = NULL, rh = currRingHdl;
   ring r;
   sip_command cmd;
   leftv lv;

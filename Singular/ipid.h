@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.13 1998-06-02 15:29:55 Singular Exp $ */
+/* $Id: ipid.h,v 1.14 1998-06-13 12:44:41 krueger Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -107,6 +107,7 @@ class idrec
   idtyp      typ;
 
   short      lev;
+  short      ref;
 
 #define IDNEXT(a)    ((a)->next)
 #define IDTYP(a)     ((a)->typ)
@@ -136,8 +137,31 @@ class idrec
 //  ~idrec();
 };
 
+#ifdef HAVE_NAMESPACES
+class namerec {
+  public:
+  namehdl    next;
+  namehdl    root;
+  package    pack;
+  bool       isroot;
+  char *     name;
+  int        lev;
+#define NSROOT(a) ((a)->pack->idroot)
+  
+  namerec()  { memset(this,0,sizeof(*this)); }
+  //namehdl    Set(idhdl root);
+  namehdl    pop();
+  namehdl    push(package pack, char *name, BOOLEAN init=FALSE);
+  idhdl      get(const char * s, int lev, int root=FALSE);
+};
 
+extern namehdl namespaceroot;
+#define IDROOT (NSROOT(namespaceroot))
+#else /* HAVE_NAMESPACES */
 extern idhdl      idroot;
+#define IDROOT idroot
+#endif /* HAVE_NAMESPACES */
+
 extern idhdl      currRingHdl;
 /*extern ring     currRing;  in structs.h */
 extern ideal      currQuotient;
