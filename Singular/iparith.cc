@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.284 2003-01-27 13:05:05 Singular Exp $ */
+/* $Id: iparith.cc,v 1.285 2003-02-18 15:09:24 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2333,6 +2333,7 @@ struct sValCmd2 dArith2[]=
 ,{jjCOEFFS2_KB,COEFFS_CMD,     MATRIX_CMD,     MODUL_CMD,  MODUL_CMD, PROFILER}
 ,{jjCONTRACT,  CONTRACT_CMD,   MATRIX_CMD,     IDEAL_CMD,  IDEAL_CMD PROFILER}
 ,{jjDEG_IV,    DEG_CMD,        INT_CMD,        POLY_CMD,   INTVEC_CMD PROFILER}
+,{jjDEG_IV,    DEG_CMD,        INT_CMD,        VECTOR_CMD, INTVEC_CMD PROFILER}
 ,{lDelete,     DELETE_CMD,     LIST_CMD,       LIST_CMD,   INT_CMD PROFILER}
 ,{jjDIFF_P,    DIFF_CMD,       POLY_CMD,       POLY_CMD,   POLY_CMD PROFILER}
 ,{jjDIFF_P,    DIFF_CMD,       VECTOR_CMD,     VECTOR_CMD, POLY_CMD PROFILER}
