@@ -1,15 +1,20 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: gfops.h,v 1.1 1997-03-27 09:59:25 schmidt Exp $
+// $Id: gfops.h,v 1.2 1997-04-30 12:38:18 schmidt Exp $
 
 #ifndef INCL_GFOPS_H
 #define INCL_GFOPS_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1997/03/27 09:59:25  schmidt
+stream-io wrapped by NOSTREAMIO
+
 Revision 1.0  1996/05/17 10:59:40  stobbe
 Initial revision
 
 */
+
+#include <config.h>
 
 #ifndef NOSTREAMIO
 #include <iostream.h>
@@ -18,6 +23,7 @@ Initial revision
 #include "assert.h"
 
 #include "cf_defs.h"
+#include "canonicalform.h"
 
 extern int gf_q;
 extern int gf_p;
@@ -28,6 +34,7 @@ extern char gf_name;
 
 extern unsigned short * gf_table;
 
+extern CanonicalForm gf_mipo;
 
 inline int gf_int2gf ( int i )
 {
@@ -169,8 +176,13 @@ inline int gf_power ( int a, int n )
 
 void gf_setcharacteristic ( int p, int n, char name );
 
+// Singular needs this
+/*BEGINPUBLIC*/
+
 int gf_gf2ff ( int a );
 
 bool gf_isff ( int a );
+
+/*ENDPUBLIC*/
 
 #endif /* INCL_GFOPS_H */
