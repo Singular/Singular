@@ -3966,9 +3966,10 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   c->strat->enterS = enterSBba;
   c->strat->sl = -1;
   i=n;
+  i=1;
   /* initS(c->S,NULL,c->strat); */
 /* intS start: */
-  i=((i+IDELEMS(c->S)+15)/16)*16;
+  // i=((i+IDELEMS(c->S)+15)/16)*16;
   c->strat->ecartS=(intset)omAlloc(i*sizeof(int)); /*initec(i);*/
   c->strat->sevS=(unsigned long*)omAlloc0(i*sizeof(unsigned long));
   /*initsevS(i);*/
