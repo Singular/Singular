@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.195 1999-12-20 12:50:19 Singular Exp $ */
+/* $Id: iparith.cc,v 1.196 1999-12-20 16:38:22 krueger Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4005,7 +4005,7 @@ static BOOLEAN jjPREIMAGE(leftv res, leftv u, leftv v, leftv w)
     if (h->typ==MAP_CMD)
     {
       mapping=IDMAP(h);
-      idhdl preim_ring=idroot->get(mapping->preimage,myynest);
+      idhdl preim_ring=IDROOT->get(mapping->preimage,myynest);
       if ((preim_ring==NULL)
       || (IDRING(preim_ring)!=currRing))
       {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.70 1999-12-08 16:59:52 Singular Exp $ */
+/* $Id: iplib.cc,v 1.71 1999-12-20 16:38:21 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -662,7 +662,7 @@ BOOLEAN iiLocateLib(const char* lib, char* where)
 {
   idhdl hl;
 
-  hl = idroot->get("LIB", 0);
+  hl = IDROOT->get("LIB", 0);
   if (hl == NULL || strstr(IDSTRING(hl), lib) == NULL) return FALSE;
 
   if (strstr(IDSTRING(hl), ",") == NULL)
