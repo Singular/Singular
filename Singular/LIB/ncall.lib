@@ -1,17 +1,19 @@
-// $Id: ncall.lib,v 1.1 2004-08-13 12:40:36 levandov Exp $
+// $Id: ncall.lib,v 1.2 2004-12-22 21:16:15 levandov Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncall.lib,v 1.1 2004-08-13 12:40:36 levandov Exp $";
+version="$Id: ncall.lib,v 1.2 2004-12-22 21:16:15 levandov Exp $";
 category = "Noncommutative";
 info="
 LIBRARY:  ncall.lib   Load all noncommutative libraries
 
 @format
-  center.lib:    Computation of central elements of G- and GR-algebras
-  ncalg.lib:     Definitions of important GR-algebras
-  ncdecomp.lib:  Central character decomposition of a module
-  nctools.lib:   General tools for noncommutative algebras
-  gkdim.lib:     Procedures for calculating the Gelfand-Kirillov dimension
-  qmatrix.lib:   Quantum matrices, quantum minors and symmetric groups
+  center.lib:      Computation of central elements of G- and GR-algebras
+  ncalg.lib:       Definitions of important GR-algebras
+  ncdecomp.lib:    Central character decomposition of a module
+  nctools.lib:     General tools for noncommutative algebras
+  gkdim.lib:       Procedures for calculating the Gelfand-Kirillov dimension
+  qmatrix.lib:     Quantum matrices, quantum minors and symmetric groups
+  involution.lib:  Computations and operations with involutions
+  nchomolog.lib:   Noncommutative homological algebra
 @end format
 ";
 
@@ -23,3 +25,5 @@ LIB "ncdecomp.lib";
 LIB "nctools.lib";
 LIB "gkdim.lib";
 LIB "qmatrix.lib";
+LIB "involution.lib";
+LIB "nchomolog.lib";
