@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hilb.cc,v 1.4 1997-04-02 15:07:02 Singular Exp $ */
+/* $Id: hilb.cc,v 1.5 1997-06-17 12:20:07 pohl Exp $ */
 /*
 *  ABSTRACT -  Hilbert series
 */
@@ -175,7 +175,7 @@ static void hHilbStep(scmon pure, scfmon stc, int Nstc, varset var,
 *basic routines
 */
 
-intvec * hSeries(ideal S, intvec *modulweight, ideal Q, int notstc)
+static intvec * hSeries(ideal S, intvec *modulweight, ideal Q, int notstc)
 {
   intvec *work, *hseries1=NULL;
   short  mc;
@@ -413,7 +413,7 @@ void hDegreeSeries(intvec *s1, intvec *s2, int *co, int *mu)
   *co = i - j;
 }
 
-void hPrintHilb(intvec *hseries, int dim)
+static void hPrintHilb(intvec *hseries, int dim)
 {
   int  i, j, l, k;
   if (hseries == NULL)
