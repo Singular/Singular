@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.157 1999-11-28 21:29:39 wichmann Exp $
+@comment $Id: general.doc,v 1.158 1999-11-29 12:56:08 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -679,18 +679,64 @@ prevents the execution of the"global"
 @node Emacs user interface, Rings and orderings, Interactive use, General concepts
 @section Emacs user interface
 @cindex Emacs, user interface
+@cindex Emacs
+@cindex interface, Emacs
+@cindex user interface, Emacs
 
-Olaf
+Besides running @sc{Singular} in an ASCII-terminal, @sc{Singular} might
+also be run within Emacs. Emacs (or, Xemacs which is very similar) is a
+very powerful and freely available text editor, which, among others,
+provides a framework for the implementation of interactive user
+interfaces. Starting from version 2.0, @sc{Singular} provides such an
+implementation, the so-called @sc{Singular} Emacs mode, or Emacs user
+interface.
+
+Generally, we recommend to use the Emacs interface,
+instead of the ASCII-terminal interface: The Emacs interface does not
+only provide everything the ASCII-terminal interface provides, but
+offers much more. Among others, it offers
 @itemize
+@item
+color-highlighting
+@item
+truncation of long lines
 @item 
-new from version 2.0; requirements
+folding of input and output
+@item
+TAB-completion for help topics
 @item 
-ESingular and Singular within
+key-bindings and interactive menus for most user interface commands and
+for basic @sc{Singular} commands (such as loading of libraries and files)
+@item
+a mode for running interactive @sc{Singular} demonstrations
 @item 
-(Dis)Advantages of Emacs interface
+convenient ways to edit @sc{Singular} input files
 @item 
-quick guide to following section
+interactive customization of nearly all aspects of the user-interface.
 @end itemize
+
+To use the @sc{Singular}-Emacs interface you need to have Emacs version
+20 or higher, or Xemacs 
+version 20 or higher installed on your system. These
+editors can be downloaded for most hard- and software platforms
+(including Windows 
+95/98/NT, but excluding the Macintosh), from either
+@uref{http://www.fsf.org/software/emacs/emacs.html} (Emacs), from
+@uref{http://www.xemacs.org} (Xemacs), or from our ftp site at 
+@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils/}. The
+differences between Emacs and Xemacs w.r.t. the  @sc{Singular}-Emacs
+interface are marginal -- which editor to use is mainly a matter of personal
+preferences.
+
+
+The next section gives  a tutorial-like introduction of Emacs and the 
+the @sc{Singular}-Emacs user interface. This introductory section is
+followed by sections which explain the functionality of various aspects 
+of the Emacs user interface in more detail: how to start/restart/kill
+@sc{Singular} within Emacs, how to run an interactive demonstration, how 
+to customize the Emacs user interface, etc. Finally, the 20 most
+important commands of the Emacs interface together with their key
+bindings are listed.
 
 @menu
 * Overview of the Emacs user interface::
@@ -707,8 +753,133 @@ quick guide to following section
 @cindex Emacs, overview of the Singular interface
 @cindex Singular,  overview of the Emacs user interface
 @cindex Overview of the Emacs user interface
-Olaf
 
+This section gives  a tutorial-like introduction of Emacs and the 
+the @sc{Singular}-Emacs user interface. Especially to users who are not
+familiar with Emacs, we recommend that they go trough this section and
+try out the described features. 
+
+The simplest way to start-up @sc{Singular} in its Emacs interface is by
+running the program @code{ESingular} which is contained in the Singular
+distribution. @code{ESingular} starts-up Emacs and @sc{Singular} and
+awaits user input from the usual @sc{Singular} prompt.
+
+@menu 
+* A quick guide to Emacs::
+@end menu
+
+@c --------------------------------------------------------------------------
+@node A quick guide to Emacs,,,Overview of the Emacs user interface
+@subsubsection A quick guide to Emacs
+
+Emacs commands generally involve the @code{CONTROL} key (sometimes
+labelled @code{CTRL} or @code{CTL}) or the @code{META} key.  On some
+keyboards, the @code{META} key is labelled @code{ALT} or @code{EDIT} or
+something else (for example, on Sun keyboards, the diamond key to the
+left of the spacebar is @code{META}).  If there is no @code{META} key,
+the @code{ESC} key can be used, instead.  Rather than writing out
+@code{META} or 
+@code{CONTROL} each time we want to prefix a character, we will use the
+following abbreviations: 
+
+@multitable @columnfractions .2 .8
+@item @code{C-<chr>}
+@tab means hold the @code{CONTROL} key while typing the character
+@code{<chr>}. Thus, @code{C-f} would be: hold the @code{CONTROL} key and
+type @code{f}.
+@item @code{M-<chr>}  
+@tab means hold the @code{META} key down while typing @code{<chr>}.  If there
+is no @code{META} key, type @code{<ESC>}, release it, then type the
+character @code{<chr>}.
+@end multitable
+
+For user new to Emacs, we highly recommend that they go through the
+interactive Emacs tutorial: type @code{C-h t} to start it.
+
+For others, it is important to understand the following Emacs concepts:
+@table @asis
+@item window
+In Emacs terminology, a window refers to separate panes within the same
+window of the window system, and not to overlapping, separate
+windows. When using @sc{Singular} within Emacs, extra windows may appear 
+which display help or output from certain commands. The most important 
+window commands are:
+@multitable @columnfractions .2 .2 .6
+@item @code{C-x 1} 
+@tab @code{File -> Un-Split}
+@tab Un-Split window (i.e., kill other windows)
+@item @code{C-x o}
+@tab 
+@tab Goto other window, i.e. move cursor into other window.
+@end multitable
+
+@item cursor and point
+The location of the cursor in the text is also called "point".  To
+paraphrase, the cursor shows on the screen where point is located in
+the text. Here is a summary of simple cursor-moving operations:
+@multitable @columnfractions .2 .8
+@item @code{C-f} @tab Move forward a character
+@item @code{C-b} @tab 	Move backward a character
+@item @code{M-f} @tab 	Move forward a word
+@item @code{M-b} @tab 	Move backward a word
+@item @code{C-a} @tab 	Move to beginning of line
+@item @code{C-e} @tab 	Move to end of line
+@end multitable
+
+@item buffer
+Any text you see in an Emacs window is always part of some buffer. For
+example, each file you are editing with Emacs is stored inside a buffer, 
+but also @sc{Singular} is running inside an Emacs buffer. Each buffer
+has a name: for example, the buffer of a file you edit usually has the
+same name as the file, @sc{Singular} is running in a buffer which has
+the name @code{*singular*} (or, @code{*singular<2>*},
+@code{*singular<3>*}, etc., if you have multiple @sc{Singular}
+sessions within the same Emacs).
+
+When you are asked for input to an Emacs commands, the cursor
+moves to the bottom line of Emacs, i.e., to a special buffer, called the
+"minibuffer". Typing @code{<RETURN>} within the minibuffer, ends the
+input, typeing @code{<SPACE>} within the minibuffer, lists all possible
+input values to the interactive Emacs command. 
+
+The most important buffer commands are
+@multitable @columnfractions .2 .8
+@item @code{C-x b} Switch buffer
+@item @code{C-x k} Kill current buffer
+@end multitable
+Alternatively, you can switch to or kill buffers using the @code{Buffer} 
+menu.
+@end table
+
+@strong{Important notes}: 
+@itemize
+@item 
+To end the Emacs (and, @sc{Singular}) session,
+type @code{C-x C-c} (two characters), or use the @code{File -> Exit}
+menu.
+@item
+If Emacs stops responding to your commands, you can stop it safely by
+typing @code{C-g}, or, if even this fails, by typing @code{C-]}.
+@item 
+help
+@item 
+mouse
+@end itemize
+
+
+
+
+
+Most Emacs 
+In its basic functionality, the Emacs user interface is almost identical 
+to the ASCII-terminal interface (@pxref{The SINGULAR prompt},
+@pxref{Editing input}).
+
+
+@sc{Singular} can be either started within an already running Emacs, or
+by using the program @code{ESingular} which is contained in the
+@sc{Singular} distribution.  @code{ESingular} is an "out of the box and
+ready to run" program. It starts up an Emacs editor, an
 @itemize
 @item 
 Emacs for dummys; tutorial; help for Emacs

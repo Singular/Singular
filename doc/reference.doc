@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.163 1999-11-26 17:45:50 obachman Exp $
+@comment $Id: reference.doc,v 1.164 1999-11-29 12:56:09 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2186,22 +2186,14 @@ To access the elements of a resolution, it has to be assigned to a list,
 which also completes computations and may therefore take some time.
 @item @strong{Example:}
 @smallexample
-<<<<<<< reference.doc
-@c only_example_only_new
-=======
-@c CHANGE @c example
->>>>>>> 1.157
+@c example
   ring r=0,(x,y,z),dp;
   ideal i=xz,yz,x^3-y^3;
   def l=hres(i,0);
   print(betti(l),"betti");// input to betti may be of type resolution
   list ll=l;
   l[2];                   // elements can only be accessed in the list
-<<<<<<< reference.doc
-@c only_example_only_new
-=======
-@c CHANGE example
->>>>>>> 1.157
+@c example
 @end smallexample
 @end table
 @c ref

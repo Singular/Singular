@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.84 1999-11-26 13:26:58 obachman Exp $
+@comment $Id: singular.doc,v 1.85 1999-11-29 12:56:11 obachman Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -105,7 +105,7 @@ This is the texinfo file describing Singular (version @value{VERSION})
 * Polynomial data::
 * Mathematical background::
 * SINGULAR libraries::
-* Installation and Platform Specifics::
+* Release Notes::
 * Index::
 @end menu
 
@@ -163,7 +163,7 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @cindex Mathematical background
 @include math.tex
 @c ----------------------------------------------------------------------------
-@node SINGULAR libraries, Installation and Platform Specifics, Mathematical background, Top
+@node SINGULAR libraries, Release Notes, Mathematical background, Top
 @appendix SINGULAR libraries
 @cindex SINGULAR libraries
 @cindex LIBs
@@ -406,15 +406,13 @@ LIB "all.lib";
 @c lib surf.lib no_ex
 
 @c ----------------------------------------------------------
-@node Installation and Platform Specifics, Index, SINGULAR libraries, Top
-@chapter Installation and Platform Specifics
-@cindex Installation
-@cindex Platform Specifics
-@cindex Installation and Platform Specifics
+@node Release Notes, Index, SINGULAR libraries, Top
+@chapter Release Notes
+@cindex Release Notes
 @include platform.tex
 
 @c ----------------------------------------------------------
-@node Index, , Installation and Platform Specifics, Top
+@node Index, , Release Notes, Top
 @chapter Index
 @cindex Index
 @printindex cp

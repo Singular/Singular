@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.43 1999-11-26 17:45:49 obachman Exp $
+### $Id: Makefile.in,v 1.44 1999-11-29 12:56:07 obachman Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -37,8 +37,9 @@ TEXI2DVI	= @TEXI2DVI@
 TEXINDEX	= @TEXINDEX@
 TEXI2HTML	= @TEXI2HTML@
 DVIPS		= dvips
-VERBOSE         = 1 # override this with make VERBOSE=2
 
+VERBOSE         = 1 # override this with make VERBOSE=2
+SINGUNAME       = @SINGUNAME@
 # d2t stuff
 SINGULAR	= @SINGULAR@
 SINGULAR_LIB_DIR= ../Singular/LIB
@@ -172,8 +173,14 @@ STANDALONE_HTML_FILES := $(STANDALONE_TEXI_FILES:.texi=.html)
 STANDALONE_FILES      := $(STANDALONE_TEXI_FILES:.texi=)
 
 # targets which produce stand-alone documents
+%.${SINGUNAME}.txt : %.texi
+	${MAKEINFO} -D UNAME --no-header --paragraph-indent none  -o $@ $<
+
 %.txt :  %.texi
 	${MAKEINFO} --no-header --paragraph-indent none -o $@ $<
+
+%.${SINGUNAME}.html : %.texi
+	${TEXI2HTML} -D UNAME -init_file t2h_standalone.init -verbose -split none -o $@ $<
 
 %.html : %.texi
 	${TEXI2HTML} -init_file t2h_standalone.init -verbose -split none -o $@ $<
@@ -242,6 +249,11 @@ install-sharedist: singular.hlp html/index.htm singular.idx
 	${MKINSTALLDIRS} ${install_docdir}
 	${INSTALL_DATA} singular.idx ${install_docdir}
 
+install-bindist: INSTALL_unix.${SINGUNAME}.txt INSTALL_unix.${SINGUNAME}.html
+	${MKINSTALLDIRS} ${install_prefix}
+	${INSTALL_DATA} INSTALL_unix.${SINGUNAME}.txt ${install_prefix}/INSTALL
+	${INSTALL_DATA} INSTALL_unix.${SINGUNAME}.html ${install_prefix}/INSTALL.html
+
 texi2html = $(TEXI2HTML:%.pl=%)
 
 lib2doc.tar.gz:
@@ -265,6 +277,7 @@ mostlyclean:
 	/bin/rm -f singular.hlp manual.hlp  ${DOC2TEX_FILES} singular.idx
 	/bin/rm -f ${HTML_SUBDIR}/${HTML_MANUAL_TOP} ${HTML_SUBDIR}/${HTML_TUTOR_TOP}
 	/bin/rm -rf ${STANDALONE_HTML_FILES} ${STANDALONE_FILES} ${STANDALONE_TXT_FILES}
+	/bin/rm -f INSTALL_unix.${SINGUNAME}.txt INSTALL_unix.${SINGUNAME}.html
 
 distclean: clean
 	/bin/rm -f Makefile
