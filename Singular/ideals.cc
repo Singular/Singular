@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.48 1999-05-19 14:52:46 Singular Exp $ */
+/* $Id: ideals.cc,v 1.49 1999-05-20 11:57:40 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1698,7 +1698,7 @@ ideal  idLift (ideal  mod,ideal submod)
     {
       p = pCopy(submod->m[j]);
       if (pGetComp(p)==0) pSetCompP(p,1);
-      q = kNF(temp,currQuotient,p);
+      q = kNF(temp,currQuotient,p,k);
       pDelete(&p);
       if (q!=NULL)
       {
