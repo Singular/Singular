@@ -23,6 +23,8 @@
 #undef HAVE_DBM
 /* Define to use gmp for rational arithmetic */
 #undef HAVE_GMP
+/* Define to have built in gmp */
+#undef HAVE_BUILTIN_GMP
 /* Define to have MP links */
 #undef HAVE_MPSR
 /* Define to have factory functionality added */

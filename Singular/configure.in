@@ -189,7 +189,11 @@ fi
 NEED_LIBS=$LIBS
 
 dnl Check gmp
-if test "$with_gmp" != no; then
+if test "$with_builtingmp" = yes; then
+  AC_DEFINE(HAVE_BUILTIN_GMP)
+  AC_DEFINE(HAVE_GMP)
+  ac_gmp_ok=yes
+elif test "$with_gmp" != no; then
   AC_CHECK_LIB(gmp, mpz_init)
   AC_CHECK_HEADER(gmp.h)
   if test "$ac_cv_lib_gmp_mpz_init" = yes && \

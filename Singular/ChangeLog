@@ -1,3 +1,7 @@
+Thu May 22 16:39:16 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* mod2.h.in: Added HAVE_BUILTIN_GMP which is set by configure 
+
 * hannes: ipshell.cc: fixed a bug in iiExport (multiple exports in rings)
           subexpr.cc: implemented sleftv::Copy for ring/qring
           syz1.cc: added missing idSkipZeros to LaScala*

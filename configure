@@ -1308,6 +1308,11 @@ else
   ac_configure_args="$ac_configure_args --disable-MP"
 fi
 
+if test "$with_builtingmp" = yes; then
+  enable_gmp=yes
+  ac_configure_args="$ac_configure_args --enable-gmp"
+fi
+
 echo $ac_n "checking whether to configure and build factory lib""... $ac_c" 1>&6
 if test "$enable_factory" != yes && test "$enable_factory" != no; then
   if test "$with_factory" != no && test "$ac_factory_ok" != yes; then
