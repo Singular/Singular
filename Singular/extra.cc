@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.153 2000-12-18 15:44:39 obachman Exp $ */
+/* $Id: extra.cc,v 1.154 2001-02-01 13:23:12 mschulze Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -86,6 +86,8 @@ extern "C"
 #include "silink.h"
 #include "walk.h"
 
+#include "rednf.h"
+
 /*
  *   New function/system-calls that will be included as dynamic module
  * should be inserted here.
@@ -97,6 +99,11 @@ extern "C"
 #include "pcv.h"
 #endif
 #endif /* not HAVE_DYNAMIC_LOADING */
+
+// procedures to compute with units
+#ifdef HAVE_UNITS
+#include "units.h"
+#endif
 
 // see clapsing.cc for a description of the `FACTORY_*' options
 
@@ -494,6 +501,22 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
 #endif
+/*==================== rednf ==================================*/
+    if(strcmp(sys_cmd,"invunit")==0)
+    {
+      return invunit(res,h);
+    }
+    else
+    if(strcmp(sys_cmd,"expand")==0)
+    {
+      return expand(res,h);
+    }
+    else
+    if(strcmp(sys_cmd,"rednf")==0)
+    {
+      return rednf(res,h);
+    }
+    else
 /*==================== pcv ==================================*/
 #ifndef HAVE_DYNAMIC_LOADING
 #ifdef HAVE_PCV
