@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.43 2001-08-27 14:46:59 Singular Exp $ */
+/* $Id: feread.cc,v 1.44 2002-02-12 12:31:39 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -13,6 +13,9 @@
 #include "tok.h"
 #include "febase.h"
 #ifdef ix86_Win
+#define OM_NO_MALLOC_MACROS
+#endif
+#ifdef PowerMacintosh_darwin
 #define OM_NO_MALLOC_MACROS
 #endif
 #include "omalloc.h"
