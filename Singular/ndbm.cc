@@ -4,7 +4,7 @@
 
 //**************************************************************************/
 //
-// $Id: ndbm.cc,v 1.13 2000-11-21 15:35:45 Singular Exp $
+// $Id: ndbm.cc,v 1.14 2000-11-22 16:38:54 Singular Exp $
 //
 //**************************************************************************/
 // 'ndbm.cc' containes all low-level functions to manipulate dbm-files
@@ -14,9 +14,11 @@
 //
 //**************************************************************************/
 
-#include <strings.h>
 #include "mod2.h"
 #ifdef HAVE_DBM
+#ifndef HPUX_9
+#include <strings.h>
+#endif
 /*
  * Copyright (c) 1983 Regents of the University of California.
  * All rights reserved.  The Berkeley software License Agreement
