@@ -682,31 +682,33 @@ char * versionString()
 }
 
 #ifdef HAVE_NS
-void listall()
+void listall(int showproc)
 {
       idhdl hh=basePack->idroot;
       PrintS("====== Top ==============\n");
       while (hh!=NULL)
       {
-        if (IDDATA(hh)==NULL) PrintS("(N)");
-        else if (IDDATA(hh)==(void *)currRing) PrintS("(R)");
-        else if (IDDATA(hh)==(void *)currPack) PrintS("(P)");
-        else PrintS("   ");
-        Print("::%s, typ %s level %d",
-               IDID(hh),Tok2Cmdname(IDTYP(hh)),IDLEV(hh));
-        if ((IDTYP(hh)==RING_CMD)
-        || (IDTYP(hh)==QRING_CMD))
-          Print(" ref: %d\n",IDRING(hh)->ref);
-        else
-          PrintLn();
+        if (showproc || (IDTYP(hh)!=PROC_CMD))
+        {
+          if (IDDATA(hh)==(void *)currRing) PrintS("(R)");
+          else if (IDDATA(hh)==(void *)currPack) PrintS("(P)");
+          else PrintS("   ");
+          Print("::%s, typ %s level %d data %x",
+                 IDID(hh),Tok2Cmdname(IDTYP(hh)),IDLEV(hh),IDDATA(hh));
+          if ((IDTYP(hh)==RING_CMD)
+          || (IDTYP(hh)==QRING_CMD))
+            Print(" ref: %d\n",IDRING(hh)->ref);
+          else
+            PrintLn();
+        }  
         hh=IDNEXT(hh);
       }
       hh=basePack->idroot;
       while (hh!=NULL)
       {
         if (IDDATA(hh)==(void *)basePack)
-          Print("(T)::%s, typ %s level %d\n",
-          IDID(hh),Tok2Cmdname(IDTYP(hh)),IDLEV(hh));
+          Print("(T)::%s, typ %s level %d data %x\n",
+          IDID(hh),Tok2Cmdname(IDTYP(hh)),IDLEV(hh),IDDATA(hh));
         else
         if ((IDTYP(hh)==RING_CMD)
         || (IDTYP(hh)==QRING_CMD)
@@ -716,12 +718,14 @@ void listall()
           idhdl h2=IDRING(hh)->idroot;
           while (h2!=NULL)
           {
-            if (IDDATA(h2)==NULL) PrintS("(N)");
-            else if (IDDATA(h2)==(void *)currRing) PrintS("(R)");
-            else if (IDDATA(h2)==(void *)currPack) PrintS("(P)");
-            else PrintS("   ");
-            Print("%s::%s, typ %s level %d\n",
-            IDID(hh),IDID(h2),Tok2Cmdname(IDTYP(h2)),IDLEV(h2));
+            if (showproc || (IDTYP(h2)!=PROC_CMD))
+            {
+              if (IDDATA(h2)==(void *)currRing) PrintS("(R)");
+              else if (IDDATA(h2)==(void *)currPack) PrintS("(P)");
+              else PrintS("   ");
+              Print("%s::%s, typ %s level %d data %x\n",
+              IDID(hh),IDID(h2),Tok2Cmdname(IDTYP(h2)),IDLEV(h2),IDDATA(h2));
+	    }  
             h2=IDNEXT(h2);
           }
         }
@@ -734,8 +738,8 @@ void checkall()
       idhdl hh=basePack->idroot;
       while (hh!=NULL)
       {
-	omCheckAddr(hh);
-	omCheckAddr(IDID(hh));
+        omCheckAddr(hh);
+        omCheckAddr(IDID(hh));
         if (RingDependend(IDTYP(hh))) Print("%s typ %d in Top\n",IDID(hh),IDTYP(hh));
         hh=IDNEXT(hh);
       }
@@ -747,8 +751,8 @@ void checkall()
           idhdl h2=IDPACKAGE(hh)->idroot;
           while (h2!=NULL)
           {
-	    omCheckAddr(h2);
-	    omCheckAddr(IDID(h2));
+            omCheckAddr(h2);
+            omCheckAddr(IDID(h2));
             if (RingDependend(IDTYP(h2))) Print("%s typ %d in %s\n",IDID(h2),IDTYP(h2),IDID(hh));
             h2=IDNEXT(h2);
           }

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.26 2001-10-09 16:36:06 Singular Exp $ */
+/* $Id: ipshell.h,v 1.27 2002-01-07 17:18:11 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -185,7 +185,7 @@ char * versionString();
 void  singular_example(char *str);
 
 #ifdef HAVE_NS
-void listall();
+void listall(int showproc=1);
 void checkall();
 #endif
 #endif
