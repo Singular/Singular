@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.11 1997-06-30 17:04:45 obachman Exp $ */
+/* $Id: mpsr_Get.cc,v 1.12 1997-07-16 07:51:29 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -447,7 +447,7 @@ mpsr_Status_t mpsr_GetOperatorLeftv(MP_Link_pt link,
                                   mpsr_leftv mlv,
                                   short quote)
 {
-  mpsr_assume(node->type == MP_CommonOperatorType);
+  mpsr_assume(node->type == MP_OperatorType);
   MP_NumChild_t nc = node->numchild, i;
   mpsr_sleftv smlv1, *mlv1 = &smlv1;
   
@@ -458,7 +458,7 @@ mpsr_Status_t mpsr_GetOperatorLeftv(MP_Link_pt link,
   if (nc > 0)
   {
     failr(mpsr_GetLeftv(link, mlv, quote));
-    for (i=0; i<nc; i++)
+    for (i=1; i<nc; i++)
     {
       failr(mpsr_GetLeftv(link, mlv1, quote));
       failr(mpsr_MergeLeftv(mlv, mlv1));
