@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: creat_top.cc,v 1.20 2002-09-26 09:55:09 anne Exp $ */
+/* $Id: creat_top.cc,v 1.21 2003-06-11 21:33:17 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -120,8 +120,13 @@ void write_mod_init(
 {
   fprintf(fp, "\n\n");
   fprintf(fp, "#line @d \"%s.cc\"\n", module->name);
-  fprintf(fp, "extern \"C\"\n");
-  fprintf(fp, "int mod_init(int(*iiAddCproc)())\n{\n");
+  fprintf(fp, "extern \"C\" {\n");
+  fprintf(fp, "int mod_init(\n  int (*iiAddCproc)(");
+#if 1
+  fprintf(fp, "char *libname, char *procname, BOOLEAN pstatic,\n");
+  fprintf(fp, "              BOOLEAN(*func)(leftv res, leftv v)");
+#endif
+  fprintf(fp, ")\n  )\n{\n");
   fprintf(fp, "  idhdl h;\n");
   fprintf(fp, "  char * tempstr;\n");
   fprintf(fp, "  FILE * binfp; \n"); 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.21 2003-06-11 10:17:40 anne Exp $ */
+/* $Id: misc.cc,v 1.22 2003-06-11 21:33:18 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -174,6 +174,8 @@ char * decl2str(int n, char *name)
 
     /* first and last entry of tok.h cannot be grepped */
       //case ATTRIB_CMD: strcpy(name,"ATTRIB_CMD"); break;
+    case POLY_CMD: strcpy(name,"POLY_CMD");       break;
+    case MATRIX_CMD: strcpy(name,"MATRIX_CMD");       break;
     case MAX_TOK: strcpy(name,"MAX_TOK");       break;
     default: strcpy(name,"(null)");
   }
