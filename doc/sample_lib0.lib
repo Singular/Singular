@@ -1,0 +1,23 @@
+// example of a library
+  info="
+         LIBRARY: sample_lib0.lib
+  ";
+
+  proc dummy1(int i,  // parameter list can stretch across
+            int j)    // multiple lines
+  { return(string(i)+"+"+string(j)+"="+string(i+j)); }
+
+  proc dummy2(proc sum, int j, int k)
+        { return(sum(j,k)); }
+  /* { and } does not need to be the
+     first charater in line */
+
+  //////////////////////////
+  /*
+    LIB"sample_lib0.lib"; // some comments at the end
+    help sample_lib0.lib;
+    proc tt1=dummy1;
+    kill dummy1;
+    dummy2(tt1,2,3);
+  */
+  
