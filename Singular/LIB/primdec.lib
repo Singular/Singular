@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.85 2001-01-09 12:59:06 pfister Exp $";
+version="$Id: primdec.lib,v 1.86 2001-01-09 13:22:57 pfister Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -516,6 +516,26 @@ static proc primaryTest (ideal i, poly p)
    return(prm);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+proc gcdTest(ideal act)
+{
+  int i,j;
+  if(size(act)<=1)
+  {
+     return(0);
+  }
+  for (i=1;i<=size(act)-1;i++)
+  {
+     for(j=i+1;j<=size(act);j++)
+     {
+        if(deg(std(ideal(act[i],act[j]))[1])>0)
+        {
+           return(0);
+        }
+     }
+  }
+  return(1);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 static proc splitPrimary(list l,ideal ser,int @wr,list sact)
