@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_unix.texi,v 1.5 1999-12-06 16:34:04 obachman Exp $
+@comment $Id: INSTALL_unix.texi,v 1.6 1999-12-06 17:02:12 obachman Exp $
 @comment this file contains the installation instruction for Singular on 
 @comment Unix
 @ifclear VERSION
@@ -65,7 +65,7 @@ with the subject line (or, mail body) @code{register}.
 
 @heading To install SINGULAR
 
-Make sure that you have appr. 12MByte of free disk space and follow
+Make sure that you have approximately 12MByte of free disk space and follow
 these steps.
 @enumerate
 @item
@@ -195,7 +195,7 @@ By default, on-line help is displayed in the @code{html} format using
 the @code{netscape} program.
 
 However, this behavior can be customized in several ways
-using the @sc{Singular} commands @code{system("--browser",<browser>")}
+using the @sc{Singular} commands @code{system("--browser",<browser>)}
 and @code{system("--allow-net", 1)} (or, by starting up @sc{Singular}
 with the respective command line options).
 
@@ -214,7 +214,7 @@ local html pages, after setting this option.
 See also 
 @ifset singularmanual
 @ref{The online help system}, @ref{Command line options}, and
-@ref{Startup sequence}
+@ref{Startup sequence},
 @end ifset
 @ifclear singularmanual
 the sections @emph{The online help system}, @emph{Command line options}, and
@@ -233,7 +233,7 @@ to your system-wide @code{dir} file (usually @code{/usr/info/dir} or
 to the directory of your @code{dir} file. 
 @*This assures that the
 @sc{Singular} manual can be  accessed from stand-alone texinfo
-browser programs such as @code{info} or @code{Emacs}:
+browser programs such as @code{info} or @code{Emacs}.
 @end itemize
 
 @heading Troubleshooting
@@ -308,12 +308,12 @@ command @code{uname -a} on your shell) in your report.
 More and up-to-date information about @sc{Singular} is always available
 from
 @display
-@uref{http://www.mathematik.uni-kl.de/~zca/Singular}
+@uref{http://www.mathematik.uni-kl.de/~zca/Singular}.
 @end display
 We very much welcome any comments, questions, and bug reports. Please
 contact us at
 @display
-@email{singular@@mathematik.uni-kl.de}
+@email{singular@@mathematik.uni-kl.de}.
 @end display
 
 @ifclear singularmanual

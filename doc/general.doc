@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.166 1999-12-06 16:06:55 obachman Exp $
+@comment $Id: general.doc,v 1.167 1999-12-06 17:02:13 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -808,8 +808,8 @@ bindings are listed.
 @cindex Emacs, overview 
 @cindex Emacs, a quick guide
 
-This section gives a tutorial-like introduction of Emacs. Especially to
-users who are not familiar with Emacs, we recommend that they go trough
+This section gives a tutorial-like introduction to Emacs. Especially to
+users who are not familiar with Emacs, we recommend that they go through
 this section and try out the described features.
 
 Emacs commands generally involve the @code{CONTROL} key (sometimes
@@ -844,9 +844,9 @@ window of the window system, and not to overlapping, separate
 windows. When using @sc{Singular} within Emacs, extra windows may appear 
 which display help or output from certain commands. The most important 
 window commands are:
-@multitable @columnfractions .2 .2 .6
+@multitable @columnfractions 2. .3 .5
 @item @code{C-x 1} 
-@tab @code{File -> Un-Split}
+@tab @code{File->Un-Split}
 @tab Un-Split window (i.e., kill other windows)
 @item @code{C-x o}
 @tab 
@@ -876,7 +876,7 @@ the name @code{*singular*} (or, @code{*singular<2>*},
 @code{*singular<3>*}, etc., if you have multiple @sc{Singular}
 sessions within the same Emacs).
 
-When you are asked for input to an Emacs commands, the cursor
+When you are asked for input to an Emacs command, the cursor
 moves to the bottom line of Emacs, i.e., to a special buffer, called the
 "minibuffer". Typing @code{<RETURN>} within the minibuffer, ends the
 input, typing @code{<SPACE>} within the minibuffer, lists all possible
@@ -884,8 +884,8 @@ input values to the interactive Emacs command.
 
 The most important buffer commands are
 @multitable @columnfractions .2 .8
-@item @code{C-x b} Switch buffer
-@item @code{C-x k} Kill current buffer
+@item @code{C-x b} @tab Switch buffer
+@item @code{C-x k} @tab Kill current buffer
 @end multitable
 Alternatively, you can switch to or kill buffers using the @code{Buffer} 
 menu.
@@ -1112,7 +1112,7 @@ The Emacs interface can be used to run interactive @sc{Singular}
 demonstrations. A demonstration is started by loading a so-called
 @sc{Singular} demo file with the Emacs command
 @code{singular-demo-load}, bound to 
-@code{C-c C-d}, or or with the menu @code{Commands->Load Demo}.
+@code{C-c C-d}, or with the menu @code{Commands->Load Demo}.
 
 A @sc{Singular} demo file should consist of @sc{Singular} commands
 separated by blank lines. When running a demo, the input up to the next
@@ -1176,7 +1176,7 @@ For doing this, you also might
 find handy the function @code{customize-face-at-point},
 which let's you customize the face at the current position of
 point. This function is automatically defined if you run
-@code{ESingular}). Otherwise, you should at its definition (see below)
+@code{ESingular}). Otherwise, you should add its definition (see below)
 to your personal @code{.emacs} file.
 
 @item Singular Interactive Miscellaneous
@@ -1184,8 +1184,11 @@ to your personal @code{.emacs} file.
 Here you can specify various different things such as the behavior of
 the cursor keys, the name of the special @sc{Singular} startup file, the
 appearance of the help window, or the default values for the
-@code{singular} command. For a first look at customization of the
-interface, this is probably the best group.
+@code{singular} command. 
+@c Time: I find this sentence rather confusing
+@c For a first look at customization of the
+@c interface, this is probably the best group.
+
 
 @item Singular Demo Mode
 
@@ -1331,7 +1334,7 @@ argument) and loads the file into @sc{Singular}.
 
 @item @code{singular-demo-load} (key @code{C-c C-d} or menu
 @code{Commands->Load Demo...}): asks for a file name of a @sc{Singular}
-demo file in the minibuffer area (hit @code{RET} for completion) and
+demo file in the minibuffer area (hit @code{SPACE} for completion) and
 enters the @sc{Singular} demo mode showing the first chunk of the demo.
 
 @item @code{singular-demo-exit} (menu @code{Commands->Exit Demo}):
