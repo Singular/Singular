@@ -1,3 +1,10 @@
+Wed May 27 15:16:31 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* usercard.tex: minor fixes, some sections added
+
+	* singcard.tex (\rep): new macro
+	  (\alt): macro slightly changed
+
 Wed May 27 11:42:11 MET DST 1998 hannes
         * added some type conversions
         * change default LIB-dir (now /usr/local/Singular/LIB)
@@ -7,6 +14,18 @@ Wed May 27 11:42:11 MET DST 1998 hannes
 	* added literatur in "math.doc"
 
 Mon May 25 09:52:16 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* usercard.tex (Input and output): new section
+	  (Miscellany): new section
+
+	* usercard.tex: fixes fixed
+
+	* singcard.tex (\alt): new macro
+	  (\verysmallskipamount): slightly changed
+	  (\entryskip): new macro
+
+	* start.doc (How to use this manual): item on `Input and output'
+	  reordered
 
 	* general.doc (The SINGULAR language): text on general language
 	  concepts added
