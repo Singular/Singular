@@ -1,5 +1,6 @@
 #ifndef PAGE_H
 #define PAGE_H
+#if defined(PAGE_TEST) || defined(PAGE_COUNT)
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -19,5 +20,6 @@ extern char          use_tab [2048];
 extern int           page_tab_ind;
 #ifdef __cplusplus
 }
+#endif
 #endif
 #endif
