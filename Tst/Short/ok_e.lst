@@ -1,6 +1,6 @@
 ;; Test which should pass shifted exponents
 allres_s
-; UNCLEAR betti_s
+betti_s
 barei_s
 bug_1
 bug_10
@@ -23,8 +23,6 @@ bug_8
 bug_barei
 bug_c_dp
 bug_factorize
-; bug_M
-; bug_CM
 bug_mres
 bug_primdec
 cyc5_lp
@@ -78,7 +76,7 @@ res_s
 resultantp_s
 ringsum
 sing_s 
-solve_s
+; solve_s negativ exponents
 ; spcurve weights?
 sres_s
 std_s

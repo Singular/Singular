@@ -1,6 +1,6 @@
 ;; Tests which should pass with Singularg
 allres_s
-; UNCLEAR betti_s
+betti_s
 barei_s
 bug_1
 bug_10
@@ -23,8 +23,6 @@ bug_8
 bug_barei
 bug_c_dp
 bug_factorize
-; bug_M
-; bug_CM
 bug_mres
 bug_primdec
 cyc5_lp
@@ -58,7 +56,7 @@ lres_s
 minor_s
 modulo_s
 monodromy_s
-mpsr_s
+; mpsr_s trouble with ring
 normal
 pAdd_s
 pAddManyVars_s
@@ -82,7 +80,7 @@ ringsum
 ; spcurve weights?
 sres_s
 std_s
-string
+string 
 test_c_dp
 triang_s
 tst_s
