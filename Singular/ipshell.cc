@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.72 2002-01-19 17:11:00 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.73 2002-01-19 17:20:59 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -38,7 +38,7 @@
 #endif
 
 // define this if you want to use the fast_map routine for mapping ideals
-//#define FAST_MAP
+#define FAST_MAP
 
 #ifdef FAST_MAP
 #include "fast_maps.h"

@@ -6,7 +6,7 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id: fast_maps.cc,v 1.16 2002-01-19 17:11:42 obachman Exp $
+ *  Version: $Id: fast_maps.cc,v 1.17 2002-01-19 17:20:59 obachman Exp $
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>
@@ -23,8 +23,6 @@
 #define HAVE_SRC_R 0
 // define if you want to use optimization step
 #define HAVE_MAP_OPTIMIZATION 0
-
-
 
 /*******************************************************************************
 **

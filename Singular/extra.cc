@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.172 2002-01-19 14:48:14 obachman Exp $ */
+/* $Id: extra.cc,v 1.173 2002-01-19 17:20:58 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -650,7 +650,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 #include "mpsr.h"
 
 #include "mod_raw.h"
-#include "fast_maps.cc"
+// #include "fast_maps.cc"
    
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 {
@@ -790,7 +790,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       ideal image_id = (ideal) theMap;
       ring map_r = IDRING(idroot->get(theMap->preimage, myynest));
       ideal map_id = IDIDEAL(map_r->idroot->get(h->Next()->Name(), myynest));
-
+#if 0
       ring src_r, dest_r;
       maMap_CreateRings(map_id, map_r, image_id, image_r, src_r, dest_r);
       mapoly mp;
@@ -798,6 +798,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           
       maMap_CreatePolyIdeal(map_id, map_r, src_r, dest_r, mp, mideal);
       maPoly_Out(mp, src_r);
+#endif
       return FALSE;
     }
     else
