@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.73 1998-10-26 15:05:48 obachman Exp $
+@comment $Id: types.doc,v 1.74 1998-10-27 10:46:37 obachman Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -1469,13 +1469,16 @@ the host and port.
 @item launch mode:
 @enumerate 4
 @item @code{"MPtcp:launch"}
-@item @code{"MPtcp:launch --MPapplication "} + application
-@item @code{"MPtcp:launch --MPhost "} + hostname
-@item @code{"MPtcp:launch --MPhost "} + hostname +
-@code{" --MPapplication "} + application
+@item @code{"MPtcp:launch" --MPrsh "} + rsh
+@item @code{"MPtcp:launch" --MPrsh "} + rsh  + @code{" --MPhost "} +
+hostname
+@item @code{"MPtcp:launch" --MPrsh "} + rsh  + @code{" --MPhost "} +
+hostname + @code{" --MPapplication "} + application
 @end enumerate
-@sc{Singular} becomes a client and starts the application on a
-different host which acts as a server.
+@sc{Singular} becomes a client and starts (launches) the application
+using the specified remote shell command (default is
+@code{ssh}) on a (possibly) different host (default is @code{localhost}
+which then acts as a server.
 @item fork mode:
 @enumerate 8
 @item @code{"MPtcp:fork"}
@@ -1489,10 +1492,13 @@ There are the following default values:
 @item if none of @code{listen}, @code{connect}, @code{launch} or
 @code{fork} is specified, the default mode is set to @code{fork}.
 
+@item if no remote shell (rsh) command is specified, then the command
+@code{ssh} is used.
+
 @item if no application is specified (in mode @code{launch}) the default
-application is the value of @code{system("Singular") + " -b"}.
+application is the value of @code{system("Singular") + " -bq"}.
 (This evaluates to the absolute path of the @sc{Singular} currently running
-with the option "-b" appended.
+with the option "-bq" appended.)
 
 @item if no hostname is specified the local host is used as default host.
 @end itemize
@@ -1508,8 +1514,8 @@ portnumber are substituted by the values from the link
 specification. The client "listens" at the given port until the server
 application does a connect call. If @sc{Singular} is used as server
 application it has to be started with the command line option @code{-b}.
-Since launching is done using @code{rsh}, the host on which the
-application should run must have an entry in the @code{.rhosts}
+Since launching is done using a remote sheel command, the host on which
+the application should run must have an entry in the @code{.rhosts}
 file. Even the local machine must have an entry if applications should
 be launched locally.
 
