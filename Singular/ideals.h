@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.27 2000-10-24 06:58:15 pohl Exp $ */
+/* $Id: ideals.h,v 1.28 2000-10-26 07:19:15 pohl Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -134,7 +134,6 @@ intvec *idSort(ideal id,BOOLEAN nolex=TRUE);
 ideal   idModulo (ideal h1,ideal h2);
 int     idElem(ideal F);
 matrix  idCoeffOfKBase(ideal arg, ideal kbase, poly how);
-intvec *idQHomWeights(ideal id);
 ideal   idTransp(ideal a);
 
 intvec *idQHomWeight(ideal id);

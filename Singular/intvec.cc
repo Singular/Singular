@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: intvec.cc,v 1.19 2000-10-24 07:03:02 pohl Exp $ */
+/* $Id: intvec.cc,v 1.20 2000-10-26 07:19:17 pohl Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -308,230 +308,17 @@ intvec * ivMult(intvec * a, intvec * b)
   return iv;
 }
 
-/*3
-* gcd of a and b
-*/
-static int ivIntGcd(int a,int b)
-{
-  int x;
-
-  while (b!=0)
-  {
-    x = b;
-    b = a % x;
-    a = x;
-  }
-  return a;
-}
-
 /*2
-*computes a triangular matrix of the lower right submatrix
-*beginning with the field (srw,cl) by Gaussian elimination
+*computes a triangular matrix 
 */
-void ivTriangMat(intvec * imat, int srw, int cl)
+void ivTriangMat(intvec * imat)
 {
-  int i=srw,t,j,k,tgcd,mult1,mult2;
+  int i=0,j=imat->rows(),k=j*imat->cols()-1;
 
-  if ((cl>imat->cols()) || (srw>imat->rows())) return;
-  ivCancelContent(imat,srw);
-  while ((i<=imat->rows()) && (IMATELEM(*imat,i,cl)==0)) i++;
-  if ((i>srw ) && (i<=imat->rows()))
-  {
-    for (j=cl;j<=imat->cols();j++)
-    {
-      t = IMATELEM(*imat,srw,j);
-      IMATELEM(*imat,srw,j) = IMATELEM(*imat,i,j);
-      IMATELEM(*imat,i,j) = t;
-    }
-  }
-  if (i<=imat->rows())
-  {
-    for (k=srw+1;k<=imat->rows();k++)
-    {
-      if (IMATELEM(*imat,k,cl)!=0)
-      {
-        tgcd = ivIntGcd(IMATELEM(*imat,srw,cl),IMATELEM(*imat,k,cl));
-        mult1 = IMATELEM(*imat,k,cl) / tgcd;
-        mult2 = IMATELEM(*imat,srw,cl) / tgcd;
-        IMATELEM(*imat,k,cl) = 0;
-        for (j=cl+1;j<=imat->cols();j++)
-        {
-          IMATELEM(*imat,k,j) =
-              mult2*IMATELEM(*imat,k,j)-mult1*IMATELEM(*imat,srw,j);
-        }
-      }
-    }
-    srw++;
-  }
-  ivTriangMat(imat,srw,cl+1);
-  return;
-}
-
-/*2
-*returns the number of the first zero row,
-*-1 for no zero row
-*/
-int ivFirstEmptyRow(intvec * imat)
-{
-  int i,j;
-
-  for (i=1;i<=imat->rows();i++)
-  {
-    j = 1;
-    while ((j<=imat->cols()) && (IMATELEM(*imat,i,j)==0)) j++;
-    if (j>imat->cols()) return i;
-  }
-  return -1;
-}
-
-/*2
-*divide out the content for every row >= from
-*/
-void ivCancelContent(intvec * imat,int from)
-{
-  if (imat->cols()<2) return;
-  int i,j,tgcd;
-
-  for (i=from;i<=imat->rows();i++)
-  {
-    tgcd = ivIntGcd(IMATELEM(*imat,i,1),IMATELEM(*imat,i,2));
-    j = 3;
-    while ((j<=imat->cols()) && ((ABS(tgcd)>1) || (tgcd==0)))
-    {
-      tgcd = ivIntGcd(tgcd,IMATELEM(*imat,i,j));
-      j++;
-    }
-    if ((j>imat->cols()) && (ABS(tgcd)>1))
-     for (j=1;j<=imat->cols();j++) IMATELEM(*imat,i,j) /= tgcd;
-  }
-  return;
-}
-
-/*3
-*searches the independent columns of the system given by imat
-*imat is assumed to be in triangular shape
-*/
-static intvec * ivIndepCols(intvec * imat)
-{
-  intvec * result=new intvec(1,imat->cols(),0);
-  int i,j;
-
-  for (i=1;i<=imat->rows();i++)
-  {
-    j=1;
-    while ((j<=imat->cols()) && (IMATELEM(*imat,i,j)==0)) j++;
-    if (j<=imat->cols()) IMATELEM(*result,1,j)=i;
-  }
-  return result;
-}
-
-/*3
-* computes basic solutions of the system given by imat
-*/
-static intvec * ivBasicSol(intvec * imat)
-{
-  intvec * result = new intvec(2*imat->cols(),imat->cols(),0);
-  intvec * indep=ivIndepCols(imat),*actsol=new intvec(imat->cols());
-  int actPosSol=1,actNegSol=imat->cols()+1,i=imat->cols(),j,k;
-  int tgcd,tlcm;
-  BOOLEAN isNeg;
-
-  while (i>0)
-  {
-    if ((*indep)[i-1]==0)
-    {
-      for (j=0;j<actsol->length();j++) (*actsol)[j] = 0;
-      (*actsol)[i-1] = 1;
-      isNeg = FALSE;
-      j = i-1;
-      while (j>0)
-      {
-        if ((*indep)[j-1]!=0)
-        {
-          tlcm = 0;
-          for (k=0;k<i;k++)
-            tlcm += IMATELEM(*imat,(*indep)[j-1],k+1)*(*actsol)[k];
-          tgcd = ivIntGcd(tlcm,IMATELEM(*imat,(*indep)[j-1],j));
-          tlcm /= tgcd;
-          tgcd = IMATELEM(*imat,(*indep)[j-1],j) / tgcd;
-          if (tgcd<0)
-          {
-            tgcd = -tgcd;
-            tlcm = -tlcm;
-          }
-          for (k=0;k<i;k++) (*actsol)[k] *= tgcd;
-          (*actsol)[j-1] = -tlcm;
-          isNeg = isNeg || (tlcm>0);
-        }
-        j--;
-      }
-/*writes the solution into result depending on the sign*/
-      if (isNeg)
-      {
-        for (j=1;j<=imat->cols();j++)
-          IMATELEM(*result,actNegSol,j) = (*actsol)[j-1];
-        actNegSol++;
-      }
-      else
-      {
-        for (j=1;j<=imat->cols();j++)
-          IMATELEM(*result,actPosSol,j) = (*actsol)[j-1];
-        actPosSol++;
-      }
-    }
-    i--;
-  }
-  delete actsol;
-  delete indep;
-  return result;
-}
-
-/*2
-*returns an integer solution of imat which is assumed to be
-*in triangular form
-*the solution contains as many positive entrees as possible
-*/
-intvec * ivSolveIntMat(intvec * imat)
-{
-  intvec * result=new intvec(imat->cols());
-  intvec * basesol=ivBasicSol(imat);
-  int i=imat->cols(),j,k,l,t;
-
-/*adds all base solutions*/
-  for (j=1;j<=2*i;j++)
-  {
-    for (k=1;k<=i;k++)
-      (*result)[k-1] += IMATELEM(*basesol,j,k);
-  }
-/*tries to cancel negative entrees by adding positive solutions*/
-  j = 1;
-  while (j<=i)
-  {
-    if ((*result)[j-1]<0)
-    {
-      t = -1;
-      l = 0;
-      for (k=1;k<=i;k++)
-      {
-        if (IMATELEM(*basesol,k,j)>t)
-        {
-          t = IMATELEM(*basesol,k,j);
-          l = k;
-        }
-      }
-      if (t>0)
-      {
-        t = ((*result)[j-1] / t) +1;
-        for (k=1;k<=i;k++)
-        {
-          (*result)[k-1] += t*IMATELEM(*basesol,l,k);
-        }
-      }
-    }
-    j++;
-  }
-  delete basesol;
-  return result;
+  ivTriangIntern(imat,i,j);
+  i *= imat->cols();
+  for(j=k;j>=i;j--)
+    (*imat)[j] = 0; 
 }
 
 /* def. internals */
@@ -553,7 +340,6 @@ static void ivOptSolve(intvec *, intvec *, int &, int &);
 static void ivContent(intvec *);
 static int ivL1Norm(intvec *);
 static int ivCondNumber(intvec *, int); 
-
 
 /* Triangulierung in intmat.cc */
 void ivTriangIntern(intvec *imat, int &ready, int &all)
@@ -834,9 +620,12 @@ static intvec * ivOptimizeKern(intvec *kern)
     }
   }
   ivContent(res);
-  l = ivCondNumber(res,-c);
-  j = ivL1Norm(res);
-  ivOptRecursive(res, NULL, kern, l, j, r);
+  if (r<11)
+  {
+    l = ivCondNumber(res,-c);
+    j = ivL1Norm(res);
+    ivOptRecursive(res, NULL, kern, l, j, r);
+  }
   return res;
 }
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.227 2000-09-20 13:25:39 obachman Exp $ */
+/* $Id: iparith.cc,v 1.228 2000-10-26 07:19:14 pohl Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2513,7 +2513,7 @@ static BOOLEAN jjBAREISS(leftv res, leftv v)
 static BOOLEAN jjBAREISS_IM(leftv res, leftv v)
 {
   intvec *m=(intvec *)v->CopyD(INTMAT_CMD);
-  ivTriangMat(m,1,1);
+  ivTriangMat(m);
   res->data = (char *)m;
   return FALSE;
 }

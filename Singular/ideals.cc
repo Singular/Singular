@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.108 2000-10-24 06:58:16 pohl Exp $ */
+/* $Id: ideals.cc,v 1.109 2000-10-26 07:19:16 pohl Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -3198,54 +3198,6 @@ matrix idCoeffOfKBase(ideal arg, ideal kbase, poly how)
     }
   }
   idDelete(&tempKbase);
-  return result;
-}
-
-intvec * idQHomWeights(ideal id)
-{
-  intvec * imat=new intvec(2*pVariables,pVariables,0);
-  poly actHead=NULL,wPoint=NULL;
-  int actIndex,i=-1,j=1,k;
-  BOOLEAN notReady=TRUE;
-
-  while (notReady)
-  {
-    if (wPoint==NULL)
-    {
-      i++;
-      while ((i<IDELEMS(id))
-      && ((id->m[i]==NULL) || (pNext(id->m[i])==NULL)))
-        i++;
-      if (i<IDELEMS(id))
-      {
-        actHead = id->m[i];
-        wPoint = pNext(actHead);
-      }
-    }
-    while ((wPoint!=NULL) && (j<=2*pVariables))
-    {
-      for (k=1;k<=pVariables;k++)
-        IMATELEM(*imat,j,k) += pGetExp(actHead,k)-pGetExp(wPoint,k);
-      pIter(wPoint);
-      j++;
-    }
-    if ((i>=IDELEMS(id)) || (j>2*pVariables))
-    {
-      ivTriangMat(imat,1,1);
-      j = ivFirstEmptyRow(imat);
-      if ((i>=IDELEMS(id)) || (j>pVariables)) notReady=FALSE;
-    }
-  }
-  intvec *result=NULL;
-  if (j<=pVariables)
-  {
-    result=ivSolveIntMat(imat);
-  }
-  //else
-  //{
-  //  WerrorS("not homogeneous");
-  //}
-  delete imat;
   return result;
 }
 

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: intvec.h,v 1.15 2000-10-24 07:03:02 pohl Exp $ */
+/* $Id: intvec.h,v 1.16 2000-10-26 07:19:16 pohl Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -82,12 +82,7 @@ intvec * ivSub(intvec * a, intvec * b);
 intvec * ivTranp(intvec * o);
 int      ivTrace(intvec * o);
 intvec * ivMult(intvec * a, intvec * b);
-void     ivTriangMat(intvec * imat, int srw, int col);
-int      ivFirstEmptyRow(intvec * imat);
-void     ivCancelContent(intvec * imat,int from=1);
-intvec * ivSolveIntMat(intvec * imat);
-
-// new: wp
+void     ivTriangMat(intvec * imat);
 void     ivTriangIntern(intvec * imat, int &ready, int &all);
 intvec * ivSolveKern(intvec * imat, int ready);
 
