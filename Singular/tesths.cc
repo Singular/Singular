@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.49 1998-06-16 11:03:59 obachman Exp $ */
+/* $Id: tesths.cc,v 1.50 1998-07-03 12:46:29 pohl Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -285,7 +285,9 @@ int main(          /* main entry to Singular */
   int optc, option_index;
 
   // do this first, because -v might print version path
+#ifndef __MWERKS__
   feInitPaths(thisfile);
+#endif
 
   // parse command line options
   while((optc = getopt_long(argc, argv,
