@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.76 1998-05-15 12:09:15 wichmann Exp $
+@comment $Id: general.doc,v 1.77 1998-05-15 12:18:14 wichmann Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -563,7 +563,6 @@ the ring
   ring r9=real,(x,y,z),dp;
 @end example
 @end itemize
->>>>>>> 1.74
 
 @c ---------------------------------------------------------------------------
 @node General syntax of a ring declaration, Term orderings, Examples of ring declarations, Rings and orderings
