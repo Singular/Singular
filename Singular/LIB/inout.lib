@@ -1,9 +1,9 @@
-// $Id: inout.lib,v 1.11 1999-07-28 18:08:07 Singular Exp $
+// $Id: inout.lib,v 1.12 1999-08-13 16:01:17 Singular Exp $
 // system("random",787422842);
 // (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: inout.lib,v 1.11 1999-07-28 18:08:07 Singular Exp $";
+version="$Id: inout.lib,v 1.12 1999-08-13 16:01:17 Singular Exp $";
 info="
 LIBRARY:  inout.lib     PROCEDURES FOR MANIPULATING IN- AND OUTPUT
 
@@ -444,12 +444,6 @@ EXAMPLE: example show; shows an example
          print(poly(@id@));
       }
       if( typeof(@id@)=="matrix")
-      {
-         @@s=@@s + ", "+string(nrows(@id@))+"x"+string(ncols(@id@));
-         @@s;
-         print(matrix(@id@));
-      }
-       if( typeof(@id@)=="matrix")
       {
          @@s=@@s + ", "+string(nrows(@id@))+"x"+string(ncols(@id@));
          @@s;
