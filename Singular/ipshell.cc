@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.36 1999-03-09 12:28:48 obachman Exp $ */
+/* $Id: ipshell.cc,v 1.37 1999-03-11 15:58:06 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -30,6 +30,7 @@
 #include "attrib.h"
 #include "ipconv.h"
 #include "silink.h"
+#include "stairc.h"
 #include "ipshell.h"
 
 leftv iiCurrArgs=NULL;
@@ -1063,4 +1064,39 @@ BOOLEAN iiCheckRing(int i)
     #endif
   }
   return FALSE;
+}
+
+poly    iiHighCorner(ideal I, int ak)
+{
+  BOOLEAN *UsedAxis=(BOOLEAN *)Alloc0(pVariables*sizeof(BOOLEAN));
+  int i,n;
+  poly po;
+  for(i=IDELEMS(I)-1;i>=0;i--)
+  {
+    po=I->m[i];
+    if ((po!=NULL) &&((n=pIsPurePower(po))!=0)) UsedAxis[n-1]=TRUE;
+  }
+  for(i=pVariables-1;i>=0;i--)
+  {
+    if(UsedAxis[i]==FALSE) return NULL; // not zero-dim.
+  }
+  if (currRing->OrdSgn== -1)
+  {
+    po=NULL;
+    scComputeHC(I,ak,po);
+    if (po!=NULL)
+    {
+      pGetCoeff(po)=nInit(1);
+      for (i=pVariables; i>0; i--)
+      {
+        if (pGetExp(po, i) > 0) pDecrExp(po,i);
+      }
+    }
+  }
+  if (po!=NULL)
+  {
+    pSetComp(po,ak);
+    pSetm(po);
+  }
+  return po;
 }

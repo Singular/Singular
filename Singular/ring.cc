@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.44 1999-03-08 18:11:50 Singular Exp $ */
+/* $Id: ring.cc,v 1.45 1999-03-11 15:58:09 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -672,9 +672,9 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
 void rComplete(ring r, int force)
 {
   int VarCompIndex, VarLowIndex, VarHighIndex;
-  
+
   r->VarOffset = (int*) Alloc((r->N + 1)*sizeof(int));
-  pGetVarIndicies(r, r->VarOffset, VarCompIndex, 
+  pGetVarIndicies(r, r->VarOffset, VarCompIndex,
                   VarLowIndex, VarHighIndex);
   r->VarCompIndex = VarCompIndex;
   r->VarLowIndex = VarLowIndex;
@@ -731,14 +731,21 @@ void rWrite(ring r)
 
 
   if (rField_is_GF(r))
-    PrintS("//   # ground field : ");
-  else
-    PrintS("//   characteristic : ");
-  if ( rField_is_R(r) )        PrintS("0 (real)\n");  /* R */
-  else Print ("%d\n",rChar(r)); /* Fp(a) */
-  if (r->parameter!=NULL)
   {
-    if (r->ch<2)
+    Print("//   # ground field : %d\n",rInternalChar(r));
+    Print("//   primitive element : %s\n", r->parameter[0]);
+    if (r==currRing)
+    {
+      StringSetS("//   minpoly        : ");
+      nfShowMipo();PrintS(StringAppend("\n"));
+    }
+  }
+  else
+  {
+    PrintS("//   characteristic : ");
+    if ( rField_is_R(r) )        PrintS("0 (real)\n");  /* R */
+    else Print ("%d\n",rChar(r)); /* Fp(a) */
+    if (r->parameter!=NULL)
     {
       Print ("//   %d parameter    : ",rPar(r));
       char **sp=r->parameter;
@@ -761,15 +768,6 @@ void rWrite(ring r)
       else
       {
         PrintS("...\n");
-      }
-    }
-    else
-    {
-      Print("//   primitive element : %s\n", r->parameter[0]);
-      if (r==currRing)
-      {
-        StringSetS("//   minpoly        : ");
-        nfShowMipo();PrintS(StringAppend("\n"));
       }
     }
   }
@@ -1345,12 +1343,12 @@ int rSum(ring r1, ring r2, ring &sum)
             tmpR.minpoly=naCopy(r1->minpoly);
             tmpR.P=1;
             nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,
-	      rPar(currRing));
+              rPar(currRing));
           }
           else
           {
             nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,
-	      rPar(currRing));
+              rPar(currRing));
             WerrorS("different minpolys");
             return -1;
           }
@@ -1366,7 +1364,7 @@ int rSum(ring r1, ring r2, ring &sum)
             nSetChar(rInternalChar(r1),TRUE,r1->parameter,rPar(r1));
             tmpR.minpoly=naCopy(r1->minpoly);
             nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,
-	      rPar(currRing));
+              rPar(currRing));
           }
           else
           {
@@ -1388,7 +1386,7 @@ int rSum(ring r1, ring r2, ring &sum)
             nSetChar(rInternalChar(r2),TRUE,r2->parameter,rPar(r2));
             tmpR.minpoly=naCopy(r2->minpoly);
             nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,
-	      rPar(currRing));
+              rPar(currRing));
           }
           else
           {
@@ -1443,7 +1441,7 @@ int rSum(ring r1, ring r2, ring &sum)
           nSetChar(rInternalChar(r1),TRUE,r1->parameter,rPar(r1));
           tmpR.minpoly=naCopy(r1->minpoly);
           nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,
-	    rPar(currRing));
+            rPar(currRing));
         }
       }
       else  /* R, Q(a),Z/q,Z/p(a),GF(p,n) */
@@ -1470,7 +1468,7 @@ int rSum(ring r1, ring r2, ring &sum)
           nSetChar(rInternalChar(r1),TRUE,r1->parameter,rPar(r1));
           tmpR.minpoly=naCopy(r2->minpoly);
           nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,
-	    rPar(currRing));
+            rPar(currRing));
         }
       }
       else if (r2->ch>1) /* Z/p,GF(p,n) */
@@ -1506,7 +1504,7 @@ int rSum(ring r1, ring r2, ring &sum)
           nSetChar(rInternalChar(r1),TRUE,r1->parameter,rPar(r1));
           tmpR.minpoly=naCopy(r1->minpoly);
           nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,
-	    rPar(currRing));
+            rPar(currRing));
         }
       }
       else  /* R, Z/p,GF(p,n) */
@@ -1536,7 +1534,7 @@ int rSum(ring r1, ring r2, ring &sum)
           nSetChar(rInternalChar(r2),TRUE,r2->parameter,rPar(r2));
           tmpR.minpoly=naCopy(r2->minpoly);
           nSetChar(rInternalChar(currRing),TRUE,currRing->parameter,
-	    rPar(currRing));
+            rPar(currRing));
         }
       }
       else
@@ -1919,24 +1917,24 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
   }
 
   if (r->N == 0) return true;
-  
+
   if (r->VarOffset == NULL)
   {
     Werror("Null ring VarOffset -- no rComplete (?) in n %s:%d\n", fn, l);
     assume(0);
     return false;
   }
-  
-  int  
-    VarCompIndex = r->VarCompIndex, 
-    VarLowIndex  = r->VarLowIndex, 
+
+  int
+    VarCompIndex = r->VarCompIndex,
+    VarLowIndex  = r->VarLowIndex,
     VarHighIndex = r->VarHighIndex,
     i;
   BOOLEAN ok = false;
   int* VarOffset = r->VarOffset;
-  
+
   rComplete(r);
-  
+
   if (   VarCompIndex != r->VarCompIndex ||
          VarLowIndex  != r->VarLowIndex ||
          VarHighIndex != r->VarHighIndex)
@@ -1945,7 +1943,7 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
     assume(0);
     ok = FALSE;
   }
-  
+
   for (i=0; i<=r->N; i++)
   {
     if (VarOffset[i] != r->VarOffset[i])

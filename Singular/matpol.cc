@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.21 1999-03-08 17:30:42 Singular Exp $ */
+/* $Id: matpol.cc,v 1.22 1999-03-11 15:58:08 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -779,7 +779,9 @@ matrix mpCoeffProc (poly f, poly vars)
 {
   poly sel, h;
   int l, i;
+  int pos_of_1 = -1;
   matrix co;
+
   if (f==NULL)
   {
     co = mpNew(2, 1);
@@ -794,20 +796,24 @@ matrix mpCoeffProc (poly f, poly vars)
   {
     for (i=l; i>=1; i--)
     {
-      h = pHead(sel);
+      h = sel;
+      pIter(sel);
+      pNext(h)=NULL;
       MATELEM(co,1,i) = h;
       MATELEM(co,2,i) = NULL;
-      sel = sel->next;
+      if (pIsConstant(h)) pos_of_1 = i;
     }
   }
   else
   {
     for (i=1; i<=l; i++)
     {
-      h = pHead(sel);
+      h = sel;
+      pIter(sel);
+      pNext(h)=NULL;
       MATELEM(co,1,i) = h;
       MATELEM(co,2,i) = NULL;
-      sel = sel->next;
+      if (pIsConstant(h)) pos_of_1 = i;
     }
   }
   while (f!=NULL)
@@ -815,16 +821,27 @@ matrix mpCoeffProc (poly f, poly vars)
     i = 1;
     loop
     {
-      h = mpExdiv(f, MATELEM(co,1,i));
-      if (h!=NULL)
+      if (i!=pos_of_1)
       {
-        MATELEM(co,2,i) = pAdd(MATELEM(co,2,i), h);
-        break;
+        h = mpExdiv(f, MATELEM(co,1,i));
+        if (h!=NULL)
+        {
+          MATELEM(co,2,i) = pAdd(MATELEM(co,2,i), h);
+          break;
+        }
       }
-      if (i < l)
-        i++;
-      else
+      if (i == l) 
+      {
+        // check monom 1 last:
+        h = mpExdiv(f, MATELEM(co,1,pos_of_1));
+        if (h!=NULL)
+        {
+          MATELEM(co,2,pos_of_1) = pAdd(MATELEM(co,2,pos_of_1), h);
+          break;
+        }
         break;
+      }	
+      i ++;
     }
     pIter(f);
   }

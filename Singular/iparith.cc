@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.133 1999-03-09 14:23:07 Singular Exp $ */
+/* $Id: iparith.cc,v 1.134 1999-03-11 15:58:05 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1494,11 +1494,11 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
         if (iiOp != IMAP_CMD) goto err_fetch;
         // Allow imap to be make an exception only for:
         if ( (rField_is_Q_a(r) &&  // Q(a..) -> Q(a..) || Q || Zp || Zp(a)
-              (rField_is_Q() || rField_is_Q_a() || 
+              (rField_is_Q() || rField_is_Q_a() ||
                (rField_is_Zp() || rField_is_Zp_a())))
              ||
              (rField_is_Zp_a(r) &&  // Zp(a..) -> Zp(a..) || Zp
-              (rField_is_Zp(currRing, rInternalChar(r)) || 
+              (rField_is_Zp(currRing, rInternalChar(r)) ||
                rField_is_Zp_a(currRing, rInternalChar(r)))) )
         {
           par_perm_size=rPar(r);
@@ -1974,6 +1974,7 @@ static BOOLEAN jjLOAD_E(leftv res, leftv v, leftv u)
 }
 
 /*=================== operations with 2 args.: table =================*/
+
 struct sValCmd2 dArith2[]=
 {
 // operations:
@@ -2507,34 +2508,47 @@ static BOOLEAN jjHIGHCORNER(leftv res, leftv v)
 {
   assumeStdFlag(v);
   ideal I=(ideal)v->Data();
-  BOOLEAN *UsedAxis=(BOOLEAN *)Alloc0(pVariables*sizeof(BOOLEAN));
-  int i,n;
-  poly po;
-  for(i=IDELEMS(I)-1;i>=0;i--)
+  res->data=(void *)iiHighCorner(I,0);
+  return FALSE;
+}
+static BOOLEAN jjHIGHCORNER_M(leftv res, leftv v)
+{
+  assumeStdFlag(v);
+  intvec *module_w=new intvec(*(intvec*)atGet(v,"isHomog"));
+  ideal I=(ideal)v->Data();
+  int i;
+  poly p=NULL,po=NULL;
+  int rk=idRankFreeModule(I);
+  if (module_w==NULL)
+    module_w = new intvec(rk);
+  for(i=rk;i>0;i--)
   {
-    po=I->m[i];
-    if ((po!=NULL) &&((n=pIsPurePower(po))!=0)) UsedAxis[n-1]=TRUE;
-  }
-  for(i=pVariables-1;i>=0;i--)
-  {
-    if(UsedAxis[i]==FALSE) return FALSE; // not zero-dim.
-  }
-  if (currRing->OrdSgn==1)
-  {
-    res->data=pOne();
-    return FALSE;
-  }
-  po=NULL;
-  scComputeHC(I,0,po);
-  if (po!=NULL)
-  {
-    pGetCoeff(po)=nInit(1);
-    for (i=pVariables; i>0; i--)
+    p=iiHighCorner(I,i);
+    if (p==NULL)
     {
-      if (pGetExp(po, i) > 0) pDecrExp(po,i);
+      Werror("module must be zero-dimensional");
+      delete module_w;
+      return TRUE;
     }
-    pSetm(po);
+    if (po==NULL)
+      po=p;
+    else
+    {
+      // now po!=NULL, p!=NULL
+      int d=(pFDeg(po)+(*module_w)[pGetComp(po)] - pFDeg(p)+ (*module_w)[i]);
+      if (d==0)
+        d=pComp0(po,p);
+      if (d < 0)
+      {
+        pDelete(&po); po=p;
+      }
+      else // (d > 0)
+      {
+        pDelete(&p);
+      }
+    }
   }
+  delete module_w;
   res->data=(void *)po;
   return FALSE;
 }
@@ -3400,6 +3414,7 @@ struct sValCmd1 dArith1[]=
 #endif
 ,{jjGETDUMP,    GETDUMP_CMD,     NONE,           LINK_CMD }
 ,{jjHIGHCORNER, HIGHCORNER_CMD,  POLY_CMD,       IDEAL_CMD }
+,{jjHIGHCORNER_M, HIGHCORNER_CMD,VECTOR_CMD,     MODUL_CMD }
 ,{jjHILBERT,    HILBERT_CMD,     NONE,           IDEAL_CMD }
 ,{jjHILBERT,    HILBERT_CMD,     NONE,           MODUL_CMD }
 ,{jjHILBERT_IV, HILBERT_CMD,     INTVEC_CMD,     INTVEC_CMD }
