@@ -1,7 +1,7 @@
 /* Copyright 1997 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: tmpl_inst.cc,v 1.5 2001-08-08 11:59:13 Singular Exp $
+// $Id: tmpl_inst.cc,v 1.6 2003-04-09 13:39:12 Singular Exp $
 ////////////////////////////////////////////////////////////
 
 
@@ -80,12 +80,12 @@ template List<Variable> Difference ( const List<Variable>&, const List<Variable>
 #ifndef NOSTREAMIO
 template ostream & operator << ( ostream &, const List<CFList> & );
 template ostream & operator << ( ostream &, const List<Variable> & );
-template ostream & operator << ( ostream &, const List<int> & );
 template ostream & operator << ( ostream &, const Array<int> & );
 #endif
 
 template class Array<int>;
 template class Array<Variable>;
+template class Array<REvaluation>;
 
 // for database
 #ifdef HAVE_DATABASE
@@ -95,6 +95,9 @@ template class ListIterator<CFFList>;
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.5  2001/08/08 11:59:13  Singular
+*hannes: Dan's NOSTREAMIO changes
+
 Revision 1.4  1998/02/27 10:34:02  schmidt
         * factor/tmpl_inst.cc: template names adapted (`*.cc' ->
           `ftmpl_*.cc')

@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 1.10 2001-06-21 14:57:41 Singular Exp $
+# $Id: Makefile.in,v 1.11 2003-04-09 13:39:11 Singular Exp $
 #################################################
 SHELL		= /bin/sh
 RM		= -rm -f
@@ -42,7 +42,7 @@ CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@
 CPPFLAGS	= -I${srcdir}/factor -I${srcdir}/charset -I${srcdir} @CPPFLAGS@ 
 DEFS		= @DEFS@ 
 LDFLAGS		= @LDFLAGS@
-LIBS		= @LIBS@ -lfac -lcf -lmem -lgmp
+LIBS		= -lfac -lcf -lcfmem -lgmp @LIBS@
 
 ##
 ## src and objects
