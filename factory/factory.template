@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: factory.template,v 1.13 2002-11-04 17:06:25 bricken Exp $ */
+/* $Id: factory.template,v 1.14 2002-11-05 11:00:12 Singular Exp $ */
 
 #ifndef INCL_FACTORY_H
 #define INCL_FACTORY_H
@@ -28,15 +28,16 @@
 #endif /* ! NOSTREAMIO */
 
 #ifdef SINGULAR
-extern "C" {
 #ifdef __cplusplus
+extern "C" {
 #undef __cplusplus
 #include <gmp.h>
 #define __cplusplus
+}
 #else
 #include <gmp.h>
 #endif
-}
+
 #endif /* SINGULAR */
 
 #ifdef macintosh
