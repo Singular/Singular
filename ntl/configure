@@ -8,14 +8,29 @@ do
   esac
 done
 
+if test -r ../config.cache; then 
+  . ../config.cache
+fi
+
+if test set${ac_cv_singuname} = set; then
+  :
+else
+  ac_cv_singuname="unknown"
+  if test -r "../singuname.sh"; then
+    if (/bin/sh ../singuname.sh >/dev/null 2>&1) then
+      ac_cv_singuname=`/bin/sh ../singuname.sh`
+    fi
+  fi
+fi
+
 echo "#!/bin/sh" >config.status
 echo "cd src" >>config.status
-echo ./configure LIBDIR=$libdir INCLUDEDIR=$includedir PREFIX=$prefix NTL_GMP_LIP=on GMP_PREFIX=$prefix/`../singuname.sh` >>config.status
+echo ./configure LIBDIR=$libdir INCLUDEDIR=$includedir PREFIX=$prefix NTL_GMP_LIP=on GMP_PREFIX=$prefix/${ac_cv_singuname} >>config.status
 echo "cd .." >>config.status
 
 cd src
 
-./configure LIBDIR=$libdir INCLUDEDIR=$includedir PREFIX=$prefix NTL_GMP_LIP=on GMP_PREFIX=$prefix/`../singuname.sh`
+./configure LIBDIR=$libdir INCLUDEDIR=$includedir PREFIX=$prefix NTL_GMP_LIP=on GMP_PREFIX=$prefix/${ac_cv_singuname}
 
 cd ..
 
