@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.10 2004-05-14 16:26:05 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.11 2004-07-29 14:58:00 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -1028,7 +1028,7 @@ poly nc_ReduceSpoly(poly p1, poly p2,poly spNoether, const ring r)
   }
   poly m=pOne();
   p_ExpVectorDiff(m,p2,p1,r);
-  p_Setm(m,r);
+  //p_Setm(m,r);
 #ifdef PDEBUG
   p_Test(m,r);
 #endif
@@ -1101,13 +1101,13 @@ poly nc_CreateSpoly(poly p1, poly p2,poly spNoether, const ring r)
 #endif
   p_ExpVectorDiff(m1,pL,p1,r);
   //p_SetComp(m1,0,r);
-  p_Setm(m1,r);
+  //p_Setm(m1,r);
 #ifdef PDEBUG
   p_Test(m1,r);
 #endif
   p_ExpVectorDiff(m2,pL,p2,r);
   //p_SetComp(m2,0,r);
-  p_Setm(m2,r);
+  //p_Setm(m2,r);
 #ifdef PDEBUG
   p_Test(m2,r);
 #endif
@@ -1172,7 +1172,7 @@ void nc_ReduceSpolyTail(poly p1, poly q, poly q2, poly spNoether, const ring r)
   poly m=pOne();
   p_ExpVectorDiff(m,Q,p1,r);
   //  p_SetComp(m,0,r);
-  p_Setm(m,r);
+  //p_Setm(m,r);
 #ifdef PDEBUG
   p_Test(m,r);
 #endif
@@ -1224,7 +1224,7 @@ void nc_kBucketPolyRed(kBucket_pt b, poly p, number *c)
   *c=nInit(1);
   poly m=pOne();
   pExpVectorDiff(m,kBucketGetLm(b),p);
-  pSetm(m);
+  //pSetm(m);
 #ifdef PDEBUG
   pTest(m);
 #endif
@@ -1256,7 +1256,7 @@ void nc_PolyPolyRed(poly &b, poly p, number *c)
   *c=nInit(1);
   poly m=pOne();
   pExpVectorDiff(m,pHead(b),p);
-  pSetm(m);
+  //pSetm(m);
 #ifdef PDEBUG
   pTest(m);
 #endif
