@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.30 2002-03-20 19:55:39 mschulze Exp $";
+version="$Id: linalg.lib,v 1.31 2002-03-26 12:41:43 mschulze Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib  Algorithmic Linear Algebra
@@ -1737,7 +1737,7 @@ EXAMPLE: example jordannf; shows examples
 "
 {
   list l=jordan(M,#);
-  return(jordanmatrix(l[1],l[2]));
+  return(jordanmatrix(l[1],l[2],l[3]));
 }
 example
 { "EXAMPLE:"; echo=2;
