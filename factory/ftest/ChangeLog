@@ -1,4 +1,95 @@
+Wed Oct  8 11:16:07 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* eval.m4 (main): does not output timer/check status when there
+	  are not any arguments
+
+Tue Oct  7 09:57:59 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* ftest_io.cc (ftestPrintResult): adds end mark at end of output
+	  now
+
+	* ftest_util.cc (ftestPrintEnv): cosmetic changes
+	(ftestPrintEnv): more cosmetic changes
+
+Thu Oct  2 09:14:15 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* ftest_util.m4 (ftestRun): call to ftestWriteSeed() added
+	* ftest_util.cc (ftestWriteSeed): new function.  Declaration
+	  added.
+	* ftest_util.cc(ftestSeedFile): new static variable
+	  (ftestParseRandom): reads seed from file
+	* ftest_util.h (ftestErrorT): new enumerator FileError
+	* ftest_util.cc (ftestError): handles error `FileError' now
+
+	* ftest_util.cc (ftestParseSwitches): bug fix.  Explicitly
+	  switches off switch if specifies with `-'
+	  (ftestParseEnv): cosmetic changes
+	  (ftestParseVars): check on error removed
+	  (ftestEnv): declared static
+
+	* ftest_util.cc (struct ftestEnvT): new member `seedSet'
+	  (ftestParseRandom): sets `seedSet' if a definite seed has
+	  been set
+	  (ftestGetEnv): initialization for `seedSet' added
+	  (ftestPrintEnv, ftestSetRandom): handles `seedSet' more neatly
+
+	* ftest_util.cc (ftestSetSeed, ftestSetRandom): function
+	  ftestSetSeed() renamed to ftestSetRandom().  All callers
+	  changed.
+	  (ftestParseSeed, ftestParseRandom): function ftestParseSeed()
+	  renamed to ftestParseRandom().  All callers changed.
+
+	* ftest_util.m4 (ftestRun): cosmetic changes
+
+	* ftest_util.cc (ftestMainExit): function removed.  Declaration,
+	  too.
+	* ftest_util.m4 (ftestMainExit): call to function ftestMainExit()
+	  removed
+
+	* ftest_util.cc (ftestMainExit): new function.  Declaration added.
+	* ftest_util.m4 (ftestMainExit): call to function ftestMainExit()
+	  added
+
+Wed Oct  1 12:27:33 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* ftest_io.cc (ftestGetCanonicalForm, ftestGetVariable): cosmetic
+	  changes
+
+	* ftest_io.cc (ftestGetCanonicalForm, ftestGetint): cosmetic changes
+
+	* ftest_util.cc (ftestParseVars): cosmetic changes
+
+	* ftest_util.m4 (_ftestOutput): bug fix
+
+	* ftest_util.m4 (ftestGetInVar): checks for non existing arguments
+	  now
+
+	* ftest_util.m4: changes comment character to `//' when finished
+	  reading library
+
+	* ftest_io.cc (ftestGetVariable): parses variables in a more
+	  beautiful and safe way
+
+	* ftest_io.cc (ftestGetint): new function.  Declaration added.
+
+Tue Sep 30 12:16:59 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* ftest_io.cc (ftestGetCanonicalForm): argument renamed from
+	  `stringF' to `canFormSpec'.  Declaration adapted.
+	  (ftestGetCanonicalForm): reads canonical forms from environment
+	  variables now
+
+	* ftest_util.h (ftestErrorT): new enumerator CanFormSpecError
+	* ftest_util.cc (ftestError): check for CanFormSpecError added
+
+	* ftest_util.cc (ftestSkipBlancs): made external.  Declaration
+	  added.
+
+	* ftest_io.cc (ftestGetVariable): cosmetic changes
+
 Mon Sep 29 14:58:09 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* eval.m4: new file
 
 	* ftest_util.cc (ftestError): does not print any result output in
 	  error case any more
