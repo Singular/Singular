@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.8 1997-12-08 18:24:23 schmidt Exp $ */
+/* $Id: cf_factor.cc,v 1.9 1998-02-09 15:58:20 stobbe Exp $ */
 
 //{{{ docu
 //
@@ -25,6 +25,7 @@
 #include "fac_univar.h"
 #include "fac_multivar.h"
 #include "fac_sqrfree.h"
+#include "cf_algorithm.h"
 
 static bool isUnivariateBaseDomain( const CanonicalForm & f )
 {
@@ -47,10 +48,28 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
 	    return FpFactorizeUnivariateCZ( f, issqrfree, 0, Variable(), Variable() );
     }
     else {
+        CanonicalForm cd = common_den( f );
+        CanonicalForm fz = f * cd;
+        CFFList F;
+        bool on_rational = isOn(SW_RATIONAL);
+        Off(SW_RATIONAL);
 	if ( f.isUnivariate() )
-	    return ZFactorizeUnivariate( f, issqrfree );
+	    F = ZFactorizeUnivariate( fz, issqrfree );
 	else
-	    return ZFactorizeMultivariate( f, issqrfree );
+	    F = ZFactorizeMultivariate( fz, issqrfree );
+        if ( on_rational )
+            On(SW_RATIONAL);
+        if ( ! cd.isOne() ) {
+            if ( F.getFirst().factor().inCoeffDomain() ) {
+                CFFactor new_first( F.getFirst().factor() / cd );
+                F.removeFirst();
+                F.insert( new_first );
+            }
+            else {
+                F.insert( CFFactor( 1/cd ) );
+            }
+        }
+        return F;
     }
 }
 
