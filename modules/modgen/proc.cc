@@ -1,5 +1,5 @@
 /*
- * $Id: proc.cc,v 1.21 2002-07-04 14:18:37 anne Exp $
+ * $Id: proc.cc,v 1.22 2002-07-05 06:51:34 anne Exp $
  */
 
 #include <stdio.h>
@@ -359,7 +359,7 @@ void write_finish_functions(
   procdefv proc
 )
 {
-  fprintf(module->modfp, "  fclose(binfp);\n");
+  fprintf(module->modfp, "  if(ret!=-1) fclose(binfp);\n");
   fprintf(module->modfp, "  return 0;\n}\n\n");
   fflush(module->modfp);
   modlineno+=3;

@@ -168,8 +168,19 @@ main( int argc, char *argv[] )
     fclose(module_def.docfp);
   }
   if(module_def.binfp   != NULL) {
+    //we have been writing to it previously
     fclose(module_def.binfp);
     cksm = crccheck(build_filename(&module_def,module_def.targetname,3));
+  } else {
+    //we have not been writing to it or we could not open it
+    if((module_def.binfp=fopen(
+             build_filename(&module_def,module_def.targetname,3),"w"))!=NULL) {
+      fprintf(module_def.binfp,"// no Singular procedure for this module\n");
+      fclose(module_def.binfp);
+      cksm = crccheck(build_filename(&module_def,module_def.targetname,3));
+    } else {
+      printf("Cannot open .bin file!!\n");
+    }
   }
   if(module_def.modfp_h != NULL) { 
     fprintf(module_def.modfp_h,"unsigned long crcsum=%lu;\n",cksm);

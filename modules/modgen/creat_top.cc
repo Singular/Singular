@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: creat_top.cc,v 1.18 2002-07-04 14:18:36 anne Exp $ */
+/* $Id: creat_top.cc,v 1.19 2002-07-05 06:51:33 anne Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -131,10 +131,11 @@ void write_mod_init(
   fprintf(fp, "  memcpy(tempstr,currPack->libname,strlen(currPack->libname));\n");
   fprintf(fp, "  memcpy(tempstr+strlen(currPack->libname)-3,\".bin\",4);\n");
   fprintf(fp, "  ret=stat(tempstr,&sb);\n");
-  fprintf(fp, "  if((ret==0) && ((sb.st_mode & S_IFMT) == S_IFREG)) { \n");
-  fprintf(fp, "    if (crccheck(tempstr)!=crcsum) ret=-1;\n");
-  fprintf(fp, "    if ((binfp = fopen(tempstr,\"r\")) == NULL) return -1;\n");
-  fprintf(fp, "  } \n  else { \n    ret=-1; \n  }\n\n");
+  fprintf(fp, "  if(ret==0) { \n");
+  fprintf(fp, "    if ((sb.st_mode & S_IFMT) == S_IFREG) { \n");
+  fprintf(fp, "      if (crccheck(tempstr)!=crcsum) ret=-1;\n");
+  fprintf(fp, "      if ((binfp = fopen(tempstr,\"r\")) == NULL) return -1;\n");
+  fprintf(fp, "    } \n    else \n      ret=-1; \n  }\n\n");
   fprintf(fp, "  fill_help_package();\n");
   fprintf(fp, "  fill_example_package();\n\n");
   fprintf(fp, "  if(ret==-1) Warn(\"file %%s does not agree with module version - ignoring file\",tempstr);\n");
