@@ -1986,7 +1986,7 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
       int quality_a=quality_of_pos_in_strat_S(erg.reduce_by,c);
       int best=erg.to_reduce_u+1;
       for (i=erg.to_reduce_u;i>=erg.to_reduce_l;i--){
-	int qc=guess_quality(los[i],c);
+	int qc=los[i].guess_quality(c);
 	if (qc<quality_a){
 	  best=i;
 	  quality_a=qc;
@@ -2012,7 +2012,7 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
 	int quality_a=quality_of_pos_in_strat_S(erg.reduce_by,c);
 	int best=erg.to_reduce_u+1;
 	for (i=erg.to_reduce_u;i>=erg.to_reduce_l;i--){
-	  int qc=guess_quality(los[i],c);
+	  int qc=los[i].guess_quality(c);
 	  if (qc<quality_a){
 	    best=i;
 	    quality_a=qc;
@@ -2032,7 +2032,7 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
       {
 	assume(erg.to_reduce_u==erg.to_reduce_l);
 	int quality_a=quality_of_pos_in_strat_S(erg.reduce_by,c);
-	int qc=guess_quality(los[erg.to_reduce_u],c);
+	int qc=los[erg.to_reduce_u].guess_quality(c);
 	if(qc<quality_a){
 	  BOOLEAN exp=FALSE;
 	  if(qc<=2)
@@ -2068,10 +2068,10 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
       //then lm(rb)>= lm(tru) so =
       assume(erg.reduce_by==erg.to_reduce_u+1);
       int best=erg.reduce_by;
-      int quality_a=guess_quality(los[erg.reduce_by],c);
+      int quality_a=los[erg.reduce_by].guess_quality(c);
       int i;
 	for (i=erg.to_reduce_u;i>=erg.to_reduce_l;i--){
-	  int qc=guess_quality(los[i],c);
+	  int qc=los[i].guess_quality(c);
 	  if (qc<quality_a){
 	    best=i;
 	    quality_a=qc;
@@ -2093,11 +2093,11 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
       //further assume, that reduce_by is the above all other polys
       //with same leading term
       int il=erg.reduce_by;
-      int quality_a =guess_quality(los[erg.reduce_by],c);
+      int quality_a =los[erg.reduce_by].guess_quality(c);
       int qc;
       while((il>0) && pLmEqual(los[il-1].p,los[il].p)){
 	il--;
-	qc=guess_quality(los[il],c);
+	qc=los[il].guess_quality(c);
 	if (qc<quality_a){
 	  quality_a=qc;
 	  erg.reduce_by=il;
@@ -2409,4 +2409,66 @@ void red_object::validate(){
   else
     p=kBucketGetLm(bucket);
 
+}
+
+void red_object::reduction_step(int reduction_id, poly reductor_full, int full_len, poly reductor_part, reduction_accumulator* join_to, calc_dat* c)
+{
+  //we have to add support later for building new sums at this points, this involves a change in the interface
+  if(this->sum==NULL)
+    kBucketPolyRed(this->bucket,reductor_full,
+		   full_len,
+		   c->strat->kNoether);
+  else 
+  {
+    assume(sum->ac!=NULL);
+    if(sum->ac->last_reduction_id!=reduction_id){
+      
+
+
+      
+      
+      number n1=kBucketPolyRed(sum->ac->bucket,reductor_full, full_len, c->strat->kNoether);
+      number n2=nMult(n1,sum->ac->multiplied);
+      nDelete(&sum->ac->multiplied);
+      nDelete(&n1);
+      sum->ac->multiplied=n2;
+    }
+      //reduce and adjust multiplied
+      sum->ac->last_reduction_id=reduction_id;
+      
+  }
+    
+      
+}
+  
+
+void red_object::adjust_coefs(number c_r, number c_ac_r){
+  assume(this->sum!=NULL);
+  number n1=nMult(sum->c_my, c_ac_r);
+  number n2=nMult(sum->c_ac,c_r);
+  nDelete(&sum->c_my);
+  nDelete(&sum->c_ac);
+ 
+  int ct = ksCheckCoeff(&n1, &n2);
+  sum->c_my=n1;
+  sum->c_ac=nNeg(n2);
+  nDelete(&n2);
+  
+
+}
+int red_object::guess_quality(calc_dat* c){
+    //works at the moment only for lenvar 1, because in different
+    //case, you have to look on coefs
+    int s=0;
+    if (c->is_char0)
+      s=kSBucketLength(bucket);
+    else 
+      s=bucket_guess(bucket);
+    if (sum!=NULL){
+      if (c->is_char0)
+      s+=kSBucketLength(sum->ac->bucket);
+    else 
+      s+=bucket_guess(sum->ac->bucket);
+    }
+    return s;
 }

@@ -26,6 +26,15 @@
 
 //#define REDTAIL_PROT
 //#define QUICK_SPOLY_TEST
+struct sorted_pair_node{
+  //criterium, which is stable 0. small lcm 1. small i 2. small j
+  int i;
+  int j;
+  int deg;
+  int expected_length;
+  poly lcm_of_lm;
+};
+
 
 /** 
     reduction_accumulators are objects which are shared by several sums
@@ -44,11 +53,19 @@ class reduction_accumulator{
   void decrease_counter(){ 
     if((--counter)==0)
       {
-	nDelete(&multiplied);
-	kBucketDeleteAndDestroy(&bucket);
 	delete this; //self destruction
       }
   }
+  int last_reduction_id;
+  reduction_accumulator(){
+    last_reduction_id=-1;
+    bucket=kBucketCreate(currRing);
+  }
+  ~reduction_accumulator(){
+    nDelete(&multiplied);
+    kBucketDeleteAndDestroy(&bucket);
+  }  
+
   
 };
 struct formal_sum_descriptor{
@@ -61,32 +78,6 @@ struct int_pair_node{
   int a;
   int b;
 };
-class red_object{
- public:
-  kBucket_pt bucket;
-  poly p;
-  formal_sum_descriptor* sum;
-  unsigned long sev;
-  void flatten();
-  void validate();
-};
-struct sorted_pair_node{
-  //criterium, which is stable 0. small lcm 1. small i 2. small j
-  int i;
-  int j;
-  int deg;
-  int expected_length;
-  poly lcm_of_lm;
-};
-
-
-enum calc_state
-  {
-    UNCALCULATED,
-    HASTREP,
-    UNIMPORTANT,
-    SOONTREP
-  };
 struct calc_dat
 {
   int* rep;
@@ -115,6 +106,28 @@ struct calc_dat
   int extended_product_crit;
   BOOLEAN is_char0;
 };
+class red_object{
+ public:
+  kBucket_pt bucket;
+  poly p;
+  formal_sum_descriptor* sum;
+  unsigned long sev;
+  void flatten();
+  void validate();
+  void red_object::reduction_step(int reduction_id, poly reductor_full, int full_len, poly reductor_part, reduction_accumulator* join_to, calc_dat* c);
+  void adjust_coefs(number c_r, number c_ac_r);
+  int guess_quality(calc_dat* c);
+};
+
+
+enum calc_state
+  {
+    UNCALCULATED,
+    HASTREP,
+    UNIMPORTANT,
+    SOONTREP
+  };
+
 static int add_to_reductors(calc_dat* c, poly h, int len);
 static int bucket_guess(kBucket* bucket);
 static poly redNFTail (poly h,const int sl,kStrategy strat, int len);
