@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.10 1998-11-25 10:27:50 mschulze Exp $ */
+/* $Id: pcv.cc,v 1.11 1998-12-08 12:33:42 mschulze Exp $ */
 /*
 * ABSTRACT: conversion between polys and coeff vectors
 */
@@ -14,6 +14,7 @@
 #include "lists.h"
 #include "matpol.h"
 #include "pcv.h"
+#include "febase.h"
 
 static int pcvMaxDeg;
 static int pcvTableSize;
@@ -63,13 +64,13 @@ BOOLEAN pcvOrd(leftv res,leftv h)
     if(h->Typ()==POLY_CMD)
     {
       res->rtyp=INT_CMD;
-      res->data=pcvOrd((poly)h->Data());
+      res->data=(void*)pcvOrd((poly)h->Data());
       return FALSE;
     }
     if(h->Typ()==MATRIX_CMD)
     {
       res->rtyp=INT_CMD;
-      res->data=pcvOrd((matrix)h->Data());
+      res->data=(void*)pcvOrd((matrix)h->Data());
       return FALSE;
     }
   }
@@ -82,9 +83,9 @@ void pcvInit(int d)
   if(d<0) d=0;
   pcvMaxDeg=d;
   pcvTableSize=pVariables*pcvMaxDeg*sizeof(unsigned);
-  pcvTable=Alloc0(pcvTableSize);
+  pcvTable=(unsigned*)Alloc0(pcvTableSize);
   pcvIndexSize=pVariables*sizeof(unsigned*);
-  pcvIndex=Alloc(pcvIndexSize);
+  pcvIndex=(unsigned**)Alloc(pcvIndexSize);
   for(int i=0;i<pVariables;i++)
     pcvIndex[i]=pcvTable+i*pcvMaxDeg;
   for(int i=0;i<pcvMaxDeg;i++)
@@ -125,7 +126,7 @@ int pcvM2n(poly m)
   return n+1;
 }
 
-poly pcvN2m(int n)
+poly pcvN2m(unsigned n)
 {
   n--;
   poly m=pOne();
@@ -301,7 +302,7 @@ BOOLEAN pcvDim(leftv res,leftv h)
       {
         int d1=(int)h->Data();
         res->rtyp=INT_CMD;
-        res->data=pcvDim(d0,d1);
+        res->data=(void*)pcvDim(d0,d1);
         return FALSE;
       }
     }
