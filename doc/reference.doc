@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.183 2000-03-08 15:21:44 Singular Exp $
+@comment $Id: reference.doc,v 1.184 2000-03-15 17:16:16 siebert Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -371,10 +371,12 @@ See
 @item @strong{Syntax:}
 @code{betti (} list_expression @code{)}
 @*@code{betti (} resolution @code{)}
+@*@code{betti (} list_expression @code{,} int_expression @code{)}
+@*@code{betti (} resolution @code{,} int_expression @code{)}
 @item @strong{Type:}
 intmat
 @item @strong{Purpose:}
-computes the graded Betti numbers of
+computes (with 1 argument) the graded Betti numbers of a minimal resolution of
 @tex
 $R^n/M$, if $R$ denotes the basering and
 $M$ a homogeneous submodule of $R^n$ and the argument represents a
@@ -399,9 +401,14 @@ generators in degree i+j of the j-th syzygy module (= module of
 relations) of R^n/M (the 0th (resp.@: 1st) syzygy module of R^n/M is R^n
 (resp.@: M)).
 @end ifinfo
-The argument is considered to be the result of a res/sres/mres/lres command.
-(Only the initial monomials are considered for the computation
-of the graded Betti numbers.)
+The argument is considered to be the result of a res/sres/mres/nres/lres command.
+This implies that a zero is only allowed (and counted) as a generator in the first
+module. 
+@*For the computation betti uses only the initial monomials. This could lead to confusing
+results for a non-homogeneous input.
+@*The optional second argument is a switch for the minimization of the Betti numbers.
+If it is 0 then the Betti numbers correspond exactly to the input - otherwise the command is 
+identical to the one-argument form.
 @item @strong{Example:}
 @smallexample
 @c example
