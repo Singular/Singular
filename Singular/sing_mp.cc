@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_mp.cc,v 1.23 1998-11-09 15:43:05 obachman Exp $ */
+/* $Id: sing_mp.cc,v 1.24 1999-07-28 12:42:51 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to MP links
@@ -75,7 +75,7 @@ static void GetCmdArgs(int *argc, char ***argv, char *str)
         while (strtok(NULL," ") != NULL) i++;
       }
     }
-    
+
     *argc = i;
     if (i>0)
     {
@@ -100,7 +100,7 @@ static void GetCmdArgs(int *argc, char ***argv, char *str)
 
     FreeL(s2);
   }
-  
+
 }
 
 /***************************************************************
@@ -113,9 +113,9 @@ static BOOLEAN slOpenMPFile(si_link l, short flag)
   char *argv[] = {"--MPtransp", "FILE", "--MPmode", "append",
                   "--MPfile", "/tmp/mpout"};
   char *mode;
-  
+
   MP_Link_pt link = NULL;
-  
+
   if (flag == SI_LINK_OPEN)
   {
    if (l->mode[0] != '\0' && (strcmp(l->mode, "r") == 0))
@@ -125,7 +125,7 @@ static BOOLEAN slOpenMPFile(si_link l, short flag)
 
   if (l->name[0] != '\0') argv[5] = l->name;
   else l->name = mstrdup(argv[5]);
-    
+
 
   if (flag == SI_LINK_READ)
   {
@@ -181,19 +181,19 @@ static MP_Link_pt slOpenMPConnect(int n_argc, char **n_argv)
   if (port == NULL) mainGetSingOptionValue("--MPport", &port);
   if (host == NULL) mainGetSingOptionValue("--MPhost", &host);
 
-  if (port != NULL) 
+  if (port != NULL)
     argv[5] = port;
   if (host != NULL)
     argv[7] = host;
   else
     argv[7] = mp_Env->thishost;
-    
+
   return MP_OpenLink(mp_Env, 8, argv);
 }
 
 static MP_Link_pt slOpenMPListen(int n_argc, char **n_argv)
 {
-  char *argv[] = {"--MPtransp", "TCP", "--MPmode", "listen", 
+  char *argv[] = {"--MPtransp", "TCP", "--MPmode", "listen",
                   "--MPport", "1025"};
   char *port = IMP_GetCmdlineArg(n_argc, n_argv, "--MPport");
 
@@ -207,7 +207,7 @@ static MP_Link_pt slOpenMPListen(int n_argc, char **n_argv)
 static MP_Link_pt slOpenMPLaunch(int n_argc, char **n_argv)
 {
   char *argv[] = {"--MPtransp", "TCP", "--MPmode", "launch",
-                  "--MPhost", "localhost",  
+                  "--MPhost", "localhost",
                   "--MPapplication", "Singular -bq  --no-warn --no-out --no-rc",
                   "--MPrsh", "rsh"};
   char *appl = IMP_GetCmdlineArg(n_argc, n_argv, "--MPapplication");
@@ -217,11 +217,11 @@ static MP_Link_pt slOpenMPLaunch(int n_argc, char **n_argv)
   MP_Link_pt link;
   int argc = 8;
 
-  if (appl == NULL && (host == NULL || 
+  if (appl == NULL && (host == NULL ||
                        strcmp(host, "localhost") == 0))
   {
     appl = feGetExpandedExecutable();
-    
+
     if (appl != NULL)
     {
       nappl = (char*) Alloc(MAXPATHLEN + 50);
@@ -230,15 +230,15 @@ static MP_Link_pt slOpenMPLaunch(int n_argc, char **n_argv)
       appl = nappl;
     }
   }
-  
-  if (host == NULL)
+
+  if ((host == NULL)||(strcmp(host, "localhost") == 0))
   {
     argv[5] = mp_Env->thishost;
   }
   else
     argv[5] = host;
 
-  if (appl != NULL)  
+  if (appl != NULL)
     argv[7] = appl;
 
 
@@ -261,7 +261,7 @@ static MP_Link_pt slOpenMPFork(si_link l, int n_argc, char **n_argv)
 
   if (port != NULL) argv[5] = port;
 
-  link = MP_OpenLink(mp_Env, 6, argv);    
+  link = MP_OpenLink(mp_Env, 6, argv);
   if (link != NULL)
   {
     if (MP_GetLinkStatus(link, MP_LinkIsParent))
@@ -290,16 +290,16 @@ static MP_Link_pt slOpenMPFork(si_link l, int n_argc, char **n_argv)
   }
 }
 
-    
-                                
+
+
 static BOOLEAN slOpenMPTcp(si_link l, short flag)
 {
   MP_Link_pt link = NULL;
   char **argv;
   int argc;
-  
+
   GetCmdArgs(&argc, &argv, l->name);
-  
+
   if (mp_Env == NULL)
     mp_Env = MP_InitializeEnv(MP_AllocateEnv());
 
@@ -323,7 +323,7 @@ static BOOLEAN slOpenMPTcp(si_link l, short flag)
   }
 
   FreeCmdArgs(argc, argv);
-  
+
   if (link != NULL)
   {
     MP_SET_LINK_OPTIONS(link);
@@ -354,7 +354,7 @@ static BOOLEAN slWriteMP(si_link l, leftv v)
     return TRUE;
   }
 
-  // take care of the remaining leftv's 
+  // take care of the remaining leftv's
   while (next != NULL)
   {
     v->next = next;
@@ -505,7 +505,7 @@ int Batch_ReadEval(si_link silink)
 static BOOLEAN stop = 1;
 #endif
 
-  
+
 int Batch_do(const char* port, const char* host)
 {
 #ifdef MPSR_BATCH_DEBUG
