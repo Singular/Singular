@@ -1,65 +1,74 @@
-// $Id: all.lib,v 1.30 2000-12-19 14:37:24 anne Exp $
+// $Id: all.lib,v 1.31 2000-12-22 13:37:10 greuel Exp $
 ///////////////////////////////////////////////////////////////////////////////
-
-version="$Id: all.lib,v 1.30 2000-12-19 14:37:24 anne Exp $";
+version="$Id: all.lib,v 1.31 2000-12-22 13:37:10 greuel Exp $";
 category="General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries
 
 General purpose
-  general_lib::     procedures of general type
-  inout_lib::       procedures for manipulating in- and output
-  poly_lib::        procedures for manipulating polynomials and ideals
-  random_lib::      procedures of random/sparse  matrix and poly operations
-  ring_lib::        procedures for manipulating rings and maps
+  general_lib:     ELEMENTARY COMPUTATIONS OF GENERAL TYPE
+  inout_lib:       PRINTING AND MANIPULATING IN- AND OUTPUT
+  poly_lib:        CREATING AND MANIPULATING POLYS, IDEALS, MODULES
+  random_lib:      CREATING RANDOM AND SPARSE MATRICES, IDEALS, POLYS
+  ring_lib:        MANIPULATING RINGS AND MAPS
 
 Linear algebra
-  matrix_lib::      procedures for matrix operations
-  jordan_lib::      procedures to compute the jordan normal form
-  linalg_lib::      procedures for algorithmic linear algebra
+  jordan_lib:      JORDAN NORMAL FORM OF A MATRIX WITH RATIONAL EIGENVALUES
+  linalg_lib:      ALGORITHMIC LINEAR ALGEBRA
+  matrix_lib:      ELEMENTARY MATRIX OPERATIONS
 
 Commutative algebra
-  algebra_lib::     procedures for computing with algebras and maps
-  elim_lib::        procedures for elimination, saturation and blowing up
-  homolog_lib::     procedures for homological algebra
-  mregular_lib::    procedures for Castelnuovo-Mumford regularity
-  normal_lib::      procedure for normalization
-  primdec_lib::     procedures for primary decomposition
-  primitiv_lib::    procedures for finding a primitive element
-  reesclos_lib::    Rees Algebra and integral closure of an ideal
-  intprog_lib::     Integer Programming
-  toric_lib::       toric ideals
+  algebra_lib:     COMPUTE WITH ALGBRAS AND ALGEBRA MAPS
+  elim_lib:        ELIMINATION, SATURATION AND BLOWING UP
+  homolog_lib:     HOMOLOGICAL ALGEBRA AND CUP PRODUCT
+  intprog_lib:     INTEGER PROGRAMMING WITH GROEBNER BASIS METHODS
+  mregular_lib:    CASTELNUOVO-MUMFORD REGULARITY OF CM-SCHEMES AND CURVES
+  normal_lib:      NORMALIZATION OF AN AFFINE RING
+  primdec_lib:     PRIMARY DECOMPOSITION AND RADICAL OF IDEALS
+  primitiv_lib:    COMPUTING A PRIMITIVE ELEMENT
+  reesclos_lib:    REES ALGEBRA AND INTEGRAL CLOSURE OF IDEALS
+  toric_lib:       STANDARD BASIS OF TORIC IDEALS
 
 Singularities
-  classify_lib::    procedures for the Arnold-classifier of singularities
-  deform_lib::      procedures for computing miniversal deformation
-  equising_lib::    procedures for equisingularity strata
-  gaussman_lib::    procedures for gauss-manin connection of a singularity
-  hnoether_lib::    procedures for the Hamburger-Noether (Puiseux) development
-  mondromy_lib::    procedures to compute the monodromy of a singularity
-  sing_lib::        procedures for computing invariants of singularities
-  spcurve_lib::     procedures for cm codimension 2 singularities
-  spectrum_lib::    procedures for computing singularity spectra
+  classify_lib:    ARNOLD CLASSIFIER OF SINGULARTIES
+  deform_lib:      MINIVERSAL DEFORMATION OF SINGULARITIES AND MODULES
+  equising_lib:    EQUISINGULARITY STRATUM OF A FAMILY OF PLANE CURVES
+  gaussman_lib:    GAUSS-MANIN CONNECTION OF A HYPERSURFACE SINGULARITY
+  hnoether_lib:    HAMBURGER-NOETHER (PUISEUX) DEVELOPMENT 
+  mondromy_lib:    MONODROMY OF AN ISOLATED HYPERSURFACE SINGULARITY
+  qhmoduli.lib:    MODULI SPACES OF SEMI-QUASIHOMOGENEOUS SINGULARITIES
+  sing_lib:        INVARIANTS OF SINGULARITIES
+  spcurve_lib:     DEFORMATIONS AND INVARIANTS OF CM-CODIM 2 SINGULARITIES
+  spectrum_lib:    SINGULARITY SPECTRA FOR NONDEGENERATE SINGULARITIES
 
 Invariant theory
-  finvar_lib::      procedures to compute invariant rings of finite groups
-  ainvar_lib::      procedures to compute invariants rings of the additive group
-  rinvar_lib::      procedures to compute invariants ring of reductive groups
+  ainvar_lib:      INVARIANTS RINGS OF THE ADDITIVE GROUP
+  finvar_lib:      INVARIANT RINGS OF FINITE GROUPS
+  rinvar_lib:      INVARIANT RINGS OF REDUCTIVE GROUPS
+  stratify_lib:    ALGORITHMIC STRATIFICATION FOR UNIPOTENT GROUP-ACTIONS
 
 Symbolic-numerical solving
-  presolve_lib::   procedures for pre-solving polynomial equations
-  solve_lib::      procedures to solve polynomial systems
-  triang_lib::     procedures for decomposing zero-dimensional ideals
-  ntsolve_lib::    one real solution of polynomial systems (Newton iteration)
-  zeroset_lib::    procedures for roots and factorization
+  ntsolve_lib:     REAL NEWTON SOLVING OF POLYNOMIAL SYSTEMS
+  presolve_lib:    PRE-SOLVING OF POLYNOMIAL EQUATIONS
+  solve_lib:       COMPLEX SOLVING OF POLYNOMIAL SYSTEMS
+  triang_lib:      DECOMPOSE ZERO-DIMENSIONAL IDEALS INTO TRIANGULAR SETS
+  zeroset_lib:     procedures for roots and factorization
 
 Visualization
-  graphics_lib::   procedures to draw  with Mathematica
-  latex_lib::      procedures for typesetting in TeX
-  surf_lib::       interface to the surf programm::
+  graphics_lib:    PROCEDURES TO USE GRAPHICS WITH MATHEMATICA
+  latex_lib:       TYPESETTING OF SINGULAR-OBJECTS IN LATEX2E
+  paramet_lib:     PARAMETRIZATION OF VARIETIES
+  surf_lib:        PROCEDURES FOR GRAPHICS WITH SURF
 
 Coding theory
-  brnoeth_lib::    Brill-Noether algorithm, Weierstrass semigroups and AG codes
+  brnoeth_lib:     BRILL-NOETHER ALGORITHM, WEIERSTRASS-SG AND AG-CODES
+
+Miscellaneous
+  makedbm_lib:     DATA BASE OF SINGULARITIES FOR THE ARNOLD-CLASSIFIER
+  template_lib:    A TEMPLATE FOR A SINGULAR LIBRARY
+
+Utilities
+  tst_lib:         PROCEDURES FOR RUNNING AUTOMATIC TST TESTS
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -92,13 +101,15 @@ LIB "equising.lib";
 LIB "gaussman.lib";
 LIB "hnoether.lib";
 LIB "mondromy.lib";
+LIB "qhmoduli.lib";
 LIB "sing.lib";
 LIB "spcurve.lib";
 LIB "spectrum.lib";
 //Invariant theory
-LIB "finvar.lib";
 LIB "ainvar.lib";
+LIB "finvar.lib";
 LIB "rinvar.lib";
+LIB "stratify.lib";
 //Symbolic-numerical solving
 LIB "presolve.lib";
 LIB "solve.lib";
@@ -109,7 +120,12 @@ LIB "zeroset.lib";
 LIB "graphics.lib";
 LIB "latex.lib";
 LIB "surf.lib";
+LIB "paramet.lib";
 //Coding theory
 LIB "brnoeth.lib";
-
+//Miscellaneous
+LIB "makedbm.lib";
+LIB "template.lib";
+//Utilities
+LIB "tst.lib";
 
