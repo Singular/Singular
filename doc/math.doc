@@ -1,6 +1,11 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.8 1998-05-13 12:45:17 Singular Exp $
+@comment $Id: math.doc,v 1.9 1998-05-14 10:29:16 Singular Exp $
 @comment this file contains the mathematical background of Singular
+This chapter introduces some of the mathematical notions and definitions used
+throughout the manual. Most sections are only a collection of the
+most prominent definitions and properties and give refer for details to
+some articles or text books. However, monomial orderings are explained
+with all details (in the subsections of "Monomial orderings").
 
 @menu
 * Monomial orderings::
@@ -34,8 +39,12 @@ We do not require
 < to be  a wellordering.
 @end ifinfo
 @ifset singularmanual
-See the literature cited in @ref{Introduction}, (section 'Background').
+See the literature cited in @ref{References}.
 @end ifset
+
+It is known that any monomial ordering can be represented by a matrix M in
+GL(n,R), but, of course, only integer coefficients are of relevance in
+practice.
 
 @sc{Singular} offers the following monomial orderings which are implemented
 in an effective way:
@@ -76,8 +85,7 @@ localization of $K[x]$ with respect to the multiplicatively closed set $\{1 +
 g \mid g = 0$ or $g \in K[x]\backslash \{0\}$ and $L(g) < 1\}$.   $L(g)$
 denotes the leading monomial of $g$, i.e.\ the biggest monomial of $g$ with
 respect to $<$.   The result of any computation which uses standard basis
-computations has to be interpreted in {\bf Loc K}$[x]$ (like @code{std, syz, res,
-mres, sres, mult, degree, dim, hilb, mstd}, etc.).
+computations has to be interpreted in {\bf Loc K}$[x]$.
 @end tex
 @ifinfo
 Global orderings are wellorderings (i.e.1 < x_i for each variable
@@ -91,8 +99,7 @@ localization of K[x] with respect to the multiplicatively closed set @{1 +
 g | g = 0 or g in K[x]\@{0@} and L(g) < 1@}.   L(g)
 denotes the leading monomial of g, i.e. the biggest monomial of g with
 respect to <.   The result of any computation which uses standard basis
-computations has to be interpreted in Loc K[x] (like @code{std, syz, res,
-mres, sres, mult, degree, dim, hilb, mstd}, etc.).
+computations has to be interpreted in Loc K[x].
 @end ifinfo
 @c --------------------------------------------------------------------------
 @node Global orderings, Local orderings, , Monomial orderings
@@ -549,10 +556,6 @@ $x^a < x^b$
 @end tex
 if and only if M*a is smaller than M*b
 with respect to the lexicographical ordering.
-
-It is known that any monomial ordering can be represented by a matrix M in
-GL(n,R), but, of course, only integer coefficients are of relevance in
-practice.
 
 The following matrices represent (for 3 variables) the global and
 local orderings defined above (note that the matrix is not uniquely determined
