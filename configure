@@ -596,11 +596,11 @@ pwd=`pwd`
 # pass them indirectly to subsequent configures
 SINGULAR_MAJOR_VERSION=1
 SINGULAR_MINOR_VERSION=3
-SINGULAR_SUB_VERSION=9
+SINGULAR_SUB_VERSION=10
 VERSION_SEP="-"
 SINGULAR_SHORT_VERSION="${SINGULAR_MAJOR_VERSION}${VERSION_SEP}${SINGULAR_MINOR_VERSION}"
 SINGULAR_VERSION="${SINGULAR_SHORT_VERSION}${VERSION_SEP}${SINGULAR_SUB_VERSION}"
-VERSION_DATE="Spetember 2000"
+VERSION_DATE="September 2000"
 SINGULAR_ROOT_DIR=$pwd
 
 export SINGULAR_MINOR_VERSION
@@ -2314,7 +2314,7 @@ else
   if test -d omalloc; then
     echo "$ac_t""yes" 1>&6
     if test "$enable_omalloc_not_set" = yes; then
-      ac_configure_args="$ac_configure_args --enable-omalloc --with-external-config_h='$pwd/Singular/omSingularConfig.h'"
+      ac_configure_args="$ac_configure_args --enable-omalloc --with-external-config_h='$pwd/Singular/omSingularConfig.h' --with-track-custom"
     fi
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS omalloc"
   else
