@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.61 1998-05-18 19:09:13 wichmann Exp $
+@comment $Id: reference.doc,v 1.62 1998-05-18 19:46:58 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1878,18 +1878,19 @@ number, poly, vector, ideal, module, matrix or list
 (the same type as the second argument)
 @item @strong{Purpose:}
 identity map on common subrings.  @code{imap} is the map between rings,
-and qrings with the same coefficient field which is the identity on
-variables of the same name and 0 otherwise. Useful for mapping from a
-homogenizing ring to the original ring.
+and qrings with the same ground coefficient field which is the identity on
+variables and parameters of the same name and 0 otherwise. Useful for
+mapping from a homogenizing ring to the original ring or for mappings
+from/to rings with/without parameters.
 @item @strong{Example:}
 @example
 @c example
-  ring r=0,(x,y,z),dp;
-  ideal i=x,y + y2;
-  ideal j = homog(i, z); j;
-  ring R=0,(x,y),lp;
-  ideal i, j = imap(r,i), imap(r, j);
-  i; j;
+  ring r = 0,(x,y,z,a,b,c),dp;
+  ideal i = xy2z3a4b5 + 1, homog(xy2z3a4b5 + 1, c); i;
+  ring r1 = 0,(a,b,x,y,z),lp;
+  ideal j = imap(r, i); j;
+  ring r2 = (0, a, b), (x,y,z), ls;
+  ideal j = imap(r, i); j;
 @c example
 @end example
 @end table
