@@ -1,4 +1,4 @@
-// $Id: latex.lib,v 1.5 1998-10-21 10:28:25 krueger Exp $   
+// $Id: latex.lib,v 1.6 1998-12-10 13:07:19 krueger Exp $   
 //                        1998/04/17
 // author : Christian Gorzel email: gorzelc@math.uni-muenster.de
 // 
@@ -480,7 +480,9 @@ EXAMPLE: example texmap; shows an example
 example 
 { "EXAMPLE:"; echo = 2;
   string fname = "tldemo";
-  ring r1=0,(x,y,z),dp;   export r1;
+  ring r1=0,(x,y,z),dp;
+  if(system("with","Namespaces")) { exportto(Current, r1); }
+  else { export r1; }
   ring r2=0,(u,v),dp;
   map phi =(r1,u2,uv -v,v2); export phi;
   list TeXreplace;
@@ -1743,9 +1745,8 @@ static proc part0(string fname)
     return(f);
    }
 
-
-
- export randompoly;
+  if(system("with","Namespaces")) { exportto(Current, randompoly); }
+  else { export randompoly; }
 
   proc randomintv(int n, int m)
   {
@@ -1901,7 +1902,9 @@ write(fname,
 write(fname,
 " A ring in characteristic 0 with short variablenames and polynomial ordering.
 " +nl);
- ring r0=0,(x,y,z),dp;        export r0;
+ ring r0=0,(x,y,z),dp;
+ if(system("with","Namespaces")) { exportto(Current, r0); }
+ else { export r0; }
  poly g = -x2y +2y13z +1;           export g;
  poly f = randompoly(5,25,25); f;      export f;
 write(fname,
@@ -1936,7 +1939,9 @@ write(fname,"\\Line");
 write(fname,
 " A ring in characteristic 7 with indexed variablenames and local ordering.
 " +nl);
- ring r1=7,(x1,x2,x3,x4),Ds;    export r1;
+ ring r1=7,(x1,x2,x3,x4),Ds;
+ if(system("with","Namespaces")) { exportto(Current, r1); }
+ else { export r1; }
  poly g = -2*x1 +x4 -1;                    
  poly f = randompoly(5,25,25); f; export f;
 write(fname,
@@ -1978,7 +1983,9 @@ write(fname,"\\Line");
 write(fname,
 " A ring in characteristic 0 with indexed variablenames and weighted  ordering.
 " +nl);
- ring r3=0,(x_1,x_2,x_3),wp(3,2,1);         export r3;
+ ring r3=0,(x_1,x_2,x_3),wp(3,2,1);
+ if(system("with","Namespaces")) { exportto(Current, r3); }
+ else { export r3; }
  poly g = -x_1*x_2 + 2*x_2*x_3 + x_1*x_3; g;     
  poly f = randompoly(5,25,25); f;            export f;
 write(fname,
@@ -2020,7 +2027,9 @@ write(fname,"\\Line");
 write(fname,
 " A ring in characteristic 0 and indexed parameters.
 " +nl);
- ring r0t=(0,s,t),(x,y),dp;     export r0t; 
+ ring r0t=(0,s,t),(x,y),dp; 
+ if(system("with","Namespaces")) { exportto(Current, r0t); }
+ else { export r0t; }
  poly g = 8*(-s+2t)/(st+t3)*x + t2*x -1; g;      
  poly f = randompoly(5,25,25); f;  export f;
 write(fname,
@@ -2086,7 +2095,9 @@ write(fname,"\\Line");
 write(fname,
 " A ring defined with \\verb|gftables|, the same as \\verb|ralg| before, but 
 with primitive element in the Galoisfield $\\F_{49}$." +nl);
- ring r49 =(49,a),x,dp;   export r49;
+ ring r49 =(49,a),x,dp;
+ if(system("with","Namespaces")) { exportto(Current, r49); }
+ else { export r49; }
  poly g = -(2a13 +a)*x2 + a2*x -a +1; g;  export g;    
  poly f = randompoly(5,25,25); f;
 write(fname,
@@ -2314,7 +2325,8 @@ texring(fname, r3,"\\R",1,"<<","^G");
 
 write(fname,nl2);
 
-export r0,ralg;
+if(system("with","Namespaces")) { exportto(Current, r0, ralg); }
+else { export r0,ralg; }
 "end part 1" + nl;
 }
 
@@ -2719,8 +2731,11 @@ ev);
 
 setring r; 
 ideal I = 3xz5+x2y3-3z,7xz5+y3z+x-z,-xyz2+4yz+2x;
-export r;
-export I;
+if(system("with","Namespaces")) { exportto(Current, r, I); }
+else {
+  export r;
+  export I;
+}
 listvar(r);
 texobj(fname,"I");
 
@@ -2753,7 +2768,9 @@ write(fname,bv +
 > map phi = r1,u2,uv -v,v2;
 > texmap(fname,phi,r1,r2,\"\\\\C\");" + nl +
 ev );
- ring r1=0,(x,y,z),dp;  export r1;
+ ring r1=0,(x,y,z),dp;
+ if(system("with","Namespaces")) { exportto(Current, r1); }
+ else { export r1; }
  ring r2=0,(u,v),dp;
  map phi =r1,u2,uv -v,v2;  export phi;
  texmap(fname,phi,r1,r2,"\\C");
