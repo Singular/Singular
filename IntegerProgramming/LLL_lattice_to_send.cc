@@ -331,7 +331,6 @@ void lll_redi (int k, int l, int C)
 | Exchange some global variables                                            |
 |___________________________________________________________________________|*/
 
-
 void lll_swapi (int k, int kmax, int C)
 {
   int j;
