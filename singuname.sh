@@ -69,7 +69,7 @@ then
     then
       prefix=Sun3OS
     else
-      prefix= SunOS
+      prefix=SunOS
     fi
     if (echo $uname_a | $egrep "4\.[0-9]" > $devnull) 
     then
