@@ -1,3 +1,72 @@
+Mon Jun 29 12:41:40 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* GNUmakefile.in (basefactorysrc): `cf_inline.cc' and
+	  `cf_iter_inline.cc' added to distribution
+
+	* canonicalform.h (class CanonicalForm): friend declarations for
+	  `operator -', `operator +', `operator *', `operator /',
+ 	  `operator %', `div', `mod' replaced by ordinary declarations
+
+	* canonicalform.cc, canonicalform.h (CanonicalForm,
+	  ~CanonicalForm, isOne, isZero, operator =): definitions of
+ 	  methods moved to `cf_inline.cc'.  Declarations marked as
+ 	  `CF_INLINE' or `CF_NO_INLINE', resp.
+	  (operator -, operator +, operator *, operator /, operator %,
+	  div, mod): definitions of operators moved to `cf_inline.cc'.
+  	  Declarations marked as `CF_INLINE' or `CF_NO_INLINE', resp.
+	* canonicalform.h (CF_INLINE, CF_NO_INLINE): new #defines.
+	  `cf_iter_inline.cc' (conditionally) #included.
+	
+	* cf_iter.cc, cf_iter.h (operator++, coeff, hasTerms, exp):
+	  definitions moved to `cf_iter_inline.cc'.  Declarations marked
+ 	  as `CF_INLINE' or `CF_NO_INLINE', resp.
+	* cf_iter.h (CF_INLINE, CF_NO_INLINE): new #defines.
+	  `cf_iter_inline.cc' (conditionally) #included.
+
+	* configure.in (enable_cf_inline): new `--enable'-option
+	* config.h.in (CF_USE_INLINE): new #define
+
+	* cf_inline.cc (CanonicalForm(Variable, int))): assertion added
+
+	* cf_inline.cc (isOne, isZero, operator -(CF)): order of immediate
+	  checks changed
+
+	* cf_inline.cc: new file
+
+	* cf_iter_inline.cc (operator ++, coeff, exp): assertions fixed
+
+	* cf_iter_inline.cc: new file
+
+Fri Jun 26 12:24:34 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* int_cf.cc, int_cf.h (isOne, isZero): pure virtual methods
+	  implemented.  Declarations adapted.
+	* int_rat.cc, int_int.cc, int_rat.h, int_int.h, int_poly.h
+	  (isZero, isOne): methods removed.  Declarations adapted.
+	* int_pp.cc (isOne, isZero): slightly speeded up.  Doc fixes.
+	* imm.h (imm_isone, imm_isone_p, imm_isone_gf): doc fixes
+	* imm.h (imm_iszero, imm_iszero_p, imm_iszero_gf): doc fixes
+
+	* int_poly.cc, int_pp.cc, int_rat.cc (neg): doc fixes
+	* int_int.cc (neg): doc fixes.  Slightly speeded up.
+	* imm.h (imm_neg, imm_neg_p, imm_neg_gf): doc fixes
+
+Mon Jun 15 16:04:26 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* configure.in: doc fixes
+
+	* configure.in: explicit path name generated slightly rewritten to
+	  work on HP's.  Absolute path names are generated already by
+	  Makefile to keep `configure.in' more readable.
+
+Fri Jun 12 16:28:48 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* int_intdiv.cc: `canonicalform.h' included
+
+	* gfops.cc, int_int.cc, readcf.y: order of includes fixed
+
+	* timing.h: bug fix.  Test on `WINNT' negated.
+
 Tue Jun  9 11:52:45 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* configure.in (ac_save_path): renamed to `$save_path'.  All
