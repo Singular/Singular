@@ -4,10 +4,15 @@
 	todo: forbid the use of non-twosided ideals
 
 6.12.02
-	option(redTail) is implemented and tested
+	DONE: option(redTail) is implemented and tested
 	file: exterior2.tst
 	todo: in twostd, running from qring should be
 	done another std() in order to get reduced result
-	todo: buckets in multiplication (p_Mult_mm, mm_Mult_p)
+	
+	DONE: buckets in multiplication (p_Mult_mm, mm_Mult_p)
+	version 1.17 - add cvs -m "buckets added", not
+	just nCopy
 	todo: syz(i) withthe canonical method, think about
 	Schreyer and LaScala (double homogenization)
+	Print(p) at gr_kstd2.cc:877 is commented out
+	
