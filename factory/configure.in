@@ -1,4 +1,4 @@
-dnl $Id: configure.in,v 1.8 1997-09-10 13:50:44 schmidt Exp $
+dnl $Id: configure.in,v 1.9 1997-10-22 16:19:12 schmidt Exp $
 
 dnl
 dnl configure.in - process this file with autoconf to generate
@@ -11,7 +11,7 @@ dnl
 #
 # - initialisation.
 #
-AC_REVISION($Id: configure.in,v 1.8 1997-09-10 13:50:44 schmidt Exp $)
+AC_REVISION($Id: configure.in,v 1.9 1997-10-22 16:19:12 schmidt Exp $)
 AC_INIT(canonicalform.cc)
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_AUX_DIR(bin)
@@ -31,7 +31,7 @@ factory_version="1.3a"
 AC_ARG_WITH(
   memman,
   [  --with-memman(=<memman>) specify Factory memory manager.
-                          <memman> is either 'old' (default), 'new', or 'no'.],
+                          <memman> is either \`old' (default), \`new', or \`no'.],
   ,
   [ if test "x$with_Singular" = xyes; then
       with_memman=no
@@ -63,8 +63,8 @@ AC_ARG_ENABLE(
 AC_ARG_ENABLE(
   memdebug,
   [  --enable-memdebug=<level> switch on memory management debugging.  Meaningful
-                          with --with-memman=new only.  <level> may be either
-                          'no' (default), 'normal', or 'full'.],
+                          with \`--with-memman=new' only.  <level> may be either
+                          \`no' (default), \`normal', or \`full'.],
   ,
   enable_memdebug=no)
 
@@ -89,8 +89,8 @@ AC_ARG_ENABLE(
 # an ugly tribute to Singular
 AC_ARG_ENABLE(
   gmp,
-  [  --enable-gmp            together with --with-Singular means: installation
-                          in process, be graceful when there is no gmp.h],
+  [  --enable-gmp            together with \`--with-Singular' means: installation
+                          in process, be graceful when there is no \`gmp.h'],
   [ if test "x$with_Singular" = xyes && test "x$enable_gmp" != xno; then
       with_gmp='$(includedir)'
     fi ])
