@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.8 1998-05-03 13:11:26 obachman Exp $
+# $Id: regress.cmd,v 1.9 1998-05-06 17:07:05 obachman Exp $
 # FILE:    regress.cmd 
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -108,7 +108,7 @@ sub tst_check
   }
   else
   {
-    $system_call = "$singular $singularOptions $root.tst > $root.new.res";
+    $system_call = "$singular $singularOptions $root.tst > $root.new.res 2>&1";
   }
   # Go Singular, Go!
   $exit_status = & mysystem($system_call);
