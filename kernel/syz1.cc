@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.5 2004-04-16 17:18:35 levandov Exp $ */
+/* $Id: syz1.cc,v 1.6 2004-06-02 13:14:40 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -1804,7 +1804,7 @@ intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim,int * row_shift)
     result = syBetti(syzstr->fullres,syzstr->length,&dummy,NULL,minim,row_shift);
   else
     result = syBetti(syzstr->minres,syzstr->length,&dummy,NULL,minim,row_shift);
-  if ((minim) || (syzstr->resPairs!=NULL))
+  if (result!=NULL) && ((minim) || (syzstr->resPairs!=NULL)))
     syzstr->betti = ivCopy(result);
   return result;
 }
