@@ -1,6 +1,6 @@
 // GMG/BM, last modified: 8.10.98
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: matrix.lib,v 1.18 2001-01-03 01:28:48 greuel Exp $";
+version="$Id: matrix.lib,v 1.19 2001-01-06 00:41:54 greuel Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -542,7 +542,7 @@ EXAMPLE: example gauss_col; shows an example
    {
      M = simplify(interred(M),1);
    }
- /*
+ */
    if (size(#) != 0)
    {
     module N = lift(A,M);
