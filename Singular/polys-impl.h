@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.7 1998-01-13 12:00:44 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.8 1998-01-14 14:42:45 obachman Exp $ */
 
 /***************************************************************
  *
@@ -69,7 +69,7 @@ struct  spolyrec
     Like COMP_FAST, except that it turns off "vector techniques" of
     monomial operations, i.e. does everything exponent-wise. 
  ***************************************************************/
-//#define COMP_FAST
+#define COMP_FAST
 // #define COMP_DEBUG
 // #define COMP_NO_EXP_VECTOR_OPS
 #define COMP_TRADITIONAL
@@ -134,31 +134,38 @@ extern int pVarHighIndex;
  ***************************************************************/
 // And here is how we determine the way exponents are stored:
 // There are the following four possibilities:
-// LITTLE_ENDIAN -- rev lex order, assume no empty exponents
-// comp, e_1, e_2, ... , e_n : pVarOffset = 0,
-//                             pCompIndex = 0,
-//                             pVarLowIndex = 1, pVarHighIndex = pVariables
-// LITTLE_ENDIAN -- lex order, assume no empty exponents
-// comp, e_n, .... , e_2, e_1: pVarOffset = pVariables + 1,
-//                             pCompIndex = 0
-//                             pVarLowIndex = 1, pVarHighIndex = pVariables
+//
+//
 // BIG_ENDIAN -- lex order
-// e_1, e_2, ... , e_n, comp : pVarOffset = -1,
-//                             pCompIndex = pVariables
-//                             pVarLowIndex = 0, pVarHighIndex = pVariables-1
+// e_1, e_2, ... , e_n,..,comp : pVarOffset = -1,
+//                               pCompIndex = pVariables + #(..)
+//                               pVarLowIndex = 0,
+//                               pVarHighIndex = pVariables-1
 // BIG_ENDIAN -- rev lex order
-// e_n, ... , e_2, e_1, comp : pVarOffset = pVariables,
-//                             pCompIndex = pVariables
-//                             pVarLowIndex = 0, pVarHighIndex = pVariables-1
-
+// e_n, ... , e_2, e_1,..,comp : pVarOffset = pVariables,
+//                               pCompIndex = pVariables + #(..)
+//                               pVarLowIndex = 0,
+//                               pVarHighIndex = pVariables-1
+// LITTLE_ENDIAN -- rev lex order
+// comp,.., e_1, e_2, ... , e_n : pVarOffset = #(..),
+//                                pCompIndex = 0,
+//                                pVarLowIndex = 1 + #(..),
+//                                pVarHighIndex = #(..) + pVariables
+// LITTLE_ENDIAN -- lex order
+// comp,..,e_n, .... , e_2, e_1 : pVarOffset = pVariables + 1 + #(..)
+//                                pCompIndex = 0
+//                                pVarLowIndex = 1 + #(..)
+//                                pVarHighIndex = #(..) + pVariables
+//
 // Furthermore, the size of the exponent vector is always a multiple
-// of the word size -- "empty exponents" are filled in between comp
-// and first/last exponent -- i.e. comp and first/last exponent might
-// not be next to each other
+// of the word size -- "empty exponents" (exactly #(..) ones) are
+// filled in between comp and first/last exponent -- i.e. comp and
+// first/last exponent might not be next to each other
 
 #ifdef COMP_FAST
 
 #ifdef WORDS_BIGENDIAN
+
 #define _pHasReverseExp    (pVarOffset != -1)
 #define _pExpIndex(i)                           \
   (pVarOffset == -1 ? (i) - 1 : pVarOffset - (i))
@@ -166,19 +173,17 @@ extern int pVarHighIndex;
   ((r)->VarOffset == -1 ? (i) - 1 : (r)->VarOffset - (i))   
 
 #else // ! WORDS_BIGENDIAN
+
 #define _pHasReverseExp    (pVarOffset > (SIZEOF_LONG / SIZEOF_EXPONENT) - 1)
-#define _pExpIndex(i)                           \
-  (pVarOffset > (SIZEOF_LONG / SIZEOF_EXPONENT) - 1 ?   \
-   pVarOffset - (i) : pVarOffset + (i))
-#define _pRingExpIndex(r, i)                                   \
-  ((r)->VarOffset > (SIZEOF_LONG / SIZEOF_EXPONENT) - 1 ?   \
-   (r)->VarOffset - (i) : (r)->VarOffset + (i))
 #define _pExpIndex(i)                                   \
   (pVarOffset > (SIZEOF_LONG / SIZEOF_EXPONENT) - 1 ?   \
    pVarOffset - (i) : pVarOffset + (i))
-#endif
+#define _pRingExpIndex(r, i)                                \
+  ((r)->VarOffset > (SIZEOF_LONG / SIZEOF_EXPONENT) - 1 ?   \
+   (r)->VarOffset - (i) : (r)->VarOffset + (i))
+
+#endif // WORDS_BIGENDIAN
     
-// For (Lex, Comp) Comparisons
 inline void pGetVarIndicies_Lex(int nvars,
                                 int &VarOffset, int &VarCompIndex,
                                 int &VarLowIndex, int &VarHighIndex)
@@ -189,17 +194,11 @@ inline void pGetVarIndicies_Lex(int nvars,
   else
     temp = (temp / sizeof(long)) + 1; // now temp == nvars1W
 #ifdef WORDS_BIGENDIAN
-  // e_1, e_2, ..., e_n, ..., comp : comp NEEDS TO BE be in last available slot
-#ifndef COMP_NO_EXP_VECTOR_OPS  
   VarCompIndex = temp * sizeof(long)/sizeof(Exponent_t) - 1;
-#else
-  VarCompIndex = nvars;
-#endif  
   VarOffset    = -1;
   VarLowIndex  = 0;
   VarHighIndex = nvars - 1;
 #else //  ! WORDS_BIGENDIAN
-  // comp, ..., e_n, .... , e_2, e_1
   VarHighIndex = temp * sizeof(long)/sizeof(Exponent_t) - 1;
   VarCompIndex = 0;
   VarOffset    = VarHighIndex + 1;
@@ -207,7 +206,7 @@ inline void pGetVarIndicies_Lex(int nvars,
 #endif // WORDS_BIGENDIAN
 }
 #define pSetVarIndicies_Lex(nvars) \
-  pGetVarIndicies_Lex(nvars, pVarOffset, pCompIndex, pVarLowIndex, pVarHighIndex)
+  pGetVarIndicies_Lex(nvars,pVarOffset,pCompIndex,pVarLowIndex,pVarHighIndex)
 
 inline void pGetVarIndicies_RevLex(int nvars,
                                    int &VarOffset, int &VarCompIndex,
@@ -219,12 +218,7 @@ inline void pGetVarIndicies_RevLex(int nvars,
   else
     temp = (temp / sizeof(long)) + 1;
 #ifdef WORDS_BIGENDIAN
-  // e_n, .... , e_2, e_1, ..., comp
-#ifndef COMP_NO_EXP_VECTOR_OPS  
   VarCompIndex = temp * sizeof(long)/sizeof(Exponent_t) - 1;
-#else
-  VarCompIndex = nvars;
-#endif  
   VarOffset    = nvars;
   VarLowIndex  = 0;
   VarHighIndex = nvars-1;
@@ -237,7 +231,7 @@ inline void pGetVarIndicies_RevLex(int nvars,
 #endif // WORDS_BIGENDIAN
 }
 #define pSetVarIndicies_RevLex(nvars) \
-  pGetVarIndicies_RevLex(nvars, pVarOffset, pCompIndex, pVarLowIndex, pVarHighIndex)
+ pGetVarIndicies_RevLex(nvars,pVarOffset,pCompIndex,pVarLowIndex,pVarHighIndex)
 
 // The default settings:
 inline void pGetVarIndicies(int nvars, 
@@ -391,6 +385,8 @@ while(0)
 
 #define _pNew()         (poly) mmAllocSpecialized()
 // #define _pNew() _pInit()
+
+#include <string.h>
   
 inline poly    _pInit(void)
 {
@@ -465,8 +461,8 @@ inline void _pMonAddFast(poly p1, poly p2)
   _pSetComp(p2, 0);
 #else
   int i = pVariables;
-  Exponent_pt s1 = &(p1->exp[0]);
-  Exponent_pt s2 = &(p2->exp[0]);
+  Exponent_pt s1 = &(p1->exp[pVarLowIndex]);
+  Exponent_pt s2 = &(p2->exp[pVarLowIndex]);
 #endif
   
   for (;;)
@@ -479,6 +475,8 @@ inline void _pMonAddFast(poly p1, poly p2)
   }
 #ifndef COMP_NO_EXP_VECTOR_OPS    
   _pSetComp(p2, c2);
+#else
+  _pSetComp(p1, _pGetComp(p2));
 #endif  
   _pGetOrder(p1) += _pGetOrder(p2);
 }
@@ -501,10 +499,16 @@ inline void __pCopyAddFast(poly p1, poly p2, poly p3)
   const unsigned long* s3 = (unsigned long*) &(p3->exp[0]);
   const unsigned long* const ub = s3 + pVariables1W;
 #else
-  Exponent_t* s1 = (Exponent_t*) &(p1->exp[0]);
-  const Exponent_t* s2 = (Exponent_t*) &(p2->exp[0]);
-  const Exponent_t* s3 = (Exponent_t*) &(p3->exp[0]);
+  Exponent_t* s1 = (Exponent_t*) &(p1->exp[pVarLowIndex]);
+  const Exponent_t* s2 = (Exponent_t*) &(p2->exp[pVarLowIndex]);
+  const Exponent_t* s3 = (Exponent_t*) &(p3->exp[pVarLowIndex]);
   const Exponent_t* const ub = s3 + pVariables;
+// need to zero the "fill in" slots (i.e., empty exponents)  
+#ifdef  WORDS_BIG_ENDIAN
+  *((unsigned long*) s1 + pMonomSize -1) = 0;
+#else
+  *((unsigned long *) s1->exp) = 0;
+#endif  
 #endif  
   
   for (;;)
@@ -538,11 +542,15 @@ inline void __pCopyAddFast1(poly p1, poly p2, poly p3)
   const unsigned long* s3 = (unsigned long*) &(p3->exp[0]);
   const unsigned long* const ub = s3 + pVariables1W;
 #else
-  _pSetComp(p1, 0);
-  Exponent_t* s1 = (Exponent_t*) &(p1->exp[0]);
-  const Exponent_t* s2 = (Exponent_t*) &(p2->exp[0]);
-  const Exponent_t* s3 = (Exponent_t*) &(p3->exp[0]);
+  Exponent_t* s1 = (Exponent_t*) &(p1->exp[pVarLowIndex]);
+  const Exponent_t* s2 = (Exponent_t*) &(p2->exp[pVarLowIndex]);
+  const Exponent_t* s3 = (Exponent_t*) &(p3->exp[pVarLowIndex]);
   const Exponent_t* const ub = s3 + pVariables;
+#ifdef  WORDS_BIG_ENDIAN
+  *((unsigned long*) s1 + pMonomSize -1) = 0;
+#else
+  *((unsigned long *) s1->exp) = 0;
+#endif  
 #endif  
 
   for (;;)
@@ -579,7 +587,7 @@ inline void __pCopyAddFast1(poly p1, poly p2, poly p3)
 
 #endif
 
-inline BOOLEAN __pDivisibleBy(poly a, poly b)
+DECLARE(BOOLEAN, __pDivisibleBy(poly a, poly b))
 {
   const unsigned long* s1;
   const unsigned long* s2;
@@ -635,25 +643,25 @@ inline BOOLEAN __pDivisibleBy(poly a, poly b)
 
 #else //  ! COMP_NO_EXP_VECTOR_OPS
 
-inline BOOLEAN __pDivisibleBy(poly a, poly b)
+DECLARE(BOOLEAN, __pDivisibleBy(poly a, poly b))
 {
 #ifdef WORDS_BIGENDIAN
-  const Exponent_t* s1 = &(a->exp[pVariables-1]);
-  const Exponent_t* s2 = &(b->exp[pVariables-1]);
-  const Exponent_t* lb = (Exponent_t*) &(a->exp[0]);
+  const Exponent_t* s1 = &(a->exp[pVarHighIndex]);
+  const Exponent_t* s2 = &(b->exp[pVarHighIndex]);
+  const Exponent_t* lb = s1 - pVariables;
 
   for (;;)
   {
     if (*s1 > *s2) return FALSE;
-    if (s1 == lb) return TRUE;
     s1--;
+    if (s1 == lb) return TRUE;
     s2--;
   }
   
 #else // !WORDS_BIGENDIAN
-  const Exponent_t* s1 = &(a->exp[1]);
-  const Exponent_t* s2 = &(b->exp[1]);
-  const Exponent_t* lb = (Exponent_t*) s1 + pVariables;
+  const Exponent_t* s1 = &(a->exp[pVarLowIndex]);
+  const Exponent_t* s2 = &(b->exp[pVarLowIndex]);
+  const Exponent_t* lb = s1 + pVariables;
 
   for (;;)
   {
@@ -672,7 +680,7 @@ inline BOOLEAN __pDivisibleBy(poly a, poly b)
 extern  BOOLEAN pDBDivisibleBy(poly p1, poly p2, char* f, int l);
 inline BOOLEAN _pDivisibleBy_orig(poly a, poly b)
 #else
-  DECLARE(BOOLEAN, _pDivisibleBy(poly a, poly b))
+inline BOOLEAN _pDivisibleBy(poly a, poly b)
 #endif // defined(PDEBUG) && PDEBUG == 1
 {
   if ((a!=NULL)&&((_pGetComp(a)==0) || (_pGetComp(a) == _pGetComp(b))))
@@ -687,12 +695,14 @@ inline BOOLEAN _pDivisibleBy_orig(poly a, poly b)
 extern  BOOLEAN pDBDivisibleBy1(poly p1, poly p2, char* f, int l);
 inline BOOLEAN _pDivisibleBy1_orig(poly a, poly b)
 #else
-  DECLARE(BOOLEAN, _pDivisibleBy1(poly a, poly b))
+inline BOOLEAN _pDivisibleBy1(poly a, poly b)
 #endif // defined(PDEBUG) && PDEBUG == 1
 {
-  if (_pGetComp(a) == 0 || _pGetComp(a) == _pGetComp(b)) return __pDivisibleBy(a,b);
+  if (_pGetComp(a) == 0 || _pGetComp(a) == _pGetComp(b))
+    return __pDivisibleBy(a,b);
   return FALSE;
 }
+
 #if defined(PDEBUG) && PDEBUG == 1
 #define _pDivisibleBy2(a,b)   pDBDivisibleBy2(a, b, __FILE__, __LINE__)
 extern  BOOLEAN pDBDivisibleBy2(poly p1, poly p2, char* f, int l);
