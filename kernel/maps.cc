@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.2 2004-05-12 11:24:37 levandov Exp $ */
+/* $Id: maps.cc,v 1.3 2004-05-14 16:26:05 levandov Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -192,6 +192,7 @@ static poly pChangeSizeOfPoly(ring p_ring, poly p,int minvar,int maxvar)
 /*2
 *returns the preimage of id under theMap,
 *if id is empty or zero the kernel is computed
+* (assumes) that both ring have the same coeff.field
 */
 ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
 {
@@ -247,25 +248,34 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
   rTest(&tmpR);
 
 #ifdef HAVE_PLURAL
-  if (sourcering->nc!= NULL)
+  if (rIsPluralRing(theImageRing))
   {
     rUnComplete(&tmpR);
-    omFreeSize(orders, sizeof(int)*(ordersize));
-    omFreeSize(block0, sizeof(int)*(ordersize));
-    omFreeSize(block1, sizeof(int)*(ordersize));
-    omFreeSize(wv, sizeof(int*)*(ordersize));
-    omFreeSize(names, (currRing->N)*sizeof(char*));
-    if (sourcering->nc->type!=nc_comm)
+    omFreeSize(orders, sizeof(int)*(ordersize));orders=NULL;
+    omFreeSize(block0, sizeof(int)*(ordersize));block0=NULL;
+    omFreeSize(block1, sizeof(int)*(ordersize));block1=NULL;
+    omFreeSize(wv, sizeof(int*)*(ordersize)); wv=NULL;
+    omFreeSize(names, (currRing->N)*sizeof(char*)); names=NULL;
+    memset(&tmpR,0,sizeof(tmpR));
+    if ((rIsPluralRing(sourcering)) && (sourcering->nc->type!=nc_comm)) 
     {
       Werror("Sorry, not yet implemented for noncomm. rings");
       return NULL;
     }    
-    if ( rSum(theImageRing, sourcering, &tmpR ) !=1 )
+    ring tmpR_ptr;
+    if ( rSum(theImageRing, sourcering, tmpR_ptr ) !=1 )
     {
       /* something is wrong with the rings... */
       Werror("Error in rSum");
       return NULL;
     }
+    memcpy(&tmpR,tmpR_ptr,sizeof(tmpR));
+    // Action!
+  }
+  if (nSetMap(theImageRing) != nCopy)
+  {
+    Werror("Coefficient fields must be equal");
+    return NULL;
   }
 #endif
 
@@ -336,11 +346,14 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
   id_Delete(&temp2, &tmpR);
   idSkipZeroes(temp1);
   rUnComplete(&tmpR);
-  omFreeSize(orders, sizeof(int)*(ordersize));
-  omFreeSize(block0, sizeof(int)*(ordersize));
-  omFreeSize(block1, sizeof(int)*(ordersize));
-  omFreeSize(wv, sizeof(int*)*(ordersize));
-  omFreeSize(names, (currRing->N)*sizeof(char*));
+  if (orders!=NULL)
+  {
+    omFreeSize(orders, sizeof(int)*(ordersize));
+    omFreeSize(block0, sizeof(int)*(ordersize));
+    omFreeSize(block1, sizeof(int)*(ordersize));
+    omFreeSize(wv, sizeof(int*)*(ordersize));
+    omFreeSize(names, (currRing->N)*sizeof(char*));
+  }
   return temp1;
 }
 

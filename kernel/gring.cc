@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.9 2004-05-12 11:24:36 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.10 2004-05-14 16:26:05 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -1301,8 +1301,8 @@ poly nc_p_Bracket_qq(poly p, poly q)
       pres=nc_mm_Bracket_nn(p,Q); /* since no coeffs are taken into account there */
       if (pres!=NULL)
       {
-        coef=nMult(pGetCoeff(p),pGetCoeff(Q));
-        pres=p_Mult_nn(pres,coef,currRing);
+        coef = nMult(pGetCoeff(p),pGetCoeff(Q));
+        pres = p_Mult_nn(pres,coef,currRing);
 	if (UseBuckets) sBucket_Add_p(bu_out,pres,pLength(pres));
 	else res=p_Add_q(res,pres,currRing);
         nDelete(&coef);
@@ -1426,6 +1426,7 @@ poly nc_mm_Bracket_nn(poly m1, poly m2)
   freeT(M2, rN);
   freeT(PREFIX, rN);
   freeT(SUFFIX, rN);
+  pTest(res);
   return(res);
 }
 

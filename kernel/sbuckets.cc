@@ -7,7 +7,7 @@
  *           a bucket sort
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: sbuckets.cc,v 1.1.1.1 2003-10-06 12:16:02 Singular Exp $
+ *  Version: $Id: sbuckets.cc,v 1.2 2004-05-14 16:26:06 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 
@@ -144,6 +144,11 @@ void sBucket_Add_p(sBucket_pt bucket, poly p, int length)
                 bucket->bucket_ring);
     bucket->buckets[i].p = NULL;
     bucket->buckets[i].length = 0;
+    if (p==NULL)
+    {
+      if (i > bucket->max_bucket) bucket->max_bucket = i;
+      return;
+    }
     i = LOG2(length);
   }
 
