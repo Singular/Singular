@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.23 1999-09-20 18:03:48 obachman Exp $ */
+/* $Id: feread.cc,v 1.24 1999-09-22 10:19:04 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -60,9 +60,8 @@ char *command_generator (char *text, int state)
   /* If no names matched, then return NULL. */
   return ((char *)NULL);
 }
-
-
 #endif
+
 /* ===================================================================*/
 /* =                      static readline                           = */
 /* ===================================================================*/
@@ -125,16 +124,6 @@ char ** singular_completion (char *text, int start, int end)
   return m;
 }
 
-void fe_reset_input_mode (void)
-{
-  char *p = getenv("SINGULARHIST");
-  if (p != NULL)
-  {
-    if(history_total_bytes()!=0)
-      write_history (p);
-  }
-}
-
 char * fe_fgets_stdin_rl(char *pr,char *s, int size)
 {
   if (!BVERBOSE(V_PROMPT))
@@ -187,7 +176,6 @@ char * fe_fgets_stdin_emu(char *pr,char *s, int size)
   return fe_fgets_stdin_fe(pr,s,size);
 }
 #endif
-
 
 /* ===================================================================*/
 /* =                     dynamic readline                           = */
@@ -262,7 +250,6 @@ static int fe_init_dyn_rl()
   return res;
 }
 
-
 /* Attempt to complete on the contents of TEXT.  START and END show the
 *   region of TEXT that contains the word to complete.  We can use the
 *   entire line in case we want to do some simple parsing.  Return the
@@ -284,16 +271,6 @@ char ** singular_completion (char *text, int start, int end)
     m[1]=NULL;
   }
   return m;
-}
-
-void fe_reset_input_mode (void)
-{
-  char *p = getenv("SINGULARHIST");
-  if (p != NULL)
-  {
-    if((*fe_history_total_bytes)()!=0)
-      (*fe_write_history) (p);
-  }
 }
 
 char * fe_fgets_stdin_drl(char *pr,char *s, int size)
@@ -428,6 +405,7 @@ char * fe_fgets_tcl(char *pr,char *s, int size)
   mflush();
   return fgets(s,size,stdin);
 }
+
 #endif
 
 /* ===================================================================*/
@@ -438,3 +416,27 @@ char * fe_fgets_dummy(char *pr,char *s, int size)
 {
   return NULL;
 }
+
+/* ===================================================================*/
+/* =          fe_reset_input_mode (all possibilities)               = */
+/* ===================================================================*/
+void fe_reset_input_mode ()
+{
+#if defined(HAVE_DYN_RL)
+  char *p = getenv("SINGULARHIST");
+  if (p != NULL)
+  {
+    if((*fe_history_total_bytes)()!=0)
+      (*fe_write_history) (p);
+  }
+#endif
+#if defined(HAVE_READLINE) && !defined(HAVE_FEREAD) && !defined(HAVE_DYN_RL)
+  char *p = getenv("SINGULARHIST");
+  if (p != NULL)
+  {
+    if(history_total_bytes()!=0)
+      write_history (p);
+  }
+#endif
+}
+

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: fegetopt.c,v 1.1 1999-09-20 18:03:47 obachman Exp $ */
+/* $Id: fegetopt.c,v 1.2 1999-09-22 10:19:04 Singular Exp $ */
 
 /* Getopt for GNU.
    NOTE: getopt is now part of the C library, so if you don't know what
@@ -83,7 +83,7 @@
    GNU application programs can use a third alternative mode in which
    they can distinguish the relative order of options and other arguments.  */
 
-#include "getopt.h"
+#include "fegetopt.h"
 
 /* For communication from `getopt' to the caller.
    When `getopt' finds an option that takes an argument,

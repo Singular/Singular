@@ -98,6 +98,7 @@ void m2_end(short i)
     PrintTCL('Q',0,NULL);
   }
   #endif
+  fe_reset_input_mode();
   if (i<=0)
   {
     #ifdef HAVE_TCL
@@ -110,19 +111,6 @@ void m2_end(short i)
         else
           printf("\n$Bye.\n");
       }
-    #ifndef macintosh
-      #ifdef HAVE_FEREAD
-        #ifdef HAVE_ATEXIT
-          //fe_reset_input_mode();
-        #else
-          //fe_reset_input_mode(0,NULL);
-        #endif
-      #else
-        #ifdef HAVE_READLINE
-          //fe_reset_input_mode();
-        #endif
-      #endif
-    #endif
     #ifdef sun
       #ifndef __svr4__
         _cleanup();
@@ -534,7 +522,7 @@ char * versionString()
               StringAppend("MP(%s),",MP_VERSION);
 #endif
 #if defined(HAVE_DYN_RL)
-              StringAppendS("d-readline,"
+              StringAppendS("d-readline,");
 #else
   #if defined(HAVE_READLINE) && !defined(FEREAD)
               StringAppendS("libreadline,");
@@ -568,7 +556,7 @@ char * versionString()
               StringAppendS("YYDEBUG=1,");
 #endif
 #ifdef HAVE_ASSUME
-             StringAppendS("ASSUME,"); 
+             StringAppendS("ASSUME,");
 #endif
 #ifdef MDEBUG
               StringAppend("MDEBUG=%d,",MDEBUG);

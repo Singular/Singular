@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.38 1999-09-21 14:44:58 obachman Exp $ */
+/* $Id: febase.h,v 1.39 1999-09-22 10:19:04 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -243,6 +243,7 @@ Voice * feInitStdin();
 
 /* the interface for reading: */
 extern  char * (*fe_fgets_stdin)(char *pr,char *s, int size);
+void fe_reset_input_mode();
 
 /* possible implementations: */
 

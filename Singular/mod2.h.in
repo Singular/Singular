@@ -4,7 +4,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.66 1999-08-25 16:02:48 Singular Exp $
+ *  Version: $Id: mod2.h.in,v 1.67 1999-09-22 10:19:05 Singular Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -145,7 +145,7 @@
  * Defines which are not set by configure
  ******************************************************************/
 /* define to use the dynamic linking of readline in non-distributions builds */
-/* #undef USE_DYN_RL */
+/* #undef USE_STATIC_RL */
 
 /* Default value for timer resolution in ticks per second */
 /* set to 10 for resolution of tenth of a second, etc */
@@ -203,7 +203,7 @@
  ******************************************************************/
 /* dynamic readline or readline ? */
 #ifdef HAVE_DL
-  #if defined(MAKE_DISTRIBUTION) || defined(USE_DYN_RL)
+  #if !defined(USE_STATIC_RL)
     #define HAVE_DYN_RL
   #endif
 #endif
