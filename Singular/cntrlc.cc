@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.29 2000-03-08 15:08:09 Singular Exp $ */
+/* $Id: cntrlc.cc,v 1.30 2000-05-18 08:31:10 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -213,6 +213,7 @@ void init_signals()
   {
     PrintS("cannot set signal handler for INT\n");
   }
+  signal(SIGCHLD, (void (*)(int))SIG_IGN);
 #endif
 }
 
@@ -258,6 +259,7 @@ void init_signals()
   signal(SIGILL, sigsegv_handler);
   signal(SIGIOT, sigsegv_handler);
   signal(SIGINT ,sigint_handler);
+  signal(SIGCHLD, (void (*)(int))SIG_IGN);
 }
 #else
 
@@ -325,6 +327,7 @@ void init_signals()
   signal(SIGXCPU, (void (*)(int))SIG_IGN);
 #endif
   signal(SIGINT ,sigint_handler);
+  signal(SIGCHLD, (void (*)(int))SIG_IGN);
 #endif
 #endif
 }
