@@ -94,59 +94,54 @@ AC_AIX
 # test for gcc-version: gcc2: prefer CC=gcc, CXX=gcc
 #                       gcc3:        CC=gcc  CXX=g++
 #                       other:       CC=cc   CXX=c++
-AC_MSG_CHECKING(can CC compile C++ files)
+AC_MSG_CHECKING(gcc version)
 AC_CACHE_VAL(ac_cv_c_cpp,
-AC_TRY_RUN([int main() {
-FILE *f=fopen("conftestval", "w");
-#ifdef __GNUC__
-char *p=__VERSION__;
-if (!f) exit(1);
-if (p[0]=='2') fprintf(f, "gcc2\n");
-else if (p[0]=='3') fprintf(f, "gcc3\n");
-else fprintf(f, "gcc_unknown\n");
-#else
-if (!f) exit(1);
-fprintf(f, "unknown\n");
-#endif
-fclose(f);exit(0); }],ac_cv_c_cpp=`cat conftestval`,ac_cv_c_cpp=unknown,ac_cv_c_cpp=unknown))
+ac_cv_c_cp="unknown"
+if test -r "gccversion.sh"; then
+  ac_cv_c_cpp=`/bin/sh gccversion.sh`
+fi
+)
+AC_MSG_RESULT($ac_cv_c_cpp)
 
 # we prefer using gcc for compiling C++ files, provided the user did
 # not overwrite it explicitely
 if test "${GXX}" = yes && test "${ac_cxx_set}" = no; then
-if test "${ac_cv_c_cpp}" = gcc2; then
-  CXX=gcc
-fi
-temp_cflags=${CXXFLAGS}
-AC_LANG_SAVE
-AC_LANG_CPLUSPLUS
-# check whether gcc accepts --no-rtti
-AC_MSG_CHECKING(whether gcc accepts --no-rtti)
-CXXFLAGS="${CXXFLAGS} --no-rtti"
-AC_CACHE_VAL(ac_cv_cxx_have_rtti,
-AC_TRY_COMPILE(,,ac_cv_cxx_have_rtti=yes,ac_cv_cxx_have_rtti=no)
-)
-AC_MSG_RESULT(${ac_cv_cxx_have_rtti})
-if test "${ac_cv_cxx_have_rtti}" != yes; then
-CXXFLAGS=$temp_flags
-else
-CXX="${CXX} --no-rtti"
-fi
+  if test "${ac_cv_c_cpp}" = gcc2; then
+    CXX=gcc
+  elif test "${ac_cv_c_cpp}" = gcc3; then
+    CXX=g++
+  fi
+  temp_cflags=${CXXFLAGS}
+  AC_LANG_SAVE
+  AC_LANG_CPLUSPLUS
+  # check whether gcc accepts --no-rtti
+  AC_MSG_CHECKING(whether gcc accepts --no-rtti)
+  CXXFLAGS="${CXXFLAGS} --no-rtti"
+  AC_CACHE_VAL(ac_cv_cxx_have_rtti,
+    AC_TRY_COMPILE(,,ac_cv_cxx_have_rtti=yes,ac_cv_cxx_have_rtti=no)
+  )
+  AC_MSG_RESULT(${ac_cv_cxx_have_rtti})
+  if test "${ac_cv_cxx_have_rtti}" != yes; then
+  CXXFLAGS=$temp_flags
+  else
+  CXX="${CXX} --no-rtti"
+  fi
 
 # check whether gcc accepts --no-exceptions
-AC_MSG_CHECKING(whether gcc accepts --no-exceptions)
-CXXFLAGS="${CXXFLAGS} --no-exceptions"
-AC_CACHE_VAL(ac_cv_cxx_have_exceptions,
-AC_TRY_LINK(,,ac_cv_cxx_have_exceptions=yes,ac_cv_cxx_have_exceptions=no)
-)
-AC_MSG_RESULT(${ac_cv_cxx_have_exceptions})
-if test "${ac_cv_cxx_have_exceptions}" != yes; then
-CXXFLAGS=$temp_flags
-else
-CXX="${CXX} --no-exceptions"
-fi
+  AC_MSG_CHECKING(whether gcc accepts --no-exceptions)
+  CXXFLAGS="${CXXFLAGS} --no-exceptions"
+  AC_CACHE_VAL(ac_cv_cxx_have_exceptions,
+    AC_TRY_LINK(,,ac_cv_cxx_have_exceptions=yes,ac_cv_cxx_have_exceptions=no)
+  )
+  AC_MSG_RESULT(${ac_cv_cxx_have_exceptions})
+  if test "${ac_cv_cxx_have_exceptions}" != yes; then
+  CXXFLAGS=$temp_flags
+  else
+  CXX="${CXX} --no-exceptions"
+  fi
 
-AC_LANG_RESTORE
-CXXFLAGS=$temp_flags
+  AC_LANG_RESTORE
+  CXXFLAGS=$temp_flags
 
 fi
 
