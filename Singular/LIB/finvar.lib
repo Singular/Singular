@@ -1,8 +1,8 @@
-// $Id: finvar.lib,v 1.19 1999-07-26 13:06:40 Singular Exp $
+// $Id: finvar.lib,v 1.20 1999-07-30 10:37:56 obachman Exp $
 // author: Agnes Eileen Heydtmann, email:agnes@math.uni-sb.de
 // last change: 98/11/05
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.19 1999-07-26 13:06:40 Singular Exp $"
+version="$Id: finvar.lib,v 1.20 1999-07-30 10:37:56 obachman Exp $"
 info="
 LIBRARY:  finvar.lib       LIBRARY TO CALCULATE INVARIANT RINGS & MORE
 AUTHOR: Agnes E. Heydtmann, email: agnes@math.uni-sb.de
@@ -1433,11 +1433,13 @@ RETURN:  n terms (type <poly>) of the partial expansion of the Molien series
          (type <poly>) of the calculation to be used as third parameter in a
          next run of partial_molien
 THEORY:  The following calculation is implemented:
-         (1+a1x+a2x^2+...+anx^n)/(1+b1x+b2x^2+...+bmx^m)=(1+(a1-b1)x+...
-         (1+b1x+b2x^2+...+bmx^m)
-         -----------------------
-            (a1-b1)x+(a2-b2)x^2+...
-            (a1-b1)x+b1(a1-b1)x^2+...
+@format
+(1+a1x+a2x^2+...+anx^n)/(1+b1x+b2x^2+...+bmx^m)=(1+(a1-b1)x+...
+(1+b1x+b2x^2+...+bmx^m)
+-----------------------
+(a1-b1)x+(a2-b2)x^2+...
+(a1-b1)x+b1(a1-b1)x^2+...
+@end format
 EXAMPLE: example partial_molien; shows an example
 "
 { poly A(2);                           // A(2) will contain the return value of

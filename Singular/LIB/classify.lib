@@ -1,8 +1,8 @@
-// $Id: classify.lib,v 1.35 1999-07-07 16:38:23 obachman Exp $
+// $Id: classify.lib,v 1.36 1999-07-30 10:37:55 obachman Exp $
 // KK, last modified: 04.04.1998
 ///////////////////////////////////////////////////////////////////////////////
 
-version  = "$Id: classify.lib,v 1.35 1999-07-07 16:38:23 obachman Exp $";
+version  = "$Id: classify.lib,v 1.36 1999-07-30 10:37:55 obachman Exp $";
 info="
 LIBRARY:  classify.lib  PROCEDURES FOR THE ARNOLD-CLASSIFIER OF SINGULARITIES
 
@@ -25,7 +25,6 @@ morsesplit(f);       residual part of f after applying the splitting lemma
 quickclass(f)        normal form of f determined by invariants (milnorcode)
 singularity(s,[]);   normal form of singularity given by its name s and index
 swap (a,b);          returns b,a
-tschirnhaus(f,v);    Tschirnhaus transformation of f w.r.t. variable v
 A_L(s/f)             shortcut for quickclass(f) or normalform(s)
 normalform(s);       normal form of singularity given by its name s
 debug_log(lev,[])    print trace and debugging information w.r.t level>@DeBug
@@ -2864,13 +2863,13 @@ proc Setring(int c, string name)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-proc internalfunctions
+proc internalfunctions()
 "USAGE:   internalfunctions();
 RETURN:  nothing, display names of internal procedures of classify.lib
 EXAMPLE: no example"
 { "   Internal functions for the classification using Arnold's method,";
  "   the function numbers correspond to numbers in Arnold's classifier:";
- "Klassifiziere(poly f);             determine the type of the singularity f
+ "Klassifiziere(poly f);        determine the type of the singularity f
   Funktion1bis (poly f, list cstn)
   Funktion3 (poly f, list cstn)
   Funktion6 (poly f, list cstn)
@@ -2916,9 +2915,9 @@ EXAMPLE: no example"
   ";
   "   Internal functions providing tools:
   ReOrder(poly f)
-  Singularitaet (string typ,int k,int r,int s,poly a,poly b,poly c,poly d)
+  Singularitaet(string typ,int k,int r,int s,poly a,poly b,poly c,poly d)
   RandomPolyK
-  Faktorisiere(poly f, poly g, int p, int k)     compute g = (ax+by^k)^p
+  Faktorisiere(poly f, poly g, int p, int k)   compute g = (ax+by^k)^p
   Teile(poly f, poly g);                  Teilt f durch g.
   GetRf(poly f, int n);
   Show(poly f);
@@ -2927,6 +2926,12 @@ EXAMPLE: no example"
   Setring(int n, string ringname);
   ";
 }
+example
+{
+  "EXAMPLE"; echo=2;
+  internalfunctions();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // E n d   O f   F i l e
 
