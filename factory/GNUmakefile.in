@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.13 1997-08-29 08:33:11 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.14 1997-09-04 15:18:09 schmidt Exp $
 
 #
 # GNUmakefile.in - used by configure to create GNUmakefile, the
@@ -125,6 +125,7 @@ DEPCXXFLAGS =	-I. -I$(srcdir) \
 # factory source files
 basefactorysrc := \
 		canonicalform.cc \
+		cf_algorithm.cc \
 		cf_binom.cc \
 		cf_char.cc \
 		cf_chinese.cc \
