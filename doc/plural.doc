@@ -38,7 +38,7 @@
 @c * Examples::
 @c * Polynomial data::
 * Mathematical background@value{PSUFFIX}::
-@c * PLURAL libraries::
+* PLURAL libraries::
 @c * Release Notes::
 @ifclear singularmanual
 * Index::
@@ -126,14 +126,14 @@
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node Mathematical background@value{PSUFFIX},  , Functions and system
+@node Mathematical background@value{PSUFFIX},PLURAL libraries, Functions and system
 variables@value{PSUFFIX}, PLURAL 
 @section Mathematical background@value{PSUFFIX}
 @end ifset
 
 
 @ifclear singularmanual
-@node Mathematical background@value{PSUFFIX}, Index, Functions and system variables@value{PSUFFIX}, Top
+@node Mathematical background@value{PSUFFIX}, PLURAL libraries, Functions and system variables@value{PSUFFIX}, Top
 @appendix Mathematical background@value{PSUFFIX}
 @end ifclear
 
@@ -142,20 +142,33 @@ variables@value{PSUFFIX}, PLURAL
 @include plumath.tex
 
 @c --------------------------------------------------------------------
-@c @node SINGULAR libraries, Release Notes, Mathematical background, Top
-@c @appendix SINGULAR libraries
-@c @cindex SINGULAR libraries
-@c @cindex LIBs
+@node PLURAL libraries, Index, Mathematical background@value{PSUFFIX}, Top
+@appendix  PLURAL libraries
+@cindex  PLURAL libraries
+@cindex  PLURAL LIBs
 
-@c @sc{Singular} comes with a set of standard libraries. Their content is
-@c described in the following subsections.
+@sc{Plural} comes with a set of standard libraries. Their content is
+described in the following subsections.
 
-@c Use the @ref{LIB} command for loading of single libraries, and the
-@c command @code{LIB "all.lib";} for loading all libraries.
+Use the @code{LIB} command for loading of single libraries.
+@c , and the
+@c command @code{LIB "all.lib";} for loading all libraries of 
+@c @sc{Singular} and @sc{Plural} together.
+
+@menu
+* lieA_lib:: 
+@end menu
 
 @c ----------------------------------------------------------
+@node lieA_lib,, PLURAL libraries, PLURAL libraries
+@section lieA_lib
+
+@c lib lieA.lib
+
+@c ----------------------------------------------------------
+
 @ifclear singularmanual
-@node Index,  ,Mathematical background@value{PSUFFIX},Top
+@node Index,  ,PLURAL libraries, Top
 @appendix Index
 @cindex  Index
 @printindex cp
