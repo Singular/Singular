@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-comp.h,v 1.19 2000-02-02 18:04:59 Singular Exp $ */
+/* $Id: polys-comp.h,v 1.20 2000-03-20 13:42:54 Singular Exp $ */
 
 /***************************************************************
  *
@@ -92,10 +92,14 @@ while (0)
 
 #endif // WORDS_BIGENDIAN
 
+#ifdef PDEBUG
+int rComp0(poly p1, poly p2);
+#else
 inline int rComp0(poly p1, poly p2)
 {
   _prMonCmp(p1, p2, currRing, return 0, return 1, return -1);
 }
+#endif
 
 inline int prComp0(poly p1, poly p2, ring r)
 {
