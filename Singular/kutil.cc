@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.96 2001-02-21 10:39:26 Singular Exp $ */
+/* $Id: kutil.cc,v 1.97 2001-02-21 15:41:47 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1643,9 +1643,9 @@ int posInS (kStrategy strat, int length,poly p)
   int i;
   int an = 0;
   int en= length;
+  int cmp_int=pOrdSgn;
   if (currRing->MixedOrder)
   {
-    int cmp_int=pOrdSgn;
     int o=pWTotaldegree(p);
     int oo=pWTotaldegree(set[length]);
 
@@ -1671,7 +1671,7 @@ int posInS (kStrategy strat, int length,poly p)
   }
   else
   {
-    if (pLmCmp(set[length],p)== -pOrdSgn)
+    if (pLmCmp(set[length],p)== -cmp_int)
       return length+1;
 
     loop
@@ -1679,18 +1679,23 @@ int posInS (kStrategy strat, int length,poly p)
       int dummy;
       if (an >= en-1)
       {
-        if (pLmCmp(set[an],p) == pOrdSgn) return an;
-        if (pLmCmp(set[an],p) == -pOrdSgn) return en;
-        if (pLDeg(set[an],&dummy)<pLDeg(p,&dummy)) return an;
+        if (pLmCmp(set[an],p) == cmp_int) return an;
+        if (pLmCmp(set[an],p) == -cmp_int) return en;
+        if ((cmp_int!=1)
+        && ((pFDeg(set[an])+strat->ecartS[an])<pLDeg(p,&dummy)))
+          return an;
         return en;
       }
       i=(an+en) / 2;
-      if (pLmCmp(set[i],p) == pOrdSgn) en=i;
-      else if (pLmCmp(set[i],p) == -pOrdSgn) an=i;
+      if (pLmCmp(set[i],p) == cmp_int) en=i;
+      else if (pLmCmp(set[i],p) == -cmp_int) an=i;
       else
       {
-        if (pLDeg(set[i],&dummy)<pLDeg(p,&dummy)) en=i;
-        else                                    an=i;
+        if ((cmp_int!=1)
+        &&((pFDeg(set[i])+strat->ecartS[i])<pLDeg(p,&dummy)))
+          en=i;
+        else
+          an=i;
       }
     }
   }
