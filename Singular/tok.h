@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id: tok.h,v 1.56 2003-12-16 14:55:37 Singular Exp $ */
+/* $Id: tok.h,v 1.57 2004-03-19 17:37:28 levandov Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -58,6 +58,7 @@ enum {
   ALIAS_CMD     = UMINUS + 15,
   ATTRIB_CMD,
   BAREISS_CMD,
+  BRACKET_CMD,
   BREAKPOINT_CMD,
   CHARACTERISTIC_CMD,
   CHARSTR_CMD,
@@ -135,6 +136,7 @@ enum {
   TEST_CMD,
   TRANSPOSE_CMD,
   TRACE_CMD,
+  TWOSTD_CMD,
   TYPEOF_CMD,
   UNLOAD_CMD,
   URSOLVE_CMD,

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.313 2004-03-19 16:47:19 Singular Exp $ */
+/* $Id: iparith.cc,v 1.314 2004-03-19 17:37:29 levandov Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -154,6 +154,9 @@ cmdnames cmds[] =
   { "attrib",      0, ATTRIB_CMD ,        CMD_123},
   { "bareiss",     0, BAREISS_CMD ,       CMD_123},
   { "betti",       0, BETTI_CMD ,         CMD_12},
+  #ifdef HAVE_PLURAL
+  { "bracket",     0, BRACKET_CMD ,       CMD_2},
+  #endif
   { "break",       0, BREAK_CMD ,         BREAK_CMD},
   { "breakpoint",  0, BREAKPOINT_CMD ,    CMD_M},
   { "char",        0, CHARACTERISTIC_CMD ,CMD_1},
@@ -323,6 +326,9 @@ cmdnames cmds[] =
   { "test",        0, TEST_CMD ,          CMD_M},
   { "trace",       0, TRACE_CMD ,         CMD_1},
   { "transpose",   0, TRANSPOSE_CMD ,     CMD_1},
+  #ifdef HAVE_PLURAL
+  { "twostd",      0, TWOSTD_CMD ,        CMD_1},
+  #endif
   { "type",        0, TYPE_CMD ,          TYPE_CMD},
   { "typeof",      0, TYPEOF_CMD ,        CMD_1},
   { "uressolve",   0, URSOLVE_CMD,        CMD_M},
@@ -2000,6 +2006,28 @@ static BOOLEAN jjPlural_mat_mat(leftv res, leftv a, leftv b)
 {
   return nc_CallPlural((matrix)a->Data(),(matrix)b->Data(),NULL,NULL,currRing);
 }
+
+static BOOLEAN jjBRACKET(leftv res, leftv a, leftv b)
+{
+  if (rIsPluralRing(currRing)) 
+  {
+    poly p = (poly)a->CopyD(POLY_CMD);
+    poly q = (poly)b->Data();
+    res->data = nc_p_Bracket_qq(p,q);
+  }
+  else res->data=NULL;
+  return FALSE;
+}
+
+static BOOLEAN jjTWOSTD(leftv res, leftv a)
+{
+  if (rIsPluralRing(currRing))  res->data=(ideal)twostd((ideal)a->Data());
+  else  res->data=(ideal)a->Data();
+  setFlag(res,FLAG_STD);
+  setFlag(res,FLAG_TWOSTD);
+  return FALSE;
+}
+
 #endif
 
 static BOOLEAN jjQUOT(leftv res, leftv u, leftv v)
@@ -2478,6 +2506,9 @@ struct sValCmd2 dArith2[]=
 ,{atATTRIB2,   ATTRIB_CMD,     NONE/*set by p*/,DEF_CMD,   STRING_CMD ALLOW_PLURAL}
 ,{jjWRONG2,    BAREISS_CMD,    0,              DEF_CMD,    DEF_CMD ALLOW_PLURAL}
 ,{syBetti2,    BETTI_CMD,      INTMAT_CMD,     RESOLUTION_CMD, INT_CMD ALLOW_PLURAL}
+#ifdef HAVE_PLURAL
+,{jjBRACKET,   BRACKET_CMD,    POLY_CMD,       POLY_CMD,   POLY_CMD ALLOW_PLURAL}
+#endif
 ,{jjCOEF,      COEF_CMD,       MATRIX_CMD,     POLY_CMD,   POLY_CMD ALLOW_PLURAL}
 ,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     IDEAL_CMD,  POLY_CMD ALLOW_PLURAL}
 ,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     MODUL_CMD,  POLY_CMD ALLOW_PLURAL}
@@ -3995,6 +4026,9 @@ struct sValCmd1 dArith1[]=
 ,{jjSYSTEM,     SYSTEM_CMD,      NONE,           STRING_CMD     ALLOW_PLURAL}
 ,{jjSYZYGY,     SYZYGY_CMD,      MODUL_CMD,      IDEAL_CMD      ALLOW_PLURAL}
 ,{jjSYZYGY,     SYZYGY_CMD,      MODUL_CMD,      MODUL_CMD      ALLOW_PLURAL}
+#ifdef HAVE_PLURAL
+,{jjTWOSTD,     TWOSTD_CMD,      IDEAL_CMD,      IDEAL_CMD      ALLOW_PLURAL}
+#endif
 ,{jjWRONG,      TRACE_CMD,       0,              INTVEC_CMD     ALLOW_PLURAL}
 ,{jjWRONG,      TRACE_CMD,       0,              IDEAL_CMD      ALLOW_PLURAL}
 ,{jjTRACE_IV,   TRACE_CMD,       INT_CMD,        INTMAT_CMD     ALLOW_PLURAL}
