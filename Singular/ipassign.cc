@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.33 1998-07-21 17:18:18 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.34 1998-07-22 07:48:55 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -341,8 +341,8 @@ static BOOLEAN jiA_STRING(leftv res, leftv a, Subexpr e)
 static BOOLEAN jiA_PROC(leftv res, leftv a, Subexpr e)
 {
   extern procinfo *iiInitSingularProcinfo(procinfo *pi, char *libname,
-					  char *procname, int line,
-					  long pos, BOOLEAN pstatic=FALSE);
+                                          char *procname, int line,
+                                          long pos, BOOLEAN pstatic=FALSE);
   extern void piCleanUp(procinfov pi);
 
   if(res->data!=NULL) piCleanUp((procinfo *)res->data);
@@ -460,10 +460,8 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
   assumeStdFlag(a);
   qr=(ring)res->Data();
   ring qrr=rCopy(currRing);
-  // hier fehlt noch: evtl. vorhandenen alten Ring streichen
-  // vorerst nur:
   memcpy4(qr,qrr,sizeof(ip_sring));
-  Free(qrr,sizeof(ip_sring));
+  rKill(qrr);
   if (qr->qideal!=NULL) idDelete(&qr->qideal);
   qr->qideal = (ideal)a->CopyD(IDEAL_CMD);
   //currRing=qr;
@@ -1280,7 +1278,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
         if((l->rtyp==IDHDL)&&(l->data!=NULL))
         {
           if ((lt==DEF_CMD) || (lt==LIST_CMD))
-	    ipMoveId((idhdl)l->data);
+            ipMoveId((idhdl)l->data);
           l->attribute=IDATTR((idhdl)l->data);
           l->flag=IDFLAG((idhdl)l->data);
         }
