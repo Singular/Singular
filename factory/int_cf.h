@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_cf.h,v 1.6 1997-10-10 10:33:31 schmidt Exp $ */
+/* $Id: int_cf.h,v 1.7 1997-12-17 11:31:11 schmidt Exp $ */
 
 #ifndef INCL_INT_CF_H
 #define INCL_INT_CF_H
@@ -54,14 +54,15 @@ public:
     virtual bool isUnivariate() const { return false; }
     virtual int intval() const;
     virtual int intmod( int ) const { return 0; }
-    virtual int sign() const;
+    virtual int sign() PVIRT_INT("sign");
 
     virtual InternalCF* num();
     virtual InternalCF* den();
 
     virtual InternalCF* neg() PVIRT_INTCF("neg");
     virtual InternalCF* invert(); // semantically const, changes refCount const
-    virtual int comparesame ( InternalCF* ) PVIRT_INT("comparesame");
+    virtual int comparesame ( InternalCF * ) PVIRT_INT("comparesame");
+    virtual int comparecoeff ( InternalCF * ) PVIRT_INT("comparecoeff");
 
     virtual InternalCF* addsame( InternalCF* ) PVIRT_INTCF("addsame");
     virtual InternalCF* subsame( InternalCF* ) PVIRT_INTCF("subsame");
@@ -72,8 +73,6 @@ public:
     virtual InternalCF* modsame( InternalCF* ) PVIRT_INTCF("modsame");
     virtual void divremsame( InternalCF*, InternalCF*&, InternalCF*& ) PVIRT_VOID("divremsame");
     virtual bool divremsamet( InternalCF*, InternalCF*&, InternalCF*& ) PVIRT_BOOL("divremsamet");
-
-    virtual int comparecoeff ( InternalCF* );
 
     virtual InternalCF* addcoeff( InternalCF* ) PVIRT_INTCF("addcoeff");
     virtual InternalCF* subcoeff( InternalCF*, bool ) PVIRT_INTCF("subcoeff");
