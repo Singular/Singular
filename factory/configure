@@ -5262,7 +5262,8 @@ echo $ECHO_N "checking whether your compiler does arithmetic shifts... $ECHO_C" 
 if test "${ac_cv_shift+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-   if test "$cross_compiling" = yes; then
+   LDFLAGS="-L$explicit_libdir $LDFLAGS"
+	if test "$cross_compiling" = yes; then
   ac_cv_shift=yes
 else
   cat >conftest.$ac_ext <<_ACEOF
