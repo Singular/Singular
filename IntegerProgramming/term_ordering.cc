@@ -9,7 +9,7 @@
 
 /////////////// constructors and destructor ///////////////////////////////////
 
-term_ordering::term_ordering(const BOOLEAN& _homogeneous=FALSE)
+term_ordering::term_ordering(const BOOLEAN& _homogeneous)
     :homogeneous(_homogeneous)
 {
   weight_vector=NULL;
@@ -23,7 +23,7 @@ term_ordering::term_ordering(const BOOLEAN& _homogeneous=FALSE)
 term_ordering::term_ordering(const short& number_of_weighted_variables,
                              const float* weights,
                              const short& _weighted_ordering,
-                             const BOOLEAN& _homogeneous=FALSE)
+                             const BOOLEAN& _homogeneous)
     :weighted_block_size(number_of_weighted_variables),
      homogeneous(_homogeneous)
 {
@@ -85,7 +85,7 @@ term_ordering::term_ordering(const short& number_of_weighted_variables,
                              const short& _weighted_ordering,
                              const short& number_of_elimination_variables,
                              const short& _elimination_ordering,
-                             const BOOLEAN& _homogeneous=FALSE)
+                             const BOOLEAN& _homogeneous)
     :weighted_block_size(number_of_weighted_variables),
      elimination_block_size(number_of_elimination_variables),
      homogeneous(_homogeneous)
@@ -149,7 +149,7 @@ term_ordering::term_ordering(const short& number_of_weighted_variables,
 
 
 term_ordering::term_ordering(ifstream& input, const short& _weighted_ordering,
-                             const BOOLEAN& _homogeneous=FALSE)
+                             const BOOLEAN& _homogeneous)
     :homogeneous(_homogeneous)
 {
 
@@ -218,7 +218,7 @@ term_ordering::term_ordering(ifstream& input, const short& _weighted_ordering,
 
 term_ordering::term_ordering(const short& n, ifstream& input,
                              const short& _weighted_ordering,
-                             const BOOLEAN& _homogeneous=FALSE)
+                             const BOOLEAN& _homogeneous)
     :homogeneous(_homogeneous)
 {
   if((_weighted_ordering<4) || (_weighted_ordering>7))
@@ -259,7 +259,7 @@ term_ordering::term_ordering(const short& n, ifstream& input,
       {
         cout << "neg found at i="<<i<<":" <<weight_vector[i] <<"\n";
         negative_weight=TRUE;
-      }	
+      }
       if(weight_vector[i]==0)
         zero_weight=TRUE;
     }
