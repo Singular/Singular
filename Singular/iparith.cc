@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.251 2001-01-31 18:01:49 Singular Exp $ */
+/* $Id: iparith.cc,v 1.252 2001-01-31 18:04:50 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2524,13 +2524,13 @@ static BOOLEAN jjBAREISS(leftv res, leftv v)
   res->data = (char *)l;
   return FALSE;
 }
-static BOOLEAN jjBAREISS_IM(leftv res, leftv v)
-{
-  intvec *m=(intvec *)v->CopyD(INTMAT_CMD);
-  ivTriangMat(m);
-  res->data = (char *)m;
-  return FALSE;
-}
+//static BOOLEAN jjBAREISS_IM(leftv res, leftv v)
+//{
+//  intvec *m=(intvec *)v->CopyD(INTMAT_CMD);
+//  ivTriangMat(m);
+//  res->data = (char *)m;
+//  return FALSE;
+//}
 static BOOLEAN jjCALL1MANY(leftv res, leftv u)
 {
   return iiExprArithM(res,u,iiOp);

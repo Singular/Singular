@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: intvec.cc,v 1.22 2001-01-19 09:47:46 Singular Exp $ */
+/* $Id: intvec.cc,v 1.23 2001-01-31 18:04:51 Singular Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -324,15 +324,15 @@ intvec * ivMult(intvec * a, intvec * b)
 /*2
 *computes a triangular matrix 
 */
-void ivTriangMat(intvec * imat)
-{
-  int i=0,j=imat->rows(),k=j*imat->cols()-1;
-
-  ivTriangIntern(imat,i,j);
-  i *= imat->cols();
-  for(j=k;j>=i;j--)
-    (*imat)[j] = 0; 
-}
+//void ivTriangMat(intvec * imat)
+//{
+//  int i=0,j=imat->rows(),k=j*imat->cols()-1;
+//
+//  ivTriangIntern(imat,i,j);
+//  i *= imat->cols();
+//  for(j=k;j>=i;j--)
+//    (*imat)[j] = 0; 
+//}
 
 /* def. internals */
 static int ivColPivot(intvec *, int, int, int, int);
