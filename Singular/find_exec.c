@@ -61,17 +61,19 @@ char * find_executable_link (const char *name)
   char *extra = NULL;
   char tbuf[MAXPATHLEN];
 
-  if (ABSOLUTE_FILENAME_P(name)) {
+  if (ABSOLUTE_FILENAME_P(name))
+  {
       /* If we can execute the named file then return it. */
-      if (! access (name, X_OK)) 
+      if (! access (name, X_OK))
         return copy_of (name);
-    }
-  else {
-    if (((name[0] == '.') && (name[1] == '/')) || 
-        ((name[0] == '.') && (name[1] == '.') && (name[2] == '/'))) {
-
+  }
+  else
+  {
+    if (((name[0] == '.') && (name[1] == '/')) ||
+        ((name[0] == '.') && (name[1] == '.') && (name[2] == '/')))
+    {
       strcpy (tbuf, (name[1] == '.' ? ".." : "."));
-      
+
 #ifdef HAVE_GETCWD
       getcwd (tbuf, MAXPATHLEN);
 #else
@@ -86,33 +88,38 @@ char * find_executable_link (const char *name)
 
 
     search = getenv("PATH");
-/* for winnt under msdos, cwd is implicetyly in the path */
+/* for winnt under msdos, cwd is implictly in the path */
 #ifdef WINNT
     p = getenv("SHELL");
     if (p == NULL || strlen(p < 2))
     {
       /* we are under msdos display */
       extra = (char*) AllocL((search != NULL ? strlen(search) : 0) + 3);
-      sprintf(extra, ".:");
+      strcpy(extra, ".:");
       if (search != NULL) strcat(extra, search);
       search = extra;
     }
 #endif
     p = search;
 
-    while (*p) {
+    while (*p)
+    {
       char *next;
       next = tbuf;
 
+#if 0
       /* Perform tilde-expansion. Stolen from GNU readline/tilde.c. */
-      if (p[0] == '~') {
-        if (! p[1] || p[1] == '/') {
+      if (p[0] == '~')
+      {
+        if (! p[1] || p[1] == '/')
+        {
           /* Prepend $HOME to the rest of the string. */
           char *temp_home = (char *) getenv ("HOME");
 
           /* If there is no HOME variable, look up the directory in the
              password database. */
-          if (! temp_home) {
+          if (! temp_home)
+          {
             struct passwd *entry;
 
             entry = getpwuid (getuid ());
@@ -124,7 +131,8 @@ char * find_executable_link (const char *name)
           next = tbuf + strlen (tbuf);
           p ++;
         }
-        else {
+        else
+        {
           char username[MAXPATHLEN];
           struct passwd *user_entry;
           int i;
@@ -135,7 +143,8 @@ char * find_executable_link (const char *name)
           username[i] = '\0';
 
           user_entry = getpwnam (username);
-          if (user_entry) {
+          if (user_entry)
+          {
             strcpy (tbuf, user_entry->pw_dir);
             next = tbuf + strlen (tbuf);
           }
@@ -143,6 +152,7 @@ char * find_executable_link (const char *name)
 
         endpwent ();
       }
+#endif      
 
       /* Copy directory name into [tbuf]. */
       while (*p && *p != ':')
@@ -165,7 +175,8 @@ char * find_executable_link (const char *name)
       strcat (tbuf, name);
 
       /* If we can execute the named file, then return it. */
-      if (! access (tbuf, X_OK)) {
+      if (! access (tbuf, X_OK))
+      {
 #ifdef WINNT
         if (extra != NULL)
           FreeL(extra);
@@ -195,10 +206,10 @@ char * find_executable (const char *name)
     char *p = strrchr(link, '/');
     char *executable;
 
-    
+
     if(p!=NULL) *(p+1)='\0';
     buf[ret]='\0';
-    
+
     if (buf[0] != '/')
     {
       executable = (char*) AllocL(strlen(link) + ret + 1);
@@ -209,7 +220,7 @@ char * find_executable (const char *name)
     {
       executable = copy_of(buf);
     }
-    
+
     FreeL(link);
     return executable;
   }
