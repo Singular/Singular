@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipprint.cc,v 1.11 1999-04-19 11:02:39 obachman Exp $ */
+/* $Id: ipprint.cc,v 1.12 1999-04-20 11:25:50 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: printing
 */
@@ -348,7 +348,8 @@ BOOLEAN jjPRINT_FORMAT(leftv res, leftv u, leftv v)
   else if (strcmp(ns,"%t") == 0)
   {
     SPrintStart();
-    type_cmd((idhdl) u);
+    if (u->rtyp==IDHDL) type_cmd((idhdl) (u->data));
+    else type_cmd((idhdl) u);
     res->data = SPrintEnd();
   }
   else if (strcmp(ns,"%;") == 0)
@@ -378,17 +379,3 @@ BOOLEAN jjPRINT_FORMAT(leftv res, leftv u, leftv v)
   res->rtyp = STRING_CMD;
   return FALSE;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
