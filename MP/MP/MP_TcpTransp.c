@@ -73,8 +73,7 @@
 
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_TcpTransp.c,v 1.1.1.1 1997/06/7 14:05:52 sgr
-ay Exp $";
+static char vcid[] = "@(#) $Id: MP_TcpTransp.c,v 1.11 2001-11-05 17:11:11 Singular Exp $";
 #endif /* lint */
 
 #include "MP.h"
