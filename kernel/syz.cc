@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.3 2004-06-02 13:12:31 Singular Exp $ */
+/* $Id: syz.cc,v 1.4 2004-08-10 12:48:06 Singular Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -797,6 +797,13 @@ intvec * syBetti(resolvente res,int length, int * regularity,
     temp2 = temp3;
   }
   mr--;
+  if (weights!=NULL)
+  {
+    for(j=0;j<weights->length();j++)
+    {
+      if (rows <(*weights)[j]+1) rows=(-mr)+(*weights)[j]+1;
+    }
+  }
   /*------ computation betti numbers --------------*/
   rows -= mr;
   result = new intvec(rows,cols,0);
