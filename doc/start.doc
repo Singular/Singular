@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.9 1998-05-13 08:58:06 schmidt Exp $
+@comment $Id: start.doc,v 1.10 1998-05-13 12:29:30 obachman Exp $
 @comment this file contains the "Introduction" chapter.
 
 @c The following directives are necessary for proper compilation
@@ -32,48 +32,55 @@
 @section Background
 @cindex Background
 
-@sc{Singular} performs algebraic manipulations on numbers, polynomials, ideals,
-rings, modules, matrices and maps between rings.
-The baserings are polynomial rings or localizations hereof over a field
-(e.g finite fields, the rationals, reals, algebraic extensions,
-transcendental extensions) or quotient rings with respect to an ideal.
-The main objects in @sc{Singular} are ideals and modules,
-one of the main algorithms is a general standard basis
-algorithm with respect to
-any semigroup ordering. This includes Buchberger's algorithm
-(if the ordering is a wellordering) and Mora's algorithm (if the ordering is
-a tangent cone ordering) as special cases.
-Other algorithms include computing modules of syzygies,
-finite free resolutions, Hilbert-Poincare series, etc.
-The first implementation of the tangent cone algorithm
-was done in Modula 2 at the Humboldt
-University of Berlin by Gerhard Pfister and Hans
-@tex
- Sch\"onemann
-@end tex
-@ifinfo
- Schoenemann
-@end ifinfo
- in 1986.
-@c It was mainly able to compute certain special invariants of singularities.
-In September 1991 it became a joint project of the Humboldt University of
-Berlin and the University of Kaiserslautern.
-Since 1994 the development of @sc{Singular} is continued at Kaiserslautern.
-@c The goal was to have all the
-@c well known algorithms for computing in
-@c nonhomogeneous ideals in polynomial and powers series rings.
-The need for a new system arose from
-the investigation of mathematical problems
-coming from singularity theory which none of the existing systems
-were able to compute.
-Later we included an algorithm for multivariate polynomial factorization
-in order to perform efficiently primary decomposition of ideals.
-The need for solving big systems of polynomial equations, orginating
-from practical problems in microelectronics, let us implement FGLM-techniques;
-further algorithms for this purpose are to be implemented.
-Thus, we hope to offer a useful system
-for dealing with local and global computational aspects
-of systems of polynomial equations.
+@sc{Singular} is a computer algebra system for polynomial
+computations with emphasize on the special needs of commutative
+algebra, algebraic geometry, and singularity theory.  
+
+@sc{Singular}'s main computational objects are ideals and
+modules over a large variety of baserings. The baserings are polynomial
+rings or localizations thereof over a field (e.g., finite fields, the
+rationals, floats, algebraic extensions, transcendental extensions) or
+quotient rings with respect to an ideal.
+
+@sc{Singular} features one of the fastest and most general
+implementations of various algorithms for computing Groebner
+resp. standard bases. The implementation includes Buchberger's algorithm
+(if the ordering is a wellordering) and Mora's algorithm (if the
+ordering is a tangent cone ordering) as special cases.  Furthermore, it
+provides polynomial factorizations, resultant, characteristic set and
+gcd computations, syzygy and free-resolution computations, and many more
+related functionalities.
+
+Based on an easy-to-use interactive shell and C-like programming
+language, @sc{Singular}'s internal functionality is augmented and
+user-extendible by libraries written in the @sc{Singular} programming
+language. A general and efficient implementation of links as endpoints
+of communications allows @sc{Singular} to make its functionality
+available to and be easily incorporated into other programmes.
+
+@sc{Singular}'s development started in 1984 with an implementation of
+Mora's Tangent Cone algorithms in Modula-2 on an Atari computer (K.P.
+Neuendorf, G. Pfister, H. Schoenemann; Humboldt-Universitaet zu
+Berlin).  The need for a new system arose from the investigation of
+mathematical problems coming from singularity theory which none of the
+existing systems was able to compute. 
+
+In the early 1990s @sc{Singular}'s "home-town" moved to
+Kaiserslautern, a general standard basis algorithm was implemented in C
+and @sc{Singular} was ported to Unix, MS-DOS, and MacOS. 
+
+Continuous extensions (like polynomial factorization, gcd computations,
+links) and refinements led in 1997 to the release of @sc{Singular}
+version 1.0.
+
+The highlights of the new @sc{Singular} version 1.2. include: much
+faster standard and Groebner bases computations based on Hilbert series
+and on improved implementations of the algorithms and the addition of
+libraries for primary decomposition, ring normalization.
+
+@c Thus, we hope to offer a useful system
+@c for dealing with local and global computational aspects
+@c of systems of polynomial equations.
 
 @c ------------------------------------------------------------------
 @node How to use this manual, Getting started, Background, Introduction
@@ -120,9 +127,13 @@ introduced such as the notions of names and objects, data types and
 conversion between them, etc.
 
 @item
-The more complex concepts of procedures and libraries of procedures as
+The more complex concepts of procedures and libraries as
 well as tools to debug them are considered in the following sections:
 @ref{Procedures}, @ref{Libraries}, and @ref{Debugging tools}.
+
+@item
+Finally, in @ref{In- and output},  @sc{Singular}'s mechanisms to
+store and retrieve data are discussed.
 
 @end itemize
 
@@ -131,11 +142,11 @@ where each section corresponds to one data type.  Except from the syntax
 of declarations, expressions, and operations, in each section there is a
 subsection listing all functions related to that particular type.
 
-@ref{Functions and system variables}, is a large alphabetically ordered list of
-all of @sc{Singular}'s functions, control structures, and system
-variables.  Each entry includes a description of the syntax and
-semantics of the item being explained as well as one or more examples
-how to use it.
+@ref{Functions and system variables}, is an alphabetically ordered
+reference list of all of @sc{Singular}'s functions, control structures,
+and system variables.  Each entry includes a description of the syntax
+and semantics of the item being explained as well as one or more
+examples on how to use it.
 
 @subsubheading Miscellany
 @ref{Tricks and pitfalls}, is a loose collection of limitations and
