@@ -4,10 +4,12 @@
  *  Purpose: limits.h configuration for omalloc  
  *  Author:  hannes (Hans Schoenemann)
  *  Created: 03/01
- *  Version: $Id: mylimits.h.in,v 1.1 2001-03-22 22:39:08 Singular Exp $
+ *  Version: $Id: mylimits.h.in,v 1.2 2001-04-05 10:40:26 Singular Exp $
  *******************************************************************/
 #ifndef MYLIMITS_H
+#ifndef sgi
 #define MYLIMITS_H
+#endif
 /*******************************************************************
  * Defines which are set by configure
  ******************************************************************/

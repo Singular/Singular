@@ -3,7 +3,7 @@
 ### Purpose: Makefile for omalloc
 ### Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
 ### Created: 11/99
-### Version: $Id: Makefile.in,v 1.9 2001-03-22 22:39:05 Singular Exp $
+### Version: $Id: Makefile.in,v 1.10 2001-04-05 10:40:26 Singular Exp $
 #################################################################
 
 SHELL		= /bin/sh
@@ -259,7 +259,7 @@ check: omtTest omtTest_ndebug
 CCG		= gcc
 CCM		= gcc -MM -DGENERATE_DEPEND
 
-CFLAGSG		= -g -O -fno-inline-functions -Wall -pipe
+CFLAGSG		= -g -O -fno-inline-functions -Wall
 DEFSG		=  @DEFS@
 
 OBJG := $(CSOURCES:.c=.og) $(GSOURCES:.c=.og)
@@ -297,7 +297,7 @@ libomalloc_d.a: $(OBJD) Makefile omConfig.h mylimits.h
 
 CCP		= gcc
 
-CFLAGSP		= -g -pg -O3 -a -pipe 
+CFLAGSP		= -g -pg -O3 -a 
 DEFSP		=  @DEFS@
 
 OBJP := $(CSOURCES:.c=.op) $(GSOURCES:.c=.op)
@@ -322,7 +322,7 @@ libomalloc_p.a: $(OBJP) Makefile omConfig.h mylimits.h
 
 CCB		= gcc
 
-CFLAGSB		= -g -O3 -pipe 
+CFLAGSB		= -g -O3
 DEFSB		=  @DEFS@
 
 ##
