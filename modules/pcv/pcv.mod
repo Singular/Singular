@@ -1,6 +1,6 @@
 %{
 /*
- *  $Id: pcv.mod,v 1.5 2000-03-30 06:37:22 krueger Exp $
+ *  $Id: pcv.mod,v 1.6 2000-12-05 15:27:00 obachman Exp $
  *
  *  Test mod fuer modgen
  */
@@ -10,9 +10,10 @@
 %}
 
 
-module="pcv";
+// module="pcv";
+package="pcv";
 
-version="$Id: pcv.mod,v 1.5 2000-03-30 06:37:22 krueger Exp $";
+version="$Id: pcv.mod,v 1.6 2000-12-05 15:27:00 obachman Exp $";
 info="
 LIBRARY: pcv.so  CONVERSION BETWEEN POLYS AND COEF VECTORS
 AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
@@ -26,7 +27,8 @@ AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
 
 cxxsource = Pcv.cc;
 
-%%
+%procedures
+
 
 int MinDeg(poly p) {
    %declaration;
@@ -93,4 +95,5 @@ list Basis(int d0,int d1)
   %return(pcvBasis);
 }
 
-%%
+// %%
+

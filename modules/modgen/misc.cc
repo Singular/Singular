@@ -1,17 +1,17 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.11 2000-11-09 21:45:16 krueger Exp $ */
+/* $Id: misc.cc,v 1.12 2000-12-05 15:26:59 obachman Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
 
+#include <stdlib.h>
 #include <mod2.h>
 #include <febase.h>
 #include <grammar.h>
 #include <ipid.h>
 #include <ipshell.h>
-#include <mmemory.h>
 #include <structs.h>
 #include <subexpr.h>
 #include <tok.h>

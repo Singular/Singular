@@ -6,6 +6,7 @@ srcdir		= @srcdir@
 prefix 		= @prefix@
 exec_prefix 	= @exec_prefix@
 libdir 		= @libdir@
+includedir	= @includedir@
 # program executable goes here
 bindir		= @bindir@
 # Singular libs go here
@@ -28,17 +29,12 @@ INSTALL_DATA    = ${INSTALL} -m 644
 MODGEN		= $(bindir)/modgen
 BISON		= bison
 
-CFLAGS	+= -g -I../include -I../../Singular -DNDEBUG -DMODULE_GENERATOR \
+CFLAGS	+= -g -I${includedir}-I../include -I../../Singular -DNDEBUG -DMODULE_GENERATOR \
 	-D${SING_UNAME}
 LIBS	+= -L/usr/local/lib -lgmp
 
 OBJS	= main.o grammar.o scanner.o misc.o makefile.o utils.o \
 	creat_top.o proc.o proc_setup.o
-
-#	iparith.o febase.o \
-#	mmalloc.o mmallocb.o mminit.o mmutil.o mmblock.o mmspec.o
-
-# subexpr.o 
 
 all	= modgen
 

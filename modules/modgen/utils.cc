@@ -1,5 +1,5 @@
 /*
- * $Id: utils.cc,v 1.9 2000-05-01 19:14:49 krueger Exp $
+ * $Id: utils.cc,v 1.10 2000-12-05 15:26:59 obachman Exp $
  */
 
 #include <stdio.h>
@@ -7,6 +7,10 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <ctype.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 int modlineno;    /* lineno within module */
 
@@ -92,7 +96,7 @@ char *build_filename(
   int what
 )
 {
-  char p[512];
+  char* p = (char*) malloc(512*sizeof(char));
 
   switch(what) 
     {

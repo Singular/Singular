@@ -1,12 +1,12 @@
 /*
- *  $Id: kernel.mod,v 1.2 1999-03-31 22:09:53 krueger Exp $
+ *  $Id: kernel.mod,v 1.3 2000-12-05 15:26:58 obachman Exp $
  *
  *  Test mod fuer modgen
  */
 module="kernel";
-version="$Id: kernel.mod,v 1.2 1999-03-31 22:09:53 krueger Exp $";
+version="$Id: kernel.mod,v 1.3 2000-12-05 15:26:58 obachman Exp $";
 info="
-LIBRARY: kernel.lib  PROCEDURES OF GENERAL TYPE WRITEN IN C
+LIBRARY: kernel.lib  PROCEDURES OF GENERAL TYPE WRITTEN IN C
 
   proclist();    Lists all procedures.
 ";

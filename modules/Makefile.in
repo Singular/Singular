@@ -2,7 +2,7 @@
 ###
 ### Makefile for Singular-modules
 ###
-### $Id: Makefile.in,v 1.6 2000-03-30 07:25:11 krueger Exp $
+### $Id: Makefile.in,v 1.7 2000-12-05 15:26:57 obachman Exp $
 ###
 #################################################################
 
@@ -59,10 +59,10 @@ LDFLAGS		= @LDFLAGS@ # @LD_DYNAMIC@
 ##
 CFLAGS		+= ${DEFS}
 
-MOD_INCLUDES	= mod2.h utils.h structs.h mmemory.h tok.h ipid.h \
-	subexpr.h febase.h modules.h grammar.h numbers.h polys.h \
+MOD_INCLUDES	= mod2.h utils.h structs.h tok.h ipid.h \
+	subexpr.h febase.h grammar.h numbers.h polys.h \
 	ideals.h intvec.h polys-impl.h lists.h matpol.h ipconv.h \
-	lists.h matpol.h mmpage.h mmheap.h polys-comp.h
+	lists.h matpol.h pInline1.h pInline2.h p_polys.h
 
 ##
 ##

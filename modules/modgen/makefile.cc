@@ -1,17 +1,22 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: makefile.cc,v 1.6 2000-03-30 11:47:48 Singular Exp $ */
+/* $Id: makefile.cc,v 1.7 2000-12-05 15:26:59 obachman Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
+
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 #include <mod2.h>
 #include <febase.h>
 #include <grammar.h>
 #include <ipid.h>
 #include <ipshell.h>
-#include <mmemory.h>
 #include <structs.h>
 #include <subexpr.h>
 #include <tok.h>

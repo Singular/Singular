@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: creat_top.cc,v 1.11 2000-05-01 19:13:05 krueger Exp $ */
+/* $Id: creat_top.cc,v 1.12 2000-12-05 15:26:58 obachman Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -9,6 +9,12 @@
 #include <mod2.h>
 
 #include "modgen.h"
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+
 extern int yylineno;
 
 void enter_id(FILE *fp, char *name, char *value);
