@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.cc,v 1.5 1997-04-13 12:43:01 Singular Exp $ */
+/* $Id: lists.cc,v 1.6 1998-04-01 18:59:29 Singular Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -194,76 +194,84 @@ lists liMakeResolv(resolvente r, int length, int reallen,
   int typ0, intvec ** weights)
 {
   lists L=(lists)Alloc0(sizeof(slists));
-  int oldlength=length;
-  while (r[length-1]==NULL) length--;
-  if (reallen<=0) reallen=pVariables;
-  reallen=max(reallen,length);
-  L->Init(reallen);
-  int i=0;
-
-  while (i<length)
+  if (length<=0)
   {
-    if (r[i]!=NULL)
+    // handle "empty" resolutions
+    L->Init(0);
+  }
+  else
+  {
+    int oldlength=length;
+    while (r[length-1]==NULL) length--;
+    if (reallen<=0) reallen=pVariables;
+    reallen=max(reallen,length);
+    L->Init(reallen);
+    int i=0;
+  
+    while (i<length)
     {
-      if (i==0)
+      if (r[i]!=NULL)
       {
-        L->m[i].rtyp=typ0;
-      }
-      else
-      {
-        L->m[i].rtyp=MODUL_CMD;
-        int rank=IDELEMS(r[i-1]);
-        if (idIs0(r[i-1]))
+        if (i==0)
         {
-          idDelete(&(r[i]));
-          r[i]=idFreeModule(rank);
+          L->m[i].rtyp=typ0;
         }
         else
         {
-          r[i]->rank=max(rank,idRankFreeModule(r[i]));
+          L->m[i].rtyp=MODUL_CMD;
+          int rank=IDELEMS(r[i-1]);
+          if (idIs0(r[i-1]))
+          {
+            idDelete(&(r[i]));
+            r[i]=idFreeModule(rank);
+          }
+          else
+          {
+            r[i]->rank=max(rank,idRankFreeModule(r[i]));
+          }
+          idSkipZeroes(r[i]);
         }
-        idSkipZeroes(r[i]);
+        L->m[i].data=(void *)r[i];
+        if ((weights!=NULL) && (weights[i]!=NULL))
+        {
+          atSet((idhdl)&L->m[i],mstrdup("isHomog"),weights[i],INTVEC_CMD);
+          weights[i] = NULL;
+        }
       }
-      L->m[i].data=(void *)r[i];
-      if ((weights!=NULL) && (weights[i]!=NULL))
+      else
       {
-        atSet((idhdl)&L->m[i],mstrdup("isHomog"),weights[i],INTVEC_CMD);
-        weights[i] = NULL;
+        // should not happen:
+        Warn("internal NULL in resolvente");
+        L->m[i].data=(void *)idInit(1,1);
       }
+      i++;
     }
-    else
+    Free((ADDRESS)r,oldlength*sizeof(ideal));
+    if (i==0)
     {
-      // should not happen:
-      Warn("internal NULL in resolvente");
-      L->m[i].data=(void *)idInit(1,1);
+      L->m[0].rtyp=typ0;
+      L->m[0].data=(char *)idInit(1,1);
+      i=1;
     }
-    i++;
-  }
-  Free((ADDRESS)r,oldlength*sizeof(ideal));
-  if (i==0)
-  {
-    L->m[0].rtyp=typ0;
-    L->m[0].data=(char *)idInit(1,1);
-    i=1;
-  }
-  while (i<reallen)
-  {
-    L->m[i].rtyp=MODUL_CMD;
-    ideal I=(ideal)L->m[i-1].data;
-    ideal J;
-    int rank=IDELEMS(I);
-    if (idIs0(I))
+    while (i<reallen)
     {
-      J=idFreeModule(rank);
+      L->m[i].rtyp=MODUL_CMD;
+      ideal I=(ideal)L->m[i-1].data;
+      ideal J;
+      int rank=IDELEMS(I);
+      if (idIs0(I))
+      {
+        J=idFreeModule(rank);
+      }
+      else
+      {
+        J=idInit(1,rank);
+      }
+      L->m[i].data=(void *)J;
+      i++;
     }
-    else
-    {
-      J=idInit(1,rank);
-    }
-    L->m[i].data=(void *)J;
-    i++;
+    //Print("make res of length %d (0..%d) L:%d\n",length,length-1,L->nr);
   }
-  //Print("make res of length %d (0..%d) L:%d\n",length,length-1,L->nr);
   return L;
 }
 
