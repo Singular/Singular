@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: gaussman.lib,v 1.1 2000-10-31 13:54:37 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.2 2000-11-06 11:02:00 mschulze Exp $";
 info="
 LIBRARY:  gaussman.lib  GAUSS-MANIN CONNECTION OF A SINGULARITY
 
@@ -456,8 +456,8 @@ EXAMPLE: example vfilt; shows an example
           V0[i1+(j1+j0)*mu,i0+j0*mu]=V0[i1+(j1+j0)*mu,i0+j0*mu]+leadcoef(p);
           if(j1+j0+1<N)
           {
-            V1[i1+(j1+j0+1)*mu,i0+j0*mu]=V1[i1+(j1+j0+1)*mu,i0+j0*mu]+
-                                         leadcoef(p);
+            V1[i1+(j1+j0+1)*mu,i0+j0*mu]=
+            V1[i1+(j1+j0+1)*mu,i0+j0*mu]+leadcoef(p);
           }
         }
         p=p-lead(p);
@@ -645,8 +645,69 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
+proc gamma(list l)
+"USAGE:   <number> g=gamma(singspec(<poly> f));
+ASSUME:  f defines an isolated hypersurface singularity
+RETURN:  Hertling's gamma invariant
+EXAMPLE: example gamma; shows an example
+"
+{
+  ideal s=l[1];
+  intvec d=l[2];
+  int n=nvars(basering)-1;
+  number g=0;
+  int i,j;
+  for(i=1;i<=ncols(s);i++)
+  {
+    for(j=1;j<=d[i];j++)
+    {
+      g=g+(number(s[i])-(n-1)/2)^2;
+    }
+  }
+  g=-g/4+sum(d)*number(s[ncols(s)]-s[1])/12;
+  return(g);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  poly f=x5+x2y2+y5;
+  gamma(singspec(f));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc gamma4(list l)
+"USAGE:   <number> g4=gamma4(singspec(<poly> f));
+ASSUME:  f defines an isolated hypersurface singularity
+RETURN:  Hertling's gamma(4) invariant
+EXAMPLE: example gamma4; shows an example
+"
+{
+  ideal s=l[1];
+  intvec d=l[2];
+  int n=nvars(basering)-1;
+  number g4=0;
+  int i,j;
+  for(i=1;i<=ncols(s);i++)
+  {
+    for(j=1;j<=d[i];j++)
+    {
+      g4=g4+(number(s[i])-(n-1)/2)^4;
+    }
+  }
+  g4=g4-(number(s[ncols(s)]-s[1])/12-1/30)*
+   (sum(d)*number(s[ncols(s)]-s[1])/4-24*gamma(l));
+ return(g4);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  poly f=x5+x2y2+y5;
+  gamma4(singspec(f));
+}
+///////////////////////////////////////////////////////////////////////////////
+
 proc vjacob(poly f)
-"USAGE:   <list> l=vjacob(f);
+"USAGE:   <list> l=vjacob(<poly> f);
 ASSUME:  f defines an isolated hypersurface singularity
 RETURN:  <ideal> l[1] : spectral numbers of the V-filtration on the 
                         Jacobian algebra in increasing order
