@@ -49,8 +49,8 @@ for (d=2; d<9; d=d+1)
                 " "+string(s )+string(e)+string(n)+string(d);
                 " 1"+string(o)+string(r)+string(e);
                 "1"+string(o)+string(n)+string(e)+string(y);
-                $
-              }
+	LIB "tst.lib";tst_status(1);$
+                      }
             }
           }
         }
@@ -58,4 +58,3 @@ for (d=2; d<9; d=d+1)
     }
   }
 }
-LIB "tst.lib";tst_status(1);$

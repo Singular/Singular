@@ -116,7 +116,7 @@ proc check_std_all(int n, list olist)
 
 option(prot);
 
-check_std_all(9, orderings)
+check_std_all(9, orderings);
 
 LIB "tst.lib";tst_status(1);$
 
