@@ -1,5 +1,5 @@
 /*
- * $Id: grammar.y,v 1.5 2000-01-27 12:40:54 krueger Exp $
+ * $Id: grammar.y,v 1.6 2000-02-14 21:41:59 krueger Exp $
  */
 
 %{
@@ -22,7 +22,7 @@ extern moddef module_def;
 extern int yylineno;
  
 extern int init_modgen(moddef *module_def, char *filename);
-extern void write_intro(moddefv module);
+extern int write_intro(moddefv module);
 extern void write_mod_init(FILE *fp);
 extern void enter_id(FILE *fp, char *name, char *value,
                      int lineno, char *file);
@@ -38,6 +38,8 @@ void yyerror(char * fmt)
 
 /* %expect 22 */
 %pure_parser
+
+%token MCOLONCOLON
 
 /* special symbols */
 %token <i> MMODULE_CMD
@@ -55,6 +57,7 @@ void yyerror(char * fmt)
 /*%token PROCEND*/
 %token PROCDECLTOK
 %token EXAMPLETOK
+%token STATICTOK
 
 /* BISON Declarations */
 
@@ -84,9 +87,9 @@ goal: part1 sect2 sect2end code
 
 part1: initmod sect1 sect1end
         {
-         write_intro(&module_def);
-        }
-        ;
+         if(write_intro(&module_def))
+           myyyerror("Error while creating files\n");
+        };
 
 initmod:
         MCCODETOK
@@ -138,6 +141,8 @@ expr:   NAME '=' MSTRINGTOK
               default: break;
                 
           }
+          free($1);
+          free($3);
         }
         | NAME '=' FILENAME
         { var_token vt;
@@ -154,6 +159,8 @@ expr:   NAME '=' MSTRINGTOK
               default: break;
                 
           }
+          free($1);
+          free($3);
         }
         | NAME '=' files
         { var_token vt;
@@ -170,6 +177,8 @@ expr:   NAME '=' MSTRINGTOK
               default: break;
                 
           }
+          free($1);
+          //free($3);
         }
         | NAME '=' NUMTOK
         { var_token vt;
@@ -186,6 +195,7 @@ expr:   NAME '=' MSTRINGTOK
               default: break;
                 
           }
+          free($1);
         }
         | NAME '=' BOOLTOK
         { var_token vt;
@@ -213,12 +223,15 @@ expr:   NAME '=' MSTRINGTOK
               default: break;
                 
           }
+          free($1);
         }
 ;
 
 files:  FILENAME ',' FILENAME
         {
           printf(">>>>>>>>files '%s' , '%s'\n", $1, $3);
+          free($1);
+          free($3);
         }
 ;
 
@@ -233,6 +246,8 @@ sect2end: SECT2END
         }
         ;
 
+/*
+ */
 procdef: procdecl proccode
         {
           printf("PROCDEF:\n");
@@ -240,6 +255,7 @@ procdef: procdecl proccode
         | procdecl proccode procdeclexample
         {
           printf("PROCDEF mit example:\n");
+          fflush(module_def.fmtfp);
         }
         ;
 
@@ -255,45 +271,88 @@ procdecl: procdecl2 '{'
 
 procdecl1: PROCDECLTOK NAME
         {
-          init_proc(&procedure_decl, $2, NULL, yylineno);
+          init_proc(&procedure_decl, $2, NULL, yylineno, LANG_SINGULAR);
+          free($2); 
+          if(write_singular_procedures(&module_def, &procedure_decl))
+            myyyerror("Error while creating bin-file\n");
         }
-        | PROCDECLTOK VARTYPETOK NAME
+        | STATICTOK PROCDECLTOK NAME
         {
-          init_proc(&procedure_decl, $3, &$2, yylineno);
-        }
+          init_proc(&procedure_decl, $3, NULL, yylineno, LANG_SINGULAR);
+          procedure_decl.is_static = TRUE;
+          free($3);
+          if(write_singular_procedures(&module_def, &procedure_decl))
+            myyyerror("Error while creating bin-file\n");
+        };
 
-procdecl2: procdecl1
+procdecl2: procdecl1 '(' sgtypelist ')'
+        | funcdecl1
+        | funcdecl1 '(' ')'
+        | funcdecl1 '(' typelist ')'
+        | procdecl1
+         {
+           write_singular_parameter(&module_def, yylineno, "list", "#");
+         }
         | procdecl1 '(' ')'
-        | procdecl1 '(' typelist ')'
+         {
+           write_singular_parameter(&module_def, yylineno, "list", "#");
+         }
         ;
 
+funcdecl1: NAME
+        {
+          printf("funcdecl1-1\n");
+          init_proc(&procedure_decl, $1, NULL, yylineno);
+          free($1);
+        }
+        | VARTYPETOK NAME
+        {
+          printf("funcdecl1-2\n");
+          init_proc(&procedure_decl, $2, &$1, yylineno);
+          free($2);
+        }
+        | STATICTOK NAME
+        {
+          printf("funcdecl1-3\n");
+          init_proc(&procedure_decl, $2, NULL, yylineno);
+          free($2);
+          procedure_decl.is_static = TRUE;
+        }
+        | STATICTOK VARTYPETOK NAME
+        {
+          printf("funcdecl1-4\n");
+          init_proc(&procedure_decl, $3, &$2, yylineno);
+          free($3);
+          procedure_decl.is_static = TRUE;
+        };
+
+  
 procdeclhelp: MSTRINGTOK
         {
-          procedure_decl.help_string = strdup($1);
+          procedure_decl.help_string = $1;
+          printf("\t\thelp=%p, %d\n", procedure_decl.help_string, strlen($1));
         }
         ;
 
 proccode: proccodeline MCODETOK
           {
-            write_function_errorhandling(&procedure_decl, module_def.fmtfp);
+            write_function_errorhandling(&module_def, &procedure_decl);
           };
 
 
 proccodeline: CODEPART
         {
-          fprintf(module_def.fmtfp, "#line %d \"%s\"\n",
-					  yylineno-1, module_def.filename);
-          fprintf(module_def.fmtfp, "%s", $1);
+          write_codeline(&module_def, &procedure_decl, $1, yylineno-1);
         }
         | proccodeline CODEPART
         {
-          fprintf(module_def.fmtfp, "%s", $2);
+          write_codeline(&module_def, &procedure_decl, $2);
         }
         | proccodeline proccmd
         {
         };
 
-procdeclexample: EXAMPLETOK examplecodeline MCODETOK
+procdeclexample: EXAMPLETOK '{' examplecodeline MCODETOK
         {
           printf("Example\n");
           if(procedure_decl.procname != NULL) {
@@ -309,16 +368,26 @@ examplecodeline: CODEPART
         {
           printf(">>1\n");
           procedure_decl.example_len = strlen($1);
-          procedure_decl.example_string = malloc(strlen($1));
-          strncpy(procedure_decl.example_string, $1, strlen($1));
+          procedure_decl.example_string = (char *)malloc(strlen($1)+1);
+          memset(procedure_decl.example_string, 0, strlen($1)+1);
+          memcpy(procedure_decl.example_string, $1, strlen($1));
         }
         | examplecodeline CODEPART
         {
-          printf(">>2\n");
-          procedure_decl.example_len += strlen($2);
+          long newlen = procedure_decl.example_len + strlen($2);
+          //procedure_decl.example_len += strlen($2);
+          printf(">>2 (%d+%d) %p\n", procedure_decl.example_len, strlen($2),
+                 procedure_decl.example_string);
           procedure_decl.example_string =
-            realloc(procedure_decl.example_string, procedure_decl.example_len);
-          strcat(procedure_decl.example_string, $2);
+            (char *)realloc((void *)procedure_decl.example_string, newlen);
+          printf(">>2 (%d)\n", procedure_decl.example_len);
+          memset(procedure_decl.example_string+procedure_decl.example_len,
+                 0, strlen($2));
+          memcpy(procedure_decl.example_string+procedure_decl.example_len,
+                 $2, strlen($2));
+          
+          //strncat(procedure_decl.example_string, $2, strlen($2));
+          //procedure_decl.example_string[procedure_decl.example_len] = '\0';
           printf(">>2b\n");
         };
 
@@ -362,15 +431,93 @@ proccmd: '%' NAME ';'
                       yylineno, $2, sectnum);
           }
           free($2); free($4);
+        }
+        | '%' NAME '(' identifier '(' arglist ')' ')' ';'
+        {
+          cmd_token vt;
+          void (*write_cmd)(moddefv module, procdefv pi, void *arg = NULL);
+          
+          if( (vt=checkcmd($2, &write_cmd, 1)) ) {
+            //write_cmd(&module_def, &procedure_decl, $4);
+          }
+          else {
+            myyyerror("Line %d: Unknown command '%s' in section %d\n",
+                      yylineno, $2, sectnum);
+          }
+          free($2);
         };
+
+identifier: NAME
+        {
+          printf("### Name %s\n", $1);
+        }
+        | identifier MCOLONCOLON NAME
+        {
+          printf("### Name %s\n", $3);
+        };
+
+arglist: NAME
+        {
+          printf("### ARGS %s\n", $1);
+        }
+        | arglist ',' NAME
+        {
+          printf("### ARGS %s\n", $3);
+        };
+        
+sgtypelist: VARTYPETOK NAME
+        {
+          printf("\tsgtypelist %s %s\n", $1.name, $2);
+          write_singular_parameter(&module_def, yylineno, $1.name, $2);
+          free($1.name);
+          free($2);
+        }
+        | VARTYPETOK '#'
+        {
+          printf("\tsgtypelist %s %s\n", $1.name, $2);
+          write_singular_parameter(&module_def, yylineno, $1.name, "#");
+          free($1.name);
+        }
+        | sgtypelist ',' VARTYPETOK NAME
+        {
+          printf("\tsgtypelist next  %s %s\n", $3.name, $4);
+          write_singular_parameter(&module_def, yylineno, $3.name, $4);
+          free($3.name);
+          free($4);
+        }
+        | sgtypelist ',' VARTYPETOK '#'
+        {
+          printf("\tsgtypelist next  %s %s\n", $3.name, $4);
+          write_singular_parameter(&module_def, yylineno, $3.name, "#");
+          free($3.name);
+        }
+        ;
 
 typelist: VARTYPETOK
         {
           AddParam(&procedure_decl, &$1);
+          free($1.name);
+        }
+        | VARTYPETOK NAME
+        {
+          if(check_reseverd($2)) 
+            myyyerror("Line %d: variablename '%s' is reserved\n",
+                            yylineno, $2);
+          AddParam(&procedure_decl, &$1, $2);
+          free($1.name); free($2);
         }
         | typelist ',' VARTYPETOK
         {
           AddParam(&procedure_decl, &$3);
+          free($3.name);
+        }
+        | typelist ',' VARTYPETOK NAME
+        {
+          if(check_reseverd($4)) 
+            myyyerror("Line %d: variablename '%s' is reserved\n",
+                            yylineno, $4);
+          AddParam(&procedure_decl, &$3, $4);
+          free($3.name); free($4);
         }
         ;
 
