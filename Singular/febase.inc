@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.inc,v 1.6 1998-04-07 17:50:20 Singular Exp $ */
+/* $Id: febase.inc,v 1.7 1998-04-28 08:57:23 pohl Exp $ */
 /*
 * ABSTRACT: handling of 'voices'
 */
@@ -557,6 +557,20 @@ NewRead:
   }
 }
 
+#ifdef __MWERKS__
+#ifdef __cplusplus
+extern "C" {
+#endif
+#ifdef macintosh
+int    isatty(int filedes);
+#else
+int    _isatty(int filedes);
+#define isatty  _isatty
+#endif /* macintosh */
+#ifdef __cplusplus
+}
+#endif
+#endif
 /*2
 * init all data structures
 */
