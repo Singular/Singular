@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.64 1998-08-04 16:54:07 Singular Exp $ */
+/* $Id: febase.cc,v 1.65 1998-08-05 16:05:30 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -920,6 +920,9 @@ void WarnS(const char *s)
     PrintTCLS('W',"\n");
   }
   else
+#endif
+#ifdef HAVE_MPSR
+  if (!feBatch) /* ignore warnings in febatch-mode */
 #endif
   {
     fwrite(warn_str,1,6,stdout);
