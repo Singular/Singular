@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.19 2003-03-11 16:49:55 levandov Exp $ */
+/* $Id: gring.h,v 1.20 2003-03-14 21:36:53 levandov Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -19,6 +19,7 @@ poly nc_pp_Mult_mm(poly p, poly m, const ring r, poly &last);
 poly nc_p_Mult_mm(poly p, poly m, const ring r);
 poly nc_p_Minus_mm_Mult_qq(poly p, const poly m, poly q, const ring r);
 // other routines we need in addition :
+poly nc_p_Mult_mm_Common(poly p, const poly m, int side, const ring r);
 poly nc_mm_Mult_p(const poly m, poly p, const ring r);
 poly nc_mm_Mult_nn (int *F, int *G, const ring r); 
 poly nc_mm_Mult_uu (int *F,int jG,int bG, const ring r);

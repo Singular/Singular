@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.33 2003-03-13 16:51:43 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.34 2003-03-14 21:36:51 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -22,15 +22,26 @@
 #include "sbuckets.h"
 #include "prCopy.h"
 #include "ipid.h"
+#include "p_Mult_q.h"
 
 /* global nc_macros : */
 #define freeT(A,v) omFreeSize((ADDRESS)A,(v+1)*sizeof(int))
 #define freeN(A,k) omFreeSize((ADDRESS)A,k*sizeof(number))
 
 /* poly functions defined in p_Procs : */
-poly nc_pp_Mult_mm(poly p, const poly m, const ring r, poly &last)
+poly nc_pp_Mult_mm(poly p, poly m, const ring r, poly &last)
 {
-  return(nc_p_Mult_mm(p_Copy(p,r),m,r));
+  return( nc_p_Mult_mm_Common(p_Copy(p,r), m, 1, r) );
+}
+
+poly nc_p_Mult_mm(poly p, const poly m, const ring r)
+{
+  return( nc_p_Mult_mm_Common(p, m, 1, r) );
+}
+
+poly nc_mm_Mult_p(const poly m, poly p, const ring r)
+{
+  return( nc_p_Mult_mm_Common(p, m, 0, r) );
 }
 
 /* poly nc_p_Mult_mm(poly p, poly m, const ring r); defined below */
@@ -69,8 +80,9 @@ poly _nc_p_Mult_q(poly p, poly q, const int copy, const ring r)
   return(res);
 }
 
-poly  nc_p_Mult_mm(poly p, const poly m, const ring r)
-/* p is poly, m is mono with coeff, p killed after */
+poly nc_p_Mult_mm_Common(poly p, const poly m, int side, const ring r)
+/* p is poly, m is mono with coeff, destroys p */
+/* if side==1, computes p_Mult_mm; otherwise, mm_Mult_p */
 {
   if ((p==NULL) || (m==NULL)) return NULL;
   /*  if (pNext(p)==NULL) return(nc_mm_Mult_nn(p,pCopy(m),r)); */
@@ -93,14 +105,16 @@ poly  nc_p_Mult_mm(poly p, const poly m, const ring r)
   const int expM=p_GetComp(m,r);
   int expP=0;
   int expOut=0;
-
-  sBucket_pt bu_out=sBucketCreate(r);
+  /* bucket constraints: */
+  int UseBuckets=1;
+  if (pLength(p)< MIN_LENGTH_BUCKET || TEST_OPT_NOT_BUCKETS) UseBuckets=0;
+  sBucket_pt bu_out;
+  poly out=NULL;
+  if (UseBuckets) bu_out=sBucketCreate(r);
 
   while (p!=NULL)
   {
-    //v=p_Head(p,r);
 #ifdef PDEBUG
-    //    p_Test(v,r);
     p_Test(p,r);
 #endif
     expP=p_GetComp(p,r);
@@ -117,104 +131,39 @@ poly  nc_p_Mult_mm(poly p, const poly m, const ring r)
       else
       {
         /* REPORT_ERROR */
-        Print("nc_p_Mult_mm: exponent mismatch %d and %d\n",expP,expM);
+	const char* s;
+	if (side==1) s="nc_p_Mult_mm";
+	else s="nc_mm_Mult_p";
+	
+	  Print("%s: exponent mismatch %d and %d\n",s,expP,expM);
         expOut=0;
       }
     }
     p_GetExpV(p,P,r);
     cP=p_GetCoeff(p,r);
     cOut=n_Mult(cP,cM,r);
-    //p_Delete(&v,r);
-    v = nc_mm_Mult_nn(P,M,r);
-    v = p_Mult_nn(v,cOut,r);
-    p_SetCompP(v,expOut,r);
-    /* hats off before buckets! */
-    sBucket_Add_p(bu_out,v,pLength(v));
-    /*    out = p_Add_q(out,v,r); */
-    p_DeleteLm(&p,r);
-    //p=p_LmDeleteAndNext(p,r);
-  }
-  freeT(P,rN);
-  freeT(M,rN);
-  poly out=NULL;
-  int len=pLength(out);
-  sBucketDestroyAdd(bu_out, &out, &len);
-#ifdef PDEBUG
-  p_Test(out,r);
-#endif
-  return(out);
-}
-
-poly nc_mm_Mult_p(const poly m, poly p, const ring r)
-/* p is poly, m is mono with coeff, p killed after */
-/* former pMultT2 */
-{
-  if ((p==NULL) || (m==NULL)) return(NULL);
-  /*  if (pNext(p)==NULL) return(nc_mm_Mult_nn(p,pCopy(m),r)); */
-  /* excluded  - the cycle will do it anyway - OK.*/
-  if (p_IsConstant(m,r)) return(p_Mult_nn(p,p_GetCoeff(m,r),r));
-
-#ifdef PDEBUG
-  p_Test(p,r);
-  p_Test(m,r);
-#endif
-  poly v=NULL;
-  int rN=r->N;
-  int *P=(int *)omAlloc0((rN+1)*sizeof(int));
-  int *M=(int *)omAlloc0((rN+1)*sizeof(int));
-  /* coefficients: */
-  number cP,cM,cOut;
-  p_GetExpV(m,M,r);
-  cM=p_GetCoeff(m,r);
-  /* components:*/
-  const int expM=p_GetComp(m,r);
-  int expP=0;
-  int expOut=0;
-
-  sBucket_pt bu_out=sBucketCreate(r);
-
-  while (p!=NULL)
-  {
-    //    v=p_Head(p,r);
-#ifdef PDEBUG
-    //    p_Test(v,r);
-    p_Test(p,r);
-#endif
-    expP=p_GetComp(p,r);
-    if (expP==0)
+    if (side==1)
     {
-      expOut=expM;
+      v = nc_mm_Mult_nn(P, M, r);      
     }
     else
     {
-      if (expM==0)
-      {
-        expOut=expP;
-      }
-      else
-      {
-        /* REPORT_ERROR */
-        Print("nc_mm_Mult_p: exponent mismatch %d and %d\n",expP,expM);
-        expOut=0;
-      }
+      v = nc_mm_Mult_nn(M, P, r);
     }
-    p_GetExpV(p,P,r);
-    cP=p_GetCoeff(p,r);
-    cOut=n_Mult(cP,cM,r);
-    //p_Delete(&v,r);
-    v= nc_mm_Mult_nn(M,P,r);
     v = p_Mult_nn(v,cOut,r);
     p_SetCompP(v,expOut,r);
-    /* hats off before buckets! */
-    sBucket_Add_p(bu_out,v,pLength(v));
-    /* out = p_Add_q(out,v,r); */
+    if (UseBuckets) sBucket_Add_p(bu_out,v,pLength(v));
+    else out = p_Add_q(out,v,r);
     p_DeleteLm(&p,r);
   }
   freeT(P,rN);
   freeT(M,rN);
-  poly out=NULL;
-  int len=pLength(out);
-  sBucketDestroyAdd(bu_out, &out, &len );
+  if (UseBuckets)
+  {
+    out = NULL;
+    int len = pLength(out);
+    sBucketDestroyAdd(bu_out, &out, &len);
+  }
 #ifdef PDEBUG
   p_Test(out,r);
 #endif
@@ -283,9 +232,9 @@ poly nc_mm_Mult_nn(int *F0, int *G0, const ring r)
           tpower = tpower + cpower;
         }
       }
-      cff = nCopy(p_GetCoeff(MATELEM(r->nc->COM,1,2),r));
+      cff = n_Copy(p_GetCoeff(MATELEM(r->nc->COM,1,2),r),r);
       nPower(cff,tpower,&tmp_num);
-      nDelete(&cff);
+      n_Delete(&cff,r);
       cff = tmp_num;
     }
     else /* skew commutative with nonequal coeffs */
@@ -301,12 +250,13 @@ poly nc_mm_Mult_nn(int *F0, int *G0, const ring r)
             if (F[i]!=0)
             {
               cpower = F[i]*G[j];
-              cff = nCopy(p_GetCoeff(MATELEM(r->nc->COM,j,i),r));
+              cff = n_Copy(p_GetCoeff(MATELEM(r->nc->COM,j,i),r),r);
               nPower(cff,cpower,&tmp_num);
               cff = nMult(totcff,tmp_num);
-              totcff = nCopy(cff);
-              nDelete(&cff);
+	      nDelete(&totcff);
               nDelete(&tmp_num);
+              totcff = n_Copy(cff,r);
+              n_Delete(&cff,r);
             }
           } /* end 2nd for */
         }
