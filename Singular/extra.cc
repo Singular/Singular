@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.161 2001-02-21 10:08:11 Singular Exp $ */
+/* $Id: extra.cc,v 1.162 2001-02-22 19:12:57 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1213,15 +1213,15 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         {
           for(j=i+1;j<=nv;j++)
           { 
-            currRing->nc->MTsize[UPMATELEM(i,j)]=DefMTsize; /* default sizes */
-            currRing->nc->MT[UPMATELEM(i,j)]=mpNew(DefMTsize,DefMTsize);
+            currRing->nc->MTsize[UPMATELEM(i,j,curring->N)]=DefMTsize; /* default sizes */
+            currRing->nc->MT[UPMATELEM(i,j,curring->N)]=mpNew(DefMTsize,DefMTsize);
             p=pOne();
             pSetCoeff(p,nCopy(pGetCoeff(MATELEM(currRing->nc->C,i,j))));
             pSetExp(p,i,1);
             pSetExp(p,j,1);
             pSetm(p);
             p=pAdd(p,pCopy(MATELEM(currRing->nc->D,i,j)));
-            MATELEM(currRing->nc->MT[UPMATELEM(i,j)],1,1)=p;
+            MATELEM(currRing->nc->MT[UPMATELEM(i,j,curring->N)],1,1)=p;
             /* set MT[i,j,1,1] to c_i_j*x_i*x_j + D_i_j */
           }
         }
