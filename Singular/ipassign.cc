@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.71 2004-04-13 15:38:26 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.72 2005-03-24 10:54:19 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -114,6 +114,50 @@ static BOOLEAN jjSHORTOUT(leftv res, leftv a)
   }
   return FALSE;
 }
+static void jjMINPOLY_red(idhdl h)
+{
+  switch(IDTYP(h))
+  {
+    case NUMBER_CMD:
+    {
+      number n=(number)IDDATA(h);
+      number one = nInit(1);
+      number nn=nMult(n,one);
+      nDelete(&n);nDelete(&one);
+      IDDATA(h)=(char*)nn;
+      break;
+    }
+    case VECTOR_CMD:
+    case POLY_CMD:
+    {
+      poly p=(poly)IDDATA(h);
+      IDDATA(h)=(char*)pMinPolyNormalize(p);
+      break;
+    }
+    case IDEAL_CMD:
+    case MODUL_CMD:
+    case MAP_CMD:
+    case MATRIX_CMD:
+    {
+      int i;
+      ideal I=(ideal)IDDATA(h);
+      for(i=IDELEMS(I)-1;i>=0;i--) I->m[i]=pMinPolyNormalize(I->m[i]);
+      break;
+    }
+    case LIST_CMD:
+    {
+      lists L=(lists)IDDATA(h);
+      int i=L->nr;
+      for(;i>=0;i--)
+      {
+        jjMINPOLY_red((idhdl)&(L->m[i]));
+      }
+    }
+    default: 
+    //case RESOLUTION_CMD:
+       Werror("type %d too complex...set minpoly before",IDTYP(h)); break;
+  }
+}
 static BOOLEAN jjMINPOLY(leftv res, leftv a)
 {
   number p=(number)a->CopyD(NUMBER_CMD);
@@ -138,6 +182,13 @@ static BOOLEAN jjMINPOLY(leftv res, leftv a)
     nNormalize(p);
     currRing->minpoly=p;
     naMinimalPoly=((lnumber)currRing->minpoly)->z;
+    // and now, normalize all already defined objects in this ring
+    idhdl h=currRing->idroot;
+    while(h!=NULL)
+    {
+      jjMINPOLY_red(h);
+      h=IDNEXT(h);
+    }
   }
   return FALSE;
 }
