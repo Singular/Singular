@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.13 1998-01-12 18:59:57 obachman Exp $ */
+/* $Id: ring.cc,v 1.14 1998-01-27 15:57:14 pohl Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -240,7 +240,7 @@ BOOLEAN rCheckIV(intvec *iv)
 static int rTypeOfMatrixOrder(intvec * order)
 {
   int i=0,j,typ=1;
-  int sz = (int)sqrt(order->length()-2);
+  int sz = (int)sqrt((double)(order->length()-2));
   
   while ((i<sz) && (typ==1))
   {
@@ -588,7 +588,7 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
 	  for (l=2;l<iv->length();l++)
 	    tmpR.wvhdl[n][l-2]=(short)(*iv)[l];
 	  tmpR.block0[n]=last+1;
-	  last+=(int)sqrt(iv->length()-2);
+	  last+=(int)sqrt((double)(iv->length()-2));
 	  tmpR.block1[n]=last;
 	  break;
 	}
