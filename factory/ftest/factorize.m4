@@ -1,9 +1,11 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: factorize.m4,v 1.1 1997-11-05 16:11:06 schmidt Exp $ */
+/* $Id: factorize.m4,v 1.2 1998-05-07 15:25:19 schmidt Exp $ */
 
 ftestSetNameOfGame( factorize, `"
-Usage: factorize [<options>] [<envSpec>] <f>
-  factorizes canonical form f.
+Usage: factorize [<options>] [<envSpec>] <f> [<v>]
+  factorizes canonical form <f>.
+  If algebraic variable <v> is specified, factorizes in
+  algebraic extension by <v>.
 "'`' )
 
 //{{{ docu
@@ -33,18 +35,27 @@ main ( int argc, char ** argv )
     // declare input and output variables
     ftestOutVar( CFFList, result );
     ftestInVar( CanonicalForm, f );
+    ftestInVar( Variable, v );
 
     // process argument list and set environment
     ftestGetOpts();
     ftestGetEnv();
     ftestGetInVar( f );
+    ftestGetInVar( v, Variable() );
 
     // do the test!
-    ftestRun(
-	result = factorize( f ); );
+    if ( ftestArgGiven( v ) ) {
+	ftestRun( result = factorize( f, v ); );
+    } else {
+	ftestRun( result = factorize( f ); );
+    }
 
     // print results
-    ftestOutput( "factorize(f)", result );
+    if ( ftestArgGiven( v ) ) {
+	ftestOutput( "factorize(f, v)", result );
+    } else {
+	ftestOutput( "factorize(f)", result );
+    }
 
     // clean up
     ftestMainExit();
