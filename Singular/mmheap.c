@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmheap.c,v 1.8 1999-01-26 14:41:40 obachman Exp $ */
+/* $Id: mmheap.c,v 1.9 1999-07-05 14:13:16 Singular Exp $ */
 
 #include "mod2.h"
 
@@ -345,7 +345,7 @@ void * mmDebugAllocHeap(memHeap heap, const char* fn, int l)
   {
     register memHeap _heap =   heap ; 
     if ((_heap)->current == ((void *)0) ) mmAllocNewHeapPage(_heap); 
-    do { register memHeapPage page = (memHeapPage) ((void*) ((long) (   (_heap)->current   ) & ~(4096  -1)))  ; 
+    do { register memHeapPage page = (memHeapPage) ((void*) ((long) (   (_heap)->current   ) & ~(SIZE_OF_SYSTEM_PAGE  -1)))  ; 
     (page->counter)++; } while (0) ; 
     ((void*) ( res )) = (_heap)->current; 
     (_heap)->current =  *((void**)(_heap)->current); 
