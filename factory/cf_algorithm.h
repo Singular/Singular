@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_algorithm.h,v 1.10 1998-03-12 10:26:47 schmidt Exp $ */
+/* $Id: cf_algorithm.h,v 1.11 1998-06-30 16:31:24 schmidt Exp $ */
 
 #ifndef INCL_CF_ALGORITHM_H
 #define INCL_CF_ALGORITHM_H
@@ -8,16 +8,18 @@
 //
 // cf_algorithm.h - declarations of higher level algorithms.
 //
+// Header file corresponds to: cf_algorithms.cc, cf_chinese.cc,
+//   cf_factor.cc, cf_linsys.cc, cf_resultant.cc
+//
+// Hierarchy: mathematical algorithms on canonical forms
+//
+// Developers note:
+// ----------------
 // This header file collects declarations of most of the
-// functions in factory which implement higher level algorithms
+// functions in Factory which implement higher level algorithms
 // on canonical forms (factorization, gcd, etc.) and declarations
-// of some low level mathematical functions, too (absolute vale,
+// of some low level mathematical functions, too (absolute value,
 // euclidean norm, etc.).
-//
-// This header file corresponds to:
-//
-// cf_algorithms.cc, cf_chinese.cc, cf_factor.cc, cf_linsys.cc,
-// cf_resultant.cc
 //
 //}}}
 
@@ -81,15 +83,20 @@ CanonicalForm resultant ( const CanonicalForm & f, const CanonicalForm & g, cons
 // `sign()'.  If it reports negative sign for `f' than -`f' is
 // returned, otherwise `f'.
 //
-// Most useful for integers and rationals.  May be used to
-// sign-normalize the leading coefficient of arbitrary
-// polynomials, too.
+// This behaviour is most useful for integers and rationals.  But
+// it may be used to sign-normalize the leading coefficient of
+// arbitrary polynomials, too.
+//
+// Type info:
+// ----------
+// f: CurrentPP
 //
 //}}}
 inline CanonicalForm
 abs ( const CanonicalForm & f )
 {
-    // it is not only more general using `sign()', it is faster, too
+    // it is not only more general to use `sign()' instead of a
+    // direct comparison `f < 0', it is faster, too
     if ( sign( f ) < 0 )
 	return -f;
     else
