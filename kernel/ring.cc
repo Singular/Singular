@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.13 2004-08-09 14:44:31 Singular Exp $ */
+/* $Id: ring.cc,v 1.14 2004-08-09 16:16:01 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3468,16 +3468,17 @@ ring rOpp(ring src)
   int i2=(rVar(r)-1)/2;
   for(int i=i2; i>=0; i--)
   {
+    //Print("ex: %d <-> %d\n",i,rVar(r)-1-i);
     // exchange names
     char *p;
     int t;
-    p=r->names[rVar(r)-i];
-    r->names[rVar(r)-i]=r->names[i];
+    p=r->names[rVar(r)-1-i];
+    r->names[rVar(r)-1-i]=r->names[i];
     r->names[i]=p;
     // exchange VarOffset
     t=r->VarOffset[i];
-    r->VarOffset[i]=r->VarOffset[rVar(r)-i];
-    r->VarOffset[rVar(r)-i]=t;
+    r->VarOffset[i]=r->VarOffset[rVar(r)-1-i];
+    r->VarOffset[rVar(r)-1-i]=t;
   }
   // change names:
   for (i=rVar(r)-1; i>=0; i--)
@@ -3488,7 +3489,7 @@ ring rOpp(ring src)
   }
   // change ordering: listing
   // change ordering: compare
-  for(i=0; r->typ[i].ord_typ!=ro_none; i++)
+  for(i=0; i<r->OrdSize; i++)
   {
     int t,tt;
     switch(r->typ[i].ord_typ)
@@ -3530,11 +3531,14 @@ ring rOpp(ring src)
         break;
       case ro_none:
       default:
-       WerrorS("unknown typ in rOpp");
+       Werror("unknown typ in rOpp(%d)",r->typ[i].ord_typ);
        break;
     }
   }
   // avoid printing changed stuff:
-  r->order[0]=0;
+  r->order[0]=ringorder_unspec;
+  r->block0[0]=1;
+  r->block1[0]=rVar(r);
+  rDebugPrint(r);
   return r;
 }
