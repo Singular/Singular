@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps_ip.cc,v 1.1 2003-12-08 16:38:23 Singular Exp $ */
+/* $Id: maps_ip.cc,v 1.2 2004-03-25 21:15:12 levandov Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -242,7 +242,7 @@ poly pSubstPar(poly p, int par, poly image)
 }
 
 /*2
-* substitute the n-th paramter by the poly e in id
+* substitute the n-th parameter by the poly e in id
 * does not destroy id and e
 */
 ideal  idSubstPar(ideal id, int n, poly e)
@@ -264,6 +264,9 @@ ideal  idSubstPar(ideal id, int n, poly e)
 */
 poly pSubstPoly(poly p, int var, poly image)
 {
+#ifdef HAVE_PLURAL
+  return pSubst(pCopy(p),var,image);
+#endif
   map theMap=(map)idMaxIdeal(1);
   theMap->preimage=NULL;
   pDelete(&(theMap->m[var-1]));
