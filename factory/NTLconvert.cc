@@ -1,4 +1,4 @@
-/* $Id: NTLconvert.cc,v 1.9 2003-04-01 17:04:37 Singular Exp $ */
+/* $Id: NTLconvert.cc,v 1.10 2003-04-09 08:01:22 Singular Exp $ */
 #include <config.h>
 
 #include "cf_gmp.h"
@@ -20,10 +20,11 @@
 #include <NTL/ZZXFactoring.h>
 #include <NTL/ZZ_pXFactoring.h>
 #include <NTL/GF2XFactoring.h>
-#include "int_int.h"
-#include <limits.h>
 #include <NTL/ZZ_pEXFactoring.h>
 #include <NTL/GF2EXFactoring.h>
+#include <NTL/tools.h>
+#include "int_int.h"
+#include <limits.h>
 #include "NTLconvert.h"
 
 #ifdef HAVE_OMALLOC
@@ -37,6 +38,11 @@
 #define Alloc(L) malloc(L)
 #define Free(A,L) free(A)
 #endif
+
+#ifdef NTL_CLIENT               // in <NTL/tools.h>: using of name space NTL
+NTL_CLIENT
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 // NAME: convertFacCF2NTLZZpX                                                 //
 //                                                                            //
