@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.83 2000-01-13 14:40:24 siebert Exp $ */
+/* $Id: ideals.cc,v 1.84 2000-01-27 16:53:46 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1362,7 +1362,7 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
     ideal result=idFreeModule(IDELEMS(h1));
     int curr_syz_limit=rGetCurrSyzLimit();
     if (curr_syz_limit>0)
-    for (ii=0;ii<IDELEMS(h1);ii++) 
+    for (ii=0;ii<IDELEMS(h1);ii++)
     {
       if (h1->m[ii]!=NULL)
         pShift(&h1->m[ii],curr_syz_limit);
@@ -1399,7 +1399,7 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
     idDelete(&s_h1);
     for (j=0; j<IDELEMS(s_h3); j++)
     {
-      if (s_h3->m[j] != NULL) 
+      if (s_h3->m[j] != NULL)
       {
         if (pMinComp(s_h3->m[j],syz_ring) > k)
           pShift(&s_h3->m[j], -k);
@@ -1415,7 +1415,7 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
     idTest(s_h3);
     return s_h3;
   }
-  
+
   ideal e = idInit(IDELEMS(s_h3), s_h3->rank);
 
   for (j=0; j<IDELEMS(s_h3); j++)
@@ -1431,11 +1431,11 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
       }
     }
   }
-  
+
   idSkipZeroes(s_h3);
   idSkipZeroes(e);
-  
-  if (deg != NULL 
+
+  if (deg != NULL
   && (!isMonomial)
   && (!TEST_OPT_NOTREGULARITY)
   && (setRegularity)
@@ -1540,7 +1540,7 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
     idDelete(&s_h1);
     rChangeCurrRing(orig_ring,TRUE);
   }
-  
+
   idDelete((ideal*)ma);
   *ma = mpNew(j,i);
 
@@ -1608,39 +1608,33 @@ static void idPrepareStd(ideal s_temp, int k)
 *computes a representation of the generators of submod with respect to those
 * of mod
 */
-ideal   idLiftNonStB (ideal  mod, ideal submod,ideal * rest, BOOLEAN goodShape,
-                    BOOLEAN divide,BOOLEAN lift1)
-{
-  return idLift(mod, submod, rest, goodShape, FALSE);
-}
 
-
-ideal   idLift (ideal mod, ideal submod,ideal * rest, BOOLEAN goodShape, 
-               BOOLEAN isSB,BOOLEAN divide,BOOLEAN lift1)
+ideal   idLift (ideal mod, ideal submod,ideal * rest, BOOLEAN goodShape,
+               BOOLEAN isSB,BOOLEAN divide,matrix * unit)
 {
-  int   lsmod =idRankFreeModule(submod), i, j, k;
+  int lsmod =idRankFreeModule(submod), i, j, k;
   int comps_to_add=0;
   poly p;
 
   if (idIs0(mod))
+  {
+    if (unit!=NULL)
+    {
+      *unit=mpNew(1,1);
+      MATELEM(*unit,1,1)=pOne();
+    }
+    if (rest!=NULL)
+    {
+      *rest=idInit(1,mod->rank);
+    }
     return idInit(1,mod->rank);
-//#define NEW_LIFT
-//#define TEST_LIFT
-#ifdef TEST_LIFT
-//divide=TRUE;
-Print("The module is:\n");
-idPrint(mod);
-Print("The submodule is:\n");
-idPrint(submod);
-#endif
-#ifdef NEW_LIFT
-  if (lift1)
+  }
+  if (unit!=NULL)
   {
     comps_to_add = IDELEMS(submod);
-    while ((comps_to_add>0) && (submod->m[comps_to_add-1]==NULL)) 
+    while ((comps_to_add>0) && (submod->m[comps_to_add-1]==NULL))
       comps_to_add--;
   }
-#endif
   k=idRankFreeModule(mod);
   if  ((k!=0) && (lsmod==0)) lsmod=1;
   k=max(k,1);
@@ -1687,8 +1681,7 @@ idPrint(submod);
         pShift(&(s_temp->m[j-1]),1);
     }
   }
-#ifdef NEW_LIFT
-  if (lift1)
+  if (unit!=NULL)
   {
     for(j = 0;j<comps_to_add;j++)
     {
@@ -1703,7 +1696,6 @@ idPrint(submod);
       }
     }
   }
-#endif
   ideal s_result = kNF(s_h3,currQuotient,s_temp,k);
   s_result->rank = s_h3->rank;
   ideal s_rest = idInit(IDELEMS(s_result),k);
@@ -1753,12 +1745,6 @@ idPrint(submod);
       }
     }
   }
-#ifdef TEST_LIFT
-Print("The lift is:\n");
-idPrint(s_result);
-Print("The rest is:\n");
-if (s_rest!=NULL) idPrint(s_rest);
-#endif
   if(syz_ring!=orig_ring)
   {
     idDelete(&s_mod);
@@ -1771,6 +1757,43 @@ if (s_rest!=NULL) idPrint(s_rest);
     *rest = s_rest;
   else
     idDelete(&s_rest);
+  if (unit!=NULL)
+  {
+    *unit=mpNew(comps_to_add,comps_to_add);
+    int i;
+    int comps=k+comps_to_add;
+    for(i=0;i<IDELEMS(s_result);i++)
+    {
+      poly p=s_result->m[i];
+      poly q=NULL;
+      while(p!=NULL)
+      {
+        if(pGetComp(p)<=comps)
+        {
+          pSetComp(p,0);
+          if (q!=NULL)
+          {
+            pNext(q)=pNext(p);
+          }
+          else
+          {
+	    if(p!=s_result->m[i])
+	      PrintS("wrong q\n"); 
+            pIter(s_result->m[i]);
+          }
+          pNext(p)=NULL;
+          MATELEM(*unit,i+1,i+1)=pAdd(MATELEM(*unit,i+1,i+1),p);
+          if(q!=NULL)   p=pNext(q);
+          else          p=s_result->m[i];
+        }
+        else
+        {
+          q=p;
+          pIter(p);
+        }
+      }
+    }
+  }
   return s_result;
 }
 
@@ -2367,7 +2390,7 @@ ideal idMinors(matrix a, int ar, ideal R)
           pDelete(&q);
         }
         if (p!=NULL)
-        { 
+        {
           if (k>=size)
           {
             pEnlargeSet(&result->m,size,32);
@@ -2957,7 +2980,7 @@ ideal idModulo (ideal h2,ideal h1)
   ring syz_ring=rCurrRingAssure_SyzComp();
   rSetSyzComp(length);
   ideal s_temp;
-  
+
   if (syz_ring != orig_ring)
   {
     s_temp = idrMoveR_NoSort(temp, orig_ring);
@@ -2966,7 +2989,7 @@ ideal idModulo (ideal h2,ideal h1)
   {
     s_temp = temp;
   }
-  
+
   idTest(s_temp);
   ideal s_temp1 = kStd(s_temp,currQuotient,testHomog,&w,NULL,length);
   if (w!=NULL) delete w;
@@ -3218,11 +3241,11 @@ static int idReadOutUnits(ideal arg,int* comp)
 
   while ((i<IDELEMS(arg)) && (generator<0))
   {
-    for (j=rk_arg;j>=0;j--) 
+    for (j=rk_arg;j>=0;j--)
       (*componentIsUsed)[j]=0;
     p = arg->m[i];
     while (p!=NULL)
-    { 
+    {
       j = pGetComp(p);
       if ((*componentIsUsed)[j]==0)
       {

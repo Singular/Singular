@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.78 2000-01-11 17:51:14 Singular Exp $ */
+/* $Id: grammar.y,v 1.79 2000-01-27 16:53:45 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -172,6 +172,7 @@ void yyerror(char * fmt)
 %token <i> DEG_CMD
 %token <i> DIFF_CMD
 %token <i> DIM_CMD
+%token <i> DIVISION_CMD
 %token <i> ELIMINATION_CMD
 %token <i> E_CMD
 %token <i> FETCH_CMD

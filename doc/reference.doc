@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.174 1999-12-17 16:40:41 Singular Exp $
+@comment $Id: reference.doc,v 1.175 2000-01-27 16:53:50 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -72,6 +72,7 @@ brackets are allowed.
 * det::
 * diff::
 * dim::
+* division::
 * dump::
 * eliminate::
 * eval::
@@ -1169,7 +1170,7 @@ See
 @ref{var};
 @c ref
 @c ---------------------------------------
-@node dim, dump, diff, Functions
+@node dim, division, diff, Functions
 @subsection dim
 @cindex dim
 
@@ -1204,8 +1205,54 @@ See
 @ref{vdim};
 @ref{mult}.
 @c ref
+@c -------------------------------------------------
+@node division, dump, dim, Functions
+@subsection division
+@cindex division
+@table @code
+@item @strong{Syntax:}
+@code{division (} ideal_expression@code{,} ideal_expression @code{)}
+@*@code{division (} module_expression@code{,} module_expression @code{)}
+@item @strong{Type:}
+list
+@item @strong{Purpose:}
+computes the transformation matrix which expresses the generators of a
+module @code{sm} in terms of the generators of a module @code{m}
+and a rest @code{R}.
+The first argument represent @code{m}, the second @code{sm}.
+Uses different
+algorithms for modules which are, resp.@: are not, represented by a
+standard basis.
+@* That is, if  @code{m} is the
+module (or ideal), @code{sm} the submodule (or ideal), 
+@code{U} a diagonal matrix of units,
+@code{R} the normal form of @code{sm} w.r.t. @code{m},
+and @code{T} the transformation matrix returned by
+lift, then @code{matrix(sm)*U+matrix(R)=matrix(m)*T}
+and @code{module(sm*U+matrix(R))=module(matrix(m)*T)}
+(or @code{ideal(sm*U+matrix(R))=ideal(matrix(m)*T)}).
+@code{U} is always the unity matrix if the base ring is a polynomial ring
+(not power series ring).
+@*Returns the list @code{T,U,R}
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r;
+  ideal m=3x2+yz,7y6+2x2y+5xz;
+  poly f=y7+x3+xyz+z2;
+  ideal i=jacob(f)+x;
+  division(i,m);
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{ideal};
+@ref{lift};
+@ref{module}.
+@c ref
 @c ---------------------------------------
-@node dump, eliminate, dim, Functions
+@node dump, eliminate, division, Functions
 @subsection dump
 @cindex dump
 @table @code
@@ -2978,6 +3025,8 @@ See
 @item @strong{Syntax:}
 @code{lift (} ideal_expression@code{,} subideal_expression @code{)}
 @*@code{lift (} module_expression@code{,} submodule_expression @code{)}
+@*@code{lift (} ideal_expression@code{,} subideal_expression@code{,} matrix_name @code{)}
+@*@code{lift (} module_expression@code{,} submodule_expression@code{,} matrix_name @code{)}
 @item @strong{Type:}
 matrix
 @item @strong{Purpose:}
@@ -2986,14 +3035,16 @@ submodule in terms of the generators of a module.  Uses different
 algorithms for modules which are, resp.@: are not, represented by a
 standard basis.
 @* That is, if  @code{m} is the
-module (or ideal), @code{sm} the submodule (or ideal), and @code{T}
-the transformation matrix returned by
-lift, then @code{matrix(sm)=matrix(m)*T}
-and @code{sm=module(matrix(m)*T)} (or @code{sm=ideal(matrix(m)*T)}).
+module (or ideal), @code{sm} the submodule (or ideal), 
+@code{U} a diagonal matrix of units
+and @code{T} the transformation matrix returned by
+lift, then @code{matrix(sm)*U=matrix(m)*T}
+and @code{module(sm*U)=module(matrix(m)*T)}
+(or @code{ideal(sm*U)=ideal(matrix(m)*T)}).
+@code{U} is always the unity matrix if the base ring is a polynomial ring
+(not power series ring).
 Gives a warning if @code{sm} is not a submodule.
-@item @strong{Note:}
-For local or mixed orderings this holds only up to units in the associated
-localized ring.
+@*In the optional third argument @code{U} will be stored.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -3008,6 +3059,7 @@ localized ring.
 @end table
 @c ref
 See
+@ref{division};
 @ref{ideal};
 @ref{module}.
 @c ref

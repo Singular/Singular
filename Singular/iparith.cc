@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.200 2000-01-13 14:18:58 siebert Exp $ */
+/* $Id: iparith.cc,v 1.201 2000-01-27 16:53:47 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -148,6 +148,7 @@ cmdnames cmds[] =
   { "diff",        0, DIFF_CMD ,          CMD_2},
   { "dim",         0, DIM_CMD ,           CMD_1},
   { "div",         0, INTDIV_CMD ,        MULDIV_OP},
+  { "division",    0, DIVISION_CMD ,      CMD_2},
 #ifdef DRING
   { "dring",       0, DRING_CMD ,         DRING_CMD},
 #endif
@@ -1481,6 +1482,26 @@ static BOOLEAN jjDIM2(leftv res, leftv v, leftv w)
   }
   return FALSE;
 }
+static BOOLEAN jjDIVISION(leftv res, leftv u, leftv v)
+{
+  ideal ui=(ideal)u->Data();
+  int ul= IDELEMS(ui);
+  ideal vi=(ideal)v->Data();
+  int vl= IDELEMS(vi);
+  ideal R; matrix U;
+  ideal m = idLift(ui,vi,&R, FALSE,hasFlag(u,FLAG_STD),FALSE,&U);
+  matrix T = idModule2formatedMatrix(m,ul,vl);
+  lists L=(lists)AllocSizeOf(slists);
+  L->Init(3);
+  L->m[0].rtyp=MATRIX_CMD;
+  L->m[0].data=(void *)T;
+  L->m[1].rtyp=MATRIX_CMD;
+  L->m[1].data=(void *)U;
+  L->m[2].rtyp=u->Typ();
+  L->m[2].data=(void *)R;
+  res->data=(char *)L;
+  return FALSE;
+}
 static BOOLEAN jjEXTGCD_I(leftv res, leftv u, leftv v)
 {
   int p0=ABS((int)u->Data()),p1=ABS((int)v->Data());
@@ -1724,26 +1745,8 @@ static BOOLEAN jjLIFT(leftv res, leftv u, leftv v)
   ideal m;
   int ul= IDELEMS((ideal)u->Data());
   int vl= IDELEMS((ideal)v->Data());
-  //if (currRing->OrdSgn==-1) ul += vl;  //to add if NEW_LIFT defined
-  if (hasFlag(u,FLAG_STD))
-  {
-    m = idLift((ideal)u->Data(),(ideal)v->Data());
-    res->data = (char *)idModule2formatedMatrix(m,ul,vl);
-  }
-  else
-  {
-    // matrix ma=mpNew(1,1);
-    // ideal mo=idLiftStd((ideal)u->CopyD(),currQuotient,&ma,testHomog);
-    // m = idLift(mo,(ideal)v->Data());
-    // matrix r=idModule2formatedMatrix(m, IDELEMS(mo),vl);
-    // idDelete(&mo);
-    // // idDelete(&m); already done by idModule2formatedMatrix
-    // res->data=(char *)mpMult(ma,r);
-    // idDelete((ideal *)&ma);
-    // idDelete((ideal *)&r);
-    m = idLiftNonStB((ideal)u->Data(),(ideal)v->Data());
-    res->data = (char *)idModule2formatedMatrix(m,ul,vl);
-  }
+  m = idLift((ideal)u->Data(),(ideal)v->Data(),NULL,FALSE,hasFlag(u,FLAG_STD));
+  res->data = (char *)idModule2formatedMatrix(m,ul,vl);
   return FALSE;
 }
 static BOOLEAN jjLIFTSTD(leftv res, leftv u, leftv v)
@@ -2159,6 +2162,8 @@ struct sValCmd2 dArith2[]=
 ,{jjEQUAL_Ma,  EQUAL_EQUAL,    INT_CMD,        MATRIX_CMD, MATRIX_CMD PROFILER}
 ,{jjWRONG2,    EQUAL_EQUAL,    0,              IDEAL_CMD,  IDEAL_CMD PROFILER}
 ,{jjWRONG2,    EQUAL_EQUAL,    0,              MODUL_CMD,  MODUL_CMD PROFILER}
+,{jjWRONG2,    EQUAL_EQUAL,    0,              IDEAL_CMD,  MODUL_CMD PROFILER}
+,{jjWRONG2,    EQUAL_EQUAL,    0,              MODUL_CMD,  IDEAL_CMD PROFILER}
 ,{jjEQUAL_I,   NOTEQUAL,       INT_CMD,        INT_CMD,    INT_CMD PROFILER}
 ,{jjEQUAL_N,   NOTEQUAL,       INT_CMD,        NUMBER_CMD, NUMBER_CMD PROFILER}
 ,{jjCOMPARE_S, NOTEQUAL,       INT_CMD,        STRING_CMD, STRING_CMD PROFILER}
@@ -2169,6 +2174,8 @@ struct sValCmd2 dArith2[]=
 ,{jjEQUAL_Ma,  NOTEQUAL,       INT_CMD,        MATRIX_CMD, MATRIX_CMD PROFILER}
 ,{jjWRONG2,    NOTEQUAL,       0,              IDEAL_CMD,  IDEAL_CMD PROFILER}
 ,{jjWRONG2,    NOTEQUAL,       0,              MODUL_CMD,  MODUL_CMD PROFILER}
+,{jjWRONG2,    NOTEQUAL,       0,              IDEAL_CMD,  MODUL_CMD PROFILER}
+,{jjWRONG2,    NOTEQUAL,       0,              MODUL_CMD,  IDEAL_CMD PROFILER}
 ,{jjDOTDOT,    DOTDOT,         INTVEC_CMD,     INT_CMD,    INT_CMD PROFILER}
 ,{jjINDEX_I,   '[',            INT_CMD,        INTVEC_CMD, INT_CMD PROFILER}
 ,{jjINDEX_IV,  '[',            INT_CMD,        INTVEC_CMD, INTVEC_CMD PROFILER}
@@ -2207,6 +2214,8 @@ struct sValCmd2 dArith2[]=
 ,{jjDIFF_ID,   DIFF_CMD,       MATRIX_CMD,     MATRIX_CMD, POLY_CMD PROFILER}
 ,{jjDIM2,      DIM_CMD,        INT_CMD,        IDEAL_CMD,  IDEAL_CMD PROFILER}
 ,{jjDIM2,      DIM_CMD,        INT_CMD,        MODUL_CMD,  IDEAL_CMD PROFILER}
+,{jjDIVISION,  DIVISION_CMD,   LIST_CMD,       IDEAL_CMD,  IDEAL_CMD PROFILER}
+,{jjDIVISION,  DIVISION_CMD,   LIST_CMD,       MODUL_CMD,  MODUL_CMD PROFILER}
 ,{jjELIMIN,    ELIMINATION_CMD,IDEAL_CMD,      IDEAL_CMD,  POLY_CMD PROFILER}
 ,{jjELIMIN,    ELIMINATION_CMD,MODUL_CMD,      MODUL_CMD,  POLY_CMD PROFILER}
 ,{jjEXTGCD_I,  EXTGCD_CMD,     LIST_CMD,       INT_CMD,    INT_CMD PROFILER}
@@ -4182,21 +4191,13 @@ static BOOLEAN jjMATRIX_Ma(leftv res, leftv u, leftv v,leftv w)
 }
 static BOOLEAN jjLIFT3(leftv res, leftv u, leftv v, leftv w)
 {
-  int sw=(int)w->Data();
-  if (sw==0)
-  {
-    return jjLIFT(res,u,v);
-  }
-  else
-  {
-    ideal m;
-    ideal ui=(ideal)u->Data();
-    ideal vi=(ideal)v->Data();
-    int ul= IDELEMS(ui);
-    int vl= IDELEMS(vi);
-    m = idLiftNonStB(ui,vi, sw);
-    res->data = (char *)idModule2formatedMatrix(m,ul,vl);
-  }
+  if (w->rtyp!=IDHDL) return TRUE;
+  int ul= IDELEMS((ideal)u->Data());
+  int vl= IDELEMS((ideal)v->Data());
+  ideal m 
+    = idLift((ideal)u->Data(),(ideal)v->Data(),NULL,FALSE,hasFlag(u,FLAG_STD),
+             FALSE, (matrix *)(&(IDMATRIX((idhdl)(w->data)))));
+  res->data = (char *)idModule2formatedMatrix(m,ul,vl);
   return FALSE;
 }
 static BOOLEAN jjREDUCE3_P(leftv res, leftv u, leftv v, leftv w)
@@ -4327,7 +4328,8 @@ struct sValCmd3 dArith3[]=
 ,{jjRES3,           MRES_CMD,   NONE,       IDEAL_CMD,  INT_CMD,    ANY_TYPE }
 ,{jjRES3,           MRES_CMD,   NONE,       MODUL_CMD,  INT_CMD,    ANY_TYPE }
 #endif
-,{jjLIFT3,          LIFT_CMD,   MATRIX_CMD, IDEAL_CMD,  IDEAL_CMD,  INT_CMD }
+,{jjLIFT3,          LIFT_CMD,   MATRIX_CMD, IDEAL_CMD,  IDEAL_CMD,  MATRIX_CMD }
+,{jjLIFT3,          LIFT_CMD,   MATRIX_CMD, MODUL_CMD,  MODUL_CMD,  MATRIX_CMD }
 ,{jjPREIMAGE,       PREIMAGE_CMD, IDEAL_CMD, RING_CMD,  ANY_TYPE,   ANY_TYPE }
 ,{jjPREIMAGE,       PREIMAGE_CMD, IDEAL_CMD, QRING_CMD, ANY_TYPE,   ANY_TYPE }
 ,{jjRANDOM_Im,      RANDOM_CMD, INTMAT_CMD, INT_CMD,    INT_CMD,    INT_CMD }
