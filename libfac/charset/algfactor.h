@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-// $Id: algfactor.h,v 1.2 1997-09-12 07:19:39 Singular Exp $
+// $Id: algfactor.h,v 1.3 2002-08-19 11:11:30 Singular Exp $
 ////////////////////////////////////////////////////////////
 
 #ifndef INCL_ALGFACTOR_H
@@ -15,6 +15,7 @@ CanonicalForm algcd(const CanonicalForm & f, const CanonicalForm & g, const CFLi
 CFFList factoras( const CanonicalForm & f, const CFList & as, int & success );
 CFFList cfactor(const CanonicalForm & f, const CFList & as, int success );
 /*BEGINPUBLIC*/
+int hasVar(const CanonicalForm &f, const Variable &v);
 /*ENDPUBLIC*/
 
 #endif /* INCL_ALGFACTOR_H */

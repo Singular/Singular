@@ -1,6 +1,6 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: Factor.cc,v 1.13 2002-07-30 17:06:47 Singular Exp $ ";
+static char * rcsid = "$Id: Factor.cc,v 1.14 2002-08-19 11:11:32 Singular Exp $ ";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de \nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -464,7 +464,7 @@ evaluate( int maxtries, int sametries, int failtries, const CanonicalForm &f , c
       else
       {
         unilist = factorize(g,Extension);
-      }	
+      }        
       if (unilist.length() <= minfactors ) {
         minfactors=unilist.length();
         minEvaluation=Substitutionlist;
@@ -520,9 +520,9 @@ find_evaluation(int maxtries, int sametries, int failtries, const CanonicalForm 
 // Returns the list of factors.                              //
 ///////////////////////////////////////////////////////////////
 CFFList
-Factorized( const CanonicalForm & F, const Variable & alpha, int Mainvar){
+Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar){
   CanonicalForm f,lt,ff,ffuni;
-  Variable Extension=alpha;
+  Variable Extension=alpha.mvar();
   CFFList Outputlist,UnivariateFactorlist,Outputlist2;
   SFormList Substitutionlist, Evaluationpoint;
   CFFactor copy;
@@ -545,7 +545,20 @@ Factorized( const CanonicalForm & F, const Variable & alpha, int Mainvar){
                degree(getMipo(Extension,'x')) );
       TIMING_START(evaluate_time);
      #if 1
-      Outputlist = factorize(F,Extension);
+      if (Extension.level() <0)
+        Outputlist = factorize(F,Extension);
+      else
+      {
+        Variable X=rootOf(alpha);
+	CFFList L=factorize(F,X);
+	CFFListIterator i=L;
+	for(;i.hasItem(); i++ )
+	{
+	  Outputlist.append(CFFactor(
+	    replacevar(i.getItem().factor(),X,Extension),
+	    i.getItem().exp()));
+	}    
+      }	
      #else
       Variable X;
       CanonicalForm mipo=getMipo(Extension,X);
@@ -852,7 +865,7 @@ Factorize(const CanonicalForm & F, int is_SqrFree ){
     }
     swapvar(F,Variable(mv),F.mvar());
   }
-											 
+                                                                                         
   DEBDECLEVEL(cout, "Factorize");
   TIMING_END(factorize_time);
 
@@ -873,7 +886,7 @@ Factorize(const CanonicalForm & F, int is_SqrFree ){
 //           * ensuring poly is sqrfree (n.y.i.)             //
 ///////////////////////////////////////////////////////////////
 CFFList
-Factorize(const CanonicalForm & F, Variable minpoly, int is_SqrFree ){
+Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree ){
   CFFList Outputlist,SqrFreeList,Intermediatelist,Outputlist2;
   ListIterator<CFFactor> i,j;
   CanonicalForm g=1,unit=1,r=1;
@@ -888,11 +901,22 @@ Factorize(const CanonicalForm & F, Variable minpoly, int is_SqrFree ){
   DEBINCLEVEL(cout, "Factorize");
   DEBOUTMSG(cout, rcsid);
   DEBOUTLN(cout, "Called with F= ", F);
-  if ( getCharacteristic() == 0 ) { // char == 0
+  if ( getCharacteristic() == 0 )
+  { // char == 0
     TIMING_START(factorize_time);
     //cout << "Factoring in char=0 of " << F << " = " << Outputlist << endl;
+    #if 0
     // SHOULD: Outputlist= factorize(F,minpoly);
     Outputlist= factorize(F);
+    #else
+    if (minpoly!=0)
+    {
+      CFList as(minpoly);
+      Outputlist = newfactoras( F, as, 1);
+    }
+    else
+      Outputlist=factorize(F);
+    #endif
     // Factorization in char=0 doesn't sometimes return at least two elements!!!
     if ( getNumVars(Outputlist.getFirst().factor()) != 0 )
       Outputlist.insert(CFFactor(1,1));
@@ -921,7 +945,7 @@ Factorize(const CanonicalForm & F, Variable minpoly, int is_SqrFree ){
   //  if ( ! SqrFreeTest(F) ){
   if ( ! is_SqrFree ){
     TIMING_START(sqrfree_time);
-    SqrFreeList = InternalSqrFree(F) ; // first sqrfree the polynomial
+    SqrFreeList = InternalSqrFree(F, minpoly) ; // first sqrfree the polynomial
     // don't use sqrFree(F), factory's internal sqrFree for multiv.
     // Polynomials; it's wrong!! Ex.: char=p   f= x^p*(y+1);
     // InternalSqrFree(f)= ( y+1, (x)^p ), sqrFree(f)= ( y+1 ) .
@@ -944,10 +968,13 @@ Factorize(const CanonicalForm & F, Variable minpoly, int is_SqrFree ){
       Outputlist.append( CFFactor(g,1) ) ;
     else// a real polynomial
       if ( g.isUnivariate() ){
-        Intermediatelist=factorize(g,minpoly); // poly is sqr-free!
+        Variable alpha=rootOf(minpoly);
+        Intermediatelist=factorize(g,alpha); // poly is sqr-free!
         for ( j=Intermediatelist; j.hasItem(); j++ )
           //Normally j.getItem().exp() should be 1
-          Outputlist.append( CFFactor( m(j.getItem().factor()),exp*j.getItem().exp()));
+          Outputlist.append(
+           CFFactor( m(replacevar(j.getItem().factor(),alpha,minpoly.mvar())),
+             exp*j.getItem().exp()));
       }
       else{ // multivariate polynomial
         if ( is_homogeneous(g) ){
@@ -996,7 +1023,7 @@ Factorize(const CanonicalForm & F, Variable minpoly, int is_SqrFree ){
     }
     swapvar(F,Variable(mv),F.mvar());
   }
-											 
+                                                                                         
   DEBDECLEVEL(cout, "Factorize");
   TIMING_END(factorize_time);
 
@@ -1011,6 +1038,9 @@ Factorize(const CanonicalForm & F, Variable minpoly, int is_SqrFree ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.13  2002/07/30 17:06:47  Singular
+*hannes: uuh - factorize in Q(a)[x] is missing, use Q[a][x].
+
 Revision 1.12  2002/07/30 15:10:22  Singular
 *hannes: added Factorize for alg. ext.
 

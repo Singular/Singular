@@ -1,6 +1,6 @@
 /* Copyright 1997 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
-// static char * rcsid = "$Id: homogfactor.cc,v 1.3 1997-09-12 07:19:57 Singular Exp $ ";
+// static char * rcsid = "$Id: homogfactor.cc,v 1.4 2002-08-19 11:11:34 Singular Exp $ ";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -110,7 +110,7 @@ homogenize( const CanonicalForm & f, const Variable & x){
 
 // we assume g is square-free
 CFFList
-HomogFactor( const CanonicalForm & g, const Variable  & minpoly, const int Mainvar ){
+HomogFactor( const CanonicalForm & g, const CanonicalForm  & minpoly, const int Mainvar ){
   DEBINCLEVEL(cout, "HomogFactor");
   Variable xn = get_max_degree_Variable(g);
   int d_xn = degree(g,xn);
@@ -153,6 +153,9 @@ HomogFactor( const CanonicalForm & g, const Variable  & minpoly, const int Mainv
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1997/09/12 07:19:57  Singular
+* hannes/michael: libfac-0.3.0
+
 Revision 1.2  1997/04/25 22:35:20  michael
 changed cerr and cout messages for use with Singular
 Version for libfac-0.2.1

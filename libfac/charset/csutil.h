@@ -1,13 +1,14 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: csutil.h,v 1.3 1997-09-12 07:19:42 Singular Exp $
+// $Id: csutil.h,v 1.4 2002-08-19 11:11:32 Singular Exp $
 ////////////////////////////////////////////////////////////
 
 #ifndef INCL_CSUTIL_H
 #define INCL_CSUTIL_H
 
 #include <factory.h>
+#include "algfactor.h"
 #include <tmpl_inst.h>
 
 // inline function's:
@@ -52,6 +53,7 @@ public:
 CanonicalForm  Prem( const CanonicalForm &f, const CanonicalForm &g );
 CanonicalForm  Prem( const CanonicalForm &f, const CFList &L );
 CFList         Prem( const CFList &AS, const CFList &L );
+CanonicalForm alg_gcd(const CanonicalForm &, const CanonicalForm &, const CFList &);
 /*ENDPUBLIC*/
 CanonicalForm  divide( const CanonicalForm & ff, const CanonicalForm & f, const CFList & as);
 CFList         remsetb( const CFList & ps, const CFList & as);
@@ -78,6 +80,9 @@ ListCFList     Minus( const ListCFList & a, const ListCFList &b);
 ////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1997/09/12 07:19:42  Singular
+* hannes/michael: libfac-0.3.0
+
 Revision 1.3  1997/04/25 22:51:48  michael
 Version for libfac-0.2.1
 

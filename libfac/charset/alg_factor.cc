@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: alg_factor.cc,v 1.9 2002-07-30 15:16:19 Singular Exp $";
+static char * rcsid = "$Id: alg_factor.cc,v 1.10 2002-08-19 11:11:29 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -18,6 +18,8 @@ static char * rcsid = "$Id: alg_factor.cc,v 1.9 2002-07-30 15:16:19 Singular Exp
 #include "algfactor.h"
 // some CC's need this:
 #include "alg_factor.h"
+
+//void out_cf(char *s1,const CanonicalForm &f,char *s2);
 
 #ifdef ALGFACTORDEBUG
 #  define DEBUGOUTPUT
@@ -359,6 +361,15 @@ simpleextension(const CFList & Astar, const Variable & Extension,
   return Returnlist;
 }
 
+CanonicalForm alg_lc(const CanonicalForm &f)
+{
+  if (f.inCoeffDomain()) return f;
+  if (f.level()>0)
+  {
+    return alg_lc(f.LC());
+  }
+}  
+
 // the heart of the algorithm: the one from Trager
 static CFFList
 alg_factor( const CanonicalForm & f, const CFList & Astar, const Variable & vminpoly, const Varlist & oldord, const CFList & as){
@@ -368,12 +379,16 @@ alg_factor( const CanonicalForm & f, const CFList & Astar, const Variable & vmin
 
   DEBINCLEVEL(cout,"alg_factor");
   DEBOUTLN(cout, "alg_factor: f= ", f);
+  //out_cf("start alg_factor:",f,"\n");
   substlist= simpleextension(Astar, vminpoly, Rstar);
   DEBOUTLN(cout, "alg_factor: substlist= ", substlist);
   DEBOUTLN(cout, "alg_factor: minpoly Rstar= ", Rstar);
   DEBOUTLN(cout, "alg_factor: vminpoly= ", vminpoly);
 
   sqrf_norm(f, Rstar, vminpoly, s, g, R );
+  //out_cf("sqrf_norm R:",R,"\n");
+  //out_cf("sqrf_norm s:",s,"\n");
+  //out_cf("sqrf_norm g:",g,"\n");
   DEBOUTLN(cout, "alg_factor: g= ", g);
   DEBOUTLN(cout, "alg_factor: s= ", s);
   DEBOUTLN(cout, "alg_factor: R= ", R);
@@ -428,7 +443,15 @@ alg_factor( const CanonicalForm & f, const CFList & Astar, const Variable & vmin
       if (degree(i.getItem().factor()) > 0 ){
         // undo linear transformation!!!! and then gcd!
         //cout << "algcd(" << g << "," << fnew << ",as" << as << ")" << endl;
-        h= algcd(g,fnew, as, oldord);
+	//out_cf("algcd g=",g,"\n");
+	//out_cf("algcd fnew=",fnew,"\n");
+        //h= algcd(g,fnew, as, oldord);
+	//if (as.length() >1)
+        //  h= algcd(g,fnew, as, oldord);
+	//else
+	  h=alg_gcd(g,fnew,as);
+	//out_cf(" -> algcd=",algcd(g,fnew, as, oldord),"\n");
+	//out_cf(" -> alg_gcd=",alg_gcd(g,fnew,as),"\n");
         //cout << "algcd result:" << h << endl;
         DEBOUTLN(cout, "  alg_factor: h= ", h);
         DEBOUTLN(cout, "  alg_factor: oldord= ", oldord);
@@ -445,9 +468,34 @@ alg_factor( const CanonicalForm & f, const CFList & Astar, const Variable & vmin
     // constant (over K_r, which can be a polynomial!)
     if (degree(g, f.mvar())>0){ L.append(CFFactor(g,1)); }
   }
-  DEBOUTLN(cout, "alg_factor: L= ", L);
+  CFFList LL;
+  if (getCharacteristic()>0)
+  {
+    CFFListIterator i=L;
+    CanonicalForm c_fac=1;
+    CanonicalForm c;
+    for(;i.hasItem(); i++ )
+    {
+      CanonicalForm ff=i.getItem().factor();
+      c=alg_lc(ff);
+      int e=i.getItem().exp();
+      ff/=c;
+      if (!ff.isOne()) LL.append(CFFactor(ff,e));
+      while (e>0) { c_fac*=c;e--; }
+    }
+    if (!c_fac.isOne()) LL.insert(CFFactor(c_fac,1));
+  }
+  else
+  {
+    LL=L;
+  }
+  //CFFListIterator i=LL;
+  //for(;i.hasItem(); i++ )
+  //  out_cf("end alg_f:",i.getItem().factor(),"\n");
+  //printf("end alg_factor\n");
+  DEBOUTLN(cout, "alg_factor: L= ", LL);
   DEBDECLEVEL(cout,"alg_factor");
-  return L;
+  return LL;
 }
 
 static CFFList
@@ -596,7 +644,14 @@ newfactoras( const CanonicalForm & f, const CFList & as, int success){
   Varlist gcdord= Union(ord,newuord); gcdord.append(f.mvar());
   // This is for now. we need alg_sqrfree implemented!
   //cout << "algcd(" << f << "," << f.deriv() << " as:" << Astar <<endl;
-  CanonicalForm Fgcd= algcd(f,f.deriv(),Astar,gcdord);
+  //CanonicalForm Fgcd= algcd(f,f.deriv(),Astar,gcdord);
+  CanonicalForm Fgcd;
+	//if (Astar.length() >1)
+        //  Fgcd= algcd(f,f.deriv(),Astar,gcdord);
+	//else
+	  Fgcd= alg_gcd(f,f.deriv(),Astar);
+	//out_cf("algcd:",algcd(f,f.deriv(),Astar,gcdord),"\n");
+	//out_cf("alg_gcd:",alg_gcd(f,f.deriv(),Astar),"\n");
  // cout << "algcd result:"  << Fgcd << endl;
   if ( Fgcd == 0 ) DEBOUTMSG(cerr, "WARNING: p'th root ?");
   if ( degree(Fgcd, f.mvar()) > 0 ){
@@ -682,6 +737,9 @@ newcfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.9  2002/07/30 15:16:19  Singular
+*hannes: fix for alg. extension
+
 Revision 1.8  2001/08/06 08:32:53  Singular
 * hannes: code cleanup
 

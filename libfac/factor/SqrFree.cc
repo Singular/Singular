@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: SqrFree.cc,v 1.7 2001-08-08 14:27:38 Singular Exp $";
+static char * rcsid = "$Id: SqrFree.cc,v 1.8 2002-08-19 11:11:33 Singular Exp $";
 static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) michael@math.uni-sb.de .\n Please include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
@@ -34,7 +34,6 @@ static char * errmsg = "\nYou found a bug!\nPlease inform (Michael Messollen) mi
 TIMING_DEFINE_PRINT(squarefree_time);
 TIMING_DEFINE_PRINT(gcd_time);
 
-
 static inline CFFactor
 Powerup( const CFFactor & F , int exp=1){
   return CFFactor(F.factor(), exp*F.exp()) ;
@@ -61,7 +60,9 @@ PthRoot( const CanonicalForm & f ){
 
   if (n==0){ // constant
     if (R.inExtension()) // not in prime field; f over |F(q=p^k)
+    {
       R = power(R,Powerup(p,getGFDegree() - 1)) ;
+    }  
     // if f in prime field, do nothing
     return R;
   }
@@ -70,6 +71,48 @@ PthRoot( const CanonicalForm & f ){
   Variable x(n);
   for (int i=0; i<= (int) (degree(R,level(R))/p) ; i++)
     RES += PthRoot( R[i*p] ) * power(x,i);
+  return RES;
+}
+
+///////////////////////////////////////////////////////////////
+// Compute the Pth root of a polynomial in characteristic p  //
+// f must be a polynomial which we can take the Pth root of. //
+// Domain is q=p^m , f a uni/multivariate polynomial         //
+///////////////////////////////////////////////////////////////
+static CanonicalForm
+PthRoot( const CanonicalForm & f ,const CanonicalForm & mipo){
+  CanonicalForm RES, R = f;
+  int n= max(level(R),getNumVars(R)), p= getCharacteristic();
+  int mipodeg=-1;
+  if (f.level()==mipo.level()) mipodeg=mipo.degree();
+  else if ((f.level()==1) &&(mipo.level()!=-1000000))
+  {
+    Variable t;
+    CanonicalForm tt=getMipo(mipo.mvar(),t);
+    mipodeg=degree(tt,t);
+  }
+
+  if ((n==0)
+  ||(mipodeg!=-1))
+  { // constant
+    if (R.inExtension()) // not in prime field; f over |F(q=p^k)
+    {
+      R = power(R,Powerup(p,getGFDegree() - 1)) ;
+    }  
+    else if ((f.level()==mipo.level())
+    ||((f.level()==1) &&(mipo.level()!=-1000000)))
+    {
+      R = power(R,Powerup(p,mipodeg - 1)) ;
+      R=mod(R, mipo);
+    }
+    // if f in prime field, do nothing
+    return R;
+  }
+  // we assume R is a Pth power here
+  RES = R.genZero();
+  Variable x(n);
+  for (int i=0; i<= (int) (degree(R,level(R))/p) ; i++)
+    RES += PthRoot( R[i*p], mipo ) * power(x,i);
   return RES;
 }
 
@@ -149,7 +192,7 @@ SqrFreeTest( const CanonicalForm & r, int opt){
 // needs not to be 1 !!!!!                                   //
 ///////////////////////////////////////////////////////////////
 static CFFList
-SqrFreed( const CanonicalForm & r ){
+SqrFreed( const CanonicalForm & r , const CanonicalForm &mipo=0){
   CanonicalForm h, g, f = r;
   CFFList Outputlist;
   int n = level(f);
@@ -164,16 +207,19 @@ SqrFreed( const CanonicalForm & r ){
 // We look if we do have a content; if so, SqrFreed the content
 // and continue computations with pp(f)
   for (int k=1; k<=n; k++) {
-    g = swapvar(f,k,n); g = content(g);
-    if ( ! (g.isOne() || (-g).isOne() || degree(g)==0 )) {
-      g = swapvar(g,k,n);
-      DEBOUTLN(cout, "We have a content: ", g);
-      Outputlist = myUnion(InternalSqrFree(g),Outputlist); // should we add a
+    if ((mipo.level()==-1000000)||(k!=1))
+    {
+      g = swapvar(f,k,n); g = content(g);
+      if ( ! (g.isOne() || (-g).isOne() || degree(g)==0 )) {
+        g = swapvar(g,k,n);
+        DEBOUTLN(cout, "We have a content: ", g);
+        Outputlist = myUnion(InternalSqrFree(g,mipo),Outputlist); // should we add a
                                                 // SqrFreeTest(g) first ?
-      DEBOUTLN(cout, "Outputlist is now: ", Outputlist);
-      f /=g;
-      DEBOUTLN(cout, "f is now: ", f);
-    }
+        DEBOUTLN(cout, "Outputlist is now: ", Outputlist);
+        f /=g;
+        DEBOUTLN(cout, "f is now: ", f);
+      }
+    }  
   }
 
 // Now f is primitive; Let`s look if f is univariate
@@ -201,27 +247,37 @@ SqrFreed( const CanonicalForm & r ){
   n=level(f); // maybe less indeterminants
   g= f.deriv();
   if ( getCharacteristic() > 0 && g.isZero() ){  // Pth roots only apply to char > 0
-    for (int k=1; k<=n; k++) {
-      g=swapvar(f,k,n) ; g = g.deriv();
-      if ( ! g.isZero() ){ // can`t be Pth root
-        CFFList Outputlist2= SqrFreed(swapvar(f,k,n));
-        for (CFFListIterator inter=Outputlist2; inter.hasItem(); inter++){
-          Outputlist= myappend(Outputlist, CFFactor(swapvar(inter.getItem().factor(),k,n), inter.getItem().exp()));
+    for (int k=1; k<=n; k++)
+    {
+      if ((mipo.level()==-1000000)||(k!=1))
+      {
+        g=swapvar(f,k,n) ;
+        g = g.deriv();
+
+        if ( ! g.isZero() )
+	{ // can`t be Pth root
+          CFFList Outputlist2= SqrFreed(swapvar(f,k,n));
+          for (CFFListIterator inter=Outputlist2; inter.hasItem(); inter++){
+            Outputlist= myappend(Outputlist, CFFactor(swapvar(inter.getItem().factor(),k,n), inter.getItem().exp()));
+          }
+          return Outputlist;
         }
-        return Outputlist;
-      }
-      else
-        if ( k==n ) { // really is Pth power
-          DEBOUTLN(cout, "f is a p'th root: ", f);
-          CFMap m;
-          g = compress(f,m);
+      }	
+      if ( k==n )
+      { // really is Pth power
+        DEBOUTLN(cout, "f is a p'th root: ", f);
+        CFMap m;
+        g = compress(f,m);
+	if (mipo==0)
           f = m(PthRoot(g));
-          DEBOUTLN(cout, "  that is       : ", f);
-          // now : Outputlist union ( SqrFreed(f) )^getCharacteristic()
-          Outputlist=myUnion(Powerup(InternalSqrFree(f),getCharacteristic()),Outputlist);
-          DEBDECLEVEL(cout, "SqrFreed");
-          return Outputlist ;
-        }
+	else
+          f = m(PthRoot(g,mipo));
+        DEBOUTLN(cout, "  that is       : ", f);
+        // now : Outputlist union ( SqrFreed(f) )^getCharacteristic()
+        Outputlist=myUnion(Powerup(InternalSqrFree(f),getCharacteristic()),Outputlist);
+        DEBDECLEVEL(cout, "SqrFreed");
+        return Outputlist ;
+      }
     }
   }
   g = f.deriv();
@@ -246,6 +302,7 @@ SqrFreed( const CanonicalForm & r ){
     DEBOUTLN(cout, "       and h= ", h);
     // For char > 0 the polys f and h can have Pth roots; so we need a test
     // Test is disabled because timing is the same
+    
 //    if ( SqrFreeTest(f,0) )
 //      Outputlist= myappend(Outputlist,CFFactor(f,1)) ;
 //    else
@@ -275,7 +332,7 @@ SqrFreed( const CanonicalForm & r ){
 // Input can have a constant as content                      //
 ///////////////////////////////////////////////////////////////
 CFFList
-InternalSqrFree( const CanonicalForm & r ){
+InternalSqrFree( const CanonicalForm & r , const CanonicalForm & mipo ){
   CanonicalForm g=icontent(r), f = r;
   CFFList Outputlist, Outputlist2;
 
@@ -294,7 +351,12 @@ InternalSqrFree( const CanonicalForm & r ){
       if ( ! g.isOne() ) Outputlist= myappend(Outputlist,CFFactor(g,1)) ;
       f /= g;
       if ( getNumVars(f) != 0 ) // a real polynomial
-        Outputlist=myUnion(SqrFreed(f),Outputlist) ;
+      {
+        if (mipo!=0)
+          Outputlist=myUnion(SqrFreed(f,mipo),Outputlist) ;
+        else  
+          Outputlist=myUnion(SqrFreed(f),Outputlist) ;
+      }
   }
   DEBOUTLN(cout,"Outputlist = ", Outputlist);
   for ( CFFListIterator i=Outputlist; i.hasItem(); i++ )
@@ -340,6 +402,9 @@ SqrFree(const CanonicalForm & r ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.7  2001/08/08 14:27:38  Singular
+*hannes: Dan's HAVE_SINGULAR_ERROR
+
 Revision 1.6  2001/08/08 14:26:56  Singular
 *hannes: Dan's HAVE_SINGULAR_ERROR
 

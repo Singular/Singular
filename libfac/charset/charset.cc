@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: charset.cc,v 1.9 2001-08-08 14:26:54 Singular Exp $";
+static char * rcsid = "$Id: charset.cc,v 1.10 2002-08-19 11:11:31 Singular Exp $";
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -539,7 +539,9 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible){
     nr += 1;
     DEBOUT(cout, "irras: factoring: ", elem);
     if ( degree(elem) > 1 ) // linear poly's are irreduzible
+    {
       qs = Factorize(elem);
+    }
     else{
       qs=(CFFactor(elem,1));
       qs.insert(CFFactor(CanonicalForm(1),1));
@@ -580,16 +582,6 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible){
             ja=nr+1;
             break;
           }
-          else
-          {
-#ifdef HAVE_SINGULAR_ERROR
-            WarnS("libfac: Factoring over algebraic function field required!");
-#else
-#ifndef NOSTREAMIO
-            cerr << "libfac: Factoring over algebraic function field!" << endl;
-#endif
-#endif
-          }
         }
       }
     }
@@ -601,6 +593,9 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible){
 ///////////////////////////////////////////////////////////////////////////////
 /*
 $Log: not supported by cvs2svn $
+Revision 1.9  2001/08/08 14:26:54  Singular
+*hannes: Dan's HAVE_SINGULAR_ERROR
+
 Revision 1.8  2001/08/06 08:32:53  Singular
 * hannes: code cleanup
 

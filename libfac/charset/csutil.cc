@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-static char * rcsid = "$Id: csutil.cc,v 1.6 2002-01-21 09:11:07 Singular Exp $";
+static char * rcsid = "$Id: csutil.cc,v 1.7 2002-08-19 11:11:31 Singular Exp $";
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -13,6 +13,9 @@ static char * rcsid = "$Id: csutil.cc,v 1.6 2002-01-21 09:11:07 Singular Exp $";
 #include <homogfactor.h>
 // Charset - Includes
 #include "csutil.h"
+//extern void out_cf(char *s1,const CanonicalForm &f,char *s2);
+extern CanonicalForm alg_lc(const CanonicalForm &f);
+extern int hasAlgVar(const CanonicalForm &f);
 
 static bool
 lowerRank ( const CanonicalForm & f, const CanonicalForm & g, int & ind )
@@ -650,8 +653,148 @@ Minus( const ListCFList & a, const ListCFList & b){
   return output;
 }
 
+#if 0
+static CanonicalForm alg_lc(const CanonicalForm &f, const CFList as)
+{
+  for(CFListIterator i=as; i.hasItem(); i++)
+  {
+    if (f.mvar()==i.getItem().mvar()) return f;
+  }  
+  if (f.level()>0)
+  {
+    return alg_lc(f.LC(),as);
+  }
+  return CanonicalForm(1);
+}
+#endif
+
+CanonicalForm alg_gcd(const CanonicalForm & fff, const CanonicalForm &ggg,
+                      const CFList &as)
+{
+  //out_cf("alg_gcd(",fff," , ");
+  //out_cf("",ggg,")\n");
+  CanonicalForm f=fff;
+  CanonicalForm g=ggg;
+  CanonicalForm res;
+  // does as appear in f and g ?
+  bool has_alg_var=false;
+  for ( CFListIterator j=as;j.hasItem(); j++ )
+  {
+    Variable v=j.getItem().mvar();
+    if (hasVar(f,v)) {has_alg_var=true; break;}
+    if (hasVar(g,v)) {has_alg_var=true; break;}
+  }  
+  if (!has_alg_var)
+  {
+    if ((hasAlgVar(f))
+    || (hasAlgVar(g)))
+    {
+      Varlist ord;
+      for ( CFListIterator j=as;j.hasItem(); j++ )
+        ord.append(j.getItem().mvar());
+      res=algcd(f,g,as,ord);
+    }
+    else
+      res=gcd(f,g);
+    //out_cf("gcd=",res,"\n");
+    return res;
+  }  
+
+  int mvf=f.level();
+  int mvg=g.level();
+  if (mvg > mvf)
+  { 
+    CanonicalForm tmp=f; f=g; g=tmp;
+    int tmp2=mvf; mvf=mvg; mvg=tmp2;
+  }  
+  if (g.inBaseDomain() || f.inBaseDomain())
+  {
+    //printf("const\n");
+    return CanonicalForm(1);
+  }  
+  
+  // gcd of all coefficients:
+  CFIterator i=f;
+  CanonicalForm c_gcd=i.coeff(); i++;
+  while( i.hasTerms())
+  {
+    c_gcd=alg_gcd(i.coeff(),c_gcd,as);
+    if (c_gcd.inBaseDomain()) break;
+    i++;
+  }
+  //printf("f.mvar=%d (%d), g.mvar=%d (%d)\n",f.level(),mvf,g.level(),mvg);
+  if (mvf!=mvg) // => mvf > mvg
+  {
+    res=alg_gcd(g,c_gcd,as);
+    //out_cf("alg_gcd1=",res,"\n");
+    return res;
+  }
+  if (!c_gcd.inBaseDomain())
+  {
+    i=g;
+    while( i.hasTerms())
+    {
+      c_gcd=alg_gcd(i.coeff(),c_gcd,as);
+      if (c_gcd.inBaseDomain()) break;
+      i++;
+    }
+  }  
+
+  f/=c_gcd;
+  g/=c_gcd;
+
+  CanonicalForm r=1;
+  CFList gg;
+  while (!(r.isZero()))
+  {
+    //printf("f.mvar=%d, g.mvar=%d\n",f.level(),g.level());
+    gg=as;
+    gg.append(g);
+    //out_cf("Prem(",f," , ");
+    //out_cf("",g,")\n");
+    if (g.inCoeffDomain()) r=0;
+    else if (g.level()==f.level()) r=Prem(f,gg);
+    else
+    {
+      // g and f have different levels
+      return c_gcd;	
+    }
+    //out_cf("->",r,"\n");
+    f=g;
+    g=r;
+  }
+  if (degree(f,Variable(mvg))==0) 
+  {
+  // remark: mvf == mvg == f.level() ==g.level()
+    //out_cf("c_gcd=",c_gcd,"\n");
+    return c_gcd;
+  }  
+  //out_cf("f=",f,"\n");
+  i=f;
+  CanonicalForm k=i.coeff(); i++;
+  //out_cf("k=",k,"\n");
+  while( i.hasTerms())
+  {
+    if (k.inCoeffDomain()) break;
+    k=alg_gcd(i.coeff(),k,as);
+    //out_cf("k=",k,"\n");
+    i++;
+  }
+  f/=k;
+  res=c_gcd*f;
+  CanonicalForm r_lc=alg_lc(res);
+  res/=r_lc;
+  //CanonicalForm r_lc=alg_lc(res,as);
+  //res/=r_lc;
+  //out_cf("alg_gcd2=",res,"\n");
+  return res;
+}
+
 /*
 $Log: not supported by cvs2svn $
+Revision 1.6  2002/01/21 09:11:07  Singular
+* hannes: handle empty set in removecontent
+
 Revision 1.5  2001/06/21 14:57:04  Singular
 *hannes/GP: Factorize, newfactoras, ...
 

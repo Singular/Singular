@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: algfactor.cc,v 1.5 2001-06-27 13:58:05 Singular Exp $";
+static char * rcsid = "$Id: algfactor.cc,v 1.6 2002-08-19 11:11:30 Singular Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -353,7 +353,8 @@ F4: //[GCD Computation]
     DEBOUT(cout, "Calculating fp= gcd(", g);
     DEBOUT(cout, ",", fp(substback,vf));
     DEBOUT(cout, ") over K_r wrt ", vf);
-    fp= algcd(g,fp(substback,vf), as, oldord);
+    fp=alg_gcd(g,fp(substback,vf), as);
+    //fp= algcd(g,fp(substback,vf), as, oldord);
     DEBOUTLN(cout, " = ", fp);
     if ( degree(fp,vf) > 0 ){ //otherwise it's a constant
       g= divide(g, fp,as);
@@ -371,7 +372,8 @@ F4: //[GCD Computation]
     DEBOUT(cout, "Calculating fp= gcd(", g);
     DEBOUT(cout, ",", fp(substback,vf));
     DEBOUT(cout, ") over K_r wrt ", vf);
-    fp= algcd(g,fp(substback,vf), as, oldord);
+    fp= alg_gcd(g,fp(substback,vf), as);
+    //fp= algcd(g,fp(substback,vf), as, oldord);
     DEBOUTLN(cout, " = ", fp);
     if ( degree(fp,vf) > 0 ){ //otherwise it's a constant
       g= divide(g, fp,as);
@@ -447,6 +449,9 @@ cfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.5  2001/06/27 13:58:05  Singular
+*hannes/GP: debug newfactoras, char_series, ...
+
 Revision 1.4  2001/06/21 14:57:04  Singular
 *hannes/GP: Factorize, newfactoras, ...
 
