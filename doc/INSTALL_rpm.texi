@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_rpm.texi,v 1.4 2002-03-21 16:19:16 mschulze Exp $
+@comment $Id: INSTALL_rpm.texi,v 1.5 2002-03-26 13:39:49 mschulze Exp $
 @c FILE: INSTALL_rpm.texi
 @c PURPOSE: Installation instruction for Singular on RPM based Linux systems
 @c
@@ -27,10 +27,10 @@ contains architecture dependend executables like the Singular program.
 contains the static version of the architecture dependend executables.
 @item Singular-share-@value{RPM_VERSION}-1.noarch.rpm
 contains architecture independend data like documentation and libraries.
-@item Singular-kde-redhat-@value{RPM_VERSION}-1.noarch.rpm
-contains KDE icons and menues for @sc{RedHat Linux}.
-@item Singular-kde-suse-@value{RPM_VERSION}-1.noarch.rpm
-contains KDE icons and menues for @sc{SuSE Linux}.
+@item Singular-redhat-@value{RPM_VERSION}-1.noarch.rpm
+contains icons and menues for @sc{gnome} and @sc{kde} under @sc{RedHat Linux}.
+@item Singular-suse-@value{RPM_VERSION}-1.noarch.rpm
+contains icons and menues for @sc{gnome} and @sc{kde} under @sc{SuSE Linux}.
 @end table
 
 The above @sc{rpm} packages are available at
@@ -58,7 +58,7 @@ Usage: rpm @{--help@}
        rpm @{--version@}
 @end smallexample
 @item
-To deal with @sc{rpm} packages, you can either use the @sc{rpm} command line tool @code{rpm} or a graphical @sc{rpm} frontend like e.g. @code{kpackage} under @sc{kde}.
+To deal with @sc{rpm} packages, you can either use the @sc{rpm} command line tool @code{rpm} or a graphical @sc{rpm} frontend like e.g. @code{gnorpm} under @sc{gnome} or @code{kpackage} under @sc{kde}.
 For a description of the usage of @code{rpm}, type 
 @smallexample
 rpm -h
@@ -77,7 +77,7 @@ in a command shell and enter the root password.
 @heading Installation of @sc{Singular} @sc{rpm} packages
 
 In the following, we describe how to install @sc{Singular} using the @sc{rpm} command line tool @code{rpm}.
-Alternatively, you can use a graphical @sc{rpm} frontend like e.g. @code{kpackage} under @sc{kde}.
+Alternatively, you can use a graphical @sc{rpm} frontend like e.g. @code{gnorpm} under @sc{gnome} or @code{kpackage} under @sc{kde}.
 
 @enumerate
 @item
@@ -111,19 +111,20 @@ rpm -ivh Singular-shared-@value{RPM_VERSION}-1.noarch.rpm
 @end smallexample
 in a command shell.
 @item
-To install a @sc{Singular} kde @sc{rpm} package, @sc{kde} has to be installed under @code{/usr/share} like for @sc{RedHat Linux} or under @code{/opt/kde} like for @sc{SuSE Linux}.
+To install a @sc{Singular} menu @sc{rpm} package, @sc{gnome} or @sc{kde} have to be installed under @code{/usr} like for @sc{RedHat Linux} or under @code{/opt} like for @sc{SuSE Linux}.
 You can check this by typing
 @smallexample
+rpm -ql gnome-core
 rpm -ql kdebase
 @end smallexample
 in a command shell.
-In the first case (@code{/opt/kde}), you type
+In the first case (@code{/usr}), you type
 @smallexample
-rpm -ivh Singular-kde-redhat-@value{RPM_VERSION}-1.noarch.rpm
+rpm -ivh Singular-redhat-@value{RPM_VERSION}-1.noarch.rpm
 @end smallexample
-and, in the second case (@code{/usr/share}),
+and, in the second case (@code{/opt}),
 @smallexample
-rpm -ivh Singular-kde-suse-@value{RPM_VERSION}-1.noarch.rpm
+rpm -ivh Singular-suse-@value{RPM_VERSION}-1.noarch.rpm
 @end smallexample
 in a command shell.
 @item
@@ -137,19 +138,19 @@ in a command shell.
 @heading Starting @sc{Singular}
 @enumerate
 @item
-To run @sc{Singular} @value{VERSION}, type
+To run @sc{Singular} @value{RPM_VERSION}, type
 @smallexample
 Singular-@value{VERSION}
 @end smallexample
 in a command shell.
-To run @sc{Singular} @value{VERSION} inside @sc{Emacs}, type
+To run @sc{Singular} @value{RPM_VERSION} under @sc{Emacs}, type
 @smallexample
 ESingular-@value{VERSION}
 @end smallexample
 in a command shell.
 @item
-There is a menu @code{Singular @value{VERSION}} in the @sc{kde} menu with menu items @code{Singular}, @code{ESingular}, and @code{Manual}.
-Click on the menu items @code{Singular} to run @sc{Singular} @value{VERSION} in a terminal, on the menu item @code{ESingular} to run @sc{Singular} @value{VERSION} inside @sc{Emacs}, and on the menu item @code{Manual} to read the @sc{Singular} @value{VERSION} manual.
+There is a menu @code{Singular @value{RPM_VERSION}} in the @sc{gnome} and @sc{kde} menu with menu items @code{Singular}, @code{ESingular}, and @code{Manual}.
+Click on the menu items @code{Singular} to run @sc{Singular} @value{RPM_VERSION} in a terminal, on the menu item @code{ESingular} to run @sc{Singular} @value{RPM_VERSION} under @sc{Emacs}, and on the menu item @code{Manual} to read the @sc{Singular} @value{RPM_VERSION} manual.
 @end enumerate
 
 
