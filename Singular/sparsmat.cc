@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.27 2000-04-27 12:27:43 pohl Exp $ */
+/* $Id: sparsmat.cc,v 1.28 2000-06-07 13:42:50 pohl Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -408,7 +408,6 @@ void sparse_mat::smToIntvec(intvec *v)
   for (i=v->rows()-1; i>=0; i--)
     (*v)[i] = perm[i+1];
 }
-
 /* ---------------- the algorithm's ------------------ */
 /*
 * the determinant (up to sign), uses new Bareiss elimination
@@ -1202,6 +1201,13 @@ void sparse_mat::smSelectPR()
   smpoly a, ap;
   int i;
 
+  if (TEST_OPT_PROT)
+  {
+    if ((crd+1)%10)
+      PrintS(".");
+    else
+      PrintS(".\n");
+  }
   a = m_act[act];
   if (a->pos < rpiv)
   {
