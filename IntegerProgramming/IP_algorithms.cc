@@ -2251,10 +2251,10 @@ int Bigatti_LaScala_Robbiano(INPUT_FILE MATRIX,
       "input file has suspicious format"<<endl;
 
   float *hom_grad=new float[variables];
-
-  for(short i=0;i<variables;i++)
+  
+  for(short _i=0;_i<variables;_i++)
   {
-    input>>hom_grad[i];
+    input>>hom_grad[_i];
 
     if(!input)
     {
@@ -2266,7 +2266,7 @@ int Bigatti_LaScala_Robbiano(INPUT_FILE MATRIX,
       return 0;
     }
 
-    if(hom_grad[i]<=0)
+    if(hom_grad[_i]<=0)
     {
       cerr<<"ERROR: int Bigatti_LaScala_Robbiano(INPUT_FILE, const BOOLEAN&):"
         "\n"
@@ -2275,6 +2275,7 @@ int Bigatti_LaScala_Robbiano(INPUT_FILE MATRIX,
       return 0;
     }
   }
+  
 
 
 ///////////////////////// computation ////////////////////////////////////////
@@ -3084,12 +3085,12 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
     for(short k=0;k<instances;k++)
     {
       // at the beginning, the variables of interest are zero
-      for(short i=0;i<weighted_variables;i++)
+      for(i=0;i<weighted_variables;i++)
         right_hand[i]=0;
 
       // right hand vector is read from the input stream into the
       // elimination variables
-      for(short i=weighted_variables;
+      for(i=weighted_variables;
           i<weighted_variables+elimination_variables-1;i++)
       {
         problem>>right_hand[i];
@@ -3107,14 +3108,14 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
       // determine the exponent of the inversion variable, i.e.
       // - min{negative components of right_hand}.
       Integer min=0;
-      for(short i=weighted_variables;
+      for(i=weighted_variables;
           i<weighted_variables+elimination_variables-1;i++)
         if(right_hand[i]<min)
           min=right_hand[i];
 
       // transform right_hand so that all components are nonnegative
       if(min<0)
-        for(short i=weighted_variables;
+        for(i=weighted_variables;
             i<weighted_variables+elimination_variables-1;i++)
           right_hand[i]-=min;
 
@@ -3138,7 +3139,7 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
       // output
 
       output<<"right hand vector:"<<endl;
-      for(short i=weighted_variables;
+      for(i=weighted_variables;
           i<weighted_variables+elimination_variables-1;i++)
         output<<setw(6)<<right_hand[i]+min;
         // original vector
@@ -3147,7 +3148,7 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
       output<<"solvable:"<<endl;
 
       BOOLEAN solvable=TRUE;
-      for(short i=weighted_variables;
+      for(i=weighted_variables;
           i<=weighted_variables+elimination_variables-1;i++)
         if(to_reduce[i]!=0)
         {
@@ -3159,7 +3160,7 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
       {
         output<<"YES"<<endl;
         output<<"optimal solution:"<<endl;
-        for(short i=0;i<weighted_variables;i++)
+        for(i=0;i<weighted_variables;i++)
           output<<setw(6)<<to_reduce[i];
         output<<endl;
       }
@@ -3191,12 +3192,12 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
       for(short k=0;k<instances;k++)
       {
         // at the beginning, the variables of interest are zero
-        for(short i=0;i<weighted_variables;i++)
+        for(i=0;i<weighted_variables;i++)
           right_hand[i]=0;
 
         // right hand vector is read from the input stream into the
         // elimination variables
-        for(short i=weighted_variables;
+        for(i=weighted_variables;
             i<weighted_variables+elimination_variables;i++)
         {
           problem>>right_hand[i];
@@ -3245,7 +3246,7 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
         // output
 
         output<<"right hand vector:"<<endl;
-        for(short i=weighted_variables;
+        for(i=weighted_variables;
             i<weighted_variables+elimination_variables;i++)
           output<<setw(6)<<right_hand[i];
         // original vector
@@ -3254,7 +3255,7 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
         output<<"solvable:"<<endl;
 
         BOOLEAN solvable=TRUE;
-        for(short i=weighted_variables;
+        for(i=weighted_variables;
             i<weighted_variables+elimination_variables;i++)
           if(to_reduce[i]!=0)
           {
@@ -3266,7 +3267,7 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
         {
           output<<"YES"<<endl;
           output<<"optimal solution:"<<endl;
-          for(short i=0;i<weighted_variables;i++)
+          for(i=0;i<weighted_variables;i++)
             output<<setw(6)<<to_reduce[i];
           output<<endl;
         }
@@ -3297,7 +3298,7 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
       {
         // initial solution vector is read from the input stream into the
         // elimination variables
-        for(short i=0;i<weighted_variables;i++)
+        for(i=0;i<weighted_variables;i++)
         {
           problem>>initial_solution[i];
 
@@ -3332,13 +3333,13 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
         // output
 
         output<<"initial solution vector:"<<endl;
-        for(short i=0;i<weighted_variables;i++)
+        for(i=0;i<weighted_variables;i++)
           output<<setw(6)<<initial_solution[i];
         // original vector
         output<<endl;
 
         output<<"optimal solution:"<<endl;
-        for(short i=0;i<weighted_variables;i++)
+        for(i=0;i<weighted_variables;i++)
           output<<setw(6)<<to_reduce[i];
         output<<endl;
 
