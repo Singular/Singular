@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.89 1998-06-19 15:55:25 obachman Exp $
+@comment $Id: reference.doc,v 1.90 1998-07-10 09:38:23 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4355,7 +4355,8 @@ See @ref{res}; @ref{mres}; @ref{sres}; @ref{minres}; @ref{option}.
 @item @strong{Type:}
 resolution
 @item @strong{Purpose:}
-computes a minimal free resolution of an ideal or module M with the standard basis method.
+computes a minimal free resolution of an ideal or module M
+using a heuristically choosen method.
 More precisely, let
 @tex
 $A_1$=matrix(M),
@@ -4414,18 +4415,16 @@ $=M_i$
 @c example
 @end example
 @end table
-@menu
-* ideal::
-* lres::
-* module::
-* mres::
-* sres::
-* syz::
-@end menu
-@iftex
-See @ref{ideal}; @ref{lres}; @ref{module};
-@ref{mres};@ref{sres}; @ref{syz}.
-@end iftex
+@c ref
+See
+@ref{ideal};
+@ref{lres};
+@ref{module};
+@ref{mres};
+@ref{nres};
+@ref{sres};
+@ref{syz}.
+@c ref
 @c ---------------------------------------
 @node reservedName, resultant, res, Functions
 @subsection reservedName
