@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.198 2003-01-31 09:16:47 Singular Exp $ */
+/* $Id: ring.cc,v 1.199 2003-01-31 09:23:39 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -533,6 +533,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     #ifndef NV_OPS
     || (ch > 32003)
     #endif
+    )
     {
       Warn("%d is invalid characteristic of ground field. 32003 is used.", ch);
       ch=32003;
