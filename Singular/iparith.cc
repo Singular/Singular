@@ -1556,11 +1556,10 @@ static BOOLEAN jjFIND2(leftv res, leftv u, leftv v)
 static BOOLEAN jjGCD_I(leftv res, leftv u, leftv v)
 {
   int p0=ABS((int)u->Data()),p1=ABS((int)v->Data());
-  int q, r;
+  int r;
 
   while ( p1!=0 )
   {
-    q=p0 / p1;
     r=p0 % p1;
     p0 = p1; p1 = r;
   }
