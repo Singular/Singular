@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmspoly.lib,v 1.2 2003-06-02 10:13:53 mschulze Exp $";
+version="$Id: gmspoly.lib,v 1.3 2003-06-02 10:55:27 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -12,7 +12,7 @@ OVERVIEW: A library to compute invariants related to the the Gauss-Manin system
 
 PROCEDURES:
   istame(f);  test if the polynomial f is tame
-  gbasis(f);  good basis of Brieskorn lattice of a tame polynomial t 
+  gbasis(f);  a good basis of the Brieskorn lattice of a tame polynomial t 
 
 SEE ALSO: gmssing_lib
 
@@ -67,6 +67,16 @@ static proc maxdegree(matrix A)
 ///////////////////////////////////////////////////////////////////////////////
 
 proc istame(poly f)
+"USAGE:    istame(f); poly f
+RETURN:
+@format
+int k=
+  0;  if f is not tame
+  1;  if f is tame
+@end format
+KEYWORDS: tame polynomial
+EXAMPLE:  example istame; shows examples
+"
 {
   int d=vdim(std(jacob(f)));
   def @X=basering;
@@ -85,6 +95,12 @@ proc istame(poly f)
   kill(@WX);
 
   return(d>0&&d==D);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),dp;
+  istame(x2y+x);
+  istame(x3+y3+xy);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -424,8 +440,8 @@ proc gbasis(poly f)
 ASSUME:   f is cohomologically tame
 RETURN:
 @format
-ring R;     basering with new variable s
-  ideal b;   [matrix(b)] is a good basis of the Brieskorn lattice
+ring R;  basering with new variable s
+  ideal b;  [matrix(b)] is a good basis of the Brieskorn lattice
   matrix A;  A(s)=A0+s*A1 and t[matrix(b)]=[matrix(b)](A(s)+s^2*(d/ds))
 @end format
 KEYWORDS: tame polynomial; Gauss-Manin system; Brieskorn lattice;
@@ -466,6 +482,7 @@ EXAMPLE:  example gbasis; shows examples
   ring @S=0,(s,t),(dp,C);
   number a0;
   ideal a;
+  int d;
   ideal e,e0;
   intvec s,s0;
   matrix A,B;
@@ -512,15 +529,14 @@ EXAMPLE:  example gbasis; shows examples
     }
 
     A=lift(B,reduce(coeffs(f*b+var(1)^2*diff(b,var(1)),M,product(X)),L1));
-int d=maxdegree(A);
+    d=maxdegree(A);
     A=chart(A);
-d;
+
     setring(@S);
 
     e0,s0,V,B=vfilt(imap(@XS,A),d);
-e0;
     a,e0,e,s,V,B,G=spec(e0,s0,V,B);
-e;
+
     a0=leadcoef(a[1]);
     for(i=2;i<=mu;i++)
     {
