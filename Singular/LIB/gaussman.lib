@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.34 2001-03-05 18:28:46 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.35 2001-03-20 14:16:46 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -8,13 +8,22 @@ LIBRARY:  gaussman.lib  Gauss-Manin Connection of a Singularity
 AUTHOR:   Mathias Schulze, email: mschulze@mathematik.uni-kl.de
 
 OVERVIEW: A library to compute invariants related to the Gauss-Manin connection
-          of a an isolated hypersurface singularity.
+          of a an isolated hypersurface singularity
 
 PROCEDURES:
- monodromy(f[,...]);    monodromy matrix of f, spectrum of monodromy of f
- vfiltration(f[,...]);  V-filtration of f on H''/H', singularity spectrum of f
- vfiltjacalg(...);      V-filtration on Jacobian algebra
- gamma(...);            C. Hertling's gamma invariant
+ monodromy(f[,opt]);        monodromy matrix, spectrum of monodromy of f
+ vfiltration(f[,opt]);      V-filtration on H''/H', singularity spectrum of f
+ spectrum(f);               singularity spectrum of f
+ endfilt(poly f,list V);    endomorphism filtration of filtration V
+ gamma(list S);             gamma invariant of spectrum S
+ spprint(list S);           print spectrum S
+ spadd(list S1,list S2);    sum of spectra S1 and S2
+ spsub(list S1,list S2);    difference of spectra S1 and S2
+ spmul(list S,int k);       product of spectrum S and integer k
+ spmul(list S,intvec k);    linear combination of spectra S with coefficients k
+ spissemicont(list S[,opt]);        test spectrum S for semicontinuity
+ spsemicont(list S0,list S[,opt]);  relative semicontinuity of spectra S0 and S
+ spgeomgenus(list S);       geometric genus of spectrum S
 
 SEE ALSO: mondromy_lib, spectrum_lib
 
@@ -78,28 +87,27 @@ static proc maxorddif(matrix H)
 ///////////////////////////////////////////////////////////////////////////////
 
 proc monodromy(poly f,list #)
-"USAGE:    monodromy(f[,mode]); poly f, int mode
+"USAGE:    monodromy(f[,opt]); poly f, int opt
 ASSUME:   basering has local ordering, f has isolated singularity at 0
 RETURN:
 @format
-if mode=0:
+if opt==0:
   matrix M: exp(-2*pi*i*M) is a monodromy matrix of f
-if mode=1:
-  ideal e: exp(-2*pi*i*e) is the spectrum of the monodromy of f
-default: mode=1
+if opt==1:
+  ideal e: exp(-2*pi*i*e) are the eigenvalues of the monodromy of f
+default: opt=1
 @end format
 SEE ALSO: mondromy_lib
-KEYWORDS: singularities; Gauss-Manin connection; monodromy;
-          Brieskorn lattice
+KEYWORDS: singularities; Gauss-Manin connection; monodromy
 EXAMPLE:  example monodromy; shows an example
 "
 {
-  int mode=1;
+  int opt=1;
   if(size(#)>0)
   {
     if(typeof(#[1])=="int")
     {
-      mode=#[1];
+      opt=#[1];
     }
   }
 
@@ -187,7 +195,7 @@ EXAMPLE:  example monodromy; shows an example
         intvec b=l[2];
         dbprint(printlevel-voice+2,"//gaussman::monodromy: e="+string(e));
         dbprint(printlevel-voice+2,"//gaussman::monodromy: b="+string(b));
-        if(mode==1)
+        if(opt==1)
         {
           mide=maxintdif(e);
           K=K+mide;
@@ -299,7 +307,7 @@ EXAMPLE:  example monodromy; shows an example
     mide--;
   }
 
-  if(mode==1)
+  if(opt==1)
   {
     return(jet(A,0));
   }
@@ -312,42 +320,40 @@ example
 { "EXAMPLE:"; echo=2;
   ring R=0,(x,y),ds;
   poly f=x5+x2y2+y5;
-  matrix M=monodromy(f);
-  print(M);
+  print(monodromy(f));
 }
 ///////////////////////////////////////////////////////////////////////////////
 
 proc vfiltration(poly f,list #)
-"USAGE:    vfiltration(f[,mode]); poly f, int mode
+"USAGE:    vfiltration(f[,opt]); poly f, int opt
 ASSUME:   basering has local ordering, f has isolated singularity at 0
 RETURN:
 @format
-list l:
-if mode=0 or mode=1:
-  ideal l[1]: spectral numbers in increasing order
-  intvec l[2]:
-    int l[2][i]: multiplicity of spectral number l[1][i]
-if mode=1:
-  list l[3]:
-  module l[3][i]: vector space basis of l[1][i]-th graded part
-                  of the V-filtration on H''/H' in terms of l[4]
-  ideal l[4]: monomial vector space basis of H''/H'
-  ideal l[5]: standard basis of the Jacobian ideal
-default: mode=1
+list V: V-filtration of f on H''/H'
+if opt==0 or opt==1:
+  ideal V[1]: spectral numbers in increasing order
+  intvec V[2]:
+    int V[2][i]: multiplicity of spectral number V[1][i]
+if opt==1:
+  list V[3]:
+    module V[3][i]: vector space basis of V[1][i]-th graded part
+                    in terms of V[4]
+  ideal V[4]: monomial vector space basis
+default: opt=1
 @end format
 NOTE:     H' and H'' denote the Brieskorn lattices
 SEE ALSO: spectrum_lib
-KEYWORDS: singularities; Gauss-Manin connection; spectrum;
-          Brieskorn lattice; Hodge filtration; V-filtration
+KEYWORDS: singularities; Gauss-Manin connection;
+          Brieskorn lattice; Hodge filtration; V-filtration; spectrum
 EXAMPLE:  example vfiltration; shows an example
 "
 {
-  int mode=1;
+  int opt=1;
   if(size(#)>0)
   {
     if(typeof(#[1])=="int")
     {
-      mode=#[1];
+      opt=#[1];
     }
   }
 
@@ -549,13 +555,13 @@ EXAMPLE:  example vfiltration; shows an example
 
   dbprint(printlevel-voice+2,
     "//gaussman::vfiltration: compute V-filtration on H0/H1");
-  ideal s;
+  ideal a;
   k=0;
   list V;
   matrix Me;
   V[ncols(eM)+1]=std(V1);
   intvec d;
-  if(mode==0)
+  if(opt==0)
   {
     for(i=ncols(eM);number(eM[i])-1>number(n-1)/2;i--)
     {
@@ -573,7 +579,7 @@ EXAMPLE:  example vfiltration; shows an example
       if(size(V[i])>size(V[i+1]))
       {
         k++;
-        s[k]=eM[i]-1;
+        a[k]=eM[i]-1;
         d[k]=size(V[i])-size(V[i+1]);
       }
     }
@@ -598,7 +604,7 @@ EXAMPLE:  example vfiltration; shows an example
       if(size(V[i])>size(V[i+1]))
       {
         k++;
-        s[k]=eM[i]-1;
+        a[k]=eM[i]-1;
         d[k]=size(V[i])-size(V[i+1]);
       }
     }
@@ -607,13 +613,13 @@ EXAMPLE:  example vfiltration; shows an example
     while(j>=1)
     {
       k++;
-      s[k]=s[j];
-      s[j]=n-1-s[k];
+      a[k]=a[j];
+      a[j]=n-1-a[k];
       d[k]=d[j];
       j--;
     }
 
-    return(list(s,d));
+    return(list(a,d));
   }
   else
   {
@@ -637,7 +643,7 @@ EXAMPLE:  example vfiltration; shows an example
         if(number(eM[i]-1)>=number(n-1)/2)
         {
           k++;
-          s[k]=eM[i]-1;
+          a[k]=eM[i]-1;
           dbprint(printlevel-voice+2,
             "//gaussman::vfiltration: transform to V0");
           v[k]=matrix(freemodule(ncols(V[i])),mu,mu*N)*division(V0,V[i])[1];
@@ -646,7 +652,7 @@ EXAMPLE:  example vfiltration; shows an example
         {
           if(j<0)
           {
-            if(s[k]==number(n-1)/2)
+            if(a[k]==number(n-1)/2)
             {
               j=k-1;
             }
@@ -656,8 +662,8 @@ EXAMPLE:  example vfiltration; shows an example
             }
           }
           k++;
-          s[k]=s[j];
-          s[j]=eM[i]-1;
+          a[k]=a[j];
+          a[j]=eM[i]-1;
           v[k]=v[j];
           dbprint(printlevel-voice+2,
             "//gaussman::vfiltration: transform to V0");
@@ -678,110 +684,135 @@ EXAMPLE:  example vfiltration; shows an example
     v[k]=std(v[k]);
     d[k]=size(v[k]);
 
-    return(list(s,d,v,m,sJ));
+    return(list(a,d,v,m));
   }
 }
 example
 { "EXAMPLE:"; echo=2;
   ring R=0,(x,y),ds;
   poly f=x5+x2y2+y5;
-  list l=vfiltration(f);
-  print(l);
+  vfiltration(f);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc vfiltjacalg(list l)
-"USAGE:   vfiltjacalg(vfiltration(f)); poly f
+proc spectrum(poly f)
+"USAGE:    spectrum(f); poly f
+ASSUME:   basering has local ordering, f has isolated singularity at 0
+RETURN:
+@format
+list S: singularity spectrum of f
+  ideal S[1]: spectral numbers in increasing order
+  intvec S[2]:
+    int S[2][i]: multiplicity of spectral number S[1][i]
+@end format
+SEE ALSO: spectrum_lib
+KEYWORDS: singularities; Gauss-Manin connection; spectrum
+EXAMPLE:  example spectrum; shows an example
+"
+{
+  return(vfiltration(f,0));
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  poly f=x5+x2y2+y5;
+  spprint(spectrum(f));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc endfilt(poly f,list V)
+"USAGE:   endfilt(f,V); poly f, list V
 ASSUME:  basering has local ordering, f has isolated singularity at 0
 RETURN:
 @format
-list l:
-  ideal l[1]: spectral numbers of the V-filtration
-              on the Jacobian algebra in increasing order
-  intvec l[2]:
-    int l[2][i]: multiplicity of spectral number l[1][i]
-  list l[3]:
-  module l[3][i]: vector space basis of the l[1][i]-th graded part
-                  of the V-filtration on the Jacobian algebra
-                  in terms of l[4]
-  ideal l[4]: monomial vector space basis of the Jacobian algebra
-  ideal l[5]: standard basis of the Jacobian ideal
+list V1: endomorphim filtration of V on the Jacobian algebra of f
+  ideal V1[1]: spectral numbers in increasing order
+  intvec V1[2]:
+    int V1[2][i]: multiplicity of spectral number V1[1][i]
+  list V1[3]:
+    module V1[3][i]: vector space basis of the V1[1][i]-th graded part
+                     in terms of V1[4]
+  ideal V1[4]: monomial vector space basis
 @end format
-EXAMPLE: example vfiltjacalg; shows an example
+SEE ALSO: spectrum_lib
+KEYWORDS: singularities; Gauss-Manin connection; spectrum;
+          Brieskorn lattice; Hodge filtration; V-filtration
+EXAMPLE: example endfilt; shows an example
 "
 {
-  def s,d,v,m,sJ=l[1..5];
+  def a,d,v,m=V[1..4];
   int mu=ncols(m);
+  ideal sJ=std(jacob(f));
 
   int i,j,k;
-  module V=v[1];
+  module V0=v[1];
   for(i=2;i<=size(v);i++)
   {
-    V=V,v[i];
+    V0=V0,v[i];
   }
 
   dbprint(printlevel-voice+2,
-    "//gaussman::vfiltjacalg: compute multiplication in Jacobian algebra");
+    "//gaussman::endfilt: compute multiplication in Jacobian algebra");
   list M;
   matrix U=freemodule(ncols(m));
   for(i=ncols(m);i>=1;i--)
   {
-    M[i]=lift(V,coeffs(reduce(m[i]*m,U,sJ),m)*V);
+    M[i]=lift(V0,coeffs(reduce(m[i]*m,U,sJ),m)*V0);
   }
 
   int i0,j0,i1,j1;
-  number r0=number(s[1]-s[ncols(s)]);
-  number r1,r2;
+  number b0=number(a[1]-a[ncols(a)]);
+  number b1,b2;
   matrix M0;
   module L;
   list v0=freemodule(ncols(m));
-  ideal s0=r0;
+  ideal a0=b0;
 
-  while(r0<number(s[ncols(s)]-s[1]))
+  while(b0<number(a[ncols(a)]-a[1]))
   {
     dbprint(printlevel-voice+2,
-      "//gaussman::vfiltjacalg: find next possible index");
-    r1=number(s[ncols(s)]-s[1]);
-    for(j=ncols(s);j>=1;j--)
+      "//gaussman::endfilt: find next possible index");
+    b1=number(a[ncols(a)]-a[1]);
+    for(j=ncols(a);j>=1;j--)
     {
-      for(i=ncols(s);i>=1;i--)
+      for(i=ncols(a);i>=1;i--)
       {
-        r2=number(s[i]-s[j]);
-        if(r2>r0&&r2<r1)
+        b2=number(a[i]-a[j]);
+        if(b2>b0&&b2<b1)
         {
-          r1=r2;
+          b1=b2;
         }
         else
         {
-          if(r2<=r0)
+          if(b2<=b0)
           {
             i=0;
           }
         }
       }
     }
-    r0=r1;
+    b0=b1;
 
-    l=ideal();
+    list l=ideal();
     for(k=ncols(m);k>=2;k--)
     {
       l=l+list(ideal());
     }
 
     dbprint(printlevel-voice+2,
-      "//gaussman::vfiltjacalg: collect conditions for V["+string(r0)+"]");
-    j=ncols(s);
+      "//gaussman::endfilt: collect conditions for V1["+string(b0)+"]");
+    j=ncols(a);
     j0=mu;
     while(j>=1)
     {
       i0=1;
       i=1;
-      while(i<ncols(s)&&s[i]<s[j]+r0)
+      while(i<ncols(a)&&a[i]<a[j]+b0)
       {
         i0=i0+d[i];
         i++;
       }
-      if(s[i]<s[j]+r0)
+      if(a[i]<a[j]+b0)
       {
         i0=i0+d[i];
         i++;
@@ -799,7 +830,7 @@ EXAMPLE: example vfiltjacalg; shows an example
     }
 
     dbprint(printlevel-voice+2,
-      "//gaussman::vfiltjacalg: compose condition matrix");
+      "//gaussman::endfilt: compose condition matrix");
     L=transpose(module(l[1]));
     for(k=2;k<=ncols(m);k++)
     {
@@ -807,12 +838,12 @@ EXAMPLE: example vfiltjacalg; shows an example
     }
 
     dbprint(printlevel-voice+2,
-      "//gaussman::vfiltjacalg: compute kernel of condition matrix");
+      "//gaussman::endfilt: compute kernel of condition matrix");
     v0=v0+list(syz(L));
-    s0=s0,r0;
+    a0=a0,b0;
   }
 
-  dbprint(printlevel-voice+2,"//gaussman::vfiltjacalg: compute graded parts");
+  dbprint(printlevel-voice+2,"//gaussman::endfilt: compute graded parts");
   option(redSB);
   for(i=1;i<size(v0);i++)
   {
@@ -821,7 +852,7 @@ EXAMPLE: example vfiltjacalg; shows an example
   }
 
   dbprint(printlevel-voice+2,
-    "//gaussman::vfiltjacalg: remove trivial graded parts");
+    "//gaussman::endfilt: remove trivial graded parts");
   i=1;
   while(size(v0[i])==0)
   {
@@ -829,7 +860,7 @@ EXAMPLE: example vfiltjacalg; shows an example
   }
   list v1=v0[i];
   intvec d1=size(v0[i]);
-  ideal s1=s0[i];
+  ideal a1=a0[i];
   i++;
   while(i<=size(v0))
   {
@@ -837,46 +868,352 @@ EXAMPLE: example vfiltjacalg; shows an example
     {
       v1=v1+list(v0[i]);
       d1=d1,size(v0[i]);
-      s1=s1,s0[i];
+      a1=a1,a0[i];
     }
     i++;
   }
-  return(list(s1,d1,v1,m));
+  return(list(a1,d1,v1,m));
 }
 example
 { "EXAMPLE:"; echo=2;
   ring R=0,(x,y),ds;
   poly f=x5+x2y2+y5;
-  vfiltjacalg(vfiltration(f));
+  endfilt(f,vfiltration(f));
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc gamma(list l)
-"USAGE:   gamma(vfiltration(f,0)); poly f
-ASSUME:  basering has local ordering, f has isolated singularity at 0
-RETURN:  number g: C. Hertling's gamma invariant
+proc gamma(list S)
+"USAGE:   gamma(S); list S
+RETURN:  number: gamma invariant of spectrum S
 EXAMPLE: example gamma; shows an example
 "
 {
-  ideal s=l[1];
-  intvec d=l[2];
+  ideal a=S[1];
+  intvec d=S[2];
   int n=nvars(basering)-1;
   number g=0;
   int i,j;
-  for(i=1;i<=ncols(s);i++)
+  for(i=1;i<=ncols(a);i++)
   {
     for(j=1;j<=d[i];j++)
     {
-      g=g+(number(s[i])-number(n-1)/2)^2;
+      g=g+(number(a[i])-number(n-1)/2)^2;
     }
   }
-  g=-g/4+sum(d)*number(s[ncols(s)]-s[1])/48;
+  g=-g/4+sum(d)*number(a[ncols(a)]-a[1])/48;
   return(g);
 }
 example
 { "EXAMPLE:"; echo=2;
   ring R=0,(x,y),ds;
   poly f=x5+x2y2+y5;
-  gamma(vfiltration(f,0));
+  gamma(spectrum(f));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc spprint(list S)
+"USAGE:   spprint(S); list S
+RETURN:  string: spectrum S
+EXAMPLE: example spprint; shows an example
+"
+{
+  string s;
+  for(int i=1;i<size(S[2]);i++)
+  {
+    s=s+"("+string(S[1][i])+","+string(S[2][i])+"),";
+  }
+  s=s+"("+string(S[1][i])+","+string(S[2][i])+")";
+  return(s);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  list S=list(ideal(-1/2,-3/10,-1/10,0,1/10,3/10,1/2),intvec(1,2,2,1,2,2,1));
+  spprint(S);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc spadd(list S1,list S2)
+"USAGE:   spadd(S1,S2); list S1,S2
+RETURN:  list: sum of spectra S1 and S2
+EXAMPLE: example spadd; shows an example
+"
+{
+  ideal s;
+  intvec m;
+  int i,i1,i2=1,1,1;
+  while(i1<=size(S1[2])||i2<=size(S2[2]))
+  {
+    if(i1<=size(S1[2]))
+    {
+      if(i2<=size(S2[2]))
+      {
+        if(number(S1[1][i1])<number(S2[1][i2]))
+        {
+          s[i]=S1[1][i1];
+          m[i]=S1[2][i1];
+          i++;
+          i1++;
+        }
+        else
+        {
+          if(number(S1[1][i1])>number(S2[1][i2]))
+          {
+            s[i]=S2[1][i2];
+            m[i]=S2[2][i2];
+            i++;
+            i2++;
+          }
+          else
+          {
+            if(S1[2][i1]+S2[2][i2]!=0)
+            {
+              s[i]=S1[1][i1];
+              m[i]=S1[2][i1]+S2[2][i2];
+              i++;
+            }
+            i1++;
+            i2++;
+          }
+        }
+      }
+      else
+      {
+        s[i]=S1[1][i1];
+        m[i]=S1[2][i1];
+        i++;
+        i1++;
+      }
+    }
+    else
+    {
+      s[i]=S2[1][i2];
+      m[i]=S2[2][i2];
+      i++;
+      i2++;
+    }
+  }
+  return(list(s,m));
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  list S1=list(ideal(-1/2,-3/10,-1/10,0,1/10,3/10,1/2),intvec(1,2,2,1,2,2,1));
+  spprint(S1);
+  list S2=list(ideal(-1/6,1/6),intvec(1,1));
+  spprint(S2);
+  spprint(spadd(S1,S2));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc spsub(list S1,list S2)
+"USAGE:   spsub(S1,S2); list S1,S2
+RETURN:  list: difference of spectra S1 and S2
+EXAMPLE: example spsub; shows an example
+"
+{
+  return(spadd(S1,spmul(S2,-1)));
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  list S1=list(ideal(-1/2,-3/10,-1/10,0,1/10,3/10,1/2),intvec(1,2,2,1,2,2,1));
+  spprint(S1);
+  list S2=list(ideal(-1/6,1/6),intvec(1,1));
+  spprint(S2);
+  spprint(spsub(S1,S2));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc spmul(list #)
+"USAGE:
+@format
+1) spmul(S,k); list S, int k
+2) spmul(S,k); list S, intvec k
+@end format
+RETURN:
+@format
+1) list: product of spectrum S and integer k
+2) list: linear combination of spectra S with coefficients k
+@end format
+EXAMPLE: example spmul; shows an example
+"
+{
+  if(size(#)==2)
+  {
+    if(typeof(#[1])=="list")
+    {
+      if(typeof(#[2])=="int")
+      {
+        return(list(#[1][1],#[1][2]*#[2]));
+      }
+      if(typeof(#[2])=="intvec")
+      {
+        list S0=list(ideal(),intvec(0));
+        for(int i=size(#[2]);i>=1;i--)
+        {
+          S0=spadd(S0,spmul(#[1][i],#[2][i]));
+        }
+        return(S0);
+      }
+    }
+  }
+  return(list(ideal(),intvec(0)));
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  list S=list(ideal(-1/2,-3/10,-1/10,0,1/10,3/10,1/2),intvec(1,2,2,1,2,2,1));
+  spprint(S);
+  spprint(spmul(S,2));
+  list S1=list(ideal(-1/6,1/6),intvec(1,1));
+  spprint(S1);
+  list S2=list(ideal(-1/3,0,1/3),intvec(1,2,1));
+  spprint(S2);
+  spprint(spmul(list(S1,S2),intvec(1,2)));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc spissemicont(list S,list #)
+"USAGE:   spissemicont(S[,opt]); list S, int opt
+RETURN:
+@format
+int k=
+if opt==0:
+  1, if sum of spectrum S over all intervals [a,a+1) is positive
+  0, if sum of spectrum S over some interval [a,a+1) is negative
+if opt==1:
+  1, if sum of spectrum S over all intervals [a,a+1) and (a,a+1) is positive
+  0, if sum of spectrum S over some interval [a,a+1) or (a,a+1) is negative
+default: opt=0
+@end format
+EXAMPLE: example spissemicont; shows an example
+"
+{
+  int opt=0;
+  if(size(#)>0)
+  {
+    if(typeof(#[1])=="int")
+    {
+      opt=1;
+    }
+  }
+  int i,j,k=1,1,0;
+  while(j<=size(S[2]))
+  {
+    while(j+1<=size(S[2])&&S[1][j]<S[1][i]+1)
+    {
+      k=k+S[2][j];
+      j++;
+    }
+    if(j==size(S[2])&&S[1][j]<S[1][i]+1)
+    {
+      k=k+S[2][j];
+      j++;
+    }
+    if(k<0)
+    {
+      return(0);
+    }
+    k=k-S[2][i];
+    if(k<0&&opt==1)
+    {
+      return(0);
+    }
+    i++;
+  }
+  return(1);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  list S1=list(ideal(-1/2,-3/10,-1/10,0,1/10,3/10,1/2),intvec(1,2,2,1,2,2,1));
+  spprint(S1);
+  list S2=list(ideal(-1/6,1/6),intvec(1,1));
+  spprint(S2);
+  spissemicont(spsub(S1,spmul(S2,5)));
+  spissemicont(spsub(S1,spmul(S2,5)),1);
+  spissemicont(spsub(S1,spmul(S2,6)));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc spsemicont(list S0,list S,list #)
+"USAGE:   spsemicont(S,k[,opt]); list S0, list S, int opt
+RETURN:  list of intvecs l:
+         spissemicont(sub(S0,spmul(S,k)),opt)==1 iff k<=l[i] for some i
+NOTE:    if the spectra S occur with multiplicities k in a deformation
+         of the [quasihomogeneous] spectrum S0 then 
+         spissemicont(sub(S0,spmul(S,k))[,1])==1
+EXAMPLE: example spsemicont; shows an example
+"
+{
+  list l,l0;
+  int i,k;
+  while(spissemicont(S0,#))
+  {
+    if(size(S)>1)
+    {
+      l0=spsemicont(S0,list(S[1..size(S)-1]));
+      for(i=size(l0);i>=1;i--)
+      {
+        l0[i][size(S)]=k;
+      }
+      l=l+l0;
+    }
+    S0=spsub(S0,S[size(S)]);
+    k++;
+  }
+  if(size(S)>1)
+  {
+    return(l);
+  }
+  else
+  {
+    return(list(intvec(k-1)));
+  }
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  list S0=list(ideal(-1/2,-3/10,-1/10,0,1/10,3/10,1/2),intvec(1,2,2,1,2,2,1));
+  spprint(S0);
+  list S1=list(ideal(-1/6,1/6),intvec(1,1));
+  spprint(S1);
+  list S2=list(ideal(-1/3,0,1/3),intvec(1,2,1));
+  spprint(S2);
+  list S=S1,S2;
+  list l=spsemicont(S0,S);
+  l;
+  spissemicont(spsub(S0,spmul(S,l[1])));
+  spissemicont(spsub(S0,spmul(S,l[1]-1)));
+  spissemicont(spsub(S0,spmul(S,l[1]+1)));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc spgeomgenus(list S)
+"USAGE:   spgeomgenus(S); list S
+RETURN:  int g: geometric genus of spectrum S
+EXAMPLE: example spgeomgenus; shows an example
+"
+{
+  int g=0;
+  int i=1;
+  while(i+1<=size(S[2])&&number(S[1][i])<=number(0))
+  {
+    g=g+S[2][i];
+    i++;
+  }
+  if(i==size(S[2])&&number(S[1][i])<=number(0))
+  {
+    g=g+S[2][i];
+  }
+  return(g);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  list S=list(ideal(-1/2,-3/10,-1/10,0,1/10,3/10,1/2),intvec(1,2,2,1,2,2,1));
+  spprint(S);
+  spgeomgenus(S);
 }
 ///////////////////////////////////////////////////////////////////////////////
