@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.38 1998-10-22 12:26:12 krueger Exp $ */
+/* $Id: iplib.cc,v 1.39 1998-10-29 13:27:56 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -305,7 +305,7 @@ static void iiShowLevRings()
     Print("lev %d:",i);
     if (iiLocalRing[i]==NULL) PrintS("NULL");
     else                      Print("%d",iiLocalRing[i]);
-    Print("\n");
+    PrintLn();
   }
 #endif
   {
@@ -314,12 +314,12 @@ static void iiShowLevRings()
       Print("%d lev %d:",nshdl->lev, nshdl->myynest);
       if (nshdl->currRing==NULL) PrintS("NULL");
       else                       Print("%d",nshdl->currRing);
-      Print("\n");
+      PrintLn();
     }
     Print("%d lev %d:",nshdl->lev, nshdl->myynest);
     if (nshdl->currRing==NULL) PrintS("NULL");
     else                       Print("%d",nshdl->currRing);
-    Print("\n");
+    PrintLn();
   }
   if (currRing==NULL) PrintS("curr:NULL\n");
   else                Print ("curr:%d\n",currRing->no);
@@ -406,7 +406,7 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
     case LANG_NONE:
                  err=TRUE;
                  break;
-               
+
     case LANG_SINGULAR:
                  err=iiPStart(pn,sl);
                  break;
@@ -597,7 +597,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
   }
 #ifdef HAVE_NAMESPACES
   int token;
-  
+
   if(IsCmd(plib, &token)) {
     Werror("'%s' is resered identifier\n", plib);
     return TRUE;
@@ -741,12 +741,13 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
       }
     }
 #if 0
-    Print("--------------------\n");
-    for(ls = library_stack; ls != NULL; ls = ls->next) {
+    PrintS("--------------------\n");
+    for(ls = library_stack; ls != NULL; ls = ls->next)
+    {
       Print("%s: LIB-stack:(%d), %s %s\n", newlib, ls->cnt, ls->get(),
         ls->to_be_done ? "not loaded" : "loaded");
     }
-    Print("--------------------\n");
+    PrintS("--------------------\n");
 #endif
   }
 #else /* HAVE_LIBPARSER */
@@ -953,7 +954,8 @@ int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
   idhdl h;
 
   h = enterid(mstrdup(procname),0, PROC_CMD, &IDROOT, FALSE);
-  if ( h!= NULL ) {
+  if ( h!= NULL )
+  {
     Print("register binary proc: %s::%s\n", libname, procname);
     pi = IDPROC(h);
     pi->libname = mstrdup(libname);
@@ -963,8 +965,10 @@ int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
     pi->is_static = pstatic;
     pi->data.o.function = func;
     return(1);
-  } else {
-    Print("iiAddCproc: failed.\n");
+  }
+  else
+  {
+    PrintS("iiAddCproc: failed.\n");
   }
   return(0);
 }
@@ -999,7 +1003,7 @@ char *iiConvName(char *libname)
   *r = mytoupper(*r);
   // printf("iiConvName: '%s' '%s' => '%s'\n", libname, tmpname, r);
   FreeL(tmpname);
-  
+
   return(r);
 }
 

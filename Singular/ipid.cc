@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.24 1998-10-28 18:12:55 Singular Exp $ */
+/* $Id: ipid.cc,v 1.25 1998-10-29 13:27:55 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -427,8 +427,9 @@ void killhdl(idhdl h, idhdl * ih)
     }
   }
   // pointer -------------------------------------------------------------
-  else if(IDTYP(h)==POINTER_CMD) {
-    Print(">>>>>>Free pointer\n");
+  else if(IDTYP(h)==POINTER_CMD)
+  {
+    PrintS(">>>>>>Free pointer\n");
   }
 #endif /* HAVE_NAMESPACES */
   // poly / vector -------------------------------------------------------
@@ -495,8 +496,10 @@ void killhdl(idhdl h, idhdl * ih)
   //  general  -------------------------------------------------------------
   // now dechain it and delete idrec
 #ifdef KAI_
-  if(h->next != NULL)Print("=======>%s(%x) -> %s<====\n", IDID(h), IDID(h), IDID(h->next));
-  else Print("=======>%s(%x)<====\n", IDID(h), IDID(h));
+  if(h->next != NULL)
+    Print("=======>%s(%x) -> %s<====\n", IDID(h), IDID(h), IDID(h->next));
+  else
+    Print("=======>%s(%x)<====\n", IDID(h), IDID(h));
 #endif
 
   FreeL((ADDRESS)IDID(h));
@@ -715,7 +718,6 @@ void paCleanUp(package pack)
     if( pack->language == LANG_C)
     {
       Print("//dclose(%s)\n",pack->libname);
-      
     }
     FreeL((ADDRESS)pack->libname);
     memset((void *) pack, 0, sizeof(package));
@@ -910,12 +912,14 @@ BOOLEAN checkPackage(package pack)
       
   for(nshdl=namespaceroot; nshdl->isroot != TRUE; nshdl = nshdl->next) {
     //Print("NSstack: %s:%d, nesting=%d\n", nshdl->name, nshdl->lev, nshdl->myynest);
-    if (nshdl->pack==pack) {
+    if (nshdl->pack==pack)
+    {
       Warn("package '%s' still in use on level %d",nshdl->name, nshdl->lev);
       return FALSE;
     }
   }
-  if (nshdl->pack==pack) {
+  if (nshdl->pack==pack)
+  {
     //Print("NSstack: %s:%d, nesting=%d\n", nshdl->name, nshdl->lev, nshdl->myynest);
     Warn("package '%s' still in use on level %d",nshdl->name, nshdl->lev);
     return FALSE;
