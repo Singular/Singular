@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_univar.cc,v 1.17 1998-03-12 14:32:54 schmidt Exp $ */
+/* $Id: fac_univar.cc,v 1.18 1998-04-06 12:05:51 schmidt Exp $ */
 
 #include <config.h>
 
@@ -270,7 +270,7 @@ UnivariateQuadraticLift ( const CanonicalForm &F, const  CanonicalForm & G, cons
     i = 1;
 
     while ( ! e.isZero() && j > 0 ) {
-	c = div( e, modulus );
+	c = e / modulus;
 	{
 	    j--;
 	    setCharacteristic( p, kvals[j+1] );
@@ -337,7 +337,7 @@ UnivariateLinearLift ( const CanonicalForm &F, const  CanonicalForm & G, const C
     i = 1;
 
     while ( ! e.isZero() && i <= k ) {
-	c = div( e, modulus );
+	c = e / modulus;
 	{
 	    setCharacteristic( p );
 	    c = mapinto( c );
