@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.31 2000-08-14 12:56:51 obachman Exp $ */
+/* $Id: sparsmat.cc,v 1.32 2000-09-07 07:38:22 Singular Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -1902,17 +1902,43 @@ static void smExactPolyDiv(poly a, poly b)
   pFree1(e);
 }
 
+// orginal text:
+// static BOOLEAN smIsNegQuot(poly a, const poly b, const poly c)
+// {
+//   int i;
+// 
+//   i=pVariables;
+//   while (i&&(pGetExp(b,i)<pGetExp(c,i))) i--;
+//   if(i)
+//   {
+//     for (i=pVariables; i; i--)
+//     {
+//       if(pGetExp(b,i)<pGetExp(c,i))
+//         pSetExp(a,i,pGetExp(c,i)-pGetExp(b,i));
+//       else
+//         pSetExp(a,i,0);
+//     }
+//     return TRUE;
+//   }
+//   else
+//   {
+//     for (i=pVariables; i; i--)
+//     {
+//       pSetExp(a,i,pGetExp(b,i)-pGetExp(c,i));
+//     }
+//     return FALSE;
+//   }
+// }
 static BOOLEAN smIsNegQuot(poly a, const poly b, const poly c)
 {
-  int i;
+  int i=pVariables;
 
-  i=pVariables;
-  while (i&&(pGetExp(b,i)<pGetExp(c,i))) i--;
-  if(i)
+  while ((i>0) && (pGetExp(c,i) >= pGetExp(b,i))) i--;
+  if(i!=0)
   {
-    for (i=pVariables; i; i--)
+    for (i=pVariables; i>0; i--)
     {
-      if(pGetExp(b,i)<pGetExp(c,i))
+      if(pGetExp(c,i) > pGetExp(b,i))
         pSetExp(a,i,pGetExp(c,i)-pGetExp(b,i));
       else
         pSetExp(a,i,0);
@@ -1921,9 +1947,11 @@ static BOOLEAN smIsNegQuot(poly a, const poly b, const poly c)
   }
   else
   {
-    for (i=pVariables; i; i--)
+    for (i=pVariables; i>0; i--)
     {
-      pSetExp(a,i,pGetExp(b,i)-pGetExp(c,i));
+      int j=pGetExp(b,i)-pGetExp(c,i);
+      if (j<0) { Print("!"); j=0;}
+      pSetExp(a,i,j);
     }
     return FALSE;
   }
