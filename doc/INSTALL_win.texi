@@ -1,0 +1,16 @@
+@comment -*-texinfo-*-
+@comment $Id: INSTALL_win.texi,v 1.1 2000-05-23 11:22:53 obachman Exp $
+@c FILE:    INSTALL.texi
+@c PURPOSE: Installation instructions for Singular on MSWindows
+@c
+
+@ifclear VERSION
+@include version.texi
+@end ifclear
+
+@ifclear singularmanual
+@majorheading Installation innstructions for Singular on MSWINDOWS.
+@end ifclear
+
+This file contains installation instructions for Singular on MSWINDOWS.
+
