@@ -1,8 +1,8 @@
-// $Id: tst.lib,v 1.14 1999-07-06 15:33:00 Singular Exp $
+// $Id: tst.lib,v 1.15 1999-09-23 12:13:39 Singular Exp $
 //(obachman, last modified 6/30/98)
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: tst.lib,v 1.14 1999-07-06 15:33:00 Singular Exp $";
+version="$Id: tst.lib,v 1.15 1999-09-23 12:13:39 Singular Exp $";
 info="
 LIBRARY:  tst.lib      PROCEDURES FOR RUNNING AUTOMATIC TST TESTS
 
@@ -245,7 +245,7 @@ EXAMPLE: example tst_init; shows example
     tst_status_out("init", "uname -a:" + tst_system("uname -a", 1));
     tst_status_out("init", "date    :" + tst_system("date", 1));
     tst_status_out("init", "version :" + string(system("version")));
-    tst_status_out("init", "ticks   :" + system("--ticks-per-sec"));
+    tst_status_out("init", "ticks   :" + string(system("--ticks-per-sec")));
     "init >> " + GetTstStatusFile();
   }
 }

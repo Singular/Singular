@@ -1,8 +1,8 @@
-// $Id: general.lib,v 1.19 1999-09-21 17:32:15 Singular Exp $
+// $Id: general.lib,v 1.20 1999-09-23 12:13:38 Singular Exp $
 //GMG, last modified 18.6.99
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: general.lib,v 1.19 1999-09-21 17:32:15 Singular Exp $";
+version="$Id: general.lib,v 1.20 1999-09-23 12:13:38 Singular Exp $";
 info="
 LIBRARY:  general.lib   PROCEDURES OF GENERAL TYPE
 
@@ -686,31 +686,87 @@ example
    product(A,3..5);
 }
 ///////////////////////////////////////////////////////////////////////////////
-
-proc ringweights (r)
-"USAGE:   ringweights(r); r ring
-RETURN:  intvec of weights of ring variables. If, say, x(1),...,x(n) are the
-         variables of the ring r, in this order, the resulting intvec is
-         deg(x(1)),...,deg(x(n)) where deg denotes the weighted degree if
-         the monomial ordering of r has only one block of type ws,Ws,wp or Wp.
-NOTE:    In all other cases, in particular if there is more than one block,
-         the resulting intvec is 1,...,1
-EXAMPLE: example ringweights; shows an example
+proc ringweights (list # )
+"USAGE:   ringweights (P); P=name of an existing ring (true name, not a string)
+RETURN:  intvec, size=nvars(P), consisting of the weights of the variables of P
+NOTE:    This is useful when enlarging P but keeping the weights of the old
+         variables
+EXAMPLE: example ringweights;  shows an example
 "
 {
-   int i; intvec v; setring r;
-   for (i=1; i<=nvars(basering); i=i+1) { v[i] = deg(var(i)); }
-   return(v);
+   int ii,q,fi,fo,fia;
+   intvec rw,nw;
+   string os;
+   def P = #[1];
+   string osP = ordstr(P);
+   fo  = 1;
+//------------------------- find weights in ordstr(P) -------------------------
+   fi  = find(osP,"(",fo);
+   fia = find(osP,"a",fo)+find(osP,"w",fo)+find(osP,"W",fo);
+   while ( fia )
+   {
+      os = osP[fi+1,find(osP,")",fi)-fi-1];
+      if( find(os,",") )
+      {
+         execute "nw = "+os+";";
+         if( size(nw) > ii )
+         {
+             rw = rw,nw[ii+1..size(nw)];
+         }
+         else  {  ii = ii - size(nw); }
+
+         if( find(osP[1,fi],"a",fo) ) { ii = size(nw); }
+      }
+      else
+      {
+         execute "q = "+os+";";
+         if( q > ii )
+         {
+            nw = 0; nw[q-ii] = 0;
+            nw = nw + 1;          //creates an intvec 1,...,1 of length q-ii
+            rw = rw,nw;
+         }
+         else { ii = ii - q; }
+      }
+      fo  = fi+1;
+      fi  = find(osP,"(",fo);
+      fia = find(osP,"a",fo)+find(osP,"w",fo)+find(osP,"W",fo);
+   }
+//-------------- adjust weight vector to length = nvars(P)  -------------------
+   if( fo > 1 )
+   {                                            // case when weights were found
+      rw = rw[2..size(rw)];
+      if( size(rw) > nvars(P) )
+      {
+         rw = rw[1..nvars(P)];
+      }
+      if( size(rw) < nvars(P) )
+      {
+         nw=0; nw[nvars(P)-size(rw)]=0; nw=nw+1; rw=rw,nw;
+      }
+   }
+   else
+   {                                         // case when no weights were found
+      rw[nvars(P)]= 0; rw=rw+1;
+   }
+   return(rw);
 }
 example
-{ "EXAMPLE:"; echo = 2;
-   ring r1=32003,(x,y,z),wp(1,2,3);
-   ring r2=32003,(x,y,z),Ws(1,2,3);
-   ring r=0,(x,y,u,v),lp;
-   intvec vr=ringweights(r1); vr;
-   ringweights(r2);
-   ringweights(r);
+{"EXAMPLE:";  echo = 2;
+  ring r0 = 0,(x,y,z),dp;
+  ringweights(r0);
+  ring r1 = 0,x(1..5),(ds(3),wp(2,3));
+  ringweights(r1);
+  ring r2 = 0,x(1..5),(a(1,2,3,0),dp);
+  ringweights(r2);
+  ring r3 = 0,x(1..10),(a(1..5),dp(5),a(10..13),Wp(5..9));
+  ringweights(r3);
+  // an example for enlarging the ring:
+  intvec v = 6,2,3,4,5;
+  ring R = 0,x(1..10),(a(ringweights(r1),v),dp);
+  ordstr(R);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 
 proc sort (id, list #)
