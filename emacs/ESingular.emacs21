@@ -1,0 +1,2 @@
+#!/bin/sh
+emacs -eval '(setq singular-emacs-home-directory "/opt/Singular/2-0-3/emacs")' -no-init-file -l /opt/Singular/2-0-3/emacs/.emacs-singular -eval '(singular-other "/opt/Singular/2-0-3/ix86-Linux/Singular" "/opt/Singular/2-0-3/ix86-Linux/" (list ) "singular")'
