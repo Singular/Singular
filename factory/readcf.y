@@ -1,29 +1,26 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: readcf.y,v 1.1 1996-12-06 14:49:26 schmidt Exp $ */
+/* $Id: readcf.y,v 1.2 1997-04-15 09:36:32 schmidt Exp $ */
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1996/12/06 14:49:26  schmidt
+Initial revision
+
 */
 
 %{
 
-#ifdef COMEAU
-#include <malloc.h>
-#endif
+#include <config.h>
+
 #include <ctype.h>
 #include <stdio.h>
 
 #include "assert.h"
+
 #include "cf_defs.h"
 #include "canonicalform.h"
 #include "parseutil.h"
 #include "variable.h"
-
-#ifdef COMEAU
-#define __HAVE_NO_ALLOCA
-#undef __GNUC__
-#undef alloca
-#endif
 
 #ifndef BISONPP
 #define YYSTYPE ParseUtil
