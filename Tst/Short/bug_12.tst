@@ -4,7 +4,7 @@ tst_init();
 //input script that crashes Singular
 //  neumann@ms.unimelb.edu.au (Walter D. Neumann)
 ring r=0,(x,y,z,u,v,a,b),lp;
-option(prot);option(mem);
+option(prot);
 poly f=x6y4-x-a;poly g=x9y6-x-b;
 poly s=z-ux-vy;
 ideal id=s,f;
