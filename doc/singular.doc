@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.34 1998-05-20 07:53:16 obachman Exp $
+@comment $Id: singular.doc,v 1.35 1998-05-20 09:17:56 schmidt Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -431,12 +431,11 @@ ideal).
 
 @item computations in qrings
 
-@sc{Singular} computes in a @code{qring} as long as possible with the given
-representative of a polynomial @code{p}, i.e. it usually does not reduce a
-polynom @code{p}w.r.t. the quotient ideal. This is only done during standard
-bases computations or by an explicite reduction using the command
-@code{reduce(p, 0)}. @ref{reduce}
-
+@sc{Singular} computes in a quotiemt rings as long as possible with the
+given representative of a polynomial, say, @code{p}.  I.e., it usually
+does not reduce @code{p} w.r.t. the quotient ideal.  This is only done
+during standard bases computations or by an explicite reduction using
+the command @code{reduce(p, std(0))} (@pxref{reduce}).
 
 @item substring selection 
 
