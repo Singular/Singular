@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmprivate.h,v 1.9 1999-04-15 09:57:04 obachman Exp $ */
+/* $Id: mmprivate.h,v 1.10 1999-06-30 15:42:13 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -49,7 +49,7 @@ typedef struct DBMCB
 typedef DBMCB * pDBMCB;
 
 #define DebugOffsetFront (sizeof(DBMCB) - sizeof(void*))
-#define DebugOffsetBack 4
+#define DebugOffsetBack SIZEOF_VOIDP
 
 #define SizeFromRealSize( size ) (size - DebugOffsetFront - DebugOffsetBack)
 #define RealSizeFromSize( size ) (size + DebugOffsetFront + DebugOffsetBack)

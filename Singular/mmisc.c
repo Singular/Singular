@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmisc.c,v 1.5 1999-03-19 17:42:31 obachman Exp $ */
+/* $Id: mmisc.c,v 1.6 1999-06-30 15:42:12 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -90,7 +90,7 @@ static int mm_printMark=102400;
 void mmCheckPrint( void )
 {
   int mm_bytesAlloc = mm_bytesValloc + mm_bytesMalloc;
-  
+
   if ( ABS(mm_bytesAlloc - mm_printMark)>(100*1024) )
   {
     int i=(mm_bytesAlloc+1023)/1024;
@@ -103,11 +103,12 @@ void mmCheckPrint( void )
 #ifndef MAKE_DISTRIBUTION
 void mmPrintStat()
 {
-  int i, l, a;
-  
-#ifdef HAVE_SBRK  
+  int i;
+  long l,a;
+
+#ifdef HAVE_SBRK
   printf("Physical:%dk ", (mmMemPhysical()+ 1023)/1024);
-#endif  
+#endif
   printf("Alloc:%dk ", (mmMemAlloc() + 1023)/1024);
   printf("Used:%dk ", (mmMemUsed()+ 1023)/1024);
   printf("Malloc:%dk ", (mm_bytesMalloc+ 1023)/1024);
@@ -123,7 +124,7 @@ void mmPrintStat()
     i++;
     l = mmListLength(mm_theList[i].pages);
     a = mmListLength(mm_theList[i].current);
-    printf("%d\t%d\t%d\t%d\t%d\t%d\n",
+    printf("%d\t%ld\t%ld\t%d\t%ld\t%ld\n",
            i, mmGetHeapBlockSize(&mm_theList[i]), l,
            (l != 0 ? ((int) ((1.0 -
                               ((double) a)
@@ -163,7 +164,7 @@ void mmTestList (int all)
 
 /**********************************************************************
  *
- * Some operations on linked lists of memory 
+ * Some operations on linked lists of memory
  *
  **********************************************************************/
 
@@ -171,22 +172,22 @@ void* mmRemoveFromList(void* list, void* element)
 {
   void* nlist;
   void* olist;
-  
+
   if (list == NULL) return NULL;
 
   nlist = *((void**) list);
   olist = list;
-  
+
   if (list == element) return nlist;
-  
+
   while (nlist != NULL && nlist != element)
   {
     list = nlist;
     nlist = *((void**) list);
   }
-  
+
   if (nlist != NULL) *((void**) list) = *((void**) nlist);
-  
+
   return olist;
 }
 
@@ -215,7 +216,7 @@ int mmIsAddrOnList(void* addr, void* list)
 {
   if (addr == NULL)
     return (list == NULL);
-  
+
   while (list != NULL)
   {
     if (addr == list) return 1;
@@ -228,7 +229,7 @@ void* mmListHasCycle(void* list)
 {
   void* l1 = list;
   void* l2;
-  
+
   int l = 0, i;
 
   while (l1 != NULL)
@@ -246,7 +247,7 @@ void* mmListHasCycle(void* list)
   }
   return NULL;
 }
-    
+
 
 int mmGListLength(void* list, int next)
 {
@@ -273,7 +274,7 @@ int mmIsAddrOnGList(void* addr, void* list, int next)
 {
   if (addr == NULL)
     return (list == NULL);
-  
+
   while (list != NULL)
   {
     if (addr == list) return 1;
@@ -286,7 +287,7 @@ void* mmGListHasCycle(void* list, int next)
 {
   void* l1 = list;
   void* l2;
-  
+
   int l = 0, i;
 
   while (l1 != NULL)
@@ -326,7 +327,7 @@ void _memcpyW(void* p1, void* p2, long l)
 void _memaddW(void* p1, void* p2, void* p3, long l)
 {
   assume(l >= 0);
-  
+
   while (l)
   {
     *p1++ = *p2++ + *p3++;
@@ -337,7 +338,7 @@ void _memaddW(void* p1, void* p2, void* p3, long l)
 void _memsetW(void* p1, long w, long l)
 {
   assume(l >= 0);
-  
+
   while (l)
   {
     *p1++ = w;

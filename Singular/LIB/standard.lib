@@ -1,12 +1,12 @@
-// $Id: standard.lib,v 1.33 1999-06-30 14:14:31 Singular Exp $
+// $Id: standard.lib,v 1.34 1999-06-30 15:42:14 Singular Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.33 1999-06-30 14:14:31 Singular Exp $";
+version="$Id: standard.lib,v 1.34 1999-06-30 15:42:14 Singular Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
  stdfglm(ideal[,ord])   standard basis of the ideal via fglm [and ordering ord]
- stdhilb(ideal)         standard basis of the ideal using the Hilbert function
+ stdhilb(ideal[,h])     standard basis of the ideal using the Hilbert function
  groebner(ideal/module) standard basis of ideal or module using a
                         heuristically choosen method
  quot(any,any[,n])  a general quotient procedure calling several algorithms

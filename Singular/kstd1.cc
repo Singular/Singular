@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.34 1999-04-30 10:39:53 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.35 1999-06-30 15:42:11 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -96,7 +96,7 @@ void doRed (LObject* h,poly* with,BOOLEAN intoT,kStrategy strat)
   poly hp;
 #ifdef KDEBUG
   pTest((*h).p);
-  pTest(*with);
+  //pTest(*with);
 #endif
 
   if (!TEST_OPT_INTSTRATEGY)
@@ -1790,8 +1790,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
     #endif
   }
 #ifdef KDEBUG
-  int i;
-  for (i=0; i<IDELEMS(r); i++) pTest(r->m[i]);
+  idTest(r);
 #endif
   if (toReset)
   {
