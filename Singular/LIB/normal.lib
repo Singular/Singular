@@ -2,12 +2,13 @@
 // normal.lib
 // algorithms for computing the normalization based on
 // the criterion of Grauert/Remmert and ideas of De Jong & Vasconcelos
-// written by Gert-Martin Greuel and Gerhard Pfister
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: normal.lib,v 1.17 1999-07-07 14:39:11 obachman Exp $";
+version="$Id: normal.lib,v 1.18 1999-08-03 11:43:08 obachman Exp $";
 info="
-LIBRARY: normal.lib     PROCEDURES FOR NORMALIZATION
+LIBRARY:  normal.lib     PROCEDURES FOR NORMALIZATION
+AUTHORS:  Gert-Martin Greuel, email: greuel@mathematik.uni-kl.de,
+          Gerhard Pfister, email: pfister@mathematik.uni-kl.de
 
 PROCEDURES:
  normal(I);             computes the normalization of basering/I
@@ -20,7 +21,6 @@ LIB "primdec.lib";
 LIB "elim.lib";
 LIB "presolve.lib";
 LIB "inout.lib";
-
 ///////////////////////////////////////////////////////////////////////////////
 static
 proc isR_HomJR (list Li)
@@ -177,7 +177,6 @@ EXAMPLE: example HomJJ;  shows an example
    int isIso,isPr,isCo,isRe,isEq,ii,jj,q,y;
    intvec rw,rw1;
    list L;
-
    y = printlevel-voice+2;  // y=printlevel (default: y=0)
  def P = basering;
    ideal SBid, id, J = Li[1], Li[2], Li[3];
@@ -221,16 +220,14 @@ EXAMPLE: example HomJJ;  shows an example
 //---------- computation of p*Hom(J,J) as R-ideal -----------------------------
    if ( y>=1 )
    {
-     "// compute p*Hom(rad(J),rad(J)) = p*J:J, p a non-zerodivisor";
+     "// compute p*Hom(J,J) = p*J:J, p a non-zerodivisor";
      "//   p is equal to:"; "";
      p;
      "";
    }
-
    f  = quotient(p*J,J);
    if ( y>=1 )
-   { "// the module p*Hom(rad(J),rad(J)) = p*J:J, p a non-zerodivisor";
-
+   { "// the module p*Hom(J,J) = p*J:J, p a non-zerodivisor";
       "// p"; p;
       "// f=p*J:J";f;
    }
@@ -280,7 +277,7 @@ EXAMPLE: example HomJJ;  shows an example
       dbprint(y,"// case R = Hom(J,J)");
       if(y>=1)
       {
-         "//   R=Hom(rad(J),rad(J))";
+         "//   R=Hom(J,J)";
          "   ";
          lastRing;
          "   ";
@@ -301,7 +298,7 @@ EXAMPLE: example HomJJ;  shows an example
          "   ";
          endphi;
          "   ";
-         pause();
+         pause;
          newline;
       }
       setring P;
@@ -309,11 +306,11 @@ EXAMPLE: example HomJJ;  shows an example
    }
    if(y>=1)
    {
-      "// R is not equal to Hom(rad(J),rad(J)), we have to try again";
+      "// R is not equal to Hom(J,J), we have to try again";
       pause();
       newline;
    }
-//---------- Hom(J,j) != R: create new ring and map form old ring -------------
+//---------- Hom(J,J) != R: create new ring and map form old ring -------------
 // the ring newR1/SBid+syzf will be isomorphic to Hom(J,J) as R-module
 
    f = p,rf;          // generates pJ:J mod(p), i.e. p*Hom(J,J)/p*R as R-module
@@ -360,7 +357,7 @@ EXAMPLE: example HomJJ;  shows an example
    Lin = ideal(T*syzf);
    if(y>=1)
    {
-      "// the ring structure of Hom(rad(J),rad(J)) as R-algebra";
+      "// the ring structure of Hom(J,J) as R-algebra";
       " ";
       "//   the linear relations";
       " ";
@@ -464,9 +461,9 @@ proc normal(ideal id, list #)
          if choose=1 the factorizing Buchberger algorithm is not used
          (which is sometimes more efficient)
 RETURN:  a list of rings (say nor), in each ring nor[i] are two ideals
-         norid, normap such that the product of the nor[i]/norid is the
-         normalization of basering/id and normap is the map from basering/id
-         to nor[i]/norid
+         norid, normap such that the direct sum of the rings nor[i]/norid is 
+         the normalization of basering/id; normap gives the normalization map 
+         from basering/id to nor[i]/norid (for each i)
 NOTE:    to use the i-th ring type: def R=nor[i]; setring R;
          increasing printlevel displays more comments (default: printlevel=0)
 COMMENT: Not implemented for local or mixed orderings.
@@ -491,6 +488,7 @@ EXAMPLE: example normal; shows an example
    }
 
    if(size(#)==0)
+//--------------- the factorizing Buchberger algorithm is used ---------------
    {
       prim[1]=id;
       if( typeof(attrib(id,"isEquidimensional"))=="int" )
@@ -554,7 +552,7 @@ EXAMPLE: example normal; shows an example
 
       result = normalizationPrimes(prim[1],maxideal(1));
       sr = string(size(result));
-
+      
       dbprint(y+1,"
 // 'normal' created a list of "+sr+" ring(s).
 // To see the rings, type (if the name of your list is nor):
@@ -564,10 +562,10 @@ EXAMPLE: example normal; shows an example
 // R/norid is the 1-st ring of the normalization and
 // normap the map from the original basering to R/norid");
 
-      // kill endphi,endid;
        return(result);
    }
    else
+//------------- the factorizing Buchberger algorithm is not used -------------
    {
       if(#[1]==0)
       {
@@ -582,7 +580,7 @@ EXAMPLE: example normal; shows an example
       {
          "// we have ",size(prim),"components";
       }
-      for(i=1;i<=size(prim);i++)
+      for(i=1; i<=size(prim); i++)
       {
          if(y>=1)
          {
@@ -625,11 +623,11 @@ EXAMPLE: example normal; shows an example
       sr = string(size(result));
 
       dbprint(y+1,"
-// 'normal' created a list of "+sr+" ring(s).
+// 'normal' created a list of "+sr+" ring(s). 
 // To see the rings, type (if the name of your list is nor):
-     show( nor);
+     show( nor);                  
 // To access the 1-st ring and map (and similair for the others), type:
-     def R = nor[1]; setring R;  norid; normap;
+     def R = nor[1]; setring R;  norid; normap; 
 // R/norid is the 1-st ring of the normalization and
 // normap the map from the original basering to R/norid");
 
@@ -652,17 +650,18 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 static
 proc normalizationPrimes(ideal i,ideal ihp, list #)
-"USAGE:   normalizationPrimes(i);  i prime ideal
+"USAGE:   normalizationPrimes(i,ihp[,si]);  i prime ideal, ihp map 
+         (partial normalization), si SB of singular locus
 RETURN:  a list of one ring L=R, in  R are two ideals
          S,M such that R/M is the normalization
          S is a standardbasis of M
 NOTE:    to use the ring: def r=L[1];setring r;
-         printlevel >=1: display comments (default: printlevel=0)
+         printlevel >= voice+1: display comments (default: printlevel=0)
 EXAMPLE: example normalizationPrimes; shows an example
 "
 {
    int y = printlevel-voice+2;  // y=printlevel (default: y=0)
-
+  
    if(y>=1)
    {
      "";
@@ -694,19 +693,39 @@ EXAMPLE: example normalizationPrimes; shows an example
          result=newR7;
          setring BAS;
          return(result);
-
    }
 
    if(y>=1)
    {
      "// SB-computation of the input ideal";
    }
-   list SM=mstd(i);
-
+   list SM=mstd(i);                //here the work starts
+   int dimSM =  dim(SM[1]);
+  // Case: Get an ideal containing a unit
+   if( dimSM == -1)
+   {  "";
+      "      // A unit ideal was found.";
+      "      // Stop with partial result computed so far";"";
+      
+         MB=SM[2];
+         intvec rw;
+         list LL=substpart(MB,ihp,0,rw);
+         def newR6=LL[1];
+         setring newR6;
+         ideal norid=endid;
+         ideal normap=endphi;
+         kill endid,endphi;
+         export norid;
+         export normap;
+         result=newR6;
+         setring BAS;
+         return(result);
+   }
+   
    if(y>=1)
    {
       "//   the dimension is:"; "";
-      dim(SM[1]);"";
+      dimSM;"";
    }
 
    if(size(#)>0)
@@ -859,10 +878,17 @@ EXAMPLE: example normalizationPrimes; shows an example
    if(((attrib(SM[2],"isIsolatedSingularity")==0)||(homog(SM[2])==0))
         &&(size(#)==0))
    {
-
+/*
+write (":a normal-fehler" ,
+         "basering:",string(basering),"nvars:", nvars(basering),
+       "dim(SM[1]):",dim(SM[1]),"ncols(jacob(SM[2]))",ncols(jacob(SM[2])),
+       "SM:", SM);
+ 
+     pause();
+*/     
       J=minor(jacob(SM[2]),nvars(basering)-dim(SM[1]));
       //ti=timer;
-      if(y>=1)
+      if(y >=1 )
       {
          "// SB of singular locus will be computed";
       }
@@ -1089,6 +1115,28 @@ EXAMPLE: example normalizationPrimes; shows an example
       setring BAS;
       return(tluser);
    }
+    // A component with singular locus the whole component found
+   if( Ann == 1)
+   {
+      "// Input appeared not to be a radical ideal!";
+      "// A (everywhere singular) component with ideal";
+      "// equal to its Jacobian ideal was found";
+      "// Procedure will stop with partial result computed so far";"";
+      
+         MB=SM[2];
+         intvec rw;
+         list LL=substpart(MB,ihp,0,rw);
+         def newR6=LL[1];
+         setring newR6;
+         ideal norid=endid;
+         ideal normap=endphi;
+         kill endid,endphi;
+         export norid;
+         export normap;
+         result=newR6;
+         setring BAS;
+         return(result);
+   }
    else
    {
       int equi=attrib(SM[2],"isEquidimensional");
@@ -1172,6 +1220,11 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 static
 proc substpart(ideal endid, ideal endphi, int homo, intvec rw)
+
+"//Repeated application of elimpart to endid, until no variables can be 
+//directy substituded. homo=1 if input is homogeneous, rw contains
+//original weights, endphi (partial) normalization map";
+
 {
    def newRing=basering;
    int ii,jj;

@@ -1,9 +1,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: mondromy.lib,v 1.7 1999-07-06 15:32:53 Singular Exp $";
+version="$Id: mondromy.lib,v 1.8 1999-08-03 11:43:07 obachman Exp $";
 info="
-LIBRARY: mondromy.lib  PROCEDURES TO COMPUTE THE MONODROMY OF A SINGULARITY
-AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
+LIBRARY:  mondromy.lib  PROCEDURES TO COMPUTE THE MONODROMY OF A SINGULARITY
+AUTHOR:   Mathias Schulze, email: mschulze@mathematik.uni-kl.de
+
+OVERVIEW: 
+ A library to compute the monodromy of an isolated hypersurface singularity. 
+ It uses an algorithm by Brieskorn (manuscipta math. 2 (1970), 103-161) to 
+ compute a connection matrix of the meromorphic Gauss-Manin connection up to 
+ arbitrarily high order, and an algorithm of Gerard and Levelt (Ann. Inst. 
+ Fourier, Grenoble 23,1 (1973), pp. 157-195) to transform it to a simple pole.
 
 PROCEDURES:
  invunit(u,n);         series inverse of polynomial u up to order n
@@ -814,12 +821,6 @@ RETURN:  The procedure returns a residue matrix M of the meromorphic
          If opt=0 (default), exp(2*pi*i*M) is a monodromy matrix of f,
          else, only the characteristic polynomial of exp(2*pi*i*M) coincides
          with the characteristic polynomial of the monodromy of f.
-THEORY:  The procedure uses an algorithm by Brieskorn (See E. Brieskorn,
-         manuscipta math. 2 (1970), 103-161) to compute a connection matrix of
-         the meromorphic Gauss-Manin connection up to arbitrarily high order,
-         and an algorithm of Gerard and Levelt (See R. Gerard, A.H.M. Levelt,
-         Ann. Inst. Fourier, Grenoble 23,1 (1973), pp. 157-195) to transform
-         it to a simple pole.
 DISPLAY: The procedure displays more comments for higher printlevel.
 EXAMPLE: example monodromy; shows an example.
 "

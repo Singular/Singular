@@ -1,9 +1,9 @@
-// $Id: elim.lib,v 1.6 1999-07-06 11:32:47 obachman Exp $
+// $Id: elim.lib,v 1.7 1999-08-03 11:43:06 obachman Exp $
 // system("random",787422842);
 // (GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: elim.lib,v 1.6 1999-07-06 11:32:47 obachman Exp $";
+version="$Id: elim.lib,v 1.7 1999-08-03 11:43:06 obachman Exp $";
 info="
 LIBRARY:  elim.lib      PROCEDURES FOR ELIMINATIOM, SATURATION AND BLOWING UP
 
@@ -13,7 +13,8 @@ PROCEDURES:
  elim1(id,p);           p=product of vars to be eliminated from id
  nselect(id,n[,m]);     select generators not containing nth [..mth] variable
  sat(id,j);             saturated quotient of ideal/module id by ideal j
- select(id,n[,m]);      select generators containing nth [..mth] variable
+ select(id,n[,m]);      select generators containing all variables n...m
+ select1(id,n[,m]);     select generators containing one variable n...m
            (parameters in square brackets [] are optional)
 ";
 
@@ -243,7 +244,9 @@ example
 
 proc select (id, int n, list#)
 "USAGE:   select(id,n[,m]); id ideal/module, n, m integers
-RETURN:  generators of id containing the variable n [up to m]
+RETURN:  generators of id containing the variable n [all variables up to m]
+NOTE:    use 'select1' for selecting generators containing at least one of the
+         variables between n and m
 EXAMPLE: example select; shows examples
 "{
    if( size(#)==0 ) { #[1]=n; }
@@ -264,5 +267,37 @@ example
    module m=i*(gen(1)+gen(2));
    m;
    select(m,1,2);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc select1 (id, int n, list#)
+"USAGE:   select(id,n[,m]); id ideal/module, n, m integers
+RETURN:  generators of id containing the variable n 
+         [at least one of the variables up to m]
+NOTE:    use 'select' for selecting generators containing all the
+         variables between n and m
+EXAMPLE: example select1; shows examples
+"{
+   if( size(#)==0 ) { #[1]=n; }
+   int j,k;
+   execute (typeof(id)+" I;");
+   for( k=1; k<=ncols(id); k=k+1 )
+   {  for( j=n; j<=#[1]; j=j+1 )
+      {   
+         if( size(subst(id[k],var(j),0)) != size(id[k]) ) 
+         { I=I,id[k]; break; }
+      }
+   }
+   return(simplify(I,2));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,t,s,z),(c,dp);
+   ideal i=x-y,y-z2,z-t3,s-x+y3;
+   ideal j=select1(i,1);
+   j;
+   module m=i*(gen(1)+gen(2));
+   m;
+   select1(m,1,2);
 }
 ///////////////////////////////////////////////////////////////////////////////

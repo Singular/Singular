@@ -1,10 +1,13 @@
-// $Id: homolog.lib,v 1.8 1999-07-06 11:32:57 obachman Exp $
-//(BM/GMG, last modified 22.06.96)
+// $Id: homolog.lib,v 1.9 1999-08-03 11:43:06 obachman Exp $
+//(BM/GMG)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: homolog.lib,v 1.8 1999-07-06 11:32:57 obachman Exp $";
+version="$Id: homolog.lib,v 1.9 1999-08-03 11:43:06 obachman Exp $";
 info="
 LIBRARY:  homolog.lib   PROCEDURES FOR HOMOLOGICAL ALGEBRA
+
+AUTHORS:  Gert-Martin Greuel, email: greuel@mathematik.uni-kl.de, 
+          Bernd Martin, email: martin@math.tu-cottbus.de
 
 PROCEDURES:
  cup(M);                cup: Ext^1(M',M') x Ext^1() --> Ext^2()

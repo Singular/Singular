@@ -1,11 +1,12 @@
-// $Id: presolve.lib,v 1.9 1999-07-26 13:14:48 Singular Exp $
+// $Id: presolve.lib,v 1.10 1999-08-03 11:43:08 obachman Exp $
 //system("random",787422842);
-//(GMG), last modified 97/10/07 by GMG
+//(GMG)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: presolve.lib,v 1.9 1999-07-26 13:14:48 Singular Exp $";
+version="$Id: presolve.lib,v 1.10 1999-08-03 11:43:08 obachman Exp $";
 info="
 LIBRARY:  presolve.lib     PROCEDURES FOR PRE-SOLVING POLYNOMIAL EQUATIONS
+AUTHOR:   Gert-Martin Greuel, email: greuel@mathematik.uni-kl.de,
 
 PROCEDURES:
  degreepart(id,d1,d2);  elements of id of total degree >= d1 and <= d2
@@ -96,9 +97,10 @@ EXAMPLE: example elimlinearpart; shows an example
    fi = find(ordstr(P),o);
    if( fi == 0 or find(ordstr(P),"a") != 0 )
    {
-  execute "ring newP = ("+charstr(P)+"),("+varstr(P)+"),dp;";
+      execute "ring newP = ("+charstr(P)+"),("+varstr(P)+"),dp;";
       ideal i = imap(P,i);
    }
+//---------------------------------- start ------------------------------------
    if ( size(#)!=0 ) {  n=#[1]; }
    ideal maxi,rest = maxideal(1),0;
    if ( n < nvars(P) ) { rest = maxi[n+1..nvars(P)]; }
@@ -119,7 +121,7 @@ EXAMPLE: example elimlinearpart; shows an example
      option(set,getoption);
      return(L);
    }
-
+  
    for ( ii=1; ii<=size(id); ii++ )
    {
       if( deg(id[ii]) > 1) { break; }
@@ -146,7 +148,7 @@ EXAMPLE: example elimlinearpart; shows an example
    ideal eva = lead(lin);
    attrib(eva,"isSB",1);
    ideal neva = reduce(maxideal(1),eva);
-//------------------ go back to original ring end return  ----------------------
+//------------------ go back to original ring end return  ---------------------
    if( fi == 0 or find(ordstr(P),"a") != 0 )
    {
       setring P;
@@ -155,6 +157,7 @@ EXAMPLE: example elimlinearpart; shows an example
       ideal lin = imap(newP,lin);
       ideal neva = imap(newP,neva);
    }
+ 
    eva = eva[ncols(eva)..1];  // sorting according to variables in basering
    lin = lin[ncols(lin)..1];
    ideal phi= neva;
@@ -208,7 +211,7 @@ EXAMPLE: example elimpart; shows an example
    int n,e = nvars(P),1;
    if ( size(#)==1 ) {  n=#[1]; }
    if ( size(#)==2 ) {  n=#[1]; e=#[2];}
-//----------- interreduce linear part with proc elimlinearpart -----------------
+//----------- interreduce linear part with proc elimlinearpart ----------------
 // lin = ideal after interreduction of linear part
 // eva = eliminated (substituted) variables
 // sub = polynomials defining substitution
@@ -216,22 +219,23 @@ EXAMPLE: example elimpart; shows an example
 // phi = map describing substitution
    list L = elimlinearpart(i,n);
    ideal lin, eva, sub, neva, phi = L[1], L[2], L[3], L[4], L[5];
-//-------- direct substitution of variables if possible and if e!=0 ------------
+//-------- direct substitution of variables if possible and if e!=0 -----------
 // first find terms lin1 of pure degree 1 in each poly of lin
 // k1 = pure degree 1 part, k1+k2 = those polys of lin which contained a pure
 // degree 1 part.
 // Then go to ring newP with ordering c,dp(n) and create a matrix with size(k1)
-// colums and 2 rows, such that if [f1,f2] is a column of M then f1+f2 is one of
-// the polys of lin containing a pure degree 1 part and f1 is this part
+// colums and 2 rows, such that if [f1,f2] is a column of M then f1+f2 is one
+// of the polys of lin containing a pure degree 1 part and f1 is this part
 // interreduce this matrix (i.e. Gauss elimination on linear part, with rest
 // transformed accordingly).
-   int ii, kk;
+
    if ( e!=0 )
    {
+      int ii,kk;
       ideal k1,k2;
       int l = size(lin);
       ideal lin1 = jet(lin,1) - jet(lin,0);  // part of pure degree 1
-      lin = lin - lin1;                      // rest, part of degree 1 substracted
+      lin = lin - lin1;                   // rest, part of degree 1 substracted
 
       for( ii=1; ii<=l; ii++ )
       {
@@ -406,7 +410,7 @@ EXAMPLE: example fastelim; shows an example.
    poly q = product(L[2]);     //product of vars which are already eliminated
    if ( q==0 ) { q=1; }
    p = p/q;                    //product of vars which must still be eliminated
-   int nu = size(L[5])-size(L[2]);   //number of vars which must still be eliminated
+   int nu = L[5]-size(L[2]);   //number of vars which must still be eliminated
    if ( p==1 )                 //ready if no vars are left
    {                           //compute minbase if 3-rd argument !=0
       if ( m != 0 ) { L[1]=minbase(L[1]); }

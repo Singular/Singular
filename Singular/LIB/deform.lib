@@ -1,12 +1,12 @@
-// $Id: deform.lib,v 1.16 1999-07-06 15:32:46 Singular Exp $
+// $Id: deform.lib,v 1.17 1999-08-03 11:43:05 obachman Exp $
 // author: Bernd Martin email: martin@math.tu-cottbus.de
 //(bm, last modified 4/98)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: deform.lib,v 1.16 1999-07-06 15:32:46 Singular Exp $";
+version="$Id: deform.lib,v 1.17 1999-08-03 11:43:05 obachman Exp $";
 info="
 LIBRARY:  deform.lib       PROCEDURES FOR COMPUTING MINIVERSAL DEFORMATION
 
-AUTHOR: Bernd Martin (martin@math.tu-cottbus.de)
+AUTHOR: Bernd Martin, email: martin@math.tu-cottbus.de
 
 PROCEDURES:
  versal(Fo[,d,any])        miniversal deformation of isolated singularity Fo
