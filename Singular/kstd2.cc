@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.6 1997-07-31 14:58:31 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.7 1997-08-05 13:04:05 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -22,6 +22,11 @@
 #include "ipshell.h"
 #include "intvec.h"
 #include "tok.h"
+#ifdef STDTRACE
+#include "comm.h"
+#include "lists.h"
+#endif
+// #include "timer.h"
 
 /*2
 * consider the part above syzComp:
@@ -877,6 +882,284 @@ void initBba(ideal F,kStrategy strat)
   }
 }
 
+#ifdef STDTRACE
+lists bbaLink (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, stdLink stdTrace)
+{
+  int oldLl;
+  int srmax,lrmax;
+  int olddeg,reduc;
+  int anzTupel=0, anzNew = 0, anzSkipped=0;
+#ifdef SDRING
+  polyset aug=(polyset)Alloc(setmax*sizeof(poly));
+  int augmax=setmax, augl=-1;
+  poly oldLcm=NULL;
+#endif
+  int hilbeledeg=1,hilbcount=0,minimcnt=0;
+
+  if(stdTrace!=NULL) stdTrace->Start(strat);
+
+  initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
+  initHilbCrit(F,Q,&hilb,strat);
+  initBba(F,strat);
+  initBuchMoraPos(strat);
+  /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
+  /*Shdl=*/initBuchMora(F, Q,strat);
+  if (strat->minim>0)
+  {
+    strat->M=idInit(IDELEMS(F),F->rank);
+  }
+  srmax = strat->sl;
+  reduc = olddeg = lrmax = 0;
+  /* compute------------------------------------------------------- */
+  while ((stdTrace!=NULL && !stdTrace->CheckEnd(strat)) || (stdTrace == NULL && strat->Ll>=0))
+    {
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      if(stdTrace!=NULL && stdTrace->Receive)
+	{
+	  stdTrace->ReceiveMsg();
+	  stdTrace->ParseMessage(strat);
+	}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      if((stdTrace!=NULL && stdTrace->Verwaltung) || (stdTrace == NULL))
+	{
+	  if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
+	  if (TEST_OPT_DEBUG) messageSets(strat);
+	  //test_int_std(strat->kIdeal);
+	  if (strat->Ll== 0) strat->interpt=TRUE;
+	  if (TEST_OPT_DEGBOUND
+	      && ((strat->honey && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p)>Kstd1_deg))
+		  || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p)>Kstd1_deg))))
+	    {
+	      /*
+	       *stops computation if
+	       * 24 IN test and the degree +ecart of L[strat->Ll] is bigger then
+	       *a predefined number Kstd1_deg
+	       */
+	      while (strat->Ll >= 0) deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
+	      break;
+	    }
+	}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      if((stdTrace!=NULL && stdTrace->TupelL) || (stdTrace == NULL ))
+	{
+	  /* picks the last element from the lazyset L */
+	  strat->P = strat->L[strat->Ll];
+	  anzTupel++;
+	  strat->Ll--;
+          if(stdTrace!=NULL && stdTrace->TupelStore)
+            {
+              if (TEST_OPT_PROT) PrintS(":");
+              stdTrace->Store(strat->P);
+	      strat->P.p=NULL;
+	      anzSkipped++;
+            }
+	}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      if((stdTrace!=NULL && stdTrace->SPoly) || (stdTrace == NULL))
+	{
+	  kTest(strat);
+	  if (pNext(strat->P.p) == strat->tail)
+	    {
+	      /* deletes the short spoly and computes */
+	      pFree1(strat->P.p);
+	      /* the real one */
+	      strat->P.p = spSpolyCreate(strat->P.p1,strat->P.p2,strat->kNoether);
+	    }
+	  if((strat->P.p1==NULL) && (strat->minim>0))
+	    strat->P.p2=pCopy(strat->P.p);
+	}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      if((stdTrace!=NULL && stdTrace->Reduzieren) || (stdTrace == NULL))
+	{
+#ifdef SDRING
+	  if (strat->P.p != NULL)
+#endif
+	    {
+	      if (strat->honey)
+		{
+		  if (TEST_OPT_PROT) message(strat->P.ecart+pFDeg(strat->P.p),&olddeg,&reduc,strat);
+		}
+	      else
+		{
+		  if (TEST_OPT_PROT) message(pFDeg(strat->P.p),&olddeg,&reduc,strat);
+		}
+	      /* reduction of the element choosen from L */
+	      oldLl=strat->Ll;
+	      strat->red(&strat->P,strat);
+	      if(stdTrace!=NULL && stdTrace->TupelPosition)
+		stdTrace->CheckPosition(strat,oldLl);
+	      if((stdTrace!=NULL && stdTrace->TupelMelden))
+		stdTrace->SendTupel(strat);
+	      if(stdTrace!=NULL && strat->P.p!=NULL && stdTrace->Modus==ModCheck)
+		anzNew++;
+	    }
+	  if (strat->P.p != NULL)
+	    {
+#ifdef SDRING
+	      aug[0]=strat->P.p;
+	      augl=0;
+	      if (pSDRING)
+		{
+		  oldLcm=strat->P.lcm;
+#ifdef SRING
+		  if (pSRING) psAug(pCopy(strat->P.p),pOne(),&aug,&augl,&augmax);
+#endif
+#ifdef DRING
+		  if (pDRING) pdAug(pCopy(strat->P.p),&aug,&augl,&augmax);
+#endif
+		  if (TEST_OPT_DEBUG)
+		    {
+		      PrintS(" aug of ");
+		      wrp(aug[0]);
+		      PrintLn();
+		      int iiaug=augl;
+		      while (iiaug>=0)
+			{
+			  Print(" to %d:",iiaug);
+			  wrp(aug[iiaug]);
+			  PrintLn();
+			  iiaug--;
+			}
+		    }
+		}
+	      for (augl++;augl != 0;)
+		{
+		  strat->P.p=aug[--augl];
+		  aug[augl]=NULL;
+		  if (pSDRING)
+		    {
+		      if (oldLcm==NULL) strat->P.lcm=NULL;
+		      else  strat->P.lcm=pCopy1(oldLcm);
+		    }
+		  if ((augl!=0)&&(strat->P.p!=NULL))
+		    strat->red(&strat->P,strat);
+		  if (strat->P.p != NULL)
+		    {
+#endif
+		      /* statistic */
+		      if (TEST_OPT_PROT) PrintS("s");
+		      /* enter P.p into s and L */
+		      {
+			int pos=posInS(strat->S,strat->sl,strat->P.p);
+#ifdef SDRING
+			if ((pSDRING) && (pos<=strat->sl)&& (pComparePolys(strat->P.p,strat->S[pos])))
+			  {
+			    if (TEST_OPT_PROT)
+			      PrintS("d");
+			  }
+			else
+#endif
+			  {
+			    if (TEST_OPT_INTSTRATEGY)
+			      {
+				if ((!TEST_OPT_MINRES)||(strat->syzComp==0)||(!strat->homog))
+				  {
+				    strat->P.p = redtailBba(strat->P.p,pos-1,strat);
+				    pCleardenom(strat->P.p);
+				  }
+			      }
+			    else
+			      {
+				pNorm(strat->P.p);
+				if ((!TEST_OPT_MINRES)||(strat->syzComp==0)||(!strat->homog))
+				  {
+				    strat->P.p = redtailBba(strat->P.p,pos-1,strat);
+				  }
+			      }
+			    if (TEST_OPT_DEBUG)
+			      {
+				PrintS("new s:");
+				wrp(strat->P.p);
+				PrintLn();
+			      }
+			    if((strat->P.p1==NULL) && (strat->minim>0))
+			      {
+				if (strat->minim==1)
+				  {
+				    strat->M->m[minimcnt]=pCopy(strat->P.p);
+				    pDelete(&strat->P.p2);
+				  }
+				else
+				  {
+				    strat->M->m[minimcnt]=strat->P.p2;
+				    strat->P.p2=NULL;
+				  }
+				minimcnt++;
+			      }
+			    enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat);
+			    if (strat->sl==-1) pos=0;
+			    else pos=posInS(strat->S,strat->sl,strat->P.p);
+			    strat->enterS(strat->P,pos,strat);
+			  }
+			if (hilb!=NULL)
+			  {  // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+			    oldLl=strat->Ll;
+			    khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
+			    if(stdTrace!=NULL)
+			      stdTrace->CheckHilb(strat,oldLl);
+			  }
+		      }
+		      if (strat->P.lcm!=NULL) pFree1(strat->P.lcm);
+#ifdef SDRING
+		    }
+		}
+	      /* delete the old pair */
+	      if (pSDRING &&(oldLcm!=NULL)) pFree1(oldLcm);
+#endif
+	      if (strat->sl>srmax) srmax = strat->sl;
+	    }
+ 	  if(stdTrace!=NULL && stdTrace->TupelTesten)
+ 	    stdTrace->TupelDifferent(strat);
+	}
+#ifdef KDEBUG
+      strat->P.lcm=NULL;
+#endif
+      kTest(strat);
+    }
+  if(stdTrace !=NULL)
+    if(TEST_OPT_PROT)
+      {
+	Print("\n(Tupel  Skipped  New) = (%i  %i  %i)\n",anzTupel, anzSkipped, anzNew);
+      }
+  if((stdTrace!=NULL && stdTrace->ResultSend) || (stdTrace == NULL))
+    {
+      if (TEST_OPT_DEBUG) messageSets(strat);
+      /* complete reduction of the standard basis--------- */
+      if (TEST_OPT_REDSB) completeReduce(strat);
+      /* release temp data-------------------------------- */
+      exitBuchMora(strat);
+      if (TEST_OPT_WEIGHTM)
+	{
+	  pFDeg=pFDegOld;
+	  pLDeg=pLDegOld;
+	  if (ecartWeights)
+	    {
+	      Free((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
+	      ecartWeights=NULL;
+	    }
+	}
+#ifdef SDRING
+      Free((ADDRESS)aug,augmax*sizeof(poly));
+#endif
+      if (TEST_OPT_PROT) messageStat(srmax,lrmax,hilbcount,strat);
+      if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
+    }
+  if(stdTrace!=NULL)
+    stdTrace->End(strat);
+  lists l=(lists)Alloc(sizeof(slists));
+  l->Init(2);
+  l->m[0].rtyp = IDEAL_CMD;
+  l->m[0].data = (void *) strat->Shdl;
+   if(stdTrace!=NULL )
+     {
+       l->m[1].rtyp = LIST_CMD;
+       l->m[1].data = (void *)stdTrace->RestTupel();
+     }
+  return (l);
+}
+
+#else
+
 ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 {
   int   srmax,lrmax;
@@ -1083,6 +1366,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
   return (strat->Shdl);
 }
+#endif
 
 poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
 {

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.16 1997-07-11 14:27:52 Singular Exp $ */
+/* $Id: extra.cc,v 1.17 1997-08-05 13:04:02 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -46,6 +46,9 @@
 #include "ideals.h"
 #include "kstd1.h"
 #include "syz.h"
+#ifdef STDTRACE
+//#include "comm.h"
+#endif
 
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
@@ -512,6 +515,56 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
+#endif    
+#ifdef STDTRACE
+    /*==================== trace =============================*/
+    /* Parameter : Ideal, Liste mit Links. */
+    if(strcmp((char*)(h->Data()),"stdtrace")==0)
+      {
+        if ((h->next!=NULL) &&(h->next->Typ()==IDEAL_CMD))
+        {
+          leftv root  = NULL,
+                ptr   = NULL,
+                lv    = NULL;
+          lists l     = NULL;
+          ideal I     = (ideal)(h->next->Data());
+          lists links = (lists)(h->next->next->Data());
+          tHomog hom  = testHomog;
+          int rw      = (int)(h->next->next->next->Data());
+  
+          if(I==NULL)
+            PrintS("I==NULL\n");
+          for(int i=0; i <= links->nr ; i++)
+          {
+            lv = (leftv)Alloc0(sizeof(sleftv));
+            lv->Copy(&(links->m[i]));
+            if(root==NULL)
+            root=lv;
+            if(ptr==NULL)
+            {
+              ptr=lv;
+              ptr->next=NULL;
+            }
+            else
+            {
+              ptr->next=lv;
+              ptr=lv;
+            }
+          }
+          ptr->next=NULL;
+          l=TraceStd(root,rw,I,currQuotient,testHomog,NULL);
+          idSkipZeroes(((ideal)l->m[0].Data()));
+          res->rtyp=LIST_CMD;
+          res->data=(void *) l;
+          res->next=NULL;
+          root->CleanUp();
+          Free(root,sizeof(sleftv));
+          return FALSE;
+        }
+        else
+         WerrorS("ideal expected");
+      }
+    else  
 #endif    
 /*============================================================*/
       WerrorS("not implemented\n");

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.8 1997-08-01 10:53:07 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.9 1997-08-05 13:04:03 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -25,7 +25,9 @@
 #include "timer.h"
 #include "tok.h"
 #include "lists.h"
-
+#ifdef STDTRACE
+#include "comm.h"
+#endif
 //#include "ipprint.h"
 
 /* the list of all options which give a warning by test */
@@ -107,7 +109,6 @@ void doRed (LObject* h,poly* with,BOOLEAN intoT,kStrategy strat)
   {
     (*h).p = spSpolyRed(*with,(*h).p,strat->kNoether);
   }
-  pTest((*h).p);
 }
 
 /*2
@@ -247,14 +248,11 @@ void redEcart (LObject* h,kStrategy strat)
   int j = 0;
   int pass = 0;
 
-  pTest(h->p);
   if (TEST_OPT_CANCELUNIT) cancelunit(h);
   d = pFDeg((*h).p)+(*h).ecart;
   reddeg = strat->LazyDegree+d;
-  pTest(h->p);
   loop
   {
-    pTest(h->p);
     if (j > strat->tl)
     {
       if (TEST_OPT_DEBUG) PrintLn();
@@ -335,7 +333,6 @@ void redEcart (LObject* h,kStrategy strat)
         wrp(pi);
       }
       doRed(h,&pi,strat->fromT,strat);
-      pTest(h->p);
       strat->fromT=FALSE;
       if (TEST_OPT_DEBUG)
       {
@@ -1705,7 +1702,6 @@ int kModDeg(poly p)
   if (i==0) return o;
   return o+(*kModW)[i-1];
 }
-
 ideal std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
           int newIdeal)
 {
@@ -1727,6 +1723,112 @@ ideal std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 #endif
   )
   {
+    if (idRankFreeModule(F)==0)       
+    {
+      h = (tHomog)idHomIdeal(F,Q);    
+      w=NULL;
+    }
+    else
+      h = (tHomog)idHomModule(F,Q,w); 
+    //Print("test homog:%d\n",h);     
+    //if ((h==isHomog)&&(w!=NULL)&&(*w!=NULL))
+    //{
+    //  (*w)->show();
+    //  PrintLn();
+    //  if (F!=NULL) jjPRINT_MA0(idModule2Matrix(idCopy(F)),sNoName);   
+    //}
+  }
+#ifdef DRING
+  if (pDRING) h=isNotHomog;
+#endif
+  if (h==isHomog)
+  {
+    if ((w!=NULL) && (*w!=NULL))      
+    {
+      kModW = *w;
+      pOldFDeg = pFDeg;
+      pFDeg = kModDeg;
+      toReset = TRUE;
+    }
+    pLexOrder = TRUE;
+    if (hilb==NULL) strat->LazyPass*=2;
+  }
+  strat->homog=h;
+  spSet(currRing);
+  if (pOrdSgn==-1)
+  {
+    if (w!=NULL)
+      r=mora(F,Q,*w,hilb,strat);      
+    else
+      r=mora(F,Q,NULL,hilb,strat);
+  }
+  else
+  {
+    #ifdef STDTRACE
+    lists l;
+    if (w!=NULL)
+      l=bbaLink(F,Q,*w,hilb,strat);
+    else
+      l=bbaLink(F,Q,NULL,hilb,strat);
+    r=(ideal)(l->m[0].data);
+    l->m[0].data=NULL;
+    l->Clean();
+    #else
+    if (w!=NULL)
+      r=bba(F,Q,*w,hilb,strat);
+    else
+      r=bba(F,Q,NULL,hilb,strat);
+    #endif
+  }
+#ifdef KDEBUG
+  int i;
+  for (i=0; i<IDELEMS(r); i++) pTest(r->m[i]);
+#endif
+  if (toReset)
+  {
+    kModW = NULL;
+    pFDeg = pOldFDeg;
+  }
+  pLexOrder = b;
+//Print("%d reductions canceled \n",strat->cel);
+  HCord=strat->HCord;
+  Free((ADDRESS)strat,sizeof(skStrategy));
+  if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
+  return r;
+}
+
+//##############################################################
+//##############################################################
+//##############################################################
+//##############################################################
+//##############################################################
+
+#ifdef STDTRACE
+lists TraceStd(leftv lv,int rw, ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
+          int newIdeal)
+{
+  lists l;
+  ideal r;
+  stdLink stdTrace=(stdLink) Alloc0(sizeof(skstdLink));
+  BOOLEAN b=pLexOrder,toReset=FALSE;
+  BOOLEAN delete_w=(w==NULL);
+  kStrategy strat=(kStrategy)Alloc0(sizeof(skStrategy));
+
+  if(!TEST_OPT_RETURN_SB)
+    strat->syzComp = syzComp;
+  if (TEST_OPT_SB_1)
+    strat->newIdeal = newIdeal;
+  strat->LazyPass=32000;
+  strat->LazyDegree = 10;
+//   if(stdTrace!=NULL)
+//     stdTrace->GetPrimes(F,primes);  // Array mit Primzahlen muß geordnet sein !
+
+  if ((h==testHomog)
+#ifdef DRING
+  && (!pDRING)
+#endif
+  )
+  {
     if (idRankFreeModule(F)==0)
     {
       h = (tHomog)idHomIdeal(F,Q);
@@ -1734,13 +1836,6 @@ ideal std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
     }
     else
       h = (tHomog)idHomModule(F,Q,w);
-    //Print("test homog:%d\n",h);
-    //if ((h==isHomog)&&(w!=NULL)&&(*w!=NULL))
-    //{
-    //  (*w)->show();
-    //  PrintLn();
-    //  if (F!=NULL) jjPRINT_MA0(idModule2Matrix(idCopy(F)),sNoName);
-    //}
   }
 #ifdef DRING
   if (pDRING) h=isNotHomog;
@@ -1759,19 +1854,21 @@ ideal std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   }
   strat->homog=h;
   spSet(currRing);
-  if (pOrdSgn==-1)
+//   if (pOrdSgn==-1)
+//   {
+//     if (w!=NULL)
+//       r=mora(F,Q,*w,hilb,strat);
+//     else
+//       r=mora(F,Q,NULL,hilb,strat);
+//   }
+//   else
   {
-    if (w!=NULL)
-      r=mora(F,Q,*w,hilb,strat);
+    stdTrace->Init(lv,rw);
+    if(w==NULL)
+      l=bbaLink(F,Q,NULL,hilb,strat,stdTrace);
     else
-      r=mora(F,Q,NULL,hilb,strat);
-  }
-  else
-  {
-    if (w!=NULL)
-      r=bba(F,Q,*w,hilb,strat);
-    else
-      r=bba(F,Q,NULL,hilb,strat);
+      l=bbaLink(F,Q,*w,hilb,strat,stdTrace);
+    r=(ideal) (l->m[0].Data());
   }
 #ifdef KDEBUG
   int i;
@@ -1787,8 +1884,15 @@ ideal std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   HCord=strat->HCord;
   Free((ADDRESS)strat,sizeof(skStrategy));
   if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
-  return r;
+  if(stdTrace!=NULL)
+  {
+    stdTrace->Kill();
+    Free(stdTrace, sizeof(skstdLink));
+  }
+
+  return l;
 }
+#endif
 
 lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
               int reduced)
@@ -1858,10 +1962,21 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   }
   else
   {
+  #ifdef STDTRACE
+    lists rl;
+    if (w!=NULL)
+      rl=bbaLink(F, Q, *w, hilb, strat, NULL);
+    else
+      rl=bbaLink(F, Q, NULL, hilb, strat, NULL);
+    r=(ideal)(rl->m[0].data);
+    rl->m[0].data=NULL;
+    rl->Clean();
+  #else
     if (w!=NULL)
       r=bba(F,Q,*w,hilb,strat);
     else
       r=bba(F,Q,NULL,hilb,strat);
+  #endif
   }
 #ifdef KDEBUG
   {

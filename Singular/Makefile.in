@@ -80,7 +80,7 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     ideals.cc intvec.cc iparith.cc \
     ipassign.cc ipconv.cc ipid.cc iplib.cc \
     ipprint.cc ipshell.cc khstd.cc kstdfac.cc \
-    kstd1.cc kstd2.cc kutil.cc lists.cc \
+    comm.cc kstd1.cc kstd2.cc kutil.cc lists.cc \
     longalg.cc longrat.cc \
     longrat0.cc maps.cc matpol.cc misc.cc \
     mminit.cc modulop.cc \
@@ -104,7 +104,7 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	cntrlc.h ipprint.h mmemory.h ring.h timer.h \
 	febase.h ipshell.h mmprivat.h shortfl.h tok.h \
 	ffields.h khstd.h silink.h \
-	fglm.h kstd1.h modulop.h sing_dbm.h weight.h \
+	fglm.h comm.h kstd1.h modulop.h sing_dbm.h weight.h \
 	fglmvec.h kstd2.h mpsr.h sing_mp.h \
 	kstdfac.h mpsr_Get.h spolys.h \
 	kutil.h mpsr_Put.h spolys0.h
@@ -125,7 +125,7 @@ DISTFILES=${SOURCES} ${HEADERS} Makefile.in configure.in configure \
 OBJS=grammar.o scanner.o matpol.o binom.o\
      febase.o feread.o timer.o intvec.o attrib.o lists.o\
      longrat.o longrat0.o misc.o ring.o numbers.o maps.o\
-     hilb.o kstd1.o kstd2.o kutil.o khstd.o kstdfac.o modulop.o spolys.o\
+     hilb.o comm.o kstd1.o kstd2.o kutil.o khstd.o kstdfac.o modulop.o spolys.o\
      ideals.o subexpr.o hdegree.o hutil.o ffields.o shortfl.o \
      longalg.o spolys0.o syz.o syz0.o syz1.o weight.o weight0.o \
      ipid.o ipshell.o iplib.o ipassign.o ipconv.o ipprint.o\
@@ -317,7 +317,7 @@ DEFSG		= @DEFS@
 OBJG1=	grammar.og scanner.og matpol.og binom.og\
      febase.og feread.og timer.og intvec.og attrib.og lists.og\
      longrat.og longrat0.og misc.og ring.og numbers.og maps.og\
-     hilb.og kstd1.og kstd2.og kutil.og khstd.og kstdfac.og modulop.og \
+     hilb.og comm.og kstd1.og kstd2.og kutil.og khstd.og kstdfac.og modulop.og \
      spolys.og ideals.og subexpr.og hdegree.og hutil.og ffields.og shortfl.og \
      longalg.og spolys0.og syz.og syz0.og syz1.og weight.og \
      ipid.og ipshell.og iplib.og ipassign.og ipconv.og ipprint.og\
