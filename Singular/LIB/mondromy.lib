@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: mondromy.lib,v 1.18 2000-12-22 14:16:11 greuel Exp $";
+version="$Id: mondromy.lib,v 1.19 2000-12-22 15:30:39 greuel Exp $";
 category="Singularities";
 info="
 LIBRARY:  mondromy.lib  Monodromy of an Isolated Hypersurface Singularity
@@ -7,7 +7,7 @@ AUTHOR:   Mathias Schulze, email: mschulze@mathematik.uni-kl.de
 
 OVERVIEW: 
  A library to compute the monodromy of an isolated hypersurface singularity. 
- It uses an algorithm by Brieskorn (manuscipta math. 2 (1970), 103-161) to 
+ It uses an algorithm by Brieskorn (manuscripta math. 2 (1970), 103-161) to 
  compute a connection matrix of the meromorphic Gauss-Manin connection up to 
  arbitrarily high order, and an algorithm of Gerard and Levelt (Ann. Inst. 
  Fourier, Grenoble 23,1 (1973), pp. 157-195) to transform it to a simple pole.
@@ -16,8 +16,13 @@ PROCEDURES:
  detadj(U);            determinant and adjoint matrix of square matrix U
  invunit(u,n);         series inverse of polynomial u up to order n
  jacoblift(f);         lifts f^kappa in jacob(f) with minimal kappa
- monodromy(f[,opt]);   monodromy of isolated hypersurface singularity f
+ monodromyB(f[,opt]);  monodromy of isolated hypersurface singularity f
  H2basis(f);           basis of Brieskorn lattice H''
+
+KEYWORDS: Monodromy, hypersurface singularity, Gauss-Manin connection,
+          Brieskorn lattice
+
+SEE ALSO: gaussman.lib
 ";
 
 LIB "ring.lib";
@@ -814,8 +819,8 @@ static proc qhmonodromy(poly f,intvec w)
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc monodromy(poly f, list #)
-"USAGE:   monodromy(f[,opt]); f poly, opt int
+proc monodromyB(poly f, list #)
+"USAGE:   monodromyB(f[,opt]); f poly, opt int
 ASSUME:  The polynomial f in a series ring (local ordering) defines
          an isolated hypersurface singularity.
 RETURN:  The procedure returns a residue matrix M of the meromorphic
@@ -825,7 +830,7 @@ RETURN:  The procedure returns a residue matrix M of the meromorphic
          else, only the characteristic polynomial of exp(-2*pi*i*M) coincides
          with the characteristic polynomial of the monodromy of f.
 DISPLAY: The procedure displays more comments for higher printlevel.
-EXAMPLE: example monodromy; shows an example.
+EXAMPLE: example monodromyB; shows an example.
 "
 {
   int opt;
@@ -914,7 +919,7 @@ example
 { "EXAMPLE:"; echo=2;
   ring R=0,(x,y),ds;
   poly f=x2y2+x6+y6;
-  matrix M=monodromy(f);
+  matrix M=monodromyB(f);
   print(M);
 }
 ///////////////////////////////////////////////////////////////////////////////
