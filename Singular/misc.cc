@@ -673,6 +673,12 @@ char * versionString()
               StringAppendS("-g,");
 #endif
 #endif
+#ifdef HAVE_EIGENVAL
+              StringAppendS("eigenvalues,");
+#endif
+#ifdef HAVE_GMS
+              StringAppendS("Gauss-Manin system,");
+#endif
               StringAppend("random=%d\n",siRandomStart);
 
               feStringAppendResources(0);
