@@ -1,12 +1,18 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.47 2003-03-04 19:35:03 bricken Exp $ */
+/* $Id: feread.cc,v 1.48 2003-03-05 18:02:09 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
 
 #include "mod2.h"
+
+// ----------------------------------------
+// system settings:
+#undef USE_GCC3
+#undef USE_READLINE4
+//----------------------------------------
 #ifdef ix86_Win
 #define READLINE_STATIC
 #endif
@@ -25,6 +31,12 @@
 #ifdef HAVE_STATIC
 #undef HAVE_DYN_RL
 #endif
+
+#ifndef USE_READLINE4
+#define rl_filename_completion_function filename_completion_function
+#define rl_completion_matches           completion_matches
+#endif
+
 
 #ifdef HAVE_TCL
 #include "ipid.h"
@@ -369,7 +381,11 @@ static char * fe_fgets_stdin_init(char *pr,char *s, int size)
   /* Allow conditional parsing of the ~/.inputrc file. */
   rl_readline_name = "Singular";
   /* Tell the completer that we want a crack first. */
+#ifdef USE_GCC3
   rl_attempted_completion_function = (RL_CPPFunction *)singular_completion;
+#else
+  rl_attempted_completion_function = (CPPFunction *)singular_completion;
+#endif
 
   /* set the output stream */
   if(!isatty(STDOUT_FILENO))
