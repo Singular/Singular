@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.93 2001-01-18 16:21:14 Singular Exp $ */
+/* $Id: kutil.cc,v 1.94 2001-02-06 13:14:02 hannes Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -22,7 +22,9 @@
 
 // define if enterL, enterT should use memmove instead of doing it manually
 // on topgun, this is slightly faster (see monodromy_l.tst, homog_gonnet.sing)
+#ifndef SunOS_4
 #define ENTER_USE_MEMMOVE
+#endif
 
 // define, if the my_memmove inlines should be used instead of
 // system memmove -- it does not seem to pay off, though
