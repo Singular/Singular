@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.71 2001-04-05 15:41:05 Singular Exp $ */
+/* $Id: syz1.cc,v 1.72 2001-05-28 15:57:29 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -1396,7 +1396,7 @@ static SSet syChosePairsPutIn(syStrategy syzstr, int *index,
 */
 SSet syChosePairs(syStrategy syzstr, int *index, int *howmuch, int * actdeg)
 {
-  return syChosePairsPutIn(syzsts,index,howmuch,actdeg,0,syzstr->length);
+  return syChosePairsPutIn(syzstr,index,howmuch,actdeg,0,syzstr->length);
 }
 
 /*3
