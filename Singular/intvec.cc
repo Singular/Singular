@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: intvec.cc,v 1.6 1997-04-30 15:25:28 Singular Exp $ */
+/* $Id: intvec.cc,v 1.7 1998-04-07 17:51:50 Singular Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -38,7 +38,7 @@ intvec::intvec(int s, int e)
     inc = -1;
   }
   v = (int *)Alloc(sizeof(int)*row);
-  if (v!=NULL)
+  //if (v!=NULL)
   {
     for (int i=0; i<row; i++)
     {
@@ -46,11 +46,11 @@ intvec::intvec(int s, int e)
       s+=inc;
     }
   }
-  else
-  {
-    Werror("internal error: creating intvec(%d)",row);
-    row=0;
-  }
+  //else
+  //{
+  //  Werror("internal error: creating intvec(%d)",row);
+  //  row=0;
+  //}
 }
 
 intvec::intvec(int r, int c, int init)
