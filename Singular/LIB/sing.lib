@@ -1,4 +1,4 @@
-// $Id: sing.lib,v 1.4 1997-09-12 07:40:37 Singular Exp $
+// $Id: sing.lib,v 1.5 1997-09-12 10:29:48 pohl Exp $
 //system("random",787422842);
 //(GMG/BM, last modified 26.06.96)
 ///////////////////////////////////////////////////////////////////////////////
@@ -43,24 +43,33 @@ NOTE:    As always, id1 and id2 must be consider as ideals in the localization
          of the polynomial ring w.r.t. the monomial ordering
 EXAMPLE: example codim; shows an example
 {
+   ideal le1, le2;
    intvec iv1, iv2, iv;
    int i, d1, d2, dd, i1, i2, ia, ie;
   //--------------------------- check id2 < id1 -------------------------------
-   ideal led = lead(id1);
-   attrib(led, "isSB",1);
-   i = size(NF(lead(id2),led));
+   le1 = lead(id1);
+   if (attrib(id1,"isSB") != 0)
+   {
+     attrib(le1,"isSB",1);
+   }
+   le2 = lead(id2);
+   if (attrib(id2,"isSB") != 0)
+   {
+     attrib(le2,"isSB",1);
+   }
+   i = size(NF(le2,le1));
    if ( i > 0 )
    {
      return(-2);
    }
   //--------------------------- 1. check finiteness ---------------------------
-   i1 = dim(id1);
-   i2 = dim(id2);
-   if (i1 < 0)
+   i1 = dim(le1);
+   i2 = dim(le2);
+   if (i1 <= 0)
    {
-     if (i2 == 0)
+     if (i2 <= 0)
      {
-       return vdim(id2);
+       return(vdim(le2)-vdim(le1)); 
      }
      else
      {
@@ -71,22 +80,22 @@ EXAMPLE: example codim; shows an example
    {
      return(-1);
    }
-   if (i2 <= 0)
+   if (mult(le2) != mult(le1))
    {
-     return(vdim(id2)-vdim(id1));
+     return(-1);
    }
   //--------------------------- module ---------------------------------------
-   d1 = nrows(id1);
-   d2 = nrows(id2);
+   d1 = nrows(le1);
+   d2 = nrows(le2);
    dd = 0;
    if (d1 > d2)
    {
-     id2=id2,maxideal(1)*gen(d1);
+     le2=le2,maxideal(1)*gen(d1);
      dd = -1;
    }
    if (d2 > d1)
    {
-     id1=id1,maxideal(1)*gen(d2);
+     le1=le1,maxideal(1)*gen(d2);
      dd = 1;
    }
   //--------------------------- compute first hilbertseries ------------------
@@ -94,6 +103,7 @@ EXAMPLE: example codim; shows an example
    i1 = size(iv1);
    iv2 = hilb(id2,1);
    i2 = size(iv2);
+   kill le1,le2;
   //--------------------------- difference of hilbertseries ------------------
    if (i2 > i1)
    {
