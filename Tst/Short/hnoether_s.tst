@@ -7,6 +7,7 @@ LIB "hnoether.lib";
 ring r=0,(x,y),ds;
 develop(x2+y2);
 develop(x2+y+y2);
+develop((x2+y3)*(x2+y3+xy2));
 poly p_1 = y2+x3;
 poly p_2 = p_1^2 + x5y;
 poly p_3 = p_2^2 + x^10 *p_1;
@@ -63,7 +64,7 @@ param(develop(y2+x3+x4));
 example displayHNE;
 // ----------------------------------------------------------------------------
 // ------- test of invariants, displayInvariants, intersection, stripHNE,   ---
-// -------         puiseux2generators, multiplicities, newtonpoly           ---
+// ---- puiseux2generators, multiplicities, newtonpoly, is_irred, HNdevelop ---
 example invariants;
 example displayInvariants;
 list hne=reddevelop((x2-y3)*(x2+y3));
@@ -73,8 +74,11 @@ puiseux2generators(intvec(3,7,15,31,63,127),intvec(2,2,2,2,2,2));
 setring r;
 multiplicities(develop(x5+y7));
 example newtonpoly;
+example is_irred;
+is_irred((x2+y3)*(x2+y3+xy2));
+example HNdevelop;
 // ------- test of getnm, T_Transform, T1_Transform, T2_Transform, koeff, -----
-// -------  redleit, squarefree, allsquarefree, set_list, referencepoly   -----
+// ------------  redleit, squarefree, allsquarefree, referencepoly   ----------
 example getnm;
 T_Transform(y2+x3,1,2);
 T1_Transform(y-x2+x3,1,2);
@@ -85,5 +89,4 @@ example redleit;
 example squarefree;
 example allsquarefree;
 list L=list(poly(x-y),ideal(x,y));
-set_list(L,intvec(2,1),x2+y7);
 tst_status(1);$
