@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.31 2002-03-26 12:41:43 mschulze Exp $";
+version="$Id: linalg.lib,v 1.32 2002-04-11 14:48:43 westenb Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib  Algorithmic Linear Algebra
@@ -36,16 +36,10 @@ PROCEDURES:
 LIB "matrix.lib";
 LIB "ring.lib";
 LIB "elim.lib";
+LIB "general.lib";
 //////////////////////////////////////////////////////////////////////////////
 // help functions
 //////////////////////////////////////////////////////////////////////////////
-static proc abs(poly c)
-"RETURN: absolut value of c, c must be constants"
-{
-  if(c>=0){ return(c);}
-  else{ return(-c);}
-}
-
 static proc const_mat(matrix A)
 "RETURN:   1 (0) if A is (is not) a constant matrix"
 {
@@ -796,7 +790,7 @@ EXAMPLE: example gaussred; shows an example"
     if(A[i,i+k]==0){
       jp=i;pivo=0;
       for(j=i+1;j<=n;j=j+1){
-        c=abs(A[j,i+k]);
+        c=absValue(A[j,i+k]);
         if(pivo<c){ pivo=c;jp=j;}
       }
       if(jp != i){       //Zeilentausch
@@ -883,9 +877,9 @@ EXAMPLE:   example gaussred_pivot; shows an example"
     if((i+k)>m){break};
 
     //Pivotisierung
-    pivo=abs(A[i,i+k]);jp=i;
+    pivo=absValue(A[i,i+k]);jp=i;
     for(j=i+1;j<=n;j=j+1){
-      c=abs(A[j,i+k]);
+      c=absValue(A[j,i+k]);
       if(pivo<c){ pivo=c;jp=j;}
     }
     if(jp != i){ //Zeilentausch

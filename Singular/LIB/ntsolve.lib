@@ -1,6 +1,6 @@
 //(GMG, last modified 16.12.00)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ntsolve.lib,v 1.13 2001-08-27 14:47:56 Singular Exp $";
+version="$Id: ntsolve.lib,v 1.14 2002-04-11 14:51:50 westenb Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  ntsolve.lib     Real Newton Solving of Polynomial Systems
@@ -12,6 +12,7 @@ PROCEDURES:
  triMNewton(G,a,[..]);      find one real root for 0-dim triangular system G
 ";
 
+LIB "general.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc nt_solve (ideal gls, ideal ini, list #)
@@ -327,7 +328,7 @@ EXAMPLE: example triMNewton; shows an example
 
     for (i = 1; i <= n; i++)
     {
-        if ( abs(h[i]) > (1/10)^err)
+        if ( absValue(h[i]) > (1/10)^err)
         {
             fertig = 0;
             break;
@@ -337,7 +338,7 @@ EXAMPLE: example triMNewton; shows an example
     {
         if (prot > 0)
         {
-           "// error:"; print(abs(h[i]));
+           "// error:"; print(absValue(h[i]));
            "// iterations to be performed: "+string(itb);
         }
         for (i = 1; i <= n; i++)
@@ -362,17 +363,3 @@ example
    l;
 }
 ///////////////////////////////////////////////////////////////////////////////
-
-static proc abs( number r)
-{
-   if (r >= 0)
-   {
-       return(r);
-   }
-   else
-   {
-       return(-r);
-   }
-}
-///////////////////////////////////////////////////////////////////////////////
-
