@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.44 1999-10-20 11:52:01 obachman Exp $ */
+/* $Id: kutil.cc,v 1.45 1999-10-26 17:15:19 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -260,8 +260,8 @@ BOOLEAN K_Test_L(char *f , int l, LObject *L,
                  BOOLEAN testp, int lpos, TSet T, int tlength)
 {
   BOOLEAN ret = TRUE;
-  
-  if (testp) 
+
+  if (testp)
   {
     if (! pDBTest(L->p, L->heap, f, l))
     {
@@ -269,7 +269,7 @@ BOOLEAN K_Test_L(char *f , int l, LObject *L,
       ret = FALSE;
     }
   }
-  
+
   if (L->pLength != 0 && L->pLength != pLength(L->p))
   {
     Warn("L[%d] length error: has %d, specified to have %d\n",
@@ -319,7 +319,7 @@ BOOLEAN K_Test (char *f, int l, kStrategy strat, int pref)
   {
     Warn("for strat->P\n");
   }
-  
+
   // test T
   if (strat->T != NULL)
   {
@@ -347,7 +347,7 @@ BOOLEAN K_Test (char *f, int l, kStrategy strat, int pref)
         Warn("L[%d].p is NULL\n", i);
         ret = FALSE;
       }
-      if (K_Test_L(f, l, &(strat->L[i]), 
+      if (K_Test_L(f, l, &(strat->L[i]),
                    (pNext(strat->L[i].p) != strat->tail), i,
                    strat->T, strat->tl + 1) == FALSE)
       {
@@ -369,7 +369,7 @@ BOOLEAN K_Test_S(char* f, int l, kStrategy strat)
   BOOLEAN ret = TRUE;
   for (i=0; i<=strat->sl; i++)
   {
-    if (strat->S[i] != NULL && strat->sevS[i] != 0 && strat->sevS[i] != 
+    if (strat->S[i] != NULL && strat->sevS[i] != 0 && strat->sevS[i] !=
         pGetShortExpVector(strat->S[i]))
     {
       Warn("S[%d] wrong sev: has %o, specified to have %o in %s:%d\n",
@@ -379,7 +379,7 @@ BOOLEAN K_Test_S(char* f, int l, kStrategy strat)
   }
   return ret;
 }
-      
+
 
 BOOLEAN K_Test_T(char* f, int l, TObject * T, int i)
 {
@@ -400,8 +400,8 @@ BOOLEAN K_Test_T(char* f, int l, TObject * T, int i)
   }
   return ret;
 }
-  
-  
+
+
 
 BOOLEAN K_Test_TS(char *f, int l, kStrategy strat)
 {
@@ -2228,49 +2228,51 @@ int posInL17_c (const LSet set, const int length,
 */
 poly redtail (poly p, int pos, kStrategy strat)
 {
-  poly h, hn;
-  int j, e, l;
-  int op;
-  unsigned long not_sev;
+  if ((!strat->noTailReduction)
+  && (pNext(p)!=NULL))
+  {
+    int j, e, l;
+    unsigned long not_sev;
 
-  if (strat->noTailReduction)
-  {
-    return p;
-  }
-  h = p;
-  hn = pNext(h);
-  while(hn != NULL)
-  {
-    not_sev = ~ pGetShortExpVector(hn);
-    op = pFDeg(hn);
-    e = pLDeg(hn,&l)-op;
-    j = 0;
-    while (j <= pos)
+    poly h = p;
+    poly hn = pNext(h); // !=NULL
+    int op = pFDeg(hn);
+    BOOLEAN save_HE=strat->kHEdgeFound;
+    strat->kHEdgeFound |= ((Kstd1_deg>0) && (op<=Kstd1_deg));
+    loop
     {
-      if (pShortDivisibleBy(strat->S[j], strat->sevS[j], hn, not_sev)
-      && ((e >= strat->ecartS[j])
-        || strat->kHEdgeFound
-        || ((Kstd1_deg>0)&&(op<=Kstd1_deg)))
-      )
+      not_sev = ~ pGetShortExpVector(hn);
+      e = pLDeg(hn,&l)-op;
+      j = 0;
+      while (j <= pos)
       {
-        ksOldSpolyTail(strat->S[j], p, h, strat->kNoether);
-        hn = pNext(h);
-        if (hn == NULL)
+        if (pShortDivisibleBy(strat->S[j], strat->sevS[j], hn, not_sev)
+        && ((e >= strat->ecartS[j])
+          || strat->kHEdgeFound)
+        )
         {
-          return p;
+          ksOldSpolyTail(strat->S[j], p, h, strat->kNoether);
+          hn = pNext(h);
+          if (hn == NULL) goto all_done;
+          not_sev = ~ pGetShortExpVector(hn);
+          op = pFDeg(hn);
+          if ((Kstd1_deg>0)&&(op>Kstd1_deg)) goto all_done;
+          e = pLDeg(hn,&l)-op;
+          j = 0;
         }
-        not_sev = ~ pGetShortExpVector(hn);
-        op = pFDeg(hn);
-        e = pLDeg(hn,&l)-op;
-        j = 0;
-      }
-      else
-      {
-        j++;
-      }
+        else
+        {
+          j++;
+        }
+      } /* while (j <= pos) */
+      h = hn; /* better for: pIter(h); */
+      hn = pNext(h);
+      if (hn==NULL) break;
+      op = pFDeg(hn);
+      if ((Kstd1_deg>0)&&(op>Kstd1_deg)) break;
     }
-    h = hn;
-    hn = pNext(h);
+all_done:
+    strat->kHEdgeFound = save_HE;
   }
   return p;
 }
@@ -2331,7 +2333,7 @@ poly redtailSyz (poly p, int pos, kStrategy strat)
   poly h, hn;
   int j;
   unsigned long not_sev;
-  
+
   if (strat->noTailReduction)
   {
     return p;
@@ -2344,7 +2346,7 @@ poly redtailSyz (poly p, int pos, kStrategy strat)
     not_sev = ~ pGetShortExpVector(hn);
     while (j <= pos)
     {
-      if (pShortDivisibleBy(strat->S[j], strat->sevS[j], hn, not_sev) 
+      if (pShortDivisibleBy(strat->S[j], strat->sevS[j], hn, not_sev)
           && (!pEqual(strat->S[j],h)))
       {
         ksOldSpolyTail(strat->S[j], p, h, strat->kNoether);
@@ -2805,7 +2807,7 @@ static poly redBba1 (poly h,int maxIndex,kStrategy strat)
 {
   int j = 0;
   unsigned long not_sev = ~ pGetShortExpVector(h);
-  
+
   while (j <= maxIndex)
   {
     if (pShortDivisibleBy(strat->S[j],strat->sevS[j],h, not_sev))

@@ -7,7 +7,6 @@ bug_res  ; sres has wrong betti result (TS)
 bug_sres_betti ; again, sres has wrong betti result (TS)
 ; INFINITE  
 deform_s
-bug_16  ; degBound not recognized 
 normal
 paramet
 
