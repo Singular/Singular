@@ -180,7 +180,7 @@ class MPT_GP_Comp_t : public GP_Comp_t, public MPT_GP_t
 
 protected:
   MPT_GP_Comp_t(MPT_Node_pt tnode, GP_CompType_t ctype, MPT_GP_pt elements) 
-      : _iterator(tnode), MPT_GP_t(tnode) 
+      : MPT_GP_t(tnode), _iterator(tnode)
     {_ctype = ctype; _elements = elements;}
   
 public:
