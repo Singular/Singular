@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_int.cc,v 1.8 1997-10-10 10:51:57 schmidt Exp $ */
+/* $Id: int_int.cc,v 1.9 1997-12-12 09:23:22 schmidt Exp $ */
 
 #include <config.h>
 
@@ -104,11 +104,6 @@ InternalCF* InternalInteger::neg()
     }
 }
 
-
-int InternalInteger::comparesame( InternalCF * c )
-{
-    return mpz_cmp( &thempi, &MPI( c ) );
-}
 
 InternalCF* InternalInteger::addsame( InternalCF * c )
 {
@@ -397,11 +392,22 @@ bool InternalInteger::divremsamet( InternalCF* c, InternalCF*& quot, InternalCF*
     return true;
 }
 
-int InternalInteger::comparecoeff( InternalCF* c )
+//{{{ int InternalInteger::comparesame, comparecoeff ( InternalCF * c )
+// docu: see CanonicalForm::operator <(), CanonicalForm::operator ==()
+int
+InternalInteger::comparesame ( InternalCF * c )
+{
+    ASSERT( ! ::is_imm( c ) && c->levelcoeff() == IntegerDomain, "incompatible base coefficients" );
+    return mpz_cmp( &thempi, &MPI( c ) );
+}
+
+int
+InternalInteger::comparecoeff ( InternalCF * c )
 {
     ASSERT( ::is_imm( c ) == INTMARK, "incompatible base coefficients" );
     return mpz_cmp_si( &thempi, imm2int( c ) );
 }
+//}}}
 
 InternalCF* InternalInteger::addcoeff( InternalCF* c )
 {
