@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_cf.cc,v 1.6 1997-10-10 10:23:17 schmidt Exp $ */
+/* $Id: int_cf.cc,v 1.7 1997-10-10 10:33:01 schmidt Exp $ */
 
 #include <config.h>
 
@@ -104,7 +104,7 @@ InternalCF::ilog2 ()
 //}}}
 
 CanonicalForm
-InternalCF::coeff( int i )
+InternalCF::coeff ( int i )
 {
     if ( i == 0 )
 	return CanonicalForm( copyObject() );
