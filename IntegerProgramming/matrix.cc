@@ -321,7 +321,7 @@ short matrix::compute_nonzero_kernel_vector()
   {
     M[i]=0;
     for(short j=0;j<columns;j++)
-      if(H[i][j]==(const BigInt&)0)
+      if(H[i][j]==BigInt(0))
         M[i]++;
   }
 
@@ -349,7 +349,7 @@ short matrix::compute_nonzero_kernel_vector()
   // smallest possible (euclidian) norm
   short min_index=-1;
   for(short i=0;i<_kernel_dimension;i++)
-    if(M[i]>(const BigInt&)0)
+    if(M[i]>BigInt(0))
       if(min_index==-1)
         min_index=i;
       else
@@ -386,7 +386,7 @@ short matrix::compute_nonzero_kernel_vector()
 
     BOOLEAN found=TRUE;
     for(short j=0;j<columns;j++)
-      if(H[0][j]==(const BigInt&)0)
+      if(H[0][j]==BigInt(0))
         found=FALSE;
 
     if(found==TRUE)
@@ -406,11 +406,11 @@ short matrix::compute_nonzero_kernel_vector()
     short remaining_zero_components=0;
 
     for(short j=0;j<columns;j++)
-      if(H[0][j]==(const BigInt&)0)
+      if(H[0][j]==BigInt(0))
       {
         remaining_zero_components++;
         for(short i=current_position;i<_kernel_dimension;i++)
-          if(H[i][j]==(const BigInt&)0)
+          if(H[i][j]==BigInt(0))
             M[i]++;
       }
 
@@ -443,7 +443,7 @@ short matrix::compute_nonzero_kernel_vector()
     // to H[0], but the smallest possible norm.
     short min_index=0;
     for(short i=current_position;i<_kernel_dimension;i++)
-      if(M[i]>(const BigInt&)0)
+      if(M[i]>BigInt(0))
         if(min_index==0)
           min_index=i;
         else
@@ -478,9 +478,9 @@ short matrix::compute_nonzero_kernel_vector()
       // check if any component !=0 of H[0] becomes zero by adding
       // mult*H[current_position]
       for(short j=0;j<columns;j++)
-        if(H[0][j]!=(const BigInt&)0)
+        if(H[0][j]!=BigInt(0))
           if(H[0][j]+(const BigInt&)mult*H[current_position][j]
-            ==(const BigInt&)0)
+            ==BigInt(0))
             found=FALSE;
 
       if(found==TRUE)
@@ -495,9 +495,9 @@ short matrix::compute_nonzero_kernel_vector()
         // check if any component !=0 of H[0] becomes zero by subtracting
         // mult*H[current_position]
         for(short j=0;j<columns;j++)
-          if(H[0][j]!=(const BigInt&)0)
+          if(H[0][j]!=BigInt(0))
             if(H[0][j]-(const BigInt&)mult*H[current_position][j]
-              ==(const BigInt&)0)
+              ==BigInt(0))
               found=FALSE;
 
         if(found==TRUE)
@@ -533,7 +533,7 @@ short matrix::compute_flip_variables(short*& F)
   // number of flip variables
 
   for(short j=0;j<columns;j++)
-    if(H[0][j]<(const BigInt&)0)
+    if(H[0][j]<BigInt(0))
       r++;
   // remember that all components of H[0] are !=0
 
@@ -550,7 +550,7 @@ short matrix::compute_flip_variables(short*& F)
     memset(F,0,r*sizeof(short));
     short counter=0;
     for(short j=0;j<columns;j++)
-      if(H[0][j]>(const BigInt&)0)
+      if(H[0][j]> BigInt(0))
       {
         F[counter]=j;
         counter++;
@@ -564,7 +564,7 @@ short matrix::compute_flip_variables(short*& F)
     memset(F,0,r*sizeof(short));
     short counter=0;
     for(short j=0;j<columns;j++)
-      if(H[0][j]<(const BigInt&)0)
+      if(H[0][j]< BigInt(0))
       {
         F[counter]=j;
         counter++;
@@ -624,10 +624,10 @@ short matrix::hosten_shapiro(short*& sat_var)
     {
       if(ideal_saturated_by_var[j]==FALSE)
       {
-        if(H[k][j]>(const BigInt&)0)
+        if(H[k][j]> BigInt(0))
           pos_sat_var++;
         else
-          if(H[k][j]<(const BigInt&)0)
+          if(H[k][j]< BigInt(0))
             neg_sat_var++;
       }
     }
@@ -638,7 +638,7 @@ short matrix::hosten_shapiro(short*& sat_var)
     {
       for(short j=0;j<columns;j++)
         if(ideal_saturated_by_var[j]==FALSE)
-          if(H[k][j]>(const BigInt&)0)
+          if(H[k][j]> BigInt(0))
             // ideal has to be saturated by the variables corresponding
             // to positive components
           {
@@ -647,7 +647,7 @@ short matrix::hosten_shapiro(short*& sat_var)
             number_of_sat_var++;
           }
           else
-            if(H[k][j]<(const BigInt&)0)
+            if(H[k][j]< BigInt(0))
               // then the ideal is automatically saturated by the variables
               // corresponding to negative components
               ideal_saturated_by_var[j]=TRUE;
@@ -656,7 +656,7 @@ short matrix::hosten_shapiro(short*& sat_var)
     {
       for(short j=0;j<columns;j++)
         if(ideal_saturated_by_var[j]==FALSE)
-          if(H[k][j]<(const BigInt&)0)
+          if(H[k][j]< BigInt(0))
             // ideal has to be saturated by the variables corresponding
             // to negative components
           {
@@ -665,7 +665,7 @@ short matrix::hosten_shapiro(short*& sat_var)
             number_of_sat_var++;
           }
           else
-            if(H[k][j]>(const BigInt&)0)
+            if(H[k][j]> BigInt(0))
               // then the ideal is automatically saturated by the variables
               // corresponding to positive components
               ideal_saturated_by_var[j]=TRUE;
