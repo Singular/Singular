@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.13 1997-09-29 08:51:48 siebert Exp $ */
+/* $Id: syz1.cc,v 1.14 1997-11-13 10:57:16 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -14,6 +14,7 @@
 #include "kstd1.h"
 #include "kutil.h"
 #include "spolys.h"
+#include "i386.h"
 #include "spolys0.h"
 #include "stairc.h"
 #include "ipid.h"
