@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.12 2000-12-05 15:26:59 obachman Exp $ */
+/* $Id: misc.cc,v 1.13 2001-05-23 20:13:02 anne Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -468,6 +468,7 @@ void  mod_write_header(FILE *fp, char *module, char what)
   fprintf(fp, "%s\n", DYNAinclude[systyp]);
   fprintf(fp, "\n");
   fprintf(fp, "#include <locals.h>\n");
+  fprintf(fp, "#include <omalloc.h>\n");
   if(what != 'h') {
     fprintf(fp, "#include \"%s.h\"\n", module);
     modlineno+=8;
