@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.108 2001-02-02 16:17:56 Singular Exp $
+@comment $Id: singular.doc,v 1.109 2001-02-09 14:54:39 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -464,7 +464,7 @@ LIB "all.lib";
 @c ---------------------------------------------------------
 @node latex_lib, paramet_lib, graphics_lib, Visualization
 @subsection latex_lib
-@c lib latex.lib no_ex
+@c lib latex.lib
 @c ---------------------------------------------------------
 @node paramet_lib, surf_lib, latex_lib, Visualization
 @subsection paramet_lib
