@@ -147,16 +147,6 @@ ZZ_pE::ZZ_pE()
 
 
 
-istream& operator>>(istream& s, ZZ_pE& x)
-{
-   ZZ_pX y;
-
-   s >> y;
-   conv(x, y);
-
-   return s;
-}
-
 void div(ZZ_pE& x, const ZZ_pE& a, const ZZ_pE& b)
 {
    ZZ_pE t;

@@ -10,8 +10,6 @@ NTL_vector_impl(RR,vec_RR)
 
 NTL_eq_vector_impl(RR,vec_RR)
 
-NTL_io_vector_impl(RR,vec_RR)
-
 void InnerProduct(RR& xx, const vec_RR& a, const vec_RR& b)
 {
    RR t1, x;

@@ -561,41 +561,6 @@ static double LastTime = 0;
 
 static void G_LLLStatus(long max_k, double t, long m, const mat_ZZ& B)
 {
-   cerr << "---- G_LLL_FP status ----\n";
-   cerr << "elapsed time: ";
-   PrintTime(cerr, t-StartTime);
-   cerr << ", stage: " << max_k;
-   cerr << ", rank: " << m;
-   cerr << ", swaps: " << NumSwaps << "\n";
-
-   ZZ t1;
-   long i;
-   double prodlen = 0;
-
-   for (i = 1; i <= m; i++) {
-      InnerProduct(t1, B(i), B(i));
-      if (!IsZero(t1))
-         prodlen += log(t1);
-   }
-
-   cerr << "log of prod of lengths: " << prodlen/(2.0*log(2.0)) << "\n";
-
-   if (LLLDumpFile) {
-      cerr << "dumping to " << LLLDumpFile << "...";
-
-      ofstream f;
-      OpenWrite(f, LLLDumpFile);
-      
-      f << "[";
-      for (i = 1; i <= m; i++) {
-         f << B(i) << "\n";
-      }
-      f << "]\n";
-
-      f.close();
-
-      cerr << "\n";
-   }
 
    LastTime = t;
    
@@ -619,8 +584,6 @@ static void inc_red_fudge()
    log_red--;
 
    
-   cerr << "G_LLL_FP: warning--relaxing reduction (" << log_red << ")\n";
-
    if (log_red < 4)
       Error("G_LLL_FP: too much loss of precision...stop!");
 }
@@ -707,7 +670,6 @@ long ll_G_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
       GivensComputeGS(B1, mu, aux, k, n, cache);
 
       if (swap_cnt > 200000) {
-         cerr << "G_LLL_FP: swap loop?\n";
          swap_cnt = 0;
       }
 
@@ -730,9 +692,6 @@ long ll_G_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
 
             if ((counter >> 7) == 1 || new_sz < sz) {
                sz = new_sz;
-            }
-            else {
-               cerr << "G_LLL_FP: warning--infinite loop? (" << k << ")\n";
             }
          }
 
@@ -1084,19 +1043,6 @@ void G_BKZStatus(double tt, double enum_time, long NumIterations,
                long NumTrivial, long NumNonTrivial, long NumNoOps, long m, 
                const mat_ZZ& B)
 {
-   cerr << "---- G_BKZ_FP status ----\n";
-   cerr << "elapsed time: ";
-   PrintTime(cerr, tt-StartTime);
-   cerr << ", enum time: ";
-   PrintTime(cerr, enum_time);
-   cerr << ", iter: " << NumIterations << "\n";
-   cerr << "triv: " << NumTrivial;
-   cerr << ", nontriv: " << NumNonTrivial;
-   cerr << ", no ops: " << NumNoOps;
-   cerr << ", rank: " << m;
-   cerr << ", swaps: " << NumSwaps << "\n";
-
-
 
    ZZ t1;
    long i;
@@ -1106,26 +1052,6 @@ void G_BKZStatus(double tt, double enum_time, long NumIterations,
       InnerProduct(t1, B(i), B(i));
       if (!IsZero(t1))
          prodlen += log(t1);
-   }
-
-   cerr << "log of prod of lengths: " << prodlen/(2.0*log(2.0)) << "\n";
-
-
-   if (LLLDumpFile) {
-      cerr << "dumping to " << LLLDumpFile << "...";
-
-      ofstream f;
-      OpenWrite(f, LLLDumpFile);
-      
-      f << "[";
-      for (i = 1; i <= m; i++) {
-         f << B(i) << "\n";
-      }
-      f << "]\n";
-
-      f.close();
-
-      cerr << "\n";
    }
 
    LastTime = tt;

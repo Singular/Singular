@@ -8,26 +8,6 @@
 NTL_START_IMPL
 
 
-void OpenWrite(ofstream& s, const char *name)
-{
-   s.open(name, ios::out);
-
-   if (!s) {
-      cerr << "open write error: " << name << "\n";
-      abort();
-   }
-}
-
-
-void OpenRead(ifstream& s, const char *name)
-{
-   s.open(name, ios::in);
-   if (!s) {
-      cerr << "open read error: " << name << "\n";
-      abort();
-   }
-}
-
 static char sbuf[256];
 
 char *FileName(const char* stem, const char *ext)

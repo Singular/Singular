@@ -683,45 +683,6 @@ void conv(ZZ& z, const quad_float& x)
 
 
 
-ostream& operator<<(ostream& s, const quad_float& a)
-{
-   quad_float aa = a;
-
-   if (!IsFinite(&aa)) {
-      s << "NaN";
-      return s;
-   }
-
-   long old_p = RR::precision();
-   long old_op = RR::OutputPrecision();
-
-   RR::SetPrecision(long(3.33*quad_float::oprec) + 10);
-   RR::SetOutputPrecision(quad_float::oprec);
-
-   static RR t;
-
-   conv(t, a);
-   s << t;
-
-   RR::SetPrecision(old_p);
-   RR::SetOutputPrecision(old_op);
-
-   return s;
-}
-
-istream& operator>>(istream& s, quad_float& x)
-{
-   long old_p = RR::precision();
-   RR::SetPrecision(4*NTL_DOUBLE_PRECISION);
-
-   static RR t;
-   s >> t;
-   conv(x, t);
-
-   RR::SetPrecision(old_p);
-   return s;
-}
-
 void random(quad_float& x)
 {
    long old_p = RR::precision();

@@ -2329,8 +2329,6 @@ NTL_vector_impl(ZZX,vec_ZZX)
 
 NTL_eq_vector_impl(ZZX,vec_ZZX)
 
-NTL_io_vector_impl(ZZX,vec_ZZX)
-
 
 
 void CopyReverse(ZZX& x, const ZZX& a, long hi)

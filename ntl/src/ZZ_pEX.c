@@ -16,19 +16,6 @@ const ZZ_pEX& ZZ_pEX::zero()
 }
 
 
-istream& operator>>(istream& s, ZZ_pEX& x)
-{
-   s >> x.rep;
-   x.normalize();
-   return s;
-}
-
-ostream& operator<<(ostream& s, const ZZ_pEX& a)
-{
-   return s << a.rep;
-}
-
-
 void ZZ_pEX::normalize()
 {
    long n;
@@ -1951,8 +1938,6 @@ void XGCD(ZZ_pEX& d, ZZ_pEX& s, ZZ_pEX& t, const ZZ_pEX& a, const ZZ_pEX& b)
 NTL_vector_impl(ZZ_pEX,vec_ZZ_pEX)
 
 NTL_eq_vector_impl(ZZ_pEX,vec_ZZ_pEX)
-
-NTL_io_vector_impl(ZZ_pEX,vec_ZZ_pEX)
 
 void IterBuild(ZZ_pE* a, long n)
 {

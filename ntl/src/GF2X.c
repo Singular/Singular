@@ -236,107 +236,6 @@ long FromHex(long c)
 }
 
 static
-istream & HexInput(istream& s, GF2X& a)
-{
-   long n;
-   long c;
-   long i;
-   long val;
-   GF2X ibuf;
-
-   n = 0;
-   clear(ibuf);
-
-   c = s.peek();
-   while ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || 
-          (c >= 'a' && c <= 'f')) 
-   {
-      val = FromHex(c);
-
-      for (i = 0; i < 4; i++)
-         if (val & (1L << i))
-            SetCoeff(ibuf, n+i);
-
-      n += 4;
-      s.get();
-      c = s.peek();
-   }
-
-   a = ibuf;
-   return s;
-}
-      
-      
-
-   
-
-
-
-istream & operator>>(istream& s, GF2X& a)   
-{   
-   static ZZ ival;
-
-   long c;   
-   if (!s) Error("bad GF2X input"); 
-   
-   c = s.peek();  
-   while (c == ' ' || c == '\n' || c == '\t') {  
-      s.get();  
-      c = s.peek();  
-   }  
-
-   if (c == '0') {
-      s.get();
-      c = s.peek();
-      if (c == 'x' || c == 'X') {
-         s.get();
-         return HexInput(s, a);
-      }
-      else {
-         Error("bad GF2X input");
-      }
-   }
-
-   if (c != '[') {  
-      Error("bad GF2X input");  
-   }  
-
-   GF2X ibuf;  
-   long n;   
-   
-   n = 0;   
-   clear(ibuf);
-      
-   s.get();  
-   c = s.peek();  
-   while (c == ' ' || c == '\n' || c == '\t') {  
-      s.get();  
-      c = s.peek();  
-   }  
-
-   while (c != ']' && c != EOF) {   
-      if (!(s >> ival)) Error("bad GF2X input");
-      SetCoeff(ibuf, n, to_GF2(ival));
-      n++;
-
-      c = s.peek();  
-
-      while (c == ' ' || c == '\n' || c == '\t') {  
-         s.get();  
-         c = s.peek();  
-      }  
-   }   
-
-   if (c == EOF) Error("bad GF2X input");  
-   s.get(); 
-   
-   a = ibuf; 
-   return s;   
-}    
-
-
-
-static
 char ToHex(long val)
 {
    if (val >= 0 && val <= 9)
@@ -348,66 +247,6 @@ char ToHex(long val)
    Error("ToHex: bad arg");
    return 0;
 }
-
-static
-ostream & HexOutput(ostream& s, const GF2X& a)
-{
-   s << "0x";
-
-   long da = deg(a);
-
-   if (da < 0) {
-      s << '0';
-      return s;
-   }
-
-   long i, n, val;
-
-   val = 0;
-   n = 0;
-   for (i = 0; i <= da; i++) {
-      val = val | (rep(coeff(a, i)) << n);
-      n++;
-
-      if (n == 4) {
-         s << ToHex(val);
-         val = 0;
-         n = 0;
-      }
-   }
-
-   if (val) 
-      s << ToHex(val);
-
-   return s;
-}
-
-
-ostream& operator<<(ostream& s, const GF2X& a)   
-{   
-   if (GF2X::HexOutput)
-      return HexOutput(s, a);
-
-   long i, da;   
-   GF2 c;
-  
-   da = deg(a);
-   
-   s << '[';   
-   
-   for (i = 0; i <= da; i++) {   
-      c = coeff(a, i);
-      if (c == 0)
-         s << "0";
-      else
-         s << "1";
-      if (i < da) s << " ";   
-   }   
-   
-   s << ']';   
-      
-   return s;   
-}   
 
 void random(GF2X& x, long n)
 {
@@ -1360,8 +1199,6 @@ void trunc(GF2X& x, const GF2X& a, long m)
 
 
 NTL_vector_impl(GF2X,vec_GF2X)
-
-NTL_io_vector_impl(GF2X,vec_GF2X)
 
 NTL_eq_vector_impl(GF2X,vec_GF2X)
 

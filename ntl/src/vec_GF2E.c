@@ -62,8 +62,6 @@ void BlockDestroy(GF2E* x, long n)
 
 NTL_vector_impl_plain(GF2E,vec_GF2E)
 
-NTL_io_vector_impl(GF2E,vec_GF2E)
-
 NTL_eq_vector_impl(GF2E,vec_GF2E)
 
 

@@ -43,23 +43,4 @@ void power(GF2& x, GF2 a, long e)
    x = a;
 }
 
-ostream& operator<<(ostream& s, GF2 a)
-{
-   if (a == 0)
-      s << "0";
-   else
-      s << "1";
-
-   return s;
-}
-
-istream& operator>>(istream& s, GF2& x)
-{
-   static ZZ a;
-
-   s >> a;
-   conv(x, a);
-   return s;
-}
- 
 NTL_END_IMPL

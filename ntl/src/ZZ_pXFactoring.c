@@ -91,8 +91,6 @@ void NullSpace(long& r, vec_long& D, vec_ZZVec& M, long verbose)
    l = 0;
    for (k = 0; k < n; k++) {
 
-      if (verbose && k % 10 == 0) cerr << "+";
-
       pos = -1;
       for (i = l; i < n; i++) {
          rem(t1, M[i][k], p);
@@ -163,7 +161,6 @@ void BuildMatrix(vec_ZZVec& M, long n, const ZZ_pX& g, const ZZ_pXModulus& F,
 
    set(h);
    for (j = 0; j < n; j++) {
-      if (verbose && j % 10 == 0) cerr << "+";
 
       m = deg(h);
       for (i = 0; i < n; i++) {
@@ -388,25 +385,18 @@ void SFBerlekamp(vec_ZZ_pX& factors, const ZZ_pX& ff, long verbose)
 
    ZZ_pX g, h;
 
-   if (verbose) { cerr << "computing X^p..."; t = GetTime(); }
    PowerXMod(g, p, F);
-   if (verbose) { cerr << (GetTime()-t) << "\n"; }
 
    vec_long D;
    long r;
 
    vec_ZZVec M;
 
-   if (verbose) { cerr << "building matrix..."; t = GetTime(); }
    BuildMatrix(M, n, g, F, verbose);
-   if (verbose) { cerr << (GetTime()-t) << "\n"; }
 
-   if (verbose) { cerr << "diagonalizing..."; t = GetTime(); }
    NullSpace(r, D, M, verbose);
-   if (verbose) { cerr << (GetTime()-t) << "\n"; }
 
 
-   if (verbose) cerr << "number of factors = " << r << "\n";
 
    if (r == 1) {
       factors.SetLength(1);
@@ -414,7 +404,6 @@ void SFBerlekamp(vec_ZZ_pX& factors, const ZZ_pX& ff, long verbose)
       return;
    }
 
-   if (verbose) { cerr << "factor extraction..."; t = GetTime(); }
 
    vec_ZZ_p roots;
 
@@ -429,7 +418,6 @@ void SFBerlekamp(vec_ZZ_pX& factors, const ZZ_pX& ff, long verbose)
    long i;
 
    while (factors.length() < r) {
-      if (verbose) cerr << "+";
       RandomBasisElt(g, D, M);
       S.kill();
       for (i = 0; i < factors.length(); i++) {
@@ -453,15 +441,7 @@ void SFBerlekamp(vec_ZZ_pX& factors, const ZZ_pX& ff, long verbose)
       swap(factors, S);
    }
 
-   if (verbose) { cerr << (GetTime()-t) << "\n"; }
 
-   if (verbose) {
-      cerr << "degrees:";
-      long i;
-      for (i = 0; i < factors.length(); i++)
-         cerr << " " << deg(factors[i]);
-      cerr << "\n";
-   }
 }
 
 
@@ -475,19 +455,13 @@ void berlekamp(vec_pair_ZZ_pX_long& factors, const ZZ_pX& f, long verbose)
       Error("berlekamp: bad args");
 
    
-   if (verbose) { cerr << "square-free decomposition..."; t = GetTime(); }
    SquareFreeDecomp(sfd, f);
-   if (verbose) cerr << (GetTime()-t) << "\n";
 
    factors.SetLength(0);
 
    long i, j;
 
    for (i = 0; i < sfd.length(); i++) {
-      if (verbose) {
-         cerr << "factoring multiplicity " << sfd[i].b 
-              << ", deg = " << deg(sfd[i].a) << "\n";
-      }
 
       SFBerlekamp(x, sfd[i].a, verbose);
 
@@ -501,8 +475,6 @@ void berlekamp(vec_pair_ZZ_pX_long& factors, const ZZ_pX& f, long verbose)
 static
 void AddFactor(vec_pair_ZZ_pX_long& factors, const ZZ_pX& g, long d, long verbose)
 {
-   if (verbose)
-      cerr << "degree=" << d << ", number=" << deg(g)/d << "\n";
    append(factors, cons(g, d));
 }
 
@@ -513,8 +485,6 @@ void ProcessTable(ZZ_pX& f, vec_pair_ZZ_pX_long& factors,
 
 {
    if (limit == 0) return;
-
-   if (verbose) cerr << "+";
 
    ZZ_pX t1;
 
@@ -768,9 +738,7 @@ void RootEDF(vec_ZZ_pX& factors, const ZZ_pX& f, long verbose)
    vec_ZZ_p roots;
    double t;
 
-   if (verbose) { cerr << "finding roots..."; t = GetTime(); }
    FindRoots(roots, f);
-   if (verbose) { cerr << (GetTime()-t) << "\n"; }
 
    long r = roots.length();
    factors.SetLength(r);
@@ -804,8 +772,6 @@ void RecEDF(vec_ZZ_pX& factors, const ZZ_pX& f, const ZZ_pX& b, long d,
    vec_ZZ_pX v;
    long i;
    ZZ_pX bb;
-
-   if (verbose) cerr << "+";
 
    EDFSplit(v, f, b, d);
    for (i = 0; i < v.length(); i++) {
@@ -852,16 +818,11 @@ void EDF(vec_ZZ_pX& factors, const ZZ_pX& ff, const ZZ_pX& bb,
 
    
    double t;
-   if (verbose) { 
-      cerr << "computing EDF(" << d << "," << r << ")..."; 
-      t = GetTime(); 
-   }
 
    factors.SetLength(0);
 
    RecEDF(factors, f, b, d, verbose);
 
-   if (verbose) cerr << (GetTime()-t) << "\n";
 }
 
 
@@ -895,17 +856,10 @@ void SFCanZass(vec_ZZ_pX& factors, const ZZ_pX& ff, long verbose)
 
    ZZ_pX h;
 
-   if (verbose) { cerr << "computing X^p..."; t = GetTime(); }
    PowerXMod(h, p, F);
-   if (verbose) { cerr << (GetTime()-t) << "\n"; }
 
    vec_pair_ZZ_pX_long u;
-   if (verbose) { cerr << "computing DDF..."; t = GetTime(); }
    NewDDF(u, f, h, verbose);
-   if (verbose) { 
-      t = GetTime()-t; 
-      cerr << "DDF time: " << t << "\n";
-   }
 
    ZZ_pX hh;
    vec_ZZ_pX v;
@@ -949,19 +903,13 @@ void CanZass(vec_pair_ZZ_pX_long& factors, const ZZ_pX& f, long verbose)
    vec_ZZ_pX x;
 
    
-   if (verbose) { cerr << "square-free decomposition..."; t = GetTime(); }
    SquareFreeDecomp(sfd, f);
-   if (verbose) cerr << (GetTime()-t) << "\n";
 
    factors.SetLength(0);
 
    long i, j;
 
    for (i = 0; i < sfd.length(); i++) {
-      if (verbose) {
-         cerr << "factoring multiplicity " << sfd[i].b 
-              << ", deg = " << deg(sfd[i].a) << "\n";
-      }
 
       SFCanZass(x, sfd[i].a, verbose);
 
@@ -1498,8 +1446,6 @@ void GenerateBabySteps(ZZ_pX& h1, const ZZ_pX& f, const ZZ_pX& h, long k,
 {
    double t;
 
-   if (verbose) { cerr << "generating baby steps..."; t = GetTime(); }
-
    ZZ_pXModulus F;
    build(F, f);
 
@@ -1517,21 +1463,11 @@ void GenerateBabySteps(ZZ_pX& h1, const ZZ_pX& f, const ZZ_pX& h, long k,
    }
 
    for (i = 1; i <= k-1; i++) {
-      if (use_files) {
-         ofstream s;
-         OpenWrite(s, FileName(ZZ_pX_stem, "baby", i));
-         s << h1 << "\n";
-         s.close();
-      }
-      else
          BabyStepFile(i) = h1;
 
       CompMod(h1, h1, H, F);
-      if (verbose) cerr << "+";
    }
 
-   if (verbose)
-      cerr << (GetTime()-t) << "\n";
 }
 
 
@@ -1540,8 +1476,6 @@ void GenerateGiantSteps(const ZZ_pX& f, const ZZ_pX& h, long l, long verbose)
 {
 
    double t;
-
-   if (verbose) { cerr << "generating giant steps..."; t = GetTime(); }
 
    ZZ_pXModulus F;
    build(F, f);
@@ -1561,30 +1495,13 @@ void GenerateGiantSteps(const ZZ_pX& f, const ZZ_pX& h, long l, long verbose)
    }
 
    for (i = 1; i <= l-1; i++) {
-      if (use_files) {
-         ofstream s;
-         OpenWrite(s, FileName(ZZ_pX_stem, "giant", i));
-         s << h1 << "\n";
-         s.close();
-      }
-      else
          GiantStepFile(i) = h1;
 
       CompMod(h1, h1, H, F);
-      if (verbose) cerr << "+";
    }
 
-   if (use_files) {
-      ofstream s;
-      OpenWrite(s, FileName(ZZ_pX_stem, "giant", i));
-      s << h1 << "\n";
-      s.close();
-   }
-   else
       GiantStepFile(i) = h1;
 
-   if (verbose)
-      cerr << (GetTime()-t) << "\n";
 }
 
 static
@@ -1615,9 +1532,6 @@ void NewAddFactor(vec_pair_ZZ_pX_long& u, const ZZ_pX& g, long m, long verbose)
    u[len].a = g;
    u[len].b = m;
 
-   if (verbose) {
-      cerr << "split " << m << " " << deg(g) << "\n";
-   }
 }
 
    
@@ -1672,15 +1586,6 @@ void NewProcessTable(vec_pair_ZZ_pX_long& u, ZZ_pX& f, const ZZ_pXModulus& F,
 static
 void FetchGiantStep(ZZ_pX& g, long gs, const ZZ_pXModulus& F)
 {
-   if (use_files) {
-      ifstream s;
-   
-      OpenRead(s, FileName(ZZ_pX_stem, "giant", gs));
-   
-      s >> g;
-      s.close();
-   }
-   else
       g = GiantStepFile(gs);
 
    rem(g, g, F);
@@ -1696,13 +1601,6 @@ void FetchBabySteps(vec_ZZ_pX& v, long k)
 
    long i;
    for (i = 1; i <= k-1; i++) {
-      if (use_files) {
-         ifstream s;
-         OpenRead(s, FileName(ZZ_pX_stem, "baby", i));
-         s >> v[i];
-         s.close();
-      }
-      else
          v[i] = BabyStepFile(i);
    }
 }
@@ -1715,11 +1613,6 @@ void GiantRefine(vec_pair_ZZ_pX_long& u, const ZZ_pX& ff, long k, long l,
 
 {
    double t;
-
-   if (verbose) {
-      cerr << "giant refine...";
-      t = GetTime();
-   }
 
    u.SetLength(0);
 
@@ -1762,11 +1655,8 @@ void GiantRefine(vec_pair_ZZ_pX_long& u, const ZZ_pX& ff, long k, long l,
          MulMod(buf[size-1], buf[size-1], h, F);
       }
 
-      if (verbose && bs == 0) cerr << "+";
-
       if (size == ZZ_pX_GCDTableSize && bs == 0) {
          NewProcessTable(u, f, F, buf, size, first_gs, k, verbose);
-         if (verbose) cerr << "*";
          size = 0;
       }
 
@@ -1783,7 +1673,6 @@ void GiantRefine(vec_pair_ZZ_pX_long& u, const ZZ_pX& ff, long k, long l,
 
    if (size > 0) {
       NewProcessTable(u, f, F, buf, size, first_gs, k, verbose);
-      if (verbose) cerr << "*";
    }
 
    if (deg(f) > 0) 
@@ -1791,7 +1680,6 @@ void GiantRefine(vec_pair_ZZ_pX_long& u, const ZZ_pX& ff, long k, long l,
 
    if (verbose) {
       t = GetTime()-t;
-      cerr << "giant refine time: " << t << "\n";
    }
 }
 
@@ -1859,11 +1747,6 @@ void BabyRefine(vec_pair_ZZ_pX_long& factors, const vec_pair_ZZ_pX_long& u,
 {
    double t;
 
-   if (verbose) {
-      cerr << "baby refine...";
-      t = GetTime();
-   }
-
    factors.SetLength(0);
 
    vec_ZZ_pX BabyStep;
@@ -1882,10 +1765,6 @@ void BabyRefine(vec_pair_ZZ_pX_long& factors, const vec_pair_ZZ_pX_long& u,
       }
    }
 
-   if (verbose) {
-      t = GetTime()-t;
-      cerr << "baby refine time: " << t << "\n";
-   }
 }
 
       

@@ -7,8 +7,6 @@ NTL_START_IMPL
 
 NTL_matrix_impl(zz_pE,vec_zz_pE,vec_vec_zz_pE,mat_zz_pE)
 
-NTL_io_matrix_impl(zz_pE,vec_zz_pE,vec_vec_zz_pE,mat_zz_pE)
-
 NTL_eq_matrix_impl(zz_pE,vec_zz_pE,vec_vec_zz_pE,mat_zz_pE)
 
 
