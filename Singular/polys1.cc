@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.11 1998-01-05 16:39:28 Singular Exp $ */
+/* $Id: polys1.cc,v 1.12 1998-04-23 09:52:15 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -275,7 +275,7 @@ static poly pMonPower(poly p, int exp)
   #ifdef TEST_MAC_ORDER
   if (bNoAdd)
     pSetm(p);
-  else  
+  else
   #endif
     p->Order *= exp;
   return p;
@@ -414,6 +414,9 @@ static poly pPow(poly p, int i)
 */
 poly pPower(poly p, int i)
 {
+  if (i==0)
+    return pOne();
+
   poly rc=NULL;
 
   if(p!=NULL)
@@ -730,14 +733,6 @@ void pContent(poly ph)
   {
     pSetCoeff(p,nInit(1));
   }
-#ifdef HAVE_FACTORY
-  else if ( (nGetChar() == 1) || (nGetChar() < 0) )
-  {
-    pTest(ph);
-    singclap_divide_content(ph);
-    pTest(ph);
-  }
-#endif
   else
   {
 #ifdef PDEBUG
@@ -752,34 +747,43 @@ void pContent(poly ph)
     {
       nNormalize(pGetCoeff(p));
       d=nGcd(h,pGetCoeff(p));
-      if(nIsOne(d))
-      {
-        nDelete(&h);
-        nDelete(&d);
-        return;
-      }
       nDelete(&h);
       h = d;
+      if(nIsOne(h))
+      {
+        break;
+      }
       pIter(p);
     }
     p = ph;
     //number tmp;
-    while (p!=NULL)
+    if(!nIsOne(h))
     {
-      //d = nDiv(pGetCoeff(p),h);
-      //tmp = nIntDiv(pGetCoeff(p),h);
-      //if (!nEqual(d,tmp))
-      //{
-      //  StringSetS("** div0:");nWrite(pGetCoeff(p));StringAppendS("/");
-      //  nWrite(h);StringAppendS("=");nWrite(d);StringAppendS(" int:");
-      //  nWrite(tmp);Print(StringAppendS("\n"));
-      //}
-      //nDelete(&tmp);
-      d = nIntDiv(pGetCoeff(p),h);
-      pSetCoeff(p,d);
-      pIter(p);
+      while (p!=NULL)
+      {
+        //d = nDiv(pGetCoeff(p),h);
+        //tmp = nIntDiv(pGetCoeff(p),h);
+        //if (!nEqual(d,tmp))
+        //{
+        //  StringSetS("** div0:");nWrite(pGetCoeff(p));StringAppendS("/");
+        //  nWrite(h);StringAppendS("=");nWrite(d);StringAppendS(" int:");
+        //  nWrite(tmp);Print(StringAppendS("\n"));
+        //}
+        //nDelete(&tmp);
+        d = nIntDiv(pGetCoeff(p),h);
+        pSetCoeff(p,d);
+        pIter(p);
+      }
     }
     nDelete(&h);
+#ifdef HAVE_FACTORY
+    if ( (nGetChar() == 1) || (nGetChar() < 0) ) /* Q[a],Q(a),Zp[a],Z/p(a) */
+    {
+      pTest(ph);
+      singclap_divide_content(ph);
+      pTest(ph);
+    }
+#endif
   }
 }
 

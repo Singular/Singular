@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.17 1998-04-22 07:49:01 Singular Exp $ */
+/* $Id: kutil.cc,v 1.18 1998-04-23 09:52:11 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for std
 */
@@ -457,29 +457,29 @@ void deleteInL (LSet set, int *length, int j,kStrategy strat)
       loop
       {
         if (i < 0)
-	{
-	  //if (strat->next!=NULL)
-	  //{
-	  //  strat=strat->next;
-	  //  i=strat->tl;
-	  //}
-	  //else
-	  {
-	    /* not found : */
+        {
+          //if (strat->next!=NULL)
+          //{
+          //  strat=strat->next;
+          //  i=strat->tl;
+          //}
+          //else
+          {
+            /* not found : */
             pDelete(&p);
-	    break;
-	  }
-	}
-	else
-	{
+            break;
+          }
+        }
+        else
+        {
           if (strat->T[i].p==p)
-	  {
-	    /* found : */
+          {
+            /* found : */
             p=NULL;
-	    break;
-	  }
-	  i--;
-	}
+            break;
+          }
+          i--;
+        }
       }
     }
     set[j].p=NULL;
@@ -3767,7 +3767,8 @@ void completeReduce (kStrategy strat)
       strat->S[i] = redtailBba(strat->S[i],i-1,strat);
       if (TEST_OPT_INTSTRATEGY)
       {
-        pCleardenom(strat->S[i]);
+        //if (strat->redTailChange)
+	  pCleardenom(strat->S[i]);
       }
       if (TEST_OPT_PROT)
       {

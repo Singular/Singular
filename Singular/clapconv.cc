@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.15 1998-03-16 14:56:25 obachman Exp $
+// $Id: clapconv.cc,v 1.16 1998-04-23 09:52:07 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -300,6 +300,7 @@ CanonicalForm convSingAPClapAP ( poly p , const Variable & a)
   CanonicalForm result = 0;
   int e, n = pVariables;
 
+  On(SW_RATIONAL);
   while ( p!=NULL)
   {
     CanonicalForm term=convSingAClapA(((lnumber)pGetCoeff(p))->z,a);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.23 1998-04-23 09:16:25 schmidt Exp $ */
+/* $Id: longalg.cc,v 1.24 1998-04-23 09:52:14 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -964,6 +964,12 @@ static alg napGcd(alg a, alg b)
     }
     return napCopy(b);
   }
+  else
+  if ((b==NULL)
+  || ((b->ne==NULL)&&(nacIsZero(b->ko))))
+  {
+    return napCopy(a);
+  }
   if (naMinimalPoly != NULL)
   {
     if (a->e[0] >= b->e[0])
@@ -976,7 +982,8 @@ static alg napGcd(alg a, alg b)
       x = b;
       y = a;
     }
-    g = napGcd0(x, y);
+    if (!naIsChar0) g = napInit(1);
+    else            g = napGcd0(x, y);
     if (y->ne==NULL)
     {
       g->e[0] = napExp(x, y);
@@ -1007,9 +1014,18 @@ static alg napGcd(alg a, alg b)
   x = (alg)Alloc0(napMonomSize);
   g=a;
   h=b;
-  x = napGcd0(g,h);
+  if (!naIsChar0) x = napInit(1);
+  else            x = napGcd0(g,h);
+  //int huhu=0;
   for (i=(naNumbOfPar-1); i>=0; i--)
+  {
     x->e[i] = napExpi(i,a,b);
+    //huhu+=x->e[i];
+  }
+  //if (huhu!=0) 
+  //{
+  //  Print("{%d}",huhu);
+  //}
   return x;
 }
 
@@ -1795,7 +1811,7 @@ number naGcd(number a, number b)
       result->z = napGcd(x->z, y->z);
   }
   else
-    result->z = napGcd0(x->z, y->z);
+    result->z = napGcd(x->z, y->z); // change frpm napGcd0
   naTest((number)result);
   return (number)result;
 }

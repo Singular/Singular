@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.30 1998-04-21 13:20:39 Singular Exp $
+// $Id: clapsing.cc,v 1.31 1998-04-23 09:52:08 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -374,7 +374,7 @@ void singclap_divide_content ( poly f )
 #ifdef FACTORY_GCD_TIMING
     TIMING_START( contentTimer );
 #endif
-    while ( p && (g != 1) )
+    while ( (p != NULL) && (g != 1) )
     {
       nTest(pGetCoeff(p));
 #ifdef FACTORY_GCD_DEBOUT
@@ -458,6 +458,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     if (with_exps!=1)
     {
       (*v)=new intvec(1);
+      (*v)[1]=1;
     }
     return res;
   }

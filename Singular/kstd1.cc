@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.19 1998-04-07 17:54:20 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.20 1998-04-23 09:52:09 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1643,7 +1643,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   initBuchMoraCrit(strat);
   initBuchMoraPos(strat);
   initMora(F,strat);
-  strat->spSpolyLoop = spGetSpolyLoop(currRing, 
+  strat->spSpolyLoop = spGetSpolyLoop(currRing,
                                       max(strat->ak,pMaxComp(q)),
                                       strat->syzComp, FALSE);
   strat->enterS = enterSMoraNF;
@@ -1738,7 +1738,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   initMora(F,strat);
   strat->enterS = enterSMoraNF;
   /*- set T -*/
-  strat->spSpolyLoop = spGetSpolyLoop(currRing, 
+  strat->spSpolyLoop = spGetSpolyLoop(currRing,
                                       max(strat->ak,idRankFreeModule(q)),
                                       strat->syzComp, FALSE);
   strat->tl = -1;
@@ -1845,19 +1845,19 @@ ideal std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 #endif
   )
   {
-    if (strat->ak == 0)       
+    if (strat->ak == 0)
     {
-      h = (tHomog)idHomIdeal(F,Q);    
+      h = (tHomog)idHomIdeal(F,Q);
       w=NULL;
     }
     else
-      h = (tHomog)idHomModule(F,Q,w); 
-    //Print("test homog:%d\n",h);     
+      h = (tHomog)idHomModule(F,Q,w);
+    //Print("test homog:%d\n",h);
     //if ((h==isHomog)&&(w!=NULL)&&(*w!=NULL))
     //{
     //  (*w)->show();
     //  PrintLn();
-    //  if (F!=NULL) jjPRINT_MA0(idModule2Matrix(idCopy(F)),sNoName);   
+    //  if (F!=NULL) jjPRINT_MA0(idModule2Matrix(idCopy(F)),sNoName);
     //}
   }
 #ifdef DRING
@@ -1865,7 +1865,7 @@ ideal std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 #endif
   if (h==isHomog)
   {
-    if ((w!=NULL) && (*w!=NULL))      
+    if ((w!=NULL) && (*w!=NULL))
     {
       kModW = *w;
       strat->kModW = *w;
@@ -1882,7 +1882,7 @@ ideal std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   if (pOrdSgn==-1)
   {
     if (w!=NULL)
-      r=mora(F,Q,*w,hilb,strat);      
+      r=mora(F,Q,*w,hilb,strat);
     else
       r=mora(F,Q,NULL,hilb,strat);
   }
@@ -2133,7 +2133,7 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   {
     l->m[1].data=(void *)idInit(1,F->rank);
     Warn("no minimal generating set computed");
-  }  
+  }
   else
   {
     idSkipZeroes(strat->M);
@@ -2141,7 +2141,7 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   }
   Free((ADDRESS)strat,sizeof(skStrategy));
   if (reduced>2)
-  {  
+  {
     Kstd1_deg=Kstd1_OldDeg;
     if (!oldDegBound)
       test &= ~Sy_bit(OPT_DEGBOUND);
