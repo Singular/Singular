@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.45 2000-11-14 16:04:58 obachman Exp $ */
+/* $Id: longalg.cc,v 1.46 2000-11-16 16:56:20 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -135,7 +135,7 @@ void naSetChar(int i, BOOLEAN complete, char ** param, int pars)
 #endif
     if (complete)
     {
-      npSetChar(-i);
+      npSetChar(-i, currRing->algring); // to be changes HS
       nacInit        = npInit;
       nacInt         = npInt;
       nacCopy        = ndCopy;

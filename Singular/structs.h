@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.44 2000-11-13 14:50:25 levandov Exp $ */
+/* $Id: structs.h,v 1.45 2000-11-16 16:50:16 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -42,6 +42,19 @@ enum noeof_t
   noeof_string
 };
 
+enum n_coeffType
+{
+  n_unknown=0,
+  n_Zp,
+  n_Q,
+  n_R,
+  n_GF,
+  n_long_R,
+  n_Zp_a,
+  n_Q_a,
+  n_long_C
+};
+
 #ifdef HAVE_PLURAL
 enum nc_type
 {
@@ -50,6 +63,8 @@ enum nc_type
   nc_lie
 };
 #endif
+
+
 /* C++-part */
 #ifdef __cplusplus
 class ip_smatrix;
@@ -65,10 +80,11 @@ class namerec;
 class kBucket;
 #endif
 
-struct  sip_sring;
-struct  sip_sideal;
-struct  sip_link;
-struct  spolynom;
+struct n_Procs_s;
+struct sip_sring;
+struct sip_sideal;
+struct sip_link;
+struct spolynom;
 struct _ssubexpr;
 struct _sssym;
 struct snumber;
@@ -76,10 +92,14 @@ struct sip_command;
 struct sip_package;
 struct s_si_link_extension;
 struct reca;
+
+typedef struct  n_Procs_s  n_Procs_s;
+
 #ifdef HAVE_PLURAL
 struct nc_struct;
 typedef struct nc_struct   nc_struct;
 #endif
+
 typedef struct _ssubexpr   sSubexpr;
 typedef struct _sssym      ssym;
 typedef struct spolyrec    polyrec;
@@ -92,10 +112,10 @@ typedef struct sip_command ip_command;
 typedef struct sip_package ip_package;
 
 /* the pointer types */
-typedef char *              char_ptr;
-typedef int  *              int_ptr;
-typedef short *             short_ptr;
-typedef void *              void_ptr;
+typedef char *             char_ptr;
+typedef int  *             int_ptr;
+typedef short *            short_ptr;
+typedef void *             void_ptr;
 typedef ip_sring *         ring;
 typedef int                idtyp;
 typedef rnumber *          number;
@@ -164,8 +184,59 @@ struct _scmdnames
 };
 typedef struct _scmdnames cmdnames;
 
-/* the function pointer types */
 typedef number (*numberfunc)(number a,number b);
+struct n_Procs_s
+{
+   n_Procs_s* next;
+   int     nChar;
+   n_coeffType type;
+   int     char_flag;
+   int     ref;
+   // the union stuff
+   // Zp:
+   int npPrimeM;
+   int npPminus1M;
+   CARDINAL *npExpTable;
+   CARDINAL *npLogTable;
+   // Zp_a, Q_a
+
+   // general stuff
+   numberfunc nMult, nSub ,nAdd ,nDiv, nIntDiv, nIntMod, nExactDiv;
+   void    (*nNew)(number * a);
+   number  (*nInit)(int i);
+   number  (*nPar)(int i);
+   int     (*nParDeg)(number n);
+   int     (*nSize)(number n);
+   int     (*nInt)(number &n);
+   number  (*nNeg)(number a);
+   number  (*nInvers)(number a);
+   number  (*nCopy)(number a);
+   void    (*nWrite)(number &a);
+   char *  (*nRead)(char * s, number * a);
+   void    (*nNormalize)(number &a);
+   BOOLEAN (*nGreater)(number a,number b),
+           (*nEqual)(number a,number b),
+           (*nIsZero)(number a),
+           (*nIsOne)(number a),
+           (*nIsMOne)(number a),
+           (*nGreaterZero)(number a);
+   void    (*nPower)(number a, int i, number * result);
+   number  (*nGetDenom)(number &n);
+   numberfunc nGcd, nLcm;
+   BOOLEAN (*nSetMap)(ring r);
+#ifdef LDEBUG
+   BOOLEAN (*nDBTest)(number a, char *f, int l);
+   void    (*nDBDelete)(number * a,char *f, int l);
+#else
+   void    (*nDelete)(number * a);
+#endif
+   char *  (*nName)(number n);
+//extern number  (*nMap)(number from);
+
+   number nNULL; /* the 0 as constant */
+};
+
+/* the function pointer types */
 
 extern ring      currRing;
 typedef long     (*pLDegProc)(poly p, int *length, ring r= currRing);
@@ -356,6 +427,8 @@ struct sip_sring
   pFDegProc     pFDeg;
   pLDegProc     pLDeg;
   p_SetmProc    p_Setm;
+  n_Procs_s*    cf;
+  ring          algring;
 #ifdef HAVE_PLURAL
   nc_struct     *nc;
 #endif

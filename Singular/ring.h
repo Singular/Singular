@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.55 2000-11-14 16:05:02 obachman Exp $ */
+/* $Id: ring.h,v 1.56 2000-11-16 16:49:20 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -128,6 +128,8 @@ inline BOOLEAN rField_has_simple_Alloc(ring r=currRing)
 /* Z/p, GF(p,n), R: nCopy, nNew, nDelete are dummies*/
 inline BOOLEAN rField_is_Extension(ring r=currRing)
 { return (rField_is_Q_a(r)) || (rField_is_Zp_a(r)); } /* Z/p(a) and Q(a)*/
+
+n_coeffType rFieldType(ring r);
 
 // this needs to be called whenever a new ring is created: new fields
 // in ring are created (like VarOffset), unless they already exist

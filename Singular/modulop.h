@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.h,v 1.10 2000-03-02 18:44:39 Singular Exp $ */
+/* $Id: modulop.h,v 1.11 2000-11-16 16:52:37 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -33,7 +33,9 @@ char *  npRead        (char *s, number *a);
 #ifdef LDEBUG
 BOOLEAN npDBTest      (number a, char *f, int l);
 #endif
-void    npSetChar(int c);
+void    npSetChar(int c, ring r);
+void    npInitChar(int c, ring r);
+
 //int     npGetChar();
 
 BOOLEAN npSetMap(ring r);

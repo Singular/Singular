@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.140 2000-11-14 16:05:01 obachman Exp $ */
+/* $Id: ring.cc,v 1.141 2000-11-16 16:49:21 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -104,7 +104,6 @@ void rChangeCurrRing(ring r, BOOLEAN complete)
 
     /*------------ global variables related to polys -------------------*/
     pSetGlobals(r, complete);
-
 
     if (complete)
     {
@@ -495,7 +494,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
    *         p    p : Fp              NULL           FALSE
    *         p   -p : Fp(a)           *names         FALSE
    *         q    q : GF(q=p^n)       *names         TRUE
-   */
+  */
   if (ch!=-1)
   {
     int l = 0;
@@ -589,7 +588,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     goto rInitError;
 
   // Complete the initialization
-  if (rComplete(R))
+  if (rComplete(R,1))
     goto rInitError;
 
   rTest(R);
@@ -848,6 +847,7 @@ void rKill(ring r)
       id_Delete(&r->qideal, r);
       r->qideal = NULL;
     }
+    nKillChar(r);
     int i=1;
     int j;
     int *pi=r->order;
@@ -1782,7 +1782,6 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
       return 0;
     }
   }
-    
 
   i=0;
   while (r1->order[i] != 0)
@@ -2012,6 +2011,7 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
     return FALSE;
   }
 
+
   if (r->N == 0) return TRUE;
 
 //  omCheckAddrSize(r,sizeof(ip_sring));
@@ -2089,6 +2089,8 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
       }
     }
   }
+  //assume(r->cf!=NULL);
+
   return TRUE;
 }
 #endif
@@ -2380,14 +2382,14 @@ static unsigned long rGetExpSize(unsigned long bitmask, int & bits, int N)
   int bits1;
   loop
   {
-    if (bits == BIT_SIZEOF_LONG) 
+    if (bits == BIT_SIZEOF_LONG)
     {
       bits =  BIT_SIZEOF_LONG - 1;
       return LONG_MAX;
     }
     unsigned long bitmask1 =rGetExpSize(bitmask+1, bits1);
     int vars_per_long1=BIT_SIZEOF_LONG/bits1;
-    if ((((N+vars_per_long-1)/vars_per_long) == 
+    if ((((N+vars_per_long-1)/vars_per_long) ==
          ((N+vars_per_long1-1)/vars_per_long1)))
     {
       vars_per_long=vars_per_long1;
@@ -2439,13 +2441,13 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
         case ringorder_dp:
         case ringorder_Wp:
         case ringorder_Dp:
-	  r_ord=ringorder_lp;
+          r_ord=ringorder_lp;
           break;
         case ringorder_Ws:
         case ringorder_Ds:
         case ringorder_ws:
         case ringorder_ds:
-	  r_ord=ringorder_ls;
+          r_ord=ringorder_ls;
           break;
         default:
           break;
@@ -2533,7 +2535,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
   // it must also be changed for new ring
   if (pFDeg != r->pFDeg)
     res->pFDeg = pFDeg;
-  else if (r->pFDeg != res->pFDeg && 
+  else if (r->pFDeg != res->pFDeg &&
            rOrd_is_WeightedDegree_Ordering(r))
     // still might need adjustment
   {
@@ -2548,7 +2550,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
     res->typ[0] = r->typ[0];
     if (r->typ[0].data.syz.limit > 0)
     {
-      res->typ[0].data.syz.syz_index 
+      res->typ[0].data.syz.syz_index
         = (int*) omAlloc((r->typ[0].data.syz.limit +1)*sizeof(int));
       memcpy(res->typ[0].data.syz.syz_index, r->typ[0].data.syz.syz_index,
              (r->typ[0].data.syz.limit +1)*sizeof(int));
@@ -2796,6 +2798,7 @@ static void rSetNegWeight(ring r)
 BOOLEAN rComplete(ring r, int force)
 {
   if (r->VarOffset!=NULL && force == 0) return FALSE;
+  nInitChar(r);
   rSetOutParams(r);
   rSetDegStuff(r);
   int n=rBlocks(r)-1;
@@ -3100,13 +3103,13 @@ BOOLEAN rComplete(ring r, int force)
   //  ----------------------------
   // right-adjust VarOffset
   rRightAdjustVarOffset(r);
-  
+
   // ----------------------------
   // set NegWeightL*
   rSetNegWeight(r);
 
   // ----------------------------
-  // p_Procs: call AFTER NegWeightL 
+  // p_Procs: call AFTER NegWeightL
   r->p_Procs = (p_Procs_s*)omAlloc(sizeof(p_Procs_s));
   p_SetProcs(r, r->p_Procs);
 
@@ -3152,7 +3155,7 @@ static void rSetVarL(ring r)
 {
   int  min = INT_MAX, min_j = -1;
   int* VarL_Number = (int*) omAlloc0(r->ExpL_Size*sizeof(int));
-  
+
   int i,j;
 
   // count how often a var long is occupied by an exponent
@@ -3164,7 +3167,7 @@ static void rSetVarL(ring r)
   // determine how many and min
   for (i=0, j=0; i<r->ExpL_Size; i++)
   {
-    if (VarL_Number[i] != 0) 
+    if (VarL_Number[i] != 0)
     {
       if (min > VarL_Number[i])
       {
@@ -3178,7 +3181,7 @@ static void rSetVarL(ring r)
   r->VarL_Size = j;
   r->VarL_Offset = (int*) omAlloc(r->VarL_Size*sizeof(int));
   r->VarL_LowIndex = 0;
-  
+
   // set VarL_Offset
   for (i=0, j=0; i<r->ExpL_Size; i++)
   {
@@ -3210,7 +3213,7 @@ static void rRightAdjustVarOffset(ring r)
   // initialize shifts
   for (i=0;i<r->ExpL_Size;i++)
     shifts[i] = BIT_SIZEOF_LONG;
-  
+
   // find minimal bit in each long var
   for (i=1;i<=r->N;i++)
   {
@@ -3221,8 +3224,8 @@ static void rRightAdjustVarOffset(ring r)
   for (i=1;i<=r->N;i++)
   {
     if (shifts[r->VarOffset[i] & 0xffffff] != 0)
-      r->VarOffset[i] 
-        = (r->VarOffset[i] & 0xffffff) | 
+      r->VarOffset[i]
+        = (r->VarOffset[i] & 0xffffff) |
         (((r->VarOffset[i] >> 24) - shifts[r->VarOffset[i] & 0xffffff]) << 24);
   }
   omFree(shifts);
@@ -3253,7 +3256,7 @@ void rDebugPrint(ring r)
   char *TYP[]={"ro_dp","ro_wp","ro_wp_neg","ro_cp",
                "ro_syzcomp", "ro_syz", "ro_none"};
   int i,j;
-  
+
   Print("ExpL_Size:%d ",r->ExpL_Size);
   Print("CmpL_Size:%d ",r->CmpL_Size);
   Print("VarL_Size:%d\n",r->VarL_Size);
@@ -3683,4 +3686,17 @@ BOOLEAN rRing_has_CompLastBlock(ring r)
   assume(r != NULL);
   int lb = rBlocks(r) - 2;
   return (r->order[lb] == ringorder_c || r->order[lb] == ringorder_C);
+}
+
+n_coeffType rFieldType(ring r)
+{
+  if (rField_is_Zp(r))     return n_Zp;
+  if (rField_is_Q(r))      return n_Q;
+  if (rField_is_R(r))      return n_R;
+  if (rField_is_GF(r))     return n_GF;
+  if (rField_is_long_R(r)) return n_long_R;
+  if (rField_is_Zp_a(r))   return n_Zp_a;
+  if (rField_is_Q_a(r))    return n_Q_a;
+  if (rField_is_long_C(r)) return n_long_C;
+  return n_unknown;
 }

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.22 1999-11-15 17:20:36 obachman Exp $ */
+/* $Id: numbers.cc,v 1.23 2000-11-16 16:52:02 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -62,6 +62,9 @@ void   (*nDelete)(number *a);
 number nNULL; /* the 0 as constant */
 int    nChar;
 
+
+n_Procs_s *cf_root=NULL;
+
 void   nDummy1(number* d) { *d=NULL; }
 
 #ifdef LDEBUG
@@ -109,8 +112,6 @@ void nSetChar(ring r, BOOLEAN complete)
     nGetDenom = ndGetDenom;
     nName = ndName;
   }
-  //Print("n:c=%d compl=%d param=%d\n",c,complete,r->parameter);
-  //if ((c == 1) || (c< (-1)))
   if (rField_is_Extension(r))
   {
     naSetChar(c,complete,r->parameter,rPar(r));
@@ -212,7 +213,7 @@ void nSetChar(ring r, BOOLEAN complete)
 #endif
     if (complete)
     {
-      npSetChar(c);
+      npSetChar(c, r);
       test &= ~Sy_bit(OPT_INTSTRATEGY); /*26*/
       nNew   = nDummy1;
       nNormalize=nDummy2;
@@ -435,3 +436,385 @@ void nSetChar(ring r, BOOLEAN complete)
   if (complete&&(!errorreported)) nNULL=nInit(0);
 }
 
+/*2
+* init operations for ring r
+*/
+void nInitChar(ring r)
+{
+  int c=rInternalChar(r);
+  n_coeffType t=rFieldType(r);
+
+  if (rField_is_Extension(r))
+  {
+    if (r->algring==NULL)
+    {
+      r->algring=(ring) omAlloc0Bin(sip_sring_bin);
+      r->algring->ch= -c;
+      r->algring->N=r->P;
+      nInitChar(r->algring);
+    }
+  }
+
+  n_Procs_s *n=cf_root;
+  while((n!=NULL)
+    && (n->nChar!=c)
+    && (n->type!=t))
+      n=n->next;
+  if (n==NULL)
+  {
+    n=(n_Procs_s*)omAlloc0(sizeof(n_Procs_s));
+    n->next=cf_root;
+    n->ref=1;
+    n->nChar=c;
+    n->type=t;
+    cf_root=n;
+  }
+  else
+  {
+    n->ref++;
+    r->cf=n;
+    return;
+  }
+  r->cf=n;
+  r->cf->nChar = c;
+  r->cf->nPar  = ndPar;
+  r->cf->nParDeg=ndParDeg;
+  r->cf->nSize = ndSize;
+  r->cf->nGetDenom= ndGetDenom;
+  r->cf->nName =  ndName;
+  if (rField_is_Extension(r))
+  {
+    //naSetChar(c,TRUE,r->parameter,rPar(r));
+#ifdef LDEBUG
+    r->cf->nDBDelete = naDBDelete;
+#else
+    r->cf->nDelete = naDelete;
+#endif
+    r->cf-> nNew       = naNew;
+    r->cf-> nNormalize = naNormalize;
+    r->cf->nInit       = naInit;
+    r->cf->nPar        = naPar;
+    r->cf->nParDeg     = naParDeg;
+    r->cf->nInt        = naInt;
+    r->cf->nAdd        = naAdd;
+    r->cf->nSub        = naSub;
+    r->cf->nMult       = naMult;
+    r->cf->nDiv        = naDiv;
+    r->cf->nExactDiv   = naDiv;
+    r->cf->nIntDiv     = naIntDiv;
+    r->cf->nIntMod     = ndIntMod; /* dummy !! */
+    r->cf->nNeg        = naNeg;
+    r->cf->nInvers     = naInvers;
+    r->cf->nCopy       = naCopy;
+    r->cf->nGreater    = naGreater;
+    r->cf->nEqual      = naEqual;
+    r->cf->nIsZero     = naIsZero;
+    r->cf->nIsOne      = naIsOne;
+    r->cf->nIsMOne     = naIsMOne;
+    r->cf->nGreaterZero= naGreaterZero;
+    r->cf->nWrite      = naWrite;
+    r->cf->nRead       = naRead;
+    r->cf->nPower      = naPower;
+    r->cf->nGcd        = naGcd;
+    r->cf->nLcm        = naLcm;
+    r->cf->nSetMap     = naSetMap;
+    r->cf->nName       = naName;
+    r->cf->nSize       = naSize;
+    r->cf->nGetDenom   = naGetDenom;
+#ifdef LDEBUG
+    r->cf->nDBTest     = naDBTest;
+#endif
+  }
+  else if (rField_is_Q(r))
+  {
+#ifdef LDEBUG
+    r->cf->nDBDelete= nlDBDelete;
+#else
+    r->cf->nDelete= nlDelete;
+#endif
+    r->cf->nNew   = nlNew;
+    r->cf->nNormalize=nlNormalize;
+    r->cf->nInit  = nlInit;
+    r->cf->nInt   = nlInt;
+    r->cf->nAdd   = nlAdd;
+    r->cf->nSub   = nlSub;
+    r->cf->nMult  = nlMult;
+    r->cf->nDiv   = nlDiv;
+    r->cf->nExactDiv= nlExactDiv;
+    r->cf->nIntDiv= nlIntDiv;
+    r->cf->nIntMod= nlIntMod;
+    r->cf->nNeg   = nlNeg;
+    r->cf->nInvers= nlInvers;
+    r->cf->nCopy  = nlCopy;
+    r->cf->nGreater = nlGreater;
+    r->cf->nEqual = nlEqual;
+    r->cf->nIsZero = nlIsZero;
+    r->cf->nIsOne = nlIsOne;
+    r->cf->nIsMOne = nlIsMOne;
+    r->cf->nGreaterZero = nlGreaterZero;
+    r->cf->nWrite = nlWrite;
+    r->cf->nRead = nlRead;
+    r->cf->nPower = nlPower;
+    r->cf->nGcd  = nlGcd;
+    r->cf->nLcm  = nlLcm;
+    r->cf->nSetMap = nlSetMap;
+    r->cf->nSize  = nlSize;
+    r->cf->nGetDenom = nlGetDenom;
+#ifdef LDEBUG
+    r->cf->nDBTest=nlDBTest;
+#endif
+  }
+  else if (rField_is_Zp(r))
+  /*----------------------char. p----------------*/
+  {
+#ifdef LDEBUG
+    r->cf->nDBDelete= nDBDummy1;
+#else
+    r->cf->nDelete= nDummy1;
+#endif
+    npInitChar(c,r);
+    r->cf->nNew   = nDummy1;
+    r->cf->nNormalize=nDummy2;
+    r->cf->nInit  = npInit;
+    r->cf->nInt   = npInt;
+    r->cf->nAdd   = npAdd;
+    r->cf->nSub   = npSub;
+    r->cf->nMult  = npMult;
+    r->cf->nDiv   = npDiv;
+    r->cf->nExactDiv= npDiv;
+    r->cf->nIntDiv= npDiv;
+    r->cf->nIntMod= ndIntMod; /* dummy !! */
+    r->cf->nNeg   = npNeg;
+    r->cf->nInvers= npInvers;
+    r->cf->nCopy  = ndCopy;
+    r->cf->nGreater = npGreater;
+    r->cf->nEqual = npEqual;
+    r->cf->nIsZero = npIsZero;
+    r->cf->nIsOne = npIsOne;
+    r->cf->nIsMOne = npIsMOne;
+    r->cf->nGreaterZero = npGreaterZero;
+    r->cf->nWrite = npWrite;
+    r->cf->nRead = npRead;
+    r->cf->nPower = npPower;
+    r->cf->nGcd  = ndGcd;
+    r->cf->nLcm  = ndGcd; /* tricky, isn't it ?*/
+    r->cf->nSetMap = npSetMap;
+    /* nName= ndName; */
+    /*nSize  = ndSize;*/
+#ifdef LDEBUG
+    r->cf->nDBTest=npDBTest;
+#endif
+  }
+  /* -------------- GF(p^m) -----------------------*/
+  else if (rField_is_GF(r))
+  {
+#ifdef LDEBUG
+    r->cf->nDBDelete= nDBDummy1;
+#else
+    r->cf->nDelete= nDummy1;
+#endif
+    //nfSetChar(c,r->parameter);
+    r->cf->nNew   = nDummy1;
+    r->cf->nNormalize=nDummy2;
+    r->cf->nInit  = nfInit;
+    r->cf->nPar   = nfPar;
+    r->cf->nParDeg= nfParDeg;
+    r->cf->nInt   = nfInt;
+    r->cf->nAdd   = nfAdd;
+    r->cf->nSub   = nfSub;
+    r->cf->nMult  = nfMult;
+    r->cf->nDiv   = nfDiv;
+    r->cf->nExactDiv= nfDiv;
+    r->cf->nIntDiv= nfDiv;
+    r->cf->nIntMod= ndIntMod; /* dummy !! */
+    r->cf->nNeg   = nfNeg;
+    r->cf->nInvers= nfInvers;
+    r->cf->nCopy  = ndCopy;
+    r->cf->nGreater = nfGreater;
+    r->cf->nEqual = nfEqual;
+    r->cf->nIsZero = nfIsZero;
+    r->cf->nIsOne = nfIsOne;
+    r->cf->nIsMOne = nfIsMOne;
+    r->cf->nGreaterZero = nfGreaterZero;
+    r->cf->nWrite = nfWrite;
+    r->cf->nRead = nfRead;
+    r->cf->nPower = nfPower;
+    r->cf->nGcd  = ndGcd;
+    r->cf->nLcm  = ndGcd; /* tricky, isn't it ?*/
+    r->cf->nSetMap = nfSetMap;
+    r->cf->nName= nfName;
+    /*nSize  = ndSize;*/
+#ifdef LDEBUG
+    r->cf->nDBTest=nfDBTest;
+#endif
+  }
+  /* -------------- R -----------------------*/
+  //if (c==(-1))
+  else if (rField_is_R(r))
+  {
+#ifdef LDEBUG
+    r->cf->nDBDelete= nDBDummy1;
+#else
+    r->cf->nDelete= nDummy1;
+#endif
+    r->cf->nNew=nDummy1;
+    r->cf->nNormalize=nDummy2;
+    r->cf->nInit  = nrInit;
+    r->cf->nInt   = nrInt;
+    r->cf->nAdd   = nrAdd;
+    r->cf->nSub   = nrSub;
+    r->cf->nMult  = nrMult;
+    r->cf->nDiv   = nrDiv;
+    r->cf->nExactDiv= nrDiv;
+    r->cf->nIntDiv= nrDiv;
+    r->cf->nIntMod= ndIntMod; /* dummy !! */
+    r->cf->nNeg   = nrNeg;
+    r->cf->nInvers= nrInvers;
+    r->cf->nCopy  = ndCopy;
+    r->cf->nGreater = nrGreater;
+    r->cf->nEqual = nrEqual;
+    r->cf->nIsZero = nrIsZero;
+    r->cf->nIsOne = nrIsOne;
+    r->cf->nIsMOne = nrIsMOne;
+    r->cf->nGreaterZero = nrGreaterZero;
+    r->cf->nWrite = nrWrite;
+    r->cf->nRead = nrRead;
+    r->cf->nPower = nrPower;
+    r->cf->nGcd  = ndGcd;
+    r->cf->nLcm  = ndGcd; /* tricky, isn't it ?*/
+    r->cf->nSetMap=nrSetMap;
+    /* nName= ndName; */
+    /*nSize  = ndSize;*/
+#ifdef LDEBUG
+    r->cf->nDBTest=nrDBTest;
+#endif
+  }
+  /* -------------- long R -----------------------*/
+  else if (rField_is_long_R(r))
+  {
+    //setGMPFloatDigits(r->ch_flags);
+#ifdef LDEBUG
+    r->cf->nDBDelete= ngfDBDelete;
+#else
+    r->cf->nDelete= ngfDelete;
+#endif
+    r->cf->nNew=ngfNew;
+    r->cf->nNormalize=nDummy2;
+    r->cf->nInit  = ngfInit;
+    r->cf->nInt   = ngfInt;
+    r->cf->nAdd   = ngfAdd;
+    r->cf->nSub   = ngfSub;
+    r->cf->nMult  = ngfMult;
+    r->cf->nDiv   = ngfDiv;
+    r->cf->nExactDiv= ngfDiv;
+    r->cf->nIntDiv= ngfDiv;
+    r->cf->nIntMod= ndIntMod; /* dummy !! */
+    r->cf->nNeg   = ngfNeg;
+    r->cf->nInvers= ngfInvers;
+    r->cf->nCopy  = ngfCopy;
+    r->cf->nGreater = ngfGreater;
+    r->cf->nEqual = ngfEqual;
+    r->cf->nIsZero = ngfIsZero;
+    r->cf->nIsOne = ngfIsOne;
+    r->cf->nIsMOne = ngfIsMOne;
+    r->cf->nGreaterZero = ngfGreaterZero;
+    r->cf->nWrite = ngfWrite;
+    r->cf->nRead = ngfRead;
+    r->cf->nPower = ngfPower;
+    r->cf->nGcd  = ndGcd;
+    r->cf->nLcm  = ndGcd; /* tricky, isn't it ?*/
+    r->cf->nSetMap=ngfSetMap;
+    r->cf->nName= ndName;
+    r->cf->nSize  = ndSize;
+#ifdef LDEBUG
+    r->cf->nDBTest=ngfDBTest;
+#endif
+  }
+  /* -------------- long C -----------------------*/
+  else if (rField_is_long_C(r))
+  {
+    //setGMPFloatDigits(r->ch_flags);
+#ifdef LDEBUG
+    r->cf->nDBDelete= ngcDBDelete;
+#else
+    r->cf->nDelete= ngcDelete;
+#endif
+    r->cf->nNew=ngcNew;
+    r->cf->nNormalize=nDummy2;
+    r->cf->nInit  = ngcInit;
+    r->cf->nInt   = ngcInt;
+    r->cf->nAdd   = ngcAdd;
+    r->cf->nSub   = ngcSub;
+    r->cf->nMult  = ngcMult;
+    r->cf->nDiv   = ngcDiv;
+    r->cf->nExactDiv= ngcDiv;
+    r->cf->nIntDiv= ngcDiv;
+    r->cf->nIntMod= ndIntMod; /* dummy !! */
+    r->cf->nNeg   = ngcNeg;
+    r->cf->nInvers= ngcInvers;
+    r->cf->nCopy  = ngcCopy;
+    r->cf->nGreater = ngcGreater;
+    r->cf->nEqual = ngcEqual;
+    r->cf->nIsZero = ngcIsZero;
+    r->cf->nIsOne = ngcIsOne;
+    r->cf->nIsMOne = ngcIsMOne;
+    r->cf->nGreaterZero = ngcGreaterZero;
+    r->cf->nWrite = ngcWrite;
+    r->cf->nRead = ngcRead;
+    r->cf->nPower = ngcPower;
+    r->cf->nGcd  = ndGcd;
+    r->cf->nLcm  = ndGcd; /* tricky, isn't it ?*/
+    r->cf->nSetMap=ngcSetMap;
+    r->cf->nPar=ngcPar;
+    /*nSize  = ndSize;*/
+#ifdef LDEBUG
+    r->cf->nDBTest=ngcDBTest;
+#endif
+  }
+#ifdef TEST
+  else
+  {
+    WerrorS("unknown field");
+  }
+#endif
+  if (!errorreported) r->cf->nNULL=r->cf->nInit(0);
+}
+
+void nKillChar(ring r)
+{
+  if ((r!=NULL) && (r->cf!=NULL))
+  {
+    r->cf->ref--;
+    if (r->cf->ref<=0)
+    {
+      n_Procs_s tmp;
+      n_Procs_s* n=&tmp;
+      tmp.next=cf_root;
+      while((n->next!=NULL) && (n->next!=r->cf)) n=n->next;
+      if (n->next==r->cf)
+      {
+        n->next=n->next->next;
+        cf_root=tmp.next;
+        r->cf->nDelete(&(r->cf->nNULL));
+        switch(r->cf->type)
+        {
+          case n_Zp:
+               omFreeSize( (ADDRESS)r->cf->npExpTable,
+                           r->cf->npPrimeM*sizeof(CARDINAL) );
+               omFreeSize( (ADDRESS)r->cf->npLogTable,
+                           r->cf->npPrimeM*sizeof(CARDINAL) );
+               break;
+
+          default:
+               break;
+        }
+        omFreeSize((ADDRESS)r->cf, sizeof(n_Procs_s));
+        r->cf=NULL;
+      }
+      else
+      {
+        WarnS("cf_root list destroyed");
+      }
+    }
+  }
+}

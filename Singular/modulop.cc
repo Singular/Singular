@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.17 2000-09-18 09:19:18 obachman Exp $ */
+/* $Id: modulop.cc,v 1.18 2000-11-16 16:54:25 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -46,8 +46,8 @@ number npMult (number a,number b)
 */
 number npInit (int i)
 {
-  while (i <  0)        i += npPrimeM;
-  while (i >= npPrimeM) i -= npPrimeM;
+  while (i <  0)                   i += npPrimeM;
+  while ((i>1) && (i >= npPrimeM)) i -= npPrimeM;
   return (number)i;
 }
 
@@ -200,7 +200,7 @@ char * npRead (char *s, number *a)
 * set the charcteristic (allocate and init tables)
 */
 
-void npSetChar(int c)
+void npSetChar(int c, ring r)
 {
   int i, w;
 
