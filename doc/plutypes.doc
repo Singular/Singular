@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plutypes.doc,v 1.15 2004-03-12 17:10:07 levandov Exp $
+@comment $Id: plutypes.doc,v 1.16 2004-03-23 20:02:57 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -95,7 +95,7 @@ defines a left ideal.
 @smallexample
 @c example
   ring r=0,(x,y,z),dp;
-  system("PLURAL",-1,0);
+  ncalgebra(-1,0);
   poly s1 = x2;
   poly s2 = y3;
   poly s3 = z;
@@ -137,7 +137,7 @@ a type cast to ideal
 @smallexample
 @c example
 ring r=0,(x,y,z),dp;
-system ("PLURAL",-1,0); 
+ncalgebra(-1,0); 
 ideal m = maxideal(1);
 m;
 poly f = x2;
@@ -198,7 +198,7 @@ matrix D[3][3];
 D[1,2]=-z;
 D[1,3]=y;
 D[2,3]=x;
-system("PLURAL",1,D); 
+ncalgebra(1,D); 
 ideal I = 0,x,0,1;
 I;
 I + 0;    // simplification
@@ -345,7 +345,7 @@ matrix D[3][3];
 D[1,2]=-z;
 D[1,3]=y;
 D[2,3]=x;
-system("PLURAL",1,D); 
+ncalgebra(1,D); 
 // it is U(so_3)
 vector s1 = [x2,y3,z];
 vector s2 = [xy,1,0];
@@ -416,7 +416,7 @@ matrix d[3][3];
 d[1,2]=-z;
 d[1,3]=2x;
 d[2,3]=-2y;
-system("PLURAL",1,d);
+ncalgebra(1,d);
 module m=[x,y],[0,0,x*z];
 print((x+y)*m);
 @c example
@@ -506,7 +506,7 @@ defines a polynomial.
 @smallexample
 @c example
 ring r = 32003,(x,y,z),dp;
-system("PLURAL",-1,1);
+ncalgebra(-1,1);
 r;
 // ring of some differential-like operators 
 poly s1  = x3y2+151x5y+186xy6+169y9;
@@ -578,7 +578,7 @@ typeof(_);
 @smallexample
 @c example
 ring r=0,(x,y),dp;
-system("PLURAL",1,1);
+ncalgebra(1,1);
 // it is a Weyl algebra 
 r;
 yx;      // not correct input
@@ -671,12 +671,12 @@ it as current basering.
 @smallexample
 @c example
 ring r=0,(x,y,z,u,v,w),dp;
-system("PLURAL",-1,0);
+ncalgebra(-1,0);
 // anticommutative algebra
 option(redSB);
 option(redTail);
 ideal i=x^2,y^2,z^2,u^2,v^2,w^2;
-qring q=system("twostd",i);
+qring q=twostd(i);
 // now it is an exterior algebra
 q;
 poly k=(x+y)*(y-u)*(zv+u-w);
@@ -741,7 +741,7 @@ none
 ring r=0,(x,y,z),dp;
 matrix D[3][3];
 D[1,2]=z;
-system("PLURAL",1,D); // it is Heisenberg algebra
+ncalgebra(1,D); // it is Heisenberg algebra
 ideal i=z2+z,x+y;
 resolution re=nres(i,0);
 re;
@@ -871,7 +871,7 @@ If one of coefficient_field, names_of_ring_variables, and ordering
 consists of only one entry, the parentheses around this entry may be
 omitted.
 
-In order to create the non-commutative extention, see @ref{plural}.  
+In order to create the non-commutative extention, see @ref{ncalgebra}.  
 
 
 @c ---------------------------------------

@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.15 2003-10-02 18:07:25 levandov Exp $
+@comment $Id: plureference.doc,v 1.16 2004-03-23 20:02:55 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -52,9 +52,9 @@ The general syntax of a function is
 * memory @value{PSUFFIX}::
 * minres @value{PSUFFIX}::
 * mres @value{PSUFFIX}::
+* ncalgebra::
 * nres @value{PSUFFIX}::
 * option @value{PSUFFIX}::
-* plural::
 * reduce @value{PSUFFIX}::
 * std @value{PSUFFIX}::
 * syz @value{PSUFFIX}:: 
@@ -71,7 +71,7 @@ The general syntax of a function is
 
 @table @code
 @item @strong{Syntax:}
-@code{system (}"bracket", poly_expression p, poly_expression q @code{)}
+@code{bracket (} poly_expression p, poly_expression q @code{)}
 @item @strong{Type:}
 poly
 @item @strong{Purpose:}
@@ -90,7 +90,7 @@ C[2,3]=Q2;
 D[1,2]=-Q*z;
 D[1,3]=1/Q*y;
 D[2,3]=-Q*x; 
-system("PLURAL",C,D);
+ncalgebra(C,D);
 // it is Quantum deformation of U(so_3).
 poly p=Q^4*x2+y2+Q^4*z2+Q*(1-Q^4)*x*y*z;
 // it is the central element  
@@ -99,7 +99,7 @@ p;
 poly q=(x+Q*y+Q^2*z)^4;
 // it is big noncentral element
 q;
-system("bracket",p,q); 
+bracket(p,q); 
 @c example
 @end smallexample 
 @end table
@@ -136,7 +136,7 @@ matrix d[4][4];
 d[1,2]=-h;
 d[1,3]=2*e;
 d[2,3]=-2*f;
-system("PLURAL",1,d);
+ncalgebra(1,d);
 // it is U(sl_2)+K[a]
 option(redSB);
 option(redTail);
@@ -195,7 +195,7 @@ if the ideal is two-sided.
   d[1,2]=-z;
   d[1,3]=2x;
   d[2,3]=-2y;
-  system("PLURAL",1,d);
+  ncalgebra(1,d);
   ideal i=x2,y2,z2-1;
   i=std(i);
   i;
@@ -242,7 +242,7 @@ see also @ref{option}).
 @smallexample
 @c example
 ring r=0,(x(1..100)),dp;
-system("PLURAL",-1,0);
+ncalgebra(-1,0);
 poly p=(x(1)+x(100))^50;
 proc ReportMemoryUsage()
 {  "Memory currently used by SINGULAR     :",memory(0),"Byte (",
@@ -290,7 +290,7 @@ matrix d[3][3];
 d[1,2]=-z;
 d[1,3]=2x;
 d[2,3]=-2y;
-system("PLURAL",1,d);
+ncalgebra(1,d);
 ideal i=x,y,z;
 i=std(i);
 resolution F=nres(i,0);
@@ -322,7 +322,7 @@ See
 
 
 @c ---------------------------------------
-@node  mres @value{PSUFFIX}, nres @value{PSUFFIX}, minres @value{PSUFFIX}, Functions @value{PSUFFIX}
+@node  mres @value{PSUFFIX}, ncalgebra, minres @value{PSUFFIX}, Functions @value{PSUFFIX}
 @subsection mres @value{PSUFFIX}
 @cindex mres @value{PSUFFIX}
 @table @code
@@ -390,7 +390,7 @@ matrix d[3][3];
 d[1,2]=-z;
 d[1,3]=2x;
 d[2,3]=-2y;
-system("PLURAL",1,d);
+ncalgebra(1,d);
 ideal i=x,y,z;
 i=std(i);
 resolution M=mres(i,0);
@@ -415,8 +415,115 @@ See
 
 
 
+
+@c -----------------------------
+@node ncalgebra, nres @value{PSUFFIX}, mres @value{PSUFFIX}, Functions @value{PSUFFIX}
+@subsection ncalgebra
+@cindex ncalgebra
+
+
+@table @code
+@item @strong{Syntax:}
+@*@code{ncalgebra(} matrix_expression C, matrix_expression D @code{)} 
+@*@code{ncalgebra(} number_expression n, matrix_expression D @code{)}
+@*@code{ncalgebra(} matrix_expression C, poly_expression p @code{)}
+@*@code{ncalgebra(} number_expression n, poly_expression p @code{)}
+@item @strong{Type:} ring
+@item @strong{Purpose:} 
+Executed in the basering @code{r}, say, in k variables
+@tex 
+$ x_1, \ldots, x_k ,\;$
+@end tex
+@ifinfo
+ x_1,... ,x_k, 
+@end ifinfo
+creates the
+non-commutative extension of @code{r} subject to relations
+@tex 
+$ \{ x_j x_i=c_{ij} \cdot x_i x_j + d_{ij}, 1 \leq i <j \leq k \}, $
+where $ c_{ij}$ and $d_{ij}$ should be organized into two strictly upper
+@end tex
+@ifinfo
+@{x_j x_i=c_@{ij@} ..., x_i x_j + d_@{ij@} , 0< i <j < k+1 @}.
+where c_@{ij@}  and d_@{ij@  should be organized into two strictly upper
+@end ifinfo
+ triangular matrices @code{C} with entries
+@tex 
+$ c_{ij}$ 
+@end tex
+@ifinfo
+c_@{ij@} 
+@end ifinfo
+ from the ground field of @code{r} 
+and @code{D}  with  polynomial entries
+@tex 
+$ d_{ij}$ 
+@end tex
+@ifinfo
+d_@{ij@} 
+@end ifinfo
+ from @code{r}.
+
+
+
+@item @strong{Remark:}
+At present, we do not perform checks of leading monomial condition
+and non-degeneracy conditions (@pxref{G-algebras}), while setting an algebra. 
+
+
+
+@item @strong{Example:}
+@smallexample
+@c example
+ring r1=(0,Q),(x,y,z),Dp;
+minpoly=Q^4+Q^2+1;
+matrix C[3][3];
+matrix D[3][3];
+C[1,2]=Q2;
+C[1,3]=1/Q2;
+C[2,3]=Q2;
+D[1,2]=-Q*z;
+D[1,3]=1/Q*y;
+D[2,3]=-Q*x; 
+ncalgebra(C,D);
+// it is quantum deformation U'_q(so_3),
+// with q=Q^2 specialized at the 3rd root of unity
+r1;
+kill r1;
+ring r2=0,(Xa,Xb,Xc,Ya,Yb,Yc,Ha,Hb),dp;
+matrix d[8][8];
+d[1,2]=-Xc; d[1,4]=-Ha; d[1,6]=Yb;
+d[1,7]=2*Xa; d[1,8]=-Xa; d[2,5]=-Hb;
+d[2,6]=-Ya; d[2,7]=-Xb; d[2,8]=2*Xb;
+d[3,4]=Xb; d[3,5]=-Xa; d[3,6]=-Ha-Hb;
+d[3,7]=Xc; d[3,8]=Xc; d[4,5]=Yc;
+d[4,7]=-2*Ya; d[4,8]=Ya; d[5,7]=Yb;
+d[5,8]=-2*Yb; d[6,7]=-Yc; d[6,8]=-Yc;
+ncalgebra(1,d);
+// it is U(sl_3)
+r2;
+kill r2;
+ring r3=0,(a,b,c,d),lp;
+matrix c[4][4];
+c[1,2]=1; c[1,3]=3; c[1,4]=-2;
+c[2,3]=-1; c[2,4]=-3; c[3,4]=1;
+ncalgebra(c,0);
+// it is some quasi--commutative algebra
+r3;
+kill r3;
+ring r4=0,(t,u,v,w),dp;
+ncalgebra(-1,0);
+// it is anticommutative algebra
+r4;
+kill r4;
+
+@c example
+@end smallexample
+@end table
+
+
 @c ---------------------------------------
-@node  nres @value{PSUFFIX}, option @value{PSUFFIX}, mres @value{PSUFFIX}, Functions @value{PSUFFIX}
+@node  nres @value{PSUFFIX}, option @value{PSUFFIX}, ncalgebra, Functions @value{PSUFFIX}
 @subsection nres @value{PSUFFIX}
 @cindex nres @value{PSUFFIX}
 @table @code
@@ -484,7 +591,7 @@ matrix d[3][3];
 d[1,2]=-z;
 d[1,3]=2x;
 d[2,3]=-2y;
-system("PLURAL",1,d);
+ncalgebra(1,d);
 ideal i=x,y,z;
 i=std(i);
 resolution F=nres(i,0);
@@ -508,7 +615,7 @@ See
 
 
 @c ---------------------------------------
-@node option @value{PSUFFIX}, plural, nres @value{PSUFFIX}, Functions @value{PSUFFIX}
+@node option @value{PSUFFIX}, reduce @value{PSUFFIX}, nres @value{PSUFFIX}, Functions @value{PSUFFIX}
 @subsection option @value{PSUFFIX}
 @cindex option @value{PSUFFIX}
 @table @code
@@ -643,87 +750,8 @@ See
 
 
 
-
-
-
-
-
-@c -----------------------------
-@node plural, reduce @value{PSUFFIX}, option @value{PSUFFIX}, Functions @value{PSUFFIX}
-@subsection plural
-@cindex plural
-
-@table @code
-@item @strong{Syntax:}
-@*@code{system(}"PLURAL", matrix_expression C, matrix_expression D @code{)} 
-@*@code{system(}"PLURAL", number_expression n, matrix_expression D @code{)}
-@*@code{system(}"PLURAL", matrix_expression C, poly_expression p @code{)}
-@*@code{system(}"PLURAL", number_expression n, poly_expression p @code{)}
-@item @strong{Type:} ring
-@item @strong{Purpose:} 
-Based on the given ring @code{r}, say, with k variables, strictly upper
-triangular matrices with numbers @code{(C)} from the ground field of @code{r}
-and polynomials from @code{(D)} from @code{r}.
-
-@item @strong{Remark:}
-At present, we do not perform checks of leading monomial condition
-and non-degeneracy conditions (@pxref{G-algebras}), while setting an algebra. 
-
-
-
-@item @strong{Example:}
-@smallexample
-@c example
-ring r1=(0,Q),(x,y,z),Dp;
-minpoly=Q^4+Q^2+1;
-matrix C[3][3];
-matrix D[3][3];
-C[1,2]=Q2;
-C[1,3]=1/Q2;
-C[2,3]=Q2;
-D[1,2]=-Q*z;
-D[1,3]=1/Q*y;
-D[2,3]=-Q*x; 
-system("PLURAL",C,D);
-// it is quantum deformation U'_q(so_3),
-// with q=Q^2 specialized at the 3rd root of unity
-r1;
-kill r1;
-ring r2=0,(Xa,Xb,Xc,Ya,Yb,Yc,Ha,Hb),dp;
-matrix d[8][8];
-d[1,2]=-Xc; d[1,4]=-Ha; d[1,6]=Yb;
-d[1,7]=2*Xa; d[1,8]=-Xa; d[2,5]=-Hb;
-d[2,6]=-Ya; d[2,7]=-Xb; d[2,8]=2*Xb;
-d[3,4]=Xb; d[3,5]=-Xa; d[3,6]=-Ha-Hb;
-d[3,7]=Xc; d[3,8]=Xc; d[4,5]=Yc;
-d[4,7]=-2*Ya; d[4,8]=Ya; d[5,7]=Yb;
-d[5,8]=-2*Yb; d[6,7]=-Yc; d[6,8]=-Yc;
-system("PLURAL",1,d);
-// it is U(sl_3)
-r2;
-kill r2;
-ring r3=0,(a,b,c,d),lp;
-matrix c[4][4];
-c[1,2]=1; c[1,3]=3; c[1,4]=-2;
-c[2,3]=-1; c[2,4]=-3; c[3,4]=1;
-system("PLURAL",c,0);
-// it is some quasi--commutative algebra
-r3;
-kill r3;
-ring r4=0,(t,u,v,w),dp;
-system("PLURAL",-1,0);
-// it is anticommutative algebra
-r4;
-kill r4;
-
-@c example
-@end smallexample
-@end table
-
-
-
 @c ---------------------------------------
-@node reduce @value{PSUFFIX}, std @value{PSUFFIX}, plural, Functions @value{PSUFFIX}
+@node reduce @value{PSUFFIX}, std @value{PSUFFIX}, option @value{PSUFFIX}, Functions @value{PSUFFIX}
 @subsection reduce @value{PSUFFIX}
 @cindex reduce @value{PSUFFIX}
 @cindex NF
@@ -761,7 +789,7 @@ matrix d[3][3];
 d[1,2]=-h;
 d[1,3]=2e;
 d[2,3]=-2f;
-system("PLURAL",1,d);
+ncalgebra(1,d);
 // it is parametric U(sl_2)
 ideal I=e2,f2,h2-1;
 I=std(I);
@@ -830,13 +858,13 @@ matrix d[3][3];
 d[1,2]=-z;
 d[1,3]=2x;
 d[2,3]=-2y;
-system("PLURAL",1,d); //U(sl_2)
+ncalgebra(1,d); //U(sl_2)
 ideal I=x3,y3,z3-z;
 I=std(I);
 I;
 kill R;
 ring Rq3=(0,Q),(x,y,z),dp; //U'_q(so_3)
-minpoly=Q^4+Q^2+1; // at the 3rd root of unity
+minpoly=Q^2-Q+1; // at the 3rd root of unity
 matrix C[3][3];
 matrix D[3][3];
 C[1,2]=Q2;
@@ -845,7 +873,7 @@ C[2,3]=Q2;
 D[1,2]=-Q*z;
 D[1,3]=1/Q*y;
 D[2,3]=-Q*x; 
-system("PLURAL",C,D);
+ncalgebra(C,D);
 ideal J=x3,y3,z3-z;
 J=std(J);
 J;
@@ -886,7 +914,7 @@ C[2,3]=Q2;
 D[1,2]=-Q*z;
 D[1,3]=1/Q*y;
 D[2,3]=-Q*x; 
-system("PLURAL",C,D);
+ncalgebra(C,D);
 poly Cq=Q^4*x2+y2+Q^4*z2+Q*(1-Q^4)*x*y*z;
 poly C1=x^3+x;
 poly C2=y^3+y;
@@ -917,7 +945,7 @@ See
 
 @table @code
 @item @strong{Syntax:}
-  @code{system (}"twostd", ideal_expression@code{)}; 
+  @code{twostd(} ideal_expression@code{)}; 
 @item @strong{Type:}
 ideal or module
 @item @strong{Purpose:}
@@ -935,7 +963,7 @@ matrix d[3][3];
 d[1,2]=-z;
 d[1,3]=2x;
 d[2,3]=-2y;
-system("PLURAL",1,d); 
+ncalgebra(1,d); 
 // it is algebra U(sl_2)
 int N=3;
 poly f=1;
@@ -949,7 +977,7 @@ option(redSB);
 option(redTail);
 ideal I=std(i);
 I;
-ideal J=system("twostd",i);
+ideal J=twostd(i);
 J;
 
 @c example
@@ -992,7 +1020,7 @@ matrix d[3][3];
 d[1,2]=-z;
 d[1,3]=2x;
 d[2,3]=-2y;
-system("PLURAL",1,d); //U(sl_2)
+ncalgebra(1,d); //U(sl_2)
 ideal I=x3,y3,z3-z;
 I=std(I);
 I;
