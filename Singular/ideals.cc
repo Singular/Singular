@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.104 2000-09-20 13:00:10 obachman Exp $ */
+/* $Id: ideals.cc,v 1.105 2000-10-16 15:32:20 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -610,6 +610,7 @@ int idRankFreeModule (ideal s)
     {
       if (*p!=NULL)
       {
+        pTest(*p);
         k = pMaxComp(*p);
         if (k>j) j = k;
       }
