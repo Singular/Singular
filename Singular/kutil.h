@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.61 2002-05-22 10:15:42 Singular Exp $ */
+/* $Id: kutil.h,v 1.62 2002-05-22 10:42:35 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -11,6 +11,7 @@
 
 #include <string.h>
 #include "mod2.h"
+#include <mylimits.h>
 
 #include "structs.h"
 #include "omalloc.h"
