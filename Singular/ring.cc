@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.194 2002-06-10 15:40:34 Singular Exp $ */
+/* $Id: ring.cc,v 1.195 2002-06-26 11:26:32 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2625,14 +2625,48 @@ ring rModifyRing_Wp(ring r, int* weights)
   return res;
 }
 
-// construct lp ring
+// construct lp ring with r->N variables, r->names vars....
 ring rModifyRing_Simple(ring r, BOOLEAN ommit_degree, BOOLEAN ommit_comp, unsigned long exp_limit, BOOLEAN &simple)
 {
   simple=TRUE;
   if (!rHasSimpleOrder(r))
   {
-    WarnS("Hannes: you still need to implement this");
-    // simple=FALSE; // sorting needed
+    simple=FALSE; // sorting needed
+    assume (r != NULL );
+    assume (exp_limit > 1);
+    BOOLEAN omitted_degree = FALSE;
+    int bits;
+
+    exp_limit=rGetExpSize(exp_limit, bits, r->N);
+
+    int nblocks=1+(ommit_comp!=0);
+    int *order=(int*)omAlloc0((nblocks+1)*sizeof(int));
+    int *block0=(int*)omAlloc0((nblocks+1)*sizeof(int));
+    int *block1=(int*)omAlloc0((nblocks+1)*sizeof(int));
+    int **wvhdl=(int**)omAlloc0((nblocks+1)*sizeof(int_ptr));
+
+    order[0]=ringorder_lp;
+    block0[0]=1;
+    block1[0]=r->N;
+    if (!ommit_comp)
+    {
+      order[1]=ringorder_C;
+    }  
+    ring res=(ring)omAlloc0Bin(ip_sring_bin);
+    *res = *r;
+    // res->qideal, res->idroot ???
+    res->wvhdl=wvhdl;
+    res->order=order;
+    res->block0=block0;
+    res->block1=block1;
+    res->bitmask=exp_limit;
+    int tmpref=r->cf->ref;
+    rComplete(res, 1);
+    r->cf->ref=tmpref;
+
+    rOptimizeLDeg(res);
+
+    return res;
   }
   return rModifyRing(r, ommit_degree, ommit_comp, exp_limit);
 }
