@@ -1,5 +1,5 @@
 ;;; Emacs edit mode for this file is  -*- Emacs-Lisp -*-
-;;; $Id: .emacs-singular,v 1.12 2000-05-05 18:40:34 obachman Exp $
+;;; $Id: .emacs-singular,v 1.13 2000-05-17 12:02:55 obachman Exp $
 
 ;;;
 ;;; .emacs-singular - Emacs initialization file to use for
@@ -80,8 +80,14 @@
 			(local-set-key [(control down)] 'comint-next-prompt))))))
 
 ;; other, "non-customizable" settings
-(add-hook 'font-lock-mode-hook 'lazy-lock-mode)
-(setq font-lock-support-mode 'lazy-lock-mode)
+
+;; lazy-lock seems to be broken under mswindows:
+;; causes delay of input (only reacts after mouse click), or even total 
+;; hang
+(cond ((not (or (eq system-type 'cygwin32)
+	     (eq system-type 'windows-nt)))
+	    (add-hook 'font-lock-mode-hook 'lazy-lock-mode)
+	    (setq font-lock-support-mode 'lazy-lock-mode)))
 
 (add-hook 'singular-interactive-mode-hook
 	  (function (lambda () (font-lock-mode 1))))
@@ -97,7 +103,7 @@
 ;; with a button
 ;; obachman: Fixed it with a simmple patch, by working around the assertion
 ;; in file indent.c line 517 (or so)
-(setq scroll-step 10)
+; (setq scroll-step 10)
 
 
 ;; this is a work-around for early version of Font Lock mode
@@ -201,12 +207,12 @@
 ;;; - load singular.el.
 ;;;
 
-;; get rid of superfluous "Load .emacs" menu entry on XEmacs
+; get rid of superfluous "Load .emacs" menu entry on XEmacs
 (when (fboundp 'delete-menu-item)
   (delete-menu-item '("Load .emacs"))		; that is for the current buffer
   (let ((current-menubar (default-value 'current-menubar)))
     (delete-menu-item '("Load .emacs"))		; that is for all other buffers
     (set-default 'current-menubar current-menubar)))
 
-;; load singular.el from `singular-emacs-home-directory'
+; load singular.el from `singular-emacs-home-directory'
 (load-file (concat singular-emacs-home-directory "singular.el"))
