@@ -32,7 +32,7 @@ AC_SUBST(SINGULAR)
 
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
-dnl those are needed to check for libs and headers, later on
+dnl Those are needed to check for libs and headers, later on
 dnl
 AC_PROG_CC
 AC_PROG_CPP
@@ -40,7 +40,7 @@ AC_AIX
 
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
-dnl set exec_prefix, bindir, libdir, includedir to some sensible values
+dnl Set exec_prefix, bindir, libdir, includedir to some sensible values
 dnl
 # expand prefix and pass it to subsequent configures
 if test "x$prefix" = xNONE; then
@@ -82,7 +82,7 @@ fi
 
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
-dnl check for various libraries and headers
+dnl Check for various libraries and headers
 dnl
 dnl After this part, the variables 'ac_<package>_ok' is 'yes'
 dnl if '<package>' is already existent on the system, otherwise
@@ -150,7 +150,7 @@ fi
 
   
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
-dnl Check whether or not to built various packages
+dnl Check command line arguments
 dnl
 AC_ARG_ENABLE(smallgmp, \
  [ --enable-PACKAGE        configure and build PACKAGE
@@ -183,6 +183,9 @@ AC_ARG_WITH(gmp, \
  [ --with-apint=PACKAGE    use PACKAGE for arbitary integer arithmetic
                           where PACKAGE can be gmp or smallgmp])
 
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl Check whether or not to configure and build various packages
+dnl
 AC_MSG_CHECKING(whether to configure and build gmp lib)
 if test "$enable_gmp" != yes && test "$enable_gmp" != no; then
   if test "$ac_gmp_ok" != yes && test -d gmp; then
@@ -273,7 +276,6 @@ elif test "$enable_MP" = yes; then
 else
   AC_MSG_RESULT(no)
 fi
-
   
 AC_MSG_CHECKING(whether to configure and build factory lib)
 if test "$enable_factory" != yes && test "$enable_factory" != no; then
@@ -357,7 +359,6 @@ else
   AC_MSG_RESULT(no)
 fi
 
-
 AC_MSG_CHECKING(whether to configure and build Singular)
 if test "$enable_Singular" != yes && test "$enable_Singular" != no; then
   if test "$with_Singular" != no && test -d Singular; then
@@ -385,7 +386,7 @@ fi
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Check whether or not to use various packages
 dnl
-AC_MSG_CHECKING(wich apint package to use)
+AC_MSG_CHECKING(which apint package to use)
 if test "$with_apint" = gmp; then
   if test "$ac_gmp_ok" = yes || test "$enable_gmp" = yes; then
     AC_MSG_RESULT(gmp)
@@ -462,7 +463,6 @@ else
   ac_configure_args="$ac_configure_args --without-libfac"
 fi
 
-
 AC_MSG_CHECKING(whether to use with Singular)
 if test "$with_Singular" != no && test "$with_Singular" != yes; then
   if test "$enable_Singular" = yes; then
@@ -478,6 +478,7 @@ if test "$with_Singular" != no; then
 else
   AC_MSG_RESULT(no)
 fi
+
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Check for known subdirs
