@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.107 1998-07-08 17:34:23 obachman Exp $
+@comment $Id: general.doc,v 1.108 1998-07-14 16:26:18 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -21,14 +21,14 @@
 @end ignore
 
 @menu
-* Interactive use::             
-* Rings and orderings::         
-* Implemented algorithms::      
-* The SINGULAR language::       
-* Input and output::              
-* Procedures::                  
-* Libraries::                   
-* Debugging tools::             
+* Interactive use::
+* Rings and orderings::
+* Implemented algorithms::
+* The SINGULAR language::
+* Input and output::
+* Procedures::
+* Libraries::
+* Debugging tools::
 @end menu
 
 
@@ -240,7 +240,7 @@ sends it to the @sc{Singular} parser for interpretation
 
 On Unix-like operating systems, @sc{Singular}
 maintains a history of the last lines of input.  If the environment
-variable @code{SINGULARHIST} is set and has a name of a file as value, 
+variable @code{SINGULARHIST} is set and has a name of a file as value,
 then the input history is stored across sessions using this
 file. Otherwise, i.e., if the environment variable @code{SINGULARHIST}
 is not set, then the history of the last inputs is only available for
@@ -717,7 +717,7 @@ and vice versa is to use the @code{fetch} function (@pxref{fetch}).
 @sc{Singular} computes in a quotient rings as long as possible with the
 given representative of a polynomial, say, @code{f}.  I.e., it usually
 does not reduce @code{f} w.r.t. the quotient ideal.  This is only done
-when necessary 
+when necessary
 during standard bases computations or by an explicate reduction using
 the command @code{reduce(f, std(0))} (@pxref{reduce}).
 
@@ -1800,7 +1800,7 @@ by either typing them in on the command line or by loading them from a
 so-called library file with the @ref{LIB} command.  Procedures are
 invoked like normal built-in commands, i.e., by typing their name
 followed by the list of arguments in parentheses. The invocation then
-executes the sequence of commands stored in the specified procedure. All 
+executes the sequence of commands stored in the specified procedure. All
 defined procedures can be displayed by the command @code{listvar(proc);}.
 
 @menu
@@ -1891,7 +1891,7 @@ Now, we load the library and execute the procedures defined there:
 @c example
 @end example
 
-@subsubheading Guidelines for the help section of a procedure 
+@subsubheading Guidelines for the help section of a procedure
 The help text of a procedure should contain information about the usage,
 purpose, return values and generated objects. Particular assumptions or
 limitations should be listed. It should also be mentioned if global
@@ -2035,7 +2035,7 @@ information about the library is displayed by the command
 like the built-in @sc{Singular} functions. To have the full functionality
 of a built-in function (like checking of the type of parameters, automatic
 loading of necessary other libraries, help pages etc.), libraries have to
-comply with the syntax rules described below. 
+comply with the syntax rules described below.
 
 @menu
 * Loading of a library::
@@ -2044,6 +2044,7 @@ comply with the syntax rules described below.
 @end menu
 @c ---------------------------------------
 @node Loading of a library, Format of a library,, Libraries
+@cindex Loading of a library
 Libraries can only be loaded with the @code{LIB} command:
 @c ------------------------------------------------------------
 @c   This piece of text exists also in the file reference.doc,
@@ -2088,7 +2089,7 @@ shows all loaded libraries.
 @item @strong{Example:}
 @example
 @c example
-  option(loadLib); // show loading of libraries; 
+  option(loadLib); // show loading of libraries;
                    // standard.lib is loaded
   LIB;
                    // the names of the procedures of inout.lib
@@ -2097,7 +2098,7 @@ shows all loaded libraries.
 @c example
 @end example
 @end table
- 
+
 @c ref
 See
 @ref{Command line options};
@@ -2108,7 +2109,6 @@ See
 @ref{string};
 @ref{system}.
 @c ref
-
 @c ---------------------------------------
 @node Format of a library, Guidelines for writing a library, Loading of a library, Libraries
 @subsection Format of a library
@@ -2181,16 +2181,16 @@ It is common practice to simply define the version string to be
 @subsection Guidelines for writing a library
 
 Although there are very few enforced rules on how libraries are written
-(e.g., on whether or where the info- and version-string are defined), it 
-is recommended that certain guidelines should be followed so that 
+(e.g., on whether or where the info- and version-string are defined), it
+is recommended that certain guidelines should be followed so that
 debugging and understanding are made easier.
 
 @enumerate
-@item 
+@item
 The info- and version-string should appear at the beginning of the
 library, before procedure definitions.
 
-@item 
+@item
 The info-string should have the following format:
 @example
 info="
@@ -2205,22 +2205,22 @@ info="
 @end example
 The purpose of the one line procedure descriptions is not to give a short help
 for the procedure, but to help the user decide what procedure might be
-the right one for the job. Details can then be found in the help section 
+the right one for the job. Details can then be found in the help section
 of each procedure. Therefore parameters may be omitted or abbreviated if
 necessary.
 
 @item
-Each procedure which is not declared @code{static} should have a 
+Each procedure which is not declared @code{static} should have a
 help and example section as explained in @ref{Procedure definition}.
 
-@item 
+@item
 Each procedure which should not be accessible by users should be
 declared @code{static}.
 
-@item 
+@item
 No procedures should be defined within the body of another procedure.
 
-@item 
+@item
 Executing procedures defined in a library should not result in any
 message displays, by default (please, shut up, by default). That is, only if
 special options or variable values are set, should a procedure display
@@ -2361,8 +2361,8 @@ $ libparse sample.lib
 Checking library 'sample.lib'
   Library         function      line,start-eod line,body-eob  line,example-eoe
 Version:0.0.0;
-g libparse             tab line    9,  149-165   13,  271-298   14,  300-402  
-l libparse    internal_tab line   24,  450-475   25,  476-496    0,    0-496  
+g libparse             tab line    9,  149-165   13,  271-298   14,  300-402
+l libparse    internal_tab line   24,  450-475   25,  476-496    0,    0-496
 @end example
 
 where the following abbreviations are used:

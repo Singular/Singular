@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.90 1998-07-10 09:38:23 Singular Exp $
+@comment $Id: reference.doc,v 1.91 1998-07-14 16:26:20 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1245,7 +1245,7 @@ prevent local evaluations  when writing to an MPtcp link.
 @end example
 @end table
 @menu
-* MPfile links:
+* MPfile links::
 * quote::
 * write::
 @end menu
@@ -1937,11 +1937,11 @@ from/to rings with/without parameters. Compared with
 @end example
 @end table
 @c ref
-See 
+See
 @ref{fetch};
-@ref{homog}; 
-@ref{map}; 
-@ref{qring}; 
+@ref{homog};
+@ref{map};
+@ref{qring};
 @ref{ring}.
 @c ref
 @c ---------------------------------------
@@ -2267,13 +2267,13 @@ argument.
 * vector::
 @end menu
 @iftex
-See 
+See
 @ref{deg};
 @ref{int};
 @ref{intvec};
 @ref{ideal};
 @ref{module};
-@ref{poly}; 
+@ref{poly};
 ref{vector}.
 @end iftex
 @c ---------------------------------------
@@ -3232,8 +3232,8 @@ See @ref{typeof}; @ref{names}; @ref{reservedName}.
 @item @strong{Type:}
 list of strings
 @item @strong{Purpose:}
-returns the names of all user defined variables which are ring independent 
-(this includes the names of  procedures) or, in the second case, belong to 
+returns the names of all user defined variables which are ring independent
+(this includes the names of  procedures) or, in the second case, belong to
 the given ring.
 @item @strong{Example:}
 @example
@@ -3457,13 +3457,11 @@ returns the number of variables of a ring.
 @c example
 @end example
 @end table
-@menu
-* ring::
-*var::
-@end menu
-@iftex
-See @ref{ring}; @ref{var}.
-@end iftex
+@c ref
+See
+@ref{ring};
+@ref{var}.
+@c ref
 @c ---------------------------------------
 @node open, option, nvars, Functions
 @subsection open
@@ -4058,8 +4056,8 @@ See @ref{ideal}; @ref{intvec}; @ref{weight}.
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-prevents expressions from evaluation. Used only in connections with write in 
-MPfile links, prevents evalution of an expression before sending to an other 
+prevents expressions from evaluation. Used only in connections with write in
+MPfile links, prevents evalution of an expression before sending to an other
 @sc{Singular}process.
 Within a quoted expression, the
 quote can be "undone" by an @code{eval} (i.e., each eval "undoes" the
@@ -4200,8 +4198,8 @@ any
 @item @strong{Purpose:}
 reads data from a link.
 @*For ASCII links, the content of the entire
-file is returned as one string. If the ASCII link is the empty string, 
-@code{read} reads from standard input the keyboard. 
+file is returned as one string. If the ASCII link is the empty string,
+@code{read} reads from standard input the keyboard.
 @*For MP links, one expression is read
 from the link, and returned after an evaluation.
 As long as there is no data to read from an MPtcp
@@ -5156,7 +5154,7 @@ of the ideal resp. module.
 * sres::
 @end menu
 @iftex
-See @ref{ideal}; @ref{lres}; @ref{module}; @ref{mres}; @ref{nres}; 
+See @ref{ideal}; @ref{lres}; @ref{module}; @ref{mres}; @ref{nres};
 @ref{res}; @ref{sres}.
 @end iftex
 @c ---------------------------------------
@@ -5185,7 +5183,7 @@ returns the trace of an intmat resp a matrix.
 * matrix::
 @end menu
 @iftex
-See 
+See
 @ref{intmat}; @ref{matrix}.
 @end iftex
 @c ---------------------------------------
@@ -6176,8 +6174,8 @@ if @code{short} is nonzero. A C-like notion is used, if short is zero.
 Both notations may be used as input.
 @*The default depends on the names of the ring variables
 (0 if there are names of variables longer than 1 character, 1 otherwise). Every
-change of the basering sets @code{short} to the proper default value for that ring 
-and overwrites the previous setting.
+change of the basering sets @code{short} to the proper default value for
+that ring and overwrites the previous setting.
 @item @strong{Example:}
 @example
 @c example
