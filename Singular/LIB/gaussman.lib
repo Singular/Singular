@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.70 2002-02-25 18:14:39 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.71 2002-02-25 18:35:43 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -403,7 +403,7 @@ static proc transf(matrix A,matrix A0,ideal r,module H,module H0,ideal e,intvec 
       "// compute maximal integer differences d of e");
     for(i=1;i<ncols(e);i++)
     {
-      for(j=i+1;i<=ncols(e);i++)
+      for(j=i+1;j<=ncols(e);j++)
       {
         k=int(e[i]-e[j]);
         if(number(e[i]-e[j])==k)
