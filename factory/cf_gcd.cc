@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.10 1997-06-20 10:45:13 schmidt Exp $ */
+/* $Id: cf_gcd.cc,v 1.11 1997-06-30 15:30:41 schmidt Exp $ */
 
 #include <config.h>
 
@@ -14,7 +14,11 @@
 #include "cf_chinese.h"
 #include "cf_map.h"
 #include "fac_util.h"
+#ifdef macintosh
+#include <::templates:ftmpl_functions.h>
+#else
 #include "templates/ftmpl_functions.h"
+#endif
 
 static CanonicalForm gcd_poly( const CanonicalForm & f, const CanonicalForm& g, bool modularflag );
 
