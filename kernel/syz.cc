@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.7 2005-02-17 09:42:22 Singular Exp $ */
+/* $Id: syz.cc,v 1.8 2005-03-17 14:14:17 Singular Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -780,18 +780,17 @@ intvec * syBetti(resolvente res,int length, int * regularity,
       weights=NULL;
     }
   }
-  if (idHomModule(res[0],currQuotient,&w)!=isHomog)
-  {
-    Warn("betti-command: Input is not homogeneous!");
-    weights=NULL;
-  }
+  //if (idHomModule(res[0],currQuotient,&w)!=isHomog)
+  //{
+  //  Warn("betti-command: Input is not homogeneous!");
+  //  weights=NULL;
+  //}
   if (weights==NULL) weights=w;
   else delete w;
   r0_len=IDELEMS(res[0]);
   while ((r0_len>0) && (res[0]->m[r0_len-1]==NULL)) r0_len--;
   #ifdef SHOW_W
-  PrintS("weights:");if (weights!=NULL) weights->show(); else Print("NULL"); P
-rintLn();
+  PrintS("weights:");if (weights!=NULL) weights->show(); else Print("NULL"); PrintLn();
   #endif
   int rkl=l = si_max(idRankFreeModule(res[0]),res[0]->rank);
   i = 0;
@@ -847,7 +846,7 @@ rintLn();
     for(j=0;j<weights->length();j++)
     {
       IMATELEM((*result),(-mr)+(*weights)[j]+1,1) ++;
-      // Print("imat(%d,%d)++ -> %d\n",(-mr)+(*weights)[j]+1, 1, IMATELEM((*result),(-mr)+(*weights)[j]+1,1));
+      //Print("imat(%d,%d)++ -> %d\n",(-mr)+(*weights)[j]+1, 1, IMATELEM((*result),(-mr)+(*weights)[j]+1,1));
     }
   }
   else
@@ -872,7 +871,7 @@ rintLn();
     //(*result)[(-mr)*cols] -= dummy;
     for(j=0;j<=rows+mr;j++)
     {
-      // Print("tocancel[%d]=%d imat(%d,%d)=%d\n",j,tocancel[j],(-mr)+j+1,1,IMATELEM((*result),(-mr)+j+1,1));
+      //Print("tocancel[%d]=%d imat(%d,%d)=%d\n",j,tocancel[j],(-mr)+j+1,1,IMATELEM((*result),(-mr)+j+1,1));
       IMATELEM((*result),(-mr)+j+1,1) -= tocancel[j];
     }
   }
