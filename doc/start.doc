@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.5 1998-05-07 16:19:19 Singular Exp $
+@comment $Id: start.doc,v 1.6 1998-05-11 20:13:41 gorzel Exp $
 @comment this file contains the "Introduction" chapter.
 @menu
 * Background::
@@ -134,3 +134,359 @@ index}, resp.
 @node Getting started,  , How to use this manual, Introduction
 @section Getting started
 @cindex Getting started
+
+@subsection{generalities}
+@cindex{generalities}
+
+@c {{{ subsection generalities }}}
+Once @sc{Singular} is started, it attends input after the promt @code{>}.
+Every statement has to be closed by an @code{;}
+@example
+  1+1;
+  @expansion{} 2
+@end example
+All objects have a type, e.g.
+integer variables are defined by the word @code{int}.
+An assignement is done by the symbol @code{=}.
+@example
+  int k =2;
+@end example
+The value of an object is display simply by typing its name
+@example
+  k;
+  @expansion{} 2
+@end example
+On the other hand output is only subpressed if an assignement is made.
+@example
+  int j;
+  j = k+1;
+@end example
+The last displayed result is always available with the special symbol
+@code{_}.
+@example
+  2*_;   // the value from k displayed three lines above
+  @expansion{} 4
+@end example
+Furthermore @sc{Singular} maintains a history of the last input, which
+is accessewd bvy CTL P and CTL N or the arrows opn the keyboard. This
+simplifies to redo examples with minor changements.
+
+Text after @code{//} is a comment and ignored for in calculations, as seen
+in the previous example.
+@c Comments are marked with @code{//} as seen  
+The whole manual is online available under the command @code{help;} 
+Explanation on single topics  e.g. @code{intmat} a matrix of integers are
+obtained by 
+@example
+  help intmat;
+@end example  
+This showss the text from @ref{intmat} in the printed maual. 
+Define a @code{3 x 3} matrix of integers, and initialize it with some values.
+@example
+  intmat m[3][3] = 1..9; // bug here, converts the 3x3 intmat into 9x1, hence
+  intmat m[3][3] = 1,2,3,4,5,6,7,8,9;
+@end example  
+A single entry is selected with the square brackets @code{[,]}.
+@example
+  m[2,2]=0;
+  m;
+  @expansion{} 1, 2, 3,
+  @expansion{} 4, 0, 6,
+  @expansion{} 5, 6, 7
+@end example  
+To calculate the fourth power of this integer matrix, use a @code{for} loop,
+the curly brackets @code{ \{} and @code{ \} } benote a begin and end of a block.
+@example
+  intmat mm = m;
+  for (j = 1; j<= 3; j++)
+  {
+   mm = mm * m;
+  }
+  mm;
+  @expansion{} 6380,5848,9276,
+  @expansion{} 10688,10008,15528,
+  @expansion{} 22316,20368,32460 
+@end example  
+
+@subsection{rings and standard bases}
+@cindex{rings and standard bases}
+To calculate with objects as ideals, matrices, modules and vectors based on 
+polynomials a ring has to be defined first.
+@example
+  ring r1 = 0,(x,y,z),dp;
+@end example   
+This gives a polynomial ring called @code{r} in characteristic zero and 
+ring varibles @code{x,y,z}. The @code{dp} at the end determines the termorder
+of the polynomials and hence the standardbasis calculation.
+The @code{p} stands for @code{p}olynomial, so decreasing order of 
+exponents, whereas an @code{s} means power@code{s}eries and increasing order 
+of exponents. With
+@example
+  poly f =  x3+y3+(x-y)*x2y2+z2;
+  poly g =  f^2 *(2x-y);
+  f;
+  @expansion{} x3y2-x2y3+x3+y3+z2
+@end example
+
+@code{size} determines in general the number of single entries in an object.
+@example
+  size(g);
+  @expansion{25}
+@end example
+A natural question is to ask if a point e.g. @code{(x,y,z)=(1,2,0)} lies on the
+variety defined by the polynomials @code{f} and @code{g}.
+@example
+  ideal I = f,g;
+@end example
+So substitute 1 for the first variable and 2 for the second.
+@example
+  ideal J= subst(I,var(1),1);
+  J = subst(J,var(2),2);
+  J = subst(J,var(3),0);
+@end example
+In an ideal @code{size} counts only the nonzero entries.
+@example
+  J;
+  @expansion{J[1]=5}
+  @expansion{J[2]=0}
+  size(J);
+  @expansion{1}
+@end example
+Hence the point @code{(1,2,0)} is not lying on the variety @code{V(f,g)}.
+
+A second question is, to decide if some function vanishes on a variety,
+or in algebraic terms if a polynomial is included in a given ideal.
+This need a standardbasis calculatation  with the command 
+@code{std}, then calculate the normalform of the asked polynomial with respect
+to the standardbasis.
+@example
+  ideal sI = std(f);
+  reduce(g,sI);
+  @expansion{0}
+@end example
+As the result is @code{0} the polynom @code{f} belongs to the ideal defined by 
+@code{g}, as was clear in at advance.
+
+The command @code{kbase} calculates a basis of the polynomial ring modulo an
+ideal. As application calculate the Milnor number
+of a  hypersurface singularity in the global and local case. This is
+the vectorspace dimension of the polynomial ring modulo the Jacobian ideal
+in the global case resp. of the powerseries ring modulo the Jacobian ideal.
+
+The Jacobian ideal is obtained with the command @code{jacob}.
+@example
+  ideal J = jacob(f);
+  J;
+  @expansion{J[1]=3x2y2-2xy3+3x2}
+  @expansion{J[2]=2x3y-3x2y2+3y2}
+  @expansion{J[3]=2z} 
+@end example
+To get a representating set of the quotient vectorspace first 
+a standardbasis has to be calculated first.
+@example
+  J = std(J);
+  J;
+  @expansion{J[1]=z}
+  @expansion{J[2]=3x2y2-2xy3+3x2}
+  @expansion{J[3]=2x3y-2xy3+3x2+3y2}
+  @expansion{J[4]=4x4-12xy3+4y4+9x2+9y2}
+  @expansion{J[5]=20y5+54x3-45x2y-30xy2-81y3}
+  @expansion{J[6]=10xy4+18x3-15x2y-27y3}
+@end example
+Then 
+@example
+  ideal I = kbase(J);
+  I;
+  @expansion{_[1]=y4}
+  @expansion{_[2]=xy3}
+  @expansion{_[3]=y3}
+  @expansion{_[4]=xy2}
+  @expansion{_[5]=y2}
+  @expansion{_[6]=x2y}
+  @expansion{_[7]=xy}
+  @expansion{_[8]=y}
+  @expansion{_[9]=x3}
+  @expansion{_[10]=x2}
+  @expansion{_[11]=x}
+  @expansion{_[12]=1}
+@end example
+and
+@example
+  size(I);
+  @expansion{12}
+@end example
+gives the desired vectorspace dimension.
+As in @sc{Singular} the functions may take directly the input from 
+earlier calculations, it can be written all together.
+@example
+  size(kbase(std(jacob(f))));
+  @expansion{}
+@end example
+
+Because we are not interested in the elements of the quotient vectorspace,
+but only in the resulting deimension we may even use the command @code{vdim}
+and write
+@example
+  vdim(std(jacob(f)));
+  @expansion{}
+@end example
+
+@subsection{procedures and libraries}
+@cindex{procedures and libraries}
+
+@sc{Singular} offers comfortable programming language, so it is possible to 
+define procedures which collect several commands to an new one. 
+Procedures are defined with the keyword @code{proc} followed by a name
+and an optional parameterlist with specified types.
+Finally a procedure may return values with the command @code{return}.
+
+So define the following procedure called @code{Milnor}
+
+@example
+  proc Milnor(poly h)
+  {
+   return(vdim(std(jacob(h))));
+  }
+@end example
+
+
+Then call
+@example
+  Milnor(f);
+  @expansion{12}
+@end example
+
+With @sc{Singular} come several libraries, collection of useful procedures
+based on the implemented commands, which extends now the facilties 
+@sc{Singular}. One of these  is e.g. @code{sing.lib}
+which contains already a procedure 
+called @code{milnor} to calculate the Milnor number not only for hypersurfaces
+but more generaly for complete intersection singularties.
+
+Libraries are loaded with the command @code{LIB}, some additional information
+during the process of loading is displayed on the screen.
+
+@example
+  LIB "sing.lib";
+@end example
+
+As all input in @sc{Singular} is case sensitiv, there is no conflict with
+the previous  defined @code{proc Milnor} but the result is the same.
+@example
+  milnor(f);
+  @expansion{}
+@end example
+
+The procedures in a library have a help part 
+which is shown with 
+@example
+  help milnor;
+@end example
+as well as some examples, which are executed with
+@example
+  example milnor;
+  @expansion{}
+@end example
+
+Likewise the library itself posses a help part, to show all the functions
+available for the user defined in the library.
+@example
+  help sing.lib;
+@end example
+
+
+@subsection{change of rings}
+@cindex{change of rings}
+
+To calculate the local Milnor number we have to do the calculation with the
+same commands in a ring with local ordering.  Define
+@example
+  ring r2 = 0,(x,y,z),ds;
+@end example
+This ordering determines the standard basis which will be calculated.
+Fetch the polynomial definded in the ring @code{r1} into this new ring. 
+@example
+  poly f = fetch(r1,f);
+  f;
+  @expansion{z2+x3+y3+x3y2-x2y3}
+@end example
+Here the terms are orderd by increasing exponents. The local Milnor number is
+now 
+@example
+  Milnor(f);
+  @expansion{4}
+@end example
+
+Iterated once again yields the Hessian of @code{f} a @code{3x3} matrix.
+@example
+  matrix H = jacob(jacob(f));
+  H;
+  @expansion{H[1,1]=6x+6xy2-2y3} 
+  @expansion{H[1,2]=6x2y-6xy2}
+  @expansion{H[1,3]=0}
+  @expansion{H[2,1]=6x2y-6xy2}
+  @expansion{H[2,2]=6y+2x3-6x2y}
+  @expansion{H[2,3]=0}
+  @expansion{H[3,1]=0}
+  @expansion{H[3,2]=0}
+  @expansion{H[3,3]=2}
+@end example
+
+The @code{print} command displays the matrix in a nicer form.
+@example
+  print(H);
+  @expansion{6x+6xy2-2y3,6x2y-6xy2,  0,}
+  @expansion{6x2y-6xy2,  6y+2x3-6x2y,0,}
+  @expansion{0,          0,          2}
+@end example
+
+We may calculate the determinat and minors of differents size.
+@example
+  det(H);
+  @expansion{72xy+24x4-72x3y+72xy3-24y4-48x4y2+64x3y3-48x2y4}
+  minor(H,1);
+  @expansion{}
+@end example
+
+The variety defined by the one dimensional minors is empty.
+With the command @code{option} the algortihm of the standardbasis 
+may be affected. For instance a reduced standard basis is obtained 
+in the following way  
+@example
+  option(redSB);
+  std(_);
+  @expansion{}
+@end example
+
+
+
+Coming back to some mathematical considerations, we study the problem how
+to calculate some ....
+
+@subsection{maps and elimintation}
+@cindex{maps and eliminination}
+
+@example
+  std(_);
+  @expansion{}
+@end example
+
+@subsection{modules and their annilator}
+@cindex{modules and and theis annilator}
+@example
+  std(_);
+  @expansion{}
+@end example
+
+@subsection{resolution and Hilbertseries}
+@cindex{resolution and Hilbertseries}
+This final example in the introduction shows how to calculate an @code{Ext}
+group.
+
+@example
+  std(_);
+  @expansion{}
+@end example
+
+
+
