@@ -3,12 +3,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: sing_dbm.h,v 1.3 1997-04-08 16:45:30 Singular Exp $ */
 /*
-* ABSTRACT
+* ABSTRACT: interface to DBM links
 */
-/* $Id: sing_dbm.h,v 1.2 1997-03-24 14:25:48 Singular Exp $ */
 
 #include "structs.h"
 
-si_link_extension dbInit(void);
+si_link_extension slInitDBMExtension(si_link_extension s);
 #endif

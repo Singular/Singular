@@ -4,7 +4,7 @@
 
 //**************************************************************************
 //
-// $Id: sing_dbm.cc,v 1.2 1997-03-24 14:25:47 Singular Exp $
+// $Id: sing_dbm.cc,v 1.3 1997-04-08 16:45:32 Singular Exp $
 //
 //**************************************************************************
 //  'sing_dbm.cc' containes command to handle dbm-files under
@@ -51,21 +51,28 @@ extern datum nextkey(datum);
 extern char *index(char *str, char c);
 
 //**************************************************************************
-BOOLEAN dbOpen(si_link l)
+BOOLEAN dbOpen(si_link l, short flag)
 {
-  if (!dbOpened)
+  if((flag==SI_LINK_OPEN)
+  || (flag==SI_LINK_READ)
+  || (flag==SI_LINK_WRITE))
   {
-    if(dbminit(l->name) == 0)
+    if (!dbOpened)
     {
-      dbOpened=TRUE;
-      SI_LINK_SET_RW_OPEN_P(l);
-      l->data=NULL;
-      return FALSE;
+      if(dbminit(l->name) == 0)
+      {
+        dbOpened=TRUE;
+        SI_LINK_SET_RW_OPEN_P(l);
+        l->data=NULL;
+        FreeL(l->mode);
+        l->mode=mstrdup("rw");
+        return FALSE;
+      }
+      Werror("dbminit of `%s` failed",l->name);
     }
-    Werror("dbminit of `%s` failed",l->name);
+    else
+      Werror("only one DBM link allowed:`%s`",l->name);
   }
-  else
-    Werror("only one DBM link allowed:`%s`",l->name);
   return TRUE;
 }
 
@@ -79,7 +86,7 @@ BOOLEAN dbClose(si_link l)
 
 //**************************************************************************
 static datum d_value;
-leftv dbRead(si_link l, leftv key)
+leftv dbRead2(si_link l, leftv key)
 {
   leftv v=NULL;
   if(dbOpened)
@@ -128,7 +135,7 @@ leftv dbRead(si_link l, leftv key)
 }
 leftv dbRead1(si_link l)
 {
-  return dbRead(l,NULL);
+  return dbRead2(l,NULL);
 }
 //**************************************************************************
 BOOLEAN dbWrite(si_link l, leftv key)
@@ -162,24 +169,28 @@ BOOLEAN dbWrite(si_link l, leftv key)
   return b;
 }
 //**************************************************************************
-si_link_extension dbInit()
+char *dbStatus(si_link l, char *request)
 {
-  si_link_extension s=(si_link_extension)Alloc0(sizeof(*s));
-  s->Init=slInitALink;
-  s->OpenRead=dbOpen;
-  s->OpenWrite=dbOpen;
+  if ((strcmp(request, "read") == 0)
+  ||  (strcmp(request, "write") == 0))
+  {
+    if (SI_LINK_R_OPEN_P(l)) return "ready";
+    else                     return "not ready";
+  }
+  else return "unknown status request";
+}
+//**************************************************************************
+si_link_extension slInitDBMExtension(si_link_extension s)
+{
+  s->Open=dbOpen;
   s->Close=dbClose;
   s->Read=dbRead1;
-  s->Read2=dbRead;
+  s->Read2=dbRead2;
   s->Write=dbWrite;
-  s->name="DBM";
+  //s->Dump=NULL;
+  //s->GetDump=NULL;
+  s->Status=dbStatus;
+  s->type="DBM";
   return s;
 }
-#ifdef HAVE_MODULE_DBM
-leftv initDBM(leftv v)
-{
-  slExtensionInit(dbInit());
-  return NULL;
-}
-#endif
 #endif
