@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmcheck.c,v 1.6 1999-03-19 17:42:29 obachman Exp $ */
+/* $Id: mmcheck.c,v 1.7 1999-06-30 14:54:11 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -81,7 +81,7 @@ void mmDBSetHeapsOfBlocks(memHeap fromheap, memHeap toheap)
   while (pages != NULL)
   {
     DBMCB *what = (DBMCB*) (((char*) pages) + SIZE_OF_HEAP_PAGE_HEADER);
-    
+
     for (i=0; i<nblocks; i++)
     {
       what->heap = toheap;
@@ -96,18 +96,18 @@ void mmDBInitNewHeapPage(memHeap heap)
   DBMCB* what = (DBMCB*) heap->current;
   DBMCB* prev = NULL;
   size_t size = SizeFromRealSize(heap->size);
-  
+
   if (mm_minAddr == 0 || mm_minAddr > (void*) what)
     mm_minAddr = (void*) what;
 
   while (what != NULL)
   {
-    mmFillDBMCB(what, size, heap, MM_FREEFLAG, __FILE__, __LINE__);    
+    mmFillDBMCB(what, size, heap, MM_FREEFLAG, __FILE__, __LINE__);
     mmMoveDBMCBInto(&mm_theDBfree, what);
     prev = what;
     what = *((void**) what);
   }
-  
+
   if (mm_maxAddr == 0 || mm_maxAddr < (void*) prev)
     mm_maxAddr = (void*) prev;
 }
@@ -115,15 +115,15 @@ void mmDBInitNewHeapPage(memHeap heap)
 static int mmPrintDBMCB ( DBMCB * what, char* msg , int given_size)
 {
   (void)fprintf( stderr, "warning: %s\n", msg );
-  (void)fprintf( stderr, "block %x %s in: %s:%d",
-                 (int)&(what->data), 
+  (void)fprintf( stderr, "block %lx %s in: %s:%d",
+                 (long)&(what->data),
                  (what->flags & MM_FREEFLAG ? "freed" : "allocated" ),
                  what->fname, what->lineno );
 #ifdef MTRACK
   mmDBPrintStack(what, MM_PRINT_ALL_STACK);
 #else
   fprintf( stderr,"\n");
-#endif  
+#endif
   if (strcmp(msg,"size")==0)
     (void)fprintf( stderr, "size is: %d, but check said %d \n",
       (int)what->size, given_size );
@@ -144,7 +144,7 @@ void mmPrintUsedList( )
     what=what->next;
   }
 }
-    
+
 void mmPrintFL( const char* fname, const int lineno )
 {
   (void)fprintf( stderr, "occured in %s:%d\n", fname, lineno );
@@ -161,7 +161,7 @@ void mmPrintFL( const char* fname, const int lineno )
 #define MM_FRONT_PATTERN 247
 #define MM_BACK_PATTERN  249
 
-void mmFillDBMCB(DBMCB* what, size_t size, memHeap heap, 
+void mmFillDBMCB(DBMCB* what, size_t size, memHeap heap,
                  int flags, char* fname, int lineno)
 {
   void* addr = &(what->data);
@@ -172,7 +172,7 @@ void mmFillDBMCB(DBMCB* what, size_t size, memHeap heap,
   what->lineno = lineno;
   what->flags = flags;
   what->init = 0;
-  
+
   if (flags & MM_FREEFLAG)
     memset(addr, MM_FREE_PATTERN, size);
 
@@ -199,7 +199,7 @@ void mmMarkInitDBMCB()
 static int mmCheckPattern(char* ptr, char pattern, size_t size)
 {
   int i;
-  
+
   for (i = 0; i<size; i++)
     if (ptr[i] != pattern) return 0;
   return 1;
@@ -214,7 +214,7 @@ static int mmCheckSingleDBMCB ( DBMCB * what, int size , int flags)
   int i;
   int ok=1;
 
-  if ( ((int)what % 4 ) != 0 )
+  if ( ((long)what % 4 ) != 0 )
   {
     fprintf( stderr, "warning: odd address\n" );
     assume(0);
@@ -238,10 +238,10 @@ static int mmCheckSingleDBMCB ( DBMCB * what, int size , int flags)
     assume(0);
     return 0;
   }
-  
+
   if ( ((long)what->fname<1000)
   #ifdef unix
-       ||((long)what->fname>(int)&(_end))
+       ||((long)what->fname>(long)&(_end))
   #endif
   )
   { /* fname should be in the text segment */
@@ -295,10 +295,10 @@ static int mmCheckSingleDBMCB ( DBMCB * what, int size , int flags)
   if (! mmCheckPattern(what->front_pattern, MM_FRONT_PATTERN,
                        MM_NUMBER_OF_FRONT_PATTERNS))
     return mmPrintDBMCB(what , "front pattern", 0);
-  if ((what->flags & MM_FREEFLAG)  && 
+  if ((what->flags & MM_FREEFLAG)  &&
       ! mmCheckPattern((char*)&(what->data), MM_FREE_PATTERN, 0))
     return mmPrintDBMCB(what, "free pattern", 0);
-  if (! mmCheckPattern((char*) &(what->data) + size, 
+  if (! mmCheckPattern((char*) &(what->data) + size,
                        MM_BACK_PATTERN, DebugOffsetBack))
     return mmPrintDBMCB(what, "back pattern", 0);
 
@@ -370,7 +370,7 @@ int mmTestHeaps()
 
   return 1;
 }
- 
+
 static int   mmIsAddrOnDList(DBMCB *what, DBMCB* list, int s)
 {
   while (list != NULL)
@@ -395,7 +395,7 @@ static int mmCheckListContainment(DBMCB * what, int flags)
     if (flags == MM_USEDFLAG)
       return mmPrintDBMCB(what, "Used flag but not in used list", 0);
   }
-  
+
   if ( mmIsAddrOnDList((void*) what, mm_theDBfree.next,
                        (void*) &(mm_theDBfree.next) -
                        (void*) &(mm_theDBfree)))
@@ -410,7 +410,7 @@ static int mmCheckListContainment(DBMCB * what, int flags)
   }
   return 1;
 }
-  
+
 int mmCheckDBMCB ( DBMCB * what, int size , int flags)
 {
 
@@ -419,7 +419,7 @@ int mmCheckDBMCB ( DBMCB * what, int size , int flags)
     return 0;
 
   if (mm_MDEBUG > 1 && ! mmTestMemory()) return 0;
-  
+
   if (mm_MDEBUG > 0 && ! mmCheckListContainment(what, flags)) return 0;
 
   return 1;
@@ -436,7 +436,7 @@ static BOOLEAN mmDBTestHeapBlockS(const void* adr, const memHeap heap,
 {
   DBMCB * what;
 
-  if ( adr == NULL || size == 0) 
+  if ( adr == NULL || size == 0)
     return TRUE;
 
   if (mm_MDEBUG > 2 && ! mmTestHeaps())
@@ -444,7 +444,7 @@ static BOOLEAN mmDBTestHeapBlockS(const void* adr, const memHeap heap,
     mmPrintFL( fname, lineno );
     return FALSE;
   }
-    
+
   what = (DBMCB*)((char*)(adr) - DebugOffsetFront);
 
   if ( ! mmCheckDBMCB( what, size, MM_USEDFLAG) )
@@ -475,20 +475,20 @@ BOOLEAN mmDBTestHeapBlock(const void* adr, const memHeap heap,
                             SizeFromRealSize(mmGetHeapBlockSize(heap)),
                             fname, lineno);
 }
-                            
-BOOLEAN mmDBTestBlock(const void* adr, const size_t size, 
+
+BOOLEAN mmDBTestBlock(const void* adr, const size_t size,
                       const char * fname, const int lineno)
 {
   int i;
   DBMCB * what;
-  
+
   if ( ( adr == NULL ) || ( size == 0 ) ) return TRUE;
 
   i = mmGetIndex(size);
   if (i < 0)
   {
     what = (DBMCB*)((char*)(adr) - DebugOffsetFront);
-    if ( ! mmCheckDBMCB( what, size, MM_USEDFLAG) ) 
+    if ( ! mmCheckDBMCB( what, size, MM_USEDFLAG) )
     {
       mmPrintFL( fname, lineno );
       return FALSE;
@@ -509,9 +509,9 @@ BOOLEAN mmDBTest( const void* adr, const char * fname, const int lineno )
     size_t l;
     adr = (size_t*)adr-1;
 #ifdef ALIGN_8
-    l= (adr<=mm_maxAddr) ? (*(size_t*)((int)adr&(~7))) :0;
+    l= (adr<=mm_maxAddr) ? (*(size_t*)((long)adr&(~((long)7)))) :0;
 #else
-    l= (adr<=mm_maxAddr) ? (*(size_t*)((int)adr&(~3))) :0;
+    l= (adr<=mm_maxAddr) ? (*(size_t*)((long)adr&(~((long)3)))) :0;
 #endif
     return mmDBTestBlock( adr,l, fname, lineno );
   }

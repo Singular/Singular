@@ -15,7 +15,8 @@
 /* #ifdef HAVE_GMALLOC */
 #if 1
 
-
+#define __USE_XOPEN
+#define __USE_XOPEN_EXTENDED
 #define _MALLOC_INTERNAL
 
 /* The malloc headers and source files from the C library follow here.  */
