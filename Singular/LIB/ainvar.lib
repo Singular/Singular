@@ -1,7 +1,7 @@
-// $Id: ainvar.lib,v 1.1 1999-12-13 15:53:37 obachman Exp $
+// $Id: ainvar.lib,v 1.2 2000-05-12 12:25:40 Singular Exp $
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: ainvar.lib,v 1.1 1999-12-13 15:53:37 obachman Exp $";
+version="$Id: ainvar.lib,v 1.2 2000-05-12 12:25:40 Singular Exp $";
 info="
 LIBRARY: ainvar.lib   PROCEDURES FOR COMPUTING INVARIANTS RINGS OF THE ADDITIVE GROUP
 AUTHORS: Gerhard Pfister,  email: pfister@mathematik.uni-kl.de
@@ -106,7 +106,7 @@ EXAMPLE: example actionIsProper; shows an example
   def bsr=basering;
 
   //changes the basering bsr to bsr[@t]
-  execute "ring s="+charstr(basering)+",("+varstr(basering)+",@t),dp;";
+  execute("ring s="+charstr(basering)+",("+varstr(basering)+",@t),dp;");
   poly inv,delta,tee,j;
   ideal id=imap(bsr,id);
   matrix @m[size(id)+1][1];
@@ -215,10 +215,10 @@ EXAMPLE: example reduction; shows an example
      poly v=product(maxideal(1));
 
   //------------- changes the basering bsr to bsr[@(0),...,@(z)] ----------
-  execute "ring s="+charstr(basering)+",("+varstr(basering)+",@(0..z)),dp;";
+  execute("ring s="+charstr(basering)+",("+varstr(basering)+",@(0..z)),dp;");
 // Ev hier die Reihenfolge der Vars aendern. Dazu muss unten aber entsprechend
 // geaendert werden:
-//  execute "ring s="+charstr(basering)+",(@(0..z),"+varstr(basering)+"),dp;";
+//  execute("ring s="+charstr(basering)+",(@(0..z),"+varstr(basering)+"),dp;");
 
   //constructs the leading ideal of dom=(p-@(0),dom[1]-@(1),...,dom[z]-@(z))
      ideal dom=imap(bsr,dom);

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: algebra.lib,v 1.4 1999-08-05 10:53:29 obachman Exp $";
+version="$Id: algebra.lib,v 1.5 2000-05-12 12:25:41 Singular Exp $";
 info="
 LIBRARY:  algebra.lib   PROCEDURES FOR COMPUTING WITH ALGBRAS AND MAPS
 AUTHORS:  Gert-Martin Greuel, email: greuel@mathematik.uni-kl.de,
@@ -583,7 +583,7 @@ EXAMPLE: example is_surjective; shows an example
     int ii,t=1,1;
     string mp=string(minpoly);
   // ------------ create new ring with extra variables ---------------------
-  execute ("ring R=("+charstr(br)+"),(x(1..n),y(1..m)),(dp(n),dp(m));");
+    execute ("ring R=("+charstr(br)+"),(x(1..n),y(1..m)),(dp(n),dp(m));");
     execute ("minpoly=number("+mp+");");
     ideal vars = x(1..n);
     map emb = br,vars;
@@ -654,7 +654,7 @@ EXAMPLE: example is_bijective; shows an example
     int ii,t = 1,1;
     string mp=string(minpoly);
   // ------------ create new ring with extra variables ---------------------
-  execute ("ring R=("+charstr(br)+"),(x(1..n),y(1..m)),(dp(n),dp(m));");
+    execute ("ring R=("+charstr(br)+"),(x(1..n),y(1..m)),(dp(n),dp(m));");
     execute ("minpoly=number("+mp+");");
     ideal vars = x(1..n);
     map emb = br,vars;

@@ -1,8 +1,8 @@
-e// $Id: classify.lib,v 1.41 2000-05-05 18:40:29 obachman Exp $
+e// $Id: classify.lib,v 1.42 2000-05-12 12:25:41 Singular Exp $
 // KK, last modified: 04.04.1998
 ///////////////////////////////////////////////////////////////////////////////
 
-version  = "$Id: classify.lib,v 1.41 2000-05-05 18:40:29 obachman Exp $";
+version  = "$Id: classify.lib,v 1.42 2000-05-12 12:25:41 Singular Exp $";
 info="
 LIBRARY:  classify.lib  Procedures for the Arnold-Classifier of Singularities
 
@@ -2367,8 +2367,8 @@ proc Singularitaet (string typ,int k,int r,int s,poly a,poly b,poly c,poly d)
     string Key = "I_", typ;
     S = "f = ", Tp, ";";
     debug_log(2,"S=", S, " Tp=", Tp, "Key=", Key);
-    execute S;
-    execute read(dbmLink, Key)+";";
+    execute(S);
+    execute(read(dbmLink, Key)+";");
     debug_log(1, "Polynom f=", f,  "  crk=", crk, "  Mu=", Mu,
                 " MlnCd=", MlnCd);
     v = f, crk, Mu, MlnCd;
@@ -2485,7 +2485,7 @@ EXAMPLE:  example init_debug; shows an example"
     string s=system("getenv", "SG_DEBUG");
     if( s != "" && defined(@DeBug)==0) {
       s="newDebug="+s;
-      execute s;
+      execute(s);
     }
   }
   if( defined(@DeBug) == 0) {
@@ -2657,7 +2657,7 @@ proc Show(poly g)
   string s;
   def ring_save=basering;
 
-  execute @ringdisplay;
+  execute(@ringdisplay);
   map showpoly=ring_save,maxideal(1);
   s = string(showpoly(g));
   setring ring_save;
@@ -2707,7 +2707,7 @@ proc DecodeNormalFormString (string S_in)
   if( find(s1, ",") == 0) {
     debug_log(8, "  Number of columns: 0");
     s2 = "k = "+s1+";";
-    execute s2;
+    execute(s2);
     if( (Typ=="A[") || (Typ=="D[") ) { s3 = "k"; }
     if( Typ == "E[") { t = 6; }
     if( Typ == "W[") { t = 12; }
@@ -2742,12 +2742,12 @@ proc DecodeNormalFormString (string S_in)
   else {
     b  = find(s1, ",");
     s2 = "k = ",s1[1..b-1],";";
-    execute s2;
+    execute(s2);
     s1 = s1[b+1..size(s1)];
     if(find(s1, ",") == 0) {
       debug_log(8, "  Number of columns 1");
       s2 = "r = "+s1+";";
-      execute s2;
+      execute(s2);
       s4 = "r";
       s3 = "k";
       if(r==0) { s4 = string(0); }
@@ -2767,9 +2767,9 @@ proc DecodeNormalFormString (string S_in)
       debug_log(2, "Y[k,r,s] / Z[k,r,s] / T[k,r,s]");
       b  = find(s1, ",");
       s2 = "r = ",s1[1..b-1],";";
-      execute s2;
+      execute(s2);
       s2 = "s = ",s1[b+1..size(s1)],";";
-      execute s2;
+      execute(s2);
       if(Typ=="Y[") { s2 = "Y[k,r,s]"; }
       if(Typ=="Z[") { s2 = "Z[k,r,s]"; }
       if(Typ=="T[") { s2 = "T[k,r,s]"; }

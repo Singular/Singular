@@ -1,8 +1,8 @@
-// $Id: finvar.lib,v 1.26 2000-05-02 14:52:48 Singular Exp $
+// $Id: finvar.lib,v 1.27 2000-05-12 12:25:43 Singular Exp $
 // author: Agnes Eileen Heydtmann, email:agnes@math.uni-sb.de
 // last change: 98/11/05
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.26 2000-05-02 14:52:48 Singular Exp $"
+version="$Id: finvar.lib,v 1.27 2000-05-12 12:25:43 Singular Exp $"
 info="
 LIBRARY:  finvar.lib       LIBRARY TO CALCULATE INVARIANT RINGS OF FINITE GROUPS
 AUTHOR: Agnes E. Heydtmann, email: agnes@math.uni-sb.de
@@ -764,19 +764,20 @@ EXAMPLE: example molien; shows an example
  //----------------- generating ring of characteristic 0 ----------------------
     if (minpoly==0)
     { if (i>size(chst))
-      { execute "ring "+newring+"=0,("+varstr(br)+"),("+ordstr(br)+")";
+      { execute("ring "+newring+"=0,("+varstr(br)+"),("+ordstr(br)+")");
       }
       else
       { chst=chst[i..size(chst)];
-        execute "ring "+newring+"=(0"+chst+"),("+varstr(br)+"),("+ordstr(br)+")";
+        execute
+        ("ring "+newring+"=(0"+chst+"),("+varstr(br)+"),("+ordstr(br)+")");
       }
     }
     else
     { string minp=string(minpoly);
       minp=minp[2..size(minp)-1];
       chst=chst[i..size(chst)];
-      execute "ring "+newring+"=(0"+chst+"),("+varstr(br)+"),("+ordstr(br)+")";
-      execute "minpoly="+minp;
+      execute("ring "+newring+"=(0"+chst+"),("+varstr(br)+"),("+ordstr(br)+")");
+      execute("minpoly="+minp);
     }
     matrix I=diag(1,n);
     poly v1=maxideal(1)[1];            // the Molien series will be in terms of
@@ -812,7 +813,7 @@ EXAMPLE: example molien; shows an example
         }
       }
       setring `newring`;
-      execute "matrix G(i)["+string(n)+"]["+string(n)+"]="+stM(i);
+      execute("matrix G(i)["+string(n)+"]["+string(n)+"]="+stM(i));
       p=det(I-v1*G(i));                // denominator of new term -
       M[1,1]=M[1,1]*p+M[1,2];          // expanding M[1,1]/M[1,2] + 1/p
       M[1,2]=M[1,2]*p;
@@ -1201,19 +1202,20 @@ EXAMPLE: example reynolds_molien; shows an example
     }
     if (minpoly==0)
     { if (i>size(chst))
-      { execute "ring "+newring+"=0,("+varstr(br)+"),("+ordstr(br)+")";
+      { execute("ring "+newring+"=0,("+varstr(br)+"),("+ordstr(br)+")");
       }
       else
       { chst=chst[i..size(chst)];
-        execute "ring "+newring+"=(0"+chst+"),("+varstr(br)+"),("+ordstr(br)+")";
+        execute
+	("ring "+newring+"=(0"+chst+"),("+varstr(br)+"),("+ordstr(br)+")");
       }
     }
     else
     { string minp=string(minpoly);
       minp=minp[2..size(minp)-1];
       chst=chst[i..size(chst)];
-      execute "ring "+newring+"=(0"+chst+"),("+varstr(br)+"),("+ordstr(br)+")";
-      execute "minpoly="+minp;
+      execute("ring "+newring+"=(0"+chst+"),("+varstr(br)+"),("+ordstr(br)+")");
+      execute("minpoly="+minp);
     }
     poly v1=var(1);                    // the Molien series will be in terms of
                                        // the first variable of the current
@@ -1233,7 +1235,7 @@ EXAMPLE: example reynolds_molien; shows an example
       }
     }
     setring `newring`;
-    execute "matrix G(1)["+string(n)+"]["+string(n)+"]="+stM(1);
+    execute("matrix G(1)["+string(n)+"]["+string(n)+"]="+stM(1));
     matrix A(2)[1][2];                 // A(2) will contain the Molien series -
     A(2)[1,1]=1;                       // A(2)[1,1] will be the numerator
     A(2)[1,2]=det(I-v1*(G(1)));        // A(2)[1,2] will be the denominator -
@@ -1270,7 +1272,7 @@ EXAMPLE: example reynolds_molien; shows an example
           }
         }
         setring `newring`;
-        execute "matrix G(i)["+string(n)+"]["+string(n)+"]="+stM(i);
+        execute("matrix G(i)["+string(n)+"]["+string(n)+"]="+stM(i));
         p=det(I-v1*G(i));              // denominator of new term -
         A(2)[1,1]=A(2)[1,1]*p+A(2)[1,2]; // expanding A(2)[1,1]/A(2)[1,2] +1/p
         A(2)[1,2]=A(2)[1,2]*p;
@@ -1329,7 +1331,7 @@ EXAMPLE: example reynolds_molien; shows an example
             }
           }
           setring `newring`;
-          execute "matrix G(g)["+string(n)+"]["+string(n)+"]="+stM(g);
+          execute("matrix G(g)["+string(n)+"]["+string(n)+"]="+stM(g));
           p=det(I-v1*G(g));            // denominator of new term
           A(2)[1,1]=A(2)[1,1]*p+A(2)[1,2];
           A(2)[1,2]=A(2)[1,2]*p;       // expanding A(2)[1,1]/A(2)[1,2] + 1/p -
@@ -1472,8 +1474,8 @@ EXAMPLE: example partial_molien; shows an example
     }
     poly A(1)=M[1,2];                  // denominator of Molien series (for now)
     string mp=string(minpoly);
-    execute "ring R=("+charstr(br)+"),("+varstr(br)+"),ds;";
-    execute "minpoly=number("+mp+");";
+    execute("ring R=("+charstr(br)+"),("+varstr(br)+"),ds;");
+    execute("minpoly=number("+mp+");");
     poly A(1)=0;                       // A(1) will contain the sum of n terms -
     poly min;                          // min will be our smallest term -
     poly A(2)=fetch(br,A(2));          // fetching A(2) and M[1,2] into R
@@ -1595,9 +1597,9 @@ EXAMPLE: example invariant_basis; shows an example
     }
   }
  //----------------------------------------------------------------------------
-  execute "ring T=("+charstr(br)+"),("+varstr(br)+",p(1..m)),lp;";
+  execute("ring T=("+charstr(br)+"),("+varstr(br)+",p(1..m)),lp;");
   // p(1..m) are the general coefficients of the general polynomial of degree g
-  execute "ideal vars="+varstr(br)+";";
+  execute("ideal vars="+varstr(br)+";");
   map f;
   ideal mon=imap(br,mon);
   poly P=0;
@@ -3044,7 +3046,7 @@ proc search_random (int n,int d,ideal B,int cd,ideal P,int i,int dif,int dB,idea
             flag=0;
           }
           if (not(flag))
-          { execute "test_dim="+string(answer[1..size(answer)]);
+          { execute("test_dim="+string(answer[1..size(answer)]));
             if (test_dim<=max)
             { flag=1;
             }
@@ -3153,7 +3155,7 @@ proc p_search_random (int n,int d,ideal B,int cd,ideal P,int i,int dif,int dB,id
               flag=0;
             }
             if (not(flag))
-            { execute "test_dim="+string(answer[1..size(answer)]);
+            { execute("test_dim="+string(answer[1..size(answer)]));
               if (test_dim<=max)
               { flag=1;
               }
@@ -5115,8 +5117,8 @@ EXAMPLE: example secondary_not_cohen_macaulay; shows an example
   // ring, generated by the primary invariants
   string mp=string(minpoly);           // generating a ring where we can do
                                        // elimination
-  execute "ring R=("+charstr(br)+"),(x(1..n),y(1..n),h),dp;";
-  execute "minpoly=number("+mp+");";
+  execute("ring R=("+charstr(br)+"),(x(1..n),y(1..n),h),dp;");
+  execute("minpoly=number("+mp+");");
   map f=br,maxideal(1);                // canonical mapping
   matrix M[k][m+k*n];
   M[1..k,1..m]=matrix(f(M(2)));        // will contain a module -
@@ -5639,15 +5641,15 @@ EXAMPLE: example orbit_variety; shows an example
     int n=nvars(br);
     int m=ncols(F);
     string mp=string(minpoly);
-    execute "ring R=("+charstr(br)+"),("+varstr(br)+",y(1..m)),dp;";
-    execute "minpoly=number("+mp+");";
+    execute("ring R=("+charstr(br)+"),("+varstr(br)+",y(1..m)),dp;");
+    execute("minpoly=number("+mp+");");
     ideal I=ideal(imap(br,F));
     for (int i=1;i<=m;i++)
     { I[i]=I[i]-y(i);
     }
     I=elim(I,1,n);
-    execute "ring "+newring+"=("+charstr(br)+"),(y(1..m)),dp(m);";
-    execute "minpoly=number("+mp+");";
+    execute("ring "+newring+"=("+charstr(br)+"),(y(1..m)),dp(m);");
+    execute("minpoly=number("+mp+");");
     ideal vars;
     for (i=2;i<=n;i++)
     { vars[i]=0;
@@ -5657,7 +5659,6 @@ EXAMPLE: example orbit_variety; shows an example
     ideal G=emb(I);
     kill emb, vars, R;
     keepring `newring`;
-    // execute "keepring "+newring+";";
     return();
   }
   else
@@ -5700,8 +5701,8 @@ EXAMPLE: example relative_orbit_variety; shows an example
     int n=nvars(br);
     int m=ncols(F);
     string mp=string(minpoly);
-    execute "ring R=("+charstr(br)+"),("+varstr(br)+",y(1..m)),lp;";
-    execute "minpoly=number("+mp+");";
+    execute("ring R=("+charstr(br)+"),("+varstr(br)+",y(1..m)),lp;");
+    execute("minpoly=number("+mp+");");
     ideal J=ideal(imap(br,F));
     ideal I=imap(br,I);
     for (int i=1;i<=m;i++)
@@ -5726,8 +5727,8 @@ EXAMPLE: example relative_orbit_variety; shows an example
       }
     }
     G=compress(G);
-    execute "ring "+newring+"=("+charstr(br)+"),(y(1..m)),lp;";
-    execute "minpoly=number("+mp+");";
+    execute("ring "+newring+"=("+charstr(br)+"),(y(1..m)),lp;");
+    execute("minpoly=number("+mp+");");
     ideal vars;
     for (i=2;i<=n;i++)
     { vars[i]=0;
@@ -5737,7 +5738,6 @@ EXAMPLE: example relative_orbit_variety; shows an example
     ideal G=emb(G);
     kill vars, emb;
     keepring `newring`;
-    // execute "keepring "+newring+";";
     return();
   }
   else
@@ -5774,7 +5774,7 @@ EXAMPLE: example image_of_variety; shows an example
     int n=nvars(br);
     string newring="E";
     relative_orbit_variety(I,F,newring);
-    execute "ring R=("+charstr(br)+"),("+varstr(br)+","+varstr(E)+"),lp;";
+    execute("ring R=("+charstr(br)+"),("+varstr(br)+","+varstr(E)+"),lp;");
     ideal F=imap(br,F);
     for (int i=1;i<=n;i++)
     { F=0,F;

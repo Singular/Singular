@@ -1,8 +1,8 @@
-// $Id: deform.lib,v 1.20 2000-05-12 12:20:25 krueger Exp $
+// $Id: deform.lib,v 1.21 2000-05-12 12:25:42 Singular Exp $
 // author: Bernd Martin email: martin@math.tu-cottbus.de
 //(bm, last modified 4/98)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: deform.lib,v 1.20 2000-05-12 12:20:25 krueger Exp $";
+version="$Id: deform.lib,v 1.21 2000-05-12 12:25:42 Singular Exp $";
 info="
 LIBRARY:  deform.lib       PROCEDURES FOR COMPUTING MINIVERSAL DEFORMATION
 
@@ -659,10 +659,10 @@ Sub-procedure: creating ring-extensions
    string my_Qx = my+"Qx";
    string my_Ox = my+"Ox";
    string my_So = my+"So";
-  extendring(my_Px,e1,my_var,my_ord);
+   extendring(my_Px,e1,my_var,my_ord);
    ideal Io  = imap(Po,Io);         attrib(Io,"isSB",1);
    my ="qring "+my_Qx+" = Io;       export("+my_Qx+");";
-  execute(my);
+   execute(my);
    if (switch)
    {
      setring `my_Px`;

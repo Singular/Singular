@@ -1,8 +1,8 @@
-// $Id: factor.lib,v 1.6 1998-05-14 18:44:59 Singular Exp $
+// $Id: factor.lib,v 1.7 2000-05-12 12:25:43 Singular Exp $
 //(RS)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: factor.lib,v 1.6 1998-05-14 18:44:59 Singular Exp $";
+version="$Id: factor.lib,v 1.7 2000-05-12 12:25:43 Singular Exp $";
 info="
 LIBRARY:  factor.lib    PROCEDURES FOR CALLING THE REDUCE FACTORIZER
 
@@ -72,7 +72,7 @@ EXAMPLE: example reduce_factor; shows an example
   if ( resultstring <> "" )
   {
     resultstring = delete_dollar( resultstring );
-    execute resultstring;
+    execute(resultstring);
   }
   // remove tmp-files after usage */
   system( "sh", "/bin/rm " + outname );

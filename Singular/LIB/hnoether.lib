@@ -1,9 +1,9 @@
-// $Id: hnoether.lib,v 1.19 2000-04-27 21:06:09 lamm Exp $
+// $Id: hnoether.lib,v 1.20 2000-05-12 12:25:47 Singular Exp $
 // last change:           27.04.00
 ///////////////////////////////////////////////////////////////////////////////
 // This library is for Singular 1-3-7 or newer
 
-version="$Id: hnoether.lib,v 1.19 2000-04-27 21:06:09 lamm Exp $";
+version="$Id: hnoether.lib,v 1.20 2000-05-12 12:25:47 Singular Exp $";
 info="
 LIBRARY:  hnoether.lib   Procedures for the Hamburger-Noether (Puiseux) development
 
@@ -280,7 +280,7 @@ EXAMPLE: example squarefree; shows some examples.
     gcd_ok=(tststr==string(char(basering)));
   }
   execute("ring rsqrf = ("+charstr(altring)+"),(x,y),dp;");
-  if ((gcd_ok!=0) && (mipl!="0")) { execute "minpoly="+mipl+";"; }
+  if ((gcd_ok!=0) && (mipl!="0")) { execute("minpoly="+mipl+";"); }
   poly f=fetch(altring,f);
   poly dif,g,l;
   if ((char(basering)==0) and (charstr(basering)!=string(char(basering)))
@@ -375,7 +375,7 @@ EXAMPLE: example allsquarefree;  shows an example
    }
  }
  execute("ring rsqrf = ("+charstr(altring)+"),(x,y),dp;");
- if (mipl!="0") { execute "minpoly="+mipl+";"; }
+ if (mipl!="0") { execute("minpoly="+mipl+";"); }
  poly f=fetch(altring,f);
  poly l=fetch(altring,l);
  //---------- eliminiere bereits mit squarefree gefundene Faktoren ------------
@@ -557,7 +557,7 @@ EXAMPLES: example develop; shows an example
    string mipl=string(minpoly);
    execute("ring guenstig = ("+charstr(altring)+"),(x,y),ls;");
    if ((char(basering)==0) && (mipl!="0")) {
-     execute "minpoly="+mipl+";";
+     execute("minpoly="+mipl+";");
    }}
  else { def guenstig=basering; }
  export guenstig;
@@ -590,7 +590,7 @@ EXAMPLES: example develop; shows an example
  map xytausch = basering,y,x;
  if ((p!=0) and (ringchar != string(p))) {
                             // coefficient field is extension of Z/pZ
-   execute "int n_elements="+ringchar[1,size(ringchar)-2]+";";
+   execute("int n_elements="+ringchar[1,size(ringchar)-2]+";");
                             // number of elements of actual ring
    number generat=par(1);   // generator of the coefficient field of the ring
  }
@@ -1788,7 +1788,7 @@ EXAMPLE: example displayHNE; shows an example
  if (parstr(basering)!="") {
    if (charstr(basering)!=string(char(basering))+","+parstr(basering)) {
      execute
-       "ring dazu=("+charstr(basering)+"),z(0.."+string(size(v)-1)+"),ls;";
+      ("ring dazu=("+charstr(basering)+"),z(0.."+string(size(v)-1)+"),ls;");
    }
    else { ring dazu=char(altring),z(0..size(v)-1),ls; }
  }
@@ -2058,16 +2058,16 @@ EXAMPLE: example extdevelop;  shows an example
      tststr=tststr[1..find(tststr,",")-1];     //-> "p^k" bzw. "p"
      if (tststr==string(p)) {
        if (size(parstr(basering))>1) {         // ring (p,a,..),...
-        execute "ring extdguenstig=("+charstr(basering)+"),(x,y),ls;";
+        execute("ring extdguenstig=("+charstr(basering)+"),(x,y),ls;");
        }
        else {                                  // ring (p,a),...
         string mipl=string(minpoly);
         ring extdguenstig=(p,`parstr(basering)`),(x,y),ls;
-        if (mipl!="0") { execute "minpoly="+mipl+";"; }
+        if (mipl!="0") { execute("minpoly="+mipl+";"); }
        }
      }
      else {
-       execute "ring extdguenstig=("+charstr(basering)+"),(x,y),ls;";
+       execute("ring extdguenstig=("+charstr(basering)+"),(x,y),ls;");
      }
   }
   else {                               // charstr(basering)== p : no parameter
@@ -2313,10 +2313,10 @@ EXAMPLE: example HNdevelop;  shows an example
      (charstr(basering)<>"real")) {
    string strmip=string(minpoly);
    string strf=string(f);
-   execute "ring tempr=("+string(char(basering))+","+parstr(basering)+"),("
-           +varstr(basering)+"),dp;";
-   execute "minpoly="+strmip+";";
-   execute "poly f="+strf+";";
+   execute("ring tempr=("+string(char(basering))+","+parstr(basering)+"),("
+           +varstr(basering)+"),dp;");
+   execute("minpoly="+strmip+";");
+   execute("poly f="+strf+";");
    list hne=reddevelop(f);
    if ((voice==2) && (printlevel > -1)) {
      "// Attention: The parameter",par(1),"has changed its meaning!";
@@ -2340,7 +2340,7 @@ EXAMPLE: example HNdevelop;  shows an example
      def altring=basering;
      string strmip=string(minpoly);
      ring HNEring=(char(altring),`parstr(altring)`),(x,y),ls;
-     execute "minpoly="+strmip+";";
+     execute("minpoly="+strmip+";");
      export HNEring;
      poly f=fetch(altring,f);
      list hn=develop(f,-1);
@@ -2494,17 +2494,17 @@ static proc pre_HN (poly f, int essential)
      " ** We try to develop this polynomial, but if the need for an extension";
      " ** occurs during the calculation, we cannot proceed with the";
      " ** corresponding branches ...";
-     execute "ring HNEring=("+charstr(basering)+"),(x,y),ls;";
+     execute("ring HNEring=("+charstr(basering)+"),(x,y),ls;");
  //--- ring ...=(char(.),`parstr()`),... geht nicht, wenn mehr als 1 Param. ---
    }
    else {
     string pa=parstr(altring);
     ring HNhelpring=p,`pa`,dp;
-    execute "poly mipo="+mipl+";";   // Minimalpolynom in Polynom umgewandelt
+    execute("poly mipo="+mipl+";");  // Minimalpolynom in Polynom umgewandelt
     ring HNEring=(p,a),(x,y),ls;
     map getminpol=HNhelpring,a;
     mipl=string(getminpol(mipo));    // String umgewandelt mit 'a' als Param.
-    execute "minpoly="+mipl+";";     // "minpoly=poly is not supported"
+    execute("minpoly="+mipl+";");     // "minpoly=poly is not supported"
     kill HNhelpring, getminpol;
    }
    if (nvars(altring)==2) { poly f=fetch(altring,f); }
