@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.17 1998-08-05 07:07:05 wichmann Exp $
+;; $Id: singular.el,v 1.18 1998-08-05 20:42:58 wichmann Exp $
 
 ;;; Commentary:
 
@@ -258,47 +258,81 @@ NOT READY [should be rewritten completely.  Interface should stay the same.]!"
 		     'singular-interactive-mode-map)))
   (define-key singular-interactive-mode-map "\C-m" 'singular-send-or-copy-input))
 
+(defvar singular-interactive-mode-menu-1 nil
+  "NOT READY [docu]")
+
+(defvar singular-interactive-mode-menu-2 nil
+  "NOT READY [docu]")
+
+(if singular-interactive-mode-menu-1
+    ()
+  (cond
+   ;; XEmacs
+   ((eq singular-emacs-flavor 'xemacs)
+    (easy-menu-define
+     singular-interactive-mode-menu-1
+     singular-interactive-mode-map ""
+     '("Singular"
+       ["start default" singular-other t]
+       ["start" singular t]
+       ["exit" singular-exit-singular t])))))
+
+(if singular-interactive-mode-menu-2
+    ()
+  (cond
+   ;; XEmacs
+   ((eq singular-emacs-flavor 'xemacs)
+    (easy-menu-define 
+     singular-interactive-mode-menu-2
+     singular-interactive-mode-map ""
+     '("Commands"
+       ["load file..." singular-load-file t]
+       ("load library"
+	["all.lib" (singular-load-library "all.lib" t) t]
+	["general.lib" (singular-load-library "general.lib" t) t]
+	["matrix.lib" (singular-load-library "matrix.lib" t) t]
+	["sing.lib" (singular-load-library "sing.lib" t) t]
+	["elim.lib" (singular-load-library "elim.lib" t) t]
+	["inout.lib" (singular-load-library "inout.lib" t) t]
+	["random.lib" (singular-load-library "random.lib" t) t]
+	["deform.lib" (singular-load-library "deform.lib" t) t]
+	["homolg.lib" (singular-load-library "homolog.lib" t) t]
+	["poly.lib" (singular-load-library "poly.lib" t) t]
+	["factor.lib" (singular-load-library "factor.lib" t) t]
+	["ring.lib" (singular-load-library "ring.lib" t) t]
+	["primdec.lib" (singular-load-library "primdex.lib" t) t]
+	"---"
+	["other..." singular-load-library t])
+       "---"
+       ["load demo" singular-demo-load (not singular-demo-mode)]
+       ["exit demo" singular-demo-exit singular-demo-mode]
+       "---"
+       ["truncate lines" (setq truncate-lines (not truncate-lines))
+	:style toggle :selected truncate-lines]
+       "---"
+       ["fold last output" (singular-do-folding 'last) t]
+       ["fold all output" (singular-do-folding 'all) t]
+       ["fold at point" (singular-do-folding 'at-point) t]
+       ["unfold last output" (singular-do-folding 'last 'unfold) t]
+       ["unfold all output" (singular-do-folding 'all 'unfold) t]
+       ["unfold at point" (singular-do-folding 'at-point 'unfold) t]
+       )))))
+
 ;; NOT READY
 ;; This is just a temporary hack for XEmacs demo.
-(defvar singular-interactive-mode-menu nil)
-(defvar singular-interactive-mode-menu-2
-  (purecopy '("Singular"
-	      ["start default" singular-other t]
-	      ["start..." singular t]
-	      ["exit" singular t])))
+(defvar singular-install-in-main-menu nil
+  "NOT READY [docu]")
 
-(defvar singular-interactive-mode-menu-1
-  '("Commands"
-    ["load file..." singular-load-file t]
-    ("load library"
-     ["all.lib" (singular-load-library "all.lib" t) t]
-     ["general.lib" (singular-load-library "general.lib" t) t]
-     ["matrix.lib" (singular-load-library "matrix.lib" t) t]
-     ["sing.lib" (singular-load-library "sing.lib" t) t]
-     ["elim.lib" (singular-load-library "elim.lib" t) t]
-     ["inout.lib" (singular-load-library "inout.lib" t) t]
-     ["random.lib" (singular-load-library "random.lib" t) t]
-     ["deform.lib" (singular-load-library "deform.lib" t) t]
-     ["homolg.lib" (singular-load-library "homolog.lib" t) t]
-     ["poly.lib" (singular-load-library "poly.lib" t) t]
-     ["factor.lib" (singular-load-library "factor.lib" t) t]
-     ["ring.lib" (singular-load-library "ring.lib" t) t]
-     ["primdec.lib" (singular-load-library "primdex.lib" t) t]
-     "---"
-     ["other..." singular-load-library t])
-    "---"
-    ["load demo" singular-demo-load (not singular-demo-mode)]
-    ["exit demo" singular-demo-exit singular-demo-mode]
-    "---"
-    ["truncate lines" (setq truncate-lines (not truncate-lines))
-       :style toggle :selected truncate-lines]
-    ["fold last section" singular t]
-    ["fold current section" singular t]
-    ["fold all sections" singular t]
-    ))
-
-;;(add-menu-button nil ["Singular" (singular) t] "Start Singular")
-;;}}}
+(if singular-install-in-main-menu
+    (cond
+     ;; XEmacs
+     ((eq singular-emacs-flavor 'xemacs)
+      (message "installing main-menu")
+      (add-submenu nil 
+		   '("Singular"
+		     ["start default" singular-other t]
+		     ["start" singular t]
+		     ["exit" singular-exit-singular t])))))
 
 ;;{{{ Syntax table
 (defvar singular-interactive-mode-syntax-table nil
@@ -351,20 +385,49 @@ VALUE."
 (defun singular-load-file (file &optional noexpand)
   "docu NOT READY"
   (interactive "fLoad file: ")
-  (let ((filename (if noexpand
-		      file
-		    (expand-file-name file))))
-    (singular-send-string (get-buffer-process (current-buffer))
-			  (concat "< \"" filename "\";"))))
+  (let* ((filename (if noexpand file (expand-file-name file)))
+	 (string (concat "< \"" filename "\";"))
+	 (process (get-buffer-process (current-buffer))))
+    (singular-input-filter process string)
+    (singular-send-string process string)))
 
 (defun singular-load-library (file &optional noexpand)
   "docu NOT READY"
   (interactive "fLoad Library: ")
-  (let ((filename (if noexpand
-		      file
-		    (expand-file-name file))))
-    (singular-send-string (get-buffer-process (current-buffer))
-			  (concat "LIB \"" filename "\";"))))
+  (let* ((filename (if noexpand file (expand-file-name file)))
+	 (string (concat "LIB \"" filename "\";"))
+	 (process (get-buffer-process (current-buffer))))
+    (singular-input-filter process string)
+    (singular-send-string process string)))
+
+(defun singular-exit-singular 
+  "NOT READY [docu]"
+  (interactive)
+  (let ((string "quit;")
+	(process (get-buffer-process (current-buffer))))
+    (singular-input-filter process string)
+    (singular-send-string process string)))
+
+(defun singular-do-folding (where &optional unfold)
+  "NOT READY [docu]
+WHERE= 'last or 'all --> just output sections
+WHERE= 'at-point --> whatever is at point"
+  (let (which)
+    (cond 
+     ((eq where 'last)
+      (setq which (list (singular-latest-output-section t))))
+     ((eq where 'at-point)
+      (setq which (list (singular-section-at (point)))))
+     ((eq where 'all)
+      (setq which (singular-section-in (point-min) (point-max))))
+     (t 
+      (message "singular-do-folding: wrong argument")))
+    (while which
+      (let* ((current (car which))
+	    (is-folded (singular-section-foldedp current)))
+	(and (if unfold is-folded (not is-folded))
+	     (singular-fold-section current)))
+      (setq which (cdr which)))))
 ;;}}}
 
 ;;{{{ Customizing variables of comint
@@ -793,7 +856,11 @@ Updates `singular-simple-sec-last-end', too."
 (defun singular-xemacs-simple-sec-start-at (pos)
   "Return start of clear section at position POS.
 Assumes that no narrowing is in effect."
-  (let ((previous-extent-change (1+ (point))))
+  ;; if previous-extent-change is called with an argument bigger
+  ;; than (1+ (buffer-size))  (not (point-max)!), we get an error!
+  (let ((previous-extent-change (if (> (point) (buffer-size))
+				    (point)
+				  (1+ (point)))))
     ;; this `while' loop at last will run into the end of the next
     ;; non-clear extent or stop at bob.  Since POS may be right at the end
     ;; of a previous non-clear location, we have to search at least one
@@ -1610,18 +1677,25 @@ are run.
 NOT READY [much more to come.  See shell.el.]!"
   (interactive)
 
+  ;; remove existing singular-start-menu from menu (XEmacs)
+  ;, NOT READY
+  ;; This is mayby just temporary
+;  (cond
+;   ;; XEmacs
+;   ((eq singular-emacs-flavor 'xemacs)
+;    (delete-menu-item '("Singular"))))
+
   ;; run comint mode and do basic mode setup
   (comint-mode)
   (setq major-mode 'singular-interactive-mode)
   (setq mode-name "Singular Interaction")
   (use-local-map singular-interactive-mode-map)
   (set-syntax-table singular-interactive-mode-syntax-table)
-  (if singular-interactive-mode-menu
-      ()
-    (easy-menu-define singular-interactive-mode-menu 
-		      singular-interactive-mode-map ""
-		      singular-interactive-mode-menu-1))
-  (easy-menu-add singular-interactive-mode-menu)
+  (cond
+   ;; XEmacs
+   ((eq singular-emacs-flavor 'xemacs)
+    (easy-menu-add singular-interactive-mode-menu-1)
+    (easy-menu-add singular-interactive-mode-menu-2)))
   (setq comment-start "// ")
   (setq comment-start-skip "// *")
   (setq comment-end "")
