@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.59 1999-07-09 14:06:50 obachman Exp $ */
+/* $Id: ring.cc,v 1.60 1999-07-09 15:27:28 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -607,6 +607,21 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
     goto rInitError;
   }
 
+  /* check names nad parameters for conflicts ------------------------- */
+  {
+    int i,j;
+    for(i=0;i<R->P; i++)
+    {
+      for(j=0;j<R->N;j++)
+      {
+        if (strcmp(R->parameter[i],R->names[j])==0)
+        {
+          Werror("parameter %d conflicts with variable %d",i+1,j+1);
+          goto rInitError;
+        }
+      }
+    }
+  }
   /* ordering -------------------------------------------------------------*/
   if (rSleftvOrdering2Ordering(ord, R))
     goto rInitError;
