@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: solve.lib,v 1.4 1999-07-02 11:58:07 greuel Exp $";
+version="$Id: solve.lib,v 1.5 1999-07-02 12:47:47 greuel Exp $";
 info="
 LIBRARY: solve.lib     PROCEDURES TO SOLVE POLYNOMIAL SYSTEMS
 AUTHOR:  Moritz Wenk,  email: wenk@mathematik.uni-kl.de
@@ -134,8 +134,8 @@ example
 {
   "EXAMPLE:";echo=2;
   // Find all roots of an univariate polynomial using Laguerre's method:
-  ring rs1= 0,(x1,x2),lp;
-  poly f = 15*x1^5 + x1^3 + x1^2 - 10;
+  ring rs1= 0,(x,y),lp;
+  poly f = 15x5 + x3 + x2 - 10;
   laguerre_solve(f);
 
   pause;
@@ -144,9 +144,10 @@ example
 
   pause;
   // Now with complex coefficients, precision is 20 digits:
-  ring rsc= (real,20,I),(x1,x2),lp;
-  poly f = (15+I*5)*x1^5 + (2+I*2)*x1^3 + x1^2 - 10*I;
-  laguerre_solve(f);
+  ring rsc= (real,20,I),x,lp;
+  poly f = (15+I*5)*x^5 + (0.25+I*2)*x^3 + x2 - 10*I;
+  list l = laguerre_solve(f);
+  l;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -234,17 +235,15 @@ example
 {
   "EXAMPLE:";  echo=2;
   ring r1 = 0,(x),lp;
-  // First example:
-  // deg(f) = 4, 
+  // determine f with deg(f) = 4 and
   // v = values of f at points 3^0, 3^1, 3^2, 3^3, 3^4
   ideal v=16,0,11376,1046880,85949136;
   interpolate( 3, v, 4 );
 
   ring r2 = 0,(x,y),dp;
-  // Second example: 
-  // deg(f) = 3
+  // determine f with deg(f) = 3 and
+  // v = values of f at 16 points (2,3)^0=(1,1),...,(2,3)^15=(2^15,3^15)
   // valuation point (2,3)
-  // v = values at 16 points
   ideal p = 2,3;
   ideal v= 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16;
   interpolate( p,v,3 );
