@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmvec.h,v 1.3 1997-10-06 12:19:13 obachman Exp $
+// $Id: fglmvec.h,v 1.4 1998-01-27 14:25:28 pohl Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -29,6 +29,10 @@ public:
     fglmVector( int size, int basis );
     fglmVector( const fglmVector & v );
     ~fglmVector();
+#ifdef macintosh
+    void mac_constr( const fglmVector & v);
+    void mac_constr_i( int size);
+#endif
     int size() const;
     int numNonZeroElems() const;
 

@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmvec.cc,v 1.5 1998-01-17 18:07:54 Singular Exp $
+// $Id: fglmvec.cc,v 1.6 1998-01-27 14:25:29 pohl Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -16,7 +16,7 @@
 
 #ifdef HAVE_FGLM
 #include "mmemory.h"
-#include "tok.h"
+#include "tok.h" 
 #include "structs.h"
 #include "numbers.h"
 #include "fglm.h"
@@ -142,7 +142,18 @@ fglmVector::~fglmVector()
     if ( rep->deleteObject() )
 	delete rep;
 }
-
+#ifdef macintosh
+void
+fglmVector::mac_constr( const fglmVector & v)
+{
+    rep= v.rep->copyObject();
+}
+void
+fglmVector::mac_constr_i( int size )
+{
+    rep= new fglmVectorRep( size );
+}
+#endif
 void 
 fglmVector::makeUnique()
 {
