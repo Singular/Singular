@@ -10,20 +10,20 @@
 //       try to create spolys as formal sums
 
 #include "tgb.h"
-#if 0
-omBin lm_bin=NULL;
+#if 1
+static omBin lm_bin=NULL;
 static inline poly p_Init_Special(const ring r)
 {
   return p_Init(r,lm_bin);
 }
-static inline poly pOne_Sepcial(const ring r=currRing)
+static inline poly pOne_Special(const ring r=currRing)
 {
   poly rc = p_Init_Special(r);
-  pSetCoeff0(rc,r->cf->nInit(i));
+  pSetCoeff0(rc,r->cf->nInit(1));
   return rc;
 }
 // zum Initialiseren: in t_rep_gb plazieren:
-lm_bin=omGetSpecBin(POLYSIZE + (r->ExpL_Size)*sizeof(long));
+
 #endif
 #define LEN_VAR1
 #define degbound(p) assume(pTotaldegree(p)<10)
@@ -1168,7 +1168,7 @@ static sorted_pair_node** add_to_basis_ideal_quotient(poly h, int i_pos, int j_p
     s->j=min(i,j);
     s->expected_length=c->lengths[i]+c->lengths[j]-2;
       
-    poly lm=pOne();
+    poly lm=pOne_Special();
       
     pLcm(c->S->m[i], c->S->m[j], lm);
     pSetm(lm);
@@ -1868,7 +1868,7 @@ static void go_on (calc_dat* c){
     //remember to free res here
     p=redTailShort(p, c->strat);
     sbuf[j]=add_to_basis_ideal_quotient(p,-1,-1,c,ibuf+j);
-    // sbuf[j]=add_to_basis(p,-1,-1,c,ibuf+j);
+    //sbuf[j]=add_to_basis(p,-1,-1,c,ibuf+j);
   }
   int sum=0;
   for(j=0;j<i;j++){
@@ -3547,7 +3547,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
   i=0;
   c->n=0;
   c->T_deg=(int*) omalloc(n*sizeof(int));
- 
+  lm_bin=omGetSpecBin(POLYSIZE + (r->ExpL_Size)*sizeof(long));
 #ifdef HEAD_BIN
   c->HeadBin=omGetSpecBin(POLYSIZE + (currRing->ExpL_Size)*sizeof(long));
 #endif
@@ -3724,6 +3724,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
     c->strat->S[i]=NULL;
   id_Delete(&c->strat->Shdl,c->r);
   pDelete(&c->tmp_lm);
+  omUnGetSpecBin(&lm_bin);
   delete c->strat;
   omfree(c);
 
@@ -4709,7 +4710,9 @@ void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
   }
   if (erg.to_reduce_u-erg.to_reduce_l>5){
     woc=TRUE;
-    poly m=pOne();
+    // poly m=pOne();
+    poly m=c->tmp_lm;
+    pSetCoeff(m,nInit(1));
     for(int i=1;i<=pVariables;i++)
       pSetExp(m,i,(pGetExp(r[erg.to_reduce_l].p, i)-pGetExp(red,i)));
     pSetm(m);
@@ -4729,7 +4732,7 @@ void multi_reduce_step(find_erg & erg, red_object* r, calc_dat* c){
 //     red_len++;
     red=red_cp;
     red_len=pLength(red);
-    pDelete(&m);
+    // pDelete(&m);
     
   }
   int i;
