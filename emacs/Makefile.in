@@ -47,5 +47,6 @@ install-sharedist: all
 	${INSTALL_DATA} ex-cmpl.el ${emacsdir}
 	${INSTALL_DATA} singular.el ${emacsdir}
 	${INSTALL_DATA} .emacs-singular ${emacsdir}
+	${INSTALL_DATA} .emacs-general ${emacsdir}
 	${INSTALL_DATA} sing.xpm	${emacsdir}
 
