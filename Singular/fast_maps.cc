@@ -6,7 +6,7 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id: fast_maps.cc,v 1.4 2002-01-19 10:15:06 Singular Exp $
+ *  Version: $Id: fast_maps.cc,v 1.5 2002-01-19 10:58:42 obachman Exp $
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>
@@ -15,6 +15,168 @@
 #include "ideals.h"
 #include "ring.h"
 #include "febase.h"
+#include "fast_maps.h"
+
+/*******************************************************************************
+**
+*F  debugging stuff
+*/
+void maMonomial_Out(mapoly monomial, ring src_r, ring dest_r = NULL)
+{
+  p_wrp(monomial->src, src_r);
+  printf(" ref:%d", monomial->ref);
+  if (dest_r != NULL)
+  {
+    printf(" dest:");
+    p_wrp(monomial->dest, dest_r);
+  }
+  printf("\n");
+  fflush(stdout);
+}
+
+void maPoly_Out(mapoly mpoly, ring src_r, ring dest_r = NULL)
+{
+  while (mpoly != NULL)
+  {
+    maMonomial_Out(mpoly, src_r, dest_r);
+    mpoly = mpoly->next;
+  }
+}
+
+
+/*******************************************************************************
+**
+*F  mapolyCreate  . . . . . . . . . . . . . . .  Creates mapoly
+*/
+static omBin mapolyBin = omGetSpecBin(sizeof(mapoly_s));
+static omBin macoeffBin = omGetSpecBin(sizeof(macoeff_s));
+
+mapoly maMonomial_Create(poly p, ring r_p, sBucket_pt bucket = NULL)
+{
+  mapoly mp = (mapoly) omAlloc0Bin(mapolyBin);
+  mp->src = p;
+  p->next = NULL;
+
+  if (bucket != NULL)
+  {
+    mp->coeff = (macoeff) omAlloc0Bin(macoeffBin);
+    mp->coeff->bucket = bucket;
+    mp->coeff->n = pGetCoeff(p);
+  }
+  mp->ref = 1;
+  return mp;
+}
+
+void maMonomial_Destroy(mapoly mp, ring src_r, ring dest_r = NULL)
+{
+  if (mp != NULL)
+  {
+    p_LmFree(mp->src, src_r);
+    if (mp->coeff != NULL)
+    {
+      macoeff coeff, next = mp->coeff;
+      do
+      {
+        coeff = next;
+        next = coeff->next;
+        omFreeBin(coeff, macoeffBin);
+      }
+      while (next != NULL);
+      if (mp->dest != NULL) 
+      {
+        assume(dest_r != NULL);
+        p_Delete(&(mp->dest), dest_r);
+      }
+      omFreeBin(mp, mapolyBin);
+    }
+  }
+}
+
+/*******************************************************************************
+**
+*F  maPoly_InsertMonomial . . . . . . . . .insertion of a monomial into mapoly
+*/
+mapoly maPoly_InsertMonomial(mapoly into, mapoly what, ring src_r)
+{
+  if (into == NULL)
+  {
+    into = what;
+    return what;
+  }
+  
+  mapoly iter = into;
+  mapoly prev = NULL;
+  
+  Top:
+  p_LmCmpAction(iter->src, what->src, src_r, goto Greater, goto Smaller, goto Equal);
+  
+  Greater:
+  prev = iter;
+  iter = iter->next;
+  if (iter == NULL) goto Smaller;
+  goto Top;
+  
+  Smaller:
+  what->next = iter;
+  if (prev != NULL) 
+    prev->next = what;
+  return what;
+  
+  Equal:
+  iter->ref += what->ref;
+  macoeff coeff = what->coeff;
+  if (coeff != NULL) 
+  {
+    while (coeff->next != NULL) coeff = coeff->next;
+    coeff->next = iter->coeff;
+    iter->coeff = what->coeff;
+  }
+  p_LmFree(what->src, src_r);
+  omFreeBinAddr(what);
+  return iter;
+}
+
+mapoly maPoly_InsertMonomial(mapoly into, poly p, ring src_r, sBucket_pt bucket = NULL)
+{
+  return maPoly_InsertMonomial(into, maMonomial_Create(p, src_r, bucket), src_r);
+}
+
+static mapoly maPoly_InsertPoly(mapoly into, poly what, ring src_r, sBucket_pt bucket)
+{
+  poly next;
+  
+  while (what != NULL)
+  {
+    next = what->next;
+    into = maPoly_InsertMonomial(into, what, src_r, bucket);
+    what = next;
+  }
+  return into;
+}
+
+static void maMap_InitMpoly(ideal map_id, ring map_r, ring src_r, ring dest_r,
+                       mapoly &mp, maideal &mideal)
+{
+  mideal = (maideal) omAlloc0(sizeof(maideal_s));
+  mideal->n = IDELEMS(map_id);
+  mideal->buckets = (sBucket_pt*) omAlloc0(mideal->n*sizeof(sBucket_pt));
+  int i;
+  mp = NULL;
+  
+  for (i=0; i<mideal->n; i++)
+  {
+    if (map_id->m[i] != NULL)
+    {
+      mideal->buckets[i] = sBucketCreate(dest_r);
+      maPoly_InsertMonomial(mp, 
+                            prShallowCopyR_NoSort(map_id->m[i], map_r, src_r),
+                            src_r,                     
+                            mideal->buckets[i]);
+    }
+  }
+}
+
+#if 0
 
 /*******************************************************************************
 **
@@ -50,12 +212,12 @@ static poly maGetMaxExpP(poly* max_map_monomials,
   return map_j;
 }
 
-// returns maximal exponent if map_id is applied to pi_id
-static Exponent_t maGetMaxExp(ideal map_id, ring map_r, ideal pi_id, ring pi_r)
+// returns maximal monomial if map_id is applied to pi_id
+static poly maGetMaxExpP(ideal map_id, ring map_r, ideal pi_id, ring pi_r)
 {
-  Exponent_t max=0;
   poly* max_map_monomials = (poly*) omAlloc(IDELEMS(map_id)*sizeof(poly));
   poly max_pi_i, max_map_i;
+  poly max_map = p_Init(map_r);
   
   int i, j;
   for (i=0; i<IDELEMS(map_id); i++)
@@ -68,17 +230,26 @@ static Exponent_t maGetMaxExp(ideal map_id, ring map_r, ideal pi_id, ring pi_r)
     max_pi_i = p_GetMaxExpP(pi_id->m[i], pi_r);
     max_map_i = maGetMaxExpP(max_map_monomials, IDELEMS(map_id), map_r, 
                               max_pi_i, pi_r);
-    Exponent_t temp = p_GetMaxExp(max_map_i, map_r);
-    if (temp> max){
-      max=temp;
+    // get maximum 
+    for (j = 1; j<= map_r->N; j++)
+    {
+      if (p_GetExp(max_map, j, map_r) < p_GetExp(max_map_i, j, map_r))
+        p_SetExp(max_map, j, p_GetExp(max_map_i, j, map_r), map_r);
     }
-
     p_LmFree(max_pi_i, pi_r);
     p_LmFree(max_map_i, map_r);
   }
-  return max;
+  return max_map;
 }
 
+// returns maximal exponent if map_id is applied to pi_id
+static Exponent_t maGetMaxExp(ideal map_id, ring map_r, ideal pi_id, ring pi_r)
+{
+  poly p = maGetMaxExpP(map_id, map_r, pi_id, pi_r);
+  Exponent_t max = p_GetMaxExp(p, map_r);
+  p_LmFree(p, map_r);
+  return max;
+}
 
 // construct ring/map ideal  in/with which we perform computations
 // return TRUE if ordering changed (not yet implemented), false, otherwise
@@ -174,181 +345,36 @@ static void maDestroyWeightedRing(ring r)
   rKillModified_Wp_Ring(r);
 }
 
-/*******************************************************************************
-**
-*S  mapoly, macoeff . . . . . . . . . . . . definition of structs/classes
-*/
-class macoeff_s;
-class mapoly_s;
-class maideal_s;
-typedef class mapoly_s*  mapoly;
-typedef class macoeff_s* macoeff;
-typedef class maideal_s* maideal;
 
-class mapoly_s
-{
-public:
-  mapoly    next;
-  int       factors;    // -1: not set, 0: constant, 1, 2, 3
-  poly      src;        // monomial from WeightedRing
-  poly      dest;       // poly in CompRing
-  mapoly    f1, f2;     // if f1 != NULL && f2 != NULL then dest = f1*f2
-  int       ref;        // use to catch last usage to save last copy
-  macoeff   coeff;      // list of coeffs to use
-};
 
-class macoeff_s 
-{
-public:
-  macoeff       next;
-  number        n;
-  sBucket_pt    bucket;
-};
 
-class maideal_s
-{
-public:
-  int n;
-  sBucket_pt* buckets;
-};
-/*******************************************************************************
-**
-*F  mapolyCreate  . . . . . . . . . . . . . . .  Creates mapoly
-*/
-static omBin mapolyBin = omGetSpecBin(sizeof(mapoly_s));
-static omBin macoeffBin = omGetSpecBin(sizeof(macoeff_s));
-mapoly mapolyCreate(poly p, sBucket_pt bucket)
-{
-  long cost, factors;
-  maGetCostFactors(p, r_p, cost, factors);
 
-  // factors < 0, i.e. monomial maps to zero
-  if (factors < 0)
-    return NULL;
-
-  if (cost 
-  mapoly mp = (mapoly) omAlloc0Bin(mapolyBin);
-  mp->src = p;
-  maGetCostFactors(src, mp->cost, mp->factors);
-  if (mp->factors == -1)
-  {
-    
-  
-  if (bucket != NULL)
-  {
-    mp->coeff = (macoeff) omAlloc0Bin(macoeffBin);
-    mp->coeff->bucket = bucket;
-    mp->coeff->n = pGetCoeff(p);
-  }
-  else
-  {
-    what->ref = 1;
-  }
-  return mp;
-}
-
-/*******************************************************************************
-**
-*F  mapInsert . . . . . . . . . . . . . . .insertion of monomial/poly into mpoly
-*/
-static int maGetFactors(poly p, ring r)
-{
-  int fac = 0;
-  
-  for (i=1; i<=r->N;i++)
-  {
-    fac += p_GetExp(p, i, r);
-    if (fac >= 3)
-      return fac;
-  }
-}
-
-static mapoly mapInsertMonomial(mapoly &into, mapoly what, ring w_r)
-{
-  if (into == NULL)
-  {
-    into = what;
-    return what;
-  }
-  
-  mapoly iter = into;
-  mapoly prev = NULL;
-  
-  Top:
-  p_LmCmpAction(iter->src, what->src, w_r,goto Greater, goto Equal, goto Smaller);
-  
-  Greater:
-  prev = iter;
-  iter = iter->next;
-  if (iter == NULL) goto Smaller;
-  goto Top;
-  
-  Smaller:
-  what->next = iter;
-  if (what->factors == -1)
-    what->factors = maGetFactors(what->src, w_r);
-  if (prev != NULL) 
-    prev->next = what;
-  return what;
-  
-  Equal:
-  iter->ref += what->ref;
-  macoeff coeff = what->coeff;
-  if (coeff != NULL) 
-  {
-    while (coeff->next != NULL) coeff = coeff->next;
-    coeff->next = iter->coeff;
-    iter->coeff = what->coeff;
-  }
-  p_LmFree(what->src, w_r);
-  omFreeBinAddr(what);
-  return iter;
-}
-
-static mapoly mapInsertMonomial(mapoly &into, poly what, ring w_r, 
-                                sBucket_pt bucket)
-{
-  return mapInsertMonomial(into, mapolyCreate(what, bucket), w_r);
-}
-
-static mapoly mapInsertPoly(mapoly &into, poly what, ring w_r, sBucket_pt bucket)
-{
-  poly next;
-  
-  while (what != NULL)
-  {
-    next = what->next;
-    into = mapInsertMonomial(into, what, w_r, bucket);
-    what = next;
-  }
-  return into;
-}
-
-/*******************************************************************************
-**
-*F  maMap_2_maPoly  . . . . . . . . . . . construnct maideal and mapoly from map
-*/
-static void maMap_2_maPoly(ideal theMap, ring map_r, ring weight_r, ring comp_r,
+static void maMap_2_maPoly(ideal source_id, ring source_r, ring weight_r, ring comp_r,
                            mapoly &mp, maideal &mideal)
 {
   mideal = (maideal) omAlloc0(sizeof(maideal_s));
-  mideal->n = IDELEMS(theMap);
+  mideal->n = IDELEMS(source_id);
   mideal->buckets = (sBucket_pt*) omAlloc0(mideal->n*sizeof(sBucket_pt));
   int i;
   mp = NULL;
   
   for (i=0; i<mideal->n; i++)
   {
-    if (theMap->m[i] != NULL)
+    if (source_id->m[i] != NULL)
     {
       mideal->buckets[i] = sBucketCreate(comp_r);
       mapInsertPoly(mp, 
-                    prShallowCopyR_NoSort(theMap->m[i], map_r, weight_r),
+                    prShallowCopyR_NoSort(source_id->m[i], source_r, weight_r),
                     weight_r,                     
                     mideal->buckets[i]);
     }
+    maPoly_Out(mp, source_r);
   }
 }
+
+
+
+
 
 static mapoly maFindBestggT(mapoly mp, mapoly in, poly ggT, poly fp, poly fq)
 {
@@ -362,7 +388,7 @@ static mapoly maFindBestggT(mapoly mp, mapoly in, poly ggT, poly fp, poly fq)
   while (in != NULL && in->factors > 1 && pFDeg(in->src) > ggt_deg)
   {
     poly q1, q2, q;
-    q = maEggT(p, in->src, q1, q2);
+//    q = maEggT(p, in->src, q1, q2);
     if (q != NULL)
     {
       if (pFDeg(q) > fft_deg)
@@ -428,9 +454,6 @@ static mapoly maPrepareEval(mapoly mp, ring r)
   }
   return res;
 }
-    
-    
-#if 0
 /*******************************************************************************
 **
 *F  ideal_2_maideal . . . . . . . . . . . . . . . . .  converts ideal to maideal
@@ -465,6 +488,31 @@ ideal maideal_2_ideal(ideal orig_id,
   
   return id;
 }
+
 #endif
 
+void map_main(ideal map_id, ring map_r, ideal image_id, ring image_r)
+{
+  
+}
 
+    
+    
+                    
+  
+    
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+ 
+      
