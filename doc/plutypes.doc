@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plutypes.doc,v 1.14 2003-10-02 18:07:26 levandov Exp $
+@comment $Id: plutypes.doc,v 1.15 2004-03-12 17:10:07 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -639,7 +639,7 @@ Computes the Lie bracket of two polinomials
 
 @sc{Plural} offers the opportunity to calculate in 
 factor rings  modulo a two-sided ideal.  The ideal has to be given
-as a Groebner basis.  For a detailed description of the concept
+as a two-sided Groebner basis.  For a detailed description of the concept
 of rings and quotient rings see
 @ifset singularmanual 
 @ref{Rings and orderings}.

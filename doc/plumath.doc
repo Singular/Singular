@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plumath.doc,v 1.15 2003-10-02 18:07:24 levandov Exp $
+@comment $Id: plumath.doc,v 1.16 2004-03-12 17:10:08 levandov Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -663,10 +663,22 @@ D. Decker and D. Eisenbud.
   In  Eisenbud, D.; Grayson, D.; Stillman, M.; Sturmfels, B., editor,
      Computations in algebraic geometry with Macaulay 2, (2001)
 
+@item
+@c art
+Jose L. Bueso, J. Gomez Torrecillas and F. J. Lobillo. 
+  Computing the Gelfand-Kirillov dimension II. 
+    In  A. Granja, J. A. Hermida and A. Verschoren eds. Ring Theory and Algebraic Geometry, Lect. Not. in Pure and Appl. Maths., Marcel Dekker, 2001.
+
+@item
+@c art
+Jose L. Bueso, J. Gomez Torrecillas and F. J. Lobillo. 
+  Re-filtering and exactness of the Gelfand-Kirillov dimension. 
+    Bulletin des Sciences Mathematiques 125(8), 689-715 (2001).
+
 
 @item
 @c GL  art
-J. Gomez-Torrecillas and F. Lobillo.
+J. Gomez Torrecillas and F.J. Lobillo.
   Global homological dimension of multifiltered rings and quantized
   enveloping algebras.
     J. Algebra, 225(2):522--533, 2000.
