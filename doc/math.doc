@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.3 1998-04-27 07:49:22 Singular Exp $
+@comment $Id: math.doc,v 1.4 1998-04-30 09:30:53 Singular Exp $
 @comment this file contains the mathematical background of Singular
 
 @menu
@@ -40,12 +40,12 @@ See the literature cited in @ref{Introduction}, (section 'Background').
 @sc{Singular} offers the following monomial orderings which are implemented
 in an effective way:
 @menu
-* global orderings:: lp, dp, wp, Dp, Wp.
-* local orderings:: ls, ds, ws, Ds, Ws.
-* module orderings:: c, C.
-* matrix orderings:: M.
-* product orderings::
-* extra weight vector:: a.
+* Global orderings:: lp, dp, wp, Dp, Wp.
+* Local orderings:: ls, ds, ws, Ds, Ws.
+* Module orderings:: c, C.
+* Matrix orderings:: M.
+* Product orderings::
+* Extra weight vector:: a.
 @end menu
 @iftex
 @itemize @bullet
@@ -95,9 +95,9 @@ computations has to be interpreted in Loc K[x] (like @code{std, syz, res,
 mres, sres, mult, degree, dim, hilb, mstd}, etc.).
 @end ifinfo
 @c --------------------------------------------------------------------------
-@node global orderings, local orderings, , Monomial orderings
-@subsection global orderings
-@cindex global orderings
+@node Global orderings, Local orderings, , Monomial orderings
+@subsection Global orderings
+@cindex Global orderings
 
 For all these orderings: Loc K[x] = K[x]
 
@@ -196,9 +196,9 @@ $\deg(x^\alpha) = w_1 \alpha_1 + \cdots + w_n\alpha_n.$
 @end tex
 @end table
 @c --------------------------------------------------------------------------
-@node local orderings, module orderings, global orderings, Monomial orderings
-@subsection local orderings
-@cindex local orderings
+@node Local orderings, Module orderings, Global orderings, Monomial orderings
+@subsection Local orderings
+@cindex Local orderings
 
 For ls, ds, Ds and, if the weights are positive integers, also for ws and
 Ws,  we have
@@ -327,9 +327,9 @@ $\deg(x^\alpha) = w_1 \alpha_1 + \cdots + w_n\alpha_n.$
 @end table
 
 @c --------------------------------------------------------------------------
-@node module orderings, matrix orderings, local orderings, Monomial orderings
-@subsection module orderings
-@cindex module orderings
+@node Module orderings, Matrix orderings, Local orderings, Monomial orderings
+@subsection Module orderings
+@cindex Module orderings
 
 @sc{Singular} offers also orderings on the set of ``monomials''
 @ifinfo
@@ -517,9 +517,9 @@ In all cases @sc{Singular} can read the
 input in both formats.
 
 @c --------------------------------------------------------------------------
-@node matrix orderings, product orderings, module orderings,Monomial orderings
-@subsection matrix orderings
-@cindex matrix orderings
+@node Matrix orderings, Product orderings, Module orderings,Monomial orderings
+@subsection Matrix orderings
+@cindex Matrix orderings
 
 Let M be an invertible n x n matrix with integer coefficients and
 @ifinfo
@@ -792,9 +792,9 @@ sufficient in most cases. These orderings are faster than the corresponding
 matrix orderings, since evaluating a matrix product is time consuming.
 
 @c --------------------------------------------------------------------------
-@node product orderings, extra weight vector, matrix orderings, Monomial orderings
-@subsection product orderings
-@cindex product orderings
+@node Product orderings, Extra weight vector, Matrix orderings, Monomial orderings
+@subsection Product orderings
+@cindex Product orderings
 
 Let
 @ifinfo
@@ -842,9 +842,9 @@ defines: @code{lp} on the first 3 variables, the matrix ordering
 @code{ws(1,2,3)} on the last 3 variables.
 
 @c --------------------------------------------------------------
-@node extra weight vector, , product orderings, Monomial orderings
-@subsection extra weight vector
-@cindex extra weight vector
+@node Extra weight vector, , Product orderings, Monomial orderings
+@subsection Extra weight vector
+@cindex Extra weight vector
 
 @ifinfo
 a: a(w_1, @dots{}, w_n),
