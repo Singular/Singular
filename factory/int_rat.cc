@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_rat.cc,v 1.5 1997-09-10 15:46:21 schmidt Exp $ */
+/* $Id: int_rat.cc,v 1.6 1997-10-10 10:35:00 schmidt Exp $ */
 
 #include <config.h>
 
@@ -138,7 +138,9 @@ InternalCF* InternalRational::genOne()
 	return new InternalRational( 1 );
 }
 
-InternalCF* InternalRational::num()
+//{{{ InternalCF* InternalRational::num (), den ()
+// docu: see CanonicalForm::num(), den()
+InternalCF* InternalRational::num ()
 {
     if ( mpz_is_imm( &_num ) ) {
 	InternalCF * res = int2imm( mpz_get_si( &_num ) );
@@ -151,7 +153,7 @@ InternalCF* InternalRational::num()
     }
 }
 
-InternalCF* InternalRational::den()
+InternalCF* InternalRational::den ()
 {
     if ( mpz_is_imm( &_den ) ) {
 	InternalCF * res = int2imm( mpz_get_si( &_den ) );
@@ -163,6 +165,7 @@ InternalCF* InternalRational::den()
 	return new InternalInteger( dummy );
     }
 }
+//}}}
 
 InternalCF* InternalRational::neg()
 {
@@ -718,11 +721,6 @@ int InternalRational::intval() const
     ASSERT( mpz_cmp_si( &_den, 1 ) == 0, "illegal operation" );
     return (int)mpz_get_si( &_num );
 }
-
-// int InternalRational::intmod( int p ) const
-// {
-//   return (int)mpz_mmod_ui( 0, &thempq, (unsigned long)p );
-// }
 
 //{{{ int InternalRational::sign () const
 // docu: see CanonicalForm::sign()
