@@ -90,6 +90,8 @@
 + Tasten, die man druecken muss, werden im Style @code geschrieben.
   Die Control-Taste wird als CTRL abgekuerzt:
     @code{CTRL-A}
+  Fuer RETURN, SPACE, etc, sollte @key{RETURN} verwendet werden.
+  (die html-UMsetzung hat Schwierigkeiten mit <SPACE> etc.)
 
 + Gross/Kleinschreibung von Ueberschriften: Das erste Wort wird gross
   geschrieben, alle anderen klein. Ausnahme: Wenn das erste Wort ein
@@ -276,4 +278,4 @@ i;  // mit Leerzeichen beginnen.
   domkumentiert. Siehe doc2tex.pl - Vorspann.
 
 ------------------------------------------------------------
-$Id: STYLEGUIDE,v 1.15 2000-01-28 17:53:17 obachman Exp $
+$Id: STYLEGUIDE,v 1.16 2001-04-19 11:48:37 Singular Exp $

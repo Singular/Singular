@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.193 2001-03-28 15:06:57 westenb Exp $
+@comment $Id: general.doc,v 1.194 2001-04-19 11:48:37 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -202,7 +202,7 @@ options})
 @end smallexample
 or with the @sc{Singular} command (@pxref{system})
 @smallexample
-system("--browser", "<browser>");
+system("--browser", <browser>);
 @end smallexample
 The  @sc{Singular} command
 @smallexample
@@ -834,12 +834,12 @@ following abbreviations:
 
 @multitable @columnfractions .2 .8
 @item @code{C-<chr>}
-@tab means hold the @code{CONTROL} key while typing the character
-@code{<chr>}. Thus, @code{C-f} would be: hold the @code{CONTROL} key and
+@tab means hold the @key{CONTROL} key while typing the character
+@code{<chr>}. Thus, @code{C-f} would be: hold the @key{CONTROL} key and
 type @code{f}.
 @item @code{M-<chr>}
-@tab means hold the @code{META} key down while typing @code{<chr>}.  If there
-is no @code{META} key, type @code{<ESC>}, release it, then type the
+@tab means hold the @key{META} key down while typing @code{<chr>}.  If there
+is no @key{META} key, type @key{ESC}, release it, then type the
 character @code{<chr>}.
 @end multitable
 
@@ -888,8 +888,8 @@ sessions within the same Emacs).
 
 When you are asked for input to an Emacs command, the cursor
 moves to the bottom line of Emacs, i.e., to a special buffer, called the
-"minibuffer". Typing @code{<RETURN>} within the minibuffer, ends the
-input, typing @code{<SPACE>} within the minibuffer, lists all possible
+"minibuffer". Typing @key{RETURN} within the minibuffer, ends the
+input, typing @key{SPACE} within the minibuffer, lists all possible
 input values to the interactive Emacs command.
 
 The most important buffer commands are
@@ -902,7 +902,7 @@ menu.
 
 @item Executing commands
 Emacs commands are executed by typing @code{M-x <command-name>}
-(remember that @code{<SPACE>} completes partial
+(remember that @key{SPACE} completes partial
 command names). Important and frequently used commands have short-cuts
 for their execution: Key bindings or even menu entries. For example, a
 file can be loaded with @code{M-x load-file}, or @code{C-x C-f}, or with
@@ -1127,12 +1127,12 @@ demonstrations. A demonstration is started by loading a so-called
 
 A @sc{Singular} demo file should consist of @sc{Singular} commands
 separated by blank lines. When running a demo, the input up to the next
-blank line is echoed to the screen. Hitting @code{<RETURN>} executes the
-echoed commands and shows their output. Hitting @code{<RETURN>} again,
+blank line is echoed to the screen. Hitting @key{RETURN} executes the
+echoed commands and shows their output. Hitting @key{RETURN} again,
 echos the next commands to the screen, and so on, until all commands of
 the demo file are executed. While running a demo, you can
 execute other commands on the @sc{Singular} prompt: the next input of
-from the demo file is then echoed again, if you hit @code{<RETURN>} on
+from the demo file is then echoed again, if you hit @key{RETURN} on
 an empty input line.
 
 A @sc{Singular} demo can prematurely be exited by either starting
