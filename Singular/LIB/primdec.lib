@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.15 1998-05-13 07:38:35 obachman Exp $
+// $Id: primdec.lib,v 1.16 1998-05-13 10:54:07 obachman Exp $
 ///////////////////////////////////////////////////////
 // primdec.lib
 // algorithms for primary decomposition based on
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann
 //////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.15 1998-05-13 07:38:35 obachman Exp $";
+version="$Id: primdec.lib,v 1.16 1998-05-13 10:54:07 obachman Exp $";
 info="
 LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION (I)
 
@@ -843,7 +843,7 @@ EXAMPLE: example zero_decomp; shows an example
   def   @P = basering;
   int nva = nvars(basering);
   int @k,@s,@n,@k1,zz;
-  list primary,lres,lres1,act,@lh,@wh;
+  list primary,lres0,lres1,act,@lh,@wh;
   map phi,psi,phi1,psi1;
   ideal jmap,jmap1,jmap2,helpprim,@qh,@qht,ser1;
   intvec @vh,@hilb;
@@ -1081,15 +1081,15 @@ EXAMPLE: example zero_decomp; shows an example
 //       @lh=zero_decomp (@qh,psi(ser),@wr);
        
        
-       kill lres;
-       list lres;
+       kill lres0;
+       list lres0;
        if(size(@lh)==2)
        {
           helpprim=@lh[2];
-          lres[1]=primary[2*@k-1];
+          lres0[1]=primary[2*@k-1];
           ser1=psi(helpprim);
-          lres[2]=psi1(ser1);
-          if(size(reduce(lres[2],lres[1],1))==0)
+          lres0[2]=psi1(ser1);
+          if(size(reduce(lres0[2],lres0[1],1))==0)
           {
              primary[2*@k]=primary[2*@k-1];
              continue;
@@ -1104,16 +1104,16 @@ EXAMPLE: example zero_decomp; shows an example
              {
                 @f=act[1][@n]^act[2][@n];
                 ser1=psi(@f);
-                lres[2*@n-1]=interred(primary[2*@k-1]+psi1(ser1));
+                lres0[2*@n-1]=interred(primary[2*@k-1]+psi1(ser1));
                 helpprim=@lh[2*@n];
                 ser1=psi(helpprim);
-                lres[2*@n]=psi1(ser1);
+                lres0[2*@n]=psi1(ser1);
              }
           }
           else
           {
              lres1=psi(@lh);
-             lres=psi1(lres1);
+             lres0=psi1(lres1);
           }
        }
        if(npars(@P)>0)
@@ -1129,7 +1129,7 @@ EXAMPLE: example zero_decomp; shows an example
        }
        execute(@ri);
        list @lvec;
-       list @lr=imap(@P,lres);
+       list @lr=imap(@P,lres0);
        ideal @lr1;
 
        if(size(@lr)==2)
@@ -1195,21 +1195,21 @@ EXAMPLE: example zero_decomp; shows an example
        }
        kill @lvec;
        setring @P;
-       lres=imap(@Phelp1,@lr);
+       lres0=imap(@Phelp1,@lr);
        kill @Phelp1;
-       for(@n=1;@n<=size(lres);@n++)
+       for(@n=1;@n<=size(lres0);@n++)
        {
-          lres[@n]=clearSB(lres[@n]);
-          attrib(lres[@n],"isSB",1);
+          lres0[@n]=clearSB(lres0[@n]);
+          attrib(lres0[@n],"isSB",1);
        }
 
-       primary[2*@k-1]=lres[1];
-       primary[2*@k]=lres[2];
+       primary[2*@k-1]=lres0[1];
+       primary[2*@k]=lres0[2];
        @s=size(primary)/2;
-       for(@n=1;@n<=size(lres)/2-1;@n++)
+       for(@n=1;@n<=size(lres0)/2-1;@n++)
        {
-         primary[2*@s+2*@n-1]=lres[2*@n+1];
-         primary[2*@s+2*@n]=lres[2*@n+2];
+         primary[2*@s+2*@n-1]=lres0[2*@n+1];
+         primary[2*@s+2*@n]=lres0[2*@n+2];
        }
        @k--;
      }
