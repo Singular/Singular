@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_util.h,v 1.6 1997-10-02 07:15:13 schmidt Exp $ */
+/* $Id: ftest_util.h,v 1.7 1997-10-02 10:37:30 schmidt Exp $ */
 
 #ifndef INCL_FTEST_UTIL_H
 #define INCL_FTEST_UTIL_H
@@ -39,11 +39,10 @@ void ftestSetName ( const char * execName, const char * algorithmName, const cha
 
 void ftestGetOpts ( const int argc, char ** argv, int & optind );
 void ftestGetEnv ( const int, char ** argv, int & optind );
+void ftestWriteSeed ();
 
 void ftestPrintTimer ( const long timer );
 void ftestPrintCheck ( const ftestStatusT check );
 void ftestPrintEnv ();
-
-void ftestMainExit ();
 
 #endif /* ! INCL_FTEST_UTIL_H */
