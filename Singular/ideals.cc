@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.119 2000-12-31 15:14:30 obachman Exp $ */
+/* $Id: ideals.cc,v 1.120 2001-01-30 08:55:47 pohl Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -20,6 +20,7 @@
 #include "weight.h"
 #include "intvec.h"
 #include "syz.h"
+#include "sparsmat.h"
 #include "ideals.h"
 #include "lists.h"
 #include "prCopy.h"
@@ -2425,20 +2426,40 @@ ideal idMinors(matrix a, int ar, ideal R)
 */
 ideal idMinors(matrix a, int ar, ideal R)
 {
-  ideal result;
   int elems=0;
+  int r=a->nrows,c=a->ncols;
+  int i;
+  matrix b;
+  ideal result,h;
+  ring origR;
+  sip_sring tmpR;
+  Exponent_t bound;
 
-  if((ar<=0) || (ar>min(a->ncols,a->nrows)))
+  if((ar<=0) || (ar>r) || (ar>c))
   {
-    Werror("%d-th minor, matrix is %dx%d",ar,a->ncols,a->nrows);
+    Werror("%d-th minor, matrix is %dx%d",ar,r,c);
     return NULL;
   }
-  a = mpCopy(a);
+  h = idMatrix2Module(mpCopy(a));
+  bound = smExpBound(h,c,r,ar);
+  idDelete(&h);
+  smRingChange(&origR,tmpR,bound);
+  b = mpNew(r,c);
+  for (i=r*c-1;i>=0;i--)
+  {
+    if (a->m[i])
+      b->m[i] = prCopyR(a->m[i],origR);
+  }
+  if (R) R = idrCopyR(R,origR);
   result=idInit(32,1);
-  if(ar>1) mpRecMin(ar-1,result,elems,a,a->nrows,a->ncols,NULL,R);
-  else mpMinorToResult(result,elems,a,a->nrows,a->ncols,R);
-  idDelete((ideal *)&a);
+  if(ar>1) mpRecMin(ar-1,result,elems,b,r,c,NULL,R);
+  else mpMinorToResult(result,elems,b,r,c,R);
+  idDelete((ideal *)&b);
+  if (R) idDelete(&R);
   idSkipZeroes(result);
+  rChangeCurrRing(origR);
+  result = idrMoveR(result,&tmpR);
+  smRingClean(origR,tmpR);
   idTest(result);
   return result;
 }
