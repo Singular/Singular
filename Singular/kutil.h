@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.11 1998-06-12 10:13:35 Singular Exp $ */
+/* $Id: kutil.h,v 1.12 1998-06-29 13:09:54 pohl Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -46,8 +46,8 @@ class skStrategy
                   const LObject &L,const kStrategy strat);
     void (*enterS)(LObject h, int pos,kStrategy strat);
     void (*initEcartPair)(LObject * h, poly f, poly g, int ecartF, int ecartG);
-    int (*posInLOld)(const LSet L,const int Ll,
-                     const LObject &L,const kStrategy strat);
+    int (*posInLOld)(const LSet Ls,const int Ll,
+                     const LObject &Lo,const kStrategy strat);
     void (*spSpolyLoop)(poly p1, poly p2, poly m, poly spNoether);
     pFDegProc pOldFDeg;
     ideal Shdl;
