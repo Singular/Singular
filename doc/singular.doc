@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.96 2000-08-14 11:51:44 obachman Exp $
+@comment $Id: singular.doc,v 1.97 2000-08-24 13:18:31 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -301,7 +301,7 @@ LIB "all.lib";
 @c lib homolog.lib
 @c ----------------------------------------------------------
 @node mregular_lib, normal_lib, homolog_lib, Commutative algebra
-@subsection Mregular_lib
+@subsection mregular_lib
 @c lib mregular.lib
 @c ---------------------------------------------------------
 @node normal_lib, primdec_lib, mregular_lib, Commutative algebra

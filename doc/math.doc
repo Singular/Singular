@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.57 2000-08-24 12:11:00 Singular Exp $
+@comment $Id: math.doc,v 1.58 2000-08-24 13:18:31 Singular Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -674,7 +674,7 @@ using @code{spectrum(f,1)}.
 
 @c ---------------------------------------------------------------------------
 @node References, , Toric ideals and integer programming, Mathematical background
-@subsection References
+@section References
 @cindex References
 
 The Centre for Computer Algebra Kaiserslautern publishes a series of preprints
