@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_util.h,v 1.5 1997-10-01 12:25:34 schmidt Exp $ */
+/* $Id: ftest_util.h,v 1.6 1997-10-02 07:15:13 schmidt Exp $ */
 
 #ifndef INCL_FTEST_UTIL_H
 #define INCL_FTEST_UTIL_H
@@ -17,7 +17,8 @@ enum ftestStatusT {
 //{{{ enum ftestErrorT
 enum ftestErrorT
 {
-    Ok, CommandlineError, EnvSyntaxError, CanFormSpecError,
+    Ok, CommandlineError, EnvSyntaxError, FileError,
+    CanFormSpecError,
     SignalError, TimeoutError = SignalError + 14
 };
 //}}}
@@ -42,5 +43,7 @@ void ftestGetEnv ( const int, char ** argv, int & optind );
 void ftestPrintTimer ( const long timer );
 void ftestPrintCheck ( const ftestStatusT check );
 void ftestPrintEnv ();
+
+void ftestMainExit ();
 
 #endif /* ! INCL_FTEST_UTIL_H */
