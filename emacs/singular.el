@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.53 1999-12-06 18:36:37 wichmann Exp $
+;; $Id: singular.el,v 1.54 1999-12-06 19:00:27 wichmann Exp $
 
 ;;; Commentary:
 
@@ -511,6 +511,7 @@ For Emacs, this function is called  at mode initialization time."
   (define-key singular-interactive-mode-map [?\M-s]	      'comint-next-matching-input)
 
   ;; C-c prefix
+  (define-key singular-interactive-mode-map [?\C-c ?\C-e]     'singular-example)
   (define-key singular-interactive-mode-map [?\C-c ?\C-t]     'singular-toggle-truncate-lines)
 
   (define-key singular-interactive-mode-map [?\C-c ?\C-f]     'singular-folding-toggle-fold-at-point-or-all)
@@ -688,6 +689,7 @@ Sets the submenu (\"Commands\" \"Libraries\") to the value of
 			["Exit" singular-exit-singular t]
 			"---"
 			["Preferences" (customize-group 'singular-interactive) t]
+			["Singular Example" singular-example t]
 			["Singular Help" singular-help t])))
 
 (defun customize-singular-interactive ()
@@ -2586,6 +2588,19 @@ o otherwise, the constant `singular-help-fall-back-file-name' is used
 	   (singular-error "Singular help topic %s not found"
 			   help-topic)))))))
 
+;; This might not be the best place for singular-example, but this function
+;; is some kind of singular help, so the place is not too bad.
+;; Note: We use singular-help-topic-history for singular-example, too
+(defun singular-example (&optional command)
+  "Show Singular example on COMMAND."
+  (interactive 
+   (list (completing-read "Example for: " singular-examples-alist
+			  nil nil nil 'singular-help-topic-history)))
+  (let ((process (singular-process))
+	(string (concat "example " command ";")))
+    (singular-input-filter process string)
+    (singular-send-string process string)))
+
 (defun singular-help-init ()
   "Initialize online help support for Singular interactive mode.
 
@@ -2850,10 +2865,10 @@ Otherwise performs completion of Singular commands."
 	  (goto-char post-prompt)
 	  (looking-at "[ \t]*\\(example \\)[ \t]*\\(.*\\)"))
 	;; then: example completion
-	(if singular-help-topics-alist
+	(if singular-examples-alist
 	    (singular-completion-do (match-string 2) (match-beginning 2)
 				    end singular-examples-alist)
-	  (message "Completion of Singular help topics disabled.")
+	  (message "Completion of Singular examples disabled.")
 	  (ding)))
        (t
 	;; else: command completion
