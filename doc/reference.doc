@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.102 1999-03-19 14:09:41 obachman Exp $
+@comment $Id: reference.doc,v 1.103 1999-04-01 17:48:14 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2582,7 +2582,7 @@ with respect to the monomial ordering.
 @c ref
 See
 @ref{lead};
-@ref{leadcexp};
+@ref{leadexp};
 @ref{leadmonom};
 @ref{number}
 @ref{poly};
@@ -2623,13 +2623,13 @@ See
 @ref{vector}.
 @c ref
 @c -------------------------------------------------
-@node leadexp, LIB, leadexp, Functions
+@node leadmonom, LIB, leadexp, Functions
 @subsection leadmonom
 @cindex leadmonom
 @table @code
 @item @strong{Syntax:}
-@code{leadexp (} poly_expression @code{)}
-@*@code{leadexp (} vector_expression @code{)}
+@code{leadmonom (} poly_expression @code{)}
+@*@code{leadmonom (} vector_expression @code{)}
 @item @strong{Type:}
 the same as the input type
 @item @strong{Purpose:}
