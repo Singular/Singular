@@ -256,6 +256,8 @@ iparith.o mpsr_Tok.o : iparith.inc mpsr_Tok.inc
 
 cntrlc.o cntrlc.og : feOptES.inc feOptTS.inc feOpt.inc
 
+p_Procs_Lib.o: p_Procs_Lib.inc
+
 claptmpl.o: claptmpl.cc mod2.h
 	${CXX} ${CXXFLAGS}  ${CPPFLAGS} ${DEFS} -c $<	
 
