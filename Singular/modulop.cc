@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.14 1999-11-15 17:20:28 obachman Exp $ */
+/* $Id: modulop.cc,v 1.15 2000-03-02 18:44:39 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -62,16 +62,11 @@ int npInt(number &n)
 
 number npAdd (number a, number b)
 {
-  int ka = (int)a + (int)b;
-  if (ka >= npPrimeM) ka -= npPrimeM;
-  return (number)ka;
+  return npAddM(a,b);
 }
 
 number npSub (number a, number b)
 {
-//  int ka = (int)a - (int)b;
-//  if (ka < 0)  ka += npPrimeM;
-//  *(int *)c = ka;
   return npSubM(a,b);
 }
 

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.h,v 1.9 1999-11-15 17:20:29 obachman Exp $ */
+/* $Id: modulop.h,v 1.10 2000-03-02 18:44:39 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -50,11 +50,31 @@ inline number npMultM(number a, number b)
   return (number)npExpTable[x<npPminus1M ? x : x-npPminus1M];
 }
 
+#if 0
+inline number npAddAsm(number a, number b, int m)
+{
+  number r;
+    asm ("addl %2, %1; cmpl %3, %1; jb 0f; subl %3, %1; 0:"
+         : "=&r" (r)
+         : "%0" (a), "g" (b), "g" (m)
+         : "cc");
+  return r;
+}
+inline number npSubAsm(number a, number b, int m)
+{
+  number r;
+  asm ("subl %2, %1; jnc 0f; addl %3, %1; 0:"
+        : "=&r" (r)
+        : "%0" (a), "g" (b), "g" (m)
+        : "cc");
+  return r;
+}
+#endif
+
 inline number npAddM(number a, number b)
 {
-  int ka = (int)a + (int)b;
-  if (ka >= npPrimeM) ka -= npPrimeM;
-  return (number)ka;
+  int r = (int)a + (int)b;
+  return (number)(r >= npPrimeM ? r - npPrimeM : r);
 }
 
 inline BOOLEAN npIsZeroM (number  a)
