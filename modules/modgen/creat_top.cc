@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: creat_top.cc,v 1.12 2000-12-05 15:26:58 obachman Exp $ */
+/* $Id: creat_top.cc,v 1.13 2001-05-23 20:14:20 anne Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -50,10 +50,10 @@ void write_enter_id(FILE *fp)
   fprintf(fp, "{\n");
   fprintf(fp, "  idhdl h;\n");
   fprintf(fp, "\n");
-  fprintf(fp, "  h=enterid(mstrdup(name),0, t, &IDROOT, TRUE/*FALSE*/);\n");
+  fprintf(fp, "  h=enterid(omStrDup(name),0, t, &IDROOT, TRUE/*FALSE*/);\n");
   fprintf(fp, "  if(h!=NULL) {\n");
   fprintf(fp, "     switch(t) {\n");
-  fprintf(fp, "         case STRING_CMD: IDSTRING(h) = mstrdup(value);break;\n");
+  fprintf(fp, "         case STRING_CMD: IDSTRING(h) = omStrDup(value);break;\n");
   fprintf(fp, "         case PACKAGE_CMD: break;\n");
   fprintf(fp, "         case PROC_CMD: break;\n");
   fprintf(fp, "     }\n");
@@ -75,8 +75,8 @@ void write_add_singular_proc(FILE *fp)
   fprintf(fp, "  h = enter_id(procname, NULL, PROC_CMD);\n");
   fprintf(fp, "  if(h == NULL) return NULL;\n");
   fprintf(fp, "\n");
-//  fprintf(fp, "  pi->libname = mstrdup(libname);\n");
-  fprintf(fp, "  pi->procname = mstrdup(procname);\n");
+//  fprintf(fp, "  pi->libname = omStrDup(libname);\n");
+  fprintf(fp, "  pi->procname = omStrDup(procname);\n");
   fprintf(fp, "  pi->language = LANG_SINGULAR;\n");
   fprintf(fp, "  pi->ref = 1;\n");
   fprintf(fp, "  pi->is_static = pstatic;\n");
