@@ -6,7 +6,7 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.cc,v 1.13 2000-10-04 13:12:04 obachman Exp $
+ *  Version: $Id: p_Procs.cc,v 1.14 2000-10-04 15:37:54 obachman Exp $
  *******************************************************************/
 #include <string.h>
 
@@ -45,7 +45,7 @@
 //   4 -- plus FieldGeneral_Length*_OrdGeneral procs
 //   5 -- all Field*_Length*_Ord* procs
 #ifdef NDEBUG
-const int HAVE_FAST_P_PROCS = 3;
+const int HAVE_FAST_P_PROCS = 2;
 #else
 const int HAVE_FAST_P_PROCS = 0;
 #endif
