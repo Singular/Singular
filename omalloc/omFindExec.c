@@ -3,7 +3,7 @@
  *  Purpose: routine which determines absolute pathname of executable
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omFindExec.c,v 1.8 2001-01-27 17:03:40 obachman Exp $
+ *  Version: $Id: omFindExec.c,v 1.9 2001-02-23 15:24:44 obachman Exp $
  *******************************************************************/
 
 #ifdef HAVE_CONFIG_H
@@ -16,7 +16,7 @@
 #include <unistd.h> /* always defiend */
 #endif
 #include <stdlib.h>
-#include <strings.h>
+#include <string.h>
 
 #include "omFindExec.h"
 

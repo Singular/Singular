@@ -3,7 +3,7 @@
  *  Purpose: declaration of common Debug/Check/Track stuff
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 7/00
- *  Version: $Id: omDebug.h,v 1.12 2000-10-27 15:28:51 obachman Exp $
+ *  Version: $Id: omDebug.h,v 1.13 2001-02-23 15:24:44 obachman Exp $
  *******************************************************************/
 #ifndef OM_DEBUG_H
 #define OM_DEBUG_H
@@ -92,11 +92,11 @@ void* omGetCustomOfTrackAddr(void* addr);
 #endif
 
 #ifndef OM_NDEBUG
-void* om_KeptAddr;
-void* om_LastKeptAddr;
-unsigned long om_MaxAddr;
-unsigned long om_MinAddr;
-void* om_AlwaysKeptAddrs;
+extern void* om_KeptAddr;
+extern void* om_LastKeptAddr;
+extern unsigned long om_MaxAddr;
+extern unsigned long om_MinAddr;
+extern void* om_AlwaysKeptAddrs;
 
 void omFreeKeptAddrFromBin(omBin bin);
 /***********************************************************************
