@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.23 1998-08-07 08:48:15 wichmann Exp $
+;; $Id: singular.el,v 1.24 1998-08-07 10:07:06 wichmann Exp $
 
 ;;; Commentary:
 
@@ -457,7 +457,8 @@ VALUE."
   (let ((string "quit;")
 	(process (singular-process)))
     (singular-input-filter process string)
-    (singular-send-string process string)))
+    (singular-send-string process string))
+  (kill-buffer (current-buffer)))
 
 (defun singular-toggle-truncate-lines ()
   "Toggle truncate-lines."
@@ -1394,7 +1395,7 @@ new state of Singular demo mode."
 	  singular-demo-mode t)
     (if singular-demo-command-on-enter
 	(send-string (singular-process) singular-demo-command-on-enter))
-    (message "Singular demo mode now active")
+    (message "Hit <Return> to continue demoq")
     (force-mode-line-update))
 
    ;; leave demo mode
@@ -2122,10 +2123,12 @@ Return buffer name with stars at start/end"
     (while temp
       (setq switches (concat switches (car temp) " "))
       (setq temp (cdr temp)))
-    (setq switches (read-from-minibuffer "Singular arguments: " switches))
+    ;; in minibuffer omit display of option "-t "
+    (setq switches (read-from-minibuffer "Singular options: " 
+					 (replace-in-string switches "-t " "")))
 
     ;; make list of strings of switch-string
-    (setq temp nil)
+    (setq temp '("-t"))
     (while (string-match "-[^ ]*" switches)
       (setq temp (append temp (list (substring switches (match-beginning 0) 
 					       (match-end 0)))))
