@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.41 1998-06-04 15:31:17 obachman Exp $ */
+/* $Id: febase.cc,v 1.42 1998-06-04 16:24:10 obachman Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -252,28 +252,54 @@ static char* feGetInfoFile(const char* bindir)
 {
   char* hlpfile = (char*) AllocL(max((bindir != NULL ? strlen(bindir) : 0),
                                      strlen(SINGULAR_ROOT_DIR))
-                                 + 30);
+
+                                  + 30);
+#ifdef PATH_DEBUG
+  printf("Search for singular.hlp\n");
+#endif
+  
   if (bindir != NULL)
   {
     sprintf(hlpfile,"%s/../doc/singular.hlp", bindir);
+#ifdef PATH_DEBUG
+    printf("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
+#endif    
     if (! access(hlpfile, R_OK)) return hlpfile;
 
     sprintf(hlpfile,"%s/../info/singular.hlp", bindir);
+#ifdef PATH_DEBUG
+    printf("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
+#endif    
     if (! access(hlpfile, R_OK)) return hlpfile;
 
     sprintf(hlpfile,"%s/../../doc/singular.hlp", bindir);
+#ifdef PATH_DEBUG
+    printf("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
+#endif    
     if (! access(hlpfile, R_OK)) return hlpfile;
 
     sprintf(hlpfile,"%s/../../info/singular.hlp", bindir);
+#ifdef PATH_DEBUG
+    printf("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
+#endif    
     if (! access(hlpfile, R_OK)) return hlpfile;
 
     sprintf(hlpfile,"%s/doc/singular.hlp", SINGULAR_ROOT_DIR);
+#ifdef PATH_DEBUG
+    printf("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
+#endif    
     if (! access(hlpfile, R_OK)) return hlpfile;
 
     sprintf(hlpfile,"%s/info/singular.hlp", SINGULAR_ROOT_DIR);
-    if (! access(hlpfile, R_OK)) return hlpfile;
+ #ifdef PATH_DEBUG
+    printf("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
+#endif    
+   if (! access(hlpfile, R_OK)) return hlpfile;
   }
   *hlpfile = '\0';
+#ifdef PATH_DEBUG
+  printf("No luck: Trying with %s\n", hlpfile);
+#endif  
   return hlpfile;
 }
 
@@ -369,6 +395,10 @@ char* feGetInfoCall(const char* what)
             feGetInfoProgram(), 
             (*infofile != '\0' ? "-f" : ""),
             (*infofile != '\0' ? infofile : "Singular"));
+
+#ifdef PATH_DEBUG
+  printf("Info call with: %s \n", feInfoCall);
+#endif  
   return feInfoCall;
 }
 
