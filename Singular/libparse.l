@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.42 2000-09-18 09:19:11 obachman Exp $ */
+/* $Id: libparse.l,v 1.43 2000-12-12 11:06:00 anne Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -26,7 +26,7 @@
 #ifdef HAVE_LIBPARSER
 #define YY_SKIP_YYWRAP
 
-typedef enum { LP_NONE, LP_INFO, LP_VERSION} lib_cmds;
+typedef enum { LP_NONE, LP_INFO, LP_CATEGORY, LP_VERSION} lib_cmds;
 
 int libread(FILE* f, char* buf, int max_size);
 int current_pos(int i);
@@ -57,6 +57,7 @@ int yylplineno = 1;
 int lpverbose = 0, check = 0;
 int texinfo_out = 0;
 int found_info=0,
+    found_cat=0,
     found_version=0,
     found_oldhelp = 0,
     found_proc_in_proc = 0;
@@ -242,6 +243,7 @@ eqnl           ([ \t\n]*+=[ \t\n]*)
 %x header
 %x help
 %x libcmd
+%x libcmd2
 %x pdef
 %x phead
 %x poldhelp
@@ -253,6 +255,7 @@ eqnl           ([ \t\n]*+=[ \t\n]*)
 %x string
 %x comment
 %x info
+%x category
 %x version
 
 %%
@@ -262,7 +265,9 @@ eqnl           ([ \t\n]*+=[ \t\n]*)
 (info+{eqnl}+{quote}+{strings}+{quote}) {
          yyless(4); old_state = YYSTATE; BEGIN(info);
        }
-
+(category+{eqnl}+{quote}+{strings}+{quote}) {
+         yyless(8); old_state = YYSTATE; BEGIN(category);
+       }
 (version+{eqnl}+{quote}+{strings}+{quote}) {
              found_version++;
              if ( mode != GET_INFO )
@@ -391,6 +396,10 @@ LIB[ \t]+"\"" { quote++;
              BEGIN(libcmd);
            }
 
+LIB[ \t]*"(\"" { quote++; brace2++;
+             BEGIN(libcmd2);
+           }
+
 <header>({comment}+{tos}+{dolar}+Id:+{string}+[^\n]*)|({comment}+{tos}+{dolar}+Header:+{string}+[^\n]*) {
              make_version(yytext, 0);
              #if YYLPDEBUG > 1
@@ -411,7 +420,7 @@ LIB[ \t]+"\"" { quote++;
              BEGIN(INITIAL);
              yymore();
            }
-<header>(info+{eqnl}+{quote})|(version+{eqnl}+{quote}) {
+<header>(info+{eqnl}+{quote})|(version+{eqnl}+{quote})|(category+{eqnl}+{quote}) {
              yyless(0);
              *lib_style = NEW_LIBSTYLE;
              BEGIN(INITIAL);
@@ -420,6 +429,9 @@ LIB[ \t]+"\"" { quote++;
 
 <header>^LIB[ \t]+"\""   { quote++;
              BEGIN(libcmd);
+           }
+<header>^LIB[ \t]+"(\""   { quote++; brace2++;
+             BEGIN(libcmd2);
            }
 <header>\n { yylplineno++; }
 <header>.  {
@@ -440,7 +452,7 @@ LIB[ \t]+"\"" { quote++;
              #endif
              BEGIN(INITIAL);
            }
-<help>(info+{eqnl}+{quote})|(version+{eqnl}+{quote}) {
+<help>(info+{eqnl}+{quote})|(version+{eqnl}+{quote})|(category+{eqnl}+{quote}) {
              yyless(0);
              *lib_style = NEW_LIBSTYLE;
              BEGIN(INITIAL);
@@ -454,6 +466,9 @@ LIB[ \t]+"\"" { quote++;
            }
 <help>^LIB[ \t]+"\""     { quote++;
              BEGIN(libcmd);
+           }
+<help>^LIB[ \t]+"(\""     { quote++; brace2++;
+             BEGIN(libcmd2);
            }
 
 <help>\n { yylplineno++; }
@@ -471,6 +486,19 @@ LIB[ \t]+"\"" { quote++;
 
 
 <libcmd>{string}"\""     { quote--;
+             yytext[yyleng-1] = '\0';
+             #ifndef STANDALONE_PARSER
+             if ( mode == LOAD_LIB )
+             {
+               library_stack->push(newlib, yytext);
+             }
+             #endif /* STANDALONE_PARSER */
+             #if YYLPDEBUG
+             if(lpverbose>1) printf("LIB:'%s'\n", yytext);
+             #endif
+             BEGIN(INITIAL);
+           }
+<libcmd2>{string}"\")"     { quote--; brace2--;
              yytext[yyleng-1] = '\0';
              #ifndef STANDALONE_PARSER
              if ( mode == LOAD_LIB )
@@ -706,6 +734,16 @@ LIB[ \t]+"\"" { quote++;
 <info>\n { yylplineno++; }
 <info>.  { }
 
+<category>{quote} {
+             quote++; BEGIN(string);
+             found_cat++;
+             string_start = current_pos(yyleng);
+             *lib_style = NEW_LIBSTYLE;
+             last_cmd = LP_CATEGORY;
+       }
+<category>\n { yylplineno++; }
+<category>.  { }
+
 <string>"\""             { quote--;
                            #ifdef HAVE_NAMESPACES
                              copy_string(mode, pl);
@@ -857,11 +895,18 @@ void copy_string(lp_modes mode)
 #endif /* HAVE_NAMESPACES */
 {
 #ifdef STANDALONE_PARSER
-  if (texinfo_out && last_cmd == LP_INFO)
+  if (texinfo_out && (last_cmd == LP_INFO || last_cmd == LP_CATEGORY))
   {
     long current_location = ftell(yylpin), i = string_start, quote = 0;
     char c;
-    printf("$info = <<EOT;\n");
+    if (last_cmd == LP_INFO)
+    {
+      printf("$info = <<EOT;\n");
+    }
+    else
+    {
+      printf("$category = <<EOT;\n");
+    }
     fseek (yylpin, i, SEEK_SET);
     while (i< current_location)
     {
