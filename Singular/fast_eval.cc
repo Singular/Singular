@@ -125,9 +125,13 @@ void maPoly_Eval(mapoly root, ring src_r, ideal dest_id, ring dest_r, int total_
 
     mapoly pp=p;
     p=p->next;
+    //p_wrp(pp->src, src_r);
     if (pp->ref<=0)
     {
+      //printf(" (%x) killed\n",pp);
       maMonomial_Destroy(pp, src_r, dest_r);
     }
+    //else
+    //  printf(" (%x) not killed, ref=%d\n",pp,pp->ref);
   }
 }
