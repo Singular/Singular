@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: mondromy.lib,v 1.21 2001-01-11 18:00:06 Singular Exp $";
+version="$Id: mondromy.lib,v 1.22 2001-01-16 10:41:13 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  mondromy.lib  Monodromy of an Isolated Hypersurface Singularity
@@ -19,7 +19,7 @@ PROCEDURES:
  monodromyB(f[,opt]);  monodromy of isolated hypersurface singularity f
  H2basis(f);           basis of Brieskorn lattice H''
 
-KEYWORDS: Monodromy, hypersurface singularity, Gauss-Manin connection,
+KEYWORDS: Monodromy; hypersurface singularity; Gauss-Manin connection;
           Brieskorn lattice
 
 SEE ALSO: gaussman_lib
