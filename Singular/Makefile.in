@@ -210,7 +210,7 @@ iparith.inc mpsr_Tok.inc: gmalloc.o claptmpl.o iparith.cc \
 	/bin/rm -f gentable gentable.exe
 
 
-mmtables.inc: mmtables.c mmprivate.h mod2.h
+mmtables.inc: mmtables.c mmprivate.h mmemory.h mod2.h
 	${CXX} ${CXXFLAGS}  ${CPPFLAGS}\
 	       -DGENERATE_INDEX_TABLE  -DHAVE_ASO=0 -DHAVE_INDEX_TABLE mmtables.c -o mmtables
 	./mmtables > mmtables.inc
@@ -433,11 +433,14 @@ CXXFLAGSB	= -g -O3 ${PIPE}
 CXXTEMPLFLAGSB	= -fno-implicit-templates
 DEFSB		= -D@SING_UNAME@ -DNDEBUG
 LDFLAGSB	= -static @LDFLAGS@
+
 # bprof object  file to link with
 BPROFOBJ	= /usr/local/lib/bmon.o
 
 DEFST           = -DNDEBUG -D@SING_UNAME@ -DMTRACK
 LDFLAGST        = -static @LDFLAGS@
+CFLAGST		= -g  -w ${PIPE}
+CXXFLAGST	= -g  -w ${PIPE}
 
 ##
 ## op and ob files for gprof and bprof, ot for mtrack
@@ -508,24 +511,24 @@ mpsr_Tok.ob: iparith.inc mpsr_Tok.cc
 # for mtrack
 # 
 claptmpl.ot: claptmpl.cc mod2.h
-	$(CXXP)  ${CXXFLAGSG} ${CPPFLAGS} ${DEFST} -c $< -o $@
+	$(CXXP)  ${CXXFLAGST} ${CPPFLAGS} ${DEFST} -c $< -o $@
 
 $(OBJT1): %.ot: %.cc
-	$(CXXP) ${CXXFLAGSG} ${CXXTEMPLFLAGSP} ${CPPFLAGS} ${DEFST} -c $< -o $@
+	$(CXXP) ${CXXFLAGST} ${CXXTEMPLFLAGSP} ${CPPFLAGS} ${DEFST} -c $< -o $@
 
 $(OBJT2) gmalloc.ot: %.ot: %.c
-	$(CCP)  ${CFLAGSG} ${CPPFLAGS} ${DEFST} -c $< -o $@
+	$(CCP)  ${CFLAGST} ${CPPFLAGS} ${DEFST} -c $< -o $@
 
 Singulart: scanner.cc  gmalloc.ot $(OBJT) iparith.ot mpsr_Tok.ot claptmpl.ot tesths.cc version.h
-	$(CXXP) ${CXXFLAGSG} ${CPPFLAGS} ${DEFST} -o Singulart \
+	$(CXXP) ${CXXFLAGST} ${CPPFLAGS} ${DEFST} -o Singulart \
 	tesths.cc iparith.ot mpsr_Tok.ot claptmpl.ot $(OBJT) ${LDFLAGST} ${LIBS} \
 	${LD_DYN_FLAGS} gmalloc.ot
 
 iparith.ot: iparith.inc iparith.cc
-	$(CXXP)  ${CXXFLAGSG} ${CXXTEMPLFLAGSB} ${CPPFLAGS} ${DEFST} -c iparith.cc -o iparith.ot
+	$(CXXP)  ${CXXFLAGST} ${CXXTEMPLFLAGSB} ${CPPFLAGS} ${DEFST} -c iparith.cc -o iparith.ot
 
 mpsr_Tok.ot: iparith.inc mpsr_Tok.cc
-	$(CXXP) ${CXXFLAGSG} ${CXXTEMPLFLAGSB} ${CPPFLAGS} ${DEFST} -c mpsr_Tok.cc -o mpsr_Tok.ot
+	$(CXXP) ${CXXFLAGST} ${CXXTEMPLFLAGSB} ${CPPFLAGS} ${DEFST} -c mpsr_Tok.cc -o mpsr_Tok.ot
 
 
 ##
