@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.307 2003-12-16 14:55:34 Singular Exp $ */
+/* $Id: iparith.cc,v 1.308 2003-12-16 18:14:29 levandov Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -57,6 +57,7 @@
 #include "mpr_inout.h"
 
 #ifdef HAVE_PLURAL
+#include "gring.h"
 #define ALLOW_PLURAL    ,1
 #define NO_PLURAL       ,0
 #define COMM_PLURAL     ,2
@@ -198,9 +199,6 @@ cmdnames cmds[] =
   { "getdump",     0, GETDUMP_CMD,        CMD_1},
   { "gcd",         0, GCD_CMD ,           CMD_2},
   { "GCD",         2, GCD_CMD ,           CMD_2},
-#ifdef HAVE_PLURAL
-  { "gring",       0, GRING_CMD ,         GRING_CMD},
-#endif
   { "hilb",        0, HILBERT_CMD ,       CMD_123},
   { "highcorner",  0, HIGHCORNER_CMD,     CMD_1},
   { "homog",       0, HOMOG_CMD ,         CMD_12},
@@ -1980,6 +1978,29 @@ static BOOLEAN jjPARSTR2(leftv res, leftv u, leftv v)
   }
   return FALSE;
 }
+
+#ifdef HAVE_PLURAL
+static BOOLEAN jjPlural_mat_mat(leftv res, leftv a, leftv b)
+{
+  return nc_CallPlural((matrix)a->Data(),(matrix)b->Data(),NULL,NULL,currRing);
+}
+
+static BOOLEAN jjPlural_num_mat(leftv res, leftv a, leftv b)
+{
+  return nc_CallPlural(NULL,(matrix)b->Data(),(poly)a->Data(),NULL,currRing);
+}
+
+static BOOLEAN jjPlural_mat_poly(leftv res, leftv a, leftv b)
+{
+  return nc_CallPlural((matrix)a->Data(),NULL,NULL,(poly)b->Data(),currRing);
+}
+
+static BOOLEAN jjPlural_num_poly(leftv res, leftv a, leftv b)
+{
+  return nc_CallPlural(NULL,NULL,(poly)a->Data(),(poly)b->Data(),currRing);
+}
+#endif
+
 static BOOLEAN jjQUOT(leftv res, leftv u, leftv v)
 {
   res->data = (char *)idQuot((ideal)u->Data(),(ideal)v->Data(),
@@ -2536,6 +2557,12 @@ struct sValCmd2 dArith2[]=
 ,{jjLIFT,      LIFT_CMD,       MATRIX_CMD,     MODUL_CMD,  MODUL_CMD NO_PLURAL}
 ,{jjLIFTSTD,   LIFTSTD_CMD,    IDEAL_CMD,      IDEAL_CMD,  MATRIX_CMD NO_PLURAL}
 ,{jjLIFTSTD,   LIFTSTD_CMD,    MODUL_CMD,      MODUL_CMD,  MATRIX_CMD NO_PLURAL}
+#ifdef HAVE_PLURAL
+,{jjPlural_mat_mat,  NCALGEBRA_CMD,  NONE,  MATRIX_CMD, MATRIX_CMD NO_PLURAL}
+,{jjPlural_num_mat,  NCALGEBRA_CMD,  NONE,  POLY_CMD,   MATRIX_CMD NO_PLURAL}
+,{jjPlural_mat_poly, NCALGEBRA_CMD,  NONE,  MATRIX_CMD, POLY_CMD   NO_PLURAL}
+,{jjPlural_num_poly, NCALGEBRA_CMD,  NONE,  POLY_CMD,   POLY_CMD   NO_PLURAL}
+#endif
 ,{jjCALL2MANY, LIST_CMD,       LIST_CMD,       DEF_CMD,    DEF_CMD ALLOW_PLURAL}
 ,{jjRES,       LRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD NO_PLURAL}
 ,{jjMINOR,     MINOR_CMD,      IDEAL_CMD,      MATRIX_CMD, INT_CMD NO_PLURAL}
