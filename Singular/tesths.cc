@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.12 1997-05-06 17:53:37 Singular Exp $ */
+/* $Id: tesths.cc,v 1.13 1997-05-06 18:14:26 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -28,7 +28,8 @@
 
 /* version strings */
 #ifdef HAVE_FACTORY
-  extern const char factoryVersion[];
+#define SI_DONT_HAVE_GLOBAL_VARS
+#include <factory.h>
 #endif
 #ifdef HAVE_LIBFAC_P
   extern const char * libfac_version;
@@ -202,11 +203,14 @@ int main(          /* main entry to Singular */
                 i++;
                 siRandomStart = siRandomStart*10+(int)(argv[1][i] - '0');
               }
-#ifdef buildin_rand
-              siSeed=siRandomStart;
-#else
-              srand((unsigned int)siRandomStart);
-#endif
+              #ifdef buildin_rand
+                siSeed=siRandomStart;
+              #else
+                srand((unsigned int)siRandomStart);
+              #endif
+              #ifdef HAVE_FACTORY
+                factoryseed(siRandomStart);
+              #endif  
               break;
             case 'x': tclmode=TRUE;
               break;
