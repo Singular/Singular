@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.14 1998-06-12 09:08:31 obachman Exp $
+# $Id: regress.cmd,v 1.15 1998-06-16 19:18:52 obachman Exp $
 # FILE:    regress.cmd 
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -28,28 +28,9 @@ _EOM_
 
 #################################################################
 # 
-# the default settings
-#
-$singularOptions = "-teqr12345678";
-$keep = "no";
-$verbosity = 1;
-$generate = "no";
-$exit_code = 0;
-chop($curr_dir=`pwd`);
-# singular -- use the one in curr directory or the one found above
-$singular = "$curr_dir/Singular";
-if ( (! (-e $singular)) || (! (-x $singular)))
-{
-  $singular = $curr_dir."/../Singular";
-}
-# sed scripts which are applied to res files before they are diff'ed
-$sed_scripts = "-e '/^\\/\\/.*used time:/d' -e '/^\\/\\/.*ignore:/d' -e '/error occurred in/d'";
-
-
-#################################################################
-# 
 # used programs
 #
+$sh="/bin/sh";
 $diff = "diff";
 $gunzip = "gunzip";
 $gzip = "gzip";
@@ -60,7 +41,19 @@ $tr = "tr";
 $sed = "sed";
 $cat = "cat";
 $tee = "tee";
-$WINNT = 1 if (system("uname -a | grep CYGWIN") == 0);;
+
+sub mysystem
+{
+  local($call) = $_[0];
+  local($exit_status);
+
+  $call =~ s/"/\\"/g;
+  $call = "$sh -c \"$call\"";
+  print "$call\n" if ($verbosity > 1);
+  return (system $call);
+}
+
+$WINNT = 1 if (&mysystem("uname -a | grep CYGWIN > /dev/null 2>&1") == 0);
 if ($WINNT)
 {
   $uudecode = "uudeview.exe -i";
@@ -71,20 +64,33 @@ else
   $uudecode = "uudecode";
 }
 
+#################################################################
+# 
+# the default settings
+#
+$singularOptions = "-teqr12345678";
+$keep = "no";
+$verbosity = 1;
+$generate = "no";
+$exit_code = 0;
+chop($curr_dir=`pwd`);
+# singular -- use the one in curr directory or the one found above
+$ext=".exe" if ($WINNT);
+$singular = "$curr_dir/Singular$ext";
+if ( (! (-e $singular)) || (! (-x $singular)))
+{
+  $singular = $curr_dir."/../Singular$ext";
+}
+# sed scripts which are applied to res files before they are diff'ed
+$sed_scripts = "-e \"/^\\/\\/.*used time:/d\" -e \"/^\\/\\/.*ignore:/d\" -e \"/error occurred in/d\"";
+
+
+
 
 #################################################################
 # 
 # auxiallary routines
 # 
-sub mysystem
-{
-  local($call) = $_[0];
-  local($exit_status);
-  
-  print "$call\n" if ($verbosity > 1);
-  return (system $call);
-}
-
 sub Set_withMP
 {
   if (! $withMP)
@@ -128,8 +134,8 @@ sub Diff
   local($exit_status);
   
   # prepare the result files: 
-  &mysystem("$cat $root.res | $tr \"\\013\" \" \" | $sed $sed_scripts > $root.res.cleaned");
-  &mysystem("$cat $root.new.res | $tr \"\\013\" \" \" | $sed $sed_scripts > $root.new.res.cleaned");
+  &mysystem("$cat $root.res | $tr -d '\\013' | $sed $sed_scripts > $root.res.cleaned");
+  &mysystem("$cat $root.new.res | $tr -d '\\013' | $sed $sed_scripts > $root.new.res.cleaned");
 
   # doo the diff call
   if ($verbosity > 0 && ! $WINNT)
@@ -271,6 +277,7 @@ while ($ARGV[0] =~ /^-/)
   if (/^-s$/)
   {
     $singular = shift;
+    $singular = "$singular$ext" if ($WINNT && $singular !~ /.*$ext$/)
   }
   elsif (/^-h$/)
   {
@@ -301,7 +308,7 @@ if ($#ARGV == -1)
 }
 
 # make sure $singular exists and is executable
-$singular = "$curr_dir/$singular" unless ($singular =~ /\/.*/);
+$singular = "$curr_dir/$singular" unless ($singular =~ /^\/.*/);
 
 if ( ! (-e $singular))
 {
