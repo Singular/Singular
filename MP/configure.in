@@ -441,25 +441,27 @@ if test "$ac_cv_prog_mp_ssh" = ssh; then
    ac_rsh_programs="$ac_rsh_programs ssh"
 fi
 
-AC_MSG_CHECKING(which remote shell command to use)
 for mp_rsh in $ac_rsh_programs; do
-    if $mp_rsh `hostname` -n uname >& /dev/null; then
+    AC_MSG_CHECKING(whether $mp_rsh works)
+    if $mp_rsh `hostname` -n uname > /dev/null 2>&1; then
       mp_rsh_found=$mp_rsh
+      AC_MSG_RESULT(yes, with hostname)
       break;
-    elif $mp_rsh localhost -n uname >& /dev/null; then
+    elif $mp_rsh localhost -n uname > /dev/null 2>&1; then
       mp_rsh_found=$mp_rsh
+      AC_MSG_RESULT(yes, with localhost)
       break;
     else
       mp_rsh_found=none
+      AC_MSG_RESULT(no)
     fi
 done
-AC_MSG_RESULT($mp_rsh_found)
 if test "${mp_rsh_found}" = none; then
    AC_MSG_WARN("No working remote shell command found")
 else
   AC_DEFINE_UNQUOTED(MP_RSH_COMMAND, "$mp_rsh_found")
    # check whether it alsow works with localhost, instead of hostname
-   if $mp_rsh localhost -n uname  >& /dev/null; then
+   if $mp_rsh localhost -n uname  > /dev/null 2>&1; then
      AC_DEFINE(RSH_CAN_LOCALHOST)
    fi
 fi
