@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.25 1998-05-14 18:59:38 Singular Exp $
+@comment $Id: singular.doc,v 1.26 1998-05-14 19:01:50 Singular Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -181,6 +181,7 @@ k;} are not allowed and result in an error.
 @c ---------------------------------------
 @node Evaluation of logical expressions, No case/switch statement, No rvalue of increments and assignments, Major differences to the C programming language
 @heading Evaluation of logical expressions
+@cindex Evaluation of logical expressions
 @cindex and
 @cindex or
 
