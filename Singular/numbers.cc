@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.45 2002-02-04 13:13:03 Singular Exp $ */
+/* $Id: numbers.cc,v 1.46 2002-06-10 16:00:45 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -89,7 +89,7 @@ int    nGetChar() { return nChar; }
 int ndSize(number a) { return (int)nIsZero(a)==FALSE; }
 
 number ndCopy(number a) { return a; }
-number nd_Copy(number a, ring r) { return a; }
+number nd_Copy(number a, ring r) { return r->cf->nCopy(a); }
 
 /*2
 * init operations for characteristic c (complete==TRUE)
