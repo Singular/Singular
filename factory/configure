@@ -1732,6 +1732,10 @@ save_prefix="$prefix"
 test "x$prefix" = xNONE && prefix="$ac_default_prefix"
 expl_datadir=`eval echo "$datadir"`
 prefix="$save_prefix"
+# get absolute path of expl_datadir
+if echo "$expl_datadir" | grep -v '^/' > /dev/null 2> /dev/null; then
+  expl_datadir="`pwd`/$expl_datadir"
+fi
 
 if test "x$with_Singular" = xyes; then
   gftabledir='${datadir}/Singular/gftables'
