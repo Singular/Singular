@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.176 1999-09-17 11:42:23 Singular Exp $ */
+/* $Id: iparith.cc,v 1.177 1999-09-27 13:31:38 obachman Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2559,6 +2559,7 @@ static BOOLEAN jjE(leftv res, leftv v)
 {
   res->data = (char *)pOne();
   pSetComp((poly)res->data,(int)v->Data());
+  pSetm((poly)res->data);
   return FALSE;
 }
 #ifdef HAVE_FACTORY
