@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.8 1998-01-14 14:42:45 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.9 1998-01-14 14:55:44 obachman Exp $ */
 
 /***************************************************************
  *
@@ -416,7 +416,7 @@ extern poly    _pFetchCopy(ring r,poly a);
 // Here is a handy Macro which disables inlining when run with
 // profiling and enables it otherwise
 
-#ifdef DO_PROFIL
+#ifdef DO_PROFILE
 
 #ifndef POLYS_IMPL_CC  
 #define DECLARE(type, arglist) type arglist; \
