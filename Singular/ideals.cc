@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.65 1999-10-20 07:31:58 siebert Exp $ */
+/* $Id: ideals.cc,v 1.66 1999-10-20 11:52:00 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1521,76 +1521,76 @@ ideal idLiftStd (ideal  h1,ideal  quot, matrix* ma, tHomog h)
   ideal s_quot=idRingCopy(quot,orig_ring);
 
   ideal s_h3=idPrepare(s_h1,s_quot,h,k,&quotgen,&i,&w);
+  ideal s_h2 = idInit(IDELEMS(s_h3), s_h3->rank);
 
   if (w!=NULL) delete w;
   i = 0;
-  for (j=0;j<IDELEMS(s_h3);j++)
-  {
-    if ((s_h3->m[j] != NULL) && (pMinComp(s_h3->m[j]) <= k))
-      i++;
-  }
-  j = IDELEMS(s_h1);
-  if (s_quot!=NULL) idDelete(&s_quot);
-
-  if (syz_ring!=orig_ring)
-    rChangeCurrRing(orig_ring,TRUE);
-  pSetSyzComp(0);
-
-  idDelete((ideal*)ma);
-  *ma = mpNew(j,i);
-  i = -1;
-  ideal e=idInit(16,h1->rank);
   for (j=0; j<IDELEMS(s_h3); j++)
   {
     if ((s_h3->m[j] != NULL) && (pMinComp(s_h3->m[j],syz_ring) <= k))
     {
-      if (syz_ring==orig_ring)
-        q = pCopy(s_h3->m[j]);
-      else
-        q = pPermPoly(s_h3->m[j],NULL,syz_ring,NULL,0);
-      qq=q;
+      i++;
+      q = s_h3->m[j];
       while (pNext(q) != NULL)
       {
         if (pGetComp(pNext(q)) > k)
         {
-          p = pNext(q);
-          pNext(q) = pNext(pNext(q));
-          pNext(p) = NULL;
-          t=pGetComp(p);
-          pSetComp(p,0);
-          pSetmComp(p);
-          MATELEM(*ma,t-k,i+2) = pAdd(MATELEM(*ma,t-k,i+2),p);
+          s_h2->m[j] = pNext(q);
+          pNext(q) = NULL;
         }
         else
         {
           pIter(q);
         }
       }
-      if (!inputIsIdeal) pShift(&qq,-1);
-      q = qq;
-      if (q !=NULL)
-      {
-        i++;
-        if (i+1 >= IDELEMS(e))
-        {
-          pEnlargeSet(&(e->m),IDELEMS(e),16);
-          IDELEMS(e) += 16;
-        }
-        e->m[i] = q;
-      }
+      if (!inputIsIdeal) pShift(&(s_h3->m[j]), -1);
+    }
+    else
+    {
+      pDelete(&(s_h3->m[j]));
     }
   }
-  if (syz_ring==orig_ring)
-    idDelete(&s_h3);
-  else
-  {
-    rChangeCurrRing(syz_ring,FALSE);
-    idDelete(&s_h3);
+
+  idSkipZeroes(s_h3);
+  j = IDELEMS(s_h1);
+  if (s_quot!=NULL) idDelete(&s_quot);
+
+  if (syz_ring!=orig_ring)
     rChangeCurrRing(orig_ring,TRUE);
-    rKill(syz_ring);
+  pSetSyzComp(0);
+  idDelete((ideal*)ma);
+  *ma = mpNew(j,i);
+
+  i = 1;
+  for (j=0; j<IDELEMS(s_h2); j++)
+  {
+    if (s_h2->m[j] != NULL)
+    {
+      q = pFetchCopyDelete(syz_ring, s_h2->m[j]);
+      s_h2->m[j] = NULL;
+      
+      while (q != NULL)
+      {
+        p = q;
+        pIter(q);
+        pNext(p) = NULL;
+        t=pGetComp(p);
+        pSetComp(p,0);
+        pSetmComp(p);
+        MATELEM(*ma,t-k,i) = pAdd(MATELEM(*ma,t-k,i),p);
+      }
+      i++;
+    }
   }
-  idSkipZeroes(e);
-  return e;
+  idDelete(&s_h2);
+
+  for (i=0; i<IDELEMS(s_h3); i++)
+  {
+    s_h3->m[i] = pFetchCopyDelete(syz_ring, s_h3->m[i]);
+  }
+
+  if (syz_ring!=orig_ring) rKill(syz_ring);
+  return s_h3;
 }
 
 /*2

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.h,v 1.20 1999-10-19 12:42:49 obachman Exp $ */
+/* $Id: syz.h,v 1.21 1999-10-20 11:52:02 obachman Exp $ */
 /*
 * ABSTRACT: Resolutions
 */
@@ -52,14 +52,15 @@ class ssyStrategy{
   intvec * resolution;
   intvec * cw;
   intvec * betti;
-  short list_length;
-  short references;
   kBucket_pt bucket;
   kBucket_pt syz_bucket;
   ring syRing;
-  int length;
   resolvente fullres;
   resolvente minres;
+  unsigned long ** sev;
+  int length;
+  short list_length;
+  short references;
 };
 
 void sySchreyersSyzygiesM(polyset F,int Fmax,polyset* Shdl,int* Smax,

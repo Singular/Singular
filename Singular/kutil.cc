@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.43 1999-10-19 12:42:45 obachman Exp $ */
+/* $Id: kutil.cc,v 1.44 1999-10-20 11:52:01 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -3062,7 +3062,6 @@ void updateS(BOOLEAN toT,kStrategy strat)
           pDelete(&redSi);
           redSi=pHead((strat->S)[i]);
           (strat->S)[i] = redMora((strat->S)[i],i-1,strat);
-          kTest(strat);
           if ((strat->S)[i]==NULL)
           {
             deleteInS(i,strat);
@@ -3089,6 +3088,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
             h.sev =  pGetShortExpVector(h.p);
             strat->sevS[i] = h.sev;
           }
+          kTest(strat);
         }
         i++;
       }

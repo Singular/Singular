@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.50 1999-10-19 12:42:47 obachman Exp $ */
+/* $Id: polys.cc,v 1.51 1999-10-20 11:52:02 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -473,6 +473,7 @@ int pWTotaldegree(poly p)
       case ringorder_c:
       case ringorder_C:
       case ringorder_S:
+      case ringorder_s:
         break;
       case ringorder_a:
         for (k=block0[i];k<=block1[i];k++)
@@ -695,7 +696,7 @@ void pSetGlobals(ring r, BOOLEAN complete)
   block1=r->block1;
   firstwv=NULL;
   polys_wv=r->wvhdl;
-  if (order[0]==ringorder_S)
+  if (order[0]==ringorder_S ||order[0]==ringorder_s)
   {
     order++;
     block0++;
@@ -710,14 +711,17 @@ void pSetGlobals(ring r, BOOLEAN complete)
   else              pLDeg = ldeg0;
   /*======== ordering type is (_,c) =========================*/
   if ((order[0]==ringorder_unspec)
-  ||(
-    ((order[1]==ringorder_c)||(order[1]==ringorder_C)||(order[1]==ringorder_S))
+      ||(
+    ((order[1]==ringorder_c)||(order[1]==ringorder_C)
+     ||(order[1]==ringorder_S)
+     ||(order[1]==ringorder_s))
     && (order[0]!=ringorder_M)
     && (order[2]==0))
-  )
+    )
   {
     if ((order[0]!=ringorder_unspec)
-    && ((order[1]==ringorder_C)||(order[1]==ringorder_S)))
+    && ((order[1]==ringorder_C)||(order[1]==ringorder_S)||
+        (order[1]==ringorder_s)))
       pComponentOrder=-1;
     if (pOrdSgn == -1) pLDeg = ldeg0c;
     if ((order[0] == ringorder_lp) || (order[0] == ringorder_ls))
@@ -732,13 +736,15 @@ void pSetGlobals(ring r, BOOLEAN complete)
   }
   /*======== ordering type is (c,_) =========================*/
   else if (((order[0]==ringorder_c)
-    ||(order[0]==ringorder_C)
-    ||(order[0]==ringorder_S))
+            ||(order[0]==ringorder_C)
+            ||(order[0]==ringorder_S)
+            ||(order[0]==ringorder_s))
   && (order[1]!=ringorder_M)
   &&  (order[2]==0))
   {
     /* pLDeg = ldeg0; is standard*/
-    if ((order[0]==ringorder_C)||(order[0]==ringorder_S))
+    if ((order[0]==ringorder_C)||(order[0]==ringorder_S)||
+        order[0]==ringorder_s)
       pComponentOrder=-1;
     if ((order[1] == ringorder_lp) || (order[1] == ringorder_ls))
     {
@@ -757,7 +763,7 @@ void pSetGlobals(ring r, BOOLEAN complete)
     //                pVarHighIndex);
     //pLexOrder=TRUE;
     pVectorOut=order[0]==ringorder_c;
-    if ((pVectorOut)||(order[0]==ringorder_C)||(order[0]==ringorder_S))
+    if ((pVectorOut)||(order[0]==ringorder_C)||(order[0]==ringorder_S)||(order[0]==ringorder_s))
     {
       if(block1[1]!=pVariables) pLexOrder=TRUE;
       firstBlockEnds=block1[1];
@@ -778,8 +784,9 @@ void pSetGlobals(ring r, BOOLEAN complete)
     while (i != 0);
 
     if ((order[0]!=ringorder_c)
-    &&(order[0]!=ringorder_C)
-    &&(order[0]!=ringorder_S))
+        && (order[0]!=ringorder_C)
+        && (order[0]!=ringorder_S)
+        && (order[0]!=ringorder_s))
     {
       pLDeg = ldeg1c;
     }

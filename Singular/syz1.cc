@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.43 1999-10-19 12:42:49 obachman Exp $ */
+/* $Id: syz1.cc,v 1.44 1999-10-20 11:52:03 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -871,7 +871,9 @@ void syEnlargeFields(syStrategy syzstr,int index)
   syzstr->elemLength[index]=(int*)ReAlloc0((ADDRESS)syzstr->elemLength[index],
                                (IDELEMS(syzstr->res[index])+1)*sizeof(int),
                                (IDELEMS(syzstr->res[index])+17)*sizeof(int));
-//Print("sort %d has now size %d\n",index,IDELEMS(res[index])+17);
+  syzstr->sev[index]=(unsigned long*)ReAlloc0((ADDRESS)syzstr->sev[index],
+                                    (IDELEMS(syzstr->res[index])+1)*sizeof(unsigned long),
+                               (IDELEMS(syzstr->res[index])+17)*sizeof(unsigned long));
   IDELEMS(syzstr->res[index]) += 16;
   pEnlargeSet(&(syzstr->orderedRes[index]->m),IDELEMS(syzstr->orderedRes[index]),16);
   IDELEMS(syzstr->orderedRes[index]) += 16;
@@ -1588,6 +1590,7 @@ int syInitSyzMod(syStrategy syzstr, int index, int init)
     syzstr->Firstelem[index] = (int*)Alloc0(init*sizeof(int));
     syzstr->elemLength[index] = (int*)Alloc0(init*sizeof(int));
     syzstr->orderedRes[index] = idInit(init-1,1);
+    syzstr->sev[index] = (unsigned long*) Alloc0(init*sizeof(unsigned long));
     result = 0;
   }
   else
@@ -1711,6 +1714,8 @@ void syKillComputation(syStrategy syzstr)
       Free((ADDRESS)syzstr->elemLength,(syzstr->length+1)*sizeof(int*));
       Free((ADDRESS)syzstr->truecomponents,(syzstr->length+1)*sizeof(int*));
       Free((ADDRESS)syzstr->ShiftedComponents,(syzstr->length+1)*sizeof(long*));
+      if (syzstr->sev != NULL)
+        Free(((ADDRESS)syzstr->sev), (syzstr->length+1)*sizeof(unsigned long*));
       Free((ADDRESS)syzstr->backcomponents,(syzstr->length+1)*sizeof(int*));
       Free((ADDRESS)syzstr->Howmuch,(syzstr->length+1)*sizeof(int*));
       Free((ADDRESS)syzstr->Firstelem,(syzstr->length+1)*sizeof(int*));
@@ -2723,6 +2728,7 @@ syStrategy syLaScala3(ideal arg,int * length)
   syzstr->backcomponents = (int**)Alloc0((*length+1)*sizeof(int*));
   syzstr->Howmuch = (int**)Alloc0((*length+1)*sizeof(int*));
   syzstr->Firstelem = (int**)Alloc0((*length+1)*sizeof(int*));
+  syzstr->sev = (unsigned long **) Alloc0((*length+1)*sizeof(unsigned long *));
   syzstr->bucket = kBucketCreate();
   int len0=idRankFreeModule(arg)+1;
   startdeg = actdeg;
