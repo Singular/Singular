@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_eval.cc,v 1.2 1997-03-26 16:29:50 schmidt Exp $
+// $Id: cf_eval.cc,v 1.3 1997-04-07 15:00:58 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.2  1997/03/26 16:29:50  schmidt
+stream-io wrapped by NOSTREAMIO
+
 Revision 1.1  1996/05/24 09:21:54  stobbe
 "operator(): Bug fix, operator( const CanonicalForm & ) now uses
             values.min() as lower index instead of 2 and produces the
@@ -14,10 +17,11 @@ Revision 1.1  1996/05/24 09:21:54  stobbe
 //
 */
 
+#include <config.h>
+
 #include "assert.h"
 
 #include "cf_defs.h"
-
 #include "cf_eval.h"
 
 static CanonicalForm evalCF ( const CanonicalForm & f, const CFArray & a, int m, int n );

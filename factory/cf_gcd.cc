@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_gcd.cc,v 1.6 1997-03-26 16:39:06 schmidt Exp $
+// $Id: cf_gcd.cc,v 1.7 1997-04-07 15:05:38 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.6  1997/03/26 16:39:06  schmidt
+debug output changed to DEBOUT
+
 Revision 1.5  1996/12/05 18:24:53  schmidt
 ``Unconditional'' check-in.
 Now it is my turn to develop factory.
@@ -36,11 +39,12 @@ Initial revision
 
 */
 
+#include <config.h>
+
 #include "assert.h"
 #include "debug.h"
 
 #include "cf_defs.h"
-
 #include "canonicalform.h"
 #include "cf_iter.h"
 #include "cf_reval.h"

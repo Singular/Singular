@@ -1,12 +1,17 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_generator.h,v 1.0 1996-05-17 10:59:38 stobbe Exp $
+// $Id: cf_generator.h,v 1.1 1997-04-07 15:07:19 schmidt Exp $
 
 #ifndef INCL_CF_GENERATOR_H
 #define INCL_CF_GENERATOR_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:38  stobbe
+Initial revision
+
 */
+
+#include <config.h>
 
 #include "canonicalform.h"
 
