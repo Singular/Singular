@@ -4,7 +4,7 @@
  *           -- the real version
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omalloc.c,v 1.4 2000-11-06 11:21:17 pohl Exp $
+ *  Version: $Id: omalloc.c,v 1.5 2000-12-21 16:23:59 obachman Exp $
  *******************************************************************/
 
 #include <stdlib.h>
@@ -55,7 +55,11 @@ void* valloc(size_t size)
   return NULL;
 }
 
+#if defined(sgi)
+void* memalign(size_t size_1, size_t size_2)
+#else
 void* memalign(void* alignment, size_t size)
+#endif
 {
   fprintf(stderr, "omalloc Warning: memalign not yet implemented\n");
   fflush(NULL);
