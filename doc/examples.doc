@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.13 1998-05-14 14:51:32 obachman Exp $
+@comment $Id: examples.doc,v 1.14 1998-05-14 17:55:34 Singular Exp $
 @comment this file contains the examples
 
 @ifinfo
@@ -914,7 +914,7 @@ In any case, if the input is weighted homogeneous (=quasihomogeneous),
 the variables should be given the correct weights.
 @sc{Singular} offers a function @code{weight} which proposes,
 given an ideal or module, integer weights for the variables, such that
-the ideal/module is as homogeneous as possible with respect to these weights.
+the ideal resp. module is as homogeneous as possible with respect to these weights.
 The function finds correct weights, if the input is weighted homogeneous
 (but is rather slow for many variables). In order to check, whether the
 input is quasihomogeneous, use the function @code{qhweight}, which returns

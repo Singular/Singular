@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.44 1998-05-14 16:12:20 obachman Exp $
+@comment $Id: types.doc,v 1.45 1998-05-14 17:55:42 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -305,7 +305,7 @@ minimal resolution (see @ref{lres})
 @item maxideal
 power of the maximal ideal at 0 (see @ref{maxideal})
 @item minbase
-minimal generating set of a homogeneous ideal/module or an ideal/module in a local ring
+minimal generating set of a homogeneous ideal resp. module or an ideal resp. module in a local ring
 (see @ref{minbase})
 @item minor
 set of minors of a matrix (see @ref{minor})
@@ -319,7 +319,7 @@ $(h1+h2)/h1=h2/(h1 \cap h2)$
 @end ifinfo
 (see @ref{modulo})
 @item mres
-minimal free resolution of an ideal/module, also minimizing the given ideal/module
+minimal free resolution of an ideal resp. module, also minimizing the given ideal resp. module
 (see @ref{mres})
 @item mstd
 standard basis and minimal generating set of an ideal (see @ref{mstd})
@@ -336,7 +336,7 @@ ideal quotient (see @ref{quotient})
 @item reduce
 normalform with respect to a standardbasis (see @ref{reduce})
 @item res
-minimal free resolution of an ideal/module but not changing the given ideal/module
+minimal free resolution of an ideal resp. module but not changing the given ideal resp. module
 (see @ref{res})
 @item simplify
 simplify a set of polynomials (see @ref{simplify})
@@ -1623,16 +1623,16 @@ minimal resolution (see @ref{lres})
 @item minres
 minimize a free resolution (see @ref{minres})
 @item mres
-minimal free resolution of an ideal/module, also
+minimal free resolution of an ideal resp. module, also
 minimizing the first module (see @ref{mres})
 @item names
 list of all userdefined variable names (see @ref{names})
 @item res
-minimal free resolution of an ideal/module (see @ref{res})
+minimal free resolution of an ideal resp. module (see @ref{res})
 @item size
 number of entries (see @ref{size})
 @item sres
-free resolution of an ideal/module given by a standard base (see @ref{sres})
+free resolution of an ideal resp. module given by a standard base (see @ref{sres})
 @end table
 
 
@@ -2124,13 +2124,13 @@ standardbasis and transformation matrix computation (see @ref{liftstd})
 @item lres
 minimal resolution (see @ref{lres})
 @item minbase
-minimal generating set of a homogeneous ideal/module or an ideal/module
+minimal generating set of a homogeneous ideal resp. module or an ideal resp. module
 over a local ring
 (see @ref{minbase})
 @item modulo
 represents (h1+h2)/h1=h2/(h1 intersect h2) (see @ref{modulo})
 @item mres
-minimal free resolution of an ideal/module, also minimizing the given module
+minimal free resolution of an ideal resp. module, also minimizing the given module
 (see @ref{mres})
 @item @code{mult}
 multiplicity of a module (see @ref{mult})
@@ -2141,13 +2141,13 @@ number of rows (see @ref{nrows})
 @item prune
 minimize the embedding into a free module (see @ref{prune})
 @item qhweight
-quasihomogeneous weights of an ideal/module (see @ref{qhweight})
+quasihomogeneous weights of an ideal resp. module (see @ref{qhweight})
 @item quotient
 ideal quotient (see @ref{quotient})
 @item reduce
 normalform with respect to a standardbasis (see @ref{reduce})
 @item res
-minimal free resolution of an ideal/module but not changing the given ideal/module
+minimal free resolution of an ideal resp. module but not changing the given ideal resp. module
 (see @ref{res})
 @item simplify
 simplify a set of vectors (see @ref{simplify})
@@ -2674,10 +2674,10 @@ See @ref{Type conversion and casting}.
 
 @table @code
 @item mres
-minimal free resolution of an ideal/module, also minimizing the given ideal/module
+minimal free resolution of an ideal resp. module, also minimizing the given ideal resp. module
 (see @ref{mres})
 @item res
-minimal free resolution of an ideal/module but not changing the given ideal/module
+minimal free resolution of an ideal resp. module but not changing the given ideal resp. module
 (see @ref{res})
 @item sres
 free resolution of a standard basis (see @ref{sres})

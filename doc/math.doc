@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.13 1998-05-14 17:40:21 Singular Exp $
+@comment $Id: math.doc,v 1.14 1998-05-14 17:55:37 Singular Exp $
 @comment this file contains the mathematical background of Singular
 This chapter introduces some of the mathematical notions and definitions used
 throughout the manual. Most sections are only a collection of the
@@ -382,13 +382,13 @@ $<_m = (<,C)$ denotes the module ordering (giving priority to the coefficients):
 @*
 @end iftex
 @tex
-\quad \quad $x^\alpha gen(i) <_m x^\beta gen(j) \Leftrightarrow x^\alpha < x^\beta$,
+\quad \quad $x^\alpha e_i <_m x^\beta e_j \Leftrightarrow x^\alpha < x^\beta$,
 @end tex
 @iftex
 @*
 @end iftex
 @tex
-    \phantom{\quad \quad $x^\alpha gen(i) <_m x^\beta gen(j) \Leftrightarrow $}
+    \phantom{\quad \quad $x^\alpha e_i <_m x^\beta e_j \Leftrightarrow $}
       or $x^\alpha = x^\beta $ and $ i < j$.
 @end tex
 
@@ -418,13 +418,13 @@ $<_m = (C, <)$ denotes the module ordering (giving priority to the component):
 @*
 @end iftex
 @tex
-\quad \quad   $x^\alpha gen(i) <_m x^\beta gen(j) \Leftrightarrow i < j$,
+\quad \quad   $x^\alpha e_i <_m x^\beta e_j \Leftrightarrow i < j$,
 @end tex
 @iftex
 @*
 @end iftex
 @tex
-    \phantom{$\quad \quad x^\alpha gen(i) <_m x^\beta gen(j) \Leftrightarrow $}
+    \phantom{$\quad \quad x^\alpha e_i <_m x^\beta e_j \Leftrightarrow $}
       or $ i = j $ and $ x^\alpha < x^\beta $.
 @end tex
 
@@ -452,13 +452,13 @@ $<_m = (<,c)$ denotes the module ordering (giving priority to the coefficients):
 @*
 @end iftex
 @tex
-\quad \quad $x^\alpha gen(i) <_m x^\beta gen(j) \Leftrightarrow x^\alpha < x^\beta$,
+\quad \quad $x^\alpha e_i <_m x^\beta e_j \Leftrightarrow x^\alpha < x^\beta$,
 @end tex
 @iftex
 @*
 @end iftex
 @tex
-    \phantom{\quad \quad $x^\alpha gen(i) <_m x^\beta gen(j) \Leftrightarrow $}
+    \phantom{\quad \quad $x^\alpha e_i <_m x^\beta e_j \Leftrightarrow $}
       or $x^\alpha = x^\beta $ and $ i > j$.
 @end tex
 
@@ -487,13 +487,13 @@ $<_m = (c, <)$ denotes the module ordering (giving priority to the component):
 @*
 @end iftex
 @tex
-\quad \quad   $x^\alpha gen(i) <_m x^\beta gen(j) \Leftrightarrow i > j$,
+\quad \quad   $x^\alpha e_i <_m x^\beta e_j \Leftrightarrow i > j$,
 @end tex
 @iftex
 @*
 @end iftex
 @tex
-    \phantom{$\quad \quad x^\alpha gen(i) <_m x^\beta gen(j) \Leftrightarrow $}
+    \phantom{$\quad \quad x^\alpha e_i <_m x^\beta e_j \Leftrightarrow $}
       or $ i = j $ and $ x^\alpha < x^\beta $.
 @end tex
 
