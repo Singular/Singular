@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.8 1998-01-16 14:29:53 krueger Exp $ */
+/* $Id: iplib.cc,v 1.9 1998-01-17 17:24:39 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -141,7 +141,7 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
     argstr=iiProcArgs(e,TRUE);
     procbuflen = pi->data.s.body_end - pi->data.s.body_start;
     pi->data.s.body = (char *)AllocL( strlen(argstr)+procbuflen+15+
-				      strlen(pi->libname) );
+                                      strlen(pi->libname) );
     //Print("Body=%ld-%ld=%d\n", pi->data.s.body_end,
     //    pi->data.s.body_start, procbuflen);
     if (pi->data.s.body==NULL) {
@@ -232,10 +232,10 @@ BOOLEAN iiPStart(idhdl pn, char* filename, sleftv  * v)
       pi = IDPROC(pn);
       if(pi!=NULL) {
         if( pi->data.s.body==NULL ) {
-	  iiGetLibProcBuffer(IDPROC(pn));
-	  if (IDPROC(pn)->data.s.body==NULL) return TRUE;
-	}
-	newBuffer( mstrdup(IDPROC(pn)->data.s.body), BT_proc, IDID(pn) );
+          iiGetLibProcBuffer(IDPROC(pn));
+          if (IDPROC(pn)->data.s.body==NULL) return TRUE;
+        }
+        newBuffer( mstrdup(IDPROC(pn)->data.s.body), BT_proc, IDID(pn) );
       } else { // for security only
         newBuffer( mstrdup(IDSTRING(pn)), BT_proc, IDID(pn) );
       }
@@ -576,7 +576,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
           char proc[256];
           char ct1, *e;
           sscanf( buf, "proc %s", proc);
-	  offset = 2;
+          offset = 2;
           char *ct=strchr(proc,'(');
           if (ct!=NULL) { *ct='\0'; offset=3; }
           sprintf( buf, "LIB:%s", newlib);
@@ -625,7 +625,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
           if(inBlock==IN_HEADER) {
             IDPROC(h)->data.s.body_start = pos;
             IDPROC(h)->data.s.body_lineno = lines-offset;
-	    // Print("%s: %d-%d\n", pi->procname, lines, offset);
+            // Print("%s: %d-%d\n", pi->procname, lines, offset);
           }
           inBlock=IN_BODY;
         }
@@ -633,13 +633,13 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
       else if ((inBlock==IN_BODY) || (inBlock==IN_EXAMPLE_BODY))
       {
         if (buf[0]=='}')
-	  {
+          {
             if(IDPROC(h)->data.s.example_start==0)
-	      IDPROC(h)->data.s.example_start=pos;
+              IDPROC(h)->data.s.example_start=pos;
             if(IDPROC(h)->data.s.body_end==0) IDPROC(h)->data.s.body_end=pos;
             IDPROC(h)->data.s.proc_end = pos;
-	    inBlock=0;
-	  }
+            inBlock=0;
+          }
       }
     }
     lines++;
@@ -665,7 +665,7 @@ procinfo *iiInitSingularProcinfo(procinfov pi, char *libname,
 {
   pi->libname = mstrdup(libname);
 
-  if( strcmp(procname,"_init")==0) { 
+  if( strcmp(procname,"_init")==0) {
     char *p = iiConvName(libname);
     pi->procname = mstrdup(p);
     FreeL((ADDRESS)p);
@@ -687,7 +687,7 @@ procinfo *iiInitSingularProcinfo(procinfov pi, char *libname,
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 char *iiConvName(char *libname)
 {
-  char *p = AllocL(strlen(libname)+7);
+  char *p = (char *)AllocL(strlen(libname)+7);
   char *q = mstrdup(libname);
   char *r = q;
   for(; *r!='\0'; r++) {
@@ -707,18 +707,18 @@ int piShowProcList()
   char *name;
 
   Print( "%-15s  %20s      %s,%s  %s,%s   %s,%s\n", "Library", "function",
-	 "line", "start", "line", "body", "line", "example");
+         "line", "start", "line", "body", "line", "example");
   for(h = idroot; h != NULL; h = IDNEXT(h)) {
     if(IDTYP(h) == PROC_CMD) {
       proc = IDPROC(h);
       if(strcmp(proc->procname, IDID(h))!=0) {
-	name = AllocL(strlen(IDID(h))+strlen(proc->procname)+4);
-	sprintf(name, "%s -> %s", IDID(h), proc->procname);
-	Print( "%-15s  %20s ", proc->libname, name);
-	FreeL(name);
+        name = (char *)AllocL(strlen(IDID(h))+strlen(proc->procname)+4);
+        sprintf(name, "%s -> %s", IDID(h), proc->procname);
+        Print( "%-15s  %20s ", proc->libname, name);
+        FreeL(name);
       } else Print( "%-15s  %20s ", proc->libname, proc->procname);
-      if(proc->language==LANG_SINGULAR) 
-        Print("line %4d,%-5ld  %4d,%-5ld  %4d,%-5ld\n", 
+      if(proc->language==LANG_SINGULAR)
+        Print("line %4d,%-5ld  %4d,%-5ld  %4d,%-5ld\n",
               proc->data.s.proc_lineno, proc->data.s.proc_start,
               proc->data.s.body_lineno, proc->data.s.body_start,
               proc->data.s.example_lineno, proc->data.s.example_start);
@@ -734,7 +734,7 @@ char *iiLineNo(char *procname, int lineno)
   char buf[256];
   idhdl pn = ggetid(procname);
   procinfo *pi = IDPROC(pn);
-  
+
   sprintf(buf, "%s %3d\0", procname, lineno);
   //sprintf(buf, "%s::%s %3d\0", pi->libname, pi->procname,
   //  lineno + pi->data.s.body_lineno);

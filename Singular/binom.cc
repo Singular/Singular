@@ -1,14 +1,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: binom.cc,v 1.7 1998-01-16 08:24:01 Singular Exp $ */
+/* $Id: binom.cc,v 1.8 1998-01-17 17:24:43 Singular Exp $ */
 
 /*
 * ABSTRACT - set order (=number of monomial) for dp
 */
 
 /* includes */
-#include <limits.h>
 #include "mod2.h"
 #include "structs.h"
 #include "binom.h"
@@ -22,10 +21,10 @@
 
 extern int  pComponentOrder;
 /* ----------- global variables, set by bBinomSet --------------------- */
-static int *bBinomials=NULL;
+int *bBinomials=NULL;
 static int  bSize;
 int         bHighdeg;
-static int  bHighdeg_1;
+int         bHighdeg_1;
 BOOLEAN     bNoAdd;
 
 /*0 implementation*/
@@ -36,10 +35,9 @@ static inline int bBinom(int i,int j)
 
 void bSetm(poly p)
 {
-  int ord = pTotaldegree(p);
 #ifdef TEST_MAC_DEBUG
+  int ord = pTotaldegree(p);
   p->Order=ord;
-#endif  
 
   if (ord<=bHighdeg)
   {
@@ -66,11 +64,12 @@ void bSetm(poly p)
       #endif
       ip+=bHighdeg_1+pGetExp(p,i);
     }
+    if (ord>=0)
+      PrintS("****************\n");
   }
-#ifdef TEST_MAC_DEBUG
   p->MOrder=ord;
 #else
-  p->Order=ord;
+  _bSetm(p);
 #endif
 }
 
@@ -79,7 +78,6 @@ void bSetm0(poly p)
 {
 #ifdef TEST_MAC_DEBUG
   p->Order=pTotaldegree(p);
-#endif  
 
   int i=1;
   int ord = -INT_MAX;
@@ -104,10 +102,11 @@ void bSetm0(poly p)
     #endif
     ip+=bHighdeg_1+pGetExp(p,i);
   }
-#ifdef TEST_MAC_DEBUG
+    if (ord>=0)
+      PrintS("****************\n");
   p->MOrder=ord;
 #else
-  p->Order=ord;
+  _bSetm0(p);
 #endif
 }
 
@@ -283,6 +282,7 @@ void bBinomSet(int * orders)
     bHighdeg++;
     h_n++;
   }
+  bHighdeg-=2;
   bHighdeg_1=bHighdeg;
   bHighdeg--;
   
@@ -290,7 +290,7 @@ void bBinomSet(int * orders)
   bSize = pVariables*bHighdeg_1*sizeof(int);
   bBinomials = (int*)Alloc(bSize);
   
-  //Print("max deg=%d, table size=%d bytes\n",bHighdeg,bSize);
+  // Print("max deg=%d, table size=%d bytes\n",bHighdeg,bSize);
   
   for(int j=1;j<=bHighdeg;j++)
   {

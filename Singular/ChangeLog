@@ -1,5 +1,7 @@
 Sat Jan 17 18:21:15 MET 1998 hannes
 	* removed duplicate _memcpyW from mmalloc.c
+	* fixed type cast in iplib.cc
+	* changes for TEST_MAC_ORDER, part 2 (binom.cc, binom.h, spSpolyLoop.cc)
 
 Fri Jan 16 15:30:07 MET 1998 Kai Krueger <krueger@mathematik.uni-kl.de>
 	* extra.cc,febase.cc,febase.inc,grammar.y,iparith.cc
