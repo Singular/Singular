@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.81 2001-02-21 10:39:24 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.82 2001-02-28 11:56:27 levandov Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1601,6 +1601,13 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 #ifdef KDEBUG
   idTest(F);
 #endif
+#ifdef PLURAL
+  if (rIsPluralRing(currRing))
+  {
+    r=gr_bba(F,Q,strat);
+  }
+  else
+#endif  
   if (pOrdSgn==-1)
   {
     if (w!=NULL)
