@@ -1,4 +1,4 @@
-version="$Id: control.lib,v 1.12 2004-08-10 14:47:02 plural Exp $";
+version="$Id: control.lib,v 1.13 2004-08-11 09:59:59 plural Exp $";
 category="Miscellaneous";
 info="
 LIBRARY:  control.lib Procedures for System and Control Theory 
@@ -20,8 +20,8 @@ LeftInverse(module R)         a left inverse of matrix (module).
 
 AUXILIARY PROCEDURES:
 ncdetection(ring r);          computes an ideal, presenting an involution map on non-comm algebra r;
-involution(m, map theta); applies the involution, presented by theta to  m of typ poly, vector, ideal, module;
-declare(string NameOfRing, string Variables[,string  Parameters, string Ordering]);     defines the ring, optional parametes are a string of parameters and a sting of ordering,
+involution(m, map theta);    applies the involution, presented by theta to m of type poly, vector, ideal, module;
+declare(string NameOfRing, Variables[,string  Parameters, Ordering]);     defines the ring, optional parametes are strings of parameters and ordering,
 view();                      Well-formatted output of lists, modules and matrixes
 ";
 
@@ -385,57 +385,6 @@ EXAMPLE:  example control; shows an example
 }
 example
 {"EXAMPLE:";echo = 2; 
-  //-------------------------------
-  ring r=0,(s1,s2,s3),dp;
-  module R=[0,-s3,s2],
-           [s3,0,-s1];
-  R=transpose(R);	   
-  view( R );  
-  view( control(R) );
-
-  module Rc=[0,-s3,s2],
-            [s3,0,-s1],
-	    [-s2,s1,0];
-  Rc=transpose(Rc);	    
-  view( Rc );
-  view( control(Rc) );
-  kill r;
-  //----------------------------------
-  //reflector antenna
-  ring A = (0, K1, K2, Te, Kp, Kc),(Dt, delta), dp;
-  module R;
-  R = [Dt, -K1, 0, 0, 0, 0, 0, 0, 0],
-       [0, Dt+K2/Te, 0, 0, 0, 0, -Kp/Te*delta, -Kc/Te*delta, -Kc/Te*delta],
-       [0, 0, Dt, -K1, 0, 0, 0, 0, 0],
-       [0, 0, 0, Dt+K2/Te, 0, 0, -Kc/Te*delta, -Kp/Te*delta, -Kc/Te*delta],
-       [0, 0, 0, 0, Dt, -K1, 0, 0, 0],
-       [0, 0, 0, 0, 0, Dt+K2/Te, -Kc/Te*delta, -Kc/Te*delta, -Kp/Te*delta];
-  R=transpose(R);
-  view(R);
-  view(control(R));
-  kill A;
-  //----------------------------------
-  //Flexible Rod
-  ring A = 0,(D1, delta), dp;
-  module R;
-  R = [D1, -D1*delta, -1],
-      [2*D1*delta, -D1-D1*delta^2, 0];
-  R=transpose(R);
-  view(R);
-  view(control(R));
-  kill A;
-  //-------------------------------------
-  //TwoPendula
-  ring r=(0,m1,m2,M,g,L1,L2),Dt,dp;
-  module R;
-  R =  [m1*L1*Dt^2, m2*L2*Dt^2, -1, (M+m1+m2)*Dt^2], 
-       [m1*L1^2*Dt^2-m1*L1*g, 0, 0, m1*L1*Dt^2],
-       [0, m2*L2^2*Dt^2-m2*L2*g, 0, m2*L2*Dt^2];
-  R=transpose(R);
-  view(R);
-  view(control(R));
-  kill r;
-  //----------------------------------------
   //Wind Tunnel
   ring A = (0,a, omega, zeta, k),(D1, delta),dp;
   module R;
@@ -445,8 +394,6 @@ example
   R=transpose(R);
   view(R);
   view(control(R));
-  kill A;
-  //-------------------------------------------
 
 };
 //------------------------------------------------------------------------
@@ -538,6 +485,7 @@ EXAMPLE:  example autonom2; shows an example
 }
 example
 {"EXAMPLE:"; echo = 2;
+  //Cauchy
   ring r=0,(s1,s2,s3,s4),dp;
   module R= [s1,-s2],
             [s2, s1],
@@ -571,6 +519,7 @@ EXAMPLE:  example autonom; shows an example
 }
 example
 {"EXAMPLE:"; echo = 2;
+  //Cauchy
   ring r=0,(s1,s2,s3,s4),dp;
   module R= [s1,-s2],
             [s2, s1],
@@ -584,7 +533,7 @@ example
 //--------------------------------------------------------------------------
 //
 //Some example rings with defined systems
-//--------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 //autonomy:
 //
 proc exAut1()
@@ -596,7 +545,7 @@ proc exAut1()
   export R;
   return(@r);
 };
-//-------------------------------------------------------
+//----------------------------------------------------------------------------
 proc exAut2()
 {
   ring @r=0,(s1,s2,s3),dp;
@@ -608,7 +557,7 @@ proc exAut2()
   return(@r);	    
 };  
 
-//-----------------------------------
+//----------------------------------------------------------------------------
 proc exCauchy()
 {
   ring @r=0,(s1,s2),dp;
@@ -618,7 +567,7 @@ proc exCauchy()
   export R;
   return(@r);	    
 };
-//-----------------------------------
+//----------------------------------------------------------------------------
 proc exCauchy2()
 {
   ring @r=0,(s1,s2,s3,s4),dp;
@@ -630,7 +579,7 @@ proc exCauchy2()
   export R;
   return(@r);	    
 }; 
-//----------------------------------------
+//----------------------------------------------------------------------------
 proc exEvasLecture()
 { 
   ring @r=0,(d1,d2),dp;
@@ -640,9 +589,30 @@ proc exEvasLecture()
   export R;
   return(@r);	    
 };  
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 //control
 //
+proc ex1()
+{
+  ring @r=0,(s1,s2,s3),dp;
+  module R=[0,-s3,s2],
+           [s3,0,-s1];
+  R=transpose(R);	   
+  export R;
+  return(@r);
+};
+//----------------------------------------------------------------------------
+proc ex2()
+{ 
+  ring @r=0,(s1,s2,s3),dp;
+  module R=[0,-s3,s2],
+            [s3,0,-s1],
+	    [-s2,s1,0];
+  R=transpose(R);	   
+  export R;
+  return(@r); 
+};
+//----------------------------------------------------------------------------
 proc exAntenna()
 {
   ring @r = (0, K1, K2, Te, Kp, Kc),(Dt, delta), dp;
@@ -659,7 +629,7 @@ proc exAntenna()
   return(@r);  
 };
 
-//---------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 proc exEinstein()
 {
@@ -721,9 +691,6 @@ proc exWindTunnel()
 };
 //--------------------------------------------------------------------------------------------
 
-proc ex()
-{
-};
 
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
