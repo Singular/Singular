@@ -76,24 +76,28 @@ $(MAIN1): term_ordering.o binomial.o list.o BigInt.o LLL.o matrix.o \
 	Buchberger.o ideal_stuff.o IP_algorithms.o testdata.o \
 	$(OBJECTS1)
 	$(CXX) $^ -o $@ $(LDFLAGS)
+	strip $(MAIN1)
 
 $(MAIN2): term_ordering.o binomial.o list.o BigInt.o LLL.o matrix.o \
 	ideal.o \
 	Buchberger.o ideal_stuff.o IP_algorithms.o testdata.o  \
 	$(OBJECTS2)
 	$(CXX)  $^ -o $@ $(LDFLAGS)
+	strip $(MAIN2)
 
 $(MAIN3): term_ordering.o binomial.o list.o BigInt.o LLL.o matrix.o \
 	ideal.o \
 	Buchberger.o ideal_stuff.o IP_algorithms.o testdata.o \
 	$(OBJECTS3)
 	$(CXX)  $^ -o $@ $(LDFLAGS)
+	strip $(MAIN3)
 
 $(MAIN4): term_ordering.o binomial.o list.o BigInt.o LLL.o matrix.o \
 	ideal.o \
 	Buchberger.o ideal_stuff.o IP_algorithms.o testdata.o \
 	$(OBJECTS4)
 	$(CXX)  $^ -o $@ $(LDFLAGS)
+	strip $(MAIN4)
 
 Makefile: Makefile.in 
 	cd ..; 	CONFIG_FILES="IntegerProgramming/Makefile" CONFIG_HEADERS= ./config.status

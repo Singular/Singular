@@ -597,11 +597,11 @@ SING_UNAME=`echo $SINGUNAME | tr '-' '_' `
 VERSION_SEP="-"
 
 
-SINGULAR_MAJOR_VERSION=${SINGULAR_MAJOR_VERSION:-1}
-SINGULAR_MINOR_VERSION=${SINGULAR_MINOR_VERSION:-3}
-SINGULAR_SUB_VERSION=${SINGULAR_SUB_VERSION:-13}
+SINGULAR_MAJOR_VERSION=${SINGULAR_MAJOR_VERSION:-2}
+SINGULAR_MINOR_VERSION=${SINGULAR_MINOR_VERSION:-0}
+SINGULAR_SUB_VERSION=${SINGULAR_SUB_VERSION:-0}
 SINGULAR_VERSION="${SINGULAR_VERSION:-$SINGULAR_MAJOR_VERSION${VERSION_SEP}$SINGULAR_MINOR_VERSION${VERSION_SEP}$SINGULAR_SUB_VERSION}"
-VERSION_DATE=${VERSION_DATE:-"January 2001"}
+VERSION_DATE=${VERSION_DATE:-"February 2001"}
 
 
 
@@ -1634,7 +1634,7 @@ done
 
 # lib checks
 # under cygwin, we should not explicitly link with -lm, except for
-# it reallz is the last thing to link with
+# it really is the last thing to link with
 if test "$ac_cv_singuname" != ix86-Win; then
 echo $ac_n "checking for atof in -lm""... $ac_c" 1>&6
 echo "configure:1641: checking for atof in -lm" >&5
