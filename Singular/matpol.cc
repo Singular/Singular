@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.14 1998-07-15 14:40:29 pohl Exp $ */
+/* $Id: matpol.cc,v 1.15 1998-07-15 15:45:00 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -1084,7 +1084,7 @@ int mp_permmatrix::mpPivotBareiss(row_col_weight *C)
   fo = 1.0e20;
   ro = 0.0;
   iopt = jopt = -1;
-  
+
   s_n--;
   s_m--;
   if (s_m == 0)
@@ -1165,7 +1165,7 @@ int mp_permmatrix::mpPivotRow(row_col_weight *C, int row)
   fo = 1.0e20;
   ro = 0.0;
   iopt = jopt = -1;
-  
+
   s_n--;
   s_m--;
   if (s_m == 0)
@@ -1232,7 +1232,7 @@ void mp_permmatrix::mpToIntvec(intvec *v)
   int i;
 
   for (i=v->rows()-1; i>=0; i--)
-    (*v)[i] = qcol[i]+1; 
+    (*v)[i] = qcol[i]+1;
 }
 
 void mp_permmatrix::mpRowReorder()

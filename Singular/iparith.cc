@@ -2173,7 +2173,8 @@ static BOOLEAN jjUMINUS_I(leftv res, leftv u)
 }
 static BOOLEAN jjUMINUS_N(leftv res, leftv u)
 {
-  number n=nNeg((number)u->CopyD());
+  number n=(number)u->CopyD();
+  n=nNeg(n);
   res->data = (char *)n;
   return FALSE;
 }
@@ -2319,13 +2320,15 @@ static BOOLEAN jjDET(leftv res, leftv v)
   }
 nonconst:
 //  res->data = (char *)mpDet(m);
-  poly p1 = mpDet(m), p2 = mpDetBareiss(m);
-  p2 = pSub(pCopy(p1),p2);
-  if (p2 != NULL)
+  poly p = mpDetBareiss(m);
+#ifdef PDEBUG
+  poly old = mpDet(m);
+  if (!pEqual(p,old))
   {
-    WerrorS("error in mpDetBareiss\n");
+    WerrorS("error in mpDetBareiss");
   }
-  res ->data = (char *)p1;
+#endif
+  res ->data = (char *)p;
   return FALSE;
 }
 static BOOLEAN jjDET_I(leftv res, leftv v)
@@ -2874,7 +2877,7 @@ static BOOLEAN jjVDIM(leftv res, leftv v)
 #define jjstrlen       (proc1)1
 #define jjpLength      (proc1)2
 #define jjidElem       (proc1)3
-#define jjmpDet        (proc1)4
+#define jjmpDetBareiss (proc1)4
 #define jjidFreeModule (proc1)5
 #define jjidVec2Ideal  (proc1)6
 #define jjrCharStr     (proc1)7
@@ -2912,7 +2915,7 @@ void jjInitTab1()
         case (int)jjidElem:       dArith1[i].p=(proc1)idElem; break;
         case (int)jjidVec2Ideal:  dArith1[i].p=(proc1)idVec2Ideal; break;
 #ifndef HAVE_FACTORY
-        case (int)jjmpDet:        dArith1[i].p=(proc1)mpDet; break;
+        case (int)jjmpDetBareiss: dArith1[i].p=(proc1)mpDetBareiss; break;
 #endif
         case (int)jjidFreeModule: dArith1[i].p=(proc1)idFreeModule; break;
         case (int)jjrCharStr:     dArith1[i].p=(proc1)rCharStr; break;
@@ -2959,9 +2962,9 @@ static BOOLEAN jjidElem(leftv res, leftv v)
   res->data = (char *)idElem((ideal)v->Data());
   return FALSE;
 }
-static BOOLEAN jjmpDet(leftv res, leftv v)
+static BOOLEAN jjmpDetBareiss(leftv res, leftv v)
 {
-  res->data = (char *)mpDet((matrix)v->Data());
+  res->data = (char *)mpDetBareiss((matrix)v->Data());
   return FALSE;
 }
 static BOOLEAN jjidFreeModule(leftv res, leftv v)
@@ -3066,7 +3069,7 @@ static BOOLEAN jjMINRES_R(leftv res, leftv v)
 #define jjstrlen       (proc1)strlen
 #define jjpLength      (proc1)pLength
 #define jjidElem       (proc1)idElem
-#define jjmpDet        (proc1)mpDet
+#define jjmpDetBareiss (proc1)mpDetBareiss
 #define jjidFreeModule (proc1)idFreeModule
 #define jjidVec2Ideal  (proc1)idVec2Ideal
 #define jjrCharStr     (proc1)rCharStr
@@ -3162,7 +3165,7 @@ struct sValCmd1 dArith1[]=
 ,{jjDET,        DET_CMD,         POLY_CMD,       MATRIX_CMD }
 #else
 ,{jjWRONG,      DET_CMD,         INT_CMD,        INTMAT_CMD }
-,{jjmpDet,      DET_CMD,         XS(POLY_CMD),   MATRIX_CMD }
+,{jjmpDetBareiss,DET_CMD,        XS(POLY_CMD),   MATRIX_CMD }
 #endif
 ,{jjDIM,        DIM_CMD,         INT_CMD,        IDEAL_CMD }
 ,{jjDIM,        DIM_CMD,         INT_CMD,        MODUL_CMD }
