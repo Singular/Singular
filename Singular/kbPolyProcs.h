@@ -3,10 +3,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbPolyProcs.h,v 1.2 1999-05-26 16:20:16 obachman Exp $ */
+/* $Id: kbPolyProcs.h,v 1.3 1999-09-27 14:33:26 obachman Exp $ */
 #include "mod2.h"
 #include "mmheap.h"
 #include "ring.h"
+#include "kutil.h"
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -36,13 +37,11 @@ typedef void (*kb_p_Minus_m_Mult_q_Proc)(poly *p, int *lp,
                                          poly m,
                                          poly q, int lq,
                                          poly spNoether,
-                                         kb_p_Mult_m_Proc kb_p_Mult_m,
                                          memHeap heap = NULL);
 extern void kb_p_Minus_m_Mult_q_General(poly *p, int *lp, 
                                         poly m,
                                         poly q, int lq,
                                         poly spNoether,
-                                        kb_p_Mult_m_Proc kb_p_Mult_m,
                                         memHeap heap = NULL);
 
 typedef struct skbPolyProcs kbPolyProcs;
@@ -63,5 +62,39 @@ extern void kbSetPolyProcs(kbPolyProcs_pt procs,
                            ring r,
                            rOrderType_t ot = rOrderType_General,
                            BOOLEAN homog = FALSE);
+
+
+#define kb_n_Mult_p kb_n_Mult_p_General
+#define kb_p_Add_q  kb_p_Add_q_General
+#define kb_p_Minus_m_Mult_q  kb_p_Minus_m_Mult_q_General
+#define kb_p_Mult_m kb_p_Mult_m_General
+
+///////////////////////////////////////////////////////////////////////
+///
+/// General Procedures for poly arithemetic which always work
+///
+void kb_n_Mult_p_General(number n, poly p);
+void kb_p_Add_q_General(poly *p, int *lp,
+                        poly *q, int *lq, 
+                        memHeap heap = NULL);
+poly  kb_p_Mult_m_General(poly p,
+                          poly m, 
+                          poly spNoether = NULL,
+                          memHeap heap = NULL);
+void kb_p_Minus_m_Mult_q_General (poly *pp, int *lpp, 
+                                  poly m,
+                                  poly q, int lq,
+                                  poly spNoether = NULL,
+                                  memHeap heap = NULL);
+
+
+void kbCreateSpoly(LObject* P,
+                   poly spNoether = NULL);
+
+
+void kbReducePoly(LObject* RP, // Poly to be reduced
+                  TObject* WP, // Poly with which is reduced
+                  poly spNoether = NULL);
+
 
 #endif /* KBPOLYPROCS_H */
