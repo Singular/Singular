@@ -226,13 +226,13 @@
 
 #if SIZEOF_EXPONENT == 1
 #define MAX_EXPONENT 0x7f
-#define MAX_COMPONENT 0x7f
+#define MAX_COMPONENT 0xff
 #elif SIZEOF_EXPONENT == 2
 #define MAX_EXPONENT 0x7fff
-#define MAX_COMPONENT 0x7fff
+#define MAX_COMPONENT 0xffff
 #else /* SIZEOF_EXPONENT == 4 */
 #define MAX_EXPONENT 0x7fffffff
-#define MAX_COMPONENT 0x7fffffff
+#define MAX_COMPONENT 0xffffffff
 #endif
 
 /*******************************************************************
