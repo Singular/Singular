@@ -7,7 +7,7 @@
  *  Author:  obachman (Olaf Bachmann), hannes (Hannes Schoenemann),
  *           bricken (Michael Brickenstein) 
  *  Created: 01/02
- *  Version: $Id: fast_maps.h,v 1.10 2002-01-19 14:12:48 Singular Exp $
+ *  Version: $Id: fast_maps.h,v 1.11 2002-01-19 14:35:17 Singular Exp $
  *******************************************************************/
 
 /*******************************************************************************
@@ -92,7 +92,7 @@ void maMap_CreateRings(ideal map_id, ring map_r,
                        ideal image_id, ring image_r, 
                        ring &src_r, ring &dest_r);
 
-ideal maIdeal_2_Ideal(maideal ideal);
+ideal maIdeal_2_Ideal(maideal ideal, ring dest_r);
 #endif
 
 
