@@ -1,11 +1,15 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_poly.cc,v 1.6 1997-10-10 10:37:01 schmidt Exp $ */
+/* $Id: int_poly.cc,v 1.7 1997-12-09 09:05:44 schmidt Exp $ */
 
 #include <config.h>
 
 #ifndef NOSTREAMIO
 #include <string.h>
+#ifdef WINNT
+#include <strstrea.h>
+#else
 #include <strstream.h>
+#endif
 #endif /* NOSTREAMIO */
 
 #include "assert.h"
@@ -134,20 +138,23 @@ InternalPoly::taildegree ()
 }
 //}}}
 
+//{{{ CanonicalForm InternalPoly::coeff ( int i )
+// docu: see CanonicalForm::operator []()
 CanonicalForm
-InternalPoly::coeff( int i )
+InternalPoly::coeff ( int i )
 {
     termList theCursor = firstTerm;
     while ( theCursor ) {
 	if ( theCursor->exp == i )
 	    return theCursor->coeff;
-	else if ( theCursor->exp > i )
-	    theCursor = theCursor->next;
+	else if ( theCursor->exp < i )
+	    return CanonicalForm( 0 );
 	else
-	    theCursor = 0;
+	    theCursor = theCursor->next;
     }
-    return 0;
+    return CanonicalForm( 0 );
 }
+//}}}
 
 #ifndef NOSTREAMIO
 void
@@ -621,7 +628,7 @@ InternalPoly::divremsamet( InternalCF* acoeff, InternalCF*& quot, InternalCF*& r
 }
 
 int
-InternalPoly::comparecoeff ( InternalCF* acoeff )
+InternalPoly::comparecoeff ( InternalCF* )
 {
     return 1;
 }
