@@ -8,12 +8,16 @@ singular.hlp
 examples.tex
 general.tex
 types.tex
+manual.tex
 math.tex
 pdata.tex
 reference.tex
 singular.tex
 start.tex
 types.tex
+tricks.tex
+
+version.texi
 
 .singular_hist
 doe.tmp
@@ -24,7 +28,6 @@ save_i
 test.ascii
 test.mp
 
-Z*
 *.tst
 *.pag
 *.dir
