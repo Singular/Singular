@@ -1,4 +1,108 @@
+Mon Sep  1 10:47:41 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* cf_algorithm.h: doc checked
+
+	* cf_resultant.cc: doc checked
+
+	* canonicalform.h (resultant): declaration moved to cf_algorithm.h
+	* cf_algorithm.h (resultant): declaration moved from
+	  canonicalform.h to cf_algorithm.h
+
+	* cf_ops.cc (resultant): function moved to cf_resultant.cc
+	* cf_resultant.cc (trivialResultant): new function
+	* cf_resultant.cc (resultant): moved from cf_ops.cc to
+	  cf_resultant.cc.  Completely rewritten.
+
+	* cf_ops.cc (psr): returns f now if deg(f) < deg(g)
+
+	* cf_resultant.cc (subResChain): new function
+	* cf_algorithm.h (subResChain): new declaration
+
+	* cf_factor.cc (factorize( CanonicalFormn, bool ), sqrFree):
+	  default argument initializer from definition removed
+
+Fri Aug 29 09:10:28 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* canonicalform.cc (degree( Variable )): slightly speeded up
+	(deriv( Variable )): slightly speeded up
+
+	* canonicalform.h (deriv): doc fix
+
+	* canonicalform.cc (deriv( Variable )): assertion added
+	(deriv( Variable )): bug fix
+
+	* cf_algorithm.h: declarations of functions from cf_linsys.cc
+	  moved from canonicalform.h to cf_algorithm.h
+	* canonicalform.h: declarations of functions from cf_linsys.cc
+	  moved to cf_algorithm.h
+
+	* cf_factor.cc (sqrFree( CF )): removed
+	  (sqrFree( CF, bool )): default argument initializer added
+	  (factorize( CF, bool )): default argument initializer added
+	* cf_algorithm.h  (sqrFree( CF )): declaration removed
+	  (sqrFree( CF, bool )): default argument initializer added to
+	  declaration
+	  (factorize( CF, bool )): default argument initializer added to
+	  declaration
+
+	* GNUmakefile.in (basefactorysrc): cf_resultant.cc added to
+	  distribution
+
+	* cf_algorithm.h: declarations from cf_factor.h moved to
+	  cf_algorithm.h
+	* cf_factor.h: declarations moved to cf_algorithm.h.  cf_factor.h
+	  removed.  All #include statements changed.
+	* GNUmakefile.in (basefactoryincl): cf_factor.h removed from
+	  distribution
+	* canonicalform.h: declarations of functions from cf_factor.cc
+	  removed.  In all files which refer to these functions #include
+	  of cf_algorithm.h added.
+
+	* cf_algorithm.h: new file
+	* cf_algorithm.h: declarations from cf_chinese.h moved to
+	  cf_algorithm.h
+	* cf_chinese.h: declarations moved to cf_algorithm.h.
+	  cf_chinese.h removed.  All #include statements changed.
+	* GNUmakefile.in (basefactoryincl): cf_chinese.h removed from
+	  distribution.  cf_algorithm.h added to distribution.
+
+Thu Aug 28 09:21:15 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* cf_map.h: superfluous '#include "templates/ftmpl_functions.h"'
+	  removed
+
+Mon Aug  4 16:57:27 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* canonicalform.cc (sqrt): doc fix
+
+Fri Aug  1 11:06:58 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* cf_map.cc (operator << ( ostream& s, const CFMap & m )):
+	  rewritten
+
+	* configure.in: checks for compiler characteristic are done with C
+	  instead of C++
+
+Thu Jul 31 14:59:07 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* fac_univar.cc (kBound): bound fixed
+
+	* canonicalform.h (sqrt): doc fix
+
+	* canonicalform.cc (sqrt): immediate case completely rewritten
+
 Wed Jul 30 09:40:08 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* cf_linsys.cc (bound): off by one errors fixed
+	(linearSystemSolve): off by one errors fixed
+
+	* cf_linsys.cc (bound): debug output added
+
+	* cf_linsys.cc (bound): returns now bound + 1
+
+	* canonicalform.cc (sqrt): sqrt(0) works now
+	(sqrt): assertion added
+	(sqrt): 'int h' changed to 'long long h'.  Casts added.
 
 	* cf_defs.h (SW_RATIONAL, SW_QUOTIENT, SW_SYMMETRIC_FF,
 	  SW_BERLEKAMP, SW_FAC_USE_BIG_PRIMES, SW_FAC_QUADRATICLIFT,
