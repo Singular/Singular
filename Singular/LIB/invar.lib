@@ -1,7 +1,7 @@
-// $Id: invar.lib,v 1.15 1999-08-03 11:43:07 obachman Exp $
+// $Id: invar.lib,v 1.16 1999-08-03 13:21:56 obachman Exp $
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: invar.lib,v 1.15 1999-08-03 11:43:07 obachman Exp $";
+version="$Id: invar.lib,v 1.16 1999-08-03 13:21:56 obachman Exp $";
 info="
 LIBRARY: invar.lib   PROCEDURES FOR COMPUTING INVARIANTS OF (K,+)-ACTIONS
 AUTHORS: Gerhard Pfister,  email: pfister@mathematik.uni-kl.de
@@ -198,7 +198,7 @@ EXAMPLE: example reduction; shows an example
        map psi = s1,maxideal(1),dom;
        poly re = p - psi(check);
        // devide by the maximal power of #[1]
-          if ( defined(q) )
+          if ( defined(q) == voice )
           {  while ((re!=0) && (re!=#[1]) &&(subst(re,#[1],0)==0))
              {  re=re/#[1];
              }
@@ -226,10 +226,7 @@ EXAMPLE: example reduction; shows an example
         dom[i]=lead(dom[i])-var(nvars(bsr)+i+1);
      }
      dom=lead(imap(bsr,p))-@(0),dom;
-    
- dom;
- pause;
- 
+
   //---------- eliminates the variables of the basering bsr --------------
   //i.e. computes dom intersected with K[@(0),...,@(z)] (this is hard)
   //### hier Variante analog zu algebra_containment einbauen!
@@ -524,9 +521,8 @@ EXAMPLE: example invariantRing; shows an example
      "";
      karl;
      "";
-     "// hit return key to continue!";
-     pause;
-     " ";
+     pause("// hit return key to continue!");
+     "";
   }
   //------------------ computation of further invariants ----------------
   it=0;
@@ -557,12 +553,11 @@ EXAMPLE: example invariantRing; shows an example
         karl=karl+simplify(k1[i],1);
       }
     }
-    if( defined(pau) )
-    {  
+    if( defined(pau) == voice)
+    {
        "// the invariants after",it,"iteration(s):"; "";
        karl;"";
-       "// hit return key to continue!";
-       pause;
+       pause("// hit return key to continue!");
        "";
     }
     if( (bou>0) && (size(k1)>0) )
