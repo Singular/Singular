@@ -1,7 +1,7 @@
-// $Id: elim.lib,v 1.12 2001-01-03 01:25:33 greuel Exp $
+// $Id: elim.lib,v 1.13 2001-01-08 00:59:48 greuel Exp $
 // (GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: elim.lib,v 1.12 2001-01-03 01:25:33 greuel Exp $";
+version="$Id: elim.lib,v 1.13 2001-01-08 00:59:48 greuel Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  elim.lib      Elimination, Saturation and Blowing up
@@ -20,6 +20,7 @@ PROCEDURES:
 LIB "inout.lib";
 LIB "general.lib";
 LIB "poly.lib";
+
 ///////////////////////////////////////////////////////////////////////////////
 
 proc blowup0 (ideal j,list #)
@@ -106,6 +107,7 @@ NOTE:    no special monomial ordering is required, result is a SB with
          respect to ordering dp (resp. ls) if the first var not to be
          eliminated belongs to a -p (resp. -s) blockordering
          This proc uses 'execute' or calls a procedure using 'execute'.
+SEE ALSO: elim1, eliminate
 EXAMPLE: example elim; shows examples
 "
 {
@@ -146,6 +148,7 @@ NOTE:    no special monomial ordering is required, result is a SB with
          respect to ordering dp (resp. ls) if the first var not to be
          eliminated belongs to a -p (resp. -s) blockordering
          This proc uses 'execute' or calls a procedure using 'execute'.
+SEE ALSO: elim, eliminate
 EXAMPLE: example elim1; shows examples
 "
 {
@@ -181,6 +184,7 @@ example
 proc nselect (id, int n, list#)
 "USAGE:   nselect(id,n[,m]); id a module or ideal, n, m integers
 RETURN:  generators of id not containing the variable n [up to m]
+SEE ALSO: select, select1
 EXAMPLE: example nselect; shows examples
 "{
    int j,k;
@@ -248,6 +252,7 @@ proc select (id, int n, list#)
 RETURN:  generators of id containing the variable n [all variables up to m]
 NOTE:    use 'select1' for selecting generators containing at least one of the
          variables between n and m
+SEE ALSO: select1, nselect
 EXAMPLE: example select; shows examples
 "{
    if( size(#)==0 ) { #[1]=n; }
@@ -277,6 +282,7 @@ RETURN:  generators of id containing the variable n
          [at least one of the variables up to m]
 NOTE:    use 'select' for selecting generators containing all the
          variables between n and m
+SEE ALSO: select, nselect
 EXAMPLE: example select1; shows examples
 "{
    if( size(#)==0 ) { #[1]=n; }
