@@ -145,7 +145,7 @@ if test "$with_info" != no; then
 fi
 
 dnl check for perl
-AC_CHECK_PROG(PERL, perl5, perl)
+AC_CHECK_PROG(PERL, perl5, perl5, perl)
   
 dnl
 dnl CHECK --without arguments
