@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.4 1998-05-04 17:41:10 Singular Exp $
+@comment $Id: start.doc,v 1.5 1998-05-07 16:19:19 Singular Exp $
 @comment this file contains the "Introduction" chapter.
 @menu
 * Background::
@@ -7,10 +7,55 @@
 * Getting started::
 @end menu
 
+@c ------------------------------------------------------------------
 @node Background, How to use this manual, Introduction, Introduction
 @section Background
 @cindex Background
 
+@sc{Singular} performs algebraic manipulations on numbers, polynomials, ideals,
+rings, modules, matrices and maps between rings.
+The baserings are polynomial rings or localizations hereof over a field
+(e.g finite fields, the rationals, reals, algebraic extensions,
+transcendental extensions) or quotient rings with respect to an ideal.
+The main objects in @sc{Singular} are ideals and modules,
+one of the main algorithms is a general standard basis
+algorithm with respect to
+any semigroup ordering. This includes Buchberger's algorithm
+(if the ordering is a wellordering) and Mora's algorithm (if the ordering is
+a tangent cone ordering) as special cases.
+Other algorithms include computing modules of syzygies,
+finite free resolutions, Hilbert-Poincare series, etc.
+The first implementation of the tangent cone algorithm
+was done in Modula 2 at the Humboldt
+University of Berlin by Gerhard Pfister and Hans
+@tex
+ Sch\"onemann
+@end tex
+@ifinfo
+ Schoenemann
+@end ifinfo
+ in 1986.
+@c It was mainly able to compute certain special invariants of singularities.
+In September 1991 it became a joint project of the Humboldt University of
+Berlin and the University of Kaiserslautern.
+Since 1994 the development of @sc{Singular} is continued at Kaiserslautern.
+@c The goal was to have all the
+@c well known algorithms for computing in
+@c nonhomogeneous ideals in polynomial and powers series rings.
+The need for a new system arose from
+the investigation of mathematical problems
+coming from singularity theory which none of the existing systems
+were able to compute.
+Later we included an algorithm for multivariate polynomial factorization
+in order to perform efficiently primary decomposition of ideals.
+The need for solving big systems of polynomial equations, orginating
+from practical problems in microelectronics, let us implement FGLM-techniques;
+further algorithms for this purpose are to be implemented.
+Thus, we hope to offer a useful system
+for dealing with local and global computational aspects
+of systems of polynomial equations.
+
+@c ------------------------------------------------------------------
 @node How to use this manual, Getting started, Background, Introduction
 @section How to use this manual
 @cindex How to use this manual
@@ -85,6 +130,7 @@ The libraries which come with @sc{Singular} and the functions contained
 in them are listed in @ref{SINGULAR libraries}, and @ref{Library function
 index}, resp.
 
+@c ------------------------------------------------------------------
 @node Getting started,  , How to use this manual, Introduction
 @section Getting started
 @cindex Getting started
