@@ -4,7 +4,7 @@
 
 //**************************************************************************/
 //
-// $Id: ndbm.cc,v 1.8 1998-01-27 15:34:08 pohl Exp $
+// $Id: ndbm.cc,v 1.9 1998-04-09 11:47:13 pohl Exp $
 //
 //**************************************************************************/
 // 'ndbm.cc' containes all low-level functions to manipulate dbm-files
@@ -29,18 +29,24 @@ static char sccsid[] = "@(#)ndbm.c        5.3 (Berkeley) 3/9/86";
 //**************************************************************************/
 
 #include <stdio.h>
+#ifdef __MWERKS__
+#   define bcopy(a,b,c) memmove(b,a,c)
+#   define EPERM 1
+#   define ENOMEM 23
+#   define ENOSPC 28
+#   define L_SET SEEK_SET
 #ifdef macintosh
 #   include <stdlib.h>
 #   include <errno.h>
 #   include "fcntl.h"
 #   include <string.h>
 #   include <stat.h>
-#   define L_SET SEEK_SET
-#   define EPERM 1
-#   define ENOSPC 28
-#   define ENOMEM 23
-#   define bcopy(a,b,c) memmove(b,a,c)
-#else /* not macintosh */
+//#   include <stat.h>
+#else
+#   include <unix.h>
+#   include <ThreadLocalData.h>
+#endif
+#else
 #   include <sys/types.h>
 #   include <sys/stat.h>
 #   include <sys/file.h>
@@ -49,7 +55,7 @@ static char sccsid[] = "@(#)ndbm.c        5.3 (Berkeley) 3/9/86";
 #   include <string.h>
 #   include <unistd.h>
 #   include <fcntl.h>
-#endif /* macintosh */
+#endif
 #ifndef HAVE_BCOPY
 #   define bcopy(a,b,c) memmove(b,a,c)
 #endif /* not HAVE_BCOPY */
@@ -67,8 +73,11 @@ static  long hashinc(register DBM *db, long hash);
 static  long dcalchash(datum item);
 static  int delitem(char buf[PBLKSIZ], int n);
 static  int additem(char buf[PBLKSIZ], datum item, datum item1);
+#if defined(__MWERKS__) && ! defined(macintosh)
+#define errno (_GetThreadLocalData()->errno)
+#else
 extern  int errno;
-
+#endif
 
 DBM *
 dbm_open(char *file, int flags, int mode)
@@ -95,20 +104,20 @@ dbm_open(char *file, int flags, int mode)
     flags = (flags & ~03) | O_RDWR;
   strcpy(db->dbm_pagbuf, file);
   strcat(db->dbm_pagbuf, ".pag");
-#ifdef macintosh
+#ifdef __MWERKS__
   db->dbm_pagf = open(db->dbm_pagbuf, flags);
-#else /* not macintosh */
+#else /* not __MWERKS__ */
   db->dbm_pagf = open(db->dbm_pagbuf, flags, mode);
-#endif /* macintosh */
+#endif /* __MWERKS__ */
   if (db->dbm_pagf < 0)
     goto bad;
   strcpy(db->dbm_pagbuf, file);
   strcat(db->dbm_pagbuf, ".dir");
-#ifdef macintosh
+#ifdef __MWERKS__
   db->dbm_dirf = open(db->dbm_pagbuf, flags);
-#else /* not macintosh */
+#else /* not __MWERKS__ */
   db->dbm_dirf = open(db->dbm_pagbuf, flags, mode);
-#endif /* macintosh */
+#endif /* __MWERKS__ */
   if (db->dbm_dirf < 0)
     goto bad1;
   fstat(db->dbm_dirf, &statb);
