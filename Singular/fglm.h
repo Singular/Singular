@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.h,v 1.5 1997-10-06 12:19:07 obachman Exp $
+// $Id: fglm.h,v 1.6 1997-10-18 11:01:57 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -80,4 +80,8 @@ fglmProc( leftv result, leftv first, leftv second );
 // FindUnivariatePolys (test)
 ideal
 FindUnivariateWrapper( ideal source );
+
+// homogeneous FGLM
+ideal
+fglmhomProc(leftv first, leftv second);
 #endif
