@@ -1,21 +1,21 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: units.cc,v 1.6 2001-02-08 13:13:05 Singular Exp $ */
+/* $Id: units.cc,v 1.7 2001-02-23 18:30:59 levandov Exp $ */
 /*
 * ABSTRACT: procedures to compute with units
 */
 
-#include <mod2.h>
-#include <tok.h>
-#include <ipid.h>
-#include <febase.h>
-#include <numbers.h>
-#include <polys.h>
-#include <ideals.h>
-#include <matpol.h>
-#include <kstd1.h>
-#include <units.h>
+#include "mod2.h"
+#include "tok.h"
+#include "ipid.h"
+#include "febase.h"
+#include "numbers.h"
+#include "polys.h"
+#include "ideals.h"
+#include "matpol.h"
+#include "kstd1.h"
+#include "units.h"
 
 matrix invunit(int n,matrix U)
 {
