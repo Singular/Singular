@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: pcv.h,v 1.10 1998-12-21 10:54:59 mschulze Exp $ */
+/* $Id: pcv.h,v 1.11 1999-06-08 09:14:01 mschulze Exp $ */
 /*
 * ABSTRACT: conversion between polys and coef vectors
 */
@@ -11,7 +11,9 @@
 
 int pcvDeg(poly p);
 int pcvMinDeg(poly p);
+int pcvMinDeg(matrix m);
 int pcvMaxDeg(poly p);
+int pcvMaxDeg(matrix m);
 BOOLEAN pcvMinDeg(leftv res,leftv h);
 BOOLEAN pcvMaxDeg(leftv res,leftv h);
 void pcvInit(int d);

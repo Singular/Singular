@@ -1,81 +1,81 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: jordan.lib,v 1.9 1999-02-18 19:29:01 mschulze Exp $";
+version="$Id: jordan.lib,v 1.10 1999-06-08 09:15:20 mschulze Exp $";
 info="
 LIBRARY: jordan.lib  PROCEDURES TO COMPUTE THE JORDAN NORMAL FORM
 AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
 
- jordan(M[,opt]);  eigenvalues, Jordan block sizes, transformation matrix of M
+ jordan(M[,opt]);  eigenvalues, Jordan block sizes, Jordan transformation of M
  jordanmatrix(l);  Jordan matrix with eigenvalues l[1], Jordan block sizes l[2]
  jordanform(M);    Jordan normal form of constant square matrix M
- inversemat(M);    inverse matrix of invertible constant matrix M
+ invmat(M);        inverse matrix of invertible constant matrix M
 ";
 
 LIB "ring.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc jordan(matrix M,list #)
-"USAGE:   jordan(M[,opt]); M constant square matrix, opt integer
-ASSUME:  the eigenvalues of M are in the coefficient field
-RETURN:  a list l with 3 entries of type ideal, list of intvecs, matrix with
-           l[1]       : eigenvalues of M
-           l[2][i][j] : size of j-th Jordan block with eigenvalue l[1][i]
-           l[3] : transformation matrix U with U^(-1)*M*U in Jordan normal form
-         which entries of l are computed depends on opt:
-           opt=-1 : compute l[1]
-           opt= 0 : compute l[1] and l[2] (default)
-           opt= 1 : compute l[1],l[2] and l[3]
-           opt= 2 : compute l[1] and l[3]
-NOTE:    a non constant polynomial matrix M is replaced by its constant part
-EXAMPLE: example jordan; shows an example
+"USAGE:   jordan(M[,opt]); with M constant square matrix and opt integer.
+ASSUME:  The eigenvalues of M are in the coefficient field.
+RETURN:  The procedure returns a list l with 3 entries of type
+         ideal, list of intvecs, matrix with
+         l[1] eigenvalues of M,
+         l[2][i][j] size of j-th Jordan block with eigenvalue l[1][i], and
+         l[3]^(-1)*M*l[3] in Jordan normal form.
+         Depending on opt, only certain entries of l are computed.
+         If opt=-1, l[1] is computed,
+         if opt= 0, l[1] and l[2] are computed,
+         if opt= 1, l[1],l[2], and l[3] are computed, and,
+         if opt= 2, l[1] and l[3] are computed.
+         By default, opt=0.
+NOTE:    A non constant polynomial matrix M is replaced by its constant part.
+EXAMPLE: example jordan; shows an example.
 "
 {
-  // test if square matrix
+  // test if M is a square matrix
   int n=nrows(M);
   if(n!=ncols(M))
   {
-    "//no square matrix";
-    return();
+    print("//no square matrix");
+    return(list());
   }
 
-  // get constant part
-  def br=basering;
-  map zero=br,0;
-  M=zero(M);
-  kill zero;
+  // replace M by its constant part
+  M=jet(M,0);
 
   // change to polynomial ring for factorization
+  def br=basering;
   changeord("pr","dp");
   matrix M=imap(br,M);
 
-  // factorize characteristic polynomial
+  // factorize characteristic polynomial of M
   list l=factorize(det(M-var(1)*freemodule(n)),2);
 
-  // get multiplicities mM
+  // get multiplicities mM of M
   def eM,mM=l[1..2];
   kill l;
 
-  // test if eigenvalues in the coefficient field
+  // test if eigenvalues of M are in the coefficient field
   int i;
   for(i=size(eM);i>=1;i--)
   {
     if(deg(eM[i])>1)
     {
+      print("//eigenvalues not in the coefficient field");
+      setring br;
       kill pr;
-      "//eigenvalues not in the coefficient field";
-      return();
+      return(list());
     }
   }
 
-  // get eigenvalues eM
+  // get eigenvalues eM of M
   map inv=pr,-var(1);
-  eM=simplify(inv(eM),1);
+  eM=jet(simplify(inv(eM),1),0);
   setring br;
-  map zero=pr,0;
-  ideal eM=zero(eM);
+  ideal eM=fetch(pr,eM);
   kill pr;
 
-  // sort eigenvalues
+  // sort eigenvalues eM
   int j;
   poly e;
   int m;
@@ -96,7 +96,7 @@ EXAMPLE: example jordan; shows an example
   }
   kill e,m;
 
-  // get option parameter
+  // get optional parameter opt
   int opt=0;
   if(size(#)>0)
   {
@@ -110,7 +110,7 @@ EXAMPLE: example jordan; shows an example
     return(list(eM));
   }
 
-  // define needed variables
+  // define variables
   int k,l;
   matrix E=freemodule(n);
   matrix Mi,Ni;
@@ -127,7 +127,7 @@ EXAMPLE: example jordan; shows an example
     intvec bMi;
   }
 
-  // do the following for all eigenvalues eM[i]
+  // do for all eigenvalues eM[i]
   for(i=ncols(eM);i>=1;i--)
   {
     Mi=M-eM[i]*E;
@@ -142,7 +142,7 @@ EXAMPLE: example jordan; shows an example
 
     if(opt<=1)
     {
-      // compute Jordan block size vector corresponding to eigenvalue eM[i]
+      // compute Jordan block size vector bMi corresponding to eigenvalue eM[i]
       bMi=0;
       bMi[size(K[2])]=0;
       for(j=size(K);j>=2;j--)
@@ -157,8 +157,7 @@ EXAMPLE: example jordan; shows an example
 
     if(opt>=1)
     {
-      // compute generating vectors for Jordan basis vectors corresponding to 
-      // eigenvalue eM[i]
+      // compute Jordan basis vectors K corresponding to eigenvalue eM[i]
       if(size(K)>1)
       {
         for(j,K1=2,0;j<=size(K)-1;j++)
@@ -169,9 +168,6 @@ EXAMPLE: example jordan; shows an example
         }
         K[j]=interred(reduce(K[j],std(K1)));
       }
-
-      // compute Jordan basis vectors corresponding to eigenvalue eM[i] from
-      // generating vectors
       for(j=size(K);j>=2;j--)
       {
         for(k=size(K[j]);k>=1;k--)
@@ -188,7 +184,7 @@ EXAMPLE: example jordan; shows an example
   }
   kill l;
 
-  // create return list
+  // create return list l
   list l=eM;
   if(opt<=1)
   {
@@ -211,30 +207,32 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc jordanmatrix(list l)
-"USAGE:   jordanmatrix(l); l list of ideal and list of intvecs
-RETURN:  the Jordan matrix J defined by l:
-           l[1]       : eigenvalues of J
-           l[2][i][j] : size of j-th Jordan block with eigenvalue l[1][i]
-EXAMPLE: example jordanmatrix; shows an example
+"USAGE:   jordanmatrix(l); with l list of ideal and list of intvecs.
+RETURN:  The procedure returns the Jordan matrix J with eigenvalues l[1] and
+         size l[2][i][j] of j-th Jordan block with eigenvalue l[1][i].
+EXAMPLE: example jordanmatrix; shows an example.
 "
 {
   // check parameters
   if(size(l)<2)
   {
-    "//not enough entries in argument list";
-    return(); 
+    print("//not enough entries in argument list");
+    matrix J[1][0];
+    return(J); 
   }
   def eJ,bJ=l[1..2];
   kill l;
   if(typeof(eJ)!="ideal")
   {
-    "//first entry in argument list not an ideal";
-    return();
+    print("//first entry in argument list not an ideal");
+    matrix J[1][0];
+    return(J); 
   }
   if(typeof(bJ)!="list")
   {
-    "//second entry in argument list not a list";
-    return();
+    print("//second entry in argument list not a list");
+    matrix J[1][0];
+    return(J); 
   }
   if(size(eJ)<size(bJ))
   {
@@ -251,8 +249,9 @@ EXAMPLE: example jordanmatrix; shows an example
   {
     if(typeof(bJ[i])!="intvec")
     {
-      "//second entry in argument list not a list of integer vectors";
-      return();
+      print("//second entry in argument list not a list of intvecs");
+      matrix J[1][0];
+      return(J);
     }
     else
     {
@@ -266,10 +265,10 @@ EXAMPLE: example jordanmatrix; shows an example
       }
     }
   }
-  matrix J[n][n];
 
   // create Jordan matrix
   int l;
+  matrix J[n][n];
   for(i,l=1,1;i<=s;i++)
   {
     for(j=1;j<=size(bJ[i]);j++)
@@ -302,11 +301,11 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc jordanform(matrix M)
-"USAGE:   jordanform(M); M constant square matrix
-ASSUME:  the eigenvalues of M are in the coefficient field
-RETURN:  the Jordan normal form of M
-NOTE:    a non constant polynomial matrix M is replaced by its constant part
-EXAMPLE: example jordanform; shows an example
+"USAGE:   jordanform(M); with M constant square matrix.
+ASSUME:  The eigenvalues of M are in the coefficient field.
+RETURN:  The procedure returns the Jordan normal form of M.
+NOTE:    A non constant polynomial matrix M is replaced by its constant part.
+EXAMPLE: example jordanform; shows an example.
 "
 {
   return(jordanmatrix(jordan(M)));
@@ -320,36 +319,30 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc inversemat(matrix M)
-"USAGE:   inversemat(M); M constant square matrix
-ASSUME:  M is invertible
-RETURN:  the inverse matrix of M
-NOTE:    a non constant polynomial matrix M is replaced by its constant part
-EXAMPLE: example inversemat; shows an example
+proc invmat(matrix M)
+"USAGE:   invmat(M); with M constant square matrix.
+ASSUME:  M is invertible.
+RETURN:  The procedure returns the inverse matrix of M.
+NOTE:    A non constant polynomial matrix M is replaced by its constant part.
+EXAMPLE: example invmat; shows an example.
 "
 {
-  // test if square matrix
-  int n=nrows(M);
-  if(n!=ncols(M))
+  if(nrows(M)==ncols(M))
   {
-    "//no square matrix";
-    return();
+    matrix invM=lift(jet(M,0),freemodule(nrows(M)));
   }
-
-  // get constant part
-  def br=basering;
-  map zero=br,0;
-  M=zero(M);
-
-  // compute inverse
-  return(lift(M,freemodule(n)));
+  else
+  {
+    print("//no square matrix");
+    matrix[1][0]=invM;
+  }
+  return(invM);
 }
 example
 { "EXAMPLE:"; echo=2;
   ring R=0,x,dp;
   matrix M[3][3]=3,2,1,0,2,1,0,0,3;
   print(M);
-  print(inversemat(M));
+  print(invmat(M));
 }
 ///////////////////////////////////////////////////////////////////////////////
-

@@ -1,12 +1,13 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.19 1999-04-29 15:09:32 Singular Exp $ */
+/* $Id: pcv.cc,v 1.20 1999-06-08 09:13:54 mschulze Exp $ */
 /*
 * ABSTRACT: conversion between polys and coef vectors
 */
 
 #include "mod2.h"
+
 #ifdef HAVE_PCV
 #if !defined(HAVE_DYNAMIC_LOADING) || defined(BUILD_MODULE)
 
@@ -15,17 +16,80 @@
 #include "numbers.h"
 #include "polys.h"
 #include "lists.h"
+#include "matpol.h"
 #include "febase.h"
 #include "pcv.h"
 
-static int pcvDegBound;
+static int pcvMaxDegree;
 static int pcvTableSize;
 static int pcvIndexSize;
 static unsigned* pcvTable=NULL;
 static unsigned** pcvIndex=NULL;
 
-#ifndef HAVE_DYNAMIC_LOADING
-/* Without dynamic-loading we need to provides following functions */
+int pcvDeg(poly p)
+{
+  int d=0;
+  for(int i=pVariables;i>=1;i--) d+=pGetExp(p,i);
+  return d;
+}
+
+int pcvMinDeg(poly p)
+{
+  if(!p) return -1;
+  int md=pcvDeg(p);
+  pIter(p);
+  while(p)
+  {
+    int d=pcvDeg(p);
+    if(d<md) md=d;
+    pIter(p);
+  }
+  return md;
+}
+
+int pcvMinDeg(matrix m)
+{
+  int i,j,d;
+  int md=-1;
+  for(i=1;i<=MATROWS(m);i++)
+  {
+    for(j=1;j<=MATCOLS(m);j++)
+    {
+      d=pcvMinDeg(MATELEM(m,i,j));
+      if((d>=0&&md>d)||md==-1) md=d;
+    }
+  }
+  return(md);
+}
+
+int pcvMaxDeg(poly p)
+{
+  if(!p) return -1;
+  int md=pcvDeg(p);
+  pIter(p);
+  while(p)
+  {
+    int d=pcvDeg(p);
+    if(d>md) md=d;
+    pIter(p);
+  }
+  return md;
+}
+
+int pcvMaxDeg(matrix m)
+{
+  int i,j,d;
+  int md=-1;
+  for(i=1;i<=MATROWS(m);i++)
+  {
+    for(j=1;j<=MATCOLS(m);j++)
+    {
+      d=pcvMinDeg(MATELEM(m,i,j));
+      if((d>=0&&md<d)||md==-1) md=d;
+    }
+  }
+  return(md);
+}
 
 BOOLEAN pcvMinDeg(leftv res,leftv h)
 {
@@ -37,8 +101,15 @@ BOOLEAN pcvMinDeg(leftv res,leftv h)
       res->data=(void*)pcvMinDeg((poly)h->Data());
       return FALSE;
     }
+    else
+    if(h->Typ()==MATRIX_CMD)
+    {
+      res->rtyp=INT_CMD;
+      res->data=(void*)pcvMinDeg((matrix)h->Data());      
+      return FALSE;
+    }
   }
-  WerrorS("<poly> expected");
+  WerrorS("<poly> or <matrix> expected");
   return TRUE;
 }
 
@@ -52,167 +123,34 @@ BOOLEAN pcvMaxDeg(leftv res,leftv h)
       res->data=(void*)pcvMaxDeg((poly)h->Data());
       return FALSE;
     }
-  }
-  WerrorS("<poly> expected");
-  return TRUE;
-}
-
-BOOLEAN pcvP2CV(leftv res,leftv h)
-{
-  if(currRingHdl)
-  {
-    if(h&&h->Typ()==LIST_CMD)
+    else
+    if(h->Typ()==MATRIX_CMD)
     {
-      lists pl=(lists)h->Data();
-      h=h->next;
-      if(h&&h->Typ()==INT_CMD)
-      {
-        int d0=(int)h->Data();
-        h=h->next;
-        if(h&&h->Typ()==INT_CMD)
-        {
-          int d1=(int)h->Data();
-          res->rtyp=LIST_CMD;
-          res->data=pcvP2CV(pl,d0,d1);
-          return FALSE;
-        }
-      }
+      res->rtyp=INT_CMD;
+      res->data=(void*)pcvMaxDeg((matrix)h->Data());      
+      return FALSE;
     }
-    WerrorS("<list>,<int>,<int> expected");
-    return TRUE;
   }
-  WerrorS("no ring active");
+  WerrorS("<poly> or <matrix> expected");
   return TRUE;
-}
-
-BOOLEAN pcvCV2P(leftv res,leftv h)
-{
-  if(currRingHdl)
-  {
-    if(h&&h->Typ()==LIST_CMD)
-    {
-      lists pl=(lists)h->Data();
-      h=h->next;
-      if(h&&h->Typ()==INT_CMD)
-      {
-        int d0=(int)h->Data();
-        h=h->next;
-        if(h&&h->Typ()==INT_CMD)
-        {
-          int d1=(int)h->Data();
-          res->rtyp=LIST_CMD;
-          res->data=pcvCV2P(pl,d0,d1);
-          return FALSE;
-        }
-      }
-    }
-    WerrorS("<list>,<int>,<int> expected");
-    return TRUE;
-  }
-  WerrorS("no ring active");
-  return TRUE;
-}
-
-BOOLEAN pcvDim(leftv res,leftv h)
-{
-  if(currRingHdl)
-  {
-    if(h&&h->Typ()==INT_CMD)
-    {
-      int d0=(int)h->Data();
-      h=h->next;
-      if(h&&h->Typ()==INT_CMD)
-      {
-        int d1=(int)h->Data();
-        res->rtyp=INT_CMD;
-        res->data=(void*)pcvDim(d0,d1);
-        return FALSE;
-      }
-    }
-    WerrorS("<int>,<int> expected");
-    return TRUE;
-  }
-  WerrorS("no ring active");
-  return TRUE;
-}
-
-BOOLEAN pcvBasis(leftv res,leftv h)
-{
-  if(currRingHdl)
-  {
-    if(h&&h->Typ()==INT_CMD)
-    {
-      int d0=(int)h->Data();
-      h=h->next;
-      if(h&&h->Typ()==INT_CMD)
-      {
-        int d1=(int)h->Data();
-        res->rtyp=LIST_CMD;
-        res->data=pcvBasis(d0,d1);
-        return FALSE;
-      }
-    }
-    WerrorS("<int>,<int> expected");
-    return TRUE;
-  }
-  WerrorS("no ring active");
-  return TRUE;
-}
-
-#endif /* HAVE_DYNAMIC_LOADING */
-
-int pcvDeg(poly p)
-{
-  int dp=0;
-  for(int i=1;i<=pVariables;i++) dp+=pGetExp(p,i);
-  return dp;
-}
-
-int pcvMinDeg(poly p)
-{
-  if(!p) return 0;
-  int md=pcvDeg(p);
-  pIter(p);
-  while(p)
-  {
-    int d=pcvDeg(p);
-    if(d<md) md=d;
-    pIter(p);
-  }
-  return md;
-}
-
-int pcvMaxDeg(poly p)
-{
-  if(!p) return 0;
-  int md=pcvDeg(p);
-  pIter(p);
-  while(p)
-  {
-    int d=pcvDeg(p);
-    if(d>md) md=d;
-    pIter(p);
-  }
-  return md;
 }
 
 void pcvInit(int d)
 {
   if(d<0) d=0;
-  pcvDegBound=d;
-  pcvTableSize=pVariables*pcvDegBound*sizeof(unsigned);
+  pcvMaxDegree=d;
+  pcvTableSize=pVariables*pcvMaxDegree*sizeof(unsigned);
   pcvTable=(unsigned*)Alloc0(pcvTableSize);
   pcvIndexSize=pVariables*sizeof(unsigned*);
   pcvIndex=(unsigned**)Alloc(pcvIndexSize);
-  int i;
-  for(i=0;i<pVariables;i++)
-    pcvIndex[i]=pcvTable+i*pcvDegBound;
-  for(i=0;i<pcvDegBound;i++)
+  for(int i=0;i<pVariables;i++)
+    pcvIndex[i]=pcvTable+i*pcvMaxDegree;
+  for(int i=0;i<pcvMaxDegree;i++)
     pcvIndex[0][i]=i;
-  for(i=1;i<pVariables;i++)
+  for(int i=1;i<pVariables;i++)
   {
     unsigned x=0;
-    for(int j=0;j<pcvDegBound;j++)
+    for(int j=0;j<pcvMaxDegree;j++)
     {
       x+=pcvIndex[i-1][j];
       pcvIndex[i][j]=x;
@@ -253,7 +191,7 @@ poly pcvN2M(int n)
   for(i=pVariables-1;i>=0;i--)
   {
     k=j;
-    for(j=0;j<pcvDegBound&& ((int)pcvIndex[i][j])<=n;j++);
+    for(j=0;j<pcvMaxDegree&&pcvIndex[i][j]<=n;j++);
     j--;
     n-=pcvIndex[i][j];
     if(i<pVariables-1) pSetExp(m,i+2,k-j);
@@ -343,6 +281,62 @@ lists pcvCV2P(lists cvl,int d0,int d1)
   return pl;
 }
 
+BOOLEAN pcvP2CV(leftv res,leftv h)
+{
+  if(currRingHdl)
+  {
+    if(h&&h->Typ()==LIST_CMD)
+    {
+      lists pl=(lists)h->Data();
+      h=h->next;
+      if(h&&h->Typ()==INT_CMD)
+      {
+        int d0=(int)h->Data();
+        h=h->next;
+        if(h&&h->Typ()==INT_CMD)
+        {
+          int d1=(int)h->Data();
+          res->rtyp=LIST_CMD;
+          res->data=pcvP2CV(pl,d0,d1);
+          return FALSE;
+        }
+      }
+    }
+    WerrorS("<list>,<int>,<int> expected");
+    return TRUE;
+  }
+  WerrorS("no ring active");
+  return TRUE;
+}
+
+BOOLEAN pcvCV2P(leftv res,leftv h)
+{
+  if(currRingHdl)
+  {
+    if(h&&h->Typ()==LIST_CMD)
+    {
+      lists pl=(lists)h->Data();
+      h=h->next;
+      if(h&&h->Typ()==INT_CMD)
+      {
+        int d0=(int)h->Data();
+        h=h->next;
+        if(h&&h->Typ()==INT_CMD)
+        {
+          int d1=(int)h->Data();
+          res->rtyp=LIST_CMD;
+          res->data=pcvCV2P(pl,d0,d1);
+          return FALSE;
+        }
+      }
+    }
+    WerrorS("<list>,<int>,<int> expected");
+    return TRUE;
+  }
+  WerrorS("no ring active");
+  return TRUE;
+}
+
 int pcvDim(int d0,int d1)
 {
   if(d0<0) d0=0;
@@ -351,6 +345,29 @@ int pcvDim(int d0,int d1)
   int d=pcvIndex[pVariables-1][d1]-pcvIndex[pVariables-1][d0];
   pcvClean();
   return d;
+}
+
+BOOLEAN pcvDim(leftv res,leftv h)
+{
+  if(currRingHdl)
+  {
+    if(h&&h->Typ()==INT_CMD)
+    {
+      int d0=(int)h->Data();
+      h=h->next;
+      if(h&&h->Typ()==INT_CMD)
+      {
+        int d1=(int)h->Data();
+        res->rtyp=INT_CMD;
+        res->data=(void*)pcvDim(d0,d1);
+        return FALSE;
+      }
+    }
+    WerrorS("<int>,<int> expected");
+    return TRUE;
+  }
+  WerrorS("no ring active");
+  return TRUE;
 }
 
 int pcvBasis(lists b,int i,poly m,int d,int n)
@@ -384,6 +401,29 @@ lists pcvBasis(int d0,int d1)
     i=pcvBasis(b,i,m,d,1);
   pDelete1(&m);
   return b;
+}
+
+BOOLEAN pcvBasis(leftv res,leftv h)
+{
+  if(currRingHdl)
+  {
+    if(h&&h->Typ()==INT_CMD)
+    {
+      int d0=(int)h->Data();
+      h=h->next;
+      if(h&&h->Typ()==INT_CMD)
+      {
+        int d1=(int)h->Data();
+        res->rtyp=LIST_CMD;
+        res->data=pcvBasis(d0,d1);
+        return FALSE;
+      }
+    }
+    WerrorS("<int>,<int> expected");
+    return TRUE;
+  }
+  WerrorS("no ring active");
+  return TRUE;
 }
 
 #endif /* !defined(HAVE_DYNAMIC_LOADING) || defined(BUILD_MODULE) */
