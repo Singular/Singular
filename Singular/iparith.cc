@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.215 2000-05-29 08:33:52 Singular Exp $ */
+/* $Id: iparith.cc,v 1.216 2000-06-06 15:46:34 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -30,6 +30,7 @@
 #include "ring.h"
 #include "subexpr.h"
 #include "lists.h"
+#include "longalg.h"
 #include "numbers.h"
 #include "stairc.h"
 #include "maps.h"
@@ -41,6 +42,7 @@
 #include "attrib.h"
 #include "silink.h"
 #include "sparsmat.h"
+#include "algmap.h"
 #ifdef HAVE_FACTORY
 #include "clapsing.h"
 #include "kstdfac.h"
@@ -4268,7 +4270,7 @@ static BOOLEAN jjSUBST_Id_X(leftv res, leftv u, leftv v,leftv w, int input_type)
 {
   sleftv tmp;
   memset(&tmp,0,sizeof(tmp));
-  // do not check the result, conversion form int/number to poly works always
+  // do not check the result, conversion from int/number to poly works always
   iiConvert(input_type,POLY_CMD,iiTestConvert(input_type,POLY_CMD),w,&tmp);
   BOOLEAN b=jjSUBST_Id(res,u,v,&tmp);
   tmp.CleanUp();
@@ -4288,6 +4290,39 @@ static BOOLEAN jjMATRIX_Id(leftv res, leftv u, leftv v,leftv w)
   memset(I->m,0,i*sizeof(poly));
   idDelete(&I);
   res->data = (char *)m;
+  return FALSE;
+}
+static BOOLEAN jjSUBST_Par_N(leftv res, leftv u, leftv v,leftv w)
+{
+  // u: to change poly 
+  // v: number (parameter)
+  // w: image of u (number)
+  int i;
+  lnumber a=(lnumber)v->Data();
+  if (naParDeg((number)a)!=1)
+  {
+    WerrorS("first argument is not a parameter");
+    return TRUE;
+  }
+  int r=rPar(currRing);
+  ideal G=idMaxIdeal(1);
+  ideal F=idInit(r,1);
+  int par=-1;
+  for(i=0;i<r;i++)
+  {
+    if (a->z->e[i]!=0) { par=i; break;}
+  }
+  for(i=0;i<r;i++)
+  {
+    if (i==par) F->m[i]=(poly)w->CopyD();
+    else
+    {
+      F->m[i]=pOne();pSetCoeff( F->m[i],naPar(i+1));
+    }
+  }
+  res->data=(poly)maAlgpolyMap(currRing,(poly)u->Data(),F,G);
+  idDelete(&F);
+  idDelete(&G);
   return FALSE;
 }
 static BOOLEAN jjMATRIX_Mo(leftv res, leftv u, leftv v,leftv w)
@@ -4486,6 +4521,7 @@ struct sValCmd3 dArith3[]=
 ,{jjSTATUS3,        STATUS_CMD, INT_CMD,    LINK_CMD,   STRING_CMD, STRING_CMD}
 ,{jjSTD_HILB_W,     STD_CMD,    IDEAL_CMD,  IDEAL_CMD,  INTVEC_CMD, INTVEC_CMD}
 ,{jjSTD_HILB_W,     STD_CMD,    MODUL_CMD,  MODUL_CMD,  INTVEC_CMD, INTVEC_CMD}
+,{jjSUBST_Par_N,    SUBST_CMD,  POLY_CMD,   POLY_CMD,   NUMBER_CMD, POLY_CMD }
 ,{jjSUBST_P,        SUBST_CMD,  POLY_CMD,   POLY_CMD,   POLY_CMD,   POLY_CMD }
 ,{jjSUBST_P,        SUBST_CMD,  POLY_CMD,   POLY_CMD,   POLY_CMD,   POLY_CMD }
 ,{jjSUBST_P,        SUBST_CMD,  VECTOR_CMD, VECTOR_CMD, POLY_CMD,   POLY_CMD }
