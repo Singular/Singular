@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: token for interpreter, as types; general macros
 */
-/* $Id: tok.h,v 1.20 1998-08-25 13:33:24 krueger Exp $ */
+/* $Id: tok.h,v 1.21 1998-10-21 10:25:40 krueger Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -74,6 +74,7 @@ enum {
   KILLATTR_CMD,
   LINK_CMD,
   LIST_CMD,
+  LOAD_CMD,
   LRES_CMD,
   MEMORY_CMD,
   MONITOR_CMD,
@@ -105,6 +106,7 @@ enum {
   TRANSPOSE_CMD,
   TRACE_CMD,
   TYPEOF_CMD,
+  UNLOAD_CMD,
   VARSTR_CMD,
   WRITE_CMD,
   /* start system var section: VECHO */

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.69 1998-10-15 14:08:28 krueger Exp $ */
+/* $Id: extra.cc,v 1.70 1998-10-21 10:25:26 krueger Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -757,18 +757,32 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         Warn("`%s` not found",(char*)h->Data());
     }
     else
+/*==================== lib ==================================*/
+    if(strcmp(sys_cmd,"nn")==0)
+    {
+      if ((h!=NULL) && (h->Typ()==STRING_CMD)) {
+        idhdl pck = NULL, id = NULL;
+        iiname2hdl(h->Data(), &pck, &id);
+        if(pck != NULL) Print("Pack: '%s'\n", pck->id);
+        if(id != NULL)  Print("Rec : '%s'\n", id->id);
+        return FALSE;
+      }
+      else
+        Warn("`%s` not found",(char*)h->Data());
+    }
+    else
 #ifdef HAVE_NAMESPACES
 /*==================== nspush ===================================*/
     if(strcmp(sys_cmd,"nspush")==0)
     {
-      idhdl hh=namespaceroot->get((char*)h->Data(),0, TRUE);
-      if ((hh!=NULL)&&(IDTYP(hh)==PACKAGE_CMD))
+      if (h->Typ()==PACKAGE_CMD)
       {
+        idhdl hh=(idhdl)h->data;
         namespaceroot = namespaceroot->push(IDPACKAGE(hh), IDID(hh));
         return FALSE;
       }
       else
-        Warn("package `%s` not found",(char*)h->Data());
+        Warn("argument 2 is not a package");
     }
     else
 /*==================== nspop ====================================*/

@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Tok.cc,v 1.18 1998-10-15 11:46:05 obachman Exp $ */
+/* $Id: mpsr_Tok.cc,v 1.19 1998-10-21 10:25:50 krueger Exp $ */
 
 /***************************************************************
  *
@@ -184,6 +184,7 @@ short ExtraCmds[] =
 //  RESERVEDNAME_CMD,
   PROC_CMD,
   MAP_CMD,
+  PACKAGE_CMD,
   '=',
   0
 };

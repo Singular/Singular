@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.27 1998-07-21 17:28:31 Singular Exp $ */
+/* $Id: libparse.l,v 1.28 1998-10-21 10:25:37 krueger Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -34,6 +34,7 @@ int current_pos(int i);
 void print_version(lp_modes mode, char *p);
 #ifdef HAVE_NAMESPACES
 void copy_string(lp_modes mode, idhdl pl);
+extern void piCleanUp(procinfov pi);
 #else /* HAVE_NAMESPACES */
 void copy_string(lp_modes mode);
 #endif /* HAVE_NAMESPACES */
@@ -111,6 +112,10 @@ void main_init(int argc, char *argv[]);
 void main_result(char *libname);
 #  else /* STANDALONE_PARSER */
 idhdl h0;
+#    ifdef HAVE_NAMESPACES
+idhdl h_top;
+extern namehdl namespaceroot;
+#    endif /* HAVE_NAMESPACES */
 #    define pi IDPROC(h0)
 extern "C"
 {
@@ -153,7 +158,7 @@ extern libstackv library_stack;
 #  ifdef HAVE_NAMESPACES
 #    define YY_DECL int yylex(char *newlib, char *libfile, \
 			       lib_style_types *lib_style, \
-			       idhdl pl, lp_modes mode)
+			       idhdl pl, BOOLEAN autoexport, lp_modes mode)
 #  else /* HAVE_NAMESPACES */
 #    define YY_DECL int yylex(char *newlib, char *libfile, \
                                  lib_style_types *lib_style, \
@@ -284,7 +289,13 @@ static     { p_static=TRUE; }
              if( mode == LOAD_LIB) {
 #  ifdef HAVE_NAMESPACES
                 h0 = enterid( mstrdup(proc), myynest, PROC_CMD,
-                                  &IDPACKAGE(pl)->idroot, TRUE );
+                                  &IDPACKAGE(pl)->idroot, TRUE);
+                if(!p_static && autoexport) {
+                   namespaceroot->push( NSPACK(namespaceroot->root) ,"");
+                   h_top = enterid( mstrdup(proc), myynest, PROC_CMD,
+                                  &NSROOT(namespaceroot->root), FALSE );
+                   namespaceroot->pop();
+                }
 #  else /* HAVE_NAMESPACES */
                h0 = enterid( mstrdup(proc), myynest, PROC_CMD,
                                    &idroot, TRUE );
@@ -292,6 +303,13 @@ static     { p_static=TRUE; }
                if (h0!=NULL) {
                  iiInitSingularProcinfo(IDPROC(h0), newlib, proc,
                                 yylplineno, current_pos(0),p_static);
+#  ifdef HAVE_NAMESPACES
+                 if (!p_static && h_top != NULL && autoexport) {
+                   if(IDPROC(h_top)!=NULL) piCleanUp((procinfo *)IDPROC(h_top));
+                   IDPROC(h_top)=IDPROC(h0);
+                   IDPROC(h_top)->ref++;
+                 }
+#  endif /* HAVE_NAMESPACES */
                  if (BVERBOSE(V_LOAD_PROC))
                    Warn( "     proc '%s' registered", proc );
                }

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.17 1998-10-15 14:08:32 krueger Exp $ */
+/* $Id: ipid.h,v 1.18 1998-10-21 10:25:33 krueger Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -75,6 +75,7 @@ struct sip_package
 {
   idhdl      idroot; /* local objects */
   short      ref;
+  language_defs language;
 };
 
 union uutypes;
@@ -155,8 +156,8 @@ class namerec {
 
  namerec()  { memset(this,0,sizeof(*this)); }
   //namehdl    Set(idhdl root);
-  namehdl    pop();
-  namehdl    push(package pack, char *name, BOOLEAN init=FALSE);
+  namehdl    pop(BOOLEAN change_nesting=FALSE);
+  namehdl    push(package pack, char *name, int nesting=-1, BOOLEAN init=FALSE);
   idhdl      get(const char * s, int lev, BOOLEAN root=FALSE);
 };
 
@@ -182,6 +183,7 @@ void  killhdl(idhdl h);
 void  killhdl(idhdl h, idhdl * ih);
 lists ipNameList(idhdl root);
 void  ipMoveId(idhdl h);
+BOOLEAN checkPackage(package pack);
 
 #define FLAG_STD   0
 #define FLAG_DRING 1

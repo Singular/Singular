@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.h,v 1.5 1998-08-25 13:33:20 krueger Exp $ */
+/* $Id: lists.h,v 1.6 1998-10-21 10:25:38 krueger Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -35,14 +35,14 @@ class slists
     }
     inline void Init(int l=0)
       { nr=l-1; m=(sleftv *)((l>0) ? Alloc0(l*sizeof(sleftv)): NULL);
-#ifdef HAVE_NAMESPACES
-        packhdl = namespaceroot->get(namespaceroot->name, 0, TRUE);
+#ifdef HAVE_NAMESPACES_N
+        src_packhdl = namespaceroot->get(namespaceroot->name, 0, TRUE);
 #endif /* HAVE_NAMESPACES */
       }
     int    nr; /* the number of elements in the list -1 */
                /* -1: empty list */
-#ifdef HAVE_NAMESPACES
-    idhdl packhdl;
+#ifdef HAVE_NAMESPACES_N
+    idhdl src_packhdl;
 #endif /* HAVE_NAMESPACES */
     sleftv  *m;  /* field of sleftv */
 };

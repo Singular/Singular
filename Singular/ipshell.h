@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.13 1998-10-15 14:08:37 krueger Exp $ */
+/* $Id: ipshell.h,v 1.14 1998-10-21 10:25:36 krueger Exp $ */
 /*
 * ABSTRACT
 */
@@ -24,7 +24,7 @@ extern char *  currid;
 extern char * thisfile;
 extern int     iiRETURNEXPR_len;
 extern sleftv *iiRETURNEXPR;
-#ifdef IILOCALRING
+#ifdef USE_IILOCALRING
 extern ring   *iiLocalRing;
 #endif
 extern cmdnames cmds[];
@@ -46,12 +46,19 @@ int     IsPrime(int i);
 
 BOOLEAN iiWRITE(leftv res,leftv exprlist);
 BOOLEAN iiExport(leftv v, int toLev);
-BOOLEAN iiExport(leftv v, int toLev, idhdl &root);
+#ifdef HAVE_NAMESPACES
+BOOLEAN iiExport(leftv v, int toLev, idhdl roothdl);
+BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl);
+#endif /* HAVE_NAMESPACES */
 char *  iiGetLibName(procinfov v);
 char *  iiGetLibProcBuffer( procinfov pi, int part=1 );
 char *  iiProcName(char *buf, char & ct, char* &e);
 char *  iiProcArgs(char *e,BOOLEAN withParenth);
+#ifdef HAVE_NAMESPACES
+BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport=TRUE, BOOLEAN tellerror=TRUE );
+#else /* HAVE_NAMESPACES */
 BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror=TRUE );
+#endif /* HAVE_NAMESPACES */
 leftv   iiMap(map theMap, char * what);
 void    iiMakeResolv(resolvente r, int length, int rlen, char * name, int typ0,
            intvec ** weights=NULL);
@@ -144,8 +151,12 @@ struct sValAssign
 BOOLEAN iiParameter(leftv p);
 /* ================================================================== */
 int     iiDeclCommand(leftv sy, leftv name, int lev, int t, idhdl* root,
-  BOOLEAN init_b=TRUE);
+  BOOLEAN isring = FALSE, BOOLEAN init_b=TRUE);
+#ifdef HAVE_NAMESPACES
+sleftv * iiMake_proc(idhdl pn, sleftv* slpn, sleftv* sl);
+#else /* HAVE_NAMESPACES */
 sleftv * iiMake_proc(idhdl pn, sleftv* sl);
+#endif /* HAVE_NAMESPACES */
 // from misc.cc:
 char *  showOption();
 BOOLEAN setOption(leftv res, leftv v);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.23 1998-10-14 10:18:54 obachman Exp $ */
+/* $Id: silink.cc,v 1.24 1998-10-21 10:25:46 krueger Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -562,6 +562,12 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
     if (fprintf(fd, "[%d][%d]", IDINTVEC(h)->rows(), IDINTVEC(h)->cols())
         == EOF) return TRUE;
   }
+
+  if (type_id == PACKAGE_CMD) {
+    if (fprintf(fd, ";\n") == EOF) return TRUE;
+    else return FALSE;
+  }
+  
   // write the equal sign
   if (fprintf(fd, " = ") == EOF) return TRUE;
 
@@ -589,6 +595,7 @@ static char* GetIdString(idhdl h)
         for (i=0; i<nl; i++)
           if (GetIdString((idhdl) &(l->m[i])) == NULL) return NULL;
       }
+      case PACKAGE_CMD:
       case INT_CMD:
       case INTVEC_CMD:
       case INTMAT_CMD:

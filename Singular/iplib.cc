@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.35 1998-10-19 14:02:31 hannes Exp $ */
+/* $Id: iplib.cc,v 1.36 1998-10-21 10:25:34 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -333,7 +333,7 @@ static void iiCheckNest()
     iiRETURNEXPR=(sleftv *)ReAlloc(iiRETURNEXPR,
                                    iiRETURNEXPR_len*sizeof(sleftv),
                                    (iiRETURNEXPR_len+16)*sizeof(sleftv));
-#ifdef IILOCALRING
+#ifdef USE_IILOCALRING
     iiLocalRing=(ring *)ReAlloc(iiLocalRing,
                                    iiRETURNEXPR_len*sizeof(ring),
                                    (iiRETURNEXPR_len+16)*sizeof(ring));
@@ -341,13 +341,19 @@ static void iiCheckNest()
     iiRETURNEXPR_len+=16;
   }
 }
+#ifdef HAVE_NAMESPACES
+sleftv * iiMake_proc(idhdl pn, sleftv* slpn, sleftv* sl)
+#else /* HAVE_NAMESPACES */
 sleftv * iiMake_proc(idhdl pn, sleftv* sl)
+#endif /* HAVE_NAMESPACES */
 {
   int err;
   procinfov pi = IDPROC(pn);
   char *plib = iiConvName(pi->libname);
 #ifdef HAVE_NAMESPACES
+//  printf("iiMake_proc: %s %s cur=%s\n", pi->libname, plib, namespaceroot->name);
   idhdl ns = namespaceroot->get(plib,0, TRUE);
+  if((ns==NULL) && (slpn!=NULL) && (slpn->packhdl != NULL)) ns=slpn->packhdl;
   if(pi->is_static) {
     if(ns==NULL) {
       Werror("'%s::%s()' 1 is a local procedure and cannot be accessed by an user.",
@@ -365,12 +371,12 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
   FreeL(plib);
   if(ns != NULL)
   {
-    namespaceroot->push(IDPACKAGE(ns), IDID(ns));
+    namespaceroot->push(IDPACKAGE(ns), IDID(ns), myynest+1);
     //printf("iiMake_proc: namespace found.\n");
   }
   else
   {
-    namespaceroot->push(namespaceroot->root->pack, "Top");
+    namespaceroot->push(namespaceroot->root->pack, "Top", myynest+1);
     //printf("iiMake_proc: staying in TOP-LEVEL\n");
   }
 #else /* HAVE_NAMESPACES */
@@ -380,7 +386,7 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
            pi->libname, pi->procname);
     return NULL;
   }
-  namespaceroot->push(NULL, plib);
+  namespaceroot->push(NULL, plib, myynest+1);
 #endif /* HAVE_NAMESPACES */
   iiCheckNest();
 #ifdef USE_IILOCALRING
@@ -424,47 +430,6 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
     iiRETURNEXPR[myynest+1].CleanUp();
     iiRETURNEXPR[myynest+1].Init();
   }
-#ifdef HAVE_NAMESPACES
-  if (namespaceroot->next->currRing != currRing)
-  //if (iiLocalRing[myynest] != currRing)
-  {
-    //Print("RING changed?\n");
-    
-    if (((iiRETURNEXPR[myynest+1].Typ()>BEGIN_RING)
-      && (iiRETURNEXPR[myynest+1].Typ()<END_RING))
-    || ((iiRETURNEXPR[myynest+1].Typ()==LIST_CMD)
-      && (lRingDependend((lists)iiRETURNEXPR[myynest+1].Data()))))
-    {
-      //idhdl hn;
-      char *n;
-      char *o;
-      if (namespaceroot->next->currRing!=NULL) o=rFindHdl(namespaceroot->next->currRing,NULL, NULL)->id;
-      //namespaceroot->currRingHdl->id;
-      else                            o="none";
-      if (currRing!=NULL)             n=rFindHdl(currRing,NULL, NULL)->id; //currRingHdl->id;
-      else                            n="none";
-      Werror("ring change during procedure call: %s -> %s",o,n);
-      iiRETURNEXPR[myynest+1].CleanUp();
-      err=TRUE;
-    }
-    if (namespaceroot->next->currRing!=NULL)
-    {
-      rSetHdl(rFindHdl(namespaceroot->next->currRing,NULL, NULL),TRUE);
-      iiLocalRing[myynest]=NULL;
-      namespaceroot->next->currRing = NULL;
-    }
-    else
-    { currRingHdl=NULL; currRing=NULL; }
-  }
-  else
-  {
-    if(currRingHdl == NULL)
-    {
-      //printf("iplib.cc: currRingHdl is NULL\n");
-      //currRingHdl = namespaceroot->currRingHdl;
-    }
-  }
-#else /* HAVE_NAMESPACES */
 #ifdef USE_IILOCALRING
   if(namespaceroot->next->currRing != iiLocalRing[myynest]) printf("iiMake_proc: 1 ring not saved\n");
   if (iiLocalRing[myynest] != currRing)
@@ -502,7 +467,6 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
     || ((iiRETURNEXPR[myynest+1].Typ()==LIST_CMD)
       && (lRingDependend((lists)iiRETURNEXPR[myynest+1].Data()))))
     {
-      //idhdl hn;
       char *n;
       char *o;
       if (NS_LRING!=NULL) o=rFindHdl(NS_LRING,NULL, NULL)->id;
@@ -522,7 +486,6 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
     { currRingHdl=NULL; currRing=NULL; }
   }
 #endif /* USE_IILOCALRING */
-#endif /* HAVE_NAMESPACES */
   if (iiCurrArgs!=NULL)
   {
     if (!err) Warn("too many arguments for %s",IDID(pn));
@@ -530,9 +493,7 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
     Free((ADDRESS)iiCurrArgs,sizeof(sleftv));
     iiCurrArgs=NULL;
   }
-// #ifdef HAVE_NAMESPACES
-  namespaceroot->pop();
-// #endif /* HAVE_NAMESPACES */
+  namespaceroot->pop(TRUE);
   if (err)
     return NULL;
   return &iiRETURNEXPR[myynest+1];
@@ -546,11 +507,19 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
 {
   BOOLEAN err;
   int old_echo=si_echo;
+  char *plib = iiConvName(pi->libname);
+#ifdef HAVE_NAMESPACES
+  idhdl ns = namespaceroot->get(plib,0, TRUE);
+#endif /* HAVE_NAMESPACES */
 
   newBuffer( example, BT_example, pi, pi->data.s.example_lineno );
   iiCheckNest();
-  namespaceroot->push(NULL, "");
-  if(namespaceroot->next->currRing != currRing) printf("iiEStart: ring not saved\n");
+#ifdef HAVE_NAMESPACES
+  if(ns != NULL)  namespaceroot->push(IDPACKAGE(ns), IDID(ns), myynest+1);
+  else            namespaceroot->push(namespaceroot->root->pack, "Top", myynest+1);
+#else /* HAVE_NAMESPACES */
+  namespaceroot->push(NULL, "", myynest+1);
+#endif /* HAVE_NAMESPACES */
 #ifdef USE_IILOCALRING
   iiLocalRing[myynest]=currRing;
 #endif
@@ -598,12 +567,16 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
     }
   }
 #endif /* USE_IILOCALRING */
-  namespaceroot->pop();
+  namespaceroot->pop(TRUE);
   return err;
 }
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+#ifdef HAVE_NAMESPACES
+BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport, BOOLEAN tellerror )
+#else /* HAVE_NAMESPACES */
 BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
+#endif /* HAVE_NAMESPACES */
 {
   char buf[256];
   char libnamebuf[128];
@@ -699,9 +672,12 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
   {
     pl = enterid( mstrdup(plib),0, PACKAGE_CMD,
                   &NSROOT(namespaceroot->root), TRUE );
+    IDPACKAGE(pl)->language = LANG_SINGULAR;
   } else {
-    Print("Found.\n");
-    if(IDTYP(pl)!=PACKAGE_CMD) Print("not of typ package.\n");
+    if(IDTYP(pl)!=PACKAGE_CMD) {
+      Warn("not of typ package.");
+      return TRUE;
+    }
   }
   namespaceroot->push(IDPACKAGE(pl), IDID(pl));
 #endif /* HAVE_NAMESPACES */
@@ -715,11 +691,10 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
 # if YYLPDEBUG > 1
   print_init();
 #  endif
-//  if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loading %s...", libnamebuf);
   extern int lpverbose;
   if (BVERBOSE(V_DEBUG_LIB)) lpverbose=1; else lpverbose=0;
 # ifdef HAVE_NAMESPACES
-   yylplex(newlib, libnamebuf, &lib_style, pl);
+   yylplex(newlib, libnamebuf, &lib_style, pl, autoexport);
 # else /* HAVE_NAMESPACES */
   yylplex(newlib, libnamebuf, &lib_style);
 # endif /* HAVE_NAMESPACES */
@@ -743,9 +718,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
     Warn( "library %s has old format. This format is still accepted,", newlib);
     Warn( "but for functionality you may wish to change to the new");
     Warn( "format. Please refer to the manual for further information.");
-  } // else {
-//     if (BVERBOSE(V_LOAD_LIB)) Print("\n");
-//   }
+  }
   reinit_yylp();
   fclose( yylpin );
 #ifdef HAVE_NAMESPACES
@@ -757,7 +730,11 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
       if(ls->to_be_done) {
         //Print("// Processing id %d LIB:%s\n", ls->cnt, ls->get());
         ls->to_be_done=FALSE;
+#ifdef HAVE_NAMESPACES
+        iiLibCmd(ls->get(), autoexport);
+#else /* HAVE_NAMESPACES */
         iiLibCmd(ls->get());
+#endif /* HAVE_NAMESPACES */
         ls = ls->pop(newlib);
         //Print("Done\n");
       }

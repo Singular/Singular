@@ -157,6 +157,7 @@ cmdnames cmds[] =
   { "example",     0, EXAMPLE_CMD ,       EXAMPLE_CMD},
   { "execute",     0, EXECUTE_CMD ,       EXECUTE_CMD},
   { "export",      0, EXPORT_CMD ,        EXPORT_CMD},
+  { "exportto",    0, EXPORTTO_CMD ,      CMD_M},
   { "factorize",   0, FAC_CMD ,           CMD_12},
   { "fetch",       0, FETCH_CMD ,         CMD_2},
   { "fglm",        0, FGLM_CMD ,          CMD_2},
@@ -174,6 +175,7 @@ cmdnames cmds[] =
   { "ideal",       0, IDEAL_CMD ,         IDEAL_CMD},
   { "if",          0, IF_CMD ,            IF_CMD},
   { "imap",        0, IMAP_CMD ,          CMD_2},
+  { "importfrom",  0, IMPORTFROM_CMD ,    CMD_M},
   { "indepSet",    0, INDEPSET_CMD ,      CMD_12},
   { "insert",      0, INSERT_CMD ,        CMD_23},
   { "int",         0, INT_CMD ,           ROOT_DECL},
@@ -197,6 +199,7 @@ cmdnames cmds[] =
   { "link",        0, LINK_CMD ,          ROOT_DECL},
   { "listvar",     0, LISTVAR_CMD ,       LISTVAR_CMD},
   { "list",        0, LIST_CMD ,          ROOT_DECL_LIST},
+  { "load",        0, LOAD_CMD ,          CMD_M},
   { "lres",        0, LRES_CMD ,          CMD_2},
   { "map",         0, MAP_CMD ,           RING_DECL},
   { "matrix",      0, MATRIX_CMD ,        MATRIX_CMD},
@@ -280,6 +283,7 @@ cmdnames cmds[] =
   { "transpose",   0, TRANSPOSE_CMD ,     CMD_1},
   { "type",        0, TYPE_CMD ,          TYPE_CMD},
   { "typeof",      0, TYPEOF_CMD ,        CMD_1},
+  { "unload",      0, UNLOAD_CMD ,        CMD_M},
   { "var",         0, VAR_CMD ,           CMD_1},
   { "varstr",      0, VARSTR_CMD ,        CMD_12},
   { "vdim",        0, VDIM_CMD ,          CMD_1},
@@ -1032,6 +1036,10 @@ static BOOLEAN jjINDEX_I(leftv res, leftv u, leftv v)
   res->rtyp=u->rtyp; u->rtyp=0;
   res->data=u->data; u->data=NULL;
   res->name=u->name; u->name=NULL;
+#ifdef HAVE_NAMESPACES
+  res->packhdl=u->packhdl; u->packhdl=NULL;
+  res->req_packhdl=u->req_packhdl; u->req_packhdl=NULL;
+#endif /* HAVE_NAMESPACES */
   res->e=u->e;       u->e=NULL;
   if (res->e==NULL) res->e=jjMakeSub(v);
   else
@@ -1071,6 +1079,9 @@ static BOOLEAN jjINDEX_IV(leftv res, leftv u, leftv v)
     p->rtyp=IDHDL;
     p->data=u->data;
     p->name=u->name;
+#ifdef HAVE_NAMESPACES
+    p->packhdl=u->packhdl;
+#endif /* HAVE_NAMESPACES */
     p->flag|=u->flag;
     p->e=jjMakeSub(&t);
   }
@@ -1196,7 +1207,15 @@ static BOOLEAN jjKLAMMER(leftv res, leftv u, leftv v)
   sprintf(n,"%s(%d)",u->name,(int)v->Data());
   FreeL((ADDRESS)u->name);
   u->name=NULL;
-  syMake(res,n);
+#ifdef HAVE_NAMESPACES
+  if(u->req_packhdl != NULL) {
+    namespaceroot->push( IDPACKAGE(u->req_packhdl), IDID(u->req_packhdl));
+    syMake(res,n);
+    namespaceroot->pop();
+  }
+  else
+#endif /* HAVE_NAMESPACES */
+    syMake(res,n);
   return FALSE;
 }
 static BOOLEAN jjKLAMMER_IV(leftv res, leftv u, leftv v)
@@ -1205,7 +1224,15 @@ static BOOLEAN jjKLAMMER_IV(leftv res, leftv u, leftv v)
   leftv p=NULL;
   int i;
   char *n;
-
+#ifdef HAVE_NAMESPACES
+  BOOLEAN needpop=FALSE;
+  
+  if(u->req_packhdl != NULL) {
+    namespaceroot->push( IDPACKAGE(u->req_packhdl), IDID(u->req_packhdl));
+    needpop = TRUE;
+  }
+#endif /* HAVE_NAMESPACES */
+  
   for (i=0;i<iv->length(); i++)
   {
     if (p==NULL)
@@ -1223,11 +1250,18 @@ static BOOLEAN jjKLAMMER_IV(leftv res, leftv u, leftv v)
   }
   FreeL((ADDRESS)u->name);
   u->name=NULL;
+#ifdef HAVE_NAMESPACES
+  if(needpop) namespaceroot->pop();
+#endif /* HAVE_NAMESPACES */
   return FALSE;
 }
 static BOOLEAN jjPROC(leftv res, leftv u, leftv v)
 {
+#ifdef HAVE_NAMESPACES
+  leftv sl = iiMake_proc((idhdl)u->data,u,v);
+#else /* HAVE_NAMESPACES */
   leftv sl = iiMake_proc((idhdl)u->data,v);
+#endif /* HAVE_NAMESPACES */
   if (sl==NULL)
   {
     return TRUE;
@@ -1442,11 +1476,11 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
   }
   else
   {
-    Werror("%s undefined in %s",v->Name(),u->Name());
+    Werror("%s undefined in %s",v->Fullname(),u->Fullname());
   }
   return TRUE;
 err_fetch:
-  Werror("no identity map from %s",u->Name());
+  Werror("no identity map from %s",u->Fullname());
   return TRUE;
 }
 static BOOLEAN jjFIND2(leftv res, leftv u, leftv v)
@@ -2197,7 +2231,11 @@ static BOOLEAN jjPROC1(leftv res, leftv u)
 {
   if ((u->rtyp!=IDHDL) || (u->e!=NULL))
     return TRUE;
+#ifdef HAVE_NAMESPACES
+  leftv sl = iiMake_proc((idhdl) u->data,u,NULL);
+#else /* HAVE_NAMESPACES */
   leftv sl = iiMake_proc((idhdl) u->data,NULL);
+#endif /* HAVE_NAMESPACES */
   if (sl==NULL)
   {
     return TRUE;
@@ -3262,6 +3300,7 @@ struct sValCmd1 dArith1[]=
 ,{jjMULT,       MULTIPLICITY_CMD,  INT_CMD,      MODUL_CMD }
 ,{jjMSTD,       MSTD_CMD,        LIST_CMD,       IDEAL_CMD }
 ,{jjNAMEOF,     NAMEOF_CMD,      STRING_CMD,     ANY_TYPE }
+,{jjNAMES,      NAMES_CMD,       LIST_CMD,       PACKAGE_CMD }
 ,{jjNAMES,      NAMES_CMD,       LIST_CMD,       RING_CMD }
 ,{jjNAMES,      NAMES_CMD,       LIST_CMD,       QRING_CMD }
 ,{jjDUMMY,      NUMBER_CMD,      NUMBER_CMD,     NUMBER_CMD }
@@ -3359,7 +3398,7 @@ static BOOLEAN jjBRACK_S(leftv res, leftv u, leftv v,leftv w)
 
   if ( (r<1) || (r>l) || (c<0) )
   {
-    Werror("wrong range[%d,%d] in string %s",r,c,u->Name());
+    Werror("wrong range[%d,%d] in string %s",r,c,u->Fullname());
     return TRUE;
   }
   res->data = (char *)AllocL(c+1);
@@ -3374,7 +3413,7 @@ static BOOLEAN jjBRACK_Im(leftv res, leftv u, leftv v,leftv w)
   if ((r<1)||(r>iv->rows())||(c<1)||(c>iv->cols()))
   {
     Werror("wrong range[%d,%d] in intmat %s(%d x %d)",
-           r,c,u->Name(),iv->rows(),iv->cols());
+           r,c,u->Fullname(),iv->rows(),iv->cols());
     return TRUE;
   }
   res->data=u->data;
@@ -3404,7 +3443,7 @@ static BOOLEAN jjBRACK_Ma(leftv res, leftv u, leftv v,leftv w)
   //Print("gen. elem %d, %d\n",r,c);
   if ((r<1)||(r>MATROWS(m))||(c<1)||(c>MATCOLS(m)))
   {
-    Werror("wrong range[%d,%d] in matrix %s(%d x %d)",r,c,u->Name(),
+    Werror("wrong range[%d,%d] in matrix %s(%d x %d)",r,c,u->Fullname(),
       MATROWS(m),MATCOLS(m));
     return TRUE;
   }
@@ -4239,7 +4278,7 @@ static BOOLEAN jjLIST_PL(leftv res, leftv v)
       if (rt==0)
       {
         L->Clean();
-        Werror("`%s` is undefined",h->Name());
+        Werror("`%s` is undefined",h->Fullname());
         return TRUE;
       }
       if ((rt==RING_CMD)||(rt==QRING_CMD))
@@ -4257,7 +4296,11 @@ static BOOLEAN jjLIST_PL(leftv res, leftv v)
 }
 static BOOLEAN jjNAMES0(leftv res, leftv v)
 {
+#ifdef HAVE_NAMESPACES
+  res->data=(void *)ipNameList(NSROOT(namespaceroot->root));
+#else /* HAVE_NAMESPACES */
   res->data=(void *)ipNameList(IDROOT);
+#endif /* HAVE_NAMESPACES */
   return FALSE;
 }
 static BOOLEAN jjOPTION_PL(leftv res, leftv v)
@@ -4377,6 +4420,80 @@ static BOOLEAN jjSTATUS_M(leftv res, leftv v)
 }
 #endif
 
+static BOOLEAN jjEXPORTTO(leftv res, leftv v)
+{
+#ifdef HAVE_NAMESPACES
+  BOOLEAN nok=TRUE;
+  if(v->rtyp==NSHDL) {
+    Print("Export to toplevel\n");
+    while(v->next!=NULL) {
+      nok = iiInternalExport(v->next, 0, v->data);
+      if(nok) return nok;
+    }
+  }
+  if(v->Typ()==PACKAGE_CMD) {
+    while(v->next!=NULL) {
+      nok = iiInternalExport(v->next, 0, v->data);
+      if(nok) return nok;
+    }
+  }
+#else /* HAVE_NAMESPACES */
+#endif /* HAVE_NAMESPACES */
+  return TRUE;
+}
+
+static BOOLEAN jjIMPORTFROM(leftv res, leftv v)
+{
+  BOOLEAN nok=FALSE;
+  Print("jjIMPORT_FROM()\n");
+  if(v->rtyp==NSHDL) {
+    Print("Import from toplevel\n");
+//While-schleife!!!
+    return FALSE;
+  }
+  if(v->Typ()==PACKAGE_CMD) {
+    Print("Import from package %s\n", v->name);
+    while(v->next!=NULL) {
+      //nok = iiInternalImport(v->next, 0, v->data);
+      if(nok) return nok;
+    }
+    return FALSE;
+  }
+  return TRUE;
+}
+
+static BOOLEAN jjLOAD(leftv res, leftv v)
+{
+  BOOLEAN nok=FALSE;
+  while( v!= NULL) {
+    if(v->Typ()==STRING_CMD) {
+      nok = iiLibCmd((char *)v->CopyD(), FALSE);
+      if(nok) return nok;
+    } else
+      return TRUE;
+    v = v->next;
+  }
+  return FALSE;
+}
+
+static BOOLEAN jjUNLOAD(leftv res, leftv v)
+{
+  if(v->Typ()==PACKAGE_CMD) {
+    char *typ;
+    idhdl h = (idhdl)v->data;
+    package d=v->Data();
+    switch (d->language) {
+        case LANG_C:        typ="object";   break;
+        case LANG_SINGULAR: 
+        case LANG_NONE:     
+        default:
+          killhdl(h);
+    }
+    return FALSE;
+  }
+  return TRUE;
+}
+
 /*=================== operations with many arg.: table =================*/
 /* number_of_args:  -1: any, -2: any >0, .. */
 struct sValCmdM dArithM[]=
@@ -4410,7 +4527,13 @@ struct sValCmdM dArithM[]=
 #ifndef __MWERKS__
 ,{jjSTATUS_M,  STATUS_CMD,      INT_CMD,             4 }
 #endif
-,{NULL,        0,               0,                  0  }
+,{jjIMPORTFROM,IMPORTFROM_CMD,  ANY_TYPE,           -2 }
+,{jjEXPORTTO,  EXPORTTO_CMD,    ANY_TYPE,           -2 }
+#ifdef HAVE_NAMESPACES
+ ,{jjLOAD,      LOAD_CMD,        NONE,              -2 }
+ ,{jjUNLOAD,    UNLOAD_CMD,      NONE,              -2 }
+#endif /* HAVE_NAMESPACES */
+ ,{NULL,        0,               0,                  0  }
 };
 #ifdef MDEBUG
 static Subexpr jjDBMakeSub(leftv e,char *f, int l)
@@ -4886,13 +5009,13 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
     const char *s=NULL;
     if (!errorreported)
     {
-      if ((at==0) && (a->Name()!=sNoName))
+      if ((at==0) && (a->Fullname()!=sNoName))
       {
-        s=a->Name();
+        s=a->Fullname();
       }
-      else if ((bt==0) && (b->Name()!=sNoName))
+      else if ((bt==0) && (b->Fullname()!=sNoName))
       {
-        s=b->Name();
+        s=b->Fullname();
       }
       if (s!=NULL)
         Werror("`%s` is not defined",s);
@@ -5047,9 +5170,9 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
     // error handling
     if (!errorreported)
     {
-      if ((at==0) && (a->Name()!=sNoName))
+      if ((at==0) && (a->Fullname()!=sNoName))
       {
-        Werror("`%s` is not defined",a->Name());
+        Werror("`%s` is not defined",a->Fullname());
       }
       else
       {
@@ -5186,17 +5309,17 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
     if (!errorreported)
     {
       const char *s=NULL;
-      if ((at==0) && (a->Name()!=sNoName))
+      if ((at==0) && (a->Fullname()!=sNoName))
       {
-        s=a->Name();
+        s=a->Fullname();
       }
-      else if ((bt==0) && (b->Name()!=sNoName))
+      else if ((bt==0) && (b->Fullname()!=sNoName))
       {
-        s=b->Name();
+        s=b->Fullname();
       }
-      else if ((ct==0) && (c->Name()!=sNoName))
+      else if ((ct==0) && (c->Fullname()!=sNoName))
       {
-        s=c->Name();
+        s=c->Fullname();
       }
       if (s!=NULL)
         Werror("`%s` is not defined",s);
@@ -5314,7 +5437,7 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
     {
       if ((args>0) && (a->rtyp==0) && (a->Name()!=sNoName))
       {
-        Werror("`%s` is not defined",a->Name());
+        Werror("`%s` is not defined",a->Fullname());
       }
       else
       {

@@ -1,8 +1,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Put.cc,v 1.12 1998-09-22 10:29:45 Singular Exp $ */
+/* $Id: mpsr_Put.cc,v 1.13 1998-10-21 10:25:54 krueger Exp $ */
 
+#define KAI
 
 /***************************************************************
  *
@@ -127,6 +128,9 @@ mpsr_Status_t mpsr_PutLeftv(MP_Link_pt link, leftv v, ring cring)
 
       case MAP_CMD:
         return mpsr_PutMapLeftv(link, v, cring);
+
+      case PACKAGE_CMD:
+        return mpsr_PutPackageLeftv(link, v);
 
       case NONE:
         return mpsr_Success;
@@ -513,6 +517,32 @@ mpsr_Status_t mpsr_PutMap(MP_Link_pt link, map m, ring cring)
 }
 
 
+mpsr_Status_t mpsr_PutPackage(MP_Link_pt link, char* pname, idhdl pack)
+{
+  MP_DictTag_t dict;
+  MP_Common_t  cop;
+
+  printf("Huhu\n");
+  failr(mpsr_tok2mp('=', &dict, &cop));
+  printf("Huhu 1\n");
+
+  // A Singular- procedure is sent as a cop with the string as arg
+  mp_failr(MP_PutCommonOperatorPacket(link,
+                                        dict,
+                                        cop,
+                                        0,
+                                        2));
+  printf("Huhu 2\n");
+  mp_failr(MP_PutIdentifierPacket(link, MP_SingularDict, pname,1));
+  printf("Huhu 3\n");
+  mp_failr(MP_PutAnnotationPacket(link,
+                                  MP_SingularDict,
+                                  0,
+                                  0));
+  printf("Huhu 4\n");
+  mp_return(MP_Success);
+}
+
 /***************************************************************
  *
  * A routine which dumps the content of Singular to a file
@@ -548,11 +578,15 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
              IDTYP(h) != LINK_CMD)
     {
       cmd.arg1.name = IDID(h);
-      //memcpy(&(cmd.arg2), h, sizeof(sleftv));
+      //cmd.arg2.next = h->next;
+      cmd.arg1.name = IDID(h);
       cmd.arg2.data=IDDATA(h);
       cmd.arg2.flag=h->flag;
       cmd.arg2.attribute=h->attribute;
       cmd.arg2.rtyp=h->typ;
+      //cmd.arg2.e = NULL;
+      //cmd.arg2.muell = 0;
+      //memcpy(&(cmd.arg2), h, sizeof(sleftv));
       if (mpsr_PutLeftv(link, lv , currRing) != mpsr_Success) break;
 #ifdef MPSR_DEBUG
       Print("Dumped %s\n", IDID(h));
@@ -566,12 +600,15 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
         h2 = r->idroot;
         while (h2 != NULL)
         {
+          //cmd.arg2.next = h->next;
           cmd.arg1.name = IDID(h2);
-          //memcpy(&(cmd.arg2), h2, sizeof(sleftv));
           cmd.arg2.data=IDDATA(h2);
-          cmd.arg2.flag=h2->flag;
-          cmd.arg2.attribute=h2->attribute;
-          cmd.arg2.rtyp=h2->typ;
+          cmd.arg2.flag = h2->flag;
+          cmd.arg2.attribute = h2->attribute;
+          cmd.arg2.rtyp = h2->typ;
+          //cmd.arg2.e = NULL;
+          //cmd.arg2.muell = 0;
+          //memcpy(&(cmd.arg2), h2, sizeof(sleftv));
           if (mpsr_PutLeftv(link, lv, r) != mpsr_Success) break;
 #ifdef MPSR_DEBUG
           Print("Dumped %s\n", IDID(h2));

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipprint.cc,v 1.6 1998-02-27 14:06:19 Singular Exp $ */
+/* $Id: ipprint.cc,v 1.7 1998-10-21 10:25:35 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: printing
 */
@@ -197,7 +197,7 @@ void jjPRINT_MA0(matrix m, const char *name)
 BOOLEAN jjPRINT_MA(leftv res, leftv u)
 {
   matrix m=(matrix)u->Data();
-  jjPRINT_MA0(m,u->Name());
+  jjPRINT_MA0(m,u->Fullname());
   return FALSE;
 }
 

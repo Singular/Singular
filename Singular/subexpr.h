@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.h,v 1.9 1998-09-29 10:39:11 krueger Exp $ */
+/* $Id: subexpr.h,v 1.10 1998-10-21 10:25:43 krueger Exp $ */
 /*
 * ABSTRACT: handling of leftv
 */
@@ -95,7 +95,7 @@ struct _sssym
 typedef struct _sssym ssym;
 typedef ssym * sym;
 
-void syMake(leftv v,char * name);
+void syMake(leftv v,char * name, idhdl packhdl = NULL);
 BOOLEAN assumeStdFlag(leftv h);
 
 class proc_singular

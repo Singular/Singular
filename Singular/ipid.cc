@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.18 1998-10-15 14:08:31 krueger Exp $ */
+/* $Id: ipid.cc,v 1.19 1998-10-21 10:25:32 krueger Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -146,7 +146,7 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
   return  h;
 }
 
-/* #define KAI */
+//#define KAI
 idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
 {
   idhdl h;
@@ -175,6 +175,12 @@ idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
 #else
         Warn(" redefining %s **",s);
 #endif
+#ifdef HAVE_NAMESPACES
+        if(strcmp(s,"Top")==0) {
+        Warn("identifier `%s` in use",s);
+        return(h);
+      }
+#endif /* HAVE_NAMESPACES */
         if (s==IDID(h))
         IDID(h)=NULL;
       killhdl(h,root);
@@ -285,11 +291,17 @@ void killhdl(idhdl h)
     killhdl(h,&currRing->idroot);
   else
   {
-    //if(t==PACKAGE_CMD) printf("Achtung\n");
-    idhdl s=IDROOT;
-    while ((s!=h) && (s!=NULL)) s=s->next;
-    if (s==NULL) killhdl(h,&currRing->idroot);
-    else killhdl(h,&IDROOT);
+#ifdef HAVE_NAMESPACES
+    if(t==PACKAGE_CMD) {
+      killhdl(h,&NSROOT(namespaceroot->root));
+    } else 
+#endif /* HAVE_NAMESPACES */
+    {
+      idhdl s=IDROOT;
+      while ((s!=h) && (s!=NULL)) s=s->next;
+      if (s==NULL) killhdl(h,&currRing->idroot);
+      else killhdl(h,&IDROOT);
+    }
   }
 }
 
@@ -307,8 +319,7 @@ void killhdl(idhdl h, idhdl * ih)
   }
   // ring / qring  --------------------------------------------------------
   // package  -------------------------------------------------------------
-  if ((IDTYP(h) == RING_CMD) || (IDTYP(h) == QRING_CMD)
-  || (IDTYP(h) == PACKAGE_CMD) /*|| (IDTYP(h) == POINTER_CMD)*/)
+  if ((IDTYP(h) == RING_CMD) || (IDTYP(h) == QRING_CMD))
   {
     idhdl savecurrRingHdl = currRingHdl;
     ring  savecurrRing = currRing;
@@ -320,7 +331,7 @@ void killhdl(idhdl h, idhdl * ih)
       idhdl * hd = &IDRING(h)->idroot;
       idhdl  hdh = IDNEXT(*hd);
       idhdl  temp;
-      killOtherRing=(IDTYP(h)!=PACKAGE_CMD) && (IDRING(h)!=currRing);
+      killOtherRing=(IDRING(h)!=currRing);
       if (killOtherRing) //we are not killing the base ring, so switch
       {
         needResetRing=TRUE;
@@ -346,13 +357,33 @@ void killhdl(idhdl h, idhdl * ih)
         rSetHdl(savecurrRingHdl,TRUE);
       }
     }
-#ifdef HAVE_NAMESPACES
-    if((IDTYP(h)==PACKAGE_CMD) || (IDTYP(h)==POINTER_CMD))
-      Print(">>>>>>Free package\n");
-    else
-#endif /* HAVE_NAMESPACES */
-      rKill(h);
+    rKill(h);
   }
+#ifdef HAVE_NAMESPACES
+  // package -------------------------------------------------------------
+  else if (IDTYP(h) == PACKAGE_CMD) {
+    package pack = IDPACKAGE(h);
+    if(!checkPackage(pack)) return;
+    idhdl hdh = pack->idroot;
+    //idhdl  hdh = IDNEXT(*hd);
+    idhdl  temp;
+    //Print(">>>>>>Free package\n");
+    while (hdh!=NULL)
+    {
+      temp = IDNEXT(hdh);
+      //Print("killing %s\n", IDID(hdh));
+      killhdl(hdh,&(IDPACKAGE(h)->idroot));
+      hdh = temp;
+    }
+    //Print("killing last %s\n", IDID(*hd));
+    //killhdl(*hd,hd);
+    //Print(">>>>>>Free package... done\n");
+  }
+  // pointer -------------------------------------------------------------
+  else if(IDTYP(h)==POINTER_CMD) {
+    Print(">>>>>>Free pointer\n");
+  }
+#endif /* HAVE_NAMESPACES */
   // poly / vector -------------------------------------------------------
   else if ((IDTYP(h) == POLY_CMD) || (IDTYP(h) == VECTOR_CMD))
   {
@@ -692,11 +723,12 @@ char *getnamelev()
   return(buf);
 }
 
-namehdl namerec::push(package pack, char *name, BOOLEAN init)
+namehdl namerec::push(package pack, char *name, int nesting, BOOLEAN init)
 {
   //printf("PUSH: put entry (%s) on stack\n", name);
   namehdl ns = (namerec *)Alloc0(sizeof(namerec));
   extern int myynest;
+  if(nesting<0) nesting = myynest;
   ns->next   = this;
   if(this==NULL && !init)
   {
@@ -711,7 +743,7 @@ namehdl namerec::push(package pack, char *name, BOOLEAN init)
 #endif /* HAVE_NAMESPACES */
     ns->isroot  = TRUE;
     ns->lev     = 1;
-    ns->myynest = 0;
+    //ns->myynest = 0;
   }
   else
   {
@@ -720,17 +752,15 @@ namehdl namerec::push(package pack, char *name, BOOLEAN init)
     ns->pack   = pack;
 #endif /* HAVE_NAMESPACES */
     ns->lev    = this->lev+1;
-    ns->myynest = myynest+1;
+    //ns->myynest = myynest+1;
     this->currRing = currRing;
     //printf("Saving Ring %x, %x\n", this->currRing, currRing);
   }
   ns->name    = mstrdup(name);
+  ns->myynest = nesting;
   
-  
-  //if(ns->isroot) Print("PUSH: Add root NameSpace\n");
   //ns->currRing = currRing;
   //ns->currRingHdl = currRingHdl;
-  //printf("Test 1\n");
   if(ns->isroot) ns->root=ns; else ns->root = this->root;
   namespaceroot = ns;
 #if 0
@@ -747,7 +777,7 @@ namehdl namerec::push(package pack, char *name, BOOLEAN init)
   return(namespaceroot);
 }
 
-namehdl namerec::pop()
+namehdl namerec::pop(BOOLEAN change_nesting)
 {
   namehdl ns;
   //printf("POP: remove entry (%s)\n", this->name);
@@ -755,6 +785,9 @@ namehdl namerec::pop()
   if(isroot) {
     //printf("POP: base. woul'd do it.\n");
     return this;
+  }
+  if(!change_nesting && this->myynest!=this->next->myynest) {
+    return(this);
   }
   ns = this;
   namespaceroot = this->next;
@@ -778,5 +811,24 @@ idhdl namerec::get(const char * s, int lev, BOOLEAN root)
     return NULL;
   }
   return( NSROOT(ns)->get(s, lev));
+}
+
+BOOLEAN checkPackage(package pack)
+{
+  namehdl nshdl = namespaceroot;
+      
+  for(nshdl=namespaceroot; nshdl->isroot != TRUE; nshdl = nshdl->next) {
+    //Print("NSstack: %s:%d, nesting=%d\n", nshdl->name, nshdl->lev, nshdl->myynest);
+    if (nshdl->pack==pack) {
+      Warn("package '%s' still in use on level %d",nshdl->name, nshdl->lev);
+      return FALSE;
+    }
+  }
+  if (nshdl->pack==pack) {
+    Warn("package '%s' still in use on level %d",nshdl->name, nshdl->lev);
+    return FALSE;
+  }
+  return TRUE;
+  
 }
 #endif /* HAVE_NAMESPACES */

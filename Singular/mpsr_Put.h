@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Put.h,v 1.7 1998-06-02 15:29:59 Singular Exp $ */
+/* $Id: mpsr_Put.h,v 1.8 1998-10-21 10:25:52 krueger Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Put.h
@@ -80,6 +80,7 @@ inline mpsr_Status_t mpsr_PutString(MP_Link_pt link, char *str)
 }
 extern mpsr_Status_t mpsr_PutRing(MP_Link_pt link, ring r);
 extern mpsr_Status_t mpsr_PutProc(MP_Link_pt link, char *pname,procinfov proc);
+extern mpsr_Status_t mpsr_PutPackage(MP_Link_pt link, char *pname,idhdl proc);
 inline mpsr_Status_t mpsr_PutDef(MP_Link_pt link, char *name)
 {
   mp_return(MP_PutIdentifierPacket(link, MP_SingularDict, name, 0));
@@ -210,6 +211,16 @@ inline mpsr_Status_t mpsr_PutMapLeftv(MP_Link_pt link, leftv v, ring cring)
 {
   typecheck(v, MAP_CMD);
   return mpsr_PutMap(link, (map) v->Data(), cring);
+}
+/* inline mpsr_Status_t mpsr_PutAliasLeftv(MP_Link_pt link, leftv v) */
+/* { */
+/*   typecheck(v, ALIAS_CMD); */
+/*   return mpsr_PutAlias(link, v->name, (idhdl) v->Data()); */
+/* } */
+inline mpsr_Status_t mpsr_PutPackageLeftv(MP_Link_pt link, leftv v)
+{
+  typecheck(v, PACKAGE_CMD);
+  return mpsr_PutPackage(link, v->name, (idhdl) v->Data());
 }
 
 /***************************************************************

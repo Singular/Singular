@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.25 1998-10-15 14:08:35 krueger Exp $ */
+/* $Id: ipshell.cc,v 1.26 1998-10-21 10:25:35 krueger Exp $ */
 /*
 * ABSTRACT:
 */
@@ -228,6 +228,7 @@ static void killlocals0(int v, idhdl * localhdl)
 
 void killlocals(int v)
 {
+#ifndef HAVE_NAMESPACES
   killlocals0(v,&IDROOT);
 
   idhdl h = IDROOT;
@@ -244,12 +245,50 @@ void killlocals(int v)
     }
     h = IDNEXT(h);
   }
+#else
+  killlocals0(v,&IDROOT);
+
+  idhdl h = NSROOT(namespaceroot->root);
+  idhdl sh=currRingHdl;
+  BOOLEAN changed=FALSE;
+
+  while (h!=NULL)
+  {
+    if (((IDTYP(h)==QRING_CMD) || (IDTYP(h) == RING_CMD))
+    && (IDRING(h)->idroot!=NULL))
+    {
+      //Print("=====> Toplevel: ring %s, lev: %d:\n",IDID(h),IDLEV(h));
+      if (h!=currRingHdl) {changed=TRUE;rSetHdl(h,FALSE);}
+      killlocals0(v,&(IDRING(h)->idroot));
+    }
+    if (IDTYP(h)==PACKAGE_CMD && (IDPACKAGE(h)->idroot!=NULL))
+    {
+      idhdl h0 = (IDPACKAGE(h))->idroot;
+      
+      //Print("=====> package: %s, lev: %d:\n",IDID(h),IDLEV(h));
+      while (h0!=NULL)
+      {
+        if (((IDTYP(h0)==QRING_CMD) || (IDTYP(h0) == RING_CMD))
+            && (IDRING(h0)->idroot!=NULL))
+        {
+          //Print("=====> '%s': ring %s, lev: %d:\n",IDID(h),IDID(h0),IDLEV(h0));
+          if (h0!=currRingHdl) {changed=TRUE;rSetHdl(h0,FALSE);}
+          killlocals0(v,&(IDRING(h0)->idroot));
+        }
+        h0 = IDNEXT(h0);
+      }
+      killlocals0(v,&((IDPACKAGE(h))->idroot));
+    }
+    h = IDNEXT(h);
+  }
+#endif /* HAVE_NAMESPACES */
   if (changed)
   {
     currRing=NULL;
     currRingHdl=NULL;
     rSetHdl(sh,TRUE);
   }
+
   if (myynest<=1) iiNoKeepRing=TRUE;
 }
 
@@ -268,7 +307,14 @@ void list_cmd(int typ, const char* what, char *prefix,BOOLEAN iterate)
     }
     else
     {
+#ifdef HAVE_NAMESPACES
+      idhdl pack;
+      if(index(what, ':')!= NULL)
+        iiname2hdl(what, &pack, &h);
+      else h = ggetid(what);
+#else /* HAVE_NAMESPACES */
       h = ggetid(what);
+#endif /* HAVE_NAMESPACES */
       if (h!=NULL)
       {
         if (iterate) list1(prefix,h,TRUE);
@@ -280,7 +326,8 @@ void list_cmd(int typ, const char* what, char *prefix,BOOLEAN iterate)
         else if((IDTYP(h)==PACKAGE_CMD) || (IDTYP(h)==POINTER_CMD))
         {
           //Print("list_cmd:package or pointer\n");
-          h=IDPACKAGE(h)->idroot;
+          if(strcmp(IDID(h), "Top")!=0) h=IDPACKAGE(h)->idroot;
+          else return;
         }
         else
           return;
@@ -485,7 +532,9 @@ leftv iiMap(map theMap, char * what)
   int i;
 
 #ifdef HAVE_NAMESPACES
-  r=namespaceroot->get(theMap->preimage,myynest);
+  idhdl pack;
+  //r=namespaceroot->get(theMap->preimage,myynest);
+  iiname2hdl(theMap->preimage,&pack,&r);
 #else
   r=idroot->get(theMap->preimage,myynest);
 #endif /* HAVE_NAMESPACES */
@@ -708,9 +757,11 @@ void iiDebug()
   }
 }
 
-int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN init_b)
+int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN isring, BOOLEAN init_b)
 {
   BOOLEAN res=FALSE;
+  char *id = name->name;
+  
   memset(sy,0,sizeof(sleftv));
   if ((name->name==NULL)||(isdigit(name->name[0])))
   {
@@ -723,7 +774,26 @@ int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN init_
     //{
     //  Warn("`%s` is already in use",name->name);
     //}
-    sy->data = (char *)enterid(name->name,lev,t,root,init_b);
+#ifdef HAVE_NAMESPACES
+    if(name->req_packhdl != NULL && name->packhdl != NULL &&
+       name->req_packhdl != name->packhdl)
+      id = mstrdup(name->name);
+    
+    //if(name->req_packhdl != NULL /*&& !isring*/) {
+    if(name->req_packhdl != NULL && !isring &&
+       IDPACKAGE(name->req_packhdl) != root) {
+      //Print("iiDeclCommand: PUSH(%s)\n",IDID(name->req_packhdl));
+      namespaceroot->push( IDPACKAGE(name->req_packhdl) ,
+                           IDID(name->req_packhdl));
+      sy->data = (char *)enterid(id,lev,t,
+                                 &IDPACKAGE(name->req_packhdl)->idroot,init_b);
+      namespaceroot->pop();
+    }
+    else
+#endif /* HAVE_NAMESPACES */
+    {
+      sy->data = (char *)enterid(id,lev,t,root,init_b);
+    }
     if (sy->data!=NULL)
     {
       sy->rtyp=IDHDL;
@@ -733,7 +803,7 @@ int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN init_
       if (name->next!=NULL)
       {
         sy->next=(leftv)Alloc(sizeof(sleftv));
-        res=iiDeclCommand(sy->next,name->next,lev,t,root);
+        res=iiDeclCommand(sy->next,name->next,lev,t,root, isring);
       }
     }
     else res=TRUE;
@@ -766,6 +836,116 @@ BOOLEAN iiParameter(leftv p)
   return res;
 }
 
+static BOOLEAN iiInternalExport (leftv v, int toLev)
+{
+  idhdl h=(idhdl)v->data;
+  //Print("iiInternalExport('%s',%d)%s\n", v->name, toLev,"");
+  if (IDLEV(h)==0) Warn("`%s` is already global",IDID(h));
+  else
+  {
+    h=IDROOT->get(v->name,toLev);
+    idhdl *root=&IDROOT;
+    if ((h==NULL)&&(currRing!=NULL))
+    {
+      h=currRing->idroot->get(v->name,toLev);
+      root=&currRing->idroot;
+    }
+    if ((h!=NULL)&&(IDLEV(h)==toLev))
+    {
+      if (IDTYP(h)==v->Typ())
+      {
+#ifdef KAI
+        Warn("!!! redefining %s",IDID(h));
+#else
+        Warn(" redefining %s",IDID(h));
+#endif
+#ifdef HAVE_NAMESPACES
+        //if (namespaceroot->currRing==IDRING(h)) namespaceroot->currRing=NULL;
+#endif /* HAVE_NAMESPACES */
+#ifdef USE_IILOCALRING
+            if (iiLocalRing[0]==IDRING(h)) iiLocalRing[0]=NULL;
+#else
+            if (namespaceroot->root->currRing==IDRING(h))
+              namespaceroot->root->currRing=NULL;
+#endif
+        killhdl(h,root);
+      }
+      else
+      {
+        return TRUE;
+      }
+    }
+    h=(idhdl)v->data;
+    IDLEV(h)=toLev;
+    iiNoKeepRing=FALSE;
+  }
+  return FALSE;
+}
+
+#ifdef HAVE_NAMESPACES
+BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl)
+{
+  idhdl h=(idhdl)v->data;
+  if(h==NULL) {
+    Warn("'%s': no such identifier\n", v->name);
+    return FALSE;
+  }
+  package rootpack = IDPACKAGE(roothdl);
+  //Print("iiInternalExport('%s',%d,%s) %s\n", v->name, toLev, IDID(roothdl),"");
+//  if (IDLEV(h)==0) Warn("`%s` is already global",IDID(h));
+//  else
+  {
+    /* is not ring or ring-element */
+    if( (IDTYP(h) == RING_CMD) || (IDTYP(h) == QRING_CMD)) {
+      sleftv tmp_expr;
+      //Print("// ==> Ring set nesting to 0\n");
+      //Print("// ++> make a copy of ring\n");
+      if(iiInternalExport(v, toLev)) return TRUE;
+      if(IDPACKAGE(roothdl) != NSPACK(namespaceroot)) {
+        namespaceroot->push(rootpack, IDID(roothdl));
+        //namespaceroot->push(NSPACK(namespaceroot->root), "Top");
+        idhdl rl=enterid(mstrdup(v->name), toLev, IDTYP(h),
+                         &(rootpack->idroot), FALSE);
+        namespaceroot->pop();
+        
+        if( rl == NULL) return TRUE;
+        ring r=(ring)v->Data();
+        if(r != NULL) {
+          if (&IDRING(rl)!=NULL) rKill(rl);
+          r->ref++;
+          IDRING(rl)=r;
+        }
+        else Print("! ! ! ! ! r is empty!!!!!!!!!!!!\n");
+      }
+    }
+    else if ((BEGIN_RING<IDTYP(h)) && (IDTYP(h)<END_RING)
+             || ((IDTYP(h)==LIST_CMD) && (lRingDependend(IDLIST(h))))) {
+      //Print("// ==> Ringdependent set nesting to 0\n");
+      if(iiInternalExport(v, toLev)) return TRUE;
+    } else {
+      if (h==IDROOT)
+      {
+        IDROOT=h->next;
+      }
+      else
+      {
+        idhdl hh=IDROOT;
+        while ((hh->next!=h)&&(hh->next!=NULL))
+          hh=hh->next;
+        if (hh->next==h)
+          hh->next=h->next;
+        else
+          return TRUE;
+      }
+      h->next=rootpack->idroot;
+      rootpack->idroot=h;
+    }
+    IDLEV(h)=toLev;
+  }
+  return FALSE;
+}
+#endif /* HAVE_NAMESAPCES */
+
 BOOLEAN iiExport (leftv v, int toLev)
 {
   BOOLEAN nok=FALSE;
@@ -779,43 +959,9 @@ BOOLEAN iiExport (leftv v, int toLev)
     }
     else
     {
-      idhdl h=(idhdl)v->data;
-      if (IDLEV(h)==0) Warn("`%s` is already global",IDID(h));
-      else
-      {
-#ifdef HAVE_NAMESPACES
-        h=namespaceroot->get(v->name,toLev);
-#else /* HAVE_NAMESPACES */
-        h=idroot->get(v->name,toLev);
-#endif /* HAVE_NAMESPACES */
-        idhdl *root=&IDROOT;
-        if ((h==NULL)&&(currRing!=NULL))
-        {
-          h=currRing->idroot->get(v->name,toLev);
-          root=&currRing->idroot;
-        }
-        if ((h!=NULL)&&(IDLEV(h)==toLev))
-        {
-          if (IDTYP(h)==v->Typ())
-          {
-            Warn("redefining %s",IDID(h));
-#ifdef USE_IILOCALRING
-            if (iiLocalRing[0]==IDRING(h)) iiLocalRing[0]=NULL;
-#else
-            if (namespaceroot->root->currRing==IDRING(h))
-              namespaceroot->root->currRing=NULL;
-#endif
-            killhdl(h,root);
-          }
-          else
-          {
-            r->CleanUp();
-            return TRUE;
-          }
-        }
-        h=(idhdl)v->data;
-        IDLEV(h)=toLev;
-        iiNoKeepRing=FALSE;
+      if(iiInternalExport(v, toLev)) {
+        r->CleanUp();
+        return TRUE;
       }
     }
     v=v->next;
@@ -825,7 +971,8 @@ BOOLEAN iiExport (leftv v, int toLev)
 }
 
 /*assume root!=idroot*/
-BOOLEAN iiExport (leftv v, int toLev, idhdl &root)
+#ifdef HAVE_NAMESPACES
+BOOLEAN iiExport (leftv v, int toLev, idhdl root)
 {
   BOOLEAN nok=FALSE;
   leftv rv=v;
@@ -853,30 +1000,17 @@ BOOLEAN iiExport (leftv v, int toLev, idhdl &root)
           return TRUE;
         }
       }
-      idhdl h=(idhdl)v->data;
-      if (h==IDROOT)
-      {
-        IDROOT=h->next;
+      if(iiInternalExport(v, toLev, root)) {
+        rv->CleanUp();
+        return TRUE;
       }
-      else
-      {
-        idhdl hh=IDROOT;
-        while ((hh->next!=h)&&(hh->next!=NULL))
-          hh=hh->next;
-        if (hh->next==h)
-          hh->next=h->next;
-        else
-          break;
-      }
-      h->next=root;
-      root=h;
-      IDLEV(h)=toLev;
     }
     v=v->next;
   }
   rv->CleanUp();
   return nok;
 }
+#endif /* HAVE_NAMESPACES */
 
 BOOLEAN iiCheckRing(int i)
 {

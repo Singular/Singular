@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.49 1998-10-15 14:08:29 krueger Exp $ */
+/* $Id: grammar.y,v 1.50 1998-10-21 10:25:27 krueger Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -244,6 +244,8 @@ void yyerror(char * fmt)
 %token <i> EXAMPLE_CMD
 %token <i> EXECUTE_CMD
 %token <i> EXPORT_CMD
+%token <i> EXPORTTO_CMD
+%token <i> IMPORTFROM_CMD
 %token <i> HELP_CMD
 %token <i> KILL_CMD
 %token <i> LIB_CMD
@@ -286,6 +288,7 @@ void yyerror(char * fmt)
 
 
 /*%nonassoc '=' PLUSEQUAL DOTDOT*/
+/*%nonassoc '=' DOTDOT COLONCOLON*/
 %nonassoc '=' DOTDOT COLONCOLON
 %left ','
 %left '|' '&'
@@ -451,12 +454,10 @@ elemexpr:
 #ifdef HAVE_NAMESPACES
             namespaceroot->push( IDPACKAGE((idhdl)$1.data),
                                  ((sleftv)$1).name);
-            syMake(&$$,$3);
+            syMake(&$$,$3, ((sleftv)$1).data);
             namespaceroot->pop();
 #else /* HAVE_NAMESPACES */
-            idroot=IDPACKAGE((idhdl)$1.data)->idroot;
             syMake(&$$,$3);
-            idroot=r;
 #endif /* HAVE_NAMESPACES */
           }
         | '[' exprlist ']'
@@ -801,7 +802,7 @@ left_value:
           {
             if ($1.rtyp==0)
             {
-              Werror("`%s` is undefined",$1.Name());
+              Werror("`%s` is undefined",$1.Fullname());
               YYERROR;
             }
             $$ = $1;
@@ -838,15 +839,15 @@ declare_ip_variable:
           }
         | RING_DECL elemexpr
           {
-            if (iiDeclCommand(&$$,&$2,myynest,$1,&(currRing->idroot))) YYERROR;
+            if (iiDeclCommand(&$$,&$2,myynest,$1,&(currRing->idroot), TRUE)) YYERROR;
           }
         | currring_lists elemexpr
           {
-            if (iiDeclCommand(&$$,&$2,myynest,$1,&(currRing->idroot))) YYERROR;
+            if (iiDeclCommand(&$$,&$2,myynest,$1,&(currRing->idroot), TRUE)) YYERROR;
           }
         | MATRIX_CMD elemexpr '[' expr ']' '[' expr ']'
           {
-            if (iiDeclCommand(&$$,&$2,myynest,$1,&(currRing->idroot))) YYERROR;
+            if (iiDeclCommand(&$$,&$2,myynest,$1,&(currRing->idroot), TRUE)) YYERROR;
             int r; TESTSETINT($4,r);
             int c; TESTSETINT($7,c);
             if (r < 1)
@@ -862,7 +863,7 @@ declare_ip_variable:
           }
         | MATRIX_CMD elemexpr
           {
-            if (iiDeclCommand(&$$,&$2,myynest,$1,&(currRing->idroot))) YYERROR;
+            if (iiDeclCommand(&$$,&$2,myynest,$1,&(currRing->idroot), TRUE)) YYERROR;
           }
         | INTMAT_CMD elemexpr '[' expr ']' '[' expr ']'
           {
@@ -900,7 +901,7 @@ declare_ip_variable:
             memset(&r,0,sizeof(sleftv));
             if ((BEGIN_RING<t) && (t<END_RING))
             {
-              if (iiDeclCommand(&r,&$3,myynest,t,&(currRing->idroot))) YYERROR;
+              if (iiDeclCommand(&r,&$3,myynest,t,&(currRing->idroot), TRUE)) YYERROR;
             }
             else
             {
@@ -914,7 +915,7 @@ declare_ip_variable:
           }
         | PROC_CMD elemexpr
           {
-            if (iiDeclCommand(&$$,&$2,myynest,PROC_CMD,&IDROOT,TRUE)) YYERROR;
+            if (iiDeclCommand(&$$,&$2,myynest,PROC_CMD,&IDROOT, FALSE, TRUE)) YYERROR;
           }
         ;
 
@@ -1076,8 +1077,12 @@ helpcmd:
 exportcmd:
         EXPORT_CMD exprlist
         {
+#ifdef HAVE_NAMESPACES
+          if (iiExport(&$2,0,namespaceroot->get("Top",0,TRUE))) YYERROR;
+#else /* HAVE_NAMESPACES */
           if (iiExport(&$2,0)) YYERROR;
-        }
+#endif /* HAVE_NAMESPACES */
+            }
         | EXPORT_CMD exprlist extendedid expr
         {
           if ((strcmp($3,"to")!=0) ||
@@ -1091,11 +1096,13 @@ exportcmd:
           }
           else
           {
+#ifdef HAVE_NAMESPACES
             if ($4.Typ()==PACKAGE_CMD) {
-              if (iiExport(&$2,0,IDPACKAGE((idhdl)$4.data)->idroot))
+              if (iiExport(&$2,0,(idhdl)$4.data))
                 YYERROR;
             }
             else
+#endif /* HAVE_NAMESPACES */
             {
              printf("String: %s;\n", (char *)$4.data);
             }
@@ -1116,6 +1123,15 @@ killcmd:
             }
             else
             {
+#ifdef HAVE_NAMESPACES
+            if (v->packhdl != NULL)
+            {
+              namespaceroot->push( IDPACKAGE(v->packhdl) , IDID(v->packhdl));
+              killhdl((idhdl)v->data);
+              namespaceroot->pop();
+            }
+            else 
+#endif /* HAVE_NAMESPACES */
               killhdl((idhdl)v->data);
             }
             v=v->next;
@@ -1160,7 +1176,125 @@ listcmd:
           }
         | LISTVAR_CMD '(' elemexpr ')'
           {
-            list_cmd(0,$3.Name(),"// ",TRUE);
+#ifdef HAVE_NAMESPACES
+            if($3.Typ() == PACKAGE_CMD) {
+              namespaceroot->push( IDPACKAGE((idhdl)$3.data),
+                                   ((sleftv)$3).name);
+              list_cmd(-1,NULL,"// ",TRUE);
+              namespaceroot->pop();
+            }
+            else
+#endif /* HAVE_NAMESPACES */
+              list_cmd(0,$3.Fullname(),"// ",TRUE);
+            $3.CleanUp();
+          }
+        | LISTVAR_CMD '(' elemexpr ',' ROOT_DECL ')'
+          {
+#ifdef HAVE_NAMESPACES
+            if($3.Typ() == PACKAGE_CMD) {
+              namespaceroot->push( IDPACKAGE((idhdl)$3.data),
+                                   ((sleftv)$3).name);
+              list_cmd($5,NULL,"// ",TRUE);
+              namespaceroot->pop();
+            }
+#endif /* HAVE_NAMESPACES */
+            $3.CleanUp();
+          }
+        | LISTVAR_CMD '(' elemexpr ',' ROOT_DECL_LIST ')'
+          {
+#ifdef HAVE_NAMESPACES
+            if($3.Typ() == PACKAGE_CMD) {
+              namespaceroot->push( IDPACKAGE((idhdl)$3.data),
+                                   ((sleftv)$3).name);
+              list_cmd($5,NULL,"// ",TRUE);
+              namespaceroot->pop();
+            }
+#endif /* HAVE_NAMESPACES */
+            $3.CleanUp();
+          }
+        | LISTVAR_CMD '(' elemexpr ',' RING_DECL ')'
+          {
+#ifdef HAVE_NAMESPACES
+            if($3.Typ() == PACKAGE_CMD) {
+              namespaceroot->push( IDPACKAGE((idhdl)$3.data),
+                                   ((sleftv)$3).name);
+              if ($5==QRING_CMD) $5=RING_CMD;
+              list_cmd($5,NULL,"// ",TRUE);
+              namespaceroot->pop();
+            }
+#endif /* HAVE_NAMESPACES */
+            $3.CleanUp();
+          }
+        | LISTVAR_CMD '(' elemexpr ',' currring_lists ')'
+          {
+#ifdef HAVE_NAMESPACES
+            if($3.Typ() == PACKAGE_CMD) {
+              namespaceroot->push( IDPACKAGE((idhdl)$3.data),
+                                   ((sleftv)$3).name);
+              list_cmd($5,NULL,"// ",TRUE);
+              namespaceroot->pop();
+            }
+#endif /* HAVE_NAMESPACES */
+            $3.CleanUp();
+          }
+        | LISTVAR_CMD '(' elemexpr ',' RING_CMD ')'
+          {
+#ifdef HAVE_NAMESPACES
+            if($3.Typ() == PACKAGE_CMD) {
+              namespaceroot->push( IDPACKAGE((idhdl)$3.data),
+                                   ((sleftv)$3).name);
+              list_cmd(RING_CMD,NULL,"// ",TRUE);
+              namespaceroot->pop();
+            }
+#endif /* HAVE_NAMESPACES */
+            $3.CleanUp();
+          }
+        | LISTVAR_CMD '(' elemexpr ',' MATRIX_CMD ')'
+          {
+#ifdef HAVE_NAMESPACES
+            if($3.Typ() == PACKAGE_CMD) {
+              namespaceroot->push( IDPACKAGE((idhdl)$3.data),
+                                   ((sleftv)$3).name);
+              list_cmd(MATRIX_CMD,NULL,"// ",TRUE);
+              namespaceroot->pop();
+            }
+#endif /* HAVE_NAMESPACES */
+            $3.CleanUp();
+          }
+        | LISTVAR_CMD '(' elemexpr ',' INTMAT_CMD ')'
+          {
+#ifdef HAVE_NAMESPACES
+            if($3.Typ() == PACKAGE_CMD) {
+              namespaceroot->push( IDPACKAGE((idhdl)$3.data),
+                                   ((sleftv)$3).name);
+              list_cmd(INTMAT_CMD,NULL,"// ",TRUE);
+              namespaceroot->pop();
+            }
+#endif /* HAVE_NAMESPACES */
+            $3.CleanUp();
+          }
+        | LISTVAR_CMD '(' elemexpr ',' PROC_CMD ')'
+          {
+#ifdef HAVE_NAMESPACES
+            if($3.Typ() == PACKAGE_CMD) {
+              namespaceroot->push( IDPACKAGE((idhdl)$3.data),
+                                   ((sleftv)$3).name);
+              list_cmd(PROC_CMD,$3.Fullname(),"// ",TRUE);
+              namespaceroot->pop();
+            }
+#endif /* HAVE_NAMESPACES */
+            $3.CleanUp();
+          }
+        | LISTVAR_CMD '(' elemexpr ',' elemexpr ')'
+          {
+#ifdef HAVE_NAMESPACES
+            if($3.Typ() == PACKAGE_CMD) {
+              namespaceroot->push( IDPACKAGE((idhdl)$3.data),
+                                   ((sleftv)$3).name);
+              list_cmd(0,$5.Fullname(),"// ",TRUE);
+              namespaceroot->pop();
+            }
+#endif /* HAVE_NAMESPACES */
             $3.CleanUp();
           }
         | LISTVAR_CMD '(' ')'
@@ -1180,13 +1314,28 @@ ringcmd:
           rlist     ','      /* var names */
           ordering           /* list of (multiplier ordering (weight(s))) */
           {
+            BOOLEAN do_pop = FALSE;
             //noringvars = FALSE;
+            char *ring_name = $2.name;
+#ifdef HAVE_NAMESPACES
+            if (((sleftv)$2).req_packhdl != NULL)
+            {
+              namespaceroot->push( IDPACKAGE(((sleftv)$2).req_packhdl) , "");
+              do_pop = TRUE;
+              if( (((sleftv)$2).req_packhdl != NULL) &&
+                  (((sleftv)$2).packhdl != ((sleftv)$2).req_packhdl))
+                ring_name = mstrdup($2.name);
+            }
+#endif /* HAVE_NAMESPACES */
             idhdl b=
-            rInit($2.name,        /* ringname */
+            rInit(ring_name,      /* ringname */
                   &$4,            /* characteristik and list of parameters*/
                   &$6,            /* names of ringvariables */
                   &$8,            /* ordering */
                   FALSE);         /* is not a dring */
+#ifdef HAVE_NAMESPACES
+            if(do_pop) namespaceroot->pop();
+#endif /* HAVE_NAMESPACES */
             $4.CleanUp();
             $6.CleanUp();
             $8.CleanUp();
@@ -1197,8 +1346,23 @@ ringcmd:
           }
         | ringcmd1 elemexpr
           {
+            BOOLEAN do_pop = FALSE;
             //noringvars = FALSE;
-            if (!inerror) rDefault($2.name);
+            char *ring_name = $2.name;
+#ifdef HAVE_NAMESPACES
+            if (((sleftv)$2).req_packhdl != NULL)
+            {
+              namespaceroot->push( IDPACKAGE(((sleftv)$2).req_packhdl) , "");
+              do_pop = TRUE;
+              if( (((sleftv)$2).req_packhdl != NULL) &&
+                  (((sleftv)$2).packhdl != ((sleftv)$2).req_packhdl))
+                ring_name = mstrdup($2.name);
+            }
+#endif /* HAVE_NAMESPACES */
+            if (!inerror) rDefault(ring_name);
+#ifdef HAVE_NAMESPACES
+            if(do_pop) namespaceroot->pop();
+#endif /* HAVE_NAMESPACES */
           }
         | DRING_CMD { noringvars = TRUE; }
           elemexpr cmdeq
@@ -1207,13 +1371,28 @@ ringcmd:
           ordering           /* list of (multiplier ordering (weight(s))) */
           {
             #ifdef DRING
+            BOOLEAN do_pop = FALSE;
             idhdl h;
             //noringvars = FALSE;
+            char *ring_name = $3.name;
+#ifdef HAVE_NAMESPACES
+            if (((sleftv)$3).req_packhdl != NULL)
+            {
+              namespaceroot->push( IDPACKAGE(((sleftv)$3).req_packhdl) , "");
+              do_pop = TRUE;
+              if( (((sleftv)$2).req_packhdl != NULL) &&
+                  (((sleftv)$3).packhdl != ((sleftv)$3).req_packhdl))
+                ring_name = mstrdup($3.name);
+            }
+#endif /* HAVE_NAMESPACES */
             h=rInit($3.name,    /* ringname */
                    &$5,         /* characteristik and list of parameters*/
                    &$7,         /* names of ringvariables */
                    &$9,         /* ordering */
                    TRUE);       /* is a dring */
+#ifdef HAVE_NAMESPACES
+            if(do_pop) namespaceroot->pop();
+#endif /* HAVE_NAMESPACES */
             $5.CleanUp();
             $7.CleanUp();
             $9.CleanUp();
@@ -1257,7 +1436,9 @@ setringcmd:
                     if(namespaceroot->isroot) {
                       if (iiExport(&$2,myynest-1)) YYERROR;
                     } else {
-                      if (iiExport(&$2,myynest-1, NSROOT(namespaceroot->next))) YYERROR;
+                      if (iiExport(&$2,myynest-1,
+                        namespaceroot->get(namespaceroot->next->name,0,TRUE)))
+                        YYERROR;
                     }
 #else /* HAVE_NAMESPACES */
                     if (iiExport(&$2,myynest-1)) YYERROR;

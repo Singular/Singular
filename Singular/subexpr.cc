@@ -99,7 +99,22 @@ void sleftv::Print(leftv store, int spaces)
         case UNKNOWN:
         case DEF_CMD:
         case PACKAGE_CMD:
+#ifdef HAVE_NAMESPACES
+          {
+            char *typ;
+            language_defs lang = ((package)d)->language;
+            ::Print("// Package : %-*.*s`%s`\n",spaces,spaces," ",n);
+            switch (lang) {
+                case LANG_SINGULAR: typ="singular"; break;
+                case LANG_C:        typ="object";   break;
+                case LANG_NONE:     typ="none";     break;
+                default:            typ="unknow language";
+            }
+            ::Print("// language: %-*.*s%s",spaces,spaces," ",typ);
+          }
+#else /* HAVE_NAMESPACES */
           ::Print("%-*.*s`%s`",spaces,spaces," ",n);
+#endif /* HAVE_NAMESPACES */
           break;
         case NONE:
           return;
@@ -538,6 +553,10 @@ void sleftv::Copy(leftv source)
 #endif
   }
   flag=source->flag;
+#ifdef HAVE_NAMESPACES
+  packhdl = source->packhdl;
+  req_packhdl = source->req_packhdl;
+#endif /* HAVE_NAMESPACES */
   if ((source->attribute!=NULL)||(source->e!=NULL))
     attribute=source->CopyA();
   if (source->next!=NULL)
@@ -1029,7 +1048,7 @@ BOOLEAN assumeStdFlag(leftv h)
 * utility for grammar and iparith
 */
 extern BOOLEAN noringvars;
-void syMake(leftv v,char * id)
+void syMake(leftv v,char * id, idhdl packhdl)
 {
   /* resolv an identifier: (to DEF_CMD, if siq>0)
   * 1) reserved id: done by scanner
@@ -1261,7 +1280,11 @@ int sleftv::Eval()
         nok=d->arg2.Eval();
         if(!nok)
         {
+#ifdef HAVE_NAMESPACES
+          leftv r=iiMake_proc(h,(sleftv*)NULL,&d->arg2);
+#else /* HAVE_NAMESPACES */
           leftv r=iiMake_proc(h,&d->arg2);
+#endif /* HAVE_NAMESPACES */
           if (r!=NULL)
             memcpy(this,r,sizeof(sleftv));
           else
@@ -1372,7 +1395,6 @@ int sleftv::Eval()
   next=nn;
   return nok;
 }
-
 
 char *iiSleftv2name(leftv v)
 {

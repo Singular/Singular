@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.35 1998-10-15 15:15:31 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.36 1998-10-21 10:25:30 krueger Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -500,6 +500,25 @@ static BOOLEAN jiA_RING(leftv res, leftv a, Subexpr e)
   r->ref++;
   return FALSE;
 }
+static BOOLEAN jiA_PACKAGE(leftv res, leftv a, Subexpr e)
+{
+  Print("Currently not supported\n");
+    return FALSE;
+  package pack=IDPACKAGE((idhdl)a->data);
+  printf("Copy package - 1\n");
+
+  idhdl rl=(idhdl)res->data;
+  if(rl == NULL) {
+    return TRUE;
+  }
+  printf("Copy package - 2\n");
+  if (&IDPACKAGE(rl)!=NULL) Free(IDPACKAGE(rl), sizeof(ip_package));
+  IDPACKAGE(rl)=pack;
+  printf("Copy package - 3\n");
+  pack->ref++;
+  printf("Copy package - 4\n");
+  return FALSE;
+}
 /*=================== table =================*/
 struct sValAssign dAssign[]=
 {
@@ -529,6 +548,7 @@ struct sValAssign dAssign[]=
 ,{jiA_LIST,     LIST_CMD,       LIST_CMD }
 ,{jiA_LINK,     LINK_CMD,       STRING_CMD }
 ,{jiA_LINK,     LINK_CMD,       LINK_CMD }
+,{jiA_PACKAGE,  PACKAGE_CMD,    PACKAGE_CMD }
 ,{NULL,         0,              0 }
 };
 struct sValAssign_sys dAssign_sys[]=
@@ -562,14 +582,14 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
   int rt=r->Typ();
   if (rt==0)
   {
-    if (!errorreported) Werror("`%s` is undefined",r->Name());
+    if (!errorreported) Werror("`%s` is undefined",r->Fullname());
     return TRUE;
   }
 
   int lt=l->Typ();
   if((lt==0)/*&&(l->name!=NULL)*/)
   {
-    if (!errorreported) Werror("left side `%s` is undefined",l->Name());
+    if (!errorreported) Werror("left side `%s` is undefined",l->Fullname());
     return TRUE;
   }
   if((rt==DEF_CMD)||(rt==NONE))
@@ -690,7 +710,7 @@ static BOOLEAN iiAssign_sys(leftv l, leftv r)
 
   if (rt==0)
   {
-    if (!errorreported) Werror("`%s` is undefined",r->Name());
+    if (!errorreported) Werror("`%s` is undefined",r->Fullname());
     return TRUE;
   }
   int i=0;
@@ -849,7 +869,7 @@ static BOOLEAN jjA_L_LIST(leftv l, leftv r)
     if ((rt==0)||(rt==NONE))
     {
       L->Clean();
-      Werror("`%s` is undefined",h->Name());
+      Werror("`%s` is undefined",h->Fullname());
       return TRUE;
     }
     //if ((rt==RING_CMD)||(rt==QRING_CMD))
@@ -863,7 +883,17 @@ static BOOLEAN jjA_L_LIST(leftv l, leftv r)
   }
   IDLIST((idhdl)l->data)->Clean();
   IDLIST((idhdl)l->data)=L;
-  ipMoveId((idhdl)l->data);
+#ifdef HAVE_NAMESPACES
+  if (l->req_packhdl != NULL)
+  {
+    //Print("jjA_L_LIST: -1 \n");
+    namespaceroot->push( IDPACKAGE(l->req_packhdl), IDID((idhdl)l));
+    ipMoveId((idhdl)l->data);
+    namespaceroot->pop();
+  }
+  else
+#endif /* HAVE_NAMESPACES */
+    ipMoveId((idhdl)l->data);
   o_r->CleanUp();
   return FALSE;
 }
@@ -893,8 +923,14 @@ static BOOLEAN jiA_L_LIST(leftv l, leftv r)
     rt=h->Typ();
     if ((rt==0)||(rt==DEF_CMD))
     {
+//<<<<<<< ipassign.cc
+//      L->Clean();
+//      Werror("`%s` is undefined",h->Fullname());
+//      return TRUE;
+//=======
       Werror("`%s` is undefined",h->Name());
       goto err;
+//>>>>>>> 1.35
     }
     if ((rt==RING_CMD)||(rt==QRING_CMD))
     {
@@ -1226,9 +1262,20 @@ BOOLEAN iiAssign(leftv l, leftv r)
          b=jiAssign_list(l,r);
        if(!b)
        {
+         //Print("jjA_L_LIST: - 2 \n");
          if((l->rtyp==IDHDL) && (l->data!=NULL))
          {
-           ipMoveId((idhdl)l->data);
+#ifdef HAVE_NAMESPACES
+           //if (IDTYP((idhdl)l->data)==LIST_CMD)
+           if ((l->req_packhdl)!= NULL)
+           {
+             namespaceroot->push( IDPACKAGE(l->req_packhdl) , IDID(l->req_packhdl));
+             ipMoveId((idhdl)l->data);
+             namespaceroot->pop();
+           }
+           else
+#endif /* HAVE_NAMESPACES */
+             ipMoveId((idhdl)l->data);
            l->attribute=IDATTR((idhdl)l->data);
            l->flag=IDFLAG((idhdl)l->data);
          }
@@ -1264,7 +1311,21 @@ BOOLEAN iiAssign(leftv l, leftv r)
         b=jiAssign_1(l,r);
         if (l->rtyp==IDHDL)
         {
-          if ((lt==DEF_CMD)||(lt==LIST_CMD)) ipMoveId((idhdl)l->data);
+          if ((lt==DEF_CMD)||(lt==LIST_CMD))
+          {
+#ifdef HAVE_NAMESPACES
+            //Print("jjA_L_LIST: - 3 \n");
+            if (lt==LIST_CMD && (l->req_packhdl)!= NULL)
+            {
+              namespaceroot->push( IDPACKAGE(l->req_packhdl) ,
+                                   IDID(l->req_packhdl));
+              ipMoveId((idhdl)l->data);
+              namespaceroot->pop();
+            }
+            else
+#endif /* HAVE_NAMESPACES */
+              ipMoveId((idhdl)l->data);
+          }
           l->attribute=IDATTR((idhdl)l->data);
           l->flag=IDFLAG((idhdl)l->data);
           l->CleanUp();
@@ -1285,7 +1346,22 @@ BOOLEAN iiAssign(leftv l, leftv r)
         if((l->rtyp==IDHDL)&&(l->data!=NULL))
         {
           if ((lt==DEF_CMD) || (lt==LIST_CMD))
-            ipMoveId((idhdl)l->data);
+          {
+            //Print("ipAssign - 3.0\n");
+#ifdef HAVE_NAMESPACES
+            //Print("jjA_L_LIST: - 4 \n");
+            if (lt==LIST_CMD && (l->req_packhdl)!= NULL)
+            {
+//              Print("==========>ipAssign() - 3\n");
+              namespaceroot->push( IDPACKAGE(l->req_packhdl) ,
+                                   IDID(l->req_packhdl));
+              ipMoveId((idhdl)l->data);
+              namespaceroot->pop();
+            }
+            else
+#endif /* HAVE_NAMESPACES */
+              ipMoveId((idhdl)l->data);
+          }
           l->attribute=IDATTR((idhdl)l->data);
           l->flag=IDFLAG((idhdl)l->data);
         }
@@ -1342,7 +1418,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
       if (((rt == RING_CMD)||(rt == QRING_CMD))&&(r->e==NULL))
       {
         FreeL((ADDRESS)IDMAP((idhdl)l->data)->preimage);
-        IDMAP((idhdl)l->data)->preimage = mstrdup (r->Name());
+        IDMAP((idhdl)l->data)->preimage = mstrdup (r->Fullname());
         /* advance the expressionlist to get the next element after the ring */
         hh = r->next;
         //r=hh;
@@ -1480,7 +1556,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
       break;
     case NONE:
     case 0:
-      Werror("cannot assign to %s",l->Name());
+      Werror("cannot assign to %s",l->Fullname());
       nok=TRUE;
       break;
     default:

@@ -354,22 +354,8 @@ void singular_help(char *str,BOOLEAN example)
     ss--;
   }
 #ifdef HAVE_NAMESPACES
-  char *p1 = AllocL(strlen(s)), *p2 = AllocL(strlen(s));
-  *p1='\0';
-  *p2='\0';
-  sscanf(s, "%[^:]::%s", p1, p2);
   idhdl h, ns;
-  if(*p2) {
-    printf("singular_help:(%s, %s)\n", p1, p2);
-    ns = namespaceroot->get(p1,0);
-    namespaceroot->push(IDPACKAGE(ns), IDID(ns));
-    h=namespaceroot->get(p2,myynest);
-    namespaceroot->pop();
-  } else {
-    h=namespaceroot->get(p1,myynest);
-  }
-  FreeL(p1);
-  FreeL(p2);
+  iiname2hdl(s, &ns, &h);
 #else /* HAVE_NAMESPACES */
   /* --------- is it a proc ? --------------------------------*/
   idhdl h=idroot->get(s,myynest);
@@ -420,7 +406,7 @@ void singular_help(char *str,BOOLEAN example)
 
       yylpin = fp;
 #  ifdef HAVE_NAMESPACES
-      yylplex(str, libnamebuf, &lib_style, IDROOT, GET_INFO);
+      yylplex(str, libnamebuf, &lib_style, IDROOT, FALSE, GET_INFO);
 #  else /* HAVE_NAMESPACES */
       yylplex(str, libnamebuf, &lib_style, GET_INFO);
 #  endif /* HAVE_NAMESPACES */
@@ -771,6 +757,9 @@ char * versionString()
 #endif
 #ifdef HAVE_INFO
               StringAppendS("info,");
+#endif
+#ifdef HAVE_NAMESPACES
+              StringAppendS("Namespaces,");
 #endif
 #ifdef TEST
               StringAppendS("TESTs,");

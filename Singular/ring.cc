@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.32 1998-10-15 14:08:39 krueger Exp $ */
+/* $Id: ring.cc,v 1.33 1998-10-21 10:25:48 krueger Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -941,25 +941,41 @@ void rKill(ring r)
 
 void rKill(idhdl h)
 {
+#ifndef HAVE_NAMESPACES1
   ring r = IDRING(h);
   if (r!=NULL) rKill(r);
   if (h==currRingHdl)
   {
-    currRingHdl=IDROOT;
-    while (currRingHdl!=NULL)
-    {
-      if ((currRingHdl!=h)
+#ifdef HAVE_NAMESPACES
+    namehdl nsHdl = namespaceroot;
+    while(nsHdl!=NULL) {
+      currRingHdl=NSROOT(nsHdl);
+#else /* HAVE_NAMESPACES */
+      currRingHdl=IDROOT;
+#endif /* HAVE_NAMESPACES */
+      while (currRingHdl!=NULL)
+      {
+        if ((currRingHdl!=h)
+            && (IDTYP(currRingHdl)==IDTYP(h))
+            && (h->data.uring==currRingHdl->data.uring))
+          break;
+        currRingHdl=IDNEXT(currRingHdl);
+      }
+#ifdef HAVE_NAMESPACES
+      if ((currRingHdl != NULL) && (currRingHdl!=h)
           && (IDTYP(currRingHdl)==IDTYP(h))
           && (h->data.uring==currRingHdl->data.uring))
         break;
-      currRingHdl=IDNEXT(currRingHdl);
+      nsHdl = nsHdl->next;
     }
-#ifdef HAVE_NAMESPACES
+#endif /* HAVE_NAMESPACES */
+  }
+#else
     if(currRingHdl==NULL) {
       namehdl ns = namespaceroot;
       BOOLEAN found=FALSE;
       
-      while(ns->next!=NULL) {
+      while(!ns->isroot) {
         currRingHdl=NSROOT(namespaceroot->next);
         while (currRingHdl!=NULL)
         {
@@ -974,19 +990,46 @@ void rKill(idhdl h)
         ns=IDNEXT(ns);
       }
     }
+    if(currRingHdl == NULL || IDRING(h) != IDRING(currRingHdl)) {
+      currRingHdl = namespaceroot->currRingHdl;
+      
+/*      Print("Running rFind()\n");
+      currRingHdl = rFindHdl(IDRING(h), NULL, NULL);
+      if(currRingHdl == NULL) {
+        Print("rFind()return 0\n");
+      } else {
+        Print("Huppi rfind return an currRingHDL\n");
+        Print("%x, %x\n", IDRING(h),IDRING(currRingHdl) );
+      }
+*/
+    } else {
+      //Print("Huppi found an currRingHDL\n");
+      //Print("%x, %x\n", IDRING(h),IDRING(currRingHdl) );
+      
+    }
 #endif /* HAVE_NAMESPACES */
-  }
 }
 
 idhdl rFindHdl(ring r, idhdl n, idhdl w)
 {
 #ifdef HAVE_NAMESPACES
   idhdl h;
-  if(namespaceroot->isroot) h = IDROOT;
-  else h = NSROOT(namespaceroot->next);
-#else
-  idhdl h=IDROOT;
-#endif
+  namehdl ns = namespaceroot;
+
+  while(!ns->isroot) {
+    h = NSROOT(ns);
+    if(w != NULL) h = w;
+    while (h!=NULL)
+    {
+      if (((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))
+          && (h->data.uring==r)
+          && (h!=n))
+        return h;
+      h=IDNEXT(h);
+    }
+    ns = ns->next;
+  }
+  h = NSROOT(ns);
   if(w != NULL) h = w;
   while (h!=NULL)
   {
@@ -996,6 +1039,31 @@ idhdl rFindHdl(ring r, idhdl n, idhdl w)
       return h;
     h=IDNEXT(h);
   }
+#if 0
+  if(namespaceroot->isroot) h = IDROOT;
+  else h = NSROOT(namespaceroot->next);
+  if(w != NULL) h = w;
+  while (h!=NULL)
+  {
+    if (((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))
+        && (h->data.uring==r)
+        && (h!=n))
+      return h;
+    h=IDNEXT(h);
+  }
+#endif
+#else
+  idhdl h=IDROOT;
+  if(w != NULL) h = w;
+  while (h!=NULL)
+  {
+    if (((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))
+        && (h->data.uring==r)
+        && (h!=n))
+      return h;
+    h=IDNEXT(h);
+  }
+#endif
   return NULL;
 }
 

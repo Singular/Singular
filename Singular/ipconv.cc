@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.11 1998-09-24 09:59:44 Singular Exp $ */
+/* $Id: ipconv.cc,v 1.12 1998-10-21 10:25:31 krueger Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -313,6 +313,10 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
         memset(input,0,sizeof(*input));
       }
     }
+#ifdef HAVE_NAMESPACES
+    output->packhdl = input->packhdl;
+    output->req_packhdl = input->req_packhdl;
+#endif /* HAVE_NAMESPACES */
     output->next=input->next;
     input->next=NULL;
     return FALSE;
@@ -336,6 +340,10 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
       {
         return TRUE;
       }
+#ifdef HAVE_NAMESPACES
+      //output->packhdl = input->packhdl;
+      //output->req_packhdl = input->req_packhdl;
+#endif /* HAVE_NAMESPACES */
       output->next=input->next;
       input->next=NULL;
       return FALSE;
