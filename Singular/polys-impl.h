@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.28 1998-12-16 18:43:44 Singular Exp $ */
+/* $Id: polys-impl.h,v 1.29 1999-03-19 14:18:04 obachman Exp $ */
 
 /***************************************************************
  *
@@ -51,6 +51,8 @@ struct  spolyrec
 
 #define POLYSIZE (sizeof(poly) + sizeof(number) + sizeof(Order_t))
 #define POLYSIZEW (POLYSIZE / sizeof(long))
+#define MAX_EXPONENT_NUMBER ((MAX_BLOCK_SIZE - POLYSIZE) / SIZEOF_EXPONENT)
+
 // number of Variables
 extern int pVariables;
 // size of a monom in bytes - always a multiple of sizeof(void*)

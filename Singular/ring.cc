@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.47 1999-03-15 14:05:31 Singular Exp $ */
+/* $Id: ring.cc,v 1.48 1999-03-19 14:18:05 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -31,6 +31,10 @@
 #ifdef RDEBUG
 short rNumber=0;
 #endif
+
+// static procedures
+// unconditionally deletes fields in r
+static void rDelete(ring r);
 
 /*0 implementation*/
 int rBlocks(ring r)
@@ -243,10 +247,17 @@ idhdl rDefault(char *s)
   return currRingHdl;
 }
 
-/*2
- *check intvec, describing the ordering
- */
-BOOLEAN rCheckIV(intvec *iv)
+///////////////////////////////////////////////////////////////////////////
+//
+// rInit: define a new ring from sleftv's
+//
+
+/////////////////////////////
+// Auxillary functions
+//
+
+// check intvec, describing the ordering
+static BOOLEAN rCheckIV(intvec *iv)
 {
   if ((iv->length()!=2)&&(iv->length()!=3))
   {
@@ -278,37 +289,226 @@ static int rTypeOfMatrixOrder(intvec * order)
   return typ;
 }
 
-/*2
- * define a new ring from the data:
- *s: name, chr: ch, parameter names (or NULL): pn,
- *varnames: rv, ordering: ord, typ: typ
- */
+// set R->order, R->block, R->wvhdl, r->OrdSgn from sleftv
+static BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
+{
+  int last = 0, o=0, n = 1, i=0, typ = 1, j;
+  sleftv *sl = ord;
+
+  // determine nBlocks
+  while (sl!=NULL)
+  {
+    intvec *iv = (intvec *)(sl->data);
+    if (((*iv)[1]==ringorder_c)||((*iv)[1]==ringorder_C)) i++;
+    else if ((*iv)[1]!=ringorder_a) o++;
+    n++;
+    sl=sl->next;
+  }
+  // check whether at least one real ordering
+  if (o==0)
+  {
+    WerrorS("invalid combination of orderings");
+    return TRUE;
+  }
+  // if no c/C ordering is given, increment n
+  if (i==0) n++;
+  else if (i != 1)
+  {
+    // throw error if more than one is given
+    WerrorS("more than one ordering c/C specified");
+    return TRUE;
+  }
+  
+  // initialize fields of R
+  R->order=(int *)Alloc0(n*sizeof(int));
+  R->block0=(int *)Alloc0(n*sizeof(int));
+  R->block1=(int *)Alloc0(n*sizeof(int));
+  R->wvhdl=(short**)Alloc0(n*sizeof(short*));
+
+  // init order, so that rBlocks works correctly
+  for (j=0; j < n-1; j++)
+    R->order[j] = (int) ringorder_unspec;
+  // set last _C order, if no c/C order was given
+  if (i == 0) R->order[n-2] = ringorder_C;
+
+  /* init orders */
+  sl=ord;
+  n=-1;
+  while (sl!=NULL)
+  {
+    intvec *iv;
+    iv = (intvec *)(sl->data);
+    n++;
+
+    /* the format of an ordering:
+     *  iv[0]: factor
+     *  iv[1]: ordering
+     *  iv[2..end]: weights
+     */
+    R->order[n] = (*iv)[1];
+    switch ((*iv)[1])
+    {
+        case ringorder_ws:
+        case ringorder_Ws:
+          typ=-1;
+        case ringorder_wp:
+        case ringorder_Wp:
+          R->wvhdl[n]=(short*)AllocL((iv->length()-1)*sizeof(short));
+          for (i=2; i<iv->length(); i++)
+            R->wvhdl[n][i-2] = (short)(*iv)[i];
+          R->block0[n] = last+1;
+          last += iv->length()-2;
+          R->block1[n] = last;
+          break;
+        case ringorder_ls:
+        case ringorder_ds:
+        case ringorder_Ds:
+          typ=-1;
+        case ringorder_lp:
+        case ringorder_dp:
+        case ringorder_Dp:
+          R->block0[n] = last+1;
+          if (iv->length() == 3) last+=(*iv)[2];
+          else last += (*iv)[0];
+          R->block1[n] = last;
+          if (rCheckIV(iv)) return TRUE;
+          break;
+        case ringorder_c:
+        case ringorder_C:
+          if (rCheckIV(iv)) return TRUE;
+          break;
+        case ringorder_a:
+          R->block0[n] = last+1;
+          R->block1[n] = last + iv->length() - 2;
+          R->wvhdl[n] = (short*)AllocL((iv->length()-1)*sizeof(short));
+          for (i=2; i<iv->length(); i++)
+          {
+            R->wvhdl[n][i-2]=(short)(*iv)[i];
+            if ((*iv)[i]<0) typ=-1;
+          }
+          break;
+        case ringorder_M:
+        {
+          int Mtyp=rTypeOfMatrixOrder(iv);
+          if (Mtyp==0) return TRUE;
+          if (Mtyp==-1) typ = -1;
+
+          R->wvhdl[n] =( short*)AllocL((iv->length()-1)*sizeof(short));
+          for (i=2; i<iv->length();i++)
+            R->wvhdl[n][i-2]=(short)(*iv)[i];
+
+          R->block0[n] = last+1;
+          last += (int)sqrt((double)(iv->length()-2));
+          R->block1[n] = last;
+          break;
+        }
+        
+        case ringorder_no:
+           R->order[n] = ringorder_unspec;
+           return TRUE;
+           
+        default:
+          Werror("Internal Error: Unknown ordering %d", (*iv)[1]);
+          R->order[n] = ringorder_unspec;
+          return TRUE;
+    }
+    sl=sl->next;
+  }
+
+  // check for complete coverage 
+  if ((R->order[n]==ringorder_c) ||  (R->order[n]==ringorder_C)) n--;
+  if (R->block1[n] != R->N)
+  {
+    if (((R->order[n]==ringorder_dp) ||
+         (R->order[n]==ringorder_ds) ||
+         (R->order[n]==ringorder_Dp) ||
+         (R->order[n]==ringorder_Ds) ||
+         (R->order[n]==ringorder_lp) ||
+         (R->order[n]==ringorder_ls))
+        && 
+        R->block0[n] <= R->N)
+    {
+      R->block1[n] = R->N;
+    }
+    else
+    {
+      Werror("mismatch of number of vars (%d) and ordering (%d vars)",
+             R->N,R->block1[n]);
+      return TRUE;
+    }
+  }
+  R->OrdSgn = typ;
+  return FALSE;
+}
+
+// get array of strings from list of sleftv's
+static BOOLEAN rSleftvList2StringArray(sleftv* sl, char** p)
+{
+  
+  while(sl!=NULL)
+  {
+    if (sl->Name() == sNoName)
+    {
+      if (sl->Typ()==POLY_CMD)
+      {
+        sleftv s_sl;
+        iiConvert(POLY_CMD,ANY_TYPE,-1,sl,&s_sl);
+        if (s_sl.Name() != sNoName) 
+          *p = mstrdup(s_sl.Name());
+        else
+          *p = NULL;
+        sl->next = s_sl.next;
+        s_sl.next = NULL;
+        s_sl.CleanUp(); 
+        if (*p == NULL) return TRUE;
+      }
+      else
+        return TRUE;
+    }
+    else
+      *p = mstrdup(sl->Name());
+    p++;
+    sl=sl->next;
+  }
+  return FALSE;
+}
+
+
+////////////////////
+//
+// rInit itself:
+// 
+// INPUT:  s: name, pn: ch & parameter (names), rv: variable (names)
+//         ord: ordering
+// RETURN: currRingHdl on success 
+//         NULL        on error
+// NOTE:   * makes new ring to current ring, on success
+//         * considers input sleftv's as read-only
 idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
             BOOLEAN isDRing)
 {
   int ch;
+  ring R = NULL;
+  idhdl tmp = NULL;
+  BOOLEAN ffChar=FALSE;
+
+  /* ch -------------------------------------------------------*/
+  // get ch of ground field
   if (pn->Typ()==INT_CMD)
   {
     ch=(int)pn->Data();
   }
-  else if (strcmp(pn->name,"real")==0)
+  else if (pn->name != NULL && strcmp(pn->name,"real")==0)
   {
     ch=-1;
   }
   else
   {
-    return NULL;
+    Werror("Wrong ground field specification");
+    goto rInitError;
   }
   pn=pn->next;
-
-  int l, last;
-  int typ = 1;
-  sleftv * sl;
-  idhdl tmp;
-  ip_sring tmpR;
-  BOOLEAN ffChar=FALSE;
-  /*every entry in the new ring is initialized to 0*/
-
+  
   /* characteristic -----------------------------------------------*/
   /* input: 0 ch=0 : Q     parameter=NULL    ffChar=FALSE
    *         0    1 : Q(a,...)        *names         FALSE
@@ -319,359 +519,107 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
    */
   if (ch!=-1)
   {
-    if ((ch!=0) &&((ch<2) || (ch > 32003)))
+    int l = 0;
+    
+    if (ch!=0 && (ch<2) || (ch > 32003)) 
     {
+      Warn("%d is invalid characteristic of ground field. 32203 is used.", ch);
       ch=32003;
     }
-    l=0;
+    // load fftable, if necessary
     if (pn!=NULL)
     {
       while ((ch!=fftable[l]) && (fftable[l])) l++;
-      if (fftable[l]==0)
-      {
-        ch = IsPrime(ch);
-      }
+      if (fftable[l]==0) ch = IsPrime(ch);
       else
       {
         char *m[1]={(char *)sNoName};
         nfSetChar(ch,m);
-        if(errorreported)
-        {
-          return NULL;
-        }
-        else
-        {
-          ffChar=TRUE;
-        }
+        if (errorreported) goto rInitError;
+        else ffChar=TRUE;
       }
     }
     else
-    {
       ch = IsPrime(ch);
-    }
   }
-  memset(&tmpR,0,sizeof(tmpR));
-
-  tmpR.ch = ch;
-
+  // allocated ring and set ch
+  R = (ring) Alloc0(sizeof(sip_sring));
+  R->ch = ch;
+  
   /* parameter -------------------------------------------------------*/
-  sleftv* hs;
-  const char* h;
-
-  if ((pn!=NULL)&& (ffChar||(ch==-1)))
-  {
-    if((ffChar && (pn->next!=NULL))
-       || (ch==-1))
-    {
-      WarnS("too many parameters");
-      if (ffChar) hs=pn->next;
-      else hs=pn;
-      hs->CleanUp();
-      if (ffChar)
-      {
-        pn->next=NULL;
-        Free((ADDRESS)hs,sizeof(sleftv));
-      }
-      else pn=NULL;
-    }
-  }
-  /* a tempory pointer for typ conversion
-   * and for deallocating sleftv*-lists:
-   *  don't deallocate the first but all other entries*/
-
   if (pn!=NULL)
   {
-    tmpR.P=pn->listLength();
-    if((ffChar && (tmpR.P>1))
-       || ((ch==-1) && (tmpR.P>0)))
+    R->P=pn->listLength();
+    if (ffChar && (R->P > 1) || ch == -1)
     {
-      tmpR.P=ffChar; /* GF(q): 1, R: 0 */
-      WarnS("too many parameters");
-      if (ffChar) hs=pn->next;
-      else hs=pn;
-      hs->CleanUp();
-      Free((ADDRESS)hs,sizeof(sleftv));
-      if (ffChar) pn->next=NULL;
-      else pn=NULL;
+      WerrorS("too many parameters");
+      goto rInitError;
     }
-    tmpR.parameter=(char**)Alloc(tmpR.P*sizeof(char *));
-    sl=pn;
-    char** p=tmpR.parameter;
-    while(sl!=NULL)
+    R->parameter=(char**)Alloc0(R->P*sizeof(char *));
+    if (rSleftvList2StringArray(pn, R->parameter))
     {
-      hs=NULL;
-      h=sl->Name();
-      if ((h==sNoName)&&(sl->Typ()==POLY_CMD))
-      {
-        hs=(leftv)Alloc(sizeof(sleftv));
-        iiConvert(POLY_CMD,ANY_TYPE,-1,sl,hs);
-        sl->next=hs->next;
-        hs->next=NULL;
-        h=hs->Name();
-      }
-      if (h==sNoName)
-      {
-        WerrorS("parameter expected");
-        return NULL;
-      }
-      *p=mstrdup(h);
-      p++;
-      if (hs!=NULL)
-      {
-        hs->CleanUp();
-        Free((ADDRESS)hs,sizeof(sleftv));
-      }
-      hs=sl;
-      sl=sl->next;
-      hs->next=NULL;
-      hs->CleanUp();
-      if (hs!=pn) Free((ADDRESS)hs,sizeof(sleftv));
+      WerrorS("parameter expected");
+      goto rInitError;
     }
-    if ((ch>1) && /*(pn!=NULL) &&*/ (!ffChar)) tmpR.ch=-tmpR.ch;
-    if (ch==0) tmpR.ch=1;
+    if (ch>1 && !ffChar) R->ch=-ch;
+    else if (ch==0) R->ch=1;
+  }
+  else if (ffChar)
+  {
+    WerrorS("need one parameter");
+    goto rInitError;
   }
 
   /* names and number of variables-------------------------------------*/
+  R->N = rv->listLength();
+  R->names   = (char **)Alloc0(R->N * sizeof(char *));
+  if (rSleftvList2StringArray(rv, R->names))
   {
-    int i, n;
-    sl = rv;
-#ifdef DRING
-    char *tmpname=NULL;
-#endif
-    n=rv->listLength();
-    tmpR.N = n;
-#ifdef SDRING
-    tmpR.partN=n+1-isDRing; // set to N+1 for SRING, N for DRING
-      if (isDRing) n=2*n+1;
-#endif
-    tmpR.N = n;
-    tmpR.names   = (char **)Alloc(n * sizeof(char *));
-    for (sl=rv, i=0; i<n; i++)
-    {
-      hs=NULL;
-#ifdef DRING
-      if (sl==NULL)
-      {
-        if (i==tmpR.N-1)
-          tmpname=mstrdup("");
-        else
-        {
-          tmpname=(char*)AllocL(strlen(tmpR.names[i-tmpR.partN])+2);
-          strcpy(tmpname,"d");
-          strcat(tmpname,tmpR.names[i-tmpR.partN]);
-        }
-        h=tmpname;
-      }
-      else
-#endif
-        h=sl->Name();
-      if ((h==sNoName)&&(sl->Typ()==POLY_CMD))
-      {
-        hs=(leftv)Alloc(sizeof(sleftv));
-        iiConvert(POLY_CMD,ANY_TYPE,-1,sl,hs);
-        sl->next=hs->next;
-        hs->next=NULL;
-        h=hs->Name();
-      }
-      if (h==sNoName)
-      {
-        WerrorS("expected name of ring variable");
-        return NULL;
-      }
-      tmpR.names[i] = mstrdup(h);
-      if (hs!=NULL)
-      {
-        hs->CleanUp();
-        Free((ADDRESS)hs,sizeof(sleftv));
-      }
-      hs=sl;
-#ifdef DRING
-      if (sl!=NULL)
-      {
-#endif
-        sl=sl->next;
-        hs->next=NULL;
-        hs->CleanUp();
-        if (hs!=rv) Free((ADDRESS)hs,sizeof(sleftv));
-#ifdef DRING
-      }
-      if (tmpname!=NULL)
-      {
-        FreeL((ADDRESS)tmpname);
-        tmpname=NULL;
-      }
-#endif
-    }
-
-    /* ordering -------------------------------------------------------------*/
-    sl = ord;
-    /* the number of orderings*/
-    n = 1; i=0;
-    int o=0;
-    while (sl!=NULL)
-    {
-      intvec *iv = (intvec *)(sl->data);
-      if (((*iv)[1]==ringorder_c)||((*iv)[1]==ringorder_C)) i++;
-      else if ((*iv)[1]!=ringorder_a) o++;
-      n++;
-      sl=sl->next;
-    }
-    if (o==0)
-    {
-      WerrorS("invalid combination of orderings");
-      return NULL;
-    }
-    if (i==0) n++;
-    else if (i!=1)
-      WarnS("more than one ordering c/C -- ignored");
-
-    /* allocating */
-    tmpR.order=(int *)Alloc0(n*sizeof(int));
-    tmpR.block0=(int *)Alloc0(n*sizeof(int));
-    tmpR.block1=(int *)Alloc0(n*sizeof(int));
-    tmpR.wvhdl=(short**)Alloc0(n*sizeof(short*));
-
-    /* init orders */
-    sl=ord;
-    n=0;
-    last=0;
-    while (sl!=NULL)
-    {
-      intvec *iv;
-      iv = (intvec *)(sl->data);
-
-      /* the format of an ordering:
-       *  iv[0]: factor
-       *  iv[1]: ordering
-       *  iv[2..end]: weights
-       */
-      tmpR.order[n] = (*iv)[1];
-      switch ((*iv)[1])
-      {
-      case ringorder_ws:
-      case ringorder_Ws:
-        typ=-1;
-      case ringorder_wp:
-      case ringorder_Wp:
-        tmpR.wvhdl[n]=(short*)AllocL((iv->length()-1)*sizeof(short));
-        for (l=2;l<iv->length();l++)
-          tmpR.wvhdl[n][l-2]=(short)(*iv)[l];
-        tmpR.block0[n]=last+1;
-        last+=iv->length()-2;
-        tmpR.block1[n]=last;
-        break;
-      case ringorder_ls:
-      case ringorder_ds:
-      case ringorder_Ds:
-        typ=-1;
-      case ringorder_lp:
-      case ringorder_dp:
-      case ringorder_Dp:
-        tmpR.block0[n]=last+1;
-        //last+=(*iv)[0];
-        if (iv->length()==3) last+=(*iv)[2];
-        else last+=(*iv)[0];
-        tmpR.block1[n]=last;
-        if (rCheckIV(iv)) return NULL;
-        break;
-      case ringorder_c:
-      case ringorder_C:
-        if (rCheckIV(iv)) return NULL;
-        break;
-      case ringorder_a:
-        tmpR.block0[n]=last+1;
-        tmpR.block1[n]=last+iv->length()-2;
-        tmpR.wvhdl[n]=(short*)AllocL((iv->length()-1)*sizeof(short));
-        for (l=2;l<iv->length();l++)
-        {
-          tmpR.wvhdl[n][l-2]=(short)(*iv)[l];
-          if ((*iv)[l]<0) typ=-1;
-        }
-        break;
-      case ringorder_M:
-        {
-          int Mtyp=rTypeOfMatrixOrder(iv);
-          if (Mtyp==0) return NULL;
-          if (Mtyp==-1) typ=-1;
-          tmpR.wvhdl[n]=(short*)AllocL((iv->length()-1)*sizeof(short));
-          for (l=2;l<iv->length();l++)
-            tmpR.wvhdl[n][l-2]=(short)(*iv)[l];
-          tmpR.block0[n]=last+1;
-          last+=(int)sqrt((double)(iv->length()-2));
-          tmpR.block1[n]=last;
-          break;
-        }
-#ifdef TEST
-      default:
-        Print("order ??? %d\n",(*iv)[1]);
-        break;
-#endif
-      }
-      sl=sl->next;
-      n++;
-    }
-    ord->CleanUp();
-    if (i==0)
-    {
-      /*there is no c/C-ordering, so append it at the end*/
-      tmpR.order[n]=ringorder_C;
-    }
-    else n--;
-    while ((tmpR.order[n]==ringorder_c)
-           ||(tmpR.order[n]==ringorder_C))
-      n--;
-    if (tmpR.block1[n]!=tmpR.N)
-    {
-      if ((tmpR.order[n]==ringorder_dp) ||
-          (tmpR.order[n]==ringorder_ds) ||
-          (tmpR.order[n]==ringorder_Dp) ||
-          (tmpR.order[n]==ringorder_Ds) ||
-          (tmpR.order[n]==ringorder_lp) ||
-          (tmpR.order[n]==ringorder_ls))
-      {
-        tmpR.block1[n]=tmpR.N;
-        if (tmpR.block0[n]>tmpR.N/*tmpR.block1[n]*/)
-        {
-          tmpR.block1[n]=tmpR.block0[n];
-          goto ord_mismatch;
-        }
-      }
-      else
-      {
-      ord_mismatch:
-        Werror("mismatch of number of vars (%d) and ordering (%d vars)",
-               tmpR.N,tmpR.block1[n]);
-        return NULL;
-      }
-    }
+    WerrorS("name of ring variable expected");
+    goto rInitError;
   }
-  tmpR.OrdSgn = typ;
+  
+  /* ordering -------------------------------------------------------------*/
+  if (rSleftvOrdering2Ordering(ord, R))
+    goto rInitError;
+
   // Complete the initialization
-  rComplete(&tmpR);
-  /* try to enter the ring into the name list*/
+  if (rComplete(R))
+    goto rInitError;
+  
+  // try to enter the ring into the name list //
   if ((tmp = enterid(s, myynest, RING_CMD, &IDROOT))==NULL)
-  {
-    return NULL;
-  }
-
-  memcpy(IDRING(tmp),&tmpR,sizeof(tmpR));
-  if (isDRing) setFlag(tmp,FLAG_DRING);
-  rSetHdl(tmp,TRUE);
-
+    goto rInitError;
+  
+  memcpy(IDRING(tmp),R,sizeof(*R));
+  // set current ring
+  Free(R,  sizeof(ip_sring));
 #ifdef RDEBUG
   rNumber++;
-  currRing->no    =rNumber;
+  R->no    =rNumber;
 #endif
+  return tmp;
 
-  return currRingHdl;
+  // error case:
+  rInitError:
+  if  (R != NULL) rDelete(R);
+  return NULL;
 }
 
 // set those fields of the ring, which can be computed from other fields:
 // More particularly, sets r->VarOffset
-
-void rComplete(ring r, int force)
+BOOLEAN rComplete(ring r, int force)
 {
+  
   int VarCompIndex, VarLowIndex, VarHighIndex;
+  // check number of vars and number of params
+  if (r->N + 1 > (int) MAX_EXPONENT_NUMBER)
+  {
+    Werror("Too many ring variables: %d is the maximum", 
+           MAX_EXPONENT_NUMBER -1);
+    return TRUE;
+  }
+  
 
   r->VarOffset = (int*) Alloc((r->N + 1)*sizeof(int));
   pGetVarIndicies(r, r->VarOffset, VarCompIndex,
@@ -679,6 +627,7 @@ void rComplete(ring r, int force)
   r->VarCompIndex = VarCompIndex;
   r->VarLowIndex = VarLowIndex;
   r->VarHighIndex = VarHighIndex;
+  return FALSE;
 }
 
 /*2
@@ -827,6 +776,62 @@ void rWrite(ring r)
   }
 }
 
+static void rDelete(ring r)
+{
+  int i, j;
+  
+  if (r == NULL) return;
+ 
+  // delete order stuff
+  if (r->order != NULL)
+  {
+    i=rBlocks(r);
+    assume(r->block0 != NULL && r->block1 != NULL && r->wvhdl != NULL);
+    // delete order
+    Free((ADDRESS)r->order,i*sizeof(int));
+    Free((ADDRESS)r->block0,i*sizeof(int));
+    Free((ADDRESS)r->block1,i*sizeof(int));
+    // delete weights
+    for (j=0; j<i; j++)
+    {
+      if (r->wvhdl[j]!=NULL)
+        FreeL(r->wvhdl[j]);
+    }
+    Free((ADDRESS)r->wvhdl,i*sizeof(short *));
+  }
+  else
+  {
+    assume(r->block0 == NULL && r->block1 == NULL && r->wvhdl == NULL);
+  }
+  
+  // delete varnames
+  if(r->names!=NULL)
+  {
+    for (i=0; i<r->N; i++)
+    {
+      if (r->names[i] != NULL) FreeL((ADDRESS)r->names[i]);
+    }
+    Free((ADDRESS)r->names,r->N*sizeof(char *));
+  }
+  
+  // delete parameter
+  if (r->parameter!=NULL)
+  {
+    char **s=r->parameter;
+    j = 0;
+    while (j < rPar(r))
+    {
+      if (*s != NULL) FreeL((ADDRESS)*s);
+      s++;
+      j++;
+    }
+    Free((ADDRESS)r->parameter,rPar(r)*sizeof(char *));
+  }
+  if (r->VarOffset != NULL) 
+    Free((ADDRESS)r->VarOffset, (r->N +1)*sizeof(int));
+  Free(r, sizeof(ip_sring));
+}
+
 void rKill(ring r)
 {
   rTest(r);
@@ -896,47 +901,8 @@ void rKill(ring r)
       }
     }
 #endif /* USE_IILOCALRING */
-    if (pi!=NULL)
-    {
-      //while(*pi!=0) { pi++;i++; }
-      i=rBlocks(r);
-      Free((ADDRESS)r->order,i*sizeof(int));
-      Free((ADDRESS)r->block0,i*sizeof(int));
-      Free((ADDRESS)r->block1,i*sizeof(int));
-      for (j=0; j<i; j++)
-      {
-        if (r->wvhdl[j]!=NULL)
-          FreeL(r->wvhdl[j]);
-      }
-      Free((ADDRESS)r->wvhdl,i*sizeof(short *));
-      if(r->names!=NULL)
-      {
-        for (i=0; i<r->N; i++)
-        {
-          FreeL((ADDRESS)r->names[i]);
-        }
-        Free((ADDRESS)r->names,r->N*sizeof(char *));
-      }
-      if (r->parameter!=NULL)
-      {
-        int len=0;
-        char **s=r->parameter;
-        while (len<rPar(r))
-        {
-          FreeL((ADDRESS)*s);
-          s++;
-          len++;
-        }
-        Free((ADDRESS)r->parameter,rPar(r)*sizeof(char *));
-      }
-      Free((ADDRESS)r->VarOffset, (r->N +1)*sizeof(int));
-    }
-#ifdef TEST
-    else
-      PrintS("internal error: ring structure destroyed\n");
-    memset(r,0,sizeof(ip_sring));
-#endif
-    Free((ADDRESS)r,sizeof(ip_sring));
+
+    rDelete(r);
     return;
   }
   r->ref--;

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmemory.h,v 1.15 1999-01-26 14:41:39 obachman Exp $ */
+/* $Id: mmemory.h,v 1.16 1999-03-19 14:18:01 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -151,6 +151,9 @@ int mmMemPhysical( void );
 void mmPrintStat();
 
 size_t mmSizeL( void* );
+
+/* max size of blocks which our memory managment handles */
+#define MAX_BLOCK_SIZE  (((SIZE_OF_HEAP_PAGE) / 16)*4)
 
 /**********************************************************************
  *

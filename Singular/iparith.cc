@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.139 1999-03-17 14:26:28 pohl Exp $ */
+/* $Id: iparith.cc,v 1.140 1999-03-19 14:18:00 obachman Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -196,6 +196,7 @@ cmdnames cmds[] =
   { "lead",        0, LEAD_CMD ,          CMD_1},
   { "leadcoef",    0, LEADCOEF_CMD ,      CMD_1},
   { "leadexp",     0, LEADEXP_CMD ,       CMD_1},
+  { "leadmonom",   0, LEADMONOM_CMD ,     CMD_1},
   { "LIB",         0, LIB_CMD ,           SYSVAR},
   { "lift",        0, LIFT_CMD ,          CMD_23},
   { "liftstd",     0, LIFTSTD_CMD ,       CMD_2},
@@ -1258,7 +1259,7 @@ static BOOLEAN jjINDEX_V_IV(leftv res, leftv u, leftv v)
 static BOOLEAN jjKLAMMER(leftv res, leftv u, leftv v)
 {
   if(u->name==NULL) return TRUE;
-  char * nn = (char *)AllocL(strlen(u->name) + 13);
+  char * nn = (char *)AllocL(strlen(u->name) + 14);
   sprintf(nn,"%s(%d)",u->name,(int)v->Data());
   FreeL((ADDRESS)u->name);
   u->name=NULL;
@@ -1281,7 +1282,8 @@ static BOOLEAN jjKLAMMER_IV(leftv res, leftv u, leftv v)
   intvec * iv=(intvec *)v->Data();
   leftv p=NULL;
   int i;
-  char *n;
+  int slen = strlen(u->name) + 14;
+  char *n = (char*) Alloc(slen);
 #ifdef HAVE_NAMESPACES
   BOOLEAN needpop=FALSE;
 
@@ -1303,12 +1305,12 @@ static BOOLEAN jjKLAMMER_IV(leftv res, leftv u, leftv v)
       p->next=(leftv)Alloc0(sizeof(sleftv));
       p=p->next;
     }
-    n = (char *)AllocL(strlen(u->name) + 6);
     sprintf(n,"%s(%d)",u->name,(*iv)[i]);
-    syMake(p,n);
+    syMake(p,mstrdup(n));
   }
   FreeL((ADDRESS)u->name);
-  u->name=NULL;
+  u->name = NULL;
+  Free(n, slen);
 #ifdef HAVE_NAMESPACES
   if(needpop) namespaceroot->pop();
 #endif /* HAVE_NAMESPACES */
@@ -2722,6 +2724,21 @@ static BOOLEAN jjLEADEXP(leftv res, leftv v)
   res->data=(char *)iv;
   return FALSE;
 }
+static BOOLEAN jjLEADMONOM(leftv res, leftv v)
+{
+  poly p=(poly)v->Data();
+  if (p == NULL)
+  {
+    res->data = (char*) NULL;
+  }
+  else
+  {
+    poly lm = pCopy1(p);
+    pSetCoeff(lm, nInit(1));
+    res->data = (char*) lm;
+  }
+  return FALSE;
+}
 static BOOLEAN jjLIB(leftv res, leftv v)
 {
   return iiLibCmd((char *)v->CopyD());
@@ -3472,6 +3489,8 @@ struct sValCmd1 dArith1[]=
 ,{jjLEADCOEF,   LEADCOEF_CMD,    NUMBER_CMD,     VECTOR_CMD }
 ,{jjLEADEXP,    LEADEXP_CMD,     INTVEC_CMD,     POLY_CMD }
 ,{jjLEADEXP,    LEADEXP_CMD,     INTVEC_CMD,     VECTOR_CMD }
+,{jjLEADMONOM,  LEADMONOM_CMD,   POLY_CMD,       POLY_CMD }
+,{jjLEADMONOM,  LEADMONOM_CMD,   VECTOR_CMD,     VECTOR_CMD }
 ,{jjLIB,        LIB_CMD,         NONE,           STRING_CMD }
 ,{jjCALL1MANY,  LIST_CMD,        LIST_CMD,       DEF_CMD }
 ,{jjWRONG,      MAP_CMD,         0,              ANY_TYPE}

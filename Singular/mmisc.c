@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmisc.c,v 1.2 1999-01-26 14:41:41 obachman Exp $ */
+/* $Id: mmisc.c,v 1.3 1999-03-19 14:18:02 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -132,6 +132,20 @@ void mmPrintStat()
            l*(SIZE_OF_PAGE/mmGetHeapBlockSize(&mm_theList[i])) - a);
   }
   while (mmGetSize(i) < MAX_BLOCK_SIZE);
+}
+#endif
+
+#ifdef MLIST
+void mmTestList ( )
+{
+  DBMCB * what=mm_theDBused.next;
+  fprintf(stderr,"list of used blocks:\n");
+  while (what!=NULL)
+  {
+    (void)fprintf( stderr, "%d bytes at %p in: %s:%d\n",
+      (int)what->size, what, what->fname, what->lineno);
+    what=what->next;
+  }
 }
 #endif
 

@@ -3,14 +3,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmprivate.h,v 1.5 1999-03-18 16:30:53 Singular Exp $ */
+/* $Id: mmprivate.h,v 1.6 1999-03-19 14:18:03 obachman Exp $ */
 /*
 * ABSTRACT
 */
 #include "structs.h"
 #include "mmheap.h"
-
-#define MAX_BLOCK_SIZE  (((SIZE_OF_HEAP_PAGE) / 16)*4)
 
 #define INDEX_ENTRY_T   char
 extern const INDEX_ENTRY_T mm_IndexTable[];

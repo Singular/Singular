@@ -344,8 +344,8 @@ extern int pShortOut;
 #define RDEBUG
 /* define TEST for non time critical tests, undefine otherwise */
 #define TEST
-/* define MM_LIST for printing block of used memory on exit */
-#define MM_LIST 1
+/* define MLIST for printing block of used memory on exit */
+#define MLIST 1
 
 /* #define PAGE_TEST */
 

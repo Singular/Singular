@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.22 1999-03-09 12:22:18 obachman Exp $ */
+/* $Id: ring.h,v 1.23 1999-03-19 14:18:06 obachman Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -17,7 +17,7 @@ void   rChangeCurrRing(ring r, BOOLEAN complete = TRUE, idhdl h = NULL);
 #else
 void   rChangeCurrRing(ring r, BOOLEAN complete = TRUE);
 #endif
-void   rSetHdl(idhdl h, BOOLEAN complete);
+void   rSetHdl(idhdl h, BOOLEAN complete = TRUE);
 idhdl  rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
   BOOLEAN isDRing);
 idhdl  rDefault(char *s);
@@ -43,7 +43,7 @@ char * rParStr(ring r);
 int    rIsExtension(ring r);
 int    rIsExtension();
 int    rSum(ring r1, ring r2, ring &sum);
-void   rComplete(ring r, int force = 0);
+BOOLEAN   rComplete(ring r, int force = 0);
 void   rUnComplete(ring r);
 int    rBlocks(ring r);
 

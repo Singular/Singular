@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.56 1999-01-07 12:21:51 Singular Exp $ */
+/* $Id: grammar.y,v 1.57 1999-03-19 14:17:58 obachman Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -189,6 +189,7 @@ void yyerror(char * fmt)
 %token <i> LEADCOEF_CMD
 %token <i> LEADEXP_CMD
 %token <i> LEAD_CMD
+%token <i> LEADMONOM_CMD
 %token <i> LIFTSTD_CMD
 %token <i> LIFT_CMD
 %token <i> MAXID_CMD
@@ -926,8 +927,13 @@ rlist:
 ordername:
         UNKNOWN_IDENT
         {
+#if 0          
           if (!($$=rOrderName($1)))
             YYERROR;
+#else
+          // let rInit take care of any errors 
+          $$=rOrderName($1);
+#endif          
         }
         ;
 
@@ -1328,6 +1334,10 @@ ringcmd:
             {
               MYYERROR("cannot make ring");
             }
+            else
+            {
+              rSetHdl(b);
+            }
           }
         | ringcmd1 elemexpr
           {
@@ -1384,6 +1394,7 @@ ringcmd:
             {
               YYERROR;
             }
+            rSetHdl(h);
             setFlag(h,FLAG_DRING);
             rDSet();
             #endif
