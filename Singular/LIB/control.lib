@@ -1,4 +1,4 @@
-version="$Id: control.lib,v 1.19 2004-12-22 18:03:16 levandov Exp $";
+version="$Id: control.lib,v 1.20 2005-02-09 19:06:35 levandov Exp $";
 category="Applications";
 info="
 LIBRARY:  control.lib Procedures for System and Control Theory 
@@ -15,15 +15,20 @@ PROCEDURES:
 control(module R);            analysis of controllability-related properties of R,
 autonom(module R);            analysis of autonomy-related properties of R (using Ext modules),
 autonom2(module R);           analysis of autonomy-related properties of R (using dimension),
+
 LeftKernel(module R);         a left kernel of R,
 RightKernel(module R);        a right kernel of R,
 LeftInverse(module R)         a left inverse of matrix (module),
 
-smith(module M);              a Smith form of a module M.
+smith(module M);              a Smith form of a module M,
+
+genericity(module M);         analysis of the genericity of parameters,
+
+canonize(list L);             Groebnerification for modules in the output of control/autonomy procs. 
 
 AUXILIARY PROCEDURES:
 declare(string NameOfRing, Variables[,string  Parameters, Ordering]);     defines the ring, optional parametes are strings of parameters and ordering,
-view();                      Well-formatted output of lists, modules and matrixes
+view();                      Well-formatted output of lists, modules and matrices
 
 NOTE (EXAMPLES): In order to use examples below, execute the commands
 @* def A = exAntenna(); setring A; 
@@ -773,38 +778,67 @@ proc exWindTunnel()
 //----------------------------------------------------------
 
 proc genericity(matrix M)
-"USAGE:  genericity(M), M is a matrix
+"USAGE:  genericity(M), M is a module/matrix
 RETURN:  list of strings with expressions, which have been assumed to be non-zero in the process of computing the Groebner basis
-NOTE:  effective with the liftstd procedure for modules with parameters
+NOTE: we strongly recommend to switch on the redSB and redTail options; 
+the procedure is effective with the lift procedure for modules with parameters
+EXAMPLE:  example genericity; shows an example
 "
 {
   // M is a matrix over a ring with params and vars;
   ideal I = ideal(M); // a list of entries
-  I = simplify(I,2); // throw 0's away
-  // decompose every coeff
-  int i; int  cl=1;
+  I = simplify(I,2); // delete 0's
+  // decompose every coeff in every poly
+  int i;
   int s = size(I);
-  list NM;
+  ideal NM;
   poly p;
+  number num;
+  int  cl=1;
+  intvec ZeroVec; ZeroVec[nvars(basering)] = 0;
+  intvec W;
   for (i=1; i<=s; i++)
   {
-    p = I[i];
+    // remove contents and add them as polys
+    p   = I[i];
+    W   = leadexp(p);
+    if (W == ZeroVec) // i.e. just a coef
+    {
+      num    = denominator(leadcoef(p)); // from poly.lib
+      p      = p*num;
+      NM[cl] = p;
+      cl++;
+      NM[cl] = num;
+      cl++;
+      p = p - lead(p); // for the next cycle
+    }      
+    if ( p!= 0)
+    {
+      num = content(p);
+      p   = p/num;
+      NM[cl] = denominator(num);
+      cl++;
+      NM[cl] = numerator(num);
+      cl++;
+    }
     while( p != 0)
     {
-      NM[cl] = leadcoef(p);
+      NM[cl] = leadcoef(p); // should be all integer
       cl++;
       p = p - lead(p);
-    };
-  };
+    }
+  }
+  NM = simplify(NM,4); // delete identical
   string newvars = parstr(basering);
   def save = basering;
   string NewRing = "ring @NR =" +string(char(basering))+",("+newvars+"),Dp;";
   execute(NewRing);
   // get params as variables
   // create a list of non-monomials
-  ideal L;
+  ideal @L;
   ideal F;
-  list NM = imap(save,NM);
+  ideal NM = imap(save,NM);
+  NM = simplify(NM,8); //delete multiples
   poly p,q;
   cl = 1;
   int j, cf;
@@ -823,18 +857,18 @@ NOTE:  effective with the liftstd procedure for modules with parameters
 	q = F[j]-lead(F[j]);
 	if (q!=0)
 	{
-	  L[cl] = F[j];
+	  @L[cl] = F[j];
 	  cl++;
 	}
       }
     }
   }
   // return the result [in string-format]
-  L = simplify(L,2+4); // skip zeroes and double entries
+  @L = simplify(@L,2+4); // skip zeroes and double entries
   list SL;
-  for (j=1; j<=size(L);j++)
+  for (j=1; j<=size(@L);j++)
   {
-    SL[j] = string(L[j]);
+    SL[j] = string(@L[j]);
   }
   setring save;
   return(SL);
@@ -848,22 +882,24 @@ example
     [m1*L1^2*Dt^2-m1*L1*g, 0, 0, m1*L1*Dt^2],
     [0, m2*L2^2*Dt^2-m2*L2*g, 0, m2*L2*Dt^2];
   module R = transpose(RR);
-  matrix T;
-  module SR = liftstd(R,T);
+  module SR = std(R);
+  matrix T = lift(R,SR);
   genericity(T);
-  //-- The result is different when computing reduced bases:
+  //-- The result might be different when computing reduced bases:
   matrix T2;
   option(redSB);
   option(redTail);
-  module SR2 = liftstd(R,T2);
+  module SR2 = std(R);
+  T2 =  lift(R,SR2);
   genericity(T2);
 }
 
 proc canonize(list L)
 "USAGE:  canonize(L), L a list
-ASSUME:  L is the output of control/autonomy procs
+ASSUME:  L is the output of control/autonomy procedures
 RETURN:  a canonized list, where modules are canonized by computing
-their reduced minimal Groebner bases
+their reduced minimal (= unique in the given ordering) Groebner bases
+EXAMPLE:  example canonize; shows an example
 "
 {
   list M = L;
