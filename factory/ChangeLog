@@ -1,8 +1,31 @@
+Thu Jun 26 16:06:39 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* GNUmakefile.in: doc checked
+
+	* GNUmakefile.in: doc fix
+
+Wed Jun 25 10:02:51 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* configure.in (enable_gmp): bug fix
+	(CPPFLAGS, LDFLAGS): bug fix
+
 Tue Jun 24 11:15:25 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
-	* configure.in: doc fix
+	* configure.in: doc checked
 
-	* configure.in: some fixes in configure's messages
+	* configure.in (with_builtingmp): command line option
+	  --with-builtingmp removed.  All references to with_builtingmp
+ 	  and some additional code to deal with the command line options
+ 	  --with-gmp and --with-builtin-gmp removed, too.
+
+	* configure.in (enable_assertions): disabled by default
+
+	* configure.in (enable_gmp): with_gmp and with_builtin_gmp are set
+	  to '$(includedir)' if command line option --enable-gmp is given
+
+	* configure.in: fixes in configure's messages
+
+	* configure.in: doc fix
 
 Mon Jun 23 12:44:50 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
@@ -91,9 +114,6 @@ Thu Jun  5 15:03:48 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* canonicalform.cc (operator>>): returns 0 again if #define
 	  SINGULAR and #define NOSTREAMIO are switched on
-
---------
-von hier ab aufw"arts noch mal checken
 
 Before Mon Jun  4 1997 Jens Schmidt <schmidt@mathematik.uni-kl.de>
 
@@ -260,8 +280,8 @@ ab hier fertig
 	* fac_univar.cc (ZFactorizeUnivariate): timing stuff changed to
 	  calls of TIMING macros
 
-	* debug.cc (deb_level, level_msg, deb_inc_level): modified so
-	  deb_inc_level()'s output is more pretty at time of first call
+	* debug.cc (deb_level, level_msg, deb_inc_level):
+	  deb_inc_level()'s output made more pretty at time of first call
 
 	* debug.h (DEBUGOUTPUT): #define DEBUGOUTPUT is switched off now
 	  if #define NDEBUG is switched on
