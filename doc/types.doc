@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.51 1998-05-18 16:12:17 obachman Exp $
+@comment $Id: types.doc,v 1.52 1998-05-18 17:05:44 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -31,68 +31,28 @@ of certain types.
 A list of expressions (in the following referred to as expression_list)
 in @sc{Singular} is any comma separated list of expressions.
 
-The general syntax of a declaration is:
-@c ------------------------------------------------------------
-@c   This piece of text exists in the file types.doc, 
-@c   chapter "Data types", general.doc, chapter "Names" and
-@c   chapter "General command syntax".
-@c   If you change something here, change it there, too!
-@c ------------------------------------------------------------
-@enumerate
-@item type name @code{=} expression @code{;}
-@* declares a variable with the given name of the given type and assigns
-the expression as initial value to it.  Expression is any expression of
-the specified type or one that can be converted to that type.
-@xref{Type conversion and casting}).
-
-@item type name @code{;}
-@* declares a variable with the given name of the given type and assigns
-the default value of the specific type to it.
-@end enumerate
-@c ------------------------------------------------------------
-@c   End of duplicate piece of text.
-@c ------------------------------------------------------------
-
-@table @strong
-@item Example:
-@example
-@c example
-  ring r;           // use default value.
-  poly f=x2-y3;     // assign initial value.
-  int i=37;         // may also be written as:
-  int j=12;         //   int i,j = 37,12;
-  string s1="abc";
-  string s2="def";
-  s1,s2;            // expression_list of strings
-  string s=s1,s2;   // typecast from expression_list to string
-  s;
-@c example
-@end example
-@end table
+For the general syntax of a declaration see @ref{General command syntax}.
 
 @menu
-* def::                         
-* ideal::                       
-* int::                         
-* intmat::                      
-* intvec::                      
-* link::                        
-* list::                        
-* map::                         
-* matrix::                      
-* module::                      
-* number::                      
-* poly::                        
-* proc::                        
-* qring::                       
-* resolution::                  
-* ring::                        
-* string::                      
-* vector::                      
+* def::
+* ideal::
+* int::
+* intmat::
+* intvec::
+* link::
+* list::
+* map::
+* matrix::
+* module::
+* number::
+* poly::
+* proc::
+* qring::
+* resolution::
+* ring::
+* string::
+* vector::
 @end menu
-@iftex
-See also @ref{Type conversion and casting}.
-@end iftex
 
 @c ---------------------------------------
 @node def, ideal, Data types, Data types
@@ -120,7 +80,7 @@ but you need a name for it (e.g. for a use with @code{setring} or @code{map}).
 @code{r} may not be local to the procedure.
 
 @menu
-* def declarations::            
+* def declarations::
 @end menu
 
 @c ------------------------------
@@ -165,10 +125,10 @@ Like polynomials they
 can only be defined or accessed with respect to a basering.
 
 @menu
-* ideal declarations::          
-* ideal expressions::           
-* ideal operations::            
-* ideal related functions::     
+* ideal declarations::
+* ideal expressions::
+* ideal operations::
+* ideal related functions::
 @end menu
 
 @c ---------------------------------------
@@ -216,7 +176,7 @@ an identifier of type ideal
 @item
 a function returning ideal
 @item
-ideal expressions combined by the arithmetic operations 
+ideal expressions combined by the arithmetic operations
 @code{+} or @code{*}
 @item
 a power of an ideal expression (operator @code{^} or @code{**})
@@ -251,7 +211,7 @@ multiplication (with ideal, poly, vector, module)
 @item @code{^}
 power, exponentiation (by an integer)
 
-@item ideal_expression @code{[} int_expression @code{]} 
+@item ideal_expression @code{[} int_expression @code{]}
 is a generator of the ideal
 @end table
 
@@ -326,11 +286,11 @@ minimal generating set of a homogeneous ideal resp. module or an ideal resp. mod
 set of minors of a matrix (see @ref{minor})
 @item modulo
 represents
-@tex 
-$(h1+h2)/h1=h2/(h1 \cap h2)$ 
+@tex
+$(h1+h2)/h1=h2/(h1 \cap h2)$
 @end tex
-@ifinfo 
-(h1+h2)/h1=h2/(h1 intersect h2) 
+@ifinfo
+(h1+h2)/h1=h2/(h1 intersect h2)
 @end ifinfo
 (see @ref{modulo})
 @item mres
@@ -366,7 +326,7 @@ standard basis computation (see @ref{std})
 @item stdfglm
 standard basis computation with fglm technique (see @ref{stdfglm})
 @item stdhilb
-Hilbert driven standard basis computation (see @ref{stdhilb} 
+Hilbert driven standard basis computation (see @ref{stdhilb}
 @item subst
 substitute a ring variable (see @ref{subst})
 @item syz
@@ -392,12 +352,12 @@ to represent boolean values
 @ref{boolean expressions}).
 
 @menu
-* int declarations::            
-* int expressions::             
-* int operations::              
-* boolean expressions::         
-* boolean operations::          
-* int related functions::       
+* int declarations::
+* int expressions::
+* int operations::
+* boolean expressions::
+* boolean operations::
+* int related functions::
 @end menu
 
 @c ---------------------------------------
@@ -470,8 +430,8 @@ int expressions combined by the arithmetic operations
 a typecast to int
 @end enumerate
 Variables of type int represent the compiler integers  and are, therefore,
-limited  in their range (see @ref{Limitations}). If this range is too small 
-the expression must be converted to the type number over a ring with 
+limited  in their range (see @ref{Limitations}). If this range is too small
+the expression must be converted to the type number over a ring with
 characteristic 0.
 
 @strong{Example:}
@@ -489,7 +449,7 @@ characteristic 0.
   11*13*17*100*200*2000*503*1111*222222;
   ring rp;
   12345678901;
-  typeof(_);  
+  typeof(_);
   int i;
   i+2;
   intvec v=i..i+3;
@@ -497,7 +457,7 @@ characteristic 0.
 @c example
 @end example
 @c ref
-See 
+See
 @ref{number};
 @ref{Type conversion and casting}.
 @c ref
@@ -714,10 +674,10 @@ diagonal. The int @code{1}, for example, is converted into the unit
 matrix.
 
 @menu
-* intmat declarations::         
-* intmat expressions::          
-* intmat operations::           
-* intmat related functions::    
+* intmat declarations::
+* intmat expressions::
+* intmat operations::
+* intmat related functions::
 @end menu
 
 @c ------------------------------
@@ -760,7 +720,7 @@ A intmat expression is:
 @enumerate
 @item
 a list of int expressions, intvec expressions and intmat expressions
-@item 
+@item
 an identifier of type intmat
 @item
 a function returning intmat
@@ -799,7 +759,7 @@ See @ref{Type conversion and casting}.
 @cindex intmat operations
 
 @table @asis
-@item @code{+} 
+@item @code{+}
 addition with intmat or int; the int is converted into a diagonal intmat
 
 @item @code{-}
@@ -810,10 +770,10 @@ diagonal intmat
 mulitplication with intmat, intvec, or int; the int is converted into a
 diagonal intmat
 
-@item @code{<>}, @code{==} 
+@item @code{<>}, @code{==}
 comparison
 
-@item intmat_expression @code{[} int_expressions@code{,} int_expression @code{]} 
+@item intmat_expression @code{[} int_expressions@code{,} int_expression @code{]}
 is an intmat entry, where the first index indicates the row and the
 second the column
 @end table
@@ -873,10 +833,10 @@ intvec with in int is done element wise.
 @end example
 
 @menu
-* intvec declarations::         
-* intvec expressions::          
-* intvec operations::           
-* intvec related functions::    
+* intvec declarations::
+* intvec expressions::
+* intvec operations::
+* intvec related functions::
 @end menu
 
 @c ------------------------------
@@ -915,14 +875,14 @@ a list of int expressions and of intvec expressions
 @item
 a range: int expression @code{..} int expression
 @item
-a function returning intvec 
+a function returning intvec
 @item
 intvec operations with int (@code{+}, @code{-}, @code{*}, @code{/}, @code{%})
 @item
 intvec operations (@code{+}, @code{-})
 @item
 intvec operation with intmat (@code{*})
-@item 
+@item
 a typecast to intvec
 @end enumerate
 
@@ -965,13 +925,13 @@ addition with intvec or int (element wise)
 @item @code{-}
 negation or subtraction with intvec or int (element wise)
 
-@item @code{*} 
+@item @code{*}
 multiplication with int (element wise)
 
 @item @code{/}, @code{div}
 division with int (element wise)
 
-@item  @code{%, mod} 
+@item  @code{%, mod}
 modulo (element wise)
 
 @item  @code{<>}, @code{==}, @code{<=}, @code{>=}, @code{>}, @code{<}
@@ -994,7 +954,7 @@ is an element of the intvec; the index 1 gives the first element.
 @cindex intvec related functions
 
 @table @code
-@item factorize 
+@item factorize
 multiplicities of factors of a polynomial (see @ref{factorize}
 @item hilb
 returns Hilbert series as intvec (see @ref{hilb})
@@ -1010,7 +970,7 @@ returns quasihgomogeneous weights (see @ref{qhweight})
 length of the intvec (see @ref{size})
 @item sortvec
 permutation for sorting ideals/modules (see @ref{sortvec})
-@item stdhilb 
+@item stdhilb
 Hilbert series for Hilbert driven standard basis computation (see
 @ref{stdhilb})
 @item transpose
@@ -1027,7 +987,7 @@ returns weights for the weighted ecart method (see @ref{weight})
 @c {{{ section link }}}
 Links are the communication channels of @sc{Singular}, i.e.
 something @sc{Singular} can write to and/or read from. Currently,
-@sc{Singular} supports four different link types: 
+@sc{Singular} supports four different link types:
 @itemize @bullet
 @item ASCII links (see
 @ref{ASCII links})
@@ -1043,12 +1003,12 @@ something @sc{Singular} can write to and/or read from. Currently,
 @end itemize
 
 @menu
-* link declarations::           
-* link expressions::            
-* link related functions::      
-* ASCII links::                 
-* MP links::                    
-* DBM links::                   
+* link declarations::
+* link expressions::
+* link related functions::
+* ASCII links::
+* MP links::
+* DBM links::
 @end menu
 
 @c ------------------------------
@@ -1065,7 +1025,7 @@ defines a new communication link.
 none
 @item Example:
 @example
-@c Tim: Let's only do the read here once, doing it twice without closing 
+@c Tim: Let's only do the read here once, doing it twice without closing
 @c it first migth be confusing
 @c example
   link l=":w example.txt";
@@ -1158,7 +1118,7 @@ into files for storage or communcation with other programs. The data is
 written in plain ASCII format. The output format of polynomials is done
 w.r.t. the value of the global variable @code{short} (see @ref{short}). Reading
 from an ASCII link returns a string - conversion into other data is up to
-the user. This can be done, for example, using the command @code{execute} 
+the user. This can be done, for example, using the command @code{execute}
 (see @ref{execute}).
 
 The ASCII link describing string has to be one of the following:
@@ -1178,7 +1138,7 @@ The ASCII link describing string has to be one of the following:
 There are the following default values:
 @itemize @bullet
 @item the type @code{ASCII} may be ommitted since ASCII links are the
-default links. 
+default links.
 
 @item if non of @code{r}, @code{w} or @code{a} is specified, the mode of
 the link is set by the first @code{read} or @code{write} command on the
@@ -1238,7 +1198,7 @@ ring description is written together with the data. Reading from an MP
 link returns an expression (not a string) which was evaluated after the
 read operation. If the expression read from an MP link is not from the
 same ring as the current ring, then a @code{read} changes the current
-ring.  
+ring.
 
 Currently, MP links are only available on Unix platforms and data is
 written without attributes (which is likely to change in future
@@ -1246,8 +1206,8 @@ versions). For a general description of MP, see
 @code{http://symbolicnet.mcs.kent.edu:/areas/mp.html}.
 
 @menu
-* MPfile links::                
-* MPtcp links::                 
+* MPfile links::
+* MPtcp links::
 @end menu
 
 @node MPfile links, MPtcp links, MP links, MP links
@@ -1268,7 +1228,7 @@ The MPfile link describing string has to be one of the following:
 @enumerate
 @item @code{"MPfile: "} + filename
 @*the mode (read or append) is set by the first @code{read} or
-@code{write} command. 
+@code{write} command.
 @item @code{"MPfile:r "} + filename
 @*opens the file for reading.
 @item @code{"MPfile:w "} + filename
@@ -1282,7 +1242,7 @@ There are the following default values:
 @item if none of @code{r}, @code{w} or @code{a} is specified, the mode of
 the link is set by the first @code{read} or @code{write} command on the
 link. If the first command is @code{write}, the mode is set to @code{a}
-(append mode). 
+(append mode).
 @c Tim: You and I were right here: It is indeed append. Olaf
 @end itemize
 
@@ -1319,7 +1279,7 @@ either for reading or for writing, but not for both at the same time. A
 
 MPtcp links give the possibility to exchange data in the binary MP
 format between two processes which may run on the same or on different
-computers. MPtcp links can be opened in four different modes: 
+computers. MPtcp links can be opened in four different modes:
 
 @table @code
 @item listen
@@ -1343,7 +1303,7 @@ The MPtcp link describing string has to be
 @item @code{"MPtcp:listen --MPport "} + portnumber
 @end enumerate
 @sc{Singular} becomes a server and waits at the port for a
-connect call. 
+connect call.
 @item connect mode:
 @enumerate 2
 @item @code{"MPtcp:connect --MPport "} + portnumber
@@ -1351,7 +1311,7 @@ connect call.
 portnumber
 @end enumerate
 @sc{Singular} becomes a client and connects to a server waiting at
-the host and port. 
+the host and port.
 @item launch mode:
 @enumerate 4
 @item @code{"MPtcp:launch"}
@@ -1367,13 +1327,13 @@ different host which acts as a server.
 @item @code{"MPtcp:fork"}
 @end enumerate
 @sc{Singular} becomes a client and forks another @sc{Singular} on the
-same host which acts as a server. 
+same host which acts as a server.
 @end itemize
 
 There are the following default values:
 @itemize @bullet
 @item if none of @code{listen}, @code{connect}, @code{launch} or
-@code{fork} is specified, the default mode is set to @code{fork}. 
+@code{fork} is specified, the default mode is set to @code{fork}.
 
 @item if no application is specified (in mode @code{launch}) the default
 application is the value of @code{system("Singular") + " -b"}.
@@ -1438,7 +1398,7 @@ is data to read.
   def j = read(l);j; // result of computation on server is read
 
   write(l,quote(std(i)));// std of polynomial "i" is computed on server
-  def k = read(l);   
+  def k = read(l);
   k; basering;       // notice that a new ring was created and set
   listvar(all);
 
@@ -1446,7 +1406,7 @@ is data to read.
   dump(l);           //  dump is written to server (includes proc's)
   read(l);           // result of previous write-command is read
   killall("not", "link"); killall("proc"); // kills eveything, but links
-                     
+
   write(l, quote(dump(mp_ll)));    // server writes dump
   getdump(l);        // dump is read from server
   read(l);           // result of previous write-command is read
@@ -1456,8 +1416,8 @@ is data to read.
 
   l = "MPtcp:";      // fork link declaration
   open(l); l;        // Notice that name is "parent"
-  
-  write(l, quote(status(mp_ll, "name"))); 
+
+  write(l, quote(status(mp_ll, "name")));
   read(l);           // and name of forked link is "child"
   write(l,quote(i)); // Child inherited vars and their values
   read(l);
@@ -1483,7 +1443,7 @@ data base in order to access all entries of the data base.
 
 If a data base with name @code{name} is opened for writing for the first
 time, two files (@code{name.pag} and @code{name.dir}) are automatically
-created, which contain the data base. 
+created, which contain the data base.
 
 The DBM link describing string has to be one of the following:
 
@@ -1550,10 +1510,10 @@ define @code{L[1]} to be the basering for instance by
 is not a copy but another reference to the same ring.
 
 @menu
-* list declarations::           
-* list expressions::            
-* list operations::             
-* list related functions::      
+* list declarations::
+* list expressions::
+* list operations::
+* list related functions::
 @end menu
 
 @c ------------------------------
@@ -1608,9 +1568,9 @@ See @ref{Type conversion and casting}.
 
 @strong{Example:}
 @example
-@c example 
+@c example
 
-@c example 
+@c example
 @end example
 
 
@@ -1626,15 +1586,15 @@ concatenation
 @item @code{,}
 construct a new list whose elements are the parts of the expression list
 
-@item list_expression @code{[} int_expression @code{]} 
+@item list_expression @code{[} int_expression @code{]}
 is a list entry; the index 1 gives the first element.
 @end table
 
 @strong{Example:}
 @example
-@c example 
+@c example
 
-@c example 
+@c example
 @end example
 
 @c ------------------------------
@@ -1681,22 +1641,22 @@ Note that the target of a map is ALWAYS the actual basering.
 Maps between rings with different coefficient fields are
 possible, the map of the coefficients is defined in the following way:
 @itemize @bullet
-@item 
-@tex 
+@item
+@tex
 % This is quite a hack, but for now it works.
 \rlap{$Z/p \mapsto Q$}\phantom{$Z/p \mapsto Z/p^\prime$}
-\quad 
+\quad
 $[i]_p \rightarrow i \in [-p/2, \, p/2]
 \subseteq Z$
-@end tex 
-@ifinfo 
+@end tex
+@ifinfo
 Z/p -> Q : [i]_p -> i in [-p/2, p/2] in Z
 @end ifinfo
 @item
 @tex
-$Z/p \mapsto Z/p^\prime$ 
-\quad 
-$[i]_p \in Z/p \rightarrow i \in [-p/2, \, p/2] \subseteq Z, \; 
+$Z/p \mapsto Z/p^\prime$
+\quad
+$[i]_p \in Z/p \rightarrow i \in [-p/2, \, p/2] \subseteq Z, \;
 i \rightarrow [i]_{p^\prime} \in Z/p^\prime$
 @end tex
 @ifinfo
@@ -1706,7 +1666,7 @@ Z/p -> Z/p' : [i]_p in Z/p -> i in [-p/2,p/2] in Z, i -> [i]_p' in Z/p'
 
 and as usual:
 @itemize @bullet
-@item 
+@item
 @tex
 $Q \mapsto Z/p$
 @end tex
@@ -1714,7 +1674,7 @@ $Q \mapsto Z/p$
 Q -> Z/p
 @end ifinfo
 
-@item 
+@item
 @tex
 $Q \mapsto (Z/p)(a, \ldots)$
 @end tex
@@ -1722,7 +1682,7 @@ $Q \mapsto (Z/p)(a, \ldots)$
 Q -> (Z/p)(a,..)
 @end ifinfo
 
-@item 
+@item
 @tex
 $Q \mapsto Q(a, \ldots)$
 @end tex
@@ -1730,7 +1690,7 @@ $Q \mapsto Q(a, \ldots)$
 Q -> Q(a,..)
 @end ifinfo
 
-@item 
+@item
 @tex
 $Z/p \mapsto (Z/p)(a, \ldots)$
 @end tex
@@ -1830,7 +1790,7 @@ composition of maps. If, for example, @code{f} and @code{g} are maps,
 then @code{f(g)} is an map expression giving the composition of @code{f}
 and @code{g}.
 
-@item map_expression @code{[} int_expressions @code{]} 
+@item map_expression @code{[} int_expressions @code{]}
 is a map entry
 @end table
 
@@ -1838,7 +1798,7 @@ is a map entry
 @strong{Example:}
 @example
 @c example
- 
+
 @c example
 @end example
 
@@ -1862,10 +1822,10 @@ the trailing zero columns of A may be deleted by module operations with
 M.
 
 @menu
-* matrix declarations::         
-* matrix expressions::          
-* matrix operations::           
-* matrix related functions::    
+* matrix declarations::
+* matrix expressions::
+* matrix operations::
+* matrix related functions::
 @end menu
 
 @c ------------------------------
@@ -1925,7 +1885,7 @@ an identifier of type matrix
 @item
 a function returning matrix
 @item
-matrix expressions combined by the arithmetic operations 
+matrix expressions combined by the arithmetic operations
 @code{+}, @code{-} or @code{*}
 @item
 a typecast to matrix
@@ -1949,20 +1909,20 @@ See @ref{Type conversion and casting}.
 @table @asis
 @item @code{+}
 addition with matrix or poly; the poly is converted into a diagonal
-matrix 
+matrix
 
 @item @code{-}
 negation or subtraction with matrix or poly; the poly is converted into
-a diagonal matrix 
+a diagonal matrix
 
 @item @code{*}
 multiplication with matrix or poly; the poly is converted into a
-diagonal matrix 
+diagonal matrix
 
 @item @code{==}, @code{<>}, @code{!=}
 comparison
 
-@item matrix_expression @code{[} int_expression@code{,} int_expression @code{]} 
+@item matrix_expression @code{[} int_expression@code{,} int_expression @code{]}
 is a matrix entry, where the first index indicates the row and the
 second the column
 @end table
@@ -2074,10 +2034,10 @@ $v_1, \ldots, v_k$
 which generate M.
 
 @menu
-* module declarations::         
-* module expressions::          
-* module operations::           
-* module related functions::    
+* module declarations::
+* module expressions::
+* module operations::
+* module related functions::
 @end menu
 
 @c ------------------------------
@@ -2131,7 +2091,7 @@ a typecast to module
 @end enumerate
 
 @c ref
-See 
+See
 @ref{ideal};
 @ref{poly};
 @ref{Type conversion and casting};
@@ -2157,11 +2117,11 @@ addition (concatenation of the generators and simplification)
 @item @code{*}
 multiplication with ideal or poly, but not `module` * `module`
 
-@item module_expression @code{[} int_expression @code{,} int_expression @code{]} 
+@item module_expression @code{[} int_expression @code{,} int_expression @code{]}
 is a module entry, where the first index indicates the row and
 the second the column
 
-@item module_expressions @code{[} int_expression @code{]} 
+@item module_expressions @code{[} int_expression @code{]}
 is a vector, where the index indicates the column
 @end table
 
@@ -2202,7 +2162,7 @@ module intersection (see @ref{intersect})
 k-jet: Taylor series up to a given order (see @ref{jet})
 @item kbase
 vector space basis of free module over the basering modulo standard basis
-(see @ref{kbase}) 
+(see @ref{kbase})
 @item lead
 initial module (see @ref{lead})
 @item lift
@@ -2216,11 +2176,11 @@ minimal generating set of a homogeneous ideal resp. module or an ideal resp. mod
 over a local ring
 @item modulo
 represents
-@tex 
-$(h1+h2)/h1=h2/(h1 \cap h2)$ 
+@tex
+$(h1+h2)/h1=h2/(h1 \cap h2)$
 @end tex
-@ifinfo 
-(h1+h2)/h1=h2/(h1 intersect h2) 
+@ifinfo
+(h1+h2)/h1=h2/(h1 intersect h2)
 @end ifinfo
 (see @ref{modulo})
 @item mres
@@ -2279,10 +2239,10 @@ They can only be defined or accessed with respect to a basering
 which determines the coefficient field.
 
 @menu
-* number declarations::         
-* number expressions::          
-* number operations::           
-* number related functions::    
+* number declarations::
+* number expressions::
+* number operations::
+* number related functions::
 @end menu
 
 @c ------------------------------
@@ -2335,9 +2295,9 @@ a function returning number
 @item
 an int expression (see @ref{Type conversion and casting})
 @item
-number expressions combined by the arithmetic operations 
+number expressions combined by the arithmetic operations
 @code{+}, @code{-}, @code{*}, @code{/}, @code{^}, or @code{**}.
-@item 
+@item
 a typecast to number
 @end enumerate
 
@@ -2348,8 +2308,8 @@ a typecast to number
   1.7e-2; 1.7e+2 // are valid (but  1.7e2 not), if the field is `real`
 @end example
 @c ref
-See 
-@ref{ring}; 
+See
+@ref{ring};
 @ref{Type conversion and casting}.
 @c ref
 
@@ -2391,7 +2351,7 @@ coefficient of the leading term (see @ref{leadcoef})
 @item par
 n-th parameter of the basering (see @ref{par})
 @item pardeg
-degree of a number in ring parameters (see @ref{pardeg}) 
+degree of a number in ring parameters (see @ref{pardeg})
 @item parstr
 string form of ring parameter (see @ref{parstr})
 @end table
@@ -2415,10 +2375,10 @@ type, the names of the indeterminants and the monomial ordering.
 @end example
 
 @menu
-* poly declarations::           
-* poly expressions::            
-* poly operations::             
-* poly related functions::      
+* poly declarations::
+* poly expressions::
+* poly operations::
+* poly related functions::
 @end menu
 
 @c ------------------------------
@@ -2462,12 +2422,12 @@ with the operations @code{*} and @code{^}
 @item
 an identifier of type poly
 @item
-a function returning poly 
+a function returning poly
 @item
-poly expressions combined by the arithmetic operations 
+poly expressions combined by the arithmetic operations
 @code{+}, @code{-}, @code{*}, @code{/}, or @code{^}
 @item
-a typecast to poly 
+a typecast to poly
 @end enumerate
 
 @strong{Example:}
@@ -2507,7 +2467,7 @@ power by an integer
 @item @code{<}, @code{<=}, @code{>}, @code{>=}, @code{==}, @code{<>}
 comparison
 
-@item poly_expression @code{[} int_expression @code{]} 
+@item poly_expression @code{[} int_expression @code{]}
 the monomial at the indicated place w.r.t. the monomial order
 @end table
 
@@ -2597,13 +2557,13 @@ user definable commands. Once a procedure is defined it can be used as
 any other @sc{Singular} command. Procedures may be defined by either
 typing them on the command line or by loading them from a file. For a
 detailed description on the concept of procedures in @sc{Singular} see
-@ref{Procedures}. A file containing procedure definitions which complies 
+@ref{Procedures}. A file containing procedure definitions which complies
 certain syntax rules is called a library. Such a file can be loaded
 using the command @code{LIB}. For more information on libraries see
-@ref{Libraries}. 
+@ref{Libraries}.
 
 @menu
-* proc declaration::            
+* proc declaration::
 @end menu
 
 @c ---------------------------------------
@@ -2612,7 +2572,7 @@ using the command @code{LIB}. For more information on libraries see
 @cindex proc declaration
 
 @c ------------------------------------------------------------
-@c   This piece of text exists also in the file general.doc, 
+@c   This piece of text exists also in the file general.doc,
 @c   chapter "Proc in a library".
 @c   If you change something here, change it there, too!
 @c ------------------------------------------------------------
@@ -2636,10 +2596,10 @@ using the command @code{LIB}. For more information on libraries see
    sequence_of_commands;
 @*@code{@}}]
 @item Purpose:
-defines a new function, the @code{proc} proc_name, with the additional 
-information help_text, which is copied to the screen by 
+defines a new function, the @code{proc} proc_name, with the additional
+information help_text, which is copied to the screen by
 @code{help proc_name;} and the @code{example} section
-which is executed by @code{example proc_name;}. 
+which is executed by @code{example proc_name;}.
 @* The help_text, the parameter_list, and the example section are optional.
 @* Specifying @code{static} in front of the procedure definition (in a
 library file) makes this procedure local to the library.
@@ -2650,8 +2610,8 @@ library file) makes this procedure local to the library.
   {
     ideal i= std(jacob(p));
     int m_nr=vdim(i);
-    if (m_nr<0) 
-    { 
+    if (m_nr<0)
+    {
       "// not an isolated singularity";
     }
     return(m_nr);         // the value of m_nr is returned
@@ -2670,10 +2630,10 @@ library file) makes this procedure local to the library.
 
 @sc{Singular} offers the opportunity to calculate in quotient rings
 (factor rings), i.e., rings modulo an ideal. The ideal has to be given
-in form of a standard basis. 
+in form of a standard basis.
 
 @menu
-* qring declaration::           
+* qring declaration::
 @end menu
 
 @node qring declaration,  , qring, qring
@@ -2691,7 +2651,7 @@ of the basering to this new ring.
 @item Default:
 none
 @item Note:
-In an @code{qring}, polynomials are not immediately reduced with respect 
+In an @code{qring}, polynomials are not immediately reduced with respect
 to the quotient ring.
 @item Example:
 @example
@@ -2720,9 +2680,9 @@ To access the elements of a resolution, it has to be assigned to a list
 (which also finishes not yet completed computations).
 
 @menu
-* resolution declarations::     
-* resolution expressions::      
-* resolution related functions::  
+* resolution declarations::
+* resolution expressions::
+* resolution related functions::
 @end menu
 
 @c ---------------------------------------
@@ -2807,8 +2767,8 @@ For a detailed description of the concept of rings see
 @ref{Rings and orderings}.
 
 @menu
-* ring declarations::           
-* ring related functions::      
+* ring declarations::
+* ring related functions::
 @end menu
 
 @c ---------------------------------------
@@ -2817,7 +2777,7 @@ For a detailed description of the concept of rings see
 @cindex ring declarations
 
 @c ------------------------------------------------------------
-@c   This piece of text exists also in the file general.doc, 
+@c   This piece of text exists also in the file general.doc,
 @c   chapter "General syntax of a ring declaration".
 @c   If you change something here, change it there, too!
 @c ------------------------------------------------------------
@@ -2939,10 +2899,10 @@ A comma between two expressions makes an expression list out of them
 while a @code{+} concatenates strings.
 
 @menu
-* string declarations::         
-* string expressions::          
-* string operations::           
-* string related functions::    
+* string declarations::
+* string expressions::
+* string operations::
+* string related functions::
 @end menu
 
 @c ------------------------------
@@ -3029,15 +2989,15 @@ concatenation
 @item @code{<=}, @code{>=}, @code{==}, @code{<>}
 comparison (lexicographic with respect to the ASCII coding)
 
-@item string_expression @code{[} int_expression @code{]} 
+@item string_expression @code{[} int_expression @code{]}
 is a character of the string; the index 1 gives the first character.
 
-@item string_expression @code{[} int_expression@code{,} int_expression @code{]} 
+@item string_expression @code{[} int_expression@code{,} int_expression @code{]}
 is a substring, where the first argument is the start index and the
 second is the length of the substring, filled up with blanks if the
 length exceeds the total size of the string
 
-@item string_expression @code{[} intvec_expression @code{]} 
+@item string_expression @code{[} intvec_expression @code{]}
 is a list of characters from the string
 @end table
 
@@ -3106,14 +3066,14 @@ Like polynomials they
 can only be defined or accessed with respect to this basering.
 (E.g. if @code{f} and @code{g} are polynomials then
 @code{f*gen(1)+g*gen(3)+gen(4)} can also be written as @code{[f,0,g,1]}
-or as @code{[f,0,g,1,0]}.) Note that the elements of a vector have to be 
+or as @code{[f,0,g,1,0]}.) Note that the elements of a vector have to be
 surrounded by square brackets (@code{[}, @code{]}).
 
 @menu
-* vector declarations::         
-* vector expressions::          
-* vector operations::           
-* vector related functions::    
+* vector declarations::
+* vector expressions::
+* vector operations::
+* vector related functions::
 @end menu
 
 @c ------------------------------
@@ -3157,8 +3117,8 @@ a function returning vector
 a poly expression (via the canonical embedding @code{p} @expansion{} @code{p*gen(1)})
 @item
 vector expressions combined by the arithmetic operations @code{+} or
-@code{-} 
-@item 
+@code{-}
+@item
 a poly expression and a vector expression combined by the arithmetic
 operation @code{*}
 @end enumerate
@@ -3197,7 +3157,7 @@ division by a monomial, not divisible terms yield 0
 @item @code{<}, @code{<=}, @code{>}, @code{>=}, @code{==}, @code{<>}
 comparison
 
-@item vector_expression @code{[} int_expressions @code{]} 
+@item vector_expression @code{[} int_expressions @code{]}
 is a vector entry; the index 1 gives the first entry.
 @end table
 

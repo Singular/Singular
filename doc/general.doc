@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.79 1998-05-18 15:51:58 Singular Exp $
+@comment $Id: general.doc,v 1.80 1998-05-18 17:05:42 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -39,13 +39,13 @@
 @cindex Interactive use
 
 @menu
-* How to enter and exit::       
-* The SINGULAR prompt::             
-* The online help system::      
-* Interrupting SINGULAR::       
-* Editing input::               
-* Commandline options::         
-* Startup sequence::            
+* How to enter and exit::
+* The SINGULAR prompt::
+* The online help system::
+* Interrupting SINGULAR::
+* Editing input::
+* Commandline options::
+* Startup sequence::
 @end menu
 
 @c --------------------------------------------------------------------------
@@ -53,7 +53,7 @@
 @subsection How to enter and exit
 @cindex How to enter and exit
 
-To start @sc{Singular}, enter @code{Singular} at the system prompt. The 
+To start @sc{Singular}, enter @code{Singular} at the system prompt. The
 @sc{Singular} banner appears which, among others, reports the version name and
 compilation date.  Enter @code{help;} to get the online manual at the
 @sc{Singular} prompt @code{>}.  Commands always need to be terminated by
@@ -120,7 +120,7 @@ go to the "up" node
 @item m
 pick a menu item specified by name. Reads name of menu entry
 @item TAB
-completes names of subtopics selected by @code{m} 
+completes names of subtopics selected by @code{m}
 @item f
 follow a cross reference.  Reads name of reference
 @item l
@@ -171,9 +171,9 @@ quits  @sc{Singular}
 @cindex Editing input
 
 On Unix-like operating systems, @sc{Singular} maintains a history of the
-last lines of input, stored in a file named .singularrc. The following 
-keys can be used for editing 
-the input and retrieving previous input lines (@code{CTRL} denotes the 
+last lines of input, stored in a file named .singularrc. The following
+keys can be used for editing
+the input and retrieving previous input lines (@code{CTRL} denotes the
 control key):
 @table @code
 @item CTRL-B
@@ -239,19 +239,19 @@ The synopsis of @sc{Singular} is
 options control the general behaviour of @sc{Singular}:
 @table @asis
 
-@item @code{-e}, @code{--echo[=VAL]} 
+@item @code{-e}, @code{--echo[=VAL]}
 Set value of variable @code{echo} to @code{VAL} (integer in the range 0
 .. 9). Without an argument, @code{echo} is set to 1, which echoes all
 input coming from a file. By default, the value of @code{echo} is 0. See
 also @ref{echo}.
 
-@item @code{-h}, @code{--help} 
+@item @code{-h}, @code{--help}
 Print a one line description of each command  line option and exit.
 
-@item @code{--no-rc}               
+@item @code{--no-rc}
 Do not execute the @code{.singularrc} file on start-up. By default,
 @sc{Singular} searches first in the current directory and then in the
-home directory of the user for a file named @code{.singularrc}. If it is 
+home directory of the user for a file named @code{.singularrc}. If it is
 found, then it is executed after the library @code{standard.lib} is
 loaded and prior to executing the string specified by
 @code{--user-option}. See also @ref{Startup sequence}.
@@ -260,16 +260,16 @@ loaded and prior to executing the string specified by
 Do not load the library @code{standard.lib} on start-up. By default,
 this library is loaded on start-up. See also @ref{Startup sequence}.
 
-@item @code{-t}, @code{--no-tty} 
+@item @code{-t}, @code{--no-tty}
 Do not redefine the terminal characteristics (useful for batch
-processes, see @ref{Editing input}).  
+processes, see @ref{Editing input}).
 
 @item @code{-q}, @code{--quiet}
 Do not print start-up banner and warnings and redirect stderr (all error
 messages) to stdout (normal output channel). This option should be used
 if the output is redirected to a file.
 
-@item @code{-v}, @code{--verbose}             
+@item @code{-v}, @code{--verbose}
 Print extended information about the version and configuration of
 @sc{Singular}  (used optional parts, compilation date, start of random
 generator etc.). This information should be included if a user reports
@@ -277,11 +277,11 @@ an error to the authors.
 @end table
 
 The following command line options allow manipulations of the timer and
-the pseudo random generator and passing of commands and strings to 
+the pseudo random generator and passing of commands and strings to
 @sc{Singular}:
 
 @table @asis
-@item @code{-c}, @code{--execute=STRING} 
+@item @code{-c}, @code{--execute=STRING}
 Execute @code{STRING} as (a sequence of) @sc{Singular} commands on
 start-up after the @code{.singularrc} file is executed, but prior to
 executing the files given on the command line, e.g.  @code{Singular -c
@@ -291,7 +291,7 @@ exits.
 @item @code{-u}, @code{--user-option=STRING} Returns @code{STRING} on
 @code{system("--user-option")}. This is useful for passing arbitrary
 arguments (like filenames) from the command line to the @sc{Singular}
-interpreter (i.e., to the top-level of @sc{Singular}), e.g., 
+interpreter (i.e., to the top-level of @sc{Singular}), e.g.,
 @code{Singular -u "xxx.dump" -c 'getdump(system("--user-option"))'}
 reads the file @code{xxx.dump} at startup and allows the user to start
 working with all the objects defined in the previous session.
@@ -302,14 +302,14 @@ Seed (i.e., set initial value of) pseudo random generator with integer
 random generated is seeded with a time-based @code{SEED} (e.g., the
 number of seconds since January, 1, 1970, on Unix systems).
 
-@item @code{--min-time=SECS} 
+@item @code{--min-time=SECS}
 If the @code{timer} (resp.  @code{rtimer}) variables is set, do only
 report times larger than @code{SECS} seconds (@code{SECS} needs to be a
 floating point number greater than 0). By default, this value is set to
 0.5 (i.e., half a second), e.g., the option @code{--min-time=0.01} forces
 Singular to report all times larger than 1/100 of a second.
 
-@item @code{--ticks-per-sec=TICKS} 
+@item @code{--ticks-per-sec=TICKS}
 Sets unit of timer to @code{TICKS} per second (i.e. the value reported
 by the @code{timer} and @code{rtimer} variable divided by @code{TICKS}
 gives the time in seconds). By default, this value is 1.
@@ -318,7 +318,7 @@ gives the time in seconds). By default, this value is 1.
 
 The last 3 options are of interest for the use with MP links:
 @table @asis
-@item @code{-b}, @code{--batch} 
+@item @code{-b}, @code{--batch}
 Run in MP batch mode. Opens a TCP/IP connection with host specified by
 @code{--MPhost} at the port specified by @code{--MPport}. Input is read
 from and output is written to this connection in the MP format. See also
@@ -335,15 +335,15 @@ further specified) . This option is mandatory when the @code{--batch}
 option is given. See also @ref{MPtcp links}.
 
 @end table
-The value of options given to @sc{Singular} (resp. their default values, 
+The value of options given to @sc{Singular} (resp. their default values,
 if an option was not given), can be checked with the command
-@code{system(LongOptionNameString)}. See also @ref{system}.  
+@code{system(LongOptionNameString)}. See also @ref{system}.
 
 @strong{Example:}
 @example
 @c example
   system("--quiet");    // if "quiet" 1, otherwise 0
-  system("--min-time"); // minimal reported time 
+  system("--min-time"); // minimal reported time
 @c example
 @end example
 @c --------------------------------------------------------------------------
@@ -374,7 +374,7 @@ data files by first searching the current working directory, and then by
 searching through all the directories specified by the environment
 variable @code{SINGULARPATH} (@code{SPATH} on DOS-based systems), and,
 finally, by searching through some default directories (e.g.,
-@code{/usr/local/share/Singular}). 
+@code{/usr/local/share/Singular}).
 
 @c --------------------------------------------------------------------------
 @c ---------------------------------------------------------------------------
@@ -382,7 +382,7 @@ finally, by searching through some default directories (e.g.,
 @section Rings and orderings
 @cindex Rings and orderings
 
-All advanced algorithms in @sc{Singular} require the prior definition of 
+All advanced algorithms in @sc{Singular} require the prior definition of
 a ring. Such a ring can be
 
 @enumerate
@@ -397,7 +397,7 @@ a tensor products of one of the above
 @end enumerate
 
 The rings are realized by choosing an appropriate global or local
-ordering. @xref{Term orderings} and @ref{Mathematical background}. 
+ordering. @xref{Term orderings} and @ref{Mathematical background}.
 
 The coefficient field of these rings may be
 
@@ -431,7 +431,7 @@ following subsections or with the commands @code{setring} and
 access them after a change of the basering they have to be mapped using
 maps or by the functions @code{imap} or @code{fetch}.
 
-@c @ref 
+@c @ref
 See
 @ref{Objects};
 @ref{fetch};
@@ -439,16 +439,16 @@ See
 @ref{keepring};
 @ref{map};
 @ref{setring}.
-@c @ref 
+@c @ref
 
 All changes of the basering in a procedure are local to this procedure
 unless a @code{keepring} command is used as the last statement of the
 procedure. @xref{Procedures} and @ref{keepring}.
 
 @menu
-* Examples of ring declarations::  
-* General syntax of a ring declaration::  
-* Term orderings::              
+* Examples of ring declarations::
+* General syntax of a ring declaration::
+* Term orderings::
 @end menu
 
 @c --------------------------------------
@@ -460,7 +460,7 @@ The exact syntax of a ring declaration is given in the next two
 subsections; this subsections lists some examples first.
 
 @itemize @bullet
-@item 
+@item
 @tex
 the ring $Z/32003Z[x,y,z]$ with local degrevlex ordering:
 @end tex
@@ -472,14 +472,14 @@ the ring Z/32003Z[x,y,z] with local degrevlex ordering:
   ring r = 32003, ( x, y, z ), ds;
 @end example
 
-@item 
+@item
 @tex
 the ring $Z/7Z[x_1,\ldots,x_6]$ with lexicographical ordering for $x_1$
 and $x_2$ and degree reverse lexicographical ordering for
-$x_3,\ldots,x_6$:  
+$x_3,\ldots,x_6$:
 @end tex
 @ifinfo
-the ring Z/7Z[x1,...,x6] with lexicographical ordering for x1 and x2 and 
+the ring Z/7Z[x1,...,x6] with lexicographical ordering for x1 and x2 and
 degree reverse lexicographical ordering for x3,...x6:
 @end ifinfo
 
@@ -488,7 +488,7 @@ degree reverse lexicographical ordering for x3,...x6:
   ring r=10,( x(1..6) ),( lp(2),dp(4) );
 @end example
 
-@item 
+@item
 @tex
 the ring
 @end tex
@@ -500,7 +500,7 @@ the ring
   ring r3=0,(x,y,z,a,b,c),(ds(3), dp(3));
 @end example
 
-@item 
+@item
 @tex
 the ring
 @end tex
@@ -512,7 +512,7 @@ the ring
   ring r4=0,(x,y,z),(c,dp);
 @end example
 
-@item 
+@item
 @tex
 the ring
 @end tex
@@ -524,7 +524,7 @@ the ring
   ring r5=(7,a),(x,y,z),dp;
 @end example
 
-@item 
+@item
 @tex
 the ring $K[x,y,z]$, where $K$ is $Z/7Z[a] / a^2+a+3$, the finite field with
 $49$ elements.
@@ -539,7 +539,7 @@ the ring K[x,y,z], where K is Z/7Z[a] / a^2+a+3, the finite field with
   ring r=(7^2,a),(x,y,z),dp;
 @end example
 
-@item 
+@item
 @tex
 the ring
 @end tex
@@ -551,7 +551,7 @@ the ring
   ring r8=(181,A,B,Z),(x,y,z),dp;
 @end example
 
-@item 
+@item
 @tex
 the ring
 @end tex
@@ -570,7 +570,7 @@ the ring
 @cindex General syntax of a ring declaration
 
 @c ------------------------------------------------------------
-@c   This piece of text (partially) exists also in the 
+@c   This piece of text (partially) exists also in the
 @c   file types.doc, chapter "ring declarations".
 @c   If you change something here, change it there, too!
 @c ------------------------------------------------------------
@@ -587,14 +587,14 @@ defines a basering and sets it as the actual basering.
 The coefficient_field is given by one of the following:
 @enumerate
 @item
-a non-negative int_expression less or equal 32003. 
+a non-negative int_expression less or equal 32003.
 @* The int_expression should either be 0, representing the field of
 rational numbers Q, or a prime number p, representing the finite field
 with p elements; if it is not a prime number, int_expression is
 converted to the next lower prime number.
 
 @item
-an expression_list of an int_expression and one or more names. 
+an expression_list of an int_expression and one or more names.
 @* The int_expression specifies the characteristic of the coefficient
 field as above. The names are used as parameters in transcendental or
 algebraic extensions of the coefficient field. Algebraic extensions are
@@ -602,7 +602,7 @@ implemented for one parameter only. In this case, a minimal polynomial
 has to be defined by assignment to @code{minpoly}. @xref{minpoly}.
 
 @item
-an expression_list of an int_expression and a name. 
+an expression_list of an int_expression and a name.
 @* The int_expression has to be a prime number p to the power of a
 positive integer n. This defines the Galois field
 @tex
@@ -611,7 +611,7 @@ $GF(p^n)$ with $p^n$ elements, where $p^n$ has to be smaller or equal $2^{15}$.
 @ifinfo
 GF(p^n) with p^n elements, where p^n has to be smaller or equal 2^15.
 @end ifinfo
-The given name refers to a primitive element of 
+The given name refers to a primitive element of
 @tex
 $GF(p^n)$
 @end tex
@@ -631,18 +631,18 @@ The names_of_ring_variables is a list of names or indexed names.
 The ordering is a list of block orderings where each block ordering is either
 
 @enumerate
-@item 
+@item
 @code{lp}, @code{dp}, @code{Dp}, @code{ls}, @code{ds}, @code{Ds},
 optionally followd by a size parameter in parentheses.
 
-@item 
+@item
 @code{wp}, @code{Wp}, @code{ws}, @code{Ws}, @code{a} followed by a
 weight vector given as an intvec_expression in parentheses.
 
-@item 
+@item
 @code{M} followed by an intmat_expresion in parantheses.
 
-@item 
+@item
 @code{c}, @code{C} which may be specified only as the first or last
 block ordering.
 @end enumerate
@@ -711,7 +711,7 @@ second character in their name.
 @table @asis
 @item @code{M(} intmat_expression @code{)}
 The intmat_expression has to be an invertible square matrix
-..???.. 
+..???..
 @end table
 
 @sc{Singular} can compute standard bases for any monomial
@@ -747,23 +747,23 @@ orderings.
 @itemx @code{(} ordering@code{,} ...@code{, C )}
 @item @code{(} ordering@code{,} ...@code{, c )}
 Sort polynomial vectors by the monomial ordering first, then by
-components. 
+components.
 
 @itemx @code{( C,} ordering@code{,} ... @code{)}
 @item @code{( c,} ordering@code{,} ... @code{)}
 Sort polynomial vectors by components first, then by the monomial
-ordering. 
+ordering.
 @end table
 
 Here a capital @code{C} sorts generators in ascending order,
 i.e., @code{gen(1)} < @code{gen(2)} < ...; a small @code{c} sorts in
-descending order, i.e., @code{gen(1)} > @code{gen(2)} > ... . The module 
+descending order, i.e., @code{gen(1)} > @code{gen(2)} > ... . The module
 ordering has not to be defined explicitly since @code{(}
 ordering@code{,} ...@code{, C )} is the default.
 @end enumerate
 
 For a mathematical description of these orderings, see @ref{Mathematical
-background}. 
+background}.
 
 @c ---------------------------------------------------------------------------
 @node Implemented algorithms, The SINGULAR language, Rings and orderings, General concepts
@@ -798,7 +798,7 @@ Algorithms for uni- and multivariate polynomial factorization and gcd computatio
 @table @code
 @item facstd
 @ref{facstd}
-@*computes a list of Groebner bases via the Factorizing Groebner Basis 
+@*computes a list of Groebner bases via the Factorizing Groebner Basis
 Algorithm: the intersection of the zero sets is the zero set of the given ideal
 @item fglm
 @ref{fglm}
@@ -832,7 +832,7 @@ a @code{std} computation guided by the hilbert series
 @table @code
 @item degree
 @ref{degree}
-@*computes the (Krull) dimension, codimension and the multiplicity. (The 
+@*computes the (Krull) dimension, codimension and the multiplicity. (The
 result is only displayed to the screen.)
 @item dim
 @ref{dim}@*
@@ -916,7 +916,7 @@ factorization in prime characteristic is implemented using Hensel-lifting to
 lift from univariate factorizations to multivariate factorizations.
 
 For characteristic 0, an univariate Hensel-lifting is done to lift from prime
-characteristic to characteristic 0.  For multivariate factorization, the 
+characteristic to characteristic 0.  For multivariate factorization, the
 problem
 is reduced to the univariate case first, then a multivariate Hensel-lifting is
 used to lift the univariate factorization.
@@ -960,15 +960,15 @@ particular, the control structures @code{for}, @code{if} .. @code{else}
 and @code{while} are not restricted to the use in procedures.
 
 @xref{Procedures} for a detailed description of how to write
-procedures. 
+procedures.
 
 @menu
-* General command syntax::      
-* Special characters::          
-* Names::                       
-* Objects::                     
-* Type conversion and casting::  
-* Flow control::                
+* General command syntax::
+* Special characters::
+* Names::
+* Objects::
+* Type conversion and casting::
+* Flow control::
 @end menu
 
 @c ---------------------------------------------------------------------------
@@ -981,8 +981,8 @@ call to a function without return type, or a print command. The general
 form of a command is described in the following subsections.
 @subsubheading Declaration
 @c ------------------------------------------------------------
-@c   This piece of text exists in the file types.doc, 
-@c   chapter "Data types", general.doc, chapter "Names" and
+@c   This piece of text exists in the file
+@c   general.doc, chapter "Names" and
 @c   chapter "General command syntax".
 @c   If you change something here, change it there, too!
 @c ------------------------------------------------------------
@@ -1015,18 +1015,18 @@ for a description on all data types known by @sc{Singular}.
 
 @subsubheading Assignment
 @enumerate 3
-@item 
+@item
 name @code{=} expression @code{;}
 @* assigns expression to name.
 
-@item 
+@item
 name_list @code{=} expression_list @code{;}
 @* assigns successively each expression of expression_list to the
-corresponding name of name_list. Both lists must be of same length. Note 
+corresponding name of name_list. Both lists must be of same length. Note
 that this is not a simultaneous assignment.
 @end enumerate
 
-There must be a type conversion of the type of expression to the type of 
+There must be a type conversion of the type of expression to the type of
 name. @xref{Type conversion and casting}.
 
 An assignment itself does not yield a value. Hence, compound assignments
@@ -1040,9 +1040,9 @@ like @code{i = j = k;} are not allowed and result in an error.
 
 @subsubheading Function without return type
 @enumerate 5
-@item 
+@item
 function_name [ @code{(} argument_list @code{)} ] @code{;}
-@* calls function function_name with arguments argument_list. 
+@* calls function function_name with arguments argument_list.
 @end enumerate
 
 The function may have output (not to be confused with a return value of
@@ -1054,7 +1054,7 @@ e.g., @code{help}, @code{LIB}.
 
 @example
 @c example
-  ring r; 
+  ring r;
   ideal i=x2+y2,x; i=std(i);
   degree(i);  // degree has no return value but prints output
 @c example
@@ -1064,15 +1064,15 @@ e.g., @code{help}, @code{LIB}.
 @enumerate 6
 @item
 expression @code{;}
-@* prints the value of an expression, for example, of a variable. 
+@* prints the value of an expression, for example, of a variable.
 @end enumerate
 
 Use the function @code{print} to get a pretty output of various data
-types, e.g., matrix or intmat. @xref{print}.  
+types, e.g., matrix or intmat. @xref{print}.
 
 @example
 @c example
-  int i=2; 
+  int i=2;
   i;
   intmat m[2][2]=1,7,10,0;
   print(m);
@@ -1162,8 +1162,8 @@ identifiers) have to be declared prior to their use.
 The general syntax of a declaration is either:
 
 @c ------------------------------------------------------------
-@c   This piece of text exists in the file types.doc, 
-@c   chapter "Data types", general.doc, chapter "Names" and
+@c   This piece of text exists in the file
+@c   general.doc, chapter "Names" and
 @c   chapter "General command syntax".
 @c   If you change something here, change it there, too!
 @c ------------------------------------------------------------
@@ -1420,9 +1420,9 @@ A block is a sequence of commands surrounded by @{ and @}.
   @}
 @end example
 Blocks are used whenever @sc{Singular} is used as a structured programming
-language. The @code{if} and @code{else} structures allow conditional 
+language. The @code{if} and @code{else} structures allow conditional
 execution of blocks (See @ref{if}, @ref{else}). @code{for} and @code{while}
-loops are available for repeated execution of blocks (See @ref{for}, 
+loops are available for repeated execution of blocks (See @ref{for},
 @ref{while}).
 In procedure definitions the main part and the example section are blocks
 as well(See @ref{proc}).
@@ -1458,18 +1458,18 @@ in parentheses. The invocation then executes
 the sequence of commands stored in the specified procedure.
 
 @menu
-* Procedure definition::             
-* Names in procedures::         
-* Parameter list::              
-* Procedure commands::          
-* Loading of procedure files::  
+* Procedure definition::
+* Names in procedures::
+* Parameter list::
+* Procedure commands::
+* Loading of procedure files::
 @end menu
 @c -------------------------------------------------
 @node Procedure definition, Names in procedures, Procedures, Procedures
 @subsection Procedure definition
 @cindex Procedure definition
 @c ------------------------------------------------------------
-@c   This piece of text exists also in the file types.doc, 
+@c   This piece of text exists also in the file types.doc,
 @c   chapter "proc declaration".
 @c   If you change something here, change it there, too!
 @c ------------------------------------------------------------
@@ -1493,19 +1493,19 @@ the sequence of commands stored in the specified procedure.
    sequence_of_commands;
 @*@code{@}}]
 @item Purpose:
-defines a new function, the @code{proc} proc_name, with the additional 
-information help_text, which is copied to the screen by 
+defines a new function, the @code{proc} proc_name, with the additional
+information help_text, which is copied to the screen by
 @code{help proc_name;} and the @code{example} section
-which is executed by @code{example proc_name;}. 
+which is executed by @code{example proc_name;}.
 @* The help_text, the parameter_list, and the example section are optional.
 The default for a parameter_list is @code{(list #)}, see @ref{Parameter list}.
-The help and example sections are ignored if the procedure is defined 
+The help and example sections are ignored if the procedure is defined
 interactively, i.e. if it was not loaded from a file by a @code{LIB} command.
 @* Specifying static in front of the proc-definition (in a library file)
 makes this procedure local to the library, i.e. accessible only for the other
 procedures in the same library, but not for the users. So there is no
 reason anymore to define a procedure within another one (it just makes
-debugging harder). 
+debugging harder).
 
 @item Example of a procedure:
 @example
@@ -1530,7 +1530,7 @@ debugging harder).
   //-----------------------result----------------------------------------
     return(m_nr);         // the value of m_nr is returned
   }
-  example 
+  example
   {
     "EXAMPLE:"; echo=2;
     ring r=0,(x,y),ds;
@@ -1544,7 +1544,7 @@ debugging harder).
   poly p=x^2+y^2+z^5;
   milnor_number(p);
   //
-  // help section is ignored, since the procedure was defined 
+  // help section is ignored, since the procedure was defined
   // interactively
   //
   help milnor_number;
@@ -1589,16 +1589,16 @@ debugging harder).
 A convenient and recommended way to define procedures is to prepare a file
 and read this file with the @code{LIB} command.
 The differences between procedures from libraries and
-other procedures are that the help and example part are ignored in 
+other procedures are that the help and example part are ignored in
 interactive definitions and that static can only be specified in libraries.
 
 @item Guidelines for the help section of a procedure:
 @* The help text of a procedure should contain information about the usage,
-   purpose, return values and generated objects. Particular assumptions or 
-   limitations should be listed. If global objects are generated, this should 
+   purpose, return values and generated objects. Particular assumptions or
+   limitations should be listed. If global objects are generated, this should
    be mentioned, too.
 
-@*The libraries contained in the @sc{Singular} distribution use the following 
+@*The libraries contained in the @sc{Singular} distribution use the following
 format for the help text:
 @example
 USAGE:    <proc_name>(<parameters>);   <explanation of parameters>
@@ -1607,7 +1607,7 @@ RETURN:   <description of the purpose and return value>
 [NOTE:    <paritcular assumptions or limitations, hints>]
 EXAMPLE:  example <proc_name>; shows an example
 @end example
-@end table 
+@end table
 
 @menu
 * LIB::
@@ -1631,10 +1631,10 @@ the proc.
 Names can be made global by @code{export} (see @ref{export}).
 These global names will not be deleted automatically.
 Ring dependent variables are stored together with the ring and deleted
-when the ring is deleted. 
+when the ring is deleted.
 
 Internally, local variables are stored using the nesting level. A variable
-is said to have nesting level 1, if it is local to a procedure that was 
+is said to have nesting level 1, if it is local to a procedure that was
 called interactively, nesting level 2, if is local to a procedure that
 was called by a procedure of nesting level 1 etc. @code{listvar()} also
 displays the nesting level, nesting level 0 is used for global objects
@@ -1655,9 +1655,9 @@ If you type @code{listvar(all);} after having executed a proc you will
 see that the variable @code{result} is still there while @code{k}
 has been deleted.
 
-Often a procedure is started while a basering is active. The procedure then 
+Often a procedure is started while a basering is active. The procedure then
 works in this basering without knowing its name. Therefore a name has to be
-assigned to the basering before executing e.g. map commands. This is done by 
+assigned to the basering before executing e.g. map commands. This is done by
 the assignment @code{def r=basering;}, writing @code{ring r=basering;} leads
 to an error.
 
@@ -1755,7 +1755,7 @@ see @ref{return}
 @cindex Loading of procedure files
 Files containing @sc{Singular} procedures may be loaded in two ways
 (the whole library will be loaded, the quotes "" are necessary):
-@*@code{< "file_name";}       (if the library does not contain info 
+@*@code{< "file_name";}       (if the library does not contain info
 and version string) @*@code{LIB "file_name";}
 
 To list all loaded procedures resp. libraries, type
@@ -1765,14 +1765,14 @@ To list all loaded procedures resp. libraries, type
 To remove a procedure type
 @code{kill proc_name;}
 
-If the library contains neither an info string nor a version string 
-it can be loaded by @code{<"..."} because it contains valid @sc{Singular} 
-commands. With @code{<} the whole file is read by @sc{Singular} and the 
-body of the procedures is stored in the main memory. Help and example 
+If the library contains neither an info string nor a version string
+it can be loaded by @code{<"..."} because it contains valid @sc{Singular}
+commands. With @code{<} the whole file is read by @sc{Singular} and the
+body of the procedures is stored in the main memory. Help and example
 sections of the procedures are ignored. Any other text in the file is
 executed. Problems may occur if one of the commands in the file is a
 procedure call. These problems do not occur if all procedures are called
-with the LIB command. Because of these limitations and problems the use of 
+with the LIB command. Because of these limitations and problems the use of
 @code{<} is @strong{discouraged}.
 
 
@@ -1834,11 +1834,11 @@ intend to write their own libraries, may skip paragraphs @ref{Format of a
 library} to @ref{A syntax example} without loosing any relevant information.
 
 @menu
-* Format of a library::         
-* LIB in a library::            
-* info::                        
-* version::                     
-* A syntax example::            
+* Format of a library::
+* LIB in a library::
+* info::
+* version::
+* A syntax example::
 @end menu
 
 @c ---------------------------------------
@@ -1955,7 +1955,7 @@ d: sample.lib,v 1.2 1998/05/07 singular Exp $";
   version="some version string";
 @end example
 @item @strong{Note:}
-It is common practice to simply define the version string to be 
+It is common practice to simply define the version string to be
 @code{"$I}@comment
 @comment !! Do not erase the @comment at the end of the previous line !!
 @comment !! It prevents cvs to substitue the id string                !!
@@ -2040,7 +2040,7 @@ info="
       <procedureN>;     <one line description of the purpose>";
 @end example
 The purpose of these one line descriptions is not to give a short help
-for the procedure, but to help the user decide what procedure might be 
+for the procedure, but to help the user decide what procedure might be
 the right one for the job. Details can then be found in the help of
 each procedure. Therefore parameters may be omitted or abbreviated if
 necessary.
@@ -2058,10 +2058,10 @@ a bracket or a @code{"}. The easiest way to leave the proc
 is to type some brackets or @code{"} and then @code{<RETURN>;} .
 
 @menu
-* Tracing of procedures::       
-* Break points::                
-* Printing of data::            
-* libparse::                    
+* Tracing of procedures::
+* Break points::
+* Printing of data::
+* libparse::
 @end menu
 
 @c ---------------------------------------
@@ -2140,7 +2140,7 @@ See @ref{dbprint}; @ref{voice}.
 @subsection libparse
 @cindex libparse
 
-@code{libparse} is a stand-alone program contained in the @sc{Singular} 
+@code{libparse} is a stand-alone program contained in the @sc{Singular}
 package,
 which cannot be called inside of @sc{Singular}. It is a debugging tool for
 libraries which performs exactly the same checks as the LIB command in
@@ -2244,11 +2244,11 @@ proc  @code{factorial}.
 
 With one exception, @sc{Singular}'s in- and output (short, I/O) is
 realized using links. This one exception is the loading of libraries
-which has to be realized with the @code{LIB} command (see @ref{LIB}). 
+which has to be realized with the @code{LIB} command (see @ref{LIB}).
 
 In other words, links are the communication channels of @sc{Singular},
 i.e.  something @sc{Singular} can write to and/or read from. Currently,
-@sc{Singular} supports four different link types: 
+@sc{Singular} supports four different link types:
 @table @asis
 @item ASCII links (see @ref{ASCII links}):
 data that can be converted to a string can be written into files for
@@ -2261,9 +2261,9 @@ example, using the command @code{execute} (see @ref{execute}).
 @example
 @c example
   // (over)write file test.ascii, link is specified as string
-  write(":w test.ascii", "int i =", 3, ";"); 
+  write(":w test.ascii", "int i =", 3, ";");
   // reading simply returns the string
-  read("test.ascii"); 
+  read("test.ascii");
   // but now test.ascii is "executed"
   execute read("test.ascii");
   i;
@@ -2273,19 +2273,19 @@ ASCII links should primarily be used for storing small amounts of data,
 especially if it might become necessary to manually inspect or
 manipulate the data.
 
-@item MPfile links (see @ref{MPfile links}): 
+@item MPfile links (see @ref{MPfile links}):
 data is stored in the binary MP format: read and write access is very
 fast compared to ASCII links. All data (including such data that can not
 be converted to a string) can be written to an MPfile link. Reading from
 an MP link returns the written expression(s) (i.e., not a string, in
-general).  
+general).
 
 @strong{Example:}
 @example
 @c example
   ring r;
   // (over)write MPfile test.mp, link is specified as string
-  write("MPfile:w test.mp", x+y); 
+  write("MPfile:w test.mp", x+y);
   kill r;
   def p = read("MPfile:r test.mp");
   typeof(p); p;
@@ -2300,12 +2300,12 @@ the data to be stored can not be (easily) converted from/to a string
 data is communicated with other processes (e.g., @sc{Singular}
 processes) which may run on the same or on different computers.
 Data exchange is accomplished using TCP/IP links
-in the binary MP format. 
+in the binary MP format.
 
 @strong{Example:}
 @example
 @c example
-  ring r; 
+  ring r;
   link l = "MPtcp:launch"; // declare a link explicitely
   open(l); // need an open, launches another SINGULAR as a server
   write(l, x+y);
@@ -2317,10 +2317,10 @@ in the binary MP format.
 @end example
 MPtcp links should primarily be used for communications with other
 programs or for parallel computations (see, for example,
-@ref{Parallelization with MPtcp links}). 
+@ref{Parallelization with MPtcp links}).
 
 @item DBM links (see @ref{DBM links})
-data is stored in and accessed from a data base. Writing is accomplished 
+data is stored in and accessed from a data base. Writing is accomplished
 by a key- and a value string and associates the value with the key in
 the specfied data base. Reading is accomplished w.r.t. a key
 (string), whose associated value (string) is returned.
@@ -2345,7 +2345,7 @@ Besides the usual I/O commands @code{write} (see @ref{write}) and
 @code{read} (see @ref{read}), there are
 also the commands @code{dump} (see @ref{dump}) and @code{getdump} (see
 @ref{getdump}) (except for DBM links) which store (resp. retrieve) the
-content of an entire @sc{Singular} session to (resp. from) a link. 
+content of an entire @sc{Singular} session to (resp. from) a link.
 
 @strong{Example:}
 @example
@@ -2362,7 +2362,7 @@ Specifying a link can be as easy as using a filename(string). In most
 cases (except for MPtcp links), links do not need to be explicitely
 opened (see @ref{open}) or closed (see @ref{close}) before (resp. after)
 they are used. Furthermore, links have various properties which can be
-checked for using the @code{status} (see @ref{status}) command. 
+checked for using the @code{status} (see @ref{status}) command.
 
 @strong{Example:}
 @example
