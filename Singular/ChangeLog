@@ -1,3 +1,17 @@
+Fri Apr 24 19:14:42 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* clapsing.cc (FACTORY_GCD_STAT, singclap_divide_content):
+	  dependency on FACTORY_GCD_TEST removed.  Statistics are now done
+ 	  using `FACTORY_GCDSTAT' and `FCATORY_CONTSTAT' which are defined
+ 	  to expand to nothing if `FACTORY_GCD_TIMING' is off.
+
+	* extra.cc (FACTORY_GCD_STAT): dependency on `FACTORY_GCD_TEST'
+	  removed.  Includes `gcd_stat.h' in dependency on
+	  `FACTORY_CGD_STAT'.
+
+	* extra.cc (jjSYSTEM): new command `gcdstat' in dependency on
+	  `FACTORY_GCD_STAT'
+
 Fri Apr 24 18:25:23 MET DST 1998 hannes
   * fixed bug in maps.cc: size of monom is not pMonomSize but mmGetSpecSize()
   * changed header in tesths.cc
@@ -6,6 +20,28 @@ Thu Apr 23 20:53:06 MET DST 1998 hannes
   * removed END_GRAMMAR ("RETURN") from iparith.cc, grammar.y
 Thu Apr 23 20:16:24 MET DST 1998 hannes
   * fixed bug in rKill of Q-rings (ring.cc, polys.cc)
+
+Thu Apr 23 11:12:48 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* clapsing.cc (FACTORY_CFTROUT, FACTORY_CFAOUT): stuipd bug fix
+
+	* clapsing.cc (FACTORY_ALGOUT, FACTORY_CFTROUT, FACTORY_CFAOUT):
+	  new macros for debugging data transfer to Factory
+ 	  (singclap_divide_content, singclap_alglcm,
+ 	  singclap_algdividecontent): use the new macros
+
+	* clapsing.cc (FACTORY_GCD_TIMING, singclap_divide_content,
+	  singclap_alglcm, singclap_algdividecontent): dependency on
+	  FACTORY_GCD_TEST removed.  Timings are now done directly using
+	  `TIMING_START' and `TIMING_END' which are defined to expand to
+	  nothing if `FACTORY_GCD_TIMING' is off.
+
+	* extra.cc (FACTORY_GCD_TIMING): dependency on FACTORY_GCD_TEST
+	  removed
+
+	* longalg.cc (naNormalize): gcd calculation depends on #define
+	  `FACTORY_GCD_TEST'
+
 Wed Apr 22 09:42:35 MET DST 1998 hannes
   * several changes concerning stdfac
     (kstdfac.cc, kutil.cc kutil.h)
