@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.120 2004-08-05 18:14:05 levandov Exp $
+@comment $Id: singular.doc,v 1.121 2005-02-22 15:30:49 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -366,7 +366,6 @@ LIB "all.lib";
 * classify_lib:: procedures for the Arnold-classifier of singularities
 * deform_lib:: procedures for computing miniversal deformation
 * equising_lib:: procedures for equisingularity strata
-* gaussman_lib:: procedures for gauss-manin connection of a singularity
 * gmssing_lib:: procedures for gauss-manin system of a singularity
 * gmspoly_lib:: procedures for gauss-manin system of cohomologically tame polynomials
 * hnoether_lib:: procedures for the Hamburger-Noether (Puiseux) development
@@ -386,15 +385,11 @@ LIB "all.lib";
 @subsection deform_lib
 @c lib deform.lib
 @c ----------------------------------------------------------
-@node equising_lib, gaussman_lib, deform_lib, Singularities
+@node equising_lib, gmssing_lib, deform_lib, Singularities
 @subsection equising_lib
 @c lib equising.lib
 @c ----------------------------------------------------------
-@node gaussman_lib, gmssing_lib, equising_lib, Singularities
-@subsection gaussman_lib
-@c lib gaussman.lib
-@c ----------------------------------------------------------
-@node gmssing_lib, gmspoly_lib, gaussman_lib, Singularities
+@node gmssing_lib, gmspoly_lib, equising_lib, Singularities
 @subsection gmssing_lib
 @c lib gmssing.lib no_ex
 @c ----------------------------------------------------------
