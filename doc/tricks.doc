@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: tricks.doc,v 1.8 2003-02-18 16:14:24 Singular Exp $
+@comment $Id: tricks.doc,v 1.9 2004-04-15 16:46:03 Singular Exp $
 @comment this file contains the "Tricks and pittfals" sections
 
 @c The following directives are necessary for proper compilation
@@ -35,19 +35,22 @@
 @sc{Singular} has the following limitations:
 @itemize @bullet
 @item
-the characteristic of a prime field must be less than 2147483629
+the characteristic of a prime field must be less or equal than 2147483629 
 @item
-the (weighted) degree of a monomial must be smaller than 2147483648
+the (weighted) degree of a monomial must be less or equal  than 2147483647
 @item
-the exponent of a ring variable and the rank of any free module
-must be smaller than 32768
+the rank of any free module
+must be less or equal than 2147483647
+@item
+the maximal allowed exponent of a ring variable
+depend on the ordering of the ring and is at least 32767.
 @c TBC -- number of max parameters
 @item
 the precision of long floating point numbers (for ground field @code{real})
-must be smaller than 32768
+must be less or equal  than 32767
 @item
 integers (of type @code{int}) have the limited range
-from -2147483647 to 2147483647
+from -2147483648 to 2147483647
 @item
 floating point numbers (type @code{number} from field @code{real}) have
 a limited range which is machine dependent. A typical range is -1.0e-38
