@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.273 2002-01-07 17:15:19 Singular Exp $ */
+/* $Id: iparith.cc,v 1.274 2002-02-06 08:52:21 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3257,8 +3257,10 @@ static BOOLEAN jjREPART(leftv res, leftv v)
 }
 static BOOLEAN jjRINGLIST(leftv res, leftv v)
 {
-  res->data = (char *)rDecompose((ring)v->Data());
-  return FALSE;
+  ring r=(ring)v->Data();
+  if (r!=NULL)
+    res->data = (char *)rDecompose((ring)v->Data());
+  return (r==NULL);
 }
 static BOOLEAN jjROWS(leftv res, leftv v)
 {
