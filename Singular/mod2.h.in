@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.105 2002-04-24 15:38:30 Singular Exp $
+ *  Version: $Id: mod2.h.in,v 1.106 2003-06-11 21:22:45 krueger Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -135,6 +135,7 @@
 #define S_ROOT_DIR ""
 /* Define to use new namespaces techniks */
 #undef HAVE_NAMESPACES
+#undef HAVE_NS
 /* Define to enable dynamic module code */
 #undef HAVE_DYNAMIC_LOADING
 /* Define to enable plural */
