@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.33 1998-07-01 13:27:15 Singular Exp $ */
+/* $Id: ideals.cc,v 1.34 1998-07-14 07:46:26 siebert Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1238,7 +1238,7 @@ ideal  idPrepare (ideal  h1,ideal  quot, tHomog h,
 {
   ideal   h2, h3;
   int     i;
-  int     j,k;
+  int     j,jj=0,k;
   poly    p,q;
   BOOLEAN orderChanged=FALSE;
 
@@ -1271,32 +1271,42 @@ ideal  idPrepare (ideal  h1,ideal  quot, tHomog h,
     else
       h2->m[j]=q;
   }
-  if ((pOrdSgn!=1) || (h!=TRUE) || (*syzcomp>1)|| (pLexOrder))
+  if (currRing->order[0]!=ringorder_c)
   {
-    pSetSyzComp(*syzcomp);
-    orderChanged=TRUE;
-  }
-  else
-  {
-    for(j=0;(j<IDELEMS(h2) && (!orderChanged));j++)
+    while ((currRing->order[jj]!=0) && (currRing->order[jj]!=ringorder_c)
+           && (currRing->order[jj]!=ringorder_C))
     {
-      if (h2->m[j] != NULL)
+      jj++;
+    }
+    if ((pOrdSgn==1) && (h==TRUE) && (*syzcomp==1) && (!pLexOrder)
+        && (currRing->order[jj]==ringorder_c))
+    {
+      for(j=0;(j<IDELEMS(h2) && (!orderChanged));j++)
       {
-        p=h2->m[j];
-        while ((p!=NULL)
-        && (pGetComp(p)<=*syzcomp))
+        if (h2->m[j] != NULL)
         {
-          if (pIsConstantComp(p))
+          p=h2->m[j];
+          while ((p!=NULL)
+          && (pGetComp(p)<=*syzcomp))
           {
-            pSetSyzComp(*syzcomp);
-            orderChanged=TRUE;
-            break;
+            if (pIsConstantComp(p))
+            {
+              pSetSyzComp(*syzcomp);
+              orderChanged=TRUE;
+              break;
+            }
+            pIter(p);
           }
-          pIter(p);
         }
       }
     }
+    else
+    {
+      pSetSyzComp(*syzcomp);
+      orderChanged=TRUE;
+    }
   }
+
 //  if (orderChanged) PrintS("order changed\n");
 //  else PrintS("order not changed\n");
 #ifdef PDEBUG
