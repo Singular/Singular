@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.43 1998-04-28 08:45:22 pohl Exp $ */
+/* $Id: extra.cc,v 1.44 1998-05-08 14:17:21 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -49,6 +49,9 @@
 #include "syz.h"
 #include "polys.h"
 
+// Define to enable many more system commands
+// #define HAVE_EXTENDED_SYSTEM
+
 #ifdef STDTRACE
 //#include "comm.h"
 #endif
@@ -93,66 +96,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
 {
   if(h->Typ() == STRING_CMD)
   {
-/*==================== lib ==================================*/
-    if(strcmp((char*)(h->Data()),"LIB")==0)
-    {
-#ifdef HAVE_NAMESPACES
-      idhdl hh=namespaceroot->get((char*)h->next->Data(),0);
-#else /* HAVE_NAMESPACES */
-      idhdl hh=idroot->get((char*)h->next->Data(),0);
-#endif /* HAVE_NAMESPACES */
-      if ((hh!=NULL)&&(IDTYP(hh)==PROC_CMD))
-      {
-        res->rtyp=STRING_CMD;
-        res->data=mstrdup(iiGetLibName(IDPROC(hh)));
-        if (res->data==NULL) res->data=mstrdup("");
-        return FALSE;
-      }
-      else
-        Warn("`%s` not found",(char*)h->next->Data());
-    }
-    else
-#ifdef HAVE_NAMESPACES
-/*==================== nspush ===================================*/
-    if(strcmp((char*)(h->Data()),"nspush")==0)
-    {
-      idhdl hh=namespaceroot->get((char*)h->next->Data(),0, TRUE);
-      if ((hh!=NULL)&&(IDTYP(hh)==PACKAGE_CMD))
-      {
-	namespaceroot = namespaceroot->push(IDPACKAGE(hh), IDID(hh));
-	return FALSE;
-      } else
-        Warn("package `%s` not found",(char*)h->next->Data());
-    }
-    else
-/*==================== nspop ====================================*/
-    if(strcmp((char*)(h->Data()),"nspop")==0)
-    {
-      namespaceroot->pop();
-      return FALSE;
-    }
-    else
-/*==================== nsstack ===================================*/
-    if(strcmp((char*)(h->Data()),"nsstack")==0)
-    {
-      namehdl nshdl = namespaceroot;
-      for( ; nshdl->isroot != TRUE; nshdl = nshdl->next) {
-	Print("NSstack: %s:%d\n", nshdl->name, nshdl->lev);
-      }
-      Print("NSstack: %s:%d\n", nshdl->name, nshdl->lev);
-      return FALSE;
-    }
-    else
-#endif /* HAVE_NAMESPACES */
-/*==================== proclist =================================*/
-    if(strcmp((char*)(h->Data()),"proclist")==0)
-    {
-      //res->rtyp=STRING_CMD;
-      //res->data=(void *)mstrdup("");
-      piShowProcList();
-      return FALSE;
-    }
-    else
+// ONLY documented system calls go here
+// Undocumented system calls go down into #ifdef HAVE_EXTENDED_SYSTEM
 /*==================== version ==================================*/
     if(strcmp((char*)(h->Data()),"version")==0)
     {
@@ -161,36 +106,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
-#ifdef HAVE_DYNAMIC_LOADING
-/*==================== load ==================================*/
-    if(strcmp((char*)(h->Data()),"load")==0)
-    {
-      if ((h->next!=NULL) && (h->next->Typ()==STRING_CMD)) {
-	int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
-		       BOOLEAN(*func)(leftv res, leftv v));
-        int (*fktn)(int(*iiAddCproc)(char *libname, char *procname,
-				     BOOLEAN pstatic,
-				     BOOLEAN(*func)(leftv res, leftv v)));
-        void *vp;
-        res->rtyp=STRING_CMD;
-
-        fprintf(stderr, "Loading %s\n", h->next->Data());
-        res->data=(void *)mstrdup("");
-        if((vp=dlopen(h->next->Data(),RTLD_LAZY))==(void *)NULL) {
-          WerrorS("dlopen failed");
-          Werror("%s not found", h->next->Data());
-        } else {
-          fktn = dlsym(vp, "mod_init");
-          if( fktn!= NULL) (*fktn)(iiAddCproc);
-          else Werror("mod_init: %s\n", dlerror());
-          piShowProcList();
-        }
-        return FALSE;
-      }
-      else WerrorS("string expected");
-    }
-    else
-#endif /* HAVE_DYNAMIC_LOADING */
 /*==================== gen ==================================*/
     if(strcmp((char*)(h->Data()),"gen")==0)
     {
@@ -366,16 +281,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
       }
     }
     else
-/*==================== print all option values =================*/
-#ifndef NDEBUG
-    if (strcmp((char*)(h->data), "OptionValues") == 0)
-    {
-      void mainOptionValues();
-      mainOptionValues();
-      return FALSE;
-    }
-    else
-#endif
 /*==================== HC ==================================*/
     if (strcmp((char*)(h->data),"HC")==0)
     {
@@ -397,10 +302,17 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
 #endif
         return FALSE;
       }
-      else
+      else if (h->next != NULL)
+      {
         WerrorS("int expected");
+        return TRUE;
+      }
+      res->rtyp=INT_CMD;
+      res->data=(void*) siRandomStart;
+      return FALSE;
     }
-    else
+#ifdef HAVE_EXTENDED_SYSTEM
+// You can put your own system calls here
 /*==================== LaScala ==================================*/
     if(strcmp((char*)(h->Data()),"LaScala")==0)
     {
@@ -687,37 +599,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     }
     else
 #endif
-/*==================== divcount & mcount =============================*/
-#ifdef MONOM_COUNT
-    if (strcmp((char*)(h->Data()),"mcount")==0)
-    {
-      extern void OutputMonomCount();
-      OutputMonomCount();
-      return FALSE;
-    }
-    else if (strcmp((char*)(h->Data()),"mreset")==0)
-    {
-      extern void ResetMonomCount();
-      ResetMonomCount();
-      return FALSE;
-    }
-    else
-#endif
-#ifdef DIV_COUNT
-    if (strcmp((char*)(h->Data()),"dcount")==0)
-    {
-      extern void OutputDivCount();
-      OutputDivCount();
-      return FALSE;
-    }
-    else if (strcmp((char*)(h->Data()),"dreset")==0)
-    {
-      extern void ResetDivCount();
-      ResetDivCount();
-      return FALSE;
-    }
-    else
-#endif
 /*==================== barstep =============================*/
     if(strcmp((char*)(h->Data()),"barstep")==0)
     {
@@ -779,7 +660,107 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     }
     else
 #endif
-      
+/*==================== lib ==================================*/
+    if(strcmp((char*)(h->Data()),"LIB")==0)
+    {
+#ifdef HAVE_NAMESPACES
+      idhdl hh=namespaceroot->get((char*)h->next->Data(),0);
+#else /* HAVE_NAMESPACES */
+      idhdl hh=idroot->get((char*)h->next->Data(),0);
+#endif /* HAVE_NAMESPACES */
+      if ((hh!=NULL)&&(IDTYP(hh)==PROC_CMD))
+      {
+        res->rtyp=STRING_CMD;
+        res->data=mstrdup(iiGetLibName(IDPROC(hh)));
+        if (res->data==NULL) res->data=mstrdup("");
+        return FALSE;
+      }
+      else
+        Warn("`%s` not found",(char*)h->next->Data());
+    }
+    else
+#ifdef HAVE_NAMESPACES
+/*==================== nspush ===================================*/
+    if(strcmp((char*)(h->Data()),"nspush")==0)
+    {
+      idhdl hh=namespaceroot->get((char*)h->next->Data(),0, TRUE);
+      if ((hh!=NULL)&&(IDTYP(hh)==PACKAGE_CMD))
+      {
+	namespaceroot = namespaceroot->push(IDPACKAGE(hh), IDID(hh));
+	return FALSE;
+      } else
+        Warn("package `%s` not found",(char*)h->next->Data());
+    }
+    else
+/*==================== nspop ====================================*/
+    if(strcmp((char*)(h->Data()),"nspop")==0)
+    {
+      namespaceroot->pop();
+      return FALSE;
+    }
+    else
+/*==================== nsstack ===================================*/
+    if(strcmp((char*)(h->Data()),"nsstack")==0)
+    {
+      namehdl nshdl = namespaceroot;
+      for( ; nshdl->isroot != TRUE; nshdl = nshdl->next) {
+	Print("NSstack: %s:%d\n", nshdl->name, nshdl->lev);
+      }
+      Print("NSstack: %s:%d\n", nshdl->name, nshdl->lev);
+      return FALSE;
+    }
+    else
+#endif /* HAVE_NAMESPACES */
+/*==================== proclist =================================*/
+    if(strcmp((char*)(h->Data()),"proclist")==0)
+    {
+      //res->rtyp=STRING_CMD;
+      //res->data=(void *)mstrdup("");
+      piShowProcList();
+      return FALSE;
+    }
+    else
+#ifdef HAVE_DYNAMIC_LOADING
+/*==================== load ==================================*/
+    if(strcmp((char*)(h->Data()),"load")==0)
+    {
+      if ((h->next!=NULL) && (h->next->Typ()==STRING_CMD)) {
+	int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
+		       BOOLEAN(*func)(leftv res, leftv v));
+        int (*fktn)(int(*iiAddCproc)(char *libname, char *procname,
+				     BOOLEAN pstatic,
+				     BOOLEAN(*func)(leftv res, leftv v)));
+        void *vp;
+        res->rtyp=STRING_CMD;
+
+        fprintf(stderr, "Loading %s\n", h->next->Data());
+        res->data=(void *)mstrdup("");
+        if((vp=dlopen(h->next->Data(),RTLD_LAZY))==(void *)NULL) {
+          WerrorS("dlopen failed");
+          Werror("%s not found", h->next->Data());
+        } else {
+          fktn = dlsym(vp, "mod_init");
+          if( fktn!= NULL) (*fktn)(iiAddCproc);
+          else Werror("mod_init: %s\n", dlerror());
+          piShowProcList();
+        }
+        return FALSE;
+      }
+      else WerrorS("string expected");
+    }
+    else
+#endif /* HAVE_DYNAMIC_LOADING */
+/*==================== print all option values =================*/
+#ifndef NDEBUG
+    if (strcmp((char*)(h->data), "options") == 0)
+    {
+      void mainOptionValues();
+      mainOptionValues();
+      return FALSE;
+    }
+    else
+#endif
+#endif // HAVE_EXTENDED_SYSTEM
 /*============================================================*/
       WerrorS( feNotImplemented );
   }
