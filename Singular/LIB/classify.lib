@@ -1,42 +1,31 @@
-// $Id: classify.lib,v 1.12 1997-08-15 07:46:44 krueger Exp $
-//=============================================================================
+// $Id: classify.lib,v 1.13 1997-09-26 08:14:35 krueger Exp $
 //
-// Please send bugs and comments to krueger@mathematik.uni-kl.de
+//  A library for the classification of isolated hypersurface singularities
+//  with respect to right equivalence. Based on the determinator of 
+//  singularities by V.I. Arnold.
+//  Author: Kai Krueger, (ev. Post Adresse)
+//  Please send bugs and comments to krueger@mathematik.uni-kl.de
+//  last modified: 
 //
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 
-LIBRARY:  classify.lib
+LIBRARY:  classify.lib  PROCEDURES FOR THE ARNOLD-CLASSIFIER OF SINGULARITIES  
 
- classify(f);            compute the Class of f.
+classify(f);         normal form of poly f determined with Arnold's method
+quickclass(f)        normal form of f determined by invariants (milnorcode)
+corank(f);           computes the corank of f (i.e. of the Hessian of f) 
+basicinvariants(f);  computes Milnor number, determinacy-bound and corank of f
+milnorcode(f[,e]);   Hilbert poly of [e-th] Milnor algebra coded with Hcode
+Hcode(v);            coding of intvec v acoording to the number repetitions 
+morsesplit(f);       residual part of f after applying the splitting lemma
+tschirnhaus(f,v);    Tschirnhaus transformation of f w.r.t. variable v
+singinfo(N,[k,]);    info about singularity given by its name N and index k
+singularity(s,[]);   normal form of singularity given by its name s and index  
+init_debug([n]);     print trace and debugging information depending on int n  
+internalfunctions(); display names of internal procedures of this library 
+(parameters in square brackets [] are optional)
 
-LIBRARY:  Kclass.lib
-  Klassifiziere(poly f);             determine the typ of the singularity f
-  Funktion1bis(poly f, int corank);  (for internal use only)
-  Funktion3(poly f, int corank);     (for internal use only)
-  Funktion6(poly f, int corank);     (for internal use only)
-  Funktion13(poly f, int corank);    (for internal use only)
-  Funktion17(poly f, int corank);    (for internal use only)
-  Funktion25(poly f, int corank);    (for internal use only)
-  Funktion40(poly f, int corank);    (for internal use only)
-  Funktion50(poly f, int corank);    (for internal use only)
-  Funktion51(poly f, int corank);    (for internal use only)
-  Funktion52(poly f, int corank);    (for internal use only)
-  Funktion54(poly f, int corank);    (for internal use only)
-  Funktion56(poly f, int corank);    (for internal use only)
-  Funktion58(poly f, int corank);    (for internal use only)
-  Funktion59(poly f, int corank);    (for internal use only)
-  Funktion66(poly f, int corank);    (for internal use only)
-  Funktion82(poly f, int corank);    (for internal use only)
-  Funktion83(poly f, int corank);    (for internal use only)
-  Funktion97(poly f, int corank);    (for internal use only)
-  Funktion103(poly f, int corank);   (for internal use only)
-  Funktion104(poly f, int corank);   (for internal use only)
-  Funktion105(poly f, int corank);   (for internal use only)
-  FunktionNoClass(poly f, int corank);  (for internal use only)
-  Isomorphie_s82_x(poly f, poly fk, int k); (for internal use only)
-  Isomorphie_s82_z(poly f, poly fk, int k); (for internal use only)
-  Tschirnhaus(poly f, int corank);   (for internal use only)
-  Isomorphie_s17 (poly f, poly fk, int k, int ct);
+LIB "inout.lib";
 
 // required libraries
 
@@ -45,11 +34,13 @@ LIB "tools.lib";
 LIB "nflist.lib";
 LIB "hilbert.lib";
 
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
+//--------------------------- output ------------------------------------------
+///////////////////////////////////////////////////////////////////////////////
 //=============================================================================
 // TopLevel Funktion of the Arnold-Classifier.
 //
-proc classify (poly @f_in)
+proc classify (poly f_in)
 USAGE:    classify(f);  f=poly
 COMPUTE:  Normalform and singularity type of f
 RETURN:   Normalform of f
@@ -58,7 +49,7 @@ REMARK:   This version of classify is only alpha.
           Please send bugs and comments to:
           "Kai Krueger" <krueger@mathematik.uni-kl.de>
 NOTE:     The procedure init_debug(n); is usefull as trace-mode.
-	  n may range from 0 to 10, higher values of n give more information.
+          n may range from 0 to 10, higher values of n give more information.
 {
 //         or set the shell-variable SG_DEBUG to the debugging level.
   if(system("version")<922) {
@@ -72,7 +63,7 @@ NOTE:     The procedure init_debug(n); is usefull as trace-mode.
   int CharOfRing = char(basering);
   export CharOfRing;
 
-  if(checkring()) { return(@f_in); }
+  if(checkring()) { return(f_in); }
   int @show_nf = 1;    // return normal form if set to '1'
 
   int @n = nvars(basering);
@@ -103,7 +94,7 @@ NOTE:     The procedure init_debug(n); is usefull as trace-mode.
   string @s1;
   string @s2;
   string @s4;
-  @s1,@s2=Klassifiziere(@Conv(@f_in));
+  @s1,@s2=Klassifiziere(@Conv(f_in));
   // @s1: f nach saemtlichen Koordinatentransformationen
   // @s2: Typ des Polynoms f z.b: E[18]
   @s4 = "poly @f_out="+@s1+";";
@@ -114,7 +105,7 @@ NOTE:     The procedure init_debug(n); is usefull as trace-mode.
     if( @s2 != "Fehler!") { @s2; }
     if(@s1=="1" || @s2[1,4]=="The " || @s2=="Fehler!" ) { 
       setring ring_top;
-      return(@f_in);
+      return(f_in);
     }
     setring Rtop;
     execute @s4;
@@ -154,45 +145,6 @@ example
 }
 //=============================================================================
 // Id: Kclass.lib,v 1.12 1997/08/13 17:21:05 krueger Exp 
-/=============================================================================
-//
-// Please send bugs and comments to krueger@mathematik.uni-kl.de
-//
-//=============================================================================
-
-//=========================================================================
-proc Kclass_lib
-{
-"
-  Klassifiziere(poly f);             determine the typ of the singularity f
-  Funktion1bis(poly f, int corank);  (for internal use only)
-  Funktion3(poly f, int corank);     (for internal use only)
-  Funktion6(poly f, int corank);     (for internal use only)
-  Funktion13(poly f, int corank);    (for internal use only)
-  Funktion17(poly f, int corank);    (for internal use only)
-  Funktion25(poly f, int corank);    (for internal use only)
-  Funktion40(poly f, int corank);    (for internal use only)
-  Funktion50(poly f, int corank);    (for internal use only)
-  Funktion51(poly f, int corank);    (for internal use only)
-  Funktion52(poly f, int corank);    (for internal use only)
-  Funktion54(poly f, int corank);    (for internal use only)
-  Funktion56(poly f, int corank);    (for internal use only)
-  Funktion58(poly f, int corank);    (for internal use only)
-  Funktion59(poly f, int corank);    (for internal use only)
-  Funktion66(poly f, int corank);    (for internal use only)
-  Funktion82(poly f, int corank);    (for internal use only)
-  Funktion83(poly f, int corank);    (for internal use only)
-  Funktion97(poly f, int corank);    (for internal use only)
-  Funktion103(poly f, int corank);   (for internal use only)
-  Funktion104(poly f, int corank);   (for internal use only)
-  Funktion105(poly f, int corank);   (for internal use only)
-  FunktionNoClass(poly f, int corank);  (for internal use only)
-  Isomorphie_s82_x(poly f, poly fk, int k); (for internal use only)
-  Isomorphie_s82_z(poly f, poly fk, int k); (for internal use only)
-  Tschirnhaus(poly f, int corank);   (for internal use only)
-";
-}
-
 //=============================================================================
 proc Klassifiziere (poly @f)
 USAGE:    Klassifiziere(f);
@@ -202,7 +154,7 @@ USAGE:    Klassifiziere(f);
 // Warum hier init() noch einmal, keine Ahnung.
 // Wenn nicht geht's einfach nicht. Hans fragen!
   init(1);
-  int  @n = nvars(basering);	// Zahl der Variablen des aktuellen Rings.
+  int  @n = nvars(basering);    // Zahl der Variablen des aktuellen Rings.
 
   // Define always 'RingDisplay' to be able to run 'Show(f)'
   if( defined(RingDisplay) == 0) { 
@@ -217,11 +169,11 @@ USAGE:    Klassifiziere(f);
 
   //
   @s1 = "ring RingB="+string(CharOfRing)+",("+A_Z("x", @n)+"),ds;";
-  execute @s1;			// in diesem Ring werden Polynome angezeigt.
+  execute @s1;                  // in diesem Ring werden Polynome angezeigt.
   @s1 = "map ShowPoly=Rtop,"+A_Z("x", @n)+";";
-  execute @s1;			// Hiermit werden Polynome angezeigt.
+  execute @s1;                  // Hiermit werden Polynome angezeigt.
   export ShowPoly;
-  setring Rtop;			// in den Ausgangs-ring zurueck.
+  setring Rtop;                 // in den Ausgangs-ring zurueck.
   export RingB;
 
   //===============================================
@@ -273,7 +225,7 @@ USAGE:    Klassifiziere(f);
   if(CoRang == 3) { return(Funktion1bis(@f, CoRang)); }
   return(Funktion105(@f, CoRang));
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion1bis (poly @f, int corank)
 USAGE:    Funktion1bis();
 { // pruefe ob abspaltung von Quadraten noetig, wenn ja tue dies.
@@ -324,7 +276,7 @@ USAGE:    Funktion1bis();
   if(corank == 3) { return(Funktion50(@G, corank)); }
   return("","Fehler!");
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion3 (poly @f, int corank);
 USAGE:    Funktion3();
 { 
@@ -343,23 +295,23 @@ USAGE:    Funktion3();
     if( mult(@Jf) == 1) { return(Funktion5(@f, corank)); } // D[k]
     if( mult(@Jf) == 2) { return(Funktion6(@f, corank)); } // E[k], J
     "dimension 1 und deg != 1, 2 => error, this should never occur";
-    return("", "Fehler!");	// Should never occur
+    return("", "Fehler!");      // Should never occur
   }
-  return("", "Fehler!");	// Should never occur
+  return("", "Fehler!");        // Should never occur
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 //proc Funktion6 - put here
 proc Funktion6 (poly @f, int corank)
 USAGE:    Funktion6()
 { 
-  int @n = nvars(basering);	// Zahl der Ringvariablen
-  poly @f3 = jet(@f, 3);	// 3-Jet von f
-  poly @fk;			// k-Jet von f mit Gewichten
-  ideal @JetId;			// Ideal fuer Gewichteten Jet
-  ideal @Jf;			// jacob(@fk)
-  int  @Dim;			// dim(@Jf)
-  int  @Mult;			// mult(@Jf)
-  int @k = 1;			//
+  int @n = nvars(basering);     // Zahl der Ringvariablen
+  poly @f3 = jet(@f, 3);        // 3-Jet von f
+  poly @fk;                     // k-Jet von f mit Gewichten
+  ideal @JetId;                 // Ideal fuer Gewichteten Jet
+  ideal @Jf;                    // jacob(@fk)
+  int  @Dim;                    // dim(@Jf)
+  int  @Mult;                   // mult(@Jf)
+  int @k = 1;                   //
 
   debug_log(1, "   Schritt 6");
 
@@ -419,12 +371,12 @@ USAGE:    Funktion6()
   }
   return("","Fehler!");
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 //proc Funktion13 - put here
 //=========================================================================
 // Id: lib_WorkOn,v 1.8 1995/01/27 12:53:11 krueger Exp
 //
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 //
 
 //=========================================================================
@@ -454,8 +406,8 @@ USAGE:    Funktion13();
   } 
   return("","Fehler!");
 }
-//=============================================================================
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion17 (poly @f, int corank)
 USAGE:    Funktion17();
 { // Analog zu Fumktion 6
@@ -473,7 +425,7 @@ USAGE:    Funktion17();
     debug_log(1, "Schritt 18(", @p, ")");
     @f = Isomorphie_s17(@f, @fk, @p, 1);
     if ( @p>1) {
-      @JetId = x(1)^3*x(2) + x(2)^(3*@p); 	// weight(@JetId);
+      @JetId = x(1)^3*x(2) + x(2)^(3*@p);       // weight(@JetId);
       @fk = jet(@f, 3*@p, weight(@JetId));
     }
     // Z[6p+5]
@@ -505,7 +457,7 @@ USAGE:    Funktion17();
   }
   return("","Fehler!");
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion25 (poly @f, int CoRang)
 USAGE:    Funktion25();
 {
@@ -593,7 +545,7 @@ USAGE:    Funktion25();
   }  // Ende der While-Schleife
   return("","Fehler!"):
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion40  (poly @f, int @k)
 USAGE:    Funktion40();
 {
@@ -677,15 +629,15 @@ USAGE:    Funktion40();
  if( @Typ == "J[k,r]" ) { return(Funktion45(@f, @k, @r, @sr)); }
  return("","Fehler!");
 }
-//=============================================================================
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 //proc Funktion50 - put here
 //=========================================================================
 // Id: lib_WorkOn,v 1.6 1995/08/29 18:04:09 krueger Exp
 //
 // Please send bugs and comments to krueger@mathematik.uni-kl.de
 //
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 
 LIB "elim.lib";
 
@@ -736,7 +688,7 @@ USAGE:    Funktion50();
 
   return("","Fehler!");
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion51 (poly @f, int @k)
 USAGE:    Funktion51();
 {
@@ -747,7 +699,7 @@ USAGE:    Funktion51();
   @s+"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion52 (poly @f, int @k)
 USAGE:    Funktion52();
 {
@@ -759,7 +711,7 @@ USAGE:    Funktion52();
   @s+"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion54 (poly @f, int @k)
 USAGE:    Funktion54();
 {
@@ -771,7 +723,7 @@ USAGE:    Funktion54();
   @s+"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion56 (poly @f, int @k)
 USAGE:    Funktion56();
 {
@@ -783,7 +735,7 @@ USAGE:    Funktion56();
   @s+"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion58 (poly @fin, int @k)
 USAGE:    Funktion58();
 {
@@ -883,14 +835,14 @@ USAGE:    Funktion58();
   "f3,s3=", Show(@f3);
 
 //--------------------------------------------------------------
-// fuehre nun Tschirnhaus in der Variablen 'z' durch und erhalte
+// fuehre nun tschirnhaus in der Variablen 'z' durch und erhalte
 // f = f_1(x,y,z)y^2 + z^3
 //
   "2) x=", @kx, "  y=", @ky, "  z=", @kz;
   @C = Coeffs(@f3, x(@kx)); 
   @fb=@C[2,1];	// Coeff von x^1
   @fc=@C[1,1];	// Coeff von x^0
-  @fc, VERT = Tschirnhaus(@fc, x(@kz));
+  @fc, VERT = tschirnhaus(@fc, x(@kz));
   VERT;
   @f = VERT(@f);
   "-------------------------------------";
@@ -956,7 +908,7 @@ USAGE:    Funktion58();
   return(Funktion59(@f, @k));
 }
 
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion59 (poly @f, int @k)
 USAGE:    Funktion59();
 {
@@ -1030,7 +982,7 @@ USAGE:    Funktion59();
   return(Show(@f), @tp);
 }
 
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion66 (poly @f, int @k)
 USAGE:    Funktion66();
 {
@@ -1057,7 +1009,7 @@ USAGE:    Funktion66();
   @JetId = std(@JetId);
   "nach z:",Show(@fz), "  Id=", @JetId, "  Dim=", dim(@JetId);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion82 (poly @f, int @k)
 USAGE:    Funktion82();
 {
@@ -1128,17 +1080,17 @@ debug_log(2, @C);
 debug_log(2, @C);
 debug_log(2, "Fall: ", @Fall, "  x=", @kx, "  z=", @kz);
     map VERT;
-    if(@Fall == 2) { @b1, VERT = Tschirnhaus(@f3/x(@kz), x(@kx)); }
+    if(@Fall == 2) { @b1, VERT = tschirnhaus(@f3/x(@kz), x(@kx)); }
     else { 
-      @b1, VERT = Tschirnhaus(@f3/x(@kx), x(@kx));
+      @b1, VERT = tschirnhaus(@f3/x(@kx), x(@kx));
       debug_log(2, "B1=", Show(jet(VERT(@f),3)));
-      @b2, VERT = Tschirnhaus(@f3/x(@kz), x(@kz));
+      @b2, VERT = tschirnhaus(@f3/x(@kz), x(@kz));
       debug_log(2, "B2=", Show(jet(VERT(@f),3)));
     }
     @f = VERT(@f);
     @f3 = jet(@f,3);
     debug_log(2, "2)f3=", Show(@f3));
-//  @f3, VERT = Tschirnhaus(@f3, x(1));
+//  @f3, VERT = tschirnhaus(@f3, x(1));
     debug_log(2, "3)f3=", Show(jet(@f,3)));
 //  }
 
@@ -1148,7 +1100,7 @@ debug_log(2, "Fall: ", @Fall, "  x=", @kx, "  z=", @kz);
   }
   return("", "Fehler");
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Isomorphie_s82_z (poly @f, poly @fk, int @p)
 USAGE:    Isomorphie_s82_z();
 {
@@ -1172,7 +1124,7 @@ USAGE:    Isomorphie_s82_z();
   return(@f);
 }
 
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Isomorphie_s82_x (poly @f, poly @fk, int @p)
 USAGE:    Isomorphie_s82_x();
 {
@@ -1196,7 +1148,7 @@ USAGE:    Isomorphie_s82_x();
 
   return(@f);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion83 (poly @f, int @k)
 USAGE:    Funktion83();
 {
@@ -1284,7 +1236,7 @@ debug_log(2, "90 - ft="+Show(@fk)+" Dim="+string(@Dim)+" mult="+string(@Mult));
   return("", "Fehler");
 }
 
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion97 (poly @f, int @K)
 USAGE:    Funktion97();
 {
@@ -1378,25 +1330,25 @@ USAGE:    Funktion97();
   " Dim=",@Dim," Dim2=",dim(@j2)," Mult=",@Mult," Mult2=",mult(@j2);
   return(Show(@f), "V[k,r]");
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion103 (poly @f)
 USAGE:    Funktion103();
 {
   return(FunktionNoClass(@f,"3-jet = x3"));
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion104 (poly @f)
 USAGE:    Funktion104();
 {
   return(FunktionNoClass(@f));
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion105 (poly @f);
 USAGE:    Funktion105();
 {
   return(FunktionNoClass(@f));
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc FunktionNoClass (poly @f, list #)
 USAGE:    FunktionNoClass();
 
@@ -1410,15 +1362,15 @@ USAGE:    FunktionNoClass();
 
   return(Show(@f), @s);
 }
-//=============================================================================
-//=============================================================================
-proc Tschirnhaus (poly @f, poly @x)
-USAGE:    Tschirnhaus();
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+proc tschirnhaus (poly @f, poly @x)
+USAGE:    tschirnhaus();
 {
   int @n = nvars(basering);
   int @j;
 
-// "Tschirnhaus fuer:", Show(@f);
+// "tschirnhaus fuer:", Show(@f);
   matrix @cf = coeffs(@f, @x);
   int @hc = nrows(@cf) - 1;	// hoechster exponent von x_i
   poly @b = @cf[@hc+1,1];	// koeffizient von x_i^hc
@@ -1439,8 +1391,8 @@ USAGE:    Tschirnhaus();
   map @Phi =basering, @B;
   return(@Phi(@f), @Phi);
 }
-//=============================================================================
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 proc Isomorphie_s17 (poly @f, poly @fk, int @k, int @ct)
 USAGE:    Isomorphie_s17();
 {
@@ -1594,61 +1546,16 @@ USAGE:    Isomorphie_s17();
 //
 // Please send bugs and comments to krueger@mathematik.uni-kl.de
 //
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 // required libraries
 
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 // required by 
 // LIB "Classify.lib"
 // LIB "Kclass.lib"
 
-//=========================================================================
-proc Ausgaben_lib
-{
-"
-  Funktion2(poly f,int k);	(for internal use only)
-  Funktion4(poly f,int k);	(for internal use only)
-  Funktion5(poly f,int k);	(for internal use only)
-  Funktion7(poly f,int k);	(for internal use only)
-  Funktion8(poly f,int k);	(for internal use only)
-  Funktion9(poly f,int k);	(for internal use only)
-  Funktion11(poly f,int k);	(for internal use only)
-  Funktion12(poly f,int k);	(for internal use only)
-  Funktion14(poly f,int k);	(for internal use only)
-  Funktion15(poly f,int k);	(for internal use only)
-  Funktion16(poly f,int k);	(for internal use only)
-  Funktion19(poly f,int k);	(for internal use only)
-  Funktion20(poly f,int k);	(for internal use only)
-  Funktion21(poly f,int k);	(for internal use only)
-  Funktion23(poly f,int k);	(for internal use only)
-  Funktion24(poly f,int k);	(for internal use only)
-  Funktion27(poly f,int k);	(for internal use only)
-  Funktion28(poly f,int k);	(for internal use only)
-  Funktion30(poly f,int k);	(for internal use only)
-  Funktion31(poly f,int k);	(for internal use only)
-  Funktion32(poly f,int k);	(for internal use only)
-  Funktion34(poly f,int k);	(for internal use only)
-  Funktion35(poly f,int k);	(for internal use only)
-  Funktion37(poly f,int k);	(for internal use only)
-  Funktion38(poly f,int k);	(for internal use only)
-  Funktion39(poly f,int k);	(for internal use only)
-  Funktion42(poly f,int k);	(for internal use only)
-  Funktion43(poly f,int k);	(for internal use only)
-  Funktion44(poly f,int k);	(for internal use only)
-  Funktion45(poly f,int k);	(for internal use only)
-  Funktion47(poly f,int k);	(for internal use only)
-  Funktion60(poly f,int k);	(for internal use only)
-  Funktion61(poly f,int k);	(for internal use only)
-  Funktion62(poly f,int k);	(for internal use only)
-  Funktion64(poly f,int k);	(for internal use only)
-  Funktion65(poly f,int k);	(for internal use only)
-  Funktion100(poly f,int k);	(for internal use only)
-  Funktion101(poly f,int k);	(for internal use only)
-";
-}
-
-//=============================================================================
-proc Funktion2
+///////////////////////////////////////////////////////////////////////////////
+proc Funktion2 (poly @f, int corank)
 USAGE:    
 { 
   poly @f = #[1];
@@ -1661,7 +1568,7 @@ USAGE:
 //  Morse(@f, Kbestimmt(@f));
   return(string(x^(Mu+1)), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion4
 USAGE:    
 { 
@@ -1673,7 +1580,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion5
 USAGE:    
 { 
@@ -1685,7 +1592,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion7
 USAGE:    
 {
@@ -1699,7 +1606,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion8
 USAGE:    
 {
@@ -1713,7 +1620,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion9
 USAGE:    
 {
@@ -1727,7 +1634,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion11
 USAGE:    
 {
@@ -1741,7 +1648,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion12
 USAGE:    
 {
@@ -1756,7 +1663,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion14
 USAGE:    
 {
@@ -1769,7 +1676,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion15
 USAGE:    
 {
@@ -1783,7 +1690,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion16
 USAGE:    
 {
@@ -1799,7 +1706,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion19
 USAGE:    
 {
@@ -1812,7 +1719,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion20
 USAGE:    
 {
@@ -1825,7 +1732,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion21
 USAGE:    
 {
@@ -1838,7 +1745,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion23
 USAGE:    
 {
@@ -1851,7 +1758,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion24
 USAGE:    
 {
@@ -1865,7 +1772,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion27
 USAGE:    
 { 
@@ -1878,7 +1785,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion28 
 USAGE:    
 {
@@ -1891,7 +1798,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion30 
 USAGE:    
 { 
@@ -1904,7 +1811,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion31 
 USAGE:    
 {
@@ -1918,7 +1825,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion32 
 USAGE:    
 {
@@ -1932,7 +1839,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion34 
 USAGE:    
 {
@@ -1945,7 +1852,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion35 
 USAGE:    
 {
@@ -1958,7 +1865,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion37 
 USAGE:    
 {
@@ -1971,7 +1878,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion38 
 USAGE:    
 {
@@ -1985,7 +1892,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion39
 USAGE:    
 {
@@ -1998,7 +1905,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion42
 USAGE:    
 {
@@ -2012,7 +1919,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion43
 USAGE:    
 {
@@ -2026,7 +1933,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion44
 USAGE:    
 {
@@ -2040,7 +1947,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion45
 USAGE:    
 {
@@ -2055,7 +1962,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion47
 USAGE:    
 {
@@ -2071,7 +1978,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion60
 USAGE:    
 {
@@ -2084,7 +1991,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion61
 USAGE:    
 {
@@ -2097,7 +2004,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion62
 USAGE:    
 {
@@ -2110,7 +2017,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion64
 USAGE:    
 {
@@ -2123,7 +2030,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion65
 USAGE:    
 {
@@ -2137,7 +2044,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion84
 USAGE:    
 {
@@ -2147,7 +2054,7 @@ USAGE:
 
   return(FunktionNoClass(#[1]));
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion86
 USAGE:    
 {
@@ -2157,7 +2064,7 @@ USAGE:
 
   return(FunktionNoClass(#[1]));
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion87
 USAGE:    
 {
@@ -2167,7 +2074,7 @@ USAGE:
 
   return(FunktionNoClass(#[1]));
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion89
 USAGE:    
 {
@@ -2177,7 +2084,7 @@ USAGE:
 
   return(FunktionNoClass(#[1]));
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion100
 USAGE:    
 {
@@ -2191,7 +2098,7 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
 proc Funktion101
 USAGE:    
 {
@@ -2205,5 +2112,102 @@ USAGE:
   @s; // +"  ("+SG_Typ+")";
   return(Show(@f), @tp);
 }
-//=============================================================================
+///////////////////////////////////////////////////////////////////////////////
+proc internalfunctions
+USAGE:   internalfunctions();
+RETURN:  nothing, display names of internal procedures of classify.lib
+EXAMPLE: no example
+{ "   Internal functions for the classification unsing Arnold's method:
+  Klassifiziere(poly f);             determine the typ of the singularity f
+  Funktion1bis (poly @f, int corank)
+  Funktion2 (poly f,int k)
+  Funktion3 (poly @f, int corank);
+  Funktion4 (poly f,int k)
+  Funktion5 (poly f,int k)
+  Funktion6 (poly @f, int corank)
+  Funktion7 (poly f,int k)
+  Funktion8 (poly f,int k)
+  Funktion9 (poly f,int k)
+  Funktion11 (poly f,int k)
+  Funktion12 (poly f,int k)
+  Funktion13 (poly @f, int corank)
+  Funktion14 (poly f,int k)
+  Funktion15 (poly f,int k)
+  Funktion16 (poly f,int k)
+  Funktion17 (poly @f, int corank)
+  Funktion19 (poly f,int k)
+  Funktion20 (poly f,int k)
+  Funktion21 (poly f,int k)
+  Funktion23 (poly f,int k)
+  Funktion24 (poly f,int k)
+  Funktion25 (poly @f, int CoRang)
+  Funktion27 (poly f,int k)
+  Funktion28 (poly f,int k)
+  Funktion30 (poly f,int k)
+  Funktion31 (poly f,int k)
+  Funktion32 (poly f,int k)
+  Funktion34 (poly f,int k)
+  Funktion35 (poly f,int k)
+  Funktion37 (poly f,int k)
+  Funktion38 (poly f,int k)
+  Funktion39 (poly f,int k)
+  Funktion40 (poly @f, int @k)
+  Funktion42 (poly f,int k)
+  Funktion43 (poly f,int k)
+  Funktion44 (poly f,int k)
+  Funktion45 (poly f,int k)
+  Funktion47 (poly f,int k)
+  Funktion50 (poly @f, int corank)
+  Funktion51 (poly @f, int @k)
+  Funktion52 (poly @f, int @k)
+  Funktion54 (poly @f, int @k)
+  Funktion56 (poly @f, int @k)
+  Funktion58 (poly @fin, int @k)
+  Funktion59 (poly @f, int @k)
+  Funktion60 (poly f,int k)
+  Funktion61 (poly f,int k)
+  Funktion62 (poly f,int k)
+  Funktion64 (poly f,int k)
+  Funktion65 (poly f,int k)
+  Funktion66 (poly @f, int @k)
+  Funktion82 (poly @f, int @k)
+  Funktion83 (poly @f, int @k)
+  Funktion84 (poly f,int k)
+  Funktion86 (poly f,int k)
+  Funktion87 (poly f,int k)
+  Funktion89 (poly f,int k)
+  Funktion97 (poly @f, int @K)
+  Funktion100 (poly f,int k)
+  Funktion101 (poly f,int k)
+
+  Funktion103(poly f, int corank);
+  Funktion104(poly f, int corank);
+  Funktion105(poly f, int corank);
+  FunktionNoClass(poly f, int corank);
+  Isomorphie_s82_x(poly f, poly fk, int k);
+  Isomorphie_s82_z(poly f, poly fk, int k);
+  tschirnhaus(poly f, int corank);
+  Isomorphie_s17 (poly f, poly fk, int k, int ct);
+  ";
+  "   Internal functions for the classifcation by invariants:
+  ";
+  "   Internal functions for the Morse-splitting lemma:
+  ";
+  "   Internal functions providing tools:
+  ";
+}
+///////////////////////////////////////////////////////////////////////////////
 // E n d   O f   F i l e
+//proc Ausgaben_lib
+//proc Funktion103 (poly @f)
+//proc Funktion104 (poly @f)
+//proc Funktion105 (poly @f);
+
+//proc FunktionNoClass (poly @f, list #)
+//proc Isomorphie_s17 (poly @f, poly @fk, int @k, int @ct)
+//proc Isomorphie_s82_x (poly @f, poly @fk, int @p)
+//proc Isomorphie_s82_z (poly @f, poly @fk, int @p)
+//proc Klassifiziere (poly @f)
+//proc classify (poly f_in)
+//proc internalfunctions
+//proc tschirnhaus (poly @f, poly @x)
