@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.cc,v 1.1.1.1 2003-10-06 12:15:57 Singular Exp $ */
+/* $Id: mod_raw.cc,v 1.2 2004-08-13 10:40:53 Singular Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -101,6 +101,10 @@ extern "C" {
 #endif
 
 #if defined(x86_64_Linux)
+#define HAVE_ELF_SYSTEM
+#endif
+
+#if defined(ppc_Linux)
 #define HAVE_ELF_SYSTEM
 #endif
 
