@@ -340,11 +340,11 @@ tar:
 	gzip -f Singular-${SINGULAR_VERSION}-src.tar
 
 
-TAGS:
+TAGS:   ${SOURCES} ${HEADERS} ${INCS}
 	etags ${SOURCES} ${HEADERS}
 
-tags:
-	ctags ${SOURCES} ${HEADERS}
+tags:   ${SOURCES} ${HEADERS} ${INCS}
+	ctags ${SOURCES} ${HEADERS} ${INCS}
 
 echoLIBS:
 	@echo ${SLIBS}
