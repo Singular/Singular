@@ -1,12 +1,11 @@
-// $Id: classify.lib,v 1.5 1997-01-24 10:23:07 krueger Exp $
+// $Id: classify.lib,v 1.6 1997-07-23 17:51:41 krueger Exp $
 //=============================================================================
 //
 // Please send bugs and comments to krueger@mathematik.uni-kl.de
 //
 //=============================================================================
 // required libraries
-//LIB "lib0";
-//LIB "lib1";
+
 LIB "lib_Setring";
 LIB "lib_ReOrder";
 LIB "lib_RandomPoly";
@@ -40,12 +39,13 @@ proc Classify
     "          int DeBug=1 / 3 / 6 / 11; ";
     "          poly g=Classify(f); ";
     "";
-    " REMARK:  This version of Classify is only pre-alpha.";
+    " REMARK:  This version of Classify is only alpha.";
     "          Please send bugs and comments to: ";
     "          \"Kai Krueger\" <krueger@mathematik.uni-kl.de>";
     "";
     "          int DeBug=1; is usefull as trace-mode. For more informations";
     "          increace the value of \'DeBug\'";
+    "          or set the shell-variable SG_DEBUG to the debugging level.";
 //=============================================================================
     return();
   }
@@ -74,15 +74,7 @@ proc Classify
   int @i;
 
   // if trace/debug mode not set, do it!
-  if( defined(DeBug) == 0) { 
-    string s=system("getenv", "SG_DEBUG");
-    if( s != "" ) {
-      s="int DeBug="+s;
-      execute s;
-    } 
-    else { int DeBug = 0; }
-  }
-  export DeBug;
+  init_debug();
 
   // define new ring
   if( defined(Rtop) == 1) { kill Rtop; }
@@ -115,6 +107,8 @@ proc Classify
   // @s2: Typ des Polynoms f z.b: E[18]
   @s4 = "poly @f_out="+@s1+";";
 //"Corang:"+ string(CoRang);
+"S1=", @s1;
+"S2=", @s2;
 
   if( @s2[1,2]=="f " || @s2[1,4]=="The " || @s2=="Fehler!" || @s2=="A[0]") { 
     if( @s2 != "Fehler!") { @s2; }
@@ -133,7 +127,6 @@ proc Classify
     map @ConvUp=RingB,maxideal(1);
   }
 //"Corang:"+ string(CoRang);
-
   if(@show_nf==1) {
     poly @f_nf = NormalForm(@s2);
     for(@i=4;@i<=@n;@i=@i+1) {
