@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: timing.h,v 1.4 1997-12-08 18:24:47 schmidt Exp $ */
+/* $Id: timing.h,v 1.5 1998-03-17 13:26:12 schmidt Exp $ */
 
 /* It should be possible to include this file multiple times for different */
 /* settings of TIMING */
@@ -36,17 +36,25 @@
 #endif
 
 #ifdef WINNT
+
 #define TIMING_START(t) { clock_t timing_ ## t ## _start, timing_ ## t ## _end; \
   timing_ ## t ## _start = clock();
 #define TIMING_END(t) timing_ ## t ## _end = clock(); \
 timing_ ## t ## _time += timing_ ## t ## _end - timing_ ## t ## _start; }
+#define TIMING_END_AND_PRINT(t, msg) times( &timing_ ## t ## _end ); \
+  fprintf( stderr, "%s%.2f sec\n", msg, \
+	   float( timing_ ## t ## _end - timing_ ## t ## _start ) / HZ ); \
+  timing_ ## t ## _time += timing_ ## t ## _end - timing_ ## t ## _start; }
 #define TIMING_DEFINE_PRINT(t) clock_t timing_ ## t ## _time; \
 void timing_print_ ## t ( char * msg ) { \
   fprintf( stderr, "%s%.2f sec\n", msg, float(timing_ ## t ## _time) / HZ ); \
+} \
+void timing_reset_ ## t () { \
+  timing_ ## t ## _time = 0; \
 }
-#define TIMING_DEFINE_PRINTPROTO(t) void timing_print_ ## t ( char * );
-#define TIMING_PRINT(t, msg) timing_print_ ## t ( msg );
-#else
+
+#else /* ! WINNT */
+
 #define TIMING_START(t) { struct tms timing_ ## t ## _start, timing_ ## t ## _end; \
   times( &timing_ ## t ## _start );
 #define TIMING_END(t) times( &timing_ ## t ## _end ); \
@@ -58,10 +66,18 @@ void timing_print_ ## t ( char * msg ) { \
 #define TIMING_DEFINE_PRINT(t) long timing_ ## t ## _time; \
 void timing_print_ ## t ( char * msg ) { \
   fprintf( stderr, "%s%.2f sec\n", msg, float(timing_ ## t ## _time) / HZ ); \
+} \
+void timing_reset_ ## t () { \
+  timing_ ## t ## _time = 0; \
 }
-#define TIMING_DEFINE_PRINTPROTO(t) void timing_print_ ## t ( char * );
+#endif /* ! WINNT */
+
+/* macros common to all platforms */
+#define TIMING_DEFINE_PRINTPROTO(t) void timing_print_ ## t ( char * ); \
+  void timing_reset_ ## t ();
 #define TIMING_PRINT(t, msg) timing_print_ ## t ( msg );
-#endif
+#define TIMING_RESET(t) timing_reset_ ## t ();
+
 #else /* TIMING */
 #define TIMING_START(t)
 #define TIMING_END(t)
@@ -69,4 +85,5 @@ void timing_print_ ## t ( char * msg ) { \
 #define TIMING_DEFINE_PRINT(t)
 #define TIMING_DEFINE_PRINTPROTO(t)
 #define TIMING_PRINT(t, msg)
+#define TIMING_RESET(t)
 #endif /* TIMING */
