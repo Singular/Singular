@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.23 1999-09-27 15:05:33 obachman Exp $ */
+/* $Id: structs.h,v 1.24 1999-09-28 17:37:22 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -200,7 +200,18 @@ struct sip_sring
 
   ideal      qideal; /* extension to the ring structure: qring */
 
-  int      *VarOffset; /* mapping exp. of var(i) -> p->exp.e[VarOffset[i]] */
+#ifdef HAVE_SHIFTED_EXPONENTS
+  long       bitmask;
+#endif
+
+  int      *VarOffset;
+  /* mapping exp. of var(i) -> p->exp.l */
+#ifdef HAVE_SHIFTED_EXPONENTS
+  /* mapping exp. of var(i) ->
+  p->exp.l[(VarOffset[i] & 0xffffff)] >> (VarOffset[i] >> 24) & bitmask */
+#else
+  /* mapping exp. of var(i) -> p->exp.e[VarOffset[i]] */
+#endif
 
   memHeap   mm_specHeap; /* Heap from where monoms are allocated */
 #ifdef SDRING
