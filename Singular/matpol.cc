@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.23 1999-03-11 16:32:55 Singular Exp $ */
+/* $Id: matpol.cc,v 1.24 1999-06-29 13:03:31 pohl Exp $ */
 
 /*
 * ABSTRACT:
@@ -23,6 +23,7 @@
 #include "subexpr.h"
 #include "intvec.h"
 #include "ring.h"
+#include "sparsmat.h"
 #include "matpol.h"
 
 /*0 implementation*/
@@ -1047,27 +1048,27 @@ void mp_permmatrix::mpElimBareiss(poly div)
     elim = a[qcol[s_n]];
     if (elim != NULL)
     {
+      elim = pNeg(elim);
       for (j=s_n-1; j>=0; j--)
       {
         q2 = NULL;
         jj = qcol[j];
-        q1 = a[jj];
         if (ap[jj] != NULL)
         {
-          q2 = pNeg(pCopy(ap[jj]));
-          q2 = pMult(q2, pCopy(elim));
-          if (q1 != NULL)
+          q2 = smMultDiv(ap[jj], elim, div);
+          if (a[jj] != NULL)
           {
-            q1 = pMult(q1,pCopy(piv));
+            q1 = smMultDiv(a[jj], piv, div);
+            pDelete(&a[jj]);
             q2 = pAdd(q2, q1);
           }
         }
-        else if (q1 != NULL)
+        else if (a[jj] != NULL)
         {
-          q2 = pMult(q1, pCopy(piv));
+          q2 = smMultDiv(a[jj], piv, div);
         }
         if ((q2!=NULL) && div)
-          q2 = mpDivide(q2, div);
+          smSpecialPolyDiv(q2, div);
         a[jj] = q2;
       }
       pDelete(&a[qcol[s_n]]);
@@ -1077,13 +1078,13 @@ void mp_permmatrix::mpElimBareiss(poly div)
       for (j=s_n-1; j>=0; j--)
       {
         jj = qcol[j];
-        q1 = a[jj];
-        if (q1 != NULL)
+        if (a[jj] != NULL)
         {
-          q1 = pMult(q1, pCopy(piv));
+          q2 = smMultDiv(a[jj], piv, div);
+          pDelete(&a[jj]);
           if (div)
-            q1 = mpDivide(q1, div);
-          a[jj] = q1;
+            smSpecialPolyDiv(q2, div);
+          a[jj] = q2;
         }
       }
     }
