@@ -99,7 +99,9 @@ struct calc_dat
   int last_index;
   int max_pairs;
   int pair_top;
+  BOOLEAN is_char0;
 };
+static int bucket_guess(kBucket* bucket);
 static poly redNFTail (poly h,const int sl,kStrategy strat, int len);
 static poly redNF2 (poly h,calc_dat* c , int &len);
 static void free_sorted_pair_node(sorted_pair_node* s, ring r);
@@ -115,7 +117,7 @@ static int* make_connections(int from, int to, poly bound, calc_dat* c);
 static void now_t_rep(const int & arg_i, const int & arg_j, calc_dat* c);
 static void soon_t_rep(const int & arg_i, const int & arg_j, calc_dat* c);
 static int pLcmDeg(poly a, poly b);
-static int simple_posInS (kStrategy strat, poly p,int len);
+static int simple_posInS (kStrategy strat, poly p,int len, BOOLEAN is_char0);
 static BOOLEAN find_next_pair(calc_dat* c, BOOLEAN go_higher=TRUE);
 static void soon_free_them(redNF_inf* inf, calc_dat* c);
 static sorted_pair_node* pop_pair(calc_dat* c);
