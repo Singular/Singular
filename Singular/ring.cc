@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.173 2002-01-10 12:33:22 Singular Exp $ */
+/* $Id: ring.cc,v 1.174 2002-01-18 16:34:43 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3980,7 +3980,7 @@ ring rCompose(lists  L)
     for(i=0;i<R->N;i++)
     {
       if (v->m[i].Typ()==STRING_CMD)
-        R->names[i]=omStrDup(v->m[i].Data());
+        R->names[i]=omStrDup((char *)v->m[i].Data());
       else
       {
         i--;
