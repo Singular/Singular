@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmcomb.cc,v 1.19 2000-09-18 09:18:57 obachman Exp $
+// $Id: fglmcomb.cc,v 1.20 2002-04-24 15:38:28 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -8,11 +8,8 @@
 * ABSTRACT -
 */
 
-#ifndef NOSTREAMIO
-#include <iostream.h>
-#endif
-
 #include "mod2.h"
+
 #ifdef HAVE_FGLM
 #include "tok.h"
 #include "structs.h"
@@ -28,9 +25,15 @@
 #include "fglmvec.h"
 #include "fglmgauss.h"
 #include "kstd1.h"
+#define SI_DONT_HAVE_GLOBAL_VARS
+#include <factory.h>
+
 #include "fglm.h"
 #include <templates/ftmpl_list.h>
 
+#ifndef NOSTREAMIO
+#include <iostream.h>
+#endif
 // nur fuer debug-Ausgaben:
 static int
 pSize( poly p )
@@ -121,7 +124,7 @@ fglmReductionStep( poly * pptr, ideal source, int * w )
         p2= pMult( m, p2 );
 
         number temp = nDiv( n1, n2 );
-        nNormalize( temp );
+        n_Normalize( temp, currRing );
         nDelete( & n1 );
         n1= temp;
         n1= nNeg( n1 );

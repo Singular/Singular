@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.104 2002-02-16 10:57:28 mschulze Exp $
+ *  Version: $Id: mod2.h.in,v 1.105 2002-04-24 15:38:30 Singular Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -165,10 +165,12 @@
 #endif
 
 /* eigenvalues */
+#ifndef HAVE_DYNAMIC_LOADING
 #define HAVE_EIGENVAL 1
 
 /* Gauss-Manin system */
 #define HAVE_GMS 1
+#endif
 
 /* linear algebra extensions from pcv.h/pcv.cc */
 #define HAVE_PCV 1

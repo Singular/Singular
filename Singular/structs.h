@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.61 2002-03-07 18:44:19 Singular Exp $ */
+/* $Id: structs.h,v 1.62 2002-04-24 15:38:30 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -115,7 +115,6 @@ typedef struct nc_struct   nc_struct;
 typedef struct _ssubexpr   sSubexpr;
 typedef struct _sssym      ssym;
 typedef struct spolyrec    polyrec;
-typedef struct snumber     rnumber;
 typedef struct sip_sideal  ip_sideal;
 typedef struct sip_smap    ip_smap;
 typedef struct sip_sring   ip_sring;
@@ -130,7 +129,7 @@ typedef short *            short_ptr;
 typedef void *             void_ptr;
 typedef ip_sring *         ring;
 typedef int                idtyp;
-typedef rnumber *          number;
+typedef struct snumber *   number;
 typedef polyrec *          poly;
 typedef poly *             polyset;
 typedef ip_sideal *        ideal;

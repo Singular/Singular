@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.h,v 1.26 2001-08-27 14:47:10 Singular Exp $ */
+/* $Id: longrat.h,v 1.27 2002-04-24 15:38:29 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers
 */
@@ -38,8 +38,6 @@ typedef MP_INT lint;
 #endif
 //#define mpz_size1(A) mpz_size(A)
 
-struct snumber;
-typedef struct snumber rnumber;
 struct snumber
 {
   lint z;

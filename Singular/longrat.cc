@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.41 2001-08-27 14:47:09 Singular Exp $ */
+/* $Id: longrat.cc,v 1.42 2002-04-24 15:38:29 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -107,7 +107,7 @@ BOOLEAN nlDBTest(number a, char *f,int l);
  *******************************************************************/
 #ifndef P_NUMBERS_H
 
-omBin rnumber_bin = omGetSpecBin(sizeof(rnumber));
+omBin rnumber_bin = omGetSpecBin(sizeof(snumber));
 
 number nlOne=nlInit(1);
 
