@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.56 2000-05-08 09:42:58 pfister Exp $
+// $Id: primdec.lib,v 1.57 2000-05-08 10:07:48 pfister Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                               //
 // algorithms for primary decomposition based on                             //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                            //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.56 2000-05-08 09:42:58 pfister Exp $";
+version="$Id: primdec.lib,v 1.57 2000-05-08 10:07:48 pfister Exp $";
 info="
 LIBRARY: primdec.lib   PROCEDURES FOR PRIMARY DECOMPOSITION
 AUTHORS:  Gerhard Pfister, email: pfister@mathematik.uni-kl.de (GTZ)
@@ -4495,7 +4495,7 @@ EXAMPLE: example prepareAss; shows an example
   ideal ann;
   if(homog(i)==1)
   {
-     list re=sres(i,0);                   //the resolution
+     list re=sres(j,0);                   //the resolution
      re=minres(re);                       //minimized resolution
   }
   else
@@ -4530,13 +4530,13 @@ NOTE:    uses algorithm of Eisenbud, Huneke and Vasconcelos
 EXAMPLE: example equidimMaxEHV; shows an example
 "
 {
-  ideal j=std(i);
+  ideal j=groebner(i);
   int cod=nvars(basering)-dim(j);
   int e;
   ideal ann;
   if(homog(i)==1)
   {
-     list re=sres(i,0);                   //the resolution
+     list re=sres(j,0);                   //the resolution
      re=minres(re);                       //minimized resolution
   }
   else
