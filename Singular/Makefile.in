@@ -229,7 +229,7 @@ iparith.inc mpsr_Tok.inc: gmalloc.o claptmpl.o iparith.cc \
                           ipconv.cc tok.h mpsr_Tok.cc grammar.h mod2.h
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} -DGENTABLE \
 	     -o gentable claptmpl.o iparith.cc tesths.cc mpsr_Tok.cc \
-	     ${OBJS} ${LDFLAGS} ${LIBS} gmalloc.o ${LD_LIBC}
+	     ${OBJS} ${LDFLAGS} ${LIBS} gmalloc.o
 	./gentable
 	/bin/rm -f gentable gentable.exe
 
@@ -264,12 +264,12 @@ libparse.cc: libparse.l
 ESingular: fegetopt.o feResource.cc mod2.h feOpt.cc version.h emacs.cc \
            feOptES.inc
 	${CXX} -O ${DEFS} -DESINGULAR -o ESingular emacs.cc fegetopt.o \
-	${LDFLAGS} ${LIBS} ${LD_LIBC}
+	${LDFLAGS} ${LIBS}
 
 TSingular: fegetopt.o feResource.cc mod2.h feOpt.cc version.h emacs.cc \
            feOptTS.inc
 	${CXX} -O ${DEFS} -DTSINGULAR -o TSingular emacs.cc fegetopt.o \
-	${LDFLAGS} ${LIBS} ${LD_LIBC}
+	${LDFLAGS} ${LIBS} 
 
 feOpt.h: feOpt.inc feOptES.inc feOptTS.inc
 
