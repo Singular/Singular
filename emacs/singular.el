@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.9 1998-07-28 15:54:04 schmidt Exp $
+;; $Id: singular.el,v 1.10 1998-07-29 10:17:50 schmidt Exp $
 
 ;;; Commentary:
 
@@ -291,7 +291,9 @@ Singular interactive mode starts up.")
 ;;   `singular-simple-sec-clear-type'.  Clear simple sections are
 ;;   represented by nil.
 ;; - Buffer narrowing does not restrict the extent of completely or
-;;   partially inaccessible simple sections.
+;;   partially inaccessible simple sections.  But one should note that
+;;   some of the functions assume that there is no narrowing in
+;;   effect.
 ;; - After creation, simple sections are not modified any further.
 ;;
 ;; - In `singular-interactive-mode', the whole buffer is covered with
@@ -308,7 +310,9 @@ If nil no clear simple sections are used.")
 (defvar singular-simple-sec-last-end nil
   "Marker at the end of the last simple section.
 Should be initialized by `singular-simple-sec-init' before any calls to
-`singular-simple-sec-create' are done.")
+`singular-simple-sec-create' are done.
+
+This variable is buffer-local.")
 
 (defun singular-simple-sec-init (pos)
   "Initialize global variables belonging to simple section management.
@@ -427,36 +431,32 @@ Updates `singular-simple-sec-last-end', too."
   (overlay-end simple-sec))
 
 (defun singular-emacs-simple-sec-start-at (pos)
-  "Return start of clear section at position POS."
-  (save-restriction
-    (widen)
-    (let ((previous-overlay-change (1+ (point))))
-      ;; this `while' loop at last will run into the end of the next
-      ;; non-clear overlay or stop at bob.  Since POS may be right at the end
-      ;; of a previous non-clear location, we have to search at least one
-      ;; time from POS+1 backwards.
-      (while (not
-	      (or (singular-emacs-simple-sec-before previous-overlay-change)
-		  (eq previous-overlay-change (point-min))))
-	(setq previous-overlay-change
-	      (previous-overlay-change previous-overlay-change)))
-      previous-overlay-change)))
+  "Return start of clear section at position POS.
+Assumes that no narrowing is in effect."
+  (let ((previous-overlay-change (1+ (point))))
+    ;; this `while' loop at last will run into the end of the next
+    ;; non-clear overlay or stop at bob.  Since POS may be right at the end
+    ;; of a previous non-clear location, we have to search at least one
+    ;; time from POS+1 backwards.
+    (while (not (or (singular-emacs-simple-sec-before previous-overlay-change)
+		    (eq previous-overlay-change (point-min))))
+      (setq previous-overlay-change
+	    (previous-overlay-change previous-overlay-change)))
+    previous-overlay-change))
 
 (defun singular-emacs-simple-sec-end-at (pos)
-  "Return end of clear section at position POS."
-  (save-restriction
-    (widen)
-    (let ((next-overlay-change (next-overlay-change (point))))
-      ;; this `while' loop at last will run into the beginning of the next
-      ;; non-clear overlay or stop at eob.  Since POS may not be at the
-      ;; beginning of a non-clear simple section we may start searching
-      ;; immediately.
-      (while (not
-	      (or (singular-emacs-simple-sec-at next-overlay-change)
-		  (eq next-overlay-change (point-max))))
-	(setq next-overlay-change
-	      (next-overlay-change next-overlay-change)))
-      next-overlay-change)))
+  "Return end of clear section at position POS.
+Assumes that no narrowing is in effect."
+  (let ((next-overlay-change (next-overlay-change (point))))
+    ;; this `while' loop at last will run into the beginning of the next
+    ;; non-clear overlay or stop at eob.  Since POS may not be at the
+    ;; beginning of a non-clear simple section we may start searching
+    ;; immediately.
+    (while (not (or (singular-emacs-simple-sec-at next-overlay-change)
+		    (eq next-overlay-change (point-max))))
+      (setq next-overlay-change
+	    (next-overlay-change next-overlay-change)))
+    next-overlay-change)))
 
 (defun singular-emacs-simple-sec-type (simple-sec)
   "Return type of SIMPLE-SEC."
@@ -476,8 +476,8 @@ Updates `singular-simple-sec-last-end', too."
 
 (defun singular-emacs-simple-sec-before (pos)
   "Return simple section before position POS.
-This is the same as `singular-emacs-section-at' except if POS falls on
-a section border.  In this case `singular-emacs-section-before'
+This is the same as `singular-simple-section-at' except if POS falls
+on a section border.  In this case `singular-simple-section-before'
 returns the previous simple section instead of the current one."
   (singular-emacs-simple-sec-at (max 1 (1- pos))))
 
@@ -503,6 +503,10 @@ order in that the appear in the region."
 ;;   simple section.
 ;; - Sections are read-only objects, neither are they modified nor are they
 ;;   created.
+;; - Buffer narrowing does not restrict the extent of completely or
+;;   partially inaccessible sections.  In contrast to simple sections
+;;   the functions concerning sections do not assume that there is no
+;;   narrowing in effect.
 ;; - Sections are independent from implementation dependencies.  There are
 ;;   no different versions of the functions for Emacs and XEmacs.
 
@@ -512,16 +516,27 @@ Returns section intersected with current restriction if RESTRICTED is
 non-nil."
   (let* ((simple-sec (singular-simple-sec-at pos))
 	 (type (singular-simple-sec-type simple-sec))
-	 (start (if simple-sec
-		    (singular-simple-sec-start simple-sec)
-		  (singular-simple-sec-start-at pos)))
-	 (end (if simple-sec
-		  (singular-simple-sec-end simple-sec)
-		(singular-simple-sec-end-at pos))))
+	 start end)
+    (if simple-sec
+	(setq start (singular-simple-sec-start simple-sec)
+	      end  (singular-simple-sec-end simple-sec))
+      (save-restriction
+	(widen)
+	(setq start (singular-simple-sec-start-at pos)
+	      end (singular-simple-sec-end-at pos))))
     (if restricted
 	(vector simple-sec type
 		(max start (point-min)) (min end (point-max)))
       (vector simple-sec type start end))))
+
+(defun singular-section-before (pos &optional restricted)
+  "Return section before position POS.
+This is the same as `singular-section-at' except if POS falls on a
+section border.  In this case `singular-section-before' returns the
+previous section instead of the current one.
+Returns section intersected with current restriction if RESTRICTED is
+non-nil."
+  (singular-section-at (max 1 (1- pos)) restricted))
 
 (defmacro singular-section-simple-sec (section)
   "Return underlying simple section of SECTION."
@@ -544,9 +559,8 @@ non-nil."
 (defvar singular-folding-ellipsis "Singular I/O ..."
   "Ellipsis to show for folded input or output.")
 
-(defun singular-fold-internal (list fold)
-  "(Un)fold regions in LIST.
-LIST should have the format (START1 END1 START2 END2 ...).
+(defun singular-fold-internal (start end fold)
+  "(Un)fold region from START to END.
 Folds if FOLD is non-nil, otherwise unfolds.
 Folds without affecting undo information, buffer-modified flag, and
 even for read-only files.
@@ -557,14 +571,11 @@ Assumes that there is no narrowing in effect."
     (unwind-protect
 	;; do it !!
 	(if fold
-	    (while list
-	      (goto-char (car list)) (insert ?\r)
-	      (subst-char-in-region (car list) (nth 1 list) ?\n ?\r t)
-	      (setq list (cdr (cdr list))))
-	  (while list
-	    (subst-char-in-region (car list) (nth 1 list) ?\r ?\n t)
-	    (goto-char (car list)) (delete-char 1)
-	    (setq list (cdr (cdr list)))))
+	    (progn
+	      (goto-char start) (insert ?\r)
+	      (subst-char-in-region start end ?\n ?\r t))
+	  (subst-char-in-region start end ?\r ?\n t)
+	  (goto-char start) (delete-char 1))
 
       ;; we have to restore the point and the modified flag.  The read-only
       ;; state and undo information are restored by the outer `let'.
@@ -580,8 +591,8 @@ Assumes that there is no narrowing in effect."
 
 (defun singular-fold-section (section)
   "Fold SECTION.
-Folds section at current cursor position and goes to beginning of
-section if called interactively."
+Folds section at point and goes to beginning of section if called
+interactively."
   (interactive (list (singular-section-at (point))))
   (let ((start (singular-section-start section))
 	;; we have to save restrictions this way since we change text
@@ -596,8 +607,7 @@ section if called interactively."
     (unwind-protect
 	(progn
 	  (widen)
-	  (singular-fold-internal (list start
-					(singular-section-end section))
+	  (singular-fold-internal start (singular-section-end section)
 				  (not (singular-section-foldedp section))))
       (narrow-to-region old-point-min old-point-max)
       (set-marker old-point-max nil))
@@ -618,6 +628,91 @@ section if called interactively."
 			   (singular-debug-format string))))
 ;;}}}
 
+;;{{{ Demo mode
+(defvar singular-demo-chunk-regexp "\\(\n\n\\)"
+  "Regular expressions to recognize chunks of a demo file.
+If there is a subexpression specified its content is removed when the
+chunk is displayed.")
+
+(defvar singular-demo-mode nil
+  "Non-nil if Singular demo mode is on.
+
+This variable is buffer-local.")
+
+(defvar singular-demo-old-mode-name nil
+  "Used to store previous `mode-name' before switching to demo mode.
+
+This variable is buffer-local.")
+
+(defun singular-demo-mode (on)
+  "Turn Singular demo mode on if ON is non-nil, otherwise off.
+Modifies `singular-demo-mode' and buffer's mode line."
+  (cond
+   ;; test on logical equality off ON and `singular-demo-mode'
+   ((eq (not on) (not singular-demo-mode)) nil)
+   ;; switch on
+   (on
+    (setq singular-demo-old-mode-name mode-name
+	  mode-name "Singular Demo"
+	  singular-demo-mode t)
+    (force-mode-line-update))
+   (;; switch off
+    t
+    (setq mode-name singular-demo-old-mode-name
+	  singular-demo-mode nil)
+    (force-mode-line-update))))
+
+(defun singular-demo-show-next-chunk ()
+  "Show next chunk of demo file at input prompt.
+Moves point to end of buffer and widenes the buffer such that the next
+chunk of the demo file becomes visible.
+Finds and removes chunk separators as specified by
+`singular-demo-chunk-regexp'.  This does not affect neither the undo
+information nor the buffer-modified flag nad works even for read-only
+buffers.
+Returns non-nil if there is still demo text to show."
+  (let ((inhibit-read-only t) (buffer-undo-list t)
+	(modified (buffer-modified-p))
+	(old-point-min (point-min)))
+    (unwind-protect
+	(progn
+	  (goto-char (point-max))
+	  (widen)
+	  (prog1 (and (re-search-forward singular-demo-chunk-regexp
+					 nil 'limit)
+		      ;; we want to return the result of the search,
+		      ;; not of the delete.  Hence the `(or ... t)'.
+		      (or (and (match-beginning 1)
+			       (delete-region (match-beginning 1)
+					      (match-end 1)))
+			  t))))
+
+      ;; this is unwind-protected
+      (narrow-to-region old-point-min (point))
+      (or modified (set-buffer-modified-p)))))
+
+(defun singular-demo-load (demo-file)
+  "Load demo file DEMO-FILE and switch to Singular demo mode.
+For a description of Singular demo mode one should refer to the
+doc-string of `singular-send-input'.
+Moves point to end of buffer, inserts contents of DEMO-FILE there, and
+makes the first chunk of the demo file visible."
+  (interactive "fLoad demo file: ")
+  (let ((old-point-min (point-min)))
+    (unwind-protect
+	(progn
+	  (goto-char (point-max))
+	  (widen)
+	  (insert-file-contents demo-file))
+
+      ;; completely hide demo file.
+      ;; This is unwide protected.
+      (narrow-to-region old-point-min (point)))
+
+    ;; show first chunk of demo file
+    (singular-demo-mode (singular-demo-show-next-chunk))))
+;;}}}
+      
 ;;{{{ Sending input and receiving output
 
 ;;{{{ Some lengthy notes on filters
@@ -701,10 +796,9 @@ section if called interactively."
 
 ;;}}}
 
-(defun singular-send-input (string)
+(defun singular-send-input (send-full-section)
   "NOT READY!!"
-  ;; STRING is always nil when called interactively
-  (interactive (list nil))
+  (interactive "P")
 
   (let ((process (get-buffer-process (current-buffer)))
 	pmark)
@@ -712,40 +806,55 @@ section if called interactively."
     (or process (error "Current buffer has no process"))
     (setq pmark (marker-position (process-mark process)))
 
-    ;; NOT READY[history expansion, handling of STRING]!
+    (cond
+     (;; check for demo mode and show next chunk if necessary
+      (and singular-demo-mode
+	  (eq (point) pmark)
+	  (eq pmark (point-max)))
+      (singular-demo-mode (singular-demo-show-next-chunk)))
 
-    ;; note that the input string does not include its terminal newline
-    (let* ((raw-input (buffer-substring pmark (point)))
-	   (input raw-input)
-	   (history raw-input))
+     (;; get old input
+      (< (point) pmark)
+      (let ((section (singular-section-at (point))))
+	(if (not (eq (singular-section-type section) 'input))
+	    (error "Not on an input section")
+	  (goto-char pmark)
+	  (insert (singular-input-section-to-string section send-full-section)))))
 
-      ;; insert newline into buffer
-      (insert-before-markers ?\n)
+     (;; send input from pmark to point
+      t
+      ;; note that the input string does not include its terminal newline
+      (let* ((raw-input (buffer-substring pmark (point)))
+	     (input raw-input)
+	     (history raw-input))
 
-      ;; insert input into history
-      (if (and (funcall comint-input-filter history)
-	       (or (null comint-input-ignoredups)
-		   (not (ring-p comint-input-ring))
-		   (ring-empty-p comint-input-ring)
-		   (not (string-equal (ring-ref comint-input-ring 0) history))))
-	  (ring-insert comint-input-ring history))
+	;; insert newline into buffer
+	(insert ?\n)
 
-      ;; run hooks and reset index into history
-      (run-hook-with-args 'comint-input-filter-functions (concat input "\n"))
-      (setq comint-input-ring-index nil)
+	;; insert input into history
+	(if (and (funcall comint-input-filter history)
+		 (or (null comint-input-ignoredups)
+		     (not (ring-p comint-input-ring))
+		     (ring-empty-p comint-input-ring)
+		     (not (string-equal (ring-ref comint-input-ring 0) history))))
+	    (ring-insert comint-input-ring history))
 
-      ;; update markers and create a new simple section
-      (set-marker comint-last-input-start pmark)
-      (set-marker comint-last-input-end (point))
-      (set-marker (process-mark process) (point))
-      (singular-debug 'interactive-simple-secs
-		      (message "Simple input section: %S"
-			       (singular-simple-sec-create 'input (point)))
-		      (singular-simple-sec-create 'input (point)))
+	;; run hooks and reset index into history
+	(run-hook-with-args 'comint-input-filter-functions (concat input "\n"))
+	(setq comint-input-ring-index nil)
 
-      ;; do it !!
-      (send-string process input)
-      (send-string process "\n"))))
+	;; update markers and create a new simple section
+	(set-marker comint-last-input-start pmark)
+	(set-marker comint-last-input-end (point))
+	(set-marker (process-mark process) (point))
+	(singular-debug 'interactive-simple-secs
+			(message "Simple input section: %S"
+				 (singular-simple-sec-create 'input (point)))
+			(singular-simple-sec-create 'input (point)))
+
+	;; do it !!
+	(send-string process input)
+	(send-string process "\n"))))))
 
 (defun singular-output-filter (process string)
   "Insert STRING containing output from PROCESS into its associated buffer.
@@ -765,26 +874,26 @@ For a more detailed descriptions of the output filter, the markers it
 sets, and output filter functions refer to the section \"Some lengthy
 notes on filters\" in singular.el."
   (let ((process-buffer (process-buffer process))
-	(save-buffer (current-buffer)))
+	(old-buffer (current-buffer)))
 
     ;; check whether buffer is still alive
     (if (and process-buffer (buffer-name process-buffer))
 	(unwind-protect
 	    (progn
 	      (set-buffer process-buffer)
-	      (let ((save-point (point))
-		    (save-point-min (point-min))
-		    (save-point-max (point-max))
-		    (save-pmark (marker-position (process-mark process)))
+	      (let ((old-point (point))
+		    (old-point-min (point-min))
+		    (old-point-max (point-max))
+		    (old-pmark (marker-position (process-mark process)))
 		    (inhibit-read-only t)
 		    (n (length string)))
 		(widen)
-		(goto-char save-pmark)
+		(goto-char old-pmark)
 
 		;; adjust point and narrowed region borders
-		(if (<= (point) save-point) (setq save-point (+ save-point n)))
-		(if (< (point) save-point-min) (setq save-point-min (+ save-point-min n)))
-		(if (<= (point) save-point-max) (setq save-point-max (+ save-point-max n)))
+		(if (<= (point) old-point) (setq old-point (+ old-point n)))
+		(if (< (point) old-point-min) (setq old-point-min (+ old-point-min n)))
+		(if (<= (point) old-point-max) (setq old-point-max (+ old-point-max n)))
 
 		;; do it !!
 		(insert-before-markers string)
@@ -794,31 +903,31 @@ notes on filters\" in singular.el."
 		;; fact that `set-marker' always returns some non-nil
 		;; value.  Looks nicer this way.
 		(and (= comint-last-input-end (point))
-		     (set-marker comint-last-input-end save-pmark)
+		     (set-marker comint-last-input-end old-pmark)
 		     ;; this may happen only on startup and only if
 		     ;; `comint-last-input-end' has been modified,
 		     ;; too.  Hence, we check for it after the first
 		     ;; test.
 		     (= comint-last-input-start (point))
-		     (set-marker comint-last-input-start save-pmark))
+		     (set-marker comint-last-input-start old-pmark))
 		(and (= singular-simple-sec-last-end (point))
-		     (singular-simple-sec-reset-last save-pmark))
+		     (singular-simple-sec-reset-last old-pmark))
 
 		;; set new markers and create/extend new simple section
-		(set-marker comint-last-output-start save-pmark)
+		(set-marker comint-last-output-start old-pmark)
 		(singular-debug 'interactive-simple-secs
 				(message "Simple output section: %S"
 					 (singular-simple-sec-create 'output (point)))
 				(singular-simple-sec-create 'output (point)))
 
 		;; restore old values, run hooks, and force mode line update
-		(narrow-to-region save-point-min save-point-max)
-		(goto-char save-point)
+		(narrow-to-region old-point-min old-point-max)
+		(goto-char old-point)
 		(run-hook-with-args 'comint-output-filter-functions string)
 		(force-mode-line-update)))
 
 	  ;; this is unwind-protected
-	  (set-buffer save-buffer)))))
+	  (set-buffer old-buffer)))))
 ;;}}}
 
 ;;{{{ Singular interactive mode
@@ -873,6 +982,10 @@ NOT READY [much more to come.  See shell.el.]!"
 	  (equal comint-input-ring-file-name "")
 	  (equal (file-truename comint-input-ring-file-name) "/dev/null"))
       (setq comint-input-ring-file-name nil))
+
+  ;; make our own local variables
+  (make-local-variable 'singular-demo-mode)
+  (make-local-variable 'singular-demo-old-mode-name)
 
   ;; selective display
   (setq selective-display t)
@@ -946,7 +1059,7 @@ Moves point to the end of BUFFER.
 Initializes all important markers and the simple sections.
 Runs `comint-exec-hook' and `singular-exec-hook' (in that order).
 Returns BUFFER."
-  (let ((save-buffer (current-buffer)))
+  (let ((old-buffer (current-buffer)))
     (unwind-protect
 	(progn
 	  (set-buffer buffer)
@@ -974,15 +1087,16 @@ Returns BUFFER."
 	    (set-marker (process-mark process) (point))
 	    (singular-simple-sec-init (point))
 
-	    ;; feed process with start file and read input ring
+	    ;; feed process with start file and read input ring.  Take
+	    ;; care about the undo information.
 	    (if start-file
-		(progn
+		(let ((buffer-undo-list t) start-string)
 		  (singular-debug 'interactive (message "Feeding start file"))
 		  (sleep-for 1)			; try to avoid timing errors
 		  (insert-file-contents start-file)
-		  (setq start-file (buffer-substring (point) (point-max)))
+		  (setq start-string (buffer-substring (point) (point-max)))
 		  (delete-region (point) (point-max))
-		  (comint-send-string process start-file)))
+		  (send-string process start-string)))
 	    (singular-debug 'interactive (message "Reading input ring"))
 	    (comint-read-input-ring t)
 
@@ -992,7 +1106,7 @@ Returns BUFFER."
 	  
 	  buffer)
       ;; this code is unwide-protected
-      (set-buffer save-buffer))))
+      (set-buffer old-buffer))))
 
 ;; Note:
 ;;
