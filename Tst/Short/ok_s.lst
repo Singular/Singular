@@ -1,5 +1,6 @@
+;; Test which should pass shifted exponents
 allres_s
-; UNCLEAR betti_s
+betti_s
 barei_s
 bug_1
 bug_10
@@ -58,6 +59,12 @@ modulo_s
 monodromy_s
 mpsr_s
 normal
+pAdd_s
+pAddManyVars_s
+pAddManyVarsManyL_s
+pMult_s
+pMultManyVars_s
+pMultManyVarsManyL_s
 paramet
 polylib_s
 primdec_s

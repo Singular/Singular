@@ -1,4 +1,5 @@
 allres_l
+bardet_probl_l
 bug_4
 classify_l
 deform_l
@@ -22,6 +23,16 @@ mpsr_l
 mre
 mre_nonhom
 Mregular
+pAdd0L_l
+pAdd0_l
+pAddL_l
+pAddManyVarsManyL_l
+pAddManyVars_l
+pAdd_l
+pMult0L_l
+pMult0_l
+pMultL_l
+pMult_l
 primdec_l
 primitiv_l
 res_l
