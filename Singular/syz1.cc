@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.11 1997-07-09 15:54:06 Singular Exp $ */
+/* $Id: syz1.cc,v 1.12 1997-07-10 12:03:43 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -2205,16 +2205,18 @@ static poly syStripOut(poly p,intvec * toStrip)
 static poly syMinimizeP(poly toMin,syStrategy syzstr,int pNum,int index,
                         intvec * toStrip)
 {
-  int i,j,tc;
+  int i,j,tc,lastin,newin=pNum-1;
   poly p,pp=pCopy(toMin),q=NULL,tq,pisN;
   SSet sPairs=syzstr->resPairs[index];
-  BOOLEAN nothingToReduce;
 
   pp = syStripOut(pp,toStrip);
-  loop
+  while (newin>=0)
   {
-    nothingToReduce = TRUE;
-    for (i=pNum-1;i>=0;i--)
+    lastin = newin;
+    while ((newin>=0) && (sPairs[lastin].order==sPairs[newin].order))
+      newin--;
+//Print("Hier lastin:%d newin:%d\n",lastin,newin);
+    for (i=newin+1;i<=lastin;i++)
     {
       if (sPairs[i].isNotMinimal!=NULL)
       {
@@ -2232,7 +2234,6 @@ static poly syMinimizeP(poly toMin,syStrategy syzstr,int pNum,int index,
             pSetCoeff0(tq,nDiv(pGetCoeff(p),pGetCoeff(pisN)));
             pGetCoeff(tq) = nNeg(pGetCoeff(tq));
             q = syAdd(q,syStripOut(syMultT1(syzstr->res[index+1]->m[sPairs[i].syzind],tq),toStrip));
-            nothingToReduce = FALSE;
           }  
           pIter(p);
         }
@@ -2243,7 +2244,6 @@ static poly syMinimizeP(poly toMin,syStrategy syzstr,int pNum,int index,
         }
       }
     }
-    if (nothingToReduce) break;
   }
   return pp;
 }
