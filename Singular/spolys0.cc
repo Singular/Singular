@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: spolys0.cc,v 1.15 1999-09-27 15:05:32 obachman Exp $ */
+/* $Id: spolys0.cc,v 1.16 2000-02-14 17:15:03 Singular Exp $ */
 
 /*
 * ABSTRACT - s-polynomials and reduction in general
@@ -461,7 +461,7 @@ poly spGSpolyRed(poly p1, poly p2,poly spNoether, spSpolyLoopProc spSpolyLoop)
 /*2
 * reduction of tail(q) with p1
 * lead(p1) divides lead(pNext(q2)) and pNext(q2) is reduced
-* do not destroy p1, but tail(q)
+* do not destroy p1, but tail(q2)
 */
 void spGSpolyTail(poly p1, poly q, poly q2, poly spNoether,
                   spSpolyLoopProc spSpolyLoop)
