@@ -4,7 +4,7 @@
 
 //**************************************************************************/
 //
-// $Id: sing_dbm.cc,v 1.5 1997-08-08 12:59:30 obachman Exp $
+// $Id: sing_dbm.cc,v 1.6 1997-08-12 14:54:52 Singular Exp $
 //
 //**************************************************************************/
 //  'sing_dbm.cc' containes command to handle dbm-files under
@@ -43,35 +43,28 @@ BOOLEAN dbOpen(si_link l, short flag)
   DBM_info *db;
   int dbm_flags = O_RDONLY | O_CREAT;  // open database readonly as default
 
-  if((flag & SI_LINK_OPEN)
-  || (flag & SI_LINK_READ)
-  || (flag & SI_LINK_WRITE)) {
-    if (l->mode[0] == '\0' || (strcmp(l->mode, "r") == 0))
-      flag = SI_LINK_READ;
-    else flag = SI_LINK_READ | SI_LINK_WRITE;
+  if((flag & SI_LINK_WRITE)
+  || ((l->mode!=NULL)&&
+    ((l->mode[0]='w')||(l->mode[1]='w')))
+  )
+  {
+    dbm_flags = O_RDWR | O_CREAT;
+    mode = "rw";
+    flag|=SI_LINK_WRITE;
   }
-
-  if((flag & SI_LINK_READ) || (flag & SI_LINK_WRITE)) {
-    if( l->data == NULL ) {
-      if ((db = (DBM_info *)malloc(sizeof *db)) == 0) {
-	errno = ENOMEM;
-	return TRUE;
-      }
-      if( flag & SI_LINK_WRITE ) {
-	dbm_flags = O_RDWR | O_CREAT;
-	mode = "rw";
-      }
-      if( (db->db = dbm_open(l->name, dbm_flags, 0664 )) != NULL ) {
-	db->first=1;
-	if(flag & SI_LINK_WRITE) SI_LINK_SET_RW_OPEN_P(l);
-	else SI_LINK_SET_R_OPEN_P(l);
-	l->data=(void *)(db);
-	FreeL(l->mode);
-	l->mode=mstrdup(mode);
-	return FALSE;
-      }
-      Werror("dbm_open of `%s` failed",l->name);
-    }
+  if ((db = (DBM_info *)malloc(sizeof *db)) == 0)
+  {
+    return TRUE;
+  }
+  if( (db->db = dbm_open(l->name, dbm_flags, 0664 )) != NULL )
+  {
+    db->first=1;
+    if(flag & SI_LINK_WRITE) SI_LINK_SET_RW_OPEN_P(l);
+    else SI_LINK_SET_R_OPEN_P(l);
+    l->data=(void *)(db);
+    FreeL(l->mode);
+    l->mode=mstrdup(mode);
+    return FALSE;
   }
   return TRUE;
 }
@@ -79,7 +72,7 @@ BOOLEAN dbOpen(si_link l, short flag)
 //**************************************************************************/
 BOOLEAN dbClose(si_link l)
 {
-  DBM_info *db = l->data;
+  DBM_info *db = (DBM_info *)l->data;
 
   dbm_close(db->db);
   free(db);
@@ -92,48 +85,45 @@ BOOLEAN dbClose(si_link l)
 static datum d_value;
 leftv dbRead2(si_link l, leftv key)
 {
-  DBM_info *db = l->data;
+  DBM_info *db = (DBM_info *)l->data;
   leftv v=NULL;
-  if(l->data != NULL) {
-    datum d_key;
+  datum d_key;
 
-    if(key!=NULL)
+  if(key!=NULL)
+  {
+    if (key->Typ()==STRING_CMD)
     {
-      if (key->Typ()==STRING_CMD)
-      {
-        d_key.dptr = (char*)key->Data();
-        d_key.dsize = strlen(d_key.dptr)+1;
-        d_value = dbm_fetch(db->db, d_key);
-        v=(leftv)Alloc0(sizeof(sleftv));
-        if (d_value.dptr!=NULL) v->data=mstrdup(d_value.dptr);
-        else                    v->data=mstrdup("");
-        v->rtyp=STRING_CMD;
-      }
-      else
-      {
-        WerrorS("read(`link`,`string`) expected");
-      }
-    }
-    else {
-      if(db->first) d_value = dbm_firstkey((DBM *)db->db);
-      else d_value = dbm_nextkey((DBM *)db->db);
-
+      d_key.dptr = (char*)key->Data();
+      d_key.dsize = strlen(d_key.dptr)+1;
+      d_value = dbm_fetch(db->db, d_key);
       v=(leftv)Alloc0(sizeof(sleftv));
+      if (d_value.dptr!=NULL) v->data=mstrdup(d_value.dptr);
+      else                    v->data=mstrdup("");
       v->rtyp=STRING_CMD;
-      if (d_value.dptr!=NULL) {
-	v->data=mstrdup(d_value.dptr);
-	db->first = 0;
-      }
-      else {
-	v->data=mstrdup("");
-	db->first = 1;
-      }
-
+    }
+    else
+    {
+      WerrorS("read(`DBM link`,`string`) expected");
     }
   }
   else
   {
-    Werror("DBM-link `%s` not open in read",l->name);
+    if(db->first) d_value = dbm_firstkey((DBM *)db->db);
+    else d_value = dbm_nextkey((DBM *)db->db);
+
+    v=(leftv)Alloc0(sizeof(sleftv));
+    v->rtyp=STRING_CMD;
+    if (d_value.dptr!=NULL)
+    {
+      v->data=mstrdup(d_value.dptr);
+      db->first = 0;
+    }
+    else
+    {
+      v->data=mstrdup("");
+      db->first = 1;
+    }
+
   }
   return v;
 }
@@ -144,44 +134,49 @@ leftv dbRead1(si_link l)
 //**************************************************************************/
 BOOLEAN dbWrite(si_link l, leftv key)
 {
-  DBM_info *db = l->data;
+  DBM_info *db = (DBM_info *)l->data;
   BOOLEAN b=TRUE;
   register int ret;
 
-  if(l->data != NULL) {                      // is database opened ?
-    if((key!=NULL) && (key->Typ()==STRING_CMD) ) { 
-      if (key->next!=NULL) {                 // have a second parameter ?
-	if(key->next->Typ()==STRING_CMD) {   // replace (key,value)
-	  datum d_key, d_value;
+  // database is opened
+  if((key!=NULL) && (key->Typ()==STRING_CMD) )
+  { 
+    if (key->next!=NULL)                   // have a second parameter ?
+    {
+      if(key->next->Typ()==STRING_CMD)     // replace (key,value)
+      {
+        datum d_key, d_value;
 
-	  d_key.dptr = (char *)key->Data();
-	  d_key.dsize = strlen(d_key.dptr)+1;
-	  d_value.dptr = (char *)key->next->Data();
-	  d_value.dsize = strlen(d_value.dptr)+1;
-	  ret  = dbm_store(db->db, d_key, d_value, DBM_REPLACE);
-	  if(!ret ) b=FALSE;
-	  else {
-	    if(dbm_error(db->db)) {
-	      Werror("DBM link I/O error. is '%s' readonly?", l->name);
-	      dbm_clearerr(db->db);
-	    }
-	  }
-	}
-      } else {                               // delete (key)
-	datum d_key;
-
-	d_key.dptr = (char *)key->Data();
-	d_key.dsize = strlen(d_key.dptr)+1;
-	dbm_delete(db->db, d_key);
-	b=FALSE;
+        d_key.dptr = (char *)key->Data();
+        d_key.dsize = strlen(d_key.dptr)+1;
+        d_value.dptr = (char *)key->next->Data();
+        d_value.dsize = strlen(d_value.dptr)+1;
+        ret  = dbm_store(db->db, d_key, d_value, DBM_REPLACE);
+        if(!ret )
+          b=FALSE;
+        else
+        {
+          if(dbm_error(db->db))
+          {
+            Werror("DBM link I/O error. Is '%s' readonly?", l->name);
+            dbm_clearerr(db->db);
+          }
+        }
       }
-    } else {
-      WerrorS("write(`DBM link`,`key string`,`data string`) expected");
+    }
+    else
+    {                               // delete (key)
+      datum d_key;
+
+      d_key.dptr = (char *)key->Data();
+      d_key.dsize = strlen(d_key.dptr)+1;
+      dbm_delete(db->db, d_key);
+      b=FALSE;
     }
   }
   else
   {
-    Werror("DBM-link `%s` not open in write",l->name);
+    WerrorS("write(`DBM link`,`key string`,`data string`) expected");
   }
   return b;
 }

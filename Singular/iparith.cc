@@ -204,6 +204,7 @@ cmdnames cmds[] =
   { "minbase",     0, MINBASE_CMD ,       CMD_1},
   { "minor",       0, MINOR_CMD ,         CMD_2},
   { "minres",      0, MINRES_CMD ,        CMD_1},
+  { "mod",         0, '%',                '%'},
   { "module",      0, MODUL_CMD ,         MODUL_CMD},
   { "modulo",      0, MODULO_CMD ,        CMD_2},
   { "monitor",     0, MONITOR_CMD ,       CMD_12},
@@ -282,7 +283,7 @@ cmdnames cmds[] =
   { "IN",          1, LEAD_CMD ,          CMD_1},
   { "NF",          1, REDUCE_CMD ,        CMD_23},
   { "multiplicity",1, MULTIPLICITY_CMD ,  CMD_1},
-  { "verbose",     1, OPTION_CMD ,        CMD_M},
+  { "verbose",     2, OPTION_CMD ,        CMD_M},
 //  { "rank",        1, ROWS_CMD ,          CMD_1},
 
 /* set sys vars*/
@@ -1887,6 +1888,9 @@ struct sValCmd2 dArith2[]=
 ,{jjDIV_N,     '/',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD PROFILER}
 ,{jjDIV_P,     '/',            POLY_CMD,       POLY_CMD,   POLY_CMD PROFILER}
 ,{jjDIV_P,     '/',            VECTOR_CMD,     VECTOR_CMD, POLY_CMD PROFILER}
+,{jjDIV_I,     '/',            INT_CMD,        INT_CMD,    INT_CMD PROFILER}
+,{jjOP_IV_I,   '/',            INTVEC_CMD,     INTVEC_CMD, INT_CMD PROFILER}
+,{jjOP_IV_I,   '/',            INTMAT_CMD,     INTMAT_CMD, INT_CMD PROFILER}
 ,{jjDIV_I,     INTDIV,         INT_CMD,        INT_CMD,    INT_CMD PROFILER}
 ,{jjOP_IV_I,   INTDIV,         INTVEC_CMD,     INTVEC_CMD, INT_CMD PROFILER}
 ,{jjOP_IV_I,   INTDIV,         INTMAT_CMD,     INTMAT_CMD, INT_CMD PROFILER}
@@ -4481,19 +4485,28 @@ void ttGen2()
                                              cmds[m].tokval);
       switch(cmds[m].toktype)
       {
-        case CMD_1:    fprintf(outfile,"CMD_1 },\n"); break;
-        case CMD_2:    fprintf(outfile,"CMD_2 },\n"); break;
-        case CMD_3:    fprintf(outfile,"CMD_3 },\n"); break;
-        case CMD_12:   fprintf(outfile,"CMD_12 },\n"); break;
-        case CMD_123 : fprintf(outfile,"CMD_123 },\n"); break;
-        case CMD_23:   fprintf(outfile,"CMD_23 },\n"); break;
-        case CMD_M:    fprintf(outfile,"CMD_M },\n"); break;
-        case SYSVAR:   fprintf(outfile,"SYSVAR },\n"); break;
-        case ROOT_DECL:   fprintf(outfile,"ROOT_DECL },\n"); break;
+        case CMD_1:            fprintf(outfile,"CMD_1 },\n"); break;
+        case CMD_2:            fprintf(outfile,"CMD_2 },\n"); break;
+        case CMD_3:            fprintf(outfile,"CMD_3 },\n"); break;
+        case CMD_12:           fprintf(outfile,"CMD_12 },\n"); break;
+        case CMD_123 :         fprintf(outfile,"CMD_123 },\n"); break;
+        case CMD_23:           fprintf(outfile,"CMD_23 },\n"); break;
+        case CMD_M:            fprintf(outfile,"CMD_M },\n"); break;
+        case SYSVAR:           fprintf(outfile,"SYSVAR },\n"); break;
+        case ROOT_DECL:        fprintf(outfile,"ROOT_DECL },\n"); break;
         case ROOT_DECL_LIST:   fprintf(outfile,"ROOT_DECL_LIST },\n"); break;
-        case RING_DECL:   fprintf(outfile,"RING_DECL },\n"); break;
-        case NONE:   fprintf(outfile,"NONE },\n"); break;
-        default:       fprintf(outfile,"%d },\n",cmds[m].toktype);
+        case RING_DECL:        fprintf(outfile,"RING_DECL },\n"); break;
+        case NONE:             fprintf(outfile,"NONE },\n"); break;
+        default:               if((cmds[m].toktype>' ')
+                               &&(cmds[m].toktype<127))
+                               {
+                                 fprintf(outfile,"'%c' },\n",cmds[m].toktype);
+                               }
+                               else
+                               {
+                                 fprintf(outfile,"%d },\n",cmds[m].toktype);
+                               }
+                               break;
       }
       if(cmds[m].tokval==VRTIMER) fprintf(outfile,"#endif\n");
       cmds[m].name=NULL;

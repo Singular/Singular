@@ -4,7 +4,7 @@
 
 //**************************************************************************/
 //
-// $Id: ndbm.cc,v 1.1 1997-08-08 12:59:28 obachman Exp $
+// $Id: ndbm.cc,v 1.2 1997-08-12 14:54:51 Singular Exp $
 //
 //**************************************************************************/
 // 'ndbm.cc' containes all low-level functions to manipulate dbm-files
@@ -23,7 +23,7 @@
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)ndbm.c	5.3 (Berkeley) 3/9/86";
+static char sccsid[] = "@(#)ndbm.c        5.3 (Berkeley) 3/9/86";
 #endif LIBC_SCCS and not lint
 
 //**************************************************************************/
@@ -229,14 +229,14 @@ split:
     if (dcalchash(item) & (db->dbm_hmask+1)) {
       item1 = makdatum(db->dbm_pagbuf, i+1);
       if (item1.dptr == NULL) {
-	fprintf(stderr, "ndbm: split not paired\n");
-	db->dbm_flags |= _DBM_IOERR;
-	break;
+        fprintf(stderr, "ndbm: split not paired\n");
+        db->dbm_flags |= _DBM_IOERR;
+        break;
       }
       if (!additem(ovfbuf, item, item1) ||
-	  !delitem(db->dbm_pagbuf, i)) {
-	db->dbm_flags |= _DBM_IOERR;
-	return (-1);
+          !delitem(db->dbm_pagbuf, i)) {
+        db->dbm_flags |= _DBM_IOERR;
+        return (-1);
       }
       continue;
     }
@@ -273,24 +273,24 @@ dbm_nextkey(register DBM *db)
   datum item;
   
   if (dbm_error(db) || fstat(db->dbm_pagf, &statb) < 0)
-		goto err;
+                goto err;
   statb.st_size /= PBLKSIZ;
   for (;;) {
     if (db->dbm_blkptr != db->dbm_pagbno) {
       db->dbm_pagbno = db->dbm_blkptr;
       (void) lseek(db->dbm_pagf, db->dbm_blkptr*PBLKSIZ, L_SET);
       if (read(db->dbm_pagf, db->dbm_pagbuf, PBLKSIZ) != PBLKSIZ)
-	bzero(db->dbm_pagbuf, PBLKSIZ);
+        bzero(db->dbm_pagbuf, PBLKSIZ);
 #ifdef DEBUG
       else if (chkblk(db->dbm_pagbuf) < 0)
-	db->dbm_flags |= _DBM_IOERR;
+        db->dbm_flags |= _DBM_IOERR;
 #endif
     }
     if (((short *)db->dbm_pagbuf)[0] != 0) {
       item = makdatum(db->dbm_pagbuf, db->dbm_keyptr);
       if (item.dptr != NULL) {
-	db->dbm_keyptr += 2;
-	return (item);
+        db->dbm_keyptr += 2;
+        return (item);
       }
       db->dbm_keyptr = 0;
     }
@@ -329,7 +329,7 @@ getbit(register DBM *db)
 {
   long bn;
   register b, i, n;
-	
+        
 
   if (db->dbm_bitno > db->dbm_maxbno)
     return (0);
@@ -414,30 +414,30 @@ static  int hitab[16]
 /* ken's
 {
         055,043,036,054,063,014,004,005,
-	010,064,077,000,035,027,025,071,
+        010,064,077,000,035,027,025,071,
 };
 */
  = {    61, 57, 53, 49, 45, 41, 37, 33,
-	29, 25, 21, 17, 13,  9,  5,  1,
+        29, 25, 21, 17, 13,  9,  5,  1,
 };
 static  long hltab[64]
  = {
-	06100151277L,06106161736L,06452611562L,05001724107L,
-	02614772546L,04120731531L,04665262210L,07347467531L,
-	06735253126L,06042345173L,03072226605L,01464164730L,
-	03247435524L,07652510057L,01546775256L,05714532133L,
-	06173260402L,07517101630L,02431460343L,01743245566L,
-	00261675137L,02433103631L,03421772437L,04447707466L,
-	04435620103L,03757017115L,03641531772L,06767633246L,
-	02673230344L,00260612216L,04133454451L,00615531516L,
-	06137717526L,02574116560L,02304023373L,07061702261L,
-	05153031405L,05322056705L,07401116734L,06552375715L,
-	06165233473L,05311063631L,01212221723L,01052267235L,
-	06000615237L,01075222665L,06330216006L,04402355630L,
-	01451177262L,02000133436L,06025467062L,07121076461L,
-	03123433522L,01010635225L,01716177066L,05161746527L,
-	01736635071L,06243505026L,03637211610L,01756474365L,
-	04723077174L,03642763134L,05750130273L,03655541561L,
+        06100151277L,06106161736L,06452611562L,05001724107L,
+        02614772546L,04120731531L,04665262210L,07347467531L,
+        06735253126L,06042345173L,03072226605L,01464164730L,
+        03247435524L,07652510057L,01546775256L,05714532133L,
+        06173260402L,07517101630L,02431460343L,01743245566L,
+        00261675137L,02433103631L,03421772437L,04447707466L,
+        04435620103L,03757017115L,03641531772L,06767633246L,
+        02673230344L,00260612216L,04133454451L,00615531516L,
+        06137717526L,02574116560L,02304023373L,07061702261L,
+        05153031405L,05322056705L,07401116734L,06552375715L,
+        06165233473L,05311063631L,01212221723L,01052267235L,
+        06000615237L,01075222665L,06330216006L,04402355630L,
+        01451177262L,02000133436L,06025467062L,07121076461L,
+        03123433522L,01010635225L,01716177066L,05161746527L,
+        01736635071L,06243505026L,03637211610L,01756474365L,
+        04723077174L,03642763134L,05750130273L,03655541561L,
 };
 
 static long
