@@ -1,8 +1,9 @@
 lift_s
 homolog_s
-polylib_s
-sres_s
-spcurve  ; becomes  huge
+sres_s 
+res_s    ; -1 in resolvente 
+bug_sres ; (c, ls) problem
+bug_sres_betti
 ; INFINITE  
 deform_s
 bug_16  ; degBound not recognized 

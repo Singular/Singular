@@ -45,7 +45,7 @@ monodromy_s
 mpsr_s
 ; INFINITE normal
 ; INFINITE paramet
-; DIFF polylib_s
+polylib_s
 primdec_s
 primitiv_s
 quotient_s
@@ -54,7 +54,7 @@ res_s
 resultantp_s
 ringsum
 sing_s
-; NON-ZERO spcurve
+spcurve
 ; DIFF sres_s
 std_s
 string
