@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.inc,v 1.14 1998-07-29 16:49:27 Singular Exp $ */
+/* $Id: febase.inc,v 1.15 1998-08-05 14:48:50 Singular Exp $ */
 /*
 * ABSTRACT: handling of 'voices'
 */
@@ -399,16 +399,31 @@ static int fePrintEcho(char *anf)
       else
         Print("%s %3d%c ",currentVoice->filename,yylineno,prompt_char);
     }
+    #ifdef HAVE_TCL
+    if(tclmode)
+    {
+      PrintTCL('N',len_s,anf);
+    }
+    else
+    {
+      fwrite(anf,1,len_s,stdout);
+      mflush();
+    }
+    #else
     fwrite(anf,1,len_s,stdout);
     mflush();
+    #endif
     if (traceit&TRACE_SHOW_LINE)
     {
+      #ifdef HAVE_TCL
+      if(!tclmode)
+      #endif
       while(fgetc(stdin)!='\n');
     }
   }
   else if (traceit&TRACE_SHOW_LINENO)
   {
-    printf("{%d}",yylineno);
+    Print("{%d}",yylineno);
     mflush();
   }
   prompt_char = '.';
