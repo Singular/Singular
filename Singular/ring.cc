@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.37 1998-11-06 14:44:16 obachman Exp $ */
+/* $Id: ring.cc,v 1.38 1998-11-09 14:16:09 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1751,7 +1751,7 @@ ring rCopy(ring r)
   ring res=(ring)Alloc(sizeof(ip_sring));
 
   memcpy4(res,r,sizeof(ip_sring));
-  res->ref=1;
+  res->ref=0;
   if (r->parameter!=NULL)
   {
     res->minpoly=nCopy(r->minpoly);
