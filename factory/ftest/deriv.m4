@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: deriv.m4,v 1.1 1997-09-24 08:55:58 schmidt Exp $ */
+/* $Id: deriv.m4,v 1.2 1997-09-24 10:49:52 schmidt Exp $ */
 
 ftestSetNameOfGame( deriv,
         `"Usage: deriv [<options>] [<envSpec>] <f> [<x>]\n"
@@ -20,10 +20,6 @@ ftestSetNameOfGame( deriv,
 ftestPreprocInit();
 
 ftestGlobalInit();
-
-//
-// - functions.
-//
 
 //
 // - main program.
