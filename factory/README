@@ -283,11 +283,20 @@ gengftables.cc which is an application of the most basic Factory features.
 14. Editing Factory
 ===================
   Parts of Factory are written using Emacs' folding-mode.  You may load
-this mode from Emacs with 'M-x load-file factory-<version>/bin/folding.el'.
-To switch it on, say 'M-x folding-mode'.  Alternatively, you may load
+this mode from Emacs with 'M-x load-file RET
+factory-<version>/bin/folding.el RET'.
+To switch it on, say 'M-x folding-mode RET'.  Alternatively, you may load
 factory-<version>/bin/fold-docu.el which contains some additional functions
-to fold only the documentation.  For more information, see the respective
-files.
+to fold only the documentation.  If you add the following lines to your
+.emacs-file, all this would be done automatically for you:
+
+  (add-hook 'c-mode-common-hook 'folding-mode)
+  (setq fold-fold-on-startup nil
+        fold-mode-marks-alist '((c++-mode "//{{{" "//}}}")))
+  (set-default 'fold-internal-margins nil)
+  (load-file "factory-<version>/bin/fold-docu.el")
+
+  For more information, see the respective files.
 
 
 15. Files in the distribution
