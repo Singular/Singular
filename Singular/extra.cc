@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.185 2002-06-04 11:49:27 levandov Exp $ */
+/* $Id: extra.cc,v 1.186 2002-06-05 11:12:53 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -64,6 +64,7 @@
 #ifdef HAVE_PLURAL
 #include "ring.h"
 #include "gring.h"
+#include "ipconv.h"
 #endif
 
 #ifdef ix86_Win /* only for the DLLTest */
@@ -1313,7 +1314,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #ifdef HAVE_PLURAL
-/*==================== PLURAL =================*/
+/*==================== lie bracket =================*/
     if (strcmp(sys_cmd, "bracket") == 0)
     {
       poly p;
@@ -1334,45 +1335,136 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       else res->data=NULL;     
       return FALSE;
     }
+/*==================== PLURAL =================*/
     if (strcmp(sys_cmd, "PLURAL") == 0)
     {
       matrix C;
       matrix D;
-      matrix COM;
-      if ((h!=NULL) && (h->Typ()==MATRIX_CMD))
-      {
-        C=(matrix)h->CopyD();
-        h=h->next;
-      }
-      else return TRUE;
-      if ((h!=NULL) && (h->Typ()==MATRIX_CMD))
-      {
-        D=(matrix)h->CopyD();
-      }
-      else return TRUE;
+      number nN;
+      poly pN;
+      int i,j;
+      sleftv tmp_v;
+      memset(&tmp_v,0,sizeof(tmp_v));
+
       if (currRing->nc==NULL)
       {
         currRing->nc=(nc_struct *)omAlloc0(sizeof(nc_struct));
-        currRing->nc->MT=(matrix *)omAlloc0(currRing->N*(currRing->N-1)/2*sizeof(matrix));
-        currRing->nc->MTsize=(int *)omAlloc0(currRing->N*(currRing->N-1)/2*sizeof(int));
       }
       else
       {
         WarnS("redefining algebra structure");
+	/* kill the previous nc data */
       }
       currRing->nc->type=nc_general;
+      /* C is either a poly (coeff - an int or a number) or a  matrix */
+      if (h==NULL) return TRUE;
+      leftv hh=h->next;
+      h->next=NULL;
+      switch(h->Typ())
+      {
+        case MATRIX_CMD: { C=(matrix)h->CopyD(); break; }
+	
+        case INT_CMD: case NUMBER_CMD:
+	{
+	  i=iiTestConvert(h->Typ(), POLY_CMD);
+	  if (i==0) 
+	  { 
+	    Werror("cannot convert to poly");
+	    return TRUE;
+	  }
+	  iiConvert(h->Typ(), POLY_CMD, i, h, &tmp_v);
+	  pN=(poly)tmp_v.Data();
+	  break;
+	}
+	
+        case POLY_CMD:  {pN=(poly)h->Data(); break;}
+
+        default: return TRUE;	
+      }
+      if (h->Typ()==MATRIX_CMD) 
+      {
+	currRing->nc->type=nc_undef; /* to analyze later ! */
+      }
+      else
+      {
+	nN=pGetCoeff(pN);
+	if (nIsOne(nN)) currRing->nc->type=nc_lie; 
+	else currRing->nc->type=nc_skew;
+	/* create matrix C */
+	C=mpNew(currRing->N,currRing->N);
+	for(i=1;i<currRing->N;i++)
+	{
+	  for(j=i+1;j<=currRing->N;j++)
+	  {
+	    MATELEM(C,i,j)=pCopy(pN);
+	  }
+	}
+      }
+      h=hh;
+      /* D is either a poly or a matrix */
+      if (h==NULL) { pN=NULL;}  /* D is zero matrix */ 
+      else 
+      {
+	switch(h->Typ())
+	{
+	  case MATRIX_CMD: { D=(matrix)h->CopyD(); break;}
+	
+	  case INT_CMD: case NUMBER_CMD:
+	  {
+	    i=iiTestConvert(h->Typ(), POLY_CMD);
+	    if (i==0) 
+	    { 
+	      Werror("cannot convert to poly");
+	      return TRUE;
+	    }
+	    iiConvert(h->Typ(), POLY_CMD, i, h, &tmp_v);
+	    pN=(poly)tmp_v.Data();
+	    break;
+	  }
+	  
+	  case POLY_CMD:  { pN=(poly)h->Data();break;}
+	  
+          default: return TRUE;
+	}
+      } /* end else h==NULL */
+      if (pN==NULL) 
+      {
+	if (currRing->nc->type==nc_lie) currRing->nc->type=nc_skew; /* even commutative! */
+	/* if (currRing->nc->type==nc_skew)  NOP */
+      }
+      else  { if (currRing->nc->type==nc_skew) currRing->nc->type=nc_general; }
+      if (h->Typ()!=MATRIX_CMD)
+      {
+	D=mpNew(currRing->N,currRing->N);
+	/* create matrix D */
+	for(i=1;i<currRing->N;i++)
+	{
+	  for(j=i+1;j<=currRing->N;j++)
+	  {
+	    MATELEM(D,i,j)=pCopy(pN);
+	  }
+	}
+      }
+      else currRing->nc->type=nc_undef;
+      tmp_v.CleanUp();
+      /* Now we proceed with C and D */
+      matrix COM;      
+      currRing->nc->MT=(matrix *)omAlloc0(currRing->N*(currRing->N-1)/2*sizeof(matrix));
+      currRing->nc->MTsize=(int *)omAlloc0(currRing->N*(currRing->N-1)/2*sizeof(int));
       currRing->nc->C=C;
       currRing->nc->D=D;
       COM=mpCopy(currRing->nc->C);
-      int i,j;
       poly p;
       short DefMTsize=7;
-      int nv=currRing->N;
-      for(i=1;i<nv;i++)
+      int IsSkewConstant=1;
+      int IsNonComm=0;
+      pN=MATELEM(currRing->nc->C,1,2);
+      for(i=1;i<currRing->N;i++)
       {
-        for(j=i+1;j<=nv;j++)
+        for(j=i+1;j<=currRing->N;j++)
         {
-          if (MATELEM(D,i,j)==NULL) /* quasicommutative case */
+	  if (!nEqual(pGetCoeff(pN),pGetCoeff(MATELEM(currRing->nc->C,i,j)))) IsSkewConstant=0; 
+          if (MATELEM(currRing->nc->D,i,j)==NULL) /* quasicommutative case */
           {
 	    currRing->nc->MTsize[UPMATELEM(i,j,currRing->N)]=1; 
 	    /* 1x1 mult.matrix */
@@ -1380,6 +1472,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           }
           else /* pure noncommutative case*/
           {
+	    IsNonComm=1;
             MATELEM(COM,i,j)=NULL;
             currRing->nc->MTsize[UPMATELEM(i,j,currRing->N)]=DefMTsize; /* default sizes */
             currRing->nc->MT[UPMATELEM(i,j,currRing->N)]=mpNew(DefMTsize,DefMTsize);
@@ -1394,7 +1487,15 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 	}
 	/* set MT[i,j,1,1] to c_i_j*x_i*x_j + D_i_j */
       }
-
+      if (currRing->nc->type==nc_undef)
+      {
+	if (IsNonComm==1) 
+	{
+	  if ((IsSkewConstant==1) && (nIsOne(pGetCoeff(pN)))) currRing->nc->type=nc_lie;
+	  else currRing->nc->type=nc_general;
+	}
+	if (IsNonComm==0) currRing->nc->type=nc_skew; /* could be also commutative */
+      }
       currRing->nc->COM=COM;
       return FALSE;
     }
@@ -1451,31 +1552,31 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 /*==================== DLL =================*/
 /* testing the DLL functionality under Win32 */
       if (strcmp(sys_cmd, "DLL") == 0)
-        {
-          typedef void  (*Void_Func)();
-          typedef int  (*Int_Func)(int);
-          void *hh=dynl_open("WinDllTest.dll");
-          if ((h!=NULL) && (h->Typ()==INT_CMD))
-            {
-              int (*f)(int);
-              if (hh!=NULL)
-                {
-                  int (*f)(int);
-                  f=(Int_Func)dynl_sym(hh,"PlusDll");
-                  int i=10;
-                  if (f!=NULL) printf("%d\n",f(i));
-                  else PrintS("cannot find PlusDll\n");
-                }
-            }
-          else
-            {
-              void (*f)();
-              f= (Void_Func)dynl_sym(hh,"TestDll");
-              if (f!=NULL) f();
-              else PrintS("cannot find TestDll\n");
-            }
-          return FALSE;
-        }
+      {
+	typedef void  (*Void_Func)();
+	typedef int  (*Int_Func)(int);
+	void *hh=dynl_open("WinDllTest.dll");
+	if ((h!=NULL) && (h->Typ()==INT_CMD))
+	{
+	  int (*f)(int);
+	  if (hh!=NULL)
+	  {
+	    int (*f)(int);
+	    f=(Int_Func)dynl_sym(hh,"PlusDll");
+	    int i=10;
+	    if (f!=NULL) printf("%d\n",f(i));
+	    else PrintS("cannot find PlusDll\n");
+	  }
+	}
+	else
+	{
+	  void (*f)();
+	  f= (Void_Func)dynl_sym(hh,"TestDll");
+	  if (f!=NULL) f();
+	  else PrintS("cannot find TestDll\n");
+	}
+	return FALSE;
+      }
       else
 #endif
 #endif
