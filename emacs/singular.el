@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.6 1998-07-28 06:54:33 schmidt Exp $
+;; $Id: singular.el,v 1.7 1998-07-28 10:45:56 schmidt Exp $
 
 ;;; Commentary:
 
@@ -406,11 +406,91 @@ order in that the appear in the region."
   nil)
 ;;}}}
 
+;;{{{ Section stuff
+
+;; Note:
+;;
+;; NOT READY[was sind und wollen sections im Gegensatz zu simple
+;; sections?]!
+
+(defun singular-section-at (pos &optional raw-section)
+  "Return section at position POS.
+Returns section intersected with current restriction unless
+RAW-SECTION is non-nil."
+  (let* ((simple-sec (singular-simple-sec-at pos))
+	 (type (singular-simple-sec-type simple-sec))
+	 (start (if simple-sec
+		    (singular-simple-sec-start simple-sec)
+		  (singular-simple-sec-start-at pos)))
+	 (end (if simple-sec
+		  (singular-simple-sec-end simple-sec)
+		(singular-simple-sec-end-at pos))))
+    (if raw-section
+	(vector simple-sec type start end)
+      (vector simple-sec type
+	      (max start (point-min)) (min end (point-max))))))
+
+(defmacro singular-section-simple-sec (section)
+  "Return underlying simple section of SECTION."
+  `(aref ,section 0))
+
+(defmacro singular-section-type (section)
+  "Return type of SECTION."
+  `(aref ,section 1))
+
+(defmacro singular-section-start (section)
+  "Return start of SECTION."
+  `(aref ,section 2))
+
+(defmacro singular-section-end (section)
+  "Return end of SECTION."
+  `(aref ,section 3))
+;;}}}
+
 ;;{{{ Folding sections
 (defvar singular-folding-ellipsis "Singular I/O ..."
   "Ellipsis to show for folded input or output.")
+
+(defun singular-fold-internal (start end fold)
+  "(Un)fold region from START to END.
+Folds if FOLD is non-nil, otherwise unfolds.
+Folds without affecting undo information, buffer-modified flag, and
+even for read-only files."
+  (let ((inhibit-read-only t) (buffer-undo-list t)
+	(save-modified (buffer-modified-p))
+	(save-point (point)))
+    (unwind-protect
+	;; do it !!
+	(if fold
+	    (progn
+	      (goto-char start) (insert ?\r)
+	      (subst-char-in-region start end ?\n ?\r t))
+	  (goto-char start) (delete-char 1)
+	  (subst-char-in-region start end ?\r ?\n t))
+
+      ;; we have to restore the point and the modified flag.  The read-only
+      ;; state and undo information are restored by the outer `let'.
+      ;; This code is unwide-protected.
+      (goto-char save-point)
+      (or save-modified
+	  (set-buffer-modified-p nil)))))
+
+(defun singular-section-foldedp (section)
+  "Return t iff SECTION is folded."
+  (eq (char-after (singular-section-start section)) ?\r))
+
+(defun singular-fold-section (section)
+  "Fold SECTION.
+Folds section at current cursor position and goes to beginning of
+section if called interactively."
+  (interactive (list (singular-section-at (point))))
+  (let ((start (singular-section-start section)))
+    (singular-fold-internal start
+			    (singular-section-end section)
+			    (not (singular-section-foldedp section)))
+    (if (interactive-p) (goto-char start))))
 ;;}}}
-  
+
 ;;{{{ Debugging input and output filters
 (defun singular-debug-input-filter (string)
   "Echo STRING in mini-buffer."
@@ -583,7 +663,7 @@ notes on filters\" in singular.el."
 		    (save-point-min (point-min))
 		    (save-point-max (point-max))
 		    (save-pmark (marker-position (process-mark process)))
-		    (buffer-read-only nil)
+		    (inhibit-read-only t)
 		    (n (length string)))
 		(widen)
 		(goto-char save-pmark)
