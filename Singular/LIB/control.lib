@@ -1,4 +1,4 @@
-version="$Id: control.lib,v 1.22 2005-02-25 10:45:27 levandov Exp $";
+version="$Id: control.lib,v 1.23 2005-02-25 10:48:06 levandov Exp $";
 category="Applications";
 info="
 LIBRARY:  control.lib Procedures for System and Control Theory 
@@ -17,7 +17,8 @@ autonom  (R);           analysis of autonomy-related properties of R (using Ext 
 autonom2 (R);           analysis of autonomy-related properties of R (using dimension),
 LeftKernel  (R);        a left kernel of R,
 RightKernel (R);        a right kernel of R,
-LeftInverse (R)         a left inverse of R,
+LeftInverse (R);        a left inverse of R,
+RighttInverse (R);      a right inverse of R,
 smith (M);              a Smith form of a module M,
 genericity (M);         analysis of the genericity of parameters,
 canonize (L);           Groebnerification for modules in the output of control/autonomy procs. 
@@ -1305,7 +1306,8 @@ example
 //---------------------------------------------------------------
 proc list_tex(list L, string name, link l)
 "USAGE: control_tex(l), where l is a list
-PURPOSE:        writes the content of list L in a tex-file 'name'
+PURPOSE: writes the content of list L in a tex-file 'name', L is supposed
+to be the output of control/autonomy procedures
 RETURN: nothing
 "
 {
