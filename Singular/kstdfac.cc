@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: kstdfac.cc,v 1.2 1997-03-24 14:25:07 Singular Exp $";
+static char rcsid[] = "$Id: kstdfac.cc,v 1.3 1997-03-26 14:37:15 Singular Exp $";
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -234,6 +234,7 @@ static void completeReduceFac (kStrategy strat, lists FL)
       PrintS("-");mflush();
     }
     int facdeg=pFDeg(strat->S[si]);
+
     ideal fac=singclap_factorize(strat->S[si],NULL,1);
 #ifndef HAVE_LIBFAC_P
     if (fac==NULL)

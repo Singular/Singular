@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: iparith.cc,v 1.7 1997-03-25 15:40:18 Singular Exp $";
+static char rcsid[] = "$Id: iparith.cc,v 1.8 1997-03-26 14:37:12 Singular Exp $";
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
@@ -2521,10 +2521,15 @@ static BOOLEAN jjP2N(leftv res, leftv v)
 {
   number n;
   poly p;
-  if ((p=(poly)v->Data())!=NULL)
+  if (((p=(poly)v->Data())!=NULL)
+  && (pIsConstant(p)))
+  {
     n=nCopy(pGetCoeff(p));
+  }
   else
+  {
     n=nInit(0);
+  }
   res->data = (char *)n;
   return FALSE;
 }
