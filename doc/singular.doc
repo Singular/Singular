@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.100 2000-12-11 13:25:43 Singular Exp $
+@comment $Id: singular.doc,v 1.101 2000-12-11 13:49:59 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -184,6 +184,7 @@ command @code{LIB "all.lib";} for loading all libraries.
 * Invariant theory::
 * Symbolic-numerical solving::
 * Visualization::
+* Coding theory::
 @end menu
 @c ----------------------------------------------------------
 @node standard_lib, General purpose, SINGULAR libraries, SINGULAR libraries
@@ -425,7 +426,7 @@ LIB "all.lib";
 @c lib zeroset.lib
 
 @c ----------------------------------------------------------------------------
-@node Visualization, , Symbolic-numerical solving, SINGULAR libraries
+@node Visualization, Coding theory, Symbolic-numerical solving, SINGULAR libraries
 @section Visualization
 @cindex Visualization
 
@@ -448,6 +449,19 @@ LIB "all.lib";
 @subsection surf_lib
 @c lib surf.lib no_ex
 
+@c ----------------------------------------------------------------------------
+@node Coding theory, , Visualization, SINGULAR libraries
+@section Coding theory
+@cindex Coding theory
+
+@menu
+* brnoeth_lib:: Brill-Noether algorithm, Weierstrass semigroups and AG codes
+@end menu
+
+@c ---------------------------------------------------------
+@node brnoeth_lib, , , Coding theory
+@subsection brnoeth_lib
+@c lib brnoeth_lib
 @c ----------------------------------------------------------
 @node Release Notes, Index, SINGULAR libraries, Top
 @chapter Release Notes
