@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.3 1997-03-24 14:24:41 Singular Exp $ */
+/* $Id: grammar.y,v 1.4 1997-03-27 12:42:43 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -332,7 +332,7 @@ pprompt:
         | EXIT_CMD
           {
             ifswitch[voice]=0;
-            Print("exit found\n");
+            /*Print("exit found\n");*/
             YYACCEPT;
           }
         | SYS_BREAK

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: kstd1.cc,v 1.3 1997-03-24 14:25:03 Singular Exp $";
+static char rcsid[] = "$Id: kstd1.cc,v 1.4 1997-03-27 12:42:47 Singular Exp $";
 /*
 * ABSTRACT:
 */
@@ -1750,7 +1750,7 @@ ideal std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
       toReset = TRUE;
     }
     pLexOrder = TRUE;
-    strat->LazyPass*=2;
+    if (hilb==NULL) strat->LazyPass*=2;
   }
   strat->homog=h;
   spSet(currRing);

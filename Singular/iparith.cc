@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: iparith.cc,v 1.9 1997-03-26 17:07:24 Singular Exp $";
+static char rcsid[] = "$Id: iparith.cc,v 1.10 1997-03-27 12:42:44 Singular Exp $";
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
@@ -2995,6 +2995,8 @@ struct sValCmd1 dArith1[]=
 ,{jjSTRING,     STRING_CMD,      STRING_CMD,     INTVEC_CMD }
 ,{jjSTRING,     STRING_CMD,      STRING_CMD,     INTMAT_CMD }
 ,{jjSTRING_PROC,STRING_CMD,      STRING_CMD,     PROC_CMD }
+,{jjSTRING,     STRING_CMD,      STRING_CMD,     RING_CMD }
+,{jjSTRING,     STRING_CMD,      STRING_CMD,     QRING_CMD }
 ,{jjSYSTEM,     SYSTEM_CMD,      NONE,           STRING_CMD }
 ,{jjSYZYGY,     SYZYGY_CMD,      MODUL_CMD,      IDEAL_CMD }
 ,{jjSYZYGY,     SYZYGY_CMD,      MODUL_CMD,      MODUL_CMD }

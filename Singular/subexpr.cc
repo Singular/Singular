@@ -1,8 +1,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/subexpr.cc,v 1.7 1997-03-26 17:07:27 Singular Exp $";
+static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/subexpr.cc,v 1.8 1997-03-27 12:42:50 Singular Exp $";
 /* $Log: not supported by cvs2svn $
+// Revision 1.7  1997/03/26  17:07:27  Singular
+// * hannes/wichmann: added fglm
+//
 // Revision 1.6  1997/03/26  14:58:06  obachman
 // Wed Mar 26 14:02:15 1997  Olaf Bachmann
 // <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
@@ -639,7 +642,6 @@ char *  sleftv::String(void *d)
         s = pString((poly)d);
         break;
       case NUMBER_CMD:
-        if (LTyp()==LIST_CMD) return LData()->String(d);
         StringSetS("");
         if ((rtyp==IDHDL)&&(IDTYP((idhdl)data)==NUMBER_CMD))
         {
@@ -673,6 +675,11 @@ char *  sleftv::String(void *d)
         intvec *v=(intvec *)d;
         return v->String();
       }
+      case RING_CMD:
+      case QRING_CMD:
+      {
+        return rString((ring)d);
+      }  
   #ifdef TEST
       default:
         ::Print("String:unknown type %s(%d)", Tok2Cmdname(Typ()),Typ());

@@ -6,7 +6,7 @@
 /*
 * ABSTRACT
 */
-/* $Id: ring.h,v 1.2 1997-03-24 14:25:42 Singular Exp $ */
+/* $Id: ring.h,v 1.3 1997-03-27 12:42:49 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -30,6 +30,7 @@ int rOrderName(char * ordername);
 char * rOrdStr(ring r);
 char * rVarStr(ring r);
 char * rCharStr(ring r);
+char * rString(ring r);
 int    rChar(ring r=currRing);
 #define rPar(r) (r->P)
 char * rParStr(ring r);

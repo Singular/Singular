@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.2 1997-03-24 14:25:43 Singular Exp $ */
+/* $Id: scanner.l,v 1.3 1997-03-27 12:42:50 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -249,7 +249,6 @@ newline                  {
                            lvalp->name = mstrdup((char *)yytext);
                            return RINGVAR;
                          }
-                         //exit[ \t\n]*[\.;]?       { /*if (exitFile())*/ return EXIT_CMD; }
 \$[\.;]?                 {
                            #ifdef HAVE_TCL
                            if (tclmode)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: ring.cc,v 1.2 1997-03-24 14:25:41 Singular Exp $";
+static char rcsid[] = "$Id: ring.cc,v 1.3 1997-03-27 12:42:48 Singular Exp $";
 /*
 * ABSTRACT - the interpreter related ring operations
 */
@@ -1033,6 +1033,19 @@ char * rParStr(ring r)
   strcat(s,r->parameter[i]);
   return s;
 }
+
+char * rString(ring r)
+{
+  char *ch=rCharStr(r);
+  char *var=rVarStr(r);
+  char *ord=rOrdStr(r);
+  char *res=(char *)AllocL(strlen(ch)+strlen(var)+strlen(ord)+9);
+  sprintf(res,"(%s),(%s),(%s)",ch,var,ord);
+  FreeL((ADDRESS)ch);
+  FreeL((ADDRESS)var);
+  FreeL((ADDRESS)ord);
+  return res;
+}  
 
 int rChar(ring r)
 {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Id: khstd.cc,v 1.2 1997-03-24 14:25:02 Singular Exp $";
+static char rcsid[] = "$Id: khstd.cc,v 1.3 1997-03-27 12:42:46 Singular Exp $";
 /*
 * ABSTRACT:utils for hilbert driven std
 */
@@ -67,6 +67,11 @@ void khCheck( ideal Q, intvec *w, intvec *hilb, int &eledeg, int &count,
           while (strat->Ll>=0)
           {
             count++;
+            if(TEST_OPT_PROT)
+            {
+              PrintS("h");
+              mflush();
+            }  
             deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
           }
           return;
@@ -80,6 +85,11 @@ void khCheck( ideal Q, intvec *w, intvec *hilb, int &eledeg, int &count,
     while ((strat->Ll>=0) && (degp(strat->L[strat->Ll].p) < deg)) // the essential step
     {
       count++;
+      if(TEST_OPT_PROT)
+      {
+        PrintS("h");
+        mflush();
+      }  
       deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
     }
   }
