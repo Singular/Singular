@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.57 1999-07-21 19:58:40 obachman Exp $ */
+/* $Id: iplib.cc,v 1.58 1999-07-22 17:52:20 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -1011,13 +1011,13 @@ char mytolower(char c)
 }
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-#if defined(WINNT)
-#  define  FS_SEP '\\'
-#elif defined(macintosh)
-#  define FS_SEP ','
-#else
-#  define FS_SEP '/'
-#endif
+//#if defined(WINNT)
+//#  define  FS_SEP '\\'
+//#elif defined(macintosh)
+//#  define FS_SEP ','
+//#else
+//#  define FS_SEP '/'
+//#endif
 
 char *iiConvName(char *libname)
 {
