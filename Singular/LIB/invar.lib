@@ -1,7 +1,7 @@
-// $Id: invar.lib,v 1.16 1999-08-03 13:21:56 obachman Exp $
+// $Id: invar.lib,v 1.17 1999-09-16 11:17:31 pfister Exp $
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: invar.lib,v 1.16 1999-08-03 13:21:56 obachman Exp $";
+version="$Id: invar.lib,v 1.17 1999-09-16 11:17:31 pfister Exp $";
 info="
 LIBRARY: invar.lib   PROCEDURES FOR COMPUTING INVARIANTS OF (K,+)-ACTIONS
 AUTHORS: Gerhard Pfister,  email: pfister@mathematik.uni-kl.de
@@ -186,6 +186,7 @@ EXAMPLE: example reduction; shows an example
       }
     }
   }
+
   // -------------------- first algorithm (default) -----------------------
   if ( choose == 0 )
   {
@@ -300,6 +301,33 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
+proc completeReductionnew(poly p, ideal dom, list #)
+"USAGE:   completeReduction(p,I[,q,n]); p poly, I ideal, [q monomial, n int]
+RETURN:  a polynomial, the SAGBI reduction of the polynomial p with I
+         via the procedure 'reduction' as long as possible
+         if n=1, a different algorithm is choosen which is sometimes faster
+         (default: n=0; q and n can be given (or not) in any order)
+NOTE:    help reduction; shows an explanation of SAGBI reduction
+EXAMPLE: example completeReduction; shows an example
+"
+{
+  if(p==0)
+  {
+     return(p);
+  }
+  poly p1=p;
+  poly p2=reduction(p,dom,#);
+  while (p1!=p2)
+  {
+    p1=p2;
+    p2=reduction(p1,dom,#);
+  }
+  poly re=lead(p2)+completeReduction(p2-lead(p2),dom,#);
+  return(re);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 proc localInvar(matrix m, poly p, poly q, poly h)
 "USAGE:   localInvar(m,p,q,h); m matrix, p,q,h polynomials
 ASSUME:  m(q) and h are invariant under the vectorfield m, i.e. m(m(q))=m(h)=0
@@ -400,6 +428,7 @@ EXAMPLE: example furtherInvar; shows an example
   setring r1;
   // --------------- compute the kernel of phi ---------------------------
   ideal ker=preimage(br,phi,null);
+  ker=mstd(ker)[2];
   // ---- define the map psi : r1 ---> br defined by y(i) ---> id[i] -----
   setring br;
   map psi=r1,id;
@@ -545,6 +574,7 @@ EXAMPLE: example invariantRing; shows an example
     karl=k2[2];
     k1=sortier(k1);
     z=size(k1);
+
     for (i=1;i<=z;i++)
     {
       k1[i]= completeReduction(k1[i],karl,ll);
@@ -681,5 +711,6 @@ example
     m[i+1,1]=x(i);
   }
   ideal in=invariantRing(m,x(2),x(1),0,"");
+
   in;
 */
