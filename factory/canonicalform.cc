@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.23 1997-10-27 14:15:36 schmidt Exp $ */
+/* $Id: canonicalform.cc,v 1.24 1997-12-18 17:05:33 schmidt Exp $ */
 
 #include <config.h>
 
@@ -422,14 +422,12 @@ CanonicalForm::degree() const
 {
     int what = is_imm( value );
     if ( what )
-	if ( what == GFMARK && imm_iszero_gf( value ) )
-	    return -1;
-	else if ( what == FFMARK && imm_iszero_gf( value ) )
-	    return -1;
-	else if ( what == INTMARK && imm_iszero( value ) )
-	    return -1;
+	if ( what == FFMARK )
+	    return imm_iszero_p( value ) ? -1 : 0;
+	else if ( what == INTMARK )
+	    return imm_iszero( value ) ? -1 : 0;
 	else
-	    return 0;
+	    return imm_iszero_gf( value ) ? -1 : 0;
     else
 	return value->degree();
 }
@@ -439,14 +437,12 @@ CanonicalForm::degree( const Variable & v ) const
 {
     int what = is_imm( value );
     if ( what )
-	if ( what == GFMARK && imm_iszero_gf( value ) )
-	    return -1;
-	else if ( what == FFMARK && imm_iszero_gf( value ) )
-	    return -1;
-	else if ( what == INTMARK && imm_iszero( value ) )
-	    return -1;
+	if ( what == FFMARK )
+	    return imm_iszero_p( value ) ? -1 : 0;
+	else if ( what == INTMARK )
+	    return imm_iszero( value ) ? -1 : 0;
 	else
-	    return 0;
+	    return imm_iszero_gf( value ) ? -1 : 0;
     else if ( value->inBaseDomain() )
 	return value->degree();
 
@@ -506,14 +502,12 @@ CanonicalForm::taildegree () const
 {
     int what = is_imm( value );
     if ( what )
-	if ( what == GFMARK && imm_iszero_gf( value ) )
-	    return -1;
-	else if ( what == FFMARK && imm_iszero_gf( value ) )
-	    return -1;
-	else if ( what == INTMARK && imm_iszero( value ) )
-	    return -1;
+	if ( what == FFMARK )
+	    return imm_iszero_p( value ) ? -1 : 0;
+	else if ( what == INTMARK )
+	    return imm_iszero( value ) ? -1 : 0;
 	else
-	    return 0;
+	    return imm_iszero_gf( value ) ? -1 : 0;
     else
 	return value->taildegree();
 }
@@ -1095,11 +1089,11 @@ CanonicalForm::operator [] ( int i ) const
 // deriv() - return the formal derivation of CO.
 //
 // deriv() derives CO with respect to its main variable.  Returns
-// zero if f is in a coefficient domain.
+// zero from the current domain if f is in a coefficient domain.
 //
 // deriv( x ) derives CO with respect to x.  x should be a
-// polynomial variable.  Returns zero if f is in a coefficient
-// domain.
+// polynomial variable.  Returns zero from the current domain if
+// f is in a coefficient domain.
 //
 // See also: ::deriv()
 //
@@ -1146,11 +1140,11 @@ CanonicalForm::deriv ( const Variable & x ) const
 // sign() - return sign of CO.
 //
 // If CO is an integer or a rational number, the sign is defined
-// as usual.  If CO is an element of a prime power domain or in a
-// finite field and SW_SYMMETRIC_FF is on the sign of CO is the
-// sign of the symmetric representation of CO.  If CO is in GF(q)
-// or in a finite field and SW_SYMMETRIC_FF is off, the sign of
-// CO is zero iff CO is zero, otherwise the sign is one.
+// as usual.  If CO is an element of a prime power domain or of
+// FF(p) and SW_SYMMETRIC_FF is on, the sign of CO is the sign of
+// the symmetric representation of CO.  If CO is in GF(q) or in
+// FF(p) and SW_SYMMETRIC_FF is off, the sign of CO is zero iff
+// CO is zero, otherwise the sign is one.
 //
 // If CO is a polynomial or in an extension of one of the base
 // domains, the sign of CO is the sign of its leading
@@ -1241,84 +1235,148 @@ CanonicalForm::ilog2 () const
 }
 //}}}
 
-//{{{ CanonicalForm CanonicalForm::gcd( const CanonicalForm & ) const
-CanonicalForm
-CanonicalForm::gcd( const CanonicalForm & ) const
-{
-//    return ::gcd( *this, f );
-    return 1;
-}
+//{{{ bool operator ==, operator != ( const CanonicalForm & lhs, const CanonicalForm & rhs )
+//{{{ docu
+//
+// operator ==(), operator !=() - compare canonical forms on
+//   (in)equality.
+//
+// operator ==() returns true iff lhs equals rhs.
+// operator !=() returns true iff lhs does not equal rhs.
+//
+// This is the point in factory where we essentially use that
+// CanonicalForms in fact are canonical.  There must not be two
+// different representations of the same mathematical object,
+// otherwise, such (in)equality will not be recognized by these
+// operators.  In other word, we rely on the fact that structural
+// different factory objects in any case represent different
+// mathematical objects.
+//
+// So we use the following procedure to test on equality (and
+// analogously on inequality).  First, we check whether lhs.value
+// equals rhs.value.  If so we are ready and return true.
+// Second, if one of the operands is immediate, but the other one
+// not, we return false.  Third, if the operand's levels differ
+// we return false.  Fourth, if the operand's levelcoeffs differ
+// we return false.  At last, we call the corresponding internal
+// method to compare both operands.
+//
+// Both operands should have coefficients from the same base domain.
+//
+// Note: To compare with the zero or the unit of the current domain,
+// you better use the methods `CanonicalForm::isZero()' or
+// `CanonicalForm::isOne()', resp., than something like `f == 0',
+// since the latter is quite a lot slower.
+//
+// See also: InternalCF::comparesame(),
+// InternalInteger::comparesame(), InternalRational::comparesame(),
+// InternalPrimePower::comparesame(), InternalPoly::comparesame()
+//
 //}}}
-
-//{{{ comparison operators
 bool
 operator == ( const CanonicalForm & lhs, const CanonicalForm & rhs )
 {
-    int what = is_imm( lhs.value );
-    if ( what )
-	if ( what == is_imm( rhs.value ) )
-	    return lhs.value == rhs.value;
-	else
-	    return false;
-    else  if ( is_imm( rhs.value ) )
+    if ( lhs.value == rhs.value )
+	return true;
+    else if ( is_imm( rhs.value ) || is_imm( lhs.value ) ) {
+	ASSERT( ! is_imm( rhs.value ) ||
+		! is_imm( lhs.value ) ||
+		is_imm( rhs.value ) == is_imm( lhs.value ),
+		"incompatible operands" );
 	return false;
-    else  if ( lhs.level() == rhs.level() )
-	if ( lhs.value->levelcoeff() >= rhs.value->levelcoeff() )
-	    return lhs.value->comparesame( rhs.value ) == 0;
-	else
-	    return rhs.value->comparesame( lhs.value ) == 0;
+    }
+    else  if ( lhs.value->level() != rhs.value->level() )
+	return false;
+    else  if ( lhs.value->levelcoeff() != rhs.value->levelcoeff() )
+	return false;
     else
-	return false;
+	return rhs.value->comparesame( lhs.value ) == 0;
 }
 
 bool
 operator != ( const CanonicalForm & lhs, const CanonicalForm & rhs )
 {
-    int what = is_imm( lhs.value );
-    if ( what )
-	if ( what == is_imm( rhs.value ) )
-	    return lhs.value != rhs.value;
-	else
-	    return true;
-    else  if ( is_imm( rhs.value ) )
+    if ( lhs.value == rhs.value )
+	return false;
+    else if ( is_imm( rhs.value ) || is_imm( lhs.value ) ) {
+	ASSERT( ! is_imm( rhs.value ) ||
+		! is_imm( lhs.value ) ||
+		is_imm( rhs.value ) == is_imm( lhs.value ),
+		"incompatible operands" );
 	return true;
-    else  if ( lhs.level() == rhs.level() )
-	if ( lhs.value->levelcoeff() >= rhs.value->levelcoeff() )
-	    return lhs.value->comparesame( rhs.value ) != 0;
-	else
-	    return rhs.value->comparesame( lhs.value ) != 0;
-    else
+    }
+    else  if ( lhs.value->level() != rhs.value->level() )
 	return true;
+    else  if ( lhs.value->levelcoeff() != rhs.value->levelcoeff() )
+	return true;
+    else	return rhs.value->comparesame( lhs.value ) != 0;
 }
+//}}}
 
+//{{{ bool operator >, operator < ( const CanonicalForm & lhs, const CanonicalForm & rhs )
+//{{{ docu
+//
+// operator >(), operator <() - compare canonical forms. on size or
+//   level.
+//
+// The most common and most useful application of these operators
+// is to compare two integers or rationals, of course.  However,
+// these operators are defined on all other base domains and on
+// polynomials, too.  From a mathematical point of view this may
+// seem meaningless, since there is no ordering on finite fields
+// or on polynomials respecting the algebraic structure.
+// Nevertheless, from a programmer's point of view it may be
+// sensible to order these objects, e.g. to sort them.
+//
+// For this reason, the ordering defined by these operators in
+// any case is a total ordering which fulfills the law of
+// trichotomy.
+//
+// It is clear how this is done in the case of the integers and
+// the rationals.  For finite fields, all you can say is that
+// zero is the minimal element w.r.t. the ordering, the other
+// elements are ordered in an arbitrary (but total!)  way.  For
+// polynomials, you have an ordering derived from the
+// lexicographical ordering of monomials.  E.g. if lm(f) < lm(g)
+// w.r.t. lexicographic ordering, then f < g.  For more details,
+// refer to the documentation of `InternalPoly::operator <()'.
+// 
+// Both operands should have coefficients from the same base domain.
+//
+// The scheme how both operators are implemented is allmost the
+// same as for the assignment operators (check for immediates,
+// then check levels, then check levelcoeffs, then call the
+// appropriate internal comparesame()/comparecoeff() method).
+// For more information, confer to the overview for the
+// arithmetic operators.
+//
+// See also: InternalCF::comparesame(),
+// InternalInteger::comparesame(), InternalRational::comparesame(),
+// InternalPrimePower::comparesame(), InternalPoly::comparesame(),
+// InternalCF::comparecoeff(), InternalInteger::comparecoeff(),
+// InternalRational::comparecoeff(),
+// InternalPrimePower::comparecoeff(), InternalPoly::comparecoeff(),
+// imm_cmp(), imm_cmp_p(), imm_cmp_gf()
+//
+//}}}
 bool
 operator > ( const CanonicalForm & lhs, const CanonicalForm & rhs )
 {
-    int what = is_imm( lhs.value );
-    if ( what ) {
-	ASSERT ( ! is_imm( rhs.value ) || (what==is_imm( rhs.value )), "illegal base coefficients" );
-	if ( what == INTMARK ) {
-	    if ( what == is_imm( rhs.value ) )
-		return imm_cmp( lhs.value, rhs.value ) > 0;
-	    else
-		return rhs.value->comparecoeff( lhs.value ) < 0;
-	}
-	else  if ( what == FFMARK ) {
-	    if ( what == is_imm( rhs.value ) )
-		return imm_cmp_p( lhs.value, rhs.value ) > 0;
-	    else
-		return rhs.value->comparecoeff( lhs.value ) < 0;
-	}
-	else {
-	    if ( what == is_imm( rhs.value ) )
-		return imm_cmp_gf( lhs.value, rhs.value ) > 0;
-	    else
-		return rhs.value->comparecoeff( lhs.value ) < 0;
-	}
+    int what = is_imm( rhs.value );
+    if ( is_imm( lhs.value ) ) {
+	ASSERT( ! what || (what == is_imm( lhs.value )), "incompatible operands" );
+	if ( what == 0 )
+	    return rhs.value->comparecoeff( lhs.value ) < 0;
+	else if ( what == INTMARK )
+	    return imm_cmp( lhs.value, rhs.value ) > 0;
+	else if ( what == FFMARK )
+	    return imm_cmp_p( lhs.value, rhs.value ) > 0;
+	else
+	    return imm_cmp_gf( lhs.value, rhs.value ) > 0;
     }
-    else  if ( is_imm( rhs.value ) )
+    else  if ( what )
 	return lhs.value->comparecoeff( rhs.value ) > 0;
-    else  if ( lhs.level() == rhs.level() )
+    else  if ( lhs.value->level() == rhs.value->level() )
 	if ( lhs.value->levelcoeff() == rhs.value->levelcoeff() )
 	    return lhs.value->comparesame( rhs.value ) > 0;
 	else  if ( lhs.value->levelcoeff() > rhs.value->levelcoeff() )
@@ -1332,31 +1390,21 @@ operator > ( const CanonicalForm & lhs, const CanonicalForm & rhs )
 bool
 operator < ( const CanonicalForm & lhs, const CanonicalForm & rhs )
 {
-    int what = is_imm( lhs.value );
-    if ( what ) {
-	ASSERT ( ! is_imm( rhs.value ) || (what==is_imm( rhs.value )), "illegal base coefficients" );
-	if ( what == INTMARK ) {
-	    if ( what == is_imm( rhs.value ) )
-		return imm_cmp( lhs.value, rhs.value ) < 0;
-	    else
-		return rhs.value->comparecoeff( lhs.value ) > 0;
-	}
-	else  if ( what == FFMARK ) {
-	    if ( what == is_imm( rhs.value ) )
-		return imm_cmp( lhs.value, rhs.value ) < 0;
-	    else
-		return rhs.value->comparecoeff( lhs.value ) > 0;
-	}
-	else {
-	    if ( what == is_imm( rhs.value ) )
-		return imm_cmp( lhs.value, rhs.value ) < 0;
-	    else
-		return rhs.value->comparecoeff( lhs.value ) > 0;
-	}
+    int what = is_imm( rhs.value );
+    if ( is_imm( lhs.value ) ) {
+	ASSERT( ! what || (what == is_imm( lhs.value )), "incompatible operands" );
+	if ( what == 0 )
+	    return rhs.value->comparecoeff( lhs.value ) > 0;
+	else if ( what == INTMARK )
+	    return imm_cmp( lhs.value, rhs.value ) < 0;
+	else if ( what == FFMARK )
+	    return imm_cmp_p( lhs.value, rhs.value ) < 0;
+	else
+	    return imm_cmp_gf( lhs.value, rhs.value ) < 0;
     }
-    else  if ( is_imm( rhs.value ) )
+    else  if ( what )
 	return lhs.value->comparecoeff( rhs.value ) < 0;
-    else  if ( lhs.level() == rhs.level() )
+    else  if ( lhs.value->level() == rhs.value->level() )
 	if ( lhs.value->levelcoeff() == rhs.value->levelcoeff() )
 	    return lhs.value->comparesame( rhs.value ) < 0;
 	else  if ( lhs.value->levelcoeff() > rhs.value->levelcoeff() )
