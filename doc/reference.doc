@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.119 1999-07-07 14:11:46 Singular Exp $
+@comment $Id: reference.doc,v 1.120 1999-07-07 16:38:37 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -139,7 +139,6 @@ brackets are allowed.
 * par::
 * pardeg::
 * parstr::
-* pause::
 * preimage::
 * prime::
 * print::
@@ -4010,7 +4009,7 @@ returns the degree of a number considered as a polynomial in the ring parameters
 See @ref{number}; @ref{ring}; @ref{var}.
 @end iftex
 @c ---------------------------------------
-@node parstr, pause, pardeg, Functions
+@node parstr, preimage, pardeg, Functions
 @subsection parstr
 @cindex parstr
 @table @code
@@ -4048,28 +4047,7 @@ See @ref{charstr}; @ref{npars}; @ref{ordstr}; @ref{par}
 @ref{varstr}.
 @end iftex
 @c ---------------------------------------
-@node pause, preimage, parstr, Functions
-@subsection pause
-@cindex pause
-@c lib standard.lib:pause lib_fun lib_ex
-@c @table @code
-@c @item @strong{Syntax:}
-@c @code{pause;}
-@c @item @strong{Type:}
-@c none
-@c @item @strong{Purpose:}
-@c pauses the execution of a procedure until the return key is pressed.
-@c @item @strong{Example:}
-@c @example
-@c // the procedure will continue if return is pressed:
-@c "press the return key to continue"; pause;
-@c @expansion{} press the return key to continue
-@c @expansion{} pause>
-@c 
-@c @end example
-@c @end table
-@c ---------------------------------------
-@node preimage, prime, pause, Functions
+@node preimage, prime, parstr, Functions
 @subsection preimage
 @cindex preimage
 @cindex kernel

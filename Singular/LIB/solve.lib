@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: solve.lib,v 1.10 1999-07-07 14:39:13 obachman Exp $";
+version="$Id: solve.lib,v 1.11 1999-07-07 16:38:28 obachman Exp $";
 info="
 LIBRARY: solve.lib     PROCEDURES TO SOLVE POLYNOMIAL SYSTEMS
 AUTHOR:  Moritz Wenk,  email: wenk@mathematik.uni-kl.de
@@ -193,7 +193,8 @@ example
   // compute resultant matrix (Macaulay resultant matrix)
   ring rdq= (0,u0,u1,u2),(x0,x1,x2),lp;
   ideal h=  homog(imap(rsq,i),x0);
-  hgls;
+  h;
+  
   module m = mp_res_mat(h,1);
   print(m);
   // computing Macaulay resultant (should be the same as above!)

@@ -1,4 +1,4 @@
-// $Id: invar.lib,v 1.10 1999-07-07 14:39:09 obachman Exp $
+// $Id: invar.lib,v 1.11 1999-07-07 16:38:26 obachman Exp $
 ///////////////////////////////////////////////////////
 // invar.lib
 // algorithm for computing the ring of invariants under
@@ -6,7 +6,7 @@
 // written by Gerhard Pfister
 //////////////////////////////////////////////////////
 
-version="$Id: invar.lib,v 1.10 1999-07-07 14:39:09 obachman Exp $";
+version="$Id: invar.lib,v 1.11 1999-07-07 16:38:26 obachman Exp $";
 info="
 LIBRARY: invar.lib  PROCEDURES FOR COMPUTING INVARIANTS OF (C,+)-ACTIONS
 
@@ -130,7 +130,7 @@ example
   matrix m[5][1];
   m[3,1]=x(1);
   m[4,1]=x(2);
-  m[5,1]=1+x(1)*x(4)^2
+  m[5,1]=1+x(1)*x(4)^2;
   actionIsProper(m);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -616,7 +616,6 @@ example
 
   poly disc=9*det(m)/(x(1)^2*y(1)^4);
 
-  LIB "invar.lib";
   matrix n[6][1];
   n[2,1]=x(1);
   n[4,1]=y(1);
@@ -629,6 +628,7 @@ example
 
   //constructive approach to Weizenbcks theorem
 
+  kill n;
   int n=5;
 
   ring w=0,(x(1..n)),wp(1..n);
@@ -642,7 +642,5 @@ example
   }
   ideal in=invariantRing(m,x(2),x(1),0);
   in;
-
-
 
 }

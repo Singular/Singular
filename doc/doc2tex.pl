@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: doc2tex.pl,v 1.3 1999-07-06 11:58:09 obachman Exp $
+# $Id: doc2tex.pl,v 1.4 1999-07-07 16:38:34 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -494,9 +494,9 @@ sub HandleLib
 sub GenerateLibDoc
 {
   my($lib, $tex_file, $l_fun, $l_ex) = @_;
-  my($lib_dir, $scall, $pl_file, $doc_file, $i, $example,$largs);
+  my($lib_dir, $scall, $pl_file, $doc_file, $i, $example,$largs, $ref);
   # vars from executing the library perl scrip
-  local($info, $libary, $version, @procs, %example, %help);
+  local($info, $libary, $version, @procs, %example, %help, $table_is_open);
   
   print "(lib $lib: " if ($verbose == 1);
   # construct doc/tex file name
@@ -538,15 +538,12 @@ sub GenerateLibDoc
     # print header
     print LDOC "\@c library version: $version\n";
     print LDOC "\@c library file: $library\n";
-    OutLibInfo(\*LDOC, $info, $l_fun);
+    undef @procs;
+    $ref = OutLibInfo(\*LDOC, $info, $l_fun);
+    OutRef(\*LDOC, $ref) if $ref;
     # print menu of available functions 
     if ($l_fun)
     {
-      @procs = sort(@procs);
-      print LDOC "\@menu\n";
-      foreach $proc (@procs) {print LDOC "* $proc"."::\n";}
-      print LDOC "\@end menu\n";
-      
       # print help and example of each function
       for ($i = 0; $i <= $#procs; $i++)
       {
@@ -562,18 +559,21 @@ sub GenerateLibDoc
 	print LDOC "\@cindex ". $procs[$i] . "\n" if ($lib eq "standard");
 
 	print LDOC "\@c ---content $procs[$i]---\n";
-	# print help section
-	print LDOC "\@strong{Info:}\n";
-	print LDOC "\@example\n";
-	print LDOC &CleanUpHelp($help{$procs[$i]});
-	print LDOC "\n\@end example\n";
-	
-	# print example section
-	next unless ($example = &CleanUpExample($lib, $example{$procs[$i]}));
-	print LDOC "\@strong{Example:}\n";
-	print LDOC "\@example\n\@c example\n";
-	print LDOC $example;
-	print LDOC "\n\@c example\n\@end example\n";
+	print LDOC "\@table \@asis\n";
+	$table_is_open = 1;
+	# print help
+	$ref = OutInfo(\*LDOC, $help{$procs[$i]});
+	print LDOC "\@end table\n";
+	$table_is_open = 0;
+	# print example 
+	if ($example = &CleanUpExample($lib, $example{$procs[$i]}))
+	{
+	  print LDOC "\@strong{Example:}\n";
+	  print LDOC "\@example\n\@c example\n";
+	  print LDOC $example;
+	  print LDOC "\n\@c example\n\@end example\n";
+	}
+	OutRef(\*LDOC, $ref) if $ref;
 	print LDOC "\@c ---end content $procs[$i]---\n";
       }
     }
@@ -598,19 +598,32 @@ sub GenerateLibDoc
 sub OutLibInfo
 {
   my ($FH, $info, $l_fun) = @_;
-  my ($item, $text, $line);
+  print $FH "\@c ---content LibInfo---\n";
+  print $FH "\@table \@asis\n";
+  $table_is_open = 1;
+  
+  my ($ref) = OutInfo($FH, $info, $l_fun);
+
+  print $FH "\@end table\n" if $table_is_open;
+  print $FH "\@c ---end content LibInfo---\n";
+  $table_is_open = 0;
+  return $ref;
+}
+
+sub OutInfo
+{
+  my ($FH, $info, $l_fun) = @_;
   $info =~ s/^\s*//;
   $info =~ s/\s*$//;
   $info .= "\n";
 
-  print $FH "\@c ---content LibInfo---\n";
-  print $FH "\@table \@code\n";
+  my ($item, $text, $line, $ref);
   while ($info =~ m/(.*\n)/g)
   {
     $line = $1;
     if ($1 =~ /^(\w.+?):(.*\n)/)
     {
-      OutLibInfoItem($FH, $item, $text, $l_fun) if $item && $text;
+      $ref .= OutInfoItem($FH, $item, $text, $l_fun) if $item && $text;
       $item = $1;
       $text = $2;
     }
@@ -619,39 +632,57 @@ sub OutLibInfo
       $text .= $line;
     }
   }
-  OutLibInfoItem($FH, $item, $text, $l_fun) if $item && $text;
-  print $FH "\@end table\n";
-  print $FH "\@c ---end content LibInfo---\n";
+  $ref .= OutInfoItem($FH, $item, $text, $l_fun) if $item && $text;
+  return $ref;
 }
 
-sub OutLibInfoItem
+sub FormatInfoText
+{
+  s/^\s*//; # remove whitespaces from beginning and end
+  s/\s*$//;
+  s/ +/ /g;  # replace double whitespeces by one
+  &protect_texi; # protect texinfo special chars
+  s/\n/\n\@*/g; # replace newline by forced newline
+}
+
+sub OutInfoItem
 {
   my ($FH, $item, $text, $l_fun) = @_;
 
   $item = lc $item;
   $item = ucfirst $item;
-  print $FH '@item @strong{'. "$item:}\n";
 
-  if (($item =~ m/^Library/)  && ($text =~ m/\s*(\w*)\.lib/))
+  if ($item =~ /see also/i)
   {
-    print $FH "$1.lib\n";
-    $text = $';
-    if ($text =~ /\w/)
-    {
-      print $FH "\n" . '@item @strong{Purpose:'."}\n";
-      print $FH lc $text;
-    }
+    # return references
+    return $text;
   }
-  elsif ($item =~ m/rocedure/)
+  elsif ($item =~ m/example/i)
   {
+    # forget about example, since it comes explicitely
+    return '';
+  }
+  elsif ($item =~ m/procedure/i)
+  {
+    if ($l_fun && $table_is_open)
+    {
+      print $FH "\@end table\n\n";
+      $table_is_open = 0;
+    }
     $text =~ s/^\s*//;
     $text =~ s/\s*$//;
-    $text =~ s/.*$//
-      if ($text =~ /parameters.*brackets\*are optional.*$/);
-
-    my ($proc, $pargs, $pinfo, $line);
-    print $FH "\@table \@asis\n";
+    $text =~ s/.*$// if ($text=~/parameters.*brackets.*are.*optional.*$/);
     $text .= "\n";
+    
+    my ($proc, $pargs, $pinfo, $line);
+    if ($l_fun)
+    {
+      print $FH "\@strong{$item}\n\@menu\n";
+    }
+    else
+    {
+      print $FH "\@item \@strong{$item}\n\@table \@asis\n";
+    }
     while ($text =~ /(.*\n)/g)
     {
       $line = $1;
@@ -668,17 +699,39 @@ sub OutLibInfoItem
       }
     }
     OutProcInfo($FH, $proc, $procargs, $pinfo, $l_fun) if $proc && $pinfo;
-    print $FH "\@end table\n\n";
+    print $FH ($l_fun ? "\@end menu\n" : "\@end table\n");
+    return '';
+  }
+
+  if (! $table_is_open)
+  {
+    print $FH "\@table \@asis\n";
+    $table_is_open = 1;
+  }
+  print $FH '@item @strong{'. "$item:}\n";
+  # prepare text:
+  local $_ = $text;
+  if (($item =~ m/^library/i)  && m/\s*(\w*)\.lib/)
+  {
+    print $FH "$1.lib\n";
+    $text = $';
+    if ($text =~ /\w/)
+    {
+      print $FH "\n" . '@item @strong{Purpose:'."}\n";
+      print $FH lc $text;
+    }
   }
   else
   {
-    local $_ = $text;
-    s/^\s*//;
-    s/\s*$//;
-    s/ +/ /;
-    &protect_texi;
+    # just print the text
+    &FormatInfoText;
+    # if functions are in text, then make it in code
+    s/(\w+\(.*?\))/\@code{$1}/g
+      if ($item =~ /usage/i || $item =~ /Return/i);
+
     print $FH "$_\n\n";
   }
+  return '';
 }
 
 sub OutProcInfo
@@ -686,36 +739,39 @@ sub OutProcInfo
   my($FH, $proc, $procargs, $pinfo, $l_fun) = @_;
   local $_ = $pinfo;
   s/^[;\s]*//;
-  s/\s*$//;
-  s/ +/ /g;
-  s/\n */\n/g;
-  &protect_texi;
+  s/\n/ /g;
+  &FormatInfoText;
   
-  print $FH "\@item \@code{$proc($procargs)}  ";
-  print $FH "\@ref{$proc}" if ($l_fun);
-  print $FH "\n$_\n";
+  if ($l_fun)
+  {
+    print $FH "* ${proc}:: $_\n";
+    push @procs, $proc;
+  }
+  else
+  {
+    print $FH "\@item \@code{$proc($procargs)}  ";
+    print $FH "\n\@findex $proc\n$_\n";
+  }
 }
 
-###################################################################
-#
-# Auxiallary functions
-# 
-sub CleanUpHelp
+sub OutRef
 {
-  local($_) = @_;
-  
-  # remove spaces quotations, etc from beginning and end
-  s/^[^\w]*//;
-  s/[\s\n"]*$//; #"
-  # replace
-  s/\\\\/\\/g;
-  s/\\"/"/g;
-  # remove line beginning with example
-  s/\nEXAMPLE.*//;
-  &protect_texi;
-  return ($_);
+  my ($FH, $refs) = @_;
+  $refs =~ s/^\s*//;
+  $refs =~ s/\s*$//;
+  my @refs = split (/[\s,]+/, $refs);
+  my $ref;
+
+  print $FH "\@c ref\nSee\n";
+  $ref = shift @refs;
+  print $FH "\@ref{$ref}";
+  for $ref (@refs)
+  {
+    print $FH ", \@ref{$ref}";
+  }
+  print $FH "\n\@c ref\n";
 }
-  
+
 sub CleanUpExample
 {
   local($lib, $example) = @_;
@@ -733,8 +789,8 @@ sub CleanUpExample
   }
   # erase EXAMPLE, echo and pause statements
   $example =~ s/"EXAMPLE.*"[^;]*;//g;
-  $example =~ s/echo[^;]*;//g;
-  $example =~ s/pause[^;]*;//g;
+  $example =~ s/echo[^;\n]*;//g; 
+  $example =~ s/pause\(.*?\)[^;]*;//g;
   
   # prepend LIB command
   $example = "LIB \"$lib.lib\";\n".$example 
@@ -743,9 +799,14 @@ sub CleanUpExample
   $example =~ s/^\s*\n//g;
   # erase spaces from beginning of lines
   $example =~ s/\n\s*/\n/g;
+  $example =~ s/\s*$//g;
   return $example;
 }
 
+###################################################################
+#
+# Auxiallary functions
+# 
 sub IsNewer
 {
   my $f1 = shift;
@@ -788,7 +849,7 @@ sub Open
 sub System
 {
   local($call) = @_;
-  print "d2t system: $call\n" if ($verbose > 1);
+  print "\nd2t system: $call\n" if ($verbose > 1);
   Error("non-zero exit status of system call: '$call': $!\n")
     if (system($call));
 }

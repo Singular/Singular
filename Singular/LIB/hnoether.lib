@@ -1,10 +1,10 @@
-// $Id: hnoether.lib,v 1.13 1999-07-07 14:39:07 obachman Exp $
+// $Id: hnoether.lib,v 1.14 1999-07-07 16:38:25 obachman Exp $
 // author:  Martin Lamm,  email: lamm@mathematik.uni-kl.de
 // last change:           09.03.99
 ///////////////////////////////////////////////////////////////////////////////
 // This library is for Singular 1.2 or newer
 
-version="$Id: hnoether.lib,v 1.13 1999-07-07 14:39:07 obachman Exp $";
+version="$Id: hnoether.lib,v 1.14 1999-07-07 16:38:25 obachman Exp $";
 info="
 LIBRARY:  hnoether.lib   PROCEDURES FOR THE HAMBURGER-NOETHER DEVELOPMENT
 
@@ -1231,12 +1231,11 @@ EXAMPLE: example intersection;  shows an example
  return(schnitt);
 }
 example
-{
+{ "EXAMPLE:"; echo = 2;
   if (nameof(basering)=="HNEring") {
    def rettering=HNEring;
    kill HNEring;
   }
-  "EXAMPLE:"; echo = 2;
   ring r=0,(x,y),dp;
   list hne=reddevelop((x2-y3)*(x2+y3));
   intersection(hne[1],hne[2]);
@@ -1344,12 +1343,11 @@ EXAMPLE: example multsequence;  shows an example
  }
 }
 example
-{
+{  "EXAMPLE:"; echo = 2;
   if (nameof(basering)=="HNEring") {
    def rettering=HNEring;
    kill HNEring;
   }
-  "EXAMPLE:"; echo = 2;
   ring r=0,(x,y),dp;
   list hne=reddevelop((x6-y10)*(x+y2-y3)*(x+y2+y3));
 
@@ -1424,12 +1422,12 @@ EXAMPLE: example displayMultsequence;  shows an example
  }
 }
 example
-{ // example multsequence; geht wegen echo nicht (muesste auf 3 gesetzt werden)
+{   "EXAMPLE:"; echo = 2;
+  // example multsequence; geht wegen echo nicht (muesste auf 3 gesetzt werden)
   if (nameof(basering)=="HNEring") {
    def rettering=HNEring;
    kill HNEring;
   }
-  "EXAMPLE:"; echo = 2;
   ring r=0,(x,y),dp;
   list hne=reddevelop((x6-y10)*(x+y2-y3)*(x+y2+y3));
 
@@ -1703,7 +1701,7 @@ EXAMPLE: example newtonpoly;  shows an example
  return(L);
 }
 example
-{ "EXAMPLE:";
+{ "EXAMPLE:"; echo = 2;
   ring @exring_Newt=0,(x,y),ls;
   export @exring_Newt;
   "  ring exring=0,(x,y),ls;";
@@ -1952,12 +1950,11 @@ EXAMPLE: example extdevelop;  shows an example
  return(list(mneu,v,switch,f));
 }
 example
-{
+{  "EXAMPLE:"; echo = 2;
   if (nameof(basering)=="HNEring") {
    def rettering=HNEring;
    kill HNEring;
   }
-  "EXAMPLE:"; echo = 2;
   ring exring=0,(x,y),dp;
   list hne=reddevelop(x14-3y2x11-y3x10-y2x9+3y4x8+y5x7+3y4x6+x5*(-y6+y5)-3y6x3-y7x2+y8);
   print(hne[1][1]); // finite HNE
@@ -2409,12 +2406,11 @@ EXAMPLE: example reddevelop;  shows an example
  return(Ergebnis);
 }
 example
-{
+{ "EXAMPLE:"; echo = 2;
   if (nameof(basering)=="HNEring") {
    def rettering=HNEring;
    kill HNEring;
   }
-  "EXAMPLE:"; echo = 2;
   ring r=0,(x,y),dp;
   list hne=reddevelop(x4-y6);
   size(hne);           // i.e. x4-y6 has two branches

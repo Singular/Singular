@@ -25,12 +25,12 @@ INSTALL_PROGRAM	= ${INSTALL}
 INSTALL_DATA	= ${INSTALL} -m 644
 MKINSTALLDIRS   = ../mkinstalldirs
 
+PERL5		= @PERL5@
 TEX		= tex
 MAKEINFO	= @MAKEINFO@
 TEXI2DVI	= @TEXI2DVI@
 TEXINDEX	= @TEXINDEX@
 TEXI2HTML	= @TEXI2HTML@
-LATEX2HTML	= @LATEX2HTML@
 DVIPS		= dvips
 IMAGES		= contents_motif.gif index_motif.gif \
 		next_motif.gif next_motif_gr.gif \
@@ -45,7 +45,7 @@ D2T_SUBDIR      = ./d2t_singular
 DOC2TEX		= ./doc2tex.pl -subdir ${D2T_SUBDIR} -Singular ${SINGULAR} \
 			-libparse ${LIBPARSE} -I ../Singular/LIB 
 TMP_DIR		= @TMP_DIR@
-TEXI2HTML_OPTS  = @TEXI2HTML_OPTS@ -l2h_l2h ${LATEX2HTML} -l2h_tmp ${TMP_DIR} 
+TEXI2HTML_OPTS  = @TEXI2HTML_OPTS@ -l2h_tmp ${TMP_DIR} 
 ##
 ## End configuration dependend stuff
 #################################################################
@@ -54,7 +54,7 @@ TEXI2HTML_OPTS  = @TEXI2HTML_OPTS@ -l2h_l2h ${LATEX2HTML} -l2h_tmp ${TMP_DIR}
 TEX_FILES	= copyright.tex
 DOC2TEX_FILES	= \
 		examples.tex general.tex math.tex reference.tex \
-		singular.tex start.tex types.tex pdata.tex
+		start.tex types.tex pdata.tex
 
 MANUAL_FILES	= ${TEX_FILES} ${DOC2TEX_FILES}
 TUTOR_FILES	= \
@@ -70,32 +70,23 @@ all: info dvi html
 # info stuff
 info: singular.hlp 
 
-singular.hlp: ${MANUAL_FILES}
+singular.hlp: ${MANUAL_FILES} singular.tex
 	- ${MAKEINFO} --no-split singular.tex
 
-singular_all.hlp: singular_all.tex
-	- ${MAKEINFO} --no-split singular_all.tex
-
-singular_lib.hlp: singular_lib.tex
-	- ${MAKEINFO} --no-split singular_lib.tex
-
 # dvi stuff
-dvi: singular.dvi usercard.dvi
+dvi: manual.dvi usercard.dvi
 
-singular.dvi: ${MANUAL_FILES}
-	${TEXI2DVI} singular.tex
+singular.dvi: ${MANUAL_FILES} singular.tex 
+	${TEXI2DVI} singular.tex 
 
-tutor.dvi: ${TUTOR_FILES}
+manual.dvi: ${MANUAL_FILES} manual.tex
+	${TEXI2DVI} manual.tex
+
+tutor.dvi: ${TUTOR_FILES} 
 	${TEXI2DVI} tutor.tex
 
 usercard.dvi: usercard.tex singcard.tex
 	${TEX} $<
-
-singular_all.dvi: singular_all.tex
-	${TEXI2DVI} singular_all.tex
-
-singular_lib.dvi: singular_lib.tex
-	${TEXI2DVI} singular_lib.tex
 
 # postscript stuff
 ps: singular.ps usercard.ps
@@ -108,13 +99,13 @@ usercard.ps: usercard.dvi
 
 # html stuff
 html: html/singular.html
-html/singular.html: ${MANUAL_FILES} t2h_singular.init t2h.init
-	${TEXI2HTML} -init_file t2h_singular.init ${TEXI2HTML_OPTS} -subdir html singular.tex
+html/singular.html: ${MANUAL_FILES} t2h_singular.init t2h.init singular.tex
+	${PERL5} ${TEXI2HTML} -init_file t2h_singular.init ${TEXI2HTML_OPTS} -subdir html singular.tex
 
 # html stuff
 html_tutor: ${TUTOR_FILES}
 	test -d html_tutor || mkdir html_tutor
-	cd html_tutor && ${TEXI2HTML} ${TEXI2HTML_OPTS} ../tutor.tex
+	cd html_tutor && ${PERL5} ${TEXI2HTML} ${TEXI2HTML_OPTS} ../tutor.tex
 	test -d html || mkdir html
 	test -d html/images || mkdir html/images
 	for img in ${IMAGES}; \
@@ -126,15 +117,14 @@ html_tutor: ${TUTOR_FILES}
 	touch html_tutor
 
 # how to create the texinfo files
-singular_all.tex: ${MANUAL_FILES} doc2tex.pl ${SINGULAR} ${LIBPARSE}
-	${DOC2TEX} -lib_fun -lib_ex -o singular_all.tex singular.doc
+manual.tex:  ${MANUAL_FILES} doc2tex.pl ${SINGULAR} ${LIBPARSE} singular.doc
+	${PERL5} ${DOC2TEX} -o manual.tex singular.doc
 
-# how to create the texinfo files
-singular_lib.tex: ${MANUAL_FILES} doc2tex.pl ${SINGULAR} ${LIBPARSE}
-	${DOC2TEX} -lib_fun -o singular_lib.tex singular.doc
+singular.tex: ${MANUAL_FILES} doc2tex.pl ${SINGULAR} ${LIBPARSE} singular.doc
+	${PERL5} ${DOC2TEX} -lib_fun -lib_ex -o singular.tex singular.doc
 
 %.tex: %.doc doc2tex.pl ${SINGULAR} ${LIBPARSE}
-	${DOC2TEX} $*
+	${PERL5} ${DOC2TEX} $*
 
 # targets which produce stand-alone documents
 COPYING: copyright.tex
@@ -156,8 +146,8 @@ clean:
 	/bin/rm -f Z* *.tst *.pag *.dir *.lst *.log *.aux *.cp *.cps
 	/bin/rm -f *.fn *.fns *.ky *.kys *.log *.pg *.pgs *.toc *.tp
 	/bin/rm -f *.tps *.vr *.vrs
-	/bin/rm -f singular.hlp *.dvi *.ps ${DOC2TEX_FILES}
-	/bin/rm -rf html ${D2T_SUBDIR}
+	/bin/rm -f singular.hlp *.dvi *.ps ${DOC2TEX_FILES} 
+	/bin/rm -rf singular.tex manual.tex  html ${D2T_SUBDIR}
 
 mostlyclean: clean
 

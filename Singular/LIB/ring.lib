@@ -1,8 +1,8 @@
-// $Id: ring.lib,v 1.9 1999-07-06 11:33:12 obachman Exp $
+// $Id: ring.lib,v 1.10 1999-07-07 16:38:27 obachman Exp $
 //(GMG, last modified 03.11.95)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: ring.lib,v 1.9 1999-07-06 11:33:12 obachman Exp $";
+version="$Id: ring.lib,v 1.10 1999-07-07 16:38:27 obachman Exp $";
 info="
 LIBRARY:  ring.lib      PROCEDURES FOR MANIPULATING RINGS AND MAPS
 
@@ -480,20 +480,20 @@ EXAMPLE: example fetchall; shows an example
    return();
 }
 example
-{  "EXAMPLE:";
-"// This example is not executed since fetchall does not work in a procedure";
-"// (and hence not in the example procedure). Just try the following commands:";
-"   ring R=0,(x,y,z),dp;";
-"   ideal j=x,y2,z2;";
-"   matrix M[2][3]=1,2,3,x,y,z;";
-"   j; print(M);";
-"   ring S=0,(a,b,c),ds;";
-"   fetchall(R);           // map from R to S: x->a, y->b, z->c";
-"   names(S);";
-"   j; print(M);";
-"   fetchall(S,\"1\");       // identity map of S: copy objects, change names";
-"   names(S);";
-"   kill R,S;";
+{  "EXAMPLE:"; echo=2;
+// This example is not executed since fetchall does not work in a procedure;
+// (and hence not in the example procedure). Just try the following commands:;
+//   ring R=0,(x,y,z),dp;
+//   ideal j=x,y2,z2;
+//   matrix M[2][3]=1,2,3,x,y,z;
+//   j; print(M);
+//   ring S=0,(a,b,c),ds;
+//   fetchall(R);           // map from R to S: x->a, y->b, z->c;
+//   names(S);
+//   j; print(M);
+//   fetchall(S,"1");       // identity map of S: copy objects, change names;
+//   names(S);
+//   kill R,S;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -525,20 +525,20 @@ EXAMPLE: example imapall; shows an example
    return();
 }
 example
-{  "EXAMPLE:";
-"// This example is not executed since imapall does not work in a procedure";
-"// (and hence not in the example procedure). Just try the following commands:";
-"   ring R=0,(x,y,z,u),dp;";
-"   ideal j=x,y,z,u2+ux+z;";
-"   matrix M[2][3]=1,2,3,x,y,uz;";
-"   j; print(M);";
-"   ring S=0,(a,b,c,x,z,y),ds;";
-"   imapall(R);           // map from R to S: x->x, y->y, z->z, u->0";
-"   names(S);";
-"   j; print(M);";
-"   imapall(S,\"1\");       // identity map of S: copy objects, change names";
-"   names(S);";
-"   kill R,S;";
+{  "EXAMPLE:"; echo = 2;
+// This example is not executed since imapall does not work in a procedure
+// (and hence not in the example procedure). Just try the following commands:
+//   ring R=0,(x,y,z,u),dp;
+//   ideal j=x,y,z,u2+ux+z;
+//   matrix M[2][3]=1,2,3,x,y,uz;
+//   j; print(M);
+//   ring S=0,(a,b,c,x,z,y),ds;
+//   imapall(R);           // map from R to S: x->x, y->y, z->z, u->0
+//   names(S);
+//   j; print(M);
+//   imapall(S,"1");       // identity map of S: copy objects, change names
+//   names(S);
+//   kill R,S;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -572,27 +572,27 @@ EXAMPLE: example mapall; shows an example
    return();
 }
 example
-{  "EXAMPLE:";
-"// This example is not executed since mapall does not work in a procedure";
-"// (and hence not in the example procedure). Just try the following commands:";
-"   ring R=0,(x,y,z),dp;";
-"   ideal j=x,y,z;";
-"   matrix M[2][3]=1,2,3,x,y,z;";
-"   map phi=R,x2,y2,z2; ";
-"   ring S=0,(a,b,c),ds;";
-"   ideal i=c,a,b;";
-"   mapall(R,i);             // map from R to S: x->c, y->a, z->b";
-"   names(S);";
-"   j; print(M); phi;        // phi is a map from R to S: x->c2, y->a2, z->b2";
-"   ideal i1=a2,a+b,1;";
-"   mapall(R,i1,\"\");         // map from R to S: x->a2, y->a+b, z->1";
-"   names(S);";
-"   j_; print(M_); phi_;";
-"   changevar(\"T\",\"x()\",R);  // change vars in R and call result T";
-"   mapall(R,maxideal(1));   // identity map from R to T";
-"   names(T);";
-"   j; print(M); phi;";
-"   kill R,S,T;";
+{  "EXAMPLE:"; echo = 2;
+// This example is not executed since mapall does not work in a procedure
+// (and hence not in the example procedure). Just try the following commands:
+//   ring R=0,(x,y,z),dp;
+//   ideal j=x,y,z;
+//   matrix M[2][3]=1,2,3,x,y,z;
+//   map phi=R,x2,y2,z2; 
+//   ring S=0,(a,b,c),ds;
+//   ideal i=c,a,b;
+//   mapall(R,i);             // map from R to S: x->c, y->a, z->b
+//   names(S);
+//   j; print(M); phi;        // phi is a map from R to S: x->c2, y->a2, z->b2
+//   ideal i1=a2,a+b,1;
+//   mapall(R,i1,\"\");         // map from R to S: x->a2, y->a+b, z->1
+//   names(S);
+//   j_; print(M_); phi_;
+//   changevar(\"T\",\"x()\",R);  // change vars in R and call result T
+//   mapall(R,maxideal(1));   // identity map from R to T
+//   names(T);
+//   j; print(M); phi;
+//   kill R,S,T;
 }
 ///////////////////////////////////////////////////////////////////////////////
 

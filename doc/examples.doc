@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.44 1999-07-07 15:06:23 Singular Exp $
+@comment $Id: examples.doc,v 1.45 1999-07-07 16:38:36 obachman Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -37,7 +37,7 @@ The following topics are treated:
 * Finite fields::
 * Elimination::
 * Free resolution::
-* Ext::
+* Computation of Ext::
 * Polar curves::
 * Depth::
 * Formatting output::
@@ -1202,7 +1202,7 @@ P^4.
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node Free resolution, Ext, Elimination, Examples
+@node Free resolution, Computation of Ext, Elimination, Examples
 @end ifset
 @ifclear singularmanual
 @node Free resolution, Formatting output, Elimination, Examples
@@ -1349,8 +1349,8 @@ the @code{lres} command.
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node Ext, Polar curves, Free resolution, Examples
-@section  Ext
+@node Computation of Ext, Polar curves, Free resolution, Examples
+@section  Computation of Ext
 @cindex  Ext
 
 We start by showing how to calculate the @math{n}-th Ext group of an
@@ -1534,7 +1534,7 @@ for some ideal @math{i} and with an extra option
 @end ifset
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node Polar curves, Depth, Ext, Examples
+@node Polar curves, Depth, Computation of Ext, Examples
 @section   Polar curves
 @cindex Polar curves
 
