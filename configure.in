@@ -121,7 +121,7 @@ AC_ARG_WITH(MP,\
  [ --with-PACKAGE          use PACKAGE, provide dependent functionality
   --without-PACKAGE       do not use PACKAGE, disable dependent functionality
  where PACKAGE can be:
-     MP                    Multi Protocol])
+     MP                   Multi Protocol library])
 AC_ARG_WITH(factory, \
  [    factory              polynomial factorization library])
 AC_ARG_WITH(libfac, \

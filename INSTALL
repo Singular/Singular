@@ -36,10 +36,10 @@ Basic Installation
 The full source distribution of Singular consists of the following
 four independent library packages 
 
-	gmp	The Gnu Multiple precision library
-	MP	The Multi Protocol library
-	factory	The factory library for polynomial factorization
-	libfac	The libfac library for characteristic set computations
+	smallgmp A minimal version of the gmp library
+	MP	 The Multi Protocol library
+	factory	 The factory library for polynomial factorization
+	libfac	 The libfac library for characteristic set computations
 
 and the Singular kernel source code itself (which is contained in the
 'Singular' subdirectory). It is possible to install these four
@@ -49,7 +49,11 @@ the respective directories.
 
 Singular can be built including almost any combination of these four
 packages. However, some Singular functionality will be disabled if you
-do not built Singular with all of them.
+do not built Singular with all of them. You do not need any additional
+add-on packages to install Singular. However, for better performance,
+we strongly recommend that you install the gmp library at a standard
+place on your system.
+
 
 You can use the `configure' shell script in this directory to control
 which packages are included or not. If given no special options, the
@@ -159,13 +163,15 @@ Optional Features
 =================
 
 Singular's top-level configure script pays attention to the following
-'--enable-PACKAGE' (resp. '--disable-PACKAGE'), and `--with-PACKAGE'
-(resp. `--without-PACKAGE') options where PACKAGE can be
-'gmp', 'MP', 'factory', and 'libfac'.
+'--enable-PACKAGE' (resp. '--disable-PACKAGE') options where PACKAGE
+can be 'MP', 'factory', and 'libfac', 'smallgmp'.
 
 Giving an '-enable-PACKAGE' (resp. '--disable-PACKAGE;) option means
 that the respective PACKAGE is configured and built (resp. is not
 configured and built).
+
+Furthermore, the following '--with-PACKAGE' (resp. --without-PACKAGE')
+options are recognized: 'MP', 'factory', and 'libfac'. 
 
 Giving an '--with-PACKAGE' (resp. `--without-PACKAGE') option means
 that Singular itself is built with (resp. without)  PACKAGE and the
@@ -183,6 +189,31 @@ Furthermore, without explicit options, configure runs as if it had given all
     * the respective '--disable-PACKAGE' option was given _and_ the
       library and header files of PACKAGE are _not_ already installed
       on your system.
+
+Singular's arbitrary precision arithmetic can be realized using the
+GNU multiple precision library, or the smallgmp library contained in
+this distribution, or using Singular build-in routines. Using the GNU
+multiple precision (GMP) library results in the best performance. The
+smallgmp library contained in this distribution is a subset of GMP
+which is written in C, only. Its performance is usually not quite as
+good as that of the original gmp library. Singular's build-in
+arbitrary precision routines are the least efficient. 
+
+You can specify which arbitrary precision routines are used in
+Singular by giving configure the option '--with_apint=PACKAGE' where
+PACKAGE can be 
+  'gmp'		requires that gmp.h and libgmp.a are installed at a
+                standard place on your system
+  'smallgmp'    requires that smallgmp.h and libsmallgmp.a are
+                installed at a standard place on your system (or, that
+                a the top-level 'make install' is used for building
+                Singular. 
+  'buildin'     disables that Singular can be build with MP, factory,
+                or libfac 
+Notice that MP, factory, and libfac, can only be built (and,
+consequently used by Singular) if the used arbitrary precision
+packages is either gmp or smallgmp.
+
 
 System Requirements
 ===================
@@ -230,7 +261,7 @@ Configuration:
   --version               print the version of autoconf that created configure
 Directory and file names:
   --prefix=PREFIX         install architecture-independent files in PREFIX
-                          [`pwd`]
+                          [/mnt/amd/users/urmel/singular/obachman/Singular]
   --exec-prefix=EPREFIX   install architecture-dependent files in EPREFIX
                           [same as prefix]
   --bindir=DIR            user executables in DIR [EPREFIX/bin]
@@ -266,10 +297,17 @@ Features and packages:
 --enable and --with options recognized:
   --enable-PACKAGE        configure and build PACKAGE
   --disable-PACKAGE       do not configure and build PACKAGE
-  --with-PACKAGE          use PACKAGE, provide dependent functionality
-  --without-PACKAGE       do not use PACKAGE, disable dependent functionality
  where PACKAGE can be:
-     gmp                  GNU multiple precision library
+     smallgmp             minimal version of gmp written in C only
      MP                   Multi Protocol library
      factory              polynomial factorization library
      libfac               char set and modp poly factorization library
+     Singular             CAS for commutative algebra
+  --with-PACKAGE          use PACKAGE, provide dependent functionality
+  --without-PACKAGE       do not use PACKAGE, disable dependent functionality
+ where PACKAGE can be:
+     MP                    Multi Protocol
+     factory              polynomial factorization library
+     libfac               char set and modp poly factorization library
+  --with-apint=PACKAGE    use PACKAGE for arbitary integer arithmetic
+                          where PACKAGE can be gmp, smallgmp, or buildin

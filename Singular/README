@@ -95,6 +95,21 @@ The source is distributed in two versions:
      only, i.e., it comes WITHOUT the sources for any of the add-on
      packages.
 
+Singular's performance is best, if it is linked with the GNU Multiple
+precision library (GMP), instead of the smallgmp library which is
+contained in the full source distribution. Furhtermore, Singular's
+terminal i/o is most convenient if it is linked with the GNU readline
+library.  The GMP library and the readline library is available at
+ftp.gnu.ai.mit.edu or its mirrors. You have to have these library
+already installed, before Singular can be linked with them. For more
+information, see the file README.src contained in this directory.
+
+The MP library library is avialbale from mcs.kent.edu:/pub/MP/
+For further information on MP, see also
+http://symbolicnet.mcs.kent.edu/areas/protocols/mp.html
+
+The factory and libfac library are available from
+www.mathematik.uni-kl.de:/pub/Math/
 
 Documentation to Singular is distributed as:
 Singular-1.0.dvi.gz	 - Reference manual in dvi format

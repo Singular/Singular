@@ -132,13 +132,6 @@ Singular's configure script pays attention to the following
 	       files are installed on your system. If these files were
 	       not found, then Singular is build without readline.
 
-  'gmp'      : Uses the gmp (Gnu Multiple Precision) library for
-               integer arithmetic. Requires that libgmp.a and gmp.h
-               are installed on your system. If these files were not
-               found, then Singular is build with its internal integer
-               arithmetic which is not as fast as the arithmetic
-               provided by gmp.
-
   'dbm'      : Uses the dbm library for DBM links. Requires that
                libdbm.a or libgdbm.a is installed on your system. If
                this library is not found, then Singular is built
@@ -149,6 +142,7 @@ Singular's configure script pays attention to the following
                the 'info' programm is installed on your system. If
                this program is not found, the a built-in display
                routine is used.
+
   'MP'       : Uses the MP library for MP links. Requires that
                libgmp.a, libMP.a, libMPT.a and gmp.h, MP.h, MPT.h are
                installed on your system. If these files are not found,
@@ -177,6 +171,25 @@ without the respective PACKAGE, disabling its functionality. To
 explicitly built Singular without one of the above PACKAGEs, give
 configure (an) appropriate '--without-PACKAGE' option(s). See the
 README file about instructions on how to obtain the above PACKAGEs.
+
+Furthermore, the following '--with-apint=PACKAGE' option is
+recognized, where package can be:
+  'gmp'      : Uses the GNU multiple precision library for arbitrary
+               integer precision arithmetic. This results in the best
+               performance. Requires that libgmp.a and gmp.h
+               are installed on your system.
+  'smallgmp' : Uses the smallgmp library for for arbitrary
+               integer precision arithmetic. This results in a
+               performance which is slightly worse than that of the
+               original gmp library.
+  'buildin'  : Uses Singular's internal integer arithmetic
+               routines. The resulting performance is poor in
+               comparison to gmp or smallgmp and the usage of MP,
+               factory, or libfac is automatically disbaled.
+
+By default, configure checks whether it can find gmp or smallgmp (in
+that order) and use the respective package, if found. If none is
+found, then Singular's internal arbitrary precision routines are used.
 
 
 System Requirements
@@ -225,7 +238,7 @@ Configuration:
   --version               print the version of autoconf that created configure
 Directory and file names:
   --prefix=PREFIX         install architecture-independent files in PREFIX
-                          [`pwd`]
+                          [/mnt/amd/users/urmel/singular/obachman/Singular/Singular/..]
   --exec-prefix=EPREFIX   install architecture-dependent files in EPREFIX
                           [same as prefix]
   --bindir=DIR            user executables in DIR [EPREFIX/bin]
@@ -260,10 +273,11 @@ Features and packages:
   --x-libraries=DIR       X library files are in DIR
 --enable and --with options recognized:
   --without-readline   do not use readline for fancy display
-  --without-gmp        do not use gmp library
   --without-MP         do not use MP (disables MP links)
   --without-dbm        do not use dbm (disables DBM links)
+  --without-info       do not use info for help (use buildin help, instead)
   --without-dld        do not use dld (disables dynamic linking)
   --without-factory    do not use factory (disables poly factorization)
   --without-libfac     do not use libfac (disables primary decompositions)
-
+  --with-apint=PACKAGE    use PACKAGE for arbitary integer arithmetic
+                          where PACKAGE can be gmp, smallgmp, or buildin

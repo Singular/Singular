@@ -11,8 +11,8 @@ IMPORTANT: Please see the COPYING.src file contained in this directory
 for license information for the Singular source code.
 
 This directory contains the following subdirectories:
-  gmp	  --  The Gnu Multiple precision library (v: 2.0.2) distribution
-              (C) Free Software Foundation
+  smallgmp--  A minimal version of gmp written in C only
+              Parts are (C) Free Software Foundation 
   MP      --  The Multi Protocol library (v: 1.1.2) distribution
               (C) Gray/Kajler/Wang; Kent State University
   factory --  The factory library (v: 1.2) for polynomial factorization
@@ -68,8 +68,8 @@ algebra and algebraic geometry. The main features of Singular are:
 Acknowledgments
 ================
 Singular 1.0 is distributed with the following libraries
-  gmp	  --  The Gnu Multiple precision library (v: 2.0.2) distribution
-              (C) Free Software Foundation
+  smallgmp--  A minimal version of gmp written in C only
+              Parts are (C) Free Software Foundation 
   MP      --  The Multi Protocol library (v: 1.1.2) distribution
               (C) Gray/Kajler/Wang; Kent State University
   factory --  The factory library (v: 1.2c) for polynomial factorization
@@ -105,14 +105,13 @@ The source is distributed in two versions:
      Singular-full-1.0.tar.gz.  This (gzip'ed and tar'ed) file
      contains the source code, documentation, and supporting data
      files for the Singular kernel, and for all add-on packages,
-     i.e. for the GMP, MP, Factory, and Libfac libraries.
+     i.e. for the smallgmp, MP, Factory, and Libfac libraries.
 
   2. A kernel source distribution of Singular can be found in
      Singular-1.0.tar.gz This (gzip'ed and tar'ed) contains the
      sources, documentation and supporting data files for Singular,
      only, i.e., it comes WITHOUT the sources for any of the add-on
      packages.
-
 
 Documentation to Singular is distributed as:
 Singular-1.0.dvi.gz	 - Reference manual in dvi format
@@ -122,8 +121,14 @@ Tutorial.dvi.gz		 - Singular tutorial in postscript format
 singular.hlp.gz		 - Reference manual in Info format
 Singular-1.0.html.tar.gz - Reference manual in html format
 
-The GMP library and the readline library is available at
-ftp.gnu.ai.mit.edu or its mirrors.
+Singular's performance is best, if it is linked with the GNU Multiple
+precision library (GMP), instead of the smallgmp library which is
+contained in the full source distribution. Furhtermore, Singular's
+terminal i/o is most convenient if it is linked with the GNU readline
+library.  The GMP library and the readline library is available at
+ftp.gnu.ai.mit.edu or its mirrors. You have to have these library
+already installed, before Singular can be linked with them. For more
+information, see the file README.src contained in this directory.
 
 The MP library library is avialbale from mcs.kent.edu:/pub/MP/
 For further information on MP, see also
