@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.160 1999-11-29 19:33:13 wichmann Exp $
+@comment $Id: general.doc,v 1.161 1999-11-29 20:15:43 wichmann Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -931,7 +931,7 @@ The customizable variables of the @sc{Singular} Emacs interface are set
 to useful default settings giving the novice user a very shell like
 feeling of the interface. Nevertheless, this default settings can be
 changed, see @ref{Customization of the Emacs interface}. Besides other
-Emacs initializations, such as fontification or blinking parantheses, a
+Emacs initializations, such as fontification or blinking parentheses, a
 new menu item called @code{Singular} is added to the main menu,
 providing menu items for starting @sc{Singular}. On XEmacs, a button
 starting @sc{Singular} is added to the main toolbar.
@@ -1078,7 +1078,51 @@ Olaf
 @cindex Singular, customization of Emacs user interface
 @cindex Customization of the Emacs interface
 
-Tim
+Emacs provides a convenient interface to customize the behavior of
+Emacs and the SINGULAR Emacs interface for you own needs. You enter the
+customize environment by either calling @code{M-x customize} (on XEmacs
+you afterwards have to enter @code{emacs} in the minibuffer area) or by
+selecting the menu item @code{Options->Customize->Emacs...} for XEmacs,
+and the menu item @code{Help->Customize->Toplevel Customization Group}
+for Emacs, resp. A brief introduction to the customization mode comes up
+with the customization buffer. All customizable parameters are
+hierarchically grouped and you can browse through all these groups and
+change the values of the parameters using the mouse. At the end you can
+safe the settings to a special file making your changes permanent.
+
+To change the settings of the @sc{Singular} Emacs interface you can
+either select the item @code{Preferences} of the @code{Singular} menu,
+call @code{M-x customize-group} and give the argument
+@code{singular-interactive} in the minibuffer area, or browse from the
+top-level customization group through the path
+@code{External->Singular->Singular interactive}.
+
+The @sc{Singular} interface customization buffer is divided into four
+groups:
+
+@itemize @bullet
+@item Singular faces
+
+Here you can specify various faces used if font-lock-mode is enabled.
+
+@item Singular Sections And Foldings
+
+Here you can specify special faces for @sc{Singular} input and output
+and change the text used as replacement for folded sections.
+
+@item Singular Interactive Miscellaneous
+
+Here you can specify various different things such as the behavior of
+the cursor keys, the name of the special @sc{Singular} startup file, the
+appearance of the help window, or the default values for the
+@code{singular} command. For a first look at customization of the
+interface, this is probably the best group.
+
+@item Singular Demo mode
+
+Here you can specify how chunks of the demo file are divided, or specify
+a default directory for demo files.
+@end itemize
 
 @c --------------------------------------------------------------------------
 @node Editing SINGULAR input files with Emacs, Top 20 Emacs commands, Customization of the Emacs interface, Emacs user interface
