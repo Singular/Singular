@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.28 1998-05-31 15:42:24 krueger Exp $ */
+/* $Id: iplib.cc,v 1.29 1998-06-03 08:47:15 obachman Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -144,7 +144,7 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
     procbuflen = pi->data.s.help_end - pi->data.s.help_start;
     //Print("Help=%ld-%ld=%d\n", pi->data.s.body_start,
     //    pi->data.s.proc_start, procbuflen);
-    s = (char *)AllocL(procbuflen+head+2);
+    s = (char *)AllocL(procbuflen+head+3);
     myfread(s, head, 1, fp);
     s[head] = '\n';
     fseek(fp, pi->data.s.help_start, SEEK_SET);
