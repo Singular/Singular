@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.27 1999-09-27 11:06:29 obachman Exp $
+# $Id: regress.cmd,v 1.28 1999-10-22 11:12:50 obachman Exp $
 # FILE:    regress.cmd
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -24,6 +24,7 @@ regress.cmd    -- regress test of Singular
   [-r [crit%[val]]] -- report if status differences [of crit] > val (in %)
   [-e [crit%[val]]] -- throw error if status difference [of crit] > val (in %)
   [-m [crit]]       -- merge status results [of crit] into result file
+  [-t]              -- compute and call mtrack at the end, no diffs
   [file.lst]        -- read tst files from file.lst
   [file.tst]        -- test Singular script file.tst
 _EOM_
@@ -328,7 +329,7 @@ sub tst_check
   }
 
   # generate $root.res
-  if ($generate ne "yes")
+  if ($generate ne "yes" && ! $mtrack)
   {
     if ((-r "$root.res.gz.uu") && ! ( -z "$root.res.gz.uu"))
     {
@@ -346,15 +347,28 @@ sub tst_check
     }
   }
 
-  # prepare Singular run
   &mysystem("$rm -f tst_status.out");
-  if ($verbosity > 2 && !$WINNT)
+  my $resfile = "$root.new.res";
+  $resfile = "$root.mtrack.res" if ($mtrack);
+  
+  if ($mtrack)
   {
-    $system_call = "$cat $root.tst | $singular $singularOptions | $tee $root.new.res";
+    $system_call = "$cat $root.tst | sed -e 's/\\\\\$/LIB \"general.lib\"; killall(); killall(\"proc\");system(\"mtrack\", \"$root.mtrack.unused\"); \\\$/' | $singular $singularOptions ";
+    $system_call .= ($verbosity > 2 ? " | $tee " : " > ");
+    $system_call .= "$root.mtrack.res";
+    $system_call .= " 2>&1 " if ($verbosity <= 2);
   }
   else
   {
-    $system_call = "$cat $root.tst | $singular $singularOptions > $root.new.res 2>&1";
+    # prepare Singular run
+    if ($verbosity > 2 && !$WINNT)
+    {
+      $system_call = "$cat $root.tst | $singular $singularOptions | $tee $resfile";
+    }
+    else
+    {
+      $system_call = "$cat $root.tst | $singular $singularOptions > $resfile 2>&1";
+    }
   }
   # Go Singular, Go!
   $exit_status = &mysystem($system_call);
@@ -366,18 +380,18 @@ sub tst_check
   else
   {
     # check for Segment fault in res file
-    $exit_status = ! (&mysystem("$grep \"Segment fault\" $root.new.res > /dev/null 2>&1"));
+    $exit_status = ! (&mysystem("$grep \"Segment fault\" $resfile > /dev/null 2>&1"));
 
     if ($exit_status)
     {
       $error_cause = "Segment fault";
     }
-    else
+    elsif (! $mtrack)
     {
       &mysystem("$rm -f $root.diff");
       if ($generate eq "yes")
       {
-        &mysystem("$cp $root.new.res $root.res");
+        &mysystem("$cp $resfile $root.res");
       }
       else
       {
@@ -395,7 +409,7 @@ sub tst_check
     }
   }
 
-  if (%checks && ! $exit_status && $generate ne "yes")
+  if (%checks && ! $exit_status && $generate ne "yes" && ! $mtrack)
   {
     & mysystem("$cp tst_status.out $root.new.stat");
     # do status checks
@@ -410,44 +424,44 @@ sub tst_check
   }
   else
   {
-
-    #clean up
-    if ($generate eq "yes")
+    unless ($mtrack)
     {
-      & mysystem("$cp tst_status.out $root.stat");
-      if (! $WINNT)
+      #clean up
+      if ($generate eq "yes")
       {
-        &mysystem("$gzip -cf $root.res | $uuencode $root.res.gz > $root.res.gz.uu");
+	& mysystem("$cp tst_status.out $root.stat");
+	if (! $WINNT)
+	{
+	  &mysystem("$gzip -cf $root.res | $uuencode $root.res.gz > $root.res.gz.uu");
+	}
+	else
+	{
+	  # uuencode is broken under windows
+	  print "Warning: Can not generate $root.res.gz.uu under Windows\n";
+	}
+	
       }
-      else
+      elsif (%merge)
       {
-        # uuencode is broken under windows
-        print "Warning: Can not generate $root.res.gz.uu under Windows\n";
+	if (! -r "$root.stat")
+	{
+	  & mysystem("$cp tst_status.out $root.stat");
+	}
+	else
+	{
+	  & mysystem("$cp tst_status.out $root.new.stat");
+	  ($exit_status, $error_cause) = & tst_status_merge($root);
+	  
+	  print (STDERR "Warning: Merge Problems: $error_cause\n")
+	    if ($verbosity > 0 && $exit_status);
+	}
       }
-
     }
-    elsif (%merge)
-    {
-      if (! -r "$root.stat")
-      {
-        & mysystem("$cp tst_status.out $root.stat");
-      }
-      else
-      {
-        & mysystem("$cp tst_status.out $root.new.stat");
-        ($exit_status, $error_cause) = & tst_status_merge($root);
-
-        print (STDERR "Warning: Merge Problems: $error_cause\n")
-          if ($verbosity > 0 && $exit_status);
-      }
-    }
-
     if ($keep ne "yes")
     {
-      &mysystem("$rm -f tst_status.out $root.new.res $root.res $root.diff $root.new.stat");
+      &mysystem("$rm -f tst_status.out $resfile $root.res $root.diff $root.new.stat");
     }
   }
-
   # und tschuess
   return ($exit_status);
 }
@@ -481,6 +495,10 @@ while ($ARGV[0] =~ /^-/)
   elsif(/^-v$/)
   {
     $verbosity = shift;
+  }
+  elsif(/^-t$/)
+  {
+    $mtrack = 1;
   }
   elsif(/^-r$/)
   {
@@ -658,7 +676,8 @@ foreach (@ARGV)
         $tst_path = "";
         $tst_base = $_;
       }
-
+      $tst_base =~ s/^\s*//;
+      $tst_base =~ s/(.*?)\s+.*/$1/;
       $exit_code = &tst_check($tst_base) || $exit_code;
 
       if ($tst_path ne "")
