@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.38 2001-10-09 16:36:11 Singular Exp $ */
+/* $Id: mpsr_Get.cc,v 1.39 2002-05-13 08:57:58 Singular Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -178,7 +178,7 @@ inline void InitApIntLeftv(mpsr_leftv mlv, mpz_ptr apint)
   mlv->r = mpsr_rDefault(0);
   n->s = 3;
   memcpy(&(n->z), apint, sizeof(MP_INT));
-  n = nlInit(n);
+  nlNormalize(n);
   omFreeBin(apint, MP_INT_bin);
   mlv->lv = mpsr_InitLeftv(NUMBER_CMD, n);
 }
