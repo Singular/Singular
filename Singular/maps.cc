@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.16 1999-07-19 10:50:43 Singular Exp $ */
+/* $Id: maps.cc,v 1.17 1999-07-23 13:45:17 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -20,6 +20,9 @@
 #include "lists.h"
 #include "longalg.h"
 #include "maps.h"
+
+/* debug output: Tok2Cmdname in maApplyFetch*/
+//#include "ipshell.h"
 
 #define MAX_MAP_DEG 128
 
@@ -277,7 +280,7 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
   {
     temp1->m[i] = pChangeSizeOfPoly(theImageRing,
                                     theImageRing->qideal->m[i-sourcering->N-j0],
-				    1,imagepvariables);
+                                    1,imagepvariables);
   }
   // we ignore here homogenity - may be changed later:
   temp2 = kStd(temp1,NULL,isNotHomog,NULL);
@@ -479,7 +482,7 @@ max_deg_fertig_p:
 /*2
 * maps the expression w to res,
 * switch what: MAP_CMD: use theMap for mapping, N for preimage ring
-*              FETCH_CMD: use pOrdPoly for mapping
+*              //FETCH_CMD: use pOrdPoly for mapping
 *              IMAP_CMD: use perm for mapping, N for preimage ring
 *              default: map only poly-structures,
 *                       use perm and par_perm, N and P,
@@ -489,7 +492,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
 {
   int i;
   int N = preimage_r->N;
-  //Print("N=%d ",N);
+  //Print("N=%d what=%s ",N,Tok2Cmdname(what));
   //if (perm!=NULL) for(i=1;i<=N;i++) Print("%d -> %d ",i,perm[i]);
   //PrintS("\n");
   //Print("P=%d ",P);
@@ -525,7 +528,8 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
     case VECTOR_CMD:
       if (what==FETCH_CMD)
         res->data=(void *)pFetchCopy(preimage_r, (poly)data);
-      else if (what==IMAP_CMD)
+      else
+      if (what==IMAP_CMD)
         res->data=(void *)pPermPoly((poly)data,perm,preimage_r,par_perm,P);
       else /*if (what==MAP_CMD)*/
       {
@@ -561,7 +565,8 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
           pTest(m->m[i]);
         }
       }
-      else if (what==IMAP_CMD)
+      else
+      if (what==IMAP_CMD)
       {
         for (i=R*C-1;i>=0;i--)
         {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.22 1999-05-26 14:16:50 obachman Exp $ */
+/* $Id: polys1.cc,v 1.23 1999-07-23 13:45:17 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -973,10 +973,10 @@ poly pOrdPolyMerge(poly p)
 
   if (p == NULL) return NULL;
 
-  for (;;)
+  loop
   {
     qq = p;
-    for (;;)
+    loop
     {
       if (pNext(p) == NULL) return pAdd(result, qq);
       if (pComp(p,pNext(p)) != 1)
@@ -1039,9 +1039,9 @@ poly pPermPoly (poly p, int * perm, ring oldRing,
 {
   int OldpVariables = oldRing->N;
   poly result = NULL;
-  poly aq=NULL;
-  poly qq;
-  int i;
+  poly result_last = NULL;
+  poly aq=NULL; /* the map coefficient */
+  poly qq; /* the mapped monomial */
 
   while (p != NULL)
   {
@@ -1063,6 +1063,7 @@ poly pPermPoly (poly p, int * perm, ring oldRing,
     }
     else
     {
+      int i;
       for(i=1; i<=OldpVariables; i++)
       {
         if (pRingGetExp(oldRing,p,i)!=0)
@@ -1088,6 +1089,7 @@ poly pPermPoly (poly p, int * perm, ring oldRing,
       }
     }
     pIter(p);
+#if 1
     if (qq!=NULL)
     {
       pSetm(qq);
@@ -1096,24 +1098,51 @@ poly pPermPoly (poly p, int * perm, ring oldRing,
       if (aq!=NULL) qq=pMult(aq,qq);
       aq = qq;
       while (pNext(aq) != NULL) pIter(aq);
-      pNext(aq) = result;
+      if (result_last==NULL)
+      {
+        result=qq;
+      }
+      else
+      {
+        pNext(result_last)=qq;
+      }
+      result_last=aq;
       aq = NULL;
-      result = qq;
     }
     else if (aq!=NULL)
     {
       pDelete(&aq);
     }
   }
-  p = result;
-  result = NULL;
-  while (p != NULL)
-  {
-    qq = p;
-    pIter(p);
-    qq->next = NULL;
-    result = pAdd(result, qq);
-  }
+  result=pOrdPolyMerge(result);
+#else  
+  //  if (qq!=NULL)
+  //  {
+  //    pSetm(qq);
+  //    pTest(qq);
+  //    pTest(aq);
+  //    if (aq!=NULL) qq=pMult(aq,qq);
+  //    aq = qq;
+  //    while (pNext(aq) != NULL) pIter(aq);
+  //    pNext(aq) = result;
+  //    aq = NULL;
+  //    result = qq;
+  //  }
+  //  else if (aq!=NULL)
+  //  {
+  //    pDelete(&aq);
+  //  }
+  //}
+  //p = result;
+  //result = NULL;
+  //while (p != NULL)
+  //{
+  //  qq = p;
+  //  pIter(p);
+  //  qq->next = NULL;
+  //  result = pAdd(result, qq);
+  //}
+#endif
   pTest(result);
   return result;
 }

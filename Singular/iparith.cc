@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.162 1999-07-14 13:16:03 Singular Exp $ */
+/* $Id: iparith.cc,v 1.163 1999-07-23 13:45:15 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1513,54 +1513,62 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
 {
   ring r=(ring)u->Data();
   idhdl w;
+  int op=iiOp;
 
-  if ((iiOp!=IMAP_CMD) &&
-      ((rInternalChar(currRing) != rInternalChar(r)) ||
-       (currRing->N != r->N && iiOp==FETCH_CMD)))
-    goto err_fetch;
   if ((w=r->idroot->get(v->Name(),myynest))!=NULL)
   {
     int *perm=NULL;
     int *par_perm=NULL;
     int par_perm_size=0;
     BOOLEAN bo;
-    if (iiOp==IMAP_CMD)
+    if (!nSetMap(rInternalChar(r),r->parameter,rPar(r),r->minpoly))
     {
-      if (!nSetMap(rInternalChar(r),r->parameter,rPar(r),r->minpoly))
+      // Allow imap/fetch to be make an exception only for:
+      if ( (rField_is_Q_a(r) &&  // Q(a..) -> Q(a..) || Q || Zp || Zp(a)
+            (rField_is_Q() || rField_is_Q_a() ||
+             (rField_is_Zp() || rField_is_Zp_a())))
+           ||
+           (rField_is_Zp_a(r) &&  // Zp(a..) -> Zp(a..) || Zp
+            (rField_is_Zp(currRing, rInternalChar(r)) ||
+             rField_is_Zp_a(currRing, rInternalChar(r)))) )
       {
-        if (iiOp != IMAP_CMD) goto err_fetch;
-        // Allow imap to be make an exception only for:
-        if ( (rField_is_Q_a(r) &&  // Q(a..) -> Q(a..) || Q || Zp || Zp(a)
-              (rField_is_Q() || rField_is_Q_a() ||
-               (rField_is_Zp() || rField_is_Zp_a())))
-             ||
-             (rField_is_Zp_a(r) &&  // Zp(a..) -> Zp(a..) || Zp
-              (rField_is_Zp(currRing, rInternalChar(r)) ||
-               rField_is_Zp_a(currRing, rInternalChar(r)))) )
-        {
-          par_perm_size=rPar(r);
-          BITSET save_test=test;
-          naSetChar(rInternalChar(r),TRUE,r->parameter,rPar(r));
-          nSetChar(currRing,TRUE);
-          test=save_test;
-        }
-        else
-        {
-          goto err_fetch;
-        }
+        par_perm_size=rPar(r);
+        BITSET save_test=test;
+        naSetChar(rInternalChar(r),TRUE,r->parameter,rPar(r));
+        nSetChar(currRing,TRUE);
+        test=save_test;
       }
+      else
+      {
+        goto err_fetch;
+      }
+    }
+    if ((iiOp!=FETCH_CMD) || (r->N!=pVariables) || (rPar(r)!=rPar(currRing)))
+    {
       perm=(int *)Alloc0((r->N+1)*sizeof(int));
       if (par_perm_size!=0)
         par_perm=(int *)Alloc0(par_perm_size*sizeof(int));
-      maFindPerm(r->names,       r->N,       r->parameter,        r->P,
-                 currRing->names,currRing->N,currRing->parameter, currRing->P,
-                 perm,par_perm, currRing->ch);
+      op=IMAP_CMD;
+      if (iiOp==IMAP_CMD)
+      {
+        maFindPerm(r->names,       r->N,       r->parameter,        r->P,
+                   currRing->names,currRing->N,currRing->parameter, currRing->P,
+                   perm,par_perm, currRing->ch);
+      }
+      else
+      {
+        int i;
+        if (par_perm_size!=0)
+          for(i=0;i<min(rPar(r),rPar(currRing));i++) par_perm[i]=-(i+1);
+        for(i=1;i<=min(r->N,pVariables);i++) perm[i]=i;
+      }
     }
     sleftv tmpW;
     memset(&tmpW,0,sizeof(sleftv));
     tmpW.rtyp=IDTYP(w);
     tmpW.data=IDDATA(w);
-    if ((bo=maApplyFetch(iiOp,NULL,res,&tmpW, r, perm,par_perm,par_perm_size)))
+    if ((bo=maApplyFetch(op,NULL,res,&tmpW, r,
+                         perm,par_perm,par_perm_size)))
     {
       Werror("cannot map %s of type %s(%d)",v->name, Tok2Cmdname(w->typ),w->typ);
     }
