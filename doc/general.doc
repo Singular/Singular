@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.104 1998-06-19 13:33:52 obachman Exp $
+@comment $Id: general.doc,v 1.105 1998-06-19 13:38:44 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -242,7 +242,7 @@ On Unix-like operating systems, @sc{Singular}
 maintains a history of the last lines of input.  If the environment
 variable @code{SINGULARHIST} is set and has a name of a file as value, 
 then the input history is stored across sessions using this
-file. Otherwsie, i.e., if the environment variable @code{SINGULARHIST}
+file. Otherwise, i.e., if the environment variable @code{SINGULARHIST}
 is not set, then the history of the last inputs is only available for
 the commands of the current session.
 
@@ -768,7 +768,7 @@ weighted lexicographical ordering; the weight vector may consist of
 positive integers only.
 @end table
 
-Global orderings are wellorderings, i.e., @math{1 < x} for each ring
+Global orderings are well-orderings, i.e., @math{1 < x} for each ring
 variable @math{x}. They are denoted by an @code{p} as the second
 character in their name.
 
@@ -792,7 +792,7 @@ of the weight vector has to be non-zero.
 of the weight vector has to be non-zero.
 @end table
 
-Local orderings are not wellorderings. They are denoted by an @code{s}
+Local orderings are not well-orderings. They are denoted by an @code{s}
 as the second character in their name.
 
 @item Matrix orderings
@@ -865,7 +865,7 @@ background}.
 
 The basic algorithm in @sc{Singular} is a general standard basis algorithm for
 any monomial ordering which is compatible with the natural semi-group
-structure of the exponents. This includes wellorderings
+structure of the exponents. This includes well-orderings
 (Buchberger algorithm to compute a Groebner basis)
 and tangent cone orderings (Mora algorithm) as special cases.
 
@@ -877,11 +877,11 @@ Algorithms to compute the standard operations on ideals and modules:
 intersection, ideal quotient, elimination, etc.
 
 @item
-Different syzygy algorithms and algorithms to compute free resolutions
+Different Szyzygy algorithms and algorithms to compute free resolutions
 of modules.
 
 @item
-Combinatorial algorithms to compute dimensions, hilbert series,
+Combinatorial algorithms to compute dimensions, Hilbert series,
 multiplicities, etc.
 
 @item
@@ -928,7 +928,7 @@ The given ideal must be zero-dimensional.
 @ref{stdhilb}@*
 computes a Groebner basis in a ring with a ``difficult'' ordering
 (e.g.@: lexicographical) via @code{std} w.r.t.@: a ``simple'' ordering
-and a @code{std} computation guided by the hilbert series.
+and a @code{std} computation guided by the Hilbert series.
 @end table
 
 @subsubheading Further processing of standard bases
@@ -979,7 +979,7 @@ method.
 The input needs to be homogeneous.
 @item mres
 @ref{mres}@*
-computes a minimal free resolution of an ideal or module with the syzygy
+computes a minimal free resolution of an ideal or module with the Szyzygy
 method.
 @item res
 @ref{res}@*
@@ -996,7 +996,7 @@ method.
 The input has to be a standard basis.
 @item syz
 @ref{syz}@*
-computes the first syzygy (i.e., the module of relations of the
+computes the first Szyzygy (i.e., the module of relations of the
 given generators).
 @end table
 
@@ -1905,7 +1905,7 @@ format for the help text:
 USAGE:    <proc_name>(<parameters>);   <explanation of parameters>
 [CREATE:  <description of created objects which are not returned>]
 RETURN:   <description of the purpose and return value>
-[NOTE:    <paritcular assumptions or limitations, details>]
+[NOTE:    <particular assumptions or limitations, details>]
 EXAMPLE:  example <proc_name>; shows an example
 @end example
 
@@ -2131,7 +2131,7 @@ to an error message while loading the library.
 If an error occurs, loading is aborted and an error message is displayed,
 specifying the type of error and the line where it was detected.
 
-The info- and version-string are defined as follwos:
+The info- and version-string are defined as follows:
 @cindex  info in a library
 @table @code
 @item @strong{Syntax:}
@@ -2165,7 +2165,7 @@ library is loaded.
 @example
 version="$I@comment
 @comment !! Do not erase the @comment at the end of the previous line !!
-@comment !! It prevents cvs to substitue the id string                !!
+@comment !! It prevents cvs to substitute the id string                !!
 d: sample.lib,v 1.2 1998/05/07 singular Exp $";
   version="some version string";
 @end example
@@ -2173,7 +2173,7 @@ d: sample.lib,v 1.2 1998/05/07 singular Exp $";
 It is common practice to simply define the version string to be
 @code{"$I}@comment
 @comment !! Do not erase the @comment at the end of the previous line !!
-@comment !! It prevents cvs to substitue the id string                !!
+@comment !! It prevents cvs to substitute the id string                !!
 @code{d:$"} and let a version control system expand it.
 @end table
 
@@ -2283,7 +2283,7 @@ See @ref{TRACE var}.
 @subsection Break points
 A break point can be put into a proc by inserting the command @code{~}.
 If @code{Singular} reaches a break point it asks for lines of commands
-(linelength must be less than 80 characters)
+(line-length must be less than 80 characters)
 from the user. It returns to normal execution if given an empty line.
 See @ref{~}.
 
@@ -2311,7 +2311,7 @@ i;
 @subsection Printing of data
 The procedure @code{dbprint} is useful for optional output of data:
 it takes 2 arguments and prints the second argument, if the first
-argumet is positive; it does nothing otherwise.
+argument is positive; it does nothing otherwise.
 @menu
 * dbprint::
 * voice::
@@ -2326,18 +2326,18 @@ See @ref{dbprint}; @ref{voice}.
 @cindex libparse
 
 @code{libparse} is a stand-alone program contained in the @sc{Singular}
-distribution (at the palce where the @sc{Singular} executable program
+distribution (at the place where the @sc{Singular} executable program
 resides), which cannot be called inside of @sc{Singular}. It is a
 debugging tool for libraries which performs exactly the same checks as
 the @code{LIB} command in @sc{Singular}, but generates more output during
-parsing.  @code{libparse} is usefulif an error
+parsing.  @code{libparse} is useful if an error
 occurs while loading the library, but the whole block around the line
 specified seems to be correct. In these situations the real error might
 be hundreds of lines earlier in the library.
 
 @strong{Usage:}
 @*@code{libparse [options] singular-library}
-@strong{Pptions:}
+@strong{Options:}
 @table @asis
 @item @code{-d} Debuglevel
 increases the amount of output during parsing, where Debuglevel is an integer
@@ -2353,7 +2353,7 @@ The following syntax checks are performed in any case:
 @item counting of "
     ( number of " must be even ).
 @item general library syntax
-    ( only LIB, static, proc (with paramaters, help, body and example)
+    ( only LIB, static, proc (with parameters, help, body and example)
 and comments, i.e // and @code{/* ... */} are allowed).
 @end itemize
 Its output lists all procedures that have been parsed successfully:
@@ -2383,12 +2383,12 @@ each of the following is the position of the byte in the library.
 @item eoe: end of example '@}'
 @end itemize
 
-The following example shows the result of a missing close-barcket @} in
+The following example shows the result of a missing close-bracket @} in
 line 26 of the library @code{sample.lib}.
 
 @example
 LIB "sample.lib";
-@expansion{}    ? Library sample.lib: ERROR occured: in line 26, 497.
+@expansion{}    ? Library sample.lib: ERROR occurred: in line 26, 497.
 @expansion{}    ? missing close bracket '@}' at end of library in line 26.
 @expansion{}    ? Cannot load library,... aborting.
 @expansion{}    ? error occurred in STDIN line 1: `LIB "sample.lib";`
