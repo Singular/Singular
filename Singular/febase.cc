@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.28 1998-04-07 18:35:22 obachman Exp $ */
+/* $Id: febase.cc,v 1.29 1998-04-15 16:44:58 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -57,6 +57,8 @@ BOOLEAN errorreported = FALSE;
 BOOLEAN feBatch;
 char *  feErrors=NULL;
 int     feErrorsLen=0;
+
+const char feNotImplemented[]="not implemented";
 
 BOOLEAN feProt = FALSE;
 FILE*   feProtFile;

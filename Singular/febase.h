@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.11 1998-04-07 18:35:23 obachman Exp $ */
+/* $Id: febase.h,v 1.12 1998-04-15 16:44:57 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -20,6 +20,7 @@ extern int    pagelength, colmax;
 extern int    yy_blocklineno;
 extern int    yy_noeof;
 extern char   prompt_char;
+extern const char feNotImplemented[];
 #ifdef HAVE_TCL
 extern BOOLEAN tclmode;
 #endif
