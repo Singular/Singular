@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.24 1998-05-06 12:34:37 wichmann Exp $
+@comment $Id: types.doc,v 1.25 1998-05-07 16:21:45 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -54,6 +54,7 @@ An expression list is any comma separated list of expressions.
 @node def, ideal, , Data types
 @section def
 @cindex def
+@cindex untyped definitions
 
 @c {{{ section def }}}
 @c ------------------------------
@@ -106,11 +107,11 @@ is local to the procedure.
 @end example
 @end table
 @menu
-* untyped definitions::
+* def::
 * typeof::
 @end menu
 @iftex
-See @ref{untyped definitions}; @ref{typeof}.
+See @ref{def}; @ref{typeof}.
 @end iftex
 @c {{{endfold}}}
 @c {{{endfold}}}
