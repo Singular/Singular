@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmzero.cc,v 1.1 1997-03-26 17:07:22 Singular Exp $
+// $Id: fglmzero.cc,v 1.2 1997-03-27 10:34:49 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -959,8 +959,7 @@ GroebnerViaFunctionals( const idealFunctionals & l )
 
 // for a descritption of the parameters see fglm.h
 BOOLEAN
-fglmzero( idhdl sourceRingHdl, ideal & sourceIdeal, idhdl destRingHdl,
-           ideal & destIdeal, BOOLEAN switchBack, BOOLEAN deleteIdeal)
+fglmzero( idhdl sourceRingHdl, ideal & sourceIdeal, idhdl destRingHdl, ideal & destIdeal, BOOLEAN switchBack, BOOLEAN deleteIdeal )
 {
     idhdl initialRingHdl = currRingHdl;
     BOOLEAN fglmok;
