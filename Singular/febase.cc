@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.16 1997-05-03 17:23:33 obachman Exp $ */
+/* $Id: febase.cc,v 1.17 1997-05-05 10:10:00 Singular Exp $ */
 /*
 * ABSTRACT: i/o system, handling of 'voices'
 */
@@ -838,7 +838,7 @@ void Print(char *fmt, ...)
   }
   if (feProt&PROT_O)
   {
-    vfprintf(feProrFile,fmt,ap);
+    vfprintf(feProtFile,fmt,ap);
   }
 #endif
   }
