@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.21 2003-03-19 23:09:01 levandov Exp $ */
+/* $Id: gring.h,v 1.22 2003-10-17 19:54:15 levandov Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -38,12 +38,16 @@ poly nc_p_CopyGet(poly a, ring r);
 poly nc_p_CopyPut(poly a, ring r);
 
 //syzygies :
-poly nc_spGSpolyCreate(poly p1, poly p2, poly spNoether, const ring r);
-poly nc_spGSpolyRed(poly p1, poly p2, poly spNoether, const ring r);
-poly nc_spGSpolyRedNew(poly p1, poly p2, poly spNoether, const ring r);
-void nc_spGSpolyRedTail(poly p1, poly q, poly q2, poly spNoether, const ring r);
-poly nc_spShort(poly p1, poly p2, const ring r=currRing);
-void nc_kBucketPolyRed(kBucket_pt b, poly p);
+// former nc_spGSpolyCreate
+poly nc_CreateSpoly(poly p1, poly p2, poly spNoether, const ring r);
+// former nc_spGSpolyRed
+poly nc_ReduceSpoly(poly p1, poly p2, poly spNoether, const ring r);
+// former nc_spGSpolyRedNew
+poly nc_ReduceSpolyNew(poly p1, poly p2, poly spNoether, const ring r);
+// former nc_spGSpolyRedTail
+void nc_ReduceSpolyTail(poly p1, poly q, poly q2, poly spNoether, const ring r);
+// former nc_spShort
+poly nc_CreateShortSpoly(poly p1, poly p2, const ring r=currRing);
 
 ideal gr_bba (ideal F, ideal Q,kStrategy strat);
 
@@ -57,6 +61,7 @@ ideal twostd(ideal I);
 
 // complete reduction routines
 
+//void nc_kBucketPolyRed(kBucket_pt b, poly p);
 void nc_kBucketPolyRed(kBucket_pt b, poly p, number *c);
 void nc_PolyPolyRed(poly &b, poly p, number *c);
 

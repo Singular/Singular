@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.123 2003-07-23 12:09:21 Singular Exp $ */
+/* $Id: kutil.cc,v 1.124 2003-10-17 19:54:16 levandov Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1154,7 +1154,7 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat, int atR 
           strat->cp++;
           Lp.p = nc_p_Bracket_qq(pCopy(p),strat->S[i]);
       }
-      else  Lp.p = nc_spGSpolyCreate(strat->S[i],p,NULL,currRing);
+      else  Lp.p = nc_CreateSpoly(strat->S[i],p,NULL,currRing);
     }
     else
     {

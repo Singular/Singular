@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.12 2003-06-26 19:21:47 levandov Exp $ */
+/* $Id: gr_kstd2.cc,v 1.13 2003-10-17 19:54:15 levandov Exp $ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
@@ -76,7 +76,7 @@ int redGrFirst (LObject* h,kStrategy strat)
         PrintS(" with ");
         wrp(strat->S[j]);
       }
-      (*h).p = nc_spGSpolyRed(strat->S[j],(*h).p, NULL, currRing);
+      (*h).p = nc_ReduceSpoly(strat->S[j],(*h).p, NULL, currRing);
       //spSpolyRed(strat->T[j].p,(*h).p,strat->kNoether);
 
       if (TEST_OPT_DEBUG)
@@ -178,7 +178,7 @@ static int redHomog (LObject* h,kStrategy strat)
         wrp(strat->S[j]);
       }
       /*- compute the s-polynomial -*/
-      (*h).p = nc_spGSpolyRed(strat->S[j],(*h).p,strat->kNoether,currRing);
+      (*h).p = nc_ReduceSpoly(strat->S[j],(*h).p,strat->kNoether,currRing);
       if ((*h).p == NULL)
       {
         if (TEST_OPT_DEBUG) PrintS(" to 0\n");
@@ -243,7 +243,7 @@ static int redHomog0 (LObject* h,kStrategy strat)
         wrp(strat->S[j]);
       }
       /*- compute the s-polynomial -*/
-      (*h).p = nc_spGSpolyRed(strat->T[j].p,(*h).p,strat->kNoether,currRing);
+      (*h).p = nc_ReduceSpoly(strat->T[j].p,(*h).p,strat->kNoether,currRing);
       if ((*h).p == NULL)
       {
         if (TEST_OPT_DEBUG) PrintS(" to 0\n");
@@ -318,7 +318,7 @@ static int redLazy (LObject* h,kStrategy strat)
         wrp(strat->S[j]);
       }
       /*- compute the s-polynomial -*/
-      (*h).p = nc_spGSpolyRed(strat->S[j],(*h).p,strat->kNoether,currRing);
+      (*h).p = nc_ReduceSpoly(strat->S[j],(*h).p,strat->kNoether,currRing);
       if ((*h).p == NULL)
       {
         if (TEST_OPT_DEBUG) PrintS(" to 0\n");
@@ -481,10 +481,10 @@ static int redHoney (LObject*  h,kStrategy strat)
       if (strat->fromT)
       {
         strat->fromT=FALSE;
-        (*h).p = nc_spGSpolyRedNew(pi,(*h).p,strat->kNoether,currRing);
+        (*h).p = nc_ReduceSpolyNew(pi,(*h).p,strat->kNoether,currRing);
       }
       else
-        (*h).p = nc_spGSpolyRed(pi,(*h).p,strat->kNoether,currRing);
+        (*h).p = nc_ReduceSpoly(pi,(*h).p,strat->kNoether,currRing);
       if (TEST_OPT_DEBUG)
       {
         PrintS(" to ");
@@ -606,7 +606,7 @@ static int redBest (LObject*  h,kStrategy strat)
       }
       else
 #endif
-      p = nc_spShort(strat->T[j].p,(*h).p);
+      p = nc_CreateShortSpoly(strat->T[j].p,(*h).p);
       /* computes only the first monomial of the spoly  */
       if (p)
       {
@@ -630,7 +630,7 @@ static int redBest (LObject*  h,kStrategy strat)
               }
               else
 #endif
-              ph = nc_spShort(strat->T[j].p,(*h).p);
+              ph = nc_CreateShortSpoly(strat->T[j].p,(*h).p);
               if (ph==NULL)
               {
                 pLmFree(p);
@@ -656,7 +656,7 @@ static int redBest (LObject*  h,kStrategy strat)
           }
         }
         pLmFree(p);
-        (*h).p = nc_spGSpolyRed(strat->T[jbest].p,(*h).p,strat->kNoether,currRing);
+        (*h).p = nc_ReduceSpoly(strat->T[jbest].p,(*h).p,strat->kNoether,currRing);
       }
       else
       {
@@ -832,9 +832,9 @@ ideal gr_bba (ideal F, ideal Q, kStrategy strat)
       if ((currRing->nc->type==nc_lie) && pHasNotCF(strat->P.p1,strat->P.p2)) /* prod crit */
       {
         strat->cp++;
-        /* prod.crit itself in nc_spGSpolyCreate */
+        /* prod.crit itself in nc_CreateSpoly */
       }
-      strat->P.p = nc_spGSpolyCreate(strat->P.p1,strat->P.p2,strat->kNoether,currRing);
+      strat->P.p = nc_CreateSpoly(strat->P.p1,strat->P.p2,strat->kNoether,currRing);
     }
     if (strat->P.p != NULL)
     {
