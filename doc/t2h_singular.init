@@ -67,6 +67,9 @@ sub singular_banner
 EOT
 }
 
+# always use bottom navigation
+$T2H_WORDS_IN_PAGE = 0;
+
 $T2H_VERTICAL_HEAD_NAVIGATION = 1;
 @T2H_SECTION_BUTTONS =
   (

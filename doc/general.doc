@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.142 1999-07-28 16:08:35 obachman Exp $
+@comment $Id: general.doc,v 1.143 1999-07-30 10:37:03 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -270,7 +270,7 @@ all input coming from a file. By default, the value of @code{echo} is
 0. @xref{echo}.
 
 @item @code{-h}, @code{--help}
-Print an one-line description of each command line option and exit.
+Print a one-line description of each command line option and exit.
 
 @item @code{--no-rc}
 Do not execute the @code{.singularrc} file on start-up.  By default,
@@ -304,7 +304,7 @@ an error to the authors.
 @end table
 
 The following command line options allow manipulations of the timer and
-the pseudo random generator and enable passing of commands and strings
+the pseudo random generator and enable the passing of commands and strings
 to @sc{Singular}:
 
 @table @asis
@@ -1983,6 +1983,8 @@ defined procedures can be displayed by the command @code{listvar(proc);}.
 @node Procedure definition, Names in procedures, Procedures, Procedures
 @subsection Procedure definition
 @cindex Procedure definition
+@cindex procedures, static
+@cindex static procedures
 @c ------------------------------------------------------------
 @c   This piece of text exists also in the file types.doc,
 @c   chapter "proc declaration".
@@ -2015,10 +2017,10 @@ which is executed by @code{example proc_name;}.
 @* The help_text, the parameter_list, and the example section are optional.
 The default for a parameter_list is @code{(list #)}, see @ref{Parameter list}.
 The help and example sections are ignored if the procedure is defined
-@ifset namesapces
+@ifset namespaces
 interactively, i.e., if it was not loaded from a file by a @ref{load} command.
 @end ifset
-@ifclear namesapces
+@ifclear namespaces
 interactively, i.e., if it was not loaded from a file by a LIB command 
 (@ref{LIB}).
 @end ifclear
@@ -2382,7 +2384,7 @@ the guidelines explained in this section, so that debugging and
 understanding are made easier.
 
 @strong{Note:} For libraries which are to be included in the @sc{Singular}
-distribution, the folowing guidelines are mandatory.
+distribution, the following guidelines are mandatory.
 
 
 @menu
@@ -2421,7 +2423,7 @@ Each procedure which is not declared @code{static} should have a
 help and example section as explained in @ref{Procedure definition}.
 @*Such procedures should furthermore carefully check any assumptions
 made about their input (like the type of list elements), and, if
-necesary, ommit an error using the  function @ref{ERROR}.
+necessary, omit an error using the  function @ref{ERROR}.
 
 @item
 No procedures should be defined within the body of another procedure.
@@ -2502,11 +2504,11 @@ example
 @node The generation of the documentation of a library, Typesetting of help strings, Procedures in a library, Guidelines for writing a library
 
 @subsection The generation of the documentation of a library
-@cindex Generation of the documentation of a libraryProcedures in a library
+@cindex Generation of the documentation of a library
 @cindex library, generation of documentation
 
-The "native" @sc{Singular} documentation is written in
-@code{texinfo}. Based on various tools, @code{info, dvi, ps,} and
+The typesetting language in which the @sc{Singular} documentation is
+written is @code{texinfo}. Based on various tools, @code{info, dvi, ps,} and
 @code{html} versions of the @code{texinfo} documentation are generated.
 
 
@@ -2532,15 +2534,35 @@ included into the documentation.
 @end itemize
 
 For a uniform look-and-feel of the library documentation, library
-developers should follow the recommendation of 
+developers should 
+@itemize
+@item 
+follow the recommendation of 
 @ref{The help string of a library} and @ref{The help string of
-procedures} and should consult the source code of libraries like
+procedures} 
+
+@item 
+consult the source code of libraries like
 @code{template.lib} (@pxref{template_lib}) or @code{standard.lib}
 (@pxref{standard_lib}) for examples on how library documentations are
-written. 
+written
 
-Furthermore, library developers should carefully check the generated
-documentation in its various fomrmats using the @code{lib2doc} utility:
+@item
+make sure that each procedure listed in the @code{PROCEDURE:}
+section of the library info string has a help string and an example
+section
+
+@item
+not use interactive functions like
+@ref{pause} or @code{read("");} (@pxref{read}) and should limit the
+length of input lines to 60 characters in the example section of 
+procedures
+
+@item 
+carefully check the generated
+documentation of their libraries in its various formats using the
+@code{lib2doc} (@pxref{lib2doc}) utility.
+@end itemize
 
 @menu
 * lib2doc::
@@ -2559,7 +2581,8 @@ documentation in its various fomrmats using the @code{lib2doc} utility:
 @cindex Typesetting of help strings
 @cindex library, typesetting of help strings
 
-The help and info strings of libraries which are included in the
+The help strings of procedures and info strings of libraries which are
+included in the 
 distribution of @sc{Singular} are parsed and automatically converted
 into the texinfo format (the typesetting language in which the
 documentation  of @sc{Singular} is written).
@@ -2570,8 +2593,8 @@ kept in mind:
 
 @itemize @bullet
 @item
-If a help string starts with a @code{@@} sign, then no parsing is done,
-and the info string is assumed to be already in the texinfo format.
+If a help string starts with an @code{@@} sign, then no parsing is done,
+and the help string is assumed to be already in the texinfo format.
 @item
 help strings are typeset within a @code{@@table @@asis} environment
 (which is similar to a latex @code{description} environment).
@@ -2580,61 +2603,181 @@ If a line starts with a character and contains a colon, then the text up
 to the colon is taken to be the description-string of an item and the
 text following the colon is taken to be the content of the item.
 @item
-If the description-string of an item matches @code{EXAMPLE} then this
-item is ignored.
-@item
-If the description-string of an item matches @code{SEE ALSO}, then the
-content of the item is assumed to be comma-separted words which are
+If the description-string of an item matches 
+@table @asis
+@item @code{EXAMPLE} 
+then this item and its content is ignored.
+@item @code{SEE ALSO}
+then the
+content of the item is assumed to be comma-separated words which are
 valid references to other texinfo nodes of the manual. (e.g., all
 procedure and command names are also texinfo nodes).
-@item
-If the description-string of an item matches @code{PROCEDURES}, then the
+@item  @code{KEYWORDS} (or, @code{KEYPHRASES})
+then the content of the item is assumed to be a
+semicolon-separated list of phrases which are taken as keys for the
+index of the manual (N.B. the name of a procedure/library is
+automatically added to the index keys).
+@item @code{PROCEDURES}
+then the
 content of the item is assumed to be a summary description of the
 procedures contained in the library. Separate texinfo nodes (subsections
 in printed documents) are
 @strong{only} created out of the help strings of such procedures which
 appear in the summary description of a library.
-@item
-The content-string of an item is typeset as follows:
-@itemize @minus
-@item
-If the content-string starts with an @code{@@} sign, then no parsing is
-done, but the content-string is assumed to be in the texinfo format.
+@end table
 
 @item
-The texinfo commands @code{@@*}, @code{@@code@{..@}},
-@code{@@math@{..@}} may be used to enforce linebreaks, and typesetting
-in typewriter font resp.@: math mode. Text inside @code{@@math@{..@}}
-need to be valid latex math markup.
+For the content of an item, the following texinfo markup elements
+are recognized (and, their content not further manipulated):
+@table @asis
+@item @code{@@*}
+to enforce a line-break.
+@table @asis
+@item Example:
+@code{old line @@* new line} 
+@* @expansion{} 
+@* old line @* new line
+@end table
 
-@item
-Words which are followed by matching round parenthesis (i.e., by
-@code{()}) are typeset using a typewriter font (like @code{myfunc()}).
+@item @code{@@math@{..@}} 
+for typesetting of small (i.e., which do not go over
+multiple lines) mathematical expressions  in LaTeX math-mode
+syntax.
+@table @asis
+@item Example:
+@code{@@math@{\alpha@}} 
+@*@expansion{} 
+@*@math{\alpha}
+@item Note:
+Mathematical expressions inside @code{@@math@{..@}} may
+not contain curly parenthesis and the "at" sign, i.e., may not contain
+@code{@{,@},@@}. 
+@end table
 
-@item
-A linebreak is inserted in front of a line, if (1) the previous line is
-shorter than 60 characters and does not contain @code{@@code@{..@}}  and
-@code{@@math@{..@}} constructs, or (2) if the first word of a line is
-followed by matching round parenthesis (like @code{myfunc()}), or (3) if
-the previous line does only consist of a word followed by matching
-parenthesis.
+@item @code{@@code@{..@}}
+for typesetting of small (i.e., which do not go over
+multiple lines) strings in typewriter font.
+@table @asis
+@item Example:
+@code{@@code@{typewriter font@}} 
+@*@expansion{} 
+@*@code{typewriter font}
+@item Note:
+The string inside @code{@@code@{..@}} may
+not contain curly parenthesis and the "at" sign, i.e., may not contain
+@code{@{,@},@@}. 
+@end table
+
+@item @code{@@example}
+ @code{...}
+@item @code{@@end example}
+for pre-formatted text which is indented and typeset in typewriter
+font. 
+@table @asis
+@item Example:
+@example
+before example
+@@example
+in              example
+notice extra identation and 
+escape of special characters like @@@{,@@@},@@@@
+@@end example
+after example
+@end example
+@expansion{}
+@*before example
+@example
+in                example
+notice extra identation  and
+escape of special characters like @{,@},@@
+@end example
+after example 
+@item Note:
+The characters @{,@},@@ have to be escaped by an @@ sign inside an
+@@example environment.
+@end table
+
+@item @code{@@format}
+ @code{...}
+@item @code{@@end format}
+for pre-formatted text which is not indented and typeset in normal
+font. 
+@table @asis
+@item Example:
+@example
+before format
+@@format
+in              format
+no extra identation but still 
+escape of special characters like @@@{,@@@},@@@@
+@@end format
+after format
+@end example
+@expansion{}
+@*before format
+@format
+in              format
+no extra identation  but still 
+escape of special characters like @{,@},@@
+@end format
+after format 
+@item Note:
+The characters @{,@},@@ have to be escaped by an @@ sign inside an
+@@example environment.
+@end table
+
+
+@item @code{@@texinfo}
+ @code{...}
+@item @code{@@end texinfo}
+for text which is written in pure texinfo.
+@table @asis
+@item Example:
+@example
+@@texinfo
+Among others, within a texinfo environment 
+one can use the tex environment to typeset 
+more complex mathematical like
+@@tex
+$i_@{1,1@} $
+@@tex
+@@end texinfo
+@end example
+@*@expansion{}
+@*Among others, within a texinfo environment one can use the tex environment
+to typeset more complex mathematical like
+@tex
+$ i_{1,1} $
+@end tex
+@end table
+
+@end table
+
+Furthermore, a line-break is inserted in front of each line 
+whose previous line is shorter than 60
+characters and does not contain any of the above described recognized
+texinfo markup elements.
 @end itemize
-@end itemize
 
-See @ref{template_lib} for an examples of the automatic typesetting.
+See also @ref{template_lib} for an examples of the typesetting rules
+explained here.
 
 @c ----------------------------------------
 @node The help string of a library, The help string of procedures, Typesetting of help strings, Guidelines for writing a library
 @subsection The help string of a library
 @cindex help string of a library
 @cindex library, help string
+@cindex library, info string
+@cindex info string of a library
 
+The help (or, info) string of a library should have the following format:
 
 @smallexample
 info="
 LIBRARY: <library_name> <one line description of the content>
 AUTHOR:  <name, and email address of author>
-
+[SEE ALSO: <comma-separated words of cross references>]
+[KEYWORDS: <semicolon-separated phrases of index keys>]
 PROCEDURES:
   <procedure1>;     <one line description of the purpose>
    .
@@ -2642,11 +2785,18 @@ PROCEDURES:
   <procedureN>;     <one line description of the purpose>
 ";
 @end smallexample
+Only such procedures should be listed in the @code{PROCEDURE} section
+for which are not @code{static} and which
+have a help and example section.
+
 The purpose of the one line procedure descriptions is not to give a short help
 for the procedure, but to help the user decide what procedure might be
 the right one for the job. Details can then be found in the help section
 of each procedure. Therefore parameters may be omitted or abbreviated if
-necessary. For more information, see also @ref{Typesetting of help strings}.
+necessary. 
+
+For more information, see @ref{Typesetting of help strings}. For an
+example, see @ref{template_lib}.
 
 
 @c ----------------------------------------
@@ -2655,15 +2805,26 @@ necessary. For more information, see also @ref{Typesetting of help strings}.
 @cindex help string of a procedure
 @cindex procedures, help string
 
+The help string of a procedure should have the following format:
+
 @smallexample
 USAGE:    <proc_name>(<parameters>);   <explanation of parameters>
 [CREATE:  <description of created objects which are not returned>]
 RETURN:   <description of the purpose and return value>
 [NOTE:    <particular assumptions or limitations, details>]
-[SEE ALSO: <comma-seprated names of related procedures>]
+[SEE ALSO: <comma-separated names of related procedures/cross references>]
+[KEYWORDS: <semicolon-separated phrases of index keys>]
 EXAMPLE:  example <proc_name>; shows an example
 @end smallexample
-For more information, see also @ref{Typesetting of help strings}.
+
+Further arbitrary items (like @code{THEORY:}, or @code{BACKGROUND:}) are
+recognized, as well, but should be used diligently.
+
+Remember that help strings are formatted as explained in
+@ref{Typesetting of help strings}. In particular, descriptions may
+contain the texinfo markup elements @code{@@*, @@math@{..@},
+@@code@{..@}, @@example, @@format, @@texinfo} to better control their
+typesetting. See @ref{msum}, @ref{mdouble}, @ref{mtripple} for examples.
 
 @c ----------------------------------------
 @node template_lib,, The help string of procedures, Guidelines for writing a library

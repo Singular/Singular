@@ -1,7 +1,7 @@
 ##########################################################################
 ##
 ## Makefiel for generation of docu for libraries
-## $Id: Makefile.lib2doc,v 1.1 1999-07-28 11:36:31 obachman Exp $
+## $Id: Makefile.lib2doc,v 1.2 1999-07-30 10:37:02 obachman Exp $
 #####################################################################
 
 ####################################################################
@@ -18,7 +18,7 @@ LIBPARSE = libparse
 ##
 ## 2.) Set this to the name of your latex2html program, if you have latex2html
 ##
-LATEX2HTML = 
+LATEX2HTML = latex2html
 
 
 ##

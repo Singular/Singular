@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: pl2doc.pl,v 1.6 1999-07-28 11:36:32 obachman Exp $
+# $Id: pl2doc.pl,v 1.7 1999-07-30 10:37:04 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -54,6 +54,7 @@ print LDOC "\@c library version: $version\n";
 print LDOC "\@c library file: $library\n";
 
 undef @procs; # will be again defined by OutLibInfo
+$parsing = "info-string of lib $lib:";
 $ref = OutLibInfo(\*LDOC, $info, ! $no_fun);
 OutRef(\*LDOC, $ref) if $ref;
 
@@ -94,6 +95,7 @@ unless ($no_fun)
       print LDOC "\@table \@asis\n";
       $table_is_open = 1;
       # print help
+      $parsing = "help-string of $lib:$procs[$i]:";
       $ref = OutInfo(\*LDOC, $help{$procs[$i]});
       print LDOC "\@end table\n";
     }
@@ -117,12 +119,21 @@ unless ($no_fun)
 if ($doc)
 {
  print LDOC <<EOT;
+\@c ----------------------------------------------------------
+\@node Index, , Singular libraries, Top
+\@chapter Index
+\@printindex cp
 
 \@bye
 EOT
 }
   
 close(LDOC);
+if ($error)
+{
+  print STDERR "ERROR: $error\n";
+  exit(1);
+}
 exit(0);
 
 ###########################################################################
@@ -133,7 +144,7 @@ sub OutLibInfo
 {
   my ($FH, $info, $l_fun) = @_;
   print $FH "\@c ---content LibInfo---\n";
-    if ($info =~ /^\@/)
+  if ($info =~ /^\@/)
   {
     print $FH $info;
     return;
@@ -152,7 +163,7 @@ sub OutLibInfo
 sub OutInfo
 {
   my ($FH, $info, $l_fun) = @_;
-  if ($info =~ /^\s*\@/)
+  if ($info =~ /^\@/)
   {
     print $FH $info;
     return;
@@ -183,59 +194,126 @@ sub OutInfo
 sub FormatInfoText
 {
   my $length = shift;
+  my ($pline, $line, $text, $ptext, $special);
+  my ($in_format, $in_example, $in_texinfo);
+
   $length = 0 unless $length;
-  # insert @* infront of all lines whose previous line is shorter than
-  # 60 characters
-  $_ = ' ' x $length . $_;
-  if (/^(.*)\n/)
+  $_ .= "\n";
+  $ptext = $_;
+  while ($ptext =~ /(.*)\n/g)
   {
-    $_ .= "\n";
-    my $pline;
-    my $line;
-    my $ptext = $_;
-    my $text = '';
-    while ($ptext =~ /(.*)\n/g)
+    $pline = $line;
+    $line = $1;
+    # check whether we are in protected env
+    if ($in_format || $in_example || $in_texinfo)
     {
-      $line = $1;
-      # break line if
-      $text .= '@*' 
-	if ($line =~ /\w/ && $pline =~ /\w/ # line and prev line are not empty
-	    && $line !~ /^\s*\@\*/  # line does not start with @*
-	    && $pline !~ /\@\*\s*/  # prev line does not end with @*
-	    &&
-	    ((length($pline) < 60  && # prev line is shorter than 60 chars
-	      $pline !~ /\@code{.*?}/ # and does not contain @code, @math
-	      && $pline !~ /\@math{.*?}/) 
-	     ||
-	     $line =~ /^\s*\w*\(.*?\)/ # $line starts with \w*(..)
-	     ||
-	     $pline =~ /^\s*\w*\(.*?\)[\s;:]*$/)); # prev line is only \w(..)
-      $line =~ s/\s*$//;
-      $text .= "$line\n";
-      $pline = $line;
+      # end protected env?
+      if ($line =~ /^\s*\@end (format|example|texinfo)\s*$/)
+      {
+	if ($in_format && $1 eq 'format')
+	{
+	  $in_format = 0;
+	  $text .= "$line\n";
+	}
+	elsif ($in_example && $1 eq 'example')
+	{
+	  $in_example = 0;
+	  $text .= "\@end smallexample\n";
+	}
+	elsif ($in_texinfo && $1 eq 'texinfo')
+	{
+	  $in_texinfo = 0;
+	  $text .= "\n";
+	}
+	else
+	{
+	  $error = "While parsing $parsing: \@end $1 found without matching \@$1" unless $error;
+	}
+	next;
+      }
+      else
+      {
+	$text .= "$line\n";
+	next;
+      }
     }
-    $_ = $text;
+    # look for @example, @format, @texinfo
+    if ($line =~ /^\s*\@(example|format|texinfo)\s*$/)
+    {
+      $special = 1;
+      if ($1 eq 'example')
+      {
+	$text .= "\@smallexample\n";
+	$in_example = 1;
+      }
+      elsif ($1 eq 'format')
+      {
+	$text .= "$line\n";
+	$in_format = 1;
+      }
+      else
+      {
+	$text .= "\n";
+	$in_texinfo = 1;
+      }
+      next;
+    }
+    if ($line =~ /([^\@]|^)\@(code|math){(.*?)}/)
+    {
+      my $l = $line;
+      $l =~ s/^\s*//;
+      $l =~ s/\s$//;
+      while ($l =~ /([^\@]|^)\@(code|math){(.*?)}/)
+      {
+	$text .= CleanAscii($`.$1);
+	$text .= "\@$2\{$3\}";
+	$l = $';
+      }
+      $special = 1;
+      $text .= CleanAscii($l) . "\n";
+      next;
+    }
+    # break line if
+    $text .= '@*' 
+      if ($line =~ /\w/ 
+	  && $pline =~ /\w/	 # line and prev line are not empty
+	  && $line !~ /^\s*\@\*/ # line does not start with @*
+	  && $pline !~ /\@\*\s*/ # prev line does not end with @*
+	  && length($pline) + $length < 60 # prev line is shorter than 60 chars
+	  && ! $special);	 # prev line was not special line
+    $line =~ s/^\s*//;
+    $line =~ s/\s$//;
+    $special = 0;
+    $text .= CleanAscii($line) . "\n";
   }
-  s/\t/ /g;
-  s/\n +/\n/g;
-  s/\s*$//g;
-  s/ +/ /g;  # replace double whitespaces by one
-  s/(\w+\(.*?\))/\@code{$1}/g;
-  s/\@\*\s*/\@\*/g;
-  s/(\@[^\*])/\@$1/g; # escape @ signs, except @*
-  s/{/\@{/g; # escape {}
-  s/}/\@}/g;
-  # unprotect @@math@{@}, @code@{@}
-  while (s/\@\@math\@{(.*?)\@}/\@math{$1}/g) {} 
-  while (s/\@\@code\@{(.*?)\@}/\@code{$1}/g) {}
-  # remove @code{} inside @code{} and inside @math{}
-  while (s/\@math{([^}]*)\@code{(.*?)}(.*)?}/\@math{$1$2$3}/g) {}
-  while (s/\@code{([^}]*)\@code{(.*?)}(.*)?}/\@code{$1$2$3}/g) {}
+  $_ = $text;
+  s/^\s*//;
+  s/\s*$//;
+  $_ .= "\n";
+  if ($in_format || $in_texinfo || $in_example)
+  {
+    $error = "While parsing $parsing: no matching \@end " .
+      ($in_format ? "format" : ($in_texinfo ? "texinfo" : "example" )) .
+	" found"
+	  unless $error;
+  }
+}
+
+sub CleanAscii
+{
+  my $a = shift;
+  $a =~ s/(\@([^\*]|$))/\@$1/g; # escape @ signs, except @*, @{, @}
+  $a =~ s/{/\@{/g; # escape {}
+  $a =~ s/}/\@}/g;
+  $a =~ s/\t/ /g;
+  $a =~ s/ +/ /g;	   
+  return $a;
 }
 
 sub OutInfoItem
 {
   my ($FH, $item, $text, $l_fun) = @_;
+  local $parsing  = $parsing . uc($item);
 
   $item = lc $item;
   $item = ucfirst $item;
@@ -290,7 +368,12 @@ sub OutInfoItem
     print $FH ($l_fun ? "\@end menu\n" : "\@end table\n");
     return '';
   }
-
+  elsif ($item =~ m/keywords/i || m/keyphrases/i)
+  {
+    # index entries
+    return OutKeywords($FH, $text);
+  }
+  
   if (! $table_is_open)
   {
     print $FH "\@table \@asis\n";
@@ -325,16 +408,15 @@ sub OutProcInfo
   s/^[;\s]*//;
   s/\n/ /g;
   FormatInfoText();
-  
   if ($l_fun)
   {
-    print $FH "* ${proc}:: $_\n";
+    print $FH "* ${proc}:: $_";
     push @procs, $proc;
   }
   else
   {
     print $FH "\@item \@code{$proc($procargs)}  ";
-    print $FH "\n\@cindex $proc\n$_\n";
+    print $FH "\n\@cindex $proc\n$_";
   }
 }
 
@@ -357,6 +439,16 @@ sub OutRef
   }
   print $FH "\n\@c ref\n\n";
 
+}
+
+sub OutKeywords
+{
+  my ($FH, $kws) = @_;
+  for $kw (split (/;/, $kws))
+  {
+    $kw =~ s/^\s*(.*?)\s*$/$1/;
+    print $FH "\@cindex $kw\n";
+  }
 }
 
 sub CleanUpExample
@@ -407,6 +499,7 @@ sub print_doc_header
 \@c %**start of header
 \@setfilename $hlp_file
 \@settitle Formatted manual of $lib.lib
+\@paragraphindent 0
 \@c %**end of header
 
 \@ifinfo
@@ -425,9 +518,10 @@ This file contains the formatted documentation of $library
 
 \@menu
 * Singular libraries::
+* Index::
 \@end menu
 
-\@node Singular libraries,,,Top
+\@node Singular libraries, Index,,Top
 \@comment node-name,next, previous, up
 \@chapter Singular libraries
 
