@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.258 2001-02-27 18:11:57 mschulze Exp $ */
+/* $Id: iparith.cc,v 1.259 2001-03-05 16:43:14 mschulze Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -201,7 +201,7 @@ cmdnames cmds[] =
   { "intmat",      0, INTMAT_CMD ,        INTMAT_CMD},
   { "intvec",      0, INTVEC_CMD ,        ROOT_DECL_LIST},
   { "jacob",       0, JACOB_CMD ,         CMD_1},
-  { "jet",         0, JET_CMD ,           CMD_23},
+  { "jet",         0, JET_CMD ,           CMD_M},
   { "kbase",       0, KBASE_CMD ,         CMD_12},
   { "keepring",    0, KEEPRING_CMD ,      KEEPRING_CMD},
   { "kill",        0, KILL_CMD ,          KILL_CMD},
@@ -4160,13 +4160,12 @@ static BOOLEAN jjJET_P_IV(leftv res, leftv u, leftv v, leftv w)
 }
 static BOOLEAN jjJET_P_P(leftv res, leftv u, leftv v, leftv w)
 {
-  poly ww=(poly)w->Data();
-  if (!pIsUnit(ww))
+  if (!pIsUnit((poly)v->Data()))
   {
-    WerrorS("3rd argument must be a unit");
+    WerrorS("2rd argument must be a unit");
     return TRUE;
   }
-  res->data = (char *)pSeries((int)v->Data(),(poly)u->CopyD(),(poly)w->CopyD());
+  res->data = (char *)pSeries((int)w->Data(),(poly)u->CopyD(),(poly)v->CopyD());
   return FALSE;
 }
 static BOOLEAN jjJET_ID_IV(leftv res, leftv u, leftv v, leftv w)
@@ -4177,14 +4176,13 @@ static BOOLEAN jjJET_ID_IV(leftv res, leftv u, leftv v, leftv w)
 }
 static BOOLEAN jjJET_ID_M(leftv res, leftv u, leftv v, leftv w)
 {
-  matrix ww=(matrix)w->Data();
-  if (!mpIsDiagUnit(ww))
+  if (!mpIsDiagUnit((matrix)v->Data()))
   {
-    WerrorS("3rd argument must be a diagonal matrix of units");
+    WerrorS("2rd argument must be a diagonal matrix of units");
     return TRUE;
   }
-  res->data = (char *)idSeries((int)v->Data(),(ideal)u->CopyD(),
-                               (matrix)w->CopyD());
+  res->data = (char *)idSeries((int)w->Data(),(ideal)u->CopyD(),
+                               (matrix)v->CopyD());
   return FALSE;
 }
 static BOOLEAN jjMINOR3(leftv res, leftv u, leftv v, leftv w)
@@ -4433,8 +4431,8 @@ static BOOLEAN jjREDUCE3_CP(leftv res, leftv u, leftv v, leftv w)
     Werror("`%s` must be 0-dimensional",v->Name());
     return TRUE;
   }
-  res->data = (char *)redNF((ideal)v->CopyD(),(poly)u->CopyD(),
-    (poly)w->CopyD());
+  res->data = (char *)redNF((ideal)w->CopyD(),(poly)u->CopyD(),
+    (poly)v->CopyD());
   return FALSE;
 }
 static BOOLEAN jjREDUCE3_CID(leftv res, leftv u, leftv v, leftv w)
@@ -4445,8 +4443,8 @@ static BOOLEAN jjREDUCE3_CID(leftv res, leftv u, leftv v, leftv w)
     Werror("`%s` must be 0-dimensional",v->Name());
     return TRUE;
   }
-  res->data = (char *)redNF((ideal)v->CopyD(),(ideal)u->CopyD(),
-    (matrix)w->CopyD());
+  res->data = (char *)redNF((ideal)w->CopyD(),(ideal)u->CopyD(),
+    (matrix)v->CopyD());
   return FALSE;
 }
 static BOOLEAN jjREDUCE3_P(leftv res, leftv u, leftv v, leftv w)
@@ -4568,10 +4566,10 @@ struct sValCmd3 dArith3[]=
 ,{jjJET_ID_IV,      JET_CMD,    IDEAL_CMD,  IDEAL_CMD,  INT_CMD,    INTVEC_CMD }
 ,{jjJET_P_IV,       JET_CMD,    VECTOR_CMD, VECTOR_CMD, INT_CMD,    INTVEC_CMD }
 ,{jjJET_ID_IV,      JET_CMD,    MODUL_CMD,  MODUL_CMD,  INT_CMD,    INTVEC_CMD }
-,{jjJET_P_P,        JET_CMD,    POLY_CMD,   POLY_CMD,   INT_CMD,    POLY_CMD }
-,{jjJET_P_P,        JET_CMD,    VECTOR_CMD, VECTOR_CMD, INT_CMD,    POLY_CMD }
-,{jjJET_ID_M,       JET_CMD,    IDEAL_CMD,  IDEAL_CMD,  INT_CMD,    MATRIX_CMD }
-,{jjJET_ID_M,       JET_CMD,    MODUL_CMD,  MODUL_CMD,  INT_CMD,    MATRIX_CMD }
+,{jjJET_P_P,        JET_CMD,    POLY_CMD,   POLY_CMD,   POLY_CMD,   INT_CMD }
+,{jjJET_P_P,        JET_CMD,    VECTOR_CMD, VECTOR_CMD, POLY_CMD,   INT_CMD }
+,{jjJET_ID_M,       JET_CMD,    IDEAL_CMD,  IDEAL_CMD,  MATRIX_CMD, INT_CMD }
+,{jjJET_ID_M,       JET_CMD,    MODUL_CMD,  MODUL_CMD,  MATRIX_CMD, INT_CMD }
 ,{jjWRONG3,         JET_CMD,    POLY_CMD,   POLY_CMD,   INT_CMD,    INT_CMD }
 ,{mpKoszul,         KOSZUL_CMD, MATRIX_CMD, INT_CMD,    INT_CMD,    IDEAL_CMD }
 ,{jjCALL3MANY,      LIST_CMD,   LIST_CMD,   DEF_CMD,    DEF_CMD,    DEF_CMD }
@@ -4595,10 +4593,10 @@ struct sValCmd3 dArith3[]=
 ,{jjREDUCE3_ID,     REDUCE_CMD, IDEAL_CMD,  IDEAL_CMD,  IDEAL_CMD,  INT_CMD }
 ,{jjREDUCE3_ID,     REDUCE_CMD, MODUL_CMD,  MODUL_CMD,  MODUL_CMD,  INT_CMD }
 ,{jjREDUCE3_ID,     REDUCE_CMD, MODUL_CMD,  MODUL_CMD,  IDEAL_CMD,  INT_CMD }
-,{jjREDUCE3_CP,     REDUCE_CMD, POLY_CMD,   POLY_CMD,   IDEAL_CMD,  POLY_CMD }
-,{jjREDUCE3_CP,     REDUCE_CMD, VECTOR_CMD, VECTOR_CMD, MODUL_CMD,  POLY_CMD }
-,{jjREDUCE3_CID,    REDUCE_CMD, IDEAL_CMD,  IDEAL_CMD,  IDEAL_CMD,  MATRIX_CMD }
-,{jjREDUCE3_CID,    REDUCE_CMD, MODUL_CMD,  MODUL_CMD,  MODUL_CMD,  MATRIX_CMD }
+,{jjREDUCE3_CP,     REDUCE_CMD, POLY_CMD,   POLY_CMD,   POLY_CMD,   IDEAL_CMD }
+,{jjREDUCE3_CP,     REDUCE_CMD, VECTOR_CMD, VECTOR_CMD, POLY_CMD,   MODUL_CMD }
+,{jjREDUCE3_CID,    REDUCE_CMD, IDEAL_CMD,  IDEAL_CMD,  MATRIX_CMD, IDEAL_CMD }
+,{jjREDUCE3_CID,    REDUCE_CMD, MODUL_CMD,  MODUL_CMD,  MATRIX_CMD, MODUL_CMD }
 #ifdef OLD_RES
 ,{jjRES3,           RES_CMD,    NONE,       IDEAL_CMD,  INT_CMD,    ANY_TYPE }
 ,{jjRES3,           RES_CMD,    NONE,       MODUL_CMD,  INT_CMD,    ANY_TYPE }
@@ -4866,6 +4864,50 @@ static BOOLEAN jjINTVEC_PL(leftv res, leftv v)
   res->data=(char *)iv;
   return FALSE;
 }
+static BOOLEAN jjJET4(leftv res, leftv u)
+{
+  leftv u1=u;
+  leftv u2=u1->next;
+  leftv u3=u2->next;
+  leftv u4=u3->next;
+  if((u1->Typ()==POLY_CMD)&&(u2->Typ()==POLY_CMD)&&(u3->Typ()==INT_CMD)&&
+     (u4->Typ()==INTVEC_CMD)||
+     (u1->Typ()==VECTOR_CMD)&&(u2->Typ()==POLY_CMD)&&(u3->Typ()==INT_CMD)&&
+     (u4->Typ()==INTVEC_CMD))
+  {
+    if(!pIsUnit((poly)u2->Data()))
+    {
+      Werror("2nd argument must be a unit");
+      return TRUE;
+    }
+    res->rtyp=u1->Typ();
+    res->data=(char*)pSeries((int)u3->Data(),pCopy((poly)u1->Data()),
+                             pCopy((poly)u2->Data()),(intvec*)u4->Data());
+    return FALSE;
+  }
+  else
+  if((u1->Typ()==IDEAL_CMD)&&(u2->Typ()==MATRIX_CMD)&&(u3->Typ()==INT_CMD)&&
+     (u4->Typ()==INTVEC_CMD)||
+     (u1->Typ()==MODUL_CMD)&&(u2->Typ()==MATRIX_CMD)&&(u3->Typ()==INT_CMD)&&
+     (u4->Typ()==INTVEC_CMD))
+  {
+    if(!mpIsDiagUnit((matrix)u2->Data()))
+    {
+      Werror("2nd argument must be a diagonal matrix of units");
+      return TRUE;
+    }
+    res->rtyp=u1->Typ();
+    res->data=(char*)idSeries((int)u3->Data(),idCopy((ideal)u1->Data()),
+                              mpCopy((matrix)u2->Data()),(intvec*)u4->Data());
+    return FALSE;
+  }
+  else
+  {
+    Werror("%s(`poly`,`poly`,`int`,`intvec`) exppected",
+           Tok2Cmdname(iiOp));
+    return TRUE;
+  }
+}
 static BOOLEAN jjKLAMMER_PL(leftv res, leftv u)
 {
   if ((yyInRingConstruction)
@@ -4949,63 +4991,94 @@ static BOOLEAN jjOPTION_PL(leftv res, leftv v)
   res->rtyp=NONE;
   return setOption(res,v);
 }
-static BOOLEAN jjREDUCE4(leftv res, leftv v)
+static BOOLEAN jjREDUCE4(leftv res, leftv u)
 {
-  // poly, ideal, deg, weights
-  leftv u1=v;
-  leftv u2=v->next;
-  leftv u3=u2->next; u2->next=NULL;
+  leftv u1=u;
+  leftv u2=u1->next;
+  leftv u3=u2->next;
   leftv u4=u3->next;
-  if ((u3->Typ()!=INT_CMD)||(u4->Typ()!=INTVEC_CMD))
+  if((u3->Typ()==INT_CMD)&&(u4->Typ()==INTVEC_CMD))
   {
-    Werror("%s(`poly`,`ideal`,`int`,`intvec`) exppected",Tok2Cmdname(iiOp));
+    int save_d=Kstd1_deg;
+    Kstd1_deg=(int)u3->Data();
+    kModW=(intvec *)u4->Data();
+    BITSET save=verbose;
+    verbose|=Sy_bit(V_DEG_STOP);
+    u2->next=NULL;
+    BOOLEAN r=jjCALL2ARG(res,u);
+    kModW=NULL;
+    Kstd1_deg=save_d;
+    verbose=save;
+    u->next->next=u3;
+    return r;
+  }
+  else
+  if((u1->Typ()==IDEAL_CMD)&&(u2->Typ()==MATRIX_CMD)&&(u3->Typ()==IDEAL_CMD)&&
+     (u4->Typ()==INT_CMD))
+  {
+    if(!mpIsDiagUnit((matrix)u2->Data()))
+    {
+      Werror("2rd argument must be a diagonal matrix of units");
+      return TRUE;
+    }
+    res->rtyp=IDEAL_CMD;
+    res->data=(char*)redNF(idCopy((ideal)u3->Data()),idCopy((ideal)u1->Data()),
+                           mpCopy((matrix)u2->Data()),(int)u4->Data());
+    return FALSE;
+  }
+  else
+  if((u1->Typ()==POLY_CMD)&&(u2->Typ()==POLY_CMD)&&(u3->Typ()==IDEAL_CMD)&&
+     (u4->Typ()==INT_CMD))
+  {
+    if(!pIsUnit((poly)u2->Data()))
+    {
+      Werror("2rd argument must be a unit");
+      return TRUE;
+    }
+    res->rtyp=POLY_CMD;
+    res->data=(char*)redNF(idCopy((ideal)u3->Data()),pCopy((poly)u1->Data()),
+                           pCopy((poly)u2->Data()),(int)u4->Data());
+    return FALSE;
+  }
+  else
+  {
+    Werror("%s(`poly`,`ideal`,`int`,`intvec`) expected",Tok2Cmdname(iiOp));
     return TRUE;
   }
-  int save_d=Kstd1_deg;
-  Kstd1_deg=(int)u3->Data();
-  kModW=(intvec *)u4->Data();
-  BITSET save=verbose;
-  verbose|=Sy_bit(V_DEG_STOP);
-  BOOLEAN r=jjCALL2ARG(res,v);
-  kModW=NULL;
-  Kstd1_deg=save_d;
-  verbose=save;
-  v->next->next=u3;
-  return r;
 }
-static BOOLEAN jjREDUCE5(leftv res, leftv v)
+static BOOLEAN jjREDUCE5(leftv res, leftv u)
 {
-  leftv u1=v;
-  leftv u2=v->next;
+  leftv u1=u;
+  leftv u2=u1->next;
   leftv u3=u2->next;
   leftv u4=u3->next;
   leftv u5=u4->next;
-  if((u1->Typ()==IDEAL_CMD)&&(u2->Typ()==IDEAL_CMD)&&(u3->Typ()==MATRIX_CMD)&&
+  if((u1->Typ()==IDEAL_CMD)&&(u2->Typ()==MATRIX_CMD)&&(u3->Typ()==IDEAL_CMD)&&
      (u4->Typ()==INT_CMD)&&(u5->Typ()==INTVEC_CMD))
   {
-    if(!mpIsDiagUnit((matrix)u3->Data()))
+    if(!mpIsDiagUnit((matrix)u2->Data()))
     {
-      Werror("3rd argument must be a diagonal matrix of units");
-      return FALSE;
+      Werror("2rd argument must be a diagonal matrix of units");
+      return TRUE;
     }
     res->rtyp=IDEAL_CMD;
-    res->data=(char*)redNF(idCopy((ideal)u2->Data()),idCopy((ideal)u1->Data()),
-                           mpCopy((matrix)u3->Data()),
+    res->data=(char*)redNF(idCopy((ideal)u3->Data()),idCopy((ideal)u1->Data()),
+                           mpCopy((matrix)u2->Data()),
                            (int)u4->Data(),(intvec*)u5->Data());
     return FALSE;
   }
   else
-  if((u1->Typ()==POLY_CMD)&&(u2->Typ()==IDEAL_CMD)&&(u3->Typ()==POLY_CMD)&&
+  if((u1->Typ()==POLY_CMD)&&(u2->Typ()==POLY_CMD)&&(u3->Typ()==IDEAL_CMD)&&
      (u4->Typ()==INT_CMD)&&(u5->Typ()==INTVEC_CMD))
   {
-    if(!pIsUnit((poly)u3->Data()))
+    if(!pIsUnit((poly)u2->Data()))
     {
-      Werror("3rd argument must be a unit");
-      return FALSE;
+      Werror("2rd argument must be a unit");
+      return TRUE;
     }
     res->rtyp=POLY_CMD;
-    res->data=(char*)redNF(idCopy((ideal)u2->Data()),pCopy((poly)u1->Data()),
-                           pCopy((poly)u3->Data()),
+    res->data=(char*)redNF(idCopy((ideal)u3->Data()),pCopy((poly)u1->Data()),
+                           pCopy((poly)u2->Data()),
                            (int)u4->Data(),(intvec*)u5->Data());
     return FALSE;
   }
@@ -5246,6 +5319,9 @@ struct sValCmdM dArithM[]=
 ,{jjINTERSECT_PL,INTERSECT_CMD, IDEAL_CMD,          -2 }
 ,{jjCALL1ARG,  INTVEC_CMD,      INTVEC_CMD,         1  }
 ,{jjINTVEC_PL, INTVEC_CMD,      INTVEC_CMD,         -2 }
+,{jjCALL2ARG,  JET_CMD,         POLY_CMD,/*or set by p*/           2  }
+,{jjCALL3ARG,  JET_CMD,         POLY_CMD,/*or set by p*/           3  }
+,{jjJET4,      JET_CMD,         POLY_CMD,/*or set by p*/           4  }
 ,{jjLIST_PL,   LIST_CMD,        LIST_CMD,           -1 }
 ,{jjCALL1ARG,  MODUL_CMD,       MODUL_CMD,          1  }
 ,{jjIDEAL_PL,  MODUL_CMD,       MODUL_CMD,          -1 }
