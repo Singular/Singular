@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.29 2002-03-20 14:03:00 mschulze Exp $";
+version="$Id: linalg.lib,v 1.30 2002-03-20 19:55:39 mschulze Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib  Algorithmic Linear Algebra
@@ -1590,7 +1590,7 @@ ASSUME:  eigenvalues of M in basefield
 RETURN:
 @format
 list l:
-  module l[1];  Jordan normal form inverse(l[1])*M*l[1]
+  module l[1];  inverse(l[1])*M*l[1] in Jordan normal form
   intvec l[2]; 
     int l[2][i];  weight filtration index of l[1][i]
 @end format

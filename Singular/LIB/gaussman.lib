@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.78 2002-03-20 14:03:00 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.79 2002-03-20 19:55:38 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -12,16 +12,16 @@ OVERVIEW: A library to compute Hodge-theoretic invariants
 
 PROCEDURES:
  gmsring(t,s);              Gauss-Manin system of t with variable s
- gmsnf(p,K);                Gauss-Manin system normal form of p
- gmscoeffs(p,K);            Gauss-Manin system basis representation of p
- monodromy(t);              Jordan data of monodromy of t
+ gmsnf(p,K);                Gauss-Manin normal form of p
+ gmscoeffs(p,K);            Gauss-Manin basis representation of p
+ monodromy(t);              Jordan data of complex monodromy of t
  spectrum(t);               singularity spectrum of t
  sppairs(t);                spectral pairs of t
  spnf(a[,m][,V]);           spectrum normal form of (a,m,V)
  sppnf(a,w[,m][,V]);        spectral pairs normal form of (a,w,m,V)
  vfilt(t);                  V-filtration of t on Brieskorn lattice
  vwfilt(t);                 weighted V-filtration of t on Brieskorn lattice
- tmatrix(t);                t-matrix on Brieskorn lattice
+ tmatrix(t);                C{{s}}-matrix of t on Brieskorn lattice
  endvfilt(V);               endomorphism V-filtration on Jacobian algebra
  spprint(sp);               print spectrum sp
  sppprint(spp);             print spectral pairs spp
@@ -30,7 +30,7 @@ PROCEDURES:
  spmul(sp0,k);              linear combination of spectra sp
  spissemicont(sp[,opt]);    semicontinuity test of spectrum sp
  spsemicont(sp0,sp[,opt]);  semicontinuous combinations of spectra sp0 in sp
- spmilnor(sp);              milnor number of spectrum sp
+ spmilnor(sp);              Milnor number of spectrum sp
  spgeomgenus(sp);           geometrical genus of spectrum sp
  spgamma(sp);               gamma invariant of spectrum sp
 
@@ -120,6 +120,7 @@ ring G;  Gauss-Manin system of t with variable s
   ideal gmsbasis;  monomial vector space basis of Jacobian algebra
   int gmsmaxdeg;  maximal weight of variables
 @end format
+NOTE:     gmsbasis is a C{{s}}-basis of H'' and [t,s]=s^2
 KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice
 EXAMPLE:  example gmsring; shows examples
 "
@@ -217,10 +218,10 @@ ASSUME:   basering returned by gmsring
 RETURN:
 @format
 list nf;
-  ideal nf[1];  projection of p to gmsbasis mod s^(K+1)
-  ideal nf[2];  p=nf[1]+nf[2]
+  ideal nf[1];  projection of p to C{{s}}*gmsbasis mod s^(K+1)
+  ideal nf[2];  p==nf[1]+nf[2]
 @end format
-NOTE:     the computation can be continued by setting p=nf[2]
+NOTE:     computation can be continued by setting p=nf[2]
 KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice
 EXAMPLE:  example gmsnf; shows examples
 "
@@ -297,10 +298,10 @@ ASSUME:   basering constructed by gmsring
 RETURN:
 @format
 list l;
-  matrix l[1];  gmsbasis representation of p mod s^(K+1)
-  ideal l[2];  p=matrix(gmsbasis)*l[1]+l[2]
+  matrix l[1];  C{{s}}-basis representation of p mod s^(K+1)
+  ideal l[2];  p==matrix(gmsbasis)*l[1]+l[2]
 @end format
-NOTE:     the computation can be continued by setting p=l[2]
+NOTE:     computation can be continued by setting p=l[2]
 KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice
 EXAMPLE:  example gmscoeffs; shows examples
 "
@@ -919,9 +920,9 @@ RETURN:
 @format
 list v;  V-filtration on H''/s*H''
   ideal v[1];
-    number v[1][i];  V-filtration index of i-th spectral pair
+    number v[1][i];  V-filtration index of i-th spectral number
   intvec v[2];
-    int v[2][i];  multiplicity of i-th spectral pair
+    int v[2][i];  multiplicity of i-th spectral number
   list v[3];
     module v[3][i];  vector space of i-th graded part in terms of v[4]
   ideal v[4];  monomial vector space basis of H''/s*H''
@@ -1067,7 +1068,12 @@ proc tmatrix(poly t,list #)
 "USAGE:    tmatrix(t); poly t
 ASSUME:   characteristic 0; local degree ordering;
           isolated critical point 0 of t
-RETURN:   list A;  matrix A[1]+s*A[2] of t on H''
+RETURN:
+@format
+list A;  C{{s}}-matrix A[1]+s*A[2] of t on H''
+  matrix A[1];
+  matrix A[2];
+@end format
 KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice;
           mixed Hodge structure; opposite Hodge filtration; V-filtration
 EXAMPLE:  example tmatrix; shows examples
