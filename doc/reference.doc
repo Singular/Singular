@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.93 1998-07-23 11:10:47 Singular Exp $
+@comment $Id: reference.doc,v 1.94 1998-08-27 16:13:18 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -5196,6 +5196,7 @@ See
 @item @strong{Syntax:}
 @code{transpose (} intmat_expression @code{)}
 @*@code{transpose (} matrix_expression @code{)}
+@*@code{transpose (} module_expression @code{)}
 @item @strong{Type:}
 same type as the argument
 @item @strong{Purpose:}
@@ -5210,13 +5211,11 @@ transposes a matrix.
 @c example
 @end example
 @end table
-@menu
-* intmat::
-* matrix::
-@end menu
-@iftex
-See @ref{intmat}; @ref{matrix}.
-@end iftex
+@c ref
+See @ref{intmat};
+@ref{matrix};
+@ref{module}.
+@c ref
 @c ---------------------------------------
 @node type, typeof, transpose, Functions
 @subsection type
@@ -5532,18 +5531,15 @@ execute "ideal k="+s+";"; // this defines an ideal k which
                           // is equal to i.
 @end example
 @end table
-@menu
-* read::
-* link::
-* Data types::
-* quote::
-* eval::
-* dump::
-@end menu
-@iftex
-See @ref{read}; @ref{link}; @ref{Data types};
-@ref{quote}; @ref{eval}; @ref{dump}.
-@end iftex
+@c ref
+See
+@ref{read};
+@ref{link};
+@ref{Data types};
+@ref{quote};
+@ref{eval};
+@ref{dump}.
+@c ref
 
 
 @c ---------------------------------------
@@ -5615,7 +5611,9 @@ while (1)
 @end example
 @end table
 @c ref
-See @ref{Control structures}; @ref{while}; @ref{for}.
+See @ref{Control structures};
+@ref{for};
+@ref{while}.
 @c ref
 @c ---------------------------------------
 @node continue, else, break, Control structures
