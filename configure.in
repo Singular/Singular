@@ -593,7 +593,7 @@ if test "$enable_Singular" != yes && test "$enable_Singular" != no; then
     enable_Singular=yes
     AC_MSG_RESULT(yes)
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS Singular"
-    BUILD_SUBDIRS="$BUILD_SUBDIRS Singular"	
+    BUILD_SUBDIRS="$BUILD_SUBDIRS kernel Singular"	
     ac_configure_args="$ac_configure_args --enable-Singular"
   else
     enable_Singular=no
