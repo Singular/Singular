@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_distrib.cc,v 1.6 1997-10-09 14:47:17 schmidt Exp $ */
+/* $Id: fac_distrib.cc,v 1.7 2002-10-10 17:43:40 Singular Exp $ */
 
 #include <config.h>
 
@@ -21,19 +21,19 @@ nonDivisors ( CanonicalForm omega, CanonicalForm delta, const CFArray & F, CFArr
     d = CFArray( 0, k );
     d[0] = delta * omega;
     for ( int i = 1; i <= k; i++ ) {
-	q = abs(F[i]);
-	for ( int j = i-1; j >= 0; j-- ) {
-	    r = d[j];
-	    do {
-		r = gcd( r, q );
-		q = q / r;
-	    } while ( r != 1 );
-	    if ( q == 1 ) {
-		DEBDECLEVEL( cerr, "nonDivisors" );
-		return false;
-	    }
-	}
-	d[i] = q;
+        q = abs(F[i]);
+        for ( int j = i-1; j >= 0; j-- ) {
+            r = d[j];
+            do {
+                r = gcd( r, q );
+                q = q / r;
+            } while ( r != 1 );
+            if ( q == 1 ) {
+                DEBDECLEVEL( cerr, "nonDivisors" );
+                return false;
+            }
+        }
+        d[i] = q;
     }
     DEBDECLEVEL( cerr, "nonDivisors" );
     return true;
@@ -49,10 +49,10 @@ checkEvaluation ( const CanonicalForm & U, const CanonicalForm & lcU, const Cano
     CFArray D;
     Vn = A( lcU );
     if ( Vn.isZero() )
-	return false;
+        return false;
     delta = content( U0 );
     for ( I = F, j = 1; I.hasItem(); I++, j++ )
-	FF[j] = A( I.getItem().factor() );
+        FF[j] = A( I.getItem().factor() );
     return nonDivisors( omega, delta, FF, D );
 }
 
@@ -66,45 +66,45 @@ distributeLeadingCoeffs ( CanonicalForm & U, CFArray & G, CFArray & lcG, const C
     int m, j, i;
     lcG = CFArray( 1, r );
     for ( j = 1; j <= r; j ++ )
-	lcG[j] = 1;
+        lcG[j] = 1;
 
     for ( I = F, i = 1; I.hasItem(); I++, i++ ) {
-	ft = I.getItem().factor();
-	m = I.getItem().exp();
-	DEBOUTLN( cerr, "trying to distribute " << ft );
-	DEBOUTLN( cerr, "which is tested with " << D[i] );
-	DEBOUTLN( cerr, "and contained to the power of " << m );
-	j = 1;
-	while ( m > 0 && j <= r ) {
-	    ut = lc( G[j] );
-	    DEBOUTLN( cerr, "checking with " << ut );
-	    while ( m > 0 && divides( D[i], ut ) ) {
-		DEBOUTLN( cerr, "match found" );
-		m--; ut /= D[i];
-		lcG[j] *= ft;
-	    }
-	    j++;
-	}
-	if (m != 0) {
-	    DEBDECLEVEL( cerr, "distributeLeadingCoeffs" );
-	    return false;
-	}
+        ft = I.getItem().factor();
+        m = I.getItem().exp();
+        DEBOUTLN( cerr, "trying to distribute " << ft );
+        DEBOUTLN( cerr, "which is tested with " << D[i] );
+        DEBOUTLN( cerr, "and contained to the power of " << m );
+        j = 1;
+        while ( m > 0 && j <= r ) {
+            ut = lc( G[j] );
+            DEBOUTLN( cerr, "checking with " << ut );
+            while ( m > 0 && divides( D[i], ut ) ) {
+                DEBOUTLN( cerr, "match found" );
+                m--; ut /= D[i];
+                lcG[j] *= ft;
+            }
+            j++;
+        }
+        if (m != 0) {
+            DEBDECLEVEL( cerr, "distributeLeadingCoeffs" );
+            return false;
+        }
     }
     DEBOUTLN( cerr, "the leading coeffs before omega and delta correction: " << lcG );
     if ( omega != 1 ) {
-	for ( j = 1; j <= r; j++ ) {
-//	    G[j] *= omega;
-	    lcG[j] *= omega;
-	    G[j] = G[j] * ( A( lcG[j] ) / lc( G[j] ) );
-	}
-	U *= power( omega, r-1 );
+        for ( j = 1; j <= r; j++ ) {
+//            G[j] *= omega;
+            lcG[j] *= omega;
+            G[j] = G[j] * ( A( lcG[j] ) / lc( G[j] ) );
+        }
+        U *= power( omega, r-1 );
     }
     if ( delta != 1 ) {
-	for ( j = 1; j <= r; j++ ) {
-	    lcG[j] *= delta;
-	    G[j] = G[j] * ( A( lcG[j] ) / lc( G[j] ) );
-	}
-	U *= power( delta, r );
+        for ( j = 1; j <= r; j++ ) {
+            lcG[j] *= delta;
+            G[j] = G[j] * ( A( lcG[j] ) / lc( G[j] ) );
+        }
+        U *= power( delta, r );
     }
     DEBDECLEVEL( cerr, "distributeLeadingCoeffs" );
     return true;
@@ -115,29 +115,29 @@ static void
 gfbAdjoin ( const CanonicalForm & F, CFList & L )
 {
     if ( F.isOne() )
-	return;
+        return;
     if ( L.isEmpty() ) {
-	L.append( F );
-	return;
+        L.append( F );
+        return;
     }
     CanonicalForm h, f = F;
     CFListIterator i, j;
     for ( i = L; i.hasItem() && ! f.isOne(); ) {
-	h = gcd( f, i.getItem() );
-	if ( h.isOne() ) {
-	    i++;
-	    continue;
-	}
-	while ( divides( h, f ) )
-	    f /= h;
-	CFList D( h );
-	gfbAdjoin( i.getItem() / h, D );
-	for ( j = D; j.hasItem(); j++ )
-	    i.append( j.getItem() );
-	i.remove( true );
+        h = gcd( f, i.getItem() );
+        if ( h.isOne() ) {
+            i++;
+            continue;
+        }
+        while ( divides( h, f ) )
+            f /= h;
+        CFList D( h );
+        gfbAdjoin( i.getItem() / h, D );
+        for ( j = D; j.hasItem(); j++ )
+            i.append( j.getItem() );
+        i.remove( true );
     }
     if ( ! f.isOne() )
-	L.append( f );
+        L.append( f );
 }
 
 
@@ -147,7 +147,7 @@ gcdFreeBasis ( const CFList L )
     CFListIterator i;
     CFList R;
     for ( i = L; i.hasItem(); i++ )
-	gfbAdjoin( i.getItem(), R );
+        gfbAdjoin( i.getItem(), R );
     return R;
 }
 
@@ -158,8 +158,8 @@ Univar2Bivar(const CanonicalForm & U, CFArray & G, const Evaluation & A, const m
     int n = G.size();
     CFArray lcG(1,n);
     for ( int i = 1; i <= n; i++ ) {
-	G[i] *= A(l)/lc(G[i]);
-	lcG[i] = l;
+        G[i] *= A(l)/lc(G[i]);
+        lcG[i] = l;
     }
     return Hensel( U * power( l, n-1 ), G, lcG, A, bound, x );
 }
@@ -170,25 +170,25 @@ Hensel2 ( const CanonicalForm & U, CFArray & G, const Evaluation & A, const modp
     int i,n = G.size(); // n is number of factors of U
     CFArray TrueLcs(1, n);
     for (i=1; i <= n; i++)
-	TrueLcs[i] = 1;
+        TrueLcs[i] = 1;
     Variable y;
     CanonicalForm lcU = LC ( U, Variable(1) );
     while (! lcU.inCoeffDomain())
     {
-	y = lcU.mvar(); // should make a more intelligent choice
-	CanonicalForm BivariateU = A ( U, 2, y.level() - 1 );
-	CFArray BivariateFactors = G;
-	CFArray lcFactors(1,n);
-	Univar2Bivar(BivariateU, BivariateFactors, A, bound, y);
-	for (i = 1; i <= n; i++)
-	{
-	    BivariateFactors[i] /= content(BivariateFactors[i]);
-	    lcFactors[i] = LC(BivariateFactors[i],Variable(1));
-	}
-//	GFB = GcdFreeBasis(lcFactors); // this is not right... should probably make everything squarefree
-//	Hensel2(lcU, GFB, A, bound, y);
+        y = lcU.mvar(); // should make a more intelligent choice
+        CanonicalForm BivariateU = A ( U, 2, y.level() - 1 );
+        CFArray BivariateFactors = G;
+        CFArray lcFactors(1,n);
+        Univar2Bivar(BivariateU, BivariateFactors, A, bound, y);
+        for (i = 1; i <= n; i++)
+        {
+            BivariateFactors[i] /= content(BivariateFactors[i]);
+            lcFactors[i] = LC(BivariateFactors[i],Variable(1));
+        }
+//        GFB = GcdFreeBasis(lcFactors); // this is not right... should probably make everything squarefree
+//        Hensel2(lcU, GFB, A, bound, y);
     }
     for (i = 1; i <= n; i++)
-	G[i] *= A(TrueLcs[i])/lc(G[i]);
+        G[i] *= A(TrueLcs[i])/lc(G[i]);
     return Hensel(U, G, TrueLcs, A, bound, x);
 }

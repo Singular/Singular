@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.15 2002-09-24 11:28:29 Singular Exp $ */
+/* $Id: cf_factor.cc,v 1.16 2002-10-10 17:43:39 Singular Exp $ */
 
 //{{{ docu
 //
@@ -173,15 +173,27 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
 {
   if ( f.inCoeffDomain() )
         return CFFList( f );
+  //out_cf("factorize:",f,"==================================\n");
   int mv=f.level();
+  int org_v=mv;
   if (! f.isUnivariate() )
   {
     mv=find_mvar(f);
-    if (mv!=f.level())
+    if ( getCharacteristic() > 0 )
     {
-      swapvar(f,Variable(mv),f.mvar());
+      if (mv!=f.level())
+      {
+        swapvar(f,Variable(mv),f.mvar());
+      }
     }
-    if ( getCharacteristic() == 0 ) Off(SW_USE_NTL);
+    else
+    {
+      if (mv!=1)
+      {
+        swapvar(f,Variable(mv),Variable(1));
+        org_v=1;
+      }
+    }
   }
   CFFList F;
   if ( getCharacteristic() > 0 )
@@ -273,10 +285,18 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
           else
             F.insert( CFFactor( ic ) );
         }
-        if ( F.getFirst().factor().isOne() )
-        {
-          F.removeFirst();
-        }
+	else
+	{
+          if ( !F.getFirst().factor().inCoeffDomain() )
+          {
+            CFFactor new_first( 1 );
+            F.insert( new_first );
+          }
+	}
+        //if ( F.getFirst().factor().isOne() )
+        //{
+        //  F.removeFirst();
+        //}
       }
       else
       #endif
@@ -305,17 +325,19 @@ CFFList factorize ( const CanonicalForm & f, bool issqrfree )
     }
   }
 
-  if ((mv!=f.level()) && (! f.isUnivariate() ))
+  if ((mv!=org_v) && (! f.isUnivariate() ))
   {
     CFFListIterator J=F;
     for ( ; J.hasItem(); J++)
     {
-      swapvar(J.getItem().factor(),Variable(mv),f.mvar());
+      swapvar(J.getItem().factor(),Variable(mv),Variable(org_v));
     }
-    swapvar(f,Variable(mv),f.mvar());
+    swapvar(f,Variable(mv),Variable(org_v));
   }
+  //out_cff(F);
   return F;
 }
+
 #ifdef HAVE_NTL
 CanonicalForm fntl ( const CanonicalForm & f, int j )
 {

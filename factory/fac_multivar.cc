@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_multivar.cc,v 1.8 1998-03-12 14:30:55 schmidt Exp $ */
+/* $Id: fac_multivar.cc,v 1.9 2002-10-10 17:43:40 Singular Exp $ */
 
 #include <config.h>
 
@@ -16,6 +16,7 @@
 #include "fac_util.h"
 #include "cf_binom.h"
 #include "cf_iter.h"
+#include "cf_primes.h"
 #include "fac_distrib.h"
 
 
@@ -32,32 +33,32 @@ conv_to_factor_array( const CFFList & L )
     bool negate = false;
 
     if ( ! I.hasItem() )
-	n = 0;
+        n = 0;
     else  if ( I.getItem().factor().inBaseDomain() ) {
-	negate = I.getItem().factor().sign() < 0;
-	I++;
-	n = L.length();
+        negate = I.getItem().factor().sign() < 0;
+        I++;
+        n = L.length();
     }
     else
-	n = L.length() + 1;
+        n = L.length() + 1;
     CFFListIterator J = I;
     while ( J.hasItem() ) {
-	n += J.getItem().exp() - 1;
-	J++;
+        n += J.getItem().exp() - 1;
+        J++;
     }
     CFArray result( 1, n-1 );
     int i, j, k;
     i = 1;
     while ( I.hasItem() ) {
-	k = I.getItem().exp();
-	for ( j = 1; j <= k; j++ ) {
-	    result[i] = I.getItem().factor();
-	    i++;
-	}
-	I++;
+        k = I.getItem().exp();
+        for ( j = 1; j <= k; j++ ) {
+            result[i] = I.getItem().factor();
+            i++;
+        }
+        I++;
     }
     if ( negate )
-	result[1] = -result[1];
+        result[1] = -result[1];
     return result;
 }
 
@@ -67,13 +68,13 @@ coeffBound ( const CanonicalForm & f, int p )
     int * degs = degrees( f );
     int M = 0, i, k = f.level();
     for ( i = 1; i <= k; i++ )
-	M += degs[i];
+        M += degs[i];
     CanonicalForm b = 2 * maxNorm( f ) * power( CanonicalForm( 3 ), M );
     CanonicalForm B = p;
     k = 1;
     while ( B < b ) {
-	B *= p;
-	k++;
+        B *= p;
+        k++;
     }
     return modpk( p, k );
 }
@@ -89,17 +90,17 @@ coeffBound ( const CanonicalForm & f, int p )
 //     d = CFArray( 0, k );
 //     d[0] = delta * omega;
 //     for ( int i = 1; i <= k; i++ ) {
-// 	q = abs(F[i]);
-// 	for ( int j = i-1; j >= 0; j-- ) {
-// 	    r = d[j];
-// 	    do {
-// 		r = gcd( r, q );
-// 		q = q / r;
-// 	    } while ( r != 1 );
-// 	    if ( q == 1 )
-// 		return false;
-// 	}
-// 	d[i] = q;
+//         q = abs(F[i]);
+//         for ( int j = i-1; j >= 0; j-- ) {
+//             r = d[j];
+//             do {
+//                 r = gcd( r, q );
+//                 q = q / r;
+//             } while ( r != 1 );
+//             if ( q == 1 )
+//                 return false;
+//         }
+//         d[i] = q;
 //     }
 //     return true;
 // }
@@ -114,28 +115,52 @@ findEvaluation ( const CanonicalForm & U, const CanonicalForm & V, const Canonic
     bool found = false;
     CFArray FF = CFArray( 1, F.length() );
     if ( r > 0 )
-	A.nextpoint();
+        A.nextpoint();
     while ( ! found ) {
-	Vn = A( V );
-	if ( Vn != 0 ) {
-	    U0 = A( U );
-	    DEBOUTLN( cerr, "U0 = " << U0 );
-	    if ( isSqrFree( U0 ) ) {
-		delta = content( U0 );
-		DEBOUTLN( cerr, "content( U0 ) = " << delta );
-		for ( I = F, j = 1; I.hasItem(); I++, j++ )
-		    FF[j] = A( I.getItem().factor() );
-		found = nonDivisors( omega, delta, FF, D );
-	    }
-	    else {
-		DEBOUTLN( cerr, "not sqrfree : " << sqrFree( U0 ) );
-	    }
-	}
-	if ( ! found )
-	    A.nextpoint();
+        Vn = A( V );
+        if ( Vn != 0 ) {
+            U0 = A( U );
+            DEBOUTLN( cerr, "U0 = " << U0 );
+            if ( isSqrFree( U0 ) ) {
+                delta = content( U0 );
+                DEBOUTLN( cerr, "content( U0 ) = " << delta );
+                for ( I = F, j = 1; I.hasItem(); I++, j++ )
+                    FF[j] = A( I.getItem().factor() );
+                found = nonDivisors( omega, delta, FF, D );
+            }
+            else {
+                DEBOUTLN( cerr, "not sqrfree : " << sqrFree( U0 ) );
+            }
+        }
+        if ( ! found )
+            A.nextpoint();
     }
     DEBDECLEVEL( cerr, "findEvaluation" );
 }
+
+#ifdef HAVE_NTL
+int prime_number=0;
+void find_good_prime(const CanonicalForm &f, const CanonicalForm &r,int &start)
+{
+  if (! f.inBaseDomain() )
+  {
+    int l = f.level();
+    for ( CFIterator i = f; i.hasTerms(); i++ )
+    {
+      find_good_prime(i.coeff(),r,start);
+    }
+  }
+  else
+  {
+    if(mod(f,cf_getSmallPrime(start))==0)
+    {
+      start++;
+      CanonicalForm ff=r;
+      find_good_prime(ff,r,start);
+    }
+  }
+}
+#endif
 
 static CFArray
 ZFactorizeMulti ( const CanonicalForm & arg )
@@ -164,84 +189,107 @@ ZFactorizeMulti ( const CanonicalForm & arg )
 
     maxdeg = 0;
     for ( i = 2; i <= t; i++ ) {
-	j = U.degree( Variable( i ) );
-	if ( j > maxdeg ) maxdeg = j;
+        j = U.degree( Variable( i ) );
+        if ( j > maxdeg ) maxdeg = j;
     }
 
     if ( F.getFirst().factor().inCoeffDomain() ) {
-	omega = F.getFirst().factor();
-	F.removeFirst();
-	if ( omega < 0 ) {
-	    negate = true;
-	    omega = -omega;
-	    U = -U;
-	}
+        omega = F.getFirst().factor();
+        F.removeFirst();
+        if ( omega < 0 ) {
+            negate = true;
+            omega = -omega;
+            U = -U;
+        }
     }
     else
-	omega = 1;
+        omega = 1;
 
     bool goodeval = false;
     r = 0;
 
 //    for ( i = 0; i < 10*t; i++ )
-//	A.nextpoint();
+//        A.nextpoint();
 
     while ( ! goodeval ) {
-	TIMING_START(fac_findeval);
-	findEvaluation( U, V, omega, F, A, U0, delta, D, r );
-	TIMING_END(fac_findeval);
-	DEBOUTLN( cerr, "the evaluation point to reduce to an univariate problem is " << A );
-	DEBOUTLN( cerr, "corresponding delta = " << delta );
-	DEBOUTLN( cerr, "              omega = " << omega );
-	DEBOUTLN( cerr, "              D     = " << D );
-	DEBOUTLN( cerr, "now factorize the univariate polynomial " << U0 );
-	G = conv_to_factor_array( factorize( U0, false ) );
-	DEBOUTLN( cerr, "which factorizes into " << G );
-	b = coeffBound( U, getZFacModulus().getp() );
-	if ( getZFacModulus().getpk() > b.getpk() )
-	    b = getZFacModulus();
-	DEBOUTLN( cerr, "the coefficient bound of the factors of U is " << b.getpk() );
+        TIMING_START(fac_findeval);
+        findEvaluation( U, V, omega, F, A, U0, delta, D, r );
+        TIMING_END(fac_findeval);
+        DEBOUTLN( cerr, "the evaluation point to reduce to an univariate problem is " << A );
+        DEBOUTLN( cerr, "corresponding delta = " << delta );
+        DEBOUTLN( cerr, "              omega = " << omega );
+        DEBOUTLN( cerr, "              D     = " << D );
+        DEBOUTLN( cerr, "now factorize the univariate polynomial " << U0 );
+        G = conv_to_factor_array( factorize( U0, false ) );
+        DEBOUTLN( cerr, "which factorizes into " << G );
+        #ifdef HAVE_NTL
+        {
+          int i=prime_number;
+	  CanonicalForm f=arg;
+	  find_good_prime(f,arg,i);
+	  f=U0;
+	  find_good_prime(f,U0,i);
+	  f=U;
+	  find_good_prime(f,U,i);
+	  int p=cf_getSmallPrime(i);
+	  //printf("found:p=%d (%d)\n",p,i);
+	  if ((i==0)||(i!=prime_number))
+	  {  
+            b = coeffBound( U, p );
+	    prime_number=i;
+	  }  
+	  modpk bb=coeffBound(U0,p);
+	  if (bb.getpk() > b.getpk() ) b=bb;
+	  bb=coeffBound(arg,p);
+	  if (bb.getpk() > b.getpk() ) b=bb;
+        }
+        #else
+        b = coeffBound( U, getZFacModulus().getp() );
+        if ( getZFacModulus().getpk() > b.getpk() )
+            b = getZFacModulus();
+        #endif
+        DEBOUTLN( cerr, "the coefficient bound of the factors of U is " << b.getpk() );
 
-	r = G.size();
-	lcG = CFArray( 1, r );
-	UU = U;
-	DEBOUTLN( cerr, "now trying to distribute the leading coefficients ..." );
-	TIMING_START(fac_distrib);
-	goodeval = distributeLeadingCoeffs( UU, G, lcG, F, D, delta, omega, A, r );
-	TIMING_END(fac_distrib);
+        r = G.size();
+        lcG = CFArray( 1, r );
+        UU = U;
+        DEBOUTLN( cerr, "now trying to distribute the leading coefficients ..." );
+        TIMING_START(fac_distrib);
+        goodeval = distributeLeadingCoeffs( UU, G, lcG, F, D, delta, omega, A, r );
+        TIMING_END(fac_distrib);
 #ifdef DEBUGOUTPUT
-	if ( goodeval ) {
-	    DEBOUTLN( cerr, "the univariate factors after distribution are " << G );
-	    DEBOUTLN( cerr, "the distributed leading coeffs are " << lcG );
-	    DEBOUTLN( cerr, "U may have changed and is now " << UU );
-	    DEBOUTLN( cerr, "which has leading coefficient " << LC( UU, Variable(1) ) );
+        if ( goodeval ) {
+            DEBOUTLN( cerr, "the univariate factors after distribution are " << G );
+            DEBOUTLN( cerr, "the distributed leading coeffs are " << lcG );
+            DEBOUTLN( cerr, "U may have changed and is now " << UU );
+            DEBOUTLN( cerr, "which has leading coefficient " << LC( UU, Variable(1) ) );
 
-	    if ( LC( UU, Variable(1) ) != prod( lcG ) || A(UU) != prod( G ) ) {
-		DEBOUTLN( cerr, "!!! distribution was not correct !!!" );
-		DEBOUTLN( cerr, "product of leading coeffs is " << prod( lcG ) );
-		DEBOUTLN( cerr, "product of univariate factors is " << prod( G ) );
-		DEBOUTLN( cerr, "the new U is evaluated as " << A(UU) );
-	    }
-	    else
-		DEBOUTLN( cerr, "leading coeffs correct" );
-	}
-	else {
-	    DEBOUTLN( cerr, "we have found a bad evaluation point" );
-	}
+            if ( LC( UU, Variable(1) ) != prod( lcG ) || A(UU) != prod( G ) ) {
+                DEBOUTLN( cerr, "!!! distribution was not correct !!!" );
+                DEBOUTLN( cerr, "product of leading coeffs is " << prod( lcG ) );
+                DEBOUTLN( cerr, "product of univariate factors is " << prod( G ) );
+                DEBOUTLN( cerr, "the new U is evaluated as " << A(UU) );
+            }
+            else
+                DEBOUTLN( cerr, "leading coeffs correct" );
+        }
+        else {
+            DEBOUTLN( cerr, "we have found a bad evaluation point" );
+        }
 #endif
-	if ( goodeval ) {
-	    TIMING_START(fac_hensel);
-	    goodeval = Hensel( UU, G, lcG, A, b, Variable(1) );
-	    TIMING_END(fac_hensel);
-	}
+        if ( goodeval ) {
+            TIMING_START(fac_hensel);
+            goodeval = Hensel( UU, G, lcG, A, b, Variable(1) );
+            TIMING_END(fac_hensel);
+        }
     }
     for ( i = 1; i <= r; i++ ) {
-	G[i] /= icontent( G[i] );
-	G[i] = M(G[i]);
+        G[i] /= icontent( G[i] );
+        G[i] = M(G[i]);
     }
     // negate noch beachten !
     if ( negate )
-	G[1] = -G[1];
+        G[1] = -G[1];
     DEBDECLEVEL( cerr, "ZFactorMulti" );
     return G;
 }
@@ -259,45 +307,45 @@ ZFactorizeMultivariate ( const CanonicalForm & f, bool issqrfree )
 
     v1 = Variable(1);
     if ( issqrfree )
-	F = CFFactor( f, 1 );
+        F = CFFactor( f, 1 );
     else
-	F = sqrFree( f );
+        F = sqrFree( f );
 
     for ( i = F; i.hasItem(); i++ ) {
-	if ( i.getItem().factor().inCoeffDomain() ) {
-	    if ( ! i.getItem().factor().isOne() )
-		R.append( CFFactor( i.getItem().factor(), i.getItem().exp() ) );
-	}
-	else {
-	    TIMING_START(fac_content);
-	    g = compress( i.getItem().factor(), M );
-	    // now after compress g contains Variable(1)
-	    vm = g.mvar();
-	    g = swapvar( g, v1, vm );
-	    cont = content( g );
-	    g = swapvar( g / cont, v1, vm );
-	    cont = swapvar( cont, v1, vm );
-	    n = i.getItem().exp();
-	    TIMING_END(fac_content);
-	    DEBOUTLN( cerr, "now after content ..." );
-	    if ( g.isUnivariate() ) {
-		G = factorize( g, true );
-		for ( j = G; j.hasItem(); j++ )
-		    if ( ! j.getItem().factor().isOne() )
-			R.append( CFFactor( M( j.getItem().factor() ), n ) );
-	    }
-	    else {
-		GG = ZFactorizeMulti( g );
-		m = GG.max();
-		for ( k = GG.min(); k <= m; k++ )
-		    if ( ! GG[k].isOne() )
-			R.append( CFFactor( M( GG[k] ), n ) );
-	    }
-	    G = factorize( cont, true );
-	    for ( j = G; j.hasItem(); j++ )
-		if ( ! j.getItem().factor().isOne() )
-		    R.append( CFFactor( M( j.getItem().factor() ), n ) );
-	}
+        if ( i.getItem().factor().inCoeffDomain() ) {
+            if ( ! i.getItem().factor().isOne() )
+                R.append( CFFactor( i.getItem().factor(), i.getItem().exp() ) );
+        }
+        else {
+            TIMING_START(fac_content);
+            g = compress( i.getItem().factor(), M );
+            // now after compress g contains Variable(1)
+            vm = g.mvar();
+            g = swapvar( g, v1, vm );
+            cont = content( g );
+            g = swapvar( g / cont, v1, vm );
+            cont = swapvar( cont, v1, vm );
+            n = i.getItem().exp();
+            TIMING_END(fac_content);
+            DEBOUTLN( cerr, "now after content ..." );
+            if ( g.isUnivariate() ) {
+                G = factorize( g, true );
+                for ( j = G; j.hasItem(); j++ )
+                    if ( ! j.getItem().factor().isOne() )
+                        R.append( CFFactor( M( j.getItem().factor() ), n ) );
+            }
+            else {
+                GG = ZFactorizeMulti( g );
+                m = GG.max();
+                for ( k = GG.min(); k <= m; k++ )
+                    if ( ! GG[k].isOne() )
+                        R.append( CFFactor( M( GG[k] ), n ) );
+            }
+            G = factorize( cont, true );
+            for ( j = G; j.hasItem(); j++ )
+                if ( ! j.getItem().factor().isOne() )
+                    R.append( CFFactor( M( j.getItem().factor() ), n ) );
+        }
     }
     return R;
 }

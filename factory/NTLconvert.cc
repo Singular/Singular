@@ -1,4 +1,4 @@
-/* $Id: NTLconvert.cc,v 1.3 2002-08-19 11:10:41 Singular Exp $ */
+/* $Id: NTLconvert.cc,v 1.4 2002-10-10 17:43:38 Singular Exp $ */
 #include <config.h>
 
 #include "cf_gmp.h"
@@ -585,7 +585,7 @@ CFFList convertNTLvec_pair_ZZX_long2FacCFFList(vec_pair_ZZX_long e,ZZ multi,Vari
 
   // Start by appending the multiplicity
 
-  if (!IsOne(multi))
+  //if (!IsOne(multi))
     rueckgabe.append(CFFactor(convertZZ2CF(multi),1));
 
   // Go through the vector e and build up the CFFList

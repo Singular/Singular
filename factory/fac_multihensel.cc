@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_multihensel.cc,v 1.7 2001-01-19 18:11:51 Singular Exp $ */
+/* $Id: fac_multihensel.cc,v 1.8 2002-10-10 17:43:40 Singular Exp $ */
 
 #include <config.h>
 
@@ -228,6 +228,7 @@ liftStep ( CFArray & P, int k, int r, int t, const modpk & b, const Evaluation &
 
     DEBOUTLN( cerr, "we are now performing the liftstep to reach " << Variable(k) );
     DEBOUTLN( cerr, "the factors so far are " << P );
+    DEBOUTLN( cerr, "modulus p^k= " << b.getpk() << "=" << b.getp() <<"^"<< b.getk() );
 
     for ( i = 1; i <= r; i++ ) {
         Variable vm = Variable( t + 1 );
