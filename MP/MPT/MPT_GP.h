@@ -33,13 +33,13 @@ typedef class MPT_GP_Ordering_t * MPT_GP_Ordering_pt;
 class MPT_Top_t
 {
 protected:
-  operator new(size_t size)
-    {return IMP_MemAllocFnc(s);}
-  operator delete(void* p, size_t s)
+  void * operator new(size_t size)
+    {return IMP_MemAllocFnc(size);}
+public:
+  void operator delete(void* p, size_t s)
     {IMP_MemFreeFnc(p,s);}
 
-public:
-  virutal ~MPT_Tope_t() {}
+  virtual ~MPT_Top_t() {}
 };
   
 class MPT_GP_t : public virtual GP_t, public MPT_Top_t 
