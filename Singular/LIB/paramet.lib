@@ -1,22 +1,22 @@
 // last change:           17.01.2001
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: paramet.lib,v 1.9 2001-01-17 08:58:54 keilen Exp $";
+version="$Id: paramet.lib,v 1.10 2001-01-17 14:24:05 keilen Exp $";
 category="Visualization";
 info="
 LIBRARY: paramet.lib   Parametrization of Varieties
 AUTHOR:  Thomas Keilen, keilen@mathematik.uni-kl.de
-SEE ALSO: normal.lib, primdec.lib, hnoether.lib
+SEE ALSO: normal_lib, primdec_lib, hnoether_lib
+
+PROCEDURES:           
+ parametrize(I);       parametrizes a prime ideal via the normalization         
+ parametrizepd(I);     calculates the prim.dec. and parametrizes the components
+ parametrizesing(f);   parametrizes an isolated plane curve singularity
 
 OVERVIEW:
  A library to compute parametrizations of algebraic varieties (if possible)
  with the aid of a normalization, or a primary decomposition, resp. to compute
  a parametrization of a plane curve singularity with the aid of a
  Hamburger-Noether expansion.
-
-PROCEDURES:           
- parametrize(I);       parametrizes a prime ideal via the normalization         
- parametrizepd(I);     calculates the prim.dec. and parametrizes the components
- parametrizesing(f);   parametrizes an isolated plane curve singularity
 ";
 ///////////////////////////////////////////////////////////////////////////////
 LIB "normal.lib";
@@ -35,7 +35,7 @@ RETURN:   a list containing the parametrization ideal resp. the original ideal,
           1 resp. 0 depending on whether the parametrization was successful
           or not
 SEE ALSO: primdecGTZ, normal, radical, parametrizepd
-KEYWORDS: parametrization, normalization
+KEYWORDS: parametrization; normalization
 EXAMPLE: example parametrize; shows an example"
 {
   intvec ov=option(get);
@@ -111,7 +111,7 @@ RETURN:   a list of lists, where each entry contains the parametrization
           resp. 0, and 1 resp. 0 depending on whether the parametrization
           of the component was successful or not
 SEE ALSO: primdecGTZ, normal, parametrize
-KEYWORDS: parametrization, normalization
+KEYWORDS: parametrization; normalization
 EXAMPLE:  example parametrizepd; shows an example"
 {
   intvec ov=option(get);
@@ -186,8 +186,8 @@ CREATE:   If the parametrization is successful, the basering will be changed to
           the parametrization ring, that is to the ring  0,(x,y),ls;
 RETURN:   a list containing the parametrizations of the different branches of the
           singularity at the origin resp. 0, if f was not of the desired kind  
-SEE ALSO: hnoether.lib, reddevelop
-KEYWORDS: parametrization, curve singularities
+SEE ALSO: hnoether_lib, reddevelop
+KEYWORDS: parametrization; curve singularities
 EXAMPLE:  example parametrizesing; shows an example"
 {
   intvec ov=option(get);
