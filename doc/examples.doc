@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.23 1998-05-20 07:13:46 pohl Exp $
+@comment $Id: examples.doc,v 1.24 1998-05-20 08:20:20 pohl Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -547,6 +547,7 @@ p;
 @expansion{} -1.222e+00y10
 
 // Compute a standard basis for the deformed ideal:
+setring R0;
 j = std(i2);
 @expansion{} v13.s14(2)s15.s16.19-s.s20.s21.23-
 @expansion{} product criterion:3 chain criterion:7
