@@ -1692,6 +1692,7 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
   syStrategy r;
   intvec **weights=NULL;
   int wmaxl=maxl;
+  ideal u_id=(ideal)u->Data();
   maxl--;
   if ((maxl==-1) && (iiOp!=MRES_CMD))
     maxl = pVariables-1;
@@ -1699,7 +1700,7 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
   {
     //if (BTEST1(28))
     //{
-    //  r=syMinRes((ideal)u->Data(),maxl,&l, iiOp==MRES_CMD);
+    //  r=syMinRes(u_id,maxl,&l, iiOp==MRES_CMD);
     //}
     //else
     {
@@ -1710,17 +1711,24 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
       //  weights[0] = ivCopy(iv);
       //  l=1;
       //}
-      //r=syResolvente((ideal)u->Data(),maxl,&l, &weights, iiOp==MRES_CMD);
-      r=syResolution((ideal)u->Data(),maxl, iv, iiOp==MRES_CMD);
+      //r=syResolvente(u_id,maxl,&l, &weights, iiOp==MRES_CMD);
+      r=syResolution(u_id,maxl, iv, iiOp==MRES_CMD);
     }
   }
   else if (iiOp==SRES_CMD)
-  //  r=sySchreyerResolvente((ideal)u->Data(),maxl+1,&l);
-    r=sySchreyer((ideal)u->Data(),maxl+1);
+  //  r=sySchreyerResolvente(u_id,maxl+1,&l);
+    r=sySchreyer(u_id,maxl+1);
   else /* LRES */
   {
     int dummy;
-    r=syLaScala3((ideal)u->Data(),&dummy);
+    if((currQuotient!=NULL)||
+    (!idHomIdeal (u_id,NULL)))
+    {
+       WerrorS
+       ("`lres` can not be called in q ring or with inhomogeneous input");
+       return TRUE;
+    }
+    r=syLaScala3(u_id,&dummy);
   }
   if (r==NULL) return TRUE;
   //res->data=(void *)liMakeResolv(r,l,wmaxl,u->Typ(),weights);
@@ -2749,7 +2757,12 @@ static BOOLEAN jjSTRING_PROC(leftv res, leftv v)
 {
   procinfov pi = IDPROC((idhdl)v->data);
   if((pi->language == LANG_SINGULAR) && (pi->data.s.body!=NULL))
+  //if(pi->language == LANG_SINGULAR)
+  {
+    //if(pi->data.s.body==NULL)
+    //  iiGetLibProcBuffer(IDPROC((idhdl)v->data));
     res->data=mstrdup(pi->data.s.body);
+  }
   else
     res->data=mstrdup("");
   return FALSE;
