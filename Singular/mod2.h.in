@@ -1,0 +1,238 @@
+/*******************************************************************
+ *  Computer Algebra System SINGULAR
+ *
+ *  mod2.h: Main configuration file for Singular
+ *          DO NOT EDIT!
+ *
+ *******************************************************************/
+#ifndef MOD2_H
+#define MOD2_H
+
+/*******************************************************************
+ * Defines which are set by configure 
+ ******************************************************************/
+/* Define if you have TeXInfo */
+#undef HAVE_INFO
+/* Define to use readline lib for fancy display */
+#undef HAVE_READLINE
+/* Define to use built-in command line parser */
+#undef HAVE_FEREAD
+/* Define if you want to use dld's */
+#undef HAVE_DLD
+/* Define to have dbm links */
+#undef HAVE_DBM
+/* Define to use gmp for rational arithmetic */
+#undef HAVE_GMP
+/* Define to have MP links */
+#undef HAVE_MPSR
+/* Define to have factory functionality added */
+#undef HAVE_FACTORY
+/* Define to have libfac functionality added */
+#undef HAVE_LIBFAC_P
+/* Define if you have stdc headers */
+#undef STDC_HEADERS
+/* Define if you have sys/file.h */
+#undef HAVE_SYS_FILE_H
+/* Define if you have sys/ioctl.h */
+#undef HAVE_SYS_IOCTL_H
+/* Define if you have sys/time.h */
+#undef HAVE_SYS_TIME_H
+/* Define if time.h and sys/time.h can be included at the same time */
+#undef TIME_WITH_SYS_TIME
+/* Define if you have alloca.h */
+#undef HAVE_ALLOCA_H
+/* Define if you have alloca */
+#undef HAVE_ALLOCA
+/* Define if you have getpagesize */
+#undef GETPAGESIZE
+/* Define if you have vprintf */
+#undef HAVE_VPRINTF
+/* Define if you have gettimeofday */
+#undef HAVE_GETTIMEOFDAY
+/* Define if you have strstr */
+#undef HAVE_STRSTR
+/* Define if you have strtod */
+#undef HAVE_STRTOD
+/* Define if you have strtol */
+#undef HAVE_STRTOL
+/* Define if you have atexit */
+#undef HAVE_ATEXIT
+/* Define if sprintf does not return number of printed chars */
+#undef BSD_SPRINTF
+/* Define sizeof(void*) */
+#define SIZEOF_VOIDP 4
+/* Define major version of Singular -- should be set in configure.in!!!*/
+#define MAJOR_VERSION 0
+/* Define minor version of Singular -- should be set in configure.in!!! */
+#define MINOR_VERSION 0
+/* Define sub version of Singular -- should be set in configure.in!!! */
+#define SUB_VERSION 0
+/* Define version as a string */
+#define S_VERSION1 ""
+/* Define version date as a string */
+#define S_VERSION2 ""
+/* Define the data directory where Singular searches for libs and gftables */ 
+#define SINGULAR_DATADIR "/usr/local/share/Singular"
+
+/*******************************************************************
+ * Defines which are not set by configure
+ ******************************************************************/
+/* Default value for timer resolution in ticks per second */
+/* set to 10 for resolution of tenth of a second, etc */
+#define TIMER_RESOLUTION 1
+/* Undefine to disable the quote/eval of expressions */
+#define SIQ 1
+/* Define to enable TCL interface */
+#undef HAVE_TCL
+/* Define to enable working in Weyl algebras */
+#undef DRING
+/* Define to enable working in exterior algebras */
+#undef SRING
+/* Undefine to disable Gerhard's fast and dirty std computations */
+#define FAST_AND_DIRTY
+/* works around a quirk in the generation of parser tables */
+#define INIT_BUG
+
+/*******************************************************************
+ * Evaluate the set defines
+ ******************************************************************/
+/* FGLM needs factory */
+#ifdef HAVE_FACTORY
+#define HAVE_FGLM
+#endif
+
+/* In case we do not have strstr, we provide our own version */
+#ifndef HAVE_STRSTR
+char *strstr(const char *haystack, const char *needle);
+#endif
+
+/* Undefine to disable real time measurments  */
+#ifdef HAVE_GETTIMEOFDAY
+#define HAVE_RTIMER
+#endif
+
+#if SIZEOF_VOIDP == 8
+#define ALIGN_8
+#endif
+
+#define VERSION (MAJOR_VERSION*1000 + MINOR_VERSION*100 + SUB_VERSION)
+#ifdef DRING
+#define SDRING
+#endif
+
+#ifdef SRING
+#define SDRING
+#endif
+
+#if HAVE_INFO != 1
+#define buildin_help 1
+#endif
+
+#ifdef macintosh
+#ifndef buildin_help
+#define buildin_help 1
+#endif
+#endif
+
+/*******************************************************************
+ * Miscellanous Defines 
+ ******************************************************************/
+#ifndef FALSE
+#define FALSE       0
+#endif
+
+#ifndef TRUE
+#define TRUE        1
+#endif
+
+#ifndef NULL
+#define NULL        (0)
+#endif
+
+#ifndef SEEK_END
+#define SEEK_END 2
+#endif
+
+#ifndef SEEK_SET
+#define SEEK_SET 0
+#endif
+
+#define HALT() m2_end(2)
+
+#define memcpy4 memcpy
+
+/* the maximal ascii length of an int number + 1 = 11 for 32 bit int */
+#define MAX_INT_LEN 11
+extern int pShortOut;
+
+/*******************************************************************
+ * DEBUG OPTIONS
+ * -- only significant for for compiling without -DNDEBUG
+ * -- you better know what your are doing, if you touch this
+ ******************************************************************/
+#ifndef NDEBUG 
+
+/* define YYDEBUG 1 for debugging bison texts, 0 otherwise */
+#define YYDEBUG 0
+/* define MDEBUG 0 for checking Alloc/Free */
+#define MDEBUG 0
+/* define MDEBUG 1 for allowing to keep track of Alloc/Free */
+/* undefine MMDEBUG otherwise */
+/*#define MDEBUG 0 */
+/* define MLIST for listing used blocks at programm end */
+/* undefine otherwise */
+/*#define MLIST */
+/* define MM_BEFORE for also printing the previous block while debugging */
+/*#define MM_BEFORE 1 */
+/* define PDEBUG checking polys, undefine otherwise */
+#define PDEBUG 
+/* define KDEBUG checking during standard base computation */
+#define KDEBUG 
+/* define LDEBUG checking numbers, undefine otherwise */
+#define LDEBUG 
+/* define RDEBUG checking rings (together with TRACE=9) */
+#define RDEBUG 
+/* define TEST for non time critical tests, undefine otherwise */
+#define TEST
+/* define OLD_RES for res/sres/mres(i,j,k) */
+#define OLD_RES
+/* define MM_COUNT 1 for use of "memory(0/1)", undefine otherwise */
+#define MM_COUNT 1
+/* define MM_STAT for printing block stats */
+/* #define MM_STAT 1 */
+/* #define PAGE_TEST */
+/* #define PAGE_COUNT */
+
+/* Undefine to disable debugging of MP stuff */
+#ifdef HAVE_MPSR
+#define MPSR_DEBUG 
+#endif
+
+/* MLIST requires MDEBUG */
+#ifdef MLIST
+#ifndef MDEBUG
+#define MDEBUG 0
+#endif
+#endif
+
+/* PDEBUG requires MDEBUG */
+#ifdef PDEBUG
+#ifndef MDEBUG
+#define MDEBUG 0
+#endif
+#endif
+
+#ifdef TEST
+#ifndef buildin_rand
+#define buildin_rand 1
+#endif
+#endif
+
+#ifdef PAGE_COUNT
+#define PAGE_TEST
+#endif
+
+#endif /* not NDEBUG */
+
+
+#endif /* MOD2_H  */

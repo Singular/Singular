@@ -1,0 +1,302 @@
+#################################################################
+###
+### Makefile for Singular
+###
+#################################################################
+
+SHELL		= /bin/sh
+
+##
+## versions
+##
+MAJOR_VERSION	= @MAJOR_VERSION@
+MINOR_VERSION	= @MINOR_VERSION@
+DIST_NAME	= Singular-${MAJOR_VERSION}.${MINOR_VERSION}
+CONFIGURE_INPUT = @ac_configure_args@
+
+## 
+## various paths
+##
+srcdir		= @srcdir@
+prefix 		= @prefix@
+exec_prefix 	= @exec_prefix@
+libdir 		= @libdir@
+# program executable goes here
+bindir		= @bindir@
+# read-only architecture-independent data (like Singular libs) go here
+singulardatadir = @singulardatadir@
+includedir	= @includedir@
+
+## 
+## various programs
+##
+CC		= @CC@
+CXX		= @CXX@
+BISON		= @BISON@
+LEX		= @LEX@
+INSTALL		= @INSTALL@
+INSTALL_DATA	= @INSTALL_DATA@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+MKINSTALLDIRS   = @MKINSTALLDIRS@
+
+##
+## compiler and linker options
+##
+CFLAGS		= @CFLAGS@
+CXXFLAGS	= @CXXFLAGS@
+CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@
+CPPFLAGS	= @CPPFLAGS@ -I${srcdir}
+DEFS		= @DEFS@ -DNDEBUG
+LDFLAGS		= @LDFLAGS@
+LIBS		= @LIBS@
+
+##
+## End configuration dependend stuff
+#################################################################
+
+CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
+    clapmem.cc clapsing.cc claptmpl.cc cntrlc.cc \
+    extra.cc febase.cc feread.cc \
+    ffields.cc hdegree.cc hilb.cc hutil.cc \
+    ideals.cc intvec.cc iparith.cc \
+    ipassign.cc ipconv.cc ipid.cc iplib.cc \
+    ipprint.cc ipshell.cc khstd.cc kstdfac.cc \
+    kstd1.cc kstd2.cc kutil.cc lists.cc \
+    longalg.cc longrat.cc \
+    longrat0.cc maps.cc matpol.cc misc.cc \
+    mminit.cc modulop.cc \
+    fglm.cc fglmzero.cc fglmvec.cc \
+    numbers.cc polys.cc polys0.cc polys1.cc polys2.cc \
+    ring.cc shortfl.cc silink.cc sing_mp.cc\
+    sing_dld.cc sing_dbm.cc spolys.cc spolys0.cc \
+    subexpr.cc syz.cc syz0.cc syz1.cc \
+    tesths.cc timer.cc weight.cc \
+    mpsr_Put.cc mpsr_PutPoly.cc mpsr_Tok.cc mpsr_GetPoly.cc \
+    mpsr_Get.cc mpsr_GetMisc.cc mpsr_Error.cc
+
+CSOURCES=mmalloc.c mmallocb.c mmallocs.c mmblock.c mmheap.c mmspec.c mmutil.c
+
+SOURCES=${CSOURCES} ${CXXSOURCES} grammar.y scanner.l
+
+HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h grammar.h\
+	longalg.h mpsr_Tok.h structs.h binom.h intvec.h longrat.h \
+	numbers.h stype.h clapconv.h ipconv.h maps.h page.h \
+	subexpr.h clapsing.h ipid.h matpol.h polys.h syz.h \
+	cntrlc.h ipprint.h mmemory.h ring.h timer.h \
+	febase.h ipshell.h mmprivat.h shortfl.h tok.h \
+	ffields.h khstd.h silink.h \
+	fglm.h kstd1.h modulop.h sing_dbm.h weight.h \
+	fglmvec.h kstd2.h mpsr.h sing_mp.h \
+	kstdfac.h mpsr_Get.h spolys.h \
+	kutil.h mpsr_Put.h spolys0.h
+
+DISTFILES=${SOURCES} ${HEADERS} Makefile.in configure.in configure \
+	mod2.h.in testgh
+
+OBJS=grammar.o scanner.o matpol.o binom.o\
+     febase.o feread.o timer.o intvec.o attrib.o lists.o\
+     longrat.o longrat0.o misc.o ring.o numbers.o maps.o\
+     hilb.o kstd1.o kstd2.o kutil.o khstd.o kstdfac.o modulop.o spolys.o\
+     ideals.o subexpr.o hdegree.o hutil.o ffields.o shortfl.o \
+     longalg.o spolys0.o syz.o syz0.o syz1.o weight.o \
+     ipid.o ipshell.o iplib.o ipassign.o ipconv.o ipprint.o\
+     polys.o polys0.o polys1.o polys2.o extra.o\
+     mminit.o mmutil.o mmalloc.o mmallocb.o mmallocs.o \
+     mmspec.o mmblock.o mmheap.o sing_dld.o sing_dbm.o silink.o \
+     sing_mp.o fglm.o fglmzero.o fglmvec.o cntrlc.o \
+     algmap.o clapconv.o  clapmem.o clapsing.o claptmpl.o\
+     mpsr_Error.o mpsr_Put.o mpsr_PutPoly.o mpsr_GetPoly.o \
+     mpsr_Get.o mpsr_GetMisc.o 
+
+##
+## PRIMARY Targets
+##
+
+.l.cc:
+	${LEX} -s -I -t $< > scanner.cc
+
+.y.cc:
+	${BISON} -d -t -o grammar.cc $<
+	./testgh
+
+.cc.o:	
+	${CXX} ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} -c $<
+.c.o:
+	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -c $<
+
+Singular: mod2.h version.h scanner.cc ${OBJS} iparith.o mpsr_Tok.o tesths.cc
+	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o Singular \
+	tesths.cc iparith.o mpsr_Tok.o ${OBJS} ${LDFLAGS} ${LIBS}
+
+iparith.o mpsr_Tok.o : iparith.inc 
+
+claptmpl.o: claptmpl.cc mod2.h
+	${CXX} ${CXXFLAGS}  ${CPPFLAGS} ${DEFS} -c $<	
+	
+
+iparith.inc : ${OBJS} iparith.cc ipconv.cc tok.h mpsr_Tok.cc grammar.h 
+	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -DGENTABLE -o gentable \
+	iparith.cc tesths.cc mpsr_Tok.cc ${OBJS} ${LDFLAGS} ${LIBS}
+	./gentable
+	/bin/rm gentable
+
+version.h: ${DISTFILES}
+	echo "#define VERSION_ID " `date '+%y%m%d%H'` >version.h
+
+mod2.h: configure mod2.h.in 
+	./configure ${CONFIGURE_INPUT}
+
+Makefile: configure Makefile.in
+	./configure ${CONFIGURE_INPUT}
+
+configure: configure.in
+	autoconf configure.in > configure
+	chmod a+x configure
+
+all: Singular
+
+install: all installbin installdata
+
+installbin: Singular
+	${MKINSTALLDIRS} ${bindir}
+	${INSTALL_PROGRAM} Singular ${bindir}
+
+installdata: 
+	${MKINSTALLDIRS} ${singulardatadir}
+	${MKINSTALLDIRS} ${singulardatadir}/gftables
+	for file in ${srcdir}/LIB/gftables/*; do \
+		${INSTALL_DATA} $${file} ${singulardatadir}/gftables; \
+	done
+	for file in ${srcdir}/LIB/*.lib; do \
+		${INSTALL_DATA} $${file} ${singulardatadir}; \
+	done
+
+uninstall: uninstallbin uninstalldata
+
+uninstallin:
+	-rm -f ${bindir}/Singular
+	-rmdir ${bindir}
+
+uninstalldata:
+	-rm -rf ${singulardatadir}/*.lib ${singulardatadir}/gftables
+	-rmdir ${singulardatadir}
+
+mostlyclean: clean
+
+clean:
+	-rm -f Singular* *.o *.og core *.d *.dd *~\#* 
+
+distclean: clean
+	-rm -f depend *.inc ${DIST_NAME}
+	-rm Singular* Makefile TAGS* config.status config.cache config.log
+
+maintainer-clean: distlean
+	@echo "This command is intended for maintainers to use;"
+	@echo "it deletes files that may require special tools to rebuild."
+	-rm configure scanner.cc grammar.h grammar.cc
+
+
+dist:
+	-rm -rf ${DIST_NAME}
+	-rm -f ${DIST_NAME}.tar.gz
+	${MKINSTALLDIRS} ${DIST_NAME}/LIB/gftables
+	-ln ${DISTFILES} ${DIST_NAME}
+	-ln LIB/*.lib ${DIST_NAME}/LIB
+	-ln LIB/gftables/* ${DIST_NAME}/LIB/gftables
+	tar cvf ${DIST_NAME}.tar  ${DIST_NAME}
+	gzip -9 ${DIST_NAME}.tar
+
+TAGS:
+	etags ${SOURCES} ${HEADERS}
+
+##
+## Below here is stuff for developpers
+#################################################################
+
+##
+## compiler and linker options
+##
+
+CCG		= gcc
+CXXG		= gcc
+CXXM		= gcc -MM
+CCM		= gcc -MM
+
+CFLAGSG		= -g -Wall -Wno-unused
+CXXFLAGSG	= -g -Wall -Wno-unused
+CXXTEMPLFLAGSG	= -fno-implicit-templates
+DEFSG		= @DEFS@ 
+
+##
+## .og files for having -O and -g object versions available at the same time
+## 
+
+OBJG1=	grammar.og scanner.og matpol.og binom.og\
+     febase.og feread.og timer.og intvec.og attrib.og lists.og\
+     longrat.og longrat0.og misc.og ring.og numbers.og maps.og\
+     hilb.og kstd1.og kstd2.og kutil.og khstd.og kstdfac.og modulop.og \
+     spolys.og ideals.og subexpr.og hdegree.og hutil.og ffields.og shortfl.og \
+     longalg.og spolys0.og syz.og syz0.og syz1.og weight.og \
+     ipid.og ipshell.og iplib.og ipassign.og ipconv.og ipprint.og\
+     polys.og polys0.og polys1.og polys2.og extra.og\
+     mminit.og sing_dld.og sing_dbm.og silink.og \
+     sing_mp.og fglm.og fglmzero.og fglmvec.og \
+     algmap.og clapconv.og  clapmem.og clapsing.og \
+     cntrlc.og  \
+     mpsr_Error.og mpsr_Put.og mpsr_PutPoly.og mpsr_GetPoly.og \
+     mpsr_Get.og mpsr_GetMisc.og 
+
+OBJG2= mmalloc.og mmallocb.og mmallocs.og mmblock.og mmheap.og \
+     mmspec.og mmutil.og
+
+OBJG=$(OBJG1) $(OBJG2) claptmpl.og
+
+##
+## Targets
+##
+
+claptmpl.og: claptmpl.cc mod2.h
+	$(CXXG)  ${CXXFLAGSG} ${CPPFLAGS} ${DEFSG} -c $< -o $@
+$(OBJG1): %.og: %.cc
+	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} -c $< -o $@
+
+$(OBJG2): %.og: %.c
+	$(CCG)  ${CFLAGSG} ${CPPFLAGS} ${DEFSG} -c $< -o $@
+
+Singularg: scanner.cc $(OBJG) iparith.og mpsr_Tok.og tesths.cc version.h 
+	$(CXXG) ${CXXFLAGSG} ${CPPFLAGS} ${DEFSG} -o Singularg \
+	tesths.cc iparith.og mpsr_Tok.og $(OBJG) ${LDFLAGS} ${LIBS}
+
+iparith.og: iparith.inc iparith.cc
+	$(CXXG)  ${CXXFLAGSG} ${CPPFLAGS} ${DEFSG} -c iparith.cc -o iparith.og
+
+mpsr_Tok.og: iparith.inc mpsr_Tok.cc
+	$(CXXG) ${CXXFLAGSG} ${CPPFLAGS} ${DEFSG} -c mpsr_Tok.cc -o mpsr_Tok.og
+
+installg: Singularg
+	${MKINSTALLDIRS} ${bindir}
+	${INSTALL_PROGRAM} Singularg ${bindir}	
+
+
+##
+## dependencies
+##
+	
+%.dd: %.cc mod2.h
+	echo $@ $(@:.dd=.og) " " \\ > $@
+	$(CXXM) -DGENTABLE ${CPPFLAGS} ${DEFSG} $< >> $@
+
+%.d: %.c mod2.h
+	echo $@ $(@:.d=.og) " " \\ > $@
+	$(CCM) ${CPPFLAGS} ${DEFSG} $< >> $@
+
+depend: $(CXXSOURCES:.cc=.dd) $(CSOURCES:.c=.d) mod2.h
+	cat *.d *.dd >depend
+
+#include $(SOURCES:.cc=.dd) $(CSOURCES:.c=.d)
+#include *.d *.dd
+ifeq (depend,$(wildcard depend))
+include depend
+endif
+
+
