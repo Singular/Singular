@@ -1,4 +1,4 @@
-dnl $Id: ftest_util.m4,v 1.10 1997-10-15 14:14:17 schmidt Exp $
+dnl $Id: ftest_util.m4,v 1.11 1997-11-13 08:37:43 schmidt Exp $
 dnl
 dnl ftest_util.m4 - m4 macros used by the factory test environment.
 dnl
@@ -79,8 +79,7 @@ define(`ftestMainInit', `dnl
 `int optind = 0;
     ftestStatusT check = UndefinedResult;
 
-    ftestSetName( argv[0], "'ftestAlgorithm`",
-        'ftestUsage`);
+    ftestSetName( argv[0], "'ftestAlgorithm`", 'ftestUsage`);
 
     ftestSignalCatch()'')
 
