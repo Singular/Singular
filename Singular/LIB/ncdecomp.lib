@@ -1,0 +1,273 @@
+///////////////////////////////////////////////////////////////////////////////
+version="$Id: ncdecomp.lib,v 1.1 2004-05-31 21:45:47 levandov Exp $";
+category="Noncommutative";
+info="
+LIBRARY:  ncdecomp.lib      Central character decomposition of a module 
+AUTHORS:  Viktor Levandovskyy,     levandov@mathematik.uni-kl.de,
+          Oleksandr Khomenko,      Oleksandr.Khomenko@math.uni-freiburg.de.
+
+PROCEDURES:
+CentralQuot(I,G);       for a module I and an ideal G, returns I:G,
+CentralSaturation(M,T); for a module M and an ideal T, returns M:T^{\infty},
+CenCharDec(I,C);        for a module I and a list C of generators of a center, returns a list L, where each entry consists of three records, namely
+L[*][1] is the character, L[*][2] is the Groebner basis of corresponding weight module, L[*][3] is the K-dimension of the weight module;
+";
+
+  LIB "ncalg.lib";
+///////////////////////////////////////////////////////////////////////////////
+static proc CharKernel(list L, int i)
+{
+// compute \cup L[j], j!=i
+  int sL = size(L);
+  if ( (i<=0) || (i>sL))  { return(0); }
+  int j;
+  list Li;
+  if (i ==1 )
+  {
+    Li = L[2..sL];
+  }
+  if (i ==sL )
+  {
+    Li = L[1..sL-1];
+  }
+  if ( (i>1) && (i < sL))
+  { 
+    Li = L[1..i-1];
+    for (j=i+1; j<=sL; j++)
+    {
+      Li[j-1] = L[j];
+    }
+  }
+//  print("intersecting kernels...");
+  module Cres = intersect(Li[1..size(Li)]);
+  return(Cres);
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc CentralQuotPoly(module M, poly g)
+{
+// here an elimination of components should be used !
+  int N=nrows(M); // M = A^N /I_M
+  module @M;
+  int i,j;
+  for(i=1; i<=N; i++)
+  {
+   @M=@M,g*gen(i);
+  }
+  @M = simplify(@M,2);
+  @M = @M,M;
+  module S = syz(@M);
+  matrix s = S;
+  module T;
+  vector t;
+  for(i=1; i<=ncols(s); i++)
+  {
+    t = 0*gen(N);
+    for(j=1; j<=N; j++)
+    {
+      t = t + s[j,i]*gen(j);
+    }
+    T[i] = t;
+  }
+  T = simplify(T,2);
+  return(T);
+}
+///////////////////////////////////////////////////////////////////////////////
+static proc MyIsEqual(module A, module B)
+{
+  option(redSB);
+  option(redTail);
+  if (attrib(A,"isSB")!=1) 
+  {
+    A = std(A);
+  }
+  if (attrib(B,"isSB")!=1) 
+  {
+    B = std(B);
+  }
+  int ANSWER = 1;
+  if ( ( ncols(A) == ncols(B) ) && ( nrows(A) == nrows(B) ) )
+  {
+    module @AB = A-B;
+    @AB = simplify(@AB,2);
+    if (@AB[1]!=0) { ANSWER = 0; }
+  }
+  else { ANSWER = 0; }
+  return(ANSWER);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc CentralQuot(module I, ideal G)
+"USAGE:  CentralQuot(M, T), for a module M and an ideal T,
+RETURN:  module of the central quotient I:G,
+NOTE:    the output module is not necessarily a Groebner basis,
+SEE ALSO: CentralSaturation, CenCharDec
+EXAMPLE: example CentralQuot; shows examples
+"{
+  int i;
+  list @L;
+  for(i=1; i<=size(G); i++)
+  {
+    @L[i] = CentralQuotPoly(I,G[i]);
+  }
+  module @I = intersect(@L[1..size(G)]);
+  if (nrows(@I)==1)
+  {
+    @I = ideal(@I);
+  }
+  return(@I);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   option(returnSB);
+   def a = sl2();
+   setring a;
+   ideal I = e3,f3,h3-4*h;
+   I = std(I);
+   poly C=4*e*f+h^2-2*h;
+   ideal G = (C-8)*(C-24);
+   ideal R = CentralQuot(I,G);
+   R;
+}
+///////////////////////////////////////////////////////////////////////////////
+proc CentralSaturation(module M, ideal T)
+"USAGE:  CentralSaturation(M, T), for a module M and an ideal T,
+RETURN:  module of the central saturation M:T^{\infty},
+NOTE:    the output module is not necessarily a Groebner basis,
+SEE ALSO: CentralQuot, CenCharDec
+EXAMPLE: example CentralSaturation; shows examples
+"{
+  option(redSB);
+  option(redTail);
+  option(returnSB);
+  module Q=0;
+  module S=M;
+  while ( !MyIsEqual(Q,S) )
+  {
+    Q = CentralQuot(M, T);
+    S = CentralQuot(Q, T);
+  }
+  if (nrows(Q)==1)
+  {
+    Q = ideal(Q);
+  }
+//  Q = std(Q);
+  return(Q);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   option(returnSB);
+   def a = sl2();
+   setring a;
+   ideal I = e3,f3,h3-4*h;
+   I = std(I);
+   poly C=4*e*f+h^2-2*h;
+   ideal G = C*(C-8);
+   ideal R = CentralSaturation(I,G);
+   R=std(R);
+   vdim(R);
+   R;
+}
+///////////////////////////////////////////////////////////////////////////////
+proc CenCharDec(ideal I, list Center)
+"USAGE:  CenCharDec(I, L), I an ideal and Center a list of generators of the center;
+RETURN:  a list L, where each entry consists of three records, namely
+L[*][1] is the character, L[*][2] is the Groebner basis of corresponding weight module, L[*][3] is the K-dimension of the weight module;
+NOTE:    
+SEE ALSO: CentralQuot, CentralSaturation
+EXAMPLE: example CenCharDec; shows examples
+"
+{
+// M = A/I
+//1. Find the Zariski closure of Supp_Z M
+// J = Ann_M 1 == I
+// J \cap Z:
+  option(redSB);
+  option(redTail);
+  option(returnSB);
+  def @A = basering;
+  setring @A;
+  int sZ=size(Center);
+  int i,j;
+  poly t=1;
+  for(i=1; i<=nvars(@A); i++)
+  {
+    t=t*var(i);
+  }
+  ring @Z=0,(@z(1..sZ)),dp;
+//  @Z;
+  def @ZplusA = @A+@Z;
+  setring @ZplusA;
+//  @ZplusA;
+  ideal I     = imap(@A,I);
+  list Center = imap(@A,Center);
+  poly t      = imap(@A,t);
+  ideal @Ker;
+  for(i=1; i<=sZ; i++)
+  {
+    @Ker[i]=@z(i) - Center[i];
+  }
+  @Ker = @Ker,I;
+  ideal @JcapZ = eliminate(@Ker,t);
+// do not forget parameters of a basering!
+  string strZ="ring @@Z=("+charstr(@A)+"),(@z(1.."+string(sZ)+")),dp;";
+//  print(strZ);
+  execute(strZ);
+  setring @@Z;
+  ideal @JcapZ = imap(@ZplusA,@JcapZ);
+  @JcapZ = std(@JcapZ);
+//  @JcapZ;
+  int sJ = vdim(@JcapZ);
+  if (sJ==-1)
+  {
+    "There is no finite decomposition";
+    return(0);
+  }
+//  print(@JcapZ);
+// 2. compute the min.ass.primes of the ideal in the center
+  LIB "primdec.lib";
+  list @L = minAssGTZ(@JcapZ);
+  int sL = size(@L);
+  list @CharKer;
+  for(i=1; i<=sL; i++)
+  {
+    @L[i] = std(@L[i]);
+  }
+//  print("etL:");
+//  @L;
+// 3. compute the intersections of characters
+  for(i=1; i<=sL; i++)
+  {
+    @CharKer[i] = CharKernel(@L,i);
+  }
+//  print("Charker:");
+//  @CharKer;
+// 4. Go back to the algebra and compute central saturations
+  setring @A;
+  map @M = @@Z,Center[1..size(Center)];
+  list L = @M(@CharKer);
+  list R,@R;
+  for(i=1; i<=sL; i++)
+  {
+    @R[1] = L[i];
+    @R[2] = CentralSaturation(I,L[i]);
+    if (nrows(@R[2])==1)
+    {
+      @R[2] = ideal(@R[2]);
+    }
+    @R[2] = std(@R[2]);
+    @R[3] = vdim(@R[2]);
+     R[i] = @R;
+  }
+  return(R);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+
+   option(returnSB);
+   def a = sl2();
+   setring a;
+   ideal I = e3,f3,h3-4*h;
+   I = twostd(I);
+   poly C=4*e*f+h^2-2*h;
+   list T = CenCharDec(I,C);
+   T;
+}
