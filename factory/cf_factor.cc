@@ -1,11 +1,13 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.5 1997-08-29 08:37:35 schmidt Exp $ */
+/* $Id: cf_factor.cc,v 1.6 1997-09-01 08:50:56 schmidt Exp $ */
 
 //{{{ docu
 //
 // cf_factor.cc - factorization and square free algorithms.
 //
 // Used by: fac_multivar.cc, fac_univar.cc, cf_irred.cc
+//
+// Header file: cf_algorithm.h
 //
 //}}}
 
@@ -34,7 +36,7 @@ static bool isUnivariateBaseDomain( const CanonicalForm & f )
     return ok;
 }
 
-CFFList factorize ( const CanonicalForm & f, bool issqrfree = false )
+CFFList factorize ( const CanonicalForm & f, bool issqrfree )
 {
     if ( f.inCoeffDomain() )
 	return CFFList( f );
@@ -61,7 +63,7 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
     return FpFactorizeUnivariateCZ( f, false, 1, alpha );
 }
 
-CFFList sqrFree ( const CanonicalForm & f, bool sort = false )
+CFFList sqrFree ( const CanonicalForm & f, bool sort )
 {
 //    ASSERT( f.isUnivariate(), "multivariate factorization not implemented" );
     CFFList result;
@@ -72,11 +74,6 @@ CFFList sqrFree ( const CanonicalForm & f, bool sort = false )
 	result = sqrFreeFp( f );
 
     return ( sort ? sortCFFList( result ) : result );
-}
-
-CFFList sqrFree ( const CanonicalForm & f )
-{
-    return sqrFree( f, false );
 }
 
 bool isSqrFree ( const CanonicalForm & f )
