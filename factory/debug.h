@@ -1,12 +1,20 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: debug.h,v 1.2 1997-04-15 11:01:49 schmidt Exp $ */
+/* $Id: debug.h,v 1.3 1997-05-14 15:57:33 schmidt Exp $ */
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.2  1997/04/15 11:01:49  schmidt
+macro DEBOUTLN sightly simplified
+
 Revision 1.1  1997/03/26 17:14:06  schmidt
 Initial revision
 
 */
+
+/* This is for compatibility with standard assert.h */
+#ifdef NDEBUG
+#undef DEBUGOUTPUT
+#endif
 
 /* It should be possible to include this file multiple times for different */
 /* settings of DEBUGOUTPUT */
