@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.40 2001-05-25 18:40:19 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.41 2001-05-28 15:17:55 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -229,10 +229,7 @@ EXAMPLE:  example gmsnf; shows examples
   int k;
   if(Kmax>=0)
   {
-    for(k=ncols(p);k>=1;k--)
-    {
-      p[k]=jet(jet(p[k],K,v),(Kmax+1)*deg(var(1))-@wmax);
-    }
+    p=jet(jet(p,K,v),(Kmax+1)*deg(var(1))-@wmax);
   }
 
   ideal r,q;
@@ -511,8 +508,6 @@ EXAMPLE:  example monodromy; shows examples
 
     intvec ide;
     ide[mu]=0;
-    module dU;
-    matrix A0e;
     int i,j;
     for(i=ncols(e);i>=1;i--)
     {
@@ -546,13 +541,7 @@ EXAMPLE:  example monodromy; shows examples
     A0=jet(A,0);
     for(i=ncols(e);i>=1;i--)
     {
-      A0e=freemodule(mu);
-      for(j=n;j>=0;j--) // Potenzen von Matrizen?
-      {
-        A0e=A0e*(A0-e[i]);
-      }
-      dU=syz(A0e);
-      U=dU+U;
+      U=syz(power(A0-e[i],n+1))+U;
     }
     A=division(U,A*U)[1];
 
@@ -784,22 +773,15 @@ EXAMPLE:  example vfiltration; shows examples
   ideal a;
   k=0;
   list V;
-  matrix Me;
   V[ncols(eM)+1]=interred(V1);
   intvec d;
   if(opt==0)
   {
     for(i=ncols(eM);number(eM[i])-1>number(n-1)/2;i--)
     {
-      Me=freemodule(mu*N);
-      for(i0=n;i0>=0;i0--) // Potenzen von Matrizen?
-      {
-        Me=Me*(M-eM[i]);
-      }
-
       dbprint(printlevel-voice+2,
         "//gaussman::vfiltration: compute V["+string(i)+"]");
-      V1=module(V1)+syz(Me);
+      V1=module(V1)+syz(power(M-eM[i],n+1));
       V[i]=interred(intersect(V1,V0));
 
       if(size(V[i])>size(V[i+1]))
@@ -816,15 +798,9 @@ EXAMPLE:  example vfiltration; shows examples
 
     if(number(eM[i])-1==number(n-1)/2)
     {
-      Me=freemodule(mu*N);
-      for(i0=n;i0>=0;i0--) // Potenzen von Matrizen?
-      {
-        Me=Me*(M-eM[i]);
-      }
-
       dbprint(printlevel-voice+2,
         "//gaussman::vfiltration: compute V["+string(i)+"]");
-      V1=module(V1)+syz(Me);
+      V1=module(V1)+syz(power(M-eM[i],n+1));
       V[i]=interred(intersect(V1,V0));
 
       if(size(V[i])>size(V[i+1]))
@@ -855,15 +831,9 @@ EXAMPLE:  example vfiltration; shows examples
     int j=-1;
     for(i=ncols(eM);i>=1;i--)
     {
-      Me=freemodule(mu*N);
-      for(i0=n;i0>=0;i0--) // Potenzen von Matrizen?
-      {
-        Me=Me*(M-eM[i]);
-      }
-
       dbprint(printlevel-voice+2,
         "//gaussman::vfiltration: compute V["+string(i)+"]");
-      V1=module(V1)+syz(Me);
+      V1=module(V1)+syz(power(M-eM[i],n+1));
       V[i]=interred(intersect(V1,V0));
 
       if(size(V[i])>size(V[i+1]))
