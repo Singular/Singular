@@ -2001,6 +2001,7 @@ static poly redNFTail (poly h,const int sl,kStrategy strat, int len)
 #ifdef REDTAIL_PROT
               PrintS(" ");
 #endif
+	      kBucketDestroy(&P.bucket);
               return res;
             }
             pTest(h);
