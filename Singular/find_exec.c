@@ -102,86 +102,52 @@ char * find_executable_link (const char *name)
 #endif
     p = search;
 
-    while (*p)
+    if (p != NULL)
     {
-      char *next;
-      next = tbuf;
-
-#if 0
-      /* Perform tilde-expansion. Stolen from GNU readline/tilde.c. */
-      if (p[0] == '~')
+      while (1)
       {
-        if (! p[1] || p[1] == '/')
+        char *next;
+        next = tbuf;
+
+        /* Copy directory name into [tbuf]. */
+        /* This is somewhat tricky: empty names mean cwd, w.r.t. some
+           shell spec */
+        while (*p && *p != ':')
+          *next ++ = *p ++;
+        *next = '\0';
+
+        if ((tbuf[0] == '.' && tbuf[1] == '\0') || tbuf[0] == '\0') {
+#ifdef HAVE_GETCWD
+          getcwd (tbuf, MAXPATHLEN);
+#else
+# ifdef HAVE_GETWD
+          getwd (tbuf);
+# endif
+#endif
+        }
+
+        strcat (tbuf, "/");
+        strcat (tbuf, name);
+
+        /* If we can execute the named file, then return it. */
+        if (! access (tbuf, X_OK))
         {
-          /* Prepend $HOME to the rest of the string. */
-          char *temp_home = (char *) getenv ("HOME");
+#ifdef WINNT
+          if (extra != NULL)
+            FreeL(extra);
+#endif
+          return copy_of (tbuf);
+        }
 
-          /* If there is no HOME variable, look up the directory in the
-             password database. */
-          if (! temp_home)
-          {
-            struct passwd *entry;
-
-            entry = getpwuid (getuid ());
-            if (entry)
-              temp_home = entry->pw_dir;
-          }
-
-          strcpy (tbuf, temp_home);
-          next = tbuf + strlen (tbuf);
+        if (*p != '\0')
+        {
           p ++;
         }
         else
         {
-          char username[MAXPATHLEN];
-          struct passwd *user_entry;
-          int i;
-
-          p ++;                        /* Skip the tilde. */
-          for (i = 0; *p && *p != '/' && *p != ':'; i++)
-            username[i] = *p ++;
-          username[i] = '\0';
-
-          user_entry = getpwnam (username);
-          if (user_entry)
-          {
-            strcpy (tbuf, user_entry->pw_dir);
-            next = tbuf + strlen (tbuf);
-          }
+          break;
         }
 
-        endpwent ();
-      }
-#endif      
-
-      /* Copy directory name into [tbuf]. */
-      while (*p && *p != ':')
-        *next ++ = *p ++;
-      *next = '\0';
-      if (*p != '\0')
-        p ++;
-
-      if (tbuf[0] == '.' && tbuf[1] == '\0') {
-#ifdef HAVE_GETCWD
-        getcwd (tbuf, MAXPATHLEN);
-#else
-# ifdef HAVE_GETWD
-        getwd (tbuf);
-# endif
-#endif
-      }
-
-      strcat (tbuf, "/");
-      strcat (tbuf, name);
-
-      /* If we can execute the named file, then return it. */
-      if (! access (tbuf, X_OK))
-      {
-#ifdef WINNT
-        if (extra != NULL)
-          FreeL(extra);
-#endif
-        return copy_of (tbuf);
       }
     }
   }
