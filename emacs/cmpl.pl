@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: cmpl.pl,v 1.5 1999-08-17 15:37:44 wichmann Exp $
+# $Id: cmpl.pl,v 1.6 1999-09-15 19:03:00 wichmann Exp $
 ###################################################################
 #
 # FILE:    cmpl.pl
@@ -42,11 +42,13 @@ if ($cmpl eq 'cmd')
   $strings = `$Singular -tq --exec='reservedName();\$'`;
   die "Error in execution of: $Singular -tq --exec='reservedName();\$': $!\n"
     if ($?);
-  @strings = split(/\s+/, $strings);
+  @strings = map "(\"$_\")", split(/\s+/, $strings);
 }
 elsif ($cmpl eq 'lib')
 {
-  @strings = split(/\s+/, <>);
+  # Sort libraries in REVERSE order! (Menu is created from bottom to
+  # top in singular.el)
+  @strings = map "(\"$_\")", sort {$b cmp $a} split(/\s+/, <>);
 }
 elsif ($cmpl eq 'hlp')
 {
@@ -63,12 +65,18 @@ elsif ($cmpl eq 'hlp')
       while (<FH>)
       {
 	last if /^\s*$/;
-	s/\* (.*):.*/$1/;
-	s/(.*) <\d+>$/$1/;
-	s/^\s*(.*)\s*/$1/;
-	s/([\\#"])/\\$1/g; #'
-	push @strings, $_ if $_ && $_ ne $prev;
-	$prev = $_;
+  	if ( /^\* (.*):\s*(.*).\s*/ ) {
+          $node = $1; $rawNode = $2;
+	  # remove duplicate counter from node
+	  $node =~ s/(.*) <\d+>$/$1/;
+  	  # quote characters special to Emacs
+  	  $node =~ s/([\"#\\])/\\\1/g;    #'
+  	  $rawNode =~ s/([\"#\\])/\\\1/g; #'
+	  # only the first occurence of $node is inserted to @string!
+          # all subsequent entries are discarded.
+	  push @strings, "(\"$node\" . \"$rawNode\")" if $node ne $prev;
+	  $prev = $node;
+  	}
       }
       last;
     }
@@ -88,7 +96,7 @@ EOT
  
 foreach $string (@strings)
 {
-  print STDOUT qq[    ("$string")\n];
+  print STDOUT "    $string\n";
 }
 
 print STDOUT "))\n";
