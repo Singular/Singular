@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.30 1999-07-20 12:29:48 Singular Exp $ */
+/* $Id: febase.h,v 1.31 1999-07-28 17:51:05 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -213,11 +213,11 @@ Voice * feInitStdin();
     #define fe_fgets_stdin(p,A,B) fgets(A,B,stdin)
   #endif
 #endif
-#endif
-#endif
+#endif /* ifndef __MWERKS__ */
 
 /* everything in between calls to these procedures is printed into a string
  * which is returned by SprintEnd()
  */
 void SPrintStart();
 char* SPrintEnd();
+#endif /* ifndef FEBASE_H */

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.18 1999-07-09 14:58:28 Singular Exp $ */
+/* $Id: ipshell.h,v 1.19 1999-07-28 17:51:07 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -167,5 +167,7 @@ char *  showOption();
 BOOLEAN setOption(leftv res, leftv v);
 /* ================================================================== */
 char * versionString();
+/* ================================================================== */
+void  singular_example(char *str);
 #endif
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.66 1999-07-28 08:38:58 Singular Exp $ */
+/* $Id: grammar.y,v 1.67 1999-07-28 17:51:06 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -31,6 +31,7 @@
 #include "ipid.h"
 #include "intvec.h"
 #include "febase.h"
+#include "fehelp.h"
 #include "matpol.h"
 #include "ring.h"
 #include "kstd1.h"

@@ -66,7 +66,7 @@ LIBS		= -lm @NEED_LIBS@
 
 CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     clapmem.cc clapsing.cc claptmpl.cc cntrlc.cc \
-    extra.cc febase.cc feread.cc \
+    extra.cc febase.cc feread.cc fehelp.cc \
     ffields.cc hdegree.cc hilb.cc hutil.cc \
     ideals.cc intvec.cc iparith.cc \
     ipassign.cc ipconv.cc ipid.cc iplib.cc \
@@ -96,7 +96,7 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	longalg.h mpsr_Tok.h structs.h binom.h intvec.h longrat.h \
 	numbers.h stype.h clapconv.h ipconv.h maps.h page.h \
 	subexpr.h clapsing.h ipid.h matpol.h polys.h syz.h \
-	cntrlc.h ipprint.h ring.h timer.h sdb.h \
+	cntrlc.h ipprint.h ring.h timer.h sdb.h fehelp.h \
 	febase.h ipshell.h shortfl.h tok.h mpr_complex.h mpr_global.h \
 	mmemory.h mmprivate.h mmheap.h mmpage.h page.h \
 	ffields.h khstd.h silink.h sparsmat.h gnumpfl.h gnumpc.h \
@@ -120,7 +120,7 @@ DISTFILES=${SOURCES} ${HEADERS} Makefile.in configure.in configure \
 	${INCS}
 
 OBJS=grammar.o scanner.o matpol.o binom.o mpr_complex.o gnumpfl.o gnumpc.o \
-     febase.o feread.o timer.o intvec.o attrib.o lists.o\
+     febase.o feread.o fehelp.o timer.o intvec.o attrib.o lists.o\
      longrat.o longrat0.o misc.o ring.o numbers.o maps.o\
      hilb.o comm.o kstd1.o kstd2.o kutil.o khstd.o kstdfac.o modulop.o spolys.o\
      ideals.o subexpr.o hdegree.o hutil.o ffields.o shortfl.o \
@@ -353,8 +353,8 @@ DEFSG		= -D@SING_UNAME@ @DEFS@
 ## 
 
 OBJG1=	grammar.og scanner.og matpol.og binom.og gnumpfl.og mpr_complex.og \
-     febase.og feread.og timer.og intvec.og attrib.og lists.og gnumpc.og\
-     longrat.og longrat0.og misc.og ring.og numbers.og maps.og\
+     febase.og feread.og fehelp.og timer.og intvec.og attrib.og lists.og \
+     gnumpc.og longrat.og longrat0.og misc.og ring.og numbers.og maps.og\
      hilb.og comm.og kstd1.og kstd2.og kutil.og khstd.og kstdfac.og modulop.og \
      spolys.og ideals.og subexpr.og hdegree.og hutil.og ffields.og shortfl.og \
      longalg.og spolys0.og syz.og syz0.og syz1.og weight.og \
@@ -362,8 +362,7 @@ OBJG1=	grammar.og scanner.og matpol.og binom.og gnumpfl.og mpr_complex.og \
      polys.og polys0.og polys1.og polys-impl.og extra.og\
      mminit.og sing_dld.og sing_dbm.og silink.og sparsmat.og\
      sing_mp.og fglm.og fglmzero.og fglmvec.og fglmgauss.og fglmhom.og\
-     algmap.og clapconv.og  clapmem.og clapsing.og \
-     cntrlc.og  sdb.og\
+     algmap.og clapconv.og  clapmem.og clapsing.og cntrlc.og  sdb.og\
      mpsr_Error.og mpsr_Put.og mpsr_PutPoly.og mpsr_GetPoly.og \
      mpsr_Get.og mpsr_GetMisc.og \
      ndbm.og spSpolyLoop.og libparse.og  mod_raw.og \
@@ -430,8 +429,8 @@ BPROFOBJ	= /usr/local/lib/bmon.o
 ## 
 
 OBJP1=	grammar.op scanner.op matpol.op binom.op gnumpfl.op mpr_complex.op \
-     febase.op feread.op timer.op intvec.op attrib.op lists.op gnumpc.op \
-     longrat.op longrat0.op misc.op ring.op numbers.op maps.op\
+     febase.op feread.op fehelp.op timer.op intvec.op attrib.op lists.op \
+     gnumpc.op longrat.op longrat0.op misc.op ring.op numbers.op maps.op\
      hilb.op comm.op kstd1.op kstd2.op kutil.op khstd.op kstdfac.op modulop.op \
      spolys.op ideals.op subexpr.op hdegree.op hutil.op ffields.op shortfl.op \
      longalg.op spolys0.op syz.op syz0.op syz1.op weight.op \

@@ -1,9 +1,9 @@
-// $Id: random.lib,v 1.8 1999-07-26 13:03:35 Singular Exp $
+// $Id: random.lib,v 1.9 1999-07-28 17:51:08 Singular Exp $
 //system("random",787422842);
 //(GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: random.lib,v 1.8 1999-07-26 13:03:35 Singular Exp $";
+version="$Id: random.lib,v 1.9 1999-07-28 17:51:08 Singular Exp $";
 info="
 LIBRARY:  random.lib    PROCEDURES OF RANDOM MATRIX AND POLY OPERATIONS
 
@@ -257,9 +257,13 @@ RETURN:  ideal = maxideal(1), but the last variable is exchanged by a random
 EXAMPLE: example randomLast; shows an example
 "
 {
-  ideal i = maxideal(1);
-  i[size(i)] = randomid(maxideal(1),1,b)[1];
-  return(i);
+  ideal i=maxideal(1); 
+  int k=size(i);
+  i[k]=0;
+  i=randomid(i,size(i),b);
+  ideal ires=maxideal(1);
+  ires[k]=i[1]+var(k);
+  return(ires);
 }
 example
 { "EXAMPLE:"; echo = 2;
