@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.7 1998-02-27 14:06:12 Singular Exp $ */
+/* $Id: feread.cc,v 1.8 1998-03-16 19:07:50 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -673,7 +673,8 @@ void fe_set_input_mode(void)
 
 void fe_reset_input_mode (void)
 {
-    /* try to read a history */
+  /* try to read a history */
+  if(!feBatch && !fe_use_fgets)
     write_history (".singular_hist");
 }
 
