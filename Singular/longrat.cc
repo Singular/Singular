@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.26 2000-03-22 16:33:45 Singular Exp $ */
+/* $Id: longrat.cc,v 1.27 2000-03-22 16:34:41 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -2054,7 +2054,7 @@ void nlNormalize (number &x)
   if ((SR_HDL(x) & SR_INT) ||(x==NULL))
     return;
 #ifdef LDEBUG
-  nlTest(x);
+  if (!nlTest(x)) return;
 #endif
   if (x->s==3)
   {
