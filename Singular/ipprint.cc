@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipprint.cc,v 1.7 1998-10-21 10:25:35 krueger Exp $ */
+/* $Id: ipprint.cc,v 1.8 1998-11-16 08:41:17 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: printing
 */
@@ -24,6 +24,7 @@
 BOOLEAN jjPRINT_GEN(leftv res, leftv u)
 {
   char *s=u->String();
+  if (s==NULL) return TRUE;
   PrintS(s);
   PrintLn();
   FreeL((ADDRESS)s);

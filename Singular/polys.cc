@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.33 1998-11-04 15:55:34 obachman Exp $ */
+/* $Id: polys.cc,v 1.34 1998-11-16 08:41:20 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -1438,21 +1438,23 @@ poly pMultT(poly a, poly exp )
     }
   }
   pMultT_nok=0;
-#ifdef DRING
-   if (pDRING)
-   {
-     pDelete(&aa);
-     return pDRINGres;
-   }
+#ifdef SDRING
+  if (
+  #ifdef DRING
+  pDRING ||
+  #endif
+  #ifdef SRING
+  pSRING ||
+  #endif
+  0 )
+  {
+    pDelete(&aa);
+    pTest(pDRINGres);
+    return pDRINGres;
+  }
 #endif
-#ifdef SRING
-   if (pSRING)
-   {
-     pDelete(&aa);
-     return pDRINGres;
-   }
-#endif
-   return aa; /*TRUE*/
+  pTest(aa);
+  return aa; /*TRUE*/
 }
 
 /*2
@@ -1484,6 +1486,7 @@ poly pMult(poly p1, poly p2)
       pDelete(&p2);
       return NULL;
     }
+    pTest(res);
     pDelete1(&p2);
     r = res;
     if (r!=NULL) rn = pNext(r);
@@ -1500,6 +1503,7 @@ poly pMult(poly p1, poly p2)
         a = pCopy(p1);
       }
       a=pMultT(a, p2); //sets pMultT_nok
+      pTest(a);
       if (pMultT_nok)
       {
         if (cont) pDelete(&p1);
@@ -1517,6 +1521,7 @@ poly pMult(poly p1, poly p2)
       else         res=r=a;
       pDelete1(&p2);
     }
+    pTest(res);
     return res;
   }
   pDelete(&p1);

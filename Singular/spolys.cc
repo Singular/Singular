@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: spolys.cc,v 1.16 1998-10-15 11:46:07 obachman Exp $ */
+/* $Id: spolys.cc,v 1.17 1998-11-16 08:41:22 Singular Exp $ */
 
 /*
 * ABSTRACT - s-polynomials and reduction for char p
@@ -664,6 +664,7 @@ poly spDSpolyRed(poly p1,poly p2,poly spNoether, spSpolyLoopProc dummy)
 
   int i;
 
+  pTest(p1);
   for (i=1;i<=pVariables;i++)
   {
     pSetExp(m,i,pGetExp(p2,i)-pGetExp(p1,i));
@@ -687,7 +688,9 @@ poly spDSpolyRed(poly p1,poly p2,poly spNoether, spSpolyLoopProc dummy)
   }
 #endif
   pSetm(m);
+  pTest(p1);
   tp1=pMult(m,pCopy(p1));
+  pTest(tp1);
   if (tp1!=NULL)
   {
     n2=nCopy(pGetCoeff(p2));

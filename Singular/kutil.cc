@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.30 1998-10-15 11:45:57 obachman Exp $ */
+/* $Id: kutil.cc,v 1.31 1998-11-16 08:41:18 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -3709,6 +3709,18 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
   }
   else
   {
+    #ifdef SDRING
+    if (
+    #ifdef SRING
+        pSRING ||
+    #endif
+    #ifdef DRING
+        pDRING ||
+    #endif
+        0)
+         /*Shdl=*/initS(F, Q,strat); /*sets also S, ecartS, fromQ */
+    else
+    #endif	
     /*Shdl=*/initSL(F, Q,strat); /*sets also S, ecartS, fromQ */
     // /*Shdl=*/initS(F, Q,strat); /*sets also S, ecartS, fromQ */
   }

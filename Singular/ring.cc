@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.38 1998-11-09 14:16:09 Singular Exp $ */
+/* $Id: ring.cc,v 1.39 1998-11-16 08:41:21 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -655,6 +655,7 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
   }
 
   memcpy(IDRING(tmp),&tmpR,sizeof(tmpR));
+  if (isDRing) setFlag(tmp,FLAG_DRING);
   rSetHdl(tmp,TRUE);
 
 #ifdef RDEBUG
