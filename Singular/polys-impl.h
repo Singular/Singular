@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.44 2000-02-02 14:27:01 Singular Exp $ */
+/* $Id: polys-impl.h,v 1.45 2000-02-02 18:04:18 Singular Exp $ */
 
 /***************************************************************
  *
@@ -15,6 +15,7 @@
  * encapsulations in polys.h should be used, instead.
  *
  ***************************************************************/
+#include "tok.h"
 #include "structs.h"
 #include "mmemory.h"
 
@@ -156,12 +157,19 @@ extern Exponent_t pDBRingSetComp(ring r, poly p, Exponent_t k, char* f, int l);
 #else
 inline Exponent_t pSGetExp(poly p, int v, ring r)
 {
+  assume(v>0);
+  assume(v<=r->N);
   return (p->exp.l[(r->VarOffset[v] & 0xffffff)] >> (r->VarOffset[v] >> 24))
           & r->bitmask;
 }
 
 inline Exponent_t pSSetExp(poly p, int v, int e, ring r)
 {
+  assume(e>=0);
+  assume(v>0);
+  assume(v<=r->N);
+  assume(e<=((int)r->bitmask));
+
   // shift e to the left:
   register int shift = r->VarOffset[v] >> 24;
   unsigned long ee = ((unsigned long)e) << shift /*(r->VarOffset[v] >> 24)*/;
@@ -176,6 +184,9 @@ inline Exponent_t pSSetExp(poly p, int v, int e, ring r)
 
 inline Exponent_t pSIncrExp(poly p, int v, ring r)
 {
+  assume(v>0);
+  assume(v<=r->N);
+
   Exponent_t e=pSGetExp(p,v,r);
   e++;
   return pSSetExp(p,v,e,r);
@@ -183,6 +194,9 @@ inline Exponent_t pSIncrExp(poly p, int v, ring r)
 
 inline Exponent_t pSDecrExp(poly p, int v, ring r)
 {
+  assume(v>0);
+  assume(v<=r->N);
+
   Exponent_t e=pSGetExp(p,v,r);
   e--;
   return pSSetExp(p,v,e,r);
@@ -190,6 +204,9 @@ inline Exponent_t pSDecrExp(poly p, int v, ring r)
 
 inline Exponent_t pSAddExp(poly p, int v, Exponent_t e, ring r)
 {
+  assume(v>0);
+  assume(v<=r->N);
+
   Exponent_t ee=pSGetExp(p,v,r);
   ee+=e;
   return pSSetExp(p,v,ee,r);
@@ -197,6 +214,9 @@ inline Exponent_t pSAddExp(poly p, int v, Exponent_t e, ring r)
 
 inline Exponent_t pSSubExp(poly p, int v, Exponent_t e, ring r)
 {
+  assume(v>0);
+  assume(v<=r->N);
+
   Exponent_t ee=pSGetExp(p,v,r);
   ee-=e;
   return pSSetExp(p,v,ee,r);
@@ -204,6 +224,9 @@ inline Exponent_t pSSubExp(poly p, int v, Exponent_t e, ring r)
 
 inline Exponent_t pSMultExp(poly p, int v, Exponent_t e, ring r)
 {
+  assume(v>0);
+  assume(v<=r->N);
+
   Exponent_t ee=pSGetExp(p,v,r);
   ee*=e;
   return pSSetExp(p,v,ee,r);

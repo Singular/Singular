@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.31 1999-11-15 17:20:42 obachman Exp $ */
+/* $Id: polys1.cc,v 1.32 2000-02-02 18:04:06 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -31,7 +31,7 @@
 /*2
 *test if the monomial is a constant
 */
-BOOLEAN   pIsConstant(poly p)
+BOOLEAN   pIsConstant(const poly p)
 {
   if (p!=NULL)
   {
@@ -48,11 +48,11 @@ BOOLEAN   pIsConstant(poly p)
 /*2
 *test if the monomial is a constant as a vector component
 */
-BOOLEAN   pIsConstantComp(poly p)
+BOOLEAN   pIsConstantComp(const poly p)
 {
   int i;
 
-  for (i=pVariables;i>0;i--)
+  for (i=pVariables;i;i--)
   {
     if (pGetExp(p,i)!=0) return FALSE;
   }
@@ -62,12 +62,11 @@ BOOLEAN   pIsConstantComp(poly p)
 /*2
 *test if a monomial /head term is a pure power
 */
-int pIsPurePower(poly p)
+int pIsPurePower(const poly p)
 {
-  pTest(p);
   int i,k=0;
 
-  for (i=pVariables;i>0;i--)
+  for (i=pVariables;i;i--)
   {
     if (pGetExp(p,i)!=0)
     {
