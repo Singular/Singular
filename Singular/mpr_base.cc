@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.3 1999-06-29 09:03:43 wenk Exp $ */
+/* $Id: mpr_base.cc,v 1.4 1999-06-29 16:57:46 hannes Exp $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -1457,11 +1457,12 @@ void resMatrixSparse::randomVector( const int dim, mprfloat shift[] )
   i= 1;
   time_t *tp = NULL;
 
-  srand((long)(((int)time(tp) % MAXSEED)+MAXSEED*18));
+  //srand((long)(((int)time(tp) % MAXSEED)+MAXSEED*18));
 
   while ( i <= dim )
   {
-    shift[i]= (mprfloat) (RVMULT*rand()/(RAND_MAX+1.0));
+    //shift[i]= (mprfloat) (RVMULT*rand()/(RAND_MAX+1.0));
+    shift[i]= (mprfloat) (RVMULT*siRand()/(INT_MAX+1.0));
     i++;
     for ( j= 1; j < i-1; j++ )
     {
@@ -2932,7 +2933,8 @@ rootContainer ** uResultant::interpolateDenseSP( BOOLEAN matchUp, const number s
         }
         else if ( i <= uvar + 2 )
         {
-          pevpoint[i]=nInit(IsPrime(1+(int) (MAXEVPOINT*rand()/(RAND_MAX+1.0))));
+//          pevpoint[i]=nInit(IsPrime(1+(int) (MAXEVPOINT*rand()/(RAND_MAX+1.0))));
+          pevpoint[i]=nInit(IsPrime(1+(int) (MAXEVPOINT*siRand()/(INT_MAX+1.0))));
           //pevpoint[i]=nInit(383);
         }
         else
@@ -3052,7 +3054,7 @@ rootContainer ** uResultant::specializeInU( BOOLEAN matchUp, const number subDet
         nDelete( &pevpoint[i] );
         if ( i <= uvar + 2 )
         {
-          pevpoint[i]=nInit(IsPrime(1+(int) (MAXEVPOINT*rand()/(RAND_MAX+1.0))));
+          pevpoint[i]=nInit(IsPrime(1+(int) (MAXEVPOINT*siRand()/(INT_MAX+1.0))));
           //pevpoint[i]=nInit(383);
         } else pevpoint[i]=nInit(0);
         mprPROTNnl(" ",pevpoint[i]);
