@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_defs.h,v 1.6 1997-07-30 07:59:21 schmidt Exp $ */
+/* $Id: cf_defs.h,v 1.7 2002-03-08 10:31:46 Singular Exp $ */
 
 #ifndef INCL_CF_DEFS_H
 #define INCL_CF_DEFS_H
@@ -34,6 +34,7 @@ const int SW_FAC_USE_BIG_PRIMES = 4;
 const int SW_FAC_QUADRATICLIFT = 5;
 const int SW_USE_EZGCD = 6;
 const int SW_USE_SPARSEMOD = 7;
+const int SW_USE_NTL=8;
 //}}}
 
 /*ENDPUBLIC*/

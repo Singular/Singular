@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_char.cc,v 1.6 1997-06-19 12:27:27 schmidt Exp $ */
+/* $Id: cf_char.cc,v 1.7 2002-03-08 10:31:45 Singular Exp $ */
 
 #include <config.h>
 
@@ -60,6 +60,12 @@ int getCharacteristic()
 {
     return theCharacteristic;
 }
+
+int getExp()
+{
+  return InternalPrimePower::getk();
+}
+
 
 int getGFDegree()
 {
