@@ -7,7 +7,7 @@
  *  Author:  obachman (Olaf Bachmann), hannes (Hannes Schoenemann),
  *           bricken (Michael Brickenstein) 
  *  Created: 01/02
- *  Version: $Id: fast_maps.h,v 1.12 2002-01-19 14:48:15 obachman Exp $
+ *  Version: $Id: fast_maps.h,v 1.13 2002-01-19 15:48:46 obachman Exp $
  *******************************************************************/
 
 /*******************************************************************************
@@ -96,7 +96,11 @@ void maMap_CreateRings(ideal map_id, ring map_r,
                        ideal image_id, ring image_r, 
                        ring &src_r, ring &dest_r);
 
+// collects tthe results into an ideal and destroys maideal
 ideal maIdeal_2_Ideal(maideal ideal, ring dest_r);
+
+ideal fast_map(ideal map_id, ring map_r, ideal image_id, ring image_r);
+
 #endif
 
 

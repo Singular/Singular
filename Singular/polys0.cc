@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys0.cc,v 1.20 2002-01-19 14:48:18 obachman Exp $ */
+/* $Id: polys0.cc,v 1.21 2002-01-19 15:48:46 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to convert polynomials to strings
@@ -20,7 +20,7 @@
 * writes a monomial (p),
 * uses form x*gen(.) if ko != coloumn number of p
 */
-void writemon(poly p, int ko, ring r)
+static void writemon(poly p, int ko, ring r)
 {
   BOOLEAN wroteCoef=FALSE,writeGen=FALSE;
 

@@ -6,7 +6,7 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id: fast_maps.cc,v 1.13 2002-01-19 14:48:15 obachman Exp $
+ *  Version: $Id: fast_maps.cc,v 1.14 2002-01-19 15:48:45 obachman Exp $
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>
@@ -240,6 +240,19 @@ ideal maIdeal_2_Ideal(maideal m_id, ring dest_r)
   }
   omFree(m_id);
   return res;
+}
+
+
+ideal fast_map(ideal map_id, ring map_r, ideal image_id, ring image_r)
+{
+  ring src_r, dest_r;
+  maMap_CreateRings(map_id, map_r, image_id, image_r, src_r, dest_r);
+  
+  mapoly mp;
+  maideal mideal;
+  maMap_CreatePolyIdeal(map_id, map_r, src_r, dest_r, mp, mideal);
+
+  return maIdeal_2_Ideal(mideal, dest_r);
 }
 
 #if 0
