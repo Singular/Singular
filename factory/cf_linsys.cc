@@ -1,8 +1,12 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_linsys.cc,v 1.1 1996-07-08 08:22:51 stobbe Exp $
+// $Id: cf_linsys.cc,v 1.2 1996-07-15 08:33:18 stobbe Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1996/07/08 08:22:51  stobbe
+"New function determinant.
+"
+
 Revision 1.0  1996/05/17 10:59:44  stobbe
 Initial revision
 
@@ -21,10 +25,11 @@ Initial revision
 static bool solve ( int **extmat, int nrows, int ncols );
 int determinant ( int **extmat, int n );
 
-static CanonicalForm bound ( CanonicalForm ** M, int rows, int cols );
+static CanonicalForm bound ( const CFMatrix & M );
 CanonicalForm detbound ( const CFMatrix & M, int rows );
 
-bool matrix_in_Z( const CFMatrix & M, int rows )
+bool
+matrix_in_Z( const CFMatrix & M, int rows )
 {
     int i, j;
     for ( i = 1; i <= rows; i++ )
@@ -34,7 +39,19 @@ bool matrix_in_Z( const CFMatrix & M, int rows )
     return true;
 }
 
-bool betterpivot ( const CanonicalForm & oldpivot, const CanonicalForm & newpivot )
+bool
+matrix_in_Z( const CFMatrix & M )
+{
+    int i, j, rows = M.rows(), cols = M.columns();
+    for ( i = 1; i <= rows; i++ )
+	for ( j = 1; j <= cols; j++ )
+	    if ( ! M(i,j).inZ() )
+		return false;
+    return true;
+}
+
+bool
+betterpivot ( const CanonicalForm & oldpivot, const CanonicalForm & newpivot )
 {
     if ( newpivot.isZero() )
 	return false;
@@ -50,87 +67,120 @@ bool betterpivot ( const CanonicalForm & oldpivot, const CanonicalForm & newpivo
 
 bool fuzzy_result;
 
-void
-linearSystemSolve( CanonicalForm ** M, int rows, int cols )
+bool
+linearSystemSolve( CFMatrix & M )
 {
-    CanonicalForm ** MM = new (CanonicalForm*)[rows];
-    int ** mm = new (int*)[rows];
-    CanonicalForm Q, Qhalf, mnew, qnew, B;
-    int i, j, p, pno;
-    bool ok;
-
-    // initialize room to hold the result and the result mod p
-    for ( i = 0; i < rows; i++ ) {
-	MM[i] = new CanonicalForm[cols];
-	mm[i] = new int[cols];
+    if ( ! matrix_in_Z( M ) ) {
+	int nrows = M.rows(), ncols = M.columns();
+	int i, j, k;
+	CanonicalForm rowpivot, pivotrecip;
+	// triangularization
+	for ( i = 1; i <= nrows; i++ ) {
+	    //find "pivot"
+	    for (j = i; j <= nrows; j++ )
+		if ( M(j,i) != 0 ) break;
+	    if ( j > nrows ) return false;
+	    if ( j != i )
+		M.swapRow( i, j );
+	    pivotrecip = 1 / M(i,i);
+	    for ( j = 1; j <= ncols; j++ )
+		M(i,j) *= pivotrecip;
+	    for ( j = i+1; j <= nrows; j++ ) {
+		rowpivot = M(j,i);
+		if ( rowpivot == 0 ) continue;
+		for ( k = i; k <= ncols; k++ )
+		    M(j,k) -= M(i,k) * rowpivot;
+	    }
+	}
+	// matrix is now upper triangular with 1s down the diagonal
+	// back-substitute
+	for ( i = nrows-1; i > 0; i-- ) {
+	    for ( j = nrows+1; j <= ncols; j++ ) {
+		for ( k = i+1; k <= nrows; k++ )
+		    M(i,j) -= M(k,j) * M(i,k);
+	    }
+	}
+	return true;
     }
+    else {
+	int rows = M.rows(), cols = M.columns();
+	CFMatrix MM( rows, cols );
+	int ** mm = new (int*)[rows];
+	CanonicalForm Q, Qhalf, mnew, qnew, B;
+	int i, j, p, pno;
+	bool ok;
 
-    // calculate the bound for the result
-    B = bound( M, rows, cols );
-    cout << "bound = " << B << endl;
+	// initialize room to hold the result and the result mod p
+	for ( i = 0; i < rows; i++ ) {
+	    mm[i] = new int[cols];
+	}
 
-    // find a first solution mod p
-    pno = 0;
-    do {
-	cout << "trying prime(" << pno << ") = " << flush;
-	p = cf_getBigPrime( pno );
-	cout << p << endl;
-	setCharacteristic( p );
-	// map matrix into char p
-	for ( i = 0; i < rows; i++ )
-	    for ( j = 0; j < cols; j++ )
-		mm[i][j] = mapinto( M[i][j] ).intval();
-	// solve mod p
-	ok = solve( mm, rows, cols );
-	pno++;
-    } while ( ! ok );
-    // initialize the result matrix with first solution
-    setCharacteristic( 0 );
-    for ( i = 0; i < rows; i++ )
-	for ( j = rows; j < cols; j++ )
-	    MM[i][j] = mm[i][j];
-    // Q so far
-    Q = p;
-    while ( Q < B && pno < cf_getNumBigPrimes() ) {
+	// calculate the bound for the result
+	B = bound( M );
+	DEBOUTLN( cerr, "bound = ",  B );
+
+	// find a first solution mod p
+	pno = 0;
 	do {
-	    cout << "trying prime(" << pno << ") = " << flush;
+	    DEBOUT( cerr, "trying prime(", pno ); DEBOUTLN( cerr, ") = ", ' ' );
 	    p = cf_getBigPrime( pno );
 	    cout << p << endl;
 	    setCharacteristic( p );
+	    // map matrix into char p
 	    for ( i = 0; i < rows; i++ )
 		for ( j = 0; j < cols; j++ )
-		    mm[i][j] = mapinto( M[i][j] ).intval();
+		    mm[i][j] = mapinto( M(i,j) ).intval();
 	    // solve mod p
 	    ok = solve( mm, rows, cols );
 	    pno++;
 	} while ( ! ok );
-	// found a solution mod p
-	// now chinese remainder it to a solution mod Q*p
+	// initialize the result matrix with first solution
 	setCharacteristic( 0 );
 	for ( i = 0; i < rows; i++ )
-	    for ( j = rows; j < cols; j++ ) {
-		chineseRemainder( MM[i][j], Q, CanonicalForm(mm[i][j]), CanonicalForm(p), mnew, qnew );
-		MM[i][j] = mnew;
-	    }
-	Q = qnew;
+	    for ( j = rows; j < cols; j++ )
+		MM(i,j) = mm[i][j];
+	// Q so far
+	Q = p;
+	while ( Q < B && pno < cf_getNumBigPrimes() ) {
+	    do {
+		cout << "trying prime(" << pno << ") = " << flush;
+		p = cf_getBigPrime( pno );
+		cout << p << endl;
+		setCharacteristic( p );
+		for ( i = 0; i < rows; i++ )
+		    for ( j = 0; j < cols; j++ )
+			mm[i][j] = mapinto( M(i,j) ).intval();
+		// solve mod p
+		ok = solve( mm, rows, cols );
+		pno++;
+	    } while ( ! ok );
+	    // found a solution mod p
+	    // now chinese remainder it to a solution mod Q*p
+	    setCharacteristic( 0 );
+	    for ( i = 0; i < rows; i++ )
+		for ( j = rows; j < cols; j++ ) {
+		    chineseRemainder( MM[i][j], Q, CanonicalForm(mm[i][j]), CanonicalForm(p), mnew, qnew );
+		    MM(i,j) = mnew;
+		}
+	    Q = qnew;
+	}
+	if ( pno == cf_getNumBigPrimes() )
+	    fuzzy_result = true;
+	else
+	    fuzzy_result = false;
+	// store the result in M
+	Qhalf = Q / 2;
+	for ( i = 0; i < rows; i++ ) {
+	    for ( j = rows; j < cols; j++ )
+		if ( MM(i,j) > Qhalf )
+		    M(i,j) = MM(i,j) - Q;
+		else
+		    M(i,j) = MM(i,j);
+	    delete [] mm[i];
+	}
+	delete [] mm;
+	return ! fuzzy_result;
     }
-    if ( pno == cf_getNumBigPrimes() )
-	fuzzy_result = true;
-    else
-	fuzzy_result = false;
-    // store the result in M
-    Qhalf = Q / 2;
-    for ( i = 0; i < rows; i++ ) {
-	for ( j = rows; j < cols; j++ )
-	    if ( MM[i][j] > Qhalf )
-		M[i][j] = MM[i][j] - Q;
-	    else
-		M[i][j] = MM[i][j];
-	delete [] MM[i];
-	delete [] mm[i];
-    }
-    delete [] MM;
-    delete [] mm;
 }
 
 CanonicalForm
@@ -256,18 +306,19 @@ determinant( const CFMatrix & M, int rows )
 }
 
 static CanonicalForm
-bound ( CanonicalForm ** M, int rows, int cols )
+bound ( const CFMatrix & M )
 {
+    int rows = M.rows(), cols = M.columns();
     CanonicalForm sum = 0;
     int i, j;
     for ( i = 0; i < rows; i++ )
 	for ( j = 0; j < rows; j++ )
-	    sum += M[i][j] * M[i][j];
+	    sum += M(i,j) * M(i,j);
     CanonicalForm vmax = 0, vsum;
     for ( j = rows; j < cols; j++ ) {
 	vsum = 0;
 	for ( i = 0; i < rows; i++ )
-	    vsum += M[i][j] * M[i][j];
+	    vsum += M(i,j) * M(i,j);
 	if ( vsum > vmax ) vmax = vsum;
     }
     sum += vmax;
