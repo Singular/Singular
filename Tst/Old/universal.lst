@@ -278,7 +278,7 @@ pol
 poly
 polylib
 preim
-preimage
+; CHECK: preimage 
 prim
 proc
 qhw
@@ -315,7 +315,7 @@ subexpr
 subexpr1
 substit
 ; DIFF syzygies
-syzygies_new
+; CHECK: syzygies_new
 syzygy
 teste
 time

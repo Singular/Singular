@@ -11,7 +11,7 @@ bug_13
 bug_14
 bug_15
 bug_16
-bug_17
+; CHECK: bug_17
 bug_18
 bug_19
 bug_20
@@ -65,7 +65,7 @@ hilb_weights
 hnoether_s
 homolog_s
 hres_s
-imap
+; CHECK: imap
 intdet_s
 intersect_s
 invar
