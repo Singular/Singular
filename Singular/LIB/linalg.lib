@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.17 2001-08-09 08:39:10 mschulze Exp $";
+version="$Id: linalg.lib,v 1.18 2001-08-25 10:51:07 mschulze Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib        Algorithmic Linear Algebra
@@ -1380,8 +1380,8 @@ static proc sortval(list l)
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc eigenval(matrix M)
-"USAGE:   eigenval(M); matrix M
+proc eigenvalues(matrix M)
+"USAGE:   eigenvalues(M); matrix M
 ASSUME:  M constant square matrix, eigenvalues of M in coefficient field
 RETURN:
 @format
@@ -1441,7 +1441,7 @@ example
   ring R=0,x,dp;
   matrix M[3][3]=3,2,1,0,2,1,0,0,3;
   print(M);
-  eigenval(M);
+  eigenvalues(M);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1469,7 +1469,7 @@ EXAMPLE: example jordan; shows examples
 
   M=jet(M,0);
 
-  list l=eigenval(M);
+  list l=eigenvalues(M);
   def e0,m0=l[1..2];
   kill l;
 
@@ -1557,7 +1557,7 @@ EXAMPLE: example jordanbasis; shows examples
 
   M=jet(M,0);
 
-  list l=eigenval(M);
+  list l=eigenvalues(M);
   def e,m=l[1..2];
   kill l;
 
