@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.97 2003-02-26 15:40:24 levandov Exp $ */
+/* $Id: febase.cc,v 1.98 2003-04-24 16:55:53 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -21,6 +21,10 @@
 #endif
 #ifdef NeXT
 #include <sys/file.h>
+#endif
+#ifdef ix86_Linux_libc5
+#undef stdin
+extern FILE *stdin;
 #endif
 
 #ifdef HAVE_PWD_H

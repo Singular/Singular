@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.53 2002-11-26 13:34:21 Singular Exp $ */
+/* $Id: febase.h,v 1.54 2003-04-24 16:55:53 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -12,7 +12,7 @@
 #include "structs.h"
 
 /* define DIR_SEPP, etc */
-#ifdef macintosh
+#ifdef macintosh /* mac os 9 */
 #  define  DIR_SEP ':'
 #  define  DIR_SEPP ":"
 #  define  UP_DIR ""
@@ -277,7 +277,7 @@ extern  char * (*fe_fgets_stdin)(char *pr,char *s, int size);
 char * fe_fgets_stdin_drl(char *pr,char *s, int size);
 #endif
 
-void fe_reset_input_mode();
+extern "C" void fe_reset_input_mode();
 
 #ifndef MSDOS
 extern "C" {
@@ -291,7 +291,10 @@ void fe_reset_fe (void);
 
 
 /* possible implementations: */
-
+#ifdef __cplusplus
+extern "C"
+{
+#endif
   /* readline, linked in: */
   char * fe_fgets_stdin_rl(char *pr,char *s, int size);
 
@@ -309,6 +312,9 @@ void fe_reset_fe (void);
   /* dummy (for batch mode): */
   char * fe_fgets_dummy(char *pr,char *s, int size);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* c++ only */
 
 /* everything in between calls to these procedures is printed into a string
