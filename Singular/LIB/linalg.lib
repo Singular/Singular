@@ -1,6 +1,6 @@
 //GMG last modified: 04/25/2000
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: linalg.lib,v 1.12 2001-05-23 16:56:29 mschulze Exp $";
+version="$Id: linalg.lib,v 1.13 2001-05-30 18:07:52 mschulze Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib        Algorithmic Linear Algebra
@@ -1425,7 +1425,7 @@ EXAMPLE: example eigenval; shows examples
       f=factorize(det(submat(M,v,v)-var(1)));
       for(i=size(f[1]);i>=1;i--)
       {
-        e=number(f[1][i]/var(1));
+        e=number(jet(f[1][i]/var(1),0));
         if(e!=0)
 	{
           l=addval(l,(e*var(1)-f[1][i])/e,f[2][i]);
