@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.76 1998-11-19 14:04:31 krueger Exp $ */
+/* $Id: extra.cc,v 1.77 1998-11-19 15:17:57 krueger Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -65,10 +65,6 @@
 #include "silink.h"
 #include "mpsr.h"
 #include "MPT_GP.h"
-
-#ifdef HAVE_DYNAMIC_LOADING
-#include <dlfcn.h>
-#endif /* HAVE_DYNAMIC_LOADING */
 
 /*
  *   New function/system-calls that will be included as dynamic module
