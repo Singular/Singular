@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.95 2001-10-23 14:04:21 Singular Exp $ */
+/* $Id: grammar.y,v 1.96 2002-01-10 12:33:19 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -1463,7 +1463,7 @@ setringcmd:
                           {
                             if (BVERBOSE(V_REDEFINE))
                               Warn("redefining %s",IDID(p));
-                            killhdl2(old,&root);
+                            killhdl2(old,&root,IDRING(h));
                           }
                           IDLEV(p)=prevlev;
                         }

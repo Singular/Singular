@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.70 2002-01-07 17:19:01 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.71 2002-01-10 12:33:20 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -243,7 +243,7 @@ static void killlocals0(int v, idhdl * localhdl)
       else if (vv >= v)
       {
         idhdl nexth = IDNEXT(h);
-        killhdl2(h,localhdl);
+        killhdl2(h,localhdl,currRing);
         h = nexth;
         //PrintS("kill\n");
       }
@@ -340,7 +340,7 @@ void killlocals(int v)
 }
 #endif
 #ifdef HAVE_NS
-void killlocals_rec(idhdl *root,int v)
+void killlocals_rec(idhdl *root,int v, ring r)
 {
   idhdl h=*root;
   while (h!=NULL)
@@ -349,14 +349,14 @@ void killlocals_rec(idhdl *root,int v)
     {
 //      Print("kill %s, lev %d for lev %d\n",IDID(h),IDLEV(h),v);
       idhdl n=IDNEXT(h);
-      killhdl2(h,root);
+      killhdl2(h,root,r);
       h=n;
     }
     else if (IDTYP(h)==PACKAGE_CMD)
     {
  //     Print("into pack %s, lev %d for lev %d\n",IDID(h),IDLEV(h),v);
       if (IDPACKAGE(h)!=basePack)
-        killlocals_rec(&(IDRING(h)->idroot),v);
+        killlocals_rec(&(IDRING(h)->idroot),v,r);
       h=IDNEXT(h);
     }
     else if ((IDTYP(h)==RING_CMD)
@@ -365,17 +365,7 @@ void killlocals_rec(idhdl *root,int v)
       if (IDRING(h)->idroot!=NULL)
       {
   //    Print("into ring %s, lev %d for lev %d\n",IDID(h),IDLEV(h),v);
-        if (currRing!=IDRING(h))
-        {
-          ring sr=currRing;
-          rChangeCurrRing(IDRING(h)); 
-          killlocals_rec(&(IDRING(h)->idroot),v);
-          rChangeCurrRing(sr);
-        }
-        else
-        {
-          killlocals_rec(&(IDRING(h)->idroot),v);
-        }
+        killlocals_rec(&(IDRING(h)->idroot),v,IDRING(h));
       }
       h=IDNEXT(h);
     }
@@ -392,9 +382,8 @@ void killlocals(int v)
   idhdl sh=currRingHdl;
   if (sh!=NULL) changed=((IDLEV(sh)<v) || (IDRING(sh)->ref>0));
   //if (changed) Print("currRing=%s(%x), lev=%d,ref=%d\n",IDID(sh),IDRING(sh),IDLEV(sh),IDRING(sh)->ref);
-  ring sr=currRing;
 
-  killlocals_rec(&(basePack->idroot),v);
+  killlocals_rec(&(basePack->idroot),v,currRing);
 
   if ((iiRETURNEXPR_len > myynest)
   && ((iiRETURNEXPR[myynest].Typ()==RING_CMD)
@@ -406,14 +395,7 @@ void killlocals(int v)
 
   if (changed)
   {
-    currRing=NULL;
-    currRingHdl=NULL;
-    if (sr!=NULL)
-    {
-      sh=rFindHdl(sr,NULL,NULL);
-      //if (sh==NULL) { Print("could not find ring %x\n",sr); listall(); }
-      if (sh!=NULL) rSetHdl(sh);
-    }
+    currRingHdl=rFindHdl(currRing,NULL,NULL);
   }
 
   if (myynest<=1) iiNoKeepRing=TRUE;
@@ -1067,7 +1049,7 @@ static BOOLEAN iiInternalExport (leftv v, int toLev)
               p->currRingHdl=NULL;
             }
 #endif
-        killhdl2(h,root);
+        killhdl2(h,root,currRing);
       }
       else
       {
@@ -1249,7 +1231,7 @@ BOOLEAN iiExport (leftv v, int toLev, idhdl root)
           {
             Warn("redefining %s",IDID(old));
           }
-          killhdl2(old,&root);
+          killhdl2(old,&root,currRing);
         }
         else
         {
@@ -1294,7 +1276,7 @@ BOOLEAN iiExport (leftv v, int toLev, idhdl root)
           {
             Warn("redefining %s",IDID(old));
           }
-          killhdl2(old,&root);
+          killhdl2(old,&root,currRing);
         }
         else
         {

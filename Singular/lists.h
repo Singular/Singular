@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.h,v 1.16 2001-10-09 16:36:08 Singular Exp $ */
+/* $Id: lists.h,v 1.17 2002-01-10 12:33:21 Singular Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -21,7 +21,7 @@
 class slists
 {
   public:
-    void Clean()
+    void Clean(ring r=currRing)
     {
       if (this!=NULL)
       {
@@ -30,7 +30,7 @@ class slists
           int i;
           for(i=nr;i>=0;i--)
           {
-            if (m[i].rtyp!=DEF_CMD) m[i].CleanUp();
+            if (m[i].rtyp!=DEF_CMD) m[i].CleanUp(r);
           }
           omFreeSize((ADDRESS)m, (nr+1)*sizeof(sleftv));
           nr=-1;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.56 2002-01-07 17:20:48 Singular Exp $ */
+/* $Id: ipid.cc,v 1.57 2002-01-10 12:33:20 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -357,7 +357,7 @@ idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
       }
 #endif /* HAVE_NAMESPACES */
       if (s==IDID(h)) IDID(h)=NULL;
-      killhdl2(h,root);
+      killhdl2(h,root,currRing);
     }
     else
       goto errlabel;
@@ -375,7 +375,7 @@ idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
         if (BVERBOSE(V_REDEFINE))
           Warn("redefining %s **",s);
         if (s==IDID(h)) IDID(h)=NULL;
-        killhdl2(h,&IDROOT);
+        killhdl2(h,&IDROOT,NULL);
       }
       else
         goto errlabel;
@@ -403,7 +403,7 @@ idhdl enterid(char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
         if (BVERBOSE(V_REDEFINE))
           Warn("redefining %s **",s);
         IDID(h)=NULL;
-        killhdl2(h,&currRing->idroot);
+        killhdl2(h,&currRing->idroot,currRing);
       }
       else
         goto errlabel;
@@ -440,14 +440,14 @@ void killid(char * id, idhdl * ih)
         h = currRing->idroot->get(id,myynest);
         if (h!=NULL)
         {
-          killhdl2(h,&(currRing->idroot));
+          killhdl2(h,&(currRing->idroot),currRing);
           return;
         }
       }
       Werror("`%s` is not defined",id);
       return;
     }
-    killhdl2(h,ih);
+    killhdl2(h,ih,currRing);
   }
   else
     Werror("kill what ?");
@@ -457,54 +457,52 @@ void killhdl(idhdl h)
 {
   int t=IDTYP(h);
   if ((BEGIN_RING<t) && (t<END_RING) && (t!=QRING_CMD))
-    killhdl2(h,&currRing->idroot);
+    killhdl2(h,&currRing->idroot,currRing);
   else
   {
 #ifdef HAVE_NAMESPACES
     if(t==PACKAGE_CMD)
     {
-      killhdl2(h,&NSROOT(namespaceroot->root));
+      killhdl2(h,&NSROOT(namespaceroot->root),currRing);
     }
     else
 #endif /* HAVE_NAMESPACES */
 #ifdef HAVE_NS
     if(t==PACKAGE_CMD)
     {
-      killhdl2(h,&(basePack->idroot));
+      killhdl2(h,&(basePack->idroot),NULL);
     }
     else
     {
       idhdl s=currPack->idroot;
       while ((s!=h) && (s!=NULL)) s=s->next;
       if (s!=NULL)
-        killhdl2(h,&(currPack->idroot));
+        killhdl2(h,&(currPack->idroot),NULL);
       else if (basePack!=currPack)
       {
         idhdl s=basePack->idroot;
         while ((s!=h) && (s!=NULL)) s=s->next;
         if (s!=NULL)
-          killhdl2(h,&(basePack->idroot));
+          killhdl2(h,&(basePack->idroot),NULL);
         else
-          killhdl2(h,&(currRing->idroot));
+          killhdl2(h,&(currRing->idroot),currRing);
        }
     }
 #else /* HAVE_NS */
     {
       idhdl s=IDROOT;
       while ((s!=h) && (s!=NULL)) s=s->next;
-      if (s==NULL) killhdl2(h,&(currRing->idroot));
-      else killhdl2(h,&IDROOT);
+      if (s==NULL) killhdl2(h,&(currRing->idroot),currRing);
+      else killhdl2(h,&IDROOT,NULL);
     }
 #endif /* HAVE_NAMESPACES */
   }
 }
 
-void killhdl2(idhdl h, idhdl * ih)
+void killhdl2(idhdl h, idhdl * ih, ring r)
 {
   //printf("kill %s, id %x, typ %d lev: %d\n",IDID(h),(int)IDID(h),IDTYP(h),IDLEV(h));
   idhdl hh;
-  BOOLEAN killOtherRing = TRUE;
-  BOOLEAN needResetRing = FALSE;
 
   if (h->attribute!=NULL)
   {
@@ -519,24 +517,15 @@ void killhdl2(idhdl h, idhdl * ih)
   // ring / qring  --------------------------------------------------------
   if ((IDTYP(h) == RING_CMD) || (IDTYP(h) == QRING_CMD))
   {
-    idhdl savecurrRingHdl = currRingHdl;
-    ring  savecurrRing = currRing;
     // any objects defined for this ring ?
-    // Hmm ... why onlyt for rings and not for qrings??
+    // Hmm ... why only for rings and not for qrings??
     // if (((IDTYP(h)==RING_CMD) && (IDRING(h)->ref<=0))
     if ((IDRING(h)->ref<=0)  &&  (IDRING(h)->idroot!=NULL))
     {
       idhdl * hd = &IDRING(h)->idroot;
       idhdl  hdh = IDNEXT(*hd);
       idhdl  temp;
-      killOtherRing=(IDRING(h)!=currRing);
-      if (killOtherRing) //we are not killing the base ring, so switch
-      {
-        needResetRing=TRUE;
-        rSetHdl(h);
-        /* no complete init*/
-      }
-      else
+      if (IDRING(h)==currRing) //we are not killing the base ring, so switch
       {
         // we are killing the basering, so: make sure that
         // sLastPrinted is killed before this ring is destroyed
@@ -549,25 +538,10 @@ void killhdl2(idhdl h, idhdl * ih)
       while (hdh!=NULL)
       {
         temp = IDNEXT(hdh);
-        killhdl2(hdh,&(IDRING(h)->idroot));
+        killhdl2(hdh,&(IDRING(h)->idroot),IDRING(h));
         hdh = temp;
       }
-      killhdl2(*hd,hd);
-    }
-    // reset currRing ?
-    if (needResetRing) // && (killOtherRing)
-    {
-      //we have to switch back to the base ring
-      //currRing = savecurrRing;
-      //currRingHdl = savecurrRingHdl;
-      if (savecurrRingHdl!=NULL)
-      {
-        rSetHdl(savecurrRingHdl);
-      }
-      else if (savecurrRing!=NULL)
-      {
-        rChangeCurrRing(savecurrRing);
-      }
+      killhdl2(*hd,hd,IDRING(h));
     }
     rKill(h);
   }
@@ -615,10 +589,10 @@ void killhdl2(idhdl h, idhdl * ih)
       while (hdh!=NULL)
       {
         temp = IDNEXT(hdh);
-        killhdl2(hdh,&(IDPACKAGE(h)->idroot));
+        killhdl2(hdh,&(IDPACKAGE(h)->idroot),NULL);
         hdh = temp;
       }
-      killhdl2(*hd,hd);
+      killhdl2(*hd,hd,NULL);
     }
     paKill(IDPACKAGE(h));
     if (currPackHdl==h) currPackHdl=packFindHdl(currPack);
@@ -627,7 +601,8 @@ void killhdl2(idhdl h, idhdl * ih)
   // poly / vector -------------------------------------------------------
   else if ((IDTYP(h) == POLY_CMD) || (IDTYP(h) == VECTOR_CMD))
   {
-    pDelete(&IDPOLY(h));
+    assume(r!=NULL);
+    p_Delete(&IDPOLY(h),r);
   }
   // ideal / module/ matrix / map ----------------------------------------
   else if ((IDTYP(h) == IDEAL_CMD)
@@ -635,13 +610,14 @@ void killhdl2(idhdl h, idhdl * ih)
            || (IDTYP(h) == MATRIX_CMD)
            || (IDTYP(h) == MAP_CMD))
   {
+    assume(r!=NULL);
     ideal iid = IDIDEAL(h);
     if (IDTYP(h) == MAP_CMD)
     {
       map im = IDMAP(h);
       omFree((ADDRESS)im->preimage);
     }
-    idDelete(&iid);
+    id_Delete(&iid,r);
   }
   // string -------------------------------------------------------------
   else if (IDTYP(h) == STRING_CMD)
@@ -657,7 +633,8 @@ void killhdl2(idhdl h, idhdl * ih)
   // number -------------------------------------------------------------
   else if (IDTYP(h) == NUMBER_CMD)
   {
-    nDelete(&IDNUMBER(h));
+    assume(r!=NULL);
+    n_Delete(&IDNUMBER(h),r);
   }
   // intvec / intmat  ---------------------------------------------------
   else if ((IDTYP(h) == INTVEC_CMD)||(IDTYP(h) == INTMAT_CMD))
@@ -667,7 +644,7 @@ void killhdl2(idhdl h, idhdl * ih)
   // list  -------------------------------------------------------------
   else if (IDTYP(h)==LIST_CMD)
   {
-    IDLIST(h)->Clean();
+    IDLIST(h)->Clean(r);
     //omFreeSize((ADDRESS)IDLIST(h)->m, (IDLIST(h)->nr+1)*sizeof(sleftv));
     //omFreeBin((ADDRESS)IDLIST(h),  slists_bin);
   }
@@ -678,8 +655,9 @@ void killhdl2(idhdl h, idhdl * ih)
   }
   else if(IDTYP(h)==RESOLUTION_CMD)
   {
+    assume(r!=NULL);
     if (IDDATA(h)!=NULL)
-      syKillComputation((syStrategy)IDDATA(h));
+      syKillComputation((syStrategy)IDDATA(h),r);
   }
 #ifdef TEST
   else if ((IDTYP(h)!= INT_CMD)&&(IDTYP(h)!=DEF_CMD) && (IDTYP(h)!=NONE))

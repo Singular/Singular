@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.h,v 1.28 2000-10-30 13:40:28 obachman Exp $ */
+/* $Id: syz.h,v 1.29 2002-01-10 12:33:24 Singular Exp $ */
 /*
 * ABSTRACT: Resolutions
 */
@@ -94,7 +94,7 @@ syStrategy syHilb(ideal arg,int * length);
 syStrategy syKosz(ideal arg,int * length);
 
 void syDeleteRes(resolvente * res,int length);
-void syKillComputation(syStrategy syzstr);
+void syKillComputation(syStrategy syzstr, ring r=currRing);
 intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim=TRUE,int * row_shift=NULL);
 BOOLEAN syBetti1(leftv res, leftv u);
 BOOLEAN syBetti2(leftv res, leftv u, leftv w);

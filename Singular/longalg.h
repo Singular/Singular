@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.27 2001-03-22 19:11:06 Singular Exp $ */
+/* $Id: longalg.h,v 1.28 2002-01-10 12:33:22 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -93,6 +93,7 @@ void    naSetIdeal(ideal I);
 #define RECA_SIZE (sizeof(napoly)+sizeof(number))
 napoly napAdd(napoly p1, napoly p2);
 void napDelete(napoly *p);
+void nap_Delete(napoly *p, ring r);
 #endif /* not LONGALGNEW */
 poly naPermNumber(number z, int * par_perm, int P, ring r);
 #ifndef LONGALGNEW
@@ -119,6 +120,7 @@ poly naPermNumber(number z, int * par_perm, int P, ring r);
 #define napGetExpFrom(p,i,r)   (p_GetExp(p,i,r->algring))
 #define napSetExp(p,i,e)       (p_SetExp(p,i,e,currRing->algring))
 #define napDelete(p)           p_Delete(p, currRing->algring)
+#define nap_Delete(p,r)        p_Delete(p, (r)->algring)
 #define napNew()               (p_Init(currRing->algring))
 #define napAdd(p1,p2)          (p_Add_q(p1,p2,currRing->algring))
 #define nanumber               lnumber

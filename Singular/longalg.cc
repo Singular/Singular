@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.62 2001-08-27 14:47:08 Singular Exp $ */
+/* $Id: longalg.cc,v 1.63 2002-01-10 12:33:21 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -248,6 +248,20 @@ void napDelete(napoly *p)
     h = h->ne;
     nacDelete(&(w->ko),currRing);
     omFreeSize((ADDRESS)w, napMonomSize);
+  }
+  *p = NULL;
+}
+
+void nap_Delete(napoly *p, ring r)
+{
+  napoly w, h = *p;
+
+  while (h!=NULL)
+  {
+    w = h;
+    h = h->ne;
+    n_Delete(&(w->ko),currRing->algring);
+    omFree((ADDRESS)w);
   }
   *p = NULL;
 }
@@ -1359,8 +1373,8 @@ void naDelete(number *p, ring r)
 {
   lnumber l = (lnumber) * p;
   if (l==NULL) return;
-  napDelete(&(l->z));
-  napDelete(&(l->n));
+  nap_Delete(&(l->z),r);
+  nap_Delete(&(l->n),r);
   omFreeBin((ADDRESS)l,  rnumber_bin);
   *p = NULL;
 }

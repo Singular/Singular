@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.172 2001-12-14 10:39:00 Singular Exp $ */
+/* $Id: ring.cc,v 1.173 2002-01-10 12:33:22 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1314,10 +1314,7 @@ int rSum(ring r1, ring r2, ring &sum)
             tmpR.parameter=(char **)omAlloc0Bin(char_ptr_bin);
             tmpR.parameter[0]=omStrDup(r1->parameter[0]);
             tmpR.P=1;
-            // HANNES: TODO: delete nSetChar
-            rChangeCurrRing(r1);
             tmpR.minpoly=n_Copy(r1->minpoly, r1);
-            rChangeCurrRing(save);
           }
           else
           {
@@ -1336,10 +1333,7 @@ int rSum(ring r1, ring r2, ring &sum)
             tmpR.parameter=(char **)omAllocBin(char_ptr_bin);
             tmpR.parameter[0]=omStrDup(r1->parameter[0]);
             tmpR.P=1;
-            // HANNES: TODO: delete nSetChar
-            rChangeCurrRing(r2);
             tmpR.minpoly=n_Copy(r2->minpoly, r2);
-            rChangeCurrRing(save);
           }
           else
           {
@@ -1391,10 +1385,7 @@ int rSum(ring r1, ring r2, ring &sum)
         memcpy(tmpR.parameter,r1->parameter,rPar(r1)*sizeof(char_ptr));
         if (r1->minpoly!=NULL)
         {
-          // HANNES: TODO: delete nSetChar
-          rChangeCurrRing(r1);
           tmpR.minpoly=n_Copy(r1->minpoly, r1);
-          rChangeCurrRing(save);
         }
       }
       else  /* R, Q(a),Z/q,Z/p(a),GF(p,n) */
@@ -1418,10 +1409,7 @@ int rSum(ring r1, ring r2, ring &sum)
         memcpy(tmpR.parameter,r2->parameter,rPar(r2)*sizeof(char_ptr));
         if (r2->minpoly!=NULL)
         {
-          // HANNES: TODO: delete nSetChar
-          rChangeCurrRing(r1);
           tmpR.minpoly=n_Copy(r2->minpoly, r2);
-          rChangeCurrRing(save);
         }
       }
       else if (r2->ch>1) /* Z/p,GF(p,n) */
@@ -1454,10 +1442,7 @@ int rSum(ring r1, ring r2, ring &sum)
         }
         if (r1->minpoly!=NULL)
         {
-          // HANNES: TODO: delete nSetChar
-          rChangeCurrRing(r1);
           tmpR.minpoly=n_Copy(r1->minpoly, r1);
-          rChangeCurrRing(currRing);
         }
       }
       else  /* R, Z/p,GF(p,n) */
@@ -1484,10 +1469,7 @@ int rSum(ring r1, ring r2, ring &sum)
         }
         if (r2->minpoly!=NULL)
         {
-          // HANNES: TODO: delete nSetChar
-          rChangeCurrRing(r2);
           tmpR.minpoly=n_Copy(r2->minpoly, r2);
-          rChangeCurrRing(save);
         }
       }
       else

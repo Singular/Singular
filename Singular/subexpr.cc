@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.78 2001-10-09 16:36:24 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.79 2002-01-10 12:33:23 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -278,7 +278,7 @@ void sleftv::Print(leftv store, int spaces)
   }
 }
 
-void sleftv::CleanUp()
+void sleftv::CleanUp(ring r)
 {
   if ((name!=NULL) && (name!=sNoName) && (rtyp!=IDHDL))
   {
@@ -306,17 +306,17 @@ void sleftv::CleanUp()
       case MATRIX_CMD:
       case MODUL_CMD:
       case IDEAL_CMD:
-        idDelete((ideal *)(&data));
+        id_Delete((ideal *)(&data),r);
         break;
       case STRING_CMD:
           omFree((ADDRESS)data);
         break;
       case POLY_CMD:
       case VECTOR_CMD:
-        pDelete((poly *)(&data));
+        p_Delete((poly *)(&data),r);
         break;
       case NUMBER_CMD:
-        nDelete((number *)(&data));
+        n_Delete((number *)(&data),r);
         break;
       case LIST_CMD:
         ((lists)data)->Clean();
@@ -342,7 +342,7 @@ void sleftv::CleanUp()
       }
       case RESOLUTION_CMD:
       {
-        syKillComputation((syStrategy)data);
+        syKillComputation((syStrategy)data,r);
         break;
       }
 #ifdef TEST
@@ -437,7 +437,7 @@ void sleftv::CleanUp()
       tmp_n=next->next;
       //next->name=NULL;
       next->next=NULL;
-      next->CleanUp();
+      next->CleanUp(r);
       omFreeBin((ADDRESS)next, sleftv_bin);
       next=tmp_n;
     } while (next!=NULL);
