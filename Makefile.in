@@ -6,6 +6,7 @@ SINGULAR_MINOR_VERSION	= @SINGULAR_MINOR_VERSION@
 
 DISTNAME	= ${PRODUCT}-full-${SINGULAR_MAJOR_VERSION}.${SINGULAR_MINOR_VERSION}
 BINDISTNAME	= ${PRODUCT}-${SINGULAR_MAJOR_VERSION}.${SINGULAR_MINOR_VERSION}.@host@
+STATIC_BINDISTNAME	= ${PRODUCT}-${SINGULAR_MAJOR_VERSION}.${SINGULAR_MINOR_VERSION}.static.@host@
 SHAREDISTNAME	= ${PRODUCT}-${SINGULAR_MAJOR_VERSION}.${SINGULAR_MINOR_VERSION}-share
 MKINSTALLDIRS	= ./mkinstalldirs
 
@@ -65,7 +66,8 @@ bindist: ${bindir}/Singular
 		cd Singular ;\
 		mv mod2.h mod2.h.orig ;\
 		sed -f ../sed.bindist.cmd mod2.h.orig > mod2.h ;\
-		/bin/rm -f febase.o misc.o;\
+		/bin/rm -f febase.o misc.o Singular; \
+		touch *.inc *.o;\
 		${MAKE} Singular ;\
 		/bin/rm -f febase.o misc.o;\
 		mv mod2.h.orig mod2.h;\
@@ -73,6 +75,23 @@ bindist: ${bindir}/Singular
 	mv Singular/Singular ${BINDISTNAME}
 	strip ${BINDISTNAME}
 	gzip -9 ${BINDISTNAME}
+
+staticbindist: ${bindir}/Singular-static
+	rm -rf  ${STATIC_BINDISTNAME}*
+	if test "${datadir}" != /usr/local/share || \
+	   test "${infodir}" != /usr/local/info; then \
+		cd Singular ;\
+		mv mod2.h mod2.h.orig ;\
+		sed -f ../sed.bindist.cmd mod2.h.orig > mod2.h ;\
+		/bin/rm -f febase.o misc.o Singular-static; \
+		touch *.inc *.o;\
+		${MAKE} Singular-static ;\
+		/bin/rm -f febase.o misc.o;\
+		mv mod2.h.orig mod2.h;\
+	fi
+	mv Singular/Singular-static ${STATIC_BINDISTNAME}
+	strip ${STATIC_BINDISTNAME}
+	gzip -9 ${STATIC_BINDISTNAME}
 
 dosdist: Singular/Singular.exe
 	mkdir /tmp/singdos
@@ -112,7 +131,10 @@ sharedist: ${bindir}/Singular
 	/bin/rm -rf ${TEMPDIR}/Singular-share
 
 ${bindir}/Singular: 
-	${MAKE} install	
+	cd Singular; ${MAKE} Singular	
+
+${bindir}/Singular-static : 
+	cd Singular; ${MAKE} Singular-static
 
 Singular/Singular.exe:
 	./configure.dos
