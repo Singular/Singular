@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.7 1997-06-04 19:45:22 obachman Exp $ */
+/* $Id: modulop.cc,v 1.8 1997-10-09 09:36:23 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -219,8 +219,6 @@ void npSetChar(int c)
   {
     Free( (ADDRESS)npExpTable,npPrimeM*sizeof(CARDINAL) );
     Free( (ADDRESS)npLogTable,npPrimeM*sizeof(CARDINAL) );
-    npExpTable=NULL;
-    npLogTable=NULL;
   }
   if ((c>1) || (c<(-1)))
   {
@@ -250,15 +248,20 @@ void npSetChar(int c)
         if (i == npPrimeM - 1)
           break;
       }
+      npGen=w;
     }
     else
     {
       npExpTable[1] = 1;
+      npGen=1;
     }
   }
   else
+  {
     npPrimeM=0;
- npGen=w;
+    npExpTable=NULL;
+    npLogTable=NULL;
+  }
 }
 
 
