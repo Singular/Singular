@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.6 1998-05-11 20:13:41 gorzel Exp $
+@comment $Id: start.doc,v 1.7 1998-05-12 13:06:17 schmidt Exp $
 @comment this file contains the "Introduction" chapter.
 @menu
 * Background::
@@ -115,7 +115,7 @@ where each section corresponds to one data type.  Except from the syntax
 of declarations, expressions, and operations, in each section there is a
 subsection listing all functions related to that particular type.
 
-@ref{Functions and variables}, is a large alphabetically ordered list of
+@ref{Functions and system variables}, is a large alphabetically ordered list of
 all of @sc{Singular}'s functions, control structures, and system
 variables.  Each entry includes a description of the syntax and
 semantics of the item being explained as well as one or more examples
@@ -135,8 +135,8 @@ index}, resp.
 @section Getting started
 @cindex Getting started
 
-@subsection{generalities}
-@cindex{generalities}
+@subsection generalities
+@cindex generalities
 
 @c {{{ subsection generalities }}}
 Once @sc{Singular} is started, it attends input after the promt @code{>}.
@@ -195,21 +195,21 @@ A single entry is selected with the square brackets @code{[,]}.
   @expansion{} 5, 6, 7
 @end example  
 To calculate the fourth power of this integer matrix, use a @code{for} loop,
-the curly brackets @code{ \{} and @code{ \} } benote a begin and end of a block.
+the curly brackets @code{@{} and @code{@}} benote a begin and end of a block.
 @example
   intmat mm = m;
   for (j = 1; j<= 3; j++)
-  {
+  @{
    mm = mm * m;
-  }
+  @}
   mm;
   @expansion{} 6380,5848,9276,
   @expansion{} 10688,10008,15528,
   @expansion{} 22316,20368,32460 
 @end example  
 
-@subsection{rings and standard bases}
-@cindex{rings and standard bases}
+@subsection rings and standard bases
+@cindex rings and standard bases
 To calculate with objects as ideals, matrices, modules and vectors based on 
 polynomials a ring has to be defined first.
 @example
@@ -331,8 +331,8 @@ and write
   @expansion{}
 @end example
 
-@subsection{procedures and libraries}
-@cindex{procedures and libraries}
+@subsection procedures and libraries
+@cindex procedures and libraries
 
 @sc{Singular} offers comfortable programming language, so it is possible to 
 define procedures which collect several commands to an new one. 
@@ -344,9 +344,9 @@ So define the following procedure called @code{Milnor}
 
 @example
   proc Milnor(poly h)
-  {
+  @{
    return(vdim(std(jacob(h))));
-  }
+  @}
 @end example
 
 
@@ -395,8 +395,8 @@ available for the user defined in the library.
 @end example
 
 
-@subsection{change of rings}
-@cindex{change of rings}
+@subsection change of rings
+@cindex change of rings
 
 To calculate the local Milnor number we have to do the calculation with the
 same commands in a ring with local ordering.  Define
@@ -463,23 +463,23 @@ in the following way
 Coming back to some mathematical considerations, we study the problem how
 to calculate some ....
 
-@subsection{maps and elimintation}
-@cindex{maps and eliminination}
+@subsection maps and elimintation
+@cindex maps and eliminination
 
 @example
   std(_);
   @expansion{}
 @end example
 
-@subsection{modules and their annilator}
-@cindex{modules and and theis annilator}
+@subsection modules and their annilator
+@cindex modules and and theis annilator
 @example
   std(_);
   @expansion{}
 @end example
 
-@subsection{resolution and Hilbertseries}
-@cindex{resolution and Hilbertseries}
+@subsection resolution and Hilbertseries
+@cindex resolution and Hilbertseries
 This final example in the introduction shows how to calculate an @code{Ext}
 group.
 
