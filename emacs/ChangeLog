@@ -1,3 +1,149 @@
+Wed Jul 29 10:50:47 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* singular.el (singular-extended-prompt-regexp,
+	  singular-string-start-anchored-prompt-regexp,
+	  singular-prompt-sequence-regexp): new constants 
+	  (singular-strip-white-space, singular-strip-prompts,
+	  singular-skip-prompt-forward): new functions
+
+	* singular.el (singular-emacs-simple-sec-end-at): bug fix
+	  (singular-fold-internal, singular-demo-show-next-chunk): do not
+	  save buffer-modified flag and do not switch off read only state
+	  (singular-output-filter): does not switch off read only state
+	  (singular-input-section-to-string): new function
+	  (singular-strip-white-space, singular-strip-prompts): new
+	  functions
+
+	* singular.el (singular-send-input): sends old input sections
+	  (singular-send-input): renamed to
+	  `singular-send-or-copy-input'.  All references changed.
+	  (singular-get-old-input): new function
+
+	* singular.el (singular-demo-end): new variable
+	  (singular-demo-mode-init, singular-interactive-mode): new
+	  function.  Call added in mode initialization.
+	  (singular-demo-load): sets `singular-demo-end'
+	  (singular-demo-show-next-chunk): is smarter concerning end of
+	  demo file
+
+	* singular.el (singular-demo-chunk-regexp): new variable
+	  (singular-demo-mode, singular-demo-old-mode-name,
+	  singular-interactive-mode): new local variables.  Localization
+	  added.
+	  (singular-demo-mode, singular-demo-show-next-chunk,
+	  singular-demo-load): new function
+	  (singular-send-input): supports demo mode
+
+	* singular.el (singular-fold-internal, singular-fold-section):
+	  again takes only a single region instead of a list.  All callers
+	  changed.
+
+	* singular.el (singular-fold-section): doc fix
+	  (singular-exec): takes care about undo information when
+	  retrieving start file
+	  (singular-emacs-simple-sec-before): doc fix
+	  (singular-exec): cosmetic changes
+	  (singular-output-filter): cosmetic changes
+	  (singular-simple-sec-last-end): doc fix
+	  (singular-send-input): argument STRING changed to
+	  SEND-FULL-SECTION.  Semantics not implemented yet.
+
+	* singular.el (singular-section-before): new function
+
+Tue Jul 28 08:49:05 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* singular.el (singular-emacs-simple-sec-start-at,
+	  singular-emacs-simple-sec-end-at):  assume that buffer is
+	  already widened
+	  (singular-section-at): widens buffer before determining start
+ 	  and end of clear simple sections
+
+	* singular.el (singular-fold-section): doc fix
+	  (singular-emacs-simple-sec-create): doc fix
+	  (singular-simple-sec-last-end): doc fix
+	  explanations for sections and simple sections added
+
+	* singular.el (singular-fold-internal, singular-fold-section):
+	  uses a list of regions instead of one region.  All callers
+ 	  changed.
+
+	* singular.el (singular-fold-internal): doc fix
+	  (singular-section-foldedp): doc fix
+	  (singular-fold-section): saves restrictions before folding
+
+	* singular.el (singular-section-at): argument `raw-section'
+	  renamed to `restricted' and its semantic inverted
+
+	* singular.el (singular-emacs-simple-sec-start-at,
+	  singular-emacs-simple-sec-end-at): new functions.  `fset's for
+ 	  the flavor-independent functions added.
+
+	* singular.el (singular-emacs-simple-sec-reset-last): new argument
+	  `pos'.  Resets `singular-simple-sec-last-end', too.
+	  (singular-output-filter): does not set
+	  `singular-simple-sec-last-end'
+
+	* singular.el (singular-simple-sec-last-end): new variable
+	  (singular-debug-format): wrapped by a `save-match-data'
+	  (singular-simple-sec-clear-type): doc fix
+	  (singular-emacs-simple-sec-create): doc fix
+	  (singular-emacs-simple-sec-create): cosmetic changes
+	  (singular-fold-internal): cosmetic changes
+	  (singular-fold-internal): bug fix.  Order of `delete-char' and
+	  `subst-char-in-region' exchanged.
+
+	* singular.el (singular-section-at): new function
+	  (singular-section-simple-sec, singular-section-start,
+	  singular-section-end, singular-section-type): new macros
+
+	* singular.el (singular-fold-internal, singular-fold-section,
+	  singular-section-foldedp): new functions
+
+	* singular.el (singular-output-filter): sets `inhibit-read-only'
+	  instead of `buffer-read-only'
+
+	* singular.el (singular-simple-sec-clear-type): new variable
+	  (singular-simple-sec-init): new function
+	  (singular-emacs-simple-sec-create,
+ 	  singular-emacs-simple-sec-reset-last,
+ 	  singular-emacs-simple-sec-start, singular-emacs-simple-sec-end,
+ 	  singular-emacs-simple-sec-type, singular-emacs-simple-sec-at,
+ 	  singular-emacs-simple-sec-before, singular-emacs-simple-sec-in
+ 	  ): new functions.  `fset's for the flavor-independent functions
+	  added.
+
+Mon Jul 27 12:39:04 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* singular.el (singular-output-filter): new function
+	  (singular-send-input): new function
+	  (singular-interactive-mode-map): `singular-send-input' bound to
+	  `"\C-m"'
+
+	* singular.el (singular-debug-input-filter,
+	  singular-debug-output-filter):  completely rewritten.  Bogus
+	  call counting removed.  Debug checks added.
+	  (singular-debug-bogus-output-filter-cnt): variable removed
+
+	* singular.el (singular): code for creation of new singular
+	  process moved to `singular-exec'
+	  (singular-exec): new function
+
+	* singular.el (singular-process-mark): new macro
+	  (singular-exit-sentinel): debug message fix
+	  (singular): arguments names changed
+	  (singular-set-version): message fix
+	  (singular-bogus-output-filter-calls): variable removed
+	  (singular-debug): optional argument `else-form' added
+	  (singular-debug-format): uses `replace-match' to replace
+	  newlines
+
+	* singular.el (singular-folding-ellipsis): new variable
+	  (singular-interactive-mode): selective display stuff added
+
+	* singular.el (singular-input-face, singular-output-face): new
+	  variables
+	  (singular-lookup-face): new function
+
 Thu Jul 23 10:28:53 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* singular.el (singular): initializes the markers
