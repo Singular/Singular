@@ -184,6 +184,7 @@ static proc ml2norm (module H, number wg)
   return(sqrt(wa,wa,wg));
 }
 
+static
 proc linesearch(ideal nl, vector aa, vector bb, intvec pe,
 number z1, number tt, number gg)
 {
