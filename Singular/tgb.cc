@@ -6,6 +6,7 @@
 //       deg -> poly_crit
 //       "e"
 //       multiple rings
+//       shorten_tails und dessen Aufrufe pruefen wlength!!!
 #include "tgb.h"
 #define OM_KEEP 0
 #define LEN_VAR1
@@ -679,8 +680,6 @@ static void initial_data(calc_dat* c, ideal I){
   /* omUnGetSpecBin(&(c->HeadBin)); */
   h=omalloc(n*sizeof(char*));
   c->states=(char**) h;
-  
-  c->deg=(int **) omalloc(n*sizeof(int*));
   h=omalloc(n*sizeof(int));
   c->lengths=(int*) h;
   h=omalloc(n*sizeof(int));
@@ -821,7 +820,6 @@ static sorted_pair_node** add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c,
     c->states=(char**) hp;
   c->gcd_of_terms=(poly*) omrealloc(c->gcd_of_terms, c->n *sizeof(poly));
   c->gcd_of_terms[i]=gcd_of_terms(h,c->r);
-  c->deg=(int**) omrealloc(c->deg, c->n * sizeof(int*));
   c->rep[i]=i;
   hp=omalloc(i*sizeof(char));
   if (hp!=NULL){
@@ -829,7 +827,6 @@ static sorted_pair_node** add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c,
   } else {
     exit(1);
   }
-  c->deg[i]=(int*) omalloc(i*sizeof(int));
   hp=omrealloc(c->S->m,c->n*sizeof(poly));
   if (hp!=NULL){
     c->S->m=(poly*) hp;
@@ -839,7 +836,6 @@ static sorted_pair_node** add_to_basis(poly h, int i_pos, int j_pos,calc_dat* c,
   c->S->m[i]=h;
   c->short_Exps[i]=p_GetShortExpVector(h,c->r);
   for (j=0;j<i;j++){
-    c->deg[i][j]=pLcmDeg(c->S->m[i],c->S->m[j]);
     if (c->rep[j]==j){
       //check product criterion
 
@@ -1564,6 +1560,18 @@ ideal t_rep_gb(ring r,ideal arg_I){
   }
   omfree(c->states);
   omfree(c->lengths);
+
+
+  omfree(c->short_Exps);
+  omfree(c->T_deg);
+  int i;
+  for(i=0;i<c->n;i++){
+    if(c->gcd_of_terms[i])
+      pDelete(&(c->gcd_of_terms[i]));
+  }
+  omfree(c->gcd_of_terms);
+
+  omfree(c->apairs);
   printf("calculated %d NFs\n",c->normal_forms);
   printf("applied %i product crit, %i extended_product crit \n", c->easy_product_crit, c->extended_product_crit);
   I=c->S;
@@ -1903,6 +1911,7 @@ static poly kBucketGcd(kBucket* b, ring r)
 
 struct find_erg{
   poly expand;
+  int expand_length;
   int to_reduce_u;
   int to_reduce_l;
   int reduce_by;//index of reductor
@@ -1953,6 +1962,7 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
       else
     {
       if (erg.to_reduce_u>erg.to_reduce_l){
+
 	int i;
 	int quality_a=quality_of_pos_in_strat_S(erg.reduce_by,c);
 	int best=erg.to_reduce_u+1;
@@ -1973,6 +1983,36 @@ static void multi_reduction_lls_trick(red_object* los, int losl,calc_dat* c,find
 	  
 	}
       }
+      else 
+      {
+	assume(erg.to_reduce_u==erg.to_reduce_l);
+	int quality_a=quality_of_pos_in_strat_S(erg.reduce_by,c);
+	int qc=guess_quality(los[erg.to_reduce_u],c);
+	if(qc<quality_a){
+	  BOOLEAN exp=FALSE;
+	  if(qc<=2)
+	    exp=TRUE;
+	  else {
+	    if (qc<quality_a/2)
+	      exp=TRUE;
+	    else
+	      if(erg.reduce_by<c->n/4)
+		exp=TRUE;
+	  }
+	  if (exp){
+	    poly clear_into;
+	    
+	    kBucketClear(los[erg.to_reduce_u].bucket,&clear_into,&erg.expand_length);
+	    erg.expand=pCopy(clear_into);
+	    kBucketInit(los[erg.to_reduce_u].bucket,clear_into,erg.expand_length);
+	    PrintS("e");
+	    
+	  }
+	}
+
+	
+      }
+      
       swap_roles=FALSE;
       return;
       }
@@ -2269,6 +2309,8 @@ static void multi_reduction(red_object* los, int & losl, calc_dat* c)
     sort_region_down(los, erg.to_reduce_l, erg.to_reduce_u-deleted, c);
 //   sort_region_down(los, 0, losl-1, c);
     //  qsort(los,losl,sizeof(red_object),red_object_better_gen);
+    if(erg.expand)
+      add_to_reductors(c,erg.expand,erg.expand_length);
   }
   return;
 }

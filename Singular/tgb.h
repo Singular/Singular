@@ -64,7 +64,6 @@ struct calc_dat
   int* lengths;
   long* short_Exps;
   kStrategy strat;
-  int** deg;
   int* T_deg;
   poly* gcd_of_terms;
   int_pair_node* soon_free;
