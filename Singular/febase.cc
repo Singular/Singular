@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.53 1998-06-15 15:47:57 obachman Exp $ */
+/* $Id: febase.cc,v 1.54 1998-06-16 11:03:57 obachman Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -248,6 +248,7 @@ static void mystrcpy(char* d, char* s)
 // ROOTDIR/Singular/doc/$version/singular.hlp
 // ROOTDIR/Singular/doc/singular.hlp
 // ROOTDIR/info/singular.hlp
+// Singular search path
 #ifdef WINNT
 static char * feFixFileName(char *hlpdir)
 {
@@ -330,6 +331,14 @@ static char* feGetInfoFile(const char* bindir)
     Print("trying %s -- %s\n", hlpfile, ( access(hlpfile, R_OK) ? "no" : "yes"));
 #endif
    if (! access(hlpfile, R_OK)) return feFixFileName(hlpfile);
+  }
+
+  // still here? Try all dirs in the search path
+  FILE *file = feFopen("singular.hlp", "r", hlpfile, 0);
+  if (file != NULL)
+  {
+    close(file);
+    return feFixFileName(hlpfile);
   }
   *hlpfile = '\0';
   return hlpfile;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.48 1998-06-13 12:44:50 krueger Exp $ */
+/* $Id: tesths.cc,v 1.49 1998-06-16 11:03:59 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -323,8 +323,8 @@ int main(          /* main entry to Singular */
           break;
 
         case 'v':
-          printf("Singular version %s  %s  (%d)  %s %s\n",
-                 S_VERSION1,S_VERSION2,
+          printf("Singular for %s version %s  (%d)  %s %s\n",
+                 S_UNAME, S_VERSION1,
                  SINGULAR_VERSION_ID,__DATE__,__TIME__);
           printf("with\n");
           printf(versionString());

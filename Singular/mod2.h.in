@@ -110,6 +110,8 @@
 #define S_VERSION1 ""
 /* Define version date as a string */
 #define S_VERSION2 ""
+/* Define uname identifier as a string */
+#define S_UNAME ""
 
 /*******************************************************************
  * Defines which are not set by configure

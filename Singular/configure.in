@@ -41,6 +41,7 @@ AC_MSG_RESULT($ac_cv_singuname)
 if test "$ac_cv_singuname" = unknown; then
   AC_MSG_ERROR(Unknown architecture: Check singuname.sh)
 fi
+AC_DEFINE_UNQUOTED(S_UNAME, "$ac_cv_singuname")
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl compiler stuff
