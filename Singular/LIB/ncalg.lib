@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncalg.lib,v 1.1 2004-03-19 15:52:29 levandov Exp $";
+version="$Id: ncalg.lib,v 1.2 2004-03-19 16:28:49 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  lieA.lib      definitions of important G-algebras
@@ -24,7 +24,7 @@ LIB "nctools.lib";
 
 // functions for debug/logging 
 
-static proc mySetRing (string @baseName, list #)
+proc mySetRing (string @baseName, list #)
 // set @@@_RING to description of current ring
 {
   if (defined( @@@_RING_NAME ))
@@ -59,7 +59,7 @@ static proc mySetRing (string @baseName, list #)
   export(@@@_CHAR);
 }
 
-static proc myGetRing ()
+proc myGetRing ()
 // get desription of current ring
 {
   if (defined( @@@_RING ))
@@ -69,7 +69,7 @@ static proc myGetRing ()
   return( "No lieA.lib ring defined" );
 }
 
-static proc myGetRingName ()
+proc myGetRingName ()
 // get desription of current ring, only family
 {
   if (defined( @@@_RING_NAME ))
@@ -80,7 +80,7 @@ static proc myGetRingName ()
   return( "No lieA.lib ring defined" );
 }
 
-static proc myGetRingChar ()
+proc myGetRingChar ()
 // get desription of current ring, only family
 {
   if (defined( @@@_CHAR ))
@@ -92,7 +92,7 @@ static proc myGetRingChar ()
 }
 
 
-static proc myInt ( list # )
+proc myInt ( list # )
 // return 0 or int(#)
 {
   int @p = 0;

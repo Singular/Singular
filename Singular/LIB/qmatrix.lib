@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: qmatrix.lib,v 1.2 2004-03-18 21:36:09 levandov Exp $";
+version="$Id: qmatrix.lib,v 1.3 2004-03-19 16:28:50 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: qmatrix.lib     Quantum matrices, quantum minors and symmetric groups.
@@ -18,8 +18,8 @@ LengthSymElement(v);	calculates the length of the element v of S(n)
 LengthSym(M);		calculates the length of each element of M, being M a subset of S(n)
 ";
 
+LIB "ncalg.lib";
 LIB "nctools.lib";
-
 ///////////////////////////////////////////////////////////////////////////////
 
 proc SymGroup(int n)
@@ -147,23 +147,9 @@ EXAMPLE: example quant; shows examples
     {
       m[i,nv+1-i]=1;
     }
+    int chr = myInt(#);
     ring @rrr=(0,q),(y(1..nv)),Dp;
-    if (size(#)>0)
-    {
-      if ( typeof( #[1] ) == "int" )
-      {
-	int chr = #[1];
-	if (chr>1)
-	{
-	  minpoly = RooOfUnity(chr);
-	}
-	else
-	{
-	  "The degree of a root should be at least 2";
-	}
-      }
-    }
-    setring @rrr;
+    minpoly = RootOfUnity(chr);
     matrix C[nv][nv]=0;
     matrix D[nv][nv]=0;
     intvec idyi, idyj;

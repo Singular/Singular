@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.2 2004-03-18 21:34:03 levandov Exp $";
+version="$Id: nctools.lib,v 1.3 2004-03-19 16:28:50 levandov Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
@@ -22,35 +22,15 @@ Exterior();             Returns qring, the exterior algebra of a basering,
 Fin_dim_algebra(matrix M, list #); Creates finite dimensional algebra structure from the multiplication matrix M,
 
 AUXILIARY PROCEDURES:
-wRing(r);		alias to weightedRing,
 Newton(f);  		Newton diagram of a polynomial f,
 NCRelations(r);		Recovers the non-commutative relations of a G-algebra,
 IsCentral(p,[v]);       Check for the commutativity of polynomial p with the G-algebra,
 UpOneMatrix(N);         Returns NxN matrix with 1's in the whole upper triagle,
+
+ALIAS PROCEDURES:
+wRing(r);		alias to weightedRing,
 ";
 
-///////////////////////////////////////////////////////////////////////////////
-
-proc wRing(ring r)
-"USAGE:   wRing(r); r a ring
-RETURN:  the same ring r but the order
-NOTE:    you have to activate this ring with the "setring" command
-EXAMPLE: example wRing; shows examples
-SEE ALSO: weightedRing, Gweights
-"{
-  return(weightedRing(r));
-} 
-example 
-{
-  "EXAMPLE:";echo=2;
-  LIB "qmatrix.lib";
-  def r=quant(3); // generate quant(3) and store it in r
-  setring r; // set the ring r the active ring
-  r;
-  def s=wRing(r);
-  setring s;
-  s;
-}
 ///////////////////////////////////////////////////////////////////////////////
 
 // This procedure computes a weights vector for a G-Algebra
@@ -174,6 +154,28 @@ example
   setring r; r;
   def t=weightedRing(r);
   setring t; t;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc wRing(def r)
+"USAGE:   see weightedRing
+"{
+  def a=weightedRing(r);
+  if (typeof(a)=="ring") { return(a); }
+  "Error";
+  return();
+} 
+example 
+{
+  "EXAMPLE:";echo=2;
+  LIB "qmatrix.lib";
+  def r=quant(3); // generate quant(3) and store it in r
+  setring r; // set the ring r the active ring
+  r;
+  def s=wRing(r);
+  setring s;
+  s;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -357,9 +359,10 @@ EXAMPLE: example NCRelations; shows examples
     poly f; poly g;
     if (n>1)
     {
-      for (int i=2; i<=n; i++)
+      int i,j;
+      for (i=2; i<=n; i++)
       {
-	for (int j=1; j<i; j++)
+	for (j=1; j<i; j++)
 	{
 	  f=var(i)*var(j); // yx=c*xy+...
 	  g=var(j)*var(i); // xy
@@ -388,7 +391,7 @@ EXAMPLE: example NCRelations; shows examples
 example
 {
   "EXAMPLE:";echo=2;
-  ring r = 0,(x,y,z),lp;
+  ring r = 0,(x,y,z),dp;
   matrix C[3][3]=0,1,2,0,0,-1,0,0,0;
   print(C);
   matrix D[3][3]=0,1,2y,0,0,-2x+y+1;
@@ -415,7 +418,8 @@ EXAMPLE: Fin_dim_algebra; shows examples
     if ( typeof(#[1])!="ring" ) { return();}
     else 
     {
-      setring #[1];
+      def @R1 = #[1];
+      setring @R1;
     }
   }
   int i,j;
@@ -492,7 +496,12 @@ example
 {
   "EXAMPLE:";echo=2;
   ring r=0,(x,y,z),dp;
-  poly c=;
+  matrix D[3][3]=0;
+  D[1,2]=-z;
+  D[1,3]=2*x;
+  D[2,3]=-2*y;
+  ncalgebra(1,D); // this is U(sl_2)
+  poly c=4*x*y+z^2-2*z;
   IsCentral(c,1);
 }
 
@@ -604,10 +613,11 @@ EXAMPLE: example RootOfUnity; shows examples
     "the procedure works only with one parameter";
     return(0);
   }
+  if (n<1) { return(0); }
   number mp = par(1);  
   if (n==1) { return(mp-1); }
   if (n==2) { return(mp+1); }
-  string OR = nameof(basering);
+  def OldRing = basering;
   string CH = charstr(basering);
   string MCH;
   int j=1;
@@ -615,9 +625,8 @@ EXAMPLE: example RootOfUnity; shows examples
   { 
     MCH=MCH+CH[j]; j++;
   }
-  string SR = "ring @@r="+MCH+","+parstr(basering)+",dp;";
+  string SR = "ring @@rR="+MCH+","+parstr(basering)+",dp;";
   execute(SR);
-  setring @@r;
   poly @t=var(1)^n-1; // (x^2i-1)=(x^i-1)(x^i+1)
   list l=factorize(@t);
   ideal @l=l[1];
@@ -626,15 +635,18 @@ EXAMPLE: example RootOfUnity; shows examples
   int d=deg(@l[s]);
   int cnt=1;
   poly res;
-  for (j=s-1;j>=1;j--)
+  for (j=s-1; j>=1; j--)
   {
     if ( deg(@l[j]) > d) { d=deg(@l[j]); }
   }
-  for (j=1;j<=s;j++)
+  for (j=1; j<=s; j++)
   {
     if ( deg(@l[j]) == d) { @d[cnt]=@l[j]; cnt++; }
   }
-  if (size(@d)==1) { res = poly(@d[1]); }
+  if ( size(@d)==1 ) 
+  { 
+    res = poly(@d[1]); 
+  }
   else
   {
     j=1;
@@ -646,10 +658,10 @@ EXAMPLE: example RootOfUnity; shows examples
     }
     res = @d[j];
   }
-  execute("setring "+OR);
-  poly I = imap(@@r,res);
+  setring OldRing;
+  poly I = imap(@@rR,res);
   mp = leadcoef(I);
-  kill @@r;
+  kill @@rR;
   return(mp);
 }
 example
@@ -778,7 +790,6 @@ EXAMPLE: example Exterior; shows examples
   int N = nvars(basering);
   string NewRing = "ring @R=("+charstr(basering)+"),("+varstr(basering)+"),("+ordstr(basering)+");";
   execute(NewRing);
-  setring @R;
   matrix @E = UpOneMatrix(N);
   @E = -1*(@E);
   ncalgebra(@E,0);
