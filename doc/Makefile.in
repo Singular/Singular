@@ -33,6 +33,7 @@ TEXI2DVI	= @TEXI2DVI@
 TEXINDEX	= @TEXINDEX@
 TEXI2HTML	= @TEXI2HTML@
 DVIPS		= dvips
+VERBOSE         = 1 # override this with make VERBOSE=2
 
 # d2t stuff
 SINGULAR	= @SINGULAR@
@@ -41,15 +42,21 @@ LIBPARSE	= ${bindir}/libparse
 D2T_SUBDIR      = ./d2t_singular
 CHKSUM_DB       = ${D2T_SUBDIR}/chksum.db
 DOC2TEX		= ${PERL5} ./doc2tex.pl -subdir ${D2T_SUBDIR} \
-                  -Singular ${SINGULAR} -make
+                  -Singular ${SINGULAR} -verbose ${VERBOSE} -make ${MAKE}
 PL2DOC		= ${PERL5} ./pl2doc.pl -db  ${CHKSUM_DB}
 
 # t2h stuff
 TMP_DIR		= @TMP_DIR@
 HTML_SUBDIR     = html
 TEXI2HTML_INIT  = t2h_singular.init
+ifeq ($(VERBOSE),0)
+T2H_VERBOSE	= -no_verbose
+else
+T2H_VERBOSE     = -verbose
+endif
 TEXI2HTML_OPTS  = -init_file ${TEXI2HTML_INIT} @TEXI2HTML_OPTS@ \
-	          -short_extn -l2h_tmp ${TMP_DIR}  -subdir ${HTML_SUBDIR}
+	          -short_extn -l2h_tmp ${TMP_DIR} -subdir ${HTML_SUBDIR} \
+                  ${T2H_VERBOSE}
 HTML_MANUAL_PREFIX = sing
 HTML_TUTOR_PREFIX  = tut
 HTML_MANUAL_TOP    = index.htm
@@ -85,7 +92,7 @@ export PATH := "${bindir}:${PATH}"
 .PHONY: info dvi ps html
 
 # default target
-all: info dvi html
+all: info dvi html singular.idx
 
 # info stuff
 info: singular.hlp 
@@ -147,8 +154,9 @@ ${D2T_SUBDIR}/%_lib.pl : ${SINGULAR_LIB_DIR}/%.lib ${LIBPARSE}
 # do not delete intermediate .pl and .doc files
 .PRECIOUS: %.doc %_noFun.doc ${D2T_SUBDIR}/%_lib.pl
 
-singular.idx: singular.hlp ${D2T_SUBDIR}/idx.db ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx
-	doc2idx.pl singular.hlp ${D2T_SUBDIR}/idx.db ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx
+# index file for help
+singular.idx: singular.hlp ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx ${CHKSUM_DB} doc2idx.pl
+	${PERL5} doc2idx.pl singular.hlp ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx ${CHKSUM_DB} > singular.idx
 
 # targets which produce stand-alone documents
 COPYING: copyright.tex
@@ -167,6 +175,8 @@ html_tutor: ${HTML_SUBDIR}/${HTML_TUTOR_TOP} ${IMAGES_HTML}
 ${HTML_SUBDIR}/${HTML_TUTOR_TOP}: ${TEXI2HTML_INIT} ${TEXI2HTML} tutor.tex
 	${PERL5} ${TEXI2HTML} ${TEXI2HTML_OPTS} -prefix ${HTML_TUTOR_PREFIX} \
         -top_file ${HTML_TUTOR_TOP} tutor.tex
+
+${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx: ${HTML_SUBDIR}/${HTML_MANUAL_TOP}
 
 # pattern rules for images
 images/%.gif : images/%.gif.uu
@@ -189,7 +199,7 @@ ${IMAGES_HTML} : ${IMAGES_SRC}
 ###########################################################
 # misc targets
 #
-install: singular.hlp html/index.htm
+install: singular.hlp html/index.htm singular.idx
 	${MKINSTALLDIRS} ${infodir}
 	${INSTALL_DATA} singular.hlp ${infodir}
 	test -L ${htmldir} || (rm -rf ${htmldir}; ln -s `pwd`/${HTML_DIR} ${htmldir})
@@ -198,18 +208,19 @@ uninstall:
 	rm -f ${infodir}/singular.hlp
 	- rmdir ${infodir}
 
-clean:
+clean: mostlyclean
+	/bin/rm -rf singular.tex manual.tex  ${HTML_DIR} ${D2T_SUBDIR}
+
+mostlyclean: 
 	/bin/rm -f .singular_hist doe.tmp dump.ascii example.mp example.txt
 	/bin/rm -f save_i test.ascii test.mp
 	/bin/rm -f Z* *.tst *.pag *.dir *.lst *.log *.aux *.cp *.cps
 	/bin/rm -f *.fn *.fns *.ky *.kys *.log *.pg *.pgs *.toc *.tp
-	/bin/rm -f *.tps *.vr *.vrs
-	/bin/rm -f singular.hlp *.dvi *.ps ${DOC2TEX_FILES} 
-	/bin/rm -rf singular.tex manual.tex  ${HTML_DIR} ${D2T_SUBDIR}
+	/bin/rm -f *.tps *.vr *.vrs *.dvi *.ps
+	/bin/rm -f singular.hlp manual.hlp  ${DOC2TEX_FILES} singular.idx
+	/bin/rm -f ${HTML_SUBDIR}/${HTML_MANUAL_TOP} ${HTML_SUBDIR}/${HTML_TUTOR_TOP}
 
-mostlyclean: clean
-
-distclean: mostlyclean
+distclean: clean
 	/bin/rm -f Makefile
 
 maintainer-clean: distclean
