@@ -1,3 +1,6 @@
+Sat Jan 24 18:21:24 MET 1998 hannes
+   * bug fixes for TEST_MAC_ORDER (binom.* polys-impl.h, spSpolyLoop.cc) 
+
 Sat Jan 17 18:56:34 MET 1998 hannes
    * changes for TEST_MAC_ORDER, part 3 (binom.cc, binom.h, spSpolyLoop.cc)
 
