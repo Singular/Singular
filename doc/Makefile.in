@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.74 2000-07-27 13:53:00 obachman Exp $
+### $Id: Makefile.in,v 1.75 2000-07-27 14:55:58 obachman Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -9,6 +9,8 @@ SHELL=/bin/sh
 ##
 ## Configuration
 ##
+SINGUNAME       = @SINGUNAME@
+S_VERSION       = $${SINGULAR_VERSION-@SINGULAR_VERSION@}
 
 ## directory where info files are installed
 prefix		= @prefix@
@@ -16,6 +18,9 @@ infodir		= ${prefix}/info
 bindir		= @bindir@
 htmldir         = ${prefix}/html
 exdir           = ${prefix}/examples
+
+localdir        = /usr/local
+install_prefix  = ${localdir}/Singular/${S_VERSION}
 install_infodir = ${install_prefix}/info
 install_htmldir = ${install_prefix}/html
 install_docdir  = ${install_prefix}/doc
@@ -46,7 +51,7 @@ TEXI2HTML	= @TEXI2HTML@
 DVIPS		= dvips
 
 VERBOSE         = 1 # override this with make VERBOSE=2
-SINGUNAME       = @SINGUNAME@
+
 # d2t stuff
 SINGULAR	= @SINGULAR@
 SINGULAR_LIB_DIR= ../Singular/LIB
@@ -281,16 +286,12 @@ install-sharedist: singular.hlp html singular.idx \
 	${MKINSTALLDIRS} ${install_prefix}
 	${MKINSTALLDIRS} ${install_infodir}
 	${INSTALL_DATA} singular.hlp ${install_infodir}
+	chmod -R +rX ${install_infodir}
 	${MKINSTALLDIRS} ${install_htmldir} 
 	cp ${HTML_SUBDIR}/*.htm ${install_htmldir}
 	cp ${HTML_SUBDIR}/*.gif ${install_htmldir}
 	cp ${HTML_SUBDIR}/*.jpg ${install_htmldir}
 	chmod -R +rX ${install_htmldir}
-	${MKINSTALLDIRS} ${install_exdir}
-	cp -R examples ${install_prefix}
-	/bin/rm -f ${install_prefix}/examples/*.res
-	/bin/rm -f ${install_prefix}/examples/*.inc
-	chmod -R +rX ${install_prefix}/
 	${MKINSTALLDIRS} ${install_docdir}
 	${INSTALL_DATA} singular.idx ${install_docdir}
 	${INSTALL_DATA} COPYING.txt ${install_prefix}/COPYING
@@ -299,6 +300,15 @@ install-sharedist: singular.hlp html singular.idx \
 	${INSTALL_DATA} NEWS.html ${install_prefix}
 	${INSTALL_DATA} README_distribution.txt ${install_prefix}/README
 	${INSTALL_DATA} README_distribution.html ${install_prefix}/README.html
+	chmod -R +rX ${install_docdir}
+	chmod -R +rX ${install_prefix}
+	${MKINSTALLDIRS} ${install_exdir}
+	cp -R examples ${install_prefix}
+	/bin/rm -f ${install_prefix}/examples/[A-Z]*.res
+	/bin/rm -f ${install_prefix}/examples/*.res
+	/bin/rm -f ${install_prefix}/examples/[A-Z]*.inc
+	/bin/rm -f ${install_prefix}/examples/*.inc
+	chmod -R +rX ${install_prefix}/
 
 # use 'make INSTALL_unix.olaf.txt INSTALL_unix.olaf.html SINGUNAME=olaf'
 # to generate these files for uname 'olaf'
