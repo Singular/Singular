@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: intvec.h,v 1.5 1998-05-19 23:47:57 obachman Exp $ */
+/* $Id: intvec.h,v 1.6 1999-03-16 13:43:38 Singular Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -64,9 +64,7 @@ class intvec
          if (v!=NULL)
          {
             Free((ADDRESS)v,sizeof(int)*row*col);
-#ifdef TEST
             v=NULL;
-#endif
          }
        }
 };
