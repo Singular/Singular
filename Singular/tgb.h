@@ -150,6 +150,7 @@ class tgb_sparse_matrix{
   int get_columns();
   void print();
   void row_normalize(int row);
+  void row_content(int row);
   //  void perm_rows(int i, int j);
   void perm_rows(int i, int j){
   mac_poly h;

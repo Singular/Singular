@@ -2517,6 +2517,63 @@ void tgb_sparse_matrix::row_normalize(int row){
 	}
   }
 }
+void tgb_sparse_matrix::row_content(int row){
+  
+  mac_poly ph=mp[row];
+  number h,d;
+  mac_poly p;
+
+  if(TEST_OPT_CONTENTSB) return;
+  if(ph->next==NULL)
+  {
+    nDelete(&ph->coef);
+    ph->coef=nInit(1);
+  }
+  else
+  {
+    nNormalize(ph->coef);
+    if(!nGreaterZero(ph->coef)) {
+      //ph = pNeg(ph);
+      p=ph;
+      while(p)
+      {
+	p->coef=nNeg(p->coef);
+	p=p->next;
+      }
+    }
+    
+    h=nCopy(ph->coef);
+    p = ph->next;
+    
+    while (p!=NULL)
+    {
+      nNormalize(p->coef);
+      d=nGcd(h,p->coef,currRing);
+      nDelete(&h);
+      h = d;
+      if(nIsOne(h))
+      {
+        break;
+      }
+      p=p->next;
+    }
+    p = ph;
+    //number tmp;
+    if(!nIsOne(h))
+    {
+      while (p!=NULL)
+      {
+    
+        d = nIntDiv(pGetCoeff(p),h);
+	nDelete(&p->coef);
+        p->coef=d;
+        p=p->next;
+      }
+    }
+    nDelete(&h);
+
+  }
+}
 int tgb_sparse_matrix::non_zero_entries(int row){
 
   return mac_length(mp[row]);
@@ -2705,6 +2762,7 @@ void simple_gauss(tgb_sparse_matrix* mat, calc_dat* c){
     }
     //reduction
     //must extract content and normalize here
+    mat->row_content(row);
     mat->row_normalize(row);
 
     //for(i=row+1;i<pn;i++){
