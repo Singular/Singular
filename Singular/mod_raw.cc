@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.cc,v 1.19 2003-05-22 17:56:37 Singular Exp $ */
+/* $Id: mod_raw.cc,v 1.20 2003-06-20 17:03:56 Singular Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -82,9 +82,29 @@ extern "C" {
 #endif
 
 /*****************************************************************************
- * SECTION ix86-linux / alpha-linux / IA64-linux                             *
+ * SECTION generic Linux: ix86-linux / alpha-linux / IA64-linux /x86_64_Linux*
  *****************************************************************************/
-#if defined(ix86_Linux) || defined(DecAlpha_Linux) || defined(ix86_Linux_libc5) || defined(IA64_Linux)
+#if defined(ix86_Linux)
+#define HAVE_ELF_SYSTEM
+#endif
+
+#if defined(ix86_Linux_libc5)
+#define HAVE_ELF_SYSTEM
+#endif
+
+#if defined(DecAlpha_Linux)
+#define HAVE_ELF_SYSTEM
+#endif
+
+#if defined(IA64_Linux)
+#define HAVE_ELF_SYSTEM
+#endif
+
+#if defined(x86_64_Linux)
+#define HAVE_ELF_SYSTEM
+#endif
+
+#if defined(HAVE_ELF_SYSTEM)
 #include <dlfcn.h>
 
 static void* kernel_handle = NULL;
@@ -115,7 +135,7 @@ const char *dynl_error()
 {
   return(dlerror());
 }
-#endif /* ix86_Linux */
+#endif /* Linux */
 
 /*****************************************************************************
  * SECTION HPUX-9/10                                                         *
