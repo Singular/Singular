@@ -1,8 +1,16 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_gcd.cc,v 1.1 1996-06-03 08:32:56 stobbe Exp $
+// $Id: cf_gcd.cc,v 1.2 1996-06-13 08:18:34 stobbe Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1996/06/03 08:32:56  stobbe
+"gcd_poly: now uses new function gcd_poly_univar0 to compute univariate
+          polynomial gcd's over Z.
+gcd_poly_univar0: computes univariate polynomial gcd's in characteristic 0
+                  via chinese remaindering.
+maxnorm: computes the maximum norm of all coefficients of a polynomial.
+"
+
 Revision 1.0  1996/05/17 11:56:37  stobbe
 Initial revision
 
@@ -109,12 +117,14 @@ balance ( const CanonicalForm & f, const CanonicalForm & q )
 {
     CFIterator i;
     CanonicalForm result = 0, qh = q / 2;
+    CanonicalForm c;
     Variable x = f.mvar();
     for ( i = f; i.hasTerms(); i++ ) {
-	if ( i.coeff() > qh )
-	    result += power( x, i.exp() ) * (i.coeff() - q);
+	c = i.coeff() % q;
+	if ( c > qh )
+	    result += power( x, i.exp() ) * (c - q);
 	else
-	    result += power( x, i.exp() ) * i.coeff();
+	    result += power( x, i.exp() ) * c;
     }
     return result;
 }
@@ -303,15 +313,13 @@ gcd_poly( const CanonicalForm & f, const CanonicalForm& g, bool modularflag )
     Ci = content( pi ); Ci1 = content( pi1 );
     C = gcd( Ci, Ci1 );
     pi1 = pi1 / Ci1; pi = pi / Ci;
-    if ( ! pi.isUnivariate() ) {
-	if ( gcd_test_one( pi1, pi ) )
-	    return C;
-    }
-    else {
-	// pi is univariate
+    if ( pi.isUnivariate() && pi1.isUnivariate() ) {
 	if ( modularflag )
 	    return gcd_poly_univar0( pi, pi1, true ) * C;
     }
+    else
+	if ( gcd_test_one( pi1, pi ) )
+	    return C;
     delta = degree( pi, v ) - degree( pi1, v );
     Hi = power( LC( pi1, v ), delta );
     if ( (delta+1) % 2 )
@@ -402,9 +410,15 @@ CanonicalForm
 gcd ( const CanonicalForm & f, const CanonicalForm & g )
 {
     if ( f.isZero() )
-	return g;
+	if ( g.lc().sign() < 0 )
+	    return -g;
+	else
+	    return g;
     else  if ( g.isZero() )
-	return f;
+	if ( f.lc().sign() < 0 )
+	    return -f;
+	else
+	    return f;
     else  if ( f.inBaseDomain() )
 	if ( g.inBaseDomain() )
 	    return igcd( f, g );
@@ -416,6 +430,16 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
 	if ( f.inExtension() && getReduce( f.mvar() ) )
 	    return 1;
 	else {
+	    if ( divides( f, g ) )
+		if ( f.lc().sign() < 0 )
+		    return -f;
+		else
+		    return f;
+	    else  if ( divides( g, f ) )
+		if ( g.lc().sign() < 0 )
+		    return -g;
+		else
+		    return g;
 	    if ( getCharacteristic() == 0 && isOn( SW_RATIONAL ) ) {
 		Off( SW_RATIONAL );
 		CanonicalForm l = lcm( common_den( f ), common_den( g ) );
@@ -424,10 +448,18 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
 		Off( SW_RATIONAL );
 		l = gcd_poly( F, G, true );
 		On( SW_RATIONAL );
-		return l;
+		if ( l.lc().sign() < 0 )
+		    return -l;
+		else
+		    return l;
 	    }
-	    else
-		return gcd_poly( f, g, getCharacteristic()==0 );
+	    else {
+		CanonicalForm d = gcd_poly( f, g, getCharacteristic()==0 );
+		if ( d.lc().sign() < 0 )
+		    return -d;
+		else
+		    return d;
+	    }
 	}
     else  if ( f.mvar() > g.mvar() )
 	return cf_content( f, g );
