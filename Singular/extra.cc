@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.179 2002-02-16 18:26:07 mschulze Exp $ */
+/* $Id: extra.cc,v 1.180 2002-03-06 16:38:29 mschulze Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -96,11 +96,21 @@
  * - without HAVE_DYNAMIC_LOADING: these functions comes as system("....");
  * - with    HAVE_DYNAMIC_LOADING: these functions are loaded as module.
  */
-//#ifndef HAVE_DYNAMIC_LOADING
+#ifndef HAVE_DYNAMIC_LOADING
+
 #ifdef HAVE_PCV
 #include "pcv.h"
 #endif
-//#endif /* not HAVE_DYNAMIC_LOADING */
+
+#ifdef HAVE_EIGENVAL
+#include "eigenval.h"
+#endif
+
+#ifdef HAVE_GMS
+#include "gms.h"
+#endif
+
+#endif /* not HAVE_DYNAMIC_LOADING */
 
 // see clapsing.cc for a description of the `FACTORY_*' options
 
@@ -249,6 +259,12 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         #endif
         #ifdef HAVE_DYNAMIC_LOADING
           TEST_FOR("DynamicLoading");
+        #endif
+        #ifdef HAVE_EIGENVAL
+          TEST_FOR("eigenval");
+        #endif
+        #ifdef HAVE_GMS
+          TEST_FOR("gms");
         #endif
           ;
         return FALSE;
@@ -501,8 +517,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
 #endif
+#ifndef HAVE_DYNAMIC_LOADING
 /*==================== pcv ==================================*/
-//#ifndef HAVE_DYNAMIC_LOADING
 #ifdef HAVE_PCV
     if(strcmp(sys_cmd,"pcvLAddL")==0)
     {
@@ -540,7 +556,28 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
 #endif
-//#endif /* HAVE_DYNAMIC_LOADING */
+/*==================== eigenvalues ==================================*/
+#ifdef HAVE_EIGENVAL
+    if(strcmp(sys_cmd,"hessenberg")==0)
+    {
+      return evHessenberg(res,h);
+    }
+    else
+    if(strcmp(sys_cmd,"eigenvals")==0)
+    {
+      return evEigenvals(res,h);
+    }
+    else
+#endif
+/*==================== Gauss-Manin system ==================================*/
+#ifdef HAVE_GMS
+    if(strcmp(sys_cmd,"gmsnf")==0)
+    {
+      return gmsNF(res,h);
+    }
+    else
+#endif
+#endif /* HAVE_DYNAMIC_LOADING */
 /*==================== contributors =============================*/
    if(strcmp(sys_cmd,"contributors") == 0)
    {
@@ -635,12 +672,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 #endif
 #include "mpsr.h"
 #include "mod_raw.h"
-#ifdef HAVE_EIGENVAL
-#include "eigenval.h"
-#endif
-#ifdef HAVE_GMS
-#include "gms.h"
-#endif
 
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 {
