@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.30 1999-11-18 11:19:16 Singular Exp $ */
+/* $Id: structs.h,v 1.31 2000-02-10 16:09:04 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -18,6 +18,18 @@ typedef void * Sy_reference;
 #define BITSET  unsigned int
 
 /* EXPONENT_TYPE is determined by configure und defined in mod2.h */
+/* the following defines should really go into mod2.h,
+   but configure dislikes it */
+
+#ifdef HAVE_SHIFTED_EXPONENTS
+/* Define the type of the exponents to be used in monomials */
+#undef EXPONENT_TYPE
+#define EXPONENT_TYPE long
+/* Define the size of exponent */
+#undef SIZEOF_EXPONENT
+#define SIZEOF_EXPONENT SIZEOF_LONG
+#endif
+
 typedef EXPONENT_TYPE Exponent_t;
 
 enum tHomog
