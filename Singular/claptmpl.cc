@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.11 1998-01-05 16:39:17 Singular Exp $
+// $Id: claptmpl.cc,v 1.12 1998-01-27 14:05:56 pohl Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -16,7 +16,7 @@
 
 #if defined(HAVE_FACTORY) || defined(HAVE_FGLM)
   #ifdef macintosh
-    #include <::templates:ftmpl_list.cc>
+    #include <:templates:ftmpl_list.cc>
   #else
     #include <templates/ftmpl_list.cc>
   #endif
@@ -27,10 +27,10 @@
 
   #ifdef HAVE_FACTORY
     #ifdef macintosh
-      #include <::templates:ftmpl_array.cc>
-      #include <::templates:ftmpl_factor.cc>
-      #include <::templates:ftmpl_functions.h>
-      #include <::templates:ftmpl_matrix.cc>
+      #include <:templates:ftmpl_array.cc>
+      #include <:templates:ftmpl_factor.cc>
+      #include <:templates:ftmpl_functions.h>
+      #include <:templates:ftmpl_matrix.cc>
       template List<CanonicalForm> Difference<CanonicalForm>(const List<CanonicalForm>&,const List<CanonicalForm>&);
       template List<CanonicalForm> Union<CanonicalForm>(const List<CanonicalForm>&,const List<CanonicalForm>&);
       template List<CFFactor> Union<CFFactor>(const List<CFFactor>&,const List<CFFactor>&);
