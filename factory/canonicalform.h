@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.h,v 1.26 2000-05-29 15:05:20 Singular Exp $ */
+/* $Id: canonicalform.h,v 1.27 2001-06-22 15:57:41 Singular Exp $ */
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
@@ -211,6 +211,8 @@ CanonicalForm content ( const CanonicalForm& );
 CanonicalForm content ( const CanonicalForm&, const Variable& );
 
 CanonicalForm icontent ( const CanonicalForm & f );
+
+CanonicalForm vcontent ( const CanonicalForm & f, const Variable & x );
 //}}}
 
 //{{{ function declarations from cf_ops.cc
