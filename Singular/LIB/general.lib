@@ -1,13 +1,14 @@
-// $Id: general.lib,v 1.8 1998-05-14 18:45:03 Singular Exp $
+// $Id: general.lib,v 1.9 1998-09-30 17:24:31 Singular Exp $
 //system("random",787422842);
-//(GMG, last modified 22.06.96)
+//GMG, last modified 30.9.98
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: general.lib,v 1.8 1998-05-14 18:45:03 Singular Exp $";
+version="$Id: general.lib,v 1.9 1998-09-30 17:24:31 Singular Exp $";
 info="
 LIBRARY:  general.lib   PROCEDURES OF GENERAL TYPE
 
  A_Z(\"a\",n);            string a,b,... of n comma seperated letters
+ ASCII([n,m]);          string of printable ASCII characters (number n to m)
  binomial(n,m[,../..]); n choose m (type int), [type string/type number]
  factorial(n[,../..]);  n factorial (=n!) (type int), [type string/number]
  fibonacci(n[,p]);      nth Fibonacci number [char p]
@@ -20,8 +21,7 @@ LIBRARY:  general.lib   PROCEDURES OF GENERAL TYPE
  ringweights(r);        intvec of weights of ring variables of ring r
  sort(ideal/module);    sort generators according to monomial ordering
  sum(vector/id/..[,v]); add components of vector/ideal/...[with indices v]
- which(command);        searches for command and returns absolute
-                        path, if found
+ which(command);        search for command and return absolute path, if found
            (parameters in square brackets [] are optional)
 ";
 
@@ -81,6 +81,61 @@ example
    sR;
    execute sR;
    R;
+}
+///////////////////////////////////////////////////////////////////////////////
+proc ASCII (list #)
+"USAGE:   ASCII([n,m]); n,m= integers (32 <= n <= m <= 126)
+RETURN:   printable ASCII characters (no native language support)
+          ASCII():    string of  all ASCII characters with its numbers,
+                      no return value
+          ASCII(n):   string, n-th ASCII charakter
+          ASCII(n,m): list, n-th up to m-th ASCII character (inclusive)
+EXAMPLE: example ASCII; shows an example
+"
+{
+  string s1 =
+ "     !    \"    #    $    %    &    '    (    )    *    +    ,    -    .
+32   33   34   35   36   37   38   39   40   41   42   43   44   45   46
+
+/    0    1    2    3    4    5    6    7    8    9    :    ;    <    =
+47   48   49   50   51   52   53   54   55   56   57   58   59   60   61
+
+>    ?    @    A    B    C    D    E    F    G    H    I    J    K    L
+62   63   64   65   66   67   68   69   70   71   72   73   74   75   76
+
+M    N    O    P    Q    R    S    T    U    V    W    X    Y    Z    [
+77   78   79   80   81   82   83   84   85   86   87   88   89   90   91
+
+\\    ]    ^    _    `    a    b    c    d    e    f    g    h    i    j
+92   93   94   95   96   97   98   99  100  101  102  103  104  105  10
+
+k    l    m    n    o    p    q    r    s    t    u    v    w    x    y
+107  108  109  110  111  112  113  114  115  116  117  118  119  120  121
+
+z    {    |    }    ~
+122  123  124  125  126 ";
+
+   string s2 =
+ " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+
+   if ( size(#) == 0 )
+   {
+      return(s1);
+   }
+   if ( size(#) == 1 )
+   {
+      return( s2[#[1]-31] );
+   }
+   if ( size(#) == 2 )
+   {
+      return( s2[#[1]-31,#[2]-#[1]+1] );
+   }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ASCII();"";
+   ASCII(42);
+   ASCII(32,126);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -261,7 +316,7 @@ example
 
 proc number_e (int n)
 "USAGE:   number_e(n);  n integer
-COMPUTE: exp(1) up to n decimal digits (no rounding)
+COMPUTE: Euler number e=exp(1) up to n decimal digits (no rounding)
          by A.H.J. Sale's algorithm
 RETURN:  - string of exp(1) if no basering of char 0 is defined;
          - exp(1), of type number, if a basering of char 0 is defined and
@@ -468,7 +523,7 @@ example
 proc sort (id, list #)
 "USAGE:   sort(id[v,o,n]); id=ideal/module/intvec/list (of intvec's or int's)
          sort may be called with 1, 2 or 3 arguments in the following way:
-         -  sort(id[v,n]); v=intvec, n=integer,
+         -  sort(id[v,n]); v=intvec of positive integers, n=integer,
          -  sort(id[o,n]); o=string (any allowed ordstr of a ring), n=integer
 RETURN:  a list of two elements:
          [1]: object of same type as input but sorted in the following manner:
@@ -487,14 +542,15 @@ RETURN:  a list of two elements:
              returned.
              (e.g. sort(id); sorts lexicographically, smaller int's come first)
              WARNING: Since negative exponents create the 0 plynomial in
-             Singular, id should not contain negative integers: the result might
-             not be as exspected
+             Singular, id should not contain negative integers: the result
+             might not be as exspected
            - if id=intvec: id is treated as list of integers
            - if n!=0 the ordering is inverse, i.e. w.r.t. v(size(v)..1)
              default: n=0
          [2]: intvec, describing the permutation of the input (hence [2]=v if
-             v is given)
-NOTE:    If v is given, id may be any simply indexed object (e.g. any list);
+             v is given (with positive intergers)
+NOTE:    If v is given id may be any simply indexed object (e.g. any list or
+         string); if v[i]<0 and i<=size(id) v[i] is set internally to i;
          entries of v must be pairwise distinct to get a permutation if id.
          Zero generators of ideal/module are deleted
 EXAMPLE: example sort; shows an example
@@ -512,7 +568,6 @@ EXAMPLE: example sort; shows an example
       }
       if ( ii != size(id) ) { v = sortvec(id); }
       else  { v = size(id)..1; }
-      if ( v == 0 ) { v = 1; }
    }
    if ( size(#)>=1 and (typeof(id)=="ideal" or typeof(id)=="module") )
    {
@@ -566,8 +621,17 @@ EXAMPLE: example sort; shows an example
       if ( #[2] != 0 ) { v = v[size(v)..1]; }
    }
    s = size(v);
+   if( size(id) < s ) { s = size(id); }
    def m = id;
-   for ( jj=1; jj<=s; jj=jj+1) { m[jj] = id[v[jj]]; }
+   if ( size(m) != 0 )
+   {
+      for ( jj=1; jj<=s; jj=jj+1)
+      {
+         if ( v[jj]<=0 ) { v[jj]=jj; }
+         m[jj] = id[v[jj]];
+      }
+   }
+   if ( v == 0 ) { v = 1; }
    list L=m,v;
    return(L);
 }
