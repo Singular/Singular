@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.173 1999-08-19 15:51:29 Singular Exp $ */
+/* $Id: iparith.cc,v 1.174 1999-09-15 12:22:59 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1531,6 +1531,11 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
     BOOLEAN bo;
     if (!nSetMap(rInternalChar(r),r->parameter,rPar(r),r->minpoly))
     {
+      if (rEqual(r,currRing))
+      {
+        nMap=nCopy;
+      }
+      else
       // Allow imap/fetch to be make an exception only for:
       if ( (rField_is_Q_a(r) &&  // Q(a..) -> Q(a..) || Q || Zp || Zp(a)
             (rField_is_Q() || rField_is_Q_a() ||

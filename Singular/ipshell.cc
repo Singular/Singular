@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.46 1999-08-16 11:11:28 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.47 1999-09-15 12:23:01 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -594,8 +594,16 @@ leftv iiMap(map theMap, char * what)
                  rPar(IDRING(r)),
                  IDRING(r)->minpoly))
     {
-      Werror("can not map from ground field of %s to current ground field", theMap->preimage);
-      return NULL;
+      if (rEqual(r,currRing))
+      {
+        nMap=nCopy;
+      }
+      else
+      {
+        Werror("can not map from ground field of %s to current ground field",
+          theMap->preimage);
+        return NULL;
+      }
     }
     if (IDELEMS(theMap)<IDRING(r)->N)
     {

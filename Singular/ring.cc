@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.62 1999-07-28 16:50:09 Singular Exp $ */
+/* $Id: ring.cc,v 1.63 1999-09-15 12:23:02 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1855,9 +1855,10 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
   if (r1 == NULL || r2 == NULL) return 0;
 
   if ((rInternalChar(r1) != rInternalChar(r2))
-  // orig: r1->ch == r2->ch ???
-  || (r1->N != r2->N) || (r1->OrdSgn != r2->OrdSgn)
-      || (rPar(r1) != rPar(r2)))
+  || (r1->ch_flags != r2->ch_flags)
+  || (r1->N != r2->N)
+  || (r1->OrdSgn != r2->OrdSgn)
+  || (rPar(r1) != rPar(r2)))
     return 0;
 
   for (i=0; i<r1->N; i++)
