@@ -1,32 +1,27 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: int_cf.h,v 1.0 1996-05-17 10:59:41 stobbe Exp $
+// $Id: int_cf.h,v 1.1 1997-03-27 10:04:57 schmidt Exp $
 
 #ifndef INCL_INTERNALCF_H
 #define INCL_INTERNALCF_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:41  stobbe
+Initial revision
+
 */
 
+#ifndef NOSTREAMIO
 #include <iostream.h>
+#endif /* NOSTREAMIO */
+
+#include "assert.h"
+
 #include "cf_defs.h"
+
 #include "variable.h"
 
 class CanonicalForm;
-
-#ifdef NDEBUG
-#define PVIRT_VOID(msg) = 0
-#define PVIRT_INTCF(msg) = 0
-#define PVIRT_BOOL(msg) = 0
-#define PVIRT_INT(msg) = 0
-#define PVIRT_CHARCC(msg) = 0
-#else
-#define PVIRT_VOID(msg) { cerr << "pure method(" << msg << ") called" << endl; }
-#define PVIRT_INTCF(msg) { cerr << "pure method(" << msg << ") called" << endl; return 0; }
-#define PVIRT_BOOL(msg) { cerr << "pure method(" << msg << ") called" << endl; return false; }
-#define PVIRT_INT(msg) { cerr << "pure method(" << msg << ") called" << endl; return 0; }
-#define PVIRT_CHARCC(msg) { cerr << "pure method(" << msg << ") called" << endl; return 0; }
-#endif
 
 class InternalCF {
 private:
@@ -39,8 +34,8 @@ public:
     InternalCF() { refCount = 1; };
     InternalCF( const InternalCF& )
     {
-	cerr << "ups there is something wrong in your code" << endl; 
-    }; 
+	ASSERT( 0, "ups there is something wrong in your code");
+    };
     virtual ~InternalCF() {};
     int deleteObject() { return decRefCount() == 0; }
     InternalCF* copyObject() { incRefCount(); return this; }
@@ -52,7 +47,9 @@ public:
     virtual int levelcoeff() const { return UndefinedDomain; }
     virtual int type() const { return UndefinedDomain; }
     virtual Variable variable() const { return Variable(); }
+#ifndef NOSTREAMIO
     virtual void print( ostream&, char* ) PVIRT_VOID("print");
+#endif /* NOSTREAMIO */
     virtual bool inBaseDomain() const { return true; }
     virtual bool inExtension() const { return false; }
     virtual bool inCoeffDomain() const { return true; }
