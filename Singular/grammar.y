@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.80 2000-05-15 12:47:43 Singular Exp $ */
+/* $Id: grammar.y,v 1.81 2000-05-25 09:02:02 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -98,6 +98,8 @@ void yyerror(char * fmt)
     else
     #endif
     {
+      if ((strlen(fmt)>1) && (strncmp(fmt,"parse",5)!=0))
+        WerrorS(fmt);
       Werror( "error occurred in %s line %d: `%s`"
              ,VoiceName(), yylineno, my_yylinebuf);
     }
