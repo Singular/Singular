@@ -546,7 +546,7 @@ if test ${GCC} = yes && test "$ac_cflags_set" = no ; then
   CFLAGS="-O3 -w -fomit-frame-pointer"
 fi
 
-AC_OUTPUT(Makefile doc/Makefile, \
+AC_OUTPUT(Makefile doc/Makefile newdoc/Makefile, \
  if test "$CONFIG_HEADERS"; then echo timestamp > stamp-h; fi)
 
 
