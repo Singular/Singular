@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.12 2002-06-04 11:49:29 levandov Exp $ */
+/* $Id: gring.h,v 1.13 2002-07-12 13:49:05 levandov Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -35,6 +35,10 @@ ideal gr_bba (ideal F, ideal Q,kStrategy strat);
 // brackets:
 poly nc_p_Bracket_qq(poly p, poly q);
 poly nc_mm_Bracket_nn(poly m1, poly m2);
+
+//twostd:
+
+ideal twostd(ideal I);
 
 #endif /* HAVE_PLURAL */
 #endif
