@@ -1,7 +1,8 @@
-// $Header: /exports/cvsroot-2/cvsroot/Singular/LIB/finvar.lib,v 1.8 1998-04-03 22:47:02 krueger Exp $
-////////////////////////////////////////////////////////////////////////////////
-
-version="$Id: finvar.lib,v 1.8 1998-04-03 22:47:02 krueger Exp $";
+// $Id: finvar.lib,v 1.9 1998-05-03 11:57:37 obachman Exp $
+// author: Agnes Eileen Heydtmann, email:agnes@math.uni-sb.de
+// last change: 3.5.98 
+//////////////////////////////////////////////////////////////////////////////
+version="$Id: finvar.lib,v 1.9 1998-05-03 11:57:37 obachman Exp $"
 info="
 LIBRARY:  finvar.lib       LIBRARY TO CALCULATE INVARIANT RINGS & MORE
                            (c) Agnes Eileen Heydtmann,
@@ -1721,7 +1722,7 @@ THEORY:  Monomials of degree d are mapped to invariants with the Reynolds
     }
     part_mon=mon[lower_bound..upper_bound];
     B=minbase(B+evaluate_reynolds(REY,part_mon));
-    if (ncols(B)==cd or upper_bound==j)
+    if ((ncols(B)==cd and B[1]<>0) or upper_bound==j)
     { degBound=0;
       return(B);
     }
@@ -4115,7 +4116,8 @@ RETURN:  a size(dv)*m <intmat> where each column ought to be interpreted as
          containing the exponents of the corresponding polynomials. The product
          of the powers is then homogeneous of degree d.
 EXAMPLE: example power_products; gives an example
-{ if (d<=0)
+{ ring R=0,x,dp;
+  if (d<=0)
   { "ERROR:   The <int> may not be <= 0";
     return();
   }
@@ -5207,7 +5209,7 @@ THEORY:  Bases of homogeneous invariants are generated successively and those
           molien(L[3..size(L)],newring,L[2],intvec(0,interval,v));
           matrix P=primary_charp(L[1],newring,v);
           matrix S,IS=secondary_charp(P,L[1],newring,v);
-          if (voice==2)
+          if (defined(aksldfalkdsflkj)==2)
           { kill aksldfalkdsflkj;
           }
           return(P,S,IS);
@@ -5224,7 +5226,7 @@ THEORY:  Bases of homogeneous invariants are generated successively and those
           }
           list l=primary_charp_no_molien(L[1],v);
           if (size(l)==2)
-          { matix S=secondary_no_molien(l[1],L[1],l[2],v);
+          { matrix S=secondary_no_molien(l[1],L[1],l[2],v);
           }
           else
           { matix S=secondary_no_molien(l[1],L[1],v);
@@ -5563,7 +5565,6 @@ THEORY:  The ideal of algebraic relations of the algebra generators f1,...,fm
     string mp=string(minpoly);
     execute "ring R=("+charstr(br)+"),(x(1..n),y(1..m)),(dp(n),dp(m));";
     execute "minpoly=number("+mp+");";
-    ring R=0,(x(1..n),y(1..m)),(dp(n),dp(m));
     ideal vars=x(1..n);
     map emb=br,vars;
     ideal A=ideal(emb(A));
@@ -5840,3 +5841,5 @@ example
          ideal I=xy;
          print(image_of_variety(I,F));
 }
+
+
