@@ -183,7 +183,7 @@ CPPFLAGS="-I${includedir} ${CPPFLAGS}"
 
 # this is a work-around to include the right term.h
 if test "$ac_cv_singuname" = SunOS-5; then
-CPPFLAGS="-I/usr/xpg4/include ${CPPFLAGS"
+CPPFLAGS="-I/usr/xpg4/include ${CPPFLAGS}"
 fi
 
 
