@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.71 1998-06-19 14:12:20 gorzel Exp $
+@comment $Id: types.doc,v 1.72 1998-06-19 14:31:16 gorzel Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -849,13 +849,13 @@ a type cast to intmat
 @c example
   intmat Idm[3][3];
   Idm +1;          // add the unit intmat
-  intmat m1[4][2] = _;  // take entries from the last result 
+  intmat m1[3][2] = _,1,-2;  // take entries from the last result 
   m1;
   intmat m2[2][3]=1,0,2,4,5,1;
   transpose(m2);
   intvec v1=1,2,4;
   intvec v2=5,7,8;
-  m1=v1,v2;         // overwrite m1 with v1 and v2
+  m1=v1,v2;         // fill m1 with v1 and v2
   m1;
   trace(m1*m2);
 @c example
@@ -914,7 +914,7 @@ second the column
   m2 div 2;
   m2[2,1];          // entry at row 2, col 1
   m1[2..3,2..3];   // submatrix
-  m2[nrows(m1),ncols(m1)];      // the last entry of intmat m2
+  m2[nrows(m2),ncols(m2)];      // the last entry of intmat m2
 @c example
 @end example
 
