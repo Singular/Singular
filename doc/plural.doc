@@ -98,7 +98,7 @@
 @end ifset 
 
 @ifclear singularmanual
-@node Data types @value{PSUFFIX}, Functions  @value{PSUFFIX}, PLURAL conventions, Top
+@node Data types @value{PSUFFIX}, Functions @value{PSUFFIX}, PLURAL conventions, Top
 @chapter Data types @value{PSUFFIX}
 @end ifclear 
 
@@ -143,7 +143,7 @@
 
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node Mathematical background @value{PSUFFIX},  , Functions
+@node Mathematical background @value{PSUFFIX},  , Functions @value{PSUFFIX}, Functions @value{PSUFFIX}
 @value{PSUFFIX}, PLURAL 
 @section Mathematical background @value{PSUFFIX}
 @end ifset
@@ -173,21 +173,30 @@ Use the @code{LIB} command for loading of single libraries.
 @c @sc{Singular} and @sc{Plural} together.
 
 @menu
-* ncalg_lib::                    
-* nctools_lib::                 
-* gkdim_lib::                   
-* qmatrix_lib::                 
+* ncalg_lib::
+* ncdecomp_lib::               
+* nctools_lib::
+* gkdim_lib::
+* qmatrix_lib::
 @end menu
 
 @c ----------------------------------------------------------
-@node ncalg_lib, nctools_lib, PLURAL libraries, PLURAL libraries
+@node ncalg_lib, ncdecomp_lib, PLURAL libraries, PLURAL libraries
 @section ncalg_lib
 
 @c lib ncalg.lib
 
 @c ----------------------------------------------------------
 
-@node nctools_lib, gkdim_lib, ncalg_lib, PLURAL libraries
+
+@node ncdecomp_lib, nctools_lib, ncalg_lib, PLURAL libraries
+@section ncdecomp_lib
+
+@c lib ncdecomp.lib
+
+@c ----------------------------------------------------------
+
+@node nctools_lib, gkdim_lib, ncdecomp_lib, PLURAL libraries
 @section nctools_lib
 
 @c lib nctools.lib
