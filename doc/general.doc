@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.63 1998-05-13 12:45:15 Singular Exp $
+@comment $Id: general.doc,v 1.64 1998-05-13 12:49:17 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -710,7 +710,7 @@ Here lead means the leading monomial with respect to ord, 1
 is the constant monomial 1 and $>$ means bigger with respect to
 ord. For global orderings, $x_i > 1$, hence Loc K$[x_1,...,x_n]$ =
 K$[x_1,...,x_n]$, for local orderings, $x_i < 1$, hence Loc K$[x_1,...,x_n]$ =
-$K[$x_1,...,x_n$]$_{(x)}$ (the localization of K[$x_1,...,x_n$] with
+K[$x_1,...,x_n$]$_{(x)}$ (the localization of K[$x_1,...,x_n$] with
 respect to the maximal ideal $(x_1,...,x_n)$).
 In general we have K[$x_1,...,x_n$]$ \subseteq $Loc K[$x_1,...,x_n$]$ \subseteq $ K[$x_1,...,x_n$]$_{(x)}$.
 A product ordering which is for example
