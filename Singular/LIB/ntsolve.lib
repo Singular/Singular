@@ -1,0 +1,240 @@
+///////////////////////////////////////////////////////////////////////////////
+version="$$";
+info="
+LIBRARY: ntsolve.lib     PROCEDURES TO FIND ONE REAL SOLUTION OF POLYNOMIAL
+                         SYSTEMS USING NEWTON ITERATION
+AUTHOR:  Wilfred Pohl,   email: pohl@mathematik.uni-kl.de
+
+PROCEDURES:
+nt_solve(i,..);        find one real root of 0-dimensional ideal
+";
+///////////////////////////////////////////////////////////////////////////////
+
+proc nt_solve( ideal gls, vector ini, intvec ipar )
+"USAGE:   nt_solve(gls,ini,ipar);
+         gls: the equations
+         ini: the vector of initial values
+         ipar: control
+           ipar[1] - max. number of iterations
+           ipar[2] - accuracy, have the l2-norm ||.||
+                     for the initial error eps0 = ||gls(ini)||
+                     accept solution sol with
+                     ||gls(sol)|| <  eps0*(0.1^ipar[2])
+           ipar[3] - some output for contol if != 0
+           defaults - 100, 10, 0
+ASSUME:  gls is a zerodimensional ideal with
+         nvars(basering) = size(gls) (> 1)
+RETURN:  vector of one solution (if found)
+         0 (else)
+EXAMPLE: example nt_solve; shows an example
+"
+{
+    def rn = basering;
+    int di = size(gls);
+    if (nvars(basering) != di){
+      ERROR("wrong dimension");}
+    if (size(ini) != di){
+      ERROR("wrong number of initial values");}
+
+    int i1,i2,i3;
+    i1 = size(ipar);
+    int itmax, acc, prot;
+    if (i1 < 1){itmax = 100;}else{itmax = ipar[1];}
+    if (i1 < 2){acc = 10;}else{acc = ipar[2];}
+    if (i1 < 3){prot = 0;}else{prot = ipar[3];}
+
+    int prec = acc+5; // precision in the working ring
+    int dpl = di+1;
+    string out; // for prot != 0 and more
+    intvec permut; // the permutations in bareiss
+    out = "ring rnewton=(real,prec),("+varstr(basering)+"),(c,dp);";
+    execute(out);
+    ideal gls1=imap(rn,gls);
+    module nt,sub;
+    sub = transpose(jacob(gls1));
+    for (i1=di;i1>0;i1--){
+      if(sub[i1]==0){break;}}
+    if (i1>0){
+      setring rn; kill rnewton;
+      ERROR("one var not in equation");}
+    vector direction,ini1;
+    ini1 = imap(rn,ini);
+    number dum,y1,y2,y3,genau;
+    genau = 0.1;
+    dum = genau;
+    genau = genau^acc;
+    for (i1=di;i1>0;i1--){
+      sub[i1]=sub[i1]+gls1[i1]*gen(dpl);}
+    nt = sub;
+    for (i1=di;i1>0;i1--){
+      nt = subst(nt,var(i1),ini1[i1]);}
+    // now we have in sub the general structure
+    // and in nt the strukture with subst. vars
+
+    // compute initial error
+    y1 = ml2norm(nt,genau);
+    if(prot){out=" initial error = "+string(y1);out;}
+    y2 = genau*y1;
+
+  // begin of iteration
+  for(i3=1;i3<=itmax;i3++){
+    if(prot){out="  Nr. "+string(i3);out;}
+
+    // find newton direction
+    list bar = bareiss(nt,1,-1);
+    nt = bar[1];
+    permut = bar[2];
+    kill bar;
+    direction=nt[di][dpl]/leadcoef(nt[di][di])*gen(di);
+    for(i1=di-1;i1>0;i1--){
+      y3 = leadcoef(nt[i1][dpl]);
+      for(i2=di;i2>i1;i2--){
+        y3 = y3-leadcoef(direction[i2])*leadcoef(nt[i1][i2]);}
+      direction = direction+(y3/leadcoef(nt[i1][i1])*gen(i1));}
+
+    // find dumping
+    dum = linesearch(gls1,ini1,direction,permut,y1,dum,genau);
+    if(prot){out="  dumping = "+string(dum);out;}
+
+    // new value
+    for(i1=di;i1>0;i1--){
+      ini1=ini1-dum*direction[i1]*gen(permut[i1]);}
+    nt = sub;
+    for (i1=di;i1>0;i1--){
+      nt = subst(nt,var(i1),ini1[i1]);}
+    y1 = ml2norm(nt,genau);
+    if(prot){out="  error = "+string(y1);out;}
+    if(y1<y2){break;} // we are ready
+  }
+
+    setring rn;
+    if (y1>y2){
+      kill rnewton;
+      ERROR("no convergence");}
+    ini = imap(rnewton,ini1);
+    kill rnewton;
+    return(ini);
+}
+example
+{
+    "EXAMPLE:";echo=2;
+    ring rsq = (real,16),(x,y,z,w),(c,lp);
+    ideal gls =  x2+y2+z2-10, y2+z3+w-8, xy+yz+xz+w5 - 1,w3+y;
+    vector ini = [3.1,2.9,1.1,0.5];
+    intvec ipar = 200,8,1;
+    vector sol = nt_solve(gls,ini,ipar);
+    sol;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc sqrt (number wr, number wa, number wg)
+{
+  number we=wr*wg;
+  number wb=wa;
+  number wf=wb*wb-wr;
+  while (wf>we)
+  {
+    wf=wf/(wb+wb);
+    wb=wb-wf;
+    wf=wb*wb-wr;
+  }
+  return(wb);
+}
+
+static proc vl2norm (vector H, number wg)
+{
+  number wa,wb;
+  int wi;
+  wa = leadcoef(H[1]);
+  wa = wa*wa;
+  for(wi=size(H);wi>1;wi--)
+  {
+    wb=leadcoef(H[wi]);
+    wa=wa+wb*wb;
+  }
+  return(sqrt(wa,wa,wg));
+}
+
+static proc il2norm (ideal H, number wg)
+{
+  number wa,wb;
+  int wi,dpl;
+  wa = leadcoef(H[1]);
+  wa = wa*wa;
+  for(wi=size(H);wi>1;wi--)
+  {
+    wb=leadcoef(H[wi]);
+    wa=wa+wb*wb;
+  }
+  return(sqrt(wa,wa,wg));
+}
+
+static proc ml2norm (module H, number wg)
+{
+  number wa,wb;
+  int wi,dpl;
+  dpl = size(H)+1;
+  wa = leadcoef(H[1][dpl]);
+  wa = wa*wa;
+  for(wi=size(H);wi>1;wi--)
+  {
+    wb=leadcoef(H[wi][dpl]);
+    wa=wa+wb*wb;
+  }
+  return(sqrt(wa,wa,wg));
+}
+
+proc linesearch(ideal nl, vector aa, vector bb, intvec pe,
+number z1, number tt, number gg)
+{
+  int ii,d;
+  vector cc;
+  ideal jn;
+  number z2,z3,e1;
+  d=size(nl);
+  cc=aa;
+  for(ii=d;ii>0;ii--){cc=cc-tt*bb[ii]*gen(pe[ii]);}
+  jn=nl;
+  for(ii=d;ii>0;ii--){jn=subst(jn,var(ii),cc[ii]);}
+  z2=il2norm(jn,gg);
+  z3=-1;
+  e1=1.0e-6;
+  while(z2>=z1)
+  {
+    if(tt<e1){return (e1);}
+    tt=0.5*tt;
+    cc=aa;
+    for(ii=d;ii>0;ii--)
+    {
+      cc=cc-tt*bb[ii]*gen(pe[ii]);
+    }
+    jn=nl;
+    for(ii=d;ii>0;ii--){jn=subst(jn,var(ii),cc[ii]);}
+    z3=z2;
+    z2=il2norm(jn,gg);
+  }
+  if(z3<0)
+  {
+    while(z3<z2)
+    {
+      tt=tt+tt;
+      cc=aa;
+      for(ii=d;ii>0;ii--)
+      {
+        cc=cc-tt*bb[ii]*gen(pe[ii]);
+      }
+      jn=nl;
+      for(ii=d;ii>0;ii--){jn=subst(jn,var(ii),cc[ii]);}
+      if(z3>0){z2=z3;}
+      z3=il2norm(jn,gg);
+    }
+  }
+  z2=z2-z1;
+  z3=z3-z1;
+  tt=0.25*tt*(z3-4*z2)/(z3-2*z2);
+  if(tt<e1){return (e1);}
+  return(tt);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+// End: ***
