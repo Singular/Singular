@@ -84,7 +84,7 @@ files and architecture-independent files.  If you give configure the option
 `--exec-prefix=<path>' the package will use <path> as the prefix for
 installing the libraries.  The other data files will still use the regular
 prefix.
-
+
 Configuring and building Factory for different configurations
 -------------------------------------------------------------
   The configure script that comes with Factory recognizes a number of
@@ -105,7 +105,7 @@ additional options.  Here is a list of them which you can get entering
   --enable-debugoutput    build Factory so it will print debugging information
   --enable-gmp            together with `--with-Singular' means: installation
                           in process, be graceful when there is no `gmp.h'
-
+
   For more detailed information, see the `README' file.  Note that not all
 possible combinations of the `--with's and `--enable's are meaningful.  The
 dependencies between them are described in the `README' file, too.
@@ -137,19 +137,23 @@ commands necessary to do that:
   make installgftables
   
 
+Configuring for Microsoft Windows NT
+------------------------------------
+  Factory compiles on Microsoft Windows NT 4.0 with the Microsoft Visual
+C++ 5.0 compiler.  There is a preconfigured environment contained in the
+folder `winnt/' which includes `config.h', `factoryconf.h', `factory.h' and
+a Makefile `nt.mak', suitable for use under MS VC++ 5.0.  There is also a
+file called `INSTALL.nt' which contains information about how to build
+under Windows NT.
+
 Configuring for Macintosh or other non-Unix platforms
 -----------------------------------------------------
   Factory translates on Macintosh with the Metroworks CodeWarrior compiler
 now.  If you want to build Factory on this or other non-Unix platforms you
 either have to configure `config.h' and `GNUmakefile' by hand or you have
 to create a suitable `config.cache' file and run `configure' on a machine
-that supports it.
-
-  Factory compiles on Microsoft Windows NT 4.0 with the Microsoft Visual C++
-5.0 compiler. There is a preconfigured environment contained in the folder
-winnt which includes config.h, factoryconf.h, factory.h and a Makefile nt.mak,
-suitable for use under MS VC++ 5.0. There is also a file called INSTALL.nt
-which contains information about how to build under Windows NT.
+that supports it.  Furthermore, you have to create the files `factory.h'
+and `factoryconf.h'.
 
 
 2. Building Factory

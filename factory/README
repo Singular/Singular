@@ -86,12 +86,27 @@ installation procedure for Singular should do everything for you.  For more
 information, see the section "A Note on Singular".
 
   See the `INSTALL' file for instructions on how to install Factory.  The
-installation procedure conforms more or less to the GNU standard:
+installation procedure on UNIX platforms conforms more or less to the GNU
+standard:
 
   ./configure; make; make gftables; make install; make installgftables
 
 However, I recommend to read the instructions since there are a lot of
 non-standard options to configure.
+
+  On platforms other than UNIX, where there is no `configure', you have to
+configure and install Factory by hand.  In particular, you have to
+create/edit the files `config.h', `factory.h', `factoryconf.h', and
+`GNUmakefile'.  For Microsoft Windows NT 4.0 with the Microsoft Visual C++
+5.0 compiler there is a preconfigured environment in the `winnt/' directory
+which you may use as an example.  For more information, confer to
+corresponding section in the `INSTALL' file and to the `INSTALL.nt' file in
+the `winnt/' directory.
+
+  In general, this `README' as well as the `INSTALL' file are written for
+UNIX platforms.  However, you may find less specific information on the
+configuration and installation process which is useful for other platforms,
+too.
 
 
 4. Distribution
@@ -314,7 +329,7 @@ following section "Factory Template Instantiation".
 
   To give an example, look at the following one-shot solution to the
 problem "linking Factory with your application" where the "application" is
-a small test program (`applocation.cc') from the subdirectory `examples/'
+a small test program (`application.cc') from the subdirectory `examples/'
 of the Factory source directory ('\' at the end of a line denotes line
 continuation):
 
