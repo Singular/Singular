@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.17 1997-09-10 15:39:05 schmidt Exp $ */
+/* $Id: canonicalform.cc,v 1.18 1997-09-12 15:25:25 schmidt Exp $ */
 
 #include <config.h>
 
@@ -1136,8 +1136,9 @@ CanonicalForm::operator[] ( int i ) const
 // domains, the sign of CO is the sign of its leading
 // coefficient.
 //
-// See also: InternalCF::sign() and derived classes, imm_sign(),
-// gf_sign()
+// See also: InternalCF::sign(), InternalInteger::sign(),
+// InternalPrimePower::sign(), InternalRational::sign(),
+// InternalPoly::sign(), imm_sign(), gf_sign()
 //
 //}}}
 int
@@ -1306,6 +1307,8 @@ CanonicalForm::isFFinGF() const
 // root.  The algorithm is from H. Cohen - 'A Course in
 // Computational Algebraic Number Theory', ch. 1.7.1.
 //
+// See also: InternalCF::sqrt(), InternalInteger::sqrt()
+//
 //}}}
 CanonicalForm
 CanonicalForm::sqrt() const
@@ -1339,6 +1342,8 @@ CanonicalForm::sqrt() const
 //
 // Returns the largest integer less or equal logarithm of CO to
 // base 2.  CO should be a positive integer.
+//
+// See also: InternalCF::ilog2(), InternalInteger::ilog2()
 //
 //}}}
 int
