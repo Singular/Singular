@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmzero.cc,v 1.13 1998-04-08 12:14:07 pohl Exp $
+// $Id: fglmzero.cc,v 1.14 1998-04-14 15:28:31 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -1104,18 +1104,19 @@ fglmzero( idhdl sourceRingHdl, ideal & sourceIdeal, idhdl destRingHdl, ideal & d
     return fglmok;
 }
 
-ideal 
-FindUnivariateWrapper( ideal source ) 
+BOOLEAN
+FindUnivariateWrapper( ideal source, ideal & destIdeal ) 
 {
-    ideal destIdeal;
     BOOLEAN fglmok;
     
     idealFunctionals L( 100, pVariables );
     fglmok = CalculateFunctionals( source, L );
     if ( fglmok == TRUE ) {
 	destIdeal= FindUnivariatePolys( L );
+	return TRUE;
     }
-    return destIdeal;
+    else 
+	return FALSE;
 }
 
 
