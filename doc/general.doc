@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.168 1999-12-06 19:10:32 wichmann Exp $
+@comment $Id: general.doc,v 1.169 1999-12-10 13:55:32 wichmann Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -1232,9 +1232,12 @@ should add the following to your @code{.emacs} file:
           (function (lambda () (c-toggle-auto-hungry-state 1))))
 ;; a handy function for customization
 (defun customize-face-at-point ()
-"Customize face which point is at"
+  "Customize face which point is at."
   (interactive)
-  (customize-face (get-text-property (point) 'face)))
+  (let ((face (get-text-property (point) 'face)))
+    (if face
+	(customize-face face)
+      (message "No face defined at point"))))
 
 @end smallexample
 
