@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.119 2004-08-05 16:09:24 Singular Exp $
+@comment $Id: singular.doc,v 1.120 2004-08-05 18:14:05 levandov Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -150,9 +150,11 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @ifset withplural
 @node Tricks and pitfalls, PLURAL, Functions and system variables, Top
 @end ifset
+
 @ifclear withplural
 @node Tricks and pitfalls, Examples, Functions and system variables, Top
 @end ifclear
+
 @chapter Tricks and pitfalls
 @cindex Tricks and pitfalls
 @include tricks.tex
@@ -169,9 +171,11 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @ifset withplural
 @node Examples, Polynomial data, PLURAL, Top
 @end ifset
+
 @ifclear withplural
 @node Examples, Polynomial data, Tricks and pitfalls, Top
 @end ifclear
+
 @appendix Examples
 @cindex Examples
 @include examples.tex

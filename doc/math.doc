@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.72 2004-08-05 16:02:50 levandov Exp $
+@comment $Id: math.doc,v 1.73 2004-08-05 18:14:03 levandov Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -676,7 +676,9 @@ principal part, then the spectrum may be computed much faster
 using @code{spectrumnd(f,1)}.
 
 @c ---------------------------------------------------------------------------
+@ifclear withplural
 @node Toric ideals and integer programming, References, Gauss-Manin connection, Mathematical background
+@end ifclear
 
 @ifset withplural
 @node Toric ideals and integer programming, Non-commutative algebra , Gauss-Manin connection, Mathematical background

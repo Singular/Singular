@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: pluconventions.doc,v 1.5 2003-10-02 18:07:24 levandov Exp $
+@comment $Id: pluconventions.doc,v 1.6 2004-08-05 18:14:03 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -41,7 +41,6 @@
 in the non-commutative case,
 one should use @code{y*x} for the multiplication while @code{yx} is interpreted as
 commutative expression. See example in  @ref{poly expressions @value{PSUFFIX}}. 
- 
 
 @end itemize
 

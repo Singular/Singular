@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.20 2004-08-05 16:02:51 levandov Exp $
+@comment $Id: plureference.doc,v 1.21 2004-08-05 18:14:04 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -165,12 +165,6 @@ print(betti(RM),"betti");
 @end table
 
 
-
-
-
-
-
-
 @c -----------------------------
 @node bracket, eliminate @value{PSUFFIX}, betti @value{PSUFFIX}, Functions @value{PSUFFIX}
 @section bracket
@@ -267,6 +261,7 @@ See
 @ref{std @value{PSUFFIX}}.
 @c ref
 
+
 @c ---------------------------------------
 @node fetch @value{PSUFFIX}, imap @value{PSUFFIX}, eliminate @value{PSUFFIX}, Functions @value{PSUFFIX}
 @section fetch @value{PSUFFIX}
@@ -319,7 +314,7 @@ See
 
 
 @c ---------------------------------------
-@node imap @value{PSUFFIX},intersect @value{PSUFFIX}, fetch@value{PSUFFIX}, Functions@value{PSUFFIX}
+@node imap @value{PSUFFIX}, intersect @value{PSUFFIX}, fetch @value{PSUFFIX}, Functions @value{PSUFFIX}
 @section imap @value{PSUFFIX}
 @cindex imap @value{PSUFFIX}
 

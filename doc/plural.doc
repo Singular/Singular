@@ -73,7 +73,7 @@
 @c @include general.tex
 @c ----------------------------------------------------------------------------
 @ifset singularmanual
-@node PLURAL conventions,  , Top, Top
+@node PLURAL conventions, Data types @value{PSUFFIX}, Tricks and pitfalls, PLURAL
 @section  PLURAL conventions
 @end ifset 
 
@@ -87,18 +87,19 @@
 
 
 @c ----------------------------------------------------------------------------
-
 @ifset singularmanual
 @menu
 * Data types @value{PSUFFIX}::  
 @end menu
+@end ifset 
 
-@node Data types @value{PSUFFIX},  , PLURAL conventions, PLURAL conventions
+@node Data types @value{PSUFFIX}, Functions @value{PSUFFIX}, PLURAL conventions, Top
+
+@ifset singularmanual
 @section Data types @value{PSUFFIX}
 @end ifset 
 
 @ifclear singularmanual
-@node Data types @value{PSUFFIX}, Functions @value{PSUFFIX}, PLURAL conventions, Top
 @chapter Data types @value{PSUFFIX}
 @end ifclear 
 
@@ -110,13 +111,15 @@
 @menu
 * Functions  @value{PSUFFIX}::  
 @end menu
+@end ifset
 
-@node Functions @value{PSUFFIX},  , Data types @value{PSUFFIX}, Data types @value{PSUFFIX}
-@section Functions @value{PSUFFIX}
+@node Functions @value{PSUFFIX}, Mathematical background @value{PSUFFIX}, Data types @value{PSUFFIX}, Top
+
+@ifset singularmanual
+@section Functions  @value{PSUFFIX}
 @end ifset
 
 @ifclear singularmanual
-@node Functions @value{PSUFFIX}, Mathematical background @value{PSUFFIX}, Data types @value{PSUFFIX}, Top
 @chapter Functions  @value{PSUFFIX}
 @end ifclear
 
@@ -142,25 +145,31 @@
 @c @include pdata.tex
 
 @c ----------------------------------------------------------------------------
+
+@node Mathematical background @value{PSUFFIX}, PLURAL libraries, Functions @value{PSUFFIX}, Top
+
 @ifset singularmanual
-@node Mathematical background @value{PSUFFIX},  , Functions @value{PSUFFIX}, Functions @value{PSUFFIX}
-@value{PSUFFIX}, PLURAL 
 @section Mathematical background @value{PSUFFIX}
 @end ifset
 
-
 @ifclear singularmanual
-@node Mathematical background @value{PSUFFIX}, PLURAL libraries, Functions @value{PSUFFIX}, Top
 @appendix Mathematical background @value{PSUFFIX}
 @end ifclear
-
 
 @cindex Mathematical background @value{PSUFFIX}
 @include plumath.tex
 
 @c --------------------------------------------------------------------
+@ifset singularmanual
+@node PLURAL libraries, Release Notes, Mathematical background @value{PSUFFIX}, PLURAL
+@section PLURAL libraries
+@end ifset
+
+@ifclear singularmanual
 @node PLURAL libraries, Release Notes, Mathematical background @value{PSUFFIX}, Top
 @appendix  PLURAL libraries
+@end ifclear
+
 @cindex  PLURAL libraries
 @cindex  PLURAL LIBs
 
@@ -173,6 +182,7 @@ Use the @code{LIB} command for loading of single libraries.
 @c @sc{Singular} and @sc{Plural} together.
 
 @menu
+* center_lib::
 * ncalg_lib::
 * ncdecomp_lib::               
 * nctools_lib::
@@ -181,7 +191,15 @@ Use the @code{LIB} command for loading of single libraries.
 @end menu
 
 @c ----------------------------------------------------------
-@node ncalg_lib, ncdecomp_lib, PLURAL libraries, PLURAL libraries
+@node center_lib, ncalg_lib, PLURAL libraries, PLURAL libraries
+@section center_lib
+
+@c lib center.lib
+
+@c ----------------------------------------------------------
+
+@c ----------------------------------------------------------
+@node ncalg_lib, ncdecomp_lib, center_lib, PLURAL libraries
 @section ncalg_lib
 
 @c lib ncalg.lib
@@ -218,14 +236,14 @@ Use the @code{LIB} command for loading of single libraries.
 @c ----------------------------------------------------------
 
 @ifclear singularmanual
-@node Release Notes, Index, PLURAL libraries, Top
-@chapter Release Notes
-@cindex Release Notes
+@node Release Notes @value{PSUFFIX}, Index @value{PSUFFIX}, PLURAL libraries, Top
+@chapter Release Notes @value{PSUFFIX}
+@cindex Release Notes @value{PSUFFIX}
 @include pluplatform.tex
 
 @c ----------------------------------------------------------
-@node Index,  , Release Notes, Top
-@appendix Index
-@cindex  Index
+@node Index @value{PSUFFIX},  , Release Notes @value{PSUFFIX}, Top
+@appendix Index @value{PSUFFIX}
+@cindex  Index @value{PSUFFIX}
 @printindex cp
 @end ifclear 
