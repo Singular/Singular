@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.75 1998-05-20 13:58:59 pohl Exp $
+@comment $Id: reference.doc,v 1.76 1998-05-24 12:09:23 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4663,6 +4663,8 @@ See @ref{betti}; @ref{ideal}; @ref{int};
 @node status, std, sres, Functions
 @subsection status
 @cindex status
+@cindex sleep
+@cindex suspend
 @table @code
 @item @strong{Syntax:}
 @code{status (} link_expression@code{,} string_expression @code{)}
@@ -4670,13 +4672,22 @@ See @ref{betti}; @ref{ideal}; @ref{int};
 string
 @item @strong{Syntax:}
 @code{status (} link_expression@code{,} string_expression@code{,} string_expression @code{)}
+@code{status (} link_expression@code{,} string_expression@code{,} string_expression @code{,} int_expression @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
 returns the status of the link as asked for by the second argument.
 If a third argument is given, the result of the comparison to the status
 string is returned:
-@code{(status(l,s1)==s2)} is equivalent to @code{status(l,s1,s2)}
+@code{(status(l,s1)==s2)} is equivalent to @code{status(l,s1,s2)}. If a
+fourth integer argument (say, @code{i}) is given and if
+@code{status(l,s1,s2)} yields @code{0}, then the execution of the
+current process is  suspended (the process is put to "sleep") for
+appr. @code{i} seconds, and afterwards the result of another call to
+@code{status(l,s1,s2)} is returned. The latter is useful for
+"polling" the @code{read} status of @code{MPtcp} links such that busy
+loops are avoided (see @ref{Parallelization with MPtcp links} for an
+example). 
 @table @code
 @item @code{"name"}
 the name string given by the definition of the link (usually the filename)

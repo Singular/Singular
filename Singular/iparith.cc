@@ -266,7 +266,7 @@ cmdnames cmds[] =
   #else
   { "sres",        0, SRES_CMD ,          CMD_2},
   #endif
-  { "status",      0, STATUS_CMD,         CMD_23},
+  { "status",      0, STATUS_CMD,         CMD_M},
   { "std",         0, STD_CMD ,           CMD_12},
   { "string",      0, STRING_CMD ,        ROOT_DECL_LIST},
   { "subst",       0, SUBST_CMD ,         CMD_3},
@@ -3955,6 +3955,18 @@ static BOOLEAN jjCALL2ARG(leftv res, leftv u)
   u->next=v;
   return b;
 }
+static BOOLEAN jjCALL3ARG(leftv res, leftv u)
+{
+  leftv v = u->next;
+  leftv w = v->next;
+  u->next = NULL;
+  v->next = NULL;
+  BOOLEAN b = iiExprArith3(res, iiOp, u, v, w);
+  u->next = v;
+  v->next = w;
+  return b;
+}
+  
 static BOOLEAN jjCOEF_M(leftv res, leftv v)
 {
   if((v->Typ() != VECTOR_CMD)
@@ -4297,6 +4309,26 @@ static BOOLEAN jjTEST(leftv res, leftv v)
   while (v!=NULL);
   return FALSE;
 }
+
+static BOOLEAN jjSTATUS_M(leftv res, leftv v)
+{
+  if ((v->Typ() != LINK_CMD) ||
+      (v->next->Typ() != STRING_CMD) ||
+      (v->next->next->Typ() != STRING_CMD) ||
+      (v->next->next->next->Typ() != INT_CMD))
+    return TRUE;
+  jjSTATUS3(res, v, v->next, v->next->next);
+#ifdef HAVE_SLEEP
+  if (((int) res->data) == 0)
+  {
+    sleep((int) v->next->next->next->Data());
+    jjSTATUS3(res, v, v->next, v->next->next);
+  }
+#endif
+  return FALSE;
+}
+
+      
 /*=================== operations with many arg.: table =================*/
 /* number_of_args:  -1: any, -2: any >0, .. */
 struct sValCmdM dArithM[]=
@@ -4325,6 +4357,9 @@ struct sValCmdM dArithM[]=
 ,{jjSYSTEM,    SYSTEM_CMD,      NONE/*or set by p*/,-2 }
 ,{jjTEST,      TEST_CMD,        NONE,               -2 }
 ,{iiWRITE,     WRITE_CMD,       NONE,               -2 }
+,{jjCALL2ARG,  STATUS_CMD,      STRING_CMD,          2 }
+,{jjCALL3ARG,  STATUS_CMD,      INT_CMD,             3 }
+,{jjSTATUS_M,  STATUS_CMD,      INT_CMD,             4 }
 ,{NULL,        0,               0,                  0  }
 };
 #ifdef MDEBUG

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.25 1998-05-20 12:42:05 wichmann Exp $
+@comment $Id: examples.doc,v 1.26 1998-05-24 12:09:22 obachman Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -2175,8 +2175,8 @@ int pid_hilb,pid_fglm = read(l_hilb),read(l_fglm);
 write(l_hilb, quote(stdhilb(i)));                       // 3.
 write(l_fglm, quote(stdfglm(eval(i)))); 
 
-while (status(l_hilb, "read", "not ready") &&           // 4.
-       status(l_fglm, "read", "not ready")) {}
+while ((! status(l_hilb, "read", "ready", 1)) &&        // 4.
+       (! status(l_fglm, "read", "ready", 1))) {}
 
 if (status(l_hilb, "read", "ready"))
 {
@@ -2218,10 +2218,10 @@ evaluation must be applied so that actual values, and not the
 identifiers are communicated (as is done for the @code{l_fglm} link).
 
 @item 
-We go into a "busy" loop and wait until one of the two children
-finished the computation. Unfortunately, there is no way, yet, to go
-into a "sleep" mode and only wake up when one of the children has
-finished.
+We go into a "sleepy" loop and wait until one of the two children
+finished the computation. That is, the current process checks appr. once 
+a per second the status of one of the connecting links, and sleeps
+(i.e., suspends its execution) in the intermediate time.
 
 @item
 The child which won delivers the result and is terminated with the usual 

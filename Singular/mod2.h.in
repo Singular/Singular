@@ -66,8 +66,6 @@
 #undef HAVE_BCOPY
 /* Define if sprintf does not return number of printed chars */
 #undef BSD_SPRINTF
-/* Define if the `S_IS*' macros in <sys/stat.h> do not work properly.  */
-#undef STAT_MACROS_BROKEN
 /* Define if you have the getcwd function.  */
 #undef HAVE_GETCWD
 /* Define if you have the getwd function.  */
@@ -76,6 +74,8 @@
 #undef HAVE_SBRK
 /* Define if you have readlink */
 #undef HAVE_READLINK
+/* Define if you have sleep */
+#undef HAVE_SLEEP
 /* Define sizeof(char) */
 #define SIZEOF_CHAR 1
 /* Define sizeof(short) */
