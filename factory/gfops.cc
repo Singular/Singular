@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: gfops.cc,v 1.2 1997-06-19 12:23:00 schmidt Exp $ */
+/* $Id: gfops.cc,v 1.3 1997-10-10 12:30:40 schmidt Exp $ */
 
 #include <config.h>
 
@@ -104,15 +104,15 @@ gf_get_table ( int p, int n )
     STICKYASSERT( p == pFile && n == nFile, "illegal table" );
     // skip (sic!) factory-representation of mipo
     // and terminating "; "
-    bufptr = strchr( buffer, ';' ) + 2;
+    bufptr = (char *)strchr( buffer, ';' ) + 2;
     // read simple representation of mipo
     int i, degree;
     sscanf( bufptr, "%d", &degree );
-    bufptr = strchr( bufptr, ' ' ) + 1;
+    bufptr = (char *)strchr( bufptr, ' ' ) + 1;
     int * mipo = new int[degree + 1];
     for ( i = 0; i <= degree; i++ ) {
 	sscanf( bufptr, "%d", mipo + i );
-	bufptr = strchr( bufptr, ' ' ) + 1;
+	bufptr = (char *)strchr( bufptr, ' ' ) + 1;
     }
 
     gf_p = p; gf_n = n;
