@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_unix.texi,v 1.11 2000-03-20 14:03:14 obachman Exp $
+@comment $Id: INSTALL_unix.texi,v 1.12 2000-03-31 10:59:21 obachman Exp $
 @c FILE: INSTALL_unix.texi
 @c PURPOSE: Installation instruction for Singular on  Unix 
 @c
@@ -9,7 +9,7 @@
 @end ifclear
 
 @ifclear singularmanual
-@majorheading Unix installation instructions for @sc{SINGULAR} version @value{VERSION}
+@majorheading Unix installation instructions for @sc{Singular} version @value{VERSION}
 @end ifclear
 
 @ifclear UNAME
