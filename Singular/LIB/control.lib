@@ -1,4 +1,4 @@
-version="$Id: control.lib,v 1.6 2004-08-04 19:11:01 levandov Exp $";
+version="$Id: control.lib,v 1.7 2004-08-08 21:40:19 plural Exp $";
 category="System and Control Theory";
 info="
 LIBRARY:  control.lib Procedures for System and Control Theory 
@@ -18,10 +18,10 @@ autonom(module R);            Computes everything related to autonomy(using Exts
 autonom2(module R);           Computes everything related to autonomy(using dim) 
 LeftKernel(module R);         Computing the left kernel of R
 RightKernel(module R);        Computing the right kernel of R
-
-Ext_Our(...)                  Copy of Ext_R from 'homolog.lib' in commutative case;
-is_zero_Our(module R)         Copy of is_zero from 'OBpoly.lib';
 LeftInverse(module R)         Computes left inverse of matrix(module)
+
+static Ext_Our(...)                  Copy of Ext_R from 'homolog.lib' in commutative case;
+static is_zero_Our(module R)         Copy of is_zero from 'OBpoly.lib';
 static space(int n)           Procedure used inside the procedure 'Print' to have a better formatted output
 static control_output();      Generating the output for the procedure 'control'
 static autonom_output();      Generating the output for the procedure 'autonom' and 'autonom2'
@@ -31,257 +31,17 @@ static autonom_output();      Generating the output for the procedure 'autonom' 
 LIB "homolog.lib"; 
 LIB "poly.lib";
 LIB "primdec.lib";
-LIB "ncalg.lib";
-
 //---------------------------------------------------------------
-proc ncdetection( r)
-//in dieser proc. wird eine matrix erzeugt, die in der i-ten zeile die 
-indices 
-//der differential-,shift- oder advance-operatoren enthaelt mit denen die 
-i-te
-//variable nicht kommutiert. 
-{
-  int i,j,k,LExp;
-  int NVars=nvars(r);
-  matrix rel = NCRelations(r)[2];
-  intmat M[NVars][3];
-  int NRows = nrows(rel);
-  intvec v,w; 
-  poly d,d_lead;
-  ideal I;
-  map theta;
- 
-  for( j=NRows;j>=2;j-- )
-  {
-   if( rel[j] == w )       //the whole column is zero
-    {
-      j--;
-      continue;
-    }
-    
-    for( i=1;i<j;i++ )         
-    {
-      if( rel[i,j]==1 )   //relation of type var(j)*var(i) = var(i)*var(j) +1
-      {
-         M[i,1]=j;
-      }
-      if( rel[i,j] == -1 ) //relation of type var(i)*var(j) = var(j)*var(i) -1
-      {
-        M[j,1]=i;
-      }
-      d = rel[i,j];
-      d_lead = lead(d);
-      v=leadexp(d_lead); 
-//in the next lines we check whether we have 
-//a relation of differential or shift type
-      LExp=0;
-      for( k=1;k<=NVars;k++)
-      {
-        LExp = LExp + v[k];
-      }
-      if( (d-d_lead != 0) || (LExp > 1) )
-      {
-        return( "wrong input" );
-      }
-      if( v[j] == 1)    //relation of type var(j)*var(i) = var(i)*var(j) -lambda*var(j)
-      {
-        if (leadcoef(d) < 0)
-        {
-          M[i,2] = j;
-        }
-        else
-        {
-          M[i,3] = j;
-        }
-      }
-      if( v[i]==1 ) //relation of type var(j)*var(i) = var(i)*var(j) -lambda*var(i)
-      {
-        if (leadcoef(d) > 0)
-        {
-          M[j,2] = i;
-        }
-        else
-        {
-          M[j,3] = i;
-        }
-      }
-    }
-  }
-  //ab hier wird die map ausgerechnet
-  for(i=1;i<=NVars;i++)
-  {
-    I=I+var(i);
-  }
-  for(i=1;i<=NVars;i++)
-  {
-    if( M[i,1..3]==(0,0,0) )
-    {
-      i++;
-      continue;
-    }
-    if( M[i,1]!=0 )
-    {
-      if( (M[i,2]!=0) && (M[i,3]!=0) )
-      {
-        I[M[i,1]] = -var(M[i,1]);
-        I[M[i,2]] = var(M[i,3]);
-        I[M[i,3]] = var(M[i,2]);
-      }
-      if( (M[i,2]==0) && (M[i,3]==0) )
-      {
-        I[M[i,1]] = -var(M[i,1]);
-      }                  
-      if( ( (M[i,2]!=0) && (M[i,3]==0) )|| ( (M[i,2]!=0) && (M[i,3]==0) ) 
-)
-      {
-        I[i] = -var(i);
-      }
-    }
-    else
-    {
-      if( (M[i,2]!=0) && (M[i,3]!=0) )
-      {
-        I[i] = -var(i);
-        I[M[i,2]] = var(M[i,3]);
-        I[M[i,3]] = var(M[i,2]);
-      }
-      else
-      {
-        I[i] = -var(i);
-      } 
-    }
-  }
-  theta = I;
-  return(theta);
-}
-example
-{ 
-  "EXAMPLE:";echo = 2;
-  ring r=0,(x,y,z,D(1..3)),dp;
-  matrix D[6][6];
-  D[1,4]=1;
-  D[2,5]=1;
-  D[3,6]=1;
-  ncalgebra(1,D);
-  ncdetection(r);
-  kill r;
-//------------------
-  ring r=0,(x,S),dp;
-  ncalgebra(1,-S);
-  ncdetection(r);
-  kill r;
-//------------------
-  ring r=0,(x,D(1),S),dp;
-  matrix D[3][3];
-  D[1,2]=1;
-  D[1,3]=-S;
-  ncalgebra(1,D);
-  ncdetection(r);
-}
-
-proc invo_poly(poly m, map theta)
-//applies the involution map theta to m, where m=polynomial
-{
-  int i,j;
-  intvec v;
-  poly p,z;
-  poly n = 0;
-  i = 1;
-  while(m[i]!=0)
-  {
-    v = leadexp(m[i]);
-    z =1;
-    for(j=nvars(basering); j>=1; j--)
-    {
-      if (v[j]!=0)
-      { 
-        p = var(j); 
-        p = theta(p);
-        z = z*(p^v[j]);
-      }
-    }    
-    n = n + (leadcoef(m[i])*z);
-    i++;  
-  }
-  return(n);
-}
-
-proc involution(m, map theta)
-//applies the involution map theta to m, where m=vector, polynomial,
-//module,ideal
-{
-  int i,j;
-  intvec v;
-  poly p,z;
-  if (typeof(m)=="poly")
-  {
-    return (invo_poly(m,theta));  
-  }
-  if ( typeof(m)=="ideal" )
-  {
-    ideal n;
-    for (i=1; i<=size(m); i++)
-    {
-      n [i] = invo_poly(m[i],theta);
-    } 
-    return(n);
-  }
-  if (typeof(m)=="vector")
-  {
-    vector n=m;
-    for(i=1; i<=size(m); i++)
-    {
-      n[i] = invo_poly(m[i],theta);
-    }
-    return (n);  
-  }
-
-  if ( (typeof(m)=="matrix") || (typeof(m)=="module"))
-  {  
-//    m=transpose(m);
-    matrix n = matrix(m);
-    int @R=nrows(n);
-    int @C=ncols(n);
-    for(i=1; i<=@R; i++)
-    {
-      for(j=1; j<=@C; j++)
-      {
-        n[i,j] = invo_poly( m[i,j], theta);
-      }
-    }
-   }
-  if (typeof(m)=="module")
-  {
-    return (module(n));
-  }
-  return(n);
-}
-example
-{ 
-  "EXAMPLE:";echo = 2;
-  ring r = 0,(x,d),dp;
-  ncalgebra(1,1); // Weyl-Algebra
-  map F = r,x,-d;
-  poly f =  x*d^2+d;
-  poly If = involution(f,F);
-  f-If;
-  poly g = x^2*d+2*x*d+3*x+7*d;
-  poly tg = -d*x^2-2*d*x+3*x-7*d;
-  poly Ig = involution(g,F);
-  tg-Ig;
-  ideal I = f,g;
-  ideal II = involution(I,F);
-  II;
-  I - involution(II,F);
-  module M  = [f,g,0],[g,0,x^2*d];
-  module IM = involution(M,F);
-  print(IM);
-  print(M - involution(IM,F));  
-}
-
-
-
 proc declare(string NameOfRing, string Variables, list #)
+"USAGE: declare(NameOfRing, Variables,[Parameters, Ordering]);
+          NameOfRing:  string with name of ring,
+	  Variables:   string with names of variables separated by commas(e.g. "x,y,z"),
+	  [Parameters, Ordering]: optional, strings:
+	    Parameters: string of parameters in the ring separated by commas(e.g. "a,b,c"),
+	    Ordering:   string with name of ordering(by default the ordering "dp,C" is used)
+RETURN:  no return value
+EXAMPLE:  example declare; shows an example 
+"
 {
   if(size(#)==0)
   {
@@ -306,7 +66,6 @@ proc declare(string NameOfRing, string Variables, list #)
     };
   };
   keepring(basering);
-  return();
 };
 example
 {"EXAMPLE:";echo = 2;
@@ -347,9 +106,11 @@ example
 //
 //-------------------------------------------------------------------------
 static proc space(int n)
-//the procedure is used in the procedure Print to have a better formatted output
-//USAGE:spase(int n)
-//RETURN: string consisting of n spases
+"USAGE:spase(n); 
+         n: integer, number of needed spaces
+RETURN:  string consisting of n spaces
+NOTE:  the procedure is used in the procedure 'view' to have a better formatted output
+"
 {
   int i;
   string s="";
@@ -360,8 +121,15 @@ static proc space(int n)
   return(s);
 };
 //-----------------------------------------------------------------------------
-proc Print(M)
-//procedure for a well-formatted output of lists, modules and matrixes
+proc view(M)
+"USAGE:  view(M);
+           M:  any type
+RETURN:  no return value
+PURPOSE:  procedure for ( well-) formatted output of modules, matrices, lists of modules, matrices;
+          shows everything even if entries are long
+NOTE:  in case of other types( not 'module', 'matrix', 'list') works just as standard 'print' procedure  
+EXAMPLE:  example view; shows an example
+"
 {
   if ( (typeof(M)=="module")||(typeof(M)=="matrix") )
   {
@@ -415,7 +183,7 @@ proc Print(M)
     int i;
     for(i=1;i<=sz;i++)
     {
-      Print(M[i]);
+      view(M[i]);
       print("");
     }; 
 
@@ -424,41 +192,74 @@ proc Print(M)
   print(M);
   return();
 };
+example
+{"EXAMPLE:";echo = 2;
+  ring r;
+  matrix M[1][3] = x,y,z;
+  print(M);
+  view(M);
+};
 //--------------------------------------------------------------------------
 proc RightKernel(matrix M)
+"USAGE:  RightKernel(M);
+           M:  matrix
+RETURN:  right kernel of matrix M, i.e., the module of all elements v such that Mv=0
+NOTE:  in commutative case it is really a left  module, in noncommutative(to be implemented later) it will be right module   
+EXAMPLE:  example RightKernel; shows an example
+"
 { 
   return(syz(M));
 }; 
+example
+{"EXAMPLE:";echo = 2;
+  ring r;
+  matrix M[1][3] = x,y,z;
+  print(M);
+  print( RightKernel(M) );
+};
 //-------------------------------------------------------------------------
 proc LeftKernel(matrix M)
+"USAGE:  LeftKernel(M);
+           M:  matrix
+RETURN:  left kernel of matrix M, i.e., the matrix whose rows are generators of left module
+         (elements of this module are to be rows) of all elements v such that vM=0   
+EXAMPLE:  example LeftKernel; shows an example
+"
 {
   return( transpose( syz( transpose(M) ) ) );
 };
+example
+{"EXAMPLE:";echo = 2;
+  ring r;
+  matrix M[3][1] = x,y,z;
+  print(M);
+  print( LeftKernel(M) );
+};
 //------------------------------------------------------------------------
-proc LeftInverse(module M)
+proc LeftInverse(matrix M)
+"USAGE:  LeftInverse(M);
+           M:  matrix
+RETURN:  left inverse of M if exists, i.e., matrix L such that LM == id;
+EXAMPLE:  example LeftInverse; shows an example
+"
 {
   int NCols=ncols(M);
   M=transpose(M);
   matrix I[NCols][NCols];
   I=I+1;
   module Id=I;
-  return( module( transpose( lift( M,Id ) ) ) );
+  return( transpose( lift( module(M),Id ) )  );
 };
 example
 {"EXAMPLE:";echo =2;
-  ring r=(0,m1,m2,M,g,L1,L2),Dt,dp;
-  module R;
-  R =  [m1*L1*Dt^2, m2*L2*Dt^2, -1, (M+m1+m2)*Dt^2], 
-       [m1*L1^2*Dt^2-m1*L1*g, 0, 0, m1*L1*Dt^2],
-       [0, m2*L2^2*Dt^2-m2*L2*g, 0, m2*L2*Dt^2];
-  R=transpose(R);
-  module RK =RightKernel(R);
-  RK = LeftInverse(RK);
-  print(RK);
-  };
+  ring r;
+  matrix M[2][1] = 1,x2z;
+  print(M);
+  print( LeftInverse(M) );  
+};
 //-----------------------------------------------------------------------
-proc Ext_Our(int i, module R, list #)
-//copy of Ext_R;
+static proc Ext_Our(int i, module R,list #)
+// just a copy of 'Ext_R' from "homolog.lib" in commutative case
 {
   if ( size(#)==0 )
   { 
@@ -470,13 +271,22 @@ proc Ext_Our(int i, module R, list #)
   };
 };
 //------------------------------------------------------------------------
-proc is_zero_Our(module R)
+static proc is_zero_Our(module R)
+//just a copy of 'is_zero' from "poly.lib"
 {
   return( is_zero(R) ) ;
 };
 //------------------------------------------------------------------------
 static proc control_output(int i, int NVars, module R, module Ext_1) 
-//in this procedure the output list with all the contollability properties of the system is generated
+"USAGE:  proc control_output(i, NVars, R, Ext_1)
+           i:  integer, number of first nonzero Ext or 
+	       just number of variables in a base ring + 1 in case that all the Exts are zero
+	   NVars:  integer, number of variables in a base ring  
+	   R:  module R (cokernel representation)
+	   Ext_1:  module, the first Ext(its cokernel representation)      
+RETURN:  list with all the contollability properties of the system which is to be returned in 'control' procedure
+NOTE:  this procedure is used in 'control' procedure
+"
 {
   int d=dim( std( Ann( transpose(R) ) ) ) ;;//this is the dimension of the system 
   string DofS= "dimension of the system:";
@@ -545,7 +355,11 @@ static proc control_output(int i, int NVars, module R, module Ext_1)
 //-------------------------------------------------------------------------
 
 proc control(module R)
-//"Computes the controllability of a behaviour represented by the matrix R"
+"USAGE:  control(R);
+           R:  module (R is a matrix of the system of equations which is to be investigated)
+RETURN:  list of all the properties concerning controllability of the system(behavior) represented by the  matrix R
+EXAMPLE:  example control; shows an example
+"
 {
   int i;
   int NVars=nvars(basering); 
@@ -571,16 +385,15 @@ example
   module R=[0,-s3,s2],
            [s3,0,-s1];
   R=transpose(R);	   
-  Print( R );  
-  Print( control(R) );
+  view( R );  
+  view( control(R) );
 
   module Rc=[0,-s3,s2],
             [s3,0,-s1],
 	    [-s2,s1,0];
   Rc=transpose(Rc);	    
-  Print( Rc );
-  Print( control(Rc) );
-  kill r;
+  view( Rc );
+  view( control(Rc) );
   //----------------------------------
   //reflector antenna
   ring A = (0, K1, K2, Te, Kp, Kc),(Dt, delta), dp;
@@ -592,9 +405,8 @@ example
        [0, 0, 0, 0, Dt, -K1, 0, 0, 0],
        [0, 0, 0, 0, 0, Dt+K2/Te, -Kc/Te*delta, -Kc/Te*delta, -Kp/Te*delta];
   R=transpose(R);
-  Print(R);
-  Print(control(R));
-  kill A;
+  view(R);
+  view(control(R));
   //----------------------------------
   //Flexible Rod
   ring A = 0,(D1, delta), dp;
@@ -602,9 +414,8 @@ example
   R = [D1, -D1*delta, -1],
       [2*D1*delta, -D1-D1*delta^2, 0];
   R=transpose(R);
-  Print(R);
-  Print(control(R));
-  kill A;
+  view(R);
+  view(control(R));
   //-------------------------------------
   //TwoPendula
   ring r=(0,m1,m2,M,g,L1,L2),Dt,dp;
@@ -613,9 +424,8 @@ example
        [m1*L1^2*Dt^2-m1*L1*g, 0, 0, m1*L1*Dt^2],
        [0, m2*L2^2*Dt^2-m2*L2*g, 0, m2*L2*Dt^2];
   R=transpose(R);
-  Print(R);
-  Print(control(R));
-  kill r;
+  view(R);
+  view(control(R));
   //----------------------------------------
   //Wind Tunnel
   ring A = (0,a, omega, zeta, k),(D1, delta),dp;
@@ -624,14 +434,20 @@ example
       [0, D1, -1, 0],
       [0, omega^2, D1+2*zeta*omega, -omega^2];
   R=transpose(R);
-  Print(R);
-  Print(control(R));
+  view(R);
+  view(control(R));
   //-------------------------------------------
 
 };
 //------------------------------------------------------------------------
 static proc autonom_output( int i, int NVars ) 
-//in this procedure the output list with all the autonomy properties of the system is generated
+"USAGE:  proc autonom_output(i, NVars)
+           i:  integer, number of first nonzero Ext or 
+	       just number of variables in a base ring + 1 in case that all the Exts are zero
+	   NVars:  integer, number of variables in a base ring  
+RETURN:  list with all the autonomy properties of the system which is to be returned in 'autonom' procedure
+NOTE:  this procedure is used in 'autonom' procedure
+"
 {
   int d=NVars-i;//that is the dimension of the system
   string DofS="dimension of the system:";
@@ -697,7 +513,12 @@ static proc autonom_output( int i, int NVars )
 };  
 //--------------------------------------------------------------------------
 proc autonom2(module R)
-//analogue to autonom using dim calculations
+"USAGE:  autonom2(R);
+           R:  module (R is a matrix of the system of equations which is to be investigated)
+RETURN:  list of all the properties concerning autonomy of the system(behavior) represented by the  matrix R
+NOTE:  this procedure is an analogue to 'autonom' using dimension calculations
+EXAMPLE:  example autonom2; shows an example
+"
 { 
   int d;
   int NVars = nvars(basering);
@@ -711,23 +532,22 @@ example
   module R=[0,-s3,s2],
            [s3,0,-s1];
   R=transpose(R);	   
-  Print( R );  
-  Print( autonom2(R) );
+  view( R );  
+  view( autonom2(R) );
 
   module Rc=[0,-s3,s2],
             [s3,0,-s1],
 	    [-s2,s1,0];
   Rc=transpose(Rc);	    
-  Print( Rc );
-  Print( autonom2(Rc) );
-  kill r;
+  view( Rc );
+  view( autonom2(Rc) );
   //-----------------------------------
   ring r=0,(s1,s2),dp;
   module R= [s1,-s2],
             [s2, s1];
   R=transpose(R);
-  Print( R );
-  Print( autonom2(R) );
+  view( R );
+  view( autonom2(R) );
   
   ring r=0,(s1,s2,s3,s4),dp;
   module R= [s1,-s2],
@@ -735,20 +555,24 @@ example
 	    [s3,-s4],
 	    [s4, s3];	    
   R=transpose(R);
-  Print( R );
-  Print( autonom2(R) );
-  kill r;
+  view( R );
+  view( autonom2(R) );
   //----------------------------------------
   ring r=0,(d1,d2),dp;
   module R=[d1^2-d2],
            [d2^2-1];
   R=transpose(R);
-  Print(R);
-  Print(autonom2(R));	   
+  view(R);
+  view(autonom2(R));	   
 };  
 //---------------------------------------------------------------------------
 
 proc autonom(module R)
+"USAGE:  autonom(R);
+           R:  module (R is a matrix of the system of equations which is to be investigated)
+RETURN:  list of all the properties concerning autonomy of the system(behavior) represented by the  matrix R
+EXAMPLE:  example autonom; shows an example
+"
 //"Computes the autonomy of a behaviour represented by the matrix R"
 {
   int i;
@@ -777,23 +601,22 @@ example
   module R=[0,-s3,s2],
            [s3,0,-s1];
   R=transpose(R);	   
-  Print( R );  
-  Print( autonom(R) );
+  view( R );  
+  view( autonom(R) );
 
   module Rc=[0,-s3,s2],
             [s3,0,-s1],
 	    [-s2,s1,0];
   Rc=transpose(Rc);	    
-  Print( Rc );
-  Print( autonom(Rc) );
-  kill r;
+  view( Rc );
+  view( autonom(Rc) );
   //-----------------------------------
   ring r=0,(s1,s2),dp;
   module R= [s1,-s2],
             [s2, s1];
   R=transpose(R);
-  Print( R );
-  Print( autonom(R) );
+  view( R );
+  view( autonom(R) );
   
   ring r=0,(s1,s2,s3,s4),dp;
   module R= [s1,-s2],
@@ -801,16 +624,15 @@ example
 	    [s3,-s4],
 	    [s4, s3];	    
   R=transpose(R);
-  Print( R );
-  Print( autonom(R) );
-  kill r;
+  view( R );
+  view( autonom(R) );
   //----------------------------------------
   ring r=0,(d1,d2),dp;
   module R=[d1^2-d2],
            [d2^2-1];
   R=transpose(R);
-  Print(R);
-  Print(autonom(R));	   
+  view(R);
+  view(autonom(R));	   
   
 };  
 //---------------------------------------------------------------------------
