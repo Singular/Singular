@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.188 2000-12-19 16:19:15 Singular Exp $
+@comment $Id: general.doc,v 1.189 2001-01-15 19:06:51 lossen Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -198,7 +198,7 @@ The browser which is used to display the help information, can be either
 set at startup time with the command line option  (@pxref{Command line
 options})
 @smallexample
---browers=<browser>
+--brower=<browser>
 @end smallexample
 or with the @sc{Singular} command (@pxref{system})
 @smallexample
