@@ -2424,7 +2424,7 @@ static void go_on_F4 (calc_dat* c){
   if(done_index>0)
   {
     pTest(done[0]);
- }
+  }
   for(i=1;i<done_index;i++)
   {
     pTest(done[i]);
@@ -2494,7 +2494,6 @@ static void go_on_F4 (calc_dat* c){
       
       for(i=0;i<done_index;i++)
       {
-	
 	pTest(done[i]);
       }
 #endif
@@ -2538,14 +2537,7 @@ static void go_on_F4 (calc_dat* c){
       omfree(q);
       q=(poly*) omalloc(q_size*sizeof(poly));
     }
-#ifdef TGB_DEBUG
-      int j;
-      for(j=0;j<done_index;j++)
-      {
-	
-	pTest(done[j]);
-      }
-#endif
+
     for(i=0;i<m_index;i++)
     {
 
@@ -2564,14 +2556,7 @@ static void go_on_F4 (calc_dat* c){
 #endif
       BOOLEAN in_done=FALSE;
       pTest(m[i]);
-#ifdef TGB_DEBUG
-     
-      for(j=0;j<done_index;j++)
-      {
-	//Print("%i %i\n",j,i);
-	pTest(done[j]);
-      }
-#endif
+
       pos=posInPolys (done, done_index, m[i],c);
 #ifdef TGB_DEBUG
       {
@@ -2720,6 +2705,8 @@ static void go_on_F4 (calc_dat* c){
   m=(poly*) omalloc(m_size*sizeof(poly));
   m_index=retranslate(m,mat,done,c);
   mat=NULL;
+  for(i=0;i<done_index;i++)
+    pDelete(&done[i]);
   omfree(done);
   done=NULL;
   //next Step addElements to basis 
@@ -2753,6 +2740,7 @@ static void go_on_F4 (calc_dat* c){
       m[i]=NULL;
     }
   }
+  assume((F_plus_index+F_minus_index)==m_index);
   Print("%i]", F_plus_index);
   for(i=0;i<p_index;i++) 
     pDelete(&p[i]);
@@ -3012,7 +3000,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
 
      omFree(c->strat->ecartS);
      omFree(c->strat->sevS);
-//   /*initsevS(i);*/
+//   initsevS(i);
    omFree(c->strat->S_2_R);
    
 
@@ -3240,7 +3228,7 @@ static void super_clean_top_of_pair_list(calc_dat* c){
   }
 }
 static void clean_top_of_pair_list(calc_dat* c){
-  while((c->pair_top>0) && (c->apairs[c->pair_top]->i>=0) && (!state_is(UNCALCULATED,c->apairs[c->pair_top]->j, c->apairs[c->pair_top]->i,c))){
+  while((c->pair_top>=0) && (c->apairs[c->pair_top]->i>=0) && (!state_is(UNCALCULATED,c->apairs[c->pair_top]->j, c->apairs[c->pair_top]->i,c))){
 
     free_sorted_pair_node(c->apairs[c->pair_top],c->r);
     c->pair_top--;
