@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.45 1998-06-19 13:09:17 krueger Exp $
+@comment $Id: singular.doc,v 1.46 1998-06-19 13:19:14 krueger Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -53,7 +53,7 @@ this is the texinfo file describing Singular (version @value{VERSION})
 @node Top, Preface, (dir), (dir)
 @ifinfo
 @c @manual 
-q:quit, m:menu item, n:next node, p:previous node, u:up, g:goto node
+@c q:quit, m:menu item, n:next node, p:previous node, u:up, g:goto node
 @c @end manual
 @sp 1
 @center Singular - Manual
