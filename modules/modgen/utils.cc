@@ -1,5 +1,5 @@
 /*
- * $Id: utils.cc,v 1.14 2002-09-26 09:55:11 anne Exp $
+ * $Id: utils.cc,v 1.15 2003-06-09 09:47:09 krueger Exp $
  */
 
 #include <stdio.h>
@@ -11,6 +11,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include "config.h"
 #include "crctab.h"
 
 int modlineno;    /* lineno within module */
@@ -65,7 +66,11 @@ int create_tmpfile(
   
   memset(tmpfile, '\0', sizeof(tmpfile));
   snprintf(tmpfile, sizeof(tmpfile), "modgen.tmpXXXXXX");
+#ifdef HAVE_MKSTEMP
+  mkstemp(tmpfile);
+#else /* HAVE_MKSTEMP */
   mktemp(tmpfile);
+#endif /* HAVE_MKSTEMP */
 
   if(debug)printf("create_tmpfile '%s'\n", tmpfile );
   
