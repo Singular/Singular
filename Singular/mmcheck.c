@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmcheck.c,v 1.1 1998-12-02 13:57:31 obachman Exp $ */
+/* $Id: mmcheck.c,v 1.2 1999-01-05 12:18:39 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -48,8 +48,7 @@ static int mmPrintDBMCB ( DBMCB * what, char* msg , int given_size)
       (int)what->size, given_size );
   else
     (void)fprintf( stderr, "size is: %d\n", (int)what->size );
-  assume(0);
-  return 1;
+  return 0;
 }
 
 void mmPrintUsedList( )
