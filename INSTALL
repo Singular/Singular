@@ -51,12 +51,12 @@ You need appr. 10MByte of free disk space to unpack the archives.
 
 After unpacking, you will have a directory structure like:
 
-  ./<uname description>/bin/Singular-<x.y.z>	executable(s)
+  ./<uname description>/bin/Singular-<x.y.z>    executable(s)
   ./<uname description>/bin/Singular            soft link to executable
-  ./info/singular.hlp				info file
-  ./Singular/LIB/<x.y.z>/			Singular libraries
-  ./Singular/doc/<x.y.z>/			documentation (ps, dvi, info)
-  ./Singular/html/<x.y.z>/			documentation (html)
+  ./info/singular.hlp                           info file
+  ./Singular/LIB/<x.y.z>/                       Singular libraries
+  ./Singular/doc/<x.y.z>/                       documentation (ps, dvi, info)
+  ./Singular/html/<x.y.z>/                      documentation (html)
 
 
 For the executable to work, the directory layout must look pretty much
@@ -94,7 +94,7 @@ info tar file.
   gzip -dc info-<uname description>.tar.gz | tar -pxf -
 
 This adds
-  ./<uname description>/bin/info		info program
+  ./<uname description>/bin/info                info program
 to the above directory structure and ensures that the `info' program
 is found at run-time.
 
