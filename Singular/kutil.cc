@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.98 2001-03-08 13:05:13 Singular Exp $ */
+/* $Id: kutil.cc,v 1.99 2001-03-14 15:51:53 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1681,7 +1681,7 @@ int posInS (kStrategy strat, int length,poly p, int ecart_p)
         if (pLmCmp(set[an],p) == cmp_int) return an;
         if (pLmCmp(set[an],p) == -cmp_int) return en;
         if ((cmp_int!=1)
-        && ((strat->ecartS[an])<ecart_p))
+        && ((strat->ecartS[an])>ecart_p))
           return an;
         return en;
       }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hutil.cc,v 1.18 2000-11-08 15:34:55 obachman Exp $ */
+/* $Id: hutil.cc,v 1.19 2001-03-14 15:51:52 Singular Exp $ */
 /*
 * ABSTRACT: Utilities for staircase operations
 */
@@ -288,10 +288,12 @@ void hOrdSupp(scfmon stc, int Nstc, varset var, int Nvar)
 
 static void hShrink(scfmon co, int a, int Nco)
 {
-  int  i = a, j = a;
-  for (; j < Nco; j++)
+  while ((co[a]!=NULL) && (a<Nco)) a++;
+  int i = a;
+  int j;
+  for (j = a; j < Nco; j++)
   {
-    if (co[j])
+    if (co[j]!=NULL)
     {
       co[i] = co[j];
       i++;
@@ -302,24 +304,24 @@ static void hShrink(scfmon co, int a, int Nco)
 
 void hStaircase(scfmon stc, int *Nstc, varset var, int Nvar)
 {
-  int  nc = *Nstc, z = 0, i, j, k, k1;
-  scmon n, o;
+  int  nc = *Nstc;
   if (nc < 2)
     return;
-  i = 0;
-  j = 1;
-  n = stc[j];
-  o = *stc;
-  k = Nvar;
+  int z = 0;
+  int i = 0;
+  int j = 1;
+  scmon n = stc[1 /*j*/];
+  scmon o = stc[0];
+  int k = Nvar;
   loop
   {
-    k1 = var[k];
+    int k1 = var[k];
     if (o[k1] > n[k1])
     {
       loop
       {
         k--;
-        if (!k)
+        if (k==0)
         {
           stc[i] = NULL;
           z++;
@@ -339,7 +341,7 @@ void hStaircase(scfmon stc, int *Nstc, varset var, int Nvar)
       loop
       {
         k--;
-        if (!k)
+        if (k==0)
         {
           stc[j] = NULL;
           z++;
@@ -357,7 +359,7 @@ void hStaircase(scfmon stc, int *Nstc, varset var, int Nvar)
     else
     {
       k--;
-      if (!k)
+      if (k==0)
       {
         stc[j] = NULL;
         z++;
@@ -366,7 +368,7 @@ void hStaircase(scfmon stc, int *Nstc, varset var, int Nvar)
     }
     if (k == Nvar)
     {
-      if (!stc[j])
+      if (stc[j]==NULL)
         i = j - 1;
       loop
       {
@@ -379,7 +381,7 @@ void hStaircase(scfmon stc, int *Nstc, varset var, int Nvar)
             n = stc[j];
           else
           {
-            if (z)
+            if (z!=0)
             {
               *Nstc -= z;
               hShrink(stc, 0, nc);
@@ -387,7 +389,7 @@ void hStaircase(scfmon stc, int *Nstc, varset var, int Nvar)
             return;
           }
         }
-        else if (stc[i])
+        else if (stc[i]!=NULL)
         {
           o = stc[i];
           break;
@@ -544,7 +546,9 @@ void hLexS(scfmon stc, int Nstc, varset var, int Nvar)
         return;
     }
     else
+    {
       k--;
+    }
   }
 }
 

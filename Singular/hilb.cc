@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hilb.cc,v 1.18 2000-12-14 16:38:48 obachman Exp $ */
+/* $Id: hilb.cc,v 1.19 2001-03-14 15:51:53 Singular Exp $ */
 /*
 *  ABSTRACT -  Hilbert series
 */
@@ -263,7 +263,7 @@ static intvec * hSeries(ideal S, intvec *modulweight,
       hNvar = pVariables;
       for (i = hNvar; i; i--)
         hvar[i] = i;
-      if (notstc)
+      //if (notstc) // TODO: no mon divedes another
         hStaircase(hstc, &hNstc, hvar, hNvar);
       hSupp(hstc, hNstc, hvar, &hNvar);
       if (hNvar!=0)
