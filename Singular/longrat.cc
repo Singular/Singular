@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.5 1997-04-25 15:04:02 obachman Exp $ */
+/* $Id: longrat.cc,v 1.6 1997-05-05 10:14:10 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -13,7 +13,6 @@
 #include "febase.h"
 #include "numbers.h"
 #include "modulop.h"
-#include "longrat.h"
 
 #ifdef HAVE_GMP
 #if __GNU_MP_VERSION >= 2 && __GNU_MP_VERSION_MINOR >= 0
@@ -23,6 +22,8 @@
 #endif 
 
 #endif /* HAVE_GMP */
+
+#include "longrat.h"
 
 #ifndef BYTES_PER_MP_LIMB
 #ifdef HAVE_LIBGMP2
