@@ -1,13 +1,13 @@
-// $Id: toric.lib,v 1.1 2000-05-11 09:24:13 Singular Exp $
+// $Id: toric.lib,v 1.2 2000-05-16 08:25:01 Singular Exp $
 //
 // author : Christine Theis
 //
-//version="$Id: toric.lib,v 1.1 2000-05-11 09:24:13 Singular Exp $";
+//version="$Id: toric.lib,v 1.2 2000-05-16 08:25:01 Singular Exp $";
 
 ///////////////////////////////////////////////////////////////////////////////
 
 info="
-LIBRARY: toric.lib                PROCEDURES FOR COMPUTING TORIC IDEALS
+LIBRARY: toric.lib                Procedures for computing toric ideals
 
 
 Let A an integral (mxn)-matrix. The toric ideal I_A of A is defined
