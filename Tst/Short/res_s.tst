@@ -87,8 +87,15 @@ list jmin2=minres(jres2);
 print(betti(jmin2),"betti");
 kill r;
 //--------------------------------------------------------------
-
+ring r1=32003,(a,b,x,y,z),ls;
+module m1 = gen(1)+x2z3*gen(2),
+x4yz3*gen(2);
+resolution rr = sres(std(m1),0);
+rr;
+list(rr);
+//--------------------------------------------------------------
 example res;
+
 
 tst_status(1);$
 

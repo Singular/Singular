@@ -1,7 +1,7 @@
 lift_s
 homolog_s
 sres_s 
-res_s    ; -1 in resolvente 
+res_s    ; -1, -14 in resolvente 
 bug_sres ; (c, ls) problem
 bug_sres_betti
 ; INFINITE  
