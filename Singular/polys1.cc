@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.58 2000-12-15 18:49:35 Singular Exp $ */
+/* $Id: polys1.cc,v 1.59 2000-12-20 11:15:48 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -68,6 +68,7 @@ BOOLEAN   pIsConstantPoly(poly p)
 * the module weights for std
 */
 static pFDegProc pOldFDeg;
+static pLDegProc pOldLDeg;
 static intvec * pModW;
 static BOOLEAN pOldLexOrder;
 
@@ -82,14 +83,15 @@ void pSetModDeg(intvec *w)
   {
     pModW = w;
     pOldFDeg = pFDeg;
+    pOldLDeg = pLDeg;
     pOldLexOrder = pLexOrder;
-    pFDeg = pModDeg;
+    pSetDegProcs(pModDeg);
     pLexOrder = TRUE;
   }
   else
   {
     pModW = NULL;
-    pFDeg = pOldFDeg;
+    pRestoreDegProcs(pOldFDeg, pOldLDeg);
     pLexOrder = pOldLexOrder;
   }
 }

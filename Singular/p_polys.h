@@ -7,7 +7,7 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: p_polys.h,v 1.17 2000-11-24 16:24:42 Singular Exp $
+ *  Version: $Id: p_polys.h,v 1.18 2000-12-20 11:15:47 obachman Exp $
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -359,6 +359,8 @@ long pLDeg1_Deg(poly p,int *l, ring r);
 long pLDeg1c_Deg(poly p,int *l, ring r);
 long pLDeg1_Totaldegree(poly p,int *l, ring r);
 long pLDeg1c_Totaldegree(poly p,int *l, ring r);
+long pLDeg1_WFirstTotalDegree(poly p,int *l, ring r);
+long pLDeg1c_WFirstTotalDegree(poly p,int *l, ring r);
 
 /***************************************************************
  *

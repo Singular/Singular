@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.69 2000-12-19 18:31:41 obachman Exp $ */
+/* $Id: kstd2.cc,v 1.70 2000-12-20 11:15:44 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -9,6 +9,8 @@
 // #define PDEBUG 2
 // define to enable tailRings
 #define HAVE_TAIL_RING
+// define if no buckets should be used 
+// #define NO_BUCKETS
 
 #include "mod2.h"
 #include "kutil.h"
@@ -474,12 +476,14 @@ void initBba(ideal F,kStrategy strat)
       /*uses automatic computation of the ecartWeights to set them*/
       kEcartWeights(F->m,IDELEMS(F)-1,ecartWeights);
     }
-    pFDeg=totaldegreeWecart;
-    pLDeg=maxdegreeWecart;
-    for(i=1; i<=pVariables; i++)
-      Print(" %d",ecartWeights[i]);
-    PrintLn();
-    mflush();
+    pRestoreDegProcs(totaldegreeWecart, maxdegreeWecart);
+    if (TEST_OPT_PROT)
+    {
+      for(i=1; i<=pVariables; i++)
+        Print(" %d",ecartWeights[i]);
+      PrintLn();
+      mflush();
+    }
   }
 }
 
@@ -509,8 +513,10 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   srmax = strat->sl;
   reduc = olddeg = lrmax = 0;
 
+#ifndef NO_BUCKETS
   if (!TEST_OPT_NOT_BUCKETS)
     strat->use_buckets = 1;
+#endif
 
   // redtailBBa against T for inhomogenous input
   if (!K_TEST_OPT_OLDSTD)
@@ -664,8 +670,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   exitBuchMora(strat);
   if (TEST_OPT_WEIGHTM)
   {
-    pFDeg=pFDegOld;
-    pLDeg=pLDegOld;
+    pRestoreDegProcs(pFDegOld, pLDegOld);
     if (ecartWeights)
     {
       omFreeSize((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
@@ -784,5 +789,3 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
   if (TEST_OPT_PROT) PrintLn();
   return res;
 }
-
-

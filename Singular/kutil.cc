@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.87 2000-12-19 18:31:41 obachman Exp $ */
+/* $Id: kutil.cc,v 1.88 2000-12-20 11:15:45 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -517,6 +517,7 @@ static const char* kTest_LmEqual(poly p, poly t_p, ring tailRing)
   return NULL;
 }
 
+static BOOLEAN sloppy_max = FALSE;
 BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
 {
   ring tailRing = T->tailRing;
@@ -565,13 +566,16 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
         pFalseReturn(p_CheckPolyRing(T->max, tailRing));
         omCheckBinAddrSize(T->max, (tailRing->PolyBin->sizeW)*SIZEOF_LONG);
 #if KDEBUG > 0
-        poly test_max = p_GetMaxExpP(pNext(T->t_p), tailRing);
-        p_Setm(T->max, tailRing);
-        p_Setm(test_max, tailRing);
-        BOOLEAN equal = p_ExpVectorEqual(T->max, test_max, tailRing);
-        if (! equal)
-          return dReportError("%c[%d].max out of sync", TN, i);
-        p_LmFree(test_max, tailRing);
+        if (! sloppy_max)
+        {
+          poly test_max = p_GetMaxExpP(pNext(T->t_p), tailRing);
+          p_Setm(T->max, tailRing);
+          p_Setm(test_max, tailRing);
+          BOOLEAN equal = p_ExpVectorEqual(T->max, test_max, tailRing);
+          if (! equal)
+            return dReportError("%c[%d].max out of sync", TN, i);
+          p_LmFree(test_max, tailRing);
+        }
 #endif
       }
     }
@@ -2698,7 +2702,6 @@ poly redtail (poly p, int pos, kStrategy strat)
   return redtail(&L, pos, strat);
 }
 
-
 poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT)
 {
   strat->redTailChange=FALSE;
@@ -3976,7 +3979,15 @@ void updateResult(ideal r,ideal Q,kStrategy strat)
 void completeReduce (kStrategy strat)
 {
   int i;
+  int low = (pOrdSgn == 1 ? 1 : 0);
+  LObject L;
 
+#ifdef KDEBUG
+  // need to set this: during tailreductions of T[i], T[i].max is out of
+  // sync
+  sloppy_max = TRUE;
+#endif
+  
   strat->noTailReduction = FALSE;
   if (TEST_OPT_PROT)
   {
@@ -3987,52 +3998,43 @@ void completeReduce (kStrategy strat)
   {
     Print("(S:%d)",strat->sl);mflush();
   }
-  if(pOrdSgn==1)
+  for (i=strat->sl; i>=low; i--)
   {
-    for (i=strat->sl; i>0; i--)
+    TObject* T_j = strat->s_2_t(i);
+    if (T_j != NULL)
     {
-      TObject* T_j = strat->s_2_t(i);
-      if (T_j != NULL)
-      {
-        assume(strat->S[i] == T_j->p);
-        strat->S[i] = redtailBba(T_j, i-1, strat);
-        assume(strat->S[i] == T_j->p);
-        if (strat->redTailChange && strat->tailRing != currRing)
-        {
-          if (T_j->max != NULL) p_LmFree(T_j->max, strat->tailRing);
-          if (pNext(T_j->p) != NULL) 
-            T_j->max = p_GetMaxExpP(pNext(T_j->p), strat->tailRing);
-          else
-            T_j->max = NULL;
-        }
-      }
+      L = *T_j;
+      poly p;
+      if (pOrdSgn == 1)
+        strat->S[i] = redtailBba(&L, i-1, strat, FALSE);
       else
-        strat->S[i] = redtailBba(strat->S[i],i-1,strat);
+        strat->S[i] = redtail(&L, strat->sl, strat);
 
-      if (TEST_OPT_INTSTRATEGY)
+      if (strat->redTailChange && strat->tailRing != currRing)
       {
-        //if (strat->redTailChange)
-          pCleardenom(strat->S[i]);
-      }
-      if (TEST_OPT_PROT)
-      {
-        PrintS("-");mflush();
+        if (T_j->max != NULL) p_LmFree(T_j->max, strat->tailRing);
+        if (pNext(T_j->p) != NULL) 
+          T_j->max = p_GetMaxExpP(pNext(T_j->p), strat->tailRing);
+        else
+          T_j->max = NULL;
       }
     }
-  }
-  else
-  {
-    for (i=strat->sl; i>=0; i--)
+    else
     {
-      strat->S[i] = redtail(strat->S[i],strat->sl,strat);
-      // Hmm .. this might also change strat->T[i]
-      // but, we don't need it any more
-      if (TEST_OPT_INTSTRATEGY)
-        pCleardenom(strat->S[i]);
-      if (TEST_OPT_PROT)
-        PrintS("-");
+      assume(currRing == strat->tailRing);
+      if (pOrdSgn == 1)
+        strat->S[i] = redtailBba(strat->S[i], i-1, strat);
+      else
+        strat->S[i] = redtail(strat->S[i], strat->sl, strat);
     }
+    if (TEST_OPT_INTSTRATEGY)
+      pCleardenom(strat->S[i]);
+    if (TEST_OPT_PROT)
+      PrintS("-");
   }
+#ifdef KDEBUG
+  sloppy_max = FALSE;
+#endif
 }
 
 
@@ -4115,11 +4117,20 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
   ring new_tailRing = rModifyRing(currRing,
                                   // Hmmm .. the condition pFDeg == pDeg
                                   // might be too strong
-                                  (strat->homog && pFDeg == pDeg && pOrdSgn == 1), 
+                                  (strat->homog && pFDeg == pDeg), 
                                   !strat->ak, 
                                   expbound);
-
   if (new_tailRing == currRing) return TRUE;
+  
+  strat->pOrigFDeg_TailRing = new_tailRing->pFDeg;
+  strat->pOrigLDeg_TailRing = new_tailRing->pLDeg;
+  
+  if (currRing->pFDeg != currRing->pFDegOrig)
+  {
+    new_tailRing->pFDeg = currRing->pFDeg;
+    new_tailRing->pLDeg = currRing->pLDeg;
+  }
+  
   if (TEST_OPT_PROT)
     Print("[%d:%d", (long) new_tailRing->bitmask, new_tailRing->ExpL_Size);
   kTest_TS(strat);
@@ -4202,6 +4213,36 @@ void kStratInitChangeTailRing(kStrategy strat)
   kStratChangeTailRing(strat, NULL, NULL, e);
 }
 
+skStrategy::skStrategy()
+{
+  memset(this, 0, sizeof(skStrategy));
+  tailRing = currRing;
+  P.tailRing = currRing;
+  tl = -1;
+  sl = -1;
+#ifdef HAVE_LM_BIN
+  lmBin = omGetStickyBinOfBin(currRing->PolyBin);
+#endif
+#ifdef HAVE_TAIL_BIN
+  tailBin = omGetStickyBinOfBin(currRing->PolyBin);
+#endif
+  pOrigFDeg = pFDeg;
+  pOrigLDeg = pLDeg;
+}
+
+
+skStrategy::~skStrategy()
+{
+  if (lmBin != NULL)
+    omMergeStickyBinIntoBin(lmBin, currRing->PolyBin);
+  if (tailBin != NULL)
+    omMergeStickyBinIntoBin(tailBin, 
+                            (tailRing != NULL ? tailRing->PolyBin:
+                             currRing->PolyBin));
+  if (currRing != tailRing)
+    rKillModifiedRing(tailRing);
+  pRestoreDegProcs(pOrigFDeg, pOrigLDeg);
+}
 
 #if 0
 Timings for the different possibilities of posInT:

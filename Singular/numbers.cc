@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.35 2000-12-20 10:54:25 pohl Exp $ */
+/* $Id: numbers.cc,v 1.36 2000-12-20 11:15:46 obachman Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -121,11 +121,6 @@ void nSetChar(ring r)
   {
     nfSetChar(c,r->parameter);
   }
-  /* -------------- R -----------------------*/
-  //if (c==(-1))
-  else if (rField_is_R(r))
-  {
-  }
   /* -------------- long R -----------------------*/
   else if (rField_is_long_R(r))
   {
@@ -137,7 +132,9 @@ void nSetChar(ring r)
     setGMPFloatDigits(r->ch_flags,r->ch_flags);
   }
 #ifdef TEST
-  else
+  /* -------------- R -----------------------*/
+  //if (c==(-1))
+  else if (!rField_is_R(r) && !rField_is_Q(r))
   {
     WerrorS("unknown field");
   }

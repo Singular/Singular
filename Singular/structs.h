@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.50 2000-12-19 18:31:46 obachman Exp $ */
+/* $Id: structs.h,v 1.51 2000-12-20 11:15:49 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -431,8 +431,16 @@ struct sip_sring
   unsigned long divmask;
 
   p_Procs_s*    p_Procs;
+
+  /* FDeg and LDeg */
   pFDegProc     pFDeg;
   pLDegProc     pLDeg;
+
+  /* as it was determined by rComplete */
+  pFDegProc     pFDegOrig;
+  /* and as it was determined before rOptimizeLDeg */
+  pLDegProc     pLDegOrig;
+  
   p_SetmProc    p_Setm;
   n_Procs_s*    cf;
   ring          algring;

@@ -6,7 +6,7 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_polys.cc,v 1.13 2000-12-14 16:38:53 obachman Exp $
+ *  Version: $Id: p_polys.cc,v 1.14 2000-12-20 11:15:46 obachman Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -198,7 +198,7 @@ long pTotaldegree(poly p, ring r)
 
 // pWTotalDegree for weighted orderings 
 // whose first block covers all variables
-long pWFirstTotalDegree(poly p, ring r)
+inline long _pWFirstTotalDegree(poly p, ring r)
 {
   int i;
   long sum = 0;
@@ -210,6 +210,10 @@ long pWFirstTotalDegree(poly p, ring r)
   return sum;
 }
 
+long pWFirstTotalDegree(poly p, ring r)
+{
+  return (long) _pWFirstTotalDegree(p, r);
+}
 
 /*2
 * compute the degree of the leading monomial of p
@@ -322,7 +326,7 @@ long pLDeg0(poly p,int *l, ring r)
      }
   }
   *l=ll;
-  return p_GetOrder(p, r);
+  return r->pFDeg(p, r);
 }
 
 /*2
@@ -343,7 +347,7 @@ long pLDeg0c(poly p,int *l, ring r)
       pIter(p);
       ll++;
     }
-    o = pFDeg(p, r);
+    o = r->pFDeg(p, r);
   }
   else
   {
@@ -356,7 +360,7 @@ long pLDeg0c(poly p,int *l, ring r)
       else break;
       pp = p;
     }
-    o = pFDeg(pp, r);
+    o = r->pFDeg(pp, r);
   }
   *l=ll;
   return o;
@@ -372,7 +376,7 @@ long pLDegb(poly p,int *l, ring r)
 {
   p_CheckPolyRing(p, r);
   Exponent_t k= p_GetComp(p, r);
-  long o = pFDeg(p, r);
+  long o = r->pFDeg(p, r);
   int ll=1;
 
   if (k != 0)
@@ -405,12 +409,12 @@ long pLDeg1(poly p,int *l, ring r)
   int ll=1;
   long  t,max;
 
-  max=pFDeg(p, r);
+  max=r->pFDeg(p, r);
   if (k > 0)
   {
     while (((p=pNext(p))!=NULL) && (p_GetComp(p, r)==k))
     {
-      t=pFDeg(p, r);
+      t=r->pFDeg(p, r);
       if (t>max) max=t;
       ll++;
     }
@@ -419,7 +423,7 @@ long pLDeg1(poly p,int *l, ring r)
   {
     while ((p=pNext(p))!=NULL)
     {
-      t=pFDeg(p, r);
+      t=r->pFDeg(p, r);
       if (t>max) max=t;
       ll++;
     }
@@ -440,7 +444,7 @@ long pLDeg1c(poly p,int *l, ring r)
   int ll=1;
   long  t,max;
 
-  max=pFDeg(p, r);
+  max=r->pFDeg(p, r);
   if (rIsSyzIndexRing(r))
   {
     long limit = rGetCurrSyzLimit(r);
@@ -448,7 +452,7 @@ long pLDeg1c(poly p,int *l, ring r)
     {
       if (p_GetComp(p, r)<=limit)
       {
-        if ((t=pFDeg(p, r))>max) max=t;
+        if ((t=r->pFDeg(p, r))>max) max=t;
         ll++;
       }
       else break;
@@ -458,7 +462,7 @@ long pLDeg1c(poly p,int *l, ring r)
   {
     while ((p=pNext(p))!=NULL)
     {
-      if ((t=pFDeg(p, r))>max) max=t;
+      if ((t=r->pFDeg(p, r))>max) max=t;
       ll++;
     }
   }
@@ -466,9 +470,10 @@ long pLDeg1c(poly p,int *l, ring r)
   return max;
 }
 
-// like pLDeg1, only pFDeg == Deg
+// like pLDeg1, only pFDeg == pDeg
 long pLDeg1_Deg(poly p,int *l, ring r)
 {
+  assume(r->pFDeg == pDeg);
   p_CheckPolyRing(p, r);
   Exponent_t k= p_GetComp(p, r);
   int ll=1;
@@ -499,6 +504,7 @@ long pLDeg1_Deg(poly p,int *l, ring r)
 
 long pLDeg1c_Deg(poly p,int *l, ring r)
 {
+  assume(r->pFDeg == pDeg);
   p_CheckPolyRing(p, r);
   int ll=1;
   long  t,max;
@@ -567,6 +573,69 @@ long pLDeg1c_Totaldegree(poly p,int *l, ring r)
   long  t,max;
 
   max=_pTotaldegree(p, r);
+  if (rIsSyzIndexRing(r))
+  {
+    long limit = rGetCurrSyzLimit(r);
+    while ((p=pNext(p))!=NULL)
+    {
+      if (p_GetComp(p, r)<=limit)
+      {
+        if ((t=_pTotaldegree(p, r))>max) max=t;
+        ll++;
+      }
+      else break;
+    }
+  }
+  else
+  {
+    while ((p=pNext(p))!=NULL)
+    {
+      if ((t=_pTotaldegree(p, r))>max) max=t;
+      ll++;
+    }
+  }
+  *l=ll;
+  return max;
+}
+
+// like pLDeg1, only pFDeg == pWFirstTotalDegree
+long pLDeg1_WFirstTotalDegree(poly p,int *l, ring r)
+{
+  p_CheckPolyRing(p, r);
+  Exponent_t k= p_GetComp(p, r);
+  int ll=1;
+  long  t,max;
+
+  max=_pWFirstTotalDegree(p, r);
+  if (k > 0)
+  {
+    while (((p=pNext(p))!=NULL) && (p_GetComp(p, r)==k))
+    {
+      t=_pWFirstTotalDegree(p, r);
+      if (t>max) max=t;
+      ll++;
+    }
+  }
+  else
+  {
+    while ((p=pNext(p))!=NULL)
+    {
+      t=_pWFirstTotalDegree(p, r);
+      if (t>max) max=t;
+      ll++;
+    }
+  }
+  *l=ll;
+  return max;
+}
+
+long pLDeg1c_WFirstTotalDegree(poly p,int *l, ring r)
+{
+  p_CheckPolyRing(p, r);
+  int ll=1;
+  long  t,max;
+
+  max=_pWFirstTotalDegree(p, r);
   if (rIsSyzIndexRing(r))
   {
     long limit = rGetCurrSyzLimit(r);

@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.20 2000-12-19 18:31:40 obachman Exp $
+ *  Version: $Id: kInline.cc,v 1.21 2000-12-20 11:15:42 obachman Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -19,40 +19,9 @@
 #include "omalloc.h"
 
 #define HAVE_TAIL_BIN
-// Hmm ... this I don't understand:
-// with HAVE_LM_BIN, cyclic_7 is appr. 10% slower (on Intel)
+// This doesn't really work, fixme, if necessary
 // #define HAVE_LM_BIN
 
-KINLINE skStrategy::skStrategy()
-{
-  memset(this, 0, sizeof(skStrategy));
-  tailRing = currRing;
-  P.tailRing = currRing;
-  tl = -1;
-  sl = -1;
-#ifdef HAVE_LM_BIN
-  lmBin = omGetStickyBinOfBin(currRing->PolyBin);
-#endif
-#ifdef HAVE_TAIL_BIN
-  tailBin = omGetStickyBinOfBin(currRing->PolyBin);
-#endif
-  pOrigFDeg = pFDeg;
-  pOrigLDeg = pLDeg;
-}
-
-KINLINE skStrategy::~skStrategy()
-{
-  if (lmBin != NULL)
-    omMergeStickyBinIntoBin(lmBin, currRing->PolyBin);
-  if (tailBin != NULL)
-    omMergeStickyBinIntoBin(tailBin, 
-                            (tailRing != NULL ? tailRing->PolyBin:
-                             currRing->PolyBin));
-  if (currRing != tailRing)
-    rKillModifiedRing(tailRing);
-  pLDeg = pOrigLDeg;
-  pFDeg = pOrigFDeg;
-}
 
 KINLINE TObject* skStrategy::S_2_T(int i)
 {
@@ -387,7 +356,7 @@ KINLINE long sTObject::GetpFDeg() const
 }
 KINLINE long sTObject::pLDeg()
 {
-  return ::pLDeg(GetLmTailRing(), &length, tailRing);
+  return tailRing->pLDeg(GetLmTailRing(), &length, tailRing);
 }
 KINLINE long sTObject::SetDegStuffReturnLDeg()
 {
@@ -697,12 +666,12 @@ KINLINE long sLObject::pLDeg()
   {
     int i = kBucketCanonicalize(bucket);
     pNext(tp) = bucket->buckets[i];
-    long ldeg = ::pLDeg(tp, &length, tailRing);
+    long ldeg = tailRing->pLDeg(tp, &length, tailRing);
     pNext(tp) = NULL;
     return ldeg;
   }
   else
-    return ::pLDeg(tp, &length, tailRing);
+    return tailRing->pLDeg(tp, &length, tailRing);
 }
 KINLINE long sLObject::pLDeg(BOOLEAN deg_last)
 {
@@ -712,12 +681,12 @@ KINLINE long sLObject::pLDeg(BOOLEAN deg_last)
     last = pLast((t_p != NULL ? t_p : p), pLength);
 #ifdef HAVE_ASSUME
   long fdeg;
-  fdeg = ::pLDeg(GetLmTailRing(), &length, tailRing);
-  assume (pLength == length && fdeg == ::pFDeg(last, tailRing));
+  fdeg = tailRing->pLDeg(GetLmTailRing(), &length, tailRing);
+  assume (pLength == length && fdeg == tailRing->pFDeg(last, tailRing));
   return fdeg;
 #else
   length = pLength;
-  return ::pFDeg(last, tailRing);
+  return tailRing->pFDeg(last, tailRing);
 #endif
 }
 

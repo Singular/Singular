@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.50 2000-12-15 18:49:35 Singular Exp $ */
+/* $Id: polys.h,v 1.51 2000-12-20 11:15:48 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing
@@ -247,6 +247,15 @@ void      pSplit(poly p, poly * r);   /*p => IN(p), r => REST(p) */
 /*-------------ring management:----------------------*/
 //extern void pChangeRing(ring newRing);
 extern void pSetGlobals(ring r, BOOLEAN complete = TRUE);
+// resets the pFDeg and pLDeg: if pLDeg is not given, it is
+// set to currRing->pLDegOrig, i.e. to the respective LDegProc which
+// only uses pFDeg (and not pDeg, or pTotalDegree, etc).
+// If you use this, make sure your procs does not make any assumptions
+// on oredering and/or OrdIndex -- otherwise they might return wrong results
+// on strat->tailRing
+extern void pSetDegProcs(pFDegProc new_FDeg, pLDegProc new_lDeg = NULL);
+// restores pFDeg and pLDeg: 
+extern void pRestoreDegProcs(pFDegProc old_FDeg, pLDegProc old_lDeg);
 
 /*-----------the ordering of monomials:-------------*/
 #define pSetm(p)    p_Setm(p, currRing)
@@ -274,6 +283,8 @@ long pLDeg1_Deg(poly p,int *l, ring r = currRing);
 long pLDeg1c_Deg(poly p,int *l, ring r = currRing);
 long pLDeg1_Totaldegree(poly p,int *l, ring r = currRing);
 long pLDeg1c_Totaldegree(poly p,int *l, ring r = currRing);
+long pLDeg1_WFirstTotalDegree(poly p,int *l, ring r=currRing);
+long pLDeg1c_WFirstTotalDegree(poly p,int *l, ring r=currRing);
 
 /*-------------pComp for syzygies:-------------------*/
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.151 2000-12-19 18:31:45 obachman Exp $ */
+/* $Id: ring.cc,v 1.152 2000-12-20 11:15:48 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -69,6 +69,7 @@ static void rSetVarL(ring r);
 static unsigned long rGetDivMask(int bits);
 // right-adjust r->VarOffset
 static void rRightAdjustVarOffset(ring r);
+static void rOptimizeLDeg(ring r);
 
 /*0 implementation*/
 //BOOLEAN rField_is_R(ring r=currRing)
@@ -1975,9 +1976,18 @@ BOOLEAN rOrder_is_WeightedOrdering(rRingOrder_t order)
 BOOLEAN rHasSimpleOrderAA(ring r)
 {
   int blocks = rBlocks(r) - 1;
-  if (blocks != 3) return FALSE;
-  return ((r->order[0] == ringorder_aa && r->order[1] != ringorder_M) ||
-          (r->order[1] == ringorder_aa && r->order[2] != ringorder_M));
+  if (blocks > 3 || blocks < 2) return FALSE;
+  if (blocks == 3)
+  {
+    return ((r->order[0] == ringorder_aa && r->order[1] != ringorder_M &&
+             (r->order[2] == ringorder_c || r->order[2] == ringorder_C)) ||
+            ((r->order[0] == ringorder_c || r->order[0] == ringorder_C) &&
+             r->order[1] == ringorder_aa && r->order[2] != ringorder_M));
+  }
+  else
+  {
+    return (r->order[0] == ringorder_aa && r->order[1] != ringorder_M);
+  }
 }
 
 // return TRUE if p->exp[r->pOrdIndex] holds total degree of p */
@@ -2456,6 +2466,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
   assume (r != NULL );
   assume (exp_limit > 1);
   BOOLEAN need_other_ring;
+  BOOLEAN omitted_degree = FALSE;
   int bits;
 
   exp_limit=rGetExpSize(exp_limit, bits, r->N);
@@ -2522,6 +2533,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
           order[j]=ringorder_rp;
           need_other_ring=TRUE;
           omit_degree=FALSE;
+          omitted_degree = TRUE;
         }
         break;
       case ringorder_Wp:
@@ -2537,6 +2549,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
           order[j]=ringorder_lp;
           need_other_ring=TRUE;
           omit_degree=FALSE;
+          omitted_degree = TRUE;
         }
         break;
       default:
@@ -2571,18 +2584,21 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
   res->bitmask=exp_limit;
   rComplete(res, 1);
 
-  // adjust res->pFDeg: if it was changed globaly, then
+  // adjust res->pFDeg: if it was changed globally, then
   // it must also be changed for new ring
-  if (pFDeg != r->pFDeg)
-    res->pFDeg = pFDeg;
-  else if (r->pFDeg != res->pFDeg &&
+  if (r->pFDegOrig != res->pFDegOrig &&
            rOrd_is_WeightedDegree_Ordering(r))
-    // still might need adjustment
   {
+    // still might need adjustment for weighted orderings
+    // and omit_degree
     res->firstwv = r->firstwv;
     res->firstBlockEnds = r->firstBlockEnds;
-    res->pFDeg = pWFirstTotalDegree;
+    res->pFDeg = res->pFDegOrig = pWFirstTotalDegree;
   }
+  if (omitted_degree)
+    res->pLDeg = res->pLDegOrig = r->pLDegOrig;
+  
+  rOptimizeLDeg(res);
 
   // set syzcomp
   if (res->typ != NULL && res->typ[0].ord_typ == ro_syz)
@@ -2703,6 +2719,31 @@ static void rSetFirstWv(ring r, int i, int* order, int* block1, int** wvhdl)
   r->firstBlockEnds=block1[i];
   r->firstwv = wvhdl[i];
 }
+
+static void rOptimizeLDeg(ring r)
+{
+  if (r->pFDeg == pDeg)
+  {
+    if (r->pLDeg == pLDeg1) 
+      r->pLDeg = pLDeg1_Deg;
+    if (r->pLDeg == pLDeg1c)
+      r->pLDeg = pLDeg1c_Deg;
+  }
+  else if (r->pFDeg == pTotaldegree)
+  {
+    if (r->pLDeg == pLDeg1) 
+      r->pLDeg = pLDeg1_Totaldegree;
+    if (r->pLDeg == pLDeg1c)
+      r->pLDeg = pLDeg1c_Totaldegree;
+  }
+  else if (r->pFDeg == pWFirstTotalDegree)
+  {
+    if (r->pLDeg == pLDeg1) 
+      r->pLDeg = pLDeg1_WFirstTotalDegree;
+    if (r->pLDeg == pLDeg1c)
+      r->pLDeg = pLDeg1c_WFirstTotalDegree;
+  }
+}
   
 // set pFDeg, pLDeg, MixOrder, ComponentOrder, etc
 static void rSetDegStuff(ring r)
@@ -2740,7 +2781,7 @@ static void rSetDegStuff(ring r)
         (order[1]==ringorder_s)))
       r->ComponentOrder=-1;
     if (r->OrdSgn == -1) r->pLDeg = pLDeg0c;
-    if ((order[0] == ringorder_lp) || (order[0] == ringorder_ls))
+    if ((order[0] == ringorder_lp) || (order[0] == ringorder_ls) || order[0] == ringorder_rp)
     {
       r->LexOrder=TRUE;
       r->pLDeg = pLDeg1c;
@@ -2762,7 +2803,7 @@ static void rSetDegStuff(ring r)
     if ((order[0]==ringorder_C)||(order[0]==ringorder_S)||
         order[0]==ringorder_s)
       r->ComponentOrder=-1;
-    if ((order[1] == ringorder_lp) || (order[1] == ringorder_ls))
+    if ((order[1] == ringorder_lp) || (order[1] == ringorder_ls) || order[1] == ringorder_rp)
     {
       r->LexOrder=TRUE;
       r->pLDeg = pLDeg1c;
@@ -2806,8 +2847,12 @@ static void rSetDegStuff(ring r)
     }
     r->pFDeg = pWTotaldegree; // may be improved: pTotaldegree for lp/dp/ls/.. blocks
   }
-  if (rOrd_is_Totaldegree_Ordering(r))
+  if (rOrd_is_Totaldegree_Ordering(r) || rOrd_is_WeightedDegree_Ordering(r))
     r->pFDeg = pDeg;
+
+  r->pFDegOrig = r->pFDeg;
+  r->pLDegOrig = r->pLDeg;
+  rOptimizeLDeg(r);
 }
 
 /*2
@@ -2836,8 +2881,11 @@ static void rSetNegWeight(ring r)
           l++;
         }
       }
+      return;
     }
   }
+  r->NegWeightL_Size = 0;
+  r->NegWeightL_Offset = NULL;
 }
 
 static void rSetOption(ring r)

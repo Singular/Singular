@@ -118,7 +118,7 @@ MPSR_SOURCES = mpsr_Put.cc mpsr_PutPoly.cc mpsr_GetPoly.cc mpsr_sl.cc\
 DBMSR_SOURCES =  ndbm.cc sing_dbm.cc
 
 # normal C source files
-CSOURCES=weight0.c fegetopt.c fereadl.c page.c feOpenWinntUrl.c dError.c mmstd.c
+CSOURCES=weight0.c fegetopt.c fereadl.c page.c feOpenWinntUrl.c dError.c mmstd.c 
 
 # C++ sources which are used if part of the kernel are dynamically linked
 DL_KERNEL_SOURCES=p_Procs_Dynamic.cc slInit_Dynamic.cc 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.73 2000-12-19 18:31:44 obachman Exp $ */
+/* $Id: polys.cc,v 1.74 2000-12-20 11:15:47 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -62,6 +62,32 @@ void pSetGlobals(ring r, BOOLEAN complete)
   }
 }
 
+// resets the pFDeg and pLDeg: if pLDeg is not given, it is
+// set to currRing->pLDegOrig, i.e. to the respective LDegProc which
+// only uses pFDeg (and not pDeg, or pTotalDegree, etc)
+void pSetDegProcs(pFDegProc new_FDeg, pLDegProc new_lDeg = NULL)
+{
+  assume(new_FDeg != NULL);
+  pFDeg = new_FDeg;
+  currRing->pFDeg = new_FDeg;
+  
+  if (new_lDeg == NULL)
+    new_lDeg = currRing->pLDegOrig;
+
+  pLDeg = new_lDeg;
+  currRing->pLDeg = new_lDeg;
+}
+
+
+// restores pFDeg and pLDeg: 
+extern void pRestoreDegProcs(pFDegProc old_FDeg, pLDegProc old_lDeg)
+{
+  assume(old_FDeg != NULL && old_lDeg != NULL);
+  pFDeg = old_FDeg;
+  currRing->pFDeg = old_FDeg;
+  pLDeg = old_lDeg;
+  currRing->pLDeg = old_lDeg;
+}
 
 /*2
 * assumes that the head term of b is a multiple of the head term of a

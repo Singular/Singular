@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.51 2000-12-19 18:31:42 obachman Exp $ */
+/* $Id: kutil.h,v 1.52 2000-12-20 11:15:46 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -217,7 +217,9 @@ public:
                    LObject* Lo,const kStrategy strat);
   pFDegProc pOrigFDeg;
   pLDegProc pOrigLDeg;
-  pFDegProc pOldFDeg;
+  pFDegProc pOrigFDeg_TailRing;
+  pLDegProc pOrigLDeg_TailRing;
+
   ideal Shdl;
   ideal D; /*V(S) is in D(D)*/
   ideal M; /*set of minimal generators*/
@@ -280,8 +282,8 @@ public:
   // S_2_R[i] yields Tobject which corresponds to S[i]
   int*      S_2_R; 
   
-  KINLINE skStrategy();
-  KINLINE ~skStrategy();
+  skStrategy();
+  ~skStrategy();
 
   // return TObject corresponding to S[i]: assume that it exists 
   // i.e. no error checking is done

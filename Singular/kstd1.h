@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.h,v 1.16 2000-11-14 16:04:55 obachman Exp $ */
+/* $Id: kstd1.h,v 1.17 2000-12-20 11:15:44 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -47,7 +47,8 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb=NULL,
               int syzComp=0,int reduced=0);
 
 
-extern pFDegProc pOldFDeg;
+extern pFDegProc pFDegOld;
+extern pLDegProc pLDegOld;
 extern intvec * kModW;
 
 /* options:

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.48 2000-12-18 13:30:36 obachman Exp $ */
+/* $Id: kstdfac.cc,v 1.49 2000-12-20 11:15:44 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -160,7 +160,6 @@ kStrategy kStratCopy(kStrategy o)
   s->enterS=o->enterS;
   s->initEcartPair=o->initEcartPair;
   s->posInLOld=o->posInLOld;
-  s->pOldFDeg=o->pOldFDeg;
   s->Shdl=idCopy(o->Shdl);
   s->S=s->Shdl->m;
   s->tailRing = o->tailRing;
@@ -757,8 +756,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
   exitBuchMora(strat);
   if (TEST_OPT_WEIGHTM)
   {
-    pFDeg=pFDegOld;
-    pLDeg=pLDegOld;
+    pRestoreDegProcs(pFDegOld, pLDegOld);
     if (ecartWeights)
     {
       omFreeSize((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
@@ -804,8 +802,9 @@ lists kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
     {
       kModW = *w;
       strat->kModW = *w;
-      pOldFDeg = pFDeg;
-      pFDeg = kModDeg;
+      pFDegOld = pFDeg;
+      pLDegOld = pLDeg;
+      pSetDegProcs(kModDeg);
       toReset = TRUE;
     }
     pLexOrder = TRUE;
@@ -884,8 +883,8 @@ lists kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
 // Ende: aufraeumen
   if (toReset)
   {
+    pRestoreDegProcs(pFDegOld, pLDegOld);
     kModW = NULL;
-    pFDeg = pOldFDeg;
   }
   pLexOrder = b;
   delete(strat);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.74 2000-12-18 17:26:39 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.75 2000-12-20 11:15:43 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -10,7 +10,7 @@
 #define MORA_USE_BUCKETS
 
 // define if tailrings should be used
-// #define HAVE_TAIL_RING
+#define HAVE_TAIL_RING
 
 #include "mod2.h"
 #include "tok.h"
@@ -89,25 +89,12 @@ BITSET validOpts=Sy_bit(0)
 // returns TRUE if mora should use buckets, false otherwise
 static BOOLEAN kMoraUseBucket(kStrategy strat);
 
-static void kOptimizeLDeg(pFDegProc fdeg, pLDegProc ldeg, kStrategy strat)
+static void kOptimizeLDeg(pLDegProc ldeg, kStrategy strat)
 {
-  if (fdeg == pDeg)
-  {
-    if (ldeg == pLDeg1) 
-      pLDeg = pLDeg1_Deg;
-    if (ldeg == pLDeg1c)
-      pLDeg = pLDeg1c_Deg;
-  }
-  else if (fdeg == pTotaldegree)
-  {
-    if (ldeg == pLDeg1) 
-      pLDeg = pLDeg1_Totaldegree;
-    if (ldeg == pLDeg1c)
-      pLDeg = pLDeg1c_Totaldegree;
-  }
-
   if (strat->ak == 0 && !rIsSyzIndexRing(currRing))
     strat->length_pLength = TRUE;
+  else
+    strat->length_pLength = FALSE;
     
   if ((ldeg == pLDeg0c && !rIsSyzIndexRing(currRing)) ||
       (ldeg == pLDeg0 && strat->ak == 0))
@@ -226,13 +213,13 @@ int redEcart (LObject* h,kStrategy strat)
     }
 
     // end of search: have to reduce with pi
-    if (!K_TEST_OPT_REDTHROUGH && ei > h->ecart)
+    if (ei > h->ecart)
     {
       // It is not possible to reduce h with smaller ecart;
       // if possible h goes to the lazy-set L,i.e
       // if its position in L would be not the last one
       strat->fromT = TRUE;
-      if (strat->Ll >= 0) /*- L is not empty -*/
+      if (!K_TEST_OPT_REDTHROUGH && strat->Ll >= 0) /*- L is not empty -*/
       {
         h->SetLmCurrRing();
         if (strat->honey && strat->posInLDependsOnLength)
@@ -879,21 +866,21 @@ void firstUpdate(kStrategy strat)
     strat->update = (strat->tl == -1);
     if (TEST_OPT_WEIGHTM)
     {
-      if (pFDegOld != pFDeg)
+      pRestoreDegProcs(pFDegOld, pLDegOld);
+      if (strat->tailRing != currRing)
       {
-        pFDeg=pFDegOld;
-        int i;
-        for (i =0; i<=strat->Ll; i++)
-        {
-          strat->L[i].SetpFDeg();
-        }
-        for (i=0; i<=strat->tl; i++)
-        {
-          strat->T[i].SetpFDeg();
-        }
+        strat->tailRing->pFDeg = strat->pOrigFDeg_TailRing;
+        strat->tailRing->pLDeg = strat->pOrigLDeg_TailRing;
       }
-      pLDeg=pLDegOld;
-      kOptimizeLDeg(pFDeg, pLDeg, strat);
+      int i;
+      for (i =0; i<=strat->Ll; i++)
+      {
+        strat->L[i].SetpFDeg();
+      }
+      for (i=0; i<=strat->tl; i++)
+      {
+        strat->T[i].SetpFDeg();
+      }
       if (ecartWeights)
       {
         omFreeSize((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
@@ -1042,14 +1029,17 @@ void initMora(ideal F,kStrategy strat)
       /*uses automatic computation of the ecartWeights to set them*/
       kEcartWeights(F->m,IDELEMS(F)-1,ecartWeights);
     }
-    pFDeg=totaldegreeWecart;
-    pLDeg=maxdegreeWecart;
-    for(i=1; i<=pVariables; i++)
-      Print(" %d",ecartWeights[i]);
-    PrintLn();
-    mflush();
+    
+    pSetDegProcs(totaldegreeWecart, maxdegreeWecart);
+    if (TEST_OPT_PROT)
+    {
+      for(i=1; i<=pVariables; i++)
+        Print(" %d",ecartWeights[i]);
+      PrintLn();
+      mflush();
+    }
   }
-  kOptimizeLDeg(pFDeg, pLDeg, strat);
+  kOptimizeLDeg(pLDeg, strat);
 }
 
 #ifdef HAVE_ASSUME
@@ -1107,7 +1097,8 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   /*- compute-------------------------------------------*/
 
 #ifdef HAVE_TAIL_RING
-  kStratInitChangeTailRing(strat);
+  if (strat->homog && strat->red == redFirst)
+    kStratInitChangeTailRing(strat);
 #endif  
   
   while (strat->Ll >= 0)
@@ -1258,8 +1249,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   if (TEST_OPT_PROT) messageStat(srmax,lrmax,hilbcount,strat);
   if (TEST_OPT_WEIGHTM)
   {
-    pFDeg=pFDegOld;
-    pLDeg=pLDegOld;
+    pRestoreDegProcs(pFDegOld, pLDegOld);
     if (ecartWeights)
     {
       omFreeSize((ADDRESS)ecartWeights,(pVariables+1)*sizeof(short));
@@ -1376,8 +1366,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   pDelete(&strat->kNoether);
   if ((TEST_OPT_WEIGHTM)&&(F!=NULL))
   {
-    pFDeg=pFDegOld;
-    pLDeg=pLDegOld;
+    pRestoreDegProcs(pFDegOld, pLDegOld);
     if (ecartWeights)
     {
       omFreeSize((ADDRESS *)&ecartWeights,(pVariables+1)*sizeof(short));
@@ -1521,7 +1510,8 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   return res;
 }
 
-pFDegProc pOldFDeg;
+pFDegProc pFDegOld;
+pLDegProc pLDegOld;
 intvec * kModW, * kHomW;
 
 long kModDeg(poly p, ring r)
@@ -1568,8 +1558,9 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   {
     pLexOrder=FALSE;
     strat->kHomW=kHomW=vw;
-    pOldFDeg = pFDeg;
-    pFDeg = kHomModDeg;
+    pFDegOld = pFDeg;
+    pLDegOld = pLDeg;
+    pSetDegProcs(kHomModDeg);
     toReset = TRUE;
   }
   if ((h==testHomog)
@@ -1593,8 +1584,9 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
       strat->kModW = kModW = *w;
       if (vw == NULL)
       {
-        pOldFDeg = pFDeg;
-        pFDeg = kModDeg;
+        pFDegOld = pFDeg;
+        pLDegOld = pLDeg;
+        pSetDegProcs(kModDeg);
         toReset = TRUE;
       }
     }
@@ -1625,7 +1617,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   if (toReset)
   {
     kModW = NULL;
-    pFDeg = pOldFDeg;
+    pRestoreDegProcs(pFDegOld, pLDegOld);
   }
   pLexOrder = b;
 //Print("%d reductions canceled \n",strat->cel);
@@ -1685,8 +1677,11 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
     {
       kModW = *w;
       strat->kModW = *w;
-      pOldFDeg = pFDeg;
-      pFDeg = kModDeg;
+      assume(pFDeg != NULL && pLDeg != NULL);
+      pFDegOld = pFDeg;
+      pLDegOld = pLDeg;
+      pSetDegProcs(kModDeg);
+      
       toReset = TRUE;
       if (reduced>1)
       {
@@ -1726,8 +1721,8 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   idSkipZeroes(r);
   if (toReset)
   {
+    pRestoreDegProcs(pFDegOld, pLDegOld);
     kModW = NULL;
-    pFDeg = pOldFDeg;
   }
   pLexOrder = b;
   HCord=strat->HCord;

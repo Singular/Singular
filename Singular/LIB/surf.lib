@@ -1,9 +1,9 @@
-// $Id: surf.lib,v 1.13 2000-12-19 15:05:43 anne Exp $
+// $Id: surf.lib,v 1.14 2000-12-20 11:15:50 obachman Exp $
 //
 // author : Hans Schoenemann
 //
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surf.lib,v 1.13 2000-12-19 15:05:43 anne Exp $";
+version="$Id: surf.lib,v 1.14 2000-12-20 11:15:50 obachman Exp $";
 category="Visualization";
 info="
 LIBRARY: surf.lib    PROCEDURES FOR GRAPHICS WITH SURF
@@ -45,6 +45,8 @@ proc  plot(ideal I)
 "USAGE:   plot(I);  I ideal
 RETURN: nothing
 NOTE: requires the external program 'surf' to be installed
+      @*If the (string) variable extra_surf_opts is defined, the the value of
+      this 
 EXAMPLE: example plot; shows an example
 "
 {

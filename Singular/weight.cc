@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: weight.cc,v 1.17 2000-10-30 13:40:29 obachman Exp $ */
+/* $Id: weight.cc,v 1.18 2000-12-20 11:15:50 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -21,10 +21,6 @@
 #include "weight.h"
 
 /*0 implementation*/
-
-pFDegProc pFDegOld;
-pLDegProc pLDegOld;
-
 #ifndef __MWERKS__
 extern "C" double (*wFunctional)(int *degw, int *lpol, int npol,
        double *rel, double wx);
