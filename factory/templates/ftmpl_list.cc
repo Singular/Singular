@@ -1,12 +1,16 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: ftmpl_list.cc,v 1.0 1996-05-17 11:06:32 stobbe Exp $
+// $Id: ftmpl_list.cc,v 1.1 1997-03-27 10:31:57 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 11:06:32  stobbe
+Initial revision
+
 */
 
-#include <templates/list.h>
+#include <templates/assert.h>
 
+#include <templates/list.h>
 
 template <class T>
 ListItem<T>::ListItem( const ListItem<T>& i )
@@ -74,6 +78,7 @@ T& ListItem<T>::getItem()
     return *item;
 }
 
+#ifndef NOSTREAMIO
 template <class T>
 void ListItem<T>::print( ostream & os )
 {
@@ -82,6 +87,7 @@ void ListItem<T>::print( ostream & os )
     else
 	os << "(no item)";
 }
+#endif /* NOSTREAMIO */
 
 
 
@@ -200,8 +206,8 @@ void List<T>::insert ( const T& t, int (*cmpf)( const T&, const T& ) )
 	}
     }
 }
-    
-    
+
+
 template <class T>
 void List<T>::insert ( const T& t, int (*cmpf)( const T&, const T& ), void (*insf)( T&, const T& ) )
 {
@@ -252,8 +258,7 @@ int List<T>::length() const
 template <class T>
 T List<T>::getFirst() const
 {
-    if ( ! first )
-	cerr << "List: no item available" << endl;
+    ASSERT( first, "List: no item available" );
     return first->getItem();
 }
 
@@ -280,8 +285,7 @@ void List<T>::removeFirst()
 template <class T>
 T List<T>::getLast() const
 {
-    if ( ! first )
-	cerr << "List: no item available" << endl;
+    ASSERT( first, "List: no item available" );
     return last->getItem();
 }
 
@@ -327,6 +331,7 @@ void List<T>::sort( int (*swapit) ( const T&, const T& ) )
 }
 
 
+#ifndef NOSTREAMIO
 template <class T>
 void List<T>::print ( ostream & os ) const
 {
@@ -339,6 +344,7 @@ void List<T>::print ( ostream & os ) const
     }
     os << " )";
 }
+#endif /* NOSTREAMIO */
 
 
 template <class T>
@@ -392,12 +398,8 @@ ListIterator<T>& ListIterator<T>::operator= ( const List<T> & l )
 template <class T>
 T& ListIterator<T>::getItem () const
 {
-    if ( current )
-	return current->getItem();
-    else {
-	cerr << "ListIterator: no item available" << endl;
-	return current->getItem();
-    }
+    ASSERT( current, "ListIterator: no item available" );
+    return current->getItem();
 }
 
 
@@ -508,12 +510,14 @@ void ListIterator<T>::remove ( int moveright )
     }
 }
 
+#ifndef NOSTREAMIO
 template <class T>
 ostream& operator<<( ostream & os, const List<T> & l )
 {
     l.print( os );
     return os;
 }
+#endif /* NOSTREAMIO */
 
 template <class T>
 List<T> Union ( const List<T> & F, const List<T> & G )
