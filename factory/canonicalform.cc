@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.18 1997-09-12 15:25:25 schmidt Exp $ */
+/* $Id: canonicalform.cc,v 1.19 1997-09-24 10:52:23 schmidt Exp $ */
 
 #include <config.h>
 
@@ -359,7 +359,7 @@ CanonicalForm::gcd( const CanonicalForm & ) const
     return 1;
 }
 
-//{{{ CanonicalForm CanonicalForm::deriv() const
+//{{{ CanonicalForm CanonicalForm::deriv () const
 //{{{ docu
 //
 // deriv() - return the formal derivation of CO.
@@ -369,7 +369,7 @@ CanonicalForm::gcd( const CanonicalForm & ) const
 //
 //}}}
 CanonicalForm
-CanonicalForm::deriv() const
+CanonicalForm::deriv () const
 {
     if ( inCoeffDomain() )
 	return 0;
@@ -384,15 +384,13 @@ CanonicalForm::deriv() const
 }
 //}}}
 
-//{{{ CanonicalForm CanonicalForm::deriv( const Variable & x ) const
+//{{{ CanonicalForm CanonicalForm::deriv ( const Variable & x ) const
 //{{{ docu
 //
 // deriv() - return the formal derivation of CO with respect to x.
 //
-// Note: If x is less than the main variable of CO we have to
-// swap variables which may be quite expensive.  x should be a
-// polynomial variable.  Returns zero if f is in a coefficient
-// domain.
+// x should be a polynomial variable.  Returns zero if f is in a
+// coefficient domain.
 //
 // Timing Note (for the developer): I tried the same without
 // 'Variable y = mvar()', replacing each occurence of y directly
@@ -401,7 +399,7 @@ CanonicalForm::deriv() const
 //
 //}}}
 CanonicalForm
-CanonicalForm::deriv( const Variable & x ) const
+CanonicalForm::deriv ( const Variable & x ) const
 {
     ASSERT( x.level() > 0, "cannot derive with respect to algebraic variables" );
     if ( inCoeffDomain() )
@@ -412,8 +410,13 @@ CanonicalForm::deriv( const Variable & x ) const
 	return 0;
     else if ( x == y )
 	return deriv();
-    else
-	return swapvar( swapvar( *this, x, y ).deriv( y ), x, y );
+    else {
+	CanonicalForm result;
+	CFIterator i;
+	for ( i = *this; i.hasTerms(); i++ )
+	    result += i.coeff().deriv( x ) * power( y, i.exp() );
+	return result;
+    }
 }
 //}}}
 
@@ -1295,7 +1298,7 @@ CanonicalForm::isFFinGF() const
     return is_imm( value ) == GFMARK && gf_isff( imm2int( value ) );
 }
 
-//{{{ CanonicalForm CanonicalForm::sqrt() const
+//{{{ CanonicalForm CanonicalForm::sqrt () const
 //{{{ docu
 //
 // sqrt() - calculate integer square root.
@@ -1307,11 +1310,11 @@ CanonicalForm::isFFinGF() const
 // root.  The algorithm is from H. Cohen - 'A Course in
 // Computational Algebraic Number Theory', ch. 1.7.1.
 //
-// See also: InternalCF::sqrt(), InternalInteger::sqrt()
+// See also: InternalCF::sqrt(), InternalInteger::sqrt(), ::sqrt()
 //
 //}}}
 CanonicalForm
-CanonicalForm::sqrt() const
+CanonicalForm::sqrt () const
 {
     if ( is_imm( value ) ) {
 	ASSERT( is_imm( value ) == INTMARK, "sqrt() not implemented" );
@@ -1343,7 +1346,7 @@ CanonicalForm::sqrt() const
 // Returns the largest integer less or equal logarithm of CO to
 // base 2.  CO should be a positive integer.
 //
-// See also: InternalCF::ilog2(), InternalInteger::ilog2()
+// See also: InternalCF::ilog2(), InternalInteger::ilog2(), ::ilog2()
 //
 //}}}
 int
