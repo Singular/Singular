@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.inc,v 1.25 1999-08-25 16:02:47 Singular Exp $ */
+/* $Id: febase.inc,v 1.26 1999-09-23 12:03:03 Singular Exp $ */
 /*
 * ABSTRACT: handling of 'voices'
 */
@@ -378,7 +378,7 @@ static int fePrintEcho(char *anf, char *b)
     len_s=ss-anf+1;
   }
   // my_yylinebuf:
-  int mrc=min(len_s,80)-1;
+  int mrc=min(len_s,79)-1;
   strcpy(my_yylinebuf,anf+(len_s-1)-mrc);
   if (my_yylinebuf[mrc] == '\n') my_yylinebuf[mrc] = '\0';
   mrc--;
