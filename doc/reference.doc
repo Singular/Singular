@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.41 1998-05-12 16:06:16 Singular Exp $
+@comment $Id: reference.doc,v 1.42 1998-05-12 16:47:54 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -3284,7 +3284,17 @@ disables the regularity bound for res/mres (see @ref{regularity})
 disables the sugar strategy
 @item @code{prot}
 shows protocol information indicating the
-progress during standard basis computation
+progress during the following computations: 
+@code{facstd}, 
+@code{fglm}, 
+@code{lres},
+@code{mres}, 
+@code{minres},
+@code{res}, 
+@code{sres},
+@code{std}, 
+@code{syz}.
+See below for more details.
 @item @code{redSB}
 computes a reduced standard basis in any standard basis computation
 @item @code{redTail}
@@ -3345,6 +3355,34 @@ shows correct usage in error messages (default)
 @c example
 @end example
 @end table
+
+
+The output reported on @code{option(prot)} has the following meaning:
+@table @code
+@item facstd
+@code{F} 
+@item fglm 
+@item lres
+@item mres 
+@item minres
+@item res 
+@item sres
+@item std 
+@item syz
+@end table
+
+
+the
+number between brackets @code{()} is the number of critical pairs still
+to be reduced (except immediatly after an @code{H} 'high corner' where
+it is the degree above which all monomials can be discarded); a
+@code{-} sign indicates that one critical pair has been reduced to 0;
+@code{s} indicates that a new (either
+to 0 or to a new s-polynomial which is indicated by an @code{s}), a
+number without brackets shows the degree in which the computation takes
+place.
+
+
 @menu
 * degBound::
 * multBound::
