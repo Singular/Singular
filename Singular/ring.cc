@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.181 2002-02-04 17:12:59 Singular Exp $ */
+/* $Id: ring.cc,v 1.182 2002-02-05 09:32:21 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -4084,11 +4084,27 @@ ring rCompose(lists  L)
     for(j=0;j<n-1;j++)
     {
     // todo: a(..), M
-      lists vv=(lists)v->m[j].Data(); // assume LIST
+      if (v->m[j].Typ()!=LIST_CMD)
+      {
+        WerrorS("ordering must be list of lists");
+        goto rCompose_err;
+      }
+      lists vv=(lists)v->m[j].Data();
+      if ((vv->nr!=1)
+      || (vv->m[0].Typ()!=STRING_CMD)
+      || ((vv->m[1].Typ()!=INTVEC_CMD) && (vv->m[1].Typ()!=INT_CMD)))
+      {
+        WerrorS("ordering name must be a (string,intvec)");
+        goto rCompose_err;
+      }
       R->order[j]=rOrderName(omStrDup((char*)vv->m[0].Data())); // assume STRING
       if (j==0) R->block0[0]=1;
       else      R->block0[j]=R->block1[j-1]+1;
-      intvec *iv=ivCopy((intvec*)vv->m[1].Data()); //assume INTVEC
+      intvec *iv;
+      if (vv->m[1].Typ()==INT_CMD)
+        iv=new intvec((int)vv->m[1].Data(),(int)vv->m[1].Data());
+      else
+        iv=ivCopy((intvec*)vv->m[1].Data()); //assume INTVEC
       R->block1[j]=R->block0[j]+iv->length()-1;
       int i;
       switch (R->order[j])
