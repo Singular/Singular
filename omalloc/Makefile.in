@@ -3,14 +3,18 @@
 ### Purpose: Makefile for omalloc
 ### Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
 ### Created: 11/99
-### Version: $Id: Makefile.in,v 1.3 2000-05-31 13:34:28 obachman Exp $
+### Version: $Id: Makefile.in,v 1.4 2000-08-14 12:08:40 obachman Exp $
 #################################################################
 
 SHELL		= /bin/sh
+VERSION 	= @VERSION@
 
 ##
 ## various paths
 ##
+prefix		= @prefix@
+exec_prefix	= @exec_prefix@
+
 # header file is installed here
 includedir	= @includedir@
 # library is installed here
@@ -25,24 +29,22 @@ AR		= @AR@
 RANLIB		= @RANLIB@
 PERL		= @PERL@
 LN_S		= @LN_S@
-INSTALL		= ../install-sh -c
-INSTALL_PROGRAM	= ${INSTALL}
-INSTALL_DATA	= ${INSTALL} -m 644
-MKINSTALLDIRS   = ../mkinstalldirs
+INSTALL		= @INSTALL@
+INSTALL_PROGRAM	= @INSTALL_PROGRAM@ 
+INSTALL_DATA	= @INSTALL_DATA@
+MKINSTALLDIRS   = ./mkinstalldirs
 ##
 ## compiler and linker options
 ##
 CFLAGS		= @CFLAGS@ 
-# CFLAGS		= @CFLAGS@  -Wno-unused
-CPPFLAGS	= @CPPFLAGS@
-DEFS		= -DNDEBUG @DEFS@
+CPPFLAGS	= -I. @CPPFLAGS@
+DEFS		= @DEFS@
 
 ##
 ## external config and and malloc files
 ##
-
-EXTERNAL_CONFIG_HEADER = @EXTERNAL_CONFIG_HEADER@
 EXTERNAL_CONFIG_SOURCE = @EXTERNAL_CONFIG_SOURCE@
+EXTERNAL_CONFIG_HEADER = @EXTERNAL_CONFIG_HEADER@
 
 OM_MALLOC_HEADER = @OM_MALLOC_HEADER@
 OM_MALLOC_SOURCE = @OM_MALLOC_SOURCE@
@@ -55,13 +57,13 @@ OM_MALLOC_SOURCE = @OM_MALLOC_SOURCE@
 ### file sets
 ###
 
-
 # normal C source files
-CSOURCES=							\
-omBinPage.c      omList.c         omAllocEmulate.c              \
-omAlloc.c        omCheck.c        omOpts.c         omTrack.c	\
-omAllocSystem.c  omError.c        omStats.c			\
-omBin.c          omFindExec.c     omDebug.c
+CSOURCES=							   \
+omBinPage.c      omList.c         omAllocEmulate.c omDebug.c       \
+omAlloc.c        omDebugCheck.c   omOpts.c         omGetBackTrace.c\
+omAllocSystem.c  omError.c        omStats.c	   omRet2Info.c   \
+omBin.c          omFindExec.c     omDebugTrack.c                   \
+omalloc_provide.c 	  
 
 ifdef EXTERNAL_CONFIG_SOURCE
 GSOURCES := ${GSOURCES} omExternalConfig.c
@@ -74,30 +76,35 @@ endif
 ASO_SOURCES = 
 
 HEADERS= 							\
-omAlloc.h              omCheck.h              omList.h		\
+omAlloc.h              omList.h		      omDerivedConfig.h \
 omAllocDecl.h          omConfig.h             omMemOps.h	\
-omDebug.h              omOpts.h		                        \
+omDebug.h              omOpts.h		      omInlineDecl.h    \
 omAllocPrivate.h       omError.h              omPage.h		\
 omAllocSystem.h        omFindExec.h           omStats.h		\
 omBin.h                omDefaultConfig.h      omStructs.h	\
-omBinPage.h            omInline.h             omTrack.h         \
+omBinPage.h            omInline.h             omGetBackTrace.h  \
+omReturn.h	       omRet2Info.h		
 
-OBJS := $(CSOURCES:.c=.o)  $(GSOURCES:.c=.o)
-
+OBJS := $(CSOURCES:.c=.o)  $(GSOURCES:.c=.o) 
+OBJS_NDEBUG := $(CSOURCES:.c=.o_ndebug) $(GSOURCES:.c=.o_ndebug) 
 
 SOURCES=${CSOURCES} omGetPageSize.h omMallocSystem.h gmalloc.c dlmalloc.h dlmalloc.c \
-        omMmap.c gmalloc.c omTables.c ommalloc.c pmalloc.h pmalloc.c
+        omMmap.c gmalloc.c omTables.c pmalloc.h pmalloc.c omalloc.c omalloc_debug.c  \
+	$(TESTSOURCES) omtTestAlloc.c 
 
 ASO_OBJS := $(ASO_SOURCES:.aso.cc=.aso) 
 
-DISTFILES=$(SOURCES) $(HEADERS) makeheader.pl Makefile.in \
-           omConfig.h.in
+DISTFILES=$(SOURCES) $(HEADERS) omtTest.h makeheader.pl Makefile.in \
+           omConfig.h.in configure.in mkinstalldirs install-sh configure 
+
 ##
 ## Build Targets
 ##
-
-%.o: %.c omConfig.h omTables.inc
+%.o: %.c omConfig.h omTables.h omalloc.h omTables.inc
 	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -c $<
+
+%.o_ndebug: %.c omConfig.h omTables.h omalloc.h omTables.inc
+	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -DOM_NDEBUG -c $< -o $@
 
 %.aso.o: %.aso.cc mmtables.inc 
 	${CXX} ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} $< -o $@
@@ -106,7 +113,7 @@ DISTFILES=$(SOURCES) $(HEADERS) makeheader.pl Makefile.in \
 %.aso: %.aso.o
 	./$< > $@
 
-all:	lib libomalloc.h libg
+all:	libomalloc.a libomalloc_ndebug.a omalloc.h omalloc.o omalloc_debug.o
 
 lib: libomalloc.a
 
@@ -115,13 +122,27 @@ libomalloc.a: $(OBJS) Makefile omConfig.h
 	$(AR) cr $@ $(OBJS) 
 	$(RANLIB) $@
 
-libomalloc.h: $(HEADERS) 
-	$(PERL) makeheader.pl omAlloc.h $@
+libomalloc_ndebug.a: $(OBJS_NDEBUG) Makefile omConfig.h
+	rm -f $@
+	$(AR) cr $@ $(OBJS_NDEBUG) 
+	$(RANLIB) $@
+
+omalloc.h: $(HEADERS) 
+	$(PERL) makeheader.pl -a omAlloc.h $@
+
+omalloc.o: omalloc.c
+	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -DOM_NDEBUG -c $< -o $@
+
+omalloc_debug.o: omalloc_debug.c 
+	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -c $< -o $@
 
 omTables.inc: omTables
 	./omTables > $@
 
-omTables: omAlloc.h omMalloc.h omConfig.h omTables.c
+omTables.h: omTables
+	./omTables 1 >$@
+
+omTables: omAllocPrivate.h omConfig.h omTables.c
 	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -DOM_GENERATE_INC omTables.c -o omTables
 
 #
@@ -137,10 +158,11 @@ ifdef EXTERNAL_CONFIG_SOURCE
 omExternalConfig.c: $(EXTERNAL_CONFIG_SOURCE)
 	cp $(EXTERNAL_CONFIG_SOURCE) omExternalConfig.c
 endif
+
 ifdef EXTERNAL_CONFIG_HEADER
-omExternalConfig.h: ${EXTERNAL_CONFIG_HEADER}
-	rm -f omExternalConfig.h
-	cp ${EXTERNAL_CONFIG_HEADER} omExternalConfig.h
+omExternalConfig.h: $(EXTERNAL_CONFIG_HEADER)
+	cp $(EXTERNAL_CONFIG_HEADER) omExternalConfig.h
+omDerivedConfig.h: omExternalConfig.h
 endif
 
 #
@@ -165,28 +187,46 @@ configure: configure.in
 ##
 ## install targets
 ##
-install: all
+install: all libomalloc_p.a
 	$(MKINSTALLDIRS) $(libdir)
 	$(MKINSTALLDIRS) $(includedir)
 	$(INSTALL_DATA) libomalloc.a $(libdir)
 	$(RANLIB) $(libdir)/libomalloc.a
-	$(INSTALL_DATA) libmalloc.h $(includedir)/omAlloc.h
+	$(INSTALL_DATA) libomalloc_ndebug.a $(libdir)
+	$(RANLIB) $(libdir)/libomalloc_ndebug.a
+	$(INSTALL_DATA) libomalloc_p.a $(libdir)
+	$(RANLIB) $(libdir)/libomalloc_p.a
+	$(INSTALL_DATA) omalloc.o omalloc_debug.o $(libdir)
+	$(INSTALL_DATA) omalloc.h omalloc.c $(includedir)
+
 
 uninstall: 
-	rm -f $(includedir)/omAlloc.h $(libdir)/libomalloc.a
+	rm -f $(includedir)/omalloc.h $(includedir)/omalloc.c
+	rm -f $(libdir)/libomalloc.a $(libdir)/libomalloc_ndebug.a $(libdir)/libomalloc_p.a $(libdir)/omalloc.o $(libdir)/omalloc_debug.o
+
+##
+## dist targets
+##
+dist: omalloc-$(VERSION).tgz
+omalloc-$(VERSION).tgz: $(DISTFILES)
+	rm -rf omalloc-$(VERSION)
+	mkdir omalloc-$(VERSION)
+	cp $(DISTFILES) omalloc-$(VERSION)
+	tar czf omalloc-$(VERSION).tgz omalloc-$(VERSION)
 
 ##
 ## clean targest
 ##
 mostlyclean: 
-	-rm -f core *.d *.o *.og *.op *_d.c *.ob *.a depend *.out *.tgz omTables
-	-rm -f omTest omTest_* libomalloc*
-	-rm -f omMalloc.c omMalloc.h omExternalConfig.h omExternalConfig.c
+	-rm -f core *.d *.o *.og *.op *_d.c *.ob *.a depend *.out *.tgz omTables *.o_ndebug *.gp *.gprof
+	-rm -f omtTest omtTest_* libomalloc* *.bprof omtTest omtTest_*
+	-rm -f omMalloc.c omExternalConfig.h omExternalConfig.c
 
 clean: mostlyclean
 
 distclean: clean
-	-rm -f  *~ .\#*  stamp-h configure
+	-rm -f  *~ .\#*  stamp-h configure omMalloc.h
+	rm -rf omalloc-$(VERSION)
 	-rm -f omConfig.h Makefile TAGS* tags config.status config.cache config.log
 
 srcclean: distclean
@@ -200,6 +240,14 @@ TAGS:	omConfig.h.in
 	etags omConfig.h.in $(SOURCES) $(HEADERS)
 
 ##
+## check
+##
+
+check: omtTest omtTest_ndebug
+	./omtTest
+	./omtTest_ndebug
+
+##
 ## Below here is stuff for developpers
 #################################################################
 
@@ -210,12 +258,12 @@ TAGS:	omConfig.h.in
 CCG		= gcc
 CCM		= gcc -MM -DGENERATE_DEPEND
 
-CFLAGSG		= -g -O -Wall -pipe
+CFLAGSG		= -g -O -fno-inline-functions -Wall -pipe
 DEFSG		=  @DEFS@
 
 OBJG := $(CSOURCES:.c=.og) $(GSOURCES:.c=.og)
 
-%.og: %.c
+%.og: %.c omConfig.h omTables.h omalloc.h
 	$(CCG) ${CFLAGSG} ${CPPFLAGS} ${DEFSG} -c $< -o $@
 
 libg: libomalloc_g.a
@@ -227,11 +275,11 @@ libomalloc_g.a: $(OBJG) Makefile omConfig.h
 
 
 ##
-## expnaded macros
+## expanded macros
 ##
-OBJD := $(CSOURCES:%.c=%_d.og) 
+OBJD := $(CSOURCES:%.c=%_d.og) $(GSOURCES:%.c=%_d.og)
 
-%_d.c : %.c omConfig.h
+%_d.c : %.c omConfig.h omTables.h omalloc.h
 	$(CCG) -E -P $< | $(PERL) -p -e 's/;/;\n/g' | $(PERL) -p -e 's/\{/\n\{/g' | $(PERL) -p -e 's/\}/\n\}/g' > $@
 .PRECIOUS: %_d.c
 
@@ -248,7 +296,7 @@ libomalloc_d.a: $(OBJD) Makefile omConfig.h
 
 CCP		= gcc
 
-CFLAGSP		= -g -pg -O3 -a -pipe
+CFLAGSP		= -g -pg -O3 -a -pipe 
 DEFSP		=  @DEFS@
 
 OBJP := $(CSOURCES:.c=.op) $(GSOURCES:.c=.op)
@@ -257,7 +305,7 @@ OBJP := $(CSOURCES:.c=.op) $(GSOURCES:.c=.op)
 ##
 ## Profile Targets
 ##
-%.op: %.c
+%.op: %.c omConfig.h omTables.h omalloc.h
 	$(CCP) ${CFLAGSP} ${CPPFLAGS} ${DEFSP} -c $< -o $@
 
 libp: libomalloc_p.a
@@ -273,7 +321,7 @@ libomalloc_p.a: $(OBJP) Makefile omConfig.h
 
 CCB		= gcc
 
-CFLAGSB		= -g -O3 -pipe
+CFLAGSB		= -g -O3 -pipe 
 DEFSB		=  @DEFS@
 
 ##
@@ -285,7 +333,7 @@ OBJB := $(CSOURCES:.c=.ob) $(GSOURCES:.c=.ob)
 ##
 ## Profile Targets
 ##
-%.ob: %.c
+%.ob: %.c omConfig.h omTables.h omalloc.h
 	$(CCB) ${CFLAGSB} ${CPPFLAGS} ${DEFSB} -c $< -o $@
 
 libb: libomalloc_b.a
@@ -298,44 +346,53 @@ libomalloc_b.a: $(OBJB) Makefile omConfig.h
 ####################################################
 ## Test program
 ##
+TESTSOURCES	= omtTest.c omtTestReal.c omtTestDebug.c omtTestError.c
 
-omTest_d: libd omTest_d.c omTest.d
-	$(CCG) ${CFLAGSG} ${CPPFLAGS} ${DEFSG} omTest_d.c -L. -lomalloc_d -o omTest_d
+TEST_D := $(TESTSOURCES:.c=_d.og) 
+omtTest_d: libd $(TEST_D) 
+	$(CCG) ${CFLAGSG} ${CPPFLAGS} ${DEFSG} $(TEST_D) -L. -lomalloc_d -o omtTest_d
 
-omTest_g: libg omTest.c omTest.d
-	$(CCG) ${CFLAGSG} ${CPPFLAGS} ${DEFSG} omTest.c -L. -lomalloc_g -o omTest_g
+TEST_G := $(TESTSOURCES:.c=.og) 
+omtTest_g: libg $(TEST_G)
+	$(CCG) ${CFLAGSG} ${CPPFLAGS} ${DEFSG} $(TEST_G) -L. -lomalloc_g -o omtTest_g
 
+TEST_P := $(TESTSOURCES:.c=.op) 
+omtTest_p: libp $(TEST_P)
+	$(CCG) ${CFLAGSP} ${CPPFLAGS} ${DEFSP} $(TEST_P) -L. -lomalloc_p -o omtTest_p
 
-omTest_p: libp omTest.c omTest.d
-	$(CCP) ${CFLAGSP} ${CPPFLAGS} ${DEFSP} omTest.c -L. -lomalloc_p -o omTest_p
+TEST_B := $(TESTSOURCES:.c=.ob) 
+omtTest_b: libb $(TEST_B)
+	$(CCG) ${CFLAGSB} ${CPPFLAGS} ${DEFSB} $(TEST_B) -L. -lomalloc_b  /usr/lib/bmon.o -o omtTest_b
 
-omTest_b: libb omTest.c omTest.d
-	$(CCB) ${CFLAGSB} ${CPPFLAGS} ${DEFSB} omTest.c	/usr/lib/bmon.o -L. -lomalloc_b -o omTest_b
+TEST_O := $(TESTSOURCES:.c=.o) 
+omtTest: lib  $(TEST_O)
+	$(CC) ${CFLAGS} ${CPPFLAGS} ${DEFS} $(TEST_O) -L. -lomalloc -o omtTest
 
-omTest: lib omTest.c omTest.d
-	$(CC) ${CFLAGS} ${CPPFLAGS} ${DEFS} omTest.c -L. -lomalloc -o omTest
+TEST_NDEBUG_O := $(TESTSOURCES:.c=.o_ndebug)
+omtTest_ndebug: libomalloc_ndebug.a $(TEST_NDEBUG_O)
+	$(CC) ${CFLAGS} ${CPPFLAGS} ${DEFS} $(TEST_NDEBUG_O) -DOM_NDEBUG -L. -lomalloc_ndebug -o omtTest_ndebug
 
-omTest_m: lib omTest.c omTest.d
-	$(CC) ${CFLAGS} ${CPPFLAGS} ${DEFS} -DOM_TEST_MALLOC omTest.c -L. -lomalloc -o omTest_m
+%.om : %.c omalloc.h
+	$(CC) ${CFLAGS} ${CPPFLAGS} ${DEFS} -DOM_TEST_MALLOC -c $< -o $@
+TEST_M := $(TESTSOURCES:.c=.om)
+omtTest_m: lib $(TEST_M) 
+	$(CC) ${CFLAGS} ${CPPFLAGS} ${DEFS} -DOM_TEST_MALLOC $(TEST_M) -L. -lomalloc -o omtTest_m
 
 ##
-## tar and backup
+## backup
 ##
 
-tar:
-	tar czvf omalloc.tgz $(DISTFILES)
-
-backup: tar
-	mcopy omalloc.tgz a:
+backup: omalloc-$(VERSION).tgz
+	mcopy -o omalloc-$(VERSION).tgz a:
 
 ##
 ## Dependencies 
 ## 
-%.d: %.c omConfig.h Makefile
-	echo $(@:.d=.og) $(@:.d=.od)  $(@:.d=.ob) $(@:.d=_d.c)" " \\ > $@
+%.d: %.c omConfig.h Makefile omTables.h omTables.inc omalloc.h
+	echo $(@:.d=.o_ndebug) $(@:.d=.og) $(@:.d=.od)  $(@:.d=.op) $(@:.d=.ob) $(@:.d=_d.c) $(@:.d=.om)" " \\ > $@
 	$(CCM) ${CPPFLAGS} ${DEFSG} $< >> $@
 
-depend:   omTest.d $(CSOURCES:.c=.d) omConfig.h 
+depend:   $(CSOURCES:.c=.d) omConfig.h $(TESTSOURCES:.c=.d)
 	cat *.d >depend
 
 ifeq (depend,$(wildcard depend))

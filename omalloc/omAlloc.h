@@ -3,7 +3,7 @@
  *  Purpose: declaration of public routines for omalloc  
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omAlloc.h,v 1.3 2000-05-31 13:34:30 obachman Exp $
+ *  Version: $Id: omAlloc.h,v 1.4 2000-08-14 12:08:44 obachman Exp $
  *******************************************************************/
 #ifndef OM_ALLOC_H
 #define OM_ALLOC_H
@@ -12,20 +12,33 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "omConfig.h"
-#include "omStructs.h"
+#include "omDerivedConfig.h"
 #include "omError.h"
+#include "omStructs.h"
 #include "omAllocDecl.h"
+#include "omInlineDecl.h"
 #include "omBin.h"
-#include "omCheck.h"
 #include "omMemOps.h"
 #include "omList.h"
-#include "omTrack.h"
+#include "omFindExec.h"
+#include "omGetBackTrace.h"
+#include "omRet2Info.h"
 #include "omStats.h"
 #include "omOpts.h"
 #include "omBinPage.h"
 #include "omAllocSystem.h"
+#include "omTables.h"
 #include "omAllocPrivate.h"
+#include "omDebug.h"
 #include "omInline.h"
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* OM_ALLOC_H */

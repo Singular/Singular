@@ -4,7 +4,7 @@
  *  Purpose: configuration for omalloc  
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omConfig.h.in,v 1.3 2000-05-31 13:34:31 obachman Exp $
+ *  Version: $Id: omConfig.h.in,v 1.4 2000-08-14 12:08:44 obachman Exp $
  *******************************************************************/
 #ifndef OM_CONFIG_H
 #define OM_CONFIG_H
@@ -12,6 +12,11 @@
 /*******************************************************************
  * Defines which are set by configure
  ******************************************************************/
+/* define if you provide an external config file to be included
+   by omDefaultConfig.h */
+#ifndef OM_HAVE_EXTERNAL_CONFIG_H
+#define OM_HAVE_EXTERNAL_CONFIG_H
+#endif
 /* define if you can inline */
 #ifndef OM_INLINE
 #undef OM_INLINE
@@ -27,6 +32,10 @@
 /* define for local inline */
 #ifndef OM_INLINE_LOCAL
 #define OM_INLINE_LOCAL static
+#endif
+/* defint to nothing if you do not understand const */
+#ifndef const
+#undef const
 #endif
 /* define to the name of addr2line program, undef otherwise */
 #ifndef OM_PROG_ADDR2LINE
@@ -76,29 +85,13 @@
 #ifndef HAVE_SYS_MMAN_H
 #define HAVE_SYS_MMAN_H
 #endif
-/* define to func which returns ith return addr */
-#ifndef OM_RETURN_ADDR
-#undef OM_RETURN_ADDR
+/* define if GET_RETURN_ADDR works */
+#ifndef OM_GET_RETURN_ADDR_WORK
+#undef OM_GET_RETURN_ADDR_WORKS
 #endif
-/* define to func which returns ith frame addr */
-#ifndef OM_FRAME_ADDR
-#undef OM_FRAME_ADDR
-#endif
-/* define if OM_RETURN_ADDR actually works */
-#ifndef OM_RETURN_ADDR_WORKS
-#undef OM_RETURN_ADDR_WORKS
-#endif
-/* define if OM_FRAME_ADDR actually works */
-#ifndef OM_FRAME_ADDR_WORKS
-#undef OM_FRAME_ADDR_WORKS
-#endif
-/* define if OM_RETURN_ADDR actually rvalue */
-#ifndef OM_RETURN_ADDR_RVALUE
-#undef OM_RETURN_ADDR_RVALUE
-#endif
-/* define if OM_FRAME_ADDR actually rvalue */
-#ifndef OM_FRAME_ADDR_RVALUE
-#undef OM_FRAME_ADDR_RVALUE
+/* define if GET_RETURN_ADDR works */
+#ifndef OM_GET_BACKTRACE_WORK
+#undef OM_GET_BACKTRACE_WORKS
 #endif
 /* Define sizeof(long) */
 #ifndef SIZEOF_LONG
@@ -132,11 +125,6 @@
 /* define if your malloc provides a working OM_MALLOC_SIZEOF_ADDR */
 #undef OM_MALLOC_PROVIDES_SIZEOF_ADDR
 #endif
-#ifndef OM_PROVIDE_MALLOC
-/* define if you want omalloc to provide ANSI-C conforming
-   malloc/calloc/realloc/free funcs */
-#undef OM_PROVIDE_MALLOC
-#endif
 #ifndef OM_EMULATE_OMALLOC
 /* define if you only want to emulate omalloc, but not actually use it */
 #undef OM_EMULATE_OMALLOC
@@ -153,84 +141,34 @@
 #ifndef OM_HAVE_DENSE_BIN_DISTRIBUTION
 #undef OM_HAVE_DENSE_BIN_DISTRIBUTION
 #endif
+/* define to disable all debugging stuff */
+#ifndef OM_NDEBUG
+#undef OM_NDEBUG
+#endif
+/* define to enable debug tracking */
+#ifndef OM_HAVE_TRACK
+#undef OM_HAVE_TRACK
+#endif
+/* define to enable tracking of files/line numbers */
+#ifndef OM_TRACK_FILE_LINE
+#undef OM_TRACK_FILE_LINE
+#endif
+/* define to enable tracking of return addresses */
+#ifndef OM_TRACK_RETURN
+#undef OM_TRACK_RETURN
+#endif
+/* define to enable tracking of stack backtraces */
+#ifndef OM_TRACK_BACKTRACE
+#undef OM_TRACK_BACKTRACE
+#endif
 /* define to enable internal debugging */
 #ifndef OM_INTERNAL_DEBUG
 #undef OM_INTERNAL_DEBUG
 #endif
-
-/*******************************************************************
- * Defines which are not set by configure
- ******************************************************************/
-#ifndef SIZEOF_VOIDP
-/* configure makes sure that SIZEOF_VOIDP == SIZEOF_LONG */
-#define SIZEOF_VOIDP SIZEOF_LONG
+/* define to -1/0/1/2/3 if you want omalloc to provide 
+   "underlying malloc"/no/normal/debug ANSI-C conforming  
+   malloc/calloc/realloc/free funcs */
+#ifndef OM_PROVIDE_MALLOC
+#define OM_PROVIDE_MALLOC 0
 #endif
-
-/* SIZEOF_VOIDP == 8 || SIZEOF_VOIDP == 4 checked by configure */
-#if SIZEOF_VOIDP == 8
-#define LOG_SIZEOF_LONG  3
-#define LOG_SIZEOF_VOIDP 3
-#define LOG_BIT_SIZEOF_LONG 6
-#else
-#define LOG_SIZEOF_LONG  2
-#define LOG_SIZEOF_VOIDP 2
-#define LOG_BIT_SIZEOF_LONG 5
-#endif
-
-/* SIZEOF_SYSTEM_PAGE == 4096 || SIZEOF_SYSTEM_PAGE == 8192 checked by configure */
-#if SIZEOF_SYSTEM_PAGE == 8192
-#define LOG_BIT_SIZEOF_SYSTEM_PAGE 13
-#else
-#define LOG_BIT_SIZEOF_SYSTEM_PAGE 12
-#endif
-
-#ifndef CHAR_BIT
-#define CHAR_BIT 8
-#endif
-
-#define BIT_SIZEOF_LONG (CHAR_BIT << LOG_SIZEOF_LONG)
-
-#ifdef OM_ALIGN_8
-#define SIZEOF_OM_ALIGNMENT 8
-#define SIZEOF_OM_ALIGNMENT_1 7
-#define LOG_SIZEOF_OM_ALIGNMENT 3 
-#define SIZEOF_STRICT_ALIGNMENT 8
-#else
-#define SIZEOF_OM_ALIGNMENT 4
-#define SIZEOF_OM_ALIGNMENT_1 3
-#define LOG_SIZEOF_OM_ALIGNMENT 2
-#ifdef OM_ALIGNMENT_NEEDS_WORK
-#define SIZEOF_STRICT_ALIGNMENT 8
-#else
-#define SIZEOF_STRICT_ALIGNMENT 4
-#endif
-#endif
-
-#define OM_ALIGN_SIZE(size) \
-   (((size) + SIZEOF_OM_ALIGNMENT_1) & (~SIZEOF_OM_ALIGNMENT_1))
-
-#define OM_STRICT_ALIGN_SIZE(size)                                          \
-   (((size) + SIZEOF_STRICT_ALIGNMENT - 1) & (~ (SIZEOF_STRICT_ALIGNMENT - 1)))
-
-
-/* define to enable assume */
-#ifndef HAVE_OM_ASSUME
-#if !defined(NDEBUG) || defined(OM_INTERNAL_DEBUG)
-#define HAVE_OM_ASSUME
-#endif
-#endif
-
-/* set to 0 to disable aso memory mamagent */
-#ifndef HAVE_ASO
-#define HAVE_ASO 1
-#endif
-#if defined(HAVE_ASO) && HAVE_ASO == 1
-/* define to enable ASO debugging */
-#undef ASO_DEBUG
-#endif
-
-#ifndef NULL
-#define NULL ((void*)0)
-#endif
-
 #endif /* OM_CONFIG_H  */

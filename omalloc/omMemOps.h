@@ -3,7 +3,7 @@
  *  Purpose: low-level Macros for memory operations
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omMemOps.h,v 1.1.1.1 1999-11-18 17:45:53 obachman Exp $
+ *  Version: $Id: omMemOps.h,v 1.2 2000-08-14 12:08:46 obachman Exp $
  *******************************************************************/
 
 #ifndef OM_MEM_OPS_H
@@ -27,12 +27,12 @@ extern void _omMemsetW(long* p1, long w, long l);
 
 #else /* ! DO_DEEP_PROFILE */
 
-#define omMemcpyW(p1, p2, l)                      \
+#define omMemcpyW(p1, p2, l)                    \
 do                                              \
 {                                               \
   long _i = l;                                  \
-  long* _s1 = (long*) p1;                       \
-  const long* _s2 = (long*) p2;                 \
+  long* _s1 = (long*) (p1);                       \
+  const long* _s2 = (long*) (p2);                 \
                                                 \
   for (;;)                                      \
   {                                             \
@@ -45,12 +45,12 @@ do                                              \
 }                                               \
 while(0)
 
-#define omMemcpy_nwODD(p1, p2, l)                 \
+#define omMemcpy_nwODD(p1, p2, l)               \
 do                                              \
 {                                               \
-  long _i = l - 1;                              \
-  long* _s1 = (long*) p1;                       \
-  const long* _s2 = (long*) p2;                 \
+  long _i = (l) - 1;                              \
+  long* _s1 = (long*) (p1);                       \
+  const long* _s2 = (long*) (p2);                 \
                                                 \
   *_s1++ = *_s2++;                              \
   for (;;)                                      \
@@ -63,12 +63,12 @@ do                                              \
 }                                               \
 while(0)
 
-#define omMemcpy_nwEVEN(p1, p2, l)                \
+#define omMemcpy_nwEVEN(p1, p2, l)              \
 do                                              \
 {                                               \
   long _i = l;                                  \
-  long* _s1 = (long*) p1;                       \
-  const long* _s2 = (long*) p2;                 \
+  long* _s1 = (long*) (p1);                       \
+  const long* _s2 = (long*) (p2);                 \
                                                 \
   for (;;)                                      \
   {                                             \
@@ -80,7 +80,7 @@ do                                              \
 }                                               \
 while(0)
 
-#define omMemaddW(P1, P2, P3, L)                  \
+#define omMemaddW(P1, P2, P3, L)                \
 do                                              \
 {                                               \
   unsigned long* _p1 = P1;                      \
@@ -97,7 +97,7 @@ do                                              \
 }                                               \
 while(0)
 
-#define omMemadd_nwODD(P1, P2, P3, L)             \
+#define omMemadd_nwODD(P1, P2, P3, L)           \
 do                                              \
 {                                               \
   unsigned long* _p1 = P1;                      \
@@ -118,7 +118,7 @@ do                                              \
 }                                               \
 while(0)
 
-#define omMemadd_nwEVEN(P1, P2, P3, L)            \
+#define omMemadd_nwEVEN(P1, P2, P3, L)          \
 do                                              \
 {                                               \
   unsigned long* _p1 = P1;                      \
@@ -136,7 +136,7 @@ do                                              \
 }                                               \
 while(0)
 
-#define omMemadd_nwONE(P1, P2, P3)                \
+#define omMemadd_nwONE(P1, P2, P3)              \
 do                                              \
 {                                               \
   unsigned long* _p1 = P1;                      \
@@ -147,7 +147,7 @@ do                                              \
 }                                               \
 while(0)
 
-#define omMemadd_nwTWO(P1, P2, P3)                \
+#define omMemadd_nwTWO(P1, P2, P3)              \
 do                                              \
 {                                               \
   unsigned long* _p1 = P1;                      \
@@ -159,15 +159,15 @@ do                                              \
 }                                               \
 while(0)
 
-#define omMemsetW(P1, W, L)                       \
+#define omMemsetW(P1, W, L)                     \
 do                                              \
 {                                               \
-  long* _p1 = (long*) P1;                               \
+  long* _p1 = (long*) (P1);                     \
   unsigned long _l = L;                         \
-                                                \
+  unsigned long _w = W;                         \
   while(_l)                                     \
   {                                             \
-    *_p1++ = W;                                 \
+    *_p1++ = _w;                                \
     _l--;                                       \
   }                                             \
 }                                               \

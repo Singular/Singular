@@ -3,8 +3,10 @@
  *  Purpose: implementation of routines for operations on linked lists
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omList.c,v 1.2 1999-11-22 18:12:59 obachman Exp $
+ *  Version: $Id: omList.c,v 1.3 2000-08-14 12:08:46 obachman Exp $
  *******************************************************************/
+#include "omConfig.h"
+
 #ifndef NULL
 #define NULL ((void*) 0)
 #endif
@@ -166,5 +168,95 @@ void* _omInsertInSortedList(void* list, int next, int long_field, void* addr)
     return list;
   }
 }
+
+
+#ifndef OM_NDEBUG
+#include "omAlloc.h"
+#include "omDebug.h"
+
+omError_t _omCheckList(void* list, int next, int level, omError_t report, OM_FLR_DECL)
+{
+  if (level <= 1) return omError_NoError;
+  
+  if (level == 1)
+  {
+    while (list != NULL)
+    {
+      omCheckReturn(omCheckPtr(list, report, OM_FLR_VAL));
+      ITER(list);
+    }
+  }
+  else
+  {
+    void* l1 = list;
+    void* l2;
+    int l = 0, i;
+
+    l1 = list;
+    while (l1 != NULL)
+    {
+      omCheckReturn(omCheckPtr(l1, report, OM_FLR_VAL));
+      i = 0;
+      l2 = list;
+      while (l1 != l2)
+      {
+        i++;
+        ITER(l2);
+      }
+      if (i != l) 
+        return omReportError(omError_ListCycleError, report, OM_FLR_VAL, "");
+      ITER(l1);
+      l++;
+    }
+  }
+  return omError_NoError;
+}
+
+omError_t _omCheckSortedList(void* list, int next, int long_field, int level, omError_t report, OM_FLR_DECL)
+{
+  void* prev = NULL;
+  
+  if (level <= 1) return omError_NoError;
+  
+  if (level == 1)
+  {
+    while (list != NULL)
+    {
+      omCheckReturn(omCheckPtr(list, report, OM_FLR_VAL));
+      if (prev != NULL && VALUE(prev, long_field) > VALUE(list, long_field))
+        return omReportError(omError_SortedListError, report, OM_FLR_VAL, 
+                             "%d > %d", VALUE(prev, long_field), VALUE(list, long_field));
+      prev = list;
+      ITER(list);
+    }
+  }
+  else
+  {
+    void* l1 = list;
+    void* l2;
+    int l = 0, i;
+
+    while (l1 != NULL)
+    {
+      omCheckReturn(omCheckPtr(l1, report, OM_FLR_VAL));
+      if (prev != NULL && VALUE(prev, long_field) > VALUE(l1, long_field))
+        return omReportError(omError_SortedListError, report, OM_FLR_VAL, 
+                             "%d > %d", VALUE(prev, long_field), VALUE(l1, long_field));
+      i = 0;
+      l2 = list;
+      while (l1 != l2)
+      {
+        i++;
+        ITER(l2);
+      }
+      omCheckReturnError(i != l, omError_ListCycleError);
+      prev = l1;
+      ITER(l1);
+      l++;
+    }
+  }
+  return omError_NoError;
+}
+#endif
 
 

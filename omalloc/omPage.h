@@ -3,7 +3,7 @@
  *  Purpose: declaration of routines for primitve page managment
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omPage.h,v 1.3 2000-05-31 13:34:32 obachman Exp $
+ *  Version: $Id: omPage.h,v 1.4 2000-08-14 12:08:46 obachman Exp $
  *******************************************************************/
 #ifndef OM_PAGE_H
 #define OM_PAGE_H
@@ -106,6 +106,9 @@ int omGetNumberOfAllocatedPages();
 
 #define omGetPageOfAddr(addr) \
   ((void*) ((long) (addr) & ~(SIZEOF_SYSTEM_PAGE -1)))
+
+#define omGetBinPageOfAddr(addr) \
+  ((omBinPage) ((long) (addr) & ~(SIZEOF_SYSTEM_PAGE -1)))
 
 #define omIsAddrOnPage(addr, page) (omGetPageOfAddr(addr) == (void*) (page))
 

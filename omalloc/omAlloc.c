@@ -3,13 +3,12 @@
  *  Purpose: implementation of main omalloc functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omAlloc.c,v 1.5 2000-05-31 13:34:29 obachman Exp $
+ *  Version: $Id: omAlloc.c,v 1.6 2000-08-14 12:08:43 obachman Exp $
  *******************************************************************/
 #ifndef OM_ALLOC_C
 #define OM_ALLOC_C
 
 #include "omAlloc.h"
-
 /*******************************************************************
  *  
  *  global variables
@@ -17,99 +16,10 @@
  *******************************************************************/
 
 omBinPage_t om_ZeroPage[] = {{0, NULL, NULL, NULL, NULL}};
-omBinPage_t om_CheckPage[] = {{0, NULL, NULL, NULL, NULL}};
-omBinPage_t om_LargePage[] = {{0, NULL, NULL, NULL, NULL}};
-omBin_t     om_LargeBin[] = {{om_LargePage, NULL, NULL, 0, 0, 0}};
-omBin_t     om_CheckBin[] = {{om_CheckPage, NULL, NULL, 0, 0, 0}};
 omSpecBin om_SpecBin = NULL;
 
-/*******************************************************************
- *  
- *  Definition of Func
- *  
- *******************************************************************/
+#include "omTables.inc"
 
-#define ALLOCBIN_FUNC_WRAPPER(func)             \
-void* omFunc##func (omBin bin)                  \
-{                                               \
-  void* addr;                                   \
-  __omType##func (void*, addr, bin);            \
-  return addr;                                  \
-}
-
-#define REALLOCBIN_FUNC_WRAPPER(func)                               \
-void* omFunc##func (void* old_addr, omBin old_bin, omBin new_bin)   \
-{                                                                   \
-  void* new_addr;                                                   \
-  __omType##func (old_addr, old_bin, void*, new_addr, new_bin);     \
-  return new_addr;                                                  \
-}
-
-#define ALLOCSIZE_FUNC_WRAPPER(func)            \
-void* omFunc##func (size_t size)                \
-{                                               \
-  void* addr;                                   \
-  __omType##func (void*, addr, size);           \
-  return addr;                                  \
-}
-
-#define REALLOCSIZE_FUNC_WRAPPER(func)                                  \
-void* omFunc##func (void* old_addr, size_t old_size, size_t new_size)   \
-{                                                                       \
-  void* new_addr;                                                       \
-  __omType##func (old_addr, old_size, void*, new_addr, new_size);       \
-  return new_addr;                                                      \
-}
-
-#define REALLOC_FUNC_WRAPPER(func)                      \
-void* omFunc##func (void* old_addr, size_t new_size)    \
-{                                                       \
-  void* new_addr;                                       \
-  __omType##func (old_addr, void*, new_addr, new_size); \
-  return new_addr;                                      \
-}
-
-#define FREESIZE_FUNC_WRAPPER(func)             \
-void omFunc##func (void* addr, size_t size)     \
-{                                               \
-  __om##func (addr, size);                      \
-}
-
-#define FREEBIN_FUNC_WRAPPER(func)             \
-void omFunc##func (void* addr, omBin bin)     \
-{                                               \
-  __om##func (addr, bin);                      \
-}
-
-#define FREE_FUNC_WRAPPER(func)                 \
-void omFunc##func (void* addr)                  \
-{                                               \
-  __om##func (addr);                            \
-}
-
-ALLOCBIN_FUNC_WRAPPER(AllocBin)
-ALLOCBIN_FUNC_WRAPPER(Alloc0Bin)
-REALLOCBIN_FUNC_WRAPPER(ReallocBin)
-REALLOCBIN_FUNC_WRAPPER(Realloc0Bin)
-FREEBIN_FUNC_WRAPPER(FreeBin)
-
-ALLOCSIZE_FUNC_WRAPPER(Alloc)
-ALLOCSIZE_FUNC_WRAPPER(Alloc0)
-REALLOCSIZE_FUNC_WRAPPER(ReallocSize)
-REALLOCSIZE_FUNC_WRAPPER(Realloc0Size)
-REALLOC_FUNC_WRAPPER(Realloc)
-REALLOC_FUNC_WRAPPER(Realloc0)
-FREESIZE_FUNC_WRAPPER(FreeSize)
-FREE_FUNC_WRAPPER(Free)
-
-#ifdef OM_ALIGNMENT_NEEDS_WORK
-ALLOCSIZE_FUNC_WRAPPER(AllocAligned)
-ALLOCSIZE_FUNC_WRAPPER(Alloc0Aligned)
-REALLOCSIZE_FUNC_WRAPPER(ReallocAlignedSize)
-REALLOCSIZE_FUNC_WRAPPER(Realloc0AlignedSize)
-REALLOC_FUNC_WRAPPER(ReallocAligned)
-REALLOC_FUNC_WRAPPER(Realloc0Aligned)
-#endif /* OM_ALIGNMENT_NEEDS_WORK */
 
 /*******************************************************************
  *  
@@ -214,7 +124,13 @@ void* omAllocBinFromFullPage(omBin bin)
   if (bin->current_page != om_ZeroPage)
   {
     omAssume(bin->last_page != NULL);
+    /* Set this to zero, but preserve the first bit,
+       so that tracking works */
+#ifdef OM_HAVE_TRACK
+    bin->current_page->used_blocks &= (1 << (BIT_SIZEOF_LONG -1));
+#else    
     bin->current_page->used_blocks = 0;
+#endif
   }
 
   if (bin->current_page->next != NULL)
@@ -237,7 +153,7 @@ void* omAllocBinFromFullPage(omBin bin)
 }
 
 
-/* page->used_blocks == 0, so, either free page or reallocate to 
+/* page->used_blocks <= 0, so, either free page or reallocate to 
    the right of current_page */
 /*
  * Now: there are three different strategies here, on what to do with 
@@ -252,8 +168,12 @@ void  omFreeToPageFault(omBinPage page, void* addr)
   omBin bin;
   omAssume(page->used_blocks <= 0);
 
-#ifdef OM_HAVE_DEBUG
-  if (page->used_blocks < 0) omDebugFree(addr, 0);
+#ifdef OM_HAVE_TRACK
+  if (page->used_blocks < 0) 
+  {
+    omFreeTrackAddr(addr);
+    return;
+  }
 #endif
     
   bin = omGetBinOfPage(page);
@@ -266,7 +186,7 @@ void  omFreeToPageFault(omBinPage page, void* addr)
       omFreeBinPage(page);
     else
       omFreeBinPages(page, - bin->max_blocks);
-#ifdef OM_HAVE_DEBUG
+#ifdef OM_HAVE_TRACK
     om_JustFreedPage = page;
 #endif    
   }
@@ -296,23 +216,51 @@ void  omFreeToPageFault(omBinPage page, void* addr)
 
 /*******************************************************************
  *  
- *  ANSI-C malloc-conforming functions
+ *  DoRealloc
  *  
  *******************************************************************/
-
-#include "ommalloc.c"
-
-#ifdef OM_PROVIDE_MALLOC
-#undef malloc
-#undef realloc
-#undef free
-#undef calloc
-#define ommallocFunc malloc
-#define omreallocFunc realloc
-#define omfreeFunc free
-#define omcallocFunc calloc
-#include "ommalloc.c"
+#ifdef OM_ALIGNMNET_NEEDS_WORK
+#define DO_ZERO(flag) (flag & 1)
+#else
+#define DO_ZERO(flag)    flag
 #endif
 
+void* omDoRealloc(void* old_addr, size_t new_size, int flag)
+{
+  void* new_addr;
+  
+  if (!omIsBinPageAddr(old_addr) && new_size > OM_MAX_BLOCK_SIZE)
+  {
+    if (DO_ZERO(flag))
+      return omRealloc0Large(old_addr, new_size);
+    else
+      return omReallocLarge(old_addr, new_size);
+  }
+  else
+  {
+    size_t old_size = omSizeOfAddr(old_addr);
+    size_t min_size;
+    
+    omAssume(OM_IS_ALIGNED(old_addr));
+    
+#ifdef OM_ALIGNMENT_NEEDS_WORK
+    if (flag & 2)
+      __omTypeAllocAligned(void*, new_addr, new_size);
+    else
+#endif
+      __omTypeAlloc(void*, new_addr, new_size);
+    
+    new_size = omSizeOfAddr(new_addr);
+    min_size = (old_size < new_size ? old_size : new_size);
+    omMemcpyW(new_addr, old_addr, min_size >> LOG_SIZEOF_LONG);
+    
+    if (DO_ZERO(flag) && (new_size > old_size))
+      omMemsetW((void*) new_addr + min_size, 0, (new_size - old_size) >> LOG_SIZEOF_LONG);
+  
+    __omFreeSize(old_addr, old_size);
+
+    return new_addr;
+  }
+}
 
 #endif /* OM_ALLOC_C */

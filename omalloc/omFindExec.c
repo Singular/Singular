@@ -3,7 +3,7 @@
  *  Purpose: routine which determines absolute pathname of executable
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omFindExec.c,v 1.2 2000-05-31 13:34:31 obachman Exp $
+ *  Version: $Id: omFindExec.c,v 1.3 2000-08-14 12:08:45 obachman Exp $
  *******************************************************************/
 
 #include "omConfig.h"
@@ -20,7 +20,6 @@
 #define MAXPATHLEN 1024
 #endif
 
-
 /* ABSOLUTE_FILENAME_P (fname): True if fname is an absolute filename */
 #ifdef atarist
 #define ABSOLUTE_FILENAME_P(fname)        ((fname[0] == '/') || \
@@ -35,11 +34,14 @@
 #ifndef HAVE_READLINK
 char * omFindExec (const char *name, char* executable)
 #else
-char * omFindExec_link (const char *name, char* executable)
+static char * omFindExec_link (const char *name, char* executable)
 #endif
 {
   char *search;
   char *p;
+#ifdef WINNT
+  char *extra = NULL;
+#endif
   char tbuf[MAXPATHLEN];
 
   if (ABSOLUTE_FILENAME_P(name))
@@ -83,8 +85,7 @@ char * omFindExec_link (const char *name, char* executable)
     {
       char *extra = NULL;
       /* we are under msdos display */
-      FIX ME
-        extra = (char*) AllocL((search != NULL ? strlen(search) : 0) + 3);
+      extra = (char*) omAlloc((search != NULL ? strlen(search) : 0) + 3);
       strcpy(extra, ".:");
       if (search != NULL) strcat(extra, search);
       search = extra;
@@ -124,7 +125,7 @@ char * omFindExec_link (const char *name, char* executable)
         {
 #ifdef WINNT
           if (extra != NULL)
-            FreeL(extra);
+            omFree(extra);
 #endif
           strcpy(executable, tbuf);
           return executable;
@@ -141,21 +142,50 @@ char * omFindExec_link (const char *name, char* executable)
       }
     }
   }
-    
-    return NULL;
-  }
+  return NULL;
+}
 
 #ifdef HAVE_READLINK
+/* similar to readlink, but dont' mess up absolute pathnames */
+static int my_readlink(const char* name, char* buf, size_t bufsize)
+{
+  char buf2[MAXPATHLEN];
+  int ret;
+  
+  if ((ret = readlink(name, buf2, bufsize)) > 0)
+  {
+    buf2[ret] = 0;
+    if (*name == '/' && *buf2 != '/')
+    {
+      char* last = strrchr(name, '/');
+      int i = 0;
+      while (&(name[i]) != last)
+      {
+        buf[i] = name[i];
+        i++;
+      }
+      buf[i] = '/';
+      i++;
+      strcpy(&(buf[i]), buf2);
+      return i + ret;
+    }
+    else
+    {
+      strcpy(buf, buf2);
+    }
+  }
+  return ret;
+}
 
 #define MAX_LINK_LEVEL 10
 /* similar to readlink (cf. man readlink), except that symbolic links are 
    followed up to MAX_LINK_LEVEL
 */
-int full_readlink(const char* name, char* buf, size_t bufsize)
+static int full_readlink(const char* name, char* buf, size_t bufsize)
 {
   int ret;
   
-  if ((ret=readlink(name, buf, bufsize)) > 0)
+  if ((ret=my_readlink(name, buf, bufsize)) > 0)
   {
     char buf2[MAXPATHLEN];
     int ret2, i = 0;
@@ -163,7 +193,7 @@ int full_readlink(const char* name, char* buf, size_t bufsize)
     do
     {
       buf[ret] = '\0';
-      if ((ret2 = readlink(buf, buf2, MAXPATHLEN)) > 0)
+      if ((ret2 = my_readlink(buf, buf2, MAXPATHLEN)) > 0)
       {
         i++;
         buf2[ret2] = '\0';
@@ -194,8 +224,23 @@ char * omFindExec (const char *name, char* exec)
   }
   if (link != NULL && (ret=full_readlink(link, buf, MAXPATHLEN)) > 0)
   {
+    char *p = strrchr(link, '/');
+
+
+    if(p!=NULL) *(p+1)='\0';
     buf[ret]='\0';
-    return omFindExec_link(buf, exec);
+
+    if (buf[0] != '/')
+    {
+      strcpy(exec, link);
+      strcat(exec, buf);
+    }
+    else
+    {
+      strcpy(exec, buf);
+    }
+
+    return exec;
   }
   return link;
 }

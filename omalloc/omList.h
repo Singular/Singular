@@ -3,12 +3,11 @@
  *  Purpose: declaration of routines for operations on linked lists
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omList.h,v 1.1.1.1 1999-11-18 17:45:53 obachman Exp $
+ *  Version: $Id: omList.h,v 1.2 2000-08-14 12:08:46 obachman Exp $
  *******************************************************************/
 
 #ifndef OM_LIST_H
 #define OM_LIST_H
-
 
 #define OM_LIST_OFFSET(ptr, name_of_offset_field) \
   (ptr != NULL ? ((void*) &(ptr->name_of_offset_field)) - ((void*) ptr) : 0)
@@ -49,7 +48,12 @@ void* _omRemoveFromSortedList(void* list,int next,int long_field,
 /* Inserts addr at the right place, returns list assumes addr != NULL */
 void* _omInsertInSortedList(void* list, int next, int long_field, 
                             void* addr);
-
+#ifndef OM_NDEBUG
+/* Check whether list is ok, i.e. whether addr of lists are aligned and in valid range */
+omError_t _omCheckList(void* list, int next, int level, omError_t report, OM_FLR_DECL);
+/* like above, but also check that sorting is ok */
+omError_t _omCheckSortedList(void* list, int next, int long_field, int level, omError_t report, OM_FLR_DECL);
+#endif
 
 /********************************************************************
  *
@@ -67,14 +71,19 @@ void* _omInsertInSortedList(void* list, int next, int long_field,
 #define omRemoveFromList(ptr, addr) \
   _omRemoveFromList(ptr, 0, addr)
 #define omFindInList(ptr, what, value) \
-  _omFindInList(ptr, 0, OM_LIST_OFFSET(ptr, what), value)
+  _omFindInList(ptr, 0, OM_LIST_OFFSET(ptr, what), (unsigned long) value)
 #define omInsertInSortedList(ptr, what, addr) \
   _omInsertInSortedList(ptr, 0, OM_LIST_OFFSET(ptr, what), addr)
 #define omFindInSortedList(ptr, what, value) \
   _omFindInSortedList(ptr, 0, OM_LIST_OFFSET(ptr, what), value)
 #define omRemoveFromSortedList(ptr, what, addr) \
   _omRemoveFromSortedList(ptr, 0, OM_LIST_OFFSET(ptr, what), addr)
-
+#ifndef OM_NDEBUG
+#define omCheckList(ptr, level, report, OM_FLR_VAL) \
+  _omCheckList(ptr, 0, level, report, OM_FLR_VAL)
+#define omCheckSortedList(ptr, what, level, report, OM_FLR_VAL) \
+  _omCheckSortedList(ptr, 0, OM_LIST_OFFSET(ptr, what), level, report, OM_FLR_VAL)
+#endif
 
 /********************************************************************
  *
@@ -92,12 +101,18 @@ void* _omInsertInSortedList(void* list, int next, int long_field,
 #define omRemoveFromGList(ptr, next, addr) \
   _omRemoveFromList(ptr, OM_LIST_OFFSET(ptr, next), addr)
 #define omFindInGList(ptr, next, what, value) \
-  _omFindInList(ptr, OM_LIST_OFFSET(ptr, next), OM_LIST_OFFSET(ptr, what), value)
+  _omFindInList(ptr, OM_LIST_OFFSET(ptr, next), OM_LIST_OFFSET(ptr, what), (unsigned long) value)
 #define omInsertInSortedGList(ptr, next, what, addr) \
   _omInsertInSortedList(ptr, OM_LIST_OFFSET(ptr, next), OM_LIST_OFFSET(ptr, what), addr)
 #define omFindInSortedGList(ptr, next, what, value) \
   _omFindInSortedList(ptr, OM_LIST_OFFSET(ptr, next),OM_LIST_OFFSET(ptr,what),value)
 #define omRemoveFromSortedGList(ptr, next, what, addr) \
   _omRemoveFromSortedList(ptr, OM_LIST_OFFSET(addr,next),OM_LIST_OFFSET(addr,what),addr)
+#ifndef OM_NDEBUG
+#define omCheckGList(ptr, next, level, report, OM_FLR_VAL) \
+ _omCheckList(ptr, OM_LIST_OFFSET(ptr,next), level, report, OM_FLR_VAL)
+#define omCheckSortedGList(ptr, next, what, level, report, OM_FLR_VAL) \
+ _omCheckSortedList(ptr, OM_LIST_OFFSET(ptr,next), OM_LIST_OFFSET(ptr,what), level, report, OM_FLR_VAL)
+#endif
 
 #endif /* OM_LIST_H */

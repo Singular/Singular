@@ -3,20 +3,23 @@ dnl File: configure.in
 dnl Purpose: Process this file with autoconf to produce configure
 dnl Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
 dnl Created: 11/99
-dnl Version: $Id: configure.in,v 1.3 2000-05-31 13:34:29 obachman Exp $
+dnl Version: $Id: configure.in,v 1.4 2000-08-14 12:08:42 obachman Exp $
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 
 AC_INIT(omAlloc.c)
+
+VERSION=0.9.5
+AC_SUBST(VERSION)
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl help for configure
 dnl
 AC_ARG_WITH(
-  external_config_h,
+  external-config_h,
   [ --with-external-config_h=HEADER_FILE
                     use HEADER_FILE for external configuration])
 AC_ARG_WITH(
-  external_config_c,
+  external-config_c,
   [ --with-external-config_c=C_FILE
                     use C_FILE for external implementations])
 AC_ARG_WITH(
@@ -24,23 +27,24 @@ AC_ARG_WITH(
   [ --with-malloc=system|dlmalloc|gmalloc|pmalloc|external
                     which malloc to use, default: dlmalloc ])
 AC_ARG_WITH(
-  external_malloc_h,
+  external-malloc_h,
   [ --with-external-malloc-h=HEADER_FILE
 		    use HEADER_FILE for external malloc declaration])
 AC_ARG_WITH(
-  external_malloc_c,
-  [ --with-external-malloc-h=C_FILE
+  external-malloc_c,
+  [ --with-external-malloc-c=C_FILE
 		    use C_FILE for external malloc implementation])
 AC_ARG_WITH(
   valloc,
   [ --with-valloc=mmap|malloc|emulate
                     how to get page-aligned memory, default: use first possible])
 AC_ARG_WITH(
-  provide_malloc,
-  [ --with-provide-malloc  
-                    provide ANSI-C conforming malloc/calloc/realloc/free])
+  provide-malloc,
+  [ --with-provide-malloc=yes|debug|malloc
+                    provide normal|debug|underlying malloc ANSI-C conforming 
+                    versions of malloc|calloc|realloc|free])
 AC_ARG_WITH(
-  emulate_omalloc,
+  emulate-omalloc,
   [ --with-emulate-omalloc
                     provide only omallocs interface, but do not use its features])
 AC_ARG_WITH(
@@ -49,66 +53,47 @@ AC_ARG_WITH(
                     how memory is aligned, 
                     default: if possible sloppy, else strict])
 AC_ARG_WITH(
-  dense_bins,
+  dense-bins,
   [ --with-dense-bins  use dense bin distribution])
 AC_ARG_WITH(
   inline,
   [ --without-inline   do not inline])
 AC_ARG_WITH(
+  debug,
+  [ --without-debug    disable all debugging facilities])
+AC_ARG_WITH(
+  track,
+  [ --without-track    disable debug tracking functionality])
+AC_ARG_WITH(
+  track-fl,
+  [ --with-track-fl    track file and line numbers])
+AC_ARG_WITH(
+  track-return,
+  [ --with-track-return track return addresses])
+AC_ARG_WITH(
+  track-backtrace,
+  [ --with-track-backtrace track stack backtraces])
+AC_ARG_WITH(
   internal_debug,
   [ --with-internal-debug       
                        turn on internal debugging])
-AC_ARG_WITH(
-  mtrack,
-  [ --without-mtrack   disable backtrace and memory track])
-AC_ARG_WITH(
-  frame_addr_func,
-  [ --with_frame_addr_func=FUNC
-                    use FUNC as function for determening frame addr
-                    default: __bultin_frame_address])
-AC_ARG_WITH(
-  return_addr_func,
-  [ --with_return_addr_func=FUNC
-                    use FUNC as function for determening return addr
-                    default: __bultin_return_address])
-
-dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
-dnl get singuname
-dnl
-AC_MSG_CHECKING(singuname)
-AC_CACHE_VAL(ac_cv_singuname,
-ac_cv_singuname="unknown"
-if test -r "singuname.sh"; then
-  if (/bin/sh singuname.sh >/dev/null 2>&1) then
-    ac_cv_singuname=`/bin/sh singuname.sh`
-  fi
-fi
-if test "$ac_cv_singuname" = unknown && test -r "../singuname.sh"; then
-  if (/bin/sh ../singuname.sh >/dev/null 2>&1) then
-    ac_cv_singuname=`/bin/sh ../singuname.sh`
-  fi
-fi
-)
-AC_MSG_RESULT($ac_cv_singuname)
-if test "$ac_cv_singuname" = unknown; then
-  AC_MSG_WARN(Unknown architecture: Check singuname.sh)
-  ac_cv_singuname="unknown"
-fi
-
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl compiler/make  config
 dnl
-if test "${CFLAGS+set}" != set; then
-  CFLAGS="-O"
-  ac_cflags_set=no
-fi
+dnl I'm not sure why I did this
+dnl if test "${CFLAGS+set}" != set; then
+dnl  CFLAGS="-O"
+dnl  ac_cflags_set=no
+dnl fi
+
 AC_PROG_MAKE_SET
 AC_PROG_CC
 AC_PROG_CPP
-AC_C_CONST
-AC_C_INLINE
 AC_PROG_RANLIB
 AC_PROG_LN_S
+AC_PROG_INSTALL
+AC_C_CONST
+AC_C_INLINE
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl check for programs
@@ -228,6 +213,8 @@ AC_MSG_CHECKING(for external config files)
 if test "${with_external_config_h+set}" = set; then
     AC_DEFINE(OM_HAVE_EXTERNAL_CONFIG_H)
     EXTERNAL_CONFIG_HEADER=${with_external_config_h}
+    rm -f omExternalConfig.h
+    cp ${with_external_config_h} omExternalConfig.h
 fi
 if test "${with_external_config_c+set}" = set; then
     AC_DEFINE(OM_HAVE_EXTERNAL_CONFIG_C)
@@ -247,8 +234,8 @@ dnl
 AC_MSG_CHECKING(which malloc to use)
 if test "${with_malloc}" = system; then
   OM_MALLOC_HEADER=omMallocSystem.h
-  if test "${with_provide_malloc}" = yes; then
-    AC_MSG_ERROR("can not provide malloc for --with_malloc=system")
+  if test "${with_provide_malloc}" = yes || test "${with_provide_malloc}" = debug; then
+    AC_MSG_ERROR("can not provide malloc for --with-malloc=system")
   fi
 elif test "${with_malloc}" = gmalloc; then
   OM_MALLOC_HEADER=gmalloc.h
@@ -260,7 +247,7 @@ elif test "${with_malloc}" = external; then
   if test "${with_external_malloc_h+set}" != set; then 
     AC_MSG_ERROR(need --with_external_malloc_h for external malloc)
   fi
-  if test "${with_provide_malloc}" = yes; then
+  if test "${with_provide_malloc}" = yes || test "${with_provide_malloc}" = debug; then
     AC_MSG_ERROR("can not provide malloc for --with_malloc=external")
   fi
   OM_MALLOC_HEADER=$with_external_malloc_h
@@ -306,9 +293,15 @@ fi
 if test "$ac_cv_malloc_sizeof_addr" != no; then
 AC_DEFINE(OM_MALLOC_PROVIDES_SIZEOF_ADDR)
 fi
-
-if test "${with_provide_malloc}" = yes; then
-  AC_DEFINE(OM_PROVIDE_MALLOC)
+  
+if test "${with_provide_malloc}" = malloc; then
+   AC_DEFINE(OM_PROVIDE_MALLOC, 3)
+elif test "${with_provide_malloc}" = debug; then
+   AC_DEFINE(OM_PROVIDE_MALLOC, 2)
+elif test "${with_provide_malloc}" = yes; then
+  AC_DEFINE(OM_PROVIDE_MALLOC, 1)
+else
+  AC_DEFINE(OM_PROVIDE_MALLOC, 0)
 fi
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
@@ -405,6 +398,23 @@ fi
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl debug and inline
 dnl
+AC_MSG_CHECKING(whether to disable debugging)
+if test "$with_debug" != no; then
+AC_MSG_RESULT(no)
+else
+AC_MSG_RESULT(yes)
+AC_DEFINE(OM_NDEBUG)
+with_track=no
+fi
+
+AC_MSG_CHECKING(whether to have tracking debug functionality)
+if test "$with_track" != no; then
+AC_MSG_RESULT(yes)
+AC_DEFINE(OM_HAVE_TRACK)
+else
+AC_MSG_RESULT(no)
+fi
+
 AC_MSG_CHECKING(whether to use internal debug)
 if test "$with_internal_debug" = yes; then
 AC_MSG_RESULT(yes)
@@ -429,142 +439,96 @@ else
 fi
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
-dnl mtrack business
+dnl backtrace business
 dnl
-if test "$with_mtrack" != no; then
-# get function for return address
-if test "${with_return_addr_func+set}" = set; then
-if test "${with_return_addr_func}" != no; then
-  ac_cv_return_addr_func=$with_return_addr_func
-fi
-else
-if test "${GCC}" = yes; then
-  ac_cv_return_addr_func="__builtin_return_address"
-fi
-fi
-
-# test this function
-if test "${ac_cv_return_addr_func+set}" = set; then
-AC_DEFINE_UNQUOTED(OM_RETURN_ADDR, $ac_cv_return_addr_func)
-# first, check whether return addr works
-AC_MSG_CHECKING(whether $ac_cv_return_addr_func works)
-AC_CACHE_VAL(ac_cv_return_addr_func_works,
+AC_MSG_CHECKING(whether GET_RET_ADDR works)
+AC_CACHE_VAL(ac_cv_get_return_addr_works,
 AC_TRY_RUN([
+#include "omReturn.h"
 int test_return_addr()
 {
-   if (OM_RETURN_ADDR(1)  != 0 && OM_RETURN_ADDR(0) != 0 && 
-       OM_RETURN_ADDR(1) != OM_RETURN_ADDR(0)) return 0;
-   return 1;
+  char* f;
+  GET_RET_ADDR(f);
+  return (int) f;
 }
-
 int main()
 {
-   return test_return_addr();
+   exit(! test_return_addr());
 }
-], ac_cv_return_addr_func_works=yes,  
-   ac_cv_return_addr_func_works=no,
-   ac_cv_return_addr_func_works=no))
-AC_MSG_RESULT($ac_cv_return_addr_func_works)
+], ac_cv_get_return_addr_works=yes,  
+   ac_cv_get_return_addr_works=no,
+   ac_cv_get_return_addr_works=no))
+AC_MSG_RESULT($ac_cv_get_return_addr_works)
+if test "$ac_cv_get_return_addr_works" = yes; then
+AC_DEFINE(OM_GET_RETURN_ADDR_WORKS)
+fi
 
-if test "$ac_cv_return_addr_func_works" = yes; then
-AC_DEFINE(OM_RETURN_ADDR_WORKS)
-# check whether return addr works with rvalues
-AC_MSG_CHECKING(whether $ac_cv_return_addr_func takes rvalues)
-AC_CACHE_VAL(ac_cv_return_addr_func_rvalue,
+AC_MSG_CHECKING(whether omGetBackTrace works)
+AC_CACHE_VAL(ac_cv_get_backtrace_works,
 AC_TRY_RUN([
-int test_return_addr(int f1, int f2)
+#include "omGetBackTrace.c"
+#include <stdio.h>
+int test_backtrace()
 {
-   if (OM_RETURN_ADDR(f1)  != 0 && OM_RETURN_ADDR(f0) != 0 &&
-       OM_RETURN_ADDR(f1) != OM_RETURN_ADDR(f0)) return 0;
-   return 1;
+  void* bt;
+  int i = omGetBackTrace(&bt, 0, 10);
+  return i;
 }
-
 int main()
 {
-   return test_return_addr(1, 0);
+   int i;	
+   omInitGetBackTrace();
+   i = test_backtrace();
+   if (i == 1) exit(0);
+   else exit(i+1);
 }
-], ac_cv_return_addr_func_rvalue=yes,  
-   ac_cv_return_addr_func_rvalue=no,
-   ac_cv_return_addr_func_rvalue=no))
-AC_MSG_RESULT($ac_cv_return_addr_func_rvalue)
-if test "$ac_cv_return_addr_func_rvalue" = yes; then
-  AC_DEFINE_UNQUOTED(OM_RETURN_ADDR_RVALUE)
+], ac_cv_get_backtrace_works=yes,  
+   ac_cv_get_backtrace_works=no,
+   ac_cv_get_backtrace_works=no))
+AC_MSG_RESULT($ac_cv_get_backtrace_works)
+if test "$ac_cv_get_backtrace_works" = yes; then
+AC_DEFINE(OM_GET_BACKTRACE_WORKS)
 fi
-fi # "$ac_cv_return_addr_func_works" = yes;
-fi # "${ac_cv_return_addr_func+set}" = set;
 
-# get function for frame address
-if test "${with_frame_addr_func+set}" = set; then
-if test "${with_frame_addr_func}" != no; then
-  ac_cv_frame_addr_func=$with_frame_addr_func
-fi
+AC_MSG_CHECKING(whether to track return addresses)
+if test "$with_track_return" = no || test "$ac_cv_get_return_addr_works" = no; then
+  with_track_return=no
 else
-if test "${GCC}" = yes; then
-  ac_cv_frame_addr_func="__builtin_frame_address"
+  AC_DEFINE(OM_TRACK_RETURN)
+  with_track_return=yes
 fi
+AC_MSG_RESULT($with_track_return)
+
+AC_MSG_CHECKING(whether to track files and line numbers)
+if test "$with_track_fl" = no && test "$with_track_return" = no; then
+  with_track_fl=yes
+fi
+if test "${with_track_fl+set}" != set; then 
+  if test "$with_track_return" = yes; then
+    with_track_fl=no
+  else
+    with_track_fl=yes
+  fi
+fi
+AC_MSG_RESULT($with_track_fl)
+if test "$with_track_fl" = yes; then 
+  AC_DEFINE(OM_TRACK_FILE_LINE)
 fi
 
-# test this function
-if test "${ac_cv_frame_addr_func+set}" = set; then
-AC_DEFINE_UNQUOTED(OM_FRAME_ADDR, $ac_cv_frame_addr_func)
-# first, check whether frame addr works
-AC_MSG_CHECKING(whether $ac_cv_frame_addr_func works)
-AC_CACHE_VAL(ac_cv_frame_addr_func_works,
-AC_TRY_RUN([
-int test_frame_addr()
-{
-   if (OM_FRAME_ADDR(1)  != 0 && OM_FRAME_ADDR(0) != 0 && 
-       OM_FRAME_ADDR(1) != OM_FRAME_ADDR(0)) return 0;
-   return 1;
-}
-
-int main()
-{
-   return test_frame_addr();
-}
-], ac_cv_frame_addr_func_works=yes,  
-   ac_cv_frame_addr_func_works=no,
-   ac_cv_frame_addr_func_works=no))
-AC_MSG_RESULT($ac_cv_frame_addr_func_works)
-
-if test "$ac_cv_frame_addr_func_works" = yes; then
-AC_DEFINE(OM_FRAME_ADDR_WORKS)
-# check whether frame addr works with rvalues
-AC_MSG_CHECKING(whether $ac_cv_frame_addr_func takes rvalues)
-AC_CACHE_VAL(ac_cv_frame_addr_func_rvalue,
-AC_TRY_RUN([
-int test_frame_addr(int f1, int f2)
-{
-   if (OM_FRAME_ADDR(f1)  != 0 && OM_FRAME_ADDR(f0) != 0 &&
-       OM_FRAME_ADDR(f1) != OM_FRAME_ADDR(f0)) return 0;
-   return 1;
-}
-
-int main()
-{
-   return test_frame_addr(1, 0);
-}
-], ac_cv_frame_addr_func_rvalue=yes,  
-   ac_cv_frame_addr_func_rvalue=no,
-   ac_cv_frame_addr_func_rvalue=no))
-AC_MSG_RESULT($ac_cv_frame_addr_func_rvalue)
-if test "$ac_cv_frame_addr_func_rvalue" = yes; then
-  AC_DEFINE_UNQUOTED(OM_FRAME_ADDR_RVALUE)
+AC_MSG_CHECKING(whether to track stack backtraces)
+if test "$with_track" != no && test "$ac_cv_get_backtrace_works" = yes && test "$with_track_backtrace" != no; then
+  with_track_backtrace=yes
+  AC_DEFINE(OM_TRACK_BACKTRACE)
+else
+  with_track_backtrace=no
 fi
-fi # "$ac_cv_frame_addr_func_works" = yes;
-fi # "${ac_cv_frame_addr_func+set}" = set;
-
-fi  # "$with_mtrack" != no;
-
-
+AC_MSG_RESULT($with_track_backtrace)
+  
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
-dnl last but not least, let's be smart about CFLAGS
+dnl wrap it up
 dnl
-if test "${GCC}" = yes && test "$ac_cflags_set" = no ; then
-  CFLAGS="-pipe -Wall -O3 -fomit-frame-pointer"
-fi
-
 AC_CONFIG_HEADER(omConfig.h omMalloc.h:${OM_MALLOC_HEADER})
+
 
 AC_OUTPUT(Makefile, \
  if test "$CONFIG_HEADERS"; then echo timestamp > stamp-h; fi)
