@@ -1,5 +1,7 @@
 Tue Apr 15 12:07:17 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
+	* iparith.cc : added #else branch to #ifdef HAVE_FGLM in proc table
+
 	*  (extra.cc): system("sh",command) returns exit status of command
 
 Thu Apr 10 11:59:41 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.19 1997-04-13 12:43:00 Singular Exp $ */
+/* $Id: iparith.cc,v 1.20 1997-04-15 11:55:36 obachman Exp $ */
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
@@ -2003,6 +2003,9 @@ struct sValCmd2 dArith2[]=
 #ifdef HAVE_FGLM
 ,{fglmProc,    FGLM_CMD,       IDEAL_CMD,      RING_CMD,   DEF_CMD }
 ,{fglmProc,    FGLM_CMD,       IDEAL_CMD,      QRING_CMD,  DEF_CMD }
+#else 
+,{jjWRONG2,    FGLM_CMD,       IDEAL_CMD,      RING_CMD,   DEF_CMD }
+,{jjWRONG2,    FGLM_CMD,       IDEAL_CMD,      QRING_CMD,  DEF_CMD }
 #endif
 ,{jjFIND2,     FIND_CMD,       INT_CMD,        STRING_CMD, STRING_CMD }
 ,{jjGCD_I,     GCD_CMD,        INT_CMD,        INT_CMD,    INT_CMD }
