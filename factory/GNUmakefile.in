@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.23 1997-11-21 14:26:43 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.24 1997-12-09 11:59:08 schmidt Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -338,6 +338,12 @@ distincl :=	\
 		$(addprefix templates/,$(templateincl)) \
 		$(addprefix ftest/,$(ftestincl))
 
+# all files for the Windows NT environment
+distntfiles :=	\
+		config.h nt.mak \
+		factory.h factoryconf.h \
+		INSTALL.nt
+
 # all files in the distribution
 distfiles :=	\
 		$(distsrc) $(distincl) $(hdrtemplsrc) \
@@ -345,10 +351,12 @@ distfiles :=	\
 		$(addprefix ftest/,$(ftestdistfiles)) \
 		GNUmakefile.in configure.in config.h.in configure \
 		ChangeLog README NEWS INSTALL \
+		$(addprefix winnt/,$(distntfiles)) \
 		examples/GNUmakefile examples/application.cc \
 		examples/factorize.cc examples/gcd.cc \
 		bin/folding.el bin/fold-docu.el \
-		bin/install-sh bin/makeheader bin/mkinstalldirs
+		bin/install-sh bin/mkinstalldirs \
+		bin/makeheader bin/makeheader.pl
 
 #
 # - phony targets.
@@ -410,13 +418,21 @@ libcfmem.a:	$(memmanobj)
 		$(AR) $(ARFLAGS) $@ $^
 		$(RANLIB) $@
 
-$(srcdir)/readcf.cc: readcf.y
-		$(BISON) $< -o $@
-
 ftmpl_inst.o:	ftmpl_inst.cc factoryconf.h factory.h \
 		$(addprefix templates/,$(templatesrc)) \
 		$(addprefix templates/,$(templateincl))
 		$(CXX) -c $< $(TMPLCXXFLAGS) -o $@
+
+# note that this is a non-source file which is distributed!
+$(srcdir)/readcf.cc: readcf.y
+		$(BISON) $< -o $@
+
+# note that these are non-source file which are distributed!
+# We do not specify any dependencies except the most important ones.
+$(srcdir)/winnt/factory.h: factory.template
+		$(MAKEHEADER) $(MAKEHEADERFLAGS) $< $@
+$(srcdir)/winnt/factoryconf.h: factoryconf.template winnt/config.h
+		$(MAKEHEADER) -I$(srcdir)/winnt $(MAKEHEADERFLAGS) $< $@
 
 # specify dependency in case user does not 'make depend'
 factoryconf.h:	config.h
@@ -567,12 +583,14 @@ uninstallgftables:
 #
 # - building a distribution.
 #
-dist:		$(srcdir)/readcf.cc $(srcdir)/configure
+dist:		$(srcdir)/readcf.cc $(srcdir)/configure \
+		$(srcdir)/winnt/factory.h $(srcdir)/winnt/factoryconf.h
 		rm -f $(distname).tgz
 		rm -rf $(distname)
 		$(MKINSTALLDIRS) $(distname)/bin
 		$(MKINSTALLDIRS) $(distname)/examples
 		$(MKINSTALLDIRS) $(distname)/ftest
+		$(MKINSTALLDIRS) $(distname)/winnt
 		$(MKINSTALLDIRS) $(distname)/templates
 		@echo "Copying files to distribution directory ..."
 		@for file in $(distfiles); do \
