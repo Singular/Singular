@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.1.1.1 2003-10-06 12:15:54 Singular Exp $ */
+/* $Id: longrat.cc,v 1.2 2004-06-04 13:23:10 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -1026,7 +1026,7 @@ BOOLEAN nlGreaterZero (number a)
 #ifdef LDEBUG
   nlTest(a);
 #endif
-  if (SR_HDL(a) & SR_INT) return SR_HDL(a)>=0;
+  if (SR_HDL(a) & SR_INT) return SR_HDL(a)>1 /* represents number(0) */;
   return (!mpz_isNeg(&a->z));
 }
 
