@@ -2404,7 +2404,7 @@ static void go_on_F4 (calc_dat* c){
   int pos=0;
   for(i=1;i<chosen_index;i++)
   {
-    if((!(chosen[i].f!=chosen[pos].f))||(!(pLmEqual(chosen[i].m,chosen[pos].m))))
+    if(((chosen[i].f!=chosen[pos].f))||(!(pLmEqual(chosen[i].m,chosen[pos].m))))
       chosen[++pos]=chosen[i];
     else pDelete(&(chosen[i].m));
   }
