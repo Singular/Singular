@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.17 2002-10-24 12:17:46 Singular Exp $ */
+/* $Id: cf_factor.cc,v 1.18 2002-10-24 12:20:04 Singular Exp $ */
 
 //{{{ docu
 //
@@ -417,7 +417,6 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
     else
     #endif
     {
-	printf("factorize without NTL: alg. ext.\n");
       F=FpFactorizeUnivariateCZ( f, false, 1, alpha, Variable() );
     }
     return F;
