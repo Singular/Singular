@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_util.cc,v 1.10 1997-10-22 14:04:26 schmidt Exp $ */
+/* $Id: ftest_util.cc,v 1.11 1997-11-13 08:31:24 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -14,14 +14,8 @@
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
+#include <unistd.h>
 #include <iostream.h>
-
-#include <GetOpt.h>
-
-// where is the declaration of this function?
-extern "C" {
-    char * strsignal();
-}
 
 // we include timing.h for calculation of HZ only
 #define TIMING
@@ -555,18 +549,22 @@ ftestParseOutputType ( const char * outputType )
 //
 // ftestSignalHandler(), ftestAlarmHandler() - signal handlers.
 //
-// Simply calls `ftestError()'.
+// Blocks new signals, flushes `cout', and calls `ftestError()'.
 //
 //}}}
 static void
 ftestSignalHandler ( int signal )
 {
+    ftestSignalCatch( true );
+    cout.flush();
     ftestError( (ftestErrorT)((int)SignalError + signal ),
-		"received signal `%s'\n", strsignal( signal ) );
+		"received signal %d\n", signal );
 }
 static void
 ftestAlarmHandler ( int )
 {
+    ftestSignalCatch( true );
+    cout.flush();
     ftestError( TimeoutError, "timeout after %d secs\n", ftestAlarm );
 }
 //}}}
@@ -660,42 +658,58 @@ ftestPrint ( const char * longFormat, const char * shortFormat ... )
 }
 //}}}
 
-//{{{ void ftestSignalCatch ()
+//{{{ void ftestSignalCatch ( bool block )
 //{{{ docu
 //
-// ftestSignalCatch() - set signal handlers.
+// ftestSignalCatch() - set signal and alarm handlers.
+//
+// If block is true block the signals instead.
 //
 //}}}
 void
-ftestSignalCatch ()
+ftestSignalCatch ( bool block )
 {
+    void (*signalHandler)( int );
+    void (*alarmHandler)( int );
+
+    if ( block ) {
+	signalHandler = 0;
+	alarmHandler = 0;
+    } else {
+	signalHandler = ftestSignalHandler;
+	alarmHandler = ftestAlarmHandler;
+    }
+
 #ifdef SIGHUP
-    signal( SIGHUP, ftestSignalHandler );
+    signal( SIGHUP, signalHandler );
 #endif
 #ifdef SIGINT
-    signal( SIGINT, ftestSignalHandler );
+    signal( SIGINT, signalHandler );
 #endif
 #ifdef SIGQUIT
-    signal( SIGQUIT, ftestSignalHandler );
+    signal( SIGQUIT, signalHandler );
 #endif
 #ifdef SIGILL
-    signal( SIGILL, ftestSignalHandler );
+    signal( SIGILL, signalHandler );
 #endif
 #ifdef SIGIOT
-    signal( SIGIOT, ftestSignalHandler );
+    signal( SIGIOT, signalHandler );
 #endif
 #ifdef SIGFPE
-    signal( SIGFPE, ftestSignalHandler );
+    signal( SIGFPE, signalHandler );
 #endif
 #ifdef SIGBUS
-    signal( SIGBUS, ftestSignalHandler );
+    signal( SIGBUS, signalHandler );
 #endif
 #ifdef SIGSEGV
-    signal( SIGSEGV, ftestSignalHandler );
+    signal( SIGSEGV, signalHandler );
+#endif
+#ifdef SIGTERM
+    signal( SIGTERM, signalHandler );
 #endif
 
     // alarm handler
-    signal( SIGALRM, ftestAlarmHandler );
+    signal( SIGALRM, alarmHandler );
 }
 //}}}
 
@@ -726,7 +740,6 @@ void
 ftestGetOpts ( const int argc, char ** argv, int & optind )
 {
     // parse command line
-    GetOpt getopt( argc, argv, "a:o:c:" );
     int optionChar;
     const char * outputType = 0;
     const char * envString = 0;
@@ -740,15 +753,15 @@ ftestGetOpts ( const int argc, char ** argv, int & optind )
 	ftestCircle = (int)strtol( envString, 0, 0 );
 
     // parse options
-    while ( (optionChar = getopt()) != EOF ) {
+    while ( (optionChar = getopt( argc, argv, "a:o:c:" )) != -1 ) {
 	switch ( optionChar ) {
-	case 'a': ftestAlarm = (int)strtol( getopt.optarg, 0, 0 ); break;
-	case 'c': ftestCircle = (int)strtol( getopt.optarg, 0, 0 ); break;
-	case 'o': outputType = getopt.optarg; break;
+	case 'a': ftestAlarm = (int)strtol( optarg, 0, 0 ); break;
+	case 'c': ftestCircle = (int)strtol( optarg, 0, 0 ); break;
+	case 'o': outputType = optarg; break;
 	default: ftestError( CommandlineError, 0 );
 	}
     }
-    optind = getopt.optind;
+    optind = ::optind;
 
     if ( outputType )
 	ftestParseOutputType( outputType );
