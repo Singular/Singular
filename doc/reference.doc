@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.97 1999-01-22 17:40:57 Singular Exp $
+@comment $Id: reference.doc,v 1.98 1999-01-22 18:18:46 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1854,7 +1854,7 @@ See
 @cindex highcorner
 @table @code
 @item @strong{Syntax:}
-@code{highcorner(} ( ideal_expression @code{);}
+@code{highcorner(} ideal_expression @code{);}
 @item @strong{Type:}
 poly
 @item @strong{Purpose:}
@@ -1865,11 +1865,12 @@ this is also the smallest monomial not contained in the ideal.
 @*If the ideal is not zero-dimensional, 0 is returned.
 @item @strong{Example:}
 @example
-@c @example
+@c example
 ring r=0,(x,y),ds;
 ideal i=x3,x2y,y3;
-highcorner(i);
-@c @example
+highcorner(std(i));
+highcorner(std(ideal(1)));
+@c example
 @end example
 @end table
 @c ref

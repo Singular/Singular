@@ -2497,12 +2497,15 @@ static BOOLEAN jjGETDUMP(leftv res, leftv v)
 }
 static BOOLEAN jjHIGHCORNER(leftv res, leftv v)
 {
+  assumeStdFlag(v);
   ideal I=(ideal)v->Data();
   BOOLEAN *UsedAxis=(BOOLEAN *)Alloc0(pVariables*sizeof(BOOLEAN));
   int i,n;
+  poly po;
   for(i=IDELEMS(I)-1;i>=0;i--)
   {
-    if((n=pIsPurePower(I->m[i]))!=0) UsedAxis[n-1]=TRUE;
+    po=I->m[i];
+    if ((po!=NULL) &&((n=pIsPurePower(po))!=0)) UsedAxis[n-1]=TRUE;
   }
   for(i=pVariables-1;i>=0;i--)
   {
@@ -2513,7 +2516,7 @@ static BOOLEAN jjHIGHCORNER(leftv res, leftv v)
     res->data=pOne();
     return FALSE;
   }
-  poly po=NULL;
+  po=NULL;
   scComputeHC(I,0,po);
   if (po!=NULL)
   {

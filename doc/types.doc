@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.75 1998-11-30 15:50:46 obachman Exp $
+@comment $Id: types.doc,v 1.76 1999-01-22 18:18:48 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -303,6 +303,10 @@ computation of univariate polynomials lying in a zero dimensional ideal
 @item groebner
 Groebner basis computation (a wrapper around @code{std,stdhilb,stdfglm},...)
 (see @ref{groebner})
+@item highcorner
+computes the smallest monomial not contained in the ideal.
+The ideal has to be zero-dimensional.
+(see @ref{highcorner})
 @item homog
 homogenization with respect to a variable (see @ref{homog})
 @item hilb
