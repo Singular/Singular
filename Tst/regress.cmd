@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.19 1998-07-01 10:10:27 obachman Exp $
+# $Id: regress.cmd,v 1.20 1998-07-03 10:05:54 obachman Exp $
 # FILE:    regress.cmd 
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -109,6 +109,8 @@ $sed_scripts = "-e '/\\/\\/.*used time:/d' -e '/\\/\\/.*tst_ignore:/d' -e '/erro
 $report_val = 10;
 # default value (in %) above which differences cause an error on -e
 $error_val = 10;
+# default value in 1/100 seconds, above which time differences are reported
+$mintime_val = 10;
 $hostname = &mysystem_catch("hostname");
 chop $hostname;
 
@@ -204,7 +206,7 @@ sub tst_status_check
   $line = <RES_FILE>;
   while ($line && $new_line)
   {
-    if ($line =~ /^STDIN.*(\d+)>/)
+    if ($line =~ /^STDIN\s*(\d+)/)
     {
       $prefix = "STDIN $1>";
     }
@@ -212,23 +214,29 @@ sub tst_status_check
     {
       $crit = $1;
       $res = $2;
-      if ($line =~ /\/\/.*tst_ignore:$crit.*$hostname:(\d+)/)
+      if ($res > $mintime_val &&
+	  $new_line =~ /\/\/.*tst_ignore:$crit.*$hostname:(\d+)/)
       {
 	$new_res = $1;
-	$res_diff = $res - $new_res;
-	$res_diff_pc = $res_diff / $res unless ($res == 0);
-	$res_diff_pc = - $res_diff_pc if ($res_diff_pc < 0);
+	$res_diff = $new_res - $res;
+	$res_diff_pc = int((($new_res / $res) - 1)*100);
 	$res_diff_line =
-	  "$prefix $crit res:$res new:$new_res diff:$res_diff %:$res_diff_pc";
+	  "$prefix $crit new:$new_res old:$res diff:$res_diff %:$res_diff_pc";
 	print (STATUS_DIFF_FILE "$res_diff_line\n") 
-	  if ($error{$crit} < $res_diff_pc || $report{$crit} < $res_diff_pc);
+	  if ((defined($error{$crit}) &&  $error{$crit}<abs($res_diff_pc)) 
+	      || 
+	      (defined($report{$crit}) && $report{$crit}<abs($res_diff_pc)));
 	
 	print "$res_diff_line\n"
 	  if ($verbosity > 0 &&
-	      ($error{$crit} < $res_diff_pc || $report{$crit} < $res_diff_pc));
+	      ((defined($error{$crit}) &&  $error{$crit}<abs($res_diff_pc)) 
+	      || 
+	      (defined($report{$crit}) && $report{$crit}<abs($res_diff_pc))));
+
 	if ($exit_status == 0)
 	{
-	  $exit_status = $exit_status || ($error{$crit} < $res_diff_pc);
+	  $exit_status = (defined($error{$crit})  
+			  && $error{$crit} < abs($res_diff_pc));
 	  $error_cause = "Status error for $crit at $prefix\n"
 	    if ($exit_status);
 	}
