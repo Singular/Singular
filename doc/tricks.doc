@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: tricks.doc,v 1.5 1999-12-03 11:20:50 obachman Exp $
+@comment $Id: tricks.doc,v 1.6 2000-05-25 09:00:14 Singular Exp $
 @comment this file contains the "Tricks and pittfals" sections
 
 @c The following directives are necessary for proper compilation
@@ -66,6 +66,8 @@ displays only the first 20 characters
 @c the interpretation of text between a closing @code{@}} and the end of
 @c the line is undefined. (Therefore do not put anything but spaces between
 @c @code{@}} and the end of the line.)
+@item
+statements may not contain more than 10000 tokens
 @end itemize
 
 @c -------------------------------------------------------------------------
