@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.5 1998-07-23 15:57:22 schmidt Exp $
+;; $Id: singular.el,v 1.6 1998-07-28 06:54:33 schmidt Exp $
 
 ;;; Commentary:
 
@@ -21,13 +21,17 @@
 ;; - use lowercase folding titles except for first word
 ;; - folding-marks are `;;{{{' and `;;}}}' resp., for sake of standard
 ;;   conformity
+;; - mark incomplete doc strings or code with `NOT READY' (optionally
+;;   followed by an explanation what exactly is missing)
 ;;
 ;; - use `singular' as prefix for all global symbols
 ;; - use `singular-debug' as prefix for all global symbols concerning
 ;;   debugging.
 ;;
 ;; - mark dependencies on Emacs flavor/version with a comment of the form
-;;   `;; Emacs[ version]' resp.  `;; XEmacs[ version]'
+;;   `;; Emacs[ <version>]'     resp.
+;;   `;; XEmacs[ <version>][ <nasty comment>]' (in that order, if
+;;   possible)
 ;; - use a `cond' statement to execute Emacs flavor/version-dependent code,
 ;;   not `if'.  This is to make such checks more extensible.
 ;; - try to define different functions for different flavors/version
@@ -53,24 +57,21 @@ Currently, only the mode `interactive' is supported.")
 
 (defun singular-debug-format (string)
   "Return STRING in a nicer format."
-
-  ;; is there any better way to replace in strings??
   (while (string-match "\n" string)
-    (setq string (concat (substring string 0 (match-beginning 0))
-			 "^J"
-			 (substring string (match-end 0)))))
+    (setq string (replace-match "^J" nil nil string)))
 
   (if (> (length string) 16)
       (concat "<" (substring string 0 7) ">...<" (substring string -8) ">")
     (concat "<" string ">")))
 
-(defmacro singular-debug (mode form)
+(defmacro singular-debug (mode form &optional else-form)
   "Major debugging hook for singular.el.
-Evaluates FORM if and only if `singular-debug' equals `all' or if MODE
-is an element of `singular-debug'."
+Evaluates FORM if `singular-debug' equals `all' or if MODE is an
+element of `singular-debug', othwerwise ELSE-FORM"
   `(if (or (eq singular-debug 'all)
 	   (memq ,mode singular-debug))
-       ,form))
+       ,form
+     ,else-form))
 ;;}}}
 
 ;;{{{ Determining version
@@ -118,7 +119,7 @@ singular.el is guaranteed to run on Emacs 19.34, Emacs 20.2, and XEmacs
       (princ
 "You seem to have quite an old Emacs or XEmacs version.  Some of the
 features from singular.el will not work properly.  Consider upgrading to a
-more recent version of Emaxs or XEmacs.  singular.el is guaranteed to run
+more recent version of Emacs or XEmacs.  singular.el is guaranteed to run
 on Emacs 19.34, Emacs 20.2, and XEmacs 20.2."))
     ;; assume the oldest version we support
     (setq singular-emacs-major-version 19
@@ -131,6 +132,26 @@ on Emacs 19.34, Emacs 20.2, and XEmacs 20.2."))
 
 (singular-set-version)
 ;;}}}
+
+;;{{{ Faces
+(make-face 'singular-input-face)
+(set-face-background 'singular-input-face "peach puff")
+(defvar singular-input-face 'singular-input-face
+  "Face for user input.
+This face should have set background only.")
+
+(make-face 'singular-output-face)
+(set-face-background 'singular-output-face "blanched almond")
+(defvar singular-output-face 'singular-output-face
+  "Face for Singular output.
+This face should have set background only.")
+
+(defun singular-lookup-face (face-type)
+  "Return face belonging to FACE-TYPE.
+NOT READY [should be rewritten completely]!"
+  (cond ((eq face-type 'input) singular-input-face)
+	((eq face-type 'output) singular-output-face)))
+;;}}}
 ;;}}}
 
 ;;{{{ Singular interactive mode
@@ -139,17 +160,19 @@ on Emacs 19.34, Emacs 20.2, and XEmacs 20.2."))
   "Key map to use in Singular interactive mode.")
 
 (if (not singular-interactive-mode-map)
-    (cond
-     ;; Emacs
-     ((eq singular-emacs-flavor 'emacs)
-      (setq singular-interactive-mode-map
-	    (nconc (make-sparse-keymap) comint-mode-map)))
-     ;; XEmacs
-     (t
-      (setq singular-interactive-mode-map (make-keymap))
-      (set-keymap-parents singular-interactive-mode-map (list comint-mode-map))
-      (set-keymap-name singular-interactive-mode-map
-		       'singular-interactive-mode-map))))
+    (progn
+      (cond
+       ;; Emacs
+       ((eq singular-emacs-flavor 'emacs)
+	(setq singular-interactive-mode-map
+	      (nconc (make-sparse-keymap) comint-mode-map)))
+       ;; XEmacs
+       (t
+	(setq singular-interactive-mode-map (make-keymap))
+	(set-keymap-parents singular-interactive-mode-map (list comint-mode-map))
+	(set-keymap-name singular-interactive-mode-map
+			 'singular-interactive-mode-map)))
+      (define-key singular-interactive-mode-map "\C-m" 'singular-send-input)))
 ;;}}}
 
 ;;{{{ Miscellaneous
@@ -170,8 +193,12 @@ off."
   "Create the buffer name for PROCESS-NAME.
 The buffer name is the process name with surrounding `*'."
   (concat "*" process-name "*"))
+
+(defmacro singular-process-mark ()
+  "Return process mark of current buffer."
+  (process-mark (get-buffer-process (current-buffer))))
 ;;}}}
-  
+
 ;;{{{ Customizing variables of comint
 
 ;; Note:
@@ -232,7 +259,173 @@ This variable is used to initialize `comint-input-filter' when
 Singular interactive mode starts up.")
 ;;}}}
 
-;;{{{ Input and output filters
+;;{{{ Simple section stuff for both Emacs and XEmacs
+
+;; Note:
+;;
+;; NOT READY[was sind und wollen simple sections]!
+
+(defvar singular-simple-sec-clear-type 'input
+  "Type of clear simple sections.")
+
+(defun singular-simple-sec-init (pos)
+  "Initialize global variables belonging to simple section management.
+Creates the buffer-local marker `singular-simple-sec-last-end' and
+initializes it to POS."
+  (make-local-variable 'singular-simple-sec-last-end)
+  (if (not (and (boundp 'singular-simple-sec-last-end)
+		singular-simple-sec-last-end))
+      (setq singular-simple-sec-last-end (make-marker)))
+  (set-marker singular-simple-sec-last-end pos))
+
+;; Note:
+;;
+;; The rest of the folding is either marked as
+;; Emacs
+;; or
+;; XEmacs
+
+(singular-fset 'singular-simple-sec-create
+	       'singular-emacs-simple-sec-create
+	       'singular-emacs-simple-sec-create)
+
+(singular-fset 'singular-simple-sec-reset-last
+	       'singular-emacs-simple-sec-reset-last
+	       'singular-emacs-simple-sec-reset-last)
+
+(singular-fset 'singular-simple-sec-start
+	       'singular-emacs-simple-sec-start
+	       'singular-emacs-simple-sec-start)
+
+(singular-fset 'singular-simple-sec-end
+	       'singular-emacs-simple-sec-end
+	       'singular-emacs-simple-sec-end)
+
+(singular-fset 'singular-simple-sec-type
+	       'singular-emacs-simple-sec-type
+	       'singular-emacs-simple-sec-type)
+
+(singular-fset 'singular-simple-sec-at
+	       'singular-emacs-simple-sec-at
+	       'singular-emacs-simple-sec-at)
+
+(singular-fset 'singular-simple-sec-before
+	       'singular-emacs-simple-sec-before
+	       'singular-emacs-simple-sec-before)
+
+(singular-fset 'singular-simple-sec-in
+	       'singular-emacs-simple-sec-in
+	       'singular-emacs-simple-sec-in)
+;;}}}
+
+;;{{{ Simple section stuff for Emacs
+(defun singular-emacs-simple-sec-create (type end)
+  "Create a new simple section of type TYPE.
+Creates the section from end of previous simple section up to END.
+Returns the new simple section or `empty' if no simple section has
+been created.
+Updates `singular-simple-sec-last-end'."
+  (let ((last-end (marker-position singular-simple-sec-last-end))
+	;; `simple-sec' is the new simple section or `empty'
+	simple-sec)
+
+    ;; get beginning of line before END
+    (setq end (let ((save-point (point)))
+		(goto-char end) (beginning-of-line)
+		(prog1 (point) (goto-char save-point))))
+
+    (cond
+     ;; do not create empty sections
+     ((eq end last-end) (setq simple-sec 'empty))
+     ;; create only non-clear simple sections
+     ((not (eq type singular-simple-sec-clear-type))
+      ;; if type has not changed we only have to extend the previous
+      ;; simple section
+      (setq simple-sec (singular-emacs-simple-sec-before last-end))
+      (if (eq type (singular-emacs-simple-sec-type simple-sec))
+	  ;; move existing overlay
+	  (setq simple-sec (move-overlay simple-sec (overlay-start simple-sec) end))
+	;; create new overlay
+	(setq simple-sec (make-overlay last-end end))
+	;; set type property
+	(overlay-put simple-sec 'singular-type type)
+	;; set face
+	(overlay-put simple-sec 'face (singular-lookup-face type))
+	;; evaporate empty sections
+	(overlay-put simple-sec 'evaporate t))))
+	    
+    ;; update end of last simple section
+    (set-marker singular-simple-sec-last-end end)
+    simple-sec))
+
+(defun singular-emacs-simple-sec-reset-last ()
+  "Reset end of last simple section after accidental extension."
+  (let ((simple-sec (singular-emacs-simple-sec-at singular-simple-sec-last-end)))
+    (if simple-sec
+	(move-overlay simple-sec (overlay-start simple-sec)
+		      singular-simple-sec-last-end))))
+
+(defun singular-emacs-simple-sec-start (simple-sec)
+  "Return start of non-clear simple section SIMPLE-SEC."
+  (overlay-start simple-sec))
+
+(defun singular-emacs-simple-sec-end (simple-sec)
+  "Return end of non-clear simple section SIMPLE-SEC."
+  (overlay-end simple-sec))
+
+(defun singular-emacs-simple-sec-type (simple-sec)
+  "Return type of SIMPLE-SEC."
+  (if simple-sec
+      (overlay-get simple-sec 'singular-type)
+    singular-simple-sec-clear-type))
+
+(defun singular-emacs-simple-sec-at (pos)
+  "Return simple section at position POS."
+  (let ((overlays (overlays-at pos)) simple-sec)
+    ;; be careful, there may be other overlays!
+    (while (and overlays (not simple-sec))
+      (if (singular-emacs-simple-sec-type (car overlays))
+	  (setq simple-sec (car overlays)))
+      (setq overlays (cdr overlays)))
+    simple-sec))
+
+(defun singular-emacs-simple-sec-before (pos)
+  "Return simple section before position POS.
+This is the same as `singular-emacs-section-at' except if POS falls on
+a section border.  In this case `singular-emacs-section-before'
+returns the previous simple section instead of the current one."
+  (singular-emacs-simple-sec-at (max 1 (1- pos))))
+
+(defun singular-emacs-simple-sec-in (beg end)
+  "Return a list of all simple sections intersecting with the region from BEG to END.
+A simple section intersects the region if the section and the region
+have at least one character in common.
+The result contains both clear and non-clear simple sections in the
+order in that the appear in the region."
+  ;; NOT READY
+  nil)
+;;}}}
+
+;;{{{ Folding sections
+(defvar singular-folding-ellipsis "Singular I/O ..."
+  "Ellipsis to show for folded input or output.")
+;;}}}
+  
+;;{{{ Debugging input and output filters
+(defun singular-debug-input-filter (string)
+  "Echo STRING in mini-buffer."
+  (singular-debug 'interactive-filter
+		  (message "Input filter: %s"
+			   (singular-debug-format string))))
+
+(defun singular-debug-output-filter (string)
+  "Echo STRING in mini-buffer."
+  (singular-debug 'interactive-filter
+		  (message "Output filter: %s"
+			   (singular-debug-format string))))
+;;}}}
+
+;;{{{ Sending input and receiving output
 
 ;;{{{ Some lengthy notes on filters
 
@@ -298,7 +491,7 @@ Singular interactive mode starts up.")
 ;; Post-conditions for `comint-send-input':
 ;; - `comint-last-input-start' <= `comint-last-input-end'
 ;;                              = `comint-last-output-start' (!)
-;;                              = process marker = `(point)'.
+;;                              = process mark = `(point)'.
 ;;   The region between the first of them is what has been inserted by the
 ;;   user.
 ;;
@@ -315,49 +508,128 @@ Singular interactive mode starts up.")
 
 ;;}}}
 
-(defconst singular-bogus-output-filter-calls
-  (cond
-   ;; XEmacs
-   ((eq singular-emacs-flavor 'xemacs) 2)
-   ;; Emacs
-   (t 1))
-  "Number of bogus runs of hooks on `comint-output-filter-functions'.")
+(defun singular-send-input (string)
+  "NOT READY!!"
+  ;; STRING is always nil when called interactively
+  (interactive (list nil))
 
-;; debugging filters
-(defvar singular-debug-bogus-output-filter-cnt 0
-  "Number of bogus runs of hooks on `comint-output-filter-functions' yet to do.
-This variable is set to `singular-bogus-output-filter-calls' in
-`singular-debug-input-filter' and decremented for each bogus run of
-`singular-debug-output-filter' until it becomes zero.")
+  (let ((process (get-buffer-process (current-buffer)))
+	pmark)
+    ;; some checks and initializations
+    (or process (error "Current buffer has no process"))
+    (setq pmark (marker-position (process-mark process)))
 
-(defun singular-debug-input-filter (string)
-  "Echo STRING and reset `singular-debug-bogus-output-filter-cnt'."
-  (message "Input filter: %s" (singular-debug-format string))
-  (setq singular-debug-bogus-output-filter-cnt
-	singular-bogus-output-filter-calls))
+    ;; NOT READY[history expansion, handling of STRING]!
 
-(defun singular-debug-output-filter (string)
-  "Echo STRING and `singular-debug-bogus-output-filter-cnt'.
-Decrement `singular-debug-bogus-output-filter-cnt' until it becomes zero."
-  (if (zerop singular-debug-bogus-output-filter-cnt)
-      (message "Output filter (real): %s"
-	       (singular-debug-format string))
-    (message "Output filter (bogus %d): %s"
-	     singular-debug-bogus-output-filter-cnt
-	     (singular-debug-format string))
-    (setq singular-debug-bogus-output-filter-cnt
-	  (1- singular-debug-bogus-output-filter-cnt))))
+    ;; note that the input string does not include its terminal newline
+    (let* ((raw-input (buffer-substring pmark (point)))
+	   (input raw-input)
+	   (history raw-input))
+
+      ;; insert newline into buffer
+      (insert-before-markers ?\n)
+
+      ;; insert input into history
+      (if (and (funcall comint-input-filter history)
+	       (or (null comint-input-ignoredups)
+		   (not (ring-p comint-input-ring))
+		   (ring-empty-p comint-input-ring)
+		   (not (string-equal (ring-ref comint-input-ring 0) history))))
+	  (ring-insert comint-input-ring history))
+
+      ;; run hooks and reset index into history
+      (run-hook-with-args 'comint-input-filter-functions (concat input "\n"))
+      (setq comint-input-ring-index nil)
+
+      ;; update markers and create a new simple section
+      (set-marker comint-last-input-start pmark)
+      (set-marker comint-last-input-end (point))
+      (set-marker (process-mark process) (point))
+      (singular-debug 'interactive-simple-secs
+		      (message "Simple input section: %S"
+			       (singular-simple-sec-create 'input (point)))
+		      (singular-simple-sec-create 'input (point)))
+
+      ;; do it !!
+      (send-string process input)
+      (send-string process "\n"))))
+
+(defun singular-output-filter (process string)
+  "Insert STRING containing output from PROCESS into its associated buffer.
+
+Takes care off:
+- current buffer, even in case of non-local exits;
+- point and restriction in buffer associated with process;
+- markers which should not be advanced when inserting output.
+Updates:
+- process mark;
+- `comint-last-output-start';
+- simple sections;
+- mode line.
+Runs the hooks on `comint-output-filter-functions'.
+
+For a more detailed descriptions of the output filter, the markers it
+sets, and output filter functions refer to the section \"Some lengthy
+notes on filters\" in singular.el."
+  (let ((process-buffer (process-buffer process))
+	(save-buffer (current-buffer)))
+
+    ;; check whether buffer is still alive
+    (if (and process-buffer (buffer-name process-buffer))
+	(unwind-protect
+	    (progn
+	      (set-buffer process-buffer)
+	      (let ((save-point (point))
+		    (save-point-min (point-min))
+		    (save-point-max (point-max))
+		    (save-pmark (marker-position (process-mark process)))
+		    (buffer-read-only nil)
+		    (n (length string)))
+		(widen)
+		(goto-char save-pmark)
+
+		;; adjust point and narrowed region borders
+		(if (<= (point) save-point) (setq save-point (+ save-point n)))
+		(if (< (point) save-point-min) (setq save-point-min (+ save-point-min n)))
+		(if (<= (point) save-point-max) (setq save-point-max (+ save-point-max n)))
+
+		;; do it !!
+		(insert-before-markers string)
+
+		;; reset markers and simple sections which may have
+		;; been advanced by above insertion.  We rely on the
+		;; fact that `set-marker' always returns some non-nil
+		;; value.  Looks nicer this way.
+		(and (= comint-last-input-end (point))
+		     (set-marker comint-last-input-end save-pmark)
+		     ;; this may happen only on startup and only if
+		     ;; `comint-last-input-end' has been modified,
+		     ;; too.  Hence, we check for it after the first
+		     ;; test.
+		     (= comint-last-input-start (point))
+		     (set-marker comint-last-input-start save-pmark))
+		(and (= singular-simple-sec-last-end (point))
+		     (set-marker singular-simple-sec-last-end save-pmark)
+		     (singular-simple-sec-reset-last))
+
+		;; set new markers and create/extend new simple section
+		(set-marker comint-last-output-start save-pmark)
+		(singular-debug 'interactive-simple-secs
+				(message "Simple output section: %S"
+					 (singular-simple-sec-create 'output (point)))
+				(singular-simple-sec-create 'output (point)))
+
+		;; restore old values, run hooks, and force mode line update
+		(narrow-to-region save-point-min save-point-max)
+		(goto-char save-point)
+		(run-hook-with-args 'comint-output-filter-functions string)
+		(force-mode-line-update)))
+
+	  ;; this is unwind-protected
+	  (set-buffer save-buffer)))))
 ;;}}}
 
 ;;{{{ Singular interactive mode
-
-;; Note:
-;;
-;; In contrast to shell.el, `singular' does not run
-;; `singular-interactive-mode' every time a new Singular process is
-;; started, but only when a new buffer is created.  This behaviour seems
-;; more intuitive w.r.t. local variables and hooks.
-
 (defun singular-interactive-mode ()
   "Major mode for interacting with Singular.
 
@@ -410,7 +682,21 @@ NOT READY [much more to come.  See shell.el.]!"
 	  (equal (file-truename comint-input-ring-file-name) "/dev/null"))
       (setq comint-input-ring-file-name nil))
 
-  ;; marking of input and output
+  ;; selective display
+  (setq selective-display t)
+  (setq selective-display-ellipses t)
+  (cond
+   ;; Emacs
+   ((eq singular-emacs-flavor 'emacs)
+    (setq buffer-display-table (or (copy-sequence standard-display-table)
+				   (make-display-table)))
+    (set-display-table-slot buffer-display-table
+     'selective-display (vconcat singular-folding-ellipsis)))
+    ;; XEmacs
+   (t
+    (set-glyph-image invisible-text-glyph singular-folding-ellipsis (current-buffer))))
+
+  ;; input and output filters
   (singular-debug 'interactive-filter
 		  (add-hook 'comint-input-filter-functions
 			    'singular-debug-input-filter nil t))
@@ -446,7 +732,7 @@ Writes back input ring after regular termination of Singular if
 process buffer is still alive."
   (save-excursion
     (singular-debug 'interactive
-		    (message "Sentinel message: %s" (substring message 0 -1)))
+		    (message "Sentinel: %s" (substring message 0 -1)))
     (if (string-match "finished\\|exited" message)
 	(let ((process-buffer (process-buffer process)))
 	  (if (and process-buffer
@@ -456,7 +742,74 @@ process buffer is still alive."
 		(singular-debug 'interactive (message "Writing input ring back"))
 		(comint-write-input-ring)))))))
 
-(defun singular (&optional singular-executable singular-name singular-switches)
+(defun singular-exec (buffer name executable start-file switches)
+  "Start a new Singular process NAME in BUFFER, running EXECUTABLE.
+EXECUTABLE should be a string denoting an executable program.
+SWITCHES should be a list of strings that are passed as command line
+switches.  START-FILE should be the name of a file which contents is
+sent to the process.
+
+Deletes any old processes running in that buffer.
+Moves point to the end of BUFFER.
+Initializes all important markers and the simple sections.
+Runs `comint-exec-hook' and `singular-exec-hook' (in that order).
+Returns BUFFER."
+  (let ((save-buffer (current-buffer)))
+    (unwind-protect
+	(progn
+	  (set-buffer buffer)
+
+	  ;; delete any old processes
+	  (let ((process (get-buffer-process buffer)))
+	    (if process (delete-process process)))
+
+	  ;; create new process
+	  (singular-debug 'interactive (message "Starting new Singular"))
+	  (let ((process (comint-exec-1 name buffer executable switches)))
+
+	    ;; set process filter and sentinel
+	    (set-process-filter process 'singular-output-filter)
+	    (set-process-sentinel process 'singular-exit-sentinel)
+	    (make-local-variable 'comint-ptyp)
+	    (setq comint-ptyp process-connection-type) ; T if pty, NIL if pipe.
+
+	    ;; go to the end of the buffer, set up markers, and
+	    ;; initialize simple sections
+	    (goto-char (point-max))
+	    (set-marker comint-last-input-start (point))
+	    (set-marker comint-last-input-end (point))
+	    (set-marker comint-last-output-start (point))
+	    (set-marker (process-mark process) (point))
+	    (singular-simple-sec-init (point))
+
+	    ;; feed process with start file and read input ring
+	    (if start-file
+		(progn
+		  (singular-debug 'interactive (message "Feeding start file"))
+		  (sleep-for 1)			; try to avoid timing errors
+		  (insert-file-contents start-file)
+		  (setq start-file (buffer-substring (point) (point-max)))
+		  (delete-region (point) (point-max))
+		  (comint-send-string process start-file)))
+	    (singular-debug 'interactive (message "Reading input ring"))
+	    (comint-read-input-ring t)
+
+	    ;; execute hooks
+	    (run-hooks 'comint-exec-hook)
+	    (run-hooks 'singular-exec-hook))
+	  
+	  buffer)
+      ;; this code is unwide-protected
+      (set-buffer save-buffer))))
+
+;; Note:
+;;
+;; In contrast to shell.el, `singular' does not run
+;; `singular-interactive-mode' every time a new Singular process is
+;; started, but only when a new buffer is created.  This behaviour seems
+;; more intuitive w.r.t. local variables and hooks.
+
+(defun singular (&optional executable name switches)
   "Run an inferior Singular process, with I/O through an Emacs buffer.
 
 NOT READY [arguments, default values, and interactive use]!
@@ -481,51 +834,29 @@ Type \\[describe-mode] in the Singular buffer for a list of commands."
 		     singular-default-switches))
 
   (let* (;; get default values for optional arguments
-	 (singular-executable (or singular-executable
-				  singular-default-executable))
-	 (singular-name (or singular-name
-			    singular-default-name))
-	 (singular-switches (or singular-switches
-				singular-default-switches))
+	 (executable (or executable singular-default-executable))
+	 (name (or name singular-default-name))
+	 (switches (or switches singular-default-switches))
 
-	 (buffer-name (singular-process-name-to-buffer-name singular-name))
+	 (buffer-name (singular-process-name-to-buffer-name name))
 	 ;; buffer associated with Singular, nil if there is none
 	 (buffer (get-buffer buffer-name)))
 
-    ;; create new buffer if there has been none and call
-    ;; `singular-interactive-mode'
     (if (not buffer)
 	(progn
+	  ;; create new buffer and call `singular-interactive-mode'
 	  (singular-debug 'interactive (message "Creating new buffer"))
 	  (setq buffer (get-buffer-create buffer-name))
 	  (set-buffer buffer)
 	  (singular-debug 'interactive (message "Calling `singular-interactive-mode'"))
 	  (singular-interactive-mode)))
 
-    ;; create new process if there has been none
     (if (not (comint-check-proc buffer))
-	(progn
-	  ;; initialize markers.  process-marker is initialized by
-	  ;; `comint-exec'.
-	  (set-marker comint-last-input-start nil)
-	  (set-marker comint-last-input-end nil)
-	  (set-marker comint-last-output-start nil)
-
-	  ;; note that `comint-exec' may result in some process output already!
-	  ;; Note furthermore that we use `comint-exec' instead of
-	  ;; `make-comint' to avoid double calls of `comint-mode'.
-	  (singular-debug 'interactive (message "Starting new Singular"))
-	  (setq buffer (funcall 'comint-exec buffer singular-name singular-executable
-				(if (file-exists-p singular-start-file) singular-start-file)
-				singular-switches))
-	  (set-process-sentinel (get-buffer-process buffer) 'singular-exit-sentinel)
-	  (set-buffer buffer)
-	  (singular-debug 'interactive (message "Reading input ring"))
-	  (comint-read-input-ring t)
-
-	  ;; go to end of buffer and run hooks
-	  (goto-char (point-max))
-	  (run-hooks 'singular-exec-hook)))
+	;; create new process if there is none
+	(singular-exec buffer name executable
+		       (if (file-exists-p singular-start-file)
+			   singular-start-file)
+		       switches))
 
     ;; pop to buffer
     (singular-debug 'interactive (message "Calling `pop-to-buffer'"))
