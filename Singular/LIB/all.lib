@@ -1,15 +1,13 @@
-// $Id: all.lib,v 1.11 1998-05-14 18:44:54 Singular Exp $
+// $Id: all.lib,v 1.12 1998-05-18 15:23:27 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: all.lib,v 1.11 1998-05-14 18:44:54 Singular Exp $";
+version="$Id: all.lib,v 1.12 1998-05-18 15:23:27 Singular Exp $";
 info="
 LIBRARY:  all.lib   Load all libraries
 
   classify.lib  PROCEDURES FOR THE ARNOLD-CLASSIFIER OF SINGULARITIES
   deform.lib    PROCEDURES FOR COMPUTING MINIVERSAL DEFORMATION
   elim.lib      PROCEDURES FOR ELIMINATION, SATURATION AND BLOWING UP
-  factor.lib    PROCEDURES FOR CALLING EXTERNAL FACTORIZER
-  fastsolv.lib  PROCEDURES FOR SIMPLIFICATION, etc.
   finvar.lib    PROCEDURES TO CALCULATE INVARIANT RINGS & MORE
   general.lib   PROCEDURES OF GENERAL TYPE
   graphics.lib  PROCEDURES TO DRAW WITH MATHEMATICA
