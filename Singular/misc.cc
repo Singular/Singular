@@ -450,6 +450,7 @@ void singular_help(char *str,BOOLEAN example)
         fclose( yylpin );
         PrintS(text_buffer);
         FreeL(text_buffer);
+	text_buffer=NULL;
       }
 #endif /* HAVE_LIBPARSER */
     }
