@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: gaussman.lib,v 1.7 2000-11-09 13:43:05 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.8 2000-11-10 10:29:47 mschulze Exp $";
 info="
 LIBRARY:  gaussman.lib  GAUSS-MANIN CONNECTION OF A SINGULARITY
 
@@ -24,6 +24,7 @@ LIB "jordan.lib";
 
 static proc maxintdif(ideal e)
 {
+  dbprint(printlevel-voice+2,"//gaussman::maxintdif");
   int i,j,id;
   int mid=0;
   for(i=ncols(e);i>=1;i--)
@@ -47,6 +48,7 @@ static proc maxintdif(ideal e)
 
 static proc maxorddif(matrix H)
 {
+  dbprint(printlevel-voice+2,"//gaussman::maxorddif");
   int i,j,d;
   int d0,d1=-1,-1;
   for(i=nrows(H);i>=1;i--)
@@ -73,6 +75,7 @@ static proc maxorddif(matrix H)
 
 static proc invunit(poly u,int n)
 {
+  dbprint(printlevel-voice+2,"//gaussman::invunit");
   if(ord(u)>0)
   {
     ERROR("no unit");
@@ -93,6 +96,7 @@ static proc invunit(poly u,int n)
 
 static proc expand(matrix M,matrix U,int n)
 {
+  dbprint(printlevel-voice+2,"//gaussman::expand");
   for(int i=ncols(U);i>=1;i--)
   {
     U[i,i]=invunit(U[i,i],n-ord(M[i]));
@@ -119,11 +123,13 @@ static proc redNF(module M,module N,list #)
   }
   N=std(N);
   module redNFM=matrix(0,nrows(M),ncols(M));
+  dbprint(printlevel-voice+2,"//gaussman::redNF: reduce");
   module weakNFM=reduce(M,N);
   while(size(weakNFM)>0)
   {
     redNFM=matrix(redNFM)+matrix(lead(weakNFM));
     M=matrix(M)-matrix(lead(weakNFM))*U;
+    dbprint(printlevel-voice+2,"//gaussman::redNF: reduce");
     weakNFM=reduce(M,N);
   }
   return(redNFM);
@@ -177,16 +183,24 @@ EXAMPLE: example monomat; shows an example
   int sdH=1;
   int k=-1;
   int K,N;
+
   while(k<K||sdH>0)
   {
     k++;
+    dbprint(printlevel-voice+2,"//gaussman::monomat: k="+string(k));
+
+    dbprint(printlevel-voice+2,"//gaussman::monomat: compute C");
     C=coeffs(redNF(w,sJ,U),m);
     A0=A0+C*var(1)^k;
+
     if(sdH>0)
     {
       H0=H;
+      dbprint(printlevel-voice+2,"//gaussman::monomat: compute dH");
       dH=jet(module(A0*dH+var(1)^2*diff(matrix(dH),var(1))),k);
       H=H*var(1)+dH;
+
+      dbprint(printlevel-voice+2,"//gaussman::monomat: test dH==0");
       sdH=size(reduce(H,std(H0*var(1))));
       if(sdH>0)
       {
@@ -194,36 +208,46 @@ EXAMPLE: example monomat; shows an example
       }
       else
       {
+        dbprint(printlevel-voice+2,"//gaussman::monomat: basis of saturation");
         H=minbase(H0);
         int modH=maxorddif(H);
         K=modH+1;
       }
     }
+
     if(k==K&&sdH==0)
     {
       N=k-modH;
+      dbprint(printlevel-voice+2,"//gaussman::monomat: A on saturation");
       l=division(H*var(1),A0*H+var(1)^2*diff(matrix(H),var(1)));
       A=expand(l[1],l[2],N-1);
       if(mide<0)
       {
+        dbprint(printlevel-voice+2,"//gaussman::monomat: eigenvalues e of A");
         ideal e=jordan(A,-1)[1];
+        dbprint(printlevel-voice+2,"//gaussman::monomat: e="+string(e));
         mide=maxintdif(e);
         K=K+mide;
       }
     }
+
     if(k<K||sdH>0)
     {
+      dbprint(printlevel-voice+2,"//gaussman::monomat: division by J");
       l=division(J,ideal(matrix(w)-matrix(m)*C*U));
       D=l[1];
-      for(i=mu;i>=1;i--) // Fehler bei division!
-      {
-        if(l[2][i,i]!=0)
-        {
-          U[i,i]=U[i,i]*l[2][i,i];
-        }
-      }
+
+      dbprint(printlevel-voice+2,"//gaussman::monomat: compute w/U");
       for(j=mu;j>=1;j--)
       {
+        if(l[2][j,j]!=0)
+        {
+          dbprint(printlevel-voice+2,
+            "//gaussman::monomat: compute U["+string(j)+"]");
+          U[j,j]=U[j,j]*l[2][j,j];
+        }
+        dbprint(printlevel-voice+2,
+          "//gaussman::monomat: compute w["+string(j)+"]");
         w[j]=0;
         for(i=n+1;i>=1;i--)
         {
@@ -236,6 +260,8 @@ EXAMPLE: example monomat; shows an example
 
   while(mide>0)
   {
+    dbprint(printlevel-voice+2,"//gaussman::monomat: mide="+string(mide));
+
     intvec b;
     b[mu]=0;
     U=0;
@@ -383,16 +409,24 @@ EXAMPLE: example vfilt; shows an example
   int sdH=1;
   int k=-1;
   int K;
+
   while(k<K||sdH>0)
   {
     k++;
+    dbprint(printlevel-voice+2,"//gaussman::vfilt: k="+string(k));
+
+    dbprint(printlevel-voice+2,"//gaussman::vfilt: compute C");
     C=coeffs(redNF(w,sJ,U),m);
     A=A+C*var(1)^k;
+
     if(sdH>0)
     {
       H0=H;
+      dbprint(printlevel-voice+2,"//gaussman::vfilt: compute dH");
       dH=jet(module(A*dH+var(1)^2*diff(matrix(dH),var(1))),k);
       H=H*var(1)+dH;
+
+      dbprint(printlevel-voice+2,"//gaussman::vfilt: test dH==0");
       sdH=size(reduce(H,std(H0*var(1))));
       if(sdH>0)
       {
@@ -400,6 +434,7 @@ EXAMPLE: example vfilt; shows an example
       }
       else
       {
+        dbprint(printlevel-voice+2,"//gaussman::vfilt: basis of saturation");
         H=minbase(H0);
         int modH=maxorddif(H);
         if(k<n)
@@ -413,19 +448,24 @@ EXAMPLE: example vfilt; shows an example
         H0=freemodule(mu)*var(1)^k;
       }
     }
+
     if(k<K||sdH>0)
     {
+      dbprint(printlevel-voice+2,"//gaussman::vfilt: division by J");
       l=division(J,ideal(matrix(w)-matrix(m)*C*U));
       D=l[1];
-      for(i=mu;i>=1;i--) // Fehler bei division!
-      {
-        if(l[2][i,i]!=0)
-        {
-          U[i,i]=U[i,i]*l[2][i,i];
-        }
-      }
+
+      dbprint(printlevel-voice+2,"//gaussman::monomat: compute w/U");
       for(j=mu;j>=1;j--)
       {
+        if(l[2][j,j]!=0)
+        {
+          dbprint(printlevel-voice+2,
+            "//gaussman::monomat: compute U["+string(j)+"]");
+          U[j,j]=U[j,j]*l[2][j,j];
+        }
+        dbprint(printlevel-voice+2,
+          "//gaussman::monomat: compute w["+string(j)+"]");
         w[j]=0;
         for(i=n+1;i>=1;i--)
         {
@@ -437,9 +477,12 @@ EXAMPLE: example vfilt; shows an example
   }
   int N=k-modH;
 
+  dbprint(printlevel-voice+2,"//gaussman::vfilt: transform H0 to saturation");
   l=division(H,H0);
   H0=expand(l[1],l[2],N-1);
 
+  dbprint(printlevel-voice+2,"//gaussman::vfilt: H0 as vector space V0");
+  dbprint(printlevel-voice+2,"//gaussman::vfilt: H1 as vector space V1");
   poly p;
   int i0,j0,i1,j1;
   matrix V0[mu*N][mu*N];
@@ -466,9 +509,11 @@ EXAMPLE: example vfilt; shows an example
     }
   }
 
+  dbprint(printlevel-voice+2,"//gaussman::vfilt: A on saturation");
   l=division(H*var(1),A*H+var(1)^2*diff(matrix(H),var(1)));
   A=expand(l[1],l[2],N-1);
 
+  dbprint(printlevel-voice+2,"//gaussman::vfilt: matrix M of A");
   matrix M[mu*N][mu*N];
   for(i0=mu;i0>=1;i0--)
   {
@@ -494,7 +539,11 @@ EXAMPLE: example vfilt; shows an example
     }
   }
 
+  dbprint(printlevel-voice+2,"//gaussman::vfilt: eigenvalues eA of A");
   ideal eA=jordan(A,-1)[1];
+  dbprint(printlevel-voice+2,"//gaussman::vfilt: eA="+string(eA));
+
+  dbprint(printlevel-voice+2,"//gaussman::vfilt: eigenvalues eM of M");
   ideal eM;
   k=0;
   intvec u;
@@ -520,7 +569,9 @@ EXAMPLE: example vfilt; shows an example
       i0=i1+1;
     }
   }
+  dbprint(printlevel-voice+2,"//gaussman::vfilt: eM="+string(eM));
 
+  dbprint(printlevel-voice+2,"//gaussman::vfilt: V-filtration on H0/H1");
   ideal s;
   k=0;
   list V;
@@ -536,8 +587,12 @@ EXAMPLE: example vfilt; shows an example
       {
         Me=Me*(M-eM[i]);
       }
+
+      dbprint(printlevel-voice+2,
+        "//gaussman::vfilt: compute V["+string(i)+"]");
       V1=module(V1)+syz(Me);
       V[i]=std(intersect(V1,V0));
+
       if(size(V[i])>size(V[i+1]))
       {
         k++;
@@ -545,6 +600,8 @@ EXAMPLE: example vfilt; shows an example
         d[k]=size(V[i])-size(V[i+1]);
       }
     }
+
+    dbprint(printlevel-voice+2,"//gaussman::vfilt: symmetry index reached");
     j=k;
     if(number(eM[i])-1==number(n-1)/2)
     {
@@ -553,8 +610,12 @@ EXAMPLE: example vfilt; shows an example
       {
         Me=Me*(M-eM[i]);
       }
+
+      dbprint(printlevel-voice+2,
+        "//gaussman::vfilt: compute V["+string(i)+"]");
       V1=module(V1)+syz(Me);
       V[i]=std(intersect(V1,V0));
+
       if(size(V[i])>size(V[i+1]))
       {
         k++;
@@ -562,6 +623,8 @@ EXAMPLE: example vfilt; shows an example
         d[k]=size(V[i])-size(V[i+1]);
       }
     }
+
+    dbprint(printlevel-voice+2,"//gaussman::vfilt: apply symmetry");
     while(j>=1)
     {
       k++;
@@ -570,6 +633,7 @@ EXAMPLE: example vfilt; shows an example
       d[k]=d[j];
       j--;
     }
+
     return(list(s,d));
   }
   else
@@ -583,14 +647,19 @@ EXAMPLE: example vfilt; shows an example
       {
         Me=Me*(M-eM[i]);
       }
+
+      dbprint(printlevel-voice+2,
+        "//gaussman::vfilt: compute V["+string(i)+"]");
       V1=module(V1)+syz(Me);
       V[i]=std(intersect(V1,V0));
+
       if(size(V[i])>size(V[i+1]))
       {
         if(number(eM[i]-1)>=number(n-1)/2)
         {
           k++;
           s[k]=eM[i]-1;
+          dbprint(printlevel-voice+2,"//gaussman::vfilt: transform to V0");
           v[k]=matrix(freemodule(ncols(V[i])),mu,mu*N)*division(V0,V[i])[1];
         }
         else
@@ -610,11 +679,14 @@ EXAMPLE: example vfilt; shows an example
           s[k]=s[j];
           s[j]=eM[i]-1;
           v[k]=v[j];
+          dbprint(printlevel-voice+2,"//gaussman::vfilt: transform to V0");
           v[j]=matrix(freemodule(ncols(V[i])),mu,mu*N)*division(V0,V[i])[1];
           j--;
         }
       }
     }
+
+    dbprint(printlevel-voice+2,"//gaussman::vfilt: graded parts");
     option(redSB);
     for(k=1;k<size(v);k++)
     {
@@ -623,6 +695,7 @@ EXAMPLE: example vfilt; shows an example
     }
     v[k]=std(v[k]);
     d[k]=size(v[k]);
+
     return(list(s,d,v,m,sJ));
   }
 }
