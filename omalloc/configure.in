@@ -3,7 +3,7 @@ dnl File: configure.in
 dnl Purpose: Process this file with autoconf to produce configure
 dnl Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
 dnl Created: 11/99
-dnl Version: $Id: configure.in,v 1.13 2001-03-22 22:39:07 Singular Exp $
+dnl Version: $Id: configure.in,v 1.14 2001-05-15 12:19:38 Singular Exp $
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 
 AC_INIT(om_Alloc.c)
@@ -264,6 +264,7 @@ else
   OM_MALLOC_SOURCE=dlmalloc.c
 fi
 AC_MSG_RESULT($with_malloc)
+
 AC_SUBST(OM_MALLOC_HEADER)
 AC_SUBST(OM_MALLOC_SOURCE)
 if test "${OM_MALLOC_SOURCE+set}" = set; then
@@ -574,9 +575,29 @@ fi
 AC_MSG_RESULT($with_track_custom)
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl figure out the return type of sbrk
+dnl
+
+AC_MSG_CHECKING(return type of sbrk)
+AC_TRY_LINK(
+#define __USE_MISC
+#include <unistd.h>
+,
+void *sbrk();
+,
+AC_DEFINE(Void_t,void),
+AC_DEFINE(Void_t,char),
+)
+AC_MSG_RESULT(Void_t)
+
+
+
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl wrap it up
 dnl
 AC_CONFIG_HEADER(omConfig.h mylimits.h omMalloc.h:${OM_MALLOC_HEADER})
 
 AC_OUTPUT(Makefile, \
  if test "$CONFIG_HEADERS"; then echo timestamp > stamp-h; fi)
+
+

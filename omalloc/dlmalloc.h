@@ -3,10 +3,12 @@
  *  Purpose: declarations for dlmalloc
  *  This was obtained by taking cutting out the beginning of malloc.c
  *
- *  Version: $Id: dlmalloc.h,v 1.8 2001-04-30 09:01:58 Singular Exp $
+ *  Version: $Id: dlmalloc.h,v 1.9 2001-05-15 12:19:38 Singular Exp $
  *******************************************************************/
 #ifndef DL_MALLOC_H
 #define DL_MALLOC_H
+
+#define Void_t char
 
 /* define to -1 if you want that this implementation provides
    malloc/calloc/realloc/free funcs */

@@ -1981,6 +1981,7 @@ fi
 echo "$ac_t""$with_malloc" 1>&6
 
 
+
 if test "${OM_MALLOC_SOURCE+set}" = set; then
   cat >> confdefs.h <<\EOF
 #define OM_HAVE_MALLOC_SOURCE 1
@@ -1989,7 +1990,7 @@ EOF
 fi
 
 echo $ac_n "checking whether malloc provides SizeOfAddr""... $ac_c" 1>&6
-echo "configure:1993: checking whether malloc provides SizeOfAddr" >&5
+echo "configure:1994: checking whether malloc provides SizeOfAddr" >&5
 if test "${ac_cv_malloc_sizeof_addr}" = no; then
   echo "$ac_t""(cached) no" 1>&6
 elif test "${ac_cv_malloc_sizeof_addr}" = "${OM_MALLOC_HEADER}_${OM_MALLOC_SOURCE}"; then
@@ -1999,7 +2000,7 @@ if test "$cross_compiling" = yes; then
   ac_cv_malloc_sizeof_addr=no
 else
   cat > conftest.$ac_ext <<EOF
-#line 2003 "configure"
+#line 2004 "configure"
 #include "confdefs.h"
 
 #include "$OM_MALLOC_HEADER"
@@ -2016,7 +2017,7 @@ main()
 }
 
 EOF
-if { (eval echo configure:2020: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:2021: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
 then
   ac_cv_malloc_sizeof_addr="${OM_MALLOC_HEADER}_${OM_MALLOC_SOURCE}"
 else
@@ -2064,7 +2065,7 @@ EOF
 fi
 
 echo $ac_n "checking whether working valloc exists""... $ac_c" 1>&6
-echo "configure:2068: checking whether working valloc exists" >&5
+echo "configure:2069: checking whether working valloc exists" >&5
 if test "${ac_cv_working_valloc}" = no; then
   echo "$ac_t""(cached) no" 1>&6
 elif test "${ac_cv_working_valloc}" = "${OM_MALLOC_HEADER}_${OM_MALLOC_SOURCE}"; then
@@ -2074,7 +2075,7 @@ if test "$cross_compiling" = yes; then
   ac_cv_working_valloc=no
 else
   cat > conftest.$ac_ext <<EOF
-#line 2078 "configure"
+#line 2079 "configure"
 #include "confdefs.h"
 
 #include "$OM_MALLOC_HEADER"
@@ -2092,7 +2093,7 @@ main()
 }
 
 EOF
-if { (eval echo configure:2096: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:2097: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
 then
   ac_cv_working_valloc="${OM_MALLOC_HEADER}_${OM_MALLOC_SOURCE}"
 else
@@ -2112,7 +2113,7 @@ fi
 fi
 
 echo $ac_n "checking which valloc to use""... $ac_c" 1>&6
-echo "configure:2116: checking which valloc to use" >&5
+echo "configure:2117: checking which valloc to use" >&5
 if test "${with_valloc+set}" != set || test "${with_valloc}" = mmap; then
   if test "${ac_cv_working_mmap}" = yes; then
     with_valloc=mmap
@@ -2137,7 +2138,7 @@ fi
 echo "$ac_t""$with_valloc" 1>&6
 
 echo $ac_n "checking whether to emulate omalloc""... $ac_c" 1>&6
-echo "configure:2141: checking whether to emulate omalloc" >&5
+echo "configure:2142: checking whether to emulate omalloc" >&5
 if test "${with_emulate_omalloc}" = yes; then
   cat >> confdefs.h <<\EOF
 #define OM_EMULATE_OMALLOC 1
@@ -2149,7 +2150,7 @@ else
 fi
 
 echo $ac_n "checking how to align""... $ac_c" 1>&6
-echo "configure:2153: checking how to align" >&5
+echo "configure:2154: checking how to align" >&5
 if test "$with_align" = 8 || test "$ac_cv_sizeof_long" = 8; then
   ac_cv_align=8
   cat >> confdefs.h <<\EOF
@@ -2170,7 +2171,7 @@ fi
 echo "$ac_t""$ac_cv_align" 1>&6
 
 echo $ac_n "checking whether to use dense bins""... $ac_c" 1>&6
-echo "configure:2174: checking whether to use dense bins" >&5
+echo "configure:2175: checking whether to use dense bins" >&5
 if test "$with_dense_bins" = yes; then
 echo "$ac_t""yes" 1>&6
 cat >> confdefs.h <<\EOF
@@ -2182,7 +2183,7 @@ echo "$ac_t""no" 1>&6
 fi
 
 echo $ac_n "checking whether to disable debugging""... $ac_c" 1>&6
-echo "configure:2186: checking whether to disable debugging" >&5
+echo "configure:2187: checking whether to disable debugging" >&5
 if test "$with_debug" != no; then
 echo "$ac_t""no" 1>&6
 else
@@ -2195,7 +2196,7 @@ with_track=no
 fi
 
 echo $ac_n "checking whether to have tracking debug functionality""... $ac_c" 1>&6
-echo "configure:2199: checking whether to have tracking debug functionality" >&5
+echo "configure:2200: checking whether to have tracking debug functionality" >&5
 if test "$with_track" != no; then
 echo "$ac_t""yes" 1>&6
 cat >> confdefs.h <<\EOF
@@ -2207,7 +2208,7 @@ echo "$ac_t""no" 1>&6
 fi
 
 echo $ac_n "checking whether to use internal debug""... $ac_c" 1>&6
-echo "configure:2211: checking whether to use internal debug" >&5
+echo "configure:2212: checking whether to use internal debug" >&5
 if test "$with_internal_debug" = yes; then
 echo "$ac_t""yes" 1>&6
 cat >> confdefs.h <<\EOF
@@ -2220,7 +2221,7 @@ echo "$ac_t""no" 1>&6
 fi
 
 echo $ac_n "checking whether to inline""... $ac_c" 1>&6
-echo "configure:2224: checking whether to inline" >&5
+echo "configure:2225: checking whether to inline" >&5
 if test "$ac_cv_c_inline" != no && test "$with_inline" != no; then
   cat >> confdefs.h <<EOF
 #define OM_INLINE static $ac_cv_c_inline
@@ -2256,7 +2257,7 @@ EOF
 fi
 
 echo $ac_n "checking whether GET_RET_ADDR works""... $ac_c" 1>&6
-echo "configure:2260: checking whether GET_RET_ADDR works" >&5
+echo "configure:2261: checking whether GET_RET_ADDR works" >&5
 if eval "test \"`echo '$''{'ac_cv_get_return_addr_works'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2264,7 +2265,7 @@ else
   ac_cv_get_return_addr_works=no
 else
   cat > conftest.$ac_ext <<EOF
-#line 2268 "configure"
+#line 2269 "configure"
 #include "confdefs.h"
 
 #include "omReturn.h"
@@ -2280,7 +2281,7 @@ int main()
 }
 
 EOF
-if { (eval echo configure:2284: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:2285: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
 then
   ac_cv_get_return_addr_works=yes
 else
@@ -2303,7 +2304,7 @@ EOF
 fi
 
 echo $ac_n "checking whether omGetBackTrace works""... $ac_c" 1>&6
-echo "configure:2307: checking whether omGetBackTrace works" >&5
+echo "configure:2308: checking whether omGetBackTrace works" >&5
 if eval "test \"`echo '$''{'ac_cv_get_backtrace_works'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2311,7 +2312,7 @@ else
   ac_cv_get_backtrace_works=no
 else
   cat > conftest.$ac_ext <<EOF
-#line 2315 "configure"
+#line 2316 "configure"
 #include "confdefs.h"
 
 #include "omGetBackTrace.c"
@@ -2332,7 +2333,7 @@ int main()
 }
 
 EOF
-if { (eval echo configure:2336: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:2337: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
 then
   ac_cv_get_backtrace_works=yes
 else
@@ -2355,7 +2356,7 @@ EOF
 fi
 
 echo $ac_n "checking whether addr2line works""... $ac_c" 1>&6
-echo "configure:2359: checking whether addr2line works" >&5
+echo "configure:2360: checking whether addr2line works" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_addr2line_works'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2363,7 +2364,7 @@ else
   ac_cv_prog_addr2line_works=no
 else
   cat > conftest.$ac_ext <<EOF
-#line 2367 "configure"
+#line 2368 "configure"
 #include "confdefs.h"
 
 #undef OM_GET_BACKTRACE_WORKS
@@ -2395,7 +2396,7 @@ int main(int argc, char** argv)
 }
 
 EOF
-if { (eval echo configure:2399: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:2400: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
 then
   ac_cv_prog_addr2line_works=yes
 else
@@ -2412,7 +2413,7 @@ fi
 echo "$ac_t""$ac_cv_prog_addr2line_works" 1>&6
 
 echo $ac_n "checking whether to track return addresses""... $ac_c" 1>&6
-echo "configure:2416: checking whether to track return addresses" >&5
+echo "configure:2417: checking whether to track return addresses" >&5
 if test "$with_track_return" = no || test "$ac_cv_get_return_addr_works" = no || test "$ac_cv_prog_addr2line_works" != yes; then
   with_track_return=no
 else
@@ -2425,7 +2426,7 @@ fi
 echo "$ac_t""$with_track_return" 1>&6
 
 echo $ac_n "checking whether to track files and line numbers""... $ac_c" 1>&6
-echo "configure:2429: checking whether to track files and line numbers" >&5
+echo "configure:2430: checking whether to track files and line numbers" >&5
 if test "$with_track_fl" = no && test "$with_track_return" = no; then
   with_track_fl=yes
 fi
@@ -2445,7 +2446,7 @@ EOF
 fi
 
 echo $ac_n "checking whether to track stack backtraces""... $ac_c" 1>&6
-echo "configure:2449: checking whether to track stack backtraces" >&5
+echo "configure:2450: checking whether to track stack backtraces" >&5
 if test "$with_track" != no && test "$ac_cv_get_backtrace_works" = yes && test "$with_track_backtrace" != no && test "$ac_cv_prog_addr2line_works" = yes; then
   with_track_backtrace=yes
   cat >> confdefs.h <<\EOF
@@ -2458,7 +2459,7 @@ fi
 echo "$ac_t""$with_track_backtrace" 1>&6
 
 echo $ac_n "checking whether to track custom values""... $ac_c" 1>&6
-echo "configure:2462: checking whether to track custom values" >&5
+echo "configure:2463: checking whether to track custom values" >&5
 if test "$with_track" != no && test "$with_track_custom" = yes; then
   cat >> confdefs.h <<\EOF
 #define OM_TRACK_CUSTOM 1
@@ -2468,6 +2469,40 @@ else
   with_track_custom=no
 fi
 echo "$ac_t""$with_track_custom" 1>&6
+
+
+echo $ac_n "checking return type of sbrk""... $ac_c" 1>&6
+echo "configure:2476: checking return type of sbrk" >&5
+cat > conftest.$ac_ext <<EOF
+#line 2478 "configure"
+#include "confdefs.h"
+#define __USE_MISC
+#include <unistd.h>
+
+int main() {
+void *sbrk();
+
+; return 0; }
+EOF
+if { (eval echo configure:2488: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+  rm -rf conftest*
+  cat >> confdefs.h <<\EOF
+#define Void_t void
+EOF
+
+else
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
+  rm -rf conftest*
+  cat >> confdefs.h <<\EOF
+#define Void_t char
+EOF
+
+fi
+rm -f conftest*
+echo "$ac_t""Void_t" 1>&6
+
+
 
 
 
@@ -2839,4 +2874,6 @@ EOF
 chmod +x $CONFIG_STATUS
 rm -fr confdefs* $ac_clean_files
 test "$no_create" = yes || ${CONFIG_SHELL-/bin/sh} $CONFIG_STATUS || exit 1
+
+
 
