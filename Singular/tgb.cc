@@ -3035,10 +3035,15 @@ static int retranslate(poly* m,tgb_matrix* mat,poly* done, calc_dat* c){
 static void go_on_F4 (calc_dat* c){
   //set limit of 1000 for multireductions, at the moment for
   //programming reasons
-  int done_size=PAR_N_F4*2;
+  int max_par;
+  if (c->is_homog)
+    max_par=PAR_N_F4;
+  else
+    max_par=200;
+  int done_size=max_par*2;
   poly* done=(poly*) omalloc(done_size*sizeof(poly));
   int done_index=0; //done_index must always be smaller than done_size
-  int chosen_size=PAR_N_F4*2;
+  int chosen_size=max_par*2;
   monom_poly* chosen=(monom_poly*) omalloc(chosen_size*sizeof(monom_poly));
   int chosen_index=0;
   //  monom_poly* vgl=(monom_poly*) omalloc(chosen_size*sizeof(monom_poly));
@@ -3052,9 +3057,9 @@ static void go_on_F4 (calc_dat* c){
   poly* p;
   int nfs=0;
   int curr_deg=-1;
-  
+
   //choose pairs and preprocess symbolically
-  while(chosen_index<PAR_N_F4)
+  while(chosen_index<max_par)
   {
     
     //    sorted_pair_node* s=c->apairs[c->pair_top];
@@ -3099,14 +3104,14 @@ static void go_on_F4 (calc_dat* c){
 
       if(done_index>=done_size)
       {
-	done_size+=PAR_N_F4;
+	done_size+=max_par;
 	done=(poly*) omrealloc(done,done_size*sizeof(poly));
       }
       done[done_index++]=lcm;
       if(chosen_index+1>=chosen_size)
       {
-	//PAR_N_F4 must be greater equal 2
-	chosen_size+=max(PAR_N_F4,2);
+	//max_par must be greater equal 2
+	chosen_size+=max(max_par,2);
 	chosen=(monom_poly*) omrealloc(chosen,chosen_size*sizeof(monom_poly));
       }
       h.f=c->S->m[s->i];
@@ -3120,7 +3125,7 @@ static void go_on_F4 (calc_dat* c){
     {
       if(chosen_index>=chosen_size)
       {
-	chosen_size+=PAR_N_F4;
+	chosen_size+=max_par;
 	chosen=(monom_poly*) omrealloc(chosen,chosen_size*sizeof(monom_poly));
       }
       h.f=s->lcm_of_lm;
