@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.48 2001-05-28 12:38:43 Singular Exp $
+@comment $Id: start.doc,v 1.49 2001-08-27 14:40:09 Singular Exp $
 @comment this file contains the "Introduction" chapter.
 @c * wichmann: + added changes by GMG.
 
@@ -335,7 +335,7 @@ Text starting with @code{//} denotes a comment and is ignored in
 calculations, as seen in the previous example. Furthermore @sc{Singular}
 maintains a history of the previous lines of input, which may be accessed by
 @code{CTRL-P} (previous) and @code{CTRL-N} (next) or the arrows on the
-keyboard. Note, that the history is not available on Macintosh systems.
+keyboard. Note that the history is not available on Macintosh systems.
 
 The whole manual is available online by typing the command @code{help;} .
 Explanation on single topics, e.g., on @code{intmat}, which defines a
@@ -382,7 +382,7 @@ curly brackets @code{@{} and @code{@}} denote the beginning resp.@:
 end of a block. If you define a variable without giving an initial
 value, as the variable @code{tr} in the example below, @sc{Singular}
 assigns a default value for the specific type. In this case, the default
-value for integers is @code{0}. Note, that the integer variable @code{j}
+value for integers is @code{0}. Note that the integer variable @code{j}
 has already been defined above.
 
 @smallexample
@@ -524,7 +524,7 @@ x^3
 @end ifinfo
 may be entered in two ways: either using the power operator @code{^},
 saying @code{x^3}, or in short-hand notation without operator, saying
-@code{x3}. Note, that the short-hand notation is forbidden if the name
+@code{x3}. Note that the short-hand notation is forbidden if the name
 of the ring variable consists of more than one character. Note, that
 @sc{Singular} always expands brackets and automatically sorts the terms
 with respect to the monomial ordering of the basering.
@@ -581,7 +581,7 @@ ideal defined by @code{f}.
 
 The function @code{groebner}, like many other functions in
 @sc{Singular}, prints a protocol during calculations, if desired. The
-command @code{option(prot);} enables protocoling whereas
+command @code{option(prot);} enables protocolling whereas
 @code{option(noprot);} turns it off.
 @ifset singularmanual
 @ref{option}, explains the meaning
@@ -694,7 +694,7 @@ proc Milnor (poly h)
 
 Note: if you have entered the first line of the procedure and pressed
 @code{RETURN}, @sc{Singular} prints the prompt @code{.} (dot) instead of
-the usual prompt @code{>} . This shows, that the input is incomplete and
+the usual prompt @code{>} . This shows that the input is incomplete and
 @sc{Singular} expects more lines. After typing the closing curly
 bracket, @sc{Singular} prints the usual prompt indicating that the input
 is now complete.
@@ -706,7 +706,7 @@ Milnor(f);
 @expansion{} 12
 @end smallexample
 
-@noindent Note, that the result may depend on the basering as we will
+@noindent Note that the result may depend on the basering as we will
 see in the next chapter.
 
 The distribution of  @sc{Singular} contains  several libraries, each of
@@ -1110,7 +1110,7 @@ print(betti(rs),"betti");
 @expansion{} total:     1     4     5     2
 @end smallexample
 
-In order to minimize the resolution, that is to calculate the maps of the minimal 
+In order to minimize the resolution, that is to calculate the maps of the minimal
 free resolution, we use the command @code{minres}:
 
 @smallexample
@@ -1125,9 +1125,9 @@ display a module in a more readable format:
 print(rs[3]);
 @expansion{} z3,   -xyz-y2z-4xz2+16z3,
 @expansion{} 0,    -y2,
-@expansion{} -y+4z,48z, 
-@expansion{} x+2z, 48z, 
-@expansion{} 0,    x+y-z  
+@expansion{} -y+4z,48z,
+@expansion{} x+2z, 48z,
+@expansion{} 0,    x+y-z
 @end smallexample
 
 In this case, the output is to be interpreted as follows: the 3rd syzygy

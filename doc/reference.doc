@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.210 2001-05-17 14:15:02 Singular Exp $
+@comment $Id: reference.doc,v 1.211 2001-08-27 14:40:06 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1232,9 +1232,9 @@ See
 list
 @item @strong{Purpose:}
 computes the transformation matrix which expresses the generators of a
-module @code{sm} (the second argument) in terms of the generators of a
-module @code{m} (the first argument) and a rest @code{R}.
-Uses different algorithms depending whether the modules are, resp.@: are not,
+module @code{sm} (the first argument) in terms of the generators of a
+module @code{m} (the second argument) and a rest @code{R}.
+Uses different algorithms depending on whether the modules are, resp.@: are not,
 represented by standard bases.
 @*Returns the list @code{T,U,R}, where @code{T,U} are matrices and @code{R}
 is a module (resp.@: ideal) such that
@@ -1251,7 +1251,7 @@ then @code{U} is the identity matrix).
   ideal m=3x2+yz,7y6+2x2y+5xz;
   poly f=y7+x3+xyz+z2;
   ideal i=jacob(f)+x;
-  division(i,m);
+  division(m,i);
 @c example
 @end smallexample
 @end table
@@ -1425,7 +1425,7 @@ i;
 computes an example for @code{topic}. Examples are available for all
 @sc{Singular} kernel and library functions. Where available (e.g.,
 within Emacs), use @code{<TAB>} completion for a list of all available
-example @code{topic}'s.
+example @code{topic}s.
 @item @strong{Example:}
 @smallexample
 example prime;
@@ -1447,7 +1447,7 @@ none
 @item @strong{Purpose:}
 executes a string containing a sequence of @sc{Singular} commands.
 @item @strong{Note:}
-The command @code{return} can not appear in the string.
+The command @code{return} cannot appear in the string.
 @* @code{execute} should be avoided in procedures
 whenever possible, since it may give rise to name conflicts.  Moreover,
 such procedures cannot be precompiled (a feature which @sc{Singular} will
@@ -1581,9 +1581,8 @@ the multiplicities (as an intvec) depending on the second argument:
     2: returns non-constant factors and multiplicities.
 @end format
 @item @strong{Note:}
-Not implemented for the coefficient fields real, finite fields of
-type @code{(p^n,a)}, and algebraic extensions over the rational
-numbers.
+Not implemented for the coefficient fields real and finite fields of
+type @code{(p^n,a)}.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -2021,7 +2020,7 @@ name of a (loaded) procedure which has a help section.
 @code{topic} may contain wildcard characters (i.e.,
 @code{*} characters).
 @item
-If a (possibly "wildcarded") @code{topic} can not be found (or,
+If a (possibly "wildcarded") @code{topic} cannot be found (or
 uniquely matched) a warning is displayed and no help information is
 provided.
 @item
@@ -2153,11 +2152,11 @@ none (if called with one argument)
 @item @strong{Purpose:}
 computes the (weighted) Hilbert series of the ideal, resp.@: module,
 defined by the leading terms of the generators of the given ideal, resp.@: module.@*
-If @code{hilb} is called with one argument, then the 1-st and 2-nd Hilbert series
+If @code{hilb} is called with one argument, then the 1st and 2nd Hilbert series
 together with some additional information are displayed.@*
 If @code{hilb} is called with two arguments, then the n-th Hilbert series is returned
 as an intvec, where n=1,2 is the second argument.@*
-If a weight vector w is a given as 3-rd argument, then the Hilbert series is computed
+If a weight vector w is a given as 3rd argument, then the Hilbert series is computed
 w.r.t.@: these weights w (by default all weights are set to 1).
 @item @strong{Caution:}
 The last entry of the returned intvec is not part of the actual Hilbert series,
@@ -2709,9 +2708,9 @@ computes a vector space basis (consisting of monomials)
 of the quotient ring by the ideal,
 resp.@: of a free module by the module, in case it is finite dimensional
 and if the input is a standard basis with respect to the ring ordering.
-If the input is no standard basis, the leading terms of the input are
+If the input is not a standard basis, the leading terms of the input are
 used and the result may have no meaning.
-@*With two arguments: computes the a part of a vector space basis of the
+@*With two arguments: computes the part of a vector space basis of the
 respective quotient with degree of the monomials equal to the
 second argument. Here, the quotient does not need to be finite dimensional.
 @item @strong{Example:}
@@ -3026,7 +3025,7 @@ This command is obsoleted by
 @ifclear namespaces
 @item @strong{Purpose:}
 reads a library of procedures from a file. If the given filename does
-not start with @kbd{.} or @kbd{/} and can not be located in the current
+not start with @kbd{.} or @kbd{/} and cannot be located in the current
 directory, each directory contained in the library
 @code{SearchPath} is searched for file of this name.
 @xref{Loading of a library}, for more info on @code{SearchPath}.
@@ -4198,6 +4197,7 @@ to their default values on a change of the current basering.
 @table @asis
 @c ---------
 @item @code{none}
+@c ---------
 @cindex none, option
 turns off all options (including the @code{prompt} option).
 @c ---------
@@ -4215,6 +4215,7 @@ orderings).
 @c ---------
 @c @item @code{interrupt}
 @c allows fast interruption of standard basis computation
+@c ---------
 @item @code{intStrategy}
 @cindex intStrategy, option
 avoids division of coefficients during standard basis
@@ -4248,6 +4249,12 @@ disables the bucket representation of polynomials during standard basis
 computations. This option usually decreases the memory usage but
 increases the computation time. It should only be set for
 memory-critical standard basis computations.
+@c ---------
+@item @code{oldStd}
+@cindex oldStd, option
+uses a more lazy approach in std computations,
+which was used in Singular version before 2-0
+(and which may lead to faster or slower computations, depending on the example)
 @c ---------
 @item @code{prot}
 @cindex prot, option
@@ -4680,7 +4687,7 @@ below).
 the description of the format string @code{"betti"} below for more
 details.
 @*The last form returns the printed output as a string. The format
-string determines, which format to use to generate the string.
+string determines which format to use to generate the string.
 
 The following format strings are supported:
 @table @code
@@ -5510,7 +5517,7 @@ coker(A1)=F0/M
 @end ifinfo
 @tex
 $coker(A_1)=F_0/M$
-$$...\longrightarrow F_2 \buildrel{A_2}\over{\longrightarrow} F_1 \buildrel{A_1}\over{\longrightarrow} F_0\longrightarrow F_0/M\longrightarrow 0,$$
+$$...\longrightarrow F_2 \buildrel{A_2}\over{\longrightarrow} F_1 \buildrel{A_1}\over{\longrightarrow} F_0\longrightarrow F_0/M\longrightarrow 0.$$
 @end tex
 If the int expression k is not zero then the computation stops after k steps
 and returns a list of modules (given by standard bases)
@@ -5536,7 +5543,7 @@ module of @code{L[1]}, etc.
 @tex
 (${\tt L[i]}=M_i$
 @end tex
- in the notations from above).
+ in the notations from above.)
 @item @strong{Note:}
 Accessing single elements of a resolution may require that some partial
 computations have to be finished and may therefore take some time.
@@ -6549,7 +6556,7 @@ See
 @item @strong{Purpose:}
 sets a breakpoint at the beginning of the specified procedure or
 at the given line.
-@strong{Note:} Line number 1 is the first line of a libary (for
+@strong{Note:} Line number 1 is the first line of a library (for
 procedures from libraries), resp.@: the line with the @code{@{}.
 @*A line number of -1 removes all breakpoint from that procedure.
 @item @strong{Example:}
@@ -6576,7 +6583,7 @@ See
 @item @strong{Purpose:}
 skips the rest of the innermost @code{for} or @code{while} loop und jumps
 to the beginning of the block. This command is only valid inside a
-@code{for} or a @code{while} construct.
+@code{for} or a @code{while} construction.
 @item @strong{Note:}
 Unlike the C-construct it @strong{does not execute the increment statement}.
 The command @code{continue} is mainly for internal use.
@@ -7008,7 +7015,7 @@ works also from inside a procedure. The commands @code{quit} and
 any
 @item @strong{Purpose:}
 returns the result(s) of a procedure and can only be used inside a
-procedure. Note, that the brackets are required even if no return value
+procedure. Note that the brackets are required even if no return value
 is given.
 @item @strong{Example:}
 @smallexample
@@ -7053,7 +7060,7 @@ repetitive, conditional execution of block.
 @*The boolean_expression is evaluated and if its value is TRUE, the
 block gets executed. This is repeated until boolean_expression evaluates
 to FALSE.  The command @code{break} leaves the innermost @code{while}
-construct.
+construction.
 @item @strong{Example:}
 @smallexample
 int i = 9;
@@ -7090,7 +7097,7 @@ See
 @item @strong{Purpose:}
 sets a break point. Whenever @sc{Singular} reaches the command @code{~;}
 in a sequence of commands it prompts for input. The user may now input
-lines of @sc{Singular} commands. The line length can not exceed 80
+lines of @sc{Singular} commands. The line length cannot exceed 80
 characters.
 @sc{Singular} proceeds with the execution of the command following @code{~;}
 as soon as it receives an empty line.
@@ -7242,7 +7249,7 @@ defining the ring.
 The minimal polynomial has to be specified in the syntax of a polynomial.
 Its variable is not one of the ring variables, but the algebraic element
 which is being adjoined to the field.
-Algebraic extensions are in @sc{singular} only possible over the rational
+Algebraic extensions in @sc{singular} are only possible over the rational
 numbers or over Z/p, p a prime number.
 @c @*@strong{Warning:}
 @*@sc{Singular} does not check whether the given
@@ -7419,7 +7426,7 @@ How to use @code{timer} in order to measure the time for a sequence of
 commands, see example below.
 
 @item @strong{Note for Windows95/98:}
-The value of the @code{timer} can not be used (resp.@: trusted) when
+The value of the @code{timer} cannot be used (resp.@: trusted) when
 @sc{Singular} is run under Windows95/98 (this is due to the shortcomings
 of the Windows95/98 operating system). Use @ref{rtimer}, instead.
 

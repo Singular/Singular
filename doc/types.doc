@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.115 2001-02-28 08:31:44 pohl Exp $
+@comment $Id: types.doc,v 1.116 2001-08-27 14:40:11 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -726,6 +726,7 @@ an intvec or  string comparison:
 @item
 boolean expressions combined by boolean operations (@code{and},
 @code{or}, @code{not})
+@end enumerate
 
 @strong{Note:}
 @c ------------------------------------------------------------
@@ -746,7 +747,6 @@ languages). For example, in these other languages, the value of @code{(1
 || b)} is determined without ever evaluating @code{b}.
 
 See @ref{Major differences to the C programming language}.
-@end enumerate
 
 @c ------------------------------
 @node boolean operations, , boolean expressions, int
@@ -760,13 +760,13 @@ See @ref{Major differences to the C programming language}.
 
 @table @code
 @item and
-logical and, may also be written as @code{&&}
+logical @code{and}, may also be written as @code{&&}
 
 @item or
-logical or, may also be written as @code{||}
+logical @code{or}, may also be written as @code{||}
 
 @item not
-logical not, may also be written as @code{!}
+logical @code{not}, may also be written as @code{!}
 @end table
 
 The precedence of the boolean operations is:
@@ -1389,7 +1389,7 @@ MP (Multi Protocol) links give the possibility to store and communicate
 data in the binary MP format: Read and write access is very fast
 compared to ASCII links. MP links can be established using files (link
 type is @code{MPfile}) or using TCP sockets (link type is
-@code{MPtcp}). All data (including such data that can not be converted
+@code{MPtcp}). All data (including such data that cannot be converted
 to a string) can be written to an MP link. For ring-dependent data, a
 ring description is written together with the data. Reading from an MP
 link returns an expression (not a string) which was evaluated after the
@@ -1415,10 +1415,10 @@ versions). For a general description of MP, see
 MPfile links provide the possibility to store data in a file using the
 binary MP format. Read and write operations are very fast compared to
 ASCII links. Therefore, for storing large amounts of data, MPfile links
-should be used, instead of ASCII links. Unlike ASCII links, data read
+should be used instead of ASCII links. Unlike ASCII links, data read
 from MPfile links is returned as expressions one at a time, and not as a
-string containing the entire content of the file. Furthermore, ring
-dependent data is stored together with a ring description. Therefore,
+string containing the entire content of the file. Furthermore, ring-dependent
+data is stored together with a ring description. Therefore,
 reading ring-dependent data might change the current ring.
 
 The MPfile link describing string has to be one of the following:
@@ -1565,7 +1565,7 @@ application does a connect call. If @sc{Singular} is used as server
 application it has to be started with the command line option @code{-b}.
 Since launching is done using a remote shell command, the host on which
 the application should run must have an entry in the @code{.rhosts}
-file. Even the local machine must have an entry if applications should
+file. Even the local machine must have an entry if applications are to
 be launched locally.
 
 If the MPtcp link is opened in fork mode a child of the current
@@ -1664,7 +1664,7 @@ The DBM link describing string has to be one of the following:
 @*opens the data base for reading and writing.
 @end enumerate
 
-Note, that @code{name} must be given without the suffix @code{.pag} or
+Note that @code{name} must be given without the suffix @code{.pag} or
 @code{.dir}. The name may contain an (absolute) path.
 
 @*@strong{Example:}
@@ -1986,13 +1986,13 @@ Q -> (Z/p)(a,..)
 @end ifinfo
 @end itemize
 In these cases the denominator and the numerator 
-of a number are mapped seperately by the usual
+of a number are mapped separately by the usual
 map from Z to Z/p, and the image of the number 
-is build again afterwards by division. It is thus
+is built again afterwards by division. It is thus
 not allowed to map numbers whose denominator is 
-divisible by the charakteristic of the target 
+divisible by the characteristic of the target 
 ground field, or objects containing such numbers. 
-We, therefore, strongly recommend to use such 
+We, therefore, strongly recommend using such 
 maps only to map objects with integer coefficients. 
 
 

@@ -8,7 +8,6 @@ example deleteSublist;
 example factorial;
 example fibonacci;
 //example kmemory;
-example killall;
 example number_e;
 example number_pi;
 example primes;
@@ -41,6 +40,6 @@ else
 ok;
 watchdog(100,"factorize(eval("+string(f)+"))");
 
-    
+example killall;
 
 tst_status(1);$

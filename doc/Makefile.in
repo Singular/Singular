@@ -1,7 +1,7 @@
 #####################################################################
-### 
-### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.78 2001-05-18 12:31:34 Singular Exp $
+###
+### Makefile for Singular documentation
+### $Id: Makefile.in,v 1.79 2001-08-27 14:40:02 Singular Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -13,9 +13,9 @@ SINGUNAME       = @SINGUNAME@
 S_VERSION       = $${SINGULAR_VERSION-@SINGULAR_VERSION@}
 
 ## directory where info files are installed
-prefix		= @prefix@
-infodir		= ${prefix}/info
-bindir		= @bindir@
+prefix          = @prefix@
+infodir	        = ${prefix}/info
+bindir	        = @bindir@
 htmldir         = ${prefix}/html
 exdir           = ${prefix}/examples
 
@@ -27,40 +27,40 @@ install_docdir  = ${install_prefix}/doc
 install_exdir   = ${install_prefix}/examples
 
 # directory where files for ftp site go
-ftpdir		= /tmp
+ftpdir          = /tmp
 
 ##
 ## needed programs
 ##
 @SET_MAKE@
-LN_S		= @LN_S@
-CC		= @CC@
-INSTALL		= ../install-sh -c
-INSTALL_PROGRAM	= ${INSTALL}
-INSTALL_DATA	= ${INSTALL} -m 644
+LN_S            = @LN_S@
+CC              = @CC@
+INSTALL	        = ../install-sh -c
+INSTALL_PROGRAM = ${INSTALL}
+INSTALL_DATA    = ${INSTALL} -m 644
 MKINSTALLDIRS   = ../mkinstalldirs
-GZIP		= @MYGZIP@
-UUDECODE	= @UUDECODE@
+GZIP            = @MYGZIP@
+UUDECODE        = @UUDECODE@
 
-PERL		= @PERL@
-TEX		= tex
-MAKEINFO	= @MAKEINFO@ --force
-TEXI2DVI	= @TEXI2DVI@
-TEXINDEX	= @TEXINDEX@
+PERL            = @PERL@
+TEX             = tex
+MAKEINFO        = @MAKEINFO@ --force
+TEXI2DVI        = @TEXI2DVI@
+TEXINDEX        = @TEXINDEX@
 # use our local texi2html
-TEXI2HTML	= ./texi2html
-DVIPS		= dvips
+TEXI2HTML       = ./texi2html
+DVIPS           = dvips
 
 VERBOSE         = 1 # override this with make VERBOSE=2
 
 # d2t stuff
-SINGULAR	= @SINGULAR@
+SINGULAR        = @SINGULAR@
 SINGULAR_LIB_DIR= ../Singular/LIB
-LIBPARSE	= ${bindir}/libparse
+LIBPARSE        = ${bindir}/libparse
 DOC_SUBDIR      = ./d2t_singular
 EX_SUBDIR       = ./examples
 CHKSUM_DB       = ${DOC_SUBDIR}/chksum
-DOC2TEX		= ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
+DOC2TEX         = ${PERL} ./doc2tex.pl -docdir ${DOC_SUBDIR} \
                   -Singular ${SINGULAR} -verbose ${VERBOSE} -make ${MAKE} \
 		  -exdir ${EX_SUBDIR}
 PL2DOC		= ${PERL} ./pl2doc.pl -db  ${CHKSUM_DB}
@@ -70,7 +70,7 @@ TMP_DIR		= @TMP_DIR@
 HTML_SUBDIR     = html
 TEXI2HTML_INIT  = t2h_singular.init
 ifeq ($(VERBOSE),0)
-T2H_VERBOSE	= 
+T2H_VERBOSE	=
 else
 T2H_VERBOSE     = -Verbose
 endif
@@ -91,7 +91,7 @@ HTML_TUTOR_TOP     = tutor.htm
 STANDALONE_TEXI_FILES	= COPYING.texi INSTALL_unix.texi NEWS.texi \
 			  README_download.texi README_ftp.texi \
 			  README_distribution.texi README_src.texi \
-			  INSTALL_win.texi 
+			  INSTALL_win.texi
 
 DOC2TEX_FILES	= \
 		examples.tex general.tex ti_ip.tex math.tex reference.tex \
@@ -119,7 +119,7 @@ export PATH := "${bindir}:${PATH}"
 all: info dvi html singular.idx
 
 # info stuff
-info: singular.hlp 
+info: singular.hlp
 
 singular.hlp: ${MANUAL_FILES} singular.tex
 	- ${MAKEINFO} --no-split singular.tex
@@ -127,13 +127,13 @@ singular.hlp: ${MANUAL_FILES} singular.tex
 # dvi stuff
 dvi: manual.dvi usercard.dvi
 
-singular.dvi: ${MANUAL_FILES} singular.tex 
-	${TEXI2DVI} singular.tex 
+singular.dvi: ${MANUAL_FILES} singular.tex
+	${TEXI2DVI} singular.tex
 
 manual.dvi: ${MANUAL_FILES} manual.tex
 	${TEXI2DVI} manual.tex
 
-tutor.dvi: ${TUTOR_FILES} 
+tutor.dvi: ${TUTOR_FILES}
 	${TEXI2DVI} tutor.tex
 
 usercard.dvi: usercard.tex singcard.tex
@@ -161,7 +161,7 @@ singular.tex: ${MANUAL_FILES} doc2tex.pl ${LIB_TEX_FILES} ${SINGULAR} ${LIBPARSE
 %_noEx.tex : %.doc doc2tex.pl ${SINGULAR}
 	${DOC2TEX} -o $@ -no_ex $<
 
-%.tex: %.doc doc2tex.pl ${SINGULAR} 
+%.tex: %.doc doc2tex.pl ${SINGULAR}
 	${DOC2TEX} -o $@ $<
 
 # pattern rules for lib docus
@@ -186,7 +186,7 @@ singular.idx: singular.hlp ${HTML_SUBDIR}/${HTML_MANUAL_PREFIX}_cp.idx doc2idx.p
 # stand-alone targest
 #
 
-STANDALONE_TXT_FILES := $(STANDALONE_TEXI_FILES:.texi=.txt) 
+STANDALONE_TXT_FILES := $(STANDALONE_TEXI_FILES:.texi=.txt)
 STANDALONE_HTML_FILES := $(STANDALONE_TEXI_FILES:.texi=.html)
 STANDALONE_FILES      := $(STANDALONE_TEXI_FILES:.texi=)
 
@@ -260,7 +260,7 @@ images/%.jpg : images/%.jpg.uu
 images/%.xbm : images/%.xbm.uu
 	cd images; ${UUDECODE} ../$< ;cd ..
 
-${IMAGES_HTML} : ${IMAGES_SRC} 
+${IMAGES_HTML} : ${IMAGES_SRC}
 	test -d ${HTML_SUBDIR} || mkdir ${HTML_SUBDIR}
 	cp ${IMAGES_SRC} ${HTML_SUBDIR}
 
@@ -277,7 +277,7 @@ install: singular.hlp html singular.idx standalone
 	test -r ${htmldir} || ln -s `pwd`/${HTML_SUBDIR} ${htmldir}
 	test -r ${exdir} || ln -s `pwd`/${EX_SUBDIR} ${exdir}
 
-uninstall: 
+uninstall:
 	rm -f ${infodir}/singular.hlp
 	- rmdir ${infodir}
 
@@ -288,7 +288,7 @@ install-sharedist: singular.hlp html singular.idx \
 	${MKINSTALLDIRS} ${install_infodir}
 	${INSTALL_DATA} singular.hlp ${install_infodir}
 	chmod -R +rX ${install_infodir}
-	${MKINSTALLDIRS} ${install_htmldir} 
+	${MKINSTALLDIRS} ${install_htmldir}
 	cp ${HTML_SUBDIR}/*.htm ${install_htmldir}
 	cp ${HTML_SUBDIR}/*.gif ${install_htmldir}
 	cp ${HTML_SUBDIR}/*.jpg ${install_htmldir}
@@ -343,7 +343,7 @@ lib2doc.tar.gz:
 clean: mostlyclean
 	/bin/rm -rf singular.tex manual.tex ${DOC_SUBDIR} ${EX_SUBDIR}
 
-mostlyclean: 
+mostlyclean:
 	/bin/rm -f .singular_hist doe.tmp dump.ascii example.mp example.txt
 	/bin/rm -f save_i test.ascii test.mp
 	/bin/rm -f Z* *.tst *.pag *.dir *.lst *.log *.aux *.cp *.cps

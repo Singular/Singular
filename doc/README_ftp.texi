@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: README_ftp.texi,v 1.11 2001-02-28 16:06:47 Singular Exp $
+@comment $Id: README_ftp.texi,v 1.12 2001-08-27 14:40:03 Singular Exp $
 @c FILE: README_download.texi
 @c PURPOSE: This should reside as README file in the main directory of the
 @c          Singular ftp site.
@@ -9,10 +9,10 @@
 @end ifclear
 
 
-@majorheading Welcome to the Development FTP site of SINGULAR
+@majorheading Welcome to the Main FTP site of SINGULAR
 
 @sc{Singular} is a Computer Algebra system for polynomial computations
-with special emphasize on the needs of commutative algebra, algebraic
+with special emphasis on the needs of commutative algebra, algebraic
 geometry, singularity theory and polynomial system solving. For a more
 detailed overview of 
 @sc{Singular}, see 
@@ -20,7 +20,12 @@ detailed overview of
 @uref{http://www.singular.uni-kl.de/Overview/}
 @end display
 
-So far, there are only version for Linux, HPUX, SunOS, and Windows 95/98/Nt/2K.
+@sc{Singular} is developed on UNIX systems (Linux and HPUX).
+Moreover, there exist ports to FreeBSD, SunOS, IRIX, AIX, 
+and Windows 95/98/NT/2K.
+If your operating system is not in this list you may try to port
+@sc{Singular} to your platform
+(see @uref{http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/src/README.html})
 
 @macro nref{name,url}
 @ifhtml
@@ -49,16 +54,7 @@ independent data like documentation and libraries.
 executables, like the @sc{Singular} program.
 @end table
 
-Although there are no known bugs, it is to be
-expected that the current version @value{VERSION} is not as stable as
-the 1.2 version(s), since major changes were done to the @sc{Singular}
-kernel. Therefore, it is important to us, that users try out this new
-version and tell us what they think about it. Thank you very much in
-advance for your support. 
-
 @include README_download.texi
-
-
 
 @heading More information about @sc{Singular}: Comments, Questions, Bug Reports
 

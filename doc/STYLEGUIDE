@@ -10,8 +10,8 @@
     @cindex Procedures
     @section Getting started
 
-+ Taucht ein Punkt innerhalb eines Satzes auf (z.B. als Ende einer 
-  Abkuerzung), so sollte darauf ein @: folgen. Sonst erscheint im 
++ Taucht ein Punkt innerhalb eines Satzes auf (z.B. als Ende einer
+  Abkuerzung), so sollte darauf ein @: folgen. Sonst erscheint im
   Ausdruch ein zu grosser Abstand zum nachfolgenden Wort:
     compute w.r.t.@: a wellordering
     a Groebner resp.@: standard basis
@@ -20,7 +20,7 @@
   ``...''.
 
 + Die Zeichen @ und { und } muessen in texinfo mit @ "gequoted"
-  werden (nicht mit Backslash!). 
+  werden (nicht mit Backslash!).
   Der Backslash muss nicht gequoted werden:
     @  muss als  @@  geschrieben werden
     {  muss als  @{  geschrieben werden
@@ -31,14 +31,14 @@
   nicht gequoted werden, das macht doc2tex alleine. Dies gilt insbesondere
   auch fuer Dateien, die ueber @c include eingelesen werden.
 
-+ Bei Aenderung von @node-Namen daran denken, dass der entsprechende Name 
-  auch im vorherigen und naechsten @node geaendert werden muss. 
++ Bei Aenderung von @node-Namen daran denken, dass der entsprechende Name
+  auch im vorherigen und naechsten @node geaendert werden muss.
   Bei Aenderung von (Sub)sections daran denken, die Menues auf den neuen
-  Stand zu bringen. 
+  Stand zu bringen.
   Fehlerhafte @node- und @menu-Strukturen sieht man, wenn man singular.hlp
   erzeugt.
 
-+ bislang wurde von texinfo nach einem @tex Kommando zu viel space 
++ bislang wurde von texinfo nach einem @tex Kommando zu viel space
   eingesetzt. Der Fehler ist im texinfo behoben. Man kann nun also auch
   mitten in einem Satz auf @tex umschalten, ohne etwas wie \noindent
   einsetzen zu muessen.
@@ -66,7 +66,7 @@
 + don't use any sophisticated tex commands (like \eqalign), restrict
   yourself to command which latex understands, as well.
 
-+ no "@"-constructs within @tex ... @end tex 
++ no "@"-constructs within @tex ... @end tex
 
 + @tex and '@end tex' should always be on separate lines
 
@@ -82,7 +82,7 @@
 
 + Alle Singular-Befehle und -Variablen werden im Style @code
   geschrieben:
-    @code{std}, @code{TRACE} 
+    @code{std}, @code{TRACE}
 
 + Singular-Typen werden NICHT im Style @code geschrieben:
     int, intmat
@@ -105,7 +105,7 @@
   auch z.B. Kommandozeilen-Optionen, etc.)  wird in der dritten Person
   beschrieben. Sie fangen mit einem Kleinbuchstaben an und schliessen mit
   einem Punkt.  Bitte vollstaendige Saetze formulieren.
-  
+
     npars: returns the number of ring parameters.
 
   Statt "will be" wird "is" verwendet:
@@ -126,7 +126,7 @@
 + "Groebner" (ohne Umlaut)
 
 + "I/O" statt "i/o"
-  
+
 + Meistens verwenden wir den Begriff "monomial ordering".
 
 + "Computer Algebra" statt "computer algebra"
@@ -152,13 +152,13 @@
 * generally, use @samllexample for (code) examples
 
 + Ist der Kommentar zu einem Kommando in einem Beispiel, das von Singular
-  gerechnet werden soll, laenger als eine Zeile, muss das Kommando in der 
-  untersten Zeile des Kommentars stehen (sonst wird in spaeter die 
+  gerechnet werden soll, laenger als eine Zeile, muss das Kommando in der
+  untersten Zeile des Kommentars stehen (sonst wird in spaeter die
   Singular-Ausgabe zwischen den Kommentar und das Kommando geschoben):
 @smallexample
 @c example
   ring r;
-                 // the following option leads to some useful output     
+                 // the following option leads to some useful output
   option(prot);  // during the Groebner basis computation.
 @c example
 @end smallexample
@@ -167,7 +167,7 @@
   @expansion ein Leerzeichen kommen, und geschweifte Klammern muessen
   gequoted werden mit @:
 @smallexample
-int i=3; 
+int i=3;
     // Kommentare ueber mehere Zeilen duerfen natuerlich
 i;  // mit Leerzeichen beginnen.
 @{@} // quote von geschweiften Klammern
@@ -190,9 +190,9 @@ i;  // mit Leerzeichen beginnen.
 
   @xref      fuer den Anfang eines Satzes
 
-   	     @xref{Tropical Storms}, for more info.
-   	     *Note Tropical Storms::, for more info.
-   	     See Section 3.1 [Tropical Storms], page 24, for more info.
+             @xref{Tropical Storms}, for more info.
+             *Note Tropical Storms::, for more info.
+             See Section 3.1 [Tropical Storms], page 24, for more info.
 
   @ref       fuer den Ende eines Satzes
 
@@ -214,7 +214,7 @@ i;  // mit Leerzeichen beginnen.
 + @pxref darf nur innerhalb einer Klammer auftauchen.  Und zwar nur ein
   einzelnes, keine Liste von @pxref's.
 
-+ mit der neuen Version von doc2tex kann (soll) man Listen von 
++ mit der neuen Version von doc2tex kann (soll) man Listen von
   Cross-Referenzen wie folgt schreiben:
     @c ref
     See
@@ -254,28 +254,28 @@ i;  // mit Leerzeichen beginnen.
 
 * Umlaute *
 ===========
-@"o                 "o      umlaut accent          
-@'o                 'o      acute accent           
-@,{c}               c,      cedilla accent         
-@=o                 =o      macron/overbar accent  
-@^o                 ^o      circumflex accent      
-@`o                 `o      grave accent           
-@~o                 ~o      tilde accent           
-@dotaccent{o}       .o      overdot accent         
-@H{o}               ''o     long Hungarian umlaut  
-@ringaccent{o}      *o      ring accent            
-@tieaccent{oo}      [oo     tie-after accent       
-@u{o}               (o      breve accent           
-@ubaraccent{o}      o_      underbar accent        
-@udotaccent{o}      o-.     underdot accent        
-@v{o}               <o      hacek or check accent  
+@"o                 "o      umlaut accent
+@'o                 'o      acute accent
+@,{c}               c,      cedilla accent
+@=o                 =o      macron/overbar accent
+@^o                 ^o      circumflex accent
+@`o                 `o      grave accent
+@~o                 ~o      tilde accent
+@dotaccent{o}       .o      overdot accent
+@H{o}               ''o     long Hungarian umlaut
+@ringaccent{o}      *o      ring accent
+@tieaccent{oo}      [oo     tie-after accent
+@u{o}               (o      breve accent
+@ubaraccent{o}      o_      underbar accent
+@udotaccent{o}      o-.     underdot accent
+@v{o}               <o      hacek or check accent
 @ss{}               ss      es-zet or sharp S
 
 * allgemeines *
 ===============
 
-+ Die Funktionalitaet von doc2tex ist im sourcecode ausfuehrlich 
++ Die Funktionalitaet von doc2tex ist im sourcecode ausfuehrlich
   domkumentiert. Siehe doc2tex.pl - Vorspann.
 
 ------------------------------------------------------------
-$Id: STYLEGUIDE,v 1.16 2001-04-19 11:48:37 Singular Exp $
+$Id: STYLEGUIDE,v 1.17 2001-08-27 14:40:04 Singular Exp $

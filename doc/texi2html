@@ -36,7 +36,7 @@ require 5.0;
 #--##############################################################################
 
 # CVS version:
-# $Id: texi2html,v 1.10 2000-08-16 14:24:09 obachman Exp $
+# $Id: texi2html,v 1.11 2001-08-27 14:40:10 Singular Exp $
 
 # Homepage:
 $T2H_HOMEPAGE = <<EOT;
@@ -92,7 +92,7 @@ eval { ($T2H_USER = (getpwuid ($<))[6]) =~ s/,.*//;}; # Who am i
 # Copy this file and make changes to it, if you like.
 # Afterwards, either, load it with command-line option -init_file <your_init_file>
 #
-# $Id: texi2html,v 1.10 2000-08-16 14:24:09 obachman Exp $
+# $Id: texi2html,v 1.11 2001-08-27 14:40:10 Singular Exp $
 
 ######################################################################
 # stuff which can also be set by command-line options
@@ -1521,7 +1521,7 @@ package Getopt::MySimple;
 
 # --------------------------------------------------------------------------
 # Locally modified by obachman (Display type instead of env, order by cmp)
-# $Id: texi2html,v 1.10 2000-08-16 14:24:09 obachman Exp $
+# $Id: texi2html,v 1.11 2001-08-27 14:40:10 Singular Exp $
 
 # use strict;
 # no strict 'refs';
@@ -5426,6 +5426,9 @@ sub protect_html {
     $what =~ s/\&\#60;\/A\&\#62;/<\/A>/g;	      # </A>
     $what =~ s/\&\#60;A ([^\&]+)\&\#62;/<A $1>/g;     # <A [^&]+>
     $what =~ s/\&\#60;IMG ([^\&]+)\&\#62;/<IMG $1>/g; # <IMG [^&]+>
+    $what =~ s/\&\#38;/\&amp;/g;
+    $what =~ s/\&\#60;/\&lt;/g;
+    $what =~ s/\&\#62;/\&gt;/g;
     return($what);
 }
 
@@ -5449,6 +5452,9 @@ sub unprotect_html {
     $what =~ s/\&\#38;/\&/g;
     $what =~ s/\&\#60;/\</g;
     $what =~ s/\&\#62;/\>/g;
+    $what =~ s/\&amp;/\&/g;
+    $what =~ s/\&lt;/\</g;
+    $what =~ s/\&gt;/\>/g;
     return($what);
 }
 

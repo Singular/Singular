@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.34 2001-02-26 16:28:51 mschulze Exp $
+@comment $Id: NEWS.texi,v 1.35 2001-08-27 14:40:03 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -20,9 +20,8 @@
 @end macro
 @end ifset
 
-The current version @value{VERSION} is the first release of the new
-release series version 2-0. Its is a major upgrade from both, the 1-2 and
-1-3 release serieses.
+The current version @value{VERSION} is an update to the new
+release series version 2-0. 
 
 Singular version 2 is generally much faster than any previous
 version of Singular, due to a rewrite of major parts of the Singular
@@ -57,7 +56,8 @@ Linux.
 @table @asis
 @item @strong{Windows distribution}
 created with Installshield, includes Cygwin, Singular, and (optionally)
-XEmacs, distributed as several self-extracting archives.
+XEmacs, distributed as several self-extracting archives. Contains @sc{Singular} help
+in a Windows Help format (the file @code{Manual.hlp}).
 @item @nref{Emacs user interface}
 the recommended interface for using @sc{Singular}
 @item @code{ESingular}
@@ -76,6 +76,8 @@ Provide on-line examples for all kernel and library commands.
 @code{Singular/<version>/}
 @item http://www.singular.uni-kl.de
 New WWW home-site of @sc{Singular}
+@item RPM versions of Singular
+including integration into KDE
 @end table
 
 @heading Extensions of the ring concept
@@ -97,6 +99,8 @@ Reorganisation of libraries into "Categories".
 @item @nref{toric_lib} procedures for Integer Programming using Groebner bases
 @item @nref{spectrum_lib} procedures for computing spectra
 @item @nref{mregular_lib}  procedures for computing the Castelnuovo-Mumford regularity
+@c @item @nref{mprimdec}
+@c procedures for primary decomposition of modules
 @item @nref{mondromy_lib}
 procedures for computing the monodromy of a singularity
 @item @nref{gaussman_lib}
@@ -182,6 +186,8 @@ extended for reduced normal form of rational expressions
 
 @heading @sc{Singular} functions whose syntax/semantics has changed
 @table @asis
+@item @nref{division}
+arguments swapped w.r.t. version 2-0-1 and before
 @item @nref{coeffs}
 Extended possible syntax to
 @code{coeffs(ideal,ideal)} and @code{coeffs(module,module)} which is
@@ -237,10 +243,12 @@ Makes polynomial arithmetic significantly faster: Especially for block -
 or weighted orderings.
 Bucket representation of polynomials in std;
 Ring change during std, res and bareiss computations
-(resulting in more speed and less sapce consumption).
+(resulting in more speed and less space consumption).
 @item new memory management
 Results is less memory usage, faster memory allocation/free, less
 fragmentation, much better locality of reference.
+@item factorization
+revisited, missing cases implemented
 @end table
 
 @heading Porting
@@ -250,5 +258,6 @@ fragmentation, much better locality of reference.
 @code{libreadline} works only with ix86-libc5,
 ix86-libc6,HPUX_9,HPUX_10
 @item Singular is available for ix86-libc5, ix86-libc6, HPUX_9, HPUX_10,
-SunOS-4, SunOS-5, ix86-Win (runs on Windows 95/98/ME, NT 4.0)
+SunOS-4, SunOS-5, IRIX-6, ix86-Win (runs on Windows 95/98/NT4/2000),
+FreeBSD 4.2, MacOS X
 @end itemize

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: README_download.texi,v 1.8 2001-03-02 13:09:13 Singular Exp $
+@comment $Id: README_download.texi,v 1.9 2001-08-27 14:40:03 Singular Exp $
 @c FILE: README_download.texi
 @c PURPOSE: downloading instructions, to be includeded in manual and README_ftp
 @c
@@ -30,7 +30,7 @@ system for which @sc{Singular} is compiled. Choose one of the following:
 @multitable @columnfractions .2 .8
 @item @code{ix86-Linux}
 @tab PC's running under Linux with @code{libc} version 6 (e.g., for SuSe
-Linux distirbution version >= 6; RedHat Linux distirbution version >= 5.2).
+Linux distribution version >= 6; RedHat Linux distribution version >= 5.2).
 @item @code{ix86-Linux-libc5}
 @tab PC's running under Linux with @code{libc} version 5 (if you are not 
 sure which @code{libc} version you have, run @code{ldd /bin/ls}).
@@ -45,6 +45,10 @@ described below.
 @tab HP workstations running under HPUX version 10
 @item @code{SunOS-5}
 @tab Sun workstations running Solaris version 5
+@item @code{IRIX-6}
+@tab IRIX workstations running IRIX version 6
+@item @code{AIX-4}
+@tab AIX workstations running AIX version 4
 @end multitable
 Please contact us if
 you can not find an appropriate architecture dependent archive.
@@ -92,9 +96,6 @@ tools/DLLs.
 @item @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Singular-@value{VERSION}-Typical.exe,Singular-@value{VERSION}-Typical.exe}
 Typical archive to download. Installs Singular and the XEmacs editor to
 run ESingular.
-@item @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Singular-@value{VERSION}-Custom.exe,Singular-@value{VERSION}-Custom.exe}
-Maximal archive to download. Installs Singular, XEmacs, and many Cygwin
-development tools (like gcc, gdb, make, perl, etc).
 @end table
 
 @item 
@@ -109,5 +110,5 @@ for details on how to finish the installation.
 @end enumerate
 
 @heading To download @sc{Singular} for the Macintosh
-The port of @sc{Singular} will be aviable soon.
+The port of @sc{Singular} will be available soon.
 

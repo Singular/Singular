@@ -1,7 +1,7 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_unix.texi,v 1.15 2001-04-04 13:53:56 lossen Exp $
+@comment $Id: INSTALL_unix.texi,v 1.16 2001-08-27 14:40:02 Singular Exp $
 @c FILE: INSTALL_unix.texi
-@c PURPOSE: Installation instruction for Singular on  Unix 
+@c PURPOSE: Installation instruction for Singular on  Unix
 @c
 
 @ifclear VERSION
@@ -20,7 +20,7 @@
 @include uname.texi
 @end ifset
 
-To install @sc{Singular} on a 
+To install @sc{Singular} on a
 @ifset UNAME
 @value{_UNAME}
 @end ifset
@@ -28,39 +28,38 @@ To install @sc{Singular} on a
 Unix
 @end ifclear
 platform, you need the following two
-archives: 
+archives:
 @table @code
-@item Singular-@value{VERSION}-share.tar.gz 
+@item Singular-@value{VERSION}-share.tar.gz
 contains architecture independent data like documentation and libraries
-(alternatively, you may also download 
+(alternatively, you may also download
 @code{Singular-@value{VERSION}-share.zip}).
 @item Singular-@value{VERSION}-@value{_UNAME}.tar.gz
 contains architecture dependent executables, like the @sc{Singular}
 program.
+@end table
 @ifclear UNAME
+@*
 @code{@value{_UNAME}} is a description of the processor and operating system
 for which @sc{Singular} is compiled (e.g, @code{ix86-Linux}). Please contact us if
 you can not find an appropriate architecture dependent archive.
 @end ifclear
-@end table
 
 You can obtain these (and other) archives from
 @display
-@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular}. 
+@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular}.
 @end display
 
 @ifclear singularmanual
-@strong{Important:} Please see 
+@strong{Important:} Please see
 @ifhtml
 @uref{COPYING.html, COPYING}
 @end ifhtml
 @ifnothtml
-the file COPYING contained in the distribution 
+the file COPYING contained in the distribution
 @end ifnothtml
-for license
-information on @sc{Singular}. In particular, notice that we only grant you
-permission to use @sc{Singular} if you have registered yourself as a
-@sc{Singular} user by using the registration form on the @sc{Singular} 
+for license information on @sc{Singular}. Please register yourself as a
+@sc{Singular} user by using the registration form on the @sc{Singular}
 homepage @uref{http://www.singular.uni-kl.de}.
 If for some reason you cannot access the registration form, you can also
 register by sending an email to @email{singular@@mathematik.uni-kl.de}
@@ -77,12 +76,12 @@ these steps.
 Simply change to the directory in which you wish to install
 @sc{Singular} (usually wherever you install 3rd-party software):
 @smallexample
-cd /usr/local/	
+cd /usr/local
 @end smallexample
 
 @sc{Singular} specific subdirectories will be created in such a way
 that multiple versions and multiple architecture dependent files
-of @sc{Singular} can peaceably coexist under the same @code{/usr/local/}
+of @sc{Singular} can peaceably coexist under the same @code{/usr/local}
 tree.
 
 
@@ -92,17 +91,18 @@ Unpack the archives:
 gzip -dc Singular-@value{VERSION}-@value{_UNAME}.tar.gz | tar -pxf -
 gzip -dc Singular-@value{VERSION}-share.tar.gz | tar -pxf -
 @end smallexample
-If you have downloaded @code{Singular-@value{VERSION}-share.zip},
-unpack with 
-@smallexample
-unzip -u Singular-@value{VERSION}-share.zip
-@end smallexample
+@c version 2-0-x does not have *-share.zip:
+@c If you have downloaded @code{Singular-@value{VERSION}-share.zip},
+@c unpack with
+@c @smallexample
+@c unzip -u Singular-@value{VERSION}-share.zip
+@c @end smallexample
 
-This creates the following 
+This creates the following
 @multitable @columnfractions .36 .64
 @item (sub)directories
 @tab  which contain
-@item @code{Singular/@value{VERSION}/@value{_UNAME}} 
+@item @code{Singular/@value{VERSION}/@value{_UNAME}}
 @tab @code{Singular} and @code{ESingular} programs
 @item @code{Singular/@value{VERSION}/LIB}
 @tab @sc{Singular} libraries (@code{*.lib} files)
@@ -120,49 +120,49 @@ This creates the following
 
 For the executable to work, the directory layout must look pretty much
 like this; the executable looks for "sibling" directories at run-time
-to figure out where its @sc{Singular} libraries and on-line 
+to figure out where its @sc{Singular} libraries and on-line
 documentation files are.  These constraints on the local directory layout
 are necessary to avoid having to hard-code pathnames into the
 executables, or require that environment variables be set before
 running the executable. In particular, you @strong{must not move or copy}
 the @sc{Singular} executables to another place, but use soft-links
-instead. 
-@end enumerate 
+instead.
+@end enumerate
 
 The following steps are optional:
 
 @itemize @bullet
 @item
 Arrange that typing @code{Singular} at the shell prompt starts up the
-installed @sc{Singular} executable. 
+installed @sc{Singular} executable.
 
 If you have root permission, do:
-@smallexample      
+@smallexample
 ln -s `pwd`/Singular/@value{VERSION}/@value{_UNAME}/Singular  /usr/local/bin/Singular-@value{VERSION}
 ln -s `pwd`/Singular/@value{VERSION}/@value{_UNAME}/ESingular  /usr/local/bin/ESingular-@value{VERSION}
 ln -s /usr/local/bin/Singular-@value{VERSION} /usr/local/bin/Singular
 ln -s /usr/local/bin/ESingular-@value{VERSION} /usr/local/bin/ESingular
 @end smallexample
-	
+
 Otherwise, append the directory
 @code{`pwd`/Singular/@value{VERSION}/@value{_UNAME}/} to your @code{$PATH}
 environment variable. For the @code{csh} (or, @code{tcsh}) shell do:
 @smallexample
 set path=(`pwd`/Singular/@value{VERSION}/@value{_UNAME} $path)
-@end smallexample 
+@end smallexample
 For the @code{bash} (or, @code{ksh}) shell do:
-@smallexample  
+@smallexample
 export PATH=`pwd`/Singular/@value{VERSION}/@value{_UNAME}/:$PATH
 @end smallexample
 
 You also might want to adjust your personal start-up files
 (@code{~/.cshrc} for @code{csh}, @code{~/.tcshrc} for @code{tcsh}, or
-@code{~/.profile} for @code{bash}) accordingly, 
+@code{~/.profile} for @code{bash}) accordingly,
 so that the @code{$PATH} variable is set automatically each time you login.
 
-@strong{IMPORTANT:} Do @emph{never} move or copy the file 
+@strong{IMPORTANT:} Do @emph{never} move or copy the file
 @code{Singular/@value{VERSION}/@value{_UNAME}/Singular} to another
-place, but use soft-links instead. 
+place, but use soft-links instead.
 
 @item
 If you wish to use any of following features of
@@ -183,7 +183,7 @@ higher
 @item TAB completion and history mechanism of ASCII-terminal interface
 @tab shared @uref{ftp://ftp.de.uu.net/pub/gnu/readline/,,readline}
 library, i.e. @code{/usr/lib/libreadline.so}
-@item visualization of curves and surfaces 
+@item visualization of curves and surfaces
 @tab
 @uref{http://www.mathematik.uni-mainz.de/AlgebraischeGeometrie/surf/surf.shtml,,surf}
 version 0.9 or higher (only available for Linux and Solaris).
@@ -212,30 +212,30 @@ system("--allow-net", 1);
 @end smallexample
 in it, allows the on-line help system to fetch its @code{html} pages
 from @uref{http://www.singular.uni-kl.de, Singular's WWW
-home site} 
+home site}
 in case its local html pages are not found. That is, you may delete your
-local html pages, after setting this option. 
+local html pages, after setting this option.
 
-See also 
+See also
 @ifset singularmanual
 @ref{The online help system}, @ref{Command line options}, and
 @ref{Startup sequence},
 @end ifset
 @ifclear singularmanual
 the sections @emph{The online help system}, @emph{Command line options}, and
-@emph{Startup sequence} in the @sc{Singular} manual 
+@emph{Startup sequence} in the @sc{Singular} manual
 @end ifclear
 for more details on customizing the on-line help system.
 
-@item 
-Add the line 
+@item
+Add the line
 @smallexample
 * Singular:(singular.hlp).     A system for polynomial computations
 @end smallexample
 to your system-wide @code{dir} file (usually @code{/usr/info/dir} or
 @code{/usr/local/info/dir} and  copy or soft-link the file
-@code{Singular/@value{VERSION}/info/singular.hlp} 
-to the directory of your @code{dir} file. 
+@code{Singular/@value{VERSION}/info/singular.hlp}
+to the directory of your @code{dir} file.
 @*This assures that the
 @sc{Singular} manual can be  accessed from stand-alone texinfo
 browser programs such as @code{info} or @code{Emacs}.
@@ -252,8 +252,8 @@ directories of the Singular distribution. If in doubt, @code{cd} to the
 directory where you unpacked @sc{Singular}, and do (as root, if
 necessary):
 @smallexample
-chmod +rX Singular 
-@end smallexample 
+chmod +rX Singular
+@end smallexample
 
 @item
 Start up @sc{Singular}, and issue the command @code{system("Singular");}.
@@ -264,8 +264,8 @@ ask you to report (see below).
 Check whether the directories containing the libraries and on-line help
 files can be found by @sc{Singular}: If @code{$bindir} denotes the
 directory where the @sc{Singular} executable resides, then @sc{Singular}
-looks for library files as follows:    
-@* (0) the current directory     
+looks for library files as follows:
+@* (0) the current directory
 @* (1) all dirs of the environment variable SINGULARPATH
 @* (2) @code{$bindir/LIB}
 @* (3) @code{$bindir/../LIB}
@@ -284,7 +284,7 @@ directories by starting up @sc{Singular} with the
 @cindex SuSE, ESingular bug
 @cindex ESingular, no prompt
 @cindex bug, ESingular
-This is due to the very restrictive access rights of @code{/dev/pty*} of 
+This is due to the very restrictive access rights of @code{/dev/pty*} of
 the standard @uref{http:/www.suse.de,SuSE} distribution (starting from
 version 6.3 on). As root, do one of the following: Either
 @example
@@ -307,7 +307,7 @@ broken which leads to messages like
 Name collision between 9826 9836
 @end example
 when @sc{Singular} is started. To fix this, you can get fixed termcap
-files from @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils} 
+files from @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils}
 by downloading the files termcap-<uname-description> and either
 replace your /etc/termcap file by the file found there, or view, and
 redo the respective changes by @code{diff}'ing the downloaded and the
@@ -323,14 +323,14 @@ To fix this, download and install
 @code{Singular-@value{VERSION}-ix86-Linux-static.tar.gz}.
 
 @item For @code{AIX} systems:
-@*The default @code{info} program of the system is not GNU's texinfo 
+@*The default @code{info} program of the system is not GNU's texinfo
 browser which is used to display the on-line documentation in the
 @code{info} format. Therefore, the distribution of the AIX executable
-already contains the @code{info} browser program. 
+already contains the @code{info} browser program.
 If you remove this program, make sure that the GNU
 @code{info} program is executed if you call '@code{info}' from your shell.
 
-@item For any other troubles: 
+@item For any other troubles:
 @*Please send an email to @email{singular@@mathematik.uni-kl.de}
 and include the header which is displayed by starting up @sc{Singular}
 with the @code{-v} option, and a description of your machine (issue the
@@ -351,7 +351,7 @@ contact us at
 @end display
 
 @ifclear singularmanual
-GOOD LUCK and ENJOY!                         
+GOOD LUCK and ENJOY!
 Your @sc{Singular} team.
 @end ifclear
 

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.194 2001-04-19 11:48:37 Singular Exp $
+@comment $Id: general.doc,v 1.195 2001-08-27 14:40:04 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -47,7 +47,7 @@ There are a few important notes which one should not forget:
 @itemize @bullet
 @item
 every command has to be terminated by a @code{;} (semicolon) followed
-by a @code{RETURN}
+by a @key{RETURN}
 @item
 the online help is accessible by means of the @code{help} function
 @end itemize
@@ -82,7 +82,7 @@ under Emacs} for details).
 
 Generally, we recommend to use @sc{Singular} in its Emacs interface,
 since this offers many more features and is more convenient to
-use than the ASCII-terminal interface(@pxref{Emacs user interface}).
+use than the ASCII-terminal interface (@pxref{Emacs user interface}).
 
 To exit @sc{Singular} type @code{quit;}, @code{exit;} or @code{$} (or,
 when running within Emacs preferably type @code{C-c $}).
@@ -305,7 +305,6 @@ environment variable @code{SINGULAR_INFO_FILE}.
 @ref{system}
 @ref{Startup sequence}
 @c ref
-
 
 @subsubheading Info help browsers
 @cindex info
@@ -859,7 +858,7 @@ window commands are:
 @tab @code{File->Un-Split}
 @tab Un-Split window (i.e., kill other windows)
 @item @code{C-x o}
-@tab 
+@tab
 @tab Goto other window, i.e. move cursor into other window.
 @end multitable
 
@@ -3941,7 +3940,7 @@ one subsection for each procedure):
 If @sc{Singular} does not come back to the prompt while calling a user
 defined procedure, probably a bracket or a @code{"} is missing.  The
 easiest way to leave the procedure is to type some brackets or @code{"}
-and then @code{RETURN} .
+and then @key{RETURN} .
 
 @menu
 * Tracing of procedures::
@@ -3957,7 +3956,7 @@ and then @code{RETURN} .
 Setting the @code{TRACE} variable to 1 (resp.@: 3) results in a listing of
 the called procedures (resp.@: together with line numbers).
 If @code{TRACE} is set to 4, @code{Singular}
-displays each line before its interpretation and waits for the @code{RETURN}
+displays each line before its interpretation and waits for the @key{RETURN}
 key being pressed.
 @menu
 * TRACE var::
