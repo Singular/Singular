@@ -1,0 +1,76 @@
+\input texinfo    @c -*-texinfo-*-
+@comment %**start of header
+@set VERSION 1.2
+@c ---------------------------------------------------------------------------
+
+@setfilename tutor.hlp
+@settitle Singular Tutorial
+@iftex
+@afourpaper
+@finalout
+@end iftex
+@comment %**end of header
+@c ------------------------
+@ifinfo
+this is the texinfo file with the Singular Tutorial (version @value{VERSION})
+@end ifinfo
+@c
+@titlepage
+@sp 2
+@center @titlefont{Singular}
+@sp 2
+@center A Computer Algebra System for Commutative Algebra, Algebraic Geometry
+@center  and Singularity Theory
+@sp 5
+@center @titlefont{Tutorial}
+@center Version @value{VERSION}
+@sp 2
+@center Singular is created and its development is directed and coordinated by
+@center G.-M. Greuel, G. Pfister and H.Schoenemann
+@center with contributions by
+@center O. Bachmann, W. Decker, C. Gorzel, H. Grassmann, K. Krueger, B. Martin, M. Messollen,
+@center W. Neumann, Th. Nuessler, W. Pohl, T. Siebert, R. Stobbe, T. Wichmann
+@sp 2
+@author Fachbereich Mathematik und Zentrum fuer Computeralgebra
+@author Universitaet Kaiserslautern
+@author D-67653 Kaiserslautern
+@end titlepage
+@c ----------------------------------------------------------------------------
+@node    Top, ,    (dir),    (dir)
+@ifinfo
+q: quit help, m: menu item, n: next node, p: previous node, u: up
+@sp 1
+@center Singular Tutorial
+@center Version @value{VERSION}
+@center A Computer Algebra System for Commutative Algebra, Algebraic Geometry
+@center and Singularity Theory
+@sp 2
+@center University of Kaiserslautern
+@center Department of Mathematics and Centre for Computer algebra
+@end ifinfo
+@menu
+* Preface
+* Getting started::
+* Examples::
+* Writing procedures::
+* Index::
+@end menu
+@c ----------------------------------------------------------------------------
+@node Preface, Getting started, (dir),  (dir)
+@chapter Preface
+@include copyright.tex
+@c ----------------------------------------------------------------------------
+@node Getting started, Examples, Preface, Top
+@include start.tex
+@c ----------------------------------------------------------------------------
+@node Examples,Writing procedures,Getting started,Top
+@include examples.tex
+@c ----------------------------------------------------------------------------
+@node Writing procedures,Index,Examples,Top
+@include proc.tex
+@c ------------------------------------------------------------------
+@node Index,,Writing procedures,Top
+@chapter Index
+@printindex cp
+@contents
+@bye

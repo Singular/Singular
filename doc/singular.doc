@@ -1,11 +1,11 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.4 1998-04-24 14:20:34 Singular Exp $
+@comment $Id: singular.doc,v 1.5 1998-04-24 17:03:01 Singular Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
 @c ------------------------
 @setfilename singular.hlp
-@settitle Singular Reference Manual
+@settitle Singular Manual
 @iftex
 @afourpaper
 @finalout
@@ -28,14 +28,14 @@ this is the texinfo file describing Singular (version @value{VERSION})
 @center A Computer Algebra System for Commutative Algebra, Algebraic Geometry
 @center and Singularity Theory
 @sp 5
-@center @titlefont{Reference Manual}
+@center @titlefont{Manual}
 @center Version @value{VERSION}
 @sp 2
 @center Singular is created and its development is directed and coordinated by
 @center G.-M. Greuel, G. Pfister and H. Schoenemann
 @sp 2
 @center with contributions by
-@center O. Bachmann, W. Decker, H. Grassmann, B. Martin, M. Messollen,
+@center O. Bachmann, W. Decker, C. Gorzel, H. Grassmann, K. Krueger, B. Martin, M. Messollen,
 @center W. Neumann, T. Nuessler, W. Pohl, T. Siebert, R. Stobbe, T. Wichmann
 @sp 2
 @author Fachbereich Mathematik
