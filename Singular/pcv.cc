@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.20 1999-06-08 09:13:54 mschulze Exp $ */
+/* $Id: pcv.cc,v 1.21 1999-06-09 11:53:12 mschulze Exp $ */
 /*
 * ABSTRACT: conversion between polys and coef vectors
 */
@@ -15,6 +15,7 @@
 #include "ipid.h"
 #include "numbers.h"
 #include "polys.h"
+#include "ideals.h"
 #include "lists.h"
 #include "matpol.h"
 #include "febase.h"
@@ -25,6 +26,82 @@ static int pcvTableSize;
 static int pcvIndexSize;
 static unsigned* pcvTable=NULL;
 static unsigned** pcvIndex=NULL;
+
+lists pcvLAddL(lists l1,lists l2)
+{
+  lists l0=(lists)Alloc(sizeof(slists));
+  int i=l1->nr;
+  if(l1->nr<l2->nr) i=l2->nr;
+  l0->Init(i+1);
+  for(;i>=0;i--)
+  {
+    if(i<=l1->nr&&(l1->m[i].rtyp==POLY_CMD||l1->m[i].rtyp==VECTOR_CMD))
+    {
+      l0->m[i].rtyp=l1->m[i].rtyp;
+      l0->m[i].data=pCopy(l1->m[i].data);
+      if(i<=l2->nr&&l2->m[i].rtyp==l1->m[i].rtyp)
+        l0->m[i].data=pAdd(l0->m[i].data,pCopy(l2->m[i].data));
+    }
+    else
+    if(i<=l2->nr&&(l2->m[i].rtyp==POLY_CMD||l2->m[i].rtyp==VECTOR_CMD))
+    {
+      l0->m[i].rtyp=l2->m[i].rtyp;
+      l0->m[i].data=pCopy(l2->m[i].data);
+    }
+  }
+  return(l0);
+}
+
+lists pcvPMulL(poly p,lists l1)
+{
+  lists l0=(lists)Alloc(sizeof(slists));
+  l0->Init(l1->nr+1);
+  for(int i=l1->nr;i>=0;i--)
+  {
+    if(l1->m[i].rtyp==POLY_CMD)
+    {
+      l0->m[i].rtyp=POLY_CMD;
+      l0->m[i].data=pMult(pCopy(p),pCopy(l1->m[i].data));
+    }
+  }
+  return(l0);
+}
+
+BOOLEAN pcvLAddL(leftv res,leftv h)
+{
+  if(h&&h->Typ()==LIST_CMD)
+  {
+    lists l1=(lists)h->Data();
+    h=h->next;
+    if(h&&h->Typ()==LIST_CMD)
+    {
+      lists l2=(lists)h->Data();
+      res->rtyp=LIST_CMD;
+      res->data=(void*)pcvLAddL(l1,l2);
+      return FALSE;
+    }
+  }
+  WerrorS("<list>,<list> expected");
+  return TRUE;
+}
+
+BOOLEAN pcvPMulL(leftv res,leftv h)
+{
+  if(h&&h->Typ()==POLY_CMD)
+  {
+    poly p=(poly)h->Data();
+    h=h->next;
+    if(h&&h->Typ()==LIST_CMD)
+    {
+      lists l=(lists)h->Data();
+      res->rtyp=LIST_CMD;
+      res->data=(void*)pcvPMulL(p,l);
+      return FALSE;
+    }
+  }
+  WerrorS("<poly>,<list> expected");
+  return TRUE;
+}
 
 int pcvDeg(poly p)
 {
@@ -62,35 +139,6 @@ int pcvMinDeg(matrix m)
   return(md);
 }
 
-int pcvMaxDeg(poly p)
-{
-  if(!p) return -1;
-  int md=pcvDeg(p);
-  pIter(p);
-  while(p)
-  {
-    int d=pcvDeg(p);
-    if(d>md) md=d;
-    pIter(p);
-  }
-  return md;
-}
-
-int pcvMaxDeg(matrix m)
-{
-  int i,j,d;
-  int md=-1;
-  for(i=1;i<=MATROWS(m);i++)
-  {
-    for(j=1;j<=MATCOLS(m);j++)
-    {
-      d=pcvMinDeg(MATELEM(m,i,j));
-      if((d>=0&&md<d)||md==-1) md=d;
-    }
-  }
-  return(md);
-}
-
 BOOLEAN pcvMinDeg(leftv res,leftv h)
 {
   if(h)
@@ -109,29 +157,7 @@ BOOLEAN pcvMinDeg(leftv res,leftv h)
       return FALSE;
     }
   }
-  WerrorS("<poly> or <matrix> expected");
-  return TRUE;
-}
-
-BOOLEAN pcvMaxDeg(leftv res,leftv h)
-{
-  if(h)
-  {
-    if(h->Typ()==POLY_CMD)
-    {
-      res->rtyp=INT_CMD;
-      res->data=(void*)pcvMaxDeg((poly)h->Data());
-      return FALSE;
-    }
-    else
-    if(h->Typ()==MATRIX_CMD)
-    {
-      res->rtyp=INT_CMD;
-      res->data=(void*)pcvMaxDeg((matrix)h->Data());      
-      return FALSE;
-    }
-  }
-  WerrorS("<poly> or <matrix> expected");
+  WerrorS("<poly> expected");
   return TRUE;
 }
 
@@ -287,7 +313,7 @@ BOOLEAN pcvP2CV(leftv res,leftv h)
   {
     if(h&&h->Typ()==LIST_CMD)
     {
-      lists pl=(lists)h->Data();
+      lists p=(lists)h->Data();
       h=h->next;
       if(h&&h->Typ()==INT_CMD)
       {
@@ -297,7 +323,7 @@ BOOLEAN pcvP2CV(leftv res,leftv h)
         {
           int d1=(int)h->Data();
           res->rtyp=LIST_CMD;
-          res->data=pcvP2CV(pl,d0,d1);
+          res->data=(void*)pcvP2CV(p,d0,d1);
           return FALSE;
         }
       }
@@ -325,7 +351,7 @@ BOOLEAN pcvCV2P(leftv res,leftv h)
         {
           int d1=(int)h->Data();
           res->rtyp=LIST_CMD;
-          res->data=pcvCV2P(pl,d0,d1);
+          res->data=(void*)pcvCV2P(pl,d0,d1);
           return FALSE;
         }
       }
@@ -415,7 +441,7 @@ BOOLEAN pcvBasis(leftv res,leftv h)
       {
         int d1=(int)h->Data();
         res->rtyp=LIST_CMD;
-        res->data=pcvBasis(d0,d1);
+        res->data=(void*)pcvBasis(d0,d1);
         return FALSE;
       }
     }
