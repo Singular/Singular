@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.25 2000-09-04 13:39:00 obachman Exp $ */
+/* $Id: maps.cc,v 1.26 2000-09-07 16:22:39 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -666,6 +666,3 @@ static poly pMinPolyNormalize(poly p)
   pNext(q) = NULL;
   return rp.next;
 }
-
-  
-  
