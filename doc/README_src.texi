@@ -1,0 +1,149 @@
+@comment -*-texinfo-*-
+@comment $Id: README_src.texi,v 1.2 2001-05-18 12:31:34 Singular Exp $
+@c FILE: README_src.texi
+@c PURPOSE: This should reside as README file in the src directory of the
+@c          Singular ftp site.
+
+@ifclear VERSION
+@include version.texi
+@end ifclear
+
+
+@majorheading Welcome to the Development FTP site of SINGULAR
+
+@sc{Singular} is a Computer Algebra system for polynomial computations
+with special emphasize on the needs of commutative algebra, algebraic
+geometry, singularity theory and polynomial system solving. For a more
+detailed overview of
+@sc{Singular}, see
+@display
+@uref{http://www.singular.uni-kl.de/Overview/}
+@end display
+
+So far, there are only version for Linux, HPUX, SunOS, IRIX, AIX, FreeBSD 4.2,
+and Windows 95/98/NT/2K.
+
+@macro nref{name,url}
+@ifhtml
+@item @uref{\url\,,\name\}
+@end ifhtml
+@ifinfo
+@item @code{\name\}
+@end ifinfo
+@end macro
+
+In this directory you find the following files:
+@table @asis
+@nref{COPYING, COPYING.html}
+license information for @sc{Singular}
+@item @code{Singular-@value{VERSION}-<package>.tar.gz}
+@sc{Singular} distribution archive which contains the package @code{<package>}
+@item @code{omalloc.tar.gz}
+@sc{Singular} distribution archives which contains the package omalloc
+@end table
+
+@heading To compile SINGULAR for a Unix platform
+
+Make sure that you have approximately 120 MByte of free disk space and
+follow these steps.
+
+@enumerate
+@item
+Make sure that you have the following software (the list may be incomplete):
+  @enumerate
+  @item
+  general unix utilities: grep, test, sed, cp, mv, gzip, uudecode, ...
+  @item
+  autoconf
+  @item
+  gnu-make
+  @item
+  gcc, g++ (version 2.7.2 preferred,
+  but version 2.6.3 to egcs 1.1.2 should work)
+  @item
+  bison (version >= 1.2.2)
+  @item
+  flex (version >=2.4)
+  @item
+  perl (version >=5)
+  @item
+  library gmp (version 3.x.x)
+  @item
+  (optional) library libreadline
+  @item
+  (optional, required to build the documentation:)
+  latex2html, tex, texi2html, texinfo
+  @* (your latex2html should produce gif files, not png files)
+  @end enumerate
+@item
+(optional, required for MP:)
+@*make sure that you can log in to your computer via rsh/remsh
+or ssh without a password (check .rhosts/.shosts);
+otherwise the configure script stops while checking this:
+if you cannot fix it, simply kill the rsh/ssh-processes
+- the configure will then disable this particulare feature
+@*The following is tested by configure
+@*rsh localhost uname
+@*ssh localhost uname
+@*rsh `hostname` uname
+@*ssh `hostname` uname
+@item
+You need to download all of the .tar.gz-files
+@item
+create a new working directory
+@item
+unpack all packages into that working directory
+@item
+(optional, for porting to a unknown machine:)
+fix ./singuname.sh not to report something unknown, but to recognize the machine
+@item
+run ./configure
+@*(try ./configure --help, ./omalloc/configure --help, ./MP/configure --help,
+./factory/configure --help, ./Singular/configure --help for a list of
+all options of configure)
+@item
+make install (resp. gmake install - the make program must be GNU-Make)
+the make process will (hopefully) build:
+  @enumerate
+  @item
+  omalloc: the memry management routines (required)
+  @item
+  MP: Multi-Protocoll (optional)
+  @item
+  factory (optional, but strongly recommended)
+  @item
+  libfac (optional, but strongly recommended)
+  @item
+  Singular (Kernel, required)
+  @item
+  doc (only possible, if all optional packages are included)
+  @item
+  emacs (only possible, if doc was build)
+  @item
+  IntegerProgramming
+  @item
+  misc
+  @end enumerate
+@item
+if you want to make any change in the directory Singular,
+run make depend there
+@item
+to install the resulting files at any other place in the system,
+run
+@*      make bindist sharedist
+@*(sharedist can only be build if doc was build sucessfully)
+and install the resulting .tar.gz files as explained
+for the binary distribution
+@item
+if you compiled Singular for a non-standard architecture and
+you are willing to share your porting effort,
+upload the changed sources and the resulting binaries to
+@code{ftp://www.mathematik.uni-kl.de/pub/Incoming}
+and send us an email about it (Singular@@mathematik.uni-kl.de)
+@item
+bug-fixes or other improvements to the source code are welcome
+@end enumerate
+
+GOOD LUCK and ENJOY!
+Your @sc{Singular} team.
+
