@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: eigenval.cc,v 1.1 2001-03-05 17:31:40 mschulze Exp $ */
+/* $Id: eigenval.cc,v 1.2 2001-03-14 10:25:11 mschulze Exp $ */
 /*
 * ABSTRACT: eigenvalues of constant square matrices
 */
@@ -113,16 +113,18 @@ lists addval(lists l,poly e0,int m0)
 {
   ideal ee=(ideal)l->m[0].data;
   intvec *mm=(intvec*)l->m[1].data;
-  int n=IDELEMS(ee);
+  int n=0;
+  if(ee!=NULL)
+    n=IDELEMS(ee);
   for(int i=n-1;i>=0;i--)
   {
     if(pEqualPolys(ee->m[i],e0))
     {
       (*mm)[i]+=m0;
-      return;
+      return l;
     }
   }
-  ideal e=idInit(n+1,0);
+  ideal e=idInit(n+1,1);
   for(int i=n-1;i>=0;i--)
   {
     e->m[i]=ee->m[i];
@@ -130,7 +132,8 @@ lists addval(lists l,poly e0,int m0)
   }
   e->m[n]=e0;
   l->m[0].data=e;
-  idDelete(&ee);
+  if(ee!=NULL)
+    idDelete(&ee);
   mm->resize(n+1);
   (*mm)[n]=m0;
   return l;
@@ -162,7 +165,7 @@ lists eigenval(matrix M)
   lists l=(lists)omAllocBin(slists_bin);
   l->Init(2);
   l->m[0].rtyp=IDEAL_CMD;
-  l->m[0].data=idInit(0,0);
+  l->m[0].data=NULL;
   l->m[1].rtyp=INTVEC_CMD;
   l->m[1].data=new intvec;
   int j=1;
