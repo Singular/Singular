@@ -20,13 +20,13 @@ of this distribution.
 Installation for the Impatient 
 ==============================
 Being in the directory which contains this file and supposing that you
-have GNU make ('gmake) installed on your system, type
+have GNU make (gmake) installed on your system, type
 
   ./configure; gmake install
 
 and get a cup of coffee (or, tea, if you prefer).
 
-Notice the 'make install' (and not just 'make' !!). For more
+Notice the 'gmake install' (and not just 'gmake' !!). For more
 explanations and details, see below.
 
 
@@ -79,7 +79,7 @@ The simplest way to compile a full Singular containing all packages is:
      some messages telling which package it is configuring and which
      features it is checking for. 
 
-  2. Type `make install' to compile Singular. 
+  2. Type `gmake install' to compile Singular. 
 
      This will create the subdirectories (of the top-level directory)
      'bin', 'include', 'lib', 'info', and 'share' containing the
@@ -139,10 +139,10 @@ Or on systems that have the `env' program, you can do it like this:
 Installation Names
 ==================
 
-By default, `make install' will install the Singular program in
+By default, `gmake install' will install the Singular program in
 `${top_srcdir}/bin', Singular's info files in `${top_srcdir}/info',
 Singular's program libraries in '${top_srcdir}/share', the header
-files of the supporting packages in '${top_srcdir}/include' and
+files of the supporting packages in '${top_srcdir}/include' and the
 libraries of the supporting packages in '${top_srcdir}/include' where
 '${top_srcdir}' refers to the top-level directory of the full Singular
 distribution.  You can specify an installation prefix other than
