@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.193 2000-08-10 17:10:22 obachman Exp $
+@comment $Id: reference.doc,v 1.194 2000-10-04 13:13:28 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4161,6 +4161,11 @@ disables the regularity bound for @code{res} and @code{mres} (see
 @item @code{notSugar}
 disables the sugar strategy during standard basis computation
 @anchor{option(prot)}
+@item @code{notBuckets}
+disables the bucket representation of polynomials during standard basis
+computations. This option usually decreases the memory usage but
+increases the computation time. It should only be set for
+memory-critical standard basis computations.
 @item @code{prot}
 shows protocol information indicating the
 progress during the following computations:

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: pdata.doc,v 1.18 1999-08-17 06:36:23 wichmann Exp $
+@comment $Id: pdata.doc,v 1.19 2000-10-04 13:13:27 obachman Exp $
 @comment this file contains the "Polynomial data" appendix.
 
 @c The following directives are necessary for proper compilation
@@ -434,7 +434,7 @@ We do not require
 < to be  a wellordering.
 @end ifinfo
 @ifset singularmanual
-See the literature cited in @ref{References}.
+ See the literature cited in @ref{References}.
 @end ifset
 
 It is known that any monomial ordering can be represented by a matrix 
@@ -937,7 +937,7 @@ $(n \times n)$-matrix
 @ifinfo
 (n x n)-matrix
 @end ifinfo
-with integer coefficients and
+ with integer coefficients and
 @ifinfo
 M_1, @dots{}, M_n the rows of M.
 @end ifinfo
