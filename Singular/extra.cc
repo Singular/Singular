@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.66 1998-07-23 15:44:38 Singular Exp $ */
+/* $Id: extra.cc,v 1.67 1998-09-08 07:51:38 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -92,17 +92,19 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h);
 /*2
 *  the "system" command
 */
-BOOLEAN jjSYSTEM(leftv res, leftv h)
+BOOLEAN jjSYSTEM(leftv res, leftv args)
 {
-  if(h->Typ() == STRING_CMD)
+  if(args->Typ() == STRING_CMD)
   {
+    const char *sys_cmd=(char *)(args->Data());
+    leftv h=args->next;
 // ONLY documented system calls go here
 // Undocumented system calls go down into #ifdef HAVE_EXTENDED_SYSTEM
 /*==================== nblocks ==================================*/
-    if (strcmp((char*)(h->Data()), "nblocks") == 0)
+    if (strcmp(sys_cmd, "nblocks") == 0)
     {
       ring r;
-      if (h->next == NULL)
+      if (h == NULL)
       {
         if (currRingHdl != NULL)
         {
@@ -116,19 +118,19 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
       }
       else
       {
-        if (h->next->Typ() != RING_CMD)
+        if (h->Typ() != RING_CMD)
         {
           WerrorS("ring expected");
           return TRUE;
         }
-        r = (ring) h->next->Data();
+        r = (ring) h->Data();
       }
       res->rtyp = INT_CMD;
       res->data = (void*) (rBlocks(r) - 1);
       return FALSE;
     }
 /*==================== version ==================================*/
-    if(strcmp((char*)(h->Data()),"version")==0)
+    if(strcmp(sys_cmd,"version")==0)
     {
       res->rtyp=INT_CMD;
       res->data=(void *)SINGULAR_VERSION;
@@ -136,7 +138,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     }
     else
 /*==================== gen ==================================*/
-    if(strcmp((char*)(h->Data()),"gen")==0)
+    if(strcmp(sys_cmd,"gen")==0)
     {
       res->rtyp=INT_CMD;
       res->data=(void *)npGen;
@@ -144,39 +146,48 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     }
     else
 /*==================== sh ==================================*/
-    #ifndef __MWERKS__
-    if(strcmp((char*)(h->Data()),"sh")==0)
+    if(strcmp(sys_cmd,"sh")==0)
     {
+      #ifndef __MWERKS__
       #ifndef MSDOS
       #ifdef HAVE_FEREAD
       fe_temp_reset();
       #endif
       #endif
+      #endif
       res->rtyp=INT_CMD;
-      if (h->next==NULL) res->data = (void *)system("sh");
-      else res->data = (void*) system((char*)(h->next->Data()));
+      #ifndef __MWERKS__
+      if (h==NULL) res->data = (void *)system("sh");
+      else if (h->Typ()==STRING_CMD)
+        res->data = (void*) system((char*)(h->Data()));
+      else
+        WerrorS("string expected");
+      #else
+      res->data=(void *)0;
+      #endif
+      #ifndef __MWERKS__
       #ifndef MSDOS
       #ifdef HAVE_FEREAD
       fe_temp_set();
       #endif
       #endif
+      #endif
       return FALSE;
     }
     else
-    #endif
 /*==================== with ==================================*/
-    if(strcmp((char*)(h->Data()),"with")==0)
+    if(strcmp(sys_cmd,"with")==0)
     {
-      if (h->next==NULL)
+      if (h==NULL)
       {
         res->rtyp=STRING_CMD;
         res->data=(void *)mstrdup(versionString());
         return FALSE;
       }
-      else if (h->next->Typ()==STRING_CMD)
+      else if (h->Typ()==STRING_CMD)
       {
         #define TEST_FOR(A) if(strcmp(s,A)==0) res->data=(void *)1; else
-        char *s=(char *)h->next->Data();
+        char *s=(char *)h->Data();
         res->rtyp=INT_CMD;
         #ifdef DRING
           TEST_FOR("DRING")
@@ -222,24 +233,28 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     }
     else
 /*==================== pid ==================================*/
-    #ifndef MSDOS
-    #ifndef __MWERKS__
-    if (strcmp((char*)(h->Data()),"pid")==0)
+    if (strcmp(sys_cmd,"pid")==0)
     {
       res->rtyp=INT_CMD;
+    #ifndef MSDOS
+    #ifndef __MWERKS__
       res->data=(void *)getpid();
+    #else
+      res->data=(void *)1;
+    #endif
+    #else
+      res->data=(void *)1;
+    #endif
       return FALSE;
     }
     else
-    #endif
-    #endif
 /*==================== getenv ==================================*/
-    if (strcmp((char*)(h->Data()),"getenv")==0)
+    if (strcmp(sys_cmd,"getenv")==0)
     {
-      if ((h->next!=NULL) && (h->next->Typ()==STRING_CMD))
+      if ((h!=NULL) && (h->Typ()==STRING_CMD))
       {
         res->rtyp=STRING_CMD;
-        char *r=getenv((char *)h->next->Data());
+        char *r=getenv((char *)h->Data());
         if (r==NULL) r="";
         res->data=(void *)mstrdup(r);
         return FALSE;
@@ -254,7 +269,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     #ifndef __MWERKS__
     #ifndef MSDOS
     #if defined(HAVE_FEREAD) || defined(HAVE_READLINE)
-    if (strcmp((char*)(h->Data()),"tty")==0)
+    if (strcmp(sys_cmd,"tty")==0)
     {
       #ifdef HAVE_FEREAD
       #ifdef HAVE_ATEXIT
@@ -265,9 +280,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
       #elif defined(HAVE_READLINE)
       system("stty sane");
       #endif
-      if ((h->next!=NULL)&&(h->next->Typ()==INT_CMD))
+      if ((h!=NULL)&&(h->Typ()==INT_CMD))
       {
-        fe_use_fgets=(int)h->next->Data();
+        fe_use_fgets=(int)h->Data();
         fe_set_input_mode();
       }
       return FALSE;
@@ -278,7 +293,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     #endif
 /*==================== Singular ==================================*/
 #ifndef __MWERKS__
-    if (strcmp((char*)(h->data), "Singular") == 0)
+    if (strcmp(sys_cmd, "Singular") == 0)
     {
       res->rtyp=STRING_CMD;
       char *r=feGetExpandedExecutable();
@@ -291,12 +306,12 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     else
 #endif
 /*==================== options ==================================*/
-    if (strstr((char*)(h->data), "--") == (char*)(h->data))
+    if (strstr(sys_cmd, "--") == sys_cmd)
     {
       BOOLEAN mainGetSingOptionValue(const char* name, char** result);
       char* val;
 
-      if (mainGetSingOptionValue(&((char*)(h->data))[2], &val))
+      if (mainGetSingOptionValue(&(sys_cmd)[2], &val))
       {
         if ((unsigned int) val > 1)
         {
@@ -312,13 +327,13 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
       }
       else
       {
-        Werror("Unknown option %s\n", (char*)(h->data));
+        Werror("Unknown option %s\n", sys_cmd);
         return TRUE;
       }
     }
     else
 /*==================== HC ==================================*/
-    if (strcmp((char*)(h->data),"HC")==0)
+    if (strcmp(sys_cmd,"HC")==0)
     {
       res->rtyp=INT_CMD;
       res->data=(void *)HCord;
@@ -326,11 +341,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     }
     else
 /*==================== random ==================================*/
-    if(strcmp((char*)(h->Data()),"random")==0)
+    if(strcmp(sys_cmd,"random")==0)
     {
-      if ((h->next!=NULL) &&(h->next->Typ()==INT_CMD))
+      if ((h!=NULL) &&(h->Typ()==INT_CMD))
       {
-        siRandomStart=(int)h->next->Data();
+        siRandomStart=(int)h->Data();
 #ifdef buildin_rand
         siSeed=siRandomStart;
 #else
@@ -338,7 +353,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
 #endif
         return FALSE;
       }
-      else if (h->next != NULL)
+      else if (h != NULL)
       {
         WerrorS("int expected");
         return TRUE;
@@ -350,12 +365,12 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
 /*==================== neworder =============================*/
 // should go below
 #ifdef HAVE_LIBFAC_P
-    if(strcmp((char*)(h->Data()),"neworder")==0)
+    if(strcmp(sys_cmd,"neworder")==0)
     {
-      if ((h->next!=NULL) &&(h->next->Typ()==IDEAL_CMD))
+      if ((h!=NULL) &&(h->Typ()==IDEAL_CMD))
       {
         res->rtyp=STRING_CMD;
-        res->data=(void *)singclap_neworder((ideal)h->next->Data());
+        res->data=(void *)singclap_neworder((ideal)h->Data());
         return FALSE;
       }
       else
@@ -364,7 +379,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     else
 #endif
 /*==================== contributors =============================*/
-   if(strcmp((char*)(h->Data()),"contributors") == 0)
+   if(strcmp(sys_cmd,"contributors") == 0)
    {
      res->rtyp=STRING_CMD;
      res->data=(void *)mstrdup(
@@ -375,9 +390,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
    {
 /*================= Extended system call ========================*/
 #ifdef HAVE_EXTENDED_SYSTEM
-     return(jjEXTENDED_SYSTEM(res, h));
+     return(jjEXTENDED_SYSTEM(res, args));
 #else
-     WerrorS( feNotImplemented );
+     Werror( "system(\"%s\",...) %s", sys_cmd, feNotImplemented );
 #endif
    }
   } /* typ==string */
@@ -397,20 +412,22 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 {
   if(h->Typ() == STRING_CMD)
   {
+    char *sys_cmd=(char *)(h->Data());
+    h=h->next;
 /*==================== latest ==================================*/
-    if(strcmp((char*)(h->Data()),"la")==0)
+    if(strcmp(sys_cmd,"la")==0)
     {
-      if (h->next!=NULL)
+      if (h!=NULL)
       {
         int i0=-1, i1=-1;
-        leftv hh=h->next->next;
+        leftv hh=h->next;
         if ((hh!=NULL)&&(hh->Typ()==INT_CMD))
         {
           i0=(int)hh->Data();
           if ((hh->next!=NULL) &&(hh->next->Typ()==INT_CMD))
             i1=(int)hh->next->Data();
         }
-        if(h->next->Typ()==IDEAL_CMD)
+        if(h->Typ()==IDEAL_CMD)
         {
         // "la",<ideal>[,<int d0>[,<int d1>]]:
         // convert ideal from deg d0 to deg d1 to coeff-vectors
@@ -419,7 +436,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
             i1=1024;
             if (i0==(-1)) i0=0;
           }
-          ideal I=(ideal)(h->next->Data());
+          ideal I=(ideal)(h->Data());
           laSet();
           ideal m=laI2Mo(I,i0,i1);
           laReset();
@@ -428,7 +445,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           return FALSE;
         }
         else
-        if(h->next->Typ()==MODUL_CMD)
+        if(h->Typ()==MODUL_CMD)
         {
         // "la",<module>[,<int c0>[,<int c1>]]:
         // convert module from comp c0 to comp c1 to ideal
@@ -437,7 +454,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
             i1=32767;
             if (i0==(-1)) i0=1;
           }
-          ideal M=(ideal)(h->next->Data());
+          ideal M=(ideal)(h->Data());
           laSet();
           ideal I=laMo2I(M,i0,i1);
           laReset();
@@ -451,11 +468,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 /*==================== naIdeal ==================================*/
-    if(strcmp((char*)(h->Data()),"naIdeal")==0)
+    if(strcmp(sys_cmd,"naIdeal")==0)
     {
-      if ((h->next!=NULL) &&(h->next->Typ()==IDEAL_CMD))
+      if ((h!=NULL) &&(h->Typ()==IDEAL_CMD))
       {
-        naSetIdeal((ideal)h->next->Data());
+        naSetIdeal((ideal)h->Data());
         return FALSE;
       }
       else
@@ -464,12 +481,12 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     else
 /*==================== isSqrFree =============================*/
 #ifdef HAVE_FACTORY
-    if(strcmp((char*)(h->Data()),"isSqrFree")==0)
+    if(strcmp(sys_cmd,"isSqrFree")==0)
     {
-      if ((h->next!=NULL) &&(h->next->Typ()==POLY_CMD))
+      if ((h!=NULL) &&(h->Typ()==POLY_CMD))
       {
         res->rtyp=INT_CMD;
-        res->data=(void *)singclap_isSqrFree((poly)h->next->Data());
+        res->data=(void *)singclap_isSqrFree((poly)h->Data());
         return FALSE;
       }
       else
@@ -482,16 +499,16 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 #ifndef MSDOS
 #ifndef atarist
 #ifdef unix
-    if(strcmp((char*)(h->Data()),"alarm")==0)
+    if(strcmp(sys_cmd,"alarm")==0)
     {
-      if ((h->next!=NULL) &&(h->next->Typ()==INT_CMD))
+      if ((h!=NULL) &&(h->Typ()==INT_CMD))
       {
         // standard variant -> SIGALARM (standard: abort)
         //alarm((unsigned)h->next->Data());
         // process time (user +system): SIGVTALARM
         struct itimerval t,o;
         memset(&t,0,sizeof(t));
-        t.it_value.tv_sec     =(unsigned)h->next->Data();
+        t.it_value.tv_sec     =(unsigned)h->Data();
         setitimer(ITIMER_VIRTUAL,&t,&o);
         return FALSE;
       }
@@ -505,12 +522,12 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 #endif
 /*==================== red =============================*/
 #if 0
-    if(strcmp((char*)(h->Data()),"red")==0)
+    if(strcmp(sys_cmd,"red")==0)
     {
-     if ((h->next!=NULL) &&(h->next->Typ()==IDEAL_CMD))
+      if ((h!=NULL) &&(h->Typ()==IDEAL_CMD))
       {
         res->rtyp=IDEAL_CMD;
-        res->data=(void *)kStdred((ideal)h->next->Data(),NULL,testHomog,NULL);
+        res->data=(void *)kStdred((ideal)h->Data(),NULL,testHomog,NULL);
         setFlag(res,FLAG_STD);
         return FALSE;
       }
@@ -520,14 +537,13 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     else
 #endif
 /*==================== algfetch =====================*/
-    if (strcmp((char*)(h->Data()),"algfetch")==0)
+    if (strcmp(sys_cmd,"algfetch")==0)
     {
       int k;
       idhdl w;
       ideal i0, i1;
-      leftv v=h->next;
-      ring r0=(ring)v->Data();
-      v = v->next;
+      ring r0=(ring)h->Data();
+      leftv v = h->next;
       w = r0->idroot->get(v->Name(),myynest);
       i0 = IDIDEAL(w);
       i1 = idInit(IDELEMS(i0),i0->rank);
@@ -541,14 +557,13 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 /*==================== algmap =======================*/
-    if (strcmp((char*)(h->Data()),"algmap")==0)
+    if (strcmp(sys_cmd,"algmap")==0)
     {
       int k;
       idhdl w;
       ideal i0, i1, i, j;
-      leftv v=h->next;
-      ring r0=(ring)v->Data();
-      v = v->next;
+      ring r0=(ring)h->Data();
+      leftv v = h->next;
       w = r0->idroot->get(v->Name(),myynest);
       i0 = IDIDEAL(w);
       v = v->next;
@@ -568,18 +583,18 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     /*==================== trace =============================*/
 #ifdef STDTRACE
     /* Parameter : Ideal, Liste mit Links. */
-    if(strcmp((char*)(h->Data()),"stdtrace")==0)
+    if(strcmp(sys_cmd,"stdtrace")==0)
     {
-      if ((h->next!=NULL) &&(h->next->Typ()==IDEAL_CMD))
+      if ((h!=NULL) &&(h->Typ()==IDEAL_CMD))
       {
         leftv root  = NULL,
               ptr   = NULL,
               lv    = NULL;
         lists l     = NULL;
-        ideal I     = (ideal)(h->next->Data());
-        lists links = (lists)(h->next->next->Data());
+        ideal I     = (ideal)(h->Data());
+        lists links = (lists)(h->next->Data());
         tHomog hom  = testHomog;
-        int rw      = (int)(h->next->next->next->Data());
+        int rw      = (int)(h->next->next->Data());
 
         if(I==NULL)
           PrintS("I==NULL\n");
@@ -617,21 +632,21 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 #endif
 #ifdef HAVE_FACTORY
 /*==================== fastcomb =============================*/
-    if(strcmp((char*)(h->Data()),"fastcomb")==0)
+    if(strcmp(sys_cmd,"fastcomb")==0)
     {
-      if ((h->next!=NULL) &&(h->next->Typ()==IDEAL_CMD))
+      if ((h!=NULL) &&(h->Typ()==IDEAL_CMD))
       {
         int i=0;
-        if (h->next->next!=NULL)
+        if (h->next!=NULL)
         {
-          if (h->next->next->Typ()!=POLY_CMD)
+          if (h->next->Typ()!=POLY_CMD)
           {
-              Warn("Wrong types for poly= comb(ideal,poly)");
+            Warn("Wrong types for poly= comb(ideal,poly)");
           }
         }
         res->rtyp=POLY_CMD;
         res->data=(void *) fglmLinearCombination(
-                           (ideal)h->next->Data(),(poly)h->next->next->Data());
+                           (ideal)h->Data(),(poly)h->next->Data());
         return FALSE;
       }
       else
@@ -639,21 +654,21 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 /*==================== comb =============================*/
-    if(strcmp((char*)(h->Data()),"comb")==0)
+    if(strcmp(sys_cmd,"comb")==0)
     {
-      if ((h->next!=NULL) &&(h->next->Typ()==IDEAL_CMD))
+      if ((h!=NULL) &&(h->Typ()==IDEAL_CMD))
       {
         int i=0;
-        if (h->next->next!=NULL)
+        if (h->next!=NULL)
         {
-          if (h->next->next->Typ()!=POLY_CMD)
+          if (h->next->Typ()!=POLY_CMD)
           {
               Warn("Wrong types for poly= comb(ideal,poly)");
           }
         }
         res->rtyp=POLY_CMD;
         res->data=(void *)fglmNewLinearCombination(
-                            (ideal)h->next->Data(),(poly)h->next->next->Data());
+                            (ideal)h->Data(),(poly)h->next->Data());
         return FALSE;
       }
       else
@@ -662,21 +677,21 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     else
 #endif
 /*==================== barstep =============================*/
-    if(strcmp((char*)(h->Data()),"barstep")==0)
+    if(strcmp(sys_cmd,"barstep")==0)
     {
-      if ((h->next!=NULL) &&(h->next->Typ()==MATRIX_CMD))
+      if ((h!=NULL) &&(h->Typ()==MATRIX_CMD))
       {
-        if (h->next->next!=NULL)
+        if (h->next!=NULL)
         {
-          if (h->next->next->Typ()!=POLY_CMD)
+          if (h->next->Typ()!=POLY_CMD)
           {
             Warn("Wrong types for barstep(matrix,poly)");
           }
         }
         int r,c;
-        poly div=(poly)h->next->next->Data();
+        poly div=(poly)h->next->Data();
         res->rtyp=MATRIX_CMD;
-        res->data=(void *)mpOneStepBareiss((matrix)h->next->Data(),
+        res->data=(void *)mpOneStepBareiss((matrix)h->Data(),
                                            &div,&r,&c);
         Print("div: ");pWrite(div);
         Print("rows: %d, cols: %d\n",r,c);
@@ -689,9 +704,9 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     else
 #ifdef FACTORY_GCD_TEST
 /*=======================gcd Testerei ================================*/
-    if ( ! strcmp( (char*)(h->Data()), "setgcd" ) ) {
-        if ( (h->next != NULL) && (h->next->Typ() == INT_CMD) ) {
-            CFPrimitiveGcdUtil::setAlgorithm( (int)h->next->Data() );
+    if ( ! strcmp( sys_cmd, "setgcd" ) ) {
+        if ( (h != NULL) && (h->Typ() == INT_CMD) ) {
+            CFPrimitiveGcdUtil::setAlgorithm( (int)h->Data() );
             return FALSE;
         } else
             WerrorS("int expected");
@@ -700,7 +715,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 #endif
 
 #ifdef FACTORY_GCD_TIMING
-    if ( ! strcmp( (char*)(h->Data()), "gcdtime" ) ) {
+    if ( ! strcmp( sys_cmd, "gcdtime" ) ) {
         TIMING_PRINT( contentTimer, "time used for content: " );
         TIMING_PRINT( algContentTimer, "time used for algContent: " );
         TIMING_PRINT( algLcmTimer, "time used for algLcm: " );
@@ -713,7 +728,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 #endif
 
 #ifdef FACTORY_GCD_STAT
-    if ( ! strcmp( (char*)(h->Data()), "gcdstat" ) ) {
+    if ( ! strcmp( sys_cmd, "gcdstat" ) ) {
         printGcdTotal();
         printContTotal();
         resetGcdTotal();
@@ -723,12 +738,12 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     else
 #endif
 /*==================== lib ==================================*/
-    if(strcmp((char*)(h->Data()),"LIB")==0)
+    if(strcmp(sys_cmd,"LIB")==0)
     {
 #ifdef HAVE_NAMESPACES
-      idhdl hh=namespaceroot->get((char*)h->next->Data(),0);
+      idhdl hh=namespaceroot->get((char*)h->Data(),0);
 #else /* HAVE_NAMESPACES */
-      idhdl hh=idroot->get((char*)h->next->Data(),0);
+      idhdl hh=idroot->get((char*)h->Data(),0);
 #endif /* HAVE_NAMESPACES */
       if ((hh!=NULL)&&(IDTYP(hh)==PROC_CMD))
       {
@@ -739,32 +754,32 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return FALSE;
       }
       else
-        Warn("`%s` not found",(char*)h->next->Data());
+        Warn("`%s` not found",(char*)h->Data());
     }
     else
 #ifdef HAVE_NAMESPACES
 /*==================== nspush ===================================*/
-    if(strcmp((char*)(h->Data()),"nspush")==0)
+    if(strcmp(sys_cmd,"nspush")==0)
     {
-      idhdl hh=namespaceroot->get((char*)h->next->Data(),0, TRUE);
+      idhdl hh=namespaceroot->get((char*)h->Data(),0, TRUE);
       if ((hh!=NULL)&&(IDTYP(hh)==PACKAGE_CMD))
       {
         namespaceroot = namespaceroot->push(IDPACKAGE(hh), IDID(hh));
         return FALSE;
       }
       else
-        Warn("package `%s` not found",(char*)h->next->Data());
+        Warn("package `%s` not found",(char*)h->Data());
     }
     else
 /*==================== nspop ====================================*/
-    if(strcmp((char*)(h->Data()),"nspop")==0)
+    if(strcmp(sys_cmd,"nspop")==0)
     {
       namespaceroot->pop();
       return FALSE;
     }
     else
 /*==================== nsstack ===================================*/
-    if(strcmp((char*)(h->Data()),"nsstack")==0)
+    if(strcmp(sys_cmd,"nsstack")==0)
     {
       namehdl nshdl = namespaceroot;
       for( ; nshdl->isroot != TRUE; nshdl = nshdl->next) {
@@ -776,7 +791,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     else
 #endif /* HAVE_NAMESPACES */
 /*==================== proclist =================================*/
-    if(strcmp((char*)(h->Data()),"proclist")==0)
+    if(strcmp(sys_cmd,"proclist")==0)
     {
       piShowProcList();
       return FALSE;
@@ -784,9 +799,9 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     else
 #ifdef HAVE_DYNAMIC_LOADING
 /*==================== load ==================================*/
-    if(strcmp((char*)(h->Data()),"load")==0)
+    if(strcmp(sys_cmd,"load")==0)
     {
-      if ((h->next!=NULL) && (h->next->Typ()==STRING_CMD)) {
+      if ((h!=NULL) && (h->Typ()==STRING_CMD)) {
         int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
                        BOOLEAN(*func)(leftv res, leftv v));
         int (*fktn)(int(*iiAddCproc)(char *libname, char *procname,
@@ -795,12 +810,12 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         void *vp;
         res->rtyp=STRING_CMD;
 
-        fprintf(stderr, "Loading %s\n", h->next->Data());
+        fprintf(stderr, "Loading %s\n", h->Data());
         res->data=(void *)mstrdup("");
         if((vp=dlopen(h->next->Data(),RTLD_LAZY))==(void *)NULL)
         {
           WerrorS("dlopen failed");
-          Werror("%s not found", h->next->Data());
+          Werror("%s not found", h->Data());
         }
         else
         {
@@ -817,16 +832,16 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 #endif /* HAVE_DYNAMIC_LOADING */
 /* ==================== newton ================================*/
 #ifdef HAVE_NEWTON
-    if(strcmp((char*)(h->Data()),"newton")==0)
+    if(strcmp(sys_cmd,"newton")==0)
     {
-      if ((h->next->Typ()!=POLY_CMD)
-      || (h->next->next->Typ()!=INT_CMD)
-      || (h->next->next->next->Typ()!=INT_CMD))
+      if ((h->Typ()!=POLY_CMD)
+      || (h->next->Typ()!=INT_CMD)
+      || (h->next->next->Typ()!=INT_CMD))
       {
         WerrorS("system(\"newton\",<poly>,<int>,<int>) expected");
         return TRUE;
       }
-      poly  p=(poly)(h->next->Data());
+      poly  p=(poly)(h->Data());
       int l=pLength(p);
       short *points=(short *)Alloc(currRing->N*l*sizeof(short));
       int i,j,k;
@@ -845,8 +860,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
                 l,      // number of points
                 (short*) points,   // points: x_1, y_1,z_1, x_2,y_2,z2,...
                 currRing->OrdSgn==-1,
-                (int) (h->next->next->Data()),      // 1: Milnor, 0: Newton
-                (int) (h->next->next->next->Data()) // debug
+                (int) (h->next->Data()),      // 1: Milnor, 0: Newton
+                (int) (h->next->next->Data()) // debug
                );
       //----<>---Output-----------------------
 
@@ -908,7 +923,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 #endif
 /*==================== print all option values =================*/
 #ifndef NDEBUG
-    if (strcmp((char*)(h->data), "options") == 0)
+    if (strcmp(sys_cmd, "options") == 0)
     {
       void mainOptionValues();
       mainOptionValues();
@@ -916,7 +931,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
-      WerrorS( feNotImplemented );
+      Werror( "system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }
   return TRUE;
 }
