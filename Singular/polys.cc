@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.31 1998-09-01 09:20:42 Singular Exp $ */
+/* $Id: polys.cc,v 1.32 1998-09-24 10:46:22 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -174,7 +174,7 @@ static int pComp_otEXP(poly p1, poly p2)
   if (d) Mreturn(d, pOrdSgn);
 
   _pMonComp_otEXP_nwGEN(p1, p2,  pVariables1W, d, goto NotEqual , return 0);
-  
+
   NotEqual:
   Mreturn(d, pLexSgn);
 }
@@ -188,7 +188,7 @@ static int pComp_otCOMPEXP(poly p1, poly p2)
   if (d) Mreturn(d, pOrdSgn);
 
   _pMonComp_otEXP_nwGEN(p1, p2,  pVariablesW, d, goto NotEqual , return 0);
-  
+
   NotEqual:
   Mreturn(d, pLexSgn);
 }
@@ -199,7 +199,7 @@ static int pComp_otEXPCOMP(poly p1, poly p2)
   if (d) Mreturn(d, pOrdSgn);
 
   _pMonComp_otEXPCOMP_nwGEN(p1, p2,  pVariables1W, d, goto NotEqual , return 0);
-  
+
   NotEqual:
   Mreturn(d, pLexSgn);
 }
@@ -2160,7 +2160,7 @@ BOOLEAN pCompareChain (poly p,poly p1,poly p2,poly lcm)
       if (pGetExp(p,j)!=pGetExp(lcm,j))
       {
         for (k=pVariables; k>j; k--)
-	{
+        {
           if ((pGetExp(p,k)!=pGetExp(lcm,k))
           && (pGetExp(p2,k)!=pGetExp(lcm,k)))
             return TRUE;
