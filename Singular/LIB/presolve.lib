@@ -1,9 +1,9 @@
-// $Id: presolve.lib,v 1.8 1999-07-07 16:38:27 obachman Exp $
+// $Id: presolve.lib,v 1.9 1999-07-26 13:14:48 Singular Exp $
 //system("random",787422842);
 //(GMG), last modified 97/10/07 by GMG
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: presolve.lib,v 1.8 1999-07-07 16:38:27 obachman Exp $";
+version="$Id: presolve.lib,v 1.9 1999-07-26 13:14:48 Singular Exp $";
 info="
 LIBRARY:  presolve.lib     PROCEDURES FOR PRE-SOLVING POLYNOMIAL EQUATIONS
 
@@ -70,7 +70,7 @@ example
 proc elimlinearpart (ideal i,list #)
 "USAGE:   elimlinearpart(i[,n]);  i=ideal, n=integer
 RETURN:  list of of 5 objects:
-         [1]: (interreduced) ideal obtained from i by eliminating (substituting)
+         [1]: (interreduced) ideal obtained from i by eliminating (substitute)
               from the first n variables those which appear in a linear part
               of i, by putting this part into triangular form
               (default: n = nvars(basering))
@@ -100,8 +100,8 @@ EXAMPLE: example elimlinearpart; shows an example
       ideal i = imap(P,i);
    }
    if ( size(#)!=0 ) {  n=#[1]; }
-   ideal max,rest = maxideal(1),0;
-   if ( n < nvars(P) ) { rest = max[n+1..nvars(P)]; }
+   ideal maxi,rest = maxideal(1),0;
+   if ( n < nvars(P) ) { rest = maxi[n+1..nvars(P)]; }
    attrib(rest,"isSB",1);
 //-------------------- interreduce and find linear part  ----------------------
 // interred does the only real work. Because of ordering dp the linear part is
@@ -111,6 +111,15 @@ EXAMPLE: example elimlinearpart; shows an example
 // which do not contain elements not to be eliminated
 
    ideal id = interred(i);
+
+   if(id[1] == 1 )                          //special case of unit ideal
+   {
+     setring P;
+     list L = ideal(1), ideal(0), ideal(0), maxideal(1), maxideal(1);
+     option(set,getoption);
+     return(L);
+   }
+
    for ( ii=1; ii<=size(id); ii++ )
    {
       if( deg(id[ii]) > 1) { break; }
