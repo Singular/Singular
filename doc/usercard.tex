@@ -1,4 +1,4 @@
-% $Id: usercard.tex,v 1.3 1998-05-27 13:24:20 schmidt Exp $
+% $Id: usercard.tex,v 1.4 1998-06-18 10:43:01 schmidt Exp $
 
 %
 % usercard.tex - Singular user quick reference card.
@@ -27,7 +27,7 @@ Some of the topics concerning interactive use are system dependent.
 
 \sec Starting SINGULAR(2.5cm)
 Singular& 			start \Singular\cr
-Singular {\it files} \rep&	read {\it files\/} and prompt for further commands\cr
+Singular {\it file} \rep&	read {\it files\/} and prompt for further commands\cr
 Singular --help&		print help on command line options and exit\cr
 \endsec
 
@@ -93,7 +93,7 @@ last expression printed.
 \sec Ring declaration()
 \longentry ring {\it name\/} = {\it basefield}, ({\it ringvars\/}), {\it ordering\/};&
 				\hyphenpenalty=50 \tolerance=200 declare ring
-				{\it name\/} and make it the current base\-ring.
+				{\it name\/} and make it the new base\-ring.
 				{\it ringvars\/} has to be a list of names, the
 				other items are described below.  Example:\par
 				{\tt ring r = 32003, (x, y, z), dp;}\cr
@@ -101,7 +101,7 @@ last expression printed.
 				declare quotient ring {\it name\/} of the
 				current base\-ring with respect to {\it
 				ideal\/}.  {\it ideal\/} has to be a standard
-				bases.  Make {\it name\/} the new basering.\cr
+				basis.  Make {\it name\/} the new basering.\cr
 \subsec{Available {\bit basefields\/}:}
 0&				the rational numbers\cr
 \it p&				the finite field $Z_p$ with {\it p\/}
@@ -206,7 +206,7 @@ Basering in the following is {\tt ring r = 0, (x, y, z, mu, nu), dp;}\cr
 number n = 5/3;\cr
 \entryskip
 \longentry
-poly p(1) = 2xy2+3/4x3yz4;\par
+poly p(1) = 3/4x3yz4+2xy2;\par
 poly p(2) = (5/3)*mu\^{}2*nu\^{}3+n*yz2;&
 				{\tt p(1)} equals $3/4x^3yz^4+2xy^2$.  Short
 				format of mono\-mials is valid for one-character
@@ -249,7 +249,7 @@ def d = read("MPfile:r example.mp");&
 
 \sec Monitoring and debugging tools()
 timer = 1;&			print time used for commands to execute\cr
-\longentry int t = timer; {\it commands\/}; \rep; timer-t;&
+\longentry int t = timer; {\it command\/}; \rep; timer-t;&
 				print time used for {\it commands\/} to execute\cr
 memory(1);&			print number of bytes allocated from system\cr
 option(prot);&			show algorithm protocol\cr
@@ -265,7 +265,7 @@ listvar(all);&			list all (user-)defined names\cr
 
 \sec Options()
 option();&			show current option settings\cr
-\longentry option($option_1$, no$option_2$, \rep);&
+\longentry option($option_1$, no$option_2$, $\ldots$);&
 				switch $option_1$ on and $option_2$ off, resp.\cr
 option(none);&			reset all options to default values\cr
 \sectext
@@ -301,7 +301,7 @@ multBound&			stop if multiplicity gets smaller than {\tt
 noether&			cut off all monomials above monomial {\tt
 				noether}\cr
 \subsec{Miscellany}
-basering&			the current basering\cr
+basering&			current basering\cr
 minpoly&			minimal polynomial for algebraic extensions\cr
 short&				do not print monomials in short format if zero\cr
 timer&				on assignment of a non-zero value show time
@@ -314,8 +314,8 @@ TRACE&				print information on procedures being executed
 
 \sec Input and output()
 < "{\it filename\/}";&		load and execute {\it filename\/}\cr
-\longentry write("{\it filename\/}", {\it expression\_list\/})&
-				write {\it expression\_list\/} to ASCII file {\it
+\longentry write("{\it filename\/}", {\it expression}, \rep)&
+				write {\it expressions} to ASCII file {\it
 				filename}\cr
 \longentry read("{\it filename\/}");&
 				read ASCII file {\it filename\/} and return
@@ -347,8 +347,8 @@ help all.lib;&			show list of all libraries\cr
 \sec Mapping(1.5cm)
 \longentry map {\it name\/} = {\it ringname}, {\it ideal\/};&
 				declare a map {\it name\/} from {\it ringname\/}
-				to current basering.  The $i$'th ring variable
-				from {\it ringname\/} is mapped to the $i$'th
+				to current basering.  The $i$-th ring variable
+				from {\it ringname\/} is mapped to the $i$-th
 				generator of {\it ideal}.\cr
 \longentry {\it mapname\/}({\it expression\/})&
 				apply map {\it mapname\/} to {\it expression}\cr
