@@ -1,7 +1,7 @@
 #include "mod2.h"
 #include <omalloc.h>
 #include "p_polys.h"
-#include "prCopy.h"
+//#include "prCopy.h"
 #include "ideals.h"
 #include "ring.h"
 #include "febase.h"
@@ -16,10 +16,11 @@
 #include "kbuckets.h"
 
 #define FULLREDUCTIONS
-#define HALFREDUCTIONS
+//#define HALFREDUCTIONS
 #define HEAD_BIN
 //#define HOMOGENEOUS_EXAMPLE
 #define REDTAIL_S
+#define PAR_N 5
 //#define REDTAIL_PROT
 //#define QUICK_SPOLY_TEST
 //#define DIAGONAL_GOING
@@ -29,6 +30,26 @@ struct int_pair_node{
   int a;
   int b;
 };
+int bucket_guess(kBucket* bucket){
+  int sum=0;
+  int i;
+  for (i=0;i<MAX_BUCKET+1;i++){
+    sum+=bucket->buckets_length[i];
+  }
+  return sum;
+}
+struct redNF_inf{
+  poly h;
+  LObject* P;
+  int_pair_node* pending;
+  int len_upper_bound;
+  int i;
+  int j;
+  BOOLEAN need_std_rep;
+  BOOLEAN is_free;
+  BOOLEAN started;
+};
+
 #ifdef RANDOM_WALK
 int my_rand(int n){
   //RANDOM integer beetween 0,..,n-1
@@ -41,7 +62,8 @@ enum calc_state
   {
     UNCALCULATED,
     HASTREP,
-    UNIMPORTANT
+    UNIMPORTANT,
+    SOONTREP
   };
 struct calc_dat
 {
@@ -56,6 +78,7 @@ struct calc_dat
   int* T_deg;
   int* misses;
   int_pair_node* soon_free;
+  redNF_inf* work_on;
 #ifdef HEAD_BIN
   struct omBin_s*   HeadBin;
 #endif
@@ -72,21 +95,22 @@ struct calc_dat
   int misses_counter;
   int misses_series;
 };
-bool find_next_pair(calc_dat* c);
+BOOLEAN find_next_pair(calc_dat* c);
 void shorten_tails(calc_dat* c, poly monom);
 void replace_pair(int & i, int & j, calc_dat* c);
 void initial_data(calc_dat* c);
 void add_to_basis(poly h, calc_dat* c);
 void do_this_spoly_stuff(int i,int j,calc_dat* c);
 ideal t_rep_gb(ring r,ideal arg_I);
-bool has_t_rep(const int & arg_i, const int & arg_j, calc_dat* state);
+BOOLEAN has_t_rep(const int & arg_i, const int & arg_j, calc_dat* state);
 int* make_connections(int from, poly bound, calc_dat* c);
 int* make_connections(int from, int to, poly bound, calc_dat* c);
-void now_t_rep(int arg_i, int arg_j, calc_dat* c);
+void now_t_rep(const int & arg_i, const int & arg_j, calc_dat* c);
+void soon_t_rep(const int & arg_i, const int & arg_j, calc_dat* c);
 int pLcmDeg(poly a, poly b);
 int simple_posInS (kStrategy strat, poly p,int len);
 
-bool find_next_pair(calc_dat* c)
+BOOLEAN find_next_pair(calc_dat* c)
 {
   int start_i,start_j,i,j;
   start_i=0;
@@ -117,7 +141,7 @@ bool find_next_pair(calc_dat* c)
 	  {
 	    c->continue_i=c->found_i=i;
 	    c->continue_j=c->found_j=j;
-	    return true;
+	    return TRUE;
 	  }
 	else
           {
@@ -151,7 +175,7 @@ bool find_next_pair(calc_dat* c)
 	    {
 	      c->continue_i=c->found_i=i;
 	      c->continue_j=c->found_j=j;
-	      return true;
+	      return TRUE;
 	    }
           else
 	    {
@@ -174,7 +198,7 @@ bool find_next_pair(calc_dat* c)
     c->continue_j=0;
     return find_next_pair(c);
   }
-  return false;
+  return FALSE;
 }
 void move_forward_in_S(int old_pos, int new_pos,kStrategy strat)
 {
@@ -254,6 +278,7 @@ void replace_pair(int & i, int & j, calc_dat* c)
       pSetm(lm);
       if (pFDeg(lm)>=deciding_deg)
 	{
+	  soon_t_rep(i_con[m],j_con[n],c);
 	  int_pair_node* h= (int_pair_node*)omalloc(sizeof(int_pair_node));
 	  if (last!=NULL)
 	    last->next=h;
@@ -390,7 +415,7 @@ int* make_connections(int from, int to, poly bound, calc_dat* c)
   int not_yet_found=cans_length;
   int con_checked=0;
   int pos;
-  bool can_find_more=true;
+  BOOLEAN can_find_more=TRUE;
   while(((not_yet_found>0) && (con_checked<connected_length))||can_find_more){
     if ((con_checked<connected_length)&& (not_yet_found>0)){
       pos=connected[con_checked];
@@ -472,9 +497,44 @@ static inline poly p_MoveHead(poly p, omBin b)
   return np;
 }
 #endif
+int init_red_phase1(calc_dat* c, int i, int j){
+  int counter;
+  for(counter=0;(counter<PAR_N)||(c->work_on[i].is_free);counter++){}
+  assume(counter<PAR_N);
+
+  int pos=counter;
+  c->work_on[pos].is_free=FALSE;
+  c->work_on[pos].i=i;
+  c->work_on[pos].j=j;
+  return pos;
+}
+void init_red_spoly_phase2(calc_dat* c,int pos){
+  poly h=ksOldCreateSpoly(c->S->m[c->work_on[pos].i], c->S->m[c->work_on[pos].j], NULL, c->r);
+  if (h==NULL){
+    c->work_on[pos].is_free=TRUE;
+    return;
+  }
+  if (c->work_on[pos].P!=NULL)
+    delete c->work_on[pos].P;
+  c->work_on[pos].P=new LObject(h);
+
+  
+  int len=pLength(h);
+  c->work_on[pos].len_upper_bound=len;
+  c->work_on[pos].P=new LObject(h);
+  c->work_on[pos].P->SetShortExpVector();
+  c->work_on[pos].P->bucket = kBucketCreate(currRing);
+  kBucketInit(c->work_on[pos].P->bucket,c->work_on[pos].P->p,len /*pLength(P.p)*/);
+  
+};
 void initial_data(calc_dat* c){
   void* h;
   int i,j;
+  c->work_on=(redNF_inf*) omalloc(PAR_N*sizeof(redNF_inf));
+  int counter;
+  for(counter=0;counter<PAR_N;counter++){
+    c->work_on[counter].is_free=TRUE;
+  }
   c->misses_series=0;
   c->soon_free=NULL;
   c->misses_counter=0;
@@ -803,6 +863,7 @@ static poly redNF (poly h,kStrategy strat)
     }
 }
 #else
+
 static poly redNF2 (poly h,calc_dat* c , int &len)
 {
   len=0;
@@ -823,12 +884,15 @@ static poly redNF2 (poly h,calc_dat* c , int &len)
   //int max_pos=simple_posInS(strat,P.p);
   loop
     {
+      int compare_bound;
+      compare_bound=bucket_guess(P.bucket);
+      len_upper_bound=min(compare_bound,len_upper_bound);
       j=kFindDivisibleByInS(strat->S,strat->sevS,strat->sl,&P);
       if (j>=0)
 	{
 	  poly sec_copy=NULL;
 	  //pseudo code
-	  bool must_replace_in_basis=(len_upper_bound<=strat->lenS[j]);//first test
+	  BOOLEAN must_replace_in_basis=(len_upper_bound<=strat->lenS[j]);//first test
 	  if (must_replace_in_basis)
 	    {
 	      //second test
@@ -840,7 +904,7 @@ static poly redNF2 (poly h,calc_dat* c , int &len)
 		}
 	      else
 		{
-		  must_replace_in_basis=false;
+		  must_replace_in_basis=FALSE;
 		}
 	    }
 	  nNormalize(pGetCoeff(P.p));
@@ -856,19 +920,19 @@ static poly redNF2 (poly h,calc_dat* c , int &len)
 	  len_upper_bound=len_upper_bound+strat->lenS[j]-2;
 	  number coef=kBucketPolyRed(P.bucket,strat->S[j],
 				     strat->lenS[j]/*pLength(strat->S[j])*/,
-  strat->kNoether);
- nDelete(&coef);
- h = kBucketGetLm(P.bucket);
- //pseudo code
- if (must_replace_in_basis){
-   int old_pos_in_c=-1;
-   poly p=strat->S[j];
-   int z;
+				     strat->kNoether);
+	  nDelete(&coef);
+	  h = kBucketGetLm(P.bucket);
+	  //pseudo code
+	  if (must_replace_in_basis){
+	    int old_pos_in_c=-1;
+	    poly p=strat->S[j];
+	    int z;
    
-   int new_length=pLength(sec_copy);
-   Print("%i",strat->lenS[j]-new_length);
-   len_upper_bound=new_length +strat->lenS[j]-2;//old entries length
-   int new_pos=simple_posInS(c->strat,strat->S[j],new_length);
+	    int new_length=pLength(sec_copy);
+	    Print("%i",strat->lenS[j]-new_length);
+	    len_upper_bound=new_length +strat->lenS[j]-2;//old entries length
+	    int new_pos=simple_posInS(c->strat,strat->S[j],new_length);//hack
    strat->S[j]=sec_copy;
    c->strat->lenS[j]=new_length;
    
@@ -906,6 +970,7 @@ static poly redNF2 (poly h,calc_dat* c , int &len)
      
 
      int old_pos=j;
+     new_pos=min(old_pos, new_pos);
      assume(new_pos<=old_pos);
  
 
@@ -1208,7 +1273,7 @@ ideal t_rep_gb(ring r,ideal arg_I){
   omfree(c);
   return(I);
 }
-void now_t_rep(int arg_i, int arg_j, calc_dat* c){
+void now_t_rep(const int & arg_i, const int & arg_j, calc_dat* c){
   int i,j;
   if (arg_i==arg_j){
     return;
@@ -1222,11 +1287,28 @@ void now_t_rep(int arg_i, int arg_j, calc_dat* c){
   }
   c->states[j][i]=HASTREP;
 }
-bool has_t_rep(const int & arg_i, const  int & arg_j, calc_dat* state){
+void soon_t_rep(const int& arg_i, const int& arg_j, calc_dat* c)
+{
+  int i,j;
+  if (arg_i==arg_j){
+    return;
+  }
+  if (arg_i>arg_j){
+    i=arg_j;
+    j=arg_i;
+  } else {
+    i=arg_i;
+    j=arg_j;
+  }
+  if (!
+      (c->states[j][i]==HASTREP))
+    c->states[j][i]=SOONTREP;
+}
+BOOLEAN has_t_rep(const int & arg_i, const  int & arg_j, calc_dat* state){
 
   if (arg_i==arg_j)
     {
-      return (true);
+      return (TRUE);
     }
   if (arg_i>arg_j)
     {
@@ -1280,12 +1362,12 @@ void shorten_tails(calc_dat* c, poly monom)
       if (c->S->m[i]==NULL) continue;
       poly tail=c->S->m[i]->next;
       poly prev=c->S->m[i];
-      bool did_something=false;
+      BOOLEAN did_something=FALSE;
       while((tail!=NULL)&& (pLmCmp(tail, monom)>=0))
 	{
 	  if (p_LmDivisibleBy(monom,tail,c->r))
 	    {
-	      did_something=true;
+	      did_something=TRUE;
 	      prev->next=tail->next;
 	      tail->next=NULL;
 	      p_Delete(& tail,c->r);
