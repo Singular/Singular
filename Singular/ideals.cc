@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.67 1999-10-20 13:30:00 obachman Exp $ */
+/* $Id: ideals.cc,v 1.68 1999-10-21 11:36:32 pohl Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2217,13 +2217,14 @@ static void idNextPotence(ideal given, ideal result,
     IDELEMS(result) += 16;
   }
   if (begin == end) return;
-  for (i=restdeg-1;i>=0;i--)
+  for (i=restdeg-1;i>0;i--)
   {
     p = pPower(pCopy(given->m[begin]),i);
     p = pMult(pCopy(ap),p);
     idNextPotence(given, result, begin+1, end, deg, restdeg-i, p);
     pDelete(&p);
   }
+  idNextPotence(given, result, begin+1, end, deg, restdeg, ap);
 }
 
 ideal idPower(ideal given,int exp)
