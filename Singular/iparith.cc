@@ -191,7 +191,7 @@ cmdnames cmds[] =
   { "leadcoef",    0, LEADCOEF_CMD ,      CMD_1},
   { "leadexp",     0, LEADEXP_CMD ,       CMD_1},
   { "LIB",         0, LIB_CMD ,           SYSVAR},
-  { "lift",        0, LIFT_CMD ,          CMD_2},
+  { "lift",        0, LIFT_CMD ,          CMD_23},
   { "liftstd",     0, LIFTSTD_CMD ,       CMD_2},
   { "link",        0, LINK_CMD ,          ROOT_DECL},
   { "listvar",     0, LISTVAR_CMD ,       LISTVAR_CMD},
@@ -3899,6 +3899,23 @@ static BOOLEAN jjMATRIX_Ma(leftv res, leftv u, leftv v,leftv w)
   res->data = (char *)m;
   return FALSE;
 }
+static BOOLEAN jjLIFT3(leftv res, leftv u, leftv v, leftv w)
+{
+  ideal m;
+  int ul= IDELEMS((ideal)u->Data());
+  int vl= IDELEMS((ideal)v->Data());
+  if (hasFlag(u,FLAG_STD))
+  {
+    m = idLift((ideal)u->Data(),(ideal)v->Data());
+    res->data = (char *)idModule2formatedMatrix(m,ul,vl);
+  }
+  else
+  {
+    m = idLiftNonStB((ideal)u->Data(),(ideal)v->Data(), (int)w->Data());
+    res->data = (char *)idModule2formatedMatrix(m,ul,vl);
+  }
+  return FALSE;
+}
 static BOOLEAN jjREDUCE3_P(leftv res, leftv u, leftv v, leftv w)
 {
   assumeStdFlag(v);
@@ -4003,6 +4020,7 @@ struct sValCmd3 dArith3[]=
 ,{jjRES3,           MRES_CMD,   NONE,       IDEAL_CMD,  INT_CMD,    ANY_TYPE }
 ,{jjRES3,           MRES_CMD,   NONE,       MODUL_CMD,  INT_CMD,    ANY_TYPE }
 #endif
+,{jjLIFT3,          LIFT_CMD,   MATRIX_CMD, IDEAL_CMD,  IDEAL_CMD,  INT_CMD }
 ,{jjPREIMAGE,       PREIMAGE_CMD, IDEAL_CMD, RING_CMD,  ANY_TYPE,   ANY_TYPE }
 ,{jjPREIMAGE,       PREIMAGE_CMD, IDEAL_CMD, QRING_CMD, ANY_TYPE,   ANY_TYPE }
 ,{jjRANDOM_Im,      RANDOM_CMD, INTMAT_CMD, INT_CMD,    INT_CMD,    INT_CMD }
