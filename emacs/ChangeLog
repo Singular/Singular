@@ -1,0 +1,48 @@
+Wed Jul 22 11:45:56 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* singular.el (singular-interactive-mode):
+	  `comint-truncate-buffer' is added to `comint-truncate-buffer'
+	  via a local `add-hook'
+	  (singular-interactive-mode): doc fix
+	  (singular-interactive-mode): `mode-name' fixed
+	  (singular): doc fix
+
+	* singular.el (comint-mode): new advice
+	  `singular-interactive-mode'
+	  (singular-interactive-mode): call to `comint-mode' re-added
+	  (singular-interactive-mode): call to `comint-read-input-ring'
+	  moved to `singular'
+	  (singular): almost completely rewritten.  Runs
+	  `singular-interactive-mode' only on creation of a new buffer.
+	  Runs hooks on `singular-exec-hook'.  Reads input ring on
+	  creation of a new process.
+
+	* singular.el (singular-prompt-regexp): doc fix
+	  (singular-input-ignoredups, singular-maximum-buffer-size):
+	  unmade customizable
+
+	* singular.el (singular-history-filter-regexp): new variable
+	  (singular-history-filter): new variable
+	  (singular-interactive-mode): sets `comint-input-filter' to
+	  `singular-history-filter'
+
+	* singular.el (singular-interactive-mode): adds
+	  `comint-truncate-buffer' to `comint-output-filter-functions'.
+	  `singular-buffer-maximum-size' unmade buffer local.
+
+	* singular.el (singular-interactive-mode): does not run
+	  `comint-mode'.  Mode name changed to `"Singular Interactive".
+
+	* singular.el (singular-debug): doc fix
+	  (singular-debug): recognition of mode `all' added
+	  (singular-interactive-mode): `singular-debug' unmade buffer
+	  local
+
+	* singular.el (singular-exit-sentinel): debug messages added
+
+	* singular.el (singular-start-file): doc fix
+	  (singular-default-executable, singular-default-name,
+	  singular-default-switches): doc fix
+	  (singular, singular-interactive-mode): doc fix
+	  (singular-delimiter-argument-list, singular-input-ignoredups,
+	  singular-buffer-maximum-size, singular-input-ring-size): doc fix
