@@ -1,0 +1,13 @@
+Thu Mar 20 11:57:00 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* sing_mp.cc (slInitBatchLink): initialized silink such that
+	  l->argv[0] == "MP:connect" (otherwise, slInitMP failed)
+
+Wed Mar 19 15:38:08 1997  Olaf Bachmann  <obachman@schlupp.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* hannes fixed maFindPerm to reflect new names <->parameter scheme 
+
+	* sing_mp.cc (mpsr_IsMPLink): fixed it
+
+	* Makefile (tags): added target tags
+
