@@ -1,3 +1,9 @@
+Wed May 27 11:42:11 MET DST 1998 hannes
+        * added some type conversions
+        * change default LIB-dir (now /usr/local/Singular/LIB)
+	* minor fixes: type in "map operations"
+	* added examples in "types.doc"
+
 Mon May 25 09:52:16 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* general.doc (The SINGULAR language): text on general language

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.66 1998-05-25 12:27:56 Singular Exp $
+@comment $Id: types.doc,v 1.67 1998-05-27 10:06:40 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -34,24 +34,24 @@ list of expressions.
 For the general syntax of a declaration see @ref{General command syntax}.
 
 @menu
-* def::                         
-* ideal::                       
-* int::                         
-* intmat::                      
-* intvec::                      
-* link::                        
-* list::                        
-* map::                         
-* matrix::                      
-* module::                      
-* number::                      
-* poly::                        
-* proc::                        
-* qring::                       
-* resolution::                  
-* ring::                        
-* string::                      
-* vector::                      
+* def::
+* ideal::
+* int::
+* intmat::
+* intvec::
+* link::
+* list::
+* map::
+* matrix::
+* module::
+* number::
+* poly::
+* proc::
+* qring::
+* resolution::
+* ring::
+* string::
+* vector::
 @end menu
 
 @c ---------------------------------------
@@ -66,14 +66,14 @@ E.g., @code{ideal i=x,y,z; def j=i^2;} defines the ideal @code{i^2}
 with the name @code{j}.
 
 @strong{Note:} Unlike other assignments a ring as an untyped object
-is not a copy but another reference to the same ring. This means that 
+is not a copy but another reference to the same ring. This means that
 entries in one of these rings appear also in the other ones.
 The following defines a ring @code{s} which is just another reference (or name)
 for the basering @code{r}.
 
 @example
 @c example
-  ring r;
+  ring r=32003,(x,y,z),dp;
   poly f = x;
   def s=basering;
   setring s;
@@ -86,7 +86,7 @@ for the basering @code{r}.
 @end example
 
 This reference to a ring with def is useful if the basering
-is not local to the procedure (so it cannot be accessed by its name) but one 
+is not local to the procedure (so it cannot be accessed by its name) but one
 needs a name for it (e.g., for a use with @code{setring} or @code{map}).
 @code{setring r;} does not work in this case, because
 @code{r} may not be local to the procedure.
@@ -126,7 +126,7 @@ is local to the procedure.
 @end table
 
 @c ref
-See 
+See
 @ref{typeof}.
 @c ref
 
@@ -198,8 +198,8 @@ ideal expressions combined by the arithmetic operations
 @item
 a power of an ideal expression (operator @code{^} or @code{**})
 @*Note that the computation of the product @code{i*i} involves
-all products of generators of @code{i} and simplifies the product 
-while @code{i^2} involves only the different ones, 
+all products of generators of @code{i} and simplifies the product
+while @code{i^2} involves only the different ones,
 but does not simplify the result and is therefore faster.
 @item
 a type cast to ideal
@@ -239,7 +239,7 @@ a type cast to ideal
 addition (concatenation of the generators and simplification)
 
 @item @code{*}
-multiplication (with ideal, poly, vector, module; simplification in case of 
+multiplication (with ideal, poly, vector, module; simplification in case of
 multiplication with ideal)
 
 @item @code{^}
@@ -257,7 +257,7 @@ are polynomial generators of the ideal, index 1 gives the first generator.
   ring r=0,(x,y,z),dp;
   ideal I = 0,x,0,1;
   I;
-  I + 0;    // simplification 
+  I + 0;    // simplification
   ideal J = I,0,x,x-z;;
   J;
   I * J;   //  multiplication with simplification
@@ -464,7 +464,7 @@ a function returning int
 int expressions combined by the arithmetic operations
 @code{+}, @code{-}, @code{*}, @code{div}, @code{/},
 @code{%} (@code{mod}), or @code{^}
-@item a boolean expression 
+@item a boolean expression
 @item
 a type cast to int
 @end enumerate
@@ -503,8 +503,8 @@ intvec v = 1,2,3;
 def d =transpose(v)*v;    // scalarproduct
 typeof(d);
 int i = d[1];             // no cast from intvec to int, access first element
-ring r;
-poly f = 1;            
+ring rr=32003,(x,y,z),dp;
+poly f = 1;
 i = int(f);               // cast to int
 //----------------------------------------------------
 int j=1;
@@ -558,7 +558,7 @@ comparison
 @end table
 
 @strong{Note:} An assignment @code{j=i++;} or @code{j=i--;} does not change
-the value of @code{j}, see @ref{Limitations}. 
+the value of @code{j}, see @ref{Limitations}.
 
 @*@strong{Example:}
 @example
@@ -567,8 +567,8 @@ the value of @code{j}, see @ref{Limitations}.
   int j;
   i++; i;  i--; i;
   // ++ and -- do not return a value as in C, the variable j is unchanged
-  j = i++; j; i;  
-  j = i--; j; i; 
+  j = i++; j; i;
+  j = i--; j; i;
   i+2, 2-i, 5^2;
   5 div 2, 8%3;
   1<2, 2<=2;
@@ -685,7 +685,7 @@ a number comparison:
 @end example
 For numbers from Z/p or from field extensions not all operations are useful:
 @* - 0 ist always the smallest element,
-@* - in Z/p the representatives in the range -p/2..p/2 are used for 
+@* - in Z/p the representatives in the range -p/2..p/2 are used for
 comparisons,
 @* - in field extensions the last two operations
 (@code{>=,<=}) yield always TRUE (1) and
@@ -865,7 +865,7 @@ a type cast to intmat
   intvec v2=5,7,8;
   m1=v1,v2;         // overwrite m1 with v1 and v2
   m1;
-  trace(m1*m2);  
+  trace(m1*m2);
 @c example
 @end example
 @c ref
@@ -893,7 +893,7 @@ diagonal intmat
 
 @item @code{div, /}
 division of entries in the integers (omitting the remainder)
-@item @code{%, mod} 
+@item @code{%, mod}
 entries modulo int (remainder of the division)
 @item @code{<>}, @code{==}
 comparison
@@ -914,8 +914,8 @@ second the column
   m * v;
   typeof(_);
   intmat m1[4][3] = 0,1,2,3,v,1;
-  intmat m2 = m * m1; 
-  m2;             //  2 x 3 intmat 
+  intmat m2 = m * m1;
+  m2;             //  2 x 3 intmat
   m2*10;           // multiply each entry of m with 10;
   -m2;
   m2 % 2;
@@ -1033,7 +1033,7 @@ a type cast to intvec
   intvec v=-1,2;
   intvec w=v,v;         // concatenation
   w;
-  w = -2..2,v,1; 
+  w = -2..2,v,1;
   w;
   intmat m[2][3] = 0,1,2,-2,3,1;
   m*v;
@@ -1090,7 +1090,7 @@ is an element of the intvec; the first element has index one.
   iv+iv;              // componentwise addition
   iv[size(iv)-1];     // last-1 entry
   intvec iw=2,3,4,0;
-  iv==iw;             // lexicographic comparision 
+  iv==iw;             // lexicographic comparision
   iv < iw;
   iv != iw;
 @c example
@@ -1713,13 +1713,15 @@ a type cast to list
 See @ref{Type conversion and casting}.
 @c ref
 
-@*@strong{Example:}
-@example
-@c example
-
-@c example
-@end example
-
+@c @*@strong{Example:}
+@c @example
+@c @c example
+@c   list l1=1,2;
+@c   list l2=2,3;
+@c   list A=l1+l2; A;
+@c   list B=l1,l2; B;
+@c @c example
+@c @end example
 
 @c ------------------------------
 @node list operations, list related functions, list expressions, list
@@ -1743,7 +1745,7 @@ is a list entry; the index 1 gives the first element.
   list l1 = 1,"hello",list(-1,1);
   list l2 = list(1,2,3);
   l1 + l2;          // one new list
-  list l3 =_;    
+  list l3 =_;
   l1,l2;            // two lists
   l2[2];
   intvec v =-1,0;
@@ -1959,14 +1961,18 @@ then @code{f(g)} is an map expression giving the composition of @code{f}
 and @code{g}.
 
 @item map_expression @code{[} int_expressions @code{]}
-is a map entry
+is a map entry (the image of the corresponding variable)
 @end table
 
 
 @*@strong{Example:}
 @example
 @c example
-
+  ring r=0,(x,y),dp;
+  map f=r,y,x;
+  poly p=x+2*y^3;
+  map g=f(f);
+  g(p);
 @c example
 @end example
 
@@ -2063,12 +2069,11 @@ matrix expressions combined by the arithmetic operations
 a type cast to matrix
 @end enumerate
 
-@*@strong{Example:}
-@example
-@c example
-
-@c example
-@end example
+@c @*@strong{Example:}
+@c @example
+@c @c example
+@c @c example
+@c @end example
 
 @c ------------------------------
 @node matrix operations, matrix related functions, matrix expressions, matrix
@@ -2099,7 +2104,9 @@ second the column
 @*@strong{Example:}
 @example
 @c example
-
+  ring r=32003,x,dp;
+  matrix m[2][2]=1,2,3;
+  print(m-transpose(m));
 @c example
 @end example
 
@@ -2270,12 +2277,11 @@ See
 @ref{vector}.
 @c ref
 
-@*@strong{Example:}
-@example
-@c example
-
-@c example
-@end example
+@c @*@strong{Example:}
+@c @example
+@c @c example
+@c @c example
+@c @end example
 
 @c ------------------------------
 @node module operations, module related functions, module expressions, module
@@ -2300,7 +2306,9 @@ is a vector, where the index indicates the column
 @*@strong{Example:}
 @example
 @c example
-
+  ring r=0,(x,y,z),dp;
+  module m=[x,y],[0,0,z];
+  print(m*(x+y));
 @c example
 @end example
 
@@ -2482,7 +2490,7 @@ a type cast to number
 @*@strong{Example:}
 @example
 @c example
-  2 / 3, 4/ 8,  2 /2; // are in any ring int expressions 
+  2 / 3, 4/ 8,  2 /2; // are in any ring int expressions
   ring r0=0,x,dp;
   2/3, 4/8, 2/2 ; // are numbers
 
@@ -2546,7 +2554,6 @@ expressions}.
   number(2)/(2+3);
   2^-2;
   number(2)^-2;
-  
 @c example
 @end example
 
@@ -2891,7 +2898,7 @@ and modules, a resolution can only be defined w.r.t.@: a basering.
 to access the elements of a resolution, it has to be assigned to a list,
 which also complete computations and may therefore take time,
 (resp.@: an access directly with the brackets @code{[ , ]} causes
-implicitly a cast to a list). 
+implicitly a cast to a list).
 
 @menu
 * resolution declarations::
@@ -3078,7 +3085,7 @@ Variables of type @code{string} are used for output (almost every type
 can be "converted" to @code{string}) and for creating new
 commands at runtime (see @ref{execute}).  They are also return values of
 certain interpreter related functions (see @ref{Functions}).  String
-constants consist of a sequence of ANY characters (including newline!) 
+constants consist of a sequence of ANY characters (including newline!)
 between a starting @code{"} and a closing @code{"}.  There is also a
 string constant @code{newline}, which is the newline character.  The
 @code{+} sign "adds" strings, @code{""} is the empty string (hence
@@ -3146,7 +3153,7 @@ A string expression is:
 @enumerate
 @item
 a sequence of characters between two unescaped quotes (@code{"})
-@item 
+@item
 a list of string expressions
 @item
 an identifier of type string
@@ -3336,7 +3343,7 @@ vector expressions combined by the arithmetic operations @code{+} or
 @item
 a poly expression and a vector expression combined by the arithmetic
 operation @code{*}
-@item 
+@item
 a type cast to vector using the brackets @code{[} , @code{]}
 @end enumerate
 
@@ -3354,8 +3361,8 @@ a type cast to vector using the brackets @code{[} , @code{]}
 @end example
 
 @c ref
-See 
-@ref{ring}; 
+See
+@ref{ring};
 @ref{Type conversion and casting}.
 @c ref
 
