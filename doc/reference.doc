@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.88 1998-06-19 14:12:12 gorzel Exp $
+@comment $Id: reference.doc,v 1.89 1998-06-19 15:55:25 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2875,10 +2875,10 @@ either homogeneous or if the ordering is local.
 @end example
 @end table
 @menu
-* minstd::
+* mstd::
 @end menu
 @iftex
-See @ref{minstd}.
+See @ref{mstd}.
 @end iftex
 @c ---------------------------------------
 @node minor, minres, minbase, Functions
@@ -4911,7 +4911,6 @@ if the ideal resp. module is homogeneous,
 @end example
 @end table
 @c ref
-@iftex
 See
 @ref{ideal};
 @ref{ring};
@@ -5713,7 +5712,7 @@ listvar();
 @end table
 @c ref
 See @ref{keepring}.
-@ ref
+@c ref
 @c ---------------------------------------
 @node for, if, export, Control structures
 @subsection for
@@ -6239,6 +6238,7 @@ commands, see example below.
 * Command line options::
 * system::
 * rtimer::
+@end menu
 @iftex
 See @ref{Command line options}; @ref{system}; @ref{rtimer}.
 @end iftex

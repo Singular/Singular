@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.47 1998-06-19 14:12:17 gorzel Exp $
+@comment $Id: singular.doc,v 1.48 1998-06-19 15:55:27 obachman Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -588,7 +588,7 @@ described in the following subsections.
 * latex_lib:: procedures for typeseting in TeX
 * hnoether_lib:: procedures for the Hamburger-Noether-development
 * classify_lib:: procedures for classifying hypersurface singularities
-* graphics.lib:: procedures to draw  with Mathematica
+* graphics_lib:: procedures to draw  with Mathematica
 @end menu
 @c ----------------------------------------------------------
 @node standard_lib, all_lib, SINGULAR libraries, SINGULAR libraries

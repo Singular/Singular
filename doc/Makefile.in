@@ -61,7 +61,7 @@ singular.hlp: ${MANUAL_FILES}
 	- ${MAKEINFO} --no-split singular.tex
 
 # dvi stuff
-dvi: singular.dvi tutor.dvi usercard.dvi
+dvi: singular.dvi usercard.dvi
 
 singular.dvi: ${MANUAL_FILES}
 	${TEXI2DVI} singular.tex
@@ -73,7 +73,7 @@ usercard.dvi: usercard.tex singcard.tex
 	${TEX} $<
 
 # postscript stuff
-ps: singular.ps tutor.ps usercard.ps
+ps: singular.ps usercard.ps
 
 usercard.ps: usercard.dvi
 	${DVIPS} -t landscape $< -o $@

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 'di ';
 'ig 00 ';
-# $Id: texi2html,v 1.6 1998-06-19 13:35:42 krueger Exp $
+# $Id: texi2html,v 1.7 1998-06-19 15:55:28 obachman Exp $
 # Description: Program to transform most Texinfo documents to HTML.
 # The plan is for the next version of makeinfo to support HTML output
 # directly, but until then ...
@@ -2053,7 +2053,7 @@ sub apply_l_style {
 	    $style = $';
 	    $text = &$style($text);
 	} elsif ($style) { # good style
-	    $text = "<H1><$style>$text</$style></H1>";
+	    $text = "<$style>$text</$style>";
 	} else { # no style
 	}
     } else { # unknown style
@@ -2414,5 +2414,4 @@ World Wide Web (WWW).
 This program does not understand all Texinfo commands (yet).
 .PP
 TeX specific commands (normally enclosed in @iftex) will be
-passed unmodified.
-.ex
+passed u
