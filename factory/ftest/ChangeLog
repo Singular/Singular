@@ -1,3 +1,47 @@
+Fri Jul  3 11:26:56 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* ChangeLog, divrem.m4, feval.m4:
+	  ***** merge from branch `factory-gcd' to main trunk
+
+	* divrem.m4 (ftestSetNameOfGame): doc fix
+
+    **************** <<< changes in branch `factory-gcd' ****************
+
+	* fbinops.m4 (binOpCFSpecArray): new entry for `psr()'
+	  (ftestPsrTest): new test function
+
+	* fbinops.m4 (ftestDivideTest, ftestModuloTest): bug fix. `%'
+	  replaced by `%%' in args to `ftestError()'.
+
+	* fbinops.m4 (ftestSetNameOfGame): doc fix
+
+Wed Jul  1 12:14:55 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* divrem.m4 (divremCheck): bug fix.  `%' in messages replaced by
+	  `%%'.
+
+    **************** >>> changes in branch `factory-gcd' ****************
+
+Tue Jun 30 16:37:33 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* divides.m4: new file
+
+Mon Jun  8 17:06:29 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+    **************** <<< changes in branch `factory-gcd' ****************
+
+	* gcd.m4 (normalizeGcd): division by leading coefficient in char 0
+	  is done in rational case only
+
+Fri Jun  5 11:53:20 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* feval.m4 (main): accepts optional argument `expand'
+
+	* feval.m4 (main): call to `ftestGetCanonicalForm()' replaced by
+	  call to `ftestReadString()'
+
+    **************** >>> changes in branch `factory-gcd' ****************
+
 Thu May  7 17:24:39 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* factorize.m4 (main): accepts optional variable now
