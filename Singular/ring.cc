@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.27 1998-06-15 08:07:56 krueger Exp $ */
+/* $Id: ring.cc,v 1.28 1998-07-21 15:56:42 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -56,7 +56,7 @@ void rChangeCurrRing(ring r, BOOLEAN complete)
   if (r != NULL)
   {
 
-    if (complete) 
+    if (complete)
     {
       /*------------ set global ring vars --------------------------------*/
       currQuotient=r->qideal;
@@ -71,7 +71,7 @@ void rChangeCurrRing(ring r, BOOLEAN complete)
     pSetGlobals(r, complete);
 
 
-    if (complete) 
+    if (complete)
     {
     /*------------ set naMinimalPoly -----------------------------------*/
       if (r->minpoly!=NULL)
@@ -181,7 +181,15 @@ void rSetHdl(idhdl h, BOOLEAN complete)
       }
     }
   }
-
+  #ifdef HAVE_TCL
+  else
+  {
+    if (tclmode)
+    {
+      PrintTCLS('R',"");
+    }
+  }
+  #endif
 }
 
 idhdl rDefault(char *s)

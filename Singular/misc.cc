@@ -464,14 +464,17 @@ void singular_help(char *str,BOOLEAN example)
   /* --------- everything else is for the manual ----------------*/
     else
     {
-#ifdef buildin_help
-      singular_manual(str);
-#else
-      system(feGetInfoCall(str));
-#ifndef MSDOS
+#ifdef HAVE_TCL
+      if(!tclmode)
+#endif
+     #ifdef buildin_help
+        singular_manual(str);
+     #else
+        system(feGetInfoCall(str));
+     #ifndef MSDOS
       //sprintf(tmp,"clear");
       //system(tmp);
-#endif
+     #endif
 #endif
     }
   }
@@ -575,6 +578,10 @@ BOOLEAN setOption(leftv res, leftv v)
     }
     if(strcmp(n,"none")==0)
     {
+      #ifdef HAVE_TCL
+      if (tclmode)
+        PrintTCLS('O',"none");
+      #endif
       test=0;
       verbose=0;
       goto okay;
@@ -584,7 +591,13 @@ BOOLEAN setOption(leftv res, leftv v)
       if (strcmp(n,optionStruct[i].name)==0)
       {
         if (optionStruct[i].setval & validOpts)
+	{
           test |= optionStruct[i].setval;
+          #ifdef HAVE_TCL
+          if (tclmode)
+            PrintTCLS('O',n);
+          #endif
+	}
         else
           Warn("cannot set option");
         if (TEST_OPT_INTSTRATEGY && (currRing!=NULL) && (currRing->ch>=2))
@@ -599,6 +612,10 @@ BOOLEAN setOption(leftv res, leftv v)
         if (optionStruct[i].setval & validOpts)
         {
           test &= optionStruct[i].resetval;
+          #ifdef HAVE_TCL
+          if (tclmode)
+            PrintTCLS('O',n);
+          #endif
         }
         else
           Warn("cannot clear option");
@@ -616,6 +633,10 @@ BOOLEAN setOption(leftv res, leftv v)
         else                  yydebug=0;
         #endif
         #endif
+        #ifdef HAVE_TCL
+        if (tclmode)
+          PrintTCLS('O',n);
+        #endif
         goto okay;
       }
       else if ((strncmp(n,"no",2)==0)
@@ -627,6 +648,10 @@ BOOLEAN setOption(leftv res, leftv v)
         if (BVERBOSE(V_YACC)) yydebug=1;
         else                  yydebug=0;
         #endif
+        #endif
+        #ifdef HAVE_TCL
+        if (tclmode)
+          PrintTCLS('O',n);
         #endif
         goto okay;
       }
