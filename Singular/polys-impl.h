@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.56 2000-09-18 09:19:29 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.57 2000-10-05 15:19:57 Singular Exp $ */
 
 /***************************************************************
  *
@@ -156,9 +156,7 @@ while (0)
 #define pPolyAssumeReturnMsg(cond, msg)  _pPolyAssumeReturnMsg(cond, msg, p, r)
 
 #define pFalseReturn(cond)  do {if (! (cond)) return FALSE;} while (0)
-  
-
-#if OM_TRACK > 2 
+#if (OM_TRACK > 2) && defined(OM_TRACK_CUSTOM)
 #define p_SetRingOfPoly(p, r) omSetCustomOfAddr(p, r)
 #else
 #define p_SetRingOfPoly(p, r) ((void)0)
