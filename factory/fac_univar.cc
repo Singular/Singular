@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_univar.cc,v 1.9 1997-06-19 12:23:16 schmidt Exp $ */
+/* $Id: fac_univar.cc,v 1.10 1997-07-16 10:17:29 schmidt Exp $ */
 
 #include <config.h>
 
@@ -151,22 +151,38 @@ cf2double ( const CanonicalForm & f )
     return res;
 }
 
-static double
-dnorm ( const CanonicalForm & f )
+//{{{ static CanonicalForm norm ( const CanonicalForm & f )
+//{{{ docu
+//
+// norm() - return euclidean norm of f.
+//
+// That, is norm(f) = sqrt(sum( f[i]^2 )).  f should be an
+// univariate poly over Z.
+//
+//}}}
+static CanonicalForm
+norm ( const CanonicalForm & f )
 {
     CFIterator i;
     CanonicalForm sum = 0;
     for ( i = f; i.hasTerms(); i++ ) sum += i.coeff() * i.coeff();
     DEBOUTLN( cerr, "sum = " << sum );
-    return sqrt( cf2double( sum ) );
+    return sqrt( sum );
 }
+//}}}
 
+//{{{ static int kBound ( const CanonicalForm & f, int p )
+//{{{ docu
+//
+// kBound() - return bound of coefficients of factors of f (???).
+//
+//}}}
 static int
 kBound ( const CanonicalForm & f, int p )
 {
-    DEBOUTLN( cerr, "lc(f) = " << lc(f) );
-    return (int)((f.degree()*log(2)+log( fabs(cf2double(lc(f))) )+log( dnorm( f ) )) / log( (double)p ) + 0.5) + 1;
+    return (int)(f.degree() + (double)(ilog2( abs(lc(f)) * norm(f) ) + 1) / (double)ilog2(p)) + 1;
 }
+//}}}
 
 modpk
 getZFacModulus()
