@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.17 1997-12-15 22:46:30 obachman Exp $ */
+/* $Id: longalg.cc,v 1.18 1998-02-16 14:22:19 obachman Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1608,7 +1608,7 @@ BOOLEAN naGreater (number a, number b)
     return FALSE;
   if (naIsZero(b))
     return TRUE; /* a!= 0)*/
-  return napDeg(((lnumber)a)->n)>napDeg(((lnumber)b)->n);
+  return napDeg(((lnumber)a)->z)>napDeg(((lnumber)b)->z);
 }
 
 /*2
