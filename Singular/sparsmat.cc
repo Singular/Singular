@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.34 2000-09-14 14:07:25 obachman Exp $ */
+/* $Id: sparsmat.cc,v 1.35 2000-09-14 14:20:45 obachman Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -1953,6 +1953,8 @@ static BOOLEAN smIsNegQuot(poly a, const poly b, const poly c)
   {
     for (i=pVariables; i>0; i--)
     {
+// Wilfried: hier knallts! 
+      pSetExp(a,i, pGetExp(b,i)-pGetExp(c,i));
       int j=pGetExp(b,i)-pGetExp(c,i);
       if (j<0) { Print("!"); j=0;}
       pSetExp(a,i,j);

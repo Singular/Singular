@@ -6,7 +6,7 @@
  *  Purpose: implementation of debug related poly routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pDebug.cc,v 1.2 2000-09-14 14:07:24 obachman Exp $
+ *  Version: $Id: pDebug.cc,v 1.3 2000-09-14 14:20:44 obachman Exp $
  *******************************************************************/
 
 #ifndef PDEBUG_CC
@@ -229,7 +229,13 @@ BOOLEAN _p_Test(poly p, ring r, int level)
     // check order
     if (p_prev != NULL)
     {
-      _pPolyAssumeReturnMsg(p_LmCmp(p_prev, p, r) == 1, "wrong order", p_prev, r);
+      int cmp = p_LmCmp(p_prev, p, r);
+      if (cmp == 0)
+      {
+        _pPolyAssumeReturnMsg(0, "monoms p and p->next are equal", p_prev, r);
+      }
+      else 
+        _pPolyAssumeReturnMsg(p_LmCmp(p_prev, p, r) == 1, "wrong order", p_prev, r);
 
       // check that compare worked sensibly
       if (level > 1 && p_GetComp(p_prev, r) == p_GetComp(p, r))
