@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.338 2005-02-08 18:58:30 levandov Exp $ */
+/* $Id: iparith.cc,v 1.339 2005-02-11 20:18:34 levandov Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2746,6 +2746,7 @@ struct sValCmd2 dArith2[]=
 #endif
 #ifdef HAVE_PLURAL
 ,{jjOPPOSE,    OPPOSE_CMD,     ANY_TYPE/*set by p*/, RING_CMD,   DEF_CMD ALLOW_PLURAL}
+,{jjOPPOSE,    OPPOSE_CMD,     ANY_TYPE/*set by p*/, QRING_CMD,   DEF_CMD ALLOW_PLURAL}
 #endif
 ,{jjPARSTR2,   PARSTR_CMD,     STRING_CMD,     RING_CMD,   INT_CMD ALLOW_PLURAL}
 ,{jjPARSTR2,   PARSTR_CMD,     STRING_CMD,     QRING_CMD,  INT_CMD ALLOW_PLURAL}
