@@ -1,9 +1,13 @@
-// $Id: classify.lib,v 1.6 1997-07-23 17:51:41 krueger Exp $
+// $Id: classify.lib,v 1.7 1997-08-10 08:49:30 krueger Exp $
 //=============================================================================
 //
 // Please send bugs and comments to krueger@mathematik.uni-kl.de
 //
 //=============================================================================
+
+LIBRARY:  Classify.lib
+
+ Classify(f);
 // required libraries
 
 LIB "lib_Setring";
@@ -18,6 +22,7 @@ LIB "NFlist.lib";
 LIB "Hilbert.lib";
 
 //=========================================================================
+//=========================================================================
 proc Classify_lib
 {
 "
@@ -28,49 +33,35 @@ proc Classify_lib
 //=============================================================================
 // TopLevel Funktion of the Arnold-Classifier.
 //
-proc Classify
+proc Classify (poly @f_in)
+USAGE:   Classify(f);  f=poly
+COMPUTE: Normalform and singularity type of f
+RETURN:  Normalform of f
+EXAMPLE: example Classify; shows an example
+REMARK:  This version of Classify is only alpha.
+         Please send bugs and comments to:
+         "Kai Krueger" <krueger@mathematik.uni-kl.de>
+NOTE:    The procedure init_debug(n); is usefull as trace-mode.
+	 n may range from 0 to 10, higher values of n give more informations.
 {
-  if( size(#) != 1 ) {
-//=============================================================================
-    " USAGE:   Classify(<poly>)";
-    " RETURN:  Normal-Form of <poly>";
-    " NOTE:    Tells the typ of f";
-    " EXAMPLE: ring r; ";
-    "          int DeBug=1 / 3 / 6 / 11; ";
-    "          poly g=Classify(f); ";
-    "";
-    " REMARK:  This version of Classify is only alpha.";
-    "          Please send bugs and comments to: ";
-    "          \"Kai Krueger\" <krueger@mathematik.uni-kl.de>";
-    "";
-    "          int DeBug=1; is usefull as trace-mode. For more informations";
-    "          increace the value of \'DeBug\'";
-    "          or set the shell-variable SG_DEBUG to the debugging level.";
-//=============================================================================
-    return();
-  }
+//         or set the shell-variable SG_DEBUG to the debugging level.
   if(system("version")<922) {
     "Sorry. You need to have at least Singular version 0.9.2.c"
     return;
   }
-  if( typeof(#[1]) != "poly") {
-    "Classify: argv(1) must be poly";
-    return(#[1]);
-  }
+
+  def ring_top=basering;
   // Get characteristics of ring set it as default.
   if(defined(CharOfRing) == 1) { kill CharOfRing; }
   int CharOfRing = char(basering);
   export CharOfRing;
 
-  if(checkring()) { return(#[1]); }
+  if(checkring()) { return(@f_in); }
   int @show_nf = 1;    // return normal form if set to '1'
 
-  poly @f_in = #[1];
   int @n = nvars(basering);
 
   // Save the name of initial ring
-  string @RingInput = "setring " + nameof(basering) + ";";
-  string @tmp = "map @Conv=" + nameof(basering) + ",";
   int @i;
 
   // if trace/debug mode not set, do it!
@@ -78,42 +69,37 @@ proc Classify
 
   // define new ring
   if( defined(Rtop) == 1) { kill Rtop; }
-  execute Setring(@n, "Rtop");
+  ring Rtop=char(basering),(x(1..@n)),(c,ds);
   export Rtop;
 
-  @tmp = @tmp + string(maxideal(1)) + ";";
-  execute @tmp;
-
-  execute @RingInput;
+  map @Conv=ring_top,maxideal(1);
+  setring ring_top;
 
   if(defined(ShowPoly) == 1) { kill ShowPoly; }
   map ShowPoly=Rtop,maxideal(1);
   export ShowPoly;
-
   setring Rtop;
   init();
 
-  string RingDisplay = @RingInput;
+  string RingDisplay = "ring_top";
   export RingDisplay;
 
   string @s1;
   string @s2;
   string @s3;
   string @s4;
-//listvar();
-//basering;
   @s1,@s2=Klassifiziere(@Conv(@f_in));
   // @s1: f nach saemtlichen Koordinatentransformationen
   // @s2: Typ des Polynoms f z.b: E[18]
   @s4 = "poly @f_out="+@s1+";";
 //"Corang:"+ string(CoRang);
-"S1=", @s1;
-"S2=", @s2;
+  debug_log(10, "S1=", @s1);
+  debug_log(10, "S2=", @s2);
 
   if( @s2[1,2]=="f " || @s2[1,4]=="The " || @s2=="Fehler!" || @s2=="A[0]") { 
     if( @s2 != "Fehler!") { @s2; }
     if(@s1=="1" || @s2[1,4]=="The " || @s2=="Fehler!" ) { 
-      execute @RingInput;
+      setring ring_top;
       return(@f_in);
     }
     setring Rtop;
@@ -126,7 +112,6 @@ proc Classify
     setring Rtop;
     map @ConvUp=RingB,maxideal(1);
   }
-//"Corang:"+ string(CoRang);
   if(@show_nf==1) {
     poly @f_nf = NormalForm(@s2);
     for(@i=4;@i<=@n;@i=@i+1) {
@@ -134,10 +119,6 @@ proc Classify
     }
     if(DeBug>1) { "Normal form NF(f)=", @f_nf; }
   }
-//"Corang:"+ string(CoRang);
-//listvar();
-//"------------------------------";
-//"Classify() Controlpoint Test----";
   poly @f_out = @ConvUp(@f_out);
 //listvar();
 //"------------------------------";
@@ -149,7 +130,7 @@ proc Classify
     @f_out = @f_out + x(@i)^2;
   }
 //"Classify() Controlpoint Test----";
-  execute @RingInput;
+  setring ring_top;
   map @ConvBack=Rtop,maxideal(1);
 //"Classify() Controlpoint Test----";
 
@@ -157,5 +138,12 @@ proc Classify
     return(@ConvBack(@f_nf));
   }
   else { return(@ConvBack(@f_out)); }
+}
+example
+{"EXAMPLE"; echo=2;
+   ring r=0,(x,y,z),ds;
+   init_debug(2);
+   poly f=(x2+3y-2z)^2+xyz-(x-y3+x2*z3)^3;
+   poly g=Classify(f);
 }
 // E n d   O f   F i l e
