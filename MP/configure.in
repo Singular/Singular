@@ -115,13 +115,7 @@ fi
 BUILD_SUBDIRS="$CONFIG_SUBDIRS MP"
 
 if test "$enable_MPT" != no && test -d MPT; then
-  if test "$with_default_apint" = saclib; then 
-    AC_MSG_WARN(Can not build MPT library with saclib ApInt)
-  elif test "$with_default_apint" = pari; then
-    AC_MSG_WARN(Can not build MPT library with pari ApInt)
-  else
     BUILD_SUBDIRS="${BUILD_SUBDIRS} MPT"
-  fi
 fi
 
 if test "$enable_examples" = yes && test -d examples; then
@@ -335,8 +329,15 @@ if test "$with_pari" = yes; then
     AC_MSG_WARN(Can not build MP with pari ApInt routines: Need genpari.h)
   else
     AC_DEFINE(MP_HAVE_PARI)
+    AC_DEFINE(LONG_IS_32BIT)
+    AC_CHECK_TYPE(ulong, no)
+    if test "$ac_cv_type_ulong" = no; then
+	AC_DEFINE(ULONG_NOT_DEFINED)
+    fi
   fi
 fi
+
+    
 
 if test "$with_tb" = yes; then
   AC_CHECK_HEADER(TB.h)
@@ -368,6 +369,8 @@ AC_CHECK_SIZEOF(long, 4)
 if test "$ac_cv_sizeof_long" != 4; then
   AC_MSG_ERROR(Need sizeof long to equal 4)
 fi
+
+dnl add some defines for if pari is used
 
 CLEAN="rm -f *~ a.out core *.o .log"
 AC_SUBST(CLEAN)

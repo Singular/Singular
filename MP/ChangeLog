@@ -1,3 +1,10 @@
+Tue Jun 24 11:54:31 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* configure.in (BUILD_SUBDIRS): took out condition that default
+	  ap_int format is gmp for building MPT lib
+	  (BUILD_SUBDIRS): added some defines which are needed for
+	  --with-pari compilation
+
 Tue May  6 09:30:51 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
 	* Added ranlib after installing libs -- Suns seem to need it
