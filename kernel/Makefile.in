@@ -266,7 +266,7 @@ DL_LIBST=
 
 endif
 
-all:	libkernel.a libkernel-g.a ${DL_LIBS} ${DL_LIBSG}
+all:	kversion.h libkernel.a libkernel-g.a ${DL_LIBS} ${DL_LIBSG}
 
 libkernel.a: ${OBJS}
 	ar cr $@ $^
