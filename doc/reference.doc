@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.15 1998-04-29 12:16:06 Singular Exp $
+@comment $Id: reference.doc,v 1.16 1998-04-29 13:52:29 anne Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1266,6 +1266,7 @@ See @ref{std};
 @*@code{factorize (} poly_expression@code{, 2 )}
 @item @strong{Type:}
 list of ideal and intvec
+@*
 @item @strong{Syntax:}
 @code{factorize (} poly_expression@code{, 1 )}
 @item @strong{Type:}
@@ -1309,10 +1310,10 @@ number, poly, vector, ideal, module, matrix or list
 maps objects between "almost identical" rings.@*
 @code{fetch} is the
 identity map between rings, and qrings with the same
-coefficient field and the same number of variables (but possible with
+coefficient field and the same number of variables (but possibly with
 different orderings), the i-th variable of the source ring is mapped to
 the i-th variable of the base ring.
-This offers a convinient way to change variable names or map objects from a
+This offers a convenient way to change variable names or map objects from a
 ring to a quotient ring of that ring or vice versa.
 @item @strong{Example:}
 @example
@@ -1359,11 +1360,12 @@ See @ref{ring}; @ref{qring};
 @item @strong{Type:}
 ideal
 @item @strong{Purpose:}
-calculates the Groebner basis in the current ring for the given ideal.
+calculates for the given ideal ideal_name in the given ring ring_name 
+a Groebner basis in the current ring.
 @*The ideal must be zero dimensional and given as a reduced Groebner
 basis in the given ring.
 The result will be a reduced Groebner basis.
-@*The only difference between the given ring and the current ring
+@*The only permissable difference between the given ring and the current ring
 may be the monomial ordering and a permutation of the variables
 resp. parameters.
 @c @item @strong{Example:}
@@ -1596,7 +1598,7 @@ from it. For Ascii links, @code{getdump} is equivalent to a
 @c example
 @end example
 @item @strong{Restrictions:} 
-@code{getdump} is not supported fro DBM links, or for a link connecting
+@code{getdump} is not supported for DBM links, or for a link connecting
 to @code{stdin} (standard input).
 @end table
 @menu
@@ -1649,7 +1651,6 @@ of the given ideal/module.   If the input is
 homogeneous (all variable weights 1) and a standard basis,
 this will be the Hilbert series of the original
 ideal/module
-@sp 1
 @*with one argument: print first and second Hilbert series
 @*with two arguments: return the n-th Hilbert series as intvec (n=1,2)
 @item @strong{Example:}
@@ -1794,7 +1795,7 @@ computes a maximal set U of independent variables of the ideal given
 by a standard basis:
 If v is the result then
 v[i] is 1 if the i-th variable of the ring is an independent variable.
-Hence the set U conisting of the variables x(i) s.t. v[i]=1 is a maximal
+Hence the set U consisting of the variables x(i) s.t. v[i]=1 is a maximal
 independent set.
 @c Indeed we compute a maximal strongly independent set U,
 @c where no power of a variable from U occurs as a leading term ofs
@@ -1917,35 +1918,20 @@ $\{g_1,...,g_{i-1},g_{i+1},...,g_s\}$
 @end tex
 @item
 in the case of a local or mixed ordering (localization of polynomial ring):
-@*if, for any i<>j, L(
+@*if, for any i<>j,
 @ifinfo
-gi
+L(gi) | L(gj)
 @end ifinfo
 @tex
-$g_i$
+$L(g_i) | L(g_j)$
 @end tex
-) | L(
+then 
 @ifinfo
-gj
+ecart(gi) > ecart(gj)
 @end ifinfo
 @tex
-$g_j$
+$ecart(g_i) > ecart(g_j)$
 @end tex
-) then ecart(
-@ifinfo
-gi
-@end ifinfo
-@tex
-$g_i$
-@end tex
-) > ecart(
-@ifinfo
-gj
-@end ifinfo
-@tex
-$g_j$
-@end tex
-)
 @end itemize
 Remark: L(g) denotes the leading term of g and ecart(g)=deg(g)-deg(L(g)).
 @item @strong{Example:}
@@ -2058,11 +2044,11 @@ See @ref{ideal expressions};
 @code{jet (} poly_expression@code{,} int_expression @code{)}
 @*@code{jet (} vector_expression@code{,} int_expression @code{)}
 @*@code{jet (} ideal_expression@code{,} int_expression @code{)}
-@*@code{jet (} modul_expression@code{,} int_expression @code{)}
+@*@code{jet (} module_expression@code{,} int_expression @code{)}
 @*@code{jet (} poly_expression@code{,} int_expression@code{,} intvec_expression @code{)}
 @*@code{jet (} vector_expression@code{,} int_expression@code{,} intvec_expression @code{)}
 @*@code{jet (} ideal_expression@code{,} int_expression@code{,} intvec_expression @code{)}
-@*@code{jet (} modul_expression@code{,} int_expression@code{,} intvec_expression @code{)}
+@*@code{jet (} module_expression@code{,} int_expression@code{,} intvec_expression @code{)}
 @item @strong{Type:}
 the same as the type of the first argument
 @item @strong{Purpose:}
@@ -2358,14 +2344,15 @@ See @ref{poly expressions};
 none
 @item @strong{Purpose:}
 reads a library of procedures (proc) from a file. If the given
-filename does not start with @kbd{.} or @kbd{/}, the following directories ares
+filename does not start with @kbd{.} or @kbd{/}, the following directories are
 searched for the file: the current directory,
 the directories given in the environment variable
 @code{SINGULARPATH}@footnote{@code{SPATH} on MS-DOS},
-@code{usr/local/share/Singular}
-Only a directory of the library is loaded, the body of the proc
+@code{usr/local/share/Singular}.
+Only the names of the procedures in the library are loaded, the body of 
+the proc
 is read during the first call of this proc. This minimizes
-the memory consumption of unused procedures.
+the memory consumption by unused procedures.
 @item @strong{Example:}
 @example
   LIB "lib"; // the names of the procedures in the
@@ -2397,7 +2384,7 @@ matrix
 @item @strong{Purpose:}
 computes the transformation matrix which expresses the generators of a
 submodule in terms of the generators of a module
-(which may be given by a standard basis or not (use two different algorithms)).
+(which may be given by a standard basis or not (two different algorithms)).
 @*Hence, if @code{sm} is the submodule (or ideal), @code{m} the
 module (or ideal) and @code{T} the transformation matrix
 then @code{matrix(sm)=matrix(m)*T}
@@ -2483,7 +2470,7 @@ lists all (user-)defined names:
 @*@code{listvar(}ring_name@code{)}: all names which belong to the given ring
 @*@code{listvar(} name @code{)}: the object with the given name
 @*@code{listvar(all)}: all names except procedures
-@*the actual base ring is marked with an @code{*}
+@*the current base ring is marked with a @code{*}
 @item @strong{Example:}
 @example
   proc t1 @{ @}
@@ -2571,7 +2558,8 @@ returns statistics concerning the memory management:
 @item @strong{Example:}
 @example
 @c example
-  "Objects of Singular use (at the moment) ",memory(0)," bytes,"+newline+
+  "Objects of Singular use (at the moment) ",memory(0)," bytes,"
+   +newline+
   "allocated from system (at the moment):", memory(1), "bytes";
 @c example
 @end example
@@ -2741,8 +2729,8 @@ See @ref{syz}.
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-starts/stops recording all user input and/or program output into a file
-The second argument describe what to log: @code{"i"} means input,
+starts/stops recording all user input and/or program output into a file.
+The second argument describes what to log: @code{"i"} means input,
 @code{"o"} means output, @code{"io"} for both.
 @*The default for the second argument is @code{"i"}.
 @*Each @code{monitor} command closes the old monitor file
@@ -2770,12 +2758,6 @@ and opens the file given by the first string expression.
 @*@code{mres (} module_expression @code{,} int_expression @code{)}
 @item @strong{Type:}
 list
-@item @strong{Syntax:}
-@code{mres (} ideal_expression@code{,} int_expression@code{,} name @code{)}
-@*@code{mres (} module_expression@code{,} int_expression@code{,} name @code{)}
-@item @strong{Type:}
-none
-@footnote{this form is kept for historical reasons (some libraries use it), it use is discouraged}
 @item @strong{Purpose:}
 computes a minimal free resolution of an ideal or module M with the
 standard basis method. More precisely, let A=matrix(M), then @code{mres}
@@ -2851,8 +2833,10 @@ See @ref{ideal expressions}; @ref{module expressions};
 @item @strong{Type:}
 list
 @item @strong{Purpose:}
-returns a list of a standard basis and a minimal set of
-generators - the input must be homogeneous and
+returns a list consisting of a standard basis and a minimal set of
+generators
+@item @strong{Note:}
+the input must be homogeneous and
 the ring a polynomial ring (global ordering).
 @item @strong{Example:}
 @example
@@ -2924,7 +2908,7 @@ See @ref{ideal}; @ref{std}; @ref{degree}; @ref{vdim}; @ref{dim}.
 @item @strong{Type:}
 string
 @item @strong{Purpose:}
-returns the name of an expression as string
+returns the name of an expression as string.
 @item @strong{Example:}
 @example
 @c example
@@ -2932,7 +2916,7 @@ returns the name of an expression as string
   string s = nameof(i);
   s;
   nameof(s);
-  nameof(i+1); //gives the empty string:
+  nameof(i+1); //returns the empty string:
 @c example
 @end example
 @end table
@@ -2987,8 +2971,8 @@ See @ref{nameof}; @ref{reservedName}.
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-returns the number of columns of a matrix or an intmat or the number of
-given generators of the ideal, including zeroes.
+returns the number of columns of a matrix or an intmat @*or the number of
+given generators of the ideal, including zeros.
 @*Note that @code{size(}ideal@code{)} counts the number of generators
 which are different from zero.
 @item @strong{Example:}
@@ -3022,7 +3006,7 @@ See @ref{matrix}; @ref{matrix expressions}; @ref{nrows}; @ref{size}.
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-returns the numbers of parameters of a ring
+returns the number of parameters of a ring
 @item @strong{Example:}
 @example
 @c example
@@ -3054,7 +3038,7 @@ int
 @item @strong{Purpose:}
 returns the number of rows of a matrix, an intmat or an intvec resp.@*
 the minimal rank of a free module in which the given the module or
-vector lives (the index of the last non-zero component)
+vector lives (the index of the last non-zero component).
 @item @strong{Example:}
 @example
 @c example
@@ -3087,7 +3071,7 @@ See @ref{matrix}; @ref{module}; @ref{vector}; @ref{ncols}.
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-returns the numbers of variables of a ring
+returns the number of variables of a ring
 @item @strong{Example:}
 @example
 @c example
@@ -3139,84 +3123,97 @@ See @ref{link}, @ref{link}; @ref{close}.
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-lists all defined options
+lists all defined options.
+@*
 @item @strong{Syntax:}
 @code{option (} option_name @code{);}
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-sets an option
-@*To disable an option, use the prefix @code{no}.
+sets an option.
+@item @strong{Note:}
+To disable an option, use the prefix @code{no}.
+@*
 @item @strong{Syntax:}
 @code{option ( get );}
 @item @strong{Type:}
 intvec
 @item @strong{Purpose:}
-dumps the state of all options to an intvec
+dumps the state of all options to an intvec.
+@*
 @item @strong{Syntax:}
 @code{option ( set,} int_expression @code{);}
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-restores the state of all options from an intvec (produced by @code{option(get)})
+restores the state of all options from an intvec (produced by @code{option(get)}).
 @sp 1
 @item @strong{Values:}
+The following options are used to manipulate the behaviour of 
+computations:
 @table @asis
 @item @code{none}
-reset all options to the default
+resets all options to the default
 @item @code{returnSB}
 the functions @code{syz},@code{intersect},@code{quotient},@code{modulo} return a standard base instead
-of a generating set.  This option should not be used for @code{lift}.
+of a generating set if @code{returnSB} is set. This option should not be used for @code{lift}.
 @item @code{fastHC}
-try to find HC (highest corner of the staircase) as fast as possible
+tries to find HC (highest corner of the staircase) as fast as possible
 during a standard basis computation (only used for local orderings)
 @item @code{interrupt}
-allow fast interruption of standard basis computation
+allows fast interruption of standard basis computation
 @item @code{intStrategy}
-avoid divisions (of coefficients) during standard basis computations
+avoids divisions (of coefficients) during standard basis computations
 @item @code{minRes}
 special (additional) minimizing during computations (res,mres),
 @*assumes homogeneous case and degree-compatible ordering
 @item @code{morePairs}
-create addditional (useless) pairs to speed up computation in some cases
+creates addditional (useless) pairs to speed up computation in some cases
 @item @code{notRegularity}
-disable the regularity bound for res/mres (see @ref{regularity})
+disables the regularity bound for res/mres (see @ref{regularity})
 @item @code{notSugar}
-disable the sugar strategy
+disables the sugar strategy
 @item @code{prot}
-protocol showing progress during standard basis computation
+shows protocol information indicating the
+progress during standard basis computation
 @item @code{redSB}
-compute reduced standard basis
+computes a reduced standard basis in any standard basis computation 
 @item @code{redTail}
 reduction of the tails of polynomials during standard basis computations
 @item @code{sugarCrit}
-use criteria similar to the homogeneous case to keep more useless pairs
+uses criteria similar to the homogeneous case to keep more useless pairs
 @item @code{weightM}
-automatically compute suitable weights for the weighted ecart and the
+automatically computes suitable weights for the weighted ecart and the
 weighted sugar method
-@item The following options have to be set without the option command:
+@end table
+There are further options that control the behaviour of the computations,
+but these options are not manipulated using the @code{option} command:
+@table @asis
 @item @code{multBound}
 a multiplicity bound is set (see @ref{multBound})
 @item @code{degBound}
 a degree bound is set (see @ref{degBound})
+@end table
+The last set of options controls the output of Singular:
+@table @asis
 @item @code{Imap}
-show the mapping of variables with the imap command
+shows the mapping of variables with the imap command
 @item @code{loadLib}
-show loading of libraries (default)
+shows loading of libraries (default)
 @item @code{debugLib}
-warn about syntax errors during loading of libraries
+warns about syntax errors during loading of libraries
 @item @code{loadProc}
-show loading of procedures from libraries
+shows loading of procedures from libraries
 @item @code{mem}
-show memory usage in square brackets
+shows memory usage in square brackets
 @item @code{prompt}
-show prompt (@code{>} resp. @code{.}) if ready for input (default)
+shows prompt (@code{>} resp. @code{.}) if ready for input (default)
 @item @code{reading}
-show the number of characters read from a file
+shows the number of characters read from a file
 @item @code{redefine}
-warn about variable redefinitions (default)
+warns about variable redefinitions (default)
 @item @code{usage}
-show correct usage in error messages (default)
+shows correct usage in error messages (default)
 @end table
 @item @strong{Example:}
 @example
@@ -3433,7 +3430,7 @@ pauses the execution of a procedure until the return key is pressed
 @item @strong{Type:}
 ideal
 @item @strong{Purpose:}
-returns the preimage of an ideal under a given map
+returns the preimage of an ideal under a given map.
 @*
 The second argument has to be a map from the basering to the given ring
 (or an ideal defining such a map),
@@ -3470,7 +3467,7 @@ See @ref{map}; @ref{ring}.
 int
 @item @strong{Purpose:}
 returns the largest prime smaller or equal to the argument;
-@*return 2 for all arguments smaller than 3
+@*returns 2 for all arguments smaller than 3
 @item @strong{Example:}
 @example
 @c example
@@ -3497,7 +3494,7 @@ See @ref{int expressions}.
 none
 @item @strong{Purpose:}
 prints expressions in a nice format, especially useful for matrices, modules
-and vectors
+and vectors.
 @*The second form uses a string to determine the format.
 @*At the moment only the "betti" format is used:
 @table @code
@@ -3549,8 +3546,8 @@ See @ref{dbprint}; @ref{short}; @ref{type}; @ref{betti}.
 @item @strong{Type:}
 module
 @item @strong{Purpose:}
-returns the module minimal embedded in a free module such that the
-corresponding factor modules are isomorphic
+returns the module minimally embedded in a free module such that the
+corresponding factor modules are isomorphic.
 @item @strong{Example:}
 @example
 @c example
@@ -3606,9 +3603,9 @@ See @ref{ideal expressions}; @ref{intvec expressions}; @ref{weight}.
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-prevents expresions from evaluation. Within a quoted expression, the
+prevents expressions from evaluation. Within a quoted expression, the
 quote can be "undone" by an @code{eval} (i.e., each eval "undoes" the
-effect of exactly one quoter). Used with @code{write}.
+effect of exactly one quote). Used with @code{write}.
 @item @strong{Example:}
 @example
   link l="MPfile:w example.mp";
@@ -3694,6 +3691,7 @@ See @ref{ideal expressions};
 int
 @item @strong{Purpose:}
 returns random integer between min_integer and max_integer
+@*
 @item @strong{Syntax:}
 @code{random (} max_integer@code{,} rows@code{,} cols @code{)}
 @item @strong{Type:}
@@ -3731,9 +3729,10 @@ reads data from a link.
 @*For Ascii links, the content of the entire
 file is returned as one string.
 @*For MP links, one expression is read
-from the link, and returned after an evaluation. A link blocks
-(i.e. does not return) as long as there is no data to read from an MPtcp
-link. The @code{status} command can be used to check whether or not
+from the link, and returned after an evaluation. 
+As long as there is no data to read from an MPtcp
+link the @code{read} command blocks (i.e. does not return). 
+The @code{status} command can be used to check whether or not
 there is data to read.
 @*For DBM links, a
 @code{read} with one argument returns the value of the next entry in the
@@ -3840,6 +3839,7 @@ The regularity is the smallest number s with the property deg( e(a,i)) <= s+i
 for all i.
 @end ifinfo
 @tex
+\noindent
 Let $0 \rightarrow\ \bigoplus_a K[x]e_{a,n}\ \rightarrow\ \dots
   \rightarrow\ \bigoplus_a K[x]e_{a,0}\ \rightarrow\
   I\ \rightarrow\ 0$
@@ -3881,13 +3881,6 @@ See @ref{res}; @ref{mres}; @ref{sres}; @ref{minres}; @ref{option}.
 @*@code{res (} module_expression@code{,} int_expression @code{)}
 @item @strong{Type:}
 list
-@item @strong{Syntax:}
-@code{res (} ideal_expression@code{,} int_expression@code{,} name @code{)}
-@*@code{res (} module_expression@code{,} int_expression@code{,} name @code{)}
-@item @strong{Type:}
-none
-@footnote{this form is kept for historical reasons (some libraries use it),
-its use is discouraged}
 @item @strong{Purpose:}
 computes a minimal free resolution of an ideal or module M with the standard basis method.
 More precisely, let
@@ -4241,13 +4234,6 @@ starting with the smallest.
 @*@code{sres (} module_expression@code{,} int_expression @code{)}
 @item @strong{Type:}
 list
-@item @strong{Syntax:}
-@code{sres (} ideal_expression@code{,} int_expression @code{,} name @code{)}
-@*@code{sres (} module_expression@code{,} int_expression @code{,} name @code{)}
-@item @strong{Type:}
-none
-@footnote{this form is kept for historical reasons (some libraries use it),
-its use is discouraged}
 @item @strong{Purpose:}
 computes a free resolution of an ideal or module with Schreyer's
 method. The ideal/module has to be a standard basis.
@@ -4261,11 +4247,11 @@ A1=matrix(M).
 Then @code{sres}
 computes a free resolution of
 @ifinfo
-M1=coker(A)=coker(A1)
+M1=coker(A1)
 @*...--> F2 --A2-> F1 --A1-> F0-->M1-->0,
 @end ifinfo
 @tex
-$M_1=coker(A)=coker(A_1)$
+$M_1=coker(A_1)$
 $$...\longrightarrow F_2 \buildrel{A_2}\over{\longrightarrow} F_1 \buildrel{A_1}\over{\longrightarrow} F_0\longrightarrow M_1\longrightarrow 0,$$
 @end tex
 The computation will stop after k steps, if the int expression k
@@ -4433,14 +4419,14 @@ See @ref{ideal}; @ref{ring}; @ref{option}; @ref{facstd}; @ref{mstd};
 returns a standard basis of an ideal in the basering, calculated via
 the FGLM algorithm from the ordering "dp" (degrevlex) to the ordering
 of the basering.
-A standard basis is a set of generators such that
-the leading terms generate the leading ideal.
 @item @strong{Syntax:}
 @code{stdfglm (} ideal_expression@code{,} string_expression @code{)}
 @item @strong{Purpose:}
 returns a standard basis of an ideal in the basering, calculated via
-the FGLM algorithm from the ordering "dp" (degrevlex) to the ordering
-given by the second argument
+the FGLM algorithm from the ordering given by the second argument to
+the ordering of the basering.
+@item @strong{Note:}
+The first argument has to be a zero-dimensional ideal.
 @item @strong{Type:}
 ideal
 @item @strong{Example:}
@@ -4483,9 +4469,7 @@ ideal
 returns a standard basis of an homogeneous ideal with respect to the
 monomial ordering of the basering
 (Hilbert driven standard basis computation).
-(First the hilbert series will be computed (if not given))
-A standard basis is a set of generators such that
-the leading terms generate the leading ideal/module.
+First the hilbert series will be computed (if not given).
 @*Use an optional
 second argument as Hilbert series
 (result of @code{hilb(i,1)}, see @ref{hilb}),
@@ -4563,7 +4547,7 @@ the first expression must be of type string and selects the desired function.
 @item @strong{Type:}
 depends on the desired function, may be none
 @item @strong{Purpose:}
-interface to internal data and the operating system
+interface to internal data and the operating system.
 @*Not all functions will work on every platform.
 @item @strong{functions}
 @code{system("sh"},string_expression @code{)} is the shell escape,
@@ -4647,12 +4631,13 @@ See @ref{ideal expressions}; @ref{module expressions}.
 @code{trace (} matrix_expression @code{)}
 @item @strong{Type:}
 poly
+@*
 @item @strong{Syntax:}
 @code{trace (} intmat_expression @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-trace of a matrix or an intmat
+returns the trace of a matrix or an intmat
 @item @strong{Example:}
 @example
 @c example
@@ -4754,7 +4739,7 @@ future extensions}@code{,
 "poly",
 "proc",
 "qring",
-"resoltion",
+"resolution",
 "ring",
 "string",
 "vector",
@@ -4816,8 +4801,8 @@ See @ref{ring}, @ref{int expressions}; @ref{nvars}; @ref{varstr}.
 string
 @item @strong{Purpose:}
 returns the list of the names of the ring variables
-@*or the name of the n-th ring variable for a given integer n
-@*@code{varstr(n)} is equivalent to @code{varstr(basering,n)}
+@*or the name of the n-th ring variable for a given integer n.
+@*@code{varstr(n)} is equivalent to @code{varstr(basering,n)}.
 @item @strong{Example:}
 @example
 @c example
@@ -4925,7 +4910,7 @@ intvec
 computes an "optimal" weight vector for an ideal/module which may be used as
 weight vector for the variables in order to speed up the standard basis
 algorithm.   If the input is weighted homogeneous, a weight vector for
-which the input is weighted homogeneous is found
+which the input is weighted homogeneous is found.
 @item @strong{Example:}
 @example
 @c example
@@ -4964,14 +4949,14 @@ none
 writes data to a link. 
 @*If the link is of type @code{Ascii}, all expressions are converted to
 strings  (and separated by a newline character) before they are
-written (as a consequence, only such values which can be converted to a
-string can be written to an  @code{Ascii} link). 
+written. As a consequence, only such values which can be converted to a
+string can be written to an  @code{Ascii} link. 
 @*For MP links,
 ring-dependent expressions are written together with a ring
 description. To prevent an evaluation of the expression before it is
 written, the @code{quote} command (possibly together with @code{eval})
 can be used. A @code{write} blocks (i.e. does not return), as long as a
-MPtcp link is nor ready for writing. 
+MPtcp link is not ready for writing. 
 @*For DBM links, @code{write} inserts (key, value) into the
 data base.
 @item @strong{Example:}
@@ -4990,7 +4975,7 @@ data base.
 
   ring r=32003,(x,y,z),dp;
   string s=read("save_i");  //creates the string x+y,z3+22y
-  execute "ideal k="+s+";"; // this defines an ideal k which@*
+  execute "ideal k="+s+";"; // this defines an ideal k which
                             // is equal to i.
 @end example
 @end table
@@ -5136,12 +5121,17 @@ converts a local variable to a global one
   proc p1
   @{
     int i,j;
+    export i;
     intmat m;
-    export i,j,m;
+    listvar();
+    export m;
   @}
-  p1();listvar();
+  p1();
+  @expansion{} // m                    [1]  intmat 1 x 1
+  @expansion{} // j                    [1]  int 0
+  @expansion{} // i                    [0]  int 0
+  listvar();
   @expansion{} // m                    [0]  intmat 1 x 1
-  @expansion{} // j                    [0]  int 0
   @expansion{} // i                    [0]  int 0
 @end example
 @end table
@@ -5153,12 +5143,16 @@ converts a local variable to a global one
 @item @strong{Syntax:}
 @code{for (} init@code{;} boolean_expression@code{;} iterate@code{)} block
 @*
-@*init is a command, init is executed first.
-@*boolean_expression is evaluated, each time before the block gets executed.
-@*iterate is a command, iterate is executed at the end of the block.
-@*@code{break;} will leave the innermost @code{for} construct.
+@*init is a command, which is executed first.
+@*boolean_expression is evaluated. 
+@*iterate is a command, which is executed at the end of the block.
 @item @strong{Purpose:}
-repetitive, conditional execution of a command block
+repetitive, conditional execution of a command block.
+@*The command init is executed first. Then boolean_expression is 
+evaluated. If its value is TRUE the block is executed, otherwise the for
+statement is complete. After each execution of the block, the command
+iterate is executed and boolean_expression is evaluated.
+@* @code{break;} leaves the innermost for construct.
 @item @strong{Example:}
 @example
   // sum of 1 to 10:
@@ -5226,8 +5220,10 @@ See @ref{block}; @ref{boolean expressions}.
 @item @strong{Syntax:}
 @code{keepring} name@code{;}
 @item @strong{Purpose:}
-changes the base ring to another (already defined) ring
-in the next (upper) level; can only be used in procedures
+moves the specified ring to the next (upper) level. @code{keepring} can only
+be used inside of procedures. There it provides the possibility to keep 
+a ring which is local to the procedure (and its objects) accessible after
+the procedure ended without making the ring global.
 @item @strong{Example:}
 @example
   proc P1
@@ -5265,8 +5261,8 @@ works also from inside a proc or from an interrupt
 @item @strong{Type:}
 any
 @item @strong{Purpose:}
-returns the result(s) of a procedure
-@*should only be used in a procedure
+returns the result(s) of a procedure.
+@*should only be used in a procedure.
 @item @strong{Example:}
 @example
   proc p2
@@ -5395,8 +5391,9 @@ int
 @item @strong{Purpose:}
 The standard basis computation is stopped if the total
 (weighted) degree
-exceeds @code{degBound}
-@*(should not be used for a global ordering with  inhomogeneous input)
+exceeds @code{degBound}.
+@* @code{degBound} should not be used for a global ordering with inhomogeneous
+input
 @*Reset this bound by setting @code{degBound} to 0
 @item @strong{Example:}
 @example
@@ -5612,7 +5609,7 @@ int
 @item @strong{Purpose:}
 the time used for each command will be printed if timer >0 and if this
 time is bigger than approx. 0.5 sec.
-@*timer is defaulted to 0
+@*Default setting of timer is 0.
 @*How to use timer in order to measure the time for a sequence of commands,
 see example below.
 @item @strong{Example:}
