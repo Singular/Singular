@@ -149,19 +149,57 @@ char * find_executable_link (const char *name)
 }
 
 #ifdef HAVE_READLINK
+
+#define MAX_LINK_LEVEL 10
+/* similar to readlink (cf. man readlink), except that symbolic links are 
+   followed up to MAX_LINK_LEVEL
+*/
+
+int full_readlink(const char* name, char* buf, size_t bufsize)
+{
+  int ret;
+  
+  if ((ret=readlink(name, buf, bufsize)) > 0)
+  {
+    char buf2[MAXPATHLEN];
+    int ret2, i = 0;
+    
+    do
+    {
+      buf[ret] = '\0';
+      if ((ret2 = readlink(buf, buf2, MAXPATHLEN)) > 0)
+      {
+        i++;
+        buf2[ret2] = '\0';
+        strcpy(buf, buf2);
+        ret = ret2;
+      }
+      else
+      {
+        return ret;
+      }
+    }
+    while (i<MAX_LINK_LEVEL);
+  }
+  return -1;
+}
+  
+  
 char * find_executable (const char *name)
 {
   char * link = find_executable_link(name);
   char buf[MAXPATHLEN];
   int ret;
 
-  if (link == NULL && (ret=readlink(name, buf, MAXPATHLEN)) > 0)
+  if (link == NULL && (ret=full_readlink(name, buf, MAXPATHLEN)) > 0)
   {
     buf[ret] ='\0';
     link = find_executable_link(buf);
   }
-  if (link != NULL && (ret=readlink(link, buf, MAXPATHLEN)) > 0)
+  if (link != NULL && (ret=full_readlink(link, buf, MAXPATHLEN)) > 0)
   {
+    /* follow link further until you reach the end of it, or unitl 
+       MAX_SYMBOLIC_LINKS are encountered */
     char *p = strrchr(link, '/');
     char *executable;
 
