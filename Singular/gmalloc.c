@@ -8,9 +8,7 @@
    if HAVE_GMALLOC is defined
 */   
 
-#ifdef	HAVE_CONFIG_H
 #include "mod2.h"
-#endif
 
 #ifdef HAVE_GMALLOC 
 
