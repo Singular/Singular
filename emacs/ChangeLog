@@ -1,3 +1,9 @@
+1999-12-06  T. Wichmann  <wichmann@arboretum.itwm.uni-kl.de>
+
+	* singular.el (singular-internal): Removed bug: Adding of trailing
+	slash crashed if directory was nil
+	(singular-completion-do): Added completion of examples
+
 1999-09-14  T. Wichmann  <wichmann@arboretum.itwm.uni-kl.de>
 
 	* singular.el (singular-exit-singular): New strategy for the
