@@ -3,7 +3,7 @@
  *  Purpose: declaration of common Debug/Check/Track stuff
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 7/00
- *  Version: $Id: omDebug.h,v 1.14 2001-04-30 09:02:04 Singular Exp $
+ *  Version: $Id: omDebug.h,v 1.15 2003-05-12 14:45:32 Singular Exp $
  *******************************************************************/
 #ifndef OM_DEBUG_H
 #define OM_DEBUG_H
@@ -69,9 +69,9 @@ void omUnMarkMemoryAsStatic();
 
 #ifdef OM_TRACK_CUSTOM
 #ifdef OM_NDEBUG
-#define omSetCustomOfAddr(addr) ((void)0)
+#define omSetCustomOfAddr(addr,value) ((void)0)
 #define omGetCustomOfAddr(addr) ((void*)0)
-#define omSetCustomOfTrackAddr(addr) ((void)0)
+#define omSetCustomOfTrackAddr(addr,value) ((void)0)
 #define omGetCustomOfTrackAddr(addr) ((void*)0)
 #else
 void omSetCustomOfTrackAddr(void* addr, void* value);
