@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.39 1998-05-07 11:10:43 Singular Exp $
+@comment $Id: general.doc,v 1.40 1998-05-07 11:12:38 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -160,8 +160,9 @@ Typing @code{CTL-C} (control C) interrupts Singular (system dependend).
 @sc{Singular} prints the current command and the current line.
 You have the following choices:
 @table @asis
-@item @code{a} return to the toplevel after finishing the current command
-@item @code{c}s
+@item @code{a}
+return to the toplevel after finishing the current command
+@item @code{c}
 continues
 @item @code{q} 
 quits  @sc{Singular}
