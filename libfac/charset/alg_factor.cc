@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-static char * rcsid = "$Id: alg_factor.cc,v 1.3 1998-03-12 12:34:24 schmidt Exp $";
+static char * rcsid = "$Id: alg_factor.cc,v 1.4 1998-05-25 18:32:38 obachman Exp $";
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -131,7 +131,7 @@ alg_sqrfree( const CanonicalForm & f ){
 // K has more than S elements (S is defined in thesis; look getextension)
 static void
 sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha, 
-	   CFGenerator & random, CanonicalForm & s,  CanonicalForm & g, 
+	   CFGenerator & myrandom, CanonicalForm & s,  CanonicalForm & g, 
 	   CanonicalForm & R){  
   Variable y=PPalpha.mvar(),vf=f.mvar();
   CanonicalForm temp, Palpha=PPalpha, t;
@@ -141,9 +141,9 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
   
   DEBOUTLN(cout, "sqrf_norm_sub:      f= ", f);
   DEBOUTLN(cout, "sqrf_norm_sub: Palpha= ", Palpha);
-  random.reset();   s=f.mvar()-random.item()*Palpha.mvar();   g=f;   
+  myrandom.reset();   s=f.mvar()-myrandom.item()*Palpha.mvar();   g=f;   
   R= CanonicalForm(0);
-  DEBOUTLN(cout, "sqrf_norm_sub: random s= ", s);
+  DEBOUTLN(cout, "sqrf_norm_sub: myrandom s= ", s);
 
   // Norm, resultante taken with respect to y
   while ( !sqfreetest ){
@@ -171,10 +171,10 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
       DEBOUTLN(cout, "SqrFreeTest(R)= ", sqfreetest);
     }
     if ( ! sqfreetest ){
-      random.next();   
-      DEBOUTLN(cout, "sqrf_norm_sub generated new random item: ", random.item());
-      if ( getCharacteristic() == 0 ) t= CanonicalForm(mapinto(random.item()));
-      else t= CanonicalForm(random.item());
+      myrandom.next();   
+      DEBOUTLN(cout, "sqrf_norm_sub generated new myrandom item: ", myrandom.item());
+      if ( getCharacteristic() == 0 ) t= CanonicalForm(mapinto(myrandom.item()));
+      else t= CanonicalForm(myrandom.item());
       s= f.mvar()+t*Palpha.mvar(); // s defines backsubstitution
       DEBOUTLN(cout, "sqrf_norm_sub: testing s= ", s); 
       g= f(f.mvar()-t*Palpha.mvar(), f.mvar());
@@ -191,9 +191,9 @@ sqrf_norm( const CanonicalForm & f, const CanonicalForm & PPalpha,
   DEBOUTLN(cout, "sqrf_norm:      f= ", f);
   DEBOUTLN(cout, "sqrf_norm: Palpha= ", PPalpha);
   if ( getCharacteristic() == 0 ) {
-    IntGenerator random; 
+    IntGenerator myrandom; 
     DEBOUTMSG(cout, "sqrf_norm: no extension, char=0");
-    sqrf_norm_sub(f,PPalpha, random, s,g,R);
+    sqrf_norm_sub(f,PPalpha, myrandom, s,g,R);
     DEBOUTLN(cout, "sqrf_norm:      f= ", f);
     DEBOUTLN(cout, "sqrf_norm: Palpha= ", PPalpha);
     DEBOUTLN(cout, "sqrf_norm:      s= ", s);
@@ -202,13 +202,13 @@ sqrf_norm( const CanonicalForm & f, const CanonicalForm & PPalpha,
   } 
   else if ( degree(Extension) > 0 ){ // working over Extensions
     DEBOUTLN(cout, "sqrf_norm: degree of extension is ", degree(Extension));
-    AlgExtGenerator random(Extension);
-    sqrf_norm_sub(f,PPalpha, random, s,g,R);
+    AlgExtGenerator myrandom(Extension);
+    sqrf_norm_sub(f,PPalpha, myrandom, s,g,R);
   }
   else{
-    FFGenerator random;
+    FFGenerator myrandom;
     DEBOUTMSG(cout, "sqrf_norm: degree of extension is 0"); 
-    sqrf_norm_sub(f,PPalpha, random, s,g,R);
+    sqrf_norm_sub(f,PPalpha, myrandom, s,g,R);
   }
 }
 
@@ -612,6 +612,10 @@ newcfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1998/03/12 12:34:24  schmidt
+	* charset/csutil.cc, charset/alg_factor.cc: all references to
+	  `common_den()' replaced by `bCommonDen()'
+
 Revision 1.2  1997/09/12 07:19:37  Singular
 * hannes/michael: libfac-0.3.0
 

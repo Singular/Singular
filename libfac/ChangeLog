@@ -1,3 +1,11 @@
+1998-05-25  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+	* charset/alg_factor.cc: replaced identifiers 'random' by
+	'myrandom' to avoid name conflicts with the built-in (stdlib)
+	library function 'random' which might be a macro -- and, actually
+	is  under gcc v 2.6.3
+	
+
 Wed Apr 22 16:12:16 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* header.tpl, factor.h, factor/version.cc (libfac_name,
