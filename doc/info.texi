@@ -10,4 +10,4 @@ contact us at
 @display
 @email{singular@@mathematik.uni-kl.de}.
 @end display
-@end ifclear singularmanual
+@end ifclear
