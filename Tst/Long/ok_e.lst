@@ -10,7 +10,7 @@ fglmquot1_l
 finvar_l
 gcd0_l
 gcdp_l
-; hnoether_l memory trouble
+; hnoether_l: memory trouble
 homtest
 hres_l
 intdet_l
@@ -18,7 +18,7 @@ lres_l
 makedbm_l
 minor_l
 modulo_l
-monodromy_l
+; monodromy_l: negative exponents
 mpsr_l
 mre
 mre_nonhom
