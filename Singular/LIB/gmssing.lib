@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmssing.lib,v 1.2 2003-08-22 15:07:29 mschulze Exp $";
+version="$Id: gmssing.lib,v 1.3 2004-04-22 10:50:51 Singular Exp $";
 category="Singularities";
 
 info="
@@ -38,7 +38,7 @@ SEE ALSO: mondromy_lib, spectrum_lib, gmspoly_lib
 KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
           mixed Hodge structure; V-filtration; weight filtration
           Bernstein polynomial; monodromy; spectrum; spectral pairs; 
-          good basis;
+          good basis
 ";
 
 LIB "linalg.lib";
@@ -216,11 +216,9 @@ proc gmsnf(ideal p,int K)
 "USAGE:    gmsnf(p,K); poly p, int K
 ASSUME:   basering returned by gmsring
 RETURN:
-@format
-list nf;
+  list nf;
   ideal nf[1];  projection of p to <gmsbasis>C{{s}} mod s^(K+1)
   ideal nf[2];  p==nf[1]+nf[2]
-@end format
 NOTE:     computation can be continued by setting p=nf[2]
 KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice
 EXAMPLE:  example gmsnf; shows examples
