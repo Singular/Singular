@@ -1,8 +1,31 @@
+Thu Jan 22 10:38:34 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* int_cf.cc, int_int.cc int_rat.cc (bgcdsame, bgcdcoeff,
+	  bextgcdsame, bextgcdcoeff): new methods.  Declarations added.
+
+	* GNUmakefile.in (ftestm4src): `bgcd.m4' and `bextgcd.m4' added to
+	  distribution
+
+	* canonicalform.h (mvar): bug fix.  Declared as `Variable mvar
+	  (...)'.
+
+	* canonicalform.cc (bgcd, bextgcd): new functions.  Declarations
+	  added.
+
+Fri Jan 16 09:08:17 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* cf_switches.h: doc fix
+
+	* cf_algorithm.h (divides): declaration moved from canonicalform.h
+	  to cf_algorithm.h
+
+	* cf_switches.cc: doc fix
+
 Tue Jan 13 14:56:42 1998  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
-	* configure.in (factory_configuration): changed order of library
-	  checks (-lm before -lgmp); check for atof in -lm check, to work
-	  around a bug on some linux machines
+	* configure.in: changed order of library checks (-lm before
+	  -lgmp); check for atof in -lm check, to work around a bug on
+ 	  some linux machines.
 
 Wed Dec 17 09:56:25 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 

@@ -1,3 +1,11 @@
+Thu Jan 22 10:46:03 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* bgcd.m4, bgcdext.m4: new files
+
+Tue Jan  6 12:10:04 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* feval.m4 (main): bug fix.  Off-by-one error fixed.
+
 Wed Dec 17 13:14:30 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* ftest_util.m4 (ftestOutVar): `bool's are initialized to `false'
