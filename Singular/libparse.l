@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.12 1998-04-27 12:34:18 obachman Exp $ */
+/* $Id: libparse.l,v 1.13 1998-04-28 09:33:57 pohl Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -86,22 +86,17 @@ int yylp_errno = 0;
 #    ifdef __cplusplus
 extern "C" {
 #    endif
+long   ftell(FILE *fp);
 #    ifdef macintosh
 int    fileno(FILE *stream);
 FILE   *fdopen(int filedes, char *type);
-long   ftell(FILE *fp);
-long   tell(int filedes);
 int    isatty(int filedes);
 #else
 int    _fileno(FILE *stream);
 FILE   *_fdopen(int filedes, char *type);
-long   _ftell(FILE *fp);
-long   _tell(int filedes);
 int    _isatty(int filedes);
 #      define fileno  _fileno
 #      define fdopen  _fdopen
-#      define ftell    _ftell
-#      define tell    _tell
 #      define isatty  _isatty
 #    endif /* macintosh */
 #    ifdef __cplusplus
