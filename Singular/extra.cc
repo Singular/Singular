@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.180 2002-03-06 16:38:29 mschulze Exp $ */
+/* $Id: extra.cc,v 1.181 2002-04-24 13:34:52 anne Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -90,6 +90,14 @@
 
 #include "fast_maps.h"
 
+#ifdef HAVE_EIGENVAL
+#include "eigenval.h"
+#endif
+
+#ifdef HAVE_GMS
+#include "gms.h"
+#endif
+
 /*
  *   New function/system-calls that will be included as dynamic module
  * should be inserted here.
@@ -100,14 +108,6 @@
 
 #ifdef HAVE_PCV
 #include "pcv.h"
-#endif
-
-#ifdef HAVE_EIGENVAL
-#include "eigenval.h"
-#endif
-
-#ifdef HAVE_GMS
-#include "gms.h"
 #endif
 
 #endif /* not HAVE_DYNAMIC_LOADING */
