@@ -195,7 +195,7 @@ vv[10]=intvec(9,21,23);
 vv[11]=intvec(10,35,41);
 vv[12]=intvec(30,115,1001);
 vv[13]=intvec(100,150,375,420,672);
-vv[14]]=intvec(8,20,30,31);
+vv[14]=intvec(8,20,30,31);
 
 /////////////////////////////////////////////////////////////////////////////////////
 /// Examples of multiplicity sequences
@@ -354,14 +354,11 @@ for (i=2;i<=10;i++)
 {
   tau_es(hnexpansion(y*(x^2-y^i)));
 }
-tau_es(FF[33]));
-tau_es(FF[34]);
-for (i=1;i<=size(FF);i++)
+for (i=1;i<=size(FF)-1;i++)
 {
   tau_es(FF[i]);
 }
 tau_es(a1);
-tau_es(L2);
 // --------------- additions: -----------------------------
 example resolutiongraph;
 example totalmultiplicities;
