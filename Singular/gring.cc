@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.22 2003-01-29 19:13:36 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.23 2003-01-30 21:41:01 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -623,7 +623,7 @@ poly nc_uu_Mult_ww_vert (int i, int a, int j, int b, const ring r)
 
   if (((a<cMTsize)&&(b<cMTsize))&&(MATELEM(cMT,a,b)!=NULL))
   {
-    out = prCopyR_NoSort(MATELEM(cMT,a,b),r->nc->basering, r);
+    out = nc_p_CopyGet(MATELEM(cMT,a,b),r);
     //   out=p_Copy(MATELEM(cMT,a,b),r);
     return (out);
   }

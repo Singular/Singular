@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.41 2001-10-09 16:36:25 Singular Exp $ */
+/* $Id: syz.cc,v 1.42 2003-01-30 21:41:04 levandov Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -197,7 +197,7 @@ static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
 //PrintS("Unit2: ");pWrite(Unit2);
           syz->m[k] = pMult(syz->m[k],pCopy(Unit1));
           syz->m[k] = pSub(syz->m[k],
-            pMult(pCopy(actWith),Unit2));
+            pMult(Unit2,pCopy(actWith)));
           if (syz->m[k]==NULL)
           {
             for (l=k;l<j-1;l++)
@@ -389,12 +389,12 @@ void syMinimizeResolvente(resolvente res, int length, int first)
 * resolution of ideal/module arg, <=maxlength steps, (r[0..maxlength])
 *   no limitation in length if maxlength==0
 * input:arg
-*       minim: TRUE means mres cmd, FALSE res cmd.
-*       if *len!=0: modul weights: weights[0]
+*       minim: TRUE means mres cmd, FALSE nres cmd.
+*       if *len!=0: module weights: weights[0]
 *          (and weights is defined:weights[0..len-1]
 *
 * output:resolvente r[0..length-1],
-*        modul weights: weights[0..length-1]
+*        module weights: weights[0..length-1]
 */
 resolvente syResolvente(ideal arg, int maxlength, int * length,
                         intvec *** weights, BOOLEAN minim)

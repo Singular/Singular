@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.130 2002-05-29 09:38:49 mschulze Exp $ */
+/* $Id: ideals.cc,v 1.131 2003-01-30 21:41:02 levandov Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1463,7 +1463,9 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
   && (!isMonomial)
   && (!TEST_OPT_NOTREGULARITY)
   && (setRegularity)
-  && (h==isHomog))
+  && (h==isHomog)
+  && (!rIsPluralRing(currRing))
+  )
   {
     ring dp_C_ring = rCurrRingAssure_dp_C();
     if (dp_C_ring != syz_ring)
