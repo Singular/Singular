@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.86 2004-02-23 19:04:02 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.87 2004-04-20 16:17:51 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -631,6 +631,11 @@ leftv iiMap(map theMap, char * what)
   if ((currPack!=basePack)
   &&((r==NULL) || ((r->typ != RING_CMD) && (r->typ != QRING_CMD))))
     r=basePack->idroot->get(theMap->preimage,myynest);
+  if ((r==NULL) && (currRingHdl!=NULL)
+  && (strcmp(theMap->preimage,IDID(currRingHdl))==0))
+  {
+    r=currRingHdl;
+  }
 #endif /* HAVE_NS */
   if ((r!=NULL) && ((r->typ == RING_CMD) || (r->typ== QRING_CMD)))
   {
