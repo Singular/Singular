@@ -1,0 +1,41 @@
+SHELL		= /bin/sh
+@SET_MAKE@
+
+BUILD_SUBDIRS	= @CONFIG_SUBDIRS@
+SUBDIRS		= @SUBDIRS@
+
+all install uninstall info dvi : Makefile
+	for SUBDIR in ${BUILD_SUBDIRS}; \
+	do \
+		echo ${MAKE} $@ in $${SUBDIR}; \
+		cd $${SUBDIR}; \
+		${MAKE} $@; \
+		cd .. ;\
+	done
+
+clean distclean mostlyclean maintainer-clean: 
+	for SUBDIR in ${SUBDIRS}; \
+	do \
+		echo ${MAKE} $@ in $${SUBDIR}; \
+		cd $${SUBDIR}; \
+		${MAKE} $@; \
+		cd .. ;\
+	done
+	rm -rf *~ a.out core *.o .log lib bin share include
+	if test $@ = distclean || test $@ = maintainer-clean; then \
+	  rm -f config.cache config.log config.status TAGS* *.gz *.tar; \
+	fi
+	if test $@ = maintainer-clean; then \
+	  echo "This command is inteneded for maintainer use, only" ; \
+	  echo "Rebuilding the deleteed file(s) requires at least autoconf"; \ 
+	  rm -f configure ;\
+	fi
+
+Makefile : Makefile.in config.status
+	./config.status
+
+config.status : configure
+	./config.status --recheck
+
+configure: configure.in
+	autoconf 

@@ -1,0 +1,415 @@
+dnl Process this file with autoconf to produce a configure script
+AC_INIT(Singular/matpol.h)
+AC_PREFIX_DEFAULT(`pwd`)
+
+AC_CANONICAL_SYSTEM
+
+
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl those are needed to check for libs and headers, later on
+dnl
+AC_PROG_CC
+AC_PROG_CPP
+AC_AIX
+
+dnl and add to -I to CPPFLAGS and and -Lto LDFLAGS, just to be sure
+if test "$libdir" = '${exec_prefix}/lib'; then
+  if test "x$exec_prefix" = xNONE; then
+    if test "x$prefix" = xNONE; then
+      LDFLAGS="-L${ac_default_prefix}/lib ${LDFLAGS}"
+    else
+      LDFLAGS="-L${prefix}/lib ${LDFLAGS}"
+    fi
+  else
+    LDFLAGS="-L${exec_prefix}/lib ${LDFLAGS}"
+  fi
+else
+  LDFLAGS="-L${libdir} ${LDFLAGS}"
+fi
+
+if test "$includedir" = '${prefix}/include'; then
+  if test "x$prefix" = xNONE; then
+    CPPFLAGS="-I${ac_default_prefix}/include ${CPPFLAGS}"
+  else
+    CPPFLAGS="-I${prefix}/include ${CPPFLAGS}"
+  fi
+else
+  CPPFLAGS="-I${includedir} ${CPPFLAGS}"
+fi
+
+dnl pass default prefix on to subdirs, if not explicitely given as an option
+if test "x$prefix" = xNONE; then
+  ac_configure_args="$ac_configure_args --prefix=$ac_default_prefix"
+fi
+
+
+
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl check for various libraries and headers
+dnl
+AC_CHECK_LIB(m, atof)
+AC_CHECK_LIB(gmp, mpz_init)
+AC_CHECK_LIB(MP, IMP_PutGmpInt)
+AC_CHECK_LIB(MPT, MPT_GetTree)
+AC_CHECK_LIB(singcf, atof)
+AC_CHECK_LIB(singfac, atof)
+
+AC_CHECK_HEADERS(gmp.h MP.h  MPT.h factory.h factor.h)
+
+if test "$ac_cv_lib_gmp_mpz_init" = yes && \
+ test "$ac_cv_header_gmp_h" = yes; then
+  if echo $target_os | egrep aix; then
+    AC_EGREP_CPP(yes,\
+     [#include <gmp.h>
+    #if defined(__GNU_MP_VERSION) &&  __GNU_MP_VERSION == 2
+    no
+    #else
+    yes
+    #endif
+    ],
+    ac_gmp_ok=yes,
+    AC_MSG_WARN(Found gmp lib version>2 which is broken under AIX: Can not use it))
+  else
+    ac_gmp_ok=yes
+  fi
+fi
+
+if test "$ac_cv_lib_MP_IMP_PutGmpInt" = yes && \
+ test "$ac_cv_lib_MPT_MPT_GetTree" && \
+ test "$ac_cv_header_MP_h" = yes && \
+ test "$ac_cv_header_MPT_h" = yes; then
+  ac_MP_ok=yes
+fi
+
+if test "$ac_cv_lib_singcf_initCanonicalForm" = yes && \
+ test "$ac_cv_header_factory_h" = yes; then
+  ac_factory_ok=yes
+fi
+
+if test "$ac_cv_lib_singfac_IrrCharSeries" = yes && \
+ test "$ac_cv_header_factor_h" = yes; then
+  ac_libfac_ok=yes
+fi
+
+
+  
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl Check whether or not to built various packages
+dnl
+AC_ARG_ENABLE(gmp, \
+ [ --enable-PACKAGE        configure and build PACKAGE
+  --disable-PACKAGE       do not configure and build PACKAGE
+  --with-PACKAGE          use PACKAGE, provide dependent functionality
+  --without-PACKAGE       do not use PACKAGE, disable dependent functionality
+ where PACKAGE can be:
+     gmp                  GNU multiple precision library])
+AC_ARG_ENABLE(MP, \
+ [    MP                   Multi Protocol library])
+AC_ARG_ENABLE(factory, \
+ [    factory              polynomial factorization library])
+AC_ARG_ENABLE(libfac, \
+ [    libfac               char set and modp poly factorization library])
+AC_ARG_ENABLE(Singular, \
+ [    Singular,            CAS for commutative algebra])
+
+AC_MSG_CHECKING(whether to configure and build gmp lib)
+if test "$enable_gmp" != yes && test "$enable_gmp" != no; then
+  if test "$with_gmp" != no && test "$ac_gmp_ok" != yes; then
+    enable_gmp=yes
+  else
+    enable_gmp=no
+  fi
+fi
+if test "$enable_gmp" = yes && test -d gmp; then
+  AC_MSG_RESULT(yes)
+  CONFIG_SUBDIRS="gmp"
+  ac_configure_args="$ac_configure_args --enable-gmp"
+else
+  AC_MSG_RESULT(no)
+  if  test "$enable_gmp" = yes && test ! -d gmp; then
+    AC_MSG_WARN(Did not find gmp subdirectory)
+  fi
+  enable_gmp=no
+  ac_configure_args="$ac_configure_args --disable-gmp"
+fi
+
+AC_MSG_CHECKING(whether to configure and build MP lib)
+if test "$enable_MP" != yes && test "$enable_MP" != no; then
+  if test "$with_MP" != no && test "$ac_MP_ok" != yes; then
+    enable_MP=yes
+  else
+    enable_MP=no
+  fi
+fi
+if test "$enable_MP" = yes && test -d MP; then
+  AC_MSG_RESULT(yes)
+  CONFIG_SUBDIRS="$CONFIG_SUBDIRS MP"
+  ac_configure_args="$ac_configure_args --enable-MP"
+else
+  AC_MSG_RESULT(no)
+  if  test "$enable_MP" = yes && test ! -d MP; then
+    AC_MSG_WARN(Did not find MP subdirectory)
+  fi
+  enable_MP=no
+  ac_configure_args="$ac_configure_args --disable-MP"
+fi
+
+AC_MSG_CHECKING(whether to configure and build factory lib)
+if test "$enable_factory" != yes && test "$enable_factory" != no; then
+  if test "$with_factory" != no && test "$ac_factory_ok" != yes; then
+    enable_factory=yes
+  else
+    enable_factory=no
+  fi
+fi
+if test "$enable_factory" = yes && test -d factory; then
+  AC_MSG_RESULT(yes)
+  CONFIG_SUBDIRS="$CONFIG_SUBDIRS factory"
+  ac_configure_args="$ac_configure_args --enable-factory"
+else
+  AC_MSG_RESULT(no)
+  if  test "$enable_factory" = yes && test ! -d factory; then
+    AC_MSG_WARN(Did not find factory subdirectory)
+  fi
+  enable_factory=no
+  ac_configure_args="$ac_configure_args --disable-factory"
+fi
+
+AC_MSG_CHECKING(whether to configure and build libfac lib)
+if test "$enable_libfac" != yes && test "$enable_libfac" != no; then
+  if test "$with_libfac" != no && test "$ac_libfac_ok" != yes; then
+    enable_libfac=yes
+  else
+    enable_libfac=no
+  fi
+fi
+if test "$enable_libfac" = yes && test -d libfac; then
+  AC_MSG_RESULT(yes)
+  CONFIG_SUBDIRS="$CONFIG_SUBDIRS libfac"
+  ac_configure_args="$ac_configure_args --enable-libfac"
+else
+  AC_MSG_RESULT(no)
+  if  test "$enable_libfac" = yes && test ! -d libfac; then
+    AC_MSG_WARN(Did not find libfac subdirectory)
+  fi
+  enable_libfac=no
+  ac_configure_args="$ac_configure_args --disable-libfac"
+fi
+
+AC_MSG_CHECKING(whether to configure and build Singular)
+if test "$enable_Singular" != yes && test "$enable_Singular" != no; then
+  if test "$with_Singular" != no && test "$ac_Singular_ok" != yes; then
+    enable_Singular=yes
+  else
+    enable_Singular=no
+  fi
+fi
+if test "$enable_Singular" = yes && test -d Singular; then
+  AC_MSG_RESULT(yes)
+  CONFIG_SUBDIRS="$CONFIG_SUBDIRS Singular"
+  ac_configure_args="$ac_configure_args --enable-Singular"
+else
+  AC_MSG_RESULT(no)
+  if  test "$enable_Singular" = yes && test ! -d Singular; then
+    AC_MSG_WARN(Did not find Singular subdirectory)
+  fi
+  enable_Singular=no
+  ac_configure_args="$ac_configure_args --disable-Singular"
+fi
+
+
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl Check whether or not to use various packages
+dnl
+AC_MSG_CHECKING(whether to use gmp)
+if test "$with_gmp" != no; then
+  if test "$ac_gmp_ok" != yes; then
+    if test "$enable_gmp" = yes; then
+      if echo $target_os | egrep aix; then
+	ac_with_gmp=no
+	ac_aix_warn=yes
+      else
+	ac_with_gmp=yes
+      fi
+    else
+      ac_with_gmp=no
+    fi
+  else
+    ac_with_gmp=yes
+  fi
+  if test "$ac_with_gmp"=yes; then
+    if test "$with_gmp" != yes; then
+      with_gmp=yes
+      ac_configure_args="$ac_configure_args --with-gmp"
+    fi
+  else
+    with_gmp=no
+    ac_configure_args="$ac_configure_args --without-gmp"
+  fi
+fi
+if test "$with_gmp" != no; then
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
+if test "$ac_aix_warn" = yes; then
+  AC_MSG_WARN(gmp version 2 has a bug under AIX)
+fi
+
+AC_MSG_CHECKING(whether to use MP)
+if test "$with_MP" != no; then
+  if test "$ac_MP_ok" != yes; then
+    if test "$enable_MP" = yes; then
+      if test "$with_gmp" != yes; then
+	ac_with_MP=no
+	ac_gmp_warn=yes
+      else
+	ac_with_MP=yes
+      fi
+    else
+      ac_with_MP=no
+    fi
+  else
+    ac_with_MP=yes
+  fi
+  if test "$ac_with_MP"=yes; then
+    if test "$with_MP" != yes; then
+      with_MP=yes
+      ac_configure_args="$ac_configure_args --with-MP"
+    fi
+  else
+    with_MP=no
+    ac_configure_args="$ac_configure_args --without-MP"
+  fi
+fi
+if test "$with_MP" != no; then
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
+if test "$ac_gmp_warn" = yes; then
+  AC_MSG_WARN(Need gmp to use MP)
+fi
+
+AC_MSG_CHECKING(whether to use factory)
+if test "$with_factory" != no; then
+  if test "$ac_factory_ok" != yes; then
+    if test "$enable_factory" = yes; then
+      if test "$with_gmp" != yes; then
+	ac_with_factory=no
+	ac_gmp_warn=yes
+      else
+	ac_with_factory=yes
+      fi
+    else
+      ac_with_factory=no
+    fi
+  else
+    ac_with_factory=yes
+  fi
+  if test "$ac_with_factory"=yes; then
+    if test "$with_factory" != yes; then
+      with_factory=yes
+      ac_configure_args="$ac_configure_args --with-factory"
+    fi
+  else
+    with_factory=no
+    ac_configure_args="$ac_configure_args --without-factory"
+  fi
+fi
+if test "$with_factory" != no; then
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
+if test "$ac_gmp_warn" = yes; then
+  AC_MSG_WARN(Need gmp to use factory)
+fi
+  
+AC_MSG_CHECKING(whether to use libfac)
+if test "$with_libfac" != no; then
+  if test "$ac_libfac_ok" != yes; then
+    if test "$enable_libfac" = yes; then
+      if test "$with_gmp" != yes || test "$with_factory" != yes; then
+	ac_with_libfac=no
+	ac_gmp_warn=yes
+      else
+	ac_with_libfac=yes
+      fi
+    else
+      ac_with_libfac=no
+    fi
+  else
+    ac_with_libfac=yes
+  fi
+  if test "$ac_with_libfac"=yes; then
+    if test "$with_libfac" != yes; then
+      with_libfac=yes
+      ac_configure_args="$ac_configure_args --with-libfac"
+    fi
+  else
+    with_libfac=no
+    ac_configure_args="$ac_configure_args --without-libfac"
+  fi
+fi
+if test "$with_libfac" != no; then
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
+if test "$ac_gmp_warn" = yes; then
+  AC_MSG_WARN(Need gmp and factory to use libfac)
+fi
+
+AC_MSG_CHECKING(whether to build with Singular)
+if test "$with_Singular" != no; then
+  if test "$enable_Singular" = yes; then
+	ac_with_Singular=yes
+  else
+    ac_with_Singular=no
+  fi
+  if test "$ac_with_Singular"=yes; then
+    if test "$with_Singular" != yes; then
+      with_Singular=yes
+      ac_configure_args="$ac_configure_args --with-Singular"
+    fi
+  else
+    with_Singular=no
+    ac_configure_args="$ac_configure_args --without-Singular"
+  fi
+fi
+if test "$with_Singular" != no; then
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
+
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl Check for known subdirs
+dnl
+if test -d gmp; then
+  SUBDIRS="gmp"
+fi
+if test -d MP; then
+  SUBDIRS="$SUBDIRS MP"
+fi
+if test -d factory; then
+  SUBDIRS="$SUBDIRS factory"
+fi
+if test -d libfac; then
+  SUBDIRS="$SUBDIRS libfac"
+fi
+if test -d Singular; then
+  SUBDIRS="$SUBDIRS Singular"
+fi
+  
+
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl Enough --wrap it up
+dnl
+AC_PROG_MAKE_SET
+AC_SUBST(SUBDIRS)
+AC_SUBST(CONFIG_SUBDIRS)
+AC_CONFIG_SUBDIRS($CONFIG_SUBDIRS) 
+
+AC_OUTPUT(Makefile)
