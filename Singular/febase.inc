@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.inc,v 1.17 1998-08-07 16:52:03 Singular Exp $ */
+/* $Id: febase.inc,v 1.18 1998-09-07 15:37:21 Singular Exp $ */
 /*
 * ABSTRACT: handling of 'voices'
 */
