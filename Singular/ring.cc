@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.85 1999-11-18 11:19:15 Singular Exp $ */
+/* $Id: ring.cc,v 1.86 1999-11-18 14:47:01 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3492,3 +3492,27 @@ int rGetMaxSyzComp(int i)
     return 0;
   }
 }
+
+BOOLEAN rRing_is_Homog(ring r)
+{
+  if (r == NULL) return FALSE;
+  int i, j, nb = rBlocks(r);
+  for (i=0; i<nb; i++)
+  {
+    if (r->wvhdl[i] != NULL)
+    {
+      int length = r->block1[i] - r->block0[i];
+      int* wvhdl = r->wvhdl[i];
+      if (r->order[i] == ringorder_M) length *= length;
+      assume(mmSizeL(wvhdl) >= length*sizeof(int));
+      
+      for (j=0; j< length; j++)
+      {
+        if (wvhdl[j] != 0 && wvhdl[j] != 1) return FALSE;
+      }
+    }
+  }
+  return TRUE;
+}
+
+        

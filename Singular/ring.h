@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.42 1999-11-17 18:22:56 Singular Exp $ */
+/* $Id: ring.h,v 1.43 1999-11-18 14:47:02 obachman Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -48,7 +48,6 @@ void rNChangeSComps(int* currComponents, long* currShiftedComponents, ring r = c
 void rNGetSComps(int** currComponents, long** currShiftedComponents, ring r = currRing);
 
 idhdl  rFindHdl(ring r, idhdl n, idhdl w);
-void   rDInit();
 int rOrderName(char * ordername);
 char * rOrdStr(ring r);
 char * rVarStr(ring r);
@@ -68,6 +67,8 @@ void   rUnComplete(ring r);
 #ifndef ABS
 #define ABS(x) ((x) < 0 ? (-(x)) : (x))
 #endif
+
+BOOLEAN rRing_is_Homog(ring r=currRing);
 
 inline BOOLEAN rField_is_Zp(ring r=currRing)
 { return (r->ch > 1) && (r->parameter==NULL); }
