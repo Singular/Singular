@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.6 1998-05-06 11:49:30 Singular Exp $
+@comment $Id: math.doc,v 1.7 1998-05-11 10:00:26 Singular Exp $
 @comment this file contains the mathematical background of Singular
 
 @menu
@@ -945,6 +945,10 @@ f in I iff NF(f,std(I)) = 0 for I in R resp. I in R^r.
 @node Syzygies and resolutions, Characteritic sets, Standard bases, Mathematical background
 @section Syzygies and resolutions
 @cindex Syzygies and resolutions
+
+Let I=@{g_1, ..., g_q@} in K[x]^r.@*
+The @strong{module of syzygies syz(I)} is
+ker (K[x]^q @expansion{} K[x]^r, sum w_i*e_i @expansion{} sum w_i*g_i).
 
 Let A=matrix(M), then a free resolution of
 @ifinfo
