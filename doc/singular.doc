@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.44 1998-06-18 20:28:47 schmidt Exp $
+@comment $Id: singular.doc,v 1.45 1998-06-19 13:09:17 krueger Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -16,7 +16,7 @@
 @c ------------------------
 @set singularmanual 1
 @set VERSION 1.2
-@set manual 1
+@c @set manual 1
 @c ------------------------
 @c <CENTER><IMG SRC="Singular2.gif"></CENTER><BR>
 @html
@@ -52,18 +52,18 @@ this is the texinfo file describing Singular (version @value{VERSION})
 @c ----------------------------------------------------------------------------
 @node Top, Preface, (dir), (dir)
 @ifinfo
-@manual 
+@c @manual 
 q:quit, m:menu item, n:next node, p:previous node, u:up, g:goto node
-@end manual
+@c @end manual
 @sp 1
 @center Singular - Manual
 @center Version @value{VERSION}
 @center A Computer Algebra System for Polynomial Computations
 @sp 2
-@center University of Kaiserslautern
-@center Department of Mathematics
+@center @url{http://www.uni-kl.de/,University of Kaiserslautern}
+@center @url{http://www.mathematik.uni-kl.de/,Department of Mathematics}
 @center and
-@center Centre for Computer Algebra
+@center @url{http://www.mathematik.uni-kl.de/~zca/,Centre for Computer Algebra}
 @end ifinfo
 @menu
 * Preface::

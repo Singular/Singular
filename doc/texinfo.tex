@@ -1,5 +1,5 @@
 %% TeX macros to handle Texinfo files.
-%% $Id: texinfo.tex,v 1.2 1998-05-18 12:56:56 schmidt Exp $
+%% $Id: texinfo.tex,v 1.3 1998-06-19 13:09:19 krueger Exp $
 
 %  Copyright (C) 1985, 86, 88, 90, 91, 92, 93,
 %                94, 95, 96, 97 Free Software Foundation, Inc.
@@ -36,7 +36,7 @@
 
 % This automatically updates the version number based on RCS.
 \def\deftexinfoversion$#1: #2 ${\def\texinfoversion{#2}}
-\deftexinfoversion$Revision: 1.2 $
+\deftexinfoversion$Revision: 1.3 $
 \message{Loading texinfo package [Version \texinfoversion]:}
 
 % If in a .fmt file, print the version number
@@ -737,6 +737,7 @@ where each line of input produces a line of output.}
 %
 \def\ifinfo{\doignore{ifinfo}}
 \def\ifhtml{\doignore{ifhtml}}
+\def\ifnottex{\doignore{ifnottex}}
 \def\html{\doignore{html}}
 \def\menu{\doignore{menu}}
 \def\direntry{\doignore{direntry}}
@@ -934,7 +935,11 @@ where each line of input produces a line of output.}
 % iftex).  But `@end iftex' should be valid only after an @iftex.
 %
 \def\iftex{\conditionalsucceed{iftex}}
+\def\ifnothtml{\conditionalsucceed{ifnothtml}}
+\def\ifnotinfo{\conditionalsucceed{ifnotinfo}}
 \defineunmatchedend{iftex}
+\defineunmatchedend{ifnothtml}
+\defineunmatchedend{ifnotinfo}
 
 % We can't just want to start a group at @iftex (for example) and end it
 % at @end iftex, since then @set commands inside the conditional have no
@@ -1275,8 +1280,8 @@ where each line of input produces a line of output.}
 \def\ctrl #1{{\tt \rawbackslash \hat}#1}
 
 \let\file=\samp
-\let\url=\samp % perhaps include a hypertex \special eventually
-\def\email#1{$\langle${\tt #1}$\rangle$}
+%\let\url=\samp % perhaps include a hypertex \special eventually
+%\def\email#1{$\langle${\tt #1}$\rangle$}
 
 % @code is a modification of @t,
 % which makes spaces the same size as normal in the surrounding text.
@@ -1342,6 +1347,28 @@ where each line of input produces a line of output.}
 \ifx\one\xkey\ifx\threex\three \key{#2}%
 \else{\tclose{\ttsl\look}}\fi
 \else{\tclose{\ttsl\look}}\fi}
+
+% @url.  Quotes do not seem necessary, so use \code.
+\let\url=\code
+
+% @uref (abbreviation for `urlref') takes an optional second argument
+% specifying the text to display.  First (mandatory) arg is the url.
+% Perhaps eventually put in a hypertex \special here.
+% 
+\def\uref#1{\urefxxx #1,,\finish}
+\def\urefxxx#1,#2,#3\finish{%
+  \setbox0 = \hbox{\ignorespaces #2}%
+  \ifdim\wd0 > 0pt
+    \unhbox0\ (\code{#1})%
+  \else
+    \code{#1}%
+  \fi
+}
+
+% rms does not like the angle brackets --karl, 17may97.
+% So now @email is just like @uref.
+%\def\email#1{\angleleft{\tt #1}\angleright}
+\let\email=\uref
 
 % Check if we are currently using a typewriter font.  Since all the
 % Computer Modern typewriter fonts have zero interword stretch (and
