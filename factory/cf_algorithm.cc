@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_algorithm.cc,v 1.8 2001-06-27 13:20:36 Singular Exp $ */
+/* $Id: cf_algorithm.cc,v 1.9 2003-05-31 12:35:05 Singular Exp $ */
 
 //{{{ docu
 //
@@ -82,7 +82,7 @@
 //
 //}}}
 CanonicalForm
-#if 1
+#if 0
 psr ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
 {
     
