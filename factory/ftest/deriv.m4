@@ -1,10 +1,11 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: deriv.m4,v 1.3 1997-10-15 09:19:06 schmidt Exp $ */
+/* $Id: deriv.m4,v 1.4 1997-11-05 16:13:07 schmidt Exp $ */
 
-ftestSetNameOfGame( deriv,
-        `"Usage: deriv [<options>] [<envSpec>] <f> [<x>]\n"
-        "  calculates df/dx or derivation of f with respect to main\n"
-	"  variable if x is not present.\n"' )
+ftestSetNameOfGame( deriv, `"
+Usage: deriv [<options>] [<envSpec>] <f> [<x>]
+  calculates df/dx or derivation of canonical form f with respect
+  to main variable if variable x is not specified.
+"'`' )
 
 //{{{ docu
 //
@@ -43,13 +44,13 @@ main ( int argc, char ** argv )
 
     // do the test!
     ftestRun(
-	if ( x.level() > 0 )
+	if ( ftestArgGiven( x ) )
 	    result = f.deriv( x );
 	else
 	    result = f.deriv(); );
 
     // print results
-    if ( x.level() > 0 ) {
+    if ( ftestArgGiven( x ) ) {
 	ftestOutput( "df/dx", result );
     } else {
 	ftestOutput( "df", result );
