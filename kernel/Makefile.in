@@ -230,6 +230,50 @@ p_Procs_Lib_%.dl_o : p_Procs_Lib.cc p_Procs_Dynamic.o
 %.dl_o : %.cc
 	${CXX} ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} ${SFLAGS} -c $< -o $@
 
+DL_TAILG=\"sog\"
+DL_TAILP=\"sop\"
+DL_TAILB=\"sob\"
+DL_TAILT=\"sot\"
+DL_TAILA=\"soa\"
+
+
+ifeq ($(DL_KERNEL),1)
+
+OBJG := $(OBJG) $(DL_KERNEL_SOURCES:.cc=.og)
+DL_LIBSG := $(P_PROCS_MODULES:%=p_Procs_%.sog) 
+
+OBJP := $(OBJP) $(DL_KERNEL_SOURCES:.cc=.op)
+DL_LIBSP := $(P_PROCS_MODULES:%=p_Procs_%.sop)
+
+OBJB := $(OBJB) $(DL_KERNEL_SOURCES:.cc=.ob)
+DL_LIBSB := $(P_PROCS_MODULES:%=p_Procs_%.sob)
+
+OBJT := $(OBJT) $(DL_KERNEL_SOURCES:.cc=.ot)
+DL_LIBST := $(P_PROCS_MODULES:%=p_Procs_%.sot)
+
+OBJA := $(OBJA) $(DL_KERNEL_SOURCES:.cc=.oa)
+DL_LIBSA := $(P_PROCS_MODULES:%=p_Procs_%.soa) 
+
+else
+
+OBJG := $(OBJG) $(STATIC_SOURCES:.cc=.og)
+DL_LIBSG=
+
+OBJP := $(OBJP) $(STATIC_SOURCES:.cc=.op)
+DL_LIBSP=
+
+OBJB := $(OBJB) $(STATIC_SOURCES:.cc=.ob)
+DL_LIBSB=
+
+OBJT := $(OBJT) $(STATIC_SOURCES:.cc=.ot)
+DL_LIBST=
+
+OBJA := $(OBJA) $(STATIC_SOURCES:.cc=.oa)
+DL_LIBST=
+
+endif
+
+
 
 all:	libkernel.a libkernel-g.a ${DL_LIBS} ${DL_LIBSG}
 
@@ -283,7 +327,7 @@ p_Procs_%.so: p_Procs_Lib_%.dl_o
 ##
 install: all installbin
 
-installbin: ${DL_LIBS}
+installbin: ${DL_LIBS} ${DL_LIBSG}
 	${MKINSTALLDIRS} ${bindir}
 	${INSTALL_PROGRAM} ${DL_LIBS} ${DL_LIBSG} ${bindir}
 	${INSTALL_PROGRAM} ${DL_LIBS} ${DL_LIBSG} ../Singular
@@ -371,50 +415,6 @@ OBJP=$(OBJP1) $(OBJP2)
 OBJB=$(OBJB1) $(OBJB2)
 OBJT=$(OBJT1) $(OBJT2)
 OBJA=$(OBJA1) $(OBJA2)
-
-DL_TAILG=\"sog\"
-DL_TAILP=\"sop\"
-DL_TAILB=\"sob\"
-DL_TAILT=\"sot\"
-DL_TAILA=\"soa\"
-
-
-ifeq ($(DL_KERNEL),1)
-
-OBJG := $(OBJG) $(DL_KERNEL_SOURCES:.cc=.og)
-DL_LIBSG := $(P_PROCS_MODULES:%=p_Procs_%.sog) 
-
-OBJP := $(OBJP) $(DL_KERNEL_SOURCES:.cc=.op)
-DL_LIBSP := $(P_PROCS_MODULES:%=p_Procs_%.sop)
-
-OBJB := $(OBJB) $(DL_KERNEL_SOURCES:.cc=.ob)
-DL_LIBSB := $(P_PROCS_MODULES:%=p_Procs_%.sob)
-
-OBJT := $(OBJT) $(DL_KERNEL_SOURCES:.cc=.ot)
-DL_LIBST := $(P_PROCS_MODULES:%=p_Procs_%.sot)
-
-OBJA := $(OBJA) $(DL_KERNEL_SOURCES:.cc=.oa)
-DL_LIBSA := $(P_PROCS_MODULES:%=p_Procs_%.soa) 
-
-else
-
-OBJG := $(OBJG) $(STATIC_SOURCES:.cc=.og)
-DL_LIBSG=
-
-OBJP := $(OBJP) $(STATIC_SOURCES:.cc=.op)
-DL_LIBSP=
-
-OBJB := $(OBJB) $(STATIC_SOURCES:.cc=.ob)
-DL_LIBSB=
-
-OBJT := $(OBJT) $(STATIC_SOURCES:.cc=.ot)
-DL_LIBST=
-
-OBJA := $(OBJA) $(STATIC_SOURCES:.cc=.oa)
-DL_LIBST=
-
-endif
-
 
 ##
 ## compiler and linker options for debug version
