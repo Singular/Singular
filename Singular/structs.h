@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.25 1999-09-29 10:59:40 obachman Exp $ */
+/* $Id: structs.h,v 1.26 1999-09-29 13:42:54 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -201,7 +201,7 @@ struct sip_sring
   ideal      qideal; /* extension to the ring structure: qring */
 
 #ifdef HAVE_SHIFTED_EXPONENTS
-  long       bitmask;
+  unsigned long bitmask;
 #endif
 
   int      *VarOffset;
