@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.52 2001-08-27 14:47:06 Singular Exp $ */
+/* $Id: kstdfac.cc,v 1.53 2002-06-11 16:46:28 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -36,7 +36,7 @@ static void copyT (kStrategy o,kStrategy n)
   int i,j;
   poly  p;
   TSet t=(TSet)omAlloc0(o->tmax*sizeof(TObject));
-  TObject** r = (TObject**)omAlloc0(o->tmax*sizeof(TObject*));
+  TObject** r = n->R; //(TObject**)omAlloc0(o->tmax*sizeof(TObject*));
 
   for (j=0; j<=o->tl; j++)
   {
@@ -111,7 +111,7 @@ static void copyL (kStrategy o,kStrategy n)
       if (p == o->T[i].p)
       {
         l[j].p1=n->T[i].p;
-        l[j].i_r1=n->T[j].i_r;
+        l[j].i_r1=n->T[i].i_r;
         break;
       }
     }
@@ -133,7 +133,7 @@ static void copyL (kStrategy o,kStrategy n)
       if (p == o->T[i].p)
       {
         l[j].p2=n->T[i].p;
-        l[j].i_r2=n->T[j].i_r;
+        l[j].i_r2=n->T[i].i_r;
         break;
       }
     }
@@ -179,6 +179,10 @@ kStrategy kStratCopy(kStrategy o)
   memcpy(s->S_2_R,o->S_2_R,IDELEMS(o->Shdl)*sizeof(int));
   s->sevT=(unsigned long *)omAlloc(o->tmax*sizeof(unsigned long));
   memcpy(s->sevT,o->sevT,o->tmax*sizeof(unsigned long));
+  s->R=(TObject**)omAlloc(o->tmax*sizeof(TObject*));
+  copyT(o,s);//s->T=...
+  s->tail = pInit();
+  copyL(o,s);//s->L=...
   if(o->fromQ!=NULL)
   {
     s->fromQ=(int *)omAlloc(IDELEMS(o->Shdl)*sizeof(int));
@@ -186,9 +190,10 @@ kStrategy kStratCopy(kStrategy o)
   }
   else
     s->fromQ=NULL;
-  copyT(o,s);//s->T=...
-  s->tail = pInit();
-  copyL(o,s);//s->L=...
+  s->tl=o->tl;
+  s->tmax=o->tmax;
+  s->Ll=o->Ll;
+  s->Lmax=o->Lmax;
   s->B=initL();
   s->kHEdge=pCopy(o->kHEdge);
   s->kNoether=pCopy(o->kNoether);
@@ -210,10 +215,6 @@ kStrategy kStratCopy(kStrategy o)
   s->pairtest=NULL;
   s->sl=o->sl;
   s->mu=o->mu;
-  s->tl=o->tl;
-  s->tmax=o->tmax;
-  s->Ll=o->Ll;
-  s->Lmax=o->Lmax;
   s->Bl=-1;
   s->Bmax=setmax;
   s->ak=o->ak;
@@ -233,6 +234,11 @@ kStrategy kStratCopy(kStrategy o)
   s->noTailReduction=o->noTailReduction;
   s->fromT=o->fromT;
   s->noetherSet=o->noetherSet;
+  for(i=s->tl;i>=0;i--)
+  {
+    s->T[i].i_r = kFindInT(s->T[i].p, s->T, s->tl);
+    s->R[s->T[i].i_r] = &(s->T[i]);
+  }  
   kTest_TS(s);
   return s;
 }
@@ -569,10 +575,10 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
             fac->m[0]=strat->P.p;
             strat->P.p=NULL;
           }
-          else
-          {
+	  else
+	  {
             pDelete(&strat->P.p);
-          }
+	  }
         }
       }
       if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
