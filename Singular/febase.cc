@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.72 1999-04-19 11:02:34 obachman Exp $ */
+/* $Id: febase.cc,v 1.73 1999-05-01 15:30:44 obachman Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -250,6 +250,7 @@ static void mystrcpy(char* d, char* s)
 // bindir/../../info/singular.hlp
 // ROOTDIR/Singular/doc/$version/singular.hlp
 // ROOTDIR/Singular/doc/singular.hlp
+// ROOTDIR/doc/singular.hlp
 // ROOTDIR/info/singular.hlp
 // Singular search path
 #ifdef WINNT
@@ -327,6 +328,13 @@ static char* feGetInfoFile(const char* bindir)
     Print("trying %s -- %s\n", hlpfile, ( access(CleanUpName(hlpfile), R_OK) ? "no" : "yes"));
 #endif
     if (! access(CleanUpName(hlpfile), R_OK)) return feFixFileName(hlpfile);
+
+    // ROOTDIR/doc/singular.hlp
+    sprintf(hlpfile,"%s/doc/singular.hlp", SINGULAR_ROOT_DIR);
+ #ifdef PATH_DEBUG
+    Print("trying %s -- %s\n", hlpfile, ( access(CleanUpName(hlpfile), R_OK) ? "no" : "yes"));
+#endif
+   if (! access(CleanUpName(hlpfile) , R_OK)) return feFixFileName(hlpfile);
 
     // ROOTDIR/info/singular.hlp
     sprintf(hlpfile,"%s/info/singular.hlp", SINGULAR_ROOT_DIR);

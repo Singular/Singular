@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.58 1999-03-19 17:42:33 obachman Exp $ */
+/* $Id: tesths.cc,v 1.59 1999-05-01 15:30:45 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -496,7 +496,11 @@ int main(          /* main entry to Singular */
   if (BVERBOSE(0) && !feBatch)
   {
     printf(
-"                     SINGULAR                             /\n"
+"                     SINGULAR                             /"
+#ifndef MAKE_DISTRIBUTION
+"  Develeopment"
+#endif
+"\n"
 " A Computer Algebra System for Polynomial Computations   /   version %s\n"
 "                                                       0<\n"
 "     by: G.-M. Greuel, G. Pfister, H. Schoenemann        \\   %s\n"
