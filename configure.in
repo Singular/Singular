@@ -98,22 +98,6 @@ AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_INSTALL
 AC_AIX
-dnl we do not want to have "-g -O" for CFLAGS
-if test "${CXXFLAGS+set}" != set; then
-  ac_cxxflags_set=no
-  CXXFLAGS="-O"
-fi
-if test "${CFLAGS+set}" != set; then
-  CFLAGS="-O"
-  ac_cflags_set=no
-fi
-
-# check whether CXX was set by user as env variable
-if test "${CXX+set}" != set; then
-  ac_cxx_set=no
-else
-  ac_cxx_set=yes
-fi
 AC_PROG_CXX
 
 # check whether the compiler accepts -pipe
