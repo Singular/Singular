@@ -1,4 +1,19 @@
+Tue Jul 22 11:04:30 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* configure.in: doc fix
+
+	* INSTALL: doc fix
+
+	* NEWS: doc fix
+
+	* README: doc fix
+
 Mon Jul 21 12:58:04 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* sm_sparsemod.cc (internalSparsemod): sparsemod() renamed to
+	  internalSparsemod()
+	  (sparsemod): new function which is a simple wrapper around
+	  internalSparsemod()
 
 	* GNUmakefile.in (distfiles): NEWS and INSTALL added to
 	  distribution
