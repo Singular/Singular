@@ -451,6 +451,10 @@ installg: Singularg
 	${MKINSTALLDIRS} ${bindir}
 	${INSTALL_PROGRAM} Singularg ${bindir}	
 
+ESingularg: fegetopt.og feResource.cc mod2.h feOpt.cc version.h emacs.cc \
+           feOptES.inc
+	${CXXG} ${CXXFLAGSG} ${CPPFLAGS} ${DEFSG} -o ESingularg emacs.cc fegetopt.og ${LDFLAGS} ${LIBS}
+
 ##
 ## compiler and linker options for profile version
 ##
