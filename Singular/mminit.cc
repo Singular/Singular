@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mminit.cc,v 1.9 1998-04-28 08:39:41 obachman Exp $ */
+/* $Id: mminit.cc,v 1.10 1998-04-28 08:46:22 obachman Exp $ */
 /*
 * ABSTRACT: init of memory management
 */
@@ -152,7 +152,7 @@ void * mgReallocBlock( void* a, size_t t1, size_t t2)
 
 #ifdef HAVE_SBRK
 #include <unistd.h>
-static unsigned long mm_SbrkInit = sbrk(0);
+unsigned long mm_SbrkInit = sbrk(0);
 #endif
 
 int mmInit();
