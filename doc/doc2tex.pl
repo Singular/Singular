@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: doc2tex.pl,v 1.9 1999-07-19 12:06:13 obachman Exp $
+# $Id: doc2tex.pl,v 1.10 1999-07-20 14:36:36 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -375,6 +375,7 @@ sub HandleRef
   @refs = sort(keys(%refs));
   # put them out
   print TEX "\@ifinfo\n\@menu\n";
+  print TEX $header ? "$header\n" : "See also:\n";
   foreach $ref (@refs) {print TEX "* ".$ref."::\n";}
   print TEX "\@end menu\n\@end ifinfo\n\@iftex\n";
 
@@ -633,7 +634,7 @@ sub OutLibInfo
 sub OutInfo
 {
   my ($FH, $info, $l_fun) = @_;
-  if ($info =~ /^\@/)
+  if ($info =~ /^\s*\@/)
   {
     print $FH $info;
     return;
@@ -707,8 +708,11 @@ sub FormatInfoText
   s/{/\@{/g; # escape {}
   s/}/\@}/g;
   # unprotect @@math@{@}, @code@{@}
-  s/\@\@math\@{(.*?)\@}/\@math{$1}/g;
-  s/\@\@code\@{(.*?)\@}/\@code{$1}/g;
+  while (s/\@\@math\@{(.*?)\@}/\@math{$1}/g) {} 
+  while (s/\@\@code\@{(.*?)\@}/\@code{$1}/g) {}
+  # remove @code{} inside @code{} and inside @math{}
+  while (s/\@math{([^}]*)\@code{(.*?)}(.*)?}/\@math{$1$2$3}/g) {}
+  while (s/\@code{([^}]*)\@code{(.*?)}(.*)?}/\@code{$1$2$3}/g) {}
 }
 
 sub OutInfoItem
@@ -825,7 +829,7 @@ sub OutRef
   my @refs = split (/[,;\.]+/, $refs);
   my $ref;
 
-  print $FH "\@c ref\nSee\n";
+  print $FH "\@c ref\nSee also:\n";
   $ref = shift @refs;
   print $FH "\@ref{$ref}";
   for $ref (@refs)
