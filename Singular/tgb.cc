@@ -1101,9 +1101,9 @@ int exp_number_builder::get_n(poly p){
   while(*node!=NULL){
     int c=pLmCmp(p,(*node)->p);
     if (c==0) return (*node)->n;
-    if (c==-1) node=&((*node)->l);
+    if (c==-1) node=&((*node)->r);
     else
-      node=&((*node)->r);
+      node=&((*node)->l);
   }
   (*node)= new poly_tree_node(n);
   n++;
