@@ -1,0 +1,20 @@
+/* emacs edit mode for this file is -*- C -*- */
+/* $Id: factoryconf.template,v 1.1 1997-06-05 13:49:51 schmidt Exp $ */
+
+#ifndef INCL_FACTORYCONF_H
+#define INCL_FACTORYCONF_H
+
+/* {{{ docu
+ *
+ * factoryconf.template - template to generate factoryconf.h which
+ *   serves as a configuration file for the (installed) template files.
+ *
+/* }}} */
+
+/*MAKEHEADER*/
+#include "config.h"
+
+/*MAKEHEADER*/
+#include "assert.h"
+
+#endif /* ! INCL_FACTORYCONF_H */
