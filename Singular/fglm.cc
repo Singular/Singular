@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.cc,v 1.11 1997-12-15 22:46:22 obachman Exp $ 
+// $Id: fglm.cc,v 1.12 1998-01-23 14:20:38 obachman Exp $ 
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -315,6 +315,22 @@ fglmProc( leftv result, leftv first, leftv second )
 	return TRUE;
 }
 
+BOOLEAN
+findUniProc( leftv result, leftv first ) 
+{
+    ideal sourceIdeal;
+    ideal destIdeal;
+    
+    idhdl sourceIdealHdl = (idhdl)first->data;
+    sourceIdeal= IDIDEAL(sourceIdealHdl);
+    
+    destIdeal= FindUnivariateWrapper( sourceIdeal );
+    
+    result->rtyp = IDEAL_CMD;
+    result->data= (void *)destIdeal;
+    
+	return FALSE;
+}
 #endif
 // ----------------------------------------------------------------------------
 // Local Variables: ***

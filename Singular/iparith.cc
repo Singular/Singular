@@ -159,6 +159,7 @@ cmdnames cmds[] =
   { "fetch",       0, FETCH_CMD ,         CMD_2},
   { "fglm",        0, FGLM_CMD ,          CMD_2},
   { "find",        0, FIND_CMD ,          CMD_23},
+  { "finduni",     0, FINDUNI_CMD,        CMD_1},
   { "forif",       0, IF_CMD ,            IF_CMD},
   { "freemodule",  0, FREEMODULE_CMD ,    CMD_1},
   { "facstd",      0, FACSTD_CMD ,        CMD_12},
@@ -3081,6 +3082,11 @@ struct sValCmd1 dArith1[]=
 #else
 ,{jjWRONG,      FAC_CMD,         LIST_CMD,       POLY_CMD }
 #endif
+#ifdef HAVE_FGLM
+,{findUniProc,  FINDUNI_CMD,     IDEAL_CMD,      IDEAL_CMD}
+#else 
+,{jjWRONG,      FINDUNI_CMD,     IDEAL_CMD,      IDEAL_CMD}
+#endif 
 ,{jjidFreeModule,FREEMODULE_CMD,-((s)MODUL_CMD), INT_CMD }
 #ifdef HAVE_FACTORY
 ,{jjFACSTD,     FACSTD_CMD,      LIST_CMD,       IDEAL_CMD }

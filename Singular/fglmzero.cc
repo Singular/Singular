@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmzero.cc,v 1.10 1998-01-05 16:39:19 Singular Exp $
+// $Id: fglmzero.cc,v 1.11 1998-01-23 14:20:40 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -1121,7 +1121,6 @@ FindUnivariateWrapper( ideal source )
     }
     return destIdeal;
 }
-
 
 #endif
 
