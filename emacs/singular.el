@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.7 1998-07-28 10:45:56 schmidt Exp $
+;; $Id: singular.el,v 1.8 1998-07-28 14:44:57 schmidt Exp $
 
 ;;; Commentary:
 
@@ -57,12 +57,13 @@ Currently, only the mode `interactive' is supported.")
 
 (defun singular-debug-format (string)
   "Return STRING in a nicer format."
-  (while (string-match "\n" string)
-    (setq string (replace-match "^J" nil nil string)))
+  (save-match-data
+    (while (string-match "\n" string)
+      (setq string (replace-match "^J" nil nil string)))
 
-  (if (> (length string) 16)
-      (concat "<" (substring string 0 7) ">...<" (substring string -8) ">")
-    (concat "<" string ">")))
+    (if (> (length string) 16)
+	(concat "<" (substring string 0 7) ">...<" (substring string -8) ">")
+      (concat "<" string ">"))))
 
 (defmacro singular-debug (mode form &optional else-form)
   "Major debugging hook for singular.el.
@@ -148,7 +149,7 @@ This face should have set background only.")
 
 (defun singular-lookup-face (face-type)
   "Return face belonging to FACE-TYPE.
-NOT READY [should be rewritten completely]!"
+NOT READY [should be rewritten completely.  Interface should stay the same.]!"
   (cond ((eq face-type 'input) singular-input-face)
 	((eq face-type 'output) singular-output-face)))
 ;;}}}
@@ -159,20 +160,20 @@ NOT READY [should be rewritten completely]!"
 (defvar singular-interactive-mode-map ()
   "Key map to use in Singular interactive mode.")
 
-(if (not singular-interactive-mode-map)
-    (progn
-      (cond
-       ;; Emacs
-       ((eq singular-emacs-flavor 'emacs)
-	(setq singular-interactive-mode-map
-	      (nconc (make-sparse-keymap) comint-mode-map)))
-       ;; XEmacs
-       (t
-	(setq singular-interactive-mode-map (make-keymap))
-	(set-keymap-parents singular-interactive-mode-map (list comint-mode-map))
-	(set-keymap-name singular-interactive-mode-map
-			 'singular-interactive-mode-map)))
-      (define-key singular-interactive-mode-map "\C-m" 'singular-send-input)))
+(if singular-interactive-mode-map
+    ()
+  (cond
+   ;; Emacs
+   ((eq singular-emacs-flavor 'emacs)
+    (setq singular-interactive-mode-map
+	  (nconc (make-sparse-keymap) comint-mode-map)))
+   ;; XEmacs
+   (t
+    (setq singular-interactive-mode-map (make-keymap))
+    (set-keymap-parents singular-interactive-mode-map (list comint-mode-map))
+    (set-keymap-name singular-interactive-mode-map
+		     'singular-interactive-mode-map)))
+  (define-key singular-interactive-mode-map "\C-m" 'singular-send-input))
 ;;}}}
 
 ;;{{{ Miscellaneous
@@ -266,7 +267,11 @@ Singular interactive mode starts up.")
 ;; NOT READY[was sind und wollen simple sections]!
 
 (defvar singular-simple-sec-clear-type 'input
-  "Type of clear simple sections.")
+  "Type of clear simple sections.
+If nil no clear simple sections are used.")
+
+(defvar singular-simple-sec-last-end nil
+  "Marker at the end of the last simple section.")
 
 (defun singular-simple-sec-init (pos)
   "Initialize global variables belonging to simple section management.
@@ -287,35 +292,43 @@ initializes it to POS."
 
 (singular-fset 'singular-simple-sec-create
 	       'singular-emacs-simple-sec-create
-	       'singular-emacs-simple-sec-create)
+	       'singular-xemacs-simple-sec-create)
 
 (singular-fset 'singular-simple-sec-reset-last
 	       'singular-emacs-simple-sec-reset-last
-	       'singular-emacs-simple-sec-reset-last)
+	       'singular-xemacs-simple-sec-reset-last)
 
 (singular-fset 'singular-simple-sec-start
 	       'singular-emacs-simple-sec-start
-	       'singular-emacs-simple-sec-start)
+	       'singular-xemacs-simple-sec-start)
 
 (singular-fset 'singular-simple-sec-end
 	       'singular-emacs-simple-sec-end
-	       'singular-emacs-simple-sec-end)
+	       'singular-xemacs-simple-sec-end)
+
+(singular-fset 'singular-simple-sec-start-at
+	       'singular-emacs-simple-sec-start-at
+	       'singular-xemacs-simple-sec-start-at)
+
+(singular-fset 'singular-simple-sec-end-at
+	       'singular-emacs-simple-sec-end-at
+	       'singular-xemacs-simple-sec-end-at)
 
 (singular-fset 'singular-simple-sec-type
 	       'singular-emacs-simple-sec-type
-	       'singular-emacs-simple-sec-type)
+	       'singular-xemacs-simple-sec-type)
 
 (singular-fset 'singular-simple-sec-at
 	       'singular-emacs-simple-sec-at
-	       'singular-emacs-simple-sec-at)
+	       'singular-xemacs-simple-sec-at)
 
 (singular-fset 'singular-simple-sec-before
 	       'singular-emacs-simple-sec-before
-	       'singular-emacs-simple-sec-before)
+	       'singular-xemacs-simple-sec-before)
 
 (singular-fset 'singular-simple-sec-in
 	       'singular-emacs-simple-sec-in
-	       'singular-emacs-simple-sec-in)
+	       'singular-xemacs-simple-sec-in)
 ;;}}}
 
 ;;{{{ Simple section stuff for Emacs
@@ -324,15 +337,17 @@ initializes it to POS."
 Creates the section from end of previous simple section up to END.
 Returns the new simple section or `empty' if no simple section has
 been created.
+Assumes that no narrowing is in effect.
 Updates `singular-simple-sec-last-end'."
   (let ((last-end (marker-position singular-simple-sec-last-end))
 	;; `simple-sec' is the new simple section or `empty'
 	simple-sec)
 
-    ;; get beginning of line before END
-    (setq end (let ((save-point (point)))
+    ;; get beginning of line before END.  At this point we need that there
+    ;; are no restrictions.
+    (setq end (let ((old-point (point)))
 		(goto-char end) (beginning-of-line)
-		(prog1 (point) (goto-char save-point))))
+		(prog1 (point) (goto-char old-point))))
 
     (cond
      ;; do not create empty sections
@@ -358,12 +373,12 @@ Updates `singular-simple-sec-last-end'."
     (set-marker singular-simple-sec-last-end end)
     simple-sec))
 
-(defun singular-emacs-simple-sec-reset-last ()
-  "Reset end of last simple section after accidental extension."
-  (let ((simple-sec (singular-emacs-simple-sec-at singular-simple-sec-last-end)))
-    (if simple-sec
-	(move-overlay simple-sec (overlay-start simple-sec)
-		      singular-simple-sec-last-end))))
+(defun singular-emacs-simple-sec-reset-last (pos)
+  "Reset end of last simple section to POS after accidental extension.
+Updates `singular-simple-sec-last-end', too."
+  (let ((simple-sec (singular-emacs-simple-sec-at pos)))
+    (if simple-sec (move-overlay simple-sec (overlay-start simple-sec) pos))
+    (set-marker singular-simple-sec-last-end pos)))
 
 (defun singular-emacs-simple-sec-start (simple-sec)
   "Return start of non-clear simple section SIMPLE-SEC."
@@ -372,6 +387,38 @@ Updates `singular-simple-sec-last-end'."
 (defun singular-emacs-simple-sec-end (simple-sec)
   "Return end of non-clear simple section SIMPLE-SEC."
   (overlay-end simple-sec))
+
+(defun singular-emacs-simple-sec-start-at (pos)
+  "Return start of clear section at position POS."
+  (save-restriction
+    (widen)
+    (let ((previous-overlay-change (1+ (point))))
+      ;; this `while' loop at last will run into the end of the next
+      ;; non-clear overlay or stop at bob.  Since POS may be right at the end
+      ;; of a previous non-clear location, we have to search at least one
+      ;; time from POS+1 backwards.
+      (while (not
+	      (or (singular-emacs-simple-sec-before previous-overlay-change)
+		  (eq previous-overlay-change (point-min))))
+	(setq previous-overlay-change
+	      (previous-overlay-change previous-overlay-change)))
+      previous-overlay-change)))
+
+(defun singular-emacs-simple-sec-end-at (pos)
+  "Return end of clear section at position POS."
+  (save-restriction
+    (widen)
+    (let ((next-overlay-change (next-overlay-change (point))))
+      ;; this `while' loop at last will run into the beginning of the next
+      ;; non-clear overlay or stop at eob.  Since POS may not be at the
+      ;; beginning of a non-clear simple section we may start searching
+      ;; immediately.
+      (while (not
+	      (or (singular-emacs-simple-sec-at next-overlay-change)
+		  (eq next-overlay-change (point-max))))
+	(setq next-overlay-change
+	      (next-overlay-change next-overlay-change)))
+      next-overlay-change)))
 
 (defun singular-emacs-simple-sec-type (simple-sec)
   "Return type of SIMPLE-SEC."
@@ -413,10 +460,10 @@ order in that the appear in the region."
 ;; NOT READY[was sind und wollen sections im Gegensatz zu simple
 ;; sections?]!
 
-(defun singular-section-at (pos &optional raw-section)
+(defun singular-section-at (pos &optional restricted)
   "Return section at position POS.
-Returns section intersected with current restriction unless
-RAW-SECTION is non-nil."
+Returns section intersected with current restriction if RESTRICTED is
+non-nil."
   (let* ((simple-sec (singular-simple-sec-at pos))
 	 (type (singular-simple-sec-type simple-sec))
 	 (start (if simple-sec
@@ -425,10 +472,10 @@ RAW-SECTION is non-nil."
 	 (end (if simple-sec
 		  (singular-simple-sec-end simple-sec)
 		(singular-simple-sec-end-at pos))))
-    (if raw-section
-	(vector simple-sec type start end)
-      (vector simple-sec type
-	      (max start (point-min)) (min end (point-max))))))
+    (if restricted
+	(vector simple-sec type
+		(max start (point-min)) (min end (point-max)))
+      (vector simple-sec type start end))))
 
 (defmacro singular-section-simple-sec (section)
   "Return underlying simple section of SECTION."
@@ -451,32 +498,38 @@ RAW-SECTION is non-nil."
 (defvar singular-folding-ellipsis "Singular I/O ..."
   "Ellipsis to show for folded input or output.")
 
-(defun singular-fold-internal (start end fold)
-  "(Un)fold region from START to END.
+(defun singular-fold-internal (list fold)
+  "(Un)fold regions in LIST.
+LIST should have the format (START1 END1 START2 END2 ...).
 Folds if FOLD is non-nil, otherwise unfolds.
 Folds without affecting undo information, buffer-modified flag, and
-even for read-only files."
+even for read-only files.
+Assumes that there is no narrowing in effect."
   (let ((inhibit-read-only t) (buffer-undo-list t)
-	(save-modified (buffer-modified-p))
-	(save-point (point)))
+	(modified (buffer-modified-p))
+	(old-point (point)))
     (unwind-protect
 	;; do it !!
 	(if fold
-	    (progn
-	      (goto-char start) (insert ?\r)
-	      (subst-char-in-region start end ?\n ?\r t))
-	  (goto-char start) (delete-char 1)
-	  (subst-char-in-region start end ?\r ?\n t))
+	    (while list
+	      (goto-char (car list)) (insert ?\r)
+	      (subst-char-in-region (car list) (nth 1 list) ?\n ?\r t)
+	      (setq list (cdr (cdr list))))
+	  (while list
+	    (subst-char-in-region (car list) (nth 1 list) ?\r ?\n t)
+	    (goto-char (car list)) (delete-char 1)
+	    (setq list (cdr (cdr list)))))
 
       ;; we have to restore the point and the modified flag.  The read-only
       ;; state and undo information are restored by the outer `let'.
       ;; This code is unwide-protected.
-      (goto-char save-point)
-      (or save-modified
+      (goto-char old-point)
+      (or modified
 	  (set-buffer-modified-p nil)))))
 
 (defun singular-section-foldedp (section)
-  "Return t iff SECTION is folded."
+  "Return t iff SECTION is folded.
+Assumes that there is no narrowing in effect."
   (eq (char-after (singular-section-start section)) ?\r))
 
 (defun singular-fold-section (section)
@@ -484,11 +537,23 @@ even for read-only files."
 Folds section at current cursor position and goes to beginning of
 section if called interactively."
   (interactive (list (singular-section-at (point))))
-  (let ((start (singular-section-start section)))
-    (singular-fold-internal start
-			    (singular-section-end section)
-			    (not (singular-section-foldedp section)))
-    (if (interactive-p) (goto-char start))))
+  (let ((start (singular-section-start section))
+	;; we have to save restrictions this way since we change text
+	;; outside the restriction.  Note that we do not use a marker for
+	;; `old-point-min'.  This way, even partial narrowed sections are
+	;; folded properly if they have been narrowed at bol.  Nice but
+	;; dirty trick.
+	(old-point-min (point-min))
+	(old-point-max (point-max-marker)))
+    (unwind-protect
+	(progn
+	  (widen)
+	  (singular-fold-internal (list start
+					(singular-section-end section))
+				  (not (singular-section-foldedp section))))
+      (narrow-to-region old-point-min old-point-max)
+      (set-marker old-point-max nil))
+    (if (interactive-p) (goto-char (max start (point-min))))))
 ;;}}}
 
 ;;{{{ Debugging input and output filters
@@ -689,8 +754,7 @@ notes on filters\" in singular.el."
 		     (= comint-last-input-start (point))
 		     (set-marker comint-last-input-start save-pmark))
 		(and (= singular-simple-sec-last-end (point))
-		     (set-marker singular-simple-sec-last-end save-pmark)
-		     (singular-simple-sec-reset-last))
+		     (singular-simple-sec-reset-last save-pmark))
 
 		;; set new markers and create/extend new simple section
 		(set-marker comint-last-output-start save-pmark)
