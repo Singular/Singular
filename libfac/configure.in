@@ -130,10 +130,12 @@ dnl Last, but not least, customize CFLAGS
 dnl
 if test ${GXX} = yes; then
 
-
 # check whether CXX accepts --no-rtti
 AC_MSG_CHECKING(whether gcc accepts --no-rtti)
+tmp_flags=${CXXFLAGS}
 CXXFLAGS="${CXXFLAGS} --no-rtti"
+AC_LANG_SAVE
+AC_LANG_CPLUSPLUS
 AC_CACHE_VAL(ac_cv_cxx_have_rtti,
 AC_TRY_COMPILE(,,ac_cv_cxx_have_rtti=yes,ac_cv_cxx_have_rtti=no)
 )
@@ -157,7 +159,10 @@ else
 CXX="${CXX} --no-exceptions"
 fi
 
+AC_LANG_RESTORE
 CXXFLAGS=$temp_flags
+  
+fi
 
   if test "$ac_cxxflags_set" = no; then
     if test "$with_debug" = yes; then

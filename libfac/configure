@@ -1051,23 +1051,31 @@ esac
 
 if test ${GXX} = yes; then
 
-
 # check whether CXX accepts --no-rtti
 echo $ac_n "checking whether gcc accepts --no-rtti""... $ac_c" 1>&6
-echo "configure:1058: checking whether gcc accepts --no-rtti" >&5
+echo "configure:1057: checking whether gcc accepts --no-rtti" >&5
+tmp_flags=${CXXFLAGS}
 CXXFLAGS="${CXXFLAGS} --no-rtti"
+
+ac_ext=C
+# CXXFLAGS is not in ac_cpp because -g, -O, etc. are not valid cpp options.
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='${CXX-g++} -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext 1>&5'
+ac_link='${CXX-g++} -o conftest${ac_exeext} $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+cross_compiling=$ac_cv_prog_cxx_cross
+
 if eval "test \"`echo '$''{'ac_cv_cxx_have_rtti'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1064 "configure"
+#line 1072 "configure"
 #include "confdefs.h"
 
 int main() {
 
 ; return 0; }
 EOF
-if { (eval echo configure:1071: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1079: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   ac_cv_cxx_have_rtti=yes
 else
@@ -1089,20 +1097,20 @@ fi
 
 # check whether gcc accepts --no-exceptions
 echo $ac_n "checking whether gcc accepts --no-exceptions""... $ac_c" 1>&6
-echo "configure:1093: checking whether gcc accepts --no-exceptions" >&5
+echo "configure:1101: checking whether gcc accepts --no-exceptions" >&5
 CXXFLAGS="${CXXFLAGS} --no-exceptions"
 if eval "test \"`echo '$''{'ac_cv_cxx_have_exceptions'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1099 "configure"
+#line 1107 "configure"
 #include "confdefs.h"
 
 int main() {
 
 ; return 0; }
 EOF
-if { (eval echo configure:1106: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:1114: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   ac_cv_cxx_have_exceptions=yes
 else
@@ -1122,7 +1130,16 @@ else
 CXX="${CXX} --no-exceptions"
 fi
 
+ac_ext=C
+# CXXFLAGS is not in ac_cpp because -g, -O, etc. are not valid cpp options.
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='${CXX-g++} -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext 1>&5'
+ac_link='${CXX-g++} -o conftest${ac_exeext} $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
+cross_compiling=$ac_cv_prog_cxx_cross
+
 CXXFLAGS=$temp_flags
+  
+fi
 
   if test "$ac_cxxflags_set" = no; then
     if test "$with_debug" = yes; then
