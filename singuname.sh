@@ -29,6 +29,10 @@ then
     then
         echo ${prefix}-10
         exit 0
+    elif (echo $uname_a | $egrep " ia64 " > $devnull)
+    then
+        echo IA64-${prefix}
+        exit 0
     else
         echo ${prefix}-Unknown
         exit 1
@@ -146,6 +150,19 @@ then
     if( uname -s | $egrep "Darwin" > $devnull)
     then
         echo ${prefix}-darwin
+        exit 0
+    else
+        echo ${prefix}-Unknown
+        exit 1
+    fi
+# itanium ########################################################
+elif (echo $uname_a | $egrep "itanium" > $devnull)
+then
+    # IA64-HPUX: see HPUX
+    prefix=IA64
+    if (echo $uname_a | $egrep "Linux" > $devnull)
+    then
+        echo ${prefix}-Linux
         exit 0
     else
         echo ${prefix}-Unknown
