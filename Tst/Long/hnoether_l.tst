@@ -57,6 +57,12 @@ ring r=(0,i),(a,b),dp;
 develop(a2+ib3);
 develop(a5+i2*a4+2i*a2b+b2);
 kill r;
+ring r=(0,i),(a,b),dp;
+minpoly=i2+1;
+develop(a2+ib3);
+develop(a5+i2*a4+2i*a2b+b2);
+develop((a+2b)^2+ib5);
+kill r;
 ring r=(7,i),(x,y),dp;
 develop(x+y);
 kill r;
@@ -275,10 +281,9 @@ displayInvariants(hne[2]);
 displayInvariants(hne);
 kill HNEring;
 // ----------------------------------------------------------------------------
-// ------- test of invariants, generators, intersection,                    ---
-// -------         stripHNE, puiseux2generators, multiplicities, newtonpoly ---
+// ------- test of invariants, intersection, stripHNE, puiseux2generators,  ---
+// -------         multiplicities, newtonpoly                               ---
 example invariants;
-example generators;
 setring r;
 list hne=reddevelop((x2-y3)*(x2+y3));
 intersection(hne[1],hne[2]);
@@ -288,11 +293,11 @@ setring r;
 multiplicities(develop(x5+y7));
 example newtonpoly;
 // ------- test of getnm, T_Transform, T1_Transform, T2_Transform, koeff, -----
-// -------         redleit, squarefree, allsquarefree, set_list           -----
+// -------  redleit, squarefree, allsquarefree, set_list, referencepoly   -----
 example getnm;
 T_Transform(y2+x3,1,2);
 T1_Transform(y-x2+x3,1,2);
-T2_Transform(y2+x3,-1,3,2);
+T2_Transform(y2+x3-x2y,-1,3,2,referencepoly(newtonpoly(y2+x3-x2y)));
 koeff(x2+2xy+3xy2-x2y-2y3,1,2);
 example redleit;
 example squarefree;

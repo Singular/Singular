@@ -62,11 +62,10 @@ param(develop(y2+x3+x4));
 // ------------ test of displayHNE: -------------------
 example displayHNE;
 // ----------------------------------------------------------------------------
-// ------- test of invariants, displayInvariants, generators, intersection, ---
-// -------         stripHNE, puiseux2generators, multiplicities, newtonpoly ---
+// ------- test of invariants, displayInvariants, intersection, stripHNE,   ---
+// -------         puiseux2generators, multiplicities, newtonpoly           ---
 example invariants;
 example displayInvariants;
-example generators;
 list hne=reddevelop((x2-y3)*(x2+y3));
 intersection(hne[1],hne[2]);
 example stripHNE;
@@ -75,11 +74,12 @@ setring r;
 multiplicities(develop(x5+y7));
 example newtonpoly;
 // ------- test of getnm, T_Transform, T1_Transform, T2_Transform, koeff, -----
-// -------         redleit, squarefree, allsquarefree, set_list           -----
+// -------  redleit, squarefree, allsquarefree, set_list, referencepoly   -----
 example getnm;
 T_Transform(y2+x3,1,2);
 T1_Transform(y-x2+x3,1,2);
-T2_Transform(y2+x3,-1,3,2);
+T2_Transform(y2+x3,-1,3,2,y2+x3);
+example referencepoly;
 koeff(x2+2xy+3xy2-x2y-2y3,1,2);
 example redleit;
 example squarefree;
