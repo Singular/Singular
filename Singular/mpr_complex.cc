@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.29 2000-12-18 15:44:41 obachman Exp $ */
+/* $Id: mpr_complex.cc,v 1.30 2000-12-20 10:54:24 pohl Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -48,18 +48,20 @@ static gmp_float diff(0.0);
 /** Set size of mantissa
  *  digits - the number of output digits (basis 10)
  *  the size of mantissa consists of two parts:
- *    the "output" part and the "zero" part.
+ *    the "output" part a and the "rest" part b.
  *  According to the GMP-precision digits is 
  *  recomputed to bits (basis 2).
  *  Two numbers a, b are equal if
  *    | a - b | < | a | * 0.1^digits .
  *  In this case we have a - b = 0 .
+ *  The epsilon e is e=0.1^(digits+rest) with
+ *  1+e != 1, but 1+0.1*e = 1.
  */
-void setGMPFloatDigits( size_t digits )
+void setGMPFloatDigits( size_t digits, size_t rest )
 {
   size_t bits = 1 + (size_t) ((float)digits * 3.5);
-  size_t db = bits+bits;
-  bits= bits>64?bits:64;
+  size_t rb = 1 + (size_t) ((float)rest * 3.5);
+  size_t db = bits+rb;
   gmp_output_digits= digits;
   mpf_set_default_prec( db );
   mpf_set_prec(*diff._mpfp(),32);

@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_inout.cc,v 1.11 2000-10-05 15:16:58 Singular Exp $ */
+/* $Id: mpr_inout.cc,v 1.12 2000-12-20 10:54:25 pohl Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultant
@@ -192,7 +192,8 @@ BOOLEAN nuUResSolve( leftv res, leftv args )
     return TRUE;
   else if ( !(rField_is_R()||rField_is_long_R()||rField_is_long_C()) )
   {
-    setGMPFloatDigits( (unsigned long int)v->Data() );
+    unsigned long int ii=(unsigned long int)v->Data();
+    setGMPFloatDigits( ii, ii );
   }
   v= v->next;
 
@@ -363,7 +364,8 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
 
   if ( !(rField_is_R()||rField_is_long_R()||rField_is_long_C()) )
   {
-    setGMPFloatDigits( (unsigned long int)arg2->Data() );
+    unsigned long int ii = (unsigned long int)arg2->Data();
+    setGMPFloatDigits( ii, ii );
   }
 
   if ( gls == NULL || pIsConstant( gls ) )

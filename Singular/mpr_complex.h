@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.h,v 1.15 2000-06-30 11:25:38 pohl Exp $ */
+/* $Id: mpr_complex.h,v 1.16 2000-12-20 10:54:24 pohl Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -25,7 +25,7 @@ extern "C" {
 #define RTOF 3
 #define CTOF 4
 
-void setGMPFloatDigits( size_t digits );
+void setGMPFloatDigits( size_t digits, size_t rest );
 size_t getGMPFloatDigits();
 
 //-> class gmp_float

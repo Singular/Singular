@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.34 2000-12-19 18:31:44 obachman Exp $ */
+/* $Id: numbers.cc,v 1.35 2000-12-20 10:54:25 pohl Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -129,12 +129,12 @@ void nSetChar(ring r)
   /* -------------- long R -----------------------*/
   else if (rField_is_long_R(r))
   {
-    setGMPFloatDigits(r->ch_flags);
+    setGMPFloatDigits(r->ch_flags,r->ch_flags);
   }
   /* -------------- long C -----------------------*/
   else if (rField_is_long_C(r))
   {
-    setGMPFloatDigits(r->ch_flags);
+    setGMPFloatDigits(r->ch_flags,r->ch_flags);
   }
 #ifdef TEST
   else
