@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.25 1998-04-29 07:05:32 siebert Exp $ */
+/* $Id: syz1.cc,v 1.26 1998-04-29 07:20:43 siebert Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -2475,9 +2475,9 @@ static resolvente syReadOutMinimalRes(syStrategy syzstr,
     tmpR.order = ord;
     tmpR.block0 = b0;
     tmpR.block1 = b1;
-    //rComplete(&tmpR);
-    pChangeRing(pVariables,1,ord,b0,b1,currRing->wvhdl);
-    //rChangeCurrRing(&tmpR, TRUE);
+    rComplete(&tmpR);
+    //pChangeRing(pVariables,1,ord,b0,b1,currRing->wvhdl);
+    rChangeCurrRing(&tmpR, TRUE);
   }
 #if ! defined(HAVE_SY_VECTOR) || defined(SY_VEC_DEBUG)  
   pSetm =syzSetm;
@@ -2524,9 +2524,9 @@ static resolvente syReadOutMinimalRes(syStrategy syzstr,
 /*--- changes to the original ring------------------*/
   if (ord!=NULL)
   {
-    pChangeRing(pVariables,currRing->OrdSgn,currRing->order,
-    currRing->block0,currRing->block1,currRing->wvhdl);
-    //rChangeCurrRing(origR,TRUE);
+    //pChangeRing(pVariables,currRing->OrdSgn,currRing->order,
+    //currRing->block0,currRing->block1,currRing->wvhdl);
+    rChangeCurrRing(origR,TRUE);
   }
   else
   {
@@ -2629,9 +2629,9 @@ syStrategy syLaScala3(ideal arg,int * length)
     tmpR.order = ord;
     tmpR.block0 = b0;
     tmpR.block1 = b1;
-    //rComplete(&tmpR);
-    pChangeRing(pVariables,1,ord,b0,b1,currRing->wvhdl);
-    //rChangeCurrRing(&tmpR, TRUE);
+    rComplete(&tmpR);
+    //pChangeRing(pVariables,1,ord,b0,b1,currRing->wvhdl);
+    rChangeCurrRing(&tmpR, TRUE);
   }  
 /*--- initializes the data structures---------------*/
   syzstr->Tl = new intvec(*length);
@@ -2720,9 +2720,9 @@ syStrategy syLaScala3(ideal arg,int * length)
   if (temp!=NULL) idDelete(&temp);
   if (ord!=NULL)
   {
-    pChangeRing(pVariables,currRing->OrdSgn,currRing->order,
-    currRing->block0,currRing->block1,currRing->wvhdl);
-    //rChangeCurrRing(origR,TRUE);
+    //pChangeRing(pVariables,currRing->OrdSgn,currRing->order,
+    //currRing->block0,currRing->block1,currRing->wvhdl);
+    rChangeCurrRing(origR,TRUE);
   }
   else
   {
