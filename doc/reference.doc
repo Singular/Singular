@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.105 1999-05-06 10:00:13 Singular Exp $
+@comment $Id: reference.doc,v 1.106 1999-05-06 10:02:26 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2633,7 +2633,7 @@ See
 @item @strong{Type:}
 the same as the input type
 @item @strong{Purpose:}
-returns the leading monomial of a polynomial or a vector as a polynomail 
+returns the leading monomial of a polynomial or a vector as a polynomail
 or vector whose coefficient is one.
 @item @strong{Example:}
 @example
@@ -4177,7 +4177,7 @@ comma
 @item "%l"
 similar to @code{"%s"}, except that embracing explicite type casts are
 inserted as much as possible (this is mostly useful for "cutting and
-pasting") 
+pasting")
 @item "%2l"
 similar to @code{"%l"}, except that newlines are inserted after every
 comma
@@ -4211,10 +4211,10 @@ returns the string equivalent to typing @code{print(expressions, "betti");}
 @end example
 @end table
 @c ref
-See 
+See
 @ref{dbprint}
 @ref{short}
-@ref{type} 
+@ref{type}
 @ref{betti}
 @ref{string type cast}
 @ref{Type conversion and casting}.
@@ -5145,7 +5145,7 @@ second argument of type @code{intvec} as Hilbert series
 if the ideal resp. module is homogeneous,
 (Hilbert driven standard basis computation, @ref{stdhilb}).
 @*Use an optional second argument of type @code{poly} resp.@ @code{vector}
-to construct the standard basis from an already computed one (givenn as the 
+to construct the standard basis from an already computed one (givenn as the
 first argument) and one additional generator (the second argument).
 @item @strong{Example:}
 @example
