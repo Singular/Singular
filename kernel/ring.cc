@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.21 2004-08-27 12:21:33 Singular Exp $ */
+/* $Id: ring.cc,v 1.22 2004-10-12 16:16:37 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3534,7 +3534,7 @@ ring rOpposite(ring src)
   /* that is R^opp, where f (*^opp) g = g*f  */
 {
   ring save=currRing;  
-  ring r=rCopy(src);
+  ring r=rCopy0(src);
   // change vars v1..vN -> vN..v1
   int i;
   int i2=(rVar(r)-1)/2;
@@ -3548,17 +3548,17 @@ ring rOpposite(ring src)
     r->names[rVar(r)-1-i]=r->names[i];
     r->names[i]=p;
   }
-  i2=(rVar(r)+1)/2;
-  for(int i=i2; i>0; i--)
-  {
-    // index: 1..N
-    //Print("ex var places: %d <-> %d\n",i,rVar(r)+1-i);
-    // exchange VarOffset
-    int t;
-    t=r->VarOffset[i];
-    r->VarOffset[i]=r->VarOffset[rOppVar(r,i)];
-    r->VarOffset[rOppVar(r,i)]=t;
-  }
+//  i2=(rVar(r)+1)/2;
+//  for(int i=i2; i>0; i--)
+//  {
+//    // index: 1..N
+//    //Print("ex var places: %d <-> %d\n",i,rVar(r)+1-i);
+//    // exchange VarOffset
+//    int t;
+//    t=r->VarOffset[i];
+//    r->VarOffset[i]=r->VarOffset[rOppVar(r,i)];
+//    r->VarOffset[rOppVar(r,i)]=t;
+//  }
   // change names:
   for (i=rVar(r)-1; i>=0; i--)
   {
@@ -3568,46 +3568,46 @@ ring rOpposite(ring src)
   }
   // change ordering: listing
   // change ordering: compare
-  for(i=0; i<r->OrdSize; i++)
-  {
-    int t,tt;
-    switch(r->typ[i].ord_typ)
-    {
-      case ro_dp:
-      // 
-        t=r->typ[i].data.dp.start;
-        r->typ[i].data.dp.start=rOppVar(r,r->typ[i].data.dp.end);
-        r->typ[i].data.dp.end=rOppVar(r,t);
-        break;
-      case ro_wp:
-      case ro_wp_neg:
-      {
-        t=r->typ[i].data.wp.start;
-        r->typ[i].data.wp.start=rOppVar(r,r->typ[i].data.wp.end);
-        r->typ[i].data.wp.end=rOppVar(r,t);
-        // invert r->typ[i].data.wp.weights
-        rOppWeight(r->typ[i].data.wp.weights,
-                   r->typ[i].data.wp.end-r->typ[i].data.wp.start);
-        break;
-      }
-      //case ro_wp64:
-      case ro_syzcomp:
-      case ro_syz:
-         WerrorS("not implemented in rOpposite");
-         // should not happen
-         break;
-
-      case ro_cp:
-        t=r->typ[i].data.cp.start;
-        r->typ[i].data.cp.start=rOppVar(r,r->typ[i].data.cp.end);
-        r->typ[i].data.cp.end=rOppVar(r,t);
-        break;
-      case ro_none:
-      default:
-       Werror("unknown type in rOpposite(%d)",r->typ[i].ord_typ);
-       break;
-    }
-  }
+//  for(i=0; i<r->OrdSize; i++)
+//  {
+//    int t,tt;
+//    switch(r->typ[i].ord_typ)
+//    {
+//      case ro_dp:
+//      // 
+//        t=r->typ[i].data.dp.start;
+//        r->typ[i].data.dp.start=rOppVar(r,r->typ[i].data.dp.end);
+//        r->typ[i].data.dp.end=rOppVar(r,t);
+//        break;
+//      case ro_wp:
+//      case ro_wp_neg:
+//      {
+//        t=r->typ[i].data.wp.start;
+//        r->typ[i].data.wp.start=rOppVar(r,r->typ[i].data.wp.end);
+//        r->typ[i].data.wp.end=rOppVar(r,t);
+//        // invert r->typ[i].data.wp.weights
+//        rOppWeight(r->typ[i].data.wp.weights,
+//                   r->typ[i].data.wp.end-r->typ[i].data.wp.start);
+//        break;
+//      }
+//      //case ro_wp64:
+//      case ro_syzcomp:
+//      case ro_syz:
+//         WerrorS("not implemented in rOpposite");
+//         // should not happen
+//         break;
+//
+//      case ro_cp:
+//        t=r->typ[i].data.cp.start;
+//        r->typ[i].data.cp.start=rOppVar(r,r->typ[i].data.cp.end);
+//        r->typ[i].data.cp.end=rOppVar(r,t);
+//        break;
+//      case ro_none:
+//      default:
+//       Werror("unknown type in rOpposite(%d)",r->typ[i].ord_typ);
+//       break;
+//    }
+//  }
   // Change order/block structurea (needed for rPrint, rAdd etc.)
   int j=0;
   int l=rBlocks(src);
@@ -3722,6 +3722,7 @@ ring rOpposite(ring src)
         break;
     }
   } 
+  rComplete(r);
 #ifdef RDEBUG
    rDebugPrint(r);
 #endif
