@@ -37,7 +37,7 @@ lib-cmpl.el: ${prefix}/Singular/Makefile cmpl.pl
 	rm lib-temp
 
 clean mostlyclean distclean:
-	rm cmd-cmpl.el hlp-cmpl.el lib-cmpl.el ex-cmpl.el
+	rm -f cmd-cmpl.el hlp-cmpl.el lib-cmpl.el ex-cmpl.el
 
 install-sharedist: all
 	${MKINSTALLDIRS} ${emacsdir}
