@@ -560,6 +560,10 @@ dnl and headers were not found under the condition that the respective
 dnl  --enable argument was given
 dnl
 
+# fereadl - io routines
+AC_CHECK_HEADERS(termcap.h)
+AC_CHECK_HEADERS(termios.h)
+
 # readline
 if test "$with_readline" != no; then
   AC_CHECK_LIB(ncurses,tgetent,,\

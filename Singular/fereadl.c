@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: fereadl.c,v 1.3 1999-11-15 17:19:58 obachman Exp $ */
+/* $Id: fereadl.c,v 1.4 1999-11-16 10:52:40 hannes Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -22,15 +22,18 @@
  #ifdef MSDOS
   #include <pc.h>
  #else
+  #ifdef HAVE_TERMCAP_H
   #include <termcap.h>
+  #elif HAVE_TERMIOS_H
+  #include <termios.h>
+  #endif
+
   #ifdef atarist
    #include <ioctl.h>
   #else
    #ifdef NeXT
     #include <sgtty.h>
     #include <sys/ioctl.h>
-   #else
-    #include <termios.h>
    #endif
   #endif
  #endif
@@ -69,8 +72,7 @@ int     fe_cursor_line; /* 0..pagelength-1*/
 
 #ifndef MSDOS
   #ifndef HAVE_ATEXIT
-    extern "C" int on_exit(void (*f)(int, void *), void *arg);
-
+    int on_exit(void (*f)(int, void *), void *arg);
     void fe_reset_fe (int i, void *v)
   #else
     void fe_reset_fe (void)
@@ -173,7 +175,7 @@ static int fe_out_char(char c)
 void fe_init (void)
 {
   #ifdef MSDOS
-  extern short ospeed;
+  /*extern short ospeed;*/
   #endif
   fe_is_initialized=TRUE;
   if ((!fe_use_fgets) && (isatty (STDIN_FILENO)))
@@ -241,7 +243,7 @@ void fe_init (void)
             tattr.c_cc[VTIME] = 0;
             tcsetattr (STDIN_FILENO, TCSAFLUSH, &tattr);
           #endif
-          ospeed=cfgetospeed(&tattr);
+          /*ospeed=cfgetospeed(&tattr);*/
         #endif
       }
     #endif

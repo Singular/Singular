@@ -4,7 +4,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.75 1999-11-15 17:20:26 obachman Exp $
+ *  Version: $Id: mod2.h.in,v 1.76 1999-11-16 10:52:41 hannes Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -48,6 +48,11 @@
 #undef HAVE_SYS_TIME_H
 /* Define if you have sys/times.h */
 #undef HAVE_SYS_TIMES_H
+/* io header: */
+/* Define if you have termcap.h */
+#undef HAVE_TERMCAP_H
+/* Define if you have termios.h */
+#undef HAVE_TERMIOS_H
 /* Define if you have readline/history.h */
 #undef HAVE_READLINE_HISTORY_H
 /* Define if readline/readline.h is ok */
