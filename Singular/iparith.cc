@@ -8,10 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-
 #include <stdio.h>
 #include <time.h>
-
 #include <unistd.h>
 
 #include "mod2.h"
@@ -97,7 +95,6 @@ struct sValCmdM
 };
 #endif
 
-
 /*============= proc =======================*/
 static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport = FALSE);
 static int iiTabIndex(const jjValCmdTab dArithTab, const int len, const int op);
@@ -107,7 +104,6 @@ static Subexpr jjDBMakeSub(leftv e,char *f, int l);
 #else
 static Subexpr jjMakeSub(leftv e);
 #endif
-
 
 /*============= vars ======================*/
 extern int cmdtok;
@@ -143,9 +139,9 @@ cmdnames cmds[] =
   { "diff",        0, DIFF_CMD ,          CMD_2},
   { "dim",         0, DIM_CMD ,           CMD_1},
   { "div",         0, INTDIV ,            INTDIV},
-//#ifdef DRING
+#ifdef DRING
   { "dring",       0, DRING_CMD ,         DRING_CMD},
-//#endif
+#endif
   { "dump",        0, DUMP_CMD,           CMD_1},
   { "extgcd",      0, EXTGCD_CMD ,        CMD_2},
   { "EXTGCD",      2, EXTGCD_CMD ,        CMD_2},
@@ -281,7 +277,7 @@ cmdnames cmds[] =
   { "transpose",   0, TRANSPOSE_CMD ,     CMD_1},
   { "type",        0, TYPE_CMD ,          TYPE_CMD},
   { "typeof",      0, TYPEOF_CMD ,        CMD_1},
-  { "unload",      0, UNLOAD_CMD ,        CMD_M},
+//  { "unload",      0, UNLOAD_CMD ,        CMD_M},
   { "var",         0, VAR_CMD ,           CMD_1},
   { "varstr",      0, VARSTR_CMD ,        CMD_12},
   { "vdim",        0, VDIM_CMD ,          CMD_1},
@@ -296,7 +292,6 @@ cmdnames cmds[] =
   { "multiplicity",1, MULTIPLICITY_CMD ,  CMD_1},
   { "verbose",     2, OPTION_CMD ,        CMD_M},
 //  { "rank",        1, ROWS_CMD ,          CMD_1},
-
 //  { "Current",     0, -1 ,                SYSVAR},
 //  { "Top",         0, -1 ,                SYSVAR},
 //  { "Up",          0, -1 ,                SYSVAR},
@@ -318,7 +313,6 @@ cmdnames cmds[] =
   { "rtimer",      0, VRTIMER,            SYSVAR},
   { "TRACE",       0, TRACE ,             SYSVAR},
   { "voice",       0, VOICE ,             SYSVAR},
-
 
 /* other reserved words:scanner.l */
   { "pause",       2, -1 ,             0},
@@ -2947,8 +2941,9 @@ static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
 #ifdef HAVE_DYNAMIC_LOADING
   extern BOOLEAN load_modules(char *newlib, char *fullpath, BOOLEAN tellerror);
 #endif /* HAVE_DYNAMIC_LOADING */
-  
-  switch(LT) {
+
+  switch(LT)
+  {
       default:
       case LT_NONE:
         Werror("%s: unknown type", s);
@@ -2957,7 +2952,7 @@ static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
       case LT_SINGULAR:
         result = iiLibCmd(s, autoexport);
         break;
- 
+
       case LT_ELF:
 #ifdef HAVE_DYNAMIC_LOADING
         result = load_modules(s, libnamebuf, autoexport);
@@ -2965,7 +2960,6 @@ static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
         Print("Dynamic modules are not supported by this version of Singular");
 #endif /* HAVE_DYNAMIC_LOADING */
         break;
-        
   }
   return result;
 }
@@ -4620,9 +4614,9 @@ struct sValCmdM dArithM[]=
 #ifdef HAVE_NAMESPACES
 ,{jjIMPORTFROM,IMPORTFROM_CMD,  ANY_TYPE,           -2 }
 ,{jjEXPORTTO,  EXPORTTO_CMD,    NONE,               -2 }
- ,{jjUNLOAD,   UNLOAD_CMD,      NONE,               -2 }
+,{jjUNLOAD,    UNLOAD_CMD,      NONE,               -2 }
 #endif /* HAVE_NAMESPACES */
- ,{NULL,        0,               0,                  0  }
+,{NULL,        0,               0,                  0  }
 };
 #ifdef MDEBUG
 static Subexpr jjDBMakeSub(leftv e,char *f, int l)
@@ -5007,7 +5001,6 @@ void ttGen3()
 BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
 {
 #ifndef GENTABLE
-
   memset(res,0,sizeof(sleftv));
 
   if (!errorreported)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.39 1998-11-16 08:41:21 Singular Exp $ */
+/* $Id: ring.cc,v 1.40 1998-12-03 17:58:04 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -679,6 +679,7 @@ void rComplete(ring r)
   r->VarCompIndex = VarCompIndex;
   r->VarLowIndex = VarLowIndex;
   r->VarHighIndex = VarHighIndex;
+  rOptimizeOrder(r);
 }
 
 /*2
@@ -1950,3 +1951,51 @@ BOOLEAN rDBTest(ring r, char* fn, int l)
 #endif
 
 
+// And here is how we determine the way exponents are stored:
+// There are the following four possibilities:
+//
+//
+// BIGENDIAN -- lex order
+// e_1, e_2, ... , e_n,..,comp:  pVarOffset = -1,
+//                               pVarLowIndex = 0,
+//                               pVarHighIndex = pVariables-1
+//                               pVarCompIndex = pVariables + #(..)
+// BIGENDIAN -- rev lex order
+// e_n, ... , e_2, e_1,..,comp:  pVarOffset = pVariables,
+//                               pVarLowIndex = 0,
+//                               pVarHighIndex = pVariables-1
+//                               pVarCompIndex = pVariables + #(..)
+// LITTLEENDIAN -- rev lex order
+// comp,.., e_1, e_2, ... , e_n : pVarOffset = #(..),
+//                                pVarLowIndex = 1 + #(..),
+//                                pVarHighIndex = #(..) + pVariables
+//                                pVarCompIndex = 0
+// LITTLEENDIAN -- lex order
+// comp,..,e_n, .... , e_2, e_1 : pVarOffset = pVariables + 1 + #(..)
+//                                pVarLowIndex = 1 + #(..)
+//                                pVarHighIndex = #(..) + pVariables
+//                                pVarCompIndex = 0
+//
+// Furthermore, the size of the exponent vector is always a multiple
+// of the word size -- "empty exponents" (exactly #(..) ones) are
+// filled in between comp and first/last exponent -- i.e. comp and
+// first/last exponent might not be next to each other
+void rOptimizeOrder(ring r)
+{
+#if 0
+  int n=rBlocks(r)-1;
+  Print("optimizing for %d blocks, %d vars\n",n,r->N);
+  int *varnum2pos=(int*)Alloc0((r->N+1)*sizeof(int));
+  if (n==2) /* minimum */
+  {
+    Free((ADDRESS)varnum2pos,(r->N+1)*sizeof(int));
+    varnum2pos=r->VarOffset;
+  }
+  else
+  {
+  }
+  for(int i=0;i<=r->N;i++)
+    Print("x(%d) at pos %d\n",i,varnum2pos[i]);
+  if (n!=2) Free((ADDRESS)varnum2pos,(r->N+1)*sizeof(int));
+#endif
+}
