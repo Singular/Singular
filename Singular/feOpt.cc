@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.cc,v 1.11 2000-05-05 18:40:28 obachman Exp $ */
+/* $Id: feOpt.cc,v 1.12 2000-05-08 15:25:25 obachman Exp $ */
 /*
 * ABSTRACT: Implementation of option buisness
 */
@@ -176,7 +176,7 @@ main()
 #ifdef ESINGULAR
   fd = fopen("feOptES.inc", "w");
 #elif defined(TSINGULAR)
-  fd = fopen("feOptXS.inc", "w");
+  fd = fopen("feOptTS.inc", "w");
 #else  
   fd = fopen("feOpt.inc", "w");
 #endif
