@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.65 2001-02-27 18:06:35 mschulze Exp $ */
+/* $Id: polys1.cc,v 1.66 2001-03-05 16:41:48 mschulze Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -1157,9 +1157,7 @@ poly ppJetW(poly p, int m, short *w)
   poly r=NULL;
   poly t=NULL;
   short *wsave=ecartWeights;
-
   ecartWeights=w;
-
   while (p!=NULL)
   {
     if (totaldegreeWecart(p)<=m)
@@ -1184,21 +1182,40 @@ poly ppJetW(poly p, int m, short *w)
   return r;
 }
 
-int pMinDegW(poly p,intvec *w)
+poly pJetW(poly p, int m, short *w)
+{
+  poly t=NULL;
+  short *wsave=ecartWeights;
+  ecartWeights=w;
+  while((p!=NULL) && (totaldegreeWecart(p)>m)) pLmDelete(&p);
+  if (p==NULL) return NULL;
+  poly r=p;
+  while (pNext(p)!=NULL)
+  {
+    if (totaldegreeWecart(pNext(p))>m)
+    {
+      pLmDelete(&pNext(p));
+    }
+    else
+      pIter(p);
+  }
+  ecartWeights=wsave;
+  return r;
+}
+
+int pMinDeg(poly p,intvec *w=NULL)
 {
   if(p==NULL)
     return -1;
-  int n=0;
-  if(w!=NULL)
-    n=w->length();
-  if(pVariables<n)
-    n=pVariables;
   int d=-1;
   while(p!=NULL)
   {
     int d0=0;
-    for(int j=0;j<n;j++)
-      d0+=(*w)[j]*pGetExp(p,j+1);
+    for(int j=0;j<pVariables;j++)
+      if(w==NULL||j>=w->length())
+        d0+=pGetExp(p,j+1);
+      else
+        d0+=(*w)[j]*pGetExp(p,j+1);
     if(d0<d||d==-1)
       d=d0;
     pIter(p);
@@ -1206,38 +1223,42 @@ int pMinDegW(poly p,intvec *w)
   return d;
 }
 
-poly pSeries(int n,poly p,poly u=NULL)
+poly pSeries(int n,poly p,poly u=NULL,intvec *w=NULL)
 {
+  short *ww=iv2array(w);
   if(p!=NULL)
   {
     if(u==NULL)
-      p=pJet(p,n);
+      p=pJetW(p,n,ww);
     else
-      p=pJet(pMult(p,pInvers(n-pTotaldegree(p),u)),n);
+      p=pJetW(pMult(p,pInvers(n-pMinDeg(p,w),u,w)),n,ww);
   }
+  omFreeSize((ADDRESS)ww,(pVariables+1)*sizeof(short));
   return p;
 }
 
-poly pInvers(int n,poly u)
+poly pInvers(int n,poly u,intvec *w)
 {
+  short *ww=iv2array(w);
   if(n<0)
     return NULL;
   number u0=nInvers(pGetCoeff(u));
   poly v=pNSet(u0);
   if(n==0)
     return v;
-  poly u1=pJet(pSub(pOne(),pMult_nn(u,u0)),n);
+  poly u1=pJetW(pSub(pOne(),pMult_nn(u,u0)),n,ww);
   if(u1==NULL)
     return v;
   poly v1=pMult_nn(pCopy(u1),u0);
   v=pAdd(v,pCopy(v1));
-  for(int i=n/pTotaldegree(u1);i>1;i--)
+  for(int i=n/pMinDeg(u1,w);i>1;i--)
   {
-    v1=pJet(pMult(v1,pCopy(u1)),n);
+    v1=pJetW(pMult(v1,pCopy(u1)),n,ww);
     v=pAdd(v,pCopy(v1));
   }
   pDelete(&u1);
   pDelete(&v1);
+  omFreeSize((ADDRESS)ww,(pVariables+1)*sizeof(short));
   return v;
 }
 
