@@ -1,6 +1,6 @@
 LIB "tst.lib";
 tst_init();
-
+LIB "classify.lib";
 example internalfunctions;
 example swap;
 example normalform;
