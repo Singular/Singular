@@ -96,7 +96,7 @@ endif
 
 # normal C++ source files
 CXXSOURCES=grammar.cc scanner.cc attrib.cc \
-    eigenval.cc\
+    eigenval_ip.cc\
     extra.cc fehelp.cc feResource.cc feOpt.cc \
     ipassign.cc ipconv.cc ipid.cc iplib.cc \
     ipprint.cc ipshell.cc \
@@ -166,7 +166,7 @@ HEADERS=lists.h attrib.h \
 	mpsr_Get.h kmatrix.h janet.h\
 	mpsr_Put.h\
 	dbm_sl.h libparse.h \
-	gms.h pcv.h eigenval.h \
+	gms.h pcv.h eigenval_ip.h \
 	feOpt.h fegetopt.h distrib.h walk.h \
         static.h\
         omSingularConfig.h
