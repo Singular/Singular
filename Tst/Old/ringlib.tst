@@ -10,4 +10,5 @@ example fetchall;
 example imapall;
 example mapall;
 example ringtensor;
+example ringweights;
 LIB "tst.lib";tst_status(1);$

@@ -13,7 +13,6 @@ example number_e;
 example number_pi;
 example primes;
 example product;
-example ringweights;
 example sort;
 example sum;
 
