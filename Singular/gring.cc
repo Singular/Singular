@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.37 2003-03-19 23:08:56 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.38 2003-04-29 21:17:18 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -1625,5 +1625,30 @@ int nc_CheckSubalgebra(poly PolyVar, ring r)
   freeT(ExpTmp,rN);
   return(TRUE);
 }
+
+// int Commutative_Context(ring r, leftv expression)
+//   /* returns 1 if expression consists */
+//   /*  of commutative elements */
+// {
+//   /* crucial: poly -> ideal, module, matrix  */
+  
+// }
+
+// int Comm_Context_Poly(ring r, poly p)
+// {
+//   poly COMM=r->nc->COMM;
+//   poly pp=pOne();
+//   memset(pp->exp,0,r->ExpL_Size*sizeof(long));
+//   while (p!=NULL)
+//   {
+//     for (i=0;i<=r->ExpL_Size;i++)
+//     {
+//       if ((p->exp[i]) && (pp->exp[i]))  return(FALSE); 
+//       /* nonzero exponent of non-comm variable */
+//     }
+//     pIter(p);
+//   }
+//   return(TRUE);
+// }
 
 #endif
