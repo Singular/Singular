@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.27 1998-04-15 16:15:01 Singular Exp $
+// $Id: clapsing.cc,v 1.28 1998-04-16 09:40:39 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -17,6 +17,7 @@
 #include "numbers.h"
 #include "subexpr.h"
 #include "ipshell.h"
+#include "ring.h"
 #include <factory.h>
 #include "clapconv.h"
 #ifdef HAVE_LIBFAC_P
