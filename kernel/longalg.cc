@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.1.1.1 2003-10-06 12:15:54 Singular Exp $ */
+/* $Id: longalg.cc,v 1.2 2004-04-29 14:54:32 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -2446,7 +2446,7 @@ void naSetIdeal(ideal I)
       if (!nacIsOne(napGetCoeff(naI->liste[i])))
       {
         x=naI->liste[i];
-	nacNormalize(napGetCoeff(x));
+        nacNormalize(napGetCoeff(x));
         a=nacCopy(napGetCoeff(x));
         number aa=nacInvers(a);
         nacDelete(&a,nacRing);
@@ -2598,6 +2598,50 @@ static napoly napMap(napoly p)
   return w;
 }
 
+static napoly napPerm(napoly p,const int *par_perm,const ring src_ring,const nMapFunc nMap)
+{
+  napoly w, a;
+
+  if (p==NULL) return NULL;
+  w = (napoly)p_Init(nacRing);
+  int i;
+  BOOLEAN not_null=TRUE;
+  loop
+  {
+    for(i=1;i<=rPar(src_ring);i++)
+    {
+      int e=par_perm[i-1];
+      int ee=napGetExpFrom(p,i,src_ring);
+      if (e<0)
+        napSetExp(w,-e,ee);
+      else if (ee>0)
+        not_null=FALSE;
+    }
+    napGetCoeff(w) = nMap(napGetCoeff(p));
+    p_Setm(w,nacRing);
+    napIter(p);
+    if (!not_null)
+    {
+      if (p==NULL)
+      {
+        napDelete(&w);
+        return NULL;
+      }
+      /* else continue*/
+      nacDelete(&(napGetCoeff(w)),nacRing);
+    }
+    else
+    {
+      if (p==NULL) return w;
+      else
+      {
+        napNext(w)=napPerm(p,par_perm,src_ring,nMap);
+        return w;
+      }
+    }
+  }
+}
+
 /*2
 * map _(a) -> _(b)
 */
@@ -2725,7 +2769,8 @@ poly naPermNumber(number z, int * par_perm, int P, ring r)
   poly res=NULL;
   poly p;
   napoly za=((lnumber)z)->z;
-  nMapFunc nMap=NULL;
+  napoly zb=((lnumber)z)->n;
+  nMapFunc nMap=naSetMap(r,currRing);
   if (currRing->parameter!=NULL)
     nMap=currRing->algring->cf->cfSetMap(r->algring, nacRing);
   else
@@ -2741,13 +2786,15 @@ poly naPermNumber(number z, int * par_perm, int P, ring r)
        pSetExp(p,i, 0);
     pSetComp(p, 0);
     napoly pa=NULL;
+    lnumber pan;
     if (currRing->parameter!=NULL)
     {
       assume(r->algring!=NULL);
       pGetCoeff(p)=(number)omAlloc0Bin(rnumber_bin);
-      ((lnumber)pGetCoeff(p))->s=2;
-      ((lnumber)pGetCoeff(p))->z=napInitz(nMap(napGetCoeff(za)));
-      pa=((lnumber)pGetCoeff(p))->z;
+      pan=(lnumber)pGetCoeff(p);
+      pan->s=2;
+      pan->z=napInitz(nMap(napGetCoeff(za)));
+      pa=pan->z;
     }
     else
     {
@@ -2760,7 +2807,7 @@ poly naPermNumber(number z, int * par_perm, int P, ring r)
         if(par_perm==NULL)
         {
           if ((rPar(currRing)>=i) && (pa!=NULL))
-	  {
+          {
             napSetExp(pa,i+1,napGetExpFrom(za,i+1,r));
             p_Setm(pa,nacRing);
           }
@@ -2773,10 +2820,10 @@ poly naPermNumber(number z, int * par_perm, int P, ring r)
         else if(par_perm[i]>0)
           pSetExp(p,par_perm[i],napGetExpFrom(za,i+1,r));
         else if((par_perm[i]<0)&&(pa!=NULL))
-	{
+        {
           napSetExp(pa,-par_perm[i], napGetExpFrom(za,i+1,r));
           p_Setm(pa,nacRing);
-	}
+        }
         else
         {
           pDelete(&p);
@@ -2787,6 +2834,12 @@ poly naPermNumber(number z, int * par_perm, int P, ring r)
     if (p!=NULL)
     {
       pSetm(p);
+      if (zb!=NULL)
+      {
+        pan->n=napPerm(zb,par_perm,r,nMap);
+        if(pan->n==NULL) /* error in mapping or mapping to variable */
+          pDelete(&p);
+      }
       pTest(p);
       res=pAdd(res,p);
     }
