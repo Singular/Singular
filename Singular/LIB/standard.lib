@@ -1,7 +1,7 @@
-// $Id: standard.lib,v 1.41 1999-08-19 13:49:39 obachman Exp $
+// $Id: standard.lib,v 1.42 1999-08-23 14:17:35 Singular Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.41 1999-08-19 13:49:39 obachman Exp $";
+version="$Id: standard.lib,v 1.42 1999-08-23 14:17:35 Singular Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
@@ -440,13 +440,13 @@ following methods:
 @item @strong{quotient rings:}
 @code{nres} (classical method using syzygies) , see @ref{nres}.
 
-@item @strong{homogenous ideals and k == 0:} 
+@item @strong{homogenous ideals and k == 0:}
 @code{lres} (La'Scala's method), see @ref{lres}.
 
-@item @strong{not minimized resolution,  and, homogenous input with k != 0 or local rings:} 
+@item @strong{not minimized resolution,  and, homogenous input with k != 0 or local rings:}
 @code{sres} (Schreyer's method), see @ref{sres}.
 
-@item @strong{all other inputs:} 
+@item @strong{all other inputs:}
 @code{mres} (classical method), see @ref{mres}.
 @end table
 @item @strong{Note:}
@@ -465,24 +465,32 @@ See also
 @ref{resolution}
 @c ref
 "
-{         
+{
    def P=basering;
    if (size(#) < 2)
    {
      ERROR("res: need at least two arguments: ideal/module, int");
    }
-   
+
    def m=#[1]; //the ideal or module
    int i=#[2]; //the length of the resolution
    if (i< 0) { i=0;}
-     
+
    string varstr_P = varstr(P);
 
-   
+   int p_opt;
+   string s_opt = option();
+   // set p_opt, if option(prot) is set
+   if (find(s_opt, "prot"))
+   {
+     p_opt = 1;
+   }
+
    if(size(ideal(basering)) > 0)
    {
      // the quick hack for qrings - seems to fit most needs
      // (lres is not implemented for qrings, sres is not so efficient)
+     if (p_opt) { "using nres";}
      return(nres(m,i));
    }
 
@@ -492,6 +500,7 @@ See also
       if (((i==0) or (i>=nvars(basering))) && typeof(m) != "module")
       {
         //LaScala for the homogeneous case and i == 0
+        if (p_opt) { "using lres";}
         re=lres(m,i);
         if(size(#)>2)
         {
@@ -502,10 +511,12 @@ See also
       {
         if(size(#)>2)
         {
+          if (p_opt) { "using mres";}
           re=mres(m,i);
         }
         else
         {
+          if (p_opt) { "using sres";}
           re=sres(std(m),i);
         }
       }
@@ -519,6 +530,7 @@ See also
                   +string(char(P))+",("+varstr_P+"),(dp,C);";
       execute(ri);
       def m=imap(P,m);
+      if (p_opt) { "using mres in another ring";}
       list re=mres(m,i);
       setring P;
       resolution result=imap(Phelp,re);
@@ -534,6 +546,7 @@ See also
       execute(ri);
       def m=imap(P,m);
       m=std(m);
+      if (p_opt) { "using sres in another ring";}
       list re=sres(m,i);
       setring P;
       resolution result=imap(Phelp,re);
@@ -545,6 +558,7 @@ See also
                   +string(char(P))+",("+varstr_P+"),(ls,C);";
    execute(ri);
    def m=imap(P,m);
+    if (p_opt) { "using mres in another ring";}
    list re=mres(m,i);
    setring P;
    resolution result=imap(Phelp,re);
