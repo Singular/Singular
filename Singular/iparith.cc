@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.163 1999-07-23 13:45:15 Singular Exp $ */
+/* $Id: iparith.cc,v 1.164 1999-07-26 17:03:54 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -283,7 +283,7 @@ cmdnames cmds[] =
   { "status",      0, STATUS_CMD,         CMD_M},
   { "std",         0, STD_CMD ,           CMD_123},
   { "string",      0, STRING_CMD ,        ROOT_DECL_LIST},
-  { "subst",       0, SUBST_CMD ,         CMD_3},
+  { "subst",       0, SUBST_CMD ,         CMD_M},
   { "system",      0, SYSTEM_CMD,         CMD_M},
   { "syz",         0, SYZYGY_CMD ,        CMD_1},
   { "test",        0, TEST_CMD ,          CMD_M},
@@ -4718,6 +4718,31 @@ static BOOLEAN jjSTATUS_M(leftv res, leftv v)
   return FALSE;
 }
 #endif
+static BOOLEAN jjSUBST_M(leftv res, leftv u)
+{
+  leftv v = u->next;
+  leftv w = v->next;
+  leftv rest = w->next;
+
+  u->next = NULL;
+  v->next = NULL;
+  w->next = NULL;
+  BOOLEAN b = iiExprArith3(res, iiOp, u, v, w);
+  if ((rest!=NULL) && (!b))
+  {
+    sleftv tmp_res;
+    leftv tmp_next=res->next;
+    res->next=rest;
+    memset(&tmp_res,0,sizeof(tmp_res));
+    b = iiExprArithM(&tmp_res,iiOp,res);
+    memcpy(res,&tmp_res,sizeof(tmp_res));
+    res->next=tmp_next;
+  }  
+  u->next = v;
+  v->next = w;
+  w->next = rest;
+  return b;
+}
 
 #ifdef HAVE_NAMESPACES
 static BOOLEAN jjIMPORTFROM(leftv res, leftv v);
@@ -4827,6 +4852,8 @@ struct sValCmdM dArithM[]=
 ,{jjCALL1ARG,  RESERVEDNAME_CMD, INT_CMD,            1 }
 ,{jjRESERVED0, RESERVEDNAME_CMD, NONE,               0 }
 ,{jjSTRING_PL, STRING_CMD,      STRING_CMD,         -1 }
+,{jjCALL3ARG,  SUBST_CMD,       NONE/*set by p*/,   3 }
+,{jjSUBST_M,   SUBST_CMD,       NONE/*set by p*/,   -2 }
 ,{jjSYSTEM,    SYSTEM_CMD,      NONE/*or set by p*/,-2 }
 ,{jjTEST,      TEST_CMD,        NONE,               -2 }
 ,{iiWRITE,     WRITE_CMD,       NONE,               -2 }
