@@ -73,9 +73,11 @@ find_executable (const char *name)
       }
     }
   else {
-    if ((name[0] == '.') && (name[1] == '/')) {
-      strcpy (tbuf, ".");
+    if (((name[0] == '.') && (name[1] == '/')) || 
+        ((name[0] == '.') && (name[1] == '.') && (name[2] == '/'))) {
 
+      strcpy (tbuf, (name[1] == '.' ? ".." : "."));
+      
 #ifdef HAVE_GETCWD
       getcwd (tbuf, MAXPATHLEN);
 #else
@@ -83,7 +85,7 @@ find_executable (const char *name)
       getwd (tbuf);
 # endif
 #endif
-      strcat (tbuf, name + 1);
+      strcat (tbuf, name + (name[1] == '.' ? 2 : 1));
       return copy_of (tbuf);
     }
 
