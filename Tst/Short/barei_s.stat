@@ -2,10 +2,10 @@ Status Output of tst_status.out
 init >> USER    :pohl
 init >> HOSTNAME:hasen.itwm.uni-kl.de
 init >> uname -a:Linux hasen.itwm.uni-kl.de 2.0.36 #3 Thu Apr 22 13:05:24 MET DST 1999 i486 unknown
-init >> date    :Fri Jul 16 13:10:49 MET DST 1999
-init >> version :1303
+init >> date    :Tue Nov 23 13:38:49 MET 1999
+init >> version :1306
 init >> ticks   :100
-1 >> tst_memory_0 :: hasen.itwm.uni-kl.de:312954
-1 >> tst_memory_1 :: hasen.itwm.uni-kl.de:443190
-1 >> tst_memory_2 :: hasen.itwm.uni-kl.de:356352
-1 >> tst_timer_1 :: hasen.itwm.uni-kl.de:91
+1 >> tst_memory_0 :: hasen.itwm.uni-kl.de:356118
+1 >> tst_memory_1 :: hasen.itwm.uni-kl.de:492294
+1 >> tst_memory_2 :: hasen.itwm.uni-kl.de:405504
+1 >> tst_timer_1 :: hasen.itwm.uni-kl.de:99
