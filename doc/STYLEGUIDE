@@ -119,12 +119,19 @@
 * Singular Beispiele und libraries *
 ====================================
 
-+ Die Kommandozeilen in einem Beispiel beginnen NICHT MEHR mit 
-  zwei Leerzeichen:
+* Die Kommandozeilen in einem Beispiel, das nicht von doc2tex
+  gerechnet wird, beginnen NICHT MEHR mit zwei Leerzeichen:
 @example
 ring r;
 ideal i=x,y;
 @end example
+
+* Beispiele, die von doc2tex gerechnet werden, muessen weiterhin mit
+  zwei Leerzeichen beginnen. Diese beiden Leerzeichen werden auto-
+  matisch von doc2tex gestrichen. 
+  Dieses Verhalten wird sich nach Mittwoch aendern. Ab dann darf kein
+  Beispiel mit Leerzeichen beginnen. Aus Zeitgruenden verwenden wir
+  im Moment den "hack" mit doc2tex.
 
 + Ist der Kommentar zu einem Kommando in einem Beispiel, das von Singular
   gerechnet werden soll, laenger als eine Zeile, muss das Kommando in der 
@@ -132,20 +139,20 @@ ideal i=x,y;
   Singular-Ausgabe zwischen den Kommentar und das Kommando geschoben):
 @example
 @c example
-ring r;
-               // the following option leads to some usefule output     
-option(prot);  // during the Groebner basis computation.
+  ring r;
+                 // the following option leads to some useful output     
+  option(prot);  // during the Groebner basis computation.
 @c example
 @end example
 
 + Bei Beispielen, die nicht wirklich von doc2tex gerechnet, muss nach dem
   @expansion ein Leerzeichen kommen:
 @example
-int i=3; i;
+int i=3; 
+    // Kommentare ueber mehere Zeilen duerfen natuerlich
+i;  // mit Leerzeichen beginnen.
 @expansion{} 3
 @end example
-  Beachte, dass auch hier beide Zeilen nicht mit zwei Leerzeichen
-  beginnen!
 
 + Beim Schreiben von Singular-Beispielen (insbesondere von
   Kommentaren) bitte darauf achten, dass die Zeilen nicht zu breit
@@ -212,5 +219,5 @@ int i=3; i;
   domkumentiert. Siehe doc2tex.c.
 
 ------------------------------------------------------------
-$Id: STYLEGUIDE,v 1.7 1998-05-18 19:36:51 wichmann Exp $
+$Id: STYLEGUIDE,v 1.8 1998-05-18 19:59:07 wichmann Exp $
 ------------------------------------------------------------
