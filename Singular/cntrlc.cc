@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.18 1998-06-12 10:13:31 Singular Exp $ */
+/* $Id: cntrlc.cc,v 1.19 1998-07-30 17:49:15 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -363,31 +363,34 @@ void sigint_handler(int sig)
     switch(fgetc(stdin))
     {
 #if defined(MONOM_COUNT) || defined(DIV_COUNT)
-	      case 'e':
+              case 'e':
 #ifdef MONOM_COUNT
-		extern void ResetMonomCount();
-		ResetMonomCount();
+                extern void ResetMonomCount();
+                ResetMonomCount();
 #endif
 #ifdef DIV_COUNT
-		extern void ResetDivCount();
-		ResetDivCount();
+                extern void ResetDivCount();
+                ResetDivCount();
 #endif
-		break;
-	      case 'o':
+                break;
+              case 'o':
 #ifdef MONOM_COUNT
-		extern void OutputMonomCount();
-		OutputMonomCount();
-#endif 
-#ifdef DIV_COUNT
-		extern void OutputDivCount();
-		OutputDivCount();
+                extern void OutputMonomCount();
+                OutputMonomCount();
 #endif
-		break;
+#ifdef DIV_COUNT
+                extern void OutputDivCount();
+                OutputDivCount();
+#endif
+                break;
 #endif // defined(MONOM_COUNT) || defined(DIV_COUNT)
       case 'q':
                 m2_end(2);
       case 'r':
                 longjmp(si_start_jmpbuf,1);
+      case 'b':
+                VoiceBackTrack();
+                break;
       case 'a':
                 siCntrlc++;
       case 'c':
