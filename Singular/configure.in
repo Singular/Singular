@@ -145,6 +145,8 @@ dnl
   
 AC_CHECK_LIB(m, atof)
 AC_CHECK_LIB(bsd, socket)
+AC_CHECK_LIB(socket, listen)
+AC_CHECK_LIB(nsl, gethostbyname)
 
 dnl Check -lreadline
 if test "$with_readline" != no; then
