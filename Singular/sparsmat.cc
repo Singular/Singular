@@ -1,18 +1,27 @@
+/****************************************
+*  Computer Algebra System SINGULAR     *
+****************************************/
+/* $Id: sparsmat.cc,v 1.2 1999-02-24 13:25:19 pohl Exp $ */
+
+/*
+* ABSTRACT: operations with sparse matrices (bareiss, ...)
+*/
+
 #include "mod2.h"
 #include "tok.h"
 #include "febase.h"
 #include "structs.h"
 #include "intvec.h"
 #include "lists.h"
+#include "ring.h"
 #include "polys.h"
 #include "ipid.h"
 #include "ideals.h"
 #include "numbers.h"
-#include "ring.h"
 #include "sparsmat.h"
 
 /* ----------------- macros ------------------ */
-#define OLD_DIV
+/* #define OLD_DIV */
 #ifdef OLD_DIV
 #define SM_MULT(A,B,C) smMult(A,B)
 #define SM_DIV smPolyDiv
@@ -34,14 +43,17 @@ struct smprec{
 };
 
 /* declare internal 'C' stuff */
+static void smDebug() { int k=0; }
 static void smExactPolyDiv(poly, poly);
 static BOOLEAN smIsScalar(const poly);
 static BOOLEAN smIsNegQuot(poly, const poly, const poly);
 static poly smEMult(poly, const poly);
+static BOOLEAN smCheckLead(const poly, const poly);
 static poly smDMult(poly, const poly);
 static void smPolyDivN(poly a, const number);
 static BOOLEAN smSmaller(poly, poly);
 static void smCombineChain(poly *, poly);
+static void smFindRef(poly *, poly *, poly);
 
 static void smElemDelete(smpoly *);
 static smpoly smElemCopy(smpoly);
@@ -88,8 +100,6 @@ private:
   void smColToRow();
   void smRowToCol();
   void smFinalMult();
-  void smFinalToCol();
-  void smFinalClear();
   void smSparseHomog();
   void smWeights();
   void smPivot();
@@ -108,6 +118,7 @@ public:
   sparse_mat(ideal);
   ~sparse_mat();
   smpoly * smGetAct() { return m_act; }
+  int smGetRed() { return tored; }
   ideal smRes2Mod();
   void smBareiss(int, int);
   void smNewBareiss(int, int);
@@ -119,10 +130,12 @@ public:
 lists smCallBareiss(ideal I, int x, int y)
 {
   lists res=(lists)Alloc(sizeof(slists));
-  sparse_mat *bareiss = new sparse_mat(I);
+  ideal II = idCopy(I);
+  sparse_mat *bareiss = new sparse_mat(II);
   intvec *v;
   ideal m;
 
+  idDelete(&II);
   if (bareiss->smGetAct() == NULL)
   {
     Free((ADDRESS)res, sizeof(slists));
@@ -130,7 +143,7 @@ lists smCallBareiss(ideal I, int x, int y)
   }
   bareiss->smBareiss(x, y);
   m = bareiss->smRes2Mod();
-  v = new intvec(m->rank);
+  v = new intvec(bareiss->smGetRed());
   bareiss->smToIntvec(v);
   delete bareiss;
   res->Init(2);
@@ -176,6 +189,7 @@ lists smCallNewBareiss(ideal I, int x, int y)
   intvec *v;
   ideal m;
 
+  idDelete(&II);
   if (bareiss->smGetAct() == NULL)
   {
     Free((ADDRESS)res, sizeof(slists));
@@ -191,7 +205,7 @@ lists smCallNewBareiss(ideal I, int x, int y)
   }
   bareiss->smNewBareiss(x, y);
   m = bareiss->smRes2Mod();
-  v = new intvec(m->rank);
+  v = new intvec(bareiss->smGetRed());
   bareiss->smToIntvec(v);
   delete bareiss;
   ideal mm;
@@ -227,6 +241,7 @@ lists smCallNewBareiss(ideal I, int x, int y)
 sparse_mat::sparse_mat(ideal smat)
 {
   int i;
+  polyset pmat;
 
   ncols = smat->ncols;
   nrows = idRankFreeModule(smat);
@@ -242,16 +257,21 @@ sparse_mat::sparse_mat(ideal smat)
   tored = nrows; // without border
   i = tored+1;
   perm = (unsigned short *)Alloc(sizeof(unsigned short)*i);
+  m_row = (smpoly *)Alloc0(sizeof(smpoly)*i);
   wrw = (float *)Alloc(sizeof(float)*i);
   i = ncols+1;
   wcl = (float *)Alloc(sizeof(float)*i);
   m_act = (smpoly *)Alloc(sizeof(smpoly)*i);
-  m_row = (smpoly *)Alloc0(sizeof(smpoly)*i);
   m_res = (smpoly *)Alloc0(sizeof(smpoly)*i);
   dumm = (smpoly)Alloc(sizeof(smprec));
   m_res[0] = (smpoly)Alloc(sizeof(smprec));
   m_res[0]->m = NULL;
-  for(i=ncols; i; i--) m_act[i] = smPoly2Smpoly(smat->m[i-1]);
+  pmat = smat->m;
+  for(i=ncols; i; i--)
+  {
+    m_act[i] = smPoly2Smpoly(pmat[i-1]);
+    pmat[i-1] = NULL;
+  }
   this->smZeroElim();
   oldpiv = NULL;
 }
@@ -267,11 +287,11 @@ sparse_mat::~sparse_mat()
   Free((ADDRESS)dumm, sizeof(smprec));
   i = ncols+1;
   Free((ADDRESS)m_res, sizeof(smpoly)*i);
-  Free((ADDRESS)m_row, sizeof(smpoly)*i);
   Free((ADDRESS)m_act, sizeof(smpoly)*i);
   Free((ADDRESS)wcl, sizeof(float)*i);
   i = nrows+1;
   Free((ADDRESS)wrw, sizeof(float)*i);
+  Free((ADDRESS)m_row, sizeof(smpoly)*i);
   Free((ADDRESS)perm, sizeof(unsigned short)*i);
 }
 
@@ -355,6 +375,8 @@ void sparse_mat::smBareiss(int x, int y)
       {
         this->smCopToRes();
       }
+      else
+        tored = crd;
       return;
     }
   }
@@ -418,6 +440,8 @@ void sparse_mat::smNewBareiss(int x, int y)
         this->smFinalMult();
         this->smCopToRes();
       }
+      else
+        tored = crd;
       return;
     }
   }
@@ -1060,128 +1084,6 @@ void sparse_mat::smRowToCol()
   }
 }
 
-/*
-* store red, the pivot and the assosiated row in m_row
-* to m_res (result):
-*   piv + m_row[rows][pos(cols)] => m_res[cols][pos(rows)]
-*/
-void sparse_mat::smFinalToCol()
-{
-  smpoly r, a, ap, h;
-
-  perm[crd] = rpiv;
-  piv->pos = crd;
-  ap = m_res[crd];
-  if (ap == NULL)
-    m_res[crd] = piv;
-  else
-  {
-    loop
-    {
-      a = ap->n;
-      if (a == NULL)
-      {
-        ap->n = piv;
-        break;
-      }
-      ap = a;
-    }
-  }
-  r = m_row[rpiv];
-  m_row[rpiv] = NULL;
-  while (r != NULL)
-  {
-    ap = m_res[r->pos];
-    loop
-    {
-      a = ap->n;
-      if (a == NULL)
-      {
-        ap->n = h = r;
-        r = r->n;
-        h->n = a;
-        h->pos = crd;
-        break;
-      }
-      ap = a;
-    }
-  }
-  r = red;
-  while (r != NULL)
-  {
-    ap = m_res[r->pos];
-    if (ap == NULL)
-    {
-      m_res[r->pos] = h = r;
-      r = r->n;
-      h->n = NULL;
-      h->pos = crd;
-    }
-    else
-    {
-      loop
-      {
-        a = ap->n;
-        if (a == NULL)
-        {
-          ap->n = h = r;
-          r = r->n;
-          h->n = a;
-          h->pos = crd;
-          break;
-        }
-        ap = a;
-      }
-    }
-  }
-}
-
-/*
-* final clear of m_row
-*/
-void sparse_mat::smFinalClear()
-{
-  int i;
-  smpoly r, a, ap, h;
-
-  for (i=nrows; i; i--)
-  {
-    if (m_row[i] != NULL)
-    {
-      crd++;
-      perm[crd] = i;
-      r = m_row[i];
-      while (r != NULL)
-      {
-        ap = m_res[r->pos];
-        if (ap == NULL)
-        {
-          m_res[r->pos] = h = r;
-          r = r->n;
-          h->n = NULL;
-          h->pos = crd;
-        }
-        else
-        {
-          loop
-          {
-            a = ap->n;
-            if (a == NULL)
-            {
-              ap->n = h = r;
-              r = r->n;
-              h->n = a;
-              h->pos = crd;
-              break;
-            }
-            ap = a;
-          }
-        }
-      }
-    }
-  }
-}
-
 /* ----------------- C++ stuff ------------------ */
 
 /*
@@ -1258,17 +1160,70 @@ void sparse_mat::smToredElim()
 */
 void sparse_mat::smCopToRes()
 {
-  while (act != 0)
+  smpoly p, r, ap, a, h;
+  int c, i;
+
+  if (act == 0) return;
+  if (act > 1)
   {
-    rpiv = m_act[act]->pos;
-    this->smSelectPR();
-    crd++;
-    this->smColToRow();
-    act--;
-    this->smFinalToCol();
-    if (act != 0) this->smZeroElim();
+    Werror("Not implemented");
   }
-//  this->smFinalClear();
+  crd++;
+  c = crd;
+  p = m_res[c] = m_act[act];
+  do
+  {
+    r = m_row[p->pos];
+    m_row[p->pos] = NULL;
+    perm[c] = p->pos;
+    p->pos = c;
+    while (r != NULL)
+    {
+      ap = m_res[r->pos];
+      loop
+      {
+        a = ap->n;
+        if (a == NULL)
+        {
+          ap->n = h = r;
+          r = r->n;
+          h->n = a;
+          h->pos = c;
+          break;
+        }
+        ap = a;
+      }
+    }
+    c++;
+    p = p->n;
+  } while (p != NULL);
+  for (i=1;i<=nrows;i++)
+  {
+    if(m_row[i] != NULL)
+    {
+      r = m_row[i];
+      m_row[i] = NULL;
+      do
+      {
+        ap = m_res[r->pos];
+        loop
+        {
+          a = ap->n;
+          if (a == NULL)
+          {
+            ap->n = h = r;
+            r = r->n;
+            h->n = a;
+            h->pos = c;
+            break;
+          }
+          ap = a;
+        }
+      } while (r!=NULL);
+      c++;
+    }
+  }
+  tored = c-1;
 }
 
 /*
@@ -1399,7 +1354,8 @@ void smPolyDiv(poly a, poly b)
           pSubExp(a,i,pGetExp(b,i));
         pSetm(a);
       }
-      y = nIntDiv(pGetCoeff(a),x);
+      y = nDiv(pGetCoeff(a),x);
+      nNormalize(y);
       pSetCoeff(a,y);
       pIter(a);
     } while (a != NULL);
@@ -1411,7 +1367,8 @@ void smPolyDiv(poly a, poly b)
     for (i=pVariables; i; i--)
       pSubExp(a,i,pGetExp(b,i));
     pSetm(a);
-    y = nIntDiv(pGetCoeff(a),x);
+    y = nDiv(pGetCoeff(a),x);
+    nNormalize(y);
     pSetCoeff(a,y);
     yn = nNeg(nCopy(y));
     t = pNext(b);
@@ -1439,6 +1396,7 @@ void smPolyDiv(poly a, poly b)
 poly smMultDiv(poly a, poly b, const poly c)
 {
   poly pa, e, res, r;
+  BOOLEAN lead;
 
   if (smSmaller(a, b))
   {
@@ -1465,21 +1423,43 @@ poly smMultDiv(poly a, poly b, const poly c)
     } while (b != NULL);
     return res;
   }
+  res = NULL;
   e = pNew();
-  loop
+  lead = FALSE;
+  while (!lead)
   {
     pSetCoeff0(e,pGetCoeff(b));
     if (smIsNegQuot(e, b, c))
-      res = smDMult(a, e);
+    {
+      lead = smCheckLead(a, e);
+      r = smDMult(a, e);
+    }
     else
-      res = smEMult(a, e);
+    {
+      lead = TRUE;
+      r = smEMult(a, e);
+    }
+    if (lead)
+    {
+      if (res != NULL)
+      {
+        smFindRef(&pa, &res, r);
+        if (pa == NULL)
+          lead = FALSE;
+      }
+      else
+      {
+        pa = res = r;
+      }
+    }
+    else
+      res = pAdd(res, r);
     pIter(b);
     if (b == NULL)
     {
       pFree1(e);
       return res;
     }
-    if (res != NULL) break;
   }
   do
   {
@@ -1487,13 +1467,15 @@ poly smMultDiv(poly a, poly b, const poly c)
     if (smIsNegQuot(e, b, c))
     {
       r = smDMult(a, e);
-      if (r != NULL)
-        res = pAdd(res,r); 
+      if (smCheckLead(a, e))
+        smCombineChain(&pa, r);
+      else
+        pa = pAdd(pa,r); 
     }
     else
     {
       r = smEMult(a, e);
-      res = pAdd(res,r);
+      smCombineChain(&pa, r);
     }
     pIter(b);
   } while (b != NULL);
@@ -1526,7 +1508,8 @@ static void smExactPolyDiv(poly a, poly b)
 
   do
   {
-    y = nIntDiv(pGetCoeff(a), x);
+    y = nDiv(pGetCoeff(a), x);
+    nNormalize(y);
     pSetCoeff(a,y);
     yn = nNeg(nCopy(y));
     pSetCoeff0(e,yn);
@@ -1591,6 +1574,17 @@ static poly smEMult(poly t, const poly e)
   }
 }
 
+static BOOLEAN smCheckLead(const poly t, const poly e)
+{
+  int i;
+  for (i=pVariables; i; i--)
+  {
+    if ((pGetExp(e,i)+pGetExp(t,i)) < 0)
+      return FALSE;
+  }
+  return TRUE;
+}
+
 static poly smDMult(poly t, const poly e)
 {
   const number y = pGetCoeff(e);
@@ -1641,7 +1635,8 @@ static void smPolyDivN(poly a, const number x)
 
   do
   {
-    y = nIntDiv(pGetCoeff(a),x);
+    y = nDiv(pGetCoeff(a),x);
+    nNormalize(y);
     pSetCoeff(a,y);
     pIter(a);
   } while (a != NULL);
@@ -1704,6 +1699,60 @@ static void smCombineChain(poly *px, poly r)
   *px = pa;
 }
 
+static void smFindRef(poly *ref, poly *px, poly r)
+{
+  number x;
+  int i;
+  poly pa = *px, pp = NULL;
+
+  loop
+  {
+    i = pComp0(pa, r);
+    if (i > 0)
+    {
+      pp = pa;
+      pIter(pa);
+      if (pa==NULL)
+      {
+        pNext(pp) = r;
+        break;
+      }
+    }
+    else
+    {
+      if (i == 0)
+      {
+        x = nAdd(pGetCoeff(pa), pGetCoeff(r));
+        pDelete1(&r);
+        if (nIsZero(x))
+        {
+          pDelete1(&pa);
+          if (pp!=NULL)
+            pNext(pp) = pAdd(pa,r);
+          else
+            *px = pAdd(pa,r);
+        }
+        else
+        {
+          pp = pa;
+          pSetCoeff(pp,x);
+          pNext(pp) = pAdd(pNext(pp), r);
+        }
+      }
+      else
+      {
+        if (pp!=NULL)
+          pp = pNext(pp) = r;
+        else
+          *px = pp = r;
+        pNext(pp) = pAdd(pa, pNext(r));
+      }
+      break;
+    }
+  }
+  *ref = pp;
+}
+
 /* ----------------- internal 'C' stuff ------------------ */
 
 static void smElemDelete(smpoly *r)
@@ -1728,15 +1777,14 @@ static smpoly smElemCopy(smpoly a)
 * from poly to smpoly
 * do not destroy p
 */
-static smpoly smPoly2Smpoly(poly p)
+static smpoly smPoly2Smpoly(poly q)
 {
-  poly pp, q;
+  poly pp;
   smpoly res, a;
   EXPONENT_TYPE x;
 
-  if (p == NULL)
+  if (q == NULL)
     return NULL;
-  q = pCopy(p);
   a = res = (smpoly)Alloc(sizeof(smprec));
   a->pos = x = pGetComp(q);
   a->m = q;
