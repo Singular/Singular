@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmemory.h,v 1.18 1999-06-08 08:20:20 Singular Exp $ */
+/* $Id: mmemory.h,v 1.19 1999-06-30 11:53:59 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -33,9 +33,11 @@ void * mmAlloc( size_t );
 void * mmRealloc( void*, size_t );
 void   mmFree( void* );
 char * mmStrdup( const char* );
+#if SIZEOF_DOUBLE == SIZEOF_VOIDP + SIZEOF_VOIDP
 void * mmAllocAlignedBlock( size_t );
 void * mmAllocAlignedBlock0( size_t );
 void   mmFreeAlignedBlock( void*, size_t );
+#endif
 
 #define AllocHeap               mmAllocHeap
 #define FreeHeap                mmFreeHeap
@@ -47,9 +49,15 @@ void   mmFreeAlignedBlock( void*, size_t );
 #define FreeL                   mmFree
 #define AllocL                  mmAlloc
 #define mstrdup                 mmStrdup
+#if SIZEOF_DOUBLE == SIZEOF_VOIDP + SIZEOF_VOIDP
 #define AllocAligned0           mmAllocAlignedBlock0
 #define AllocAligned            mmAllocAlignedBlock
 #define FreeAligned             mmFreeAlignedBlock
+#elif SIZEOF_DOUBLE == SIZEOF_VOIDP
+#define AllocAligned0           mmAllocBlock0
+#define AllocAligned            mmAllocBlock
+#define FreeAligned             mmFreeBlock
+#endif
 
 #else /* MDEBUG */
 
@@ -64,9 +72,11 @@ void * mmDBAlloc( size_t, char*, int );
 void * mmDBRealloc( void*, size_t, char*, int );
 void   mmDBFree( void*, char*, int );
 char * mmDBStrdup( const char * s, char *fname, int lineno);
+#if SIZEOF_DOUBLE == SIZEOF_VOIDP + SIZEOF_VOIDP
 void * mmDBAllocAlignedBlock( size_t, char*, int );
 void * mmDBAllocAlignedBlock0( size_t,  char*, int);
 void   mmDBFreeAlignedBlock( void*, size_t, char*, int );
+#endif
 
 #define AllocHeap(res, heap)\
   (res) = mmDBAllocHeap(heap, __FILE__, __LINE__)
@@ -80,9 +90,15 @@ void   mmDBFreeAlignedBlock( void*, size_t, char*, int );
 #define AllocL(s)               mmDBAlloc(s, __FILE__, __LINE__)
 #define FreeL(a)                mmDBFree(a,__FILE__,__LINE__)
 #define mstrdup(s)              mmDBStrdup(s, __FILE__, __LINE__)
+#if SIZEOF_DOUBLE == SIZEOF_VOIDP + SIZEOF_VOIDP
 #define AllocAligned(s)         mmDBAllocAlignedBlock(s, __FILE__, __LINE__)
 #define AllocAligned0(s)        mmDBAllocAlignedBlock0(s, __FILE__, __LINE__)
 #define FreeAligned(a,s)        mmDBFreeAlignedBlock(a, s, __FILE__, __LINE__)
+#elif SIZEOF_DOUBLE == SIZEOF_VOIDP
+#define AllocAligned(s)         mmDBAllocBlock(s, __FILE__, __LINE__)
+#define AllocAligned0(s)        mmDBAllocBlock0(s, __FILE__, __LINE__)
+#define FreeAligned(a,s)        mmDBFreeBlock(a, s, __FILE__, __LINE__)
+#endif
 
 #endif /* MDEBUG */
 
