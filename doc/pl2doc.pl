@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: pl2doc.pl,v 1.2 1999-07-21 19:53:26 obachman Exp $
+# $Id: pl2doc.pl,v 1.3 1999-07-22 14:51:32 obachman Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -61,7 +61,7 @@ unless ($no_fun)
 {
   if ($db_file)
   {
-    $db_file = $1 if ($db_file =~ /(.*)\.db$/);
+    $db_file = $1 if ($db_file =~ /(.*)\..*$/);
     dbmopen(%CHECKSUMS, $db_file, oct(755)) ||
       die "Error: can't open chksum data base $db_file";
   }
