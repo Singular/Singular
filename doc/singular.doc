@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.91 2000-02-04 13:21:16 obachman Exp $
+@comment $Id: singular.doc,v 1.92 2000-03-14 18:03:55 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -278,6 +278,7 @@ LIB "all.lib";
 * algebra_lib:: procedures for computing with algebras and maps
 * elim_lib:: procedures for elimination, saturation and blowing up
 * homolog_lib:: procedures for homological algebra
+* Mregular_lib:: procedures for Castelnuovo-Mumford regularity
 * normal_lib:: procedure for normalization
 * primdec_lib:: procedures for primary decomposition
 * primitiv_lib:: procedures for finding a primitive element
@@ -292,11 +293,15 @@ LIB "all.lib";
 @subsection elim_lib
 @c lib elim.lib
 @c ----------------------------------------------------------
-@node homolog_lib, normal_lib, elim_lib, Commutative algebra
+@node homolog_lib, Mregular_lib, elim_lib, Commutative algebra
 @subsection homolog_lib
 @c lib homolog.lib
+@c ----------------------------------------------------------
+@node Mregular_lib, normal_lib, homolog_lib, Commutative algebra
+@subsection Mregular_lib
+@c lib Mregular.lib
 @c ---------------------------------------------------------
-@node normal_lib, primdec_lib, homolog_lib, Commutative algebra
+@node normal_lib, primdec_lib, Mregular_lib, Commutative algebra
 @subsection normal_lib
 @c lib normal.lib
 @c ----------------------------------------------------------
