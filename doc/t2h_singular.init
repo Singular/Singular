@@ -7,6 +7,10 @@
 # we only redefine things which ar of relevance to singular
 # all the others we simply "include"
 
+# -prefix
+# Set the output file prefix, prepended to all .html, .gif and .pl files.
+$T2H_PREFIX = 'sing';
+
 # -expand
 # if set to "tex" (or, "info") expand @iftex and @tex (or, @ifinfo) sections
 # else, neither expand @iftex, @tex, nor @ifinfo sections
@@ -23,10 +27,6 @@ $T2H_NO_SUBDIR = 0;
 # If this is set all HTML file will have extension ".htm" instead of
 # ".html". This is helpful when shipping the document to PC systems.
 $T2H_SHORTEXTN = 1;
-
-# -prefix
-# Set the output file prefix, prepended to all .html, .gif and .pl files.
-$T2H_PREFIX = '';
 
 #if set cross-references are given without section numbers
 $T2H_SHORT_REF = 1;
