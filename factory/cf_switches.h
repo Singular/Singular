@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_switches.h,v 1.4 1997-07-23 15:55:19 schmidt Exp $ */
+/* $Id: cf_switches.h,v 1.5 1997-09-08 10:43:01 schmidt Exp $ */
 
 #ifndef INCL_CF_SWITCHES_H
 #define INCL_CF_SWITCHES_H
@@ -38,10 +38,10 @@ const int CFSwitchesMax = 10;
 //}}}
 //{{{ inline method docu
 //
-// void On( int s )
-// void Off( int s )
-// bool isOn( int s )
-// bool isOff( int s )
+// void On ( int s )
+// void Off ( int s )
+// bool isOn ( int s )
+// bool isOff ( int s )
 //
 // On(), Off() - switch s on or off, resp.
 //
@@ -53,13 +53,13 @@ class CFSwitches
 private:
     bool switches [CFSwitchesMax];
 public:
-    CFSwitches();
-    ~CFSwitches() {}
+    CFSwitches ();
+    ~CFSwitches () {}
 
-    void On( int s ) { switches[s] = true; }
-    void Off( int s ) { switches[s] = false; }
-    bool isOn( int s ) const { return switches[s]; }
-    bool isOff( int s ) const { return ! switches[s]; }
+    void On ( int s ) { switches[s] = true; }
+    void Off ( int s ) { switches[s] = false; }
+    bool isOn ( int s ) const { return switches[s]; }
+    bool isOff ( int s ) const { return ! switches[s]; }
 };
 //}}}
 
