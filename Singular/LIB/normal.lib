@@ -5,7 +5,7 @@
 // written by Gert-Martin Greuel and Gerhard Pfister
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: normal.lib,v 1.8 1998-07-27 09:13:02 obachman Exp $";
+version="$Id: normal.lib,v 1.9 1998-07-28 10:35:55 obachman Exp $";
 info="
 LIBRARY: normal.lib: PROCEDURE FOR NORMALIZATION (I)
 
@@ -1217,6 +1217,9 @@ proc substpart(ideal endid,ideal endphi, int homo, intvec rw)
    def newRing=basering;
    int ii,jj;
    map phi = basering,maxideal(1);
+
+   //endid=diagon(endid);
+
    list Le = elimpart(endid);
            //this proc and the next loop try to
    int q = size(Le[2]);              //substitute as many variables as possible
@@ -1228,7 +1231,13 @@ proc substpart(ideal endid,ideal endphi, int homo, intvec rw)
    {
       endid = Le[1];
       map ps = newRing,Le[5];
+
       phi = ps(phi);
+      for(ii=1;ii<=size(Le[2])-1;ii++)
+      {
+         phi=phi(phi);
+      }
+      //eingefuegt wegen x2-y2z2+z3
       kill ps;
 
       for( ii=1; ii<=size(rw1); ii++ )
@@ -1286,7 +1295,14 @@ proc substpart(ideal endid,ideal endphi, int homo, intvec rw)
    return(L);
 }
 
-
+proc diagon(ideal i)
+{
+   matrix m;
+   option(redSB);
+   ideal j=liftstd(jet(i,1),m);
+   option(noredSB);
+   return(ideal(matrix(i)*m));
+}
 /////////////////////////////////////////////////////////////////////////////
 /*
 LIB"normal.lib";
