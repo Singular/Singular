@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.59 2000-01-13 10:36:53 Singular Exp $
+// $Id: clapsing.cc,v 1.60 2000-03-14 14:02:59 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -865,8 +865,13 @@ matrix singclap_irrCharSeries ( ideal I)
     setCharacteristic( nGetChar() );
     for(i=0;i<IDELEMS(I);i++)
     {
-      if (I->m[i]!=NULL)
-        L.append(convSingPClapP(I->m[i]));
+      poly p=I->m[i];
+      if (p!=NULL)
+      {
+        p=pCopy(p);
+        pCleardenom(p);
+        L.append(convSingPClapP(p));
+      }
     }
   }
   // and over Q(a) / Fp(a)
@@ -877,8 +882,13 @@ matrix singclap_irrCharSeries ( ideal I)
     else               setCharacteristic( -nGetChar() );
     for(i=0;i<IDELEMS(I);i++)
     {
-      if (I->m[i]!=NULL)
-        L.append(convSingTrPClapP(I->m[i]));
+      poly p=I->m[i];
+      if (p!=NULL)
+      {
+        p=pCopy(p);
+        pCleardenom(p);
+        L.append(convSingTrPClapP(p));
+      }
     }
   }
   else
