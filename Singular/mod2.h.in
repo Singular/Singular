@@ -357,7 +357,7 @@ extern int pShortOut;
 
 #ifdef HAVE_MTRACK 
 /* define MTRACK for allowing to keep track of Alloc/Free with a backtrace */
-/* works only under linux/elf
+/* works only under linux/elf */
 #define MTRACK
 /* the maximal level of stacks to remembre in debug (MTRACK) mode */
 #define BT_MAXSTACK 10
