@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: pcv.h,v 1.2 1998-11-18 13:00:12 mschulze Exp $ */
+/* $Id: pcv.h,v 1.3 1998-11-20 17:07:28 mschulze Exp $ */
 /*
 * ABSTRACT: conversion between polys and coeff vectors
 */
@@ -9,25 +9,22 @@
 #ifndef PCV_H
 #define PCV_H
 
-int pcvDegW(poly p,short w[]);
-int pcvOrdW(poly p,short w[]);
-void pcvInit(int d,short w[]);
-void pcvInitW(int d,short w[]);
+int pcvDeg(poly p);
+int pcvOrd(poly p);
+int pcvOrd(matrix m);
+BOOLEAN pcvOrd(leftv res,leftv h);
+void pcvInit(int d);
 void pcvClean();
-int pcvMon2Num(poly m);
-poly pcvNum2Mon(int n);
-poly pcvPoly2Vec(poly p,int d0,int d1,short w[]);
-poly pcvVec2Poly(poly v,int d0,int d1,short w[]);
-ideal pcvId2Mod(ideal I,int d0,int d1,short w[]);
-ideal pcvMod2Id(ideal M,int d0,int d1,short w[]);
-int pcvDimW(int d0,int d1,short w[]);
-int pcvDegBasisW(ideal I,int i,poly m,int d,int j,short w[]);
-ideal pcvBasisW(int d0,int d1,short w[]);
-
-// interface to interpreter
-BOOLEAN iiPcvConv(leftv res, leftv h);
-BOOLEAN iiPcvDim(leftv res, leftv h);
-BOOLEAN iiPcvBasis(leftv res, leftv h);
-BOOLEAN iiPcvOrd(leftv res, leftv h);
+poly pcvP2CV(poly p,int d0,int d1);
+poly pcvCV2P(poly cv,int d0,int d1);
+lists pcvP2CV(lists pl,int d0,int d1);
+lists pcvCV2P(lists cvl,int d0,int d1);
+BOOLEAN pcvP2CV(leftv res,leftv h);
+BOOLEAN pcvCV2P(leftv res,leftv h);
+int pcvDim(int d0,int d1);
+BOOLEAN pcvDim(leftv res,leftv h);
+int pcvBasis(lists b,int i,poly m,int d,int n);
+lists pcvBasis(int d0,int d1);
+BOOLEAN pcvBasis(leftv res,leftv h);
 
 #endif

@@ -1,21 +1,18 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.6 1998-11-19 14:04:39 krueger Exp $ */
+/* $Id: pcv.cc,v 1.7 1998-11-20 17:07:27 mschulze Exp $ */
 /*
 * ABSTRACT: conversion between polys and coeff vectors
 */
 
 #include "mod2.h"
-
-/* compile as module if DYNAMIC_LOADING is enabled */
-#ifndef HAVE_DYNAMIC_LOADING
 #include "tok.h"
 #include "ipid.h"
 #include "numbers.h"
 #include "polys.h"
-#include "ideals.h"
-#include "intvec.h"
+#include "lists.h"
+#include "matpol.h"
 #include "pcv.h"
 
 static int pcvMaxDeg;
@@ -24,55 +21,78 @@ static int pcvIndexSize;
 static unsigned* pcvTable=NULL;
 static unsigned** pcvIndex=NULL;
 
-// INPUT: poly p, weights w[]
-// OUTPUT: w-deg(L(p))
-int pcvDegW(poly p,short w[])
+int pcvDeg(poly p)
 {
-  int d=0;
-  for(int i=1;i<=pVariables;i++)
-    d+=(*(w++))*pGetExp(p,i);
-  return d;
+  int dp=0;
+  for(int i=1;i<=pVariables;i++) dp+=pGetExp(p,i);
+  return dp;
 }
 
-// INPUT: poly p, weights w[]
-// OUTPUT: min{w-deg(m)|m monomial of p}
-int pcvOrdW(poly p,short w[])
+int pcvOrd(poly p)
 {
   if(!p) return -1;
-  int o=pcvDegW(p,w);
+  int op=pcvDeg(p);
   pIter(p);
   while(p)
   {
-    int d=pcvDegW(p,w);
-    if(d<o) o=d;
+    int d=pcvDeg(p);
+    if(d<op) op=d;
     pIter(p);
   }
-  return o;
+  return op;
 }
 
-// PURPOSE: allocate and initialize pcvTable and pcvIndex:
-// pcvIndex[i][j]=#{m|m i-monomial, deg(m)<j},
-// 0<=i<pVariables, 0<=j<=max{deg(m)|m i-monomial, w-deg(m)<d}
-// INPUT: deg d, weights w[]
-// NOTE: call pcvClean() to free pcvTable and pcvIndex
-void pcvInit(int d,short w[])
+int pcvOrd(matrix m)
 {
-  int i,j;
-  for(i=1,j=w[0];i<pVariables;i++)
-    if(w[i]<j) j=w[i];
-  pcvMaxDeg=d/j;
-  pcvTableSize=(pVariables*(pcvMaxDeg+1))*sizeof(unsigned);
-  pcvTable=(unsigned*)Alloc0(pcvTableSize);
+  int om=-1;
+  for(int i=MATROWS(m);i>=1;i--)
+  {
+    for(int j=MATCOLS(m);j>=1;j--)
+    {
+      int o=pcvOrd(MATELEM(m,i,j));
+      if(o<om&&o>=0||om==-1) om=o;
+    }
+  }
+  return om;
+}
+
+BOOLEAN pcvOrd(leftv res,leftv h)
+{
+  if(h)
+  {
+    if(h->Typ()==POLY_CMD)
+    {
+      res->rtyp=INT_CMD;
+      res->data=pcvOrd((poly)h->Data());
+      return FALSE;
+    }
+    if(h->Typ()==MATRIX_CMD)
+    {
+      res->rtyp=INT_CMD;
+      res->data=pcvOrd((matrix)h->Data());
+      return FALSE;
+    }
+  }
+  WerrorS("<matrix> expected");
+  return TRUE;
+}
+
+void pcvInit(int d)
+{
+  if(d<0) d=0;
+  pcvMaxDeg=d;
+  pcvTableSize=pVariables*pcvMaxDeg*sizeof(unsigned);
+  pcvTable=Alloc0(pcvTableSize);
   pcvIndexSize=pVariables*sizeof(unsigned*);
-  pcvIndex=(unsigned**)Alloc(pcvIndexSize);
-  for(i=0;i<pVariables;i++)
-    pcvIndex[i]=pcvTable+i*(pcvMaxDeg+1);
-  for(i=0;i<=pcvMaxDeg;i++)
+  pcvIndex=Alloc(pcvIndexSize);
+  for(int i=0;i<pVariables;i++)
+    pcvIndex[i]=pcvTable+i*pcvMaxDeg;
+  for(int i=0;i<pcvMaxDeg;i++)
     pcvIndex[0][i]=i;
-  for(i=1;i<pVariables;i++)
+  for(int i=1;i<pVariables;i++)
   {
     unsigned x=0;
-    for(j=0;j<=pcvMaxDeg;j++)
+    for(int j=0;j<pcvMaxDeg;j++)
     {
       x+=pcvIndex[i-1][j];
       pcvIndex[i][j]=x;
@@ -80,63 +100,21 @@ void pcvInit(int d,short w[])
   }
 }
 
-// PURPOSE: allocate and initialize pcvTable and pcvIndex:
-// pcvIndex[i][j]=#{m|m i-monomial, w-deg(m)<j},
-// 0<=i<pVariables, 0<=j<=d
-// INPUT: w-deg d, weights w[]
-// NOTE: call pcvClean() to free pcvTable and pcvIndex
-void pcvInitW(int d,short w[])
-{
-  pcvMaxDeg=d;
-  pcvTableSize=(pVariables*(pcvMaxDeg+1))*sizeof(unsigned);
-  pcvTable=(unsigned*)Alloc0(pcvTableSize);
-  pcvIndexSize=pVariables*sizeof(unsigned*);
-  pcvIndex=(unsigned**)Alloc(pcvIndexSize);
-  int i,j,k;
-  for(i=0;i<pVariables;i++)
-    pcvIndex[i]=pcvTable+i*(pcvMaxDeg+1);
-  for(i=0,j=1,k=1;j<=pcvMaxDeg;i++,j++)
-  {
-    if(i==w[0])
-    {
-      i=0;
-      k++;
-    }
-    pcvIndex[0][j]=k;
-  }
-  for(i=1;i<pVariables;i++)
-  {
-    for(k=1;k<=w[i];k++)
-    {
-      unsigned x=0;
-      for(j=k;j<=pcvMaxDeg;j+=w[i])
-      {
-        x+=pcvIndex[i-1][j];
-        pcvIndex[i][j]=x;
-      }
-    }
-  }
-}
-
-// PURPOSE: free pcvTable, pcvIndex
 void pcvClean()
 {
   if(pcvTable)
   {
-    Free((ADDRESS)pcvTable,pcvTableSize);
+    Free(pcvTable,pcvTableSize);
     pcvTable=NULL;
   }
   if(pcvIndex)
   {
-    Free((ADDRESS)pcvIndex,pcvIndexSize);
+    Free(pcvIndex,pcvIndexSize);
     pcvIndex=NULL;
   }
 }
 
-// INPUT: momonial p
-// OUTPUT: number of p
-// NOTE: call pcvInit() before, pcvClean() after
-int pcvMon2Num(poly m)
+int pcvM2N(poly m)
 {
   unsigned n=0,d=0;
   for(int i=0;i<pVariables;i++)
@@ -147,10 +125,7 @@ int pcvMon2Num(poly m)
   return n+1;
 }
 
-// INPUT: number n
-// OUTPUT: monomial with number n
-// NOTE: call pcvInit() before, pcvClean() after
-poly pcvNum2Mon(int n)
+poly pcvN2M(int n)
 {
   n--;
   poly m=pOne();
@@ -176,350 +151,219 @@ poly pcvNum2Mon(int n)
   }
 }
 
-// INPUT: poly p, w-deg d0, w-deg d1, weights w[]
-// OUTPUT: coeff vector of p
-// considering monomials m with d0<=w-deg(m)<d1
-// NOTE: call pcvInit() before, pcvClean() after
-poly pcvPoly2Vec(poly p,int d0,int d1,short w[])
+poly pcvP2CV(poly p,int d0,int d1)
 {
-  poly r=NULL;
+  poly cv=NULL;
   while(p)
   {
-    int d=pcvDegW(p,w);
+    int d=pcvDeg(p);
     if(d0<=d&&d<d1)
     {
-      poly pp=pOne();
-      pSetComp(pp,pcvMon2Num(p));
-      pSetCoeff(pp,nCopy(pGetCoeff(p)));
-      r=pAdd(r,pp);
+      poly c=pOne();
+      pSetComp(c,pcvM2N(p));
+      pSetCoeff(c,nCopy(pGetCoeff(p)));
+      cv=pAdd(cv,c);
     }
     pIter(p);
   }
-  return r;
+  return cv;
 }
 
-// INPUT: coeff vector v, w-deg d0, w-deg d1, weights w[]
-// OUTPUT: poly with coeff vector v
-// considering monomials m with d0<=w-deg(m)<d1
-// NOTE: call pcvInit() before, pcvClean() after
-poly pcvVec2Poly(poly v,int d0,int d1,short w[])
+poly pcvCV2P(poly cv,int d0,int d1)
 {
-  poly r=NULL;
-  while(v)
+  poly p=NULL;
+  while(cv)
   {
-    poly p=pcvNum2Mon(pGetComp(v));
-    if(p)
+    poly m=pcvN2M(pGetComp(cv));
+    if(m)
     {
-      int d=pcvDegW(p,w);
+      int d=pcvDeg(m);
       if(d0<=d&&d<d1)
       {
-        pSetCoeff(p,nCopy(pGetCoeff(v)));
-        r=pAdd(r,p);
+        pSetCoeff(m,nCopy(pGetCoeff(cv)));
+        p=pAdd(p,m);
       }
     }
-    pIter(v);
+    pIter(cv);
   }
-  return r;
+  return p;
 }
 
-// INPUT: ideal I, w-deg d0, w-deg d1, weights w[]
-// OUTPUT: module M of coeff vectors of polys in I
-// considering monomials m with d0<=w-deg(m)<d1
-// NOTE: calls pcvInit(), pcvClean()
-ideal pcvId2Mod(ideal I,int d0,int d1,short w[])
+lists pcvP2CV(lists pl,int d0,int d1)
 {
-  if(d1<d0) d1=d0;
-  pcvInit(d1,w);
-  ideal M=idInit(IDELEMS(I),1);
-  for(int i=IDELEMS(I)-1;i>=0;i--)
-    M->m[i]=pcvPoly2Vec(I->m[i],d0,d1,w);
-  M->rank=max(1,idRankFreeModule(M));
+  lists cvl=(lists)Alloc(sizeof(slists));
+  cvl->Init(pl->nr+1);
+  pcvInit(d1);
+  for(int i=pl->nr;i>=0;i--)
+  {
+    if(pl->m[i].rtyp==POLY_CMD)
+    {
+      cvl->m[i].rtyp=VECTOR_CMD;
+      cvl->m[i].data=pcvP2CV((poly)pl->m[i].data,d0,d1);
+    }
+  }
   pcvClean();
-  return M;
+  return cvl;
 }
 
-// INPUT: module M of coeff vectors, w-deg d0, w-deg d1, weights w[]
-// OUTPUT: ideal I of polys with coeff vectors in M
-// considering monomials m with d0<=w-deg(m)<d1
-// NOTE: calls pcvInit(), pcvClean()
-ideal pcvMod2Id(ideal M,int d0,int d1,short w[])
+lists pcvCV2P(lists cvl,int d0,int d1)
 {
-  if(d1<d0) d1=d0;
-  pcvInit(d1,w);
-  ideal I=idInit(IDELEMS(M),1);
-  for(int i=IDELEMS(I)-1;i>=0;i--)
-    I->m[i]=pcvVec2Poly(M->m[i],d0,d1,w);
+  lists pl=(lists)Alloc(sizeof(slists));
+  pl->Init(cvl->nr+1);
+  pcvInit(d1);
+  for(int i=cvl->nr;i>=0;i--)
+  {
+    if(cvl->m[i].rtyp==VECTOR_CMD)
+    {
+      pl->m[i].rtyp=POLY_CMD;
+      pl->m[i].data=pcvCV2P((poly)cvl->m[i].data,d0,d1);
+    }
+  }
   pcvClean();
-  return I;
+  return pl;
 }
 
-// INPUT: w-deg d0, w-deg d1, weights w[]
-// OUTPUT: number of monomials m with d0<=w-deg(m)<d1
-// NOTE: calls pcvInitW(), pcvClean()
-int pcvDimW(int d0,int d1,short w[])
+BOOLEAN pcvP2CV(leftv res,leftv h)
 {
-  if(d1<d0) d1=d0;
-  pcvInitW(d1,w);
+  if(currRingHdl)
+  {
+    if(h&&h->Typ()==LIST_CMD)
+    {
+      lists pl=(lists)h->Data();
+      h=h->next;
+      if(h&&h->Typ()==INT_CMD)
+      {
+        int d0=(int)h->Data();
+        h=h->next;
+        if(h&&h->Typ()==INT_CMD)
+        {
+          int d1=(int)h->Data();
+          res->rtyp=LIST_CMD;
+          res->data=pcvP2CV(pl,d0,d1);
+          return FALSE;
+        }
+      }
+    }
+    WerrorS("<list>,<int>,<int> expected");
+    return TRUE;
+  }
+  WerrorS("no ring active");
+  return TRUE;
+}
+
+BOOLEAN pcvCV2P(leftv res,leftv h)
+{
+  if(currRingHdl)
+  {
+    if(h&&h->Typ()==LIST_CMD)
+    {
+      lists pl=(lists)h->Data();
+      h=h->next;
+      if(h&&h->Typ()==INT_CMD)
+      {
+        int d0=(int)h->Data();
+        h=h->next;
+        if(h&&h->Typ()==INT_CMD)
+        {
+          int d1=(int)h->Data();
+          res->rtyp=LIST_CMD;
+          res->data=pcvCV2P(pl,d0,d1);
+          return FALSE;
+        }
+      }
+    }
+    WerrorS("<list>,<int>,<int> expected");
+    return TRUE;
+  }
+  WerrorS("no ring active");
+  return TRUE;
+}
+
+int pcvDim(int d0,int d1)
+{
+  if(d0<0) d0=0;
+  if(d1<0) d1=0;
+  pcvInit(d1+1);
   int d=pcvIndex[pVariables-1][d1]-pcvIndex[pVariables-1][d0];
   pcvClean();
   return d;
 }
 
-// PURPOSE: see pcvBasisW()
-int pcvDegBasisW(ideal I,int i,poly m,int d,int n,short w[])
+BOOLEAN pcvDim(leftv res,leftv h)
 {
-  if(n+1<pVariables)
+  if(currRingHdl)
   {
-    int l=d/w[0];
-    for(int k=0;k<=l;k++,d-=w[0])
+    if(h&&h->Typ()==INT_CMD)
     {
-      pSetExp(m,n+1,k);
-      i=pcvDegBasisW(I,i,m,d,n+1,w+1);
+      int d0=(int)h->Data();
+      h=h->next;
+      if(h&&h->Typ()==INT_CMD)
+      {
+        int d1=(int)h->Data();
+        res->rtyp=INT_CMD;
+        res->data=pcvDim(d0,d1);
+        return FALSE;
+      }
+    }
+    WerrorS("<int>,<int> expected");
+    return TRUE;
+  }
+  WerrorS("no ring active");
+  return TRUE;
+}
+
+int pcvBasis(lists b,int i,poly m,int d,int n)
+{
+  if(n<pVariables)
+  {
+    for(int k=0,l=d;k<=l;k++,d--)
+    {
+      pSetExp(m,n,k);
+      i=pcvBasis(b,i,m,d,n+1);
     }
   }
   else
-  if(d%w[0]==0)
   {
-    pSetExp(m,n+1,d/w[0]);
+    pSetExp(m,n,d);
     pSetm(m);
-    I->m[i++]=pCopy(m);
+    b->m[i].rtyp=POLY_CMD;
+    b->m[i++].data=pCopy(m);
   }
   return i;
 }
 
-// INPUT: w-deg d0, w-deg d1, weights w[]
-// OUTPUT: ideal of monomials m with d0<=w-deg(m)<d1
-// NOTE: calls pcvDimW(), pcvDegBasisW()
-ideal pcvBasisW(int d0,int d1,short w[])
+lists pcvBasis(int d0,int d1)
 {
-  ideal I;
-  if(d1<=d0) I=idInit(1,1);
-  else I=idInit(pcvDimW(d0,d1,w),1);
+  if(d0<0) d0=0;
+  if(d1<0) d1=0;
+  lists b=(lists)Alloc(sizeof(slists));
+  b->Init(pcvDim(d0,d1));
   poly m=pOne();
   for(int d=d0,i=0;d<d1;d++)
-    i=pcvDegBasisW(I,i,m,d,0,w);
+    i=pcvBasis(b,i,m,d,1);
   pDelete1(&m);
-  return I;
+  return b;
 }
 
-/*2
-* interface to interpreter
-*/
-BOOLEAN iiPcvConv(leftv res, leftv h)
+BOOLEAN pcvBasis(leftv res,leftv h)
 {
-  if(h&&(h->Typ()==IDEAL_CMD||h->Typ()==MODUL_CMD))
+  if(currRingHdl)
   {
-    leftv hh=h->next;
-    int i0=0,i1;
-    short* w=(short*)Alloc(currRing->N*sizeof(short));
-    BOOLEAN defi1=FALSE,defw=FALSE;
-    while(hh)
+    if(h&&h->Typ()==INT_CMD)
     {
-      if(hh->Typ()==INT_CMD)
+      int d0=(int)h->Data();
+      h=h->next;
+      if(h&&h->Typ()==INT_CMD)
       {
-        if(defi1)
-        {
-          i0=i1;
-          i1=(int)hh->Data();
-        }
-        else
-        {
-          i1=(int)hh->Data();
-          defi1=TRUE;
-        }
-      }
-      else
-      if(hh->Typ()==INTVEC_CMD)
-      {
-        intvec *iv=(intvec*)hh->Data();
-        if(iv->rows()==currRing->N&&iv->cols()==1)
-        {
-          for(int i=0;i<currRing->N;i++) w[i]=(*iv)[i];
-          defw=TRUE;
-        }
-      }
-      hh=hh->next;
-    }
-    if(defi1)
-    {
-      if(!defw) for(int i=0;i<currRing->N;i++) w[i]=1;
-      if(h->Typ()==IDEAL_CMD)
-      {
-        // "pcvConv",<ideal>[,<int d0>],<int d1>[,<intvec w>]:
-        // convert ideal to module of coeff vectors
-        // considering monomials m with d0<=w-deg(m)<d1
-        res->rtyp=MODUL_CMD;
-        res->data=(void*)pcvId2Mod((ideal)h->Data(),i0,i1,w);
-        Free((ADDRESS)w,currRing->N*sizeof(short));
-        return FALSE;
-      }
-      else
-      {
-        // "pcvConv",<module>[,<int d0>],<int d1>[,<intvec w>]:
-        // convert module of coeff vectors to ideal
-        // considering monomials m with d0<=w-deg(m)<d1
-        res->rtyp=IDEAL_CMD;
-        res->data=(void*)pcvMod2Id((ideal)h->Data(),i0,i1,w);
-        Free((ADDRESS)w,currRing->N*sizeof(short));
+        int d1=(int)h->Data();
+        res->rtyp=LIST_CMD;
+        res->data=pcvBasis(d0,d1);
         return FALSE;
       }
     }
-    Free((ADDRESS)w,currRing->N*sizeof(short));
-  }
-  WerrorS("<ideal/module>[,<int>],<int>[,<intvec>] expected");
-  return TRUE;
-}
-
-/*2
-* interface to interpreter
-*/
-BOOLEAN iiPcvDim(leftv res, leftv h)
-{
-  if(!currRingHdl)
-  {
-    WerrorS("no ring active");
+    WerrorS("<int>,<int> expected");
     return TRUE;
   }
-  int i0=0,i1;
-  short* w=(short*)Alloc(currRing->N*sizeof(short));
-  BOOLEAN defi1=FALSE,defw=FALSE;
-  while(h)
-  {
-    if(h->Typ()==INT_CMD)
-    {
-      if(defi1)
-      {
-        i0=i1;
-        i1=(int)h->Data();
-      }
-      else
-      {
-        i1=(int)h->Data();
-        defi1=TRUE;
-      }
-    }
-    else
-    if(h->Typ()==INTVEC_CMD)
-    {
-      intvec *iv=(intvec*)h->Data();
-      if(iv->rows()==currRing->N&&iv->cols()==1)
-      {
-        int i;
-        for(i=0;i<currRing->N;i++) w[i]=(*iv)[i];
-        defw=TRUE;
-      }
-    }
-    h=h->next;
-  }
-  if(!defw)
-  {
-    int i;
-    for(i=0;i<currRing->N;i++) w[i]=1;
-  }
-  if(defi1)
-  {
-    // "pcvDim"[,<int d0>],<int d1>[,<intvec w>]:
-    // number of monomials m with d0<=w-deg(m)<d1
-    res->rtyp=INT_CMD;
-    res->data=(void*)pcvDimW(i0,i1,w);
-    return FALSE;
-  }
-  Free((ADDRESS)w,(currRing->N)*sizeof(short));
-  WerrorS("[<int>],<int>[,<intvec>] expected");
+  WerrorS("no ring active");
   return TRUE;
 }
-
-/*2
-* interface to interpreter
-*/
-BOOLEAN iiPcvBasis(leftv res, leftv h)
-{
-  if(!currRingHdl)
-  {
-    WerrorS("no ring active");
-    return TRUE;
-  }
-  int i0=0,i1;
-  short* w=(short*)Alloc(currRing->N*sizeof(short));
-  BOOLEAN defi1=FALSE,defw=FALSE;
-  while(h!=NULL)
-  {
-    if(h->Typ()==INT_CMD)
-    {
-      if(defi1)
-      {
-        i0=i1;
-        i1=(int)h->Data();
-      }
-      else
-      {
-        i1=(int)h->Data();
-        defi1=TRUE;
-      }
-    }
-    else
-    if(h->Typ()==INTVEC_CMD)
-    {
-      intvec *iv=(intvec*)h->Data();
-      if(iv->rows()==currRing->N&&iv->cols()==1)
-      {
-        int i;
-        for(i=0;i<currRing->N;i++) w[i]=(*iv)[i];
-        defw=TRUE;
-      }
-    }
-    h=h->next;
-  }
-  if(!defw)
-  {
-    int i;
-    for(i=0;i<currRing->N;i++) w[i]=1;
-  }
-  if(defi1)
-  {
-    // "pcvBasis"[,<int d0>],<int d1>[,<intvec w>]:
-    // ideal of monomials m with d0<=w-deg(m)<d1
-    res->rtyp=IDEAL_CMD;
-    res->data=(void*)pcvBasisW(i0,i1,w);
-    return FALSE;
-  }
-  Free((ADDRESS)w,(currRing->N)*sizeof(short));
-  WerrorS("[<int>],<int>[,<intvec>] expected");
-  return TRUE;
-}
-
-/*2
-* interface to interpreter
-*/
-BOOLEAN iiPcvOrd(leftv res, leftv h)
-{
-  if(h&&h->Typ()==POLY_CMD)
-  {
-    leftv hh=h->next;
-    short* w=(short*)Alloc(currRing->N*sizeof(short));
-    BOOLEAN defw=FALSE;
-    while(hh)
-    {
-      if(hh->Typ()==INTVEC_CMD)
-      {
-        intvec *iv=(intvec*)hh->Data();
-        if(iv->rows()==currRing->N&&iv->cols()==1)
-        {
-          for(int i=0;i<currRing->N;i++) w[i]=(*iv)[i];
-          defw=TRUE;
-        }
-      }
-      hh=hh->next;
-    }
-    if(!defw) for(int i=0;i<currRing->N;i++) w[i]=1;
-    // "pcvOrd",<poly p>[,<intvec w>]:
-    // min{w-deg(m)|m monomial of p}
-    res->rtyp=INT_CMD;
-    res->data=(void*)pcvOrdW((poly)h->Data(),w);
-    Free((ADDRESS)w,currRing->N*sizeof(short));
-    return FALSE;
-  }
-  WerrorS("<poly>[,<intvec>] expected");
-  return TRUE;
-}
-#endif /* not HAVE_DYNAMIC_LOADING */
