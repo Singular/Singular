@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.72 1999-09-21 12:03:07 obachman Exp $ */
+/* $Id: tesths.cc,v 1.73 1999-09-21 14:44:59 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -175,9 +175,11 @@ int main(          /* main entry to Singular */
   if (feOptValue(FE_OPT_EXECUTE) != NULL)
     newBuffer(mstrdup((char*) feOptValue(FE_OPT_EXECUTE)), BT_execute);
 
-  // first thing, however, is to load .singularrc
+  // first thing, however, is to load .singularrc from Singularpath
+  // and cwd/$HOME (in that order).
   if (! feOptValue(FE_OPT_NO_RC))
   {
+    char buf[MAXPATHLEN];
     FILE * rc=myfopen(".singularrc","r");
     if (rc!=NULL)
     {
@@ -186,7 +188,6 @@ int main(          /* main entry to Singular */
     }
     else
     {
-      char buf[MAXPATHLEN];
       char *home = getenv("HOME");
       if (home != NULL)
       {
@@ -199,6 +200,13 @@ int main(          /* main entry to Singular */
           newFile(buf);
         }
       }
+    }
+    // 
+    FILE *fd = feFopen(".singularrc", "r", buf, FALSE, TRUE);
+    if (fd != NULL)
+    {
+      fclose(fd);
+      newFile(buf);
     }
   }
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.cc,v 1.2 1999-09-21 12:03:06 obachman Exp $ */
+/* $Id: feOpt.cc,v 1.3 1999-09-21 14:44:57 obachman Exp $ */
 /*
 * ABSTRACT: Implementation of option buisness
 */
@@ -115,6 +115,9 @@ struct fe_option feOptSpec[] =
    0,          "Run in TCL mode, i.e., with TCL user interface",       feOptBool,    0,      0},
 #endif
 
+  {"allow-net",         no_argument,  0,  LONG_OPTION_RETURN,
+   0,          "Allow to fetch (html) help pages from the net",                feOptBool,    0,      0},
+
   {"browser",           required_argument,  0,  LONG_OPTION_RETURN,
    "BROWSER",  "Display help in BROWSER ([x,tk]info, netscape)",       feOptString, 0,   0},
 
@@ -127,7 +130,7 @@ struct fe_option feOptSpec[] =
    0,          "Do not load `standard.lib' on start-up",               feOptBool,    0,      0},
   
   {"no-rc",             no_argument,  0,  LONG_OPTION_RETURN,
-   0,          "Do not execute `.singularrc' file on start-up",        feOptBool,    0,      0},
+   0,          "Do not execute `.singularrc' file(s) on start-up",     feOptBool,    0,      0},
 
   {"no-warn",           no_argument,  0,  LONG_OPTION_RETURN,
    0,          "Do not display warning messages",                      feOptBool,    0,      0},
@@ -411,7 +414,7 @@ static char* feOptAction(feOptIndex opt)
       }
 
       case FE_OPT_BROWSER:
-        feHelpBrowser(feOptSpec[FE_OPT_BROWSER].value, 1);
+        feHelpBrowser((char*) feOptSpec[FE_OPT_BROWSER].value, 1);
 
       case FE_OPT_TICKS_PER_SEC:
       {

@@ -740,11 +740,16 @@ static BOOLEAN heNetscapeInit(int warn)
   if (feResource('h' /*"HtmlDir"*/, warn) == NULL)
   {
     if (warn) WarnS("no local HtmlDir found");
-    return FALSE;
-//    if (warn) Warn("using %s instead", feResource('u' /*"ManualUrl"*/, warn));
+    if (feOptValue(FE_OPT_ALLOW_NET))
+    {
+      if (warn) Warn("using URL %s instead", feResource('u' /*"ManualUrl"*/, warn));
+    }
+    else
+      return FALSE;
   }
   return TRUE;
 }
+
 static void heNetscapeHelp(heEntry hentry)
 {
   char sys[MAX_SYSCMD_LEN];

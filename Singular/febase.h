@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.37 1999-09-20 18:03:47 obachman Exp $ */
+/* $Id: febase.h,v 1.38 1999-09-21 14:44:58 obachman Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -169,7 +169,9 @@ extern unsigned long feVersionId;
  * File Stuff
  *
  *****************************************************************/
-FILE *  feFopen(char *path, char *mode, char *where=NULL, int useWerror=FALSE);
+FILE *  feFopen(char *path, char *mode, char *where=NULL, int useWerror=FALSE,
+                int path_only=FALSE);
+
 #ifndef __MWERKS__
 #ifdef HAVE_TCL
 

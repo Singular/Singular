@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.82 1999-09-20 18:03:46 obachman Exp $ */
+/* $Id: febase.cc,v 1.83 1999-09-21 14:44:58 obachman Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -95,7 +95,8 @@ BOOLEAN tclmode=FALSE;
  *
  *****************************************************************/
 
-FILE * feFopen(char *path, char *mode, char *where,int useWerror)
+FILE * feFopen(char *path, char *mode, char *where,int useWerror, 
+               int path_only)
 {
   char longpath[MAXPATHLEN];
   if (path[0]=='~')
@@ -108,10 +109,14 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror)
       path = longpath;
     }
   }
-  FILE * f=myfopen(path,mode);
+  FILE * f=NULL;
+  if (! path_only)
+    f = myfopen(path,mode);
   if (where!=NULL) strcpy(where,path);
-  if ((*mode=='r') && (path[0]!=DIR_SEP)&&(path[0]!='.')
-  &&(f==NULL))
+  if ((*mode=='r') &&
+      (path[0]!=DIR_SEP) &&
+      ! (path[0] == '.' && path[1] == DIR_SEP) &&
+      (f==NULL))
   {
     char found = 0;
     char* spath = feResource('s');
@@ -603,7 +608,7 @@ char* eati(char *s, int *i)
 
 #ifndef unix
 // Make sure that mode contains binary option
-FILE *myfopen(char *path, char *mode)
+FILE* myfopen(char *path, char *mode)
 {
   char mmode[4];
   int i;
