@@ -2,11 +2,10 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.28 1998-04-16 09:40:39 Singular Exp $
+// $Id: clapsing.cc,v 1.29 1998-04-21 10:42:57 schmidt Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
-
 
 #include "mod2.h"
 #ifdef HAVE_FACTORY
@@ -23,23 +22,41 @@
 #ifdef HAVE_LIBFAC_P
 #include <factor.h>
 #endif
+#include "ring.h"
+
+// FACTORY_GCD_TEST: use new gcd instead of old one.
+// FACTORY_GCD_STAT: print statistics on polynomials.  Works only
+//   with appropriately translated new gcd.
+// FACTORY_GCD_TIMING: accumulate time used for gcd calculations.
+//   For this option, the file `timing.h' from the Factory
+//   distribution has to be copied to the Singular source directory.
+//   Works only with new gcd.
+// FACTORY_GCD_DEBOUT: print polynomials involved in gcd calculations
+
+#ifdef FACTORY_GCD_STAT
+#define FACTORY_GCD_TEST
+#endif
+
+#ifdef FACTORY_GCD_TIMING
+#define FACTORY_GCD_TEST
+#define TIMING
+#include "timing.h"
+TIMING_DEFINE_PRINT( contentTimer );
+TIMING_DEFINE_PRINT( algContentTimer );
+TIMING_DEFINE_PRINT( algLcmTimer );
+#endif
+
+#ifdef FACTORY_GCD_DEBOUT
+#include "longalg.h"
+#include "febase.h"
+#endif
 
 poly singclap_gcd ( poly f, poly g )
 {
-  if (f==NULL)
-  {
-    if(g==NULL)
-      return NULL;
-    else
-      return pCopy(g);
-  }
-  else if (g==NULL)
-    return pCopy(f);
-
   poly res=NULL;
   
-  pCleardenom(f);
-  pCleardenom(g);
+  if (f) pCleardenom(f);
+  if (g) pCleardenom(g);
   
   // for now there is only the possibility to handle polynomials over
   // Q and Fp ...
@@ -340,16 +357,47 @@ void singclap_divide_content ( poly f )
     CanonicalForm g, h;
     poly p = pNext(f);
     nTest(pGetCoeff(f));
+#ifdef FACTORY_GCD_DEBOUT
+    StringSetS("g0 = ");
+    if (f) napWrite(((lnumber)pGetCoeff(f))->z);
+    PrintS(StringAppend("\n"));
+#endif
     g = convSingTrClapP( ((lnumber)pGetCoeff(f))->z );
     L.append( g );
+#ifdef FACTORY_GCD_TIMING
+    TIMING_START( contentTimer );
+#endif
     while ( p && (g != 1) )
     {
       nTest(pGetCoeff(p));
+#ifdef FACTORY_GCD_DEBOUT
+      StringSetS("h = ");
+      if (p) napWrite(((lnumber)pGetCoeff(p))->z);
+      PrintS(StringAppend("\n"));
+#endif 
       h = convSingTrClapP( ((lnumber)pGetCoeff(p))->z );
       p = pNext( p );
+#ifdef FACTORY_GCD_STAT
+      fprintf( stderr, "cont:\t" );
+#endif
+#ifdef FACTORY_GCD_TEST
+      g = CFPrimitiveGcdUtil::gcd( g, h );
+#else
+
+      // this part is translated if there are not any options at all
       g = gcd( g, h );
+
+#endif
+#ifdef FACTORY_GCD_DEBOUT
+      StringSetS("g = ");
+      napWrite(convClapPSingTr(g));
+      PrintS(StringAppend("\n"));
+#endif 
       L.append( h );
     }
+#ifdef FACTORY_GCD_TIMING
+    TIMING_END( contentTimer );
+#endif
     if ( g == 1 )
     {
       pTest(f);
@@ -899,34 +947,7 @@ BOOLEAN jjCHARSERIES(leftv res, leftv u)
 
 alg singclap_alglcm ( alg f, alg g )
 {
-  // over Q(a) / Fp(a)
- if (nGetChar()==1) setCharacteristic( 0 );
- else               setCharacteristic( -nGetChar() );
- alg res;
- if (currRing->minpoly!=NULL)
- {
-   CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
-   Variable a=rootOf(mipo);
-   CanonicalForm F( convSingAClapA( f,a ) ), G( convSingAClapA( g,a ) );
-   res= convClapASingA( (F/ gcd( F, G ))*G );
- }
- else
- {
-   CanonicalForm F( convSingTrClapP( f ) ), G( convSingTrClapP( g ) );
-   res= convClapPSingTr( (F/gcd( F, G ))*G );
- }
- Off(SW_RATIONAL);
- return res;
-}
-
-#ifdef FACTORY_DEBUG_OUT
-#include "longalg.h"
-#include "febase.h"
-#endif
-
-void singclap_algdividecontent ( alg f, alg g, alg &ff, alg &gg )
-{
-#ifdef FACTORY_DEBUG_OUT
+#ifdef FACTORY_GCD_DEBOUT
     StringSetS("f = ");
     napWrite(f);
     PrintS(StringAppend("\n"));
@@ -937,37 +958,133 @@ void singclap_algdividecontent ( alg f, alg g, alg &ff, alg &gg )
   // over Q(a) / Fp(a)
  if (nGetChar()==1) setCharacteristic( 0 );
  else               setCharacteristic( -nGetChar() );
- ff=gg=NULL;
+ alg res;
+#ifdef FACTORY_GCD_STAT
+ fprintf( stderr, "algLcm:\t" );
+#endif
  if (currRing->minpoly!=NULL)
  {
    CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
    Variable a=rootOf(mipo);
    CanonicalForm F( convSingAClapA( f,a ) ), G( convSingAClapA( g,a ) );
+#ifdef FACTORY_GCD_TIMING
+   CanonicalForm GCD;
+   TIMING_START( algLcmTimer );
+   GCD = CFPrimitiveGcdUtil::gcd( F, G );
+   TIMING_END( algLcmTimer );
+   res= convClapASingA( (F/ GCD)*G );
+#elif defined( FACTORY_GCD_TEST )
+   res= convClapASingA( (F/ CFPrimitiveGcdUtil::gcd( F, G ))*G );
+#else
+
+   // this part is translated if there are not any options at all
+   res= convClapASingA( (F/ gcd( F, G ))*G );
+
+#endif
+ }
+ else
+ {
+   CanonicalForm F( convSingTrClapP( f ) ), G( convSingTrClapP( g ) );
+#ifdef FACTORY_GCD_TIMING
+   CanonicalForm GCD;
+   TIMING_START( algLcmTimer );
+   GCD = CFPrimitiveGcdUtil::gcd( F, G );
+   TIMING_END( algLcmTimer );
+   res= convClapPSingTr( (F/GCD)*G );
+#elif defined( FACTORY_GCD_TEST )
+   res= convClapPSingTr( (F/CFPrimitiveGcdUtil::gcd( F, G ))*G );
+#else
+
+   // this part is translated if there are not any options at all
+   res= convClapPSingTr( (F/gcd( F, G ))*G );
+
+#endif
+ }
+ Off(SW_RATIONAL);
+#ifdef FACTORY_GCD_DEBOUT
+    StringSetS("res = ");
+    napWrite(res);
+    PrintS(StringAppend("\n"));
+#endif
+ return res;
+}
+
+void singclap_algdividecontent ( alg f, alg g, alg &ff, alg &gg )
+{
+#ifdef FACTORY_GCD_DEBOUT
+  alg algGcd;
+  StringSetS("f = ");
+  napWrite(f);
+  PrintS(StringAppend("\n"));
+  StringSetS("g = ");
+  napWrite(g);
+  PrintS(StringAppend("\n"));
+#endif
+  // over Q(a) / Fp(a)
+ if (nGetChar()==1) setCharacteristic( 0 );
+ else               setCharacteristic( -nGetChar() );
+ ff=gg=NULL;
+#ifdef FACTORY_GCD_STAT
+ fprintf( stderr, "alCont:\t" );
+#endif
+ if (currRing->minpoly!=NULL)
+ {
+   CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
+   Variable a=rootOf(mipo);
+   CanonicalForm F( convSingAClapA( f,a ) ), G( convSingAClapA( g,a ) );
+#ifdef FACTORY_GCD_TIMING
+   CanonicalForm GCD;
+   TIMING_START( algContentTimer );
+   GCD=CFPrimitiveGcdUtil::gcd( F, G );
+   TIMING_END( algContentTimer );
+#elif defined( FACTORY_GCD_TEST )
+   CanonicalForm GCD=CFPrimitiveGcdUtil::gcd( F, G );
+#else
+
+   // this part is translated if there are not any options at all
    CanonicalForm GCD=gcd( F, G );
+
+#endif
    if (GCD!=1)
    {
      ff= convClapASingA( F/ GCD );
      gg= convClapASingA( G/ GCD );
    }
+#ifdef FACTORY_GCD_DEBOUT
+   algGcd=convClapASingA( GCD );
+#endif
  }
  else
  {
    CanonicalForm F( convSingTrClapP( f ) ), G( convSingTrClapP( g ) );
+#ifdef FACTORY_GCD_TIMING
+   CanonicalForm GCD;
+   TIMING_START( algContentTimer );
+   GCD=CFPrimitiveGcdUtil::gcd( F, G );
+   TIMING_END( algContentTimer );
+#elif defined( FACTORY_GCD_TEST )
+   CanonicalForm GCD=CFPrimitiveGcdUtil::gcd( F, G );
+#else
+
+   // this part is translated if there are not any options at all
    CanonicalForm GCD=gcd( F, G );
+
+#endif
    if (GCD!=1)
    {
      ff= convClapPSingTr( F/ GCD );
      gg= convClapPSingTr( G/ GCD );
    }
+#ifdef FACTORY_GCD_DEBOUT
+   algGcd=convClapPSingTr( GCD );
+#endif
  }
  Off(SW_RATIONAL);
-#ifdef FACTORY_DEBUG_OUT
-    StringSetS("ff = ");
-    napWrite(ff);
-    PrintS(StringAppend("\n"));
-    StringSetS("gg = ");
-    napWrite(gg);
-    PrintS(StringAppend("\n"));
+#ifdef FACTORY_GCD_DEBOUT
+  StringSetS("gcd = ");
+  napWrite(algGcd);
+  PrintS(StringAppend("\n"));
+  napDelete(&algGcd);
 #endif 
 }
 #endif
