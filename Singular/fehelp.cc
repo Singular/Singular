@@ -38,14 +38,16 @@ typedef struct
 } heEntry_s;
 typedef  heEntry_s * heEntry;
 
-typedef void (*heBrowserHelpProc)(heEntry hentry);
-typedef BOOLEAN (*heBrowserInitProc)(int warn);
+typedef void (*heBrowserHelpProc)(heEntry hentry, int br);
+typedef BOOLEAN (*heBrowserInitProc)(int warn, int br);
 
 typedef struct
 {
   char* browser;
   heBrowserInitProc init_proc;
   heBrowserHelpProc help_proc;
+  char* required;
+  char* action;
 } heBrowser_s;
 typedef heBrowser_s * heBrowser;
 
@@ -63,23 +65,19 @@ static void heBrowserHelp(heEntry hentry);
 static long heKeyChksum(char* key);
 
 // browser functions
-static BOOLEAN heInfoInit(int);    static void heInfoHelp(heEntry hentry);
-#if ! defined(macintosh)
-static BOOLEAN heNetscapeInit(int);static void heNetscapeHelp(heEntry hentry);
-static BOOLEAN heXinfoInit(int);   static void heXinfoHelp(heEntry hentry);
-static BOOLEAN heTkinfoInit(int);  static void heTkinfoHelp(heEntry hentry);
-#endif
-static BOOLEAN heBuiltinInit(int); static void heBuiltinHelp(heEntry hentry);
-static BOOLEAN heDummyInit(int);   static void heDummyHelp(heEntry hentry);
-static BOOLEAN heEmacsInit(int);   static void heEmacsHelp(heEntry hentry);
+static BOOLEAN heGenInit(int,int);    static void heGenHelp(heEntry hentry,int);
+                                      static void heBuiltinHelp(heEntry hentry,int);
+static BOOLEAN heDummyInit(int,int);   static void heDummyHelp(heEntry hentry,int);
+static BOOLEAN heEmacsInit(int,int);   static void heEmacsHelp(heEntry hentry,int);
 
 #ifdef ix86_Win
-static void heHtmlHelp(heEntry hentry);
-static void heWinHelp(heEntry hentry);
+static void heHtmlHelp(heEntry hentry,int);
+static void heWinHelp(heEntry hentry,int);
 #include "sing_win.h"
 #endif
 
 static heBrowser heCurrentHelpBrowser = NULL;
+static int heCurrentHelpBrowserIndex= -1;
 
 
 /*****************************************************************
@@ -88,23 +86,28 @@ static heBrowser heCurrentHelpBrowser = NULL;
  *
  *****************************************************************/
 // order is improtant -- first possible help is choosen
+#if 1
+static heBrowser_s *heHelpBrowsers=NULL;
+#else
 static heBrowser_s heHelpBrowsers[] =
 {
 #ifdef ix86_Win
-  { "html",     heDummyInit,    heHtmlHelp},
-  { "winhlp",   heDummyInit,    heWinHelp},
+//  { "html",     heDummyInit,    heHtmlHelp, NULL, NULL},
+//  { "winhlp",   heDummyInit,    heWinHelp, NULL, NULL},
 #endif
-#if ! defined(macintosh)
-  { "netscape", heNetscapeInit, heNetscapeHelp},
-  { "tkinfo",   heTkinfoInit,   heTkinfoHelp},
-  { "xinfo",    heXinfoInit,    heXinfoHelp},
-#endif
-  { "info",     heInfoInit,     heInfoHelp},
-  { "builtin",  heBuiltinInit,  heBuiltinHelp},
-  { "dummy",    heDummyInit,    heDummyHelp},
-  { "emacs",    heEmacsInit,    heEmacsHelp},
-  { NULL, NULL, NULL} // must be the last record
+  { "mozilla",  heGenInit,      heGenHelp, "xDhE:mozilla:", "(mozilla -remote \"openURL(%h)\")||(mozilla %h)"},
+  { "netscape", heGenInit,      heGenHelp, "xDhE:netscape:", "(netscape -remote \"openURL(%h)\")||(netscape %h)"},
+  { "tkinfo",   heGenInit,      heGenHelp, "xDiE:tkinfo:", "tkinfo '(%i)%n' &"},
+  { "xinfo",    heGenInit,      heGenHelp, "xDiE:xterm:E:info:", "xterm -e info -f %i --node='%n' &"},
+  { "mac",      heGenInit,      heGenHelp,  "xhE:open:","open %h" },
+  { "machtml",  heGenInit,      heGenHelp,  "xE:open:","open %H" },
+  { "info",     heGenInit,      heGenHelp, "xiE:info:", "info -f %i --node='%n' &"},
+  { "builtin",  heGenInit,      heBuiltinHelp, "i", NULL},
+  { "dummy",    heDummyInit,    heDummyHelp, NULL, NULL},
+  { "emacs",    heEmacsInit,    heEmacsHelp, NULL, NULL},
+  { NULL, NULL, NULL, NULL, NULL} // must be the last record
 };
+#endif
 
 /*****************************************************************
  *
@@ -116,36 +119,10 @@ void feHelp(char *str)
   str = strclean(str);
   if (str == NULL) {heBrowserHelp(NULL); return;}
 
-  BOOLEAN key_is_regexp = (strchr(str, '*') != NULL);
-#ifdef HAVE_NS
-  if (!key_is_regexp)
-  {
-    // test for help mod::p;
-    char *cc=strstr(str,"::");
-    if ((cc!=NULL) && (cc!=str))
-    {
-      char *cc=strstr(str,"::");
-      *cc='\0';
-      cc+=2;
-      idhdl pack=basePack->idroot->get(str,0);
-      if (IDTYP(pack)==PACKAGE_CMD)
-      {
-        package save=currPack;
-        currPack=IDPACKAGE(pack);
-        BOOLEAN r=heOnlineHelp(cc);
-        currPack=save;
-        if (r) return;
-	else
-        {
-          cc-=2; *cc=':';
-        }
-      }
-    }
-  }
-#endif
   if (strlen(str) > MAX_HE_ENTRY_LENGTH - 2)  // need room for extra **
     str[MAX_HE_ENTRY_LENGTH - 3] = '\0';
 
+  BOOLEAN key_is_regexp = (strchr(str, '*') != NULL);
   heEntry_s hentry;
   char* idxfile = feResource('x' /*"IdxFile"*/);
 
@@ -215,12 +192,77 @@ void feHelp(char *str)
   hentry.chksum = 0;
   heBrowserHelp(&hentry);
 }
+static void feBrowserFile()
+{
+  FILE *f=feFopen("help.cnf","r",NULL,TRUE);
+  int br=0;
+  if (f!=NULL)
+  {
+    char buf[512];
+    while (fgets( buf, sizeof(buf), f))
+    {
+      if ((buf[0]!='#') && (buf[0]>' ')) br++;
+    }
+    fseek(f,0,SEEK_SET);
+    // for the 4(!) default browsers
+    heHelpBrowsers=(heBrowser_s*)omAlloc0((br+4)*sizeof(heBrowser_s));
+    br=0;
+    while (fgets( buf, sizeof(buf), f))
+    {
+      if ((buf[0]!='#') && (buf[0]>' '))
+      {
+        char *name=strtok(buf,"!");
+        char *req=strtok(NULL,"!");
+        char *cmd=strtok(NULL,"!");
+        while ((cmd[0]!='\0') && (cmd[strlen(cmd)-1]<=' '))
+          cmd[strlen(cmd)-1]='\0';
+        //Print("name %d >>%s<<\n\treq:>>%s<<\n\tcmd:>>%s<<\n",br,name,req,cmd);
+        heHelpBrowsers[br].browser=(char *)omStrDup(name);
+        heHelpBrowsers[br].init_proc=heGenInit;
+        heHelpBrowsers[br].help_proc=heGenHelp;
+        heHelpBrowsers[br].required=omStrDup(req);
+        heHelpBrowsers[br].action=omStrDup(cmd);
+        br++;
+      }
+    }
+    fclose(f);
+  }
+  else
+  {
+    // for the 4(!) default browsers
+    heHelpBrowsers=(heBrowser_s*)omAlloc0(4*sizeof(heBrowser_s));
+  }
+  heHelpBrowsers[br].browser="builtin";
+  heHelpBrowsers[br].init_proc=heGenInit;
+  heHelpBrowsers[br].help_proc=heBuiltinHelp;
+  heHelpBrowsers[br].required="i";
+  //heHelpBrowsers[br].action=NULL;
+  br++;
+  heHelpBrowsers[br].browser="dummy";
+  heHelpBrowsers[br].init_proc=heDummyInit;
+  heHelpBrowsers[br].help_proc=heDummyHelp;
+  //heHelpBrowsers[br].required=NULL;
+  //heHelpBrowsers[br].action=NULL;
+  br++;
+  heHelpBrowsers[br].browser="emacs";
+  heHelpBrowsers[br].init_proc=heEmacsInit;
+  heHelpBrowsers[br].help_proc=heEmacsHelp;
+  //heHelpBrowsers[br].required=NULL;
+  //heHelpBrowsers[br].action=NULL;
+  //br++;
+  //heHelpBrowsers[br].browser=NULL;
+  //heHelpBrowsers[br].init_proc=NULL;
+  //heHelpBrowsers[br].help_proc=NULL;
+  //heHelpBrowsers[br].required=NULL;
+  //heHelpBrowsers[br].action=NULL;
+}
 
 char* feHelpBrowser(char* which, int warn)
 {
   int i = 0;
 
   // if no argument, choose first available help browser
+  if (heHelpBrowsers==NULL) feBrowserFile();
   if (which == NULL || *which == '\0')
   {
     // return, if already set
@@ -235,9 +277,10 @@ char* feHelpBrowser(char* which, int warn)
       while (heHelpBrowsers[i].browser != NULL)
       {
         if (strcmp(heHelpBrowsers[i].browser, "emacs") == 0 &&
-            (heHelpBrowsers[i].init_proc(0)))
+            (heHelpBrowsers[i].init_proc(0,i)))
         {
           heCurrentHelpBrowser = &(heHelpBrowsers[i]);
+          heCurrentHelpBrowserIndex=i;
           goto Finish;
         }
         i++;
@@ -247,9 +290,10 @@ char* feHelpBrowser(char* which, int warn)
 #endif
     while (heHelpBrowsers[i].browser != NULL)
     {
-      if (heHelpBrowsers[i].init_proc(0))
+      if (heHelpBrowsers[i].init_proc(0,i))
       {
         heCurrentHelpBrowser = &(heHelpBrowsers[i]);
+        heCurrentHelpBrowserIndex=i;
         goto Finish;
       }
       i++;
@@ -270,9 +314,10 @@ char* feHelpBrowser(char* which, int warn)
   else
   {
     // see whether we can init it
-    if (heHelpBrowsers[i].init_proc(warn))
+    if (heHelpBrowsers[i].init_proc(warn,i))
     {
       heCurrentHelpBrowser = &(heHelpBrowsers[i]);
+      heCurrentHelpBrowserIndex=i;
       goto Finish;
     }
   }
@@ -300,8 +345,8 @@ char* feHelpBrowser(char* which, int warn)
       strcmp((char*) feOptSpec[FE_OPT_BROWSER].value,
              heCurrentHelpBrowser->browser) != 0)
   {
-      omfree(feOptSpec[FE_OPT_BROWSER].value);
-   feOptSpec[FE_OPT_BROWSER].value
+    omfree(feOptSpec[FE_OPT_BROWSER].value);
+    feOptSpec[FE_OPT_BROWSER].value
      = (void*) omStrDup(heCurrentHelpBrowser->browser);
   }
   return heCurrentHelpBrowser->browser;
@@ -313,9 +358,10 @@ void  feStringAppendBrowsers(int warn)
   StringAppendS("Available HelpBrowsers: ");
 
   i = 0;
+  if (heHelpBrowsers==NULL) feBrowserFile();
   while (heHelpBrowsers[i].browser != NULL)
   {
-    if (heHelpBrowsers[i].init_proc(warn))
+    if (heHelpBrowsers[i].init_proc(warn,i))
       StringAppend("%s, ", heHelpBrowsers[i].browser);
     i++;
   }
@@ -568,36 +614,28 @@ static int heReKey2Entry (char* filename, char* key, heEntry hentry)
 // otherwise, return FALSE
 static BOOLEAN heOnlineHelp(char* s)
 {
-  idhdl h=IDROOT->get(s,myynest);
+#ifdef HAVE_NAMESPACES
+  idhdl h, ns;
+  iiname2hdl(s, &ns, &h);
+#else /* HAVE_NAMESPACES */
+  idhdl h=idroot->get(s,myynest);
+#endif /* HAVE_NAMESPACES */
 
   // try help for a procedure
   if ((h!=NULL) && (IDTYP(h)==PROC_CMD))
   {
-    procinfo *p=IDPROC(h);
-#ifdef HAVE_NS
-    if (p->language==LANG_SINGULAR)
-#endif
+    char *lib=iiGetLibName(IDPROC(h));
+    if((lib!=NULL)&&(*lib!='\0'))
     {
-      char *lib=iiGetLibName(p /*IDPROC(h)*/);
-      if((lib!=NULL)&&(*lib!='\0'))
+      Print("// proc %s from lib %s\n",s,lib);
+      s=iiGetLibProcBuffer(IDPROC(h), 0);
+      if (s!=NULL)
       {
-        Print("// proc %s from lib %s\n",s,lib);
-        s=iiGetLibProcBuffer(p /*IDPROC(h)*/, 0);
-        if (s!=NULL)
-        {
-          PrintS(s);
-          omFree((ADDRESS)s);
-        }
-        return TRUE;
-     }
-    }
-#ifdef HAVE_NS
-    else if (p->language==LANG_C)
-    {
-      Print("// c-proc %s\n",s);
+        PrintS(s);
+        omFree((ADDRESS)s);
+      }
       return TRUE;
     }
-#endif
     return FALSE;
   }
 
@@ -631,11 +669,11 @@ static BOOLEAN heOnlineHelp(char* s)
     lib_style_types lib_style; // = OLD_LIBSTYLE;
 
     yylpin = fp;
-#ifdef HAVE_NS
+#ifdef HAVE_NAMESPACES
     yylplex(str, libnamebuf, &lib_style, IDROOT, FALSE, GET_INFO);
-#else /* HAVE_NS */
+#else /* HAVE_NAMESPACES */
     yylplex(str, libnamebuf, &lib_style, GET_INFO);
-#endif /* HAVE_NS */
+#endif /* HAVE_NAMESPACES */
     reinit_yylp();
     if(lib_style == OLD_LIBSTYLE)
     {
@@ -681,7 +719,12 @@ static BOOLEAN heOnlineHelp(char* s)
 static long heKeyChksum(char* key)
 {
   if (key == NULL || *key == '\0') return 0;
-  idhdl h=IDROOT->get(key,myynest);
+#ifdef HAVE_NAMESPACES
+  idhdl h, ns;
+  iiname2hdl(key, &ns, &h);
+#else /* HAVE_NAMESPACES */
+  idhdl h=idroot->get(key,myynest);
+#endif /* HAVE_NAMESPACES */
   if ((h!=NULL) && (IDTYP(h)==PROC_CMD))
   {
     procinfo *pi = IDPROC(h);
@@ -722,7 +765,7 @@ static void heBrowserHelp(heEntry hentry)
     i = 0;
     while (heHelpBrowsers[i].browser != NULL)
     {
-      if (heHelpBrowsers[i].init_proc(0))
+      if (heHelpBrowsers[i].init_proc(0,i))
         StringAppend("\"%s\", ", heHelpBrowsers[i].browser);
       i++;
     }
@@ -734,121 +777,152 @@ static void heBrowserHelp(heEntry hentry)
     WarnS(browsers);
   }
 
-  heCurrentHelpBrowser->help_proc(hentry);
+  heCurrentHelpBrowser->help_proc(hentry, heCurrentHelpBrowserIndex);
   feHelpCalled = TRUE;
 }
 
 #define MAX_SYSCMD_LEN MAXPATHLEN*2
-// browser functions
-static BOOLEAN heInfoInit(int warn)
+static BOOLEAN heGenInit(int warn, int br)
 {
-  if (feResource('i', warn) == NULL)
+  if (heHelpBrowsers[br].required==NULL) return TRUE;
+  char *p=heHelpBrowsers[br].required;
+  while (*p>'\0')
   {
-    if (warn) WarnS("'info' help browser not available: no InfoFile");
-    return FALSE;
-  }
-  if (feResource('I') == NULL)
-  {
-    if (warn)
-      WarnS("'info' help browser not available: no 'info' program found");
-    return FALSE;
-  }
-  return TRUE;
-}
-static void heInfoHelp(heEntry hentry)
-{
-  char sys[MAX_SYSCMD_LEN];
-
-  if (hentry != NULL && *(hentry->key) != '\0')
-  {
-    if (*(hentry->node) != '\0')
-      sprintf(sys, "%s -f %s --node='%s'",
-              feResource('I'), feResource('i'), hentry->node);
-    else
-      sprintf(sys, "%s -f %s Index '%s'",
-              feResource('I'), feResource('i'), hentry->key);
-  }
-  else
-    sprintf(sys, "%s -f %s --node=Top", feResource('I'), feResource('i'));
-  system(sys);
-}
-
-#if ! defined(macintosh)
-static BOOLEAN heNetscapeInit(int warn)
-{
-  if (feResource('N' /*"netscape"*/, warn) == NULL)
-  {
-    if (warn) WarnS("'netscape' help browser not available: no 'netscape' program found");
-    return FALSE;
-  }
-#ifndef ix86_Win
-  if (getenv("DISPLAY") == NULL)
-  {
-    if (warn) WarnS("'netscape' help browser not available:");
-    if (warn) WarnS("Environment variable DISPLAY not set");
-    return FALSE;
-  }
-#endif
-
-  if (feResource('h' /*"HtmlDir"*/, (feOptValue(FE_OPT_ALLOW_NET)? 0 : warn))
-      == NULL)
-  {
-    if (warn) WarnS("No local HtmlDir found.");
-    if (feOptValue(FE_OPT_ALLOW_NET))
+    switch (*p)
     {
-      if (warn) Warn("Using URL '%s' instead.", feResource('u' /*"ManualUrl"*/, warn));
+      case '#': break;
+      case ' ': break;
+      case 'i': /* singular.hlp */
+      case 'x': /* singular.idx */
+      case 'h': /* html dir */
+               if (feResource(*p, warn) == NULL)
+               {
+                 if (warn) Warn("ressource `%c` not found",*p);
+                 return FALSE;
+               }
+               break;
+      case 'D': /* DISPLAY */
+               if (getenv("DISPLAY") == NULL)
+               {
+                 if (warn) WarnS("ressource `D` not found");
+                 return FALSE;
+               }
+               break;
+      case 'E': /* executable: E:xterm: */
+               {
+                 char name[128];
+                 char exec[128];
+                 memset(name,0,128);
+                 int i=0;
+                 p++;
+                 while (((*p==':')||(*p<=' ')) && (*p!='\0')) p++;
+                 while((i<127) && (*p>' ') && (*p!=':'))
+                 {
+                   name[i]=*p; p++; i++;
+                 }
+                 if (i==0) return FALSE;
+                 if (omFindExec(name,exec)==NULL)
+                 {
+                   if (warn) Warn("executable `%s` not found",name);
+                   return FALSE;
+                 }
+               }
+               break;
+      default: Warn("unknown char %c",*p);
+               break;
     }
-    else
-      return FALSE;
+    p++;
   }
   return TRUE;
 }
 
-static void heNetscapeHelp(heEntry hentry)
+static void heGenHelp(heEntry hentry, int br)
 {
   char sys[MAX_SYSCMD_LEN];
   char url[MAXPATHLEN];
-  char* htmldir = feResource('h' /*"HtmlDir"*/);
-  char* urltype;
-
-  if (htmldir == NULL)
+  char *p=heHelpBrowsers[br].action;
+  if (p==NULL) {PrintS("no action ?\n"); return;}
+  memset(sys,0,MAX_SYSCMD_LEN);
+  int i=0;
+  while ((*p>'\0')&& (i<MAX_SYSCMD_LEN))
   {
-    urltype = "";
-    htmldir = feResource('u' /*"ManualUrl"*/);
-  }
-  else
-  {
-    urltype = "file:";
-  }
-
-  if (hentry != NULL && *(hentry->url) != '\0')
-  {
-    sprintf(url, "%s%s/%s", urltype, htmldir, hentry->url);
-  }
-  else
-  {
-    sprintf(url, "%s%s/index.htm", urltype, htmldir);
-  }
-#ifndef ix86_Win
-  sprintf(sys, "%s --remote 'OpenUrl(%s)' > /dev/null 2>&1",
-#else
-  sprintf(sys, "%s %s",
-#endif
-          feResource('N' /*"netscape"*/), url);
-
-  // --remote exits with status != 0 if netscaep isn't already running
-  if (system(sys) != 0)
-  {
-    sprintf(sys, "%s %s &", feResource('N' /*"netscape"*/), url);
-    system(sys);
-  }
-  else
-  {
-    if (! feHelpCalled)
+    if ((*p)=='%')
     {
-      Warn("Help is displayed in already running 'netscape'.");
+      p++;
+      switch (*p)
+      {
+        case 'f': /* local html:file */
+        case 'h': /* local html:URL */
+        case 'H': /* www html */
+                 {
+                   char temp[256];
+                   char *htmldir = feResource('h' /*"HtmlDir"*/);
+                   if ((*p=='h')&&(htmldir!=NULL))
+                     strcat(sys,"file://localhost");
+                   else if ((*p=='H')||(htmldir==NULL))
+                     htmldir = feResource('u' /* %H -> "ManualUrl"*/);
+                     /* always defined */
+                   if (hentry != NULL && *(hentry->url) != '\0')
+                   #ifdef HAVE_VSNPRINTF
+                     snprintf(temp,256,"%s/%s", htmldir, hentry->url);
+                   else
+                     snprintf(temp,256,"%s/index.htm", htmldir);
+                   #else
+                     sprintf(temp,"%s/%s", htmldir, hentry->url);
+                   else
+                     sprintf(temp,"%s/index.htm", htmldir);
+                   #endif
+                   strcat(sys,temp);
+                   if ((*p)=='f')
+                   { // remove #SEC
+                     char *pp=strchr(sys,'#');
+                     if (pp!=NULL)
+		     { 
+		       *pp='\0';
+                       i=strlen(sys);
+		       memset(pp,0,MAX_SYSCMD_LEN-i);
+		     }  
+                   }
+                   i=strlen(sys);
+                   break;
+                 }
+        case 'i': /* singular.hlp */
+                 {
+                   char *i_res=feResource('i');
+                   if (i_res!=NULL) strcat(sys,i_res);
+                   else
+                   {
+                     WarnS("singular.hlp not found");
+                     return;
+                   }
+                   i=strlen(sys);
+                   break;
+                 }
+        case 'n': /* info node */
+                 {
+                   char temp[256];
+                   if ((hentry!=NULL) && (*(hentry->node) != '\0'))
+                     sprintf(temp,"%s",hentry->node);
+                   //else if ((hentry!=NULL) && (hentry->key!=NULL))
+                   //  sprintf(temp,"Index '%s'",hentry->key);
+                   else
+                     sprintf(temp,"Top");
+                   strcat(sys,temp);
+                   i=strlen(sys);
+                   break;
+                 }
+        default: break;
+      }
+      p++;
+    }
+    else
+    {
+      sys[i]=*p;
+      p++;i++;
     }
   }
+  Print("running `%s`\n",sys);
+  system(sys);
 }
 
 #ifdef ix86_Win
@@ -883,114 +957,20 @@ static void heWinHelp(heEntry hentry)
 }
 #endif
 
-static BOOLEAN heXinfoInit(int warn)
-{
-#ifndef ix86_Win
-  if (getenv("DISPLAY") == NULL)
-  {
-    if (warn) WarnS("'xinfo' help browser not available:");
-    if (warn) WarnS("Environment variable DISPLAY not set");
-    return FALSE;
-  }
-#endif
-  if (feResource('i', warn) == NULL)
-  {
-    if (warn) WarnS("'xinfo' help browser not available: no InfoFile");
-    return FALSE;
-  }
-  if (feResource('I', warn) == NULL)
-  {
-    if (warn) WarnS("'xinfo' help browser not available: no 'info' program found");
-    return FALSE;
-  }
-  if (feResource('X', warn) == NULL)
-  {
-    if (warn) WarnS("'xinfo' help browser not available: no 'xterm' program found");
-    return FALSE;
-  }
-  return TRUE;
-}
-static void heXinfoHelp(heEntry hentry)
-{
-  char sys[MAX_SYSCMD_LEN];
-
-#ifdef ix86_Win
-#define EXTRA_XTERM_ARGS "+vb -sb -fb Courier-bold-12 -tn linux -cr Red3"
-#else
-#define EXTRA_XTERM_ARGS ""
-#endif
-
-  if (hentry != NULL && *(hentry->key) != '\0')
-  {
-    if (*(hentry->node) != '\0')
-      sprintf(sys, "%s %s -e %s -f %s --node='%s' &",
-              feResource('X'), EXTRA_XTERM_ARGS,
-              feResource('I'), feResource('i'), hentry->node);
-    else
-      sprintf(sys, "%s %s -e %s -f %s Index '%s' &",
-              feResource('X'), EXTRA_XTERM_ARGS,
-              feResource('I'), feResource('i'), hentry->key);
-  }
-  else
-    sprintf(sys, "%s %s -e %s -f %s --node=Top &",
-            feResource('X'), EXTRA_XTERM_ARGS,
-            feResource('I'), feResource('i'));
-  system(sys);
-}
-
-static BOOLEAN heTkinfoInit(int warn)
-{
-#ifndef ix86_Win
-  if (getenv("DISPLAY") == NULL)
-  {
-    if (warn) WarnS("'tkinfo' help browser not available:");
-    if (warn) WarnS("Environment variable DISPLAY not set");
-    return FALSE;
-  }
-#endif
-  if (feResource('i', warn) == NULL)
-  {
-    if (warn) WarnS("'tkinfo' help browser not available: no InfoFile");
-    return FALSE;
-  }
-  if (feResource('T', warn) == NULL)
-  {
-    if (warn) WarnS("'tkinfo' help browser not available: no 'tkinfo' program found");
-    return FALSE;
-  }
-  return TRUE;
-}
-static void heTkinfoHelp(heEntry hentry)
-{
-  char sys[MAX_SYSCMD_LEN];
-  if (hentry != NULL && *(hentry->node) != '\0')
-  {
-    sprintf(sys, "%s '(%s)%s' &",
-            feResource('T'), feResource('i'), hentry->node);
-  }
-  else
-  {
-    sprintf(sys, "%s %s &",
-            feResource('T'), feResource('i'));
-  }
-  system(sys);
-}
-#endif // ! defined(macintosh)
-
-static BOOLEAN heDummyInit(int warn)
+static BOOLEAN heDummyInit(int warn, int br)
 {
   return TRUE;
 }
-static void heDummyHelp(heEntry hentry)
+static void heDummyHelp(heEntry hentry, int br)
 {
   Werror("No functioning help browser available.");
 }
 
-static BOOLEAN heEmacsInit(int warn)
+static BOOLEAN heEmacsInit(int warn, int br)
 {
   return TRUE;
 }
-static void heEmacsHelp(heEntry hentry)
+static void heEmacsHelp(heEntry hentry, int br)
 {
   WarnS("Your help command could not be executed. Use");
   Warn("C-h C-s %s",
@@ -998,17 +978,8 @@ static void heEmacsHelp(heEntry hentry)
   Warn("to enter the Singular online help. For general");
   Warn("information on Singular running under Emacs, type C-h m.");
 }
-static BOOLEAN heBuiltinInit(int warn)
-{
-  if (feResource('i', warn) == NULL)
-  {
-    if (warn) WarnS("'builtin' help browser not available: no InfoFile");
-    return FALSE;
-  }
-  return TRUE;
-}
 static int singular_manual(char *str);
-static void heBuiltinHelp(heEntry hentry)
+static void heBuiltinHelp(heEntry hentry, int br)
 {
   char* node = omStrDup(hentry != NULL && *(hentry->node) != '\0' ?
                        hentry->node : "Top");
@@ -1029,11 +1000,7 @@ static void heBuiltinHelp(heEntry hentry)
 #define IDX_LEN        64
 #define MAX_LINES      21
 
-#ifdef macintosh
-static char tolow(char p)
-#else
 static inline char tolow(char p)
-#endif
 {
   if (('A'<=p)&&(p<='Z')) return p | 040;
   return p;
@@ -1056,11 +1023,7 @@ static int show(unsigned long offset,FILE *help, char *close)
     printf("%s", buffer);
     if(lines++> MAX_LINES)
     {
-#ifdef macintosh
-      printf("\n Press <RETURN> to continue or x and <RETURN> to exit help.\n");
-#else
       printf("\n Press <RETURN> to continue or x to exit help.\n");
-#endif
       fflush(stdout);
       *close = (char)getchar();
       if(*close=='x')
@@ -1073,11 +1036,7 @@ static int show(unsigned long offset,FILE *help, char *close)
   }
   if(*close!='x')
   {
-#ifdef macintosh
-    printf("\nEnd of part. Press <RETURN> to continue or x and <RETURN> to exit help.\n");
-#else
     printf("\nEnd of part. Press <RETURN> to continue or x to exit help.\n");
-#endif
     fflush(stdout);
     *close = (char)getchar();
     if(*close=='x')

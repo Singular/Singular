@@ -1,0 +1,31 @@
+# Singular help browser file $Id: help.cnf,v 1.2 2003-04-22 17:19:49 Singular Exp $
+# each line which start with an # is a comment
+# each other line defines a (possible) help browser
+# the format of the entries is: <name>!<requirements>!<shell command>
+#----------------------------------------------------
+# known requirements:
+#  x- requires singular.idx
+#  i- requires singular.hlp
+#  h- requires html dir
+#  D- requires the enviroment variable DISPLAY
+#  E:executable:- requires the named exectable
+#----------------------------------------------------
+# shell commands substitute the following:
+#  %h: the local html file (in the form file://localhost/some/dir/sing_123.htm)
+#  %f: the local html file (in the form /some/dir/sing_123.htm)
+#  %H: the www html  file
+#             (in the form http://www.singular.uni-kl.de/some/dir/sing_123.htm)
+#  %i: the complete path of singular.hlp
+#  %n: the info node
+#----------------------------------------------------
+# the default help browsers builtin, dummy and emacs are always 
+# available and should NOT ne mentioned here
+#----------------------------------------------------
+mozilla!xDhE:mozilla:!(mozilla -remote "openURL(%h)")||(mozilla %h) &
+galeon!xDhE:galeon:!galeon -n %h &
+netscape!xDhE:netscape:!(netscape -remote "openURL(%h)")||(netscape %h) &
+tkinfo!xDiE:tkinfo:!tkinfo '(%i)%n' &
+xinfo!xDiE:xterm:E:info:!xterm -e info -f %i --node='%n' &
+mac!xhE:open:!open %f &
+mac-net!xE:open:!open %H &
+info!xiE:info:!info -f %i --node='%n'
