@@ -1,6 +1,24 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.19 1998-05-18 20:28:30 wichmann Exp $
+@comment $Id: examples.doc,v 1.20 1998-05-19 12:03:27 wichmann Exp $
 @comment this file contains the examples
+
+@c The following directives are necessary for proper compilation
+@c with emacs (C-c C-e C-r).  Please keep it as it is.  Since it
+@c is wrapped in `@ignore' and `@end ignore' it does not harm `tex' or
+@c `makeinfo' but is a great help in editing this file (emacs
+@c ignores the `@ignore').
+@ignore
+%**start
+\input texinfo.tex
+@setfilename examples.info
+@node Top, Examples
+@menu
+* General concepts::
+@end menu
+@node Examples, Mathematical Background, Tricks and pitfalls, Top
+@appendix Examples
+%**end
+@end ignore
 
 @ifinfo
 The following topics are treated:
@@ -853,15 +871,19 @@ the Zariski-closure of the image is the zero-set of the ideal
 @tex
 $$
 \displaylines{
-j=J \cap K[x_1,\ldots,x_n], \;\quad\hbox{\rm where}\cr
+j=J \cap k[x_1,\ldots,x_n], \;\quad\hbox{\rm where}\cr
 J=(x_1-f_1(t_1,\ldots,t_r),\ldots,x_n-f_n(t_1,\ldots,t_r))\subseteq
-k[t_1,\ldots,t_r,x_1,\ldots,x_n]\cap k[x_1,\ldots,x_n],\cr
+k[t_1,\ldots,t_r,x_1,\ldots,x_n]
 }
 $$
 @end tex
 @ifinfo
-@*      J=(x1-f1(t1,...,tr),...,xn-fn(t1,...,tr))
-@*in k[t1,...tr,x1,...,xn] intersected with k[x1,...,xn],
+
+@example
+        j = J intersected with K[x1,...,xn]
+J=(x1-f1(t1,...,tr),...,xn-fn(t1,...,tr)) in k[t1,...tr,x1,...,xn] 
+@end example
+
 @end ifinfo
 i.e of the ideal j obtained from J by eliminating the variables
 @tex
