@@ -1,8 +1,8 @@
-// $Id: inout.lib,v 1.14 2000-04-27 10:07:13 obachman Exp $
+// $Id: inout.lib,v 1.15 2000-04-28 10:03:57 obachman Exp $
 // (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: inout.lib,v 1.14 2000-04-27 10:07:13 obachman Exp $";
+version="$Id: inout.lib,v 1.15 2000-04-28 10:03:57 obachman Exp $";
 info="
 LIBRARY:  inout.lib     PROCEDURES FOR MANIPULATING IN- AND OUTPUT
 
@@ -306,7 +306,6 @@ EXAMPLE: example rMacaulay; shows an example
    s0 = s0[1,size(s0)-2];
    return(s0);
 }
-/* This is broken under ix86-Win
 example
 {  "EXAMPLE:"; echo = 2;
    // Assume there exists a file 'Macid' with the following ideal in Macaulay
@@ -338,7 +337,6 @@ example
    0  0  0  0  e3 ";
    rMacaulay(s2);
 }
-*/
 
 ///////////////////////////////////////////////////////////////////////////////
 
