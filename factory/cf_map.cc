@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_map.cc,v 1.11 1998-03-10 14:48:12 schmidt Exp $ */
+/* $Id: cf_map.cc,v 1.12 2000-05-29 15:05:21 Singular Exp $ */
 
 //{{{ docu
 //
@@ -47,6 +47,10 @@ operator << ( ostream & s, const MapPair & p )
     return s;
 }
 //}}}
+
+void MapPair::print( ostream&) const
+{
+}
 #endif /* NOSTREAMIO */
 
 //{{{ CFMap::CFMap ( const CFList & L )
@@ -202,7 +206,8 @@ CFMap::operator () ( const CanonicalForm & f ) const
 ostream &
 operator << ( ostream & s, const CFMap & m )
 {
-    return s << m.P;
+    m.P.print(s);
+    return s;
 }
 //}}}
 #endif /* NOSTREAMIO */

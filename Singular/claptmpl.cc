@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.21 2000-05-29 08:09:04 pohl Exp $
+// $Id: claptmpl.cc,v 1.22 2000-05-29 15:05:19 Singular Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -85,6 +85,10 @@ public:
     Substitution<T>& operator= ( const T& );
     T factor() const { return _factor; }
     T exp() const { return _exp; }
+    friend int operator== ( const Substitution<T>&, const Substitution<T>& );
+#ifndef NOSTREAMIO
+    friend ostream & operator <<(ostream &, const Substitution<T> &);
+#endif
 };
 
 // class.cc
@@ -105,6 +109,11 @@ Substitution<T>& Substitution<T>::operator= ( const T & f )
     _exp = 1;
     return *this;
 }
+
+#ifndef NOSTREAMIO
+template <class T>
+ostream& operator<< ( ostream & os, const Substitution<T> & a ) { return os; }
+#endif
 
 template <class T>
 int operator== ( const Substitution<T> &f1, const Substitution<T> &f2 )

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_map.h,v 1.11 1998-03-10 14:48:18 schmidt Exp $ */
+/* $Id: cf_map.h,v 1.12 2000-05-29 15:05:21 Singular Exp $ */
 
 #ifndef INCL_CF_MAP_H
 #define INCL_CF_MAP_H
@@ -55,6 +55,7 @@ public:
     Variable var () const { return V; }
     CanonicalForm subst () const { return S; }
 #ifndef NOSTREAMIO
+    void print( ostream&) const;
     friend ostream & operator << ( ostream & s, const MapPair & p );
 #endif /* NOSTREAMIO */
 };

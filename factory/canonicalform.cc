@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.29 2000-02-07 13:51:34 Singular Exp $ */
+/* $Id: canonicalform.cc,v 1.30 2000-05-29 15:05:19 Singular Exp $ */
 
 #include <config.h>
 
@@ -1557,6 +1557,15 @@ CanonicalForm::print( ostream & os, char * str ) const
 	imm_print( os, value, str );
     else
 	value->print( os, str );
+}
+
+void
+CanonicalForm::print( ostream & os ) const
+{
+    if ( is_imm( value ) )
+	imm_print( os, value, "" );
+    else
+	value->print( os, "" );
 }
 
 ostream&

@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.h,v 1.12 1999-11-24 12:29:37 wichmann Exp $
+// $Id: fglm.h,v 1.13 2000-05-29 15:05:19 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -12,6 +12,9 @@
 
 #ifndef FGLM_H
 #define FGLM_H
+
+#ifdef HAVE_FGLM
+#include <factory.h>
 
 #include "polys.h"
 #include "fglmvec.h"
@@ -35,7 +38,13 @@ public:
     void cleanup();
     BOOLEAN isBasisOrEdge() const { return ( (divisors[0] == numVars) ? TRUE : FALSE ); }
     void newDivisor( int var ) { divisors[ ++divisors[0] ]= var; }
+#ifndef NOSTREAMIO
+friend ostream & operator <<(ostream &, fglmSelem);
+#endif
 };
+#ifndef NOSTREAMIO
+inline ostream & operator <<(ostream & os, fglmSelem) { return os;};
+#endif
 
 class fglmDelem
 {
@@ -49,7 +58,13 @@ public:
     void cleanup();
     BOOLEAN isBasisOrEdge() const { return ( (insertions == 0) ? TRUE : FALSE ); }
     void newDivisor() { insertions--; }
+#ifndef NOSTREAMIO
+friend ostream & operator <<(ostream &, fglmDelem);
+#endif
 };
+#ifndef NOSTREAMIO
+inline ostream & operator <<(ostream & os, fglmDelem) { return os;};
+#endif
 
 // fglmzero(...):
 // The fglm algorithm for 0-dimensional ideals. ( fglmzero is defined in fglmzero.cc )
@@ -102,4 +117,5 @@ findUniProc( leftv result, leftv first);
 // homogeneous FGLM
 ideal
 fglmhomProc(leftv first, leftv second);
+#endif
 #endif

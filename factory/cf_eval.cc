@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_eval.cc,v 1.4 1997-06-19 12:27:22 schmidt Exp $ */
+/* $Id: cf_eval.cc,v 1.5 2000-05-29 15:05:20 Singular Exp $ */
 
 #include <config.h>
 
@@ -50,7 +50,7 @@ Evaluation::nextpoint()
 ostream&
 operator<< ( ostream& s, const Evaluation &e )
 {
-    s << e.values;
+    e.values.print(s);
     return s;
 }
 #endif /* NOSTREAMIO */

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.h,v 1.25 1998-06-29 14:37:00 schmidt Exp $ */
+/* $Id: canonicalform.h,v 1.26 2000-05-29 15:05:20 Singular Exp $ */
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
@@ -146,6 +146,7 @@ public:
     // input/output
 #ifndef NOSTREAMIO
     void print( ostream&, char * ) const;
+    void print( ostream& ) const;
     friend ostream& operator << ( ostream&, const CanonicalForm& );
     friend istream& operator >> ( istream&, CanonicalForm& );
 #endif /* NOSTREAMIO */
