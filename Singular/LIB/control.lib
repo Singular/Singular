@@ -1,4 +1,4 @@
-version="$Id: control.lib,v 1.20 2005-02-09 19:06:35 levandov Exp $";
+version="$Id: control.lib,v 1.21 2005-02-18 17:38:45 levandov Exp $";
 category="Applications";
 info="
 LIBRARY:  control.lib Procedures for System and Control Theory 
@@ -71,7 +71,20 @@ LIB "ncalg.lib";
 LIB "nctools.lib";
 LIB "nchomolog.lib"; 
 LIB "gkdim.lib";
+
 //---------------------------------------------------------------
+static proc Opt_Our()
+"USAGE: Opt_Our();
+RETURN: intvec, where previous options are stored
+PURPOSE: save previous options and set customized options
+"
+{
+  intvec v;
+  v=option(get);
+  option(redSB);
+  option(redTail);
+  return (v);
+}
 proc declare(string NameOfRing, string Variables, list #)
 "USAGE: declare(NameOfRing, Variables,[Parameters, Ordering]);
           NameOfRing:  string with name of ring,
@@ -290,10 +303,9 @@ NOTE: exists only in the case when Id \subseteq M!
   int NCols = ncols(M);
   module Id = freemodule(NCols);
   module N  = transpose(M);
+  intvec old_opt=Opt_Our();
   Id = std(Id);
   matrix T;
-  option(redSB);
-  option(redTail);
   // check the correctness (Id \subseteq M)
   // via dimension: {dim/GKdim} (M) = -1!
   int d = dim_Our(N);
@@ -314,7 +326,7 @@ NOTE: exists only in the case when Id \subseteq M!
   //  T2 = transpose(T2)*transpose(T);
   T2 =  transpose(T2);
   // set options back
-  option(noredTail);
+  option(set,old_opt);
   return(T2);
 }
 example
@@ -336,6 +348,11 @@ example
   print(L);
 };
 //-----------------------------------------------------------------------
+proc RightInverse(module R)
+{
+  return(transpose(LeftInverse(transpose(R))));
+}
+//-----------------------------------------------------------------------
 static proc dim_Our(module R)
 {
   int d;
@@ -343,39 +360,40 @@ static proc dim_Our(module R)
   {
     R = std(R);
   }
-  if (Is_NC())
-  {
-    d = GKdim(R);
-  }
-  else { d = dim(R); }
+  //  if (Is_NC())
+  //  {
+  //    d = GKdim(R);
+  //  }
+  //  else { d = dim(R); }
+  d = dim(R);
   return(d);
 }
 //-----------------------------------------------------------------------
 static proc Ann_Our(module R)
 {
-  if (Is_NC())
-  {
-    // TODO: use preAnn, that is an annihilator of the generators
-    // what is a left ideal!
-    return(-1);
-  }
-  else
-  {
-    return(Ann(R));
-  }
-
+//   if (Is_NC())
+//   {
+//     // TODO: use preAnn, that is an annihilator of the generators
+//     // what is a left ideal!
+//     return(-1);
+//   }
+//   else
+//   {
+//     return(Ann(R));
+//   }
+  return(Ann(R));
 }
 //-----------------------------------------------------------------------
 static proc Ext_Our(int i, module R, list #)
 // mimicking 'Ext_R' from "homolog.lib" in commutative case
 {
-  int ISNC = Is_NC();
+  //  int ISNC = Is_NC();
   int ExtraArg = ( size(#)>0 );
-  if (ISNC)
-  {
-    // ExtraArg not yet implemented and thus ignored
-    return( ncExt_R(i,R) );
-  }
+  //  if (ISNC)
+  //  {
+  //    // ExtraArg not yet implemented and thus ignored
+  //    return( ncExt_R(i,R) );
+  //  }
   // the commutative case:
   if (ExtraArg)
   {
@@ -397,7 +415,8 @@ static proc is_zero_Our
   //  return( is_zero(R) ) ;
 };
 //------------------------------------------------------------------------
-static proc control_output(int i, int NVars, module R, module Ext_1) 
+static proc control_output(int i, int NVars, module R, module Ext_1, list Gen) 
+//static proc control_output(int i, int NVars, module R, module Ext_1) 
 "USAGE:  control_output(i, NVars, R, Ext_1), where
            i:  integer, number of first nonzero Ext or 
 	       just number of variables in a base ring + 1 in case that all the Exts are zero,
@@ -409,12 +428,15 @@ NOTE:  this procedure is used in 'control' procedure
 "
 {
   // TODO: NVars to be replaced with the global hom. dimension of basering!!!
-  int d = dim_Our( std( transpose(R) ) ); // this is the dimension of the system 
   string DofS = "dimension of the system:";
   string Fn   = "number of first nonzero Ext:";
+  string Gen_mes = "The following parameter constellations might lead to a non-controllable system: ";
+
+  module RK = RightKernel(R); 
+  int d=dim_Our(std(transpose(R)));
+
   if (i==1)
   { 
-    module RK = RightKernel(R); 
     return( 
             list ( Fn,
 	           i,
@@ -433,15 +455,17 @@ NOTE:  this procedure is used in 'control' procedure
   };
   
   if(i>NVars)
-  { module RK = RightKernel(R); 
+  { 
     return( list(  Fn,
                    -1, 
-                  "strongly controllable, image representation:",
+                  "strongly controllable(flat), image representation:",
 		   RK,
 		  "left inverse to image representation:",
 		   LeftInverse(RK),
-		   DofS, 
-		   d) 
+		   DofS,
+		   d,
+		   Gen_mes,
+		   Gen) 
           );
   };
   
@@ -454,9 +478,11 @@ NOTE:  this procedure is used in 'control' procedure
     return( list( Fn,
                   i, 
                  "controllable, not reflexive, image representation:",
-		  RightKernel(R),
+		  RK,
                   DofS,
-                  d ) 
+                  d,
+		  Gen_mes,
+		  Gen) 
           ); 
   };
     
@@ -465,9 +491,11 @@ NOTE:  this procedure is used in 'control' procedure
     return( list ( Fn,
                    i, 
                   "reflexive, not strongly controllable, image representation:",
-		   RightKernel(R),
+		   RK,
 		   DofS,
-		   d) 
+		   d,
+   		   Gen_mes,
+		   Gen) 
           );
   };  
 };  
@@ -483,18 +511,25 @@ EXAMPLE:  example control; shows an example
   int NVars=nvars(basering); 
   // TODO: NVars to be replaced with the global hom. dimension of basering!!!
   int ExtIsZero;
-
-  module Ext_1 = std(Ext_Our(1,R));
+  intvec v=Opt_Our();
+  module R_std=std(R);
+  module Ext_1 = std(Ext_Our(1,R_std));
+  //  module Ext_1 = std(Ext_Our(1,R));
    
   ExtIsZero=is_zero_Our(Ext_1);
   i=1;
   while( (ExtIsZero) && (i<=NVars) )
   {
     i++;
-    ExtIsZero = is_zero_Our( Ext_Our(i,R) );
+    ExtIsZero = is_zero_Our( Ext_Our(i,R_std) );
+    //    ExtIsZero = is_zero_Our( Ext_Our(i,R) );
   };
-  
-  return( control_output( i, NVars, R, Ext_1 ) );
+  matrix T=lift(R,R_std);
+  list l=genericity(T);
+  option(set,v);
+
+  return( control_output( i, NVars, R, Ext_1, l ) );
+  //  return( control_output( i, NVars, R, Ext_1 ) );
 }
 example
 {"EXAMPLE:";echo = 2; 
@@ -508,8 +543,45 @@ example
   view(R);
   view(control(R));
 };
+//------------------------------------------------------------------------------------------
+proc control2(module R)
+"USAGE:  control2(R); R a module (R is the matrix of the system of equations which is to be investigated)
+RETURN:  list of all the properties concerning controllability of the system (behavior) represented by the  matrix R
+EXAMPLE:  example control; shows an example
+NOTE: same as control(R); but using dimensions
+"
+{
+  intvec v=option(get);
+  module R_std=std(R);
+  int d=dim_Our(R_std);
+  int NVars=nvars(basering);
+  int i=NVars-d;
+  module Ext_1;
+
+  if(i==1)
+    {
+      Ext_1=std(Ext_Our(1,R_std));
+    }
+  matrix T=lift(R,R_std);
+  list l=genericity(T);
+  option(set, v);
+  return( control_output( i, NVars, R, Ext_1, l));
+}
+example
+{"EXAMPLE:";echo = 2; 
+  //Wind Tunnel
+  ring A = (0,a, omega, zeta, k),(D1, delta),dp;
+  module R;
+  R = [D1+a, -k*a*delta, 0, 0],
+      [0, D1, -1, 0],
+      [0, omega^2, D1+2*zeta*omega, -omega^2];
+  R=transpose(R);
+  view(R);
+  view(control2(R));
+};
 //------------------------------------------------------------------------
-static proc autonom_output( int i, int NVars ) 
+static proc autonom_output( int i, int NVars, module RC ) 
+//static proc autonom_output( int i, int NVars ) 
 "USAGE:  proc autonom_output(i, NVars)
            i:  integer, number of first nonzero Ext or 
 	       just number of variables in a base ring + 1 in case that all the Exts are zero
@@ -526,6 +598,8 @@ NOTE:  this procedure is used in 'autonom' procedure
     return( list(  Fn,
                    i,
                   "not autonomous",
+		   "kernel representation for controllable part",
+		   RC,
 		   DofS,
 		   d ) 
 	  );
@@ -563,7 +637,7 @@ NOTE:  this procedure is used in 'autonom' procedure
   {  
     return( list(  Fn,
                    i,
-                  "strongly autonomous,in particular overdetermined",
+                  "strongly autonomous(fin. dimensional),in particular overdetermined",
 		   DofS,
 		   d) 
 	  );
@@ -589,9 +663,18 @@ EXAMPLE:  example autonom2; shows an example
 { 
   int d;
   int NVars = nvars(basering);
-  R = transpose(R);
-  d = dim_Our( std(R) );
-  return( autonom_output(NVars-d,NVars) );
+//   R = transpose(R);
+//   d = dim_Our( std(R) );
+//   return( autonom_output(NVars-d,NVars) );
+  module RT = transpose(R);
+  module RC;  //for computation of controllable part if if exists
+  d = dim_Our( std(RT) );  //this is the dimension of the system 
+  int i=NVars-d;  //First non-zero Ext
+  if(d==0)
+    {
+      RC=LeftKernel(RightKernel(R));
+    }
+  return( autonom_output(i,NVars,RC) );
 }
 example
 {"EXAMPLE:"; echo = 2;
@@ -613,16 +696,25 @@ EXAMPLE:  example autonom; shows an example
 "
 {
   int NVars=nvars(basering);
-  int ExtIsZero;    
-  R=transpose(R); 
-  ExtIsZero=is_zero_Our(Ext_Our(0,R)); 
+  int ExtIsZero;
+  module RT=transpose(R);
+  module RC;
+  ExtIsZero=is_zero_Our(Ext_Our(0,RT));     
+//   R=transpose(R); 
+//   ExtIsZero=is_zero_Our(Ext_Our(0,R)); 
   int i=0;
   while( (ExtIsZero)&&(i<=NVars) )
   {
     i++;
-    ExtIsZero = is_zero_Our(Ext_Our(i,R));
+    ExtIsZero = is_zero_Our(Ext_Our(i,RT));
+    //    ExtIsZero = is_zero_Our(Ext_Our(i,R));
   };
-  return(autonom_output(i,NVars));     
+  if(i==0)
+    {
+      RC=LeftKernel(RightKernel(R));
+    }
+  return(autonom_output(i,NVars,RC));
+  //  return(autonom_output(i,NVars));     
 }
 example
 {"EXAMPLE:"; echo = 2;
@@ -903,8 +995,9 @@ EXAMPLE:  example canonize; shows an example
 "
 {
   list M = L;
-  option(redSB);
-  option(redTail);
+  intvec v=Opt_Our();
+  //  option(redSB);
+  //  option(redTail);
   int s = size(L);
   int i;
   for (i=2; i<=s; i=i+2)
@@ -916,7 +1009,8 @@ EXAMPLE:  example canonize; shows an example
       //      M[i] = std(M[i]);
     }
   }
-  option(noredTail); // set the initial option back
+  option(set, v); //set old values back
+  //  option(noredTail); // set the initial option back
   return(M);
 }
 example
@@ -943,6 +1037,12 @@ static proc smdeg(matrix N)
   int d,d_temp;
   intvec v;
   int i,j;            // counter
+
+  if(N==0) 
+  {
+    v=1,1;
+    return(v);
+  } 
   
   for(i=1;i<=n;i++) // hier wird ein Element ausgewaehlt(!=0) und mit dessen Grad gestartet
   {
@@ -1014,7 +1114,7 @@ such that U*M*V=S. An empty list is returned when no Smith Form exists.
 NOTE: The Smith form only exists over PIDs (principal ideal domains).
 "
 {
-  if (nvars(basering)>1)
+  if (nvars(basering)>1) //if more than one variable, return empty list
     {
       list @L;
       return (@L);
@@ -1033,8 +1133,6 @@ NOTE: The Smith form only exists over PIDs (principal ideal domains).
   intmat g[1][m];              //to save degrees
   matrix mu[1][m];             //to save leadcoefficients
   int ii;                       //counter
-  ideal J;                      //for extgcd-computations
-  matrix T;                     //----------"------------
   
   while ((k!=n) && (k!=m) )    
   {
@@ -1107,8 +1205,6 @@ NOTE: The Smith form only exists over PIDs (principal ideal domains).
     if( (k!=1) && (k<n) && (k<m) )
     {
       L=extgcd(N[k-1,k-1],N[k,k]);  //one can use this line if extgcd-bug is fixed
-      
-      //the next lines are needed for the divisibility condition of the entries of the Smith Form
       
       if(!(N[k-1,k-1]==L[1]))  //means that N[k-1,k-1] is not a divisor of N[k,k]
 	{
