@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.16 1998-07-31 21:05:53 schmidt Exp $
+;; $Id: singular.el,v 1.17 1998-08-05 07:07:05 wichmann Exp $
 
 ;;; Commentary:
 
@@ -170,10 +170,76 @@ NOT READY [should be rewritten completely.  Interface should stay the same.]!"
   (cond ((eq face-type 'input) singular-input-face)
 	((eq face-type 'output) singular-output-face)))
 ;;}}}
+
+;;{{{ Font-locking
+(defvar singular-font-lock-keywords-1
+  '(
+    ("\\<\\(poly\\|ideal\\)\\>" 1 font-lock-keyword-face)
+    ("\\<\\(ring\\)\\>)" 1 font-lock-variable-face)
+;;    ("\\<^   \\? no\\>" font-lock-warn-face)
+    )
+  "Subdued level for highlighting in singular-(interactive)-mode")
+
+(defvar singular-font-lock-keywords-2 
+  (append
+   singular-font-lock-keywords-1
+   '(
+     ("skipping" font-lock-warn-face)
+;;     ()))
+     ))
+  "Gaudy level for highlihgting in singular-(interactive)-mode") 
+
+(defvar singular-font-lock-keywords singular-font-lock-keywords-1
+  "Default highlighting for singular-(interactive)-mode")
+
+(defvar singular-emacs-font-lock-defaults 
+  '((singular-font-lock-keywords
+     singular-font-lock-keywords-1
+     singular-font-lock-keywords-2)
+    ;; KEYWORDS-ONLY (don't fontify comments/strings when non-nil) 
+    nil
+    ;; CASE-FOLD (ignore case when non-nil)
+    nil
+    ;; SYNTAX-ALIST
+    ((?_ . "w"))
+;;; was soll ich da nehmen NOT READY	(( . )) 
+    ;; SYNTAX_BEGIN
+    (beginning-of-defun)
+;;    beginning-of-line 
+    (font-lock-comment-start-regexp . "//")) ;; gibt es nich im XEmacs
+  "Emacs-default for font-lock-mode in singular-(interactive)-mode")
+
+(defvar singular-xemacs-font-lock-defaults 
+  '((singular-font-lock-keywords
+     singular-font-lock-keywords-1
+     singular-font-lock-keywords-2)
+
+    ;; KEYWORDS-ONLY (don't fontify comments/strings when non-nil) 
+    nil
+
+    ;; CASE-FOLD (ignore case when non-nil)
+    nil
+
+    ;; SYNTAX-ALIST
+    nil;;; was soll ich da nehmen NOT READY	(( . )) 
+
+    ;; SYNTAX_BEGIN
+    nil) ;;    beginning-of-line 
+  "XEmacs-default for font-lock-mode in singular-(interactive)-mode")
+
+(cond 
+ ;; XEmacs
+ ((eq singular-emacs-flavor 'xemacs)
+  (singular-debug 'interactive (message "setting up font-lock for XEmacs"))
+  (put 'singular-interactive-mode 'font-lock-defaults
+       singular-xemacs-font-lock-defaults)))
+
+
+;;}}}
 ;;}}}
 
 ;;{{{ Singular interactive mode
-;;{{{ Key map
+;;{{{ Key map and menus
 (defvar singular-interactive-mode-map ()
   "Key map to use in Singular interactive mode.")
 
@@ -191,6 +257,56 @@ NOT READY [should be rewritten completely.  Interface should stay the same.]!"
     (set-keymap-name singular-interactive-mode-map
 		     'singular-interactive-mode-map)))
   (define-key singular-interactive-mode-map "\C-m" 'singular-send-or-copy-input))
+
+;; NOT READY
+;; This is just a temporary hack for XEmacs demo.
+(defvar singular-interactive-mode-menu nil)
+(defvar singular-interactive-mode-menu-2
+  (purecopy '("Singular"
+	      ["start default" singular-other t]
+	      ["start..." singular t]
+	      ["exit" singular t])))
+
+(defvar singular-interactive-mode-menu-1
+  '("Commands"
+    ["load file..." singular-load-file t]
+    ("load library"
+     ["all.lib" (singular-load-library "all.lib" t) t]
+     ["general.lib" (singular-load-library "general.lib" t) t]
+     ["matrix.lib" (singular-load-library "matrix.lib" t) t]
+     ["sing.lib" (singular-load-library "sing.lib" t) t]
+     ["elim.lib" (singular-load-library "elim.lib" t) t]
+     ["inout.lib" (singular-load-library "inout.lib" t) t]
+     ["random.lib" (singular-load-library "random.lib" t) t]
+     ["deform.lib" (singular-load-library "deform.lib" t) t]
+     ["homolg.lib" (singular-load-library "homolog.lib" t) t]
+     ["poly.lib" (singular-load-library "poly.lib" t) t]
+     ["factor.lib" (singular-load-library "factor.lib" t) t]
+     ["ring.lib" (singular-load-library "ring.lib" t) t]
+     ["primdec.lib" (singular-load-library "primdex.lib" t) t]
+     "---"
+     ["other..." singular-load-library t])
+    "---"
+    ["load demo" singular-demo-load (not singular-demo-mode)]
+    ["exit demo" singular-demo-exit singular-demo-mode]
+    "---"
+    ["truncate lines" (setq truncate-lines (not truncate-lines))
+       :style toggle :selected truncate-lines]
+    ["fold last section" singular t]
+    ["fold current section" singular t]
+    ["fold all sections" singular t]
+    ))
+
+;;(add-menu-button nil ["Singular" (singular) t] "Start Singular")
+;;}}}
+
+;;{{{ Syntax table
+(defvar singular-interactive-mode-syntax-table nil
+  "Syntax table for singular-interactive-mode")
+(if singular-interactive-mode-syntax-table
+    ()
+  (setq singular-interactive-mode-syntax-table (make-syntax-table))
+  (modify-syntax-entry ?/ ". 1456" singular-interactive-mode-syntax-table))
 ;;}}}
 
 ;;{{{ Miscellaneous
@@ -231,6 +347,24 @@ VALUE."
 (defmacro singular-process-mark ()
   "Return process mark of current buffer."
   (process-mark (get-buffer-process (current-buffer))))
+
+(defun singular-load-file (file &optional noexpand)
+  "docu NOT READY"
+  (interactive "fLoad file: ")
+  (let ((filename (if noexpand
+		      file
+		    (expand-file-name file))))
+    (singular-send-string (get-buffer-process (current-buffer))
+			  (concat "< \"" filename "\";"))))
+
+(defun singular-load-library (file &optional noexpand)
+  "docu NOT READY"
+  (interactive "fLoad Library: ")
+  (let ((filename (if noexpand
+		      file
+		    (expand-file-name file))))
+    (singular-send-string (get-buffer-process (current-buffer))
+			  (concat "LIB \"" filename "\";"))))
 ;;}}}
 
 ;;{{{ Customizing variables of comint
@@ -1481,6 +1615,16 @@ NOT READY [much more to come.  See shell.el.]!"
   (setq major-mode 'singular-interactive-mode)
   (setq mode-name "Singular Interaction")
   (use-local-map singular-interactive-mode-map)
+  (set-syntax-table singular-interactive-mode-syntax-table)
+  (if singular-interactive-mode-menu
+      ()
+    (easy-menu-define singular-interactive-mode-menu 
+		      singular-interactive-mode-map ""
+		      singular-interactive-mode-menu-1))
+  (easy-menu-add singular-interactive-mode-menu)
+  (setq comment-start "// ")
+  (setq comment-start-skip "// *")
+  (setq comment-end "")
 
   ;; customize comint for Singular
   (setq comint-prompt-regexp singular-prompt-regexp)
@@ -1536,6 +1680,14 @@ NOT READY [much more to come.  See shell.el.]!"
   ;; other input or output filters
   (add-hook 'singular-post-output-filter-functions
 	    'singular-remove-prompt-filter nil t)
+
+  ;; font-locking
+  (cond
+   ;; Emacs
+   ((eq singular-emacs-flavor 'emacs)
+    (make-local-variable 'font-lock-defaults)
+    (singular-debug 'interactive (message "Setting up font-lock for emacs"))
+    (setq font-lock-defaults singular-font-lock-defaults)))
 
   (run-hooks 'singular-interactive-mode-hook))
 ;;}}}
