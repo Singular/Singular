@@ -41,6 +41,7 @@ SINGULAR_MINOR_VERSION=2
 SINGULAR_SUB_VERSION=0
 SINGULAR_VERSION="${SINGULAR_MAJOR_VERSION}${VERSION_SEP}${SINGULAR_MINOR_VERSION}${VERSION_SEP}${SINGULAR_SUB_VERSION}"
 VERSION_DATE="June 1998"
+SINGULAR_DOS_VERSION="${SINGULAR_MAJOR_VERSION}-${SINGULAR_MINOR_VERSION}-${SINGULAR_SUB_VERSION}"
 export SINGULAR_MINOR_VERSION
 export SINGULAR_MAJOR_VERSION
 export SINGULAR_SUB_VERSION
@@ -49,8 +50,7 @@ export VERSION_DATE
 
 dnl substitue them into the Makefiles
 AC_SUBST(SINGULAR_VERSION)
-
-
+AC_SUBST(SINGULAR_DOS_VERSION)
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Those are needed to check for libs and headers, later on
@@ -60,6 +60,7 @@ AC_PROG_CPP
 AC_AIX
 
 AC_CHECK_PROGS(PERL, perl5 perl)
+AC_CHECK_PROGS(ZIP, zip pkzip)
 AC_PROG_LN_S
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
