@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.17 2002-07-03 12:42:50 anne Exp $ */
+/* $Id: misc.cc,v 1.18 2002-07-03 14:11:23 anne Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -262,6 +262,24 @@ void write_main_variable(
 {
   enter_id(module->fmtfp, t, (char *)arg1, (char *)arg2, yylineno,
            module->filename);
+  switch(type) {
+    case VAR_INFO:
+          module->info = (char *)malloc(strlen((char *)arg2)+1);
+	  memset(module->info, '\0', strlen((char *)arg2)+1);
+	  memcpy(module->info,(char *)arg2,strlen((char *)arg2));
+          break;
+    case VAR_VERSION:
+          module->version = (char *)malloc(strlen((char *)arg2)+1);
+	  memset(module->version, '\0', strlen((char *)arg2)+1);
+	  memcpy(module->version,(char *)arg2,strlen((char *)arg2));
+	  break;
+    case VAR_CATEGORY:
+          module->category = (char *)malloc(strlen((char *)arg2)+1);
+	  memset(module->category, '\0', strlen((char *)arg2)+1);
+	  memcpy(module->category,(char *)arg2,strlen((char *)arg2));
+	  break;
+    default: break;
+  }
 }
   
 /*========================================================================*/

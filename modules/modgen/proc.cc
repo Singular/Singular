@@ -1,5 +1,5 @@
 /*
- * $Id: proc.cc,v 1.19 2002-07-03 12:42:51 anne Exp $
+ * $Id: proc.cc,v 1.20 2002-07-03 14:11:24 anne Exp $
  */
 
 #include <stdio.h>
@@ -586,20 +586,28 @@ int write_helpfile_help(
       return -1;
     }
     if(trace)printf("Creating %s, ", filename);fflush(stdout);
-    fprintf(module->docfp, "$library = \"%s.so\";\n", module->targetname);
-    fprintf(module->docfp, "$version = \"%s\";\n", module->version);
+    fprintf(module->docfp, "$library = \"%s.so\";\n", 
+           (module->targetname!=NULL) ? module->targetname : module->name);
+    fprintf(module->docfp, "$version = \"%s\";\n",
+           (module->version!=NULL) ? module->version : "none");  
     fprintf(module->docfp, "$category = <<EOT;\n");
-    fprintf(module->docfp, "%s\nEOT\n",module->category);
+    fprintf(module->docfp, "%s\nEOT\n",
+           (module->category!=NULL) ? module->category : "none");
     fprintf(module->docfp, "$info = <<EOT;\n");
-    fprintf(module->docfp, "%s\nEOT\n",module->info);
+    fprintf(module->docfp, "%s\nEOT\n",
+           (module->info!=NULL) ? module->info : "none");
   }
 
   /* */
   fprintf(module->docfp, "push(@procs, \"%s\");\n",proc->procname);
   fprintf(module->docfp, "$help{\"%s\"} = << EOT;\n",proc->procname);
-  fprintf(module->docfp, "%s\nEOT\n",proc->help_string);
-  fprintf(module->docfp, "$example{\"%s\"} = << EOT;\n",proc->procname);
-  fprintf(module->docfp, "%s\nEOT\n\n",proc->example_string);
+  fprintf(module->docfp, "%s\nEOT\n",
+            (proc->help_string!=NULL) ? proc->help_string :
+	    "No help available for this command");
+  if(proc->example_string!=NULL) {
+    fprintf(module->docfp, "$example{\"%s\"} = << EOT;\n",proc->procname);
+    fprintf(module->docfp, "%s\nEOT\n\n",proc->example_string);
+  }
 
   return 0;
 }  
