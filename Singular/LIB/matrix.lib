@@ -1,6 +1,6 @@
 // GMG/BM, last modified: 8.10.98
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: matrix.lib,v 1.19 2001-01-06 00:41:54 greuel Exp $";
+version="$Id: matrix.lib,v 1.20 2001-01-07 15:21:46 greuel Exp $";
 category="Linear Algebra";
 info="
 LIBRARY:  matrix.lib    Elementary Matrix Operations
@@ -502,13 +502,13 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc gauss_col (matrix A, list #)
-"USAGE:   gauss_col(A[,e]); A matrix, e any type
+"USAGE:   gauss_col(A[,any]); A a matrix, any any type
 RETURN:  - a matrix B, if called with one argument; B is the complete column-
            reduced upper-triangular normal form of A if A is constant, 
            (resp. as far as this is possible if A is a polynomial matrix;
            no division by polynomials).
 @*       - a list L of two matrices, if called with two arguments;  
-           L satidfies L[1] = A * L[2] with L[1] the column-reduced form of A
+           L satisfies L[1] = A * L[2] with L[1] the column-reduced form of A
            and L[2] the transformation matrix.
 NOTE:    * The procedure just applies interred to A with ordering (C,dp).
            The transformation matrix is obtained by applying 'lift'.
@@ -517,6 +517,7 @@ NOTE:    * The procedure just applies interred to A with ordering (C,dp).
            pivoting and rounding error treatment).
 @*       * Parameters are allowed. Hence, if the entries of A are parameters,
            B is the column-reduced form of A over the rational function field.
+SEE ALSO:  colred
 EXAMPLE: example gauss_col; shows an example
 "
 {
@@ -525,28 +526,21 @@ EXAMPLE: example gauss_col; shows an example
    int m = ncols(A);
    module M = A;
    intvec v = option(get);
+//------------------------ change ordering if necessary ----------------------
    if( ordstr(R) != "C,dp(nvars(R))" )
    {
      changeord("@R","C,dp",R); u=1;
      matrix A = imap(R,A);
      module M = A;
    }
+//------------------------------ start computation ---------------------------
    option(redSB);
    M = simplify(interred(M),1);
- /*
-   if (#[1] == 0)
+   if(size(#) != 0) 
    {
-     M = simplify(std(M),1);
+      module N = lift(A,M);
    }
-   if (#[1] == 1)
-   {
-     M = simplify(interred(M),1);
-   }
- */
-   if (size(#) != 0)
-   {
-    module N = lift(A,M);
-   }
+//--------------- reset ring and options and return --------------------------
    if ( u==1 )
    {
       setring R;
@@ -595,7 +589,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc gauss_row (matrix A, list #)
-"USAGE:  gauss_row(A); A matrix, e any type
+"USAGE:  gauss_row(A [,e]); A matrix, e any type
 RETURN: - a matrix B, if called with one argument; B is the complete row-
           reduced lower-triangular normal form of A if A is constant,
           (resp. as far as this is possible if A is a polynomial matrix;
@@ -610,6 +604,7 @@ NOTE:   * This procedure just applies gauss_col to the transposed matrix.
           pivoting and rounding error treatment).
 @*      * Parameters are allowed. Hence, if the entries of A are parameters,
           B is the row-reduced form of A over the rational function field.
+SEE ALSO: rowred
 EXAMPLE: example gauss_row; shows an example
 "
 {
@@ -632,7 +627,6 @@ example
    0, 0,  0, 0, 0,  0, 2b, A, 
    0, 0,  0, 0, 0,  0, 0, 2a;"";
    print(gauss_row(m));"";
-
    ring S=0,x,dp;
    matrix A[4][5] =  3, 1,1,-1,2,
                     13, 8,6,-7,1,
@@ -765,15 +759,16 @@ RETURN:  - a matrix B, being the row reduced form of A, if rowred is called
 @*       - a list L of two matrices, such that L[1] = L[2] * A with L[1]
            the row-reduced form of A and L[2] the transformation matrix
            (if rowred is called with two arguments).
-NOTE:    * This procedure is designed for teaching purposes only.
+NOTE:    * This procedure is designed for teaching purposes mainly.
 @*       * The straight forward Gaussian algorithm is implemented in the 
-           library (no standard basis computation), hence it is not very 
-           efficient. The transformation matrix is obtained by concatenating
-           a unit matrix to A, proc gauss_red should be faster.
+           library (no standard basis computation).
+           The transformation matrix is obtained by concatenating a unit 
+           matrix to A. proc gauss_row should be faster.
 @*       * It should only be used with exact coefficient field (there is no
            pivoting) over the polynomial ring (ordering lp or dp).
 @*       * Parameters are allowed. Hence, if the entries of A are parameters
            the computation takes place over the field of rational functions.
+SEE ALSO:  gauss_row
 EXAMPLE: example rowred; shows an example
 "
 {
@@ -849,13 +844,14 @@ RETURN:  - a matrix B, being the column reduced form of A, if colred is
 @*       - a list L of two matrices, such that L[1] = A * L[2] with L[1]
            the column-reduced form of A and L[2] the transformation matrix
            (if colred is called with two arguments).
-NOTE:    * This procedure is designed for teaching purposes only.
-@*       * It applies rowred to the transposed matrix, hence it is not very 
-           efficient (cf. rowred); proc gauss_col should be faster.
+NOTE:    * This procedure is designed for teaching purposes mainly.
+@*       * It applies rowred to the transposed matrix.
+           proc gauss_col should be faster.
 @*       * It should only be used with exact coefficient field (there is no
            pivoting) over the polynomial ring (ordering lp or dp).
 @*       * Parameters are allowed. Hence, if the entries of A are parameters
            the computation takes place over the field of rational functions.
+SEE ALSO:  gauss_col
 EXAMPLE: example colred; shows an example
 "
 {
