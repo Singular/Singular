@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.2 1999-05-26 16:20:17 obachman Exp $ */
+/* $Id: kbuckets.cc,v 1.3 1999-09-27 13:35:53 obachman Exp $ */
 
 #include "mod2.h"
 #include "tok.h"
@@ -24,7 +24,7 @@
 inline unsigned int pLogLength(unsigned int l)
 {
   unsigned int i = 0;
-  
+
   if (l == 0) return 0;
   l--;
   while ((l = (l >> 2))) i++;
@@ -37,7 +37,7 @@ inline unsigned int pLogLength(poly p)
   return pLogLength((unsigned int) pLength(p));
 }
 
-  
+
 
 #if defined(PDEBUG) && ! defined(HAVE_PSEUDO_BUCKETS)
 
@@ -49,19 +49,19 @@ void kbDBTest(kBucket_pt bucket, int i, char* file, int line)
   pDBTest(bucket->buckets[i], file, line);
   if (bucket->buckets_length[i] != pLength(bucket->buckets[i]))
   {
-    Warn("Bucket %d lengths difference should:%d has:%d in %s:%d\n",
+    Warn("Bucket %d lengths difference should:%d has:%d in %s:%d",
           i, bucket->buckets_length[i], pLength(bucket->buckets[i]), file, line);
     assume(0);
   }
   else if (i > 0 && (int) pLogLength(bucket->buckets_length[i]) > i)
   {
-    Warn("Bucket %d too long %d in %s:%d\n", 
+    Warn("Bucket %d too long %d in %s:%d",
           i, bucket->buckets_length[i], file, line);
     assume(0);
   }
   else if (i==0 && bucket->buckets_length[0] > 1)
   {
-    Warn("Bucket 0 too long \n");
+    Warn("Bucket 0 too long");
   }
 }
 
@@ -78,16 +78,16 @@ void kbDBTests(kBucket_pt bucket, char* file, int line)
     if (lm != NULL &&  bucket->buckets[i] != NULL
         && pComp0(lm, bucket->buckets[i]) != 1)
     {
-      Warn("Bucket %d larger than lm in %s:%d\n", i, file, line);
+      Warn("Bucket %d larger than lm in %s:%d", i, file, line);
       assume(0);
     }
   }
-  
+
   for (; i<=MAX_BUCKET; i++)
   {
     if (bucket->buckets[i] != NULL || bucket->buckets_length[i] != 0)
     {
-      Warn("Bucket %d not zero in %s:%d\n", i, file, line);
+      Warn("Bucket %d not zero in %s:%d", i, file, line);
       assume(0);
     }
   }
@@ -125,7 +125,7 @@ void kBucketDestroy(kBucket_pt *bucket)
 
 inline void kBucketAdjustBucketsUsed(kBucket_pt bucket)
 {
-  while ( bucket->buckets_used > 0 &&  
+  while ( bucket->buckets_used > 0 &&
           bucket->buckets[bucket->buckets_used] == NULL)
     (bucket->buckets_used)--;
 }
@@ -151,8 +151,8 @@ inline void kBucketMergeLm(kBucket_pt bucket)
     bucket->buckets_length[0] = 0;
   }
 }
-           
-                             
+
+
 static BOOLEAN kBucketIsCleared(kBucket_pt bucket)
 {
   int i;
@@ -170,7 +170,7 @@ void kBucketInit(kBucket_pt bucket, poly lm, int length,
                  memHeap heap)
 {
   int i;
-  
+
   assume(bucket != NULL);
   assume(length <= 0 || length == pLength(lm));
   assume(kBucketIsCleared(bucket));
@@ -206,7 +206,7 @@ static void kBucketSetLm(kBucket_pt bucket)
   poly lt;
   BOOLEAN zero = FALSE;
   assume(bucket->buckets[0] == NULL && bucket->buckets_length[0] == 0);
-  
+
   do
   {
     j = 0;
@@ -216,8 +216,8 @@ static void kBucketSetLm(kBucket_pt bucket)
       {
         int comp = (j == 0 ? 1 :
                     pComp0(bucket->buckets[i], bucket->buckets[j]));
-        
-        if (comp > 0) 
+
+        if (comp > 0)
         {
           if (j > 0 &&
               bucket->buckets[j] != NULL &&
@@ -248,7 +248,7 @@ static void kBucketSetLm(kBucket_pt bucket)
   }
   while (j < 0);
 
-  if (j == 0) 
+  if (j == 0)
   {
     return;
   }
@@ -289,7 +289,7 @@ static int kBucketCanonicalize(kBucket_pt bucket)
   bucket->buckets[1] = NULL;
   bucket->buckets_length[1] = 0;
 
-  
+
   for (i=2; i<=bucket->buckets_used; i++)
   {
     bucket->pprocs->p_Add_q(&p, &pl,
@@ -346,14 +346,14 @@ void kBucketInit(kBucket_pt bucket, poly lm, int length,
                  memHeap heap)
 {
   int i;
-  
+
   assume(bucket != NULL);
   assume(length <= 0 || length == pLength(lm));
 
   bucket->p = lm;
   if (length <= 0) bucket->l = pLength(lm);
   else bucket->l = length;
-  
+
   bucket->heap = heap;
   assume(pprocs != NULL);
   bucket->pprocs = pprocs;
@@ -376,7 +376,7 @@ poly kBucketExtractLm(kBucket_pt bucket)
 
 void kBucketClear(kBucket_pt bucket, poly *p, int *length)
 {
-  assume(pLength(bucket->p) == bucket->l); 
+  assume(pLength(bucket->p) == bucket->l);
   *p = bucket->p;
   *length = bucket->l;
   bucket->p = NULL;
@@ -405,10 +405,10 @@ void kBucketCompactifyIfNecessary(kBucket_pt bucket)
     pNext(bucket->buckets[0]) = NULL;
   }
 }
-    
+
 #else
 
-#define kBucketCompactifyIfNecessary(b) 
+#define kBucketCompactifyIfNecessary(b)
 
 #endif
 
@@ -420,13 +420,13 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
 {
 #ifndef HAVE_PSEUDO_BUCKETS
   int i;
-  
+
   for (i=0; i<= bucket->buckets_used; i++)
-    if (bucket->buckets[i] != NULL) 
+    if (bucket->buckets[i] != NULL)
       bucket->pprocs->n_Mult_p(n, bucket->buckets[i]);
 #else
   bucket->pprocs->n_Mult_p(n, bucket->p);
-#endif  
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -434,23 +434,23 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
 /// Bpoly == Bpoly - m*p; where m is a monom
 /// Does not destroy p and m
 /// assume (*l <= 0 || pLength(p) == *l)
-void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l, 
+void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
                             poly spNoether)
 {
   assume (*l <= 0 || pLength(p) == *l);
   int i, l1;
   poly p1 = p;
-  
-  if (*l <= 0) 
+
+  if (*l <= 0)
   {
     l1 = pLength(p1);
     *l = l1;
   }
   else
     l1 = *l;
-  
+
   if (m == NULL || p == NULL) return;
-  
+
 #ifndef HAVE_PSEUDO_BUCKETS
   kBucketMergeLm(bucket);
   i = pLogLength(l1);
@@ -460,7 +460,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
     bucket->pprocs->p_Minus_m_Mult_q
       (&(bucket->buckets[i]), &(bucket->buckets_length[i]),
        m,
-       p1, l1, 
+       p1, l1,
        spNoether,
        bucket->pprocs->p_Mult_m,
        bucket->heap);
@@ -472,7 +472,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
     while (bucket->buckets[i] != NULL)
     {
       bucket->pprocs->p_Add_q(&p1, &l1,
-                              &(bucket->buckets[i]), 
+                              &(bucket->buckets[i]),
                               &(bucket->buckets_length[i]),
                               bucket->heap);
       i = pLogLength(l1);
@@ -487,29 +487,29 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
 
   bucket->buckets[i] = p1;
   bucket->buckets_length[i]=l1;
-  if (i >= bucket->buckets_used) 
+  if (i >= bucket->buckets_used)
     bucket->buckets_used = i;
   else
     kBucketAdjustBucketsUsed(bucket);
 #else // HAVE_PSEUDO_BUCKETS
   bucket->pprocs->p_Minus_m_Mult_q(&(bucket->p), &(bucket->l),
-                                   m, p, l1, spNoether, 
+                                   m, p, l1, spNoether,
                                    bucket->pprocs->p_Mult_m,
                                    bucket->heap);
-#endif  
+#endif
   kbTests(bucket);
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// 
+//
 // Extract all monomials from bucket with component comp
 // Return as a polynomial *p with length *l
-// In other words, afterwards 
+// In other words, afterwards
 // Bpoly == Bpoly - (poly consisting of all monomials with component comp)
 // and components of monomials of *p are all 0
-// 
-void kBucketTakeOutComp(kBucket_pt bucket, 
-                        Exponent_t comp, 
+//
+void kBucketTakeOutComp(kBucket_pt bucket,
+                        Exponent_t comp,
                         poly *r_p, int *l)
 {
   poly p = NULL, q;
@@ -535,20 +535,20 @@ void kBucketTakeOutComp(kBucket_pt bucket,
 #else
   pTakeOutComp(&(bucket->p), comp, &p, &lp);
   (bucket->l) -= lp;
-#endif  
+#endif
   *r_p = p;
   *l = lp;
-  
+
   kbTests(bucket);
 }
 
-void kBucketDecrOrdTakeOutComp(kBucket_pt bucket, 
-                               Exponent_t comp, Order_t order, 
+void kBucketDecrOrdTakeOutComp(kBucket_pt bucket,
+                               Exponent_t comp, Order_t order,
                                poly *r_p, int *l)
 {
   poly p = NULL, q;
   int i, lp = 0, lq;
-  
+
 #ifndef HAVE_PSEUDO_BUCKETS
   kBucketMergeLm(bucket);
   for (i=1; i<=bucket->buckets_used; i++)
@@ -567,30 +567,30 @@ void kBucketDecrOrdTakeOutComp(kBucket_pt bucket,
 #else
   pDecrOrdTakeOutComp(&(bucket->p), comp, order, &p, &lp);
   (bucket->l) -= lp;
-#endif  
+#endif
 
   *r_p = p;
   *l = lp;
 }
-  
+
 /////////////////////////////////////////////////////////////////////////////
 // Reduction of Bpoly with a given poly
 //
 
 extern int spCheckCoeff(number *a, number *b);
 
-number kBucketPolyRed(kBucket_pt bucket, 
-                      poly p1, int l1, 
+number kBucketPolyRed(kBucket_pt bucket,
+                      poly p1, int l1,
                       poly spNoether)
 {
-  assume(p1 != NULL && 
+  assume(p1 != NULL &&
          pDivisibleBy(p1,  kBucketGetLm(bucket)));
   assume(pLength(p1) == (int) l1);
 
   poly a1 = pNext(p1), lm = kBucketExtractLm(bucket);
   BOOLEAN reset_vec=FALSE;
   number rn;
-  
+
   if(a1==NULL)
   {
     kb_pDelete1(lm, bucket->heap);
@@ -614,13 +614,15 @@ number kBucketPolyRed(kBucket_pt bucket,
   {
     pSetCompP(a1, pGetComp(lm));
     reset_vec = TRUE;
+    pSetComp(lm, pGetComp(p1));
+    pSetm(lm);
   }
-  
+
   spMonSub(lm,p1);
   l1--;
 
   kBucket_Minus_m_Mult_p(bucket, lm, a1, &l1, spNoether);
-  
+
   kb_pDelete1(lm, bucket->heap);
   if (reset_vec) spModuleToPoly(a1);
   kbTests(bucket);
@@ -653,23 +655,23 @@ void kBucketRedHomog (LObject* h,kStrategy strat)
     PrintS(" ");
   }
 #endif
-  
+
   kBucketInit(&(strat->bucket), h->p, h->length, &(strat->pprocs),
               h->heap);
-  
+
   lm = kBucketGetLm(&(strat->bucket));
-  
+
   for(;;)
   {
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG) Print("%d",j);
 #endif
     j = 0;
-    
+
 #ifdef KB_HAVE_SHORT_EVECTORS
     unsigned long ev = ~ pGetShortExpVector(lm);
 #endif
-    
+
     if (strat->ak)
     {
       while(j <= strat->tl)
@@ -715,8 +717,8 @@ void kBucketRedHomog (LObject* h,kStrategy strat)
       /*- compute the s-polynomial -*/
     if (strat->T[j].length <= 0)
       strat->T[j].length = pLength(strat->T[j].p);
-      
-    // Compactify 
+
+    // Compactify
     kBucketCompactifyIfNecessary(&(strat->bucket));
 
     number up = kBucketPolyRed(&(strat->bucket),
@@ -724,7 +726,7 @@ void kBucketRedHomog (LObject* h,kStrategy strat)
                                strat->kNoether);
     nDelete(&up);
     lm = kBucketGetLm(&(strat->bucket));
-      
+
     if (lm == NULL)
     {
       h->p = NULL;
@@ -767,7 +769,7 @@ void kBucketRedHoney (LObject*  h,kStrategy strat)
   }
 #endif
   kTest(strat);
-  
+
   if (strat->fromT)
   {
     HeapPoly b_hp(h->heap), r_hp(h->p, h->length);
@@ -780,7 +782,7 @@ void kBucketRedHoney (LObject*  h,kStrategy strat)
                 h->heap);
 
   poly lm = kBucketGetLm(&(strat->bucket));
-  
+
   strat->fromT=FALSE;
 
   while (1)
@@ -789,7 +791,7 @@ void kBucketRedHoney (LObject*  h,kStrategy strat)
 #ifdef KB_HAVE_SHORT_EVECTORS
     unsigned long ev = ~ pGetShortExpVector(lm);
 #endif
- 
+
     if (strat->ak)
     {
       while(j <= strat->tl)
@@ -807,7 +809,7 @@ void kBucketRedHoney (LObject*  h,kStrategy strat)
           j++;
         else
           goto Found;
-#else        
+#else
         if (pDivisibleBy2(strat->T[j].p,lm)) goto Found;
         j++;
 #endif
@@ -817,7 +819,7 @@ void kBucketRedHoney (LObject*  h,kStrategy strat)
     assume(j > strat->tl);
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG) PrintLn();
-#endif  
+#endif
     kBucketClear(&(strat->bucket), &(h->p), &(h->length));
     if (TEST_OPT_INTSTRATEGY) pCleardenom(h->p);// also does a pContent
     return;
@@ -836,7 +838,7 @@ void kBucketRedHoney (LObject*  h,kStrategy strat)
       li =  strat->T[j].length;
     }
 
-      
+
     /*
      * the polynomial to reduce with (up to the moment) is;
      * pi with ecart ei
@@ -1025,8 +1027,8 @@ void kBucketRedTail(LObject *hp, int pos, kStrategy strat)
                       &(strat->pprocs),
                       hp->heap);
         }
-        number up = kBucketPolyRed(&(strat->bucket), strat->S[j], 
-                                   pLength(strat->S[j]), 
+        number up = kBucketPolyRed(&(strat->bucket), strat->S[j],
+                                   pLength(strat->S[j]),
                                    strat->kNoether);
         nDelete(&up);
         hn = kBucketGetLm(&(strat->bucket));
@@ -1058,7 +1060,7 @@ void kBucketRedTail(LObject *hp, int pos, kStrategy strat)
     }
     length++;
   }
-  
+
 
   Finish:
   assume(pLength(hp->p) == length);
