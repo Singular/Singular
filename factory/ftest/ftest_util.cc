@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_util.cc,v 1.14 1997-11-21 14:07:22 schmidt Exp $ */
+/* $Id: ftest_util.cc,v 1.15 1998-03-11 16:11:06 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -136,31 +136,6 @@ static char * ftestSeedFile = 0;
 //
 // - static functions.
 //
-
-//{{{ static const char * ftestSubStr( const char * subString, const char * string )
-//{{{ docu
-//
-// ftestSubStr() - check whether subString is a substring of string.
-//
-// If so, return index behind subString in string, otherwise
-// string.
-//
-//}}}
-static const char *
-ftestSubStr( const char * subString, const char * string )
-{
-    const char * stringStart = string;
-
-    while ( *subString && *subString == *string ) {
-	subString++; string++;
-    }
-
-    if ( *subString )
-	return stringStart;
-    else
-	return string;
-}
-//}}}
 
 //{{{ static char * ftestConcatEnv ( char ** argv, int & optind )
 //{{{ docu
@@ -589,7 +564,54 @@ ftestSkipBlancs ( const char * string )
 }
 //}}}
 
-//{{{ void ftestError ( const ftestErrorT errno, const char * format ... )
+//{{{ char * ftestCutBlancs ( char * string )
+//{{{ docu
+//
+// ftestCutBlancs() - cut off all trailing blancs in `string'.
+//
+// Returns `string' unchanged.
+//
+//}}}
+char *
+ftestCutBlancs ( char * string )
+{
+    char * stringCursor = string + strlen( string );
+
+    while ( (string != stringCursor)
+	    && isspace( *(stringCursor-1) ) )
+	stringCursor--;
+
+    *stringCursor = '\0';
+    return string;
+}
+//}}}
+
+//{{{ const char * ftestSubStr ( const char * subString, const char * string )
+//{{{ docu
+//
+// ftestSubStr() - check whether subString is a substring of string.
+//
+// If so, return index behind subString in string, otherwise
+// string.
+//
+//}}}
+const char *
+ftestSubStr ( const char * subString, const char * string )
+{
+    const char * stringStart = string;
+
+    while ( *subString && *subString == *string ) {
+	subString++; string++;
+    }
+
+    if ( *subString )
+	return stringStart;
+    else
+	return string;
+}
+//}}}
+
+//{{{ void ftestError ( ftestErrorT errno, const char * format ... )
 //{{{ docu
 //
 // ftestError() - main error handler.
@@ -601,7 +623,7 @@ ftestSkipBlancs ( const char * string )
 //
 //}}}
 void
-ftestError ( const ftestErrorT errno, const char * format ... )
+ftestError ( ftestErrorT errno, const char * format ... )
 {
     // print error message
     if ( format ) {
@@ -616,6 +638,8 @@ ftestError ( const ftestErrorT errno, const char * format ... )
     }
 
     switch ( errno ) {
+    case noError:
+	return;
     case CommandlineError:
     case EnvSyntaxError: 
     case CanFormSpecError:
@@ -734,7 +758,7 @@ ftestSetName ( const char * execName, const char * algorithmName, const char * u
 }
 //}}}
 
-//{{{ void ftestGetOpts ( const int argc, char ** argv, int & optind )
+//{{{ void ftestGetOpts ( int argc, char ** argv, int & optind )
 //{{{ docu
 //
 // ftestGetOpts() - read options from commandline.
@@ -743,7 +767,7 @@ ftestSetName ( const char * execName, const char * algorithmName, const char * u
 //
 //}}}
 void
-ftestGetOpts ( const int argc, char ** argv, int & optind )
+ftestGetOpts ( int argc, char ** argv, int & optind )
 {
     // parse command line
     int optionChar;
@@ -775,7 +799,7 @@ ftestGetOpts ( const int argc, char ** argv, int & optind )
 }
 //}}}
 
-//{{{ void ftestGetEnv ( const int, char ** argv, int & optind )
+//{{{ void ftestGetEnv ( int, char ** argv, int & optind )
 //{{{ docu
 //
 // ftestGetEnv() - read factory environment specs, set environment.
@@ -785,7 +809,7 @@ ftestGetOpts ( const int argc, char ** argv, int & optind )
 //
 //}}}
 void
-ftestGetEnv ( const int, char ** argv, int & optind )
+ftestGetEnv ( int, char ** argv, int & optind )
 {
     // initialize environment
     ftestEnv.seed = 0;
@@ -800,6 +824,65 @@ ftestGetEnv ( const int, char ** argv, int & optind )
     char * envString = ftestConcatEnv( argv, optind );
     ftestParseEnv( envString );
     delete [] envString;
+}
+//}}}
+
+//{{{ bool ftestSearchTaggedArg ( int, char ** argv, int & optind, const char * optionTag )
+//{{{ docu
+//
+// ftestSearchTaggedArg() - search for tagged argument.
+//
+// If the current argument (`argv[ optind ]') is of the form
+// `<tag>=<value>', where `<tag>' is a substring of
+// `<optionTag>', the current argument is modified to point
+// directly after the `=' sign and `true' is returned.
+//
+// Otherwise, `false' is returned.
+//
+// Note: There may be arbitrary white-space between the several
+// tokens of the tagged argument, but the tokens must not span
+// more than one argument.
+//
+//}}}
+bool
+ftestSearchTaggedArg ( int, char ** argv, int & optind, const char * optionTag )
+{
+    const char * tokenCursor;
+    const char * tokenString = argv[ optind ];
+    int tokenLen;
+
+    // check for end of argument list
+    if ( ! tokenString )
+	return false;
+
+    // skip leading blancs
+    tokenString = ftestSkipBlancs( tokenString );
+
+    // check whether it is a tagged argument
+    tokenCursor = strchr( tokenString, '=' );
+    if ( ! tokenCursor )
+	return false;
+    tokenLen = tokenCursor - tokenString;
+
+    // isolate possible keyword
+    char * keyword = new char[ tokenLen+1 ];
+    strncpy( keyword, tokenString, tokenLen );
+    keyword[ tokenLen ] = '\0';
+    ftestCutBlancs( keyword );
+
+    // advance tokenString after `=' sign
+    tokenString = tokenCursor+1;
+
+    // check whether keyword is a substring of `optionTag'
+    tokenCursor = ftestSubStr( keyword, optionTag );
+    if ( tokenCursor == optionTag ) {
+	// optionTag not found
+	delete [] keyword;
+	return false;
+    } else {
+	argv[ optind ] = (char *)tokenString;
+	return true;
+    }
 }
 //}}}
 
@@ -823,28 +906,28 @@ ftestWriteSeed ()
 }
 //}}}
 
-//{{{ void ftestPrintTimer ( const long timer )
+//{{{ void ftestPrintTimer ( long timer )
 //{{{ docu
 //
 // ftestPrintTimer() - print value of timer.
 //
 //}}}
 void
-ftestPrintTimer ( const long timer )
+ftestPrintTimer ( long timer )
 {
     if ( ftestPrintTimingFlag )
 	cout << "Time:\t\t" << (float)timer / HZ << endl;
 }
 //}}}
 
-//{{{ void ftestPrintCheck ( const ftestSatusT check )
+//{{{ void ftestPrintCheck ( ftestSatusT check )
 //{{{ docu
 //
 // ftestPrintCheck() - print status of checks.
 //
 //}}}
 void
-ftestPrintCheck ( const ftestStatusT check )
+ftestPrintCheck ( ftestStatusT check )
 {
     if ( ftestPrintCheckFlag ) {
 	char * checkStr = 0;

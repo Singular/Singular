@@ -1,4 +1,4 @@
-dnl $Id: ftest_util.m4,v 1.15 1998-02-19 15:10:07 schmidt Exp $
+dnl $Id: ftest_util.m4,v 1.16 1998-03-11 16:11:17 schmidt Exp $
 dnl
 dnl ftest_util.m4 - m4 macros used by the factory test environment.
 dnl
@@ -109,22 +109,30 @@ define(`ftestMainExit', `dnl
     `return check'')
 
 #
+# ftestDefaultInitializer() - return type dependent default
+#   initializer.
+#
+# $1: type
+#
+define(`ftestDefaultInitializer', `dnl
+ifelse(
+  `$1', `int', `` = 0'',
+  `$1', `bool', `` = false'',
+  `')')
+
+#
 # ftestOutVar() - declare output variable.
 #
 # $1: type of output variable
 # $2: name of output variable
 #
-# Stores type of variable in macro _ftestOutType_<name>.
-# Does some extra magic for int's to avoid warnings on
+# Stores type of variable in macro _ftestOutType_<name>.  Does
+# some extra magic for internal data types to avoid warnings on
 # uninitialized variables.
 #
 define(`ftestOutVar', `dnl
 define(`_ftestOutType_'_qstripTWS(`$2'), `$1')dnl
-ifelse(`$1', `int',
-  ``$1 '_qstripTWS(`$2')` = 0'',
-  `$1', `bool',
-  ``$1 '_qstripTWS(`$2')` = false'',
-  ``$1 '_qstripTWS(`$2')')')
+`$1 '_qstripTWS(`$2')ftestDefaultInitializer(`$1')')
 
 #
 # ftestInVar() - declare input variable.
@@ -136,14 +144,12 @@ ifelse(`$1', `int',
 # Furthermore, declares a variable ftestArgGiven<name> for later
 # checks whether this variable has been set from commandline or
 # not.
-# Does some extra magic for int's to avoid warnings on
-# uninitialized variables.
+# Does some extra magic for internal data types to avoid warnings
+# on uninitialized variables.
 #
 define(`ftestInVar', `dnl
 define(`_ftestInType_'_qstripTWS(`$2'), `$1')dnl
-ifelse(`$1', `int',
-  ``$1 '_qstripTWS(`$2')` = 0;'',
-  ``$1 '_qstripTWS(`$2')`;'')`
+`$1 '_qstripTWS(`$2')ftestDefaultInitializer(`$1')`;
     bool ftestArgGiven$2= false'')
 
 #
@@ -162,24 +168,35 @@ define(`ftestGetEnv', `dnl
 `#line' __line__ "__file__"
     `ftestGetEnv( argc, argv, optind );
 
-    ftestPrintEnv()'')
+    ftestPrintEnv();
+
+'dnl')
 
 #
 # ftestGetInVar() - read variable from command line.
 #
 # $1: name of input variable
 # $2: default for optional command line arguments
+# $3: search for optional argument with this tag
 #
 # Before reading the argument, check whether it really exists.
 # If so, call the appropriate function to convert the string into
 # the type of the variable you are reading.  If there are not any
 # more arguments, and there is no default specified, print an
 # error.  If there is a default value, use it instead.
+#
+# If optional third argument is given, call
+# `ftestSearchTaggedArg()' to check whether there is a tagged
+# optional argument `<tag> = <value>' where `<tag>' is a
+# substring of `$3'.  Use `<value>' as value for the input
+# variable in this case, `$2' otherwise.
+#
 # In any case, save the fact whether the argument was given or
 # not in the variable ftestArgGiven<name>.
 #
 define(`ftestGetInVar', `dnl
-ifelse(`$#', `1',
+ifelse(
+  `$#', `1',
   ``if ( argv[ optind ] ) {
         ftestArgGiven$1= true;
         $1= ftestGet'_stripTWS(`_ftestInType_$1')`( argv[ optind++ ] );
@@ -187,7 +204,13 @@ ifelse(`$#', `1',
 	ftestError( CommandlineError,
                     "expected '_stripTWS(`_ftestInType_$1')` at position %d in commandline\n",
                     optind );'',
+  `$#', `2',
   ``if ( argv[ optind ] ) {
+	ftestArgGiven$1 = true;
+	$1 = ftestGet'_stripTWS(`_ftestInType_$1')`( argv[ optind++ ] );
+    } else
+	$1 = '_qstripTWS(`$2')`;'',
+  ``if ( ftestSearchTaggedArg( argc, argv, optind, $3) ) {
 	ftestArgGiven$1 = true;
 	$1 = ftestGet'_stripTWS(`_ftestInType_$1')`( argv[ optind++ ] );
     } else
@@ -214,7 +237,12 @@ define(`ftestArgGiven', `dnl
 #
 define(`ftestRun', `dnl
 `#line' __line__ "__file__"
-    `// save random generator seed now since the algorithm
+    `// check for superfluous command line arguments
+    if ( argv[ optind ] )
+	ftestError( CommandlineError, "superfluous argument `%s' at position %d",
+                    argv[ optind ], optind );
+
+    // save random generator seed now since the algorithm
     // most likely is going to change it
     ftestWriteSeed();
 
@@ -249,7 +277,8 @@ define(`ftestCheck', `dnl
 
 # internal auxiliary function
 define(`_ftestOutput', `dnl
-ifelse(`$#', `0', ,
+ifelse(
+  `$#', `0', ,
   `$#', `1', ,
 ``;
     ftestPrintResult( $1, '_qstripTWS(`$2')` )'_ftestOutput(shift(shift($@)))')')

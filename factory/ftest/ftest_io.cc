@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_io.cc,v 1.10 1997-11-21 13:59:07 schmidt Exp $ */
+/* $Id: ftest_io.cc,v 1.11 1998-03-11 16:10:54 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -137,6 +137,46 @@ ftestGetint ( const char * stringInt )
 		    "extra characters after int spec `%s'\n", stringInt );
 
     return i;
+}
+//}}}
+
+//{{{ bool ftestGetbool ( const char * stringBool )
+//{{{ docu
+//
+// ftestGetbool() - read an boolean from stringBool,
+//   return it.
+//
+//}}}
+bool
+ftestGetbool ( const char * stringBool )
+{
+    const char * tokenCursor;
+
+    bool b;
+    // skip blancs
+    stringBool = ftestSkipBlancs( stringBool );
+
+    // look for "true" or "false"
+    tokenCursor = ftestSubStr( "true", stringBool );
+    if ( stringBool != tokenCursor )
+	b = true;
+    else {
+	tokenCursor = ftestSubStr( "false", stringBool );
+	b = false;
+    }
+
+    // do error checks
+    if ( stringBool == tokenCursor )
+	ftestError( CommandlineError,
+		    "bool expected at `%s'\n", stringBool );
+
+    // check for extra characters
+    stringBool = ftestSkipBlancs( tokenCursor );
+    if ( *stringBool )
+	ftestError( CommandlineError,
+		    "extra characters after bool spec `%s'\n", stringBool );
+
+    return b;
 }
 //}}}
 

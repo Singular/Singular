@@ -1,9 +1,9 @@
 #! /home/schmidt/bin/bash
-# $Id: runfex,v 1.5 1998-02-02 11:00:54 schmidt Exp $
+# $Id: runfex,v 1.6 1998-03-11 16:11:28 schmidt Exp $
 
 #{{{ docu
 #
-# runfxc - run factory example collection.
+# runfex - run factory example collection.
 #
 #}}}
 
@@ -129,6 +129,8 @@ runAlgorithm()
 #
 # $1: options how to print data
 # $2: default width to print data
+# $3: name of example/collection
+# $4: note on example/collection
 #
 # Global variables used:
 #   alg* algorithm information,
@@ -138,6 +140,8 @@ printData()
 {
     typeset \
 	options="$1" \
+	name="$3" \
+	note="$4" \
 	colWidth
 
     colWidth="${options//[a-z]/}"
@@ -148,6 +152,16 @@ printData()
 
     while [ -n "$options" ]; do
 	case "$options" in
+	    (*h*)
+		# do some pretty printing
+		if [ ${#name} -lt 7 ]; then
+		    echo "$name:		$note."
+		elif  [ ${#name} -lt 15 ]; then
+		    echo "$name:	$note."
+		else
+		    echo "$name: $note."
+		fi
+		 options="${options//h/}" ;;
 	    (*p*) echo "$algChar"
 		 options="${options//p/}" ;;
 	    (*s*) echo "$algSwitch"
@@ -337,8 +351,6 @@ example()
     if skipExample "$exampleName"; then
 	if [ -n "$debugMode" ]; then
 	    echo "skipping $exampleName"
-	else
-	    warn "skipping $exampleName"
 	fi
 	return
     else
@@ -422,7 +434,7 @@ example()
 	done
 
 	# print table
-	printData "$algorithmTBOptions" "$TBColWidth"
+	printData "$algorithmTBOptions" "$TBColWidth" "$exampleName" "$exampleNote"
     }
     #}}}
 }
@@ -434,7 +446,6 @@ example()
 # - main program.
 #
 # runROOptions: options for RO table.  Read from commandline.
-# runNote: comment on run.  Read from commandline.
 # rawCollectionName: collection name with full path
 #
 # Global variables used:
@@ -444,15 +455,13 @@ example()
 #
 #}}}
 typeset runROOptions=""
-typeset runNote=""
 typeset rawCollectionName=""
 
 #{{{ read options and environment
 # read options
 typeset opt
-while getopts "n:a:c:C:t:r:d" opt; do
+while getopts "a:c:C:t:r:d" opt; do
     case "$opt" in
-	(n)  runNote="$OPTARG" ;;
 	(a)  runOptions="$runOptions -a$OPTARG" ;;
 	(c)  runOptions="$runOptions -c$OPTARG" ;;
 	(C)  runConfiguration="$OPTARG" ;;
@@ -517,7 +526,7 @@ if [ -z "$debugMode" ]; then
 	# remove some options
 	options="${options//tcrd/}"
 
-	printData "$options" "$ROColWidth"
+	printData "$options" "$ROColWidth" "$collectionName" "$collectionNote"
     }
 fi
 #}}}

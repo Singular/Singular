@@ -1,7 +1,72 @@
+Wed Feb 25 17:26:18 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* runfex (printData): arguments `$name' and `$note' re-added
+	  which are printed on occurence of `h' in `$options'.  All
+	  callers changed.
+
+	* runfex (main): variable `$runNote' and corresponding commandline
+	  option removed.
+
+	* gcd.fex (collection gcd): cosmetic changes
+
+	* gcd.fex (univ0RanA, univ0RanB, univ0CofactorSerialA,
+	  univ0GCDSerialA): real results added
+
+	* gcd.fex (univ0CofactorSerialA): slightly modified
+
+	* ftest_util.m4 (ftestGetInVar): recognizes tagged arguments
+
+	* ftest_util.m4 (ftestGetEnv, _ftestOutput): cosmetic changes
+
+	* ftest_util.m4 (ftestRun): checks for end of commandline before
+	  running algorithm
+
+	* ftest_util.m4 (ftestDefaultInitializer): new macro.
+	* ftest_util.m4 (ftestOutVar, ftestInVar): call
+	  `ftestDefaultInitializer()' to write default initializer
+
+	* ftest_io.cc (ftestGetbool): new function.  Declaration adapted.
+
+	* ftest_util.cc (ftestSearchTaggedArg, ftestCutBlancs): new
+	  functions.  Declarations adapted.
+
+	* ftest_util.cc (ftestSubStr): made external.  Declaration
+	  adapted.
+
+	* ftest_util.cc (ftestError, ftestGetOpts, ftestGetEnv,
+	  ftestPrintTimer, ftestPrintEnv): superfluous `const' removed
+	  from signature.  Declarations adapted.
+
+Fri Feb 20 18:29:40 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* ftest_util.cc (ftestError): returns on `errno' == `noError'
+
+	* ftest_util.h (ftestErrorT): `Ok' renamed to `noError'
+
+Thu Feb 19 16:07:09 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* ftest_util.m4: `#line' preprocessor directives added to most of
+	  the macros (that's cool, man!)
+
+	* ftest_util.m4 (ftestSetEnv): macro removed
+
 Mon Feb  2 11:59:36 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* runfex (runConfiguration): new global variable.  `runfex'
 	  supports different configurations.
+
+Fri Jan 30 15:11:23 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* gcd.fex (univ0CofactorSerialA, univ0GCDSerialA): new examples
+
+	* gcd.fex (univ0RanC, univ0RanD): examples removed
+
+	* runfex: (example): does not print `skipping example ...'
+
+	* runfex: cosmetic changes
+
+	* runfex: totally rewritten.  Does not print html-code any longer,
+	  only ASCII-information.
 
 Thu Jan 22 10:46:03 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
