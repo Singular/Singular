@@ -120,10 +120,10 @@ static proc BCall(string Name, list #)
 ///////////////////////////////////////////////////////////////////////////////
 static proc ECall(string Name, list #)
 {
-    if( toprint() )
-    {
-	"RESULT: ", Name, "(...)={ ", string(#), " }.";
-    };
+   if( toprint() )
+   {
+		"RESULT: ", Name, "(...)={ ", string(#), " }.";
+   };
 };
 
 
@@ -2198,17 +2198,26 @@ proc rm4list( poly l, poly q )
 };
 
 /******************************************************************************/ 
-static proc reduce_one_per_row(list @given, int @option)
+static proc reduce_one_per_row(list @given)
 {
 	BCall( "reduce_one_per_row" );
 	
 	int @k;
 	int @l = size (@given);
+	
+	if( @l == 0 )
+	{
+		return (@given);
+	};
+	
 	int @char = char(basering);
 	
 	intvec @marks;
 
-	poly @t = poly(0);
+	if ( @char == 0 )
+	{
+		poly @t = poly(0);
+	};
 
 	list @unis = list ();
 	poly p;
@@ -2236,7 +2245,12 @@ static proc reduce_one_per_row(list @given, int @option)
 		def save = basering;
 		execute( "ring NewRingWithGoodField = (0), (" + varstr(save) + "), (" + ordstr(save) + "); ");
 		poly @t = 0;
-		list @unis = imap( save, @unis );
+		
+		if(! defined (@unis) )
+		{
+			list @unis = imap( save, @unis );
+		};
+		
 		for ( @k = @l; @k > 0; @k -- )
 		{
 			if( @marks[@k] == 1 )
@@ -2254,7 +2268,7 @@ static proc reduce_one_per_row(list @given, int @option)
 	{
 		@for_delete = poly(0);
 		@ll = size(@t);    
-
+		
 		for ( @k = @ll; @k > 0; @k -- )
 		{
 			if ( leadcoef(@t[@k]) == 1 )
@@ -2264,7 +2278,7 @@ static proc reduce_one_per_row(list @given, int @option)
 		};
 
 		@loop_size = size( @for_delete );
-	
+
 		if ( @loop_size>0 )
 		{
 			for( @k = @l ; @k > 0 ; @k -- )
@@ -2280,16 +2294,14 @@ static proc reduce_one_per_row(list @given, int @option)
 					};
 				};
 			};		
-		};
+		};		
 	};
-
+	
 	if ( @char != 0 )
 	{
 		setring(save);
-		@t = imap( NewRingWithGoodField, @t );
 		kill(NewRingWithGoodField);
 	};
-
 
 	list @reduced = list();
 	
@@ -2307,15 +2319,8 @@ static proc reduce_one_per_row(list @given, int @option)
 		};
 	};
     
-	if (@option == 2)
-	{
-		@reduced = list ( @t, @reduced );
-	};
-		
 	ECall( "reduce_one_per_row", "{...l...}" );
-
 	return (@reduced);
-
 };
 
 
@@ -2436,7 +2441,7 @@ static proc calc_base (list @AD_GIVEN, list #)
     };    
 
 	ECall( "calc_base" );
-    return (@AD_CALC);
+	return (@AD_CALC);
 
 };
 
@@ -2444,31 +2449,13 @@ static proc calc_base (list @AD_GIVEN, list #)
 static proc calc_k_base (list l, list #)
 "
   calculation of Ker as Vector Space
-  
-  ?? need debug ??
-  
 "
 {
-
 	BCall( "calc_k_base", "{...l...}[, " + string(#) + "]" );
 
-	list t;
-	int opt = 666;
-	
-	if ( opt == 666 ) 
-	{
+	list t = reduce_one_per_row( l, 0); /// optimization (a1)
+	return( calc_base(t, #) );          /// calculation of groupps (a2) + gauss.
 
-		t = reduce_one_per_row( l, 0); 	/// optimization (a1)
-		return( calc_base(t, #) );	 		/// calculation of groupps (a2) + gauss.
-
-	} else
-	{
-
-		//// one HUGE matrix (system)
-		t = reduce_one_per_row( l, 2 ); 	/// return also uni-poly
-		return (  my_calc( t[2], uni_poly(t[1]), # ) );
-
-	};
 };
 
 /******************************************************************************/ 
@@ -2740,27 +2727,20 @@ proc center(int MaxDeg, list # )
 "
 {
 
+	if ( myInt(#) > 0 ) /// given a number of central elements to compute
+	{
+		return ( center_min_iterative( MaxDeg, # ) );
+	};
+
 	if( MaxDeg >= 0 ) /// standard computation - the fastest one (often)
 	{
-//		return ( center_min_vectorspace ( MaxDeg ) );
-		return ( center_min_iterative( MaxDeg, # ) );
-    };
-
-	int n = myInt(#);
-	
-	if ( n > 0 ) /// given a number of central elements to compute
-	{
-		return ( center_min_iterative( MaxDeg, # ) );
+//		return ( center_min_iterative( MaxDeg, # ) );
+		return ( center_min_vectorspace ( MaxDeg ) );
 	};
 
-	if( (MaxDeg < 0 ) and (n == 0) )
-	{
-		print( "Error: wrong input: MaxDeg should be >= 0 or specify number of generators - n" );
-		return(list());
-	};
-
-	print( "Error: wrong arguments!" );
+	print( "Error: wrong arguments." );
 	return(list());
+	
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2776,16 +2756,21 @@ proc centralizator( int MaxDeg, poly p, list # )
 	Note: 1 is in generators of centralizator since scalars commutes with any polynomials in our algebras
 "
 {
-	int n = myInt(#);
 	
-	if( (MaxDeg < 0) and (n == 0) )
+	if( myInt(#) > 0 )
 	{
-		print( "Error: wrong arguments" );
-		return(list());
+		return( centralizator_min_iterative( MaxDeg, p, # ) );
 	};
-    
-//		return( centralizator_min_vectorspace( MaxDeg, p ) );
-	return( centralizator_min_iterative( MaxDeg, p, # ) );
+	
+	if( MaxDeg >= 0 )
+	{
+//		return( centralizator_min_iterative( MaxDeg, p, # ) );
+		return( centralizator_min_vectorspace( MaxDeg, p ) );
+	};
+	
+	print( "Error: wrong arguments." );
+	return(list());
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
