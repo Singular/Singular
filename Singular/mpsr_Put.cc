@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Put.cc,v 1.6 1997-04-10 13:08:37 obachman Exp $ */
+/* $Id: mpsr_Put.cc,v 1.7 1998-01-16 14:29:55 krueger Exp $ */
 
 
 /***************************************************************
@@ -216,25 +216,33 @@ mpsr_Status_t mpsr_PutRing(MP_Link_pt link, ring cring)
   return mpsr_PutRingAnnots(link, cring, 1);
 }
 
-mpsr_Status_t mpsr_PutProc(MP_Link_pt link, char* pname, char *proc)
+mpsr_Status_t mpsr_PutProc(MP_Link_pt link, char* pname, procinfov proc)
 {
   MP_DictTag_t dict;
   MP_Common_t  cop;
+  char *iiGetLibProcBuffer(procinfov pi, int part=1);
 
   failr(mpsr_tok2mp('=', &dict, &cop));
   
   // A Singular- procedure is sent as a cop with the string as arg
   mp_failr(MP_PutCommonOperatorPacket(link,
-                                      dict,
-                                      cop,
-                                      0,
-                                      2));
+					dict,
+					cop,
+					0,
+					2));
   mp_failr(MP_PutIdentifierPacket(link, MP_SingularDict, pname,1));
   mp_failr(MP_PutAnnotationPacket(link,
-                                  MP_SingularDict,
-                                  MP_AnnotSingularProcDef,
-                                  0));
-  mp_return(MP_PutStringPacket(link, proc, 0));
+				  MP_SingularDict,
+				  MP_AnnotSingularProcDef,
+				  0));
+  if( proc->language == LANG_SINGULAR) {
+    if (proc->data.s.body == NULL)
+      iiGetLibProcBuffer(proc);
+    mp_return(MP_PutStringPacket(link, proc->data.s.body, 0));
+  }
+  else
+    mp_return(MP_PutStringPacket(link, "", 0));
+  mp_return(MP_Success);
 }
 
 

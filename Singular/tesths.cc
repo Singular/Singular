@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.28 1997-12-03 16:59:09 obachman Exp $ */
+/* $Id: tesths.cc,v 1.29 1998-01-16 14:29:59 krueger Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -222,7 +222,7 @@ int main(          /* main entry to Singular */
     //idhdl h=idroot->get("init",0);
     //if ((h!=NULL) && (IDTYP(h)==PROC_CMD))
     //{
-    //  IDSTRING(h)=iiGetLibProcBuffer( IDSTRING(h), IDID(h));
+    //  IDSTRING(h)=iiGetLibProcBuffer( IDPROC(h)));
     //  newBuffer( mstrdup(IDSTRING(h)), BT_execute, IDID(h) );
       //leftv r=iiMake_proc(h,NULL);
       //r->CleanUp();

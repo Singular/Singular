@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.7 1997-07-09 15:54:01 Singular Exp $ */
+/* $Id: iplib.cc,v 1.8 1998-01-16 14:29:53 krueger Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -21,29 +21,19 @@
 #include "ipshell.h"
 #include "lists.h"
 
+procinfo *iiInitSingularProcinfo(procinfo *pi, char *libname,
+                                 char *procname, int line, long pos);
+char *iiConvName(char *p);
+
 /*2
 * find the library of an proc:
-* first case: IDSTRING="LIB:xyz.lib"
-*  => return (string+4)
-* second case: IDSTRING=".....);\n"
-*  => return NULL; (no lib known)
-* else: IDSTRING="....\nxxx.lib"
-*  => return (xxx.lib)
+*  => return (pi->libname)
 */
-char * iiGetLibName(char *procstr)
+char * iiGetLibName(procinfov pi)
 {
   char *res=NULL;
 
-  if (strncmp(procstr,"LIB:",4)==0)
-  {
-    res=(procstr+4);
-  }
-  else
-  {
-    int l=strlen(procstr)-1; /* procstr[l] is the last character */
-    while((l>0) && (procstr[l]!='\n')) l--;
-    if (procstr[l]=='\n') res=(procstr+l+1);
-  }
+  res = pi->libname;
   return res;
 }
 /*2
@@ -110,144 +100,81 @@ char * iiProcArgs(char *e,BOOLEAN withParenth)
   } while (in_args);
   return argstr;
 }
+
 /*2
 * locate `procname` in lib `libname` and find the part `part`:
 *  part=0: help, between, but excluding the line "proc ..." and "{...":
-*    => Print, return NULL
+*    => return
 *  part=1: body, between "{ ..." and "}", including the 1. line, w/o "{"
-*    => FreeL(libname), return
+*    => set pi->data.s.body, return NULL
 *  part=2: example, between, but excluding the line "exapmle {..." and "}":
 *    => return
 */
-char* iiGetLibProcBuffer( char* libname, char* procname, int part )
+char* iiGetLibProcBuffer(procinfo *pi, int part )
 {
-  /* =========== open lib ==============*/
-  char buf[256];
-  if (part==1)
-  {
-    // libname comes as LIB:name
-    libname += 4;
-    //libname[strlen(libname)-1] = '\0';
-  }
-  FILE * fp = feFopen( libname, "rb", NULL, TRUE );
+  char buf[256], *s = NULL, *p;
+  long procbuflen;
+
+  FILE * fp = feFopen( pi->libname, "rb", NULL, TRUE );
   if (fp==NULL)
   {
-    if (part==1) FreeL((ADDRESS)(libname-4));
     return NULL;
   }
 
-  /* =========== search lib =========== */
-  while (fgets( buf, sizeof(buf), fp))
-  {
-    /* search for lines "proc ..." */
-    if (strncmp( buf, "proc ", 5) == 0)
-    {
-      char ct;
-      char *e;
-      char *s=iiProcName(buf,ct,e);
-      char *argstr=NULL;
-      if (strcmp( s, procname ) == 0)
-      {
-        if (part==1)
-        {
-          // =========== processing of argument list =============
-          *e=ct;
-          argstr=iiProcArgs(e,TRUE);
-        }
-        int procbuflen;
-        // =========== search beginning of proc body ============
-        long startpos = ftell( fp );
-        loop
-        {
-          if(!fgets( buf, sizeof(buf), fp)) return NULL; // search "{"
-          //if (strchr(buf,'{')!=NULL)
-          if (buf[0]=='{')
-          {
-             if (part==0) return NULL;
-             procbuflen=strlen(buf);
-             break;
-          }
-          if (part==0) PrintS(buf);
-          startpos = ftell( fp );
-        }
-
-        // =========== search end of proc body ============
-        // read till "}", to calculate length of procbuffer
-        while (fgets( buf, sizeof(buf), fp))
-        {
-          if (buf[0] == '}') break;
-          procbuflen += strlen(buf);
-        }
-        // =========== search example part ============
-        if (part==2)
-        {
-          procbuflen = 0;
-          loop
-          {
-            /* EOF ? */
-            if (!fgets( buf, sizeof(buf), fp))
-              return NULL;
-            /* found ? */
-            if (strncmp( buf, "example", 7) == 0)
-              break;
-            /* next proc ? */
-            if (strncmp( buf, "proc ", 5) == 0)
-              return NULL;
-          }
-          startpos = ftell( fp );
-          while (fgets( buf, sizeof(buf), fp))
-          {
-            if (buf[0] == '}') break;
-            procbuflen += strlen(buf);
-          }
-          //Print("start:%d, len:%d\n",startpos,procbuflen);
-        }
-
-        // =========== read the part ===========
-        char* procbuf;
-        if (part==1) procbuf = (char *)AllocL( strlen(argstr)+procbuflen+14+strlen(libname) );
-        else         procbuf = (char *)AllocL( procbuflen+14+strlen(libname) );
-        if (procbuf==NULL)
-        {
-          Werror( "unable to allocate proc buffer `%s`", procname );
-          if (part==1) FreeL((ADDRESS)(libname-4));
-          return NULL;
-        }
-        fseek( fp, startpos, SEEK_SET );
-        if (part==1)
-        {
-          strcpy(procbuf,argstr);
-          fread( procbuf+strlen(argstr), procbuflen, 1, fp);
-          procbuflen+=strlen(argstr);
-          FreeL(argstr);
-        }
-        else
-        {
-          fread( procbuf, procbuflen, 1, fp);
-        }
-        fclose( fp );
-        procbuf[procbuflen] = '\0';
-
-        // =========== modify text ===========
-        //if ((part==1)||(part==2))
-        {
-          //strcpy( procbuf+procbuflen, "\n;RETURN();\n" );
-          strcat( procbuf+procbuflen-3, "\n;RETURN();\n\n" );
-          if (part==1)
-          {
-            strcat( procbuf+procbuflen+10,libname);
-            FreeL((ADDRESS)(libname-4));
-          }
-        }
-        s=strchr(procbuf,'{');
-        if (s!=NULL) *s=' ';
-        //Print("end iiGetLibProcBuffer, changed pos: %d, s=%x\n",procbuf-s,s);
-        return procbuf;
-      }
-    }
+  fseek(fp, pi->data.s.proc_start, SEEK_SET);
+  if(part==0) { // load help string
+    procbuflen = pi->data.s.body_start - pi->data.s.proc_start;
+    //Print("Help=%ld-%ld=%d\n", pi->data.s.body_start,
+    //    pi->data.s.proc_start, procbuflen);
+    s = (char *)AllocL(procbuflen);
+    fread(s, procbuflen, 1, fp);
+    s[procbuflen] = '\0';
+    return(s);
   }
-  Werror( "`%s` not found in LIB `%s`", procname, libname );
-  if (part==1) FreeL((ADDRESS)(libname-4));
+  if(part==1) { // load proc part
+    fgets(buf, sizeof(buf), fp);
+    char ct;
+    char *e;
+    s=iiProcName(buf,ct,e);
+    char *argstr=NULL;
+    *e=ct;
+    argstr=iiProcArgs(e,TRUE);
+    procbuflen = pi->data.s.body_end - pi->data.s.body_start;
+    pi->data.s.body = (char *)AllocL( strlen(argstr)+procbuflen+15+
+				      strlen(pi->libname) );
+    //Print("Body=%ld-%ld=%d\n", pi->data.s.body_end,
+    //    pi->data.s.body_start, procbuflen);
+    if (pi->data.s.body==NULL) {
+      Werror( "unable to allocate proc buffer `%s`", pi->procname );
+      return NULL;
+    }
+    fseek(fp, pi->data.s.body_start, SEEK_SET);
+    strcpy(pi->data.s.body,argstr);
+    fread( pi->data.s.body+strlen(argstr), procbuflen, 1, fp);
+    procbuflen+=strlen(argstr);
+    FreeL(argstr);
+    fclose( fp );
+    pi->data.s.body[procbuflen] = '\0';
+    strcat( pi->data.s.body+procbuflen, "\n;\nRETURN();\n\n" );
+    strcat( pi->data.s.body+procbuflen+13,pi->libname);
+    s=strchr(pi->data.s.body,'{');
+    if (s!=NULL) *s=' ';
+    return NULL;
+  }
+  if(part==2) { // load example
+    fseek(fp, pi->data.s.example_start, SEEK_SET);
+    fgets(buf, sizeof(buf), fp);
+    procbuflen = pi->data.s.proc_end - pi->data.s.example_start - strlen(buf);
+    //Print("Example=%ld-%ld=%d\n", pi->data.s.proc_end,
+    //  pi->data.s.example_start, procbuflen);
+    s = (char *)AllocL(procbuflen+14);
+    fread(s, procbuflen, 1, fp);
+    s[procbuflen] = '\0';
+    strcat(s+procbuflen-3, "\n;RETURN();\n\n" );
+    p=strchr(s,'{');
+    if (p!=NULL) *s=' ';
+    return(s);
+  }
   return NULL;
 }
 
@@ -301,12 +228,17 @@ BOOLEAN iiPStart(idhdl pn, char* filename, sleftv  * v)
     /* we do not enter this case if filename != NULL !! */
     if (pn!=NULL)
     {
-      if (strncmp( IDSTRING(pn), "LIB:", 4 ) == 0)
-      {
-        IDSTRING(pn) = iiGetLibProcBuffer( IDSTRING(pn), IDID(pn) );
-        if (IDSTRING(pn)==NULL) return TRUE;
+      procinfov pi;
+      pi = IDPROC(pn);
+      if(pi!=NULL) {
+        if( pi->data.s.body==NULL ) {
+	  iiGetLibProcBuffer(IDPROC(pn));
+	  if (IDPROC(pn)->data.s.body==NULL) return TRUE;
+	}
+	newBuffer( mstrdup(IDPROC(pn)->data.s.body), BT_proc, IDID(pn) );
+      } else { // for security only
+        newBuffer( mstrdup(IDSTRING(pn)), BT_proc, IDID(pn) );
       }
-      newBuffer( mstrdup(IDSTRING(pn)), BT_proc, IDID(pn) );
       fileVoice = voice;
     }
   }
@@ -392,6 +324,7 @@ static void iiCheckNest()
 sleftv * iiMake_proc(idhdl pn, sleftv* sl)
 {
   int err;
+  procinfov pi = IDPROC(pn);
   iiCheckNest();
   iiLocalRing[myynest]=currRing;
   iiRETURNEXPR[myynest+1].Init();
@@ -403,7 +336,25 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
 #ifdef RDEBUG
   if (traceit&TRACE_SHOW_RINGS) iiShowLevRings();
 #endif
-  err=iiPStart(pn,NULL,sl);
+#if 1
+  if(pi->language == LANG_SINGULAR) err=iiPStart(pn,NULL,sl);
+  if(pi->language == LANG_C) {
+    leftv res = (leftv)Alloc0(sizeof(sleftv));
+    err = (pi->data.o.function)(res, sl);
+    iiRETURNEXPR[myynest+1].Copy(res);
+    Free((ADDRESS)res, sizeof(sleftv));
+  }
+#else
+  switch (pi->language) {
+    case LANG_SINGULAR: err=iiPStart(pn,NULL,sl); break;
+    case LANG_C: leftv res = (leftv)Alloc0(sizeof(sleftv));
+      err = (pi->data.o.function)(res, sl);
+      iiRETURNEXPR[myynest+1].Copy(res);
+      Free((ADDRESS)res, sizeof(sleftv));
+      break;
+    default: err=TRUE;
+  }
+#endif
   if (traceit&TRACE_SHOW_PROC)
   {
     if (traceit&TRACE_SHOW_LINENO) printf("\n");
@@ -503,6 +454,9 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
   char buf[256];
   char libnamebuf[128];
   idhdl h,hl;
+  int lines = 1;
+  long pos = 0L;
+  procinfov pi;
   FILE * fp = feFopen( newlib, "r", libnamebuf, tellerror );
   if (fp==NULL)
   {
@@ -588,10 +542,13 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
 
   #define IN_HEADER 1
   #define IN_BODY   2
-  #define IN_LIB_HEADER 3
+  #define IN_EXAMPLE      3
+  #define IN_EXAMPLE_BODY 4
+  #define IN_LIB_HEADER   5
   int v=-1,otherLines=0,inBlock=IN_LIB_HEADER;
   do /*while (fgets( buf, sizeof(buf), fp))*/
   {
+    int  offset;
     if (buf[0]!='\n')
     {
       if ((inBlock==0)||(inBlock==IN_LIB_HEADER))
@@ -617,14 +574,24 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
         else if (strncmp( buf, "proc ", 5) == 0)
         {
           char proc[256];
+          char ct1, *e;
           sscanf( buf, "proc %s", proc);
+	  offset = 2;
           char *ct=strchr(proc,'(');
-          if (ct!=NULL) *ct='\0';
+          if (ct!=NULL) { *ct='\0'; offset=3; }
           sprintf( buf, "LIB:%s", newlib);
-          h = enterid( mstrdup(proc), myynest, PROC_CMD, &idroot, FALSE );
+#if 0
+          if(strcmp(proc, "_init")==0) {
+            char *p =  iiConvName(newlib);
+            Print("Init found:%s;\n", p);
+            h = enterid( mstrdup(p), myynest, PROC_CMD, &idroot, FALSE );
+            FreeL((ADDRESS)p);
+          } else
+#endif
+            h = enterid( mstrdup(proc), myynest, PROC_CMD, &idroot, FALSE );
           if (h!=NULL)
           {
-            IDSTRING(h) = mstrdup( buf );
+            iiInitSingularProcinfo(IDPROC(h),newlib,proc,lines,pos);
             if (BVERBOSE(V_LOAD_PROC)) Warn( "     proc %s loaded", proc );
           }
           inBlock=IN_HEADER;
@@ -639,7 +606,9 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
         }
         else if (strncmp( buf, "example", 7) == 0)
         {
-          inBlock=IN_HEADER;
+          IDPROC(h)->data.s.example_start = pos;
+          IDPROC(h)->data.s.example_lineno = lines;
+          inBlock=IN_EXAMPLE;
         }
         else if (strncmp( buf, "//", 2) != 0)
         {
@@ -649,23 +618,35 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
           }
         }
       }
-      else if (inBlock==IN_HEADER)
+      else if ((inBlock==IN_HEADER) || (inBlock==IN_EXAMPLE))
       {
         if (buf[0]=='{')
         {
+          if(inBlock==IN_HEADER) {
+            IDPROC(h)->data.s.body_start = pos;
+            IDPROC(h)->data.s.body_lineno = lines-offset;
+	    // Print("%s: %d-%d\n", pi->procname, lines, offset);
+          }
           inBlock=IN_BODY;
         }
       }
-      else if (inBlock==IN_BODY)
+      else if ((inBlock==IN_BODY) || (inBlock==IN_EXAMPLE_BODY))
       {
         if (buf[0]=='}')
-        {
-          inBlock=0;
-        }
+	  {
+            if(IDPROC(h)->data.s.example_start==0)
+	      IDPROC(h)->data.s.example_start=pos;
+            if(IDPROC(h)->data.s.body_end==0) IDPROC(h)->data.s.body_end=pos;
+            IDPROC(h)->data.s.proc_end = pos;
+	    inBlock=0;
+	  }
       }
     }
+    lines++;
+    pos = ftell(fp);
   } while (fgets( buf, sizeof(buf), fp));
   fclose( fp );
+  //if (h!=NULL) IDPROC(h) = pi;
   if (BVERBOSE(V_DEBUG_LIB))
   {
     if (inBlock!=0)
@@ -679,3 +660,83 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
   return FALSE;
 }
 
+procinfo *iiInitSingularProcinfo(procinfov pi, char *libname,
+                                 char *procname, int line, long pos)
+{
+  pi->libname = mstrdup(libname);
+
+  if( strcmp(procname,"_init")==0) { 
+    char *p = iiConvName(libname);
+    pi->procname = mstrdup(p);
+    FreeL((ADDRESS)p);
+  } else pi->procname = mstrdup(procname);
+  pi->language = LANG_SINGULAR;
+  pi->ref = 1;
+  pi->data.s.proc_start = pos;
+  pi->data.s.help_start = 0L;
+  pi->data.s.body_start = 0L;
+  pi->data.s.body_end   = 0L;
+  pi->data.s.example_start = 0L;
+  pi->data.s.proc_lineno = line;
+  pi->data.s.body_lineno = 0;
+  pi->data.s.example_lineno = 0;
+  pi->data.s.body = NULL;
+  return(pi);
+}
+
+/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+char *iiConvName(char *libname)
+{
+  char *p = AllocL(strlen(libname)+7);
+  char *q = mstrdup(libname);
+  char *r = q;
+  for(; *r!='\0'; r++) {
+    if(*r=='.') *r='_';
+    if(*r==':') *r='_';
+  }
+  sprintf(p, "%s_init\0", q);
+  FreeL((ADDRESS)q);
+  return(p);
+}
+
+/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+int piShowProcList()
+{
+  idhdl h;
+  procinfo *proc;
+  char *name;
+
+  Print( "%-15s  %20s      %s,%s  %s,%s   %s,%s\n", "Library", "function",
+	 "line", "start", "line", "body", "line", "example");
+  for(h = idroot; h != NULL; h = IDNEXT(h)) {
+    if(IDTYP(h) == PROC_CMD) {
+      proc = IDPROC(h);
+      if(strcmp(proc->procname, IDID(h))!=0) {
+	name = AllocL(strlen(IDID(h))+strlen(proc->procname)+4);
+	sprintf(name, "%s -> %s", IDID(h), proc->procname);
+	Print( "%-15s  %20s ", proc->libname, name);
+	FreeL(name);
+      } else Print( "%-15s  %20s ", proc->libname, proc->procname);
+      if(proc->language==LANG_SINGULAR) 
+        Print("line %4d,%-5ld  %4d,%-5ld  %4d,%-5ld\n", 
+              proc->data.s.proc_lineno, proc->data.s.proc_start,
+              proc->data.s.body_lineno, proc->data.s.body_start,
+              proc->data.s.example_lineno, proc->data.s.example_start);
+      else if(proc->language==LANG_C) Print("type: object\n");
+
+    }
+  }
+}
+
+/*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+char *iiLineNo(char *procname, int lineno)
+{
+  char buf[256];
+  idhdl pn = ggetid(procname);
+  procinfo *pi = IDPROC(pn);
+  
+  sprintf(buf, "%s %3d\0", procname, lineno);
+  //sprintf(buf, "%s::%s %3d\0", pi->libname, pi->procname,
+  //  lineno + pi->data.s.body_lineno);
+  return(buf);
+}

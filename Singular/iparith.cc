@@ -2688,7 +2688,10 @@ static BOOLEAN jjSort_Id(leftv res, leftv v)
 }
 static BOOLEAN jjSTRING_PROC(leftv res, leftv v)
 {
-  res->data=mstrdup(IDSTRING((idhdl)v->data));
+  procinfov pi = IDPROC((idhdl)v->data);
+  if(pi->language == LANG_SINGULAR)
+    res->data=mstrdup(pi->data.s.body);
+  else res->data=mstrdup("");
   return FALSE;
 }
 static BOOLEAN jjSYZYGY(leftv res, leftv v)

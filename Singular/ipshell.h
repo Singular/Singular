@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.9 1997-07-11 14:27:55 Singular Exp $ */
+/* $Id: ipshell.h,v 1.10 1998-01-16 14:29:54 krueger Exp $ */
 /*
 * ABSTRACT
 */
@@ -45,8 +45,8 @@ int     IsPrime(int i);
 BOOLEAN iiWRITE(leftv res,leftv exprlist);
 BOOLEAN iiExport(leftv v, int toLev);
 BOOLEAN iiExport(leftv v, int toLev, idhdl &root);
-char *  iiGetLibName(char *procstr);
-char *  iiGetLibProcBuffer( char* libname, char* procname, int part=1 );
+char *  iiGetLibName(procinfov v);
+char *  iiGetLibProcBuffer( procinfov pi, int part=1 );
 char *  iiProcName(char *buf, char & ct, char* &e);
 char *  iiProcArgs(char *e,BOOLEAN withParenth);
 BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror=TRUE );

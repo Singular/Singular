@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.8 1997-12-18 14:26:35 Singular Exp $ */
+/* $Id: ipid.cc,v 1.9 1998-01-16 14:29:52 krueger Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -94,9 +94,6 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
         IDIDEAL(h) = idInit(1,1);
         IDMAP(h)->preimage = mstrdup(IDID(currRingHdl));
         break;
-      case PROC_CMD:
-        IDSTRING(h) = mstrdup("parameter list #;\nreturn();\n\n");
-        break;
       case STRING_CMD:
         IDSTRING(h) = mstrdup("");
         break;
@@ -124,6 +121,11 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
     {
       IDSTRING(h) = (char *)Alloc0(len);
     }
+  }
+  if(t == PROC_CMD) {
+    IDPROC(h) = (procinfo *)Alloc(sizeof(procinfo));
+    memset(IDPROC(h),0,sizeof(*IDPROC(h)));
+    IDPROC(h)->language=LANG_NONE;
   }
   return  h;
 }
@@ -322,13 +324,16 @@ void killhdl(idhdl h, idhdl * ih)
     }
     idDelete(&iid);
   }
-  // string / proc / binary ------------------------------------------------
-  else if ((IDTYP(h) == STRING_CMD)
-           ||(IDTYP(h) == PROC_CMD)
-      )
+  // string -------------------------------------------------------------
+  else if (IDTYP(h) == STRING_CMD)
   {
     FreeL((ADDRESS)IDSTRING(h));
     //IDSTRING(h)=NULL;
+  }
+  // proc ---------------------------------------------------------------
+  else if (IDTYP(h) == PROC_CMD)
+  {
+    piKill(IDPROC(h));
   }
   // number -------------------------------------------------------------
   else if (IDTYP(h) == NUMBER_CMD)
@@ -473,3 +478,48 @@ void  ipMoveId(idhdl tomove)
     }
   }
 }
+
+char * piProcinfo(procinfov pi, char *request)
+{
+  if(pi == NULL) return "empty proc";
+  else if (strcmp(request, "libname")  == 0) return pi->libname;
+  else if (strcmp(request, "procname") == 0) return pi->procname;
+  else if (strcmp(request, "type")     == 0) {
+    switch (pi->language) {
+      case LANG_SINGULAR: return "singular"; break;
+      case LANG_C:        return "object";   break;
+      case LANG_NONE:     return "none";     break;
+      default:            return "unknow language";
+    }
+  } else if (strcmp(request, "ref")      == 0) {
+    char p[8];
+    sprintf(p, "%d\0", pi->ref);
+    return mstrdup(p);
+  }
+
+}
+
+void piCleanUp(procinfov pi)
+{
+  (pi->ref)--;
+  if (pi->ref <= 0)
+  {
+    FreeL((ADDRESS)pi->libname);
+    FreeL((ADDRESS)pi->procname);
+    if( pi->language == LANG_SINGULAR) { 
+      FreeL((ADDRESS)pi->data.s.body);
+    }
+    if( pi->language == LANG_C) {
+    }
+    memset((void *) pi, 0, sizeof(procinfo));
+    pi->language=LANG_NONE;
+  }
+}
+
+void piKill(procinfov pi)
+{
+  piCleanUp(pi);
+  if (pi->ref <= 0)
+    Free((ADDRESS)pi, sizeof(procinfo));
+}
+

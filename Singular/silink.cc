@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.12 1997-08-12 17:14:43 Singular Exp $ */
+/* $Id: silink.cc,v 1.13 1998-01-16 14:29:56 krueger Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -638,7 +638,7 @@ static int DumpRhs(FILE *fd, idhdl h)
     }
     fprintf(fd, ")");
   }
-  else  if (type_id == PROC_CMD || type_id == STRING_CMD)
+  else  if (type_id == STRING_CMD)
   {
     char *pstr = IDSTRING(h), c;
     fputc('"', fd);
@@ -649,6 +649,21 @@ static int DumpRhs(FILE *fd, idhdl h)
       pstr++;
     }
     fputc('"', fd);
+  }
+  else  if (type_id == PROC_CMD)
+  { 
+    procinfov pi = IDPROC(h);
+    if (pi->language == LANG_SINGULAR) {
+      if( pi->data.s.body==NULL) iiGetLibProcBuffer(pi);
+      char *pstr = pi->data.s.body, c;
+      fputc('"', fd);
+      while (*pstr != '\0') {
+	if (*pstr == '"') fputc('\\', fd);
+	fputc(*pstr, fd);
+	pstr++;
+      }
+      fputc('"', fd);
+    } else fputs("(null)", fd);
   }
   else
   {

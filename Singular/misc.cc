@@ -330,7 +330,7 @@ void singular_help(char *str,BOOLEAN example)
   idhdl h=idroot->get(s,myynest);
   if ((h!=NULL) && (IDTYP(h)==PROC_CMD))
   {
-    char *lib=iiGetLibName(IDSTRING(h));
+    char *lib=iiGetLibName(IDPROC(h));
     Print("// proc %s ",s);
     if((lib==NULL)||(*lib=='\0'))
     {
@@ -339,16 +339,16 @@ void singular_help(char *str,BOOLEAN example)
     else
     {
       Print("from lib %s\n",lib);
-      if (!example)
-        iiGetLibProcBuffer(lib,s,0);
-      else
-      {
-        s=iiGetLibProcBuffer(lib,s,2);
-        if (s!=NULL)
-        {
-          if (strlen(s)>5) iiEStart(s); /*newBuffer(s,BT_execute);*/
-          else FreeL((ADDRESS)s);
-        }
+      s=iiGetLibProcBuffer(IDPROC(h), example ? 2 : 0);
+      if (!example) {
+	PrintS(s);
+	FreeL((ADDRESS)s);
+      }
+      else {
+	if (s!=NULL) {
+	  if (strlen(s)>5) iiEStart(s); /*newBuffer(s,BT_execute);*/
+	  else FreeL((ADDRESS)s);
+	}
       }
     }
   }

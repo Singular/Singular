@@ -89,17 +89,15 @@ void sleftv::Print(leftv store, int spaces)
   else
 #endif
   {
-    if (t/*Typ()*/!=PROC_CMD)
-    {
-      const char *n=Name();
-      char *s;
-      void *d=Data();
-      if (errorreported)
-        return;
-      if ((store!=NULL)&&(store!=this))
-        store->CleanUp();
-
-      switch (t /*=Typ()*/)
+    const char *n=Name();
+    char *s;
+    void *d=Data();
+    if (errorreported)
+      return;
+    if ((store!=NULL)&&(store!=this))
+      store->CleanUp();
+    
+    switch (t /*=Typ()*/)
       {
         case UNKNOWN:
         case DEF_CMD:
@@ -139,6 +137,19 @@ void sleftv::Print(leftv store, int spaces)
        case INT_CMD:
           ::Print("%-*.*s%d",spaces,spaces," ",(int)d);
           break;
+       case PROC_CMD:
+         {
+           procinfov pi=(procinfov)d;
+	   ::Print("%-*.*s// libname  : %s\n",spaces,spaces," ",
+		   piProcinfo(pi, "libname"));
+	   ::Print("%-*.*s// procname : %s\n",spaces,spaces," ",
+		   piProcinfo(pi, "procname"));
+	   ::Print("%-*.*s// type     : %s",spaces,spaces," ",
+		   piProcinfo(pi, "type"));
+	   //	   ::Print("%-*.*s// ref      : %s",spaces,spaces," ",
+	   //   piProcinfo(pi, "ref"));
+	   break;
+         }
        case LINK_CMD:
           {
             si_link l=(si_link)d;
@@ -187,7 +198,6 @@ void sleftv::Print(leftv store, int spaces)
           ::Print("Print:unknown type %s(%d)", Tok2Cmdname(t),t);
 #endif
       } /* end switch: (Typ()) */
-    }
   }
   if (next!=NULL)
   {
@@ -261,6 +271,9 @@ void sleftv::CleanUp()
       case RING_CMD:
         rKill((ring)data);
         break;
+      case PROC_CMD:
+	piKill((procinfov)data);
+	break;
       case LINK_CMD:
         slKill((si_link)data);
         break;
@@ -402,7 +415,7 @@ void * slInternalCopy(leftv source, int t, void *d, Subexpr e)
       }
       #endif
     case PROC_CMD:
-      return  (void *)mstrdup((char *)d);
+      return  (void *)piCopy((procinfov) d);
     case POLY_CMD:
     case VECTOR_CMD:
       return  (void *)pCopy((poly)d);
@@ -458,10 +471,10 @@ void sleftv::Copy(leftv source)
       data= (void *)idCopy((ideal)d);
       break;
     case STRING_CMD:
-    //  data= (void *)mstrdup((char *)d);
-    //  break;
-    case PROC_CMD:
       data= (void *)mstrdup((char *)d);
+      break;
+    case PROC_CMD:
+      data= (void *)piCopy((procinfov) d);
       break;
     case POLY_CMD:
     case VECTOR_CMD:

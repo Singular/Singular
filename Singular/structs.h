@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.6 1997-12-03 16:59:06 obachman Exp $ */
+/* $Id: structs.h,v 1.7 1998-01-16 14:29:57 krueger Exp $ */
 /*
 * ABSTRACT
 */
@@ -33,6 +33,7 @@ class slists;
 class sattr;
 class skStrategy;
 class ssyStrategy;
+class procinfo;
 
 struct  sip_sring;
 struct  sip_sideal;
@@ -81,6 +82,7 @@ typedef ip_package *       package;
 typedef struct s_si_link_extension *si_link_extension;
 typedef ssyStrategy *      syStrategy;
 typedef struct reca *      alg;
+typedef procinfo *         procinfov;
 
 struct _scmdnames
 {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.19 1997-11-13 10:52:44 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.20 1998-01-16 14:29:52 krueger Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -329,6 +329,25 @@ static BOOLEAN jiA_STRING(leftv res, leftv a, Subexpr e)
   }
   return FALSE;
 }
+static BOOLEAN jiA_PROC(leftv res, leftv a, Subexpr e)
+{
+  extern procinfo *iiInitSingularProcinfo(procinfo *pi, char *libname,
+				   char *procname, int line, long pos);
+  extern void piCleanUp(procinfov pi);
+
+  if(res->data!=NULL) piCleanUp((procinfo *)res->data);
+  if(a->rtyp==STRING_CMD) {
+    res->data = (void *)Alloc(sizeof(procinfo));
+    memset(res->data,0,sizeof(*(res->data)));
+    ((procinfo *)(res->data))->language=LANG_NONE;
+    iiInitSingularProcinfo((procinfo *)res->data,"",res->name,0,0);
+    ((procinfo *)res->data)->data.s.body=(void *)a->CopyD(STRING_CMD);
+  }
+  else
+    res->data=(void *)a->CopyD(PROC_CMD);
+  jiAssignAttr(res,a);
+  return FALSE;
+}
 static BOOLEAN jiA_INTVEC(leftv res, leftv a, Subexpr e)
 {
   if (res->data!=NULL) delete ((intvec *)res->data);
@@ -477,8 +496,8 @@ struct sValAssign dAssign[]=
 ,{jiA_RING,     RING_CMD,       RING_CMD }
 ,{jiA_RING,     QRING_CMD,      QRING_CMD }
 ,{jiA_STRING,   STRING_CMD,     STRING_CMD }
-,{jiA_STRING,   PROC_CMD,       STRING_CMD }
-,{jiA_STRING,   PROC_CMD,       PROC_CMD }
+,{jiA_PROC,     PROC_CMD,       STRING_CMD }
+,{jiA_PROC,     PROC_CMD,       PROC_CMD }
 ,{jiA_POLY,     VECTOR_CMD,     VECTOR_CMD }
 ,{jiA_INTVEC,   INTVEC_CMD,     INTVEC_CMD }
 ,{jiA_INTVEC,   INTMAT_CMD,     INTMAT_CMD }

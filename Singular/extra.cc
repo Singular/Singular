@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.26 1998-01-12 17:32:46 Singular Exp $ */
+/* $Id: extra.cc,v 1.27 1998-01-16 14:29:47 krueger Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -80,12 +80,22 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
       if ((hh!=NULL)&&(IDTYP(hh)==PROC_CMD))
       {
         res->rtyp=STRING_CMD;
-        res->data=mstrdup(iiGetLibName(IDSTRING(hh)));
+        res->data=mstrdup(iiGetLibName(IDPROC(hh)));
         if (res->data==NULL) res->data=mstrdup("");
         return FALSE;
       }
       else
         Warn("`%s` not found",(char*)h->next->Data());
+    }
+    else
+/*==================== proclist =================================*/
+    if(strcmp((char*)(h->Data()),"proclist")==0)
+    {
+      int piShowProcList();
+      res->rtyp=STRING_CMD;
+      res->data=(void *)mstrdup("");
+      piShowProcList();
+      return FALSE;
     }
     else
 /*==================== version ==================================*/

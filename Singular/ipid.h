@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.7 1998-01-12 18:59:49 obachman Exp $ */
+/* $Id: ipid.h,v 1.8 1998-01-16 14:29:53 krueger Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -94,6 +94,7 @@ union uutypes
   lists         l;
   si_link       li;
   package       pack;
+  procinfo *    pinf;
 };
 
 class idrec
@@ -129,6 +130,7 @@ class idrec
 #define IDLIST(a)   ((a)->data.l)
 #define IDLINK(a)   ((a)->data.li)
 #define IDPACKAGE(a) ((a)->data.pack)
+#define IDPROC(a)   ((a)->data.pinf)
 
   idrec() { memset(this,0,sizeof(*this)); }
   idhdl get(const char * s, int lev);

@@ -1,3 +1,14 @@
+Fri Jan 16 15:30:07 MET 1998 Kai Krueger <krueger@mathematik.uni-kl.de>
+	* extra.cc,febase.cc,febase.inc,grammar.y,iparith.cc
+	* ipassign.cc,ipid.cc,ipid.h,iplib.cc,ipshell.h,misc.cc
+	* mpsr_Put.cc,mpsr_Put.h,silink.cc,structs.h,subexpr.cc,subexpr.h
+	* tesths.cc 
+	  Implementation of new proc-scheme done.
+	
+Fri Jan 16 14:51:07 MET 1998 Kai Krueger <krueger@mathematik.uni-kl.de>
+	* Makefile.in,tests/mpcheck,teste/comparecheck:
+	  fixed use of correct Singular during checks
+
 Fri Jan 16 09:23:07 MET 1998
         * changes for TEST_MAC_ORDER, part 1 (hannes)
 

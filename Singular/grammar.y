@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.19 1997-09-12 08:27:08 Singular Exp $ */
+/* $Id: grammar.y,v 1.20 1998-01-16 14:29:49 krueger Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -41,6 +41,9 @@
 #include "syz.h"
 #include "lists.h"
 
+
+procinfo *iiInitSingularProcinfo(procinfo *pi, char *libname,
+                                 char *procname, int line, long pos);
 
 extern int   yylineno;
 extern FILE* yyin;
@@ -1394,14 +1397,16 @@ forcmd:
 proccmd:
         PROC_CMD extendedid BLOCKTOK
           {
+	    procinfov pi;
             idhdl h = enterid($2,myynest,PROC_CMD,&idroot,FALSE);
             if (h==NULL) {FreeL((ADDRESS)$3); YYERROR;}
-            IDSTRING(h) = (char *)AllocL(strlen($3)+31);
-            sprintf(IDSTRING(h),"parameter list #;\n%s;return();\n\n",$3);
+	    iiInitSingularProcinfo(IDPROC(h),"", $2, 0, 0);
+	    IDPROC(h)->data.s.body = (char *)AllocL(strlen($3)+31);;
+	    sprintf(IDPROC(h)->data.s.body,"parameter list #;\n%s;return();\n\n",$3);
             FreeL((ADDRESS)$3);
           }
         | PROC_DEF STRINGTOK BLOCKTOK
-          {
+          { 
             idhdl h = enterid($1,myynest,PROC_CMD,&idroot,FALSE);
             if (h==NULL)
             {
@@ -1410,12 +1415,14 @@ proccmd:
               YYERROR;
             }
             char *args=iiProcArgs($2,FALSE);
-            FreeL((ADDRESS)$2);
-            IDSTRING(h) = (char *)AllocL(strlen($3)+strlen(args)+14);
-            sprintf(IDSTRING(h),"%s\n%s;RETURN();\n\n",args,$3);
+            procinfov pi;
+	    FreeL((ADDRESS)$2);
+	    iiInitSingularProcinfo(IDPROC(h),"", $1, 0, 0);
+	    IDPROC(h)->data.s.body = (char *)AllocL(strlen($3)+strlen(args)+14);;
+	    sprintf(IDPROC(h)->data.s.body,"%s\n%s;RETURN();\n\n",args,$3);
             FreeL((ADDRESS)args);
             FreeL((ADDRESS)$3);
-            //Print(">>%s<<\n",IDSTRING(h));
+            //Print(">>%s<<\n",IDPROC(h)->data.s.body);
           }
         ;
 

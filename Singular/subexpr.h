@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.h,v 1.3 1997-04-09 12:20:15 Singular Exp $ */
+/* $Id: subexpr.h,v 1.4 1998-01-16 14:29:58 krueger Exp $ */
 /*
 * ABSTRACT: handling of leftv
 */
@@ -87,4 +87,56 @@ typedef ssym * sym;
 void syMake(leftv v,char * name);
 BOOLEAN assumeStdFlag(leftv h);
 
+class proc_singular
+{
+public:
+  long   proc_start;       // position where proc is starting
+  long   help_start;       // position where help is starting
+  long   body_start;       // position where proc-body is starting
+  long   body_end;         // position where proc-body is ending
+  long   example_start;    // position where example is starting
+  long   proc_end;         // position where proc is ending
+  int    proc_lineno;
+  int    body_lineno;
+  int    example_lineno;
+  char   *body;
+};
+
+struct proc_object
+{
+//public:
+  BOOLEAN (*function)(leftv res, leftv v);
+};
+
+union uprocinfodata;
+
+union uprocinfodata
+{
+public:
+  proc_singular  s;        // data of Singular-procedure
+  struct proc_object    o; // pointer to binary-function
+};
+
+typedef union uprocinfodata procinfodata;
+
+typedef enum { LANG_NONE, LANG_SINGULAR, LANG_C } language_defs;
+
+class procinfo
+{
+public:
+  char          *libname;
+  char          *procname;
+  language_defs language;
+  short         ref;
+  procinfodata  data;
+};
+
+inline procinfov piCopy(procinfov pi)
+{
+  pi->ref++;
+  return pi;
+}
+void piKill(procinfov l);
+char *piProcinfo(procinfov pi, char *request);
+void piShowProcinfo(procinfov pi, char *txt);
 #endif

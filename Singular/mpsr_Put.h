@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Put.h,v 1.5 1997-06-30 17:04:47 obachman Exp $ */
+/* $Id: mpsr_Put.h,v 1.6 1998-01-16 14:29:56 krueger Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Put.h
@@ -79,7 +79,7 @@ inline mpsr_Status_t mpsr_PutString(MP_Link_pt link, char *str)
     mp_return(MP_PutStringPacket(link, str, 0));
 }
 extern mpsr_Status_t mpsr_PutRing(MP_Link_pt link, ring r);
-extern mpsr_Status_t mpsr_PutProc(MP_Link_pt link,  char *pname, char* proc);
+extern mpsr_Status_t mpsr_PutProc(MP_Link_pt link, char *pname,procinfov proc);
 inline mpsr_Status_t mpsr_PutDef(MP_Link_pt link, char *name)
 {
   mp_return(MP_PutIdentifierPacket(link, MP_SingularDict, name, 0));
@@ -153,7 +153,7 @@ inline mpsr_Status_t mpsr_PutQRingLeftv(MP_Link_pt link, leftv v)
 inline mpsr_Status_t mpsr_PutProcLeftv(MP_Link_pt link, leftv v)
 {
   typecheck(v, PROC_CMD);
-  return mpsr_PutProc(link, v->name, (char *) v->Data());
+  return mpsr_PutProc(link, v->name, (procinfov) v->Data());
 }
 inline mpsr_Status_t mpsr_PutDefLeftv(MP_Link_pt link, leftv v)
 {
