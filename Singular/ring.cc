@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.157 2001-01-31 17:58:25 Singular Exp $ */
+/* $Id: ring.cc,v 1.158 2001-01-31 19:08:26 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2622,7 +2622,9 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
   res->block0=block0;
   res->block1=block1;
   res->bitmask=exp_limit;
+  int tmpref=r->cf->ref;
   rComplete(res, 1);
+  r->cf->ref=tmpref;
 
   // adjust res->pFDeg: if it was changed globally, then
   // it must also be changed for new ring
