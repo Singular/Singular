@@ -1,12 +1,13 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: gcd.m4,v 1.4 1997-10-15 09:19:11 schmidt Exp $ */
+/* $Id: gcd.m4,v 1.5 1997-11-05 16:26:23 schmidt Exp $ */
 
-ftestSetNameOfGame( gcd,
-        `"Usage: gcd [<options>] [<envSpec>] <f> <g> [<realResult>]\n"
-        "  calculates greatest common divider of canonical forms f and g.\n"
-    	"  If the gcd of f and g is already known, the optional canonical\n"
-    	"  form <realResult> may be used to check the result of the gcd\n"
-    	"  computation.\n"' )
+ftestSetNameOfGame( gcd, `"
+Usage: gcd [<options>] [<envSpec>] <f> <g> [<realResult>]
+  calculates greatest common divider of canonical forms f and g.
+  If the gcd of f and g is already known, the optional canonical
+  form realResult may be used to check the result of the gcd
+  computation.
+"'`' )
 
 //{{{ docu
 //

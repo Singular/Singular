@@ -1,15 +1,18 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: feval.m4,v 1.2 1997-10-15 09:19:09 schmidt Exp $ */
+/* $Id: feval.m4,v 1.3 1997-11-05 16:26:37 schmidt Exp $ */
 
-ftestSetNameOfGame( feval,
-        `"Usage: feval [<options>] [<envSpec>] <f>\n"
-        "  evaluates canonical form <f>.\n"
-    	"  In contrast to the other programs of the factory test\n"
-	"  environment, <f> may span more than one argument.\n"
-	"  More precisely, all arguments are pasted together and\n"
-	"  then evaluated as one canonical form.\n"
-	"  If there are not any arguments, neither time nor status\n"
-	"  nor result nor data information is printed.\n"' )
+ftestSetNameOfGame( feval, `"
+Usage: feval [<options>] [<envSpec>] <f>
+  evaluates canonical form <f>.
+  In contrast to the other programs of the Factory Test
+  Environment, f may span more than one argument.  More
+  precisely, all arguments are pasted together and are then
+  evaluated as one canonical form.  If there are not any
+  arguments, neither time nor status nor result nor data
+  information is printed.
+"'`' )
+dnl // the trailing quotes at the end of the second argument
+dnl // are for font-lock only (another font-lock-trick)
 
 //{{{ docu
 //
