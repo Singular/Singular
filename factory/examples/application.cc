@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: application.cc,v 1.2 1997-10-27 16:50:59 schmidt Exp $ */
+/* $Id: application.cc,v 1.3 1997-10-28 13:46:41 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -12,13 +12,7 @@
 int
 main()
 {
-    // test for existence of GF(q) tables
-    setCharacteristic( 3, 2, 'z' );
-    cout << factoryVersion << endl;
-    cout << factoryConfiguration << endl;
-    cout << "Factory lives!" << endl;
-
-    // now for something completely different
+    // set our ring
     setCharacteristic( 0 );
     On( SW_RATIONAL );
 
