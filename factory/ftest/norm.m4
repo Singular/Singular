@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: norm.m4,v 1.1 1998-03-11 17:56:11 schmidt Exp $ */
+/* $Id: norm.m4,v 1.2 1998-04-06 11:05:03 schmidt Exp $ */
 
 ftestSetNameOfGame( norm, `"
 Usage: norm [<options>] [<envSpec>] <f> [<euclideanFlag>]
@@ -44,11 +44,11 @@ main ( int argc, char ** argv )
     ftestGetInVar( euclideanFlag, 0 );
 
     // do the test!
-    ftestRun(
-	if ( euclideanFlag )
-	    result = euclideanNorm( f );
-	else
-	    result = maxNorm( f ); );
+    if ( euclideanFlag ) {
+	ftestRun( result = euclideanNorm( f ); );
+    } else {
+	ftestRun( result = maxNorm( f ); );
+    }
 
     // print results
     if ( euclideanFlag ) {

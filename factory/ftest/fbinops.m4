@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fbinops.m4,v 1.4 1998-03-31 10:23:59 schmidt Exp $ */
+/* $Id: fbinops.m4,v 1.5 1998-04-06 11:05:17 schmidt Exp $ */
 
 ftestSetNameOfGame( fbinops, `"
 Usage: fbinops [<options>] [<envSpec>] <f> <operator> <g>
@@ -160,9 +160,24 @@ ftestArithTest( const CanonicalForm &, const CanonicalForm &, const CanonicalFor
 static ftestStatusT
 ftestDivideTest( const CanonicalForm & f, const CanonicalForm & g, const CanonicalForm & quot )
 {
-    if ( ! ((quot*g)+(f%g)-f).isZero() ) {
+    CanonicalForm rem = f % g;
+    if ( ! ((quot*g)+rem-f).isZero() ) {
 	ftestError( CheckError, "f != (f/g)*g+(f%%g)\n" );
 	return Failed;
+    } else if ( f.inBaseDomain() && g.inBaseDomain() && getCharacteristic() == 0
+		&& (rem < 0 || rem > abs( g )) ) {
+	// check euclidean division in Z
+	ftestError( CheckError, "!(0 <= f%g < abs(g))\n" );
+	return Failed;
+    } else if ( f.inPolyDomain() || g.inPolyDomain() ) {
+	// check euclidean division in R[x]
+	Variable x = (mvar( f ) >= mvar( g )) ? mvar( f ) : mvar( g );
+	if ( rem.isZero() || degree( rem, x ) < degree( g, x ) )
+	    return Passed;
+	else {
+	    ftestError( CheckError, "degree(rem) >= degree(g)\n" );
+	    return Failed;
+	}
     } else
 	return Passed;
 }
@@ -186,6 +201,20 @@ ftestModuloTest( const CanonicalForm & f, const CanonicalForm & g, const Canonic
     if ( ! (((f/g)*g)+(rem)-f).isZero() ) {
 	ftestError( CheckError, "f != (f/g)*g+(f%%g)\n" );
 	return Failed;
+    } else if ( f.inBaseDomain() && g.inBaseDomain() && getCharacteristic() == 0
+		&& (rem < 0 || rem > abs( g )) ) {
+	// check euclidean division in Z
+	ftestError( CheckError, "!(0 <= f%g < abs(g))\n" );
+	return Failed;
+    } else if ( f.inPolyDomain() || g.inPolyDomain() ) {
+	// check euclidean division in R[x]
+	Variable x = (mvar( f ) >= mvar( g )) ? mvar( f ) : mvar( g );
+	if ( rem.isZero() || degree( rem, x ) < degree( g, x ) )
+	    return Passed;
+	else {
+	    ftestError( CheckError, "degree(rem) >= degree(g)\n" );
+	    return Failed;
+	}
     } else
 	return Passed;
 }

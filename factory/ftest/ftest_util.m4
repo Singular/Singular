@@ -1,4 +1,4 @@
-dnl $Id: ftest_util.m4,v 1.16 1998-03-11 16:11:17 schmidt Exp $
+dnl $Id: ftest_util.m4,v 1.17 1998-04-06 11:09:14 schmidt Exp $
 dnl
 dnl ftest_util.m4 - m4 macros used by the factory test environment.
 dnl
@@ -199,20 +199,20 @@ ifelse(
   `$#', `1',
   ``if ( argv[ optind ] ) {
         ftestArgGiven$1= true;
-        $1= ftestGet'_stripTWS(`_ftestInType_$1')`( argv[ optind++ ] );
+        ftestRead( argv[ optind++ ], $1);
     } else
 	ftestError( CommandlineError,
                     "expected '_stripTWS(`_ftestInType_$1')` at position %d in commandline\n",
                     optind );'',
   `$#', `2',
   ``if ( argv[ optind ] ) {
-	ftestArgGiven$1 = true;
-	$1 = ftestGet'_stripTWS(`_ftestInType_$1')`( argv[ optind++ ] );
+        ftestArgGiven$1= true;
+        ftestRead( argv[ optind++ ], $1 );
     } else
 	$1 = '_qstripTWS(`$2')`;'',
   ``if ( ftestSearchTaggedArg( argc, argv, optind, $3) ) {
-	ftestArgGiven$1 = true;
-	$1 = ftestGet'_stripTWS(`_ftestInType_$1')`( argv[ optind++ ] );
+        ftestArgGiven$1 = true;
+        ftestRead( argv[ optind++ ], $1 );
     } else
 	$1 = '_qstripTWS(`$2')`;'')
     `#line' __line__ "__file__"

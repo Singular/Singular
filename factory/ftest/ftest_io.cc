@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_io.cc,v 1.12 1998-03-31 10:36:02 schmidt Exp $ */
+/* $Id: ftest_io.cc,v 1.13 1998-04-06 11:08:28 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -21,160 +21,130 @@
 // - external functions.
 //
 
-//{{{ CanonicalForm ftestGetCanonicalForm ( const char * canFormSpec )
+//{{{ void ftestReadString ( const char * canFormSpec, CanonicalForm & f )
 //{{{ docu
 //
-// ftestGetCanonicalForm() - read a canonical form from canFormSpec,
-//   return it.
+// ftestReadString() - read canonical form `f' from `canFormSpec'.
 //
 //}}}
-CanonicalForm
-ftestGetCanonicalForm ( const char * canFormSpec )
+void
+ftestReadString ( const char * canFormSpec, CanonicalForm & f )
 {
-    const char * stringF = canFormSpec;
-    stringF = ftestSkipBlancs( stringF );
+    canFormSpec = ftestSkipBlancs( canFormSpec );
 
-    // check for a single minus
-    if ( stringF[0] == '-' ) {
-	const char * tokenCursor = ftestSkipBlancs( stringF+1 );
-
+    // check for a single minus and read from stdin
+    if ( *canFormSpec == '-' ) {
+	const char * tokenCursor = ftestSkipBlancs( canFormSpec+1 );
 	if ( ! *tokenCursor ) {
-	    CanonicalForm f;
 	    cin >> f;
-	    return f;
+	    return;
 	}
-    }
-
-    // get string to read canonical form from
-    if ( *stringF == '$' ) {
-	const char * tokenCursor = ftestSkipBlancs( stringF+1 );
-	// read canonical form from environment
-	stringF = getenv( tokenCursor );
-	if ( ! stringF )
-	    ftestError( CanFormSpecError,
-			"no environment variable `$%s' set\n",
-			tokenCursor );
     }
 
     // create terminated CanonicalForm
-    int i = strlen( stringF );
-    char * terminatedStringF = new char[i+2];
-    char * stringCursor = terminatedStringF;
-    while ( *stringF ) {
-	switch ( *stringF ) {
-	case '.': *stringCursor = '*'; break;
-	case '{': *stringCursor = '('; break;
-	case '}': *stringCursor = ')'; break;
-	default: *stringCursor = *stringF; break;
+    char * terminatedSpec = new char[ strlen( canFormSpec )+2 ];
+    char * cursor = terminatedSpec;
+    while ( *canFormSpec ) {
+	switch ( *canFormSpec ) {
+	case '.': *cursor = '*'; break;
+	case '{': *cursor = '('; break;
+	case '}': *cursor = ')'; break;
+	default: *cursor = *canFormSpec; break;
 	}
-	stringF++; stringCursor++;
+	canFormSpec++; cursor++;
     }
-    *stringCursor++ = ';';
-    *stringCursor = '\0';
+    *cursor++ = ';';
+    *cursor = '\0';
 
-    // read f and return it
-    CanonicalForm f;
-    istrstream( terminatedStringF ) >> f;
-    delete [] terminatedStringF;
-    return f;
+    // read f from string
+    istrstream( terminatedSpec ) >> f;
+    delete [] terminatedSpec;
 }
 //}}}
 
-//{{{ Variable ftestGetVariable ( const char * stringVariable )
+//{{{ void ftestReadString ( const char * varSpec, Variable & v )
 //{{{ docu
 //
-// ftestGetVariable() - read a variable from stringVariable,
-//   return it.
+// ftestReadString() - read variable `v' from `varSpec'.
 //
 //}}}
-Variable
-ftestGetVariable ( const char * stringVariable )
+void
+ftestReadString ( const char * varSpec, Variable & v )
 {
-    Variable v;
-    stringVariable = ftestSkipBlancs( stringVariable );
+    varSpec = ftestSkipBlancs( varSpec );
 
-    if ( isalpha( *stringVariable ) )
-	v = Variable( *stringVariable );
-    else if ( isdigit( *stringVariable ) )
+    if ( isalpha( *varSpec ) )
+	v = Variable( *varSpec );
+    else if ( isdigit( *varSpec ) )
 	v = Variable();
     else
 	ftestError( CommandlineError,
-		    "variable expected at `%s'\n", stringVariable );
+		    "variable expected at `%s'\n", varSpec );
 
-    stringVariable = ftestSkipBlancs( stringVariable+1 );
-    if ( *stringVariable )
+    varSpec = ftestSkipBlancs( varSpec+1 );
+    if ( *varSpec )
 	ftestError( CommandlineError,
-		    "extra characters after var spec `%s'\n", stringVariable );
-
-    return v;
+		    "extra characters after var spec `%s'\n", varSpec );
 }
 //}}}
 
-//{{{ int ftestGetint ( const char * stringInt )
+//{{{ void ftestReadString ( const char * intSpec, int & i )
 //{{{ docu
 //
-// ftestGetint() - read an integer from stringInt,
-//   return it.
+// ftestReadString() - read integer `i' from `intSpec'.
 //
 //}}}
-int
-ftestGetint ( const char * stringInt )
+void
+ftestReadString ( const char * intSpec, int & i )
 {
     const char * tokenCursor;
 
-    int i = (int)strtol( stringInt, (char**)&tokenCursor, 0 );
+    i = (int)strtol( intSpec, (char**)&tokenCursor, 0 );
 
     // do error checks
-    if ( stringInt == tokenCursor )
+    if ( intSpec == tokenCursor )
 	ftestError( CommandlineError,
-		    "integer expected at `%s'\n", stringInt );
+		    "integer expected at `%s'\n", intSpec );
 
-    stringInt = ftestSkipBlancs( tokenCursor );
-    if ( *stringInt )
+    // check for extra characters after skipping blancs
+    intSpec = ftestSkipBlancs( tokenCursor );
+    if ( *intSpec )
 	ftestError( CommandlineError,
-		    "extra characters after int spec `%s'\n", stringInt );
-
-    return i;
+		    "extra characters after int spec `%s'\n", intSpec );
 }
 //}}}
 
-//{{{ bool ftestGetbool ( const char * stringBool )
+//{{{ void ftestReadString ( const char * boolSpec, bool & b )
 //{{{ docu
 //
-// ftestGetbool() - read an boolean from stringBool,
-//   return it.
+// ftestReadString() - read boolean `b' from `boolSpec'.
 //
 //}}}
-bool
-ftestGetbool ( const char * stringBool )
+void
+ftestReadString ( const char * boolSpec, bool & b )
 {
-    const char * tokenCursor;
-
-    bool b;
     // skip blancs
-    stringBool = ftestSkipBlancs( stringBool );
+    boolSpec = ftestSkipBlancs( boolSpec );
 
     // look for "true" or "false"
-    tokenCursor = ftestSubStr( "true", stringBool );
-    if ( stringBool != tokenCursor )
+    const char * tokenCursor = ftestSubStr( "true", boolSpec );
+    if ( boolSpec != tokenCursor )
 	b = true;
     else {
-	tokenCursor = ftestSubStr( "false", stringBool );
+	tokenCursor = ftestSubStr( "false", boolSpec );
 	b = false;
     }
 
     // do error checks
-    if ( stringBool == tokenCursor )
+    if ( boolSpec == tokenCursor )
 	ftestError( CommandlineError,
-		    "bool expected at `%s'\n", stringBool );
+		    "bool expected at `%s'\n", boolSpec );
 
-    // check for extra characters
-    stringBool = ftestSkipBlancs( tokenCursor );
-    if ( *stringBool )
+    // check for extra characters after skipping blancs
+    boolSpec = ftestSkipBlancs( tokenCursor );
+    if ( *boolSpec )
 	ftestError( CommandlineError,
-		    "extra characters after bool spec `%s'\n", stringBool );
-
-    return b;
+		    "extra characters after bool spec `%s'\n", boolSpec );
 }
 //}}}
 
@@ -229,5 +199,23 @@ ftestPrintResult ( const char * resultName, const int result )
 	cout << "Result:\t\t" << resultName << ": " << result << endl;
     else if ( ! ftestPrintFlag )
 	cout << result << endl;
+}
+//}}}
+
+//{{{ void ftestPrintResult ( const char * resultName, const bool result )
+//{{{ docu
+//
+// ftestPrintResult() - print a boolean.
+//
+//}}}
+void
+ftestPrintResult ( const char * resultName, const bool result )
+{
+    const char * stringResult = result ? "true" : "false";
+
+    if ( ftestPrintResultFlag )
+	cout << "Result:\t\t" << resultName << ": " << stringResult << endl;
+    else if ( ! ftestPrintFlag )
+	cout << stringResult << endl;
 }
 //}}}
