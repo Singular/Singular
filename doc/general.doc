@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.189 2001-01-15 19:06:51 lossen Exp $
+@comment $Id: general.doc,v 1.190 2001-01-18 15:38:19 keilen Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -76,13 +76,13 @@ and the compilation date.
 
 To start @sc{Singular} in its Emacs user interface, either enter
 @code{ESingular} at the system prompt, or type @code{M-x singular}
-wtihin a running Emacs (provided you have loaded the file
+within a running Emacs (provided you have loaded the file
 @code{singular.el} in your running Emacs, see @ref{Running SINGULAR
 under Emacs} for details).
 
 Generally, we recommend to use @sc{Singular} in its Emacs interface,
-since this it offers many more features and is more convenient to
-use than the ASCII-terminal interface(@pxref{Emacs user interface}.
+since this offers many more features and is more convenient to
+use than the ASCII-terminal interface(@pxref{Emacs user interface}).
 
 To exit @sc{Singular} type @code{quit;}, @code{exit;} or @code{$} (or,
 when running within Emacs preferably type @code{C-c $}).
@@ -442,7 +442,7 @@ Library, Command Line Editing, readline, The GNU Readline Library
 Manual}, for more information. If a shared version of this library can
 be found on your machine, then additional command-line editing
 features like  history completion are available.
-In particuliar, if @sc{Singular} is able to load taht library and
+In particuliar, if @sc{Singular} is able to load that library and
 if the environment
 variable @code{SINGULARHIST} is set and has a name of a file as value,
 then the input history is stored across sessions using this
@@ -630,7 +630,7 @@ Finally, the following options are only available when running
 @item --emacs=EMACS
 @cindex --emacs
 Use @code{EMACS} as Emacs program to run the @sc{Singular} Emacs
-interface.
+interface, where @code{EMACS} may e.g. be emacs ore xemacs.
 
 @item --emacs-dir=DIR
 @cindex --emacs-dir
@@ -647,7 +647,7 @@ Start @code{PROG} as @sc{Singular} program within Emacs
 
 The value of options given to @sc{Singular} (resp.@: their default values,
 if an option was not given), can be checked with the command
-@code{system("}--long_option_name@code{")}.  @xref{system}.
+@code{system("--}long_option_name@code{")}.  @xref{system}.
 @smallexample
 @c example
   system("--quiet");    // if ``quiet'' 1, otherwise 0
@@ -658,7 +658,7 @@ if an option was not given), can be checked with the command
 
 Furthermore, the value of options (e.g., @code{--browser}) can be
 re-set while @sc{Singular} is running with the command
-@code{system("}--long_option_name_string @code{",}expression@code{)}. @xref{system}.
+@code{system("--}long_option_name_string @code{",}expression@code{)}. @xref{system}.
 @smallexample
   system("--browser", "builtin");  // sets browser to 'builtin'
   system("--ticks-per-sec", 100);  // sets timer resolution to 100
@@ -725,8 +725,8 @@ if (system("version") >= 1306) // assure backwards-compatibility
   @}
 @}; // the last semicolon is important: otherwise no ">", but "." prompt
 @end smallexample
-in her home directory, which sets the default help browser to
-@code{info} (unless @sc{Singular} is run within emcas) and thereby
+in his home directory, which sets the default help browser to
+@code{info} (unless @sc{Singular} is run within emacs) and thereby
 prevents the execution of the"global"
 @code{.singularrc} file installed by the system administrator (since the
 @code{.singularrc} file of the user is found before the "global"
@@ -744,7 +744,7 @@ Besides running @sc{Singular} in an ASCII-terminal, @sc{Singular} might
 also be run within Emacs. Emacs (or, XEmacs which is very similar) is a
 powerful and freely available text editor, which, among others,
 provides a framework for the implementation of interactive user
-interfaces. Starting from version 1.3.6 , @sc{Singular} provides such an
+interfaces. Starting from version 1.3.6, @sc{Singular} provides such an
 implementation, the so-called @sc{Singular} Emacs mode, or Emacs user
 interface.
 
@@ -762,7 +762,7 @@ folding of input and output
 @item
 TAB-completion for help topics
 @item
-highlighting of matching parenthesis
+highlighting of matching parentheses
 @item
 key-bindings and interactive menus for most user interface commands and
 for basic @sc{Singular} commands (such as loading of libraries and files)
@@ -793,7 +793,7 @@ distribution. Alternatively, @sc{Singular} can be started within an
 already running Emacs -- see @ref{Running SINGULAR under Emacs} for
 details.
 
-The next section gives  a tutorial-like introduction of Emacs. This
+The next section gives  a tutorial-like introduction to Emacs. This
 introductory section is
 followed by sections which explain the functionality of various aspects
 of the Emacs user interface in more detail: how to start/restart/kill
@@ -858,7 +858,7 @@ window commands are:
 @tab @code{File->Un-Split}
 @tab Un-Split window (i.e., kill other windows)
 @item @code{C-x o}
-@tab
+@tab 
 @tab Goto other window, i.e. move cursor into other window.
 @end multitable
 
@@ -871,8 +871,8 @@ the text. Here is a summary of simple cursor-moving operations:
 @item @code{C-b} @tab   Move backward a character
 @item @code{M-f} @tab   Move forward a word
 @item @code{M-b} @tab   Move backward a word
-@item @code{C-a} @tab   Move to beginning of line
-@item @code{C-e} @tab   Move to end of line
+@item @code{C-a} @tab   Move to the beginning of line
+@item @code{C-e} @tab   Move to the end of line
 @end multitable
 
 @item buffer
@@ -985,7 +985,7 @@ there are the following options which are special to @code{ESingular}:
 @item @code{--emacs=EMACS}
 @*@code{ESINGULAR_EMACS}
 @tab Use @code{EMACS} as Emacs program to run the @sc{Singular} Emacs
-interface.
+interface, where @code{EMACS} may e.g. be emacs or xemacs.
 
 @item @code{--emacs-dir=DIR}
 @*@code{ESINGULAR_EMACS_DIR}
@@ -1081,7 +1081,7 @@ customize this default settings, see
 @item @code{singular-exit-singular} (bound to @code{C-c $} or menu
 @code{Singular}, item @code{Exit})
 
-kills the running @sc{Singular} process of the current
+Kills the running @sc{Singular} process of the current
 buffer (but does not kill the buffer). Once you have killed a
 @sc{Singular} process you can start a new one in the same buffer with
 the command @code{singular} (or select the item @code{Start default} of
@@ -1090,7 +1090,7 @@ the @code{Singular} menu).
 @item @code{singular-restart} (bound to @code{C-c C-r} or menu
 @code{Singular}, item @code{Restart})
 
-kills the running @sc{Singular} process of the current buffer and starts
+Kills the running @sc{Singular} process of the current buffer and starts
 a new process in the same buffer with exactly the same command line
 arguments as before.
 
@@ -1149,7 +1149,7 @@ Some aspects of running @sc{Singular} demos can be customized.
 @cindex Customization of the Emacs interface
 
 Emacs provides a convenient interface to customize the behavior of
-Emacs and the SINGULAR Emacs interface for you own needs. You enter the
+Emacs and the SINGULAR Emacs interface for your own needs. You enter the
 customize environment by either calling @code{M-x customize} (on XEmacs
 you afterwards have to enter @code{emacs} in the minibuffer area) or by
 selecting the menu item @code{Options->Customize->Emacs...} for XEmacs,
@@ -1171,7 +1171,7 @@ The @sc{Singular} interface customization buffer is divided into four
 groups:
 
 @itemize @bullet
-@item Singular faces
+@item Singular Faces
 
 Here you can specify various faces used if font-lock-mode is enabled
 (which it is, by default).
@@ -1219,7 +1219,7 @@ automatically  taken over by a "normal" Emacs, and vice versa.
 @cindex Singular, editing input files with Emacs
 @cindex Editing SINGULAR input files with Emacs
 
-Since @sc{Singular}'s programming language is similar to @code{C}, you
+Since @sc{Singular}'s programming language is similar to C, you
 should use the Emacs C/C++-mode to edit @sc{Singular} input files and
 @sc{Singular} libraries. Among others, this Emacs mode provides
 automatic indentation, line-breaking and keyword highlighting.
@@ -1254,7 +1254,7 @@ Notice that you can change the default settings for source-code
 highlighting (colors, fonts, etc.) by customizing the respective faces
 using the @code{Customize} feature of Emacs. For doing this, you might
 find handy the above given function @code{customize-face-at-point},
-which lets you customize the of the current position of point (this
+which lets you customize the face of the current position of point (this
 function is automatically defined if you run @code{ESingular}).
 
 @c --------------------------------------------------------------------------
@@ -1305,7 +1305,7 @@ to scroll left and right, resp.
 context specific completion. If point is inside a string, file name
 completion is done. If point is at the end of a help command (i.e.,
 @code{help} or @code{?}), completion on @sc{Singular} help topics is
-done. If point is at the end of a example command (i.e.,
+done. If point is at the end of an example command (i.e.,
 @code{example}), completion is done on @sc{Singular} examples. In all
 other cases, completion on @sc{Singular} commands is done.
 
@@ -1508,17 +1508,17 @@ Z/7[x1,@dots{},x6]
 @end ifinfo
 with lexicographical ordering for
 @tex
-$x_1,\ldots,x_3$
+$x_1,x_2,x_3$
 @end tex
 @ifinfo
-x1,@dots{},x3
+x1,x2,x3
 @end ifinfo
 and degree reverse lexicographical ordering for
 @tex
-$x_4,\ldots,x_6$:
+$x_4,x_5,x_6$:
 @end tex
 @ifinfo
-x4,@dots{},x6:
+x4,x5,x6:
 @end ifinfo
 
 @smallexample
@@ -1565,7 +1565,7 @@ $\mu_a=a^2+a+3$,
 mu_a=a^2+a+3,
 @end ifinfo
 in the second case, @math{a}
-refers to some generator of the cyclic group of unities of @math{K}:
+refers to some generator of the cyclic group of units of @math{K}:
 
 @smallexample
 ring r = (7,a),(x,y,z),dp; minpoly = a^2+a+3;
@@ -1600,7 +1600,7 @@ ring r = (complex,50,j),(x,y,z),dp;
 @end smallexample
 
 @item
-the ring @math{R''(i)[x,y,z]}, where @math{R''} denotes the field of real
+the ring @math{R'(i)[x,y,z]}, where @math{R'} denotes the field of real
 numbers represented by floating point numbers of 3 valid decimal digits
 and @math{i} denotes the imaginary unit.
 
@@ -1631,7 +1631,7 @@ qring r = std(maxideal(2));
 @c ------------------------------------------------------------
 @table @strong
 @item Syntax:
-@code{ring} name @code{=} coefficient_field@code{,}
+@code{ring} name @code{=} @code{(}coefficient_field@code{),}
   @code{(} names_of_ring_variables @code{),}
   @code{(} ordering @code{);}
 @item Default:
@@ -1693,7 +1693,7 @@ Note that computations over this field are not exact.
 an expression_list of the name @code{complex},
 an optional int_expression and a name.
 @* This specifies the field of complex numbers represented with floating point
-numbers with an precision given by the int expression (default: 3).
+numbers with a precision given by the int expression (default: 3).
 @*The name of the imaginary unit is given by the last parameter.
 @*These numbers are implemented with machine floating point numbers
 of single precision (for a precision smaller than 4).
@@ -1720,7 +1720,7 @@ weight vector given as an intvec_expression in parentheses.
 @code{c} or @code{C}.
 @end enumerate
 
-For the definition of the orderings, see @ref{Monomial orderings} and @ref{Monomial orderings}.
+For the definition of the orderings, see @ref{Monomial orderings}.
 
 If one of coefficient_field, names_of_ring_variables, and ordering
 consists of only one entry, the parentheses around this entry may be
@@ -1953,7 +1953,7 @@ resultant and gcd computations.
 @item facstd
 @ref{facstd}
 @*computes a list of Groebner bases via the Factorizing Groebner Basis
-Algorithm, i.e., which has the same radical as the original ideal. It need not
+Algorithm, i.e., their intersection has the same radical as the original ideal. It need not
 be a Groebner basis of the given ideal.
 
 The intersection of the zero-sets is the zero-set of the given ideal.
@@ -2125,6 +2125,9 @@ algorithm.
 
 Multivariate polynomials are considered as univariate polynomials in the
 main variable (which has to be specified by the user).
+@item vandermonde
+@ref{vandermonde}@*
+interpolates a polynomial from its values at several points
 @end table
 
 @c ----------------------------------------------------------------------
@@ -2154,9 +2157,6 @@ computes all (complex) roots of a univariate polynomial
 @item uressolve
 @ref{uressolve}@*
 find all roots of 0-dimensional ideal i with multivariate resultants
-@item vandermonde
-@ref{vandermonde}@*
-interpolates a polynomial from its values at several points
 @end table
 
 @c ----------------------------------------------------------------------
@@ -2429,6 +2429,12 @@ synonym for @code{help}
 @item @code{//}
 @cindex //
 comment delimiter.  Comment extends to end of line.
+@item @code{/*}
+@cindex //
+comment delimiter.  Starts a comment which ends with @code{*/}.
+@item @code{*/}
+@cindex //
+comment delimiter.  Ends a comment which starts with @code{/*}.
 @item @code{;}
 @cindex ;
 statement separator
@@ -2674,7 +2680,7 @@ Possible type casts are:
 @item
 @    @tab  @code{ideal} @tab  expression lists of @code{int}, @code{number}, @code{poly}
 @item
-@    @tab  @code{ideal} @tab  @code{int}, @code{matrix}, @code{module},@code{number}, @code{poly}, @code{vector}
+@    @tab  @code{ideal} @tab  @code{int}, @code{matrix}, @code{module}, @code{number}, @code{poly}, @code{vector}
 @item
 @    @tab  @code{int} @tab    @code{number}, @code{poly}
 @item
@@ -2832,7 +2838,7 @@ Links have various properties which can be queried using the
 @end smallexample
 
 @subheading ASCII links
-Data that can be converted to a string can be written into files for
+Data that can be converted to a string that can be written into files for
 storage or communication with other programs. The data are written in
 plain ASCII format. Reading from an ASCII link returns a string ---
 conversion into other data is up to the user. This can be done, for
@@ -3063,7 +3069,7 @@ objects are generated or manipulated.
 
 The help text of procedures contained in libraries of the
 @sc{Singular} distribution
-should furthermore comply with the certain rules as explained in
+should furthermore comply with  certain rules as explained in
 @ref{The help string of procedures}.
 
 @c ---------------------------------------
@@ -3324,7 +3330,7 @@ See
 @subsection Format of a library
 @cindex Format of a library
 
-A library file can contain comments, an category-, info- and version-string
+A library file can contain comments, a category-, info- and version-string
 definition, @code{LIB} commands, @code{proc} commands
 and @code{proc} commands with @code{example} and @code{help} sections,
 i.e., the following keywords are allowed:
@@ -3351,8 +3357,8 @@ defines the general help for the library. This text is displayed on
 @item @strong{Example:}
 @smallexample
 info="
-      This could be the general help of an library.
-     Quotes must be escaped with an \ such as \"
+      This could be the general help of a library.
+     Quotes must be escaped with a \ such as \"
 ";
 @end smallexample
 @item @strong{Note:}
@@ -3380,7 +3386,7 @@ version="$I@comment
 @comment !! Do not erase the @comment at the end of the previous line !!
 @comment !! It prevents cvs to substitute the id string                !!
 d: sample.lib,v 1.2 1998/05/07 singular Exp $";
-  version="some version string";
+version="some version string";
 @end smallexample
 @item @strong{Note:}
 It is common practice to simply define the version string to be
@@ -3543,7 +3549,7 @@ written is @code{texinfo}. Based on various tools, @code{info, dvi, ps,} and
 @code{html} versions of the @code{texinfo} documentation are generated.
 
 
-Starting with @sc{Singular} version 1-4, the @code{texinfo}
+Starting with @sc{Singular} version 1-3, the @code{texinfo}
 documentation of all libraries of the @sc{Singular} distribution is
 generated automatically from their source code.
 
@@ -3570,24 +3576,24 @@ developers should
 @item
 follow the recommendation of
 @ref{The help string of a library} and @ref{The help string of
-procedures}
+procedures}.
 
 @item
 consult the source code of libraries like
 @code{template.lib} (@pxref{template_lib})
 for examples on how library documentations are
-written
+written.
 
 @item
 make sure that each procedure listed in the @code{PROCEDURE:}
 section of the library info string has a help string and an example
-section
+section.
 
 @item
 not use interactive functions like
 @code{pause("..")} or @code{read("");} (@pxref{read}) and should limit the
 length of input lines to 60 characters in the example section of
-procedures
+procedures.
 
 @item
 carefully check the generated
@@ -3853,7 +3859,7 @@ PROCEDURES:
 ";
 @end smallexample
 Only such procedures should be listed in the @code{PROCEDURE} section
-for which are not @code{static} and which
+which are not @code{static} and which
 have a help and example section.
 
 The purpose of the one line procedure descriptions is not to give a short help
@@ -4002,7 +4008,7 @@ quit debugger, set debugger flags(0,1,2)
 
 @subsubheading Syntactical errors in procedures
 If @sc{Singular} was started with the command line option @code{-d} or
-@code{--sdb} an syntactical error in a procedure will start the
+@code{--sdb} a syntactical error in a procedure will start the
 source code debugger instead of returning to the top level with an
 error message. The commands @code{q 1} and @code{q 2} are equivalent in this
 case.
