@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_rpm.texi,v 1.3 2002-03-12 14:57:41 mschulze Exp $
+@comment $Id: INSTALL_rpm.texi,v 1.4 2002-03-21 16:19:16 mschulze Exp $
 @c FILE: INSTALL_rpm.texi
 @c PURPOSE: Installation instruction for Singular on RPM based Linux systems
 @c
@@ -14,6 +14,7 @@
 
 @sc{rpm} is a powerful package manager, which can be used to build, install, query, verify, update, and erase individual software packages.
 @sc{Singular} can be installed on an @sc{rpm} based @sc{Linux} system.
+The installation of @sc{Singular} on a general @sc{Unix} system is described in @code{INSTALL_unix}.
 
 @heading @sc{Singular} @sc{rpm} packages
 
@@ -53,8 +54,8 @@ RPM Version 4.0.3
 Copyright (C) 1998-2000 - Red Hat, Inc.
 This program may be freely redistributed under the terms of the GNU GPL
 
-Usage: rpm {--help}
-       rpm {--version}
+Usage: rpm @{--help@}
+       rpm @{--version@}
 @end smallexample
 @item
 To deal with @sc{rpm} packages, you can either use the @sc{rpm} command line tool @code{rpm} or a graphical @sc{rpm} frontend like e.g. @code{kpackage} under @sc{kde}.
@@ -75,12 +76,15 @@ in a command shell and enter the root password.
 
 @heading Installation of @sc{Singular} @sc{rpm} packages
 
+In the following, we describe how to install @sc{Singular} using the @sc{rpm} command line tool @code{rpm}.
+Alternatively, you can use a graphical @sc{rpm} frontend like e.g. @code{kpackage} under @sc{kde}.
+
 @enumerate
 @item
-The installation requires about 18MB of free disk space under @code{/opt}.
+The installation requires about 20MB of free disk space under @code{/opt}.
 You can check the free disk space by typing
 @smallexample
-df
+df -h
 @end smallexample
 in a command shell.
 @item
@@ -91,6 +95,7 @@ To install the @sc{Singular} binary @sc{rpm} package, type
 rpm -ivh Singular-@value{RPM_VERSION}-1.i386.rpm
 @end smallexample
 in a command shell.
+
 This requires several shared libraries.
 If these are not present in your system, @code{rpm} will give an error report.
 In this case, you have to install @sc{rpm} packages providing these shared libraries and retry.
@@ -112,11 +117,11 @@ You can check this by typing
 rpm -ql kdebase
 @end smallexample
 in a command shell.
-In the first case, you type
+In the first case (@code{/opt/kde}), you type
 @smallexample
 rpm -ivh Singular-kde-redhat-@value{RPM_VERSION}-1.noarch.rpm
 @end smallexample
-and in the second case
+and, in the second case (@code{/usr/share}),
 @smallexample
 rpm -ivh Singular-kde-suse-@value{RPM_VERSION}-1.noarch.rpm
 @end smallexample
