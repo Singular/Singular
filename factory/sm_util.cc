@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: sm_util.cc,v 1.2 1997-07-19 08:39:15 schmidt Exp $ */
+/* $Id: sm_util.cc,v 1.3 1997-08-29 07:26:46 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -17,7 +17,7 @@
 #include "debug.h"
 
 #include "cf_defs.h"
-#include "cf_chinese.h"
+#include "cf_algorithm.h"
 #include "cf_iter.h"
 #include "cf_reval.h"
 #include "canonicalform.h"

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: factory.template,v 1.9 1997-06-30 15:41:28 schmidt Exp $ */
+/* $Id: factory.template,v 1.10 1997-08-29 07:26:43 schmidt Exp $ */
 
 #ifndef INCL_FACTORY_H
 #define INCL_FACTORY_H
@@ -64,7 +64,7 @@ extern "C" {
 #include "cf_binom.h"
 
 /*MAKEHEADER PUBLIC ONLY*/
-#include "cf_chinese.h"
+#include "cf_algorithm.h"
 
 /*MAKEHEADER PUBLIC ONLY*/
 #include "cf_eval.h"

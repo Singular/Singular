@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.12 1997-07-19 08:15:32 schmidt Exp $ */
+/* $Id: cf_gcd.cc,v 1.13 1997-08-29 07:26:37 schmidt Exp $ */
 
 #include <config.h>
 
@@ -11,7 +11,7 @@
 #include "cf_iter.h"
 #include "cf_reval.h"
 #include "cf_primes.h"
-#include "cf_chinese.h"
+#include "cf_algorithm.h"
 #include "cf_map.h"
 #include "sm_sparsemod.h"
 #include "fac_util.h"

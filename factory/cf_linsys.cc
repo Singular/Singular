@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_linsys.cc,v 1.9 1997-07-30 15:23:19 schmidt Exp $ */
+/* $Id: cf_linsys.cc,v 1.10 1997-08-29 07:26:40 schmidt Exp $ */
 
 #include <config.h>
 
@@ -11,7 +11,7 @@
 #include "cf_primes.h"
 #include "canonicalform.h"
 #include "cf_iter.h"
-#include "cf_chinese.h"
+#include "cf_algorithm.h"
 #include "ffops.h"
 #include "cf_primes.h"
 
