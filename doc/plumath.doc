@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plumath.doc,v 1.3 2003-02-03 13:55:19 levandov Exp $
+@comment $Id: plumath.doc,v 1.4 2003-02-06 15:51:38 levandov Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -16,10 +16,11 @@
 @menu
 * Mathematical background::
 @end menu
-@node Mathematical background,Index, Functions and system variables, Top
+@node Mathematical background,Index,Functions and system variable , Top
 @chapter Mathematical background
 %**end
 @end ignore
+
 
 This chapter introduces some of the mathematical notions and definitions used
 throughout the manual. It is mostly a collection of the

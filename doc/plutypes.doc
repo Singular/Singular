@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plutypes.doc,v 1.3 2003-02-03 13:55:20 levandov Exp $
+@comment $Id: plutypes.doc,v 1.4 2003-02-06 15:51:39 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -23,12 +23,12 @@
 @end ignore
 
 @cindex expression list
-This chapter explains all data types of @sc{Singular} in
+This chapter explains all data types of @sc{Plural} in
 alphabetical order. For every type, there is a description of the
 declaration syntax as well as information about how to build expressions
 of certain types.
 
-The term expression list in @sc{Singular} refers to any comma separated
+The term expression list in @sc{Plural} refers to any comma separated
 list of expressions.
 
 For the general syntax of a declaration see 
@@ -43,6 +43,7 @@ For the general syntax of a declaration see
 * qring::
 * resolution::
 * ring::
+* vector::
 @ifset namespaces
 @end ifset
 @end menu
@@ -1059,7 +1060,7 @@ a type cast to resolution from a list of ideals, resp.@: modules..
 
 @c ---------------------------------------
 
-@node ring, , resolution, Data types
+@node ring, vector, resolution, Data types
 @section ring
 @cindex ring
 
@@ -1167,3 +1168,177 @@ following guide lines into consideration:
 @c example
 @end smallexample
 
+
+@c ---------------------------------------
+@node vector,  ,ring , Data types
+@section vector
+@cindex vector
+
+Vectors are elements of a free module over the basering with basis
+@code{gen(1)}, @code{gen(2)}, @dots{} .
+Each vector belongs to a free module of rank equal to the biggest index
+of a generator with non-zero coefficient. Since generators with zero
+coefficients need not be written any vector may be considered
+also as an element of a free module of higher rank.
+Like polynomials they
+can only be defined or accessed with respect to the basering.
+(E.g., if @code{f} and @code{g} are polynomials then
+@code{f*gen(1)+g*gen(3)+gen(4)} may also be written as @code{[f,0,g,1]}
+or as @code{[f,0,g,1,0]}.) Note that the elements of a vector have to be
+surrounded by square brackets (@code{[}  , @code{]})
+@c(cf. @ref{Representation of mathematical objects}).
+
+@menu
+* vector declarations::
+* vector expressions::
+* vector operations::
+* vector related functions::
+@end menu
+
+@c ------------------------------
+@node vector declarations, vector expressions, vector, vector
+@subsection vector declarations
+@cindex vector declarations
+
+@table @strong
+@item Syntax:
+@code{vector} name @code{=} vector_expression @code{;}
+
+@item Purpose:
+defines a vector of polynomials (an element of a free module).
+
+@item Default:
+[0]
+
+@item Example:
+@smallexample
+@c example
+  ring r=0,(x,y,z),(c,dp);
+  poly s1 = x2;
+  poly s2 = y3;
+  poly s3 = z;
+  vector v = [s1, s2-s1, s3-s1]+ s1*gen(5);
+  // v is a vector in the free module of rank 5
+  v;
+@c example
+@end smallexample
+@end table
+
+@c ------------------------------
+@node vector expressions, vector operations, vector declarations, vector
+@subsection vector expressions
+@cindex vector expressions
+
+A vector expression is:
+@enumerate
+@item
+an identifier of type vector
+@item
+a function returning vector
+@item
+a poly expression (via the canonical embedding @code{p} @expansion{} @code{p*gen(1)})
+@item
+vector expressions combined by the arithmetic operations @code{+} or
+@code{-}
+@item
+a poly expression and a vector expression combined by the arithmetic
+operation @code{*}
+@item
+a type cast to vector using the brackets @code{[} , @code{]}
+@end enumerate
+
+@*@strong{Example:}
+@smallexample
+@c example
+  // ordering gives priority to components:
+  ring rr=0,(x,y,z),(c,dp);
+  vector v=[x2+y3,2,0,x*y]+gen(6)*x6;
+  v;
+  vector w=[z3-x,3y];
+  v-w;
+  v*(z+x);
+@c example
+@end smallexample
+
+@c ref
+See
+@ref{ring};
+@c ref
+
+@c ------------------------------
+@node vector operations, vector related functions, vector expressions, vector
+@subsection vector operations
+@cindex vector operations
+
+@table @asis
+@item @code{+}
+addition
+
+@item @code{-}
+negation or subtraction
+
+@item @code{/}
+division by a monomial, not divisible terms yield 0
+
+@item @code{<}, @code{<=}, @code{>}, @code{>=}, @code{==}, @code{<>}
+comparison of leading terms w.r.t. monomial ordering
+
+@item vector_expression @code{[} int_expressions @code{]}
+is a vector entry; the index 1 gives the first entry.
+@end table
+
+@*@strong{Example:}
+@smallexample
+@c example
+  ring R=0,(x,y),(c,dp);
+  [x,y]-[1,x];
+  [1,2,x,4][3];
+@c example
+@end smallexample
+
+
+@c ------------------------------
+@node vector related functions,  , vector operations, vector
+@subsection vector related functions
+@cindex vector related functions
+
+@c @table @code
+@c @item cleardenom
+@c quotient of a vector by its content (see @ref{cleardenom})
+@c @item coeffs
+@c matrix of coefficients (see @ref{coeffs})
+@c @item deg
+@c degree (see @ref{deg})
+@c @item diff
+@c partial derivative (see @ref{diff})
+@c @item gen
+@c i-th generator (see @ref{gen})
+@c @item homog
+@c homogenization (see @ref{homog})
+@c @item jet
+@c k-jet: monomials with degree smaller k+1 (see @ref{jet})
+@c @item lead
+@c leading term (see @ref{lead})
+@c @item leadcoef
+@c leading coefficient (see @ref{leadcoef})
+@c @item leadexp
+@c the exponent vector of the leading monomial (see @ref{leadexp})
+@c @item leadmonom
+@c leading monomial (see @ref{leadmonom})
+@c @item nrows
+@c number of rows (see @ref{nrows})
+@c @item ord
+@c degree of the leading monomial (see @ref{ord})
+@c @item reduce
+@c normal form with respect to a standard base (see @ref{reduce})
+@c @item simplify
+@c normalize a vector (see @ref{simplify})
+@c @item size
+@c number of monomials (see @ref{size})
+@c @item subst
+@c substitute a ring variable (see @ref{subst})
+@c @end table
+
+@c @*@strong{Example:}
+@c @example
+@c @end example
