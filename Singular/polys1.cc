@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.56 2000-12-07 12:22:42 Singular Exp $ */
+/* $Id: polys1.cc,v 1.57 2000-12-08 16:20:03 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -834,7 +834,7 @@ poly pPermPoly (poly p, int * perm, ring oldRing,
     else
     {
       qq=pOne();
-      aq=naPermNumber(pGetCoeff(p),par_perm,OldPar);
+      aq=naPermNumber(pGetCoeff(p),par_perm,OldPar, oldRing);
       if ((currRing->minpoly!=NULL)
       && ((rField_is_Zp_a()) || (rField_is_Q_a())))
       {
@@ -980,7 +980,7 @@ poly p_PermPoly (poly p, int * perm, ring oldRing,
     else
     {
       qq=p_ISet(1, newRing);
-      aq=naPermNumber(pGetCoeff(p),par_perm,OldPar);
+      aq=naPermNumber(pGetCoeff(p),par_perm,OldPar, oldRing);
       if ((newRing->minpoly!=NULL)
       && ((rField_is_Zp_a(newRing)) || (rField_is_Q_a(newRing))))
       {
