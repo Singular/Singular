@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.46 2001-01-18 15:38:48 keilen Exp $
+@comment $Id: start.doc,v 1.47 2001-02-26 10:34:03 Singular Exp $
 @comment this file contains the "Introduction" chapter.
 @c * wichmann: + added changes by GMG.
 
@@ -97,8 +97,7 @@ version 1.0 and in 1998 to the release of version 1.2
 and on improved implementations of the algorithms,
 libraries for primary decomposition, ring normalization, etc.)
 
-For the highlights of the new @sc{Singular} version @value{VERSION} see ...
-(TBC)
+For the highlights of the new @sc{Singular} version @value{VERSION} see @ref{News and changes}.
 
 @c Thus, we hope to offer a useful system
 @c for dealing with local and global computational aspects
