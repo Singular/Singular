@@ -1,8 +1,8 @@
-// $Id: classify.lib,v 1.36 1999-07-30 10:37:55 obachman Exp $
+e// $Id: classify.lib,v 1.37 1999-09-03 15:17:01 krueger Exp $
 // KK, last modified: 04.04.1998
 ///////////////////////////////////////////////////////////////////////////////
 
-version  = "$Id: classify.lib,v 1.36 1999-07-30 10:37:55 obachman Exp $";
+version  = "$Id: classify.lib,v 1.37 1999-09-03 15:17:01 krueger Exp $";
 info="
 LIBRARY:  classify.lib  PROCEDURES FOR THE ARNOLD-CLASSIFIER OF SINGULARITIES
 
@@ -2818,8 +2818,12 @@ EXAMPLE:  example normalform; shows an example."
 {
   string Typ;
   int    k, r, s, crk;
+  int    n, i;
   poly   f;
   list   v;
+  def ring_ext = basering;
+  n = nvars(basering);
+  ring ring_top=char(basering),(x(1..n)),(c,ds);
 
   if(checkring()) { return(s_in); }
   if(nvars(basering)<=1) {
@@ -2833,7 +2837,13 @@ EXAMPLE:  example normalform; shows an example."
   Typ, k, r, s = v[1..4];
   if(Typ=="Error") { return(0); }
   v = singularity(Typ, k, r, s);
-  f, crk = v[1..2];
+  poly f_out;
+  f_out, crk = v[1..2];
+  if(crk>1) { for(i=crk+1;i<=n;i=i+1) { f_out = f_out + x(i)^2; } }
+  setring ring_ext;
+  map conv_top2ext=ring_top,maxideal(1);
+  f = conv_top2ext(f_out);
+//  f, crk = v[1..2];
   return(f);
 }
 example
