@@ -1,7 +1,7 @@
-// $Id: standard.lib,v 1.36 1999-07-06 15:32:59 Singular Exp $
+// $Id: standard.lib,v 1.37 1999-07-07 14:11:45 Singular Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.36 1999-07-06 15:32:59 Singular Exp $";
+version="$Id: standard.lib,v 1.37 1999-07-07 14:11:45 Singular Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
@@ -926,8 +926,9 @@ EXAMPLE : example pause; shows an example
 }
 example
 { "EXAMPLE:"; echo=2;
-  pause("press <return> to continue");
-  pause();
+  // cannot be shown non-interactively, try the follwing commands without //
+  // pause("press <return> to continue");
+  // pause();
 }
 
 

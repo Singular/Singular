@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.118 1999-07-06 11:58:12 obachman Exp $
+@comment $Id: reference.doc,v 1.119 1999-07-07 14:11:46 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -4051,22 +4051,23 @@ See @ref{charstr}; @ref{npars}; @ref{ordstr}; @ref{par}
 @node pause, preimage, parstr, Functions
 @subsection pause
 @cindex pause
-@table @code
-@item @strong{Syntax:}
-@code{pause;}
-@item @strong{Type:}
-none
-@item @strong{Purpose:}
-pauses the execution of a procedure until the return key is pressed.
-@item @strong{Example:}
-@example
-// the procedure will continue if return is pressed:
-"press the return key to continue"; pause;
-@expansion{} press the return key to continue
-@expansion{} pause>
-
-@end example
-@end table
+@c lib standard.lib:pause lib_fun lib_ex
+@c @table @code
+@c @item @strong{Syntax:}
+@c @code{pause;}
+@c @item @strong{Type:}
+@c none
+@c @item @strong{Purpose:}
+@c pauses the execution of a procedure until the return key is pressed.
+@c @item @strong{Example:}
+@c @example
+@c // the procedure will continue if return is pressed:
+@c "press the return key to continue"; pause;
+@c @expansion{} press the return key to continue
+@c @expansion{} pause>
+@c 
+@c @end example
+@c @end table
 @c ---------------------------------------
 @node preimage, prime, pause, Functions
 @subsection preimage
@@ -6054,7 +6055,7 @@ For a dynamic module the packagename is hard-coded in the binary file.
 To use this features, just specify the identifier by its full name:
 
 @example
-@c example
+@c example error
   listvar(package);
   Inout::version;     // full name of a variable in the package Inout
   listvar(package);   // the package Inout has been autoloaded
