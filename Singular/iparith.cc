@@ -2783,6 +2783,7 @@ static BOOLEAN jjVDIM(leftv res, leftv v)
 /*=================== operations with 1 arg.: table =================*/
 
 #ifdef INIT_BUG
+#define XS(A) -((short)A)
 #define jjstrlen       (proc1)1
 #define jjpLength      (proc1)2
 #define jjidElem       (proc1)3
@@ -2853,10 +2854,12 @@ void jjInitTab1()
     }
   }
 }
-#elif defined(PROC_BUG)
+#else
+#if defined(PROC_BUG)
+#define XS(A) A
 static BOOLEAN jjstrlen(leftv res, leftv v)
 {
-  res->data = (char *)strlen(v->Data());
+  res->data = (char *)strlen((char *)v->Data());
   return FALSE;
 }
 static BOOLEAN jjpLength(leftv res, leftv v)
@@ -2972,6 +2975,7 @@ static BOOLEAN jjMINRES_R(leftv res, leftv v)
   return FALSE;
 }
 #else
+#define XS(A)          -((short)A)
 #define jjstrlen       (proc1)strlen
 #define jjpLength      (proc1)pLength
 #define jjidElem       (proc1)idElem
@@ -2997,6 +3001,7 @@ static BOOLEAN jjMINRES_R(leftv res, leftv v)
 #define jjCOUNT_R        (proc1)syLength
 #define jjDIM_R        (proc1)syDim
 #define jjMINRES_R     (proc1)syMinimize
+#endif
 #endif
 BOOLEAN jjnInt(leftv res, leftv u)
 {
@@ -3028,7 +3033,7 @@ struct sValCmd1 dArith1[]=
 ,{jjBAREISS_IM, BAREISS_CMD,     INTMAT_CMD,     INTMAT_CMD }
 ,{jjBAREISS,    BAREISS_CMD,     MATRIX_CMD,     MATRIX_CMD }
 ,{jjBETTI,      BETTI_CMD,       INTMAT_CMD,     LIST_CMD }
-,{jjBETTI_R,    BETTI_CMD,      -((s)INTMAT_CMD),RESOLUTION_CMD }
+,{jjBETTI_R,    BETTI_CMD,       XS(INTMAT_CMD), RESOLUTION_CMD }
 ,{jjCHAR,       CHARACTERISTIC_CMD, INT_CMD,     RING_CMD }
 ,{jjCHAR,       CHARACTERISTIC_CMD, INT_CMD,     QRING_CMD }
 #ifdef HAVE_FACTORY
@@ -3036,8 +3041,8 @@ struct sValCmd1 dArith1[]=
 #else
 ,{jjWRONG,      CHAR_SERIES_CMD, MATRIX_CMD,     IDEAL_CMD }
 #endif
-,{jjrCharStr,   CHARSTR_CMD,    -((s)STRING_CMD),RING_CMD }
-,{jjrCharStr,   CHARSTR_CMD,    -((s)STRING_CMD),QRING_CMD }
+,{jjrCharStr,   CHARSTR_CMD,     XS(STRING_CMD), RING_CMD }
+,{jjrCharStr,   CHARSTR_CMD,     XS(STRING_CMD), QRING_CMD }
 ,{jjOpenClose,  CLOSE_CMD,       NONE,           LINK_CMD }
 ,{jjWRONG,      COLS_CMD,        0,              VECTOR_CMD }
 ,{jjCOLS,       COLS_CMD,        INT_CMD,        MATRIX_CMD }
@@ -3048,12 +3053,12 @@ struct sValCmd1 dArith1[]=
 ,{jjCONTENT,    CONTENT_CMD,     POLY_CMD,       POLY_CMD }
 ,{jjCONTENT,    CONTENT_CMD,     VECTOR_CMD,     VECTOR_CMD }
 ,{jjCOUNT_N,    COUNT_CMD,       INT_CMD,        NUMBER_CMD }
-,{jjCOUNT_R,    COUNT_CMD,      -((s)INT_CMD),   RESOLUTION_CMD }
-,{jjstrlen,     COUNT_CMD,      -((s)INT_CMD),   STRING_CMD }
-,{jjpLength,    COUNT_CMD,      -((s)INT_CMD),   POLY_CMD }
-,{jjpLength,    COUNT_CMD,      -((s)INT_CMD),   VECTOR_CMD }
-,{jjidElem,     COUNT_CMD,      -((s)INT_CMD),   IDEAL_CMD }
-,{jjidElem,     COUNT_CMD,      -((s)INT_CMD),   MODUL_CMD }
+,{jjCOUNT_R,    COUNT_CMD,       XS(INT_CMD),    RESOLUTION_CMD }
+,{jjstrlen,     COUNT_CMD,       XS(INT_CMD),    STRING_CMD }
+,{jjpLength,    COUNT_CMD,       XS(INT_CMD),    POLY_CMD }
+,{jjpLength,    COUNT_CMD,       XS(INT_CMD),    VECTOR_CMD }
+,{jjidElem,     COUNT_CMD,       XS(INT_CMD),    IDEAL_CMD }
+,{jjidElem,     COUNT_CMD,       XS(INT_CMD),    MODUL_CMD }
 ,{jjCOUNT_M,    COUNT_CMD,       INT_CMD,        MATRIX_CMD }
 ,{jjCOUNT_IV,   COUNT_CMD,       INT_CMD,        INTVEC_CMD }
 ,{jjCOUNT_IV,   COUNT_CMD,       INT_CMD,        INTMAT_CMD }
@@ -3070,11 +3075,11 @@ struct sValCmd1 dArith1[]=
 ,{jjDET,        DET_CMD,         POLY_CMD,       MATRIX_CMD }
 #else
 ,{jjWRONG,      DET_CMD,         INT_CMD,        INTMAT_CMD }
-,{jjmpDet,      DET_CMD,        -((s)POLY_CMD),  MATRIX_CMD }
+,{jjmpDet,      DET_CMD,         XS(POLY_CMD),   MATRIX_CMD }
 #endif
 ,{jjDIM,        DIM_CMD,         INT_CMD,        IDEAL_CMD }
 ,{jjDIM,        DIM_CMD,         INT_CMD,        MODUL_CMD }
-,{jjDIM_R,      DIM_CMD,        -((s)INT_CMD),   RESOLUTION_CMD }
+,{jjDIM_R,      DIM_CMD,         XS(INT_CMD),    RESOLUTION_CMD }
 ,{jjDUMP,       DUMP_CMD,        NONE,           LINK_CMD }
 ,{jjE,          E_CMD,           VECTOR_CMD,     INT_CMD }
 #ifdef HAVE_FACTORY
@@ -3087,7 +3092,7 @@ struct sValCmd1 dArith1[]=
 #else 
 ,{jjWRONG,      FINDUNI_CMD,     IDEAL_CMD,      IDEAL_CMD}
 #endif 
-,{jjidFreeModule,FREEMODULE_CMD,-((s)MODUL_CMD), INT_CMD }
+,{jjidFreeModule,FREEMODULE_CMD, XS(MODUL_CMD),  INT_CMD }
 #ifdef HAVE_FACTORY
 ,{jjFACSTD,     FACSTD_CMD,      LIST_CMD,       IDEAL_CMD }
 #else
@@ -3099,7 +3104,7 @@ struct sValCmd1 dArith1[]=
 ,{jjHILBERT_IV, HILBERT_CMD,     INTVEC_CMD,     INTVEC_CMD }
 ,{jjHOMOG1,     HOMOG_CMD,       INT_CMD,        IDEAL_CMD }
 ,{jjHOMOG1,     HOMOG_CMD,       INT_CMD,        MODUL_CMD }
-,{jjidVec2Ideal,IDEAL_CMD,      -((s)IDEAL_CMD), VECTOR_CMD }
+,{jjidVec2Ideal,IDEAL_CMD,       XS(IDEAL_CMD),  VECTOR_CMD }
 ,{jjIDEAL_Ma,   IDEAL_CMD,       IDEAL_CMD,      MATRIX_CMD }
 ,{jjIDEAL_R,    IDEAL_CMD,       IDEAL_CMD,      QRING_CMD }
 ,{jjIDEAL_R,    IDEAL_CMD,       IDEAL_CMD,      RING_CMD }
@@ -3125,27 +3130,27 @@ struct sValCmd1 dArith1[]=
 #ifdef MDEBUG
 ,{jjpHead,      LEAD_CMD,        POLY_CMD,       POLY_CMD }
 #else
-,{jjpHead,      LEAD_CMD,       -((s)POLY_CMD),  POLY_CMD }
+,{jjpHead,      LEAD_CMD,        XS(POLY_CMD),   POLY_CMD }
 #endif
-,{jjidHead,     LEAD_CMD,       -((s)IDEAL_CMD), IDEAL_CMD }
+,{jjidHead,     LEAD_CMD,        XS(IDEAL_CMD),  IDEAL_CMD }
 #ifdef MDEBUG
 ,{jjpHead,      LEAD_CMD,        VECTOR_CMD,     VECTOR_CMD }
 #else
-,{jjpHead,      LEAD_CMD,       -((s)VECTOR_CMD),VECTOR_CMD }
+,{jjpHead,      LEAD_CMD,        XS(VECTOR_CMD), VECTOR_CMD }
 #endif
-,{jjidHead,     LEAD_CMD,       -((s)MODUL_CMD), MODUL_CMD }
+,{jjidHead,     LEAD_CMD,        XS(MODUL_CMD),  MODUL_CMD }
 ,{jjLEADCOEF,   LEADCOEF_CMD,    NUMBER_CMD,     POLY_CMD }
 ,{jjLEADCOEF,   LEADCOEF_CMD,    NUMBER_CMD,     VECTOR_CMD }
 ,{jjLEADEXP,    LEADEXP_CMD,     INTVEC_CMD,     POLY_CMD }
 ,{jjLEADEXP,    LEADEXP_CMD,     INTVEC_CMD,     VECTOR_CMD }
 ,{jjWRONG,      MAP_CMD,         0,              ANY_TYPE}
 ,{jjDUMMY,      MATRIX_CMD,      MATRIX_CMD,     MATRIX_CMD }
-,{jjidMaxIdeal, MAXID_CMD,      -((s)IDEAL_CMD), INT_CMD }
+,{jjidMaxIdeal, MAXID_CMD,       XS(IDEAL_CMD),  INT_CMD }
 ,{jjMEMORY,     MEMORY_CMD,      INT_CMD,        INT_CMD }
-,{jjidMinBase,  MINBASE_CMD,    -((s)IDEAL_CMD), IDEAL_CMD }
-,{jjidMinBase,  MINBASE_CMD,    -((s)MODUL_CMD), MODUL_CMD }
+,{jjidMinBase,  MINBASE_CMD,     XS(IDEAL_CMD),  IDEAL_CMD }
+,{jjidMinBase,  MINBASE_CMD,     XS(MODUL_CMD),  MODUL_CMD }
 ,{jjMINRES,     MINRES_CMD,      LIST_CMD,       LIST_CMD }
-,{jjMINRES_R,   MINRES_CMD,     -((s)RESOLUTION_CMD), RESOLUTION_CMD }
+,{jjMINRES_R,   MINRES_CMD,      XS(RESOLUTION_CMD), RESOLUTION_CMD }
 ,{jjDUMMY,      MODUL_CMD,       MODUL_CMD,      MODUL_CMD }
 ,{jjMONITOR1,   MONITOR_CMD,     NONE,           STRING_CMD }
 ,{jjMULT,       MULTIPLICITY_CMD,  INT_CMD,      IDEAL_CMD }
@@ -3163,13 +3168,13 @@ struct sValCmd1 dArith1[]=
 ,{jjOpenClose,  OPEN_CMD,        NONE,           LINK_CMD }
 ,{jjORD,        ORD_CMD,         INT_CMD,        POLY_CMD }
 ,{jjORD,        ORD_CMD,         INT_CMD,        VECTOR_CMD }
-,{jjrOrdStr,    ORDSTR_CMD,     -((s)STRING_CMD),RING_CMD }
-,{jjrOrdStr,    ORDSTR_CMD,     -((s)STRING_CMD),QRING_CMD }
+,{jjrOrdStr,    ORDSTR_CMD,      XS(STRING_CMD), RING_CMD }
+,{jjrOrdStr,    ORDSTR_CMD,      XS(STRING_CMD), QRING_CMD }
 ,{jjPAR1,       PAR_CMD,         NUMBER_CMD,     INT_CMD }
 ,{jjPARDEG,     PARDEG_CMD,      INT_CMD,        NUMBER_CMD }
 ,{jjPARSTR1,    PARSTR_CMD,      STRING_CMD,     INT_CMD }
-,{jjrParStr,    PARSTR_CMD,     -((s)STRING_CMD),RING_CMD }
-,{jjrParStr,    PARSTR_CMD,     -((s)STRING_CMD),QRING_CMD }
+,{jjrParStr,    PARSTR_CMD,      XS(STRING_CMD), RING_CMD }
+,{jjrParStr,    PARSTR_CMD,      XS(STRING_CMD), QRING_CMD }
 ,{jjDUMMY,      POLY_CMD,        POLY_CMD,       POLY_CMD }
 ,{jjPRIME,      PRIME_CMD,       INT_CMD,        INT_CMD }
 ,{jjPRINT_GEN,  PRINT_CMD,       NONE,           INT_CMD }
@@ -3181,7 +3186,7 @@ struct sValCmd1 dArith1[]=
 ,{jjPRINT_GEN,  PRINT_CMD,       NONE,           IDEAL_CMD }
 ,{jjPRINT_MA,   PRINT_CMD,       NONE,           MATRIX_CMD }
 ,{jjPRINT_LIST, PRINT_CMD,       NONE,           LIST_CMD }
-,{jjidMinEmbedding, PRUNE_CMD,  -((s)MODUL_CMD), MODUL_CMD }
+,{jjidMinEmbedding, PRUNE_CMD,   XS(MODUL_CMD),  MODUL_CMD }
 ,{kQHWeight,    QHWEIGHT_CMD,    INTVEC_CMD,     IDEAL_CMD }
 ,{kQHWeight,    QHWEIGHT_CMD,    INTVEC_CMD,     MODUL_CMD }
 ,{jjWRONG,      QRING_CMD,       0,              ANY_TYPE}
@@ -3190,7 +3195,7 @@ struct sValCmd1 dArith1[]=
 ,{jjRESERVEDNAME,RESERVEDNAME_CMD, INT_CMD,      STRING_CMD }
 ,{jjL2R,        RESOLUTION_CMD,  RESOLUTION_CMD, LIST_CMD }
 ,{jjWRONG,      ROWS_CMD,        0,              POLY_CMD }
-,{jjpMaxComp,   ROWS_CMD,       -((s)INT_CMD),   VECTOR_CMD }
+,{jjpMaxComp,   ROWS_CMD,        XS(INT_CMD),    VECTOR_CMD }
 ,{jjROWS,       ROWS_CMD,        INT_CMD,        MODUL_CMD }
 ,{jjROWS,       ROWS_CMD,        INT_CMD,        MATRIX_CMD }
 ,{jjROWS_IV,    ROWS_CMD,        INT_CMD,        INTMAT_CMD }
@@ -3219,18 +3224,18 @@ struct sValCmd1 dArith1[]=
 ,{jjWRONG,      TRACE_CMD,       0,              INTVEC_CMD }
 ,{jjWRONG,      TRACE_CMD,       0,              IDEAL_CMD }
 ,{jjTRACE_IV,   TRACE_CMD,       INT_CMD,        INTMAT_CMD }
-,{jjmpTrace,    TRACE_CMD,      -((s)POLY_CMD),  MATRIX_CMD }
+,{jjmpTrace,    TRACE_CMD,       XS(POLY_CMD),   MATRIX_CMD }
 ,{jjTRANSP_IV,  TRANSPOSE_CMD,   INTMAT_CMD,     INTVEC_CMD }
 ,{jjTRANSP_IV,  TRANSPOSE_CMD,   INTMAT_CMD,     INTMAT_CMD }
-,{jjmpTransp,   TRANSPOSE_CMD,  -((s)MATRIX_CMD),MATRIX_CMD }
+,{jjmpTransp,   TRANSPOSE_CMD,   XS(MATRIX_CMD), MATRIX_CMD }
 ,{jjTYPEOF,     TYPEOF_CMD,      STRING_CMD,     ANY_TYPE }
 ,{jjDUMMY,      VECTOR_CMD,      VECTOR_CMD,     VECTOR_CMD }
 ,{jjVDIM,       VDIM_CMD,        INT_CMD,        IDEAL_CMD }
 ,{jjVDIM,       VDIM_CMD,        INT_CMD,        MODUL_CMD }
 ,{jjVAR1,       VAR_CMD,         POLY_CMD,       INT_CMD }
 ,{jjVARSTR1,    VARSTR_CMD,      STRING_CMD,     INT_CMD }
-,{jjrVarStr,    VARSTR_CMD,     -((s)STRING_CMD),RING_CMD }
-,{jjrVarStr,    VARSTR_CMD,     -((s)STRING_CMD),QRING_CMD }
+,{jjrVarStr,    VARSTR_CMD,      XS(STRING_CMD), RING_CMD }
+,{jjrVarStr,    VARSTR_CMD,      XS(STRING_CMD), QRING_CMD }
 ,{kWeight,      WEIGHT_CMD,      INTVEC_CMD,     IDEAL_CMD }
 ,{kWeight,      WEIGHT_CMD,      INTVEC_CMD,     MODUL_CMD }
 ,{NULL,         0,               0,              0}
