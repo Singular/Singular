@@ -18,7 +18,7 @@ lres_l
 makedbm_l
 minor_l
 modulo_l
-; monodromy_l: negative exponents
+monodromy_l
 mpsr_l
 mre
 mre_nonhom
@@ -38,7 +38,7 @@ primitiv_l
 res_l
 resultantp_l
 sing_l
-; solve_l negative exponents
+solve_l
 sres_l
 std_l
 triang_l

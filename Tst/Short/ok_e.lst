@@ -68,7 +68,7 @@ paramet
 polylib_s
 primdec_s
 primdec2
-; primdec3 negative exponents
+primdec3
 primitiv_s
 quotient_s
 rInit
@@ -76,7 +76,7 @@ res_s
 resultantp_s
 ringsum
 sing_s 
-; solve_s negativ exponents
+solve_s
 ; spcurve weights?
 sres_s
 std_s

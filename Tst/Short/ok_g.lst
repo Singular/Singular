@@ -68,7 +68,7 @@ paramet
 polylib_s
 primdec_s
 primdec2
-; primdec3 negative exponents
+primdec3 negative exponents
 primitiv_s
 quotient_s
 rInit
