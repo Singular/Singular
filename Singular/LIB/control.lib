@@ -1,4 +1,4 @@
-version="$Id: control.lib,v 1.23 2005-02-25 10:48:06 levandov Exp $";
+version="$Id: control.lib,v 1.24 2005-03-16 16:15:14 levandov Exp $";
 category="Applications";
 info="
 LIBRARY:  control.lib Procedures for System and Control Theory 
@@ -12,13 +12,14 @@ and V. Levandovskyy), Uni Kaiserslautern
 NOTE: This library provides algebraic analysis tools for System and Control Theory
 
 PROCEDURES:
-control  (R);           analysis of controllability-related properties of R,
+control  (R);           analysis of controllability-related properties of R(using Ext modules),
+control2(R);            analysis of controllability-related properties of R(using dimension),
 autonom  (R);           analysis of autonomy-related properties of R (using Ext modules),
 autonom2 (R);           analysis of autonomy-related properties of R (using dimension),
 LeftKernel  (R);        a left kernel of R,
 RightKernel (R);        a right kernel of R,
 LeftInverse (R);        a left inverse of R,
-RighttInverse (R);      a right inverse of R,
+RightInverse (R);      a right inverse of R,
 smith (M);              a Smith form of a module M,
 genericity (M);         analysis of the genericity of parameters,
 canonize (L);           Groebnerification for modules in the output of control/autonomy procs. 
@@ -571,7 +572,7 @@ proc control2(module R)
 "USAGE:  control2(R); R a module (R is the matrix of the system of equations to be investigated)
 PURPOSE: computes list of all the properties concerning controllability of the system (behavior), represented by the  matrix R
 RETURN: list
-EXAMPLE:  example control; shows an example
+EXAMPLE:  example control2; shows an example
 NOTE: same as control(R); but using dimensions
 "
 {
@@ -604,7 +605,15 @@ example
   view(control2(R));
 };
 //------------------------------------------------------------------------
-static proc autonom_output( int i, int NVars, module RC ) 
+proc rank(module M)
+{
+  module M_red=bareiss(M)[1];
+  int NCols_red=ncols(M_red);
+  return (NCols_red);
+}
+//------------------------------------------------------------------------
+static proc autonom_output( int i, int NVars, module RC, int R_rank ) 
+//static proc autonom_output( int i, int NVars, module RC ) 
 //static proc autonom_output( int i, int NVars ) 
 "USAGE:  proc autonom_output(i, NVars)
            i:  integer, number of first nonzero Ext or 
@@ -624,6 +633,8 @@ NOTE:  this procedure is used in 'autonom' procedure
                   "not autonomous",
 		   "kernel representation for controllable part",
 		   RC,
+		   "column-rank of the matrix",
+		   R_rank,
 		   DofS,
 		   d ) 
 	  );
@@ -724,6 +735,7 @@ EXAMPLE:  example autonom; shows an example
   int ExtIsZero;
   module RT=transpose(R);
   module RC;
+  int R_rank=ncols(R);
   ExtIsZero=is_zero_Our(Ext_Our(0,RT));     
 //   R=transpose(R); 
 //   ExtIsZero=is_zero_Our(Ext_Our(0,R)); 
@@ -737,8 +749,10 @@ EXAMPLE:  example autonom; shows an example
   if(i==0)
     {
       RC=LeftKernel(RightKernel(R));
+      R_rank=rank(R);
     }
-  return(autonom_output(i,NVars,RC));
+  return(autonom_output(i,NVars,RC,R_rank));
+  //  return(autonom_output(i,NVars,RC));
   //  return(autonom_output(i,NVars));     
 }
 example
@@ -897,16 +911,16 @@ proc exWindTunnel()
 proc genericity(matrix M)
 "USAGE:  genericity(M), M is a module/matrix
 PURPOSE: determine parametric expressions which have been assumed to be non-zero in the process of computing the Groebner basis
-RETURN:  list (of strings)
+RETURN:  list (of strings) 
 NOTE: we strongly recommend to switch on the redSB and redTail options; 
 @*    the procedure is effective with the lift procedure for modules with parameters
 EXAMPLE:  example genericity; shows an example
 "
 {
-  // returns nothing, if there are no parameters!
+  // returns "-", if there are no parameters!
   if (npars(basering)==0)
   {
-    return("");
+    return("-");
   }
   int plevel = printlevel-voice+2;
   // M is a matrix over a ring with params and vars;
@@ -1033,10 +1047,10 @@ example
   T2 =  lift(R,SR2);
   genericity(T2);
 }
-
+//---------------------------------------------------------------
 proc canonize(list L)
 "USAGE:  canonize(L), L a list
-PURPOSE: modules in the list are canonized by computing their reduced minimal (= unique in the given ordering) Groebner bases
+PURPOSE: modules in the list are canonized by computing their reduced minimal (= unique up to constant factor w.r.t. the given ordering) Groebner bases
 RETURN:  list 
 ASSUME:  L is the output of control/autonomy procedures
 EXAMPLE:  example canonize; shows an example
@@ -1076,7 +1090,6 @@ example
 }
 
 //---------------------------------------------------------------
-
 static proc smdeg(matrix N)  
 // returns an intvec of length 2 with the index of an element of N with smallest degree
 {
@@ -1304,40 +1317,64 @@ example
   print(B2);
 }
 //---------------------------------------------------------------
-proc list_tex(list L, string name, link l)
-"USAGE: control_tex(l), where l is a list
-PURPOSE: writes the content of list L in a tex-file 'name', L is supposed
-to be the output of control/autonomy procedures
+proc list_tex(L, string name,link l,int nr_loop)
+"USAGE: list_tex(L,name,l), where L is a list, name a string, l a link
+	 writes the content of list L in a tex-file 'name'
 RETURN: nothing
 "
 {
-  if(size(L)==0)
-    {
-    }
+  if(typeof(L)!="list")  //in case L is not a list
+  {
+    texobj(name,L);
+  }
+  if(size(L)==0)  
+  {
+  }
   else
+  {
+    string t;
+    for (int i=1;i<=size(L);i++)
     {
-      string t;
-      for (int i=1;i<=size(L);i++)
+      while(1)
+      {
+	if(typeof(L[i])=="string")  //Fehler hier fuer normalen output->nur wenn string in liste dann verbatim
 	{
-	  while(1)
-	    {
-	      if(typeof(L[i])=="string")
-		{
-		  t=L[i];
-		  write(l,t,"\\par");
-		  break;
-		}
-	      if(typeof(L[i])=="module")
-		{
-		  texobj(s,matrix(L[i]));
-		  break;
-		}
-	      texobj(s,L[i]);
-	      write(l,"\\par");
-	      break;
-	    }
+	  t=L[i];
+	  if(nr_loop==1)
+	  {
+	    write(l,"\\begin\{center\}");
+	    write(l,"\\begin\{verbatim\}");
+	  }
+	  write(l,t);
+	  if(nr_loop==0)
+	  {
+	    write(l,"\\par");
+	  }
+	  if(nr_loop==1)
+	  {
+	    write(l,"\\end\{verbatim\}");
+	    write(l,"\\end\{center\}");
+	  }
+	  break;
 	}
+	if(typeof(L[i])=="module")
+	{
+	  texobj(name,matrix(L[i]));
+	  break;
+	}
+	if(typeof(L[i])=="list")
+	{
+	  list_tex(L[i],name,l,1);
+	  break;
+	}
+	write(l,"\\begin\{center\}");
+	texobj(name,L[i]);
+	write(l,"\\end\{center\}");
+	write(l,"\\par");
+	break;
+      }
     }
+  }
 }
 //---------------------------------------------------------------
 proc verbatim_tex(string s, link l)
@@ -1351,4 +1388,50 @@ RETURN: nothing
   write(l,s);
   write(l,"\\end{verbatim}");
   write(l,"\\par");
+}
+//---------------------------------------------------------------
+proc FindTorsion(module R, ideal TAnn)
+"USAGE:  FindTorsion(R, I);   R an ideal/matrix/module, I an ideal
+PURPOSE: computes the Groebner basis of the submodule of R, annihilated by I
+RETURN:  module
+NOTE: especially helpful, when I is the annihilator of the t(R) - the torsion submodule of R. In this case, the result is the explicit presentation of t(R) as
+the submodule of R
+EXAMPLE: example FindTorsion; shows an example
+"
+{
+  // motivation: let R be a module,
+  // TAnn is the annihilator of t(R)\subset R
+  // compute the generators of t(R) explicitly
+  ideal AS = TAnn;
+  module S = R;
+  if (attrib(S,"isSB")<>1)
+  {
+    S = std(S);
+  }
+  if (attrib(AS,"isSB")<>1)
+  {
+    AS = std(AS);
+  }
+  int nc  = ncols(S);
+  module Tmp = AS*freemodule(nc);
+  module To = modulo(Tmp,S);
+  To = NF(std(To+S),S);
+  To = simplify(To,2);
+  To = std(To);
+  return(To);
+}
+example
+{
+  "EXAMPLE:";echo = 2;
+  // Flexible Rod
+  ring A = 0,(D1, D2), (c,dp);
+  module R= [D1, -D1*D2, -1], [2*D1*D2, -D1-D1*D2^2, 0];
+  module RR = transpose(R);
+  list L = control(RR);
+  view(L);
+  // here, we have the annihilator:
+  ideal LAnn = D1; // = L[10]
+  module Tr  = FindTorsion(RR,LAnn);
+  print(RR);  // the module itself
+  print(Tr); // generators of the torsion submodule
 }
