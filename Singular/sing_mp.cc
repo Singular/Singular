@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_mp.cc,v 1.19 1998-06-13 12:44:48 krueger Exp $ */
+/* $Id: sing_mp.cc,v 1.20 1998-10-14 10:18:56 obachman Exp $ */
 
 /*
 * ABSTRACT: interface to MP links
@@ -209,10 +209,11 @@ static MP_Link_pt slOpenMPListen(int n_argc, char **n_argv)
 static MP_Link_pt slOpenMPLaunch(int n_argc, char **n_argv)
 {
   char *argv[] = {"--MPtransp", "TCP", "--MPmode", "launch",
-                  "--MPhost", "localhost", 
+                  "--MPhost", "localhost",  "--MPrsh", "rsh",
                   "--MPapplication", "Singular -bq  --no-stdlib --no-rc"};
   char *appl = IMP_GetCmdlineArg(n_argc, n_argv, "--MPapplication");
   char *host = IMP_GetCmdlineArg(n_argc, n_argv, "--MPhost");
+  char *rsh = IMP_GetCmdlineArg(n_argc, n_argv, "--MPrsh");
   char* nappl = NULL;
   MP_Link_pt link;
 
@@ -232,7 +233,7 @@ static MP_Link_pt slOpenMPLaunch(int n_argc, char **n_argv)
   }
   
   if (appl != NULL)  
-    argv[7] = appl;
+    argv[9] = appl;
 
   if (host == NULL)
   {
@@ -241,7 +242,12 @@ static MP_Link_pt slOpenMPLaunch(int n_argc, char **n_argv)
   else
     argv[5] = host;
 
-  link = MP_OpenLink(mp_Env, 8, argv);
+  if (rsh != NULL)
+  {
+    argv[7] = rsh;
+  }
+
+  link = MP_OpenLink(mp_Env, 10, argv);
   if (nappl != NULL) Free(nappl, MAXPATHLEN + 24);
   return link;
 }
@@ -397,6 +403,12 @@ static BOOLEAN slCloseMP(si_link l)
   return FALSE;
 }
 
+static BOOLEAN slKillMP(si_link l)
+{
+  MP_KillLink((MP_Link_pt) l->data);
+  SI_LINK_SET_CLOSE_P(l);
+  return FALSE;
+}
 
 static BOOLEAN slDumpMP(si_link l)
 {
@@ -542,6 +554,7 @@ void slInitMPFileExtension(si_link_extension s)
 {
   s->Open=slOpenMPFile;
   s->Close=slCloseMP;
+  s->Close=slKillMP;
   s->Read=slReadMP;
   //s->Read2=NULL;
   s->Dump=slDumpMP;
@@ -555,6 +568,7 @@ void slInitMPTcpExtension(si_link_extension s)
 {
   s->Open=slOpenMPTcp;
   s->Close=slCloseMP;
+  s->Kill=slKillMP;
   s->Read=slReadMP;
   //s->Read2=NULL;
   s->Dump=slDumpMP;

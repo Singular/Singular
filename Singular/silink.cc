@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.22 1998-08-06 08:52:57 Singular Exp $ */
+/* $Id: silink.cc,v 1.23 1998-10-14 10:18:54 obachman Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -105,7 +105,11 @@ void slCleanUp(si_link l)
   (l->ref)--;
   if (l->ref == 0)
   {
-    if (SI_LINK_OPEN_P(l)) slClose(l);
+    if (SI_LINK_OPEN_P(l))
+    {
+      if (l->m->Kill != NULL) l->m->Kill(l);
+      else if (l->m->Close != NULL) l->m->Close(l);
+    }
     FreeL((ADDRESS)l->name);
     FreeL((ADDRESS)l->mode);
     memset((void *) l, 0, sizeof(ip_link));
@@ -753,6 +757,7 @@ void slStandardInit()
   si_link_root=(si_link_extension)Alloc0(sizeof(*si_link_root));
   si_link_root->Open=slOpenAscii;
   si_link_root->Close=slCloseAscii;
+  si_link_root->Kill=slCloseAscii;
   si_link_root->Read=slReadAscii;
   si_link_root->Write=slWriteAscii;
   si_link_root->Dump=slDumpAscii;

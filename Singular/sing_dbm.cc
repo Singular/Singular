@@ -4,7 +4,7 @@
 
 //**************************************************************************/
 //
-// $Id: sing_dbm.cc,v 1.9 1998-04-08 16:04:32 Singular Exp $
+// $Id: sing_dbm.cc,v 1.10 1998-10-14 10:18:55 obachman Exp $
 //
 //**************************************************************************/
 //  'sing_dbm.cc' containes command to handle dbm-files under
@@ -207,6 +207,7 @@ si_link_extension slInitDBMExtension(si_link_extension s)
 {
   s->Open=dbOpen;
   s->Close=dbClose;
+  s->Kill=dbClose;
   s->Read=dbRead1;
   s->Read2=dbRead2;
   s->Write=dbWrite;

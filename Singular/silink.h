@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.h,v 1.9 1998-06-02 15:30:04 Singular Exp $ */
+/* $Id: silink.h,v 1.10 1998-10-14 10:18:55 obachman Exp $ */
 /*
 * ABSTRACT: general interface to links
 */
@@ -14,6 +14,7 @@
 typedef BOOLEAN    (*slOpenProc)(si_link l, short flag);
 typedef BOOLEAN    (*slWriteProc)(si_link l, leftv lv);
 typedef BOOLEAN    (*slCloseProc)(si_link l);
+typedef BOOLEAN    (*slKillProc)(si_link l);
 typedef leftv      (*slReadProc)(si_link l);
 typedef leftv      (*slRead2Proc)(si_link l, leftv a);
 typedef BOOLEAN    (*slDumpProc)(si_link l);
@@ -25,6 +26,7 @@ struct s_si_link_extension
   si_link_extension next;
   slOpenProc       Open;
   slCloseProc      Close;
+  slKillProc       Kill;
   slReadProc       Read;
   slRead2Proc      Read2;
   slWriteProc      Write;

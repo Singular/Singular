@@ -1,3 +1,8 @@
+1998-10-14  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
+
+	* sing_mp.cc (slOpenMPLaunch): added slKill as link function
+	* added --MPrsh to slOpenLaunch
+
 Wed Jul  1 15:25:23 MET DST 1998 hannes:
 * fixed bug with quotient: M:module(0) returns (1), not ([1])
 
