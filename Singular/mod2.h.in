@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.95 2000-12-12 08:44:47 obachman Exp $
+ *  Version: $Id: mod2.h.in,v 1.96 2000-12-15 16:37:26 Singular Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -201,7 +201,7 @@
 
 /* Spectrum needs GMP */
 #ifdef HAVE_GMP
-/* #define HAVE_SPECTRUM */
+#define HAVE_SPECTRUM 1
 #endif
 
 /* Undefine to disable real time measurments  */
