@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.24 1998-07-14 14:18:31 obachman Exp $
+# $Id: regress.cmd,v 1.25 1998-10-27 17:31:13 obachman Exp $
 # FILE:    regress.cmd 
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -104,7 +104,7 @@ if ( (! (-e $singular)) || (! (-x $singular)))
   $singular = $curr_dir."/../Singular$ext";
 }
 # sed scripts which are applied to res files before they are diff'ed
-$sed_scripts = "-e '/used time:/d' -e '/tst_ignore:/d' -e '/Id:/d'";
+$sed_scripts = "-e '/used time:/d' -e '/tst_ignore:/d' -e '/Id:/d' -e '/error occurred in/d'";
 # default value (in %) above which differences are reported on -r
 $report_val = 5;
 # default value (in %) above which differences cause an error on -e
@@ -196,7 +196,7 @@ sub tst_status_check
   local($root) = $_[0];
   local($line,$new_line,$prefix,$crit,$res,$new_res);
   local($res_diff,$res_diff_pc,$res_diff_line);
-  local($exit_status) = 0;
+  local($exit_status, $reported) = (0, 0);
   local($error_cause) = "";
   
   open(RES_FILE, "<$root.stat") || 
@@ -208,6 +208,7 @@ sub tst_status_check
 
   $new_line = <NEW_RES_FILE>;
   $line = <RES_FILE>;
+  
   while ($line && $new_line)
   {
     if ($line =~ /(\d+) >> (\w+) ::.*$hostname:(\d+)/ && $checks{$2})
@@ -223,16 +224,14 @@ sub tst_status_check
 	$res_diff_pc = int((($new_res / $res) - 1)*100);
 	$res_diff_line =
 	  "$prefix >> $crit :: new:$new_res old:$res diff:$res_diff %:$res_diff_pc";
-	print (STATUS_DIFF_FILE "$res_diff_line\n") 
-	  if ((defined($error{$crit}) &&  $error{$crit}<abs($res_diff_pc)) 
+	if ((defined($error{$crit}) &&  $error{$crit}<abs($res_diff_pc)) 
 	      || 
-	      (defined($report{$crit}) && $report{$crit}<abs($res_diff_pc)));
-	
-	print "$res_diff_line\n"
-	  if ($verbosity > 0 &&
-	      ((defined($error{$crit}) &&  $error{$crit}<abs($res_diff_pc)) 
-	      || 
-	      (defined($report{$crit}) && $report{$crit}<abs($res_diff_pc))));
+	    (defined($report{$crit}) && $report{$crit}<abs($res_diff_pc)))
+	{
+	  $reported = 1;
+	  print (STATUS_DIFF_FILE "$res_diff_line\n");
+	  print "$res_diff_line\n" if ($verbosity > 0);
+	}
 
 	if ($exit_status == 0)
 	{
@@ -250,8 +249,7 @@ sub tst_status_check
   close(NEW_RES_FILE);
   close(STATUS_DIFF_FILE);
   mysystem("rm -f $root.stat.sdiff")
-    if ($exit_status == 0 && $keep ne "yes");
-  
+    if ($reported == 0 &&  $exit_status == 0 && $keep ne "yes");
   return ($exit_status, $error_cause);
 }
 
@@ -446,7 +444,7 @@ sub tst_check
 
     if ($keep ne "yes")
     {
-      &mysystem("$rm -f tst_status.out $root.new.res $root.res $root.*diff $root.new.stat");
+      &mysystem("$rm -f tst_status.out $root.new.res $root.res $root.diff $root.new.stat");
     } 
   }
   
