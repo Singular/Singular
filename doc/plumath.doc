@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plumath.doc,v 1.1 2002-12-11 15:49:40 levandov Exp $
+@comment $Id: plumath.doc,v 1.2 2002-12-20 14:11:25 levandov Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -10,7 +10,7 @@
 @ignore
 %**start
 \input texinfo.tex
-@setfilename math.info
+@setfilename plumath.info
 @node Top, Mathematical background
 @menu
 * General concepts::
@@ -29,9 +29,6 @@ some articles or text books (see @ref{References}).
 * Standard bases::
 * Hilbert function::
 * Syzygies and resolutions::
-* Characteristic sets::
-* Gauss-Manin connection::
-* Toric ideals and integer programming::
 * References::
 @end menu
 @c ---------------------------------------------------------------------------
@@ -169,7 +166,7 @@ Q(t) is called the first (weighted) Hilbert series of M.
 @end ifinfo
 
 @c ---------------------------------------------------------------------------
-@node Syzygies and resolutions, Characteristic sets, Hilbert function, Mathematical background
+@node Syzygies and resolutions, References, Hilbert function, Mathematical background
 @section Syzygies and resolutions
 @cindex Syzygies and resolutions
 
@@ -223,7 +220,7 @@ But one can show that they depend on I uniquely up to direct summands.
 Let $I=(g_1,...,g_s)\subseteq R^r$ and $M= R^r/I$.
 A {\bf free resolution of $M$} is a long exact sequence
 $$...\longrightarrow F_2 \buildrel{A_2}\over{\longrightarrow} F_1
-\buildrel{A_1}\over{\longrightarrow} F_0\longrightarrow M\longrightarrow
+ \buildrel{A_1}\over{\longrightarrow} F_0\longrightarrow M\longrightarrow
 0,$$
 @end tex
 @ifinfo
@@ -327,360 +324,13 @@ deg(e(a,j)) <= s+j-1    for all j.
 @c example
 @end smallexample
 @end table
-@c ---------------------------------------------------------------------------
-@node Characteristic sets, Gauss-Manin connection, Syzygies and resolutions, Mathematical background
-@section Characteristic sets
-@cindex Characteristic sets
 
-@tex
-Let $<$ be the lexicographical ordering on $R=K[x_1,...,x_n]$ with $x_1
-< ... < x_n$.
-For $f \in R$ let lvar($f$) (the leading variable of $f$) be the largest
-variable in $f$,
-i.e., if $f=a_s(x_1,...,x_{k-1})x_k^s+...+a_0(x_1,...,x_{k-1})$ for some
-$k \leq n$ then lvar$(f)=x_k$.
 
-Moreover, let
-\hbox{ini}$(f):=a_s(x_1,...,x_{k-1})$. The pseudoremainder
-$r=\hbox{prem}(g,f)$ of $g$ with respect to $f$ is
-defined by the equality $\hbox{ini}(f)^a\cdot g = qf+r$ with
-$\hbox{deg}_{lvar(f)}(r)<\hbox{deg}_{lvar(f)}(f)$ and $a$
-minimal.
 
-A set $T=\{f_1,...,f_r\} \subset R$ is called triangular if
-$\hbox{lvar}(f_1)<...<\hbox{lvar}(f_r)$. Moreover, let $ U \subset T $,
-then $(T,U)$ is called a triangular system, if $T$ is a triangular set
-such that $\hbox{ini}(T)$ does not vanish on $V(T) \setminus V(U)
-(=:V(T\setminus U))$.
 
-$T$ is called irreducible if for every $i$ there are no
-$d_i$,$f_i'$,$f_i''$ such that
-$$   \hbox{lvar}(d_i)<\hbox{lvar}(f_i) =
-\hbox{lvar}(f_i')=\hbox{lvar}(f_i''),$$
-$$   0 \not\in \hbox{prem}(\{ d_i, \hbox{ini}(f_i'),
-\hbox{ini}(f_i'')\},\{ f_1,...,f_{i-1}\}),$$
-$$\hbox{prem}(d_if_i-f_i'f_i'',\{f_1,...,f_{i-1}\})=0.$$
-Furthermore, $(T,U)$ is called irreducible if $T$ is irreducible.
-
-The main result on triangular sets is the following:
-let $G=\{g_1,...,g_s\} \subset R$ then there are irreducible triangular sets $T_1,...,T_l$
-such that $V(G)=\bigcup_{i=1}^{l}(V(T_i\setminus I_i))$
-where $I_i=\{\hbox{ini}(f) \mid f \in T_i \}$. Such a set
-$\{T_1,...,T_l\}$ is called an {\bf irreducible characteristic series} of
-the ideal $(G)$.
-@end tex
-@ifinfo
-Let > be the lexicographical ordering on R=K[x_1,...,x_n] with x_1<...<x_n .
-For f in R let lvar(f) (the leading variable of f) be the largest
-variable in lead(f) (the leading term of f with respect to >),
-i.e., if f=a_s(x_1,...,x_(k-1))x_k^s+...+a_0(x_1,...,x_(k-1)) for some
-k<=n then lvar(f)=x_k.
-
-Moreover, let ini(f):=a_s(x_1,...,x_(k-1)). The pseudoremainder
-r=prem(g,f) of g with respect to f is defined by ini(f)^a*g=q*f+r with
-the property deg_(lvar(f))(r)<deg_(lvar(f))(f), @code{a} minimal.
-
-A set T=@{f_1,...,f_r@} in R is called triangular if lvar(f_1)<...<lvar(f_r).
-
-(T,U) is called a triangular system, if U is a subset of T and
-if T is a triangular set such that ini(T)
-does not vanish on the zero-set of T \ zero-set of U
-( =:Zero(T\U)).
-
-T is called irreducible if for every i there are no d_i,f_i',f_i'' with
-the property:
-@display
-lvar(d_i)<lvar(f_i)
-lvar(f_i')=lvar(f_i'')=lvar(f_i)
-0 not in prem(@{ d_i, ini(f_i'), ini(f_i'')@},@{ f_1,...,f_(i-1)@})
-@end display
-such that prem(d_i*f_i-f_i'*f_i'',@{f_1,...,f_(i-1)@})=0.
-
-(T,U) is called irreducible if T is irreducible.
-
-The main result on triangular sets is the following: let
-G=@{g_1,...,g_s@} then there are irreducible triangular sets T_1,...,T_l
-such that Zero(G)=Union(i=1,...,l: Zero(T_i\I_i)) where I_i=@{ini(f), f
-in T_i @}.  Such a set @{T_1,...,T_l@} is called an @strong{irreducibel
-characteristic series} of the ideal (G).
-@end ifinfo
-
-@table @code
-@item @strong{Example:}
-@smallexample
-@c example
-  ring R= 0,(x,y,z,u),dp;
-  ideal i=-3zu+y2-2x+2,
-          -3x2u-4yz-6xz+2y2+3xy,
-          -3z2u-xu+y2z+y;
-  print(char_series(i));
-@c example
-@end smallexample
-@end table
-@c ---------------------------------------------------------------------------
-@node Gauss-Manin connection, Toric ideals and integer programming, Characteristic sets, Mathematical background
-@section Gauss-Manin connection
-@cindex Gauss-Manin connection
-
-@c the following text contain too much math code, so there are
-@c tex and info versions of it. It end just before the introducing text
-@c to the first example.
-
-@tex
-Let $f\colon(C^{n+1},0)\rightarrow(C,0)$ be a complex isolated hypersurface singularity given by a polynomial with algebraic coefficients which we also denote by $f$.
-Let $O=C[x_0,\ldots,x_n]_{(x_0,\ldots,x_n)}$ be the local ring at the origin and $J_f$ the Jacobian ideal of $f$.
-
-A {\bf Milnor representative} of $f$ defines a differentiable fibre bundle over the punctured disc with fibres of homotopy type of $\mu$ $n$-spheres.
-The $n$-th cohomology bundle is a flat vector bundle of dimension $n$ and carries a natural flat connection with covariant derivative $\partial_t$.
-The {\bf monodromy operator} is the action of a positively oriented generator of the fundamental group of the puctured disc on the Milnor fibre.
-Sections in the cohomology bundle of {\bf moderate growth} at $0$ form a regular $D=C\{t\}[\partial_t]$-module $G$, the {\bf Gauss-Manin connection}.
-
-By integrating along flat multivalued families of cycles, one can consider fibrewise global holomorphic differential forms as elements of $G$.
-This factors through an inclusion of the {\bf Brieskorn lattice} $H'':=\Omega^{n+1}_{C^{n+1},0}/df\wedge d\Omega^{n-1}_{C^{n+1},0}$ in $G$.
-
-The $D$-module structure defines the {\bf V-filtration} $V$ on $G$ by $V^\alpha:=\sum_{\beta\ge\alpha}C\{t\}ker(t\partial_t-\beta)^{n+1}$.
-The Brieskorn lattice defines the {\bf Hodge filtration} $F$ on $G$ by $F_k=\partial_t^kH''$ which comes from the {\bf mixed Hodge structure} on the Milnor fibre.
-Note that $F_{-1}=H'$.
-
-The induced V-filtration on the Brieskorn lattice determines the {\bf singularity spectrum} $Sp$ by $Sp(\alpha):=\dim_CGr_V^\alpha Gr^F_0G$.
-The spectrum consists of $\mu$ rational numbers $\alpha_1,\dots,\alpha_\mu$ such that $e^{2\pi i\alpha_1},\dots,e^{2\pi i\alpha_\mu}$ are the eigenvalues of the monodromy.
-These {\bf spectral numbers} lie in the open interval $(-1,n)$, symmetric about the midpoint $(n-1)/2$.
-
-The spectrum is constant under $\mu$-constant deformations and has the following semicontinuity property:
-The number of spectral numbers in an interval $(a,a+1]$ of all singularities of a small deformation of $f$ is greater or equal to that of f in this interval.
-For semiquasihomogeneous singularities, this also holds for intervals of the form $(a,a+1)$.
-
-Two given isolated singularities $f$ and $g$ determine two spectra and from these spectra we get an integer.
-This integer is the maximal positive integer $k$ such that the semicontinuity holds for the spectrum of $f$ and $k$ times the spectrum of $g$.
-These numbers give bounds for the maximal number of isolated singularties of a specific type on a hypersurface $X\subset{P}^n$ of degree $d$: 
-such a hypersurface has a smooth hyperplane section, and the complement is a small deformation of a cone over this hyperplane section.
-The cone itself being a $\mu$-constant deformation of $x_0^d+\dots+x_n^d=0$, the singularities are bounded by the spectrum of $x_0^d+\dots+x_n^d$.
-
-Using the library {\tt gaussman.lib} one can compute the {\bf monodromy}, the V-fitration on $H''/H'$, and the spectrum.
-@end tex
-
-@ifinfo
-Let f:(C^(n+1),0)--->(C,0) be a complex isolated hypersurface singularity given by a polynomial with algebraic coefficients which we also denote by f.
-Let O=C[x_0,...,x_n]_(x_0,...,x_n) be the local ring at the origin and J_f the Jacobian ideal of f.
-
-A @strong{Milnor representative} of f defines a differentiable fibre bundle over the punctured disc with fibres of homotopy type of mu n-spheres.
-The n-th cohomology bundle is a flat vector bundle of dimension n and carries a natural flat connection with covariant derivative d_t.
-The @strong{monodromy operator} is the action of a positively oriented generator of the fundamental group of the puctured disc on the Milnor fibre.
-Sections in the cohomology bundle of @strong{moderate growth} at 0 form a regular D=C@{t@}[d_t]-module G, the @strong{Gauss-Manin connection}.
-
-By integrating along flat multivalued families of cycles, one can consider fibrewise global holomorphic differential forms as elements of G.
-This factors through an inclusion of the @strong{Brieskorn lattice} H'':=Omega^(n+1)_(C^(n+1),0)/df*dOmega^(n-1)_(C^(n+1),0) in G.
-
-The D-module structure defines the @strong{V-filtration} V on G by V^a:=sum_(b>=a)C@{t@}ker(t*d_t-b)^(n+1).
-The Brieskorn lattice defines the @strong{Hodge filtration} F on G by F_k=d_t^kH'' which comes from the @strong{mixed Hodge structure} on the Milnor fibre.
-Note that F_(-1)=H'.
-
-The induced V-filtration on the Brieskorn lattice determines the @strong{singularity spectrum} Sp by Sp(a):=dim_CGr_V^a Gr^F_0G.
-The spectrum consists of mu rational numbers a_1,...,a_mu such that exp(2*pi*i*a_1),...,exp(2*pi*i*a_mu) are the eigenvalues of the monodromy.
-These @strong{spectral numbers} lie in the open interval (-1,n), symmetric about the midpoint (n-1)/2.
-
-The spectrum is constant under mu-constant deformations and has the following semicontinuity property:
-The number of spectral numbers in an interval (a,a+1] of all singularities of a small deformation of f is greater or equal to that of f in this interval.
-For semiquasihomogeneous singularities, this also holds for intervals of the form (a,a+1).
-
-Two given isolated singularities f and g determine two spectra and from these spectra we get an integer.
-This integer is the maximal positive integer k such that the semicontinuity holds for the spectrum of f and k times the spectrum of g.
-These numbers give bounds for the maximal number of isolated singularties of a specific type on a hypersurface X in P^n of degree d: 
-such a hypersurface has a smooth hyperplane section, and the complement is a small deformation of a cone over this hyperplane section.
-The cone itself being a mu-constant deformation of x_0^d+...+x_n^d=0, the singularities are bounded by the spectrum of x_0^d+...+x_n^d.
-
-Using the library @code{gaussman.lib} one can compute the @strong{monodromy}, the V-fitration on H''/H', and the spectrum.
-@end ifinfo
-
-Let us consider as an example @math{f=x^5+x^2y^2+y^5}.
-First, we compute a matrix @math{M} such that
-@tex
-$\exp(2\pi iM)$
-@end tex
-@ifinfo
-exp(-2*pi*i*M)
-@end ifinfo
-is a monodromy matrix of @math{f} and the Jordan normal form of @math{M}:
-@smallexample
-  // not computed !!
-  LIB "gaussman.lib";
-  ring R=0,(x,y),ds;
-  poly f=x5+x2y2+y5;
-  matrix M=monodromy(f);
-  print(jordanform(M));
-@end smallexample
-
-Now, we compute the V-fitration on @math{H''/H'} and the spectrum:
-@smallexample
-  // not computed !!
-  LIB "gaussman.lib";
-  ring R=0,(x,y),ds;
-  poly f=x5+x2y2+y5;
-  list l=vfiltration(f);
-  print(l[1]);
-  print(l[2]);
-  print(l[3]);
-  print(l[4]);
-@end smallexample
-Here @code{l[1]} contains the spectral numbers, @code{l[2]} the corresponding multiplicities, @code{l[3]} a @math{C}-basis of the V-filtration on @math{H''/H'} in terms of the monomial basis of
-@tex
-$O/J_f\cong H''/H'$
-@end tex
-@ifinfo
-O/J_f~=H''/H' 
-@end ifinfo
-in @code{l[4]}.
-
-@tex
-If the principal part of $f$ is $C$-nondegenerate, one can compute the spectrum using the library {\tt spectrum.lib}.
-In this case, the V-filtration on $H''$ coincides with the Newton-filtration on $H''$ which allows to compute the spectrum more efficiently.
-@end tex
-
-@ifinfo
-If the principal part of f is C-nondegenerate, one can compute the spectrum using the library @code{spectrum.lib}.
-In this case, the V-filtration on H'' coincides with the Newton-filtration on H'' which allows to compute the spectrum more efficiently.
-@end ifinfo
-
-Let us calculate one specific example, the maximal number 
-of triple points of type
-@tex
-$\tilde{E}_6$ on a surface $X\subset{P}^3$
-@end tex
-@ifinfo
-E~_6 on a surface X in P^3
-@end ifinfo
-of degree seven.
-This calculation can be done over the rationals.
-So choose a local ordering on @math{Q[x,y,z]}. Here we take the
-negative degree lexicographical ordering which is denoted
-@code{ds} in @sc{Singular}:
-
-@smallexample
-@c example
-ring r=0,(x,y,z),ds;
-LIB "spectrum.lib";
-poly f=x^7+y^7+z^7;
-list s1=spectrumnd( f );
-s1;
-@c example
-@end smallexample
-
-The command @code{spectrumnd(f)} computes the spectrum of @math{f} and
-returns a list with six entries:
-The Milnor number
-@tex
-$\mu(f)$, the geometric genus $p_g(f)$
-@end tex
-@ifinfo
-mu(f), the geometric genus p_g(f)
-@end ifinfo
-and the number of different spectrum numbers.
-The other three entries are of type @code{intvec}.
-They contain the numerators, denominators and
-multiplicities of the spectrum numbers. So
-@tex
-$x^7+y^7+z^7=0$
-@end tex
-@ifinfo
-x^7+y^7+z^7=0
-@end ifinfo
-has Milnor number 216 and geometrical
-genus 35. Its spectrum consists of the 16 different rationals
-@*
-@tex
-${3 \over 7}, {4 \over 7}, {5 \over 7}, {6 \over 7}, {1 \over 1},
-{8 \over 7}, {9 \over 7}, {10 \over 7}, {11 \over 7}, {12 \over 7},
-{13 \over 7}, {2 \over 1}, {15 \over 7}, {16 \over 7}, {17 \over 7},
-{18 \over 7}$
-@end tex
-@ifinfo
-3/7, 4/7, 5/7, 6/7, 1, 8/7, 9/7, 10/7, 11/7, 12/7, 13/7, 2, 15/7, 16/7, 17/7, 
-18/7
-@end ifinfo
-@*appearing with multiplicities
-@*1,3,6,10,15,21,25,27,27,25,21,15,10,6,3,1.
-
-@tex
-The singularities of type $\tilde{E}_6$ form a
-$\mu$-constant one parameter family given by
-$x^3+y^3+z^3+\lambda xyz=0,\quad \lambda^3\neq-27$.
-@end tex
-@ifinfo
-The singularities of type E~_6 form a
-mu-constant one parameter family given by
-x^3+y^3+z^3+lambda xyz=0, lambda^3 <> -27.
-@end ifinfo
-Therefore they have all the same spectrum, which we compute
-for 
-@tex
-$x^3+y^3+z^3$.
-@end tex
-@ifinfo
-@math{x^3+y^3+z^3}.
-@end ifinfo
-
-@smallexample
-poly g=x^3+y^3+z^3;
-list s2=spectrumnd(g);
-s2;
-@expansion{} [1]:
-@expansion{}    8
-@expansion{} [2]:
-@expansion{}    1
-@expansion{} [3]:
-@expansion{}    4
-@expansion{} [4]:
-@expansion{}    1,4,5,2
-@expansion{} [5]:
-@expansion{}    1,3,3,1
-@expansion{} [6]:
-@expansion{}    1,3,3,1
-@end smallexample
-Evaluating semicontinuity is very easy:
-@smallexample
-semicont(s1,s2);
-@expansion{} 18
-@end smallexample
-
-This tells us that there are at most 18 singularities of type
-@tex
-$\tilde{E}_6$ on a septic in $P^3$. But $x^7+y^7+z^7$
-@end tex
-@ifinfo
-E~_6 on a septic in P^3. But x^7+y^7+z^7
-@end ifinfo
-is semiquasihomogeneous (sqh), so we can also apply the stronger
-form of semicontinuity:
-
-@smallexample
-semicontsqh(s1,s2);
-@expansion{} 17
-@end smallexample
-
-So in fact a septic has at most 17 triple points of type
-@tex
-$\tilde{E}_6$.
-@end tex
-@ifinfo
-E~_6.
-@end ifinfo
-
-Note that @code{spectrumnd(f)} works only if @math{f} has nondegenerate
-principal part. In fact @code{spectrumnd} will detect a degenerate
-principal part in many cases and print out an error message.
-However if it is known in advance that @math{f} has nondegenerate
-principal part, then the spectrum may be computed much faster
-using @code{spectrumnd(f,1)}.
 
 @c ---------------------------------------------------------------------------
-@node Toric ideals and integer programming, References, Gauss-Manin connection, Mathematical background
-@section Toric ideals and integer programming
-@cindex Toric ideals and integer programming
-
-@include ti_ip.tex
-
-@c ---------------------------------------------------------------------------
-@node References, , Toric ideals and integer programming, Mathematical background
+@node References, , Syzygies and resolutions, Mathematical background
 @section References
 @cindex References
 

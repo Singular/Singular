@@ -1,7 +1,7 @@
 #####################################################################
 ###
 ### Makefile for Singular documentation
-### $Id: Makefile.in,v 1.82 2002-12-11 18:11:11 levandov Exp $
+### $Id: Makefile.in,v 1.83 2002-12-20 14:11:27 levandov Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -103,7 +103,7 @@ DOC2TEX_FILES	= \
 		start.tex types.tex pdata.tex tricks.tex platform.tex
 
 PLU_DOC2TEX_FILES	= \
-		plumath.tex plutypes.tex
+		plumath.tex plureference.tex plutypes.tex
 
 MANUAL_FILES	= ${TEX_FILES} ${DOC2TEX_FILES}
 
@@ -380,7 +380,8 @@ mostlyclean:
 	/bin/rm -f *.fn *.fns *.ky *.kys *.log *.pg *.pgs *.toc *.tp
 	/bin/rm -f *.tps *.vr *.vrs *.dvi *.ps
 	/bin/rm -f singular.hlp manual.hlp  ${DOC2TEX_FILES} singular.idx
-	/bin/rm -f plural.hlp manual.hlp  ${PLU_DOC2TEX_FILES} singular.idx		/bin/rm -f ${HTML_SUBDIR}/${HTML_MANUAL_TOP} ${HTML_SUBDIR}/${HTML_TUTOR_TOP}
+	/bin/rm -f plural.hlp manual.hlp  ${PLU_DOC2TEX_FILES}
+	/bin/rm -f ${HTML_SUBDIR}/${HTML_MANUAL_TOP} ${HTML_SUBDIR}/${HTML_TUTOR_TOP}
 	/bin/rm -f ${PLU_HTML_SUBDIR}/${HTML_MANUAL_TOP} ${PLU_HTML_SUBDIR}/${HTML_TUTOR_TOP}
 	/bin/rm -rf ${STANDALONE_HTML_FILES} ${STANDALONE_FILES} ${STANDALONE_TXT_FILES}
 	/bin/rm -f INSTALL_unix.${SINGUNAME}.txt INSTALL_unix.${SINGUNAME}.html

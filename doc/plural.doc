@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: plural.doc,v 1.1 2002-12-11 15:47:27 levandov Exp $
+@comment $Id: plural.doc,v 1.2 2002-12-20 14:11:25 levandov Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -22,7 +22,7 @@
 @end iftex
 
 @set singularmanual 1
-@c @set namespaces 1
+@set namespaces 1
 @include version.texi
 @include uname.texi
 @c --------------------- end general setting --------------------
@@ -41,7 +41,7 @@ This is the texinfo file describing Singular:Plural (version @value{VERSION})
 @center @titlefont{Singular:Plural}
 @sp 2
 @center A Computer Algebra System for Polynomial Computations
-@sp 5
+@c@sp 5
 @center @titlefont{Manual}
 @center Version @value{VERSION}
 @sp 2
@@ -98,7 +98,7 @@ This is the texinfo file describing Singular:Plural (version @value{VERSION})
 @c * Introduction::
 @c * General concepts::
 * Data types::
-@c * Functions and system variables::
+* Functions and system variables::
 @c * Tricks and pitfalls::
 @c * Examples::
 @c * Polynomial data::
@@ -127,16 +127,16 @@ This is the texinfo file describing Singular:Plural (version @value{VERSION})
 @c @include general.tex
 
 @c ----------------------------------------------------------------------------
-@node Data types, Mathematical background, Top, Top
+@node Data types, Functions and system variables , Top, Top
 @chapter Data types
 @cindex Data types
 @include plutypes.tex
 
-@c @c ----------------------------------------------------------------------------
-@c @node Functions and system variables, Tricks and pitfalls, Data types, Top
-@c @chapter Functions and system variables
-@c @cindex Commands
-@c @include reference.tex
+@c ----------------------------------------------------------------------------
+@node Functions and system variables, Mathematical background,Data types, Top
+@chapter Functions and system variables
+@cindex Commands
+@include plureference.tex
 
 @c @c ----------------------------------------------------------------------------
 @c @node Tricks and pitfalls, Examples, Functions and system variables, Top
