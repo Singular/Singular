@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.cc,v 1.8 1999-12-03 11:20:14 obachman Exp $ */
+/* $Id: feOpt.cc,v 1.9 2000-02-04 13:15:25 obachman Exp $ */
 /*
 * ABSTRACT: Implementation of option buisness
 */
@@ -527,8 +527,8 @@ static void feOptHelp(const char* name)
   }
 
   printf("\nFor more information, type `help;' from within Singular or visit\n");
-  printf("http://www.mathematik.uni-kl.de/~zca/Singular or consult the\n");
-  printf("Singular manual (available as on-line info or printed manual).\n");
+  printf("http://www.singular.uni-kl.de or consult the\n");
+  printf("Singular manual (available as on-line info or html manual).\n");
 }
 
 

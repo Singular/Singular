@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.21 1999-12-16 14:33:29 obachman Exp $ */
+/* $Id: feResource.cc,v 1.22 2000-02-04 13:15:26 obachman Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -73,7 +73,7 @@ static feResourceConfig_s feResourceConfigs[20] =
   {"InfoFile",  'i',    feResFile,  "SINGULAR_INFO_FILE",   "%r/info/singular.hlp", ""},
   {"IdxFile",   'x',    feResFile,  "SINGULAR_IDX_FILE",    "%r/doc/singular.idx",  ""},
   {"HtmlDir",   'h',    feResDir,   "SINGULAR_HTML_DIR",    "%r/html",              ""},
-  {"ManualUrl", 'u',    feResUrl,   "SINGULAR_URL",         "http://www.mathematik.uni-kl.de/~zca/Singular/Manual/"S_VERSION1,    ""},
+  {"ManualUrl", 'u',    feResUrl,   "SINGULAR_URL",         "http://www.singular.uni-kl.de/Manual/"S_VERSION1,    ""},
   {"ExDir",      'm',   feResDir,   "SINGULAR_EXAMPLES_DIR","%r/examples",              ""},
 #if !defined(macintosh)
   {"netscape",  'N',    feResBinary,"NETSCAPE",             "%b/netscape",          ""},
