@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.32 1998-06-19 14:12:07 gorzel Exp $
+@comment $Id: math.doc,v 1.33 1998-06-19 14:18:22 wichmann Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -338,7 +338,7 @@ Other sources to check are @code{http://symbolicnet.mcs.kent.edu/},
 Adams, W.; Loustaunau, P.: An Introduction to Gr\"obner Bases. Providence, RI,
 AMS, 1996
 @end tex
-ifinfo
+@ifinfo
 Adams, W.; Loustaunau, P.: An Introduction Groebner Bases. Providence, RI,
 AMS ,1996
 @end ifinfo
