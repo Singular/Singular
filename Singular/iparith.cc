@@ -37,6 +37,7 @@
 #include "sing_dld.h"
 #include "attrib.h"
 #include "silink.h"
+#include "sparsmat.h"
 #ifdef HAVE_FACTORY
 #include "clapsing.h"
 #include "kstdfac.h"
@@ -2316,6 +2317,7 @@ static BOOLEAN jjBAREISS(leftv res, leftv v)
 {
   matrix m=(matrix)v->Data();
   lists l=mpBareiss(m,FALSE);
+  //lists l=smCallNewBareiss((ideal)v->Data(),0,0);
   res->data = (char *)l;
   return FALSE;
 }
@@ -3315,7 +3317,7 @@ struct sValCmd1 dArith1[]=
 // and the procedures with 1 argument:
 ,{atATTRIB1,    ATTRIB_CMD,      NONE,           DEF_CMD }
 ,{jjBAREISS_IM, BAREISS_CMD,     INTMAT_CMD,     INTMAT_CMD }
-,{jjBAREISS,    BAREISS_CMD,     LIST_CMD,       MATRIX_CMD }
+,{jjBAREISS,    BAREISS_CMD,     LIST_CMD,       MODUL_CMD }
 ,{jjBETTI,      BETTI_CMD,       INTMAT_CMD,     LIST_CMD }
 ,{jjBETTI_R,    BETTI_CMD,       XS(INTMAT_CMD), RESOLUTION_CMD }
 ,{jjCHAR,       CHARACTERISTIC_CMD, INT_CMD,     RING_CMD }
