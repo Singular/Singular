@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.162 2001-02-22 19:12:57 levandov Exp $ */
+/* $Id: extra.cc,v 1.163 2001-02-26 15:08:42 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -68,6 +68,7 @@ extern "C"
 #endif
 
 #ifdef HAVE_PLURAL
+#include "ring.h"
 #include "gring.h"
 #endif
 
@@ -1179,7 +1180,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     {
       matrix C;
       matrix D;
-
+      matrix COM;
       if ((h!=NULL) && (h->Typ()==MATRIX_CMD))
       {
         C=(matrix)h->CopyD();
@@ -1194,43 +1195,48 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       if (currRing->nc==NULL)
       {
         currRing->nc=(nc_struct *)omAlloc0(sizeof(nc_struct));
-	currRing->nc->MT=(matrix *)omAlloc0(pVariables*(pVariables-1)/2*sizeof(matrix));
-	currRing->nc->MTsize=(int *)omAlloc0(pVariables*(pVariables-1)/2*sizeof(int));
+        currRing->nc->MT=(matrix *)omAlloc0(currRing->N*(currRing->N-1)/2*sizeof(matrix));
+        currRing->nc->MTsize=(int *)omAlloc0(currRing->N*(currRing->N-1)/2*sizeof(int));
       }
       else
       {
         WarnS("redefining algebra structure");
-      }
+      }     
       currRing->nc->type=nc_general;
       currRing->nc->C=C;
       currRing->nc->D=D;
+      COM=mpCopy(currRing->nc->C);
+      int i,j;
+      poly p;
+      short DefMTsize=7;
+      int nv=currRing->N;
+      for(i=1;i<nv;i++)
       {
-        int i,j;
-        poly p;
-        short DefMTsize=7;
-        int nv=pVariables;
-        for(i=1;i<nv;i++)
+        for(j=i+1;j<=nv;j++)
         {
-          for(j=i+1;j<=nv;j++)
-          { 
-            currRing->nc->MTsize[UPMATELEM(i,j,curring->N)]=DefMTsize; /* default sizes */
-            currRing->nc->MT[UPMATELEM(i,j,curring->N)]=mpNew(DefMTsize,DefMTsize);
+          if (MATELEM(D,i,j)==NULL)
+          {
+            currRing->nc->MTsize[UPMATELEM(i,j,currRing->N)]=0;
+          }
+          else
+          {
+            MATELEM(COM,i,j)=NULL;
+            currRing->nc->MTsize[UPMATELEM(i,j,currRing->N)]=DefMTsize; /* default sizes */
+            currRing->nc->MT[UPMATELEM(i,j,currRing->N)]=mpNew(DefMTsize,DefMTsize);
             p=pOne();
             pSetCoeff(p,nCopy(pGetCoeff(MATELEM(currRing->nc->C,i,j))));
             pSetExp(p,i,1);
             pSetExp(p,j,1);
             pSetm(p);
             p=pAdd(p,pCopy(MATELEM(currRing->nc->D,i,j)));
-            MATELEM(currRing->nc->MT[UPMATELEM(i,j,curring->N)],1,1)=p;
-            /* set MT[i,j,1,1] to c_i_j*x_i*x_j + D_i_j */
+            MATELEM(currRing->nc->MT[UPMATELEM(i,j,currRing->N)],1,1)=p;
           }
+          
+          /* set MT[i,j,1,1] to c_i_j*x_i*x_j + D_i_j */
         }
       }
-      // set p_Procs:
-//      currRing->p_Procs->pp_Mult_mm =nc_pp_Mult_mm;
-//      currRing->p_Procs->p_Mult_mm =nc_p_Mult_mm;
-//      currRing->p_Procs->p_Minus_mm_Mult_qq =nc_p_Minus_mm_Mult_qq;
-
+      
+      currRing->nc->COM=COM;
       return FALSE;
     }
     else

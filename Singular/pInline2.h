@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.26 2001-02-23 16:28:24 levandov Exp $
+ *  Version: $Id: pInline2.h,v 1.27 2001-02-26 15:08:44 levandov Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -25,6 +25,7 @@
 #include "sbuckets.h"
 #ifdef HAVE_PLURAL
 #include "gring.h"
+#include "ring.h"
 #endif
 
 PINLINE2 number p_SetCoeff(poly p, number n, ring r)

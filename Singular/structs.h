@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.57 2001-02-20 09:45:43 Singular Exp $ */
+/* $Id: structs.h,v 1.58 2001-02-26 15:08:45 levandov Exp $ */
 /*
 * ABSTRACT
 */
@@ -352,6 +352,7 @@ struct nc_struct
   matrix C;
   matrix D;
   matrix *MT;
+  matrix COM;
   int *MTsize;
 };
 #endif

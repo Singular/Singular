@@ -3,18 +3,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.5 2001-02-23 16:28:24 levandov Exp $ */
+/* $Id: gring.h,v 1.6 2001-02-26 15:08:44 levandov Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
 
 #include "mod2.h"
 #ifdef HAVE_PLURAL
-#include "polys.h" // do we need it really?
-#include "numbers.h"
-#include "matpol.h"
-/* #include "p_Procs.h" */
-#include "ideals.h"
+#include "structs.h"
 
 #define UPMATELEM(i,j,nVar) ( (nVar * ((i)-1) - ((i) * ((i)-1))/2 + (j)-1)-(i) )
 // poly functions defined in p_Procs :
@@ -26,6 +22,7 @@ poly nc_mm_Mult_p(const poly m, poly p, const ring r);
 poly nc_mm_Mult_nn (Exponent_t *F, Exponent_t *G, const ring r); 
 poly nc_mm_Mult_uu (Exponent_t *F,int jG,int bG, const ring r);
 poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r);
+poly _nc_p_Mult_q(poly p, poly q, const int copy, const ring r);
 
 #endif /* HAVE_PLURAL */
 #endif

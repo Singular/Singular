@@ -6,11 +6,18 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.7 2001-02-23 16:44:13 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.8 2001-02-26 15:08:43 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
-#include "gring.h"
 #ifdef HAVE_PLURAL
+#include "gring.h"
+#include "febase.h"
+#include "ring.h"
+#include "polys.h"
+#include "numbers.h"
+#include "ideals.h"
+#include "matpol.h"
+
 
 //global nc_macros :
 #define freeT(A,v) omFreeSize((ADDRESS)A,(v+1)*sizeof(Exponent_t))
@@ -38,12 +45,12 @@ poly nc_p_Minus_mm_Mult_qq(poly p, const poly m, poly q, const ring r)
 poly _nc_p_Mult_q(poly p, poly q, const int copy, const ring r)
   /* destroy p,q */
 {
-  poly res=0;
-  poly ghost;
+  poly res=NULL;
+  poly ghost=NULL;
   while (q!=NULL)
     {
       res=p_Add_q(res,nc_pp_Mult_mm(p,p_Head(q,r),r,ghost),r);
-      p_LmDeleteAndNext(q,r);
+      q=p_LmDeleteAndNext(q,r);
     }
   p_Delete(&p,r);
   return(res);
@@ -116,7 +123,7 @@ poly  nc_p_Mult_mm(poly p, const poly m, const ring r)
     p_SetCompP(v,expOut,r);
     out = p_Add_q(out,v,r);
     //    p_DeleteLm(&p,r);
-    p_LmDeleteAndNext(p,r);
+    p=p_LmDeleteAndNext(p,r);
   }
   freeT(P,r->N);
 //  freeT(M,r->N);
@@ -585,57 +592,57 @@ poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
   poly out=NULL;
   number tmp_number=NULL;
   
-// first check wether the polynom is alredy computed
+//Now check zero exeptions, commutativity and should we do something at all?  
+  out=pOne();
+  p_SetExp(out,j,b,r);
+  p_SetExp(out,i,a,r);
+  if (i==j) p_SetExp(out,j,a+b,r);
+  p_Setm(out,r);
+  if ((a==0)||(b==0)||(i<=j)) return(out);//zero exeptions and usual case
+  
+  if (MATELEM(r->nc->COM,j,i)!=NULL)
+//commutative or quasicommutative case
+  {
+    if (r->cf->nIsOne(p_GetCoeff(MATELEM(r->nc->COM,j,i),r))) //commutative case
+    {
+      return(out);
+    }     
+    else
+    {
+      tmp_number=p_GetCoeff(MATELEM(r->nc->COM,j,i),r); //quasicommutative case
+      nPower(tmp_number,a*b,&tmp_number);
+      p_SetCoeff(out,tmp_number,r);
+      return(out);
+    }
+  }// end commutative or quasicommutative case
+
+  //we are here if  i>j and variables do not commute or quasicommute
+  //in fact, now a>=1 and b>=1; and j<i
+  // now check wether the polynom is alredy computed
   int vik = UPMATELEM(j,i,r->N);
   matrix cMT=r->nc->MT[vik];
   int cMTsize=r->nc->MTsize[vik];
 
   if (((a<cMTsize)&&(b<cMTsize))&&(MATELEM(cMT,a,b)!=NULL))
   {
-     out=p_Copy(MATELEM(cMT,a,b),r);
-     return (out);
+    out=p_Copy(MATELEM(cMT,a,b),r);
+    return (out);
   }
-
-//Now check zero exeptions, commutativity and should we do something at all?  
-      out=pOne();
-      p_SetExp(out,j,b,r);
-      p_SetExp(out,i,a,r);
-      if (i==j) p_SetExp(out,j,a+b,r);
-      p_Setm(out,r);
-      if ((a==0)||(b==0)||(i<=j)) return(out);//zero exeptions and usual case
-      
-      if (p_GetCoeff(r->nc->COM[UPMATELEM(i,j,r->N)],r)!=0) //commutative or quasicommutative case
-      {
-        if (p_GetCoeff(r->nc->COM[UPMATELEM(i,j,r->N)],r)!=n_Init(1,r)) //commutative case
-        {
-          return(out);
-        }     
-        else
-        {
-          tmp_number=p_GetCoeff(r->nc->COM[UPMATELEM(i,j,r->N)],r); //quasicommutative case
-          nPower(tmp_number,a*b,&tmp_number);
-          p_SetCoeff(out,tmp_number,r);
-          return(out);
-        }
-      }// end commutative or quasicommutative case
-
-//we are here if  i>j and variables do not commute or quasicommute
-//in fact, now a>=1 and b>=1; and j<i
-
+  
 //  poly C=MATELEM(r->nc->C,j,i);               
 //  number c=p_GetCoeff(C,r); //coeff           
 //  p_Delete(&C,r);
       
   int newcMTsize=0;
-  
+  int k,m;
   p_Delete(&out,r);//Shura thinks it is nesessary
+
   
   if (a>=b) {newcMTsize=a;} else {newcMTsize=b;}
   if (newcMTsize>cMTsize)
   {
      newcMTsize = newcMTsize+cMTsize;
      matrix tmp = mpNew(newcMTsize,newcMTsize);
-     int k,m;
      
      for (k=1;k<r->N;k++)
      {
