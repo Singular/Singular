@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.24 1998-05-20 08:20:20 pohl Exp $
+@comment $Id: examples.doc,v 1.25 1998-05-20 12:42:05 wichmann Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -1843,7 +1843,7 @@ the factor rings of the rings in the list divided out by the ideals
 @example
 @c example
   LIB "normal.lib";
-  // ----- first example: -----
+  // ----- first example: rational quadruple point -----
   ring R=32003,(x,y,z),wp(3,5,15);
   ideal I=z*(y3-x5)+x10;
   list pr=normal(I);
@@ -2037,7 +2037,6 @@ proc algebraicDep(ideal I, poly g)
                         ("+varstr(R)+",Y(1.."+string(n)+")),"+orde;
   
   execute(ri);
-  keepring(Rhelp);
   ideal I=imap(R,I);
   for(i=1;i<=n;i++)
   @{
@@ -2052,11 +2051,11 @@ proc algebraicDep(ideal I, poly g)
        el=el*var(i);
     @}
     ideal KK=eliminate(I,el);
-    export(KK);
+    keepring(Rhelp);
     return(KK);
   @}
   ideal KK=reduce(g,std(I));
-  export(KK);
+  keepring(Rhelp);
   return(KK);
 @}
 @end example
