@@ -1,19 +1,17 @@
-// $Id: fglmquot1_s.tst,v 1.1 1999-11-24 13:32:29 wichmann Exp $
+// $Id: fglmquot1_s.tst,v 1.2 1999-11-24 13:34:48 wichmann Exp $
 
 //
-// fglm_s.tst - short tests for fglm and stdfglm
-//              fglm: reco1, omdi, cyclic5 in char 32003 and 0
-//           stdfglm: caprasse in char 32003 and 0
+// fglm_s.tst - short tests for fglmquotient
 //
 
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS: $Id: fglmquot1_s.tst,v 1.1 1999-11-24 13:32:29 wichmann Exp $");
+tst_ignore("CVS: $Id: fglmquot1_s.tst,v 1.2 1999-11-24 13:34:48 wichmann Exp $");
 
 option(redSB);
 
-// first the easy cases
+// start with the easy cases
 ring r=0,(x,y,z),lp;
 ideal i=x2,y2,z2; i=std(i);
 fglmquot(i,0);
