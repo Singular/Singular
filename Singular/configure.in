@@ -747,7 +747,9 @@ if test "$with_dl" != no; then
   AC_CHECK_LIB(dl, dlopen)
   if test "$ac_cv_lib_dl_dlopen" = yes; then
     NEED_LIBS="-ldl ${NEED_LIBS}"
-    LD_DYN_FLAGS="-Xlinker -E"
+    case "$ac_cv_singuname" in
+    *-Linux | HPUX-* ) LD_DYN_FLAGS="-Xlinker -E" ;;
+    esac
     LD_LIBC="-lc"
     AC_SUBST(LD_LIBC)
     AC_DEFINE(HAVE_DL)
