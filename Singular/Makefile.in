@@ -294,7 +294,7 @@ clean:
 
 distclean: clean
 	-rm -rf depend iparith.inc mpsr_Tok.inc spSpolyLoop.inc 
-        -rm -rf ${DIST_NAME} ${testdir}/out stamp-h
+	-rm -rf ${DIST_NAME} ${testdir}/out stamp-h
 	-rm mod2.h Makefile TAGS* config.status config.cache config.log
 	cd ${docdir}; ${MAKE} distclean
 
