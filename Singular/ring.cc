@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.99 2000-03-21 16:21:43 Singular Exp $ */
+/* $Id: ring.cc,v 1.100 2000-03-22 11:20:54 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3247,7 +3247,7 @@ void rDebugPrint(ring r)
       {  Print("v%d at e[%d], bit %d; ", i,r->VarOffset[i] & 0xffffff,
                                          r->VarOffset[i] >>24 ); }
       #else
-      if( r->VarOffset[i]*sizeof(Exponent_t)/sizeof(long) == j )
+      if((((int)(r->VarOffset[i]*sizeof(Exponent_t))/sizeof(long))) == j)
       {  Print("v%d at e[%d]; ", i, r->VarOffset[i]); }
       #endif
     }

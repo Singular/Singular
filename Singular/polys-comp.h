@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-comp.h,v 1.21 2000-03-21 16:21:41 Singular Exp $ */
+/* $Id: polys-comp.h,v 1.22 2000-03-22 11:20:54 Singular Exp $ */
 
 /***************************************************************
  *
@@ -92,7 +92,7 @@ while (0)
 
 #endif // WORDS_BIGENDIAN
 
-#ifdef PDEBUG
+#if defined(PDEBUG) && defined(HAVE_SHIFTED_EXPONENTS)
 extern int pDBsyzComp;
 int rComp0(poly p1, poly p2);
 #else
