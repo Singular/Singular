@@ -70,7 +70,10 @@
 #undef LONG_IS_32BIT
 #endif
 
-/* Define if genpari.h is included and ulong is not on your system */
+/* Define if genpari.h is included and ulong is not on yo\ur system */
 #ifndef ULONG_NOT_DEFINED 
 #undef ULONG_NOT_DEFINED
 #endif
+
+/* Define remote shell command */
+#define MP_RSH_COMMAND	"rsh"
