@@ -110,7 +110,7 @@ CSOURCES=weight0.c fegetopt.c fereadl.c page.c feOpenWinntUrl.c dError.c
 ESOURCES=iparith.cc tesths.cc mpsr_Tok.cc claptmpl.cc
 
 SOURCES=${CSOURCES} ${CXXSOURCES} ${ESOURCES} mmalloc.cc\
-	grammar.y scanner.l libparse.l syz2.cc \
+	grammar.y scanner.l libparse.l syz2.cc prCopyTemplate.cc \
         p_Delete__Template.cc p_ShallowCopyDelete__Template.cc \
         p_Copy__Template.cc p_Mult_nn__Template.cc  pp_Mult_nn__Template.cc \
         pp_Mult_mm__Template.cc p_Mult_mm__Template.cc \
@@ -135,15 +135,16 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	pcv.h mod_raw.h kbuckets.h \
 	mpr_global.h mpr_inout.h mpr_base.h mpr_numeric.h \
 	feOpt.h fegetopt.h distrib.h walk.h \
-	prCopy.h \
+	prCopy.h prCopyMacros.h \
         p_MemAdd.h p_MemCopy.h p_MemCmp.h p_Numbers.h \
-        pInline2.h pInline1.h pInline0.h 
+        pInline2.h pInline1.h pInline0.h p_Procs.h mmalloc.h static.h\
+        omSingularConfig.h
 
 INCS=febase.inc polys.inc iparith.inc mpsr_Tok.inc feOpt.inc
 
 DISTFILES=${SOURCES} ${HEADERS} Makefile.in configure.in configure \
 	mod2.h.in grammar.h testgh install-sh mkinstalldirs \
-	${INCS} check_aso.pl 
+	${INCS} check_aso.pl prCopy.pl
 
 OBJS := $(CXXSOURCES:.cc=.o) $(CSOURCES:.c=.o)
 
