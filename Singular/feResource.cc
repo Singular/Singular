@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.7 1999-08-16 15:09:47 obachman Exp $ */
+/* $Id: feResource.cc,v 1.8 1999-08-25 15:26:02 obachman Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -9,9 +9,12 @@
 #include <unistd.h>
 
 #include "mod2.h"
+#include "version.h"
+#ifndef ESINGULAR
 #include "mmemory.h"
 #include "febase.h"
-#include "version.h"
+extern "C" char* find_executable(const char* argv0);
+#endif
 
 // define RESOURCE_DEBUG for chattering about resource management
 // #define RESOURCE_DEBUG
@@ -72,13 +75,19 @@ static feResourceConfig_s feResourceConfigs[20] =
   {"HtmlDir",   'h',    feResDir,   "SINGULAR_HTML_DIR",    "%r/html",              ""},
   {"ManualUrl", 'u',    feResUrl,   "SINGULAR_URL",         "http://www.mathematik.uni-kl.de/~zca/Singular/Manual/"S_VERSION1,    ""},
   {"EmacsDir",  'e',    feResDir,   "SINGULAR_EMACS_DIR",   "%r/emacs",             ""},
-#if !defined(WINNT) && ! defined(macintosh)
+#if !defined(macintosh)
   {"netscape",  'N',    feResBinary,"NETSCAPE",             "%b/netscape",          ""},
   {"info",      'I',    feResBinary,"INFO",                 "%b/info",              ""},
   {"tkinfo",    'T',    feResBinary,"TKINFO",               "%b/tkinfo",            ""},
   {"xterm",     'X',    feResBinary,"XTERM",                "%b/xterm",             ""},
   {"Path",      'p',    feResPath,  NULL,                   "%b;$PATH",         ""},
-#endif // !defined(WINNT) && ! defined(macintosh)
+#endif // ! defined(macintosh)
+ 
+#ifdef ESINGULAR
+  {"emacs",    'E',    feResBinary, "EMACS",               "%b/emacs",              ""},
+  {"SingularEmacs", 'M',    feResBinary, "SINGULAR_EMACS",  "%b/Singular",           ""},
+  {"EmacsLoad",'l',    feResFile,   "SINGULAR_EMACS_LOAD", "%e/.singular-emacs",             ""},
+#endif
   {NULL, 0, feResUndef, NULL, NULL, NULL}, // must be the last record
 };
 
@@ -103,6 +112,7 @@ char fePathSep =
 static feResourceConfig feGetResourceConfig(const char id);
 static feResourceConfig feGetResourceConfig(const char* key);
 static char* feResource(feResourceConfig config, int warn);
+static char* feResourceDefault(feResourceConfig config);
 static char* feInitResource(feResourceConfig config, int warn);
 static char* feGetExpandedExecutable();
 static BOOLEAN feVerifyResourceValue(feResourceType type, char* value);
@@ -111,7 +121,6 @@ static char* feCleanUpFile(char* fname);
 static char* feCleanUpPath(char* path);
 static void mystrcpy(char* d, char* s);
 static char* feSprintf(char* s, const char* fmt, int warn = -1);
-extern "C" char* find_executable(const char* argv0);
 #if defined(WINNT) && defined(__GNUC__)
 // utility function of Cygwin32:
 extern "C" int cygwin32_posix_path_list_p (const char *path);
@@ -122,14 +131,24 @@ extern "C" int cygwin32_posix_path_list_p (const char *path);
  * Public functions
  *
  *****************************************************************/
-char* feResource(const char id, int warn)
+char* feResource(const char id, int warn = -1)
 {
   return feResource(feGetResourceConfig(id), warn);
 }
 
-char* feResource(const char* key, int warn)
+char* feResource(const char* key, int warn = -1)
 {
   return feResource(feGetResourceConfig(key), warn);
+}
+
+char* feResourceDefault(const char id)
+{
+  return feResourceDefault(feGetResourceConfig(id));
+}
+
+char* feResourceDefault(const char* key)
+{
+  return feResourceDefault(feGetResourceConfig(key));
 }
 
 void feInitResources(char* argv0)
@@ -215,6 +234,13 @@ static char* feResource(feResourceConfig config, int warn)
   if (config == NULL) return NULL;
   if (config->value != NULL && *(config->value) != '\0') return config->value;
   return feInitResource(config, warn);
+}
+
+static char* feResourceDefault(feResourceConfig config)
+{
+  char* value = (char*) AllocL(MAXRESOURCELEN);
+  feSprintf(value, config->fmt, -1);
+  return value;
 }
 
 static char* feInitResource(feResourceConfig config, int warn)
@@ -321,8 +347,8 @@ static char* feInitResource(feResourceConfig config, int warn)
   // this value is gotten for the first time
   if (warn > 0 || (warn < 0 && config->value != NULL))
   {
-    Warn("Could not get %s.", config->key);
-    Warn("Either set environment variable %s to the location of %s", 
+    Warn("Could not get %s. ", config->key);
+    Warn("Either set environment variable %s to the location of %s ", 
          config->env, config->key);
     feSprintf(value, config->fmt, warn);
     Warn("or make sure that %s is at %s", config->key, value);
@@ -660,7 +686,7 @@ static char* feSprintf(char* s, const char* fmt, int warn)
   return s_in;
 }
     
-void feStringAppendResources(int warn)
+void feStringAppendResources(int warn = -1)
 {
   int i = 0;
   char* r;

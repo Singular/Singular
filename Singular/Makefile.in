@@ -66,7 +66,7 @@ LIBS		= -lm @NEED_LIBS@
 
 CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     clapmem.cc clapsing.cc claptmpl.cc cntrlc.cc \
-    extra.cc febase.cc feread.cc fehelp.cc feResource.cc \
+    extra.cc febase.cc feread.cc fehelp.cc feResource.cc feCmdLineOptions.cc\
     ffields.cc hdegree.cc hilb.cc hutil.cc \
     ideals.cc intvec.cc iparith.cc \
     ipassign.cc ipconv.cc ipid.cc iplib.cc \
@@ -245,6 +245,9 @@ libparse.cc: libparse.l
 	fi
 	${LEX} -I -Pyylp -olibparse.cc libparse.l
 
+ESingular: feResource.cc mod2.h feCmdLineOptions.cc version.h emacs.cc
+	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o ESingular emacs.cc
+
 src: scanner.cc grammar.h grammar.cc libparse.cc spSpolyLoop.inc
 
 mod2.h: stamp-h
@@ -268,10 +271,11 @@ configure: configure.in
 ##
 install: all installbin installslib
 
-installbin: Singular libparse
+installbin: Singular libparse ESingular
 	${MKINSTALLDIRS} ${bindir}
 	${INSTALL_PROGRAM} Singular ${bindir}/Singular-${SINGULAR_VERSION}
 	${INSTALL_PROGRAM} libparse ${bindir}/libparse
+	${INSTALL_PROGRAM} ESingular ${bindir}/ESingular
 	chmod a+x ${bindir}/Singular-${SINGULAR_VERSION}
 	rm -f ${bindir}/Singular
 	cd ${bindir}; ${LN_S} Singular-${SINGULAR_VERSION} Singular;\
@@ -322,17 +326,19 @@ maintainer-clean: distclean srcclean
 Singular-bindist: ${OBJS} Makefile
 	echo "#define SINGULAR_VERSION_ID " `date '+%y%m%d%H'` >version.h
 	echo "#define MAKE_DISTRIBUTION	" >> version.h
-	${MAKE} Singular
-	strip Singular
+	${MAKE} Singular ESingular
+	strip Singular ESingular
 	${INSTALL} -s Singular Singular-bindist
+	${INSTALL} -s ESingular ESingular-bindist
 	echo "#define SINGULAR_VERSION_ID " `date '+%y%m%d%H'` >version.h
 
 Singular-static-bindist: ${OBJS} Makefile
 	echo "#define SINGULAR_VERSION_ID " `date '+%y%m%d%H'` >version.h
 	echo "#define MAKE_DISTRIBUTION	" >> version.h
-	${MAKE} Singular-static
-	strip Singular-static
+	${MAKE} Singular-static ESingular
+	strip Singular-static ESingular
 	mv Singular-static Singular-static-bindist
+	${INSTALL} -s ESingular ESingular-bindist
 	echo "#define SINGULAR_VERSION_ID " `date '+%y%m%d%H'` >version.h
 
 tar:

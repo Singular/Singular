@@ -18,7 +18,10 @@
 #include <stdlib.h>
 #include <strings.h>
 
+#ifndef ESINGULAR
 #include "mmemory.h"
+#endif
+
 
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 1024
