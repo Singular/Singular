@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.213 2004-10-11 09:06:52 bricken Exp $ */
+/* $Id: extra.cc,v 1.214 2004-10-18 18:57:43 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -954,6 +954,67 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
+/*==================== opp ==================================*/
+    if (strcmp(sys_cmd, "opp")==0)
+    {
+      if ((h!=NULL) && (h->Typ()==RING_CMD))
+      {
+        ring r=(ring)h->Data();
+        res->data=rOpposite(r);
+        res->rtyp=RING_CMD;
+        return FALSE;
+      }
+      else
+      {
+        WerrorS("`system(\"opp\",<ring>)` expected");
+        return TRUE;
+      }
+    }
+    else
+/*==================== env ==================================*/
+    if (strcmp(sys_cmd, "env")==0)
+    {
+      if ((h!=NULL) && (h->Typ()==RING_CMD))
+      {
+        ring r = (ring)h->Data();
+        res->data = rEnvelope(r);
+        res->rtyp = RING_CMD;
+        return FALSE;
+      }
+      else
+      {
+        WerrorS("`system(\"env\",<ring>)` expected");
+        return TRUE;
+      }
+    }
+    else
+/*==================== oppose ==================================*/
+    if (strcmp(sys_cmd, "oppose")==0)
+    {
+      ring Rop;
+      if ((h!=NULL) && (h->Typ()==RING_CMD))
+      {
+        Rop = (ring)h->Data();
+        h   = h->next;
+      }
+      if ((h!=NULL)) 
+      {
+	idhdl w;
+	if ((w=Rop->idroot->get(h->Name(),myynest))!=NULL)
+	{
+	  poly p = (poly)IDDATA(w);
+	  res->data = pOppose(Rop,p);
+	  res->rtyp = POLY_CMD;
+	  return FALSE;
+	}
+       }
+      else
+      {
+        WerrorS("`system(\"oppose\",<ring>,<poly>)` expected");
+        return TRUE;
+      }
+    }
+    else
 #endif
 /*================= Extended system call ========================*/
    {
@@ -1669,67 +1730,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       res->rtyp=IDEAL_CMD;
       setFlag(res,FLAG_STD);
       return(FALSE);
-    }
-    else
-/*==================== opp ==================================*/
-    if (strcmp(sys_cmd, "opp")==0)
-    {
-      if ((h!=NULL) && (h->Typ()==RING_CMD))
-      {
-        ring r=(ring)h->Data();
-        res->data=rOpposite(r);
-        res->rtyp=RING_CMD;
-        return FALSE;
-      }
-      else
-      {
-        WerrorS("`system(\"opp\",<ring>)` expected");
-        return TRUE;
-      }
-    }
-    else
-/*==================== env ==================================*/
-    if (strcmp(sys_cmd, "env")==0)
-    {
-      if ((h!=NULL) && (h->Typ()==RING_CMD))
-      {
-        ring r=(ring)h->Data();
-        res->data=rEnvelope(r);
-        res->rtyp=RING_CMD;
-        return FALSE;
-      }
-      else
-      {
-        WerrorS("`system(\"env\",<ring>)` expected");
-        return TRUE;
-      }
-    }
-    else
-/*==================== oppose ==================================*/
-    if (strcmp(sys_cmd, "oppose")==0)
-    {
-      ring Rop;
-      if ((h!=NULL) && (h->Typ()==RING_CMD))
-      {
-        Rop =(ring)h->Data();
-        h=h->next;
-      }
-      if ((h!=NULL)) 
-      {
-	idhdl w;
-	if ((w=Rop->idroot->get(h->Name(),myynest))!=NULL)
-	{
-	  poly p = (poly)IDDATA(w);
-	  res->data = p_Oppose(Rop,p);
-	  res->rtyp = POLY_CMD;
-	  return FALSE;
-	}
-       }
-      else
-      {
-        WerrorS("`system(\"oppose\",<ring>,<poly>)` expected");
-        return TRUE;
-      }
     }
     else
 /*==================== Error =================*/

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.328 2004-10-05 13:00:29 Singular Exp $ */
+/* $Id: iparith.cc,v 1.329 2004-10-18 18:57:44 levandov Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -186,6 +186,9 @@ cmdnames cmds[] =
   { "ERROR",       0, ERROR_CMD ,         CMD_1},
   { "eliminate",   0, ELIMINATION_CMD,    CMD_23},
   { "else",        0, ELSE_CMD ,          ELSE_CMD},
+  #ifdef HAVE_PLURAL
+  { "envelope",    0, ENVELOPE_CMD ,       CMD_1},
+  #endif
   { "eval",        0, EVAL ,              EVAL},
   { "example",     0, EXAMPLE_CMD ,       EXAMPLE_CMD},
   { "execute",     0, EXECUTE_CMD ,       CMD_1},
@@ -276,6 +279,10 @@ cmdnames cmds[] =
   { "number",      0, NUMBER_CMD ,        RING_DECL},
   { "nvars",       0, NVARS_CMD ,         CMD_1},
   { "open",        0, OPEN_CMD ,          CMD_1},
+  #ifdef HAVE_PLURAL
+  { "oppose",      0, OPPOSE_CMD ,        CMD_2},
+  { "opposite",    0, OPPOSITE_CMD ,      CMD_1},
+  #endif
   { "option",      0, OPTION_CMD ,        CMD_M},
   { "or",          0, '|' ,               LOGIC_OP},
   { "ord",         0, ORD_CMD ,           CMD_1},
@@ -2027,16 +2034,113 @@ static BOOLEAN jjBRACKET(leftv res, leftv a, leftv b)
   return FALSE;
 }
 
-static BOOLEAN jjTWOSTD(leftv res, leftv a)
+static BOOLEAN jjOPPOSE(leftv res, leftv a, leftv b)
 {
-  if (rIsPluralRing(currRing))  res->data=(ideal)twostd((ideal)a->Data());
-  else  res->data=(ideal)a->Data();
-  setFlag(res,FLAG_STD);
-  setFlag(res,FLAG_TWOSTD);
+  /* int, number, poly, vector, intvec  */
+  /* if (rIsPluralRing(currRing)) -- skipped! */
+  ring  r = (ring)a->Data();
+  if (r == currRing)
+  {
+    res->data = b->Data();
+    res->rtyp  = b->rtyp;
+    return FALSE;
+  }
+  if (!rIsLikeOpposite(currRing, r))
+  {
+    Werror("%s is not an opposite ring to current ring",a->Fullname());
+    return TRUE;
+  }
+  idhdl w;
+  if( ((w=r->idroot->get(b->Name(),myynest))!=NULL) && (b->e==NULL))
+  {
+    int argtype = IDTYP(w);
+    switch (argtype)
+    {
+    case NUMBER_CMD:
+      {
+	/* since basefields are equal, we can apply nCopy */
+	res->data = nCopy((number)IDDATA(w));
+	res->rtyp = argtype;
+	break;
+      }
+    case POLY_CMD: 
+    case VECTOR_CMD:
+      {
+	poly    q = (poly)IDDATA(w);
+	res->data = pOppose(r,q);
+	res->rtyp = argtype;
+	break;
+      }
+    case IDEAL_CMD: 
+    case MODUL_CMD:  
+      {
+	ideal   Q = (ideal)IDDATA(w);
+	res->data = idOppose(r,Q);
+	res->rtyp = argtype;
+	break;
+      }
+    default:  
+      {       
+	Werror("unsupported type in oppose");
+	return TRUE;
+      }
+    }
+  }
+  else 
+  {
+    Werror("identifier %s not found in %s",b->Fullname(),a->Fullname());
+    return TRUE;
+  }
   return FALSE;
 }
 
-#endif
+// static BOOLEAN jjOPPOSE_ideal(leftv res, leftv a, leftv b)
+// {
+//   /* int, number, poly, vector, intvec  */
+//   ring    A = (ring)a->Data();
+//   ideal   Q = (ideal)b->Data();
+//   // if (rIsPluralRing(currRing)) 
+//   {
+//     res->data = idOppose(A,Q);
+//   }
+//   return FALSE;
+// }
+
+// static BOOLEAN jjOPPOSE(leftv res, leftv a, leftv b)
+// {
+//   if (rIsPluralRing(currRing)) 
+//   {
+//     int btype = (int)b->rtyp;
+//     ring    A = (ring)a->Data();
+//     switch (btype)
+//     {
+//     case INT_CMD:
+//     case POLY_CMD:
+//     case VECTOR_CMD:
+//     case INTVEC_CMD:
+//     case NUMBER_CMD:
+//       {
+// 	poly    q = (poly)b->Data();
+// 	res->data = pOppose(A,q);
+// 	res->rtyp = b->rtyp;
+//       }
+//     case IDEAL_CMD:   
+//     case MATRIX_CMD: 
+//     case MODUL_CMD:  
+//     case INTMAT_CMD: 
+//       {
+// 	ideal   Q = (ideal)b->Data();
+// 	res->data = idOppose(A,Q);
+// 	res->rtyp = b->rtyp;
+//       }
+//       // TODO   case RESOLUTION_CMD: 
+//     default:       return FALSE;
+//     }
+//   }
+//   else res->data=NULL;
+//   return FALSE;
+// }
+#endif /* HAVE_PLURAL */
 
 static BOOLEAN jjQUOT(leftv res, leftv u, leftv v)
 {
@@ -2550,6 +2654,14 @@ struct sValCmd2 dArith2[]=
 ,{jjBETTI2_ID, BETTI_CMD,      INTMAT_CMD,     MODUL_CMD,  INT_CMD ALLOW_PLURAL}
 #ifdef HAVE_PLURAL
 ,{jjBRACKET,   BRACKET_CMD,    POLY_CMD,       POLY_CMD,   POLY_CMD ALLOW_PLURAL}
+,{jjOPPOSE,    OPPOSE_CMD,     ANY_TYPE/*set by p*/, RING_CMD,   POLY_CMD ALLOW_PLURAL}
+,{jjOPPOSE,    OPPOSE_CMD,     ANY_TYPE/*set by p*/, RING_CMD,   DEF_CMD ALLOW_PLURAL}
+// ,{jjOPPOSE_poly,    OPPOSE_CMD,     NUMBER_CMD,     RING_CMD,   NUMBER_CMD ALLOW_PLURAL}
+// ,{jjOPPOSE_poly,    OPPOSE_CMD,     POLY_CMD,       RING_CMD,   POLY_CMD ALLOW_PLURAL}
+// ,{jjOPPOSE_poly,    OPPOSE_CMD,     VECTOR_CMD,     RING_CMD,   VECTOR_CMD ALLOW_PLURAL}
+// ,{jjOPPOSE_ideal,   OPPOSE_CMD,     IDEAL_CMD,      RING_CMD,   IDEAL_CMD ALLOW_PLURAL}
+// ,{jjOPPOSE_ideal,   OPPOSE_CMD,     MODUL_CMD,      RING_CMD,   MODUL_CMD  ALLOW_PLURAL}
+// ,{jjOPPOSE_ideal,   OPPOSE_CMD,     MATRIX_CMD,     RING_CMD,   MATRIX_CMD ALLOW_PLURAL}
 #endif
 ,{jjCOEF,      COEF_CMD,       MATRIX_CMD,     POLY_CMD,   POLY_CMD ALLOW_PLURAL}
 ,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     IDEAL_CMD,  POLY_CMD ALLOW_PLURAL}
@@ -3525,6 +3637,54 @@ static BOOLEAN jjTRANSP_IV(leftv res, leftv v)
   res->data = (char *)ivTranp((intvec*)(v->Data()));
   return FALSE;
 }
+
+#ifdef HAVE_PLURAL
+
+static BOOLEAN jjOPPOSITE(leftv res, leftv a)
+{
+  ring    r = (ring)a->Data();
+  if (rIsPluralRing(currRing))
+  {  
+    res->data = rOpposite(r);
+  }
+  else res->data = rCopy(r);
+  return FALSE;
+}
+
+static BOOLEAN jjENVELOPE(leftv res, leftv a)
+{
+  ring    r = (ring)a->Data();
+  if (rIsPluralRing(currRing))
+  {  
+    //    ideal   i;
+//     if (a->rtyp == QRING_CMD)
+//     {
+//       i = r->qideal;
+//       r->qideal = NULL;
+//     }
+    ring s = rEnvelope(r);
+//     if (a->rtyp == QRING_CMD)
+//     {
+//       ideal is  = idOppose(r,i); /* twostd? */
+//       is        = idAdd(is,i);
+//       s->qideal = i;
+//     }
+    res->data = s;
+  }
+  else  res->data = rCopy(r);
+  return FALSE;
+}
+
+static BOOLEAN jjTWOSTD(leftv res, leftv a)
+{
+  if (rIsPluralRing(currRing))  res->data=(ideal)twostd((ideal)a->Data());
+  else  res->data=(ideal)a->Data();
+  setFlag(res,FLAG_STD);
+  setFlag(res,FLAG_TWOSTD);
+  return FALSE;
+}
+#endif
+
 static BOOLEAN jjTYPEOF(leftv res, leftv v)
 {
   switch ((int)v->data)
@@ -4072,6 +4232,8 @@ struct sValCmd1 dArith1[]=
 ,{jjSYZYGY,     SYZYGY_CMD,      MODUL_CMD,      IDEAL_CMD      ALLOW_PLURAL}
 ,{jjSYZYGY,     SYZYGY_CMD,      MODUL_CMD,      MODUL_CMD      ALLOW_PLURAL}
 #ifdef HAVE_PLURAL
+,{jjENVELOPE,   ENVELOPE_CMD,    RING_CMD,       RING_CMD       ALLOW_PLURAL}
+,{jjOPPOSITE,   OPPOSITE_CMD,    RING_CMD,       RING_CMD       ALLOW_PLURAL}
 ,{jjTWOSTD,     TWOSTD_CMD,      IDEAL_CMD,      IDEAL_CMD      ALLOW_PLURAL}
 #endif
 ,{jjWRONG,      TRACE_CMD,       0,              INTVEC_CMD     ALLOW_PLURAL}

@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id: tok.h,v 1.58 2004-04-23 13:52:00 Singular Exp $ */
+/* $Id: tok.h,v 1.59 2004-10-18 18:57:46 levandov Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -74,6 +74,7 @@ enum {
   DET_CMD,
   DUMP_CMD,
   END_GRAMMAR,
+  ENVELOPE_CMD,
   ERROR_CMD,
   EXECUTE_CMD,
   EXTGCD_CMD,
@@ -113,6 +114,8 @@ enum {
   NPARS_CMD,
   NVARS_CMD,
   OPEN_CMD,
+  OPPOSE_CMD,
+  OPPOSITE_CMD,
   OPTION_CMD,
   ORDSTR_CMD,
   PACKAGE_CMD,
