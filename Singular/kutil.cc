@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.36 1999-09-27 14:57:11 obachman Exp $ */
+/* $Id: kutil.cc,v 1.37 1999-09-29 10:59:31 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -11,11 +11,9 @@
 #include "mod2.h"
 #include "tok.h"
 #include "febase.h"
-#include "spolys.h"
 #include "mmemory.h"
 #include "numbers.h"
 #include "polys.h"
-//#include "ipid.h"
 #include "ring.h"
 #include "ideals.h"
 #include "timer.h"
@@ -24,75 +22,14 @@
 #include "subexpr.h"
 #include "kstd1.h"
 #include "kutil.h"
-#include "spSpolyLoop.h"
-//#include "longrat.h"
 
 static poly redMora (poly h,int maxIndex,kStrategy strat);
 static poly redBba (poly h,int maxIndex,kStrategy strat);
 
-//int     cp, c3;
-//BOOLEAN interpt;
-//BOOLEAN news=FALSE;
-//static BOOLEAN newt=FALSE;/*used for messageSets*/
 BITSET  test=(BITSET)0;
-//int     ak;
-//int     syzComp=0;
 int     HCord;
-//LObject P;
-//poly    tail;
-//BOOLEAN *pairtest;/*used for enterOnePair*/
-//int    // LazyPass=100,
-//        LazyDegree=1;
 int        Kstd1_deg;
 int        mu=32000;
-
-//polyset S;
-//int     sl;
-//ideal   Shdl;
-//intset  ecartS;
-//intset  fromQ;
-
-//TSet    T;
-//int     tl;
-//int     tmax;
-
-//LSet    L;
-//int     Ll;
-//int     Lmax;
-
-//LSet    B;
-//int     Bl;
-//int     Bmax;
-
-//BOOLEAN kActive=FALSE;
-//BOOLEAN fromT = FALSE;
-//BOOLEAN honey, sugarCrit;/*option 5*/
-//BOOLEAN Gebauer;
-//BOOLEAN * NotUsedAxis;
-//BOOLEAN homog;
-//BOOLEAN noTailReduction = FALSE;
-
-/*0 implementation*/
-/*
-*static void deleteHCn(poly* p)
-*{
-*  poly p1;
-*  if (pHEdgeFound && (*p))
-*  {
-*    if (pComp0(*p,pNoether) == -1)
-*    {
-*      pDelete(p);
-*      return;
-*    }
-*    p1 = *p;
-*    while (pNext(p1))
-*    {
-*      if (pComp0(pNext(p1), pNoether) == -1) pDelete(&pNext(p1));
-*      else                                  pIter(p1);
-*    }
-*  }
-*}
-*/
 
 /*2
 *deletes higher monomial of p, re-compute ecart and length
@@ -607,28 +544,9 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
   Lp.lcm = pInit();
   pLcm(p,strat->S[i],Lp.lcm);
   pSetm(Lp.lcm);
-#ifdef DRING
-//  if ((pDRING) && (pdDFlag(Lp.lcm)==0))
-//  {
-//    for(j=1;j<=pdN;j++)
-//    {
-//      if((Lp.pGetExp(lcm,pdX(j))>0)
-//      &&(Lp.pGetExp(lcm,pdIX(j))>0))
-//      {
-//        pFree1(Lp.lcm);
-//        Lp.lcm=NULL;
-//        return;
-//      }
-//    }
-//    /*delete pairs with lcm contains x_j^a*x_j^(-b)*/
-//  }
-#endif
   if (strat->sugarCrit)
   {
     if(
-#ifdef SDRING
-    (!pSDRING) &&
-#endif
     (!((strat->ecartS[i]>0)&&(ecart>0)))
     && pHasNotCF(p,strat->S[i]))
     {
@@ -664,9 +582,6 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
     *if the leading term of s devides lcm(r,p) then (r,p) will be canceled
     *if the leading term of r devides lcm(s,p) then (s,p) will not enter B
     */
-#ifdef SDRING
-    if (!pSDRING)
-#endif
     {
       j = strat->Bl;
       loop
@@ -698,9 +613,6 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
   else /*sugarcrit*/
   {
     if(/*(strat->ak==0) && productCrit(p,strat->S[i])*/
-#ifdef SDRING
-    (!pSDRING) &&
-#endif
     pHasNotCF(p,strat->S[i]))
     {
     /*
@@ -733,9 +645,6 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
     *if the leading term of s devides lcm(r,p) then (r,p) will be canceled
     *if the leading term of r devides lcm(s,p) then (s,p) will not enter B
     */
-#ifdef SDRING
-    if (!pSDRING)
-#endif
     for(j = strat->Bl;j>=0;j--)
     {
       compare=pDivComp(strat->B[j].lcm,Lp.lcm);
@@ -768,18 +677,8 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
   if ((strat->fromQ!=NULL) && (isFromQ!=0) && (strat->fromQ[i]!=0))
     Lp.p=NULL;
   else
-#ifdef SDRING
-  // spSpolyShortBba will not work for SDRING
-  if (pSDRING)
   {
-    Lp.p=spSpolyCreate(strat->S[i],p,strat->kNoether,strat->spSpolyLoop);
-    if (Lp.p!=NULL)
-      pDelete(&pNext(Lp.p));
-  }
-  else
-#endif
-  {
-    Lp.p = spSpolyShortBba(strat->S[i],p);
+    Lp.p = ksCreateShortSpoly(strat->S[i],p);
   }
   if (Lp.p == NULL)
   {
@@ -813,23 +712,6 @@ void enterOnePair (int i,poly p,int ecart, int isFromQ,kStrategy strat)
     l = strat->posInL(strat->B,strat->Bl,Lp,strat);
     enterL(&strat->B,&strat->Bl,&strat->Bmax,Lp,l);
   }
-#ifdef DRING
-  if ((pDRING) && (pdDFlag(strat->S[i])==0) && (pdDFlag(p)==0))
-  {
-    Lp.lcm=pOne();
-    pdLcm(strat->S[i],p,Lp.lcm);
-    Lp.p1 = strat->S[i];
-    Lp.p2 = p;
-    Lp.p = pdSpolyCreate(strat->S[i],p);
-    if (Lp.p!=NULL)
-    {
-      /*spoly of p and S[i] bzgl Lp.lcm*/
-      strat->initEcartPair(&Lp,strat->S[i],p,strat->ecartS[i],ecart);
-      l = strat->posInL(strat->B,strat->Bl,Lp,strat);
-      enterL(&strat->B,&strat->Bl,&strat->Bmax,Lp,l);
-    }
-  }
-#endif
 }
 
 /*2
@@ -844,11 +726,7 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat)
   Lp.lcm = pInit();
   pLcm(p,strat->S[i],Lp.lcm);
   pSetm(Lp.lcm);
-  if(
-#ifdef SDRING
-  (!pSDRING) &&
-#endif
-  (pHasNotCF(p,strat->S[i])))
+  if(pHasNotCF(p,strat->S[i]))
   {
     strat->cp++;
     pFree1(Lp.lcm);
@@ -872,19 +750,7 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat)
   }
   /*-  compute the short s-polynomial -*/
 
-#ifdef SDRING
-  // spSpolyShortBba will not work for SDRING
-  if (pSDRING)
-  {
-    Lp.p=spSpolyCreate(strat->S[i],p,strat->kNoether,strat->spSpolyLoop);
-    if (Lp.p!=NULL)
-      pDelete(&pNext(Lp.p));
-  }
-  else
-#endif
-  {
-    Lp.p = spSpolyShortBba(strat->S[i],p);
-  }
+  Lp.p = ksCreateShortSpoly(strat->S[i],p);
   if (Lp.p == NULL)
   {
      pFree1(Lp.lcm);
@@ -903,23 +769,6 @@ void enterOnePairSpecial (int i,poly p,int ecart,kStrategy strat)
     l = strat->posInL(strat->L,strat->Ll,Lp,strat);
     enterL(&strat->L,&strat->Ll,&strat->Lmax,Lp,l);
   }
-#ifdef DRING
-  if ((pDRING) && (pdDFlag(strat->S[i])==0) && (pdDFlag(p)==0))
-  {
-    Lp.lcm=pOne();
-    pdLcm(strat->S[i],p,Lp.lcm);
-    Lp.p1 = strat->S[i];
-    Lp.p2 = p;
-    Lp.p = pdSpolyCreate(strat->S[i],p);
-    if (Lp.p!=NULL)
-    {
-      /*spoly of p and S[i] bzgl Lp.lcm*/
-      strat->initEcartPair(&Lp,strat->S[i],p,strat->ecartS[i],ecart);
-      l = strat->posInL(strat->B,strat->Bl,Lp,strat);
-      enterL(&strat->B,&strat->Bl,&strat->Bmax,Lp,l);
-    }
-  }
-#endif
 }
 
 /*2
@@ -937,9 +786,6 @@ void chainCrit (poly p,int ecart,kStrategy strat)
   */
   if (strat->pairtest!=NULL)
   {
-#ifdef SDRING
-    if (!pSDRING)
-#endif
     {
       /*- i.e. there is an i with pairtest[i]==TRUE -*/
       for (j=0; j<=strat->sl; j++)
@@ -960,11 +806,7 @@ void chainCrit (poly p,int ecart,kStrategy strat)
     Free((ADDRESS)strat->pairtest,(strat->sl+2)*sizeof(BOOLEAN));
     strat->pairtest=NULL;
   }
-  if ((strat->Gebauer || strat->fromT)
-#ifdef SDRING
-  && (!pSDRING)
-#endif
-  )
+  if (strat->Gebauer || strat->fromT)
   {
     if (strat->sugarCrit)
     {
@@ -1073,9 +915,6 @@ void chainCrit (poly p,int ecart,kStrategy strat)
   }
   else
   {
-#ifdef SDRING
-    if (!pSDRING)
-#endif
     for (j=strat->Ll; j>=0; j--)
     {
       if (pCompareChain(p,strat->L[j].p1,strat->L[j].p2,strat->L[j].lcm))
@@ -1108,9 +947,6 @@ void chainCrit (poly p,int ecart,kStrategy strat)
     }
     strat->Bl = -1;
     j = strat->Ll;
-#ifdef SDRING
-    if (!pSDRING)
-#endif
     loop  /*cannot be changed into a for !!! */
     {
       if (j <= 0)
@@ -2350,7 +2186,7 @@ poly redtail (poly p, int pos, kStrategy strat)
         || ((Kstd1_deg>0)&&(op<=Kstd1_deg)))
       )
       {
-        spSpolyTail(strat->S[j], p, h, strat->kNoether, strat->spSpolyLoop);
+        ksOldSpolyTail(strat->S[j], p, h, strat->kNoether);
         hn = pNext(h);
         if (hn == NULL)
         {
@@ -2395,7 +2231,7 @@ poly redtailBba (poly p, int pos, kStrategy strat)
       if (pDivisibleBy(strat->S[j], hn))
       {
         strat->redTailChange=TRUE;
-        spSpolyTail(strat->S[j], p, h, strat->kNoether, strat->spSpolyLoop);
+        ksOldSpolyTail(strat->S[j], p, h, strat->kNoether);
         hn = pNext(h);
         if (hn == NULL)
         {
@@ -2436,7 +2272,7 @@ poly redtailSyz (poly p, int pos, kStrategy strat)
     {
       if (pDivisibleBy(strat->S[j], hn) && (!pEqual(strat->S[j],h)))
       {
-        spSpolyTail(strat->S[j], p, h, strat->kNoether, strat->spSpolyLoop);
+        ksOldSpolyTail(strat->S[j], p, h, strat->kNoether);
         hn = pNext(h);
         if (hn == NULL)
         {
@@ -2543,10 +2379,6 @@ void initS (ideal F, ideal Q,kStrategy strat)
 {
   LObject h;
   int   i,pos;
-#ifdef SDRING
-  polyset aug=(polyset)Alloc(setmax*sizeof(poly));
-  int augmax=setmax, augl=-1;
-#endif
 
   h.ecart=0; h.length=0;
   if (Q!=NULL) i=IDELEMS(Q);
@@ -2599,32 +2431,6 @@ void initS (ideal F, ideal Q,kStrategy strat)
     if (F->m[i]!=NULL)
     {
       h.p = pCopy(F->m[i]);
-#ifdef SDRING
-      aug[0]=h.p;
-      augl=0;
-#ifdef SRING
-      if (pSRING)
-        psAug(pCopy(h.p),pOne(),&aug,&augl,&augmax);
-#endif
-#ifdef DRING
-      if (pDRING)
-        pdAug(pCopy(h.p),&aug,&augl,&augmax);
-#endif
-      for (augl++;augl != 0;)
-      {
-        h.p=aug[--augl];
-#ifdef KDEBUG
-        pHeapTest(h.p, h.heap);
-#endif
-#ifdef KDEBUG
-        if (TEST_OPT_DEBUG && pSDRING)
-        {
-          PrintS("new (aug) s:");
-          wrp(h.p);
-          PrintLn();
-        }
-#endif
-#endif
         if (TEST_OPT_INTSTRATEGY)
         {
           //pContent(h.p);
@@ -2655,9 +2461,6 @@ void initS (ideal F, ideal Q,kStrategy strat)
           }
           strat->enterS(h,pos,strat);
         }
-#ifdef SDRING
-      }
-#endif
     }
   }
   /*- test, if a unit is in F -*/
@@ -2665,19 +2468,12 @@ void initS (ideal F, ideal Q,kStrategy strat)
   {
     while (strat->sl>0) deleteInS(strat->sl,strat);
   }
-#ifdef SDRING
-  Free((ADDRESS)aug,augmax*sizeof(poly));
-#endif
 }
 
 void initSL (ideal F, ideal Q,kStrategy strat)
 {
   LObject h;
   int   i,pos;
-#ifdef SDRING
-  polyset aug=(polyset)Alloc(setmax*sizeof(poly));
-  int augmax=setmax, augl=-1;
-#endif
 
   h.ecart=0; h.length=0;
   if (Q!=NULL) i=IDELEMS(Q);
@@ -2733,32 +2529,6 @@ void initSL (ideal F, ideal Q,kStrategy strat)
       h.p1=NULL;
       h.p2=NULL;
       h.lcm=NULL;
-#ifdef SDRING
-      aug[0]=h.p;
-      augl=0;
-#ifdef SRING
-      if (pSRING)
-        psAug(pCopy(h.p),pOne(),&aug,&augl,&augmax);
-#endif
-#ifdef DRING
-      if (pDRING)
-        pdAug(pCopy(h.p),&aug,&augl,&augmax);
-#endif
-      for (augl++;augl != 0;)
-      {
-        h.p=aug[--augl];
-#ifdef KDEBUG
-        pTest(h.p);
-#endif
-#ifdef SDRING
-        if (TEST_OPT_DEBUG && pSDRING)
-        {
-          PrintS("new (aug) s:");
-          wrp(h.p);
-          PrintLn();
-        }
-#endif
-#endif
         if (TEST_OPT_INTSTRATEGY)
         {
           //pContent(h.p);
@@ -2789,9 +2559,6 @@ void initSL (ideal F, ideal Q,kStrategy strat)
           }
           enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
         }
-#ifdef SDRING
-      }
-#endif
     }
   }
   /*- test, if a unit is in F -*/
@@ -2799,9 +2566,6 @@ void initSL (ideal F, ideal Q,kStrategy strat)
   {
     while (strat->Ll>0) deleteInL(strat->L,&strat->Ll,strat->Ll-1,strat);
   }
-#ifdef SDRING
-  Free((ADDRESS)aug,augmax*sizeof(poly));
-#endif
 }
 
 
@@ -2812,10 +2576,6 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
 {
   LObject h;
   int   i,pos;
-#ifdef SDRING
-  polyset aug=(polyset)Alloc(setmax*sizeof(poly));
-  int augmax=setmax, augl=-1;
-#endif
 
   h.ecart=0; h.length=0;
   if (Q!=NULL) i=IDELEMS(Q);
@@ -2949,9 +2709,6 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
       }
     }
   }
-#ifdef SDRING
-  Free((ADDRESS)aug,augmax*sizeof(poly));
-#endif
 }
 /*2
 * reduces h using the set S
@@ -2964,7 +2721,7 @@ static poly redBba1 (poly h,int maxIndex,kStrategy strat)
   while (j <= maxIndex)
   {
     if (pDivisibleBy(strat->S[j],h))
-       return spSpolyRedNew(strat->S[j],h,strat->kNoether, strat->spSpolyLoop);
+       return ksOldSpolyRedNew(strat->S[j],h,strat->kNoether);
     else j++;
   }
   return h;
@@ -3037,7 +2794,7 @@ static poly redQ (poly h, int j, kStrategy strat)
   {
     if (pDivisibleBy(strat->S[j],h))
     {
-      h = spSpolyRed(strat->S[j],h,strat->kNoether, strat->spSpolyLoop);
+      h = ksOldSpolyRed(strat->S[j],h,strat->kNoether);
       if (h==NULL) return NULL;
       j = start;
     }
@@ -3058,7 +2815,7 @@ static poly redBba (poly h,int maxIndex,kStrategy strat)
   {
     if (pDivisibleBy(strat->S[j],h))
     {
-      h = spSpolyRed(strat->S[j],h,strat->kNoether, strat->spSpolyLoop);
+      h = ksOldSpolyRed(strat->S[j],h,strat->kNoether);
       if (h==NULL) return NULL;
       j = 0;
     }
@@ -3086,7 +2843,7 @@ static poly redMora (poly h,int maxIndex,kStrategy strat)
       if (pDivisibleBy(strat->S[j],h)
       && ((e >= strat->ecartS[j]) || strat->kHEdgeFound))
       {
-        h1 = spSpolyRedNew(strat->S[j],h,strat->kNoether, strat->spSpolyLoop);
+        h1 = ksOldSpolyRedNew(strat->S[j],h,strat->kNoether);
         if(TEST_OPT_DEBUG)
         {
           PrintS("reduce "); wrp(h); Print(" with S[%d] (",j);wrp(strat->S[j]);
@@ -3115,13 +2872,6 @@ void updateS(BOOLEAN toT,kStrategy strat)
   LObject h;
   int i, suc=0;
   poly redSi=NULL;
-#ifdef SDRING
-  polyset aug=(polyset)Alloc(setmax*sizeof(poly));
-  int augmax=setmax;
-  int augl;
-  int pos;
-  BOOLEAN recursiv=FALSE;
-#endif
 
 //Print("nach initS: updateS start mit sl=%d\n",(strat->sl));
 //  for (i=0; i<=(strat->sl); i++)
@@ -3165,54 +2915,6 @@ void updateS(BOOLEAN toT,kStrategy strat)
             deleteInS(i,strat);
             i--;
           }
-#ifdef SDRING
-          else if ((pSDRING) && (pComp(redSi,strat->S[i])!=0))
-          {
-            pDelete(&redSi);
-            redSi=strat->S[i];
-            strat->S[i]=NULL;
-            deleteInS(i,strat);
-            suc=0;
-            i=0;
-            aug[0]=redSi;
-            augl=0;
-#ifdef SRING
-            if (pSRING) psAug(pCopy(redSi),pOne(),&aug,&augl,&augmax);
-#endif
-#ifdef DRING
-            if (pDRING) pdAug(pCopy(redSi),&aug,&augl,&augmax);
-#endif
-            redSi=NULL;
-            if (augl>0) recursiv=TRUE;
-            while (augl >= 0)
-            {
-              h.p=aug[augl];
-              pHeapTest(h.p, p.heap);
-              if (h.p!=NULL)
-              {
-                if (TEST_OPT_DEBUG)
-                {
-                  Print("new (aug %d) s:",augl);
-                  wrp(h.p);
-                  PrintLn();
-                }
-                if (TEST_OPT_INTSTRATEGY)
-                {
-                  //pContent(h.p);
-                  pCleardenom(h.p);// also does a pContent
-                }
-                else
-                {
-                  pNorm(h.p);
-                }
-                strat->initEcart(&h);
-                pos = posInS(strat->S,strat->sl,h.p);
-                strat->enterS(h,pos,strat);
-              }
-              augl--;
-            }
-          }
-#endif
           else
           {
             pDelete(&redSi);
@@ -3236,9 +2938,6 @@ void updateS(BOOLEAN toT,kStrategy strat)
       for (i=0; i<=strat->sl; i++)
       {
         if (((strat->fromQ==NULL) || (strat->fromQ[i]==0))
-#ifdef SDRING
-        && (!pSDRING)
-#endif
         )
           h.p = redtailBba(strat->S[i],i-1,strat);
         else
@@ -3274,48 +2973,6 @@ void updateS(BOOLEAN toT,kStrategy strat)
             deleteInS(i,strat);
             i--;
           }
-#ifdef SDRING
-          else if ((pSDRING) && (pComp(redSi,(strat->S)[i])!=0))
-          {
-            pDelete(&redSi);
-            redSi=(strat->S)[i];
-            (strat->S)[i]=NULL;
-            deleteInS(i,strat);
-            i--;
-            aug[0]=redSi;
-            augl=0;
-#ifdef SRING
-            if (pSRING) psAug(pCopy(redSi),pOne(),&aug,&augl,&augmax);
-#endif
-#ifdef DRING
-            if (pDRING) pdAug(pCopy(redSi),&aug,&augl,&augmax);
-#endif
-            redSi=NULL;
-            if (augl>0) recursiv=TRUE;
-            for (augl++;augl != 0;)
-            {
-              h.p=aug[--augl];
-#ifdef KDEBUG
-              if (TEST_OPT_DEBUG)
-              {
-                PrintS("new (aug) s:");
-                wrp(h.p);
-                PrintLn();
-              }
-#endif
-              if (!TEST_OPT_INTSTRATEGY)
-                pNorm(h.p);
-              else
-              {
-                //pContent(h.p);
-                pCleardenom(h.p);// also does a pContent
-              }
-              strat->initEcart(&h);
-              pos = posInS(strat->S,strat->sl,h.p);
-              strat->enterS(h,pos,strat);
-            }
-          }
-#endif
           else if (TEST_OPT_INTSTRATEGY)
           {
             pDelete(&redSi);
@@ -3353,9 +3010,6 @@ void updateS(BOOLEAN toT,kStrategy strat)
     for (i=0; i<=strat->sl; i++)
     {
       if (((strat->fromQ==NULL) || (strat->fromQ[i]==0))
-#ifdef SDRING
-      && (!pSDRING)
-#endif
       )
       {
         strat->S[i] = h.p = redtail(strat->S[i],strat->sl,strat);
@@ -3375,10 +3029,6 @@ void updateS(BOOLEAN toT,kStrategy strat)
     }
   }
   if (redSi!=NULL) pDelete1(&redSi);
-#ifdef SDRING
-  Free((ADDRESS)aug,augmax*sizeof(poly));
-  if (recursiv) updateS(FALSE,strat);
-#endif
 #ifdef KDEBUG
   kTest(strat);
 #endif
@@ -3392,35 +3042,6 @@ void enterSBba (LObject p,int atS,kStrategy strat)
 {
   int i;
 
-#ifdef SDRING
-  if (pSDRING
-  && (atS<=strat->sl)
-  && pComparePolys(p.p,strat->S[atS]))
-  {
-    if (TEST_OPT_PROT)
-      PrintS("m");
-    p.p=NULL;
-    return;
-  }
-  if (pSDRING
-  && (atS<strat->sl)
-  && pComparePolys(p.p,strat->S[atS+1]))
-  {
-    if (TEST_OPT_PROT)
-      PrintS("m");
-    p.p=NULL;
-    return;
-  }
-  if (pSDRING
-  && (atS>0)
-  && pComparePolys(p.p,strat->S[atS-1]))
-  {
-    if (TEST_OPT_PROT)
-      PrintS("m");
-    p.p=NULL;
-    return;
-  }
-#endif
   strat->news = TRUE;
   /*- puts p to the standardbasis s at position at -*/
   if (strat->sl == IDELEMS(strat->Shdl)-1)
@@ -3663,18 +3284,6 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
   }
   else
   {
-    #ifdef SDRING
-    if (
-    #ifdef SRING
-        pSRING ||
-    #endif
-    #ifdef DRING
-        pDRING ||
-    #endif
-        0)
-         initS(F, Q,strat); /*sets also S, ecartS, fromQ */
-    else
-    #endif
     /*Shdl=*/initSL(F, Q,strat); /*sets also S, ecartS, fromQ */
     // /*Shdl=*/initS(F, Q,strat); /*sets also S, ecartS, fromQ */
   }

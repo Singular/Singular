@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.15 1999-09-27 14:57:12 obachman Exp $ */
+/* $Id: kutil.h,v 1.16 1999-09-29 10:59:32 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -67,7 +67,6 @@ class skStrategy
     void (*initEcartPair)(LObject * h, poly f, poly g, int ecartF, int ecartG);
     int (*posInLOld)(const LSet Ls,const int Ll,
                      const LObject &Lo,const kStrategy strat);
-    void (*spSpolyLoop)(poly p1, poly p2, poly m, poly spNoether);
     pFDegProc pOldFDeg;
     ideal Shdl;
     ideal D; /*V(S) is in D(D)*/
@@ -172,9 +171,6 @@ void completeReduce (kStrategy strat);
 BOOLEAN homogTest(polyset F, int Fmax);
 BOOLEAN newHEdge(polyset S, int ak,kStrategy strat);
 
-rOrderType_t spGetOrderType(ring r, int modrank, int syzcomp);
-extern int spCheckCoeff(number *a, number *b);
-
 inline TSet initT () { return (TSet)Alloc0(setmax*sizeof(TObject)); }
 
 #ifdef KDEBUG
@@ -196,6 +192,77 @@ BOOLEAN K_Test_L(char* f, int l, LObject* L,
 #endif
 #endif
 
+/***************************************************************
+ *
+ * From kstd2.cc
+ * 
+ ***************************************************************/
+ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
+poly kNF2 (ideal F, ideal Q, poly q, kStrategy strat, int lazyReduce);
+ideal kNF2 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce);
+void initBba(ideal F,kStrategy strat);
+
+/***************************************************************
+ *
+ * From kSpolys.cc
+ * 
+ ***************************************************************/
+// Reduces PR with PW
+// Assumes PR != NULL, PW != NULL, Lm(PW) divides Lm(PR)
+// Changes: PR
+// Const:   PW
+// If coef != NULL, then *coef is a/gcd(a,b), where a = LC(PR), b = LC(PW)
+void ksReducePoly(LObject* PR,
+                  TObject* PW,
+                  poly spNoether = NULL,
+                  number *coef = NULL);
+
+// Reduces PR at Current->next with PW
+// Assumes PR != NULL, Current contained in PR 
+//         Current->next != NULL, LM(PW) devides LM(Current->next)
+// Changes: PR
+// Const:   PW
+void ksReducePolyTail(LObject* PR,
+                      TObject* PW,
+                      poly Current,
+                      poly spNoether = NULL);
+
+// Creates S-Poly of Pair
+// Const:   Pair->p1, Pair->p2
+// Changes: Pair->p == S-Poly of p1, p2
+// Assume:  Pair->p1 != NULL && Pair->p2
+void ksCreateSpoly(LObject* Pair, 
+                   poly spNoether = NULL);
+
+
+/*2
+* creates the leading term of the S-polynomial of p1 and p2
+* do not destroy p1 and p2
+* remarks:
+*   1. the coefficient is 0 (nNew)
+*   2. pNext is undefined
+*/
+poly ksCreateShortSpoly(poly p1, poly p2);
+
+
+/*
+* input - output: a, b
+* returns:
+*   a := a/gcd(a,b), b := b/gcd(a,b)
+*   and return value
+*       0  ->  a != 1,  b != 1
+*       1  ->  a == 1,  b != 1
+*       2  ->  a != 1,  b == 1
+*       3  ->  a == 1,  b == 1
+*   this value is used to control the spolys
+*/
+int ksCheckCoeff(number *a, number *b);
+
+// old stuff
+poly ksOldSpolyRed(poly p1, poly p2, poly spNoether = NULL);
+poly ksOldSpolyRedNew(poly p1, poly p2, poly spNoether = NULL);
+poly ksOldCreateSpoly(poly p1, poly p2, poly spNoether = NULL);
+void ksOldSpolyTail(poly p1, poly q, poly q2, poly spNoether);
 
 #ifdef HAVE_SHORT_EVECTORS
 

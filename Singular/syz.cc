@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.22 1999-09-27 15:32:56 obachman Exp $ */
+/* $Id: syz.cc,v 1.23 1999-09-29 10:59:40 obachman Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -15,9 +15,7 @@
 #include "febase.h"
 #include "kstd1.h"
 #include "kutil.h"
-#include "spolys.h"
 #include "stairc.h"
-//#include "ipid.h"
 #include "cntrlc.h"
 #include "ipid.h"
 #include "intvec.h"

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.19 1999-09-16 12:34:00 Singular Exp $ */
+/* $Id: numbers.cc,v 1.20 1999-09-29 10:59:34 obachman Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -20,12 +20,6 @@
 #include "gnumpfl.h"
 #include "gnumpc.h"
 #include "ring.h"
-#ifndef FAST_AND_DIRTY
-#undef npMultM
-#undef npSubM
-#undef npNegM
-#undef npEqualM
-#endif
 #include "ffields.h"
 #include "shortfl.h"
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.40 1999-09-27 15:05:33 obachman Exp $ */
+/* $Id: syz1.cc,v 1.41 1999-09-29 10:59:41 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -13,8 +13,6 @@
 #include "febase.h"
 #include "kstd1.h"
 #include "kutil.h"
-#include "spolys.h"
-#include "spolys0.h"
 #include "stairc.h"
 #include "ipid.h"
 #include "cntrlc.h"
@@ -30,15 +28,14 @@
 #include "lists.h"
 #include "syz.h"
 #include "kbuckets.h"
-#include "kbPolyProcs.h"
 #include <limits.h>
 
 extern void rSetmS(poly p, int* Components, long* ShiftedComponents);
 
 /*--------------static variables------------------------*/
 /*---points to the real components, shifted of the actual module-*/
-static int *  currcomponents=NULL;
-static long *  currShiftedComponents=NULL;
+int *  currcomponents=NULL;
+long *  currShiftedComponents=NULL;
 
 // Logarithm of estimate of maximal number of new components
 #define SYZ_SHIFT_MAX_NEW_COMP_ESTIMATE 8
@@ -373,7 +370,7 @@ poly syRedtail (poly p, syStrategy syzstr, int index)
         if (pDivisibleBy2(redWith->m[j], hn))
         {
           //hn = sySPolyRed(hn,redWith->m[j]);
-          hn = spSpolyRed(redWith->m[j],hn,NULL,spSpolyLoop_General);
+          hn = ksOldSpolyRed(redWith->m[j],hn);
           if (hn == NULL)
           {
             pNext(h) = NULL;
@@ -804,7 +801,7 @@ static intvec* syLinStrat(SSet nextPairs, syStrategy syzstr,
       pTest(tso.p2);
       pTest(tso.p1);
       nextPairs[i].p =
-        spSpolyCreate(tso.p2, tso.p1,NULL,spSpolyLoop_General);
+        ksOldCreateSpoly(tso.p2, tso.p1,NULL);
       (*spl)[i] = pLength(nextPairs[i].p);
     }
     i--;
@@ -1045,7 +1042,7 @@ static void syRedGenerOfCurrDeg(syStrategy syzstr, int deg, int index)
         if (pDivisibleBy1(res->m[j],(sPairs)[i].syz))
         {
           (sPairs)[i].syz =
-            spSpolyRed(res->m[j],(sPairs)[i].syz,NULL,spSpolyLoop_General);
+            ksOldSpolyRed(res->m[j],(sPairs)[i].syz);
             //sySPolyRed((sPairs)[i].syz,res->m[j]);
           j = k-1;
         }
@@ -1534,7 +1531,8 @@ static SSet syChosePairsIH(syStrategy syzstr, int *index,
 */
 static void syStatistics(resolvente res,int length)
 {
-  int i,j=1,k,deg=0;
+  int i,j=1,k;
+  Order_t deg = 0;
 
   PrintLn();
   while ((j<length) && (res[j]!=NULL))
@@ -2517,7 +2515,6 @@ static resolvente syReadOutMinimalRes(syStrategy syzstr,
 //Print("laeufts ");
   pComp0 = syzcomp2dpc;
   syzstr->bucket = kBucketCreate();
-  kbSetPolyProcs(&syzstr->pProcs,currRing,rOrderType_Syz2dpc,FALSE);
   for (index=syzstr->length-1;index>0;index--)
   {
     if (syzstr->resPairs[index]!=NULL)
@@ -2713,7 +2710,6 @@ syStrategy syLaScala3(ideal arg,int * length)
   syzstr->Howmuch = (int**)Alloc0((*length+1)*sizeof(int*));
   syzstr->Firstelem = (int**)Alloc0((*length+1)*sizeof(int*));
   syzstr->bucket = kBucketCreate();
-  kbSetPolyProcs(&syzstr->pProcs,currRing,rOrderType_Syz2dpc,FALSE);
   int len0=idRankFreeModule(arg)+1;
   startdeg = actdeg;
   nextPairs = syChosePairs(syzstr,&index,&howmuch,&actdeg);

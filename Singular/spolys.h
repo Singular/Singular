@@ -6,9 +6,8 @@
 /*
 * ABSTRACT: s-polynomials
 */
-/* $Id: spolys.h,v 1.7 1999-09-27 14:43:43 obachman Exp $ */
+/* $Id: spolys.h,v 1.8 1999-09-29 10:59:40 obachman Exp $ */
 #include "structs.h"
-#include "spSpolyLoop.h"
 
 /* reduction */
 extern poly (*spSpolyRed)(poly p1, poly p2,poly spNoether,

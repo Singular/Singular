@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.42 1999-09-28 15:02:32 obachman Exp $ */
+/* $Id: polys.cc,v 1.43 1999-09-29 10:59:36 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -53,21 +53,6 @@ BOOLEAN pLexOrder;
 BOOLEAN pMixedOrder;
 /* 1 for c ordering, -1 otherwise (i.e. for C ordering) */
 int  pComponentOrder;
-
-#ifdef DRING
-int      p2;
-BOOLEAN  pDRING=FALSE;
-#endif
-
-#ifdef SRING
-int      pAltVars;
-BOOLEAN  pSRING=FALSE;
-#endif
-
-#ifdef SDRING
-BOOLEAN  pSDRING=FALSE;
-#include "polys.inc"
-#endif
 
 /* ----------- global variables, set by procedures from hecke/kstd1 ----- */
 /* the highest monomial below pHEdge */
@@ -718,10 +703,6 @@ void pSetGlobals(ring r, BOOLEAN complete)
   int i;
   pComponentOrder=1;
   if (ppNoether!=NULL) pDelete(&ppNoether);
-#ifdef SRING
-  pSRING=FALSE;
-  pAltVars=r->N+1;
-#endif
   pVariables = r->N;
 
   // set the various size parameters and initialize memory
@@ -860,9 +841,6 @@ poly pMultT(poly a, poly exp )
   number t,x,y=pGetCoeff(exp);
   poly aa=a;
   poly prev=NULL;
-#ifdef SDRING
-  poly pDRINGres=NULL;
-#endif
 
   pMultT_nok = pGetComp(exp);
 #ifdef PDEBUG
@@ -882,41 +860,6 @@ poly pMultT(poly a, poly exp )
     }
     else
     {
-#ifdef DRING
-      if (pDRING)
-      {
-         if (pdDFlag(a)==1)
-         {
-           if (pdDFlag(exp)==1)
-           {
-             pDRINGres=pAdd(pDRINGres,pMultDD(a,exp));
-           }
-           else
-           {
-             pDRINGres=pAdd(pDRINGres,pMultDT(a,exp));
-           }
-         }
-         else
-         {
-           if (pdDFlag(exp)==1)
-           {
-             pDRINGres=pAdd(pDRINGres,pMultDD(a,exp));
-           }
-           else
-           {
-             pDRINGres=pAdd(pDRINGres,pMultTT(a,exp));
-           }
-         }
-      }
-      else
-#endif
-#ifdef SRING
-      if (pSRING)
-      {
-        pDRINGres=pAdd(pDRINGres,psMultM(a,exp));
-      }
-      else
-#endif
       {
         if (pMultT_nok)  /* comp of exp != 0 */
         {
@@ -932,21 +875,6 @@ poly pMultT(poly a, poly exp )
     }
   }
   pMultT_nok=0;
-#ifdef SDRING
-  if (
-  #ifdef DRING
-  pDRING ||
-  #endif
-  #ifdef SRING
-  pSRING ||
-  #endif
-  0 )
-  {
-    pDelete(&aa);
-    pTest(pDRINGres);
-    return pDRINGres;
-  }
-#endif
   pTest(aa);
   return aa; /*TRUE*/
 }
@@ -1186,19 +1114,6 @@ done:
   if (nIsZero(pGetCoeff(rc))) pDelete1(&rc);
   else
   {
-#ifdef DRING
-    if (pDRING)
-    {
-      for(i=1;i<=pdN;i++)
-      {
-        if(pGetExp(rc,pdDX(i))>0)
-        {
-          pdSetDFlag(rc,1);
-          break;
-        }
-      }
-    }
-#endif
     pSetm(rc);
   }
   return rc;
@@ -1588,10 +1503,6 @@ void pDeleteComp(poly * p,int k)
 */
 BOOLEAN pHasNotCF(poly p1, poly p2)
 {
-#ifdef SRING
-  if (pSRING)
-    return FALSE;
-#endif
 
   if (pGetComp(p1) > 0 || pGetComp(p2) > 0)
     return FALSE;

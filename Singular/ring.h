@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.33 1999-09-27 14:39:26 obachman Exp $ */
+/* $Id: ring.h,v 1.34 1999-09-29 10:59:39 obachman Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -15,11 +15,7 @@
 #define SHORT_REAL_LENGTH 6 // use short reals for real <= 6 digits
 
 
-#ifdef DRING
-void   rChangeCurrRing(ring r, BOOLEAN complete = TRUE, idhdl h = NULL);
-#else
 void   rChangeCurrRing(ring r, BOOLEAN complete = TRUE);
-#endif
 void   rSetHdl(idhdl h, BOOLEAN complete = TRUE);
 idhdl  rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord);
 idhdl  rDefault(char *s);
@@ -50,9 +46,6 @@ void rNChangeSComps(int* currComponents, long* currShiftedComponents, ring r = c
 void rNGetSComps(int** currComponents, long** currShiftedComponents, ring r = currRing);
 
 idhdl  rFindHdl(ring r, idhdl n, idhdl w);
-#ifdef DRING
-void rDSet();
-#endif
 void   rDInit();
 int rOrderName(char * ordername);
 char * rOrdStr(ring r);

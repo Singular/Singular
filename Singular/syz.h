@@ -3,12 +3,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.h,v 1.17 1999-09-27 15:05:33 obachman Exp $ */
+/* $Id: syz.h,v 1.18 1999-09-29 10:59:41 obachman Exp $ */
 /*
 * ABSTRACT: Resolutions
 */
 #include "structs.h"
-#include "kbPolyProcs.h"
 
 struct sSObject{
                  poly  p;
@@ -49,7 +48,6 @@ class ssyStrategy{
   kBucket_pt bucket;
   kBucket_pt syz_bucket;
   ring syRing;
-  kbPolyProcs pProcs;
   int length;
   resolvente fullres;
   resolvente minres;

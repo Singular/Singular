@@ -73,21 +73,21 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     ideals.cc intvec.cc \
     ipassign.cc ipconv.cc ipid.cc iplib.cc \
     ipprint.cc ipshell.cc khstd.cc kstdfac.cc \
-    comm.cc kstd1.cc kstd2.cc kutil.cc lists.cc \
+    kstd1.cc kstd2.cc kutil.cc lists.cc \
     longalg.cc longrat.cc longrat0.cc \
     maps.cc matpol.cc misc.cc sdb.cc gnumpfl.cc gnumpc.cc \
     mminit.cc modulop.cc mpr_complex.cc sparsmat.cc \
     fglm.cc fglmzero.cc fglmvec.cc fglmgauss.cc fglmhom.cc fglmcomb.cc \
     numbers.cc polys.cc polys0.cc polys1.cc polys-impl.cc \
     ring.cc shortfl.cc silink.cc sing_mp.cc\
-    sing_dld.cc sing_dbm.cc spolys.cc spolys0.cc \
+    sing_dld.cc sing_dbm.cc kspoly.cc \
     subexpr.cc syz.cc syz0.cc syz1.cc \
     timer.cc weight.cc \
     mpsr_Put.cc mpsr_PutPoly.cc mpsr_GetPoly.cc \
     mpsr_Get.cc mpsr_GetMisc.cc mpsr_Error.cc \
     GMPrat.cc multicnt.cc npolygon.cc semic.cc spectrum.cc splist.cc \
-    ndbm.cc spSpolyLoop.cc libparse.cc mod_raw.cc\
-    pcv.cc kbuckets.cc kbPolyProcs.cc \
+    ndbm.cc  libparse.cc mod_raw.cc\
+    pcv.cc kbuckets.cc pProcs.cc \
     mpr_inout.cc mpr_base.cc mpr_numeric.cc
 # normal C source files
 CSOURCES=mmalloc.c mmheap.c mmpage.c mmcheck.c  mmisc.c mmtables.c \
@@ -96,10 +96,10 @@ CSOURCES=mmalloc.c mmheap.c mmpage.c mmcheck.c  mmisc.c mmtables.c \
 # special source files (need extra compiling and/or linking)
 ESOURCES=iparith.cc gmalloc.c tesths.cc mpsr_Tok.cc claptmpl.cc
 
-SOURCES=${CSOURCES} ${CXXSOURCES} grammar.y scanner.l libparse.l spSpolyLoop.pl generate.pl
+SOURCES=${CSOURCES} ${CXXSOURCES} grammar.y scanner.l libparse.l 
 
 SOURCES=${CSOURCES} ${CXXSOURCES} ${ESOURCES} \
-	grammar.y scanner.l libparse.l spSpolyLoop.pl generate.pl
+	grammar.y scanner.l libparse.l 
 
 HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	longalg.h mpsr_Tok.h structs.h binom.h intvec.h longrat.h \
@@ -109,17 +109,17 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	febase.h ipshell.h shortfl.h tok.h mpr_complex.h mpr_global.h \
 	mmemory.h mmprivate.h mmheap.h mmpage.h page.h \
 	ffields.h khstd.h silink.h sparsmat.h gnumpfl.h gnumpc.h \
-	fglm.h comm.h kstd1.h modulop.h sing_dbm.h weight.h \
-	fglmgauss.h fglmvec.h kstd2.h mpsr.h sing_mp.h \
-	kstdfac.h mpsr_Get.h spolys.h \
-	kutil.h mpsr_Put.h spolys0.h sing_dld.h\
-	ndbm.h spSpolyLoop.h polys-impl.h polys-comp.h libparse.h \
+	fglm.h kstd1.h modulop.h sing_dbm.h weight.h \
+	fglmgauss.h fglmvec.h mpsr.h sing_mp.h \
+	kstdfac.h mpsr_Get.h \
+	kutil.h mpsr_Put.h sing_dld.h\
+	ndbm.h polys-impl.h polys-comp.h libparse.h \
         GMPrat.h multicnt.h npolygon.h semic.h spectrum.h splist.h multicnt.h \
-	pcv.h mod_raw.h kbuckets.h kbPolyProcs.h \
+	pcv.h mod_raw.h kbuckets.h pProcs.h \
 	mpr_global.h mpr_inout.h mpr_base.h mpr_numeric.h \
 	feOpt.h fegetopt.h
 
-INCS=febase.inc polys.inc iparith.inc mpsr_Tok.inc spSpolyLoop.inc feOpt.inc
+INCS=febase.inc polys.inc iparith.inc mpsr_Tok.inc feOpt.inc
 
 TESTS=${testdir}/comparecheck ${testdir}/fac_test.in ${testdir}/fac_test.out\
 	${testdir}/general_test.in ${testdir}/general_test.out \
@@ -210,25 +210,6 @@ version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in \
            configure.in
 	echo unsigned long feVersionId =  `date '+%Y%m%d%H'`\; >version.h
 
-kbPolyProcs.cc kbPolyProcs.dd : kbPolyProcs.pin
-
-kbPolyProcs.pin : generate.pl
-	@if test "x${PERL5}" = x; then \
-		echo Error: no perl5 given. Can not rebuild $@;\
-		exit 1;\
-	fi
-	${PERL5} generate.pl kb_n_Mult_p kb_p_Mult_m kb_p_Add_q kb_p_Minus_m_Mult_q > $@
-
-spSpolyLoop.cc spSpolyLoop.dd : spSpolyLoop.inc
-
-spSpolyLoop.inc: spSpolyLoop.pl
-	@if test "x${PERL5}" = x; then \
-		echo Error: no perl5 given. Can not rebuild spSpolyLoop.inc;\
-		exit 1;\
-	fi
-	${PERL5} spSpolyLoop.pl > spSpolyLoop.inc
-
-
 libparse: libparse_main.o utils.o fegetopt.o
 	${CXX} -o libparse libparse_main.o utils.o fegetopt.o
 
@@ -258,7 +239,7 @@ feOptES.inc: feOpt.cc
 	./a.out
 	rm a.out
 
-src: scanner.cc grammar.h grammar.cc libparse.cc spSpolyLoop.inc
+src: scanner.cc grammar.h grammar.cc libparse.cc 
 
 mod2.h: stamp-h
 
@@ -321,7 +302,7 @@ srcclean:
 	@echo "This command is intended for maintainers to use;"
 	@echo "Rebuilding the deleted files requires flex"
 	@echo "bison, perl"
-	-rm -f scanner.cc grammar.h grammar.cc libparse.cc spSpolyLoop.inc
+	-rm -f scanner.cc grammar.h grammar.cc libparse.cc
 
 maintainer-clean: distclean srcclean
 	@echo "This command is intended for maintainers to use;"
@@ -449,8 +430,8 @@ OBJP1=	grammar.op scanner.op matpol.op binom.op gnumpfl.op mpr_complex.op \
      febase.op feread.op fehelp.op feResource.op timer.op intvec.op attrib.op lists.op \
      gnumpc.op longrat.op longrat0.op misc.op ring.op numbers.op maps.op\
      hilb.op comm.op kstd1.op kstd2.op kutil.op khstd.op kstdfac.op modulop.op \
-     spolys.op ideals.op subexpr.op hdegree.op hutil.op ffields.op shortfl.op \
-     longalg.op spolys0.op syz.op syz0.op syz1.op weight.op \
+     ideals.op subexpr.op hdegree.op hutil.op ffields.op shortfl.op \
+     longalg.op kspoly.op syz.op syz0.op syz1.op weight.op \
      ipid.op ipshell.op iplib.op ipassign.op ipconv.op ipprint.op\
      polys.op polys0.op polys1.op polys-impl.op extra.op\
      mminit.op sing_dld.op sing_dbm.op silink.op sparsmat.op\
@@ -459,7 +440,7 @@ OBJP1=	grammar.op scanner.op matpol.op binom.op gnumpfl.op mpr_complex.op \
      cntrlc.op  sdb.op\
      mpsr_Error.op mpsr_Put.op mpsr_PutPoly.op mpsr_GetPoly.op \
      mpsr_Get.op mpsr_GetMisc.op \
-     ndbm.op spSpolyLoop.op libparse.op  mod_raw.op \
+     ndbm.op libparse.op  mod_raw.op \
      mpr_inout.op mpr_base.op mpr_numeric.op \
      GMPrat.op multicnt.op npolygon.op semic.op spectrum.op splist.op \
      pcv.op kbuckets.op kbPolyProcs.op
@@ -478,7 +459,7 @@ OBJB1=	grammar.ob scanner.ob matpol.ob binom.ob\
      longrat.ob longrat0.ob misc.ob ring.ob numbers.ob maps.ob\
      hilb.ob comm.ob kstd1.ob kstd2.ob kutil.ob khstd.ob kstdfac.ob modulop.ob \
      spolys.ob ideals.ob subexpr.ob hdegree.ob hutil.ob ffields.ob shortfl.ob \
-     longalg.ob spolys0.ob syz.ob syz0.ob syz1.ob weight.ob \
+     longalg.ob kspoly.ob syz.ob syz0.ob syz1.ob weight.ob \
      ipid.ob ipshell.ob iplib.ob ipassign.ob ipconv.ob ipprint.ob\
      polys.ob polys0.ob polys1.ob polys-impl.ob extra.ob\
      mminit.ob sing_dld.ob sing_dbm.ob silink.ob \
@@ -487,7 +468,7 @@ OBJB1=	grammar.ob scanner.ob matpol.ob binom.ob\
      cntrlc.ob  \
      mpsr_Error.ob mpsr_Put.ob mpsr_PutPoly.ob mpsr_GetPoly.ob \
      mpsr_Get.ob mpsr_GetMisc.ob \
-     ndbm.ob spSpolyLoop.ob libparse.ob mod-${SINGUNAME}.ob \
+     ndbm.ob libparse.ob mod-${SINGUNAME}.ob \
      pcv.ob kbuckets.ob kbPolyProcs.ob
 
 OBJB2= mmalloc.ob mmheap.ob mmpage.ob mmcheck.ob mmbt.ob page.ob\

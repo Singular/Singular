@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys0.cc,v 1.11 1999-09-27 15:05:31 obachman Exp $ */
+/* $Id: polys0.cc,v 1.12 1999-09-29 10:59:37 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to convert polynomials to strings
@@ -34,9 +34,6 @@ static void writemon(poly p, int ko)
   || ((!nIsOne(pGetCoeff(p)))
     && (!nIsMOne(pGetCoeff(p)))
   )
-#ifdef DRING
-  || (pDRING && pdIsConstantComp(p))
-#endif
   )
   {
     nWrite(p->coef);
@@ -58,9 +55,6 @@ static void writemon(poly p, int ko)
   int i;
   for (i=0; i<pVariables; i++)
   {
-#ifdef DRING
-    if ((!pDRING)||(i!=2*pdN))
-#endif
     {
       Exponent_t ee = pGetExp(p,i+1);
       if (ee!=0)
@@ -70,17 +64,7 @@ static void writemon(poly p, int ko)
         //else
           wroteCoef=(pShortOut==0);
         writeGen=TRUE;
-#ifdef DRING
-        if((pDRING)&&(pdN<=i)&&(i<2*pdN)&&(pdDFlag(p)==0))
-        {
-          StringAppendS(RingVar(i-pdN));
-          ee=-ee;
-        }
-        else
-          StringAppendS(RingVar(i));
-#else
         StringAppendS(RingVar(i));
-#endif
         if (ee != 1)
         {
           if (pShortOut==0) StringAppendS("^");

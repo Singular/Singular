@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.34 1999-09-29 09:52:38 Singular Exp $ */
+/* $Id: polys-impl.h,v 1.35 1999-09-29 10:59:36 obachman Exp $ */
 
 /***************************************************************
  *
@@ -40,7 +40,7 @@ union s_exp
 typedef s_exp  monomial;
 typedef Exponent_t* Exponent_pt;
 
-typedef long Order_t;
+typedef unsigned long Order_t;
 struct  spolyrec
 {
   poly      next; // next needs to be the first field
@@ -323,8 +323,8 @@ inline void __pMonAddOn(poly p1, poly p2)
 #endif // defined(PDEBUG) && PDEBUG > 1
 {
   int i = currRing->ExpLSize;
-  long* s1 = &(p1->exp.l[0]);
-  const long* s2 = &(p2->exp.l[0]);
+  unsigned long* s1 = &(p1->exp.l[0]);
+  const unsigned long* s2 = &(p2->exp.l[0]);
   for (;;)
   {
     *s1 += *s2;
@@ -344,8 +344,8 @@ inline void __pMonSubFrom(poly p1, poly p2)
 #endif // defined(PDEBUG) && PDEBUG > 1
 {
   int i = currRing->ExpLSize;
-  long* s1 = &(p1->exp.l[0]);
-  const long* s2 = &(p2->exp.l[0]);
+  unsigned long* s1 = &(p1->exp.l[0]);
+  const unsigned long* s2 = &(p2->exp.l[0]);
 
   for (;;)
   {
@@ -366,10 +366,10 @@ inline void __pMonAdd(poly p1, poly p2, poly p3)
   DECLARE(void, _pMonAdd(poly p1, poly p2, poly p3))
 #endif // defined(PDEBUG) && PDEBUG > 1
 {
-  long* s1 = &(p1->exp.l[0]);
-  const long* s2 = &(p2->exp.l[0]);
-  const long* s3 = &(p3->exp.l[0]);
-  const long* const ub = s3 + currRing->ExpLSize;
+  unsigned long* s1 = &(p1->exp.l[0]);
+  const unsigned long* s2 = &(p2->exp.l[0]);
+  const unsigned long* s3 = &(p3->exp.l[0]);
+  const unsigned long* const ub = s3 + currRing->ExpLSize;
 
   p1->next = p2->next;
   p1->coef = p2->coef;
@@ -483,9 +483,9 @@ extern  BOOLEAN pDBDivisibleBy2(poly p1, poly p2, char* f, int l);
 
 DECLARE(BOOLEAN, _pEqual(poly p1, poly p2))
 {
-  const long *s1 = (long*) &(p1->exp.l[0]);
-  const long *s2 = (long*) &(p2->exp.l[0]);
-  const long* const lb = s1 + currRing->ExpLSize;
+  const unsigned long *s1 = (unsigned long*) &(p1->exp.l[0]);
+  const unsigned long *s2 = (unsigned long*) &(p2->exp.l[0]);
+  const unsigned long* const lb = s1 + currRing->ExpLSize;
 
   for(;;)
   {

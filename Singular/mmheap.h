@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmheap.h,v 1.9 1999-09-27 15:05:25 obachman Exp $ */
+/* $Id: mmheap.h,v 1.10 1999-09-29 10:59:33 obachman Exp $ */
 #include <stdlib.h>
 #include "mod2.h"
 #include "structs.h"
@@ -55,7 +55,6 @@ void mmMergeHeap(memHeap into, memHeap what);
  * Alloc, Free and Check for Heaps
  *
  *****************************************************************/
-
 #ifndef HEAP_DEBUG
 
 #define mmAllocHeap(res, heap)  _mmAllocHeap(res, heap)
@@ -88,6 +87,8 @@ int mmDebugCheckHeapAddr(void* addr, memHeap heap, int flag,
                          const char* fn, int l);
   
 #endif
+/* use this for unknown heaps */
+#define MM_UNKNOWN_HEAP ((memHeap) 1)
 
 /*****************************************************************
  *

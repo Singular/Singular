@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Error.cc,v 1.9 1999-09-27 15:05:26 obachman Exp $ */
+/* $Id: mpsr_Error.cc,v 1.10 1999-09-29 10:59:34 obachman Exp $ */
 
 /***************************************************************
  *
@@ -53,7 +53,7 @@ mpsr_Status_t mpsr_SetError(mpsr_Status_t error)
 mpsr_Status_t mpsr_SetError(MP_Link_pt link)
 {
   mpsr_SetError(mpsr_MP_Failure);
-  mpsr_MP_errno = link->MP_errno;
+  mpsr_MP_errno = (enum MP_Errors) link->MP_errno;
   return mpsr_MP_Failure;
 }
 

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.9 1999-09-16 12:34:01 Singular Exp $ */
+/* $Id: numbers.h,v 1.10 1999-09-29 10:59:34 obachman Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
@@ -66,12 +66,5 @@ void nDBDummy1(number* d,char *f, int l);
 #endif
 int  nGetChar();
 void nSetChar(ring r, BOOLEAN complete);
-
-#ifndef FAST_AND_DIRTY
-#define npMultM  nMult
-#define npSubM   nSub
-#define npNegM   nNeg
-#define npEqualM nEqual
-#endif
 
 #endif

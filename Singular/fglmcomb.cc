@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmcomb.cc,v 1.14 1998-10-28 12:43:29 Singular Exp $
+// $Id: fglmcomb.cc,v 1.15 1999-09-29 10:59:28 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -20,7 +20,6 @@
 #include "polys.h"
 #include "ideals.h"
 #include "ring.h"
-#include "spolys.h"
 #include "ipid.h"
 #include "ipshell.h"
 #include "febase.h"

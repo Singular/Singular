@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz2.cc,v 1.1 1999-09-27 15:05:34 obachman Exp $ */
+/* $Id: syz2.cc,v 1.2 1999-09-29 10:59:42 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -604,7 +604,7 @@ Print("<H%d>",toGo);
     if ((tso.p1!=NULL) && (tso.p2!=NULL))
     {
       //tso.p = sySPoly(tso.p1, tso.p2,tso.lcm);
-      tso.p = spSpolyCreate(tso.p2, tso.p1,NULL,spSpolyLoop_General);
+      tso.p = ksOldCreateSpoly(tso.p2, tso.p1);
 #ifdef SHOW_PROT
 Print("reduziere Paar mit: \n");
 Print("poly1: ");pWrite(tso.p1);
@@ -965,7 +965,6 @@ syStrategy syHilb(ideal arg,int * length)
   syzstr->hilb_coeffs = (intvec**)Alloc0((*length+1)*sizeof(intvec*));
   syzstr->bucket = kBucketCreate();
   syzstr->syz_bucket = kBucketCreate();
-  kbSetPolyProcs(&syzstr->pProcs,currRing,rOrderType_Syz2dpc,FALSE);
   startdeg = actdeg;
   nextPairs = syChosePairs(syzstr,&index,&howmuch,&actdeg);
 /*--- computes the resolution ----------------------*/

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.24 1999-09-28 17:37:22 Singular Exp $ */
+/* $Id: structs.h,v 1.25 1999-09-29 10:59:40 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -214,9 +214,6 @@ struct sip_sring
 #endif
 
   memHeap   mm_specHeap; /* Heap from where monoms are allocated */
-#ifdef SDRING
-  short      partN;
-#endif
   short      ch;     /* characteristic */
   short      ch_flags; /* additional char-flags */
 

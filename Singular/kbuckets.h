@@ -3,10 +3,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.h,v 1.4 1999-09-27 14:34:18 obachman Exp $ */
+/* $Id: kbuckets.h,v 1.5 1999-09-29 10:59:29 obachman Exp $ */
 #include "mod2.h"
 #include "mmheap.h"
-#include "kbPolyProcs.h"
 
 /////////////////////////////////////////////////////////////////////////
 // configuration

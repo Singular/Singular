@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.cc,v 1.14 1999-09-17 11:42:22 Singular Exp $ */
+/* $Id: attrib.cc,v 1.15 1999-09-29 10:59:27 obachman Exp $ */
 
 /*
 * ABSTRACT: attributes to leftv and idhdl
@@ -349,34 +349,6 @@ BOOLEAN atATTRIB3(leftv res,leftv a,leftv b,leftv c)
     ideal I=(ideal)v->Data();
     I->rank=max(I->rank,(int)c->Data());
   }
-#ifdef DRING
-  else if (strcmp(name,"D")==0)
-  {
-    if (c->Typ()!=INT_CMD)
-    {
-      WerrorS("attrib `D` must be int");
-      return TRUE;
-    }
-    switch (v->Typ())
-    {
-      case POLY_CMD:
-      case VECTOR_CMD:
-        pdSetDFlagP((poly)v->Data(),(int)c->Data());
-        break;
-      case IDEAL_CMD:
-      case MODUL_CMD:
-        {
-          ideal I=(ideal)v->Data();
-          int i=IDELEMS(I)-1;
-          int cc=(int)c->Data();
-          while (i>=0) { pdSetDFlagP(I->m[i],cc); i--; }
-          break;
-        }
-      default:
-        WerrorS("cannot set attrib `D` for this type");
-    }
-  }
-#endif
   else
   {
     int typ=c->Typ();
@@ -417,13 +389,6 @@ BOOLEAN atKILLATTR2(leftv res,leftv a,leftv b)
     resetFlag(a,FLAG_STD);
     resetFlag((idhdl)a->data,FLAG_STD);
   }
-#ifdef DRING
-  else if (strcmp(name,"D")==0)
-  {
-    resetFlag(a,FLAG_DOPERATOR);
-    resetFlag((idhdl)a->data,FLAG_DOPERATOR);
-  }
-#endif
   else
   {
     atKill((idhdl)a->data,name);

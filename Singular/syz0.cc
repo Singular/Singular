@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.20 1999-09-27 15:32:56 obachman Exp $ */
+/* $Id: syz0.cc,v 1.21 1999-09-29 10:59:41 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -11,11 +11,9 @@
 #include "tok.h"
 #include "mmemory.h"
 #include "polys.h"
-#include "spolys.h"
 #include "febase.h"
 #include "kstd1.h"
 #include "kutil.h"
-#include "spolys.h"
 #include "stairc.h"
 #include "ipid.h"
 #include "cntrlc.h"
@@ -30,7 +28,6 @@
 #include "kbuckets.h"
 
 static kBucket_pt sy0buck;
-static kbPolyProcs sy0pProcs;
 
 static polyset syInitSort(polyset oldF,int rkF,int Fmax,
          int syComponentOrder,intvec **modcomp)
@@ -124,7 +121,7 @@ static void syCreatePairs(polyset F,int lini,int wend,int k,int j,int i,
   }
 }
 
-static poly syRedtail2(poly p, polyset redWith, intvec *modcomp, spSpolyLoopProc SpolyLoop = NULL)
+static poly syRedtail2(poly p, polyset redWith, intvec *modcomp)
 {
   poly h, hn;
   int hncomp,nxt;
@@ -142,7 +139,7 @@ static poly syRedtail2(poly p, polyset redWith, intvec *modcomp, spSpolyLoopProc
       if (pDivisibleBy2(redWith[j], hn))
       {
         //if (TEST_OPT_PROT) Print("r");
-        hn = spSpolyRed(redWith[j],hn,NULL, SpolyLoop);
+        hn = ksOldSpolyRed(redWith[j],hn);
         if (hn == NULL)
         {
           pNext(h) = NULL;
@@ -201,7 +198,6 @@ void sySchreyersSyzygiesFM(polyset F,int Fmax,polyset* Shdl,int* Smax,
   idF->m=F;IDELEMS(idF)=Fmax;
   rkF=idRankFreeModule(idF);
   Free((ADDRESS)idF,sizeof(ip_sideal));
-  spSet(currRing);
 /*-------------sorting of F for index handling------------*/
   if (noSort)
   {
@@ -285,7 +281,7 @@ void sySchreyersSyzygiesFM(polyset F,int Fmax,polyset* Shdl,int* Smax,
         }
         tl = smax;
 /*--------------begin to reduce-----------------------------*/
-        toRed = spSpolyCreate(S[j],S[k],NULL, NULL);
+        toRed = ksOldCreateSpoly(S[j],S[k]);
         ecartToRed = 1;
         bestEcart = 1;
         if (BTEST1(6))
@@ -382,7 +378,7 @@ void sySchreyersSyzygiesFM(polyset F,int Fmax,polyset* Shdl,int* Smax,
               tl++;
             }
 
-            toRed = spSpolyRed(p,toRed,NULL, NULL);
+            toRed = ksOldSpolyRed(p,toRed);
           }
         }
 //PrintS("s");
@@ -432,7 +428,7 @@ void sySchreyersSyzygiesFM(polyset F,int Fmax,polyset* Shdl,int* Smax,
 /*3
 *special Normalform for Schreyer in factor rings
 */
-poly sySpecNormalize(poly toNorm,ideal mW=NULL, spSpolyLoopProc SpolyLoop=NULL)
+poly sySpecNormalize(poly toNorm,ideal mW=NULL)
 {
   int j,i=0;
   poly p;
@@ -449,7 +445,7 @@ poly sySpecNormalize(poly toNorm,ideal mW=NULL, spSpolyLoopProc SpolyLoop=NULL)
     if (pDivisibleBy(currQuotient->m[i],p))
     {
       //pNorm(toNorm);
-      toNorm = spSpolyRed(currQuotient->m[i],toNorm,NULL, SpolyLoop);
+      toNorm = ksOldSpolyRed(currQuotient->m[i],toNorm);
       pDelete(&p);
       if (toNorm==NULL) return NULL;
       p = pHead(toNorm);
@@ -549,7 +545,7 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
         if (k<Fl)
         {
           number an=nCopy(pGetCoeff(F[k])),bn=nCopy(pGetCoeff(F[j]));
-          int ct = spCheckCoeff(&an, &bn);
+          int ct = ksCheckCoeff(&an, &bn);
           syz = pCopy(pairs[k]);
           //syz->coef = nCopy(F[k]->coef);
           syz->coef = an;
@@ -586,11 +582,11 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
           }
         }
         if (k<Fl)
-          toRed = spSpolyCreate(F[j],F[k],NULL, NULL);
+          toRed = ksOldCreateSpoly(F[j],F[k]);
         else
         {
           q = pMultT(pCopy(F[j]),multWith);
-          toRed = sySpecNormalize(q,mW, NULL);
+          toRed = sySpecNormalize(q,mW);
           pDelete(&multWith);
         }
         kBucketInit(sy0buck,toRed,-1);
@@ -613,7 +609,7 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
           kBucketClear(sy0buck,&toRed,&ltR);
           printf("toRed in Pair[%d, %d]:", j, k);
           pWrite(toRed);
-          kBucketInit(sy0buck,toRed,-1,&sy0pProcs);
+          kBucketInit(sy0buck,toRed,-1);
 #endif
 
           if (l<kkk)
@@ -621,7 +617,7 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
             if ((currQuotient!=NULL) && (isNotReduced))
             {
               kBucketClear(sy0buck,&toRed,&ltR);
-              toRed = sySpecNormalize(toRed,mW, NULL);
+              toRed = sySpecNormalize(toRed,mW);
 #ifdef WRITE_BUCKETS
               printf("toRed in Pair[%d, %d]:", j, k);
               pWrite(toRed);
@@ -690,7 +686,7 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
           if (BTEST1(OPT_REDTAIL))
           {
             (*newmodcomp)[j+2] = Sl;
-            (*Shdl)[Sl] = syRedtail2(syz,*Shdl,newmodcomp, NULL);
+            (*Shdl)[Sl] = syRedtail2(syz,*Shdl,newmodcomp);
             (*newmodcomp)[j+2] = 0;
           }
           else
@@ -843,7 +839,6 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
     i = IDELEMS(res[syzIndex]);
     //while ((i!=0) && (!res[syzIndex]->m[i-1])) i--;
     sy0buck = kBucketCreate();
-    kbSetPolyProcs(&sy0pProcs,currRing,spGetOrderType(currRing,1,0));
     if (syzIndex+1==*length)
     {
       newres = (resolvente)Alloc((*length+4)*sizeof(ideal));

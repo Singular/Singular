@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.28 1999-09-28 15:02:33 obachman Exp $ */
+/* $Id: polys1.cc,v 1.29 1999-09-29 10:59:38 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -76,6 +76,17 @@ int pIsPurePower(poly p)
     }
   }
   return k;
+}
+
+BOOLEAN pIsMonomOf(poly p, poly m)
+{
+  if (m == NULL) return TRUE;
+  while (p != NULL)
+  {
+    if (p == m) return TRUE;
+    pIter(p);
+  }
+  return FALSE;
 }
 
 /*-----------------------------------------------------------*/
@@ -477,13 +488,6 @@ poly pPower(poly p, int i)
             return NULL;
           }
         }
-#ifdef SDRING
-        if(pSDRING)
-        {
-          return pPow(p,i);
-        }
-        else
-#endif
         {
           rc = pNext(p);
           if (rc == NULL)

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.107 1999-09-27 15:32:54 obachman Exp $ */
+/* $Id: extra.cc,v 1.108 1999-09-29 10:59:28 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -54,10 +54,6 @@
 // Define to enable many more system commands
 #ifndef MAKE_DISTRIBUTION
 #define HAVE_EXTENDED_SYSTEM
-#endif
-
-#ifdef STDTRACE
-//#include "comm.h"
 #endif
 
 #ifdef HAVE_FACTORY
@@ -191,9 +187,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         #define TEST_FOR(A) if(strcmp(s,A)==0) res->data=(void *)1; else
         char *s=(char *)h->Data();
         res->rtyp=INT_CMD;
-        #ifdef DRING
-          TEST_FOR("DRING")
-        #endif
         #ifdef HAVE_DBM
           TEST_FOR("DBM")
         #endif
@@ -214,9 +207,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         #endif
         #ifdef HAVE_TCL
           TEST_FOR("tcl")
-        #endif
-        #ifdef SRING
-          TEST_FOR("SRING")
         #endif
         #ifdef TEST_MAC_ORDER
           TEST_FOR("MAC_ORDER");
@@ -704,56 +694,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
-    /*==================== trace =============================*/
-#ifdef STDTRACE
-    /* Parameter : Ideal, Liste mit Links. */
-    if(strcmp(sys_cmd,"stdtrace")==0)
-    {
-      if ((h!=NULL) &&(h->Typ()==IDEAL_CMD))
-      {
-        leftv root  = NULL,
-              ptr   = NULL,
-              lv    = NULL;
-        lists l     = NULL;
-        ideal I     = (ideal)(h->Data());
-        lists links = (lists)(h->next->Data());
-        tHomog hom  = testHomog;
-        int rw      = (int)(h->next->next->Data());
-
-        if(I==NULL)
-          PrintS("I==NULL\n");
-        for(int i=0; i <= links->nr ; i++)
-        {
-          lv = (leftv)Alloc0(sizeof(sleftv));
-          lv->Copy(&(links->m[i]));
-          if(root==NULL)
-          root=lv;
-          if(ptr==NULL)
-          {
-            ptr=lv;
-            ptr->next=NULL;
-          }
-          else
-          {
-            ptr->next=lv;
-            ptr=lv;
-          }
-        }
-        ptr->next=NULL;
-        l=TraceStd(root,rw,I,currQuotient,testHomog,NULL);
-        idSkipZeroes(((ideal)l->m[0].Data()));
-        res->rtyp=LIST_CMD;
-        res->data=(void *) l;
-        res->next=NULL;
-        root->CleanUp();
-        Free(root,sizeof(sleftv));
-        return FALSE;
-      }
-      else
-         WerrorS("ideal expected");
-    }
-    else
-#endif
 #ifdef HAVE_FACTORY
 /*==================== fastcomb =============================*/
     if(strcmp(sys_cmd,"fastcomb")==0)

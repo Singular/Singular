@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.23 1999-09-28 15:01:20 obachman Exp $ */
+/* $Id: polys.h,v 1.24 1999-09-29 10:59:37 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
@@ -18,44 +18,6 @@ extern poly     ppNoether;
 extern BOOLEAN  pVectorOut;
 // 1 for lex ordering (except ls), -1 otherwise
 extern int pComponentOrder;
-
-#ifdef DRING
-// D=k[x,d,y] is the Weyl-Algebra [y], y commuting with all others
-// M=k[x,x^(-1),y] is a D-module
-// all x(1..n),d,x(1..n)^(-1),y(1..k) are considered as "ring variables" v(1..N)
-// the map from x(i) to v:
-#define pdX(i)  (i)
-// d(i)
-#define pdDX(i) (pdN+i)
-// x(i)^(-1)
-#define pdIX(i) (pdN+i)
-// y(i)
-#define pdY(i)  (pdN*2+i+1)
-// a monomial m belongs to a D-module M iff pdDFlag(m)==0
-// a monomial m belongs to an ideal in the Weyl-Algebra D iff pdDFlag(m)==1
-#define pdDFlag(m) pGetExp(m,pdN*2+1)
-#define pdSetDFlag(m,i) pSetExp(m,pdN*2+1,i)
-
-extern int      pdN;
-extern int      pdK;
-extern BOOLEAN  pDRING;
-poly   pdSpolyCreate(poly a, poly b);
-void   pdLcm(poly a, poly b, poly m);
-BOOLEAN pdIsConstantComp(poly p);
-void   spModuleToPoly(poly a1);
-void   pdSetDFlagP(poly p,int i);
-#endif
-#ifdef SRING
-extern int      pAltVars;
-extern BOOLEAN  pSRING;
-#endif
-#ifdef SDRING
-void   psAug(poly q, poly done, polyset *s, int *l, int *m);
-void   pdAug(poly q, polyset *s, int *l, int *m);
-#endif
-#ifdef SDRING
-extern BOOLEAN pSDRING;
-#endif
 
 /* function prototypes */
 
@@ -120,6 +82,8 @@ int       pIsPurePower(poly p);
 #define   pIsVector(p)     (pGetComp(p)!=0)
 BOOLEAN   pHasNotCF(poly p1, poly p2);   /*has no common factor ?*/
 void      pSplit(poly p, poly * r);   /*p => IN(p), r => REST(p) */
+// Returns TRUE if m is monom of p, FALSE otherwise
+BOOLEAN pIsMonomOf(poly p, poly m);
 
 
 /*-------------ring management:----------------------*/
@@ -348,6 +312,7 @@ void pDecrOrdTakeOutComp(poly *p, Exponent_t comp, Order_t order,
                          poly *q, int *lq);
 // This is something weird -- Don't use it, unless you know what you are doing
 poly      pTakeOutComp(poly * p, int k);
+void      pSetPolyComp(poly p, int comp);
 void      pDeleteComp(poly * p,int k);
 void      pNorm(poly p);
 void      pNormalize(poly p);
@@ -374,6 +339,8 @@ BOOLEAN pComparePolys(poly p1,poly p2);
 // returns the "Short Exponent Vector" -- used to speed up divisibility
 // tests (see polys-impl.cc )
 unsigned long pGetShortExpVector(poly p);
+
+
 
 
 #ifdef PDEBUG

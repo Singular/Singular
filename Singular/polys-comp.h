@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-comp.h,v 1.11 1999-09-27 15:05:28 obachman Exp $ */
+/* $Id: polys-comp.h,v 1.12 1999-09-29 10:59:35 obachman Exp $ */
 
 /***************************************************************
  *
@@ -357,9 +357,9 @@ while(0)
 inline long __pMonComp(poly p1, poly p2)
 {
   long d;
-  long _i = currRing->pCompLSize - 1;
-  register const long* s1 = &(p1->exp.l[currRing->pCompHighIndex]);
-  register const long* s2 = &(p2->exp.l[currRing->pCompHighIndex]);
+  unsigned long _i = currRing->pCompLSize - 1;
+  register const unsigned long* s1 = &(p1->exp.l[currRing->pCompHighIndex]);
+  register const unsigned long* s2 = &(p2->exp.l[currRing->pCompHighIndex]);
 
   for (;;)
   {

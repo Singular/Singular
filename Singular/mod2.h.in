@@ -4,7 +4,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.68 1999-09-27 14:37:13 obachman Exp $
+ *  Version: $Id: mod2.h.in,v 1.69 1999-09-29 10:59:33 obachman Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -156,10 +156,6 @@
 
 /* Define to enable TCL interface */
 #undef HAVE_TCL 
-/* Define to enable working in Weyl algebras */
-#undef DRING
-/* Define to enable working in exterior algebras */
-#undef SRING
 
 /* Undefine to disable Gerhard's and Wilfried's fast and dirty std computations */
 #define FAST_AND_DIRTY
@@ -243,13 +239,6 @@
 #define BIT_SIZEOF_LONG CHAR_BIT*SIZEOF_LONG
 
 #define SINGULAR_VERSION (SINGULAR_MAJOR_VERSION*1000 + SINGULAR_MINOR_VERSION*100 + SINGULAR_SUB_VERSION)
-#ifdef DRING
-#define SDRING
-#endif
-
-#ifdef SRING
-#define SDRING
-#endif
 
 #if SIZEOF_EXPONENT == 1
 #define MAX_EXPONENT 0x7f
@@ -364,12 +353,28 @@ extern int pShortOut;
 #undef PAGE_DEBUG
 #endif
 
+/* undef PDEBUG to disable checks of polys
+ *
+ * define PDEBUG to
+ * 0 for basic, explicitely requested tests
+ * 1 for tests in pProcs
+ * 2 for low-level tests (Exponent access, primitive monom operations)
+ * NOTE: for PDEBUG > 1 it gets very slow
+ *       You can locally enable tests in pProcs by setting the 
+ *       define at the beginning of pProcs.cc
+ */
+#define PDEBUG 0
 
-/* define PDEBUG checking polys, undefine otherwise */
-/* define PDEBUG 1 for additionally checking access to polys  -- vewry slow !*/
-#define PDEBUG 1
-/* define KDEBUG checking during standard base computation */
-#define KDEBUG
+/* undef KDEBUG for checck of data during std computations 
+ *
+ * define KDEBUG to
+ * 0 for basic tests
+ * 1 for tests in kSpoly 
+ * NOTE: You can locally enable tests in kspoly by setting the 
+ *       define at the beginning of kspoly.cc
+ */
+#define KDEBUG 0
+
 /* define LDEBUG checking numbers, undefine otherwise */
 #define LDEBUG
 /* define RDEBUG checking rings (together with TRACE=9) */

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.23 1999-09-27 15:04:58 obachman Exp $ */
+/* $Id: kstdfac.cc,v 1.24 1999-09-29 10:59:31 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -14,12 +14,9 @@
 #include "febase.h"
 #include "kutil.h"
 #include "kstd1.h"
-#include "kstd2.h"
 #include "khstd.h"
-#include "spolys.h"
 #include "cntrlc.h"
 #include "weight.h"
-//#include "ipid.h"
 #include "ipshell.h"
 #include "intvec.h"
 #ifdef HAVE_FACTORY
@@ -27,7 +24,6 @@
 #endif
 #include "lists.h"
 #include "ideals.h"
-#include "spSpolyLoop.h"
 #include "timer.h"
 #include "kstdfac.h"
 
@@ -206,7 +202,6 @@ kStrategy kStratCopy(kStrategy o)
   s->noTailReduction=o->noTailReduction;
   s->fromT=o->fromT;
   s->noetherSet=o->noetherSet;
-  s->spSpolyLoop = o->spSpolyLoop;
   return s;
 }
 
@@ -452,10 +447,9 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
       /* deletes the short spoly and computes */
       pFree1(strat->P.p);
       /* the real one */
-      strat->P.p = spSpolyCreate(strat->P.p1,
-                                 strat->P.p2,
-                                 strat->kNoether,
-                                 strat->spSpolyLoop);
+      strat->P.p = ksOldCreateSpoly(strat->P.p1,
+                                    strat->P.p2,
+                                    strat->kNoether);
     }
     if (strat->honey)
     {
@@ -782,8 +776,6 @@ lists kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
     strat->LazyPass*=2;
   }
   strat->homog=h;
-  spSet(currRing);
-  strat->spSpolyLoop = spGetSpolyLoop(currRing, strat);
   initBuchMoraCrit(strat); /*set Gebauer, honey, sugarCrit*/
   initBuchMoraPos(strat);
   initBba(F,strat);

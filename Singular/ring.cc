@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.65 1999-09-27 14:39:25 obachman Exp $ */
+/* $Id: ring.cc,v 1.66 1999-09-29 10:59:38 obachman Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -21,7 +21,6 @@
 #include "intvec.h"
 #include "longalg.h"
 #include "ffields.h"
-#include "spolys.h"
 #include "subexpr.h"
 #include "ideals.h"
 #include "lists.h"
@@ -52,11 +51,7 @@ int rBlocks(ring r)
 // global variables:
 // complete == FALSE : only delete operations are enabled
 // complete == TRUE  : full reset of all variables
-#ifdef DRING
-void rChangeCurrRing(ring r, BOOLEAN complete, idhdl h)
-#else
 void rChangeCurrRing(ring r, BOOLEAN complete)
-#endif
 {
   /*------------ set global ring vars --------------------------------*/
   currRing = r;
@@ -88,31 +83,7 @@ void rChangeCurrRing(ring r, BOOLEAN complete)
         naMinimalPoly=((lnumber)r->minpoly)->z;
       }
 
-#ifdef DRING
-      pDRING=FALSE;
-      pSDRING=FALSE;
-      if ((h!=NULL) && (hasFlag(h,FLAG_DRING))) rDSet();
-#endif // DRING
-
-#ifdef SRING
-      if ((currRing->partN<=currRing->N)
-#ifdef DRING
-          && ((h==NULL) || (!hasFlag(h,FLAG_DRING)))
-#endif
-          )
-      {
-        pAltVars=currRing->partN;
-        pSRING=TRUE;
-        pSDRING=TRUE;
-      }
-      else
-      {
-        pAltVars=currRing->N+1;
-      }
-#endif // SRING
-
     /*------------ set spolys ------------------------------------------*/
-      spSet(r);
     }
   }
 }
@@ -139,11 +110,7 @@ void rSetHdl(idhdl h, BOOLEAN complete)
     }
 
    /*------------ change the global ring -----------------------*/
-  #ifdef DRING
-  rChangeCurrRing(rg,complete,h);
-  #else
   rChangeCurrRing(rg,complete);
-  #endif
   currRingHdl = h;
 
     /*------------ set pShortOut -----------------------*/
@@ -205,9 +172,6 @@ idhdl rDefault(char *s)
   r->ch    = 32003;
   r->N     = 3;
   /*r->P     = 0; Alloc0 in idhdl::set, ipid.cc*/
-#ifdef SRING
-  r->partN = 4;
-#endif
   /*names*/
   r->names = (char **) Alloc(3 * sizeof(char *));
   r->names[0]  = mstrdup("x");
@@ -649,15 +613,6 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord)
  * set a new ring from the data:
  s: name, chr: ch, varnames: rv, ordering: ord, typ: typ
  */
-#ifdef DRING
-void rDSet()
-{
-  pDRING=TRUE;
-  pSDRING=TRUE;
-  pdN=currRing->partN;
-  pdK=pVariables-pdN*2-1;
-}
-#endif
 
 int rIsRingVar(char *n)
 {
@@ -2408,6 +2363,15 @@ BOOLEAN rComplete(ring r, int force)
   r->ExpESize=j;
   r->ExpLSize=j/(sizeof(long)/sizeof(Exponent_t));
   r->mm_specHeap = mmGetSpecHeap(POLYSIZE + (r->ExpLSize)*sizeof(long));
+  if (r->mm_specHeap == NULL)
+  {
+    // monomial too large, clean up
+    Free((ADDRESS)tmp_ordsgn,(2*(n+r->N)*sizeof(long)));
+    Free((ADDRESS)tmp_typ,(2*(n+r->N)*sizeof(sro_ord)));
+    Free((ADDRESS)v,(r->N+1)*sizeof(int));
+    return TRUE;
+  }
+  
 
   // ----------------------------
   // indices and ordsgn vector for comparison

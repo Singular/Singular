@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.37 1999-09-13 08:16:20 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.38 1999-09-29 10:59:30 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -13,9 +13,7 @@
 #include "febase.h"
 #include "kutil.h"
 #include "kstd1.h"
-#include "kstd2.h"
 #include "khstd.h"
-#include "spolys.h"
 #include "stairc.h"
 #include "weight.h"
 #include "cntrlc.h"
@@ -25,10 +23,6 @@
 #include "ipid.h"
 #include "timer.h"
 #include "lists.h"
-#ifdef STDTRACE
-#include "comm.h"
-#endif
-#include "spSpolyLoop.h"
 
 //#include "ipprint.h"
 
@@ -107,13 +101,13 @@ void doRed (LObject* h,poly* with,BOOLEAN intoT,kStrategy strat)
   }
   if (intoT)
   {
-    hp = spSpolyRedNew(*with,(*h).p,strat->kNoether, strat->spSpolyLoop);
+    hp = ksOldSpolyRedNew(*with,(*h).p,strat->kNoether);
     enterT(*h,strat);
     (*h).p = hp;
   }
   else
   {
-    (*h).p = spSpolyRed(*with,(*h).p,strat->kNoether, strat->spSpolyLoop);
+    (*h).p = ksOldSpolyRed(*with,(*h).p,strat->kNoether);
   }
   if (TEST_OPT_DEBUG)
   {
@@ -215,12 +209,21 @@ void redEcart19 (LObject* h,kStrategy strat)
         at = strat->posInL(strat->L,strat->Ll,*h,strat);
         if (at <= strat->Ll)
         {
+          /*test if h is already standardbasis element*/
+#ifdef HAVE_HOMOG_T
+          i=strat->tl+1;
+#else
           i=strat->sl+1;
+#endif
           do
           {
             i--;
             if (i<0) return;
+#ifdef HAVE_HOMOG_T
+          } while (!pDivisibleBy1(strat->T[i].p,(*h).p));
+#else
           } while (!pDivisibleBy1(strat->S[i],(*h).p));
+#endif        
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
           if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
           (*h).p = NULL;
@@ -366,12 +369,20 @@ void redEcart (LObject* h,kStrategy strat)
         at = strat->posInL(strat->L,strat->Ll,*h,strat);
         if (at <= strat->Ll)
         {
+#ifdef HAVE_HOMOG_T
+          i=strat->tl+1;
+#else
           i=strat->sl+1;
+#endif
           do
           {
             i--;
             if (i<0) return;
+#ifdef HAVE_HOMOG_T
+          } while (!pDivisibleBy1(strat->T[i].p,(*h).p));
+#else
           } while (!pDivisibleBy1(strat->S[i],(*h).p));
+#endif        
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
           if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
           (*h).p = NULL;
@@ -428,8 +439,7 @@ void redFirst (LObject* h,kStrategy strat)
         PrintS(" with ");
         wrp(strat->T[j].p);
       }
-      (*h).p = spSpolyRed(strat->T[j].p,(*h).p,strat->kNoether,
-                          strat->spSpolyLoop);
+      (*h).p = ksOldSpolyRed(strat->T[j].p,(*h).p,strat->kNoether);
       if (TEST_OPT_DEBUG)
       {
         PrintS(" to ");
@@ -467,12 +477,20 @@ void redFirst (LObject* h,kStrategy strat)
         at = strat->posInL(strat->L,strat->Ll,*h,strat);
         if (at <= strat->Ll)
         {
+#ifdef HAVE_HOMOG_T
+          i=strat->tl+1;
+#else
           i=strat->sl+1;
+#endif
           do
           {
             i--;
             if (i<0) return;
+#ifdef HAVE_HOMOG_T
+          } while (!pDivisibleBy1(strat->T[i].p,(*h).p));
+#else
           } while (!pDivisibleBy1(strat->S[i],(*h).p));
+#endif        
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
           if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
           (*h).p = NULL;
@@ -616,12 +634,20 @@ void redMoraBest (LObject* h,kStrategy strat)
         at = strat->posInL(strat->L,strat->Ll,*h,strat);
         if (at <= strat->Ll)
         {
+#ifdef HAVE_HOMOG_T
+          i=strat->tl+1;
+#else
           i=strat->sl+1;
+#endif
           do
           {
             i--;
             if (i<0) return;
+#ifdef HAVE_HOMOG_T
+          } while (!pDivisibleBy1(strat->T[i].p,(*h).p));
+#else
           } while (!pDivisibleBy1(strat->S[i],(*h).p));
+#endif        
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
           if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
           (*h).p = NULL;
@@ -909,10 +935,9 @@ void updateL(kStrategy strat)
       if (pNext(strat->L[j].p) == strat->tail)
       {
         pFree1(strat->L[j].p);    /*deletes the short spoly and computes*/
-        strat->L[j].p=spSpolyCreate(strat->L[j].p1,
+        strat->L[j].p=ksOldCreateSpoly(strat->L[j].p1,
                                     strat->L[j].p2,
-                                    strat->kNoether,
-                                    strat->spSpolyLoop);   /*the real one*/
+                                    strat->kNoether);   /*the real one*/
         if (!strat->honey)
           strat->initEcart(&strat->L[j]);
         else
@@ -950,10 +975,11 @@ void updateLHC(kStrategy strat)
       else
       {
         pFree1(strat->L[i].p);
-        strat->L[i].p = spSpolyCreate(strat->L[i].p1,
-                                      strat->L[i].p2,
-                                      strat->kNoether,
-                                      strat->spSpolyLoop);
+        strat->L[i].p = ksOldCreateSpoly(strat->L[i].p1,
+                                         strat->L[i].p2,
+                                         strat->kNoether);
+        
+                                      
         strat->L[i].ecart = pLDeg(strat->L[i].p,&strat->L[i].length)-pFDeg(strat->L[i].p);
       }
     }
@@ -1040,35 +1066,6 @@ void enterSMora (LObject p,int atS,kStrategy strat)
 {
   int i;
 
-#ifdef SDRING
-  if (pSDRING
-  && (atS<=strat->sl)
-  && pComparePolys(p.p,strat->S[atS]))
-  {
-    if (TEST_OPT_PROT)
-      PrintS("m");
-    p.p=NULL;
-    return;
-  }
-  if (pSDRING
-  && (atS<strat->sl)
-  && pComparePolys(p.p,strat->S[atS+1]))
-  {
-    if (TEST_OPT_PROT)
-      PrintS("m");
-    p.p=NULL;
-    return;
-  }
-  if (pSDRING
-  && (atS>0)
-  && pComparePolys(p.p,strat->S[atS-1]))
-  {
-    if (TEST_OPT_PROT)
-      PrintS("m");
-    p.p=NULL;
-    return;
-  }
-#endif
   strat->news = TRUE;
   /*- puts p to the standardbasis s at position atS -*/
   if (strat->sl == IDELEMS(strat->Shdl)-1)
@@ -1247,12 +1244,6 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   int reduc = 0;
   int hilbeledeg=1,hilbcount=0;
 
-#ifdef SDRING
-  polyset aug=(polyset)Alloc(setmax*sizeof(poly));
-  int augmax=setmax, augl=-1;
-  poly oldLcm;
-#endif
-
   strat->update = TRUE;
   /*- setting global variables ------------------- -*/
   initBuchMoraCrit(strat);
@@ -1314,49 +1305,20 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     if (pNext(strat->P.p) == strat->tail)
     {
       pFree1(strat->P.p);/*- deletes the short spoly and computes -*/
-      strat->P.p = spSpolyCreate(strat->P.p1,
-                                 strat->P.p2,
-                                 strat->kNoether,
-                                 strat->spSpolyLoop);/*- the real one -*/
+      strat->P.p = ksOldCreateSpoly(strat->P.p1,
+                                    strat->P.p2,
+                                    strat->kNoether);/*- the real one -*/
       if (!strat->honey)
         strat->initEcart(&strat->P);
       else
         strat->P.length = pLength(strat->P.p);
     }
-#ifdef SDRING
-    if (strat->P.p != NULL)
-#endif
     {
       if (TEST_OPT_PROT) message(strat->P.ecart+pFDeg(strat->P.p),&olddeg,&reduc,strat);
       strat->red(&strat->P,strat);/*- reduction of the element choosen from L -*/
     }
     if (strat->P.p != NULL)
     {
-#ifdef SDRING
-      aug[0]=strat->P.p;
-      augl=0;
-      if (pSDRING)
-      {
-        oldLcm=strat->P.lcm;
-#ifdef SRING
-        if (pSRING) psAug(pCopy(strat->P.p),pOne(),&aug,&augl,&augmax);
-#endif
-#ifdef DRING
-        if (pDRING) pdAug(pCopy(strat->P.p),&aug,&augl,&augmax);
-#endif
-      }
-      for (augl++;augl != 0;)
-      {
-        strat->P.p=aug[--augl];
-        if (pSDRING)
-        {
-          if (oldLcm==NULL) strat->P.lcm=NULL;
-          else  strat->P.lcm=pCopy1(oldLcm);
-        }
-        if ((augl!=0) && (strat->P.p!=NULL)) strat->red(&strat->P,strat);
-        if (strat->P.p != NULL)
-        {
-#endif
           if (TEST_OPT_PROT) PrintS("s");/*- statistic -*/
           /*- enter P.p into s and b: -*/
           if (!TEST_OPT_INTSTRATEGY)
@@ -1377,16 +1339,6 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           enterT(strat->P,strat);
           {
             int pos;
-#ifdef SDRING
-            pos = posInS(strat->S,strat->sl,strat->P.p);
-            if (pSDRING && (pos<=strat->sl)
-            && (pComparePolys(strat->P.p,strat->S[pos])))
-            {
-              if (TEST_OPT_PROT)
-                PrintS("d");
-            }
-            else
-#endif
             {
               enterpairs(strat->P.p,strat->sl,strat->P.ecart,0,strat);
               if (strat->sl==-1)
@@ -1403,12 +1355,6 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
           }
           if (strat->P.lcm!=NULL) pFree1(strat->P.lcm);
           strat->P.lcm=NULL;
-#ifdef SDRING
-        }
-      }
-      /* delete the old pair */
-      if (pSDRING &&(oldLcm!=NULL)) pFree1(oldLcm);
-#endif
 #ifdef KDEBUG
       memset(&strat->P,0,sizeof(strat->P));
 #endif
@@ -1449,9 +1395,6 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   strat->lastAxis = 0; //???
   pDelete(&strat->kNoether);
   Free((ADDRESS)strat->NotUsedAxis,(pVariables+1)*sizeof(BOOLEAN));
-#ifdef SDRING
-  Free((ADDRESS)aug,augmax*sizeof(poly));
-#endif
   if (TEST_OPT_PROT) messageStat(srmax,lrmax,hilbcount,strat);
   if (TEST_OPT_WEIGHTM)
   {
@@ -1498,9 +1441,6 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   initBuchMoraCrit(strat);
   initBuchMoraPos(strat);
   initMora(F,strat);
-  strat->spSpolyLoop = spGetSpolyLoop(currRing,
-                                      max(strat->ak,pMaxComp(q)),
-                                      strat->syzComp, FALSE);
   strat->enterS = enterSMoraNF;
   /*- set T -*/
   strat->tl = -1;
@@ -1596,9 +1536,6 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   initMora(F,strat);
   strat->enterS = enterSMoraNF;
   /*- set T -*/
-  strat->spSpolyLoop = spGetSpolyLoop(currRing,
-                                      max(strat->ak,idRankFreeModule(q)),
-                                      strat->syzComp, FALSE);
   strat->tl = -1;
   strat->tmax = setmax;
   strat->T = initT();
@@ -1722,9 +1659,6 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
     toReset = TRUE;
   }
   if ((h==testHomog)
-#ifdef DRING
-  && (!pDRING)
-#endif
   )
   {
     if (strat->ak == 0)
@@ -1745,9 +1679,6 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
     //}
   }
   pLexOrder=b;
-#ifdef DRING
-  if (pDRING) h=isNotHomog;
-#endif
   if (h==isHomog)
   {
     if ((w!=NULL) && (*w!=NULL))
@@ -1764,8 +1695,6 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
     if (hilb==NULL) strat->LazyPass*=2;
   }
   strat->homog=h;
-  spSet(currRing);
-  strat->spSpolyLoop = spGetSpolyLoop(currRing, strat, syzComp);
   if (pOrdSgn==-1)
   {
     if (w!=NULL)
@@ -1775,21 +1704,10 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   }
   else
   {
-    #ifdef STDTRACE
-    lists l;
-    if (w!=NULL)
-      l=bbaLink(F,Q,*w,hilb,strat);
-    else
-      l=bbaLink(F,Q,NULL,hilb,strat);
-    r=(ideal)(l->m[0].data);
-    l->m[0].data=NULL;
-    l->Clean();
-    #else
     if (w!=NULL)
       r=bba(F,Q,*w,hilb,strat);
     else
       r=bba(F,Q,NULL,hilb,strat);
-    #endif
   }
 #ifdef KDEBUG
   idTest(r);
@@ -1813,100 +1731,6 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
 //##############################################################
 //##############################################################
 
-#ifdef STDTRACE
-lists TraceStd(leftv lv,int rw, ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
-          int newIdeal)
-{
-  lists l;
-  ideal r;
-  stdLink stdTrace=(stdLink) Alloc0(sizeof(skstdLink));
-  BOOLEAN b=pLexOrder,toReset=FALSE;
-  BOOLEAN delete_w=(w==NULL);
-  kStrategy strat=(kStrategy)Alloc0(sizeof(skStrategy));
-
-  if(!TEST_OPT_RETURN_SB)
-    strat->syzComp = syzComp;
-  if (TEST_OPT_SB_1)
-    strat->newIdeal = newIdeal;
-  strat->LazyPass=32000;
-  strat->LazyDegree = 10;
-  strat->ak = idRankFreeModule(F);
-//   if(stdTrace!=NULL)
-//     stdTrace->GetPrimes(F,primes);  // Array mit Primzahlen muß geordnet sein !
-
-  if ((h==testHomog)
-#ifdef DRING
-  && (!pDRING)
-#endif
-  )
-  {
-    if (strat->ak == 0)
-    {
-      h = (tHomog)idHomIdeal(F,Q);
-      w=NULL;
-    }
-    else
-      h = (tHomog)idHomModule(F,Q,w);
-  }
-#ifdef DRING
-  if (pDRING) h=isNotHomog;
-#endif
-  if (h==isHomog)
-  {
-    if ((w!=NULL) && (*w!=NULL))
-    {
-      kModW = *w;
-      strat->kModW = *w;
-      pOldFDeg = pFDeg;
-      pFDeg = kModDeg;
-      toReset = TRUE;
-    }
-    pLexOrder = TRUE;
-    if (hilb==NULL) strat->LazyPass*=2;
-  }
-  strat->homog=h;
-  spSet(currRing);
-  strat->spSpolyLoop = spGetSpolyLoop(currRing, strat syzComp);
-//   if (pOrdSgn==-1)
-//   {
-//     if (w!=NULL)
-//       r=mora(F,Q,*w,hilb,strat);
-//     else
-//       r=mora(F,Q,NULL,hilb,strat);
-//   }
-//   else
-  {
-    stdTrace->Init(lv,rw);
-    if(w==NULL)
-      l=bbaLink(F,Q,NULL,hilb,strat,stdTrace);
-    else
-      l=bbaLink(F,Q,*w,hilb,strat,stdTrace);
-    r=(ideal) (l->m[0].Data());
-  }
-#ifdef KDEBUG
-  int i;
-  for (i=0; i<IDELEMS(r); i++) pTest(r->m[i]);
-#endif
-  if (toReset)
-  {
-    kModW = NULL;
-    pFDeg = pOldFDeg;
-  }
-  pLexOrder = b;
-//Print("%d reductions canceled \n",strat->cel);
-  HCord=strat->HCord;
-  Free((ADDRESS)strat,sizeof(skStrategy));
-  if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
-  if(stdTrace!=NULL)
-  {
-    stdTrace->Kill();
-    Free(stdTrace, sizeof(skstdLink));
-  }
-
-  return l;
-}
-#endif
-
 lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
               int reduced)
 {
@@ -1927,9 +1751,6 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   strat->minim=(reduced % 2)+1;
   strat->ak = idRankFreeModule(F);
   if ((h==testHomog)
-#ifdef DRING
-  && (!pDRING)
-#endif
   )
   {
     if (strat->ak == 0)
@@ -1942,9 +1763,6 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
       h = (tHomog)idHomModule(F,Q,w);
     }
   }
-#ifdef DRING
-  if (pDRING) h=isNotHomog;
-#endif
   if (h==isHomog)
   {
     if ((w!=NULL) && (*w!=NULL))
@@ -1969,8 +1787,6 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
     strat->LazyPass*=2;
   }
   strat->homog=h;
-  spSet(currRing);
-  strat->spSpolyLoop = spGetSpolyLoop(currRing, strat, syzComp);
   if (pOrdSgn==-1)
   {
     if (w!=NULL)
@@ -1980,21 +1796,10 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   }
   else
   {
-  #ifdef STDTRACE
-    lists rl;
-    if (w!=NULL)
-      rl=bbaLink(F, Q, *w, hilb, strat, NULL);
-    else
-      rl=bbaLink(F, Q, NULL, hilb, strat, NULL);
-    r=(ideal)(rl->m[0].data);
-    rl->m[0].data=NULL;
-    rl->Clean();
-  #else
     if (w!=NULL)
       r=bba(F,Q,*w,hilb,strat);
     else
       r=bba(F,Q,NULL,hilb,strat);
-  #endif
   }
 #ifdef KDEBUG
   {
@@ -2043,7 +1848,6 @@ poly kNF(ideal F, ideal Q, poly p,int syzComp, int lazyReduce)
      return NULL;
   kStrategy strat=(kStrategy)Alloc0(sizeof(skStrategy));
   strat->syzComp = syzComp;
-  spSet(currRing);
   if (pOrdSgn==-1)
     p=kNF1(F,Q,p,strat,lazyReduce);
   else
@@ -2055,7 +1859,6 @@ poly kNF(ideal F, ideal Q, poly p,int syzComp, int lazyReduce)
 ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
 {
   ideal res;
-  spSet(currRing);
   if (TEST_OPT_PROT)
   {
     Print("(S:%d)",IDELEMS(p));mflush();
@@ -2087,7 +1890,6 @@ ideal kInterRed (ideal F, ideal Q)
   strat->kHEdgeFound = ppNoether != NULL;
   strat->kNoether=pCopy(ppNoether);
   strat->ak = idRankFreeModule(F);
-  spSet(currRing);
   initBuchMoraCrit(strat);
   strat->NotUsedAxis = (BOOLEAN *)Alloc((pVariables+1)*sizeof(BOOLEAN));
   for (j=pVariables; j>0; j--) strat->NotUsedAxis[j] = TRUE;
@@ -2098,7 +1900,6 @@ ideal kInterRed (ideal F, ideal Q)
   strat->tl          = -1;
   strat->tmax        = setmax;
   strat->T           = initT();
-  strat->spSpolyLoop = spGetSpolyLoop(currRing, strat);
   if (pOrdSgn == -1)   strat->honey = TRUE;
   initS(F,Q,strat);
   if (TEST_OPT_REDSB)
