@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_map.h,v 1.7 1997-07-23 16:25:08 schmidt Exp $ */
+/* $Id: cf_map.h,v 1.8 1997-08-28 07:22:39 schmidt Exp $ */
 
 #ifndef INCL_CF_MAP_H
 #define INCL_CF_MAP_H
@@ -19,10 +19,8 @@
 #include "variable.h"
 #include "canonicalform.h"
 #ifdef macintosh
-#include <::templates:ftmpl_functions.h>
 #include <::templates:ftmpl_list.h>
 #else
-#include "templates/ftmpl_functions.h"
 #include "templates/ftmpl_list.h"
 #endif
 
