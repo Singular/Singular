@@ -1,8 +1,8 @@
-// $Id: deform.lib,v 1.24 2001-01-16 13:48:24 Singular Exp $
+// $Id: deform.lib,v 1.25 2001-02-06 11:30:28 anne Exp $
 // author: Bernd Martin email: martin@math.tu-cottbus.de
 //(bm, last modified 4/98)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: deform.lib,v 1.24 2001-01-16 13:48:24 Singular Exp $";
+version="$Id: deform.lib,v 1.25 2001-02-06 11:30:28 anne Exp $";
 category="Singularities";
 info="
 LIBRARY:  deform.lib    Miniversal Deformation of Singularities and Modules
@@ -28,11 +28,11 @@ proc versal (ideal Fo,list #)
 COMUPTE: miniversal deformation of Fo up to degree d (default d=100),
 CREATE:  Rings (exported):
          'my'Px = extending the basering Po by new variables given by
-           \"A,B,..\" (deformation parameters), returns as basering, the
-           new variables come before the old ones, the ordering is the
+           \"A,B,..\" (deformation parameters), returns as basering; the
+           new variables precede the old ones, the ordering is the
            product between \"ls\" and \"ord(Po)\"
          @*'my'Qx = Px/Fo extending Qo=Po/Fo,
-         @*'my'So = being the embedding-ring of the versal base space,
+         @*'my'So = the embedding-ring of the versal base space,
          @*'my'Ox = Px/Js extending So/Js.   (default my=\"\")
 
       Matrices (in Px, exported):
@@ -299,7 +299,7 @@ proc mod_versal(matrix Mo, ideal I, list #)
 COMUPTE: miniversal deformation of coker(Mo) over Qo=Po/Io, Po=basering;
 CREATE:  Ringsr (exported):
          'my'Px  = extending the basering by new variables (deformation
-                   parameters), the new variables come before the old ones,
+                   parameters), the new variables precede the old ones,
                    the ordering is the product between \"my_ord\"
                    and \"ord(Po)\"
          @*'my'Qx  = Px/Io extending Qo (returns as basering),
@@ -707,9 +707,9 @@ proc lift_rel_kb (module N, module M, list #)
 ASSUME:  [p a monomial ] or the product of all variables
          N, M modules of same rank, M depending only on variables not in p
          and vdim(M) is finite in this ring,
-         [ kbaseM the kbase of M in the subring given by variables not in p ]
-         warning: these assumtions are not checked by the procedure
-RETURN:  matrix A, whose j-th columnes present the coeff's of N[j] in kbaseM,
+         [ kbaseM the kbase of M in the subring given by variables not in p ] @*
+         warning: these assumptions are not checked by the procedure
+RETURN:  matrix A, whose j-th columns present the coeff's of N[j] in kbaseM,
          i.e. kbaseM*A = reduce(N,std(M))
 EXAMPLE: example lift_rel_kb;  shows examples
 "
