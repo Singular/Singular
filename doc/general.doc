@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.42 1998-05-08 07:48:45 wichmann Exp $
+@comment $Id: general.doc,v 1.43 1998-05-08 11:20:11 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -48,14 +48,13 @@
 @cindex How to enter and exit
 
 @*To start @sc{Singular}, enter @code{Singular} at the system prompt.
-@*You will get a header with the version name, the compilation date
-and a short remark how to get help on
-@sc{Singular}.
+@*You get a header which, among others, reports the version name and
+compilation date.
 Enter @code{help;} to get the online manual at the @sc{Singular} prompt
 @code{>}.
-Commands are always ended with a @code{;} (semicolon) and @code{<ENTER>}.
-Spaces and commas are always considered as separators.
-@*To exit @sc{Singular} enter @code{quit;}, @code{exit;} or @code{$}.
+Commands are always need to be ended by a @code{;} (semicolon) and
+@code{<ENTER>}. @*To exit @sc{Singular} type @code{quit;}, @code{exit;}
+or @code{$}. 
 
 
 @sc{Singular} may also be started with command-line options and with
@@ -84,11 +83,11 @@ executes the files @code{file1}, @code{file2} ...  (given on the command
 line) in that order.
 @end enumerate
 
-Unless otherwise specified, @sc{Singular} locates all (data) files and
-libraries by first searching for them in the current working directory,
+Unless specified otherwise, @sc{Singular} locates all (data) files and
+libraries by first searching the current working directory,
 and then by searching through all the directories specified by the
 environment variable @code{SINGULARPATH} (@code{SPATH} on DOS-based
-systems) and finally by searching through some default directories
+systems), and, finally, by searching through some default directories
 (e.g., @code{/usr/local/share/Singular}).
 
 @c --------------------------------------------------------------------------
