@@ -11,7 +11,7 @@ SHELL		= /bin/sh
 ##
 SINGULAR_MAJOR_VERSION	= @SINGULAR_MAJOR_VERSION@
 SINGULAR_MINOR_VERSION	= @SINGULAR_MINOR_VERSION@
-DIST_NAME	= Singular-${SINGULAR_MAJOR_VERSION}.${SINGULAR_MINOR_VERSION}
+DISTNAME	= Singular-${SINGULAR_MAJOR_VERSION}.${SINGULAR_MINOR_VERSION}
 
 ## 
 ## various paths
@@ -88,7 +88,7 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     longalg.cc longrat.cc \
     longrat0.cc maps.cc matpol.cc misc.cc \
     mminit.cc modulop.cc \
-    fglm.cc fglmzero.cc fglmvec.cc fglmgauss.cc fglmhom.cc \
+    fglm.cc fglmzero.cc fglmvec.cc fglmgauss.cc fglmhom.cc fglmcomb.cc \
     numbers.cc polys.cc polys0.cc polys1.cc polys-impl.cc \
     ring.cc shortfl.cc silink.cc sing_mp.cc\
     sing_dld.cc sing_dbm.cc spolys.cc spolys0.cc \
@@ -112,8 +112,10 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	fglm.h comm.h kstd1.h modulop.h sing_dbm.h weight.h \
 	fglmgauss.h fglmvec.h kstd2.h mpsr.h sing_mp.h \
 	kstdfac.h mpsr_Get.h spolys.h \
-	kutil.h mpsr_Put.h spolys0.h \
-	ndbm.h spSpolyLoop.h polys-impl.h polys-comp.h getopt.h
+	kutil.h mpsr_Put.h spolys0.h sing_dld.h\
+	ndbm.h spSpolyLoop.h polys-impl.h polys-comp.h getopt.h libparse.h
+
+INCS=febase.inc polys.inc iparith.inc mpsr_Tok.inc spSpolyLoop.inc
 
 TESTS=${testdir}/comparecheck ${testdir}/fac_test.in ${testdir}/fac_test.out\
 	${testdir}/general_test.in ${testdir}/general_test.out \
@@ -127,7 +129,7 @@ DOCS=${docdir}/Makefile.in ${docdir}/copyright.tex ${docdir}/doc2tex.c \
 
 DISTFILES=${SOURCES} ${HEADERS} Makefile.in configure.in configure \
 	mod2.h.in grammar.h testgh install-sh mkinstalldirs \
-	${TESTS} ${DOCS}
+	${INCS} ${DOCS}
 
 OBJS=grammar.o scanner.o matpol.o binom.o\
      febase.o feread.o timer.o intvec.o attrib.o lists.o\
@@ -303,7 +305,7 @@ clean:
 
 distclean: clean
 	-rm -rf depend iparith.inc mpsr_Tok.inc 
-	-rm -rf ${DIST_NAME} ${testdir}/out stamp-h
+	-rm -rf ${DISTNAME} ${testdir}/out stamp-h
 	-rm mod2.h Makefile TAGS* config.status config.cache config.log
 	cd ${docdir}; ${MAKE} distclean
 
@@ -362,6 +364,11 @@ dist:
 	rm -rf ${TEMPDIR}/${DISTNAME}
 	- gzip -9 ${TEMPDIR}/${DISTNAME}.tar
 	- mv ${TEMPDIR}/${DISTNAME}.tar.gz .
+
+tar:
+	tar cf ${DISTNAME}.tar ${DISTFILES}
+	gzip -f ${DISTNAME}.tar
+
 
 TAGS:
 	etags ${SOURCES} ${HEADERS}
