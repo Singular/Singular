@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.205 2004-04-29 17:11:22 levandov Exp $ */
+/* $Id: extra.cc,v 1.206 2004-07-20 15:22:54 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -41,7 +41,6 @@
 #include "cntrlc.h"
 #include "stairc.h"
 #include "ipshell.h"
-#include "algmap.h"
 #include "modulop.h"
 #include "febase.h"
 #include "matpol.h"
@@ -1253,66 +1252,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
-/*==================== algfetch =====================*/
-    if (strcmp(sys_cmd,"algfetch")==0)
-    {
-      int k;
-      idhdl w;
-      ideal i0, i1;
-      ring r0=(ring)h->Data();
-      leftv v = h->next;
-      w = r0->idroot->get(v->Name(),myynest);
-      if (w!=NULL)
-      {
-        if (IDTYP(w)==IDEAL_CMD)
-        {
-          i0 = IDIDEAL(w);
-          i1 = idInit(IDELEMS(i0),i0->rank);
-          for (k=0; k<IDELEMS(i1); k++)
-          {
-            i1->m[k] = maAlgpolyFetch(r0, i0->m[k]);
-          }
-          res->rtyp = IDEAL_CMD;
-          res->data = (void*)i1;
-          return FALSE;
-        }
-        else if (IDTYP(w)==POLY_CMD)
-        {
-          res->rtyp = POLY_CMD;
-          res->data = (void*)maAlgpolyFetch(r0,IDPOLY(w));
-          return FALSE;
-        }
-        else
-          WerrorS("`system(\"algfetch\",<ideal>/<poly>)` expected");
-      }
-      else
-        Werror("`%s` not found in `%s`",v->Name(),h->Name());
-    }
-    else
-/*==================== algmap =======================*/
-    if (strcmp(sys_cmd,"algmap")==0)
-    {
-      int k;
-      idhdl w;
-      ideal i0, i1, i, j;
-      ring r0=(ring)h->Data();
-      leftv v = h->next;
-      w = r0->idroot->get(v->Name(),myynest);
-      i0 = IDIDEAL(w);
-      v = v->next;
-      i = (ideal)v->Data();
-      v = v->next;
-      j = (ideal)v->Data();
-      i1 = idInit(IDELEMS(i0),i0->rank);
-      for (k=0; k<IDELEMS(i1); k++)
-      {
-        i1->m[k] = maAlgpolyMap(r0, i0->m[k], i, j);
-      }
-      res->rtyp = IDEAL_CMD;
-      res->data = (void*)i1;
-      return FALSE;
-    }
-    else
 #ifdef HAVE_FACTORY
 /*==================== fastcomb =============================*/
     if(strcmp(sys_cmd,"fastcomb")==0)
