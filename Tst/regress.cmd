@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.30 1999-12-08 23:51:20 obachman Exp $
+# $Id: regress.cmd,v 1.31 1999-12-08 23:52:38 obachman Exp $
 # FILE:    regress.cmd
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -425,7 +425,10 @@ sub tst_check
       # do status checks
       ($exit_status, $error_cause) = & tst_status_check($root);
     }
-    print "Warning: no file tst_status.out\n";
+    else
+    {
+      print "Warning: no file tst_status.out\n";
+    }
   }
 
 
