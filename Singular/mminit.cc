@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mminit.cc,v 1.25 2002-11-04 17:14:18 bricken Exp $ */
+/* $Id: mminit.cc,v 1.26 2002-12-19 11:22:17 Singular Exp $ */
 /*
 * ABSTRACT: init of memory management
 */
@@ -17,16 +17,7 @@
 #define OMALLOC_C
 #include "omalloc.h"
 
-extern "C"
-{
-#ifdef __cplusplus
-#undef __cplusplus
-#include <gmp.h>
-#define __cplusplus
-#else
-#include <gmp.h>
-#endif
-}
+#include <si_gmp.h>
 
 int mmIsInitialized=mmInit();
 
