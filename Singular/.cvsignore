@@ -4,6 +4,7 @@ Singular libparse .gdb_history si_paths.h libparse.cc
 *.soa *.oa
 *.sop *.op
 *.dl_o*
+*.sog *.og
 Singularg*
 Singulara*
 Singularp*
