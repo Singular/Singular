@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.9 1997-05-02 15:10:20 Singular Exp $ */
+/* $Id: misc.cc,v 1.10 1997-05-06 08:31:05 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -172,8 +172,13 @@ int siRand()
 #define not  !
 #define HELP_NOT_OPEN  1
 #define HELP_NOT_FOUND 2
+#ifndef macintosh
+#define Index_File     SINGULAR_INFODIR "singular.hlp"
+#define Help_File      SINGULAR_INFODIR "singular.hlp"
+#else
 #define Index_File     "singular.hlp"
 #define Help_File      "singular.hlp"
+#endif
 #define BUF_LEN        128
 #define IDX_LEN        64
 #define MAX_LINES      21
@@ -370,8 +375,13 @@ void singular_help(char *str,BOOLEAN example)
 #ifdef buildin_help
       singular_manual(str);
 #else
-      char tmp[100];
-      sprintf(tmp,"info singular Index \"%s\"",str);
+      char tmp[150];
+      sprintf(tmp,"%s/singular.hlp", SINGULAR_INFODIR);
+      if (!access(tmp, R_OK))
+        sprintf(tmp, "info -f %s/singular.hlp Index \"%s\"",
+                SINGULAR_INFODIR, str);
+      else
+        sprintf(tmp,"info singular Index \"%s\"",str);
       system(tmp);
 #ifndef MSDOS
       //sprintf(tmp,"clear");

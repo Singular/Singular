@@ -59,6 +59,13 @@ docdir		= doc
 testdir		= tests
 
 ##
+## the configuration
+##
+WITH_MP		= @WITH_MP@
+WITH_FACTORY	= @WITH_FACTORY@
+WITH_LIBFAC	= @WITH_LIBFAC@
+
+##
 ## End configuration dependend stuff
 #################################################################
 
@@ -182,7 +189,9 @@ config.status: configure
 	./config.status --recheck
 
 configure: configure.in
-	autoconf 
+	echo "You need to rerun autoconf. I am proceeding, for now."
+	touch configure
+#	autoconf 
 
 ##
 ## install targets
@@ -245,11 +254,21 @@ info dvi ps html:
 
 check:	Singular ${testdir}/check ${testdir}/out.should
 	cd ${testdir}; SINGULARPATH=./../LIB/ ./check ./../Singular
-	if test -n "@HAVE_MPSR@"; then echo; ${MAKE} mpcheck; fi
+	if test "$WITH_MP" = yes; then echo; ${MAKE} mpcheck; fi
+	if test "$WITH_FACTORY" = yes && test "$WITH_LIBFAC" = yes; then \
+	  ${MAKE} factorycheck;\
+	fi	
+         	    
 
 mpcheck: Singular ${testdir}/mpcheck ${testdir}/mpcheck.data
 	cd ${testdir}; ./mpcheck `pwd`/.. mpcheck.data
 
+factorycheck: Singular ${testdir}/comparecheck ${testdir}/fac_test.in \
+		${testdir}/fac_test.out
+	SINGULARPATH=`pwd`/LIB; export SINGULARPATH; \
+	PATH=`pwd`:${PATH}; export PATH;\
+	cd ${testdir}; ./comparecheck fac_test.in fac_test.out
+	
 ##
 ## miscellanous targets
 ##

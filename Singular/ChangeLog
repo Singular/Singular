@@ -1,3 +1,15 @@
+Tue May  6 08:29:57 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* added factorycheck target in Makefile.in
+
+	* Makefile.in (configure): took out rules which automatically
+	  reruns autoconf. Print out warning, instead
+
+	* misc.cc, configure.in, mod2.h.in: 
+	    added SINGULAR_INFODIR to search for info files
+
+	* configure.in: Added AC_SUBST(WITH_LIBFAC, WITH_MP, WITH_FACTORY)
+
 Mon May  5 10:31:15 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
 	* #include "factory" instead of include "singfactory"

@@ -75,6 +75,8 @@
 #define S_VERSION2 ""
 /* Define the data directory where Singular searches for libs and gftables */ 
 #define SINGULAR_DATADIR "/usr/local/share/Singular"
+/* Define the info directory where Singular searches for help files */ 
+#define SINGULAR_INFODIR "/usr/local/info"
 
 /*******************************************************************
  * Defines which are not set by configure
