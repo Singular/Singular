@@ -22,6 +22,7 @@
 #include "libparse.h"
 #include "feOpt.h"
 
+
 /*****************************************************************
  *
  * Declarations: Data  structures
@@ -63,7 +64,7 @@ static long heKeyChksum(char* key);
 
 // browser functions
 static BOOLEAN heInfoInit(int);    static void heInfoHelp(heEntry hentry);
-#if ! defined(WINNT) && ! defined(macintosh)
+#if ! defined(macintosh)
 static BOOLEAN heNetscapeInit(int);static void heNetscapeHelp(heEntry hentry);
 static BOOLEAN heXinfoInit(int);   static void heXinfoHelp(heEntry hentry);
 static BOOLEAN heTkinfoInit(int);  static void heTkinfoHelp(heEntry hentry);
@@ -71,6 +72,11 @@ static BOOLEAN heTkinfoInit(int);  static void heTkinfoHelp(heEntry hentry);
 static BOOLEAN heBuiltinInit(int); static void heBuiltinHelp(heEntry hentry);
 static BOOLEAN heDummyInit(int);   static void heDummyHelp(heEntry hentry);
 static BOOLEAN heEmacsInit(int);   static void heEmacsHelp(heEntry hentry);
+
+#ifdef WINNT
+static void heHtmlHelp(heEntry hentry);
+extern "C" void heOpenWinntUrl(const char* url, int local);
+#endif
 
 static heBrowser heCurrentHelpBrowser = NULL;
 
@@ -83,7 +89,10 @@ static heBrowser heCurrentHelpBrowser = NULL;
 // order is improtant -- first possible help is choosen
 static heBrowser_s heHelpBrowsers[] =
 {
-#if ! defined(WINNT) && ! defined(macintosh)
+#ifdef WINNT
+  { "html",     heDummyInit,    heHtmlHelp},
+#endif
+#if ! defined(macintosh)
   { "netscape", heNetscapeInit, heNetscapeHelp},
   { "tkinfo",   heTkinfoInit,   heTkinfoHelp},
   { "xinfo",    heXinfoInit,    heXinfoHelp},
@@ -731,7 +740,7 @@ static void heInfoHelp(heEntry hentry)
   system(sys);
 }
 
-#if ! defined(WINNT) && ! defined(macintosh)
+#if ! defined(macintosh)
 static BOOLEAN heNetscapeInit(int warn)
 {
   if (feResource('N' /*"netscape"*/, warn) == NULL)
@@ -739,13 +748,14 @@ static BOOLEAN heNetscapeInit(int warn)
     if (warn) WarnS("'netscape' help browser not available: no 'netscape' program found");
     return FALSE;
   }
+#ifndef WINNT
   if (getenv("DISPLAY") == NULL)
   {
     if (warn) WarnS("'netscape' help browser not available:");
     if (warn) WarnS("Environment variable DISPLAY not set");
     return FALSE;
   }
-
+#endif
   
   if (feResource('h' /*"HtmlDir"*/, (feOptValue(FE_OPT_ALLOW_NET)? 0 : warn)) 
       == NULL)
@@ -786,7 +796,11 @@ static void heNetscapeHelp(heEntry hentry)
   {
     sprintf(url, "%s%s/index.htm", urltype, htmldir);
   }
+#ifndef WINNT
   sprintf(sys, "%s --remote 'OpenUrl(%s)' > /dev/null 2>&1",
+#else
+  sprintf(sys, "%s %s", 
+#endif
           feResource('N' /*"netscape"*/), url);
 
   // --remote exits with status != 0 if netscaep isn't already running
@@ -804,14 +818,29 @@ static void heNetscapeHelp(heEntry hentry)
   }
 }
 
+#ifdef WINNT
+static void heHtmlHelp(heEntry hentry)
+{
+  char url[MAXPATHLEN];
+  char* html_dir = feResource('h' /*"HtmlDir"*/);
+  sprintf(url, "%s/%s",
+          (html_dir != NULL ? html_dir : feResource('u' /*"ManualUrl"*/)),
+          (hentry!=NULL && *(hentry->url)!='\0' ? hentry->url : "index.htm"));
+
+  heOpenWinntUrl(url, (html_dir != NULL ? 1 : 0));
+}
+#endif
+
 static BOOLEAN heXinfoInit(int warn)
 {
+#ifndef WINNT
   if (getenv("DISPLAY") == NULL)
   {
     if (warn) WarnS("'xinfo' help browser not available:");
     if (warn) WarnS("Environment variable DISPLAY not set");
     return FALSE;
   }
+#endif
   if (feResource('i', warn) == NULL)
   {
     if (warn) WarnS("'xinfo' help browser not available: no InfoFile");
@@ -833,29 +862,40 @@ static void heXinfoHelp(heEntry hentry)
 {
   char sys[MAX_SYSCMD_LEN];
 
+#ifdef WINNT 
+#define EXTRA_XTERM_ARGS "+vb -sb -fb Courier-bold-13 -tn linux -cr Red3"
+#else
+#define EXTRA_XTERM_ARGS ""
+#endif
+
   if (hentry != NULL && *(hentry->key) != '\0')
   {
     if (*(hentry->node) != '\0')
-      sprintf(sys, "%s -e %s -f %s --node='%s' &",
-              feResource('X'), feResource('I'), feResource('i'), hentry->node);
+      sprintf(sys, "%s %s -e %s -f %s --node='%s' &",
+              feResource('X'), EXTRA_XTERM_ARGS, 
+              feResource('I'), feResource('i'), hentry->node);
     else
-      sprintf(sys, "%s -e %s -f %s Index '%s' &",
-              feResource('X'), feResource('I'), feResource('i'), hentry->key);
+      sprintf(sys, "%s %s -e %s -f %s Index '%s' &",
+              feResource('X'), EXTRA_XTERM_ARGS,
+              feResource('I'), feResource('i'), hentry->key);
   }
   else
-    sprintf(sys, "%s -e %s -f %s --node=Top &",
-            feResource('X'), feResource('I'), feResource('i'));
+    sprintf(sys, "%s %s -e %s -f %s --node=Top &",
+            feResource('X'), EXTRA_XTERM_ARGS,
+            feResource('I'), feResource('i'));
   system(sys);
 }
 
 static BOOLEAN heTkinfoInit(int warn)
 {
+#ifndef WINNT
   if (getenv("DISPLAY") == NULL)
   {
     if (warn) WarnS("'tkinfo' help browser not available:");
     if (warn) WarnS("Environment variable DISPLAY not set");
     return FALSE;
   }
+#endif
   if (feResource('i', warn) == NULL)
   {
     if (warn) WarnS("'tkinfo' help browser not available: no InfoFile");
@@ -883,7 +923,7 @@ static void heTkinfoHelp(heEntry hentry)
   }
   system(sys);
 }
-#endif // ! defined(WINNT) && ! defined(macintosh)
+#endif // ! defined(macintosh)
 
 static BOOLEAN heDummyInit(int warn)
 {

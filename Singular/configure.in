@@ -47,9 +47,9 @@ dnl here are some defaults
 
 SINGULAR_MAJOR_VERSION=${SINGULAR_MAJOR_VERSION:-1}
 SINGULAR_MINOR_VERSION=${SINGULAR_MINOR_VERSION:-3}
-SINGULAR_SUB_VERSION=${SINGULAR_SUB_VERSION:-7}
+SINGULAR_SUB_VERSION=${SINGULAR_SUB_VERSION:-8}
 SINGULAR_VERSION="${SINGULAR_VERSION:-$SINGULAR_MAJOR_VERSION${VERSION_SEP}$SINGULAR_MINOR_VERSION${VERSION_SEP}$SINGULAR_SUB_VERSION}"
-VERSION_DATE=${VERSION_DATE:-"March 2000"}
+VERSION_DATE=${VERSION_DATE:-"May 2000"}
 
 dnl pass them on into the Makefiles
 AC_SUBST(SINGULAR_VERSION)
@@ -84,6 +84,7 @@ fi
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_CXX
+AC_PROG_INSTALL
 AC_AIX
 
 # we prefer using gcc for compiling C++ files, provided the user did
@@ -172,7 +173,7 @@ fi
 
 # expand bindir
 test "x$bindir" = 'x${exec_prefix}/bin' && bindir="${exec_prefix}"
-SINGULAR=${SINGULAR:-$bindir/Singular-$SINGULAR_MAJOR_VERSION${VERSION_SEP}$SINGULAR_MINOR_VERSION${VERSION_SEP}$SINGULAR_SUB_VERSION}${EXEC_EXT}
+SINGULAR=${SINGULAR:-$bindir/Singular-$SINGULAR_MAJOR_VERSION${VERSION_SEP}$SINGULAR_MINOR_VERSION${VERSION_SEP}$SINGULAR_SUB_VERSION}
 AC_SUBST(SINGULAR)
 AC_DEFINE_UNQUOTED(S_BIN_DIR, "${bindir}")
 
@@ -574,7 +575,8 @@ ac_cv_header_readline_readline_h_ok="no",
       AC_CACHE_VAL(ac_cv_have_readline,
       AC_TRY_LINK(
 #include <stdio.h>
-,
+extern "C"
+{
 extern char * rl_readline_name;
 extern char *rl_line_buffer;
 char *filename_completion_function();
@@ -585,10 +587,13 @@ extern FILE * rl_outstream;
 char * readline ();
 void add_history ();
 int write_history ();
+int read_history();
+}
 #ifndef NULL
 #define NULL 0
 #endif
- rl_readline_name=NULL;
+,
+rl_readline_name=NULL;
 *rl_line_buffer=1;
 completion_matches(NULL, filename_completion_function);
 rl_attempted_completion_function = (CPPFunction *) NULL;

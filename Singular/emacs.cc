@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: emacs.cc,v 1.12 2000-04-27 10:07:05 obachman Exp $ */
+/* $Id: emacs.cc,v 1.13 2000-05-05 18:40:27 obachman Exp $ */
 /*
 * ABSTRACT: Esingular main file
 */
@@ -9,11 +9,13 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-
+#include <windows.h>
 #include "mod2.h"
 #include "version.h"
 
+#if !defined(TSINGULAR) && !defined(ESINGULAR)
 #define ESINGULAR
+#endif
 
 #define Alloc   malloc
 #define AllocL  malloc
@@ -37,25 +39,51 @@
 #  define  DIR_SEP '/'
 #  define  DIR_SEPP "/"
 #  define  UP_DIR ".."
-#define Warn  printf
-#define WarnS printf
+
+#ifndef WINNT
+void error(const char *fmt, ...)
+{
+  va_list ap;
+  va_start(ap, fmt);
+  fprintf(stderr, fmt, ap);
+}
+#else
+#include <windows.h>
+void error(char* fmt, ...)
+{
+   char buf[4096];
+   int j =0;
+   va_list args;
+   va_start(args, fmt);
+   j =   sprintf(buf,    "");
+   j += vsprintf(buf + j,fmt,args);
+   j +=  sprintf(buf + j,"\n");
+   va_end(args);
+   MessageBox(NULL, buf, "ESingular.exe", MB_ICONSTOP);
+   exit(1);
+}
+#endif
+
+#define Warn  error
+#define WarnS error
 #define StringAppend printf
-#define Print printf
+#define Print error
 
 #define feReportBug(s) fePrintReportBug(s, __FILE__, __LINE__)
 void fePrintReportBug(char* msg, char* file, int line)
 {
-  WarnS("YOU HAVE FOUND A BUG IN SINGULAR. ");
-  WarnS("Please, email the following output to singular@mathematik.uni-kl.de ");
-  Warn("Bug occured at %s:%d ", file, line);
-  Warn("Message: %s ", msg);
-  Warn("Version: " S_UNAME S_VERSION1 " (%lu) " __DATE__ __TIME__,
-       feVersionId);
+  error("YOU HAVE FOUND A BUG IN SINGULAR. 
+Please, email the following output to singular@mathematik.uni-kl.de
+Bug occured at %s:%d 
+Message: %s 
+Version: " S_UNAME S_VERSION1 " (%lu) " __DATE__ __TIME__,
+        file, line, msg, feVersionId);
+
 }
 
 void assume_violation(char* file, int line)
 {
-  fprintf(stderr, "Internal assume violation: file %s line %d\n", file, line);
+  error( "Internal assume violation: file %s line %d\n", file, line);
 }
    
 extern "C" {
@@ -66,7 +94,7 @@ extern "C" {
 
 void mainUsage()
 {
-  fprintf(stderr, "Use `%s --help' for a complete list of options\n", feArgv0);
+  error( "Use `%s --help' for a complete list of options\n", feArgv0);
 }
 
 int main(int argc, char** argv)
@@ -107,6 +135,11 @@ int main(int argc, char** argv)
         {
           switch(option_index)
           {
+#ifdef TSINGULAR
+              case FE_OPT_XTERM:
+                emacs = fe_optarg;
+              break;
+#else              
               case FE_OPT_EMACS:
                 emacs = fe_optarg;
                 break;
@@ -118,12 +151,12 @@ int main(int argc, char** argv)
               case FE_OPT_EMACS_LOAD:
                 emacs_load = fe_optarg;
                 break;
-                
+#endif                
               case FE_OPT_SINGULAR:
                 singular = fe_optarg;
                 break;
 
-              case FE_OPT_NO_EMACS_CALL:
+              case FE_OPT_NO_CALL:
                 no_emacs_call = 1;
                 break;
                 
@@ -141,14 +174,60 @@ int main(int argc, char** argv)
     }
     NEXT:{}
   }
+
+  int i, length = 0;
+  char* syscall;
+  for (i=1; i<argc; i++)
+  {
+    if (argv[i] != NULL) length += strlen(argv[i]) + 3;
+  }
+
+#ifdef TSINGULAR
+  if (emacs == NULL) emacs = feResource('X', 0);
+  if (emacs == NULL)
+  {
+    error( "Error: Can't find emacs xterm program. \n Expected it at %s or %s\n Specify alternative with --xterm=PROGRAM option,\n or set ESINGULAR_EMACS environment variable to the name of the program to use as xterm.\n", 
+           feResourceDefault('X'));
+    mainUsage();
+    exit(1);
+  }
   
+  if (singular == NULL) singular = feResource("SingularXterm", 0);
+  if (singular == NULL)
+  {
+    error( "Error: Can't find singular executable.\n Expected it at %s\n Specify with --singular option,\n or set TSINGULAR_SINGULAR environment variable.\n", 
+            feResourceDefault("SingularXterm"));
+    mainUsage();
+    exit(1);
+  }
+
+#ifdef WINNT 
+#define EXTRA_XTERM_ARGS "+vb -sl 2000 -fb Courier-bold-13 -tn linux -cr Red3"
+#else
+#define EXTRA_XTERM_ARGS ""
+#endif
+
+  syscall = (char*) AllocL(strlen(emacs) + 
+                                 strlen(singular) + 
+                                 length + 300);
+  sprintf(syscall, "%s %s -e %s ", emacs, EXTRA_XTERM_ARGS, singular);
+
+  for (i=1; i<argc; i++)
+  {
+    if (argv[i] != NULL)
+    {
+      strcat(syscall, " ");
+      strcat(syscall, argv[i]);
+    }
+  }
+#else  
   // make sure  emacs, singular, emacs_dir, emacs_load are set
   if (emacs == NULL) emacs = feResource("emacs", 0);
   if (emacs == NULL) emacs = feResource("xemacs", 0);
   if (emacs == NULL)
   {
-    fprintf(stderr, "Error: Can't find emacs executable. \n Expected it at %s\n Specify alternative with --emacs option,\n or set ESINGULAR_EMACS environment variable.\n", 
-            feResourceDefault("emacs"));
+    error( "Error: Can't find emacs or xemacs executable. \n Expected it at %s or %s\n Specify alternative with --emacs option,\n or set ESINGULAR_EMACS environment variable.\n", 
+            feResourceDefault("emacs"), feResourceDefault("xemacs"));
     mainUsage();
     exit(1);
   }
@@ -156,7 +235,7 @@ int main(int argc, char** argv)
   if (singular == NULL) singular = feResource("SingularEmacs", 0);
   if (singular == NULL)
   {
-    fprintf(stderr, "Error: Can't find singular executable.\n Expected it at %s\n Specify with --singular option,\n or set ESINGULAR_SINGULAR environment variable.\n", 
+    error( "Error: Can't find singular executable.\n Expected it at %s\n Specify with --singular option,\n or set ESINGULAR_SINGULAR environment variable.\n", 
             feResourceDefault("SingularEmacs"));
     mainUsage();
     exit(1);
@@ -165,7 +244,7 @@ int main(int argc, char** argv)
   if (emacs_dir == NULL) emacs_dir = feResource("EmacsDir", 0);
   if (emacs_dir == NULL)
   {
-    fprintf(stderr, "Error: Can't find emacs directory for Singular lisp files. \n Expected it at %s\n Specify with --emacs_dir option,\n or set ESINGULAR_EMACS_DIR environment variable.\n", 
+    error( "Error: Can't find emacs directory for Singular lisp files. \n Expected it at %s\n Specify with --emacs_dir option,\n or set ESINGULAR_EMACS_DIR environment variable.\n", 
             feResourceDefault("EmacsDir"));
     mainUsage();
     exit(1);
@@ -190,7 +269,7 @@ int main(int argc, char** argv)
         emacs_load = feResource("EmacsLoad", 0);
         if (emacs_load == NULL)
         {
-          fprintf(stderr, "Error: Can't find emacs load file for Singular mode. \n Expected it at %s\n Specify with --emacs_load option,\n or set ESINGULAR_EMACS_LOAD environment variable,\n or put file '.emacs-singular' in your home directory.\n", 
+          error( "Error: Can't find emacs load file for Singular mode. \n Expected it at %s\n Specify with --emacs_load option,\n or set ESINGULAR_EMACS_LOAD environment variable,\n or put file '.emacs-singular' in your home directory.\n", 
                   feResourceDefault("EmacsLoad"));  
           mainUsage();
           exit(1);
@@ -199,18 +278,11 @@ int main(int argc, char** argv)
     }
   }
   
-  // construct options
-  int i, length = 0;
-  for (i=1; i<argc; i++)
-  {
-    if (argv[i] != NULL) length += strlen(argv[i]) + 3;
-  }
-  
-  char* syscall = (char*) AllocL(strlen(emacs) + 
-                                 strlen(singular) + 
-                                 strlen(emacs_dir) + 
-                                 strlen(emacs_load) +
-                                 length + 300);
+  syscall = (char*) AllocL(strlen(emacs) + 
+                           strlen(singular) + 
+                           strlen(emacs_dir) + 
+                           strlen(emacs_load) +
+                           length + 300);
   char* prefix = "--";
   if (strstr(emacs, "xemacs") || strstr(emacs, "Xemacs") || strstr(emacs, "XEMACS"))
     prefix = "-";
@@ -224,6 +296,7 @@ int main(int argc, char** argv)
           emacs, prefix, emacs_dir, prefix, prefix, emacs_load, prefix, 
           singular, cwd);
 
+
   for (i=1; i<argc; i++)
   {
     if (argv[i] != NULL)
@@ -234,7 +307,8 @@ int main(int argc, char** argv)
     }
   }
   strcat(syscall, ") \"singular\")'");
-  
+#endif
+
   if (no_emacs_call)
   {
     printf("%s\n", syscall);
@@ -243,7 +317,7 @@ int main(int argc, char** argv)
   {
     if (system(syscall) != 0)
     {
-      fprintf(stderr, "Error: Execution of\n%s\n", syscall);
+      error( "Error: Execution of\n%s\n", syscall);
       mainUsage();
       exit(1);
     }

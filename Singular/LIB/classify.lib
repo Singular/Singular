@@ -1,8 +1,8 @@
-e// $Id: classify.lib,v 1.40 1999-12-13 15:33:44 obachman Exp $
+e// $Id: classify.lib,v 1.41 2000-05-05 18:40:29 obachman Exp $
 // KK, last modified: 04.04.1998
 ///////////////////////////////////////////////////////////////////////////////
 
-version  = "$Id: classify.lib,v 1.40 1999-12-13 15:33:44 obachman Exp $";
+version  = "$Id: classify.lib,v 1.41 2000-05-05 18:40:29 obachman Exp $";
 info="
 LIBRARY:  classify.lib  Procedures for the Arnold-Classifier of Singularities
 
@@ -2444,7 +2444,8 @@ proc debug_log (int level, list #)
 COMPUTE:  print \"messages\" if level>=@DeBug.
           useful for user-defined trace messages.
 EXAMPLE:  example debug_log; shows an example
-SEE ALSO: init_debug"
+SEE ALSO: init_debug
+"
 {
    int len = size(#);
 //   int printresult = printlevel - level +1;

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.h,v 1.5 2000-02-01 15:30:23 Singular Exp $ */
+/* $Id: feOpt.h,v 1.6 2000-05-05 18:40:28 obachman Exp $ */
 /*
 * ABSTRACT: Declarations for working with Options
 */
@@ -22,6 +22,8 @@ extern struct fe_option feOptSpec[];
 #if ! defined(GENTABLE) && ! defined(GENERATE_DEPEND)
 #ifdef ESINGULAR
 #include "feOptES.inc"
+#elif defined(TSINGULAR)
+#include "feOptTS.inc"
 #else
 #include "feOpt.inc"
 #endif

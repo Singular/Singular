@@ -37,9 +37,9 @@ CXX		= @CXX@
 LEX		= @LEX@
 PERL		= @PERL@
 BISON		= bison
-INSTALL		= ./install-sh -c
-INSTALL_PROGRAM	= ${INSTALL} 
-INSTALL_DATA	= ${INSTALL} -m 644
+INSTALL		= @INSTALL@
+INSTALL_PROGRAM	= @INSTALL_PROGRAM@ 
+INSTALL_DATA	= @INSTALL_DATA@
 MKINSTALLDIRS   = ./mkinstalldirs
 LN_S		= @LN_S@
 
@@ -95,7 +95,7 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
 
 # normal C source files
 CSOURCES=mmalloc.c mmheap.c mmpage.c mmcheck.c  mmisc.c mmtables.c \
-    mmbt.c weight0.c find_exec.c fegetopt.c fereadl.c page.c
+    mmbt.c weight0.c find_exec.c fegetopt.c fereadl.c page.c feOpenWinntUrl.c
 
 # special source files (need extra compiling and/or linking)
 ESOURCES=iparith.cc gmalloc.c tesths.cc mpsr_Tok.cc claptmpl.cc
@@ -246,15 +246,17 @@ libparse.cc: libparse.l
 	fi
 	${LEX} -I -Pyylp -olibparse.cc libparse.l
 
+# Hmm compiling with -fomit-frame-pointer resulted in access violation
+# under cygwin
 ESingular: fegetopt.o feResource.cc mod2.h feOpt.cc version.h emacs.cc \
            feOptES.inc
-	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o ESingular emacs.cc fegetopt.o ${LDFLAGS} ${LIBS}
+	${CXX} -O ${DEFS} -DESINGULAR -o ESingular emacs.cc fegetopt.o 
 
-ESingular-static: fegetopt.o feResource.cc mod2.h feOpt.cc version.h emacs.cc \
-           feOptES.inc
-	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${DEFS} -o ESingular emacs.cc fegetopt.o ${LDFLAGS} ${STATIC_LDFLAGS} ${LIBS}
+TSingular: fegetopt.o feResource.cc mod2.h feOpt.cc version.h emacs.cc \
+           feOptTS.inc
+	${CXX} -O ${DEFS} -DTSINGULAR -o TSingular emacs.cc fegetopt.o 
 
-feOpt.h: feOpt.inc feOptES.inc
+feOpt.h: feOpt.inc feOptES.inc feOptTS.inc
 
 feOpt.inc: feOpt.cc mod2.h
 	$(CXX) -DGENERATE_OPTION_INDEX -DHAVE_ASO=0 feOpt.cc -o feOpt
@@ -263,6 +265,11 @@ feOpt.inc: feOpt.cc mod2.h
 
 feOptES.inc: feOpt.cc
 	$(CXX) -DGENERATE_OPTION_INDEX  -DHAVE_ASO=0 -DESINGULAR feOpt.cc -o feOpt
+	./feOpt
+	rm -f feOpt feOpt.exe
+
+feOptTS.inc: feOpt.cc
+	$(CXX) -DGENERATE_OPTION_INDEX  -DHAVE_ASO=0 -DTSINGULAR feOpt.cc -o feOpt
 	./feOpt
 	rm -f feOpt feOpt.exe
 
@@ -290,15 +297,40 @@ configure: configure.in
 #	autoconf
 
 ##
+## windows only targets
+##
+run.o: run.c run.h
+	gcc -c -I. -O2 run.c -o run.o
+
+runTSingular : run.c run.h run.rc run.o
+	windres -DTSINGULAR -i run.rc -o run_res.o
+	gcc -mwindows -e _mainCRTStartup run.o run_res.o -o runTSingular.exe
+
+runESingular : run.c run.h run.rc run.o
+	windres -DESINGULAR -i run.rc -o run_res.o
+	gcc -mwindows -e _mainCRTStartup run.o run_res.o -o runESingular.exe
+
+run_res.o : run.rc
+	windres -i run.rc -o run_res.o
+
+run: run.c run.h run_res.o run.o
+	gcc -mwindows -e _mainCRTStartup run.o run_res.o -o run.exe
+
+##
 ## install targets
 ##
+ifeq ($(SINGUNAME),ix86-Win)
+RUN_SINGULARS=runESingular runTSingular
+endif
+
 install: all installbin installslib
 
-installbin: Singular libparse ESingular
+installbin: Singular libparse ESingular TSingular ${RUN_SINGULARS}
 	${MKINSTALLDIRS} ${bindir}
 	${INSTALL_PROGRAM} Singular ${SINGULAR}
-	${INSTALL_PROGRAM} libparse ${bindir}
+	${INSTALL_PROGRAM} libparse ${RUN_SINGULARS} ${bindir}
 	${INSTALL_PROGRAM} ESingular ${bindir}
+	${INSTALL_PROGRAM} TSingular ${bindir}
 	chmod a+x ${SINGULAR}
 	rm -f ${bindir}/Singular${EXEC_EXT}
 	cd ${bindir}; ${LN_S} ${SINGULAR} Singular${EXEC_EXT};\
@@ -320,6 +352,7 @@ uninstallbin:
 mostlyclean: 
 	-rm -f Singular Singularg Singularp Singularb libparse feOpt*.inc
 	-rm -f *.o *.og core *.op *.ob *.ot Singulart
+	-rm ESingular* TSingular*
 
 clean: mostlyclean
 	 -rm -f *.aso *.bak *.d *.dd depend 
@@ -345,31 +378,27 @@ maintainer-clean: distclean srcclean
 ## miscellanous targets
 ##
 
-Singular-bindist ESingular-bindist: $(HEADERS) $(SOURCES) Makefile depend
+Singular-bindist: $(HEADERS) $(SOURCES) Makefile depend
 	echo "#define MAKE_DISTRIBUTION	" > distrib.h
-	${MAKE} Singular ESingular
-	${INSTALL_PROGRAM} -s Singular Singular-bindist
-	${INSTALL_PROGRAM} -s ESingular ESingular-bindist
+	${MAKE} Singular ESingular TSingular
+	${INSTALL_PROGRAM} 
 	echo "#undef MAKE_DISTRIBUTION " > distrib.h
 
-Singular-static-bindist ESingular-static-bindist: $(HEADERS) $(SOURCES) Makefile depend
+Singular-static-bindist: $(HEADERS) $(SOURCES) Makefile depend
 	echo "#define MAKE_DISTRIBUTION	" > distrib.h
-	${MAKE} Singular-static ESingular-static 
-	${INSTALL_PROGRAM} -s Singular-static Singular-static-bindist
-	${INSTALL_PROGRAM} -s ESingular-static ESingular-static-bindist
+	${MAKE} Singular-static ESingular TSingular
+	${INSTALL_PROGRAM} -s Singular-static Singular
 	echo "#undef MAKE_DISTRIBUTION " > distrib.h
 
-install-bindist: Singular-bindist ESingular-bindist libparse
-	${MKINSTALLDIRS} ${install_bindir}
-	${INSTALL_PROGRAM} Singular-bindist ${install_bindir}/Singular
-	${INSTALL_PROGRAM} ESingular-bindist ${install_bindir}/ESingular
-	${INSTALL_PROGRAM} libparse ${install_bindir}/libparse
+install-bindist: libparse ${RUN_SINGULARS} Singular-bindist 
+	${MKINSTALLDIRS} ${install_bindir} 
+	${INSTALL_PROGRAM} -s Singular ESingular TSingular ${install_bindir}
+	${INSTALL_PROGRAM} -s libparse ${RUN_SINGULARS} ${install_bindir}
 
-install-static-bindist: Singular-static-bindist ESingular-static-bindist libparse
-	${MKINSTALLDIRS} ${install_bindir}
-	${INSTALL_PROGRAM} Singular-static-bindist ${install_bindir}/Singular
-	${INSTALL_PROGRAM} ESingular-static-bindist ${install_bindir}/ESingular
-	${INSTALL_PROGRAM} libparse ${install_bindir}/libparse
+install-static-bindist: libparse ${RUN_SINGULARS} Singular-static-bindist 
+	${MKINSTALLDIRS} ${install_bindir} 
+	${INSTALL_PROGRAM} -s Singular ESingular TSingular ${install_bindir}
+	${INSTALL_PROGRAM} -s libparse ${RUN_SINGULARS} ${install_bindir}
 
 install-sharedist: ${SLIBS_FILES} LIB/gftables
 	${MKINSTALLDIRS} ${install_slibdir}
@@ -452,7 +481,7 @@ installg: Singularg
 
 ESingularg: fegetopt.og feResource.cc mod2.h feOpt.cc version.h emacs.cc \
            feOptES.inc
-	${CXXG} ${CXXFLAGSG} ${CPPFLAGS} ${DEFSG} -o ESingularg emacs.cc fegetopt.og ${LDFLAGS} ${LIBS}
+	${CXXG} -DESINGULAR -g ${DEFSG} -o ESingularg emacs.cc fegetopt.og ${LDFLAGS} ${LIBS}
 
 ##
 ## compiler and linker options for profile version

@@ -1,5 +1,5 @@
 ;;; Emacs edit mode for this file is  -*- Emacs-Lisp -*-
-;;; $Id: .emacs-singular,v 1.11 1999-12-22 10:22:45 wichmann Exp $
+;;; $Id: .emacs-singular,v 1.12 2000-05-05 18:40:34 obachman Exp $
 
 ;;;
 ;;; .emacs-singular - Emacs initialization file to use for
@@ -93,7 +93,11 @@
 	  (function (lambda () (font-lock-mode 1))))
 
 ;; somewhat nicer scrolling 
-(setq scroll-step 1)
+;; This causes a core dump with 21.1.9 under cygwin, when a file is opened
+;; with a button
+;; obachman: Fixed it with a simmple patch, by working around the assertion
+;; in file indent.c line 517 (or so)
+(setq scroll-step 10)
 
 
 ;; this is a work-around for early version of Font Lock mode
@@ -127,6 +131,7 @@
  '(singular-help-same-window t)
  '(singular-cursor-key-model (quote terminal))
  '(transient-mark-mode t)
+ '(Info-button1-follows-hyperlink t)
  '(singular-section-face-alist (quote ((input . singular-section-input-face) (output)))))
 
 (custom-set-faces
@@ -140,6 +145,8 @@
  '(font-lock-type-face ((t (:bold t :foreground "violet"))) t)
  '(font-lock-comment-face ((t (:bold nil :foreground "Red"))) t)
  '(font-lock-function-name-face ((t (:bold t :foreground "blue3"))) t))
+ '(info-xref ((t (:foreground "blue" :bold t))))
+ '(info-node ((t (:foreground "blue" :bold t :italic nil))))
 ;; obachman: played around a little bit, found this better
 ;;  '(singular-section-input-face ((t (:bold t))))
 ;;  '(singular-section-output-face ((t (:bold nil))))

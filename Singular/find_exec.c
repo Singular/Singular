@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifndef ESINGULAR
+#if !defined(ESINGULAR) && !defined(XSINGULAR)
 #include "mmemory.h"
 #endif
 
@@ -26,7 +26,6 @@
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 1024
 #endif
-
 
 /* Do not return copies of sth, but simply the strings
    -- we make copies later */

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.23 2000-04-27 10:07:06 obachman Exp $ */
+/* $Id: feResource.cc,v 1.24 2000-05-05 18:40:28 obachman Exp $ */
 /*
 * ABSTRACT: management of resources
 */
@@ -10,7 +10,7 @@
 
 #include "mod2.h"
 #include "distrib.h"
-#ifndef ESINGULAR
+#if !defined(ESINGULAR) && !defined(TSINGULAR)
 #include "mmemory.h"
 #include "febase.h"
 extern "C" char* find_executable(const char* argv0);
@@ -20,7 +20,7 @@ extern "C" char* find_executable(const char* argv0);
 // #define RESOURCE_DEBUG
 
 #if defined(MAKE_DISTRIBUTION)
-#if defined(WINNT)
+#if defined(WINNT) && ! defined(__CYGWIN__)
 #define SINGULAR_DEFAULT_DIR "/Singular/"S_VERSION1
 #elif defined(macintosh)
 #define SINGULAR_DEFAULT_DIR "Macintosh HD:Singular:"S_VERSION1
@@ -79,7 +79,11 @@ static feResourceConfig_s feResourceConfigs[25] =
   {"netscape",  'N',    feResBinary,"NETSCAPE",             "%b/netscape",          ""},
   {"info",      'I',    feResBinary,"INFO",                 "%b/info",              ""},
   {"tkinfo",    'T',    feResBinary,"TKINFO",               "%b/tkinfo",            ""},
+#ifdef WINNT
+  {"rxvt",     'X',    feResBinary,"RXVT",                "%b/rxvt",             ""},
+#else
   {"xterm",     'X',    feResBinary,"XTERM",                "%b/xterm",             ""},
+#endif
   {"Path",      'p',    feResPath,  NULL,                   "%b;$PATH",         ""},
 #endif // ! defined(macintosh)
 
@@ -89,6 +93,8 @@ static feResourceConfig_s feResourceConfigs[25] =
   {"SingularEmacs",'M',feResBinary, "ESINGULAR_SINGULAR",    "%b/Singular",           ""},
   {"EmacsLoad",'l',    feResFile,   "ESINGULAR_EMACS_LOAD",  "%e/.emacs-singular",             ""},
   {"EmacsDir",  'e',    feResDir,   "ESINGULAR_EMACS_DIR",   "%r/emacs",             ""},
+#elif defined(TSINGULAR)
+  {"SingularXterm",'M',feResBinary, "TSINGULAR_SINGULAR",    "%b/Singular",           ""},
 #else
   {"EmacsDir",  'e',    feResDir,   "SINGULAR_EMACS_DIR",   "%r/emacs",             ""},
 #endif
@@ -253,6 +259,7 @@ static char* feResource(feResourceConfig config, int warn)
 
 static char* feResourceDefault(feResourceConfig config)
 {
+  if (config == NULL) return NULL;
   char* value = (char*) AllocL(MAXRESOURCELEN);
   feSprintf(value, config->fmt, -1);
   return value;
@@ -298,7 +305,13 @@ static char* feInitResource(feResourceConfig config, int warn)
     char* executable = feGetExpandedExecutable();
     if (executable != NULL)
     {
+#ifdef RESOURCE_DEBUG
+      printf("exec:%s\n", executable);
+#endif
       strcpy(value, executable);
+#ifdef RESOURCE_DEBUG
+      printf("value:%s\n", value);
+#endif
       FreeL(executable);
     }
   }
@@ -316,6 +329,10 @@ static char* feInitResource(feResourceConfig config, int warn)
       if (executable != NULL) *executable = '\0';
     }
   }
+
+#ifdef RESOURCE_DEBUG
+      printf("value:%s\n", value);
+#endif
 
   if (*value == '\0' && config->fmt != NULL )
   {
@@ -400,7 +417,7 @@ static char* feGetExpandedExecutable()
 #endif
   char* executable = find_executable(feArgv0);
 #ifdef RESOURCE_DEBUG
-  printf("feGetExpandedExecutable: find_exec exited with =%s=\n", executable);
+  printf("feGetExpandedExecutable: find_exec exited with =%s=%d\n", executable, access(executable, X_OK));
 #endif
   if (executable == NULL)
   {
@@ -420,6 +437,7 @@ static BOOLEAN feVerifyResourceValue(feResourceType type, char* value)
 {
 #ifdef RESOURCE_DEBUG
   printf("feVerifyResourceValue: entering with =%s=\n", value);
+  printf("%d:%d\n", access(value, R_OK), access(value, X_OK));
 #endif
   switch(type)
   {
@@ -448,11 +466,18 @@ static BOOLEAN feVerifyResourceValue(feResourceType type, char* value)
 static char* feCleanResourceValue(feResourceType type, char* value)
 {
   if (value == NULL || *value == '\0') return value;
+#ifdef RESOURCE_DEBUG
+      printf("Clean value:%s\n", value);
+#endif
 #ifdef WINNT
+#ifdef RESOURCE_DEBUG
+      printf("Clean WINNT value:%s\n", value);
+#endif
   if (type == feResBinary)
   {
     int l = strlen(value);
-    if (l < 4 || strcmp(&value[l-4], ".exe") != 0)
+    if (l < 4 || (strcmp(&value[l-4], ".exe") != 0 && 
+                  strcmp(&value[l-4], ".EXE") != 0))
       strcat(value, ".exe");
   }
 #endif

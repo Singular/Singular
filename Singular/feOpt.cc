@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.cc,v 1.10 2000-04-27 10:07:06 obachman Exp $ */
+/* $Id: feOpt.cc,v 1.11 2000-05-05 18:40:28 obachman Exp $ */
 /*
 * ABSTRACT: Implementation of option buisness
 */
@@ -51,6 +51,7 @@ struct fe_option feOptSpec[] =
 // Options whose hel starts with an "//" are considered undocumented,
 // i.e., their help is not printed on -h
 //
+#if defined(ESINGULAR) || defined(TSINGULAR)
 #ifdef ESINGULAR
 // options only relevant for ESINGULAR
   {"emacs",         required_argument,      LONG_OPTION_RETURN,
@@ -61,12 +62,16 @@ struct fe_option feOptSpec[] =
 
   {"emacs-load",        required_argument,  LONG_OPTION_RETURN,
    "FILE",      "Load FILE on emacs start-up, instead of default",     feOptString, 0,   0},
+#else
+  {"xterm",         required_argument,      LONG_OPTION_RETURN,
+   "XTERM",     "Use XTERM as terminal program to run Singular",          feOptString, 0,   0},
+#endif  
 
   {"singular",          required_argument,  LONG_OPTION_RETURN,
    "PROG",      "Start PROG as Singular program within emacs",         feOptString, 0,   0},
 
-  {"no-emacs-call",     no_argument,        LONG_OPTION_RETURN,
-   0,          "Do not start emacs. Print emacs-call to stdout",       feOptBool,   0,   0},
+  {"no-call",     no_argument,        LONG_OPTION_RETURN,
+   0,          "Do not start program. Print call to stdout",       feOptBool,   0,   0},
 #endif
 
 #ifdef HAVE_MPSR
@@ -170,7 +175,9 @@ main()
   FILE* fd;
 #ifdef ESINGULAR
   fd = fopen("feOptES.inc", "w");
-#else
+#elif defined(TSINGULAR)
+  fd = fopen("feOptXS.inc", "w");
+#else  
   fd = fopen("feOpt.inc", "w");
 #endif
 
@@ -261,7 +268,7 @@ static void feOptHelp(const char* name);
 //
 // Return: NULL -- everything ok
 //         "error-string" on error
-#ifndef ESINGULAR
+#if !defined(ESINGULAR) && !defined(TSINGULAR)
 #include "mmemory.h"
 #include "febase.h"
 #include "ipshell.h"

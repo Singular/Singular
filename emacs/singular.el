@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.56 2000-04-27 12:12:27 wichmann Exp $
+;; $Id: singular.el,v 1.57 2000-05-05 18:40:34 obachman Exp $
 
 ;;; Commentary:
 
@@ -3327,7 +3327,7 @@ associated to PROCESS.  The functions get the non-terminated string."
     (if (and process-buffer (buffer-name process-buffer))
 	(save-excursion
 	  (set-buffer process-buffer)
-	  (send-string
+	  (process-send-string
 	   process
 	   (concat (singular-run-hook-with-arg-and-value
 		    singular-pre-input-filter-functions string)
@@ -3977,7 +3977,7 @@ Returns BUFFER."
 		  (insert-file-contents start-file)
 		  (setq start-string (buffer-substring (point) (point-max)))
 		  (delete-region (point) (point-max))
-		  (send-string process start-string)))
+		  (process-send-string process start-string)))
 
 	    ;; read history if present
 	    (singular-history-read)
