@@ -21,9 +21,12 @@
  * Meta type definitions
  *
  ***************************************************************************/
-#define MP_CmtNumberRational           1
+#define MP_CmtNumberRational            1
 #define MP_CmtNumberInteger             2
 #define MP_CmtNumberComplex             3
+#define MP_CmtNumberReal                4
+#define MP_CmtNumberCharp               5
+#define MP_CmtNumberModulo              6
 
 
 /***************************************************************************

@@ -70,6 +70,7 @@ public:
   bool IsSpecOk();
   bool IsDataOk(const void* data);
   bool IsOk(const void* data) {return IsSpecOk() && IsDataOk(data);}
+  bool Equals(GP_pt other) {return false;}
 };
 
 typedef class GP_Object_t
@@ -175,7 +176,8 @@ typedef enum
   GP_ModuleCompType,
   GP_QuotientCompType,
   GP_VectorCompType,
-  GP_MatrixCompType 
+  GP_MatrixCompType,
+  GP_FreeModuleCompType
 } GP_CompType_t;
 
 class GP_Comp_t : virtual public GP_t
@@ -190,9 +192,14 @@ public:
   virtual   GP_pt    Elements()         = 0;
   // Iterator over Elmenets
   virtual   GP_Iterator_pt  ElementDataIterator(const void* data)  = 0;
-    
-  virtual void MatrixDimension(const void* data, int &dx, int &dy) 
+
+  // only relevant for matricies
+  virtual void MatrixDimension(int &dx, int &dy) 
     {dx = -1; dy = -1;}
+
+  // only relevant fro Free modules
+  virtual int   FreeModuleComponent(void* data);
+  virtual void* FreeModuleElement(void* data);
 };
 
 
@@ -318,7 +325,7 @@ public:
   virtual void* Coeff(const void* monom)                    = 0;
 
   // for DenseDistPoly, we simply let the Exp Vector be filled
-  virtual void       ExpVector(const void* monom, int* &expvector) {}
+  virtual void       ExpVector(const void* monom, long* &expvector) {}
 
   // for SparseDistPolys, we need another iterator
   virtual GP_Iterator_pt ExpVectorIterator(const void* monom) {return NULL;}
@@ -406,134 +413,12 @@ public:
   // blocks of orderings and number of blocks for product orderings 
   virtual GP_Iterator_pt BlockOrderingIterator() {return NULL;}
 
-  virtual void BlockLimits(const void* block, int &low, int &high) 
-    {low = -1; high = 0;}
+  virtual void BlockLength(const void* block, int &length)
+    {length = -1;}
 
 private:
   bool IsBlockOrderingOk(const void* block_ordering);
 };
-
-
-#if 0
-/***************************************************************
- ***************************************************************
- **
- ** Some other helpful classes
- ** 
- ***************************************************************
- ***************************************************************/
-// using CompleteVarNames, you do not have to bother any more about
-// having less variable names then actual variables
-class GP_CompleteVarNames_t 
-{
-  char  tmp[20];
-  char* prefix;
-  MP_Sint32_t vardiff;
-  MP_Uint32_t varnamesnumber;
-  GP_MvPoly_pt pspec;
-
-public:
-  GP_CompleteVarNames_t(GP_MvPoly_pt polyspec, char* prefix);
-  MP_NumChild_t     VarNamesNumber();
-  // if there are more variables then variable names, VarName uses the
-  // given prefix and constructs a varname by appending the number to
-  // the prefix
-  char*             VarName(MP_NumChild_t i);
-};
-
-
-/***************************************************************
- ***************************************************************
- **
- ** Some useful macros and utilities
- ** 
- ***************************************************************
- ***************************************************************/
-
-inline GP_OrderingType_t GP_CcPolyOrdering_2_OrderingType(MP_Common_t cc)
-{
-  switch(cc)
-  {
-      case  MP_CcPolyOrdering_Lex           : return GP_LexOrdering;
-      case  MP_CcPolyOrdering_DegRevLex     : return GP_DegRevLexOrdering;
-      case  MP_CcPolyOrdering_DegLex        : return GP_DegLexOrdering;
-      case  MP_CcPolyOrdering_NegLex        : return GP_NegLexOrdering;
-      case  MP_CcPolyOrdering_NegDegRevLex  : return GP_NegDegRevLexOrdering; 
-      case  MP_CcPolyOrdering_NegDegLex     : return GP_NegDegLexOrdering;
-      case  MP_CcPolyOrdering_Vector        : return GP_VectorOrdering;
-      case  MP_CcPolyOrdering_Matrix        : return GP_MatrixOrdering;
-      case  MP_CcPolyOrdering_IncComp        : return GP_IncCompOrdering;
-      case  MP_CcPolyOrdering_DecComp       : return GP_DecCompOrdering;
-
-      default : return GP_UnknownOrdering;
-  }
-}
-
-inline MP_Common_t
-GP_OrderingType_2_CcPolyOrdering(GP_OrderingType_t ordering)
-{
-  switch(ordering)
-  {
-      case GP_LexOrdering          : return MP_CcPolyOrdering_Lex;
-      case GP_DegRevLexOrdering    : return MP_CcPolyOrdering_DegRevLex;
-      case GP_DegLexOrdering       : return MP_CcPolyOrdering_DegLex;
-      case GP_NegLexOrdering       : return MP_CcPolyOrdering_NegLex;
-      case GP_NegDegLexOrdering    : return MP_CcPolyOrdering_NegDegLex;
-      case GP_NegDegRevLexOrdering : return MP_CcPolyOrdering_NegDegRevLex;
-      case GP_VectorOrdering       : return MP_CcPolyOrdering_Vector; 
-      case GP_MatrixOrdering       : return MP_CcPolyOrdering_Matrix;
-      case GP_IncCompOrdering      : return MP_CcPolyOrdering_IncComp;
-      case GP_DecCompOrdering      : return MP_CcPolyOrdering_DecComp;
-
-      default: return MP_CcPolyOrdering_Unknown;
-  }
-}
-
-extern MP_Sint32_t* g_GP_TmpVector;
-extern MP_Uint32_t  g_GP_TmpVectorLength;
-
-inline MP_Sint32_t* GP_GetTmpVector(MP_NumChild_t l)
-{
-  if (l < g_GP_TmpVectorLength)
-  {
-    if (g_GP_TmpVector != NULL)
-      g_GP_TmpVector = (MP_Sint32_t*)
-        IMP_MemReallocFnc(g_GP_TmpVector,
-                          l*sizeof(MP_Sint32_t),
-                          g_GP_TmpVectorLength*sizeof(MP_Sint32_t));
-    else
-      g_GP_TmpVector = (MP_Sint32_t*) IMP_MemAllocFnc(l*sizeof(MP_Sint32_t));
-    
-      g_GP_TmpVectorLength = l;
-  }   
-  return g_GP_TmpVector;
-}
-                                                 
-#ifndef NDEBUG
-#include <MPT.h>
-#define GP_Assume(x)   MPT_Assume(x)
-#define ERR_RTR(x)                                                            \
-do                                                                            \
-{                                                                             \
-  MP_Status_t _status = x;                                                    \
-  if (x != MP_Success)                                                        \
-  {                                                                           \
-    fprintf(stderr, "MP_Failure return in %s, Line %d, ErrorCode %d\n, Expression\n%s\n", \
-            __FILE__, __LINE__, _status, #x);                                          \
-    return _status;                                                                 \
-  }                                                                           \
-} while(0)
-#else
-#define GP_Assume(x)   ((void)0)
-#define ERR_RTR(x)
-do                                              \
-{                                               \
-  MP_Status_t _status = x;                      \
-  if (x != MP_Success) return _status;                \
-} while(0)
-#endif
-
-#endif
 
 #endif // _GP_H_
 

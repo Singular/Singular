@@ -64,7 +64,7 @@ bool GP_Atom_t::IsAtomSpecOk()
       AtomEncoding() == GP_UnknownAtomEncoding)
     return false;
   
-  if ((type == GP_ModuloAtomType || type == GP_ModuloAtomType) &&
+  if ((type == GP_ModuloAtomType || type == GP_CharPAtomType) &&
       GP_AtomModulus() == NULL) 
     return false;
 
@@ -145,7 +145,7 @@ bool GP_Comp_t::IsCompDataOk(const void* data)
       case GP_MatrixCompType:
       {
         int dx, dy;
-        MatrixDimension(data, dx, dy);
+        MatrixDimension(dx, dy);
         if (dx < 0 || dy < 0) return false;
         if (dx*dy != n) return false;
         break;
@@ -403,11 +403,11 @@ bool GP_RecMvPoly_t::IsRecMvPolyDataOk(const void* data)
 /////////////////////////////////////////////////////////////////////
 bool GP_Ordering_t::IsBlockOrderingOk(const void* block_ordering)
 {
-  int low, high;
+  int length;
   
-  BlockLimits(block_ordering, low, high);
+  BlockLimits(block_ordering, length);
   
-  if (low < 0 || high < low) return false;
+  if (length <= NULL) return false;
   
   switch (OrderingType(block_ordering))
   {
@@ -419,7 +419,7 @@ bool GP_Ordering_t::IsBlockOrderingOk(const void* block_ordering)
       {
         GP_Iterator_pt iter = WeightsIterator();
         if (iter == NULL) return false;
-        if (iter->N() != (high - low)*(high - low)) return false;
+        if (iter->N() != length*length) return false;
         return true;
       }
         
@@ -482,4 +482,24 @@ bool GP_Ordering_t::IsOk(const int nvars)
         return true;
   }
 }
+
+//
+//OBJECTS = mpGP.o
+//
+//olaf.mdm:	$(OBJECTS) olaf.cc
+//		mmg -g -v olaf.cc $(OBJECTS)
+//
+
+MFUNC( test, MCnop )
+{ MFnargsCheck(1);
+
+  GP_pt GPobj = mpGetGP( MFarg(1) );
+
+  if( GPobj == NULL ) 
+      MFreturn( MFcopy(MVunknown) );
+  if( mpCheckGP(GPobj) ) 
+      MFreturn( MFcopy(MVtrue) );
+  else
+      MFreturn( MFcopy(MVfalse) );
+} MFEND
 
