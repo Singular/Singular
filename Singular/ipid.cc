@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.48 2001-03-26 21:15:23 Singular Exp $ */
+/* $Id: ipid.cc,v 1.49 2001-03-27 17:08:24 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -463,9 +463,11 @@ void killhdl(idhdl h)
   else
   {
 #ifdef HAVE_NAMESPACES
-    if(t==PACKAGE_CMD) {
+    if(t==PACKAGE_CMD)
+    {
       killhdl(h,&NSROOT(namespaceroot->root));
-    } else
+    }
+    else
 #endif /* HAVE_NAMESPACES */
     {
       idhdl s=IDROOT;
@@ -653,6 +655,11 @@ void killhdl(idhdl h, idhdl * ih)
     hh = *ih;
     loop
     {
+      if (hh==NULL)
+      {
+        Print(">>%s<< not found for kill\n",IDID(h));
+	break;
+      }	
       idhdl hhh = IDNEXT(hh);
       if (hhh == h)
       {
