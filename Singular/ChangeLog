@@ -1,5 +1,8 @@
 1998-05-19  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
+	* find_exec.c (find_executable): add "." top path, if under WINNT
+	and MSDOS display
+
 	* mmutil.c (mmCheckDBMCB): use _end only #ifdef unix
 
 	* ideals.cc (idDelLmEquals): added idDelLmEqual == simplify(16),

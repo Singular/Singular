@@ -55,6 +55,7 @@ find_executable (const char *name)
 {
   char *search;
   char *p;
+  char *extra = NULL;
   char tbuf[MAXPATHLEN];
 
   if (ABSOLUTE_FILENAME_P(name)) {
@@ -90,7 +91,19 @@ find_executable (const char *name)
       return copy_of (tbuf);
     }
 
-    search = getenv ("PATH");
+
+    search = getenv("PATH");
+/* for winnt under msdos, cwd is implicetyly in the path */
+#ifdef WINNT
+    if (strlen(getenv("SHELL")) < 1)
+    {
+      /* we are under msdos */
+      extra = (char*) AllocL(strlen(search) + 3);
+      sprintf(extra, ".:");
+      strcat(extra, search);
+      search = extra;
+    }
+#endif
     p = search;
 
     while (*p) {
@@ -167,6 +180,10 @@ find_executable (const char *name)
 #ifndef STAT_MACROS_BROKEN
         if (! S_ISREG(stat_temp.st_mode))
           continue;
+#endif
+#ifdef WINNT
+        if (extra != NULL)
+          FreeL(extra);
 #endif
         return copy_of (tbuf);
       }
