@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ffops.h,v 1.5 1997-12-08 18:24:38 schmidt Exp $ */
+/* $Id: ffops.h,v 1.6 1998-04-14 15:16:24 pohl Exp $ */
 
 #ifndef INCL_FFOPS_H
 #define INCL_FFOPS_H
@@ -43,6 +43,7 @@ inline int ff_longnorm ( const long a )
 	return n;
 }
 
+#ifndef __MWERKS__
 inline int ff_bignorm ( const INT64 a )
 {
     int n = (int)(a % (INT64)ff_prime);
@@ -51,6 +52,7 @@ inline int ff_bignorm ( const INT64 a )
     else
 	return n;
 }
+#endif
 
 inline int ff_add ( const int a, const int b )
 {
@@ -67,6 +69,9 @@ inline int ff_neg ( const int a )
     return ff_norm( -a );
 }
 
+#ifdef __MWERKS__
+int ff_mul ( const int a, const int b );
+#else
 inline int ff_mul ( const int a, const int b )
 {
     if ( ff_big )
@@ -74,6 +79,7 @@ inline int ff_mul ( const int a, const int b )
     else
 	return ff_longnorm ( (long)a * (long)b );
 }
+#endif
 
 inline int ff_inv ( const int a )
 {
