@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.37 1998-05-07 09:10:58 krueger Exp $
+@comment $Id: general.doc,v 1.38 1998-05-07 10:05:17 wichmann Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -11,8 +11,6 @@
 @c @end menu
 @c @node General concepts, Data types, Introduction, Top
 @c @chapter General concepts
-
-@c test comment
 
 @menu
 * Interactive use::
@@ -2053,17 +2051,22 @@ description of each procedure).
 @item @strong{Syntax:}
 @code{version} = string_constant @code{;}
 @item @strong{Purpose:}
-define the version number for the library. It isdisplayed when the
+define the version number for the library. It is displayed when the
 library is loaded.
 @item @strong{Example:}
 @example
-  version="$I@c
-d: general.doc,v 1.35 1998/05/07 08:19:32 singular Exp $";
-  version="some version string"
+  version="$I@comment
+@comment !! Do not erase the @comment at the end of the previous line !!
+@comment !! It prevents cvs to substitue the id string                !!
+d: sample.lib,v 1.2 1998/05/07 singular Exp $";
+  version="some version string";
 @end example
 @item @strong{Note:}
-It is common practice to simply define the version string to be "$I@c d:$"
-and let a version control system expand it.
+It is common practice to simply define the version string to be 
+@code{"$I}@comment
+@comment !! Do not erase the @comment at the end of the previous line !!
+@comment !! It prevents cvs to substitue the id string                !!
+@code{d:$"} and let a version control system expand it.
 @end table
 
 @c ---------------------------------------
@@ -2079,12 +2082,16 @@ best.
 
 @c @table @code
 @example
-  // $I@c
+  // $I@comment
+@comment !! Do not erase the @comment at the end of the previous line !!
+@comment !! It prevents cvs to substitue the id string                !!
 d: template.lib,v 1.2 1998/05/07 08:19:32 singular Exp $
   //
   //
   ///////////////////////////////////////////////////////////////////////////
-  version="$I@c
+  version="$I@comment
+@comment !! Do not erase the @comment at the end of the previous line !!
+@comment !! It prevents cvs to substitue the id string                !!
 d: template.lib,v 1.2 1998/05/07 08:19:32 singular Exp $;
   info="
          LIBRARY: template.lib
