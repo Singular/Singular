@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.22 1998-05-25 09:36:09 schmidt Exp $
+@comment $Id: start.doc,v 1.23 1998-05-26 15:09:06 wichmann Exp $
 @comment this file contains the "Introduction" chapter.
 
 @c The following directives are necessary for proper compilation
@@ -208,6 +208,14 @@ keys are denoted using typewriter:
 @section Getting started
 @cindex Getting started
 
+@sc{Singular} is a special purpose System for polynomial
+computations. Hence, the most powerful computations in @sc{Singular}
+require the prior definition of a ring. Most important rings are
+polynomial rings over a field, localizations hereof, or quotient rings of 
+such rings modulo an ideal. However, some simple computations with
+integers (machine integers of limited size) and manipulations of strings 
+is available without a ring.
+
 @menu
 * First steps::                 
 * Rings and standard bases::    
@@ -222,19 +230,30 @@ keys are denoted using typewriter:
 @subsection First steps
 @cindex First steps
 
-Once @sc{Singular} is started, it attends input after the prompt @code{>}.
-Every statement has to be terminated by an @code{;} .
+Once @sc{Singular} is started, it attends an input after the prompt
+@code{>}.  Every statement has to be terminated by @code{;} .
 
 @example
-1+1;
-@expansion{} 2
+37+5;
+@expansion{} 42
 @end example
 
 All objects have a type, e.g., integer variables are defined by
-the word @code{int}. An assignment is done by the symbol @code{=}.
+the word @code{int}. An assignment is done by the symbol @code{=} .
 
 @example
 int k = 2;
+@end example
+
+@noindent Test for equality resp.@: inequality is done using @code{==}
+resp.@: @code{!=} (or @code{<>}), where @code{0} represents the boolean
+value FALSE, any other value represents TRUE.
+
+@example
+k == 2;
+@expansion{} 1
+k != 2;
+@expansion{} 0
 @end example
 
 @noindent The value of an object is displayed by simply typing its name
@@ -244,7 +263,7 @@ k;
 @expansion{} 2
 @end example
 
-@noindent On the other hand output is suppressed if an assignment
+@noindent On the other hand the output is suppressed if an assignment
 is made.
 
 @example
@@ -253,22 +272,22 @@ j = k+1;
 @end example
 
 @noindent The last displayed result is always available with the special
-symbol @code{_}.
+symbol @code{_} .
 
 @example
 2*_;   // the value from k displayed above
 @expansion{} 4
 @end example
 
-Furthermore @sc{Singular} maintains a history of the last inputs, which
-may be accessed by @code{CTRL-P} (previous) and @code{CTRL-N} (next) or
-the arrows on the keyboard.
-
 Text starting with @code{//} denotes a comment and is ignored in
-calculations, as seen in the previous example. The whole manual is
-online available with the command @code{help;} Explanation on single
-topics, e.g., on @code{intmat} which defines a matrix of integers are
-obtained by
+calculations, as seen in the previous example. Furthermore @sc{Singular}
+maintains a history of the last inputs, which may be accessed by
+@code{CTRL-P} (previous) and @code{CTRL-N} (next) or the arrows on the
+keyboard.
+
+The whole manual is online available with the command @code{help;}
+Explanation on single topics, e.g., on @code{intmat} which defines a
+matrix of integers are obtained by
 
 @example
 help intmat;
@@ -283,14 +302,15 @@ $3 \times 3$
 @ifinfo
 3 x 3
 @end ifinfo
-matrix of integers is defined and initialized with some values:
+matrix of integers is defined and initialized with some values, row-wise 
+from left to right:
 
 @example
 intmat m[3][3] = 1,2,3,4,5,6,7,8,9;
 @end example  
 
-@noindent A single matrix entry is selected with the square brackets
-@code{[} and @code{]}. 
+@noindent A single matrix entry may be selected and changed with the
+square brackets @code{[} and @code{]}.
 
 @example
 m[2,2]=0;
@@ -301,8 +321,8 @@ m;
 @end example  
 
 To calculate the fourth power of this integer matrix, use a @code{for} loop.
-The curly brackets @code{@{} and @code{@}} denote the begin and end of a
-block, resp.
+The curly brackets (@code{@{} and @code{@}}) denote the beginning
+resp.@: end of a block.
 
 @example
 intmat mm = m;
@@ -315,6 +335,10 @@ mm;
 @expansion{} 10688,10008,15528,
 @expansion{} 22316,20368,32460 
 @end example  
+
+@noindent Note that the entries are machine integers and a higher power
+may result in an integer overflow. For big numbers use a ring with
+characteristic 0.
 
 @c ------------------------------------------------------------------
 @node Rings and standard bases, Procedures and libraries, First steps, Getting started
@@ -330,10 +354,10 @@ ring r = 0,(x,y,z),dp;
 
 @noindent This declares a polynomial ring called @code{r} in
 characteristic zero and ring variables @code{x}, @code{y}, @code{z}. The
-@code{dp} at the end determines the term order of the polynomials and
-hence influences the standard basis calculation. The @code{p} stands for
-polynomial, so decreasing order of exponents, whereas a @code{s} means
-power series and increasing order of exponents.  
+@code{dp} at the end determines the monomial ordering and hence
+influences the standard resp.@: Groebner basis calculation. The @code{p}
+stands for polynomial, whereas @code{s} means series. (@pxref{Monomial
+orderings} for a detailed discussion.) 
 
 Define some polynomials:
 
@@ -345,18 +369,19 @@ f;
 @end example
 
 @noindent The command @code{size} determines in general the number of
-single entries in an object. In particular, for polynomials, @code{size}
-determines the number of monomials.
+''single entries`` in an object. In particular, for polynomials,
+@code{size} determines the number of monomials.
 
 @example
 size(f);
 @expansion{} 5
 
 @end example
-A natural question is to ask if a point e.g. @code{(x,y,z)=(1,2,0)} lies on the
-variety defined by the polynomials @code{f} and @code{g}. So define an
-ideal generated by both polynomials, substitute the coordinates of the
-point for the ring variables, and check if the result is zero:
+A natural question is to ask if a point e.g. @code{(x,y,z)=(1,2,0)} lies
+on the variety defined by the polynomials @code{f} and @code{g}. For
+this we define an ideal generated by both polynomials, substitute the
+coordinates of the point for the ring variables, and check if the result
+is zero:
 
 @example
 ideal I = f,g;
@@ -368,14 +393,14 @@ J;
 @expansion{} J[2]=0
 @end example
 
-@noindent Since the result is not zero, the point @code{(1,2,0)} is not
-lying on the variety @code{V(f,g)}. 
+@noindent Since the result is not zero, the point @code{(1,2,0)} does
+not lye on the variety @code{V(f,g)}.
 
-A second question is, to decide if some function vanishes on a variety,
-or in algebraic terms if a polynomial is included in a given ideal.
-This need a standard basis calculation with the command @code{std},
-then calculate the normalform of the asked polynomial with respect to
-the standard basis.
+Another question is, to decide wether some function vanishes on a
+variety, or in algebraic terms if a polynomial is contained in a given
+ideal.  This needs a standard basis calculation either with the command
+@code{std} or with the command @code{groebner}, then reduce the
+polynomial with respect to the standard basis.
 
 @example
 ideal sI = groebner(f);
@@ -386,8 +411,12 @@ reduce(g,sI);
 @noindent As the result is @code{0} the polynom @code{f} belongs to the
 ideal defined by @code{g}.
 
+Note that @code{std} is the usual standard basis command. The command
+@code{groebner} tries to find, by some heuristics, the fastest method
+to compute a standard basis.
+
 The command @code{kbase} calculates a basis of the polynomial ring
-modulo an ideal. As application calculate the Milnor number of a hyper
+modulo an ideal. As an example calculate the Milnor number of a hyper
 surface singularity in the global and local case. This is the vector
 space dimension of the polynomial ring modulo the Jacobian ideal in the
 global case resp.@: of the power series ring modulo the Jacobian ideal.
@@ -403,21 +432,11 @@ J;
 @end example
 
 To get a representing set of the quotient vectorspace 
-a standard basis has to be calculated first.
+a standard basis has to be calculated first and then the function
+@code{kbase} has to be applied.
 
 @example
 J = std(J);
-J;
-@expansion{} J[1]=z
-@expansion{} J[2]=3x2y2-2xy3+3x2
-@expansion{} J[3]=2x3y-2xy3+3x2+3y2
-@expansion{} J[4]=4x4-12xy3+4y4+9x2+9y2
-@expansion{} J[5]=20y5+54x3-45x2y-30xy2-81y3
-@expansion{} J[6]=10xy4+18x3-15x2y-27y3
-@end example
-
-Then 
-@example
 ideal K = kbase(J);
 K;
 @expansion{} K[1]=y4
@@ -434,7 +453,7 @@ K;
 @expansion{} K[12]=1
 @end example
 
-@noindent and
+@noindent Then
 
 @example
 size(I);
@@ -450,9 +469,9 @@ size(kbase(std(jacob(f))));
 @expansion{} 12
 @end example
 
-Because we are not interested in the elements of the quotient
-vector space, but only in the resulting dimension we may even use the
-command @code{vdim} and write:
+When we are not interested in a basis of the quotient vector space, but
+only in the resulting dimension we may even use the command @code{vdim}
+and write:
 
 @example
 vdim(std(jacob(f)));
@@ -488,11 +507,18 @@ Milnor(f);
 @end example
 
 With @sc{Singular} come several libraries, a collection of useful
-procedures based on the kernel commands, which extends now the
-functionality of @sc{Singular}. One of these is, e.g., @code{sing.lib}
-which contains already a procedure called @code{milnor} to calculate the
-Milnor number not only for hyper surfaces but more generally for complete
-intersection singularities.
+procedures based on the kernel commands, which extend the functionality
+of @sc{Singular}. The command @code{help "all.lib";} lists all libraries
+together with a one-line explanation. The command @code{help}
+library_name@code{;} lists all procedures of the library, @code{help}
+proc_name@code{;} shows an explanation of the procedure after the
+library has been loaded. The command @code{LIB "all.lib";} loads all
+libraries. 
+
+One of these libraries is @code{sing.lib} which contains already a
+procedure called @code{milnor} to calculate the Milnor number not only
+for hyper surfaces but more generally for complete intersection
+singularities.
 
 Libraries are loaded with the command @code{LIB}. Some additional
 information during the process of loading is displayed on the screen,
