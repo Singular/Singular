@@ -1,0 +1,15 @@
+#!/bin/sh
+for i in $*
+do
+  case $i in
+  --prefix=*) prefix=`echo $i|sed 's/--prefix=//'` ;;
+  --libdir=*) libdir=`echo $i|sed 's/--libdir=//'` ;;
+  --includedir=*) includedir=`echo $i|sed 's/--includedir=//'` ;;
+  esac
+done
+cd src
+
+./configure LIBDIR=$libdir INCLUDEDIR=$includedir PREFIX=$prefix
+
+cd ..
+
