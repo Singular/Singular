@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-/* $Id: factory.template,v 1.4 1997-04-30 13:58:31 schmidt Exp $ */
+/* $Id: factory.template,v 1.5 1997-05-06 15:24:24 schmidt Exp $ */
 
 #ifndef INCL_FACTORY_H
 #define INCL_FACTORY_H
@@ -9,6 +9,12 @@
 #ifndef NOSTREAMIO
 #include <iostream.h>
 #endif /* NOSTREAMIO */
+
+#ifdef SINGULAR
+extern "C" {
+#include <gmp.h>
+}
+#endif
 
 #include <templates/array.h>
 #include <templates/factor.h>
@@ -62,5 +68,13 @@
 
 /*MAKEHEADER PUBLIC ONLY*/
 #include "cf_reval.h"
+
+#ifdef SINGULAR
+/*MAKEHEADER PUBLIC ONLY*/
+#include "gfops.h"
+
+/*MAKEHEADER PUBLIC ONLY*/
+#include "singext.h"
+#endif
 
 #endif /* INCL_FACTORY_H */
