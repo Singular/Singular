@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.12 2004-08-13 18:26:03 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.13 2004-08-14 13:55:27 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -2302,5 +2302,28 @@ poly p_CopyEmbed(poly p, ring srcRing, int shift, int par_shift)
   }
   return(q);
 }
+
+poly p_Oppose(ring Rop, poly p)
+{
+  /* TODO check Rop == rOpposite(currRing) */
+  /* the same basefield, same number of variables */
+
+  /* the simplest case:*/
+  if (Rop==currRing) return pCopy(p); // ok
+  nMapFunc nMap=nSetMap(Rop);
+  int *perm=(int *)omAlloc0((Rop->N+1)*sizeof(int));
+  /* we know perm exactly */
+  int i;
+  for(i=1; i<=Rop->N; i++)
+  {
+    perm[i] = Rop->N+1-i;
+  }
+  /*  int *par_perm=NULL; */
+  poly res = pPermPoly(p, perm, Rop, nMap);
+  omFreeSize((ADDRESS)perm,(Rop->N+1)*sizeof(int));
+  //omFreeSize((ADDRESS)par_perm,rPar(r)*sizeof(int));
+  return res;
+}
+
 
 #endif

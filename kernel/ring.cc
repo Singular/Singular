@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.19 2004-08-14 12:11:55 Singular Exp $ */
+/* $Id: ring.cc,v 1.20 2004-08-14 13:55:28 levandov Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3571,19 +3571,19 @@ ring rOpposite(ring src)
     }
   }
   // avoid printing changed stuff:
-//   r->order[0]=ringorder_unspec;
-//   r->block0[0]=1;
-//   r->block1[0]=rVar(r);
-//   r->order[1]=0;
+  r->order[0]=ringorder_unspec;
+  r->block0[0]=1;
+  r->block1[0]=rVar(r);
+  r->order[1]=0;
 // #ifdef RDEBUG
 //   rDebugPrint(r);
 //#endif
-  /* now, we initialize a non-comm structure on it */
-  rComplete(r); /* dare we? */
-  //#ifdef HAVE_PLURAL
+
+#ifdef HAVE_PLURAL
+  /* now, we initialize a non-comm structure on r */
   if (!rIsPluralRing(src))
   {
-    return(r);
+    return r;
   }
   rChangeCurrRing(r);  
   /* basic nc constructions  */
@@ -3617,7 +3617,9 @@ ring rOpposite(ring src)
   if (nc_InitMultiplication(r))
     WarnS("Error initializing multiplication!");
   r->nc->IsSkewConstant =   src->nc->IsSkewConstant;
+  omFreeSize((ADDRESS)perm,(r->N+1)*sizeof(int));
   rChangeCurrRing(save);
+#endif HAVE_PLURAL
   return r;
 }
 

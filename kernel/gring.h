@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.6 2004-08-13 18:28:01 levandov Exp $ */
+/* $Id: gring.h,v 1.7 2004-08-14 13:55:27 levandov Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -83,6 +83,7 @@ matrix nc_PrintMat(int a, int b, ring r, int metric);
 int nc_CheckSubalgebra(poly PolyVar, ring r);
 
 poly p_CopyEmbed(poly p, ring srcRing, int shift, int par_shift);
+poly p_Oppose(ring Rop, poly p);
 
 #else
 /* dummy definition to make gcc happy */
