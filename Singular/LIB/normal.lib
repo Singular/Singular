@@ -4,7 +4,7 @@
 // the criterion of Grauert/Remmert and ideas of De Jong & Vasconcelos
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: normal.lib,v 1.21 1999-11-17 13:53:15 pfister Exp $";
+version="$Id: normal.lib,v 1.22 2000-05-08 15:52:50 pfister Exp $";
 info="
 LIBRARY:  normal.lib     PROCEDURES FOR NORMALIZATION
 AUTHORS:  Gert-Martin Greuel, email: greuel@mathematik.uni-kl.de,
@@ -376,7 +376,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc normal(ideal id, list #)
 "USAGE:   normal(i [,choose]);  i a radical ideal, choose empty or 1
-         if choose=1 the factorizing Buchberger algorithm is not used
+         if choose=1 the normalization of the associated primes is computed 
          (which is sometimes more efficient)
 RETURN:  a list of rings (say nor), in each ring nor[i] are two ideals
          norid, normap such that the direct sum of the rings nor[i]/norid is 
@@ -404,142 +404,110 @@ EXAMPLE: example normal; shows an example
      "// please change to global ordering!";
      return(result);
    }
-
-   if(size(#)==0)
-//--------------- the factorizing Buchberger algorithm is used ---------------
+   if( typeof(attrib(id,"isCompleteIntersection"))=="int" )
    {
-      prim[1]=id;
+      if(attrib(id,"isCompleteIntersection")==1)
+      {
+         attrib(id,"isCohenMacaulay",1);
+         attrib(id,"isEquidimensional",1);
+      } 
+   }       
+   if( typeof(attrib(id,"isCohenMacaulay"))=="int" )
+   {
+      if(attrib(id,"isCohenMacaulay")==1)
+      {
+         attrib(id,"isEquidimensional",1);
+      } 
+   }       
+   if( typeof(attrib(id,"isPrim"))=="int" )
+   {
+      if(attrib(id,"isPrim")==1)
+      {
+         attrib(id,"isEquidimensional",1);
+      } 
+   }       
+   if(size(#)==0)
+   {
       if( typeof(attrib(id,"isEquidimensional"))=="int" )
       {
-        if(attrib(id,"isEquidimensional")==1)
-        {
-           attrib(prim[1],"isEquidimensional",1);
-        }
+         if(attrib(id,"isEquidimensional")==1)
+         {
+            prim[1]=id;
+         }
+         else
+         {
+            prim=equidim(id);
+         }
       }
       else
       {
-         attrib(prim[1],"isEquidimensional",0);
+         prim=equidim(id);
       }
-      if( typeof(attrib(id,"isCompleteIntersection"))=="int" )
-      {
-        if(attrib(id,"isCompleteIntersection")==1)
-        {
-           attrib(prim[1],"isCompleteIntersection",1);
-        }
-      }
-      else
-      {
-         attrib(prim[1],"isCompleteIntersection",0);
-      }
-
-      if( typeof(attrib(id,"isPrim"))=="int" )
-      {
-        if(attrib(id,"isPrim")==1)  {attrib(prim[1],"isPrim",1); }
-      }
-      else
-      {
-         attrib(prim[1],"isPrim",0);
-      }
-      if( typeof(attrib(id,"isIsolatedSingularity"))=="int" )
-      {
-         if(attrib(id,"isIsolatedSingularity")==1)
-             {attrib(prim[1],"isIsolatedSingularity",1); }
-      }
-      else
-      {
-         attrib(prim[1],"isIsolatedSingularity",0);
-      }
-      if( typeof(attrib(id,"isCohenMacaulay"))=="int" )
-      {
-         if(attrib(id,"isCohenMacaulay")==1)
-           { attrib(prim[1],"isCohenMacaulay",1); }
-      }
-      else
-      {
-         attrib(prim[1],"isCohenMacaulay",0);
-      }
-      if( typeof(attrib(id,"isRegInCodim2"))=="int" )
-      {
-         if(attrib(id,"isRegInCodim2")==1)
-         { attrib(prim[1],"isRegInCodim2",1);}
-      }
-      else
-      {
-          attrib(prim[1],"isRegInCodim2",0);
-      }
-
-      result = normalizationPrimes(prim[1],maxideal(1));
-      sr = string(size(result));
-      
-      dbprint(y+1,"
-// 'normal' created a list of "+sr+" ring(s).
-// To see the rings, type (if the name of your list is nor):
-     show( nor);
-// To access the 1-st ring and map (and similair for the others), type:
-     def R = nor[1]; setring R;  norid; normap;
-// R/norid is the 1-st ring of the normalization and
-// normap the map from the original basering to R/norid");
-
-       return(result);
-   }
-   else
-//------------- the factorizing Buchberger algorithm is not used -------------
-   {
-      if(#[1]==0)
-      {
-         prim=minAssPrimes(id);
-      }
-      else
-      {
-         prim=minAssPrimes(id,1);
-      }
-
       if(y>=1)
       {
-         "// we have ",size(prim),"components";
+         "// we have ",size(prim),"equidimensional components";
       }
-      for(i=1; i<=size(prim); i++)
+   }
+   else
+   {  
+      if( typeof(attrib(id,"isPrim"))=="int" )
       {
-         if(y>=1)
+         if(attrib(id,"isPrim")==1)
          {
-            "// we are in loop ",i;
-         }
-         attrib(prim[i],"isCohenMacaulay",0);
-         attrib(prim[i],"isPrim",1);
-         attrib(prim[i],"isRegInCodim2",0);
-         attrib(prim[i],"isIsolatedSingularity",0);
-         attrib(prim[i],"isEquidimensional",0);
-         attrib(prim[i],"isCompleteIntersection",0);
-
-         if( typeof(attrib(id,"isEquidimensional"))=="int" )
-         {
-           if(attrib(id,"isEquidimensional")==1)
-           {
-              attrib(prim[i],"isEquidimensional",1);
-           }
+            prim[1]=id;
          }
          else
-         {
-            attrib(prim[i],"isEquidimensional",0);
+         {   
+            prim=minAssPrimes(id);
          }
-         if( typeof(attrib(id,"isIsolatedSingularity"))=="int" )
-         {
+      }
+      else
+      {
+         prim=minAssPrimes(id);
+      }         
+      if(y>=1)
+      {
+         "// we have ",size(prim),"irreducible components";
+      }
+   }
+   for(i=1; i<=size(prim); i++)
+   {
+      if(y>=1)
+      {
+         "// we are in loop ",i;
+      }
+      attrib(prim[i],"isCohenMacaulay",0);
+      if(size(#)!=0)
+      {
+         attrib(prim[i],"isPrim",1);
+      }
+      else
+      {
+         attrib(prim[i],"isPrim",0);
+      }
+      attrib(prim[i],"isRegInCodim2",0);
+      attrib(prim[i],"isIsolatedSingularity",0);
+      attrib(prim[i],"isEquidimensional",1);
+      attrib(prim[i],"isCompleteIntersection",0);
+
+      if( typeof(attrib(id,"isIsolatedSingularity"))=="int" )
+      {
             if(attrib(id,"isIsolatedSingularity")==1)
              {attrib(prim[i],"isIsolatedSingularity",1); }
-         }
-         else
-         {
-            attrib(prim[i],"isIsolatedSingularity",0);
-         }
+      }
 
-         keepresult=normalizationPrimes(prim[i],maxideal(1));
-         for(j=1;j<=size(keepresult);j++)
-         {
-            result=insert(result,keepresult[j]);
-         }
+      if( typeof(attrib(id,"isCompleteIntersection"))=="int" )
+      {
+            if((attrib(id,"isIsolatedSingularity")==1)&&(size(#)==0))
+             {attrib(prim[i],"isIsolatedSingularity",1); }
+      }
+      keepresult=normalizationPrimes(prim[i],maxideal(1));
+      for(j=1;j<=size(keepresult);j++)
+      {
+         result=insert(result,keepresult[j]);
       }
       sr = string(size(result));
-
+   }
       dbprint(y+1,"
 // 'normal' created a list of "+sr+" ring(s). 
 // To see the rings, type (if the name of your list is nor):
@@ -551,7 +519,6 @@ EXAMPLE: example normal; shows an example
 
       //kill endphi,endid;
       return(result);
-   }
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -617,6 +584,7 @@ EXAMPLE: example normalizationPrimes; shows an example
    {
      "// SB-computation of the input ideal";
    }
+   
    list SM=mstd(i);                //here the work starts
    int dimSM =  dim(SM[1]);
   // Case: Get an ideal containing a unit
@@ -687,7 +655,7 @@ EXAMPLE: example normalizationPrimes; shows an example
    {
       attrib(SM[2],"isRegInCodim2",0);
    }
-    if(attrib(i,"isEquidimensional")==1)
+   if(attrib(i,"isEquidimensional")==1)
    {
       attrib(SM[2],"isEquidimensional",1);
    }
@@ -820,7 +788,6 @@ write (":a normal-fehler" ,
          "//   the dimension of the singular locus is:";"";
          dim(JM[1]); "";
       }
-
       attrib(JM[2],"isRad",0);
       //   timer-ti;
       attrib(JM[1],"isSB",1);
@@ -848,7 +815,7 @@ write (":a normal-fehler" ,
       {
          attrib(SM[2],"isIsolatedSingularity",1);
       }
-      if(dim(JM[1])<=nvars(basering)-2)
+      if(dim(JM[1])<=dim(SM[1])-2)
       {
          attrib(SM[2],"isRegInCodim2",1);
       }
@@ -861,6 +828,26 @@ write (":a normal-fehler" ,
         attrib(JM[1],"isSB",1);
         attrib(SM[2],"isRegInCodim2",1);
      }
+   }
+   if((attrib(SM[2],"isRegInCodim2")==1)&&(attrib(SM[2],"isCohenMacaulay")==1))
+   {      
+      if(y>=1)
+      {
+            "// the ideal was CohenMacaulay and regular in codimension 2";
+      }
+      MB=SM[2];
+      intvec rw;
+      list LL=substpart(MB,ihp,0,rw);
+      def newR6=LL[1];
+      setring newR6;
+      ideal norid=endid;
+      ideal normap=endphi;
+      kill endid,endphi;
+      export norid;
+      export normap;
+      result=newR6;
+      setring BAS;
+      return(result);          
    }
    //if it is an isolated singularity things are easier
    if((dim(JM[1])==0)&&(homog(SM[2])==1))
@@ -1249,6 +1236,7 @@ a3b2cd-bc2d4+ab2c3e-b5de-d6e+3abcd2e2-a2be4-de6,
 a4b2c-abc2d3-ab5e-b3c2de-ad5e+2a2bcde2+cd2e4,
 b6c+bc6+a2b4e-3ab2c2de+c4d2e-a3cde2-abd3e2+bce5;
 
+int aa=timer;list nor=normal(i);timer-aa;
 
 //Vasconcelos
 ring r=32003,(x,y,z,w,t),dp;
@@ -1261,6 +1249,11 @@ y2w4-xy2z2t-w3t3;
 //Theo1
 ring r=32003,(x,y,z),wp(2,3,6);
 ideal i=zy2-zx3-x6;
+
+//Theo1a (CohenMacaulay and regular in codimension 2)
+ring r=32003,(x,y,z,u),wp(2,3,6,6);
+ideal i=zy2-zx3-x6+u2;
+
 
 //Theo2
 ring r=32003,(x,y,z),wp(3,4,12);
@@ -1410,6 +1403,10 @@ qtx,
 uv2z-uwz,
 uv3-uvw,
 puv2-puw;
+
+ring r=0,(u,v,w,x,y,z),wp(1,1,1,3,2,1);
+ideal i=wx,wy,wz,vx,vy,vz,ux,uy,uz,y3-x2;
+
 
 
 */
