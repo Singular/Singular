@@ -1,5 +1,12 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: clapconv.h,v 1.2 1997-03-21 13:18:55 Singular Exp $
+/****************************************
+*  Computer Algebra System SINGULAR     *
+****************************************/
+// $Id: clapconv.h,v 1.3 1997-04-09 12:19:39 Singular Exp $
+/*
+* ABSTRACT: convert data between Singular and factory
+*/
+
 
 #ifndef INCL_SINGCONV_H
 #define INCL_SINGCONV_H
@@ -24,4 +31,6 @@ alg convClapASingA ( const CanonicalForm & f );
 CanonicalForm convSingTrPClapP ( poly p );
 poly convClapPSingTrP ( const CanonicalForm & f );
 
+// CanonicalForm convSingIClapI( int i);a <- by constructor of CanonicalForm
+int convClapISingI( const CanonicalForm & f);
 #endif /* INCL_SINGCONV_H */

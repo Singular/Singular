@@ -3,8 +3,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: ideals.h,v 1.3 1997-04-09 12:19:44 Singular Exp $ */
 /*
-* ABSTRACT
+* ABSTRACT - all basic methods to manipulate ideals
 */
 #include "structs.h"
 

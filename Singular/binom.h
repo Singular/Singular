@@ -3,8 +3,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: binom.h,v 1.3 1997-04-09 12:19:38 Singular Exp $ */
 /*
-* ABSTRACT
+* ABSTRACT - set order (=number of monomial) for dp
 */
 //#define TEST_MAC_ORDER
 #ifdef TEST_MAC_ORDER

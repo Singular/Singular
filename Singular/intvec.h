@@ -3,8 +3,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: intvec.h,v 1.3 1997-04-09 12:19:45 Singular Exp $ */
 /*
-* ABSTRACT
+* ABSTRACT: class intvec: lists/vectors of integers
 */
 #include <string.h>
 #include "mmemory.h"

@@ -3,10 +3,10 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: sing_mp.h,v 1.5 1997-04-09 12:20:11 Singular Exp $ */
 /*
-* ABSTRACT
+* ABSTRACT: interface to MP links
 */
-/* $Id: sing_mp.h,v 1.4 1997-04-08 08:43:31 obachman Exp $ */
 
 
 #ifdef HAVE_MPSR

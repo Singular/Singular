@@ -3,6 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: cntrlc.h,v 1.3 1997-04-09 12:19:41 Singular Exp $ */
 /*
 * ABSTRACT - interupt and signal handling
 */

@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.3 1997-04-08 16:49:16 Singular Exp $
+// $Id: clapconv.cc,v 1.4 1997-04-09 12:19:38 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -516,4 +516,9 @@ convRecTrP ( const CanonicalForm & f, int * exp, poly & result , int offs)
   }
 }
 
+int convClapISingI( const CanonicalForm & f)
+{
+  if (!f.isImm()) Werror("int overflow in det");
+  return f.intval();
+}
 #endif

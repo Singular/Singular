@@ -1,10 +1,10 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.cc,v 1.11 1997-04-08 08:43:32 obachman Exp $ */
+/* $Id: subexpr.cc,v 1.12 1997-04-09 12:20:14 Singular Exp $ */
 
 /*
-* ABSTRACT:
+* ABSTRACT: handling of leftv
 */
 
 #include <stdlib.h>
@@ -211,6 +211,7 @@ void sleftv::Print(leftv store, int spaces)
     && (t/*Typ()*/!=QRING_CMD)
     && (t/*Typ()*/!=PACKAGE_CMD)
     && (t/*Typ()*/!=PROC_CMD)
+    && (t/*Typ()*/!=DEF_CMD)
     )
     {
       store->rtyp=t/*Typ()*/;
@@ -542,6 +543,7 @@ void * sleftv::CopyD(int t)
     case LINK_CMD:
       return (void *)slCopy((si_link) d);
     case 0:
+    case DEF_CMD:
       break;
 #ifdef TEST
     //case RING_CMD:

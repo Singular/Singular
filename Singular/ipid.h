@@ -3,8 +3,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: ipid.h,v 1.3 1997-04-09 12:19:50 Singular Exp $ */
 /*
-* ABSTRACT
+* ABSTRACT: identfier handling
 */
 #include <string.h>
 #include "structs.h"

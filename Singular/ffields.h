@@ -3,8 +3,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: ffields.h,v 1.3 1997-04-09 12:19:43 Singular Exp $ */
 /*
-* ABSTRACT - interupt and signal handling
+* ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
 #include "structs.h"
 

@@ -3,8 +3,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: ipconv.h,v 1.3 1997-04-09 12:19:49 Singular Exp $ */
 /*
-* ABSTRACT
+* ABSTRACT: interpreter: converting types
 */
 #include "structs.h"
 

@@ -3,10 +3,10 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: stairc.h,v 1.3 1997-04-09 12:20:13 Singular Exp $ */
 /*
 * ABSTRACT
 */
-/* $Id: stairc.h,v 1.2 1997-03-24 14:25:56 Singular Exp $ */
 
 #include "structs.h"
 

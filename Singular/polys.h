@@ -3,8 +3,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: polys.h,v 1.3 1997-04-09 12:20:06 Singular Exp $ */
 /*
-* ABSTRACT
+* ABSTRACT - all basic methods to manipulate polynomials
 */
 #include "structs.h"
 

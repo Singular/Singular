@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.2 1997-04-08 16:49:18 Singular Exp $
+// $Id: clapsing.cc,v 1.3 1997-04-09 12:19:40 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -621,6 +621,23 @@ poly singclap_det( const matrix m )
   }
   else
     WerrorS( "not implemented" );
+  Off(SW_RATIONAL);
+  return res;
+}
+
+int singclap_det_i( intvec * m )
+{
+  setCharacteristic( 0 );
+  CFMatrix M(m->rows(),m->cols());
+  int i,j;
+  for(i=1;i<=m->rows();i++)
+  {
+    for(j=1;j<=m->cols();j++)
+    {
+      M(i,j)=IMATELEM(*m,i,j);
+    }
+  }
+  int res= convClapISingI( determinant(M,m->rows())) ;
   Off(SW_RATIONAL);
   return res;
 }

@@ -3,6 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: matpol.h,v 1.4 1997-04-09 12:19:58 Singular Exp $ */
 /*
 * ABSTRACT
 */

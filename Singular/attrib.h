@@ -3,8 +3,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: attrib.h,v 1.3 1997-04-09 12:19:37 Singular Exp $ */
 /*
-* ABSTRACT
+* ABSTRACT: attributes to leftv and idhdl
 */
 #include <string.h>
 #include "structs.h"

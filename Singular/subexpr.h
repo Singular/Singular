@@ -3,10 +3,10 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: subexpr.h,v 1.3 1997-04-09 12:20:15 Singular Exp $ */
 /*
-* ABSTRACT
+* ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.h,v 1.2 1997-03-24 14:25:59 Singular Exp $ */
 
 #include <string.h>
 #include "structs.h"

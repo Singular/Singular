@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.cc,v 1.3 1997-04-02 15:07:20 Singular Exp $ */
+/* $Id: lists.cc,v 1.4 1997-04-09 12:19:55 Singular Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -69,8 +69,9 @@ BOOLEAN lAdd(leftv res, leftv u, leftv v)
 */
 lists lInsert0(lists ul, leftv v, int pos)
 {
+  if ((pos<0)||(v->rtyp==NONE))
+    return NULL;
   lists l=(lists) Alloc(sizeof(slists));
-  if (pos<0) return NULL;
   l->Init(max(ul->nr+2,pos+1));
   int i,j;
 
@@ -98,7 +99,7 @@ BOOLEAN lInsert(leftv res, leftv u, leftv v)
 {
   lists ul=(lists)u->CopyD();
   res->data=(char *)lInsert0(ul,v,0);
-  return FALSE;
+  return (res->data==NULL);
 }
 
 /*2
@@ -108,7 +109,7 @@ BOOLEAN lInsert3(leftv res, leftv u, leftv v, leftv w)
 {
   lists ul=(lists)u->CopyD();
   res->data=(char *)lInsert0(ul,v,(int)w->Data());
-  return FALSE;
+  return (res->data==NULL);
 }
 
 /*2
@@ -118,7 +119,7 @@ BOOLEAN lAppend(leftv res, leftv u, leftv v)
 {
   lists ul=(lists)u->CopyD();
   res->data=(char *)lInsert0(ul,v,ul->nr+1);
-  return FALSE;
+  return (res->data==NULL);
 }
 
 /*2

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.5 1997-03-27 20:23:39 obachman Exp $ */
+/* $Id: grammar.y,v 1.6 1997-04-09 12:19:43 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -148,7 +148,6 @@ void yyerror(char * fmt)
 %token <i> CONTRACT_CMD
 %token <i> DEGREE_CMD
 %token <i> DEG_CMD
-%token <i> DET_CMD
 %token <i> DIFF_CMD
 %token <i> DIM_CMD
 %token <i> ELIMINATION_CMD
@@ -1531,7 +1530,7 @@ proccmd:
             sprintf(IDSTRING(h),"parameter list #;\n%s;return();\n\n",$3);
             FreeL((ADDRESS)$3);
           }
-        | PROC_CMD extendedid '=' expr ';'
+        | PROC_CMD elemexpr '=' expr ';'
           {
             #ifdef SIC
             if (sic)
@@ -1541,12 +1540,9 @@ proccmd:
               MYYERROR("not implemented");
             }
             #endif
-            if ($4.Typ()!=STRING_CMD)
-              MYYERROR("string expression expected");
-            idhdl h = enterid($2,myynest,PROC_CMD,&idroot,FALSE);
-            if (h==NULL) YYERROR;
-            IDSTRING(h) = (char *)$4.CopyD();
-            $4.CleanUp();
+            sleftv v;
+            if ((iiDeclCommand(&v,&$2,myynest,PROC_CMD,&idroot,FALSE))
+            || (iiAssign(&v,&($4)))) YYERROR;
           }
         | PROC_DEF STRINGTOK BLOCKTOK
           {

@@ -3,8 +3,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: modulop.h,v 1.3 1997-04-09 12:20:01 Singular Exp $ */
 /*
-* ABSTRACT
+* ABSTRACT: numbers modulo p (<=32003)
 */
 #include "structs.h"
 

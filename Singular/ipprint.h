@@ -3,8 +3,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: ipprint.h,v 1.3 1997-04-09 12:19:50 Singular Exp $ */
 /*
-* ABSTRACT
+* ABSTRACT: interpreter: printing
 */
 #include "structs.h"
 

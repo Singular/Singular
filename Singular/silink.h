@@ -3,33 +3,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.h,v 1.6 1997-04-08 08:43:29 obachman Exp $ */
+/* $Id: silink.h,v 1.7 1997-04-09 12:20:09 Singular Exp $ */
 /*
-* ABSTRACT
-*/
-/* $Log: not supported by cvs2svn $
- * Revision 1.4  1997/03/28  21:44:37  obachman
- * Fri Mar 28 14:12:05 1997  Olaf Bachmann
- * <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
- *
- * 	* Added routines dump(link) and getdump(link) for ascii and MP
- * 	  links
- *
- * 	* ipconv.cc (dConvertTypes): added int->module conversion so that
- * 	  'module m = 0' works
- *
- * 	* iparith.cc (jjVAR1): added LINK_CMD to list of typeof(...)
- *
- * Revision 1.3  1997/03/26  14:58:03  obachman
- * Wed Mar 26 14:02:15 1997  Olaf Bachmann
- * <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
- *
- * 	* added reference counter to links, updated slKill, slCopy, slInit
- * 	* various small bug fixes for Batch mode
- *
- * Revision 1.1.1.1  1997/03/19  13:18:41  obachman
- * Imported Singular sources
- *
+* ABSTRACT: general interface to links
 */
 
 #include "structs.h"

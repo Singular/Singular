@@ -4,7 +4,7 @@
 
 //**************************************************************************
 //
-// $Id: sing_dbm.cc,v 1.3 1997-04-08 16:45:32 Singular Exp $
+// $Id: sing_dbm.cc,v 1.4 1997-04-09 12:20:09 Singular Exp $
 //
 //**************************************************************************
 //  'sing_dbm.cc' containes command to handle dbm-files under
@@ -174,8 +174,8 @@ char *dbStatus(si_link l, char *request)
   if ((strcmp(request, "read") == 0)
   ||  (strcmp(request, "write") == 0))
   {
-    if (SI_LINK_R_OPEN_P(l)) return "ready";
-    else                     return "not ready";
+    if (SI_LINK_RW_OPEN_P(l)) return "ready";
+    else                      return "not ready";
   }
   else return "unknown status request";
 }

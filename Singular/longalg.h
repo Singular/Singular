@@ -3,8 +3,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: longalg.h,v 1.3 1997-04-09 12:19:56 Singular Exp $ */
 /*
-* ABSTRACT
+* ABSTRACT:   algebraic numbers
 */
 #include "longrat.h"
 

@@ -3,8 +3,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: kstd2.h,v 1.3 1997-04-09 12:19:53 Singular Exp $ */
 /*
-* ABSTRACT
+* ABSTRACT -  Kernel: alg. of Buchberger
 */
 #include "structs.h"
 

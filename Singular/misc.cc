@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.4 1997-04-02 15:07:27 Singular Exp $ */
+/* $Id: misc.cc,v 1.5 1997-04-09 12:19:59 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -60,6 +60,7 @@ int inits(void)
 /*4 private data of other modules*/
   I_FEbase();
   memset(&sLastPrinted,0,sizeof(sleftv));
+  sLastPrinted.rtyp=NONE;
 #ifdef HAVE_MPSR
   extern void mpsr_Init();
   mpsr_Init();

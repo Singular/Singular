@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.16 1997-04-08 08:43:16 obachman Exp $ */
+/* $Id: iparith.cc,v 1.17 1997-04-09 12:19:46 Singular Exp $ */
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
@@ -1866,7 +1866,9 @@ struct sValCmd2 dArith2[]=
 ,{jjTIMES_MA_I2,'*',           MATRIX_CMD,     INT_CMD,    MATRIX_CMD }
 ,{jjTIMES_MA,  '*',            MATRIX_CMD,     MATRIX_CMD, MATRIX_CMD }
 ,{jjOP_IV_I,   '*',            INTVEC_CMD,     INTVEC_CMD, INT_CMD }
+,{jjOP_I_IV,   '*',            INTVEC_CMD,     INT_CMD,    INTVEC_CMD }
 ,{jjOP_IV_I,   '*',            INTMAT_CMD,     INTMAT_CMD, INT_CMD }
+,{jjOP_I_IV,   '*',            INTMAT_CMD,     INT_CMD,    INTMAT_CMD }
 ,{jjTIMES_IV,  '*',            INTVEC_CMD,     INTMAT_CMD, INTVEC_CMD }
 ,{jjTIMES_IV,  '*',            INTMAT_CMD,     INTMAT_CMD, INTMAT_CMD }
 ,{jjDIV_I,     '/',            INT_CMD,        INT_CMD,    INT_CMD }
@@ -2067,6 +2069,10 @@ static BOOLEAN jjDUMMY(leftv res, leftv u)
   res->data = (char *)u->CopyD();
   return FALSE;
 }
+static BOOLEAN jjNULL(leftv res, leftv u)
+{
+  return FALSE;
+}
 //static BOOLEAN jjPLUSPLUS(leftv res, leftv u)
 //{
 //  res->data = (char *)((int)u->Data()+1);
@@ -2250,11 +2256,18 @@ static BOOLEAN jjDET(leftv res, leftv v)
       }
     }
 
-    res->data = (char *)singclap_det((matrix)(v->Data()));
+    res->data = (char *)singclap_det(m);
     return FALSE;
   }
 nonconst:
-  res->data = (char *)mpDet((matrix)(v->Data()));
+  res->data = (char *)mpDet(m);
+  return FALSE;
+}
+static BOOLEAN jjDET_I(leftv res, leftv v)
+{
+  int i,j;
+  intvec * m=(intvec*)v->Data();
+  res->data = (char *)singclap_det_i(m);
   return FALSE;
 }
 #endif
@@ -2897,6 +2910,7 @@ struct sValCmd1 dArith1[]=
 ,{jjCOUNT_IV,   COUNT_CMD,       INT_CMD,        INTVEC_CMD }
 ,{jjCOUNT_IV,   COUNT_CMD,       INT_CMD,        INTMAT_CMD }
 ,{jjCOUNT_L,    COUNT_CMD,       INT_CMD,        LIST_CMD }
+,{jjNULL,       DEF_CMD,         DEF_CMD,        INT_CMD }
 ,{jjWRONG,      DEF_CMD,         0,              ANY_TYPE }
 ,{jjDEG,        DEG_CMD,         INT_CMD,        POLY_CMD }
 ,{jjDEG,        DEG_CMD,         INT_CMD,        VECTOR_CMD }
@@ -2904,8 +2918,10 @@ struct sValCmd1 dArith1[]=
 ,{jjDEGREE,     DEGREE_CMD,      NONE,           MODUL_CMD }
 ,{jjDEFINED,    DEFINED_CMD,     INT_CMD,        DEF_CMD }
 #ifdef HAVE_LIBFACTORY
+,{jjDET_I,      DET_CMD,         INT_CMD,        INTMAT_CMD }
 ,{jjDET,        DET_CMD,         POLY_CMD,       MATRIX_CMD }
 #else
+//,{jjWRONG,      DET_CMD,         INT_CMD,        INTMAT_CMD }
 ,{jjmpDet,      DET_CMD,        -((s)POLY_CMD),  MATRIX_CMD }
 #endif
 ,{jjDIM,        DIM_CMD,         INT_CMD,        IDEAL_CMD }

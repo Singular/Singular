@@ -3,8 +3,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: longrat.h,v 1.3 1997-04-09 12:19:57 Singular Exp $ */
 /*
-* ABSTRACT
+* ABSTRACT: computation with long rational numbers
 */
 #include "structs.h"
 #ifdef HAVE_GMP

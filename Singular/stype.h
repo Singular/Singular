@@ -3,10 +3,10 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: stype.h,v 1.3 1997-04-09 12:20:14 Singular Exp $ */
 /*
 * ABSTRACT: flex/bison interface
 */
-/* $Id: stype.h,v 1.2 1997-03-24 14:25:58 Singular Exp $ */
 
 #include "structs.h"
 #include "subexpr.h"

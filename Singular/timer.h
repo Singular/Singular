@@ -4,9 +4,9 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /*
-* ABSTRACT
+*  ABSTRACT - get the computing time
 */
-/* $Id: timer.h,v 1.3 1997-03-27 20:26:05 obachman Exp $ */
+/* $Id: timer.h,v 1.4 1997-04-09 12:20:17 Singular Exp $ */
 
 extern int timerv;
 void startTimer(void);

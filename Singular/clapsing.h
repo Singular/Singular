@@ -1,5 +1,12 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: clapsing.h,v 1.1.1.1 1997-03-19 13:18:53 obachman Exp $
+/****************************************
+*  Computer Algebra System SINGULAR     *
+****************************************/
+// $Id: clapsing.h,v 1.2 1997-04-09 12:19:41 Singular Exp $
+/*
+* ABSTRACT: interface between Singular and factory
+*/
+
 
 #ifndef INCL_FACTORYSING_H
 #define INCL_FACTORYSING_H
@@ -31,6 +38,7 @@ BOOLEAN singclap_isSqrFree(poly f);
 char* singclap_neworder ( ideal I);
 
 poly singclap_det( const matrix m );
+int singclap_det_i( intvec * m );
 
 BOOLEAN jjGCD_P(leftv res, leftv u, leftv v);
 BOOLEAN jjFAC_P(leftv res, leftv u);

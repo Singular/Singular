@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.3 1997-03-27 12:42:50 Singular Exp $ */
+/* $Id: scanner.l,v 1.4 1997-04-09 12:20:07 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -91,6 +91,7 @@ parname        #
 
 %x string
 %x block
+%x blockstr
 %x brace
 %x bracestr
 %x bracket
@@ -134,7 +135,7 @@ proc[ \t]+{name}[ \t]*\( {
                          }
 
 <brace>"\""              {
-                           noeof = noeof_brace;
+                           noeof = noeof_string;
                            BEGIN(bracestr);
                            yymore();
                          }
@@ -185,7 +186,20 @@ proc[ \t]+{name}[ \t]*\( {
                            noeof = noeof_block;
                            BEGIN(block);
                          }
-<block>[^\{\}]*          { yymore(); }
+<block>"\""              {
+                           noeof = noeof_string;
+                           BEGIN(blockstr);
+                           yymore();
+                         }
+<blockstr>[^\"]          { yymore(); }
+<blockstr>"\\\\"         { yymore(); }
+<blockstr>"\\\""         { yymore(); }
+<blockstr>"\""           {
+                           noeof = noeof_block;
+                           BEGIN(block);
+                           yymore();
+                         }
+<block>[^\{\}\"]*        { yymore(); }
 <block>"{"               { blocknest++; yymore(); }
 <block>"}"               {
                            if (--blocknest <= 0)

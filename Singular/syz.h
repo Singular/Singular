@@ -3,9 +3,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.h,v 1.3 1997-04-03 12:16:48 Singular Exp $ */
+/* $Id: syz.h,v 1.4 1997-04-09 12:20:16 Singular Exp $ */
 /*
-* ABSTRACT
+* ABSTRACT: resolutions
 */
 #include "structs.h"
 

@@ -4,9 +4,9 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /*
-* ABSTRACT
+* ABSTRACT: s-polynomials
 */
-/* $Id: spolys.h,v 1.2 1997-03-24 14:25:53 Singular Exp $ */
+/* $Id: spolys.h,v 1.3 1997-04-09 12:20:11 Singular Exp $ */
 #include "structs.h"
 
 /* reduction */

@@ -3,8 +3,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: numbers.h,v 1.3 1997-04-09 12:20:05 Singular Exp $ */
 /*
-* ABSTRACT
+* ABSTRACT: interface to coefficient aritmetics
 */
 #include "structs.h"
 

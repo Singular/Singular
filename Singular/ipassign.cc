@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.7 1997-04-08 08:43:19 obachman Exp $ */
+/* $Id: ipassign.cc,v 1.8 1997-04-09 12:19:48 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -511,6 +511,11 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
     if (!errorreported) Werror("left side `%s` is undefined",l->name);
     return TRUE;
   }
+  if((rt==DEF_CMD)||(rt==NONE))
+  {
+    if (!errorreported) WerrorS("right side is not a datum");
+    return TRUE;
+  }
   
   int i=0;
   BOOLEAN nok=FALSE;
@@ -728,7 +733,7 @@ static BOOLEAN jjA_L_LIST(leftv l, leftv r)
     r=r->next;
     h->next=NULL;
     rt=h->Typ();
-    if (rt==0)
+    if ((rt==0)||(rt==NONE))
     {
       L->Clean();
       Werror("`%s` is undefined",h->Name());

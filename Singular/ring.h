@@ -4,9 +4,9 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /*
-* ABSTRACT
+* ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.3 1997-03-27 12:42:49 Singular Exp $ */
+/* $Id: ring.h,v 1.4 1997-04-09 12:20:07 Singular Exp $ */
 
 /* includes */
 #include "structs.h"

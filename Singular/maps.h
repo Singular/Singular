@@ -3,8 +3,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: maps.h,v 1.5 1997-04-09 12:19:57 Singular Exp $ */
 /*
-* ABSTRACT
+* ABSTRACT - the mapping of polynomials to other rings
 */
 #include "structs.h"
 

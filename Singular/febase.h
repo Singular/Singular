@@ -3,6 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: febase.h,v 1.3 1997-04-09 12:19:42 Singular Exp $ */
 /*
 * ABSTRACT
 */

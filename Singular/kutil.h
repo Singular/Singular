@@ -3,8 +3,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: kutil.h,v 1.3 1997-04-09 12:19:54 Singular Exp $ */
 /*
-* ABSTRACT
+* ABSTRACT: kernel: utils for std
 */
 #include "structs.h"
 #include "mmemory.h"

@@ -4,9 +4,9 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /*
-* ABSTRACT
+* ABSTRACT: token for interpreter, as types; general macros
 */
-/* $Id: tok.h,v 1.6 1997-04-08 08:43:35 obachman Exp $ */
+/* $Id: tok.h,v 1.7 1997-04-09 12:20:17 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -59,6 +59,7 @@ enum {
   DEF_CMD,
   DEFINED_CMD,
   DELETE_CMD,
+  DET_CMD,
   DUMP_CMD,
   EXTGCD_CMD,
   FAC_CMD,

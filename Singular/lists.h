@@ -3,6 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
+/* $Id: lists.h,v 1.3 1997-04-09 12:19:55 Singular Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
