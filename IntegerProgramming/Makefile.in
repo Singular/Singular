@@ -7,6 +7,8 @@ bindir          = @bindir@
 prefix          = @prefix@
 slibdir         = ${prefix}/LIB
 install_bindir  = ${install_prefix}/${SINGUNAME}
+libdir          = @libdir@
+
 
 ##
 ## various programs
@@ -27,7 +29,7 @@ MKINSTALLDIRS   = ../mkinstalldirs
 ##
 CPPFLAGS	= -I . @CPPFLAGS@
 CXXFLAGS        = @CXXFLAGS@
-LDFLAGS         = @LDFLAGS@ -lgmp
+LDFLAGS         = -L${libdir} @LDFLAGS@ -lgmp
 
 
 MAIN1	:= solve_IP
