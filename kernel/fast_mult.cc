@@ -1,5 +1,6 @@
 #include "fast_mult.h"
 #include "kbuckets.h"
+#include "febase.h"
 typedef poly fastmultrec(poly f, poly g, ring r);
 static const int pass_option=1;
 static int mults=0;
@@ -375,5 +376,119 @@ poly pFastPower(poly f, int n, ring r){
   //free res
   omfree(pot_array);
   omfree(int_pot_array);
+  return erg;
+}
+
+static poly p_MonPowerMB(poly p, int exp, ring r)
+{
+  int i;
+
+  if(!n_IsOne(p_GetCoeff(p,r),r))
+  {
+    number x, y;
+    y = p_GetCoeff(p,r);
+    n_Power(y,exp,&x,r);
+    n_Delete(&y,r);
+    p_SetCoeff0(p,x,r);
+  }
+  for (i=rVar(r); i!=0; i--)
+  {
+    p_MultExp(p,i, exp,r);
+  }
+  p_Setm(p,r);
+  return p;
+}
+static void buildTermAndAdd(int n,number* facult,poly* f_terms,int* exp,int f_len,kBucket_pt erg_bucket,ring r){
+  number denom=n_Init(1,r);
+  int i;
+  poly term=p_Init(r);
+  for(i=0;i<f_len;i++){
+    if(exp[i]!=0){
+      number trash=denom;
+      denom=n_Mult(denom,facult[exp[i]],r);
+      n_Delete(&trash,r);
+    }
+    
+  }
+  number coef=n_IntDiv(facult[n],denom,r);   //right function here?
+  n_Delete(&denom,r);
+  poly erg=p_NSet(coef,r);
+  for(i=0;i<f_len;i++){
+    if(exp[i]!=0){
+      poly term=p_Copy(f_terms[i],r);
+      term->next=NULL;
+      p_MonPowerMB(term, exp[i],r);
+      erg=p_Mult_mm(erg,term,r);
+      p_Delete(&term,r);
+    }
+    
+  }
+  int pseudo_len=0;
+  kBucket_Add_q(erg_bucket,erg,&pseudo_len);
+}
+
+
+
+static void MC_iterate(poly f, int n, ring r, int f_len,number* facult, int* exp,poly* f_terms,kBucket_pt erg_bucket,int pos,int sum){
+  int i;
+  if (pos<f_len-1){
+    for(i=0;i<=n-sum;i++){
+      exp[pos]=i;
+      MC_iterate(f, n, r, f_len,facult, exp,f_terms,erg_bucket,pos+1,sum+i);
+    }
+    return;
+  }
+  if(pos==f_len-1){
+    i=n-sum;
+    exp[pos]=i;
+    buildTermAndAdd(n,facult,f_terms,exp,f_len,erg_bucket,r);
+  }
+  assume(pos<=f_len-1);
+}
+poly pFastPowerMC(poly f, int n, ring r){
+  //only char=0
+  if(rChar(r)!=0)
+    Werror("Char not 0, pFastPowerMC not implemented for this case");
+
+  //  number null_number=n_Init(0,r);
+  number* facult=(number*) omalloc((n+1)*sizeof(number));
+  facult[0]=n_Init(1,r);
+  int i;
+  for(i=1;i<=n;i++){
+    number this_n=n_Init(i,r);
+    facult[i]=n_Mult(this_n,facult[i-1],r);
+    n_Delete(&this_n,r);
+  }
+  kBucket_pt erg_bucket= kBucketCreate(currRing);
+  kBucketInit(erg_bucket,NULL,0);
+  const int f_len=pLength(f);
+  int* exp=(int*)omalloc(f_len*sizeof(int));
+  //poly f_terms[f_len];
+  poly* f_terms=(poly*)omalloc(f_len*sizeof(poly));
+  poly f_iter=f;
+  for(i=0;i<f_len;i++){
+    f_terms[i]=f_iter;
+    f_iter=pNext(f_iter);
+  }
+  assume(f_iter==NULL);
+  MC_iterate(f,n,r,f_len,&facult[0], &exp[0], &f_terms[0],erg_bucket,0,0);
+
+
+
+
+
+
+  //free res
+  
+  //free facult
+  for(i=0;i<=n;i++){
+    nDelete(&facult[0]);
+  }
+  omfree(exp);
+  omfree(facult);
+  omfree(f_terms);
+  int len=0;
+  poly erg;
+  kBucketClear(erg_bucket,&erg, &len);
   return erg;
 }
