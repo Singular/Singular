@@ -1,0 +1,303 @@
+Access specifiers:
+------------------
+private:	symbol is accessed only in same folding
+public:		symbol is accessed througout whole singular.el
+semipub:	symbol is accessed only in a feq functions
+		outside same folding.  Functions have to be
+		specified, then.
+user:		symbol belongs to the user interface of
+		singular.el (customizing and interactive
+		functions).  For variable, implies `const var'.
+
+Type:
+-----
+func:		function
+macro:		macro
+subst:		inline function
+var:		regular variable
+const var:	variable is (except from initialization) never
+		changed throughout singular.el
+const:		const variable (defined via `defconst')
+const const:	const is (except from initialization) never
+		changed throughout singular.el
+lvar: 		buffer local variable
+face:		face (defined via `defface')
+group:		customizing group
+require:	require called
+
+
+Code common to both modes
+=========================
+
+Customizing (1.43)
+------------------
+user	group		singular-faces
+
+Debugging stuff (1.43)
+----------------------
+private	const var	singular-debug
+public	func		singular-debug-format
+public	macro		singular-debug
+
+Determining version (1.43)
+--------------------------
+public  const var	singular-emacs-flavor
+public  const var	singular-emacs-major-version
+public  const var	singular-emacs-minor-version
+public  func		singular-fset
+private	func		singular-set-version
+private			<static initialization>
+
+Syntax table (1.43)
+-------------------
+private	const var	singular-mode-syntax-table
+private			<static initialization>
+semipub	func		singular-mode-syntax-table-init
+			// used in `singular-interactive-mode'
+
+Miscellaneous (1.48)
+--------------------
+public	func		singular-keep-region-active
+
+Singular interactive mode
+=========================
+
+Customizing (1.43)
+------------------
+user	group		singular-interactive
+user	group		singular-sections-and-foldings
+user	group		singular-interactive-miscellaneous
+user	group		singular-demo-mode
+public	func		singular-map-buffer
+
+Comint (1.43)
+-------------
+	require		comint
+
+Font-locking (1.47)
+-------------------
+private	const var	singular-font-lock-error-face
+private	const var	singular-font-lock-warning-face
+private	const var	singular-font-lock-prompt-face
+
+user	face		singular-font-lock-error-face
+user	face		singular-font-lock-warning-face
+user	face		singular-font-lock-prompt-face
+
+private	const const	singular-font-lock-singular-types
+private			<static initialization>
+private	const const	singular-interactive-font-lock-keywords-1
+private	const const	singular-interactive-font-lock-keywords-2
+private	const const	singular-interactive-font-lock-keywords-3
+private	const const	singular-interactive-font-lock-keywords
+private	const const	singular-interactive-font-lock-defaults
+
+semipub	func		singular-interactive-font-lock-init
+			// used in `singular-interactive-mode'
+private			<static initialization>
+
+Key map (1.48)
+--------------
+semipub	const var	singular-interactive-mode-map
+			// used in `Menus and logos' folding
+private			<static initialization>
+
+user	var		singular-history-keys
+user	var		singular-cursor-keys
+private	func		singular-history-cursor-key-set
+private	func		singular-history-cursor-keys-set
+private			<static initialization>
+
+semipub	func		singular-interactive-mode-map-init
+			// used in `singular-interactive-mode'
+
+-- not checked --
+Menus and logos
+---------------
+
+Skipping and stripping prompts and newlines and other things
+------------------------------------------------------------
+-- end not checked --
+
+Miscellaneous (1.44)
+--------------------
+public	subst		singular-buffer-name-to-process-name
+public	subst		singular-process-name-to-buffer-name
+public	subst		singular-run-hook-with-arg-and-value
+public	subst		singular-process
+public	subst		singular-process-mark
+public	func		singular-time-stamp-difference
+
+Miscellaneous interactive (1.43)
+--------------------------------
+user	func		singular-recenter
+user	func		singular-reposition-point-and-window
+user	func		singular-toggle-truncate-lines
+private	var		singular-scroll-previous-amount
+user	func		singular-scroll-right
+user	func		singular-scroll-left
+
+-- not checked --
+user	func		singular-load-file
+user	func		singular-load-library
+user	func		singular-exit-singular
+-- end not checked --
+
+History (1.43)
+--------------
+user	var		singular-history-ignoredups
+user	var		singular-history-size
+user	var		singular-history-filter-regexp
+user	var		singular-history-explicit-file-name
+semipub	func		singular-history-read
+			// used in `singular-exec'
+semipub	func		singular-history-write
+			// used in `singular-exit-sentinel'
+semipun	func		singular-history-insert
+			// used in `singular-send-or-copy-input'
+semipub	func		singular-history-init
+			// used in `singular-interactive-mode'
+
+Simple section API for both Emacs and XEmacs (1.45)
+---------------------------------------------------
+semipub	var		singular-simple-sec-clear-type
+			// used in `singular-section-type-alist'
+private lvar		singular-simple-sec-last-end
+semipub	func		singular-simple-sec-init
+			// used in `singular-exec'
+semipub	macro		singular-simple-sec-last-end-position
+			// used in `singular-input-filter' and
+			// `singular-output-filter'
+private	subst		singular-simple-sec-lookup-face
+
+semipub	func		singular-simple-sec-create
+			// used in `singular-input-filter' and
+			// `singular-output-filter'
+semipub	func		singular-simple-sec-at
+			// used in
+			// `singular-section-at',
+			// `singular-last-input-section',
+			// `singular-current-output-section',
+			// `singular-last-output-section'
+
+semipub	subst		singular-simple-sec-start
+semipub	subst		singular-simple-sec-end
+semipub	subst		singular-simple-sec-type
+semipub	subst		singular-simple-sec-before
+semipub	func		singular-simple-sec-start-at
+semipub	func		singular-simple-sec-end-at
+semipub	func		singular-simple-sec-in
+			// all of the preceding functions
+			// used in `Section API' folding
+
+Section API (1.45)
+------------------
+user	var		singular-section-face-alist
+user	face		singular-section-input-face
+user	face		singular-section-output-face
+
+public	subst		singular-section-create
+public	subst		singular-section-simple-sec
+public	subst		singular-section-type
+public	subst		singular-section-start
+public	subst		singular-section-end
+
+public	func		singular-section-at
+public	func		singular-section-before
+public	func		singular-section-in
+private	func		singular-section-in-internal
+public	func		singular-section-mapsection
+
+-- not checked --
+Section miscellaneous
+---------------------
+public	func	singular-input-section-to-string
+-- end not checked --
+
+Section miscellaneous interactive (1.46)
+----------------------------------------
+user	func		singular-section-goto-beginning
+user	func		singular-section-goto-end
+user	func		singular-section-backward
+user	func		singular-section-forward
+
+Folding sections for both Emacs and XEmacs (1.48)
+-------------------------------------------------
+user	var		singular-folding-ellipsis
+user	var		singular-folding-line-move-ignore-folding
+private	func		singular-folding-set-ellipsis
+semipub	func		singular-folding-init
+			// used in `singular-interactive-mode'
+
+public	func		singular-folding-fold
+public	func		singular-folding-unfold
+public	func		singular-folding-foldedp
+
+user	func		singular-folding-fold-at-point
+user	func		singular-folding-unfold-at-point
+user	func		singular-folding-fold-latest-output
+user	func		singular-folding-unfold-latest-output
+user	func		singular-folding-fold-all-output
+user	func		singular-folding-unfold-all-output
+user	func		singular-folding-toggle-fold-at-point-or-all
+user	func		singular-folding-toggle-fold-latest-output
+
+private	func		singular-folding-fold-internal
+private	func		singular-folding-unfold-internal
+private	func		singular-folding-foldedp
+
+-- not checked --
+Online help
+-----------
+-- end not checked --
+
+Debugging filters (1.45)
+------------------------
+private	func		singular-debug-pre-input-filter
+private	func		singular-debug-post-input-filter
+private	func		singular-debug-pre-output-filter
+private	func		singular-debug-post-output-filter
+
+semipub	func		singular-debug-filter-init
+			// used in `singular-interactive-mode'
+
+-- checked up to here --
+
+Demo mode (1.39)
+----------------
+user	var		singular-demo-chunk-regexp
+user	var		singular-demo-insert-into-history
+user	var		singular-demo-print-messages
+user	var		singular-demo-exit-on-load
+user	var		singular-demo-load-directory
+
+public	lvar		singular-demo-mode
+private	lvar		singular-demo-old-mode-name
+private	lvar		singular-demo-end
+
+NOT READY user	func	singular-demo-load
+private	func		singular-demo-exit-internal
+user	func		singular-demo-exit
+semipub	func		singular-demo-show-next-chunk
+			// used in `singular-send-or-copy-input'
+
+semipub	func		singular-demo-mode-init
+			// used in `singular-mode'
+
+Some lengthy notes on input and output
+--------------------------------------
+
+Last input and output section
+-----------------------------
+
+Sending input
+-------------
+
+Receiving output
+----------------
+
+Singular interactive mode
+-------------------------
+
+Starting singular
+-----------------
