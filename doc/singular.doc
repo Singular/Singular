@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.19 1998-05-08 16:03:19 obachman Exp $
+@comment $Id: singular.doc,v 1.20 1998-05-11 11:56:41 wichmann Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -390,7 +390,7 @@ ideal).
 
 Singular computes in a @code{qring} as long as possible with the given
 representative of a polynomial, i.e. it usually does not reduce a
-polynom w.r.t. the qutient ideal. This is only doen during standard
+polynom w.r.t. the quotient ideal. This is only done during standard
 bases computations.
 
 @item substring selection 
