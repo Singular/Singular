@@ -4428,12 +4428,13 @@ static BOOLEAN jjSTATUS_M(leftv res, leftv v)
 }
 #endif
 
+#ifdef HAVE_NAMESPACES
 static BOOLEAN jjEXPORTTO(leftv res, leftv v)
 {
-#ifdef HAVE_NAMESPACES
   BOOLEAN nok=TRUE;
   leftv u=v;
-  if(u->rtyp==NSHDL) {
+  if(u->rtyp==NSHDL)
+  {
     namehdl ns = (namehdl)(u->data);
     idhdl h = namespaceroot->root->get(ns->name, 0, TRUE);
     Print("Export to '%s', lev %d\n", ns->name, ns->myynest);
@@ -4457,11 +4458,10 @@ static BOOLEAN jjEXPORTTO(leftv res, leftv v)
     }
     return FALSE;
   }
-#else /* HAVE_NAMESPACES */
-#endif /* HAVE_NAMESPACES */
   return TRUE;
 }
-
+#endif /* HAVE_NAMESPACES */
+#ifdef HAVE_NAMESPACES
 static BOOLEAN jjIMPORTFROM(leftv res, leftv v)
 {
   BOOLEAN nok=FALSE;
@@ -4484,7 +4484,7 @@ static BOOLEAN jjIMPORTFROM(leftv res, leftv v)
   }
   return TRUE;
 }
-
+#endif
 #ifdef HAVE_NAMESPACES
 static BOOLEAN jjUNLOAD(leftv res, leftv v)
 {
@@ -4541,9 +4541,9 @@ struct sValCmdM dArithM[]=
 #ifndef __MWERKS__
 ,{jjSTATUS_M,  STATUS_CMD,      INT_CMD,             4 }
 #endif
+#ifdef HAVE_NAMESPACES
 ,{jjIMPORTFROM,IMPORTFROM_CMD,  ANY_TYPE,           -2 }
 ,{jjEXPORTTO,  EXPORTTO_CMD,    NONE,               -2 }
-#ifdef HAVE_NAMESPACES
  ,{jjUNLOAD,   UNLOAD_CMD,      NONE,               -2 }
 #endif /* HAVE_NAMESPACES */
  ,{NULL,        0,               0,                  0  }
