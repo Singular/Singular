@@ -1,6 +1,6 @@
-// $Id: all.lib,v 1.35 2001-03-02 13:02:54 Singular Exp $
+// $Id: all.lib,v 1.36 2001-05-17 14:36:29 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: all.lib,v 1.35 2001-03-02 13:02:54 Singular Exp $";
+version="$Id: all.lib,v 1.36 2001-05-17 14:36:29 Singular Exp $";
 category = "General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries
@@ -22,6 +22,7 @@ Commutative algebra
   elim_lib:        Elimination, Saturation and Blowing up
   homolog_lib:     Procedures for Homological Algebra
   intprog_lib:     Integer Programming with Groebner Basis Methods
+  mprimdec_lib:    Primary Decomposition of Modules
   mregular_lib:    Castelnuovo-Mumford Regularity of CM-Schemes and Curves
   normal_lib:      Normalization of Affine Rings
   primdec_lib:     Primary Decomposition and Radical of Ideals
@@ -84,6 +85,7 @@ LIB "linalg.lib";
 LIB "algebra.lib";
 LIB "elim.lib";
 LIB "homolog.lib";
+LIB "mprimdec.lib";
 LIB "mregular.lib";
 LIB "normal.lib";
 LIB "primdec.lib";
