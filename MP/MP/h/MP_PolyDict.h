@@ -70,8 +70,8 @@
 #define MP_CopPolyIdeal                 10
 #define MP_CopPolyKbase                 11
 #define MP_CopPolyLead                  12
-#define MP_CopPolyDictLeadCoef          13
-#define MP_CopPolyDictLeadExp           14
+#define MP_CopPolyLeadCoef              13
+#define MP_CopPolyLeadExp               14
 #define MP_CopPolyMaxIdeal              15
 #define MP_CopPolyMinBase               16
 #define MP_CopPolyMinRes                17
