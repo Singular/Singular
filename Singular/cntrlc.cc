@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.32 2000-08-14 12:55:56 obachman Exp $ */
+/* $Id: cntrlc.cc,v 1.33 2000-09-15 16:43:52 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -25,7 +25,7 @@
 
 
 /* undef, if you don't want GDB to come up on error */
-/* #define CALL_GDB */
+#define CALL_GDB 
 
 #if defined(__OPTIMIZE__) && defined(CALL_GDB)
 #undef CALL_GDB
@@ -54,7 +54,7 @@
 
 #define INTERACTIVE 0
 #define STACK_TRACE 1
-#ifdef __CALL_GDB__
+#ifdef CALL_GDB
 static void debug (int);
 static void debug_stop (char **);
 #endif

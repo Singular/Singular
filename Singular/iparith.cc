@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.222 2000-09-12 16:00:55 obachman Exp $ */
+/* $Id: iparith.cc,v 1.223 2000-09-15 16:43:52 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -15,6 +15,8 @@
 #include <unistd.h>
 
 #include "mod2.h"
+#define OM_TRACK 5
+#define OM_CHECK 3
 #include "tok.h"
 #include "ipid.h"
 #include "intvec.h"
@@ -5166,7 +5168,7 @@ static Subexpr jjDBMakeSub(leftv e,char *f, int l)
 static Subexpr jjMakeSub(leftv e)
 #endif
 {
-  // assume: e->Typ()==INT_CMD
+  assume( e->Typ()==INT_CMD );
   Subexpr r=(Subexpr)omAlloc0Bin(sSubexpr_bin);
   r->start =(int)e->Data();
   return r;
