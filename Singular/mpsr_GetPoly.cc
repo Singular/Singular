@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.32 2001-08-27 14:47:16 Singular Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.33 2002-05-16 17:49:22 Singular Exp $ */
 
 /***************************************************************
  *
@@ -237,7 +237,8 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
     gnum = &(y->z);
     mpz_init(gnum);
     mp_failr(IMP_MyGetApInt(link, (MP_ApInt_t *) &gnum));
-    *x = nlInit(y);
+    nlNormalize(y);
+    *x = y;
   }
   // fraction of numbers
   else if (node == MP_CommonOperatorType &&
@@ -270,7 +271,7 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
     mp_failr(IMP_GetUint32(link, &ui));
     // check whether u_int can be casted safely to int
     if (ui < INT_MAX)
-      *x = nlInit(i);
+      *x = nlInit(ui);
     else
     {
       // otherwise, make an apint out of it
