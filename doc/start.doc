@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.10 1998-05-13 12:29:30 obachman Exp $
+@comment $Id: start.doc,v 1.11 1998-05-18 02:42:14 gorzel Exp $
 @comment this file contains the "Introduction" chapter.
 
 @c The following directives are necessary for proper compilation
@@ -179,11 +179,11 @@ them, resp.
 @end menu
 
 @c ------------------------------------------------------------------
-@node Generalities, Rings and standard bases, Getting started, Getting started
-@subsection Generalities
-@cindex Generalities
+@node General concepts, Rings and standard bases, Getting started, Getting started
+@subsection General concepts
+@cindex General concepts
 
-@c {{{ subsection generalities }}}
+@c {{{ subsection General concepts }}}
 Once @sc{Singular} is started, it attends input after the promt @code{>}.
 Every statement has to be closed by an @code{;}
 @example
@@ -213,14 +213,15 @@ The last displayed result is always available with the special symbol
   @expansion{} 4
 @end example
 Furthermore @sc{Singular} maintains a history of the last input, which
-is accessewd by @code{CTRL-P} and @code{CTRL-N} or the arrows opn the
+may be  accessed by @code{CTRL-P} and @code{CTRL-N} or the arrows on the
 keyboard. This simplifies to redo examples with minor changements.
 
-Text after @code{//} is a comment and ignored for in calculations, as seen
-in the previous example.
+Text starting with @code{//}denotes a comment and is ignored in 
+calculations, as seen in the previous example.
 @c Comments are marked with @code{//} as seen  
 The whole manual is online available under the command @code{help;} 
-Explanation on single topics  e.g. @code{intmat} a matrix of integers are
+Explanation on single topics  e.g. on @code{intmat} which defines a matrix 
+of integers are
 obtained by 
 @example
   help intmat;
@@ -228,7 +229,7 @@ obtained by
 This showss the text from @ref{intmat} in the printed maual. 
 Define a @code{3 x 3} matrix of integers, and initialize it with some values.
 @example
-  intmat m[3][3] = 1..9; // bug here, converts the 3x3 intmat into 9x1, hence
+@c  intmat m[3][3] = 1..9; // bug here, converts the 3x3 intmat into 9x1, hence
   intmat m[3][3] = 1,2,3,4,5,6,7,8,9;
 @end example  
 A single entry is selected with the square brackets @code{[,]}.
@@ -263,11 +264,12 @@ polynomials a ring has to be defined first.
   ring r1 = 0,(x,y,z),dp;
 @end example   
 This gives a polynomial ring called @code{r} in characteristic zero and 
-ring varibles @code{x,y,z}. The @code{dp} at the end determines the termorder
+ring variables @code{x,y,z}. The @code{dp} at the end determines the termorder
 of the polynomials and hence the standardbasis calculation.
 The @code{p} stands for @code{p}olynomial, so decreasing order of 
 exponents, whereas an @code{s} means power@code{s}eries and increasing order 
-of exponents. With
+of exponents.
+@* Define some polynomials
 @example
   poly f =  x3+y3+(x-y)*x2y2+z2;
   poly g =  f^2 *(2x-y);
@@ -285,13 +287,13 @@ variety defined by the polynomials @code{f} and @code{g}.
 @example
   ideal I = f,g;
 @end example
-So substitute 1 for the first variable and 2 for the second.
+So substitute 1 for the first variable, 2 for the second and 3 for the last.
 @example
   ideal J= subst(I,var(1),1);
   J = subst(J,var(2),2);
   J = subst(J,var(3),0);
 @end example
-In an ideal @code{size} counts only the nonzero entries.
+In an ideal @code{size} counts only the nonzero generators.
 @example
   J;
   @expansion{J[1]=5}
@@ -312,7 +314,7 @@ to the standardbasis.
   @expansion{0}
 @end example
 As the result is @code{0} the polynom @code{f} belongs to the ideal defined by 
-@code{g}, as was clear in at advance.
+@code{g}, as it was clear in at advance.
 
 The command @code{kbase} calculates a basis of the polynomial ring modulo an
 ideal. As application calculate the Milnor number
@@ -328,7 +330,7 @@ The Jacobian ideal is obtained with the command @code{jacob}.
   @expansion{J[2]=2x3y-3x2y2+3y2}
   @expansion{J[3]=2z} 
 @end example
-To get a representating set of the quotient vectorspace first 
+To get a representing set of the quotient vectorspace 
 a standardbasis has to be calculated first.
 @example
   J = std(J);
@@ -364,10 +366,10 @@ and
 @end example
 gives the desired vectorspace dimension.
 As in @sc{Singular} the functions may take directly the input from 
-earlier calculations, it can be written all together.
+earlier calculations, all may be written together in one single statement.
 @example
   size(kbase(std(jacob(f))));
-  @expansion{}
+  @expansion{12}
 @end example
 
 Because we are not interested in the elements of the quotient vectorspace,
@@ -375,7 +377,7 @@ but only in the resulting deimension we may even use the command @code{vdim}
 and write
 @example
   vdim(std(jacob(f)));
-  @expansion{}
+  @expansion{12}
 @end example
 
 @c ------------------------------------------------------------------
@@ -383,13 +385,15 @@ and write
 @subsection Procedures and libraries
 @cindex Procedures and libraries
 
-@sc{Singular} offers comfortable programming language, so it is possible to 
-define procedures which collect several commands to an new one. 
+@sc{Singular} offers a comfortable programming language, with syntax close 
+to C. 
+So it is possible to 
+define procedures which collect several commands to a new one. 
 Procedures are defined with the keyword @code{proc} followed by a name
 and an optional parameterlist with specified types.
-Finally a procedure may return values with the command @code{return}.
+Finally, a procedure may return values with the command @code{return}.
 
-So define the following procedure called @code{Milnor}
+Define the following procedure called @code{Milnor}
 
 @example
   proc Milnor(poly h)
@@ -405,15 +409,15 @@ Then call
   @expansion{12}
 @end example
 
-With @sc{Singular} come several libraries, collection of useful procedures
-based on the implemented commands, which extends now the facilties 
+With @sc{Singular} come several libraries, collections of useful procedures
+based on the implemented commands, which extends now the facilities of 
 @sc{Singular}. One of these  is e.g. @code{sing.lib}
 which contains already a procedure 
 called @code{milnor} to calculate the Milnor number not only for hypersurfaces
-but more generaly for complete intersection singularties.
+but more generally for complete intersection singularties.
 
-Libraries are loaded with the command @code{LIB}, some additional information
-during the process of loading is displayed on the screen.
+Libraries are loaded with the command @code{LIB}. Some additional information
+during the process of loading is displayed on the screen, which we omitt here.
 
 @example
   LIB "sing.lib";
@@ -430,11 +434,19 @@ The procedures in a library have a help part
 which is shown with 
 @example
   help milnor;
-@end example
+  @expansion{// proc milnor from lib sing.lib}
+  @expansion{proc milnor (ideal i)}
+  @expansion{USAGE:   milnor(i); i ideal or poly}
+  @expansion{RETURN:  Milnor number of i, if i is ICIS (isolated complete intersection}
+  @expansion{         singularity) in generic form, resp. -1 if not}
+  @expansion{NOTE:    use proc nf_icis to put generators in generic form}
+  @expansion{         printlevel >=0: display comments (default)}
+  @expansion{EXAMPLE: example milnor; shows an example}
+  @end example
 as well as some examples, which are executed with
 @example
   example milnor;
-  @expansion{}
+  @expansion{12}
 @end example
 
 Likewise the library itself posses a help part, to show all the functions
@@ -454,7 +466,8 @@ same commands in a ring with local ordering.  Define
   ring r2 = 0,(x,y,z),ds;
 @end example
 This ordering determines the standard basis which will be calculated.
-Fetch the polynomial definded in the ring @code{r1} into this new ring. 
+Fetch the polynomial definded in the ring @code{r1} into this new ring,
+thus avoiding retyping the input.
 @example
   poly f = fetch(r1,f);
   f;
@@ -467,7 +480,8 @@ now
   @expansion{4}
 @end example
 
-Iterated once again yields the Hessian of @code{f} a @code{3x3} matrix.
+The command @code{jacob} applied twice 
+givess the Hessian of @code{f} a @code{3x3} matrix.
 @example
   matrix H = jacob(jacob(f));
   H;
@@ -508,41 +522,208 @@ in the following way
   @expansion{}
 @end example
 
-
-
-Coming back to some mathematical considerations, we study the problem how
-to calculate some ....
+@c Coming back to some mathematical considerations, we study the problem how
+@c to calculate some ....
 
 @c ------------------------------------------------------------------
-@node Maps and elimination, Modules and their annilator, Change of rings, Getting started
-@subsection Maps and elimination
-@cindex Maps and elimination
+@node Maps and elimination, Modules and their annihilator, Change of rings, Getting started
+@c @subsection Maps and elimination
+@c @cindex Maps and elimination
 
+
+@c ------------------------------------------------------------------
+@node Modules and their annihilator, Resolution and ext groups, Maps and elimination, Getting started
+@subsection Modules and their annihilator
+@cindex Modules and and their annihilator
+@sc{Singular} is able to calculate with modules over all the rings,
+which can be defined as @code{basering}. A free module of rank @code{n}
+is defined as follows, 
 @example
-  std(_);
+  ring rr;
+  int n = 4;
+  freemodule(4);
+  @expansion{}_[1]=1*gen(1)
+  @expansion{}_[2]=1*gen(2)
+  @expansion{}_[3]=1*gen(3)
+  @expansion{}_[4]=1*gen(4)
+  typeof(_);
+  @expansion{}module
+  print(freemodule(4));
+  @expansion{}1,0,0,0,
+  @expansion{}0,1,0,0,
+  @expansion{}0,0,1,0,
+  @expansion{}0,0,0,1 
+@end example
+
+There are two possibilities to define a module. First A submodule may be
+defined by a generating set of vectors. Then this set of vectors, and the
+module itself my be identified with the columns of matrix.
+For that reason in @sc{Singular} matrices and modules may be interchanged.
+@example
+  ring r =0,(x,y,z),dp;
+  module MD = [x,0,x],[y,z,-y];
+  matrix MM = MD;
+  print(MM);
+  @expansion{}x,-y,
+  @expansion{}0,z, 
+  @expansion{}x,-y 
+@end example
+ 
+The second possibility, and this is what @sc{Singular} means when 
+a @code{module} is defined, is to describe the module by the relations 
+of the generators of a free module. To pass from  the first description
+to the second is done with the command @code{syz}
+@example
+  syz(MD);
+  @expansion{}_[1]=x*gen(2)+y*gen(1)
+@end example
+
+We want to calculate as application the annihilator  of a given module.
+Let the module M = Rk/U,  where U is our defining module. 
+@example
+  module U = [z3,xy2,x3],[yz2,1,xy5z+z3],[y2z,0,x3],[xyz+x2,y2,0],[xyz,x2y,1];
+  print(U);
   @expansion{}
 @end example
 
-@c ------------------------------------------------------------------
-@node Modules and their annilator, Resolution and Hilbert series, Maps and elimination, Getting started
-@subsection Modules and their annilator
-@cindex Modules and and their annilator
+then by definition
+the annihilator of M is the ideal ann(M) = @{a | aM = 0 @} which is by the 
+description of M the same as @{ a | aRk contained in U @}.
+Hence we have to calculate using the command @code{quotient} the
+quotient @{ a | a in U:Rk@}. The rank of the freemodule is determined by the 
+choice of @code{U} and is the number of rows of the corresponding matrix.
+This may be determined by the @code{nrows}. All we have to do now is to
+apply the following statement.
 @example
-  std(_);
-  @expansion{}
+  quotient(U,freemodule(nrows(U)));
+  typeof(_);
+  @expansion{} ideal
 @end example
 
-@c ------------------------------------------------------------------
-@node Resolution and Hilbert series,  , Modules and their annilator, Getting started
-@subsection Resolution and Hilbert series
-@cindex Resolution and Hilbert series
-This final example in the introduction shows how to calculate an @code{Ext}
-group.
+As this calculation may take a while, let us mesure the time. Reset
+the timer and redo it.
+@example
+  timer =0;
+  ideal I = quotient(U,freemodule(nrows(U)));
+  timer;
+  @expansion{}16
+@end example
+ 
+
+Therefore it is useful to simplify the input. In the case of a module the
+command @code{prune} may be used first, which tries to find an isomorphic
+module with smaller rank, i.e. the matrix has less rows.
 
 @example
-  std(_);
+  prune(U);
   @expansion{}
+  timer=0;
+  I =  quotient(prune(U),freemodule(nrows(prune(U))));
+  timer;
+  @expansion{}  
 @end example
 
 
+@c ------------------------------------------------------------------
+@node Resolution and Ext groups,  , Modules and their annihillator, Getting started
+@subsection Resolution and Ext groups
+@cindex Resolution and Ext groups
+This final example in the introduction shows how to calculate the @code{n-th Ext} group of an ideal.
+The ingredients to do this are by definition of @code{Ext}: calculate a (minimal) resolution
+at least up to length @code{n}, apply the @code{Hom}-functor, and calculate the
+@code{n-th} Homology group, so form the quotient of @code{ker} and @code{Im}
+in the sequenze.
+@* The corresponding commands in @sc{Singular} are the following:
+the command @code{mres( ,n)} calculates a minimal free resolution
+with the standard basis method.
 
+Here we mention that @sc{Singular} gives the possibility to inspect 
+its calculation process. This can be enable with the @code{option} command.
+@example
+
+  ring rr;      // the default ring in char 32003
+  rr;
+  @expansion{}//   characteristic : 32003
+  @expansion{}//   number of vars : 3
+  @expansion{}//        block   1 : ordering dp
+  @expansion{}//                  : names    x y z 
+  @expansion{}//        block   2 : ordering C
+  ideal I = x4+x3y+x2yz,x2y2+xy2z+y2z2,x2z2+2xz3,2x2z2+xyz2;
+  option(prot);
+  resolution rs = mres(I,0);
+  @expansion{}v4(3)s-s.s.s5(3)s6-s.s-s7(2)s-s-s
+  @expansion{}product criterion:0 chain criterion:8
+  @expansion{}(6)(5).(4).(3)..(2)..(1).[1]
+  @expansion{}(7)(6)(5)(4).(3)(2).(1)[2]
+  @expansion{} // ....
+@end example
+Disable this protocol with
+@example
+  option(prot);
+@end example
+
+When we enter the name of the calculated resolution, we get a pictorial,
+description of the resolution where the exponents denote the rank of the
+free modules.
+@example
+  rs;
+  @expansion{}  1       4       5       2       0
+  @expansion{}rr  <-- rr  <-- rr  <-- rr  <-- rr
+  @expansion{} 
+  @expansion{}0       1       2       3       4
+@end example
+
+
+A single module in this resolution is obtained as usual with the brackets
+@code{[ ]}.
+@example
+  print(rs[3]);
+  @expansion{}y2z,  y3,    
+  @expansion{}-y2,  -y2,   
+  @expansion{}x+y-z,x+y-z, 
+  @expansion{}-2z,  x-y+4z,
+  @expansion{}-z,   -y+3z  
+@end example
+
+
+We continue with the translation into @sc{Singular} commands.
+The @code{Hom} functor is given simply by transposing (hence dualizing)
+the module or the corresponding matrix with the command @code{transpose}.
+The image of the @code{n-1-th} map is generated by the columns themself. 
+To calculate the kernel apply the command @code{syz} at the  @code{n-1-th}
+transposed entry of the resolution.
+Finally, the quotient is obtained by the command @code{modulo}, which
+gives for two modules A= ker, B = im  a representing module of 
+A/(A intersect B) in the usual way. 
+As we have a chain complex this is obviously the
+same as ker/im.
+@* We collect these statements in this short procedure.
+@example
+  proc Ext(int n, ideal I)
+  {
+    resolution rs = mres(I,n+1);
+    module tAn    = transpose(rs[n+1]);
+    module tAn_1  = transpose(rs[n]);
+    module ext_n  = modulo(syz(tAn),tAn_1); 
+    return(ext_n);
+  }
+@end example  
+
+Now we consider the following example:
+
+@example
+  ring r5 = 32003,(a,b,c,d,e),dp;
+  ideal I = a2b2+ab2c+b2cd, a2c2+ac2d+c2de,a2d2+ad2e+bd2e,a2e2+abe2+bce2;
+  print(Ext(2,I));
+  @expansion{}1,0,0,0,0,0,0,
+  @expansion{}0,1,0,0,0,0,0,
+  @expansion{}0,0,1,0,0,0,0,
+  @expansion{}0,0,0,1,0,0,0,
+  @expansion{}0,0,0,0,1,0,0,
+  @expansion{}0,0,0,0,0,1,0,
+  @expansion{}0,0,0,0,0,0,1 
+  Ext(3,I);   // too big to display here
+@end example
+
+Finally we mention, that in the library @code{homolog.lib} more general
+procs to calculate Ext groups are implemented.
