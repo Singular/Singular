@@ -1,8 +1,16 @@
 SHELL		= /bin/sh
-@SET_MAKE@
 
+PRODUCT		= Singular
+VERSION		= 1.0
+
+DISTNAME	= ${PRODUCT}-full-${VERSION}
+
+@SET_MAKE@
 BUILD_SUBDIRS	= @CONFIG_SUBDIRS@
 SUBDIRS		= @SUBDIRS@
+
+TEMPDIR		= /tmp
+
 
 all install uninstall info dvi : Makefile
 	for SUBDIR in ${BUILD_SUBDIRS}; \
@@ -20,8 +28,8 @@ clean distclean mostlyclean maintainer-clean:
 		cd $${SUBDIR}; \
 		${MAKE} $@; \
 		cd .. ;\
-	done
-	rm -rf *~ a.out core *.o .log lib bin share include
+	done;\
+	rm -rf *~ a.out core *.o .log lib bin share include; \
 	if test "$@" = distclean || test "$@" = maintainer-clean; then \
 	  rm -f config.cache config.log config.status TAGS* *.gz *.tar; \
 	fi; \
@@ -31,8 +39,17 @@ clean distclean mostlyclean maintainer-clean:
 	  rm -f configure ;\
 	fi
 
-dist:
-	
+dist: 
+	rm -rf ${DISTNAME}.tar* ${TEMPDIR}/${DISTNAME}*
+	mkdir ${TEMPDIR}/${DISTNAME}
+	cp -pR . ${TEMPDIR}/${DISTNAME}
+	cd ${TEMPDIR}/${DISTNAME}; ${MAKE} distclean; 
+	- find ${TEMPDIR}/${DISTNAME} -name CVS -exec rm -rf {} \; 
+	cd ${TEMPDIR}; tar cf ${DISTNAME}.tar ${DISTNAME} 
+	rm -rf ${TEMPDIR}/${DISTNAME}
+	gzip -9 ${TEMPDIR}/${DISTNAME}.tar
+	- mv ${TEMPDIR}/${DISTNAME}.tar.gz .
+
 Makefile : Makefile.in config.status
 	./config.status
 
