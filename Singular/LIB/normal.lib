@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: normal.lib,v 1.36 2001-08-27 14:47:56 Singular Exp $";
+version="$Id: normal.lib,v 1.37 2001-10-23 10:26:24 pfister Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
@@ -1426,13 +1426,12 @@ EXAMPLE: example genus; shows an example
        ideal I1=imap(newR,IDsing);
        iloc=vdim(std(I1));
        if(iglob==iloc)  // only cusps and nodes outside 0
-       {  
-          I=imap(newR,I);
-          tauloc=vdim(std(I+jacob(I)));
+       { 
           setring newR;
+          tau=vdim(std(I+jacob(I)));
           inv=deltaLoc(I[1],maxideal(1));
           delta=inv[1];
-          tau=inv[2];
+          tauloc=inv[2];
           nodes=tau-tauloc-2*cusps; 
           nbranch=inv[3]+ 2*nodes+cusps;          
           delta=delta+nodes+cusps;
@@ -1448,8 +1447,9 @@ EXAMPLE: example genus; shows an example
               tausing=tausing+inv[2];
               nbranch=nbranch+inv[3];
            }
-           nodes=tau-tauloc-2*cusps;
            tau=vdim(std(I+jacob(I)));
+
+           nodes=tau-tausing-2*cusps;
            delta=delta+nodes+cusps;  
            nbranch=nbranch+2*nodes+cusps;            
         }
@@ -1554,6 +1554,7 @@ proc deltaLoc(poly f,ideal singL)
       poly g=f+var(1)^mu+var(2)^mu;  //to obtain a convinient Newton-polygon
  
       list NP=newton(g);
+
       int s=size(NP);
       int nN=-NP[1][2]-NP[s][1]+1;  // computation of the Newton-number
       intmat m[2][2];
@@ -1912,7 +1913,7 @@ ideal i=y30+y13x+x4y5+x3*(x+1)^2;
 ring r=0,(x,y),dp;   //genus 55
 ideal i=y40+y13x+x4y5+x3*(x+1)^2;
 
-ring r=0,(x,y),dp;  //genus 55
+ring r=0,(x,y),dp;  //genus 4
 ideal i=((x2+y3)^2+xy6)*((x3+y2)^2+x10y);
 
 */
