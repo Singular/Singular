@@ -3,7 +3,7 @@
 ### Purpose: Makefile for omalloc
 ### Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
 ### Created: 11/99
-### Version: $Id: Makefile.in,v 1.15 2002-03-08 12:23:05 hannes Exp $
+### Version: $Id: Makefile.in,v 1.16 2004-03-17 15:57:35 Singular Exp $
 #################################################################
 
 SHELL		= /bin/sh
@@ -305,7 +305,7 @@ libomalloc_d.a: $(OBJD) Makefile omConfig.h mylimits.h omlimits.h
 
 CCP		= gcc
 
-CFLAGSP		= -g -pg -O3 -a
+CFLAGSP		= -g -pg -O3
 DEFSP		=  @DEFS@
 
 OBJP := $(CSOURCES:.c=.op) $(GSOURCES:.c=.op)
