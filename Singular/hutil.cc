@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hutil.cc,v 1.3 1997-04-02 15:07:03 Singular Exp $ */
+/* $Id: hutil.cc,v 1.4 1997-09-04 07:31:57 pohl Exp $ */
 /*
 * ABSTRACT: Utilities for staircase operations
 */
@@ -142,19 +142,21 @@ void hSupp(scfmon stc, int Nstc, varset var, int *Nvar)
   *Nvar = i1;
 }
 
-
 void hOrdSupp(scfmon stc, int Nstc, varset var, int Nvar)
 {
   int  i, i1, j, jj, k, l;
   short  x;
-  scmon temp;
-  varset v1;
-  v1 = (int *)Alloc(Nvar * sizeof(int));
+  scmon temp, count;
+  float o, h, g, *v1;
+
+  v1 = (float *)Alloc(Nvar * sizeof(float));
   temp = (short *)Alloc(Nstc * sizeof(short));
+  count = (short *)Alloc(Nstc * sizeof(short));
   for (i = 1; i <= Nvar; i++)
   {
     i1 = var[i];
     *temp = stc[0][i1];
+    *count = 1;
     jj = 1;
     for (j = 1; j < Nstc; j++)
     {
@@ -168,42 +170,61 @@ void hOrdSupp(scfmon stc, int Nstc, varset var, int Nvar)
           if (k == jj)
           {
             temp[k] = x;
+            count[k] = 1;
             jj++;
             break;
           }
         }
         else if (x < temp[k])
         {
-          for (l = jj; l < k; l--)
+          for (l = jj; l > k; l--)
+          {
             temp[l] = temp[l-1];
+            count[l] = count[l-1];
+          }
           temp[k] = x;
+          count[k] = 1;
           jj++;
           break;
         }
         else
+        {
+          count[k]++;
           break;
+        }
       }
     }
-    jj *= 2;
-    if (!(*temp))
-      jj--;
-    v1[i-1] = jj;
+    h = 0.0;
+    o = (float)Nstc/(float)jj;
+    for(j = 0; j < jj; j++)
+    {
+       g = (float)count[j];
+       if (g > o)
+         g -= o;
+       else
+	 g = o - g;
+       if (g > h)
+         h = g;
+    }
+    v1[i-1] = h * (float)jj;
   }
+  Free((ADDRESS)count, Nstc * sizeof(short));
+  Free((ADDRESS)temp, Nstc * sizeof(short));
   for (i = 1; i < Nvar; i++)
   {
     i1 = var[i+1];
-    jj = v1[i];
+    h = v1[i];
     j = 0;
     loop
     {
-      if (jj > v1[j])
+      if (h > v1[j])
       {
         for (l = i; l > j; l--)
         {
           v1[l] = v1[l-1];
           var[l+1] = var[l];
         }
-        v1[j] = jj;
+        v1[j] = h;
         var[j+1] = i1;
         break;
       }
@@ -212,8 +233,7 @@ void hOrdSupp(scfmon stc, int Nstc, varset var, int Nvar)
         break;
     }
   }
-  Free((ADDRESS)temp, Nstc * sizeof(short));
-  Free((ADDRESS)v1, Nvar * sizeof(int));
+  Free((ADDRESS)v1, Nvar * sizeof(float));
 }
 
 
