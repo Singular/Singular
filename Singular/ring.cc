@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.126 2000-10-23 16:32:28 obachman Exp $ */
+/* $Id: ring.cc,v 1.127 2000-10-24 16:33:49 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2999,6 +2999,9 @@ BOOLEAN rComplete(ring r, int force)
   // ----------------------------
   // set VarL_*
   rSetVarL(r);
+  // ----------------------------
+  // set NegWeightL*
+  rSetNegWeightL(r);
   return FALSE;
 }
 
@@ -3029,6 +3032,11 @@ void rUnComplete(ring r)
       omFreeSize(r->p_Procs, sizeof(p_Procs_s));
     omfreeSize(r->VarL_Offset, r->VarL_Size*sizeof(int));
   }
+  if (r->NegWeightL_Offset!=NULL)
+  {
+    omFreeSize(r->NegWeightL_Offset, r->NegWeightL_Size*sizeof(int));
+    r->NegWeightL_Offset=NULL;
+  }
 }
 
 // set r->VarL_Size, r->VarL_Offset, r->VarL_LowIndex
@@ -3058,6 +3066,36 @@ static void rSetVarL(ring r)
   r->VarL_Offset = (int*) omReallocSize(VarL_Offset,r->ExpLSize*sizeof(int),
                                         j*sizeof(int));
   p_LmFree(p, r);
+}
+
+/*2
+* set NegWeightL_Size, NegWeightL_Offset
+*/
+static void rSetNegWeightL(ring r)
+{
+  int i,l;
+  if (r->typ!=NULL)
+  {
+    l=0;
+    for(i=0;i<r->OrdSize;i++)
+    {
+      if(r->typ[i].ord_typ==ro_wp_neg) l++;
+    }
+    if (l>0)
+    {
+      r->NegWeightL_Size=l;
+      r->NegWeightL_Offset=(int *) omAlloc(l*sizeof(int));
+      l=0;
+      for(i=0;i<r->OrdSize;i++)
+      {
+        if(r->typ[i].ord_typ==ro_wp_neg)
+	{
+	  r->NegWeightL_Offset[l]=r->typ[i].data.wp.place;
+	  l++;
+	}
+      }
+    }
+  }
 }
 
 // get r->divmask depending on bits per exponent
