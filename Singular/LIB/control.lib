@@ -1,4 +1,4 @@
-version="$Id: control.lib,v 1.15 2004-10-21 18:18:22 levandov Exp $";
+version="$Id: control.lib,v 1.16 2004-12-09 13:56:29 levandov Exp $";
 category="Applications";
 info="
 LIBRARY:  control.lib Procedures for System and Control Theory 
@@ -274,9 +274,10 @@ EXAMPLE:  example LeftInverse; shows an example
 {
   int NCols=ncols(M);
   M=transpose(M);
-  matrix I[NCols][NCols];
-  I=I+1;
-  module Id=I;
+  //  matrix I[NCols][NCols];
+  //  I=I+1;
+  //  module Id=I;
+  module Id = freemodule(NCols);
   return( transpose( lift( module(M),Id ) )  );
 }
 example
@@ -800,9 +801,11 @@ example
 }
 
 proc ncdetection( r)
-//in dieser proc. wird eine matrix erzeugt, die in der i-ten zeile die indices 
-//der differential-,shift- oder advance-operatoren enthaelt mit denen die i-te
-//variable nicht kommutiert. 
+// in this procedure an involution map is generated from the NCRelations 
+// that will be used in the function involution
+// in dieser proc. wird eine matrix erzeugt, die in der i-ten zeile die indices 
+// der differential-,shift- oder advance-operatoren enthaelt mit denen die i-te
+// variable nicht kommutiert. 
 {
   int i,j,k,LExp;
   int NVars=nvars(r);
@@ -942,4 +945,121 @@ example
   D[1,3]=-S;
   ncalgebra(1,D);
   ncdetection(r);
+}
+
+proc genericity(matrix M)
+"USAGE:  genericity(M), M is a matrix
+RETURN:  list of strings with 
+NOTE:  effective with the liftstd procedure
+"
+{
+  // M is a matrix over a ring with params and vars;
+  ideal I = ideal(M); // a list of entries
+  I = simplify(I,2); // throw 0's away
+  // decompose every coeff
+  int i; int  cl=1;
+  int s = size(I);
+  list NM;
+  poly p;
+  for (i=1; i<=s; i++)
+  {
+    p = I[i];
+    while( p != 0)
+    {
+      NM[cl] = leadcoef(p);
+      cl++;
+      p = p - lead(p);
+    };
+  };
+  string newvars = parstr(basering);
+  def save = basering;
+  string NewRing = "ring @NR =" +string(char(basering))+",("+newvars+"),Dp;";
+  execute(NewRing);
+  // get params as variables
+  // creat a list of non-monomials
+  ideal L;
+  ideal F;
+  list NM = imap(save,NM);
+  poly p,q;
+  cl = 1;
+  int j, cf;
+  for(i=1; i<=size(NM);i++)
+  {
+    p = NM[i] - lead(NM[i]);
+    if (p!=0)
+    {
+      //      L[cl] = p;
+      F  = factorize(NM[i],1); //non-constant factors only
+      cf = 1;
+      // factorize every polynomial
+      // throw away every non-monomial
+      for (j=1; j<=size(F);j++)
+      {
+	q = F[j]-lead(F[j]);
+	if (q!=0)
+	{
+	  L[cl] = F[j];
+	  cl++;
+	}
+      }
+    }
+  }
+  // return the result [in string=format]
+  L = simplify(L,2+4); // skip zeroes and double entries
+  list SL;
+  for (j=1; j<=size(L);j++)
+  {
+    SL[j] = string(L[j]);
+  }
+  setring save;
+  return(SL);
+}
+example
+{  // TwoPendula
+  "EXAMPLE:"; echo = 2;
+  ring r=(0,m1,m2,M,g,L1,L2),Dt,dp;
+  module RR = 
+    [m1*L1*Dt^2, m2*L2*Dt^2, -1, (M+m1+m2)*Dt^2], 
+    [m1*L1^2*Dt^2-m1*L1*g, 0, 0, m1*L1*Dt^2],
+    [0, m2*L2^2*Dt^2-m2*L2*g, 0, m2*L2*Dt^2];
+  module R = transpose(RR);
+  matrix T;
+  module SR = liftstd(R,T);
+  genericity(T);
+}
+
+proc canonize(list L)
+"USAGE:  canonize(L), L is a list
+ASSUME: L is the output of control/autonomy procs
+RETURN:  canonized list
+"
+{
+  list M = L;
+  option(redSB);
+  option(redTail);
+  int s = size(L);
+  int i;
+  for (i=2; i<=s; i=i+2)
+  {
+    if (typeof(M[i])=="module")
+    {
+      M[i] = std(M[i]);
+      M[i] = prune(M[i]); // mimimal embedding
+      M[i] = std(M[i]);
+    }
+  }
+  return(M);
+}
+example
+{  // TwoPendula with L1=L2=L
+  "EXAMPLE:"; echo = 2;
+  ring r=(0,m1,m2,M,g,L),Dt,dp;
+  module RR = 
+    [m1*L*Dt^2, m2*L*Dt^2, -1, (M+m1+m2)*Dt^2], 
+    [m1*L^2*Dt^2-m1*L*g, 0, 0, m1*L*Dt^2],
+    [0, m2*L^2*Dt^2-m2*L*g, 0, m2*L*Dt^2];
+  module R = transpose(RR);
+  list C = control(R);
+  list CC = canonize(C);
+  view(CC);
 }
