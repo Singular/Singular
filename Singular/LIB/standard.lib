@@ -1,4 +1,4 @@
-//
+// $Id: standard.lib,v 1.2 1997-07-11 11:12:46 obachman Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
 LIBRARY: standard.lib	PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
