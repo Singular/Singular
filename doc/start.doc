@@ -1,6 +1,26 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.8 1998-05-12 14:55:11 wichmann Exp $
+@comment $Id: start.doc,v 1.9 1998-05-13 08:58:06 schmidt Exp $
 @comment this file contains the "Introduction" chapter.
+
+@c The following directives are necessary for proper compilation
+@c with emacs (C-c C-e C-r).  Please keep it as it is.  Since it
+@c is wrapped in `@ignore' and `@end ignore' it does not harm `tex' or
+@c `makeinfo' but is a great help in editing this file (emacs
+@c ignores the `@ignore').
+@ignore
+%**start
+\input texinfo.tex
+@setfilename general.info
+@node Top, Introduction
+@menu
+* Introduction::
+@end menu
+@node Introduction, General concepts, Preface, Top
+@chapter Introduction
+%**end
+@end ignore
+
+
 @menu
 * Background::
 * How to use this manual::
@@ -59,30 +79,25 @@ of systems of polynomial equations.
 @node How to use this manual, Getting started, Background, Introduction
 @section How to use this manual
 @cindex How to use this manual
-Generally speaking, the manual starts as a user manual and becomes more
-and more a reference manual in the later chapters.
-Somewhat outstanding from this rule is @ref{Mathematical background}.  It
-introduces some of the mathematical notions and definitions used
-throughout this manual.  For example, if in doubt what exactly
-@sc{Singular} means by a ``negative degree reverse lexicographical
-ordering'' one should refer to this chapter.
 
+@subsubheading For the impatient user
 In @ref{Getting started}, some simple examples are explained in a
-step-by-step manner to introduce into @sc{Singular}.  This includes the
-most important steps: how to enter and exit.
+step-by-step manner to introduce into @sc{Singular}.
 
-For real learning-by-doing or to quickly solve some given mathematical
-problem without dwelling to deeply into @sc{Singular} one should
-continue with @ref{Examples} (which is the last exception to the
-rule stated in the first paragraph).  This chapter contains a lot of
-real-life examples and detailed instructions and explanations how to
-solve them using @sc{Singular}.
+@ref{Examples} should come next for real learning-by-doing or to quickly
+solve some given mathematical problem without dwelling to deeply into
+@sc{Singular}.  This chapter contains a lot of real-life examples and
+detailed instructions and explanations how to solve them using
+@sc{Singular}.
 
-Users preferring the systematic approach maybe would like to continue
-with @ref{General concepts}, instead of/in addition to running the
-examples.  All basic concepts important to use and understand
-@sc{Singular} are developed there more or less in the order the novice
-user has to deal with them.
+@subsubheading For the systematic user
+In @ref{General concepts}, all basic concepts important to use and
+understand @sc{Singular} are developed.  But even for users preferring the
+systematic it will be helpful to have a look at the examples in
+@ref{Getting started} every now and then.
+
+The topics in this chapter are organized more or less in the order the
+novice user has to deal with them.
 
 @itemize @bullet
 @item
@@ -96,6 +111,10 @@ define a basering in @sc{Singular}.  This is explained in detail in
 @ref{Rings and orderings}.
 
 @item
+An overview of the algorithms implemented in @sc{Singular} is given in
+@ref{Implemented algorithms}.
+
+@item
 In @ref{The SINGULAR language}, language specific concepts are
 introduced such as the notions of names and objects, data types and
 conversion between them, etc.
@@ -105,9 +124,6 @@ The more complex concepts of procedures and libraries of procedures as
 well as tools to debug them are considered in the following sections:
 @ref{Procedures}, @ref{Libraries}, and @ref{Debugging tools}.
 
-@item
-An overview of the algorithms implemented in @sc{Singular} is given in
-@ref{Implemented algorithms}.
 @end itemize
 
 @ref{Data types}, is a complete treatment for @sc{Singular}'s data types
@@ -121,14 +137,20 @@ variables.  Each entry includes a description of the syntax and
 semantics of the item being explained as well as one or more examples
 how to use it.
 
+@subsubheading Miscellany
 @ref{Tricks and pitfalls}, is a loose collection of limitations and
 features which may be unexpected by those who expect to be the
 @sc{Singular} language an exact copy of the C programming language.  But
 some mathematical tips are collected there, too.
 
-The libraries which come with @sc{Singular} and the functions contained
-in them are listed in @ref{SINGULAR libraries}, and @ref{Library function
-index}, resp.
+@ref{Mathematical background} introduces some of the mathematical
+notions and definitions used throughout this manual.  For example, if in
+doubt what exactly @sc{Singular} means by a ``negative degree reverse
+lexicographical ordering'' one should refer to this chapter.
+
+@ref{SINGULAR libraries}, and @ref{Library function index} lists the
+libraries which come with @sc{Singular} and the functions contained in
+them, resp.
 
 @c ------------------------------------------------------------------
 @node Getting started,  , How to use this manual, Introduction
@@ -180,8 +202,8 @@ The last displayed result is always available with the special symbol
   @expansion{} 4
 @end example
 Furthermore @sc{Singular} maintains a history of the last input, which
-is accessewd bvy CTL P and CTL N or the arrows opn the keyboard. This
-simplifies to redo examples with minor changements.
+is accessewd by @code{CTRL-P} and @code{CTRL-N} or the arrows opn the
+keyboard. This simplifies to redo examples with minor changements.
 
 Text after @code{//} is a comment and ignored for in calculations, as seen
 in the previous example.
