@@ -21,6 +21,9 @@ fi
 if test -d "emacs"; then
    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" emacs/Makefile"
 fi
+if test -d "IntegerProgramming"; then
+   OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" IntegerProgramming/Makefile"
+fi
 
 pwd=`pwd`
 
@@ -77,12 +80,46 @@ AC_SUBST(VERSION_DATE)
 AC_SUBST(SINGULAR_SHORT_VERSION)
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
-dnl Those are needed to check for libs and headers, later on
+dnl compiler stuff
+dnl is needed to check for libs and headers, later on
 dnl
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_INSTALL
 AC_AIX
+dnl we do not want to have "-g -O" for CFLAGS
+if test "${CXXFLAGS+set}" != set; then
+  ac_cxxflags_set=no
+  CXXFLAGS="-O"
+fi
+if test "${CFLAGS+set}" != set; then
+  CFLAGS="-O"
+  ac_cflags_set=no
+fi
+
+# check whether CXX was set by user as env variable
+if test "${CXX+set}" != set; then
+  ac_cxx_set=no
+else
+  ac_cxx_set=yes
+fi
+AC_PROG_CXX
+
+# check whether the compiler accepts -pipe
+AC_MSG_CHECKING(whether compiler accepts -pipe)
+temp_cflags=${CFLAGS}
+CFLAGS="${CFLAGS} -pipe"
+AC_CACHE_VAL(ac_cv_cxx_have_pipe,
+AC_TRY_COMPILE(,,ac_cv_cxx_have_pipe=yes,ac_cv_cxx_have_pipe=no)
+)
+AC_MSG_RESULT(${ac_cv_cxx_have_pipe})
+CFLAGS=${temp_cflags}
+if test "${ac_cv_cxx_have_pipe}" != yes; then
+  PIPE=
+else
+  PIPE="-pipe"
+fi
+AC_SUBST(PIPE)
 
 AC_CHECK_PROGS(PERL, perl5 perl)
 AC_CHECK_PROGS(UUDECODE, uudecode "uudeview -i")
@@ -510,6 +547,11 @@ else
   AC_CHECK_PROG(TEXINDEX, texindex, texindex, ${pwd}/warn_not_found.sh texindex)
 fi  
 
+# test if IntegerProgramming should be built:
+
+if test -d "IntegerProgramming"; then
+   BUILD_SUBDIRS="$BUILD_SUBDIRS IntegerProgramming"
+fi
 
 AC_MSG_CHECKING(whether to configure and build Texi2html)
 if test "$enable_Texi2html" != no && test -d Texi2html; then
@@ -722,6 +764,7 @@ if test -d rpm; then
   SUBDIRS="$SUBDIRS rpm"
 fi
   
+
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Enough -- wrap it up
