@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: solve.lib,v 1.15 2000-05-12 12:17:18 krueger Exp $";
+version="$Id: solve.lib,v 1.16 2000-06-29 08:46:44 pohl Exp $";
 info="
 LIBRARY: solve.lib     PROCEDURES TO SOLVE POLYNOMIAL SYSTEMS
 AUTHOR:  Moritz Wenk,  email: wenk@mathematik.uni-kl.de
@@ -849,7 +849,7 @@ EXAMPLE: example triang_solve; shows an example
 	idelem= size(fi);
 
 	// solve fi[1]
-	li= laguerre_solve(fi[1]);
+	li= laguerre_solve(fi[1],myCompDigits,2);
 	lis= size(li);
 
 	if ( pdebug>=1 )
