@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.27 2001-02-26 15:08:44 levandov Exp $
+ *  Version: $Id: pInline2.h,v 1.28 2001-05-22 13:25:13 Singular Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -136,8 +136,15 @@ PINLINE2 Exponent_t p_GetExp(poly p, int v, ring r)
 {
   p_LmCheckPolyRing2(p, r);
   pAssume2(v > 0 && v <= r->N);
+#if 0
+  int pos=(r->VarOffset[v] & 0xffffff);
+  int bitpos=(r->VarOffset[v] >> 24);
+  long exp=(p->exp[pos] >> bitmask) & r->bitmask;
+  return exp;
+#else  
   return (p->exp[(r->VarOffset[v] & 0xffffff)] >> (r->VarOffset[v] >> 24))
           & r->bitmask;
+#endif  
 }
 PINLINE2 Exponent_t p_SetExp(poly p, int v, int e, ring r)
 {
@@ -149,10 +156,10 @@ PINLINE2 Exponent_t p_SetExp(poly p, int v, int e, ring r)
   // shift e to the left:
   register int shift = r->VarOffset[v] >> 24;
   unsigned long ee = ((unsigned long)e) << shift /*(r->VarOffset[v] >> 24)*/;
-  // clear the bits in the exponent vector:
+  // find the bits in the exponent vector
   register int offset = (r->VarOffset[v] & 0xffffff);
-  p->exp[offset]  &=
-    ~( r->bitmask << shift );
+  // clear the bits in the exponent vector:
+  p->exp[offset]  &= ~( r->bitmask << shift );
   // insert e with |
   p->exp[ offset ] |= ee;
   return e;

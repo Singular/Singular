@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly Level 0 functions
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline0.h,v 1.6 2000-12-31 15:14:37 obachman Exp $
+ *  Version: $Id: pInline0.h,v 1.7 2001-05-22 13:24:32 Singular Exp $
  *******************************************************************/
 #ifndef PINLINE0_H
 #define PINLINE0_H
@@ -80,9 +80,10 @@ PINLINE0 long p_MinComp(poly p, ring lmRing, ring tailRing)
   result = p_GetComp(p,lmRing);
   if (result != 0)
   {
-    while (pNext(p)!=NULL)
+    loop
     {
       pIter(p);
+      if(p==NULL) break;
       i = p_GetComp(p,tailRing);
       if (i<result) result = i;
     }
@@ -99,9 +100,10 @@ PINLINE0 long p_MaxComp(poly p, ring lmRing, ring tailRing)
   result = p_GetComp(p, lmRing);
   if (result != 0) 
   {
-    while (pNext(p)!=NULL)
+    loop
     {
       pIter(p);
+      if(p==NULL) break;
       i = p_GetComp(p, tailRing);
       if (i>result) result = i;
     }

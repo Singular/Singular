@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.18 2001-04-05 15:41:13 Singular Exp $
+ *  Version: $Id: pInline1.h,v 1.19 2001-05-22 13:24:32 Singular Exp $
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H
@@ -67,7 +67,7 @@ PINLINE1 void p_MemAdd_NegWeightAdjust(poly p, ring r)
 {
   if (r->NegWeightL_Offset != NULL)
   {
-    for (int i=0; i<r->NegWeightL_Size; i++)
+    for (int i=r->NegWeightL_Size-1; i>=0; i--)
     {
       p->exp[r->NegWeightL_Offset[i]] -= POLY_NEGWEIGHT_OFFSET;
     }
@@ -77,7 +77,7 @@ PINLINE1 void p_MemSub_NegWeightAdjust(poly p, ring r)
 {
   if (r->NegWeightL_Offset != NULL)
   {
-    for (int i=0; i<r->NegWeightL_Size; i++)
+    for (int i=r->NegWeightL_Size-1; i>=0; i--)
     {
       p->exp[r->NegWeightL_Offset[i]] += POLY_NEGWEIGHT_OFFSET;
     }
@@ -128,7 +128,7 @@ PINLINE1 poly p_LmInit(poly s_p, ring s_r, ring d_r, omBin d_bin)
   p_CheckRing(d_r);
   pAssume1(d_r->N <= s_r->N);
   poly d_p = p_Init(d_r, d_bin);
-  for (int i=1; i<=d_r->N;i++)
+  for (int i=d_r->N; i>0; i--)
   {
     p_SetExp(d_p, i, p_GetExp(s_p, i,s_r), d_r);
   }
@@ -272,7 +272,7 @@ PINLINE1 unsigned long p_ExpVectorQuerSum(poly p, ring r)
   unsigned long s = p_GetTotalDegree(p->exp[r->VarL_Offset[0]],
                                      r,
                                      r->MinExpPerLong);
-  for (int i = 1; i<r->VarL_Size; i++)
+  for (int i=r->VarL_Size-1; i>0; i--)
   {
     s += p_GetTotalDegree(p->exp[r->VarL_Offset[i]], r);
   }
