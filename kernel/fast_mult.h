@@ -3,5 +3,5 @@
 #include "mod2.h"
 #include "polys.h"
 poly unifastmult(poly f,poly g);
-
+poly multifastmult(poly f, poly g);
 #endif

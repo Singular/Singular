@@ -26,7 +26,7 @@ static void degsplit(poly p,int n,poly &p1,poly&p2, int vn){
   }
   if(erg2_i){
     pNext(erg2_i)=NULL;
-      }
+  }
   if (erg1_i){
     pNext(erg1_i)=NULL;
   }
@@ -41,7 +41,7 @@ static void div_by_x_power_n(poly p, int n, int vn){
   }
 }
 
-poly do_unifastmult(poly f,int df,poly g,int dg, int vn, fastmultrec rec){
+static poly do_unifastmult(poly f,int df,poly g,int dg, int vn, fastmultrec rec){
   int n=1;
   if ((f==NULL)||(g==NULL)) return NULL;
   //int df=pGetExp(f,vn);//pFDeg(f);
@@ -93,31 +93,31 @@ poly do_unifastmult(poly f,int df,poly g,int dg, int vn, fastmultrec rec){
 
   
   if((f1!=NULL) &&(f0!=NULL) &&(g0!=NULL) && (g1!=NULL)){
-  //if(true){
-//eat up f0,f1,g0,g1
+    //if(true){
+    //eat up f0,f1,g0,g1
     poly s1=pAdd(f0,f1);
     poly s2=pAdd(g0,g1);
-  poly pbig=rec(s1,s2);
-  pDelete(&s1);
-  pDelete(&s2);
+    poly pbig=rec(s1,s2);
+    pDelete(&s1);
+    pDelete(&s2);
 
  
-  //eat up pbig
-  poly sum=pbig;
-  pSetExp(factor,vn,pot);
+    //eat up pbig
+    poly sum=pbig;
+    pSetExp(factor,vn,pot);
   
-  //eat up p00
-  sum=pAdd(sum,pNeg(p00));
+    //eat up p00
+    sum=pAdd(sum,pNeg(p00));
  
-  //eat up p11
-  sum=pAdd(sum,pNeg(p11));
+    //eat up p11
+    sum=pAdd(sum,pNeg(p11));
 
   
-  sum=pMult_mm(sum,factor);
+    sum=pMult_mm(sum,factor);
 
 
-  //eat up sum
-  erg=pAdd(sum,erg);
+    //eat up sum
+    erg=pAdd(sum,erg);
   } else {
     //eat up f0,f1,g0,g1 
     poly s1=unifastmult(f0,g1);
@@ -222,6 +222,13 @@ poly do_unifastmult(poly f,int df,poly g,int dg, int vn, fastmultrec rec){
 
 //   return erg;
 // }
+
+static inline int max(int a, int b){
+  return (a>b)? a:b;
+}
+static inline int min(int a, int b){
+  return (a>b)? b:a;
+}
 poly unifastmult(poly f,poly g){
   int vn=1;
   if((f==NULL)||(g==NULL)) return NULL;
@@ -239,3 +246,44 @@ poly unifastmult(poly f,poly g){
 
 }
 
+poly multifastmult(poly f, poly g){
+  if((f==NULL)||(g==NULL)) return NULL;
+  if (pLength(f)*pLength(g)<100)
+    return ppMult_qq(f,g);
+  //find vn
+  //determine df,dg simultaneously
+  int i;
+  int can_i=-1;
+  int can_df=0;
+  int can_dg=0;
+  int can_crit=0;
+  for(i=1;i<=pVariables;i++){
+    poly p;
+    int df=0;
+    int dg=0;
+    //max min max Strategie
+    p=f;
+    while(p){
+      df=max(df,pGetExp(p,i));
+      p=pNext(p);
+    }
+    if(df>can_crit){
+      p=g;
+      while(p){
+	dg=max(dg,pGetExp(p,i));
+	p=pNext(p);
+      }
+      int crit=min(df,dg);
+      if (crit>can_crit){
+	can_crit=crit;
+	can_i=i;
+	can_df=df;
+	can_dg=dg;
+      }
+    }
+  }
+  if(can_crit==0)
+    return ppMult_qq(f,g);
+  else
+    return do_unifastmult(f,can_df,g,can_dg,can_i,multifastmult);
+}
