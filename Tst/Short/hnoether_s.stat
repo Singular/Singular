@@ -2,10 +2,10 @@ Status Output of tst_status.out
 init >> USER    :hannes
 init >> HOSTNAME:nepomuck.mathematik.uni-kl.de
 init >> uname -a:Linux nepomuck.mathematik.uni-kl.de 2.0.33 #1 Wed Jan 21 18:50:57 MET 1998 i686 unknown
-init >> date    :Tue Apr 13 15:25:18 MET DST 1999
-init >> version :1302
+init >> date    :Fri Jul  9 17:58:13 MET DST 1999
+init >> version :1303
 init >> ticks   :100
-1 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:228005
-1 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:314357
-1 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:385024
-1 >> tst_timer_1 :: nepomuck.mathematik.uni-kl.de:326
+1 >> tst_memory_0 :: nepomuck.mathematik.uni-kl.de:230273
+1 >> tst_memory_1 :: nepomuck.mathematik.uni-kl.de:314409
+1 >> tst_memory_2 :: nepomuck.mathematik.uni-kl.de:487424
+1 >> tst_timer_1 :: nepomuck.mathematik.uni-kl.de:320
