@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_sqrfree.cc,v 1.0 1996-05-17 10:59:45 stobbe Exp $
+// $Id: fac_sqrfree.cc,v 1.1 1996-05-20 13:39:48 stobbe Exp $
 
 #include "assert.h"
 #include "cf_defs.h"
@@ -7,6 +7,9 @@
 
 /*
 $Log: not supported by cvs2svn $
+// Revision 1.0  1996/05/17  10:59:45  stobbe
+// Initial revision
+//
 */
 
 static int divexp = 1;
@@ -19,10 +22,14 @@ static void divexpfunc ( CanonicalForm &, int & e )
 CFFList sqrFreeFp ( const CanonicalForm & f )
 {
     CanonicalForm t0 = f, t, v, w, h;
+    CanonicalForm leadcf = t0.lc();
     Variable x = f.mvar();
     CFFList F;
     int p = getCharacteristic();
     int k, e = 1;
+
+    if ( ! leadcf.isOne() )
+	t0 /= leadcf;
 
     divexp = p;
     while ( t0.degree(x) > 0 ) {
@@ -40,10 +47,17 @@ CFFList sqrFreeFp ( const CanonicalForm & f )
 	    v = w;
 	    t /= v;
 	    if ( h.degree(x) > 0 )
-		F.append( CFFactor( h, e*k ) );
+		F.append( CFFactor( h/h.lc(), e*k ) );
 	}
 	t0 = apply( t, divexpfunc );
 	e = p * e;
+    }
+    if ( ! leadcf.isOne() ) {
+	if ( F.getFirst().exp() == 1 ) {
+	    leadcf = F.getFirst().factor() * leadcf;
+	    F.removeFirst();
+	}
+	F.insert( CFFactor( leadcf, 1 ) );
     }
     return F;
 }
