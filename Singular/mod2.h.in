@@ -122,8 +122,8 @@
 /* Undefine to disable Gerhard's and Wilfried's fast and dirty std computations */
 #define FAST_AND_DIRTY
 #ifdef __MWERKS__
-/* static tables only */
-#define PROC_BUG
+/* includes for Metrowerks */
+#include "mod2.mwerks.h"
 #else
 /* works around a quirk in the generation of parser tables */
 #define INIT_BUG
@@ -153,7 +153,7 @@
 
 /* Undefine to disable real time measurments  */
 #ifdef HAVE_GETTIMEOFDAY
-#if ! defined(macintosh) && ! defined(MSDOS)
+#if ! defined(__MWERKS__) && ! defined(MSDOS)
 #define HAVE_RTIMER
 #else
 #undef HAVE_RTIMER
@@ -175,15 +175,6 @@
 
 #if HAVE_INFO != 1
 #define buildin_help 1
-#endif
-
-#ifdef macintosh
-#ifndef buildin_help
-#define buildin_help 1
-#endif
-#ifdef HAVE_GMP
-#define buildin_gmp 1
-#endif
 #endif
 
 #if SIZEOF_EXPONENT == 1
