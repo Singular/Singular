@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.13 1998-05-14 10:02:31 Singular Exp $ */
+/* $Id: ffields.cc,v 1.14 1998-06-04 17:17:24 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -621,16 +621,10 @@ void nfSetChar(int c, char **param)
     else     nfCharQ = -c;
     char buf[100];
     sprintf(buf,"gftables/%d",nfCharQ);
-    FILE * fp = feFopen(buf,"r",NULL,FALSE);
+    FILE * fp = feFopen(buf,"r",NULL,TRUE);
     if (fp==NULL)
     {
-      sprintf(buf,"../gftables/%d",nfCharQ);
-      fp = feFopen(buf,"r",NULL,FALSE);
-      if (fp == NULL)
-      {
-        Werror("cannot find gftables/%d", nfCharQ);
-        return;
-      }
+      return;
     }
     if(!fgets( buf, sizeof(buf), fp)) return;
     if(strcmp(buf,"@@ factory GF(q) table @@\n")!=0)
