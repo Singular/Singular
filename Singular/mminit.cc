@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mminit.cc,v 1.22 2001-01-27 17:04:59 obachman Exp $ */
+/* $Id: mminit.cc,v 1.23 2001-05-31 09:11:38 Singular Exp $ */
 /*
 * ABSTRACT: init of memory management
 */
@@ -22,7 +22,7 @@ extern "C"
 #include <gmp.h>
 }
 
-static int mmIsInitialized=mmInit();
+int mmIsInitialized=mmInit();
 
 extern "C"
 {
@@ -57,9 +57,3 @@ int mmInit( void )
   mmIsInitialized=1;
   return 1;
 }
-
-
-  
-
-
-
