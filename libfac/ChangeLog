@@ -1,3 +1,7 @@
+Tue May 13 11:32:11 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+	* Makefile.in (uninstall): took out template installation
+
 Tue May  6 09:30:51 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
 	* Added ranlib after installing libs -- Suns seem to need it

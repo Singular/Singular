@@ -1,4 +1,4 @@
-# $Id: Makefile.in,v 1.4 1997-05-06 19:37:57 obachman Exp $
+# $Id: Makefile.in,v 1.5 1997-05-13 10:09:17 obachman Exp $
 #################################################
 SHELL		= /bin/sh
 RM		= rm -f
@@ -143,17 +143,11 @@ install:	all
 	${INSTALL_DATA} ${LIBFACINCLUDE} ${includedir}
 	${INSTALL_PROGRAM} ${TARGETNAME}.a ${libdir}
 	${RANLIB} ${libdir}/${TARGETNAME}.a
-	for TEMPL in ${FACTORTEMPL}; do \
-		${INSTALL_DATA} $${TEMPL} ${templatedir}; \
-	done
 
 uninstall: 
 	$(RM) ${includedir}/${LIBFACINCLUDE}
 	$(RM) ${libdir}/${LIBFACNAME}.a
 	$(RM) ${libdir}/${SINGLIBFACNAME}.a
-	for TEMPL in ${FACTORTEMPL}; do \
-		$(RM) ${templatedir}/$${TEMPL}; \
-	done
 
 mostlyclean:
 	$(RM)	test ${LIBFACNAME}.a ${SINGLIBFACNAME}.a \
