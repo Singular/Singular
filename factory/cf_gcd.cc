@@ -1,8 +1,12 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_gcd.cc,v 1.5 1996-12-05 18:24:53 schmidt Exp $
+// $Id: cf_gcd.cc,v 1.6 1997-03-26 16:39:06 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.5  1996/12/05 18:24:53  schmidt
+``Unconditional'' check-in.
+Now it is my turn to develop factory.
+
 Revision 1.4  1996/07/08 08:21:10  stobbe
 "gcd_poly: now uses ezgcd if the switch SW_USE_EZGCD is on.
 "
@@ -33,7 +37,10 @@ Initial revision
 */
 
 #include "assert.h"
+#include "debug.h"
+
 #include "cf_defs.h"
+
 #include "canonicalform.h"
 #include "cf_iter.h"
 #include "cf_reval.h"
@@ -271,7 +278,7 @@ gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primiti
     }
     cg = gcd( f.lc(), g.lc() );
     cl = ( f.lc() / cg ) * g.lc();
-//     B = 2 * cg * tmin( 
+//     B = 2 * cg * tmin(
 // 	maxnorm(f)*power(CanonicalForm(2),f.degree())*isqrt(f.degree()+1),
 // 	maxnorm(g)*power(CanonicalForm(2),g.degree())*isqrt(g.degree()+1)
 // 	)+1;
@@ -324,7 +331,7 @@ gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primiti
 	else {
 	    return gcd_poly( F, G, false );
 	}
-	cerr << "another try ..." << endl;
+	DEBOUTLN( cerr, "another try ...", ' ' );
     }
 }
 
@@ -394,7 +401,7 @@ gcd_poly( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
 	return gcd_poly1( f, g, modularflag );
     }
 }
-    
+
 
 static CanonicalForm
 cf_content ( const CanonicalForm & f, const CanonicalForm & g )
