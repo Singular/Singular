@@ -2197,8 +2197,8 @@ static BOOLEAN jjPROC1(leftv res, leftv u)
 static BOOLEAN jjBAREISS(leftv res, leftv v)
 {
   matrix m=(matrix)v->Data();
-  m=mpBareiss(m,FALSE);
-  res->data = (char *)m;
+  lists l=mpBareiss(m,FALSE);
+  res->data = (char *)l;
   return FALSE;
 }
 static BOOLEAN jjBAREISS_IM(leftv res, leftv v)
@@ -3090,7 +3090,7 @@ struct sValCmd1 dArith1[]=
 // and the procedures with 1 argument:
 ,{atATTRIB1,    ATTRIB_CMD,      NONE,           DEF_CMD }
 ,{jjBAREISS_IM, BAREISS_CMD,     INTMAT_CMD,     INTMAT_CMD }
-,{jjBAREISS,    BAREISS_CMD,     MATRIX_CMD,     MATRIX_CMD }
+,{jjBAREISS,    BAREISS_CMD,     LIST_CMD,     MATRIX_CMD }
 ,{jjBETTI,      BETTI_CMD,       INTMAT_CMD,     LIST_CMD }
 ,{jjBETTI_R,    BETTI_CMD,       XS(INTMAT_CMD), RESOLUTION_CMD }
 ,{jjCHAR,       CHARACTERISTIC_CMD, INT_CMD,     RING_CMD }
