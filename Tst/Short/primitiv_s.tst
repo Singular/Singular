@@ -4,6 +4,7 @@ LIB "tst.lib";
 tst_init();
 LIB "primitiv.lib";
 // ------------ test of primitive: -------------------
+printlevel=3;
 ring r=0,x,dp;
 primitive(ideal(x2+1));
 kill r;
@@ -28,6 +29,9 @@ kill r;
 ring r=3,(x,y,z),dp;
 ideal i=x2+1,y3-y-1,z2+yz-1;
 primitive(i);
+// ------------ test of primitive_extra: -------------
+primitive_extra(i);
+primitive_extra(ideal(i[1],i[2]));
 kill r;
 // ------------ test of splitring: -------------------
 ring r=0,(x,y),ds;
@@ -49,7 +53,5 @@ list L=splitring(c2-2j,"",list(a2+ja,j,l[5]));
 L;
 L[3]^2;
 kill R1,r;
-// ------------ test of randomLast: ------------------
-example randomLast;
 tst_status(1);$
 
