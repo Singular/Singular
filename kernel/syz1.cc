@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.6 2004-06-02 13:14:40 Singular Exp $ */
+/* $Id: syz1.cc,v 1.7 2004-06-02 14:51:16 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -302,18 +302,6 @@ static int syzcompmonomdp(poly p1, poly p2)
   return -1;
 }
 
-static int syLength(poly p)
-{
-  int result=0;
-
-  while (p!=NULL)
-  {
-    result++;
-    pIter(p);
-  }
-  return result;
-}
-
 poly syRedtail (poly p, syStrategy syzstr, int index)
 {
   poly h, hn;
@@ -493,10 +481,7 @@ static void pResetSetm(poly p)
     pIter(p);
   }
 #ifdef PDEBUG
-  if (! pTest(q))
-  {
-    pSetm(p);
-  }
+  pTest(q);
 #endif
 }
 

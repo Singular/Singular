@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz2.cc,v 1.1.1.1 2003-10-06 12:16:04 Singular Exp $ */
+/* $Id: syz2.cc,v 1.2 2004-06-02 14:54:54 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -129,13 +129,13 @@ static void syCreateNewPairs_Hilb(syStrategy syzstr, int index,
                 if (pLmDivisibleByNoComp(nP->m[j],p))
                 {
                   pDelete(&p);
-                  p = NULL;
+                  /* p = NULL;*/
                   break;
                 }
                 else if (pLmDivisibleByNoComp(p,nP->m[j]))
                 {
                   pDelete(&(nP->m[j]));
-                  nP->m[j] = NULL;
+                  /* nP->m[j] = NULL;*/
                 }
 #ifdef USE_CHAINCRIT
                 else
