@@ -1,8 +1,8 @@
-// $Id: deform.lib,v 1.11 1998-05-14 18:44:57 Singular Exp $
+// $Id: deform.lib,v 1.12 1998-05-29 15:01:55 Singular Exp $
 // author: Bernd Martin email: martin@math.tu-cottbus.de
 //(bm, last modified 4/98)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: deform.lib,v 1.11 1998-05-14 18:44:57 Singular Exp $";
+version="$Id: deform.lib,v 1.12 1998-05-29 15:01:55 Singular Exp $";
 info="
 LIBRARY:  deform.lib       PROCEDURES FOR COMPUTING MINIVERSAL DEFORMATION
                            by Bernd Martin (martin@math.tu-cottbus.de)
@@ -578,7 +578,7 @@ Sub-procedure: obtain Ext1 and Ext2 and other objects used by mod_versal
    module Co,Do,ima,ex1,ex2;
    matrix M0,M1,M2,ker,kb1,lift1,kb2,A,B,C,D;
 //------- resM ---------------------------------------------------------------
-   list resM = res(Mo,3);
+   list resM = nres(Mo,3);
    M0 = resM[1];
    M1 = resM[2];
    M2 = resM[3];   kill resM;

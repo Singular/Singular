@@ -1,8 +1,8 @@
-// $Id: matrix.lib,v 1.7 1998-05-14 18:45:10 Singular Exp $
+// $Id: matrix.lib,v 1.8 1998-05-29 15:01:59 Singular Exp $
 // (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: matrix.lib,v 1.7 1998-05-14 18:45:10 Singular Exp $";
+version="$Id: matrix.lib,v 1.8 1998-05-29 15:01:59 Singular Exp $";
 info="
 LIBRARY:  matrix.lib    PROCEDURES FOR MATRIX OPERATIONS
 
@@ -232,7 +232,7 @@ example
 { "EXAMPLE:";   echo = 2;
    ring r=32003,(x,y,z),ds;
    ideal i=x4+y5+z6,xyz,yx2+xz2+zy7;
-   list L=res(i,0);
+   list L=nres(i,0);
    is_complex(L);
    L[4]=matrix(i);
    is_complex(L);

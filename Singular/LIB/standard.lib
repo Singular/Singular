@@ -1,14 +1,14 @@
-// $Id: standard.lib,v 1.16 1998-05-25 21:28:33 obachman Exp $
+// $Id: standard.lib,v 1.17 1998-05-29 15:02:02 Singular Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.16 1998-05-25 21:28:33 obachman Exp $";
+version="$Id: standard.lib,v 1.17 1998-05-29 15:02:02 Singular Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
  stdfglm(ideal[,ord])   standard basis of the ideal via fglm [and ordering ord]
  stdhilb(ideal)         standard basis of the ideal using the Hilbert function
- groebner(ideal/module) standard basis of ideal or module using a 
-                        heuristically choosen method 
+ groebner(ideal/module) standard basis of ideal or module using a
+                        heuristically choosen method
 ";
 
 //////////////////////////////////////////////////////////////////////////////
@@ -125,20 +125,20 @@ example
 
 proc groebner(def i, list #)
 "USAGE: groebner(i[, wait]) i -- ideal/module; wait -- int
-RETURNS: Standard basis of ideal or module which is computed using a 
-         heuristically choosen method: 
+RETURNS: Standard basis of ideal or module which is computed using a
+         heuristically choosen method:
          If the ordering of the current ring is a local ordering, or
          if it is a non-block ordering and the current ring has no
-         parameters, then std(i) is returned.  
+         parameters, then std(i) is returned.
          Otherwise, i is mapped into a ring with no parameters and
          ordering dp, where its Hilbert series is computed. This is
          followed by a Hilbert-series based std computation in the
          original ring.
 NOTE: If a 2nd argument 'wait' is given, then the computation proceeds
-      at most 'wait' seconds. That is, if no result could be computed in 
-      'wait' seconds, then the computation is interrupted, 0 is returned, 
-      a warning message is displayed, and the global variable 
-      'groebner_error' is defined. 
+      at most 'wait' seconds. That is, if no result could be computed in
+      'wait' seconds, then the computation is interrupted, 0 is returned,
+      a warning message is displayed, and the global variable
+      'groebner_error' is defined.
 EXAMPLE: example groebner; shows an example"
 {
   def P=basering;
@@ -152,14 +152,14 @@ EXAMPLE: example groebner; shows an example"
       {
         int wait = #[1];
         int j = 10;
-        
+
         string bs = nameof(basering);
         link l_fork = "MPtcp:fork";
         open(l_fork);
         write(l_fork, quote(system("pid")));
         int pid = read(l_fork);
         write(l_fork, quote(groebner(eval(i))));
-        
+
         // sleep in small intervalls for appr. one second
         if (wait > 0)
         {
@@ -169,7 +169,7 @@ EXAMPLE: example groebner; shows an example"
             j = j + j;
           }
         }
-        
+
         // sleep in intervalls of one second from now on
         j = 1;
         while (j < wait)
@@ -177,7 +177,7 @@ EXAMPLE: example groebner; shows an example"
           if (status(l_fork, "read", "ready", 1000000)) {break;}
           j = j + 1;
         }
-        
+
         if (status(l_fork, "read", "ready"))
         {
           def result = read(l_fork);
@@ -225,7 +225,7 @@ EXAMPLE: example groebner; shows an example"
     //spaeter den lokalen fall ueber lp oder aehnlich behandeln
     return(std(i));
   }
-   
+
   int IsSimple_P;
   if (system("nblocks") <= 2)
   {
@@ -264,12 +264,12 @@ EXAMPLE: example groebner; shows an example"
   {
     option(mem);
   }
-   
+
   // construct ring in which first std computation is done
   string varstr_P = varstr(P);
   string parstr_P = parstr(P);
-  int is_homog = (homog(i) && (npars_P == 0)); 
-   
+  int is_homog = (homog(i) && (npars_P == 0));
+
   string ri = "ring Phelp =" + string(char(P)) + ",(" + varstr_P;
   // parameters are converted to ring variables
   if (npars_P > 0)
@@ -286,7 +286,7 @@ EXAMPLE: example groebner; shows an example"
 
   // change the ring
   execute(ri);
-   
+
   // get ideal from previous ring
   if (is_homog)
   {
@@ -297,7 +297,7 @@ EXAMPLE: example groebner; shows an example"
     // and homogenize
     ideal qh=homog(imap(P,i),@t);
   }
-   
+
   // compute std and hilbert series
   if (p_opt)
   {
@@ -321,9 +321,9 @@ EXAMPLE: example groebner; shows an example"
   {
     // additional variables were introduced
     // need another intermediate ring
-    ri = "ring Phelp1 =" + string(char(P)) 
+    ri = "ring Phelp1 =" + string(char(P))
       + ",(" + varstr(Phelp) + "),(" + ordstr_P;
-     
+
     // for lp without parameters, we do not need a block ordering
     if ( ! (IsSimple_P && (npars_P + is_homog < 2) && find(ordstr_P, "l")))
     {
@@ -331,7 +331,7 @@ EXAMPLE: example groebner; shows an example"
       ri = ri + ", dp(" + string(npars_P + is_homog) + ")";
     }
     ri = ri + ");";
-     
+
     // change to intermediate ring
     execute(ri);
     ideal qh = imap(Phelp, qh);
@@ -347,7 +347,7 @@ EXAMPLE: example groebner; shows an example"
     {
       qh = subst(qh, @t, 1);
     }
-     
+
     // go back to original ring
     setring P;
     // get ideal, delete zeros and clean SB
@@ -369,7 +369,7 @@ example
 {
   "EXAMPLE: "; echo = 2;
   ring r = 0, (a,b,c,d), lp;
-  option(prot); 
+  option(prot);
   ideal i = a+b+c+d, ab+ad+bc+cd, abc+abd+acd+bcd, abcd-1; // cyclic 4
   groebner(i);
   ring rp = (0, a, b), (c,d), lp;
@@ -383,12 +383,12 @@ example
 
 
 //////////////////////////////////////////////////////////////////////////
-proc resu(list #)
+proc res(list #)
 {
    def P=basering;
    list result;
    def m=#[1]; //the ideal or module
-   
+
    int i=#[2]; //the length of the resolution
                //if size(#)>2 a minimal resolution is computed
 
@@ -413,7 +413,7 @@ proc resu(list #)
       list re=mres(m,i);
       setring P;
       result=imap(Phelp,re);
-      return(result);   
+      return(result);
    }
 
    //sres for the local case and not minimal resolution
@@ -438,10 +438,10 @@ proc resu(list #)
    list re=mres(m,i);
    setring P;
    result=imap(Phelp,re);
-   return(result);      
+   return(result);
 }
 
 proc minresu(list #)
 {
-   return(resu(#[1],#[2],1));
+   return(res(#[1],#[2],1));
 }

@@ -1,8 +1,8 @@
-// $Id: finvar.lib,v 1.11 1998-05-14 18:45:00 Singular Exp $
+// $Id: finvar.lib,v 1.12 1998-05-29 15:01:57 Singular Exp $
 // author: Agnes Eileen Heydtmann, email:agnes@math.uni-sb.de
 // last change: 3.5.98
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.11 1998-05-14 18:45:00 Singular Exp $"
+version="$Id: finvar.lib,v 1.12 1998-05-29 15:01:57 Singular Exp $"
 info="
 LIBRARY:  finvar.lib       LIBRARY TO CALCULATE INVARIANT RINGS & MORE
                            (c) Agnes Eileen Heydtmann,
@@ -5080,7 +5080,7 @@ THEORY:  The secondary invariants are generated following \"Generating Invariant
     B=f(trivialS)-trivialS;            // these relations should be 0 -
     M(1)[i,1..k]=B[1..k];              // we will look for the syzygies of M(1)
   }
-  module M(2)=res(M(1),2)[2];
+  module M(2)=nres(M(1),2)[2];
   int m=ncols(M(2));                   // number of generators of the module
                                        // M(2) -
   // the following steps calculates the intersection of the module M(2) with

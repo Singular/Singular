@@ -1,3 +1,6 @@
+Fri May 29 17:00:27 MET DST 1998 hannes
+	* change res to nres (cmd), resu to res(standard.lib)
+	  including changes to libs, docs (partially)
 Wed May 27 19:13:10 MET DST 1998 hannes
 	* removed #define HAVE_GMP and non-gmp-parts
 Wed May 20 15:03:28 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>

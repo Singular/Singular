@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.67 1998-05-27 10:06:40 Singular Exp $
+@comment $Id: types.doc,v 1.68 1998-05-29 15:02:06 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -329,7 +329,7 @@ lift-matrix (see @ref{lift})
 @item liftstd
 standard basis and transformation matrix computation (see @ref{liftstd})
 @item lres
-minimal resolution (see @ref{lres})
+minimal resolution for homogeneous ideals (see @ref{lres})
 @item maxideal
 power of the maximal ideal at 0 (see @ref{maxideal})
 @item minbase

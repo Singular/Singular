@@ -1,8 +1,8 @@
-// $Id: homolog.lib,v 1.6 1998-05-05 11:55:28 krueger Exp $
+// $Id: homolog.lib,v 1.7 1998-05-29 15:01:58 Singular Exp $
 //(BM/GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: homolog.lib,v 1.6 1998-05-05 11:55:28 krueger Exp $";
+version="$Id: homolog.lib,v 1.7 1998-05-29 15:01:58 Singular Exp $";
 info="
 LIBRARY:  homolog.lib   PROCEDURES FOR HOMOLOGICAL ALGEBRA
 
@@ -55,7 +55,7 @@ EXAMPLE: example cup; shows examples
 //take a resolution of M<--F(0)<--- ...  <---F(3)
 //apply Hom(-,M) and compute the Ext's
 //-----------------------------------------------------------------------------
-   list resM = res(M,3);
+   list resM = nres(M,3);
    M1 = resM[2];
    M2 = resM[3];
    f0 = nrows(M);
@@ -240,10 +240,10 @@ EXAMPLE: example cupproduct; shows examples
 //                     M<--F(0)<--- ...  <---F(p+q+1)
 //                     N<--G(0)<--- ...  <---G(q+1)
 //-----------------------------------------------------------------------------
-   list resM = res(M,p+q+1);
+   list resM = nres(M,p+q+1);
    M1 = resM[p];
    M2 = resM[p+1];
-   list resN = res(N,q+1);
+   list resN = nres(N,q+1);
    N1 = resN[q];
    N2 = resN[q+1];
    P1 = resM[p+q];

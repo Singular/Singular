@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.27 1998-05-25 09:24:27 schmidt Exp $
+@comment $Id: examples.doc,v 1.28 1998-05-29 15:02:03 Singular Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -1088,26 +1088,30 @@ In @sc{Singular} a free resolution of a module or ideal is a list of modules,
 which are submodules of a free module. The first module in the list is
 the input module (minimized if @code{mres} is used), the k-th module in the
 list is the first syzygy-module (module of relations) of the (k-1)st module.
-There are 3 resolution commands @code{sres}, @code{res}, @code{mres}
-and the command @code{syz}:
+There are several resolution commands @code{res}, @code{lres}, @code{sres},s
+@code{nres}, @code{mres} and the command @code{syz}:
 @table @code
+@item res
+computes a resolution using a heuristically choosen method
+@item lres
+computes a resolution for homogeneous ideals
 @item sres
 requires a standard basis as input, does not give a minimal resolution.
 Is quite often (in symmetric or determinantal situations which are far
-from a complete intersection) much faster than the other two commands.
+from a complete intersection) much faster than the other commands.
 @item mres
- computes a minimal resolution, also minimizing the first module
-@item res
-  minimizes every module in the resolution except the first module
+computes a minimal resolution, also minimizing the first module
+@item nres
+minimizes every module in the resolution except the first module
 @item syz
   computes the 1-st syzygy module of the input, i.e. the module of
          relations between the given generators.
 @end table
-@code{sres(i,r)}, @code{mres(i,r)}, @code{res(i,r)} compute the
-first r modules of the resolution
+@code{res(i,r)}, @code{lres(i,r)}, @code{sres(i,r)}, @code{mres(i,r)}, 
+@code{nres(i,r)} compute the first r modules of the resolution
 of i, resp. the full resolution if r=0 and the basering is not a qring.
-See the description of @code{sres}, @code{mres} and @code{res} in the
-manual for a precise description.
+See the description of @code{res}, @code{lres}, @code{sres}, @code{mres} and
+@code{nres} in the manual for a precise description.
 @*Note: The command @code{betti} does not require a minimal
 resolution for the minimal betti numbers.
 

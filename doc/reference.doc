@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.82 1998-05-27 10:46:25 Singular Exp $
+@comment $Id: reference.doc,v 1.83 1998-05-29 15:02:05 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -117,6 +117,7 @@ the brackets are optional. In the syntax of the commands @code{help} and
 * names::
 * ncols::
 * npars::
+* nres::
 * nrows::
 * nvars::
 * open::
@@ -3245,7 +3246,7 @@ matrix or intmat.)
 See @ref{matrix}; @ref{nrows}; @ref{size}.
 @end iftex
 @c ---------------------------------------
-@node npars, nrows, ncols, Functions
+@node npars, nres, ncols, Functions
 @subsection npars
 @cindex npars
 @table @code
@@ -3272,6 +3273,85 @@ returns the number of parameters of a ring.
 @iftex
 See @ref{par}; @ref{parstr}; @ref{ring}.
 @end iftex
+@c ---------------------------------------
+@node  nres, nrows, npars, Functions
+@subsection nres
+@cindex nres
+@table @code
+@item @strong{Syntax:}
+@code{nres (} ideal_expression@code{,} int_expression @code{)}
+@*@code{nres (} module_expression@code{,} int_expression @code{)}
+@item @strong{Type:}
+resolution
+@item @strong{Purpose:}
+computes a minimal free resolution of an ideal or module M with the standard basis method.
+More precisely, let
+@tex
+$A_1$=matrix(M),
+@end tex
+@ifinfo
+A1=matrix(M),
+@end ifinfo
+then @code{nres}
+computes a free resolution of
+@ifinfo
+M1=coker(A1)
+@*...--> F2 --A2-> F1 --A1-> F0-->M1-->0,
+@end ifinfo
+@tex
+$M_1=coker(A_1)$
+$$...\longrightarrow F_2 \buildrel{A_2}\over{\longrightarrow} F_1 \buildrel{A_1}\over{\longrightarrow} F_0\longrightarrow M_1\longrightarrow 0,$$
+@end tex
+@*where the columns of the matrix
+@tex
+$A_1$
+@end tex
+@ifinfo
+A1
+@end ifinfo
+are the given set of generators of M.
+The computation stops after k steps, if the int expression k
+is not zero, and returns a list of modules
+@tex
+$M_i={\tt module}(A_i)$, i=1..k.
+@end tex
+@ifinfo
+Mi=module(Ai), i=1..k.
+@end ifinfo
+@*If k=0, @code{nres(M,0)}
+returns a list of n modules where n is the number of variables of the basering.
+Let @code{list l=nres(M,0);}
+then L[1]=M is identical to the input, L[2] is a minimal set of generators
+of the first szyzgy
+module of L[1], etc.
+( L[i]
+@ifinfo
+=M_i
+@end ifinfo
+@tex
+$=M_i$
+@end tex
+ in the notations from above).
+@item @strong{Example:}
+@example
+@c example
+  ring r  = 31991,(t,x,y,z,w),ls;
+  ideal M = t2x2+tx2y+x2yz,t2y2+ty2z+y2zw,
+            t2z2+tz2w+xz2w,t2w2+txw2+xyw2;
+  resolution L = nres(M,0);
+  L;
+@c example
+@end example
+@end table
+@c ref
+See
+@ref{ideal};
+@ref{lres};
+@ref{module};
+@ref{mres};
+@ref{res};
+@ref{sres}.
+@c ref
 @c ---------------------------------------
 @node nrows, nvars, npars, Functions
 @subsection nrows

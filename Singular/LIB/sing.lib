@@ -1,9 +1,9 @@
-// $Id: sing.lib,v 1.11 1998-05-14 18:45:16 Singular Exp $
+// $Id: sing.lib,v 1.12 1998-05-29 15:02:01 Singular Exp $
 //system("random",787422842);
 //(GMG/BM, last modified 26.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: sing.lib,v 1.11 1998-05-14 18:45:16 Singular Exp $";
+version="$Id: sing.lib,v 1.12 1998-05-29 15:02:01 Singular Exp $";
 info="
 LIBRARY:  sing.lib      PROCEDURES FOR SINGULARITIES
 
@@ -538,20 +538,21 @@ EXAMPLE: example T1; shows an example
   }
 //--------------------------- presentation of J -------------------------------
    int rk;
-  def P = basering;
+   def P = basering;
    module jac, t1;
    jac  = jacob(J);                 // jacobian matrix of J converted to module
-   res(J,2,A);                      // compute presentation of J
-                                    // A(2) = 1st syzygy module of J
+   list A=nres(J,2);                // compute presentation of J
+   def A(1..2)=A[1..2]; kill A;     // A(2) = 1st syzygy module of J
 //---------- go to quotient ring mod J and compute normal bundle --------------
-  qring  R    = std(J);
+   qring  R    = std(J);
    module jac = fetch(P,jac);
    module t1  = transpose(fetch(P,A(2)));
-   res(t1,2,B);                     // resolve t1, B(2)=(J/J^2)*=normal_bdl
+   list B=nres(t1,2,B);             // resolve t1, B(2)=(J/J^2)*=normal_bdl
+   def B(1..2)=B[1..2]; kill B;
    t1         = modulo(B(2),jac);   // pres. of normal_bdl/trivial_deformations
    rk=nrows(t1);
 //-------------------------- pull back to basering ----------------------------
-  setring P;
+   setring P;
    t1 = fetch(R,t1)+J*freemodule(rk);  // T1-module, presentation of T1
    t1 = std(t1);
    dbprint(printlevel-voice+3,"// dim T1 = "+string(vdim(t1)));
@@ -608,20 +609,22 @@ EXAMPLE: example T2; shows an example
    list L;
    int n,rk;
 //------------------- presentation of non-trivial syzygies --------------------
-   res(J,2,A);                            // resolve J, A(2)=syz
+   list A=nres(J,2);                      // resolve J, A(2)=syz
+   def A(1..2)=A[1..2]; kill A;
    kos  = koszul(2,J);                    // module of Koszul relations
    SK   = modulo(A(2),kos);               // presentation of syz/kos
    ideal J0 = std(J);                     // standard basis of J
 //?*** sollte bei der Berechnung von res mit anfallen, zu aendern!!
 //---------------------- fetch to quotient ring mod J -------------------------
-  qring R = J0;                           // make P/J the basering
+   qring R = J0;                          // make P/J the basering
    module A2' = transpose(fetch(P,A(2))); // dual of syz
    module t2  = transpose(fetch(P,SK));   // dual of syz/kos
-   res(t2,2,B);                           // resolve (syz/kos)*
+   list B=nres(t2,2);                     // resolve (syz/kos)*
+   def B(1..2)=B[1..2]; kill B;
    t2 = modulo(B(2),A2');                 // presentation of T2
    rk = nrows(t2);
 //---------------------  fetch back to basering -------------------------------
-  setring P;
+   setring P;
    t2 = fetch(R,t2)+J*freemodule(rk);
    t2 = std(t2);
    dbprint(printlevel-voice+3,"// dim T2 = "+string(vdim(t2)));
@@ -682,7 +685,7 @@ EXAMPLE: example T12; shows an example
    list L;
    ideal  i0 = std(i);
 //-------------------- presentation of non-trivial syzygies -------------------
-   list I= res(i,2);                            // resolve i
+   list I= nres(i,2);                           // resolve i
    Syz  = matrix(I[2]);                         // syz(i)
    jac = jacob(i);                              // jacobi ideal
    Kos = koszul(2,i);                           // koszul-relations
@@ -692,9 +695,9 @@ EXAMPLE: example T12; shows an example
    module Jac = fetch(P,jac);
    matrix No  = transpose(fetch(P,Syz));        // ker(No) = Hom(syz,Ox)
    module So  = transpose(fetch(P,SK));         // Hom(syz/kos,R)
-   list resS  = res(So,2);
+   list resS  = nres(So,2);
    matrix Sx  = resS[2];
-   list resN  = res(No,2);
+   list resN  = nres(No,2);
    matrix Nx  = resN[2];
    module T2  = modulo(Sx,No);                  // presentation of T2
    r2         = nrows(T2);

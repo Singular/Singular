@@ -1,5 +1,5 @@
 //
-version="$Id: fastsolv.lib,v 1.4 1998-05-14 18:44:59 Singular Exp $";
+version="$Id: fastsolv.lib,v 1.5 1998-05-29 15:01:56 Singular Exp $";
 info="";
 
 // ====================================================================
@@ -180,8 +180,7 @@ EXAMPLE:  example fastElim; shows an example.
      // Falls das 4. Argument 1 ist, eine minimale Basis berechnen
      if (#[4]==1)
      {
-       mres(@a,1,@a0);
-       @a=@a0(1);
+       @a=mres(@a,1)[1];
      }
      return(@a);
    }
@@ -228,8 +227,7 @@ EXAMPLE:  example fastElim; shows an example.
    // Falls das 4. Argument 1 ist, eine minimale Basis berechnen
    if (#[4]==1)
    {
-     mres(@b,1,@b0);
-     @b=@b0(1);
+     @b=mres(@b,1)[1];
    }
 
    // dehomogenisieren (@homo=1) und zurueck in den alten Ring

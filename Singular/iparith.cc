@@ -218,6 +218,11 @@ cmdnames cmds[] =
   { "ncols",       0, COLS_CMD ,          CMD_1},
   { "not",         0, NOT ,               NOT},
   { "npars",       0, NPARS_CMD ,         CMD_1},
+  #ifdef OLD_RES
+  { "nres",        0, RES_CMD ,           CMD_23},
+  #else
+  { "nres",        0, RES_CMD ,           CMD_2},
+  #endif
   { "nrows",       0, ROWS_CMD ,          CMD_1},
   { "number",      0, NUMBER_CMD ,        RING_DECL},
   { "nvars",       0, NVARS_CMD ,         CMD_1},
@@ -245,11 +250,6 @@ cmdnames cmds[] =
   { "read",        0, READ_CMD ,          CMD_12},
   { "reduce",      0, REDUCE_CMD ,        CMD_23},
   { "regularity",  0, REGULARITY_CMD ,    CMD_1},
-  #ifdef OLD_RES
-  { "res",         0, RES_CMD ,           CMD_23},
-  #else
-  { "res",         0, RES_CMD ,           CMD_2},
-  #endif
   { "reservedName",0, RESERVEDNAME_CMD ,  CMD_M},
   { "resolution",  0, RESOLUTION_CMD ,    RING_DECL},
   { "resultant",   0, RESULTANT_CMD,      CMD_3},
