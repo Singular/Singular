@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.66 1998-08-24 14:39:07 obachman Exp $ */
+/* $Id: febase.cc,v 1.67 1998-09-01 15:10:15 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -70,10 +70,6 @@ BOOLEAN errorreported = FALSE;
 BOOLEAN feBatch=FALSE;
 char *  feErrors=NULL;
 int     feErrorsLen=0;
-#ifdef macintosh
-static  int lines = 0;
-static  int cols = 0;
-#endif
 
 const char feNotImplemented[]="not implemented";
 
@@ -949,6 +945,9 @@ void Warn(const char *fmt, ...)
 }
 
 #ifdef macintosh
+static  int lines = 0;
+static  int cols = 0;
+
 void mwrite(uchar c)
 {
   if (c == '\n')
@@ -971,7 +970,7 @@ void mwrite(uchar c)
     cols++;
     if (cols == colmax)
     {
-//      cols = 0;   //will be done by mwrite('\n');
+      // cols = 0;   //will be done by mwrite('\n');
       mwrite('\n');
     }
   }
@@ -995,11 +994,12 @@ void PrintS(char *s)
   else
 #endif
   {
-    fwrite(s,1,strlen(s),stdout);
+    int i=strlen(s);
+    fwrite(s,1,i,stdout);
     fflush(stdout);
     if (feProt&PROT_O)
     {
-      fwrite(s,1,strlen(s),feProtFile);
+      fwrite(s,1,i,feProtFile);
     }
   }
 #endif
