@@ -1,8 +1,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/kstd1.cc,v 1.1.1.1 1997-03-19 13:18:47 obachman Exp $";
+static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/kstd1.cc,v 1.2 1997-03-24 10:57:50 Singular Exp $";
 /* $Log: not supported by cvs2svn $
+// Revision 1.1.1.1  1997/03/19  13:18:47  obachman
+// Imported Singular sources
+//
 */
 /*
 * ABSTRACT:
@@ -1866,6 +1869,7 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
     for (i=0; i<IDELEMS(r); i++) pTest(r->m[i]);
   }
 #endif
+  idSkipZeroes(r);
   if (toReset)
   {
     kModW = NULL;
@@ -1879,12 +1883,16 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   l->m[0].rtyp=IDEAL_CMD;
   l->m[0].data=(void *)r;
   l->m[1].rtyp=IDEAL_CMD;
-  l->m[1].data=(void *)strat->M;
   if (strat->M==NULL)
   {
     l->m[1].data=(void *)idInit(1,F->rank);
     Warn("no minimal generating set computed");
   }  
+  else
+  {
+    idSkipZeroes(strat->M);
+    l->m[1].data=(void *)strat->M;
+  }
   Free((ADDRESS)strat,sizeof(skStrategy));
   if (reduced>2)
   {  
