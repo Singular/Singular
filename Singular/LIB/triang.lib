@@ -1,5 +1,6 @@
+//last change: 13.02.2001 (Eric Westenberger)
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: triang.lib,v 1.6 2001-01-16 13:48:46 Singular Exp $";
+version="$Id: triang.lib,v 1.7 2001-02-19 14:17:50 lossen Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY: triang.lib   Decompose Zero-dimensional Ideals into Triangular Sets
@@ -23,14 +24,13 @@ LIB "elim.lib";    // Muss geladen werden fuer sat().
 ///////////////////////////////////////////////////////////////////////////////
 
 proc triangL (ideal G)
-"USAGE:   triangL(G); G the reduced lexicographical Groebner bases
-                     of the zero-dimensional ideal (G), sorted
-                     by increasing leading terms.
+"USAGE:   triangL(G); G=ideal
+ASSUME:  G is the reduced lexicographical Groebner bases of the
+         zero-dimensional ideal (G), sorted by increasing leading terms.
 RETURN:  a list of finitely many triangular systems, such that
          the union of their varieties equals the variety of (G).
-NOTE:    Algorithm of Lazard (see: Lazard, D.: Solving
-         zero-dimensional algebraic systems,
-         J. Symb. Comp. 13, 117 - 132, 1992).
+NOTE:    Algorithm of Lazard (see: Lazard, D.: Solving zero-dimensional
+         algebraic systems, J. Symb. Comp. 13, 117 - 132, 1992).
 EXAMPLE: example triangL; shows an example
 "
 {
@@ -174,14 +174,13 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc triangLfak (ideal G)
-"USAGE:   triangLfak(G); G the reduced lexicographical Groebner bases
-                        of the zero-dimensional ideal (G), sorted
-                        by increasing leading terms.
+"USAGE:   triangLfak(G); G=ideal
+ASSUME:  G is the reduced lexicographical Groebner bases of the
+         zero-dimensional ideal (G), sorted by increasing leading terms.
 RETURN:  a list of finitely many triangular systems, such that
          the union of their varieties equals the variety of (G).
 NOTE:    Algorithm of Lazard with factorization (see: Lazard, D.: Solving
-         zero-dimensional algebraic systems,
-         J. Symb. Comp. 13, 117 - 132, 1992).
+         zero-dimensional algebraic systems, J. Symb. Comp. 13, 117 - 132, 1992).
 REMARK:  each polynomial of the triangular systems is factorized.
 EXAMPLE: example triangLfak; shows an example
 "
@@ -626,12 +625,12 @@ RETURN:  Entweder Triangulierung [T1,T2] von (T) oder
 ///////////////////////////////////////////////////////////////////////////////
 
 proc triangM (ideal G, list #)
-"USAGE:   triangM(G[,i]); G the reduced lexicographical Groebner bases
-                         of the zero-dimensional ideal (G), sorted
-                         by increasing leading terms, i = 1 or 2.
+"USAGE:   triangM(G[,i]); G=ideal, i=integer,@*
+ASSUME:  G is the reduced lexicographical Groebner bases of the
+         zero-dimensional ideal (G), sorted by increasing leading terms.
 RETURN:  a list of finitely many triangular systems, such that
          the union of their varieties equals the variety of (G).
-         If i == 2, then each polynomial of the triangular systems
+         If i = 2, then each polynomial of the triangular systems
          is factorized.
 NOTE:    Algorithm of Moeller (see: Moeller, H.M.:
          On decomposing systems of polynomial equations with
@@ -655,7 +654,7 @@ EXAMPLE: example triangM; shows an example
     }
 
     // Noetige Optionen setzen.
-    // obachman: save options so that tey can be reset on exit
+    // obachman: save options so that they can be reset on exit
     intvec ovec = option(get);
     option(redSB);
     option(returnSB);
@@ -806,20 +805,19 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc triangMH (ideal G, list #)
-"USAGE:   triangMH(G[,i]); G the reduced lexicographical Groebner bases
-                          of the zero-dimensional ideal (G), sorted
-                          by increasing leading terms, i = 1 or 2.
+"USAGE:   triangMH(G[,i]); G=ideal, i=integer
+ASSUME:  G is the reduced lexicographical Groebner bases of the
+         zero-dimensional ideal (G), sorted by increasing leading terms.
 RETURN:  a list of finitely many triangular systems, such that
          the disjoint union of their varieties equals the variety of (G).
-         If i == 2, then each polynomial of the triangular systems
-         is factorized.
+         If i = 2, then each polynomial of the triangular systems is factorized.
 NOTE:    Algorithm of Moeller and Hillebrand (see: Moeller, H.M.:
-         On decomposing systems of polynomial equations with
-         finitely many solutions, Appl. Algebra Eng. Commun. Comput. 4,
-         217 - 230, 1993 and Hillebrand, D.: Triangulierung
-         nulldimensionaler Ideale - Implementierung und Vergleich
-         zweier Algorithmen, master thesis, Universitaet Dortmund,
-         Fachbereich Mathematik, Prof. Dr. H.M. Moeller, 1999).
+         On decomposing systems of polynomial equations with finitely many
+         solutions, Appl. Algebra Eng. Commun. Comput. 4, 217 - 230, 1993 and
+         Hillebrand, D.: Triangulierung nulldimensionaler Ideale -
+         Implementierung und Vergleich zweier Algorithmen, master thesis,
+         Universitaet Dortmund, Fachbereich Mathematik, Prof. Dr. H.M. Moeller,
+         1999).
 EXAMPLE: example triangMH; shows an example
 "
 {

@@ -1,5 +1,6 @@
+//last change: 13.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surf.lib,v 1.17 2001-01-16 13:48:45 Singular Exp $";
+version="$Id: surf.lib,v 1.18 2001-02-19 14:17:49 lossen Exp $";
 category="Visualization";
 info="
 LIBRARY: surf.lib    Procedures for Graphics with Surf
@@ -39,6 +40,7 @@ static proc num_of_vars(ideal I)
 
 proc  plot(ideal I,list #)
 "USAGE:   plot(I);  I ideal
+ASSUME: I involves only 2 or 3 variables
 RETURN: nothing
 NOTE: requires the external program 'surf' to be installed
 EXAMPLE: example plot; shows an example
@@ -54,7 +56,8 @@ EXAMPLE: example plot; shows an example
   }
   if (n==0 or n>3)
   {
-    ERROR("Cannot plot equations with", n, "variables");
+    string err_mes="Cannot plot equations with "+string(n)+" variables";
+    ERROR(err_mes);
   }
   ring r=0,(x,y,z),dp;
   short=0;
@@ -129,19 +132,14 @@ example
 
    ideal I = x1^3 - x2^2;
    plot(I);
-   ideal J = x1^2-x1-x2^3;
-   plot(J);
 
    ring rr1 = 0,(x,y,z),dp;
    ideal I(1) = 2x2-1/2x3 +1-y+1;
    plot(I(1));
-   ideal I(2) = x3-x-y;
-   plot(I(2));
 
   //  ---- Singular Logo --------------
   poly logo = ((x+3)^3 + 2*(x+3)^2 - y^2)*(x^3 - y^2)*((x-3)^3-2*(x-3)^2-y^2);
   plot(logo);
-
 
    // --------- implicit curves ------------
    // implicit curves
@@ -154,15 +152,6 @@ example
 
    ideal I(3) = x4+2x2y2 + y4, x2-y2;
    plot(I(3));
-
-   // a critical part
-   // adjust the plotregion properly to get a good picture
-
-   poly f = (x-y)*(x2+y);
-   plot(f,1);
-   ideal J = jacob(f);
-   J;
-   plot(J);     // bad resolution
 
    // ----------- surfaces -------------------
    ideal J(1) = 3xy4 + 2xy2, x5y3 + x + y6,10x2;
@@ -180,10 +169,6 @@ example
 
   // Whitney umbrella
   plot(z^2-x^2*y);
-
-  // A1
-  plot(y2-xz);
-
 
 }
 ///////////////////////////////////////////////////////////////////////////////

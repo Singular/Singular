@@ -1,6 +1,6 @@
 //(GMG, last modified 16.12.00)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ntsolve.lib,v 1.11 2001-01-16 13:48:35 Singular Exp $";
+version="$Id: ntsolve.lib,v 1.12 2001-02-19 14:17:47 lossen Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  ntsolve.lib     Real Newton Solving of Polynomial Systems
@@ -8,24 +8,26 @@ AUTHORS:  Wilfred Pohl, email: pohl@mathematik.uni-kl.de
           Dietmar Hillebrand
 
 PROCEDURES:
- nt_solve(G,..);        find one real root of 0-dimensional ideal G
- triMNewton(G,..);      find one real root for 0-dim triangular system G
+ nt_solve(G,ini,[..]);        find one real root of 0-dimensional ideal G
+ triMNewton(G,a,[..]);      find one real root for 0-dim triangular system G
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
 
 proc nt_solve (ideal gls, ideal ini, list #)
-"USAGE:   nt_solve(gls,ini[,ipar]); gls ideal, ini ideal, ipar list or intvec
-         gls: contains the equations, for which a solution will be computed
-         ini: ideal of initial values (approximate solutions to start with)
-         ipar: control integers (default: ipar = 100,10)
-         ipar[1] - max. number of iterations
-         ipar[2] - accuracy (we have the l_2-norm ||.||): accept solution
-         sol if ||gls(sol)|| < eps0*(0.1^ipar[2]) where eps0 = ||gls(ini)||
-         is the initial error
+"USAGE:   nt_solve(gls,ini[,ipar]); gls,ini= ideals, ipar=list/intvec,@*
+  gls: contains the equations, for which a solution will be computed
+  ini: ideal of initial values (approximate solutions to start with),@*
+  ipar: control integers (default: ipar = 100,10)
+  @format
+ ipar[1]: max. number of iterations
+ ipar[2]: accuracy (we have the l_2-norm ||.||): accept solution @code{sol}
+          if ||gls(sol)|| < eps0*(0.1^ipar[2]) 
+          where eps0 = ||gls(ini)|| is the initial error
+  @end format
 ASSUME:  gls is a zerodimensional ideal with nvars(basering) = size(gls) (>1)
 RETURN:  ideal, coordinates of one solution (if found), 0 else
-NOTE:    printlevel >0: displays comments (default =0)
+NOTE:    if printlevel >0: displays comments (default =0)
 EXAMPLE: example nt_solve; shows an example
 "
 {
@@ -253,17 +255,17 @@ number z1, number tt, number gg)
 ///////////////////////////////////////////////////////////////////////////////
 
 proc triMNewton (ideal G, ideal a, list #)
-"USAGE:  triMNewton(G,a[,ipar]); G ideal, a ideal, ipar list or intvec
-ASSUME:  G:   g1,..,gn, a triangular system of n equations in n vars,
-              i.e gi=gi(var(n-i+1),..,var(n))
-         a:   ideal of numbers, coordinates of an approximation of a common
-              zero of G to start with (with a[i] to be substituted in var(i))
-         ipar: control integer vector (default: ipar = 100,10)
-         ipar[1] - max. number of iterations
-         ipar[2] - accuracy (we have as norm |.| absolute value ):
-         accept solution  sol if |G(sol)| < |G(a)|*(0.1^ipar[2])
-         itb: int, the maximal number of iterations performed
-         err: number, an error bound
+"USAGE:  triMNewton(G,a[,ipar]); G,a= ideals, ipar=list/intvec
+ASSUME:  G:   g1,..,gn, a triangular system of n equations in n vars, i.e.
+  gi=gi(var(n-i+1),..,var(n)),@*
+  a:   ideal of numbers, coordinates of an approximation of a common
+       zero of G to start with (with a[i] to be substituted in var(i)),@*
+  ipar: control integer vector (default: ipar = 100,10)
+  @format
+  ipar[1]: max. number of iterations
+  ipar[2]: accuracy (we have as norm |.| absolute value ):
+           accept solution @code{sol} if |G(sol)| < |G(a)|*(0.1^ipar[2]).
+  @end format
 RETURN:  an ideal, coordinates of a better approximation of a zero of G
 EXAMPLE: example triMNewton; shows an example
 "
