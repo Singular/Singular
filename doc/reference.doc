@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.169 1999-12-06 16:06:57 obachman Exp $
+@comment $Id: reference.doc,v 1.170 1999-12-06 16:34:04 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -76,6 +76,7 @@ brackets are allowed.
 * eliminate::
 * eval::
 * ERROR::
+* example::
 * execute::
 * exit::
 * extgcd::
@@ -1330,7 +1331,7 @@ See
 @ref{write}.
 @c ref
 @c ---------------------------------------
-@node ERROR, execute, eval, Functions
+@node ERROR, example, eval, Functions
 @subsection ERROR
 @cindex ERROR
 @table @code
@@ -1357,6 +1358,29 @@ i;
 @end smallexample
 @end table
 @c ---------------------------------------
+@node example, execute, ERROR, Functions
+@subsection example
+@cindex example
+@table @code
+@item @strong{Syntax:}
+@code{example} topic @code{;}
+@item @strong{Purpose:}
+compute an example for @code{topic}. Examples are available for all
+@sc{Singular} kernel and library functions. Where available (e.g.,
+within Emacs) Use @code{<TAB>} completion for a list of all available
+example @code{topic}'s.
+@item @strong{Example:}
+@smallexample
+@c example
+example prime;
+// TBC: example cyclic;
+example intvec_declarations;
+@c example
+@end smallexample
+@c ref
+@ref{help}
+@c ref
+@c ---------------------------------------
 @node execute, exit, ERROR, Functions
 @subsection execute
 @cindex execute
@@ -1367,7 +1391,6 @@ i;
 none
 @item @strong{Purpose:}
 executes a string containing a sequence of @sc{Singular} commands.
-
 @item @strong{Note:}
 The string is inserted into the input stream at the next line break,
 @emph{NOT} after the @code{;} !  Hence, @code{execute} should be the
