@@ -1,5 +1,5 @@
 ;;; Emacs edit mode for this file is  -*- Emacs-Lisp -*-
-;;; $Id: .emacs-singular,v 1.14 2000-05-17 13:05:40 obachman Exp $
+;;; $Id: .emacs-singular,v 1.15 2000-05-23 14:27:04 obachman Exp $
 
 ;;;
 ;;; .emacs-singular - Emacs initialization file to use for
@@ -137,6 +137,7 @@
 ;;; particular function definition by selecting it from the menu.  The
 ;;; following code turns this on for all of the recognized languages.       
 (cond ((string-match "XEmacs\\|Lucid" emacs-version)
+       (toggle-auto-compression 1)
        (require 'func-menu)
        (define-key global-map 'f8 'function-menu)
        (add-hook 'find-file-hooks 'fume-add-menubar-entry)
