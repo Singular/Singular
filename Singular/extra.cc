@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.175 2002-02-06 14:06:22 Singular Exp $ */
+/* $Id: extra.cc,v 1.176 2002-02-12 18:25:13 mschulze Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -75,7 +75,7 @@
 
 // Define to enable many more system commands
 #ifndef MAKE_DISTRIBUTION
-#define HAVE_EXTENDED_SYSTEM
+#define HAVE_EXTENDED_SYSTEM 1
 #endif
 
 #ifdef HAVE_FACTORY
@@ -650,8 +650,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 #include <hc_newton.h>
 #endif
 #include "mpsr.h"
-
 #include "mod_raw.h"
+#include "gms.h"
 
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 {
@@ -1471,6 +1471,12 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       else
 #endif
 #endif
+/*==================== Gauss-Manin system normal form =================*/
+      if(strcmp(sys_cmd,"gmsnf")==0)
+      {
+        return gmsnf(res,h);
+      }
+      else
 /*==================== Error =================*/
       Werror( "system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }
