@@ -1,8 +1,11 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_char.cc,v 1.0 1996-05-17 10:59:43 stobbe Exp $
+// $Id: cf_char.cc,v 1.1 1996-06-18 06:52:45 stobbe Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:43  stobbe
+Initial revision
+
 */
 
 #include "assert.h"
@@ -10,6 +13,7 @@ $Log: not supported by cvs2svn $
 #include "canonicalform.h"
 #include "imm.h"
 #include "int_pp.h"
+#include "cf_primes.h"
 
 static int theCharacteristic = 0;
 static int theDegree = 1;
@@ -32,6 +36,7 @@ void setCharacteristic( int c )
 	theDegree = 1;
 	CFFactory::settype( FiniteFieldDomain );
 	theCharacteristic = c;
+	ff_big = c > cf_getBigPrime( 0 );
 	ff_setprime( c );
     }
 }
