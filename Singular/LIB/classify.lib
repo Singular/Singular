@@ -1,50 +1,29 @@
+// $Id: classify.lib,v 1.5 1997-01-24 10:23:07 krueger Exp $
 //=============================================================================
-// $Id: classify.lib,v 1.4 1995-02-09 13:52:14 krueger Exp $
 //
 // Please send bugs and comments to krueger@mathematik.uni-kl.de
 //
 //=============================================================================
-LIB "lib0";
-LIB "lib1";
+// required libraries
+//LIB "lib0";
+//LIB "lib1";
 LIB "lib_Setring";
 LIB "lib_ReOrder";
 LIB "lib_RandomPoly";
-LIB "lib_Morse";
-LIB "lib_tools";
-LIB "lib_Kclass";
-LIB "lib_Ausgaben";
-LIB "lib_WorkOn";
-LIB "lib_HKclass";
+LIB "Morse.lib";
+LIB "tools.lib";
+LIB "Kclass.lib";
+LIB "Ausgaben.lib";
+LIB "HKclass.lib";
+LIB "NFlist.lib";
+LIB "Hilbert.lib";
 
-//=============================================================================
-//
-//
-proc ShowLibs
-{ 
-  string @Required = LIB;
-  int @len = size(@Required);
-  int @i;
-  int @k;
-  int @j;
-  string @s;
-  string @s1;
-
-  for(@i=1;@i<@len;@i=@i+@k) {
-    @s = @Required[@i..@len];
-    @k = find(@s, ",");
-    if(@k>0) { 
-      @s = @Required[@i,@k-1]; 
-    }
-    else {
-      @k = size(@s);
-    }
-    @s1 = "@j = defined(SLib_"+@s+");";
-    execute @s1;
-    if( @j != 0) {
-      @s1 = "SLib_"+@s+";";
-      execute @s1;
-    }
-  }
+//=========================================================================
+proc Classify_lib
+{
+"
+  Classify(poly f);    determine the typ of the singularity f
+";
 }
 
 //=============================================================================
@@ -52,7 +31,7 @@ proc ShowLibs
 //
 proc Classify
 {
-  if( #ARGS != 1 ) {
+  if( size(#) != 1 ) {
 //=============================================================================
     " USAGE:   Classify(<poly>)";
     " RETURN:  Normal-Form of <poly>";
@@ -62,7 +41,7 @@ proc Classify
     "          poly g=Classify(f); ";
     "";
     " REMARK:  This version of Classify is only pre-alpha.";
-    "          Please reports bugs and comments to: ";
+    "          Please send bugs and comments to: ";
     "          \"Kai Krueger\" <krueger@mathematik.uni-kl.de>";
     "";
     "          int DeBug=1; is usefull as trace-mode. For more informations";
@@ -70,13 +49,23 @@ proc Classify
 //=============================================================================
     return();
   }
-  if( typeof(#1) != "poly") {
-    "Classify: argv(1) must be poly";
-    return(#1);
+  if(system("version")<922) {
+    "Sorry. You need to have at least Singular version 0.9.2.c"
+    return;
   }
-  int @show_nf = 1;    // return Normal-form if set to '1'
+  if( typeof(#[1]) != "poly") {
+    "Classify: argv(1) must be poly";
+    return(#[1]);
+  }
+  // Get characteristics of ring set it as default.
+  if(defined(CharOfRing) == 1) { kill CharOfRing; }
+  int CharOfRing = char(basering);
+  export CharOfRing;
 
-  poly @f_in = #1;
+  if(checkring()) { return(#[1]); }
+  int @show_nf = 1;    // return normal form if set to '1'
+
+  poly @f_in = #[1];
   int @n = nvars(basering);
 
   // Save the name of initial ring
@@ -85,48 +74,91 @@ proc Classify
   int @i;
 
   // if trace/debug mode not set, do it!
-  if( defined(DeBug) == 0) { int DeBug = 0; }
-  if(system("version")>=91) { global DeBug; }
+  if( defined(DeBug) == 0) { 
+    string s=system("getenv", "SG_DEBUG");
+    if( s != "" ) {
+      s="int DeBug="+s;
+      execute s;
+    } 
+    else { int DeBug = 0; }
+  }
+  export DeBug;
 
   // define new ring
   if( defined(Rtop) == 1) { kill Rtop; }
   execute Setring(@n, "Rtop");
+  export Rtop;
+
   @tmp = @tmp + string(maxideal(1)) + ";";
   execute @tmp;
-  if(system("version")>=91) { global Rtop; }
 
   execute @RingInput;
+
+  if(defined(ShowPoly) == 1) { kill ShowPoly; }
   map ShowPoly=Rtop,maxideal(1);
-  if(system("version")>=91) { global ShowPoly; }
+  export ShowPoly;
+
   setring Rtop;
   init();
+
   string RingDisplay = @RingInput;
-  if(system("version")>=91) { global RingDisplay; }
+  export RingDisplay;
 
   string @s1;
   string @s2;
   string @s3;
   string @s4;
+//listvar();
+//basering;
   @s1,@s2=Klassifiziere(@Conv(@f_in));
+  // @s1: f nach saemtlichen Koordinatentransformationen
+  // @s2: Typ des Polynoms f z.b: E[18]
   @s4 = "poly @f_out="+@s1+";";
+//"Corang:"+ string(CoRang);
 
-  setring RingB;
-  execute @s4;
-  setring Rtop;
-
-  poly @f_nf = NormalForm(@s2);
-  for(@i=5;@i<=@n;@i=@i+1) {
-    @f_nf = @f_nf + x(@i)^2;
+  if( @s2[1,2]=="f " || @s2[1,4]=="The " || @s2=="Fehler!" || @s2=="A[0]") { 
+    if( @s2 != "Fehler!") { @s2; }
+    if(@s1=="1" || @s2[1,4]=="The " || @s2=="Fehler!" ) { 
+      execute @RingInput;
+      return(@f_in);
+    }
+    setring Rtop;
+    execute @s4;
+    map @ConvUp=Rtop,maxideal(1);
   }
-  if(DeBug>1) { "Normal form NF(f)=", @f_nf; }
+  else {
+    setring RingB;
+    execute @s4;
+    setring Rtop;
+    map @ConvUp=RingB,maxideal(1);
+  }
+//"Corang:"+ string(CoRang);
 
-  map @ConvUp=RingB,maxideal(1);
+  if(@show_nf==1) {
+    poly @f_nf = NormalForm(@s2);
+    for(@i=4;@i<=@n;@i=@i+1) {
+      @f_nf = @f_nf + x(@i)^2;
+    }
+    if(DeBug>1) { "Normal form NF(f)=", @f_nf; }
+  }
+//"Corang:"+ string(CoRang);
+//listvar();
+//"------------------------------";
+//"Classify() Controlpoint Test----";
   poly @f_out = @ConvUp(@f_out);
+//listvar();
+//"------------------------------";
+//"Corang:"+ string(CoRang);
+//"Classify() Controlpoint Test----";
+//listvar();
+//"------------------------------";
   for(@i=CoRang+1;@i<=@n;@i=@i+1) {
     @f_out = @f_out + x(@i)^2;
   }
+//"Classify() Controlpoint Test----";
   execute @RingInput;
   map @ConvBack=Rtop,maxideal(1);
+//"Classify() Controlpoint Test----";
 
   if(@show_nf == 1) {
     return(@ConvBack(@f_nf));
