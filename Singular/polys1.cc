@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.55 2000-11-23 17:44:07 Singular Exp $ */
+/* $Id: polys1.cc,v 1.56 2000-12-07 12:22:42 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -31,16 +31,16 @@
 /*2
 *test if the monomial is a constant
 */
-BOOLEAN   pIsConstant(const poly p)
+BOOLEAN   p_IsConstant(const poly p, const ring r)
 {
   if (p!=NULL)
   {
     int i;
-    for (i=pVariables;i;i--)
+    for (i=r->N;i;i--)
     {
-      if (pGetExp(p,i)!=0) return FALSE;
+      if (p_GetExp(p,i,r)!=0) return FALSE;
     }
-    if (pGetComp(p)) return FALSE;
+    if (p_GetComp(p,r)>0) return FALSE;
   }
   return TRUE;
 }
@@ -872,7 +872,7 @@ poly pPermPoly (poly p, int * perm, ring oldRing,
           else if (perm[i]<0)
           {
             lnumber c=(lnumber)pGetCoeff(qq);
-            c->z->e[-perm[i]-1]+=e/*p_GetExp( p,i,oldRing)*/;
+            napAddExp(c->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/);
             mapped_to_par=1;
           }
           else
@@ -949,6 +949,124 @@ poly pPermPoly (poly p, int * perm, ring oldRing,
   pTest(result);
   return result;
 }
+
+#if 0
+/*2
+*returns a re-ordered copy of a polynomial, with permutation of the variables
+*/
+poly p_PermPoly (poly p, int * perm, ring oldRing,
+   int *par_perm, int OldPar, ring newRing)
+{
+  int OldpVariables = oldRing->N;
+  poly result = NULL;
+  poly result_last = NULL;
+  poly aq=NULL; /* the map coefficient */
+  poly qq; /* the mapped monomial */
+
+  while (p != NULL)
+  {
+    if (OldPar==0)
+    {
+      qq = pInit();
+      number n=newRing->cf->nMap(pGetCoeff(p));
+      if ((newRing->minpoly!=NULL)
+      && ((rField_is_Zp_a(newRing)) || (rField_is_Q_a(newRing))))
+      {
+        newRing->cf->nNormalize(n);
+      }
+      pGetCoeff(qq)=n;
+    // coef may be zero:  pTest(qq);
+    }
+    else
+    {
+      qq=p_ISet(1, newRing);
+      aq=naPermNumber(pGetCoeff(p),par_perm,OldPar);
+      if ((newRing->minpoly!=NULL)
+      && ((rField_is_Zp_a(newRing)) || (rField_is_Q_a(newRing))))
+      {
+        poly tmp=aq;
+        while (tmp!=NULL)
+        {
+          number n=pGetCoeff(tmp);
+          newRing->cf->nNormalize(n);
+          pGetCoeff(tmp)=n;
+          pIter(tmp);
+        }
+      }
+      //pTest(aq);
+    }
+    p_SetComp(qq, p_GetComp(p,oldRing), newRing);
+    if (newRing->cf->nIsZero(pGetCoeff(qq)))
+    {
+      p_DeleteLm(&qq, newRing);
+    }
+    else
+    {
+      int i;
+      int mapped_to_par=0;
+      for(i=1; i<=OldpVariables; i++)
+      {
+        int e=p_GetExp(p,i,oldRing);
+        if (e!=0)
+        {
+          if (perm==NULL)
+          {
+            p_SetExp(qq,i, e, newRing);
+          }
+          else if (perm[i]>0)
+            p_AddExp(qq,perm[i], e/*p_GetExp( p,i,oldRing)*/, newRing);
+          else if (perm[i]<0)
+          {
+            lnumber c=(lnumber)pGetCoeff(qq);
+            napAddExp(c->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/);
+            mapped_to_par=1;
+          }
+          else
+          {
+            /* this variable maps to 0 !*/
+            p_DeleteLm(&qq, newRing);
+            break;
+          }
+        }
+      }
+      if (mapped_to_par
+      && (newRing->minpoly!=NULL))
+      {
+        number n=pGetCoeff(qq);
+        newRing->cf->nNormalize(n);
+        pGetCoeff(qq)=n;
+      }
+    }
+    pIter(p);
+    if (qq!=NULL)
+    {
+      p_Setm(qq, newRing);
+      //pTest(aq);
+      //pTest(qq);
+      if (aq!=NULL) qq=pMult(aq,qq);
+      aq = qq;
+      while (pNext(aq) != NULL) pIter(aq);
+      if (result_last==NULL)
+      {
+        result=qq;
+      }
+      else
+      {
+        pNext(result_last)=qq;
+      }
+      result_last=aq;
+      aq = NULL;
+    }
+    else if (aq!=NULL)
+    {
+      p_Delete(&aq, newRing);
+    }
+  }
+  result=pOrdPolyMerge(result);
+  //pTest(result);
+  return result;
+}
+#endif
 
 poly pJet(poly p, int m)
 {

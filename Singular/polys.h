@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.48 2000-11-30 16:46:08 Singular Exp $ */
+/* $Id: polys.h,v 1.49 2000-12-07 12:22:42 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing
@@ -234,10 +234,11 @@ extern poly     ppNoether;
 extern BOOLEAN  pVectorOut;
 
 /*-------------predicate on polys ----------------------*/
-BOOLEAN   pIsConstant(const poly p);
+BOOLEAN   p_IsConstant(const poly p, const ring r);
+#define   pIsConstant(p)    p_IsConstant(p,currRing)
 BOOLEAN   pIsConstantPoly(poly p);
 #define   pIsPurePower(p)   p_IsPurePower(p, currRing)
-#define   pIsVector(p)     (pGetComp(p)!=0)
+#define   pIsVector(p)      (pGetComp(p)>0)
 BOOLEAN   pHasNotCF(poly p1, poly p2);   /*has no common factor ?*/
 void      pSplit(poly p, poly * r);   /*p => IN(p), r => REST(p) */
 
