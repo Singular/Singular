@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.60 2000-12-22 16:11:36 mschulze Exp $
+@comment $Id: math.doc,v 1.61 2001-01-11 17:18:03 Singular Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -582,13 +582,13 @@ negative degree lexicographical ordering which is denoted
 @code{ds} in @sc{Singular}:
 
 @smallexample
-@c STILL BROKEN @c example
+@c example
 ring r=0,(x,y,z),ds;
 LIB "spectrum.lib";
 poly f=x^7+y^7+z^7;
 list s1=spectrum( f );
 s1;
-@c STILL BROKEN @c example
+@c example
 @end smallexample
 
 The command @code{spectrum(f)} computes the spectrum of @math{f} and
