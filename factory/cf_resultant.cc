@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_resultant.cc,v 1.1 1997-09-01 09:01:15 schmidt Exp $ */
+/* $Id: cf_resultant.cc,v 1.2 1997-09-01 10:33:42 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -16,7 +16,7 @@
 #include "canonicalform.h"
 #include "variable.h"
 
-//{{{ CFArray subResChain ( const CanonicalForm & f, const CanonicalForm & g, Variable x )
+//{{{ CFArray subResChain ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
 //{{{ docu
 //
 // subResChain() - caculate extended subresultant chain.
@@ -36,7 +36,7 @@
 //
 //}}}
 CFArray
-subResChain ( const CanonicalForm & f, const CanonicalForm & g, Variable x )
+subResChain ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
 {
     ASSERT( x.level() > 0, "cannot calculate subresultant sequence with respect to algebraic variables" );
 
@@ -127,5 +127,114 @@ subResChain ( const CanonicalForm & f, const CanonicalForm & g, Variable x )
     }
 
     return S;
+}
+//}}}
+
+//{{{ static CanonicalForm trivialResultant( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
+//{{{ docu
+//
+// trivialResultant - calculate trivial resultants.
+//
+// x's level should be larger than f's and g's levels.  Either f
+// or g should be constant or both linear.
+//
+//}}}
+static CanonicalForm
+trivialResultant( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
+{
+    // f or g in R
+    if ( degree( f, x ) == 0 )
+	return power( f, degree( g, x ) );
+    if ( degree( g, x ) == 0 )
+	return power( g, degree( f, x ) );
+
+    // f and g are linear polynomials
+    return LC( f, x ) * g - LC( g, x ) * f;
+}
+//}}}
+
+//{{{ CanonicalForm resultant( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
+//{{{ docu
+//
+// resultant() - return resultant of f and g with respect to x.
+//
+// The chain is calculated from f and g with respect to variable
+// x which should not be an algebraic variable.  If f or q equals
+// zero, zero is returned.  If f is a coefficient with respect to
+// x, f^degree(g, x) is returned, analogously for g.
+//
+// This algorithm serves as a wrapper around other resultant
+// algorithms which do the real work.  Here we use standard
+// properties of resultants only.
+//
+//}}}
+CanonicalForm
+resultant( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
+{
+    ASSERT( x.level() > 0, "cannot calculate resultant with respect to algebraic variables" );
+
+    // some checks on triviality.  We will not use degree( v )
+    // here because this may involve variable swapping.
+    if ( f.isZero() || g.isZero() )
+	return 0;
+    if ( f.mvar() < x )
+	return power( f, g.degree( x ) );
+    if ( g.mvar() < x )
+	return power( g, f.degree( x ) );
+
+    // make x main variale
+    CanonicalForm F, G;
+    Variable X;
+    if ( f.mvar() > x || g.mvar() > x ) {
+	if ( f.mvar() > g.mvar() )
+	    X = f.mvar();
+	else
+	    X = g.mvar();
+	F = swapvar( f, X, x );
+	G = swapvar( g, X, x );
+    }
+    else {
+	X = x;
+	F = f;
+	G = g;
+    }
+    // at this point, we have to calculate resultant( F, G, X )
+    // where X is equal to or greater than the main variables
+    // of F and G
+
+    int m = degree( F, X );
+    int n = degree( G, X );
+    // catch trivial cases
+    if ( m+n <= 2 || m == 0 || n == 0 )
+	return swapvar( trivialResultant( F, G, X ), X, x );
+
+    // exchange F and G if necessary
+    int flipFactor;
+    if ( m < n ) {
+	CanonicalForm swap = F;
+	F = G; G = swap;
+	int degswap = m;
+	m = n; n = degswap;
+	if ( m & 1 && n & 1 )
+	    flipFactor = -1;
+	else
+	    flipFactor = 1;
+    } else
+	flipFactor = 1;
+
+    // this is not an effective way to calculate the resultant!
+    CanonicalForm extFactor;
+    if ( m == n ) {
+	if ( n & 1 )
+	    extFactor = -LC( G, X );
+	else
+	    extFactor = LC( G, X );
+    } else
+	extFactor = power( LC( F, X ), m-n-1 );
+
+    CanonicalForm result;
+    result = subResChain( F, G, X )[0] / extFactor;
+
+    return swapvar( result, X, x ) * flipFactor;
 }
 //}}}
