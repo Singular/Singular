@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.90 2002-05-16 17:53:01 Singular Exp $ */
+/* $Id: tesths.cc,v 1.91 2002-11-26 14:26:07 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -189,7 +189,7 @@ int main(          /* main entry to Singular */
   }
   else
   {
-    currentVoice=feInitStdin();
+    currentVoice=feInitStdin(NULL);
   }
 
   // before scripts, we execute -c, if it was given
