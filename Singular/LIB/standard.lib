@@ -1,7 +1,7 @@
-// $Id: standard.lib,v 1.40 1999-08-03 13:28:21 obachman Exp $
+// $Id: standard.lib,v 1.41 1999-08-19 13:49:39 obachman Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.40 1999-08-03 13:28:21 obachman Exp $";
+version="$Id: standard.lib,v 1.41 1999-08-19 13:49:39 obachman Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
@@ -10,6 +10,7 @@ PROCEDURES:
  stdhilb(ideal[,h])     standard basis of ideal using the Hilbert function
  groebner(ideal/module) standard basis using a heuristically chosen method
  quot(any,any[,n])      quotient using heuristically chosen method
+ res(ideal/module,[i])  free resolution of ideal or module
  sprintf(fmt,...)     returns fomatted string
  fprintf(link,fmt,..) writes formatted string to link
  printf(fmt,...)      displays formatted string
@@ -417,15 +418,67 @@ example
 
 //////////////////////////////////////////////////////////////////////////
 proc res(list #)
-{
+"@c we do texinfo here:
+@cindex resolution, computation of
+@table @code
+@item @strong{Syntax:}
+@code{res (} ideal_expression@code{,} int_expression @code{[,} any_expression @code{])}
+@*@code{res (} module_expression@code{,} int_expression @code{[,} any_expression @code{])}
+@item @strong{Type:}
+resolution
+@item @strong{Purpose:}
+computes a (possibly minimal) free resolution of an ideal or module using
+a heuristically choosen method.
+@* The second (int) argument (say, @code{k}) specifies the length of
+the resolution. If @code{k <=0 } then k is assumed to be the number of
+variables of the basering.
+@* If a third argument is given, the returned resolution is minimized.
+
+Depending on the input, the returned resolution is computed using the
+following methods:
+@table @asis
+@item @strong{quotient rings:}
+@code{nres} (classical method using syzygies) , see @ref{nres}.
+
+@item @strong{homogenous ideals and k == 0:} 
+@code{lres} (La'Scala's method), see @ref{lres}.
+
+@item @strong{not minimized resolution,  and, homogenous input with k != 0 or local rings:} 
+@code{sres} (Schreyer's method), see @ref{sres}.
+
+@item @strong{all other inputs:} 
+@code{mres} (classical method), see @ref{mres}.
+@end table
+@item @strong{Note:}
+Accessing single elements of a resolution may require that some partial computations have to be finished and may therefor take some time.
+@end table
+@c ref
+See also
+@ref{betti};
+@ref{ideal};
+@ref{minres};
+@ref{module};
+@ref{mres};
+@ref{nres};
+@ref{lres};
+@ref{sres}.
+@ref{resolution}
+@c ref
+"
+{         
    def P=basering;
+   if (size(#) < 2)
+   {
+     ERROR("res: need at least two arguments: ideal/module, int");
+   }
+   
    def m=#[1]; //the ideal or module
-
    int i=#[2]; //the length of the resolution
-               //if size(#)>2 a minimal resolution is computed
-
+   if (i< 0) { i=0;}
+     
    string varstr_P = varstr(P);
 
+   
    if(size(ideal(basering)) > 0)
    {
      // the quick hack for qrings - seems to fit most needs
@@ -433,12 +486,12 @@ proc res(list #)
      return(nres(m,i));
    }
 
-   //LaScala for the homogeneous case
    if(homog(m)==1)
    {
       resolution re;
-      if ((i==0) or (i>=nvars(basering)))
+      if (((i==0) or (i>=nvars(basering))) && typeof(m) != "module")
       {
+        //LaScala for the homogeneous case and i == 0
         re=lres(m,i);
         if(size(#)>2)
         {
@@ -469,6 +522,7 @@ proc res(list #)
       list re=mres(m,i);
       setring P;
       resolution result=imap(Phelp,re);
+      if (size(#) > 2) {result = minres(result);}
       return(result);
    }
 
@@ -494,8 +548,27 @@ proc res(list #)
    list re=mres(m,i);
    setring P;
    resolution result=imap(Phelp,re);
+   result = minres(result);
    return(result);
 }
+example
+{"EXAMPLE:"; echo = 2;
+  ring r=0,(x,y,z),dp;
+  ideal i=xz,yz,x^3-y^3;
+  def l=res(i,0); // homogenous ideal: uses lres
+  l;              // resolution is not yet minimized
+  print(betti(l), "betti"); // input to betti may be of type resolution
+  l[2];         // element access may take some time
+  i=i, x+1;
+  l=res(i,0);   // inhomogenous ideal: uses mres
+  l;            // resolution is not yet minimized
+  ring rs=0,(x,y,z),ds;
+  ideal i = imap(r, i);
+  def l=res(i,0); // local ring not minimized: uses sres
+  l;              // resolution is minimized
+  res(i,0,0);     // local ring and minimized: uses mres
+}
+
 
 proc quot (m1,m2,list #)
 "USAGE:   quot(m1, m2[, n]); m1, m2 two submodules of k^s,
