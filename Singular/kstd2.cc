@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.80 2002-06-03 12:09:49 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.81 2002-06-07 10:59:42 levandov Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -415,9 +415,7 @@ static poly redNF (poly h,kStrategy strat)
 #endif
       if (rIsPluralRing(currRing))
       {
-        #ifdef HAVE_PLURAL
 	nc_kBucketPolyRed(P.bucket,strat->S[j]);
-	#endif
       }
       else
       {
