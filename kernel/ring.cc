@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.20 2004-08-14 13:55:28 levandov Exp $ */
+/* $Id: ring.cc,v 1.21 2004-08-27 12:21:33 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -398,7 +398,7 @@ void rDelete(ring r)
       if (r->wvhdl[j]!=NULL)
         omFree(r->wvhdl[j]);
     }
-    omFreeSize((ADDRESS)r->wvhdl,i*sizeof(short *));
+    omFreeSize((ADDRESS)r->wvhdl,i*sizeof(int *));
   }
   else
   {
@@ -1069,12 +1069,15 @@ int rSum(ring r1, ring r2, ring &sum)
   {
     for(i=0;i<k;i++) omFree((ADDRESS)tmpR.names[i]);
     omFreeSize((ADDRESS)names,tmpR.N*sizeof(char_ptr));
-    Werror("difficulties with variables: %d,%d -> %d",r1->N,r2->N,k);
+    Werror("difficulties with variables: %d,%d -> %d",rVar(r1),rVar(r2),k);
     return -1;
   }
   sum=(ring)omAllocBin(ip_sring_bin);
   memcpy(sum,&tmpR,sizeof(ip_sring));
   rComplete(sum);
+//#ifdef RDEBUG
+//  rDebugPrint(sum);
+//#endif
 #ifdef HAVE_PLURAL
   BOOLEAN R1_is_nc = rIsPluralRing(r1);
   BOOLEAN R2_is_nc = rIsPluralRing(r2);
@@ -1135,40 +1138,42 @@ int rSum(ring r1, ring r2, ring &sum)
     ring old_ring = currRing;
     rChangeCurrRing(sum);
 /* find permutations of vars and pars */
-    int *perm1 = (int *)omAlloc0((R1->N+1)*sizeof(int));
-    int *par_perm1 = (int *)omAlloc0((R1->P+1)*sizeof(int));
-    int *perm2 = (int *)omAlloc0((R2->N+1)*sizeof(int));
-    int *par_perm2 = (int *)omAlloc0((R2->P+1)*sizeof(int));
+    int *perm1 = (int *)omAlloc0((rVar(R1)+1)*sizeof(int));
+    int *par_perm1 = NULL;
+    if (rPar(R1)!=0) par_perm1=(int *)omAlloc0((rPar(R1)+1)*sizeof(int));
+    int *perm2 = (int *)omAlloc0((rVar(R2)+1)*sizeof(int));
+    int *par_perm2 = NULL;
+    if (rPar(R2)!=0) par_perm2=(int *)omAlloc0((rPar(R2)+1)*sizeof(int));
     //    maFindPerm(char **preim_names, int preim_n, char **preim_par, int preim_p,
     //                char **names,       int n,       char **par,       int nop,
     //                int * perm, int *par_perm, int ch);
-    maFindPerm(R1->names,  R1->N,  R1->parameter,  R1->P,
-               sum->names, sum->N, sum->parameter, sum->P,
+    maFindPerm(R1->names,  rVar(R1),  R1->parameter,  rPar(R1),
+               sum->names, rVar(sum), sum->parameter, rPar(sum),
                perm1, par_perm1, sum->ch);
-    maFindPerm(R2->names,  R2->N,  R2->parameter,  R2->P,
-               sum->names, sum->N, sum->parameter, sum->P,
+    maFindPerm(R2->names,  rVar(R2),  R2->parameter,  rPar(R2),
+               sum->names, rVar(sum), sum->parameter, rPar(sum),
                perm2, par_perm2, sum->ch);
     nMapFunc nMap1 = nSetMap(R1);
     nMapFunc nMap2 = nSetMap(R2);
     matrix C1 = R1->nc->C, C2 = R2->nc->C;
     matrix D1 = R1->nc->D, D2 = R2->nc->D;
-    int l = R1->N + R2->N;
+    int l = rVar(R1) + rVar(R2);
     matrix C  = mpNew(l,l);
     matrix D  = mpNew(l,l);
     int param_shift = 0;
-    for (i=1; i<= R1->N + R2->N; i++)
+    for (i=1; i<= rVar(R1) + rVar(R2); i++)
     {
-      for (j= i+1; j<= R1->N + R2->N; j++)
+      for (j= i+1; j<= rVar(R1) + rVar(R2); j++)
       {
 	MATELEM(C,i,j) = pOne();
       }
     }
-    for (i=1; i< R1->N; i++)
+    for (i=1; i< rVar(R1); i++)
     {
-      for (j=i+1; j<=R1->N; j++)
+      for (j=i+1; j<=rVar(R1); j++)
       {
-	MATELEM(C,i,j) = pPermPoly(MATELEM(C1,i,j),perm1,R1,nMap1,par_perm1,R1->P);
-	MATELEM(D,i,j) = pPermPoly(MATELEM(D1,i,j),perm1,R1,nMap1,par_perm1,R1->P);
+        MATELEM(C,i,j) = pPermPoly(MATELEM(C1,i,j),perm1,R1,nMap1,par_perm1,rPar(R1));
+	MATELEM(D,i,j) = pPermPoly(MATELEM(D1,i,j),perm1,R1,nMap1,par_perm1,rPar(R1));
 	//	MATELEM(C,i,j) = p_CopyEmbed(MATELEM(C1,i,j),R1,0,param_shift);
 	  //prCopyR_NoSort(MATELEM(C1,i,j),R1,sum);
 	//	MATELEM(D,i,j) = prCopyR(MATELEM(D1,i,j),R1,sum);
@@ -1176,21 +1181,23 @@ int rSum(ring r1, ring r2, ring &sum)
 
       }
     }
-    for (i=1; i< R2->N; i++)
+    for (i=1; i< rVar(R2); i++)
     {
-      for (j=i+1; j<=R2->N; j++)
+      for (j=i+1; j<=rVar(R2); j++)
       {
-	//	MATELEM(C,R1->N+i,R1->N+j) = prCopyR_NoSort(MATELEM(C2,i,j),R2,sum);
-	//	MATELEM(D,R1->N+i,R1->N+j) = prCopyR(MATELEM(D2,i,j),R2,sum);
-	//	MATELEM(C,R1->N+i,R1->N+j) = p_CopyEmbed(MATELEM(C2,i,j),R2, R1->N,param_shift);
-	//	MATELEM(D,R1->N+i,R1->N+j) = p_CopyEmbed(MATELEM(D2,i,j),R2, R1->N,param_shift);
+	//	MATELEM(C,rVar(R1)+i,rVar(R1)+j) = prCopyR_NoSort(MATELEM(C2,i,j),R2,sum);
+	//	MATELEM(D,rVar(R1)+i,rVar(R1)+j) = prCopyR(MATELEM(D2,i,j),R2,sum);
+	//	MATELEM(C,rVar(R1)+i,rVar(R1)+j) = p_CopyEmbed(MATELEM(C2,i,j),R2, rVar(R1),param_shift);
+	//	MATELEM(D,rVar(R1)+i,rVar(R1)+j) = p_CopyEmbed(MATELEM(D2,i,j),R2, rVar(R1),param_shift);
 
-	MATELEM(C,R1->N+i,R1->N+j) = pPermPoly(MATELEM(C2,i,j),perm2,R2,nMap2,par_perm2,R2->P);
-	MATELEM(D,R1->N+i,R1->N+j) = pPermPoly(MATELEM(D2,i,j),perm2,R2,nMap2,par_perm2,R2->P);
+        MATELEM(C,rVar(R1)+i,rVar(R1)+j) = pPermPoly(MATELEM(C2,i,j),perm2,R2,nMap2,par_perm2,rPar(R2));
+	MATELEM(D,rVar(R1)+i,rVar(R1)+j) = pPermPoly(MATELEM(D2,i,j),perm2,R2,nMap2,par_perm2,rPar(R2));
       }
     }
     sum->nc->C = C;
     sum->nc->D = D;
+    idTest((ideal)C);
+    idTest((ideal)D);
     if (nc_InitMultiplication(sum))
       WarnS("Error initializing multiplication!");
     sum->nc->IsSkewConstant =(int)((R1->nc->IsSkewConstant) && (R2->nc->IsSkewConstant));
@@ -1261,7 +1268,7 @@ static ring rCopy0(ring r, BOOLEAN copy_qideal = TRUE,
     res->block1 = NULL;
   }
 
-  res->names   = (char **)omAlloc0(r->N * sizeof(char_ptr));
+  res->names   = (char **)omAlloc0(rVar(r) * sizeof(char_ptr));
   for (i=0; i<res->N; i++)
   {
     res->names[i] = omStrDup(r->names[i]);
@@ -1310,12 +1317,12 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
   if ((rInternalChar(r1) != rInternalChar(r2))
   || (r1->float_len != r2->float_len)
   || (r1->float_len2 != r2->float_len2)
-  || (r1->N != r2->N)
+  || (rVar(r1) != rVar(r2))
   || (r1->OrdSgn != r2->OrdSgn)
   || (rPar(r1) != rPar(r2)))
     return 0;
 
-  for (i=0; i<r1->N; i++)
+  for (i=0; i<rVar(r1); i++)
   {
     if (r1->names[i] != NULL && r2->names[i] != NULL)
     {
@@ -1523,7 +1530,7 @@ BOOLEAN rOrd_SetCompRequiresSetm(ring r)
 BOOLEAN rOrd_is_Totaldegree_Ordering(ring r)
 {
   // Hmm.... what about Syz orderings?
-  return (r->N > 1 &&
+  return (rVar(r) > 1 &&
           ((rHasSimpleOrder(r) &&
            (rOrder_is_DegOrdering((rRingOrder_t)r->order[0]) ||
             rOrder_is_DegOrdering(( rRingOrder_t)r->order[1]))) ||
@@ -1536,7 +1543,7 @@ BOOLEAN rOrd_is_Totaldegree_Ordering(ring r)
 BOOLEAN rOrd_is_WeightedDegree_Ordering(ring r =currRing)
 {
   // Hmm.... what about Syz orderings?
-  return (r->N > 1 &&
+  return ((rVar(r) > 1) &&
           rHasSimpleOrder(r) &&
           (rOrder_is_WeightedOrdering((rRingOrder_t)r->order[0]) ||
            rOrder_is_WeightedOrdering(( rRingOrder_t)r->order[1])));
@@ -1719,6 +1726,21 @@ static void rO_WDegree(int &place, int &bitplace, int start, int end,
   // weighted degree (aligned) of variables v_start..v_end, ordsgn 1
   while((start<end) && (weights[0]==0)) { start++; weights++; }
   while((start<end) && (weights[end-start]==0)) { end--; }
+  int i;
+  int pure_tdeg=1;
+  for(i=start;i<=end;i++)
+  {
+    if(weights[i-start]!=1)
+    {
+      pure_tdeg=0;
+      break;
+    }
+  }
+  if (pure_tdeg)
+  {
+    rO_TDegree(place,bitplace,start,end,o,ord_struct);
+    return;
+  }
   rO_Align(place,bitplace);
   ord_struct.ord_typ=ro_wp;
   ord_struct.data.wp.start=start;
@@ -1728,7 +1750,6 @@ static void rO_WDegree(int &place, int &bitplace, int start, int end,
   o[place]=1;
   place++;
   rO_Align(place,bitplace);
-  int i;
   for(i=start;i<=end;i++)
   {
     if(weights[i-start]<0)
@@ -3485,6 +3506,29 @@ void rSetWeightVec(ring r, int *wv)
 
 #include <ctype.h>
 
+static int rRealloc1(ring r, ring src, int size, int pos)
+{
+  r->order=(int*)omReallocSize(r->order, size*sizeof(int), (size+1)*sizeof(int));
+  r->block0=(int*)omReallocSize(r->block0, size*sizeof(int), (size+1)*sizeof(int));
+  r->block1=(int*)omReallocSize(r->block1, size*sizeof(int), (size+1)*sizeof(int));
+  r->wvhdl=(int_ptr*)omReallocSize(r->wvhdl,size*sizeof(int_ptr), (size+1)*sizeof(int_ptr));
+  for(int k=size; k>pos; k--) r->wvhdl[k]=r->wvhdl[k-1];
+  r->order[size]=0;
+  size++;
+  return size;
+}
+static void rOppWeight(int *w, int l)
+{
+  int i2=(l+1)/2;
+  for(int j=0; j<=i2; j++)
+  {
+    int t=w[j];
+    w[j]=w[l-j]; 
+    w[l-j]=t; 
+  }
+}
+#define rOppVar(R,I) (rVar(R)+1-I)
+
 ring rOpposite(ring src)
   /* creates an opposite algebra of R */
   /* that is R^opp, where f (*^opp) g = g*f  */
@@ -3497,7 +3541,7 @@ ring rOpposite(ring src)
   for(int i=i2; i>=0; i--)
   {
     // index: 0..N-1
-    //Print("ex var names: %d <-> %d\n",i,rVar(r)-1-i);
+    //Print("ex var names: %d <-> %d\n",i,rOppVar(r,i));
     // exchange names
     char *p;
     p=r->names[rVar(r)-1-i];
@@ -3512,8 +3556,8 @@ ring rOpposite(ring src)
     // exchange VarOffset
     int t;
     t=r->VarOffset[i];
-    r->VarOffset[i]=r->VarOffset[rVar(r)+1-i];
-    r->VarOffset[rVar(r)+1-i]=t;
+    r->VarOffset[i]=r->VarOffset[rOppVar(r,i)];
+    r->VarOffset[rOppVar(r,i)]=t;
   }
   // change names:
   for (i=rVar(r)-1; i>=0; i--)
@@ -3532,26 +3576,20 @@ ring rOpposite(ring src)
       case ro_dp:
       // 
         t=r->typ[i].data.dp.start;
-        r->typ[i].data.dp.start=rVar(r)+1-r->typ[i].data.dp.end;
-        r->typ[i].data.dp.end=rVar(r)+1-t;
+        r->typ[i].data.dp.start=rOppVar(r,r->typ[i].data.dp.end);
+        r->typ[i].data.dp.end=rOppVar(r,t);
         break;
       case ro_wp:
       case ro_wp_neg:
       {
         t=r->typ[i].data.wp.start;
-        r->typ[i].data.wp.start=rVar(r)+1-r->typ[i].data.wp.end;
-        r->typ[i].data.wp.end=rVar(r)+1-t;
+        r->typ[i].data.wp.start=rOppVar(r,r->typ[i].data.wp.end);
+        r->typ[i].data.wp.end=rOppVar(r,t);
         // invert r->typ[i].data.wp.weights
-        i2=(r->typ[i].data.wp.end+1-r->typ[i].data.wp.start)/2;
-        int *w=r->typ[i].data.wp.weights;
-        for(int j=0; j<=i2; j++)
-        {
-          t=w[j];
-          w[j]=w[r->typ[i].data.wp.end-r->typ[i].data.wp.start-j]; 
-          w[r->typ[i].data.wp.end-r->typ[i].data.wp.start-j]=t; 
-        }
+        rOppWeight(r->typ[i].data.wp.weights,
+                   r->typ[i].data.wp.end-r->typ[i].data.wp.start);
         break;
-      }         
+      }
       //case ro_wp64:
       case ro_syzcomp:
       case ro_syz:
@@ -3561,8 +3599,8 @@ ring rOpposite(ring src)
 
       case ro_cp:
         t=r->typ[i].data.cp.start;
-        r->typ[i].data.cp.start=rVar(r)+1-r->typ[i].data.cp.end;
-        r->typ[i].data.cp.end=rVar(r)+1-t;
+        r->typ[i].data.cp.start=rOppVar(r,r->typ[i].data.cp.end);
+        r->typ[i].data.cp.end=rOppVar(r,t);
         break;
       case ro_none:
       default:
@@ -3570,41 +3608,152 @@ ring rOpposite(ring src)
        break;
     }
   }
-  // avoid printing changed stuff:
-  r->order[0]=ringorder_unspec;
-  r->block0[0]=1;
-  r->block1[0]=rVar(r);
-  r->order[1]=0;
-// #ifdef RDEBUG
-//   rDebugPrint(r);
-//#endif
-
+  // Change order/block structurea (needed for rPrint, rAdd etc.)
+  int j=0;
+  int l=rBlocks(src);
+  for(i=0; src->order[i]!=0; i++)
+  {
+    switch (src->order[i])
+    {
+      case ringorder_c: /* c-> c */
+      case ringorder_C: /* C-> C */
+      case ringorder_no /*=0*/: /* end-of-block */
+        r->order[j]=src->order[i];
+        j++; break;
+      case ringorder_lp: /* lp -> rp */
+        r->order[j]=ringorder_rp;
+        r->block0[j]=rOppVar(r, src->block1[i]);
+        r->block1[j]=rOppVar(r, src->block0[i]);
+        break;
+      case ringorder_rp: /* rp -> lp */
+        r->order[j]=ringorder_lp;
+        r->block0[j]=rOppVar(r, src->block1[i]);
+        r->block1[j]=rOppVar(r, src->block0[i]);
+        break;
+      case ringorder_dp: /* dp -> a(1..1),ls */
+      { 
+        l=rRealloc1(r,src,l,j);
+        r->order[j]=ringorder_a;
+        r->block0[j]=rOppVar(r, src->block1[i]);
+        r->block1[j]=rOppVar(r, src->block0[i]);
+        r->wvhdl[j]=(int*)omAlloc((r->block1[j]-r->block0[j]+1)*sizeof(int));
+        for(int k=r->block0[j]; k<=r->block1[j]; k++)
+          r->wvhdl[j][k-r->block0[j]]=1;
+        j++;
+        r->order[j]=ringorder_ls;
+        r->block0[j]=rOppVar(r, src->block1[i]);
+        r->block1[j]=rOppVar(r, src->block0[i]);
+        j++;
+        break;
+      } 
+      case ringorder_Dp: /* Dp -> a(1..1),rp */
+      { 
+        l=rRealloc1(r,src,l,j);
+        r->order[j]=ringorder_a;
+        r->block0[j]=rOppVar(r, src->block1[i]);
+        r->block1[j]=rOppVar(r, src->block0[i]);
+        r->wvhdl[j]=(int*)omAlloc((r->block1[j]-r->block0[j]+1)*sizeof(int));
+        for(int k=r->block0[j]; k<=r->block1[j]; k++)
+          r->wvhdl[j][k-r->block0[j]]=1;
+        j++;
+        r->order[j]=ringorder_rp;
+        r->block0[j]=rOppVar(r, src->block1[i]);
+        r->block1[j]=rOppVar(r, src->block0[i]);
+        j++;
+        break;
+      } 
+      case ringorder_wp: /* wp -> a(...),ls */
+      { 
+        l=rRealloc1(r,src,l,j);
+        r->order[j]=ringorder_a;
+        r->block0[j]=rOppVar(r, src->block1[i]);
+        r->block1[j]=rOppVar(r, src->block0[i]);
+        r->wvhdl[j]=r->wvhdl[j+1]; r->wvhdl[j+1]=r->wvhdl[j+1]=NULL;
+        rOppWeight(r->wvhdl[j], r->block1[j]-r->block0[j]);
+        j++;
+        r->order[j]=ringorder_ls;
+        r->block0[j]=rOppVar(r, src->block1[i]);
+        r->block1[j]=rOppVar(r, src->block0[i]);
+        j++;
+        break;
+      } 
+      case ringorder_Wp: /* Wp -> a(...),rp */
+      { 
+        l=rRealloc1(r,src,l,j);
+        r->order[j]=ringorder_a;
+        r->block0[j]=rOppVar(r, src->block1[i]);
+        r->block1[j]=rOppVar(r, src->block0[i]);
+        r->wvhdl[j]=r->wvhdl[j+1]; r->wvhdl[j+1]=r->wvhdl[j+1]=NULL;
+        rOppWeight(r->wvhdl[j], r->block1[j]-r->block0[j]);
+        j++;
+        r->order[j]=ringorder_rp;
+        r->block0[j]=rOppVar(r, src->block1[i]);
+        r->block1[j]=rOppVar(r, src->block0[i]);
+        j++;
+        break;
+      } 
+      case ringorder_M: /* M -> M */
+      { 
+        r->order[j]=ringorder_M;
+        r->block0[j]=rOppVar(r, src->block1[i]);
+        r->block1[j]=rOppVar(r, src->block0[i]);
+        int n=r->block1[j]-r->block0[j];
+        /* M is a (n+1)x(n+1) matrix */
+        for (int nn=0; nn<=n; nn++)
+        {
+          rOppWeight(&(r->wvhdl[j][nn*(n+1)]), n /*r->block1[j]-r->block0[j]*/);
+        }
+        j++;
+        break;
+      } 
+      // not yet done:
+      case ringorder_ls:
+      case ringorder_ds:
+      case ringorder_Ds:
+      case ringorder_ws:
+      case ringorder_Ws:
+      // should not occur:
+      case ringorder_S:
+      case ringorder_s:
+      case ringorder_aa:
+      case ringorder_L:
+      case ringorder_unspec:
+        Werror("order %s not (yet) supported", rSimpleOrdStr(src->order[i]));
+        break;
+    }
+  } 
+#ifdef RDEBUG
+   rDebugPrint(r);
+#endif
+  rTest(r);
+  /* DO NOT CALL: rComplete(r); - it is all done */
 #ifdef HAVE_PLURAL
   /* now, we initialize a non-comm structure on r */
   if (!rIsPluralRing(src))
   {
     return r;
   }
+  {
   rChangeCurrRing(r);  
   /* basic nc constructions  */
   r->nc = (nc_struct *)omAlloc0(sizeof(nc_struct));
   r->nc->ref = 1; /* in spite of Copy(src)? */
   r->nc->basering = r;
   r->nc->type =  src->nc->type;
-  int *perm = (int *)omAlloc0((r->N+1)*sizeof(int));
+  int *perm = (int *)omAlloc0((rVar(r)+1)*sizeof(int));
   int *par_perm = NULL;
   nMapFunc nMap = nSetMap(src);
   int j;
   int ni,nj;
   for(i=1; i<=r->N; i++)
   {
-    perm[i] = r->N+1-i;
+    perm[i] = rOppVar(r,i);
   }
-  matrix C = mpNew(r->N,r->N);
-  matrix D = mpNew(r->N,r->N);
-  for (i=1; i< r->N; i++)
+  matrix C = mpNew(rVar(r),rVar(r));
+  matrix D = mpNew(rVar(r),rVar(r));
+  for (i=1; i< rVar(r); i++)
   {
-    for (j=i+1; j<=r->N; j++)
+    for (j=i+1; j<=rVar(r); j++)
     {
       ni = r->N +1 - i;
       nj = r->N +1 - j; /* i<j ==>   nj < ni */
@@ -3612,14 +3761,17 @@ ring rOpposite(ring src)
       MATELEM(D,nj,ni) = pPermPoly(MATELEM(src->nc->D,i,j),perm,src,nMap,par_perm,src->P);
     }
   }
+  idTest((ideal)C);
+  idTest((ideal)D);
   r->nc->C = C;
   r->nc->D = D;
   if (nc_InitMultiplication(r))
     WarnS("Error initializing multiplication!");
   r->nc->IsSkewConstant =   src->nc->IsSkewConstant;
-  omFreeSize((ADDRESS)perm,(r->N+1)*sizeof(int));
+  omFreeSize((ADDRESS)perm,(rVar(r)+1)*sizeof(int));
   rChangeCurrRing(save);
-#endif HAVE_PLURAL
+  }
+#endif
   return r;
 }
 
@@ -3628,7 +3780,7 @@ ring rEnvelope(ring R)
   /* that is R^e = R \tensor_K R^opp */
 {
   ring Ropp = rOpposite(R);
-  ring Renv;
+  ring Renv=NULL;
   int stat = rSum(R, Ropp, Renv);
   if (stat <=0)
     WarnS("Error in rEnvelope at rSum");
