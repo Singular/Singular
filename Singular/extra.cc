@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.63 1998-07-03 13:02:27 pohl Exp $ */
+/* $Id: extra.cc,v 1.64 1998-07-15 16:17:34 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -47,7 +47,6 @@
 #include "ideals.h"
 #include "kstd1.h"
 #include "syz.h"
-#include "polys.h"
 
 // Define to enable many more system commands
 //#define HAVE_EXTENDED_SYSTEM
