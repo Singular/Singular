@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: COPYING.texi,v 1.7 2000-05-23 14:41:20 obachman Exp $
+@comment $Id: COPYING.texi,v 1.8 2001-01-19 10:38:54 keilen Exp $
 @comment this file contains the copyright notice on Singular
 @ifclear VERSION
 @include version.texi
@@ -58,7 +58,7 @@ sold.
 
 If you use Singular or parts thereof in a project and/or publish
 results that were partly obtained using @sc{Singular}, we request that you
-cite @sc{Singular} and inform us about it -- see
+cite @sc{Singular} and inform us thereof -- see
 @uref{http://www.singular.uni-kl.de/how_to_cite.html},
 for information on how to cite Singular.
 
@@ -68,7 +68,7 @@ Please send any comments or bug reports to
 The following parts of @sc{Singular} have their own copyright: the Gnu
 Multiple Precision Library (GMP), the Multi Protocol library (MP), the
 Factory library, the libfac library, and, for the Windows 9X/NT
-distributions the Cygwin DLL and the Cygwin tools (Cygwin) and the
+distributions the Cygwin DLL and the Cygwin tools (Cygwin), and the
 XEmacs editor (XEmacs).
 
 Their copyrights and licences can be found in the accompanying files
@@ -120,7 +120,7 @@ Contributions to the kernel of @sc{Singular} have been made by
 Olaf Bachmann,
 Hubert Grassmann,
 Kai Kr@"uger,
-Michael Messollen,
+Michael Me@ss{}ollen,
 Wolfgang Neumann,
 Thomas N@"u@ss{}ler,
 Wilfred Pohl,
@@ -147,12 +147,15 @@ Tim Wichmann.
 @sc{Singular} libraries have furthermore been contributed by
 Stephan Endra@ss{},
 Wolfram Decker,
+Ignacio Farran, 
 Anne Fr@"ubis-Kr@"uger,
 Christian Gorzel,
 Agnes Eileen Heydtmann,
 Dietmar Hillebrand,
+Thomas Keilen,
 Ulrich Klein,
 Martin Lamm,
+Christoph Lossen,
 Bernd Martin,
 Mathias Schulze,
 and
@@ -160,12 +163,15 @@ Moritz Wenk.
 
 @cindex Endra@ss{}, Stephan
 @cindex Decker, Wolfram
+@cindex Farran, Ignacio
 @cindex  Fr@"ubis-Kr@"uge,r Anne
 @cindex Gorzel, Christian
 @cindex Heydtmann, Agnes Eileen 
 @cindex Hillebrand, Dietmar
+@cindex Keilen, Thomas
 @cindex Klein, Ulrich
 @cindex Lamm, Martin
+@cindex Lossen, Christoph
 @cindex Martin, Bernd
 @cindex Schulze, Mathias
 
