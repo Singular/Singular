@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.29 1999-11-15 14:37:01 Singular Exp $ */
+/* $Id: feread.cc,v 1.30 1999-11-17 18:22:52 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -360,7 +360,10 @@ static char * fe_fgets_stdin_init(char *pr,char *s, int size)
   int res=fe_init_dyn_rl();
   if (res!=0)
   {
-    Warn("dynamic loading failed: %d\n",res);
+    if (res==1)
+      WarnS("dynamic loading of libreadline failed");
+    else
+      Warn("dynamic loading failed: %d\n",res);
     fe_fgets_stdin=fe_fgets_stdin_emu;
     return fe_fgets_stdin_emu(pr,s,size);
   }

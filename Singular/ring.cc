@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.83 1999-11-17 10:51:02 obachman Exp $ */
+/* $Id: ring.cc,v 1.84 1999-11-17 18:22:55 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -482,7 +482,8 @@ static BOOLEAN rSleftvList2StringArray(sleftv* sl, char** p)
 //         NULL        on error
 // NOTE:   * makes new ring to current ring, on success
 //         * considers input sleftv's as read-only
-idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord)
+//idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord)
+ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 {
   int ch;
   int float_len=0;
@@ -636,20 +637,21 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord)
 
   rTest(R);
 
-  // try to enter the ring into the name list //
+  // try to enter the ring into the name list
   // need to clean up sleftv here, before this ring can be set to
   // new currRing or currRing can be killed beacuse new ring has
   // same name
   if (pn != NULL) pn->CleanUp();
   if (rv != NULL) rv->CleanUp();
   if (ord != NULL) ord->CleanUp();
-  if ((tmp = enterid(s, myynest, RING_CMD, &IDROOT))==NULL)
-    goto rInitError;
+  //if ((tmp = enterid(s, myynest, RING_CMD, &IDROOT))==NULL)
+  //  goto rInitError;
 
-  memcpy(IDRING(tmp),R,sizeof(*R));
+  //memcpy(IDRING(tmp),R,sizeof(*R));
   // set current ring
-  FreeSizeOf(R,  ip_sring);
-  return tmp;
+  //FreeSizeOf(R,  ip_sring);
+  //return tmp;
+  return R;
 
   // error case:
   rInitError:
@@ -1731,7 +1733,7 @@ int rSum(ring r1, ring r2, ring &sum)
  *        qring:        same nCopy, same idCopy as currRing)
  * DOES NOT CALL rComplete
  */
-static ring rCopy0(ring r, BOOLEAN copy_qideal = TRUE, 
+static ring rCopy0(ring r, BOOLEAN copy_qideal = TRUE,
                    BOOLEAN copy_ordering = TRUE)
 {
   if (r == NULL) return NULL;
@@ -1787,7 +1789,7 @@ static ring rCopy0(ring r, BOOLEAN copy_qideal = TRUE,
     res->names[i] = mstrdup(r->names[i]);
   }
   res->idroot = NULL;
-  if (r->qideal!=NULL) 
+  if (r->qideal!=NULL)
   {
     if (copy_qideal) res->qideal= idCopy(r->qideal);
     else res->qideal = NULL;
@@ -3070,14 +3072,14 @@ BOOLEAN rComplete(ring r, int force)
 #else
   if (r->order[0] == ringorder_s)
   {
-    if (r->pCompIndex == r->ExpESize-3) 
+    if (r->pCompIndex == r->ExpESize-3)
       r->pOrdIndex = r->ExpLSize-3;
     else
       r->pOrdIndex = r->ExpLSize-2;
   }
-  else if (r->pCompIndex == r->ExpESize-1) 
+  else if (r->pCompIndex == r->ExpESize-1)
     r->pOrdIndex=r->ExpLSize-2;
-  else                               
+  else
     r->pOrdIndex=r->ExpLSize-1;
 #endif
   return FALSE;
@@ -3094,7 +3096,7 @@ void rUnComplete(ring r)
   {
     if (r->order[0] == ringorder_s && r->typ[0].data.syz.limit > 0)
     {
-      Free(r->typ[0].data.syz.syz_index, 
+      Free(r->typ[0].data.syz.syz_index,
            (r->typ[0].data.syz.limit +1)*sizeof(int));
     }
   }
@@ -3279,7 +3281,7 @@ void rNGetSComps(int** currComponents, long** currShiftedComponents, ring r)
 // The following routines all take as input a ring r, and return R
 // where R has a certain property. P might be equal r in which case r
 // had already this property
-// 
+//
 // Without argument, these functions work on currRing and change it,
 // if necessary
 
@@ -3288,11 +3290,11 @@ static ring rAssureSyzComp(ring r);
 ring rCurrRingAssureSyzComp()
 {
   ring r = rAssureSyzComp(currRing);
-  if (r != currRing) 
+  if (r != currRing)
   {
     ring old_ring = currRing;
     rChangeCurrRing(r, TRUE);
-    if (old_ring->qideal != NULL) 
+    if (old_ring->qideal != NULL)
     {
       r->qideal = idrCopyR_NoSort(old_ring->qideal, old_ring);
       assume(idRankFreeModule(r->qideal) == 0);
@@ -3321,7 +3323,7 @@ static ring rAssureSyzComp(ring r)
   for(j=i;j>0;j--) res->block1[j]=r->block1[j-1];
 
   int ** wvhdl =(int **)Alloc0((i+1)*sizeof(int**));
-  for(j=i;j>0;j--) 
+  for(j=i;j>0;j--)
   {
     if (r->wvhdl[j-1] != NULL)
     {
@@ -3334,21 +3336,21 @@ static ring rAssureSyzComp(ring r)
   rComplete(res,1);
   return res;
 }
-  
+
 
 // use this for global orderings consisting of two blocks
 static ring rCurrRingAssure_Global(rRingOrder_t b1, rRingOrder_t b2)
 {
   int r_blocks = rBlocks(currRing);
   int i;
-  
-  assume(b1 == ringorder_c || b1 == ringorder_C || 
-         b2 == ringorder_c || b1 == ringorder_C || 
+
+  assume(b1 == ringorder_c || b1 == ringorder_C ||
+         b2 == ringorder_c || b1 == ringorder_C ||
          b2 == ringorder_S);
-  
+
   if (r_blocks == 2 && currRing->order[0] == b1 && currRing->order[2] == 0)
     return currRing;
-  
+
   ring res = rCopy0(currRing, FALSE, FALSE);
   res->order = (int*)Alloc0(3*sizeof(int));
   res->block0 = (int*)Alloc0(3*sizeof(int));
@@ -3406,13 +3408,13 @@ void rSetSyzComp(int k)
     else
     {
       currRing->typ[0].data.syz.syz_index = (int*)
-        ReAlloc(currRing->typ[0].data.syz.syz_index, 
+        ReAlloc(currRing->typ[0].data.syz.syz_index,
                 (currRing->typ[0].data.syz.limit+1)*sizeof(int),
                 (k+1)*sizeof(int));
     }
     for (i=currRing->typ[0].data.syz.limit + 1; i<= k; i++)
     {
-      currRing->typ[0].data.syz.syz_index[i] = 
+      currRing->typ[0].data.syz.syz_index[i] =
         currRing->typ[0].data.syz.curr_index;
     }
     currRing->typ[0].data.syz.limit = k;
@@ -3448,5 +3450,3 @@ int rGetMaxSyzComp(int i)
     return 0;
   }
 }
-
-    

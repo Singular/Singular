@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.74 1999-11-15 17:20:04 obachman Exp $ */
+/* $Id: grammar.y,v 1.75 1999-11-17 18:22:53 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -325,7 +325,7 @@ lines:
             }
             #endif
             prompt_char = '>';
-	    if (sdb_flags & 2) { sdb_flags=1; YYERROR; }
+            if (sdb_flags & 2) { sdb_flags=1; YYERROR; }
             if(siCntrlc)
             {
               siCntrlc=FALSE;
@@ -364,7 +364,7 @@ pprompt:
             #ifdef SIQ
             siq=0;
             #endif
-	    yyInRingConstruction = FALSE;
+            yyInRingConstruction = FALSE;
             currentVoice->ifsw=0;
             if (inerror)
             {
@@ -380,11 +380,11 @@ pprompt:
             if (!errorreported) WerrorS("...parse error");
             yyerror("");
             yyerrok;
-	    if ((sdb_flags & 1) && currentVoice->pi!=NULL)
-	    {
-	      currentVoice->pi->trace_flag |=1;
-	    } 
-	    else
+            if ((sdb_flags & 1) && currentVoice->pi!=NULL)
+            {
+              currentVoice->pi->trace_flag |=1;
+            }
+            else
             if (myynest>0)
             {
               feBufferTypes t=currentVoice->Typ();
@@ -399,7 +399,7 @@ pprompt:
             {
               exitVoice();
             }
-	    if (sdb_flags &2) sdb_flags=1;
+            if (sdb_flags &2) sdb_flags=1;
           }
         ;
 
@@ -477,7 +477,7 @@ elemexpr:
               sleftv tmp;
               memset(&tmp,0,sizeof(tmp));
               i=iiTestConvert((t=v->Typ()),POLY_CMD);
-              if((i==0) || (iiConvert(t /*v->Typ()*/,POLY_CMD,i,v,&tmp))) 
+              if((i==0) || (iiConvert(t /*v->Typ()*/,POLY_CMD,i,v,&tmp)))
               {
                 pDelete((poly *)&$$.data);
                 $2.CleanUp();
@@ -662,6 +662,14 @@ expr:   expr_arithmetic
         | INTMAT_CMD '(' expr ')'
           {
             if(iiExprArith1(&$$,&$3,INTMAT_CMD)) YYERROR;
+          }
+        | RING_CMD '(' rlist ',' rlist ',' ordering ')'
+          {
+            if(iiExprArith3(&$$,RING_CMD,&$3,&$5,&$7)) YYERROR;
+          }
+        | RING_CMD '(' expr ')'
+          {
+            if(iiExprArith1(&$$,&$3,RING_CMD)) YYERROR;
           }
         | quote_start expr quote_end
           {
@@ -949,7 +957,7 @@ rlist:
 ordername:
         UNKNOWN_IDENT
         {
-          // let rInit take care of any errors 
+          // let rInit take care of any errors
           $$=rOrderName($1);
         }
         ;
@@ -1128,16 +1136,16 @@ killcmd:
             }
             else
             {
-#ifdef HAVE_NAMESPACES
-            if (v->packhdl != NULL)
-            {
-              namespaceroot->push( IDPACKAGE(v->packhdl) , IDID(v->packhdl));
-              killhdl((idhdl)v->data);
-              namespaceroot->pop();
-            }
-            else 
-#endif /* HAVE_NAMESPACES */
-              killhdl((idhdl)v->data);
+            #ifdef HAVE_NAMESPACES
+              if (v->packhdl != NULL)
+              {
+                namespaceroot->push( IDPACKAGE(v->packhdl) , IDID(v->packhdl));
+                killhdl((idhdl)v->data);
+                namespaceroot->pop();
+              }
+              else
+              #endif /* HAVE_NAMESPACES */
+                killhdl((idhdl)v->data);
             }
             v=v->next;
           } while (v!=NULL);
@@ -1331,81 +1339,56 @@ ringcmd:
                   ring_name = mstrdup($2.name);
               }
             #endif /* HAVE_NAMESPACES */
-            idhdl b=
-            rInit(ring_name,      /* ringname */
-                  &$4,            /* characteristik and list of parameters*/
+            ring b=
+            rInit(&$4,            /* characteristik and list of parameters*/
                   &$6,            /* names of ringvariables */
                   &$8);            /* ordering */
-#ifdef HAVE_NAMESPACES
-            if(do_pop) namespaceroot->pop();
-#endif /* HAVE_NAMESPACES */
-	    yyInRingConstruction = FALSE;
-            if (b==NULL)
+            idhdl newRingHdl=NULL;
+            if (b!=NULL)
+            {
+              newRingHdl=enterid(ring_name, myynest, RING_CMD, &IDROOT);
+              if (newRingHdl!=NULL)
+              {
+                Free(IDRING(newRingHdl),sizeof(ip_sring));
+                IDRING(newRingHdl)=b;
+              }
+              else
+              {
+                rKill(b);
+              }
+            }
+            #ifdef HAVE_NAMESPACES
+              if(do_pop) namespaceroot->pop();
+            #endif /* HAVE_NAMESPACES */
+            yyInRingConstruction = FALSE;
+            if (newRingHdl==NULL)
             {
               MYYERROR("cannot make ring");
             }
             else
             {
-              rSetHdl(b);
+              rSetHdl(newRingHdl);
             }
           }
         | ringcmd1 elemexpr
           {
             BOOLEAN do_pop = FALSE;
             char *ring_name = $2.name;
-#ifdef HAVE_NAMESPACES
-            if (((sleftv)$2).req_packhdl != NULL)
-            {
-              namespaceroot->push( IDPACKAGE(((sleftv)$2).req_packhdl) , "");
-              do_pop = TRUE;
-              if( (((sleftv)$2).req_packhdl != NULL) &&
+            #ifdef HAVE_NAMESPACES
+              if (((sleftv)$2).req_packhdl != NULL)
+              {
+                namespaceroot->push( IDPACKAGE(((sleftv)$2).req_packhdl) , "");
+                do_pop = TRUE;
+                if( (((sleftv)$2).req_packhdl != NULL) &&
                   (((sleftv)$2).packhdl != ((sleftv)$2).req_packhdl))
-                ring_name = mstrdup($2.name);
-            }
-#endif /* HAVE_NAMESPACES */
+                  ring_name = mstrdup($2.name);
+              }
+            #endif /* HAVE_NAMESPACES */
             if (!inerror) rDefault(ring_name);
-#ifdef HAVE_NAMESPACES
-            if(do_pop) namespaceroot->pop();
-#endif /* HAVE_NAMESPACES */
-	    yyInRingConstruction = FALSE;
-          }
-        | DRING_CMD { yyInRingConstruction = TRUE; }
-          elemexpr cmdeq
-          rlist     ','       /* description of coeffs */
-          rlist     ','       /* var names */
-          ordering           /* list of (multiplier ordering (weight(s))) */
-          {
-            #ifdef DRING
-            BOOLEAN do_pop = FALSE;
-            idhdl h;
-            char *ring_name = $3.name;
-#ifdef HAVE_NAMESPACES
-            if (((sleftv)$3).req_packhdl != NULL)
-            {
-              namespaceroot->push( IDPACKAGE(((sleftv)$3).req_packhdl) , "");
-              do_pop = TRUE;
-              if( (((sleftv)$2).req_packhdl != NULL) &&
-                  (((sleftv)$3).packhdl != ((sleftv)$3).req_packhdl))
-                ring_name = mstrdup($3.name);
-            }
-#endif /* HAVE_NAMESPACES */
-            h=rInit($3.name,    /* ringname */
-                   &$5,         /* characteristik and list of parameters*/
-                   &$7,         /* names of ringvariables */
-                   &$9,         /* ordering */
-                   TRUE);       /* is a dring */
-#ifdef HAVE_NAMESPACES
-            if(do_pop) namespaceroot->pop();
-#endif /* HAVE_NAMESPACES */
-            if(h==NULL)
-            {
-              YYERROR;
-            }
-            rSetHdl(h);
-            setFlag(h,FLAG_DRING);
-            rDSet();
-            #endif
-	    yyInRingConstruction = FALSE;
+            #ifdef HAVE_NAMESPACES
+              if(do_pop) namespaceroot->pop();
+            #endif /* HAVE_NAMESPACES */
+            yyInRingConstruction = FALSE;
           }
         ;
 

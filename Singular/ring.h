@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.41 1999-11-17 10:51:04 obachman Exp $ */
+/* $Id: ring.h,v 1.42 1999-11-17 18:22:56 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -17,7 +17,7 @@
 
 void   rChangeCurrRing(ring r, BOOLEAN complete = TRUE);
 void   rSetHdl(idhdl h, BOOLEAN complete = TRUE);
-idhdl  rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord);
+ring   rInit(sleftv* pn, sleftv* rv, sleftv* ord);
 idhdl  rDefault(char *s);
 int    rIsRingVar(char *n);
 char * RingVar(short);
@@ -142,7 +142,7 @@ inline int rBlocks(ring r)
   return i+1;
 }
 
-typedef enum rRingOrder_t 
+typedef enum rRingOrder_t
 {
   ringorder_no = 0,
   ringorder_a,
@@ -186,7 +186,7 @@ inline BOOLEAN rIsSyzIndexRing(ring r)
 { return r->order[0] == ringorder_s;}
 
 inline int rGetCurrSyzLimit()
-{ return (currRing->order[0] == ringorder_s ? 
+{ return (currRing->order[0] == ringorder_s ?
           currRing->typ[0].data.syz.limit : 0);}
 
 // Ring Manipulations
@@ -198,7 +198,7 @@ ring   rCurrRingAssure_C_dp();
 // return the max-comonent wchich has syzIndex i
 // Assume: i<= syzIndex_limit
 int rGetMaxSyzComp(int i);
-  
+
 BOOLEAN rHasSimpleOrder(ring r);
 // returns TRUE, if simple lp or ls ordering
 BOOLEAN rHasSimpleLexOrder(ring r);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.186 1999-11-15 17:20:08 obachman Exp $ */
+/* $Id: iparith.cc,v 1.187 1999-11-17 18:22:54 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4237,6 +4237,11 @@ static BOOLEAN jjRES3(leftv res, leftv u, leftv v, leftv w)
   return TRUE;
 }
 #endif
+static BOOLEAN jjRING3(leftv res, leftv u, leftv v, leftv w)
+{
+  res->data=(void *)rInit(u,v,w);
+  return (res->data==NULL);
+}
 static BOOLEAN jjSTATUS3(leftv res, leftv u, leftv v, leftv w)
 {
   int yes;
@@ -4333,6 +4338,7 @@ struct sValCmd3 dArith3[]=
 #else
 ,{jjWRONG3,         RESULTANT_CMD, POLY_CMD,POLY_CMD,   POLY_CMD,   POLY_CMD }
 #endif
+,{jjRING3,          RING_CMD,   RING_CMD,   DEF_CMD,    DEF_CMD,    DEF_CMD }
 #ifdef HAVE_SPECTRUM
 ,{semicProc3,       SEMIC_CMD,  INT_CMD,    LIST_CMD,   LIST_CMD,   INT_CMD }
 ,{spectrumOp3,      SPECTRUM_CMD, LIST_CMD, LIST_CMD,   STRING_CMD, INT_CMD }
