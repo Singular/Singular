@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmcheck.c,v 1.18 1999-11-16 13:04:04 hannes Exp $ */
+/* $Id: mmcheck.c,v 1.19 1999-11-23 19:35:14 obachman Exp $ */
 
 /*
 * ABSTRACT: several checking routines to help debugging the memory subsystem
@@ -136,7 +136,7 @@ static int mmPrintDBMCB ( DBMCB * what, char* msg , int given_size)
     (void)fprintf( stderr, "freed in: %s:%d ",
                    what->freed_fname, what->freed_lineno );
 #ifdef MTRACK_FREE
-    mmDBPrintThisStack(what, MM_PRINT_ALL_STACK, 1);
+    mmDBPrintThisStack(stderr, what, MM_PRINT_ALL_STACK, 1);
 #endif
   }
 #ifndef MTRACK
@@ -357,7 +357,7 @@ static int mmCheckSingleDBMCB ( DBMCB * what, int size , int flags)
     {
       mmMoveDBMCB(&mm_theDBfree, &mm_theDBused, what);
       what->flags |= MM_USEDFLAG;
-      return mmPrintDBMCB( what, "block has been freed but still in use (fixed)", 0 );
+      return mmPrintDBMCB( what, "block has been freed but still in use", 0 );
     }
     return mmPrintDBMCB(what, "block still in use but should be free", 0);
   }
