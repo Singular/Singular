@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.55 2001-01-16 13:48:44 Singular Exp $";
+version="$Id: standard.lib,v 1.56 2001-01-16 14:49:46 lossen Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -434,8 +434,8 @@ resolution
 computes a (possibly minimal) free resolution of an ideal or module using
 a heuristically choosen method.
 @* The second (int) argument (say, @code{k}) specifies the length of
-the resolution. If @code{k <=0 } then k is assumed to be the number of
-variables of the basering.
+the resolution. If it is not positive then @code{k} is assumed to be the 
+number of variables of the basering.
 @* If a third argument is given, the returned resolution is minimized.
 
 Depending on the input, the returned resolution is computed using the
@@ -447,14 +447,7 @@ following methods:
 @item @strong{homogeneous ideals and k=0:}
 @code{lres} (La'Scala's method), see @ref{lres}.
 
-@ifinfo
-@item *not minimized resolution and (homogeneous input with k<>0,
-or local rings):*@*
-@end ifinfo
-@tex
-@item {\bf not minimized resolution and (homogeneous input with k
-$\neq$0, or local rings):}
-@end tex
+@item @strong{not minimized resolution and (homogeneous input with k not 0, or local rings):}
 @code{sres} (Schreyer's method), see @ref{sres}.
 
 @item @strong{all other inputs:}
