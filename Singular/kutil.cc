@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.92 2000-12-31 15:14:33 obachman Exp $ */
+/* $Id: kutil.cc,v 1.93 2001-01-18 16:21:14 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -24,7 +24,7 @@
 // on topgun, this is slightly faster (see monodromy_l.tst, homog_gonnet.sing)
 #define ENTER_USE_MEMMOVE
 
-// define, if the my_memmove inlines should be used instead of 
+// define, if the my_memmove inlines should be used instead of
 // system memmove -- it does not seem to pay off, though
 // #define ENTER_USE_MYMEMMOVE
 
@@ -43,7 +43,7 @@
 #include "kstd1.h"
 #include "pShallowCopyDelete.h"
 
-#ifdef KDEBUG 
+#ifdef KDEBUG
 #undef KDEBUG
 #define KDEBUG 2
 #endif
@@ -170,7 +170,7 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
     }
     p1 = p;
     while (pNext(p1)!=NULL)
-    { 
+    {
       if (p_LmCmp(pNext(p1), strat->kNoetherTail(), L->tailRing) == -1)
       {
         L->last = p1;
@@ -200,7 +200,7 @@ void deleteHC(LObject *L, kStrategy strat, BOOLEAN fromNext)
     }
     if (bucket != NULL)
     {
-      if (L->pLength > 1) 
+      if (L->pLength > 1)
       {
         kBucketInit(bucket, pNext(p), L->pLength - 1);
         pNext(p) = NULL;
@@ -336,10 +336,10 @@ static inline void enlargeT (TSet &T, TObject** &R, unsigned long* &sevT,
                              int &length, int incr)
 {
   int i;
-  T = (TSet)omrealloc0Size(T, length*sizeof(TObject), 
+  T = (TSet)omrealloc0Size(T, length*sizeof(TObject),
                            (length+incr)*sizeof(TObject));
 
-  sevT = (unsigned long*) omreallocSize(sevT, length*sizeof(long*), 
+  sevT = (unsigned long*) omreallocSize(sevT, length*sizeof(long*),
                            (length+incr)*sizeof(long*));
 
   R = (TObject**)omrealloc0Size(R,length*sizeof(TObject*),
@@ -354,8 +354,8 @@ void cleanT (kStrategy strat)
   poly  p;
   assume(currRing == strat->tailRing || strat->tailRing != NULL);
 
-  pShallowCopyDeleteProc p_shallow_copy_delete = 
-    (strat->tailRing != currRing ? 
+  pShallowCopyDeleteProc p_shallow_copy_delete =
+    (strat->tailRing != currRing ?
      pGetShallowCopyDeleteProc(strat->tailRing, currRing) :
      NULL);
 
@@ -363,7 +363,7 @@ void cleanT (kStrategy strat)
   {
     p = strat->T[j].p;
     strat->T[j].p=NULL;
-    if (strat->T[j].max != NULL) 
+    if (strat->T[j].max != NULL)
       p_LmFree(strat->T[j].max, strat->tailRing);
     i = -1;
     loop
@@ -385,7 +385,7 @@ void cleanT (kStrategy strat)
         if (strat->T[j].t_p != NULL)
         {
           assume(p_shallow_copy_delete != NULL);
-          pNext(p) = p_shallow_copy_delete(pNext(p),strat->tailRing,currRing, 
+          pNext(p) = p_shallow_copy_delete(pNext(p),strat->tailRing,currRing,
                                            currRing->PolyBin);
           p_LmFree(strat->T[j].t_p, strat->tailRing);
         }
@@ -487,7 +487,7 @@ int kFindInT(poly p, kStrategy strat)
   while (strat != NULL);
   return -1;
 }
-  
+
 #ifdef KDEBUG
 
 void sTObject::wrp()
@@ -526,7 +526,7 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
 
   poly p = T->p;
   ring r = currRing;
-  
+
   if (T->p == NULL && T->t_p == NULL && i >= 0)
     return dReportError("%c[%d].poly is NULL", TN, i);
 
@@ -562,7 +562,7 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
           return dReportError("%c[%d].max is NULL", TN, i);
         if (pNext(T->max) != NULL)
           return dReportError("pNext(%c[%d].max) != NULL", TN, i);
-        
+
         pFalseReturn(p_CheckPolyRing(T->max, tailRing));
         omCheckBinAddrSize(T->max, (tailRing->PolyBin->sizeW)*SIZEOF_LONG);
 #if KDEBUG > 0
@@ -582,7 +582,7 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
   }
   else
   {
-    if (T->max != NULL) 
+    if (T->max != NULL)
       return dReportError("%c[%d].max != NULL but tailRing == currRing",TN,i);
     if (T->t_p != NULL)
       return dReportError("%c[%d].t_p != NULL but tailRing == currRing",TN,i);
@@ -616,7 +616,7 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
   return TRUE;
 }
 
-BOOLEAN kTest_L(LObject *L, ring strat_tailRing, 
+BOOLEAN kTest_L(LObject *L, ring strat_tailRing,
                 BOOLEAN testp, int lpos, TSet T, int tlength)
 {
   if (testp)
@@ -688,7 +688,7 @@ BOOLEAN kTest (kStrategy strat)
         return dReportError("strat->sevT[%d] out of sync", i);
     }
   }
-  
+
   // test L
   if (strat->L != NULL)
   {
@@ -697,14 +697,14 @@ BOOLEAN kTest (kStrategy strat)
       kFalseReturn(kTest_L(&(strat->L[i]), strat->tailRing,
                            strat->L[i].Next() != strat->tail, i,
                            strat->T, strat->tl));
-      if (strat->use_buckets && strat->L[i].Next() != strat->tail && 
+      if (strat->use_buckets && strat->L[i].Next() != strat->tail &&
           strat->L[i].Next() != NULL && strat->L[i].p1 != NULL)
       {
         assume(strat->L[i].bucket != NULL);
       }
     }
   }
-  
+
   // test S
   if (strat->S != NULL)
     kFalseReturn(kTest_S(strat));
@@ -718,7 +718,7 @@ BOOLEAN kTest_S(kStrategy strat)
   BOOLEAN ret = TRUE;
   for (i=0; i<=strat->sl; i++)
   {
-    if (strat->S[i] != NULL && 
+    if (strat->S[i] != NULL &&
         strat->sevS[i] != pGetShortExpVector(strat->S[i]))
     {
       return dReportError("S[%d] wrong sev: has %o, specified to have %o",
@@ -740,11 +740,11 @@ BOOLEAN kTest_TS(kStrategy strat)
   for (i=0; i<=strat->tl; i++)
   {
     if (strat->T[i].i_r < 0 || strat->T[i].i_r > strat->tl)
-      return dReportError("strat->T[%d].i_r == %d out of bounds", i, 
+      return dReportError("strat->T[%d].i_r == %d out of bounds", i,
                           strat->T[i].i_r);
     if (strat->R[strat->T[i].i_r] != &(strat->T[i]))
       return dReportError("T[%d].i_r with R out of sync", i);
-  }   
+  }
   // test containment of S inT
   if (strat->S != NULL)
   {
@@ -840,7 +840,7 @@ void deleteInL (LSet set, int *length, int j,kStrategy strat)
   {
 #ifdef ENTER_USE_MEMMOVE
     memmove(&(set[j]), &(set[j+1]), (*length - j)*sizeof(LObject));
-#else    
+#else
     int i;
     for (i=j; i < (*length); i++)
       set[i] = set[i+1];
@@ -1921,7 +1921,7 @@ int posInT_EcartpLength(const TSet set,const int length,LObject &p)
         an=i;
     }
 }
-  
+
 /*2
 * looks up the position of p in set
 * set[0] is the smallest with respect to the ordering-procedure
@@ -2553,10 +2553,10 @@ int posInL17_c (const LSet set, const int length,
 /***************************************************************
  *
  * Tail reductions
- * 
+ *
  ***************************************************************/
-static TObject* 
-kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T, 
+static TObject*
+kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
                     long ecart = LONG_MAX)
 {
   int j = 0;
@@ -2565,7 +2565,7 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
   poly p;
   ring r;
   L->GetLm(p, r);
-  
+
   assume(~not_sev == p_GetShortExpVector(p, r));
 
   if (r == currRing)
@@ -2582,7 +2582,7 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
           (ecart== LONG_MAX || ecart>= strat->ecartS[j]) &&
           p_LmDivisibleBy(strat->S[j], p, r))
         break;
-      
+
 #endif
       j++;
     }
@@ -2594,7 +2594,7 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
     }
     else
     {
-      assume (j >= 0 && j <= strat->tl && strat->S_2_T(j) != NULL && 
+      assume (j >= 0 && j <= strat->tl && strat->S_2_T(j) != NULL &&
               strat->S_2_T(j)->p == strat->S[j]);
       return strat->S_2_T(j);
     }
@@ -2609,10 +2609,10 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
       t = strat->S_2_T(j);
       assume(t != NULL && t->t_p != NULL && t->tailRing == r);
-      if (p_LmShortDivisibleBy(t->t_p, sev[j], p, not_sev, r) && 
+      if (p_LmShortDivisibleBy(t->t_p, sev[j], p, not_sev, r) &&
           (ecart== LONG_MAX || ecart>= strat->ecartS[j]))
         return t;
-#else      
+#else
       if (! (sev[j] & not_sev) && (ecart== LONG_MAX || ecart>= strat->ecartS[j]))
       {
         t = strat->S_2_T(j);
@@ -2647,7 +2647,7 @@ poly redtail (LObject* L, int pos, kStrategy strat)
   long e;
   int l;
   BOOLEAN save_HE=strat->kHEdgeFound;
-  strat->kHEdgeFound |= 
+  strat->kHEdgeFound |=
     ((Kstd1_deg>0) && (op<=Kstd1_deg)) || TEST_OPT_INFREDTAIL;
 
   while(hn != NULL)
@@ -2685,7 +2685,7 @@ poly redtail (LObject* L, int pos, kStrategy strat)
     h = hn;
     hn = pNext(h);
   }
-  
+
   all_done:
   if (strat->redTailChange)
   {
@@ -2711,7 +2711,7 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT)
   TObject* With;
   // placeholder in case strat->tl < 0
   TObject  With_s(strat->tailRing);
-  
+
   h = L->GetLmTailRing();
   p = h;
   LObject Ln(pNext(h), strat->tailRing);
@@ -3372,13 +3372,13 @@ static poly redMora (poly h,int maxIndex,kStrategy strat)
 #ifdef KDEBUG
         if (TEST_OPT_DEBUG)
           {PrintS("reduce ");wrp(h);Print(" with S[%d] (",j);wrp(strat->S[j]);}
-        
-#endif          
+
+#endif
         h = ksOldSpolyRed(strat->S[j],h,strat->kNoetherTail());
 #ifdef KDEBUG
         if(TEST_OPT_DEBUG)
           {PrintS(")\nto "); wrp(h); PrintLn();}
-        
+
 #endif
         // pDelete(&h);
         if (h == NULL) return NULL;
@@ -3543,7 +3543,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
           /*strat->kHEdgeFound =*/ HEckeTest(h.p,strat);
         }
         if (strat->kHEdgeFound)
-          newHEdge(strat->S,strat->ak,strat);
+          newHEdge(strat->S,strat);
       }
     }
     for (i=0; i<=strat->sl; i++)
@@ -3597,7 +3597,7 @@ void enterSBba (LObject p,int atS,kStrategy strat, int atR)
     strat->ecartS = (intset)omReallocSize(strat->ecartS,
                                           IDELEMS(strat->Shdl)*sizeof(int),
                                           (IDELEMS(strat->Shdl)+setmax)*sizeof(int));
-    strat->S_2_R = (int*) omRealloc0Size(strat->S_2_R, 
+    strat->S_2_R = (int*) omRealloc0Size(strat->S_2_R,
                                          IDELEMS(strat->Shdl)*sizeof(int),
                                          (IDELEMS(strat->Shdl)+setmax)
                                                   *sizeof(int));
@@ -3615,15 +3615,15 @@ void enterSBba (LObject p,int atS,kStrategy strat, int atR)
   {
 #ifdef ENTER_USE_MEMMOVE
 // #if 0
-    memmove(&(strat->S[atS+1]), &(strat->S[atS]), 
+    memmove(&(strat->S[atS+1]), &(strat->S[atS]),
             (strat->sl - atS + 1)*sizeof(poly));
-    memmove(&(strat->ecartS[atS+1]), &(strat->ecartS[atS]), 
+    memmove(&(strat->ecartS[atS+1]), &(strat->ecartS[atS]),
             (strat->sl - atS + 1)*sizeof(int));
-    memmove(&(strat->sevS[atS+1]), &(strat->sevS[atS]), 
+    memmove(&(strat->sevS[atS+1]), &(strat->sevS[atS]),
             (strat->sl - atS + 1)*sizeof(unsigned long));
-    memmove(&(strat->S_2_R[atS+1]), &(strat->S_2_R[atS]), 
+    memmove(&(strat->S_2_R[atS+1]), &(strat->S_2_R[atS]),
             (strat->sl - atS + 1)*sizeof(int));
-#else    
+#else
     for (i=strat->sl+1; i>=atS+1; i--)
     {
       strat->S[i] = strat->S[i-1];
@@ -3673,14 +3673,14 @@ void enterT(LObject p, kStrategy strat, int atT = -1)
   strat->newt = TRUE;
   if (atT < 0)
     atT = strat->posInT(strat->T, strat->tl, p);
-  if (strat->tl == strat->tmax-1) 
+  if (strat->tl == strat->tmax-1)
     enlargeT(strat->T,strat->R,strat->sevT,strat->tmax,setmax);
   if (atT <= strat->tl)
   {
 #ifdef ENTER_USE_MEMMOVE
-    memmove(&(strat->T[atT+1]), &(strat->T[atT]), 
+    memmove(&(strat->T[atT+1]), &(strat->T[atT]),
             (strat->tl-atT+1)*sizeof(TObject));
-    memmove(&(strat->sevT[atT+1]), &(strat->sevT[atT]), 
+    memmove(&(strat->sevT[atT+1]), &(strat->sevT[atT]),
             (strat->tl-atT+1)*sizeof(unsigned long));
 #endif
     for (i=strat->tl+1; i>=atT+1; i--)
@@ -3696,7 +3696,7 @@ void enterT(LObject p, kStrategy strat, int atT = -1)
   if (strat->tailBin != NULL && (pNext(p.p) != NULL))
   {
     pNext(p.p)=p_ShallowCopyDelete(pNext(p.p),
-                                   (strat->tailRing != NULL ? 
+                                   (strat->tailRing != NULL ?
                                     strat->tailRing : currRing),
                                    strat->tailBin);
     if (p.t_p != NULL) pNext(p.t_p) = pNext(p.p);
@@ -3748,7 +3748,7 @@ BOOLEAN kPosInLDependsOnLength(int (*pos_in_l)
                                 LObject* L,const kStrategy strat))
 {
   if (pos_in_l == posInL110 ||
-      pos_in_l == posInL10) 
+      pos_in_l == posInL10)
     return TRUE;
 
   return FALSE;
@@ -3761,7 +3761,7 @@ void initBuchMoraPos (kStrategy strat)
     if (strat->honey)
     {
       strat->posInL = posInL15;
-      // ok -- here is the deal: from my experiments for Singular-2-0 
+      // ok -- here is the deal: from my experiments for Singular-2-0
       // I conclude that that posInT_EcartpLength is the best of
       // posInT15, posInT_EcartFDegpLength, posInT_FDegLength, posInT_pLength
       // see the table at the end of this file
@@ -3987,7 +3987,7 @@ void completeReduce (kStrategy strat)
   // sync
   sloppy_max = TRUE;
 #endif
-  
+
   strat->noTailReduction = FALSE;
   if (TEST_OPT_PROT)
   {
@@ -4013,7 +4013,7 @@ void completeReduce (kStrategy strat)
       if (strat->redTailChange && strat->tailRing != currRing)
       {
         if (T_j->max != NULL) p_LmFree(T_j->max, strat->tailRing);
-        if (pNext(T_j->p) != NULL) 
+        if (pNext(T_j->p) != NULL)
           T_j->max = p_GetMaxExpP(pNext(T_j->p), strat->tailRing);
         else
           T_j->max = NULL;
@@ -4044,12 +4044,12 @@ void completeReduce (kStrategy strat)
 * computes the new strat->kHEdge and the new pNoether,
 * returns TRUE, if pNoether has changed
 */
-BOOLEAN newHEdge(polyset S, int ak,kStrategy strat)
+BOOLEAN newHEdge(polyset S, kStrategy strat)
 {
   int i,j;
   poly newNoether;
 
-  scComputeHC(strat->Shdl,ak,strat->kHEdge, strat->tailRing);
+  scComputeHC(strat->Shdl,NULL,strat->ak,strat->kHEdge, strat->tailRing);
   if (strat->t_kHEdge != NULL) p_LmFree(strat->t_kHEdge, strat->tailRing);
   if (strat->tailRing != currRing)
     strat->t_kHEdge = k_LmInit_currRing_2_tailRing(strat->kHEdge, strat->tailRing);
@@ -4083,7 +4083,7 @@ BOOLEAN newHEdge(polyset S, int ak,kStrategy strat)
     if (strat->t_kNoether != NULL) p_LmFree(strat->t_kNoether, strat->tailRing);
     if (strat->tailRing != currRing)
       strat->t_kNoether = k_LmInit_currRing_2_tailRing(strat->kNoether, strat->tailRing);
-    
+
     return TRUE;
   }
   pLmFree(newNoether);
@@ -4101,12 +4101,12 @@ BOOLEAN kCheckSpolyCreation(LObject *L, kStrategy strat, poly &m1, poly &m2)
   assume(L->i_r1 >= 0 && L->i_r1 <= strat->tl);
   assume(L->i_r2 >= 0 && L->i_r2 <= strat->tl);
   assume(strat->tailRing != currRing);
-  
+
   if (! k_GetLeadTerms(L->p1, L->p2, currRing, m1, m2, strat->tailRing))
     return FALSE;
   poly p1_max = (strat->R[L->i_r1])->max;
   poly p2_max = (strat->R[L->i_r2])->max;
-  
+
   if ((p1_max != NULL && !p_LmExpVectorAddIsOk(m1, p1_max, strat->tailRing)) ||
       (p2_max != NULL && !p_LmExpVectorAddIsOk(m2, p2_max, strat->tailRing)))
   {
@@ -4118,7 +4118,7 @@ BOOLEAN kCheckSpolyCreation(LObject *L, kStrategy strat, poly &m1, poly &m2)
   }
   return TRUE;
 }
-                       
+
 BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned long expbound)
 {
   if (expbound == 0) expbound = strat->tailRing->bitmask << 1;
@@ -4126,33 +4126,33 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
   ring new_tailRing = rModifyRing(currRing,
                                   // Hmmm .. the condition pFDeg == pDeg
                                   // might be too strong
-                                  (strat->homog && pFDeg == pDeg), 
-                                  !strat->ak, 
+                                  (strat->homog && pFDeg == pDeg),
+                                  !strat->ak,
                                   expbound);
   if (new_tailRing == currRing) return TRUE;
-  
+
   strat->pOrigFDeg_TailRing = new_tailRing->pFDeg;
   strat->pOrigLDeg_TailRing = new_tailRing->pLDeg;
-  
+
   if (currRing->pFDeg != currRing->pFDegOrig)
   {
     new_tailRing->pFDeg = currRing->pFDeg;
     new_tailRing->pLDeg = currRing->pLDeg;
   }
-  
+
   if (TEST_OPT_PROT)
     Print("[%d:%d", (long) new_tailRing->bitmask, new_tailRing->ExpL_Size);
   kTest_TS(strat);
   assume(new_tailRing != strat->tailRing);
-  pShallowCopyDeleteProc p_shallow_copy_delete 
+  pShallowCopyDeleteProc p_shallow_copy_delete
     = pGetShallowCopyDeleteProc(strat->tailRing, new_tailRing);
-  
+
   omBin new_tailBin = omGetStickyBinOfBin(new_tailRing->PolyBin);
-  
+
   int i;
   for (i=0; i<=strat->tl; i++)
   {
-    strat->T[i].ShallowCopyDelete(new_tailRing, new_tailBin, 
+    strat->T[i].ShallowCopyDelete(new_tailRing, new_tailBin,
                                   p_shallow_copy_delete);
   }
   for (i=0; i<=strat->Ll; i++)
@@ -4161,13 +4161,13 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
     if (pNext(strat->L[i].p) != strat->tail)
       strat->L[i].ShallowCopyDelete(new_tailRing, p_shallow_copy_delete);
   }
-  if (strat->P.t_p != NULL || 
+  if (strat->P.t_p != NULL ||
       (strat->P.p != NULL && pNext(strat->P.p) != strat->tail))
     strat->P.ShallowCopyDelete(new_tailRing, p_shallow_copy_delete);
-  
+
   if (L != NULL && L->tailRing != new_tailRing)
   {
-    if (L->i_r < 0)    
+    if (L->i_r < 0)
       L->ShallowCopyDelete(new_tailRing, p_shallow_copy_delete);
     else
     {
@@ -4180,17 +4180,17 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
       L->max = t_l->max;
     }
   }
-      
+
   if (T != NULL && T->tailRing != new_tailRing && T->i_r < 0)
     T->ShallowCopyDelete(new_tailRing, new_tailBin, p_shallow_copy_delete);
-    
+
   omMergeStickyBinIntoBin(strat->tailBin, strat->tailRing->PolyBin);
   if (strat->tailRing != currRing)
     rKillModifiedRing(strat->tailRing);
-  
+
   strat->tailRing = new_tailRing;
   strat->tailBin = new_tailBin;
-  strat->p_shallow_copy_delete 
+  strat->p_shallow_copy_delete
     = pGetShallowCopyDeleteProc(currRing, new_tailRing);
 
   if (strat->kHEdge != NULL)
@@ -4204,7 +4204,7 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
   {
     if (strat->t_kNoether != NULL)
       p_LmFree(strat->t_kNoether, strat->tailRing);
-    strat->t_kNoether=k_LmInit_currRing_2_tailRing(strat->kNoether, 
+    strat->t_kNoether=k_LmInit_currRing_2_tailRing(strat->kNoether,
                                                    new_tailRing);
   }
   kTest_TS(strat);
@@ -4219,7 +4219,7 @@ void kStratInitChangeTailRing(kStrategy strat)
   int i;
   Exponent_t e;
   ring new_tailRing;
-  
+
   assume(strat->tailRing == currRing);
 
   for (i=0; i<= strat->Ll; i++)
@@ -4233,7 +4233,7 @@ void kStratInitChangeTailRing(kStrategy strat)
   }
   e = p_GetMaxExp(l, currRing);
   if (e <= 1) e = 2;
-  
+
   kStratChangeTailRing(strat, NULL, NULL, e);
 }
 
@@ -4260,7 +4260,7 @@ skStrategy::~skStrategy()
   if (lmBin != NULL)
     omMergeStickyBinIntoBin(lmBin, currRing->PolyBin);
   if (tailBin != NULL)
-    omMergeStickyBinIntoBin(tailBin, 
+    omMergeStickyBinIntoBin(tailBin,
                             (tailRing != NULL ? tailRing->PolyBin:
                              currRing->PolyBin));
   if (t_kHEdge != NULL)
@@ -4275,33 +4275,33 @@ skStrategy::~skStrategy()
 
 #if 0
 Timings for the different possibilities of posInT:
-            T15	    EDL	    DL	    EL	    L	    1-2-3
-Gonnet		43.26	42.30	38.34	41.98	38.40	100.04
-Hairer_2_1	1.11	1.15	1.04	1.22	1.08	4.7
-Twomat3		1.62	1.69	1.70	1.65	1.54	11.32
-ahml		4.48	4.03	4.03	4.38	4.96	26.50
-c7		    15.02	13.98	15.16	13.24	17.31	47.89
-c8		    505.09	407.46	852.76	413.21	499.19  n/a
-f855		12.65	9.27	14.97	8.78	14.23	33.12
-gametwo6	11.47	11.35	14.57	11.20	12.02	35.07
-gerhard_3	2.73	2.83	2.93	2.64	3.12	6.24
-ilias13		22.89	22.46	24.62	20.60	23.34	53.86
-noon8		40.68	37.02	37.99	36.82	35.59	877.16
-rcyclic_19	48.22	42.29	43.99	45.35	51.51	204.29
-rkat9		82.37	79.46	77.20	77.63	82.54	267.92
-schwarz_11	16.46	16.81	16.76	16.81	16.72   35.56
-test016		16.39	14.17	14.40	13.50	14.26	34.07
-test017		34.70	36.01	33.16	35.48	32.75	71.45
-test042		10.76	10.99	10.27	11.57	10.45	23.04
-test058		6.78	6.75	6.51	6.95	6.22	9.47
-test066		10.71	10.94	10.76	10.61	10.56	19.06
-test073		10.75	11.11	10.17	10.79	8.63	58.10
-test086		12.23	11.81	12.88	12.24	13.37	66.68
-test103		5.05	4.80	5.47	4.64	4.89	11.90
-test154		12.96	11.64	13.51	12.46	14.61	36.35
-test162		65.27	64.01	67.35	59.79	67.54	196.46
-test164		7.50	6.50	7.68	6.70	7.96	17.13
-virasoro	3.39	3.50	3.35	3.47	3.70	7.66
+            T15           EDL         DL          EL            L         1-2-3
+Gonnet      43.26       42.30       38.34       41.98       38.40      100.04
+Hairer_2_1   1.11        1.15        1.04        1.22        1.08        4.7
+Twomat3      1.62        1.69        1.70        1.65        1.54       11.32
+ahml         4.48        4.03        4.03        4.38        4.96       26.50
+c7          15.02       13.98       15.16       13.24       17.31       47.89
+c8         505.09      407.46      852.76      413.21      499.19        n/a
+f855        12.65        9.27       14.97        8.78       14.23       33.12
+gametwo6    11.47       11.35       14.57       11.20       12.02       35.07
+gerhard_3    2.73        2.83        2.93        2.64        3.12        6.24
+ilias13     22.89       22.46       24.62       20.60       23.34       53.86
+noon8       40.68       37.02       37.99       36.82       35.59      877.16
+rcyclic_19  48.22       42.29       43.99       45.35       51.51      204.29
+rkat9       82.37       79.46       77.20       77.63       82.54      267.92
+schwarz_11  16.46       16.81       16.76       16.81       16.72       35.56
+test016     16.39       14.17       14.40       13.50       14.26       34.07
+test017     34.70       36.01       33.16       35.48       32.75       71.45
+test042     10.76       10.99       10.27       11.57       10.45       23.04
+test058      6.78        6.75        6.51        6.95        6.22        9.47
+test066     10.71       10.94       10.76       10.61       10.56       19.06
+test073     10.75       11.11       10.17       10.79        8.63       58.10
+test086     12.23       11.81       12.88       12.24       13.37       66.68
+test103      5.05        4.80        5.47        4.64        4.89       11.90
+test154     12.96       11.64       13.51       12.46       14.61       36.35
+test162     65.27       64.01       67.35       59.79       67.54      196.46
+test164      7.50        6.50        7.68        6.70        7.96       17.13
+virasoro     3.39        3.50        3.35        3.47        3.70        7.66
 #endif
 
 

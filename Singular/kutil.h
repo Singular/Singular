@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.54 2000-12-31 15:14:34 obachman Exp $ */
+/* $Id: kutil.h,v 1.55 2001-01-18 16:21:16 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -371,7 +371,7 @@ void updateResult(ideal r,ideal Q,kStrategy strat);
 void completeReduce (kStrategy strat);
 void kFreeStrat(kStrategy strat);
 BOOLEAN homogTest(polyset F, int Fmax);
-BOOLEAN newHEdge(polyset S, int ak,kStrategy strat);
+BOOLEAN newHEdge(polyset S, kStrategy strat);
 // returns index of p in TSet, or -1 if not found
 int kFindInT(poly p, TSet T, int tlength);
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.77 2000-12-31 15:14:33 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.78 2001-01-18 16:21:16 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -95,7 +95,7 @@ static void kOptimizeLDeg(pLDegProc ldeg, kStrategy strat)
     strat->length_pLength = TRUE;
   else
     strat->length_pLength = FALSE;
-    
+
   if ((ldeg == pLDeg0c && !rIsSyzIndexRing(currRing)) ||
       (ldeg == pLDeg0 && strat->ak == 0))
   {
@@ -107,7 +107,7 @@ static void kOptimizeLDeg(pLDegProc ldeg, kStrategy strat)
   }
 }
 
-  
+
 static int doRed (LObject* h, TObject* with,BOOLEAN intoT,kStrategy strat)
 {
   poly hp;
@@ -290,7 +290,7 @@ int redEcart (LObject* h,kStrategy strat)
         && ((d >= reddeg) || (pass > strat->LazyPass)))
     {
       h->SetLmCurrRing();
-      if (strat->honey && strat->posInLDependsOnLength) 
+      if (strat->honey && strat->posInLDependsOnLength)
         h->SetLength(strat->length_pLength);
       assume(h->FDeg == h->pFDeg());
       at = strat->posInL(strat->L,strat->Ll,h,strat);
@@ -298,7 +298,7 @@ int redEcart (LObject* h,kStrategy strat)
       {
         if (kFindDivisibleByInS(strat->S, strat->sevS, strat->sl, h) < 0)
         {
-          if (strat->honey && !strat->posInLDependsOnLength) 
+          if (strat->honey && !strat->posInLDependsOnLength)
             h->SetLength(strat->length_pLength);
           return 1;
         }
@@ -382,7 +382,7 @@ int redFirst (LObject* h,kStrategy strat)
 #ifdef KDEBUG
         if (TEST_OPT_DEBUG) PrintS(" > syzComp\n");
 #endif
-        if (strat->homog) 
+        if (strat->homog)
           h->SetDegStuffReturnLDeg(strat->LDegLast);
         return -2;
       }
@@ -396,7 +396,7 @@ int redFirst (LObject* h,kStrategy strat)
           h->ecart = d - h->GetpFDeg();
         else
           h->ecart = d - h->GetpFDeg() + strat->T[j].ecart - h->ecart;
-      
+
         d = h->GetpFDeg() + h->ecart;
       }
       else
@@ -641,7 +641,7 @@ BOOLEAN hasPurePower (const poly p,int last, int *length,kStrategy strat)
   if (strat->ak <= 0 || p_MinComp(p, currRing, strat->tailRing) == strat->ak)
   {
     i = p_IsPurePower(p, currRing);
-    if (i == last) 
+    if (i == last)
     {
       *length = 0;
       return TRUE;
@@ -668,7 +668,7 @@ BOOLEAN hasPurePower (LObject *L,int last, int *length,kStrategy strat)
     pNext(p) = NULL;
     return ret;
   }
-  else 
+  else
   {
     return hasPurePower(L->p, last, length, strat);
   }
@@ -739,8 +739,8 @@ void updateL(kStrategy strat)
         pLmFree(strat->L[j].p);    /*deletes the short spoly and computes*/
         strat->L[j].p = NULL;
         poly m1 = NULL, m2 = NULL;
-        // check that spoly creation is ok 
-        while (strat->tailRing != currRing && 
+        // check that spoly creation is ok
+        while (strat->tailRing != currRing &&
                !kCheckSpolyCreation(&(strat->L[j]), strat, m1, m2))
         {
           assume(m1 == NULL && m2 == NULL);
@@ -749,7 +749,7 @@ void updateL(kStrategy strat)
           kStratChangeTailRing(strat);
         }
         /* create the real one */
-        ksCreateSpoly(&(strat->L[j]), strat->kNoetherTail(), FALSE, 
+        ksCreateSpoly(&(strat->L[j]), strat->kNoetherTail(), FALSE,
                       strat->tailRing, m1, m2, strat->R);
 
         strat->L[j].SetLmCurrRing();
@@ -757,11 +757,11 @@ void updateL(kStrategy strat)
           strat->initEcart(&strat->L[j]);
         else
           strat->L[j].SetLength(strat->length_pLength);
-        
+
         BOOLEAN pp = hasPurePower(&(strat->L[j]),strat->lastAxis,&dL,strat);
-        
+
         if (strat->use_buckets) strat->L[j].PrepareRed(TRUE);
-        
+
         if (pp)
         {
           p=strat->L[strat->Ll];
@@ -798,8 +798,8 @@ void updateLHC(kStrategy strat)
         pLmFree(strat->L[i].p);
         strat->L[i].p = NULL;
         poly m1 = NULL, m2 = NULL;
-        // check that spoly creation is ok 
-        while (strat->tailRing != currRing && 
+        // check that spoly creation is ok
+        while (strat->tailRing != currRing &&
                !kCheckSpolyCreation(&(strat->L[i]), strat, m1, m2))
         {
           assume(m1 == NULL && m2 == NULL);
@@ -808,13 +808,13 @@ void updateLHC(kStrategy strat)
           kStratChangeTailRing(strat);
         }
         /* create the real one */
-        ksCreateSpoly(&(strat->L[i]), strat->kNoetherTail(), FALSE, 
+        ksCreateSpoly(&(strat->L[i]), strat->kNoetherTail(), FALSE,
                       strat->tailRing, m1, m2, strat->R);
         if (! strat->L[i].IsNull())
         {
           strat->L[i].SetLmCurrRing();
           strat->L[i].SetpFDeg();
-          strat->L[i].ecart 
+          strat->L[i].ecart
             = strat->L[i].pLDeg(strat->LDegLast) - strat->L[i].GetpFDeg();
           if (strat->use_buckets) strat->L[i].PrepareRed(TRUE);
         }
@@ -934,7 +934,7 @@ void enterSMora (LObject p,int atS,kStrategy strat, int atR = -1)
   if ((!strat->kHEdgeFound) || (strat->kNoether!=NULL)) HEckeTest(p.p,strat);
   if (strat->kHEdgeFound)
   {
-    if (newHEdge(strat->S,strat->ak,strat))
+    if (newHEdge(strat->S,strat))
     {
       firstUpdate(strat);
       if (BTEST1(27))
@@ -980,7 +980,7 @@ void enterSMoraNF (LObject p, int atS,kStrategy strat, int atR = -1)
   enterSBba(p, atS, strat, atR);
   if ((!strat->kHEdgeFound) || (strat->kNoether!=NULL)) HEckeTest(p.p,strat);
   if (strat->kHEdgeFound)
-    newHEdge(strat->S,strat->ak,strat);
+    newHEdge(strat->S,strat);
   else if (strat->kNoether!=NULL)
     strat->kHEdgeFound = TRUE;
 }
@@ -1033,7 +1033,7 @@ void initMora(ideal F,kStrategy strat)
       /*uses automatic computation of the ecartWeights to set them*/
       kEcartWeights(F->m,IDELEMS(F)-1,ecartWeights);
     }
-    
+
     pSetDegProcs(totaldegreeWecart, maxdegreeWecart);
     if (TEST_OPT_PROT)
     {
@@ -1103,8 +1103,8 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #ifdef HAVE_TAIL_RING
 //  if (strat->homog && strat->red == redFirst)
     kStratInitChangeTailRing(strat);
-#endif  
-  
+#endif
+
   while (strat->Ll >= 0)
   {
 #ifdef HAVE_ASSUME
@@ -1144,8 +1144,8 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       pLmFree(strat->P.p);
       strat->P.p = NULL;
       poly m1 = NULL, m2 = NULL;
-      // check that spoly creation is ok 
-      while (strat->tailRing != currRing && 
+      // check that spoly creation is ok
+      while (strat->tailRing != currRing &&
              !kCheckSpolyCreation(&(strat->P), strat, m1, m2))
       {
         assume(m1 == NULL && m2 == NULL);
@@ -1153,7 +1153,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         kStratChangeTailRing(strat);
       }
       /* create the real one */
-      ksCreateSpoly(&(strat->P), strat->kNoetherTail(), strat->use_buckets, 
+      ksCreateSpoly(&(strat->P), strat->kNoetherTail(), strat->use_buckets,
                     strat->tailRing, m1, m2, strat->R);
       if (!strat->use_buckets)
         strat->P.SetLength(strat->length_pLength);
@@ -1164,11 +1164,11 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       strat->P.SetLength(strat->length_pLength);
       strat->P.PrepareRed(strat->use_buckets);
     }
-    
+
     if (!strat->P.IsNull())
     {
       // might be NULL from noether !!!
-      if (TEST_OPT_PROT) 
+      if (TEST_OPT_PROT)
         message(strat->P.ecart+strat->P.GetpFDeg(),&olddeg,&reduc,strat, red_result);
       // reduce
       red_result = strat->red(&strat->P,strat);
@@ -1685,7 +1685,7 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
       pFDegOld = pFDeg;
       pLDegOld = pLDeg;
       pSetDegProcs(kModDeg);
-      
+
       toReset = TRUE;
       if (reduced>1)
       {
@@ -1865,15 +1865,15 @@ ideal kInterRed (ideal F, ideal Q)
 static BOOLEAN kMoraUseBucket(kStrategy strat)
 {
 #ifdef MORA_USE_BUCKETS
-  if (TEST_OPT_NOT_BUCKETS) 
+  if (TEST_OPT_NOT_BUCKETS)
     return FALSE;
   if (strat->red == redFirst)
   {
 #ifdef NO_LDEG
     if (!strat->syzComp)
       return TRUE;
-#else    
-    if ((strat->homog || strat->honey) && !strat->syzComp) 
+#else
+    if ((strat->homog || strat->honey) && !strat->syzComp)
       return TRUE;
 #endif
   }

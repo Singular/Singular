@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.60 2001-01-16 13:26:57 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.61 2001-01-18 16:21:17 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1135,7 +1135,7 @@ poly    iiHighCorner(ideal I, int ak)
   po=NULL;
   if (currRing->OrdSgn== -1)
   {
-    scComputeHC(I,ak,po);
+    scComputeHC(I,currQuotient,ak,po);
     if (po!=NULL)
     {
       pGetCoeff(po)=nInit(1);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hdegree.cc,v 1.23 2000-12-21 16:37:48 obachman Exp $ */
+/* $Id: hdegree.cc,v 1.24 2001-01-18 16:21:14 Singular Exp $ */
 /*
 *  ABSTRACT -  dimension, multiplicity, HC, kbase
 */
@@ -1047,13 +1047,12 @@ static void hHedgeStep(scmon pure, scfmon stc,
   }
 }
 
-
-void scComputeHC(ideal S, int ak, poly &hEdge, ring tailRing)
+void scComputeHC(ideal S, ideal Q, int ak, poly &hEdge, ring tailRing)
 {
   int  i;
   Exponent_t  k = ak;
   hNvar = pVariables;
-  hexist = hInit(S, NULL, &hNexist, tailRing);
+  hexist = hInit(S, Q, &hNexist, tailRing);
   if (k!=0)
     hComp(hexist, hNexist, k, hexist, &hNstc);
   else
