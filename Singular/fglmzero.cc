@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmzero.cc,v 1.11 1998-01-23 14:20:40 obachman Exp $
+// $Id: fglmzero.cc,v 1.12 1998-01-27 14:49:15 pohl Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -36,7 +36,7 @@
 // assumes, that NOSTREAMIO is set in factoryconf.h, which is included
 // by templates/list.h. 
 #ifdef macintosh
-#include <::templates:ftmpl_list.h>
+#include <:templates:ftmpl_list.h>
 #else
 #include <templates/ftmpl_list.h>
 #endif
@@ -591,7 +591,7 @@ fglmSdata::getBorderDiv( const poly m, int & var ) const
 //     have to be in Z.
 //     returns TRUE if the result is valid, FALSE if theIdeal
 //      is not reduced.
-BOOLEAN
+static BOOLEAN
 CalculateFunctionals( const ideal & theIdeal, idealFunctionals & l )
 {
     fglmSdata data( theIdeal );
@@ -970,7 +970,7 @@ fglmDdata::gaussreduce( fglmVector & v, fglmVector & p, number & pdenom )
     }
 }
 
-ideal
+static ideal
 GroebnerViaFunctionals( const idealFunctionals & l )
 // Calculates the groebnerBasis for the ideal which is defined by l.
 // The dimension of l has to be finite.
@@ -1028,7 +1028,7 @@ GroebnerViaFunctionals( const idealFunctionals & l )
 }
 //<-
 
-ideal
+static ideal
 FindUnivariatePolys( const idealFunctionals & l )
 {
     fglmVector v;
@@ -1121,6 +1121,7 @@ FindUnivariateWrapper( ideal source )
     }
     return destIdeal;
 }
+
 
 #endif
 
