@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shortfl.cc,v 1.4 1997-04-12 16:04:45 Singular Exp $ */
+/* $Id: shortfl.cc,v 1.5 1997-05-06 18:04:53 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -132,12 +132,16 @@ BOOLEAN nrIsZero (number  a)
 
 BOOLEAN nrIsOne (number a)
 {
-  return (1.0 == nf(a).F());
+  float aa=nf(a).F()-1.0;
+  if (aa<0.0) aa=-aa;
+  return (aa<nrEps);
 }
 
 BOOLEAN nrIsMOne (number a)
 {
-  return ((-1.0) == nf(a).F());
+  float aa=nf(a).F()+1.0;
+  if (aa<0.0) aa=-aa;
+  return (aa<nrEps);
 }
 
 number nrDiv (number a,number b)
