@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.206 2001-02-21 15:40:28 Singular Exp $
+@comment $Id: reference.doc,v 1.207 2001-02-22 09:39:33 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -3720,7 +3720,7 @@ $M_i={\tt module}(A_i)$, i=1...k.
 @ifinfo
 Mi=module(Ai), i=1...k.
 @end ifinfo
-@*@code{mres(M,0)} returns a resolution consisting of at most n modules,
+@*@code{mres(M,0)} returns a resolution consisting of at most n+2 modules,
 where n is the number of variables of the basering.
 Let @code{list L=mres(M,0);}
  then @code{L[1]} consists of a minimal set of generators of the input, @code{L[2]}
