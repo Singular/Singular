@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: imm.h,v 1.17 1998-06-26 16:18:04 schmidt Exp $ */
+/* $Id: imm.h,v 1.18 2001-06-27 13:20:37 Singular Exp $ */
 
 #ifndef INCL_IMM_H
 #define INCL_IMM_H
@@ -55,17 +55,17 @@ inline int imm2int ( const InternalCF * const imm )
 {
     // this could be better done by masking the sign bit
     if ( (int)imm < 0 )
-	return -((-(int)imm) >> 2);
+        return -((-(int)imm) >> 2);
     else
-	return (int)imm >> 2;
+        return (int)imm >> 2;
 }
 
 inline InternalCF * int2imm ( int i )
 {
     if ( i < 0 )
-	return (InternalCF*)(-(((-i) << 2) | INTMARK));
+        return (InternalCF*)(-(((-i) << 2) | INTMARK));
     else
-	return (InternalCF*)((i << 2) | INTMARK );
+        return (InternalCF*)((i << 2) | INTMARK );
 }
 
 #endif
@@ -134,19 +134,19 @@ imm_iszero_gf ( const InternalCF * const ptr )
 inline int imm_intval ( const InternalCF* const op )
 {
     if ( is_imm( op ) == FFMARK )
-	if ( cf_glob_switches.isOn( SW_SYMMETRIC_FF ) )
-	    return ff_symmetric( imm2int( op ) );
-	else
-	    return imm2int( op );
+        if ( cf_glob_switches.isOn( SW_SYMMETRIC_FF ) )
+            return ff_symmetric( imm2int( op ) );
+        else
+            return imm2int( op );
     else  if ( is_imm( op ) == GFMARK ) {
-	ASSERT( gf_isff( imm2int( op ) ), "invalid conversion" );
-	if ( cf_glob_switches.isOn( SW_SYMMETRIC_FF ) )
-	    return ff_symmetric( gf_gf2ff( imm2int( op ) ) );
-	else
-	    return gf_gf2ff( imm2int( op ) );
+        ASSERT( gf_isff( imm2int( op ) ), "invalid conversion" );
+        if ( cf_glob_switches.isOn( SW_SYMMETRIC_FF ) )
+            return ff_symmetric( gf_gf2ff( imm2int( op ) ) );
+        else
+            return gf_gf2ff( imm2int( op ) );
     }
     else
-	return imm2int( op );
+        return imm2int( op );
 }
 //}}}
 
@@ -168,23 +168,23 @@ inline int
 imm_sign ( const InternalCF * const op )
 {
     if ( is_imm( op ) == FFMARK )
-	if ( imm2int( op ) == 0 )
-	    return 0;
-	else  if ( cf_glob_switches.isOn( SW_SYMMETRIC_FF ) )
-	    if ( ff_symmetric( imm2int( op ) ) > 0 )
-		return 1;
-	    else
-		return -1;
-	else
-	    return 1;
+        if ( imm2int( op ) == 0 )
+            return 0;
+        else  if ( cf_glob_switches.isOn( SW_SYMMETRIC_FF ) )
+            if ( ff_symmetric( imm2int( op ) ) > 0 )
+                return 1;
+            else
+                return -1;
+        else
+            return 1;
     else  if ( is_imm( op ) == GFMARK )
-	return gf_sign( imm2int( op ) );
+        return gf_sign( imm2int( op ) );
     else  if ( imm2int( op ) == 0 )
-	return 0;
+        return 0;
     else  if ( imm2int( op ) > 0 )
-	return 1;
+        return 1;
     else
-	return -1;
+        return -1;
 }
 //}}}
 
@@ -207,34 +207,34 @@ inline int
 imm_cmp ( const InternalCF * const lhs, const InternalCF * const rhs )
 {
     if ( imm2int( lhs ) == imm2int( rhs ) )
-	return 0;
+        return 0;
     else  if ( imm2int( lhs ) > imm2int( rhs ) )
-	return 1;
+        return 1;
     else
-	return -1;
+        return -1;
 }
 
 inline int
 imm_cmp_p ( const InternalCF * const lhs, const InternalCF * const rhs )
 {
     if ( imm2int( lhs ) == imm2int( rhs ) )
-	return 0;
+        return 0;
     else if ( imm2int( lhs ) > imm2int( rhs ) )
-	return 1;
+        return 1;
     else
-	return -1;
+        return -1;
 }
 
 inline int
 imm_cmp_gf ( const InternalCF * const lhs, const InternalCF * const rhs )
 {
     if ( imm2int( lhs ) == imm2int( rhs ) )
-	return 0;
+        return 0;
     // check is done in this way because zero should be minimal
     else if ( imm2int( lhs ) > imm2int( rhs ) )
-	return -1;
+        return -1;
     else
-	return 1;
+        return 1;
 }
 //}}}
 
@@ -243,9 +243,9 @@ inline InternalCF * imm_add ( const InternalCF * const lhs, const InternalCF * c
 {
     int result = imm2int( lhs ) + imm2int( rhs );
     if ( ( result > MAXIMMEDIATE ) || ( result < MINIMMEDIATE ) )
-	return CFFactory::basic( result );
+        return CFFactory::basic( result );
     else
-	return int2imm( result );
+        return int2imm( result );
 }
 
 inline InternalCF * imm_add_p ( const InternalCF * const lhs, const InternalCF * const rhs )
@@ -262,9 +262,9 @@ inline InternalCF * imm_sub ( const InternalCF * const lhs, const InternalCF * c
 {
     int result = imm2int( lhs ) - imm2int( rhs );
     if ( ( result > MAXIMMEDIATE ) || ( result < MINIMMEDIATE ) )
-	return CFFactory::basic( result );
+        return CFFactory::basic( result );
     else
-	return int2imm( result );
+        return int2imm( result );
 }
 
 inline InternalCF * imm_sub_p ( const InternalCF * const lhs, const InternalCF * const rhs )
@@ -285,11 +285,11 @@ imm_mul ( InternalCF * lhs, InternalCF * rhs )
 {
     INT64 result = (INT64)imm2int( lhs ) * imm2int( rhs );
     if ( ( result > MAXIMMEDIATELL ) || ( result < MINIMMEDIATELL ) ) {
-	InternalCF * res = CFFactory::basic( IntegerDomain, imm2int( lhs ), true );
-	return res->mulcoeff( rhs );
+        InternalCF * res = CFFactory::basic( IntegerDomain, imm2int( lhs ), true );
+        return res->mulcoeff( rhs );
     }
     else
-	return int2imm( (int)result );
+        return int2imm( (int)result );
 }
 #endif /* ! __MWERKS__ */
 
@@ -308,26 +308,26 @@ inline InternalCF * imm_div ( const InternalCF * const lhs, const InternalCF * c
     int a = imm2int( lhs );
     int b = imm2int( rhs );
     if ( a > 0 )
-	return int2imm( a / b );
+        return int2imm( a / b );
     else  if ( b > 0 )
-	return int2imm( -((b-a-1)/b) );
+        return int2imm( -((b-a-1)/b) );
     else
-	return int2imm( (-a-b-1)/(-b) );
+        return int2imm( (-a-b-1)/(-b) );
 }
 
 inline InternalCF * imm_divrat ( const InternalCF * const lhs, const InternalCF * const rhs )
 {
     if ( cf_glob_switches.isOn( SW_RATIONAL ) )
-	return CFFactory::rational( imm2int( lhs ), imm2int( rhs ) );
+        return CFFactory::rational( imm2int( lhs ), imm2int( rhs ) );
     else {
-	int a = imm2int( lhs );
-	int b = imm2int( rhs );
-	if ( a > 0 )
-	    return int2imm( a / b );
-	else  if ( b > 0 )
-	    return int2imm( -((b-a-1)/b) );
-	else
-	    return int2imm( (-a-b-1)/(-b) );
+        int a = imm2int( lhs );
+        int b = imm2int( rhs );
+        if ( a > 0 )
+            return int2imm( a / b );
+        else  if ( b > 0 )
+            return int2imm( -((b-a-1)/b) );
+        else
+            return int2imm( (-a-b-1)/(-b) );
     }
 }
 
@@ -344,24 +344,24 @@ inline InternalCF * imm_div_gf ( const InternalCF * const lhs, const InternalCF 
 inline InternalCF * imm_mod ( const InternalCF * const lhs, const InternalCF * const rhs )
 {
     if ( cf_glob_switches.isOn( SW_RATIONAL ) )
-	return int2imm( 0 );
+        return int2imm( 0 );
     else {
-	int a = imm2int( lhs );
-	int b = imm2int( rhs );
-	if ( a > 0 )
-	    if ( b > 0 )
-		return int2imm( a % b );
-	    else
-		return int2imm( a % (-b) );
-	else
-	    if ( b > 0 ) {
-		int r = (-a) % b;
-		return int2imm( (r==0) ? r : b-r );
-	    }
-	    else {
-		int r = (-a) % (-b);
-		return int2imm( (r==0) ? r : -b-r );
-	    }
+        int a = imm2int( lhs );
+        int b = imm2int( rhs );
+        if ( a > 0 )
+            if ( b > 0 )
+                return int2imm( a % b );
+            else
+                return int2imm( a % (-b) );
+        else
+            if ( b > 0 ) {
+                int r = (-a) % b;
+                return int2imm( (r==0) ? r : b-r );
+            }
+            else {
+                int r = (-a) % (-b);
+                return int2imm( (r==0) ? r : -b-r );
+            }
     }
 }
 
@@ -378,12 +378,12 @@ inline InternalCF * imm_mod_gf ( const InternalCF * const, const InternalCF * co
 inline void imm_divrem ( const InternalCF * const lhs, const InternalCF * const rhs, InternalCF * & q, InternalCF * & r )
 {
     if ( cf_glob_switches.isOn( SW_RATIONAL ) ) {
-	q = imm_divrat( lhs, rhs );
-	r = CFFactory::basic( 0 );
+        q = imm_divrat( lhs, rhs );
+        r = CFFactory::basic( 0 );
     }
     else {
-	q = imm_div( lhs, rhs );
-	r = imm_mod( lhs, rhs );
+        q = imm_div( lhs, rhs );
+        r = imm_mod( lhs, rhs );
     }
 }
 
@@ -426,16 +426,16 @@ imm_neg_gf ( const InternalCF * const op )
 inline void imm_print ( ostream & os, const InternalCF * const op, const char * const str )
 {
     if ( is_imm( op ) == FFMARK )
-	if ( cf_glob_switches.isOn( SW_SYMMETRIC_FF ) )
-	    os << ff_symmetric( imm2int( op ) ) << str;
-	else
-	    os << imm2int( op ) << str;
+        if ( cf_glob_switches.isOn( SW_SYMMETRIC_FF ) )
+            os << ff_symmetric( imm2int( op ) ) << str;
+        else
+            os << imm2int( op ) << str;
     else  if ( is_imm( op ) == GFMARK ) {
-	gf_print( os, imm2int( op ) );
-	os << str;
+        gf_print( os, imm2int( op ) );
+        os << str;
     }
     else
-	os << imm2int( op ) << str;
+        os << imm2int( op ) << str;
 }
 #endif /* NOSTREAMIO */
 //}}}

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_matrix.cc,v 1.9 1998-03-10 14:51:38 schmidt Exp $ */
+/* $Id: ftmpl_matrix.cc,v 1.10 2001-06-27 13:20:39 Singular Exp $ */
 
 #include <factoryconf.h>
 
@@ -315,3 +315,12 @@ T& SubMatrix<T>::operator[] ( int i )
     ASSERT( r_min == r_max && i >= c_min && i <= c_max, "illegal index" );
     return M.elems[r_min-1][i-1];
 }
+
+#ifndef NOSTREAMIO
+template <class T>
+ostream & operator<< ( ostream & s, const Matrix<T>& M )
+{
+   M.print( s );
+   return s;
+}
+#endif /* NOSTREAMIO */

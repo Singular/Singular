@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_algorithm.cc,v 1.7 1998-06-30 16:36:05 schmidt Exp $ */
+/* $Id: cf_algorithm.cc,v 1.8 2001-06-27 13:20:36 Singular Exp $ */
 
 //{{{ docu
 //
@@ -82,8 +82,10 @@
 //
 //}}}
 CanonicalForm
+#if 1
 psr ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
 {
+    
     ASSERT( x.level() > 0, "type error: polynomial variable expected" );
     ASSERT( ! g.isZero(), "math error: division by zero" );
 
@@ -100,10 +102,34 @@ psr ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
     if ( fDegree < 0 || fDegree < gDegree )
 	return f;
     else {
-	CanonicalForm result = (power( LC( G, X ), fDegree-gDegree+1 ) * F) % G;
+	CanonicalForm xresult = (power( LC( G, X ), fDegree-gDegree+1 ) * F) ;
+	CanonicalForm result = xresult -(xresult/G)*G;
 	return swapvar( result, x, X );
     }
 }
+#else
+psr ( const CanonicalForm &rr, const CanonicalForm &vv, const Variable & x ){
+  CanonicalForm r=rr, v=vv, l, test, lu, lv, t, retvalue;
+  int dr, dv, d,n=0;
+
+
+  dr = degree( r, x );
+  dv = degree( v, x );
+  if (dv <= dr) {l=LC(v,x); v = v -l*power(x,dv);}
+  else { l = 1; }
+  d= dr-dv+1;
+  while ( ( dv <= dr  ) && ( r != r.genZero()) ){
+    test = power(x,dr-dv)*v*LC(r,x);
+    if ( dr == 0 ) { r= CanonicalForm(0); }
+    else { r= r - LC(r,x)*power(x,dr); }
+    r= l*r -test;
+    dr= degree(r,x);
+    n+=1;
+  }
+  r= power(l, d-n)*r;
+  return r;
+}
+#endif
 //}}}
 
 //{{{ CanonicalForm psq ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
