@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.12 2004-07-29 09:42:03 Singular Exp $ */
+/* $Id: ring.cc,v 1.13 2004-08-09 14:44:31 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3458,3 +3458,83 @@ void rSetWeightVec(ring r, int *wv)
   memcpy(r->typ[0].data.wp.weights,wv,r->N*sizeof(int));
 }
 
+#include <ctype.h>
+
+ring rOpp(ring src)
+{
+  ring r=rCopy(src);
+  // change vars v1..vN -> vN..v1
+  int i;
+  int i2=(rVar(r)-1)/2;
+  for(int i=i2; i>=0; i--)
+  {
+    // exchange names
+    char *p;
+    int t;
+    p=r->names[rVar(r)-i];
+    r->names[rVar(r)-i]=r->names[i];
+    r->names[i]=p;
+    // exchange VarOffset
+    t=r->VarOffset[i];
+    r->VarOffset[i]=r->VarOffset[rVar(r)-i];
+    r->VarOffset[rVar(r)-i]=t;
+  }
+  // change names:
+  for (i=rVar(r)-1; i>=0; i--)
+  {
+    char *p=r->names[i];
+    if(isupper(*p)) *p=tolower(*p);
+    else            *p=toupper(*p);
+  }
+  // change ordering: listing
+  // change ordering: compare
+  for(i=0; r->typ[i].ord_typ!=ro_none; i++)
+  {
+    int t,tt;
+    switch(r->typ[i].ord_typ)
+    {
+      case ro_dp:
+      // 
+        t=r->typ[i].data.dp.start;
+        r->typ[i].data.dp.start=rVar(r)+1-r->typ[i].data.dp.end;
+        r->typ[i].data.dp.end=rVar(r)+1-t;
+        break;
+      case ro_wp:
+      case ro_wp_neg:
+      {
+        t=r->typ[i].data.wp.start;
+        r->typ[i].data.wp.start=rVar(r)+1-r->typ[i].data.wp.end;
+        r->typ[i].data.wp.end=rVar(r)+1-t;
+        // invert r->typ[i].data.wp.weights
+        i2=(r->typ[i].data.wp.end+1-r->typ[i].data.wp.start)/2;
+        int *w=r->typ[i].data.wp.weights;
+        for(int j=0; j<=i2; j++)
+        {
+          t=w[j];
+          w[j]=w[r->typ[i].data.wp.end-r->typ[i].data.wp.start-j]; 
+          w[r->typ[i].data.wp.end-r->typ[i].data.wp.start-j]=t; 
+        }
+        break;
+      }         
+      //case ro_wp64:
+      case ro_syzcomp:
+      case ro_syz:
+         WerrorS("not implemented in rOpp");
+         // should not happen
+         break;
+
+      case ro_cp:
+        t=r->typ[i].data.cp.start;
+        r->typ[i].data.cp.start=rVar(r)+1-r->typ[i].data.cp.end;
+        r->typ[i].data.cp.end=rVar(r)+1-t;
+        break;
+      case ro_none:
+      default:
+       WerrorS("unknown typ in rOpp");
+       break;
+    }
+  }
+  // avoid printing changed stuff:
+  r->order[0]=0;
+  return r;
+}

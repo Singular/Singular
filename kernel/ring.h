@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.3 2004-04-28 16:38:04 Singular Exp $ */
+/* $Id: ring.h,v 1.4 2004-08-09 14:44:30 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -27,6 +27,7 @@ void   rWrite(ring r);
 void   rKill(idhdl h);
 void   rKill(ring r);
 ring   rCopy(ring r);
+ring   rOpp(ring r);
 
 
 
