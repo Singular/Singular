@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.12 1997-12-03 16:58:30 obachman Exp $
+// $Id: clapconv.cc,v 1.13 1998-01-12 17:32:44 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -279,17 +279,6 @@ convRecPTr ( const CanonicalForm & f, int * exp, alg & result )
           {
             mpz_clear(&z->n);
             z->s=3;
-            if (mpz_size1(&z->z)<=MP_SMALL)
-            {
-              int ui=(int)mpz_get_si(&z->z);
-              if ((((ui<<3)>>3)==ui)
-              && (mpz_cmp_si(&z->z,(long)ui)==0))
-              {
-                mpz_clear(&z->z);
-                Free((ADDRESS)z,sizeof(rnumber));
-                z=INT_TO_SR(ui);
-              }
-            }
           }
           else
           {

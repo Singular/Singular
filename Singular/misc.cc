@@ -646,58 +646,59 @@ char *strstr(const char *haystack, const char *needle)
 
 char * versionString()
 {
-  StringSet("");
+  StringSet("\t");
 #ifdef HAVE_FACTORY
-              StringAppend("\tfactory (%s),\n", factoryVersion);
+              StringAppend("factory (%s),", factoryVersion);
 #endif
 #ifdef HAVE_LIBFAC_P
-              StringAppend("\tlibfac(%s,%s),\n",libfac_version,libfac_date);
-#endif
-#ifdef SRING
-              StringAppend("\tsuper algebra,\n");
-#endif
-#ifdef DRING
-              StringAppend("\tWeyl algebra,\n");
+              StringAppend("libfac(%s,%s),\n\t",libfac_version,libfac_date);
 #endif
 #ifdef HAVE_GMP
 #if defined (__GNU_MP_VERSION) && defined (__GNU_MP_VERSION_MINOR)
-              StringAppend("\tGMP(%d.%d),\n",__GNU_MP_VERSION,__GNU_MP_VERSION_MINOR);
+              StringAppend("GMP(%d.%d),",__GNU_MP_VERSION,__GNU_MP_VERSION_MINOR);
 #elif defined (HAVE_SMALLGMP)
-              StringAppend("\tSmallGMP(2.0.2.0),\n");
+              StringAppendS("SmallGMP(2.0.2.0),");
 #else
-              StringAppend("\tGMP(1.3),\n");
+              StringAppendS("GMP(1.3),");
 #endif
-#endif
-#ifdef HAVE_DBM
-              StringAppend("\tDBM,\n");
 #endif
 #ifdef HAVE_MPSR
-              StringAppend("\tMP(%s),\n",MP_VERSION);
+              StringAppend("MP(%s),\n\t",MP_VERSION);
 #endif
 #if defined(HAVE_READLINE) && !defined(FEREAD)
-              StringAppend("\tlibreadline,\n");
+              StringAppendS("libreadline,\n\t");
 #endif
 #ifdef HAVE_FEREAD
-              StringAppend("\temulated libreadline,\n");
+              StringAppendS("emulated libreadline,\n");
+#endif
+#ifdef SRING
+              StringAppendS("super algebra,");
+#endif
+#ifdef DRING
+              StringAppendS("Weyl algebra,");
+#endif
+#ifdef HAVE_DBM
+              StringAppendS("DBM,");
 #endif
 #ifdef HAVE_INFO
-              StringAppend("\tinfo,\n");
-#else
-              StringAppend("\twithout info,\n");
+              StringAppendS("info,");
 #endif
 #ifdef TEST
-              StringAppend("\tTESTs,\n");
+              StringAppendS("TESTs,");
 #endif
 #if YYDEBUG
-              StringAppend("\tYYDEBUG=1,\n");
+              StringAppendS("YYDEBUG=1,");
 #endif
 #ifdef MDEBUG
-              StringAppend("\tMDEBUG=%d,\n",MDEBUG);
+              StringAppend("MDEBUG=%d,",MDEBUG);
+#endif
+#ifdef TEST_MAC_ORDER
+              StringAppendS("mac_order,");
 #endif
 #ifndef __OPTIMIZE__
-              StringAppend("\t-g,\n");
+              StringAppend("-g,");
 #endif
-              StringAppend("\trandom=%d\n",siRandomStart);
+              StringAppend("random=%d\n",siRandomStart);
 #ifdef MSDOS
               char *p=getenv("SPATH");
 #else

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.25 1997-12-18 14:26:32 Singular Exp $ */
+/* $Id: extra.cc,v 1.26 1998-01-12 17:32:46 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -168,6 +168,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
         #endif
         #ifdef SRING
           TEST_FOR("SRING")
+        #endif
+        #ifdef TEST_MAC_ORDER
+          TEST_FOR("MAC_ORDER");
         #endif
           ;
         return FALSE;

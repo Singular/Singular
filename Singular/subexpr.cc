@@ -652,7 +652,7 @@ int  sleftv::Typ()
 {
   if (e==NULL)
   {
-    switch (rtyp & 1023)
+    switch (rtyp)
     {
       case IDHDL:
         return IDTYP((idhdl)data);

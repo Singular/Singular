@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.20 1997-12-16 11:40:27 Singular Exp $
+// $Id: clapsing.cc,v 1.21 1998-01-12 17:32:46 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -27,8 +27,6 @@ poly singclap_gcd ( poly f, poly g )
 {
   poly res=NULL;
 
-  pCleardenom(f);
-  pCleardenom(g);
   // for now there is only the possibility to handle polynomials over
   // Q and Fp ...
   if ( nGetChar() == 0 || nGetChar() > 1 )
@@ -60,115 +58,113 @@ poly singclap_gcd ( poly f, poly g )
   }
   else
     WerrorS( "not implemented" );
-  pDelete(&f);
-  pDelete(&g);
   return res;
 }
 
-//poly singclap_resultant ( poly f, poly g , poly x)
-//{
-//  int i=pIsPurePower(x);
-//  if (i==0)
-//  {
-//    WerrorS("3rd argument must be a ring variable");
-//    return NULL;
-//  }
-//  Variable X(i);
-//  // for now there is only the possibility to handle polynomials over
-//  // Q and Fp ...
-//  if ( nGetChar() == 0 || nGetChar() > 1 )
-//  {
-//    setCharacteristic( nGetChar() );
-//    CanonicalForm F( convSingPClapP( f ) ), G( convSingPClapP( g ) );
-//    poly res=convClapPSingP( resultant( F, G, X ) );
-//    Off(SW_RATIONAL);
-//    return res;
-//  }
-//  // and over Q(a) / Fp(a)
-//  else if (( nGetChar()==1 ) /* Q(a) */
-//  || (nGetChar() <-1))       /* Fp(a) */
-//  {
-//    if (nGetChar()==1) setCharacteristic( 0 );
-//    else               setCharacteristic( -nGetChar() );
-//    poly res;
-//    if (currRing->minpoly!=NULL)
-//    {
-//      CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
-//      Variable a=rootOf(mipo);
-//      CanonicalForm F( convSingAPClapAP( f,a ) ), G( convSingAPClapAP( g,a ) );
-//      res= convClapAPSingAP( resultant( F, G, X ) );
-//    }
-//    else
-//    {
-//      CanonicalForm F( convSingTrPClapP( f ) ), G( convSingTrPClapP( g ) );
-//      res= convClapPSingTrP( resultant( F, G, X ) );
-//    }
-//    Off(SW_RATIONAL);
-//    return res;
-//  }
-//  else
-//    WerrorS( "not implemented" );
-//  return NULL;
-//}
 poly singclap_resultant ( poly f, poly g , poly x)
 {
-  int i=pVar(x);
+  int i=pIsPurePower(x);
   if (i==0)
   {
-    WerrorS("ringvar expected");
+    WerrorS("3rd argument must be a ring variable");
     return NULL;
   }
-  ideal I=idInit(1,1);
-
-  // get the coeffs von f wrt. x:
-  I->m[0]=pCopy(f);
-  matrix ffi=mpCoeffs(I,i);
-  ffi->rank=1;
-  ffi->ncols=ffi->nrows;
-  ffi->nrows=1;
-  ideal fi=(ideal)ffi;
-
-  // get the coeffs von g wrt. x:
-  I->m[0]=pCopy(g);
-  matrix ggi=mpCoeffs(I,i);
-  ggi->rank=1;
-  ggi->ncols=ggi->nrows;
-  ggi->nrows=1;
-  ideal gi=(ideal)ggi;
-
-  // contruct the matrix:
-  int fn=IDELEMS(fi); //= deg(f,x)+1
-  int gn=IDELEMS(gi); //= deg(g,x)+1
-  matrix m=mpNew(fn+gn-2,fn+gn-2);
-  if(m==NULL)
+  Variable X(i);
+  // for now there is only the possibility to handle polynomials over
+  // Q and Fp ...
+  if ( nGetChar() == 0 || nGetChar() > 1 )
   {
-    return NULL;
+    setCharacteristic( nGetChar() );
+    CanonicalForm F( convSingPClapP( f ) ), G( convSingPClapP( g ) );
+    poly res=convClapPSingP( resultant( F, G, X ) );
+    Off(SW_RATIONAL);
+    return res;
   }
-
-  // enter the coeffs into m:
-  int j;
-  for(i=0;i<gn-1;i++)
+  // and over Q(a) / Fp(a)
+  else if (( nGetChar()==1 ) /* Q(a) */
+  || (nGetChar() <-1))       /* Fp(a) */
   {
-    for(j=0;j<fn;j++)
+    if (nGetChar()==1) setCharacteristic( 0 );
+    else               setCharacteristic( -nGetChar() );
+    poly res;
+    if (currRing->minpoly!=NULL)
     {
-      MATELEM(m,i+1,fn-j+i)=pCopy(fi->m[j]);
+      CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
+      Variable a=rootOf(mipo);
+      CanonicalForm F( convSingAPClapAP( f,a ) ), G( convSingAPClapAP( g,a ) );
+      res= convClapAPSingAP( resultant( F, G, X ) );
     }
-  }
-  for(i=0;i<fn-1;i++)
-  {
-    for(j=0;j<gn;j++)
+    else
     {
-      MATELEM(m,gn+i,gn-j+i)=pCopy(gi->m[j]);
+      CanonicalForm F( convSingTrPClapP( f ) ), G( convSingTrPClapP( g ) );
+      res= convClapPSingTrP( resultant( F, G, X ) );
     }
+    Off(SW_RATIONAL);
+    return res;
   }
-
-  poly r=mpDet(m);
-
-  idDelete(&fi);
-  idDelete(&gi);
-  idDelete((ideal *)&m);
-  return r;
+  else
+    WerrorS( "not implemented" );
+  return NULL;
 }
+//poly singclap_resultant ( poly f, poly g , poly x)
+//{
+//  int i=pVar(x);
+//  if (i==0)
+//  {
+//    WerrorS("ringvar expected");
+//    return NULL;
+//  }
+//  ideal I=idInit(1,1);
+//
+//  // get the coeffs von f wrt. x:
+//  I->m[0]=pCopy(f);
+//  matrix ffi=mpCoeffs(I,i);
+//  ffi->rank=1;
+//  ffi->ncols=ffi->nrows;
+//  ffi->nrows=1;
+//  ideal fi=(ideal)ffi;
+//
+//  // get the coeffs von g wrt. x:
+//  I->m[0]=pCopy(g);
+//  matrix ggi=mpCoeffs(I,i);
+//  ggi->rank=1;
+//  ggi->ncols=ggi->nrows;
+//  ggi->nrows=1;
+//  ideal gi=(ideal)ggi;
+//
+//  // contruct the matrix:
+//  int fn=IDELEMS(fi); //= deg(f,x)+1
+//  int gn=IDELEMS(gi); //= deg(g,x)+1
+//  matrix m=mpNew(fn+gn-2,fn+gn-2);
+//  if(m==NULL)
+//  {
+//    return NULL;
+//  }
+//
+//  // enter the coeffs into m:
+//  int j;
+//  for(i=0;i<gn-1;i++)
+//  {
+//    for(j=0;j<fn;j++)
+//    {
+//      MATELEM(m,i+1,fn-j+i)=pCopy(fi->m[j]);
+//    }
+//  }
+//  for(i=0;i<fn-1;i++)
+//  {
+//    for(j=0;j<gn;j++)
+//    {
+//      MATELEM(m,gn+i,gn-j+i)=pCopy(gi->m[j]);
+//    }
+//  }
+//
+//  poly r=mpDet(m);
+//
+//  idDelete(&fi);
+//  idDelete(&gi);
+//  idDelete((ideal *)&m);
+//  return r;
+//}
 
 lists singclap_extgcd ( poly f, poly g )
 {
@@ -786,7 +782,7 @@ int singclap_det_i( intvec * m )
 /* interpreter interface : */
 BOOLEAN jjGCD_P(leftv res, leftv u, leftv v)
 {
-  res->data=(void *)singclap_gcd((poly)(u->CopyD()),((poly)v->CopyD()));
+  res->data=(void *)singclap_gcd((poly)(u->Data()),((poly)v->Data()));
   return FALSE;
 }
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.14 1997-11-27 08:36:06 Singular Exp $ */
+/* $Id: longrat.cc,v 1.15 1998-01-12 17:32:47 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -214,7 +214,6 @@ BOOLEAN nlDBTest(number a, char *f,int l)
 
 void nlNew (number * r)
 {
-  //*r=INT_TO_SR(0);
   *r=NULL;
 }
 
@@ -271,9 +270,9 @@ number nlInit (number u)
 
 int nlSize(number a)
 {
-  if ((int)a==1)
+  if (a==INT_TO_SR(0))
      return 0; /* rational 0*/
-  if ((((int)a)&3)==1)
+  if (SR_HDL(a) & SR_INT)
      return 1; /* immidiate int */
 #ifdef HAVE_LIBGMP2
   int s=a->z._mp_alloc;
@@ -1151,7 +1150,7 @@ number nlMult (number a, number b)
         {
           mpz_mul_ui(&u->z,&b->z,(unsigned long)-SR_TO_INT(a));
           mpz_neg(&u->z,&u->z);
-        }  
+        }
       }
       nlGmpSimple(&u->z);
       if (u->s<2)
@@ -1943,6 +1942,27 @@ void nlNormalize (number &x)
 #endif
   if ((SR_HDL(x) & SR_INT) ||(x==NULL))
     return;
+  if (x->s==3)
+  {
+    if (mpz_cmp_ui(&x->z,(long)0)==0)
+    {
+      nlDelete(&x);
+      x=nlInit(0);
+      return;
+    }
+    if (mpz_size1(&x->z)<=MP_SMALL)
+    {
+      int ui=(int)mpz_get_si(&x->z);
+      if ((((ui<<3)>>3)==ui)
+      && (mpz_cmp_si(&x->z,(long)ui)==0))
+      {
+        mpz_clear(&x->z);
+        Free((ADDRESS)x,sizeof(rnumber));
+        x=INT_TO_SR(ui);
+        return;
+      }
+    }
+  }
   if (x->s!=1) nlGmpSimple(&x->z);
   if (x->s==0)
   {

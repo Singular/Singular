@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.7 1997-12-15 22:46:32 obachman Exp $ */
+/* $Id: matpol.cc,v 1.8 1998-01-12 17:32:48 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -446,9 +446,13 @@ poly mpDet (matrix m)
     //ma[i] = mpNew(n,n);
     ma[i]=mpMult(ma[i-1], ma[1]);
     MATELEM(s,1,i) = mpTrace(ma[i]);
+    pTest(MATELEM(s,1,i));
   }
   for (i=k+1; i<=n; i++)
+  {
     MATELEM(s,1,i) = TraceOfProd(ma[i / 2], ma[(i+1) / 2], n);
+    pTest(MATELEM(s,1,i));
+  }
   for (i=1; i<=k; i++)
     idDelete((ideal *)&(ma[i]));
 /* the array s contains the traces of the powers of the matrix m,
@@ -458,9 +462,11 @@ poly mpDet (matrix m)
   for (i=2; i<=n; i++)
   {
     p = pCopy(MATELEM(s,1,i));
+    pTest(p);
     for (j=i-1; j>=1; j--)
     {
       q = pMult(pCopy(MATELEM(s,1,j)), pCopy(MATELEM(a,1,i-j)));
+      pTest(q);
       p = pAdd(p,q);
     }
     // c= -1/i
@@ -469,6 +475,7 @@ poly mpDet (matrix m)
     nDelete(&d);
 
     pMultN(p, c);
+    pTest(p);
     MATELEM(a,1,i) = p;
     nDelete(&c);
   }
