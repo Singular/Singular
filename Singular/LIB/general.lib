@@ -1,9 +1,10 @@
-// $Id: general.lib,v 1.28 2000-12-12 13:49:29 anne Exp $
+// $Id: general.lib,v 1.29 2000-12-19 14:37:25 anne Exp $
 //GMG, last modified 18.6.99
 //anne, added deleteSublist and watchdog 12.12.2000
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: general.lib,v 1.28 2000-12-12 13:49:29 anne Exp $";
+version="$Id: general.lib,v 1.29 2000-12-19 14:37:25 anne Exp $";
+category="General purpose";
 info="
 LIBRARY:  general.lib   PROCEDURES OF GENERAL TYPE
 

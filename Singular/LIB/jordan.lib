@@ -1,6 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: jordan.lib,v 1.17 2000-03-10 10:32:36 mschulze Exp $";
+version="$Id: jordan.lib,v 1.18 2000-12-19 14:37:25 anne Exp $";
+category="Linear Algebra";
 info="
 LIBRARY: jordan.lib  PROCEDURES TO COMPUTE THE JORDAN NORMAL FORM
 AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de

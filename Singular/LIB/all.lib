@@ -1,7 +1,8 @@
-// $Id: all.lib,v 1.29 2000-12-15 16:20:44 Singular Exp $
+// $Id: all.lib,v 1.30 2000-12-19 14:37:24 anne Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: all.lib,v 1.29 2000-12-15 16:20:44 Singular Exp $";
+version="$Id: all.lib,v 1.30 2000-12-19 14:37:24 anne Exp $";
+category="General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries
 

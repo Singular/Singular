@@ -2,7 +2,8 @@
 //	last modified: 04/25/2000 by GMG
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: linalg.lib,v 1.5 2000-05-23 23:00:50 greuel Exp $";
+version="$Id: linalg.lib,v 1.6 2000-12-19 14:37:26 anne Exp $";
+category="Linear Algebra";
 info="
 LIBRARY:  linalg.lib	PROCEDURES FOR ALGORITHMIC LINEAR ALGEBRA
 AUTHOR:	  Ivor Saynisch (ivs@math.tu-cottbus.de)

@@ -1,8 +1,9 @@
-// $Id: ring.lib,v 1.12 2000-05-23 23:02:18 greuel Exp $
+// $Id: ring.lib,v 1.13 2000-12-19 14:37:27 anne Exp $
 //(GMG, last modified 03.11.95)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: ring.lib,v 1.12 2000-05-23 23:02:18 greuel Exp $";
+version="$Id: ring.lib,v 1.13 2000-12-19 14:37:27 anne Exp $";
+category="General purpose";
 info="
 LIBRARY:  ring.lib      PROCEDURES FOR MANIPULATING RINGS AND MAPS
 

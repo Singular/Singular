@@ -1,8 +1,9 @@
-// $Id: inout.lib,v 1.17 2000-05-12 12:20:25 krueger Exp $
+// $Id: inout.lib,v 1.18 2000-12-19 14:37:25 anne Exp $
 // (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: inout.lib,v 1.17 2000-05-12 12:20:25 krueger Exp $";
+version="$Id: inout.lib,v 1.18 2000-12-19 14:37:25 anne Exp $";
+category="General purpose";
 info="
 LIBRARY:  inout.lib     PROCEDURES FOR MANIPULATING IN- AND OUTPUT
 

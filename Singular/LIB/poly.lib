@@ -1,10 +1,11 @@
-// $Id: poly.lib,v 1.27 2000-12-12 13:50:08 anne Exp $
+// $Id: poly.lib,v 1.28 2000-12-19 14:37:26 anne Exp $
 //(GMG, last modified 22.06.96)
 //(obachman: 17.12.97 -- added katsura)
 //(anne: 11.12.2000 -- added mod2id, id2mod, subrInterred)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: poly.lib,v 1.27 2000-12-12 13:50:08 anne Exp $";
+version="$Id: poly.lib,v 1.28 2000-12-19 14:37:26 anne Exp $";
+category="General purpose";
 info="
 LIBRARY:  poly.lib      PROCEDURES FOR MANIPULATING POLYS, IDEALS, MODULES
 
