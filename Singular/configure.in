@@ -475,6 +475,10 @@ fi
 if test "$ac_cv_sizeof_voidp" != 4 && test "$ac_cv_sizeof_voidp" != 8; then
   AC_MSG_ERROR(need void* to be 4 or 8 bytes long)
 fi
+if test "$ac_cv_sizeof_voidp" != 4; then
+  DEFS="-UOMNDEBUG"
+  AC_SUBST(DEFS)
+fi
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl help for configure
