@@ -1,268 +1,35 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_osx.texi,v 1.3 2002-04-23 13:28:46 westenb Exp $
-@c FILE: INSTALL_unix.texi
-@c PURPOSE: Installation instruction for Singular on MacOS X
-@c
+@comment $Id: INSTALL_osx.texi,v 1.4 2005-02-23 11:27:39 pohl Exp $
+@c FILE:    INSTALL_osx.texi
+@c PURPOSE: Installation instructions for Singular on Macintosh
 
 @ifclear VERSION
 @include version.texi
 @end ifclear
 
 @ifclear singularmanual
-@majorheading MacOS X installation instructions for @sc{Singular} version @value{VERSION}
-@end ifclear
+@majorheading Installation instructions for @sc{Singular} on a Macintosh (MacOS X)
 
-@ifclear UNAME
-@set _UNAME <uname>
-@end ifclear
 
-@ifset UNAME
-@include uname.texi
-@end ifset
+@heading Installation preliminaries
 
-To install @sc{Singular} on
-@ifset UNAME
-@value{_UNAME}
-@end ifset
-@ifclear UNAME
-MacOS X
-@end ifclear
-, you need the following two
-archives:
-@table @code
-@item Singular-@value{VERSION}-share.tar.gz
-contains architecture independent data like documentation and libraries
-(alternatively, you may also download
-@code{Singular-@value{VERSION}-share.zip}).
-@item Singular-@value{VERSION}-@value{_UNAME}.tar.gz
-contains architecture dependent executables, like the @sc{Singular}
-program.
-@end table
-@ifclear UNAME
-@*
-@code{@value{_UNAME}} is a description of the processor and operating system
-for which @sc{Singular} is compiled (e.g, @code{ix86-Linux}). Please contact us if
-you can not find an appropriate architecture dependent archive.
-@end ifclear
-
-You can obtain these (and other) archives from
-@display
-@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular}.
-@end display
+To install @sc{Singular} on a Macintosh, you need the file @code{Singular-<version>-ppcMac-darwin.tar.gz} resp. @code{Singular-<version>-share.tar.gz} which you can obtain by public ftp from @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular}. Furthermore, you need MacOSX version >= 10.2. 
 
 @include register.texi
 
-@heading To install SINGULAR
+@heading Installing @sc{Singular} on MacOS X
 
-Make sure that you have approximately 12MByte of free disk space and follow
-these steps.
-@enumerate
-@item
-Simply change to the directory in which you wish to install
-@sc{Singular} (usually wherever you install 3rd-party software), for example:
-@smallexample
-cd /usr/local
-or
-mkdir install;cd install 
-(you do not need root privileges in this case)
-@end smallexample
-@sc{Singular} specific subdirectories will be created in such a way
-that multiple versions and multiple architecture dependent files
-of @sc{Singular} can peaceably coexist under the same @code{/usr/local}
-tree.
-
-@item
-Unpack the archives:
-@smallexample
-gzip -dc <path_to>/Singular-@value{VERSION}-@value{_UNAME}.tar.gz | tar -pxf -
-gzip -dc <path_to>/Singular-@value{VERSION}-share.tar.gz | tar -pxf -
-@end smallexample
-@c version 2-0-x does not have *-share.zip:
-@c If you have downloaded @code{Singular-@value{VERSION}-share.zip},
-@c unpack with
-@c @smallexample
-@c unzip -u Singular-@value{VERSION}-share.zip
-@c @end smallexample
-This creates the the directory Singular/@value{VERSION} with 
-@multitable @columnfractions .36 .64
-@item (sub)directories
-@tab  which contain
-@item @code{@value{_UNAME}}
-@tab @code{Singular} executetable
-@item @code{LIB}
-@tab @sc{Singular} libraries (@code{*.lib} files)
-@item @code{emacs}
-@tab files for the @sc{Singular} Emacs user interface
-@item @code{info}
-@tab info files of @sc{Singular} manual
-@item @code{html}
-@tab html files of @sc{Singular} manual
-@item @code{doc}
-@tab miscellaneous documentation files
-@item @code{examples}
-@tab @sc{Singular} examples (@code{*.sing} files)
-@end multitable
-
-For the executable to work, the directory layout must look pretty much
-like this; the executable looks for "sibling" directories at run-time
-to figure out where its @sc{Singular} libraries and on-line
-documentation files are.  These constraints on the local directory layout
-are necessary to avoid having to hard-code pathnames into the
-executables, or require that environment variables be set before
-running the executable. In particular, you @strong{must not move or copy}
-the @sc{Singular} executables to another place, but use soft-links
-instead.
-@end enumerate
-
-The following steps are optional:
-
-@itemize @bullet
-@item
-Arrange that typing @code{Singular} at the shell prompt starts up the
-installed @sc{Singular} executable.
-
-If you have root permission, do:
-@smallexample
-ln -s `pwd`/Singular/@value{VERSION}/@value{_UNAME}/Singular  /usr/local/bin/Singular-@value{VERSION}
-ln -s /usr/local/bin/Singular-@value{VERSION} /usr/local/bin/Singular
-@end smallexample
-	Otherwise, append the directory
-@code{`pwd`/Singular/@value{VERSION}/@value{_UNAME}/} to your @code{$PATH}
-environment variable. For the @code{csh} (or, @code{tcsh}) shell do:
-@smallexample
-set path=(`pwd`/Singular/@value{VERSION}/@value{_UNAME} $path)
-@end smallexample
-For the @code{bash} (or, @code{ksh}) shell do:
-@smallexample
-export PATH=`pwd`/Singular/@value{VERSION}/@value{_UNAME}/:$PATH
-@end smallexample
-You also might want to adjust your personal start-up files
-(@code{~/.cshrc} for @code{csh}, @code{~/.tcshrc} for @code{tcsh}, or
-@code{~/.profile} for @code{bash}) accordingly,
-so that the @code{$PATH} variable is set automatically each time you login.
-
-@strong{IMPORTANT:} Do @emph{never} move or copy the file
-@code{Singular/@value{VERSION}/@value{_UNAME}/Singular} to another
-place, but use soft-links instead.
-
-@item
-If you wish to use any of following features of
-@sc{Singular}, make sure that the respective programs are installed on your system:
-
-@multitable @columnfractions .5 .5
-@item @strong{Feature} @tab @strong{Requires}
-
-@item on-line @code{html} help
-@tab @uref{http://www.netscape.com,,netscape} browser
-@item on-line @code{info} help
-@tab @uref{http://www.texinfo.org,,info}, or
-@uref{http://math-www.uni-paderborn.de/~axel/tkinfo/,,tkinfo} texinfo browser programs
-@item TAB completion and history mechanism of ASCII-terminal interface
-@tab shared @uref{ftp://ftp.de.uu.net/pub/gnu/readline/,,readline}
-library, i.e. @code{/usr/lib/libreadline.so}
-@end multitable
-You may download most of these programs from
-@display
-@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils/}.
-@end display
-
-@item Customize the on-line help system:
-
-By default, on-line help is displayed in the @code{html} format using
-the @code{netscape} program.
-
-However, this behavior can be customized in several ways
-using the @sc{Singular} commands @code{system("--browser",<browser>)}
-and @code{system("--allow-net", 1)} (or, by starting up @sc{Singular}
-with the respective command line options).
-
-In particular, creating the file
-@code{Singular/@value{VERSION}/LIB/.singularrc} and putting the
-@sc{Singular} command
-@smallexample
-system("--allow-net", 1);
-@end smallexample
-in it, allows the on-line help system to fetch its @code{html} pages
-from @uref{http://www.singular.uni-kl.de, Singular's WWW
-home site}
-in case its local html pages are not found. That is, you may delete your
-local html pages, after setting this option.
-
-See also
-@ifset singularmanual
-@ref{The online help system}, @ref{Command line options}, and
-@ref{Startup sequence},
-@end ifset
-@ifclear singularmanual
-the sections @emph{The online help system}, @emph{Command line options}, and
-@emph{Startup sequence} in the @sc{Singular} manual
-@end ifclear
-for more details on customizing the on-line help system.
-
-@item
-Add the line
-@smallexample
-* Singular:(singular.hlp).     A system for polynomial computations
-@end smallexample
-to your system-wide @code{dir} file (usually @code{/usr/info/dir} or
-@code{/usr/local/info/dir} and  copy or soft-link the file
-@code{Singular/@value{VERSION}/info/singular.hlp}
-to the directory of your @code{dir} file.
-@*This assures that the
-@sc{Singular} manual can be  accessed from stand-alone texinfo
-browser programs such as @code{info} or @code{Emacs}.
-(It is not necessary for the use of the help system from within @code{Singular}.)
-@end itemize
-
-@heading Troubleshooting
-
-@itemize @bullet
-@item General: @sc{Singular} can not find its libraries or on-line help
-@enumerate
-@item
-Make sure that you have read and/or execute permission the files and
-directories of the Singular distribution. If in doubt, @code{cd} to the
-directory where you unpacked @sc{Singular}, and do (as root, if
-necessary):
-@smallexample
-chmod -R a+rX Singular
-@end smallexample
-@item
-Start up @sc{Singular}, and issue the command @code{system("Singular");}.
-If this does not return the correct and expanded location of the
-@sc{Singular} executable, then you found a bug in @sc{Singular}, which we
-ask you to report (see below).
-@item
-Check whether the directories containing the libraries and on-line help
-files can be found by @sc{Singular}: If @code{$bindir} denotes the
-directory where the @sc{Singular} executable resides, then @sc{Singular}
-looks for library files as follows:
-@* (0) the current directory
-@* (1) all dirs of the environment variable SINGULARPATH
-@* (2) @code{$bindir/LIB}
-@* (3) @code{$bindir/../LIB}
-@* (4) @code{/usr/local/Singular/@value{VERSION}/LIB}
-@* (4) @code{/usr/local/Singular/LIB}
-@* The on-line @code{info} files need to be at  @code{$bindir/../info} and the
-@code{html} pages at @code{$bindir/../html}.
-@end enumerate
-
-You can inspect the found library and @code{info}/@code{html}
-directories by starting up @sc{Singular} with the
-@code{--version} option, or by issuing the @sc{Singular} command
-@code{system("--version");}.
-
-@item For any other troubles:
-@*Please send an email to @email{singular@@mathematik.uni-kl.de}
-and include the header which is displayed by starting up @sc{Singular}
-with the @code{-v} option, and a description of your machine (issue the
-command @code{uname -a} on your shell) in your report.
-@end itemize
+Please see @uref{INSTALL_unix.html}. Full functionality of @sc{Singular} requires the presence of the X-window
+environment. In the absense of X under MacOS X, @sc{Singular} is only available as a shell command, that is
+there are no @code{TSingular} and @code{ESingular}. @sc{Singular} can only be used by typing @code{Singular}
+in a terminal under Aqua. Alternatively, you may choose @code{Terminal} as the application to open the file @code{Singular} with and put it into the dock. The last step is easier under 10.3 (Panther), because the binaries already
+have this property.
 
 @include info.texi
 
-@ifclear singularmanual
-GOOD LUCK and ENJOY!
-Your @sc{Singular} team.
-@end ifclear
+For any troubles, please send an email to @email{singular@@mathematik.uni-kl.de} and include the header which is displayed by starting up @sc{Singular}
+with the @code{-v} option, and a description of your machine and operating system.
 
+@ifclear singularmanual
+Good luck and enjoy! Your @sc{Singular} team.
+@end ifclear
