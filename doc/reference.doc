@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.130 1999-07-26 17:28:38 Singular Exp $
+@comment $Id: reference.doc,v 1.131 1999-07-28 15:11:27 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -75,6 +75,7 @@ brackets are allowed.
 * dump::
 * eliminate::
 * eval::
+* ERROR::
 * execute::
 * exit::
 * extgcd::
@@ -1275,7 +1276,7 @@ See
 @ref{std}.
 @c ref
 @c ---------------------------------------
-@node eval, execute, eliminate, Functions
+@node eval, ERROR, eliminate, Functions
 @subsection eval
 @cindex eval
 @table @code
@@ -1316,7 +1317,34 @@ See
 @ref{write}.
 @c ref
 @c ---------------------------------------
-@node execute, exit, eval, Functions
+@node ERROR, execute, eval, Functions
+@subsection ERROR
+@cindex ERROR
+@table @code
+@item @strong{Syntax:}
+@code{ERROR}(string_expression);
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+Immediately Interrupts the current computation, returns to the
+top-level, and displays the argument @code{string_expression} as error
+message. 
+
+@item @strong{Note:}
+This should be used as an emergency, or, failure exit within procedures.
+
+@item @strong{Example:}
+@smallexample
+@c example error
+int i = 1;
+proc myError() {ERROR("Need to leave now"); i = 2;}
+myError();
+i;     
+@c example
+@end smallexample
+@end table
+@c ---------------------------------------
+@node execute, exit, ERROR, Functions
 @subsection execute
 @cindex execute
 @table @code
