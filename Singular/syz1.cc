@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.56 2000-03-01 16:08:37 Singular Exp $ */
+/* $Id: syz1.cc,v 1.57 2000-03-22 08:56:05 siebert Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -1749,7 +1749,8 @@ intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim,int * row_shift)
   int dummy;
   if (syzstr->betti!=NULL)
   {
-    return ivCopy(syzstr->betti);
+    if (minim || (syzstr->resPairs!=NULL))
+      return ivCopy(syzstr->betti);
   }
   intvec *result;
   if (syzstr->resPairs!=NULL)
@@ -1804,13 +1805,14 @@ intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim,int * row_shift)
         j++;
       }
     }
-    syzstr->betti = result;
   }
   else if (syzstr->fullres!=NULL)
-    syzstr->betti = syBetti(syzstr->fullres,syzstr->length,&dummy,NULL,minim,row_shift);
+    result = syBetti(syzstr->fullres,syzstr->length,&dummy,NULL,minim,row_shift);
   else
-    syzstr->betti = syBetti(syzstr->minres,syzstr->length,&dummy,NULL,minim,row_shift);
-  return ivCopy(syzstr->betti);
+    result = syBetti(syzstr->minres,syzstr->length,&dummy,NULL,minim,row_shift);
+  if ((minim) || (syzstr->resPairs!=NULL)) 
+    syzstr->betti = ivCopy(result);
+  return result;
 }
 
 /*2

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.35 2000-02-29 10:46:03 siebert Exp $ */
+/* $Id: syz.cc,v 1.36 2000-03-22 08:56:04 siebert Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -229,7 +229,8 @@ static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
 }
 
 /*2
-* make Gauss for one element
+* make Gauss with the element elnum in the module component ModComp
+* for the generators from - till
 */
 void syGaussForOne(ideal syz, int elnum, int ModComp,int from,int till)
 {
