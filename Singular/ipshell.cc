@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.76 2002-05-03 08:50:34 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.77 2002-07-02 13:26:04 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1007,6 +1007,8 @@ BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl)
     Warn("'%s': no such identifier\n", v->name);
     return FALSE;
   }
+  package frompack=v->req_packhdl; 
+  if (frompack==NULL) frompack=currPack;
   package rootpack = IDPACKAGE(roothdl);
   Print("iiInternalExport('%s',%d,%s) typ:%d\n", v->name, toLev, IDID(roothdl),v->Typ());
   if (RingDependend(IDTYP(h)))
@@ -1016,19 +1018,20 @@ BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl)
   }
   else
   {
-    if (h==IDROOT)
+    if (h==frompack->idroot)
     {
-      IDROOT=h->next;
+      frompack->idroot=h->next;
     }
     else
     {
-      idhdl hh=IDROOT;
+      idhdl hh=frompack->idroot;
       while ((hh!=NULL) && (hh->next!=h))
         hh=hh->next;
       if ((hh!=NULL) && (hh->next==h))
         hh->next=h->next;
       else
       {
+        Werror("`%s` not found",v->Name());
         return TRUE;
       }
     }
@@ -1076,6 +1079,7 @@ BOOLEAN iiExport (leftv v, int toLev)
 BOOLEAN iiExport (leftv v, int toLev, idhdl root)
 {
   checkall();
+//      Print("iiExport1: pack=%s\n",IDID(root));
   BOOLEAN nok=FALSE;
   leftv rv=v;
   while (v!=NULL)
@@ -1105,6 +1109,7 @@ BOOLEAN iiExport (leftv v, int toLev, idhdl root)
           return TRUE;
         }
       }
+      //Print("iiExport: pack=%s\n",IDID(root));
       if(iiInternalExport(v, toLev, root))
       {
         rv->CleanUp();
