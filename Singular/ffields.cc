@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.16 1998-07-30 12:46:15 Singular Exp $ */
+/* $Id: ffields.cc,v 1.17 1998-09-29 12:00:54 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -150,7 +150,7 @@ BOOLEAN nfGreaterZero (number k)
 #ifdef LDEBUG
   nfTest(k);
 #endif
-  return !nfIsZero(k);
+  return !nfIsZero(k) && !nfIsMOne(k);
 }
 
 /*2
@@ -413,6 +413,7 @@ void nfWrite (number &a)
 #endif
   if ((int)a==nfCharQ)  StringAppendS("0");
   else if ((int)a==0)   StringAppendS("1");
+  else if (nfIsMOne(a))   StringAppendS("-1");
   else
   {
     StringAppendS(nfParameter);
