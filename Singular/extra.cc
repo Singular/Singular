@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.202 2004-02-23 19:04:01 Singular Exp $ */
+/* $Id: extra.cc,v 1.203 2004-04-03 17:25:02 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -96,7 +96,7 @@
 #include "fast_maps.h"
 
 #ifdef HAVE_EIGENVAL
-#include "eigenval.h"
+#include "eigenval_ip.h"
 #endif
 
 #ifdef HAVE_GMS

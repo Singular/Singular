@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: gms.cc,v 1.8 2003-11-04 16:43:24 Singular Exp $ */
+/* $Id: gms.cc,v 1.9 2004-04-03 17:25:04 levandov Exp $ */
 /*
 * ABSTRACT: Gauss-Manin system normal form
 */
@@ -12,7 +12,6 @@
 
 #include "febase.h"
 #include "structs.h"
-#include "ipid.h"
 #include "numbers.h"
 #include "polys.h"
 #include "ideals.h"
