@@ -643,11 +643,26 @@ static void heBrowserHelp(heEntry hentry)
   if (! feHelpCalled)
   {
     Warn("Displaying help in browser '%s'.", heCurrentHelpBrowser->browser);
-    Warn("Use 'system(\"--browser\", \"<browser>\");' to change browser");
-    Warn("Use 'system(\"browsers\");'               for available browsers");
-    feHelpCalled = TRUE;
+    Warn("Use 'system(\"--browser\", <browser>);' to change browser");
+    char* browsers = StringSetS("where <browser> can be: ");
+    int i = 0;
+    i = 0;
+    while (heHelpBrowsers[i].browser != NULL)
+    {
+      if (heHelpBrowsers[i].init_proc(0))
+        StringAppend("\"%s\", ", heHelpBrowsers[i].browser);
+      i++;
+    }
+    if (browsers[strlen(browsers)-2] == ',')
+    {
+      browsers[strlen(browsers)-2] = '.';
+      browsers[strlen(browsers)-1] = '\0';
+    }
+    WarnS(browsers);
   }
+    
   heCurrentHelpBrowser->help_proc(hentry);
+  feHelpCalled = TRUE;
 }
 
 #define MAX_SYSCMD_LEN MAXPATHLEN*2
@@ -740,6 +755,13 @@ static void heNetscapeHelp(heEntry hentry)
   {
     sprintf(sys, "%s %s &", feResource('N' /*"netscape"*/), url);
     system(sys);
+  }
+  else
+  {
+    if (! feHelpCalled)
+    {
+      Warn("Help is displayed in already running 'netscape'.");
+    }
   }
 }
 
