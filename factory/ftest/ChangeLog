@@ -1,3 +1,82 @@
+Tue Mar 31 12:33:25 MET DST 1998  Jens Schmidt
+
+	* ChangeLog, ftest_io.cc, fbinops.m4:
+	  ***** merge from branch `factory-gcd' to main trunk
+
+Thu Mar 26 09:29:36 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+    **************** <<< changes in branch `factory-gcd' ****************
+
+    **************** !!!!! Repository changed !!!!! ****************
+
+	* gcdUniv0.fex, gcdUnivP.fex, gcdUnivPAlpha.fex, insert.fex,
+	  runfex, stdUniv0Gcd.in, stdUnivPGcd.in: files moved in
+	  repository from `factory/ftest' to `factory/fex'
+
+    **************** !!!!! Repository changed !!!!! ****************
+
+	* stdUniv0Gcd.in, stdUnivPGcd.in: new files
+
+	* gcd.m4 (main): reads optional argument `algorithm' and calls it
+	  using `CFPrimitiveGcdUtil::gcd()'
+	  (gcdCheck): compares old and new gcd's
+
+	* gcd.m4 (normalizeGcd): new function.  Calls added to
+	  `gcdCheck()'
+
+	* gcd.m4 (gcdCheck): declared static
+
+	* runfex (printData): new output option `x'.  Column width is
+	  adjustable (to zero, too) ar runtime.
+
+	* gcdUnivPAlpha.fex: new file
+
+	* gcdUnivP.fex: prefix `univP' removed from all identifiers
+
+	* gcdUnivP.fex: new file
+
+	* ftest_io.cc (ftestGetCanonicalForm): ignores trailing blanks
+	  when reading `-'
+
+	* ftest_io.cc (ftestGetCanonicalForm): `<-' as "read from stdin"
+	  specifier replaced by `-'
+
+Wed Mar 25 08:35:01 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* runfex: option `-t' added
+
+Tue Mar 24 11:28:50 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* runfex (usage): new function.  Calls added to main program.
+
+	* runfex (printData): uses stdin instead of `alg*' variables to
+	  read data from algorithm.  `example()' adapted.
+
+	* runfex (runAlgorithm): bug fix
+
+	* runfex (signalHandlerInterrupt, signalHandleQuit): new functions
+	  (trap): handles signals better
+
+	* insert.fex: adapted to new `runfex' format
+
+	* gcd.fex: file splitted up in several smaller files
+	* gcdUniv0.fex: new file
+
+	* runfex: major rewrite.  Hopefully the last one.
+
+Mon Mar 23 17:46:57 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* randomgcd.m4, ranMulGCD.fex: files removed
+
+	* gcd.fex (collection gcd): `-c 50' removed
+
+	* fbinops.m4 (ftestDivideTest, ftestDivTest, ftestModuloTest): new
+	  functions
+	  (binOpCFSpecArray): new entries added for `div()' and `mod()'.
+	  Extra tests for `operator /()' and `operator %()' added.
+
+    **************** >>> changes in branch `factory-gcd' ****************
+
 Mon Mar 23 16:38:41 1998  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* randomgcd.m4, ranMulGCD.fex: files removed

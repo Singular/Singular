@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_io.cc,v 1.11 1998-03-11 16:10:54 schmidt Exp $ */
+/* $Id: ftest_io.cc,v 1.12 1998-03-31 10:36:02 schmidt Exp $ */
 
 //{{{ docu
 //
@@ -33,52 +33,50 @@ ftestGetCanonicalForm ( const char * canFormSpec )
 {
     const char * stringF = canFormSpec;
     stringF = ftestSkipBlancs( stringF );
-    if ( *stringF == '<' ) {
-	CanonicalForm f;
-	
-	stringF++;
-	if ( *stringF == '-' ) {
-	    // read canonical form from stdin
+
+    // check for a single minus
+    if ( stringF[0] == '-' ) {
+	const char * tokenCursor = ftestSkipBlancs( stringF+1 );
+
+	if ( ! *tokenCursor ) {
+	    CanonicalForm f;
 	    cin >> f;
-	} else
-	    ftestError( CanFormSpecError,
-			"not a valid canonical form specification `<%s'\n",
-			stringF );
-	return f;
-    } else {
-	// get string to read canonical form from
-	if ( *stringF == '$' ) {
-	    const char * tokenCursor = ftestSkipBlancs( stringF+1 );
-	    // read canonical form from environment
-	    stringF = getenv( tokenCursor );
-	    if ( ! stringF )
-		ftestError( CanFormSpecError,
-			    "no environment variable `$%s' set\n",
-			    tokenCursor );
+	    return f;
 	}
-
-	// create terminated CanonicalForm
-	int i = strlen( stringF );
-	char * terminatedStringF = new char[i+2];
-	char * stringCursor = terminatedStringF;
-	while ( *stringF ) {
-	    switch ( *stringF ) {
-	    case '.': *stringCursor = '*'; break;
-	    case '{': *stringCursor = '('; break;
-	    case '}': *stringCursor = ')'; break;
-	    default: *stringCursor = *stringF; break;
-	    }
-	    stringF++; stringCursor++;
-	}
-	*stringCursor++ = ';';
-	*stringCursor = '\0';
-
-	// read f and return it
-	CanonicalForm f;
-	istrstream( terminatedStringF ) >> f;
-	delete [] terminatedStringF;
-	return f;
     }
+
+    // get string to read canonical form from
+    if ( *stringF == '$' ) {
+	const char * tokenCursor = ftestSkipBlancs( stringF+1 );
+	// read canonical form from environment
+	stringF = getenv( tokenCursor );
+	if ( ! stringF )
+	    ftestError( CanFormSpecError,
+			"no environment variable `$%s' set\n",
+			tokenCursor );
+    }
+
+    // create terminated CanonicalForm
+    int i = strlen( stringF );
+    char * terminatedStringF = new char[i+2];
+    char * stringCursor = terminatedStringF;
+    while ( *stringF ) {
+	switch ( *stringF ) {
+	case '.': *stringCursor = '*'; break;
+	case '{': *stringCursor = '('; break;
+	case '}': *stringCursor = ')'; break;
+	default: *stringCursor = *stringF; break;
+	}
+	stringF++; stringCursor++;
+    }
+    *stringCursor++ = ';';
+    *stringCursor = '\0';
+
+    // read f and return it
+    CanonicalForm f;
+    istrstream( terminatedStringF ) >> f;
+    delete [] terminatedStringF;
+    return f;
 }
 //}}}
 
