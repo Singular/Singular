@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.204 2001-02-08 13:13:06 Singular Exp $
+@comment $Id: reference.doc,v 1.205 2001-02-13 18:02:58 mschulze Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2643,12 +2643,16 @@ See
 @*@code{jet (} vector_expression@code{,} int_expression@code{,} intvec_expression @code{)}
 @*@code{jet (} ideal_expression@code{,} int_expression@code{,} intvec_expression @code{)}
 @*@code{jet (} module_expression@code{,} int_expression@code{,} intvec_expression @code{)}
+@*@code{jet (} poly_expression@code{,} int_expression@code{,} poly_expression @code{)}
+@*@code{jet (} vector_expression@code{,} int_expression@code{,} poly_expression @code{)}
+@*@code{jet (} ideal_expression@code{,} int_expression@code{,} matrix_expression @code{)}
+@*@code{jet (} module_expression@code{,} int_expression@code{,} matrix_expression @code{)}
 @item @strong{Type:}
 the same as the type of the first argument
 @item @strong{Purpose:}
-deletes from the first argument all terms of degree
-(resp.@: weighted degree where the weights are given by the third argument)
-bigger than the second argument.
+deletes from the first argument all terms of degree bigger than the second argument.
+@*If a third argument @code{w} of type intvec is given, the degree is replaced by the weighted degree defined by @code{w}.
+@*If a third argument @code{u} of type poly or matrix is given, the first argument @code{p} is replaced by @code{p/u}.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -5028,16 +5032,13 @@ See
 @item @strong{Type:}
 the type of the first argument
 @item @strong{Purpose:}
-reduces a polynomial, vector, ideal  or module
-to its normal form with respect to an ideal or module represented
-by a standard basis.
+reduces a polynomial, vector, ideal  or module to its normal form with respect to an ideal or module represented by a standard basis.
 Returns 0 if and only if the polynomial (resp.@: vector, ideal, module)
 is an element (resp.@: subideal, submodule) of the ideal (resp.@: module).
 The result may have no meaning if the second argument is not a standard basis.
-@*The third (optional) argument 1 forces a reduction which considers
-only the leading term and does no tail reduction.
-@*The third (optional) argument @code{u} of type poly or matrix reduces
-@code{p/u} instead of @code{p}.
+@*The third (optional) argument 1 of type int forces a reduction which considers only the leading term and does no tail reduction.
+@*If a third argument @code{u} of type poly or matrix is given, the first argument @code{p} is replaced by @code{p/u}.
+This works only for zero dimensional ideals (resp.@: modules) in the second argument and gives, even in a local ring, a reduced normal form which is the projection to the quotient by the ideal (resp.@: module).
 @item @strong{Note:}
 The commands @code{reduce} and @code{NF} are synonymous.
 @item @strong{Example:}
