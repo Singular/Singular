@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.21 1998-05-14 13:04:16 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.22 1998-05-20 10:08:39 pfister Exp $ */
 /*
 * ABSTRACT:
 */
@@ -2217,6 +2217,8 @@ ideal kInterRed (ideal F, ideal Q)
   strat->spSpolyLoop = spGetSpolyLoop(currRing, strat);
   if (pOrdSgn == -1)   strat->honey = TRUE;
   initS(F,Q,strat);
+  if (TEST_OPT_REDSB)
+    strat->noTailReduction=FALSE;
   updateS(TRUE,strat);
   if (TEST_OPT_REDSB && TEST_OPT_INTSTRATEGY)
     completeReduce(strat);

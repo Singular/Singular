@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.20 1998-05-14 13:04:19 Singular Exp $ */
+/* $Id: kutil.cc,v 1.21 1998-05-20 10:08:41 pfister Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -3101,7 +3101,8 @@ void updateS(BOOLEAN toT,kStrategy strat)
           pDelete(&redSi);
           redSi = pHead(strat->S[i]);
           strat->S[i] = redBba(strat->S[i],i-1,strat);
-          if ((strat->ak!=0)&&(strat->S[i]!=NULL)) strat->S[i]=redQ(strat->S[i],i+1,strat); /*reduce S[i] mod Q*/
+          if ((strat->ak!=0)&&(strat->S[i]!=NULL))
+	    strat->S[i]=redQ(strat->S[i],i+1,strat); /*reduce S[i] mod Q*/
           if (TEST_OPT_PROT && (pComp(redSi,strat->S[i])!=0))
           {
             if (strat->S[i]==NULL)
@@ -3200,7 +3201,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
     }
     if (toT)
     {
-      for (i=0; i<=strat->sl; i++)
+      for (i=1; i<=strat->sl; i++)
       {
         if (((strat->fromQ==NULL) || (strat->fromQ[i]==0))
 #ifdef SDRING
