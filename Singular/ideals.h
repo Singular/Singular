@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.26 2000-10-19 15:25:41 obachman Exp $ */
+/* $Id: ideals.h,v 1.27 2000-10-24 06:58:15 pohl Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -137,6 +137,7 @@ matrix  idCoeffOfKBase(ideal arg, ideal kbase, poly how);
 intvec *idQHomWeights(ideal id);
 ideal   idTransp(ideal a);
 
+intvec *idQHomWeight(ideal id);
 
 ideal idXXX (ideal  h1, int k);
 #endif

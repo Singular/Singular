@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.107 2000-10-19 15:25:40 obachman Exp $ */
+/* $Id: ideals.cc,v 1.108 2000-10-24 06:58:16 pohl Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -3370,5 +3370,51 @@ ideal idTransp(ideal a)
     }
   }
   return b;
+}
+
+intvec * idQHomWeight(ideal id)
+{
+  poly head, tail;
+  int k;
+  int in=IDELEMS(id)-1, ready=0, all=0,
+      coldim=pVariables, rowmax=2*coldim;
+  intvec *imat=new intvec(rowmax+1,coldim,0);
+
+  do
+  {
+    head = id->m[in--];
+    if (head!=NULL)
+    {
+      tail = pNext(head);
+      while (tail!=NULL)
+      {
+        all++;
+        for (k=1;k<=coldim;k++)
+          IMATELEM(*imat,all,k) = pGetExpDiff(head,tail,k);
+        if (all==rowmax)
+        {
+          ivTriangIntern(imat, ready, all);
+          if (ready==coldim)
+          {
+            delete imat;
+            return NULL;
+          }
+        }
+        pIter(tail);
+      }
+    }
+  } while (in>=0);
+  if (all>ready)
+  {
+    ivTriangIntern(imat, ready, all);
+    if (ready==coldim)
+    {
+      delete imat;
+      return NULL;
+    }
+  }
+  intvec *result = ivSolveKern(imat, ready);
+  delete imat;
+  return result;
 }
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: weight.cc,v 1.15 2000-10-23 12:02:23 obachman Exp $ */
+/* $Id: weight.cc,v 1.16 2000-10-24 07:00:46 pohl Exp $ */
 
 /*
 * ABSTRACT:
@@ -236,7 +236,7 @@ BOOLEAN kWeight(leftv res,leftv id)
 
 BOOLEAN kQHWeight(leftv res,leftv v)
 {
-  res->data=(char *)idQHomWeights((ideal)v->Data());
+  res->data=(char *)idQHomWeight((ideal)v->Data());
   if (res->data==NULL)
     res->data=(char *)new intvec(pVariables);
   return FALSE;
