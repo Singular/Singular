@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.39 1999-02-16 17:59:20 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.40 1999-02-16 18:18:31 schmidt Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -180,6 +180,9 @@ distfactorysrc := \
 		$(basefactorysrc) \
 		$(singfactorysrc) \
 		$(useiofactorysrc)
+doxysrc :=	\
+		$(basefactorysrc) \
+		parseutil.cc
 
 # factory object files and dependencies
 factoryobj :=	$(factorysrc:.cc=.o)
@@ -244,6 +247,9 @@ distfactoryincl := \
 		$(basefactoryincl) \
 		$(singfactoryincl) \
 		$(useiofactoryincl)
+doxyincl :=	\
+		$(basefactoryincl) \
+		parseutil.h
 
 # memory manager source files
 basememmansrc := \
@@ -329,6 +335,7 @@ ftestm4src :=	$(ftestm4develsrc) \
 		norm.m4 \
 		resultant.m4 \
 		revert.m4 \
+		sqrfree.m4 \
 		size.m4 \
 		totaldegree.m4
 export ftestm4src
@@ -383,7 +390,8 @@ distfiles :=	\
 		clean mostlyclean distclean maintainer-clean \
 		install installcf installmem installgftables installtest \
 		uninstall uninstallcf uninstallmem uninstallgftables \
-		ftestall ftestclean ftestdistclean
+		ftestall ftestclean ftestdistclean \
+		doxy doxyclean
 
 # we make these targets phony to make sure that they are
 # up to date when a new distribution is built
@@ -471,6 +479,22 @@ conftest:
 		  echo "\`--without-Singular --with-memman --enable-streamio'."; \
 		  exit 1; \
 		fi
+
+#
+# - doxygen.
+#
+
+# files and environment variables to export for doxygen
+doxyfiles :=	$(addprefix $(srcdir)/,$(doxysrc) $(doxyincl))
+
+export version srcdir doxyfiles
+
+# doxygen targets
+doxy:		factory.cfg $(doxysrc) $(doxyincl)
+		doxygen $<
+
+doxyclean:
+		rm -rf doxygen
 
 #
 # - Factory Test Environment.
@@ -635,7 +659,7 @@ clean:		ftestclean
 		  factoryconf.h factory.h *.o *.d *.dtmp
 
 # remove gftables only if we built them
-mostlyclean:	clean
+mostlyclean:	clean doxyclean
 		-rm -f TAGS
 		-if test ! -f gftables/README; then \
 		  rm -rf gftables; \
