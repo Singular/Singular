@@ -50,7 +50,7 @@ info: singular.hlp
 singular.hlp: ${SINGULAR_OBJS} ${TEX_FILES} Makefile
 	- ${MAKEINFO} --no-split singular.tex
 
-dvi: singular.dvi tutor.dvi
+dvi: singular.dvi tutor.dvi usercard.dvi
 
 ps: dvi
 	${DVIPS} singular.dvi -o
@@ -67,6 +67,9 @@ tutor.dvi: tutor.tex examples.tex start.tex proc.tex copyright.tex
 	${TEX} tutor.tex
 	${TEXINDEX} tutor.??
 	${TEX} tutor.tex
+
+usercard.dvi: usercard.tex singcard.tex
+	${TEX} $<
 
 install: 
 	${MKINSTALLDIRS} ${infodir}
