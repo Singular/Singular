@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.39 1999-08-31 19:17:22 wichmann Exp $
+;; $Id: singular.el,v 1.40 1999-09-03 10:52:12 wichmann Exp $
 
 ;;; Commentary:
 
@@ -3619,7 +3619,8 @@ NOT READY [much more to come.  See shell.el.]!"
 
   ;; run comint mode and do basic mode setup
   (let (comint-mode-hook)
-    (comint-mode))
+    (comint-mode)
+    (singular-comint-init))
   (setq major-mode 'singular-interactive-mode)
   (setq mode-name "Singular Interaction")
 
@@ -3636,7 +3637,6 @@ NOT READY [much more to come.  See shell.el.]!"
   (make-local-variable 'singular-pre-output-filter-functions)
   (make-local-hook 'singular-post-output-filter-functions)
 
-  ;; initialize foldings
   (singular-interactive-mode-map-init)
   (singular-mode-syntax-table-init)
   (singular-interactive-mode-menu-init)
@@ -3644,6 +3644,7 @@ NOT READY [much more to come.  See shell.el.]!"
   (singular-folding-init)
   (singular-help-init)
   (singular-prompt-init)
+  (singular-exec-init)
 
   ;; Font Lock mode initialization for Emacs.  For XEmacs, it is done at
   ;; singular.el loading time.
