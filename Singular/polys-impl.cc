@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.6 1998-01-15 16:20:26 obachman Exp $ */
+/* $Id: polys-impl.cc,v 1.7 1998-01-16 08:24:03 Singular Exp $ */
 
 /***************************************************************
  *
@@ -26,7 +26,7 @@
 #include "polys.h"
 #include "ring.h"
 #include "ipid.h"
-  
+
 /***************************************************************
  *
  * definition of global variables
@@ -89,7 +89,7 @@ void pGetVarIndicies(ring r,
         case ringorder_ls:
 #else
         default:
-#endif          
+#endif   
           pGetVarIndicies_Lex(r->N, VarOffset, VarCompIndex,
                                  VarLowIndex, VarHighIndex);
 #ifdef PDEBUG
@@ -109,7 +109,7 @@ void pGetVarIndicies(ring r,
 // assumes that pVarOffset != src_r->VarOffset
 inline void RingCopy2ExpV(poly dest, poly src, ring src_r)
 {
-#if 0  
+#if 0
   if (_pHasReverseExp)
   {
 #ifdef WORDS_BIGENDIAN
@@ -118,14 +118,14 @@ inline void RingCopy2ExpV(poly dest, poly src, ring src_r)
 #else
 #endif
   }
-  
+
 #endif
   for (int i=pVariables; i; i--)
     pSetExp(dest, i, pRingGetExp(src_r, src, i));
   pSetComp(dest, pRingGetComp(src_r, src));
 }
-    
-// Returns a converted copy (in the sense that the returned poly is 
+
+// Returns a converted copy (in the sense that the returned poly is
 // poly of currRing) of poly p which is from ring r -- assumes that
 // currRing and r have the same number of variables, i.e. that polys
 // from r can be "fetched" into currRing
@@ -182,7 +182,7 @@ poly _pFetchCopy(ring r, poly p)
       pIter(p);
       do
       {
-        // the VarOffset's are different: Hence we 
+        // the VarOffset's are different: Hence we
         // convert betweeen a lex order and a revlex order -- to speed
         // up the sorting, we assemble new poly in inverse order
 #ifdef MDEBUG
@@ -206,7 +206,7 @@ poly _pFetchCopy(ring r, poly p)
   return res;
 #else
   return pOrdPolyMerge(res);
-#endif  
+#endif
 }
 #endif // COMP_FAST
 
@@ -373,16 +373,16 @@ poly _pCopy(poly p)
 */
 #ifdef MDEBUG
 poly pDBCopy1(poly p,char *f,int l)
-#else  
+#else
 poly _pCopy1(poly p)
-#endif  
+#endif
 {
   poly w;
 #ifdef MDEBUG
   w = pDBNew(f,l);
-#else  
+#else
   w = pNew();
-#endif  
+#endif
   pCopy2(w,p);
   nNew(&(w->coef));
   pNext(w) = NULL;
@@ -582,7 +582,12 @@ void pDBMonAddFast(poly p1, poly p2, char* f, int l)
   _pMonAddFast(p1, p2);
 
   for (int i=1; i<=pVariables; i++)
+  {
     pAddExp(ptemp, i, pGetExp(p2, i));
+  }
+#ifdef TEST_MAC_ORDER
+  if (bNoAdd) bSetm(ptemp);else
+#endif
   pGetOrder(ptemp) += pGetOrder(p2);
 
   if (! pEqual(ptemp, p1))
@@ -597,7 +602,7 @@ void pDBCopyAddFast(poly p1, poly p2, poly p3, char* f, int l)
 {
   if (p2 == p1 || p3 == p1)
   {
-    Print("Error in CopyAddFast: Destination equals source in %s:%d\n", f, l);
+    Print("Error in pCopyAddFast: Destination equals source in %s:%d\n", f, l);
   }
   poly ptemp = pNew();
   __pCopyAddFast(ptemp, p2, p3);
@@ -606,10 +611,10 @@ void pDBCopyAddFast(poly p1, poly p2, poly p3, char* f, int l)
   pDBMonAddFast(p1, p3, f, l);
 
   if (! pEqual(ptemp, p1))
-    Print("Error in CopyMonAddFast in %s:%d\n", f, l);
+    Print("Error in pCopyMonAddFast in %s:%d\n", f, l);
   pFree1(ptemp);
 }
-  
+
 
 static BOOLEAN OldpDivisibleBy(poly a, poly b)
 {
@@ -653,7 +658,7 @@ BOOLEAN pDBDivisibleBy2(poly a, poly b, char* f, int l)
 {
   BOOLEAN istrue = OldpDivisibleBy(a,b);
   BOOLEAN f_istrue = __pDivisibleBy(a, b);
-  
+
   if (istrue != f_istrue)
   {
     Print("Error in pDivisibleBy2 in %s:%d\n", f, l);
@@ -664,9 +669,9 @@ BOOLEAN pDBDivisibleBy2(poly a, poly b, char* f, int l)
 
 #endif // COMP_FAST
 
-#endif // PDEBUG != 0 
+#endif // PDEBUG != 0
 
-    
+
 BOOLEAN pDBTest(poly p, char *f, int l)
 {
   poly old=NULL;
@@ -697,13 +702,13 @@ BOOLEAN pDBTest(poly p, char *f, int l)
     {
       if (pGetExp(p,i)<0)
       {
-        Print("neg. Exponent in %s:%l\n",f,l);
+        Print("neg. Exponent in %s:%d\n",f,l);
         return FALSE;
       }
     }
     if (pGetComp(p)<0)
     {
-      Print("neg Component in %s:%l\n",f,l);
+      Print("neg Component in %s:%d\n",f,l);
       return FALSE;
     }
 #endif

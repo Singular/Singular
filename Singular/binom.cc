@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: binom.cc,v 1.6 1998-01-05 16:39:15 Singular Exp $ */
+/* $Id: binom.cc,v 1.7 1998-01-16 08:24:01 Singular Exp $ */
 
 /*
 * ABSTRACT - set order (=number of monomial) for dp
@@ -37,6 +37,9 @@ static inline int bBinom(int i,int j)
 void bSetm(poly p)
 {
   int ord = pTotaldegree(p);
+#ifdef TEST_MAC_DEBUG
+  p->Order=ord;
+#endif  
 
   if (ord<=bHighdeg)
   {
@@ -64,12 +67,61 @@ void bSetm(poly p)
       ip+=bHighdeg_1+pGetExp(p,i);
     }
   }
+#ifdef TEST_MAC_DEBUG
+  p->MOrder=ord;
+#else
   p->Order=ord;
+#endif
 }
 
-static int bComp1dpc(poly p1, poly p2)
+// avoid checking for overflow:
+void bSetm0(poly p)
 {
+#ifdef TEST_MAC_DEBUG
+  p->Order=pTotaldegree(p);
+#endif  
+
+  int i=1;
+  int ord = -INT_MAX;
+  //int expsum=0;
+  //while (i<=pVariables)
+  //{
+  //  expsum += pGetExp(p,i);
+  //  ord += bBinom(expsum,i);
+  //  expsum++;
+  //  i++;
+  //}
+
+  int *ip=bBinomials+pGetExp(p,1);
+  loop
+  {
+    ord += (*ip);
+    if (i==pVariables) break;
+    i++;
+    #ifdef PDEBUG
+    if(pGetExp(p,i)<0)
+      Print("neg. Exp %d:%d in %s:%d\n",i,pGetExp(p,i),__FILE__,__LINE__);
+    #endif
+    ip+=bHighdeg_1+pGetExp(p,i);
+  }
+#ifdef TEST_MAC_DEBUG
+  p->MOrder=ord;
+#else
+  p->Order=ord;
+#endif
+}
+
+#ifdef TEST_MAC_DEBUG
+int bComp1dpc_org(poly p1, poly p2)
+#else
+int bComp1dpc(poly p1, poly p2)
+#endif
+{
+#ifdef TEST_MAC_DEBUG
+  int o1=p1->MOrder, o2=p2->MOrder;
+#else
   int o1=p1->Order, o2=p2->Order;
+#endif
   if (o1 > o2) return 1;
   if (o1 < o2) return -1;
 
@@ -91,7 +143,25 @@ static int bComp1dpc(poly p1, poly p2)
   return pComponentOrder;
 }
 
-static int bComp1cdp(poly p1, poly p2)
+#ifdef TEST_MAC_DEBUG
+static pCompProc pComp0_c;
+int bComp1dpc(poly p1, poly p2)
+{
+  int m=bComp1dpc_org(p1,p2);
+  int c=pComp0_c(p1,p2);
+  if (c!=m)
+  {
+    Print("comp mismatch\n");
+    wrp(p1);
+    Print(" ");
+    wrp(p2);
+    Print("mac:%d, org:%d\n",m,c);
+  }  
+  return c;
+}  
+#endif
+
+int bComp1cdp(poly p1, poly p2)
 {
   int o1=pGetComp(p1)-pGetComp(p2);
   if (o1 > 0) return -pComponentOrder;
@@ -161,6 +231,9 @@ static int bLDeg0(poly p,int *l)
 */
 void bBinomSet(int * orders)
 {
+#ifdef TEST_MAC_DEBUG
+  pComp0_c=pComp0;
+#endif
   bNoAdd=TRUE;
 #if 0
   int bbHighdeg=1;

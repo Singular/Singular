@@ -3,14 +3,18 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: binom.h,v 1.5 1998-01-14 14:42:17 obachman Exp $ */
+/* $Id: binom.h,v 1.6 1998-01-16 08:24:02 Singular Exp $ */
 /*
 * ABSTRACT - set order (=number of monomial) for dp
 */
 // #define TEST_MAC_ORDER
 #ifdef TEST_MAC_ORDER
-extern int bHighdeg;
-extern BOOLEAN bNoAdd;
-void       bBinomSet(int * orders);
+extern int      bHighdeg;
+extern BOOLEAN  bNoAdd;
+void            bSetm(poly p);
+void            bSetm0(poly p);
+void            bBinomSet(int * orders);
+int             bComp1dpc(poly p1, poly p2);
+int             bComp1cdp(poly p1, poly p2);
 #endif
 #endif

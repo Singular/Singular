@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: spolys0.h,v 1.6 1998-01-05 16:39:30 Singular Exp $ */
+/* $Id: spolys0.h,v 1.7 1998-01-16 08:24:06 Singular Exp $ */
 /*
 * ABSTRACT: s-polynomials, internal header
 */
@@ -14,14 +14,23 @@
 #define spMemcpy(A,B)      pCopy2(A,B)
 
 #ifdef TEST_MAC_ORDER
+#ifdef COMP_FAST
+#define spMonAdd(a,m)  \
+        {for(int ii=pVarLowIndex; ii<=pVarHighIndex; ii++) (a)->exp[ii] += (m)->exp[ii];\
+        if (bNoAdd) bSetm(a);else pGetOrder(a) += pGetOrder(m);}
+#define spMonSub(a,b)  \
+        {for(int ii=pVarLowIndex; ii<=pVarHighIndex; ii++) (a)->exp[ii] -= (b)->exp[ii];\
+        if (bNoAdd) bSetm(a);else pGetOrder(a) -= pGetOrder(b);}
+#else // TEST_MAC_ORDER && ! COMP_FAST
 #define spMonAdd0(a,m)  \
         {for(int ii=pVariables; ii; ii--) (a)->exp[ii] += (m)->exp[ii];}
 #define spMonAdd(a,m)  \
         {for(int ii =pVariables; ii; ii--) (a)->exp[ii] += (m)->exp[ii];\
-        if (bNoAdd) pSetm(a);else pGetOrder(a) += pGetOrder(m);}
+        if (bNoAdd) bSetm(a);else pGetOrder(a) += pGetOrder(m);}
 #define spMonSub(a,b)  \
         {for(int ii =pVariables; ii; ii--) (a)->exp[ii] -= (b)->exp[ii];\
         if (bNoAdd) pSetm(a);else pGetOrder(a) -= pGetOrder(b);}
+#endif
 #else
 #ifdef COMP_FAST
 #define spMonAdd(a,m)  \
@@ -36,11 +45,9 @@
 #define spMonAdd(a,m)  \
         {for(int ii =pVariables; ii; ii--) (a)->exp[ii] += (m)->exp[ii];\
         pGetOrder(a) += pGetOrder(m);}
-//        (a)->order += (m)->order;}
 #define spMonSub(a,b)  \
         {for(int ii =pVariables; ii; ii--) (a)->exp[ii] -= (b)->exp[ii];\
         pGetOrder(a) -= pGetOrder(b);}
-//        (a)->order -= (b)->order;}
 #endif // COMP_FAST
 #endif
 

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.11 1998-01-15 16:16:23 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.12 1998-01-16 08:24:03 Singular Exp $ */
 
 /***************************************************************
  *
@@ -25,7 +25,7 @@
  *
  ***************************************************************/
 
-// EXPONENT_TYPE is determined by configure und defined in mod2.h 
+// EXPONENT_TYPE is determined by configure und defined in mod2.h
 typedef EXPONENT_TYPE Exponent_t;
 
 #define VARS (100)   /*max. number of variables as constant*/
@@ -40,34 +40,37 @@ struct  spolyrec
   poly      next;
   number    coef;
   Order_t   Order;
+  #ifdef TEST_MAC_DEBUG
+  Order_t   MOrder;
+  #endif
   monomial  exp;
 };
 
 /***************************************************************
  * MACROS CONTROLING MONOMIAL COMPARIONS:
 
- * COMP_TRADITIONAL 
+ * COMP_TRADITIONAL
      Keeps the traditional comparison routines
      defined -- needed as long as their might be comparisons with
      negativ components.
      All the traditional routines are prefixed by t_
-     
- * COMP_FAST 
+
+ * COMP_FAST
      Implements monomial operations using the fast vector
      techniques and several other extensions which go along with that.
-     Undefine in case there are problems. 
-     
- * COMP_STATISTIC  
+     Undefine in case there are problems.
+
+ * COMP_STATISTIC
      Provides several routines for accumulating statistics on monomial
      comparisons and divisibility tests
-     
- * COMP_DEBUG 
+
+ * COMP_DEBUG
      Turns on debugging of COMP_FAST by comparing the results of fast
      comparison with traditional comparison
 
  * COMP_NO_EXP_VECTOR_OPS
     Like COMP_FAST, except that it turns off "vector techniques" of
-    monomial operations, i.e. does everything exponent-wise. 
+    monomial operations, i.e. does everything exponent-wise.
  ***************************************************************/
 // #define COMP_FAST
 // #define COMP_DEBUG
@@ -106,7 +109,11 @@ struct  spolyrec
  ***************************************************************/
 
 // size of poly without exponents
+#ifdef TEST_MAC_DEBUG
+#define POLYSIZE (sizeof(poly) + sizeof(number) + 2*sizeof(Order_t))
+#else
 #define POLYSIZE (sizeof(poly) + sizeof(number) + sizeof(Order_t))
+#endif
 #define POLYSIZEW (POLYSIZE / sizeof(long))
 // number of Variables
 extern int pVariables;
@@ -170,7 +177,7 @@ extern int pVarHighIndex;
 #define _pExpIndex(i)                           \
   (pVarOffset == -1 ? (i) - 1 : pVarOffset - (i))
 #define _pRingExpIndex(r, i)                           \
-  ((r)->VarOffset == -1 ? (i) - 1 : (r)->VarOffset - (i))   
+  ((r)->VarOffset == -1 ? (i) - 1 : (r)->VarOffset - (i))
 
 #else // ! WORDS_BIGENDIAN
 
@@ -183,7 +190,7 @@ extern int pVarHighIndex;
    (r)->VarOffset - (i) : (r)->VarOffset + (i))
 
 #endif // WORDS_BIGENDIAN
-    
+
 inline void pGetVarIndicies_Lex(int nvars,
                                 int &VarOffset, int &VarCompIndex,
                                 int &VarLowIndex, int &VarHighIndex)
@@ -234,10 +241,10 @@ inline void pGetVarIndicies_RevLex(int nvars,
  pGetVarIndicies_RevLex(nvars,pVarOffset,pCompIndex,pVarLowIndex,pVarHighIndex)
 
 // The default settings:
-inline void pGetVarIndicies(int nvars, 
+inline void pGetVarIndicies(int nvars,
                             int &VarOffset, int &VarCompIndex,
                             int &VarLowIndex, int &VarHighIndex)
-{   
+{
   pGetVarIndicies_Lex(nvars,VarOffset,VarCompIndex,VarLowIndex,VarHighIndex);
 }
 
@@ -249,15 +256,15 @@ extern void pGetVarIndicies(ring r,
 #define pSetVarIndicies(nvars) \
   pGetVarIndicies(nvars, pVarOffset, pCompIndex, pVarLowIndex, pVarHighIndex)
 
-    
+
 #else  // ! COMP_FAST
 #define _pExpIndex(i)       (i)
-#define _pRingExpIndex(r,i) (i)    
+#define _pRingExpIndex(r,i) (i)
 #endif // COMP_FAST
 
 /***************************************************************
  *
- * Primitives for accessing and seeting fields of a poly 
+ * Primitives for accessing and seeting fields of a poly
  *
  ***************************************************************/
 #define _pNext(p)           ((p)->next)
@@ -375,19 +382,19 @@ while(0)
 #define _pCopy1(A)      pDBCopy1(A, __FILE__,__LINE__)
 #define _pHead(A)       pDBHead(A,__FILE__,__LINE__)
 #define _pHead0(A)      pDBHead0(A, __FILE__,__LINE__)
-#ifdef COMP_FAST  
+#ifdef COMP_FAST
 #define _pFetchCopy(r,A)    pDBFetchCopy(r, A,__FILE__,__LINE__)
 #else
 #define _pFetchCopy(r,p)    pOrdPolyInsertSetm(pCopy(p))
 #endif
-  
+
 #else // ! MDEBUG
 
 #define _pNew()         (poly) mmAllocSpecialized()
 // #define _pNew() _pInit()
 
 #include <string.h>
-  
+
 inline poly    _pInit(void)
 {
   poly p=(poly)mmAllocSpecialized();
@@ -418,18 +425,18 @@ extern poly    _pFetchCopy(ring r,poly a);
 
 #ifdef DO_PROFILE
 
-#ifndef POLYS_IMPL_CC  
+#ifndef POLYS_IMPL_CC
 #define DECLARE(type, arglist) type arglist; \
    static type dummy_##arglist
 #else
-#define DECLARE(type, arglist) type arglist 
+#define DECLARE(type, arglist) type arglist
 #endif // POLYS_IMPL_CC
 
 #else //! DO_PROFILE
 
-#define DECLARE(type, arglist ) inline type arglist 
+#define DECLARE(type, arglist ) inline type arglist
 
-#endif // DO_PROFILE 
+#endif // DO_PROFILE
 
 
 /***************************************************************
@@ -439,8 +446,8 @@ extern poly    _pFetchCopy(ring r,poly a);
  ***************************************************************/
 
 #ifdef COMP_FAST
-  
-// nice declaration isn't it ??  
+
+// nice declaration isn't it ??
 #if defined(PDEBUG) && PDEBUG == 1
 #define pMonAddFast(p1, p2)  pDBMonAddFast(p1, p2, __FILE__, __LINE__)
 extern  void pDBMonAddFast(poly p1, poly p2, char* f, int l);
@@ -453,7 +460,7 @@ inline void _pMonAddFast(poly p1, poly p2)
   // dirty: the following only works correctly if all exponents are
   // positive and the sum of two exponents does not exceed
   // EXPONENT_MAX
-#ifndef COMP_NO_EXP_VECTOR_OPS  
+#ifndef COMP_NO_EXP_VECTOR_OPS
   Exponent_t c2 = _pGetComp(p2);
   int i = pVariables1W;
   unsigned long* s1 = (unsigned long*) &(p1->exp[0]);
@@ -465,7 +472,7 @@ inline void _pMonAddFast(poly p1, poly p2)
   Exponent_pt s1 = &(p1->exp[pVarLowIndex]);
   Exponent_pt s2 = &(p2->exp[pVarLowIndex]);
 #endif
-  
+
   for (;;)
   {
     *s1 += *s2;
@@ -477,7 +484,10 @@ inline void _pMonAddFast(poly p1, poly p2)
 #ifndef COMP_NO_EXP_VECTOR_OPS
   // reset comp of p2
   _pSetComp(p2, c2);
-#endif  
+#endif
+#ifdef TEST_MAC_ORDER
+  if (bNoAdd) bSetm(p1);else
+#endif
   _pGetOrder(p1) += _pGetOrder(p2);
 }
 
@@ -503,14 +513,14 @@ inline void __pCopyAddFast(poly p1, poly p2, poly p3)
   const Exponent_t* s2 = (Exponent_t*) &(p2->exp[pVarLowIndex]);
   const Exponent_t* s3 = (Exponent_t*) &(p3->exp[pVarLowIndex]);
   const Exponent_t* const ub = s3 + pVariables;
-// need to zero the "fill in" slots (i.e., empty exponents)  
+// need to zero the "fill in" slots (i.e., empty exponents)
 #ifdef  WORDS_BIG_ENDIAN
   *((unsigned long*) p1 + pMonomSize -1) = 0;
 #else
   *((unsigned long *) p1->exp) = 0;
-#endif  
-#endif  
-  
+#endif
+#endif
+
   for (;;)
   {
     *s1 = *s2 + *s3;
@@ -522,11 +532,14 @@ inline void __pCopyAddFast(poly p1, poly p2, poly p3)
   // we first are supposed to do a copy from p2 to p1 -- therefore,
   // component of p1 is set to comp of p2
   _pSetComp(p1, _pGetComp(p2));
+  #ifdef TEST_MAC_ORDER
+  if (bNoAdd) bSetm(p1);else
+  #endif
   _pGetOrder(p1) = _pGetOrder(p2) + _pGetOrder(p3);
 }
 
 // Similar to pCopyAddFast, except that we assume that the component
-// of p2 and p3 is zero component 
+// of p2 and p3 is zero component
 #if defined(PDEBUG) && PDEBUG == 1
 #define _pCopyAddFast1(p1, p2, p3)  pDBCopyAddFast(p1, p2, p3, __FILE__, __LINE__)
 extern  void pDBCopyAddFast(poly p1, poly p2, poly p3, char* f, int l);
@@ -552,8 +565,8 @@ inline void __pCopyAddFast1(poly p1, poly p2, poly p3)
   *((unsigned long*) p1 + pMonomSize -1) = 0;
 #else
   *((unsigned long *) p1->exp) = 0;
-#endif  
-#endif  
+#endif
+#endif
 
   for (;;)
   {
@@ -563,6 +576,9 @@ inline void __pCopyAddFast1(poly p1, poly p2, poly p3)
     s1++;
     s2++;
   }
+  #ifdef TEST_MAC_ORDER
+  if (bNoAdd) bSetm(p1);else
+  #endif
   _pGetOrder(p1) = _pGetOrder(p2) + _pGetOrder(p3);
 }
 
@@ -594,7 +610,7 @@ DECLARE(BOOLEAN, __pDivisibleBy(poly a, poly b))
   const unsigned long* s1;
   const unsigned long* s2;
   const unsigned long* lb;
-  
+
 #ifdef WORDS_BIGENDIAN
   lb = (unsigned long*) &(a->exp[0]);
   if (pVariables & ((SIZEOF_LONG / SIZEOF_EXPONENT) - 1))
@@ -611,7 +627,7 @@ DECLARE(BOOLEAN, __pDivisibleBy(poly a, poly b))
     s1 = ((unsigned long*) a) + pMonomSizeW -2;
     s2 = ((unsigned long*) b) + pMonomSizeW -2;
   }
-#else // !WORDS_BIGENDIAN 
+#else // !WORDS_BIGENDIAN
   lb = ((unsigned long*) a) + pMonomSizeW;
   if (pVariables & ((SIZEOF_LONG / SIZEOF_EXPONENT) - 1))
   {
@@ -623,7 +639,7 @@ DECLARE(BOOLEAN, __pDivisibleBy(poly a, poly b))
     s1 = (unsigned long*) &(a->exp[0]) + 1;
     s2 = (unsigned long*) &(b->exp[0]) + 1;
   }
-#endif  
+#endif
   for (;;)
   {
 // O.K. -- and now comes a bit of magic. The following _really_
@@ -639,7 +655,7 @@ DECLARE(BOOLEAN, __pDivisibleBy(poly a, poly b))
     s1++;
     if (s1 == lb) return TRUE;
     s2++;
-#endif    
+#endif
   }
 }
 
@@ -659,7 +675,7 @@ DECLARE(BOOLEAN, __pDivisibleBy(poly a, poly b))
     if (s1 == lb) return TRUE;
     s2--;
   }
-  
+
 #else // !WORDS_BIGENDIAN
   const Exponent_t* s1 = &(a->exp[pVarLowIndex]);
   const Exponent_t* s2 = &(b->exp[pVarLowIndex]);
@@ -712,10 +728,10 @@ extern  BOOLEAN pDBDivisibleBy2(poly p1, poly p2, char* f, int l);
 #define _pDivisibleBy2(a,b) __pDivisibleBy(a,b)
 #endif // defined(PDEBUG) && PDEBUG == 1
 
-  
+
 DECLARE(BOOLEAN, _pEqual(poly p1, poly p2))
 {
-#ifndef COMP_NO_EXP_VECTOR_OPS  
+#ifndef COMP_NO_EXP_VECTOR_OPS
   const long *s1 = (long*) &(p1->exp[0]);
   const long *s2 = (long*) &(p2->exp[0]);
   const long* const lb = s1 + pVariables1W;
@@ -724,7 +740,7 @@ DECLARE(BOOLEAN, _pEqual(poly p1, poly p2))
   const Exponent_t *s2 = (Exponent_t*) &(p2->exp[pVarLowIndex]);
   const Exponent_t* const lb = s1 + pVariables;
   if (_pGetComp(p1) != _pGetComp(p2)) return FALSE;
-#endif  
+#endif
 
   for(;;)
   {
@@ -786,12 +802,11 @@ DECLARE(BOOLEAN, _pDivisibleBy(poly a, poly b))
 #define _pDivisibleBy2(a,b) _pDivisibleBy(a,b)
 
 #ifdef TEST_MAC_ORDER
-extern pSetmProc pSetm;
 DECLARE(void, pMonAddFast(poly a, poly m))
 {
   for(int ii =pVariables; ii; ii--) (a)->exp[ii] += (m)->exp[ii];\
-  if (bNoAdd) pSetm(a);
-  else _pGetOrder(a) += _pGetOrder(m);
+  if (bNoAdd) bSetm(a); else
+  _pGetOrder(a) += _pGetOrder(m);
 }
 #else
 DECLARE(void, pMonAddFast(poly a, poly m))
@@ -829,7 +844,7 @@ DECLARE(int, __pExpQuerSum2(poly p, int from, int to))
 {
   int j = p->exp[from];
   int i = from + 1;
-  
+
   for(;;)
   {
     if (i > to) return j;
@@ -845,7 +860,7 @@ DECLARE(int, __pExpQuerSum2(poly p, int from, int to))
  (_pHasReverseExp ? \
     __pExpQuerSum2(p, _pExpIndex(to), _pExpIndex(1)) : \
     __pExpQuerSum2(p, _pExpIndex(1), _pExpIndex(to)))
- 
+
 #define _pExpQuerSum2(p,from,to) \
  (_pHasReverseExp ? \
     __pExpQuerSum2(p, _pExpIndex(to), _pExpIndex(from)) : \
@@ -857,6 +872,6 @@ DECLARE(int, __pExpQuerSum2(poly p, int from, int to))
 #define _pExpQuerSum2(p, from, to)  __pExpQuerSum2(p, from, to)
 
 #endif
-           
+
 #endif // POLYS_IMPL_H
 

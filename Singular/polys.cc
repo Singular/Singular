@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.13 1998-01-12 18:59:54 obachman Exp $ */
+/* $Id: polys.cc,v 1.14 1998-01-16 08:24:04 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -116,7 +116,7 @@ static void setlex1(poly p)
 */
 static void setlex2(poly p)
 {
-  p->Order = (((Order_t)pGetExp(p,1))<<(sizeof(short)*8))
+  p->Order = (((Order_t)pGetExp(p,1))<<(sizeof(Exponent_t)*8))
     + (Order_t)pGetExp(p,2); 
 }
 

@@ -1,3 +1,6 @@
+Fri Jan 16 09:23:07 MET 1998
+        * changes for TEST_MAC_ORDER, part 1 (hannes)
+
 Wed Jan 14 15:36:04 1998  Olaf Bachmann  <obachman@mathematik.uni-kl.de>
 
 	* polys-impl.h (pMonAddFast): fixed handling of component
