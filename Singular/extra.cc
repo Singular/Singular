@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.14 1997-07-09 15:53:51 Singular Exp $ */
+/* $Id: extra.cc,v 1.15 1997-07-10 13:02:35 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -510,6 +510,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
         WerrorS("ideal expected");
     }
     else
+#ifdef HAVE_MPSR
 /*==================== ftest =============================*/
     if(strcmp((char*)(h->Data()),"ftest")==0)
     {
@@ -545,6 +546,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
+#endif    
 /*============================================================*/
       WerrorS("not implemented\n");
   }
