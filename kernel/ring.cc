@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.23 2004-10-13 10:50:37 levandov Exp $ */
+/* $Id: ring.cc,v 1.24 2004-10-15 17:40:30 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3517,6 +3517,16 @@ static int rRealloc1(ring r, ring src, int size, int pos)
   size++;
   return size;
 }
+static int rReallocM1(ring r, ring src, int size, int pos)
+{
+  r->order=(int*)omReallocSize(r->order, size*sizeof(int), (size-1)*sizeof(int));
+  r->block0=(int*)omReallocSize(r->block0, size*sizeof(int), (size-1)*sizeof(int));
+  r->block1=(int*)omReallocSize(r->block1, size*sizeof(int), (size-1)*sizeof(int));
+  r->wvhdl=(int_ptr*)omReallocSize(r->wvhdl,size*sizeof(int_ptr), (size-1)*sizeof(int_ptr));
+  for(int k=pos+1; k<size; k++) r->wvhdl[k]=r->wvhdl[k+1];
+  size--;
+  return size;
+}
 static void rOppWeight(int *w, int l)
 {
   int i2=(l+1)/2;
@@ -3706,7 +3716,25 @@ ring rOpposite(ring src)
         }
         j++;
         break;
-      } 
+      }
+      case ringorder_a: /*  a(...),ls -> wp/dp */
+      { 
+        r->block0[j]=rOppVar(r, src->block1[i]);
+        r->block1[j]=rOppVar(r, src->block0[i]);
+        rOppWeight(r->wvhdl[j], r->block1[j]-r->block0[j]);
+        if (src->order[i+1]==ringorder_ls)
+        {
+          r->order[j]=ringorder_wp;
+          i++;
+          l=rReallocM1(r,src,l,j);
+        }
+        else
+        {
+          r->order[j]=ringorder_a;
+        }
+        j++;
+        break;
+      }
       // not yet done:
       case ringorder_ls:
       case ringorder_ds:
