@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.44 1998-12-09 11:20:54 krueger Exp $ */
+/* $Id: iplib.cc,v 1.45 1998-12-09 16:40:23 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -619,9 +619,9 @@ BOOLEAN iiTryLoadLib(leftv v, char *id)
       }
     }
   }
+  FreeL(libname);
 #else /* HAVE_NAMESPACES */
 #endif /* HAVE_NAMESPACES */
-  FreeL(libname);
   return LoadResult;
 }
 
