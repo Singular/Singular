@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.11 1999-05-17 13:15:40 Singular Exp $ */
+/* $Id: numbers.cc,v 1.12 1999-05-29 14:31:30 obachman Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -384,6 +384,7 @@ void nSetChar(ring r, BOOLEAN complete)
 #endif
     }
   }
+  else
   /* -------------- long C -----------------------*/
   else if (rField_is_long_C(r))
   {
