@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Get.h,v 1.7 1999-09-27 15:05:27 obachman Exp $ */
+/* $Id: mpsr_Get.h,v 1.8 1999-10-14 14:27:24 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.h
@@ -22,6 +22,9 @@
 #include "ipid.h"
 
 #include"mpsr.h"
+#if HAVE_ASO == 1
+#include "mpsr_Get.aso"
+#endif
 
 
 

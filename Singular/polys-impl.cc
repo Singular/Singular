@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.26 1999-09-30 14:09:39 obachman Exp $ */
+/* $Id: polys-impl.cc,v 1.27 1999-10-14 14:27:27 obachman Exp $ */
 
 /***************************************************************
  *
@@ -233,19 +233,6 @@ poly _pFetchCopyDelete(ring r, poly p)
 
 
 /*2
-* create a new monomial and init
-*/
-#ifdef MDEBUG
-poly pDBInit(memHeap heap, char * f, int l)
-{
-  poly p=pDBNew(heap, f,l);
-  memset(p,0, pMonomSize);
-  nNew(&(p->coef));
-  return p;
-}
-#endif
-
-/*2
 * delete a poly, resets pointer
 * put the monomials in the freelist
 */
@@ -332,7 +319,7 @@ poly _pCopy(memHeap d_h, poly s_p)
   poly d_p = &dp;
 
   assume(d_h != NULL && (d_h == mm_specHeap) ||
-         mmGetHeapBlockSize(d_h) == mmGetHeapBlockSize(mm_specHeap));
+         d_h->size == mm_specHeap->size);
 
   while (s_p != NULL)
   {
@@ -375,7 +362,7 @@ poly _pShallowCopyDelete(memHeap d_h, poly *p, memHeap s_h)
   poly s_p = *p;
 
   assume(d_h != NULL && s_h != NULL &&
-         mmGetHeapBlockSize(d_h) == mmGetHeapBlockSize(s_h));
+         d_h->size == s_h->size);
 
   if (currRing->ExpLSize <= 2)
   {
@@ -521,7 +508,7 @@ poly _pHead(memHeap heap, poly p)
   if (p!=NULL)
   {
     assume(heap != NULL && (heap == mm_specHeap) ||
-           mmGetHeapBlockSize(heap) == mmGetHeapBlockSize(mm_specHeap));
+           heap->size == mm_specHeap->size);
 
 #ifdef MDEBUG
     w = (poly) mmDBAllocHeap(heap, f, l);
@@ -547,7 +534,7 @@ poly _pShallowCopyDeleteHead(memHeap d_h, poly *s_p, memHeap s_h)
   if (p!=NULL)
   {
     assume(d_h != NULL && s_h != NULL &&
-           mmGetHeapBlockSize(d_h) == mmGetHeapBlockSize(s_h));
+           d_h->size == s_h->size);
 
 #ifdef MDEBUG
     w = (poly) mmDBAllocHeap(d_h, f, l);
@@ -1128,16 +1115,23 @@ static unsigned long GetBitFields(Exponent_t e,
 
 // Short Exponent Vectors are used for fast divisibility tests
 // ShortExpVectors "squeeze" an exponent vector into one word as follows:
-// Let n = BIT_SIZEOF_LONG / pVariables, then each exponent is
+// Let n = BIT_SIZEOF_LONG / pVariables.
+// If n == 0 (i.e. pVariables > BIT_SIZE_OF_LONG), let m == the number
+// of non-zero exponents. If (m>BIT_SIZEOF_LONG), then sev = ~0, else
+// first m bits of sev are set to 1.
+// Otherwise (i.e. pVariables <= BIT_SIZE_OF_LONG)
 // represented by a bit-field of length n (resp. n+1 for some
 // exponents). If the value of an exponent is greater or equal to n, then
 // all of its respective n bits are set to 1. If the value of an exponent
 // is smaller than n, say m, then only the first m bits of the respective
-// n bits are set to 1, the others are set to 0. This way, we have:
+// n bits are set to 1, the others are set to 0. 
+// This way, we have:
 // exp1 / exp2 ==> (ev1 & ~ev2) == 0, i.e.,
 // if (ev1 & ~ev2) then exp1 does not divide exp2
 unsigned long pGetShortExpVector(poly p)
 {
+  assume(p != NULL);
+  if (p == NULL) return 0;
   unsigned long ev = 0; // short exponent vector
   unsigned int n = BIT_SIZEOF_LONG / pVariables; // number of bits per exp
   unsigned int m1; // highest bit which is filled with (n+1)
@@ -1145,8 +1139,13 @@ unsigned long pGetShortExpVector(poly p)
 
   if (n == 0)
   {
-    n = 1;
-    m1 = 0;
+    for (; j<=(unsigned long) pVariables; j++)
+    {
+      if (pGetExp(p,j) > 0) i++;
+      if (i == BIT_SIZEOF_LONG) break;
+    }
+    ev = (unsigned long) ~0 >> ((unsigned long) (BIT_SIZEOF_LONG - i));
+    return ev;
   }
   else
   {
@@ -1171,12 +1170,16 @@ unsigned long pGetShortExpVector(poly p)
   return ev;
 }
 
-#ifdef PDEBUG
+#ifdef PDIV_DEBUG
+static int pDivisibleBy_number = 1;
+static int pDivisibleBy_FALSE = 1;
+static int pDivisibleBy_ShortFalse = 1;
+static int pDivisibleBy_Null = 1;
 BOOLEAN pDBShortDivisibleBy(poly p1, unsigned long sev_1,
                             poly p2, unsigned long not_sev_2, 
                             char* f, int l)
 {
-  if (pGetShortExpVector(p1) != sev_1)
+  if (sev_1 != 0 && pGetShortExpVector(p1) != sev_1)
   {
     Warn("sev1 is %o but should be %o in %s:%d\n", sev_1, 
           pGetShortExpVector(p1), f, l);
@@ -1188,17 +1191,30 @@ BOOLEAN pDBShortDivisibleBy(poly p1, unsigned long sev_1,
           ~ pGetShortExpVector(p2), f, l);
     assume(0);
   }
+  if (sev_1 == 0) pDivisibleBy_Null++;
+  pDivisibleBy_number++;
+  BOOLEAN ret = pDivisibleBy(p1, p2);
+  if (! ret) pDivisibleBy_FALSE++;
   if (sev_1 & not_sev_2)
   {
-    if (pDivisibleBy(p1, p2))
+    pDivisibleBy_ShortFalse++;
+    if (ret)
     {
       Warn("p1 divides p2, but sev's are wrong in %s:%d\n", f, l);
       assume(0);
-      return TRUE;
     }
-    return FALSE;
   }
-  return pDivisibleBy(p1, p2);
+  return ret;
+}
+
+void pPrintDivisbleByStat()
+{
+  Print("#Tests: %d; #FALSE %d(%d); #SHORT %d(%d) #NULL:%d(%d)\n",
+        pDivisibleBy_number, 
+        pDivisibleBy_FALSE, pDivisibleBy_FALSE*100/pDivisibleBy_number,
+        pDivisibleBy_ShortFalse, pDivisibleBy_ShortFalse*100/pDivisibleBy_FALSE,
+        pDivisibleBy_Null, pDivisibleBy_Null*100/pDivisibleBy_number);
+
 }
 #endif
 

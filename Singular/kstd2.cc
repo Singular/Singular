@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.33 1999-10-01 17:18:25 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.34 1999-10-14 14:27:12 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -51,6 +51,7 @@ static void redSyz (LObject* h,kStrategy strat)
   int j = 0,i=0,pos;
   BOOLEAN exchanged=pDivisibleBy((*h).p2,(*h).p1);
   poly p,q;
+  unsigned long not_sev;
 
   if (exchanged)
   {
@@ -82,9 +83,10 @@ static void redSyz (LObject* h,kStrategy strat)
   {
     i = 0;
     j = strat->sl + 1;
+    not_sev = ~ PGetShortExpVector(h->p);
     while (i <= strat->tl)
     {
-      if (K_DIVISIBLE_BY(strat->T[i], h->p))
+      if (pShortDivisibleBy(strat->T[i], strat->T[i].sev, h->p, not_sev))
       {
         if ((!exchanged) && (pEqual((*h).p,strat->T[i].p)))
         {
@@ -198,6 +200,7 @@ static void redSyz (LObject* h,kStrategy strat)
   int j = 0,i=0,pos;
   BOOLEAN exchanged=pDivisibleBy((*h).p2,(*h).p1);
   poly p,q;
+  unsigned long not_sev;
 
   if (exchanged)
   {
@@ -225,9 +228,11 @@ static void redSyz (LObject* h,kStrategy strat)
     PrintS("red:");
     wrp(h->p);
   }
+  h->sev = pGetShortExpVector(h->p);
+  not_sev = ~ h->sev;
   loop
   {
-    if (pDivisibleBy(strat->S[j],(*h).p))
+    if (pShortDivisibleBy(strat->S[j], strat->sevS[j], h->p, not_sev))
     {
       if ((!exchanged) && (pEqual((*h).p,strat->S[j])))
       {
@@ -244,9 +249,11 @@ static void redSyz (LObject* h,kStrategy strat)
             pCleardenom((*h).p);// also does a pContent
           }
           strat->S[j] = (*h).p;
+          strat->sevS[j] = ~ not_sev;
           (*h).p = p;
+          h->sev = strat->sevS[j];
           while ((i<=strat->tl) && (strat->T[i].p!=p)) i++;
-          if (i<=strat->tl) strat->T[i].p = strat->S[j];
+          if (i<=strat->tl) strat->T[i].SetP(strat->S[j]);
           for (i=0;i<=strat->Ll;i++)
           {
             if (strat->L[i].p1==p) strat->L[i].p1=strat->S[j];
@@ -276,6 +283,8 @@ static void redSyz (LObject* h,kStrategy strat)
       }
 /*- try to reduce the s-polynomial -*/
       j = 0;
+      h->sev = pGetShortExpVector(h->p);
+      not_sev = ~ h->sev;
     }
     else
     {
@@ -340,13 +349,16 @@ static void redHomog (LObject* h,kStrategy strat)
   }
 #endif
   int j;
+  unsigned long not_sev;
   while (1)
   {
     j = 0;
-    K_INIT_SHORT_EVECTOR(h->p);
+    h->sev = pGetShortExpVector(h->p);
+    not_sev = ~ h->sev;
     while ( j <= strat->tl)
     {
-      if (K_DIVISIBLE_BY(strat->T[j], h->p)) break;
+      if (pShortDivisibleBy(strat->T[j].p, strat->T[j].sev, 
+                            h->p, not_sev)) break;
       j++;
     }
 
@@ -401,13 +413,18 @@ static void redLazy (LObject* h,kStrategy strat)
   int j = 0;
   int pass = 0;
   int reddeg = pFDeg((*h).p);
+  int not_sev;
 
+  h->sev = pGetShortExpVector(h->p);
+  not_sev = ~ h->sev;
   while (1)
   {
     j = 0;
     while (j <= strat->tl)
     {
-      if (pDivisibleBy1(strat->T[j].p,(*h).p)) break;
+      if (pShortDivisibleBy(strat->T[j].p,strat->T[j].sev,
+                            h->p, not_sev))
+          break;
       j++;
     }
 
@@ -443,6 +460,8 @@ static void redLazy (LObject* h,kStrategy strat)
 #endif
       return;
     }
+    h->sev = pGetShortExpVector(h->p);
+    not_sev = ~ h->sev;
     /*- try to reduce the s-polynomial -*/
     pass++;
     d = pFDeg((*h).p);
@@ -461,7 +480,8 @@ static void redLazy (LObject* h,kStrategy strat)
             return;
           }
         }
-        while (!pDivisibleBy1(strat->S[i],(*h).p));
+        while (!pShortDivisibleBy(strat->S[i], strat->sevS[i], 
+                                  h->p, not_sev));
         if (TEST_OPT_DEBUG) Print(" ->L[%d]\n",at);
         enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
         (*h).p = NULL;
@@ -491,21 +511,25 @@ static void redHoney (LObject*  h,kStrategy strat)
 
   poly pi;
   int i,j,at,reddeg,d,pass,ei, ii;
+  unsigned long not_sev;
 
   pass = j = 0;
   d = reddeg = pFDeg((*h).p)+(*h).ecart;
+  h->sev = pGetShortExpVector(h->p);
+  not_sev = ~ h->sev;
   loop
   {
     j = 0;
-    K_INIT_SHORT_EVECTOR(h->p);
     while (j<= strat->tl)
     {
-      if (K_DIVISIBLE_BY(strat->T[j], h->p)) break;
+      if (pShortDivisibleBy(strat->T[j].p, strat->T[j].sev, 
+                            h->p, not_sev)) break;
       j++;
     }
 
     if (j > strat->tl)
     {
+      h->sev = ~ not_sev;
       if (TEST_OPT_INTSTRATEGY)
       {
         pCleardenom(h->p);// also does a pContent
@@ -531,7 +555,9 @@ static void redHoney (LObject*  h,kStrategy strat)
         break;
       if ((!BTEST1(20)) && (ei <= (*h).ecart))
         break;
-      if ((strat->T[i].ecart < ei) && pDivisibleBy(strat->T[i].p,(*h).p))
+      if ((strat->T[i].ecart < ei) && 
+          pShortDivisibleBy(strat->T[i].p, strat->T[i].sev,
+                            h->p, not_sev))
       {
         /*
          * the polynomial to reduce with is now;
@@ -599,6 +625,8 @@ static void redHoney (LObject*  h,kStrategy strat)
 #endif
       return;
     }
+    h->sev = pGetShortExpVector(h->p);
+    not_sev = ~ h->sev;
     /* compute the ecart */
     if (ei <= (*h).ecart)
       (*h).ecart = d-pFDeg((*h).p);
@@ -628,7 +656,8 @@ static void redHoney (LObject*  h,kStrategy strat)
             enterTBba((*h),at,strat);
             return;
           }
-        } while (!pDivisibleBy(strat->S[i],(*h).p));
+        } while (!pShortDivisibleBy(strat->S[i], strat->sevS[i], 
+                                    h->p, not_sev));
         enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
         if (TEST_OPT_DEBUG)
           Print(" degree jumped: -> L%d\n",at);
@@ -774,14 +803,16 @@ static poly redNF (poly h,kStrategy strat)
 {
   int j = 0;
   int z = 3;
+  unsigned long not_sev;
 
   if (0 > strat->sl)
   {
     return h;
   }
+  not_sev = ~ pGetShortExpVector(h);
   loop
   {
-    if (pDivisibleBy1(strat->S[j],h))
+    if (pShortDivisibleBy(strat->S[j], strat->sevS[j], h, not_sev))
     {
       //if (strat->interpt) test_int_std(strat->kIdeal);
       /*- compute the s-polynomial -*/
@@ -808,6 +839,7 @@ static poly redNF (poly h,kStrategy strat)
       }
       /*- try to reduce the s-polynomial -*/
       j = 0;
+      not_sev = ~ pGetShortExpVector(h);
     }
     else
     {
@@ -1050,7 +1082,10 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
     p = redtailBba(p,strat->sl,strat);
   }
   /*- release temp data------------------------------- -*/
-  Free((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
+  if (strat->ecartS != NULL)
+    Free((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
+  if (strat->sevS != NULL)
+    Free((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
   idDelete(&strat->Shdl);
   test=save_test;
   if (TEST_OPT_PROT) PrintLn();
@@ -1102,7 +1137,10 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
     //  res->m[i]=NULL;
   }
   /*- release temp data------------------------------- -*/
-  Free((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
+  if (strat->ecartS != NULL)
+    Free((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
+  if (strat->sevS != NULL)
+    Free((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
   idDelete(&strat->Shdl);
   test=save_test;
   if (TEST_OPT_PROT) PrintLn();
@@ -1135,7 +1173,7 @@ ideal stdred(ideal F, ideal Q, tHomog h,intvec ** w)
   ideal r;
   BOOLEAN b=pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
-  kStrategy strat=(kStrategy)Alloc0(sizeof(skStrategy));
+  kStrategy strat=(kStrategy)Alloc0SizeOf(skStrategy);
 
   if (rField_has_simple_inverse())
     strat->LazyPass=20;
@@ -1188,7 +1226,7 @@ ideal stdred(ideal F, ideal Q, tHomog h,intvec ** w)
     pFDeg = pOldFDeg;
   }
   pLexOrder = b;
-  Free((ADDRESS)strat,sizeof(skStrategy));
+  FreeSizeOf((ADDRESS)strat,skStrategy);
   if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
   idSkipZeroes(r);
   return r;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat0.cc,v 1.8 1999-04-26 12:57:58 Singular Exp $ */
+/* $Id: longrat0.cc,v 1.9 1999-10-14 14:27:16 obachman Exp $ */
 /*
 * ABSTRACT -
 * IO for long rational numbers (Hubert Grassmann)
@@ -53,10 +53,10 @@ char * nlRead (char *s, number *a)
     *a = nlInit(1);
     return s;
   }
-  *a=(number)Alloc(sizeof(rnumber));
+  *a=(number)AllocSizeOf(rnumber);
   {
     (*a)->s = 3;
-#ifdef LDEBUG
+#if defined(LDEBUG) && ! defined(HAVE_ASO)
     (*a)->debug=123456;
 #endif
     MP_INT *z=&((*a)->z);
@@ -93,7 +93,7 @@ char * nlRead (char *s, number *a)
       && (mpz_cmp_si(&(*a)->z,(long)ui)==0))
       {
         mpz_clear(&(*a)->z);
-        Free((ADDRESS)(*a),sizeof(rnumber));
+        FreeSizeOf((ADDRESS)(*a),rnumber);
         (*a)=INT_TO_SR(ui);
       }
     }

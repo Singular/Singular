@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.h,v 1.36 1999-09-30 14:09:40 obachman Exp $ */
+/* $Id: polys-impl.h,v 1.37 1999-10-14 14:27:28 obachman Exp $ */
 
 /***************************************************************
  *
@@ -17,7 +17,6 @@
  ***************************************************************/
 #include "structs.h"
 #include "mmemory.h"
-#include "mmheap.h"
 
 /***************************************************************
  *
@@ -72,6 +71,7 @@ extern int *pVarOffset;
 // extern int pVarLowIndex;
 // extern int pVarHighIndex;
 // extern int pVarCompIndex;
+extern memHeap mm_specHeap;
 
 /***************************************************************
  *
@@ -197,9 +197,16 @@ inline void _pSetExpV(poly p, Exponent_t *ev)
  * Storage Managament Routines
  *
  ***************************************************************/
-#ifdef MDEBUG
+#define _pNew(h)            (poly) AllocHeap(h)
+#define _pInit(h)           (poly) Alloc0Heap(h)
+#define _pFree1(a, h)       FreeHeap((void*) a, h)
+#define _pRingFree1(r, a)   FreeHeap((void*) a, r->mm_specHeap)
 
-poly    pDBInit(memHeap h, char *f, int l);
+#ifdef MDEBUG
+#define pDBNew(h, f, l)   (poly) mmDBAllocHeap(h, f, l)
+#define pDBInit(h, f, l)  (poly) mmDBAlloc0Heap(h, f, l)
+#define pDBFree1(a,h,f,l)   mmDBFreeHeap((void*)a, h, f, l)
+
 poly    pDBCopy(poly a, char *f, int l);
 poly    pDBCopy(memHeap h, poly a, char *f, int l);
 poly    pDBCopy1(poly a, char *f, int l);
@@ -217,12 +224,6 @@ poly    pDBShallowCopyDelete(memHeap d_h,poly *s_p,memHeap s_h, char *f,int l);
 void    pDBDelete(poly * a, memHeap h, char * f, int l);
 void    pDBDelete1(poly * a, memHeap h, char * f, int l);
 
-#define pDBNew(h, f,l)  (poly) mmDBAllocHeap(h, f,l)
-#define _pNew(h)        (poly) mmDBAllocHeap(h, __FILE__, __LINE__)
-#define _pInit(h)       (poly) pDBInit(h, __FILE__,__LINE__)
-
-#define pDBFree1(a,h,f,l)   mmDBFreeHeap((void*)a, h, f, l)
-#define _pFree1(a, h)       mmDBFreeHeap((void*)a, h, __FILE__, __LINE__)
 
 #define _pDelete(a, h)     pDBDelete((a),h, __FILE__,__LINE__)
 #define _pDelete1(a, h)    pDBDelete1((a),h, __FILE__,__LINE__)
@@ -242,29 +243,11 @@ void    pDBDelete1(poly * a, memHeap h, char * f, int l);
 #define _pFetchHead(r,A)        pDBFetchHead(r, A,__FILE__,__LINE__)
 #define _pFetchHeadDelete(r,A)  pDBFetchHeadDelete(r, A,__FILE__,__LINE__)
 
-#define _pRingFree1(r, A)      pDBFreeHeap(A,r->mm_specHeap,__FILE__,__LINE__)
 #define _pRingDelete1(r, A)     pDBDelete1(A,r->mm_specHeap,__FILE__,__LINE__)
 #define _pRingDelete(r, A)      pDBDelete(A,r->mm_specHeap,__FILE__, __LINE__)
 
 #else // ! MDEBUG
 
-inline poly _pNew(memHeap h)
-{
-  poly p;
-  AllocHeap(p, h);
-  return p;
-}
-
-inline poly    _pInit(memHeap h)
-{
-  poly p;
-  AllocHeap(p, h);
-  memsetW((long *)p,0, pMonomSizeW);
-  return p;
-}
-
-#define _pFree1(a, h)       FreeHeap(a, h)
-#define _pRingFree1(r, a)   FreeHeap(a, r->mm_specHeap)
 #define _pRingDelete1(r, A) _pDelete1(A, r->mm_specHeap)
 #define _pRingDelete(r, A)  _pDelete(A, r->mm_specHeap)
 
@@ -500,7 +483,13 @@ DECLARE(BOOLEAN, _pEqual(poly p1, poly p2))
  *
  ***************************************************************/
 // Divisiblity tests based on Short Exponent Vectors
-#ifdef PDEBUG
+// define to enable debugging of this
+#define PDIV_DEBUG
+#if defined(PDEBUG) && ! defined(PDIV_DEBUG)
+#define PDIV_DEBUG
+#endif
+
+#ifdef PDIV_DEBUG
 #define _pShortDivisibleBy(a, sev_a, b, not_sev_b) \
   pDBShortDivisibleBy(a, sev_a, b, not_sev_b, __FILE__, __LINE__)
 BOOLEAN pDBShortDivisibleBy(poly p1, unsigned long sev_1,

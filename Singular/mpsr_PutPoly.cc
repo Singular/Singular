@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_PutPoly.cc,v 1.16 1999-09-27 15:05:28 obachman Exp $ */
+/* $Id: mpsr_PutPoly.cc,v 1.17 1999-10-14 14:27:26 obachman Exp $ */
 
 /***************************************************************
  *
@@ -427,7 +427,7 @@ static mpsr_Status_t PutProtoTypeAnnot(MP_Link_pt link, ring r,
   {
     // alg numbers
     // create temporary ring for describing the coeeficient domain
-    ring alg_r = (ring) Alloc0(sizeof(sip_sring));
+    ring alg_r = (ring) Alloc0SizeOf(sip_sring);
 
     alg_r->N = rPar(r);
     alg_r->ch = rChar(r);
@@ -458,7 +458,7 @@ static mpsr_Status_t PutProtoTypeAnnot(MP_Link_pt link, ring r,
 
     // destroy temporary ring
     Free(alg_r->order, 3*sizeof(int));
-    Free(alg_r, sizeof(sip_sring));
+    FreeSizeOf(alg_r, sip_sring);
   }
 
   // second element is the exponent vector

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.18 1999-08-30 17:24:59 Singular Exp $ */
+/* $Id: ipconv.cc,v 1.19 1999-10-14 14:27:08 obachman Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -101,14 +101,12 @@ static void * iiDummy(void *data)
 static void * iiMo2Ma(void *data)
 {
   void *res=idModule2Matrix((ideal)data);
-  idDelete((ideal *)&data);
   return res;
 }
 
 static void * iiMa2Mo(void *data)
 {
   void *res=idMatrix2Module((matrix)data);
-  idDelete((ideal *)&data);
   return res;
 }
 
@@ -174,7 +172,7 @@ static void * iiN2Ma(void *data)
 
 static void * iiS2Link(void *data)
 {
-  si_link l=(si_link)Alloc0(sizeof(ip_link));
+  si_link l=(si_link)Alloc0SizeOf(ip_link);
   slInit(l, (char *) data);
   FreeL((ADDRESS)data);
   return (void *)l;

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.26 1999-06-28 16:06:30 Singular Exp $ */
+/* $Id: pcv.cc,v 1.27 1999-10-14 14:27:27 obachman Exp $ */
 /*
 * ABSTRACT: conversion between polys and coef vectors
 */
@@ -29,7 +29,7 @@ static unsigned** pcvIndex=NULL;
 
 lists pcvLAddL(lists l1,lists l2)
 {
-  lists l0=(lists)Alloc(sizeof(slists));
+  lists l0=(lists)AllocSizeOf(slists);
   int i=l1->nr;
   if(l1->nr<l2->nr) i=l2->nr;
   l0->Init(i+1);
@@ -54,7 +54,7 @@ lists pcvLAddL(lists l1,lists l2)
 
 lists pcvPMulL(poly p,lists l1)
 {
-  lists l0=(lists)Alloc(sizeof(slists));
+  lists l0=(lists)AllocSizeOf(slists);
   l0->Init(l1->nr+1);
   for(int i=l1->nr;i>=0;i--)
   {
@@ -288,7 +288,7 @@ poly pcvCV2P(poly cv,int d0,int d1)
 
 lists pcvP2CV(lists pl,int d0,int d1)
 {
-  lists cvl=(lists)Alloc(sizeof(slists));
+  lists cvl=(lists)AllocSizeOf(slists);
   cvl->Init(pl->nr+1);
   pcvInit(d1);
   for(int i=pl->nr;i>=0;i--)
@@ -305,7 +305,7 @@ lists pcvP2CV(lists pl,int d0,int d1)
 
 lists pcvCV2P(lists cvl,int d0,int d1)
 {
-  lists pl=(lists)Alloc(sizeof(slists));
+  lists pl=(lists)AllocSizeOf(slists);
   pl->Init(cvl->nr+1);
   pcvInit(d1);
   for(int i=cvl->nr;i>=0;i--)
@@ -433,7 +433,7 @@ lists pcvBasis(int d0,int d1)
 {
   if(d0<0) d0=0;
   if(d1<0) d1=0;
-  lists b=(lists)Alloc(sizeof(slists));
+  lists b=(lists)AllocSizeOf(slists);
   b->Init(pcvDim(d0,d1));
   poly m=pOne();
   for(int d=d0,i=0;d<d1;d++)

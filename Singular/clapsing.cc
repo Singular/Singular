@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.54 1999-09-17 11:42:22 Singular Exp $
+// $Id: clapsing.cc,v 1.55 1999-10-14 14:26:58 obachman Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -438,7 +438,7 @@ lists singclap_extgcd ( poly f, poly g )
     WerrorS( feNotImplemented );
     return NULL;
   }
-  lists L=(lists)Alloc(sizeof(slists));
+  lists L=(lists)AllocSizeOf(slists);
   L->Init(3);
   L->m[0].rtyp=POLY_CMD;
   L->m[0].data=(void *)res;
@@ -599,7 +599,7 @@ void singclap_divide_content ( poly f )
         lnumber c=(lnumber)pGetCoeff(p);
         napDelete(&c->z);
         #ifdef LDEBUG
-        number nt=(number)Alloc0(sizeof(rnumber));
+        number nt=(number)Alloc0SizeOf(rnumber);
         lnumber nnt=(lnumber)nt;
         nnt->z=convClapPSingTr( i.getItem());
         nTest(nt);
@@ -1141,7 +1141,7 @@ BOOLEAN jjFAC_P(leftv res, leftv u)
   #ifdef MDEBUG
   v->ivTEST();
   #endif
-  lists l=(lists)Alloc(sizeof(slists));
+  lists l=(lists)AllocSizeOf(slists);
   l->Init(2);
   l->m[0].rtyp=IDEAL_CMD;
   l->m[0].data=(void *)f;
@@ -1163,7 +1163,7 @@ BOOLEAN jjSQR_FREE_DEC(leftv res, leftv u,leftv dummy)
     case 0:
     case 2:
     {
-      lists l=(lists)Alloc(sizeof(slists));
+      lists l=(lists)AllocSizeOf(slists);
       l->Init(2);
       l->m[0].rtyp=IDEAL_CMD;
       l->m[0].data=(void *)f;

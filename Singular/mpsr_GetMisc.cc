@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_GetMisc.cc,v 1.17 1999-09-27 13:53:43 obachman Exp $ */
+/* $Id: mpsr_GetMisc.cc,v 1.18 1999-10-14 14:27:25 obachman Exp $ */
 
 /***************************************************************
  *
@@ -71,10 +71,10 @@ ring mpsr_rDefault(short ch)
 
 static ring rDefault(short ch, char *name)
 {
-  ring r = (ring) Alloc0(sizeof(sip_sring));
+  ring r = (ring) Alloc0SizeOf(sip_sring);
   r->ch = ch;
   r->N = 1;
-  r->names = (char **) Alloc(sizeof(char *));
+  r->names = (char **) AllocSizeOf(char_ptr);
   r->names[0] = mstrdup(name);
 
   r->wvhdl = (int **)Alloc0(3 * sizeof(int *));
@@ -401,11 +401,11 @@ void mpsr_DeleteExternalData(MPT_ExternalData_t edata)
     if (mlv->lv != NULL)
     {
       mlv->lv->CleanUp();
-      Free(mlv->lv, sizeof(sleftv));
+      FreeSizeOf(mlv->lv, sleftv);
     }
     if (mlv->r != NULL) rKill(mlv->r);
   }
-  Free(mlv, sizeof(mpsr_sleftv));
+  FreeSizeOf(mlv, mpsr_sleftv);
 }
 
 void mpsr_CopyExternalData(MPT_ExternalData_t *dest,
@@ -415,9 +415,9 @@ void mpsr_CopyExternalData(MPT_ExternalData_t *dest,
 
   if (slv != NULL)
   {
-    dlv = (mpsr_leftv) Alloc0(sizeof(mpsr_sleftv));
+    dlv = (mpsr_leftv) Alloc0SizeOf(mpsr_sleftv);
     dlv->r = rCopy(slv->r);
-    dlv->lv = (leftv) Alloc0(sizeof(sleftv));
+    dlv->lv = (leftv) Alloc0SizeOf(sleftv);
     if (slv->lv != NULL) dlv->lv->Copy(slv->lv);
     else dlv->lv = NULL;
 

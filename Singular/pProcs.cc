@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: pProcs.cc,v 1.6 1999-10-01 19:34:19 obachman Exp $ */
+/* $Id: pProcs.cc,v 1.7 1999-10-14 14:27:26 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for primitive poly arithmetic
 */
@@ -182,7 +182,7 @@ poly  p_Mult_m_General(poly p,
   {
     while (p != NULL)
     {
-      AllocHeap(pNext(q), heap);
+      pNext(q) = AllocHeap(heap);
       q = pNext(q);
       pSetCoeff0(q, nMult(ln, pGetCoeff(p)));
     
@@ -196,7 +196,7 @@ poly  p_Mult_m_General(poly p,
     poly r;
     while (p != NULL)
     {
-      AllocHeap(r, heap);
+      r = AllocHeap(heap);
       assume(pGetComp(m) == 0 || pGetComp(p) == 0);
       pMonAdd(r, p, m);
 
@@ -265,7 +265,7 @@ poly p_Minus_m_Mult_q_General (poly p,
 
   if (p == NULL) goto Finish;       // we are done if p is 0
   
-  AllocHeap(qm, heap);
+  qm = AllocHeap(heap);
   assume(pGetComp(q) == 0 || pGetComp(m) == 0);
   pMonAdd(qm, q, m);
   
@@ -312,7 +312,7 @@ poly p_Minus_m_Mult_q_General (poly p,
         goto Finish; 
       }
       // construct new qm 
-      AllocHeap(qm, heap);
+      qm = AllocHeap(heap);
       assume(pGetComp(q) == 0 || pGetComp(m) == 0);
       pMonAdd(qm, q, m);
       goto Top;

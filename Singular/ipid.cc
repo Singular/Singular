@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.34 1999-09-27 17:54:55 Singular Exp $ */
+/* $Id: ipid.cc,v 1.35 1999-10-14 14:27:08 obachman Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -119,7 +119,7 @@ idhdl idrec::get(const char * s, int lev)
 idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
 {
   //printf("define %s, %x, lev: %d, typ: %d\n", s,s,lev,t);
-  idhdl h = (idrec *)Alloc0(sizeof(idrec));
+  idhdl h = (idrec *)Alloc0SizeOf(idrec);
   int   len = 0;
   IDID(h)   = s;
   IDTYP(h)  = t;
@@ -154,7 +154,7 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
         IDSTRING(h) = mstrdup("");
         break;
       case LIST_CMD:
-        IDLIST(h)=(lists)Alloc(sizeof(slists));
+        IDLIST(h)=(lists)AllocSizeOf(slists);
         IDLIST(h)->Init();
         break;
     //the types with the standard init: set the struct to zero
@@ -494,7 +494,7 @@ void killhdl(idhdl h, idhdl * ih)
   {
     IDLIST(h)->Clean();
     //Free((ADDRESS)IDLIST(h)->m, (IDLIST(h)->nr+1)*sizeof(sleftv));
-    //Free((ADDRESS)IDLIST(h), sizeof(slists));
+    //FreeSizeOf((ADDRESS)IDLIST(h), slists);
   }
   // link  -------------------------------------------------------------
   else if (IDTYP(h)==LINK_CMD)
@@ -541,7 +541,7 @@ void killhdl(idhdl h, idhdl * ih)
       hh = hhh;
     }
   }
-  Free((ADDRESS)h,sizeof(idrec));
+  FreeSizeOf((ADDRESS)h,idrec);
 }
 
 idhdl ggetid(const char *n, BOOLEAN local, idhdl *packhdl)
@@ -620,7 +620,7 @@ lists ipNameList(idhdl root)
   int l=0;
   while (h!=NULL) { l++; h=IDNEXT(h); }
   /* allocate list */
-  lists L=(lists)Alloc(sizeof(slists));
+  lists L=(lists)AllocSizeOf(slists);
   L->Init(l);
   /* copy names */
   h=root;
@@ -734,7 +734,7 @@ BOOLEAN piKill(procinfov pi)
   }
   piCleanUp(pi);
   if (pi->ref <= 0)
-    Free((ADDRESS)pi, sizeof(procinfo));
+    FreeSizeOf((ADDRESS)pi, procinfo);
   return FALSE;
 }
 
@@ -775,7 +775,7 @@ BOOLEAN paKill(package pack, BOOLEAN force_top)
     }
     if(checkPackage(pack)) {
       paCleanUp(pack);
-      Free((ADDRESS)pack, sizeof(sip_package));
+      FreeSizeOf((ADDRESS)pack, sip_package);
     } else return FALSE;
   } else paCleanUp(pack);
   return TRUE;
@@ -851,7 +851,7 @@ char *getnamelev()
 namehdl namerec::push(package pack, char *name, int nesting, BOOLEAN init)
 {
   //printf("PUSH: put entry (%s) on stack\n", name);
-  namehdl ns = (namerec *)Alloc0(sizeof(namerec));
+  namehdl ns = (namerec *)Alloc0SizeOf(namerec);
   extern int myynest;
   if(nesting<0) nesting = myynest;
   ns->next   = this;
@@ -864,7 +864,7 @@ namehdl namerec::push(package pack, char *name, int nesting, BOOLEAN init)
   {
     ns->next    = NULL;
 #ifdef HAVE_NAMESPACES
-    ns->pack    = (ip_package *)Alloc0(sizeof(ip_package));
+    ns->pack    = (ip_package *)Alloc0SizeOf(ip_package);
 #endif /* HAVE_NAMESPACES */
     ns->isroot  = TRUE;
     ns->lev     = 1;
@@ -893,7 +893,7 @@ namehdl namerec::push(package pack, char *name, int nesting, BOOLEAN init)
     idhdl pl = enterid( mstrdup("Top"),0, PACKAGE_CMD,
                       &NSROOT(namespaceroot), TRUE );
     if(pl != NULL) {
-      Free((ADDRESS)IDPACKAGE(pl), sizeof(ip_package));
+      FreeSizeOf((ADDRESS)IDPACKAGE(pl), ip_package);
       IDPACKAGE(pl) = ns->pack;
     }
   }
@@ -917,7 +917,7 @@ namehdl namerec::pop(BOOLEAN change_nesting)
   ns = this;
   namespaceroot = this->next;
   FreeL((ADDRESS)ns->name);
-  Free((ADDRESS)ns, sizeof(namerec));
+  FreeSizeOf((ADDRESS)ns, namerec);
   return(namespaceroot);
 }
 

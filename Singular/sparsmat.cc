@@ -1,13 +1,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.12 1999-10-06 13:06:39 pohl Exp $ */
+/* $Id: sparsmat.cc,v 1.13 1999-10-14 14:27:31 obachman Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
 */
 
 #include "mod2.h"
+#include "structs.h"
 #include "tok.h"
 #include "febase.h"
 #include "structs.h"
@@ -31,17 +32,6 @@
 #define SM_DIV smSpecialPolyDiv
 #endif
 /* ----------------- general definitions ------------------ */
-
-/* elements of a 'sparse' matrix in SINGULAR */
-typedef struct smprec sm_prec;
-typedef sm_prec * smpoly;
-struct smprec{
-  smpoly n;            // the next element
-  int pos;             // position
-  int e;               // level
-  poly m;              // the element
-  float f;             // complexity of the element
-};
 
 /* declare internal 'C' stuff */
 static void smExactPolyDiv(poly, poly);
@@ -234,7 +224,7 @@ poly smCallDet(ideal I)
 
 lists smCallBareiss(ideal I, int x, int y)
 {
-  lists res=(lists)Alloc(sizeof(slists));
+  lists res=(lists)AllocSizeOf(slists);
   ideal II = idCopy(I);
   sparse_mat *bareiss = new sparse_mat(II);
   intvec *v;
@@ -243,7 +233,7 @@ lists smCallBareiss(ideal I, int x, int y)
   idDelete(&II);
   if (bareiss->smGetAct() == NULL)
   {
-    Free((ADDRESS)res, sizeof(slists));
+    FreeSizeOf((ADDRESS)res, slists);
     return NULL;
   }
   bareiss->smBareiss(x, y);
@@ -263,7 +253,7 @@ lists smCallNewBareiss(ideal I, int x, int y)
 {
   ring origR;
   sip_sring tmpR;
-  lists res=(lists)Alloc(sizeof(slists));
+  lists res=(lists)AllocSizeOf(slists);
   ideal II=smRingCopy(I,&origR,tmpR);
   sparse_mat *bareiss = new sparse_mat(II);
   ideal mm=II;
@@ -335,8 +325,8 @@ sparse_mat::sparse_mat(ideal smat)
   wcl = (float *)Alloc(sizeof(float)*i);
   m_act = (smpoly *)Alloc(sizeof(smpoly)*i);
   m_res = (smpoly *)Alloc0(sizeof(smpoly)*i);
-  dumm = (smpoly)Alloc(sizeof(smprec));
-  m_res[0] = (smpoly)Alloc(sizeof(smprec));
+  dumm = (smpoly)AllocSizeOf(smprec);
+  m_res[0] = (smpoly)AllocSizeOf(smprec);
   m_res[0]->m = NULL;
   pmat = smat->m;
   for(i=ncols; i; i--)
@@ -355,8 +345,8 @@ sparse_mat::~sparse_mat()
 {
   int i;
   if (m_act == NULL) return;
-  Free((ADDRESS)m_res[0], sizeof(smprec));
-  Free((ADDRESS)dumm, sizeof(smprec));
+  FreeSizeOf((ADDRESS)m_res[0], smprec);
+  FreeSizeOf((ADDRESS)dumm, smprec);
   i = ncols+1;
   Free((ADDRESS)m_res, sizeof(smpoly)*i);
   Free((ADDRESS)m_act, sizeof(smpoly)*i);
@@ -408,7 +398,7 @@ poly sparse_mat::smDet()
   if (act < 2)
   {
     if (act != 0) res = m_act[1]->m;
-    Free((void *)m_act[1], sizeof(smprec));
+    FreeSizeOf((void *)m_act[1], smprec);
     return res;
   }
   normalize = 0;
@@ -432,7 +422,7 @@ poly sparse_mat::smDet()
     this->smFinalMult();
     this->smPivDel();
     if (act != 0) res = m_act[1]->m;
-    Free((void *)m_act[1], sizeof(smprec));
+    FreeSizeOf((void *)m_act[1], smprec);
     return res;
   }
   loop
@@ -458,7 +448,7 @@ poly sparse_mat::smDet()
       this->smFinalMult();
       this->smPivDel();
       if (act != 0) res = m_act[1]->m;
-      Free((void *)m_act[1], sizeof(smprec));    
+      FreeSizeOf((void *)m_act[1], smprec);    
       return res;
     }
   }
@@ -2100,13 +2090,13 @@ static void smElemDelete(smpoly *r)
   smpoly a = *r, b = a->n;
 
   pDelete(&a->m);
-  Free((void *)a, sizeof(smprec));
+  FreeSizeOf((void *)a, smprec);
   *r = b;
 }
 
 static smpoly smElemCopy(smpoly a)
 {
-  smpoly r = (smpoly)Alloc(sizeof(smprec));
+  smpoly r = (smpoly)AllocSizeOf(smprec);
 
   memcpy(r, a, sizeof(smprec));
 /*  r->m = pCopy(r->m); */
@@ -2125,7 +2115,7 @@ static smpoly smPoly2Smpoly(poly q)
 
   if (q == NULL)
     return NULL;
-  a = res = (smpoly)Alloc(sizeof(smprec));
+  a = res = (smpoly)AllocSizeOf(smprec);
   a->pos = x = pGetComp(q);
   a->m = q;
   a->e = 0;
@@ -2141,7 +2131,7 @@ static smpoly smPoly2Smpoly(poly q)
     }
     if (pGetComp(q) != x)
     {
-      a = a->n = (smpoly)Alloc(sizeof(smprec));
+      a = a->n = (smpoly)AllocSizeOf(smprec);
       pNext(pp) = NULL;
       a->pos = x = pGetComp(q);
       a->m = q;
@@ -2176,7 +2166,7 @@ static poly smSmpoly2Poly(smpoly a)
   {
     b = a;
     a = a->n;
-    Free((void *)b, sizeof(smprec));
+    FreeSizeOf((void *)b, smprec);
     if (a == NULL)
       return res;
     x = a->pos;

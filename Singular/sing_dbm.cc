@@ -4,7 +4,7 @@
 
 //**************************************************************************/
 //
-// $Id: sing_dbm.cc,v 1.10 1998-10-14 10:18:55 obachman Exp $
+// $Id: sing_dbm.cc,v 1.11 1999-10-14 14:27:30 obachman Exp $
 //
 //**************************************************************************/
 //  'sing_dbm.cc' containes command to handle dbm-files under
@@ -12,13 +12,14 @@
 //
 //**************************************************************************/
 
+#  include <stdio.h>
+#  include <fcntl.h>
+#  include <errno.h>
+
 #include "mod2.h"
 
 #ifdef HAVE_DBM
 
-#  include <stdio.h>
-#  include <fcntl.h>
-#  include <errno.h>
 #  include "tok.h"
 #  include "febase.h"
 #  include "mmemory.h"
@@ -97,7 +98,7 @@ leftv dbRead2(si_link l, leftv key)
       d_key.dptr = (char*)key->Data();
       d_key.dsize = strlen(d_key.dptr)+1;
       d_value = dbm_fetch(db->db, d_key);
-      v=(leftv)Alloc0(sizeof(sleftv));
+      v=(leftv)Alloc0SizeOf(sleftv);
       if (d_value.dptr!=NULL) v->data=mstrdup(d_value.dptr);
       else                    v->data=mstrdup("");
       v->rtyp=STRING_CMD;
@@ -114,7 +115,7 @@ leftv dbRead2(si_link l, leftv key)
     else
       d_value = dbm_nextkey((DBM *)db->db);
 
-    v=(leftv)Alloc0(sizeof(sleftv));
+    v=(leftv)Alloc0SizeOf(sleftv);
     v->rtyp=STRING_CMD;
     if (d_value.dptr!=NULL)
     {

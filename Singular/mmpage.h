@@ -19,7 +19,6 @@ void mmFreePage(void* page);
 
 void mmReleaseFreePages();
 
-extern int mm_bytesValloc;
 int mmGetNumberOfFreePages();
 int mmGetNumberOfUsedPages();
 int mmGetNumberOfAllocatedPages();
@@ -28,8 +27,6 @@ int mmGetNumberOfAllocatedPages();
  *
  * Macros for page manipulations
  */
-
-#ifdef HAVE_PAGE_ALIGNMENT
 
 #define mmIsAddrPageAligned(addr) \
   (((long) (addr) & (SIZE_OF_SYSTEM_PAGE -1)) == 0)
@@ -45,21 +42,5 @@ int mmGetNumberOfAllocatedPages();
 int mmIsAddrOnFreePage(void* addr);
 
 #define mmIsNotAddrOnFreePage(addr) (!mmIsAddrOnFreePage(addr))
-
-#else /* ! HAVE_PAGE_ALIGNMENT */
-
-#define mmIsAddrPageAligned(addr) 1
-
-#define mmGetPageOfAddr(addr) (addr)
-
-#define mmIsAddrOnPage(addr, page) 1
-
-#define mmAreAddrOnSamePage(a1, a2) 1
-
-#define mmIsAddrOnFreePage(addr) 1
-
-#define mmIsNotAddrOnFreePage(addr) 1
-#endif
-
 
 #endif /* MMPAGE_H */

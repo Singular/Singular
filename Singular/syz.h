@@ -3,11 +3,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.h,v 1.18 1999-09-29 10:59:41 obachman Exp $ */
+/* $Id: syz.h,v 1.19 1999-10-14 14:27:34 obachman Exp $ */
 /*
 * ABSTRACT: Resolutions
 */
 #include "structs.h"
+#if HAVE_ASO == 1
+#include "syz.aso"
+#endif
 
 struct sSObject{
                  poly  p;

@@ -504,7 +504,11 @@ char * showOption()
 
 char * versionString()
 {
-  char* str = StringSetS("\t");
+  char* str = StringSetS("");
+  StringAppend("Singular for %s version %s  (%lu)  %s %s\nwith\n",
+               S_UNAME, S_VERSION1,
+               feVersionId,__DATE__,__TIME__);
+  StringAppend("\t");
 #ifdef HAVE_FACTORY
               StringAppend("factory(%s),", factoryVersion);
 #endif
@@ -581,5 +585,6 @@ char * versionString()
 
               feStringAppendResources(0);
               feStringAppendBrowsers(0);
+              StringAppend("\n");
               return str;
 }

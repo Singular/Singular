@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.76 1999-09-29 10:59:43 obachman Exp $ */
+/* $Id: tesths.cc,v 1.77 1999-10-14 14:27:35 obachman Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -157,9 +157,18 @@ int main(          /* main entry to Singular */
   if (fe_optind < argc)
   {
     int i = argc - 1;
+    FILE *fd;
     while (i >= fe_optind)
     {
-      newFile(argv[i]);
+      if ((fd = feFopen(argv[i], "r")) == NULL)
+      {
+        Warn("Can not open %s", argv[i]);
+      }
+      else
+      {
+        fclose(fd);
+        newFile(argv[i]);
+      }
       i--;
     }
   }

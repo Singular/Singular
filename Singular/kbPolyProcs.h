@@ -3,9 +3,8 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbPolyProcs.h,v 1.3 1999-09-27 14:33:26 obachman Exp $ */
+/* $Id: kbPolyProcs.h,v 1.4 1999-10-14 14:27:10 obachman Exp $ */
 #include "mod2.h"
-#include "mmheap.h"
 #include "ring.h"
 #include "kutil.h"
 

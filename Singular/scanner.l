@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.21 1999-07-20 12:29:50 Singular Exp $ */
+/* $Id: scanner.l,v 1.22 1999-10-14 14:27:29 obachman Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -72,7 +72,7 @@ letter         [@a-zA-Z\']
 integer        {digit}+
 monom          {letter}+{digit}*
 rgvars         ({digit}+[/])*{digit}+{monom}+
-realnum        {digit}+"."{digit}+("e"[+-]{digit}+)?
+realnum        {digit}*"."{digit}+("e"[+-]{digit}+)?
 name           ({letter}({letter}*{digit}*_*)*|_)
 parname        #
 
@@ -266,7 +266,7 @@ newline                  {
                            lvalp->name = (char *)yytext;
                            return RINGVAR;
                          }
-\$                       {
+\$                        {
                            m2_end(-1);
                          }
 (quit|exit)[ \t\n]*[\.;]?  {
@@ -285,7 +285,15 @@ newline                  {
                            lvalp->name = (char *)yytext;
                            return RINGVAR;
                          }
-
+[0-9]+\."e"[+-][0-9]+    { 
+                           lvalp->name = (char *)yytext;
+                           return RINGVAR;
+                         }
+[0-9]+\./[^\.]           {
+                           lvalp->name = (char *)yytext;
+                           return RINGVAR;
+                         }
+       
 ({parname}|{name})       {
                            /* {name} */
                            int rc=0;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.38 1999-09-30 14:09:36 obachman Exp $ */
+/* $Id: kutil.cc,v 1.39 1999-10-14 14:27:13 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -149,6 +149,11 @@ inline static intset initec (int maxnr)
   return (intset)Alloc(maxnr*sizeof(int));
 }
 
+inline static unsigned long* initsevS (int maxnr)
+{
+  return (unsigned long*)Alloc0(maxnr*sizeof(unsigned long));
+}
+
 static inline void enlargeT (TSet* T,int* length,int incr)
 {
   *T = (TSet)ReAlloc0((ADDRESS)(*T),(*length)*sizeof(TObject),
@@ -260,14 +265,14 @@ BOOLEAN K_Test_L(char *f , int l, LObject *L,
   {
     if (! pDBTest(L->p, L->heap, f, l))
     {
-      Print("for L->p\n");
+      Warn("for L->p\n");
       ret = FALSE;
     }
   }
   
   if (L->pLength != 0 && L->pLength != pLength(L->p))
   {
-    Print("L[%d] length error: has %d, specified to have %d\n",
+    Warn("L[%d] length error: has %d, specified to have %d\n",
           lpos, pLength(L->p), L->pLength);
     ret = FALSE;
   }
@@ -284,14 +289,14 @@ BOOLEAN K_Test_L(char *f , int l, LObject *L,
       if (L->p1 == T[i].p) break;
     if (i>=tlength)
     {
-      Print("L[%d].p1 not in T \n",lpos);
+      Warn("L[%d].p1 not in T \n",lpos);
       ret = FALSE;
     }
     for (i=0; i<tlength; i++)
       if (L->p2 == T[i].p) break;
     if (i>=tlength)
     {
-      Print("L[%d].p2 not in T \n",lpos);
+      Warn("L[%d].p2 not in T \n",lpos);
       ret &= FALSE;
     }
   }
@@ -301,13 +306,25 @@ BOOLEAN K_Test_L(char *f , int l, LObject *L,
 BOOLEAN K_Test (char *f, int l, kStrategy strat, int pref)
 {
   int i;
-  BOOLEAN ret;
+  BOOLEAN ret = TRUE;
   // test P
+#ifdef MDEBUG
+    if (pref) mmStartReferenceWatch();
+#endif
+  ret = K_Test_L(f, l, &(strat->P),
+                 (strat->P.p != NULL && pNext(strat->P.p) != strat->tail),
+                 -1, strat->T, strat->tl+1);
+
+  if (ret == FALSE)
+  {
+    Warn("for strat->P\n");
+  }
+  
   // test T
   if (strat->T != NULL)
   {
 #ifdef MDEBUG
-    mmStartReferenceWatch();
+    if (! pref) mmStartReferenceWatch();
 #endif
     for (i=0; i<=strat->tl; i++)
     {
@@ -316,22 +333,10 @@ BOOLEAN K_Test (char *f, int l, kStrategy strat, int pref)
         ret = FALSE;
       }
     }
-#ifdef MDEBUG
-    if (! pref) mmStopReferenceWatch();
-#endif
   }
-  ret = K_Test_L(f, l, &(strat->P),
-                 (strat->P.p != NULL && pNext(strat->P.p) != strat->tail),
-                 -1, strat->T, strat->tl+1);
-
 #ifdef MDEBUG
-  if (pref) mmStopReferenceWatch();
+  mmStopReferenceWatch();
 #endif
-  if (ret == FALSE)
-  {
-    Print("for strat->P\n");
-  }
-  
   // test L
   if (strat->L != NULL)
   {
@@ -339,41 +344,60 @@ BOOLEAN K_Test (char *f, int l, kStrategy strat, int pref)
     {
       if (strat->L[i].p == NULL)
       {
-        Print("L[%d].p is NULL\n", i);
+        Warn("L[%d].p is NULL\n", i);
         ret = FALSE;
       }
       if (K_Test_L(f, l, &(strat->L[i]), 
                    (pNext(strat->L[i].p) != strat->tail), i,
                    strat->T, strat->tl + 1) == FALSE)
       {
-        Print("for strat->L[%d]\n", i);
+        Warn("for strat->L[%d]\n", i);
         ret = FALSE;
       }
     }
   }
+  // test S
+  if (strat->S != NULL)
+    ret = ret &&  K_Test_S(f, l, strat);
 
   return ret;
 }
 
+BOOLEAN K_Test_S(char* f, int l, kStrategy strat)
+{
+  int i;
+  BOOLEAN ret = TRUE;
+  for (i=0; i<=strat->sl; i++)
+  {
+    if (strat->S[i] != NULL && strat->sevS[i] != 0 && strat->sevS[i] != 
+        pGetShortExpVector(strat->S[i]))
+    {
+      Warn("S[%d] wrong sev: has %o, specified to have %o in %s:%d\n",
+           i , pGetShortExpVector(strat->S[i]), strat->sevS[i],f, l);
+      ret = FALSE;
+    }
+  }
+  return ret;
+}
+      
+
 BOOLEAN K_Test_T(char* f, int l, TObject * T, int i)
 {
   BOOLEAN ret = pDBTest(T->p, T->heap, f, l);
-  if (ret == FALSE) Print("for T[%d]\n", i);
+  if (ret == FALSE) Warn("for T[%d]\n", i);
   if (T->pLength != 0 &&
       T->pLength != pLength(T->p))
   {
-    Print("T[%d] length error: has %d, specified to have %d in %s:%d\n",
+    Warn("T[%d] length error: has %d, specified to have %d in %s:%d\n",
           i , pLength(T->p), T->pLength,f, l);
     ret = FALSE;
   }
-#ifdef HAVE_SHORT_EVECTORS
   if (T->sev != 0 && pGetShortExpVector(T->p) != T->sev)
   {
-    Print("T[%d] wrong sev: has %o, specified to have %o in %s:%d\n",
+    Warn("T[%d] wrong sev: has %o, specified to have %o in %s:%d\n",
           i , pGetShortExpVector(T->p), T->sev,f, l);
     ret = FALSE;
   }
-#endif
   return ret;
 }
   
@@ -394,7 +418,7 @@ BOOLEAN K_Test_TS(char *f, int l, kStrategy strat)
         if (strat->S[i] == strat->T[j].p) break;
       if (j > strat->tl)
       {
-        Print("S[%d] not in T\n", i);
+        Warn("S[%d] not in T\n", i);
         ret = FALSE;
       }
     }
@@ -415,6 +439,7 @@ void deleteInS (int i,kStrategy strat)
   {
     strat->S[j] = strat->S[j+1];
     strat->ecartS[j] = strat->ecartS[j+1];
+    strat->sevS[j] = strat->sevS[j+1];
   }
   if (strat->fromQ!=NULL)
   {
@@ -496,7 +521,8 @@ void deleteInL (LSet set, int *length, int j,kStrategy strat)
 */
 void clearS (poly p, int* at, int* k,kStrategy strat)
 {
-  if (!pDivisibleBy(p,strat->S[*at])) return;
+  unsigned long sev = pGetShortExpVector(p);
+  if (!pShortDivisibleBy(p,sev, strat->S[*at], ~ strat->sevS[*at])) return;
   deleteInS((*at),strat);
   (*at)--;
   (*k)--;
@@ -1177,7 +1203,8 @@ void pairs (kStrategy strat)
       {
         j++;
         if (j > strat->sl) break;
-        if (pDivisibleBy(strat->S[i],strat->S[j]))
+        if (pShortDivisibleBy(strat->S[i], strat->sevS[i],
+                              strat->S[j], ~ strat->sevS[j]))
         {
         //  Print("delete %d=",j);
         //  wrp(strat->S[j]);
@@ -1203,6 +1230,7 @@ void reorderS (int* suc,kStrategy strat)
 {
   int i,j,at,ecart;
   int fq=0;
+  unsigned long sev;
   poly  p;
 
   *suc = -1;
@@ -1214,14 +1242,17 @@ void reorderS (int* suc,kStrategy strat)
       if ((*suc > at) || (*suc == -1)) *suc = at;
       p = strat->S[i];
       ecart = strat->ecartS[i];
+      sev = strat->sevS[i];
       if (strat->fromQ!=NULL) fq=strat->fromQ[i];
       for (j=i; j>=at+1; j--)
       {
         strat->S[j] = strat->S[j-1];
         strat->ecartS[j] = strat->ecartS[j-1];
+        strat->sevS[j] = strat->sevS[j-1];
       }
       strat->S[at] = p;
       strat->ecartS[at] = ecart;
+      strat->sevS[at] = sev;
       if (strat->fromQ!=NULL)
       {
         for (j=i; j>=at+1; j--)
@@ -2198,6 +2229,7 @@ poly redtail (poly p, int pos, kStrategy strat)
   poly h, hn;
   int j, e, l;
   int op;
+  unsigned long not_sev;
 
   if (strat->noTailReduction)
   {
@@ -2207,12 +2239,13 @@ poly redtail (poly p, int pos, kStrategy strat)
   hn = pNext(h);
   while(hn != NULL)
   {
+    not_sev = ~ pGetShortExpVector(hn);
     op = pFDeg(hn);
     e = pLDeg(hn,&l)-op;
     j = 0;
     while (j <= pos)
     {
-      if (pDivisibleBy(strat->S[j], hn)
+      if (pShortDivisibleBy(strat->S[j], strat->sevS[j], hn, not_sev)
       && ((e >= strat->ecartS[j])
         || strat->kHEdgeFound
         || ((Kstd1_deg>0)&&(op<=Kstd1_deg)))
@@ -2224,6 +2257,7 @@ poly redtail (poly p, int pos, kStrategy strat)
         {
           return p;
         }
+        not_sev = ~ pGetShortExpVector(hn);
         op = pFDeg(hn);
         e = pLDeg(hn,&l)-op;
         j = 0;
@@ -2247,6 +2281,7 @@ poly redtailBba (poly p, int pos, kStrategy strat)
 {
   poly h, hn;
   int j;
+  unsigned long not_sev;
   strat->redTailChange=FALSE;
 
   if (strat->noTailReduction)
@@ -2258,9 +2293,10 @@ poly redtailBba (poly p, int pos, kStrategy strat)
   while(hn != NULL)
   {
     j = 0;
+    not_sev = ~ pGetShortExpVector(hn);
     while (j <= pos)
     {
-      if (pDivisibleBy(strat->S[j], hn))
+      if (pShortDivisibleBy(strat->S[j], strat->sevS[j], hn, not_sev))
       {
         strat->redTailChange=TRUE;
         assume(p != strat->S[j]);
@@ -2270,6 +2306,7 @@ poly redtailBba (poly p, int pos, kStrategy strat)
         {
           return p;
         }
+        not_sev = ~ pGetShortExpVector(hn);
         j = 0;
       }
       else
@@ -2291,7 +2328,8 @@ poly redtailSyz (poly p, int pos, kStrategy strat)
 {
   poly h, hn;
   int j;
-
+  unsigned long not_sev;
+  
   if (strat->noTailReduction)
   {
     return p;
@@ -2301,9 +2339,11 @@ poly redtailSyz (poly p, int pos, kStrategy strat)
   while(hn != NULL)
   {
     j = 0;
+    not_sev = ~ pGetShortExpVector(hn);
     while (j <= pos)
     {
-      if (pDivisibleBy(strat->S[j], hn) && (!pEqual(strat->S[j],h)))
+      if (pShortDivisibleBy(strat->S[j], strat->sevS[j], hn, not_sev) 
+          && (!pEqual(strat->S[j],h)))
       {
         ksOldSpolyTail(strat->S[j], p, h, strat->kNoether);
         hn = pNext(h);
@@ -2311,6 +2351,7 @@ poly redtailSyz (poly p, int pos, kStrategy strat)
         {
           return p;
         }
+        not_sev = ~ pGetShortExpVector(hn);
         j = 0;
       }
       else
@@ -2418,6 +2459,7 @@ void initS (ideal F, ideal Q,kStrategy strat)
   else i=0;
   i=((i+IDELEMS(F)+15)/16)*16;
   strat->ecartS=initec(i);
+  strat->sevS=initsevS(i);
   strat->fromQ=NULL;
   strat->Shdl=idInit(i,F->rank);
   strat->S=strat->Shdl->m;
@@ -2453,6 +2495,7 @@ void initS (ideal F, ideal Q,kStrategy strat)
           {
             pos = posInS(strat->S,strat->sl,h.p);
           }
+          h.sev = pGetShortExpVector(h.p);
           strat->enterS(h,pos,strat);
           strat->fromQ[pos]=1;
         }
@@ -2492,6 +2535,7 @@ void initS (ideal F, ideal Q,kStrategy strat)
           {
             pos = posInS(strat->S,strat->sl,h.p);
           }
+          h.sev = pGetShortExpVector(h.p);
           strat->enterS(h,pos,strat);
         }
     }
@@ -2513,6 +2557,7 @@ void initSL (ideal F, ideal Q,kStrategy strat)
   else i=0;
   i=((i+16)/16)*16;
   strat->ecartS=initec(i);
+  strat->sevS=initsevS(i);
   strat->fromQ=NULL;
   strat->Shdl=idInit(i,F->rank);
   strat->S=strat->Shdl->m;
@@ -2548,6 +2593,7 @@ void initSL (ideal F, ideal Q,kStrategy strat)
           {
             pos = posInS(strat->S,strat->sl,h.p);
           }
+          h.sev = pGetShortExpVector(h.p);
           strat->enterS(h,pos,strat);
           strat->fromQ[pos]=1;
         }
@@ -2590,6 +2636,7 @@ void initSL (ideal F, ideal Q,kStrategy strat)
           {
             pos = strat->posInL(strat->L,strat->Ll,h,strat);
           }
+          h.sev = pGetShortExpVector(h.p);
           enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
         }
     }
@@ -2615,6 +2662,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
   else i=0;
   i=((i+IDELEMS(F)+15)/16)*16;
   strat->ecartS=initec(i);
+  strat->sevS=initsevS(i);
   strat->fromQ=NULL;
   strat->Shdl=idInit(i,F->rank);
   strat->S=strat->Shdl->m;
@@ -2651,6 +2699,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
           {
             pos = posInS(strat->S,strat->sl,h.p);
           }
+          h.sev = pGetShortExpVector(h.p);
           strat->enterS(h,pos,strat);
           strat->fromQ[pos]=1;
         }
@@ -2685,6 +2734,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
         {
           pos = posInS(strat->S,strat->sl,h.p);
         }
+        h.sev = pGetShortExpVector(h.p);
         strat->enterS(h,pos,strat);
         h.length = pLength(h.p);
         enterT(h,strat);
@@ -2729,6 +2779,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
           {
             pNorm(h.p);
           }
+          h.sev = pGetShortExpVector(h.p);
           pos = posInS(strat->S,strat->sl,h.p);
           enterpairsSpecial(h.p,strat->sl,h.ecart,pos,strat);
           strat->enterS(h,pos,strat);
@@ -2737,6 +2788,7 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
       }
       else
       {
+        h.sev = pGetShortExpVector(h.p);
         strat->enterS(h,0,strat);
         enterT(h,strat);
       }
@@ -2750,10 +2802,11 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
 static poly redBba1 (poly h,int maxIndex,kStrategy strat)
 {
   int j = 0;
-
+  unsigned long not_sev = ~ pGetShortExpVector(h);
+  
   while (j <= maxIndex)
   {
-    if (pDivisibleBy(strat->S[j],h))
+    if (pShortDivisibleBy(strat->S[j],strat->sevS[j],h, not_sev))
        return ksOldSpolyRedNew(strat->S[j],h,strat->kNoether);
     else j++;
   }
@@ -2820,16 +2873,17 @@ void cancelunit1 (LObject* p,int index,kStrategy strat )
 static poly redQ (poly h, int j, kStrategy strat)
 {
   int start;
-
+  unsigned long not_sev = ~ pGetShortExpVector(h);
   while ((j <= strat->sl) && (pGetComp(strat->S[j])!=0)) j++;
   start=j;
   while (j<=strat->sl)
   {
-    if (pDivisibleBy(strat->S[j],h))
+    if (pShortDivisibleBy(strat->S[j],strat->sevS[j], h, not_sev))
     {
       h = ksOldSpolyRed(strat->S[j],h,strat->kNoether);
       if (h==NULL) return NULL;
       j = start;
+      not_sev = ~ pGetShortExpVector(h);
     }
     else j++;
   }
@@ -2843,15 +2897,16 @@ static poly redQ (poly h, int j, kStrategy strat)
 static poly redBba (poly h,int maxIndex,kStrategy strat)
 {
   int j = 0;
+  unsigned long not_sev = ~ pGetShortExpVector(h);
 
   while (j <= maxIndex)
   {
-    if (pDivisibleBy(strat->S[j],h))
+    if (pShortDivisibleBy(strat->S[j],strat->sevS[j], h, not_sev))
     {
       h = ksOldSpolyRed(strat->S[j],h,strat->kNoether);
       if (h==NULL) return NULL;
       j = 0;
-    }
+      not_sev = ~ pGetShortExpVector(h);    }
     else j++;
   }
   return h;
@@ -2867,13 +2922,14 @@ static poly redMora (poly h,int maxIndex,kStrategy strat)
   int  j=0;
   int  e,l;
   poly h1;
+  unsigned long not_sev = ~ pGetShortExpVector(h);
 
   if (maxIndex >= 0)
   {
     e = pLDeg(h,&l)-pFDeg(h);
     do
     {
-      if (pDivisibleBy(strat->S[j],h)
+      if (pShortDivisibleBy(strat->S[j],strat->sevS[j], h, not_sev)
       && ((e >= strat->ecartS[j]) || strat->kHEdgeFound))
       {
         h1 = ksOldSpolyRedNew(strat->S[j],h,strat->kNoether);
@@ -2887,6 +2943,7 @@ static poly redMora (poly h,int maxIndex,kStrategy strat)
         h = h1;
         e = pLDeg(h,&l)-pFDeg(h);
         j = 0;
+        not_sev = ~ pGetShortExpVector(h);
       }
       else j++;
     }
@@ -2905,7 +2962,6 @@ void updateS(BOOLEAN toT,kStrategy strat)
   LObject h;
   int i, suc=0;
   poly redSi=NULL;
-
 //Print("nach initS: updateS start mit sl=%d\n",(strat->sl));
 //  for (i=0; i<=(strat->sl); i++)
 //  {
@@ -2960,6 +3016,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
             {
               pNorm(strat->S[i]);
             }
+            strat->sevS[i] = pGetShortExpVector(strat->S[i]);
           }
         }
         i++;
@@ -2982,6 +3039,9 @@ void updateS(BOOLEAN toT,kStrategy strat)
           strat->initEcart(&h);
           strat->ecartS[i] = h.ecart;
         }
+        if (strat->sevS[i] == 0) {strat->sevS[i] = pGetShortExpVector(h.p);}
+        else assume(strat->sevS[i] == pGetShortExpVector(h.p));
+        h.sev = strat->sevS[i];
         /*puts the elements of S also to T*/
         enterT(h,strat);
       }
@@ -3006,22 +3066,26 @@ void updateS(BOOLEAN toT,kStrategy strat)
             deleteInS(i,strat);
             i--;
           }
-          else if (TEST_OPT_INTSTRATEGY)
-          {
-            pDelete(&redSi);
-            //pContent(strat->S[i]);
-            pCleardenom(strat->S[i]);// also does a pContent
-            h.p = strat->S[i];
-            strat->initEcart(&h);
-            strat->ecartS[i] = h.ecart;
-          }
           else
           {
-            pDelete(&redSi);
-            pNorm(strat->S[i]);
-            h.p = strat->S[i];
-            strat->initEcart(&h);
-            strat->ecartS[i] = h.ecart;
+            if (TEST_OPT_INTSTRATEGY)
+            {
+              pDelete(&redSi);
+              pCleardenom(strat->S[i]);// also does a pContent
+              h.p = strat->S[i];
+              strat->initEcart(&h);
+              strat->ecartS[i] = h.ecart;
+            }
+            else
+            {
+              pDelete(&redSi);
+              pNorm(strat->S[i]);
+              h.p = strat->S[i];
+              strat->initEcart(&h);
+              strat->ecartS[i] = h.ecart;
+            }
+            h.sev =  pGetShortExpVector(h.p);
+            strat->sevS[i] = h.sev;
           }
         }
         i++;
@@ -3048,11 +3112,14 @@ void updateS(BOOLEAN toT,kStrategy strat)
         strat->S[i] = h.p = redtail(strat->S[i],strat->sl,strat);
         strat->initEcart(&h);
         strat->ecartS[i] = h.ecart;
+        h.sev = pGetShortExpVector(h.p);
+        strat->sevS[i] = h.sev;
       }
       else
       {
         h.p = strat->S[i];
         h.ecart=strat->ecartS[i];
+        h.sev = strat->sevS[i];
       }
       if ((strat->fromQ==NULL) || (strat->fromQ[i]==0))
         cancelunit1(&h,strat->sl,strat);
@@ -3079,6 +3146,10 @@ void enterSBba (LObject p,int atS,kStrategy strat)
   /*- puts p to the standardbasis s at position at -*/
   if (strat->sl == IDELEMS(strat->Shdl)-1)
   {
+    strat->sevS = (unsigned long*) ReAlloc0(strat->sevS,
+                                    IDELEMS(strat->Shdl)*sizeof(unsigned long),
+                                    (IDELEMS(strat->Shdl)+setmax)
+                                           *sizeof(unsigned long));
     strat->ecartS = (intset)ReAlloc(strat->ecartS,
                                     IDELEMS(strat->Shdl)*sizeof(int),
                                     (IDELEMS(strat->Shdl)+setmax)*sizeof(int));
@@ -3096,6 +3167,7 @@ void enterSBba (LObject p,int atS,kStrategy strat)
   {
     strat->S[i] = strat->S[i-1];
     if (strat->honey) strat->ecartS[i] = strat->ecartS[i-1];
+    strat->sevS[i] = strat->sevS[i-1];
   }
   if (strat->fromQ!=NULL)
   {
@@ -3108,6 +3180,15 @@ void enterSBba (LObject p,int atS,kStrategy strat)
   /*- save result -*/
   strat->S[atS] = p.p;
   if (strat->honey) strat->ecartS[atS] = p.ecart;
+  if (p.sev == 0)
+  {
+    p.sev = pGetShortExpVector(p.p);
+  }
+  else
+  {
+    assume(p.sev == pGetShortExpVector(p.p));
+  }
+  strat->sevS[atS] = p.sev;
   strat->sl++;
 }
 
@@ -3135,9 +3216,15 @@ void enterT (LObject p,kStrategy strat)
   strat->T[atT].length = p.length;
   strat->T[atT].pLength = p.pLength;
   strat->T[atT].heap = p.heap;
-#ifdef HAVE_SHORT_EVECTORS
-  strat->T[atT].sev = pGetShortExpVector(p.p);
-#endif
+  if (p.sev == 0)
+  {
+    p.sev = pGetShortExpVector(p.p);
+  }
+  else
+  {
+    assume(p.sev == pGetShortExpVector(p.p));
+  }
+  strat->T[atT].sev = p.sev;
   strat->tl++;
 }
 
@@ -3163,9 +3250,15 @@ void enterTBba (LObject p, int atT,kStrategy strat)
 
   strat->T[atT].heap = p.heap;
   strat->T[atT].pLength = p.pLength;
-#ifdef HAVE_SHORT_EVECTORS
-  strat->T[atT].sev = pGetShortExpVector(p.p);
-#endif
+  if (p.sev == 0)
+  {
+    p.sev = pGetShortExpVector(p.p);
+  }
+  else
+  {
+    assume(p.sev == pGetShortExpVector(p.p));
+  }
+  strat->T[atT].sev = p.sev;
 
   strat->tl++;
 }
@@ -3338,6 +3431,7 @@ void exitBuchMora (kStrategy strat)
   cleanT(strat);
   Free((ADDRESS)strat->T,(strat->tmax)*sizeof(TObject));
   Free((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
+  Free((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(int));
   /*- set L: should be empty -*/
   Free((ADDRESS)strat->L,(strat->Lmax)*sizeof(LObject));
   /*- set B: should be empty -*/
@@ -3346,7 +3440,7 @@ void exitBuchMora (kStrategy strat)
   strat->syzComp=0;
   if (strat->kIdeal!=NULL)
   {
-    Free((ADDRESS)strat->kIdeal,sizeof(sleftv));
+    FreeSizeOf((ADDRESS)strat->kIdeal,sleftv);
     strat->kIdeal=NULL;
   }
 }

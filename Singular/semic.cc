@@ -175,7 +175,7 @@ spectrum spectrum::operator = ( const spectrum &spec )
 
 lists   spectrum::thelist( void )
 {
-    lists   L  = (lists)Alloc( sizeof( slists ) );
+    lists   L  = (lists)AllocSizeOf( slists );
 
     L->Init( 6 );
 

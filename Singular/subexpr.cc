@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.53 1999-09-17 11:42:25 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.54 1999-10-14 14:27:32 obachman Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -330,7 +330,7 @@ void sleftv::CleanUp()
         if (cmd->arg1.rtyp!=0) cmd->arg1.CleanUp();
         if (cmd->arg2.rtyp!=0) cmd->arg2.CleanUp();
         if (cmd->arg3.rtyp!=0) cmd->arg3.CleanUp();
-        Free((ADDRESS)data,sizeof(ip_command));
+        FreeSizeOf((ADDRESS)data,ip_command);
         break;
       }
       case RESOLUTION_CMD:
@@ -418,7 +418,7 @@ void sleftv::CleanUp()
   while (e!=NULL)
   {
     h=e->next;
-    Free((ADDRESS)e,sizeof(*e));
+    FreeSizeOf((ADDRESS)e,sSubexpr);
     e=h;
   }
   rtyp=NONE;
@@ -431,7 +431,7 @@ void sleftv::CleanUp()
       //next->name=NULL;
       next->next=NULL;
       next->CleanUp();
-      Free((ADDRESS)next,sizeof(sleftv));
+      FreeSizeOf((ADDRESS)next,sleftv);
       next=tmp_n;
     } while (next!=NULL);
   }
@@ -599,7 +599,7 @@ void sleftv::Copy(leftv source)
     //}
     if (source->next!=NULL)
     {
-      next=(leftv)Alloc(sizeof(sleftv));
+      next=(leftv)AllocSizeOf(sleftv);
       next->Copy(source->next);
     }
   }
@@ -971,6 +971,18 @@ int  sleftv::LTyp()
     return LIST_CMD;
   }
   return Typ();
+}
+
+void sleftv::SetData(void* what)
+{
+  if (rtyp == IDHDL)
+  {
+    (void*) IDDATA((idhdl)data) = what;
+  }
+  else
+  {
+    data = what;
+  }
 }
 
 void * sleftv::Data()

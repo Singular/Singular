@@ -1,12 +1,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmalloc.c,v 1.15 1999-09-29 17:03:34 obachman Exp $ */
+/* $Id: mmalloc.c,v 1.16 1999-10-14 14:27:18 obachman Exp $ */
 
 /*
-* ABSTRACT:
+* ABSTRACT: implementation of alloc/free routines
 */
 
+#ifndef MM_ALLOC_C
+#define MM_ALLOC_C
 
 #include <string.h>
 #include <stdio.h>
@@ -20,6 +22,7 @@
 #include "tok.h"
 #include "mmemory.h"
 #include "mmprivate.h"
+#include "mmpage.h"
 #ifdef MTRACK
 #include "mmbt.h"
 #endif
@@ -44,21 +47,11 @@ void* mmAllocBlock(size_t size)
   
   if (i < 0)
   {
-    void *res=(void*)malloc( size );
-    if (res==NULL)
-    {
-      WerrorS("out of memory");
-      m2_end(99);
-    }
-    mm_bytesMalloc += size;
-    if (BVERBOSE(V_SHOW_MEM)) mmCheckPrint();
-    return res;
+    return mmMallocFromSystem(size);
   }
   else
   {
-    void* res;
-    AllocHeap(res, &mm_theList[i]);
-    return res;
+    return AllocHeap(&mm_theList[i]);
   }
 }
 
@@ -71,9 +64,7 @@ void mmFreeBlock(void* adr, size_t size)
   
   if (i < 0)
   {
-    mm_bytesMalloc -= size;
-    if (BVERBOSE(V_SHOW_MEM)) mmCheckPrint();
-    free( adr );
+    mmFreeToSystem(adr, size);
   }
   else
   {
@@ -95,15 +86,7 @@ void * mmReallocBlock( void* adr, size_t oldsize, size_t newsize )
 
   if ( ( i < 0 ) && ( j < 0 ) )
   {
-    void *res=(void *)realloc( adr, newsize );
-    if (res==NULL)
-    {
-      WerrorS("out of memory");
-      m2_end(99);
-    }
-    mm_bytesMalloc += ( (int)newsize - (int)oldsize );
-    if (BVERBOSE(V_SHOW_MEM)) mmCheckPrint();
-    return res;
+    return mmReallocFromSystem(adr, newsize, oldsize);
   }
   else if ( i == j )
     return adr;
@@ -186,21 +169,13 @@ static void * mmDBAllocHeapS(memHeap heap, size_t size,
 #else
   mmAllocHeap((void*) result, heap);
 #endif  
-
+    
 #ifdef MTRACK
   mmTrack(result->bt_allocated_stack);
 #endif
 
-  if (! mmCheckDBMCB(result, SizeFromRealSize(mmGetHeapBlockSize(heap)),
-                     MM_FREEFLAG))
-  {
-    mmPrintFL( fname, lineno );
-    return result;
-  }
-    
   mmMoveDBMCB( &mm_theDBfree, &mm_theDBused, result );
   mmFillDBMCB(result, size, heap, MM_USEDFLAG, fname, lineno);
-
   return (void*) &(result->data);
 }
 
@@ -215,7 +190,6 @@ static void mmDBFreeHeapS(void* addr, memHeap heap, size_t size,
     return;
   }
 
-  
 #ifdef HEAP_DEBUG
   mmDebugFreeHeap(what, heap, fname, lineno);
 #else
@@ -224,23 +198,30 @@ static void mmDBFreeHeapS(void* addr, memHeap heap, size_t size,
 #endif
   
   mmMoveDBMCB( &mm_theDBused, &mm_theDBfree, what );
-  mmFillDBMCB(what, SizeFromRealSize(mmGetHeapBlockSize(heap)),
+  mmFillDBMCB(what, SizeFromRealSize(heap->size),
               heap, MM_FREEFLAG, fname, lineno);
-
-#ifdef MTRACK
+  
+#ifdef MTRACK_FREE
   mmTrack(what->bt_freed_stack);
 #endif  
 }
 
 void * mmDBAllocHeap(memHeap heap, char* f, int l)
 {
-  return mmDBAllocHeapS(heap, SizeFromRealSize(mmGetHeapBlockSize(heap)),f,l);
+  return mmDBAllocHeapS(heap, SizeFromRealSize(heap->size),f,l);
+}
+
+void * mmDBAlloc0Heap(memHeap heap, char* f, int l)
+{
+  void* ptr = mmDBAllocHeapS(heap, SizeFromRealSize(heap->size),f,l);
+  memsetW(ptr, 0, (SizeFromRealSize(heap->size)) >> LOG_SIZEOF_LONG);
+  return ptr;
 }
 
                  
 void   mmDBFreeHeap(void* addr, memHeap heap, char*f, int l)
 {
-  mmDBFreeHeapS(addr, heap, SizeFromRealSize(mmGetHeapBlockSize(heap)),f,l);
+  mmDBFreeHeapS(addr, heap, SizeFromRealSize(heap->size),f,l);
 }
 
 
@@ -263,39 +244,28 @@ void * mmDBAllocBlock( size_t size,  char * fname, int lineno)
   i = mmGetIndex( size );
   if ( i < 0 )
   {
-    DBMCB * result=NULL;
     int tmpsize=RealSizeFromSize(size);
-    if ((result = (DBMCB*)malloc(tmpsize))!=NULL)
-    {
-      mm_bytesMalloc += tmpsize;
-      if (BVERBOSE(V_SHOW_MEM)) mmCheckPrint();
-
-      mmMoveDBMCBInto( &mm_theDBused, result );
+    DBMCB * result = (DBMCB *) mmMallocFromSystem(tmpsize);
+    memset(result, 0, sizeof(DBMCB));
+    
+    mmMoveDBMCBInto( &mm_theDBused, result );
       
-      if ( mm_minAddr == NULL )
-      {
-        mm_minAddr = (void*)result;
-        mm_maxAddr = (void*)result;
-      }
-      else if ( (void*)result < mm_minAddr )
-        mm_minAddr = (void*)result;
-      else if ( (void*)result > mm_maxAddr )
-        mm_maxAddr = (void*)result;
+    if ( mm_minAddr == NULL )
+    {
+      mm_minAddr = (void*)result;
+      mm_maxAddr = (void*)result;
+    }
+    else if ( (void*)result < mm_minAddr )
+      mm_minAddr = (void*)result;
+    else if ( (void*)result > mm_maxAddr )
+      mm_maxAddr = (void*)result;
 
-      mmFillDBMCB(result, size, NULL, MM_USEDFLAG, fname, lineno);
+    mmFillDBMCB(result, size, NULL, MM_USEDFLAG, fname, lineno);
   
-      #ifdef MTRACK
-      mmTrack(result->bt_allocated_stack);
-      #endif
-      
-      return (void*) &(result->data);
-    }
-    else
-    {
-      WerrorS("out of memory");
-      m2_end(99);
-      return NULL;
-    }
+#ifdef MTRACK
+    mmTrack(result->bt_allocated_stack);
+#endif
+    return (void*) &(result->data);
   }
   else
   {
@@ -320,10 +290,8 @@ void mmDBFreeBlock(void* adr, size_t size, char * fname, int lineno)
       mmPrintFL( fname, lineno );
       return;
     }
-    mm_bytesMalloc -= tmpsize;
-    mmTakeOutDBMCB(what );
-    free( what );
-    if (BVERBOSE(V_SHOW_MEM)) mmCheckPrint();
+    mmTakeOutDBMCB(what);
+    mmFreeToSystem(what, tmpsize);
   }
   else
   {
@@ -338,12 +306,11 @@ void * mmDBAllocBlock0( size_t size, char * fname, int lineno )
   return result;
 }
 
-
 void * mmDBReallocBlock( void* adr, size_t oldsize, size_t newsize, 
                          char * fname, int lineno )
 {
   void* newadr;
-
+  mmTest(adr, oldsize);
   newadr = mmDBAllocBlock( newsize, fname, lineno);
   memcpy( newadr, adr, (oldsize < newsize) ? oldsize : newsize );
   mmDBFreeBlock( adr, oldsize, fname, lineno);
@@ -409,6 +376,69 @@ char * mmDBStrdup( const char * s, char *fname, int lineno)
 
 #endif /* MDEBUG */
 
+/**********************************************************************
+ *
+ * Routines to debug ASO
+ *
+ **********************************************************************/
+#if defined(ASO_DEBUG) || defined(MDEBUG)
+void* mmDBAllocHeapSizeOf(memHeap heap, size_t size, char* file, int line)
+{
+  if (&(mm_theList[mmGetIndex(size)]) != heap)
+  {
+    fprintf(stderr, "ASO Error: Got heap %d:%ld but should be from heap %d:%d occured in %s:%d\n", 
+            mmGetIndex(SizeFromRealSize(heap->size)), SizeFromRealSize(heap->size), 
+            mmGetIndex(size), size, file, line);
+    fflush(stderr);
+    heap = &(mm_theList[mmGetIndex(size)]);
+  }
+
+#ifdef MDEBUG
+  return mmDBAllocHeapS(heap, size, file, line);
+#else
+  return AllocHeap(heap);
+#endif
+}
+
+void* mmDBAlloc0HeapSizeOf(memHeap heap, size_t size, char* file, int line)
+{
+  void* res;
+  if (&(mm_theList[mmGetIndex(size)]) != heap)
+  {
+    fprintf(stderr, "ASO Error: Got heap %d:%ld but should be from heap %d:%d occured in %s:%d\n", 
+            mmGetIndex(SizeFromRealSize(heap->size)), SizeFromRealSize(heap->size), 
+            mmGetIndex(size), size, file, line);
+    fflush(stderr);
+    heap = &(mm_theList[mmGetIndex(size)]);
+  }
+#ifdef MDEBUG
+  res = mmDBAllocHeapS(heap, size, file, line);
+  memset(res, 0, size);
+  return res;
+#else
+  return Alloc0Heap(heap);
+#endif
+}
+
+void  mmDBFreeHeapSizeOf(void* addr, memHeap heap, size_t size, 
+                         char* file, int line)
+{
+  if (&(mm_theList[mmGetIndex(size)]) != heap)
+  {
+    fprintf(stderr, "ASO Error: Got heap %d:%ld but should be from heap %d:%d occured in %s:%d\n", 
+            mmGetIndex(SizeFromRealSize(heap->size)), SizeFromRealSize(heap->size), 
+            mmGetIndex(size), size, file, line);
+    fflush(stderr);
+    heap = &(mm_theList[mmGetIndex(size)]);
+  }
+#ifdef MDEBUG 
+  mmDBFreeHeapS(addr, heap, size, file, line);
+#else
+  mmFreeHeap(addr, heap);
+#endif
+}
+
+#endif /* ASO_DEBUG || MDEBUG */
 
 /**********************************************************************
  *
@@ -447,22 +477,17 @@ void * mmAllocAlignedBlock( size_t size)
   }
   else
   {
-#if SIZEOF_DOUBLE != SIZEOF_VOIDP 
     void *garbage = NULL, *good, *temp;
 
     while (1)
     {
-#endif /* SIZEOF_DOUBLE != SIZEOF_VOIDP */
-
 #ifdef MDEBUG
       good = mmDBAllocHeapS(&(mm_theList[i]), size, f, l);
 #else
-      AllocHeap(good, &(mm_theList[i]));
+      good = AllocHeap(&(mm_theList[i]));
 #endif
       assume(good != NULL);
 
-#if SIZEOF_DOUBLE != SIZEOF_VOIDP 
-    
       if (((unsigned long) good) & (SIZEOF_DOUBLE - 1))
       {
         *((void**) good) = garbage;
@@ -484,8 +509,6 @@ void * mmAllocAlignedBlock( size_t size)
       FreeHeap(temp, &(mm_theList[i]));
 #endif
     }
-#endif /* SIZEOF_DOUBLE != SIZEOF_VOIDP */
-
     assume(((unsigned long) good) % SIZEOF_DOUBLE == 0);
     
     return good;
@@ -545,8 +568,102 @@ void  mmFreeAlignedBlock( void* addr, size_t size)
 #endif /* SIZEOF_DOUBLE == SIZEOF_VOIDP + SIZEOF_VOIDP */
     
 
+/**********************************************************************
+ *
+ * malloc/free routine from/to system
+ *
+ **********************************************************************/
+void* mmMallocFromSystem(size_t size)
+{
+  void* ptr;
+#ifdef ALIGN_8
+  if (size % 8 != 0) size = size + 8 - (size % 8);
+#endif
+  ptr = malloc(size);
+  if (ptr == NULL)
+  {
+    mmGarbageCollectHeaps(3);
+    ptr = malloc(size);
+    if (ptr == NULL)
+    {
+      WerrorS("out of memory");
+      m2_end(99);
+      /* should never get here */
+      exit(1);
+    }
+  }
+  mm_bytesMalloc += size;
+  if (BVERBOSE(V_SHOW_MEM)) mmCheckPrint();
+  return ptr;
+}
 
+void* mmReallocFromSystem(void* addr, size_t newsize, size_t oldsize)
+{
+  void* res;
+#ifdef ALIGN_8
+  if (newsize % 8 != 0) newsize = newsize + 8 - (size % 8);
+  if (oldsize % 8 != 0) oldsize = oldsize + 8 - (size % 8);
+#endif
   
+  res = realloc(addr, newsize);
+  if (res == NULL)
+  {
+    mmGarbageCollectHeaps(3);
+    /* Can do a realloc again: manpage reads:
+       "If realloc() fails the original block is left untouched - 
+       it is not freed or moved." */
+    res = realloc(addr, newsize); 
+    if (res == NULL)
+    {
+      WerrorS("out of memory");
+      m2_end(99);
+      /* should never get here */
+      exit(1);
+    }
+  }
+  mm_bytesMalloc += ( (int)newsize - (int)oldsize );
+  if (BVERBOSE(V_SHOW_MEM)) mmCheckPrint();
+  return res;
+}
   
+void mmFreeToSystem(void* addr, size_t size)
+{
+#ifdef ALIGN_8
+  if (size % 8 != 0) size = size + 8 - (size % 8);
+#endif
+  free( addr );
+  mm_bytesMalloc -= size;
+  if (BVERBOSE(V_SHOW_MEM)) mmCheckPrint();
+}
+
+void* mmAllocPageFromSystem()
+{
+  void* page = PALLOC(SIZE_OF_PAGE);
+  if (page == NULL)
+  {
+    mmGarbageCollectHeaps(3);
+    page = PALLOC(SIZE_OF_PAGE);
+    if (page == NULL)
+    {
+      (void)fprintf( stderr, "\nerror: no more memory\n" );
+      m2_end(14);
+      /* should never get here */
+      exit(1);
+    }
+  }
+  mm_bytesValloc += SIZE_OF_PAGE;
+  if (BVERBOSE(V_SHOW_MEM)) mmCheckPrint();
+  return page;
+}
+
+void mmFreePageToSystem(void* page)
+{
+  PFREE(page);
+  mm_bytesValloc -= SIZE_OF_PAGE;
+  if (BVERBOSE(V_SHOW_MEM)) mmCheckPrint();
+}
   
 
+#endif /* MM_ALLOC_C */
+
+      

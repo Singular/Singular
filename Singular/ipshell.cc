@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.49 1999-09-27 15:32:55 obachman Exp $ */
+/* $Id: ipshell.cc,v 1.50 1999-10-14 14:27:10 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -621,7 +621,7 @@ leftv iiMap(map theMap, char * what)
     }
     else if ((w=IDRING(r)->idroot->get(what,myynest))!=NULL)
     {
-      v=(leftv)Alloc0(sizeof(*v));
+      v=(leftv)Alloc0SizeOf(sleftv);
       sleftv tmpW;
       memset(&tmpW,0,sizeof(sleftv));
       tmpW.rtyp=IDTYP(w);
@@ -629,7 +629,7 @@ leftv iiMap(map theMap, char * what)
       if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,IDRING(r),NULL,NULL,0))
       {
         Werror("cannot map %s(%d)",Tok2Cmdname(w->typ),w->typ);
-        Free((ADDRESS)v,sizeof(*v));
+        FreeSizeOf((ADDRESS)v,sleftv);
         return NULL;
       }
       return v;
@@ -680,7 +680,7 @@ void  iiMakeResolv(resolvente r, int length, int rlen, char * name, int typ0,
     i++;
   }
   Free((ADDRESS)L->m,(L->nr+1)*sizeof(sleftv));
-  Free((ADDRESS)L,sizeof(slists));
+  FreeSizeOf((ADDRESS)L,slists);
   Free((ADDRESS)s,strlen(name)+5);
 }
 #endif
@@ -870,7 +870,7 @@ int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN isrin
       //sy->e = NULL;
       if (name->next!=NULL)
       {
-        sy->next=(leftv)Alloc(sizeof(sleftv));
+        sy->next=(leftv)AllocSizeOf(sleftv);
         res=iiDeclCommand(sy->next,name->next,lev,t,root, isring);
       }
     }
@@ -900,7 +900,7 @@ BOOLEAN iiParameter(leftv p)
     h->next=NULL;
   }
   BOOLEAN res=iiAssign(p,h);
-  Free((ADDRESS)h,sizeof(sleftv));
+  FreeSizeOf((ADDRESS)h,sleftv);
   return res;
 }
 

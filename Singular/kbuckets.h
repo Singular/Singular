@@ -3,9 +3,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.h,v 1.5 1999-09-29 10:59:29 obachman Exp $ */
+/* $Id: kbuckets.h,v 1.6 1999-10-14 14:27:11 obachman Exp $ */
 #include "mod2.h"
-#include "mmheap.h"
+#include "structs.h"
+#if HAVE_ASO == 1
+#include "kbuckets.aso"
+#endif
 
 /////////////////////////////////////////////////////////////////////////
 // configuration
@@ -76,6 +79,7 @@ void kBucketTakeOutComp(kBucket_pt bucket,
                         Exponent_t comp, 
                         poly *p, int *l);
 
+#if HAVE_ASO == 1
 // Here we only extract such monoms which have component == comp and
 // degree == order
 // ASSUME: monomial ordering is Order compatible, i.e., if m1, m2 Monoms then
@@ -83,6 +87,7 @@ void kBucketTakeOutComp(kBucket_pt bucket,
 void kBucketDecrOrdTakeOutComp(kBucket_pt bucket, 
                                Exponent_t comp, Order_t order, 
                                poly *p, int *l);
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 ///
@@ -127,7 +132,7 @@ public:
  * 
  *
  ***************************************************************/
-#define kb_pNew(p, heap)            AllocHeap(p, mm_specHeap)
+#define kb_pNew(p, heap)            p = AllocHeap(mm_specHeap)
 #define kb_pFree1(p, heap)          FreeHeap(p, mm_specHeap)
 
 #define kb_pFree1AndAdvance(p, heap)            \

@@ -1,16 +1,17 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.10 1999-09-27 14:59:32 obachman Exp $ */
+/* $Id: mpr_base.cc,v 1.11 1999-10-14 14:27:22 obachman Exp $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
  *            ( sparse, dense, u-resultant solver )
  */
 
-#include "mod2.h"
 #include <limits.h>
-//#ifdef HAVE_MPR
+#include <math.h>
+
+#include "mod2.h"
 
 //-> includes
 #include "structs.h"
@@ -32,10 +33,13 @@
 #endif
 #include "sparsmat.h"
 
-#include <math.h>
 #include "mpr_global.h"
 #include "mpr_base.h"
 #include "mpr_numeric.h"
+#if HAVE_ASO == 1
+#include "mpr_base.aso"
+#endif
+
 //<-
 
 extern void nPrint(number n);  // for debugging output
@@ -61,6 +65,8 @@ extern void nPrint(number n);  // for debugging output
 //<-
 
 //-> sparse resultant matrix
+
+//-> typedefs and structs
 
 /* set of points */
 class pointSet;
@@ -138,8 +144,6 @@ private:
 };
 //<-
 
-//-> typedefs and structs
-poly monomAt( poly p, int i );
 
 typedef unsigned int Coord_t;
 
@@ -336,6 +340,10 @@ private:
 
   linProgP pLP;
 };
+
+poly monomAt( poly p, int i );
+
+#if HAVE_ASO == 1
 //<-
 
 //-> debug output stuff
@@ -429,7 +437,7 @@ pointSet::pointSet( const int _dim, const int _index, const int count )
   points = (onePointP *)Alloc( (count+1) * sizeof(onePointP) );
   for ( i= 0; i <= max; i++ )
   {
-    points[i]= (onePointP)Alloc( sizeof(onePoint) );
+    points[i]= (onePointP)AllocSizeOf( onePoint );
     points[i]->point= (Coord_t *)Alloc0( (dim+2) * sizeof(Coord_t) );
   }
   lifted= false;
@@ -442,7 +450,7 @@ pointSet::~pointSet()
   for ( i= 0; i <= max; i++ )
   {
     Free( (ADDRESS) points[i]->point, fdim * sizeof(Coord_t) );
-    Free( (ADDRESS) points[i], sizeof(onePoint) );
+    FreeSizeOf( (ADDRESS) points[i], onePoint );
   }
   Free( (ADDRESS) points, (max+1) * sizeof(onePointP) );
 }
@@ -464,7 +472,7 @@ inline bool pointSet::checkMem()
                                  (2*max + 1) * sizeof(onePointP) );
     for ( i= max+1; i <= max*2; i++ )
     {
-      points[i]= (onePointP)Alloc( sizeof(struct onePoint) );
+      points[i]= (onePointP)AllocSizeOf( onePoint );
       points[i]->point= (Coord_t *)Alloc0( fdim * sizeof(Coord_t) );
     }
     max*= 2;
@@ -2071,7 +2079,7 @@ resMatrixDense::~resMatrixDense()
       for ( j= 1; j <= numVectors; j++ )
         pDelete( &MATELEM(m , i, j) );
     Free( (ADDRESS)m->m, numVectors * numVectors * sizeof(poly) );
-    Free( (ADDRESS)m, sizeof(ip_smatrix) );
+    FreeSizeOf( (ADDRESS)m, ip_smatrix );
   }
 }
 
@@ -2464,17 +2472,8 @@ const ideal resMatrixDense::getMatrix()
     }
   }
 
+  // obachman: idMatrix2Module frees resmat !!
   ideal resmod= idMatrix2Module(resmat);
-
-  if ( resmat != NULL )
-  {
-    for ( i= 1; i <= numVectors; i++ )
-      for ( j= 1; j <= numVectors; j++ )
-        pDelete( &MATELEM(resmat , i, j) );
-    Free( (ADDRESS)resmat->m, numVectors * numVectors * sizeof(poly) );
-    Free( (ADDRESS)resmat, sizeof(ip_smatrix) );
-  }
-
   return resmod;
 }
 
@@ -2505,17 +2504,8 @@ const ideal resMatrixDense::getSubMatrix()
     j++;
   }
 
+  // obachman: idMatrix2Module frees resmat !!
   ideal resmod= idMatrix2Module(resmat);
-
-  if ( resmat != NULL )
-  {
-    for ( i= 1; i <= numVectors; i++ )
-      for ( j= 1; j <= numVectors; j++ )
-        pDelete( &MATELEM(resmat , i, j) );
-    Free( (ADDRESS)resmat->m, numVectors * numVectors * sizeof(poly) );
-    Free( (ADDRESS)resmat, sizeof(ip_smatrix) );
-  }
-
   return resmod;
 }
 
@@ -3159,6 +3149,8 @@ int uResultant::nextPrime( int i )
 
 //-----------------------------------------------------------------------------
 
+#endif // ! HAVE_ASO
+
 // local Variables: ***
 // folded-file: t ***
 // compile-command-1: "make installg" ***
@@ -3168,3 +3160,4 @@ int uResultant::nextPrime( int i )
 // in folding: C-c x
 // leave fold: C-c y
 //   foldmode: F10
+

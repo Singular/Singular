@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.cc,v 1.15 1999-09-29 10:59:27 obachman Exp $ */
+/* $Id: attrib.cc,v 1.16 1999-10-14 14:26:57 obachman Exp $ */
 
 /*
 * ABSTRACT: attributes to leftv and idhdl
@@ -22,6 +22,7 @@
 #include "matpol.h"
 #include "ipshell.h"
 #include "attrib.h"
+#include "mmemory.h"
 
 void sattr::Print()
 {
@@ -33,7 +34,7 @@ void sattr::Print()
 attr sattr::Copy()
 {
   mmTestP(this,sizeof(sattr));
-  attr n=(attr)Alloc0(sizeof(sattr));
+  attr n=(attr)Alloc0SizeOf(sattr);
   n->atyp=atyp;
   if (name!=NULL) n->name=mstrdup(name);
   n->data=CopyA();
@@ -104,7 +105,7 @@ attr sattr::set(char * s, void * data, int t)
   }
   else
   {
-     h = (attr)Alloc0(sizeof(sattr));
+     h = (attr)Alloc0SizeOf(sattr);
      h->name = s;
      h->next = this;
      h->data = data;
@@ -212,7 +213,7 @@ void sattr::kill()
 #endif
   } /* end switch: (atyp) */
   data=NULL;
-  Free((ADDRESS)this,sizeof(sattr));
+  FreeSizeOf((ADDRESS)this,sattr);
 }
 
 void sattr::killAll()

@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_numeric.cc,v 1.4 1999-07-28 08:22:17 wenk Exp $ */
+/* $Id: mpr_numeric.cc,v 1.5 1999-10-14 14:27:24 obachman Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff
@@ -748,7 +748,7 @@ lists rootArranger::listOfRoots( const unsigned int oprec )
   int count= roots[0]->getAnzRoots(); // number of roots
   int elem= roots[0]->getAnzElems();  // number of koordinates per root
 
-  lists listofroots= (lists)Alloc( sizeof(slists) ); // must be done this way!
+  lists listofroots= (lists)AllocSizeOf( slists ); // must be done this way!
 
   if ( found_roots )
   {
@@ -756,7 +756,7 @@ lists rootArranger::listOfRoots( const unsigned int oprec )
 
     for (i=0; i < count; i++)
     {
-      lists onepoint= (lists)Alloc(sizeof(slists)); // must be done this way!
+      lists onepoint= (lists)AllocSizeOf(slists); // must be done this way!
       onepoint->Init(elem);
       for ( j= 0; j < elem; j++ )
       {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.38 1999-09-29 10:59:30 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.39 1999-10-14 14:27:11 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -125,6 +125,9 @@ void redEcart19 (LObject* h,kStrategy strat)
   int i,at,reddeg,d;
   int j = 0;
   int pass = 0;
+  unsigned long not_sev;
+  h->sev = pGetShortExpVector(h->p);
+  not_sev = ~ h->sev;
 
   if (TEST_OPT_CANCELUNIT) cancelunit(h);
   d = pFDeg((*h).p)+(*h).ecart;
@@ -135,7 +138,7 @@ void redEcart19 (LObject* h,kStrategy strat)
     {
       return;
     }
-    if (pDivisibleBy1(strat->T[j].p,(*h).p))
+    if (pShortDivisibleBy(strat->T[j].p, strat->T[j].sev, (*h).p, not_sev))
     {
       //if (strat->interpt) test_int_std(strat->kIdeal);
       /*- compute the s-polynomial -*/
@@ -175,8 +178,9 @@ void redEcart19 (LObject* h,kStrategy strat)
         if (h->lcm!=NULL) pFree1((*h).lcm);
         return;
       }
+      h->sev = pGetShortExpVector(h->p);
+      not_sev = ~ h->sev;
       /*computes the ecart*/
-
       if (strat->honey)
       {
         if (strat->T[j].ecart <= (*h).ecart)
@@ -210,20 +214,13 @@ void redEcart19 (LObject* h,kStrategy strat)
         if (at <= strat->Ll)
         {
           /*test if h is already standardbasis element*/
-#ifdef HAVE_HOMOG_T
-          i=strat->tl+1;
-#else
           i=strat->sl+1;
-#endif
           do
           {
             i--;
             if (i<0) return;
-#ifdef HAVE_HOMOG_T
-          } while (!pDivisibleBy1(strat->T[i].p,(*h).p));
-#else
-          } while (!pDivisibleBy1(strat->S[i],(*h).p));
-#endif        
+          } while (!pShortDivisibleBy(strat->S[i], strat->sevS[i], 
+                                      (*h).p, not_sev));
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
           if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
           (*h).p = NULL;
@@ -254,17 +251,20 @@ void redEcart (LObject* h,kStrategy strat)
   int i,at,reddeg,d,ei,li;
   int j = 0;
   int pass = 0;
+  unsigned long not_sev;
 
   if (TEST_OPT_CANCELUNIT) cancelunit(h);
   d = pFDeg((*h).p)+(*h).ecart;
   reddeg = strat->LazyDegree+d;
+  h->sev = pGetShortExpVector(h->p);
+  not_sev = ~ h->sev;
   loop
   {
     if (j > strat->tl)
     {
       return;
     }
-    if (pDivisibleBy1(strat->T[j].p,(*h).p))
+    if (pShortDivisibleBy(strat->T[j].p, strat->T[j].sev, (*h).p, not_sev))
     {
       //if (strat->interpt) test_int_std(strat->kIdeal);
       /*- compute the s-polynomial -*/
@@ -285,7 +285,8 @@ void redEcart (LObject* h,kStrategy strat)
         if ((((strat->T[i]).ecart < ei)
           || (((strat->T[i]).ecart == ei)
           && ((strat->T[i]).length < li)))
-          && pDivisibleBy1((strat->T[i]).p,(*h).p))
+          && pShortDivisibleBy(strat->T[i].p, strat->T[i].sev,
+                               (*h).p, not_sev))
         {
           /*
            * the polynomial to reduce with is now;
@@ -334,6 +335,8 @@ void redEcart (LObject* h,kStrategy strat)
         if (h->lcm!=NULL) pFree1((*h).lcm);
         return;
       }
+      h->sev = pGetShortExpVector(h->p);
+      not_sev = ~ h->sev;
       /*computes the ecart*/
       if (strat->honey)
       {
@@ -369,20 +372,13 @@ void redEcart (LObject* h,kStrategy strat)
         at = strat->posInL(strat->L,strat->Ll,*h,strat);
         if (at <= strat->Ll)
         {
-#ifdef HAVE_HOMOG_T
-          i=strat->tl+1;
-#else
           i=strat->sl+1;
-#endif
           do
           {
             i--;
             if (i<0) return;
-#ifdef HAVE_HOMOG_T
-          } while (!pDivisibleBy1(strat->T[i].p,(*h).p));
-#else
-          } while (!pDivisibleBy1(strat->S[i],(*h).p));
-#endif        
+          } while (!pShortDivisibleBy(strat->S[i], strat->sevS[i], 
+                                      (*h).p, not_sev));
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
           if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
           (*h).p = NULL;
@@ -417,13 +413,17 @@ void redFirst (LObject* h,kStrategy strat)
   if (TEST_OPT_CANCELUNIT) cancelunit(h);
   d = pFDeg((*h).p)+(*h).ecart;
   reddeg = strat->LazyDegree+d;
+  unsigned long not_sev;
+  h->sev = pGetShortExpVector(h->p);
+  not_sev = ~ h->sev;
   loop
   {
     if (j > strat->tl)
     {
+      assume(h->sev == pGetShortExpVector(h->p));
       return;
     }
-    if (pDivisibleBy1(strat->T[j].p,(*h).p))
+    if (pShortDivisibleBy(strat->T[j].p, strat->T[j].sev, (*h).p, not_sev))
     {
       //if (strat->interpt) test_int_std(strat->kIdeal);
       /*
@@ -449,8 +449,11 @@ void redFirst (LObject* h,kStrategy strat)
       if ((*h).p == NULL)
       {
         if (h->lcm!=NULL) pFree1((*h).lcm);
+        h->sev = 0;
         return;
       }
+      h->sev = pGetShortExpVector(h->p);
+      not_sev = ~ h->sev;
       if (TEST_OPT_CANCELUNIT) cancelunit(h);
       /*computes the ecart*/
       d = pLDeg((*h).p,&((*h).length));
@@ -477,23 +480,17 @@ void redFirst (LObject* h,kStrategy strat)
         at = strat->posInL(strat->L,strat->Ll,*h,strat);
         if (at <= strat->Ll)
         {
-#ifdef HAVE_HOMOG_T
-          i=strat->tl+1;
-#else
           i=strat->sl+1;
-#endif
           do
           {
             i--;
             if (i<0) return;
-#ifdef HAVE_HOMOG_T
-          } while (!pDivisibleBy1(strat->T[i].p,(*h).p));
-#else
-          } while (!pDivisibleBy1(strat->S[i],(*h).p));
-#endif        
+          } while (!pShortDivisibleBy(strat->S[i],strat->sevS[i], 
+                                      (*h).p, not_sev));
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
           if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
           (*h).p = NULL;
+          h->sev = 0;
           return;
         }
       }
@@ -525,13 +522,16 @@ void redMoraBest (LObject* h,kStrategy strat)
   if (TEST_OPT_CANCELUNIT) cancelunit(h);
   d = pFDeg((*h).p)+(*h).ecart;
   reddeg = strat->LazyDegree+d;
+  unsigned long not_sev;
+  h->sev = pGetShortExpVector(h->p);
+  not_sev = ~ h->sev;
   loop
   {
     if (j > strat->tl)
     {
       return;
     }
-    if (pDivisibleBy1(strat->T[j].p,(*h).p))
+    if (pShortDivisibleBy(strat->T[j].p, strat->T[j].sev, (*h).p, not_sev))
     {
       //if (strat->interpt) test_int_std(strat->kIdeal);
       /*- compute the s-polynomial -*/
@@ -551,7 +551,8 @@ void redMoraBest (LObject* h,kStrategy strat)
         if (((strat->T[i].ecart < ei)
           || ((strat->T[i].ecart == ei)
         && (strat->T[i].length < li)))
-        && pDivisibleBy1(strat->T[i].p,(*h).p))
+            && pShortDivisibleBy(strat->T[i].p, strat->T[i].sev, 
+                                 (*h).p, not_sev))
         {
           /*
           * the polynomial to reduce with is now:
@@ -600,6 +601,8 @@ void redMoraBest (LObject* h,kStrategy strat)
         if (h->lcm!=NULL) pFree1((*h).lcm);
         return;
       }
+      h->sev = pGetShortExpVector(h->p);
+      not_sev = ~ h->sev;
       /*computes the ecart*/
       if (strat->honey)
       {
@@ -634,20 +637,13 @@ void redMoraBest (LObject* h,kStrategy strat)
         at = strat->posInL(strat->L,strat->Ll,*h,strat);
         if (at <= strat->Ll)
         {
-#ifdef HAVE_HOMOG_T
-          i=strat->tl+1;
-#else
           i=strat->sl+1;
-#endif
           do
           {
             i--;
             if (i<0) return;
-#ifdef HAVE_HOMOG_T
-          } while (!pDivisibleBy1(strat->T[i].p,(*h).p));
-#else
-          } while (!pDivisibleBy1(strat->S[i],(*h).p));
-#endif        
+          } while (!pShortDivisibleBy(strat->S[i],strat->sevS[i], 
+                                      (*h).p, not_sev));
           enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
           if (TEST_OPT_DEBUG) Print(" degree jumped; ->L%d\n",at);
           (*h).p = NULL;
@@ -680,18 +676,20 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
   int o,ei,li;
   int j = 0;
   int z = 10;
-
+  unsigned long not_sev;
   H.p = h;
   o = pFDeg(h);
   H.ecart = pLDeg(H.p,&H.length)-o;
   if (flag==0) cancelunit(&H);
+  H.sev = pGetShortExpVector(H.p);
+  not_sev = ~ H.sev;
   loop
   {
     if (j > strat->tl)
     {
       return H.p;
     }
-    if (pDivisibleBy1(strat->T[j].p,H.p))
+    if (pShortDivisibleBy(strat->T[j].p, strat->T[j].sev, H.p, not_sev))
     {
       //if (strat->interpt) test_int_std(strat->kIdeal);
       /*- remember the found T-poly -*/
@@ -712,7 +710,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
         if (((strat->T[j].ecart < ei)
           || ((strat->T[j].ecart == ei)
         && (strat->T[j].length < li)))
-        && pDivisibleBy1(strat->T[j].p,H.p))
+        && pShortDivisibleBy(strat->T[j].p,strat->T[j].sev, H.p, not_sev))
         {
           /*
           * the polynomial to reduce with is now;
@@ -759,6 +757,8 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
       cancelunit(&H);
       H.ecart = pLDeg(H.p,&(H.length))-o;
       j = 0;
+      H.sev = pGetShortExpVector(H.p);
+      not_sev = ~ H.sev;
     }
     else
     {
@@ -1071,6 +1071,10 @@ void enterSMora (LObject p,int atS,kStrategy strat)
   if (strat->sl == IDELEMS(strat->Shdl)-1)
   {
     pEnlargeSet(&strat->S,IDELEMS(strat->Shdl),setmax);
+    strat->sevS = (unsigned long*) ReAlloc0(strat->sevS,
+                                    IDELEMS(strat->Shdl)*sizeof(unsigned long),
+                                    (IDELEMS(strat->Shdl)+setmax)
+                                           *sizeof(unsigned long));
     strat->ecartS = (intset) ReAlloc(strat->ecartS,
                                      IDELEMS(strat->Shdl)*sizeof(int),
                                      (IDELEMS(strat->Shdl)+setmax)*sizeof(int));
@@ -1087,6 +1091,7 @@ void enterSMora (LObject p,int atS,kStrategy strat)
   {
     strat->S[i] = strat->S[i-1];
     strat->ecartS[i] = strat->ecartS[i-1];
+    strat->sevS[i] = strat->sevS[i-1];
   }
   if (strat->fromQ)
   {
@@ -1099,6 +1104,9 @@ void enterSMora (LObject p,int atS,kStrategy strat)
   /*- save result -*/
   strat->S[atS] = p.p;
   strat->ecartS[atS] = p.ecart;
+  if (p.sev == 0) p.sev = pGetShortExpVector(p.p);
+  else assume(p.sev == pGetShortExpVector(p.p));
+  strat->sevS[atS] = p.sev;
   strat->sl++;
   if (TEST_OPT_DEBUG)
   {
@@ -1155,6 +1163,10 @@ void enterSMoraNF (LObject p, int atS,kStrategy strat)
   if (strat->sl == IDELEMS(strat->Shdl)-1)
   {
     pEnlargeSet(&strat->S,IDELEMS(strat->Shdl),setmax);
+    strat->sevS = (unsigned long*) ReAlloc0(strat->sevS,
+                                    IDELEMS(strat->Shdl)*sizeof(unsigned long),
+                                    (IDELEMS(strat->Shdl)+setmax)
+                                           *sizeof(unsigned long));
     strat->ecartS=(intset)ReAlloc(strat->ecartS,
                                   IDELEMS(strat->Shdl)*sizeof(intset),
                                   (IDELEMS(strat->Shdl)+setmax)*sizeof(intset));
@@ -1165,9 +1177,13 @@ void enterSMoraNF (LObject p, int atS,kStrategy strat)
   {
     strat->S[i] = strat->S[i-1];
     strat->ecartS[i] = strat->ecartS[i-1];
+    strat->sevS[i] = strat->sevS[i-1];
   }
   strat->S[atS] = p.p;/*- save result -*/
   strat->ecartS[atS] = p.ecart;
+  if (p.sev == 0) p.sev = pGetShortExpVector(p.p);
+  else assume(p.sev == pGetShortExpVector(p.p));
+  strat->sevS[atS] = p.sev;
   strat->sl++;
   if ((!strat->kHEdgeFound) || (strat->kNoether!=NULL)) HEckeTest(p.p,strat);
   if (strat->kHEdgeFound)
@@ -1319,6 +1335,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     }
     if (strat->P.p != NULL)
     {
+      assume(strat->P.sev == 0 || strat->P.sev == pGetShortExpVector(strat->P.p));
           if (TEST_OPT_PROT) PrintS("s");/*- statistic -*/
           /*- enter P.p into s and b: -*/
           if (!TEST_OPT_INTSTRATEGY)
@@ -1460,7 +1477,10 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   {
     h.p = strat->S[i];
     h.ecart = strat->ecartS[i];
+    if (strat->sevS[i] == 0) strat->sevS[i] = pGetShortExpVector(h.p);
+    else assume(strat->sevS[i] == pGetShortExpVector(h.p));
     h.length = pLength(h.p);
+    h.sev = strat->sevS[i];
     enterT(h,strat);
   }
   /*- compute------------------------------------------- -*/
@@ -1477,6 +1497,7 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   cleanT(strat);
   Free((ADDRESS)strat->T,strat->tmax*sizeof(TObject));
   Free((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
+  Free((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
   Free((ADDRESS)strat->NotUsedAxis,(pVariables+1)*sizeof(BOOLEAN));
   if ((Q!=NULL)&&(strat->fromQ!=NULL))
   {
@@ -1564,6 +1585,10 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
           h.p = strat->S[j];
           h.ecart = strat->ecartS[j];
           h.length = pLength(h.p);
+          if (strat->sevS[j] == 0) strat->sevS[j] = pGetShortExpVector(h.p);
+          else assume(strat->sevS[j] == pGetShortExpVector(h.p));
+          h.sev = strat->sevS[j];
+          h.length = pLength(h.p);
           enterT(h,strat);
         }
         if (TEST_OPT_PROT) { PrintS("r"); mflush(); }
@@ -1583,6 +1608,7 @@ ideal kNF1 (ideal F,ideal Q,ideal q, kStrategy strat, int lazyReduce)
   /*- release temp data------------------------------- -*/
   Free((ADDRESS)strat->T,strat->tmax*sizeof(TObject));
   Free((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
+  Free((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
   Free((ADDRESS)strat->NotUsedAxis,(pVariables+1)*sizeof(BOOLEAN));
   if ((Q!=NULL)&&(strat->fromQ!=NULL))
   {
@@ -1636,7 +1662,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   ideal r;
   BOOLEAN b=pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
-  kStrategy strat=(kStrategy)Alloc0(sizeof(skStrategy));
+  kStrategy strat=(kStrategy)Alloc0SizeOf(skStrategy);
 
   if(!TEST_OPT_RETURN_SB)
     strat->syzComp = syzComp;
@@ -1720,7 +1746,7 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   pLexOrder = b;
 //Print("%d reductions canceled \n",strat->cel);
   HCord=strat->HCord;
-  Free((ADDRESS)strat,sizeof(skStrategy));
+  FreeSizeOf((ADDRESS)strat,skStrategy);
   if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
   return r;
 }
@@ -1739,7 +1765,7 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   BOOLEAN b=pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
   BOOLEAN oldDegBound=TEST_OPT_DEGBOUND;
-  kStrategy strat=(kStrategy)Alloc0(sizeof(skStrategy));
+  kStrategy strat=(kStrategy)Alloc0SizeOf(skStrategy);
 
   if(!TEST_OPT_RETURN_SB)
      strat->syzComp = syzComp;
@@ -1816,7 +1842,7 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   pLexOrder = b;
   HCord=strat->HCord;
   if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;
-  lists l=(lists)Alloc(sizeof(slists));
+  lists l=(lists)AllocSizeOf(slists);
   l->Init(2);
   l->m[0].rtyp=IDEAL_CMD;
   l->m[0].data=(void *)r;
@@ -1832,7 +1858,7 @@ lists min_std(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
     idSkipZeroes(strat->M);
     l->m[1].data=(void *)strat->M;
   }
-  Free((ADDRESS)strat,sizeof(skStrategy));
+  FreeSizeOf((ADDRESS)strat,skStrategy);
   if (reduced>2)
   {
     Kstd1_deg=Kstd1_OldDeg;
@@ -1846,13 +1872,13 @@ poly kNF(ideal F, ideal Q, poly p,int syzComp, int lazyReduce)
 {
   if (p==NULL)
      return NULL;
-  kStrategy strat=(kStrategy)Alloc0(sizeof(skStrategy));
+  kStrategy strat=(kStrategy)Alloc0SizeOf(skStrategy);
   strat->syzComp = syzComp;
   if (pOrdSgn==-1)
     p=kNF1(F,Q,p,strat,lazyReduce);
   else
     p=kNF2(F,Q,p,strat,lazyReduce);
-  Free((ADDRESS)strat,sizeof(skStrategy));
+  FreeSizeOf((ADDRESS)strat,skStrategy);
   return p;
 }
 
@@ -1863,13 +1889,13 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
   {
     Print("(S:%d)",IDELEMS(p));mflush();
   }
-  kStrategy strat=(kStrategy)Alloc0(sizeof(skStrategy));
+  kStrategy strat=(kStrategy)Alloc0SizeOf(skStrategy);
   strat->syzComp = syzComp;
   if (pOrdSgn==-1)
     res=kNF1(F,Q,p,strat,lazyReduce);
   else
     res=kNF2(F,Q,p,strat,lazyReduce);
-  Free((ADDRESS)strat,sizeof(skStrategy));
+  FreeSizeOf((ADDRESS)strat,skStrategy);
   return res;
 }
 
@@ -1879,7 +1905,7 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
 ideal kInterRed (ideal F, ideal Q)
 {
   int j;
-  kStrategy strat = (kStrategy)Alloc0(sizeof(skStrategy));
+  kStrategy strat = (kStrategy)Alloc0SizeOf(skStrategy);
 
 //  if (TEST_OPT_PROT)
 //  {
@@ -1910,6 +1936,7 @@ ideal kInterRed (ideal F, ideal Q)
   pDelete(&strat->kHEdge);
   Free((ADDRESS)strat->T,strat->tmax*sizeof(TObject));
   Free((ADDRESS)strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int));
+  Free((ADDRESS)strat->sevS,IDELEMS(strat->Shdl)*sizeof(unsigned long));
   Free((ADDRESS)strat->NotUsedAxis,(pVariables+1)*sizeof(BOOLEAN));
   if (strat->fromQ)
   {
@@ -1927,6 +1954,6 @@ ideal kInterRed (ideal F, ideal Q)
 //    mflush();
 //  }
   ideal shdl=strat->Shdl;
-  Free((ADDRESS)strat,sizeof(skStrategy));
+  FreeSizeOf((ADDRESS)strat,skStrategy);
   return shdl;
 }

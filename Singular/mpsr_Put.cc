@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_Put.cc,v 1.17 1999-09-27 15:05:27 obachman Exp $ */
+/* $Id: mpsr_Put.cc,v 1.18 1999-10-14 14:27:26 obachman Exp $ */
 
 /***************************************************************
  *
@@ -654,7 +654,7 @@ mpsr_Status_t mpsr_PutDump(MP_Link_pt link)
     h = h->next;
   }
   MP_EndMsg(link);
-  Free(lv, sizeof(sleftv));
+  FreeSizeOf(lv, sleftv);
   if (rh != NULL && rh != currRingHdl) rSetHdl(rh, TRUE);
 
   if (h == NULL && h2 == NULL)

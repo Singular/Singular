@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.cc,v 1.5 1999-09-22 15:42:12 Singular Exp $ */
+/* $Id: feOpt.cc,v 1.6 1999-10-14 14:27:02 obachman Exp $ */
 /*
 * ABSTRACT: Implementation of option buisness
 */
@@ -358,12 +358,7 @@ static char* feOptAction(feOptIndex opt)
         return NULL;
 
       case FE_OPT_VERSION:
-        printf("Singular for %s version %s  (%lu)  %s %s\n",
-               S_UNAME, S_VERSION1,
-               feVersionId,__DATE__,__TIME__);
-        printf("with\n");
         printf(versionString());
-        printf("\n\n");
         return NULL;
 
 #ifdef HAVE_TCL

@@ -3,22 +3,20 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.17 1999-09-30 14:09:36 obachman Exp $ */
+/* $Id: kutil.h,v 1.18 1999-10-14 14:27:14 obachman Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
+#include <string.h>
 #include "mod2.h"
 #include "structs.h"
 #include "mmemory.h"
 #include "ring.h"
-#include <string.h>
+#if HAVE_ASO == 1
+#include "kutil.aso"
+#endif
 
 #define setmax 16
-
-// define to enable divisiblity tests bawsed on short exponent vectors
-// #define HAVE_SHORT_EVECTORS
-// define to enable debugging of this business (needs PDEBUG, as well)
-// #define DEBUG_SHORT_EVECTORS
 
 typedef int* intset;
 
@@ -28,10 +26,9 @@ public:
   poly  p;
   int ecart,length, pLength;
   memHeap heap;
-#ifdef HAVE_SHORT_EVECTORS
   unsigned long sev;
-#endif
   sTObject() { memset((void*) this, 0, sizeof(sTObject));}
+  inline poly SetP(poly p_new);
 };
 
 class sLObject
@@ -40,8 +37,9 @@ public:
   poly  p;
   poly  p1,p2; /*- the pair p comes from -*/
   poly  lcm;   /*- the lcm of p1,p2 -*/
-  int ecart,length, pLength;
   memHeap heap;
+  int ecart,length, pLength;
+  unsigned long sev;
   sLObject() { memset((void*) this, 0, sizeof(sLObject));}
 };
 
@@ -74,6 +72,7 @@ class skStrategy
     polyset S;
     intset ecartS;
     intset fromQ;
+    unsigned long* sevS;
     TSet T;
     LSet L;
     LSet    B;
@@ -178,6 +177,7 @@ inline TSet initT () { return (TSet)Alloc0(setmax*sizeof(TObject)); }
 #define kTest_TS(A) K_Test(__FILE__,__LINE__,A)
 #define kTest_T(T) K_Test_T(__FILE__,__LINE__,T)
 #define kTest_L(L) K_Test_L(__FILE__,__LINE__,L)
+#define kTest_S(strat) K_Test_S(__FILE__,__LINE__,strat)
 #define kTest_Pref(L) K_Test(__FILE__,__LINE__,L, 1)
 BOOLEAN K_Test(char *f, int l,kStrategy strat, int pref=0);
 BOOLEAN K_Test_TS(char *f, int l,kStrategy strat);
@@ -185,11 +185,13 @@ BOOLEAN K_Test_T(char *f, int l, TObject* T, int tpos = -1);
 BOOLEAN K_Test_L(char* f, int l, LObject* L, 
                  BOOLEAN testp = FALSE, int lpos = -1, 
                  TSet T = NULL, int tlength = -1);
+BOOLEAN K_Test_S(char* f, int l, kStrategy strat);
 #else
 #define kTest(A)    (TRUE)
 #define kTest_Pref(A) (TRUE)
 #define kTest_TS(A) (TRUE)
 #define kTest_T(T)  (TRUE)
+#define kTest_S(T)  (TRUE)
 #define kTest_L(T)  (TRUE)
 #endif
 #endif
@@ -266,20 +268,15 @@ poly ksOldSpolyRedNew(poly p1, poly p2, poly spNoether = NULL);
 poly ksOldCreateSpoly(poly p1, poly p2, poly spNoether = NULL);
 void ksOldSpolyTail(poly p1, poly q, poly q2, poly spNoether);
 
-#ifdef HAVE_SHORT_EVECTORS
 
-#define K_INIT_SHORT_EVECTOR(p) unsigned long __sev = ~ pGetShortExpVector(p);
-
-#if defined(DEBUG_SHORT_EVECTORS) && defined(PDEBUG)
-#define K_DIVISIBLE_BY(T, p2) \
-  (pDBShortDivisibleBy(T.p, T.sev, p2, __sev, __FILE__, __LINE__))
-#else
-#define K_DIVISIBLE_BY(T, p2) \
-  (pShortDivisibleBy(T.p, T.sev, p2, __sev))
-#endif
-
-#else
-#define K_INIT_SHORT_EVECTOR(p)
-#define K_DIVISIBLE_BY(T, p2) pDivisibleBy(T.p, p2)
-#endif // HAVE_SHORT_EVECTORS
+#include "polys.h"
+// Methods for tobjects
+inline poly sTObject::SetP(poly new_p)
+{
+  poly old_p = p;
+  memset((void*) this, 0, sizeof(sTObject));
+  p = new_p;
+  sev = pGetShortExpVector(p);
+  return p;
+}
 

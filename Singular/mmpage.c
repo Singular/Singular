@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmpage.c,v 1.2 1999-02-26 15:32:06 Singular Exp $ */
+/* $Id: mmpage.c,v 1.3 1999-10-14 14:27:20 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -18,11 +18,10 @@
 #endif
 
 #include "mmpage.h"
-#include "tok.h" /* needed only for m2_end */
+#include "mmemory.h"
 
 static void* mm_FreePages = NULL;
 static int mm_NumberOfFreePages = 0;
-int mm_bytesValloc = 0;
 
 void* mmGetPage()
 {
@@ -34,25 +33,11 @@ void* mmGetPage()
     page = mm_FreePages;
     mm_FreePages = *((void**)mm_FreePages);
     mm_NumberOfFreePages--;
+    return page;
   }
   else
 #endif
-  {
-    page = PALLOC(SIZE_OF_PAGE);
-    if (page == NULL)
-    {
-      (void)fprintf( stderr, "\nerror: no more memory\n" );
-      m2_end(14);
-    }
-      
-#ifdef HAVE_PAGE_ALIGNMENT
-    assume(mmIsAddrPageAligned(page));
-#endif    
-    mm_bytesValloc += SIZE_OF_PAGE;
-  }
-  
-  if (BVERBOSE(V_SHOW_MEM)) mmCheckPrint();
-  return (void*) page;
+    return mmAllocPageFromSystem();
 }
 
 void mmFreePage(void* page)
@@ -71,15 +56,13 @@ void mmReleaseFreePages()
   while (mm_FreePages != NULL)
   {
     next = *((void**)mm_FreePages);
-    PFREE(mm_FreePages);
+    mmFreePageToSystem(mm_FreePages);
     mm_FreePages = next;
-    mm_bytesValloc -= SIZE_OF_PAGE;
   }
   mm_NumberOfFreePages = 0;
 #endif
 }
 
-#ifdef HAVE_PAGE_ALIGNMENT
 int mmIsAddrOnFreePage(void* addr)
 {
   void* page = mm_FreePages;
@@ -90,7 +73,6 @@ int mmIsAddrOnFreePage(void* addr)
   }
   return 0;
 }
-#endif
 
 int mmGetNumberOfFreePages()
 {

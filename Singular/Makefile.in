@@ -81,14 +81,16 @@ CXXSOURCES=grammar.cc scanner.cc algmap.cc attrib.cc binom.cc clapconv.cc \
     numbers.cc polys.cc polys0.cc polys1.cc polys-impl.cc \
     ring.cc shortfl.cc silink.cc sing_mp.cc\
     sing_dld.cc sing_dbm.cc kspoly.cc \
-    subexpr.cc syz.cc syz0.cc syz1.cc \
+    subexpr.cc syz.cc syz0.cc syz1.cc\
     timer.cc weight.cc \
     mpsr_Put.cc mpsr_PutPoly.cc mpsr_GetPoly.cc \
     mpsr_Get.cc mpsr_GetMisc.cc mpsr_Error.cc \
     GMPrat.cc multicnt.cc npolygon.cc semic.cc spectrum.cc splist.cc \
     ndbm.cc  libparse.cc mod_raw.cc\
     pcv.cc kbuckets.cc pProcs.cc \
-    mpr_inout.cc mpr_base.cc mpr_numeric.cc
+    mpr_inout.cc mpr_base.cc mpr_numeric.cc 
+
+
 # normal C source files
 CSOURCES=mmalloc.c mmheap.c mmpage.c mmcheck.c  mmisc.c mmtables.c \
     mmbt.c weight0.c find_exec.c fegetopt.c fereadl.c page.c
@@ -96,10 +98,14 @@ CSOURCES=mmalloc.c mmheap.c mmpage.c mmcheck.c  mmisc.c mmtables.c \
 # special source files (need extra compiling and/or linking)
 ESOURCES=iparith.cc gmalloc.c tesths.cc mpsr_Tok.cc claptmpl.cc
 
-SOURCES=${CSOURCES} ${CXXSOURCES} grammar.y scanner.l libparse.l 
-
 SOURCES=${CSOURCES} ${CXXSOURCES} ${ESOURCES} \
-	grammar.y scanner.l libparse.l 
+	grammar.y scanner.l libparse.l syz2.cc
+
+# ASO_SOURCES
+ASO_SOURCES = structs.aso.cc ipid.aso.cc mmprivate.aso.cc silink.aso.cc \
+              matpol.aso.cc longrat.aso.cc kbuckets.aso.cc mpsr_Get.aso.cc \
+	      mpr_base.aso.cc attrib.aso.cc lists.aso.cc kutil.aso.cc \
+              syz.aso.cc subexpr.aso.cc 
 
 HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	longalg.h mpsr_Tok.h structs.h binom.h intvec.h longrat.h \
@@ -107,30 +113,27 @@ HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
 	subexpr.h clapsing.h ipid.h matpol.h polys.h syz.h \
 	cntrlc.h ipprint.h ring.h timer.h sdb.h \
 	febase.h ipshell.h shortfl.h tok.h mpr_complex.h mpr_global.h \
-	mmemory.h mmprivate.h mmheap.h mmpage.h page.h \
+	mmemory.h mmprivate.h mmpage.h page.h \
 	ffields.h khstd.h silink.h sparsmat.h gnumpfl.h gnumpc.h \
 	fglm.h kstd1.h modulop.h sing_dbm.h weight.h \
 	fglmgauss.h fglmvec.h mpsr.h sing_mp.h \
-	kstdfac.h mpsr_Get.h \
+	kstdfac.h mpsr_Get.h mmbt.h \
 	kutil.h mpsr_Put.h sing_dld.h\
 	ndbm.h polys-impl.h polys-comp.h libparse.h \
         GMPrat.h multicnt.h npolygon.h semic.h spectrum.h splist.h multicnt.h \
 	pcv.h mod_raw.h kbuckets.h pProcs.h \
 	mpr_global.h mpr_inout.h mpr_base.h mpr_numeric.h \
-	feOpt.h fegetopt.h
+	feOpt.h fegetopt.h distrib.h walk.h
 
 INCS=febase.inc polys.inc iparith.inc mpsr_Tok.inc feOpt.inc
 
-TESTS=${testdir}/comparecheck ${testdir}/fac_test.in ${testdir}/fac_test.out\
-	${testdir}/general_test.in ${testdir}/general_test.out \
-	${testdir}/mpcheck ${testdir}/mpcheck.data \
-	${testdir}/dbm_test.in ${testdir}/dbm_test.out
-
 DISTFILES=${SOURCES} ${HEADERS} Makefile.in configure.in configure \
 	mod2.h.in grammar.h testgh install-sh mkinstalldirs \
-	${INCS}
+	${INCS} $(ASO_SOURCES) check_aso.pl aso.h
 
 OBJS := $(CXXSOURCES:.cc=.o) $(CSOURCES:.c=.o)
+
+ASO_OBJS := $(ASO_SOURCES:.aso.cc=.aso) 
 
 # Singular libraries which go into distribution
 SLIBS = algebra.lib        all.lib            classify.lib       deform.lib  \
@@ -166,10 +169,18 @@ SLIBS = algebra.lib        all.lib            classify.lib       deform.lib  \
 .c.o:
 	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -c $<
 
+%.aso.o: %.aso.cc mmtables.inc 
+	${CXX} ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} $< -o $@
+.PRECIOUS: %.aso.o
+
+%.aso: %.aso.o
+	./$< > $@
+
 all:	Singular
 
 Singular: mod2.h Makefile version.h scanner.cc gmalloc.o \
-          ${OBJS} iparith.o tesths.cc libparse.cc claptmpl.o mpsr_Tok.o
+          ${ASO_OBJS} ${OBJS} \
+          iparith.o tesths.cc libparse.cc claptmpl.o mpsr_Tok.o
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} \
 	  -o Singular \
 	  tesths.cc iparith.o mpsr_Tok.o claptmpl.o\
@@ -177,7 +188,8 @@ Singular: mod2.h Makefile version.h scanner.cc gmalloc.o \
 	  gmalloc.o ${LD_LIBC}
 
 Singular-static: mod2.h Makefile version.h scanner.cc  gmalloc.o \
-	        ${OBJS} iparith.o mpsr_Tok.o tesths.cc claptmpl.o
+	        ${ASO_OBJS}  ${OBJS} \
+                iparith.o mpsr_Tok.o tesths.cc claptmpl.o
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} \
 	  -o Singular-static \
 	  tesths.cc iparith.o mpsr_Tok.o claptmpl.o\
@@ -200,7 +212,7 @@ iparith.inc mpsr_Tok.inc: gmalloc.o claptmpl.o iparith.cc \
 
 mmtables.inc: mmtables.c mmprivate.h mod2.h
 	${CXX} ${CXXFLAGS}  ${CPPFLAGS}\
-	       -DGENERATE_INDEX_TABLE -DHAVE_INDEX_TABLE mmtables.c -o mmtables
+	       -DGENERATE_INDEX_TABLE  -DHAVE_ASO=0 -DHAVE_INDEX_TABLE mmtables.c -o mmtables
 	./mmtables > mmtables.inc
 	rm -f mmtables mmtables.exe
 
@@ -211,10 +223,10 @@ version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in \
 	echo unsigned long feVersionId =  `date '+%Y%m%d%H'`\; >version.h
 
 libparse: libparse_main.o utils.o fegetopt.o
-	${CXX} -o libparse libparse_main.o utils.o fegetopt.o
+	${CXX}  -DHAVE_ASO=0  -o libparse libparse_main.o utils.o fegetopt.o
 
 libparse_main.o: libparse.cc
-	${CXX} -c -o libparse_main.o libparse.cc -DSTANDALONE_PARSER
+	${CXX} -c -o libparse_main.o libparse.cc  -DHAVE_ASO=0 -DSTANDALONE_PARSER
 
 libparse.cc: libparse.l
 	@if test "x${LEX}" = x; then \
@@ -230,12 +242,12 @@ ESingular: fegetopt.o feResource.cc mod2.h feOpt.cc version.h emacs.cc \
 feOpt.h: feOpt.inc feOptES.inc
 
 feOpt.inc: feOpt.cc
-	$(CXX) -DGENERATE_OPTION_INDEX feOpt.cc
+	$(CXX) -DGENERATE_OPTION_INDEX -DHAVE_ASO=0 feOpt.cc
 	./a.out
 	rm a.out
 
 feOptES.inc: feOpt.cc
-	$(CXX) -DGENERATE_OPTION_INDEX -DESINGULAR feOpt.cc
+	$(CXX) -DGENERATE_OPTION_INDEX  -DHAVE_ASO=0 -DESINGULAR feOpt.cc
 	./a.out
 	rm a.out
 
@@ -287,14 +299,15 @@ uninstallbin:
 ##
 ## clean targest
 ##
-mostlyclean: clean
+mostlyclean: 
+	-rm -f Singular Singularg Singularp Singularb libparse feOpt*.inc
+	-rm -f *.o *.og core *.op *.ob
 
-clean:
-	-rm -f Singular Singularg Singularp Singularb libparse feOpt*.inc\
-            *.o *.og core *.op *.ob 
+clean: mostlyclean
+	 -rm -f *.aso *.bak *.d *.dd depend 
 
 distclean: clean
-	-rm -f depend iparith.inc mpsr_Tok.inc stamp.h *.d *.dd
+	-rm -f iparith.inc mpsr_Tok.inc stamp.h 
 	-rm -f Singular* *.gprof *.bprof *~ .\#* version.h
 	-rm -f mod2.h Makefile TAGS* tags config.status config.cache config.log
 
@@ -354,8 +367,8 @@ echoLIBS:
 
 CCG		= gcc
 CXXG		= gcc
-CXXM		= gcc -MM
-CCM		= gcc -MM
+CXXM		= gcc -MM -DGENERATE_DEPEND
+CCM		= gcc -MM -DGENERATE_DEPEND
 
 CFLAGSG		= -g -Wall -Wno-unused ${PIPE}
 CXXFLAGSG	= -g -Wall -Wno-unused ${PIPE}
@@ -385,7 +398,9 @@ $(OBJG1) : %.og: %.cc
 $(OBJG2) gmalloc.og: %.og: %.c
 	$(CCG)  ${CFLAGSG} ${CPPFLAGS} ${DEFSG} -c $< -o $@
 
-Singularg: scanner.cc gmalloc.og $(OBJG) iparith.og mpsr_Tok.og claptmpl.og tesths.cc version.h 
+Singularg: scanner.cc gmalloc.og \
+           $(ASO_OBJS) $(OBJG)  \
+           iparith.og mpsr_Tok.og claptmpl.og tesths.cc version.h 
 	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGSG} ${CPPFLAGS} ${DEFSG} -o Singularg \
 	tesths.cc iparith.og mpsr_Tok.og claptmpl.og $(OBJG) ${LDFLAGS} ${LIBS} \
 	${LD_DYN_FLAGS} gmalloc.og
@@ -483,23 +498,31 @@ mpsr_Tok.ob: iparith.inc mpsr_Tok.cc
 	$(CXXP) ${CXXFLAGSP} ${CPPFLAGS} ${DEFSB} -c mpsr_Tok.cc -o mpsr_Tok.ob
 
 ##
+## check_aso
+##
+check_aso:
+	${PERL5} check_aso.pl $(SOURCES)
+##
 ## dependencies
 ##
-%.dd: %.cc mod2.h
+
+%.aso.dd: %.aso.cc mod2.h aso.h
+	$(CXXM) ${CPPFLAGS} ${DEFS} $< >> $@
+
+%.dd: %.cc mod2.h $(ASO_OBJS)
 	echo $(@:.dd=.og) $(@:.dd=.op) $(@:.dd=.ob) " " \\ > $@
 	$(CXXM) -DGENTABLE ${CPPFLAGS} ${DEFSG} $< >> $@
 
-%.d: %.c mod2.h
+%.d: %.c mod2.h $(ASO_OBJS)
 	echo $(@:.d=.og) $(@:.d=.op) $(@:.d=.ob) " " \\ > $@
 	$(CCM) ${CPPFLAGS} ${DEFSG} $< >> $@
 
-depend: $(CXXSOURCES:.cc=.dd) $(CSOURCES:.c=.d) mod2.h
+depend:   $(ASO_SOURCES:.cc=.dd) $(CXXSOURCES:.cc=.dd) $(CSOURCES:.c=.d) mod2.h 
 	cat *.d *.dd >depend
 
-#include $(SOURCES:.cc=.dd) $(CSOURCES:.c=.d)
-#include *.d *.dd
 ifeq (depend,$(wildcard depend))
 include depend
 endif
+
 
 

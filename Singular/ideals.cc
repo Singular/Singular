@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.57 1999-10-14 12:50:25 Singular Exp $ */
+/* $Id: ideals.cc,v 1.58 1999-10-14 14:27:05 obachman Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -46,9 +46,9 @@ ideal idInit(int idsize, int rank)
 {
   /*- initialise an ideal -*/
 #if defined(MDEBUG) && defined(PDEBUG)
-  ideal hh = (ideal )mmDBAllocBlock(sizeof(*hh),f,l);
+  ideal hh = (ideal )mmDBAllocBlock(sizeof(sip_sideal),f,l);
 #else
-  ideal hh = (ideal )Alloc(sizeof(*hh));
+  ideal hh = (ideal )AllocSizeOf(sip_sideal);
 #endif
   hh->nrows = 1;
   hh->rank = rank;
@@ -128,9 +128,9 @@ void idDelete (ideal * h)
     #endif
   }
   #if defined(MDEBUG) && defined(PDEBUG)
-  mmDBFreeBlock((ADDRESS)(*h),sizeof(**h),f,l);
+  mmDBFreeBlock((ADDRESS)(*h),sizeof(sip_sideal),f,l);
   #else
-  Free((ADDRESS)*h,sizeof(**h));
+  FreeSizeOf((ADDRESS)*h,sip_sideal);
   #endif
   *h=NULL;
 }
@@ -2709,12 +2709,13 @@ ideal idHomogen(ideal h, int varnum)
 ideal idVec2Ideal(poly vec)
 {
    ideal result=idInit(1,1);
-   Free((ADDRESS)result->m,sizeof(poly));
+   FreeSizeOf((ADDRESS)result->m,poly);
    result->m=NULL; // remove later
    pVec2Polys(vec, &(result->m), &(IDELEMS(result)));
    return result;
 }
 
+// converts mat to module, destroys mat 
 ideal idMatrix2Module(matrix mat)
 {
   ideal result = idInit(MATCOLS(mat),MATROWS(mat));
@@ -2740,6 +2741,8 @@ ideal idMatrix2Module(matrix mat)
       }
     }
   }
+  // obachman: need to clean this up
+  idDelete((ideal*) &mat);
   return result;
 }
 
@@ -2786,6 +2789,8 @@ matrix idModule2Matrix(ideal mod)
       MATELEM(result,cp,i+1) = pAdd(MATELEM(result,cp,i+1),h);
     }
   }
+// obachman 10/99: added the following line, otherwise memory lack! 
+  idDelete(&mod);
   return result;
 }
 

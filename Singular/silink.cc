@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.31 1999-07-23 08:24:30 Singular Exp $ */
+/* $Id: silink.cc,v 1.32 1999-10-14 14:27:30 obachman Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -120,7 +120,7 @@ void slKill(si_link l)
 {
   slCleanUp(l);
   if (l->ref == 0)
-    Free((ADDRESS)l, sizeof(ip_link));
+    FreeSizeOf((ADDRESS)l, ip_link);
 }
 
 char* slStatus(si_link l, char *request)
@@ -427,7 +427,7 @@ leftv slReadAscii2(si_link l, leftv pr)
       }
     }
   }
-  leftv v=(leftv)Alloc0(sizeof(sleftv));
+  leftv v=(leftv)Alloc0SizeOf(sleftv);
   v->rtyp=STRING_CMD;
   v->data=buf;
   return v;
@@ -815,7 +815,7 @@ BOOLEAN slGetDumpAscii(si_link l)
 void slStandardInit()
 {
   si_link_extension s;
-  si_link_root=(si_link_extension)Alloc0(sizeof(*si_link_root));
+  si_link_root=(si_link_extension)Alloc0SizeOf(s_si_link_extension);
   si_link_root->Open=slOpenAscii;
   si_link_root->Close=slCloseAscii;
   si_link_root->Kill=slCloseAscii;
@@ -829,16 +829,16 @@ void slStandardInit()
   s = si_link_root;
 #ifdef HAVE_DBM
 #ifndef HAVE_MODULE_DBM
-  s->next = (si_link_extension)Alloc0(sizeof(*si_link_root));
+  s->next = (si_link_extension)Alloc0SizeOf(s_si_link_extension);
   s = s->next;
   slInitDBMExtension(s);
 #endif
 #endif
 #ifdef HAVE_MPSR
-  s->next = (si_link_extension)Alloc0(sizeof(*si_link_root));
+  s->next = (si_link_extension)Alloc0SizeOf(s_si_link_extension);
   s = s->next;
   slInitMPFileExtension(s);
-  s->next = (si_link_extension)Alloc0(sizeof(*si_link_root));
+  s->next = (si_link_extension)Alloc0SizeOf(s_si_link_extension);
   s = s->next;
   slInitMPTcpExtension(s);
 #endif

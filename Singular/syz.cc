@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.23 1999-09-29 10:59:40 obachman Exp $ */
+/* $Id: syz.cc,v 1.24 1999-10-14 14:27:33 obachman Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -547,11 +547,11 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
 syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim)
 {
   int typ0;
-  syStrategy result=(syStrategy)Alloc0(sizeof(ssyStrategy));
+  syStrategy result=(syStrategy)Alloc0SizeOf(ssyStrategy);
 
   if (w!=NULL)
   {
-    result->weights = (intvec**)Alloc0(sizeof(intvec*));
+    result->weights = (intvec**)Alloc0SizeOf(void_ptr);
     (result->weights)[0] = ivCopy(w);
     result->length = 1;
   }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmisc.c,v 1.13 1999-09-30 14:09:38 obachman Exp $ */
+/* $Id: mmisc.c,v 1.14 1999-10-14 14:27:20 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -18,48 +18,163 @@
 #include "mmbt.h"
 #endif
 
-static int mm_specIndex = 0;
 static int mm_specSize = 0;
-
-size_t mmSpecializeBlock( size_t size )
-{
-  if (mm_specIndex != mmGetIndex( size ))
-  {
-    int mm_new_specIndex = mmGetIndex( size );
-    if (mm_new_specIndex<0)
-    {
-      WerrorS("too many ring variables...");
-    }
-    else
-    {
-      mm_specIndex = mm_new_specIndex;
-      mm_specHeap = &(mm_theList[mm_specIndex]);
-    }
-    mm_specSize = mmGetSize(mm_specIndex);
-  }
-  return mm_specSize;
-}
+static memSpecHeap mm_SpecHeaps = NULL;
+static memSpecHeap mm_TempHeaps = NULL;
 
 memHeap mmGetSpecHeap( size_t size)
 {
   int mm_new_specIndex = mmGetIndex( size );
-  if (mm_new_specIndex<0)
+#ifdef ALIGN_8
+  if (size % 8 != 0) size = size + 8 - (size % 8);
+#endif
+  if (mm_new_specIndex < 0 || 
+      ((mm_theList[mm_new_specIndex].size != RealSizeFromSize(size)) && 
+       (SIZE_OF_HEAP_PAGE/RealSizeFromSize(size) 
+        > 
+        SIZE_OF_HEAP_PAGE/mm_theList[mm_new_specIndex].size)))
   {
-      WerrorS("too many ring variables...");
-      return NULL;
+    memSpecHeap s_heap;
+      s_heap 
+        = mmFindInSortedGList(mm_SpecHeaps, 
+                              ((void**) &s_heap->next) - ((void**) s_heap), 
+                              ((void**) &s_heap->size) - ((void**) s_heap), 
+                              RealSizeFromSize(size));
+    if (s_heap != NULL) 
+    {
+      (s_heap->ref)++;
+      assume(s_heap->heap != NULL && s_heap->heap->size == s_heap->size);
+      return s_heap->heap;
+    }
+    s_heap = (memSpecHeap) Alloc0SizeOf(ip_memSpecHeap);
+    s_heap->ref = 1;
+    s_heap->heap = mmCreateHeap(RealSizeFromSize(size));
+    s_heap->size = s_heap->heap->size;
+    mm_SpecHeaps = 
+      mmSortedInsertInGList(mm_SpecHeaps, 
+                            ((void**) &s_heap->next) - ((void**) s_heap), 
+                            ((void**) &s_heap->size) - ((void**) s_heap), 
+                            s_heap);
+    return s_heap->heap;
   }
   else
   {
-    return &(mm_theList[mm_new_specIndex]);
+      return &(mm_theList[mm_new_specIndex]);
   }
 }
 
-size_t mmGetSpecSize()
+void mmUnGetSpecHeap(memHeap *heap_p)
 {
-  return mm_specSize;
+  memHeap heap = *heap_p;
+  int mm_this_specIndex = mmGetIndex(SizeFromRealSize(heap->size));
+
+  mmGarbageCollectHeap(heap, 0);
+
+  if (mm_this_specIndex < 0 || 
+      ((mm_theList[mm_this_specIndex].size != heap->size) && 
+       (SIZE_OF_HEAP_PAGE/heap->size) 
+        > 
+       (SIZE_OF_HEAP_PAGE/mm_theList[mm_this_specIndex].size)))
+  {
+    memSpecHeap s_heap 
+      = mmFindInSortedGList(mm_SpecHeaps, 
+                            ((void**) &s_heap->next) - ((void**) s_heap), 
+                            ((void**) &s_heap->size) - ((void**) s_heap), 
+                            heap->size);
+    if (s_heap == NULL)
+    {
+#ifdef MDEBUG
+      fprintf(stderr, "Warning: mmUngetSpecHeap: heap not previously gotten with mmGetSpecHeap\n");
+#else
+      feReportBug("SpecHeap memory managment");
+#endif
+      return;
+    }
+    (s_heap->ref)--;
+    if (s_heap->ref == 0)
+    {
+      mm_SpecHeaps = 
+        mmRemoveFromGList(mm_SpecHeaps,
+                          ((void**) &s_heap->next) - ((void**) s_heap),
+                          s_heap);
+      mmDestroyHeap(&(s_heap->heap));
+      FreeSizeOf(s_heap, ip_memSpecHeap);
+    }
+  }
+  *heap_p = NULL;
+}
+  
+memHeap mmGetTempHeap(size_t size)
+{
+  memSpecHeap s_heap = (memSpecHeap) Alloc0SizeOf(ip_memSpecHeap);
+  s_heap->heap = mmCreateHeap(size);
+  mm_TempHeaps = 
+    mmSortedInsertInGList(mm_TempHeaps,
+                          ((void**) &s_heap->next) - ((void**) s_heap), 
+                          ((void**) &s_heap->size) - ((void**) s_heap), 
+                          s_heap);
+  return s_heap->heap;
 }
 
+#ifndef HEAP_DEBUG
+void mmUnGetTempHeap(memHeap *heap_p) 
+#else
+void mmDebugUnGetTemHeap(memHeap *heap_p, char* file, int line)
+#endif
+{
+  memHeap heap = *heap_p;
+  memSpecHeap s_heap;
+  assume(heap != NULL);
+  s_heap = 
+    mmFindInSortedGList(mm_TempHeaps, 
+                        ((void**) &s_heap->next) - ((void**) s_heap), 
+                        ((void**) &s_heap->size) - ((void**) s_heap), 
+                        heap->size);
+  if (s_heap == NULL)
+  {
+#ifdef MDEBUG
+    fprintf(stderr, "Warning: mmUngetTempHeap: heap not previously gotten with mmGetTempHeap\n");
+#else
+    feReportBug("TempHeap memory managment");
+#endif
+    return;
+  }
+  mm_TempHeaps = 
+    mmRemoveFromGList(mm_SpecHeaps,
+                      ((void**) &s_heap->next) - ((void**) s_heap),
+                      s_heap);
+  mmDestroyHeap(&(s_heap->heap));
+  FreeSizeOf(s_heap, ip_memSpecHeap);
+}
 
+ 
+void mmGarbageCollectHeaps(int strict)
+{
+  int i;
+  int s_strict = strict & 1;
+  memSpecHeap s_heap;
+  s_heap = mm_SpecHeaps;
+  while (s_heap != NULL)
+  {
+    mmGarbageCollectHeap(s_heap->heap, s_strict);
+    s_heap = s_heap->next;
+  }
+  if (strict)
+  {
+    s_heap = mm_TempHeaps;
+    while (s_heap != NULL)
+    {
+      mmGarbageCollectHeap(s_heap->heap, s_strict);
+      s_heap = s_heap->next;
+    }
+  }
+  for (i=0; mmGetSize(i) <= MAX_BLOCK_SIZE; i++)
+  {
+    mmGarbageCollectHeap(&mm_theList[i], s_strict);
+  }
+  if (strict & 2) mmReleaseFreePages();
+}
+  
 size_t mmSizeL( void* adr )
 {
   if (adr!=NULL)
@@ -74,16 +189,31 @@ int mmMemAlloc( void )
 {
   return mm_bytesMalloc + mm_bytesValloc;
 }
+
 int mmMemUsed( void )
 {
   int bytesfree = 0;
   int i;
+  memSpecHeap s_heap;
 
-  for (i=0; mmGetSize(i) < MAX_BLOCK_SIZE; i++)
+  for (i=0; mmGetSize(i) <= MAX_BLOCK_SIZE; i++)
     bytesfree += mmListLength(mm_theList[i].current)*mm_theList[i].size;
+
+  s_heap = mm_SpecHeaps;
+  while (s_heap != NULL)
+  {
+    bytesfree += mmListLength(s_heap->heap->current) * (s_heap->heap->size);
+    s_heap = s_heap->next;
+  }
+  s_heap = mm_TempHeaps;
+  while (s_heap != NULL)
+  {
+    bytesfree += mmListLength(s_heap->heap->current) * s_heap->heap->size;
+    s_heap = s_heap->next;
+  }
   return
-    mm_bytesMalloc + mm_bytesValloc
-    - (bytesfree + mmListLength(mm_theList[i].current)*mm_theList[i].size);
+    mm_bytesMalloc + mm_bytesValloc 
+     - bytesfree - mmGetNumberOfFreePages()*SIZE_OF_PAGE;
 }
 
 #ifdef HAVE_SBRK
@@ -97,6 +227,7 @@ int mmMemPhysical( void )
 
 
 int mm_bytesMalloc=0;
+int mm_bytesValloc = 0;
 static int mm_printMark=102400;
 
 #ifndef ABS
@@ -116,11 +247,54 @@ void mmCheckPrint( void )
   }
 }
 
+extern memHeap mm_specHeap;
+
+static void mmPrintHeapStat(memHeap heap, int i)
+{
+  long l,a;
+  if (i >= 0) printf("%d", i);
+  else if (i== -1) printf("S");
+  else if (i== -2) printf("T");
+  printf("\t%ld", heap->size);
+  a = mmListLength(heap->current);
+  if (heap->size > MAX_HEAP_CHUNK_SIZE)
+  {
+    l = (int) heap->pages;
+    printf("\t%ld\t%d\t%ld\t%ld",
+           l, (l > 0 ? ((int) ((1.0 -
+                                ((double) a)
+                                /
+                                ((double) l)
+                                )*100.0))
+               : 0), a, l-a);
+  }
+  else
+  {
+    l = mmListLength(heap->pages);
+    printf("\t%ld\t%d\t%ld\t%ld",
+           l,
+           (l != 0 ? ((int) ((1.0 -
+                              ((double) a)
+                              /
+                              ((double) l*(SIZE_OF_PAGE/heap->size))
+                              )*100.0))
+            : 0),
+           a,
+           l*(SIZE_OF_PAGE/heap->size) - a);
+  }
+  if (heap == mm_specHeap) printf(" *");
+  else if (mm_specHeap != NULL && mm_specHeap->size == heap->size)
+    printf(" +");
+  printf("\n");
+  fflush(stdout);
+}
+      
 void mmPrintStat()
 {
 #ifndef MAKE_DISTRIBUTION
   int i;
   long l,a;
+  memSpecHeap s_heap;
 
 #ifdef HAVE_SBRK
   printf("Physical:%dk ", (mmMemPhysical()+ 1023)/1024);
@@ -133,25 +307,23 @@ void mmPrintStat()
   printf("Pused:%d ", mmGetNumberOfUsedPages());
   printf("\n");
 
-  i=-1;
   printf("Heap\tSize\tPages\tUsage\tFree\tUsed\n");
-  do
+  for (i=0; mmGetSize(i) <= MAX_BLOCK_SIZE; i++)
   {
-    i++;
-    l = mmListLength(mm_theList[i].pages);
-    a = mmListLength(mm_theList[i].current);
-    printf("%d\t%ld\t%ld\t%d\t%ld\t%ld\n",
-           i, mmGetHeapBlockSize(&mm_theList[i]), l,
-           (l != 0 ? ((int) ((1.0 -
-                              ((double) a)
-                              /
-                              ((double) l*(SIZE_OF_PAGE/mmGetHeapBlockSize(&mm_theList[i])))
-                              )*100.0))
-            : 0),
-           a,
-           l*(SIZE_OF_PAGE/mmGetHeapBlockSize(&mm_theList[i])) - a);
+    mmPrintHeapStat(&(mm_theList[i]), i);
   }
-  while (mmGetSize(i) < MAX_BLOCK_SIZE);
+  s_heap = mm_SpecHeaps;
+  while (s_heap != NULL)
+  {
+    mmPrintHeapStat(s_heap->heap, -1);
+    s_heap = s_heap->next;
+  }
+  s_heap = mm_TempHeaps;
+  while (s_heap != NULL)
+  {
+    mmPrintHeapStat(s_heap->heap, -2);
+    s_heap = s_heap->next;
+  }
 #endif
 }
 
@@ -320,6 +492,66 @@ void* mmGListHasCycle(void* list, int next)
     l++;
   }
   return NULL;
+}
+
+void* mmSortedInsertInGList(void* list, int next, int int_field, void* element)
+{
+  int el_size = *((int *) ((void**)element + int_field));
+  
+  if (list == NULL || *((int *)((void**)list + int_field)) > el_size)
+  {
+    *((void**)element + next) = list;
+    return element;
+  }
+  else
+  {
+    void* prev = list;
+    void* curr = *((void**)list + next);
+    
+    while (curr != NULL && *((int *)((void**)curr + int_field)) > el_size)
+    {
+      prev = curr;
+      curr = *((void**)curr + next);
+    }
+    assume(prev != NULL);
+    *((void**)prev+ next) = element;
+    *((void**)element+ next) = curr;
+    return list;
+  }
+}
+
+void* mmFindInSortedGList(void* list, int next, int int_field, int what)
+{
+  while (1)
+  {
+    if (list == NULL || *((int *)((void**)list + int_field)) > what)
+      return NULL;
+    if (*((int *)((void**)list + int_field)) == what) return list;
+    list = *((void**)list + next);
+  }
+}
+
+void* mmRemoveFromGList(void* list, int next, void* element)
+{
+  void* nlist;
+  void* olist;
+
+  if (list == NULL) return NULL;
+
+  nlist = *((void**) (list + next));
+  olist = list;
+
+  if (list == element) return nlist;
+
+  while (nlist != NULL && nlist != element)
+  {
+    list = nlist;
+    nlist = *((void**) (list + next));
+  }
+
+  if (nlist != NULL) *((void**) (list + next)) = *((void**) (nlist + next));
+
+  return olist;
 }
 
 /**********************************************************************

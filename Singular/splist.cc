@@ -524,7 +524,7 @@ spectrumState   spectrumPolyList::spectrum( lists *L,int fast )
             //  principal part
             // ---------------------------------------------
 
-            *L = (lists)Alloc( sizeof( slists ) );
+            *L = (lists)AllocSizeOf( slists );
             (*L)->Init( 1 );
             (*L)->m[0].rtyp = INT_CMD;    //  milnor number
             (*L)->m[0].data = (void*)mu;
@@ -533,7 +533,7 @@ spectrumState   spectrumPolyList::spectrum( lists *L,int fast )
         }
     }
 
-    *L = (lists)Alloc( sizeof( slists ) );
+    *L = (lists)AllocSizeOf( slists );
 
     (*L)->Init( 6 );
 

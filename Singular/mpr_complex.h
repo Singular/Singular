@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.h,v 1.8 1999-09-24 16:39:47 Singular Exp $ */
+/* $Id: mpr_complex.h,v 1.9 1999-10-14 14:27:23 obachman Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -109,7 +109,7 @@ public:
   inline bool isOne();   // t == 1 ?
   inline bool isMOne();  // t == -1 ?
 
-  inline bool setFromStr( char * in );
+  bool setFromStr( char * in );
 
   // access
   inline const mpf_t *mpfp() const;
@@ -241,11 +241,6 @@ inline bool gmp_float::isMOne()
 #else
   return mpf_eq( t , gmpMOne.t , gmp_float::gmp_needequal_bits );
 #endif
-}
-
-inline bool gmp_float::setFromStr( char * in )
-{
-  return ( mpf_set_str( t, in, 10 ) == 0 );
 }
 
 // access pointer

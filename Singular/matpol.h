@@ -3,12 +3,17 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.h,v 1.8 1999-08-19 08:31:10 pohl Exp $ */
+/* $Id: matpol.h,v 1.9 1999-10-14 14:27:17 obachman Exp $ */
 /*
 * ABSTRACT
 */
 #include "structs.h"
+#if HAVE_ASO == 1
+#include "matpol.aso"
+#endif
 
+// THIS IS REALLY DIRTY: ip_smatrix HAS TO BE IDENTICAL TO ip_sideal
+// SO, DON'T CHANGE THE DECLARATION OF ip_smatrix
 class ip_smatrix
 {
   public:

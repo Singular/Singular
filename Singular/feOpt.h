@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.h,v 1.1 1999-09-20 18:03:45 obachman Exp $ */
+/* $Id: feOpt.h,v 1.2 1999-10-14 14:27:03 obachman Exp $ */
 /*
 * ABSTRACT: Declarations for working with Options
 */
@@ -20,7 +20,7 @@ extern struct fe_option feOptSpec[];
 #ifndef GENERATE_OPTION_INDEX
 
 // provides feOptIndex enum type for fast accesses to feOptSpec
-#ifndef GENTABLE
+#if ! defined(GENTABLE) && ! defined(GENERATE_DEPEND)
 #ifdef ESINGULAR
 #include "feOptES.inc"
 #else

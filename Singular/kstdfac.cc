@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.24 1999-09-29 10:59:31 obachman Exp $ */
+/* $Id: kstdfac.cc,v 1.25 1999-10-14 14:27:12 obachman Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -49,6 +49,7 @@ static void copyT (kStrategy o,kStrategy n)
         t[j].p=pCopy(p);
         t[j].ecart=o->T[j].ecart;
         t[j].length=o->T[j].length;
+        t[j].sev=o->T[j].sev;
         break;
       }
       if (p == o->S[i])
@@ -56,6 +57,7 @@ static void copyT (kStrategy o,kStrategy n)
         t[j].p=n->S[i];
         t[j].ecart=o->T[j].ecart;
         t[j].length=o->T[j].length;
+        t[j].sev=o->T[j].sev;
         break;
       }
     }
@@ -133,7 +135,7 @@ static void copyL (kStrategy o,kStrategy n)
 
 kStrategy kStratCopy(kStrategy o)
 {
-  kStrategy s=(kStrategy)Alloc0(sizeof(skStrategy));
+  kStrategy s=(kStrategy)Alloc0SizeOf(skStrategy);
   s->next=NULL;
   s->red=o->red;
   s->initEcart=o->initEcart;
@@ -149,6 +151,8 @@ kStrategy kStratCopy(kStrategy o)
   else            s->D=NULL;
   s->ecartS=(int *)Alloc(IDELEMS(o->Shdl)*sizeof(int));
   memcpy(s->ecartS,o->ecartS,IDELEMS(o->Shdl)*sizeof(int));
+  s->sevS=(unsigned long *)Alloc(IDELEMS(o->Shdl)*sizeof(unsigned long));
+  memcpy(s->sevS,o->sevS,IDELEMS(o->Shdl)*sizeof(unsigned long));
   if(o->fromQ!=NULL)
   {
     s->fromQ=(int *)Alloc(IDELEMS(o->Shdl)*sizeof(int));
@@ -741,9 +745,9 @@ lists kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
   ideal r;
   BOOLEAN b=pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
-  kStrategy strat=(kStrategy)Alloc0(sizeof(skStrategy));
+  kStrategy strat=(kStrategy)Alloc0SizeOf(skStrategy);
   kStrategy orgstrat=strat;
-  lists L=(lists)Alloc(sizeof(slists)); L->Init(0);
+  lists L=(lists)AllocSizeOf(slists); L->Init(0);
   sleftv v; memset(&v,0,sizeof(v));
 
   if (rField_has_simple_inverse())
@@ -856,7 +860,7 @@ lists kStdfac(ideal F, ideal Q, tHomog h,intvec ** w,ideal D)
   while (strat!=NULL)
   {
     orgstrat=strat->next;
-    Free((ADDRESS)strat,sizeof(skStrategy));
+    FreeSizeOf((ADDRESS)strat,skStrategy);
     strat=orgstrat;
   }
   if ((delete_w)&&(w!=NULL)&&(*w!=NULL)) delete *w;

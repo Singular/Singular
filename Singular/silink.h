@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.h,v 1.11 1999-04-15 09:57:05 obachman Exp $ */
+/* $Id: silink.h,v 1.12 1999-10-14 14:27:30 obachman Exp $ */
 /*
 * ABSTRACT: general interface to links
 */
@@ -96,4 +96,7 @@ inline char* slString(si_link l)
   }
 }
 
+#if HAVE_ASO == 1
+#include "silink.aso"
+#endif
 #endif // SILINK_H

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.h,v 1.9 1999-09-27 15:05:25 obachman Exp $ */
+/* $Id: lists.h,v 1.10 1999-10-14 14:27:14 obachman Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -11,6 +11,10 @@
 #include "mmemory.h"
 #include "subexpr.h"
 #include "tok.h"
+#if HAVE_ASO == 1
+#include "lists.aso"
+#endif
+
 
 class slists
 {

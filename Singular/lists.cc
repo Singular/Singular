@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.cc,v 1.17 1999-09-27 15:05:24 obachman Exp $ */
+/* $Id: lists.cc,v 1.18 1999-10-14 14:27:14 obachman Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -18,7 +18,7 @@
 
 lists lCopy(lists L)
 {
-  lists N=(lists)Alloc0(sizeof(slists));
+  lists N=(lists)Alloc0SizeOf(slists);
   int n=L->nr;
   if (L->nr>=0)
     N->Init(n+1);
@@ -40,7 +40,7 @@ lists lCopy(lists L)
 */
 BOOLEAN lAdd(leftv res, leftv u, leftv v)
 {
-  lists l=(lists) Alloc(sizeof(slists));
+  lists l=(lists) AllocSizeOf(slists);
   lists ul=(lists)u->CopyD();
   lists vl=(lists)v->CopyD();
   l->Init(ul->nr+vl->nr+2);
@@ -59,9 +59,9 @@ BOOLEAN lAdd(leftv res, leftv u, leftv v)
     l->m[i+ul->nr+1].data=vl->m[i].data;
   }
   Free((ADDRESS)ul->m,(ul->nr+1)*sizeof(sleftv));
-  Free((ADDRESS)ul,sizeof(slists));
+  FreeSizeOf((ADDRESS)ul,slists);
   Free((ADDRESS)vl->m,(vl->nr+1)*sizeof(sleftv));
-  Free((ADDRESS)vl,sizeof(slists));
+  FreeSizeOf((ADDRESS)vl,slists);
   memset(u,0,sizeof(*u));
   memset(v,0,sizeof(*v));
   res->data = (char *)l;
@@ -76,7 +76,7 @@ lists lInsert0(lists ul, leftv v, int pos)
 {
   if ((pos<0)||(v->rtyp==NONE))
     return NULL;
-  lists l=(lists) Alloc(sizeof(slists));
+  lists l=(lists) AllocSizeOf(slists);
   l->Init(max(ul->nr+2,pos+1));
   int i,j;
 
@@ -93,7 +93,7 @@ lists lInsert0(lists ul, leftv v, int pos)
   l->m[pos].flag=v->flag;
   l->m[pos].attribute=v->CopyA();
   Free((ADDRESS)ul->m,(ul->nr+1)*sizeof(sleftv));
-  Free((ADDRESS)ul,sizeof(slists));
+  FreeSizeOf((ADDRESS)ul,slists);
   return l;
 }
 
@@ -149,7 +149,7 @@ BOOLEAN lDelete(leftv res, leftv u, leftv v)
   if((0<=VIndex)&&(VIndex<=ul->nr))
   {
     int i,j;
-    lists l=(lists) Alloc(sizeof(slists));
+    lists l=(lists) AllocSizeOf(slists);
     l->Init(ul->nr);
 
     ul=(lists)u->CopyD();
@@ -166,7 +166,7 @@ BOOLEAN lDelete(leftv res, leftv u, leftv v)
       }
     }
     Free((ADDRESS)ul->m,(ul->nr+1)*sizeof(sleftv));
-    Free((ADDRESS)ul,sizeof(slists));
+    FreeSizeOf((ADDRESS)ul,slists);
     res->data = (char *)l;
     return FALSE;
   }
@@ -197,7 +197,7 @@ BOOLEAN lRingDependend(lists L)
 lists liMakeResolv(resolvente r, int length, int reallen,
   int typ0, intvec ** weights)
 {
-  lists L=(lists)Alloc0(sizeof(slists));
+  lists L=(lists)Alloc0SizeOf(slists);
   if (length<=0)
   {
     // handle "empty" resolutions

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hilb.cc,v 1.9 1998-12-15 09:58:46 pohl Exp $ */
+/* $Id: hilb.cc,v 1.10 1999-10-14 14:27:05 obachman Exp $ */
 /*
 *  ABSTRACT -  Hilbert series
 */
@@ -225,7 +225,7 @@ static intvec * hSeries(ideal S, intvec *modulweight,
     hWeight();
   else
     hWDegree(wdegree);
-  p0 = (int *)Alloc(sizeof(int));
+  p0 = (int *)AllocSizeOf(int);
   *p0 = 1;
   hwork = (scfmon)Alloc(hNexist * sizeof(scmon));
   hvar = (varset)Alloc((pVariables + 1) * sizeof(int));
@@ -282,7 +282,7 @@ static intvec * hSeries(ideal S, intvec *modulweight,
         (**Qpol)++;
       else
       {
-        *Qpol = (int *)Alloc(sizeof(int));
+        *Qpol = (int *)AllocSizeOf(int);
         hLength = *Ql = **Qpol = 1;
       }
     }
@@ -349,7 +349,7 @@ static intvec * hSeries(ideal S, intvec *modulweight,
   Free((ADDRESS)hvar, (pVariables + 1) * sizeof(int));
   Free((ADDRESS)hwork, hNexist * sizeof(scmon));
   hDelete(hexist, hNexist);
-  Free((ADDRESS)p0, sizeof(int));
+  FreeSizeOf((ADDRESS)p0, int);
   if (hisModule!=0)
     Free((ADDRESS)hstc, hNexist * sizeof(scmon));
   return hseries1;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.41 1999-09-29 10:59:41 obachman Exp $ */
+/* $Id: syz1.cc,v 1.42 1999-10-14 14:27:34 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -1717,7 +1717,7 @@ void syKillComputation(syStrategy syzstr)
       rChangeCurrRing(origR, FALSE);
       rKill(syzstr->syRing);
     }
-    Free((ADDRESS)syzstr,sizeof(ssyStrategy));
+    FreeSizeOf((ADDRESS)syzstr,ssyStrategy);
   }
 }
 
@@ -2172,7 +2172,7 @@ lists syConvRes(syStrategy syzstr,BOOLEAN toDel)
 syStrategy syConvList(lists li,BOOLEAN toDel)
 {
   int typ0;
-  syStrategy result=(syStrategy)Alloc0(sizeof(ssyStrategy));
+  syStrategy result=(syStrategy)Alloc0SizeOf(ssyStrategy);
 
   resolvente fr = liFindRes(li,&(result->length),&typ0,&(result->weights));
   if (fr != NULL)
@@ -2189,7 +2189,7 @@ syStrategy syConvList(lists li,BOOLEAN toDel)
   }
   else
   {
-    Free (result, sizeof(ssyStrategy));
+    FreeSizeOf (result, ssyStrategy);
     result = NULL;
   }
   if (toDel) li->Clean();
@@ -2202,7 +2202,7 @@ syStrategy syConvList(lists li,BOOLEAN toDel)
 syStrategy syForceMin(lists li)
 {
   int typ0;
-  syStrategy result=(syStrategy)Alloc0(sizeof(ssyStrategy));
+  syStrategy result=(syStrategy)Alloc0SizeOf(ssyStrategy);
 
   resolvente fr = liFindRes(li,&(result->length),&typ0);
   result->minres = (resolvente)Alloc0((result->length+1)*sizeof(ideal));
@@ -2619,14 +2619,14 @@ syStrategy syLaScala3(ideal arg,int * length)
   poly p;
   ideal temp;
   SSet nextPairs;
-  syStrategy syzstr=(syStrategy)Alloc0(sizeof(ssyStrategy));
+  syStrategy syzstr=(syStrategy)Alloc0SizeOf(ssyStrategy);
   ring tmpR = NULL;
   ring origR = currRing;
 
   if ((idIs0(arg)) ||
       ((idRankFreeModule(arg)>0) && (!idHomModule(arg,NULL,&(syzstr->cw)))))
   {
-    syzstr->minres = (resolvente)Alloc0(sizeof(ideal));
+    syzstr->minres = (resolvente)Alloc0SizeOf(ideal);
     syzstr->length = 1;
     syzstr->minres[0] = idInit(1,arg->rank);
     return syzstr;
@@ -2640,7 +2640,7 @@ syStrategy syLaScala3(ideal arg,int * length)
   syzstr->length = *length = pVariables+2;
 
   // construct new ring
-  tmpR = (ring) Alloc0(sizeof(sip_sring));
+  tmpR = (ring) Alloc0SizeOf(sip_sring);
   tmpR->wvhdl = (int **)Alloc0(3 * sizeof(int *));
   ord = (int*)Alloc0(3*sizeof(int));
   b0 = (int*)Alloc0(3*sizeof(int));

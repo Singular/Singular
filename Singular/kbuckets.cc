@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.6 1999-09-30 16:27:43 obachman Exp $ */
+/* $Id: kbuckets.cc,v 1.7 1999-10-14 14:27:10 obachman Exp $ */
 
 #include "mod2.h"
 #include "tok.h"
@@ -107,13 +107,13 @@ void kbDBTests(kBucket_pt bucket, char* file, int line)
 
 kBucket_pt kBucketCreate()
 {
-  kBucket_pt bucket = (kBucket_pt) Alloc0(sizeof(kBucket));
+  kBucket_pt bucket = (kBucket_pt) Alloc0SizeOf(kBucket);
   return bucket;
 }
 
 void kBucketDestroy(kBucket_pt *bucket)
 {
-  Free(*bucket, sizeof(kBucket));
+  FreeSizeOf(*bucket, kBucket);
   *bucket = NULL;
 }
 

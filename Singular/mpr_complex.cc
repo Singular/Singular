@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.16 1999-09-24 16:39:47 Singular Exp $ */
+/* $Id: mpr_complex.cc,v 1.17 1999-10-14 14:27:22 obachman Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -90,6 +90,30 @@ size_t getGMPFloatDigits()
 //-> gmp_float::*
 unsigned long int gmp_float::gmp_default_prec_bits= GMP_DEFAULT_PREC_BITS;
 unsigned long int gmp_float::gmp_needequal_bits= GMP_NEEDEQUAL_BITS;
+
+bool gmp_float::setFromStr( char * in )
+{
+  // gmp doesn't understand number which begin with "." -- it needs 0.
+  // so, insert the zero
+  if (*in == '.')
+  {
+    bool ret;
+    int len = strlen(in)+2;
+    char* c_in;
+    c_in = (char*) Alloc(len);
+    *c_in = '0';
+    strcpy(&(c_in[1]), in);
+    
+    ret = ( mpf_set_str( t, c_in, 10 ) == 0 );
+    Free((void*)c_in, len);
+    return ret;
+  }
+  else
+  {
+    return  ( mpf_set_str( t, in, 10 ) == 0 );
+  }
+}
+
 
 // <gmp_float> = <gmp_float> operator <gmp_float>
 gmp_float operator + ( const gmp_float & a, const gmp_float & b )

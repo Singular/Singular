@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.65 1999-09-27 15:32:54 obachman Exp $ */
+/* $Id: iplib.cc,v 1.66 1999-10-14 14:27:09 obachman Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -273,7 +273,7 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
   /* generate argument list ======================================*/
   if (v!=NULL)
   {
-    iiCurrArgs=(leftv)Alloc(sizeof(sleftv));
+    iiCurrArgs=(leftv)AllocSizeOf(sleftv);
     memcpy(iiCurrArgs,v,sizeof(sleftv));
     memset(v,0,sizeof(sleftv));
   }
@@ -430,10 +430,10 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
                  err=iiPStart(pn,sl);
                  break;
     case LANG_C:
-                 leftv res = (leftv)Alloc0(sizeof(sleftv));
+                 leftv res = (leftv)Alloc0SizeOf(sleftv);
                  err = (pi->data.o.function)(res, sl);
                  iiRETURNEXPR[myynest+1].Copy(res);
-                 Free((ADDRESS)res, sizeof(sleftv));
+                 FreeSizeOf((ADDRESS)res, sleftv);
                  break;
   }
   if ((traceit&TRACE_SHOW_PROC)
@@ -510,7 +510,7 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
   {
     if (!err) Warn("too many arguments for %s",IDID(pn));
     iiCurrArgs->CleanUp();
-    Free((ADDRESS)iiCurrArgs,sizeof(sleftv));
+    FreeSizeOf((ADDRESS)iiCurrArgs,sleftv);
     iiCurrArgs=NULL;
   }
   namespaceroot->pop(TRUE);
@@ -1159,7 +1159,7 @@ void libstack::push(char *p, char *libname)
     }
     if(lp==NULL)
     {
-      libstackv ls = (libstack *)Alloc0(sizeof(libstack));
+      libstackv ls = (libstack *)Alloc0SizeOf(libstack);
       ls->next = this;
       ls->libname = mstrdup(libname);
       ls->to_be_done = TRUE;
@@ -1174,7 +1174,7 @@ libstackv libstack::pop(char *p)
   libstackv ls = this;
   //FreeL((ADDRESS)ls->libname);
   library_stack = ls->next;
-  Free((ADDRESS)ls, sizeof(libstack));
+  FreeSizeOf((ADDRESS)ls, libstack);
   return(library_stack);
 }
 

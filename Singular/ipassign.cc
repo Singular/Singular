@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.49 1999-09-17 11:42:24 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.50 1999-10-14 14:27:07 obachman Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -347,7 +347,7 @@ static BOOLEAN jiA_PROC(leftv res, leftv a, Subexpr e)
   if(res->data!=NULL) piCleanUp((procinfo *)res->data);
   if(a->rtyp==STRING_CMD)
   {
-    res->data = (void *)Alloc0(sizeof(procinfo));
+    res->data = (void *)Alloc0SizeOf(procinfo);
     ((procinfo *)(res->data))->language=LANG_NONE;
     iiInitSingularProcinfo((procinfo *)res->data,"",res->name,0,0);
     ((procinfo *)res->data)->data.s.body=(char *)a->CopyD(STRING_CMD);
@@ -407,14 +407,14 @@ static BOOLEAN jiA_LINK(leftv res, leftv a, Subexpr e)
   {
     if (l == NULL)
     {
-      l = (si_link) Alloc0(sizeof(sip_link));
+      l = (si_link) Alloc0SizeOf(sip_link);
       res->data = (void *) l;
     }
     return slInit(l, (char *) a->Data());
   }
   else if (a->Typ() == LINK_CMD)
   {
-    if (l != NULL) Free(l, sizeof(sip_link));
+    if (l != NULL) FreeSizeOf(l, sip_link);
     res->data = slCopy((si_link)a->Data());
     return FALSE;
   }
@@ -462,7 +462,7 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
   qr=(ring)res->Data();
   ring qrr=rCopy(currRing);
   memcpy4(qr,qrr,sizeof(ip_sring));
-  Free((ADDRESS)qrr,sizeof(ip_sring));
+  FreeSizeOf((ADDRESS)qrr,ip_sring);
   if (qr->qideal!=NULL) idDelete(&qr->qideal);
   qr->qideal = (ideal)a->CopyD(IDEAL_CMD);
   //currRing=qr;
@@ -633,7 +633,7 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
   if (dAssign[i].res==0)
   {
     int ri;
-    leftv rn = (leftv)Alloc0(sizeof(sleftv));
+    leftv rn = (leftv)Alloc0SizeOf(sleftv);
     BOOLEAN failed=FALSE;
     i=0;
     while ((dAssign[i].res!=lt)
@@ -649,7 +649,7 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
         }
         // everything done, clean up temp. variables
         rn->CleanUp();
-        Free((ADDRESS)rn,sizeof(sleftv));
+        FreeSizeOf((ADDRESS)rn,sleftv);
         if (failed)
         {
           // leave loop, goto error handling
@@ -718,7 +718,7 @@ static BOOLEAN iiAssign_sys(leftv l, leftv r)
   if (dAssign_sys[i].res==0)
   {
     int ri;
-    leftv rn = (leftv)Alloc0(sizeof(sleftv));
+    leftv rn = (leftv)Alloc0SizeOf(sleftv);
     BOOLEAN failed=FALSE;
     i=0;
     while ((dAssign_sys[i].res!=lt)
@@ -731,7 +731,7 @@ static BOOLEAN iiAssign_sys(leftv l, leftv r)
             || (dAssign_sys[i].p(l,rn)));
         // everything done, clean up temp. variables
         rn->CleanUp();
-        Free((ADDRESS)rn,sizeof(sleftv));
+        FreeSizeOf((ADDRESS)rn,sleftv);
         if (failed)
         {
           // leave loop, goto error handling
@@ -836,7 +836,7 @@ static BOOLEAN jjA_L_LIST(leftv l, leftv r)
 */
 {
   int sl = r->listLength();
-  lists L=(lists)Alloc(sizeof(slists));
+  lists L=(lists)AllocSizeOf(slists);
   lists oldL;
   leftv h=NULL,o_r=r;
   int i;
@@ -1232,7 +1232,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
        while (l->e!=NULL)
        {
          h=l->e->next;
-         Free((ADDRESS)l->e,sizeof(*(l->e)));
+         FreeSizeOf((ADDRESS)l->e,sSubexpr);
          l->e=h;
        }
        return b;
@@ -1317,7 +1317,7 @@ BOOLEAN iiAssign(leftv l, leftv r)
         while (l->e!=NULL)
         {
           h=l->e->next;
-          Free((ADDRESS)l->e,sizeof(*(l->e)));
+          FreeSizeOf((ADDRESS)l->e,sSubexpr);
           l->e=h;
         }
         return b;

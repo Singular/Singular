@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmemory.h,v 1.23 1999-09-30 14:09:38 obachman Exp $ */
+/* $Id: mmemory.h,v 1.24 1999-10-14 14:27:19 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -11,19 +11,19 @@
 
 #ifdef __cplusplus
 extern "C" {
+#else
+#define inline static
 #endif
 
+#include "mod2.h"
 #include "structs.h"
-#include "mmheap.h"
 
 /**********************************************************************
  *
  * Memory allocation
  *
  **********************************************************************/
-
 #ifndef MDEBUG
-
 void * mmAllocBlock( size_t );
 void * mmAllocBlock0( size_t );
 void   mmFreeBlock( void*, size_t );
@@ -38,8 +38,6 @@ void * mmAllocAlignedBlock( size_t );
 void * mmAllocAlignedBlock0( size_t );
 void   mmFreeAlignedBlock( void*, size_t );
 #endif
-
-#define AllocHeap               mmAllocHeap
 #define FreeHeap                mmFreeHeap
 #define Alloc                   mmAllocBlock
 #define Alloc0                  mmAllocBlock0
@@ -62,6 +60,7 @@ void   mmFreeAlignedBlock( void*, size_t );
 #else /* MDEBUG */
 
 void * mmDBAllocHeap(memHeap heap, char*, int );
+void * mmDBAlloc0Heap(memHeap heap, char*, int );
 void   mmDBFreeHeap(void* addr, memHeap heap, char*, int );
 void * mmDBAllocBlock( size_t, char*, int );
 void * mmDBAllocBlock0( size_t,  char*, int);
@@ -78,10 +77,9 @@ void * mmDBAllocAlignedBlock0( size_t,  char*, int);
 void   mmDBFreeAlignedBlock( void*, size_t, char*, int );
 #endif
 
-#define AllocHeap(res, heap)\
-  (void*) (res) = mmDBAllocHeap(heap, __FILE__, __LINE__)
-#define FreeHeap(addr, heap)\
-  mmDBFreeHeap(addr, heap,  __FILE__, __LINE__)
+#define AllocHeap(heap)         mmDBAllocHeap(heap, __FILE__, __LINE__)
+#define Alloc0Heap(heap)        mmDBAlloc0Heap(heap, __FILE__, __LINE__)
+#define FreeHeap(addr, heap)    mmDBFreeHeap(addr, heap,  __FILE__, __LINE__)
 #define Alloc(s)                mmDBAllocBlock(s, __FILE__, __LINE__)
 #define Alloc0(s)               mmDBAllocBlock0(s, __FILE__, __LINE__)
 #define Free(a,s)               mmDBFreeBlock(a, s, __FILE__, __LINE__)
@@ -101,6 +99,40 @@ void   mmDBFreeAlignedBlock( void*, size_t, char*, int );
 #endif
 
 #endif /* MDEBUG */
+
+/**********************************************************************
+ *
+ * ASO stuff -- enable/disable in mod2.h
+ *
+ **********************************************************************/
+#if defined(HAVE_ASO) && HAVE_ASO == 1
+
+/* definitions of ALLOC_SIZE_OF_## are given in *.aso */
+
+#define AllocSizeOf(x)  ALLOC_SIZE_OF_##x
+#define Alloc0SizeOf(x) ALLOC0_SIZE_OF_##x
+#define FreeSizeOf(x,y) FREE_SIZE_OF_##y(x)
+
+#if defined(ASO_DEBUG) || defined(MDEBUG)
+void* mmDBAllocHeapSizeOf(memHeap heap, size_t size, char* file, int line);
+void* mmDBAlloc0HeapSizeOf(memHeap heap, size_t size, char* file, int line);
+void  mmDBFreeHeapSizeOf(void* addr, memHeap heap, size_t size, 
+                         char* file, int line);
+#define AllocHeapSizeOf(h, s) mmDBAllocHeapSizeOf(h, s, __FILE__, __LINE__)
+#define Alloc0HeapSizeOf(h, s) mmDBAlloc0HeapSizeOf(h, s, __FILE__, __LINE__)
+#define FreeHeapSizeOf(x, h, s) mmDBFreeHeapSizeOf(x, h, s, __FILE__, __LINE__)
+#else /* ! (ASO_DEBUG || MDEBUG) */
+#define AllocHeapSizeOf(h, s)   AllocHeap(h)
+#define Alloc0HeapSizeOf(h, s)  Alloc0Heap(h)
+#define FreeHeapSizeOf(x, h, s) FreeHeap(x, h)
+#endif /* ASO_DEBUG || MDEBUG */
+
+#else
+/* defaults for AllocSizeOf stuff -- should be redefined by *.aso files */
+#define AllocSizeOf(x)    Alloc(sizeof(x))
+#define Alloc0SizeOf(x)   Alloc0(sizeof(x))
+#define FreeSizeOf(x, y)  FreeSizeOf(x, sizeof(y))
+#endif /* HAVE_ASO */
 
 
 /**********************************************************************
@@ -156,18 +188,132 @@ void mmTestList (int all);
 
 #endif /* MDEBUG */
 
+/**********************************************************************
+ *
+ * Public Heap Routines
+ *
+ **********************************************************************/
+
+/**********************************
+ *
+ * Creation/Destruction/Garbage Collection
+ *
+ **********************************/
+/* creates and initializes a temporary heap */
+extern memHeap mmCreateTempHeap(size_t size);
+#ifndef HEAP_DEBUG
+/* UNCONDITIONALLY clears and destoys temporary heap */
+extern void mmDestroyTempHeap(memHeap *heap_p);
+#else
+#define mmDestroyTempHeap(h) mmDebugDestroyTempHeap(h)
+extern void mmDebugDestroyTempHeap(memHeap *heap);
+#endif /* HEAP_DEBUG */
+
+/* removes chunks in freelist which fill one page */
+/* if strict & 1, does it even if free ptr  has not changed w.r.t. last gc */
+/* if strict & 2, also releases free pages */
+extern void mmGarbageCollectHeaps(int strict);
+extern void mmGarbageCollectHeap(memHeap heap, int strict);
+
+/* Returns a heap of the given size */
+extern memHeap mmGetSpecHeap( size_t );
+/* use this to "unget" (free) a heap once allocated with mmGetSpecHeap */
+extern void mmUnGetSpecHeap(memHeap *heap);
+  
+/* Merges what is free in Heap "what" into free list of heap "into" */
+extern void mmMergeHeap(memHeap into, memHeap what);
+/* Removes addr from freelist of heap, provided it finds it there */
+extern void mmRemoveFromCurrentHeap(memHeap heap, void* addr);
+
+/**********************************
+ *
+ * Allocate, Free from Heaps
+ *
+ **********************************/
+#ifndef HEAP_DEBUG
+#define mmAllocHeap(res, heap)  _mmAllocHeap(res, heap)
+#define mmFreeHeap(addr, heap) _mmFreeHeap(addr, heap)
+#define mmCheckHeap(heap)           1
+#define mmCheckHeapAddr(addr, heap) 1
+#else
+/* 
+ * define HEAP_DEBUG  and/or set mm_HEAP_DEBUG to 
+ * 0 to enable basic heap addr checks (at least on each alloc/free)
+ * 1 for addtl. containment checks in free/alloc list of heap
+ * 2 for addtl. check of entire  heap at each heap addr check
+ * NOTE: For HEAP_DEBUG > 1 on, it gets very slow
+ */
+extern int mm_HEAP_DEBUG;
+
+#define mmAllocHeap(res, heap)\
+  (res) = mmDebugAllocHeap(heap, __FILE__, __LINE__)
+void * mmDebugAllocHeap(memHeap heap, const char*, int );
+
+#define mmFreeHeap(addr, heap)\
+  mmDebugFreeHeap(addr, heap, __FILE__, __LINE__)
+void   mmDebugFreeHeap(void* addr, memHeap heap, const char*, int );
+
+#define mmCheckHeap(heap)\
+  mmDebugCheckHeap(heap, __FILE__, __LINE__)
+int mmDebugCheckHeap(memHeap heap, const char* fn, int line);
+
+#define mmCheckHeapAddr(addr, heap) \
+  mmDebugCheckHeapAdr(addr, heap, MM_HEAP_ADDR_USED_FLAG, __FILE__, __LINE__)  
+int mmDebugCheckHeapAddr(void* addr, memHeap heap, int flag,
+                         const char* fn, int l);
+#endif /* HEAP_DEBUG */
+
+/**********************************
+ *
+ * Low-level heap stuff 
+ *
+ **********************************/
+/* Need to define it here, has to be known to macros */
+struct sip_memHeap 
+{
+  void*         current; /* Freelist pointer */
+  memHeapPage   pages;   /* Pointer to linked list of pages */
+  void*         last_gc; /* current pointer after last gc */
+  long          size;    /* Size of heap chunks */
+};
+
+/* array of static heaps */
+extern struct sip_memHeap mm_theList[];
+
+extern void mmAllocNewHeapPage(memHeap heap);
+/* Allocates memory block from a heap */
+#define _mmAllocHeap(what, heap)                            \
+do                                                          \
+{                                                           \
+  register memHeap _heap = heap;                            \
+  if ((_heap)->current == NULL) mmAllocNewHeapPage(_heap);  \
+  what = (void *)((_heap)->current);              \
+  (_heap)->current =  *((void**)(_heap)->current);          \
+}                                                           \
+while (0)
+
+/* Frees addr into heap, assumes  addr was previously allocated from heap */ 
+#define _mmFreeHeap(addr, heap)                \
+do                                              \
+{                                               \
+  register memHeap _heap = heap;                \
+  *((void**) addr) = (_heap)->current;          \
+  (_heap)->current = (void*) addr;              \
+}                                               \
+while (0)
+
+#define MM_HEAP_ADDR_UNKNOWN_FLAG 0  
+#define MM_HEAP_ADDR_USED_FLAG   1
+#define MM_HEAP_ADDR_FREE_FLAG   2
+/* use this for unknown heaps */
+#define MM_UNKNOWN_HEAP ((memHeap) 1)
+
 
 /**********************************************************************
  *
  * Misc stuff
  *
  **********************************************************************/
-
-/* For handling of monomials */
-size_t mmSpecializeBlock( size_t );
-size_t mmGetSpecSize();
-extern memHeap mm_specHeap;
-
 /* for handling of memory statistics */
 int mmMemAlloc( void );
 int mmMemUsed( void );
@@ -177,9 +323,6 @@ int mmMemPhysical( void );
 void mmPrintStat();
 
 size_t mmSizeL( void* );
-
-/* max size of blocks which our memory managment handles */
-#define MAX_BLOCK_SIZE  (((SIZE_OF_HEAP_PAGE) / 16)*4)
 
 /**********************************************************************
  *
@@ -214,7 +357,19 @@ int mmIsAddrOnGList(void* addr, void* list, int next);
  * first element of list which is contained at least twice in memory
  * list. If no, NULL is returned */
 void* mmGListHasCycle(void* list, int next);
+/* Removes element from list, if contained in it and returns list */
+void* mmRemoveFromGList(void* list, int next, void* element);
 
+/* The following cast (list + int_field) to a pointer to int 
+   and assume list is sorted in ascending order w.r.t. *(list + int_field) 
+ */
+/* Inserts element at the right place */
+void* mmSortedInsertInGList(void* list, int next, int int_field, void* element);
+/* Finds element */
+void* mmFindInSortedGList(void* list, int next, int int_field, int what);
+  
+
+  
 /**********************************************************************
  *
  * some fast macros for basic memory operations
@@ -373,9 +528,9 @@ while(0)
 #define memsetW(P1, W, L)                       \
 do                                              \
 {                                               \
-  long* _p1 = P1;                               \
+  long* _p1 = (long*) P1;                               \
   unsigned long _l = L;                         \
-  long _w = W;                                  \
+  long _w = (long) W;                                  \
                                                 \
   while(_l)                                     \
   {                                             \
@@ -390,6 +545,22 @@ while(0)
 #ifdef __cplusplus
 }
 int mmInit();
+#endif
+
+#if ! defined(MDEBUG)
+inline void* AllocHeap(memHeap heap)
+{
+  void* ptr;
+  mmAllocHeap(ptr, heap);
+  return ptr;
+}
+inline void* Alloc0Heap(memHeap heap)
+{
+  void* ptr;
+  mmAllocHeap(ptr, heap);
+  memsetW(ptr, 0, (heap->size) >> LOG_SIZEOF_LONG);
+  return ptr;
+}
 #endif
 
 

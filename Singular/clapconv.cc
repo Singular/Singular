@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.20 1999-06-15 07:59:28 Singular Exp $
+// $Id: clapconv.cc,v 1.21 1999-10-14 14:26:57 obachman Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -142,10 +142,10 @@ convRecPP ( const CanonicalForm & f, int * exp, poly & result )
         pGetCoeff( term ) = nInit( f.intval() );
       else
       {
-        number z=(number)Alloc(sizeof(rnumber));
-        #ifdef LDEBUG
+        number z=(number)AllocSizeOf(rnumber);
+#if defined(LDEBUG) && ! defined(HAVE_ASO)
         z->debug=123456;
-        #endif
+#endif
         z->z = gmp_numerator( f );
         if ( f.den() == 1 )
           z->s = 3;
@@ -276,10 +276,10 @@ convRecPTr ( const CanonicalForm & f, int * exp, alg & result )
         napGetCoeff( term ) = nlInit( f.intval() );
       else
       {
-        number z=(number)Alloc(sizeof(rnumber));
-        #ifdef LDEBUG
+        number z=(number)AllocSizeOf(rnumber);
+#if defined(LDEBUG) && ! defined(HAVE_ASO)
         z->debug=123456;
-        #endif
+#endif
         z->z = gmp_numerator( f );
         if ( f.den() == 1 )
         {
@@ -364,7 +364,7 @@ convRecAP ( const CanonicalForm & f, int * exp, poly & result )
       for ( int i = 1; i <= pVariables; i++ )
         pSetExp( term, i , exp[i]);
       pSetComp(term, 0);
-      pGetCoeff(term)=(number)Alloc0(sizeof(rnumber));
+      pGetCoeff(term)=(number)Alloc0SizeOf(rnumber);
       ((lnumber)pGetCoeff(term))->z=z;
       pSetm( term );
       result = pAdd( result, term );
@@ -434,10 +434,10 @@ static number convClapNSingAN( const CanonicalForm &f)
     return nacInit( f.intval() );
   else
   {
-    number z=(number)Alloc(sizeof(rnumber));
-    #ifdef LDEBUG
+    number z=(number)AllocSizeOf(rnumber);
+#if defined(LDEBUG) && ! defined(HAVE_ASO)
     z->debug=123456;
-    #endif
+#endif
     z->z = gmp_numerator( f );
     if ( f.den() == 1 )
     {
@@ -533,7 +533,7 @@ convRecTrP ( const CanonicalForm & f, int * exp, poly & result , int offs)
     for ( int i = 1; i <= pVariables; i++ )
       pSetExp( term, i ,exp[i]);
     pSetComp(term, 0);
-    pGetCoeff(term)=(number)Alloc0(sizeof(rnumber));
+    pGetCoeff(term)=(number)Alloc0SizeOf(rnumber);
     ((lnumber)pGetCoeff(term))->z=convClapPSingTr( f );
     pSetm( term );
     result = pAdd( result, term );

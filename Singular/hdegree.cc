@@ -1,12 +1,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hdegree.cc,v 1.16 1998-12-16 12:04:13 Singular Exp $ */
+/* $Id: hdegree.cc,v 1.17 1999-10-14 14:27:04 obachman Exp $ */
 /*
 *  ABSTRACT -  dimension, multiplicity, HC, kbase
 */
 
 #include "mod2.h"
+
+
 #include "tok.h"
 #include "lists.h"
 #include "febase.h"
@@ -269,14 +271,6 @@ intvec * scIndIntvec(ideal S, ideal Q)
   return Set;
 }
 
-typedef struct sindlist indlist;
-typedef indlist * indset;
-
-struct sindlist
-{
-  indset nx;
-  intvec * set;
-};
 indset ISet, JSet;
 
 static BOOLEAN hNotZero(scfmon rad, int Nrad, varset var, int Nvar)
@@ -307,7 +301,7 @@ static void hIndep(scmon pure)
     else
       (*Set)[iv-1] = 1;
   }
-  ISet = ISet->nx = (indset)Alloc0(sizeof(indlist));
+  ISet = ISet->nx = (indset)Alloc0SizeOf(indlist);
   hMu++;
 }
 
@@ -443,7 +437,7 @@ static indset hCheck2(indset sm, scmon pure)
           hMu2--;
           be->nx = sm->nx;
           delete Set;
-          Free((ADDRESS)sm,sizeof(indlist));
+          FreeSizeOf((ADDRESS)sm,indlist);
           sm = be;
         }
         break;
@@ -460,7 +454,7 @@ static indset hCheck2(indset sm, scmon pure)
   {
     hMu2++;
     sm->set = new intvec(pVariables);
-    sm->nx = (indset)Alloc0(sizeof(indlist));
+    sm->nx = (indset)Alloc0SizeOf(indlist);
     return sm;
   }
 }
@@ -553,7 +547,7 @@ lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
 {
   int i;
   indset save;
-  lists res=(lists)Alloc0(sizeof(slists));
+  lists res=(lists)Alloc0SizeOf(slists);
 
   hexist = hInit(S, Q, &hNexist);
   if ((hNexist == 0) || (hisModule!=0))
@@ -561,7 +555,7 @@ lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
     res->Init(0);
     return res;
   }
-  save = ISet = (indset)Alloc0(sizeof(indlist));
+  save = ISet = (indset)Alloc0SizeOf(indlist);
   hMu = 0;
   hwork = (scfmon)Alloc(hNexist * sizeof(scmon));
   hvar = (varset)Alloc((pVariables + 1) * sizeof(int));
@@ -591,13 +585,13 @@ lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
     hMu2 = 0;
     if (all && (hCo+1 < pVariables))
     {
-      JSet = (indset)Alloc0(sizeof(indlist));
+      JSet = (indset)Alloc0SizeOf(indlist);
       hIndAllMult(hpure, hNpure, hrad, hNrad, hvar, hNvar);
       i=hMu+hMu2;
       res->Init(i);
       if (hMu2 == 0)
       {
-        Free((ADDRESS)JSet,sizeof(indlist));
+        FreeSizeOf((ADDRESS)JSet,indlist);
       }
     }
     else
@@ -610,9 +604,9 @@ lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
       res->m[i].rtyp = INTVEC_CMD;
       ISet = save;
       save = save->nx;
-      Free((ADDRESS)ISet,sizeof(indlist));
+      FreeSizeOf((ADDRESS)ISet,indlist);
     }
-    Free((ADDRESS)save,sizeof(indlist));
+    FreeSizeOf((ADDRESS)save,indlist);
     if (hMu2 != 0)
     {
       save = JSet;
@@ -622,15 +616,15 @@ lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
         res->m[i].rtyp = INTVEC_CMD;
         JSet = save;
         save = save->nx;
-        Free((ADDRESS)JSet,sizeof(indlist));
+        FreeSizeOf((ADDRESS)JSet,indlist);
       }
-      Free((ADDRESS)save,sizeof(indlist));
+      FreeSizeOf((ADDRESS)save,indlist);
     }
   }
   else
   {
     res->Init(0);
-    Free((ADDRESS)ISet, sizeof(indlist));
+    FreeSizeOf((ADDRESS)ISet, indlist);
   }
   hKill(radmem, pVariables - 1);
   Free((ADDRESS)hpure, (1 + (pVariables * pVariables)) * sizeof(Exponent_t));

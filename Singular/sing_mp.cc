@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_mp.cc,v 1.29 1999-10-01 17:18:26 Singular Exp $ */
+/* $Id: sing_mp.cc,v 1.30 1999-10-14 14:27:31 obachman Exp $ */
 
 /*
 * ABSTRACT: interface to MP links
@@ -381,12 +381,12 @@ leftv slReadMP(si_link l)
 
 static void SentQuitMsg(si_link l)
 {
-  leftv v = (leftv) Alloc0(sizeof(sleftv));
+  leftv v = (leftv) Alloc0SizeOf(sleftv);
 
   v->rtyp = STRING_CMD;
   v->data = MPSR_QUIT_STRING;
   slWriteMP(l, v);
-  Free(v, sizeof(sleftv));
+  FreeSizeOf(v, sleftv);
 }
 
 static BOOLEAN slCloseMP(si_link l)
@@ -487,7 +487,7 @@ int Batch_ReadEval(si_link silink)
     if (v != NULL)
     {
       v->CleanUp();
-      Free(v, sizeof(sleftv));
+      FreeSizeOf(v, sleftv);
       v = NULL;
     }
   }
@@ -507,7 +507,7 @@ int Batch_do(const char* port, const char* host)
   fprintf(stderr, "Was started with pid %d\n", getpid());
   while (stop){};
 #endif
-  si_link silink = (si_link) Alloc0(sizeof(sip_link));
+  si_link silink = (si_link) Alloc0SizeOf(sip_link);
   char *istr;
 
   // parse argv to get port and host

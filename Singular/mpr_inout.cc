@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_inout.cc,v 1.4 1999-07-08 10:18:12 wenk Exp $ */
+/* $Id: mpr_inout.cc,v 1.5 1999-10-14 14:27:23 obachman Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultant
@@ -35,7 +35,6 @@
 // to get detailed timigs, define MPR_TIMING
 #ifdef MPR_TIMING
 #define TIMING
-#endif
 #include "../factory/timing.h"
 TIMING_DEFINE_PRINT(mpr_overall)
 TIMING_DEFINE_PRINT(mpr_check)
@@ -44,8 +43,12 @@ TIMING_DEFINE_PRINT(mpr_ures)
 TIMING_DEFINE_PRINT(mpr_mures)
 TIMING_DEFINE_PRINT(mpr_arrange)
 TIMING_DEFINE_PRINT(mpr_solver)
-
 #define TIMING_EPR(t,msg) TIMING_END_AND_PRINT(t,msg);TIMING_RESET(t);
+#else
+#define TIMING_START(x)
+#define TIMING_EPR(x,y)
+#endif
+
 
 enum mprState
 {
@@ -207,7 +210,7 @@ BOOLEAN nuUResSolve( leftv res, leftv args )
   number smv= NULL;
   BOOLEAN interpolate_det= (mtype==uResultant::denseResMat)?TRUE:FALSE;
 
-  //emptylist= (lists)Alloc( sizeof(slists) );
+  //emptylist= (lists)AllocSizeOf( slists );
   //emptylist->Init( 0 );
 
   //res->rtyp = LIST_CMD;
@@ -310,7 +313,7 @@ BOOLEAN nuUResSolve( leftv res, leftv args )
   res->data= (void *)listofroots;
 
   //emptylist->Clean();
-  //  Free( (ADDRESS) emptylist, sizeof(slists) );
+  //  FreeSizeOf( (ADDRESS) emptylist, slists );
 
   TIMING_EPR(mpr_overall,"overall time\t\t")
 
@@ -365,7 +368,7 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   lists elist;
   lists rlist;
 
-  elist= (lists)Alloc( sizeof(slists) );
+  elist= (lists)AllocSizeOf( slists );
   elist->Init( 0 );
 
   if ( !(rField_is_R() ||
@@ -434,7 +437,7 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   char *dummy;
   int j;
 
-  rlist= (lists)Alloc( sizeof(slists) );
+  rlist= (lists)AllocSizeOf( slists );
   rlist->Init( elem );
 
   if (rField_is_long_C())
@@ -457,7 +460,7 @@ BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 )
   }
 
   elist->Clean();
-  //Free( (ADDRESS) elist, sizeof(slists) );
+  //FreeSizeOf( (ADDRESS) elist, slists );
 
   for ( i= deg; i >= 0; i-- ) nDelete( &pcoeffs[i] );
   Free( (ADDRESS) pcoeffs, (deg+1) * sizeof( number ) );

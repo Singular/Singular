@@ -3,13 +3,17 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.h,v 1.22 1999-09-27 17:54:56 Singular Exp $ */
+/* $Id: subexpr.h,v 1.23 1999-10-14 14:27:33 obachman Exp $ */
 /*
 * ABSTRACT: handling of leftv
 */
 
 #include <string.h>
 #include "structs.h"
+
+#if HAVE_ASO == 1
+#include "subexpr.aso"
+#endif
 
 struct _ssubexpr
 {
@@ -77,6 +81,7 @@ class sleftv
     int  Typ();
     int  LTyp(); /* returns LIST_CMD for l[i], otherwise returns Typ() */
     void * Data();
+    void SetData(void* value);
     leftv LData(); /* returns &(l[i]) for l[i], otherwise returns this */
     leftv LHdl();
     attr * Attribute();

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.27 1999-10-14 12:50:29 Singular Exp $ */
+/* $Id: structs.h,v 1.28 1999-10-14 14:27:32 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -37,10 +37,6 @@ enum noeof_t
   noeof_string
 };
 
-struct sip_memHeap;
-typedef struct sip_memHeap ip_memHeap;
-typedef ip_memHeap *       memHeap;
-
 /* C++-part */
 #ifdef __cplusplus
 class ip_smatrix;
@@ -67,7 +63,8 @@ struct sip_command;
 struct sip_package;
 struct s_si_link_extension;
 struct reca;
-
+struct sip_memHeap;
+struct sip_memHeapPage;
 typedef struct _ssubexpr   sSubexpr;
 typedef struct _sssym      ssym;
 typedef struct spolyrec    polyrec;
@@ -78,9 +75,13 @@ typedef struct sip_sring   ip_sring;
 typedef struct sip_link    ip_link;
 typedef struct sip_command ip_command;
 typedef struct sip_package ip_package;
-
+typedef struct sip_memHeap ip_memHeap;
 
 /* the pointer types */
+typedef char *              char_ptr;
+typedef int  *              int_ptr;
+typedef short *             short_ptr;
+typedef void *              void_ptr;
 typedef ip_sring *         ring;
 typedef int                idtyp;
 typedef rnumber *          number;
@@ -93,6 +94,10 @@ typedef union uutypes      utypes;
 typedef ip_command *       command;
 typedef struct s_si_link_extension *si_link_extension;
 typedef struct reca *      alg;
+typedef struct sip_memHeap * memHeap;
+typedef struct sip_memHeapPage * memHeapPage;
+
+
 #ifdef __cplusplus
 typedef idrec *            idhdl;
 typedef ip_smatrix *       matrix;
@@ -107,6 +112,35 @@ typedef ssyStrategy *      syStrategy;
 typedef procinfo *         procinfov;
 typedef namerec *          namehdl;
 typedef kBucket*           kBucket_pt;
+
+// for hdegree.cc   
+typedef struct sindlist indlist;
+typedef indlist * indset;
+struct sindlist
+{
+  indset nx;
+  intvec * set;
+};
+
+// for longalg.cc
+struct snaIdeal
+{
+  int anz;
+  alg *liste;
+};
+typedef struct snaIdeal * naIdeal;
+
+
+// for sparsemat.cc 
+typedef struct smprec sm_prec;
+typedef sm_prec * smpoly;
+struct smprec{
+  smpoly n;            // the next element
+  int pos;             // position
+  int e;               // level
+  poly m;              // the element
+  float f;             // complexity of the element
+};
 
 struct _scmdnames
 {
@@ -273,7 +307,7 @@ struct sip_smap
   int nrows;
   int ncols;
 };
-#endif
+#endif /* __cplusplus */
 
 /* the function pointer types */
 typedef number (*numberfunc)(number a,number b);
@@ -330,6 +364,10 @@ class libstack;
 typedef libstack *  libstackv;
 #endif
 #endif /* HAVE_LIBPARSER */
+
+#if HAVE_ASO == 1
+#include "structs.aso"
+#endif
 
 #endif
 

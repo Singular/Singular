@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.27 1999-09-27 15:05:25 obachman Exp $ */
+/* $Id: matpol.cc,v 1.28 1999-10-14 14:27:17 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -12,6 +12,7 @@
 #include <math.h>
 
 #include "mod2.h"
+#include "structs.h"
 #include "tok.h"
 #include "lists.h"
 #include "polys.h"
@@ -19,7 +20,6 @@
 #include "febase.h"
 #include "numbers.h"
 #include "ideals.h"
-//#include "ipid.h"
 #include "subexpr.h"
 #include "intvec.h"
 #include "ring.h"
@@ -69,7 +69,7 @@ matrix mpNew(int r, int c)
 #ifdef MDEBUG
   matrix rc = (matrix)mmDBAllocBlock(sizeof(ip_smatrix),f,l);
 #else
-  matrix rc = (matrix)Alloc(sizeof(ip_smatrix));
+  matrix rc = (matrix)AllocSizeOf(ip_smatrix);
 #endif
   rc->nrows = r;
   rc->ncols = c;
@@ -1659,7 +1659,7 @@ static void mpPartClean(matrix a, int lr, int lc)
 static void mpFinalClean(matrix a)
 {
   Free((ADDRESS)a->m,a->nrows*a->ncols*sizeof(poly));
-  Free((ADDRESS)a,sizeof(*a));
+  FreeSizeOf((ADDRESS)a,ip_smatrix);
 }
 
 /*2

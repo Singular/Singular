@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.26 1999-09-27 15:05:26 obachman Exp $ */
+/* $Id: mpsr_Get.cc,v 1.27 1999-10-14 14:27:24 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -171,15 +171,15 @@ inline void InitIntLeftv(mpsr_leftv mlv, int i)
 
 inline void InitApIntLeftv(mpsr_leftv mlv, mpz_ptr apint)
 {
-  number n = (number) Alloc(sizeof(rnumber));
-#ifdef LDEBUG
+  number n = (number) AllocSizeOf(rnumber);
+#if defined(LDEBUG) && ! defined(HAVE_ASO)
     n->debug=123456;
 #endif
   mlv->r = mpsr_rDefault(0);
   n->s = 3;
   memcpy(&(n->z), apint, sizeof(MP_INT));
   n = nlInit(n);
-  Free(apint, sizeof(MP_INT));
+  FreeSizeOf(apint, MP_INT);
   mlv->lv = mpsr_InitLeftv(NUMBER_CMD, n);
 }
 
@@ -472,7 +472,7 @@ mpsr_Status_t mpsr_GetOperatorLeftv(MP_Link_pt link,
     }
   }
 
-  command cmd = (command) Alloc0(sizeof(sip_command));
+  command cmd = (command) Alloc0SizeOf(sip_command);
   cmd->op = PROC_CMD;
   cmd->arg1.rtyp = STRING_CMD;
   cmd->arg1.data = (void *) mstrdup(MP_STRING_T(node->nvalue));
@@ -481,7 +481,7 @@ mpsr_Status_t mpsr_GetOperatorLeftv(MP_Link_pt link,
   {
     cmd->argc = 2;
     memcpy(&(cmd->arg2), mlv->lv, sizeof(sleftv));
-    Free(mlv->lv, sizeof(sleftv));
+    FreeSizeOf(mlv->lv, sleftv);
   }
   else cmd->argc = 1;
 
@@ -667,7 +667,7 @@ static mpsr_Status_t GetMatrixLeftv(MP_Link_pt link, MPT_Node_pt node,
 static mpsr_Status_t GetPackageLeftv(MP_Link_pt link, MPT_Node_pt node,
                                      mpsr_leftv mlv)
 {
-  package pack = (package) Alloc0(sizeof(sip_package));
+  package pack = (package) Alloc0SizeOf(sip_package);
 
   pack->language = LANG_NONE;
 
@@ -725,19 +725,19 @@ static mpsr_Status_t GetMapLeftv(MP_Link_pt link, MPT_Node_pt node,
     IDROOT = h;
   }
 
-  map m = (map) Alloc0(sizeof(sip_smap));
+  map m = (map) Alloc0SizeOf(sip_smap);
   m->preimage = mstrdup(name);
   m->m = id->m;
   m->nrows = id->nrows;
   m->ncols = id->ncols;
 
-  Free(mlv->lv, sizeof(sleftv));
+  FreeSizeOf(mlv->lv, sleftv);
 
   FreeL(mlv1->lv->data);
-  Free(mlv1->lv, sizeof(sleftv));
+  FreeSizeOf(mlv1->lv, sleftv);
 
-  Free(id, sizeof(sip_sideal));
-  Free(mlv2->lv, sizeof(sleftv));
+  FreeSizeOf(id, sip_sideal);
+  FreeSizeOf(mlv2->lv, sleftv);
 
   mlv->r = mlv2->r;
   mlv->lv = mpsr_InitLeftv(MAP_CMD, (void *) m);
@@ -777,7 +777,7 @@ static mpsr_Status_t GetCopCommandLeftv(MP_Link_pt link, MPT_Node_pt node,
     failr(mpsr_MergeLeftv(mlv, mlv1));
   }
 
-  command cmd = (command) Alloc0(sizeof(sip_command));
+  command cmd = (command) Alloc0SizeOf(sip_command);
   cmd->op = tok;
   cmd->argc = nc;
 
@@ -794,12 +794,12 @@ static mpsr_Status_t GetCopCommandLeftv(MP_Link_pt link, MPT_Node_pt node,
       memcpy(&(c->arg1), lv, sizeof(sleftv));
       c->arg1.next = NULL;
 
-      c2 = (command) Alloc0(sizeof(sip_command));
+      c2 = (command) Alloc0SizeOf(sip_command);
       c->arg2.data = (void *) c2;
       c->arg2.rtyp = COMMAND;
       c = c2;
       lv2 = lv->next;
-      Free(lv, sizeof(sleftv));
+      FreeSizeOf(lv, sleftv);
       lv = lv2;
     }
     c->op = tok;
@@ -807,8 +807,8 @@ static mpsr_Status_t GetCopCommandLeftv(MP_Link_pt link, MPT_Node_pt node,
     memcpy(&(c->arg1), lv, sizeof(sleftv));
     c->arg1.next = NULL;
     memcpy(&(c->arg2), lv->next, sizeof(sleftv));
-    Free(lv->next, sizeof(sleftv));
-    Free(lv, sizeof(sleftv));
+    FreeSizeOf(lv->next, sleftv);
+    FreeSizeOf(lv, sleftv);
   }
   else if (nc >= 1)
   {
@@ -824,12 +824,12 @@ static mpsr_Status_t GetCopCommandLeftv(MP_Link_pt link, MPT_Node_pt node,
         if (nc == 3)
         {
           memcpy(&(cmd->arg3), mlv->lv->next->next, sizeof(sleftv));
-          Free(mlv->lv->next->next, sizeof(sleftv));
+          FreeSizeOf(mlv->lv->next->next, sleftv);
         }
-        Free(mlv->lv->next, sizeof(sleftv));
+        FreeSizeOf(mlv->lv->next, sleftv);
       }
     }
-    Free(mlv->lv, sizeof(sleftv));
+    FreeSizeOf(mlv->lv, sleftv);
   }
 
   // Now we perform some tree manipulations
@@ -837,7 +837,7 @@ static mpsr_Status_t GetCopCommandLeftv(MP_Link_pt link, MPT_Node_pt node,
     // Here we work around a Singular bug: It can not handle lists of 0 args
     // so we construct them explicitely
   {
-    lists l = (lists) Alloc(sizeof(slists));
+    lists l = (lists) AllocSizeOf(slists);
     l->Init(0);
     mlv->lv = mpsr_InitLeftv(LIST_CMD, (void *) l);
     return mpsr_Success;
@@ -878,7 +878,7 @@ MPT_Status_t mpsr_GetExternalData(MP_Link_pt link,
 
     if (status == mpsr_Success)
     {
-      mpsr_leftv mmlv = (mpsr_leftv) Alloc0(sizeof(mpsr_sleftv));
+      mpsr_leftv mmlv = (mpsr_leftv) Alloc0SizeOf(mpsr_sleftv);
       memcpy(mmlv, &mlv, sizeof(mpsr_sleftv));
       *odata = (MPT_ExternalData_t) mmlv;
       return MPT_Success;
@@ -919,7 +919,7 @@ mpsr_Status_t mpsr_GetDump(MP_Link_pt link)
       {
         mlv.lv->Eval();
         mlv.lv->CleanUp();
-        Free(mlv.lv, sizeof(sleftv));
+        FreeSizeOf(mlv.lv, sleftv);
       }
     }
     else

@@ -449,7 +449,6 @@ rm -rf conftesteval _pagetest.c
 
 if test "$ac_cv_have_page_alignment" != no && test "$ac_cv_with_gmalloc" != no; then
   eval $ac_cv_have_page_alignment
-  AC_DEFINE(HAVE_PAGE_ALIGNMENT)
   AC_DEFINE_UNQUOTED(PALLOC, valloc)
   AC_DEFINE_UNQUOTED(PFREE, free)
   if test "$ac_cv_have_gmalloc" = yes; then

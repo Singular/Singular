@@ -1,13 +1,13 @@
-#ifndef MEMHEAP_H
-#define MEMHEAP_H
+#ifndef MM_HEAP_H
+#define MM_HEAP_H
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmheap.h,v 1.11 1999-09-30 14:09:38 obachman Exp $ */
-#include <stdlib.h>
+/* $Id: mmheap.h,v 1.12 1999-10-14 14:27:20 obachman Exp $ */
+
 #include "mod2.h"
 #include "structs.h"
-#include "mmpage.h"
+#include <stdlib.h>
 
 
 #ifdef __cplusplus
@@ -16,41 +16,32 @@ extern "C" {
 
 /*****************************************************************
  *
- * Declaration and Configuration
+ * Basic routines, see the beginning of mmheap.c for customizations
  *
  *****************************************************************/
-/* define to enable automatic "garbage" collection of heaps */
-/* #define HAVE_AUTOMATIC_HEAP_COLLECTION */
-
-/*****************************************************************
- *
- * Basic routines
- *
- *****************************************************************/
-  
-/* Initializes Heap, assumes size < SIZE_OF_HEAP_PAGE */
+/* Initializes Heap */
 extern void mmInitHeap(memHeap heap, size_t size);
 /* creates and initializes heap */
 extern memHeap mmCreateHeap(size_t size);
 
+#ifndef HEAP_DEBUG
 /* UNCONDITIONALLY frees all pages of heap */
 extern void mmClearHeap(memHeap heap);
 /* UNCONDITIONALLY Clears and destroys heap */
-void mmDestroyHeap(memHeap *heap);
-
-/* Tries to free as many unused pages of heap as possible */
-#if defined(HAVE_AUTOMATIC_HEAP_COLLECTION) && defined(HAVE_PAGE_ALIGNMENT)
-/* CleanUpHeap does not do anything when automatic heap collection is on */
-#define mmCleanHeap(heap) 
-extern void _mmCleanHeap(memHeap heap);
-#else
-extern void mmCleanHeap(memHeap heap);
+extern void mmDestroyHeap(memHeap *heap);
 #endif
+
+/* if all cunks of one page are in free list, then removes these
+   chunks from freelist 
+   if strict == 0, does it only if current free pointer is different
+   from what it was the last time we did a GC
+*/
+extern void mmGarbageCollectHeap(memHeap heap, int strict);
 
 /* Merges what is free in Heap "what" into free list of heap "into" */
 void mmMergeHeap(memHeap into, memHeap what);
 
-/* Removes addr from free list of heap, provided it finds it there */
+/* Removes addr from freelist of heap, provided it finds it there */
 void mmRemoveFromCurrentHeap(memHeap heap, void* addr);
   
 
@@ -68,9 +59,13 @@ void mmRemoveFromCurrentHeap(memHeap heap, void* addr);
 #define mmCheckHeapAddr(addr, heap) 1
 
 #else
-
-/* use this variables to control level of HEAP_DEBUG at run-time
-   (see mod2.h for details) */
+/* 
+ * define HEAP_DEBUG  and/or set mm_HEAP_DEBUG to 
+ * 0 to enable basic heap addr checks (at least on each alloc/free)
+ * 1 for addtl. containment checks in free/alloc list of heap
+ * 2 for addtl. check of entire  heap at each heap addr check
+ * NOTE: For HEAP_DEBUG > 1 on, it gets very slow
+ */
 extern int mm_HEAP_DEBUG;
   
 #define mmAllocHeap(res, heap)\
@@ -90,18 +85,21 @@ int mmDebugCheckHeap(memHeap heap, const char* fn, int line);
 int mmDebugCheckHeapAddr(void* addr, memHeap heap, int flag,
                          const char* fn, int l);
   
+
+#define mmClearHeap(h)   mmDebugClearHeap(h, __FILE__, __LINE__)
+#define mmDestroyHeap(h) mmDebugDestroyHeap(h, __FILE__, __LINE__)
+void mmDebugClearHeap(memHeap heap, const char* fn, int line);
+void mmDebugDestroyHeap(memHeap *heap, const char* fn, int line);
 #endif
+
 /* use this for unknown heaps */
 #define MM_UNKNOWN_HEAP ((memHeap) 1)
 
 /*****************************************************************
  *
- * Low-level allocation routines
+ * Low-level allocation/ routines and declarations
  *
  *****************************************************************/
-
-struct sip_memHeapPage;
-typedef struct sip_memHeapPage * memHeapPage;
 
 struct sip_memHeapPage 
 {
@@ -109,71 +107,21 @@ struct sip_memHeapPage
   long counter;
 };
 
+/* Change this appropriately, if you change sip_memHeapPage           */
+/* However, make sure that sizeof(sip_memHeapPage) is a multiple of 8 */
+#define SIZE_OF_HEAP_PAGE_HEADER (SIZEOF_VOIDP + SIZEOF_LONG) 
+#define SIZE_OF_HEAP_PAGE (SIZE_OF_PAGE - SIZE_OF_HEAP_PAGE_HEADER)
+
 struct sip_memHeap
 {
-  void*         current;
-  memHeapPage   pages;
-  size_t        size;
+  void*         current; /* Freelist pointer */
+  memHeapPage   pages;   /* Pointer to linked list of pages */
+  void*         last_gc; /* current pointer after last gc */
+  int           size;    /* Size of heap chunks */
 };
 
 
-
-#define SIZE_OF_HEAP_PAGE_HEADER (SIZEOF_VOIDP + SIZEOF_LONG) 
-
-#ifdef HAVE_PAGE_ALIGNMENT
-
-#define mmGetHeapPageOfAddr(addr) (memHeapPage) mmGetPageOfAddr(addr)
-
-#define mmIncrHeapPageCounterOfAddr(addr)       \
-do                                              \
-{                                               \
-  register memHeapPage page = mmGetHeapPageOfAddr(addr); \
-  (page->counter)++;                            \
-}                                               \
-while (0)
-
-extern void mmRemoveHeapBlocksOfPage(memHeap heap, memHeapPage hpage);
-
-#define mmDecrCurrentHeapPageCounter(heap)                          \
-do                                                                  \
-{                                                                   \
-  register memHeapPage page = mmGetHeapPageOfAddr((heap)->current); \
-  if (--(page->counter) == 0) mmRemoveHeapBlocksOfPage(heap, page); \
-}                                                                   \
-while (0)
-#endif /* HAVE_PAGE_ALIGNMENT */
-
-
-#define SIZE_OF_HEAP_PAGE (SIZE_OF_PAGE - SIZE_OF_HEAP_PAGE_HEADER)
-#define mmGetHeapBlockSize(heap) ((heap)->size)
-
 extern void mmAllocNewHeapPage(memHeap heap);
-
-#if defined (HAVE_PAGE_ALIGNMENT) && defined(HAVE_AUTOMATIC_HEAP_COLLECTION)
-/* Allocates memory block from a heap */
-#define _mmAllocHeap(what, heap)                            \
-do                                                          \
-{                                                           \
-  register memHeap _heap = heap;                            \
-  if ((_heap)->current == NULL) mmAllocNewHeapPage(_heap);  \
-  mmIncrHeapPageCounterOfAddr((_heap)->current);            \
-  (what) = (void *)(_heap)->current;                        \
-  (_heap)->current =  *((void**)(_heap)->current);          \
-}                                                           \
-while (0)
-
-/* Frees addr into heap, assumes  addr was previously allocated from heap */ 
-#define _mmFreeHeap(addr, heap)                 \
-do                                              \
-{                                               \
-  register memHeap _heap = heap;                \
-  *((void**) addr) = (_heap)->current;          \
-  (_heap)->current = (void*) addr;              \
-  mmDecrCurrentHeapPageCounter(_heap);          \
-}                                               \
-while (0)
-
-#else 
 
 /* Allocates memory block from a heap */
 #define _mmAllocHeap(what, heap)                            \
@@ -196,8 +144,6 @@ do                                              \
 }                                               \
 while (0)
 
-#endif /* defined(HAVE_PAGE_ALIGNMENT) && ... */
-
 #define MM_HEAP_ADDR_UNKNOWN_FLAG 0  
 #define MM_HEAP_ADDR_USED_FLAG   1
 #define MM_HEAP_ADDR_FREE_FLAG   2
@@ -206,7 +152,5 @@ while (0)
 }
 #endif
 
-memHeap mmGetSpecHeap( size_t size);
-
-#endif /* MEMHEAP_H */
+#endif /* MM_HEAP_H */
 

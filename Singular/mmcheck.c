@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmcheck.c,v 1.9 1999-09-30 14:09:37 obachman Exp $ */
+/* $Id: mmcheck.c,v 1.10 1999-10-14 14:27:18 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -19,7 +19,6 @@
 #include "mmemory.h"
 #include "mmprivate.h"
 #include "mmpage.h"
-#include "mmheap.h"
 #ifdef MTRACK
 #include "mmbt.h"
 #endif
@@ -105,7 +104,7 @@ void mmDBInitNewHeapPage(memHeap heap)
 
   while (what != NULL)
   {
-    memset(what, 0, sizeof(DBMCB));
+    memset(&(what->next), 0, sizeof(DBMCB) - sizeof(void*));
     mmFillDBMCB(what, size, heap, MM_FREEFLAG, __FILE__, __LINE__);
     mmMoveDBMCBInto(&mm_theDBfree, what);
     prev = what;
@@ -119,8 +118,8 @@ void mmDBInitNewHeapPage(memHeap heap)
 static int mmPrintDBMCB ( DBMCB * what, char* msg , int given_size)
 {
   (void)fprintf( stderr, "warning: %s\n", msg );
-  (void)fprintf( stderr, "block %p allocated in: %s:%d",
-                 (long)&(what->data),
+  (void)fprintf( stderr, "block %p allocated in: %s:%d ",
+                 &(what->data),
                  what->allocated_fname, what->freed_lineno );
 #ifdef MTRACK
   mmDBPrintThisStack(what, MM_PRINT_ALL_STACK, 0);
@@ -130,7 +129,7 @@ static int mmPrintDBMCB ( DBMCB * what, char* msg , int given_size)
   {
     (void)fprintf( stderr, "freed in: %s:%d",
                    what->freed_fname, what->freed_lineno );
-#ifdef MTRACK
+#ifdef MTRACK_FREE
     mmDBPrintThisStack(what, MM_PRINT_ALL_STACK, 1);
 #endif
   }
@@ -254,13 +253,13 @@ static int mmCheckSingleDBMCB ( DBMCB * what, int size , int flags)
     assume(0);
     return 0;
   }
-  if ( (void*)what > mm_maxAddr )
+  if ( (void*)what > mm_maxAddr && mm_maxAddr != NULL)
   {
     fprintf( stderr, "warning: address too high\n" );
     assume(0);
     return 0;
   }
-  if ( (void*)what < mm_minAddr )
+  if ( (void*)what < mm_minAddr && mm_minAddr != NULL)
   {
     fprintf( stderr, "warning: address too low\n" );
     assume(0);
@@ -345,8 +344,8 @@ static int mmCheckSingleDBMCB ( DBMCB * what, int size , int flags)
   {
     if (flags & MM_USEDFLAG)
     {
-//      mmRemoveFromCurrentHeap(what->heap, what);
-//      mmMoveDBMCB(&mm_theDBfree, &mm_theDBused, what);
+      mmRemoveFromCurrentHeap(what->heap, what);
+      mmMoveDBMCB(&mm_theDBfree, &mm_theDBused, what);
       what->flags |= MM_USEDFLAG;
       return mmPrintDBMCB( what, "block has been freed but still in use (fixed)", 0 );
     }
@@ -549,7 +548,7 @@ BOOLEAN mmDBTestHeapBlock(const void* adr, const memHeap heap,
                           const char * fname, const int lineno )
 {
   return mmDBTestHeapBlockS(adr, heap,
-                            SizeFromRealSize(mmGetHeapBlockSize(heap)),
+                            SizeFromRealSize(heap->size),
                             fname, lineno);
 }
 

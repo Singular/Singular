@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.21 1999-09-29 10:59:41 obachman Exp $ */
+/* $Id: syz0.cc,v 1.22 1999-10-14 14:27:34 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -183,7 +183,7 @@ void sySchreyersSyzygiesFM(polyset F,int Fmax,polyset* Shdl,int* Smax,
   BOOLEAN notFound = FALSE;
 
 /*-------------initializing the sets--------------------*/
-  ideal idF=(ideal)Alloc(sizeof(ip_sideal));
+  ideal idF=(ideal)AllocSizeOf(ip_sideal);
   ST=(polyset)Alloc0(Fl*sizeof(poly));
   S=(polyset)Alloc0(Fl*sizeof(poly));
   ecartS=(int*)Alloc(Fl*sizeof(int));
@@ -197,7 +197,7 @@ void sySchreyersSyzygiesFM(polyset F,int Fmax,polyset* Shdl,int* Smax,
   tmax = 2*Fl;
   idF->m=F;IDELEMS(idF)=Fmax;
   rkF=idRankFreeModule(idF);
-  Free((ADDRESS)idF,sizeof(ip_sideal));
+  FreeSizeOf((ADDRESS)idF,ip_sideal);
 /*-------------sorting of F for index handling------------*/
   if (noSort)
   {
@@ -481,7 +481,7 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
   int *Flength;
   polyset pairs,oldF,F=*FF;
   poly p,q,toRed,syz,lastmonom,multWith;
-  ideal idF=(ideal)Alloc(sizeof(*idF)),null;
+  ideal idF=(ideal)AllocSizeOf(sip_sideal),null;
   BOOLEAN isNotReduced=TRUE;
 
   while ((Fl!=0) && (F[Fl-1]==NULL)) Fl--;
@@ -495,7 +495,7 @@ void sySchreyersSyzygiesFB(polyset *FF,int Fmax,polyset* Shdl,int* Smax,
   idF->m=F;IDELEMS(idF)=Fmax;
   rkF=idRankFreeModule(idF);
   null = idInit(1,rkF);
-  Free((ADDRESS)idF,sizeof(*idF));
+  FreeSizeOf((ADDRESS)idF,sip_sideal);
   if (noSort)
   {
     oldF = *FF;
@@ -962,7 +962,7 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
 syStrategy sySchreyer(ideal arg, int maxlength)
 {
   int typ0;
-  syStrategy result=(syStrategy)Alloc0(sizeof(ssyStrategy));
+  syStrategy result=(syStrategy)Alloc0SizeOf(ssyStrategy);
 
   resolvente fr = sySchreyerResolvente(arg,maxlength,&(result->length));
   result->fullres = (resolvente)Alloc0((result->length+1)*sizeof(ideal));

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.19 1999-09-27 13:49:06 obachman Exp $ */
+/* $Id: maps.cc,v 1.20 1999-10-14 14:27:16 obachman Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -603,7 +603,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
     case LIST_CMD:
     {
       lists l=(lists)data;
-      lists ml=(lists)Alloc(sizeof(slists));
+      lists ml=(lists)AllocSizeOf(slists);
       ml->Init(l->nr+1);
       for(i=0;i<=l->nr;i++)
       {
@@ -614,7 +614,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
                            preimage_r,perm,par_perm,P))
           {
             ml->Clean();
-            Free((ADDRESS)ml,sizeof(slists));
+            FreeSizeOf((ADDRESS)ml,slists);
             res->rtyp=0;
             return TRUE;
           }

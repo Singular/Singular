@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.23 1999-09-27 15:05:27 obachman Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.24 1999-10-14 14:27:25 obachman Exp $ */
 
 /***************************************************************
  *
@@ -229,8 +229,8 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
   else if (node == MP_ApIntType)
   {
     mpz_ptr gnum;
-    y =  (number) Alloc0(sizeof(rnumber));
-#ifdef LDEBUG
+    y =  (number) Alloc0SizeOf(rnumber);
+#if defined(LDEBUG) && ! defined(HAVE_ASO)
     y->debug = 123456;
 #endif
     y->s = 3;
@@ -249,9 +249,9 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
       mpt_failr(MPT_SkipAnnots(link, num_annots, &req));
       if (req) return mpsr_SetError(mpsr_ReqAnnotSkip);
     }
-    *x =  (number) Alloc0(sizeof(rnumber));
+    *x =  (number) Alloc0SizeOf(rnumber);
     y = (number) *x;
-#ifdef LDEBUG
+#if defined(LDEBUG) && ! defined(HAVE_ASO)
     y->debug = 123456;
 #endif
     y->s = 1;
@@ -274,9 +274,9 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
     else
     {
       // otherwise, make an apint out of it
-      *x =  (number) Alloc0(sizeof(rnumber));
+      *x =  (number) Alloc0SizeOf(rnumber);
       y = (number) *x;
-#ifdef LDEBUG
+#if defined(LDEBUG) && ! defined(HAVE_ASO)
       y->debug = 123456;
 #endif
       mpz_init_set_ui(&(y->z), ui);
@@ -360,7 +360,7 @@ static mpsr_Status_t GetAlgNumber(MP_Link_pt link, number *a)
   else if (ut == 1 || ut == 2)
   {
     // single number
-    b = (lnumber) Alloc0(sizeof(rnumber));
+    b = (lnumber) Alloc0SizeOf(rnumber);
     *a = (number) b;
     failr(GetAlgPoly(link, &(b->z)));
     if (ut == 2)
@@ -540,7 +540,7 @@ mpsr_Status_t mpsr_GetRingAnnots(MPT_Node_pt node, ring &r,
   failr(GetProtoTypeAnnot(node, &r1, mv, subring));
 
   // if we are still here, then we are successful in constructing the ring
-  r = (ring) Alloc(sizeof(sip_sring));
+  r = (ring) AllocSizeOf(sip_sring);
   memcpy(r, &r1, sizeof(sip_sring));
 
   if (GetVarNamesAnnot(node, r) != mpsr_Success)
@@ -672,7 +672,7 @@ static mpsr_Status_t GetProtoTypeAnnot(MPT_Node_pt node, ring r, BOOLEAN mv,
                                   MP_AnnotSingularGalois)) != NULL &&
            (annot->value != NULL) &&
            (annot->value->node->type == MP_StringType));
-        r->parameter = (char **)Alloc(sizeof(char *));
+        r->parameter = (char **)AllocSizeOf(char_ptr);
         r->parameter[0] = mstrdup(MP_STRING_T(annot->value->node->nvalue));
         r->P = 1;
       }

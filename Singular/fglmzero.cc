@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmzero.cc,v 1.24 1999-09-16 12:33:55 Singular Exp $
+// $Id: fglmzero.cc,v 1.25 1999-10-14 14:27:03 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -43,6 +43,7 @@
 #define fglmASSERT(ignore1,ignore2)
 
 
+
 // internal Version: 1.3.1.12
 // ============================================================
 //!      The idealFunctionals
@@ -83,6 +84,7 @@ public:
     fglmVector addCols( const int var, int basisSize, const fglmVector v ) const;
     fglmVector multiply( const fglmVector v, int var ) const;
 };
+
 
 idealFunctionals::idealFunctionals( int blockSize, int numFuncs )
 {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmtables.c,v 1.2 1999-01-26 14:41:42 obachman Exp $ */
+/* $Id: mmtables.c,v 1.3 1999-10-14 14:27:21 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -15,7 +15,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "mod2.h"
-#include "mmheap.h"
 #include "mmemory.h"
 #include "mmprivate.h"
 #include "mmpage.h"
@@ -36,8 +35,8 @@ const size_t mm_mcbSizesAlign4 [] = {   8,  12,  16,  20,
                                       160, 192, 224, 256,
                                       HALF_MAX_BLOCK_SIZE, MAX_BLOCK_SIZE};
 
-INDEX_ENTRY_T mm_IndiciesAlign8[MAX_INDEX + 1];
-INDEX_ENTRY_T mm_IndiciesAlign4[MAX_INDEX + 1];
+char mm_IndiciesAlign8[MAX_INDEX + 1];
+char mm_IndiciesAlign4[MAX_INDEX + 1];
 
 int mmGetBinaryIndexAlign8( size_t size )
 {
@@ -232,7 +231,7 @@ int GetIndex(size_t size, const size_t* size_table)
 }
 
 
-void mmInitIndexTable(INDEX_ENTRY_T* index_table, const size_t* size_table,
+void mmInitIndexTable(char* index_table, const size_t* size_table,
                       int (*GetIndexFnc)(size_t size))
 {
   unsigned int i;
@@ -260,11 +259,11 @@ void mmInitIndexTable(INDEX_ENTRY_T* index_table, const size_t* size_table,
   }
 }
 
-void OutputIndexTable(INDEX_ENTRY_T* index_table)
+void OutputIndexTable(char* index_table)
 {
   int i;
   int l=0;
-  printf("const INDEX_ENTRY_T mm_IndexTable[/*%d*/] = {\n",MAX_INDEX+1);
+  printf("const char mm_IndexTable[/*%d*/] = {\n",MAX_INDEX+1);
   for (i=0;i<MAX_INDEX; i++,l++)
   {
     printf("%d,", index_table[i]);
@@ -274,11 +273,11 @@ void OutputIndexTable(INDEX_ENTRY_T* index_table)
 }
 
 #if 0
-void OutputIndexTable(INDEX_ENTRY_T* index_table)
+void OutputIndexTable(char* index_table)
 {
   int i = -1;
   int l= -1;
-  printf("const INDEX_ENTRY_T mm_IndexTable[] = {\n");
+  printf("const char mm_IndexTable[] = {\n");
   do
   {
     i++;
@@ -297,12 +296,12 @@ void OutputTheListTable(const size_t *mm_mcbSizes)
   printf("struct sip_memHeap mm_theList[] = {\n");
   printf("#ifndef MDEBUG\n");
   for (i=0;  mm_mcbSizes[i] < MAX_BLOCK_SIZE; i++)
-    printf("{NULL, NULL, %d},\n", mm_mcbSizes[i]);
-  printf("{NULL, NULL, %d}\n};\n", mm_mcbSizes[i]);
+    printf("{NULL, NULL, NULL, %d},\n", mm_mcbSizes[i]);
+  printf("{NULL, NULL, NULL, %d}\n};\n", mm_mcbSizes[i]);
   printf("#else /* MDEBUG */\n");
   for (i=0; mm_mcbSizes[i] < MAX_BLOCK_SIZE; i++)
-    printf("{NULL, NULL, %d},\n", RealSizeFromSize(mm_mcbSizes[i]));
-  printf("{NULL, NULL, %d}\n};\n", RealSizeFromSize(mm_mcbSizes[i]));
+    printf("{NULL, NULL, NULL, %d},\n", RealSizeFromSize(mm_mcbSizes[i]));
+  printf("{NULL, NULL, NULL, %d}\n};\n", RealSizeFromSize(mm_mcbSizes[i]));
   printf("#endif /* ! MDEBUG */\n");
 }
  
@@ -322,22 +321,31 @@ int main()
   mmInitIndexTable(mm_IndiciesAlign4, mm_mcbSizesAlign4,
                    mmGetBinaryIndex);
 
+  printf("#ifndef MM_TABLES_INC\n#define MM_TABLES_INC\n");
+  printf("
+#include \"mod2.h\"
+#include \"mmemory.h\"
+#include \"mmprivate.h\"
+");
   printf("#ifdef ALIGN_8\n");
   OutputIndexTable(mm_IndiciesAlign8);
   OutputSizeTable(mm_mcbSizesAlign8);
   OutputTheListTable(mm_mcbSizesAlign8);
-  printf("#else\n");
+  printf("#else /* ! ALIGN_8 */\n");
   OutputIndexTable(mm_IndiciesAlign4);
   OutputSizeTable(mm_mcbSizesAlign4);
   OutputTheListTable(mm_mcbSizesAlign4);
-  printf("#endif");
+  printf("#endif /* ALIGN_8 */\n");
+  printf("#endif /* MM_TABLES_INC*/\n");
   return 0;
 }
 
 #else /* ! GENERATE_INDEX_TABLE */
+
 #include "mod2.h"
+#include "mmemory.h"
 #include "mmprivate.h"
-#include"mmtables.inc"
+#include "mmtables.inc"
 
 #endif /* GENERATE_INDEX_TABLE */
 

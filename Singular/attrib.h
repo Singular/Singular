@@ -3,12 +3,15 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.h,v 1.3 1997-04-09 12:19:37 Singular Exp $ */
+/* $Id: attrib.h,v 1.4 1999-10-14 14:26:57 obachman Exp $ */
 /*
 * ABSTRACT: attributes to leftv and idhdl
 */
 #include <string.h>
 #include "structs.h"
+#if HAVE_ASO == 1
+#include "attrib.aso"
+#endif
 
 class sattr;
 typedef sattr * attr;

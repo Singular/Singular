@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.109 1999-10-14 12:50:25 Singular Exp $ */
+/* $Id: extra.cc,v 1.110 1999-10-14 14:27:02 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -154,6 +154,13 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     {
       res->rtyp=INT_CMD;
       res->data=(void *)npGen;
+      return FALSE;
+    }
+    else
+/*==================== gc ==================================*/
+    if(strcmp(sys_cmd,"gc")==0)
+    {
+      mmGarbageCollectHeaps(3);
       return FALSE;
     }
     else
@@ -427,7 +434,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
    {
      res->rtyp=STRING_CMD;
      res->data=(void *)mstrdup(
-       "Olaf Bachmann, Hubert Grassmann, Kai Krueger, Wolfgang Neumann, Thomas Nuessler, Wilfred Pohl, Thomas Siebert, Ruediger Stobbe, Tim Wichmann");
+       "Olaf Bachmann, Hubert Grassmann, Kai Krueger, Wolfgang Neumann, Thomas Nuessler, Wilfred Pohl, Jens Schmidt, Thomas Siebert, Ruediger Stobbe, Tim Wichmann");
      return FALSE;
    }
    else
@@ -598,6 +605,16 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
+/*==================== pDivStat =============================*/
+    if(strcmp(sys_cmd,"pDivStat")==0)
+    {
+#ifdef PDIV_DEBUG
+      extern void pPrintDivisbleByStat();
+      pPrintDivisbleByStat();
+#endif
+      return FALSE;
+    }
+    else
 /*==================== alarm ==================================*/
 #ifndef __MWERKS__
 #ifndef MSDOS
@@ -880,7 +897,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 //  PrintS("Bin jetzt in extra.cc bei der Auswertung.\n"); // **********
 
 
-      lists L=(lists)Alloc(sizeof(slists));
+      lists L=(lists)AllocSizeOf(slists);
       L->Init(6);
       L->m[0].rtyp=STRING_CMD;               // newtonnumber;
       L->m[0].data=(void *)mstrdup(r.nZahl);

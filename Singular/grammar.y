@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.71 1999-09-29 17:19:04 Singular Exp $ */
+/* $Id: grammar.y,v 1.72 1999-10-14 14:27:04 obachman Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -459,7 +459,7 @@ elemexpr:
             }
             else
             {
-              $1.next=(leftv)Alloc(sizeof(sleftv));
+              $1.next=(leftv)AllocSizeOf(sleftv);
               memcpy($1.next,&$3,sizeof(sleftv));
               if(iiExprArithM(&$$,&$1,'(')) YYERROR;
             }
@@ -542,7 +542,7 @@ exprlist:
             {
               v=v->next;
             }
-            v->next = (leftv)Alloc(sizeof(sleftv));
+            v->next = (leftv)AllocSizeOf(sleftv);
             memcpy(v->next,&($3),sizeof(sleftv));
             $$ = $1;
           }
@@ -917,7 +917,7 @@ declare_ip_variable:
             }
             leftv v=&$1;
             while (v->next!=NULL) v=v->next;
-            v->next=(leftv)Alloc(sizeof(sleftv));
+            v->next=(leftv)AllocSizeOf(sleftv);
             memcpy(v->next,&r,sizeof(sleftv));
             $$=$1;
           }
@@ -940,7 +940,7 @@ rlist:
             {
               v=v->next;
             }
-            v->next = (leftv)Alloc(sizeof(sleftv));
+            v->next = (leftv)AllocSizeOf(sleftv);
             memcpy(v->next,&($4),sizeof(sleftv));
             $$ = $2;
           }
@@ -1013,7 +1013,7 @@ OrderingList:
         |  orderelem ',' OrderingList
           {
             $$ = $1;
-            $$.next = (sleftv *)Alloc(sizeof(sleftv));
+            $$.next = (sleftv *)AllocSizeOf(sleftv);
             memcpy($$.next,&$3,sizeof(sleftv));
           }
         ;
@@ -1339,9 +1339,6 @@ ringcmd:
 #ifdef HAVE_NAMESPACES
             if(do_pop) namespaceroot->pop();
 #endif /* HAVE_NAMESPACES */
-            $4.CleanUp();
-            $6.CleanUp();
-            $8.CleanUp();
 	    yyInRingConstruction = FALSE;
             if (b==NULL)
             {
@@ -1400,9 +1397,6 @@ ringcmd:
 #ifdef HAVE_NAMESPACES
             if(do_pop) namespaceroot->pop();
 #endif /* HAVE_NAMESPACES */
-            $5.CleanUp();
-            $7.CleanUp();
-            $9.CleanUp();
             if(h==NULL)
             {
               YYERROR;

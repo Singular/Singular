@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.35 1999-09-16 12:33:58 Singular Exp $ */
+/* $Id: longalg.cc,v 1.36 1999-10-14 14:27:15 obachman Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "mod2.h"
+#include "structs.h"
 #include "tok.h"
 #include "mmemory.h"
 #include "febase.h"
@@ -27,13 +28,6 @@
 #define  FEHLER1 1
 #define  FEHLER2 1
 #define  FEHLER3 1
-
-struct snaIdeal
-{
-  int anz;
-  alg *liste;
-};
-typedef struct snaIdeal * naIdeal;
 
 naIdeal naI=NULL;
 
@@ -92,7 +86,7 @@ void naSetChar(int i, BOOLEAN complete, char ** param, int pars)
     for (j=naI->anz-1; j>=0; j--)
        napDelete (&naI->liste[j]);
     Free((ADDRESS)naI->liste,naI->anz*sizeof(alg));
-    Free((ADDRESS)naI,sizeof(*naI));
+    FreeSizeOf((ADDRESS)naI,snaIdeal);
     naI=NULL;
   }
   naMap = naCopy;
@@ -1203,11 +1197,11 @@ number naInit(int i)
 {
   if (i!=0)
   {
-    lnumber l = (lnumber)Alloc(sizeof(rnumber));
+    lnumber l = (lnumber)AllocSizeOf(rnumber);
     l->z = napInit(i);
     if (l->z==NULL)
     {
-      Free((ADDRESS)l, sizeof(rnumber));
+      FreeSizeOf((ADDRESS)l, rnumber);
       return NULL;
     }
     l->s = 2;
@@ -1220,7 +1214,7 @@ number naInit(int i)
 
 number  naPar(int i)
 {
-  lnumber l = (lnumber)Alloc(sizeof(rnumber));
+  lnumber l = (lnumber)AllocSizeOf(rnumber);
   l->s = 2;
   l->z = napInit(1);
   l->z->e[i-1]=1;
@@ -1281,7 +1275,7 @@ void naDelete(number *p)
 #if defined(MDEBUG) && defined(LDEBUG)
   mmDBFreeBlock((ADDRESS)l, sizeof(rnumber),f,lno);
 #else
-  Free((ADDRESS)l, sizeof(rnumber));
+  FreeSizeOf((ADDRESS)l, rnumber);
 #endif
   *p = NULL;
 }
@@ -1295,7 +1289,7 @@ number naCopy(number p)
   naTest(p);
   lnumber erg;
   lnumber src = (lnumber)p;
-  erg = (lnumber)Alloc0(sizeof(rnumber));
+  erg = (lnumber)Alloc0SizeOf(rnumber);
   erg->z = napCopy(src->z);
   erg->n = napCopy(src->n);
   erg->s = src->s;
@@ -1323,7 +1317,7 @@ number naAdd(number la, number lb)
   if (b==NULL) return naCopy(la);
   mmTestP(a,sizeof(rnumber));
   mmTestP(b,sizeof(rnumber));
-  lu = (lnumber)Alloc(sizeof(rnumber));
+  lu = (lnumber)AllocSizeOf(rnumber);
   if (b->n!=NULL) x = napMult(napCopy(a->z), napCopy(b->n));
   else            x = napCopy(a->z);
   if (a->n!=NULL) y = napMult(napCopy(b->z), napCopy(a->n));
@@ -1331,7 +1325,7 @@ number naAdd(number la, number lb)
   lu->z = napAdd(x, y);
   if (lu->z==NULL)
   {
-    Free((ADDRESS)lu, sizeof(rnumber));
+    FreeSizeOf((ADDRESS)lu, rnumber);
     return (number)NULL;
   }
   if (a->n!=NULL)
@@ -1378,7 +1372,7 @@ number naSub(number la, number lb)
 
   mmTestP(a,sizeof(rnumber));
   mmTestP(b,sizeof(rnumber));
-  lu = (lnumber)Alloc(sizeof(rnumber));
+  lu = (lnumber)AllocSizeOf(rnumber);
   if (b->n!=NULL) x = napMult(napCopy(a->z), napCopy(b->n));
   else            x = napCopy(a->z);
   if (a->n!=NULL) y = napMult(napCopy(b->z), napCopyNeg(a->n));
@@ -1386,7 +1380,7 @@ number naSub(number la, number lb)
   lu->z = napAdd(x, y);
   if (lu->z==NULL)
   {
-    Free((ADDRESS)lu, sizeof(rnumber));
+    FreeSizeOf((ADDRESS)lu, rnumber);
     return (number)NULL;
   }
   if (a->n!=NULL)
@@ -1425,7 +1419,7 @@ number naMult(number la, number lb)
   naTest(la);
   naTest(lb);
 
-  lo = (lnumber)Alloc(sizeof(rnumber));
+  lo = (lnumber)AllocSizeOf(rnumber);
   lo->z = napMult(napCopy(a->z), napCopy(b->z));
 
   if (a->n==NULL)
@@ -1473,7 +1467,7 @@ number naMult(number la, number lb)
   lo->s = 0;
   if(lo->z==NULL)
   {
-    Free((ADDRESS)lo,sizeof(rnumber));
+    FreeSizeOf((ADDRESS)lo,rnumber);
     lo=NULL;
   }
   naTest((number)lo);
@@ -1492,7 +1486,7 @@ number naIntDiv(number la, number lb)
     WerrorS("div. by 0");
     return NULL;
   }
-  res = (lnumber)Alloc(sizeof(rnumber));
+  res = (lnumber)AllocSizeOf(rnumber);
   res->z = napCopy(a->z);
   res->n = napCopy(b->z);
   res->s = 0;
@@ -1524,7 +1518,7 @@ number naDiv(number la, number lb)
   }
   mmTestP(a,sizeof(rnumber));
   mmTestP(b,sizeof(rnumber));
-  lo = (lnumber)Alloc(sizeof(rnumber));
+  lo = (lnumber)AllocSizeOf(rnumber);
   if (b->n!=NULL)
     lo->z = napMult(napCopy(a->z), napCopy(b->n));
   else
@@ -1591,7 +1585,7 @@ number naInvers(number a)
     return NULL;
   }
   mmTestP(b,sizeof(rnumber));
-  lo = (lnumber)Alloc0(sizeof(rnumber));
+  lo = (lnumber)Alloc0SizeOf(rnumber);
   lo->s = b->s;
   if (b->n!=NULL)
     lo->z = napCopy(b->n);
@@ -1714,7 +1708,7 @@ char  *naRead(char *s, number *p)
     *p = NULL;
     return s;
   }
-  *p = (number)Alloc0(sizeof(rnumber));
+  *p = (number)Alloc0SizeOf(rnumber);
   a = (lnumber)*p;
   if ((naMinimalPoly!=NULL) && (x->e[0] >= naMinimalPoly->e[0]))
     a->z = napRemainder(x, naMinimalPoly);
@@ -1730,7 +1724,7 @@ char  *naRead(char *s, number *p)
     a->z = x;
   if(a->z==NULL)
   {
-    Free((ADDRESS)*p,sizeof(rnumber));
+    FreeSizeOf((ADDRESS)*p,rnumber);
     *p=NULL;
   }
   else
@@ -1893,7 +1887,7 @@ void naPower(number p, int i, number *rc)
 number naGcd(number a, number b)
 {
   lnumber x, y;
-  lnumber result = (lnumber)Alloc0(sizeof(rnumber));
+  lnumber result = (lnumber)Alloc0SizeOf(rnumber);
 
   x = (lnumber)a;
   y = (lnumber)b;
@@ -2177,7 +2171,7 @@ number naLcm(number la, number lb)
   lnumber result;
   lnumber a = (lnumber)la;
   lnumber b = (lnumber)lb;
-  result = (lnumber)Alloc0(sizeof(rnumber));
+  result = (lnumber)Alloc0SizeOf(rnumber);
   //if (((naMinimalPoly==NULL) && (naI==NULL)) || !naIsChar0)
   //{
   //  result->z = napInit(1);
@@ -2231,7 +2225,7 @@ void naSetIdeal(ideal I)
   {
     for (i=naI->anz-1; i>=0; i--)
       napDelete(&naI->liste[i]);
-    Free((ADDRESS)naI,sizeof(*naI));
+    FreeSizeOf((ADDRESS)naI,snaIdeal);
     naI=NULL;
   }
   else
@@ -2240,7 +2234,7 @@ void naSetIdeal(ideal I)
     number a;
     alg x;
 
-    naI=(naIdeal)Alloc(sizeof(*naI));
+    naI=(naIdeal)AllocSizeOf(snaIdeal);
     naI->anz=IDELEMS(I);
     naI->liste=(alg*)Alloc(naI->anz*sizeof(alg));
     for (i=IDELEMS(I)-1; i>=0; i--)
@@ -2267,7 +2261,7 @@ void naSetIdeal(ideal I)
 number naMapP0(number c)
 {
   if (npIsZero(c)) return NULL;
-  lnumber l=(lnumber)Alloc(sizeof(rnumber));
+  lnumber l=(lnumber)AllocSizeOf(rnumber);
   l->s=2;
   l->z=(alg)Alloc0(napMonomSize);
   int i=(int)c;
@@ -2283,7 +2277,7 @@ number naMapP0(number c)
 number naMap00(number c)
 {
   if (nlIsZero(c)) return NULL;
-  lnumber l=(lnumber)Alloc(sizeof(rnumber));
+  lnumber l=(lnumber)AllocSizeOf(rnumber);
   l->s=0;
   l->z=(alg)Alloc0(napMonomSize);
   l->z->ko=nlCopy(c);
@@ -2297,7 +2291,7 @@ number naMap00(number c)
 number naMapPP(number c)
 {
   if (npIsZero(c)) return NULL;
-  lnumber l=(lnumber)Alloc(sizeof(rnumber));
+  lnumber l=(lnumber)AllocSizeOf(rnumber);
   l->s=2;
   l->z=(alg)Alloc0(napMonomSize);
   l->z->ko=c; /* omit npCopy, because npCopy is a no-op */
@@ -2315,7 +2309,7 @@ number naMapPP1(number c)
   if (i>naPrimeM) i-=naPrimeM;
   number n=npInit(i);
   if (npIsZero(n)) return NULL;
-  lnumber l=(lnumber)Alloc(sizeof(rnumber));
+  lnumber l=(lnumber)AllocSizeOf(rnumber);
   l->s=2;
   l->z=(alg)Alloc0(napMonomSize);
   l->z->ko=n;
@@ -2331,7 +2325,7 @@ number naMap0P(number c)
   if (nlIsZero(c)) return NULL;
   number n=npInit(nlInt(c));
   if (npIsZero(n)) return NULL;
-  lnumber l=(lnumber)Alloc(sizeof(rnumber));
+  lnumber l=(lnumber)AllocSizeOf(rnumber);
   l->s=2;
   l->z=(alg)Alloc0(napMonomSize);
   l->z->ko=n;
@@ -2368,7 +2362,7 @@ static alg napMap(alg p)
 number naMapQaQb(number c)
 {
   if (c==NULL) return NULL;
-  lnumber erg= (lnumber)Alloc0(sizeof(rnumber));
+  lnumber erg= (lnumber)Alloc0SizeOf(rnumber);
   lnumber src =(lnumber)c;
   erg->s=src->s;
   erg->z=napMap(src->z);
@@ -2477,7 +2471,7 @@ poly naPermNumber(number z, int * par_perm, int P)
     napoly pa=NULL;
     if (currRing->parameter!=NULL)
     {
-      pGetCoeff(p)=(number)Alloc0(sizeof(rnumber));
+      pGetCoeff(p)=(number)Alloc0SizeOf(rnumber);
       ((lnumber)pGetCoeff(p))->s=2;
       ((lnumber)pGetCoeff(p))->z=napInitz(nacCopy(napGetCoeff(za)));
       pa=((lnumber)pGetCoeff(p))->z;
@@ -2520,7 +2514,7 @@ number   naGetDenom(number &n)
   lnumber x=(lnumber)n;
   if (x->n!=NULL)
   {
-    lnumber r=(lnumber)Alloc0(sizeof(rnumber));
+    lnumber r=(lnumber)Alloc0SizeOf(rnumber);
     r->z=napCopy(naGetDenom0(x));
     r->s = 2;
     return (number)r;
