@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.36 1998-05-07 08:25:01 wichmann Exp $
+@comment $Id: general.doc,v 1.37 1998-05-07 09:10:58 krueger Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -1689,7 +1689,7 @@ see @ref{return}
 @table @code
 @item @strong{Syntax:}
 @code{[static] proc} proc_name parameter_list
-@*help_text
+@*"help_text"
 @*@code{@{}
 @*
 @tex
@@ -1736,12 +1736,12 @@ which is loaded with the @code{LIB} command.
   \";
 
   proc tab (int n)
-  USAGE:    tab(n);  (n integer)
+  \"USAGE:    tab(n);  (n integer)
   RETURNS:  string of n space tabs
-  EXAMPLE:  example tab; shows an example
+  EXAMPLE:  example tab; shows an example\"
   { return(internal_tab(n)); }
   example
-{
+  {
     \"EXAMPLE:\"; echo=2;
     for(int n=0; n<=5; n=n+1)
     { tab(5-n)+\"*\"+tab(n)+\"+\"+tab(n)+\"*\"; }
@@ -2057,10 +2057,12 @@ define the version number for the library. It isdisplayed when the
 library is loaded.
 @item @strong{Example:}
 @example
-  version="$Id: general.doc,v 1.36 1998-05-07 08:25:01 wichmann Exp $";
+  version="$I@c
+d: general.doc,v 1.35 1998/05/07 08:19:32 singular Exp $";
+  version="some version string"
 @end example
 @item @strong{Note:}
-It is common practice to simply define the version string to be "$Id: general.doc,v 1.36 1998-05-07 08:25:01 wichmann Exp $"
+It is common practice to simply define the version string to be "$I@c d:$"
 and let a version control system expand it.
 @end table
 
@@ -2077,11 +2079,13 @@ best.
 
 @c @table @code
 @example
-  // $Id: general.doc,v 1.36 1998-05-07 08:25:01 wichmann Exp $
+  // $I@c
+d: template.lib,v 1.2 1998/05/07 08:19:32 singular Exp $
   //
   //
   ///////////////////////////////////////////////////////////////////////////
-  version="$Id: general.doc,v 1.36 1998-05-07 08:25:01 wichmann Exp $;
+  version="$I@c
+d: template.lib,v 1.2 1998/05/07 08:19:32 singular Exp $;
   info="
          LIBRARY: template.lib
 
@@ -2104,9 +2108,9 @@ best.
   proc dummy1(proc p,
             int i,
             int j)
-  USAGE:   dummy1(p, i,j); p proc, i,j int
+  "USAGE:   dummy1(p, i,j); p proc, i,j int
   RETURN:  returns the result of p(i,j)
-  EXMAPLE: example dummy1; shows examples
+  EXMAPLE: example dummy1; shows examples"
         @{ return(p(j,k)); @}
   example
   @{ "EXAMPLE:"; echo=2;
