@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.76 2002-01-30 14:33:02 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.77 2002-05-22 10:40:00 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -44,7 +44,7 @@ int kFindDivisibleByInT(const TSet &T, const unsigned long* sevT,
 
   if (r == currRing)
   {
-    while (1)
+    loop
     {
       if (j > tl) return -1;
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
@@ -61,7 +61,7 @@ int kFindDivisibleByInT(const TSet &T, const unsigned long* sevT,
   }
   else
   {
-    while (1)
+    loop
     {
       if (j > tl) return -1;
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
@@ -86,7 +86,7 @@ int kFindDivisibleByInS(const polyset &S, const unsigned long* sev, const int sl
   int j = 0;
 
   pAssume(~not_sev == p_GetShortExpVector(p, currRing));
-  while (1)
+  loop
   {
     if (j > sl) return -1;
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
@@ -118,7 +118,7 @@ static int redHomog (LObject* h,kStrategy strat)
   }
 #endif
   int j;
-  while (1)
+  loop
   {
     // find a poly with which we can reduce
     h->SetShortExpVector();
@@ -166,7 +166,7 @@ static int redLazy (LObject* h,kStrategy strat)
   long reddeg = h->GetpFDeg();
 
   h->SetShortExpVector();
-  while (1)
+  loop
   {
     j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
     if (j < 0) return 1;
@@ -384,21 +384,23 @@ static int redHoney (LObject* h, kStrategy strat)
 
 static poly redNF (poly h,kStrategy strat)
 {
-  int j = 0;
-  int z = 3;
-  unsigned long not_sev;
+  if (h==NULL) return NULL;
+  int j;
 
   if (0 > strat->sl)
   {
     return h;
   }
-  not_sev = ~ pGetShortExpVector(h);
+  LObject P(h);
+  P.SetShortExpVector();
+  P.bucket = kBucketCreate(currRing);
+  kBucketInit(P.bucket,P.p,pLength(P.p));
   loop
   {
-    if (pLmShortDivisibleBy(strat->S[j], strat->sevS[j], h, not_sev))
+    j=kFindDivisibleByInS(strat->S,strat->sevS,strat->sl,&P);
+    if (j>=0)
     {
-      //if (strat->interpt) test_int_std(strat->kIdeal);
-      /*- compute the s-polynomial -*/
+      nNormalize(pGetCoeff(P.p));
 #ifdef KDEBUG
       if (TEST_OPT_DEBUG)
       {
@@ -408,7 +410,14 @@ static poly redNF (poly h,kStrategy strat)
         wrp(strat->S[j]);
       }
 #endif
-      h = ksOldSpolyRed(strat->S[j],h,strat->kNoether);
+      number coef;
+      coef=kBucketPolyRed(P.bucket,strat->S[j],pLength(strat->S[j]),strat->kNoether);
+      nDelete(&coef);
+      h = kBucketGetLm(P.bucket);
+      if (h==NULL) return NULL;
+      P.p=h;
+      P.t_p=NULL;
+      P.SetShortExpVector();
 #ifdef KDEBUG
       if (TEST_OPT_DEBUG)
       {
@@ -417,25 +426,16 @@ static poly redNF (poly h,kStrategy strat)
         PrintLn();
       }
 #endif
-      if (h == NULL) return NULL;
-      z++;
-      if (z>=10)
-      {
-        z=0;
-        pNormalize(h);
-      }
-      /*- try to reduce the s-polynomial -*/
-      j = 0;
-      not_sev = ~ pGetShortExpVector(h);
     }
     else
     {
-      if (j >= strat->sl) return h;
-      j++;
+      P.p=kBucketClear(P.bucket);
+      kBucketDestroy(&P.bucket);
+      pNormalize(P.p);
+      return P.p;
     }
   }
 }
-
 void initBba(ideal F,kStrategy strat)
 {
   int i;
@@ -701,7 +701,7 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   /*- init local data struct.---------------------------------------- -*/
   /*Shdl=*/initS(F,Q,strat);
   /*- compute------------------------------------------------------- -*/
-  if ((TEST_OPT_INTSTRATEGY)&&(lazyReduce==0))
+  //if ((TEST_OPT_INTSTRATEGY)&&(lazyReduce==0))
   {
     for (i=strat->sl;i>=0;i--)
       pNorm(strat->S[i]);
@@ -753,7 +753,7 @@ ideal kNF2 (ideal F,ideal Q,ideal q,kStrategy strat, int lazyReduce)
   /*Shdl=*/initS(F,Q,strat);
   /*- compute------------------------------------------------------- -*/
   res=idInit(IDELEMS(q),q->rank);
-  if ((TEST_OPT_INTSTRATEGY)&&(lazyReduce==0))
+  //if ((TEST_OPT_INTSTRATEGY)&&(lazyReduce==0))
   {
     for (i=strat->sl;i>=0;i--)
       pNorm(strat->S[i]);
