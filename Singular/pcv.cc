@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.18 1999-03-31 22:01:18 krueger Exp $ */
+/* $Id: pcv.cc,v 1.19 1999-04-29 15:09:32 Singular Exp $ */
 /*
 * ABSTRACT: conversion between polys and coef vectors
 */
@@ -253,7 +253,7 @@ poly pcvN2M(int n)
   for(i=pVariables-1;i>=0;i--)
   {
     k=j;
-    for(j=0;j<pcvDegBound&&pcvIndex[i][j]<=n;j++);
+    for(j=0;j<pcvDegBound&& ((int)pcvIndex[i][j])<=n;j++);
     j--;
     n-=pcvIndex[i][j];
     if(i<pVariables-1) pSetExp(m,i+2,k-j);
