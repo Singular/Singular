@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.14 1997-08-04 14:57:41 schmidt Exp $ */
+/* $Id: canonicalform.cc,v 1.15 1997-08-29 13:15:16 schmidt Exp $ */
 
 #include <config.h>
 
@@ -357,6 +357,15 @@ CanonicalForm::gcd( const CanonicalForm & ) const
     return 1;
 }
 
+//{{{ CanonicalForm CanonicalForm::deriv() const
+//{{{ docu
+//
+// deriv() - return the formal derivation of CO.
+//
+// Derives CO with respect to its main variable.  Returns zero if
+// f is in a coefficient domain.
+//
+//}}}
 CanonicalForm
 CanonicalForm::deriv() const
 {
@@ -371,21 +380,32 @@ CanonicalForm::deriv() const
 	return res;
     }
 }
+//}}}
 
+//{{{ CanonicalForm CanonicalForm::deriv( const Variable & x ) const
+//{{{ docu
+//
+// deriv() - return the formal derivation of CO with respect to x.
+//
+// Note: If x is less than the main variable of CO we have to
+// swap variables which may be quite expensive.  x should be a
+// polynomial variable.  Returns zero if f is in a coefficient
+// domain.
+//
+//}}}
 CanonicalForm
 CanonicalForm::deriv( const Variable & x ) const
 {
-    if ( inCoeffDomain() )
+    ASSERT( x.level() > 0, "cannot derive with respect to algebraic variables" );
+    Variable y = mvar();
+    if ( inCoeffDomain() || x > y )
 	return 0;
-    else {
-	CanonicalForm res = 0;
-	Variable y = mvar();
-	for ( CFIterator i = (y==x) ? *this : swapvar( *this, x, y ); i.hasTerms(); i++ )
-	    if ( i.exp() > 0 )
-		res += power( y, i.exp()-1 ) * i.coeff() * i.exp();
-	return (y==x) ? res : swapvar( res, x, y );
-    }
+    else if ( x == y )
+	return deriv();
+    else
+	return swapvar( swapvar( *this, x, y ).deriv( y ), x, y );
 }
+//}}}
 
 CanonicalForm
 CanonicalForm::genCoeff( int type, int i )
