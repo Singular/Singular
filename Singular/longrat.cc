@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.25 1999-11-15 17:20:20 obachman Exp $ */
+/* $Id: longrat.cc,v 1.26 2000-03-22 16:33:45 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -699,8 +699,8 @@ number nlAdd (number a, number b)
           mpz_neg(&x,&x);
         }
         mpz_add(&u->z,&b->z,&x);
-        nlGmpSimple(&u->z);
         mpz_clear(&x);
+        nlGmpSimple(&u->z);
         if (mpz_cmp_ui(&u->z,(long)0)==0)
         {
           mpz_clear(&u->z);
@@ -1190,6 +1190,7 @@ number nlMult (number a, number b)
 #endif
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
+    if (a==INT_TO_SR(0)) return INT_TO_SR(0);
     if (b==INT_TO_SR(0)) return INT_TO_SR(0);
     int r=(SR_HDL(a)-1)*(SR_HDL(b)>>1);
     if ((r/(SR_HDL(b)>>1))==(SR_HDL(a)-1))
@@ -1351,6 +1352,8 @@ number   nlExactDiv(number a, number b)
     WerrorS("div. by 0");
     return INT_TO_SR(0);
   }
+  if (a==INT_TO_SR(0))
+    return INT_TO_SR(0);
   number u;
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
@@ -1409,6 +1412,8 @@ number nlIntDiv (number a, number b)
     WerrorS("div. by 0");
     return INT_TO_SR(0);
   }
+  if (a==INT_TO_SR(0))
+    return INT_TO_SR(0);
   number u;
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
@@ -1535,7 +1540,7 @@ number nlIntMod (number a, number b)
     return INT_TO_SR(0);
   }
   if (a==INT_TO_SR(0))
-      return INT_TO_SR(0);
+    return INT_TO_SR(0);
   number u;
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
