@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.10 1998-01-17 18:07:56 Singular Exp $ */
+/* $Id: ipid.cc,v 1.11 1998-04-07 17:52:45 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -122,7 +122,8 @@ idhdl idrec::set(char * s, int lev, idtyp t, BOOLEAN init)
       IDSTRING(h) = (char *)Alloc0(len);
     }
   }
-  if(t == PROC_CMD) {
+  if(t == PROC_CMD)
+  {
     IDPROC(h) = (procinfo *)Alloc(sizeof(procinfo));
     memset(IDPROC(h),0,sizeof(*IDPROC(h)));
     IDPROC(h)->language=LANG_NONE;
