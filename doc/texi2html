@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 'di ';
 'ig 00 ';
-# $Id: texi2html,v 1.1 1998-06-08 13:06:03 krueger Exp $
+# $Id: texi2html,v 1.2 1998-06-08 13:22:47 krueger Exp $
 # Description: Program to transform most Texinfo documents to HTML.
 # The plan is for the next version of makeinfo to support HTML output
 # directly, but until then ...
@@ -447,6 +447,7 @@ foreach ('_author', '_title', '_subtitle',
 %bib2href = ();				# bibliography reference to HREF
 %gloss2href = ();			# glossary term to HREF
 @sections = ();				# list of sections
+@left_index = ();
 %tag2pro = ();				# protected sections
 
 #
@@ -661,7 +662,6 @@ while ($_ = &next_line) {
 	    if ($split_node) {
 		&next_doc;
 		push(@lines, $SPLITTAG) if $split_num++;
-		print "= = =>$node\n";
 		push(@sections, $node);
 	    }
 	    next;
@@ -907,6 +907,7 @@ while ($_ = &next_line) {
 		$level = $sec2level{$tag};
 		$name = &update_sec_num($tag, $level) . "  $name"
 		    if $number_sections && $tag !~ /^unnumbered/;
+		push(@left_index, $name);
 		if ($tag =~ /heading$/) {
 		    push(@lines, &html_debug("\n", __LINE__));
 		    if ($html_element ne 'body') {
@@ -933,7 +934,6 @@ while ($_ = &next_line) {
 			if ($level == $toplevel) {
 			    &next_doc;
 			    push(@lines, $SPLITTAG) if $split_num++;
-			    print "=+=+=> $name;\n";
 			    push(@sections, $name);
 			}
 		    }
@@ -1490,8 +1490,10 @@ push(@menu_lines, "<BODY BACKGROUND=\"/rock.gif\">\n");
 #push(@menu_lines, " LINK=#FFFFFF ALINK=#FF00FF VLINK=\"#00FF00\">\n");
 #push(@menu_lines, "<NOBR>\n");
 push(@menu_lines, "<DL>\n");
-foreach (@sections) {
-    &left_menu_entry($_);
+foreach (@left_index) {
+    if (!/^[A-Z0-9]\./) {
+	&left_menu_entry($_);
+    }
 }
 push(@menu_lines, "</DL>\n");
 print "# end of pass 5\n" if $verbose;
