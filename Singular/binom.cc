@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: binom.cc,v 1.8 1998-01-17 17:24:43 Singular Exp $ */
+/* $Id: binom.cc,v 1.9 1998-01-17 18:56:45 Singular Exp $ */
 
 /*
 * ABSTRACT - set order (=number of monomial) for dp
@@ -17,6 +17,7 @@
 #include "mmemory.h"
 #include "febase.h"
 #include "polys.h"
+#include "polys-comp.h"
 #include "ring.h"
 
 extern int  pComponentOrder;
@@ -121,25 +122,40 @@ int bComp1dpc(poly p1, poly p2)
 #else
   int o1=p1->Order, o2=p2->Order;
 #endif
-  if (o1 > o2) return 1;
-  if (o1 < o2) return -1;
+  register long d=o1-o2;
+
+   if (d!=0)
+   {
+     if(d>0) return 1;
+     else    return -1;
+   }  
 
   /* now o1==o2: */
   if (o1>0)
   {
-    int i = pVariables;
-    while ((pGetExp(p1,i)==pGetExp(p2,i)) && (i>1))
-      i--;
-    if (i>1)
+    if (pVariablesW >2 )
     {
-      if (pGetExp(p1,i) < pGetExp(p2,i)) return 1;
-      return -1;
+      if (pVariablesW & 1)
+      {
+        _pMonCmp_2i_1(p1,p2, pVariablesW, d, goto NotEqual, return 0);
+      }	
+      _pMonCmp_2i(p1,p2, pVariablesW, d, goto NotEqual, return 0);
     }
+    if (pVariablesW == 1)
+    {
+      _pMonCmp_1(p1,p2, d, goto NotEqual, return 0);
+    }  
+    _pMonCmp_2(p1,p2, d, goto NotEqual, return 0);
+
+    NotEqual:
+    if (d>0) return -1; /*pLexSgn*/
+    return 1; /*-pLexSgn*/
   }
-  o1=pGetComp(p1)-pGetComp(p2);
-  if (o1 == 0) return 0;
-  if (o1 > 0) return -pComponentOrder;
-  return pComponentOrder;
+  //o1=pGetComp(p1)-pGetComp(p2);
+  //if (o1 == 0) return 0;
+  //if (o1 > 0) return -pComponentOrder;
+  //return pComponentOrder;
+  return 0;
 }
 
 #ifdef TEST_MAC_DEBUG
