@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: intvec.h,v 1.4 1997-04-30 15:25:29 Singular Exp $ */
+/* $Id: intvec.h,v 1.5 1998-05-19 23:47:57 obachman Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -34,7 +34,7 @@ class intvec
     int& operator[](int i) {
        if((i<0)||(i>=row*col))
        {
-          Print("wrong index:%d\n",i);
+          Werror("wrong intvec index:%d\n",i);
        }
        return v[i];}
 #define IMATELEM(M,I,J) (M)[(I-1)*(M).cols()+J-1]

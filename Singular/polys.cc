@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.26 1998-05-06 12:44:08 pohl Exp $ */
+/* $Id: polys.cc,v 1.27 1998-05-19 23:48:00 obachman Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -351,7 +351,6 @@ static int comp1a  ( poly p1, poly p2, int f, int l, short * w )
     return -1;
   return 0;
 }
-
 
 /*---------------------------------------------------*/
 

@@ -2514,9 +2514,9 @@ static BOOLEAN jjLEADEXP(leftv res, leftv v)
   intvec *iv=new intvec(pVariables);
   if (p!=NULL)
   {
-    for(int i=pVariables-1;i;i--)
+    for(int i = pVariables;i;i--)
     {
-      (*iv)[i]=pGetExp(p,i);
+      (*iv)[i-1]=pGetExp(p,i);
     }
   }
   res->data=(char *)iv;
