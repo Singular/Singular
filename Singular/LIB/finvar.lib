@@ -1,8 +1,8 @@
-// $Id: finvar.lib,v 1.12 1998-05-29 15:01:57 Singular Exp $
+// $Id: finvar.lib,v 1.13 1998-10-01 12:26:39 Singular Exp $
 // author: Agnes Eileen Heydtmann, email:agnes@math.uni-sb.de
 // last change: 3.5.98
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.12 1998-05-29 15:01:57 Singular Exp $"
+version="$Id: finvar.lib,v 1.13 1998-10-01 12:26:39 Singular Exp $"
 info="
 LIBRARY:  finvar.lib       LIBRARY TO CALCULATE INVARIANT RINGS & MORE
                            (c) Agnes Eileen Heydtmann,
@@ -2222,7 +2222,7 @@ THEORY:  Bases of homogeneous invariants are generated successively and those
     return();
   }
   if (typeof(`ring_name`)<>"ring")
-  { "ERROR:   Second parameter ought to the name of a ring where the Molien";
+  { "ERROR:   Second parameter ought to be the name of a ring where the Molien";
     "         is stored.";
     return();
   }
@@ -2926,7 +2926,12 @@ THEORY:  Bases of homogeneous invariants are generated successively and those
     }
     list L=group_reynolds(#[1..gen_num],v);
     string newring="aksldfalkdsflkj";
-    molien(L[2..size(L)],newring,intvec(1,interval,v));
+    if (typeof(L[2])=="int")
+    { molien(L[3..size(L)],newring,intvec(1,interval,v));
+    }
+    else
+    { molien(L[2..size(L)],newring,intvec(1,interval,v));
+    }
     matrix P=primary_charp(L[1],newring,v);
     return(P,L[1],newring);
   }
@@ -3361,7 +3366,7 @@ THEORY:  Bases of homogeneous invariants are generated successively and random
     return();
   }
   if (typeof(`ring_name`)<>"ring")
-  { "ERROR:   Second parameter ought to the name of a ring where the Molien";
+  { "ERROR:   Second parameter ought to be the name of a ring where the Molien";
     "         is stored.";
     return();
   }
@@ -4025,7 +4030,12 @@ THEORY:  Bases of homogeneous invariants are generated successively and random
         { if (v)
           { "  We are dealing with the non-modular case.";
           }
-          molien(L[2..size(L)],newring,intvec(0,interval,v));
+          if (typeof(L[2])=="int")
+          { molien(L[3..size(L)],newring,intvec(0,interval,v));
+          }
+          else
+          { molien(L[2..size(L)],newring,intvec(0,interval,v));
+          }
           matrix P=primary_charp_random(L[1],newring,max,v);
           return(P,L[1],newring);
         }
@@ -4094,7 +4104,12 @@ THEORY:  Bases of homogeneous invariants are generated successively and random
     }
     list L=group_reynolds(#[1..gen_num],v);
     string newring="aksldfalkdsflkj";
-    molien(L[2..size(L)],newring,intvec(1,interval,v));
+    if (typeof(L[2])=="int")
+    { molien(L[3..size(L)],newring,intvec(1,interval,v));
+    }
+    else
+    { molien(L[2..size(L)],newring,intvec(1,interval,v));
+    }
     matrix P=primary_charp_random(L[1],newring,max,v);
     return(P,L[1],newring);
   }
@@ -5233,7 +5248,12 @@ THEORY:  Bases of homogeneous invariants are generated successively and those
         { if (v)
           { "  We are dealing with the non-modular case.";
           }
-          molien(L[3..size(L)],newring,L[2],intvec(0,interval,v));
+          if (typeof(L[2])=="int")
+          { molien(L[3..size(L)],newring,L[2],intvec(0,interval,v));
+          }
+          else
+          { molien(L[2..size(L)],newring,L[2],intvec(0,interval,v));
+          }
           matrix P=primary_charp(L[1],newring,v);
           matrix S,IS=secondary_charp(P,L[1],newring,v);
           if (defined(aksldfalkdsflkj)==2)
@@ -5316,7 +5336,12 @@ THEORY:  Bases of homogeneous invariants are generated successively and those
     }
     list L=group_reynolds(#[1..gen_num],v);
     string newring="aksldfalkdsflkj";
-    molien(L[2..size(L)],newring,intvec(1,interval,v));
+    if (typeof(L[2])=="int")
+    { molien(L[3..size(L)],newring,intvec(1,interval,v));
+    }
+    else
+    { molien(L[2..size(L)],newring,intvec(1,interval,v));
+    }
     matrix P=primary_charp(L[1],newring,v);
     matrix S,IS=secondary_charp(P,L[1],newring,v);
     kill aksldfalkdsflkj;
@@ -5457,7 +5482,12 @@ THEORY:  is the same as for invariant_ring except that random combinations of
         { if (v)
           { "  We are dealing with the non-modular case.";
           }
-          molien(L[3..size(L)],newring,L[2],intvec(0,interval,v));
+          if (typeof(L[2])"int")
+          { molien(L[3..size(L)],newring,L[2],intvec(0,interval,v));
+          }
+          else
+          { molien(L[2..size(L)],newring,L[2],intvec(0,interval,v));
+          }
           matrix P=primary_charp_random(L[1],newring,max,v);
           matrix S,IS=secondary_charp(P,L[1],newring,v);
           if (voice==2)
@@ -5540,7 +5570,12 @@ THEORY:  is the same as for invariant_ring except that random combinations of
     }
     list L=group_reynolds(#[1..gen_num],v);
     string newring="aksldfalkdsflkj";
-    molien(L[2..size(L)],newring,intvec(1,v));
+    if (typeof(L[2])"int")
+    { molien(L[3..size(L)],newring,L[2],intvec(0,interval,v));
+    }
+    else
+    { molien(L[2..size(L)],newring,L[2],intvec(0,interval,v));
+    }
     matrix P=primary_charp_random(L[1],newring,max,v);
     matrix S,IS=secondary_charp(P,L[1],newring,v);
     kill aksldfalkdsflkj;
