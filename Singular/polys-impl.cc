@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-impl.cc,v 1.21 1998-12-02 13:57:39 obachman Exp $ */
+/* $Id: polys-impl.cc,v 1.22 1999-03-15 16:55:41 Singular Exp $ */
 
 /***************************************************************
  *
@@ -375,7 +375,7 @@ poly _pCopy(poly p)
 #else
   w = a = pNew();
 #endif
-  memcpy(w,p,pMonomSize);
+  pCopy2(w,p);
   w->coef=nCopy(p->coef);
   if (pNext(p)!=NULL)
   {
@@ -387,7 +387,7 @@ poly _pCopy(poly p)
 #else
       a = pNext(a) = pNew();
 #endif
-      memcpy(a,p,pMonomSize);
+      pCopy2(a,p);
       a->coef=nCopy(p->coef);
       pIter(p);
     }

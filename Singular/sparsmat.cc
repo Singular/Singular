@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.4 1999-03-03 16:58:52 Singular Exp $ */
+/* $Id: sparsmat.cc,v 1.5 1999-03-15 16:55:42 Singular Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -1363,7 +1363,7 @@ void smPolyDiv(poly a, poly b)
     } while (a != NULL);
     return;
   }
-  dummy = pNew();
+  dummy = pInit();
   do
   {
     for (i=pVariables; i; i--)
@@ -1377,8 +1377,8 @@ void smPolyDiv(poly a, poly b)
     h = dummy;
     do
     {
-      h = pNext(h) = pNew();
-      pSetComp(h,0);
+      h = pNext(h) = pInit();
+      //pSetComp(h,0);
       for (i=pVariables; i; i--)
         pSetExp(h,i,pGetExp(a,i)+pGetExp(t,i));
       pSetm(h);
@@ -1426,7 +1426,7 @@ poly smMultDiv(poly a, poly b, const poly c)
     return res;
   }
   res = NULL;
-  e = pNew();
+  e = pInit();
   lead = FALSE;
   while (!lead)
   {
@@ -1504,7 +1504,7 @@ void smSpecialPolyDiv(poly a, poly b)
 static void smExactPolyDiv(poly a, poly b)
 {
   const number x = pGetCoeff(b);
-  poly tail = pNext(b), e = pNew();
+  poly tail = pNext(b), e = pInit();
   poly h;
   number y, yn;
 
@@ -1558,10 +1558,10 @@ static poly smEMult(poly t, const poly e)
   poly res, h;
   int i;
 
-  h = res = pNew();
+  h = res = pInit();
   loop
   {
-    pSetComp(h,0);
+    //pSetComp(h,0);
     for (i=pVariables; i; i--)
       pSetExp(h,i,pGetExp(e,i)+pGetExp(t,i));
     pSetm(h);
@@ -1572,7 +1572,7 @@ static poly smEMult(poly t, const poly e)
       pNext(h) = NULL;
       return res;
     }
-    h = pNext(h) = pNew();
+    h = pNext(h) = pInit();
   }
 }
 
@@ -1595,7 +1595,7 @@ static poly smDMult(poly t, const poly e)
   int i;
   EXPONENT_TYPE w;
 
-  r = h = res = pNew();
+  r = h = res = pInit();
   loop
   {
     x = pGetCoeff(t);
@@ -1608,7 +1608,7 @@ static poly smDMult(poly t, const poly e)
     pIter(t);
     if (i == 0)
     {
-      pSetComp(h,0);
+      //pSetComp(h,0);
       pSetm(h);
       pSetCoeff0(h,nMult(y,x));
       if (t == NULL)
@@ -1617,7 +1617,7 @@ static poly smDMult(poly t, const poly e)
         return res;
       }
       r = h;
-      h = pNext(h) = pNew();
+      h = pNext(h) = pInit();
     }
     else if (t == NULL)
     {

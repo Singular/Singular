@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.18 1999-02-26 14:27:46 Singular Exp $ */
+/* $Id: polys1.cc,v 1.19 1999-03-15 16:55:42 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -123,7 +123,7 @@ poly pAdd(poly p1, poly p2)
   if (p2==NULL) return p1;
   a1 = p1;
   a2 = p2;
-  a = p  = pNew();
+  a = p  = pInit();
   nNew(&(p->coef));
   loop
   {
