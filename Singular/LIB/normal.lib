@@ -4,7 +4,7 @@
 // the criterion of Grauert/Remmert and ideas of De Jong & Vasconcelos
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: normal.lib,v 1.25 2000-05-12 12:20:25 krueger Exp $";
+version="$Id: normal.lib,v 1.26 2000-05-23 22:57:52 greuel Exp $";
 info="
 LIBRARY:  normal.lib     PROCEDURES FOR NORMALIZATION
 AUTHORS:  Gert-Martin Greuel, email: greuel@mathematik.uni-kl.de,
@@ -587,7 +587,7 @@ EXAMPLE: example normalizationPrimes; shows an example
    }
    
    list SM=mstd(i);                //here the work starts
-   int dimSM =  dim(SM[1]);
+   int dimSM =  dim(SM[1]);        //dimension of variety to normalize
   // Case: Get an ideal containing a unit
    if( dimSM == -1)
    {  "";
@@ -756,7 +756,7 @@ EXAMPLE: example normalizationPrimes; shows an example
       attrib(SM[2],"isEquidimensional",1);
       if(y>=1)
       {
-         "// the ideal is a complete Intersection";
+         "// the ideal is a complete intersection";
       }
    }
 
@@ -783,7 +783,8 @@ write (":a normal-fehler" ,
     //kills the embeded components
 
       list JM=mstd(sin);
-
+      //JM[1] SB os singular locus, JM[2]=minbasis of singular locus
+      //SM[1] SB of irreducible component, SM[2] minbasis
       if(y>=1)
       {
          "//   the dimension of the singular locus is:";"";
@@ -851,13 +852,16 @@ write (":a normal-fehler" ,
       return(result);          
    }
    //if it is an isolated singularity things are easier
-   if((dim(JM[1])==0)&&(homog(SM[2])==1))
+   //JM ideal of singular locus, SM ideal of variety
+   if((dim(JM[1])==0)&&(homog(SM[2])==1))            //isolated sing. case
    {
       attrib(SM[2],"isIsolatedSingularity",1);
-      ideal SL=simplify(reduce(maxideal(1),SM[1]),2);
+      ideal SL=simplify(reduce(maxideal(1),SM[1]),2);  
+           //vars not contained in ideal
       ideal Ann=quotient(SM[2],SL[1]);
       ideal qAnn=simplify(reduce(Ann,SM[1]),2);
-
+      
+      //qAnn=0 ==> the first var(=SL[1]) not contained in SM is a nzd of R/SM
       if(size(qAnn)==0)
       {
          if(y>=1)
@@ -901,6 +905,11 @@ write (":a normal-fehler" ,
          return(result);
 
        }
+      //Now the case where qAnn!=0, i.e.SL[1] is a zero divisor of R/SM
+      //and we have found a splitting: id and id1
+      //id=qAnn+SM[2] defines components of R/SM in the complement of V(SL[1]) 
+      //id1 defines components of R/SM in the complement of V(id)
+      //?????instead of id1 we can take SL[1]+Ann+SM[2]???????????
        else
        {
           ideal id=qAnn+SM[2];
@@ -914,7 +923,7 @@ write (":a normal-fehler" ,
 
           keepresult1=normalizationPrimes(id,ihp);
           ideal id1=quotient(SM[2],Ann)+SM[2];
-//          evtl. qAnn nehmen
+//          evtl. qAnn statt Ann nehmen
 //          ideal id=SL[1]+SM[2];
 
           attrib(id1,"isCohenMacaulay",0);
