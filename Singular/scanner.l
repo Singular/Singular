@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.17 1999-07-06 15:32:44 Singular Exp $ */
+/* $Id: scanner.l,v 1.18 1999-07-09 14:58:29 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -22,7 +22,6 @@ int blocknest = 0;
 extern char * yytext;
 //extern unsigned char * yytext;
 extern int yyleng;
-extern BOOLEAN noringvars;
 extern int inerror;
 
 static char * dupyytext()

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.17 1999-04-15 17:28:05 Singular Exp $ */
+/* $Id: ipshell.h,v 1.18 1999-07-09 14:58:28 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -31,6 +31,7 @@ extern ring   *iiLocalRing;
 #endif
 extern cmdnames cmds[];
 extern char *lastreserved;
+extern BOOLEAN yyInRingConstruction; /* 1: during ring construction */
 
 int     IsCmd(char *n, int & tok);
 BOOLEAN iiPStart(idhdl pn, sleftv * sl);

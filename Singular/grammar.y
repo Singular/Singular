@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.61 1999-05-29 12:00:01 Singular Exp $ */
+/* $Id: grammar.y,v 1.62 1999-07-09 14:58:24 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -57,7 +57,7 @@ extern FILE* yyin;
 
 char       my_yylinebuf[80];
 char *     currid;
-BOOLEAN    noringvars=FALSE;
+BOOLEAN    yyInRingConstruction=FALSE;
 BOOLEAN    expected_parms;
 int        cmdtok;
 int        inerror = 0;
@@ -363,7 +363,7 @@ pprompt:
             #ifdef SIQ
             siq=0;
             #endif
-	    noringvars = FALSE;
+	    yyInRingConstruction = FALSE;
             currentVoice->ifsw=0;
             if (inerror)
             {
@@ -940,13 +940,8 @@ rlist:
 ordername:
         UNKNOWN_IDENT
         {
-#if 0          
-          if (!($$=rOrderName($1)))
-            YYERROR;
-#else
           // let rInit take care of any errors 
           $$=rOrderName($1);
-#endif          
         }
         ;
 
@@ -1308,7 +1303,7 @@ listcmd:
         ;
 
 ringcmd1:
-       RING_CMD { noringvars = TRUE; }
+       RING_CMD { yyInRingConstruction = TRUE; }
        ;
 
 ringcmd:
@@ -1342,7 +1337,7 @@ ringcmd:
             $4.CleanUp();
             $6.CleanUp();
             $8.CleanUp();
-	    noringvars = FALSE;
+	    yyInRingConstruction = FALSE;
             if (b==NULL)
             {
               MYYERROR("cannot make ring");
@@ -1370,9 +1365,9 @@ ringcmd:
 #ifdef HAVE_NAMESPACES
             if(do_pop) namespaceroot->pop();
 #endif /* HAVE_NAMESPACES */
-	    noringvars = FALSE;
+	    yyInRingConstruction = FALSE;
           }
-        | DRING_CMD { noringvars = TRUE; }
+        | DRING_CMD { yyInRingConstruction = TRUE; }
           elemexpr cmdeq
           rlist     ','       /* description of coeffs */
           rlist     ','       /* var names */
@@ -1411,7 +1406,7 @@ ringcmd:
             setFlag(h,FLAG_DRING);
             rDSet();
             #endif
-	    noringvars = FALSE;
+	    yyInRingConstruction = FALSE;
           }
         ;
 

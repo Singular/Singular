@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.51 1999-06-15 11:36:41 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.52 1999-07-09 14:58:30 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -1210,7 +1210,6 @@ BOOLEAN assumeStdFlag(leftv h)
 * into an expression (sleftv), deletes the string
 * utility for grammar and iparith
 */
-extern BOOLEAN noringvars;
 void syMake(leftv v,char * id, idhdl packhdl)
 {
   /* resolv an identifier: (to DEF_CMD, if siq>0)
@@ -1332,7 +1331,7 @@ void syMake(leftv v,char * id, idhdl packhdl)
     if ((currRingHdl!=NULL) && (IDLEV(currRingHdl)==myynest))
     {
       BOOLEAN ok=FALSE;
-      poly p = (!noringvars) ? pmInit(id,ok) : (poly)NULL;
+      poly p = (!yyInRingConstruction) ? pmInit(id,ok) : (poly)NULL;
       if (ok)
       {
         if (p==NULL)
@@ -1362,8 +1361,9 @@ void syMake(leftv v,char * id, idhdl packhdl)
     /* 7. non-local ring: number/poly */
     {
       BOOLEAN ok=FALSE;
-      poly p = ((currRingHdl!=NULL)&&(!noringvars)&&(IDLEV(currRingHdl)!=myynest))
-               /* ring required */  /* not in decl */    /* already in case 4/6 */
+      poly p = ((currRingHdl!=NULL)     /* ring required */
+               &&(!yyInRingConstruction) /* not in decl */
+	       &&(IDLEV(currRingHdl)!=myynest)) /* already in case 4/6 */
                      ? pmInit(id,ok) : (poly)NULL;
       if (ok)
       {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.157 1999-07-09 14:06:45 obachman Exp $ */
+/* $Id: iparith.cc,v 1.158 1999-07-09 14:58:25 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4310,7 +4310,7 @@ static BOOLEAN jjCALL2ARG(leftv res, leftv u)
 {
   leftv v=u->next;
   u->next=NULL;
-  BOOLEAN b=iiExprArith2(res,u,iiOp,v);
+  BOOLEAN b=iiExprArith2(res,u,iiOp,v, (iiOp > 255));
   u->next=v;
   return b;
 }
@@ -4521,6 +4521,12 @@ static BOOLEAN jjINTVEC_PL(leftv res, leftv v)
 }
 static BOOLEAN jjKLAMMER_PL(leftv res, leftv u)
 {
+  if (yyInRingConstruction)
+  {
+    memcpy(res,u,sizeof(sleftv));
+    memset(u,0,sizeof(sleftv));
+    return FALSE;
+  }
   leftv v=u->next;
   BOOLEAN b;
   if(v==NULL)
