@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.5 1999-06-24 07:46:50 wenk Exp $ */
+/* $Id: mpr_complex.cc,v 1.6 1999-06-26 16:40:42 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -339,7 +339,7 @@ char *nicifyFloatStr( char * in, mp_exp_t exponent, size_t oprec, int *size, int
   return out;
 }
 
-char *floatToStr( const gmp_float & r, const size_t oprec )
+char *floatToStr( const gmp_float & r, const unsigned int oprec )
 {
 #if 1
   mp_exp_t exponent;
@@ -490,7 +490,7 @@ gmp_complex sqrt( const gmp_complex & x )
 
 // converts a gmp_complex to a string ( <real part> + I * <imaginary part> )
 //
-char *complexToStr( const gmp_complex & c, const size_t oprec )
+char *complexToStr( const gmp_complex & c, const unsigned int oprec )
 {
   char *out,*in_imag,*in_real;
 
