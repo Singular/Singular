@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.11 1997-07-30 07:55:02 schmidt Exp $ */
+/* $Id: canonicalform.cc,v 1.12 1997-07-30 15:06:33 schmidt Exp $ */
 
 #include <config.h>
 
@@ -1249,13 +1249,15 @@ CanonicalForm::sqrt ( ) const
     if ( is_imm( value ) ) {
 	ASSERT( is_imm( value ) == INTMARK, "not implemented" );
 	int a = imm2int( value );
-	if ( a == 1 )
-	    return CanonicalForm( CFFactory::basic( 1 ) );
+	ASSERT( a >= 0, "arg to sqrt less than zero" );
+	if ( a == 0 || a == 1 )
+	    return CanonicalForm( CFFactory::basic( a ) );
 	else {
-	    int h, x0, x1 = a;
+	    int x0, x1 = a;
+	    long long int h;
 	    do {
 		x0 = x1;
-		h = x0 * x0 + a - 1;
+		h = (long long int)x0 * x0 + a - 1;
 		if ( h % (2 * x0) == 0 )
 		    x1 = h / (2 * x0);
 		else
