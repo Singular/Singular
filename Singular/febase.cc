@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.23 1997-11-18 16:30:52 Singular Exp $ */
+/* $Id: febase.cc,v 1.24 1998-01-27 14:10:15 pohl Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -106,6 +106,47 @@ BOOLEAN tclmode=FALSE;
 FILE * feFopen(char *path, char *mode, char *where,int useWerror)
 {
   FILE * f=fopen(path,mode);
+#ifdef macintosh
+  if (f!=NULL)
+  {
+    if (where!=NULL) strcpy(where,path);
+    return f;
+  }
+  char *res;
+  int idat=strlen(SINGULAR_DATADIR),ipath=strlen(path);
+  char *env=getenv("SINGULARPATH");
+  int ienv=strlen(env), ii=ienv;
+  if (ii<idat) ii = idat;
+  if (ii==0)
+  {
+    if (useWerror)
+      Werror("cannot open `%s`",path);
+    return f;
+  }
+  res=(char*) AllocL(ii+ipath+1);
+  if (ienv!=0)
+  {
+    memcpy(res,env,ienv);
+    memcpy(res+ienv,path,ipath);
+    res[ienv+ipath]='\0';
+    f=fopen(res,mode);
+  }
+  if ((f==NULL)&&(idat!=0))
+  {
+    memcpy(res,SINGULAR_DATADIR,idat);
+    memcpy(res+idat,path,ipath);
+    res[idat+ipath]='\0';
+    f=fopen(res,mode);
+  }
+  if (f==NULL)
+  {
+    if (useWerror)
+      Werror("cannot open `%s`",res);
+  }
+  else if (where!=NULL)
+    strcpy(where,res);
+  FreeL(res);
+#else
   if (where!=NULL) strcpy(where,path);
   if ((*mode=='r') && (path[0]!=DIR_SEP)&&(path[0]!='.')
   &&(f==NULL))
@@ -177,6 +218,7 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror)
   }
   if ((f==NULL)&&(useWerror))
     Werror("cannot open `%s`",path);
+#endif
   return f;
 }
 
