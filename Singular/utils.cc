@@ -227,6 +227,7 @@ printpi(procinfov pi)
     }
   }
   
+  if (fp != NULL) fclose(fp);
 
 #if 0
   if( fp != NULL) { // loading body
@@ -264,7 +265,6 @@ printpi(procinfov pi)
       free(buf);
     }
 
-    fclose(fp);
     //getchar();
   }
 #endif
