@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.23 1998-07-14 08:50:04 pfister Exp $
+// $Id: primdec.lib,v 1.24 1998-07-31 17:42:18 Singular Exp $
 ////////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                                //
 // algorithms for primary decomposition based on                              //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                             //
 ////////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.23 1998-07-14 08:50:04 pfister Exp $";
+version="$Id: primdec.lib,v 1.24 1998-07-31 17:42:18 Singular Exp $";
 info="
 LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION
 
@@ -2771,7 +2771,7 @@ proc radicalKL (list m,ideal ser,list #)
          }
          if(homog(@j)==1)
          {
-            @mu=mstd(@j);   
+            @mu=mstd(@j);
          }
          else
          {
@@ -4210,12 +4210,12 @@ EXAMPLE: example radical; shows an example
       option(noredSB);
       setring @Q;
       ideal i1=fetch(@P,re);
-      return(i1);      
+      return(i1);
    }
-   if(dim(re)+size(i)==nvars(basering))
+   if((dim(re)+size(i)==nvars(basering))&&(nvars(basering)<=6)&&(size(i)<=6))
    {
 //hier spaeter SB uebergeben
-     i=radicalEHV(i,ideal(1),1);  
+     i=radicalEHV(i,ideal(1),1);
      setring @Q;
      ideal i1=fetch(@P,i);
      return(i1);
