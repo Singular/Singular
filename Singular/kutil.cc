@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.25 1998-07-28 15:24:07 Singular Exp $ */
+/* $Id: kutil.cc,v 1.26 1998-07-30 07:32:52 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2924,7 +2924,8 @@ void initSSpecial (ideal F, ideal Q, ideal P,kStrategy strat)
         if (pOrdSgn==1)
         {
           h.p=redBba(h.p,strat->sl,strat);
-          h.p=redtailBba(h.p,strat->sl,strat);
+	  if (h.p!=NULL)
+            h.p=redtailBba(h.p,strat->sl,strat);
         }
         else
         {
