@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.35 1998-05-08 16:03:18 obachman Exp $
+@comment $Id: reference.doc,v 1.36 1998-05-11 10:05:05 wichmann Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2711,9 +2711,13 @@ See @ref{det}.
 @code{minres (} list @code{)}
 @item @strong{Type:}
 list
+@item @strong{Syntax:}
+@code{minres (} resolution @code{)}
+@item @strong{Type:}
+resolution
 @item @strong{Purpose:}
 minimizes a free resolution of an ideal or module
-given by the list argument.
+given by the list resp. resolution argument.
 @item @strong{Example:}
 @example
 @c example
@@ -5102,6 +5106,7 @@ See @ref{read}, @ref{link}, @ref{Data types};
 @node Control structures, System variables, Functions, Functions and variables
 @section Control structures
 @cindex Control structures
+@cindex block
 @ifinfo
 @*List of all supported control structures.
 @end ifinfo
@@ -5117,6 +5122,28 @@ See @ref{read}, @ref{link}, @ref{Data types};
 * return::
 * while::
 @end menu
+
+A sequence of commands surrounded by curly brackets (@code{@{} and
+@code{@}}) is a so called block. Blocks are used in @sc{Singular} in
+order to define procedures and to collect commands belonging to
+@code{if}, @code{else}, and @code{while} statements. Variables which are
+defined inside a block are local to that block. Use @code{export} to
+make them globally available. Note that there is no ending semicolon at
+the and of the block.
+@table @code
+@item @strong{Example:}
+@example
+  if ( i>j )
+  @{
+    // This is the block
+    int temp; // temp is a local variable
+    i=temp;
+    i=j;
+    j=temp;
+  @}
+@end example
+@end table
+
 @c ---------------------------------------
 @node break, continue, Control structures, Control structures
 @subsection break
@@ -5125,24 +5152,22 @@ See @ref{read}, @ref{link}, @ref{Data types};
 @item @strong{Syntax:}
 @code{break;}
 @item @strong{Purpose:}
-leaves the innermost block of a for- or a while-construct.
+leaves the innermost @code{for}- or @code{while}-block.
 @item @strong{Example:}
 @example
   while (1)
   @{
     @dots{}
-    if ( @dots{} )  break; // leave the while block
+    if ( @dots{} )  
+    @{  
+      break; // leave the while block
+    @}
   @}
 @end example
 @end table
-@menu
-* for::
-* while::
-* Control structures::
-@end menu
-@iftex
+@c ref
 See @ref{Control structures}; @ref{while}; @ref{for}.
-@end iftex
+@c ref
 @c ---------------------------------------
 @node continue, else, break, Control structures
 @subsection continue
@@ -5151,11 +5176,11 @@ See @ref{Control structures}; @ref{while}; @ref{for}.
 @item @strong{Syntax:}
 @code{continue;}
 @item @strong{Purpose:}
-is only valid inside a @code{for} construct, skips the rest
-of this loop and jumps to the beginning of the block.
+skips the rest of this loop und jumps to the beginning of the
+block. This command is only valid inside a @code{for} construct.
 @item @strong{Note:}
-Unlike the C-construct it @strong{does not execute the increment statement}
-@code{continue} is mainly for internal use
+Unlike the C-construct it @strong{does not execute the increment statement}.
+The command @code{continue} is mainly for internal use.
 @item @strong{Example:}
 @example
   for (int i = 1 ; i<=10; i=i+1)
@@ -5173,21 +5198,19 @@ Unlike the C-construct it @strong{does not execute the increment statement}
   @expansion{} 10
 @end example
 @end table
-@menu
-* for::
-* Control structures::
-@end menu
-@iftex
+@c ref 
 See @ref{Control structures}; @ref{for}.
-@end iftex
+@c ref
 @c ---------------------------------------
 @node else, export, continue, Control structures
 @subsection else
 @table @code
 @item @strong{Syntax:}
-@code{if (} boolean_expression @code{)} block @code{else} block
+@code{if (} boolean_expression @code{)} true_block @code{else} false_block
 @item @strong{Purpose:}
-conditional execution of a block, only valid after an `if`.
+executes true_block if the boolean_expression of the @code{if} statement
+is false. This command is only valid in combination with an @code{if}
+command. 
 @item @strong{Example:}
 @example
   int i=3;
@@ -5202,13 +5225,9 @@ conditional execution of a block, only valid after an `if`.
   @expansion{} i is smaller than 6
 @end example
 @end table
-@menu
-* if::
-* Control structures::
-@end menu
-@iftex
-See @ref{if}; @ref{Control structures}.
-@end iftex
+@c ref
+See @ref{if}; @ref{boolean expressions}; @ref{Control structures}.
+@c ref
 @c ---------------------------------------
 @node export, for, else, Control structures
 @subsection export
@@ -5218,7 +5237,7 @@ See @ref{if}; @ref{Control structures}.
 @code{export} name @code{;}
 @*@code{export} list_of_names @code{;}
 @item @strong{Purpose:}
-converts a local variable to a global one.
+converts a local variable of a procedure to a global one.
 @item @strong{Example:}
 @example
   proc p1
@@ -5244,18 +5263,16 @@ converts a local variable to a global one.
 @cindex for
 @table @code
 @item @strong{Syntax:}
-@code{for (} init@code{;} boolean_expression@code{;} iterate@code{)} block
-@*
-@*init is a command, which is executed first.
-@*boolean_expression is evaluated.
-@*iterate is a command, which is executed at the end of the block.
+@code{for (} init_command@code{;} 
+boolean_expression@code{;} 
+iterate_command@code{)} block
 @item @strong{Purpose:}
 repetitive, conditional execution of a command block.
-@*The command init is executed first. Then boolean_expression is
+@*The command init_command is executed first. Then boolean_expression is
 evaluated. If its value is TRUE the block is executed, otherwise the @code{for}
 statement is complete. After each execution of the block, the command
-iterate is executed and boolean_expression is evaluated.
-@* @code{break;} leaves the innermost @code{for} construct.
+iterate_command is executed and boolean_expression is evaluated.
+@*The command @code{break;} leaves the innermost @code{for} construct.
 @item @strong{Example:}
 @example
   // sum of 1 to 10:
@@ -5268,17 +5285,10 @@ iterate is executed and boolean_expression is evaluated.
   @expansion{} 55
 @end example
 @end table
-@menu
-* Control structures::
-* boolean expressions::
-* while::
-* if::
-* break::
-@end menu
-@iftex
+@c ref
 See @ref{Control structures}; @ref{boolean expressions}; @ref{while}; @ref{if};
 @ref{break}; @ref{continue}.
-@end iftex
+@c ref
 @c ---------------------------------------
 @node if, keepring, for, Control structures
 @subsection if
@@ -5286,11 +5296,12 @@ See @ref{Control structures}; @ref{boolean expressions}; @ref{while}; @ref{if};
 @cindex else
 @table @code
 @item @strong{Syntax:}
-@code{if (} boolean_expression @code{)} block
-@*@code{if (} boolean_expression @code{) break;}
-@*@code{if (} boolean_expression @code{)} block @code{else} block
+@code{if (} boolean_expression @code{)} true_block
+@*@code{if (} boolean_expression @code{)} true_block @code{else} false_block
 @item @strong{Purpose:}
-conditional execution of a block.
+executes true_block if the boolean condition is true. If the @code{if}
+statement is followed by an @code{else} statement and the boolean
+condition is false, then false_block is executed.
 @item @strong{Example:}
 @example
   int i = 9;
@@ -5299,22 +5310,12 @@ conditional execution of a block.
   @{
     m[i][i] = i;
   @}
-  else
-  @{
-    if (i<5)
-    @{
-      "index i=",i," is too small";
-    @}
-  @}
 @end example
 @end table
-@menu
-* Control structures::
-* boolean expressions::
-@end menu
-@iftex
-See @ref{Control structures}; @ref{boolean expressions}.
-@end iftex
+@c ref
+See @ref{else}; @ref{break}; @ref{Control structures}; 
+@ref{boolean expressions}.
+@c ref
 @c ---------------------------------------
 @node keepring, quit, if, Control structures
 @subsection keepring
@@ -5323,7 +5324,7 @@ See @ref{Control structures}; @ref{boolean expressions}.
 @item @strong{Syntax:}
 @code{keepring} name @code{;}
 @item @strong{Purpose:}
-moves the specified ring to the next (upper) level. @code{keepring} can only
+moves the specified ring to the next (upper) level. This command can only
 be used inside of procedures. There it provides the possibility to keep
 a ring which is local to the procedure (and its objects) accessible after
 the procedure ended without making the ring global.
@@ -5334,10 +5335,18 @@ the procedure ended without making the ring global.
     ring r=0,x,dp;
     keepring r;
   @}
+  proc P2
+  @{
+    "inside P2: " + nameof(basering);
+    P1();
+    "inside P2, after call of P1: " + nameof(basering);
+  @}
   ring r1= 0,y,dp;
-  P1();
-  nameof(basering);
-  @expansion{} r
+  P2();
+  @expansion{} inside P2: r1
+  @expansion{} inside P2, after call of P1: r
+  "at top level: " + nameof(basering);
+  @expansion{} at top level: r1
 @end example
 @end table
 @c ---------------------------------------
@@ -5349,7 +5358,7 @@ the procedure ended without making the ring global.
 @code{quit;}
 @item @strong{Purpose:}
 quits @sc{Singular},
-works also from inside a proc or from an interrupt.
+works also from inside a procedure or from an interrupt.
 @item @strong{Example:}
   quit;
 @end table
@@ -5360,12 +5369,12 @@ works also from inside a proc or from an interrupt.
 @table @code
 @item @strong{Syntax:}
 @code{return (} expression_list @code{);}
-@*@code{return ( );}
+@*@code{return ();}
 @item @strong{Type:}
 any
 @item @strong{Purpose:}
 returns the result(s) of a procedure.
-@*should only be used in a procedure.
+@*Can only be used inside a procedure.
 @item @strong{Example:}
 @example
   proc p2
@@ -5384,13 +5393,9 @@ returns the result(s) of a procedure.
   return(i(1..5));
 @end example
 @end table
-@menu
-* Data types::
-* proc::
-@end menu
-@iftex
+@c ref
 See @ref{Data types}; @ref{proc}.
-@end iftex
+@c ref
 @c ---------------------------------------
 @node while,  , return, Control structures
 @subsection while
@@ -5399,19 +5404,20 @@ See @ref{Data types}; @ref{proc}.
 @item @strong{Syntax:}
 @code{while (}boolean_expression@code{)} block
 @item @strong{Purpose:}
-repetitive, conditional execution of block.
-@*@code{break} will leave the innermost @code{while} construct.
+repetitive, conditional execution of block.  
+@*The command @code{break} will leave the innermost @code{while}
+construct.
 @item @strong{Example:}
 @example
   int i = 9;
   while (i>0)
   @{
-     // @dots{} // do something for i=9,8,7,6,5,4,3,2,1
+     // @dots{} // do something for i=9, 8, ..., 1
      i = i - 1;
   @}
   while (1)
   @{
-     // @dots{} // do something forever
+     // @dots{}   // do something forever
      if (i == -5) // but leave the loop if i is -5
      @{
        break;
@@ -5419,15 +5425,9 @@ repetitive, conditional execution of block.
   @}
 @end example
 @end table
-@menu
-* boolean expressions::
-* Control structures::
-* break::
-@end menu
-@iftex
+@c ref
 See @ref{Control structures}; @ref{boolean expressions}; @ref{break}.
-@end iftex
-
+@c ref
 
 @c ---------------------------------------
 @node System variables,  , Control structures, Functions and variables
