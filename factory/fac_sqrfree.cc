@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_sqrfree.cc,v 1.1 1996-05-20 13:39:48 stobbe Exp $
+// $Id: fac_sqrfree.cc,v 1.2 1996-06-26 13:15:28 stobbe Exp $
 
 #include "assert.h"
 #include "cf_defs.h"
@@ -7,6 +7,12 @@
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1996/05/20 13:39:48  stobbe
+"sqrFree: Now the product of all factors found by sqrFree is equal to the
+         parameter of sqrFree. The bug resulted from an incorrect handling
+         of the leading coefficient of the argument of sqrFree.
+"
+
 // Revision 1.0  1996/05/17  10:59:45  stobbe
 // Initial revision
 //
@@ -127,8 +133,15 @@ CFFList sqrFreeZ ( const CanonicalForm & a )
 	    F.append( CFFactor( -w, i ) );
 	else
 	    F.append( CFFactor( w, i ) );
-    if ( ! cont.isOne() )
-	return Union( F, sqrFreeZ( cont ) );
-    else
-	return F;
+    if ( ! cont.isOne() && ! cont.inCoeffDomain() )
+	F = Union( F, sqrFreeZ( cont ) );
+    if ( lc( a ).sign() < 0 ) {
+	if ( F.getFirst().exp() == 1 ) {
+	    CanonicalForm f = F.getFirst().factor();
+	    CFFListIterator(F).getItem() = CFFactor( -f, 1 );
+	}
+	else
+	    F.insert( CFFactor( -1, 1 ) );
+    }
+    return F;
 }
