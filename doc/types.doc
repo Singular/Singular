@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.25 1998-05-07 16:21:45 Singular Exp $
+@comment $Id: types.doc,v 1.26 1998-05-07 16:41:51 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -923,7 +923,6 @@ returns weights for the weighted ecart method (see @ref{weight})
 @menu
 * link declarations::
 * link expressions::
-* link operations::
 * link related functions::
 * ASCII links::
 * MP links::
