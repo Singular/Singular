@@ -136,7 +136,7 @@ OBJS=grammar.o scanner.o matpol.o binom.o\
 	${LEX} -s -I -t $< > scanner.cc
 .y.cc:
 	@if test "x${BISON}" = x; then \
-		echo Error: no lex given, could not rebuilt scanner.cc;\
+		echo Error: no bison given, could not rebuilt grammar.cc;\
                 exit 1; \
 	fi
 	${BISON} -d -t -o grammar.cc $<

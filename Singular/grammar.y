@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.41 1998-07-23 09:06:59 Singular Exp $ */
+/* $Id: grammar.y,v 1.42 1998-07-24 16:41:13 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -272,6 +272,7 @@ void yyerror(char * fmt)
 
 /*%nonassoc '=' PLUSEQUAL DOTDOT*/
 %nonassoc '=' DOTDOT COLONCOLON
+%left ','
 %left '|' '&'
 %left EQUAL_EQUAL NOTEQUAL
 %left '<' '>' GE LE
@@ -281,8 +282,7 @@ void yyerror(char * fmt)
 %left  '^'
 %left '[' ']'
 %left '(' ')'
-%left PLUSPLUS
-%left MINUSMINUS
+%left PLUSPLUS MINUSMINUS
 
 %%
 lines:
@@ -342,15 +342,15 @@ pprompt:
             #endif
             currentVoice->ifsw=0;
             if (inerror)
-	    {
-	      if ((inerror!=3) && ($1.i<UMINUS) && ($1.i>' '))
+            {
+              if ((inerror!=3) && ($1.i<UMINUS) && ($1.i>' '))
               {
                 // 1: yyerror called
                 // 2: scanner put actual string
                 // 3: error rule put token+\n
                 inerror=3;
                 Print(" error at token `%s`\n",iiTwoOps($1.i));
-              }		
+              }
             }
             if (!errorreported) WerrorS("...parse error");
             yyerror("");
@@ -359,7 +359,7 @@ pprompt:
             {
               feBufferTypes t=currentVoice->Typ();
               //PrintS("leaving yyparse\n");
-	      exitBuffer(BT_proc);
+              exitBuffer(BT_proc);
               if (t==BT_example)
                 YYACCEPT;
               else
@@ -534,17 +534,6 @@ exprlist:
           {
             $$ = $1;
           }
-        | '(' expr ',' exprlist ')'
-          {
-            leftv v = &$2;
-            while (v->next!=NULL)
-            {
-              v=v->next;
-            }
-            v->next = (leftv)Alloc(sizeof(sleftv));
-            memcpy(v->next,&($4),sizeof(sleftv));
-            $$ = $2;
-          }
         ;
 
 expr:   expr_arithmetic
@@ -553,7 +542,7 @@ expr:   expr_arithmetic
             $$ = $1;
           }
         | elemexpr       { $$ = $1; }
-        | '(' expr ')'    { $$ = $2; }
+        | '(' exprlist ')'    { $$ = $2; }
         | expr '[' expr ',' expr ']'
           {
             if(iiExprArith3(&$$,'[',&$1,&$3,&$5)) YYERROR;
@@ -1331,7 +1320,7 @@ typecmd:
             #endif
             $1.Print(&sLastPrinted);
             $1.CleanUp();
-	    if (errorreported) YYERROR;
+            if (errorreported) YYERROR;
           }
         ;
 

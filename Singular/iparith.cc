@@ -522,6 +522,22 @@ static BOOLEAN jjCOMPARE_S(leftv res, leftv u, leftv v)
   jjEQUAL_REST(res,u,v);
   return FALSE;
 }
+static BOOLEAN jjOP_REST(leftv res, leftv u, leftv v)
+{
+  if (u->Next()!=NULL)
+  {
+    u=u->next;
+    res->next = (leftv)Alloc(sizeof(sleftv));
+    return iiExprArith2(res->next,u,iiOp,v);
+  }
+  else if (v->Next()!=NULL)
+  {
+    v=v->next;
+    res->next = (leftv)Alloc(sizeof(sleftv));
+    return iiExprArith2(res->next,u,iiOp,v);
+  }
+  return FALSE;
+}
 static BOOLEAN jjPOWER_I(leftv res, leftv u, leftv v)
 {
   int b=(int)u->Data();
@@ -543,6 +559,7 @@ static BOOLEAN jjPOWER_I(leftv res, leftv u, leftv v)
     if (overflow)
       Warn("int overflow(^), result may be wrong");
     res->data = (char *)rc;
+    if (u!=NULL) return jjOP_REST(res,u,v);
     return FALSE;
   }
   else
@@ -564,16 +581,19 @@ static BOOLEAN jjPOWER_N(leftv res, leftv u, leftv v)
   }
   nPower(n,e,(number*)&res->data);
   nDelete(&n);
+  if (u!=NULL) return jjOP_REST(res,u,v);
   return FALSE;
 }
 static BOOLEAN jjPOWER_P(leftv res, leftv u, leftv v)
 {
   res->data = (char *)pPower((poly)u->CopyD(POLY_CMD),(int)v->Data());
+  if (u!=NULL) return jjOP_REST(res,u,v);
   return FALSE;
 }
 static BOOLEAN jjPOWER_ID(leftv res, leftv u, leftv v)
 {
   res->data = (char *)idPower((ideal)(u->Data()),(int)(v->Data()));
+  if (u!=NULL) return jjOP_REST(res,u,v);
   return FALSE;
 }
 static BOOLEAN jjPLUSMINUS_Gen(leftv res, leftv u, leftv v)
@@ -584,7 +604,11 @@ static BOOLEAN jjPLUSMINUS_Gen(leftv res, leftv u, leftv v)
   {
     if (v==NULL) return FALSE;      /* u==NULL, v==NULL */
     if (iiOp=='-')                  /* u==NULL, v<>NULL, iiOp=='-'*/
+    {
+      if (res->next==NULL)
+        res->next = (leftv)Alloc(sizeof(sleftv));
       return iiExprArith1(res->next,v,'-');
+    }
     loop                            /* u==NULL, v<>NULL, iiOp=='+' */
     {
       res->next = (leftv)Alloc0(sizeof(sleftv));
@@ -732,46 +756,16 @@ static BOOLEAN jjTIMES_I(leftv res, leftv u, leftv v)
   if ((b!=0) && (c/b !=a))
     Warn("int overflow(*), result may be wrong");
   res->data = (char *)c;
-  if (u->Next()!=NULL)
-  {
-    u=u->next;
-    res->next = (leftv)Alloc(sizeof(sleftv));
-    return iiExprArith2(res->next,u,iiOp,v);
-  }
-  else if (v->Next()!=NULL)
-  {
-    v=v->next;
-    res->next = (leftv)Alloc(sizeof(sleftv));
-    return iiExprArith2(res->next,u,iiOp,v);
-  }
+  if ((u->Next()!=NULL) || (v->Next()!=NULL))
+    return jjOP_REST(res,u,v);
   return FALSE;
 }
 static BOOLEAN jjTIMES_N(leftv res, leftv u, leftv v)
 {
-  number a;
-  number b;
-
-  if (v->next==NULL)
-  {
-    a=(number)u->Data();
-    if (u->next==NULL)
-    {
-      res->data = (char *)(nMult( a, (number)v->Data()));
-      return FALSE;
-    }
-    // u->next exists: copy v
-    b=(number)v->Data();
-    res->data = (char *)(nMult( a, b));
-    res->next = (leftv)Alloc(sizeof(sleftv));
-    res=res->next;
-    return iiExprArith2(res,u->next,iiOp,v);
-  }
-  // v->next exists: copy u
-  a=nCopy((number)u->Data());
-  b=(number)v->CopyD();
-  res->data = (char *)(nMult( a, b));
-  res->next = (leftv)Alloc(sizeof(sleftv));
-  return iiExprArith2(res->next,u,iiOp,v->next);
+  res->data = (char *)(nMult( (number)u->Data(), (number)v->Data()));
+  if ((v->next!=NULL) || (u->next!=NULL))
+    return jjOP_REST(res,u,v);
+  return FALSE;
 }
 static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
 {
@@ -790,20 +784,19 @@ static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
     // u->next exists: copy v
     b=pCopy((poly)v->Data());
     res->data = (char *)(pMult( a, b));
-    res->next = (leftv)Alloc(sizeof(sleftv));
-    res=res->next;
-    return iiExprArith2(res,u->next,iiOp,v);
+    return jjOP_REST(res,u,v);
   }
   // v->next exists: copy u
   a=pCopy((poly)u->Data());
   b=(poly)v->CopyD();
   res->data = (char *)(pMult( a, b));
-  res->next = (leftv)Alloc(sizeof(sleftv));
-  return iiExprArith2(res->next,u,iiOp,v->next);
+  return jjOP_REST(res,u,v);
 }
 static BOOLEAN jjTIMES_ID(leftv res, leftv u, leftv v)
 {
   res->data = (char *)idMult((ideal)u->Data(),(ideal)v->Data());
+  if ((v->next!=NULL) || (u->next!=NULL))
+    return jjOP_REST(res,u,v);
   return FALSE;
 }
 static BOOLEAN jjTIMES_IV(leftv res, leftv u, leftv v)
@@ -814,6 +807,8 @@ static BOOLEAN jjTIMES_IV(leftv res, leftv u, leftv v)
      WerrorS("intmat size not compatible");
      return TRUE;
   }
+  if ((v->next!=NULL) || (u->next!=NULL))
+    return jjOP_REST(res,u,v);
   return FALSE;
 }
 static BOOLEAN jjTIMES_MA_P1(leftv res, leftv u, leftv v)
@@ -858,6 +853,8 @@ static BOOLEAN jjTIMES_MA(leftv res, leftv u, leftv v)
      WerrorS("matrix size not compatible");
      return TRUE;
   }
+  if ((v->next!=NULL) || (u->next!=NULL))
+    return jjOP_REST(res,u,v);
   return FALSE;
 }
 static BOOLEAN jjGE_I(leftv res, leftv u, leftv v)
