@@ -3,7 +3,7 @@
  *  Purpose: implementation of main omDebug functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDebugTrack.c,v 1.4 2000-08-18 09:05:52 obachman Exp $
+ *  Version: $Id: omDebugTrack.c,v 1.5 2000-08-24 14:07:10 obachman Exp $
  *******************************************************************/
 #include <limits.h>
 #include "omConfig.h"
@@ -505,16 +505,22 @@ static omError_t omDoCheckTrackAddr(omTrackAddr d_addr, void* addr, void* bin_si
   }
   else
   {
-      if (flags & OM_FBIN)
-      {
-        size_t size = omTrackAddr_2_OutSize(d_addr);
-        omAddrCheckReturnError(!omIsKnownTopBin((omBin) bin_size, 1), omError_UnknownBin);
-        omAddrCheckReturnError(size < (((omBin)bin_size)->sizeW<<LOG_SIZEOF_LONG), omError_WrongBin);
-      }
-      else if (flags & OM_FSIZE && (!(flags & OM_FSLOPPY)  || bin_size > 0))
-      {
-        omAddrCheckReturnError(omTrackAddr_2_OutSize(d_addr) < (size_t) bin_size, omError_WrongSize);
-      }
+    /* track < 2 */
+    if (flags & OM_FBIN)
+    {
+      size_t size = omTrackAddr_2_OutSize(d_addr);
+      omAddrCheckReturnError(!omIsKnownTopBin((omBin) bin_size, 1), omError_UnknownBin);
+      omAddrCheckReturnError(size < (((omBin)bin_size)->sizeW<<LOG_SIZEOF_LONG), omError_WrongBin);
+    }
+    else if (flags & OM_FSIZE && (!(flags & OM_FSLOPPY)  || bin_size > 0))
+    {
+      omAddrCheckReturnError(omTrackAddr_2_OutSize(d_addr) < (size_t) bin_size, omError_WrongSize);
+    }
+    else if (flags & OM_FBINADDR)
+    {
+      size_t size = omTrackAddr_2_OutSize(d_addr);
+      omAddrCheckReturnError(size > OM_MAX_BLOCK_SIZE, omError_NotBinAddr);
+    }
   }
   return omError_NoError;
 }
