@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.60 2000-09-12 16:01:10 obachman Exp $ */
+/* $Id: polys.cc,v 1.61 2000-09-13 13:16:40 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -18,7 +18,6 @@
 #include "numbers.h"
 #include "polys.h"
 #include "ring.h"
-#include "binom.h"
 
 /* ----------- global variables, set by pSetGlobals --------------------- */
 /* initializes the internal data from the exp vector */
@@ -113,11 +112,7 @@ void p_Setm(poly p, ring r)
           a=o->data.cp.start;
           e=o->data.cp.end;
           int pl=o->data.cp.place;
-          #ifdef HAVE_SHIFTED_EXPONENTS
           for(int i=a;i<=e;i++) { p->exp[pl]=p_GetExp(p,i,r); pl++; }
-          #else
-          for(int i=a;i<=e;i++) { p->exp.e[pl]=p_GetExp(p,i,r); pl++; }
-          #endif
           break;
         }
         case ro_syzcomp:
@@ -197,11 +192,7 @@ void rSetmS(poly p, int* Components, long* ShiftedComponents)
           a=o->data.cp.start;
           e=o->data.cp.end;
           int pl=o->data.cp.place;
-	  #ifdef HAVE_SHIFTED_EXPONENTS
           for(int i=a;i<=e;i++) { p->exp[pl]=pGetExp(p,i); pl++; }
-	  #else
-          for(int i=a;i<=e;i++) { p->exp.e[pl]=pGetExp(p,i); pl++; }
-	  #endif
           break;
         }
         case ro_syzcomp:
@@ -591,7 +582,7 @@ static int ldeg1c(poly p,int *l)
   max=pFDeg(p);
   while ((p=pNext(p))!=NULL)
   {
-    if (! rIsSyzIndexRing(currRing) || 
+    if (! rIsSyzIndexRing(currRing) ||
         (pGetComp(p)<=rGetCurrSyzLimit()))
     {
        if ((t=pFDeg(p))>max) max=t;
@@ -1095,7 +1086,7 @@ poly pTakeOutComp(poly * p, int k)
     pNext(qq) = NULL;
   }
   if (q==NULL) return result;
-  if (pGetComp(q) > k) 
+  if (pGetComp(q) > k)
   {
     pDecrComp(q);
     pSetmComp(q);
@@ -1123,7 +1114,7 @@ poly pTakeOutComp(poly * p, int k)
     else
     {
       /*pIter(q);*/ q=pNext_q;
-      if (pGetComp(q) > k) 
+      if (pGetComp(q) > k)
       {
         pDecrComp(q);
         pSetmComp(q);
@@ -1297,7 +1288,7 @@ void pDeleteComp(poly * p,int k)
   while ((*p!=NULL) && (pGetComp(*p)==k)) pDelete1(p);
   if (*p==NULL) return;
   q = *p;
-  if (pGetComp(q)>k) 
+  if (pGetComp(q)>k)
   {
     pDecrComp(q);
     pSetmComp(q);
@@ -1309,7 +1300,7 @@ void pDeleteComp(poly * p,int k)
     else
     {
       pIter(q);
-      if (pGetComp(q)>k) 
+      if (pGetComp(q)>k)
       {
         pDecrComp(q);
         pSetmComp(q);
@@ -1460,7 +1451,7 @@ static void pSplitAndReversePoly(poly p, int n, poly *non_zero, poly *zero)
   *non_zero = n_z;
   return;
 }
-  
+
 /*3
 * substitute the n-th variable by 1 in p
 * destroy p
