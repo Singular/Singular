@@ -1,21 +1,18 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fac_ezgcd.cc,v 1.1 1996-12-12 15:55:53 schmidt Exp $
+// $Id: fac_ezgcd.cc,v 1.2 1997-03-27 09:41:47 schmidt Exp $
 
 /*
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  1996/12/12 15:55:53  schmidt
+ * Initial revision
+ *
  */
 
-#undef TIMING
-#undef DEBUGOUTPUT
-
-#ifndef NDEBUG
-//#define DEBUGOUTPUT
-#endif
-
-#include "timing.h"
-
 #include "assert.h"
+#include "debug.h"
+
 #include "cf_defs.h"
+
 #include "templates/functions.h"
 #include "canonicalform.h"
 #include "fac_util.h"
