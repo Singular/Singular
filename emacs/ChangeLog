@@ -1,3 +1,24 @@
+1999-09-14  T. Wichmann  <wichmann@arboretum.itwm.uni-kl.de>
+
+	* singular.el (singular-exit-singular): New strategy for the
+	communication between `singular-exit-singular' and
+	`singular-exit-sentinel'. Some new functions and variables
+	introduced. 
+	(singular-restart): now deletes a running singular process
+	(singular-exit-sentinel): On demand inserts a string indicating
+	that the process was killed
+
+1999-09-08  T. Wichmann  <wichmann@arboretum.itwm.uni-kl.de>
+
+	* singular.el (singular-interactive-mode-menu-init): Also remove
+	  "Singular"-start menu
+	  (singular-interactive-mode-map): corrected key for 
+	  singular-exit-singular
+	  (singular-help): added new version of Jens
+
+	* .emacs-singular Singular start menu for XEmacs appears now
+	  in every buffer
+
 1999-09-01  T. Wichmann  <wichmann@arboretum.itwm.uni-kl.de>
 
 	* singular.el (singular-interactive-mode): added
