@@ -1,7 +1,7 @@
-// $Id: standard.lib,v 1.27 1999-02-10 14:30:42 siebert Exp $
+// $Id: standard.lib,v 1.28 1999-04-19 13:20:02 obachman Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.27 1999-02-10 14:30:42 siebert Exp $";
+version="$Id: standard.lib,v 1.28 1999-04-19 13:20:02 obachman Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
@@ -20,6 +20,9 @@ LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
                   instead of the quotient-command from the kernel
  quotient5(m1,m2) computes with a real general element of m2 by adjoining
                   a new variable
+ sprintf(fmt,...)     returns fomatted string
+ fprintf(link,fmt,..) writes formatted string to link
+ printf(fmt,...)      displays formatted string
 ";
 
 //////////////////////////////////////////////////////////////////////////////
@@ -716,6 +719,165 @@ static proc intersect1(ideal i,ideal j)
   map phi=gnir,maxideal(1);
   return(phi(j));
 }
+
+//////////////////////////////////////////////////////////////////
+///
+/// sprintf, fprintf printf
+///
+proc sprintf(string fmt, list #)
+"USAGE:    sprintf(fmt, ...) fmt string
+RETURN:   string 
+PURPOSE:  sprintf performs output formatting. The first argument is a format 
+          control string. Additional arguments may be required, depending on 
+          the contents of the control string. A series of output characters is 
+          generated as directed by the control string; these characters are 
+          returned as a string. The control string is simply text to be copied,
+          except that the string may contain conversion specifications. Do
+          'help print:' for a listing of valid conversion specifications.
+NOTE:     If one of the additional arguments is a list, then it should be 
+          enclosed once more into a list() command, since passing a list
+          as an argument flattens the list by one level.
+SEE ALSO: fprintf, printf, print, string
+EXAMPLE : example sprintf; shows an example
+"
+{
+  if (size(fmt) <= 1)
+  {
+    return (fmt);
+  }
+  int next, l, nnext;
+  string ret;
+  list formats = "%l", "%s", "%2l", "%2s", "%t", "%;", "%p", "%b";
+  while (1)
+  {
+    if (size(#) <= 0)
+    {
+      return (ret + fmt);
+    }
+    nnext = 0;
+    while (1)
+    {
+      nnext = find(fmt, "%", nnext + 1);
+      if (nnext == 0)
+      {
+        next = 0;
+        break;
+      }
+      l = 1;
+      while (l <= size(formats))
+      {
+        next = find(fmt, formats[l], nnext);
+        if (next == nnext) break;
+        l++;
+      }
+      if (next == nnext) break;
+    }
+    if (next == 0)
+    {
+      return (ret + fmt);
+    }
+    ret = ret + fmt[1, next - 1] + print(#[1], formats[l]);
+    if (size(fmt) <= (next + size(formats[l]) - 1))
+    {
+      return (ret);
+    }
+    # = delete(#, 1);
+    fmt = fmt[next + size(formats[l]), size(fmt)-next-size(formats[l]) + 1];
+  }
+}
+example
+{
+  ring r=0,(x,y,z),dp;
+  module m=[1,y],[0,x+z];
+  intmat M=betti(mres(m,0));
+  list l = r, m, M;
+  string s = sprintf("s:%s, l:%l", 1, 2); s;
+  s = sprintf("s:%s", l); s;
+  s = sprintf("s:%s", list(l)); s;
+  s = sprintf("2l:%2l", list(l)); s;
+  s = sprintf("%p", list(l)); s;
+  s = sprintf("%;", list(l)); s;
+  s = sprintf("%b", M); s;
+}
+
+proc printf(string fmt, list #)
+"USAGE:    printf(fmt, ...) fmt string
+RETURN:   none
+PURPOSE:  printf performs output formatting. The first argument is a format 
+          control string. Additional arguments may be required, depending on 
+          the contents of the control string. A series of output characters is 
+          generated as directed by the control string; these characters are 
+          displayed (i.e. printed to standard out). 
+          The control string is simply text to be copied, except that the 
+          string may contain conversion specifications. 
+          Do 'help print:' for a listing of valid conversion specifications.
+
+NOTE:     If one of the additional arguments is a list, then it should be 
+          enclosed once more into a list() command, since passing a list
+          as an argument flattens the list by one level.
+SEE ALSO: sprintf, fprintf, print, string
+EXAMPLE : example printf; shows an example
+"
+{
+  write("", sprintf(fmt, #));
+}
+example
+{
+  ring r=0,(x,y,z),dp;
+  module m=[1,y],[0,x+z];
+  intmat M=betti(mres(m,0));
+  list l = r, m, M;
+  printf("s:%s, l:%l", 1, 2);
+  printf("s:%s", l);
+  printf("s:%s", list(l));
+  printf("2l:%2l", list(l));
+  printf("%p", list(l));
+  printf("%;", list(l));
+  printf("%b", M);
+}
+
+
+proc fprintf(link l, string fmt, list #)
+"USAGE:    fprintf(l, fmt, ...) l link; fmt string
+RETURN:   none
+PURPOSE:  fprintf performs output formatting. The second argument is a format 
+          control string. Additional arguments may be required, depending on 
+          the contents of the control string. A series of output characters is 
+          generated as directed by the control string; these characters are 
+          written to the link l.
+          The control string is simply text to be copied, except that the 
+          string may contain conversion specifications. 
+          Do 'help print:' for a listing of valid conversion specifications.
+
+NOTE:     If one of the additional arguments is a list, then it should be 
+          enclosed once more into a list() command, since passing a list
+          as an argument flattens the list by one level.
+SEE ALSO: sprintf, printf, print, string
+EXAMPLE : example fprintf; shows an example
+"
+{
+  write(l, sprintf(fmt, #));
+}
+example
+{
+  ring r=0,(x,y,z),dp;
+  module m=[1,y],[0,x+z];
+  intmat M=betti(mres(m,0));
+  list l = r, m, M;
+  link li = ""; // link to stdout
+  fprintf(li, "s:%s, l:%l", 1, 2);
+  fprintf(li, "s:%s", l);
+  fprintf(li, "s:%s", list(l));
+  fprintf(li, "2l:%2l", list(l));
+  fprintf(li, "%p", list(l));
+  fprintf(li, "%;", list(l));
+  fprintf(li, "%b", M);
+}
+  
+   
+  
+  
+  
 
 /*
 proc minres(list #)
