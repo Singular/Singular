@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.21 1998-05-04 17:17:27 Singular Exp $
+@comment $Id: general.doc,v 1.22 1998-05-04 17:19:45 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -173,7 +173,7 @@ the input and retrieving previous input lines
 (CTL denotes the control key):
 @table @kbd
 @item CTL-A
-goto to the start of the line
+go to the start of the line
 @item CTL-B
 go one character to the left
 @item CTL-D
@@ -200,7 +200,7 @@ save the current line to the history and
 send it to the @sc{Singular} parser for interpretation
 @end table
 @* @strong{Remark:}
-@* There is a history of the last 32 unique lines.
+@c @* There is a history of the last 32 unique lines.
 @* This section does not apply to the MPW-Macintosh version of
 @sc{Singular}.
 @* This section describes only a subset of the key bindings of
