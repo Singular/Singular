@@ -1,11 +1,11 @@
-// $Id: tst.lib,v 1.29 2000-12-19 15:05:48 anne Exp $
+// $Id: tst.lib,v 1.30 2000-12-22 15:05:57 greuel Exp $
 //(obachman, last modified 6/30/98)
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: tst.lib,v 1.29 2000-12-19 15:05:48 anne Exp $";
+version="$Id: tst.lib,v 1.30 2000-12-22 15:05:57 greuel Exp $";
 category="Utilities";
 info="
-LIBRARY:  tst.lib      PROCEDURES FOR RUNNING AUTOMATIC TST TESTS
+LIBRARY:  tst.lib      Procedures for running automatic tst Tests
 
 PROCEDURES:
  tst_system(s)          returns string which is stdout of system(\"sh\", s)

@@ -1,10 +1,8 @@
-// "$Id: triang.lib,v 1.4 2000-12-19 15:05:46 anne Exp $";
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: triang.lib,v 1.4 2000-12-19 15:05:46 anne Exp $";
+version="$Id: triang.lib,v 1.5 2000-12-22 15:04:40 greuel Exp $";
 category="Symbolic-numerical solving";
 info="
-LIBRARY: triang.lib   PROCEDURES FOR DECOMPOSING ZERO-DIMENSIONAL IDEALS
-
+LIBRARY: triang.lib   Decompose Zero-dimensional Ideals into Triangular Sets
 AUTHOR:	D. Hillebrand 
 
 PROCEDURES:
@@ -1199,4 +1197,5 @@ RETURN:  Leitkoeffizient von f bzgl. var(v).
     matrix m = coeffs(f,var(v));
     return(m[size(m),1]);
 }
+///////////////////////////////////////////////////////////////////////////////
 
