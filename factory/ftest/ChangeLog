@@ -1,5 +1,7 @@
 Wed Oct 15 10:50:07 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
+	* degree.m4, randomgcd.m4: new files
+
 	* gcd.m4, deriv.m4, feval.m4, resultant.m4, size.m4,
 	  totaldegree.m4: doc fix
 
