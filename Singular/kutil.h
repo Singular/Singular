@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.63 2002-05-27 09:35:33 Singular Exp $ */
+/* $Id: kutil.h,v 1.64 2002-06-17 16:47:01 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -19,7 +19,19 @@
 #include "tok.h"
 #include "pShallowCopyDelete.h"
 
+#if 1
 #define setmax 16
+#define setmaxL 56
+#define setmaxLinc 32
+#define setmaxT 64
+#define setmaxTinc 32
+#else
+#define setmax 16
+#define setmaxL 16
+#define setmaxLinc 16
+#define setmaxT 16
+#define setmaxTinc 16
+#endif
 
 // define if you want std computations as in Singular version < 2
 // This disbales RedThrough, tailReductions against T (bba),

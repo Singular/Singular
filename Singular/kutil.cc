@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.110 2002-06-06 16:02:11 levandov Exp $ */
+/* $Id: kutil.cc,v 1.111 2002-06-17 16:46:54 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -248,7 +248,7 @@ void cancelunit (LObject* L)
 
   if (L->ecart != 0)
   {
-    for(i=1;i<=r->N;i++)
+    for(i=r->N;i>0;i--)
     {
       if ((p_GetExp(p,i,r)>0) && (rIsPolyVar(i, r)==TRUE)) return;
     }
@@ -325,33 +325,38 @@ void HEckeTest (poly pp,kStrategy strat)
 /*2
 *utilities for TSet, LSet
 */
-inline static intset initec (int maxnr)
+inline static intset initec (const int maxnr)
 {
   return (intset)omAlloc(maxnr*sizeof(int));
 }
 
-inline static unsigned long* initsevS (int maxnr)
+inline static unsigned long* initsevS (const int maxnr)
 {
   return (unsigned long*)omAlloc0(maxnr*sizeof(unsigned long));
 }
-inline static int* initS_2_R (int maxnr)
+inline static int* initS_2_R (const int maxnr)
 {
   return (int*)omAlloc0(maxnr*sizeof(int));
 }
 
 static inline void enlargeT (TSet &T, TObject** &R, unsigned long* &sevT,
-                             int &length, int incr)
+                             int &length, const int incr)
 {
+  assume(T!=NULL);
+  assume(sevT!=NULL);
+  assume(R!=NULL);
+  assume((length+incr) > 0);
+   
   int i;
-  T = (TSet)omrealloc0Size(T, length*sizeof(TObject),
+  T = (TSet)omRealloc0Size(T, length*sizeof(TObject),
                            (length+incr)*sizeof(TObject));
 
-  sevT = (unsigned long*) omreallocSize(sevT, length*sizeof(long*),
+  sevT = (unsigned long*) omReallocSize(sevT, length*sizeof(long*),
                            (length+incr)*sizeof(long*));
 
-  R = (TObject**)omrealloc0Size(R,length*sizeof(TObject*),
+  R = (TObject**)omRealloc0Size(R,length*sizeof(TObject*),
                                 (length+incr)*sizeof(TObject*));
-  for (i=0;i<length;i++) R[T[i].i_r] = &(T[i]);
+  for (i=length-1;i>=0;i--) R[T[i].i_r] = &(T[i]);
   length += incr;
 }
 
@@ -406,8 +411,8 @@ void cleanT (kStrategy strat)
 LSet initL ()
 {
   int i;
-  LSet l = (LSet)omAlloc(setmax*sizeof(LObject));
-  for (i=0;i<setmax;i++)
+  LSet l = (LSet)omAlloc(setmaxL*sizeof(LObject));
+  for (i=setmaxL-1;i>=0;i--)
   {
     l[i].tailRing = currRing;
     l[i].i_r1 = -1;
@@ -417,9 +422,10 @@ LSet initL ()
   return l;
 }
 
-static inline void enlargeL (LSet* L,int* length,int incr)
+static inline void enlargeL (LSet* L,int* length,const int incr)
 {
-  LSet h;
+  assume((*L)!=NULL);
+  assume((length+incr)>0);
 
   *L = (LSet)omReallocSize((*L),(*length)*sizeof(LObject),
                                    ((*length)+incr)*sizeof(LObject));
@@ -798,8 +804,13 @@ BOOLEAN kTest_TS(kStrategy strat)
 */
 void deleteInS (int i,kStrategy strat)
 {
+#ifdef ENTER_USE_MEMMOVE
+  memmove(&(strat->S[i]), &(strat->S[i+1]), (strat->sl - i)*sizeof(poly));
+  memmove(&(strat->ecartS[i]),&(strat->ecartS[i+1]),(strat->sl - i)*sizeof(int));
+  memmove(&(strat->sevS[i]),&(strat->sevS[i+1]),(strat->sl - i)*sizeof(long));
+  memmove(&(strat->S_2_R[i]),&(strat->S_2_R[i+1]),(strat->sl - i)*sizeof(int));
+#else
   int j;
-
   for (j=i; j<strat->sl; j++)
   {
     strat->S[j] = strat->S[j+1];
@@ -807,16 +818,25 @@ void deleteInS (int i,kStrategy strat)
     strat->sevS[j] = strat->sevS[j+1];
     strat->S_2_R[j] = strat->S_2_R[j+1];
   }
+#endif  
   if (strat->lenS!=NULL)
   {
+#ifdef ENTER_USE_MEMMOVE
+    memmove(&(strat->lenS[i]),&(strat->lenS[i+1]),(strat->sl - i)*sizeof(int));
+#else
     for (j=i; j<strat->sl; j++) strat->lenS[j] = strat->lenS[j+1];
+#endif  
   }
   if (strat->fromQ!=NULL)
   {
+#ifdef ENTER_USE_MEMMOVE
+    memmove(&(strat->fromQ[i]),&(strat->fromQ[i+1]),(strat->sl - i)*sizeof(int));
+#else
     for (j=i; j<strat->sl; j++)
     {
       strat->fromQ[j] = strat->fromQ[j+1];
     }
+#endif  
   }
   strat->S[strat->sl] = NULL;
   strat->sl--;
@@ -887,7 +907,7 @@ void enterL (LSet *set,int *length, int *LSetmax, LObject p,int at)
   assume(p.FDeg == p.pFDeg());
   if ((*length)>=0)
   {
-    if ((*length) == (*LSetmax)-1) enlargeL(set,LSetmax,setmax);
+    if ((*length) == (*LSetmax)-1) enlargeL(set,LSetmax,setmaxLinc);
     if (at <= (*length))
 #ifdef ENTER_USE_MEMMOVE
       memmove(&((*set)[at+1]), &((*set)[at]), ((*length)-at+1)*sizeof(LObject));
@@ -2973,9 +2993,8 @@ void initS (ideal F, ideal Q,kStrategy strat)
 {
   int   i,pos;
 
-  if (Q!=NULL) i=IDELEMS(Q);
-  else i=0;
-  i=((i+IDELEMS(F)+15)/16)*16;
+  if (Q!=NULL) i=((IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
+  else i=setmaxT;
   strat->ecartS=initec(i);
   strat->sevS=initsevS(i);
   strat->S_2_R=initS_2_R(i);
@@ -3072,9 +3091,8 @@ void initSL (ideal F, ideal Q,kStrategy strat)
 {
   int   i,pos;
 
-  if (Q!=NULL) i=IDELEMS(Q);
-  else i=0;
-  i=((i+16)/16)*16;
+  if (Q!=NULL) i=((IDELEMS(Q)+(setmaxTinc-1))/setmaxTinc)*setmaxTinc;
+  else i=setmaxT;
   strat->ecartS=initec(i);
   strat->sevS=initsevS(i);
   strat->S_2_R=initS_2_R(i);
@@ -3681,28 +3699,29 @@ void enterSBba (LObject p,int atS,kStrategy strat, int atR)
   {
     strat->sevS = (unsigned long*) omRealloc0Size(strat->sevS,
                                     IDELEMS(strat->Shdl)*sizeof(unsigned long),
-                                    (IDELEMS(strat->Shdl)+setmax)
+                                    (IDELEMS(strat->Shdl)+setmaxTinc)
                                                   *sizeof(unsigned long));
     strat->ecartS = (intset)omReallocSize(strat->ecartS,
                                           IDELEMS(strat->Shdl)*sizeof(int),
-                                          (IDELEMS(strat->Shdl)+setmax)*sizeof(int));
+                                          (IDELEMS(strat->Shdl)+setmaxTinc)
+					          *sizeof(int));
     strat->S_2_R = (int*) omRealloc0Size(strat->S_2_R,
                                          IDELEMS(strat->Shdl)*sizeof(int),
-                                         (IDELEMS(strat->Shdl)+setmax)
+                                         (IDELEMS(strat->Shdl)+setmaxTinc)
                                                   *sizeof(int));
     if (strat->lenS!=NULL)
       strat->lenS=(int*)omRealloc0Size(strat->lenS,
                                        IDELEMS(strat->Shdl)*sizeof(int),
-                                       (IDELEMS(strat->Shdl)+setmax)
+                                       (IDELEMS(strat->Shdl)+setmaxTinc)
                                                  *sizeof(int));
     if (strat->fromQ!=NULL)
     {
       strat->fromQ = (intset)omReallocSize(strat->fromQ,
                                     IDELEMS(strat->Shdl)*sizeof(int),
-                                    (IDELEMS(strat->Shdl)+setmax)*sizeof(int));
+                                    (IDELEMS(strat->Shdl)+setmaxTinc)*sizeof(int));
     }
-    pEnlargeSet(&strat->S,IDELEMS(strat->Shdl),setmax);
-    IDELEMS(strat->Shdl)+=setmax;
+    pEnlargeSet(&strat->S,IDELEMS(strat->Shdl),setmaxTinc);
+    IDELEMS(strat->Shdl)+=setmaxTinc;
     strat->Shdl->m=strat->S;
   }
   if (atS <= strat->sl)
@@ -3735,10 +3754,15 @@ void enterSBba (LObject p,int atS,kStrategy strat, int atR)
   }
   if (strat->fromQ!=NULL)
   {
+#ifdef ENTER_USE_MEMMOVE
+    memmove(&(strat->fromQ[atS+1]), &(strat->fromQ[atS]),
+                  (strat->sl - atS + 1)*sizeof(int));
+#else
     for (i=strat->sl+1; i>=atS+1; i--)
     {
       strat->fromQ[i] = strat->fromQ[i-1];
     }
+#endif
     strat->fromQ[atS]=0;
   }
 
@@ -3774,7 +3798,7 @@ void enterT(LObject p, kStrategy strat, int atT)
   if (atT < 0)
     atT = strat->posInT(strat->T, strat->tl, p);
   if (strat->tl == strat->tmax-1)
-    enlargeT(strat->T,strat->R,strat->sevT,strat->tmax,setmax);
+    enlargeT(strat->T,strat->R,strat->sevT,strat->tmax,setmaxTinc);
   if (atT <= strat->tl)
   {
 #ifdef ENTER_USE_MEMMOVE
@@ -3956,16 +3980,16 @@ void initBuchMora (ideal F,ideal Q,kStrategy strat)
   /*- set s -*/
   strat->sl = -1;
   /*- set L -*/
-  strat->Lmax = setmax;
+  strat->Lmax = setmaxL;
   strat->Ll = -1;
   strat->L = initL();
   /*- set B -*/
-  strat->Bmax = setmax;
+  strat->Bmax = setmaxL;
   strat->Bl = -1;
   strat->B = initL();
   /*- set T -*/
   strat->tl = -1;
-  strat->tmax = setmax;
+  strat->tmax = setmaxT;
   strat->T = initT();
   strat->R = initR();
   strat->sevT = initsevT();

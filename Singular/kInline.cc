@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.26 2002-01-22 09:13:16 Singular Exp $
+ *  Version: $Id: kInline.cc,v 1.27 2002-06-17 16:47:08 Singular Exp $
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC
@@ -71,8 +71,8 @@ KINLINE poly skStrategy::kNoetherTail()
 
 KINLINE TSet initT ()
 {
-  TSet T = (TSet)omAlloc0(setmax*sizeof(TObject));
-  for (int i=0; i<setmax; i++)
+  TSet T = (TSet)omAlloc0(setmaxT*sizeof(TObject));
+  for (int i=setmaxT-1; i>=0; i--)
   {
     T[i].tailRing = currRing;
     T[i].i_r = -1;
@@ -82,12 +82,12 @@ KINLINE TSet initT ()
 
 KINLINE TObject** initR()
 {
-  return (TObject**) omAlloc0(setmax*sizeof(TObject*));
+  return (TObject**) omAlloc0(setmaxT*sizeof(TObject*));
 }
 
 KINLINE unsigned long* initsevT()
 {
-  return (unsigned long*) omAlloc0(setmax*sizeof(unsigned long));
+  return (unsigned long*) omAlloc0(setmaxT*sizeof(unsigned long));
 }
 
 // initialization
