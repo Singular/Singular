@@ -7,7 +7,7 @@
  *  Author:  obachman (Olaf Bachmann), hannes (Hannes Schoenemann),
  *           bricken (Michael Brickenstein) 
  *  Created: 01/02
- *  Version: $Id: fast_maps.h,v 1.3 2002-01-19 10:31:45 Singular Exp $
+ *  Version: $Id: fast_maps.h,v 1.4 2002-01-19 10:40:15 Singular Exp $
  *******************************************************************/
 
 /*******************************************************************************
@@ -66,7 +66,9 @@ void maMonomial_Destroy(mapoly monomial, ring src_r, ring dest_r);
 inline mapoly maMonomial_Free(mapoly monomial, ring src_r, ring dest_r)
 {
   monomial->ref--;
-  if (monomial->ref <= 0) maMonomial_Destroy(monomial, src_r, dest_r);
+  if (monomial->ref <= 0) 
+  { maMonomial_Destroy(monomial, src_r, dest_r); return NULL;}
+  return monomial;
 }
 
 // inserts ("adds") monomial what into poly into
