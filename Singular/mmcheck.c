@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmcheck.c,v 1.2 1999-01-05 12:18:39 Singular Exp $ */
+/* $Id: mmcheck.c,v 1.3 1999-01-26 14:41:38 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -37,6 +37,77 @@ int mm_MDEBUG = 0;
  * Auxillary routines
  *
  **********************************************************************/
+
+void mmMoveDBMCB ( pDBMCB from, pDBMCB to, DBMCB * what )
+{
+  what->prev->next = what->next;
+  if ( what->next != NULL )
+    what->next->prev = what->prev;
+  what->prev = to;
+  what->next = to->next;
+  if (to->next!=NULL)
+    to->next->prev=what;
+  to->next = what;
+}
+
+void mmMoveDBMCBInto ( pDBMCB to, pDBMCB what )
+{
+  if (to->next !=NULL)
+  {
+    what->next = to->next;
+    what->next->prev = what;
+  }
+  to->next = what;
+  what->prev = to;
+}
+
+void mmTakeOutDBMCB ( pDBMCB what )
+{
+  what->prev->next = what->next;
+  if ( what->next != NULL )
+    what->next->prev = what->prev;
+}
+
+void mmDBSetHeapsOfBlocks(memHeap fromheap, memHeap toheap)
+{
+  memHeapPage pages = fromheap->pages;
+  int nblocks = SIZE_OF_HEAP_PAGE / toheap->size;
+  int i;
+
+  assume(fromheap->size == toheap->size);
+  while (pages != NULL)
+  {
+    DBMCB *what = (DBMCB*) (((char*) pages) + SIZE_OF_HEAP_PAGE_HEADER);
+    
+    for (i=0; i<nblocks; i++)
+    {
+      what->heap = toheap;
+      what = (DBMCB*) (((char*) what)  + toheap->size);
+    }
+    pages = pages->next;
+  }
+}
+
+void mmDBInitNewHeapPage(memHeap heap)
+{
+  DBMCB* what = (DBMCB*) heap->current;
+  DBMCB* prev = NULL;
+  size_t size = SizeFromRealSize(heap->size);
+  
+  if (mm_minAddr == 0 || mm_minAddr > (void*) what)
+    mm_minAddr = (void*) what;
+
+  while (what != NULL)
+  {
+    mmFillDBMCB(what, size, heap, MM_FREEFLAG, __FILE__, __LINE__);    
+    mmMoveDBMCBInto(&mm_theDBfree, what);
+    prev = what;
+    what = *((void**) what);
+  }
+  
+  if (mm_maxAddr == 0 || mm_maxAddr < (void*) prev)
+    mm_maxAddr = (void*) prev;
+}
 
 static int mmPrintDBMCB ( DBMCB * what, char* msg , int given_size)
 {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmalloc.c,v 1.10 1999-01-18 17:28:05 Singular Exp $ */
+/* $Id: mmalloc.c,v 1.11 1999-01-26 14:41:38 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -21,6 +21,8 @@
 #include "mmemory.h"
 #include "mmprivate.h"
 
+#undef HAVE_ASSUME
+#define HAVE_ASSUME
 
 #ifndef MDEBUG
 
@@ -168,62 +170,6 @@ char * mmStrdup( const char * s)
 
 /**********************************************************************
  *
- * Auxillary routines
- *
- **********************************************************************/
-static void mmMoveDBMCB ( pDBMCB from, pDBMCB to, DBMCB * what )
-{
-  what->prev->next = what->next;
-  if ( what->next != NULL )
-    what->next->prev = what->prev;
-  what->prev = to;
-  what->next = to->next;
-  if (to->next!=NULL)
-    to->next->prev=what;
-  to->next = what;
-}
-
-static void mmMoveDBMCBInto ( pDBMCB to, pDBMCB what )
-{
-  if (to->next !=NULL)
-  {
-    what->next = to->next;
-    what->next->prev = what;
-  }
-  to->next = what;
-  what->prev = to;
-}
-
-static void mmTakeOutDBMCB ( pDBMCB from, pDBMCB what )
-{
-  what->prev->next = what->next;
-  if ( what->next != NULL )
-    what->next->prev = what->prev;
-}
-
-void mmDBInitNewHeapPage(memHeap heap)
-{
-  DBMCB* what = (DBMCB*) heap->current;
-  DBMCB* prev = NULL;
-  size_t size = SizeFromRealSize(heap->size);
-  
-  if (mm_minAddr == 0 || mm_minAddr > (void*) what)
-    mm_minAddr = (void*) what;
-
-  while (what != NULL)
-  {
-    mmFillDBMCB(what, size, heap, MM_FREEFLAG, __FILE__, __LINE__);    
-    mmMoveDBMCBInto(&mm_theDBfree, what);
-    prev = what;
-    what = *((void**) what);
-  }
-  
-  if (mm_maxAddr == 0 || mm_maxAddr < (void*) prev)
-    mm_maxAddr = (void*) prev;
-}
-
-/**********************************************************************
- *
  * Heap routines 
  *
  **********************************************************************/
@@ -360,7 +306,7 @@ void mmDBFreeBlock(void* adr, size_t size, char * fname, int lineno)
       return;
     }
     mm_bytesMalloc -= tmpsize;
-    mmTakeOutDBMCB( &mm_theDBused, what );
+    mmTakeOutDBMCB(what );
     free( what );
     if (BVERBOSE(V_SHOW_MEM)) mmCheckPrint();
   }
@@ -457,7 +403,6 @@ char * mmDBStrdup( const char * s, char *fname, int lineno)
     
 #if SIZEOF_DOUBLE == SIZEOF_VOIDP + SIZEOF_VOIDP
 
-#if 0 
 #ifdef MDEBUG
 void * mmDBAllocAlignedBlock( size_t size, char* f, int l)    
 #else
@@ -469,16 +414,21 @@ void * mmAllocAlignedBlock( size_t size)
   if (i < 0)
   {
 #ifdef MDEBUG
-    unsigned long ret = (unsigned long) _mmDBAllocBlock(size + 9, f, l);
+    unsigned long ret = 
+      (unsigned long) mmDBAllocBlock(size + SIZEOF_DOUBLE + 1, f, l);
 #else
-    unsigned long ret = (unsigned long) _mmAllocBlock(size+SIZEOF_DOUBLE+1);
+    unsigned long ret = 
+      (unsigned long) mmAllocBlock(size+SIZEOF_DOUBLE+1);
 #endif
     unsigned char shift = (ret + 1) & (SIZEOF_DOUBLE - 1);
     *((unsigned char*) ret) = (unsigned char) shift;
 
     assume(ret != 0);
+    ret = ((ret + 1) & ~(SIZEOF_DOUBLE - 1));
 
-    return (void*) ((ret + 1) & ~(SIZEOF_DOUBLE - 1));
+    assume(ret % SIZEOF_DOUBLE == 0);
+
+    return (void*) ret;
   }
   else
   {
@@ -536,9 +486,9 @@ void * mmAllocAlignedBlock0( size_t size)
 {
   void* good;
 #ifdef MDEBUG
-  good = mmDBAllocBlock(size, f, l);
+  good = mmDBAllocAllignedBlock(size, f, l);
 #else
-  good = mmAllocBlock(size);
+  good = mmAllocAlignedBlock(size);
 #endif
   
   memset(good, 0, size);
@@ -553,6 +503,8 @@ void  mmFreeAlignedBlock( void* addr, size_t size)
 #endif
 {
   int i = mmGetIndex(size);
+
+  assume((unsigned long) addr % SIZEOF_DOUBLE == 0);
   
   if (i < 0)
   {
@@ -560,9 +512,9 @@ void  mmFreeAlignedBlock( void* addr, size_t size)
     unsigned char shift = *adj_addr;
 
 #ifdef MDEBUG    
-    _mmDBFreeBlock(adj_addr - shift, size + SIZEOF_DOUBLE + 1, f, l);
+    mmDBFreeBlock(adj_addr - shift, size + SIZEOF_DOUBLE + 1, f, l);
 #else
-    _mmFreeBlock(adj_addr - shift, size + SIZEOF_DOUBLE + 1);
+    mmFreeBlock(adj_addr - shift, size + SIZEOF_DOUBLE + 1);
 #endif
   }
   else
@@ -574,7 +526,6 @@ void  mmFreeAlignedBlock( void* addr, size_t size)
 #endif
   }
 }
-#endif
 
 #endif /* SIZEOF_DOUBLE == SIZEOF_VOIDP + SIZEOF_VOIDP */
     

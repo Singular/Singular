@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmtables.c,v 1.1 1998-12-02 13:57:37 obachman Exp $ */
+/* $Id: mmtables.c,v 1.2 1999-01-26 14:41:42 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -15,10 +15,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "mod2.h"
+#include "mmheap.h"
 #include "mmemory.h"
 #include "mmprivate.h"
 #include "mmpage.h"
-#include "mmheap.h"
 
 
 #define MAX_INDEX ((MAX_BLOCK_SIZE - 1) >> 2)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmisc.c,v 1.1 1998-12-02 13:57:34 obachman Exp $ */
+/* $Id: mmisc.c,v 1.2 1999-01-26 14:41:41 obachman Exp $ */
 
 /*
 * ABSTRACT:
@@ -141,6 +141,29 @@ void mmPrintStat()
  * Some operations on linked lists of memory 
  *
  **********************************************************************/
+
+void* mmRemoveFromList(void* list, void* element)
+{
+  void* nlist;
+  void* olist;
+  
+  if (list == NULL) return NULL;
+
+  nlist = *((void**) list);
+  olist = list;
+  
+  if (list == element) return nlist;
+  
+  while (nlist != NULL && nlist != element)
+  {
+    list = nlist;
+    nlist = *((void**) list);
+  }
+  
+  if (nlist != NULL) *((void**) list) = *((void**) nlist);
+  
+  return olist;
+}
 
 int mmListLength(void* list)
 {

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmemory.h,v 1.14 1998-12-18 11:11:38 obachman Exp $ */
+/* $Id: mmemory.h,v 1.15 1999-01-26 14:41:39 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -33,11 +33,9 @@ void * mmAlloc( size_t );
 void * mmRealloc( void*, size_t );
 void   mmFree( void* );
 char * mmStrdup( const char* );
-#if 0 /* Alligned Allloc does not work, yet */
 void * mmAllocAlignedBlock( size_t );
 void * mmAllocAlignedBlock0( size_t );
-void * mmFreeAlignedBlock( void*, size_t );
-#endif
+void   mmFreeAlignedBlock( void*, size_t );
 
 #define AllocHeap               mmAllocHeap
 #define FreeHeap                mmFreeHeap
@@ -49,11 +47,9 @@ void * mmFreeAlignedBlock( void*, size_t );
 #define FreeL                   mmFree
 #define AllocL                  mmAlloc
 #define mstrdup                 mmStrdup
-#if 0
 #define AllocAligned0           mmAllocAlignedBlock0
 #define AllocAligned            mmAllocAlignedBlock
 #define FreeAligned             mmFreeAlignedBlock
-#endif
 
 #else /* MDEBUG */
 
@@ -68,11 +64,9 @@ void * mmDBAlloc( size_t, char*, int );
 void * mmDBRealloc( void*, size_t, char*, int );
 void   mmDBFree( void*, char*, int );
 char * mmDBStrdup( const char * s, char *fname, int lineno);
-#if 0
 void * mmDBAllocAlignedBlock( size_t, char*, int );
 void * mmDBAllocAlignedBlock0( size_t,  char*, int);
-void * mmDBFreeAlignedBlock( void*, size_t, char*, int );
-#endif
+void   mmDBFreeAlignedBlock( void*, size_t, char*, int );
 
 #define AllocHeap(res, heap)\
   ((void*)(res)) = mmDBAllocHeap(heap, __FILE__, __LINE__)
@@ -86,11 +80,9 @@ void * mmDBFreeAlignedBlock( void*, size_t, char*, int );
 #define AllocL(s)               mmDBAlloc(s, __FILE__, __LINE__)
 #define FreeL(a)                mmDBFree(a,__FILE__,__LINE__)
 #define mstrdup(s)              mmDBStrdup(s, __FILE__, __LINE__)
-#if 0
 #define AllocAligned(s)         mmDBAllocAlignedBlock(s, __FILE__, __LINE__)
 #define AllocAligned0(s)        mmDBAllocAlignedBlock0(s, __FILE__, __LINE__)
 #define FreeAligned(a,s)        mmDBFreeAlignedBlock(a, s, __FILE__, __LINE__)
-#endif
 
 #endif /* MDEBUG */
 
@@ -166,7 +158,8 @@ size_t mmSizeL( void* );
  *
  **********************************************************************/
 /* The following routines assume that Next(list) == *((void**) list) */
-
+/* Removes element from list, if contained in it and returns list */
+void* mmRemoveFromList(void* list, void* element);
 /* Returns the length of a memory list; assumes list has no cycles */
 int mmListLength(void* list);
 /* Returns last non-NULL element of list; assumes list has no cycles */

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmprivate.h,v 1.3 1998-12-16 18:43:42 Singular Exp $ */
+/* $Id: mmprivate.h,v 1.4 1999-01-26 14:41:41 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -65,6 +65,11 @@ void mmDBInitNewHeapPage(memHeap heap);
 int mmCheckDBMCB ( DBMCB * what, int size , int flags);
 void mmFillDBMCB(DBMCB* what, size_t size, memHeap heap,
                  int flags, char* fname, int lineno);
+void mmDBSetHeapsOfBlocks(memHeap fromheap, memHeap toheap);
+void mmTakeOutDBMCB (DBMCB* what );
+void mmMoveDBMCB ( pDBMCB from, pDBMCB to, DBMCB * what );
+void mmMoveDBMCBInto ( pDBMCB to, pDBMCB what );
+
 #endif /* MDEBUG */
 
 extern int mm_bytesMalloc;
