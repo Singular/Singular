@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: primdec.lib,v 1.81 2000-12-22 14:24:36 greuel Exp $";
+version="$Id: primdec.lib,v 1.82 2000-12-31 02:02:05 greuel Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
@@ -1252,13 +1252,13 @@ proc coeffLcm(ideal h)
    string @pa=parstr(basering);
    if(size(@pa)==0)
    {
-      return(lcmP(h));
+      return(lcm(h));
    }
    def bsr= basering;
    string @id=string(h);
    execute("ring @r=0,("+@pa+","+varstr(bsr)+"),(C,dp);");
    execute ("ideal @i="+@id+";");
-   poly @p=lcmP(@i);
+   poly @p=lcm(@i);
    string @ps=string(@p);
    setring bsr;
    execute ("poly @p="+@ps+";");
@@ -1274,63 +1274,8 @@ example
    poly  pr= coeffLcm(l);
    pr;
 }
-
 ///////////////////////////////////////////////////////////////////////////////
 
-proc lcmP(ideal i)
-"USAGE:   lcm(i); i list of polynomials
-RETURN:  poly = lcm(i[1],...,i[size(i)])
-NOTE:
-EXAMPLE: example lcm; shows an example
-"
-{
-  int k,j;
-   poly p,q;
-  i=simplify(i,10);
-  for(j=1;j<=size(i);j++)
-  {
-    if(deg(i[j])>0)
-    {
-      p=i[j];
-      break;
-    }
-  }
-  if(deg(p)==-1)
-  {
-    return(1);
-  }
-  for (k=j+1;k<=size(i);k++)
-  {
-     if(deg(i[k])!=0)
-     {
-        q=GCD(p,i[k]);
-        if(deg(q)==0)
-        {
-           p=p*i[k];
-        }
-        else
-        {
-           p=p/q;
-           p=p*i[k];
-        }
-     }
-   }
-  return(p);
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   ring  r = 0,(x,y,z),lp;
-   poly  p = (x+y)*(y+z);
-   poly  q = (z4+2)*(y+z);
-   ideal l=p,q;
-   poly  pr= lcmP(l);
-   pr;
-   l=1,-1,p,1,-1,q,1;
-   pr=lcmP(l);
-   pr;
-}
-
-///////////////////////////////////////////////////////////////////////////////
 proc clearSB (ideal i,list #)
 "USAGE:   clearSB(i); i ideal which is SB ordered by monomial ordering
 RETURN:  ideal = minimal SB
