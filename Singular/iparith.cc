@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.20 1997-04-15 11:55:36 obachman Exp $ */
+/* $Id: iparith.cc,v 1.21 1997-04-17 17:52:18 Singular Exp $ */
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
 */
@@ -152,6 +152,7 @@ cmdnames cmds[] =
 #endif
   { "dump",        0, DUMP_CMD,           CMD_1},
   { "extgcd",      0, EXTGCD_CMD ,        CMD_2},
+  { "EXTGCD",      2, EXTGCD_CMD ,        CMD_2},
   { "eliminate",   0, ELIMINATION_CMD,    CMD_23},
   { "else",        0, ELSE_CMD ,          ELSE_CMD},
   { "eval",        0, EVAL ,              EVAL},
@@ -168,6 +169,7 @@ cmdnames cmds[] =
   { "gen",         0, E_CMD ,             CMD_1},
   { "getdump",     0, GETDUMP_CMD,        CMD_1},
   { "gcd",         0, GCD_CMD ,           CMD_2},
+  { "GCD",         2, GCD_CMD ,           CMD_2},
   { "hilb",        0, HILBERT_CMD ,       CMD_12},
   { "homog",       0, HOMOG_CMD ,         CMD_12},
   { "ideal",       0, IDEAL_CMD ,         IDEAL_CMD},
@@ -3981,11 +3983,15 @@ static BOOLEAN jjOPTION_PL(leftv res, leftv v)
 static BOOLEAN jjRESERVED0(leftv res, leftv v)
 {
   int i=1;
-  while(cmds[i].name!=NULL)
+  loop
   {
-    PrintS(cmds[i].name);PrintLn();
+    Print("%-20s",cmds[i].name);
     i++;
+    if(cmds[i].name==NULL) 
+      break;
+    if ((i%3)==1) PrintLn();
   }
+  PrintLn();
   return FALSE;
 }
 static BOOLEAN jjSTRING_PL(leftv res, leftv v)
@@ -5072,6 +5078,12 @@ int IsCmd(char *n, int & tok)
   }
   lastreserved=cmds[i].name;
   tok=cmds[i].tokval;
+  if(cmds[i].alias==2)
+  {
+    Warn("outdated identifier `%s` used - please change your code",
+    cmds[i].name);
+    cmds[i].alias=1;
+  }
   #ifndef SIC
   if (currRingHdl==NULL)
   {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.5 1997-04-16 10:02:48 Singular Exp $ */
+/* $Id: syz1.cc,v 1.6 1997-04-17 17:52:23 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -2017,7 +2017,7 @@ resolvente syLaScala1(ideal arg,int * length)
       h_n++;
     }
     highdeg--;
-    Print("max deg=%d\n",highdeg);
+    //Print("max deg=%d\n",highdeg);
   }  
   binomials = (int*)Alloc(pVariables*(highdeg+1)*sizeof(int));
   syBinomSet();
@@ -2236,7 +2236,7 @@ resolvente syLaScala2(ideal arg,int * length)
       h_n++;
     }
     highdeg--;
-    Print("max deg=%d\n",highdeg);
+    //Print("max deg=%d\n",highdeg);
   }  
   binomials = (int*)Alloc(pVariables*(highdeg+1)*sizeof(int));
   syBinomSet();

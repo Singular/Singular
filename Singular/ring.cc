@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.6 1997-04-16 18:38:07 Singular Exp $ */
+/* $Id: ring.cc,v 1.7 1997-04-17 17:52:21 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -587,8 +587,9 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
       {
         tmpR.block1[n]=tmpR.N;
         #ifndef SIC
-        if (tmpR.block0[n]>tmpR.block1[n])
+        if (tmpR.block0[n]>tmpR.N/*tmpR.block1[n]*/)
         {
+          tmpR.block1[n]=tmpR.block0[n];
           goto ord_mismatch;
           //Werror("mismatch of number of vars (%d) and ordering (>=%d vars)",
           //  tmpR.N,tmpR.block0[n]);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipprint.cc,v 1.4 1997-04-08 16:49:21 Singular Exp $ */
+/* $Id: ipprint.cc,v 1.5 1997-04-17 17:52:20 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: printing
 */
@@ -90,14 +90,14 @@ void jjPRINT_MA0(matrix m, const char *name)
     /* convert all polys to string */
     i=MATCOLS(m)*MATROWS(m)-1;
     ss=pString(m->m[i]);
-    if (strlen(ss)>colmax) s[i]=NULL;
-    else                   s[i]=mstrdup(ss);
+    if ((int)strlen(ss)>colmax) s[i]=NULL;
+    else                        s[i]=mstrdup(ss);
     for(i--;i>=0;i--)
     {
       pString(m->m[i]);
       ss=StringAppend(",");
-      if (strlen(ss)>colmax) s[i]=NULL;
-      else                   s[i]=mstrdup(ss);
+      if ((int)strlen(ss)>colmax) s[i]=NULL;
+      else                        s[i]=mstrdup(ss);
     }
     /* look up the width of all columns, put it in l[col_nr] */
     /* insert names for very long entries */

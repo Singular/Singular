@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.8 1997-04-16 10:02:47 Singular Exp $ */
+/* $Id: syz0.cc,v 1.9 1997-04-17 17:52:22 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -757,7 +757,11 @@ resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
   BOOLEAN sort = TRUE;
   tHomog hom=(tHomog)idHomModule(arg,NULL,&w);
 
-  if((hom==isHomog)&&(maxlength==pVariables-1)&&(idRankFreeModule(arg)==0))
+  if((hom==isHomog)
+  &&(maxlength==pVariables-1)
+  &&(currQuotient==NULL)
+  &&(idRankFreeModule(arg)==0)
+  &&(!idIs0(arg)))
   {
    return syLaScala1(arg,length);
   }  
