@@ -2,7 +2,7 @@
  *  File:    gmalloc.c
  *  Purpose: implementation of malloc and friends from libc of 
  *           Linux kernel version 5
- *  Version: $Id: gmalloc.c,v 1.4 2000-08-14 12:26:38 obachman Exp $
+ *  Version: $Id: gmalloc.c,v 1.5 2001-03-22 22:39:07 Singular Exp $
  *******************************************************************/
 #include "omMalloc.h"
 
@@ -52,7 +52,7 @@ Cambridge, MA 02139, USA.
 #endif
 
 #if defined (__GNU_LIBRARY__) || (defined (__STDC__) && __STDC__)
-#include <limits.h>
+#include <mylimits.h>
 #else
 #ifndef CHAR_BIT
 #define CHAR_BIT 8

@@ -3,7 +3,7 @@
 ### Purpose: Makefile for omalloc
 ### Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
 ### Created: 11/99
-### Version: $Id: Makefile.in,v 1.8 2001-01-27 17:03:38 obachman Exp $
+### Version: $Id: Makefile.in,v 1.9 2001-03-22 22:39:05 Singular Exp $
 #################################################################
 
 SHELL		= /bin/sh
@@ -75,8 +75,8 @@ endif
 # ASO_SOURCES
 ASO_SOURCES = 
 
-HEADERS= 							\
-om_Alloc.h              omList.h	      omDerivedConfig.h \
+HEADERS= 	mylimits.h					\
+om_Alloc.h             omList.h  	      omDerivedConfig.h \
 omAllocDecl.h          omConfig.h             omMemOps.h	\
 omDebug.h              omOpts.h		      omInlineDecl.h    \
 omAllocPrivate.h       omError.h              omPage.h		\
@@ -95,15 +95,15 @@ SOURCES=${CSOURCES} omGetPageSize.h omMallocSystem.h gmalloc.c dlmalloc.h dlmall
 ASO_OBJS := $(ASO_SOURCES:.aso.cc=.aso) 
 
 DISTFILES=$(SOURCES) $(HEADERS) omtTest.h makeheader.pl Makefile.in \
-           omConfig.h.in configure.in mkinstalldirs install-sh configure 
+           omConfig.h.in mylimits.h configure.in mkinstalldirs install-sh configure 
 
 ##
 ## Build Targets
 ##
-%.o: %.c omConfig.h omTables.h omalloc.h omTables.inc
+%.o: %.c omConfig.h mylimits.h omTables.h omalloc.h omTables.inc
 	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -c $<
 
-%.o_ndebug: %.c omConfig.h omTables.h omalloc.h omTables.inc
+%.o_ndebug: %.c omConfig.h mylimits.h omTables.h omalloc.h omTables.inc
 	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -DOM_NDEBUG -c $< -o $@
 
 %.aso.o: %.aso.cc mmtables.inc 
@@ -117,12 +117,12 @@ all:	libomalloc.a libomalloc_ndebug.a omalloc.h omalloc.o omalloc_debug.o
 
 lib: libomalloc.a
 
-libomalloc.a: $(OBJS) Makefile omConfig.h
+libomalloc.a: $(OBJS) Makefile omConfig.h mylimits.h
 	rm -f $@
 	$(AR) cr $@ $(OBJS) 
 	$(RANLIB) $@
 
-libomalloc_ndebug.a: $(OBJS_NDEBUG) Makefile omConfig.h
+libomalloc_ndebug.a: $(OBJS_NDEBUG) Makefile omConfig.h mylimits.h
 	rm -f $@
 	$(AR) cr $@ $(OBJS_NDEBUG) 
 	$(RANLIB) $@
@@ -142,7 +142,7 @@ omTables.inc: omTables
 omTables.h: omTables
 	./omTables 1 >$@
 
-omTables: omAllocPrivate.h omConfig.h omTables.c
+omTables: omAllocPrivate.h omConfig.h omTables.c mylimits.h
 	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -DOM_GENERATE_INC omTables.c -o omTables
 
 #
@@ -168,10 +168,10 @@ endif
 #
 # configure related stuff
 #
-omConfig.h omMalloc.h: stamp-h
+omConfig.h omMalloc.h mylimits.h: stamp-h
 
-stamp-h : config.status omConfig.h.in ${OM_MALLOC_HEADER}
-	CONFIG_FILES= CONFIG_HEADERS="omConfig.h omMalloc.h:${OM_MALLOC_HEADER}" ./config.status
+stamp-h : config.status omConfig.h.in mylimits.h.in ${OM_MALLOC_HEADER}
+	CONFIG_FILES= CONFIG_HEADERS="omConfig.h mylimits.h omMalloc.h:${OM_MALLOC_HEADER}" ./config.status
 
 Makefile: Makefile.in config.status
 	CONFIG_FILES="Makefile" CONFIG_HEADERS= ./config.status
@@ -198,6 +198,7 @@ install: all libomalloc_p.a
 	$(RANLIB) $(libdir)/libomalloc_p.a
 	$(INSTALL_DATA) omalloc.o omalloc_debug.o $(libdir)
 	$(INSTALL_DATA) omalloc.h omalloc.c $(includedir)
+	$(INSTALL_DATA) mylimits.h omalloc.c $(includedir)
 
 
 uninstall: 
@@ -227,7 +228,7 @@ clean: mostlyclean
 distclean: clean
 	-rm -f  *~ .\#*  stamp-h configure omMalloc.h
 	rm -rf omalloc-$(VERSION)
-	-rm -f omConfig.h Makefile TAGS* tags config.status config.cache config.log
+	-rm -f omConfig.h mylimits.h Makefile TAGS* tags config.status config.cache config.log
 
 srcclean: distclean
 
@@ -236,8 +237,8 @@ maintainer-clean: distclean
 
 .PHONY: TAGS
 
-TAGS:	omConfig.h.in
-	etags omConfig.h.in $(SOURCES) $(HEADERS)
+TAGS:	omConfig.h.in mylimits.h.in
+	etags omConfig.h.in mylimits.h.in $(SOURCES) $(HEADERS)
 
 ##
 ## check
@@ -263,12 +264,12 @@ DEFSG		=  @DEFS@
 
 OBJG := $(CSOURCES:.c=.og) $(GSOURCES:.c=.og)
 
-%.og: %.c omConfig.h omTables.h omalloc.h
+%.og: %.c omConfig.h omTables.h omalloc.h mylimits.h
 	$(CCG) ${CFLAGSG} ${CPPFLAGS} ${DEFSG} -c $< -o $@
 
 libg: libomalloc_g.a
 
-libomalloc_g.a: $(OBJG) Makefile omConfig.h
+libomalloc_g.a: $(OBJG) Makefile omConfig.h mylimits.h
 	rm -f $@
 	$(AR) cr $@ $(OBJG) 
 	$(RANLIB) $@
@@ -279,13 +280,13 @@ libomalloc_g.a: $(OBJG) Makefile omConfig.h
 ##
 OBJD := $(CSOURCES:%.c=%_d.og) $(GSOURCES:%.c=%_d.og)
 
-%_d.c : %.c omConfig.h omTables.h omalloc.h
+%_d.c : %.c omConfig.h omTables.h omalloc.h mylimits.h
 	$(CCG) -E -P $< | $(PERL) -p -e 's/;/;\n/g' | $(PERL) -p -e 's/\{/\n\{/g' | $(PERL) -p -e 's/\}/\n\}/g' > $@
 .PRECIOUS: %_d.c
 
 libd: libomalloc_d.a
 
-libomalloc_d.a: $(OBJD) Makefile omConfig.h
+libomalloc_d.a: $(OBJD) Makefile omConfig.h mylimits.h
 	rm -f $@
 	$(AR) cr $@ $(OBJD) 
 	$(RANLIB) $@
@@ -305,12 +306,12 @@ OBJP := $(CSOURCES:.c=.op) $(GSOURCES:.c=.op)
 ##
 ## Profile Targets
 ##
-%.op: %.c omConfig.h omTables.h omalloc.h
+%.op: %.c omConfig.h omTables.h omalloc.h mylimits.h
 	$(CCP) ${CFLAGSP} ${CPPFLAGS} ${DEFSP} -c $< -o $@
 
 libp: libomalloc_p.a
 
-libomalloc_p.a: $(OBJP) Makefile omConfig.h
+libomalloc_p.a: $(OBJP) Makefile omConfig.h mylimits.h
 	rm -f $@
 	$(AR) cr $@ $(OBJP) 
 	$(RANLIB) $@
@@ -333,12 +334,12 @@ OBJB := $(CSOURCES:.c=.ob) $(GSOURCES:.c=.ob)
 ##
 ## Profile Targets
 ##
-%.ob: %.c omConfig.h omTables.h omalloc.h
+%.ob: %.c omConfig.h omTables.h omalloc.h mylimits.h
 	$(CCB) ${CFLAGSB} ${CPPFLAGS} ${DEFSB} -c $< -o $@
 
 libb: libomalloc_b.a
 
-libomalloc_b.a: $(OBJB) Makefile omConfig.h
+libomalloc_b.a: $(OBJB) Makefile omConfig.h mylimits.h
 	rm -f $@
 	$(AR) cr $@ $(OBJB) 
 	$(RANLIB) $@
@@ -388,11 +389,11 @@ backup: omalloc-$(VERSION).tgz
 ##
 ## Dependencies 
 ## 
-%.d: %.c omConfig.h Makefile omTables.h omTables.inc omalloc.h
+%.d: %.c omConfig.h mylimits.h Makefile omTables.h omTables.inc omalloc.h
 	echo $(@:.d=.o_ndebug) $(@:.d=.og) $(@:.d=.od)  $(@:.d=.op) $(@:.d=.ob) $(@:.d=_d.c) $(@:.d=.om)" " \\ > $@
 	$(CCM) ${CPPFLAGS} ${DEFSG} $< >> $@
 
-depend:   $(CSOURCES:.c=.d) omConfig.h $(TESTSOURCES:.c=.d)
+depend:   $(CSOURCES:.c=.d) omConfig.h mylimits.h $(TESTSOURCES:.c=.d)
 	cat *.d >depend
 
 ifeq (depend,$(wildcard depend))

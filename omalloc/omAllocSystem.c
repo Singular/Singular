@@ -3,13 +3,13 @@
  *  Purpose: implementation of main lowl-level alloc functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omAllocSystem.c,v 1.7 2000-12-12 15:26:15 obachman Exp $
+ *  Version: $Id: omAllocSystem.c,v 1.8 2001-03-22 22:39:08 Singular Exp $
  *******************************************************************/
 #ifndef OM_ALLOC_SYSTEM_C
 #define OM_ALLOC_SYSTEM_C
 
 #include <unistd.h>
-#include <limits.h>
+#include <mylimits.h>
 
 
 /* disable our malloc macros */

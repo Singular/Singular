@@ -31,14 +31,14 @@ ac_help="$ac_help
                     how to get page-aligned memory, default: use first possible"
 ac_help="$ac_help
  --with-provide-malloc=yes|debug|malloc
-                    provide normal|debug|underlying malloc ANSI-C conforming 
+                    provide normal|debug|underlying malloc ANSI-C conforming
                     versions of malloc|calloc|realloc|free"
 ac_help="$ac_help
  --with-emulate-omalloc
                     provide only omallocs interface, but do not use its features"
 ac_help="$ac_help
- --with-align=8|sloppy|strict 
-                    how memory is aligned, 
+ --with-align=8|sloppy|strict
+                    how memory is aligned,
                     default: if possible sloppy, else strict"
 ac_help="$ac_help
  --with-dense-bins  use dense bin distribution"
@@ -57,7 +57,7 @@ ac_help="$ac_help
 ac_help="$ac_help
  --with-track-custom track custom values"
 ac_help="$ac_help
- --with-internal-debug       
+ --with-internal-debug
                        turn on internal debugging"
 
 # Initialize some variables set by options.
@@ -674,7 +674,7 @@ if test "${with_track_custom+set}" = set; then
   withval="$with_track_custom"
   :
 fi
- 
+
 # Check whether --with-internal_debug or --without-internal_debug was given.
 if test "${with_internal_debug+set}" = set; then
   withval="$with_internal_debug"
@@ -1817,7 +1817,7 @@ fi
 
 fi
 
-# can not really handle pagesizes which are greater -- there must be a 
+# can not really handle pagesizes which are greater -- there must be a
 # bug somewhere
 if test $ac_cv_pagesize -gt 8192; then
   ac_cv_pagesize=8192
@@ -1888,12 +1888,12 @@ else
   cat > conftest.$ac_ext <<EOF
 #line 1890 "configure"
 #include "confdefs.h"
- 
-main() 
+
+main()
 {
-  void* ptr = (void*) malloc(12); 
-  double* d_ptr; 
-  if ((unsigned long) ptr % 8 == 0) ptr = ptr + 4;  
+  void* ptr = (void*) malloc(12);
+  double* d_ptr;
+  if ((unsigned long) ptr % 8 == 0) ptr = ptr + 4;
   d_ptr = (double*) ptr;
   *d_ptr = (double) 1.1;
   if (*d_ptr != (double) 1.1) exit(1);
@@ -1961,7 +1961,7 @@ elif test "${with_malloc}" = pmalloc; then
   OM_MALLOC_HEADER=pmalloc.h
   OM_MALLOC_SOURCE=pmalloc.c
 elif test "${with_malloc}" = external; then
-  if test "${with_external_malloc_h+set}" != set; then 
+  if test "${with_external_malloc_h+set}" != set; then
     { echo "configure: error: need --with_external_malloc_h for external malloc" 1>&2; exit 1; }
   fi
   if test "${with_provide_malloc}" = yes || test "${with_provide_malloc}" = debug; then
@@ -1973,7 +1973,7 @@ elif test "${with_malloc}" = external; then
 #define OMALLOC_USES_MALLOC 1
 EOF
 
-else 
+else
   with_malloc=dlmalloc
   OM_MALLOC_HEADER=dlmalloc.h
   OM_MALLOC_SOURCE=dlmalloc.c
@@ -2040,7 +2040,7 @@ cat >> confdefs.h <<\EOF
 EOF
 
 fi
-  
+
 if test "${with_provide_malloc}" = malloc; then
    cat >> confdefs.h <<\EOF
 #define OM_PROVIDE_MALLOC 3
@@ -2165,7 +2165,7 @@ EOF
   ac_cv_align="strict"
 else
   ac_cv_align="sloppy"
-fi	
+fi
 fi
 echo "$ac_t""$ac_cv_align" 1>&6
 
@@ -2324,7 +2324,7 @@ int test_backtrace()
 }
 int main()
 {
-   int i;	
+   int i;
    omInitGetBackTrace();
    i = test_backtrace();
    if (i == 1) exit(0);
@@ -2379,13 +2379,12 @@ int test_Ret_2_Info()
   void* bt;
   int i;
   struct omRetInfo_s info;
-  
+
   GET_RET_ADDR(bt);
   i = omBackTrace_2_RetInfo(&bt, &info, 1);
   return i;
 }
 
-  
 int main(int argc, char** argv)
 {
   int i;
@@ -2396,7 +2395,7 @@ int main(int argc, char** argv)
 }
 
 EOF
-if { (eval echo configure:2400: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:2399: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
 then
   ac_cv_prog_addr2line_works=yes
 else
@@ -2411,9 +2410,9 @@ fi
 fi
 
 echo "$ac_t""$ac_cv_prog_addr2line_works" 1>&6
-  
+
 echo $ac_n "checking whether to track return addresses""... $ac_c" 1>&6
-echo "configure:2417: checking whether to track return addresses" >&5
+echo "configure:2416: checking whether to track return addresses" >&5
 if test "$with_track_return" = no || test "$ac_cv_get_return_addr_works" = no || test "$ac_cv_prog_addr2line_works" != yes; then
   with_track_return=no
 else
@@ -2426,11 +2425,11 @@ fi
 echo "$ac_t""$with_track_return" 1>&6
 
 echo $ac_n "checking whether to track files and line numbers""... $ac_c" 1>&6
-echo "configure:2430: checking whether to track files and line numbers" >&5
+echo "configure:2429: checking whether to track files and line numbers" >&5
 if test "$with_track_fl" = no && test "$with_track_return" = no; then
   with_track_fl=yes
 fi
-if test "${with_track_fl+set}" != set; then 
+if test "${with_track_fl+set}" != set; then
   if test "$with_track_return" = yes; then
     with_track_fl=no
   else
@@ -2438,7 +2437,7 @@ if test "${with_track_fl+set}" != set; then
   fi
 fi
 echo "$ac_t""$with_track_fl" 1>&6
-if test "$with_track_fl" = yes; then 
+if test "$with_track_fl" = yes; then
   cat >> confdefs.h <<\EOF
 #define OM_TRACK_FILE_LINE 1
 EOF
@@ -2446,7 +2445,7 @@ EOF
 fi
 
 echo $ac_n "checking whether to track stack backtraces""... $ac_c" 1>&6
-echo "configure:2450: checking whether to track stack backtraces" >&5
+echo "configure:2449: checking whether to track stack backtraces" >&5
 if test "$with_track" != no && test "$ac_cv_get_backtrace_works" = yes && test "$with_track_backtrace" != no && test "$ac_cv_prog_addr2line_works" = yes; then
   with_track_backtrace=yes
   cat >> confdefs.h <<\EOF
@@ -2459,7 +2458,7 @@ fi
 echo "$ac_t""$with_track_backtrace" 1>&6
 
 echo $ac_n "checking whether to track custom values""... $ac_c" 1>&6
-echo "configure:2463: checking whether to track custom values" >&5  
+echo "configure:2462: checking whether to track custom values" >&5
 if test "$with_track" != no && test "$with_track_custom" = yes; then
   cat >> confdefs.h <<\EOF
 #define OM_TRACK_CUSTOM 1
@@ -2469,7 +2468,6 @@ else
   with_track_custom=no
 fi
 echo "$ac_t""$with_track_custom" 1>&6
-
 
 
 
@@ -2574,7 +2572,7 @@ done
 ac_given_srcdir=$srcdir
 ac_given_INSTALL="$INSTALL"
 
-trap 'rm -fr `echo "Makefile omConfig.h omMalloc.h:${OM_MALLOC_HEADER}" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
+trap 'rm -fr `echo "Makefile omConfig.h mylimits.h omMalloc.h:${OM_MALLOC_HEADER}" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
 cat >> $CONFIG_STATUS <<EOF
 
@@ -2744,7 +2742,7 @@ ac_eD='%g'
 if test "${CONFIG_HEADERS+set}" != set; then
 EOF
 cat >> $CONFIG_STATUS <<EOF
-  CONFIG_HEADERS="omConfig.h omMalloc.h:${OM_MALLOC_HEADER}"
+  CONFIG_HEADERS="omConfig.h mylimits.h omMalloc.h:${OM_MALLOC_HEADER}"
 EOF
 cat >> $CONFIG_STATUS <<\EOF
 fi
@@ -2841,8 +2839,4 @@ EOF
 chmod +x $CONFIG_STATUS
 rm -fr confdefs* $ac_clean_files
 test "$no_create" = yes || ${CONFIG_SHELL-/bin/sh} $CONFIG_STATUS || exit 1
-
-
-
-
 

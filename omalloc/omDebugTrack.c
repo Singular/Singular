@@ -3,9 +3,9 @@
  *  Purpose: implementation of main omDebug functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDebugTrack.c,v 1.12 2000-12-12 15:26:17 obachman Exp $
+ *  Version: $Id: omDebugTrack.c,v 1.13 2001-03-22 22:39:10 Singular Exp $
  *******************************************************************/
-#include <limits.h>
+#include <mylimits.h>
 #include <string.h>
 #include "omConfig.h"
 #include "omDerivedConfig.h"

@@ -3,9 +3,9 @@
  *  Purpose: implementation of omCheck functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDebugCheck.c,v 1.11 2000-12-12 15:26:16 obachman Exp $
+ *  Version: $Id: omDebugCheck.c,v 1.12 2001-03-22 22:39:09 Singular Exp $
  *******************************************************************/
-#include <limits.h>
+#include <mylimits.h>
 #include <stdarg.h>
 
 #include "om_Alloc.h"

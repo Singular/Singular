@@ -3,7 +3,7 @@
  *  Purpose: default declaration of of configurable stuff
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDefaultConfig.h,v 1.6 2001-03-12 19:14:28 obachman Exp $
+ *  Version: $Id: omDefaultConfig.h,v 1.7 2001-03-22 22:39:10 Singular Exp $
  *******************************************************************/
 
 /********************************************************************
@@ -22,7 +22,7 @@
   Notice that some of these parameters can also be set at run-time, using 
   the global om_Opts struct.
 ********************************************************************/
-#include <limits.h>
+#include <mylimits.h>
 #include "omConfig.h"
 /* if external config was provided, 'make' makes links from it to omExternalConfig.h */
 #ifdef OM_HAVE_EXTERNAL_CONFIG_H

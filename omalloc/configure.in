@@ -3,7 +3,7 @@ dnl File: configure.in
 dnl Purpose: Process this file with autoconf to produce configure
 dnl Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
 dnl Created: 11/99
-dnl Version: $Id: configure.in,v 1.12 2001-01-27 17:03:39 obachman Exp $
+dnl Version: $Id: configure.in,v 1.13 2001-03-22 22:39:07 Singular Exp $
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 
 AC_INIT(om_Alloc.c)
@@ -41,7 +41,7 @@ AC_ARG_WITH(
 AC_ARG_WITH(
   provide-malloc,
   [ --with-provide-malloc=yes|debug|malloc
-                    provide normal|debug|underlying malloc ANSI-C conforming 
+                    provide normal|debug|underlying malloc ANSI-C conforming
                     versions of malloc|calloc|realloc|free])
 AC_ARG_WITH(
   emulate-omalloc,
@@ -49,8 +49,8 @@ AC_ARG_WITH(
                     provide only omallocs interface, but do not use its features])
 AC_ARG_WITH(
   align,
-  [ --with-align=8|sloppy|strict 
-                    how memory is aligned, 
+  [ --with-align=8|sloppy|strict
+                    how memory is aligned,
                     default: if possible sloppy, else strict])
 AC_ARG_WITH(
   dense-bins,
@@ -75,10 +75,10 @@ AC_ARG_WITH(
   [ --with-track-backtrace track stack backtraces])
 AC_ARG_WITH(
   track-custom,
-  [ --with-track-custom track custom values]) 
+  [ --with-track-custom track custom values])
 AC_ARG_WITH(
   internal_debug,
-  [ --with-internal-debug       
+  [ --with-internal-debug
                        turn on internal debugging])
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl compiler/make  config
@@ -160,7 +160,7 @@ main()
   fprintf(f, "%d\n", omalloc_getpagesize);
   exit(0);
 }], ac_cv_pagesize=`cat conftestval`, ac_cv_pagesize=0, ac_cv_pagesize=0))
-# can not really handle pagesizes which are greater -- there must be a 
+# can not really handle pagesizes which are greater -- there must be a
 # bug somewhere
 if test $ac_cv_pagesize -gt 8192; then
   ac_cv_pagesize=8192
@@ -197,12 +197,12 @@ dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl for strict alignment
 dnl
 AC_CACHE_CHECK(whether alignment needs to be strict, ac_cv_align_need_strict,
-AC_TRY_RUN([ 
-main() 
+AC_TRY_RUN([
+main()
 {
-  void* ptr = (void*) malloc(12); 
-  double* d_ptr; 
-  if ((unsigned long) ptr % 8 == 0) ptr = ptr + 4;  
+  void* ptr = (void*) malloc(12);
+  double* d_ptr;
+  if ((unsigned long) ptr % 8 == 0) ptr = ptr + 4;
   d_ptr = (double*) ptr;
   *d_ptr = (double) 1.1;
   if (*d_ptr != (double) 1.1) exit(1);
@@ -249,7 +249,7 @@ elif test "${with_malloc}" = pmalloc; then
   OM_MALLOC_HEADER=pmalloc.h
   OM_MALLOC_SOURCE=pmalloc.c
 elif test "${with_malloc}" = external; then
-  if test "${with_external_malloc_h+set}" != set; then 
+  if test "${with_external_malloc_h+set}" != set; then
     AC_MSG_ERROR(need --with_external_malloc_h for external malloc)
   fi
   if test "${with_provide_malloc}" = yes || test "${with_provide_malloc}" = debug; then
@@ -258,7 +258,7 @@ elif test "${with_malloc}" = external; then
   OM_MALLOC_HEADER=$with_external_malloc_h
   OM_MALLOC_SOURCE=$with_external_malloc_c
   AC_DEFINE(OMALLOC_USES_MALLOC)
-else 
+else
   with_malloc=dlmalloc
   OM_MALLOC_HEADER=dlmalloc.h
   OM_MALLOC_SOURCE=dlmalloc.c
@@ -299,7 +299,7 @@ fi
 if test "$ac_cv_malloc_sizeof_addr" != no; then
 AC_DEFINE(OM_MALLOC_PROVIDES_SIZEOF_ADDR)
 fi
-  
+
 if test "${with_provide_malloc}" = malloc; then
    AC_DEFINE(OM_PROVIDE_MALLOC, 3)
 elif test "${with_provide_malloc}" = debug; then
@@ -374,7 +374,7 @@ else
 fi
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
-dnl alignment 
+dnl alignment
 dnl
 AC_MSG_CHECKING(how to align)
 if test "$with_align" = 8 || test "$ac_cv_sizeof_long" = 8; then
@@ -386,7 +386,7 @@ if test "$ac_cv_align_need_strict" = "yes" || test "$with_align" = "strict"; the
   ac_cv_align="strict"
 else
   ac_cv_align="sloppy"
-fi	
+fi
 fi
 AC_MSG_RESULT($ac_cv_align)
 
@@ -461,7 +461,7 @@ int main()
 {
    exit(! test_return_addr());
 }
-], ac_cv_get_return_addr_works=yes,  
+], ac_cv_get_return_addr_works=yes,
    ac_cv_get_return_addr_works=no,
    ac_cv_get_return_addr_works=no))
 AC_MSG_RESULT($ac_cv_get_return_addr_works)
@@ -482,13 +482,13 @@ int test_backtrace()
 }
 int main()
 {
-   int i;	
+   int i;
    omInitGetBackTrace();
    i = test_backtrace();
    if (i == 1) exit(0);
    else exit(i+1);
 }
-], ac_cv_get_backtrace_works=yes,  
+], ac_cv_get_backtrace_works=yes,
    ac_cv_get_backtrace_works=no,
    ac_cv_get_backtrace_works=no))
 AC_MSG_RESULT($ac_cv_get_backtrace_works)
@@ -512,13 +512,12 @@ int test_Ret_2_Info()
   void* bt;
   int i;
   struct omRetInfo_s info;
-  
+
   GET_RET_ADDR(bt);
   i = omBackTrace_2_RetInfo(&bt, &info, 1);
   return i;
 }
 
-  
 int main(int argc, char** argv)
 {
   int i;
@@ -527,11 +526,11 @@ int main(int argc, char** argv)
   if (i==1) exit(0);
   else exit (i+10);
 }
-], ac_cv_prog_addr2line_works=yes,  
+], ac_cv_prog_addr2line_works=yes,
    ac_cv_prog_addr2line_works=no,
    ac_cv_prog_addr2line_works=no))
 AC_MSG_RESULT($ac_cv_prog_addr2line_works)
-  
+
 AC_MSG_CHECKING(whether to track return addresses)
 if test "$with_track_return" = no || test "$ac_cv_get_return_addr_works" = no || test "$ac_cv_prog_addr2line_works" != yes; then
   with_track_return=no
@@ -545,7 +544,7 @@ AC_MSG_CHECKING(whether to track files and line numbers)
 if test "$with_track_fl" = no && test "$with_track_return" = no; then
   with_track_fl=yes
 fi
-if test "${with_track_fl+set}" != set; then 
+if test "${with_track_fl+set}" != set; then
   if test "$with_track_return" = yes; then
     with_track_fl=no
   else
@@ -553,7 +552,7 @@ if test "${with_track_fl+set}" != set; then
   fi
 fi
 AC_MSG_RESULT($with_track_fl)
-if test "$with_track_fl" = yes; then 
+if test "$with_track_fl" = yes; then
   AC_DEFINE(OM_TRACK_FILE_LINE)
 fi
 
@@ -566,7 +565,7 @@ else
 fi
 AC_MSG_RESULT($with_track_backtrace)
 
-AC_MSG_CHECKING(whether to track custom values)  
+AC_MSG_CHECKING(whether to track custom values)
 if test "$with_track" != no && test "$with_track_custom" = yes; then
   AC_DEFINE(OM_TRACK_CUSTOM)
 else
@@ -577,12 +576,7 @@ AC_MSG_RESULT($with_track_custom)
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl wrap it up
 dnl
-AC_CONFIG_HEADER(omConfig.h omMalloc.h:${OM_MALLOC_HEADER})
-
+AC_CONFIG_HEADER(omConfig.h mylimits.h omMalloc.h:${OM_MALLOC_HEADER})
 
 AC_OUTPUT(Makefile, \
  if test "$CONFIG_HEADERS"; then echo timestamp > stamp-h; fi)
-
-
-
-

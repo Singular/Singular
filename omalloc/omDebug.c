@@ -3,9 +3,9 @@
  *  Purpose: implementation of main omTest functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 7/00
- *  Version: $Id: omDebug.c,v 1.13 2000-12-12 15:26:16 obachman Exp $
+ *  Version: $Id: omDebug.c,v 1.14 2001-03-22 22:39:09 Singular Exp $
  *******************************************************************/
-#include <limits.h>
+#include <mylimits.h>
 #include <string.h>
 #include "omConfig.h"
 #include "om_Alloc.h"

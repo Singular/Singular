@@ -1,6 +1,6 @@
 #include <time.h>
 #include <string.h>
-#include <limits.h>
+#include <mylimits.h>
 
 #define TRACK_LEVEL   1
 #define CHECK_LEVEL   1
