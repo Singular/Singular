@@ -87,16 +87,6 @@ SING_UNAME=`echo $SINGUNAME | tr '-' '_' `
 AC_SUBST(SING_UNAME)
 
 
-
-# for gmp-3.0 to work for all ix86 processors, set generic target
-if test "$target" = NONE; then 
-echo "target=$target uname=$ac_cv_singuname"
-case "$ac_cv_singuname" in 
-	ix86*) ac_configure_args="$ac_configure_args --target=i386" ;;
-esac
-fi
-echo $ac_configure_args
-
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl compiler stuff
 dnl is needed to check for libs and headers, later on
@@ -340,6 +330,7 @@ if test "$enable_gmp" != yes && test "$enable_gmp" != no; then
     enable_gmp=yes
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS gmp"
     ac_configure_args="$ac_configure_args --enable-gmp"
+#    This we used to need for our patched version of gmp 2.x
 #    OUTPUT_MAKEFILES="$OUTPUT_MAKEFILES gmp/Makefile.in"
   else
     AC_MSG_RESULT(no)
@@ -352,11 +343,27 @@ elif test "$enable_gmp" = yes; then
   else
     AC_MSG_RESULT(yes)
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS gmp"
+#    This we used to need for our patched version of gmp 2.x
 #    OUTPUT_MAKEFILES="$OUTPUT_MAKEFILES gmp/Makefile.in"
   fi
 else
   AC_MSG_RESULT(no)
 fi
+
+if "$enable_gmp" = yes; then
+# for gmp-3.0 to work for all ix86 processors, set generic target
+if test "$target" = NONE; then 
+case "$ac_cv_singuname" in 
+	ix86*) 
+	gmp_target=`./config.guess | sed 's/^\w*-/i386-/'`
+	echo $gmp_target
+	ac_configure_args="$ac_configure_args --target=$gmp_target" 
+	;;
+esac
+fi
+
+fi
+
 
 AC_MSG_CHECKING(whether to configure and build smallgmp lib)
 if test "$enable_smallgmp" != yes && test "$enable_smallgmp" != no; then
