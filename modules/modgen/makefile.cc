@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: makefile.cc,v 1.3 2000-03-28 07:14:25 krueger Exp $ */
+/* $Id: makefile.cc,v 1.4 2000-03-29 13:56:27 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -40,7 +40,9 @@ static char *object_name(char *p);
 void mod_create_makefile(moddefv module)
 {
   FILE *fp;
-  fp = fopen("tmp/Makefile", "w");
+
+  mkdir(module->name, 0755);
+  fp = fopen(build_filename(module, "Makefile", 0), "w");
   cfilesv cf = module->files;
   int i;
   

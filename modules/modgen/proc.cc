@@ -1,5 +1,5 @@
 /*
- * $Id: proc.cc,v 1.10 2000-03-29 09:31:42 krueger Exp $
+ * $Id: proc.cc,v 1.11 2000-03-29 13:56:27 krueger Exp $
  */
 
 #include <stdio.h>
@@ -189,7 +189,7 @@ void write_function_return(
           break;
 
         default:
-          fprintf(module->modfp_h, "%s %s(", type_conv[pi->return_val.typ],
+          fprintf(module->modfp_h, "//%s %s(", type_conv[pi->return_val.typ],
                   pi->funcname);
     }
     for (i=0;i<pi->paramcnt; i++) {
@@ -503,18 +503,19 @@ int write_singular_procedures(
   )
 {
   if(module->binfp==NULL) {
-    char *filename;
+    char filename[512];
 
-    filename = (char *)malloc(strlen(module->name)+5+4);
-    sprintf(filename, "tmp/%s.bin", module->name);
+    //filename = (char *)malloc(strlen(module->name)+5+4);
+    //sprintf(filename, "tmp/%s.bin", module->name);
+    strcpy(filename, build_filename(module, module->name, 3));
 
     if( (module->binfp = fopen(filename, "w")) == NULL) {
-      free(filename);
+      //free(filename);
       return -1;
     }
     printf("Creating %s, ", filename);fflush(stdout);
 
-    free(filename);
+    //free(filename);
   }
   
   /* */

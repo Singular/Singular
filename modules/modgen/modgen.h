@@ -1,5 +1,5 @@
 /*
- *  $Id: modgen.h,v 1.9 2000-03-29 09:31:43 krueger Exp $
+ *  $Id: modgen.h,v 1.10 2000-03-29 13:56:27 krueger Exp $
  *
  */
 
@@ -164,6 +164,7 @@ extern void build_compile_section(FILE *fp, moddefv module);
 
 /* from utils.cc */
 extern int create_tmpfile(moddefv module_def, int which = 0);
+extern char *build_filename(moddefv module, char *text, int what);
 
 /* from proc_setup.cc */
 extern int check_reseverd(char *name);

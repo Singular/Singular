@@ -1,5 +1,5 @@
 /*
- * $Id: utils.cc,v 1.6 2000-03-29 09:31:42 krueger Exp $
+ * $Id: utils.cc,v 1.7 2000-03-29 13:56:27 krueger Exp $
  */
 
 #include <stdio.h>
@@ -84,6 +84,34 @@ int create_tmpfile(
   }
   
   return 0;
+}
+
+/*========================================================================*/
+char *build_filename(
+  moddefv module,
+  char *text,
+  int what
+)
+{
+  char p[512];
+
+  switch(what) 
+    {
+        case 1:
+          snprintf(p, sizeof(p), "%s/%s.cc", module->name, text);
+          break;
+        case 2:
+          snprintf(p, sizeof(p), "%s/%s.h", module->name, text);
+          break;
+        case 3:
+          snprintf(p, sizeof(p), "%s/%s.bin", module->name, text);
+          break;
+        default:
+          snprintf(p, sizeof(p), "%s/%s", module->name, text);
+          break;
+    }
+  
+  return p;
 }
 
 /*========================================================================*/

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: creat_top.cc,v 1.8 2000-03-29 09:31:41 krueger Exp $ */
+/* $Id: creat_top.cc,v 1.9 2000-03-29 13:56:26 krueger Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -121,15 +121,15 @@ int write_intro(
     moddefv module
     )
 {
-  char *filename;
+  char filename[512];
 
-  filename = (char *)malloc(strlen(module->name)+5+4);
-  sprintf(filename, "tmp/%s.cc", module->name);
+  mkdir(module->name, 0755);
+  strcpy(filename, build_filename(module, module->name, 1));
   
   fflush(module->fmtfp);
 
   if( (module->modfp = fopen(filename, "w")) == NULL) {
-    free(filename);
+    //free(filename);
     return -1;
   }
   printf("Creating %s, ", filename);fflush(stdout);
@@ -145,15 +145,16 @@ int write_intro(
   printf("%p %p %p\n", module->fmtfp, module->fmtfp2, module->fmtfp3);
   
   
-  sprintf(filename, "tmp/%s.h", module->name);
+  strcpy(filename, build_filename(module, module->name, 2));
+  //sprintf(filename, "%s/%s.h", module->name, module->name);
   if( (module->modfp_h = fopen(filename, "w")) == NULL) {
-    free(filename);
+    //free(filename);
     return -1;
   }
   printf("Creating %s, ", filename);fflush(stdout);
   mod_write_header(module->modfp_h, module->name, 'h');
 
-  free(filename);
+  //free(filename);
 //  write_enter_id(module->modfp);
   return 0;
 }
