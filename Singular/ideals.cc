@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.10 1997-06-30 12:31:40 Singular Exp $ */
+/* $Id: ideals.cc,v 1.11 1997-10-19 11:34:25 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -85,21 +85,38 @@ ideal idMaxIdeal (void)
 /*2
 * deletes an ideal/matrix
 */
+#ifdef MDEBUG
+void idDBDelete (ideal* h, char *f, int l)
+#else
 void idDelete (ideal * h)
+#endif
 {
-  int j;
-  if (*h == NULL) return ;
-  j=(*h)->nrows*(*h)->ncols;
+  int j,elems;
+  if (*h == NULL)
+    return;
+  elems=j=(*h)->nrows*(*h)->ncols;
   if (j>0)
   {
     do
     {
+      #ifdef MDEBUG
+      pDBDelete(&((*h)->m[--j]),f,l);
+      #else
       pDelete(&((*h)->m[--j]));
+      #endif
     }
     while (j>0);
-    Free((ADDRESS)((*h)->m),sizeof(poly)*(*h)->nrows*(*h)->ncols);
+    #ifdef MDEBUG
+    mmDBFreeBlock((ADDRESS)((*h)->m),sizeof(poly)*elems,f,l);
+    #else
+    Free((ADDRESS)((*h)->m),sizeof(poly)*elems);
+    #endif
   }
+  #ifdef MDEBUG
+  mmDBFreeBlock((ADDRESS)(*h),sizeof(**h),f,l);
+  #else
   Free((ADDRESS)*h,sizeof(**h));
+  #endif
   *h=NULL;
 }
 
@@ -108,25 +125,36 @@ void idDelete (ideal * h)
 */
 void idSkipZeroes (ideal ide)
 {
-  int j,k;
-  j = -1;
+  int k;
+  int j = -1;
+  BOOLEAN change=FALSE;
   for (k=0; k<IDELEMS(ide); k++)
   {
     if (ide->m[k] != NULL)
     {
       j++;
-      ide->m[j] = ide->m[k];
+      if (change)
+      {
+        ide->m[j] = ide->m[k];
+      }
+    }
+    else
+    {
+      change=TRUE;
     }
   }
-  if (j == -1)
-    j = 0;
-  else
+  if (change)
   {
-    for (k=j+1; k<IDELEMS(ide); k++)
-      ide->m[k] = NULL;
+    if (j == -1)
+      j = 0;
+    else
+    { 
+      for (k=j+1; k<IDELEMS(ide); k++)
+        ide->m[k] = NULL;
+    }
+    pEnlargeSet(&(ide->m),IDELEMS(ide),j+1-IDELEMS(ide));
+    IDELEMS(ide) = j+1;
   }
-  pEnlargeSet(&(ide->m),IDELEMS(ide),j+1-IDELEMS(ide));
-  IDELEMS(ide) = j+1;
 }
 
 /*2
@@ -254,7 +282,9 @@ void idDBTest(ideal h1,char *f,int l)
 
   if (h1 != NULL)
   {
-    mmTestP(h1,sizeof(*h1));
+    #ifdef MDEBUG
+    mmDBTestBlock(h1,sizeof(*h1),f,l);
+    #endif
     for (i=IDELEMS(h1)-1; i>=0; i--)
       pDBTest(h1->m[i],f,l);
   }

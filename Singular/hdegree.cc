@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hdegree.cc,v 1.6 1997-10-15 08:05:23 pohl Exp $ */
+/* $Id: hdegree.cc,v 1.7 1997-10-19 11:34:23 Singular Exp $ */
 /*
 *  ABSTRACT -  dimension, multiplicity, HC, kbase
 */
@@ -43,7 +43,7 @@ static void hDimSolve(scmon pure, int Npure, scfmon rad, int Nrad,
   iv = Nvar;
   while(pure[var[iv]]) iv--;
   hStepR(rad, Nrad, var, iv, &rad0);
-  if (rad0)
+  if (rad0!=0)
   {
     iv--;
     if (rad0 < Nrad)
@@ -210,7 +210,7 @@ intvec * scIndIntvec(ideal S, ideal Q)
   intvec *Set=new intvec(pVariables);
   short  mc,i;
   hexist = hInit(S, Q, &hNexist);
-  if (!hNexist)
+  if (hNexist==0)
   {
     for(i=0; i<pVariables; i++)
       (*Set)[i]=1;
@@ -221,7 +221,7 @@ intvec * scIndIntvec(ideal S, ideal Q)
   hpure = (scmon)Alloc((1 + (pVariables * pVariables)) * sizeof(short));
   hInd = (scmon)Alloc((1 + pVariables) * sizeof(short));
   mc = hisModule;
-  if (!mc)
+  if (mc==0)
   {
     hrad = hexist;
     hNrad = hNexist;
@@ -232,14 +232,14 @@ intvec * scIndIntvec(ideal S, ideal Q)
   hCo = pVariables + 1;
   loop
   {
-    if (mc)
+    if (mc!=0)
       hComp(hexist, hNexist, mc, hrad, &hNrad);
-    if (hNrad)
+    if (hNrad!=0)
     {
       hNvar = pVariables;
       hRadical(hrad, &hNrad, hNvar);
       hSupp(hrad, hNrad, hvar, &hNvar);
-      if (hNvar)
+      if (hNvar!=0)
       {
         memset(hpure, 0, (pVariables + 1) * sizeof(short));
         hPure(hrad, 0, &hNrad, hvar, hNvar, hpure, &hNpure);
@@ -300,7 +300,7 @@ static void hIndep(scmon pure)
   intvec *Set;
 
   Set = ISet->set = new intvec(pVariables);
-  for (iv=pVariables; iv; iv--)
+  for (iv=pVariables; iv!=0 ; iv--)
   {
     if (pure[iv])
       (*Set)[iv-1] = 0;
@@ -322,12 +322,12 @@ static void hIndMult(scmon pure, int Npure, scfmon rad, int Nrad,
     dn = Npure + Nrad;
     if (dn == hCo)
     {
-      if (!Nrad)
+      if (Nrad==0)
         hIndep(pure);
       else
       {
         pn = *rad;
-        for (iv = Nvar; iv; iv--)
+        for (iv = Nvar; iv!=0; iv--)
         {
           x = var[iv];
           if (pn[x])
@@ -1362,7 +1362,7 @@ static ideal scIdKbase()
     p = pNext(q);
     pNext(q) = NULL;
     q = p;
-  } while (q);
+  } while (q!=NULL);
   return res;
 }
 
@@ -1377,7 +1377,7 @@ extern ideal scKBase(int deg, ideal s, ideal Q)
     if (di != 0)
     {
       Werror("KBase not finite");
-      return idInit(1,0);
+      return idInit(1,1);
     }
   }
   stcmem = hCreate(pVariables - 1);
@@ -1419,11 +1419,13 @@ ende:
   hKill(stcmem, pVariables - 1);
   pDelete1(&p);
   if (p == NULL)
-    return idInit(1,0);
+    return idInit(1,s->rank);
   else
   {
     last = p;
-    return scIdKbase();
+    ideal res=scIdKbase();
+    res->rank=s->rank;
+    return res;
   }
 }
 

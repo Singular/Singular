@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.5 1997-07-29 13:07:44 siebert Exp $ */
+/* $Id: syz.cc,v 1.6 1997-10-19 11:34:27 Singular Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -88,7 +88,7 @@ static void syDeleteAbove(ideal up, int k)
 static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
                       tHomog h=isNotHomog)
 {
-  ideal deg0;
+  ideal deg0=NULL;
   poly Unit1,Unit2,actWith;
   int len,i,j,ModComp,m,k,l;
   BOOLEAN searchUnit,existsUnit;
@@ -102,22 +102,22 @@ static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
     syz=deg0;
   }
 /*--cancels empty entees and their related components above--*/
-    j = IDELEMS(syz);
-    while ((j>0) && (!syz->m[j-1])) j--;
-    k = 0;
-    while (k<j)
+  j = IDELEMS(syz);
+  while ((j>0) && (!syz->m[j-1])) j--;
+  k = 0;
+  while (k<j)
+  {
+    if (syz->m[k]!=NULL)
+      k++;
+    else
     {
-      if (syz->m[k]!=NULL)
-        k++;
-      else
-      {
-        if (TEST_OPT_PROT) Print(".");
-        for (l=k;l<j-1;l++) syz->m[l] = syz->m[l+1];
-        syz->m[j-1] = NULL;
-        syDeleteAbove(up,k);
-        j--;
-      }
+      if (TEST_OPT_PROT) Print(".");
+      for (l=k;l<j-1;l++) syz->m[l] = syz->m[l+1];
+      syz->m[j-1] = NULL;
+      syDeleteAbove(up,k);
+      j--;
     }
+  }
 /*--searches for syzygies coming from superfluous elements
 * in the module below--*/
   searchUnit = TRUE;
@@ -212,7 +212,8 @@ static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
   if (TEST_OPT_PROT) Print("\n");
   idSkipZeroes(mod);
   idSkipZeroes(syz);
-  if (final) idDelete(&deg0);
+  if (deg0!=NULL)
+    idDelete(&deg0);
 }
 
 void syMinimizeResolvente(resolvente res, int length, int first)

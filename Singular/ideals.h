@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.3 1997-04-09 12:19:44 Singular Exp $ */
+/* $Id: ideals.h,v 1.4 1997-10-19 11:34:26 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -12,14 +12,17 @@
 #ifdef MDEBUG
 ideal idDBInit (int size, int rank, char *f, int l);
 #define idInit(A,B) idDBInit(A,B,__FILE__,__LINE__)
+void idDBDelete (ideal* h, char *f, int l);
+#define idDelete(A) idDBDelete(A,__FILE__,__LINE__)
 #else
 ideal idInit (int size, int rank=1);
+  /*- creates an ideal -*/
+void idDelete (ideal* h);
+  /*- deletes an ideal -*/
 #endif
   /*- initialise an ideal -*/
 ideal idMaxIdeal (int deg);
   /*- initialise the maximal ideal (at 0) -*/
-void idDelete (ideal* h);
-  /*- deletes an ideal -*/
 void idSkipZeroes (ideal ide);
   /*gives an ideal the minimal possible size*/
 void idNorm(ideal id);
