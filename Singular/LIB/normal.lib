@@ -5,14 +5,14 @@
 // written by Gert-Martin Greuel and Gerhard Pfister
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: normal.lib,v 1.15 1999-07-06 11:33:04 obachman Exp $";
+version="$Id: normal.lib,v 1.16 1999-07-06 15:32:54 Singular Exp $";
 info="
 LIBRARY: normal.lib     PROCEDURES FOR NORMALIZATION
 
 PROCEDURES:
  normal(I);             computes the normalization of basering/I
  extraweight(R);        intvec of variable weights of ring R
- HomJJ(L);              presentation of End_R(J) as affine ring, L a list      
+ HomJJ(L);              presentation of End_R(J) as affine ring, L a list
 ";
 
 LIB "sing.lib";
@@ -175,7 +175,7 @@ EXAMPLE: example HomJJ;  shows an example
    int isIso,isPr,isCo,isRe,isEq,ii,jj,q,y;
    intvec rw,rw1;
    list L;
-   
+
    y = printlevel-voice+2;  // y=printlevel (default: y=0)
  def P = basering;
    ideal SBid, id, J = Li[1], Li[2], Li[3];
@@ -218,17 +218,17 @@ EXAMPLE: example HomJJ;  shows an example
 
 //---------- computation of p*Hom(J,J) as R-ideal -----------------------------
    if ( y>=1 )
-   { 
+   {
      "// compute p*Hom(rad(J),rad(J)) = p*J:J, p a non-zerodivisor";
      "//   p is equal to:"; "";
      p;
-     ""; 
+     "";
    }
 
    f  = quotient(p*J,J);
    if ( y>=1 )
    { "// the module p*Hom(rad(J),rad(J)) = p*J:J, p a non-zerodivisor";
-      
+
       "// p"; p;
       "// f=p*J:J";f;
    }
@@ -299,7 +299,7 @@ EXAMPLE: example HomJJ;  shows an example
          "   ";
          endphi;
          "   ";
-         pause;
+         pause();
          newline;
       }
       setring P;
@@ -308,7 +308,7 @@ EXAMPLE: example HomJJ;  shows an example
    if(y>=1)
    {
       "// R is not equal to Hom(rad(J),rad(J)), we have to try again";
-      pause;
+      pause();
       newline;
    }
 //---------- Hom(J,j) != R: create new ring and map form old ring -------------
@@ -378,7 +378,7 @@ EXAMPLE: example HomJJ;  shows an example
       "//   the quadratic relations";
       "   ";
       interred(Quad);
-      pause;
+      pause();
       newline;
    }
    Q = Lin+Quad;
@@ -433,7 +433,7 @@ EXAMPLE: example HomJJ;  shows an example
       "   ";
       endphi;
       "   ";
-      pause;
+      pause();
       newline;
    }
    L = lastRing;
@@ -462,7 +462,7 @@ proc normal(ideal id, list #)
          if choose=1 the factorizing Buchberger algorithm is not used
          (which is sometimes more efficient)
 RETURN:  a list of rings (say nor), in each ring nor[i] are two ideals
-         norid, normap such that the product of the nor[i]/norid is the 
+         norid, normap such that the product of the nor[i]/norid is the
          normalization of basering/id and normap is the map from basering/id
          to nor[i]/norid
 NOTE:    to use the i-th ring type: def R=nor[i]; setring R;
@@ -552,7 +552,7 @@ EXAMPLE: example normal; shows an example
 
       result = normalizationPrimes(prim[1],maxideal(1));
       sr = string(size(result));
-      
+
       dbprint(y+1,"
 // 'normal' created a list of "+sr+" ring(s).
 // To see the rings, type (if the name of your list is nor):
@@ -623,11 +623,11 @@ EXAMPLE: example normal; shows an example
       sr = string(size(result));
 
       dbprint(y+1,"
-// 'normal' created a list of "+sr+" ring(s). 
+// 'normal' created a list of "+sr+" ring(s).
 // To see the rings, type (if the name of your list is nor):
-     show( nor);                  
+     show( nor);
 // To access the 1-st ring and map (and similair for the others), type:
-     def R = nor[1]; setring R;  norid; normap; 
+     def R = nor[1]; setring R;  norid; normap;
 // R/norid is the 1-st ring of the normalization and
 // normap the map from the original basering to R/norid");
 
@@ -660,14 +660,14 @@ EXAMPLE: example normalizationPrimes; shows an example
 "
 {
    int y = printlevel-voice+2;  // y=printlevel (default: y=0)
-  
+
    if(y>=1)
    {
      "";
      "// START a normalization loop with the ideal";  "";
      i;  "";
      basering;  "";
-     pause;
+     pause();
      newline;
    }
 

@@ -1,7 +1,7 @@
-// $Id: standard.lib,v 1.35 1999-07-06 11:33:15 obachman Exp $
+// $Id: standard.lib,v 1.36 1999-07-06 15:32:59 Singular Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.35 1999-07-06 11:33:15 obachman Exp $";
+version="$Id: standard.lib,v 1.36 1999-07-06 15:32:59 Singular Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
@@ -16,6 +16,7 @@ PROCEDURES:
  sprintf(fmt,...)     returns fomatted string
  fprintf(link,fmt,..) writes formatted string to link
  printf(fmt,...)      displays formatted string
+ pause([prompt])      pause in the computation till user input
 ";
 
 //////////////////////////////////////////////////////////////////////////////
@@ -397,8 +398,7 @@ EXAMPLE: example groebner; shows an example"
   return (i);
 }
 example
-{
-  "EXAMPLE: "; echo = 2;
+{ "EXAMPLE: "; echo = 2;
   ring r = 0, (a,b,c,d), lp;
   option(prot);
   ideal i = a+b+c+d, ab+ad+bc+cd, abc+abd+acd+bcd, abcd-1; // cyclic 4
@@ -815,7 +815,7 @@ EXAMPLE : example sprintf; shows an example
   }
 }
 example
-{
+{ "EXAMPLE:"; echo=2;
   ring r=0,(x,y,z),dp;
   module m=[1,y],[0,x+z];
   intmat M=betti(mres(m,0));
@@ -854,7 +854,7 @@ EXAMPLE : example printf; shows an example
   write("", sprintf(fmt, #));
 }
 example
-{
+{ "EXAMPLE:"; echo=2;
   ring r=0,(x,y,z),dp;
   module m=[1,y],[0,x+z];
   intmat M=betti(mres(m,0));
@@ -894,7 +894,7 @@ EXAMPLE : example fprintf; shows an example
   write(l, sprintf(fmt, #));
 }
 example
-{
+{ "EXAMPLE:"; echo=2;
   ring r=0,(x,y,z),dp;
   module m=[1,y],[0,x+z];
   intmat M=betti(mres(m,0));
@@ -907,6 +907,27 @@ example
   fprintf(li, "%p", list(l));
   fprintf(li, "%;", list(l));
   fprintf(li, "%b", M);
+}
+
+
+proc pause(list #)
+"USAGE:    pause([ prompt ])  prompt string
+RETURN:   none
+PURPOSE: pause in the computation till user input
+EXAMPLE : example pause; shows an example
+"
+{
+  string pr="pause>";
+  if (size(#)!=0)
+  {
+    pr=#[1];
+  }
+  pr=read("",pr);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  pause("press <return> to continue");
+  pause();
 }
 
 

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.28 1999-04-17 14:58:46 obachman Exp $ */
+/* $Id: febase.h,v 1.29 1999-07-06 15:32:44 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -105,7 +105,6 @@ char*   feGetInfoProgram();
 char*   feGetInfoFile();
 
 FILE *  feFopen(char *path, char *mode, char *where=NULL, int useWerror=FALSE);
-void    fePause(void);
 #ifndef __MWERKS__
 #ifdef HAVE_TCL
 

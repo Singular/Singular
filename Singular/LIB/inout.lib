@@ -1,9 +1,9 @@
-// $Id: inout.lib,v 1.8 1999-07-06 11:32:58 obachman Exp $
+// $Id: inout.lib,v 1.9 1999-07-06 15:32:49 Singular Exp $
 // system("random",787422842);
 // (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: inout.lib,v 1.8 1999-07-06 11:32:58 obachman Exp $";
+version="$Id: inout.lib,v 1.9 1999-07-06 15:32:49 Singular Exp $";
 info="
 LIBRARY:  inout.lib     PROCEDURES FOR MANIPULATING IN- AND OUTPUT
 
@@ -36,8 +36,8 @@ EXAMPLE: example allprint; shows an example
    {
       int i;
       for( i=1; i<=size(#); i=i+1 ) { print(#[i]); }
-      if( ALLprint==2 ) { pause; listvar(matrix); }
-      if( ALLprint >0 ) { pause; }
+      if( ALLprint==2 ) { pause(); listvar(matrix); }
+      if( ALLprint >0 ) { pause(); }
    }
    return();
 }
@@ -402,7 +402,7 @@ EXAMPLE: example show; shows an example
          else
          {
             "["+string(@ii)+"]:";
-            tab(@li@+2),"//",id[@ii]; 
+            tab(@li@+2),"//",id[@ii];
          }
       }
       short=@short@; return();

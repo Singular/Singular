@@ -1,8 +1,8 @@
-// $Id: deform.lib,v 1.15 1999-07-06 11:32:46 obachman Exp $
+// $Id: deform.lib,v 1.16 1999-07-06 15:32:46 Singular Exp $
 // author: Bernd Martin email: martin@math.tu-cottbus.de
 //(bm, last modified 4/98)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: deform.lib,v 1.15 1999-07-06 11:32:46 obachman Exp $";
+version="$Id: deform.lib,v 1.16 1999-07-06 15:32:46 Singular Exp $";
 info="
 LIBRARY:  deform.lib       PROCEDURES FOR COMPUTING MINIVERSAL DEFORMATION
 
@@ -563,7 +563,8 @@ Sub-procedure: kills exported rings of 'versal' and
   if (defined(`br`)) { kill `br`;}
   br = my+"Sx";
   if (defined(`br`)) { kill `br`}
-  if(system("with","Namespaces")) { 
+  if(system("with","Namespaces"))
+  {
     br = my+"Qx";
     if (defined(Top::`br`)) { kill Top::`br`;}
     br = my+"Ox";

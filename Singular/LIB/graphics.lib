@@ -1,9 +1,9 @@
-// $Id: graphics.lib,v 1.3 1999-07-06 11:32:55 obachman Exp $
+// $Id: graphics.lib,v 1.4 1999-07-06 15:32:47 Singular Exp $
 //
 // author : Christian Gorzel email: gorzelc@math.uni-muenster.de
 //
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: graphics.lib,v 1.3 1999-07-06 11:32:55 obachman Exp $";
+version="$Id: graphics.lib,v 1.4 1999-07-06 15:32:47 Singular Exp $";
 info="
 LIBRARY: graphics.lib    PROCEDURES FOR GRAPHICS WITH MATHEMATICA
 
@@ -135,15 +135,15 @@ static proc endstr(string filename)
   }
 
  if (i>0)
- { suffix = filename[i,size(filename)-i+1]; 
+ { suffix = filename[i,size(filename)-i+1];
    name = ">" + filename[1,i-1]+ ".m";
  }
  else { print("--Error: Suffix of filename incorrect"); return("");}
 // if (suffix ==".m") { cmd = "Display[\" " + filename + "\",% ]";}
- if (suffix ==".mps") { cmd = "Display[\" " + filename + "\",%] ";} 
- if (suffix ==".ps") { cmd = "Display[\" ! psfix > " + filename + "\", %]";} 
- if (suffix ==".eps") 
-                { cmd = "Display[\" ! psfix -epsf > " + filename + "\", %]";} 
+ if (suffix ==".mps") { cmd = "Display[\" " + filename + "\",%] ";}
+ if (suffix ==".ps") { cmd = "Display[\" ! psfix > " + filename + "\", %]";}
+ if (suffix ==".eps")
+                { cmd = "Display[\" ! psfix -epsf > " + filename + "\", %]";}
 
  }
  return(newline + cmd);
@@ -346,8 +346,7 @@ example
  // Paste the output into a Mathematica notebook
  // active evalutation of the cell with SHIFT RETURN
 
- // Hit RETURN to continue
- pause;
+ pause("Hit RETURN to continue");
    // --------- space curves --------------
    I(1) = x3,-1/10x3+x2,x2;
    I(2) = x2,-x2+2,-2x2-x+1; "";
@@ -356,8 +355,7 @@ example
  // Paste the output into a Mathematica notebook
  // active evalutation of the cell with SHIFT RETURN
 
- // Hit RETURN to continue
- pause;
+ pause("Hit RETURN to continue");
    // --------- implicit curves ------------
    ring rr = 0,(x,y),ds;  export rr;
    // implicit curves
@@ -386,8 +384,7 @@ example
  // Paste the output into a Mathematica notebook
  // active evalutation of the cell with SHIFT RETURN
 
- // Hit RETURN to continue
- pause;
+ pause("Hit RETURN to continue");
    // ----------- surfaces -------------------
    ideal J(1) = 3xy4 + 2xy2, x5y3 + x + y6,10x2;
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.73 1999-05-01 15:30:44 obachman Exp $ */
+/* $Id: febase.cc,v 1.74 1999-07-06 15:32:43 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -988,7 +988,8 @@ void mwrite(uchar c)
     if (lines == pagelength)
     {
       lines = 0;
-      fePause();
+      fputs("pause>\n",stderr);
+      uchar c = fgetc(stdin);
     }
     else
     {
@@ -1022,12 +1023,12 @@ static void SPrintS(char* s)
   if (s == NULL) return;
   int ls = strlen(s);
   if (ls == 0) return;
-  
+
   char* ns;
   int l = strlen(sprint);
   ns = (char*) AllocL((l + ls + 1)*sizeof(char));
   if (l > 0) strcpy(ns, sprint);
-  
+
   strcpy(&(ns[l]), s);
   FreeL(sprint);
   sprint = ns;
@@ -1051,10 +1052,10 @@ void PrintS(char *s)
     SPrintS(s);
     return;
   }
-  
+
   if (feOut) /* do not print when option --no-out was given */
   {
-    
+
 #ifdef macintosh
     char c;
     while ('\0' != (c = *s++))
@@ -1100,7 +1101,7 @@ void Print(char *fmt, ...)
       int l = strlen(sprint);
       ns = (char*) AllocL(sizeof(char)*(ls + l + 256));
       if (l > 0)  strcpy(ns, sprint);
-                
+
 #ifdef HAVE_VSNPRINTF
       l = vsnprintf(&(ns[l]), ls+255, fmt, ap);
       assume(l != -1);
@@ -1159,26 +1160,6 @@ void Print(char *fmt, ...)
 }
 
 /* end extern "C" */
-}
-
-void fePause()
-{
-#ifdef HAVE_TCL
-  if(!tclmode)
-#endif
-  {
-    mflush();
-#ifndef macintosh
-    fputs("pause>",stderr);
-#else
-    fputs("pause>\n",stderr);
-#endif
-    uchar c = fgetc(stdin);
-    if (((c == '\003') || (c == 'C')) || (c == 'c'))
-    {
-      m2_end(4);
-    }
-  }
 }
 
 void monitor(char* s, int mode)

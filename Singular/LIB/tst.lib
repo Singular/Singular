@@ -1,8 +1,8 @@
-// $Id: tst.lib,v 1.13 1999-07-06 11:33:17 obachman Exp $
+// $Id: tst.lib,v 1.14 1999-07-06 15:33:00 Singular Exp $
 //(obachman, last modified 6/30/98)
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: tst.lib,v 1.13 1999-07-06 11:33:17 obachman Exp $";
+version="$Id: tst.lib,v 1.14 1999-07-06 15:33:00 Singular Exp $";
 info="
 LIBRARY:  tst.lib      PROCEDURES FOR RUNNING AUTOMATIC TST TESTS
 
@@ -12,9 +12,9 @@ PROCEDURES:
                                    prepending prefix \"// tst_ignore:\"
  tst_init()             writes some identification data to GetTstStatusFile()
  tst_status([any])      writes status info to to GetTstStatusFile()
- tst_groebnerTest(ideal i)  
-                        tests groebner command 
- tst_stdEqual(ideal i1, ideal i2) 
+ tst_groebnerTest(ideal i)
+                        tests groebner command
+ tst_stdEqual(ideal i1, ideal i2)
                         test whether two std's are \"equal\"
 ";
 
@@ -48,10 +48,10 @@ example
 proc tst_ignore(list #)
 "USAGE:    tst_ignore(any,[keyword], [link])
             any     -- valid argument to string()
-            keyword -- an arbitrary string 
+            keyword -- an arbitrary string
             link    -- a link which can be written to
 RETURN:   none; writes string(any) to link (or stdout, if no link given),
-          prepending prefix \"// tst_ignore:\", or 
+          prepending prefix \"// tst_ignore:\", or
                             \"// tst_ignore:keyword hostname:\",
                             if keyword was given.
           Should be used in tst files to output system dependent data
@@ -163,31 +163,31 @@ static proc GetTstStatusFile()
   {
     return ("tst_status.out");
   }
-  else 
+  else
   {
     return (tst_status_file);
   }
 }
-  
+
 static proc tst_status_out (def prefix, def what, list #)
 {
   string outstring;
-  
+
   outstring = string(prefix) + " >> " + string(what);
   if (size(#) > 0)
   {
-    outstring = outstring + " :: " + 
+    outstring = outstring + " :: " +
       tst_system("hostname", 1) + ":" + string(#[1]);
   }
   write(":a " + GetTstStatusFile(), outstring);
 }
-  
+
 proc tst_status (list #)
 "USAGE:   tst_status([any])
 RETURN:   none; writes to stdout the current memory usage and used time
-          since last call to tst_status(), if no argument is given, or, 
+          since last call to tst_status(), if no argument is given, or,
           since start-up of Singular, if an argument is given.
-NOTE:     Should be used regularly within tst files to enable automatic 
+NOTE:     Should be used regularly within tst files to enable automatic
           tracking of memory and time performance.
 EXAMPLE: example tst_status; shows example
 "
@@ -203,7 +203,7 @@ EXAMPLE: example tst_status; shows example
     {
       tst_status_counter++;
     }
-  
+
     tst_status_out(tst_status_counter, "tst_memory_0", memory(0));
     tst_status_out(tst_status_counter, "tst_memory_1", memory(1));
     tst_status_out(tst_status_counter, "tst_memory_2", memory(2));
@@ -229,7 +229,7 @@ example
   tst_status(1);
 }
 
-  
+
 proc tst_init()
 "USAGE:   tst_init()
 RETURN:  none; writes some identification data to stdout;
@@ -262,11 +262,11 @@ proc tst_groebnerTest(ideal i, list #)
 RETURN: 1, if groebner command produced \"equal\" std as std command
         0, otherwise
         Two std's are \"equal\" here, if their redSB's are element-wise equal,
-        and if they reduce each other to zero, and if their leading ideals 
+        and if they reduce each other to zero, and if their leading ideals
         are equal
         On success, times of std - groebner is written with tst_ignore, and
-        times are added to global variables tst_std_time and 
-        tst_groebner_time. If v given, and <= 0, short ideal 
+        times are added to global variables tst_std_time and
+        tst_groebner_time. If v given, and <= 0, short ideal
         characteristic is printed, if v > 0, ideals are printed.
         On failure, Error message and ideals are printed.
 EXAMPLE: example tst_groebner; shows an example
@@ -275,7 +275,7 @@ EXAMPLE: example tst_groebner; shows an example
   int st = timer;
   ideal si = std(i);
   st = timer - st;
-  
+
   int gt = timer;
   ideal gi = groebner(i);
   gt = timer - gt;
@@ -321,16 +321,16 @@ example
   tst_groebnerTest(i, 1);
 }
 
-  
+
 //
 // A routine which test for equality of "std-bases"
-// 
+//
 proc tst_stdEqual(ideal i1, ideal i2)
 "USAGE: tst_stdEqual(i1, i2)  ideal i1, i2
 RETURN 1, if i1 \"equald\" i2 as a std bases
        0, otherwise
        Two std's are \"equal\" here, if their redSB's are element-wise equal,
-       and if they reduce each other to zero, and if their leading ideals 
+       and if they reduce each other to zero, and if their leading ideals
        are equal
        On failure, error message is printed.
 EXAMPLE: example tst_stdEqual; shows an example
@@ -340,10 +340,10 @@ EXAMPLE: example tst_stdEqual; shows an example
   int back;
   intvec opts = option(get);
   option(redSB);
-  
+
   ideal ri1 = simplify(interred(i1), 1);
   ideal ri2 = simplify(interred(i2), 1);
-  
+
   option(set, opts);
 
   if (size(ri1) != size(ri2))
@@ -371,10 +371,10 @@ EXAMPLE: example tst_stdEqual; shows an example
     if (size(reduce(i2, i1, 1)) == 0)
     {
       poly p1, p2;
-      
+
       ideal si1 = simplify(i1, 7);
       ideal si2 = simplify(i2, 7);
-      
+
       if (size(si1) == size(si2))
       {
         for (i=1; i<=size(si1); i++)
@@ -431,6 +431,6 @@ static proc idPrintShort(ideal id, string name)
   }
 }
 
-  
+
 
 

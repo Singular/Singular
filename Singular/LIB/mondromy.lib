@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: mondromy.lib,v 1.6 1999-07-06 11:33:02 obachman Exp $";
+version="$Id: mondromy.lib,v 1.7 1999-07-06 15:32:53 Singular Exp $";
 info="
 LIBRARY: mondromy.lib  PROCEDURES TO COMPUTE THE MONODROMY OF A SINGULARITY
 AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
@@ -109,7 +109,7 @@ static proc mdivp(matrix m,poly p)
       m[i,j]=m[i,j]/p;
     }
   }
-  return(m);  
+  return(m);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -188,7 +188,7 @@ ASSUME:  U is a square matrix with non zero determinant.
 RETURN:  The procedure returns a list with at most 2 entries.
          If U is not a sqaure matrix, the list is empty.
          If U is a sqaure matrix, then the first entry is the determinant of U.
-         If U is a square matrix and the determinant of U not zero, 
+         If U is a square matrix and the determinant of U not zero,
          then the second entry is the adjoint matrix of U.
 DISPLAY: The procedure displays comments if printlevel>=1.
 EXAMPLE: example detadj; shows an example.
@@ -245,9 +245,9 @@ example
 
 proc jacoblift(poly f)
 "USAGE:   jacoblift(f); f poly
-ASSUME:  The polynomial f in a series ring (local ordering) defines 
+ASSUME:  The polynomial f in a series ring (local ordering) defines
          an isolated hypersurface singularity.
-RETURN:  The procedure returns a list with entries kappa, xi, u of type 
+RETURN:  The procedure returns a list with entries kappa, xi, u of type
          int, vector, poly such that kappa is minimal with f^kappa in jacob(f),
          u is a unit, and u*f^kappa=(matrix(jacob(f))*xi)[1,1].
 DISPLAY: The procedure displays comments if printlevel>=1.
@@ -404,7 +404,7 @@ static proc nablaK(poly f,int kappa,vector xi,poly u,int N,int prevN,
   int i,j;
   for(i=1;i<=size(e);i++)
   {
-    for(j,p=nvars(basering),0;j>=1;j--) 
+    for(j,p=nvars(basering),0;j>=1;j--)
     {
       q=jet(e[i]*xi[j],N);
       if(q!=0)
@@ -806,19 +806,19 @@ static proc qhmonodromy(poly f,intvec w)
 
 proc monodromy(poly f, list #)
 "USAGE:   monodromy(f[,opt]); f poly, opt int
-ASSUME:  The polynomial f in a series ring (local ordering) defines 
+ASSUME:  The polynomial f in a series ring (local ordering) defines
          an isolated hypersurface singularity.
-RETURN:  The procedure returns a residue matrix M of the meromorphic 
-         Gauss-Manin connection of the singularity defined by f 
-         or an empty matrix if the assumptions are not fulfilled. 
-         If opt=0 (default), exp(2*pi*i*M) is a monodromy matrix of f, 
-         else, only the characteristic polynomial of exp(2*pi*i*M) coincides 
+RETURN:  The procedure returns a residue matrix M of the meromorphic
+         Gauss-Manin connection of the singularity defined by f
+         or an empty matrix if the assumptions are not fulfilled.
+         If opt=0 (default), exp(2*pi*i*M) is a monodromy matrix of f,
+         else, only the characteristic polynomial of exp(2*pi*i*M) coincides
          with the characteristic polynomial of the monodromy of f.
-THEORY:  The procedure uses an algorithm by Brieskorn (See E. Brieskorn, 
-         manuscipta math. 2 (1970), 103-161) to compute a connection matrix of 
-         the meromorphic Gauss-Manin connection up to arbitrarily high order, 
-         and an algorithm of Gerard and Levelt (See R. Gerard, A.H.M. Levelt, 
-         Ann. Inst. Fourier, Grenoble 23,1 (1973), pp. 157-195) to transform 
+THEORY:  The procedure uses an algorithm by Brieskorn (See E. Brieskorn,
+         manuscipta math. 2 (1970), 103-161) to compute a connection matrix of
+         the meromorphic Gauss-Manin connection up to arbitrarily high order,
+         and an algorithm of Gerard and Levelt (See R. Gerard, A.H.M. Levelt,
+         Ann. Inst. Fourier, Grenoble 23,1 (1973), pp. 157-195) to transform
          it to a simple pole.
 DISPLAY: The procedure displays more comments for higher printlevel.
 EXAMPLE: example monodromy; shows an example.
@@ -836,7 +836,7 @@ EXAMPLE: example monodromy; shows an example.
       print("\\second parameter no int");
       return();
     }
-   
+
   }
 
   dbprint(printlevel-voice+2,"//basering="+string(basering));
@@ -917,7 +917,7 @@ example
 
 proc H''basis(poly f)
 "USAGE:   H''basis(f); f poly
-ASSUME:  The polynomial f in a series ring (local ordering) defines 
+ASSUME:  The polynomial f in a series ring (local ordering) defines
          an isolated hypersurface singularity.
 RETURN:  The procedure returns a list of representatives of a C{f}-basis of the
          Brieskorn lattice H''=Omega^(n+1)/df^dOmega^(n-1).

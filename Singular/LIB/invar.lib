@@ -1,4 +1,4 @@
-// $Id: invar.lib,v 1.8 1999-07-06 11:32:59 obachman Exp $
+// $Id: invar.lib,v 1.9 1999-07-06 15:32:50 Singular Exp $
 ///////////////////////////////////////////////////////
 // invar.lib
 // algorithm for computing the ring of invariants under
@@ -6,7 +6,7 @@
 // written by Gerhard Pfister
 //////////////////////////////////////////////////////
 
-version="$Id: invar.lib,v 1.8 1999-07-06 11:32:59 obachman Exp $";
+version="$Id: invar.lib,v 1.9 1999-07-06 15:32:50 Singular Exp $";
 info="
 LIBRARY: invar.lib PROCEDURES FOR COMPUTING INVARIANTS OF (C,+)-ACTIONS
 
@@ -489,7 +489,6 @@ EXAMPLE: example furtherInvar; shows an example
      "the local invariants:";
      "                     ";
      karl;
-    // pause;
      "                     ";
   }
   // computation of further invariants
@@ -528,7 +527,6 @@ EXAMPLE: example furtherInvar; shows an example
        it;
        "                                  ";
        karl;
-      // pause;
        "                                  ";
     }
     if((bou>0) && (size(k1)>0))

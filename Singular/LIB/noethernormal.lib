@@ -1,8 +1,8 @@
-// $Id: noethernormal.lib,v 1.2 1999-07-06 11:33:03 obachman Exp $
+// $Id: noethernormal.lib,v 1.3 1999-07-06 15:32:53 Singular Exp $
 //(GP, last modified 15.08.98)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: noethernormal.lib,v 1.2 1999-07-06 11:33:03 obachman Exp $";
+version="$Id: noethernormal.lib,v 1.3 1999-07-06 15:32:53 Singular Exp $";
 info="
 LIBRARY:  noetherNormal.lib    PROCEDURE FOR NOETHERNORMALIZATION
 PROCEDURES:
@@ -61,7 +61,7 @@ example
 proc finitenessTest(ideal i)
 {
    intvec v,w;
-   int j;   
+   int j;
    for(j=1;j<=size(i);j++)
    {
       w=leadexp(i[j]);
@@ -94,22 +94,22 @@ proc mapIsFinite(R, map phi, ideal I)
          I an ideal in the basering
 RETURN:  1 if R---->basering/I is finite and 0 else
 EXAMPLE: mapIsFinite; shows an example
-"  
+"
 {
   int n=nvars(R);
   def S=basering;
-  
+
   setring R;
   ideal jj=maxideal(1);
   setring S;
   ideal jj=phi(jj);
-  
+
   def T=S+R;
-  setring T;  
+  setring T;
   changeord("@rr","lp");
 //  ideal j=imap(S,phi(jj));
   ideal j=imap(S,jj);
-  
+
   int i;
   for(i=1;i<=nvars(S);i++)
   {
@@ -127,6 +127,6 @@ example
    ring s=0,(x,y,z),dp;
    ideal i= xy;
    map phi=r,(xy)^3+x2+z,y2-1,z3;
-   
+
    mapIsFinite(r,phi,i);
 }

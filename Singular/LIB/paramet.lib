@@ -1,17 +1,17 @@
-// $Id: paramet.lib,v 1.4 1999-07-06 11:33:06 obachman Exp $
+// $Id: paramet.lib,v 1.5 1999-07-06 15:32:55 Singular Exp $
 // author : Thomas Keilen email: keilen@mathematik.uni-kl.de
 // last change:           07.08.98
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: paramet.lib,v 1.4 1999-07-06 11:33:06 obachman Exp $";
+version="$Id: paramet.lib,v 1.5 1999-07-06 15:32:55 Singular Exp $";
 info="
-LIBRARY:  paramet.lib   PROCEDURES FOR PARAMETRIZATION OF PRIMARY 
+LIBRARY:  paramet.lib   PROCEDURES FOR PARAMETRIZATION OF PRIMARY
                         DECOMPOSITION, ETC.
 
 PROCEDURES:
- parametrize(I);       parametrizes a prime ideal if possible via the 
+ parametrize(I);       parametrizes a prime ideal if possible via the
                        normalization
- parametrizepd(I);     calculates the primary decomp. and parametrizes 
+ parametrizepd(I);     calculates the primary decomp. and parametrizes
                        the components
  parametrizesing(f);   parametrize an isolated plane curve singularity
 ";
@@ -24,13 +24,13 @@ LIB "hnoether.lib";
 
 proc parametrize(ideal I)
 "USAGE:  parametrize(); I ideal in an arbitrary number of variables,
-         whose radical is prime, in a ring with global ordering  
+         whose radical is prime, in a ring with global ordering
 RETURN:  a list containing the parametrization ideal resp. the original ideal,
          the number of variables needed for the parametrization resp. 0, and
-         1 resp. 0 depending on whether the parametrization was successful 
+         1 resp. 0 depending on whether the parametrization was successful
          or not
 NOTE:    if successful, the basering is changed to the parametrization ring;
-         the result will be incorrect, if the parametrization needs more than 
+         the result will be incorrect, if the parametrization needs more than
          two variables
 EXAMPLE: example parametrize; shows an example
 "
@@ -42,7 +42,7 @@ EXAMPLE: example parametrize; shows an example
  {
    list nor=normal(newI);
    def N=nor[1];
-   ring PR=0,(s,t),dp;    
+   ring PR=0,(s,t),dp;
    setring N;
    // If the ideal is zero dimensional, the procedure works as well in good cases.
    if ((size(norid)==0) or (d==0))
@@ -52,7 +52,7 @@ EXAMPLE: example parametrize; shows an example
      map p=N,(s,t);
      ideal para=p(normap);
      export para;
-     // The i-th list component contains the parametrization, the 
+     // The i-th list component contains the parametrization, the
      // number of necessary variables, and the information, if
      // the parametrization was successful.
      list param=para,d,1;
@@ -65,7 +65,7 @@ EXAMPLE: example parametrize; shows an example
      export(PR);
      keepring(PR);
    }
-   else 
+   else
    {
      list param=I,0,0;
    }
@@ -78,7 +78,7 @@ EXAMPLE: example parametrize; shows an example
  return(param);
 }
 example
-{ "EXAMPLE:";echo = 2; 
+{ "EXAMPLE:";echo = 2;
   ring RING=0,(x,y,z),dp;
   ideal I=z2-y2x2+x3;
   parametrize(I);
@@ -93,7 +93,7 @@ RETURN:  a list of lists, where each entry contains the parametrization
          of a primary component of I resp. 0, the number of variables
          resp. 0, and 1 resp. 0 depending on whether the parametrization
          of the component was successful or not
-NOTE:    the basering will be changed to PR=0,(s,t),dp          
+NOTE:    the basering will be changed to PR=0,(s,t),dp
          the result will be incorrect, if the parametrization needs more than two
          variables
 EXAMPLE: example parametrizepd; shows an example
@@ -107,12 +107,12 @@ EXAMPLE: example parametrizepd; shows an example
  primary=primdecGTZ(I);
  for (int ii=1; ii<=size(primary); ii=ii+1)
    {
-     no=normal(std(primary[ii][2]));     
+     no=normal(std(primary[ii][2]));
      nor[ii]=no[1];
      def N=nor[ii];
      setring N;
      int d=dim(std(norid));
-     // Test if the normalization is K, K[s] or K[s,t]. Then give back the parametrization. 
+     // Test if the normalization is K, K[s] or K[s,t]. Then give back the parametrization.
      if (size(norid)==0)
      {
        setring PR;
@@ -130,7 +130,7 @@ EXAMPLE: example parametrizepd; shows an example
        kill inter;
        setring BAS;
      }
-     else 
+     else
      {
        setring PR;
        list inter=0,0,0;
@@ -140,13 +140,13 @@ EXAMPLE: example parametrizepd; shows an example
      }
    }
  export nor;
- setring PR; 
+ setring PR;
  export PR;
  keepring PR;
  return(param);
 }
 example
-{ "EXAMPLE:";echo = 2; 
+{ "EXAMPLE:";echo = 2;
   ring RING=0,(x,y,z),dp;
   ideal I=(x2-y2z2+z3)*(x2-z2-z3),(x2-y2z2+z3)*yz;
   parametrizepd(I);
@@ -159,7 +159,7 @@ example
 proc parametrizesing(poly f)
 "USAGE:  parametrizesing(); f a polynomial in two variables with ordering ls or ds
 RETURN:  a list containing the parametrizations of the different branches of the
-         singularity at the origin resp. 0, if f was not of the desired kind  
+         singularity at the origin resp. 0, if f was not of the desired kind
 NOTE:    if successful, the basering is changed to ring 0,(x,y),ls;
 EXAMPLE: example parametrizesing; shows an example
 "
@@ -184,7 +184,7 @@ EXAMPLE: example parametrizesing; shows an example
   return(para);
 }
 example
-{ "EXAMPLE:";echo = 2; 
+{ "EXAMPLE:";echo = 2;
   ring RING=0,(x,y),ls;
   poly f=(x^2-y^3)*(x^2-y^2-y^3);
   parametrizesing(f);
@@ -264,7 +264,7 @@ parametrize(i);
 
 /// Examples for parametrizepd
 
-/// Example 1  
+/// Example 1
 ring r=0,(x,y,z),dp;
 ideal i=y2z5-x2y2z2+y2z4-z6-z5+x4-x2z2,-y3z3+yz4+x2yz;
 parametrizepd(i);

@@ -1,9 +1,9 @@
-// $Id: surf.lib,v 1.4 1999-07-06 11:33:16 obachman Exp $
+// $Id: surf.lib,v 1.5 1999-07-06 15:33:00 Singular Exp $
 //
 // author : Hans Schoenemann
 //
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surf.lib,v 1.4 1999-07-06 11:33:16 obachman Exp $";
+version="$Id: surf.lib,v 1.5 1999-07-06 15:33:00 Singular Exp $";
 info="
 LIBRARY: surf.lib    PROCEDURES FOR GRAPHICS WITH SURF (by Stephan Endrass)
 
@@ -32,7 +32,7 @@ static proc num_of_vars(ideal I)
 proc  plot(ideal I)
 "USAGE:   plot(I);  I ideal
 RETURN:
-NOTE: 
+NOTE:
 EXAMPLE: example plot; shows an example
 "
 {
@@ -102,19 +102,19 @@ example
    ideal I = x1^3 - x2^2;
    plot(I);
    ideal J = x1^2-x1-x2^3;
-   plot(J); 
+   plot(J);
 
    ring rr1 = 0,(x,y,z),dp;
    ideal I(1) = 2x2-1/2x3 +1-y+1;
    plot(I(1));
-   ideal I(2) = x3-x-y; 
+   ideal I(2) = x3-x-y;
    plot(I(2));
 
   //  ---- Singular Logo --------------
   poly logo = ((x+3)^3 + 2*(x+3)^2 - y^2)*(x^3 - y^2)*((x-3)^3-2*(x-3)^2-y^2);
   plot(logo);
 
- 
+
    // --------- implicit curves ------------
    // implicit curves
    ideal I(1) = y,-x2;
@@ -131,7 +131,7 @@ example
    // adjust the plotregion properly to get a good picture
 
    poly f = (x-y)*(x2+y);
-   plot(f,1); 
+   plot(f,1);
    ideal J = jacob(f);
    J;
    plot(J);     // bad resolution
@@ -144,7 +144,7 @@ example
 
    ideal J(2) = x^2*y^2+x^2*z^2+y^2*z^2-17*x*y*z;
    plot(J(2));
-  
+
   plot(x*(x2-y2)+z2);
 
   // E7

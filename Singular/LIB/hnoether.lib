@@ -1,10 +1,10 @@
-// $Id: hnoether.lib,v 1.11 1999-07-06 11:32:56 obachman Exp $
+// $Id: hnoether.lib,v 1.12 1999-07-06 15:32:48 Singular Exp $
 // author:  Martin Lamm,  email: lamm@mathematik.uni-kl.de
 // last change:           09.03.99
 ///////////////////////////////////////////////////////////////////////////////
 // This library is for Singular 1.2 or newer
 
-version="$Id: hnoether.lib,v 1.11 1999-07-06 11:32:56 obachman Exp $";
+version="$Id: hnoether.lib,v 1.12 1999-07-06 15:32:48 Singular Exp $";
 info="
 LIBRARY:  hnoether.lib   PROCEDURES FOR THE HAMBURGER-NOETHER DEVELOPMENT
 
@@ -539,7 +539,7 @@ EXAMPLES: example develop; shows an example
       if (test_sqr != f) {
        "The given polynomial is in fact not squarefree.";
        "I'll continue with the radical.";
-       pause;
+       pause("Hit RETURN to continue");
        f=test_sqr;
       }
       else {"everything is ok -- the polynomial is squarefree in char(k)=0";}
@@ -579,7 +579,7 @@ EXAMPLES: example develop; shows an example
     if (p != 0)
      {"But if the polynomial contains a factor of the form g^"+string(p)+",";
       "this factor will be lost.";}
-    pause;
+    pause("Hit RETURN to continue");
     f=test_sqr;
     nm = getnm(f);              // N,M haben sich veraendert
     N = nm[1]; M = nm[2];       // Berechne Schnittpunkte Newtonpoly mit Achsen
@@ -761,7 +761,8 @@ example
   // z(3) = -z(4)^2 + 0*z(4)^3 +...+ 0*z(4)^8 + ?*z(4)^9 + ...
   //   (the missing x in the matrix indicates that this line is not complete.
   //    It can only occur in the last line of the HNE, and normally does.)
-  hne[2]; pause;
+  hne[2];
+  pause("Hit RETURN to continue");
   param(hne);
   // returns the parametrization x(t)= -t14+O(t21), y(t)= -3t98+O(t105)
   // (the term -t109 in y may have a wrong coefficient)
@@ -869,7 +870,7 @@ example
  list hne=develop(f);
  list hne_extended1=develop(f,6);
  list hne_extended2=develop(f,10);
- pause;
+ pause("Hit RETURN to continue");
                                    //   compare the different matrices ...
  print(hne[1]);
  print(hne_extended1[1]);
@@ -1958,13 +1959,15 @@ example
   ring exring=0,(x,y),dp;
   list hne=reddevelop(x14-3y2x11-y3x10-y2x9+3y4x8+y5x7+3y4x6+x5*(-y6+y5)-3y6x3-y7x2+y8);
   print(hne[1][1]); // finite HNE
-  print(extdevelop(hne[1],5)[1]); pause;
+  print(extdevelop(hne[1],5)[1]);
+  pause("Hit RETURN to continue");
   print(hne[2][1]); // HNE that can be extended
   list ehne=extdevelop(hne[2],5);
   print(ehne[1]); // new HN-matrix has 5 columns
   param(hne[2]);
   param(ehne);
-  param(extdevelop(ehne,7)); pause;
+  param(extdevelop(ehne,7));
+  pause("Hit RETURN to continue");
   //////////////////////////
   print(develop(x-y2-2y3-3y4)[1]);
   print(extdevelop(develop(x-y2-2y3-3y4),4)[1]);
@@ -2418,7 +2421,7 @@ example
   param(hne[2]);
   displayInvariants(hne);
   kill HNEring,r;
-  pause;
+  pause("Hit RETURN to continue");
   // a more interesting example:
   ring r = 32003,(x,y),dp;
   poly f = x25+x24-4x23-1x22y+4x22+8x21y-2x21-12x20y-4x19y2+4x20+10x19y+12x18y2
@@ -3075,7 +3078,8 @@ EXAMPLE: example extrafactor;  shows an example
       if (defined(testpol)==0) { poly testpol=1; }
       if (testpol!=0) {
         "factorize not implemented in char (0,a)!";
-        "could not factorize:",charPoly(leitf,M,N); pause;
+        "could not factorize:",charPoly(leitf,M,N);
+        pause("Hit RETURN to continue");
       }
  return(faktoren,(testpol==0)); // Test: faktoren==list() geht leider nicht
 }

@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.37 1999-07-06 11:33:09 obachman Exp $
+// $Id: primdec.lib,v 1.38 1999-07-06 15:32:56 Singular Exp $
 ////////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                                //
 // algorithms for primary decomposition based on                              //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                             //
 ////////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.37 1999-07-06 11:33:09 obachman Exp $";
+version="$Id: primdec.lib,v 1.38 1999-07-06 15:32:56 Singular Exp $";
 info="
 LIBRARY: primdec.lib PROCEDURE FOR PRIMARY DECOMPOSITION
 
@@ -263,11 +263,11 @@ proc testFactor(list act,poly p)
 
       act;
       keep;
-      pause;
+      pause();
 
       p;
       q;
-      pause;
+      pause();
    }
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -1624,7 +1624,7 @@ EXAMPLE: example minAssPrimes; shows an example
      for(j=1;j<=size(@pr);j++)
      {
 //@pr[j];
-//pause;
+//pause();
         @res[j]=decomp(@pr[j],2);
 //       @res[j]=decomp(@pr[j],2,@pr[j],ser);
 //       for(k=1;k<=size(@res[j]);k++)
