@@ -31,7 +31,7 @@ static void usage(char *progname)
   printf("   -h                    : print this message\n");
   exit(1);
 }
- 
+
 static char* lib_file = NULL;
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
@@ -69,17 +69,17 @@ void main_init(int argc, char *argv[])
     }
   }
   if (texinfo_out || category_out) lpverbose = 0;
-    
+
   if(lib_file!=NULL) {
     yylpin = fopen( lib_file, "rb" );
-    if (! (texinfo_out || category_out)) 
+    if (! (texinfo_out || category_out))
       printf("Checking library '%s'\n", lib_file);
     else if (! category_out)
       printf("$library = \"%s\";\n", lib_file);
   } else {
     while(argc>fe_optind && yylpin==NULL) {
       yylpin = fopen( argv[fe_optind], "rb" );
-      if(yylpin!=NULL) 
+      if(yylpin!=NULL)
       {
         lib_file = argv[fe_optind];
         if (! (texinfo_out || category_out) )
@@ -154,9 +154,9 @@ static void PrintOut(FILE *fd, int pos_start, int pos_end)
 {
   if (pos_start <= 0 || pos_end - pos_start <= 4) return;
   char c = 0;
-  
+
   fseek(fd, pos_start, SEEK_SET);
-  while (pos_start++ <= pos_end) 
+  while (pos_start++ <= pos_end)
   {
     if (c == '\\')
     {
@@ -179,7 +179,7 @@ void printpi(procinfov pi)
   /* pi->libname is badly broken -- use file, instead */
   FILE *fp = fopen( lib_file, "rb");
 
-  if (fp == NULL) 
+  if (fp == NULL)
   {
     printf("Can not open %s\n", lib_file);
     return;
@@ -231,7 +231,7 @@ void printpi(procinfov pi)
         printf("*** found proc within procedure '%s'.\n", pi->procname);
     }
   }
-  
+
   if (fp != NULL) fclose(fp);
 
 #if 0

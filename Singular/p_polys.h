@@ -3,11 +3,11 @@
 ****************************************/
 /***************************************************************
  *  File:    p_Polys.h
- *  Purpose: declaration of poly stuf which are independent of 
+ *  Purpose: declaration of poly stuf which are independent of
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: p_polys.h,v 1.19 2000-12-31 15:14:40 obachman Exp $
+ *  Version: $Id: p_polys.h,v 1.20 2001-10-09 16:36:17 Singular Exp $
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
@@ -23,10 +23,10 @@
           - implemented in: pInline2.h
           - debugging only if PDEBUG >= 2
           - normally inlined, unless PDEBUG >= 2 || NO_INLINE2
- Level 1: operations on monomials with time proportional to length 
+ Level 1: operations on monomials with time proportional to length
           - implemented in: pInline1.h
           - debugging only if PDEBUG >= 1
-          - normally inlined, unless PDEBUG >= 1 || NO_INLINE1 
+          - normally inlined, unless PDEBUG >= 1 || NO_INLINE1
  Level 0: short operations on polynomials with time proportional to
           length of poly
           - implemented in pInline0.cc
@@ -34,7 +34,7 @@
           - normally _not_ inlined: can be forced with
             #define DO_PINLINE0
             #include "pInline0.h"
- Misc   : operations on polynomials which do not fit in any of the 
+ Misc   : operations on polynomials which do not fit in any of the
           above categories
           - implemented in: polys*.cc
           - never inlined
@@ -65,7 +65,7 @@
 // deletes old p->coef and sets new one
 PINLINE2 number p_SetCoeff(poly p, number n, ring r);
 
-// get Order 
+// get Order
 PINLINE2 Order_t p_GetOrder(poly p, ring r);
 // don't use this
 PINLINE2 Order_t p_SetOrder(poly p, long order, ring r);
@@ -91,7 +91,7 @@ PINLINE2 Exponent_t p_GetExpDiff(poly p1, poly p2, int i, ring r);
 
 /***************************************************************
  *
- * Allocation/Initalization/Deletion 
+ * Allocation/Initalization/Deletion
  * except for pDeleteLm and pHead, all polys must be != NULL
  *
  ***************************************************************/
@@ -157,10 +157,10 @@ PINLINE1 int p_LmCmp(poly p, poly q, ring r);
 // returns: (p2==NULL ? 1 : (p1 == NULL ? -1 : p_LmCmp(p1, p2)))
 PINLINE2 int p_Cmp(poly p1, poly p2, ring r);
 
-  
+
 /***************************************************************
  *
- * Divisiblity tests, args must be != NULL, except for 
+ * Divisiblity tests, args must be != NULL, except for
  * pDivisbleBy
  *
  ***************************************************************/
@@ -168,7 +168,7 @@ PINLINE1 BOOLEAN p_DivisibleBy(poly a, poly b, ring r);
 PINLINE1 BOOLEAN p_LmDivisibleBy(poly a, poly b, ring r);
 PINLINE1 BOOLEAN p_LmDivisibleByNoComp(poly a, poly b, ring r);
 unsigned long p_GetShortExpVector(poly a, ring r);
-PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a, 
+PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a,
                                       poly b, unsigned long not_sev_b, ring r);
 
 PINLINE1 BOOLEAN p_DivisibleBy(poly a, ring r_a, poly b, ring r_b);
@@ -182,7 +182,7 @@ PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a, ring r_a,
  *
  ***************************************************************/
 // test if the monomial is a constant as a vector component
-// i.e., test if all exponents are zero 
+// i.e., test if all exponents are zero
 PINLINE1 BOOLEAN p_LmIsConstantComp(const poly p, const ring r);
 PINLINE1 BOOLEAN p_LmIsConstant(const poly p, const ring r);
 
@@ -281,13 +281,13 @@ PINLINE2 poly p_Add_q(poly p, poly q, int &lp, int lq, const ring r);
 PINLINE2 poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, const ring r);
 // like p_Minus_mm_Mult_qq, except that if lp == pLength(lp) lq == pLength(lq)
 // then lp == pLength(p -m*q)
-PINLINE2 poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq, 
+PINLINE2 poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
                                  poly spNoether, const ring r);
 // returns p + m*q destroys p, const: q, m
 PINLINE2 poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, const ring r);
 
 // returns p + m*q destroys p, const: q, m
-PINLINE2 poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq, 
+PINLINE2 poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
                                 const ring r);
 
 // returns p*q, destroys p and q
@@ -401,7 +401,7 @@ BOOLEAN pHaveCommonMonoms(poly p, poly q);
 
 // check if Lm(p) is from ring r
 BOOLEAN p_LmCheckIsFromRing(poly p, ring r);
-// check if Lm(p) != NULL, r != NULL and initialized && Lm(p) is from r 
+// check if Lm(p) != NULL, r != NULL and initialized && Lm(p) is from r
 BOOLEAN p_LmCheckPolyRing(poly p, ring r);
 // check if all monoms of p are from ring r
 BOOLEAN p_CheckIsFromRing(poly p, ring r);

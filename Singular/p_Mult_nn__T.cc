@@ -6,7 +6,7 @@
  *  Purpose: template for p_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Mult_nn__T.cc,v 1.2 2001-08-27 14:47:26 Singular Exp $
+ *  Version: $Id: p_Mult_nn__T.cc,v 1.3 2001-10-09 16:36:15 Singular Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -20,7 +20,7 @@ LINKAGE poly p_Mult_nn(poly p, const number n, const ring r)
 {
   pAssume(!n_IsZero(n,r));
   p_Test(p, r);
-  
+
   poly q = p;
   while (p != NULL)
   {

@@ -1,19 +1,19 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: prCopyTemplate.cc,v 1.5 2000-12-07 15:42:30 obachman Exp $ */
+/* $Id: prCopyTemplate.cc,v 1.6 2001-10-09 16:36:20 Singular Exp $ */
 /*
 * ABSTRACT - templates for pr routines
 */
 
 
-static poly PR_NAME 
+static poly PR_NAME
 (poly &src, ring r_src, ring r_dest)
 {
   spolyrec dest_s;
   poly dest = &dest_s;
   poly tmp;
-  PR_INIT_EVECTOR_COPY(r_src, r_dest); 
+  PR_INIT_EVECTOR_COPY(r_src, r_dest);
 
   while (src != NULL)
   {
@@ -31,5 +31,3 @@ static poly PR_NAME
   p_Test(dest, r_dest);
   return dest;
 }
-
-    

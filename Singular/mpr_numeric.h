@@ -4,7 +4,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_numeric.h,v 1.5 1999-12-02 23:03:52 wenk Exp $ */
+/* $Id: mpr_numeric.h,v 1.6 2001-10-09 16:36:11 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff
@@ -17,7 +17,7 @@
 #include "mpr_complex.h"
 
 // define polish mode when finding roots
-#define PM_NONE    0 
+#define PM_NONE    0
 #define PM_POLISH  1
 #define PM_CORRUPT 2
 //<-
@@ -175,17 +175,17 @@ private:
 class simplex
 {
 public:
-  
+
   int m;         // number of constraints, make sure m == m1 + m2 + m3 !!
   int n;         // # of independent variables
   int m1,m2,m3;  // constraints <=, >= and ==
-  int icase;     // == 0: finite solution found; 
+  int icase;     // == 0: finite solution found;
                  // == +1 objective funtion unbound; == -1: no solution
-  int *izrov,*iposv;    
+  int *izrov,*iposv;
 
   mprfloat **LiPM; // the matrix (of size [m+2, n+1])
 
-  /** #rows should be >= m+2, #cols >= n+1 
+  /** #rows should be >= m+2, #cols >= n+1
    */
   simplex( int rows, int cols );
   ~simplex();

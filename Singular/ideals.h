@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.34 2001-03-05 16:41:48 mschulze Exp $ */
+/* $Id: ideals.h,v 1.35 2001-10-09 16:36:02 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -59,7 +59,7 @@ ideal idMult (ideal h1,ideal h2);
 BOOLEAN idIs0 (ideal h);
 
 long idRankFreeModule(ideal m, ring lmRing, ring tailRing);
-inline long idRankFreeModule(ideal m, ring r = currRing) 
+inline long idRankFreeModule(ideal m, ring r = currRing)
 {return idRankFreeModule(m, r, r);}
 
 BOOLEAN idHomIdeal (ideal id, ideal Q=NULL);

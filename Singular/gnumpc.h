@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.h,v 1.10 2001-03-22 19:11:00 Singular Exp $ */
+/* $Id: gnumpc.h,v 1.11 2001-10-09 16:36:00 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 */
@@ -47,4 +47,4 @@ nMapFunc  ngcSetMap(ring src, ring dst);
 // local Variables: ***
 // folded-file: t ***
 // compile-command: "make installg" ***
-// End: *** 
+// End: ***

@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.9 2001-02-28 11:54:49 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.10 2001-10-09 16:36:02 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -80,13 +80,13 @@ poly  nc_p_Mult_mm(poly p, const poly m, const ring r)
   const Exponent_t expM=p_GetComp(m,r);
   Exponent_t expP=0;
   Exponent_t expOut=0;
-  
+
   while (p!=NULL)
   {
     v=p_Head(p,r);
     p_Test(v,r);
     p_Test(p,r);
-    
+
     expP=p_GetComp(v,r);
     if (expP==0)
     {
@@ -97,7 +97,7 @@ poly  nc_p_Mult_mm(poly p, const poly m, const ring r)
       else
       {
         expOut=expM;
-      }      
+      }
     }
     else
     {
@@ -112,7 +112,7 @@ poly  nc_p_Mult_mm(poly p, const poly m, const ring r)
         expOut=NULL;
       }
     }
-    
+
     p_GetExpV(v,P,r);
     cP=p_GetCoeff(v,r);
     v= nc_mm_Mult_nn(P,M,r);
@@ -154,13 +154,13 @@ poly nc_mm_Mult_p(const poly m, poly p, const ring r)
   const Exponent_t expM=p_GetComp(m,r);
   Exponent_t expP=0;
   Exponent_t expOut=0;
-  
+
   while (p!=NULL)
   {
     v=p_Head(p,r);
     p_Test(v,r);
     p_Test(p,r);
-    
+
     expP=p_GetComp(v,r);
     if (expP==0)
     {
@@ -171,7 +171,7 @@ poly nc_mm_Mult_p(const poly m, poly p, const ring r)
       else
       {
         expOut=expM;
-      }      
+      }
     }
     else
     {
@@ -185,7 +185,7 @@ poly nc_mm_Mult_p(const poly m, poly p, const ring r)
         expOut=NULL;
       }
     }
-    
+
     p_GetExpV(v,P,r);
     cP=p_GetCoeff(v,r);
     v= nc_mm_Mult_nn(M,P,r);
@@ -221,7 +221,7 @@ poly nc_mm_Mult_nn(Exponent_t *F0, Exponent_t *G0, const ring r)
   }
   F[0]=0;
   G[0]=0;
-  
+
   iF=r->N;
   while ((F[iF]==0)&&(iF>=1)) iF--; /* last exp_num of F */
   jG=1;
@@ -236,7 +236,7 @@ poly nc_mm_Mult_nn(Exponent_t *F0, Exponent_t *G0, const ring r)
     for (i=1;i<=r->N;i++)
     {
       F[i]=F[i]+G[i];
-    }  
+    }
     p_SetExpV(out,F,r);
     p_Setm(out,r);
     freeT(F,r->N);
@@ -247,13 +247,13 @@ poly nc_mm_Mult_nn(Exponent_t *F0, Exponent_t *G0, const ring r)
   if (iG==jG)
 // g is univariate monomial
   {
-//    if (ri->nc->type==nc_skew) -- postpone to TU   
+//    if (ri->nc->type==nc_skew) -- postpone to TU
     out=nc_mm_Mult_uu(F,jG,G[jG],r);
     freeT(F,r->N);
     freeT(G,r->N);
     return(out);
   }
-  
+
   number n1=n_Init(1,r);
   Exponent_t *Prv=(Exponent_t *)omAlloc0(ExpSize);
   Exponent_t *Nxt=(Exponent_t *)omAlloc0(ExpSize);
@@ -330,7 +330,7 @@ poly nc_mm_Mult_nn(Exponent_t *F0, Exponent_t *G0, const ring r)
        p_SetExpV(Pn,On,r);
        p_Setm(Pn,r);
        p_Test(Pn,r);
-       
+
 //       if (pNext(D)==0)
 // is D a monomial? could be postponed higher
 //       {
@@ -338,7 +338,7 @@ poly nc_mm_Mult_nn(Exponent_t *F0, Exponent_t *G0, const ring r)
 //       }
 //       else
 //       {
-       Rout=nc_p_Mult_mm(D,Pn,r); 
+       Rout=nc_p_Mult_mm(D,Pn,r);
 //       }
      }
      else
@@ -346,7 +346,7 @@ poly nc_mm_Mult_nn(Exponent_t *F0, Exponent_t *G0, const ring r)
        Rout=D;
        D=NULL;
      }
-     
+
      if (Rout!=NULL)
      {
        Rout=p_Mult_nn(Rout,c[cnt-1],r); /* Rest is ready */
@@ -394,7 +394,7 @@ poly nc_mm_Mult_uu(Exponent_t *F,int jG,int bG, const ring r)
   poly out=NULL;
   int i;
   number num=NULL;
-  
+
   int iF=r->N;
   while ((F[iF]==0)&&(iF>0)) iF-- ;   /* last exponent_num of F */
 
@@ -425,7 +425,7 @@ poly nc_mm_Mult_uu(Exponent_t *F,int jG,int bG, const ring r)
 //   num=NULL;
    return(out);
   }
-  
+
   Exponent_t *Prv=(Exponent_t*)omAlloc0((r->N+1)*sizeof(Exponent_t));
   Exponent_t *Nxt=(Exponent_t*)omAlloc0((r->N+1)*sizeof(Exponent_t));
   int *lF=(int *)omAlloc0((r->N+1)*sizeof(int));
@@ -517,7 +517,7 @@ poly nc_mm_Mult_uu(Exponent_t *F,int jG,int bG, const ring r)
      {
        kk=lF[cnt+1];
        On[kk]=F[kk];
-       
+
        Pn=pOne();
        p_SetExpV(Pn,On,r);
        p_Setm(Pn,r);
@@ -561,7 +561,7 @@ poly nc_mm_Mult_uu(Exponent_t *F,int jG,int bG, const ring r)
 
 /* leadterm and Prv-part with coef 1 */
 //  U[0]=exp;
-  
+
 //  U[jG]=U[jG]+bG;  /* make leadterm */
 // ??????????? we have done it already :-0
   Rout=pOne();
@@ -586,27 +586,27 @@ poly nc_mm_Mult_uu(Exponent_t *F,int jG,int bG, const ring r)
   return (out);
 }
 
-//----------pMultUU--------- 
+//----------pMultUU---------
 poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
 {
   poly out=NULL;
   number tmp_number=NULL;
-  
-//Now check zero exeptions, commutativity and should we do something at all?  
+
+//Now check zero exeptions, commutativity and should we do something at all?
   out=pOne();
   p_SetExp(out,j,b,r);
   p_SetExp(out,i,a,r);
   if (i==j) p_SetExp(out,j,a+b,r);
   p_Setm(out,r);
   if ((a==0)||(b==0)||(i<=j)) return(out);//zero exeptions and usual case
-  
+
   if (MATELEM(r->nc->COM,j,i)!=NULL)
 //commutative or quasicommutative case
   {
     if (r->cf->nIsOne(p_GetCoeff(MATELEM(r->nc->COM,j,i),r))) //commutative case
     {
       return(out);
-    }     
+    }
     else
     {
       tmp_number=p_GetCoeff(MATELEM(r->nc->COM,j,i),r); //quasicommutative case
@@ -628,22 +628,22 @@ poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
     out=p_Copy(MATELEM(cMT,a,b),r);
     return (out);
   }
-  
-//  poly C=MATELEM(r->nc->C,j,i);               
-//  number c=p_GetCoeff(C,r); //coeff           
+
+//  poly C=MATELEM(r->nc->C,j,i);
+//  number c=p_GetCoeff(C,r); //coeff
 //  p_Delete(&C,r);
-      
+
   int newcMTsize=0;
   int k,m;
   p_Delete(&out,r);//Shura thinks it is nesessary
 
-  
+
   if (a>=b) {newcMTsize=a;} else {newcMTsize=b;}
   if (newcMTsize>cMTsize)
   {
      newcMTsize = newcMTsize+cMTsize;
      matrix tmp = mpNew(newcMTsize,newcMTsize);
-     
+
      for (k=1;k<r->N;k++)
      {
         for (m=1;m<=r->N;m++)
@@ -661,7 +661,7 @@ poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
 
   poly x=pOne();p_SetExp(x,j,1,r);p_Setm(x,r);//var(j);
   poly y=pOne();p_SetExp(y,i,1,r);p_Setm(y,r);//var(i);  for convenience
-  
+
   poly t=NULL;
 /* ------------ Main Cycles ----------------------------*/
 
@@ -678,7 +678,7 @@ poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
      }
      t=NULL;
   }
-  
+
   for (m=2;m<=b;m++)
   {
      t=MATELEM(cMT,a,m);
@@ -761,7 +761,7 @@ poly nc_spGSpolyCreate(poly p1, poly p2,poly spNoether, const ring r)
 {
   int i=0;
   int nv=r->N;
-  
+
   Exponent_t *A1=(Exponent_t *)omAlloc0((r->N+1)*sizeof(Exponent_t));
   Exponent_t *A2=(Exponent_t *)omAlloc0((r->N+1)*sizeof(Exponent_t));
   Exponent_t *G=(Exponent_t *)omAlloc0((r->N+1)*sizeof(Exponent_t));

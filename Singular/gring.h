@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.7 2001-02-28 11:54:49 levandov Exp $ */
+/* $Id: gring.h,v 1.8 2001-10-09 16:36:02 Singular Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -19,7 +19,7 @@ poly nc_p_Mult_mm(poly p, poly m, const ring r);
 poly nc_p_Minus_mm_Mult_qq(poly p, const poly m, poly q, const ring r);
 // other routines we need in addition :
 poly nc_mm_Mult_p(const poly m, poly p, const ring r);
-poly nc_mm_Mult_nn (Exponent_t *F, Exponent_t *G, const ring r); 
+poly nc_mm_Mult_nn (Exponent_t *F, Exponent_t *G, const ring r);
 poly nc_mm_Mult_uu (Exponent_t *F,int jG,int bG, const ring r);
 poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r);
 poly _nc_p_Mult_q(poly p, poly q, const int copy, const ring r);

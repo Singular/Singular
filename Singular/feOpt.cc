@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.cc,v 1.18 2001-09-19 09:49:37 Singular Exp $ */
+/* $Id: feOpt.cc,v 1.19 2001-10-09 16:35:58 Singular Exp $ */
 /*
 * ABSTRACT: Implementation of option buisness
 */
@@ -66,7 +66,7 @@ struct fe_option feOptSpec[] =
 #else
   {"xterm",         required_argument,      LONG_OPTION_RETURN,
    "XTERM",     "Use XTERM as terminal program to run Singular",          feOptString, 0,   0},
-#endif  
+#endif
 
   {"singular",          required_argument,  LONG_OPTION_RETURN,
    "PROG",      "Start PROG as Singular program within emacs",         feOptString, 0,   0},
@@ -183,7 +183,7 @@ main()
   fd = fopen("feOptES.inc", "w");
 #elif defined(TSINGULAR)
   fd = fopen("feOptTS.inc", "w");
-#else  
+#else
   fd = fopen("feOpt.inc", "w");
 #endif
 
@@ -374,7 +374,7 @@ static char* feOptAction(feOptIndex opt)
           sdb_flags = 1;
         else
           sdb_flags = 0;
-      #endif	  
+      #endif	
         return NULL;
 
       case FE_OPT_VERSION:

@@ -6,13 +6,13 @@
  *  Purpose: template for p_Delete
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Delete__T.cc,v 1.2 2001-08-27 14:47:23 Singular Exp $
+ *  Version: $Id: p_Delete__T.cc,v 1.3 2001-10-09 16:36:13 Singular Exp $
  *******************************************************************/
 
 LINKAGE void p_Delete(poly* pp, const ring r)
 {
   poly p = *pp;
-  
+
   while (p != NULL)
   {
     n_Delete(&(p->coef), r);

@@ -6,14 +6,14 @@
  *  Purpose: template for p_ShallowCopyDelete
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_ShallowCopyDelete__T.cc,v 1.2 2001-08-27 14:47:29 Singular Exp $
+ *  Version: $Id: p_ShallowCopyDelete__T.cc,v 1.3 2001-10-09 16:36:17 Singular Exp $
  *******************************************************************/
 
 /***************************************************************
  *
  * Destroys: p
- * Assumes:  Monoms of p are from 
- * Returns: 
+ * Assumes:  Monoms of p are from
+ * Returns:
  ***************************************************************/
 LINKAGE poly p_ShallowCopyDelete(poly s_p, const ring r, omBin d_bin)
 {
@@ -21,7 +21,7 @@ LINKAGE poly p_ShallowCopyDelete(poly s_p, const ring r, omBin d_bin)
   poly d_p = &dp;
   unsigned long* s_e;
   poly h;
-  
+
   DECLARE_LENGTH(const unsigned long length = r->ExpL_Size);
 
   while (s_p != NULL)

@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmzero.cc,v 1.33 2001-01-09 15:40:06 Singular Exp $
+// $Id: fglmzero.cc,v 1.34 2001-10-09 16:36:00 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -660,7 +660,7 @@ CalculateFunctionals( const ideal & theIdeal, idealFunctionals & l,
     internalCalculateFunctionals( theIdeal, l, data );
     //    STICKYPROT("Calculating vector rep\n");
     v = data.getVectorRep( p );
-    // if ( v.isZero() ) 
+    // if ( v.isZero() )
     //   STICKYPROT("vectorrep is 0\n");
     return ( data.state() );
 }
@@ -1019,7 +1019,7 @@ GroebnerViaFunctionals( const idealFunctionals & l,
       // STICKYPROT("initv is not zero\n");
       initv = iv;
     }
-      
+
     poly one = pOne();
     data.updateCandidates( one, initv );
     number nOne = nInit( 1 );

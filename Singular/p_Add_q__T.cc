@@ -6,15 +6,15 @@
  *  Purpose: template for p_Add_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Add_q__T.cc,v 1.2 2001-08-27 14:47:21 Singular Exp $
+ *  Version: $Id: p_Add_q__T.cc,v 1.3 2001-10-09 16:36:13 Singular Exp $
  *******************************************************************/
 
 /***************************************************************
  *
- * Returns:  p + q, 
+ * Returns:  p + q,
  *           Shorter, where Shorter == Length(p) + Length(q) - Length(p+q);
  * Destroys: p, q
- * 
+ *
  ***************************************************************/
 LINKAGE poly p_Add_q(poly p, poly q, int &Shorter, const ring r)
 {
@@ -23,12 +23,12 @@ LINKAGE poly p_Add_q(poly p, poly q, int &Shorter, const ring r)
 #if PDEBUG > 0
   int l = pLength(p) + pLength(q);
 #endif
-  
+
   // test for trivial cases
   Shorter = 0;
   if (q == NULL) return p;
   if (p == NULL) return q;
-  
+
   number t, n1, n2;
   int shorter = 0;
   spolyrec rp;
@@ -46,7 +46,7 @@ LINKAGE poly p_Add_q(poly p, poly q, int &Shorter, const ring r)
   n_Delete(&n1, r);
   n_Delete(&n2, r);
   q = p_LmFreeAndNext(q, r);
-  
+
   if (n_IsZero(t, r))
   {
     shorter += 2;
@@ -63,19 +63,19 @@ LINKAGE poly p_Add_q(poly p, poly q, int &Shorter, const ring r)
   if (p==NULL) { pNext(a) = q; goto Finish;}
   if (q==NULL) { pNext(a) = p; goto Finish;}
   goto Top;
-     
+
   Greater:
   a = pNext(a) = p;
   pIter(p);
   if (p==NULL) { pNext(a) = q; goto Finish;}
   goto Top;
-    
+
   Smaller:
   a = pNext(a) = q;
   pIter(q);
   if (q==NULL) { pNext(a) = p; goto Finish;}
   goto Top;
-  
+
 
   Finish:
   Shorter = shorter;
@@ -83,7 +83,7 @@ LINKAGE poly p_Add_q(poly p, poly q, int &Shorter, const ring r)
   p_Test(pNext(&rp), r);
 #if PDEBUG > 0
   pAssume1(l - pLength(pNext(&rp)) == Shorter);
-#endif  
+#endif
   return pNext(&rp);
 }
 

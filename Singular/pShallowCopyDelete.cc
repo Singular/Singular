@@ -6,7 +6,7 @@
  *  Purpose: implementation of pShallowCopyDelete routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pShallowCopyDelete.cc,v 1.3 2000-10-26 16:31:37 obachman Exp $
+ *  Version: $Id: pShallowCopyDelete.cc,v 1.4 2001-10-09 16:36:12 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "p_polys.h"
@@ -26,13 +26,13 @@ poly pShallowCopyDelete_General(poly s_p, ring s_r, ring d_r, omBin d_bin)
   poly d_p = &dp;
   int N = d_r->N;
   int i;
-  
+
 
   while (s_p != NULL)
   {
     d_p->next = p_Init(d_r, d_bin);
     pIter(d_p);
-    
+
     pSetCoeff0(d_p, pGetCoeff(s_p));
     for (i=1; i<= N; i++)
       p_SetExp(d_p, i, p_GetExp(s_p, i, s_r), d_r);
@@ -40,7 +40,7 @@ poly pShallowCopyDelete_General(poly s_p, ring s_r, ring d_r, omBin d_bin)
     if (rRing_has_Comp(d_r))
       p_SetComp(d_p, p_GetComp(s_p, s_r), d_r);
     p_Setm(d_p, d_r);
-    
+
     s_p = p_LmFreeAndNext(s_p, s_r);
   }
   pNext(d_p) = NULL;
@@ -52,8 +52,3 @@ pShallowCopyDeleteProc pGetShallowCopyDeleteProc(ring source_r, ring dest_r)
 {
   return pShallowCopyDelete_General;
 }
-
-
-  
-  
-  

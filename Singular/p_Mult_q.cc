@@ -6,13 +6,13 @@
  *  Purpose: multiplication of polynomials
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Mult_q.cc,v 1.7 2000-12-31 15:14:38 obachman Exp $
+ *  Version: $Id: p_Mult_q.cc,v 1.8 2001-10-09 16:36:15 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 
 /***************************************************************
  *
- * Returns:  p * q, 
+ * Returns:  p * q,
  * Destroys: if !copy then p, q
  * Assumes: pLength(p) >= 2 pLength(q) >=2
  ***************************************************************/
@@ -26,7 +26,7 @@
 BOOLEAN pqLength(poly p, poly q, int &lp, int &lq, const int min)
 {
   int l = 0;
-  
+
   do
   {
     if (p == NULL)
@@ -61,9 +61,9 @@ BOOLEAN pqLength(poly p, poly q, int &lp, int &lq, const int min)
   while (1);
 }
 
-      
-static poly _p_Mult_q_Bucket(poly p, const int lp, 
-                             poly q, const int lq, 
+
+static poly _p_Mult_q_Bucket(poly p, const int lp,
+                             poly q, const int lq,
                              const int copy, const ring r)
 {
   assume(p != NULL && pNext(p) != NULL && q != NULL && pNext(q) != NULL);
@@ -79,9 +79,9 @@ static poly _p_Mult_q_Bucket(poly p, const int lp,
   poly rr = res;                    // last monom which is surely not NULL
   poly rn = pNext(res);             // pNext(rr)
   number n, n1;
-  
+
   kBucket_pt bucket = kBucketCreate(r);
-  
+
   // initialize bucket
   kBucketInit(bucket, pNext(rn), lp - 2);
   pNext(rn) = NULL;
@@ -90,14 +90,14 @@ static poly _p_Mult_q_Bucket(poly p, const int lp,
   Top:
   if (rn == NULL) goto Smaller;
   p_LmCmpAction(rn, qn, r, goto Equal, goto Greater, goto Smaller);
-  
+
   Greater:
   // rn > qn, so iter
   rr = rn;
   pNext(rn) = kBucketExtractLm(bucket);
   pIter(rn);
   goto Top;
-  
+
   // rn < qn, append qn to rr, and compute next Lm(qq)*pp
   Smaller:
   pNext(rr) = qn;
@@ -116,12 +116,12 @@ static poly _p_Mult_q_Bucket(poly p, const int lp,
     kBucket_Plus_mm_Mult_pp(bucket, qq, pp, lp - 1);
     pNext(rr) = kBucketExtractLm(bucket);
   }
-  
+
   pIter(qq);
   if (qq == NULL) goto Finish;
   rn = pNext(rr);
   goto Top;
-  
+
   Equal:
   n1 = pGetCoeff(rn);
   n = n_Add(n1, pGetCoeff(qn), r);
@@ -140,12 +140,12 @@ static poly _p_Mult_q_Bucket(poly p, const int lp,
   n_Delete(&pGetCoeff(qn),r);
   qn = p_LmFreeAndNext(qn, r);
   goto Work;
-  
+
   Finish:
   assume(rr != NULL && pNext(rr) != NULL);
   pNext(pNext(rr)) = kBucketClear(bucket);
   kBucketDestroy(&bucket);
-  
+
   if (!copy)
   {
     p_Delete(&p, r);
@@ -170,18 +170,18 @@ static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
   poly rr = res;                    // last monom which is surely not NULL
   poly rn = pNext(res);             // pNext(rr)
   number n, n1;
-  
+
   // now the main loop
   Top:
   if (rn == NULL) goto Smaller;
   p_LmCmpAction(rn, qn, r, goto Equal, goto Greater, goto Smaller);
-  
+
   Greater:
   // rn > qn, so iter
   rr = rn;
   pIter(rn);
   goto Top;
-  
+
   // rn < qn, append qn to rr, and compute next Lm(qq)*pp
   Smaller:
   pNext(rr) = qn;
@@ -194,12 +194,12 @@ static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
   {
     pNext(rr) = p_Plus_mm_Mult_qq(rn, qq, pp, r);
   }
-  
+
   pIter(qq);
   if (qq == NULL) goto Finish;
   rn = pNext(rr);
   goto Top;
-  
+
   Equal:
   n1 = pGetCoeff(rn);
   n = n_Add(n1, pGetCoeff(qn), r);
@@ -218,7 +218,7 @@ static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
   n_Delete(&pGetCoeff(qn),r);
   qn = p_LmFreeAndNext(qn, r);
   goto Work;
-  
+
   Finish:
   if (!copy)
   {
@@ -234,9 +234,9 @@ poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
 {
   int lp, lq, l;
   poly pt;
-  
+
   pqLength(p, q, lp, lq, MIN_LENGTH_BUCKET);
-  
+
   if (lp < lq)
   {
     pt = p;

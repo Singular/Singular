@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.59 2001-03-22 19:11:08 Singular Exp $ */
+/* $Id: structs.h,v 1.60 2001-10-09 16:36:24 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -268,7 +268,7 @@ typedef enum
 {
   ro_dp, // ordering is a degree ordering
   ro_wp, // ordering is a weighted degree ordering
-  ro_wp_neg, // ordering is a weighted degree ordering 
+  ro_wp_neg, // ordering is a weighted degree ordering
              // with possibly negative weights
   ro_cp,    // ordering duplicates variables
   ro_syzcomp, // ordering indicates "subset" of component number
@@ -335,7 +335,7 @@ struct omBin_s;
 struct sro_ord
 {
   ro_typ  ord_typ;
-  int     order_index; // comes from r->order[order_index] 
+  int     order_index; // comes from r->order[order_index]
   union
   {
      sro_dp dp;
@@ -395,26 +395,26 @@ struct sip_sring
   short      OrdSgn; /* 1 for polynomial rings, -1 otherwise */
 
   short     firstBlockEnds;
-  
+
 
   BOOLEAN   VectorOut;
   BOOLEAN   ShortOut;
   BOOLEAN   CanShortOut;
   BOOLEAN   LexOrder;
-  // TRUE if the monomial ordering has polynomial and power series blocks 
+  // TRUE if the monomial ordering has polynomial and power series blocks
   BOOLEAN   MixedOrder;
   // 1 for lex ordering (except ls), -1 otherwise
   BOOLEAN   ComponentOrder;
-  
-  
+
+
   // what follows below here should be set by rComplete, _only_
   // contains component, but no weight fields in E */
-  short      ExpL_Size; // size of exponent vector in long 
+  short      ExpL_Size; // size of exponent vector in long
   short      CmpL_Size; // portions which need to be compared
-  /* number of long vars in exp vector: 
-     long vars are those longs in the exponent vector which are 
+  /* number of long vars in exp vector:
+     long vars are those longs in the exponent vector which are
      occupied by variables, only */
-  short     VarL_Size;   
+  short     VarL_Size;
 
   short      BitsPerExp; /* number of bits per exponent */
   short      ExpPerLong; /* maximal number of Exponents per long */
@@ -433,14 +433,14 @@ struct sip_sring
   // number of exponents in r->VarL_Offset[0]
   // is minimal number of exponents in a long var
   short     MinExpPerLong;
-  
+
   /* if this is > 0, then NegWeightL_Offset[0..size_1] is index of longs in
    ExpVector whose values need an offset due to negative weights */
   short     NegWeightL_Size;
   /* array of NegWeigtL_Size indicies */
   int*      NegWeightL_Offset;
-  
-  /* array of size VarL_Size, 
+
+  /* array of size VarL_Size,
      VarL_Offset[i] gets i-th long var in exp vector */
   int*      VarL_Offset;
 
@@ -459,7 +459,7 @@ struct sip_sring
   pFDegProc     pFDegOrig;
   /* and as it was determined before rOptimizeLDeg */
   pLDegProc     pLDegOrig;
-  
+
   p_SetmProc    p_Setm;
   n_Procs_s*    cf;
   ring          algring;

@@ -6,14 +6,14 @@
  *  Purpose: template for p_Add_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Merge_q__T.cc,v 1.2 2001-08-27 14:47:24 Singular Exp $
+ *  Version: $Id: p_Merge_q__T.cc,v 1.3 2001-10-09 16:36:14 Singular Exp $
  *******************************************************************/
 
 /***************************************************************
  *
  * Returns:  p merged with q
  * Destroys: p, q
- * 
+ *
  ***************************************************************/
 LINKAGE poly p_Merge_q(poly p, poly q, const ring r)
 {
@@ -23,7 +23,7 @@ LINKAGE poly p_Merge_q(poly p, poly q, const ring r)
 #if PDEBUG > 0
   int l = pLength(p) + pLength(q);
 #endif
-  
+
   spolyrec rp;
   poly a = &rp;
   DECLARE_LENGTH(const unsigned long length = r->CmpL_Size);
@@ -36,25 +36,25 @@ LINKAGE poly p_Merge_q(poly p, poly q, const ring r)
   // should never get here
   dReportError("Equal monomials in p_Merge_q");
   return NULL;
-  
+
   Greater:
   a = pNext(a) = p;
   pIter(p);
   if (p==NULL) { pNext(a) = q; goto Finish;}
   goto Top;
-    
+
   Smaller:
   a = pNext(a) = q;
   pIter(q);
   if (q==NULL) { pNext(a) = p; goto Finish;}
   goto Top;
-  
+
   Finish:
 
   p_Test(pNext(&rp), r);
 #if PDEBUG > 0
   pAssume1(l - pLength(pNext(&rp)) == 0);
-#endif  
+#endif
   return pNext(&rp);
 }
 

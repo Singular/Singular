@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.93 2001-09-25 16:07:26 Singular Exp $ */
+/* $Id: grammar.y,v 1.94 2001-10-09 16:36:01 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -1132,7 +1132,7 @@ exportcmd:
 #else
 #ifdef HAVE_NS
 #else
-            Print("%s::%s;\n", (char *)$4.Name(),$2.Name()); 
+            Print("%s::%s;\n", (char *)$4.Name(),$2.Name());
 #endif /* HAVE_NS */
 #endif /* HAVE_NAMESPACES */
           }
@@ -1429,6 +1429,7 @@ setringcmd:
             {
               idhdl h=(idhdl)$2.data;
               if ($2.e!=NULL) h=rFindHdl((ring)$2.Data(),NULL, NULL);
+              //Print("setring %s lev %d (ptr:%x)\n",IDID(h),IDLEV(h),IDRING(h));
               if ($1==KEEPRING_CMD)
               {
                 if (h!=NULL)
@@ -1460,20 +1461,20 @@ setringcmd:
                           {
                             if (BVERBOSE(V_REDEFINE))
                               Warn("redefining %s",IDID(p));
-                            killhdl(old,&root);
+                            killhdl2(old,&root);
                           }
                           IDLEV(p)=prevlev;
                         }
                         p=IDNEXT(p);
                       }
+		      IDRING(h)->idroot=root;
                     //}
                   }
 #ifdef USE_IILOCALRING
                   iiLocalRing[myynest-1]=IDRING(h);
-#else
+#endif
                   procstack->currRing=IDRING(h);
                   procstack->currRingHdl=h;
-#endif
                 }
                 else
                 {

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.h,v 1.15 2001-01-09 15:40:11 Singular Exp $ */
+/* $Id: modulop.h,v 1.16 2001-10-09 16:36:09 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -52,7 +52,7 @@ extern CARDINAL *npLogTable;
 #ifdef HAVE_MULT_MOD
 inline number npMultM(number a, number b)
 {
-  return (number) 
+  return (number)
     ((((unsigned long) a)*((unsigned long) b)) % ((unsigned long) npPrimeM));
 }
 #else

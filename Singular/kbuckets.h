@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.h,v 1.14 2000-12-31 15:14:32 obachman Exp $ */
+/* $Id: kbuckets.h,v 1.15 2001-10-09 16:36:07 Singular Exp $ */
 #include "structs.h"
 #include "p_Procs.h"
 #include "pShallowCopyDelete.h"
@@ -120,7 +120,7 @@ void kBucket_Add_q(kBucket_pt bucket, poly q, int* lq);
 
 // first, do ExtractLarger
 // then add q
-inline poly 
+inline poly
 kBucket_ExtractLarger_Add_q(kBucket_pt bucket, poly append, poly q, int *lq)
 {
   append = kBucket_ExtractLarger(bucket, q, append);
@@ -146,17 +146,17 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l);
 //////////////////////////////////////////////////////////////////////////
 ///
 /// For changing the ring of the Bpoly to new_tailBin
-/// 
-void kBucketShallowCopyDelete(kBucket_pt bucket, 
+///
+void kBucketShallowCopyDelete(kBucket_pt bucket,
                               ring new_tailRing, omBin new_tailBin,
                               pShallowCopyDeleteProc p_shallow_copy_delete);
 
 //////////////////////////////////////////////////////////////////////////
 ///
 /// Tests
-/// 
-/// 
-#ifdef KDEBUG 
+///
+///
+#ifdef KDEBUG
 BOOLEAN kbTest(kBucket_pt bucket);
 #else
 #define kbTest(bucket)  ((void)0)
@@ -168,9 +168,9 @@ BOOLEAN kbTest(kBucket_pt bucket);
 ///
 
 // define this if length of bucket polys are 2, 4, 8, etc
-// instead of 4, 16, 64 ... -- 
+// instead of 4, 16, 64 ... --
 // this seems to be less efficient, both, in theory and in practice
-// #define BUCKET_TWO_BASE 
+// #define BUCKET_TWO_BASE
 #ifdef BUCKET_TWO_BASE
 #define MAX_BUCKET 28
 #else

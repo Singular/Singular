@@ -6,14 +6,14 @@
  *  Purpose: template for p_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Mult_mm__T.cc,v 1.2 2001-08-27 14:47:25 Singular Exp $
+ *  Version: $Id: p_Mult_mm__T.cc,v 1.3 2001-10-09 16:36:15 Singular Exp $
  *******************************************************************/
 
 /***************************************************************
  *
  *   Returns:  p*m
  *   Const:    m
- *   Destroys: p  
+ *   Destroys: p
  *
  ***************************************************************/
 LINKAGE poly p_Mult_mm(poly p, const poly m, const ring ri)

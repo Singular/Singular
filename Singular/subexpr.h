@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.h,v 1.29 2001-09-25 16:07:33 Singular Exp $ */
+/* $Id: subexpr.h,v 1.30 2001-10-09 16:36:25 Singular Exp $ */
 /*
 * ABSTRACT: handling of leftv
 */
@@ -151,6 +151,9 @@ class procinfo
 public:
   char          *libname;
   char          *procname;
+#ifdef HAVE_NS
+  package       pack;
+#endif
   language_defs language;
   short         ref;
   char          is_static;        // if set, proc not accessible for user

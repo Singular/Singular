@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.h,v 1.15 2001-08-27 14:47:08 Singular Exp $ */
+/* $Id: lists.h,v 1.16 2001-10-09 16:36:08 Singular Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -12,8 +12,8 @@
 #include "subexpr.h"
 #include "tok.h"
 
-#ifdef MDEBUG 
-#define INLINE_THIS 
+#ifdef MDEBUG
+#define INLINE_THIS
 #else
 #define INLINE_THIS inline
 #endif

@@ -6,13 +6,13 @@
  *  Purpose: declaration for debug error handling
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: dError.h,v 1.5 2000-12-31 15:14:29 obachman Exp $
+ *  Version: $Id: dError.h,v 1.6 2001-10-09 16:35:56 Singular Exp $
  *******************************************************************/
 #ifndef DERROR_H
 #define DERROR_H
 
 #ifdef __cplusplus
-extern "C" 
+extern "C"
 {
 #endif
 extern int dReportError(const char* fmt, ...);

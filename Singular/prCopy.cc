@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: prCopy.cc,v 1.11 2000-12-31 15:14:43 obachman Exp $ */
+/* $Id: prCopy.cc,v 1.12 2001-10-09 16:36:19 Singular Exp $ */
 /*
 * ABSTRACT - implementation of functions for Copy/Move/Delete for Polys
 */
@@ -15,7 +15,7 @@
 #include "ideals.h"
 #include "sbuckets.h"
 
-static inline void 
+static inline void
 prCopyEvector(poly dest, ring dest_r, poly src, ring src_r,int max)
 {
   assume((dest_r == currRing)||(dest_r== currRing->algring));
@@ -40,7 +40,7 @@ prCopyEvector(poly dest, ring dest_r, poly src, ring src_r,int max)
 poly prCopy(poly p)
 {
   poly res;
-  
+
   if (rField_has_simple_Alloc(currRing))
     res = pr_Copy_REqual_NSimple_NoSort(p, currRing, currRing);
   else
@@ -91,10 +91,10 @@ poly prMoveR_NoSort(poly &p, ring src_r)
     res =  pr_Move_NoREqual_NSimple_NoSort(p, src_r, currRing);
   else
     res =  pr_Move_NoREqual_NoNSimple_NoSort(p, src_r, currRing);
-  pTest(res);  
+  pTest(res);
   return res;
 }
-  
+
 /////////////////////////////////////////////////////////////////////////
 // prHead
 typedef poly (*prCopyProc_t)(poly &src_p, ring src_r, ring dest_r);
@@ -113,24 +113,24 @@ poly prHeadR(poly p, ring src_r, prCopyProc_t prproc)
 poly prHeadR(poly p, ring src_r)
 {
   prCopyProc_t prproc;
-  if (rField_has_simple_Alloc(currRing)) 
+  if (rField_has_simple_Alloc(currRing))
     prproc = pr_Copy_NoREqual_NSimple_NoSort;
   else
-    prproc = pr_Copy_NoREqual_NoNSimple_NoSort;  
-  
+    prproc = pr_Copy_NoREqual_NoNSimple_NoSort;
+
   return prHeadR(p, src_r, prproc);
 }
 
 /////////////////////////////////////////////////////////////////////////
 // idrCopy
-static inline ideal 
+static inline ideal
 idrCopy(ideal id, ring src_r, ring dest_r, prCopyProc_t prproc)
 {
   if (id == NULL) return NULL;
   poly p;
   ideal res = idInit(IDELEMS(id), id->rank);
   int i;
-  
+
   for (i=IDELEMS(id)-1; i>=0; i--)
   {
     p = id->m[i];
@@ -144,7 +144,7 @@ ideal idrCopy(ideal id)
 {
   ideal res;
   prCopyProc_t prproc;
-  if (rField_has_simple_Alloc(currRing)) 
+  if (rField_has_simple_Alloc(currRing))
     prproc = pr_Copy_REqual_NSimple_NoSort;
   else
     prproc = pr_Copy_REqual_NoNSimple_NoSort;
@@ -156,34 +156,34 @@ ideal idrCopyR(ideal id, ring src_r)
 {
   ideal res;
   prCopyProc_t prproc;
-  if (rField_has_simple_Alloc(currRing)) 
+  if (rField_has_simple_Alloc(currRing))
     prproc = pr_Copy_NoREqual_NSimple_Sort;
   else
     prproc = pr_Copy_NoREqual_NoNSimple_Sort;
   res =  idrCopy(id, src_r, currRing, prproc);
   return res;
 }
-  
+
 ideal idrCopyR_NoSort(ideal id, ring src_r)
 {
   ideal res;
   prCopyProc_t prproc;
-  if (rField_has_simple_Alloc(currRing)) 
+  if (rField_has_simple_Alloc(currRing))
     prproc = pr_Copy_NoREqual_NSimple_NoSort;
   else
     prproc = pr_Copy_NoREqual_NoNSimple_NoSort;
   res =  idrCopy(id, src_r, currRing, prproc);
   return res;
 }
-  
+
 /////////////////////////////////////////////////////////////////////////
 // idrMove
-static inline ideal 
+static inline ideal
 idrMove(ideal &id, ring src_r, ring dest_r, prCopyProc_t prproc)
 {
   if (id == NULL) return NULL;
   ideal res = id;
-  
+
   int i;
   for (i=IDELEMS(id)-1; i>=0; i--)
     res->m[i] = prproc(id->m[i], src_r, dest_r);
@@ -195,21 +195,21 @@ ideal idrMoveR(ideal &id, ring src_r)
 {
   prCopyProc_t prproc;
   ideal res;
-  
-  if (rField_has_simple_Alloc(currRing)) 
+
+  if (rField_has_simple_Alloc(currRing))
     prproc = pr_Move_NoREqual_NSimple_Sort;
   else
     prproc = pr_Move_NoREqual_NoNSimple_Sort;
   res =  idrMove(id, src_r, currRing, prproc);
   return res;
 }
-  
+
 ideal idrMoveR_NoSort(ideal &id, ring src_r)
 {
   prCopyProc_t prproc;
   ideal res;
-  
-  if (rField_has_simple_Alloc(currRing)) 
+
+  if (rField_has_simple_Alloc(currRing))
     prproc = pr_Move_NoREqual_NSimple_NoSort;
   else
     prproc = pr_Move_NoREqual_NoNSimple_NoSort;

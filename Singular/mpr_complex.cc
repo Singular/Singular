@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.31 2001-08-27 14:47:13 Singular Exp $ */
+/* $Id: mpr_complex.cc,v 1.32 2001-10-09 16:36:10 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -49,7 +49,7 @@ static gmp_float diff(0.0);
  *  digits - the number of output digits (basis 10)
  *  the size of mantissa consists of two parts:
  *    the "output" part a and the "rest" part b.
- *  According to the GMP-precision digits is 
+ *  According to the GMP-precision digits is
  *  recomputed to bits (basis 2).
  *  Two numbers a, b are equal if
  *    | a - b | < | a | * 0.1^digits .
@@ -85,7 +85,7 @@ void gmp_float::setFromStr( char * in )
     char* c_in = (char*) omAlloc(len);
     *c_in = '0';
     strcpy(&(c_in[1]), in);
-    
+
     mpf_set_str( t, c_in, 10 );
     omFreeSize((void*)c_in, len);
   }
@@ -232,14 +232,14 @@ bool operator < ( const gmp_float & a, const gmp_float & b )
 }
 bool operator >= ( const gmp_float & a, const gmp_float & b )
 {
-  if (a.t == b.t)  
-    return true;  
+  if (a.t == b.t)
+    return true;
   return mpf_cmp( a.t, b.t ) >= 0;
 }
 bool operator <= ( const gmp_float & a, const gmp_float & b )
 {
-  if (a.t == b.t)  
-    return true;   
+  if (a.t == b.t)
+    return true;
   return mpf_cmp( a.t, b.t ) <= 0;
 }
 
@@ -364,7 +364,7 @@ gmp_float numberFieldToFloat( number num, int k )
 {
   gmp_float r;
 
-  switch (k) 
+  switch (k)
   {
   case QTOF:
     if ( num != NULL )
@@ -664,7 +664,7 @@ char *complexToStr( gmp_complex & c, const unsigned int oprec )
       int len=(strlen(in_real)+strlen(in_imag)+9) * sizeof(char);
       out=(char*)omAlloc( len );
       memset(out,0,len);
-      if ( !c.real().isZero() ) 
+      if ( !c.real().isZero() )
 	sprintf(out,"(%s%s%s)",in_real,c.imag().sign()>=0?"+I*":"-I*",in_imag);
       else
 	sprintf(out,"(%s%s)",c.imag().sign()>=0?"I*":"-I*",in_imag);
@@ -672,7 +672,7 @@ char *complexToStr( gmp_complex & c, const unsigned int oprec )
     omFree( (ADDRESS) in_real );
     omFree( (ADDRESS) in_imag );
   }
-  else 
+  else
   {
     out= floatToStr( c.real(), oprec );
   }

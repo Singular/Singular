@@ -6,7 +6,7 @@
  *  Purpose: link initialization for dynamic linking
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: slInit_Dynamic.cc,v 1.1 2000-12-12 08:44:54 obachman Exp $
+ *  Version: $Id: slInit_Dynamic.cc,v 1.2 2001-10-09 16:36:23 Singular Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -33,7 +33,7 @@ static void* slInitMPSRHandle()
     mpsr_so_handle = dynl_open_binary_warn("mpsr");
     if (mpsr_so_handle != NULL)
     {
-      voidProc init_proc = (voidProc) 
+      voidProc init_proc = (voidProc)
         dynl_sym_warn(mpsr_so_handle, "mpsr_Init");
       if (init_proc != NULL)
         (*init_proc)();
@@ -49,7 +49,7 @@ si_link_extension slInitMPFileExtension(si_link_extension s)
   void* handle = slInitMPSRHandle();
 
   if (handle == NULL) return NULL;
-  
+
   s->Open = (slOpenProc) dynl_sym_warn(handle, "slOpenMPFile");
   s->Close = (slCloseProc) dynl_sym_warn(handle, "slCloseMP");
   s->Kill = (slKillProc) s->Close;
@@ -108,7 +108,7 @@ static void* slInitDBMHandle()
 {
   if (dbm_so_handle == NULL)
     dbm_so_handle = dynl_open_binary_warn("dbmsr");
-    
+
   return dbm_so_handle;
 }
 
@@ -117,7 +117,7 @@ si_link_extension slInitDBMExtension(si_link_extension s)
   void* handle = slInitDBMHandle();
 
   if (handle == NULL) return NULL;
-  
+
   s->Open=(slOpenProc)dynl_sym_warn(handle, "dbOpen");
   s->Close=(slCloseProc)dynl_sym_warn(handle, "dbClose");
   s->Kill=(slKillProc)dynl_sym_warn(handle, "dbClose");
@@ -128,11 +128,11 @@ si_link_extension slInitDBMExtension(si_link_extension s)
   if (s->Open == NULL || s->Close == NULL || s->Kill == NULL ||
       s->Read == NULL || s->Read2 == NULL)
     return NULL;
-  
+
   s->Status=slStatusAscii;
   s->type="DBM";
   return s;
 }
 
 #endif
-  
+

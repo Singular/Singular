@@ -6,7 +6,7 @@
  *  Purpose: source for dynamically loaded version of p_Procs
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Dynamic.cc,v 1.4 2001-01-30 12:19:24 Singular Exp $
+ *  Version: $Id: p_Procs_Dynamic.cc,v 1.5 2001-10-09 16:36:16 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "structs.h"
@@ -57,14 +57,14 @@ static void* p_ProcInitHandle(void** handle, const char* module)
 static inline void* p_ProcGetHandle(p_Proc proc, p_Field field)
 {
   const char* module =  p_ProcField_2_Module(proc, field);
-  
-  if (strcmp(module, "FieldIndep") == 0) 
+
+  if (strcmp(module, "FieldIndep") == 0)
     return p_ProcInitHandle(&p_procs_handle_FieldIndep, module);
-  else if (strcmp(module, "FieldZp") == 0) 
+  else if (strcmp(module, "FieldZp") == 0)
     return p_ProcInitHandle(&p_procs_handle_FieldZp, module);
-  else if (strcmp(module, "FieldQ") == 0) 
+  else if (strcmp(module, "FieldQ") == 0)
     return p_ProcInitHandle(&p_procs_handle_FieldQ, module);
-  else if (strcmp(module, "FieldGeneral") == 0) 
+  else if (strcmp(module, "FieldGeneral") == 0)
     return p_ProcInitHandle(&p_procs_handle_FieldGeneral, module);
   else
   {
@@ -73,42 +73,42 @@ static inline void* p_ProcGetHandle(p_Proc proc, p_Field field)
   }
 }
 
-  
+
 #define InitSetProcs(f, l, o) ((void)0)
 
 static void* GetGeneralProc(p_Proc proc)
 {
   switch(proc)
   {
-      case p_Copy_Proc: 
+      case p_Copy_Proc:
         return (void *)p_Copy__FieldGeneral_LengthGeneral_OrdGeneral;
-      case p_Delete_Proc: 
+      case p_Delete_Proc:
         return (void *)p_Delete__FieldGeneral_LengthGeneral_OrdGeneral;
-      case p_ShallowCopyDelete_Proc: 
+      case p_ShallowCopyDelete_Proc:
         return (void *)p_ShallowCopyDelete__FieldGeneral_LengthGeneral_OrdGeneral;
-      case p_Mult_nn_Proc: 
+      case p_Mult_nn_Proc:
         return (void *)p_Mult_nn__FieldGeneral_LengthGeneral_OrdGeneral;
-      case pp_Mult_nn_Proc: 
+      case pp_Mult_nn_Proc:
         return (void *)pp_Mult_nn__FieldGeneral_LengthGeneral_OrdGeneral;
-      case pp_Mult_mm_Proc: 
+      case pp_Mult_mm_Proc:
         return (void *)pp_Mult_mm__FieldGeneral_LengthGeneral_OrdGeneral;
-      case pp_Mult_mm_Noether_Proc: 
+      case pp_Mult_mm_Noether_Proc:
         return (void *)pp_Mult_mm_Noether__FieldGeneral_LengthGeneral_OrdGeneral;
-      case p_Mult_mm_Proc: 
+      case p_Mult_mm_Proc:
         return (void *)p_Mult_mm__FieldGeneral_LengthGeneral_OrdGeneral;
-      case p_Add_q_Proc: 
+      case p_Add_q_Proc:
         return (void *)p_Add_q__FieldGeneral_LengthGeneral_OrdGeneral;
-      case p_Minus_mm_Mult_qq_Proc: 
+      case p_Minus_mm_Mult_qq_Proc:
         return (void *)p_Minus_mm_Mult_qq__FieldGeneral_LengthGeneral_OrdGeneral;
-      case p_Neg_Proc: 
+      case p_Neg_Proc:
         return (void *)p_Neg__FieldGeneral_LengthGeneral_OrdGeneral;
-      case pp_Mult_Coeff_mm_DivSelect_Proc: 
+      case pp_Mult_Coeff_mm_DivSelect_Proc:
         return (void *)pp_Mult_Coeff_mm_DivSelect__FieldGeneral_LengthGeneral_OrdGeneral;
-      case pp_Mult_Coeff_mm_DivSelectMult_Proc: 
+      case pp_Mult_Coeff_mm_DivSelectMult_Proc:
         return (void *)pp_Mult_Coeff_mm_DivSelectMult__FieldGeneral_LengthGeneral_OrdGeneral;
-      case p_Merge_q_Proc: 
+      case p_Merge_q_Proc:
         return (void *)p_Merge_q__FieldGeneral_LengthGeneral_OrdGeneral;
-      case p_kBucketSetLm_Proc: 
+      case p_kBucketSetLm_Proc:
         return (void *)p_kBucketSetLm__FieldGeneral_LengthGeneral_OrdGeneral;
       case p_Unknown_Proc:
         break;
@@ -124,35 +124,35 @@ static char* GetGeneralProcName(p_Proc proc)
 {
   switch(proc)
   {
-      case p_Copy_Proc: 
+      case p_Copy_Proc:
         return "p_Copy__FieldGeneral_LengthGeneral_OrdGeneral";
-      case p_Delete_Proc: 
+      case p_Delete_Proc:
         return "p_Delete__FieldGeneral_LengthGeneral_OrdGeneral";
-      case p_ShallowCopyDelete_Proc: 
+      case p_ShallowCopyDelete_Proc:
         return "p_ShallowCopyDelete__FieldGeneral_LengthGeneral_OrdGeneral";
-      case p_Mult_nn_Proc: 
+      case p_Mult_nn_Proc:
         return "p_Mult_nn__FieldGeneral_LengthGeneral_OrdGeneral";
-      case pp_Mult_nn_Proc: 
+      case pp_Mult_nn_Proc:
         return "pp_Mult_nn__FieldGeneral_LengthGeneral_OrdGeneral";
-      case pp_Mult_mm_Proc: 
+      case pp_Mult_mm_Proc:
         return "pp_Mult_mm__FieldGeneral_LengthGeneral_OrdGeneral";
-      case pp_Mult_mm_Noether_Proc: 
+      case pp_Mult_mm_Noether_Proc:
         return "pp_Mult_mm_Noether__FieldGeneral_LengthGeneral_OrdGeneral";
-      case p_Mult_mm_Proc: 
+      case p_Mult_mm_Proc:
         return "p_Mult_mm__FieldGeneral_LengthGeneral_OrdGeneral";
-      case p_Add_q_Proc: 
+      case p_Add_q_Proc:
         return "p_Add_q__FieldGeneral_LengthGeneral_OrdGeneral";
-      case p_Minus_mm_Mult_qq_Proc: 
+      case p_Minus_mm_Mult_qq_Proc:
         return "p_Minus_mm_Mult_qq__FieldGeneral_LengthGeneral_OrdGeneral";
-      case p_Neg_Proc: 
+      case p_Neg_Proc:
         return "p_Neg__FieldGeneral_LengthGeneral_OrdGeneral";
-      case pp_Mult_Coeff_mm_DivSelect_Proc: 
+      case pp_Mult_Coeff_mm_DivSelect_Proc:
         return "pp_Mult_Coeff_mm_DivSelect__FieldGeneral_LengthGeneral_OrdGeneral";
-      case pp_Mult_Coeff_mm_DivSelectMult_Proc: 
+      case pp_Mult_Coeff_mm_DivSelectMult_Proc:
         return "pp_Mult_Coeff_mm_DivSelectMult__FieldGeneral_LengthGeneral_OrdGeneral";
-      case p_Merge_q_Proc: 
+      case p_Merge_q_Proc:
         return "p_Merge_q__FieldGeneral_LengthGeneral_OrdGeneral";
-      case p_kBucketSetLm_Proc: 
+      case p_kBucketSetLm_Proc:
         return "p_kBucketSetLm__FieldGeneral_LengthGeneral_OrdGeneral";
       case p_Unknown_Proc:
         break;
@@ -162,7 +162,7 @@ static char* GetGeneralProcName(p_Proc proc)
 #endif
 
 
-static void* GetDynamicProc(const char* proc_s, p_Proc proc, 
+static void* GetDynamicProc(const char* proc_s, p_Proc proc,
                             p_Field field, p_Length length, p_Ord ord
 #ifdef RDEBUG
                      , int get_name = 0
@@ -171,9 +171,9 @@ static void* GetDynamicProc(const char* proc_s, p_Proc proc,
 {
   void* proc_ptr = NULL;
   char proc_name[MAX_PROCNAME_LEN];
-  sprintf(proc_name, "%s__%s_%s_%s", proc_s, 
-          p_FieldEnum_2_String(field), 
-          p_LengthEnum_2_String(length), 
+  sprintf(proc_name, "%s__%s_%s_%s", proc_s,
+          p_FieldEnum_2_String(field),
+          p_LengthEnum_2_String(length),
           p_OrdEnum_2_String(ord));
   // first, try to get the proc from the kernel
   proc_ptr = dynl_sym(DYNL_KERNEL_HANDLE, proc_name);
@@ -186,7 +186,7 @@ static void* GetDynamicProc(const char* proc_s, p_Proc proc,
       proc_ptr = GetGeneralProc(proc);
 #ifdef RDEBUG
       sprintf(proc_name, GetGeneralProcName(proc));
-#endif      
+#endif
     }
   }
 #ifdef RDEBUG
@@ -199,7 +199,7 @@ static void* GetDynamicProc(const char* proc_s, p_Proc proc,
 #endif
   return  proc_ptr;
 }
-  
+
 
 #define DoReallySetProc(what, field, length, ord)           \
   _p_procs->what = (what##_Proc_Ptr)                        \
@@ -220,7 +220,7 @@ while(0)
 #define DoSetProc DoReallySetProc
 #endif
 
-      
+
 #include "p_Procs_Set.h"
 
 

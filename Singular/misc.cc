@@ -630,6 +630,9 @@ char * versionString()
               StringAppendS("\n\t");
 #endif
 #ifdef HAVE_NAMESPACES
+              StringAppendS("Namespaces,");
+#endif
+#ifdef HAVE_NS
               StringAppendS("namespaces,");
 #endif
 #ifdef HAVE_DYNAMIC_LOADING
@@ -678,4 +681,79 @@ char * versionString()
               return str;
 }
 
-
+#ifdef HAVE_NS
+void listall()
+{
+      idhdl hh=basePack->idroot;
+      PrintS("====== Top ==============\n");
+      while (hh!=NULL)
+      {
+        if (IDDATA(hh)==NULL) PrintS("(N)");
+        else if (IDDATA(hh)==(void *)currRing) PrintS("(R)");
+        else if (IDDATA(hh)==(void *)currPack) PrintS("(P)");
+        else PrintS("   ");
+        Print("::%s, typ %s level %d",
+               IDID(hh),Tok2Cmdname(IDTYP(hh)),IDLEV(hh));
+        if ((IDTYP(hh)==RING_CMD)
+        || (IDTYP(hh)==QRING_CMD))
+          Print(" ref: %d\n",IDRING(hh)->ref);
+        else
+          PrintLn();
+        hh=IDNEXT(hh);
+      }
+      hh=basePack->idroot;
+      while (hh!=NULL)
+      {
+        if (IDDATA(hh)==(void *)basePack)
+          Print("(T)::%s, typ %s level %d\n",
+          IDID(hh),Tok2Cmdname(IDTYP(hh)),IDLEV(hh));
+        else
+        if ((IDTYP(hh)==RING_CMD)
+        || (IDTYP(hh)==QRING_CMD)
+        || (IDTYP(hh)==PACKAGE_CMD))
+        {
+          Print("====== %s ==============\n",IDID(hh));
+          idhdl h2=IDRING(hh)->idroot;
+          while (h2!=NULL)
+          {
+            if (IDDATA(h2)==NULL) PrintS("(N)");
+            else if (IDDATA(h2)==(void *)currRing) PrintS("(R)");
+            else if (IDDATA(h2)==(void *)currPack) PrintS("(P)");
+            else PrintS("   ");
+            Print("%s::%s, typ %s level %d\n",
+            IDID(hh),IDID(h2),Tok2Cmdname(IDTYP(h2)),IDLEV(h2));
+            h2=IDNEXT(h2);
+          }
+        }
+        hh=IDNEXT(hh);
+      }
+      Print("currRing:%x, currPack:%x,basePack:%x\n",currRing,currPack,basePack);
+}
+void checkall()
+{
+      idhdl hh=basePack->idroot;
+      while (hh!=NULL)
+      {
+	omCheckAddr(hh);
+	omCheckAddr(IDID(hh));
+        if (RingDependend(IDTYP(hh))) Print("%s typ %d in Top\n",IDID(hh),IDTYP(hh));
+        hh=IDNEXT(hh);
+      }
+      hh=basePack->idroot;
+      while (hh!=NULL)
+      {
+        if (IDTYP(hh)==PACKAGE_CMD)
+        {
+          idhdl h2=IDPACKAGE(hh)->idroot;
+          while (h2!=NULL)
+          {
+	    omCheckAddr(h2);
+	    omCheckAddr(IDID(h2));
+            if (RingDependend(IDTYP(h2))) Print("%s typ %d in %s\n",IDID(h2),IDTYP(h2),IDID(hh));
+            h2=IDNEXT(h2);
+          }
+        }
+        hh=IDNEXT(hh);
+      }
+}
+#endif

@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.47 2001-09-25 16:07:29 Singular Exp $ */
+/* $Id: libparse.l,v 1.48 2001-10-09 16:36:08 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -33,10 +33,10 @@ int current_pos(int i);
 void print_version(lp_modes mode, char *p);
 #ifdef HAVE_NAMESPACES
 void copy_string(lp_modes mode, idhdl pl);
-extern void piCleanUp(procinfov pi);
 #else /* HAVE_NAMESPACES */
 void copy_string(lp_modes mode);
 #endif /* HAVE_NAMESPACES */
+extern void piCleanUp(procinfov pi);
 void make_version(char *p, int what);
 
 int brace1 = 0;  /* { } */
@@ -118,6 +118,9 @@ idhdl h0;
 idhdl h_top;
 extern namehdl namespaceroot;
 #endif /* HAVE_NAMESPACES */
+#ifdef HAVE_NS
+idhdl h_top;
+#endif
 #define pi IDPROC(h0)
 extern "C"
 {
@@ -179,9 +182,15 @@ while(0)
                            lib_style_types *lib_style, \
                            idhdl pl, BOOLEAN autoexport, lp_modes mode)
 #else /* HAVE_NAMESPACES */
+#ifdef HAVE_NS
+#define YY_DECL int yylex(char *newlib, char *libfile, \
+                           lib_style_types *lib_style, \
+                           idhdl pl, BOOLEAN autoexport, lp_modes mode)
+#else
 #define YY_DECL int yylex(char *newlib, char *libfile, \
                            lib_style_types *lib_style, \
                            lp_modes mode)
+#endif /* HAVE_NS */
 #endif /* HAVE_NAMESPACES */
 
 #undef YY_INPUT
@@ -340,19 +349,29 @@ static     { p_static=TRUE; }
              #else STANDALONE_PARSER
              if( mode == LOAD_LIB)
              {
-                #ifdef HAVE_NAMESPACES
-                h0 = enterid( omStrDup(proc), 0 /*myynest*/, PROC_CMD,
-                                  &IDPACKAGE(pl)->idroot, TRUE);
-                if(!p_static && autoexport)
-                {
-                   namespaceroot->push( NSPACK(namespaceroot->root) ,"");
-                   h_top = enterid( omStrDup(proc), myynest, PROC_CMD,
-                                  &NSROOT(namespaceroot->root), FALSE );
-                   namespaceroot->pop();
-                }
+               #ifdef HAVE_NAMESPACES
+               h0 = enterid( omStrDup(proc), 0 /*myynest*/, PROC_CMD,
+                                 &IDPACKAGE(pl)->idroot, TRUE);
+               if(!p_static && autoexport)
+               {
+                  namespaceroot->push( NSPACK(namespaceroot->root) ,"");
+                  h_top = enterid( omStrDup(proc), myynest, PROC_CMD,
+                                 &NSROOT(namespaceroot->root), FALSE );
+                  namespaceroot->pop();
+               }
                #else /* HAVE_NAMESPACES */
+               #ifdef HAVE_NS
+               h0 = enterid( omStrDup(proc), 0 /*myynest*/, PROC_CMD,
+                                 &(IDPACKAGE(pl)->idroot), TRUE);
+               if(!p_static && autoexport)
+               {
+                  h_top = enterid( omStrDup(proc), 0 /*myynest*/, PROC_CMD,
+                                 &(basePack->idroot), FALSE );
+               }
+               #else
                h0 = enterid( omStrDup(proc), 0 /*myynest*/, PROC_CMD,
                                    &IDROOT, TRUE );
+               #endif /* HAVE_NS */
                #endif /* HAVE_NAMESPACES */
                /* omCheckAddr(IDID(h0)); */
                if (h0!=NULL)
@@ -367,6 +386,15 @@ static     { p_static=TRUE; }
                    IDPROC(h_top)->ref++;
                  }
                  #endif /* HAVE_NAMESPACES */
+                 #ifdef HAVE_NS
+                 if (!p_static && h_top != NULL && autoexport)
+                 {
+                   if(IDPROC(h_top)!=NULL) piCleanUp((procinfo *)IDPROC(h_top));
+                   IDPROC(h_top)=IDPROC(h0);
+                   IDPROC(h_top)->ref++;
+                 }
+		 IDPROC(h0)->pack=IDPACKAGE(pl);
+                 #endif /* HAVE_NS */
                  if (BVERBOSE(V_LOAD_PROC))
                    Warn( "     proc '%s' registered", proc );
                }

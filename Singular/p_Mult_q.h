@@ -3,11 +3,11 @@
 ****************************************/
 /***************************************************************
  *  File:    p_Mult_q.h
- *  Purpose: declaration of some auxillary routines for 
+ *  Purpose: declaration of some auxillary routines for
  *           p_Mult_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Mult_q.h,v 1.1 2000-12-31 15:14:39 obachman Exp $
+ *  Version: $Id: p_Mult_q.h,v 1.2 2001-10-09 16:36:15 Singular Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "structs.h"

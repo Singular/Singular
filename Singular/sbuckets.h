@@ -3,13 +3,13 @@
 ****************************************/
 /***************************************************************
  *  File:    sbuckets.h
- *  Purpose: declaration of routines for sorting and adding up polys using 
+ *  Purpose: declaration of routines for sorting and adding up polys using
  *           a bucket sort
  *  Note:    If you need to extract the leading momonial of a bucket,
  *           use kbuckets, instead.
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: sbuckets.h,v 1.1 2000-12-31 15:17:47 obachman Exp $
+ *  Version: $Id: sbuckets.h,v 1.2 2001-10-09 16:36:21 Singular Exp $
  *******************************************************************/
 #ifndef S_BUCKETS_H
 #define S_BUCKETS_H

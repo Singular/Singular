@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmhom.cc,v 1.17 2000-09-18 09:18:58 obachman Exp $
+// $Id: fglmhom.cc,v 1.18 2001-10-09 16:35:59 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -67,14 +67,14 @@ public:
         mon.sm= NULL;
     }
 #ifndef HAVE_EXPLICIT_CONSTR
-    void initialize( poly m, int b, BOOLEAN ind ) 
+    void initialize( poly m, int b, BOOLEAN ind )
     {
 	basis = b;
 	inDest = ind;
 	mon.dm = m;
 	mon.sm = NULL;
     }
-    void initialize( const homogElem h ) 
+    void initialize( const homogElem h )
     {
 	basis = h.basis;
 	inDest = h.inDest;
@@ -165,9 +165,9 @@ generateMonoms( poly m, int var, int deg, homogData * dat )
                 int k;
 #ifdef HAVE_EXPLICIT_CONSTR
 		// Expand array using Singulars ReAlloc function
-                dat->monlist= 
-		    (homogElem * )omReallocSize( dat->monlist, 
-					   (dat->monlistmax)*sizeof( homogElem ), 
+                dat->monlist=
+		    (homogElem * )omReallocSize( dat->monlist,
+					   (dat->monlistmax)*sizeof( homogElem ),
 					   (dat->monlistmax+dat->monlistblock) * sizeof( homogElem ) );
                 for ( k= dat->monlistmax; k < (dat->monlistmax+dat->monlistblock); k++ )
                     dat->monlist[k].homogElem();
@@ -176,7 +176,7 @@ generateMonoms( poly m, int var, int deg, homogData * dat )
 		int newsize = dat->monlistmax  + dat->monlistblock;
 		homogElem * tempelem = new homogElem[ newsize ];
 		// Copy old elements
-		for ( k= dat->monlistmax - 1; k >= 0; k-- ) 
+		for ( k= dat->monlistmax - 1; k >= 0; k-- )
 		    tempelem[k].initialize( dat->monlist[k] );
 		delete [] homogElem;
 		homogElem = tempelem;
@@ -362,7 +362,7 @@ fglmhomog( idhdl sourceRingHdl, ideal sourceIdeal, idhdl destRingHdl, ideal & de
 
     // Map the sourceHeads to the destRing
     int * vperm = (int *)omAlloc( (sourceRing->N + 1)*sizeof(int) );
-    maFindPerm( sourceRing->names, sourceRing->N, NULL, 0, currRing->names, 
+    maFindPerm( sourceRing->names, sourceRing->N, NULL, 0, currRing->names,
                 currRing->N, NULL, 0, vperm, NULL, currRing->ch);
     //nSetMap( sourceRing->ch, sourceRing->parameter, sourceRing->P, sourceRing->minpoly );
     nSetMap( sourceRing );

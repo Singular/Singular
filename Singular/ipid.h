@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.30 2001-09-25 16:07:28 Singular Exp $ */
+/* $Id: ipid.h,v 1.31 2001-10-09 16:36:05 Singular Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -34,6 +34,11 @@ inline package paCopy(package pack)
 {
   pack->ref++;
   return pack;
+}
+
+inline void paKill(package pack)
+{
+  pack->ref--;
 }
 
 union uutypes;
@@ -109,9 +114,9 @@ class proclevel {
   #endif
   char      * name;
   proclevel()  { memset(this,0,sizeof(*this)); }
-  void    push(ring,idhdl,char *);
-  void    pop(ring &, idhdl &);
-}; 
+  void    push(char *);
+  void    pop();
+};
 extern proclevel *procstack;
 
 #ifdef HAVE_NAMESPACES
@@ -148,6 +153,7 @@ extern idhdl      idroot;
 
 #ifdef HAVE_NS
 extern idhdl currPackHdl;
+extern idhdl basePackHdl;
 extern package currPack;
 extern package basePack;
 #define IDROOT (currPack->idroot)
@@ -164,10 +170,13 @@ idhdl ggetid(const char *n, BOOLEAN local = FALSE);
 idhdl ggetid(const char *n, BOOLEAN local, idhdl *packhdl);
 void  killid(char * a, idhdl * i);
 void  killhdl(idhdl h);
-void  killhdl(idhdl h, idhdl * ih);
+void  killhdl2(idhdl h, idhdl * ih);
 lists ipNameList(idhdl root);
 void  ipMoveId(idhdl h);
 BOOLEAN checkPackage(package pack);
+#ifdef HAVE_NS
+idhdl packFindHdl(package r);
+#endif
 
 #define FLAG_STD   0
 #define FLAG_DRING 1

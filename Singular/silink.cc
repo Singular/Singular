@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.41 2001-08-27 14:47:39 Singular Exp $ */
+/* $Id: silink.cc,v 1.42 2001-10-09 16:36:22 Singular Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -617,6 +617,10 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
   if ((type_id == PACKAGE_CMD) &&(strcmp(IDID(h), "Top") == 0))
     return FALSE;
 #endif
+#ifdef HAVE_NS
+  if ((type_id == PACKAGE_CMD) &&(strcmp(IDID(h), "Top") == 0))
+    return FALSE;
+#endif
 
   // we do not throw an error if a wrong type was attempted to be dumped
   if (type_str == NULL)
@@ -627,9 +631,11 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
     return DumpQring(fd, h, type_str);
 
 #ifndef HAVE_NAMESPACES
+#ifndef HAVE_NS
   // do not dump LIB string
   if (type_id == STRING_CMD && strcmp("LIB", IDID(h)) == 0)
     return FALSE;
+#endif
 #endif
 
   // put type and name
@@ -657,6 +663,12 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
   {
     if (fprintf(fd, ";\n") == EOF) return TRUE;
     else return FALSE;
+  }
+#endif
+#ifdef HAVE_NS
+  if (type_id == PACKAGE_CMD)
+  {
+    return (fprintf(fd, ";\n") == EOF);
   }
 #endif
 

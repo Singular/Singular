@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: emacs.cc,v 1.20 2001-08-27 14:46:56 Singular Exp $ */
+/* $Id: emacs.cc,v 1.21 2001-10-09 16:35:57 Singular Exp $ */
 /*
 * ABSTRACT: Esingular main file
 */
@@ -74,10 +74,10 @@ void error(char* fmt, ...)
 #define feReportBug(s) fePrintReportBug(s, __FILE__, __LINE__)
 void fePrintReportBug(char* msg, char* file, int line)
 {
-  error("YOU HAVE FOUND A BUG IN SINGULAR. 
+  error("YOU HAVE FOUND A BUG IN SINGULAR.
 Please, email the following output to singular@mathematik.uni-kl.de
-Bug occured at %s:%d 
-Message: %s 
+Bug occured at %s:%d
+Message: %s
 Version: " S_UNAME S_VERSION1 " (%lu) " __DATE__ __TIME__,
         file, line, msg, feVersionId);
 
@@ -99,17 +99,17 @@ int main(int argc, char** argv)
   char* emacs_load = NULL;
   int no_emacs_call = 0;
   char cwd[MAXPATHLEN];
-  
+
   // parse-cmdline options
-  
+
   feInitResources(argv[0]);
   feResource('S');
   feResource('b');
   feResource('r');
-  
+
   int optc, option_index;
-  
-  while ((optc = fe_getopt_long(argc, argv, SHORT_OPTS_STRING, 
+
+  while ((optc = fe_getopt_long(argc, argv, SHORT_OPTS_STRING,
                                 feOptSpec, &option_index))
         != EOF)
   {
@@ -118,7 +118,7 @@ int main(int argc, char** argv)
         case 'h':
           feOptHelp(feArgv0);
           exit(0);
-          
+
         case '?':
         case ':':
         case '\0':
@@ -133,19 +133,19 @@ int main(int argc, char** argv)
               case FE_OPT_XTERM:
                 emacs = fe_optarg;
               break;
-#else              
+#else
               case FE_OPT_EMACS:
                 emacs = fe_optarg;
                 break;
-                
+
               case FE_OPT_EMACS_DIR:
                 emacs_dir = fe_optarg;
                 break;
-                
+
               case FE_OPT_EMACS_LOAD:
                 emacs_load = fe_optarg;
                 break;
-#endif                
+#endif
               case FE_OPT_SINGULAR:
                 singular = fe_optarg;
                 break;
@@ -153,12 +153,12 @@ int main(int argc, char** argv)
               case FE_OPT_NO_CALL:
                 no_emacs_call = 1;
                 break;
-                
+
               default:
                 goto NEXT;
           }
           // delete options from option-list
-          if (fe_optind > 2 && *argv[fe_optind-1] != '-' && 
+          if (fe_optind > 2 && *argv[fe_optind-1] != '-' &&
               fe_optarg != NULL && feOptSpec[option_index].has_arg)
           {
             argv[fe_optind-2] = NULL;
@@ -180,29 +180,29 @@ int main(int argc, char** argv)
   if (emacs == NULL) emacs = feResource('X', 0);
   if (emacs == NULL)
   {
-    error( "Error: Can't find emacs xterm program. \n Expected it at %s or %s\n Specify alternative with --xterm=PROGRAM option,\n or set ESINGULAR_EMACS environment variable to the name of the program to use as xterm.\n", 
+    error( "Error: Can't find emacs xterm program. \n Expected it at %s or %s\n Specify alternative with --xterm=PROGRAM option,\n or set ESINGULAR_EMACS environment variable to the name of the program to use as xterm.\n",
            feResourceDefault('X'));
     mainUsage();
     exit(1);
   }
-  
+
   if (singular == NULL) singular = feResource("SingularXterm", 0);
   if (singular == NULL)
   {
-    error( "Error: Can't find singular executable.\n Expected it at %s\n Specify with --singular option,\n or set TSINGULAR_SINGULAR environment variable.\n", 
+    error( "Error: Can't find singular executable.\n Expected it at %s\n Specify with --singular option,\n or set TSINGULAR_SINGULAR environment variable.\n",
             feResourceDefault("SingularXterm"));
     mainUsage();
     exit(1);
   }
 
-#ifdef WINNT 
+#ifdef WINNT
 #define EXTRA_XTERM_ARGS "+vb -sl 2000 -fb Courier-bold-13 -tn linux -cr Red3"
 #else
 #define EXTRA_XTERM_ARGS ""
 #endif
 
-  syscall = (char*) omAlloc(strlen(emacs) + 
-                                 strlen(singular) + 
+  syscall = (char*) omAlloc(strlen(emacs) +
+                                 strlen(singular) +
                                  length + 300);
   sprintf(syscall, "%s %s -e %s ", emacs, EXTRA_XTERM_ARGS, singular);
 
@@ -214,37 +214,37 @@ int main(int argc, char** argv)
       strcat(syscall, argv[i]);
     }
   }
-#else  
+#else
   // make sure  emacs, singular, emacs_dir, emacs_load are set
   if (emacs == NULL) emacs = feResource("xemacs", 0);
   if (emacs == NULL) emacs = feResource("emacs", 0);
   if (emacs == NULL)
   {
-    error( "Error: Can't find emacs or xemacs executable. \n Expected it at %s or %s\n Specify alternative with --emacs option,\n or set ESINGULAR_EMACS environment variable.\n", 
+    error( "Error: Can't find emacs or xemacs executable. \n Expected it at %s or %s\n Specify alternative with --emacs option,\n or set ESINGULAR_EMACS environment variable.\n",
             feResourceDefault("emacs"), feResourceDefault("xemacs"));
     mainUsage();
     exit(1);
   }
-            
+
   if (singular == NULL) singular = feResource("SingularEmacs", 0);
   if (singular == NULL)
   {
-    error( "Error: Can't find singular executable.\n Expected it at %s\n Specify with --singular option,\n or set ESINGULAR_SINGULAR environment variable.\n", 
+    error( "Error: Can't find singular executable.\n Expected it at %s\n Specify with --singular option,\n or set ESINGULAR_SINGULAR environment variable.\n",
             feResourceDefault("SingularEmacs"));
     mainUsage();
     exit(1);
   }
-    
+
   if (emacs_dir == NULL) emacs_dir = feResource("EmacsDir", 0);
   if (emacs_dir == NULL)
   {
-    error( "Error: Can't find emacs directory for Singular lisp files. \n Expected it at %s\n Specify with --emacs_dir option,\n or set ESINGULAR_EMACS_DIR environment variable.\n", 
+    error( "Error: Can't find emacs directory for Singular lisp files. \n Expected it at %s\n Specify with --emacs_dir option,\n or set ESINGULAR_EMACS_DIR environment variable.\n",
             feResourceDefault("EmacsDir"));
     mainUsage();
     exit(1);
   }
 
-  if (emacs_load == NULL) 
+  if (emacs_load == NULL)
   {
     // look into env variable
     emacs_load = getenv("ESINGULAR_EMACS_LOAD");
@@ -267,18 +267,18 @@ int main(int argc, char** argv)
         emacs_load = feResource("EmacsLoad", 0);
         if (emacs_load == NULL)
         {
-          error( "Error: Can't find emacs load file for Singular mode. \n Expected it at %s\n Specify with --emacs_load option,\n or set ESINGULAR_EMACS_LOAD environment variable,\n or put file '.emacs-singular' in your home directory.\n", 
-                  feResourceDefault("EmacsLoad"));  
+          error( "Error: Can't find emacs load file for Singular mode. \n Expected it at %s\n Specify with --emacs_load option,\n or set ESINGULAR_EMACS_LOAD environment variable,\n or put file '.emacs-singular' in your home directory.\n",
+                  feResourceDefault("EmacsLoad"));
           mainUsage();
           exit(1);
         }
       }
     }
   }
-  
-  syscall = (char*) omAlloc(strlen(emacs) + 
-                           strlen(singular) + 
-                           strlen(emacs_dir) + 
+
+  syscall = (char*) omAlloc(strlen(emacs) +
+                           strlen(singular) +
+                           strlen(emacs_dir) +
                            strlen(emacs_load) +
                            length + 300);
   char* prefix = "--";
@@ -287,11 +287,11 @@ int main(int argc, char** argv)
   getcwd(cwd, MAXPATHLEN);
   // append / at the end of cwd
   if (cwd[strlen(cwd)-1] != '/') strcat(cwd, "/");
-    
-  // Note: option -no-init-file should be equivalent to -q. Anyhow, 
+
+  // Note: option -no-init-file should be equivalent to -q. Anyhow,
   // xemacs-20.4 sometimes crashed on startup when using -q. Don´t know why.
   sprintf(syscall, "%s %seval '(setq singular-emacs-home-directory \"%s\")' %sno-init-file %sl %s %seval '(singular-other \"%s\" \"%s\" (list ",
-          emacs, prefix, emacs_dir, prefix, prefix, emacs_load, prefix, 
+          emacs, prefix, emacs_dir, prefix, prefix, emacs_load, prefix,
           singular, cwd);
 
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.37 2001-02-21 15:41:48 Singular Exp $ */
+/* $Id: syz0.cc,v 1.38 2001-10-09 16:36:25 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -216,7 +216,7 @@ static ideal sySchreyersSyzygiesFM(ideal arg,intvec ** modcomp)
 /*----------------construction of the new ordering----------*/
   if (rkF>0)
     rSetSyzComp(rkF);
-  else 
+  else
     rSetSyzComp(1);
 /*----------------creating S--------------------------------*/
   for(j=0;j<Fl;j++)
@@ -856,7 +856,7 @@ static void syPrintResolution(resolvente res,int start,int length)
     idTest(res[start]);
     //idPrint(res[start]);
     start++;
-  }  
+  }
 }
 
 resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,

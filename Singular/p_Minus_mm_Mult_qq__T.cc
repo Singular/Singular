@@ -6,7 +6,7 @@
  *  Purpose: template for p_Minus_m_Mult_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Minus_mm_Mult_qq__T.cc,v 1.2 2001-08-27 14:47:25 Singular Exp $
+ *  Version: $Id: p_Minus_mm_Mult_qq__T.cc,v 1.3 2001-10-09 16:36:14 Singular Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -15,7 +15,7 @@
  *           Shorter, where Shorter == Length(p) + Length(q) - Length(p - m*q);
  * Destroys: p
  * Const:    m, q
- * 
+ *
  ***************************************************************/
 LINKAGE poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly spNoether, const ring r, poly &last)
 {
@@ -30,7 +30,7 @@ LINKAGE poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly
   Shorter = 0;
   // we are done if q == NULL || m == NULL
   if (q == NULL || m == NULL) return p;
-  
+
   spolyrec rp;
   poly a = &rp,                    // collects the result
     qm = NULL,                     // stores q*m
@@ -49,9 +49,9 @@ LINKAGE poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly
 
   const unsigned long* m_e = m->exp;
   omBin bin = r->PolyBin;
-  
+
   if (p == NULL) goto Finish;           // return tneg*q if (p == NULL)
-  
+
   pAssume(p_GetComp(q, r) == 0 || p_GetComp(m, r) == 0);
 
   AllocTop:
@@ -59,11 +59,11 @@ LINKAGE poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly
   SumTop:
   p_MemSum(qm->exp, q->exp, m_e, length);
   p_MemAddAdjust(qm, r);
-  
-  CmpTop:     
+
+  CmpTop:
   // compare qm = m*q and p w.r.t. monomial ordering
   p_MemCmp(qm->exp, p->exp, length, ordsgn, goto Equal, goto Greater, goto Smaller );
-  
+
   Equal:   // qm equals p
   tb = n_Mult(pGetCoeff(q), tm, r);
   tc = pGetCoeff(p);
@@ -77,7 +77,7 @@ LINKAGE poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly
     pIter(p);
   }
   else
-  { // coeffs are equal, so their difference is 0: 
+  { // coeffs are equal, so their difference is 0:
     shorter += 2;
     n_Delete(&tc, r);
     p = p_LmFreeAndNext(p, r);
@@ -87,7 +87,7 @@ LINKAGE poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly
   if (q == NULL || p == NULL) goto Finish; // are we done ?
   // no, so update qm
   goto SumTop;
-  
+
 
   Greater:
   pSetCoeff0(qm, n_Mult(pGetCoeff(q), tneg, r));
@@ -96,17 +96,17 @@ LINKAGE poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly
   if (q == NULL) // are we done?
   {
     qm = NULL;
-    goto Finish; 
+    goto Finish;
   }
-  // construct new qm 
+  // construct new qm
   goto AllocTop;
-    
-  Smaller:     
+
+  Smaller:
   a = pNext(a) = p;// append p to result and advance p
   pIter(p);
   if (p == NULL) goto Finish;
   goto CmpTop;
- 
+
 
   Finish: // q or p is NULL: Clean-up time
   if (q == NULL) // append rest of p to result
@@ -128,10 +128,10 @@ LINKAGE poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly
       pNext(a) = r->p_Procs->pp_Mult_mm(q, m, r, last);
     pSetCoeff0(m, tm);
   }
-   
+
   n_Delete(&tneg, r);
   if (qm != NULL) p_FreeBinAddr(qm, r);
   Shorter = shorter;
   p_Test(pNext(&rp), r);
   return pNext(&rp);
-} 
+}

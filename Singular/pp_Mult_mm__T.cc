@@ -6,7 +6,7 @@
  *  Purpose: template for p_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pp_Mult_mm__T.cc,v 1.2 2001-08-27 14:47:35 Singular Exp $
+ *  Version: $Id: pp_Mult_mm__T.cc,v 1.3 2001-10-09 16:36:19 Singular Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -19,7 +19,7 @@ LINKAGE poly pp_Mult_mm(poly p, const poly m, const ring ri, poly &last)
 {
   p_Test(p, ri);
   p_LmTest(m, ri);
-  if (p == NULL) 
+  if (p == NULL)
   {
     last = NULL;
     return NULL;

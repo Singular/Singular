@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.cc,v 1.20 2001-03-22 19:10:59 Singular Exp $ */
+/* $Id: gnumpc.cc,v 1.21 2001-10-09 16:36:00 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP complex floating-point numbers
 *
@@ -321,15 +321,15 @@ number ngcRePart(number a)
   if (((gmp_complex*)a)->real().isZero()) return NULL;
   gmp_complex* n = new gmp_complex(((gmp_complex*)a)->real());
   return (number)n;
-}  
-  
+}
+
 number ngcImPart(number a)
 {
   if (((gmp_complex*)a)->imag().isZero()) return NULL;
   gmp_complex* n = new gmp_complex(((gmp_complex*)a)->imag());
   return (number)n;
-}  
-  
+}
+
 /*2
 * za >= 0 ?
 */

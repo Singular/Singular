@@ -6,14 +6,14 @@
  *  Purpose: template for pp_Mult_Coeff_mm__DivSelectMult
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pp_Mult_Coeff_mm_DivSelectMult__T.cc,v 1.2 2001-08-27 14:47:33 Singular Exp $
+ *  Version: $Id: pp_Mult_Coeff_mm_DivSelectMult__T.cc,v 1.3 2001-10-09 16:36:18 Singular Exp $
  *******************************************************************/
 
 /***************************************************************
  *
  *   Returns:  p*Coeff(m)*a/b for such monomials pm of p, for which
  *             m is divisble by pm, shorter == #of monomials left out
- *   Assumes:  m, a, b are monomials, ordering is (c, dp), 
+ *   Assumes:  m, a, b are monomials, ordering is (c, dp),
  *            (p*a) is divisble by b for all monimials in question
  *   Const:    p, m, a, b
  *
@@ -39,9 +39,9 @@ LINKAGE poly pp_Mult_Coeff_mm_DivSelectMult
   p_AllocBin(ab, bin, r);
   unsigned long* ab_e = &(ab->exp[0]);
 
-  p_MemDiff(ab_e, ((unsigned long*) &(a->exp[0])), ((unsigned long*) &(b->exp[0])), 
+  p_MemDiff(ab_e, ((unsigned long*) &(a->exp[0])), ((unsigned long*) &(b->exp[0])),
             length);
-  
+
   int Shorter = 0;
   poly q = &rp;
 
@@ -49,12 +49,12 @@ LINKAGE poly pp_Mult_Coeff_mm_DivSelectMult
   {
     p_MemCmp_Bitmask_2(m_e, &(p->exp[2]), bitmask, length_2,
                        goto Divisible, goto NotDivisible);
-    
+
     NotDivisible:
     pAssume(!p_LmDivisibleByNoComp(m, p, r));
     Shorter++;
     goto Iter;
-    
+
     Divisible:
     pAssume(p_LmDivisibleByNoComp(m, p, r));
     p_AllocBin(pNext(q), bin, r);

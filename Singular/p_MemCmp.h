@@ -6,15 +6,15 @@
  *  Purpose: macros for memory comparisons
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_MemCmp.h,v 1.2 2000-12-31 15:14:37 obachman Exp $
+ *  Version: $Id: p_MemCmp.h,v 1.3 2001-10-09 16:36:13 Singular Exp $
  *******************************************************************/
 #ifndef P_MEM_CMP_H
 #define P_MEM_CMP_H
 
 /***************************************************************
- *  
+ *
  *  auxiallary macros
- *  
+ *
  *******************************************************************/
 #define _p_MemCmp_Declare(s1, s2)                   \
   const unsigned long* _s1 = ((unsigned long*) s1); \
@@ -62,11 +62,11 @@ do                                                                  \
     }                                                               \
 }                                                                   \
 while (0)
-  
+
 /***************************************************************
- *  
+ *
  *  Pomog
- *  
+ *
  *******************************************************************/
 #define p_MemCmp_LengthOne_OrdPomog(s1, s2, length, ordsgn, actionE, actionG, actionS) \
 do                                                                          \
@@ -143,9 +143,9 @@ do                                                                              
 while (0)
 
 /***************************************************************
- *  
+ *
  *  Nomog
- *  
+ *
  *******************************************************************/
 #define p_MemCmp_LengthOne_OrdNomog(s1, s2, length, ordsgn, actionE, actionG, actionS)     \
   p_MemCmp_LengthOne_OrdPomog(s1, s2, length, ordsgn, actionE, actionS, actionG)
@@ -167,9 +167,9 @@ while (0)
   p_MemCmp_LengthGeneral_OrdPomog(s1, s2, length, ordsgn, actionE, actionS, actionG)
 
 /***************************************************************
- *  
+ *
  *  PomogZero
- *  
+ *
  *******************************************************************/
 #define p_MemCmp_LengthTwo_OrdPomogZero(s1, s2, length, ordsgn, actionE, actionG, actionS)     \
   p_MemCmp_LengthOne_OrdPomog(s1, s2, length, ordsgn, actionE, actionG, actionS)
@@ -189,9 +189,9 @@ while (0)
   p_MemCmp_LengthGeneral_OrdPomog(s1, s2, (length) -1, ordsgn, actionE, actionG, actionS)
 
 /***************************************************************
- *  
+ *
  *  NomogZero
- *  
+ *
  *******************************************************************/
 #define p_MemCmp_LengthTwo_OrdNomogZero(s1, s2, length, ordsgn, actionE, actionG, actionS)     \
   p_MemCmp_LengthOne_OrdNomog(s1, s2, length, ordsgn, actionE, actionG, actionS)
@@ -211,9 +211,9 @@ while (0)
   p_MemCmp_LengthGeneral_OrdNomog(s1, s2, (length) -1, ordsgn, actionE, actionG, actionS)
 
 /***************************************************************
- *  
+ *
  *  NegPomog
- *  
+ *
  *******************************************************************/
 #define p_MemCmp_LengthTwo_OrdNegPomog(s1, s2, length, ordsgn, actionE, actionG, actionS)  \
   p_MemCmp_LengthOne_OrdPomog(s1, s2, length, ordsgn,                                      \
@@ -249,9 +249,9 @@ while (0)
                            actionS, actionG)
 
 /***************************************************************
- *  
+ *
  *  PomogNeg
- *  
+ *
  *******************************************************************/
 #define p_MemCmp_LengthTwo_OrdPomogNeg(s1, s2, length, ordsgn, actionE, actionG, actionS)  \
   p_MemCmp_LengthOne_OrdPomog(s1, s2, length, ordsgn,                                      \
@@ -287,9 +287,9 @@ while (0)
                            actionG, actionS)
 
 /***************************************************************
- *  
+ *
  *  PosNomog
- *  
+ *
  *******************************************************************/
 #define p_MemCmp_LengthThree_OrdPosNomog(s1, s2, length, ordsgn, actionE, actionG, actionS)    \
   p_MemCmp_LengthThree_OrdNegPomog(s1, s2, length, ordsgn, actionE, actionS, actionG)
@@ -305,11 +305,11 @@ while (0)
   p_MemCmp_LengthEight_OrdNegPomog(s1, s2, length, ordsgn, actionE, actionS, actionG)
 #define p_MemCmp_LengthGeneral_OrdPosNomog(s1, s2, length, ordsgn, actionE, actionG, actionS)  \
   p_MemCmp_LengthGeneral_OrdNegPomog(s1, s2, length, ordsgn, actionE, actionS, actionG)
-  
+
 /***************************************************************
- *  
+ *
  *  NomogPos
- *  
+ *
  *******************************************************************/
 #define p_MemCmp_LengthThree_OrdNomogPos(s1, s2, length, ordsgn, actionE, actionG, actionS)    \
   p_MemCmp_LengthThree_OrdPomogNeg(s1, s2, length, ordsgn, actionE, actionS, actionG)
@@ -328,9 +328,9 @@ while (0)
 
 
 /***************************************************************
- *  
+ *
  *  PomogNegZero
- *  
+ *
  *******************************************************************/
 #define p_MemCmp_LengthThree_OrdPomogNegZero(s1, s2, length, ordsgn, actionE, actionG, actionS)   \
   p_MemCmp_LengthTwo_OrdPomogNeg(s1, s2, length, ordsgn, actionE, actionG, actionS)
@@ -348,9 +348,9 @@ while (0)
   p_MemCmp_LengthGeneral_OrdPomogNeg(s1, s2, (length) -1, ordsgn, actionE, actionG, actionS)
 
 /***************************************************************
- *  
+ *
  *  NegPomogZero
- *  
+ *
  *******************************************************************/
 #define p_MemCmp_LengthThree_OrdNegPomogZero(s1, s2, length, ordsgn, actionE, actionG, actionS)   \
   p_MemCmp_LengthTwo_OrdNegPomog(s1, s2, length, ordsgn, actionE, actionG, actionS)
@@ -368,9 +368,9 @@ while (0)
   p_MemCmp_LengthGeneral_OrdNegPomog(s1, s2, (length) -1, ordsgn, actionE, actionG, actionS)
 
 /***************************************************************
- *  
+ *
  *  NomogPosZero
- *  
+ *
  *******************************************************************/
 #define p_MemCmp_LengthFour_OrdNomogPosZero(s1, s2, length, ordsgn, actionE, actionG, actionS)    \
   p_MemCmp_LengthThree_OrdNomogPos(s1, s2, length, ordsgn, actionE, actionG, actionS)
@@ -386,9 +386,9 @@ while (0)
   p_MemCmp_LengthGeneral_OrdNomogPos(s1, s2, (length) -1, ordsgn, actionE, actionG, actionS)
 
 /***************************************************************
- *  
+ *
  *  PosNomogZero
- *  
+ *
  *******************************************************************/
 #define p_MemCmp_LengthFour_OrdPosNomogZero(s1, s2, length, ordsgn, actionE, actionG, actionS)    \
   p_MemCmp_LengthThree_OrdPosNomog(s1, s2, length, ordsgn, actionE, actionG, actionS)
@@ -404,9 +404,9 @@ while (0)
   p_MemCmp_LengthGeneral_OrdPosNomog(s1, s2, (length) -1, ordsgn, actionE, actionG, actionS)
 
 /***************************************************************
- *  
- * PosPosNomog 
- *  
+ *
+ * PosPosNomog
+ *
  *******************************************************************/
 #define p_MemCmp_LengthThree_OrdPosPosNomog(s1, s2, length, ordsgn, actionE, actionG, actionS)             \
   p_MemCmp_LengthOne_OrdPomog(s1, s2, length, ordsgn,                                                      \
@@ -445,9 +445,9 @@ while (0)
                            actionG, actionS)
 
 /***************************************************************
- *  
- * NegPosNomog 
- *  
+ *
+ * NegPosNomog
+ *
  *******************************************************************/
 #define p_MemCmp_LengthThree_OrdNegPosNomog(s1, s2, length, ordsgn, actionE, actionG, actionS)             \
   p_MemCmp_LengthOne_OrdPomog(s1, s2, length, ordsgn,                                                      \
@@ -487,9 +487,9 @@ while (0)
                            actionS, actionG)
 
 /***************************************************************
- *  
- * PosNomogPos 
- *  
+ *
+ * PosNomogPos
+ *
  *******************************************************************/
 #define p_MemCmp_LengthThree_OrdPosNomogPos(s1, s2, length, ordsgn, actionE, actionG, actionS)             \
   p_MemCmp_LengthOne_OrdPomog(s1, s2, length, ordsgn,                                                      \
@@ -529,9 +529,9 @@ while (0)
 
 
 /***************************************************************
- *  
+ *
  *  PosPosNomogZero
- *  
+ *
  *******************************************************************/
 #define p_MemCmp_LengthFour_OrdPosPosNomogZero(s1, s2, length, ordsgn, actionE, actionG, actionS)    \
   p_MemCmp_LengthThree_OrdPosPosNomog(s1, s2, length, ordsgn, actionE, actionG, actionS)
@@ -547,9 +547,9 @@ while (0)
   p_MemCmp_LengthGeneral_OrdPosPosNomog(s1, s2, (length) -1, ordsgn, actionE, actionG, actionS)
 
 /***************************************************************
- *  
+ *
  *  PosNomogPosZero
- *  
+ *
  *******************************************************************/
 #define p_MemCmp_LengthFour_OrdPosNomogPosZero(s1, s2, length, ordsgn, actionE, actionG, actionS)    \
   p_MemCmp_LengthThree_OrdPosNomogPos(s1, s2, length, ordsgn, actionE, actionG, actionS)
@@ -565,9 +565,9 @@ while (0)
   p_MemCmp_LengthGeneral_OrdPosNomogPos(s1, s2, (length) -1, ordsgn, actionE, actionG, actionS)
 
 /***************************************************************
- *  
+ *
  *  NegPosNomogZero
- *  
+ *
  *******************************************************************/
 #define p_MemCmp_LengthFour_OrdNegPosNomogZero(s1, s2, length, ordsgn, actionE, actionG, actionS)    \
   p_MemCmp_LengthThree_OrdNegPosNomog(s1, s2, length, ordsgn, actionE, actionG, actionS)
@@ -584,9 +584,9 @@ while (0)
 
 
 /***************************************************************
- *  
+ *
  *  OrdGeneral
- *  
+ *
  *******************************************************************/
 #define _p_MemCmp_OrdGeneral_Declare(s1, s2)    \
   const unsigned long* _s1 = ((unsigned long*) s1);     \
@@ -607,7 +607,7 @@ do                                                              \
   if (_ordsgn[_i] == 1) actionS;                                \
   actionG;                                                      \
 }                                                               \
-while (0)                         
+while (0)
 
 #define _p_MemCmp_OrdGeneral(i, actionE)         \
 do                                              \
@@ -617,7 +617,7 @@ do                                              \
   _v2 = _s2[i];                                 \
   if (_v1 == _v2) actionE;                      \
 }                                               \
-while(0)                         
+while(0)
 
 #define _p_MemCmp_LengthTwo_OrdGeneral(actionE)          \
   _p_MemCmp_OrdGeneral(0, _p_MemCmp_OrdGeneral(1, actionE))
@@ -713,9 +713,9 @@ do                                                                              
 while (0)
 
 /***************************************************************
- *  
+ *
  *  Last but not least LengthGeneral_OrdGeneral
- *  
+ *
  *******************************************************************/
 #define p_MemCmp_LengthGeneral_OrdGeneral(s1, s2, length, ordsgn, actionE, actionG, actionS)    \
 do                                                                                              \
@@ -765,9 +765,9 @@ do                                                                              
 while (0)
 
 /***************************************************************
- *  
+ *
  *  Bitmask
- *  
+ *
  *******************************************************************/
 #define _p_MemCmp_Bitmask_Declare(s1, s2, bitmask)  \
   const unsigned long* _s1 = ((unsigned long*) s1); \
@@ -812,7 +812,7 @@ do                                                                          \
     actionS;                                                               \
 }                                                                           \
 while (0)
-  
+
 #define _p_MemCmp_Bitmask_LengthTwo(actionS)    \
   do                                            \
 {                                               \

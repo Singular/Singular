@@ -6,7 +6,7 @@
  *  Purpose: template for p_Copy
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Copy__T.cc,v 1.2 2001-08-27 14:47:22 Singular Exp $
+ *  Version: $Id: p_Copy__T.cc,v 1.3 2001-10-09 16:36:13 Singular Exp $
  *******************************************************************/
 
 LINKAGE poly p_Copy(poly s_p, const ring r)
@@ -17,7 +17,7 @@ LINKAGE poly p_Copy(poly s_p, const ring r)
   poly d_p = &dp;
   omBin bin = r->PolyBin;
   poly h;
-  
+
   DECLARE_LENGTH(const unsigned long length = r->ExpL_Size);
 
   while (s_p != NULL)

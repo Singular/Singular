@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.25 2001-09-25 16:07:29 Singular Exp $ */
+/* $Id: ipshell.h,v 1.26 2001-10-09 16:36:06 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -170,7 +170,11 @@ int     iiDeclCommand(leftv sy, leftv name, int lev, int t, idhdl* root,
 #ifdef HAVE_NAMESPACES
 sleftv * iiMake_proc(idhdl pn, sleftv* slpn, sleftv* sl);
 #else /* HAVE_NAMESPACES */
+#ifdef HAVE_NS
+sleftv * iiMake_proc(idhdl pn, package pack, sleftv* sl);
+#else /* HAVE_NS */
 sleftv * iiMake_proc(idhdl pn, sleftv* sl);
+#endif /* HAVE_NS */
 #endif /* HAVE_NAMESPACES */
 // from misc.cc:
 char *  showOption();
@@ -179,5 +183,10 @@ BOOLEAN setOption(leftv res, leftv v);
 char * versionString();
 /* ================================================================== */
 void  singular_example(char *str);
+
+#ifdef HAVE_NS
+void listall();
+void checkall();
+#endif
 #endif
 

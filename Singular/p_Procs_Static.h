@@ -6,7 +6,7 @@
  *  Purpose: Configuration for static p_Procs
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Static.h,v 1.3 2000-12-20 17:18:53 obachman Exp $
+ *  Version: $Id: p_Procs_Static.h,v 1.4 2001-10-09 16:36:16 Singular Exp $
  *******************************************************************/
 
 #ifndef P_PROCS_STATIC_H
@@ -45,7 +45,7 @@
 #define HAVE_FAST_ORD 4
 
 // Set HAVE_FAST_ZERO_ORD to:
-//  0 -- no zero ords are considered 
+//  0 -- no zero ords are considered
 //  1 -- only ZeroOrds for OrdPosNomogPosZero, OrdNomogPosZero, OrdPomogNegZero
 //  2 -- ZeroOrds for all
 #define HAVE_FAST_ZERO_ORD 1

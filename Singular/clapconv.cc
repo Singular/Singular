@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.32 2000-12-08 17:26:22 Singular Exp $
+// $Id: clapconv.cc,v 1.33 2001-10-09 16:35:56 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -209,7 +209,7 @@ static void convRecPP ( const CanonicalForm & f, int * exp, poly & result )
       else
       {
         number z=(number)omAllocBin(rnumber_bin);
-#if defined(LDEBUG) 
+#if defined(LDEBUG)
         z->debug=123456;
 #endif
         z->z = gmp_numerator( f );
@@ -282,7 +282,7 @@ conv_RecPP ( const CanonicalForm & f, int * exp, poly & result, ring r )
       else
       {
         number z=(number)omAllocBin(rnumber_bin);
-#if defined(LDEBUG) 
+#if defined(LDEBUG)
         z->debug=123456;
 #endif
         z->z = gmp_numerator( f );
@@ -580,7 +580,7 @@ static number convClapNSingAN( const CanonicalForm &f)
   else
   {
     number z=(number)omAllocBin(rnumber_bin);
-#if defined(LDEBUG) 
+#if defined(LDEBUG)
     z->debug=123456;
 #endif
     z->z = gmp_numerator( f );

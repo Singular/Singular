@@ -6,7 +6,7 @@
  *  Purpose: template for p_Mult_n
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pp_Mult_mm_Noether__T.cc,v 1.2 2001-08-27 14:47:35 Singular Exp $
+ *  Version: $Id: pp_Mult_mm_Noether__T.cc,v 1.3 2001-10-09 16:36:19 Singular Exp $
  *******************************************************************/
 
 /***************************************************************
@@ -22,7 +22,7 @@ LINKAGE poly pp_Mult_mm_Noether(poly p, const poly m, const poly spNoether, int 
   p_Test(p, ri);
   p_LmTest(m, ri);
   assume(spNoether != NULL);
-  if (p == NULL) 
+  if (p == NULL)
   {
     ll = 0;
     last = NULL;
@@ -39,7 +39,7 @@ LINKAGE poly pp_Mult_mm_Noether(poly p, const poly m, const poly spNoether, int 
   pAssume(!n_IsZero(ln,ri));
   pAssume1(p_GetComp(m, ri) == 0 || p_MaxComp(p, ri) == 0);
   int l = 0;
-  
+
   do
   {
     p_AllocBin(r, bin, ri);
@@ -47,7 +47,7 @@ LINKAGE poly pp_Mult_mm_Noether(poly p, const poly m, const poly spNoether, int 
     p_MemAddAdjust(r, ri);
 
     p_MemCmp(r->exp, spNoether_exp, length, ordsgn, goto Continue, goto Continue, goto Break);
-    
+
     Break:
     p_FreeBinAddr(r, ri);
     break;
@@ -63,8 +63,8 @@ LINKAGE poly pp_Mult_mm_Noether(poly p, const poly m, const poly spNoether, int 
     ll = l;
   else
     ll = pLength(p);
-  
-  if (q != &rp) 
+
+  if (q != &rp)
     last = q;
   pNext(q) = NULL;
 

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.32 2001-02-13 13:10:38 Singular Exp $ */
+/* $Id: pcv.cc,v 1.33 2001-10-09 16:36:17 Singular Exp $ */
 /*
 * ABSTRACT: conversion between polys and coef vectors
 */
@@ -153,7 +153,7 @@ BOOLEAN pcvMinDeg(leftv res,leftv h)
     if(h->Typ()==MATRIX_CMD)
     {
       res->rtyp=INT_CMD;
-      res->data=(void*)pcvMinDeg((matrix)h->Data());      
+      res->data=(void*)pcvMinDeg((matrix)h->Data());
       return FALSE;
     }
   }

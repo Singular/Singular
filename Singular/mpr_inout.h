@@ -4,7 +4,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_inout.h,v 1.6 1999-12-02 23:03:51 wenk Exp $ */
+/* $Id: mpr_inout.h,v 1.7 2001-10-09 16:36:10 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - interface to Singular
@@ -48,10 +48,10 @@ BOOLEAN nuMPResMat( leftv res, leftv arg1, leftv arg2 );
 BOOLEAN nuLagSolve( leftv res, leftv arg1, leftv arg2, leftv arg3 );
 
 /**
- * COMPUTE: polynomial p with values given by v at points p1,..,pN derived 
+ * COMPUTE: polynomial p with values given by v at points p1,..,pN derived
  * from p; more precisely: consider p as point in K^n and v as N elements in K,
  * let p1,..,pN be the points in K^n obtained by evaluating all monomials
- * of degree 0,1,...,N at p in lexicographical order, then the procedure 
+ * of degree 0,1,...,N at p in lexicographical order, then the procedure
  * computes the polynomial f satisfying f(pi) = v[i]
  * RETURN:  polynomial f of degree d
  */

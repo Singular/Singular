@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.52 2001-08-27 14:47:40 Singular Exp $ */
+/* $Id: sparsmat.cc,v 1.53 2001-10-09 16:36:23 Singular Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -30,7 +30,7 @@
 
 // this is also influenced by TEST_OPT_NOTBUCKETS
 #ifndef SM_NO_BUCKETS
-// buckets do carry a small additional overhead: only use them if 
+// buckets do carry a small additional overhead: only use them if
 // min-length of polys is >= SM_MIN_LENGTH_BUCKET
 #define SM_MIN_LENGTH_BUCKET MIN_LENGTH_BUCKET - 5
 #else
@@ -55,7 +55,7 @@ static poly smSmpoly2Poly(smpoly);
 static BOOLEAN smHaveDenom(poly);
 static number smCleardenom(ideal);
 
-static poly pp_Mult_Coeff_mm_DivSelect_MultDiv(poly p, int &lp, poly m, 
+static poly pp_Mult_Coeff_mm_DivSelect_MultDiv(poly p, int &lp, poly m,
                                                poly a, poly b)
 {
   if (rOrd_is_Comp_dp(currRing) && currRing->ExpL_Size > 2)
@@ -65,7 +65,7 @@ static poly pp_Mult_Coeff_mm_DivSelect_MultDiv(poly p, int &lp, poly m,
     // should be generalized, at least to dp with ExpL_Size == 2
     // (is the case for 1 variable)
     int shorter;
-    p = currRing->p_Procs->pp_Mult_Coeff_mm_DivSelectMult(p, m, a, b, 
+    p = currRing->p_Procs->pp_Mult_Coeff_mm_DivSelectMult(p, m, a, b,
                                                           shorter, currRing);
     lp -= shorter;
   }
@@ -1944,7 +1944,7 @@ poly smMultDiv(poly a, poly b, const poly c)
       return res;
     }
   }
-  
+
   if (!TEST_OPT_NOT_BUCKETS && lb >= SM_MIN_LENGTH_BUCKET)
   {
     // use buckets if minimum length is smaller than threshold
@@ -1959,7 +1959,7 @@ poly smMultDiv(poly a, poly b, const poly c)
     else
     {
       append = res;
-      while (pNext(append) != pa) 
+      while (pNext(append) != pa)
       {
         assume(pNext(append) != NULL);
         pIter(append);
@@ -2141,7 +2141,7 @@ static void smExactPolyDiv(poly a, poly b)
         h = ppMult_mm(tail, e);
       nDelete(&yn);
       kBucket_Add_q(bucket, h, &lh);
-    
+
       a = pNext(a) = kBucketExtractLm(bucket);
     } while (a!=NULL);
     kBucketDestroy(&bucket);
@@ -2199,9 +2199,9 @@ static void smExpMultDiv(poly t, const poly b, const poly c)
   pLmTest(b);
   pLmTest(c);
   poly bc = p_New(currRing);
-  
+
   p_ExpVectorDiff(bc, b, c, currRing);
-  
+
   while(t!=NULL)
   {
     pExpVectorAdd(t, bc);
@@ -2545,7 +2545,7 @@ private:
   int sing;            // indicator for singular problem
   int rpiv;            // row-position of the pivot
   int *perm;           // permutation of rows
-  number one;          // the "1" 
+  number one;          // the "1"
   number *sol;         // field for solution
   int *wrw, *wcl;      // weights of rows and columns
   smnumber * m_act;    // unreduced columns

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmalloc.h,v 1.2 2000-08-14 16:05:43 obachman Exp $ */
+/* $Id: mmalloc.h,v 1.3 2001-10-09 16:36:09 Singular Exp $ */
 /*
 * ABSTRACT: declaration of routines for memory stuff
 */
@@ -15,7 +15,7 @@ int mmInit(void);
 #undef freeSize
 
 #ifdef __cplusplus
-extern "C" 
+extern "C"
 {
 #endif
   void* reallocSize(void* old_addr, size_t old_size, size_t new_size);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.77 2001-09-25 16:07:31 Singular Exp $ */
+/* $Id: polys.cc,v 1.78 2001-10-09 16:36:18 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -70,7 +70,7 @@ void pSetDegProcs(pFDegProc new_FDeg, pLDegProc new_lDeg)
   assume(new_FDeg != NULL);
   pFDeg = new_FDeg;
   currRing->pFDeg = new_FDeg;
-  
+
   if (new_lDeg == NULL)
     new_lDeg = currRing->pLDegOrig;
 
@@ -79,7 +79,7 @@ void pSetDegProcs(pFDegProc new_FDeg, pLDegProc new_lDeg)
 }
 
 
-// restores pFDeg and pLDeg: 
+// restores pFDeg and pLDeg:
 extern void pRestoreDegProcs(pFDegProc old_FDeg, pLDegProc old_lDeg)
 {
   assume(old_FDeg != NULL && old_lDeg != NULL);

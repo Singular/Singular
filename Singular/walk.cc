@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: walk.cc,v 1.5 2001-08-27 14:47:45 Singular Exp $ */
+/* $Id: walk.cc,v 1.6 2001-10-09 16:36:27 Singular Exp $ */
 /*
 * ABSTRACT: Implementation of the Groebner walk
 */
@@ -80,7 +80,7 @@ static inline void cancel(long &zaehler, long &nenner)
 static inline int MLmWeightedDegree(const poly p, intvec* weight)
 {
   int i, d = 0;
-  
+
   for (i=1; i<=pVariables; i++)
     d += pGetExp(p, i) * (*weight)[i-1];
 
@@ -98,11 +98,11 @@ static inline int MwalkWeightDegree(poly p, intvec* weight_vector)
 
   while(p != NULL)
   {
-    hp = pHead(p); 
+    hp = pHead(p);
     pIter(p);
     maxtemp = MLmWeightedDegree(hp, weight_vector);
 
-    if (maxtemp > max) 
+    if (maxtemp > max)
       max = maxtemp;
   }
   return max;
@@ -115,17 +115,17 @@ static poly MpolyInitialForm(poly g, intvec* curr_weight)
 {
   if(g == NULL)
     return g;
-  
+
   int maxtmp, max = 0;
-  poly in_w_g = NULL, hg;    
- 
+  poly in_w_g = NULL, hg;
+
   while(g != NULL)
   {
     hg = pHead(g);
     pIter(g);
     maxtmp = MwalkWeightDegree(hg, curr_weight);
 
-    if(maxtmp > max)  
+    if(maxtmp > max)
     {
       max = maxtmp;
       in_w_g = hg;
@@ -145,7 +145,7 @@ ideal MwalkInitialForm(ideal G, intvec* curr_weight)
 {
   int i;
   int nG = IDELEMS(G);
-  ideal Gomega  = idInit(nG, G->rank); 
+  ideal Gomega  = idInit(nG, G->rank);
 
   for(i=0; i<nG; i++)
     Gomega->m[i] = MpolyInitialForm(G->m[i], curr_weight);
@@ -183,7 +183,7 @@ void* test_w_in_Cone(ideal G, intvec* iv)
 //compute a least common multiple of two integers
 static inline long Mlcm(long &i1, long &i2)
 {
-  long temp = gcd(i1, i2);  
+  long temp = gcd(i1, i2);
   return ((i1*i2) / temp);
 }
 
@@ -196,7 +196,7 @@ static inline long  MivDotProduct(intvec* a, intvec* b)
   assume( a->length() ==  b->length());
   int i, n = a->length();
   long result = 0;
-  
+
   for(i=0; i<n; i++)
     result += (*a)[i] * (*b)[i];
 
@@ -213,9 +213,9 @@ static intvec* MExpPol(poly f)
 
   intvec* result = new intvec(nR);
   int i;
-  
+
   for(i=0; i<nR; i++)
-    (*result)[i] = pGetExp(f,i+1);    
+    (*result)[i] = pGetExp(f,i+1);
 
   intvec *res = ivCopy(result);
   omFree((ADDRESS) result);
@@ -231,19 +231,19 @@ static poly MpDiv(poly a, poly b)
 {
   assume (b != NULL);
   BOOLEAN ok = TRUE;
-  
-  if(a == NULL)
-    return a;  
-  
-  int nR = currRing->N;
-  
-  number nn = (number) omAllocBin(rnumber_bin);
-      
-  poly  ptmp, ppotenz; 
-  poly result = pISet(1); 
 
-  intvec* iva = MExpPol(a);  //head exponent of a   
-  intvec* ivb = MExpPol(b);  //head exponent of a  
+  if(a == NULL)
+    return a;
+
+  int nR = currRing->N;
+
+  number nn = (number) omAllocBin(rnumber_bin);
+
+  poly  ptmp, ppotenz;
+  poly result = pISet(1);
+
+  intvec* iva = MExpPol(a);  //head exponent of a
+  intvec* ivb = MExpPol(b);  //head exponent of a
 
   int nab;
   for(int i=0; i<nR; i++)
@@ -257,7 +257,7 @@ static poly MpDiv(poly a, poly b)
     }
     //define a polynomial which is a variable of the basering
     ptmp = (poly) pmInit(currRing->names[i], ok);  //p:=xi
-    ppotenz = pPower(ptmp, nab); 
+    ppotenz = pPower(ptmp, nab);
     result = pMult(result, ppotenz);
   }
   nn = nDiv(pGetCoeff(a), pGetCoeff(b));
@@ -275,23 +275,23 @@ static poly MpDiv(poly a, poly b)
 static poly MpMult(poly a, poly b)
 {
   if(a == NULL || b == NULL)
-    return a;  
-  
+    return a;
+
   int nR = currRing->N;
-  BOOLEAN ok = TRUE;  
-  
-  poly  ptmp, ppotenz; 
-  poly result = pISet(1);  // result := 1  
+  BOOLEAN ok = TRUE;
+
+  poly  ptmp, ppotenz;
+  poly result = pISet(1);  // result := 1
   intvec* ivab = ivAdd(MExpPol(a), MExpPol(b));
 
   for(int i=0; i<nR; i++)
   {
     //define a polynomial which is a variable of the basering
     ptmp = pmInit(currRing->names[i], ok);
-    ppotenz = pPower(ptmp, (*ivab)[i]); 
+    ppotenz = pPower(ptmp, (*ivab)[i]);
     result = pMult(result, ppotenz);
   }
-  number nn = nMult(pGetCoeff(a), pGetCoeff(b)); 
+  number nn = nMult(pGetCoeff(a), pGetCoeff(b));
   result = pMult_nn(result, nn);
 
   return result;
@@ -299,27 +299,27 @@ static poly MpMult(poly a, poly b)
 
 
 poly  MivSame(intvec* u , intvec* v)
-{ 
+{
   assume(u->length() == v->length());
 
   int i, niv = u->length();
-  
+
   for (i=0; i<niv; i++)
     if ((*u)[i] != (*v)[i])
       return pISet(1);
 
-  return (poly) NULL; 
+  return (poly) NULL;
 }
 
 poly  M3ivSame(intvec* temp, intvec* u , intvec* v)
-{ 
+{
   assume(temp->length() == u->length() && u->length() == v->length());
 
   if(MivSame(temp, u) == NULL)
     return (poly) NULL;
   if(MivSame(temp, v) == NULL)
     return pISet(1);
-  return pISet(2);  
+  return pISet(2);
 }
 
 
@@ -333,11 +333,11 @@ poly MPolVar(intvec* iv)
   poly ptemp = pOne();
   poly pvar, ppotenz;
   BOOLEAN ok = TRUE;
-  
+
   for(i=0; i<niv; i++)
   {
     pvar = (poly) pmInit(currRing->names[i], ok);  //p:=x_i
-    ppotenz = pPower(pvar, (*iv)[i]); 
+    ppotenz = pPower(pvar, (*iv)[i]);
     ptemp = pMult(ptemp, ppotenz);
   }
   return ptemp;
@@ -358,16 +358,16 @@ ideal Mstdhom(ideal G)
 {
   G = kStd(G, NULL, isHomog, NULL);
   G = kInterRed(G, NULL);//21.02
-  idSkipZeroes(G);  
+  idSkipZeroes(G);
   return G;
 }
 
 /* compute a reduced Groebner basis of a Groebner basis */
 ideal MkInterRed(ideal G)
-{  
+{
   if(G == NULL)
     return G;
-  
+
   G = kInterRed(G, NULL);
   idSkipZeroes(G);
   return G;
@@ -384,7 +384,7 @@ ideal MkInterRed(ideal G)
 intvec* MivMatrixOrder(intvec* iv)
 {
   int i,j;
-  int nR = currRing->N; 
+  int nR = currRing->N;
   intvec* ivm = new intvec(nR*nR);
 
   for(i=0; i<nR; i++)
@@ -398,7 +398,7 @@ intvec* MivMatrixOrder(intvec* iv)
 
 static intvec* MivMatUnit(void)
 {
-  int nR = currRing->N; 
+  int nR = currRing->N;
   intvec* ivm = new intvec(nR);
 
   (*ivm)[0] = 1;
@@ -409,7 +409,7 @@ static intvec* MivMatUnit(void)
 /* return iv = (1, ..., 1) */
 intvec* Mivdp(int nR)
 {
-  int i; 
+  int i;
   intvec* ivm = new intvec(nR);
 
   for(i=0; i<nR; i++)
@@ -421,16 +421,16 @@ intvec* Mivdp(int nR)
 /* return iv = (1,0, ..., 0) */
 intvec* Mivlp(int nR)
 {
-  int i; 
+  int i;
   intvec* ivm = new intvec(nR);
   (*ivm)[0] = 1;
 
-  return ivm;  
+  return ivm;
 }
 
 intvec* Mivdp0(int nR)
 {
-  int i; 
+  int i;
   intvec* ivm = new intvec(nR);
   (*ivm)[nR-1] = 0;
   for(i=0; i<nR-1; i++)
@@ -448,7 +448,7 @@ intvec* Mivdp0(int nR)
 * intmat target_ord is an integer order matrix of the monomial ordering of   *
 * basering.                                                                  *
 * This programm computes a perturbated vector with a p_deg perturbation      *
-* degree which smaller than the numbers of varibles                          * 
+* degree which smaller than the numbers of varibles                          *
 ******************************************************************************/
 /* ivtarget is a matrix of a degree reverse lex. order */
 intvec* MPertVectors(ideal G, intvec* ivtarget, int pdeg)
@@ -458,10 +458,10 @@ intvec* MPertVectors(ideal G, intvec* ivtarget, int pdeg)
 
   int i, j;
   intvec* pert_vector =  new intvec(nV);
-  
+
   //Checking that the perturbated degree is valid
   if(pdeg > nV || pdeg <= 0)
-  {  
+  {
     WerrorS("The perturbed degree is wrong!!");
     return pert_vector;
   }
@@ -470,7 +470,7 @@ intvec* MPertVectors(ideal G, intvec* ivtarget, int pdeg)
 
   if(pdeg == 1)
     return pert_vector;
-     
+
   // Calculate max1 = Max(A2)+Max(A3)+...+Max(Apdeg),
   // where the Ai are the i-te rows of the matrix target_ord.
 
@@ -478,36 +478,36 @@ intvec* MPertVectors(ideal G, intvec* ivtarget, int pdeg)
   //for(i=1; i<pdeg; i++)
   for(i=0; i<pdeg; i++) //for "dp"
   {
-    maxAi = (*ivtarget)[i*nV]; 
+    maxAi = (*ivtarget)[i*nV];
     for(j=i*nV+1; j<(i+1)*nV; j++)
     {
       ntemp = (*ivtarget)[j];
       if(ntemp > maxAi)
         maxAi = ntemp;
     }
-    maxA += maxAi;    
+    maxA += maxAi;
   }
-  
+
   // Calculate inveps = 1/eps, where 1/eps > totaldeg(p)*max1 for all p in G.
   int inveps, tot_deg = 0, maxdeg;
 
-  intvec* ivUnit = Mivdp(nV);//19.02 
+  intvec* ivUnit = Mivdp(nV);//19.02
   for(i=0; i<IDELEMS(G); i++)
   {
     //maxdeg = pTotaldegree(G->m[i], currRing); //it's wrong for ex1,2,rose
     maxdeg = MwalkWeightDegree(G->m[i], ivUnit);
-    if (maxdeg > tot_deg ) 
+    if (maxdeg > tot_deg )
       tot_deg = maxdeg;
   }
   inveps = (tot_deg * maxA) + 1;
-  
+
   // pert(A1) = inveps^(pdeg-1)*A1 + inveps^(pdeg-2)*A2+...+A_pdeg,
   // pert_vector := A1
   for ( i=1; i < pdeg; i++ )
     for(j=0; j<nV; j++)
        (*pert_vector)[j] = inveps*(*pert_vector)[j] + (*ivtarget)[i*nV+j];
 
-  
+
   int temp = (*pert_vector)[0];
   for(i=1; i<nV; i++)
   {
@@ -518,7 +518,7 @@ intvec* MPertVectors(ideal G, intvec* ivtarget, int pdeg)
   if(temp != 1)
     for(i=0; i<nV; i++)
       (*pert_vector)[i] = (*pert_vector)[i] / temp;
-  
+
   //test_w_in_Cone(G, pert_vector);
   return pert_vector;
 }
@@ -531,10 +531,10 @@ intvec* MPertVectorslp(ideal G, intvec* ivtarget, int pdeg)
 
   int i, j;
   intvec* pert_vector =  new intvec(nV);
-  
+
   //Checking that the perturbated degree is valid
   if(pdeg > nV || pdeg <= 0)
-  {  
+  {
     WerrorS("The perturbed degree is wrong!!");
     return pert_vector;
   }
@@ -543,32 +543,32 @@ intvec* MPertVectorslp(ideal G, intvec* ivtarget, int pdeg)
 
   if(pdeg == 1)
     return pert_vector;
-     
+
   // Calculate max1 = Max(A2)+Max(A3)+...+Max(Apdeg),
   // where the Ai are the i-te rows of the matrix target_ord.
   int ntemp, maxAi, maxA=0;
   for(i=1; i<pdeg; i++)
   //for(i=0; i<pdeg; i++) //for "dp"
   {
-    maxAi = (*ivtarget)[i*nV]; 
+    maxAi = (*ivtarget)[i*nV];
     for(j=i*nV+1; j<(i+1)*nV; j++)
     {
       ntemp = (*ivtarget)[j];
       if(ntemp > maxAi)
         maxAi = ntemp;
     }
-    maxA += maxAi;    
+    maxA += maxAi;
   }
-  
+
   // Calculate inveps := 1/eps, where 1/eps > deg(p)*max1 for all p in G.
   int inveps, tot_deg = 0, maxdeg;
 
-  intvec* ivUnit = Mivdp(nV);//19.02 
+  intvec* ivUnit = Mivdp(nV);//19.02
   for(i=0; i<IDELEMS(G); i++)
   {
     //maxdeg = pTotaldegree(G->m[i], currRing); //it's wrong for ex1,2,rose
     maxdeg = MwalkWeightDegree(G->m[i], ivUnit);
-    if (maxdeg > tot_deg ) 
+    if (maxdeg > tot_deg )
       tot_deg = maxdeg;
   }
   inveps = (tot_deg * maxA) + 1;
@@ -578,7 +578,7 @@ intvec* MPertVectorslp(ideal G, intvec* ivtarget, int pdeg)
   for ( i=1; i < pdeg; i++ )
     for(j=0; j<nV; j++)
       (*pert_vector)[j] = inveps*((*pert_vector)[j]) + (*ivtarget)[i*nV+j];
-    
+
   int temp = (*pert_vector)[0];
   for(i=1; i<nV; i++)
   {
@@ -604,10 +604,10 @@ intvec* MivMatrixOrderlp(int nV)
 {
   int i;
   intvec* ivM = new intvec(nV*nV);
-      
+
   for(i=0; i<nV; i++)
     (*ivM)[i*nV + i] = 1;
-  
+
   return(ivM);
 }
 
@@ -615,13 +615,13 @@ intvec* MivMatrixOrderdp(int nV)
 {
   int i;
   intvec* ivM = new intvec(nV*nV);
-      
+
   for(i=0; i<nV; i++)
     (*ivM)[i] = 1;
 
   for(i=1; i<nV; i++)
     (*ivM)[(i+1)*nV - i] = -1;
-  
+
   return(ivM);
 }
 
@@ -631,13 +631,13 @@ intvec* MivWeightOrderlp(intvec* ivstart)
   int i;
   int nV = ivstart->length();
   intvec* ivM = new intvec(nV*nV);
-      
+
   for(i=0; i<nV; i++)
     (*ivM)[i] = (*ivstart)[i];
 
   for(i=1; i<nV; i++)
     (*ivM)[i*nV + i-1] = 1;
-  
+
   return(ivM);
 }
 
@@ -646,7 +646,7 @@ intvec* MivWeightOrderdp(intvec* ivstart)
   int i;
   int nV = ivstart->length();
   intvec* ivM = new intvec(nV*nV);
-      
+
   for(i=0; i<nV; i++)
     (*ivM)[i] = (*ivstart)[i];
 
@@ -655,7 +655,7 @@ intvec* MivWeightOrderdp(intvec* ivstart)
 
   for(i=2; i<nV; i++)
     (*ivM)[(i+1)*nV - i] = -1;
-  
+
   return(ivM);
 }
 
@@ -663,10 +663,10 @@ intvec* MivUnit(int nV)
 {
   int i;
   intvec* ivM = new intvec(nV);
-      
+
   for(i=0; i<nV; i++)
     (*ivM)[i] = 1;
-  
+
   return(ivM);
 }
 
@@ -674,7 +674,7 @@ intvec* MivUnit(int nV)
 *  compute a perturbed weight vector of a matrix order w.r.t. an ideal  *
 *************************************************************************/
 intvec* Mfpertvector(ideal G, intvec* ivtarget)
-//intvec* Mfpertvector(ideal G) 
+//intvec* Mfpertvector(ideal G)
 {
   int i, j;
   int nV = currRing->N;
@@ -683,33 +683,33 @@ intvec* Mfpertvector(ideal G, intvec* ivtarget)
   // Calculate max1 = Max(A2) + Max(A3) + ... + Max(AnV),
   // where the Ai are the i-te rows of the matrix 'targer_ord'.
   int ntemp, maxAi, maxA=0;
-  for(i=1; i<nV; i++) //30.03   
+  for(i=1; i<nV; i++) //30.03
     //for(i=0; i<nV; i++) //for "dp"
   {
-    maxAi = (*ivtarget)[i*nV]; 
+    maxAi = (*ivtarget)[i*nV];
     for(j=i*nV+1; j<(i+1)*nV; j++)
     {
       ntemp = (*ivtarget)[j];
       if(ntemp > maxAi)
         maxAi = ntemp;
     }
-    maxA = maxA + maxAi;    
+    maxA = maxA + maxAi;
   }
   intvec* ivUnit = Mivdp(nV);
-  
+
   // Calculate inveps = 1/eps, where 1/eps > deg(p)*max1 for all p in G.
   int inveps, tot_deg = 0, maxdeg;
   for(i=0; i<IDELEMS(G); i++)
   {
     maxdeg = MwalkWeightDegree(G->m[i], ivUnit);
     //maxdeg = pTotaldegree(G->m[i]);
-    if (maxdeg > tot_deg ) 
+    if (maxdeg > tot_deg )
       tot_deg = maxdeg;
   }
-  inveps = (tot_deg * maxA) + 1;  
+  inveps = (tot_deg * maxA) + 1;
 
   // Calculate the perturbed target orders:
-  intvec* ivtemp = new intvec(nV);  
+  intvec* ivtemp = new intvec(nV);
   intvec* pert_vector = new intvec(niv);
   for(i=0; i<nV; i++)
   {
@@ -721,8 +721,8 @@ intvec* Mfpertvector(ideal G, intvec* ivtarget)
   {
     for(j=0; j<nV; j++)
       (* ivtemp)[j] = inveps*(*ivtemp)[j] + (*ivtarget)[i*nV+j];
-    for(j=0; j<nV; j++) 
-      (* pert_vector)[i*nV+j] = (* ivtemp)[j];   
+    for(j=0; j<nV; j++)
+      (* pert_vector)[i*nV+j] = (* ivtemp)[j];
   }
   omFree((ADDRESS)ivtemp);
   return pert_vector;
@@ -732,21 +732,21 @@ intvec* Mfpertvector(ideal G, intvec* ivtarget)
 /**********************************************************************
  *  computes a transformation matrix as an ideal L
     an i-th element of L is a representasion of an i-th element M w.r.t.
-    the generators of Gomega  
+    the generators of Gomega
 ********************************************************************/
 
 ideal MidLift(ideal Gomega, ideal M)
 {
-  //M = idLift(Gomega, M, NULL, FALSE, FALSE, TRUE, NULL); 
+  //M = idLift(Gomega, M, NULL, FALSE, FALSE, TRUE, NULL);
   //return M;
   //17.04.01
-  ideal Mtmp = idInit(IDELEMS(M),1); 
-  Mtmp = idLift(Gomega, M, NULL, FALSE, FALSE, TRUE, NULL);  
+  ideal Mtmp = idInit(IDELEMS(M),1);
+  Mtmp = idLift(Gomega, M, NULL, FALSE, FALSE, TRUE, NULL);
   idSkipZeroes(Mtmp);
-  M = idCopy(Mtmp); 
+  M = idCopy(Mtmp);
 
-  omFree((ADDRESS)Mtmp); 
-  return M; 
+  omFree((ADDRESS)Mtmp);
+  return M;
 }
 
 /****************************************************************
@@ -760,30 +760,30 @@ ideal MidMultLift(ideal A, ideal B)
 
   if(A==NULL || B==NULL)
     return result;
-  
+
   if(mB < mA)
-  {    
+  {
     mA = mB;
     result = idInit(mA, 1);
   }
   else
   result = idInit(mA, 1);
-  
+
   int i, k=0;
   for(i=0; i<mA; i++)
     if(A->m[i] != NULL)
-    {  
+    {
       result->m[k] = pMult(pCopy(A->m[i]), pCopy(B->m[i]));
       k++;
-    }      
+    }
 
   //idSkipZeroes(result); //walkalp_CON
   ideal res = idCopy(result);
   idDelete(&result);
-  return res;  
+  return res;
 }
 
-//computes a  multiplication of two ideals L and G, ie. L[i]*G[i] 
+//computes a  multiplication of two ideals L and G, ie. L[i]*G[i]
 ideal MLiftLmalG(ideal L, ideal G)
 {
   int i, j;
@@ -797,7 +797,7 @@ ideal MLiftLmalG(ideal L, ideal G)
     T = idVec2Ideal(L->m[i]);
     mG = MidMultLift(T,G);
     idSkipZeroes(mG);
- 
+
     for(j=0; j<IDELEMS(mG); j++)
     {
       pGtmp = pAdd(pGtmp, mG->m[j]);
@@ -807,12 +807,12 @@ ideal MLiftLmalG(ideal L, ideal G)
   idSkipZeroes(Gtemp);
 
   //compute a reduced Groebner basis of GF
-  //Gtemp = kInterRed(Gtemp, NULL); 
+  //Gtemp = kInterRed(Gtemp, NULL);
   L = idCopy(Gtemp);
 
   omFree((ADDRESS)mG);
-  omFree((ADDRESS)Gtemp);  
-  return L; 
+  omFree((ADDRESS)Gtemp);
+  return L;
 }
 
 /*********************************************************************
@@ -827,28 +827,28 @@ ideal MLiftLmalG(ideal L, ideal G)
 ideal MLiftLmalGNew(ideal Gomega, ideal M, ideal G)
 {
   int i, j;
-  M = idLift(Gomega, M, NULL, FALSE, FALSE, TRUE, NULL); 
+  M = idLift(Gomega, M, NULL, FALSE, FALSE, TRUE, NULL);
   int nM = IDELEMS(M);
   ideal Gtemp = idInit(IDELEMS(M),1);
   ideal mG = idInit(IDELEMS(G),1);
   poly pmG, pGtmp = NULL;
   ideal T;
-  
+
   for(i=0; i<nM; i++)
   {
     T = idVec2Ideal(M->m[i]);
     mG = MidMultLift(T, G);
-     
+
     for(j=0; j<IDELEMS(mG); j++)
       pGtmp = pAdd(pGtmp, mG->m[j]);
-    
+
     Gtemp->m[i] = pCopy(pGtmp);
   }
   idSkipZeroes(Gtemp);
 
   M = idCopy(Gtemp);
 
-  omFree((ADDRESS)mG); 
+  omFree((ADDRESS)mG);
   omFree((ADDRESS)Gtemp);
   return M;
 }
@@ -859,7 +859,7 @@ ideal MLiftLmalGNew(ideal Gomega, ideal M, ideal G)
  *****************************************************************************/
 intvec* MwalkNextWeight(intvec* curr_weight, intvec* target_weight, ideal G)
 {
-  assume(currRing != NULL && curr_weight != NULL && 
+  assume(currRing != NULL && curr_weight != NULL &&
          target_weight != NULL && G != NULL);
 
   int nRing = currRing->N;
@@ -870,18 +870,18 @@ intvec* MwalkNextWeight(intvec* curr_weight, intvec* target_weight, ideal G)
   long s_zaehler, s_nenner, temp, MwWd;
   long deg_w0_p1, deg_d0_p1;
   int j;
-  
+
   intvec* diff_weight = ivSub(target_weight, curr_weight);
   poly g;
   for (j=0; j<nG; j++)
-  { 
+  {
     g = G->m[j];
-    if (g != NULL)  
+    if (g != NULL)
     {
       ivtemp = MExpPol(g);
       deg_w0_p1 = MivDotProduct(ivtemp, curr_weight);
       deg_d0_p1 = MivDotProduct(ivtemp, diff_weight);
-      
+
       pIter(g);
 
       while (g != NULL)
@@ -892,7 +892,7 @@ intvec* MwalkNextWeight(intvec* curr_weight, intvec* target_weight, ideal G)
 	s_zaehler = deg_w0_p1 - MwWd;
 
         if (s_zaehler != 0)
-        {          
+        {
           //s_nenner = MwalkWeightDegree(g, diff_weight) - deg_d0_p1;
 	  MwWd = MivDotProduct(ivtemp, diff_weight);
           s_nenner = MwWd - deg_d0_p1;
@@ -917,12 +917,12 @@ intvec* MwalkNextWeight(intvec* curr_weight, intvec* target_weight, ideal G)
               {
                 t_nenner = s_nenner;
                 t_zaehler = s_zaehler;
-              }	      
+              }	
             }
             else
             {
               t_nenner = s_nenner;
-              t_zaehler = s_zaehler; 
+              t_zaehler = s_zaehler;
             }
           }
         }
@@ -932,30 +932,30 @@ intvec* MwalkNextWeight(intvec* curr_weight, intvec* target_weight, ideal G)
   }
   if(t_nenner == 0)
   {
-    diff_weight = ivCopy(curr_weight); 
-    return diff_weight; 
+    diff_weight = ivCopy(curr_weight);
+    return diff_weight;
   }
-  
+
   if(t_nenner == 1 && t_zaehler == 1)
   {
     diff_weight = ivCopy(target_weight);
     return diff_weight;
   }
-    
+
   // construct a new weight vector
   for (j=0; j<nRing; j++)
-  {    
+  {
     (*diff_weight)[j] = t_nenner*(*curr_weight)[j] +
       t_zaehler*(*diff_weight)[j];
   }
-  
+
   // and take out the content
   temp = (*diff_weight)[0];
   if(temp != 1)
     for (j=1; j<nRing; j++)
     {
       temp = gcd(temp, (*diff_weight)[j]);
-      if (temp == 1) 
+      if (temp == 1)
 	return diff_weight;
     }
 
@@ -1017,10 +1017,10 @@ static ideal MNormalForm(poly f, ideal G)
       ncheck = 1;
     }
 
-    if(ntest == 1) 
+    if(ntest == 1)
     {
       result->m[ind] = pCopy(pAdd(result->m[ind], qtmp));
-      ntest = 0; 
+      ntest = 0;
     }
   }
   ideal rest = idCopy(result);
@@ -1041,7 +1041,7 @@ static poly MpolyConversion(poly f, ideal GW, ideal G)
   poly result = NULL;
   int i;
   int nG = IDELEMS(G);
-  
+
   for(i=0; i<nG; i++)
    result = pCopy(pAdd(result, HG->m[i]));
 
@@ -1076,7 +1076,7 @@ static inline int MCheckpRedId(poly f, ideal G)
   {
     q = MpDiv(f, G->m[i]);
     if(q != NULL)
-      return 0; 
+      return 0;
   }
   return 1;
 }
@@ -1097,14 +1097,14 @@ poly MpReduceId(poly f, ideal GO)
   while(h!=NULL)
   {
     f = pCopy( h);
-    lmh = pHead(h); 
+    lmh = pHead(h);
 
     if(MCheckpRedId(lmh, HG) != 0)
     {
       result = pCopy(pAdd(result, lmh));
       pIter(h);
     }
-    else 
+    else
       for(i=0; i<nG; i++)
       {
 	q = MpDiv(lmh, HG->m[i]);
@@ -1139,7 +1139,7 @@ static poly MpMinimId(poly f, ideal M)
     HM->m[i] = pCopy(M->m[i]);
 
   poly result = pCopy(f);
-  poly hf=pHead(f), q, qtmp, h=f; 
+  poly hf=pHead(f), q, qtmp, h=f;
 
   if(MCheckpRedId(pHead(f), HM) != 0)
     goto FINISH;
@@ -1157,9 +1157,9 @@ static poly MpMinimId(poly f, ideal M)
 	  hf = pHead(h);
 	  pcheck = MCheckpRedId(hf, HM);
 	  if(pcheck != 0)
-	  { 
+	  {
 	    result = pCopy(h);
-	    goto FINISH;	   
+	    goto FINISH;	
 	  }
 	  break;
 	}
@@ -1180,14 +1180,14 @@ ideal MidMinimId(ideal M)
   for(i=0; i<IDELEMS(M); i++)
   {
     ideal Mtmp = idCopy(M);
-    Mtmp->m[j] = NULL; 
+    Mtmp->m[j] = NULL;
     idSkipZeroes(Mtmp);
     pmin = MpMinimId(pCopy(M->m[i]), Mtmp);
-    M->m[i] = pCopy(pmin);    
+    M->m[i] = pCopy(pmin);
     result->m[j] = pmin;
     if(pmin == NULL)
     {
-      i--; 
+      i--;
       j--;
       idSkipZeroes(M);
     }
@@ -1202,7 +1202,7 @@ ideal MidMinimId(ideal M)
 
 
 ideal MidMinBase(ideal G)
-{  
+{
   if(G == NULL)
     return G;
 
@@ -1229,7 +1229,7 @@ ideal MNWstdhomRed(ideal G, intvec* iv)
 }
 
 /*****************************************************************************
-* If target_ord = intmat(A1,..., An) then calculate the perturbation vectors * 
+* If target_ord = intmat(A1,..., An) then calculate the perturbation vectors *
 *     tau_p_dep = inveps^(p_deg-1)*A1 + inveps^(p_deg-2)*A2 +... + A_p_deg   *
 * where                                                                      *
 *     inveps > totaldegree(G)*(max(A2)+...+max(A_p_deg))                     *
@@ -1240,7 +1240,7 @@ intvec* Mfivpert(ideal G, intvec* target, int p_deg)
 {
   int i, j;
   int nV = currRing->N;
-  
+
   //Checking that the perturbation degree is valid
   if(p_deg > nV || p_deg <= 0)
   {
@@ -1252,13 +1252,13 @@ intvec* Mfivpert(ideal G, intvec* target, int p_deg)
   //    where the Ai are the rows of the target-order matrix.
   int nmax = 0, maxAi, ntemp;
 
-  for(i=1; i < p_deg; i++) 
+  for(i=1; i < p_deg; i++)
   {
     maxAi = (*target)[i*nV];
-    for(j=1; j < nV; j++) 
+    for(j=1; j < nV; j++)
     {
       ntemp = (*target)[i*nV + j];
-      if(ntemp > maxAi) 
+      if(ntemp > maxAi)
         maxAi = ntemp;
     }
     nmax += maxAi;
@@ -1268,21 +1268,21 @@ intvec* Mfivpert(ideal G, intvec* target, int p_deg)
   //        for all p in G.
   int inv_eps, degG, max_deg=0;
   intvec* ivUnit = Mivdp(nV);
-  
-  for (i=0; i<IDELEMS(G); i++) 
+
+  for (i=0; i<IDELEMS(G); i++)
   {
     degG = MwalkWeightDegree(G->m[i], ivUnit);
-    if(degG > max_deg) 
+    if(degG > max_deg)
       max_deg = degG;
   }
   inv_eps = (max_deg * nmax) + 1;
 
-  
+
   // Calculate the perturbed target order:
   // Since a weight vector in Singular has to be in integral, we compute
   // tau_p_deg = inv_eps^(p_deg-1)*A1 - inv_eps^(p_deg-2)*A2+...+A_p_deg,
 
-  intvec* ivtemp = new intvec(nV);  
+  intvec* ivtemp = new intvec(nV);
   intvec* pert_vector = new intvec(nV);
 
   for(i=0; i<nV; i++)
@@ -1297,7 +1297,7 @@ intvec* Mfivpert(ideal G, intvec* target, int p_deg)
     for(j=0; j<nV; j++)
       (* ivtemp)[j] = inv_eps*(*ivtemp)[j] + (*target)[i*nV+j];
 
-    pert_vector = ivtemp;  
+    pert_vector = ivtemp;
   }
   omFree((ADDRESS) ivtemp);
   return pert_vector;

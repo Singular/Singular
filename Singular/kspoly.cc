@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.24 2001-01-09 15:40:09 Singular Exp $ */
+/* $Id: kspoly.cc,v 1.25 2001-10-09 16:36:07 Singular Exp $ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */
@@ -25,7 +25,7 @@ int create_count = 0;
  *
  * Reduces PR with PW
  * Assumes PR != NULL, PW != NULL, Lm(PR) divides Lm(PW)
- * 
+ *
  ***************************************************************/
 int ksReducePoly(LObject* PR,
                  TObject* PW,
@@ -47,7 +47,7 @@ int ksReducePoly(LObject* PR,
   ring tailRing = PR->tailRing;
   kTest_L(PR);
   kTest_T(PW);
-  
+
   poly p1 = PR->GetLmTailRing();
   poly p2 = PW->GetLmTailRing();
   poly t2 = pNext(p2), lm = p1;
@@ -55,11 +55,11 @@ int ksReducePoly(LObject* PR,
   p_CheckPolyRing(p1, tailRing);
   p_CheckPolyRing(p2, tailRing);
 
-  pAssume1(p2 != NULL && p1 != NULL && 
+  pAssume1(p2 != NULL && p1 != NULL &&
            p_DivisibleBy(p2,  p1, tailRing));
 
   pAssume1(p_GetComp(p1, tailRing) == p_GetComp(p2, tailRing) ||
-           (p_GetComp(p2, tailRing) == 0 && 
+           (p_GetComp(p2, tailRing) == 0 &&
             p_MaxComp(pNext(p2),tailRing) == 0));
 
   if (t2==NULL)
@@ -70,7 +70,7 @@ int ksReducePoly(LObject* PR,
   }
 
   p_ExpVectorSub(lm, p2, tailRing);
-  
+
   if (tailRing != currRing)
   {
     // check that reduction does not violate exp bound
@@ -97,7 +97,7 @@ int ksReducePoly(LObject* PR,
     number an = pGetCoeff(p2);
     int ct = ksCheckCoeff(&an, &bn);
     p_SetCoeff(lm, bn,tailRing);
-    if ((ct == 0) || (ct == 2)) 
+    if ((ct == 0) || (ct == 2))
       PR->Tail_Mult_nn(an);
     if (coef != NULL) *coef = an;
     else n_Delete(&an, tailRing);
@@ -106,9 +106,9 @@ int ksReducePoly(LObject* PR,
   {
     if (coef != NULL) *coef = n_Init(1, tailRing);
   }
-  
-  
-  // and finally, 
+
+
+  // and finally,
   PR->Tail_Minus_mm_Mult_qq(lm, t2, PW->GetpLength() - 1, spNoether);
   PR->LmDeleteAndIter();
 #if defined(KDEBUG) && defined(TEST_OPT_DEBUG_RED)
@@ -123,11 +123,11 @@ int ksReducePoly(LObject* PR,
 /***************************************************************
  *
  * Creates S-Poly of p1 and p2
- * 
+ *
  *
  ***************************************************************/
-void ksCreateSpoly(LObject* Pair,   poly spNoether, 
-                   int use_buckets, ring tailRing, 
+void ksCreateSpoly(LObject* Pair,   poly spNoether,
+                   int use_buckets, ring tailRing,
                    poly m1, poly m2, TObject** R)
 {
 #ifdef KDEBUG
@@ -138,7 +138,7 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   poly p2 = Pair->p2;
   poly last;
   Pair->tailRing = tailRing;
-  
+
   assume(p1 != NULL);
   assume(p2 != NULL);
   assume(tailRing != NULL);
@@ -148,7 +148,7 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   int co=0, ct = ksCheckCoeff(&lc1, &lc2);
 
   int l1=0, l2=0;
-  
+
   if (p_GetComp(p1, currRing)!=p_GetComp(p2, currRing))
   {
     if (p_GetComp(p1, currRing)==0)
@@ -167,7 +167,7 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
   //     m2 = LCM(LM(p1), LM(p2))/LM(p2)
   if (m1 == NULL)
     k_GetLeadTerms(p1, p2, currRing, m1, m2, tailRing);
-    
+
   pSetCoeff0(m1, lc2);
   pSetCoeff0(m2, lc1);  // and now, m1 * LT(p1) == m2 * LT(p2)
 
@@ -176,7 +176,7 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
     l1 = (R[Pair->i_r1])->GetpLength() - 1;
     l2 = (R[Pair->i_r2])->GetpLength() - 1;
   }
-  
+
   // get m2 * a2
   if (spNoether != NULL)
   {
@@ -190,11 +190,11 @@ void ksCreateSpoly(LObject* Pair,   poly spNoether,
 
   // get m2*a2 - m1*a1
   Pair->Tail_Minus_mm_Mult_qq(m1, a1, l1, spNoether);
-  
+
   // Clean-up time
   Pair->LmDeleteAndIter();
   p_LmDelete(m1, tailRing);
-  
+
   if (co != 0)
   {
     if (co==1)
@@ -214,11 +214,11 @@ int ksReducePolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
   number coef;
   poly Lp =     PR->GetLmCurrRing();
   poly Save =   PW->GetLmCurrRing();
-  
+
   kTest_L(PR);
   kTest_T(PW);
   pAssume(pIsMonomOf(Lp, Current));
-  
+
   assume(Lp != NULL && Current != NULL && pNext(Current) != NULL);
   assume(PR->bucket == NULL);
 
@@ -227,7 +227,7 @@ int ksReducePolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
 
   pAssume(!pHaveCommonMonoms(Red.p, With.p));
   ret = ksReducePoly(&Red, &With, spNoether, &coef);
-  
+
   if (!ret)
   {
     if (! n_IsOne(coef, currRing))
@@ -244,7 +244,7 @@ int ksReducePolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
       pNext(PR->t_p) = pNext(Current);
   }
 
-  if (Lp == Save) 
+  if (Lp == Save)
     With.Delete();
   return ret;
 }
@@ -252,8 +252,8 @@ int ksReducePolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
 /***************************************************************
  *
  * Auxillary Routines
- * 
- * 
+ *
+ *
  ***************************************************************/
 
 /*
@@ -463,10 +463,3 @@ x1:
     }
   }
 }
-
-
-
-
-
-  
-  

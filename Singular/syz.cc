@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.40 2000-12-06 11:03:30 Singular Exp $ */
+/* $Id: syz.cc,v 1.41 2001-10-09 16:36:25 Singular Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -426,7 +426,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
   ring origR = currRing;
   ring syz_ring = rCurrRingAssure_SyzComp();
   rSetSyzComp(rk_arg);
-  
+
   if (syz_ring != origR)
   {
     res[0] = idrCopyR_NoSort(arg, origR);
@@ -435,7 +435,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
   {
     res[0] = idCopy(arg);
   }
-  
+
 /*--- creating weights for the module components ---------------*/
   if ((weights==NULL) || (*weights==NULL) || ((*weights)[0]==NULL))
   {
@@ -471,7 +471,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
   {
     setRegularity = FALSE;
   }
-    
+
 /*--- the main loop --------------------------------------*/
   while ((!idIs0(res[syzIndex])) &&
          ((maxlength==-1) || (syzIndex<=maxlength)))
@@ -549,7 +549,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
         {
           (*w)[i + rGetCurrSyzLimit()] = pFDeg(res[syzIndex-1]->m[i]);
           if (pGetComp(res[syzIndex-1]->m[i])>0)
-            (*w)[i + rGetCurrSyzLimit()] 
+            (*w)[i + rGetCurrSyzLimit()]
               += (*w)[pGetComp(res[syzIndex-1]->m[i])-1];
           (*((*weights)[syzIndex]))[i] = (*w)[i+rGetCurrSyzLimit()];
         }

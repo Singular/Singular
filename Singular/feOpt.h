@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.h,v 1.6 2000-05-05 18:40:28 obachman Exp $ */
+/* $Id: feOpt.h,v 1.7 2001-10-09 16:35:58 Singular Exp $ */
 /*
 * ABSTRACT: Declarations for working with Options
 */
@@ -11,7 +11,7 @@
 #include "fegetopt.h"
 
 extern const char SHORT_OPTS_STRING[];
-#define LONG_OPTION_RETURN 13 
+#define LONG_OPTION_RETURN 13
 
 /* specifies format of options */
 extern struct fe_option feOptSpec[];
@@ -36,7 +36,7 @@ extern "C" {
 #endif
 
 void* feGetOptValue(feOptIndex opt);
-  
+
 
 #ifdef __cplusplus
 }
@@ -47,7 +47,7 @@ inline void* feOptValue(feOptIndex opt)
 }
 inline int feOptValue(feOptIndex opt, char** val)
 {
-  if (opt != FE_OPT_UNDEF && feOptSpec[(int)opt].type == feOptString) 
+  if (opt != FE_OPT_UNDEF && feOptSpec[(int)opt].type == feOptString)
   {
     *val = (char*) feOptSpec[(int)opt].value;
     return TRUE;
@@ -57,7 +57,7 @@ inline int feOptValue(feOptIndex opt, char** val)
 }
 inline int feOptValue(feOptIndex opt, int* val)
 {
-  if (opt != FE_OPT_UNDEF && feOptSpec[(int)opt].type != feOptString) 
+  if (opt != FE_OPT_UNDEF && feOptSpec[(int)opt].type != feOptString)
   {
     *val = (int) feOptSpec[(int)opt].value;
     return TRUE;
@@ -65,7 +65,7 @@ inline int feOptValue(feOptIndex opt, int* val)
   *val = 0;
   return FALSE;
 }
- 
+
 // maps name to otions
 feOptIndex feGetOptIndex(const char* name);
 feOptIndex feGetOptIndex(int optc);

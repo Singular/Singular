@@ -4,11 +4,11 @@
 
 //**************************************************************************/
 //
-// $Id: sing_dbm.cc,v 1.17 2001-08-27 14:47:39 Singular Exp $
+// $Id: sing_dbm.cc,v 1.18 2001-10-09 16:36:22 Singular Exp $
 //
 //**************************************************************************/
 //  'sing_dbm.cc' containes command to handle dbm-files under
-// Singular. 
+// Singular.
 //
 //**************************************************************************/
 
@@ -48,7 +48,7 @@ LINKAGE BOOLEAN dbOpen(si_link l, short flag)
   GDBM_info *db;
   datum d_key;
   //  int dbm_flags = O_RDONLY | O_CREAT;  // open database readonly as default
-  int read_write= GDBM_READER; 
+  int read_write= GDBM_READER;
 
   if(flag & SI_LINK_WRITE)
   {
@@ -105,7 +105,7 @@ LINKAGE BOOLEAN dbClose(si_link l)
   gdbm_sync(db->db);
   gdbm_close(db->db);
   omFreeSize((ADDRESS)db,(sizeof *db));
-  l->data=NULL;  
+  l->data=NULL;
   SI_LINK_SET_CLOSE_P(l);
   return FALSE;
 }
@@ -129,7 +129,7 @@ LINKAGE leftv dbRead2(si_link l, leftv key)
 	{
 	  if (!dbClose(l)) {Print("cannot close link!\n");}
 	}
-      //(SI_LINK_CLOSE_P(l)) automatically      
+      //(SI_LINK_CLOSE_P(l)) automatically
       if (dbOpen(l, SI_LINK_READ)) return NULL;
     }
   if (SI_LINK_RW_OPEN_P(l)) {Print("I/O Error!\n");}
@@ -211,7 +211,7 @@ LINKAGE BOOLEAN dbWrite(si_link l, leftv key)
 //   db = (GDBM_info *)l->data;
   BOOLEAN b=TRUE;
   register int ret;
-  
+
   if (strcmp(l->mode,"rw")!=0) // r-mode
     {
       Print("Write error on readonly source\n");
@@ -229,7 +229,7 @@ LINKAGE BOOLEAN dbWrite(si_link l, leftv key)
     }
 
   if((key!=NULL) && (key->Typ()==STRING_CMD) )
-  { 
+  {
     if (key->next!=NULL)                   // have a second parameter ?
     {
       if(key->next->Typ()==STRING_CMD)     // replace (key,value)
@@ -330,7 +330,7 @@ LINKAGE BOOLEAN dbClose(si_link l)
 
   dbm_close(db->db);
   omFreeSize((ADDRESS)db,(sizeof *db));
-  l->data=NULL;  
+  l->data=NULL;
   SI_LINK_SET_CLOSE_P(l);
   return FALSE;
 }
@@ -396,7 +396,7 @@ LINKAGE BOOLEAN dbWrite(si_link l, leftv key)
 
   // database is opened
   if((key!=NULL) && (key->Typ()==STRING_CMD) )
-  { 
+  {
     if (key->next!=NULL)                   // have a second parameter ?
     {
       if(key->next->Typ()==STRING_CMD)     // replace (key,value)

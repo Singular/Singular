@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.67 2001-09-27 13:13:03 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.68 2001-10-09 16:36:06 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -243,7 +243,7 @@ static void killlocals0(int v, idhdl * localhdl)
       else if (vv >= v)
       {
         idhdl nexth = IDNEXT(h);
-        killhdl(h,localhdl);
+        killhdl2(h,localhdl);
         h = nexth;
         //PrintS("kill\n");
       }
@@ -258,7 +258,16 @@ static void killlocals0(int v, idhdl * localhdl)
 
 void killlocals(int v)
 {
+#ifndef HAVE_NS
   killlocals0(v,&IDROOT);
+#else
+  killlocals0(v,&(currPack->idroot));
+  if (currPack!=basePack)
+  {
+    //PrintS("killlocals in Top\n");
+    killlocals0(v,&(basePack->idroot));
+  }
+#endif
 
   if ((iiRETURNEXPR_len > myynest)
   && ((iiRETURNEXPR[myynest].Typ()==RING_CMD)
@@ -269,20 +278,44 @@ void killlocals(int v)
   }
 
   idhdl sh=currRingHdl;
+  ring sr=currRing;
   BOOLEAN changed=FALSE;
 #ifndef HAVE_NAMESPACES
+#ifdef HAVE_NS
+  idhdl h = currPack->idroot;
+#else
   idhdl h = IDROOT;
+#endif
 
+//  Print("killlocals in %s\n",IDID(currPackHdl));
   while (h!=NULL)
   {
     if (((IDTYP(h)==QRING_CMD) || (IDTYP(h) == RING_CMD))
     && (IDRING(h)->idroot!=NULL))
     {
-      if (h!=currRingHdl) {changed=TRUE;rSetHdl(h);}
+      if (IDRING(h)!=currRing) {changed=TRUE;rSetHdl(h);}
       killlocals0(v,&(IDRING(h)->idroot));
     }
     h = IDNEXT(h);
   }
+#ifdef HAVE_NS
+  if (currPack!=basePack)
+  {
+    //PrintS("killlocals in Top\n");
+    h=basePack->idroot;
+    while (h!=NULL)
+    {
+      if (((IDTYP(h)==QRING_CMD) || (IDTYP(h) == RING_CMD))
+      && (IDRING(h)->idroot!=NULL))
+      {
+        //Print("go to %s\n",IDID(h));
+        if (IDRING(h)!=currRing) {changed=TRUE;rSetHdl(h);}
+        killlocals0(v,&(IDRING(h)->idroot));
+      }
+      h = IDNEXT(h);
+    }
+  }
+#endif
 #else
   idhdl h = NSROOT(namespaceroot->root);
 
@@ -321,9 +354,16 @@ void killlocals(int v)
     currRing=NULL;
     currRingHdl=NULL;
     if (sh!=NULL) rSetHdl(sh);
+    else if (sr!=NULL)
+    {
+      sh=rFindHdl(sr,NULL,NULL);
+      rSetHdl(sh);
+    }
   }
 
   if (myynest<=1) iiNoKeepRing=TRUE;
+  //Print("end killlocals  >= %d\n",v);
+  //listall();
 }
 
 void list_cmd(int typ, const char* what, char *prefix,BOOLEAN iterate, BOOLEAN fullname)
@@ -612,6 +652,11 @@ leftv iiMap(map theMap, char * what)
   iiname2hdl(theMap->preimage,&pack,&r);
 #else
   r=IDROOT->get(theMap->preimage,myynest);
+#ifdef HAVE_NS
+  if ((currPack!=basePack)
+  &&((r==NULL) || ((r->typ != RING_CMD) && (r->typ != QRING_CMD))))
+    r=basePack->idroot->get(theMap->preimage,myynest);
+#endif /* HAVE_NS */
 #endif /* HAVE_NAMESPACES */
   if ((r!=NULL) && ((r->typ == RING_CMD) || (r->typ== QRING_CMD)))
   {
@@ -886,6 +931,7 @@ int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN isrin
     else
 #endif /* HAVE_NAMESPACES */
     {
+      if (name->rtyp==IDHDL) { id=omStrDup(id); }
       sy->data = (char *)enterid(id,lev,t,root,init_b);
     }
     if (sy->data!=NULL)
@@ -958,6 +1004,7 @@ static BOOLEAN iiInternalExport (leftv v, int toLev)
 #ifdef USE_IILOCALRING
             if (iiLocalRing[0]==IDRING(h)) iiLocalRing[0]=NULL;
 #else
+#endif
             proclevel *p=procstack;
             while (p->next!=NULL) p=p->next;
             if (p->currRing==IDRING(h))
@@ -965,8 +1012,8 @@ static BOOLEAN iiInternalExport (leftv v, int toLev)
               p->currRing=NULL;
               p->currRingHdl=NULL;
             }
-#endif
-        killhdl(h,root);
+//#endif
+        killhdl2(h,root);
       }
       else
       {
@@ -1093,6 +1140,7 @@ BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl)
 
 BOOLEAN iiExport (leftv v, int toLev)
 {
+  checkall();
   BOOLEAN nok=FALSE;
   leftv r=v;
   while (v!=NULL)
@@ -1113,6 +1161,7 @@ BOOLEAN iiExport (leftv v, int toLev)
     v=v->next;
   }
   r->CleanUp();
+  checkall();
   return nok;
 }
 
@@ -1141,7 +1190,7 @@ BOOLEAN iiExport (leftv v, int toLev, idhdl root)
           {
             Warn("redefining %s",IDID(old));
           }
-          killhdl(old,&root);
+          killhdl2(old,&root);
         }
         else
         {
@@ -1164,6 +1213,7 @@ BOOLEAN iiExport (leftv v, int toLev, idhdl root)
 #ifdef HAVE_NS
 BOOLEAN iiExport (leftv v, int toLev, idhdl root)
 {
+  checkall();
   BOOLEAN nok=FALSE;
   leftv rv=v;
   while (v!=NULL)
@@ -1185,7 +1235,7 @@ BOOLEAN iiExport (leftv v, int toLev, idhdl root)
           {
             Warn("redefining %s",IDID(old));
           }
-          killhdl(old,&root);
+          killhdl2(old,&root);
         }
         else
         {
@@ -1202,6 +1252,7 @@ BOOLEAN iiExport (leftv v, int toLev, idhdl root)
     v=v->next;
   }
   rv->CleanUp();
+  checkall();
   return nok;
 }
 #endif

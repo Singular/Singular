@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Get.cc,v 1.37 2001-09-25 15:45:43 Singular Exp $ */
+/* $Id: mpsr_Get.cc,v 1.38 2001-10-09 16:36:11 Singular Exp $ */
 /***************************************************************
  *
  * File:       mpsr_Get.cc
@@ -172,7 +172,7 @@ inline void InitIntLeftv(mpsr_leftv mlv, int i)
 inline void InitApIntLeftv(mpsr_leftv mlv, mpz_ptr apint)
 {
   number n = (number) omAllocBin(rnumber_bin);
-#if defined(LDEBUG) 
+#if defined(LDEBUG)
     n->debug=123456;
 #endif
   mlv->r = mpsr_rDefault(0);
@@ -213,7 +213,7 @@ inline void InitIdentifierLeftv(mpsr_leftv mlv, char *name, short quote)
     else
     {
       poly p;
-      
+
       pos = mpsr_rDefault(0, name, mlv->r);
       mpsr_SetCurrRing(mlv->r, TRUE);
       p = pOne();

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.168 2001-09-27 15:56:25 Singular Exp $ */
+/* $Id: extra.cc,v 1.169 2001-10-09 16:35:57 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -245,6 +245,9 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         #endif
         #ifdef HAVE_NAMESPACES
           TEST_FOR("Namespaces");
+        #endif
+        #ifdef HAVE_NS
+          TEST_FOR("namespaces");
         #endif
         #ifdef HAVE_DYNAMIC_LOADING
           TEST_FOR("DynamicLoading");
@@ -1022,41 +1025,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     if(strcmp(sys_cmd,"listall")==0)
     {
 #ifdef HAVE_NS
-      idhdl hh=basePack->idroot;
-      while (hh!=NULL)
-      {
-        if (IDDATA(hh)==(void *)currRing) PrintS("(R)");
-        else if (IDDATA(hh)==(void *)currPack) PrintS("(P)");
-        else PrintS("   ");
-        Print("::%s, typ %s level %d\n",
-               IDID(hh),Tok2Cmdname(IDTYP(hh)),IDLEV(hh));
-        hh=IDNEXT(hh);
-      }
-      hh=basePack->idroot;
-      while (hh!=NULL)
-      {
-        if (IDDATA(hh)==(void *)basePack)
-          Print("(T)::%s, typ %s level %d\n",
-          IDID(hh),Tok2Cmdname(IDTYP(hh)),IDLEV(hh));
-        else
-        if ((IDTYP(hh)==RING_CMD)
-        || (IDTYP(hh)==QRING_CMD)
-        || (IDTYP(hh)==PACKAGE_CMD))
-        {
-          idhdl h2=IDRING(hh)->idroot;
-          while (h2!=NULL)
-          {
-            if (IDDATA(h2)==(void *)currRing) PrintS("(R)");
-            else if (IDDATA(h2)==(void *)currPack) PrintS("(P)");
-            else PrintS("   ");
-            Print("%s::%s, typ %s level %d\n",
-            IDID(hh),IDID(h2),Tok2Cmdname(IDTYP(h2)),IDLEV(h2));
-            h2=IDNEXT(h2);
-          }
-        }
-        hh=IDNEXT(hh);
-      }
-#else      
+      listall();
+#else
       idhdl hh=IDROOT;
       while (hh!=NULL)
       {

@@ -3,11 +3,11 @@
 ****************************************/
 /***************************************************************
  *  File:    sbuckets.cc
- *  Purpose: implementation of routines for sorting polys using 
+ *  Purpose: implementation of routines for sorting polys using
  *           a bucket sort
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: sbuckets.cc,v 1.1 2000-12-31 15:17:47 obachman Exp $
+ *  Version: $Id: sbuckets.cc,v 1.2 2001-10-09 16:36:21 Singular Exp $
  *******************************************************************/
 #include "sbuckets.h"
 #include "omalloc.h"
@@ -55,10 +55,10 @@ inline int LOG2(int i)
     j++;
   }
   while (1);
-  
+
   return j;
 }
-  
+
 //////////////////////////////////////////////////////////////////////////
 // Creation/Destruction of buckets
 //
@@ -95,22 +95,22 @@ static void sBucket_Merge_m(sBucket_pt bucket, poly p)
     i++;
     assume(LOG2(length) == i);
   }
-  
+
   bucket->buckets[i].p = p;
   bucket->buckets[i].length = length;
   if (i > bucket->max_bucket) bucket->max_bucket = i;
 }
-  
+
 void sBucket_Merge_p(sBucket_pt bucket, poly p, int length)
 {
   assume(bucket != NULL);
   assume(length <= 0 || length == pLength(p));
-  
+
   if (p == NULL) return;
   if (length <= 0) length = pLength(p);
-  
+
   int i = LOG2(length);
-  
+
   while (bucket->buckets[i].p != NULL)
   {
     p = p_Merge_q(p, bucket->buckets[i].p, bucket->bucket_ring);
@@ -120,7 +120,7 @@ void sBucket_Merge_p(sBucket_pt bucket, poly p, int length)
     i++;
     assume(LOG2(length) == i);
   }
-  
+
   bucket->buckets[i].p = p;
   bucket->buckets[i].length = length;
   if (i > bucket->max_bucket) bucket->max_bucket = i;
@@ -130,21 +130,21 @@ void sBucket_Add_p(sBucket_pt bucket, poly p, int length)
 {
   assume(bucket != NULL);
   assume(length <= 0 || length == pLength(p));
-  
+
   if (p == NULL) return;
   if (length <= 0) length = pLength(p);
-  
+
   int i = LOG2(length);
-  
+
   while (bucket->buckets[i].p != NULL)
   {
-    p = p_Add_q(p, bucket->buckets[i].p, length, bucket->buckets[i].length, 
+    p = p_Add_q(p, bucket->buckets[i].p, length, bucket->buckets[i].length,
                 bucket->bucket_ring);
     bucket->buckets[i].p = NULL;
     bucket->buckets[i].length = 0;
     i = LOG2(length);
   }
-  
+
   bucket->buckets[i].p = p;
   bucket->buckets[i].length = length;
   if (i > bucket->max_bucket) bucket->max_bucket = i;
@@ -157,7 +157,7 @@ void sBucketClearMerge(sBucket_pt bucket, poly *p, int *length)
   poly pr = NULL;
   int  lr = 0;
   int i = 0;
-  
+
   while (bucket->buckets[i].p == NULL)
   {
     i++;
@@ -169,7 +169,7 @@ void sBucketClearMerge(sBucket_pt bucket, poly *p, int *length)
   bucket->buckets[i].p = NULL;
   bucket->buckets[i].length = 0;
   i++;
-  
+
   while (i <= bucket->max_bucket)
   {
     if (bucket->buckets[i].p != NULL)
@@ -181,7 +181,7 @@ void sBucketClearMerge(sBucket_pt bucket, poly *p, int *length)
     }
     i++;
   }
-  
+
   done:
   *p = pr;
   *length = lr;
@@ -195,7 +195,7 @@ void sBucketClearAdd(sBucket_pt bucket, poly *p, int *length)
   poly pr = NULL;
   int  lr = 0;
   int i = 0;
-  
+
   while (bucket->buckets[i].p == NULL)
   {
     i++;
@@ -207,19 +207,19 @@ void sBucketClearAdd(sBucket_pt bucket, poly *p, int *length)
   bucket->buckets[i].p = NULL;
   bucket->buckets[i].length = 0;
   i++;
-  
+
   while (i <= bucket->max_bucket)
   {
     if (bucket->buckets[i].p != NULL)
     {
-      pr = p_Add_q(pr, bucket->buckets[i].p, lr, bucket->buckets[i].length, 
+      pr = p_Add_q(pr, bucket->buckets[i].p, lr, bucket->buckets[i].length,
                    bucket->bucket_ring);
       bucket->buckets[i].p = NULL;
       bucket->buckets[i].length = 0;
     }
     i++;
   }
-  
+
   done:
   *p = pr;
   *length = lr;
@@ -235,12 +235,12 @@ poly sBucketSortMerge(poly p, ring r)
 #ifdef HAVE_ASSUME
   int l_in = pLength(p);
 #endif
-  
+
   if (p == NULL || pNext(p) == NULL) return p;
-  
+
   sBucket_pt bucket = sBucketCreate(r);
   poly pn = pNext(p);
-  
+
   do
   {
     pNext(p) = NULL;
@@ -250,7 +250,7 @@ poly sBucketSortMerge(poly p, ring r)
     pn = pNext(pn);
   }
   while (1);
-  
+
   int l_dummy;
   sBucketClearMerge(bucket, &pn, &l_dummy);
   sBucketDestroy(&bucket);
@@ -272,12 +272,12 @@ poly sBucketSortAdd(poly p, ring r)
 #ifdef HAVE_ASSUME
   int l_in = pLength(p);
 #endif
-  
+
   if (p == NULL || pNext(p) == NULL) return p;
-  
+
   sBucket_pt bucket = sBucketCreate(r);
   poly pn = pNext(p);
-  
+
   do
   {
     pNext(p) = NULL;
@@ -287,7 +287,7 @@ poly sBucketSortAdd(poly p, ring r)
     pn = pNext(pn);
   }
   while (1);
-  
+
   int l_dummy;
   sBucketClearAdd(bucket, &pn, &l_dummy);
   sBucketDestroy(&bucket);
@@ -299,9 +299,3 @@ poly sBucketSortAdd(poly p, ring r)
 #endif
   return pn;
 }
-
-
-
-  
-  
-

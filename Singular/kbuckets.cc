@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.23 2000-12-31 15:14:32 obachman Exp $ */
+/* $Id: kbuckets.cc,v 1.24 2001-10-09 16:36:06 Singular Exp $ */
 
 #include "mod2.h"
 #include "tok.h"
@@ -120,7 +120,7 @@ void kBucketDestroy(kBucket_pt *bucket_pt)
   omFreeBin(*bucket_pt, kBucket_bin);
   *bucket_pt = NULL;
 }
-  
+
 
 void kBucketDeleteAndDestroy(kBucket_pt *bucket_pt)
 {
@@ -189,7 +189,7 @@ void kBucketInit(kBucket_pt bucket, poly lm, int length)
   assume(bucket != NULL);
   assume(length <= 0 || length == pLength(lm));
   assume(kBucketIsCleared(bucket));
-  
+
   if (lm == NULL) return;
 
   if (length <= 0)
@@ -321,18 +321,18 @@ void kBucketClear(kBucket_pt bucket, poly *p, int *length)
 //////////////////////////////////////////////////////////////////////////
 ///
 /// For changing the ring of the Bpoly to new_tailBin
-/// 
+///
 void kBucketShallowCopyDelete(kBucket_pt bucket,
                               ring new_tailRing, omBin new_tailBin,
                               pShallowCopyDeleteProc p_shallow_copy_delete)
 {
 #ifndef HAVE_PSEUDO_BUCKETS
   int i;
-  
+
   kBucketCanonicalize(bucket);
   for (i=0; i<= bucket->buckets_used; i++)
     if (bucket->buckets[i] != NULL)
-      bucket->buckets[i] = p_shallow_copy_delete(bucket->buckets[i], 
+      bucket->buckets[i] = p_shallow_copy_delete(bucket->buckets[i],
                                                  bucket->bucket_ring,
                                                  new_tailRing,
                                                  new_tailBin);
@@ -384,7 +384,7 @@ void kBucket_Add_q(kBucket_pt bucket, poly q, int *l)
   }
   else
     l1 = *l;
-  
+
   kBucketMergeLm(bucket);
   kbTest(bucket);
   i = pLogLength(l1);
@@ -441,7 +441,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
   if (i <= bucket->buckets_used && bucket->buckets[i] != NULL)
   {
     p1 = p_Minus_mm_Mult_qq(bucket->buckets[i], m, p1,
-                            bucket->buckets_length[i], l1, 
+                            bucket->buckets_length[i], l1,
                             spNoether, r);
     l1 = bucket->buckets_length[i];
     bucket->buckets[i] = NULL;
@@ -461,7 +461,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
       p1 = r->p_Procs->pp_Mult_mm(p1, m, r, last);
     pSetCoeff0(m, nNeg(pGetCoeff(m)));
   }
-    
+
   while (bucket->buckets[i] != NULL)
   {
     p1 = p_Add_q(p1, bucket->buckets[i],
@@ -525,7 +525,7 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
   {
     p1 = r->p_Procs->pp_Mult_mm(p1, m, r, last);
   }
-    
+
   while (bucket->buckets[i] != NULL)
   {
     p1 = p_Add_q(p1, bucket->buckets[i],

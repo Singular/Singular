@@ -7,7 +7,7 @@
  *  Purpose: declaration of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.h,v 1.13 2001-08-27 14:47:28 Singular Exp $
+ *  Version: $Id: p_Procs.h,v 1.14 2001-10-09 16:36:16 Singular Exp $
  *******************************************************************/
 #ifndef P_PROCS_H
 #define P_PROCS_H
@@ -20,14 +20,14 @@ typedef poly (*p_ShallowCopyDelete_Proc_Ptr)(poly p, const ring r, omBin_s* dest
 typedef poly (*p_Mult_nn_Proc_Ptr)(poly p, const number n, const ring r);
 typedef poly (*pp_Mult_nn_Proc_Ptr)(poly p, const number n, const ring r);
 typedef poly (*p_Mult_mm_Proc_Ptr)(poly p, const poly m, const ring r);
-typedef poly (*pp_Mult_mm_Proc_Ptr)(poly p, const poly m, 
-                                    const ring r, 
+typedef poly (*pp_Mult_mm_Proc_Ptr)(poly p, const poly m,
+                                    const ring r,
                                     poly &last);
-typedef poly (*pp_Mult_mm_Noether_Proc_Ptr)(poly p, const poly m, 
+typedef poly (*pp_Mult_mm_Noether_Proc_Ptr)(poly p, const poly m,
                                             const poly spNoether, int &ll,
                                             const ring r, poly &last);
 typedef poly (*p_Add_q_Proc_Ptr)(poly p, poly q, int & shorter, const ring r);
-typedef poly (*p_Minus_mm_Mult_qq_Proc_Ptr)(poly p, poly m, poly q, 
+typedef poly (*p_Minus_mm_Mult_qq_Proc_Ptr)(poly p, poly m, poly q,
                                             int &shorter, const poly spNoether,
                                             const ring r, poly &last);
 typedef poly (*p_Neg_Proc_Ptr)(poly p, const ring r);
@@ -58,10 +58,10 @@ typedef struct p_Procs_s
   p_kBucketSetLm_Proc_Ptr               p_kBucketSetLm;
 } pProcs_s;
 
-  
+
 void p_ProcsSet(ring r, p_Procs_s* p_Procs);
 #ifdef RDEBUG
-void p_Debug_GetSpecNames(const ring r, char* &field, char* &length, 
+void p_Debug_GetSpecNames(const ring r, char* &field, char* &length,
                           char* &ord);
 void p_Debug_GetProcNames(const ring r, p_Procs_s* p_Procs);
 #endif

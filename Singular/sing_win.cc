@@ -4,7 +4,7 @@
 #include <winuser.h>
 #include <sys/cygwin.h>
 #include <stdio.h>
-#ifndef MAXPATHLEN 
+#ifndef MAXPATHLEN
 #define MAXPATHLEN 1024
 #endif
 
@@ -13,7 +13,7 @@ void heOpenWinntHlp(const char* keyw, char* helppath )
   char path[MAXPATHLEN];
 #ifdef TEST
   printf("keyw:%s\n", keyw);
-#endif    
+#endif
   cygwin_conv_to_full_win32_path(helppath, path);
 #ifdef TEST
   printf("path:%s\n", path);
@@ -40,7 +40,7 @@ void heOpenWinntUrl(const char* url, int local)
   }
   else
   {
-    // need to check whether this works 
+    // need to check whether this works
     ShellExecute(NULL, "open", url, 0, 0, SW_SHOWNORMAL);
   }
 }

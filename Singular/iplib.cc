@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.91 2001-09-27 13:13:03 Singular Exp $ */
+/* $Id: iplib.cc,v 1.92 2001-10-09 16:36:05 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -61,6 +61,7 @@ BOOLEAN iiGetLibStatus(char *lib)
   idhdl hl;
 
 #ifndef HAVE_NAMESPACES
+#ifndef HAVE_NS
   char *p;
 
   hl = IDROOT->get("LIB", 0);
@@ -68,6 +69,17 @@ BOOLEAN iiGetLibStatus(char *lib)
   if ((p!=IDSTRING(hl)) && (*(p-1)!=',')) return FALSE;
 
   return TRUE;
+#else
+  char *plib = iiConvName(lib);
+  hl = basePack->idroot->get(plib,0);
+  if((hl==NULL) ||(IDTYP(hl)!=PACKAGE_CMD))
+  {
+    omFree(plib);
+    return FALSE;
+  }
+  omFree(plib);
+  return (strcmp(lib,IDPACKAGE(hl)->libname)==0);
+#endif
 #else
   char *plib = iiConvName(lib);
   hl = namespaceroot->get(plib,0, TRUE);
@@ -315,12 +327,14 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
   /* start interpreter ======================================*/
   myynest++;
   err=yyparse();
+  checkall();
   if (sLastPrinted.rtyp!=0)
   {
     sLastPrinted.CleanUp();
   }
   //Print("kill locals for %s (level %d)\n",IDID(pn),myynest);
   killlocals(myynest);
+  checkall();
   //Print("end kill locals for %s (%d)\n",IDID(pn),myynest);
   myynest--;
   si_echo=old_echo;
@@ -330,24 +344,16 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
 }
 
 #ifdef USE_IILOCALRING
-ring    *iiLocalRing
-#ifdef TEST
-                    =NULL
+ring    *iiLocalRing;
 #endif
-                   ;
-#endif
-sleftv  *iiRETURNEXPR
-#ifdef TEST
-                    =NULL
-#endif
-                   ;
+sleftv  *iiRETURNEXPR;
 int     iiRETURNEXPR_len=0;
 
 #ifdef RDEBUG
 static void iiShowLevRings()
 {
-#ifdef USE_IILOCALRING
   int i;
+#ifdef USE_IILOCALRING
   for (i=1;i<=myynest;i++)
   {
     Print("lev %d:",i);
@@ -356,15 +362,18 @@ static void iiShowLevRings()
     PrintLn();
   }
 #endif
+#ifdef HAVE_NS
+  i=myynest;
+  proclevel *p=procstack;
+  while (p!=NULL)
   {
-    proclevel * nshdl;
-    for(nshdl=procstack; nshdl != NULL; nshdl = nshdl->next)
-    {
-      if (nshdl->currRing==NULL) PrintS("NULL");
-      else                       Print("%d",nshdl->currRing);
-      PrintLn();
-    }
+    Print("lev %d:",i);
+    if (p->currRingHdl==NULL) PrintS("NULL");
+    else                      Print("%s",IDID(p->currRingHdl));
+    PrintLn();
+    p=p->next;
   }
+#endif
   if (currRing==NULL) PrintS("curr:NULL\n");
   else                Print ("curr:%x\n",currRing);
 }
@@ -389,7 +398,11 @@ static void iiCheckNest()
 #ifdef HAVE_NAMESPACES
 sleftv * iiMake_proc(idhdl pn, sleftv* slpn, sleftv* sl)
 #else /* HAVE_NAMESPACES */
+#ifdef HAVE_NS
+sleftv * iiMake_proc(idhdl pn, package pack, sleftv* sl)
+#else /* HAVE_NS */
 sleftv * iiMake_proc(idhdl pn, sleftv* sl)
+#endif /* HAVE_NS */
 #endif /* HAVE_NAMESPACES */
 {
   int err;
@@ -421,7 +434,6 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
     namespaceroot->push(namespaceroot->root->pack, "Top", myynest+1);
     //printf("iiMake_proc: staying in TOP-LEVEL\n");
   }
-  procstack->push(currRing,currRingHdl,pi->procname);
 #else /* HAVE_NAMESPACES */
   omFree((ADDRESS)plib);
   if(pi->is_static && myynest==0)
@@ -430,13 +442,13 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
            pi->libname, pi->procname);
     return NULL;
   }
-  procstack->push(currRing,currRingHdl,pi->procname);
 #endif /* HAVE_NAMESPACES */
   iiCheckNest();
 #ifdef USE_IILOCALRING
   iiLocalRing[myynest]=currRing;
 #endif
   iiRETURNEXPR[myynest+1].Init();
+  procstack->push(pi->procname);
   if ((traceit&TRACE_SHOW_PROC)
   || (pi->trace_flag&TRACE_SHOW_PROC))
   {
@@ -454,6 +466,19 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
                  break;
 
     case LANG_SINGULAR:
+                 #ifdef HAVE_NS
+                 if ((pi->pack!=NULL)&&(currPack!=pi->pack))
+                 {
+                   currPack=pi->pack;
+                   currPackHdl=packFindHdl(currPack);
+                   //Print("set pack=%s\n",IDID(currPackHdl));
+                 }
+                 else if ((pack!=NULL)&&(currPack!=pack))
+                 {
+                   currPack=pack;
+                   currPackHdl=packFindHdl(currPack);
+                 }
+                 #endif
                  err=iiPStart(pn,sl);
                  break;
     case LANG_C:
@@ -506,6 +531,54 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
     { currRingHdl=NULL; currRing=NULL; }
   }
 #else /* USE_IILOCALRING */
+  if (procstack->currRing != currRing)
+  {
+    //if (procstack->currRingHdl!=NULL)
+    //Print("procstack:%s,",IDID(procstack->currRingHdl));
+    //if (currRingHdl!=NULL)
+    //Print(" curr:%s\n",IDID(currRingHdl));
+    //Print("pr:%x, curr: %x\n",procstack->currRing,currRing);
+    if (((iiRETURNEXPR[myynest+1].Typ()>BEGIN_RING)
+      && (iiRETURNEXPR[myynest+1].Typ()<END_RING))
+    || ((iiRETURNEXPR[myynest+1].Typ()==LIST_CMD)
+      && (lRingDependend((lists)iiRETURNEXPR[myynest+1].Data()))))
+    {
+      //idhdl hn;
+      char *n;
+      char *o;
+      if (procstack->currRing!=NULL)
+      {
+        //PrintS("reset ring\n");
+        procstack->currRingHdl=rFindHdl(procstack->currRing,NULL, NULL);
+        if (procstack->currRingHdl==NULL)
+          procstack->currRingHdl=
+           rFindHdl(procstack->currRing,NULL,procstack->currPack->idroot);
+        if (procstack->currRingHdl==NULL)
+          procstack->currRingHdl=
+           rFindHdl(procstack->currRing,NULL,basePack->idroot);
+        o=IDID(procstack->currRingHdl);
+        currRing=procstack->currRing;
+        currRingHdl=procstack->currRingHdl;
+      }
+      else                            o="none";
+      if (currRing!=NULL)             n=IDID(currRingHdl);
+      else                            n="none";
+      if (currRing==NULL)
+      {
+        Werror("ring change during procedure call: %s -> %s",o,n);
+        iiRETURNEXPR[myynest+1].CleanUp();
+        err=TRUE;
+      }
+    }
+    if (procstack->currRingHdl!=NULL)
+    {
+      rSetHdl(procstack->currRingHdl);
+    }
+    else
+    { currRingHdl=NULL; currRing=NULL; }
+  }
+#endif /* USE_IILOCALRING */
+#ifdef HAVE_NAMESPACES
   if (NS_LRING != currRing)
   {
     if (((iiRETURNEXPR[myynest+1].Typ()>BEGIN_RING)
@@ -545,7 +618,7 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
     else
     { currRingHdl=NULL; currRing=NULL; }
   }
-#endif /* USE_IILOCALRING */
+#endif /* HAVE_NAMESPACES */
   if (iiCurrArgs!=NULL)
   {
     if (!err) Warn("too many arguments for %s",IDID(pn));
@@ -553,7 +626,7 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
     omFreeBin((ADDRESS)iiCurrArgs, sleftv_bin);
     iiCurrArgs=NULL;
   }
-  procstack->pop(currRing,currRingHdl);
+  procstack->pop();
   if (err)
     return NULL;
   return &iiRETURNEXPR[myynest+1];
@@ -580,9 +653,9 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
 #ifdef HAVE_NAMESPACES
   if(ns != NULL)  namespaceroot->push(IDPACKAGE(ns), IDID(ns), myynest+1);
   else            namespaceroot->push(namespaceroot->root->pack, "Top", myynest+1);
-  procstack->push(currRing,currRingHdl,example);
+  procstack->push(example);
 #else /* HAVE_NAMESPACES */
-  procstack->push(currRing,currRingHdl,example);
+  procstack->push(example);
 #endif /* HAVE_NAMESPACES */
 #ifdef USE_IILOCALRING
   iiLocalRing[myynest]=currRing;
@@ -622,6 +695,7 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
     }
   }
 #else /* USE_IILOCALRING */
+#endif /* USE_IILOCALRING */
   if (NS_LRING != currRing)
   {
     if (NS_LRING!=NULL)
@@ -637,8 +711,8 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
       currRing=NULL;
     }
   }
-#endif /* USE_IILOCALRING */
-  procstack->pop(currRing,currRingHdl);
+//#endif /* USE_IILOCALRING */
+  procstack->pop();
   return err;
 }
 
@@ -769,6 +843,9 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
 #ifdef HAVE_NAMESPACES
   idhdl pl;
 #else
+#ifdef HAVE_NS
+  idhdl pl;
+#endif
   idhdl hl;
 #endif /* HAVE_NAMESPACES */
   int lines = 1;
@@ -777,6 +854,9 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
 #ifdef HAVE_NAMESPACES
   char *plib = iiConvName(newlib);
 #endif /* HAVE_NAMESPACES */
+#ifdef HAVE_NS
+  char *plib = iiConvName(newlib);
+#endif
   FILE * fp = feFopen( newlib, "r", libnamebuf, tellerror );
   if (fp==NULL)
   {
@@ -872,18 +952,42 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN tellerror )
   namespaceroot->push(IDPACKAGE(pl), IDID(pl));
   LoadResult = iiLoadLIB(fp, libnamebuf, newlib, pl, autoexport, tellerror);
 #else /* HAVE_NAMESPACES */
+#ifdef HAVE_NS
+  pl = basePack->idroot->get(plib,0);
+  if (pl==NULL)
+  {
+    pl = enterid( omStrDup(plib),0, PACKAGE_CMD,
+                  &(basePack->idroot), TRUE );
+    IDPACKAGE(pl)->language = LANG_SINGULAR;
+    IDPACKAGE(pl)->libname=omStrDup(newlib);
+  }
+  else
+  {
+    if(IDTYP(pl)!=PACKAGE_CMD)
+    {
+      Warn("not of typ package.");
+      fclose(fp);
+      return TRUE;
+    }
+  }
+  LoadResult = iiLoadLIB(fp, libnamebuf, newlib, pl, TRUE, tellerror);
+#else /* HAVE_NS */
   LoadResult = iiLoadLIB(fp, libnamebuf, newlib, NULL, FALSE, tellerror);
+#endif /* HAVE_NS */
 #endif /* HAVE_NAMESPACES */
+
+  omFree((ADDRESS)newlib);
 
 #ifdef HAVE_NAMESPACES
   if(!LoadResult) IDPACKAGE(pl)->loaded = TRUE;
   namespaceroot->pop();
-#endif /* HAVE_NAMESPACES */
-
-  omFree((ADDRESS)newlib);
-#ifdef HAVE_NAMESPACES
   omFree((ADDRESS)plib);
-#endif /* HAVE_LIBPARSER */
+#endif /* HAVE_NAMESPACES */
+#ifdef HAVE_NS
+  if(!LoadResult) IDPACKAGE(pl)->loaded = TRUE;
+  omFree((ADDRESS)plib);
+#endif /* HAVE_NS */
+
  return LoadResult;
 }
 
@@ -938,7 +1042,11 @@ static BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
   #ifdef HAVE_NAMESPACES
     yylplex(newlib, libnamebuf, &lib_style, pl, autoexport);
   #else /* HAVE_NAMESPACES */
+  #ifdef HAVE_NS
+    yylplex(newlib, libnamebuf, &lib_style, pl, autoexport);
+  #else
     yylplex(newlib, libnamebuf, &lib_style);
+  #endif /* HAVE_NS */
   #endif /* HAVE_NAMESPACES */
   if(yylp_errno)
   {
@@ -1031,6 +1139,7 @@ procinfo *iiInitSingularProcinfo(procinfov pi, char *libname, char *procname,
     pi->procname = omStrDup(procname);
   pi->language = LANG_SINGULAR;
   pi->ref = 1;
+  pi->pack = NULL;
   pi->is_static = pstatic;
   pi->data.s.proc_start = pos;
   pi->data.s.def_end    = 0L;

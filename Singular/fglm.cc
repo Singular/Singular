@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.cc,v 1.25 2001-01-12 13:47:09 Singular Exp $
+// $Id: fglm.cc,v 1.26 2001-10-09 16:35:59 Singular Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -146,8 +146,8 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
         pperm= (int *)omAlloc0( (npar+1)*sizeof( int ) );
     else
         pperm= NULL;
-    maFindPerm( sring->names, nvar, sring->parameter, npar, 
-                dring->names, nvar, dring->parameter, npar, vperm, pperm, 
+    maFindPerm( sring->names, nvar, sring->parameter, npar,
+                dring->names, nvar, dring->parameter, npar, vperm, pperm,
                 dring->ch);
     for ( k= nvar; (k > 0) && (state == FglmOk); k-- )
         if ( vperm[k] <= 0 ) {
@@ -186,7 +186,7 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
         if ( state != FglmOk ) return state;
         // check if dring->qideal is contained in sring->qideal:
         int * dsvperm = (int *)omAlloc0( (nvar+1)*sizeof( int ) );
-        maFindPerm( dring->names, nvar, NULL, 0, sring->names, nvar, NULL, 0, 
+        maFindPerm( dring->names, nvar, NULL, 0, sring->names, nvar, NULL, 0,
                     dsvperm, NULL, sring->ch);
         nMap=nSetMap(dring);
         ideal dqins = idInit( IDELEMS( dring->qideal ), 1 );
@@ -340,7 +340,7 @@ fglmQuotProc( leftv result, leftv first, leftv second )
       if ( quot == NULL ) state= FglmPolyIsZero;
       else if ( pIsConstant( quot ) ) state= FglmPolyIsOne;
     }
-    
+
     if ( state == FglmOk ) {
       assumeStdFlag( first );
       if ( fglmquot( sourceIdeal, quot, destIdeal ) == FALSE )

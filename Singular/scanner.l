@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.29 2000-09-18 09:19:32 obachman Exp $ */
+/* $Id: scanner.l,v 1.30 2001-10-09 16:36:21 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -46,7 +46,7 @@ static void my_free(void* addr)
 }
 #undef malloc
 #define malloc my_malloc
-#undef realloc 
+#undef realloc
 #define realloc my_realloc
 #undef free
 #define free my_free

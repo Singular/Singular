@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmalloc.cc,v 1.4 2001-02-01 21:19:54 obachman Exp $ */
+/* $Id: mmalloc.cc,v 1.5 2001-10-09 16:36:09 Singular Exp $ */
 /*
 * ABSTRACT: standard version of C++-memory management alloc func
 */
@@ -11,7 +11,7 @@
 
 #include <omalloc.h>
 
-/* We define those, so that our values of 
+/* We define those, so that our values of
    OM_TRACK and OM_CHECK are used  */
 void* operator new ( size_t size )
 {

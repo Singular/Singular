@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.77 2001-09-25 16:07:33 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.78 2001-10-09 16:36:24 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -452,7 +452,7 @@ BOOLEAN sleftv::RingDependend()
     return TRUE;
   if (rt==LIST_CMD)
     return lRingDependend((lists)Data());
-  return FALSE;  
+  return FALSE;
 }
 
 void * slInternalCopy(leftv source, int t, void *d, Subexpr e)
@@ -1023,7 +1023,7 @@ void * sleftv::Data()
       case VMAXMULT:   return (void *)Kstd1_mu;
       case TRACE:      return (void *)traceit;
       case VSHORTOUT:  return (void *)(currRing != NULL ? currRing->ShortOut : 0);
-      case VMINPOLY:   if (currRing != NULL && 
+      case VMINPOLY:   if (currRing != NULL &&
                            (currRing->minpoly!=NULL)&&(!rField_is_GF()))
                        /* Q(a), Fp(a), but not GF(q) */
                          return (void *)currRing->minpoly;
@@ -1319,7 +1319,9 @@ void syMake(leftv v,char * id, idhdl packhdl)
   v->packhdl = NULL;
   if(packhdl != NULL)
     v->req_packhdl = IDPACKAGE(packhdl);
-  else v->req_packhdl = basePack;
+  else v->req_packhdl = currPack;
+//  if (v->req_packhdl!=basePack)
+//    Print("search %s in %s\n",id,v->req_packhdl->libname);
 #endif /* HAVE_NS */
 #ifdef SIQ
   if (siq<=0)
@@ -1493,6 +1495,13 @@ void syMake(leftv v,char * id, idhdl packhdl)
         return;
       }
     }
+#ifdef HAVE_NS
+    if(v->req_packhdl!=basePack)
+    {
+      v->req_packhdl=basePack;
+      return syMake(v,id,basePackHdl);
+    }
+#endif
   }
 #ifdef SIQ
   else
@@ -1544,7 +1553,11 @@ int sleftv::Eval()
 #ifdef HAVE_NAMESPACES
           leftv r=iiMake_proc(h,(sleftv*)NULL,&d->arg2);
 #else /* HAVE_NAMESPACES */
+#ifdef HAVE_NS
+          leftv r=iiMake_proc(h,req_packhdl,&d->arg2);
+#else /* HAVE_NS */
           leftv r=iiMake_proc(h,&d->arg2);
+#endif /* HAVE_NS */
 #endif /* HAVE_NAMESPACES */
           if (r!=NULL)
             memcpy(this,r,sizeof(sleftv));
@@ -1579,7 +1592,7 @@ int sleftv::Eval()
           {
             n=omStrDup(IDID((idhdl)d->arg1.data));
             killhdl((idhdl)d->arg1.data);
-	    d->arg1.Init();
+            d->arg1.Init();
             //d->arg1.data=NULL;
             d->arg1.name=n;
           }

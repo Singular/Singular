@@ -14,10 +14,10 @@
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.  */
-/* 
-   obachman 9/99: adapted to Singular by 
+/*
+   obachman 9/99: adapted to Singular by
     * adding prefix fe_ to global variables
-    * extended fe_option structure    
+    * extended fe_option structure
 */
 
 #ifndef FEGETOPT_H
@@ -90,7 +90,7 @@ struct fe_option
   const char*   arg_name;// name of argument, for display in help
   const char*   help;    // (short) help string
   feOptType     type;    // type of argument, if has_arg > 0
-  void*         value;   // (default) value of option 
+  void*         value;   // (default) value of option
   int           set;     // only relevant for strings: 0 if not set, 1 if set
 };
 

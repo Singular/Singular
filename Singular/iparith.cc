@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.267 2001-09-25 16:07:26 Singular Exp $ */
+/* $Id: iparith.cc,v 1.268 2001-10-09 16:36:03 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -762,7 +762,7 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
 
       case PACKAGE_CMD:
         packhdl = (idhdl)u->data;
-        if((!IDPACKAGE(packhdl)->loaded) 
+        if((!IDPACKAGE(packhdl)->loaded)
         && (IDPACKAGE(packhdl)->language > LANG_TOP))
         {
           //if(iiReLoadLib(packhdl))
@@ -1457,7 +1457,15 @@ static BOOLEAN jjPROC(leftv res, leftv u, leftv v)
 #ifdef HAVE_NAMESPACES
   leftv sl = iiMake_proc((idhdl)u->data,u,v);
 #else /* HAVE_NAMESPACES */
+#ifdef HAVE_NS
+  leftv sl;
+  if (u->req_packhdl==currPack)
+    sl = iiMake_proc((idhdl)u->data,NULL,v);
+  else
+    sl = iiMake_proc((idhdl)u->data,u->req_packhdl,v);
+#else /* HAVE_NS */
   leftv sl = iiMake_proc((idhdl)u->data,v);
+#endif /* HAVE_NS */
 #endif /* HAVE_NAMESPACES */
   if (sl==NULL)
   {
@@ -2558,7 +2566,11 @@ static BOOLEAN jjPROC1(leftv res, leftv u)
 #ifdef HAVE_NAMESPACES
   leftv sl = iiMake_proc((idhdl) u->data,u,NULL);
 #else /* HAVE_NAMESPACES */
+#ifdef HAVE_NS
+  leftv sl = iiMake_proc((idhdl) u->data,u->req_packhdl,NULL);
+#else /* HAVE_NS */
   leftv sl = iiMake_proc((idhdl) u->data,NULL);
+#endif /* HAVE_NS */
 #endif /* HAVE_NAMESPACES */
   if (sl==NULL)
   {

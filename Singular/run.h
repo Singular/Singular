@@ -22,7 +22,7 @@
 #if defined(__CYGWIN__)
 #ifdef B19
 #define CYGWIN_ATTACH_HANDLE_TO_FD(a)      cygwin32_attach_handle_to_fd      a
-#define CYGWIN_CONV_TO_FULL_POSIX_PATH(a)  cygwin32_conv_to_full_posix_path  a 
+#define CYGWIN_CONV_TO_FULL_POSIX_PATH(a)  cygwin32_conv_to_full_posix_path  a
 #define CYGWIN_CONV_TO_FULL_WIN32_PATH(a)  cygwin32_conv_to_full_win32_path  a
 #define CYGWIN_CONV_TO_POSIX_PATH(a)       cygwin32_conv_to_posix_path       a
 #define CYGWIN_CONV_TO_WIN32_PATH(a)       cygwin32_conv_to_win32_path       a
@@ -38,7 +38,7 @@
 #define CYGWIN_WINPID_TO_PID(a)            cygwin32_winpid_to_pid            a
 #else
 #define CYGWIN_ATTACH_HANDLE_TO_FD(a)      cygwin_attach_handle_to_fd      a
-#define CYGWIN_CONV_TO_FULL_POSIX_PATH(a)  cygwin_conv_to_full_posix_path  a 
+#define CYGWIN_CONV_TO_FULL_POSIX_PATH(a)  cygwin_conv_to_full_posix_path  a
 #define CYGWIN_CONV_TO_FULL_WIN32_PATH(a)  cygwin_conv_to_full_win32_path  a
 #define CYGWIN_CONV_TO_POSIX_PATH(a)       cygwin_conv_to_posix_path       a
 #define CYGWIN_CONV_TO_WIN32_PATH(a)       cygwin_conv_to_win32_path       a
@@ -90,7 +90,7 @@ int build_cmdline(char* new_cmdline, char* exec, int argc, char* argv[]);
 void process_execname(char *exec, const char* execname, const char* execpath);
 int fileExists(char* fullname, const char* path, const char* name);
 int endsWith(const char* s1, const char* s2);
-int fileExistsMulti(char* fullname, const char* path, 
+int fileExistsMulti(char* fullname, const char* path,
                     const char* name_noext, const char* exts[],
                     const int extcnt);
 

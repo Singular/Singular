@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: sing_dld.cc,v 1.5 1999-11-15 17:20:48 obachman Exp $ */
+/* $Id: sing_dld.cc,v 1.6 2001-10-09 16:36:22 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to dynamic loading
@@ -100,7 +100,7 @@ BOOLEAN dlLoad(const char * fn, const char *pn)
   {
     p1();
     return FALSE;
-  }  
+  }
   else
   {
     Werror("cannot find %s in %s",pn,fn);

@@ -1,8 +1,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.2 2001-08-27 14:47:00 Singular Exp $ */
+/* $Id: gr_kstd2.cc,v 1.3 2001-10-09 16:36:01 Singular Exp $ */
 /* $Log: not supported by cvs2svn $
+/* Revision 1.2  2001/08/27 14:47:00  Singular
+/* *hannes: merge-2-0-2
+/*
 /* Revision 1.1.2.2  2001/08/16 13:17:29  Singular
 /* * hannes: removed rcsid
 /*
@@ -579,7 +582,7 @@ static int redBest (LObject*  h,kStrategy strat)
 	{
 	  pLmFree((*h).lcm);
           (*h).lcm=NULL;
-	}  
+	}
         (*h).p = NULL;
         return 0;
       }

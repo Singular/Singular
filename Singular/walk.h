@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: walk.h,v 1.4 2001-08-27 14:47:45 Singular Exp $ */
+/* $Id: walk.h,v 1.5 2001-10-09 16:36:27 Singular Exp $ */
 /*
 * ABSTRACT: Declaration of the Groebner walk
 */
@@ -65,7 +65,7 @@ intvec* MwalkNextWeight(intvec* curr_weight,intvec* target_weight, ideal G);
 //return lead exponent of the polynomial f
 //intvec* MExpPol(poly f);//11.02
 
-//return the product  of two intvecs 
+//return the product  of two intvecs
 //intvec* MivMult(intvec* a, intvec* b); //11.02
 intvec* Mivdp(int n);
 intvec* Mivlp(int n);
@@ -78,44 +78,44 @@ poly M3ivSame(intvec* next_weight, intvec* u , intvec* v);
  ***********************/
 //5.12 ring MNextRing(intvec* new_weight_vector);
 
-//ring MNextRing(ring startRing, intvec* new_weight_vector); 
-char* MNextRingStringC(ring startRing, intvec* new_weight_vector);  
+//ring MNextRing(ring startRing, intvec* new_weight_vector);
+char* MNextRingStringC(ring startRing, intvec* new_weight_vector);
 
 // compute an intermediate Groebner basis
 //ideal MwalkStep(ideal G,intvec* origin_weight, intvec* curr_weight, intvec* weight_order);
 
-//ideal MwalkStep(ideal G, intvec* curr_weight, ring NRing); 
+//ideal MwalkStep(ideal G, intvec* curr_weight, ring NRing);
 
 // compute a Groebner basis of an ideal G w.r.t. lexicographic order
-//ideal Mwalk(ideal G, intvec* curr_weight, intvec* target_weight); 
+//ideal Mwalk(ideal G, intvec* curr_weight, intvec* target_weight);
 
 //compute the division of two monoms
-//poly MpDiv(poly a, poly b); 
+//poly MpDiv(poly a, poly b);
 
 //compute the multiplication of two monoms
-//poly MpMult(poly a, poly b); 
+//poly MpMult(poly a, poly b);
 
 //compare a intvec to intvec NULL
 //int Mivcomp(intvec* op);
 
 //define a monomial which exponent is intvec iv
-poly MPolVar(intvec* iv);  
+poly MPolVar(intvec* iv);
 
 
-//int* MExpSub(int* i1, int*i2); 
+//int* MExpSub(int* i1, int*i2);
 
-//int* Mleadexp(poly f); 
+//int* Mleadexp(poly f);
 
 //compute the multiplikation of two ideals by "elementweise"
-ideal MidMultLift(ideal A, ideal B);   
+ideal MidMultLift(ideal A, ideal B);
 
 //poly maIMap(ring r, poly h);
 
 //compute a Groebner basis of an ideal G
-ideal Mstd(ideal G); 
-ideal Mstdhom(ideal G); 
+ideal Mstd(ideal G);
+ideal Mstdhom(ideal G);
 //compute a reduced Groebner basis of a Groebner basis G
-ideal MkInterRed(ideal G); 
+ideal MkInterRed(ideal G);
 ideal MidMinBase(ideal G);
 /********** Perturbation Walk ******************/
 /*****************************************************************************
@@ -125,43 +125,43 @@ ideal MidMinBase(ideal G);
 *    integer weight vector which its size is the numbers of variables.       *
 ******************************************************************************/
 
-intvec* MivMatrixOrder(intvec* iv);  
-intvec* MivMatrixOrderdp(int iv);  
-intvec* MPertVectors(ideal G, intvec* ivtarget, int pdeg);  
-intvec* MPertVectorslp(ideal G, intvec* ivtarget, int pdeg);  
-//ideal pwalk(ideal G, intvec* delta, intvec* teta, int op_deg, int tp_deg); 
+intvec* MivMatrixOrder(intvec* iv);
+intvec* MivMatrixOrderdp(int iv);
+intvec* MPertVectors(ideal G, intvec* ivtarget, int pdeg);
+intvec* MPertVectorslp(ideal G, intvec* ivtarget, int pdeg);
+//ideal pwalk(ideal G, intvec* delta, intvec* teta, int op_deg, int tp_deg);
 
 /**** Fractal Walk *****/
 intvec* MivMatrixOrderlp(int nV);
 
-intvec* Mfpertvector(ideal G, intvec* iv);  
+intvec* Mfpertvector(ideal G, intvec* iv);
 intvec* MivUnit(int nV);
 /*
 //ideal MFractalWalkR(ideal G, int nlev, intvec* sigma, intvec* tau, int step);
-ideal MFractalWalkR(ideal G, int nlev, intvec* tau, int step); 
-ideal MFractalWalk(ideal I, intvec* ivstart); 
-poly Mpsimple(poly p); 
-poly Mpofid(ideal H); 
+ideal MFractalWalkR(ideal G, int nlev, intvec* tau, int step);
+ideal MFractalWalk(ideal I, intvec* ivstart);
+poly Mpsimple(poly p);
+poly Mpofid(ideal H);
 
-intvec* MivMatrixOrderlp(int n); 
+intvec* MivMatrixOrderlp(int n);
 */
-intvec* MivWeightOrderlp(intvec* ivstart);  
-intvec* MivWeightOrderdp(intvec* ivstart);  
-//ideal Mimap(ring oldRing, ideal G); 
+intvec* MivWeightOrderlp(intvec* ivstart);
+intvec* MivWeightOrderdp(intvec* ivstart);
+//ideal Mimap(ring oldRing, ideal G);
 
-ideal MidLift(ideal Gomega, ideal M);  
+ideal MidLift(ideal Gomega, ideal M);
 ideal MLiftLmalG(ideal L, ideal G);
-ideal MLiftLmalGNew(ideal Gomega, ideal M, ideal G);  
-ideal MLiftLmalGMin(ideal L, ideal G);  
-//intvec* MwalkNextWeight(intvec* curr_weight,intvec* target_weight, ideal G); 
-intvec* Mfivpert(ideal G, intvec* target, int p_deg);  
+ideal MLiftLmalGNew(ideal Gomega, ideal M, ideal G);
+ideal MLiftLmalGMin(ideal L, ideal G);
+//intvec* MwalkNextWeight(intvec* curr_weight,intvec* target_weight, ideal G);
+intvec* Mfivpert(ideal G, intvec* target, int p_deg);
 
 
-//int MpSame(poly a, poly b);  
-//char* MidString(ideal G); 
+//int MpSame(poly a, poly b);
+//char* MidString(ideal G);
 
 
-//intvec* MwalkNextWeightZ(intvec* iv); 
+//intvec* MwalkNextWeightZ(intvec* iv);
 //intvec* MNextWeightList(intvec* curr_weight, intvec* target_weight, ideal G);
 
 ideal MNWstdhomRed(ideal G, intvec* iv);
@@ -173,7 +173,7 @@ ideal MadeLift(ideal M, ideal Gw, ideal G);
 ideal MpHeadIdeal(ideal G);
 void* test_w_in_Cone(ideal G, intvec* iv);
 void* checkideal(ideal G);
-matrix MaMidLift(ideal Gomega, ideal M); 
+matrix MaMidLift(ideal Gomega, ideal M);
 
 //ideal MNormalForm(poly f, ideal G);
 //poly MpolyConversion(poly f, ideal GW, ideal G);
