@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_random.h,v 1.2 1997-06-19 12:23:59 schmidt Exp $ */
+/* $Id: cf_random.h,v 1.3 1997-07-01 12:27:34 schmidt Exp $ */
 
 #ifndef INCL_CF_RANDOM_H
 #define INCL_CF_RANDOM_H
@@ -69,10 +69,10 @@ public:
     static CFRandom * generate();
 };
 
-/*ENDPUBLIC*/
-
 int factoryrandom( int n );
 
 void factoryseed( int s );
+
+/*ENDPUBLIC*/
 
 #endif /* ! INCL_CF_RANDOM_H */
