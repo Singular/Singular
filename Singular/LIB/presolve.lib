@@ -1,9 +1,9 @@
-// $Id: presolve.lib,v 1.5 1998-05-14 18:45:12 Singular Exp $
+// $Id: presolve.lib,v 1.6 1999-03-09 12:28:50 obachman Exp $
 //system("random",787422842);
 //(GMG), last modified 97/10/07 by GMG
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: presolve.lib,v 1.5 1998-05-14 18:45:12 Singular Exp $";
+version="$Id: presolve.lib,v 1.6 1999-03-09 12:28:50 obachman Exp $";
 info="
 LIBRARY:  presolve.lib     PROCEDURES FOR PRE-SOLVING POLYNOMIAL EQUATIONS
 
@@ -69,7 +69,7 @@ example
 proc elimlinearpart (ideal i,list #)
 "USAGE:   elimlinearpart(i[,n]);  i=ideal, n=integer
 RETURN:  list of of 5 objects:
-         [1]: (interreduced) ideal obtained from i by eliminating (sbstituting)
+         [1]: (interreduced) ideal obtained from i by eliminating (substituting)
               from the first n variables those which appear in a linear part
               of i, by putting this part into triangular form
               (default: n = nvars(basering))

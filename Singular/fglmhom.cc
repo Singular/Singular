@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmhom.cc,v 1.11 1998-09-24 09:59:39 Singular Exp $
+// $Id: fglmhom.cc,v 1.12 1999-03-09 12:28:46 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -325,7 +325,8 @@ fglmhomog( idhdl sourceRingHdl, ideal sourceIdeal, idhdl destRingHdl, ideal & de
 
     // Map the sourceHeads to the destRing
     int * vperm = (int *)Alloc( (sourceRing->N + 1)*sizeof(int) );
-    maFindPerm( sourceRing->names, sourceRing->N, NULL, 0, currRing->names, currRing->N, NULL, 0, vperm, NULL );
+    maFindPerm( sourceRing->names, sourceRing->N, NULL, 0, currRing->names, 
+                currRing->N, NULL, 0, vperm, NULL, currRing->ch);
     nSetMap( sourceRing->ch, sourceRing->parameter, sourceRing->P, sourceRing->minpoly );
     for ( s= IDELEMS( sourceIdeal ) - 1; s >= 0; s-- ) {
         dat.sourceHeads[s].dm= pPermPoly( dat.sourceHeads[s].sm, vperm, sourceRing, NULL, 0 );

@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglm.cc,v 1.16 1999-03-08 18:11:39 Singular Exp $
+// $Id: fglm.cc,v 1.17 1999-03-09 12:28:45 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -143,7 +143,9 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
         pperm= (int *)Alloc0( (npar+1)*sizeof( int ) );
     else
         pperm= NULL;
-    maFindPerm( sring->names, nvar, sring->parameter, npar, dring->names, nvar, dring->parameter, npar, vperm, pperm );
+    maFindPerm( sring->names, nvar, sring->parameter, npar, 
+                dring->names, nvar, dring->parameter, npar, vperm, pperm, 
+                dring->ch);
     for ( k= nvar; (k > 0) && (state == FglmOk); k-- )
         if ( vperm[k] <= 0 ) {
             WerrorS( "variable names do not agree" );
@@ -180,8 +182,9 @@ fglmConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
         if ( state != FglmOk ) return state;
         // check if dring->qideal is contained in sring->qideal:
         int * dsvperm = (int *)Alloc0( (nvar+1)*sizeof( int ) );
-        maFindPerm( dring->names, nvar, NULL, 0, sring->names, nvar, NULL, 0, dsvperm, NULL );
-        nSetMap( rInternalChar(dring), dring->parameter, npar, dring->minpoly );
+        maFindPerm( dring->names, nvar, NULL, 0, sring->names, nvar, NULL, 0, 
+                    dsvperm, NULL, sring->ch);
+        nSetMap(rInternalChar(dring), dring->parameter, npar, dring->minpoly);
         ideal dqins = idInit( IDELEMS( dring->qideal ), 1 );
         for ( k= IDELEMS( dring->qideal )-1; k >= 0; k-- )
             (dqins->m)[k]= pPermPoly( (dring->qideal->m)[k], dsvperm, sring);

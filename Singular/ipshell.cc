@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.35 1999-03-08 18:11:46 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.36 1999-03-09 12:28:48 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -573,8 +573,7 @@ leftv iiMap(map theMap, char * what)
                  rPar(IDRING(r)),
                  IDRING(r)->minpoly))
     {
-      Werror("map from characteristic %d to %d not implemented",
-        rChar(IDRING(r)),rChar());
+      Werror("can not map from ground field of %s to current ground field", theMap->preimage);
       return NULL;
     }
     if (IDELEMS(theMap)<IDRING(r)->N)
