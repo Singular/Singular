@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.14 1998-05-05 07:50:43 Singular Exp $
+@comment $Id: singular.doc,v 1.15 1998-05-05 15:29:28 obachman Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -109,14 +109,11 @@ q:quit, m:menu item, n:next node, p:previous node, u:up, g:goto node
 
 @menu
 * Limitations::
-* Integer division::
-* Monomials and precedence::
-* Behaviour of continue::
-* Evaluation of logical expressions::
-* Meaning of mult etc.::
+* Major differences to the C programming language::
+* Miscellaneous oddities::
 @end menu
 @c -------------------------------------------------------------------------
-@node Limitations,Integer division,,Tricks and pitfalls
+@node Limitations,Major differences to the C programming language,,Tricks and pitfalls
 @section Limitations
 @cindex Limitations
 
@@ -147,11 +144,189 @@ displays only the first 20 characters
 @end table
 
 @c -------------------------------------------------------------------------
-@node Integer division,Monomials and precedence,Limitations,Tricks and pitfalls
-@section Integer division
-@cindex Integer division
+@node Major differences to the C programming language,Evaluation of logical expressions,Monomials and precedence,Tricks and pitfalls
+@section Major differences to the C programming language
+@cindex C programming language
+
+Although many constructs from Singular's programming language are similar
+to those from the C programming language, there are some subtle
+differences. Most notably:
+
+@menu
+* no rvalue of increments::
+* no rvalue of assignments::
+* no left-to-right evaluation of logical expressions::
+* no case/switch statement::
+* usage of commas::
+* usage of brackets::
+* behaviour of continue::
+@end menu
+@c ---------------------------------------
+@node no rvalue of increments, no rvalue of assignments,,Major differences to the C programming language 
+@subsection no rvalue of increments
+@cindex rvalue of increments
+ The increment @code{++} (resp. decrement operator @code{--}) has no rvalue 
+ rvalue, i.e. can not be used on the right-hand sides of 
+ assignments. So, instead of 
+@*@code{j = i++;  // WRONG!!!}
+@*(which results in an error), it must be written
+@*@code{i++; j = i;}
+
+@c ---------------------------------------
+@node no rvalue of assignments, no left-to-right evaluation of logical expressions, no rvalue of increments, Major differences to the C programming language
+@subsection no rvalue of assignments
+@cindex rvalue of assignments 
+An assignment expression does not have a result, i.e., does not have an rvalue. Therefore, compound assignments like @code{i = j = k;} are not allowed. However, the following works:
+@*@code{string s; int i;}
+@*@code{s, i = "Hello", 2;}
+
+@c ---------------------------------------
+@node no left-to-right evaluation of logical expressions, no case/switch statement, no rvalue of assignments, Major differences to the C programming language
+@subsection Evaluation of logical expressions
+@cindex and
+@cindex or
+
+@strong{All} arguments of a logical expressions are first
+evaluated and then the value of the logical expression is
+determined. For example, the logical expressions @code{(a || b)} is
+evaluated by first evaluating @code{a} and @code{b}, even though the value of
+@code{b} has no influence on the value of @code{(a || b)}. Note that
+this is different from the left-to-right evaluation of logical
+expressions (as found in most programming languages like C) which, for
+example, determine the @code{(1 || b)} without evaluating @code{b}.
+Hence, in Singular, the following results in a syntax error
+@example
+if (defined(i) && i > 0) @{@}
+@end example
+if the variable @code{i} is undefined and must be written intead as
+@example
+if (defined(i)) 
+@{ 
+  if (i > 0) @{@}
+@}
+@end example
+However, there are several short work-arounds for this problem:
+@enumerate
+@item 
+If a variable (say, @code{i}) can  only have two values (say, 1 and 0),
+then define (value equals 1) and undefine (value equals 0) @code{i}
+instead of assigning a value. Then it is sufficient to simply write
+@example
+if (defined(i))
+@end example
+in order to check whether @code{i} has the value 1.
+@item 
+If a variable  can have more than two values, then
+define it, if necessary, before it is used for the first time.
+For example, if the following is used within a procedure
+@example
+if (! defined(DEBUG)) { int DEBUG = 1;}
+@dots{}
+if (DEBUG == 3)  @{@dots{}@}
+if (DEBUG == 2)  @{@dots{}@}
+@dots{}
+@end example
+then the existence of the variable @code{DEBUG} remains hidden from the
+user. However, if @code{DEBUG} exists globally, then its local default
+value is overwritten.
+@end enumerate
+
+@c ---------------------------------------
+@node no case/switch statement,  usage of commas, no left-to-right evaluation of logical expressions, Major differences to the C programming language
+@subsection no case/switch statement
+@cindex case
+@cindex switch
+
+Singular does not offer a @code{case} (or, @code{switch})
+statement. However, it can be imitated in the following way:
+@example
+  while (1)
+  @{
+     if (choice == choice_1) @{ @dots{}; break;@}
+     @dots{}
+     if (choice == choice_n) @{ @dots{}; break;@}
+     // default case
+     @dots{}; break;
+  @}
+@end example
+
+@node  usage of commas, usage of brackets, no case/switch statement, Major differences to the C programming language
+@subsection usage of commas
+@cindex comma
+
+@c ---------------------------------------
+In Singular, a comma separates list elements and the value of a comma
+expression is a list. Hence, commas can not be used to combine several expressions into a single expression. For example, instead of writing
+@example
+ for (i=1, j=5; i<j; i++, j++) @{@dots{}@} // WRONG!!!!!! 
+@end example
+you have to write
+@example
+ for (i,j = 1,5; i<j; i++, j++) @{@dots{}@}
+@end example
+
+@c ---------------------------------------
+@node  usage of brackets, behaviour of continue, usage of commas, Major differences to the C programming language
+@subsection usage of brackets
+@cindex bracket
+
+In Singular, curly brackets (i.e. "@code{@{@}}") @strong{must always} be
+used to enclose the (statement) body following such constructs like
+@code{if, else, for, while}, even if this block consists of only a
+single statement. Similarly, in the return statement a procedure round
+brackets (i.e. "@code{()}") @strong{must always} be used to enclose the
+return value.
+For example,
+@example
+  if (i == 1) return i;    // WRONG!!!!!
+@end example
+results in a errors. Instead, it must be written as
+@example
+  if (i == 1) return (i); 
+@end example
+
+On the other hand, more than one value can be returned by a single
+@code{return} statement. For example,
+@example
+proc tworeturn () @{ return (1,2); @}
+int i,j = tworeturn();
+@end example
+
+@c ---------------------------------------
+@node  behaviour of continue,, usage of brackets, Major differences to the C programming language
+@subsection behaviour of continue
+@cindex continue 
+Singular's @code{continue} construct is only valid inside the body of
+the @code{for} construct. It skips the rest of the loop-body and jumps
+to the beginning of the block. Unlike the C-construct Singular's
+@code{continue} @strong{does not execute the increment statement}. For
+example,
+@example
+  for (int i = 1 ; i<=10; i=i+1)
+  @{
+     @dots{}
+     if (i==3) @{ i=8;continue; @}
+       // skip the rest if i is 3 and
+       // continue with the next i: 8
+     i;
+  @}
+  @expansion{} 1
+  @expansion{} 2
+  @expansion{} 8
+  @expansion{} 9
+  @expansion{} 10
+@end example
+
+
+
+@c -------------------------------------------------------------------------
+@node Miscellaneous oddities,,Major differences to the C programming language, Tricks and Pitfalls
+@section Miscellaneous oddities
+
+@enumerate
+@item integer division
+@cindex integer division
 @cindex mod
-@cindex div
 
 A sequence of digits and @code{/} without spaces is of type number.
 With spaces it is an expression of type ints
@@ -170,10 +345,10 @@ To avoid confusion use the operand @code{div}.
   a div b;
 @c example
 @end example
-@c -------------------------------------------------------------------------
-@node Monomials and precedence,Behaviour of continue,Integer division,Tricks and pitfalls
-@section Monomials and precedence
-@cindex Monomials and precedence
+
+
+@item monomials and precedence
+@cindex monomials and precedence
 
 The computation of a monomial has precedence over all operators:
 @example
@@ -183,45 +358,72 @@ The computation of a monomial has precedence over all operators:
   x*y^2;
 @c example
 @end example
-@c -------------------------------------------------------------------------
-@node Behaviour of continue,Evaluation of logical expressions,Monomials and precedence,Tricks and pitfalls
-@section Behaviour of continue
-@cindex continue
 
-Unlike the C-construct @code{continue}
-@strong{does not execute the increment statement}.
-@code{continue} is mainly for internal use.
 
-@c -------------------------------------------------------------------------
-@node Evaluation of logical expressions,Meaning of mult etc.,Behaviour of continue,Tricks and pitfalls
-@section Evaluation of logical expressions
-@cindex and
-@cindex or
-
-@strong{All} arguments of a logical expressions are first
-evaluated and then the value of the logical expression is
-determined. For example, the logical expressions @code{(a || b)} is
-evaluated by first evaluating @code{a} and @code{b}, even though the value of
-@code{b} has no influence on the value of @code{(a || b)}. Note that
-this is different from the left-to-right evaluation of logical
-expressions (as found in most programming languages like C) which, for
-example, determine the @code{(1 || b)} without evaluating @code{b}.
-
-@c -------------------------------------------------------------------------
-@node Meaning of mult etc., , Evaluation of logical expressions,Tricks and pitfalls
-@section Meaning of mult etc.
+@item meaning of mult
 @cindex mult
 @cindex degree
 
-A standard mistake is to interprete degree(i) or mult(i) for an
-inhomogeneous ideal i as the degree of the homogenisation or
-as something like the 'degree of the affine part'. For the
-ordering dp (degree reverse lexicographical) the converse is
-true: if i is given by a standard basis, mult(i) is the degree
-of the homogeneous ideal obtained by homogenisation of i and
-then putting the homogenizing variable to 0, hence it is the
-degree of the part at infinity.
-(Check this by looking at the initial ideal.)
+A standard mistake is to interpret @code{degree(i)} or @code{mult(i)}
+for an inhomogeneous ideal @code{i} as the degree of the homogenization
+or as something like the 'degree of the affine part'. For the ordering
+dp (degree reverse lexicographical) the converse is true: if @code{i} is
+given by a standard basis, @code{mult(i)} is the degree of the
+homogeneous ideal obtained by homogenization of @code{i} and then
+putting the homogenizing variable to 0, hence it is the degree of the
+part at infinity (this can also be checked by looking at the initial
+ideal).
+
+@item size of ideals
+@cindex ideals
+@cindex sizeof
+
+@code{size} counts the non-zero entries of an ideal (resp. module). Use
+@code{ncols} to determine the actual number of entries in the ideal
+(resp. module).
+
+@item computations in qrings
+
+Singular computes in a @code{qring} as long as possible with the given
+representative of a polynomial, i.e. it usually does not reduce a
+polynom w.r.t. the qutient ideal. This is only doen during standard
+bases computations.
+
+@item substring selection 
+
+Two comma -- separated @code{int}s in square brackets after a string select a
+substring. An @code{intvec} in square brackets after a string selects the respective single characters of the string and collects them as strings.
+In particular,
+@example
+@c example
+  string s = "hello";
+  s[1,4];
+  intvec v = 1,4;
+  s[v];
+  size(s[1,4]);
+  size(s[v]);
+@c example
+@end example
+
+@item return type of procedures
+
+The type of the return value of a procedure does not need to be fixed,
+i.e., the return type may depend on the input. However, the retun value
+of such a procedures can only be assigned to a variable of type @code{def}.
+@example
+@c example
+proc type_return (int i) 
+{ 
+  if (i > 0) {return (i);} 
+  else {return (list(i));} 
+}
+def t1 = type_return(1);
+def t2 = type_return(-1);
+typeof(t1); typeof(t2);
+@c example
+@end example
+@end enumerate
+
 
 @c ----------------------------------------------------------------------------
 @node Examples, Mathematical background, Tricks and pitfalls, Top
