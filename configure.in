@@ -249,12 +249,12 @@ AC_MSG_CHECKING(which tmp dir to use)
 if test "${with_tmpdir+set}" = set && test -d ${with_tmpdir}; then
   if (echo "${with_tmpdir}" | egrep "\." >/dev/null 2>&1)
   then
-    TMP_DIR="/tmp"
+    TMP_DIR="${pwd}/tmp"
   else
     TMP_DIR=${with_tmpdir}
   fi
 else
-  TMP_DIR="/tmp"
+  TMP_DIR="${pwd}/tmp"
 fi
 AC_MSG_RESULT($TMP_DIR)
 AC_SUBST(TMP_DIR)
