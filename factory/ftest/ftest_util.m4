@@ -1,4 +1,4 @@
-dnl $Id: ftest_util.m4,v 1.13 1997-11-21 11:37:51 schmidt Exp $
+dnl $Id: ftest_util.m4,v 1.14 1997-12-17 12:16:11 schmidt Exp $
 dnl
 dnl ftest_util.m4 - m4 macros used by the factory test environment.
 dnl
@@ -112,8 +112,10 @@ define(`ftestMainExit', `dnl
 define(`ftestOutVar', `dnl
 define(`_ftestOutType_'_qstripTWS(`$2'), `$1')dnl
 ifelse(`$1', `int',
-  ``$1 '_qstripTWS(`$2')` = 0;'',
-  ``$1 '_qstripTWS(`$2')`;'')')
+  ``$1 '_qstripTWS(`$2')` = 0'',
+  `$1', `bool',
+  ``$1 '_qstripTWS(`$2')` = false'',
+  ``$1 '_qstripTWS(`$2')')')
 
 #
 # ftestInVar() - declare input variable.
