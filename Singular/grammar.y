@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.101 2003-03-10 16:42:50 Singular Exp $ */
+/* $Id: grammar.y,v 1.102 2004-08-27 12:18:46 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -50,6 +50,45 @@
 #include "syz.h"
 #include "lists.h"
 #include "libparse.h"
+
+#if 0
+void debug_list(leftv v)
+{
+  idhdl r=basePackHdl;
+  idhdl h;
+  BOOLEAN found=FALSE;
+  const char *nn=v->name;
+  h=IDROOT->get(nn,myynest);
+  if (h!=NULL)
+  {
+     Print("Curr::%s, (%s)\n",nn,Tok2Cmdname((int)IDTYP(h)));
+     found=TRUE;
+  }
+  else         Print("`%s` not found in IDROOT\n",nn);
+  while (r!=NULL)
+  {
+    if ((IDTYP(r)==PACKAGE_CMD)
+    || (IDTYP(r)==RING_CMD)
+    || (IDTYP(r)==QRING_CMD))
+    {
+      h=IDPACKAGE(r)->idroot->get(nn,myynest);
+      if (h!=NULL)
+      {
+        Print("%s::%s, (%s)\n",r->id,nn,Tok2Cmdname((int)IDTYP(h)));
+        found=TRUE;
+      }
+      else         Print("%s::%s not found\n",r->id,nn);
+    }
+    if (r==basePackHdl) r=IDPACKAGE(r)->idroot;
+    r=r->next;
+   if (r==basePackHdl) break;
+  }
+  if (!found)
+  {
+    listall(TRUE);
+  }
+}
+#endif
 
 /* From the bison docu:
 
@@ -1149,7 +1188,10 @@ killcmd:
           {
             if (v->rtyp!=IDHDL)
             {
-              if (v->name!=NULL) Werror("`%s` is undefined in kill",v->name);
+              if (v->name!=NULL)
+              {
+                 Werror("`%s` is undefined in kill",v->name);
+              }
               else               WerrorS("kill what ?");
             }
             else
