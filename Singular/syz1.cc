@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.55 2000-02-29 10:46:05 siebert Exp $ */
+/* $Id: syz1.cc,v 1.56 2000-03-01 16:08:37 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -535,7 +535,7 @@ void syResetShiftedComponents(syStrategy syzstr, int index,int hilb)
       assume (index>1);
       assume (syzstr->resPairs[index-1]!=NULL);
       SSet Pairs=syzstr->resPairs[index-1];
-      SSet Pairs1=syzstr->resPairs[index]; 
+      SSet Pairs1=syzstr->resPairs[index];
       int till=(*syzstr->Tl)[index-1];
       for (i=0;i<till;i++)
       {
@@ -1701,7 +1701,8 @@ void syKillComputation(syStrategy syzstr)
               pDelete(&(syzstr->res[i]->m[j]));
           }
         }
-        if (syzstr->hilb_coeffs[i]!=NULL)
+        if ((syzstr->hilb_coeffs!=NULL)
+        && (syzstr->hilb_coeffs[i]!=NULL))
           delete syzstr->hilb_coeffs[i];
         if (syzstr->sev[i] != NULL)
           Free((ADDRESS)syzstr->sev[i], (IDELEMS(syzstr->res[i])+1)*sizeof(unsigned long));
