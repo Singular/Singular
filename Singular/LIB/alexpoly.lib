@@ -741,9 +741,13 @@ EXAMPLE:  example semigroup;  shows an example
         //////////////////////////////////////////////////////////////////////////////
         if (typeof(INPUT[1])=="intmat")    
         { 
-          intmat contact=INPUT[1];
+          intmat contact=INPUT[1];          
           charexp=INPUT[2];
           int n=ncols(contact); // to know how many branches we have	 
+          if (n==1) // Only one branch!
+          {
+            return(semigroup(charexp[1]));
+          }
           intmat intersecmult=charexp2inter(contact,charexp);
           for(i=1;i<=ncols(contact);i++)
           {
@@ -825,7 +829,7 @@ EXAMPLE:  example semigroup;  shows an example
   intvec series;                    // ith entry = row in totmult which corresponds to w_i
   intvec deadarc;                   // Star point and the point connected to the star point of a dead arc.
   list deadarcs;                    // Saves deadarc for all dead arcs.
-  int stop,ctp;
+  int stop,ctp,ctpstop;
   list ordinary_generators, series_generators; // the v_i and the w_i from the description
   // Find for each branch of the curve all the points in the graph to which it is connected
   // and save the numbers of the corresponding rows in the graph as well as the weight of the point.
@@ -885,7 +889,7 @@ EXAMPLE:  example semigroup;  shows an example
   }
   //////////////////////////////////////////////////////////////////////////////////
   // Points (!=1) which are on the geodesics of every branch don't contribute.
-  // (The geodesic of a branch is the shortes connection of the strict transform to 1 in the graph.)
+  // (The geodesic of a branch is the shortest connection of the strict transform to 1 in the graph.)
   stop=0;              // Checks whether the points on all geodesics have been found.
   ctp=1;               // Point (=row in resgr) to be considered.
   int prev_ctp;        // Previous point in the graph, to which ctp was connected.
@@ -937,12 +941,17 @@ EXAMPLE:  example semigroup;  shows an example
       else
       {
         // Set ctp to the point connected to ctp which is not in the dead arc and is not prev_ctp.
-        for (i=1;i<=3;i++)
+        i=1;
+        ctpstop=0;
+        while ((i<=3) and (ctpstop==0))
         {
           if ((conpts[ctp][1][i]!=prev_ctp) and (conpts[ctp][1][i]!=dead_arc_ctp))
           {
+            prev_ctp=ctp;
             ctp=conpts[ctp][1][i];
+            ctpstop=1;
           }
+          i++;
         }
       }
     }
@@ -1215,7 +1224,8 @@ EXAMPLE:     example charexp2inter;   shows an example"
   int n=ncols(contact);
   int i,j,k;
   list multpl;
-  intvec max=0;
+  int max=0;
+  intvec helpvect;
   intmat inters[n][n];
   // Calculate the multiplicity sequences of the branches.
   for (i=1;i<=n;i++)
@@ -1227,13 +1237,19 @@ EXAMPLE:     example charexp2inter;   shows an example"
       max=size(multpl[i]);
     }
   } 
+  // If the contact of certain branches is higher than the maximal length of the
+  // multiplicity sequence, then max should be the maximal contact!
+  helpvect=max,intvec(contact);
+  max=max_in_intvec(helpvect)[1];
   // Prolong them by 1s, in order to take care of higher contact.
   for (i=1;i<=n;i++)
   {
+    helpvect=multpl[i];
     for (j=size(multpl[i]+1);j<=max;j++)
     {
-      multpl[i][j]=1;
+      helpvect[j]=1;
     }
+    multpl[i]=helpvect;
   }
   // Calculate the intersection numbers of the branches: for two branches f_i and f_j
   // this is the sum over mult_k(f_i)*mult_k(f_j), where k runs over all infinitely 
@@ -1701,6 +1717,7 @@ NOTE:     This procedure is only for internal use; it is called by resgraph.
   list result=resgraph,tm,multpl; //HIER GEAENDERT!!!!
   return(result);
 }
+
 
 static proc max_in_intvec (intvec v, list #)
 "USAGE:   max_in_intvec(v); v intvec
