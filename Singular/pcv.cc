@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: pcv.cc,v 1.4 1998-11-18 13:00:12 mschulze Exp $ */
+/* $Id: pcv.cc,v 1.5 1998-11-18 14:12:24 mschulze Exp $ */
 /*
 * ABSTRACT: conversion between polys and coeff vectors
 */
@@ -225,6 +225,7 @@ poly pcvVec2Poly(poly v,int d0,int d1,short w[])
 // NOTE: calls pcvInit(), pcvClean()
 ideal pcvId2Mod(ideal I,int d0,int d1,short w[])
 {
+  if(d1<d0) d1=d0;
   pcvInit(d1,w);
   ideal M=idInit(IDELEMS(I),1);
   for(int i=IDELEMS(I)-1;i>=0;i--)
@@ -240,6 +241,7 @@ ideal pcvId2Mod(ideal I,int d0,int d1,short w[])
 // NOTE: calls pcvInit(), pcvClean()
 ideal pcvMod2Id(ideal M,int d0,int d1,short w[])
 {
+  if(d1<d0) d1=d0;
   pcvInit(d1,w);
   ideal I=idInit(IDELEMS(M),1);
   for(int i=IDELEMS(I)-1;i>=0;i--)
@@ -253,6 +255,7 @@ ideal pcvMod2Id(ideal M,int d0,int d1,short w[])
 // NOTE: calls pcvInitW(), pcvClean()
 int pcvDimW(int d0,int d1,short w[])
 {
+  if(d1<d0) d1=d0;
   pcvInitW(d1,w);
   int d=pcvIndex[pVariables-1][d1]-pcvIndex[pVariables-1][d0];
   pcvClean();
@@ -286,7 +289,9 @@ int pcvDegBasisW(ideal I,int i,poly m,int d,int n,short w[])
 // NOTE: calls pcvDimW(), pcvDegBasisW()
 ideal pcvBasisW(int d0,int d1,short w[])
 {
-  ideal I=idInit(pcvDimW(d0,d1,w),1);
+  ideal I;
+  if(d1<=d0) I=idInit(1,1);
+  else I=idInit(pcvDimW(d0,d1,w),1);
   poly m=pOne();
   for(int d=d0,i=0;d<d1;d++)
     i=pcvDegBasisW(I,i,m,d,0,w);
@@ -434,7 +439,7 @@ BOOLEAN iiPcvBasis(leftv res, leftv h)
   int i0=0,i1;
   short* w=(short*)Alloc(currRing->N*sizeof(short));
   BOOLEAN defi1=FALSE,defw=FALSE;
-  while(h)
+  while(h!=NULL)
   {
     if(h->Typ()==INT_CMD)
     {
@@ -455,23 +460,27 @@ BOOLEAN iiPcvBasis(leftv res, leftv h)
       intvec *iv=(intvec*)h->Data();
       if(iv->rows()==currRing->N&&iv->cols()==1)
       {
-        for(int i=0;i<currRing->N;i++) w[i]=(*iv)[i];
+        int i;
+        for(i=0;i<currRing->N;i++) w[i]=(*iv)[i];
         defw=TRUE;
       }
     }
     h=h->next;
   }
+  if(!defw)
+  {
+    int i;
+    for(i=0;i<currRing->N;i++) w[i]=1;
+  }
   if(defi1)
   {
-    if(!defw) for(int i=0;i<currRing->N;i++) w[i]=1;
-    // "pcvDim"[,<int d0>],<int d1>[,<intvec w>]:
-    // number of monomials m with d0<=w-deg(m)<d1
-    res->rtyp=INT_CMD;
-    res->data=(void*)pcvDimW(i0,i1,w);
-    Free((ADDRESS)w,currRing->N*sizeof(short));
+    // "pcvBasis"[,<int d0>],<int d1>[,<intvec w>]:
+    // ideal of monomials m with d0<=w-deg(m)<d1
+    res->rtyp=IDEAL_CMD;
+    res->data=(void*)pcvBasisW(i0,i1,w);
     return FALSE;
   }
-  Free((ADDRESS)w,currRing->N*sizeof(short));
+  Free((ADDRESS)w,(currRing->N)*sizeof(short));
   WerrorS("[<int>],<int>[,<intvec>] expected");
   return TRUE;
 }
