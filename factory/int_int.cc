@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_int.cc,v 1.13 1998-06-12 14:33:50 schmidt Exp $ */
+/* $Id: int_int.cc,v 1.14 1998-06-26 16:16:33 schmidt Exp $ */
 
 #include <config.h>
 
@@ -55,16 +55,6 @@ void InternalInteger::print( ostream & os, char * c )
 }
 #endif /* NOSTREAMIO */
 
-bool InternalInteger::isZero() const
-{
-    return mpz_cmp_si( &thempi, 0 ) == 0;
-}
-
-bool InternalInteger::isOne() const
-{
-    return mpz_cmp_si( &thempi, 1 ) == 0;
-}
-
 bool InternalInteger::is_imm() const
 {
     return mpz_is_imm( &thempi );
@@ -86,20 +76,23 @@ InternalCF* InternalInteger::genOne()
 	return new InternalInteger( 1 );
 }
 
-InternalCF* InternalInteger::neg()
+//{{{ InternalCF * InternalInteger::neg ()
+// docu: see CanonicalForm::operator -()
+InternalCF *
+InternalInteger::neg ()
 {
     if ( getRefCount() > 1 ) {
 	decRefCount();
 	MP_INT dummy;
-	mpz_init( &dummy );
-	mpz_neg( &dummy, &thempi );
+	mpz_init_set( &dummy, &thempi );
+	mpz_neg( &dummy, &dummy );
 	return new InternalInteger( dummy );
-    }
-    else {
+    } else {
 	mpz_neg( &thempi, &thempi );
 	return this;
     }
 }
+//}}}
 
 
 InternalCF* InternalInteger::addsame( InternalCF * c )

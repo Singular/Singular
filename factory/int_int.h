@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_int.h,v 1.8 1998-03-17 15:56:18 schmidt Exp $ */
+/* $Id: int_int.h,v 1.9 1998-06-26 16:16:40 schmidt Exp $ */
 
 #ifndef INCL_INT_INT_H
 #define INCL_INT_INT_H
@@ -45,8 +45,6 @@ public:
 #ifndef NOSTREAMIO
     void print( ostream&, char* );
 #endif /* NOSTREAMIO */
-    bool isZero() const;
-    bool isOne() const;
     InternalCF* genZero();
     InternalCF* genOne();
 
