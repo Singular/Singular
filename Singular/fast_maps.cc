@@ -6,7 +6,7 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id: fast_maps.cc,v 1.21 2002-01-19 18:39:03 Singular Exp $
+ *  Version: $Id: fast_maps.cc,v 1.22 2002-01-19 19:52:13 obachman Exp $
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>
@@ -20,9 +20,9 @@
 // define if you want to use special dest_ring
 #define HAVE_DEST_R 1
 // define if you want to use special src_ring
-#define HAVE_SRC_R 0
+#define HAVE_SRC_R 1
 // define if you want to use optimization step
-#define HAVE_MAP_OPTIMIZATION 1
+// #define HAVE_MAP_OPTIMIZATION 1
 
 /*******************************************************************************
 **
@@ -166,8 +166,8 @@ void maMonomial_Destroy(mapoly mp, ring src_r, ring dest_r = NULL)
         p_Delete(&(mp->dest), dest_r);
       }
     }
-    omFreeBin(mp, mapolyBin);
   }
+  omFreeBin(mp, mapolyBin);
 }
 
 /*******************************************************************************
@@ -260,7 +260,11 @@ void maMap_CreatePolyIdeal(ideal map_id, ring map_r, ring src_r, ring dest_r,
     {
       mideal->buckets[i] = sBucketCreate(dest_r);
       maPoly_InsertPoly(mp, 
+#ifdef PDEBUG
+                        prShallowCopyR(map_id->m[i], map_r, src_r),
+#else
                         prShallowCopyR_NoSort(map_id->m[i], map_r, src_r),
+#endif
                         src_r,                     
                         mideal->buckets[i]);
     }
@@ -275,11 +279,11 @@ void maMap_CreateRings(ideal map_id, ring map_r,
 #if HAVE_SRC_R > 0
   int* weights = (int*) omAlloc0(map_r->N);
   int i;
-  int n = min(map_r->N, IDELEMS(theMap));
+  int n = min(map_r->N, IDELEMS(image_id));
 
   for (i=0; i<n; i++)
   {
-    weights[i] = pLength(theMap->m[i]);
+    weights[i] = pLength(image_id->m[i]);
   }
   src_r = rModifyRing_Wp(map_r, weights);
 #else
@@ -288,6 +292,9 @@ void maMap_CreateRings(ideal map_id, ring map_r,
 
 #if HAVE_DEST_R > 0
   Exponent_t maxExp = maGetMaxExp(map_id, map_r, image_id, image_r);
+  if (maxExp <=  1) maxExp = 2;
+  else if (maxExp > (Exponent_t) image_r->bitmask) 
+    maxExp = (Exponent_t) image_r->bitmask;
   dest_r = rModifyRing_Simple(image_r, TRUE, TRUE, maxExp);
 #else
   dest_r = image_r;
@@ -320,7 +327,7 @@ ideal maIdeal_2_Ideal(maideal m_id, ring dest_r)
   return res;
 }
 
-void maPoly_GetLength(mapoly mp, ring src_r, int length, int total_cost)
+void maPoly_GetLength(mapoly mp, ring src_r, int &length, int &total_cost)
 {
   length = 0;
   total_cost = 0;
@@ -364,7 +371,7 @@ ideal fast_map(ideal map_id, ring map_r, ideal image_id, ring image_r)
   if (TEST_OPT_PROT)
   {
     maPoly_GetLength(mp, src_r, length, total_cost);
-    Print("map[%d:%d]{%d:%d}", src_r->bitmask, src_r->ExpL_Size, length, total_cost);
+    Print("map[%d:%d]{%d:%d}", dest_r->bitmask, dest_r->ExpL_Size, length, total_cost);
   }
   
   // do the optimization step
@@ -395,6 +402,9 @@ ideal fast_map(ideal map_id, ring map_r, ideal image_id, ring image_r)
   
   // clean-up the rings
   maMap_KillRings(map_r, image_r, src_r, dest_r);
+
+  if (TEST_OPT_PROT)
+    Print("\n");
 
   return res_image_id;
 }
