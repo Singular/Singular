@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.60 2000-05-10 12:56:13 pfister Exp $
+// $Id: primdec.lib,v 1.61 2000-05-11 11:22:40 pfister Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                               //
 // algorithms for primary decomposition based on                             //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                            //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.60 2000-05-10 12:56:13 pfister Exp $";
+version="$Id: primdec.lib,v 1.61 2000-05-11 11:22:40 pfister Exp $";
 info="
 LIBRARY: primdec.lib   PROCEDURES FOR PRIMARY DECOMPOSITION
 AUTHORS:  Gerhard Pfister, email: pfister@mathematik.uni-kl.de (GTZ)
@@ -26,7 +26,7 @@ PROCEDURES:
   radical(I);       computes the radical of the ideal I
   equiRadical(I);   the radical of the equidimensional part of the ideal I
   prepareAss(I);    list of radicals of the equidimensional components of I
-  equidim(I);       equidimensional decomposition of I
+  equidim(I);       weak equidimensional decomposition of I
   equidimMax(I);    equidimensional locus of I
   equidimMaxEHV(I); equidimensional locus of I (Algorithm of Eisenbud,
                     Huneke and Vasconcelos)
@@ -1764,30 +1764,28 @@ proc radicalOld(ideal i)
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc equidim(ideal i,list #)
-"USAGE:  equidim(i); i ideal           
- RETURN:  list = list of equidimensional ideals a1,...,as such that
-          i is the intersection of a1,...,as
- EXAMPLE: example equidim; shows an example
+"USAGE:  equidim(i) or equidim(i,1) ; i ideal 
+         equidim(i,1) uses the algorithm of Eisenbud, Hunecke and Vasconcelos          
+ RETURN: list = list of equidimensional ideals a1,...,as such that
+         i is the intersection of a1,...,as. as is the equidimensional
+         locus of i, ai are the lower dimensional equidimensional loci
+         with (perhaps) modified embedded components,i.e. an embedded
+         component q (primary ideal) of i can be replaced in the decompo-
+         sition by a primary ideal q1 with the same radical as q
+ EXAMPLE:example equidim; shows an example
 "
 {
   def  P = basering;
   list eq;
   intvec w;
-  int n,ra;
-  ideal te=1;
+  int n,m;
   int a=attrib(i,"isSB");
   int homo=homog(i);
-  if( typeof(attrib(i,"isRadical"))=="int" )
-  {
-     if(attrib(i,"isRadical")==1)
-     { 
-        ra=1;
-     }
-  }
   if(size(#)!=0)
   {
-    te=#[1];
-  }   
+     m=1;
+  }
+
   if(((homo==1)||(a==1))&&(find(ordstr(basering),"l")==0)
                                 &&(find(ordstr(basering),"s")==0))
   {
@@ -1811,14 +1809,6 @@ proc equidim(ideal i,list #)
      ideal j=groebner(i);
   }
   
-  ideal te=imap(P,te);
-  list equ,equi,indep;
-  int b;
-  if((size(reduce(te,j))==0)&&(deg(te[1])>0))
-  {
-    setring P;
-    return(eq);
-  }
   if(homo==1)
   {
      for(n=1;n<=nvars(basering);n++)
@@ -1827,6 +1817,7 @@ proc equidim(ideal i,list #)
      }
      intvec hil=hilb(j,1,w);
   }
+
   if ((dim(j)==-1)||(size(j)==0)||(nvars(basering)==1)||(dim(j)==0))
   {
     setring P;
@@ -1835,76 +1826,30 @@ proc equidim(ideal i,list #)
     return(eq);
   }
 
-  indep=maxIndependSet(j);
-
-  string va=string(maxideal(1));
-
-  execute "ring gnir1 = ("+charstr(basering)+"),("+indep[1][1]+"),("
-                              +indep[1][2]+");";
-  if(homo==1)
+  if(m==0)
   {
-     ideal j=std(imap(gnir,i),hil,w);
+     ideal k=equidimMax(j); 
   }
   else
   {
-     ideal j=groebner(imap(gnir,i));
-  }
-  string quotring=prepareQuotientring(nvars(basering)-indep[1][3]);
-
-  execute quotring;
-
-  ideal j=imap(gnir1,j);
-
-  kill gnir1;
-  j=clearSB(j);
-  ideal h;
-  for(n=1;n<=size(j);n++)
-  {
-     h[n]=leadcoef(j[n]);
+     ideal k=equidimMaxEHV(j); 
   }
 
-  setring gnir;
-  ideal h=imap(quring,h);
-  kill quring;
-  list l=minSat(j,h);
-  attrib(l[1],"isSB",1);
-  
-  if(ra==1)
+  option(returnSB);  
+  j=quotient(j,k);
+  option(noreturnSB);
+
+  list equi=equidim(j);  
+  if(deg(equi[size(equi)][1])<=0)
   {
-     option(returnSB);  
-     j=quotient(j,l[1]);
-     option(noreturnSB);
-     attrib(j,"isSB",1);
-     attrib(j,"isRadical",1);
+      equi[size(equi)]=k;
   }
   else
   {
-     j=std(sat(j,l[1])[1]);  
+    equi[size(equi)+1]=k;
   }
-  if(size(reduce(te,l[1]))!=0)
-  {
-    te=intersect(te,l[1]);
-    equi=equidim(j,te);  
-    if((dim(l[1])==dim(j))&&(size(equi)>0))
-    {
-      equi[size(equi)]=intersect(l[1],equi[size(equi)]);
-    }
-    else
-    {
-      equi[size(equi)+1]=l[1];
-    }
-  }
-  else
-  {
-    equi=equidim(j,te);
-  }
-  b=size(equi);
-
   setring P;
-  if(b!=0)
-  {
-    eq=imap(gnir,equi);
-  }
+  eq=imap(gnir,equi);
   kill gnir;
   return(eq);
 }
@@ -1999,7 +1944,7 @@ proc equidimMax(ideal i)
   if(dim(equ)==dim(j))
   {
     equi=equidimMax(j);
-    equ=intersect(equ,equi);
+    equ=interred(intersect(equ,equi));
   }
   setring P;
   eq=imap(gnir,equ);
