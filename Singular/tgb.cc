@@ -2154,14 +2154,16 @@ static void go_on_F4 (calc_dat* c){
   c->average_length=c->average_length/c->n;
   i=0;
   poly* p;
-
+  int nfs=0;
   int curr_deg=-1;
   
   //choose pairs and preprocess symbolically
   while(chosen_index<PAR_N_F4)
   {
+    
     sorted_pair_node* s=top_pair(c);//here is actually chain criterium done
     if (!s) break;
+    nfs++;
     if(curr_deg>=0)
     {
       if (s->deg >curr_deg) break;
@@ -2242,7 +2244,7 @@ static void go_on_F4 (calc_dat* c){
   
 
   }
-
+  Print("M[%i, ",nfs);
   //next Step, simplify all pairs
   for(i=0;i<chosen_index;i++)
   {
@@ -2395,11 +2397,12 @@ static void go_on_F4 (calc_dat* c){
   }
   omfree(m);
   omfree(q);
+  Print("%i, ",chosen_index);
   //next Step build matrix
   assume(p_index==chosen_index);
   
   tgb_matrix* mat=build_matrix(p,p_index,done, done_index,c);
-
+  
   //next Step Gauss
   simple_gauss(mat);
   //next Step retranslate
@@ -2410,71 +2413,109 @@ static void go_on_F4 (calc_dat* c){
   m=(poly*) omalloc(m_size*sizeof(poly));
   m_index=retranslate(m,mat,done,c);
   mat=NULL;
+  omfree(done);
+  done=NULL;
   //next Step addElements to basis 
-  
-//  pre_comp(p,i,c);
-  if(i==0){
-    omfree(p);
-    return;
-  }
-  red_object* buf=(red_object*) omalloc(i*sizeof(red_object));
-  c->normal_forms+=i;
-  int j;
-  for(j=0;j<i;j++){
-    buf[j].p=p[j];
-    buf[j].sev=pGetShortExpVector(p[j]);
-    buf[j].sum=NULL;
-    buf[j].bucket = kBucketCreate(currRing);
-    int len=pLength(p[j]);
-    kBucketInit(buf[j].bucket,buf[j].p,len);
-  }
-  omfree(p);
-  qsort(buf,i,sizeof(red_object),red_object_better_gen);
-//    Print("\ncurr_deg:%i\n",curr_deg);
-  Print("M[%i, ",i);
+  int F_plus_size=m_index;
+  poly* F_plus=(poly*)omalloc(F_plus_size*sizeof(poly));
+  int F_plus_index=0;
+  int F_minus_size=m_index;
+  poly* F_minus=(poly*) omalloc(F_minus_size*sizeof(poly));
+  int F_minus_index=0;
 
-  multi_reduction(buf, i, c);
-
-  //resort S
-
-  Print("%i]",i); 
-
-  int* ibuf=(int*) omalloc(i*sizeof(int));
-  sorted_pair_node*** sbuf=(sorted_pair_node***) omalloc(i*sizeof(sorted_pair_node**));
-  for(j=0;j<i;j++)
+  //better algorithm replace p by its monoms, qsort,delete duplicates and binary search for testing if monom is contained in array
+ 
+  for(i=0;i<m_index;i++)
   {
-    int len;
-    poly p;
-    buf[j].flatten();
-    kBucketClear(buf[j].bucket,&p, &len);
-    kBucketDestroy(&buf[j].bucket);
+    int j;
+    BOOLEAN minus=FALSE;
+    for(j=0;j<p_index;j++)
+      if (pLmEqual(p[j],m[i]))
+      {
+	minus=TRUE;
+	break;
+      }
+    if(minus)
+    {
+      F_minus[F_minus_index++]=m[i];
+      m[i]=NULL;
+    }
+    else
+    {
+      F_plus[F_plus_index++]=m[i];
+      m[i]=NULL;
+    }
+  }
+  Print("%i]", F_plus_index);
+  for(i=0;i<p_index;i++) 
+    pDelete(&p[i]);
+  omfree(p);
+  p=NULL;
+  omfree(m);
+  m=NULL;
+  //the F_minus list must be cleared separately at the end
+  mp_array_list** F_i;
+  poly_array_list** F_m_i;
+  F_i=&(c->F);
+  F_m_i=&(c->F_minus);
+  while((*F_i)!=NULL)
+  {
+    assume((*F_minus)!=NULL);
+    F_i=(&((*F_i)->next));
+    F_m_i=(&((*F_m_i)->next));
+  }
+  assume((*F_minus)==NULL);
+  //should resize the array to save memory
+  //F and F_minus
+  (*F_m_i)=(poly_array_list*) omalloc(sizeof(poly_array_list));
+  (*F_m_i)->size=F_minus_index;
+  (*F_m_i)->p=F_minus;
+  (*F_m_i)->next=NULL;
+  (*F_i)=(mp_array_list*) omalloc(sizeof(poly_array_list));
+  (*F_i)->size=chosen_index;
+  (*F_i)->mp=chosen;
+  (*F_i)->next=NULL;
+  
+  if(F_plus_index>0)
+  {
+    int j;
+    int* ibuf=(int*) omalloc(F_plus_index*sizeof(int));
+    sorted_pair_node*** sbuf=(sorted_pair_node***) omalloc(F_plus_index*sizeof(sorted_pair_node**));
+  
+    for(j=0;j<F_plus_index;j++)
+    {
+      int len;
+      poly p=F_plus[j];
+    
     // delete buf[j];
     //remember to free res here
     //    p=redTailShort(p, c->strat);
-    sbuf[j]=add_to_basis(p,-1,-1,c,ibuf+j);
+      sbuf[j]=add_to_basis(p,-1,-1,c,ibuf+j);
     
-  }
-  int sum=0;
-  for(j=0;j<i;j++){
-    sum+=ibuf[j];
-  }
-  sorted_pair_node** big_sbuf=(sorted_pair_node**) omalloc(sum*sizeof(sorted_pair_node*));
-  int partsum=0;
-  for(j=0;j<i;j++)
-  {
-    memmove(big_sbuf+partsum, sbuf[j],ibuf[j]*sizeof(sorted_pair_node*));
-    omfree(sbuf[j]);
-    partsum+=ibuf[j];
-  }
+    }
+    int sum=0;
+    for(j=0;j<i;j++)
+    {
+      sum+=ibuf[j];
+    }
+    sorted_pair_node** big_sbuf=(sorted_pair_node**) omalloc(sum*sizeof(sorted_pair_node*));
+    int partsum=0;
+    for(j=0;j<i;j++)
+    {
+      memmove(big_sbuf+partsum, sbuf[j],ibuf[j]*sizeof(sorted_pair_node*));
+      omfree(sbuf[j]);
+      partsum+=ibuf[j];
+    }
 
-  qsort(big_sbuf,sum,sizeof(sorted_pair_node*),pair_better_gen2);
-  c->apairs=merge(c->apairs,c->pair_top+1,big_sbuf,sum,c);
-  c->pair_top+=sum;
-  clean_top_of_pair_list(c);
-  omfree(big_sbuf);
-  omfree(sbuf);
-  omfree(ibuf);
-  omfree(buf);
+    qsort(big_sbuf,sum,sizeof(sorted_pair_node*),pair_better_gen2);
+    c->apairs=merge(c->apairs,c->pair_top+1,big_sbuf,sum,c);
+    c->pair_top+=sum;
+    clean_top_of_pair_list(c);
+    omfree(big_sbuf);
+    omfree(sbuf);
+    omfree(ibuf);
+  }
+  omfree(F_plus);
 #ifdef TGB_DEBUG
   int z;
   for(z=1;z<=c->pair_top;z++)
