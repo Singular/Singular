@@ -1,4 +1,4 @@
-version="$Id: control.lib,v 1.2 2004-07-22 18:49:14 plural Exp $";
+version="$Id: control.lib,v 1.3 2004-07-28 11:49:35 plural Exp $";
 category="System and Control Theory";
 info="
 LIBRARY:  control.lib Procedures for System and Control Theory 
@@ -9,7 +9,7 @@ SUPPORT: Forschungsschwerpunkt 'Mathematik und Praxis'
 
 
 PROCEDURES:
-declare(string NameOfRing, string Variables[, list #]);
+declare(string NameOfRing, string Variables[,string  Parameters, string Ordering]);
 Defining the ring, optional parametes are a string of parameters and a sting of ordering.
  
 Print();                      Well-formatted output of lists, modules and matrixes
@@ -183,6 +183,21 @@ proc LeftKernel(matrix M)
   return( transpose( syz( transpose(M) ) ) );
 };
 //------------------------------------------------------------------------
+proc LeftInverse(module M)
+{
+  int NCols=ncols(M);
+  M=transpose(M);
+  matrix I[NCols][NCols];
+  I=I+1;
+  module Id=I;
+  return( module( transpose( lift( M,Id ) ) ) );
+};
+example
+{"EXAMPLE:";echo =2;
+  ring r=0,(x,y,z),dp;
+  
+};
+//------------------------------------------------------------------------
 static proc control_output(int i, int NVars, module R, module Ext_1) 
 //in this procedure the output list with all the contollability properties of the system is generated
 {
@@ -208,10 +223,12 @@ static proc control_output(int i, int NVars, module R, module Ext_1)
   };
   
   if(i>NVars)
-  {  
+  { module RK =RightKernel(R); 
     return( list( -1, 
                   "strongly controllable, image representation:",
-		   RightKernel(R),
+		   RK,
+		  "left inverse to image representation:",
+		   LeftInverse(RK),
 		   DofS, 
 		   d) 
           );
