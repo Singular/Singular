@@ -1966,7 +1966,7 @@ fi
 
           if test "$ac_cv_lib_dl_dlopen" = yes; then
 	  	LD_DYN_FLAGS="-ldl -rdynamic"
-	  	SFLAGS="-fPIC -DPIC"
+	  	SFLAGS="-fpic -DPIC"
 	  	SLDFLAGS=-shared
 	        ac_lib_dl=yes
 	  fi
