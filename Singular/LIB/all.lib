@@ -1,7 +1,7 @@
-// $Id: all.lib,v 1.18 1999-07-06 15:32:45 Singular Exp $
+// $Id: all.lib,v 1.19 1999-07-07 14:39:05 obachman Exp $
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: all.lib,v 1.18 1999-07-06 15:32:45 Singular Exp $";
+version="$Id: all.lib,v 1.19 1999-07-07 14:39:05 obachman Exp $";
 info="
 LIBRARY:  all.lib   Load all libraries
 
@@ -20,6 +20,7 @@ LIBRARY:  all.lib   Load all libraries
   normal.lib    PROCEDURES FOR COMPUTING THE NORMALIZATION
   poly.lib      PROCEDURES FOR MANIPULATING POLYS, IDEALS, MODULES
   presolve.lib  PROCEDURES FOR PRE-SOLVING POLYNOMIAL EQUATIONS
+  solve.lib     PROCEDURES FOR SOLVING POLYNOMIAL SYSTEMS
   primdec.lib   PROCEDURES FOR PRIMARY DECOMPOSITION
   primitiv.lib  PROCEDURES FOR FINDING A PRIMITIVE ELEMENT
   random.lib    PROCEDURES OF RANDOM MATRIX AND POLY OPERATIONS
@@ -30,6 +31,7 @@ LIBRARY:  all.lib   Load all libraries
   paramet.lib   PROCEDURES FOR PARAMETRIZATION OF PRIMARY DECOMPOSITION
   mondromy.lib  PROCEDURES TO COMPUTE THE MONODROMY OF A SINGULARITY
   jordan.lib    PROCEDURES TO COMPUTE THE JORDAN NORMAL FORM
+  spcurve.lib    PROCEDURES FOR CM CODIMENSION 2 SINGULARITIES
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -50,6 +52,7 @@ LIB "matrix.lib";
 LIB "normal.lib";
 LIB "poly.lib";
 LIB "presolve.lib";
+LIB "solve.lib";
 LIB "primdec.lib";
 LIB "primitiv.lib";
 LIB "random.lib";
@@ -59,5 +62,6 @@ LIB "latex.lib";
 LIB "paramet.lib";
 LIB "mondromy.lib"
 LIB "jordan.lib";
+LIB "spcurve.lib";
 
 // LIB "tools.lib";

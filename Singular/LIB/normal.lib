@@ -5,7 +5,7 @@
 // written by Gert-Martin Greuel and Gerhard Pfister
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: normal.lib,v 1.16 1999-07-06 15:32:54 Singular Exp $";
+version="$Id: normal.lib,v 1.17 1999-07-07 14:39:11 obachman Exp $";
 info="
 LIBRARY: normal.lib     PROCEDURES FOR NORMALIZATION
 
@@ -19,6 +19,8 @@ LIB "sing.lib";
 LIB "primdec.lib";
 LIB "elim.lib";
 LIB "presolve.lib";
+LIB "inout.lib";
+
 ///////////////////////////////////////////////////////////////////////////////
 static
 proc isR_HomJR (list Li)

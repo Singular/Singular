@@ -1,8 +1,8 @@
-// $Id: classify.lib,v 1.33 1999-07-06 11:32:45 obachman Exp $
+// $Id: classify.lib,v 1.34 1999-07-07 14:39:06 obachman Exp $
 // KK, last modified: 04.04.1998
 ///////////////////////////////////////////////////////////////////////////////
 
-version  = "$Id: classify.lib,v 1.33 1999-07-06 11:32:45 obachman Exp $";
+version  = "$Id: classify.lib,v 1.34 1999-07-07 14:39:06 obachman Exp $";
 info="
 LIBRARY:  classify.lib  PROCEDURES FOR THE ARNOLD-CLASSIFIER OF SINGULARITIES
 
@@ -26,9 +26,9 @@ quickclass(f)        normal form of f determined by invariants (milnorcode)
 singularity(s,[]);   normal form of singularity given by its name s and index
 swap (a,b);          returns b,a
 tschirnhaus(f,v);    Tschirnhaus transformation of f w.r.t. variable v
-A_L(s/f)              shortcut for quickclass(f) or normalform(s)
+A_L(s/f)             shortcut for quickclass(f) or normalform(s)
 normalform(s);       normal form of singularity given by its name s
-debug_log (lev,[])   print trace and debugging information w.r.t level>@DeBug
+debug_log(lev,[])    print trace and debugging information w.r.t level>@DeBug
            (parameters in square brackets [] are optional)
 ";
 

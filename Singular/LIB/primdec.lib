@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.38 1999-07-06 15:32:56 Singular Exp $
+// $Id: primdec.lib,v 1.39 1999-07-07 14:39:12 obachman Exp $
 ////////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                                //
 // algorithms for primary decomposition based on                              //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                             //
 ////////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.38 1999-07-06 15:32:56 Singular Exp $";
+version="$Id: primdec.lib,v 1.39 1999-07-07 14:39:12 obachman Exp $";
 info="
 LIBRARY: primdec.lib PROCEDURE FOR PRIMARY DECOMPOSITION
 
@@ -43,6 +43,8 @@ LIB "general.lib";
 LIB "elim.lib";
 LIB "poly.lib";
 LIB "random.lib";
+LIB "inout.lib";
+
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////

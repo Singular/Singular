@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: solve.lib,v 1.9 1999-07-06 15:32:57 Singular Exp $";
+version="$Id: solve.lib,v 1.10 1999-07-07 14:39:13 obachman Exp $";
 info="
 LIBRARY: solve.lib     PROCEDURES TO SOLVE POLYNOMIAL SYSTEMS
 AUTHOR:  Moritz Wenk,  email: wenk@mathematik.uni-kl.de
@@ -80,7 +80,6 @@ example
   ures_solve(gls);
   // result is a list (x,y)-coordinates as strings
 
-  pause();
   // now with complex coefficient field, precision is 10 digits
   ring rsc= (real,10,I),(x,y),lp;
   ideal i = (2+3*I)*x2 + (0.35+I*45.0e-2)*y2 - 8, x2 + xy + (42.7)*y2;
@@ -139,11 +138,9 @@ example
   poly f = 15x5 + x3 + x2 - 10;
   laguerre_solve(f);
 
-  pause();
   // Now with 10 digits precision:
   laguerre_solve(f,10);
 
-  pause();
   // Now with complex coefficients, precision is 20 digits:
   ring rsc= (real,20,I),x,lp;
   poly f = (15.4+I*5)*x^5 + (25.0e-2+I*2)*x^3 + x2 - 10*I;
@@ -193,7 +190,6 @@ example
   // computing sparse resultant
   det(m);
 
-  pause();
   // compute resultant matrix (Macaulay resultant matrix)
   ring rdq= (0,u0,u1,u2),(x0,x1,x2),lp;
   ideal h=  homog(imap(rsq,i),x0);
@@ -203,7 +199,6 @@ example
   // computing Macaulay resultant (should be the same as above!)
   det(m);
 
-  pause();
   // compute numerical sparse resultant matrix
   setring rsq;
   ideal ir= 15+2*x1+5*x2,x1^2 + x2^2 - 10,x1^2 + x1*x2 + 2*x2^2 - 16;

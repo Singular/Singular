@@ -1,4 +1,4 @@
-// $Id: invar.lib,v 1.9 1999-07-06 15:32:50 Singular Exp $
+// $Id: invar.lib,v 1.10 1999-07-07 14:39:09 obachman Exp $
 ///////////////////////////////////////////////////////
 // invar.lib
 // algorithm for computing the ring of invariants under
@@ -6,25 +6,13 @@
 // written by Gerhard Pfister
 //////////////////////////////////////////////////////
 
-version="$Id: invar.lib,v 1.9 1999-07-06 15:32:50 Singular Exp $";
+version="$Id: invar.lib,v 1.10 1999-07-07 14:39:09 obachman Exp $";
 info="
-LIBRARY: invar.lib PROCEDURES FOR COMPUTING INVARIANTS OF (C,+)-ACTIONS
+LIBRARY: invar.lib  PROCEDURES FOR COMPUTING INVARIANTS OF (C,+)-ACTIONS
 
 PROCEDURES:
- invariantRing(matrix m,poly p,poly q,int choose)
-  // ring of invariants of the action of the additive group
-  // defined by the vectorfield corresponding to the matrix m
-  // (m[i,1] are the coefficients of d/dx(i))
-  // the polys p and q are assumed to be variables x(i) and x(j)
-  // such that m[j,1]=0 and m[i,1]=x(j)
-  // if choose=0 the computation stops if generators of the ring
-  // of invariants are computed (to be used only if you know that
-  // the ring of invariants is finitey generated)
-  // if choose<>0 it computes invariants up to degree choose
-
-  actionIsProper(matrix m)
-  // returns 1 if the action of the additive group defined by the
-  // matrix m as above i proper and 0 if not.
+ invariantRing(m,p,q[,i])  computes invariants of (C,+)-action
+ actionIsProper(matrix m)  check for proper action
 ";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -89,9 +77,10 @@ example
 
 
 proc actionIsProper(matrix m)
-"USAGE:   actionIsProper(m); m matrix
-RETURN:  int= 1 if is proper, 0 else
-NOTE:
+"USAGE:  actionIsProper(m); m matrix
+RETURN:  1 if the action of the additive group defined by the matrix m is 
+         proper. 
+         0 if not proper.
 EXAMPLE: example actionIsProper; shows an example
 "
 {
@@ -153,7 +142,6 @@ RETURN:  poly= (p-H(f1,...,fr))/q^a, if Lt(p)=H(Lt(f1),...,Lt(fr)) for
                some polynomial H in r variables over the base field,
                a maximal such that q^a devides p-H(f1,...,fr),
                dom =(f1,...,fr)
-NOTE:
 EXAMPLE: example reduction; shows an example
 "
 {
@@ -375,7 +363,6 @@ RETURN:  ideal= further invariants of the vectorfield m=Sum m[i,1]*d/dx(i) with 
                the elements mentioned  above are computed and divided by q
                as much as possible
                the ideal karl contains all invariants computed yet
-NOTE:
 EXAMPLE: example furtherInvar; shows an example
 "
 {
@@ -460,10 +447,17 @@ example
 
 
 proc invariantRing(matrix m, poly p, poly q,list #)
-"USAGE:   invariantRing(m,p,q); m matrix, p,q poly
-RETURN:  ideal= the invariants of the vectorfield m=Sum m[i,1]*d/dx(i)
-                p,q variables with m(p)=q invariant
-NOTE:
+"USAGE:   invariantRing(m,p,q[,choose]); m matrix; p,q poly; choose integer
+RETURN:   ideal which holds invariants of the action of the additive group
+          defined by the vectorfield corresponding to the matrix m
+          (m[i,1] are the coefficients of d/dx(i)).
+          The polys p and q are assumed to be variables x(i) and x(j)
+          such that m[j,1]=0 and m[i,1]=x(j)
+          If choose=0 the computation stops if generators of the ring
+          of invariants are computed (to be used only if you know that
+          the ring of invariants is finitey generated).
+          If choose<>0 it computes invariants up to degree choosen.
+          
 EXAMPLE: example furtherInvar; shows an example
 "
 {

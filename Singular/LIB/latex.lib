@@ -1,10 +1,10 @@
-// $Id: latex.lib,v 1.8 1999-07-06 15:32:52 Singular Exp $
+// $Id: latex.lib,v 1.9 1999-07-07 14:39:10 obachman Exp $
 //                        1998/04/17
 // author : Christian Gorzel email: gorzelc@math.uni-muenster.de
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="1.14";
+version="$Id: latex.lib,v 1.9 1999-07-07 14:39:10 obachman Exp $";
 info="
 LIBRARY: latex.lib    PROCEDURES FOR TYPESET OF SINGULAROBJECTS IN LATEX2E
 
@@ -123,6 +123,7 @@ EXAMPLE: example tex; shows an example
 example
 { "EXAMPLE:"; echo =2;
   ring r;
+  LIB "inout.lib";
   ideal I = maxideal(7);
   opentex("exp001");              // defaulted latex2e document
   texobj("exp001","An ideal ",I);
@@ -1139,6 +1140,7 @@ EXAMPLE: example rmx; shows an example
 }
 example
 { "EXAMPLE:"; echo =2;
+  LIB "inout.lib";
   ring r;
   poly f = x+y+z;
   opentex("exp001");              // defaulted latex2e document
@@ -1192,6 +1194,7 @@ EXAMPLE: example xdvi; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
+  LIB "inout.lib";
   ring r;
   ideal i = maxideal(7);
   opentex("exp001");              // defaulted latex2e document

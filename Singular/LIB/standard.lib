@@ -1,22 +1,18 @@
-// $Id: standard.lib,v 1.37 1999-07-07 14:11:45 Singular Exp $
+// $Id: standard.lib,v 1.38 1999-07-07 14:39:14 obachman Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.37 1999-07-07 14:11:45 Singular Exp $";
+version="$Id: standard.lib,v 1.38 1999-07-07 14:39:14 obachman Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
 PROCEDURES:
- stdfglm(ideal[,ord])   standard basis of the ideal via fglm [and ordering ord]
- stdhilb(ideal[,h])     standard basis of the ideal using the Hilbert function
- groebner(ideal/module) standard basis of ideal or module using a
-                        heuristically choosen method
- quot(any,any[,n])  a general quotient procedure calling several algorithms
-                    allows module/module, ideal/ideal, module/ideal and a
-                    pre-definition of the algorithm by the parameter n
+ stdfglm(ideal[,ord])   standard basis of ideal via fglm [and ordering ord]
+ stdhilb(ideal[,h])     standard basis of ideal using the Hilbert function
+ groebner(ideal/module) standard basis using a heuristically choosen method
+ quot(any,any[,n])      quotient using heuristically choosen method
  sprintf(fmt,...)     returns fomatted string
  fprintf(link,fmt,..) writes formatted string to link
  printf(fmt,...)      displays formatted string
- pause([prompt])      pause in the computation till user input
 ";
 
 //////////////////////////////////////////////////////////////////////////////
@@ -27,6 +23,7 @@ RETURN:  stdfglm(i): standard basis of i in the basering, calculated via fglm
                      from ordering \"dp\" to the ordering of the basering.
          stdfglm(i,s): standard basis of i in the basering, calculated via
                      fglm from ordering s to the ordering of the basering.
+SEE ALSO: stdhilb, std, groebner
 EXAMPLE: example stdfglm; shows an example"
 {
    string os;
@@ -69,6 +66,7 @@ proc stdhilb(ideal i,list #)
          stdhilb(i,v); i homogeneous ideal, v intvec (the Hilbert function)
 RETURN:  stdhilb(i): a standard basis of i (computing v internally)
          stdhilb(i,v): standard basis of i, using the given Hilbert function
+SEE ALSO: stdfglm, std, groebner
 EXAMPLE: example stdhilb; shows an example"
 {
    def R=basering;
@@ -147,6 +145,7 @@ NOTE: If a 2nd argument 'wait' is given, then the computation proceeds
       'wait' seconds, then the computation is interrupted, 0 is returned,
       a warning message is displayed, and the global variable
       'groebner_error' is defined.
+SEE ALSO: stdhilb, stdfglm, std
 EXAMPLE: example groebner; shows an example"
 {
   def P=basering;
@@ -497,8 +496,9 @@ proc res(list #)
 
 proc quot (m1,m2,list #)
 "USAGE:   quot(m1, m2[, n]); m1, m2 two submodules of k^s,
-         n (optional) integer (1<= n <=5)
+          n (optional) integer (1<= n <=5)
 RETURN:  the quotient of m1 and m2
+SEE ALSO: quotient
 EXAMPLE: example quot; shows an example"
 {
   if (((typeof(m1)!="ideal") and (typeof(m1)!="module"))
@@ -908,33 +908,6 @@ example
   fprintf(li, "%;", list(l));
   fprintf(li, "%b", M);
 }
-
-
-proc pause(list #)
-"USAGE:    pause([ prompt ])  prompt string
-RETURN:   none
-PURPOSE: pause in the computation till user input
-EXAMPLE : example pause; shows an example
-"
-{
-  string pr="pause>";
-  if (size(#)!=0)
-  {
-    pr=#[1];
-  }
-  pr=read("",pr);
-}
-example
-{ "EXAMPLE:"; echo=2;
-  // cannot be shown non-interactively, try the follwing commands without //
-  // pause("press <return> to continue");
-  // pause();
-}
-
-
-
-
-
 
 /*
 proc minres(list #)
