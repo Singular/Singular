@@ -1,6 +1,6 @@
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID $Id: allres_s.tst,v 1.1 1999-10-19 16:03:07 obachman Exp $");
+tst_ignore("CVS ID $Id: allres_s.tst,v 1.2 1999-10-19 17:17:04 obachman Exp $");
 
 ring an=32003,(w,x,y,z),(dp,C);
 ideal i=
@@ -45,6 +45,16 @@ ideal i=
 1w4x+1w4z+1w3yz+1w2xyz+1wx2yz+1x2y2z+1xy2z2,
 1w6+1w5z+1w4xz+1w3xyz+1w2xy2z+1wx2y2z+1x2y2z2;
 tst_test_res(i);
+kill an;
+
+ring an=0,(w,x,y,z),(dp,c);
+ideal i=
+wx2+y3,
+xy2+z3,
+yz2+w3,
+zw2+x3,
+xyz+yzw+zwx+wxy;
+tst_test_res(i, 1);
 kill an;
 
 ring an=0,(w,x,y,z),(dp,c);
