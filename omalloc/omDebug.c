@@ -3,12 +3,12 @@
  *  Purpose: implementation of main omTest functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 7/00
- *  Version: $Id: omDebug.c,v 1.12 2000-10-04 13:12:29 obachman Exp $
+ *  Version: $Id: omDebug.c,v 1.13 2000-12-12 15:26:16 obachman Exp $
  *******************************************************************/
 #include <limits.h>
 #include <string.h>
 #include "omConfig.h"
-#include "omAlloc.h"
+#include "om_Alloc.h"
 #include "omDebug.h"
 #include "omReturn.h"
 

@@ -3,7 +3,7 @@
  *  Purpose: translation of return addr to RetInfo
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omRet2Info.c,v 1.10 2000-11-03 15:47:25 obachman Exp $
+ *  Version: $Id: omRet2Info.c,v 1.11 2000-12-12 15:26:18 obachman Exp $
  *******************************************************************/
 #include <stdio.h>
 #include <string.h>
@@ -43,6 +43,7 @@ void omInitRet_2_Info(const char* argv0)
   }
 }
 
+
 int omBackTrace_2_RetInfo(void** bt, omRetInfo info, int max)
 {
   int i=0, j=0, filled = 0;
@@ -74,6 +75,7 @@ int omBackTrace_2_RetInfo(void** bt, omRetInfo info, int max)
       l+=sprintf(&command[l], " %p", info[i].addr);
       i++;
     }
+    fflush(stdin);
     pipe = popen(command, "r");
     if (pipe != NULL)
     {

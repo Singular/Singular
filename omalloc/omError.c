@@ -3,11 +3,11 @@
  *  Purpose: implementation of Error handling routines 
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omError.c,v 1.7 2000-10-04 13:12:30 obachman Exp $
+ *  Version: $Id: omError.c,v 1.8 2000-12-12 15:26:17 obachman Exp $
  *******************************************************************/
 
 #include <stdarg.h>
-#include "omAlloc.h"
+#include "om_Alloc.h"
 
 omError_t om_ErrorStatus = omError_NoError;
 omError_t om_InternalErrorStatus = omError_NoError;

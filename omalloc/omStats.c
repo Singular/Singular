@@ -3,14 +3,14 @@
  *  Purpose: definitions of stats related stuff
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omStats.c,v 1.5 2000-11-06 11:21:17 pohl Exp $
+ *  Version: $Id: omStats.c,v 1.6 2000-12-12 15:26:18 obachman Exp $
  *******************************************************************/
 #include <unistd.h>
 #define OM_NO_MALLOC_MACROS
 #include "omConfig.h"
 #include "omDefaultConfig.h"
 #include "omMalloc.h"
-#include "omAlloc.h"
+#include "om_Alloc.h"
 
 omInfo_t om_Info = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 

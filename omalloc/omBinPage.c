@@ -3,10 +3,10 @@
  *  Purpose: implementation of routines for primitve BinPage managment
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omBinPage.c,v 1.5 2000-10-27 15:28:50 obachman Exp $
+ *  Version: $Id: omBinPage.c,v 1.6 2000-12-12 15:26:16 obachman Exp $
  *******************************************************************/
 #include <limits.h>
-#include "omAlloc.h"
+#include "om_Alloc.h"
 #include "omDefaultConfig.h"
 
 /*******************************************************************

@@ -3,7 +3,7 @@
  *  Purpose: implementation of main omDebug functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDebugTrack.c,v 1.11 2000-10-04 13:12:30 obachman Exp $
+ *  Version: $Id: omDebugTrack.c,v 1.12 2000-12-12 15:26:17 obachman Exp $
  *******************************************************************/
 #include <limits.h>
 #include <string.h>
@@ -12,7 +12,7 @@
 
 #ifdef OM_HAVE_TRACK
 #include "omDefaultConfig.h"
-#include "omAlloc.h"
+#include "om_Alloc.h"
 
 /*******************************************************************
  *  
@@ -725,7 +725,7 @@ void* omGetCustomOfTrackAddr(void* addr)
 #ifndef OM_NDEBUG
 
 #ifndef OM_HAVE_TRACK
-#include "omAlloc.h"
+#include "om_Alloc.h"
 #endif
 
 int omIsInKeptAddrList(void* addr)

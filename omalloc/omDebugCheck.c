@@ -3,12 +3,12 @@
  *  Purpose: implementation of omCheck functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDebugCheck.c,v 1.10 2000-10-27 15:28:51 obachman Exp $
+ *  Version: $Id: omDebugCheck.c,v 1.11 2000-12-12 15:26:16 obachman Exp $
  *******************************************************************/
 #include <limits.h>
 #include <stdarg.h>
 
-#include "omAlloc.h"
+#include "om_Alloc.h"
 #include "omDebug.h"
 
 #ifndef OM_NDEBUG

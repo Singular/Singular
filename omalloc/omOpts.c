@@ -3,10 +3,10 @@
  *  Purpose: definitions of stats related stuff
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omOpts.c,v 1.5 2000-09-25 12:27:43 obachman Exp $
+ *  Version: $Id: omOpts.c,v 1.6 2000-12-12 15:26:17 obachman Exp $
  *******************************************************************/
 
-#include "omAlloc.h"
+#include "om_Alloc.h"
 #include "omDefaultConfig.h"
 
 omOpts_t om_Opts = 

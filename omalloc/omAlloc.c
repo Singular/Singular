@@ -3,12 +3,12 @@
  *  Purpose: implementation of main omalloc functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omAlloc.c,v 1.10 2000-10-27 15:28:49 obachman Exp $
+ *  Version: $Id: omAlloc.c,v 1.11 2000-12-12 15:26:14 obachman Exp $
  *******************************************************************/
 #ifndef OM_ALLOC_C
 #define OM_ALLOC_C
 
-#include "omAlloc.h"
+#include "om_Alloc.h"
 /*******************************************************************
  *  
  *  global variables

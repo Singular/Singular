@@ -3,10 +3,10 @@
  *  Purpose: definitions of routines for working with bins
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omBin.c,v 1.5 2000-10-27 15:28:50 obachman Exp $
+ *  Version: $Id: omBin.c,v 1.6 2000-12-12 15:26:15 obachman Exp $
  *******************************************************************/
 
-#include "omAlloc.h"
+#include "om_Alloc.h"
 /* this should go away */
 
 #ifdef OM_INTERNAL_DEBUG

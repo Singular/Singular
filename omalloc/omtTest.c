@@ -4,7 +4,7 @@
 #define OM_CHECK CHECK_LEVEL
 #endif
 
-#include "omAlloc.h"
+#include "om_Alloc.h"
 
 omMemCell_t cells[MAX_CELLS];
 int errors = 0;

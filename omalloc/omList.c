@@ -3,7 +3,7 @@
  *  Purpose: implementation of routines for operations on linked lists
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omList.c,v 1.6 2000-10-04 13:12:31 obachman Exp $
+ *  Version: $Id: omList.c,v 1.7 2000-12-12 15:26:17 obachman Exp $
  *******************************************************************/
 #include "omConfig.h"
 
@@ -171,7 +171,7 @@ void* _omInsertInSortedList(void* list, int next, int long_field, void* addr)
 
 
 #ifndef OM_NDEBUG
-#include "omAlloc.h"
+#include "om_Alloc.h"
 #include "omDebug.h"
 
 omError_t _omCheckList(void* list, int next, int level, omError_t report, OM_FLR_DECL)

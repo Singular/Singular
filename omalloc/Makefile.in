@@ -3,7 +3,7 @@
 ### Purpose: Makefile for omalloc
 ### Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
 ### Created: 11/99
-### Version: $Id: Makefile.in,v 1.5 2000-09-18 09:12:13 obachman Exp $
+### Version: $Id: Makefile.in,v 1.6 2000-12-12 15:26:14 obachman Exp $
 #################################################################
 
 SHELL		= /bin/sh
@@ -76,7 +76,7 @@ endif
 ASO_SOURCES = 
 
 HEADERS= 							\
-omAlloc.h              omList.h		      omDerivedConfig.h \
+om_Alloc.h              omList.h	      omDerivedConfig.h \
 omAllocDecl.h          omConfig.h             omMemOps.h	\
 omDebug.h              omOpts.h		      omInlineDecl.h    \
 omAllocPrivate.h       omError.h              omPage.h		\
@@ -128,7 +128,7 @@ libomalloc_ndebug.a: $(OBJS_NDEBUG) Makefile omConfig.h
 	$(RANLIB) $@
 
 omalloc.h: $(HEADERS) 
-	$(PERL) makeheader.pl -a omAlloc.h $@
+	$(PERL) makeheader.pl -a om_Alloc.h $@
 
 omalloc.o: omalloc.c
 	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -DOM_NDEBUG -c $< -o $@
@@ -148,7 +148,7 @@ omTables: omAllocPrivate.h omConfig.h omTables.c
 #
 # targets to generate omExternalConfig.[c,h]
 #
-omAlloc.h: omMalloc.h
+om_Alloc.h: omMalloc.h
 
 ifdef OM_MALLOC_SOURCE
 omMalloc.c: $(OM_MALLOC_SOURCE) 

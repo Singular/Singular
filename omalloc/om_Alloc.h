@@ -1,9 +1,9 @@
 /*******************************************************************
- *  File:    omAlloc.h
+ *  File:    om_Alloc.h
  *  Purpose: declaration of public routines for omalloc  
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omAlloc.h,v 1.7 2000-08-24 13:51:23 obachman Exp $
+ *  Version: $Id: om_Alloc.h,v 1.1 2000-12-12 15:26:18 obachman Exp $
  *******************************************************************/
 #ifndef OM_ALLOC_H
 #define OM_ALLOC_H
