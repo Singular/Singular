@@ -214,7 +214,7 @@ mmtables.o mmtables.d: mmtables.inc
 
 version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in \
            configure.in
-	echo "#define SINGULAR_VERSION_ID " `date '+%y%m%d%H'` >version.h
+	echo "#define SINGULAR_VERSION_ID " `date '+%Y%m%d%H'` >version.h
 
 kbPolyProcs.cc kbPolyProcs.dd : kbPolyProcs.pin 
 
