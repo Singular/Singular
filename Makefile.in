@@ -34,6 +34,8 @@ ${SINGULAR}:
 TEXINFO_TEX_FILES = epsf.tex texinfo.tex txi-cs.tex txi-de.tex txi-no.tex
 TEXINFO_TEX_DIR = Texinfo/doc
 all install uninstall:
+	cd Singular && ${MAKE} version.h && cp version.h ../kernel
+	cd ..
 	@ for SUBDIR in ${BUILD_SUBDIRS}; \
 	do \
 	  echo ${MAKE} $@ in $${SUBDIR}; \
