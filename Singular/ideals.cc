@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.70 1999-10-25 08:32:15 obachman Exp $ */
+/* $Id: ideals.cc,v 1.71 1999-10-27 15:04:44 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1101,8 +1101,8 @@ ideal idSect (ideal h1,ideal h2)
   {
     length = 1;
   }
-  temp = idInit(IDELEMS(first),1);
   j = IDELEMS(first);
+  temp = idInit(j /*IDELEMS(first)*/,length+j);
 
   ring orig_ring=currRing;
   ring syz_ring=rAddSyzComp(currRing);
@@ -1397,8 +1397,7 @@ ideal idSyzygies (ideal  h1,ideal  quot, tHomog h,intvec **w,
   assume(currRing != NULL);
   ring orig_ring=currRing;
   ring syz_ring=rAddSyzComp(currRing);
-  
-  
+
   pSetSyzComp(k);
 
   ideal s_h1=idRingCopy(h1,orig_ring);
@@ -1558,7 +1557,7 @@ ideal idLiftStd (ideal  h1,ideal  quot, matrix* ma, tHomog h)
   j = IDELEMS(s_h1);
   if (s_quot!=NULL) idDelete(&s_quot);
   idDelete(&s_h1);
-  
+
   if (syz_ring!=orig_ring)
     rChangeCurrRing(orig_ring,TRUE);
   pSetSyzComp(0);
@@ -1572,7 +1571,7 @@ ideal idLiftStd (ideal  h1,ideal  quot, matrix* ma, tHomog h)
     {
       q = pFetchCopyDelete(syz_ring, s_h2->m[j]);
       s_h2->m[j] = NULL;
-      
+
       while (q != NULL)
       {
         p = q;
@@ -2012,10 +2011,6 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
   {
     s_h3 = kStd(s_h4,currQuotient,hom,&weights1,NULL,kmax-1);
   }
-  if (resultIsIdeal)
-    s_h3->rank = 1;
-  else
-    s_h3->rank = h1->rank;
   idTest(s_h3);
   if (weights1!=NULL) delete weights1;
   idDelete(&s_h4);
@@ -2040,6 +2035,10 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
     else
       pDelete(&h3->m[i]);
   }
+  if (resultIsIdeal)
+    h3->rank = 1;
+  else
+    h3->rank = h1->rank;
   if(syz_ring!=orig_ring)
   {
     rChangeCurrRing(syz_ring,FALSE);
@@ -2954,7 +2953,7 @@ ideal idModulo (ideal h2,ideal h1)
   {
     length = 1;
   }
-  ideal temp = idInit(IDELEMS(h2),1);
+  ideal temp = idInit(IDELEMS(h2),length+IDELEMS(h2));
   for (i=0;i<IDELEMS(h2);i++)
   {
     temp->m[i] = pCopy(h2->m[i]);

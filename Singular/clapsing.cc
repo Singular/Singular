@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.56 1999-10-22 11:14:06 obachman Exp $
+// $Id: clapsing.cc,v 1.57 1999-10-27 15:04:42 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -897,7 +897,8 @@ matrix singclap_irrCharSeries ( ideal I)
   }
   if ((m==0) || (n==0))
   {
-    Warn("char_series returns %d x %d matrix from %d input polys (%d)\n",m,n,IDELEMS(I)+1,LL.length());
+    Warn("char_series returns %d x %d matrix from %d input polys (%d)",
+      m,n,IDELEMS(I)+1,LL.length());
     iiWriteMatrix((matrix)I,"I",2,0);
     m=max(m,1);
     n=max(n,1);

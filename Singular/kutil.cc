@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.45 1999-10-26 17:15:19 Singular Exp $ */
+/* $Id: kutil.cc,v 1.46 1999-10-27 15:04:45 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -265,14 +265,14 @@ BOOLEAN K_Test_L(char *f , int l, LObject *L,
   {
     if (! pDBTest(L->p, L->heap, f, l))
     {
-      Warn("for L->p\n");
+      Warn("for L->p");
       ret = FALSE;
     }
   }
 
   if (L->pLength != 0 && L->pLength != pLength(L->p))
   {
-    Warn("L[%d] length error: has %d, specified to have %d\n",
+    Warn("L[%d] length error: has %d, specified to have %d",
           lpos, pLength(L->p), L->pLength);
     ret = FALSE;
   }
@@ -289,14 +289,14 @@ BOOLEAN K_Test_L(char *f , int l, LObject *L,
       if (L->p1 == T[i].p) break;
     if (i>=tlength)
     {
-      Warn("L[%d].p1 not in T \n",lpos);
+      Warn("L[%d].p1 not in T",lpos);
       ret = FALSE;
     }
     for (i=0; i<tlength; i++)
       if (L->p2 == T[i].p) break;
     if (i>=tlength)
     {
-      Warn("L[%d].p2 not in T \n",lpos);
+      Warn("L[%d].p2 not in T",lpos);
       ret &= FALSE;
     }
   }
@@ -317,7 +317,7 @@ BOOLEAN K_Test (char *f, int l, kStrategy strat, int pref)
 
   if (ret == FALSE)
   {
-    Warn("for strat->P\n");
+    Warn("for strat->P");
   }
 
   // test T
@@ -344,14 +344,14 @@ BOOLEAN K_Test (char *f, int l, kStrategy strat, int pref)
     {
       if (strat->L[i].p == NULL)
       {
-        Warn("L[%d].p is NULL\n", i);
+        Warn("L[%d].p is NULL", i);
         ret = FALSE;
       }
       if (K_Test_L(f, l, &(strat->L[i]),
                    (pNext(strat->L[i].p) != strat->tail), i,
                    strat->T, strat->tl + 1) == FALSE)
       {
-        Warn("for strat->L[%d]\n", i);
+        Warn("for strat->L[%d]", i);
         ret = FALSE;
       }
     }
@@ -372,7 +372,7 @@ BOOLEAN K_Test_S(char* f, int l, kStrategy strat)
     if (strat->S[i] != NULL && strat->sevS[i] != 0 && strat->sevS[i] !=
         pGetShortExpVector(strat->S[i]))
     {
-      Warn("S[%d] wrong sev: has %o, specified to have %o in %s:%d\n",
+      Warn("S[%d] wrong sev: has %o, specified to have %o in %s:%d",
            i , pGetShortExpVector(strat->S[i]), strat->sevS[i],f, l);
       ret = FALSE;
     }
@@ -384,17 +384,17 @@ BOOLEAN K_Test_S(char* f, int l, kStrategy strat)
 BOOLEAN K_Test_T(char* f, int l, TObject * T, int i)
 {
   BOOLEAN ret = pDBTest(T->p, T->heap, f, l);
-  if (ret == FALSE) Warn("for T[%d]\n", i);
+  if (ret == FALSE) Warn("for T[%d]", i);
   if (T->pLength != 0 &&
       T->pLength != pLength(T->p))
   {
-    Warn("T[%d] length error: has %d, specified to have %d in %s:%d\n",
+    Warn("T[%d] length error: has %d, specified to have %d in %s:%d",
           i , pLength(T->p), T->pLength,f, l);
     ret = FALSE;
   }
   if (T->sev != 0 && pGetShortExpVector(T->p) != T->sev)
   {
-    Warn("T[%d] wrong sev: has %o, specified to have %o in %s:%d\n",
+    Warn("T[%d] wrong sev: has %o, specified to have %o in %s:%d",
           i , pGetShortExpVector(T->p), T->sev,f, l);
     ret = FALSE;
   }
@@ -418,7 +418,7 @@ BOOLEAN K_Test_TS(char *f, int l, kStrategy strat)
         if (strat->S[i] == strat->T[j].p) break;
       if (j > strat->tl)
       {
-        Warn("S[%d] not in T\n", i);
+        Warn("S[%d] not in T", i);
         ret = FALSE;
       }
     }

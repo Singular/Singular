@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.37 1999-10-22 11:14:12 obachman Exp $ */
+/* $Id: ipid.cc,v 1.38 1999-10-27 15:04:44 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -387,7 +387,6 @@ void killhdl(idhdl h, idhdl * ih)
   {
     idhdl savecurrRingHdl = currRingHdl;
     ring  savecurrRing = currRing;
-
     // any objects defined for this ring ?
     if (((IDTYP(h)==RING_CMD) && (IDRING(h)->ref<=0))
     &&  (IDRING(h)->idroot!=NULL))
@@ -416,9 +415,13 @@ void killhdl(idhdl h, idhdl * ih)
       //we have to switch back to the base ring
       //currRing = savecurrRing;
       //currRingHdl = savecurrRingHdl;
-      if (savecurrRing!=NULL)
+      if (savecurrRingHdl!=NULL)
       {
         rSetHdl(savecurrRingHdl,TRUE);
+      }
+      else if (savecurrRing!=NULL)
+      {
+        rChangeCurrRing(savecurrRing,TRUE);
       }
     }
     rKill(h);
