@@ -52,6 +52,7 @@ fi
 
 AC_PROG_CC
 AC_PROG_CXX
+AC_SET_MAKE
 
 dnl we prefer using gcc for compiling C++ files
 if test ${GXX} = yes; then
@@ -59,7 +60,7 @@ if test ${GXX} = yes; then
 fi  
 
 dnl and add to -I to CPPFLAGS and and -Lto LDFLAGS, just to be sure
-if test "x$libdir" = '${exec_prefix}/lib'; then
+if test "$libdir" = '${exec_prefix}/lib'; then
   if test "x$exec_prefix" = xNONE; then
     if test "x$prefix" = xNONE; then
       LDFLAGS="-L${ac_default_prefix}/lib ${LDFLAGS}"
@@ -73,7 +74,7 @@ else
   LDFLAGS="-L${libdir} ${LDFLAGS}"
 fi
 
-if test "x$includedir" = '${prefix}/include'; then
+if test "$includedir" = '${prefix}/include'; then
   if test "x$prefix" = xNONE; then
     CPPFLAGS="-I${ac_default_prefix}/include ${CPPFLAGS}"
   else
@@ -129,6 +130,8 @@ AC_ARG_WITH(
 AC_ARG_WITH(
   libfac,
   [  --without-libfac     do not use libfac (disables primary decompositions)])
+
+dnl without info !
 
 dnl
 dnl CHECK VARIOUS LIBRARIES
