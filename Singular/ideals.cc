@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.126 2002-01-19 14:48:16 obachman Exp $ */
+/* $Id: ideals.cc,v 1.127 2002-02-28 17:56:33 mschulze Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1882,6 +1882,68 @@ ideal   idLift (ideal mod, ideal submod,ideal * rest, BOOLEAN goodShape,
     }
   }
   return s_result;
+}
+
+/*2
+*computes division of P by Q with remainder up to weighted degree n
+*P, Q, and w are not changed
+*/
+lists idLiftW(ideal P, ideal Q, int n, short *w)
+{
+  int N=0;
+  int i;
+  for(i=IDELEMS(Q)-1;i>=0;i--)
+    N=max(N,pDegW(Q->m[i],w));
+  N+=n;
+
+  matrix T=mpNew(IDELEMS(Q),IDELEMS(P));
+  ideal R=idInit(IDELEMS(P),P->rank);
+
+  for(i=IDELEMS(P)-1;i>=0;i--)
+  {
+    poly p=ppJetW(P->m[i],N,w);
+
+    int j=IDELEMS(Q)-1;
+    while(p!=NULL)
+    {
+      if(pDivisibleBy(Q->m[j],p))
+      {
+        poly p0=pDivideM(pHead(p),pHead(Q->m[j]));
+        p=pJetW(pSub(p,ppMult_mm(Q->m[j],p0)),N,w);
+        pNormalize(p);
+        if(pDegW(p0,w)>n)
+          pDelete(&p0);
+	else
+          MATELEM(T,j+1,i+1)=pAdd(MATELEM(T,j+1,i+1),p0);
+        j=IDELEMS(Q)-1;
+      }
+      else
+      {
+        if(j==0)
+        {
+	  poly p0=p;
+	  pIter(p);
+          pNext(p0)=NULL;
+	  if(pDegW(p0,w)>n)
+            pDelete(&p0);
+	  else
+            R->m[i]=pAdd(R->m[i],p0);
+          j=IDELEMS(Q)-1;
+        }
+        else
+          j--;
+      }
+    }
+  }
+
+  lists L=(lists)omAllocBin(slists_bin);
+  L->Init(2);
+  L->m[0].rtyp=MATRIX_CMD;
+  L->m[0].data=(void *)T;
+  L->m[1].rtyp=MODUL_CMD;
+  L->m[1].data=(void *)R;
+
+  return L;
 }
 
 /*2

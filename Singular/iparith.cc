@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.277 2002-02-26 12:25:17 mschulze Exp $ */
+/* $Id: iparith.cc,v 1.278 2002-02-28 17:56:34 mschulze Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4826,7 +4826,7 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
 
   if(i1==0||i2==0||v3->Typ()!=INT_CMD||v4->Typ()!=INTVEC_CMD)
   {
-    Warn("<module>,<module>,<int>,<intvec> expected!");
+    WarnS("<module>,<module>,<int>,<intvec> expected!");
     return TRUE;
   }
 
@@ -4839,72 +4839,32 @@ static BOOLEAN jjDIVISION4(leftv res, leftv v)
   int n=(int)v3->Data();
   short *w=iv2array((intvec *)v4->Data());
 
-  int N=0;
-  for(int i=IDELEMS(Q)-1;i>=0;i--)
-    N=max(N,pDegW(Q->m[i],w));
-  N+=n;
-
-  matrix T=mpNew(IDELEMS(Q),IDELEMS(P));
-  ideal R=idInit(IDELEMS(P),P->rank);
-
-  for(int i=IDELEMS(P)-1;i>=0;i--)
+  short *w0=w+1;
+  int i=pVariables;
+  while(i>0&&*w0>0)
   {
-    poly p=ppJetW(P->m[i],N,w);
-
-    int j=IDELEMS(Q)-1;
-    while(p!=NULL)
-    {
-      if(pDivisibleBy(Q->m[j],p))
-      {
-        poly p0=pDivideM(pHead(p),pHead(Q->m[j]));
-        p=pJetW(pSub(p,ppMult_mm(Q->m[j],p0)),N,w);
-        pNormalize(p);
-        if(pDegW(p0,w)>n)
-          pDelete(&p0);
-	else
-          MATELEM(T,j+1,i+1)=pAdd(MATELEM(T,j+1,i+1),p0);
-        j=IDELEMS(Q)-1;
-      }
-      else
-      {
-        if(j==0)
-        {
-	  poly p0=p;
-	  pIter(p);
-          pNext(p0)=NULL;
-	  if(pDegW(p0,w)>n)
-            pDelete(&p0);
-	  else
-            R->m[i]=pAdd(R->m[i],p0);
-          j=IDELEMS(Q)-1;
-        }
-        else
-          j--;
-      }
-    }
+    w0++;
+    i--;
   }
+  if(i>0)
+    WarnS("not all weights are positive!");
+
+  lists L=idLiftW(P,Q,n,w);
 
   omFree(w);
 
-  lists L=(lists)omAllocBin(slists_bin);
-  L->Init(2);
-  L->m[0].rtyp=MATRIX_CMD;
-  L->m[0].data=(void *)T;
   L->m[1].rtyp=v1->Typ();
+  ideal R=(ideal)L->m[1].data;
   if(v1->Typ()==POLY_CMD||v1->Typ()==VECTOR_CMD)
   {
-    L->m[1].data=(void *)pCopy(R->m[0]);
+    L->m[1].data=(void *)R->m[0];
+    R->m[0]=NULL;
     idDelete(&R);
   }
-  else if(v1->Typ()==IDEAL_CMD||v1->Typ()==MODUL_CMD)
-    L->m[1].data=(void *)R;
   else if(v1->Typ()==MATRIX_CMD)
     L->m[1].data=(void *)idModule2Matrix(R);
-  else
-  {
+  else if(v1->Typ()!=IDEAL_CMD&&v1->Typ()!=MODUL_CMD)
     L->m[1].rtyp=MODUL_CMD;
-    L->m[1].data=(void *)R;
-  }
   res->data=L;
   res->rtyp=LIST_CMD;
 
