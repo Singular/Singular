@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.79 1999-11-02 15:19:10 Singular Exp $ */
+/* $Id: ring.cc,v 1.80 1999-11-05 15:54:29 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2469,8 +2469,22 @@ BOOLEAN rComplete(ring r, int force)
   r->pCompHighIndex=(j-1)/(sizeof(long)/sizeof(Exponent_t));
 
   // fill in some empty slots with variables not already covered
-  // v0 is special, is therefore already covered
-  assume(v[0]!=-1);
+  // v0 is special, is therefore normally already covered
+  // but if not:
+  if (v[0]== -1)
+  {
+    if (prev_ordsgn==1)
+    {
+      rO_Align(j, j_bits);
+      rO_LexVars(j, j_bits, 0,0, prev_ordsgn,tmp_ordsgn,v,BITS_PER_LONG);
+    }
+    else
+    {
+      rO_Align(j, j_bits);
+      rO_LexVars_neg(j, j_bits, 0,0, prev_ordsgn,tmp_ordsgn,v,BITS_PER_LONG);
+    }
+  }
+  // the variables
   for(i=1 ; i<r->N+1 ; i++)
   {
     if(v[i]==(-1))
@@ -2915,9 +2929,9 @@ BOOLEAN rComplete(ring r, int force)
   j=j0+1;
 
   // fill in some empty slots with variables not already covered
-  // v0 is special, is therefore already covered
-  assume(v[0]!=-1);
-  for(i=1 ; i<r->N+1 ; i++)
+  // v0 is special, is therefore normally already covered
+  // but if not:
+  for(i=0 ; i<r->N+1 ; i++)
   {
     if(v[i]==(-1))
     {
