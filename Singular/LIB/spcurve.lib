@@ -1,11 +1,10 @@
 // (anne, last modified 31.5.99)
 /////////////////////////////////////////////////////////////////////////////
-version="$Id: spcurve.lib,v 1.14 2001-01-31 15:36:02 lossen Exp $";
+version="$Id: spcurve.lib,v 1.15 2001-02-06 11:38:07 anne Exp $";
 category="Singularities";
 info="
 LIBRARY: spcurve.lib    Deformations and Invariants of CM-codim 2 Singularities
 AUTHOR:  Anne Fruehbis-Krueger, anne@mathematik.uni-kl.de
-last modified: 31.5.99
 
 PROCEDURES:
  isCMcod2(i);            presentation matrix of the ideal i, if i is CM
@@ -27,7 +26,7 @@ LIB "poly.lib";
 
 proc isCMcod2(ideal kurve)
 "USAGE:   isCMcod2(i);   i an ideal
-RETURN:  presentation matrix of i, if i is Cohen-Macaulay of codimension2
+RETURN:  presentation matrix of i, if i is Cohen-Macaulay of codimension 2 @*
          a zero matrix otherwise
 EXAMPLE: example isCMcod2; shows an example"
 {
@@ -263,7 +262,7 @@ example
 
 proc discr(ideal kurve, int n)
 "USAGE:   discr(sem,n);  sem ideal, n integer
-ASSUME:  sem is the versal deformation of an ideal of codimension 2
+ASSUME:  sem is the versal deformation of an ideal of codimension 2. @*
          the first n variables of the ring are treated as variables
          all the others as parameters
 RETURN:  ideal describing the discriminant
@@ -499,7 +498,7 @@ proc relweight(matrix N, intmat W, intvec a)
 ASSUME:  N is a non-zero matrix
          W is an integer matrix of the same size as N
          a is an integer vector giving the weights of the variables
-RETURN:  integer, max(a-weighted order(N_ij) - W_ij | all entries ij)
+RETURN:  integer, max(a-weighted order(N_ij) - W_ij | all entries ij) @*
          string "ERROR" if sizes do not match
 EXAMPLE: example relweight; shows an example"
 {
@@ -554,10 +553,10 @@ example
 /////////////////////////////////////////////////////////////////////////////
 
 proc posweight(matrix M, module t1, int choose, list #)
-"USAGE:   posweight(M,t1,n[,s]); M matrix, t1 module, n int, s string
-         n=0 : all deformations of non-negative weight
-         n=1 : only non-constant deformations of non-negative weight
-         n=2 : all deformations of positive weight
+"USAGE:   posweight(M,t1,n[,s]); M matrix, t1 module, n int, s string @*
+         n=0 : all deformations of non-negative weight @*
+         n=1 : only non-constant deformations of non-negative weight @*
+         n=2 : all deformations of positive weight @*
          As an optional parameter the name of a new ring may be
          specified.
 ASSUME:  M is a presentation matrix of a Cohen-Macaulay codimension 2
@@ -714,14 +713,14 @@ example
 /////////////////////////////////////////////////////////////////////////////
 
 proc KSpencerKernel(matrix M,list #)
-"USAGE:     KSpencerKernel(M[,s][,v]);  M matrix, s string, v intvec
+"USAGE:     KSpencerKernel(M[,s][,v]);  M matrix, s string, v intvec @*
            optional parameters (please specify in this order, if both are
            present):
            *  s = first of the names of the new rings
               e.g. \"R\" leads to ring names R and R1
-           *  v of size n(n+1) leads to the following module ordering
-              gen(v[1]) > gen(v[2]) > ... > gen(v[n(n+1)])
-              where the matrix entry ij corresponds to gen((i-1)*n+j)
+           *  v of size n(n+1) leads to the following module ordering @*
+              gen(v[1]) > gen(v[2]) > ... > gen(v[n(n+1)]) where the matrix 
+              entry ij corresponds to gen((i-1)*n+j)
 ASSUME:    M is a quasihomogeneous n x (n+1) matrix where the n minors define
            an isolated space curve singularity
 CREATE:    2 new rings (default names: rneu and reneu)
@@ -730,18 +729,17 @@ RETURN:    coefficient matrix representing the kernel of the Kodaira-
            Spencer map of the family of non-negative deformations
            having the given singularity as special fibre
 NOTE:      * the initial basering should not contain variables with name
-             e(i) or T(i), since those variable names will be internally
+             e(i) or T(i), since those variable names will internally be
              used by the script
            * setting an intvec with 5 entries and name watchProgress
-             shows the progress of the computations:
-             watchProgress[1]>0  => option(prot) in groebner commands
-             watchProgress[2]>0  => trace output for highcorner
-             watchProgress[3]>0  => output of deformed matrix
-             watchProgress[4]>0  => result of elimination step
+             shows the progress of the computations: @*
+             watchProgress[1]>0  => option(prot) in groebner commands @*
+             watchProgress[2]>0  => trace output for highcorner @*
+             watchProgress[3]>0  => output of deformed matrix @*
+             watchProgress[4]>0  => result of elimination step @*
              watchProgress[4]>1  => trace output of multiplications with xyz
-                                    and subsequent reductions
-             watchProgress[5]>0  => matrix representing the kernel
-                                    using print
+                                    and subsequent reductions @*
+             watchProgress[5]>0  => matrix representing the kernel using print
 EXAMPLE:   example KSpencerKernel; shows an example"
 {
   int p = printlevel-voice+3;  // p=printlevel+1 (default: p=1)
@@ -1079,7 +1077,8 @@ example
 { "EXAMPLE:"; echo=2;
   ring r=0,(x,y,z),ds;
   matrix M[3][2]=z-x^7,0,y^2,z,x^9,y;
-  KSpencerKernel(M,"ar");
+  def KS=KSpencerKernel(M,"ar");
+  print(KS);
   nameof(basering);
   basering;
 }
