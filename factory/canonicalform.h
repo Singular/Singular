@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.h,v 1.16 1997-09-09 08:40:54 schmidt Exp $ */
+/* $Id: canonicalform.h,v 1.17 1997-09-29 16:06:41 schmidt Exp $ */
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
@@ -32,7 +32,9 @@ static int cf_is_initialized_now = initCanonicalForm();
 
 class InternalCF;
 
-class CanonicalForm {
+//{{{ class CanonicalForm
+class CanonicalForm
+{
 private:
     InternalCF *value;
 public:
@@ -142,9 +144,61 @@ public:
 
     friend class CFIterator;
 };
+//}}}
 
 // some useful functions
 
+//{{{ function declarations from canonicalform.cc
+CanonicalForm power ( const CanonicalForm & f, int n );
+
+CanonicalForm power ( const Variable & v, int n );
+
+bool divides ( const CanonicalForm & f, const CanonicalForm & g );
+//}}}
+
+//{{{ function declarations from cf_gcd.cc
+CanonicalForm gcd ( const CanonicalForm&, const CanonicalForm& );
+
+CanonicalForm extgcd ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, CanonicalForm& );
+
+CanonicalForm iextgcd ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, CanonicalForm& );
+
+CanonicalForm lcm ( const CanonicalForm&, const CanonicalForm& );
+
+CanonicalForm pp ( const CanonicalForm& );
+
+CanonicalForm content ( const CanonicalForm& );
+
+CanonicalForm content ( const CanonicalForm&, const Variable& );
+
+CanonicalForm icontent ( const CanonicalForm & f );
+//}}}
+
+//{{{ function declarations from cf_ops.cc
+CanonicalForm swapvar ( const CanonicalForm &, const Variable &, const Variable & );
+
+CanonicalForm replacevar ( const CanonicalForm &, const Variable &, const Variable & );
+
+int getNumVars( const CanonicalForm & f );
+
+CanonicalForm getVars( const CanonicalForm & f );
+
+CanonicalForm apply ( const CanonicalForm & f, void (*mf)( CanonicalForm &, int & ) );
+
+CanonicalForm mapdomain ( const CanonicalForm & f, CanonicalForm (*mf)( const CanonicalForm & ) );
+
+int * degrees ( const CanonicalForm & f, int * degs = 0 );
+
+int totaldegree ( const CanonicalForm & f );
+
+int totaldegree ( const CanonicalForm & f, const Variable & v1, const Variable & v2 );
+
+int size ( const CanonicalForm & f, const Variable & v );
+
+int size ( const CanonicalForm & f );
+//}}}
+
+//{{{ inline functions
 inline CanonicalForm
 lc ( const CanonicalForm & f ) { return f.lc(); }
 
@@ -160,31 +214,11 @@ degree ( const CanonicalForm & f ) { return f.degree(); }
 inline int
 degree ( const CanonicalForm & f, const Variable & v ) { return f.degree( v ); }
 
-int totaldegree ( const CanonicalForm & f );
-
-int totaldegree ( const CanonicalForm & f, const Variable & v1, const Variable & v2 );
-
 inline int
 taildegree ( const CanonicalForm & f ) { return f.taildegree(); }
 
 inline CanonicalForm
 tailcoeff ( const CanonicalForm & f ) { return f.tailcoeff(); }
-
-CanonicalForm power ( const CanonicalForm & f, int n );
-
-CanonicalForm power ( const Variable & v, int n );
-
-inline CanonicalForm
-head ( const CanonicalForm & f )
-{
-    if ( f.level() > 0 )
-	return power( f.mvar(), f.degree() ) * f.LC();
-    else
-	return f;
-}
-
-inline int
-headdegree ( const CanonicalForm & f ) { return totaldegree( head( f ) ); }
 
 inline int
 level ( const CanonicalForm & f ) { return f.level(); }
@@ -201,32 +235,6 @@ den ( const CanonicalForm & f ) { return f.den(); }
 inline CanonicalForm
 mapinto ( const CanonicalForm & f ) { return f.mapinto(); }
 
-CanonicalForm swapvar ( const CanonicalForm &, const Variable &, const Variable & );
-
-CanonicalForm replacevar ( const CanonicalForm &, const Variable &, const Variable & );
-
-CanonicalForm gcd ( const CanonicalForm&, const CanonicalForm& );
-
-CanonicalForm extgcd ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, CanonicalForm& );
-
-CanonicalForm iextgcd ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, CanonicalForm& );
-
-CanonicalForm lcm ( const CanonicalForm&, const CanonicalForm& );
-
-CanonicalForm pp ( const CanonicalForm& );
-
-CanonicalForm content ( const CanonicalForm& );
-
-CanonicalForm content ( const CanonicalForm&, const Variable& );
-
-CanonicalForm icontent ( const CanonicalForm & f );
-
-CanonicalForm apply ( const CanonicalForm & f, void (*mf)( CanonicalForm &, int & ) );
-
-CanonicalForm mapdomain ( const CanonicalForm & f, CanonicalForm (*mf)( const CanonicalForm & ) );
-
-bool divides ( const CanonicalForm & f, const CanonicalForm & g );
-
 //{{{ inline CanonicalForm deriv ( const CanonicalForm & f, const Variable & x )
 //{{{ docu
 //
@@ -239,15 +247,6 @@ deriv ( const CanonicalForm & f, const Variable & x )
     return f.deriv(x);
 }
 //}}}
-
-inline CanonicalForm
-abs ( const CanonicalForm & f )
-{
-    if ( f < 0 )
-	return -f;
-    else
-	return f;
-}
 
 //{{{ inline CanonicalForm sqrt ( const CanonicalForm & a )
 //{{{ docu
@@ -275,29 +274,43 @@ ilog2 ( const CanonicalForm & a )
 }
 //}}}
 
-int getNumVars( const CanonicalForm & f );
-CanonicalForm getVars( const CanonicalForm & f );
+inline CanonicalForm
+head ( const CanonicalForm & f )
+{
+    if ( f.level() > 0 )
+	return power( f.mvar(), f.degree() ) * f.LC();
+    else
+	return f;
+}
 
-int * degrees ( const CanonicalForm & f, int * degs = 0 );
+inline CanonicalForm
+abs ( const CanonicalForm & f )
+{
+    if ( f < 0 )
+	return -f;
+    else
+	return f;
+}
 
-//CanonicalForm norm( const CanonicalForm & );
+inline int
+headdegree ( const CanonicalForm & f ) { return totaldegree( head( f ) ); }
+//}}}
 
-//CanonicalForm igcd( const CanonicalForm & );
-
-//CanonicalForm ff2z( const CanonicalForm & );
-//CanonicalForm z2ff( const CanonicalForm & );
-
+//{{{ other function declarations
 void setCharacteristic( int c ); // -> Fp && Q
 void setCharacteristic( int c, int n ); // -> PrimePower
 void setCharacteristic( int c, int n, char name ); // -> GF(q)
 
 int getCharacteristic();
 int getGFDegree();
-
 CanonicalForm getGFGenerator();
 
-// misc template stuff for inst file
+void On( int );
+void Off( int );
+bool isOn( int );
+//}}}
 
+//{{{ type definitions
 typedef Factor<CanonicalForm> CFFactor;
 typedef List<CFFactor> CFFList;
 typedef ListIterator<CFFactor> CFFListIterator;
@@ -305,10 +318,7 @@ typedef List<CanonicalForm> CFList;
 typedef ListIterator<CanonicalForm> CFListIterator;
 typedef Array<CanonicalForm> CFArray;
 typedef Matrix<CanonicalForm> CFMatrix;
-
-void On( int );
-void Off( int );
-bool isOn( int );
+//}}}
 
 /*ENDPUBLIC*/
 
