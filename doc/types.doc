@@ -1,6 +1,17 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.15 1998-04-29 11:26:52 krueger Exp $
+@comment $Id: types.doc,v 1.16 1998-04-29 11:33:26 Singular Exp $
 @comment this file contains the type definitions
+
+@c The following directives are necessary for proper compilation
+@c with emacs (C-c C-e C-b).
+@c @setfilename types.info
+@c @node Top, Data types
+@c @menu
+@c * Data types::     
+@c @end menu
+@c @node Data types, , Top, Top
+@c @chapter Data types
+
 @cindex expression list
 An expression list is any comma separated list of expressions.
 @*@strong{Example:}
@@ -42,7 +53,7 @@ An expression list is any comma separated list of expressions.
 @section def
 @cindex def
 
-@c --> section def
+@c {{{ section def }}}
 @c ------------------------------
 Objects may also be defined without a type: they get their
 type from the first assignment to them.
@@ -71,7 +82,7 @@ but you need a name for it (e.g. for a use with @code{setring} or @code{map}).
 @subsection def declarations
 @cindex def declarations
 
-@c --> subsection def declarations
+@c {{{ subsection def declarations }}}
 @table @code
 @item @strong{Syntax:}
 @code{def} name @code{=} expression @code{;}
@@ -82,7 +93,8 @@ none
 @item @strong{Note:}
 This is useful if the right-hand side may be of
 variable type as a consequence of a computation (e.g. ideal or module or
-matrix ..)
+matrix). It is also used in procedures to give the basering a name which
+is local to the procedure.
 @item @strong{Example:}
 @example
 @c example
@@ -98,15 +110,15 @@ matrix ..)
 @iftex
 See @ref{untyped definitions}; @ref{typeof}.
 @end iftex
-@c <--
-@c <--
+@c {{{endfold}}}
+@c {{{endfold}}}
 
 @c ---------------------------------------
 @node ideal, int, def, Data types
 @section ideal
 @cindex ideal
 
-@c --> section ideal
+@c {{{ section ideal }}}
 @menu
 * ideal declarations::
 * ideal expressions::
@@ -128,7 +140,7 @@ can only be defined or accessed with respect to a base ring.
 @subsection ideal declarations
 @cindex ideal declarations
 
-@c --> subsection ideal declarations
+@c {{{ subsection ideal declarations }}}
 @table @code
 @item @strong{Syntax:}
 @code{ideal} name @code{=} list_of_poly_expressions @code{;}
@@ -154,14 +166,14 @@ defines an ideal.
 @c example
 @end example
 @end table
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node ideal expressions, ideal operations, ideal declarations, ideal
 @subsection ideal expressions
 @cindex ideal expressions
 
-@c --> subsection ideal expressions
+@c {{{ subsection ideal expressions }}}
 An ideal expression is:
 @enumerate
 @item
@@ -191,14 +203,14 @@ a typecast to ideal.
 See @ref{ideal}; @ref{ideal operations}; @ref{ideal related functions};
 @ref{implicit type conversions}; @ref{type casting}.
 @end iftex
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node ideal operations, ideal related functions, ideal expressions, ideal
 @subsection ideal operations
 @cindex ideal operations
 
-@c --> subsection ideal oparations
+@c {{{ subsection ideal oparations }}}
 @table @asis
 @item @code{+}
 addition (concatenation of the generator and simplification)
@@ -212,14 +224,14 @@ Brackets may be used to access elements of ideals:
 @c @strong{Example:}
 @c @example
 @c @end example
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node ideal related functions, ,ideal operations, ideal
 @subsection ideal related functions
 @cindex ideal related functions
 
-@c --> subsection ideal related functions
+@c {{{ subsection ideal related functions }}}
 @table @asis
 @item @code{char_series}
 ireducible characteristic series (see @ref{char_series})
@@ -316,16 +328,24 @@ optimal weights (see @ref{weight})
 @c @strong{Example:}
 @c @example
 @c @end example
-@c <--
+@c {{{endfold}}}
 
-@c <--
+@c {{{endfold}}}
 
 @c ---------------------------------------
 @node int, intmat, ideal, Data types
 @section int
 @cindex int
 
-@c --> section int
+@c {{{ section int }}}
+
+Variables of type int represent the compiler integers and are, therefore,
+limited  in their range (i.e. the range is between
+-2147483647 and 2147483647 for 32-bit mchines). They are used
+to count things (dimension, rank, etc., see @ref{dim}),
+in loops (see @ref{for}) and
+to represent boolean values
+(FALSE is represented by 0, every other value means TRUE).
 
 @menu
 * int declarations::
@@ -336,20 +356,12 @@ optimal weights (see @ref{weight})
 * int related functions::
 @end menu
 
-Variables of type int represent the compiler integers and are, therefore,
-limited  in their range (i.e. the range is between
--2147483647 and 2147483647 for 32-bit mchines). They are used
-to count things (dimension, rank, etc., see @ref{dim}),
-in loops (see @ref{for}) and
-to represent boolean values
-(FALSE is represented by 0, every other value means TRUE).
-
 @c ---------------------------------------
 @node int declarations, int expressions, int, int
 @subsection int declarations
 @cindex int declarations
 
-@c --> subsection int declarations
+@c {{{ subsection int declarations }}}
 @table @code
 @item @strong{Syntax:}
 @code{int} name @code{=} int_expression @code{;}
@@ -368,14 +380,14 @@ defines an integer variable.
 @c example
 @end example
 @end table
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node int expressions, int operations, int declarations, int
 @subsection int expressions
 @cindex int expressions
 
-@c --> subsection int expression
+@c {{{ subsection int expression }}}
 Integers consist of a sequence of digits, possibly preceded by a sign.
 A space is considered as a separator, so it is not allowed between digits.
 A sequence of digits outside the allowed range will be converted to the type
@@ -444,17 +456,16 @@ must be converted to the type number over a ring with characteristic 0.
 @iftex
 See @ref{implicit type conversions}; @ref{type casting}; @ref{int related functions}.
 @end iftex
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
-@c @node int operations, int related functions, int expressions, int
 @node int operations, boolean expressions, int expressions, int
 @subsection int operations
 @cindex int operations
 @cindex mod
 @cindex div
 
-@c --> subsection int operations
+@c {{{ subsection int operations }}}
 @table @asis
 @item @code{++}
 will change its operand to its successor, is itself no int expression
@@ -484,7 +495,7 @@ comparison
   i+2, 2-i, 5^2, 5 div 2, 8%3, 1<2, 2<=2;
 @c example
 @end example
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node boolean expressions, boolean operations, int operations, int
@@ -501,7 +512,7 @@ comparison
 @cindex ||
 @cindex not
 
-@c --> subsection boolean expressions
+@c {{{ subsection boolean expressions }}}
 A boolean expression is really an int expression used in a logical context:
 @enumerate
 @item
@@ -573,7 +584,7 @@ this is different from the left-to-right evaluation of logical
 expressions (as found in most programming languages like C) which, for
 example, determine the @code{(1 || a)} without evaluating @code{a}.
 @end enumerate
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node boolean operations, int related functions, boolean expressions, int
@@ -585,7 +596,7 @@ example, determine the @code{(1 || a)} without evaluating @code{a}.
 @subsection int related functions
 @cindex int related functions
 
-@c --> section int related functions
+@c {{{ section int related functions }}}
 @table @asis
 @item @code{char}
 characteristic of the coefficient field of a ring (see @ref{char})
@@ -633,15 +644,24 @@ trace of an integer matrix (see @ref{trace})
 vector space dimension of base ring modulo ideal resp. of freemodule modulo
 module (see @ref{vdim})
 @end table
-@c <--
-@c <--
+@c {{{endfold}}}
+@c {{{endfold}}}
 
 @c ---------------------------------------
 @node intmat, intvec, int, Data types
 @section intmat
 @cindex intmat
 
-@c --> section intmat
+@c {{{ section intmat }}}
+
+Integer matrices are matrices with entries of integers.
+For the range of integers see @ref{int expressions}.
+@example
+@c example
+  intmat m[2][3]=1,2,3,4,5,6;
+  m;
+@c example
+@end example
 
 @menu
 * intmat declarations::
@@ -649,12 +669,13 @@ module (see @ref{vdim})
 * intmat operations::
 * intmat related functions::
 @end menu
+
 @c ------------------------------
 @node intmat declarations, intmat expressions, intmat, intmat
 @subsection intmat declarations
 @cindex intmat declarations
 
-@c --> subsection intmat declarations
+@c {{{ subsection intmat declarations }}}
 @table @code
 @item @strong{Syntax:}
 @code{intmat} name @code{=} intmat_expression @code{;}
@@ -675,28 +696,19 @@ elements, only the first rows*cols elements are used.
   intmat im[3][5]=1,3,5,7,8,9,10,11,12,13;
   im;
   im[2,2];
-  intmat m[2][3] = im[1..2, 3..5];  // define a submatrix
+  intmat m[2][3] = im[1..2, 3..5];  // defines a submatrix
   m;
 @c example
 @end example
 @end table
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node intmat expressions, intmat operations, intmat declarations, intmat
 @subsection intmat expressions
 @cindex intmat expressions
 
-@c --> subsection intmat expressions
-Integer matrices are matrices with entries of integers.
-For the range of integers see @ref{int expressions}.
-@example
-@c example
-  intmat m[2][3]=1,2,3,4,5,6;
-  m;
-@c example
-@end example
-
+@c {{{ subsection intmat expressions }}}
 A intmat expression is:
 @enumerate
 @item
@@ -728,7 +740,7 @@ intmat comparison (yielding int): @code{<>}, @code{==}
   trace(m);
 @c example
 @end example
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node intmat operations, intmat related functions, intmat expressions, intmat
@@ -740,7 +752,7 @@ intmat comparison (yielding int): @code{<>}, @code{==}
 @subsection intmat related functions
 @cindex intmat related functions
 
-@c --> intmat related functions
+@c {{{ intmat related functions }}}
 @table @asis
 @item @code{bareiss}
 Bareiss algorithm (see @ref{bareiss})
@@ -761,21 +773,37 @@ transpose of an intmat (see @ref{transpose})
 @item @code{trace}
 trace of an intmat (see @ref{trace})
 @end table
-@c <--
-@c <--
+@c {{{endfold}}}
+@c {{{endfold}}}
 
 @c ---------------------------------------
 @node intvec, link, intmat, Data types
 @section intvec
 @cindex intvec
 
-@c --> section intvec
+@c {{{ section intvec }}}
+
+Variables of type intvec are lists of integers.
+For the range of integers see @ref{int expressions}.
+They can be used for simulating integers sets
+(and other sets if the intvec entry is used as an index for other objects).
+They are also return values of certain interpreter related functions
+(see @ref{Functions}).
+@example
+@c example
+  intvec iv=1,2,5,7;
+  iv;
+  iv[3];
+  iv[7]=1;
+  iv;
+@c example
+@end example
 
 @menu
-* intvec declarations::
-* intvec expressions::
-* intvec operations::
-* intvec related functions::
+* intvec declarations::         
+* intvec expressions::          
+* intvec operations::           
+* intvec related functions::    
 @end menu
 
 @c ------------------------------
@@ -783,7 +811,7 @@ trace of an intmat (see @ref{trace})
 @subsection intvec declarations
 @cindex intvec declarations
 
-@c --> subsection intvec declarations
+@c {{{ subsection intvec declarations }}}
 @table @code
 @item @strong{Syntax:}
 @code{intvec} name @code{=} intvec_expression @code{;}
@@ -802,30 +830,14 @@ defines an intvec variable.
 @c example
 @end example
 @end table
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node intvec expressions, intvec operations, intvec declarations, intvec
 @subsection intvec expressions
 @cindex intvec expressions
 
-@c --> intvec expressions
-Variables of type intvec are lists of integers.
-For the range of integers see @ref{int expressions}.
-They can be used for simulating integers sets
-(and other sets if the intvec entry is used as an index for other objects).
-They are also return values of certain interpreter related functions
-(see @ref{Functions}).
-@example
-@c example
-  intvec iv=1,2,5,7;
-  iv;
-  iv[3];
-  iv[7]=1;
-  iv;
-@c example
-@end example
-
+@c {{{ intvec expressions }}}
 An intvec expression is:
 @enumerate
 @item
@@ -874,7 +886,7 @@ See @ref{intvec functions}.
   iv;
 @c example
 @end example
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node intvec operations, intvec related functions, intvec expressions, intvec
@@ -886,7 +898,7 @@ See @ref{intvec functions}.
 @subsection intvec related functions
 @cindex intvec related functions
 
-@c --> intvec related functions
+@c {{{ intvec related functions }}}
 @table @asis
 @item @code{hilb}
 returns Hilbert series as intvec (see @ref{hilb})
@@ -907,15 +919,20 @@ transpose of an intvec, returns an intmat (see @ref{transpose})
 @item @code{weight}
 returns weights for the weigted ecart method (see @ref{weight})
 @end table
-@c <--
-@c <--
+@c {{{endfold}}}
+@c {{{endfold}}}
 
 @c ---------------------------------------
 @node link, list, intvec, Data types
 @section link
 @cindex link
 
-@c --> section link
+@c {{{ section link }}}
+
+Links describe the communication channels of @sc{Singular}, i.e.
+something @sc{Singular} can write to and/or read from. Currently,
+@sc{Singular} supports four different link types: @ref{Ascii links},  
+@ref{MPfile links}, @ref{MPtcp links}, and @ref{DBM links}.
 
 @menu
 * link declarations::
@@ -927,17 +944,12 @@ returns weights for the weigted ecart method (see @ref{weight})
 * DBM links::
 @end menu
 
-Links describe the communication channels of @sc{Singular}, i.e.
-something @sc{Singular} can write to and/or read from. Currently,
-@sc{Singular} supports four different link types: @ref{Ascii links},  
-@ref{MPfile links}, @ref{MPtcp links}, and @ref{DBM links}.
-
 @c ------------------------------
 @node link declarations, link expressions, link, link
 @subsection link declarations
 @cindex link declarations
 
-@c --> subsection link declarations
+@c {{{ subsection link declarations }}}
 @table @code
 @item @strong{Syntax:}
 @code{link} name @code{=} string_expression @code{;}
@@ -959,14 +971,14 @@ none.
   close(l);
 @end example
 @end table
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node link expressions, link related functions, link declarations, link
 @subsection link expressions
 @cindex link expressions
 
-@c --> subsection link expression
+@c {{{ subsection link expression }}}
 A link expression is:
 @enumerate
 @item
@@ -1004,14 +1016,14 @@ session (i.e. all variables and their values) can be dumped and
 retrieved using the commands @code{dump} and @code{getdump}. See
 @ref{read}, @ref{write}, @ref{open}, @ref{close}, @ref{status},
 @ref{dump}, @ref{getdump}.
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node link related functions, ASCII links, link expressions, link
 @subsection link related functions
 @cindex link related functions
 
-@c --> subsection link related functions
+@c {{{ subsection link related functions }}}
 @table @asis
 @item @code{close}
 closes a link (see @ref{close})
@@ -1030,14 +1042,14 @@ writes to a link (see @ref{write})
 @item @code{kill}
 closes and kills a link (see @ref{kill})
 @end table
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node ASCII links, MP links, link related functions, link
 @subsection ASCII links
 @cindex ASCII links
 
-@c --> subsection ASCII links
+@c {{{ subsection ASCII links }}}
 Via Ascii links data that can be converted to a string can be written
 into files for storage or communcation with other programs. The data is
 written in plain Ascii format. The output format of polynomials is done
@@ -1081,14 +1093,14 @@ Types without a conversion to @code{string} cannot be written.
   dump("");                    // dump to stdout
 @c example
 @end example
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node MP links, DBM links, ASCII links, link
 @subsection MP links
 @cindex MP links
 
-@c --> subsection MP links
+@c {{{ subsection MP links }}}
 MP (Multi Protocol) links give the possibility to store and communicate
 data in the binary MP format format: read and write access is very fast
 compared to Ascii links. MP links can be established using files (link
@@ -1119,7 +1131,7 @@ objects of type @code{poly}.
 @subsubsection MPfile links
 @cindex MPfile links
 
-@c --> subsubsection MPfile links
+@c {{{ subsubsection MPfile links }}}
 MPfile links provide the possibility to store data in a file using the
 binary MP format. Read and write operations are very fast compared to
 Ascii links. Therefore, for storing large amounts of data, MPfile links
@@ -1165,13 +1177,13 @@ change of i/o direction.
   getdump("MPfile: example.mp");// get dump from file
 @c example
 @end example
-@c <--
+@c {{{endfold}}}
 
 @node MPtcp links,  , MPfile links, MP links
 @subsubsection MPtcp links
 @cindex MPtcp links
 
-@c --> subsubsection MPtcp links
+@c {{{ subsubsection MPtcp links }}}
 MPtcp links give the possibility to exchange data in the binary MP
 format between two processes which may run on the same or different
 computers. MPtcp links can be opened in four different modes: listen,
@@ -1279,15 +1291,15 @@ portnumber
   close(l);          // shut down forked child
 @c example
 @end example
-@c <--
-@c <--
+@c {{{endfold}}}
+@c {{{endfold}}}
 
 @c ------------------------------
 @node DBM links,  , MP links, link
 @subsection DBM links
 @cindex DBM links
 
-@c --> subsection DBM links
+@c {{{ subsection DBM links }}}
 DBM links provide access to data stored in a data base
 (using the unix dbm or gdbm library).
 
@@ -1315,15 +1327,31 @@ DBM links provide access to data stored in a data base
   close(dbmLink);
 @c example
 @end example
-@c <--
-@c <--
+@c {{{endfold}}}
+@c {{{endfold}}}
 
 @c ---------------------------------------
 @node list, map, link, Data types
 @section list
 @cindex list
 
-@c --> section list
+@c {{{ section list }}}
+
+Lists are arrays whose elements can be of any type
+(including ring/qring). If one element belongs to a ring the whole list
+belongs to that ring.
+(This applies also to the special list @code{#}.)
+@*Note that a list stores the objects itself and not the names.
+Hence, if @code{L} is a list, @code{L[1]} for example has no name.
+You can create a name, say @code{R}, for @code{L[1]} by @code{def R=L[1];}.
+If you want to store also the name of an object,
+say @code{r}, you may add it to the list with @code{nameof(r);}.
+Objects of a list may be rings. If @code{L[1]} is a ring, you may
+define @code{L[1]} to be the basering for instance by
+@code{setring L[1];}.
+@*Note: Unlike other assignments a ring as an element of a list
+is not a copy but another reference to the same ring.
+@*Note: @code{list()} is the empty list, see @ref{type casting}.
 
 @menu
 * list declarations::
@@ -1337,7 +1365,7 @@ DBM links provide access to data stored in a data base
 @subsection list declarations
 @cindex list declarations
 
-@c --> subsection list declarations
+@c {{{ subsection list declarations }}}
 @table @code
 @item @strong{Syntax:}
 @code{list} name @code{=} expression_list@code{;}
@@ -1359,30 +1387,14 @@ empty list
 @c example
 @end example
 @end table
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node list expressions, list operations, list declarations, list
 @subsection list expressions
 @cindex list expressions
 
-@c --> subsection list expressions
-Lists are arrays whose elements can be of any type
-(including ring/qring). If one element belongs to a ring the whole list
-belongs to that ring.
-(This applies also to the special list @code{#}.)
-@*Note that a list stores the objects itself and not the names.
-Hence, if @code{L} is a list, @code{L[1]} for example has no name.
-You can create a name, say @code{R}, for @code{L[1]} by @code{def R=L[1];}.
-If you want to store also the name of an object,
-say @code{r}, you may add it to the list with @code{nameof(r);}.
-Objects of a list may be rings. If @code{L[1]} is a ring, you may
-define @code{L[1]} to be the basering for instance by
-@code{setring L[1];}.
-@*Note: Unlike other assignments a ring as an element of a list
-is not a copy but another reference to the same ring.
-@*Note: @code{list()} is the empty list, see @ref{type casting}.
-
+@c {{{ subsection list expressions }}}
 A list expression is:
 @enumerate
 @item
@@ -1407,14 +1419,14 @@ the empty list @code{list()}
 See @ref{list}; @ref{list operations}; @ref{list functions};
 @ref{implicit type conversions}; @ref{type casting}.
 @end iftex
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node list operations, list related functions, list expressions, list
 @subsection list operations
 @cindex list operations
 
-@c --> subsection list operations
+@c {{{ subsection list operations }}}
 @table @asis
 @item @code{+}
 concatenation
@@ -1426,14 +1438,14 @@ Brackets may be used to access elements of lists:
 @c @strong{Example:}
 @c @example
 @c @end example
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node list related functions, ,list operations, list
 @subsection list related functions
 @cindex list related functions
 
-@c --> subsection list related functions
+@c {{{ subsection list related functions }}}
 @table @asis
 @item @code{betti}
 Betti numbers from a resolution (see @ref{betti})
@@ -1460,15 +1472,15 @@ free resolution of an ideal/module given by a standard base (see @ref{sres})
 @c @strong{Example:}
 @c @example
 @c @end example
-@c <--
-@c <--
+@c {{{endfold}}}
+@c {{{endfold}}}
 
 @c ---------------------------------------
 @node map, matrix, list, Data types
 @section map
 @cindex map
 
-@c --> section map
+@c {{{ section map }}}
 Maps are ring maps from a preimage ring into the base ring.
 Note that the target of a map is ALWAYS the actual base ring.
 Maps between rings with different coefficient fields are
@@ -1510,7 +1522,7 @@ See @ref{imap}; @ref{fetch}; @ref{subst}.
 @subsection map declarations
 @cindex map declarations
 
-@c --> subsection map declarations
+@c {{{ subsection map declarations }}}
 @table @code
 @item @strong{Syntax:}
 @code{map} name @code{=} preimage_ring_name @code{,} ideal_expression @code{;}
@@ -1561,14 +1573,14 @@ There are standard mappings for the identity map: @code{fetch} and @code{imap}.
 See @ref{map}; @ref{ideal expression}; @ref{ring};
 @ref{imap}; @ref{fetch}.
 @end iftex
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node map expressions, map related functions, map declarations, map
 @subsection map expressions
 @cindex map expressions
 
-@c --> subsection map expressions
+@c {{{ subsection map expressions }}}
 A map expression is:
 @enumerate
 @item
@@ -1578,7 +1590,7 @@ a function returning map
 @item
 map expressions combined by composition
 @end enumerate
-@c <--
+@c {{{endfold}}}
 
 @c @c ------------------------------
 @c @node map operations, map related functions, map expressions, map
@@ -1587,26 +1599,36 @@ map expressions combined by composition
 @c
 
 @c ------------------------------
-@c @node map related functions, ,map operations, map
 @node map related functions,  , map expressions, map
 @subsection map related functions
 @cindex map related functions
 
-@c --> subsection map related functions
+@c {{{ subsection map related functions }}}
 @strong{Apply a map:}
 the name of a map serves as the function which maps objects from the
 preimage_ring into the base ring.  These objects must be defined
 by names (no evaluation in the preimage ring is possible).
-@c <--
-@c <--
+@c {{{endfold}}}
+@c {{{endfold}}}
 
 @c ---------------------------------------
 @node matrix, module, map, Data types
 @section matrix
 @cindex matrix
 
-@c --> section matrix
+@c {{{ section matrix }}}
 @c ------------------------------
+
+Matrices are matrices with polynomial entries.
+Like polynomials they
+can only be defined or accessed with respect to a base ring.
+If you wish to compute with matrices having integer or rational entries
+define a ring with characteristic 0 and one variable.
+
+If A is a matrix then the assignment @code{module M=A;} or
+@code{module M=module(A);} creates a module generated by the columns of A.
+Note that the trailing zero columns of A may be deleted by module operations with M.
+
 @menu
 * matrix declarations::
 * matrix expressions::
@@ -1618,7 +1640,7 @@ by names (no evaluation in the preimage ring is possible).
 @subsection matrix declarations
 @cindex matrix declarations
 
-@c --> subsection matrix declarations
+@c {{{ subsection matrix declarations }}}
 @table @code
 @item @strong{Syntax:}
 @code{matrix} name@code{[}rows@code{][}cols@code{] =} list_of_poly_expressions @code{;}
@@ -1649,29 +1671,21 @@ If the size is omitted a 1x1 matrix will be created.
   m;
   print(m);
   matrix A;   // the 1 x 1 zero matrix
+  matrix B[2][2] = m[1..2, 2..3]; //defines a submatrix
+  print(B);
   matrix C=m; // defines C as a 3 x 3 matrix equal to m
   print(C);
 @c example
 @end example
 @end table
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node matrix expressions, matrix operations, matrix declarations, matrix
 @subsection matrix expressions
 @cindex matrix expressions
 
-@c --> subsection matrix expressions
-Matrices are matrices with polynomial entries.
-Like polynomials they
-can only be defined or accessed with respect to a base ring.
-If you wish to compute with matrices having integer or rational entries
-define a ring with characteristic 0 and one variable.
-
-If A is a matrix then the assignment @code{module M=A;} or
-@code{module M=module(A);} creates a module generated by the columns of A.
-Note that the trailing zero columns of A may be deleted by module operations with M.
-
+@c {{{ subsection matrix expressions }}}
 A matrix expression is:
 @enumerate
 @item
@@ -1696,14 +1710,14 @@ a typecast to matrix.
 See @ref{matrix}; @ref{matrix operations}; @ref{matrix functions};
 @ref{implicit type conversions}; @ref{type casting}.
 @end iftex
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node matrix operations, matrix related functions, matrix expressions, matrix
 @subsection matrix operations
 @cindex matrix operations
 
-@c --> subsection matrix oparations
+@c {{{ subsection matrix oparations }}}
 @table @asis
 @item @code{+}
 addition
@@ -1719,14 +1733,14 @@ Brackets may be used to access elements of matrices:
 @c @strong{Example:}
 @c @example
 @c @end example
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node matrix related functions, ,matrix operations, matrix
 @subsection matrix related functions
 @cindex matrix related functions
 
-@c --> subsection matrix related functions
+@c {{{ subsection matrix related functions }}}
 @table @asis
 @item @code{bareiss}
 Bareiss algorithm (see @ref{bareiss})
@@ -1766,58 +1780,15 @@ wedge product (see @ref{wedge})
 @c @strong{Example:}
 @c @example
 @c @end example
-@c <--
-@c <--
+@c {{{endfold}}}
+@c {{{endfold}}}
 
 @c ---------------------------------------
 @node module, number, matrix, Data types
 @section module
 @cindex module
 
-@c --> section module
-@c ------------------------------
-@menu
-* module declarations::
-* module expressions::
-* module operations::
-* module related functions::
-@end menu
-
-@node module declarations, module expressions, module, module
-@subsection module declarations
-@cindex module declarations
-
-@c --> subsection module declarations
-@table @code
-@item @strong{Syntax:}
-@code{module} name @code{=} list_of_vector_expressions @code{;}
-@*@code{module} name @code{=} module_expression @code{;}
-@item @strong{Purpose:}
-defines a module.
-@item @strong{Default:}
-[0]
-@item @strong{Example:}
-@example
-@c example
-  ring r=0,(x,y,z),(c,dp);
-  vector s1 = [x2,y3,z];
-  vector s2 = [xy,1,0];
-  vector s3 = [0,x2-y2,z];
-  poly   f  = xyz;
-  module m = s1, s2-s1,f*(s3-s1);
-  // show m in the matrix format (columns generate m)
-  print(m);
-@c example
-@end example
-@end table
-@c <--
-
-@c ------------------------------
-@node module expressions, module operations, module declarations, module
-@subsection module expressions
-@cindex module expressions
-
-@c --> subsection module expressions
+@c {{{ section module }}}
 Modules are submodules of a free module over the base ring with basis
 @code{gen(1)}, @code{gen(2)}, @dots{} .
 They are represented by lists of vectors which generate the submodule.
@@ -1864,6 +1835,50 @@ $v_1, \ldots, v_k$
 @end tex
 which generate M.
 
+@menu
+* module declarations::         
+* module expressions::          
+* module operations::           
+* module related functions::    
+@end menu
+
+@c ------------------------------
+@node module declarations, module expressions, module, module
+@subsection module declarations
+@cindex module declarations
+
+@c {{{ subsection module declarations }}}
+@table @code
+@item @strong{Syntax:}
+@code{module} name @code{=} list_of_vector_expressions @code{;}
+@*@code{module} name @code{=} module_expression @code{;}
+@item @strong{Purpose:}
+defines a module.
+@item @strong{Default:}
+[0]
+@item @strong{Example:}
+@example
+@c example
+  ring r=0,(x,y,z),(c,dp);
+  vector s1 = [x2,y3,z];
+  vector s2 = [xy,1,0];
+  vector s3 = [0,x2-y2,z];
+  poly   f  = xyz;
+  module m = s1, s2-s1,f*(s3-s1);
+  m;
+  // show m in matrix format (columns generate m)
+  print(m);
+@c example
+@end example
+@end table
+@c {{{endfold}}}
+
+@c ------------------------------
+@node module expressions, module operations, module declarations, module
+@subsection module expressions
+@cindex module expressions
+
+@c {{{ subsection module expressions }}}
 A module expression is:
 @enumerate
 @item
@@ -1890,14 +1905,14 @@ a typecast to module.
 See @ref{module}; @ref{module operations}; @ref{module functions};
 @ref{implicit type conversions}; @ref{type casting}.
 @end iftex
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node module operations, module related functions, module expressions, module
 @subsection module operations
 @cindex module operations
 
-@c --> subsection module oparations
+@c {{{ subsection module oparations }}}
 @table @asis
 @item @code{+}
 addition (concatenation of the generators and simplification)
@@ -1908,14 +1923,14 @@ multiplication with ideal or poly, but not `module` * `module`
 @c @strong{Example:}
 @c @example
 @c @end example
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node module related functions, ,module operations, module
 @subsection module related functions
 @cindex module related functions
 
-@c --> subsection module related functions
+@c {{{ subsection module related functions }}}
 @table @asis
 @item @code{coeffs}
 matrix of coefficients (see @ref{coeffs})
@@ -1996,16 +2011,33 @@ vector space dimension of free module over the basering modulo module (see @ref{
 @c @strong{Example:}
 @c @example
 @c @end example
-@c <--
-@c <--
+@c {{{endfold}}}
+@c {{{endfold}}}
 
 @c ---------------------------------------
 @node number, poly, module, Data types
 @section number
 @cindex number
 
-@c --> section number
+@c {{{ section number }}}
 @c ------------------------------
+
+Numbers are the coefficients of a monomial (power products of ring variables).
+They can only be defined or accessed with respect to a base ring
+which determines the coefficient field.
+@example
+@c example
+  ring r0=32003,x,dp;
+  number n=2/3; n;
+  ring r1=0,x,dp;
+  number n=2/3; n;
+  ring r2=(0,a),(x,y,z),dp;
+  number n=2/3; n;
+  n=a+a^2;
+  poly f=n*x+2;f;
+@c example
+@end example
+
 @menu
 * number declarations::         
 * number expressions::          
@@ -2016,7 +2048,7 @@ vector space dimension of free module over the basering modulo module (see @ref{
 @subsection number declarations
 @cindex number declarations
 
-@c --> subsection number declarations
+@c {{{ subsection number declarations }}}
 @table @code
 @item @strong{Syntax:}
 @code{number} name @code{=} number_expression @code{;}
@@ -2041,30 +2073,14 @@ defines a number.
 @c example
 @end example
 @end table
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node number expressions, number operations, number declarations, number
 @subsection number expressions
 @cindex number expressions
 
-@c --> subsection number expressions
-Numbers are the coefficients of a monomial (power products of ring variables).
-They can only be defined or accessed with respect to a base ring
-which determines the coefficient field.
-@example
-@c example
-  ring r0=32003,x,dp;
-  number n=2/3; n;
-  ring r1=0,x,dp;
-  number n=2/3; n;
-  ring r2=(0,a),(x,y,z),dp;
-  number n=2/3; n;
-  n=a+a^2;
-  poly f=n*x+2;f;
-@c example
-@end example
-
+@c {{{ subsection number expressions }}}
 A number expression is:
 @enumerate
 @item
@@ -2101,14 +2117,14 @@ number s combined by arithmetic operations @code{+,-,*,/} or @code{^,**}.
 See @ref{number}; @ref{ring}; @ref{number operations};
 @ref{implicit type conversions}; @ref{type casting}.
 @end iftex
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
-@node number operations, number related functions, number expressions, number
+@node number operations, , number expressions, number
 @subsection number operations
 @cindex number operations
 
-@c --> subsection number operations
+@c {{{ subsection number operations }}}
 @table @asis
 @item @code{+}
 addition
@@ -2129,16 +2145,31 @@ coefficient of the leading term (see @ref{leadcoef})
 @c @strong{Example:}
 @c @example
 @c @end example
-@c <--
-@c <--
+@c {{{endfold}}}
+@c {{{endfold}}}
 
 @c ---------------------------------------
 @node poly, proc, number, Data types
 @section poly
 @cindex poly
 
-@c --> section poly
+@c {{{ section poly }}}
 @c ------------------------------
+
+Polynomials are the basic data for all main algorithms in @code{@sc{Singular}}.
+They consist of finitely many terms (coefficient*power product)
+which are combined by the usual
+polynomial operations (see @ref{poly expressions}).
+Polynomials can only be defined or accessed with respect to a base ring
+which determines the coefficient type, the names of the indeterminants and the
+monomial ordering.
+@example
+@c example
+  ring r=32003,(x,y,z),dp;
+  poly f=x3+y5+z2;
+@c example
+@end example
+
 @menu
 * poly declarations::
 * poly expressions::
@@ -2150,7 +2181,7 @@ coefficient of the leading term (see @ref{leadcoef})
 @subsection poly declarations
 @cindex poly declarations
 
-@c --> subsection poly declarations
+@c {{{ subsection poly declarations }}}
 @table @code
 @item @strong{Syntax:}
 @code{poly} name @code{=} poly_expression @code{;}
@@ -2168,28 +2199,14 @@ defines a polynomial.
   poly f=3*x^a+x*y^(b+c)+t*x^a*y^b*z^c;
 @end example
 @end table
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node poly expressions, poly operations, poly declarations, poly
 @subsection poly expressions
 @cindex poly expressions
 
-@c --> subsection poly expressions
-Polynomials are the basic data for all main algorithms in @code{@sc{Singular}}.
-They consist of finitely many terms (coefficient*power product)
-which are combined by the usual
-polynomial operations (see @ref{poly expressions}).
-Polynomials can only be defined or accessed with respect to a base ring
-which determines the coefficient type, the names of the indeterminants and the
-monomial ordering.
-@example
-@c example
-  ring r=32003,(x,y,z),dp;
-  poly f=x3+y5+z2;
-@c example
-@end example
-
+@c {{{ subsection poly expressions }}}
 A poly expression is (optional parts in square brackets):
 @enumerate
 @item
@@ -2232,14 +2249,14 @@ poly expressions combined by arithmetic operations +,-,*,/ or ^.
 See @ref{ring}; @ref{poly}; @ref{poly operations}; @ref{poly related functions};
 @ref{implicit type conversions}; @ref{type casting}.
 @end iftex
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node poly operations, poly related functions, poly expressions, poly
 @subsection poly operations
 @cindex poly operations
 
-@c --> subsection poly operations
+@c {{{ subsection poly operations }}}
 @table @asis
 @item @code{+}
 addition
@@ -2271,14 +2288,14 @@ Brackets may be used to access elements of ideals and matrices:
   (x+y)/x;
 @c example
 @end example
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node poly related functions, ,poly operations, poly
 @subsection poly related functions
 @cindex poly related functions
 
-@c --> subsection poly related functions
+@c {{{ subsection poly related functions }}}
 @table @asis
 @item @code{cleardenom}
 quotient of a poly by its content (see @ref{cleardenom})
@@ -2327,8 +2344,8 @@ the indicated variable of the ring (see @ref{var})
 @c @strong{Example:}
 @c @example
 @c @end example
-@c <--
-@c <--
+@c {{{endfold}}}
+@c {{{endfold}}}
 
 @c ---------------------------------------
 @node proc, ring, poly, Data types
@@ -2349,46 +2366,9 @@ See @ref{Rings and orderings}.
 @section string
 @cindex string
 
-@c --> section string
+@c {{{ section string }}}
 @c ------------------------------
-@menu
-* string declarations::
-* string expressions::
-* string operations::
-* string related functions::
-@end menu
 
-@node string declarations, string expressions, string, string
-@subsection string declarations
-@cindex string declarations
-
-@c --> subsection string declarations
-@table @code
-@item @strong{Syntax:}
-@code{string} name @code{=} string_expression @code{;}
-@item @strong{Purpose:}
-defines a string variable.
-@item @strong{Default:}
-"" (the empty string)
-@item @strong{Example:}
-@example
-@c example
-  string s1="Now I know";
-  string s2="how to encode a \" in a string...";
-  string s=s1+" "+s2; // concatenation of 3 strings
-  s;
-  s1,s2;   // 2 strings, separated by a blank in the output:
-@c example
-@end example
-@end table
-@c <--
-
-@c ------------------------------
-@node string expressions, string operations, string declarations, string
-@subsection string expressions
-@cindex string expressions
-
-@c --> subsection string expressions
 Variables of type @code{string} are used for output (almost every type can be
 "converted"
 to @code{string}) and for building your own commands at runtime
@@ -2420,6 +2400,44 @@ A comma between two expressions makes an expression list out of them
 (such a list is printed with as a separating blank between),
 while a @code{+} concatenates strings.
 
+@menu
+* string declarations::
+* string expressions::
+* string operations::
+* string related functions::
+@end menu
+
+@node string declarations, string expressions, string, string
+@subsection string declarations
+@cindex string declarations
+
+@c {{{ subsection string declarations }}}
+@table @code
+@item @strong{Syntax:}
+@code{string} name @code{=} string_expression @code{;}
+@item @strong{Purpose:}
+defines a string variable.
+@item @strong{Default:}
+"" (the empty string)
+@item @strong{Example:}
+@example
+@c example
+  string s1="Now I know";
+  string s2="how to encode a \" in a string...";
+  string s=s1+" "+s2; // concatenation of 3 strings
+  s;
+  s1,s2;   // 2 strings, separated by a blank in the output:
+@c example
+@end example
+@end table
+@c {{{endfold}}}
+
+@c ------------------------------
+@node string expressions, string operations, string declarations, string
+@subsection string expressions
+@cindex string expressions
+
+@c {{{ subsection string expressions }}}
 A string expression is:
 @enumerate
 @item
@@ -2467,14 +2485,14 @@ string expressions combined by the operation @code{+}.
 @iftex
 See @ref{implicit type conversions}; @ref{type casting}.
 @end iftex
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node string operations, string related functions, string expressions, string
 @subsection string operations
 @cindex string operations
 
-@c --> subsection string operations
+@c {{{ subsection string operations }}}
 @table @asis
 @item @code{+}
 concatenation
@@ -2501,14 +2519,14 @@ from the string.
   s="123456"; s=s[3..5]; s;
 @c example
 @end example
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node string related functions, ,string operations, string
 @subsection string related functions
 @cindex string related functions
 
-@c --> subsection string related functions
+@c {{{ subsection string related functions }}}
 @table @asis
 @item @code{nameof}
 name of an object (see @ref{nameof})
@@ -2535,16 +2553,29 @@ name of the n-th ring variable (see @ref{varstr})
 @c @strong{Example:}
 @c @example
 @c @end example
-@c <--
-@c <--
+@c {{{endfold}}}
+@c {{{endfold}}}
 
 @c ---------------------------------------
 @node vector,  , string, Data types
 @section vector
 @cindex vector
 
-@c --> section vector
+@c {{{ section vector }}}
 @c ------------------------------
+
+Vectors are elements of a free module over the basering with basis
+@code{gen(1)}, @code{gen(2)}, @dots{} .
+Each vector belongs to a free module of rank equal to the biggest index
+of a generator with nonzero coefficient. Since generators with zero
+coefficients need not be written any vector may be considered
+also as an element of a free module of higher rank.
+Like polynomials they
+can only be defined or accessed with respect to this base ring.
+(E.g. if @code{f} and @code{g} are polynomials then
+@code{f*gen(1)+g*gen(3)+gen(4)} can also be written as @code{[f,0,g,1]}
+or as @code{[f,0,g,1,0]}.)
+
 @menu
 * vector declarations::
 * vector expressions::
@@ -2556,7 +2587,7 @@ name of the n-th ring variable (see @ref{varstr})
 @subsection vector declarations
 @cindex vector declarations
 
-@c --> subsection vector declarations
+@c {{{ subsection vector declarations }}}
 @table @code
 @item @strong{Syntax:}
 @code{vector} name @code{=} vector_expression @code{;}
@@ -2577,26 +2608,14 @@ defines a vector of polynomials (an element of a free module).
 @c example
 @end example
 @end table
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node vector expressions, vector operations, vector declarations, vector
 @subsection vector expressions
 @cindex vector expressions
 
-@c --> subsection vector expressions
-Vectors are elements of a free module over the basering with basis
-@code{gen(1)}, @code{gen(2)}, @dots{} .
-Each vector belongs to a free module of rank equal to the biggest index
-of a generator with nonzero coefficient. Since generators with zero
-coefficients need not be written any vector may be considered
-also as an element of a free module of higher rank.
-Like polynomials they
-can only be defined or accessed with respect to this base ring.
-(E.g. if @code{f} and @code{g} are polynomials then
-@code{f*gen(1)+g*gen(3)+gen(4)} can also be written as @code{[f,0,g,1]}
-or as @code{[f,0,g,1,0]}.)
-
+@c {{{ subsection vector expressions }}}
 A vector expression is:
 @enumerate
 @item
@@ -2635,14 +2654,14 @@ combined by arithmetic operation @code{*}.
 See @ref{ring}; @ref{vector}; @ref{vector operations}; @ref{vector related functions};
 @ref{implicit type conversions}; @ref{type casting}.
 @end iftex
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node vector operations, vector related functions, vector expressions, vector
 @subsection vector operations
 @cindex vector operations
 
-@c --> subsection vector operations
+@c {{{ subsection vector operations }}}
 @table @asis
 @item @code{+}
 addition
@@ -2664,14 +2683,14 @@ choice of a component
   [1,2,x,4][3];
 @c example
 @end example
-@c <--
+@c {{{endfold}}}
 
 @c ------------------------------
 @node vector related functions, ,vector operations, vector
 @subsection vector related functions
 @cindex vector related functions
 
-@c --> subsection vector related functions
+@c {{{ subsection vector related functions }}}
 @table @asis
 @item @code{cleardenom}
 quotient of a vector by its content (see @ref{cleardenom})
@@ -2710,11 +2729,11 @@ substitute a ring variable (see @ref{subst})
 @c @strong{Example:}
 @c @example
 @c @end example
-@c <--
-@c <--
+@c {{{endfold}}}
+@c {{{endfold}}}
 
 @c Local Variables: ***
 @c folded-file: t ***
-@c page-delimiter: "^@c -->" ***
+@c page-delimiter: "^@c {{{" ***
 @c fold-internal-margins: nil ***
 @c End: ***
