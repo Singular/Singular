@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.9 1999-06-22 11:24:02 pohl Exp $ */
+/* $Id: sparsmat.cc,v 1.10 1999-06-30 14:42:39 pohl Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -1270,9 +1270,9 @@ void sparse_mat::smToredElim()
   {
     j++;
     if (j > act) break;
-    if (m_act[i]->pos > tored)
+    if (m_act[j]->pos > tored)
     {
-      m_res[inred] = m_act[i];
+      m_res[inred] = m_act[j];
       inred--;
     }
     else
@@ -1302,7 +1302,7 @@ void sparse_mat::smCopToRes()
       i++;
       perm[crd+i] = a->pos;
       a = a->n;
-    } while (a != NULL);
+    } while ((a != NULL) && (a->pos <= tored));
     for (j=act-1;j;j--) // load all positions of perm
     {
       a = m_act[j];
@@ -1318,17 +1318,17 @@ void sparse_mat::smCopToRes()
             i++;
           }
           a = a->n;
-          if (a == NULL) break;
+          if ((a == NULL) || (a->pos > tored)) break;
         }
         k++;
-        if (k > i)
+        if ((k > i) && (a->pos <= tored))
         {
           do
           {
             i++;
             perm[crd+i] = a->pos;
             a = a->n;
-          } while (a != NULL);
+          } while ((a != NULL) && (a->pos <= tored));
           break;
         }
       }
@@ -1381,7 +1381,7 @@ void sparse_mat::smCopToRes()
     m_res[crd] = m_act[act];
     act--;
   }
-  for (i=1;i<=nrows;i++) // take the rest of m_row
+  for (i=1;i<=tored;i++) // take the rest of m_row
   {
     if(m_row[i] != NULL)
     {
@@ -1401,6 +1401,31 @@ void sparse_mat::smCopToRes()
             r = r->n;
             h->n = NULL;
             h->pos = tored;
+            break;
+          }
+          ap = a;
+        }
+      } while (r!=NULL);
+    }
+  }
+  for (i=tored+1;i<=nrows;i++) // take the rest of m_row
+  {
+    if(m_row[i] != NULL)
+    {
+      r = m_row[i];
+      m_row[i] = NULL;
+      do
+      {
+        ap = m_res[r->pos];
+        loop
+        {
+          a = ap->n;
+          if (a == NULL)
+          {
+            h = ap->n = r;
+            r = r->n;
+            h->n = NULL;
+            h->pos = i;
             break;
           }
           ap = a;
