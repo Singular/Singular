@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.50 1998-07-03 12:46:29 pohl Exp $ */
+/* $Id: tesths.cc,v 1.51 1998-08-03 16:39:34 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -338,6 +338,7 @@ int main(          /* main entry to Singular */
 #ifdef HAVE_TCL
           tclmode = TRUE;
           mainSetSingOptionValue(LON_TCLMODE, (char*) 1);
+	  verbose|=Sy_bit(V_SHOW_MEM);
           break;
 #else
           printf("%s: Option `-x' not supported in this configuration\n", argv[0]);
