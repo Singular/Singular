@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.30 1998-06-19 14:11:59 gorzel Exp $
+@comment $Id: examples.doc,v 1.31 1998-07-08 14:59:58 Singular Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -2161,8 +2161,8 @@ on the Hilbert polynomial of the Milnor algebra is made.
 @cindex Fast lexicographical GB
 
 Compute Groebner basis in lexicographical ordering
-by using FGLM algorithm (@code{stdfglm)} and Hilbert driven
-Groebner (@code{stdhilb}).
+by using FGLM algorithm (@code{stdfglm})
+and Hilbert driven Groebner (@code{stdhilb}).
 
 The command @code{stdfglm} works only for zero dimensional ideals and
 returns a reduced Groebner basis.
@@ -2201,8 +2201,15 @@ parallelize computations.
 
 To compute a standard base for a zero-dimensional ideal in the
 lexicographical ordering, one of the two powerful routines
-@code{stdhilb} (see @ref{stdhilb}) and @code{stdfglm} (see
-@ref{stdfglm}) should be used. However, one can not a priory predict
+@code{stdhilb}
+@ifset singularmanual
+(see @ref{stdhilb})s
+@end ifset
+and @code{stdfglm}
+@ifset singularmanual
+(see @ref{stdfglm})
+@end ifset
+should be used. However, one can not a priory predict
 which one the two commands is faster. This very much depends on the
 (input) example. Therefore, we use MPtcp links to let the two commands
 work on the problem independently and in parallel, so that the one which
