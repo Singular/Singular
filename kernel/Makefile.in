@@ -323,35 +323,18 @@ endif
 ##
 ## install targets
 ##
-install: all installbin installslib
-
-installbin: ${SING_EXEC} ${RUN_SINGULARS}
-	${MKINSTALLDIRS} ${bindir}
-	${INSTALL_PROGRAM} ${SING_EXEC} ${SINGULAR}
-	${INSTALL_PROGRAM} ${RUN_SINGULARS} ${bindir}
-	${INSTALL_PROGRAM} ESingular TSingular ${DL_LIBS} ${bindir}
-	chmod a+x ${SINGULAR}${EXEC_EXT}
-	rm -f ${bindir}/${SING_EXEC}${EXEC_EXT}
-	cd ${bindir}; ${LN_S} ${SINGULAR} Singular${EXEC_EXT};
-
-installslib: LIB
-	test -r ${slibdir} || ${LN_S} `pwd`/LIB ${slibdir}
-
-
-uninstall: uninstallbin
-
-uninstallbin:
-	rm -f ${bindir}/Singular${EXEC_EXT} 
-	rm -f ${SINGULAR}
-	-rmdir ${bindir}
+install: all 
+	${MKINSTALLDIRS} ${libdir}
+	${INSTALL_PROGRAM} libkernel.a ${libdir}
+	${INSTALL_PROGRAM} libkernel-g.a ${libdir}
+	${INSTALL_PROGRAM} ${DL_LIBS} ${bindir}
 
 ##
 ## clean targest
 ##
 mostlyclean: 
-	-rm -f Singular Singular-static Singulara Singularg Singularp Singularb feOpt*.inc p_Procs_*.inc
-	-rm -f *.o *.og core *.op *.ob *.ot Singulart *.od *_d.cc *_d.c p_Procs *.oa *.dl_o* *.so*
-	-rm -f ESingular* TSingular*
+	-rm -f p_Procs_*.inc
+	-rm -f *.o *.og core *.op *.ob *.ot *.od *_d.cc *_d.c p_Procs *.oa *.dl_o* *.so*
 
 clean: mostlyclean
 	-rm -f *.bak *.d *.dd depend 
@@ -359,7 +342,7 @@ clean: mostlyclean
 
 distclean: clean
 	-rm -f stamp.h 
-	-rm -f Singular* *.gprof *.bprof *~ .\#* version.h
+	-rm -f *.gprof *.bprof *~ .\#* version.h
 	-rm -f mod2.h Makefile TAGS* tags
 
 maintainer-clean: distclean srcclean
