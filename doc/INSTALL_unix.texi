@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_unix.texi,v 1.17 2002-03-08 15:25:20 mschulze Exp $
+@comment $Id: INSTALL_unix.texi,v 1.18 2002-03-08 15:32:52 mschulze Exp $
 @c FILE: INSTALL_unix.texi
 @c PURPOSE: Installation instruction for Singular on  Unix
 @c
@@ -322,7 +322,7 @@ with the @code{-v} option, and a description of your machine (issue the
 command @code{uname -a} on your shell) in your report.
 @end itemize
 
-@include info.texti
+@include info.texi
 
 @ifclear singularmanual
 GOOD LUCK and ENJOY!
