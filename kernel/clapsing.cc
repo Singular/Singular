@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.2 2004-02-17 17:40:33 Singular Exp $
+// $Id: clapsing.cc,v 1.3 2004-12-15 17:45:10 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -396,7 +396,9 @@ BOOLEAN singclap_extgcd ( poly f, poly g, poly &res, poly &pa, poly &pb )
   {
     setCharacteristic( nGetChar() );
     CanonicalForm F( convSingPClapP( f ) ), G( convSingPClapP( g ) );
-    if (!F.isUnivariate() || !G.isUnivariate() || F.mvar()!=G.mvar())
+    CanonicalForm FpG=F+G;
+    if (!(FpG.isUnivariate()|| FpG.inCoeffDomain()))
+    //if (!F.isUnivariate() || !G.isUnivariate() || F.mvar()!=G.mvar())
     {
       Off(SW_RATIONAL);
       WerrorS("not univariate");
@@ -421,7 +423,9 @@ BOOLEAN singclap_extgcd ( poly f, poly g, poly &res, poly &pa, poly &pb )
       CanonicalForm mipo=convSingTrClapP(((lnumber)currRing->minpoly)->z);
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingAPClapAP( f,a ) ), G( convSingAPClapAP( g,a ) );
-      if (!F.isUnivariate() || !G.isUnivariate() || F.mvar()!=G.mvar())
+      CanonicalForm FpG=F+G;
+      if (!(FpG.isUnivariate()|| FpG.inCoeffDomain()))
+      //if (!F.isUnivariate() || !G.isUnivariate() || F.mvar()!=G.mvar())
       {
         WerrorS("not univariate");
         return TRUE;
@@ -433,7 +437,9 @@ BOOLEAN singclap_extgcd ( poly f, poly g, poly &res, poly &pa, poly &pb )
     else
     {
       CanonicalForm F( convSingTrPClapP( f ) ), G( convSingTrPClapP( g ) );
-      if (!F.isUnivariate() || !G.isUnivariate() || F.mvar()!=G.mvar())
+      CanonicalForm FpG=F+G;
+      if (!(FpG.isUnivariate()|| FpG.inCoeffDomain()))
+      //if (!F.isUnivariate() || !G.isUnivariate() || F.mvar()!=G.mvar())
       {
         Off(SW_RATIONAL);
         WerrorS("not univariate");
