@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.133 1999-08-04 15:37:16 obachman Exp $
+@comment $Id: reference.doc,v 1.134 1999-08-05 10:58:55 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1871,30 +1871,43 @@ See
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
-provides online help information for @code{topic} using the currently
+displays online help information for @code{topic} using the currently
 set help browser. If no @code{topic} is given, the title page of the
-manual is provided.
+manual is displayed.
 
+@item @strong{Note:}
+@itemize
+@cindex ?
+@item
+@code{?} may be used instead of @code{help}.
+
+@item 
 @code{topic} can be an index entry of the @sc{Singular} manual or the
 name of (loaded) procedure which has a help section. 
-@*@code{topic} may contain wildcard characters (i.e.,
-@code{*}-characters).  
-@*If a (possibly "wildcarded") @code{topic} can not be found (or,
+@item
+@code{topic} may contain wildcard characters (i.e.,
+@code{*} characters).  
+@item
+If a (possibly "wildcarded") @code{topic} can not be found (or,
 uniquely matched) a warning is displayed and no help information is
 provided.
+@item
+If @code{topic} is the name of a (loaded) procedure whose help
+section has changed w.r.t. the help availble in the manual, then ,
+instead of displaying the respective help section of the manual in the
+help browser, the "newer" help section of the procedure is simply
+printed to the terminal.
 
+@item
 The browser in which the help information is displayed can be either set
-with the command-line option @code{--browser} 
-(@pxref{Command line options}), 
-or with the command @code{system("--browser", "<browser>")}
-(@pxref{system}). @code{<browser>} may be one of @code{info},
-@code{netscape}, @code{xinfo}, @code{tkinfo}, or
-@code{builtin}. Depending on your platform and local installation, only
-some browsers might be available. The default browser is @code{info}.
+with the command-line option @code{--browser=<browser>} (@pxref{Command
+line options}), or with the command @code{system("--browser",
+"<browser>")}. Use the command @code{system("browserws");} for a list of 
+all available browsers. @xref{The online help system}, for more details
+about help browsers.
 
-@cindex ?
-@item @strong{Note:}
-@code{?} may be used instead of @code{help}.
+@end itemize
+
 @item @strong{Example:}
 @smallexample
 help;      // display title page of manual
@@ -1905,7 +1918,7 @@ help ring; // display help about 'ring'
 @expansion{} // ** or  '?Index;'  for all available help topics
 ?ring*;     
 @expansion{} //  ** No unique help for 'ring*'
-@expansion{} // ** Try one of
+@expansion{} //  ** Try one of
 @expansion{} ?Rings and orderings; ?Rings and standard bases; ?ring; 
 @expansion{} ?ring declarations; ?ring operations; ?ring related functions; 
 @expansion{} ?ring.lib; ?ring_lib; ?ringtensor; ?ringweights;
@@ -1913,8 +1926,8 @@ help Rings and orderings;
 help standard.lib;  // displays help about library 'standard.lib'
 @end smallexample
 @end table
+
 @c ref
-See also
 @ref{Format of a library};
 @ref{Procedure definition};
 @ref{Command line options};

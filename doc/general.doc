@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.144 1999-08-04 15:37:15 obachman Exp $
+@comment $Id: general.doc,v 1.145 1999-08-05 10:58:54 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -118,22 +118,20 @@ name or, more generally, any index entry of the @sc{Singular}
 manual. Furthermore, topic may contain wildcard characters. 
 @xref{help}, for more information.
 
-
 @cindex browsers
 @cindex help browsers
 Online help information can be displayed in various help browsers. The
-following table lists the supported browsers:
+following table lists a summary of the supported browsers. See below for 
+more details about particular browsers.
 
 @multitable @columnfractions .2 .2 .6
-@item @strong{Browser} @tab @strong{Platform} @tab @strong{Description}
-
-@item info
-@tab Unix, Windows 
-@tab uses the @code{info} program to display texinfo version of manual
+@item @strong{Browser} @tab @strong{Platform} 
+@tab @strong{Description} 
 
 @item netscape 
-@tab Unix, Windows 
+@tab Unix, Windows
 @tab uses @code{netscape} to display html version of manual
+
 @item xinfo
 @tab Unix 
 @tab uses the @code{info} program to display texinfo version of manual in an 
@@ -143,10 +141,58 @@ extra @code{xterm}
 @tab Unix
 @tab uses the @code{tkinfo} program to display texinfo version of manual
 
+@item info
+@tab Unix, Windows 
+@tab uses the @code{info} program to display texinfo version of manual
+
 @item builtin
 @tab all
 @tab simply outputs the help information in plain ASCII format
+
+@item emacs
+@tab Unix, Windows
+@tab when running @sc{Singular} within (X)emacs, display help in
+(X)emacs info buffer.
+
+@item dummy
+@tab all
+@tab displays error message about no available help browser
 @end multitable
+
+The browser which is used to display the help information, can be either
+set at startup time with the command line option  (@pxref{Command line
+options}) 
+@smallexample
+--browers=<browser>
+@end smallexample
+or with the @sc{Singular} command (@pxref{system})
+@smallexample
+system("--browser", "<browser>");
+@end smallexample
+The  @sc{Singular} command
+@smallexample
+system("browsers");
+@end smallexample
+lists all available browsers and the command
+@smallexample
+system("--browser");
+@end smallexample
+returns the currently used browser.
+
+If no browser is explicitely set by the user, then the first (w.r.t. the
+order of the browsers in the table above) available browser is
+choosen. In other words, the default browser is @code{netscape}, unless
+your local set-up does not allow to run it.
+
+The @code{.singularrc} (@pxref{Startup sequence}) file is a good place
+to set your default browser. Recall that if a file
+@code{$HOME/.singularrc} exists on your system, then the content of this 
+file is executed befor the first user input. Hence, putting a line like
+@smallexample
+system("--browser", "xinfo");
+@end smallexample
+in your file @code{$HOME/.singularrc} sets your default browser to
+@code{info}.
 
 
 On Unix-like operating systems, the online help system is based on the
@@ -316,10 +362,11 @@ Print a one-line description of each command line option and exit.
 @item @code{--browser=VAL}
 @cindex --browser
 Use @code{VAL} as browser for the @sc{Singular} online manual. 
-@*@code{VAL} may be one of @code{info}, @code{netscape}, @code{xinfo},
-@code{tkinfo}, or @code{builtin}. Depending on your platform and local
+@*@code{VAL} may be one of @code{netscape}, @code{xinfo},
+@code{tkinfo}, @code{info}, @code{builtin}, or @code{emacs}. Depending
+on your platform and local 
 installation, only some browsers might be available. The default browser 
-is @code{info}. @xref{The online help system}.
+is @code{netscape}. @xref{The online help system}.
 
 @item @code{--no-rc}
 @cindex --no-rc

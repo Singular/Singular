@@ -834,8 +834,6 @@ static BOOLEAN heDummyInit(int warn)
 static void heDummyHelp(heEntry hentry)
 {
   Werror("No functioning help browser available.");
-  Werror("Use 'system(\"--bowser\", <browser>);' to set help browser.");
-  Werror("Make sure file singular.hlp is found");
 }
 
 static BOOLEAN heEmacsInit(int warn)
