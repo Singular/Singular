@@ -3538,6 +3538,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
       if(!(c->is_homog)) break;
     }
   }
+  Print("is homog:%d",c->is_homog);
   void* h;
   poly hp;
   int i,j;
@@ -3718,19 +3719,7 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
     Print("applied %i product crit, %i extended_product crit \n", c->easy_product_crit, c->extended_product_crit);
   }
   int deleted_form_c_s=0;
-
-  for(i=0;i<c->n;i++){
-    if (c->rep[i]!=i){
-      for(j=0;j<=c->strat->sl;j++){
-	if(c->strat->S[j]==c->S->m[i]){
-	  c->strat->S[j]=NULL;
-	  break;
-	}
-      }
-//      PrintS("R_delete");
-      pDelete(&c->S->m[i]);
-    }
-  }
+  
   for(i=0;i<=c->strat->sl;i++){
     if (!c->strat->S[i]) continue;
     BOOLEAN found=FALSE;
@@ -3741,6 +3730,41 @@ ideal t_rep_gb(ring r,ideal arg_I, BOOLEAN F4_mode){
       }
     }
     if(!found) pDelete(&c->strat->S[i]);
+  }
+//   for(i=0;i<c->n;i++){
+//     if (c->rep[i]!=i){
+// //       for(j=0;j<=c->strat->sl;j++){
+// // 	if(c->strat->S[j]==c->S->m[i]){
+// // 	  c->strat->S[j]=NULL;
+// // 	  break;
+// // 	}
+// //       }
+// //      PrintS("R_delete");
+//       pDelete(&c->S->m[i]);
+//     }
+//   }
+
+//  qsort(c->S->m, c->n,sizeof(poly),pLmCmp_func);
+  for(i=0;i<c->n;i++)
+  {
+    assume(c->S->m[i]!=NULL);
+    for(j=0;j<c->n;j++)
+    {
+      if((c->S->m[j]==NULL)||(i==j)) 
+	continue;
+      assume(p_LmShortDivisibleBy(c->S->m[j],c->short_Exps[j],
+			       c->S->m[i],~c->short_Exps[i],
+				   c->r)==p_LmDivisibleBy(c->S->m[j],
+							c->S->m[i],
+							  c->r));
+      if (p_LmShortDivisibleBy(c->S->m[j],c->short_Exps[j],
+			       c->S->m[i],~c->short_Exps[i],
+				   c->r))
+      {
+	pDelete(&c->S->m[i]);
+	break;
+      }
+    }
   }
   omfree(c->rep);
   for(i=0;i<I->idelems();i++)
