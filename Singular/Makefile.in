@@ -226,7 +226,7 @@ mostlyclean: clean
 
 clean:
 	-rm -rf Singular* *.o *.og core *.d *.dd *~ \#* /tmp/mp*
-	cd ${testdir} rm -f out.got *dump* out.diff
+	cd ${testdir}; rm -f out.got *dump* out.diff
 	cd ${docdir}; ${MAKE} clean
 
 distclean: clean
