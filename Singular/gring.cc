@@ -3,10 +3,10 @@
 ****************************************/
 /***************************************************************
  *  File:    gring.cc
- *  Purpose: p_Mult family of procedures
+ *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.39 2003-06-14 16:55:13 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.40 2003-06-26 19:21:47 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -127,6 +127,12 @@ poly nc_p_Mult_mm_Common(poly p, const poly m, int side, const ring r)
       if (expM==0)
       {
         expOut=expP;
+#ifdef PDEBUG
+	if (side) 
+        {
+	  Print("Multiplication in the left module from the right");
+	}
+#endif          
       }
       else
       {
@@ -134,8 +140,7 @@ poly nc_p_Mult_mm_Common(poly p, const poly m, int side, const ring r)
 	const char* s;
 	if (side==1) s="nc_p_Mult_mm";
 	else s="nc_mm_Mult_p";
-	
-	  Print("%s: exponent mismatch %d and %d\n",s,expP,expM);
+	Print("%s: exponent mismatch %d and %d\n",s,expP,expM);
         expOut=0;
       }
     }
@@ -201,9 +206,9 @@ poly nc_mm_Mult_nn(int *F0, int *G0, const ring r)
     return(out);
   }
   jG=1;
-  while ((G[jG]==0)&&(jG<=rN)) jG++;  /* first exp_num of G */
+  while ((G[jG]==0)&&(jG<rN)) jG++;  /* first exp_num of G */
   iG=rN;
-  while ((G[iG]==0)&&(iG>=1)) iG--;  /* last exp_num of G */
+  while ((G[iG]==0)&&(iG>1)) iG--;  /* last exp_num of G */
 
   out=pOne();
 
@@ -233,7 +238,7 @@ poly nc_mm_Mult_nn(int *F0, int *G0, const ring r)
         if (G[j]!=0)
         {
           cpower = 0;
-          for(i=iF; i>jG; i--)
+          for(i=j+1; i<=iF; i++)
           {
             cpower = cpower + F[i];
           }
@@ -254,7 +259,7 @@ poly nc_mm_Mult_nn(int *F0, int *G0, const ring r)
         if (G[j]!=0)
         {
           cpower = 0;
-          for(i=iF; i>jG ; i--)
+          for(i=j+1; i<=iF; i++)
           {
             if (F[i]!=0)
             {
@@ -1017,7 +1022,9 @@ poly nc_spGSpolyRed(poly p1, poly p2,poly spNoether, const ring r)
   && (p_GetComp(p1,r)!=0)
   && (p_GetComp(p2,r)!=0))
   {
+#ifdef PDEBUG
     Print("nc_spGSpolyRed: different components");
+#endif
     return(NULL);
   }
   poly m=pOne();
@@ -1068,7 +1075,9 @@ poly nc_spGSpolyCreate(poly p1, poly p2,poly spNoether, const ring r)
   && (p_GetComp(p1,r)!=0)
   && (p_GetComp(p2,r)!=0))
   {
-    /* Print("nc_spGSpolyCreate : different components!"); */
+#ifdef PDEBUG
+    Print("nc_spGSpolyCreate : different components!");
+#endif
     return(NULL);
   }
   if ((r->nc->type==nc_lie) && pHasNotCF(p1,p2)) /* prod crit */
@@ -1412,7 +1421,7 @@ ideal twostd(ideal I)
   int flag;
   poly p=NULL;
   poly q=NULL;
-  ideal J=kStd(I, currQuotient, testHomog,NULL,NULL,0,0,NULL);
+  ideal J=kStd(I, currQuotient,testHomog,NULL,NULL,0,0,NULL);
   idSkipZeroes(J);
   ideal K=NULL;
   poly varj=NULL;

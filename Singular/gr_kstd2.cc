@@ -1,9 +1,9 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.11 2003-03-05 14:35:31 Singular Exp $ */
+/* $Id: gr_kstd2.cc,v 1.12 2003-06-26 19:21:47 levandov Exp $ */
 /*
-*  ABSTRACT -  Kernel: alg. of Buchberger
+*  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
 
 #include "mod2.h"
@@ -783,7 +783,7 @@ static void gr_initBba(ideal F,kStrategy strat)
   }
 }
 
-ideal gr_bba (ideal F, ideal Q,kStrategy strat)
+ideal gr_bba (ideal F, ideal Q, kStrategy strat)
 {
   intvec *w=NULL;
   intvec *hilb=NULL;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.80 2003-03-11 16:52:40 Singular Exp $ */
+/* $Id: polys.cc,v 1.81 2003-06-26 19:21:48 levandov Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -106,7 +106,7 @@ poly pDivide(poly a, poly b)
 }
 
 /*2
-* divides a by the monomial b, ignores monomials wihich are not divisible
+* divides a by the monomial b, ignores monomials which are not divisible
 * assumes that b is not NULL
 */
 poly pDivideM(poly a, poly b)
@@ -227,7 +227,7 @@ poly pmInit(char *st, BOOLEAN &ok)
 }
 
 /*2
-*make p homgeneous by multiplying the monomials by powers of x_varnum
+*make p homogeneous by multiplying the monomials by powers of x_varnum
 */
 poly pHomogen (poly p, int varnum)
 {
@@ -288,7 +288,7 @@ poly pDehomogen (poly p1,poly p2,number n)
   //}
   pCancelPolyByMonom(p1,p2,&P,&SizeOfSet);
   p = P[0];
-  //P[0] = NULL ;// for safety, may be remoeved later
+  //P[0] = NULL ;// for safety, may be removed later
   for (i=1; i<SizeOfSet; i++)
   {
     if (P[i] != NULL)
@@ -648,7 +648,7 @@ BOOLEAN pHasNotCF(poly p1, poly p2)
 
 
 /*2
-*divides p1 by its leading monomial
+*divides p1 by its leading coefficient
 */
 void pNorm(poly p1)
 {
@@ -689,7 +689,7 @@ void pNorm(poly p1)
 }
 
 /*2
-*normalize all coeffizients
+*normalize all coefficients
 */
 void p_Normalize(poly p, ring r) 
 {
