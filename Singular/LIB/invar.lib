@@ -1,12 +1,12 @@
-// $Id: invar.lib,v 1.2 1997-09-10 07:52:55 Singular Exp $
+// $Id: invar.lib,v 1.3 1997-09-18 09:58:24 Singular Exp $
 ///////////////////////////////////////////////////////
 // invar.lib
 // algorithm for computing the ring of invariants under
-// the action of the additive group
+// the action of the additive group (C,+)
 // written by Gerhard Pfister
 //////////////////////////////////////////////////////
 
-LIBRARY: invar.lib PROCEDURE FOR COMPUTING INVARIANTS UNDER C+-ACTIONS
+LIBRARY: invar.lib PROCEDURE FOR COMPUTING INVARIANTS UNDER (C,+)-ACTIONS
 
   invariantRing(matrix m,poly p,poly q,int choose)
   // ring of invariants of the action of the additive group

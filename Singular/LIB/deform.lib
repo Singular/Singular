@@ -1,4 +1,4 @@
-// $Id: deform.lib,v 1.2 1997-04-28 19:27:15 obachman Exp $
+// $Id: deform.lib,v 1.3 1997-09-18 09:58:22 Singular Exp $
 //(BM/GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 LIBRARY:  deform.lib    PROCEDURES FOR COMPUTING MINIVERSAL DEFORMATION
@@ -41,7 +41,7 @@ CREATE:  A ring with name `na` (e.g. R if na="R", default na="Ont") extending
          The procedure creates also two ideals:
             ideal jetJ - defining the miniversal base space (in `na`)
             ideal jetF - defining miniversal total space (in `na`)
-NOTE:    printlevel >=0: display dimT1,T2 and explain created objects (default)
+NOTE:    printlevel >=0: display dimT1,T2 and miniversal equations (default)
          printlevel >=1: show partial + final result during computation
          printlevel >=2: show also memory and time usage
          printlevel >=3: test and show obstructions
@@ -71,11 +71,11 @@ EXAMPLE: example miniversal; shows an example
    string @ords = ordstr(@Pn);
    id = simplify(id,10);
    int @rowR = size(id);
-   if( @rowR<=1 )
-   {
-      "// hypersurface, use proc deform from sing.lib";
-      return();
-   }
+   //if( @rowR<=1 )
+   //{
+   //   "// hypersurface, use proc deform from sing.lib";
+   //   return();
+   //}
 //------- change ordering if not correct --------------------------------------
    @t1=1;
    for( @d=1;@d<=nvars(@Pn);@d=@d+1 ) { @t1=@t1*(lead(1+var(@d))==var(@d)); }
@@ -220,13 +220,13 @@ EXAMPLE: example miniversal; shows an example
       dbprint(p-1,"","// ___ degree-"+string(@d+1)+"-part of deformed equations:",Fn);
    }
 //---------  end loop and final output ---------------------------------------
-dbprint(p-1,"","// ___ Equations of miniversal base space ___",jetJ,
-            "","// ___ Equations of miniversal total space ___",jetF);
-dbprint(p,"","// Result belongs to ring "+@na+".",
-       "// Equations of total space of miniversal deformation are ",
-       "// given by jetF, equations of miniversal base space by jetJ.",
+dbprint(p,"","// ___ Equations of miniversal base space (jetJ) ___",jetJ,
+          "","// ___ Equations of miniversal total space (jetF) ___",jetF);
+dbprint(p,"","// Equations of base space of miniversal deformation are given",
+       "// by the ideal jetJ, equations of miniversal total space by jetF.",
+       "// Both are defined in the ring "+@na+" created in 'miniversal'.",
        "// Make "+@na+" the basering and list objects defined in "+@na+" by typing:",
-       "   setring "+@na+"; show("+@na+");","   listvar(ideal);");
+       "// setring "+@na+";  show("+@na+");  listvar(ideal);");
   kill @On;
   return();
 }

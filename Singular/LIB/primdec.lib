@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.4 1997-09-10 10:55:39 Singular Exp $
+// $Id: primdec.lib,v 1.5 1997-09-18 09:58:26 Singular Exp $
 ///////////////////////////////////////////////////////
 // primdec.lib
 // algorithms for primary decomposition based on
@@ -6,7 +6,7 @@
 // written by Gerhard Pfister
 //////////////////////////////////////////////////////
 
-LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION (I)
+LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION (G/T/Z)
 
   minAssPrimes (ideal I, list choose)
   // minimal associated primes

@@ -1,4 +1,4 @@
-// $Id: matrix.lib,v 1.3 1997-08-12 14:01:08 Singular Exp $
+// $Id: matrix.lib,v 1.4 1997-09-18 09:58:24 Singular Exp $
 // (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 LIBRARY:  matrix.lib    PROCEDURES FOR MATRIX OPERATIONS
@@ -11,6 +11,7 @@ LIBRARY:  matrix.lib    PROCEDURES FOR MATRIX OPERATIONS
  genericmat(n,m[,id]);  generic nxm matrix [entries from id]
  is_complex(c);         1 if list c is a complex, 0 if not
  outer(A,B);            matrix, outer product of matrices A and B
+ power(A,n);            matrix/intmat, n-th power of matrix/intmat A
  skewmat(n[,id]);       generic skew-symmetric nxn matrix [entries from id]
  submat(A,r,c);         submatrix of A with rows/cols specified by intvec r/c
  symmat(n[,id]);        generic symmetric nxn matrix [entries from id]
@@ -261,6 +262,81 @@ example
    print(A);
    print(B);
    print(outer(A,B));
+}
+////////////////////////////////////////////////////////////////////////////////
+
+proc power ( A, int n)
+USAGE:   power(A,n);  A a square-matrix of type intmat or matrix, n=integer
+RETURN:  inmat resp. matrix, the n-th power of A
+NOTE:    for intamt and big n the result may be wrong because of int overflow
+EXAMPLE: example power; shows an example
+{
+//---------------------------- type checking ----------------------------------
+   if( typeof(A)!="matrix" and typeof(A)!="intmat" )
+   {
+      "// no matrix or intmat!";
+      return (A);
+   }
+   if( ncols(A) != nrows(A) )
+   {
+      "// not a suare matrix!";
+      return();
+   }
+//---------------------------- trivial cases ----------------------------------
+   int ii;
+   if( n <= 0 ) 
+   {
+      if( typeof(A)=="matrix" ) 
+      { 
+         return (unitmat(nrows(A))); 
+      }
+      if( typeof(A)=="intmat" ) 
+      { 
+         intmat B[nrows(A)][nrows(A)];
+         for( ii=1; ii<=nrows(A); ii++ )
+         {
+            B[ii,ii] = 1;
+         }
+         return (B); 
+      }
+   }
+   if( n == 1 ) { return (A); }
+//---------------------------- sub procedure ----------------------------------
+   proc matpow (A, int n)
+   {
+      def B = A*A;
+      int ii= 2;
+      int jj= 4;
+      while( jj <= n )
+      {
+         B=B*B;
+         ii=jj;
+         jj=2*jj;
+      }
+      return(B,n-ii);
+   }
+//----------------------------- main program ----------------------------------
+   list L = matpow(A,n);
+   def B  = L[1];
+   ii     = L[2];
+   while( ii>=2 )
+   {
+      L = matpow(A,ii);
+      B = B*L[1];
+      ii= L[2];
+   }
+   if( ii == 0) { return(B); }
+   if( ii == 1) { return(A*B); }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   intmat A[3][3]=1,2,3,4,5,6,7,8,9;
+   print(power(A,3));"";
+   ring r=0,(x,y,z),dp;
+   matrix B[4][4]=0,x,y,z,0,0,y,z,0,0,0,z,x,y,z,0;
+   print(power(B,3));"";
+   matrix C[3][3]=1,2,3,4,5,6,7,8,9;
+   power(C,50);
 }
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -1,4 +1,4 @@
-// $Id: prim_dec.lib,v 1.5 1997-08-12 17:14:45 Singular Exp $
+// $Id: prim_dec.lib,v 1.6 1997-09-18 09:58:25 Singular Exp $
 ///////////////////////////////////////////////////////
 // pseudoprimdec.lib
 // algorithms for primary decomposition based on
@@ -6,7 +6,7 @@
 // written by Wolfram Decker and Hans Schoenemann
 //////////////////////////////////////////////////////
 
-LIBRARY: prim_dec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION (II)
+LIBRARY: prim_dec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION (S/Y)
 
   min_ass_prim_charsets (ideal I, int choose)
   // minimal associated primes via the  characteristic set

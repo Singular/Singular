@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.11 1997-09-16 13:45:32 Singular Exp $ */
+/* $Id: longalg.cc,v 1.12 1997-09-18 09:58:20 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -53,7 +53,7 @@ BOOLEAN naDBTest(number a, char *f,int l);
 number (*naMap)(number from);
 /* procedure variables */
 static numberfunc
-                nacMult, nacSub, nacAdd, nacDiv, nacGcd, nacLcm;
+                nacMult, nacSub, nacAdd, nacDiv, nacIntDiv, nacGcd, nacLcm;
 #ifdef LDEBUG
 static void     (*nacDBDelete)(number *a,char *f,int l);
 #define         nacDelete(A) nacDBDelete(A,__FILE__,__LINE__)
@@ -78,6 +78,7 @@ static alg napTailred(alg q);
 static BOOLEAN napDivPoly(alg p, alg q);
 static int napExpi(int i, alg a, alg b);
 
+static number nadGcd( number a, number b) { return nacInit(1); }
 /*2
 *  sets the appropriate operators
 */
@@ -113,6 +114,7 @@ void naSetChar(int i, BOOLEAN complete, char ** param, int pars)
       nacSub         = nlSub;
       nacMult        = nlMult;
       nacDiv         = nlDiv;
+      nacIntDiv      = nlIntDiv;
       nacInvers      = nlInvers;
       nacNormalize   = nlNormalize;
       nacNeg         = nlNeg;
@@ -144,6 +146,7 @@ void naSetChar(int i, BOOLEAN complete, char ** param, int pars)
       nacSub         = npSub;
       nacMult        = npMult;
       nacDiv         = npDiv;
+      nacIntDiv      = npDiv;
       nacInvers      = npInvers;
       nacNormalize   = nDummy2;
       nacNeg         = npNeg;
@@ -153,8 +156,8 @@ void naSetChar(int i, BOOLEAN complete, char ** param, int pars)
       nacGreaterZero = npGreaterZero;
       nacIsOne       = npIsOne;
       nacIsMOne      = npIsMOne;
-      nacGcd         = ndGcd;
-      nacLcm         = ndGcd;
+      nacGcd         = nadGcd;
+      nacLcm         = nadGcd;
     }
   }
 #ifdef TEST
@@ -166,6 +169,10 @@ void naSetChar(int i, BOOLEAN complete, char ** param, int pars)
 }
 
 /*============= procedure for polynomials: napXXXX =======================*/
+
+#define napSetCoeff(p,n) {nacDelete(&((p)->ko));(p)->ko=n;}
+#define napIter(A) A=(A)->ne
+
 
 /*3
 * creates  an alg poly
@@ -2015,6 +2022,57 @@ void naNormalize(number &pp)
     napDelete(&l);
   }
 #endif
+  /* remove common factors from z and n */
+  x=p->z;
+  y=p->n;
+  if(!nacGreaterZero(napGetCoeff(y)))
+  {
+    x=napNeg(x);
+    y=napNeg(y);
+  }
+  number g=nacCopy(napGetCoeff(x));
+  napIter(x);
+  while (x!=NULL)
+  {
+    number d=nacGcd(g,napGetCoeff(x));
+    if(nacIsOne(d))
+    {
+      nacDelete(&g);
+      nacDelete(&d);
+      return;
+    }
+    nacDelete(&g);
+    g = d;
+    napIter(x);
+  }
+  while (y!=NULL)
+  {
+    number d=nacGcd(g,napGetCoeff(y));
+    if(nacIsOne(d))
+    {
+      nacDelete(&g);
+      nacDelete(&d);
+      return;
+    }
+    nacDelete(&g);
+    g = d;
+    napIter(y);
+  }
+  x=p->z;
+  y=p->n;
+  while (x!=NULL)
+  {
+    number d = nacIntDiv(napGetCoeff(x),g);
+    napSetCoeff(x,d);
+    napIter(x);
+  }
+  while (y!=NULL)
+  {
+    number d = nacIntDiv(napGetCoeff(y),g);
+    napSetCoeff(y,d);
+    napIter(y);
+  }
+  nacDelete(&g);
 }
 
 /*2
