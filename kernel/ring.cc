@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.6 2004-04-29 14:53:56 Singular Exp $ */
+/* $Id: ring.cc,v 1.7 2004-04-29 17:10:21 levandov Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1050,6 +1050,105 @@ int rSum(ring r1, ring r2, ring &sum)
   sum=(ring)omAllocBin(ip_sring_bin);
   memcpy(sum,&tmpR,sizeof(ip_sring));
   rComplete(sum);
+#ifdef HAVE_PLURAL
+  BOOLEAN R1_is_nc = rIsPluralRing(r1);
+  BOOLEAN R2_is_nc = rIsPluralRing(r2);
+  if ( (R1_is_nc) || (R2_is_nc))
+  {
+    ring R1 = rCopy(r1);
+    ring R2 = rCopy(r2);
+    /* basic nc constructions  */
+    sum->nc = (nc_struct *)omAlloc0(sizeof(nc_struct));
+    sum->nc->ref = 1;
+    sum->nc->basering = sum;
+    if ( !R1_is_nc ) nc_rCreateNCcomm(R1);
+    if ( !R2_is_nc ) nc_rCreateNCcomm(R2);
+    /* nc types */
+    sum->nc->type = nc_undef;
+    nc_type t1 = R1->nc->type, t2 = R2->nc->type;
+    if ( t1==t2) sum->nc->type = t1;
+    else
+    {
+      if ( (t1==nc_general) || (t2==nc_general) ) sum->nc->type = nc_general;
+    }
+    if (sum->nc->type == nc_undef) /* not yet done */
+    {
+      switch (t1) 
+      {
+        case nc_comm:
+	  sum->nc->type = t2; break;
+        case nc_lie:
+	  switch(t2)
+	  {
+	    case nc_skew:
+	      sum->nc->type = nc_general;  break;
+	    case nc_comm:
+	      sum->nc->type = nc_lie;  break;
+	    default:
+	      sum->nc->type = nc_undef;  break;
+	  }
+	  break;
+        case nc_skew:
+	  switch(t2)
+	  {
+	    case nc_lie:
+	      sum->nc->type = nc_lie;  break;
+	    case nc_comm:
+	      sum->nc->type = nc_skew;  break;
+	    default:
+	      sum->nc->type = nc_undef;  break;
+	  }
+      }
+    }
+    if (sum->nc->type == nc_undef)
+      WarnS("Error on recognizing nc types");
+    /* multiplication matrices */
+    ring old_ring = currRing;
+    rChangeCurrRing(sum);
+    matrix C1 = R1->nc->C, C2 = R2->nc->C;
+    matrix D1 = R1->nc->D, D2 = R2->nc->D;
+    int l = R1->N + R2->N;
+    matrix C  = mpNew(l,l);
+    matrix D  = mpNew(l,l);
+    for (i=1; i<= R1->N + R2->N; i++)
+    {
+      for (j= i+1; j<= R1->N + R2->N; j++)
+      {
+	MATELEM(C,i,j) = pOne();
+      }
+    }
+    for (i=1; i< R1->N; i++)
+    {
+      for (j=i+1; j<=R1->N; j++)
+      {
+	MATELEM(C,i,j) = p_CopyEmbed(MATELEM(C1,i,j),R1,0);
+	  //prCopyR_NoSort(MATELEM(C1,i,j),R1,sum);
+	//	MATELEM(D,i,j) = prCopyR(MATELEM(D1,i,j),R1,sum);
+	MATELEM(D,i,j) = p_CopyEmbed(MATELEM(D1,i,j),R1,0);
+      }
+    }
+    for (i=1; i< R2->N; i++)
+    {
+      for (j=i+1; j<=R2->N; j++)
+      {
+	//	MATELEM(C,R1->N+i,R1->N+j) = prCopyR_NoSort(MATELEM(C2,i,j),R2,sum);
+	//	MATELEM(D,R1->N+i,R1->N+j) = prCopyR(MATELEM(D2,i,j),R2,sum);
+	MATELEM(C,R1->N+i,R1->N+j) = p_CopyEmbed(MATELEM(C2,i,j),R2, R1->N);
+	MATELEM(D,R1->N+i,R1->N+j) = p_CopyEmbed(MATELEM(D2,i,j),R2, R1->N);
+      }
+    }
+    sum->nc->C = C;
+    sum->nc->D = D;
+    if (nc_InitMultiplication(sum))
+      WarnS("Error initializing multiplication!");
+    sum->nc->IsSkewConstant =(int)((R1->nc->IsSkewConstant) && (R2->nc->IsSkewConstant));
+    /* delete R1, R2*/
+    rDelete(R1);
+    rDelete(R2);
+    if ( old_ring != NULL)
+      rChangeCurrRing(old_ring);
+  }
+#endif
   return 1;
 }
 /*2

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.4 2004-03-25 21:18:57 levandov Exp $ */
+/* $Id: gring.h,v 1.5 2004-04-29 17:10:20 levandov Exp $ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */
@@ -19,6 +19,7 @@
 BOOLEAN nc_CallPlural(matrix CC, matrix DD, poly CN, poly DN, ring r);
 BOOLEAN nc_InitMultiplication(ring r);
 
+ring nc_rCreateNCcomm(ring r);
 void ncKill(ring r);
 void ncCleanUp(ring r); /* smaller than kill */
 
@@ -68,6 +69,8 @@ poly nc_mm_Bracket_nn(poly m1, poly m2);
 
 /* twostd: */
 ideal twostd(ideal I);
+/* Ann: */
+ideal Approx_Step(ideal L);
 
 /* complete reduction routines */
 
@@ -78,6 +81,8 @@ void nc_PolyPolyRed(poly &b, poly p, number *c);
 matrix nc_PrintMat(int a, int b, ring r, int metric);
 
 int nc_CheckSubalgebra(poly PolyVar, ring r);
+
+poly p_CopyEmbed(poly p, ring srcRing, int shift);
 
 #else
 /* dummy definition to make gcc happy */

@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.6 2004-04-08 21:12:05 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.7 2004-04-29 17:10:19 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -1490,7 +1490,8 @@ ideal twostd(ideal I)
       return(J);
     }
     /* now we update GrBasis J with K */
-    iSize=IDELEMS(J);
+    //    iSize=IDELEMS(J);
+    iSize=idElem(J);
     id_tmp=idSimpleAdd(J,K);
     idDelete(&K);
     idDelete(&J); 
@@ -1887,7 +1888,9 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD, poly CCN, poly DDN, ring r)
 BOOLEAN nc_InitMultiplication(ring r)
 {
   /* returns TRUE if there were errors */
-  /* initialize the multiplication */
+  /* initialize the multiplication: */
+  /*  r->nc->MTsize, r->nc->MT, r->nc->COM, */
+  /* and r->nc->IsSkewConstant for the skew case */
   int i,j;
   matrix COM;
   r->nc->MT = (matrix *)omAlloc0(r->N*(r->N-1)/2*sizeof(matrix));
@@ -1998,6 +2001,288 @@ poly nc_pSubst(poly p, int n, poly e)
   freeT(PRE,rN);
   freeT(SUF,rN);
   return(out);
+}
+
+static ideal idPrepareStd(ideal T, ideal s,  int k)
+{
+  /* T is a left SB, without zeros, s is a list with zeros */
+#ifdef PDEBUG
+  if (IDELEMS(s)!=IDELEMS(T))
+  {
+    Print("ideals of diff. size!!!");
+  }
+#endif
+  ideal t = idCopy(T);
+  int j,rs=idRankFreeModule(s),rt=idRankFreeModule(t);
+  poly p,q;
+
+  ideal res = idInit(2*idElem(t),1+idElem(t));
+  if (rs == 0)
+  {
+    for (j=0; j<IDELEMS(t); j++)
+    {
+      if (s->m[j]!=NULL) pSetCompP(s->m[j],1);
+      if (t->m[j]!=NULL) pSetCompP(t->m[j],1);
+    }
+    k = si_max(k,1);
+  }
+  for (j=0; j<IDELEMS(t); j++)
+  {
+    if (s->m[j]!=NULL)
+    {
+      p = s->m[j];
+      q = pOne();
+      pSetComp(q,k+1+j);
+      pSetmComp(q);
+#if 0      
+      while (pNext(p)) pIter(p);
+      pNext(p) = q;
+#else
+      p = pAdd(p,q);
+      s->m[j] = p;
+#ifdef PDEBUG
+    pTest(p);
+#endif
+#endif
+    }
+  }
+  res = idSimpleAdd(t,s);
+  idDelete(&t);
+  res->rank = 1+idElem(T);
+  return(res);
+}
+
+ideal Approx_Step(ideal L)
+{
+  int N=currRing->N;
+  int i,j; // k=syzcomp
+  int flag, flagcnt, syzcnt=0;
+  int syzcomp = 0;
+  int k=1; /* for ideals not modules */
+  ideal I = kStd(L, currQuotient,testHomog,NULL,NULL,0,0,NULL);
+  idSkipZeroes(I);
+  ideal s_I;
+  int idI = idElem(I);
+  ideal trickyQuotient,s_trickyQuotient;
+  if (currQuotient !=NULL)
+  {
+    trickyQuotient = idSimpleAdd(currQuotient,I);
+  }
+  else
+    trickyQuotient = I;
+  idSkipZeroes(trickyQuotient);
+  poly *var = (poly *)omAlloc0((N+1)*sizeof(poly));
+  //  poly *W = (poly *)omAlloc0((2*N+1)*sizeof(poly));
+  resolvente S = (resolvente)omAlloc0((N+1)*sizeof(ideal));
+  ideal SI, res;
+  matrix MI;
+  poly x=pOne();
+  var[0]=x;
+  ideal   h2, h3, s_h2, s_h3;
+  poly    p,q,qq;
+  /* init vars */
+  for (i=1; i<=N; i++ )
+  {
+    x = pOne();
+    pSetExp(x,i,1);
+    pSetm(x);
+    var[i]=pCopy(x);
+  }
+  /* init NF's */
+  for (i=1; i<=N; i++ )
+  {
+    h2 = idInit(idI,1);
+    flag = 0;
+    for (j=0; j< idI; j++ )
+    {
+      q = nc_p_Mult_mm(pCopy(I->m[j]),var[i],currRing);
+      q = kNF(I,currQuotient,q,0,0);
+      if (q!=0)
+      {
+	h2->m[j]=pCopy(q);
+	//	pShift(&(h2->m[flag]),1);
+	flag++;
+	pDelete(&q);
+      }
+      else
+	h2->m[j]=0;
+    }
+    /* W[1..idElems(I)] */
+    if (flag >0)
+    {
+      /* compute syzygies with values in I*/
+      //      idSkipZeroes(h2);
+      //      h2 = idSimpleAdd(h2,I);
+      //      h2->rank=flag+idI+1;
+      idTest(h2);
+      idShow(h2);
+      ring orig_ring=currRing;
+      ring syz_ring=rCurrRingAssure_SyzComp();
+      syzcomp = 1;
+      rSetSyzComp(syzcomp);
+      if (orig_ring != syz_ring)
+      {
+	s_h2=idrCopyR_NoSort(h2,orig_ring);
+	//	s_trickyQuotient=idrCopyR_NoSort(trickyQuotient,orig_ring);
+	//	rDebugPrint(syz_ring);
+	s_I=idrCopyR_NoSort(I,orig_ring);
+      }
+      else
+      {
+	s_h2 = h2;
+	s_I  = I;
+	//	s_trickyQuotient=trickyQuotient;
+      }
+      idTest(s_h2);
+      //      idTest(s_trickyQuotient);
+      Print(".proceeding with the variable %d\n",i);
+      s_h3 = idPrepareStd(s_I, s_h2, 1);
+      BITSET save_test=test;
+      test|=Sy_bit(OPT_SB_1);
+      idTest(s_h3);
+      idDelete(&s_h2);
+      s_h2=idCopy(s_h3);
+      idDelete(&s_h3);
+      Print("...computing Syz");
+      s_h3 = kStd(s_h2, currQuotient,FALSE,NULL,NULL,syzcomp,idI);
+      test=save_test;
+      idShow(s_h3);
+      if (orig_ring != syz_ring)
+      {
+	idDelete(&s_h2);
+	for (j=0; j<IDELEMS(s_h3); j++)
+	{
+	  if (s_h3->m[j] != NULL)
+	  {
+	    if (p_MinComp(s_h3->m[j],syz_ring) > syzcomp) /* i.e. it is a syzygy */
+	      pShift(&s_h3->m[j], -syzcomp);
+	    else
+	      pDelete(&s_h3->m[j]);
+	  }
+	}
+	idSkipZeroes(s_h3);
+	s_h3->rank -= syzcomp;
+	rChangeCurrRing(orig_ring);
+	//	s_h3 = idrMoveR_NoSort(s_h3, syz_ring);
+	s_h3 = idrMoveR_NoSort(s_h3, syz_ring);
+	rKill(syz_ring);
+      }
+      idTest(s_h3);
+      S[syzcnt]=kStd(s_h3,currQuotient,FALSE,NULL,NULL);
+      syzcnt++;
+      idDelete(&s_h3);
+    } /* end if flag >0 */
+    else 
+    {
+      flagcnt++;
+    }
+  }
+  if (flagcnt == N) 
+  {
+    Print("the input is a two--sided ideal");
+    return(I);
+  }
+  if (syzcnt >0)
+  {
+    Print("..computing Intersect of %d modules\n",syzcnt);
+    if (syzcnt == 1)
+      SI = S[0];
+    else
+      SI = idMultSect(S, syzcnt);
+    idShow(SI);
+    MI = idModule2Matrix(SI);
+    res= idInit(MATCOLS(MI),1);
+    for (i=1; i<= MATCOLS(MI); i++)
+    {    
+      p = NULL;
+      for (j=0; j< idElem(I); j++)
+      { 
+	q = pCopy(MATELEM(MI,j+1,i));
+	if (q!=NULL)
+	{
+	  q = pMult(q,pCopy(I->m[j]));
+	  p = pAdd(p,q);
+	}
+      }
+      res->m[i-1]=p;
+    }
+    Print("final std");
+    res = kStd(res, currQuotient,testHomog,NULL,NULL,0,0,NULL);
+    idSkipZeroes(res);
+    return(res);
+  }
+  else
+  {
+    Print("No syzygies");
+    return(I);
+  }
+}
+
+
+ring nc_rCreateNCcomm(ring r)
+  /* creates a commutative nc extension; "converts" comm.ring to a Plural ring */
+{
+  if (rIsPluralRing(r)) return r;
+  r->nc = (nc_struct *)omAlloc0(sizeof(nc_struct));
+  r->nc->ref = 1;
+  r->nc->basering = r;
+  r->nc->type = nc_comm;
+  r->nc->IsSkewConstant = 1;
+  matrix C = mpNew(r->N,r->N);
+  matrix D = mpNew(r->N,r->N);
+  int i,j;
+  number One=r->cf->nInit(1);
+  for(i=1; i<r->N; i++)
+  {
+    for(j=i+1; j<=r->N; j++)
+    {
+      MATELEM(C,i,j) = pOne();
+    }
+  }
+  r->nc->C = C;
+  r->nc->D = D;
+  if (nc_InitMultiplication(r))
+  {
+    WarnS("Error initializing multiplication!");
+  }
+  return r;
+}
+
+poly p_CopyEmbed(poly p, ring srcRing, int shift)
+  /* for use with embeddings: srcRing is a sum of smaller rings */
+  /* shift defines the position of a subring in srcRing */
+{
+  if (currRing == srcRing)
+  {
+    return(p_Copy(p,currRing));
+  }
+  nMapFunc nMap=nSetMap(srcRing);
+  poly q;
+  if ( nMap == nCopy)
+  {
+    q = prCopyR(p,srcRing);
+  }
+  else
+  {
+    int *perm = (int *)omAlloc0((srcRing->N+1)*sizeof(int));
+    int *par_perm = NULL;
+    //    int *par_perm = (int *)omAlloc0((srcRing->P+1)*sizeof(int));
+    int i;
+    //    if (srcRing->P > 0)
+    //    {
+    //      for (i=0; i<srcRing->P; i++)
+    //	par_perm[i]=-i;
+    //    }
+    if ((shift<0) || (shift > currRing->N))
+    {
+      Werror("bad shifts in p_CopyEmbed");
+      return(0);
+    }
+    for (i=1; i<=srcRing->N; i++)
+      perm[i]=shift+i;
+    q = pPermPoly(p,perm,srcRing,nMap,par_perm,srcRing->P);
+  }
+  return(q);
 }
 
 #endif
