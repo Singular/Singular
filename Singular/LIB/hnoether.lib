@@ -1,14 +1,16 @@
-// $Id: hnoether.lib,v 1.10 1999-04-14 12:11:49 Singular Exp $
+// $Id: hnoether.lib,v 1.11 1999-07-06 11:32:56 obachman Exp $
 // author:  Martin Lamm,  email: lamm@mathematik.uni-kl.de
 // last change:           09.03.99
 ///////////////////////////////////////////////////////////////////////////////
 // This library is for Singular 1.2 or newer
 
-version="$Id: hnoether.lib,v 1.10 1999-04-14 12:11:49 Singular Exp $";
+version="$Id: hnoether.lib,v 1.11 1999-07-06 11:32:56 obachman Exp $";
 info="
 LIBRARY:  hnoether.lib   PROCEDURES FOR THE HAMBURGER-NOETHER DEVELOPMENT
 
-           Important procedures:
+AUTHOR: Martin Lamm,  lamm@mathematik.uni-kl.de
+
+MAIN PROCEDURES:
  develop(f [,n]);    Hamburger-Noether development of the irred. polynomial f
  reddevelop(f);      Hamburger-Noether development of the (red.) polynomial f
  extdevelop(hne,n);  extension of the Hamburger-Noether development hne of f
@@ -21,7 +23,7 @@ LIBRARY:  hnoether.lib   PROCEDURES FOR THE HAMBURGER-NOETHER DEVELOPMENT
  displayMultsequence(hne);  display sequence of multiplicities
  stripHNE(hne);      reduce amount of memory consumed by hne
 
-           perhaps useful procedures:
+SUB-PROCEDURES:
  puiseux2generators(m,n); convert Puiseux pairs to generators of semigroup
  multiplicities(hne);     multiplicities of blowed up curves
  separateHNE(hne1,hne2);  number of quadratic transf. needed for separation

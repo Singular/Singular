@@ -1,4 +1,4 @@
-// $Id: invar.lib,v 1.7 1998-05-14 18:45:08 Singular Exp $
+// $Id: invar.lib,v 1.8 1999-07-06 11:32:59 obachman Exp $
 ///////////////////////////////////////////////////////
 // invar.lib
 // algorithm for computing the ring of invariants under
@@ -6,11 +6,12 @@
 // written by Gerhard Pfister
 //////////////////////////////////////////////////////
 
-version="$Id: invar.lib,v 1.7 1998-05-14 18:45:08 Singular Exp $";
+version="$Id: invar.lib,v 1.8 1999-07-06 11:32:59 obachman Exp $";
 info="
 LIBRARY: invar.lib PROCEDURES FOR COMPUTING INVARIANTS OF (C,+)-ACTIONS
 
-  invariantRing(matrix m,poly p,poly q,int choose)
+PROCEDURES:
+ invariantRing(matrix m,poly p,poly q,int choose)
   // ring of invariants of the action of the additive group
   // defined by the vectorfield corresponding to the matrix m
   // (m[i,1] are the coefficients of d/dx(i))
@@ -63,7 +64,7 @@ example
 
 proc der (matrix m, poly f)
 "USAGE:   der(m,f);  m matrix, f poly
-RETURN:  poly= application of the vectorfield m befined by the matrix m
+RETURN:  poly= application of the vectorfield m defined by the matrix m
          (m[i,1] are the coefficients of d/dx(i)) to f
 NOTE:
 EXAMPLE: example der; shows an example

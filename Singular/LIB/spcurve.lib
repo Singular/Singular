@@ -1,11 +1,12 @@
-// $Id: spcurve.lib,v 1.1 1999-04-30 16:56:19 obachman Exp $
+// $Id: spcurve.lib,v 1.2 1999-07-06 11:33:14 obachman Exp $
 // (anne, last modified 20.7.98)
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: spcurve.lib,v 1.1 1999-04-30 16:56:19 obachman Exp $";
+version="$Id: spcurve.lib,v 1.2 1999-07-06 11:33:14 obachman Exp $";
 info="
 LIBRARY: spcurve.lib    PROCEDURES FOR CM CODIMENSION 2 SINGULARITIES
 
+PROCEDURES:
  isCMcod2(i);            presentation matrix of the ideal i
  CMtype(i);              Cohen-Macaulay type of the ideal i
  matrixT1(M,n);          T1 in matrix description

@@ -1,12 +1,13 @@
-// $Id: graphics.lib,v 1.2 1998-06-19 13:36:00 gorzel Exp $
+// $Id: graphics.lib,v 1.3 1999-07-06 11:32:55 obachman Exp $
 //
 // author : Christian Gorzel email: gorzelc@math.uni-muenster.de
 //
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: graphics.lib,v 1.2 1998-06-19 13:36:00 gorzel Exp $";
+version="$Id: graphics.lib,v 1.3 1999-07-06 11:32:55 obachman Exp $";
 info="
 LIBRARY: graphics.lib    PROCEDURES FOR GRAPHICS WITH MATHEMATICA
 
+PROCEDURES:
  staircase(fname,I);  Mathematica text for displaying staircase of I
  mathinit();          string for loading Mathematica's ImplicitPlot
  plot(fname,I[# s]);  Mathematica text for various plots

@@ -5,10 +5,11 @@
 // written by Gert-Martin Greuel and Gerhard Pfister
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: normal.lib,v 1.14 1999-06-08 11:15:58 Singular Exp $";
+version="$Id: normal.lib,v 1.15 1999-07-06 11:33:04 obachman Exp $";
 info="
 LIBRARY: normal.lib     PROCEDURES FOR NORMALIZATION
 
+PROCEDURES:
  normal(I);             computes the normalization of basering/I
  extraweight(R);        intvec of variable weights of ring R
  HomJJ(L);              presentation of End_R(J) as affine ring, L a list      

@@ -1,13 +1,14 @@
 
-// $Id: sing.lib,v 1.14 1999-06-28 12:48:18 wenk Exp $
+// $Id: sing.lib,v 1.15 1999-07-06 11:33:13 obachman Exp $
 //system("random",787422842);
 //(GMG/BM, last modified 26.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: sing.lib,v 1.14 1999-06-28 12:48:18 wenk Exp $";
+version="$Id: sing.lib,v 1.15 1999-07-06 11:33:13 obachman Exp $";
 info="
 LIBRARY:  sing.lib      PROCEDURES FOR SINGULARITIES
 
+PROCEDURES:
  codim (id1, id2);      vector space dimension of of id2/id1 if finite
  deform(i);             infinitesimal deformations of ideal i
  dim_slocus(i);         dimension of singular locus of ideal i

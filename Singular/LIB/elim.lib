@@ -1,12 +1,13 @@
-// $Id: elim.lib,v 1.5 1999-07-01 15:51:50 Singular Exp $
+// $Id: elim.lib,v 1.6 1999-07-06 11:32:47 obachman Exp $
 // system("random",787422842);
 // (GMG, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: elim.lib,v 1.5 1999-07-01 15:51:50 Singular Exp $";
+version="$Id: elim.lib,v 1.6 1999-07-06 11:32:47 obachman Exp $";
 info="
 LIBRARY:  elim.lib      PROCEDURES FOR ELIMINATIOM, SATURATION AND BLOWING UP
 
+PROCEDURES:
  blowup0(j[,s1,s2]);    create presentation of blownup ring of ideal j
  elim(id,n,m);          variable n..m eliminated from id (ideal/module)
  elim1(id,p);           p=product of vars to be eliminated from id

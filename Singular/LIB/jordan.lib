@@ -1,10 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: jordan.lib,v 1.13 1999-06-22 15:39:03 mschulze Exp $";
+version="$Id: jordan.lib,v 1.14 1999-07-06 11:32:59 obachman Exp $";
 info="
 LIBRARY: jordan.lib  PROCEDURES TO COMPUTE THE JORDAN NORMAL FORM
 AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
 
+PROCEDURES:
  jordan(M[,opt]);  eigenvalues, Jordan block sizes, Jordan transformation of M
  jordanmatrix(l);  Jordan matrix with eigenvalues l[1], Jordan block sizes l[2]
  jordanform(M);    Jordan normal form of constant square matrix M

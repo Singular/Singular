@@ -1,10 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: mondromy.lib,v 1.5 1999-06-30 09:32:49 mschulze Exp $";
+version="$Id: mondromy.lib,v 1.6 1999-07-06 11:33:02 obachman Exp $";
 info="
 LIBRARY: mondromy.lib  PROCEDURES TO COMPUTE THE MONODROMY OF A SINGULARITY
 AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de
 
+PROCEDURES:
  invunit(u,n);         series inverse of polynomial u up to order n
  detadj(U);            determinant and adjoint matrix of square matrix U
  jacoblift(f);         lifts f^kappa in jacob(f) with minimal kappa

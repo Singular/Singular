@@ -1,4 +1,4 @@
-// $Id: solver.lib,v 1.1 1999-06-07 12:26:51 obachman Exp $
+// $Id: solver.lib,v 1.2 1999-07-06 11:33:14 obachman Exp $
 ////////////////////////////////////////////////////////////////////////////////
 // solver.lib                                                                //
 // algorithms for solving algebraic system of dimension zero                              //
@@ -6,10 +6,12 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-version="$Id: solver.lib,v 1.1 1999-06-07 12:26:51 obachman Exp $";
+version="$Id: solver.lib,v 1.2 1999-07-06 11:33:14 obachman Exp $";
 info="
 LIBRARY: solver.lib: PROCEDURES FOR SOLVING ZERO-DIMENSIONAL ALGEBRAIC SYSTEMS
+AUTHOR: Dietmar Hillebrand
 
+PROCEDURES:
   triMNewton(G,a,err,itb); computes an improved approximation for
                            a common zero of the triangular system G
                            via multivariate Newton.

@@ -1,10 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: solve.lib,v 1.7 1999-07-02 16:14:41 wenk Exp $";
+version="$Id: solve.lib,v 1.8 1999-07-06 11:33:13 obachman Exp $";
 info="
 LIBRARY: solve.lib     PROCEDURES TO SOLVE POLYNOMIAL SYSTEMS
 AUTHOR:  Moritz Wenk,  email: wenk@mathematik.uni-kl.de
 
+PROCEDURES:
  ures_solve(i,..);      find all roots of 0-dimensional ideal i with resultants
  mp_res_mat(i,..);      multipolynomial resultant matrix of ideal i
  laguerre_solve(p,..);  find all roots of univariate polynom p

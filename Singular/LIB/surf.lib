@@ -1,12 +1,13 @@
-// $Id: surf.lib,v 1.3 1999-05-26 16:23:25 obachman Exp $
+// $Id: surf.lib,v 1.4 1999-07-06 11:33:16 obachman Exp $
 //
 // author : Hans Schoenemann
 //
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surf.lib,v 1.3 1999-05-26 16:23:25 obachman Exp $";
+version="$Id: surf.lib,v 1.4 1999-07-06 11:33:16 obachman Exp $";
 info="
 LIBRARY: surf.lib    PROCEDURES FOR GRAPHICS WITH SURF (by Stephan Endrass)
 
+PROCEDURES:
  plot(I);  plots curves and surfaces
 ";
 

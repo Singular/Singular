@@ -1,12 +1,13 @@
-// $Id: presolve.lib,v 1.6 1999-03-09 12:28:50 obachman Exp $
+// $Id: presolve.lib,v 1.7 1999-07-06 11:33:08 obachman Exp $
 //system("random",787422842);
 //(GMG), last modified 97/10/07 by GMG
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: presolve.lib,v 1.6 1999-03-09 12:28:50 obachman Exp $";
+version="$Id: presolve.lib,v 1.7 1999-07-06 11:33:08 obachman Exp $";
 info="
 LIBRARY:  presolve.lib     PROCEDURES FOR PRE-SOLVING POLYNOMIAL EQUATIONS
 
+PROCEDURES:
  degreepart(id,d1,d2);  elements of id of total degree >= d1 and <= d2
  elimlinearpart(id);    linear part eliminated from id
  elimpart(id[,n]);      partial elimination of vars [among 1-st n vars]

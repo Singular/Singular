@@ -1,12 +1,13 @@
-// $Id: inout.lib,v 1.7 1999-06-07 17:32:21 Singular Exp $
+// $Id: inout.lib,v 1.8 1999-07-06 11:32:58 obachman Exp $
 // system("random",787422842);
 // (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: inout.lib,v 1.7 1999-06-07 17:32:21 Singular Exp $";
+version="$Id: inout.lib,v 1.8 1999-07-06 11:32:58 obachman Exp $";
 info="
 LIBRARY:  inout.lib     PROCEDURES FOR MANIPULATING IN- AND OUTPUT
 
+PROCEDURES:
  allprint(list);        print list if ALLprint is defined, with pause if >0
  dbpri(n,list);         print objects of list if int n<=printlevel
  lprint(poly/...[,n]);  display poly/... fitting to pagewidth [size n]

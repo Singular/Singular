@@ -1,12 +1,13 @@
-// $Id: random.lib,v 1.6 1999-07-02 09:06:02 obachman Exp $
+// $Id: random.lib,v 1.7 1999-07-06 11:33:11 obachman Exp $
 //system("random",787422842);
 //(GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: random.lib,v 1.6 1999-07-02 09:06:02 obachman Exp $";
+version="$Id: random.lib,v 1.7 1999-07-06 11:33:11 obachman Exp $";
 info="
 LIBRARY:  random.lib    PROCEDURES OF RANDOM MATRIX AND POLY OPERATIONS
 
+PROCEDURES:
  genericid(id[,p,b]);   generic sparse linear combinations of generators of id
  randomid(id,[k,b]);    random linear combinations of generators of id
  randommat(n,m[,id,b]); nxm matrix of random linear combinations of id

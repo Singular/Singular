@@ -1,13 +1,14 @@
-// $Id: poly.lib,v 1.14 1998-05-19 18:08:26 obachman Exp $
+// $Id: poly.lib,v 1.15 1999-07-06 11:33:07 obachman Exp $
 //system("random",787422842);
 //(GMG, last modified 22.06.96)
 //(obachman: 17.12.97 -- added katsura)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: poly.lib,v 1.14 1998-05-19 18:08:26 obachman Exp $";
+version="$Id: poly.lib,v 1.15 1999-07-06 11:33:07 obachman Exp $";
 info="
 LIBRARY:  poly.lib      PROCEDURES FOR MANIPULATING POLYS, IDEALS, MODULES
 
+PROCEDURES:
  cyclic(int);           ideal of cyclic n-roots
  katsura([i]);          katsura [i] ideal
  freerank(poly/...)     rank of coker(input) if coker is free else -1

@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.36 1999-07-02 09:06:00 obachman Exp $
+// $Id: primdec.lib,v 1.37 1999-07-06 11:33:09 obachman Exp $
 ////////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                                //
 // algorithms for primary decomposition based on                              //
@@ -10,10 +10,13 @@
 // written by Wolfram Decker and Hans Schoenemann                             //
 ////////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.36 1999-07-02 09:06:00 obachman Exp $";
+version="$Id: primdec.lib,v 1.37 1999-07-06 11:33:09 obachman Exp $";
 info="
-LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION
+LIBRARY: primdec.lib PROCEDURE FOR PRIMARY DECOMPOSITION
 
+AUTHORS: Gerhard Pfister, Wolfram Decker, Hans Schoenemann
+
+PROCEDURES:
   minAssGTZ(I);     computes the minimal associated primes
                       via Gianni,Trager,Zacharias
   minAssChar(I);    computes the minimal associated primes
@@ -28,6 +31,8 @@ LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION
   equiRadical(I);   computes the radical of the equidimensional part
                       of the ideal I
   prepareAss(I);    computes the radicals of the equidimensional parts of I
+
+REMARK:
 These procedures are implemented to be used in characteristic 0.
 They work also in positive characteristic >> 0.
 In small characteristic primdecGTZ, minAssGTZ, radical and equiRadical may not

@@ -1,23 +1,25 @@
-// $Id: finvar.lib,v 1.15 1998-12-02 10:52:08 Singular Exp $
+// $Id: finvar.lib,v 1.16 1999-07-06 11:32:50 obachman Exp $
 // author: Agnes Eileen Heydtmann, email:agnes@math.uni-sb.de
 // last change: 98/11/05
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: finvar.lib,v 1.15 1998-12-02 10:52:08 Singular Exp $"
+version="$Id: finvar.lib,v 1.16 1999-07-06 11:32:50 obachman Exp $"
 info="
 LIBRARY:  finvar.lib       LIBRARY TO CALCULATE INVARIANT RINGS & MORE
 
+OVERVIEW:
  A library for computing polynomial invariants of finite matrix groups and
  generators of related varieties. The algorithms are based on B. Sturmfels,
  G. Kemper and Decker et al..
- Author: Agnes E. Heydtmann, agnes@math.uni-sb.de
 
- MAIN PROCEDURES:
+AUTHOR: Agnes E. Heydtmann, agnes@math.uni-sb.de
+
+MAIN PROCEDURES:
  invariant_ring()                  generators of the invariant ring (i.r.)
  invariant_ring_random()           generators of the i.r., randomized alg.
  primary_invariants()              primary invariants (p.i.)
  primary_invariants_random()       primary invariants, randomized alg.
 
- SUB-PROCEDURES:
+SUB-PROCEDURES:
  cyclotomic()                      cyclotomic polynomial
  group_reynolds()                  finite group and Reynolds operator (R.o.)
  molien()                          Molien series (M.s.)

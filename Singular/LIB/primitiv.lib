@@ -1,13 +1,14 @@
-// $Id: primitiv.lib,v 1.9 1999-07-02 09:06:01 obachman Exp $
+// $Id: primitiv.lib,v 1.10 1999-07-06 11:33:10 obachman Exp $
 // author:  Martin Lamm,  email: lamm@mathematik.uni-kl.de
 // last change:            19.03.99
 ///////////////////////////////////////////////////////////////////////////////
 // This library is for Singular 1.2 or newer
 
-version="$Id: primitiv.lib,v 1.9 1999-07-02 09:06:01 obachman Exp $";
+version="$Id: primitiv.lib,v 1.10 1999-07-06 11:33:10 obachman Exp $";
 info="
 LIBRARY:    primitiv.lib    PROCEDURES FOR FINDING A PRIMITIVE ELEMENT
-
+AUTHOR: Martin Lamm,  email: lamm@mathematik.uni-kl.de
+PROCEDURES:
  primitive(ideal i);   find minimal polynomial for a primitive element
  primitive_extra(i);   find primitive element for two generators
  splitring(f,R[,L]);   define ring extension with name R and switch to it

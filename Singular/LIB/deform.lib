@@ -1,21 +1,19 @@
-// $Id: deform.lib,v 1.14 1998-10-21 10:28:19 krueger Exp $
+// $Id: deform.lib,v 1.15 1999-07-06 11:32:46 obachman Exp $
 // author: Bernd Martin email: martin@math.tu-cottbus.de
 //(bm, last modified 4/98)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: deform.lib,v 1.14 1998-10-21 10:28:19 krueger Exp $";
+version="$Id: deform.lib,v 1.15 1999-07-06 11:32:46 obachman Exp $";
 info="
 LIBRARY:  deform.lib       PROCEDURES FOR COMPUTING MINIVERSAL DEFORMATION
-                           by Bernd Martin (martin@math.tu-cottbus.de)
 
+AUTHOR: Bernd Martin (martin@math.tu-cottbus.de)
+
+PROCEDURES:
  versal(Fo[,d,any])        miniversal deformation of isolated singularity Fo
  mod_versal(Mo,I,[,d,any]) miniversal deformation of module Mo modulo ideal I
  lift_kbase(N,M);          lifting N into standard kbase of M
  lift_rel_kb(N,M[,kbM,p])  relative lifting N into a kbase of M
- kill_rings([\"prefix\"])    kills the exported rings from above
-
-  SUB-PROCEDURES            used by main procedure:
-                  get_rings,compute_ext,get_inf_def,interact1,
-                  interact2,negative_part,homog_test
+ kill_rings([\"prefix\"])  kills the exported rings from above
 ";
 ///////////////////////////////////////////////////////////////////////////////
 LIB "inout.lib";

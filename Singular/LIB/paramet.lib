@@ -1,13 +1,14 @@
-// $Id: paramet.lib,v 1.3 1999-05-26 14:32:02 obachman Exp $
+// $Id: paramet.lib,v 1.4 1999-07-06 11:33:06 obachman Exp $
 // author : Thomas Keilen email: keilen@mathematik.uni-kl.de
 // last change:           07.08.98
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: paramet.lib,v 1.3 1999-05-26 14:32:02 obachman Exp $";
+version="$Id: paramet.lib,v 1.4 1999-07-06 11:33:06 obachman Exp $";
 info="
 LIBRARY:  paramet.lib   PROCEDURES FOR PARAMETRIZATION OF PRIMARY 
                         DECOMPOSITION, ETC.
 
+PROCEDURES:
  parametrize(I);       parametrizes a prime ideal if possible via the 
                        normalization
  parametrizepd(I);     calculates the primary decomp. and parametrizes 

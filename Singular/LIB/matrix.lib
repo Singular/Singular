@@ -1,12 +1,12 @@
-// $Id: matrix.lib,v 1.11 1999-02-11 12:36:47 greuel Exp $
+// $Id: matrix.lib,v 1.12 1999-07-06 11:33:01 obachman Exp $
 // GMG/BM, last modified: 8.10.98
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: matrix.lib,v 1.11 1999-02-11 12:36:47 greuel Exp $";
+version="$Id: matrix.lib,v 1.12 1999-07-06 11:33:01 obachman Exp $";
 info="
 LIBRARY:  matrix.lib    PROCEDURES FOR MATRIX OPERATIONS
-                        Authors: GMG/BM
 
+PROCEDURES:
  compress(A);           matrix, zero columns from A deleted
  concat(A1,A2,..);      matrix, concatenation of matrices A1,A2,...
  diag(p,n);             matrix, nxn diagonal matrix with entries poly p

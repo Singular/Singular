@@ -1,4 +1,4 @@
-// $Id: latex.lib,v 1.6 1998-12-10 13:07:19 krueger Exp $   
+// $Id: latex.lib,v 1.7 1999-07-06 11:33:00 obachman Exp $   
 //                        1998/04/17
 // author : Christian Gorzel email: gorzelc@math.uni-muenster.de
 // 
@@ -7,9 +7,10 @@
 version="1.14";
 info="
 LIBRARY: latex.lib    PROCEDURES FOR TYPESET OF SINGULAROBJECTS IN LATEX2E
-                        by Christian Gorzel, send bugs and
-                        comments to gorzelc@math.uni-muenster.de
 
+AUTHOR: Christian Gorzel, gorzelc@math.uni-muenster.de
+
+PROCEDURES:
  closetex(fnm);       writes closing line for TeX-document
  opentex(fnm);        writes header for TeX-file fnm
  tex(fnm);            calls LaTeX2e for TeX-file fnm
@@ -25,7 +26,7 @@ LIBRARY: latex.lib    PROCEDURES FOR TYPESET OF SINGULAROBJECTS IN LATEX2E
  xdvi(s);             calls xdvi for dvi-file s
          (parameters in square brackets [] are optional)
  
-                      Global Variables: 
+GLOBAL VARIABLES: 
   TeXwidth, TeXnofrac, TeXbrack, TeXproj, TeXaligned, TeXreplace, NoDollars
                   are used to control the typesetting  
     Call example texdemo; to become familiar with the features of latex.lib

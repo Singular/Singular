@@ -1,11 +1,12 @@
-// $Id: ring.lib,v 1.8 1998-10-21 10:28:27 krueger Exp $
+// $Id: ring.lib,v 1.9 1999-07-06 11:33:12 obachman Exp $
 //(GMG, last modified 03.11.95)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: ring.lib,v 1.8 1998-10-21 10:28:27 krueger Exp $";
+version="$Id: ring.lib,v 1.9 1999-07-06 11:33:12 obachman Exp $";
 info="
 LIBRARY:  ring.lib      PROCEDURES FOR MANIPULATING RINGS AND MAPS
 
+PROCEDURES:
  changechar(\"R\",c[,r]); make a copy R of basering [ring r] with new char c
  changeord(\"R\",o[,r]);  make a copy R of basering [ring r] with new ord o
  changevar(\"R\",v[,r]);  make a copy R of basering [ring r] with new vars v
