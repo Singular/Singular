@@ -1,8 +1,8 @@
-// $Id: general.lib,v 1.24 1999-12-13 16:06:52 obachman Exp $
+// $Id: general.lib,v 1.25 2000-01-13 12:15:54 obachman Exp $
 //GMG, last modified 18.6.99
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: general.lib,v 1.24 1999-12-13 16:06:52 obachman Exp $";
+version="$Id: general.lib,v 1.25 2000-01-13 12:15:54 obachman Exp $";
 info="
 LIBRARY:  general.lib   PROCEDURES OF GENERAL TYPE
 
@@ -94,7 +94,7 @@ EXAMPLE: example ASCII; shows an example
 "
 {
   string s1 =
- "     !    \"    #    $    &    '    (    )    *    +    ,    -    .
+ "     !    \"    #    $    %    &    '    (    )    *    +    ,    -    .
 32   33   34   35   36   37   38   39   40   41   42   43   44   45   46
 /    0    1    2    3    4    5    6    7    8    9    :    ;    <    =
 47   48   49   50   51   52   53   54   55   56   57   58   59   60   61
