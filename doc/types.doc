@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.57 1998-05-19 17:32:36 Singular Exp $
+@comment $Id: types.doc,v 1.58 1998-05-20 00:34:58 gorzel Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -65,17 +65,28 @@ Objects may be defined without a specific type: they get their
 type from the first assignment to them.
 E.g., @code{ideal i=x,y,z; def j=i^2;} defines the ideal @code{i^2}
 with the name @code{j}.
-@*Note: Unlike other assignments a ring as an untyped object
-is not a copy but another reference to the same ring.
+@*@strong{Note:} Unlike other assignments a ring as an untyped object
+is not a copy but another reference to the same ring. This means that 
+entries in one of these rings appear also in the other ones.
+The following defines a ring @code{s} which is just another reference (or name)
+for the basering @code{r}.
 @example
+@c example
   ring r;
+  poly f = x;
   def s=basering;
   setring s;
+  nameof(basering);
+  listvar();
+  poly g = y;
+  kill f;
+  listvar(r);
+@c example
 @end example
-defines a ring @code{s} which is just another reference (or name)
-for the basering. This is useful if the basering
-is not local to the procedure (so it cannot be accessed by its name)
-but one needs a name for it (e.g., for a use with @code{setring} or @code{map}).
+
+This reference to a ring with def is useful if the basering
+is not local to the procedure (so it cannot be accessed by its name) but one 
+needs a name for it (e.g., for a use with @code{setring} or @code{map}).
 @code{setring r;} does not work in this case, because
 @code{r} may not be local to the procedure.
 
@@ -110,7 +121,8 @@ is local to the procedure.
 @end table
 
 @c ref
-See @ref{typeof}.
+See 
+@ref{typeof}.
 @c ref
 
 @c ---------------------------------------
@@ -121,7 +133,8 @@ See @ref{typeof}.
 Ideals are represented as lists of polynomials which generate the ideal.
 Like polynomials they
 can only be defined or accessed with respect to a basering.
-
+@*strong{Note:} @code{size} counts only the non zero generators of an ideal
+whereas @code{ncols} counts all generators.
 @menu
 * ideal declarations::
 * ideal expressions::
@@ -149,8 +162,10 @@ defines an ideal.
   poly s1 = x2;
   poly s2 = y3;
   poly s3 = z;
-  ideal i =  s1, s2-s1, s2*s3, s3^4;
+  ideal i =  s1, s2-s1, 0,s2*s3, s3^4;
   i;
+  size(i);
+  ncols(i);
 @c example
 @end example
 @end table
@@ -163,7 +178,7 @@ defines an ideal.
 An ideal expression is:
 @enumerate
 @item
-an expression list of poly expressions
+an expression list of poly expressions, and ideal expressions
 @item
 an identifier of type ideal
 @item
@@ -174,8 +189,9 @@ ideal expressions combined by the arithmetic operations
 @item
 a power of an ideal expression (operator @code{^} or @code{**})
 @*Note that the computation of the product @code{i*i} involves
-all products of generators of @code{i} while @code{i^2} involves only
-the different ones and is therefore faster
+all products of generators of @code{i} and simplifies the product 
+while @code{i^2} involves only the different ones, 
+but does not simplify the result and is therefore faster.
 @item
 a typecast to ideal
 @end enumerate
@@ -183,15 +199,23 @@ a typecast to ideal
 @example
 @c example
   ring r=0,(x,y,z),dp;
-  poly s1 = x2;
-  poly s2 = y3;
-  poly s3 = z;
-  ideal i =  s1, s2-s1, s2*s3, s3^4;
-  ideal j = i^2;
-  // generators i[k]*i[l], 1<=k<=l<=size(i);
-  ideal IJ = i*j;
-  // generators i[k]*j[l], 1<=k<=size(i), 1<=l<=size(j)
-  size(j), size(IJ);
+  ideal m = maxideal(1);
+  m;
+  poly f = x2;
+  poly g = y3;
+  ideal i = x*y*z , f-g, g*(x-y) + f^4 ,0, 2x-z2y;
+  ideal M = maxideal(10);
+  timer =0;
+  i = M*M;
+  timer;
+  ncols(i);
+  timer =0;
+  i = M^2;
+  ncols(i);
+  timer;
+  i[ncols(i)];
+  vector v = [x,y-z,x2,y-x,x2yz2-y];
+  ideal j = ideal(v);
 @c example
 @end example
 
@@ -205,19 +229,35 @@ a typecast to ideal
 addition (concatenation of the generators and simplification)
 
 @item @code{*}
-multiplication (with ideal, poly, vector, module)
+multiplication (with ideal, poly, vector, module; simplification in case of 
+multiplication with ideal)
 
 @item @code{^}
 exponentiation (by a non-negative integer)
 
-@item ideal_expression @code{[} int_expression @code{]}
-is a polynomial generator of the ideal, index 1 gives the first generator.
+@item ideal_expression @code{[} intvec_expression @code{]}
+are polynomial generators of the ideal, index 1 gives the first generator.
 @end table
+
+@*@strong{Note:} For simplification of an ideal, see also @ref{simplify}.
 
 @strong{Example:}
 @example
 @c example
-
+  ring r=0,(x,y,z),dp;
+  ideal I = 0,x,0,1;
+  I;
+  I + 0;    // simplification 
+  ideal J = I,0,x,x-z;;
+  J;
+  I * J;   //  multiplication with simplification
+  I*x;
+  vector V = [x,y,z];
+  print(V*I);
+  ideal m = maxideal(1);
+  m^2;
+  ideal II = I[2..4];
+  II;
 @c example
 @end example
 
@@ -228,7 +268,7 @@ is a polynomial generator of the ideal, index 1 gives the first generator.
 
 @table @code
 @item char_series
-ireducible characteristic series (see @ref{char_series})
+irreducible characteristic series (see @ref{char_series})
 @item coeffs
 matrix of coefficients (see @ref{coeffs})
 @item contract
@@ -290,7 +330,7 @@ set of minors of a matrix (see @ref{minor})
 @item modulo
 represents
 @tex
-$(h1+h2)/h1=h2/(h1 \cap h2)$
+$(h1+h2)/h1 \cong h2/(h1 \cap h2)$
 @end tex
 @ifinfo
 (h1+h2)/h1=h2/(h1 intersect h2)
@@ -411,9 +451,11 @@ a function returning int
 int expressions combined by the arithmetic operations
 @code{+}, @code{-}, @code{*}, @code{div}, @code{/},
 @code{%} (@code{mod}), or @code{^}
+@item a boolean expression 
 @item
 a typecast to int
 @end enumerate
+@strong{Note:}
 Variables of type int represent the compiler integers  and are, therefore,
 limited  in their range (see @ref{Limitations}). If this range is too small
 the expression must be converted to the type number over a ring with
@@ -427,20 +469,34 @@ typeof(_);
 ring r=0,x,dp;
 12345678901;
 typeof(_);
-// using the type cast number for a greater allowed range
-number(11)*13*17*100*200*2000*503*1111*222222;
 // Note: 11*13*17*100*200*2000*503*1111*222222
 // would return a machine integer:
 11*13*17*100*200*2000*503*1111*222222;
+// using the type cast number for a greater allowed range
+number(11)*13*17*100*200*2000*503*1111*222222;
 ring rp=320003,x,dp;
 12345678901;
 typeof(_);
+intmat m[2][2] = 1,2,3,4;
+m;
+m[2,2];
+typeof(_);
+det(m);
+m[1,1] + m[2,1] == trace(m);
+! 0;
+1 and 2;
+intvec v = 1,2,3;
+def d =transpose(v)*v;    // scalarproduct
+typeof(d);
+int i = d[1];             // no cast from intvec to int, access first element
+ring r;
+poly f = 1;            
+i = int(f);               // cast to int
 //----------------------------------------------------
 int j=1;
-ring r;
 // dimension of factor ring defined by (x,y)
 // (i.e. R/(x,y)) if it is given by a standard basis
-int i=dim(std(ideal(x,y)));
+i=dim(std(ideal(x,y)));
 int compare = i<j;
 compare;      // 0 (FALSE) if i >= j, 1 (TRUE) if i<j
 //----------------------------------------------------
@@ -486,12 +542,21 @@ exponentiation
 comparison
 @end table
 
+@strong{Note:} An assignment @code{j=i++;} or @code{j=i--;} does not change
+the value of @code{j}, see @ref{Limitations}. 
+
 @strong{Example:}
 @example
 @c example
   int i=1;
-  i++; i ; i--; i; // ++ and -- do not return a value as in C
-  i+2, 2-i, 5^2, 5 div 2, 8%3, 1<2, 2<=2;
+  int j;
+  i++; i;  i--; i;
+  // ++ and -- do not return a value as in C, the variable j is unchanged
+  j = i++; j; i;  
+  j = i--; j; i; 
+  i+2, 2-i, 5^2;
+  5 div 2, 8%3;
+  1<2, 2<=2;
 @c example
 @end example
 
@@ -572,10 +637,15 @@ module (see @ref{vdim})
 @cindex not
 
 A boolean expression is really an int expression used in a logical context:
-@enumerate
-@item
-an int expression (<> 0 evalutates to @emph{TRUE} (represented by 1),
+
+@c item
+@*An int expression (<> 0 evalutates to @emph{TRUE} (represented by 1),
 0 represents @emph{FALSE})
+
+The following is the list of available comparions of objects of a same type.
+@*@strong{Note:} There are no comparisons for ideals and modules, resolution
+and maps.
+@enumerate
 @item
 an integer comparison:
 @example
@@ -598,32 +668,34 @@ a number comparison:
 @end example
 For numbers from Z/p or from field extensions not all operations are useful:
 @* - 0 ist always the smallest element,
-@* - in Z/p the representatives in the range -p/2..p/2 are used for comparisons,
+@* - in Z/p the representatives in the range -p/2..p/2 are used for 
+comparisons,
 @* - in field extensions the last two operations
 (@code{>=,<=}) yield always TRUE (1) and
 the @code{<} and @code{>} are equivalent to @code{!=}.
 @item
-a polynomial comparison:
+a polynomial or vector comparison:
 @example
   f == g
   f != g    // or     f <> g
   f <= g    // comparing the leading term w.r.t. the monomial order
+  f <  g
   f >= g
+  f >  g
 @end example
 @item
-an intvec or intmat comparison:
+an intmat or matrix comparison:
 @example
   v == w
   v != w    // or     v <> w
 @end example
 @item
-a string comparison:
+an intvec or  string comparison:
 @example
   f == g
   f != g    // or     f <> g
   f <= g    // comparing lexicographically
-            // w.r.t. the order specified by ASCII
-  f >= g
+  f >= g    // w.r.t. the order specified by ASCII
   f >  g
   f <  g
 @end example
@@ -632,7 +704,7 @@ boolean expressions combined by boolean operations (@code{and},
 @code{or}, @code{not})
 
 @strong{Note:}
-@strong{All} arguments of a logical expressions are first evaluated and
+All arguments of a logical expressions are first evaluated and
 then the value of the logical expression is determined. For example, the
 logical expressions @code{(a || b)} is evaluated by first evaluating
 @code{a} @emph{and} @code{b}, even though the value of @code{b} has no
@@ -662,6 +734,23 @@ logical or, may also be written as @code{||}
 logical not, may also be written as @code{!}
 @end table
 
+The precedence of of the boolean operations is:
+@enumerate
+@item parentheses
+@item comparisons
+@item not
+@item and
+@item or
+
+@strong{Example:}
+@example
+@c example
+  (1>2) and 3;
+  1 > 2 and 3;
+  ! 0 or 1;
+  !(0 or 1);
+@c example
+@end example
 @c ---------------------------------------
 @node intmat, intvec, int, Data types
 @section intmat
@@ -708,7 +797,7 @@ elements, only the first rows*cols elements are used.
   intmat im[3][5]=1,3,5,7,8,9,10,11,12,13;
   im;
   im[3,2];
-  intmat m[2][3] = im[1..2, 3..5];  // defines a submatrix
+  intmat m[2][3] = im[1..2,3..5];  // defines a submatrix
   m;
 @c example
 @end example
@@ -738,20 +827,24 @@ a typecast to intmat
 @strong{Example:}
 @example
 @c example
-  intmat m[2][3]=1,0,2,4,5,1;
-  m+1;             // adds unit intmat to m
-  m[2,1];          // entry at row 2, col 1
-  intmat m1[3][2]=1,0,2,4,0,1;
-  m1*10;           // multiply each entry with 10
-  m*m1;
-  m+transpose(m1);
+  intmat Idm[3][3];
+  Idm +1;          // add the unit intmat
+  intmat m1[4][2] = _,1,-2;
+  m1;
+  intmat m2[2][3]=1,0,2,4,5,1;
+  transpose(m2);
   intvec v1=1,2,4;
   intvec v2=5,7,8;
-  m=v1,v2;         // overwrite M with v1 and v2
-  m;
-  trace(m);
+  m1=v1,v2;         // overwrite m1 with v1 and v2
+  m1;
+  trace(m1*m2);  
 @c example
 @end example
+@c ref
+See
+@ref{number};
+@ref{Type conversion and casting}.
+@c ref
 
 @c ------------------------------
 @node intmat operations, intmat related functions, intmat expressions, intmat
@@ -767,13 +860,17 @@ negation or subtraction with intmat or int; the int is converted into a
 diagonal intmat
 
 @item @code{*}
-mulitplication with intmat, intvec, or int; the int is converted into a
+multiplication with intmat, intvec, or int; the int is converted into a
 diagonal intmat
 
+@item @code{div, /}
+division of entries in the integers (omitting the remainder)
+@item @code{%, mod} 
+entries modulo int (remainder of the division)
 @item @code{<>}, @code{==}
 comparison
 
-@item intmat_expression @code{[} int_expressions@code{,} int_expression @code{]}
+@item intmat_expression @code{[} intvec_expressions@code{,} intvec_expression @code{]}
 is an intmat entry, where the first index indicates the row and the
 second the column
 @end table
@@ -781,7 +878,23 @@ second the column
 @strong{Example:}
 @example
 @c example
-
+  intmat m[2][4] = 1,0,2,4,0,1,-1,0,3,2,1,-2;
+  m;
+  m[2,3];          // entry at row 2, col 3
+  size(m);         // number of entries
+  intvec v = 1,0,-1,2;
+  m * v;
+  typeof(_);
+  intmat m1[4][3] = 0,1,2,3,v,1;
+  intmat m2 = m * m1; 
+  m2;             //  2 x 3 intmat 
+  m2*10;           // multiply each entry of m with 10;
+  -m2;
+  m2 % 2;
+  m2 div 2;
+  m2[2,1];          // entry at row 2, col 1
+  m1[2..3,2..3];   // submatrix
+  m1[nrows(m1),nrows(m1)];      // the last intmat entry
 @c example
 @end example
 
@@ -791,8 +904,6 @@ second the column
 @cindex intmat related functions
 
 @table @code
-@item bareiss
-Gauss-Bareiss algorithm (see @ref{bareiss})
 @item betti
 Betti numbers of a free resolution (see @ref{betti})
 @item det
@@ -888,23 +999,21 @@ a typecast to intvec
 @strong{Example:}
 @example
 @c example
-  intvec iv=1,3,5,7,8;
-  iv=iv,iv;           // concatenation
-  iv+1;               // add 1 to each entry
-  iv*2;
-  iv;
-  iv-10;
-  iv=iv,0;
-  iv;
-  iv/2;
-  iv+iv;              // componentwise addition
-  iv[size(iv)-1];     // last-1 entry
-  intvec iw=2,3,4,0;
-  iv==iw;             // comparision
-  intmat im[2][4];
-  im=2,3,4,0,1,0,0,0;
-  iv=im*iw;
-  iv;
+  intvec v=-1,2;
+  intvec w=v,v;         // concatenation
+  w;
+  w = -2..2,v,1; 
+  w;
+  intmat m[2][3] = 0,1,2,-2,3,1;
+  m*v;
+  typeof(_);
+  v = intvec(m);
+  v;
+  ring r;
+  poly f = x2z + 2xy-z;
+  f;
+  v = leadexp(f);
+  v;
 @c example
 @end example
 
@@ -939,7 +1048,20 @@ is an element of the intvec; the first element has index one.
 @strong{Example:}
 @example
 @c example
-
+  intvec iv =  1,3,5,7,8;
+  iv+1;               // add 1 to each entry
+  iv*2;
+  iv;
+  iv-10;
+  iv=iv,0;
+  iv;
+  iv/2;
+  iv+iv;              // componentwise addition
+  iv[size(iv)-1];     // last-1 entry
+  intvec iw=2,3,4,0;
+  iv==iw;             // lexicographic comparision 
+  iv < iw;
+  iv != iw;
 @c example
 @end example
 
@@ -1539,6 +1661,8 @@ A list expression is:
 @item
 the empty list @code{list()}
 @item
+a list of expressions of any type
+@item
 an identifier of type list
 @item
 a function returning list
@@ -1568,7 +1692,10 @@ See @ref{Type conversion and casting}.
 @table @asis
 @item @code{+}
 concatenation
-
+@item @code{delete}
+deletes one element from list, returns new list
+@item @code{insert}
+inserts or appends a new elemet to list, returns a new list
 @item list_expression @code{[} int_expression @code{]}
 is a list entry; the index 1 gives the first element.
 @end table
@@ -1576,7 +1703,21 @@ is a list entry; the index 1 gives the first element.
 @strong{Example:}
 @example
 @c example
-
+  list l1 = 1,"hello",list(-1,1);
+  list l2 = list(1,2,3);
+  l1 + l2;          // one new list
+  list l3 =_;    
+  l1,l2;            // two lists
+  l2[2];
+  intvec v =-1,0;
+  l2[2] = v;
+  l2;
+  insert(l1,"one word");
+  l1;               // l1 remains unchanged
+  l1 = insert(l1,list(),2);  // insert empty list after 2 position
+  l1;
+  l3 = delete(l2,2);
+  l3;
 @c example
 @end example
 
@@ -1589,13 +1730,13 @@ is a list entry; the index 1 gives the first element.
 @item betti
 Betti numbers of a resolution (see @ref{betti})
 @item delete
-delete an element from a list (see @ref{delete})
+deletes an element from a list (see @ref{delete})
 @item facstd
 factorizing Groebner basis algorithm (see @ref{facstd})
 @item factorize
 list of factors of a polynomial (see @ref{factorize})
 @item insert
-insert or append a new element to a list (see @ref{insert})
+inserts or appends a new element to a list (see @ref{insert})
 @item lres
 minimal resolution (see @ref{lres})
 @item minres
@@ -2287,9 +2428,24 @@ a typecast to number
 
 @strong{Example:}
 @example
+@c example
+  2 / 3, 4/ 8,  2 /2; // are in any ring int expressions 
+  ring r0=0,x,dp;
   2/3, 4/8, 2/2 ; // are numbers
-  2 / 3, 4/ 8,  2 /2 ; // are int expressions (of value 0, 0 and 1)
-  1.7e-2; 1.7e+2 // are valid (but  1.7e2 not), if the field is `real`
+
+  poly f = 2x2 +1;
+  leadcoef(f);
+  typeof(_);
+  ring rr =real,x,dp;
+  1.7e-2; 1.7e+2; // are valid (but  1.7e2 not), if the field is `real`
+  ring rp = (31,t),x,dp;
+  2/3, 4/8, 2/2 ; // are numbers
+  poly g = (3t2 +1)*x2 +1;
+  leadcoef(g);
+  typeof(_);
+  par(1);
+  typeof(_);
+@c example
 @end example
 @c ref
 See
@@ -2317,10 +2473,26 @@ power, exponentiation (by an integer)
 comparison
 @end table
 
+@strong{Note:} quotient and exponentiation is oply recognized as a number
+expression is if  is alredy a number, see @ref{Pits}.
+For the behaviour ofcomparison operators in rings with basering different
+ from real or the rational numbers, see @ref{boolean expressions}.
+
 @strong{Example:}
 @example
 @c example
-
+  ring r=0,x,dp;
+  number n = 1/2 +1/3;
+  n;
+  n/2;
+  n = 2;
+  n^-2;
+  // the following oddities appear here
+  2/(2+3);
+  number(2)/(2+3);
+  2^-2;
+  number(2)^-2;
+  
 @c example
 @end example
 
@@ -2637,7 +2809,8 @@ of the basering to this new ring.
 none
 @item Note:
 In a qring, polynomials are not immediately reduced with respect
-to the quotient ring.
+to the quotient ring. It will be calculated as long as possible with the
+input as representing objects of their class in the qring.
 @item Example:
 @example
 @c example
@@ -2646,6 +2819,11 @@ to the quotient ring.
   qring q=i;
   basering;
   std(ideal(x+y,x+y+z,z));
+  poly  f= x2 +y + 1;
+  poly g = x+y+z;
+  f,g;
+  f+g;               // not reduced w.r.t to the quotient
+  std(_);            // reduction 
 @c example
 @end example
 @end table
@@ -2661,8 +2839,10 @@ computations. It furthermore enables the use of partial results to
 compute, for example, Betti numbers or minimal resolutions. Like ideals
 and modules, a resolution can only be defined w.r.t. a basering.
 
-To access the elements of a resolution, it has to be assigned to a list
-(which also finishes not yet completed computations).
+@strong{Note:}
+to access the elements of a resolution, it has to be assigned to a list,
+which also complete computations and may therefore take time,
+(resp. an access directly with the brackets @code{[ , ]} causes implicitely a cast to a list).
 
 @menu
 * resolution declarations::
@@ -2708,7 +2888,7 @@ an identifier of type resolution
 @item
 a function returning a resolution
 @item
-a typecast to resolution.
+a typecast to resolution from a list of ideals resp. modules..
 @end enumerate
 
 @c ref
@@ -2818,6 +2998,9 @@ be omitted.
 @c example
   ring r=0,(a,b,c,d),dp;
   r;
+  ring ri=(0,i),(x),lp;     // polynomial ring over the gaussian numbers
+  minpoly = i2+1;
+  ri;
 @c example
 @end example
 @end table
@@ -2856,7 +3039,7 @@ name of the n-th ring variable (see @ref{varstr})
 @cindex string
 
 Variables of type @code{string} are used for output (almost every type
-can be "converted" to @code{string}) and for building user defined
+can be "converted" to @code{string}) and for creating new
 commands at runtime (see @ref{execute}).  They are also return values of
 certain interpreter related functions (see @ref{Functions}).  String
 constants consist of a sequence of ANY characters (including newline!) 
@@ -2923,6 +3106,8 @@ A string expression is:
 @enumerate
 @item
 a sequence of characters between two unescaped quotes (@code{"})
+@item 
+a list of string expressions
 @item
 an identifier of type string
 @item
@@ -2930,7 +3115,7 @@ a function returning string
 @item
 a substring (using the bracket operator)
 @item
-a typecast to string (from any type)
+a typecast to string
 @item
 string expressions combined by the operation @code{+}.
 @end enumerate
@@ -3051,7 +3236,7 @@ can only be defined or accessed with respect to this basering.
 (E.g., if @code{f} and @code{g} are polynomials then
 @code{f*gen(1)+g*gen(3)+gen(4)} may also be written as @code{[f,0,g,1]}
 or as @code{[f,0,g,1,0]}.). Note that the elements of a vector have to be
-surrounded by square brackets (@code{[}, @code{]}).
+surrounded by square brackets (@code{[}  , @code{]}).
 
 @menu
 * vector declarations::
@@ -3105,6 +3290,8 @@ vector expressions combined by the arithmetic operations @code{+} or
 @item
 a poly expression and a vector expression combined by the arithmetic
 operation @code{*}
+@item 
+a typecast to vector using the brackets @code{[} , @code{]}
 @end enumerate
 
 @strong{Example:}
