@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.26 1998-05-24 12:09:22 obachman Exp $
+@comment $Id: examples.doc,v 1.27 1998-05-25 09:24:27 schmidt Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -801,10 +801,10 @@ the miniversal deformations:
 @section Finite fields
 @cindex Finite fields
 
-We define a variety in n-space of codimension 2 defined by polynomials
-of degree d with generic coefficients over the prime field Z/p and look
-for zeroes on the torus. First over the prime field and then in the
-finite extension field with
+We define a variety in @math{n}-space of codimension 2 defined by
+polynomials of degree @math{d} with generic coefficients over the prime
+field @math{Z/p} and look for zeroes on the torus. First over the prime
+field and then in the finite extension field with
 @tex
 $p^k$
 @end tex
@@ -1172,19 +1172,18 @@ from above.
 @section  Ext
 @cindex  Ext
 
-The library @code{homolog.lib} contains
-several procedures for computing Ext-modules and related modules.
-If M is a module, then
+The library @code{homolog.lib} contains several procedures for computing
+Ext-modules and related modules.  If @math{M} is a module, then
 @tex
-$\hbox{Ext}^1(M,M)$ resp. $\hbox{Ext}^2(M,M)$
+$\hbox{Ext}^1(M,M)$ resp.\ $\hbox{Ext}^2(M,M)$
 @end tex
 @ifinfo
 Ext^1(M,M) resp. Ext^2(M,M)
 @end ifinfo
-are the modules of
-infinitesimal deformations resp. of obstructions of M (like T1 and T2
-for a singularity). Similar to the treatment for singularities,
-the semiuniversal deformation of M can be computed (if
+are the modules of infinitesimal deformations resp.@: of obstructions of
+@math{M} (like T1 and T2 for a singularity).  Similar to the treatment
+for singularities, the semiuniversal deformation of @math{M} can be
+computed (if
 @tex
 $\hbox{Ext}^1$
 @end tex
@@ -1205,7 +1204,8 @@ $\hbox{Ext}^k(R/J,R)$
 @ifinfo
 Ext^k(R/J,R)
 @end ifinfo
-if J is an ideal in R since this is faster than the general Ext.
+if @math{J} is an ideal in @math{R} since this is faster than the
+general Ext.
 
 We compute
 @itemize @bullet
@@ -1224,7 +1224,7 @@ and obstructions
 @ifinfo
 (=Ext^2(K,K))
 @end ifinfo
-of the residue field K=R/m of an ordinary cusp,
+of the residue field @math{K=R/m} of an ordinary cusp,
 @tex
 R=Loc$_K[x,y]/(x^2-y^3)$, m=($x,y$).
 @end tex
@@ -1239,7 +1239,7 @@ $\hbox{Ext}^1(m,m)$
 Ext^1(m,m),
 @end ifinfo
 here we have to compute @code{Ext(1,syz(m),syz(m))} with
-@code{syz(m)} the first syzygy module of m, which is isomorphic to
+@code{syz(m)} the first syzygy module of @math{m}, which is isomorphic to
 @tex
 $\hbox{Ext}^2(K,K)$.
 @end tex
@@ -1253,7 +1253,7 @@ $\hbox{Ext}^k(R/i,R)$
 @ifinfo
 Ext^k(R/i,R)
 @end ifinfo
-for some ideal i and with an extra option
+for some ideal @math{i} and with an extra option
 @end itemize
 
 @example
@@ -1301,23 +1301,23 @@ $f\in k[x_1,\ldots,x_n,t]$
 @ifinfo
 f in k[x1,...,xn,t]
 @end ifinfo
-with respect to t (we may consider f=0 as a family of hypersurfaces
-parametrized by t) is defined as the Zariski closure of
+with respect to @math{t} (we may consider @math{f=0} as a family of
+hypersurfaces parametrized by @math{t}) is defined as the Zariski
+closure of
 @tex
 $V(\partial f/\partial x_1,\ldots,\partial f/\partial x_n) \setminus V(f)$
 @end tex
 @ifinfo
 V(diff(f,x1),...,diff(f,xn)) \ V(f)
 @end ifinfo
-if this happens to be a curve.
-(Some authors consider
+if this happens to be a curve.  Some authors consider
 @tex
 $V(\partial f/\partial x_1,\ldots,\partial f/\partial x_n)$
 @end tex
 @ifinfo
 V(diff(f,x1),...,diff(f,xn))
 @end ifinfo
-itself as polar curve.)
+itself as polar curve.
 
 We may consider projective hypersurfaces
 @tex
@@ -1343,9 +1343,9 @@ or germs of hypersurfaces
 getting in this way
 projective, affine or local polar curves.
 
-We shall compute now this for a family of curves.
-We need the library @code{elim.lib} for saturation and @code{sing.lib}
-for the singular locus. 
+We shall compute now this for a family of curves.  We need the library
+@code{elim.lib} for saturation and @code{sing.lib} for the singular
+locus.
 
 @example
 @c example
@@ -1435,19 +1435,18 @@ D$_k$(R)
 @ifinfo
 D_k(R)
 @end ifinfo
-of the variety defined by the (m+1)-minors of generic symmetric nxn matrix.
-We do this by computing the resolution over the polynomial ring.
-Then, by the Auslander-Buchsbaum formula, the depth is equal to
-the number of variable minus the length of a minimal resolution.
-This example was suggested by U. Vetter in order to check wheter his
-bound
+of the variety defined by the @math{(m+1)}-minors of generic symmetric
+nxn matrix.  We do this by computing the resolution over the polynomial
+ring.  Then, by the Auslander-Buchsbaum formula, the depth is equal to
+the number of variable minus the length of a minimal resolution.  This
+example was suggested by U.@: Vetter in order to check wheter his bound
 @tex
 $\hbox{depth}(\hbox{D}_k(R))\geq m(m+1)/2 + m-1$
 @end tex
 @ifinfo
 depth(D_k(R)) >= m(m+1)/2 + m-1
 @end ifinfo
-could be improved.)
+could be improved.
 
 @example
 @c example
@@ -1584,8 +1583,8 @@ degree(j);
 @section G_a -Invariants
 @cindex G_a -Invariants
 
-We work in characteristic 0 and use the Lie algebra generated
-by one vectorfield of the form
+We work in characteristic 0 and use the Lie algebra generated by one
+vectorfield of the form
 @tex
 $\sum x_i \partial /\partial x_{i+1}$.
 @end tex
@@ -1629,23 +1628,22 @@ Two algorithms to compute the invariant ring are implemented in
 @sc{Singular}, @code{invariant_ring} and @code{invariant_ring_random},
 both by Agnes E. Heydtmann (@code{agnes@@math.uni-sb.de}):
 
-Bases of homogeneous invariants are generated successively and those
-are chosen as primary invariants that lower the dimension of the ideal
+Bases of homogeneous invariants are generated successively and those are
+chosen as primary invariants that lower the dimension of the ideal
 generated by the previously found invariants (see paper "Generating a
 Noetherian Normalization of the Invariant Ring of a Finite Group" by
-Decker, Heydtmann, Schreyer (1997) to appear in JSC). In the
-non-modular case secondary invariants are calculated by finding a
-basis (in terms of monomials) of the basering modulo the primary
-invariants, mapping to invariants with the Reynolds operator and using
-those or their power products such that they are linearly independent
-modulo the primary invariants (see paper "Some Algorithms in Invariant
-Theory of Finite Groups" by Kemper and Steel (1997)). In the modular
-case they are generated according to "Generating Invariant Rings of
-Finite Groups over Arbitrary Fields" by Kemper (1996, to appear in
-JSC).
+Decker, Heydtmann, Schreyer (1997) to appear in JSC).  In the
+non-modular case secondary invariants are calculated by finding a basis
+(in terms of monomials) of the basering modulo the primary invariants,
+mapping to invariants with the Reynolds operator and using those or
+their power products such that they are linearly independent modulo the
+primary invariants (see paper "Some Algorithms in Invariant Theory of
+Finite Groups" by Kemper and Steel (1997)).  In the modular case they
+are generated according to "Generating Invariant Rings of Finite Groups
+over Arbitrary Fields" by Kemper (1996, to appear in JSC).
 
-We calculate now an example from
-Sturmfels: "Algorithms in Invariant Theory 2.3.7:".
+We calculate now an example from Sturmfels: "Algorithms in Invariant
+Theory 2.3.7":
 
 @example
 @c example
@@ -1680,10 +1678,9 @@ Sturmfels: "Algorithms in Invariant Theory 2.3.7:".
 @section Factorization
 @cindex Factorization
 
-The factorization of polynomials is is implemented in
-the C++ -libraries 'factory' (written mainly by
-Ruediger Stobbe) and 'libfac' (written by Michael
-Messollen) which are part of the @sc{Singular} system.
+The factorization of polynomials is implemented in the C++ libraries
+Factory (written mainly by Ruediger Stobbe) and libfac (written by
+Michael Messollen) which are part of the @sc{Singular} system.
 
 @example
 @c example
@@ -1708,23 +1705,19 @@ Messollen) which are part of the @sc{Singular} system.
 @section Puiseux pairs
 @cindex Puiseux pairs
 
-The Puiseux pairs of an irreducible and reduced curve
-singularity are its most important invariants.
-They can be computed from its Hamburger-Noether expansion.
-The library @code{hnoether.lib} written by Martin Lamm uses
-the algorithm of Antonio Campillo "Algebroid curves
-in positive characteristic" SLN 813, 1980.
-This algorithm has the advantage that it needs least
-possible field extensions and, moreover, works in
-any characteristic. This fact can be used to compute
-the invariants over a field of finite characteristic, say
-32003, which will then be most probably be the same
-in characteristic 0.
+The Puiseux pairs of an irreducible and reduced curve singularity are
+its most important invariants.  They can be computed from its
+Hamburger-Noether expansion.  The library @code{hnoether.lib} written by
+Martin Lamm uses the algorithm of Antonio Campillo "Algebroid curves in
+positive characteristic" SLN 813, 1980.  This algorithm has the
+advantage that it needs least possible field extensions and, moreover,
+works in any characteristic. This fact can be used to compute the
+invariants over a field of finite characteristic, say 32003, which will
+then be most probably be the same in characteristic 0.
 
-We compute the Hamburger-Noether expansion of some
-plane curve singularities given by a polynomial f in
-two variables. This is a matrix which allows to
-compute the parametrization (up to a given order)
+We compute the Hamburger-Noether expansion of some plane curve
+singularities given by a polynomial @math{f} in two variables. This is a
+matrix which allows to compute the parametrization (up to a given order)
 and all numerical invariants like
 @itemize @bullet
 @item
@@ -1738,10 +1731,9 @@ and all numerical invariants like
 @item
     generators of semigroup
 @end itemize
-Besides this, the library contains procedures to
-compute the Newton polygon of f, the squarefree part
-of f and a procedure to convert one set of invariants to
-another.
+Besides this, the library contains procedures to compute the Newton
+polygon of @math{f}, the squarefree part of @math{f} and a procedure to
+convert one set of invariants to another.
 
 
 @example
@@ -1787,9 +1779,9 @@ another.
 
 There are two algorithms implemented in @sc{Singular} which provide
 primary decomposition: @code{primdecGTZ}, based on
-Gianni/Trager/Zacharias (written by Gerhard Pfister)
-and @code{primdecSY}, based on Shimoyama/Yokoyama
-(written by Wolfram Decker and Hans Schoenemann).
+Gianni/Trager/Zacharias (written by Gerhard Pfister) and
+@code{primdecSY}, based on Shimoyama/Yokoyama (written by Wolfram Decker
+and Hans Schoenemann).
 
 The result of primdecGTZ is returned as a list of ideals,
 where the even indexed ideals form the prime ideal and the odd indexed
