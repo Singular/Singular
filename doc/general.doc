@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.86 1998-05-19 14:05:49 wichmann Exp $
+@comment $Id: general.doc,v 1.87 1998-05-19 14:35:55 schmidt Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -66,9 +66,9 @@ the online help is accessible by means of the @code{help} function
 @subsection How to enter and exit
 @cindex How to enter and exit
 
-To start @sc{Singular}, enter @code{Singular} at the system prompt. The 
-@sc{Singular} banner appears which, among others, reports the version and
-compilation date.
+To start @sc{Singular}, enter @code{Singular} at the system prompt. The
+@sc{Singular} banner appears which, among others, reports the version
+and the compilation date.
 
 To exit @sc{Singular} type @code{quit;}, @code{exit;} or @code{$}.
 
@@ -88,18 +88,18 @@ Singular  [options] [file1 [file2 ...]]
 @cindex error recovery
 The @sc{Singular} prompt @code{>} (larger than) asks the user for input
 of commands.  The ``continuation'' prompt @code{.} (period) asks the
-user for input of missing parts of a command (remember the semicolon
-@code{;} at the end of every command).
+user for input of missing parts of a command (remember the semicolon at
+the end of every command).
 
 @sc{Singular} does not interpret the semicolon as the end of a command
 if it occures inside a string.  Also, @sc{Singular} waits for blocks
-(sequences of commands enclosed in curly brackets) to close before
+(sequences of commands enclosed in curly brackets) to be closed before
 prompting with @code{>} for more commands.  Thus, if @sc{Singular} does
 not respond with its regular prompt after typing a semicolon it may wait
 for a @code{"} or a @code{@}} first.
 
-Additional @code{;} will not harm @sc{Singular} since extra semicolons
-are interpreted as empty statements.
+Additional semicolons will not harm @sc{Singular} since they are
+interpreted as empty statements.
 
 @c --------------------------------------------------------------------------
 @node The online help system,Interrupting SINGULAR, The SINGULAR prompt,Interactive use
@@ -115,15 +115,14 @@ name or, more generally, the name of any section of the printed manual.
 @xref{help}, for more information.
 
 On Unix-like operating systems, the online help system is based on the
-@code{info} program from the Gnu @code{texinfo} package.  @xref{Top,
-An Introduction to Info, Getting started, info, The Info Manual}, for
-more information.
+@code{info} program from the Gnu @code{texinfo} package.  @xref{Top, An
+Introduction to Info, Getting started, info, The Info Manual}, for more
+information.  On Windows NT, the online help system is not interactively
+as described in the remainder of this section.  Instead, after
+displaying the information @sc{Singular} immediately returns to the
+input prompt.
 
-On Windows NT, the online help system is not interactively as described
-below.  Instead, after displaying the information @sc{Singular}
-immediately returns to the input prompt.
-
-The whole manual is decomposed into ``nodes'' of information, closely
+The online manual is decomposed into ``nodes'' of information, closely
 related to the division of the printed manual into sections and
 subsections.  A node contains text describing a specific topic at a
 specific level of detail.  The top line of a node is its ``header''.
@@ -223,8 +222,8 @@ moves cursor to beginning of line
 moves cursor to end of line
 @item CTRL-D
 deletes character under cursor
-@* Warning: on an empty line, @code{CTRL-D} evaluates to @code{EOF},
-which immediately terminates @sc{Singular}.
+@* Warning: on an empty line, @code{CTRL-D} is interpreted as the
+@code{EOF} character which immediately terminates @sc{Singular}.
 @item BACKSPACE
 @itemx DELETE
 @itemx CTRL-H
@@ -369,12 +368,12 @@ On start-up, @sc{Singular}
 @enumerate
 @item
 loads the library @code{standard.lib} (provided the @code{--no-stdlib}
-was not given),
+option was not given),
 
 @item
 searches the current directory and then the
 home directory of the user for a file named @code{.singularrc} and
-executes it, if found (provided the @code{--no-rc} options was not
+executes it, if found (provided the @code{--no-rc} option was not
 given),
 
 @item
@@ -387,7 +386,7 @@ line) in that order.
 @end enumerate
 
 Unless specified otherwise, @sc{Singular} locates all libraries and ASCII
-data files by first searching the current working directory, and then by
+data files by first searching the current working directory, then by
 searching through all the directories specified by the environment
 variable @code{SINGULARPATH} (@code{SPATH} on DOS-based systems), and,
 finally, by searching through some default directories.
@@ -398,68 +397,67 @@ finally, by searching through some default directories.
 @section Rings and orderings
 @cindex Rings and orderings
 
-All advanced algorithms in @sc{Singular} require the prior definition of
+All non-trivial algorithms in @sc{Singular} require the prior definition of
 a ring. Such a ring can be
 
 @enumerate
 @item
-a polynomial ring over a field
+a polynomial ring over a field,
 @item
-a series ring, i.e a localization of a polynomial ring
+a localization of a polynomial ring,
 @item
-a quotient ring by an ideal of one of the above
+a quotient ring by an ideal of one of 1.@: or 2.,
 @item
-a tensor products of one of the above
+a tensor product of one of 1.@: or 2.
 @end enumerate
 
-The rings are realized by choosing an appropriate global or local
-ordering. @xref{Term orderings}, @ref{Mathematical background}. 
+All of these rings are realized by choosing an appropriate global or
+local monomial ordering on the ring variables. @xref{Term orderings},
+@ref{Mathematical background}.
 
-The coefficient field of these rings may be
+The coefficient field of the rings may be
 
 @enumerate
 @item
-the rational numbers Q (char 0)
-@item
-a finite field Z/p, p a prime <= 32003 (char p)
+the field of rational numbers Q,
 @item
 @tex
-a finite field with $q=p^n$ elements ($p^n \le 2^{15}$)
+finite fields $Z/p$, $p$ a prime $\le 32003$,
 @end tex
 @ifinfo
-a finite field with q=p^n elements (p^n<=2^15)
+finite fields Z/p, p a prime <= 32003,
 @end ifinfo
 @item
-transcendental extension K(A,B,C,...), K=Q or Z/p
+@tex
+finite fields $\hbox{GF}(p^n)$ with $p^n$ elements, $p$ a prime, $p^n \le 2^{15}$,
+@end tex
+@ifinfo
+finite fields GF(p^n) with p^n elements, p a prime, p^n <= 2^15,
+@end ifinfo
 @item
-algebraic extension K[A]/minpoly, K=Q or Z/p
+transcendental extension of Q or Z/p,
 @item
-floating point real numbers with simple precision (real)
+simple algebraic extension of Q or Z/p,
+@item
+the field of real numbers represented by simple precision floating point
+numbers.
 @end enumerate
 
 Throughout this manual, the current active ring in @sc{Singular} is
 called basering. The reserved name @code{basering} in @sc{Singular} is
-an alias for the current active ring.
-
-The basering can be set by declaring a new ring as described in the
-following subsections or with the commands @code{setring} and
-@code{keepring}. Objects of ring dependent types are local to a ring. To
-access them after a change of the basering they have to be mapped using
-maps or by the functions @code{imap} or @code{fetch}.
-
-@c @ref
-See
-@ref{Objects};
-@ref{fetch};
-@ref{imap};
-@ref{keepring};
-@ref{map};
+an alias for the current active ring.  The basering can be set by
+declaring a new ring as described in the following subsections or with
+the commands @code{setring} and @code{keepring}. @xref{keepring};
 @ref{setring}.
-@c @ref
+
+Objects of ring dependent types are local to a ring. To access them
+after a change of the basering they have to be mapped using maps or by
+the functions @code{imap} or @code{fetch}. @xref{Objects}; @ref{fetch};
+@ref{imap}; @ref{map}.
 
 All changes of the basering in a procedure are local to this procedure
 unless a @code{keepring} command is used as the last statement of the
-procedure. @xref{Procedures} and @ref{keepring}.
+procedure. @xref{Procedures}, @ref{keepring}.
 
 @menu
 * Examples of ring declarations::
@@ -473,18 +471,13 @@ procedure. @xref{Procedures} and @ref{keepring}.
 @cindex Examples of ring declarations
 
 The exact syntax of a ring declaration is given in the next two
-subsections; this subsections lists some examples first.
+subsections; this subsection lists some examples first.
 
 @itemize @bullet
 @item
-the ring 
-@tex
-$Z/32003Z[x,y,z]$
-@end tex
-@ifinfo
-Z/32003Z[x,y,z]
-@end ifinfo
-with degree reverse lexicographical ordering (this is the default ring): 
+the ring @math{Z/32003[x,y,z]} with degree reverse lexicographical
+ordering.  The exact ring declaration may be omitted in the first
+example since this is the default ring:
 
 @example
 ring r;
@@ -492,104 +485,90 @@ ring r = 32003,(x,y,z),dp;
 @end example
 
 @item
-the ring
-@tex
-$Q[a,b,c,d]$
-@end tex
-@ifinfo
-Q[a,b,c,d]
-@end ifinfo
-with lexicographical ordering:
+the ring @math{Q[a,b,c,d]} with lexicographical ordering:
 
 @example
 ring r = 0,(a,b,c,d),lp;
 @end example
 
 @item
-the ring
-@tex
-$Z/32003Z[x,y,z]$
-@end tex
-@ifinfo
-Z/32003Z[x,y,z]
-@end ifinfo
-with local degree reverse lexicographical ordering:
+the ring @math{Z/7[x,y,z]} with local degree reverse lexicographical
+ordering.  The non-prime 10 is converted to the next lower prime in the
+second example:
 
 @example
-ring r = 32003,(x,y,z),ds;
+ring r = 7,(x,y,z),ds;
+ring r = 10,(x,y,z),ds;
 @end example
 
 @item
 the ring
 @tex
-$Z/7Z[x_1,\ldots,x_6]$
+$Z/7[x_1,\ldots,x_6]$
 @end tex
 @ifinfo
-Z/7Z[x1,...,x6]
+Z/7[x1,...,x6]
 @end ifinfo
 with lexicographical ordering for
 @tex
-$x_1$ and $x_2$
+$x_1,\ldots,x_3$
 @end tex
 @ifinfo
-x1 and x2
+x1,...,x3
 @end ifinfo
 and degree reverse lexicographical ordering for
 @tex
-$x_3,\ldots,x_6$:
+$x_4,\ldots,x_6$:
 @end tex
 @ifinfo
-x3,...,x6:
+x4,...,x6:
 @end ifinfo
 
 @example
-ring r= 7,( x(1..6) ),( lp(2),dp(4) );
-ring r=10,( x(1..6) ),( lp(2),dp(4) );
+ring r=7,(x(1..6)),(lp(3),dp);
 @end example
 
 @item
-the ring
-@tex
-@end tex
-@ifinfo
-@end ifinfo
+the localization of @math{(Q[a,b,c])[x,y,z]} at the maximal ideal
+@math{(x,y,z)}:
 
 @example
 ring r3=0,(x,y,z,a,b,c),(ds(3), dp(3));
 @end example
 
 @item
-the ring
-@tex
-@end tex
-@ifinfo
-@end ifinfo
+the ring @math{Q[x,y,z]} with weighted reverse lexicographical ordering.
+The variables @math{x}, @math{y}, and @math{z} have the weights 2, 1,
+and 3, resp.  Vectors are ordered by components first, then by
+monomials.  Vector components are ordered in descending order.  For
+ascending order, component ordering @code{C} would have been specified:
 
 @example
-ring r=0,(x,y,z),(c,dp);
+ring r=0,(x,y,z),(c,wp(2,1,3));
 @end example
 
 @item
-the ring
-@tex
-@end tex
-@ifinfo
-@end ifinfo
-with degree lexicographical ordering:
+the ring @math{K[x,y,z]}, where @math{K=Z/7(a,b,c)} denotes the
+transcendental extension of @math{Z/7} by @math{a}, @math{b}, and
+@math{c}, with degree lexicographical ordering:
 
 @example
-ring r=(7,a),(x,y,z),Dp;
+ring r=(7,a,b,c),(x,y,z),Dp;
 @end example
 
 @item
-the ring 
+the ring @math{K[x,y,z]}, where @math{K=Z/7[a]} denotes the algebraic extension of
+degree 2 of @math{Z/7} by @math{a}. In other words, @math{K} is the finite field with
+49 elements.  In the first case, @math{a} denotes an algebraic element over
+@math{Z/7} with minimal polynomial
 @tex
-$K[x,y,z]$ where $K$ is $Z/7Z[a] / a^2+a+3$,
+$\mu_a=a^2+a+3$,
 @end tex
 @ifinfo
-K[x,y,z], where K is Z/7Z[a] / a^2+a+3,
+mu_a=a^2+a+3,
 @end ifinfo
-the finite field with 49 elements:
+in the second case, @math{a}
+refers to some generator of the cyclic group of unities of @math{K}:
 
 @example
 ring r=(7,a),(x,y,z),dp; minpoly=a^2+a+3;
@@ -597,25 +576,11 @@ ring r=(7^2,a),(x,y,z),dp;
 @end example
 
 @item
-the ring
-@tex
-@end tex
-@ifinfo
-@end ifinfo
+the ring @math{R'[x,y,z]}, where @math{R'} denotes the field of real
+numbers represented by simple precision floating point numbers:
 
 @example
-ring r8=(181,A,B,Z),(x,y,z),dp;
-@end example
-
-@item
-the ring
-@tex
-@end tex
-@ifinfo
-@end ifinfo
-
-@example
-ring r9=real,(x,y,z),dp;
+ring r = real,(x,y,z),dp;
 @end example
 @end itemize
 
@@ -637,72 +602,76 @@ ring r9=real,(x,y,z),dp;
 @item @strong{Default:}
 @code{32003,(x,y,z),(dp,C);}
 @item @strong{Purpose:}
-defines a basering and sets it as the actual basering.
+declares a ring and sets it as the actual basering.
 @end table
 The coefficient_field is given by one of the following:
 @enumerate
 @item
 a non-negative int_expression less or equal 32003.
-@* The int_expression should either be 0, representing the field of
-rational numbers Q, or a prime number p, representing the finite field
-with p elements; if it is not a prime number, int_expression is
+@* The int_expression should either be 0, specifying the field of
+rational numbers Q, or a prime number p, specifying the finite field
+with p elements.  If it is not a prime number, int_expression is
 converted to the next lower prime number.
 
 @item
 an expression_list of an int_expression and one or more names.
 @* The int_expression specifies the characteristic of the coefficient
-field as above. The names are used as parameters in transcendental or
-algebraic extensions of the coefficient field. Algebraic extensions are
-implemented for one parameter only. In this case, a minimal polynomial
-has to be defined by assignment to @code{minpoly}. @xref{minpoly}.
+field as described above. The names are used as parameters in
+transcendental or algebraic extensions of the coefficient
+field. Algebraic extensions are implemented for one parameter only. In
+this case, a minimal polynomial has to be defined by assignment to
+@code{minpoly}. @xref{minpoly}.
 
 @item
 an expression_list of an int_expression and a name.
 @* The int_expression has to be a prime number p to the power of a
 positive integer n. This defines the Galois field
 @tex
-$GF(p^n)$ with $p^n$ elements, where $p^n$ has to be smaller or equal $2^{15}$.
+$\hbox{GF}(p^n)$ with $p^n$ elements, where $p^n$ has to be smaller or equal $2^{15}$.
 @end tex
 @ifinfo
 GF(p^n) with p^n elements, where p^n has to be smaller or equal 2^15.
 @end ifinfo
 The given name refers to a primitive element of
 @tex
-$GF(p^n)$
+$\hbox{GF}(p^n)$
 @end tex
 @ifinfo
 GF(p^n)
 @end ifinfo
-generating the multiplicative group.
+generating the multiplicative group.  Due to a different internal
+representation, the arithemtic operations in these coefficient fields
+are faster than arithmetic operations in algebraic extensions as
+described above.
 
 @item
-the name @code{real}
+the name @code{real}.
 @* This specifies the field of real numbers represented as machine
-floating point numbers. Note that computing over this field is not
+floating point numbers. Note that computations over this field are not
 exact.
 @end enumerate
 
 The names_of_ring_variables is a list of names or indexed names.
+
 The ordering is a list of block orderings where each block ordering is either
 
 @enumerate
 @item
-@code{lp}, @code{dp}, @code{Dp}, @code{ls}, @code{ds}, @code{Ds},
-optionally followd by a size parameter in parentheses.
+@code{lp}, @code{dp}, @code{Dp}, @code{ls}, @code{ds}, or @code{Ds}
+optionally followed by a size parameter in parentheses.
 
 @item
-@code{wp}, @code{Wp}, @code{ws}, @code{Ws}, @code{a} followed by a
+@code{wp}, @code{Wp}, @code{ws}, @code{Ws}, or @code{a} followed by a
 weight vector given as an intvec_expression in parentheses.
 
 @item
 @code{M} followed by an intmat_expresion in parantheses.
 
 @item
-@code{c}, @code{C} which may be specified only as the first or last
-block ordering.
+@code{c} or @code{C}.
 @end enumerate
 
-For the definition of these orderings, see @ref{Term orderings} and
+For the definition of these orderings, see @ref{Term orderings},
 @ref{Mathematical background}.
 
 @c ------------------------------------------------------------
