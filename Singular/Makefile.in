@@ -293,8 +293,8 @@ Singular-static-bindist: mod2.h Makefile version.h scanner.cc si_paths.h \
 	mv Singular-static Singular-static-bindist
 
 tar:
-	tar cf ${DISTNAME}.tar ${DISTFILES}
-	gzip -f ${DISTNAME}.tar
+	tar cf Singular-${SINGULAR_VERSION}-src.tar ${DISTFILES}
+	gzip -f Singular-${SINGULAR_VERSION}-src.tar
 
 
 TAGS:
