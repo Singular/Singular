@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.182 2000-07-27 15:47:50 obachman Exp $
+@comment $Id: general.doc,v 1.183 2000-11-17 17:01:58 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -2510,6 +2510,8 @@ Names may not coincide with reserved names (keywords).  Type
 @xref{reservedName}.  Names should not interfere with names of ring
 variables or, more generally, with monomials.  @xref{Identifier
 resolution}.
+@* The command @code{listvar} provides a list of the names in use
+(@pxref{listvar}).
 
 The most recently printed expression is available
 under the special name @code{_}, e.g.,
