@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.212 2000-05-25 11:43:02 Singular Exp $ */
+/* $Id: iparith.cc,v 1.213 2000-05-25 13:26:45 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -5048,7 +5048,7 @@ struct sValCmdM dArithM[]=
 ,{jjCALL2ARG,  INTERSECT_CMD,   IDEAL_CMD,          2  }
 ,{jjINTERSECT_PL,INTERSECT_CMD, IDEAL_CMD,          -2 }
 ,{jjCALL1ARG,  INTVEC_CMD,      INTVEC_CMD,         1  }
-,{jjINTVEC_PL, INTVEC_CMD,      INTVEC_CMD,         -1 }
+,{jjINTVEC_PL, INTVEC_CMD,      INTVEC_CMD,         -2 }
 ,{jjLIST_PL,   LIST_CMD,        LIST_CMD,           -1 }
 ,{jjCALL1ARG,  MODUL_CMD,       MODUL_CMD,          1  }
 ,{jjIDEAL_PL,  MODUL_CMD,       MODUL_CMD,          -1 }
