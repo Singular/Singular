@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_inout.cc,v 1.1.1.1 2003-10-06 12:15:56 Singular Exp $ */
+/* $Id: mpr_inout.cc,v 1.2 2004-01-20 15:17:45 bricken Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultant
@@ -96,7 +96,7 @@ void mprPrintError( mprState state, const char * name )
 mprState mprIdealCheck( const ideal theIdeal,
                         const char * name,
                         uResultant::resMatType mtype,
-                        BOOLEAN rmatrix= false )
+                        BOOLEAN rmatrix )
 {
   mprState state = mprOk;
   int power;

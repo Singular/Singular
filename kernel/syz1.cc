@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.1.1.1 2003-10-06 12:15:55 Singular Exp $ */
+/* $Id: syz1.cc,v 1.2 2004-01-20 15:17:46 bricken Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -2025,7 +2025,7 @@ void syPrint(syStrategy syzstr)
 * from the LaScala-resolution
 */
 resolvente syReorder(resolvente res,int length,
-        syStrategy syzstr,BOOLEAN toCopy=TRUE,resolvente totake=NULL)
+        syStrategy syzstr,BOOLEAN toCopy,resolvente totake)
 {
   int i,j,l;
   poly p,q,tq;
