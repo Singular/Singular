@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.22 1998-04-22 07:49:04 Singular Exp $ */
+/* $Id: longalg.cc,v 1.23 1998-04-23 09:16:25 schmidt Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1808,6 +1808,10 @@ number naGcd(number a, number b)
 * cancels monomials
 * occuring in denominator
 * and enumerator  ?          naNumbOfPar != 1;
+*
+* #defines for Factory:
+* FACTORY_GCD_TEST: do not apply built in gcd for
+*   univariate polynomials, always use Factory
 */
 void naNormalize(number &pp)
 {
@@ -1911,6 +1915,7 @@ void naNormalize(number &pp)
     p->n = NULL;
     return;
   }
+#ifndef FACTORY_GCD_TEST
   if (naNumbOfPar == 1) /* apply built-in gcd */
   {
     alg x1,y1;
@@ -1978,8 +1983,11 @@ void naNormalize(number &pp)
       }
     }
   }
+#endif /* FACTORY_GCD_TEST */
 #ifdef HAVE_FACTORY
+#ifndef FACTORY_GCD_TEST
   else
+#endif
   {
     alg xx,yy;
     singclap_algdividecontent(x,y,xx,yy);
