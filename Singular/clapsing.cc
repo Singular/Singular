@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.62 2000-04-11 14:09:39 Singular Exp $
+// $Id: clapsing.cc,v 1.63 2000-04-11 14:48:25 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -498,77 +498,89 @@ void singclap_divide_content ( poly f )
     pSetCoeff( f, nInit( 1 ) );
     return;
   }
-
-  if (rField_is_Zp_a())
-  {
-    setCharacteristic( -nGetChar() );
-  }
-  else if (rField_is_Q_a())
-  {
-    setCharacteristic( 0 );
-  }
   else
-    return; /* not implemented R, long R, long C, GF, Z/p */
-
-  CFList L;
-  CanonicalForm g, h;
-  poly p = pNext(f);
-
-  // first attemp: find 2 smallest g:
-
-  number g1=pGetCoeff(f);
-  number g2=pGetCoeff(p); // p==pNext(f);
-  pIter(p);
-  int sz1=nSize(g1);
-  int sz2=nSize(g2);
-  if (sz1>sz2)
   {
-    number gg=g1;
-    g1=g2; g2=gg;
-    int sz=sz1;
-    sz1=sz2; sz2=sz;
-  }
-  while (p!=NULL)
-  {
-    int n_sz=nSize(pGetCoeff(p));
-    if (n_sz<sz1)
-    {
-      sz2=sz1;
-      g2=g1;
-      g1=pGetCoeff(p);
-      sz1=n_sz;
-      if (sz1<=3) break;
-    }
-    else if(n_sz<sz2)
-    {
-      sz2=n_sz;
-      g2=pGetCoeff(p);
-      sz2=n_sz;
-    }
+    if ( nGetChar() == 1 )
+      setCharacteristic( 0 );
+    else  if ( nGetChar() == -1 )
+      return; /* not implemented for R */
+    else  if ( nGetChar() < 0 )
+      setCharacteristic( -nGetChar() );
+    else if (currRing->parameter==NULL) /* not GF(q) */
+      setCharacteristic( nGetChar() );
+    else
+      return; /* not implemented*/
+
+    CFList L;
+    CanonicalForm g, h;
+    poly p = pNext(f);
+
+    // first attemp: find 2 smallest g:
+
+    number g1=pGetCoeff(f);
+    number g2=pGetCoeff(p); // p==pNext(f);
     pIter(p);
-  }
-  if (sz1 > 4) return; // do only a simple gcd
-  FACTORY_ALGOUT( "G", ((lnumber)g1)->z );
-  g = convSingTrClapP( ((lnumber)g1)->z );
-  g = gcd( g, convSingTrClapP( ((lnumber)g2)->z ));
+    int sz1=nSize(g1);
+    int sz2=nSize(g2);
+    if (sz1>sz2)
+    {
+      number gg=g1;
+      g1=g2; g2=gg;
+      int sz=sz1;
+      sz1=sz2; sz2=sz;
+    }
+    while (p!=NULL)
+    {
+      int n_sz=nSize(pGetCoeff(p));
+      if (n_sz<sz1)
+      {
+        sz2=sz1;
+        g2=g1;
+        g1=pGetCoeff(p);
+        sz1=n_sz;
+        if (sz1<=3) break;
+      }
+      else if(n_sz<sz2)
+      {
+        sz2=n_sz;
+        g2=pGetCoeff(p);
+        sz2=n_sz;
+      }
+      pIter(p);
+    }
+    FACTORY_ALGOUT( "G", ((lnumber)g1)->z );
+    g = convSingTrClapP( ((lnumber)g1)->z );
+    g = gcd( g, convSingTrClapP( ((lnumber)g2)->z ));
 
-  // second run: gcd's
+    // second run: gcd's
 
-  p = f;
-  TIMING_START( contentTimer );
-  while ( (p != NULL) && (g != 1)  && ( g != 0))
-  {
-    FACTORY_ALGOUT( "h", (((lnumber)pGetCoeff(p))->z) );
-    h = convSingTrClapP( ((lnumber)pGetCoeff(p))->z );
-    pIter( p );
-    g = gcd( g, h );
-    L.append( h );
+    p = f;
+    TIMING_START( contentTimer );
+    while ( (p != NULL) && (g != 1)  && ( g != 0))
+    {
+      FACTORY_ALGOUT( "h", (((lnumber)pGetCoeff(p))->z) );
+      h = convSingTrClapP( ((lnumber)pGetCoeff(p))->z );
+      pIter( p );
+#ifdef FACTORY_GCD_STAT
+      // save g
+      CanonicalForm gOld = g;
+#endif
+
+#ifdef FACTORY_GCD_TEST
+      g = CFPrimitiveGcdUtil::gcd( g, h );
+#else
+      g = gcd( g, h );
+#endif
+
+      FACTORY_GCDSTAT( "gcnt:", gOld, h, g );
+      FACTORY_CFTROUT( "g", g );
+      L.append( h );
+    }
+    TIMING_END( contentTimer );
+    FACTORY_CONTSTAT( "cont:", g );
     if (( g == 1 ) || (g == 0))
     {
       pTest(f);
-      #ifdef LDEBUG
-      PrintS("=> gcd 0 in divide_content\n");
-      #endif
       return;
     }
     else
@@ -1270,7 +1282,6 @@ alg singclap_alglcm ( alg f, alg g )
 
 void singclap_algdividecontent ( alg f, alg g, alg &ff, alg &gg )
 {
- On(SW_USE_SPARSEMOD);
  FACTORY_ALGOUT( "f", f );
  FACTORY_ALGOUT( "g", g );
 
@@ -1290,14 +1301,14 @@ void singclap_algdividecontent ( alg f, alg g, alg &ff, alg &gg )
 #ifdef FACTORY_GCD_TEST
    GCD=CFPrimitiveGcdUtil::gcd( F, G );
 #else
-   GCD=gcd ( F, G );
+   GCD=gcd( F, G );
 #endif
    TIMING_END( algContentTimer );
 
    FACTORY_CFAOUT( "d", GCD );
    FACTORY_GCDSTAT( "acnt:", F, G, GCD );
 
-   if ((GCD!=1) && (GCD != 0))
+   if ((GCD!=1) && (GCD=!0))
    {
      ff= convClapASingA( F/ GCD );
      gg= convClapASingA( G/ GCD );
@@ -1319,7 +1330,7 @@ void singclap_algdividecontent ( alg f, alg g, alg &ff, alg &gg )
    FACTORY_CFTROUT( "d", GCD );
    FACTORY_GCDSTAT( "acnt:", F, G, GCD );
 
-   if ((GCD!=1) && (GCD != 0))
+   if ((GCD!=1) && (GCD!=0))
    {
      ff= convClapPSingTr( F/ GCD );
      gg= convClapPSingTr( G/ GCD );
