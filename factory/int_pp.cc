@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_pp.cc,v 1.4 1997-09-09 09:03:35 schmidt Exp $ */
+/* $Id: int_pp.cc,v 1.5 1997-09-10 15:42:36 schmidt Exp $ */
 
 #include <config.h>
 
@@ -376,7 +376,11 @@ int InternalPrimePower::intmod( int p ) const
   return (int)mpz_mmod_ui( 0, &thempi, (unsigned long)p );
 }
 
-int InternalPrimePower::sign ( ) const
+//{{{ int InternalPrimePower::sign () const
+// docu: see CanonicalForm::sign()
+int
+InternalPrimePower::sign () const
 {
-    return mpz_cmp_si( &thempi, 0 );
+    return mpz_sgn( &thempi );
 }
+//}}}
