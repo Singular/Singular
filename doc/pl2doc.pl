@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: pl2doc.pl,v 1.19 2001-01-31 17:18:45 Singular Exp $
+# $Id: pl2doc.pl,v 1.20 2001-01-31 17:48:08 Singular Exp $
 ###################################################################
 #  Computer Algebra System SINGULAR
 #
@@ -375,7 +375,7 @@ sub OutInfoItem
     my ($proc, $pargs, $pinfo, $line);
     if ($l_fun)
     {
-      print $FH "\@ifinfo\n\@strong{$item:}\n\@end ifinfo\n\@menu\n";
+      print $FH "\@strong{$item:}\n\@menu\n";
     }
     else
     {
