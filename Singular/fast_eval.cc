@@ -2,6 +2,7 @@
 #include "structs.h"
 #include "p_polys.h"
 #include "fast_maps.h"
+#include "febase.h"
 
 // substitute p everywhere the monomial occours,
 // return the number of substitutions
@@ -43,7 +44,7 @@ static poly maPoly_EvalMon(poly src, ring src_r, poly* dest_id, ring dest_r)
   return p;
 }
 
-void maPoly_Eval(mapoly root, ring src_r, ideal dest_id, ring dest_r)
+void maPoly_Eval(mapoly root, ring src_r, ideal dest_id, ring dest_r, int total_cost)
 {
   // invert the list rooted at root:
   if ((root!=NULL) && (root->next!=NULL))
@@ -61,56 +62,72 @@ void maPoly_Eval(mapoly root, ring src_r, ideal dest_id, ring dest_r)
     while (qn !=NULL);
   }
 
+  total_cost /= 10;
+  int next_print_cost = total_cost;
+  
   // the evaluation -----------------------------------------
   mapoly p=root;
+  int cost = 0;
+  
   while (p!=NULL)
   {
-     // look at each mapoly: compute its value in ->dest
-     assume (p->dest==NULL);
-     {
-       if ((p->f1!=NULL)&&(p->f2!=NULL))
-       {
-         printf("found prod:");
-	 p_wrp(p->src,src_r);printf("=");
-	 p_wrp(p->f1->src,src_r);printf(" * ");
-	 p_wrp(p->f2->src,src_r);printf("\n");
-         poly f1=p->f1->dest;
-         poly f2=p->f2->dest;
-         if (p->f1->ref>0) f1=p_Copy(f1,dest_r);
-         else
-         {
-           // we own p->f1->dest now (in f1)
-           p->f1->dest=NULL;
-         }
-         if (p->f2->ref>0) f2=p_Copy(f2,dest_r);
-         else
-         {
-           // we own p->f2->dest now (in f2)
-           p->f2->dest=NULL;
-         }
-         maMonomial_Free(p->f1,src_r, dest_r);
-         maMonomial_Free(p->f2,src_r, dest_r);
-         p->dest=p_Mult_q(f1,f2,dest_r);
-       } /* factors : 2 */
-       else
-       {
-         //printf("compute "); p_wrp(p->src,src_r);printf("\n");
-         assume((p->f1==NULL) && (p->f2==NULL));
-         //if(p->f1!=NULL) { printf(" but f1="); p_wrp(p->f1->src,src_r);printf("\n"); }
-         //if(p->f2!=NULL) { printf(" but f2="); p_wrp(p->f2->src,src_r);printf("\n"); }
-         // no factorization provided, use the classical method:
-         p->dest=maPoly_EvalMon(p->src,src_r,dest_id->m,dest_r);
-	 //p_wrp(p->dest, dest_r); printf(" is p->dest\n");
-       }
-     } /* p->dest==NULL */
-     // substitute the monomial: go through macoeff
-     p->ref -= maPoly_Substitute(p->coeff, p->dest, dest_r);
-     //printf("subst done\n");
-     mapoly pp=p;
-     p=p->next;
-     if (pp->ref<=0)
-     {
-       maMonomial_Destroy(pp, src_r, dest_r);
-     }
-   }
+    // look at each mapoly: compute its value in ->dest
+    assume (p->dest==NULL);
+    {
+      if ((p->f1!=NULL)&&(p->f2!=NULL))
+      {
+        printf("found prod:");
+        p_wrp(p->src,src_r);printf("=");
+        p_wrp(p->f1->src,src_r);printf(" * ");
+        p_wrp(p->f2->src,src_r);printf("\n");
+        poly f1=p->f1->dest;
+        poly f2=p->f2->dest;
+        if (p->f1->ref>0) f1=p_Copy(f1,dest_r);
+        else
+        {
+          // we own p->f1->dest now (in f1)
+          p->f1->dest=NULL;
+        }
+        if (p->f2->ref>0) f2=p_Copy(f2,dest_r);
+        else
+        {
+          // we own p->f2->dest now (in f2)
+          p->f2->dest=NULL;
+        }
+        maMonomial_Free(p->f1,src_r, dest_r);
+        maMonomial_Free(p->f2,src_r, dest_r);
+        p->dest=p_Mult_q(f1,f2,dest_r);
+      } /* factors : 2 */
+      else
+      {
+        //printf("compute "); p_wrp(p->src,src_r);printf("\n");
+        assume((p->f1==NULL) && (p->f2==NULL));
+        //if(p->f1!=NULL) { printf(" but f1="); p_wrp(p->f1->src,src_r);printf("\n"); }
+        //if(p->f2!=NULL) { printf(" but f2="); p_wrp(p->f2->src,src_r);printf("\n"); }
+        // no factorization provided, use the classical method:
+        p->dest=maPoly_EvalMon(p->src,src_r,dest_id->m,dest_r);
+        //p_wrp(p->dest, dest_r); printf(" is p->dest\n");
+      }
+    } /* p->dest==NULL */
+    // substitute the monomial: go through macoeff
+    p->ref -= maPoly_Substitute(p->coeff, p->dest, dest_r);
+    //printf("subst done\n");
+    if (total_cost)
+    {
+      assume(TEST_OPT_PROT);
+      cost += pDeg(p->src, src_r);
+      if (cost > next_print_cost)
+      {
+        Print("-");
+        next_print_cost += total_cost;
+      }
+    }
+
+    mapoly pp=p;
+    p=p->next;
+    if (pp->ref<=0)
+    {
+      maMonomial_Destroy(pp, src_r, dest_r);
+    }
+  }
 }
