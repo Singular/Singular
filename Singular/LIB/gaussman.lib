@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.85 2002-07-16 14:37:39 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.86 2002-07-23 15:29:34 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -372,7 +372,7 @@ static proc saturate()
   int k=-1;
   list l;
 
-  while(size(reduce(H,std(H0*s)))>0)
+  while(size(reduce(H,std(H0*var(1))))>0)
   {
     dbprint(printlevel-voice+2,"// compute matrix A of t");
     k++;
@@ -383,16 +383,16 @@ static proc saturate()
 
     dbprint(printlevel-voice+2,"// compute saturation of H''");
     H0=H;
-    H1=jet(module(A0*H1+s^2*diff(matrix(H1),s)),k);
-    H=H*s+H1;
+    H1=jet(module(A0*H1+var(1)^2*diff(matrix(H1),var(1))),k);
+    H=H*var(1)+H1;
   }
 
-  A0=A0-k*s;
+  A0=A0-k*var(1);
   dbprint(printlevel-voice+2,"// compute basis of saturation of H''");
   H=std(H0);
 
   dbprint(printlevel-voice+2,"// transform H'' to saturation of H''");
-  H0=division(freemodule(mu)*s^k,H,k*deg(s))[1];
+  H0=division(freemodule(mu)*var(1)^k,H,k*deg(var(1)))[1];
 
   return(A0,r,H,H0,k);
 }
@@ -407,8 +407,8 @@ static proc tjet(matrix A0,ideal r,module H,int k0,int K)
   C,r=l[1..2];
   A0=A0+C;
   dbprint(printlevel-voice+2,"// transform A to saturation of H''");
-  matrix A=division(A0*H+s^2*diff(matrix(H),s),H,(K+1)*deg(s))[1]/s;
-
+  matrix A=division(A0*H+var(1)^2*diff(matrix(H),var(1)),H,
+    (K+1)*deg(var(1)))[1]/var(1);
   return(A,A0,r);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -423,12 +423,12 @@ static proc eigenval(matrix A0,ideal r,module H,int k0)
   def e,m=l[1..2];
   dbprint(printlevel-voice+2,"// e="+string(e));
   dbprint(printlevel-voice+2,"// m="+string(m));
-
   return(e,m,A0,r);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc transform(matrix A,matrix A0,ideal r,module H,module H0,ideal e,intvec m,int k0,int K,int opt)
+static proc transform(matrix A,matrix A0,ideal r,module H,module H0,ideal e,
+  intvec m,int k0,int K,int opt)
 {
   int mu=ncols(gmsbasis);
 
@@ -481,7 +481,7 @@ static proc transform(matrix A,matrix A0,ideal r,module H,module H0,ideal e,intv
   }
 
   A,A0,r=tjet(A0,r,H,k0,K+k1);
-  module U0=s^k0*freemodule(mu);
+  module U0=var(1)^k0*freemodule(mu);
 
   if(k>0)
   {
@@ -514,11 +514,11 @@ static proc transform(matrix A,matrix A0,ideal r,module H,module H0,ideal e,intv
             {
               if(d[i0]==0&&d[j0]>0)
               {
-                A[i,j]=A[i,j]/s;
+                A[i,j]=A[i,j]/var(1);
               }
               if(d[i0]>0&&d[j0]==0)
               {
-                A[i,j]=A[i,j]*s;
+                A[i,j]=A[i,j]*var(1);
               }
             }
 	  }
@@ -533,8 +533,8 @@ static proc transform(matrix A,matrix A0,ideal r,module H,module H0,ideal e,intv
           for(i1=1;i1<=m[i0];i1,i=i1+1,i+1)
           {
             A[i,i]=A[i,i]-1;
-            H0[i]=H0[i]*s;
-            U0[i]=U0[i]/s;
+            H0[i]=H0[i]*var(1);
+            U0[i]=U0[i]/var(1);
           }
           e[i0]=e[i0]-1;
           d[i0]=d[i0]-1;
@@ -1060,7 +1060,7 @@ EXAMPLE:  example vwfilt; shows examples
   dbprint(printlevel-voice+2,"// transform to weight filtration basis");
   matrix V=inverse(U);
   A=V*A*U;
-  dbprint(printlevel-voice+2,"// compute normal form of H''");
+  dbprint(printlevel-voice+2,"// compute standard basis of H''");
   H0=std(V*H0);
   U0=U0*U;
 
@@ -1070,11 +1070,11 @@ EXAMPLE:  example vwfilt; shows examples
   for(i=1;i<=mu;i++)
   {
     j=leadexp(H0[i])[nvars(basering)+1];
-    a[i]=A[j,j]+ord(H0[i])/deg(s)-1;
+    a[i]=A[j,j]+ord(H0[i])/deg(var(1))-1;
     w[i]=v[j]+n;
   }
   kill v;
-  module v=simplify(jet(H*U0*H0,2*k0)/s^(2*k0),1);
+  module v=simplify(jet(H*U0*H0,2*k0)/var(1)^(2*k0),1);
 
   kill l;
   list l=sppnf(a,w,v)+list(gmsbasis,gmsstd);
@@ -1120,9 +1120,10 @@ ASSUME:   characteristic 0; local degree ordering;
           isolated critical point 0 of t
 RETURN:
 @format
-list A;  C[[s]]-matrix A[1]+s*A[2] of t on H''
-  matrix A[1];
-  matrix A[2];
+list l=A0,A1,T,M;
+  matrix A0,A1;  t=A0+s*A1+s^2*(d/ds) on H'' w.r.t. C[[s]]-basis M*T
+  module T;  C-basis of C^mu
+  ideal M;  monomial C-basis of H''/sH''
 @end format
 KEYWORDS: singularities; Gauss-Manin connection; Brieskorn lattice;
           mixed Hodge structure; opposite Hodge filtration; V-filtration
@@ -1144,18 +1145,20 @@ EXAMPLE:  example tmatrix; shows examples
   e,m,A0,r=eigenval(A0,r,H,k0);
   int k1=int(nmax(e)-nmin(e));
   A,A0,r,H0,U0,e,m=transform(A,A0,r,H,H0,e,m,k0,k0+k1,1);
+  module T=H*U0;
 
   ring S=0,s,(ds,c);
   matrix A=imap(G,A);
   module H0=imap(G,H0);
+  module T=imap(G,T);
   ideal e=imap(G,e);
-  kill G,gmsmaxdeg;
 
   dbprint(printlevel-voice+2,"// transform to Jordan basis");
   module U=jordanbasis(A,e,m)[1];
   matrix V=inverse(U);
   A=V*A*U;
   module H=V*H0;
+  T=T*U;
 
   dbprint(printlevel-voice+2,"// compute splitting of V-filtration");
   int i,j,k;
@@ -1167,18 +1170,19 @@ EXAMPLE:  example tmatrix; shows examples
   {
     for(j=0;j<k;j++)
     {
-      V=matrix(V)-(jet(A,k-j)/s^(k-j))*(jet(U,j)/s^j);
+      V=matrix(V)-(jet(A,k-j)/var(1)^(k-j))*(jet(U,j)/var(1)^j);
     }
     v=V[1..mu,1..mu];
     v=inverse(A0+k)*v;
     V=v[1..mu^2,1];
-    U=matrix(U)+s^k*V;
+    U=matrix(U)+var(1)^k*V;
   }
   attrib(U,"isSB",1);
 
   dbprint(printlevel-voice+2,"// transform to V-splitting basis");
   A=jet(A,0);
-  H=std(division(H,U,(k0+k1)*deg(s))[1]);
+  H=std(division(H,U,(k0+k1)*deg(var(1)))[1]);
+  T=T*U;
 
   dbprint(printlevel-voice+2,"// compute V-leading terms of H''");
   int i0,j0;
@@ -1186,19 +1190,19 @@ EXAMPLE:  example tmatrix; shows examples
   for(k=ncols(H1);k>=1;k--)
   {
     i0=leadexp(H1[k])[nvars(basering)+1];
-    j0=ord(H1[k]);//deg(s);
+    j0=ord(H1[k]);
     H0[k]=lead(H1[k]);
     H1[k]=H1[k]-lead(H1[k]);
     if(H1[k]!=0)
     {
       i=leadexp(H1[k])[nvars(basering)+1];
-      j=ord(H1[k]);//deg(s);
+      j=ord(H1[k]);
       while(A[i,i]+j==A[i0,i0]+j0)
       {
         H0[k]=H0[k]+lead(H1[k]);
         H1[k]=H1[k]-lead(H1[k]);
         i=leadexp(H1[k])[nvars(basering)+1];
-        j=ord(H1[k]);//deg(s);
+        j=ord(H1[k]);
       }
     }
   }
@@ -1244,7 +1248,7 @@ EXAMPLE:  example tmatrix; shows examples
       }
       for(i=ncols(F0);i>=1;i--)
       {
-        F0[i]=F0[i]/s;
+        F0[i]=F0[i]/var(1);
       }
     }
 
@@ -1278,6 +1282,7 @@ EXAMPLE:  example tmatrix; shows examples
   V=inverse(U);
   A=V*A*U;
   H=V*H;
+  T=T*U;
 
   dbprint(printlevel-voice+2,"// compute reduced standard basis of H''");
   degBound=k0+k1+2;
@@ -1287,17 +1292,20 @@ EXAMPLE:  example tmatrix; shows examples
   degBound=0;
   H=simplify(jet(H,k0+k1),1);
   attrib(H,"isSB",1);
-
   dbprint(printlevel-voice+2,"// compute matrix A0+sA1 of t");
-  A=division(s*A*H+s^2*diff(matrix(H),s),H,deg(s))[1];
+  A=division(var(1)*A*H+var(1)^2*diff(matrix(H),var(1)),H,deg(var(1)))[1];
   A0=jet(A,0);
-  A=jet(A,1)/s;
+  A=jet(A,1)/var(1);
+  T=jet(T*H,2*k0)/var(1)^(2*k0);
 
   setring(R);
   matrix A0=imap(S,A0);
   matrix A1=imap(S,A);
+  module T=imap(S,T);
+  ideal M=imap(G,gmsbasis);
+  kill G,gmsmaxdeg;
   kill S;
-  return(list(A0,A1));
+  return(list(A0,A1,T,M));
 }
 example
 { "EXAMPLE:"; echo=2;
@@ -1306,6 +1314,8 @@ example
   list A=tmatrix(t);
   print(A[1]);
   print(A[2]);
+  print(A[3]);
+  print(A[4]);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
