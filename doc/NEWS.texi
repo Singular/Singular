@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.26 2000-12-19 15:49:19 Singular Exp $
+@comment $Id: NEWS.texi,v 1.27 2000-12-20 16:40:57 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -100,8 +100,8 @@ visualization of curves and surfaces with @code{surf}
 Rees Algebra and integral closure of an ideal
 @item @nref{brnoeth_lib}
 Brill-Noether algorithm, Weierstrass semigroups and AG codes
-@c @item @nref{stratify_lib}
-@c Algorithmic stratification by the Greuel-Pfister algorithm
+@item @nref{stratify_lib}
+Algorithmic stratification by the Greuel-Pfister algorithm
 @item @nref{paramet_lib}
 parametrization of curves
 @item @nref{rinvar_lib}
