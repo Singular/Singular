@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.80 1998-05-18 17:05:42 Singular Exp $
+@comment $Id: general.doc,v 1.81 1998-05-18 19:11:14 wichmann Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -78,10 +78,10 @@ Singular  [options] [file1 [file2 ...]]
 @cindex error recovery
 The @sc{Singular} prompt @code{>} asks the user for input of a command, while
 the prompt @code{.}  asks the user for input of missing parts of a command
-(remember the semicolon @code{;} at the end of every command).  If your input is
+(remember the semicolon @code{;} at the end of every command).  If the input is
 erroneous @sc{Singular} may miss the semicolon (it may be missed because
 @sc{Singular} needs first a @code{"} or @code{@}}).  On the other hand
-additional @code{;} will not harm @sc{Singular} since extra semicolons are
+additional @code{;} do not harm @sc{Singular} since extra semicolons are
 interpreted as empty statements.
 
 @c --------------------------------------------------------------------------
@@ -102,10 +102,10 @@ the name of the next node (@code{Next:}),
 the name of the previous node (@code{Prev:}),
 and the name of an "Up" node (@code{Up:}).
 
-To move within info, type commands consisting of single characters.  Do not type
-@code{RETURN}.  You should not use cursor keys, either.  If you use some of the
-cursor keys by accident, you might get popped to some totally different
-node.  Type @code{l} to return to your original node.
+To move within info, type commands consisting of single characters.  Do
+not type @code{RETURN}.  Do not use cursor keys, either. Using some of
+the cursor keys by accident might pop to some totally different node.
+Type @code{l} to return to the original node.
 
 The most important commands are:
 @table @code
@@ -408,7 +408,7 @@ the rational numbers Q (char 0)
 a finite field Z/p, p a prime <= 32003 (char p)
 @item
 @tex
-\noindent a finite field with $q=p^n$ elements ($p^n \le 2^{15}$)
+a finite field with $q=p^n$ elements ($p^n \le 2^{15}$)
 @end tex
 @ifinfo
 a finite field with q=p^n elements (p^n<=2^15)
@@ -1188,8 +1188,8 @@ on the name and the object named by it, the @code{type} command may be
 used (@ref{type}).
 
 It is possible to redefine or overwrite an already existing name if it
-is a name of the same type.  A redefinition will first set the variable
-to the default value and then compute the expression.  The difference
+is a name of the same type. A redefinition first sets the variable
+to the default value and then computes the expression. The difference
 between redefining and overwriting a variable is shown in the following
 example:
 
@@ -1365,7 +1365,7 @@ Possible type casts are:
 @item
 @   6. @tab to @code{matrix} @tab from @code{module}, @code{ideal}, @code{vector}.
 @* There are two forms to convert something to a matrix: if @code{matrix(}
-expression @code{)} is used then the size of the matrix will be determined
+expression @code{)} is used then the size of the matrix is determined
 by the size of expression.
 @* But @code{matrix(} expression @code{,} m @code{,} n @code{)} may also be
 used - the result is a
@@ -1446,7 +1446,7 @@ as well(See @ref{proc}).
 @section Procedures
 @cindex Procedures
 Procedures contain sequences of @sc{Singular} commands in a special format.
-They are used to extend the set of commands with your own commands.
+They are used to extend the set of commands with user defined commands.
 Procedures are defined by either typing them in on the command line or by
 loading them from a file. If a procedure is defined in a file which complies
 with the syntax rules for libraries, this file may be loaded with the
@@ -1629,7 +1629,7 @@ These names cannot interfere with names in other
 procedures and are automatically deleted after having executed
 the proc.
 Names can be made global by @code{export} (see @ref{export}).
-These global names will not be deleted automatically.
+These global names are not deleted automatically.
 Ring dependent variables are stored together with the ring and deleted
 when the ring is deleted.
 
@@ -1640,7 +1640,7 @@ was called by a procedure of nesting level 1 etc. @code{listvar()} also
 displays the nesting level, nesting level 0 is used for global objects
 (See @ref{listvar}). A ring may be 'moved up' by one nesting level
 with @code{keepring} (see @ref{keepring}). All variables living in that
-ring will be moved together with that ring.
+ring are moved together with that ring.
 
 @example
   proc xxx
@@ -1651,9 +1651,9 @@ ring will be moved together with that ring.
   @}
 @end example
 
-If you type @code{listvar(all);} after having executed a proc you will
-see that the variable @code{result} is still there while @code{k}
-has been deleted.
+Typing @code{listvar(all);} after having executed a procedure shows that
+the variable @code{result} is still there while @code{k} has been
+deleted.
 
 Often a procedure is started while a basering is active. The procedure then
 works in this basering without knowing its name. Therefore a name has to be
@@ -1754,8 +1754,8 @@ see @ref{return}
 @cindex LIB
 @cindex Loading of procedure files
 Files containing @sc{Singular} procedures may be loaded in two ways
-(the whole library will be loaded, the quotes "" are necessary):
-@*@code{< "file_name";}       (if the library does not contain info
+(the whole library is loaded, the quotes "" are necessary):
+@*@code{< "file_name";}       (if the library does not contain info 
 and version string) @*@code{LIB "file_name";}
 
 To list all loaded procedures resp. libraries, type
@@ -1856,7 +1856,7 @@ i.e. the following keywords are allowed:
 @code{/* ... */},
 @code{//},
 @code{[static] proc}.
-Anything else will not be recognized by the parser of @sc{Singular} and will lead
+Anything else is not recognized by the parser of @sc{Singular} and leads
 to an error message while loading the library.
 If an error occurs, loading is aborted and an error message is returned,
 specifying the type of error and the line where it was detected.
@@ -1969,9 +1969,9 @@ It is common practice to simply define the version string to be
 @cindex template
 
 Although there are very few enforced rules on the format of a library,
-we recommend that certain guidelines should be followed (which will make
-debugging and understanding easier). An example probably explains it
-best.
+it is recommended that certain guidelines should be followed (which will
+make debugging and understanding easier). An example probably explains
+it best.
 
 @c @table @code
 @example
@@ -2052,10 +2052,10 @@ necessary.
 @section Debugging tools
 @cindex Debugging tools
 
-If you have written your own proc and, while calling that proc,
-@sc{Singular} does not come back to the prompt, you probably forgot
-a bracket or a @code{"}. The easiest way to leave the proc
-is to type some brackets or @code{"} and then @code{<RETURN>;} .
+If @sc{Singular} does not come back to the prompt while calling a user
+defined procedure, probably a bracket or a @code{"} is missing.  The
+easiest way to leave the procedure is to type some brackets or @code{"}
+and then @code{<RETURN>} .
 
 @menu
 * Tracing of procedures::
@@ -2160,7 +2160,7 @@ between 0 and 4. Default is 0.
 turns on reporting about violations of unenforced syntax rules
 @end table
 
-The following syntax checks will be performed in any case:
+The following syntax checks are performed in any case:
 @itemize @bullet
 @item counting of pairs of brackets @{,@} , [,] and (,)
     (number of @{ has to match number of @}, same for [,] and (,) ).
