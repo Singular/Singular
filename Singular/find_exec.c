@@ -198,8 +198,6 @@ char * find_executable (const char *name)
   }
   if (link != NULL && (ret=full_readlink(link, buf, MAXPATHLEN)) > 0)
   {
-    /* follow link further until you reach the end of it, or unitl 
-       MAX_SYMBOLIC_LINKS are encountered */
     char *p = strrchr(link, '/');
     char *executable;
 
