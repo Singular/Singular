@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.87 1999-11-19 15:07:51 Singular Exp $ */
+/* $Id: ring.cc,v 1.88 1999-11-19 15:17:47 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2789,10 +2789,6 @@ BOOLEAN rComplete(ring r, int force)
       case ringorder_a:
         rO_WDegree(j,r->block0[i],r->block1[i],tmp_ordsgn,tmp_typ[typ_i],
                    r->wvhdl[i]);
-        if (r->OrdIndex== -1)
-        {
-          r->OrdIndex= (j-1)*sizeof(Exponent_t)/sizeof(long);
-        }
         r->pVarLowIndex=j;
         typ_i++;
         break;
@@ -2815,28 +2811,16 @@ BOOLEAN rComplete(ring r, int force)
                        r->wvhdl[i]+(r->block1[i]-r->block0[i]+1)*l);
             typ_i++;
           }
-        if (r->OrdIndex== -1)
-        {
-          r->OrdIndex= (j-1)*sizeof(Exponent_t)/sizeof(long);
-        }
           r->pVarLowIndex=j;
           break;
         }
 
       case ringorder_lp:
         rO_LexVars(j, r->block0[i],r->block1[i], prev_ordsgn,tmp_ordsgn,v);
-        if (r->OrdIndex== -1)
-        {
-          r->OrdIndex= (j-1)*sizeof(Exponent_t)/sizeof(long);
-        }
         break;
 
       case ringorder_ls:
         rO_LexVars_neg(j, r->block0[i],r->block1[i], prev_ordsgn,tmp_ordsgn,v);
-        if (r->OrdIndex== -1)
-        {
-          r->OrdIndex= (j-1)*sizeof(Exponent_t)/sizeof(long);
-        }
         break;
 
       case ringorder_dp:
