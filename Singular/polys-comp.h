@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys-comp.h,v 1.13 1999-10-01 16:24:38 obachman Exp $ */
+/* $Id: polys-comp.h,v 1.14 1999-10-01 19:34:20 obachman Exp $ */
 
 /***************************************************************
  *
@@ -64,24 +64,25 @@ do                                              \
   }                                             \
 }                                               \
 while (0)
+#define register
 
-#define _pMonCmp(p1, p2, actionE, actionG, actionS)                          \
-do                                                                           \
-{                                                                            \
-  register const unsigned long* s1 = &(p1->exp.l[currRing->pCompLowIndex]); \
-  register const unsigned long* s2 = &(p2->exp.l[currRing->pCompLowIndex]); \
-  register int _i = currRing->pCompLSize - 1;                                \
-  _memcmp(s1, s2, _i, actionE, goto _NotEqual);                              \
-                                                                             \
-  _NotEqual:                                                                 \
-  if (currRing->ordsgn[_i] != 1)                                             \
-  {                                                                          \
-    if (s2[_i] > s1[_i]) actionG;                                            \
-    actionS;                                                                 \
-  }                                                                          \
-  if (s1[_i] > s2[_i]) actionG;                                              \
-  actionS;                                                                   \
-}                                                                            \
+#define _pMonCmp(p1, p2, actionE, actionG, actionS)                           \
+do                                                                            \
+{                                                                             \
+  register const unsigned long* __s1 = &(p1->exp.l[currRing->pCompLowIndex]); \
+  register const unsigned long* __s2 = &(p2->exp.l[currRing->pCompLowIndex]); \
+  register int __i = currRing->pCompLSize - 1;                                \
+  _memcmp(__s1, __s2, __i, actionE, goto _NotEqual);                          \
+                                                                              \
+  _NotEqual:                                                                  \
+  if (currRing->ordsgn[__i] != 1)                                             \
+  {                                                                           \
+    if (__s2[__i] > __s1[__i]) actionG;                                       \
+    actionS;                                                                  \
+  }                                                                           \
+  if (__s1[__i] > __s2[__i]) actionG;                                         \
+  actionS;                                                                    \
+}                                                                             \
 while (0)
 
 

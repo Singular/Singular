@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: pProcs.cc,v 1.5 1999-10-01 16:24:38 obachman Exp $ */
+/* $Id: pProcs.cc,v 1.6 1999-10-01 19:34:19 obachman Exp $ */
 /*
 *  ABSTRACT -  Routines for primitive poly arithmetic
 */
@@ -54,6 +54,19 @@ poly p_Mult_n_General(poly p, number n)
   return q;
 }
 
+#if 1
+#undef _pMonCmp
+#define _pMonCmp(p1, p2, ae, ag, as)            \
+do                                              \
+{                                               \
+  int __j = pComp0(p1, p2);                     \
+  if (__j == 0) ae;                             \
+  if (__j > 0) ag;                              \
+  as;                                           \
+}                                               \
+while (0)
+#endif
+
 /***************************************************************
  *
  * General:  p_Add_q which always works
@@ -89,12 +102,7 @@ poly p_Add_q_General(poly p, poly q, int *lp, int lq,
   if (lp != NULL) l = *lp + lq;
 
   Top:     // compare p and q w.r.t. monomial ordering
-  register long d;
-#ifdef HAVE_COMP_MACROS
-  _pMonComp(p, q, d, goto NotEqual , goto Equal);
-#else
-  if ((d = pComp0(p, q))) goto NotEqual; else goto Equal;
-#endif
+  _pMonCmp(p, q, goto Equal, goto Greater , goto Smaller);
 
   Equal:
   assume(pComp0(p, q) == 0);
@@ -123,21 +131,18 @@ poly p_Add_q_General(poly p, poly q, int *lp, int lq,
   if (q==NULL) { pNext(a) = p; goto Finish;}
   goto Top;
      
-  NotEqual:
-  if (d < 0)
-  {
-    assume(pComp0(p, q) == -1);
-    a = pNext(a) = q;
-    pIter(q);
-    if (q==NULL) { pNext(a) = p; goto Finish;}
-  }
-  else 
-  {
-    assume(pComp0(p, q) == 1);
-    a = pNext(a) = p;
-    pIter(p);
-    if (p==NULL) { pNext(a) = q; goto Finish;}
-  }
+  Greater:
+  assume(pComp0(p, q) == 1);
+  a = pNext(a) = p;
+  pIter(p);
+  if (p==NULL) { pNext(a) = q; goto Finish;}
+  goto Top;
+    
+  Smaller:
+  assume(pComp0(p, q) == -1);
+  a = pNext(a) = q;
+  pIter(q);
+  if (q==NULL) { pNext(a) = p; goto Finish;}
   goto Top;
   
 
@@ -266,14 +271,10 @@ poly p_Minus_m_Mult_q_General (poly p,
   
   // MAIN LOOP:
   Top:     // compare qm = m*q and p w.r.t. monomial ordering
-  register long d;
-#ifdef HAVE_COMP_MACROS
-    _pMonComp(qm, p, d, goto NotEqual, goto Equal);
-#else
-    if ((d = pComp0(qm, p))) goto NotEqual; else goto Equal;
-#endif
-
+  _pMonCmp(qm, p, goto Equal, goto Greater, goto Smaller);
+  
   Equal:   // qm equals p
+  assume(pComp0(qm, p) == 0);
     tb = nMult(pGetCoeff(q), tm);
     tc = pGetCoeff(p);
     if (!nEqual(tc, tb))
@@ -299,16 +300,9 @@ poly p_Minus_m_Mult_q_General (poly p,
     pMonAdd(qm, q, m);
     goto Top;
 
-  NotEqual:     // qm != p 
-    if (d < 0)  // qm < p: 
-    {
-      a = pNext(a) = p;// append p to result and advance p
-      pIter(p);
-      if (p == NULL) goto Finish;;
-      goto Top;
-    }
-    else // now d >= 0, i.e., qm > p
-    {
+
+  Greater:
+  assume(pComp0(qm, p) == 1);
       pSetCoeff0(qm,nMult(pGetCoeff(q), tneg));
       a = pNext(a) = qm;       // append qm to result and advance q
       pIter(q);
@@ -322,12 +316,17 @@ poly p_Minus_m_Mult_q_General (poly p,
       assume(pGetComp(q) == 0 || pGetComp(m) == 0);
       pMonAdd(qm, q, m);
       goto Top;
-    }
- 
- Finish: // q or p is NULL: Clean-up time
-
-    pNext(a) = NULL;
     
+  Smaller:     
+  assume(pComp0(qm, p) == -1);
+      a = pNext(a) = p;// append p to result and advance p
+      pIter(p);
+      if (p == NULL) goto Finish;;
+      goto Top;
+ 
+
+  Finish: // q or p is NULL: Clean-up time
+
    if (q == NULL) // append rest of p to result
      pNext(a) = p;
    else  // append (- m*q) to result
