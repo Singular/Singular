@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.92 2000-11-14 16:04:51 obachman Exp $ */
+/* $Id: febase.cc,v 1.93 2001-01-31 13:39:05 levandov Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -630,7 +630,7 @@ char* eati(char *s, int *i)
 
 #endif
 
-#ifndef unix
+#ifdef ix86_Win
 // Make sure that mode contains binary option
 FILE* myfopen(char *path, char *mode)
 {

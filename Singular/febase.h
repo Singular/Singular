@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.48 2000-09-04 13:38:56 obachman Exp $ */
+/* $Id: febase.h,v 1.49 2001-01-31 13:39:04 levandov Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -39,7 +39,7 @@ extern char fePathSep;
   #undef HAVE_READLINE
   #define HAVE_FEREAD 1
 #elif ! defined(HAVE_READLINE)
-  #define HAVE_FEREAD
+  #define HAVE_FEREAD 1
 #endif
 
 /*
@@ -50,7 +50,7 @@ extern char fePathSep;
 // IMPORTANT: do only use myfopen and myfread when reading text,
 // do never use fopen and fread
 */
-#ifndef unix
+#ifdef ix86_Win
 FILE *myfopen(char *path, char *mode);
 #else
 #define myfopen fopen
