@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.104 2002-04-30 13:35:11 levandov Exp $ */
+/* $Id: kutil.cc,v 1.105 2002-05-22 10:23:52 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -2639,9 +2639,9 @@ int posInL17_c (const LSet set, const int length,
  * Tail reductions
  *
  ***************************************************************/
-static TObject*
+TObject*
 kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
-                    long ecart = LONG_MAX)
+                    long ecart)
 {
   int j = 0;
   const unsigned long not_sev = ~L->sev;
@@ -2654,7 +2654,7 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
 
   if (r == currRing)
   {
-    while (1)
+    loop
     {
       if (j > pos) return NULL;
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
@@ -2686,7 +2686,7 @@ kFindDivisibleByInS(kStrategy strat, int pos, LObject* L, TObject *T,
   else
   {
     TObject* t;
-    while (1)
+    loop
     {
       if (j > pos) return NULL;
       assume(strat->S_2_R[j] != -1);
@@ -2739,7 +2739,7 @@ poly redtail (LObject* L, int pos, kStrategy strat)
     op = strat->tailRing->pFDeg(hn, strat->tailRing);
     if ((Kstd1_deg>0)&&(op>Kstd1_deg)) goto all_done;
     e = strat->tailRing->pLDeg(hn, &l, strat->tailRing) - op;
-    while (1)
+    loop
     {
       Ln.Set(hn, strat->tailRing);
       Ln.sev = p_GetShortExpVector(hn, strat->tailRing);
@@ -2791,13 +2791,14 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT)
   strat->redTailChange=FALSE;
   if (strat->noTailReduction) return L->GetLmCurrRing();
   poly h, p;
+  p = h = L->GetLmTailRing();
+  if ((h==NULL) || (pNext(h)==NULL))
+    return L->GetLmCurrRing();
 
   TObject* With;
   // placeholder in case strat->tl < 0
   TObject  With_s(strat->tailRing);
 
-  h = L->GetLmTailRing();
-  p = h;
   LObject Ln(pNext(h), strat->tailRing);
   Ln.pLength = L->GetpLength() - 1;
 
@@ -2809,7 +2810,7 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT)
 
   while(!Ln.IsNull())
   {
-    while (1)
+    loop
     {
       Ln.SetShortExpVector();
       if (! withT)
@@ -2839,6 +2840,7 @@ poly redtailBba (LObject* L, int pos, kStrategy strat, BOOLEAN withT)
       }
       strat->redTailChange=TRUE;
       if (Ln.IsNull()) goto all_done;
+      if (! withT) With_s.Init(currRing);
     }
     pNext(h) = Ln.LmExtractAndIter();
     pIter(h);
