@@ -1,15 +1,22 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_map.cc,v 1.1 1996-07-08 08:17:22 stobbe Exp $
+// $Id: cf_map.cc,v 1.2 1997-03-26 16:47:32 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1996/07/08 08:17:22  stobbe
+"New function compress( f, g, M, N ) that maps the common variables to be
+the ones with the lowest level.
+"
+
 Revision 1.0  1996/05/17 10:59:44  stobbe
 Initial revision
 
 */
 
 #include "assert.h"
+
 #include "cf_defs.h"
+
 #include "cf_map.h"
 #include "cf_iter.h"
 #include "templates/functions.h"
@@ -29,12 +36,14 @@ MapPair::operator= ( const MapPair & p )
     return *this;
 }
 
+#ifndef NOSTREAMIO
 ostream&
 operator << ( ostream& s, const MapPair & p )
 {
     s << p.var() << " -> " << p.subst();
     return s;
 }
+#endif /* NOSTREAMIO */
 
 CFMap::CFMap ( const List<CanonicalForm> & L )
 {
@@ -65,6 +74,7 @@ CFMap::operator() ( const CanonicalForm & f ) const
     return subsrec( f, i );
 }
 
+#ifndef NOSTREAMIO
 ostream&
 operator<< ( ostream& s, const CFMap & m )
 {
@@ -82,6 +92,7 @@ operator<< ( ostream& s, const CFMap & m )
     }
     return s;
 }
+#endif /* NOSTREAMIO */
 
 CanonicalForm
 compress ( const CanonicalForm & f, CFMap & m )
@@ -214,5 +225,3 @@ subsrec( const CanonicalForm & f, const ListIterator<MapPair> & i )
     else
 	return f;
 }
-
-

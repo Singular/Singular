@@ -1,17 +1,25 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_map.h,v 1.1 1996-07-08 08:17:22 stobbe Exp $
+// $Id: cf_map.h,v 1.2 1997-03-26 16:48:36 schmidt Exp $
 
 #ifndef INCL_CF_MAP_H
 #define INCL_CF_MAP_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1996/07/08 08:17:22  stobbe
+"New function compress( f, g, M, N ) that maps the common variables to be
+the ones with the lowest level.
+"
+
 Revision 1.0  1996/05/17 10:59:38  stobbe
 Initial revision
 
 */
 
+#ifndef NOSTREAMIO
 #include <iostream.h>
+#endif /* NOSTREAMIO */
+
 #include "variable.h"
 #include "templates/list.h"
 #include "canonicalform.h"
@@ -31,7 +39,9 @@ public:
     MapPair& operator=( const MapPair & p );
     Variable var() const { return V; }
     CanonicalForm subst() const { return S; }
+#ifndef NOSTREAMIO
     friend ostream& operator << ( ostream& s, const MapPair & p );
+#endif /* NOSTREAMIO */
 };
 
 typedef List<MapPair> MPList;
@@ -53,7 +63,9 @@ public:
   CFMap& operator=( const CFMap & m );
   void newpair( const Variable & v, const CanonicalForm & s );
   CanonicalForm operator() ( const CanonicalForm & f ) const;
+#ifndef NOSTREAMIO
   friend ostream& operator<< ( ostream& s, const CFMap & m );
+#endif /* NOSTREAMIO */
 };
 
 CanonicalForm compress ( const CanonicalForm & f, CFMap & m );
@@ -63,4 +75,3 @@ void compress ( const CanonicalForm & f, const CanonicalForm & g, CFMap & M, CFM
 /*ENDPUBLIC*/
 
 #endif /* INCL_CF_MAP_H */
-
