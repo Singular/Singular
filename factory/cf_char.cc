@@ -1,8 +1,12 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_char.cc,v 1.2 1996-06-18 12:09:43 stobbe Exp $
+// $Id: cf_char.cc,v 1.3 1996-06-24 11:25:45 stobbe Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.2  1996/06/18 12:09:43  stobbe
+"setCharacteristic: changed the setting of ff_big.
+"
+
 Revision 1.1  1996/06/18 06:52:45  stobbe
 "setCharacteristic: now sets the flag ff_big
 "
@@ -40,7 +44,7 @@ void setCharacteristic( int c )
 	theDegree = 1;
 	CFFactory::settype( FiniteFieldDomain );
 	theCharacteristic = c;
-	ff_big = c > cf_getSmallPrime( cf_getNumSmallPrimes() );
+	ff_big = c > cf_getSmallPrime( cf_getNumSmallPrimes()-1 );
 	ff_setprime( c );
     }
 }
