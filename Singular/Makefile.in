@@ -168,7 +168,7 @@ SLIBS = algebra.lib        all.lib            classify.lib       deform.lib  \
 all:	Singular
 
 Singular: mod2.h Makefile version.h scanner.cc gmalloc.o \
-          ${OBJS} iparith.o tesths.cc libparse.cc claptmpl.o
+          ${OBJS} iparith.o tesths.cc libparse.cc claptmpl.o mpsr_Tok.o
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} \
 	  -o Singular \
 	  tesths.cc iparith.o mpsr_Tok.o claptmpl.o\
