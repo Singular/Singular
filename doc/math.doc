@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.28 1998-05-19 16:10:37 Singular Exp $
+@comment $Id: math.doc,v 1.29 1998-05-19 17:14:02 wichmann Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -362,19 +362,27 @@ Vasconcelos, V.:
 @item
 Bareiss, E.:
 Sylvester's identity and multistep integer-preserving Gaussian elimination,
-Math. Comp. 22 (1968), 565-578.
+Math. Comp. 22 (1968), 565-578
+
+@item
+Campillo, A.: Algebroid curves in positive characteristic, SLN 813, 1980
 
 @item
 Decker, W.; G.-M. Greuel, G.-M.; Pfister, G.:
 Primary decomposition: algorithms and
 comparisons.  Preprint, Univ. Kaiserslautern, 1998.
 To appear in: Greuel, G.-M.; Matzat, B. H.; Hiss, G. (Eds.),
-Algorithmic Algebra and Number Theory, Springer Verlag, Heidelberg, (1998). 
+Algorithmic Algebra and Number Theory, Springer Verlag, Heidelberg, (1998)
 
 @item
 Decker, W.; G.-M. Greuel, G.-M.; de Jong, T.; Pfister, G.:
 The normalisation: a new algorithm,
-implementation and comparisons. Preprint, Univ. Kaiserslautern, 1998. 
+implementation and comparisons. Preprint, Univ. Kaiserslautern, 1998
+
+@item 
+Decker, Heydtmann, Schreyer: Generating a Noetherian Normalization of
+the Invariant Ring of a Finite Group, 1997, to appear in Journal of
+Symbolic Computation
 
 @item 
 @tex
@@ -405,7 +413,7 @@ Sch\"onemann,
 @end ifinfo
  H.; Siebert, T.:  On an
 implementation of standard bases and syzygies in  @sc{Singular},
-Proceedings of the Workshop  Computational Methods in Lie theory in AAECC (1995).
+Proceedings of the Workshop  Computational Methods in Lie theory in AAECC (1995)
 
 @item
 Greuel, G.-M.; Pfister, G.:
@@ -413,17 +421,24 @@ Advances and improvements in the theory of standard bases and
 syzygies, Arch. d. Math. 63(1995)
 
 @item
+Kemper; Generating Invariant Rings of Finite Groups over Arbitrary
+Fields, 1996, to appear in Journal of Symbolic Computation
+
+@item
+Kemper and Steel: Some Algorithms in Invariant Theory of Finite Groups, 1997
+
+@item
 @tex
-Sch\"onemann, H:
+Sch\"onemann, H.:
 @end tex
 @ifinfo
 Schoenemann, H.:
 @end ifinfo
 Algorithms in @sc{Singular},
-Reports on Computer Algebra 2(1996), Kaiserslautern.
+Reports on Computer Algebra 2(1996), Kaiserslautern
 
 @item
 Siebert, T.:
 On strategies and implementations for computations of free resolutions.
-Reports on Computer Algebra 8(1996), Kaiserslautern.
+Reports on Computer Algebra 8(1996), Kaiserslautern
 @end itemize
