@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.33 1998-07-22 11:46:33 siebert Exp $
+@comment $Id: examples.doc,v 1.34 1998-07-22 11:57:49 siebert Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -1082,9 +1082,11 @@ P^4.
 @section  Free resolution
 @cindex  Free resolution
 
-In @sc{Singular} a free resolution of a module or ideal is a list of modules,
-which are submodules of a free module. The first module in the list is
-the input module (minimized if @code{mres} is used), the k-th module in the
+In @sc{Singular} a free resolution of a module or ideal has its own type:
+resolution. This is a field in which all information related to
+free resolutions is stored. To see the differentials of the complex the
+type resolution must be converted to the type list which 
+yield a list of modules. The k-th module in this
 list is the first syzygy-module (module of relations) of the (k-1)st module.
 There are several resolution commands @code{res}, @code{lres}, @code{sres},s
 @code{nres}, @code{mres} and the command @code{syz}:
