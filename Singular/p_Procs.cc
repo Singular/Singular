@@ -6,7 +6,7 @@
  *  Purpose: implementation of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.cc,v 1.1 2000-08-24 14:42:43 obachman Exp $
+ *  Version: $Id: p_Procs.cc,v 1.2 2000-08-24 15:31:22 obachman Exp $
  *******************************************************************/
 #include "mod2.h"
 
@@ -38,10 +38,10 @@
 // Set HAVE_FAST_P_PROCS to:
 //   0 -- only FieldGeneral_LengthGeneral_OrdGeneral
 //   1 -- plus FieldZp_Length*_OrdGeneral procs
-//   2 -- plus FiedZp_Length*_Ord* procs
+//   2 -- plus FieldZp_Length*_Ord* procs
 //   3 -- plus Field*_Length*_OrdGeneral procs
 //   4 -- all Field*_Length*_Ord* procs
-const int HAVE_FAST_P_PROCS = 4;
+const int HAVE_FAST_P_PROCS = 2;
 
 // Set HAVE_FAST_FIELD to:
 //   0 -- only FieldGeneral
@@ -55,7 +55,7 @@ const int HAVE_FAST_FIELD = 1;
 //   2 -- special cases for length <= 2
 //   3 -- special cases for length <= 4
 //   4 -- special cases for length <= 8
-const int HAVE_FAST_LENGTH = 4;
+const int HAVE_FAST_LENGTH = 3;
 
 // Set HAVE_FAST_ORD to:
 //  0  -- only OrdGeneral
@@ -71,7 +71,7 @@ const int HAVE_FAST_ORD = 4;
 //  0 -- no zero ords are considered 
 //  1 -- only ZeroOrds for OrdPosNomogPosZero, OrdNomogPosZero, OrdPomogNegZero
 //  2 -- ZeroOrds for all
-const int HAVE_FAST_ZERO_ORD = 2;
+const int HAVE_FAST_ZERO_ORD = 1;
 
 // Predicate which returns true if alloc/copy/free of numbers is
 // like that of Zp
