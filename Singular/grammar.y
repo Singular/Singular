@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.33 1998-05-13 14:53:44 Singular Exp $ */
+/* $Id: grammar.y,v 1.34 1998-05-14 10:02:35 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -1189,17 +1189,19 @@ ringcmd:
           ordering           /* list of (multiplier ordering (weight(s))) */
           {
             //noringvars = FALSE;
-            if(!rInit($2.name,        /* ringname */
-                     &$4,            /* characteristik and list of parameters*/
-                     &$6,            /* names of ringvariables */
-                     &$8,            /* ordering */
-                     FALSE))         /* is not a dring */
-            {
-              MYYERROR("cannot make ring");
-            }
+	    idhdl b=
+	    rInit($2.name,        /* ringname */
+                  &$4,            /* characteristik and list of parameters*/
+                  &$6,            /* names of ringvariables */
+                  &$8,            /* ordering */
+                  FALSE);         /* is not a dring */
             $4.CleanUp();
             $6.CleanUp();
             $8.CleanUp();
+            if (b==NULL)
+            {
+              MYYERROR("cannot make ring");
+            }
           }
         | ringcmd1 elemexpr
           {
@@ -1215,19 +1217,20 @@ ringcmd:
             #ifdef DRING
             idhdl h;
             //noringvars = FALSE;
-            if(!(h=rInit($3.name,    /* ringname */
-                     &$5,            /* characteristik and list of parameters*/
-                     &$7,            /* names of ringvariables */
-                     &$9,            /* ordering */
-                     TRUE)))         /* is a dring */
+            h=rInit($3.name,    /* ringname */
+                   &$5,            /* characteristik and list of parameters*/
+                   &$7,            /* names of ringvariables */
+                   &$9,            /* ordering */
+                   TRUE));         /* is a dring */
+            $5.CleanUp();
+            $7.CleanUp();
+            $9.CleanUp();
+            if(h==NULL)
             {
               YYERROR;
             }
             setFlag(h,FLAG_DRING);
             rDSet();
-            $5.CleanUp();
-            $7.CleanUp();
-            $9.CleanUp();
             #endif
           }
         ;

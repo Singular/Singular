@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.23 1998-04-24 16:39:26 Singular Exp $ */
+/* $Id: ring.cc,v 1.24 1998-05-14 10:02:39 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -288,9 +288,6 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
   }
   else
   {
-    pn->CleanUp();
-    rv->CleanUp();
-    ord->CleanUp();
     return NULL;
   }
   pn=pn->next;
@@ -331,8 +328,7 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
         nfSetChar(ch,m);
         if(errorreported)
         {
-          errorreported=0;
-          ch=IsPrime(ch);
+          return NULL;
         }
         else
         {
@@ -407,9 +403,6 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
       if (h==sNoName)
       {
         WerrorS("parameter expected");
-        pn->CleanUp();
-        rv->CleanUp();
-        ord->CleanUp();
         return NULL;
       }
       *p=mstrdup(h);
@@ -474,8 +467,6 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
       if (h==sNoName)
       {
         WerrorS("expected name of ring variable");
-        sl->CleanUp();
-        ord->CleanUp();
         return NULL;
       }
       tmpR.names[i] = mstrdup(h);
@@ -519,7 +510,6 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
     if (o==0)
     {
       WerrorS("invalid combination of orderings");
-      ord->CleanUp();
       return NULL;
     }
     if (i==0) n++;
@@ -635,9 +625,6 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
         {
           tmpR.block1[n]=tmpR.block0[n];
           goto ord_mismatch;
-          //Werror("mismatch of number of vars (%d) and ordering (>=%d vars)",
-          //  tmpR.N,tmpR.block0[n]);
-          //return NULL;
         }
       }
       else

@@ -3225,6 +3225,7 @@ struct sValCmd1 dArith1[]=
 ,{jjPRINT_GEN,  PRINT_CMD,       NONE,           IDEAL_CMD }
 ,{jjPRINT_MA,   PRINT_CMD,       NONE,           MATRIX_CMD }
 ,{jjPRINT_LIST, PRINT_CMD,       NONE,           LIST_CMD }
+,{jjPRINT_GEN,  PRINT_CMD,       NONE,           RESOLUTION_CMD }
 ,{jjidMinEmbedding, PRUNE_CMD,   XS(MODUL_CMD),  MODUL_CMD }
 ,{kQHWeight,    QHWEIGHT_CMD,    INTVEC_CMD,     IDEAL_CMD }
 ,{kQHWeight,    QHWEIGHT_CMD,    INTVEC_CMD,     MODUL_CMD }
