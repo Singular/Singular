@@ -1,8 +1,11 @@
 /* emacs edit mode for this file is -*- C -*- */
-/* $Id: mmallocb.c,v 1.0 1996-05-17 10:59:47 stobbe Exp $ */
+/* $Id: mmallocb.c,v 1.1 1997-03-27 10:16:24 schmidt Exp $ */
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:47  stobbe
+Initial revision
+
 */
 
 #define _POSIX_SOURCE 1
@@ -10,6 +13,7 @@ $Log: not supported by cvs2svn $
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "memman.h"
 #include "mmprivate.h"
 
@@ -149,7 +153,7 @@ mmDBAllocBlock( size_t size, char * fname, int lineno )
 	if ( mm_theList[i] != NULL ) {
 	    result = (DBMCB*)((char*)(mm_theList[i]) - DebugOffsetFront);
 	    mm_theList[i] = (mcb)*mm_theList[i];
-#ifdef TEST
+#ifdef MM_TEST
 	    if ( ! mmCheckDBMCB( result, MM_FREEFLAG, mmGetSize( i ) ) ) {
 		fprintf( stderr, "alloc list damaged, file %s, line %d", fname, lineno );
 		mmTestList();
@@ -212,7 +216,7 @@ mmDBAllocBlock0( size_t size, char * fname, int lineno )
 	if ( mm_theList[i] != NULL ) {
 	    result = (DBMCB*)((char*)(mm_theList[i]) - DebugOffsetFront);
 	    mm_theList[i] = (mcb)*mm_theList[i];
-#ifdef TEST
+#ifdef MM_TEST
 	    if ( ! mmCheckDBMCB( result, MM_FREEFLAG, mmGetSize( i ) ) ) {
 		fprintf( stderr, "alloc list damaged, file %s, line %d", fname, lineno );
 		mmTestList();
