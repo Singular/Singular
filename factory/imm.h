@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: imm.h,v 1.5 1997-09-10 14:30:25 schmidt Exp $ */
+/* $Id: imm.h,v 1.6 1997-09-10 14:45:17 schmidt Exp $ */
 
 #ifndef INCL_IMM_H
 #define INCL_IMM_H
@@ -365,7 +365,7 @@ imm_sign ( const InternalCF * const op )
 	    return 1;
     else  if ( is_imm( op ) == GFMARK )
 	return gf_sign( imm2int( op ) );
-    else  if ( imm2int( op ) = 0 )
+    else  if ( imm2int( op ) == 0 )
 	return 0;
     else  if ( imm2int( op ) > 0 )
 	return 1;
