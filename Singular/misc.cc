@@ -239,11 +239,11 @@ void singular_example(char *str)
     fd = feFopen(sing_file, "r");
     if (fd != NULL)
     {
-      
+
       int old_echo = si_echo;
       int length, got;
       char* s;
-      
+
       fseek(fd, 0, SEEK_END);
       length = ftell(fd);
       fseek(fd, 0, SEEK_SET);
@@ -561,13 +561,22 @@ char * versionString()
               StringAppend("MP(%s),",MP_VERSION);
 #endif
 #if defined(HAVE_DYN_RL)
-              StringAppendS("d-readline,");
+              if (fe_fgets_stdin==fe_fgets_dummy)
+                StringAppendS("no input,");
+              else if (fe_fgets_stdin==fe_fgets)
+                StringAppendS("fgets,");
+              if (fe_fgets_stdin==fe_fgets_stdin_drl)
+                StringAppendS("dynamic readline,");
+              else if (fe_fgets_stdin==fe_fgets_stdin_emu)
+                StringAppendS("emulated readline,");
+              else
+                StringAppendS("unknown fgets method,");
 #else
   #if defined(HAVE_READLINE) && !defined(FEREAD)
-              StringAppendS("libreadline,");
+              StringAppendS("readline,");
   #else
     #ifdef HAVE_FEREAD
-              StringAppendS("emulated libreadline,");
+              StringAppendS("emulated readline,");
     #endif
   #endif
 #endif
