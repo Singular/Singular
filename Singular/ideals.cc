@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.45 1999-05-07 15:41:32 Singular Exp $ */
+/* $Id: ideals.cc,v 1.46 1999-05-17 13:33:25 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1706,7 +1706,9 @@ ideal  idLift (ideal  mod,ideal submod)
         {
           if (!reported)
           {
-            Warn("first module not a standardbasis");
+            Warn("first module not a standardbasis(comp=%d,k=%d), q=",
+	      pMinComp(q),k);
+	      pWrite(q);
             Warn("or second not a proper submodule");
             reported=TRUE;
           }
@@ -2920,9 +2922,9 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
 
 ideal idJet(ideal i,int d)
 {
-  ideal r=idInit(IDELEMS(i),i->rank);
+  ideal r=idInit((i->nrows)*(i->ncols),i->rank);
   r->nrows = i-> nrows;
-  //r->ncols = i-> ncols;
+  r->ncols = i-> ncols;
   //r->rank = i-> rank;
   int k;
   for(k=(i->nrows)*(i->ncols)-1;k>=0; k--)
