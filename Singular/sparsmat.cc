@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.7 1999-06-04 13:06:28 pohl Exp $ */
+/* $Id: sparsmat.cc,v 1.8 1999-06-10 09:01:17 pohl Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -43,7 +43,6 @@ struct smprec{
 };
 
 /* declare internal 'C' stuff */
-static void smDebug() { int k=0; }
 static void smExactPolyDiv(poly, poly);
 static BOOLEAN smIsScalar(const poly);
 static BOOLEAN smIsNegQuot(poly, const poly, const poly);
@@ -87,6 +86,7 @@ private:
   int act;             // number of unreduced columns (start: ncols)
   int crd;             // number of reduced columns (start: 0)
   int tored;           // border for rows to reduce
+  int inred;           // unreducable part
   int rpiv, cpiv;      // position of the pivot
   unsigned short *perm;// permutation of rows
   float wpoints;       // weight of all points
@@ -307,7 +307,7 @@ sparse_mat::sparse_mat(ideal smat)
     return;
   }
   sign = 1;
-  act = ncols;
+  inred = act = ncols;
   crd = 0;
   tored = nrows; // without border
   i = tored+1;
@@ -462,10 +462,7 @@ void sparse_mat::smBareiss(int x, int y)
   if (y < 2) y = 2;
   if (act < y)
   {
-    if (act != 0)
-    {
-      this->smCopToRes();
-    }
+    this->smCopToRes();
     return;
   }
   this->smPivot();
@@ -498,12 +495,7 @@ void sparse_mat::smBareiss(int x, int y)
       this->smToredElim();
     if (act < y)
     {
-      if (act != 0)
-      {
-        this->smCopToRes();
-      }
-      else
-        tored = crd;
+      this->smCopToRes();
       return;
     }
   }
@@ -524,10 +516,7 @@ void sparse_mat::smNewBareiss(int x, int y)
   if (y < 2) y = 2;
   if (act < y)
   {
-    if (act != 0)
-    {
-      this->smCopToRes();
-    }
+    this->smCopToRes();
     return;
   }
   this->smPivot();
@@ -561,13 +550,8 @@ void sparse_mat::smNewBareiss(int x, int y)
       this->smToredElim();
     if (act < y)
     {
-      if (act != 0)
-      {
-        this->smFinalMult();
-        this->smCopToRes();
-      }
-      else
-        tored = crd;
+      this->smFinalMult();
+      this->smCopToRes();
       return;
     }
   }
@@ -1256,8 +1240,8 @@ void sparse_mat::smToredElim()
     if (i > act) return;
     if (m_act[i]->pos > tored)
     {
-      m_res[crd] = m_act[i];
-      crd++;
+      m_res[inred] = m_act[i];
+      inred--;
       break;
     }
   }
@@ -1268,8 +1252,8 @@ void sparse_mat::smToredElim()
     if (j > act) break;
     if (m_act[i]->pos > tored)
     {
-      m_res[crd] = m_act[i];
-      crd++;
+      m_res[inred] = m_act[i];
+      inred--;
     }
     else
     {
@@ -1286,49 +1270,72 @@ void sparse_mat::smToredElim()
 */
 void sparse_mat::smCopToRes()
 {
-  smpoly p, r, ap, a, h;
-  int c, i;
+  smpoly a,ap,r,h;
+  int i,j,k,l;
 
-  if (act == 0) return;
-  if (act > 1)
+  i = 0;
+  if (act)
   {
-    Werror("Not implemented");
-  }
-  crd++;
-  c = crd;
-  p = m_res[c] = m_act[act];
-  do
-  {
-    r = m_row[p->pos];
-    m_row[p->pos] = NULL;
-    perm[c] = p->pos;
-    p->pos = c;
-    while (r != NULL)
+    a = m_act[act]; // init perm
+    do
     {
-      ap = m_res[r->pos];
+      i++;
+      perm[crd+i] = a->pos;
+      a = a->n;
+    } while (a != NULL);
+    for (j=act-1;j;j--) // load all positions of perm
+    {
+      a = m_act[j];
+      k = 1;
       loop
       {
-        a = ap->n;
-        if (a == NULL)
+        if (perm[crd+k] >= a->pos)
         {
-          ap->n = h = r;
-          r = r->n;
-          h->n = a;
-          h->pos = c;
+          if (perm[crd+k] > a->pos)
+          {
+            for (l=i;l>=k;l--) perm[crd+l+1] = perm[crd+l];
+            perm[crd+k] = a->pos;
+            i++;
+          }
+          a = a->n;
+          if (a == NULL) break;
+        }
+        k++;
+        if (k > i)
+        {
+          do
+          {
+            i++;
+            perm[crd+i] = a->pos;
+            a = a->n;
+          } while (a != NULL);
           break;
         }
-        ap = a;
       }
     }
-    c++;
-    p = p->n;
-  } while (p != NULL);
-  for (i=1;i<=nrows;i++)
+  }
+  tored = crd+i; // the number or permuted rows
+  for (j=act;j;j--) // renumber m_act
   {
-    if(m_row[i] != NULL)
+    k = 1;
+    a = m_act[j];
+    do
     {
-      r = m_row[i];
-      m_row[i] = NULL;
+      if (perm[crd+k] == a->pos)
+      {
+        a->pos = crd+k;
+        a = a->n;
+      }
+      k++;
+    } while (a != NULL);
+  }
+  for(k=1;k<=i;k++) // clean this from m_row
+  {
+    j = perm[crd+k];
+    if (m_row[j] != NULL)
+    {
+      r = m_row[j];
+      m_row[j] = NULL;
       do
       {
         ap = m_res[r->pos];
@@ -1337,19 +1344,56 @@ void sparse_mat::smCopToRes()
           a = ap->n;
           if (a == NULL)
           {
-            ap->n = h = r;
+            h = ap->n = r;
             r = r->n;
-            h->n = a;
-            h->pos = c;
+            h->n = NULL;
+            h->pos = crd+k;
             break;
           }
           ap = a;
         }
       } while (r!=NULL);
-      c++;
     }
   }
-  tored = c-1;
+  while(act) // clean m_act
+  {
+    crd++;
+    m_res[crd] = m_act[act];
+    act--;
+  }
+  for (i=1;i<=nrows;i++) // take the rest of m_row
+  {
+    if(m_row[i] != NULL)
+    {
+      tored++;
+      r = m_row[i];
+      m_row[i] = NULL;
+      perm[tored] = i;
+      do
+      {
+        ap = m_res[r->pos];
+        loop
+        {
+          a = ap->n;
+          if (a == NULL)
+          {
+            h = ap->n = r;
+            r = r->n;
+            h->n = NULL;
+            h->pos = tored;
+            break;
+          }
+          ap = a;
+        }
+      } while (r!=NULL);
+    }
+  }
+  while (inred < ncols) // take unreducable
+  {
+    crd++;
+    inred++;
+    m_res[crd] = m_res[inred];
+  }
 }
 
 /*
