@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.45 1998-05-08 15:29:38 Singular Exp $ */
+/* $Id: extra.cc,v 1.46 1998-05-11 13:19:58 obachman Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -311,6 +311,22 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
       res->data=(void*) siRandomStart;
       return FALSE;
     }
+/*==================== neworder =============================*/
+// should go below
+#ifdef HAVE_LIBFAC_P
+    if(strcmp((char*)(h->Data()),"neworder")==0)
+    {
+      if ((h->next!=NULL) &&(h->next->Typ()==IDEAL_CMD))
+      {
+        res->rtyp=STRING_CMD;
+        res->data=(void *)singclap_neworder((ideal)h->next->Data());
+        return FALSE;
+      }
+      else
+        WerrorS("ideal expected");
+    }
+    else
+#endif
 #ifdef HAVE_EXTENDED_SYSTEM
 // You can put your own system calls here
 /*==================== LaScala ==================================*/
@@ -359,21 +375,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
       }
       else
         WerrorS("poly expected");
-    }
-    else
-#endif
-/*==================== neworder =============================*/
-#ifdef HAVE_LIBFAC_P
-    if(strcmp((char*)(h->Data()),"neworder")==0)
-    {
-      if ((h->next!=NULL) &&(h->next->Typ()==IDEAL_CMD))
-      {
-        res->rtyp=STRING_CMD;
-        res->data=(void *)singclap_neworder((ideal)h->next->Data());
-        return FALSE;
-      }
-      else
-        WerrorS("ideal expected");
     }
     else
 #endif
