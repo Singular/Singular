@@ -1,9 +1,9 @@
-// $Id: inout.lib,v 1.6 1998-05-14 18:45:07 Singular Exp $
+// $Id: inout.lib,v 1.7 1999-06-07 17:32:21 Singular Exp $
 // system("random",787422842);
 // (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: inout.lib,v 1.6 1998-05-14 18:45:07 Singular Exp $";
+version="$Id: inout.lib,v 1.7 1999-06-07 17:32:21 Singular Exp $";
 info="
 LIBRARY:  inout.lib     PROCEDURES FOR MANIPULATING IN- AND OUTPUT
 
@@ -386,20 +386,27 @@ EXAMPLE: example show; shows an example
 //----------------------- case: id is of type list ----------------------------
    if ( typeof(id)=="list" )
    {
-      @@s = tab(@li@)+"// list, "+string(size(id))+" element(s):";
-      @@s;"";
+//      @@s = tab(@li@)+"// list, "+string(size(id))+" element(s):";
+      @@s = tab((3*(voice-2)))+"// list, "+string(size(id))+" element(s):";
+      @@s;
       for ( @ii=1; @ii<=size(id); @ii++ )
       {
          if( typeof(id[@ii])!="none" )
          {
             def @id(@ii) = id[@ii];
-            show(@id(@ii),@li@+3);
+            tab(3*(voice-2))+"["+string(@ii)+"]:";
+            //           show(@id(@ii),@li@+3*(voice-1));
+            show(@id(@ii),3*(voice-1));
          }
-         else { tab(@li@+2),"//",id[@ii]; }
+         else
+         {
+            "["+string(@ii)+"]:";
+            tab(@li@+2),"//",id[@ii]; 
+         }
       }
       short=@short@; return();
     }
-   if( defined(@id@)!=voice ) { "// wrong syntax, type help show;";  return(); }
+   if( defined(@id@)!=voice ) { "// wrong syntax, type help show;";  return();}
 //-------------------- case: @id@ belongs to any ring -------------------------
    if( typeof(@id@)=="string" or typeof(@id@)=="int" or typeof(@id@)=="intvec"
        or typeof(@id@)=="intmat" or typeof(@id@)=="list" )
@@ -440,6 +447,12 @@ EXAMPLE: example show; shows an example
          @@s;
          print(matrix(@id@));
       }
+       if( typeof(@id@)=="matrix")
+      {
+         @@s=@@s + ", "+string(nrows(@id@))+"x"+string(ncols(@id@));
+         @@s;
+         print(matrix(@id@));
+      }
       short=@short@; return();
    }
    if( typeof(@id@)=="vector" )
@@ -458,9 +471,9 @@ EXAMPLE: example show; shows an example
       for( @n@=1; @n@<=ncols(@id@); @n@=@n@+1 ) { print(@id@[@n@]); }
       short=@short@; return();
    }
-   if( typeof(@id@)=="number" )
+   if( typeof(@id@)=="number" or typeof(@id@)=="resolution" )
    {
-      @@s = tab(@li@)+"//", typeof(@id@);
+      @@s = tab(@li@)+"// ", typeof(@id@);
       @@s;
       @id@; short=@short@; return();
    }
@@ -484,8 +497,14 @@ EXAMPLE: example show; shows an example
       string s="("+charstr(@id@)+"),("+varstr(@id@)+"),("+ordstr(@id@)+");";
       if( typeof(@id@)=="ring" )
       {
+         kill @id@;
          @@s = tab(@li@)+"// ring:"; @@s,s;
          @@s = tab(@li@)+"// minpoly ="; @@s,minpoly;
+         "// objects belonging to this ring:";
+         listvar(poly);listvar(ideal);
+         listvar(vector);listvar(module);
+         listvar(map);listvar(matrix);
+         listvar(number);listvar(resolution);
       }
       if( typeof(@id@)=="qring" )
       {
@@ -493,6 +512,10 @@ EXAMPLE: example show; shows an example
          @@s = tab(@li@)+"// minpoly ="; @@s, minpoly;
          @@s = tab(@li@)+"// quotient ring from ideal:"; @@s;
          ideal(@id@);
+         listvar(poly);listvar(ideal);
+         listvar(vector);listvar(module);
+         listvar(map);listvar(matrix);
+         listvar(number);listvar(resolution);
       }
       short=@short@; //return();
    }
@@ -502,7 +525,7 @@ example
     ring r;
     show(r);
     ideal i=x^3+y^5-6*z^3,xy,x3-y2;
-    show(i,3);
+    show(i,3);            // introduce 3 space tabs before information
     vector v=x*gen(1)+y*gen(3);
     module m=v,2*v+gen(4);
     list L = i,v,m;
@@ -514,7 +537,7 @@ example
     show(Q);
     map F=r,a2,b^2,3*c3;
     show(F);
-// Apply show to i (which does not belong to the basering) by typing
+// Apply 'show' to i (which does not belong to the basering) by typing
 // ring r; ideal i=xy,x3-y2; ring Q; show(r,"i");
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -556,10 +579,10 @@ EXAMPLE: example showrecursive; shows an example
 }
 example
 { "EXAMPLE:"; echo=2;
-   ring r=2,(t(1..15),x,y),ds;
-   poly f=y+t(15)*x^2+t(14)*x^3+t(13)*x^2*y^2+t(12)*x*y^3;
-   showrecursive(f,xy);
-   showrecursive(f,xy,"ds");
+   ring r=2,(a,b,c,d,x,y),ds;
+   poly f=y+ax2+bx3+cx2y2+dxy3;
+   showrecursive(f,x);
+   showrecursive(f,xy,"lp");
 }
 ///////////////////////////////////////////////////////////////////////////////
 
