@@ -3,24 +3,23 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.18 2000-11-17 14:07:12 Singular Exp $ */
+/* $Id: numbers.h,v 1.19 2000-12-01 15:21:35 Singular Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
 #include "structs.h"
 
-#define n_Copy(n, r)          nCopy(n)
+#define n_Copy(n, r)          (r)->cf->nCopy(n)
 #define n_Delete(n, r)        (r)->cf->nDelete(n)
-//#define n_Delete(n, r)        nDelete(n)
-#define n_Mult(n1, n2, r)     nMult(n1, n2)
-#define n_Add(n1, n2, r)      nAdd(n1, n2)
-#define n_IsZero(n, r)	      nIsZero(n)
-#define n_Equal(n1, n2, r)    nEqual(n1, n2)
-#define n_Neg(n, r)	          nNeg(n)
-#define n_Sub(n1, n2, r)      nSub(n1, n2)
-#define n_GetChar(r)          nGetChar()
-#define n_Init(i, r)          nInit(i)
-#define n_IsOne(n, r)         nIsOne(n)
+#define n_Mult(n1, n2, r)     (r)->cf->nMult(n1, n2)
+#define n_Add(n1, n2, r)      (r)->cf->nAdd(n1, n2)
+#define n_IsZero(n, r)        (r)->cf->nIsZero(n)
+#define n_Equal(n1, n2, r)    (r)->cf->nEqual(n1, n2)
+#define n_Neg(n, r)           (r)->cf->nNeg(n)
+#define n_Sub(n1, n2, r)      (r)->cf->nSub(n1, n2)
+#define n_GetChar(r)          ((r)->cf->nChar)
+#define n_Init(i, r)          (r)->cf->nInit(i)
+#define n_IsOne(n, r)         (r)->cf->nIsOne(n)
 
 /* variables */
 extern short fftable[];
