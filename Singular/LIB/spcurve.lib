@@ -1,27 +1,28 @@
-// $Id: spcurve.lib,v 1.5 1999-07-20 07:23:46 anne Exp $
+// $Id: spcurve.lib,v 1.6 1999-07-20 08:47:19 Singular Exp $
 // (anne, last modified 31.5.99)
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: spcurve.lib,v 1.5 1999-07-20 07:23:46 anne Exp $";
+version="$Id: spcurve.lib,v 1.6 1999-07-20 08:47:19 Singular Exp $";
 info="
 LIBRARY: spcurve.lib    PROCEDURES FOR CM CODIMENSION 2 SINGULARITIES
 AUTHOR:  Anne Fruehbis-Krueger, anne@mathematik.uni-kl.de
 last modified: 31.5.99
 
+PROCEDURES:
  isCMcod2(i);            presentation matrix of the ideal i, if i is CM
  CMtype(i);              Cohen-Macaulay type of the ideal i
  matrixT1(M,n);          1st order deformation T1 in matrix description
  semiCMcod2(M,T1);       semiuniversal deformation of maximal minors of M
- discr(sem,n);           discriminant of semiuniversal deformation 
+ discr(sem,n);           discriminant of semiuniversal deformation
  qhmatrix(M);            weights if M is quasihomogeneous
  relweight(N,W,a);       relative matrix weight of N w.r.t. weights (W,a)
  posweight(M,T1,i);      deformation of coker(M) of non-negative weight
- KSpencerKernel(M);      kernel of the Kodaira-Spencer map 
+ KSpencerKernel(M);      kernel of the Kodaira-Spencer map
  mod2id(M,iv);           conversion of a module M to an ideal
  id2mod(i,iv);           conversion inverse to mod2id
  subrInterred(i1,i2,iv)  interred w.r.t. a subset of variables
 ";
-          
+
 LIB "elim.lib";
 LIB "homolog.lib";
 LIB "inout.lib";
@@ -41,8 +42,8 @@ EXAMPLE: example isCMcod2; shows an example"
 //---------------------------------------------------------------------------
   list kurveres=mres(kurve,0);
   matrix M=kurveres[2];
-  if ((size(kurveres)>3) && 
-         ((size(kurveres[3])>1) || 
+  if ((size(kurveres)>3) &&
+         ((size(kurveres[3])>1) ||
           ((size(kurveres[3])<=1) && (kurveres[3][1,1]!=0))))
   {
     dbprint(p,"//not Cohen-Macaulay, codim 2");
@@ -61,7 +62,7 @@ example
 
 proc CMtype(ideal kurve)
 "USAGE:   CMtype(i);  i an ideal, CM of codimension 2
-RETURN:  Cohen-Macaulay type of i (integer) 
+RETURN:  Cohen-Macaulay type of i (integer)
          (-1, if i is not Cohen-Macaulay of codimension 2)
 EXAMPLE: example CMtype; shows an example"
 {
@@ -73,10 +74,10 @@ EXAMPLE: example CMtype; shows an example"
 //---------------------------------------------------------------------------
   list kurveres;
   kurveres=mres(kurve,0);
-  if ((size(kurveres)>3) && 
-         ((size(kurveres[3])>1) || 
+  if ((size(kurveres)>3) &&
+         ((size(kurveres[3])>1) ||
           ((size(kurveres[3])<=1) && (kurveres[3][1,1]!=0))))
-  { 
+  {
     dbprint(p,"//not Cohen-Macaulay, codim 2");
     return(gt);
   }
@@ -98,10 +99,10 @@ example
 proc matrixT1(matrix M ,int n)
 "USAGE:   matrixT1(M,n);  M matrix, n integer
 ASSUME:  M is a presentation matrix of an ideal i, CM of codimension 2;
-         consider i as a family of ideals in a ring in the first n 
-         variables where the remaining variables are considered as 
+         consider i as a family of ideals in a ring in the first n
+         variables where the remaining variables are considered as
          parameters
-RETURN:  list consisting of the k x (k+1) matrix M and a module K_M such that 
+RETURN:  list consisting of the k x (k+1) matrix M and a module K_M such that
          T1=Mat(k,k+1;R)/K_M is the space of first order deformations of i
 EXAMPLE: example matrixT1; shows an example"
 {
@@ -123,7 +124,7 @@ EXAMPLE: example matrixT1; shows an example"
   {
     dbprint(p,"//not a k x (k+1) matrix");
     return("ERROR");
-  } 
+  }
 //---------------------------------------------------------------------------
 // Construct the denominator - step by step
 // step 1: initialization
@@ -159,7 +160,7 @@ EXAMPLE: example matrixT1; shows an example"
     }
   }
 //---------------------------------------------------------------------------
-// step 4: so is L*M 
+// step 4: so is L*M
 //---------------------------------------------------------------------------
   for( i=1; i <= (gt+1); i++)
   {
@@ -219,7 +220,7 @@ EXAMPLE: example semiCMcod2; shows an example"
       break;
     }
   }
-  if (defined(jj)>1) 
+  if (defined(jj)>1)
   {
     if (jj==-1)
     {
@@ -242,7 +243,7 @@ EXAMPLE: example semiCMcod2; shows an example"
   matrix N=matrix(m);
   matrix Mtemp[gt*(gt+1)][1];
   for( i=1; i<=tau; i++)
-  { 
+  {
     Mtemp=t1erz[i];
     N=N+A(i)*transpose(Mtemp);
   }
@@ -281,7 +282,7 @@ EXAMPLE: example discr; shows an example"
 //---------------------------------------------------------------------------
   int i;
   ideal sem=std(kurve);
-  ideal semdiff; 
+  ideal semdiff;
   ideal J2;
   int ncol=ncols(matrix(sem));
   matrix Jacob[n][ncol];
@@ -322,10 +323,10 @@ example
 
 proc qhmatrix(matrix M)
 "USAGE:   qhmatrix(M);   M a k x (k+1) matrix
-RETURN:  list, consisting of an integer vector containing the weights of 
+RETURN:  list, consisting of an integer vector containing the weights of
          the variables of the basering and an integer matrix giving the
          weights of the entries of M, if M is quasihomogeneous;
-         zero integer vector and zero integer matrix, if M is not 
+         zero integer vector and zero integer matrix, if M is not
          quasihomogeneous, i.e. does not allow row and column weights
 EXAMPLE: example qhmatrix; shows an example"
 {
@@ -350,7 +351,7 @@ EXAMPLE: example qhmatrix; shows an example"
   {
     dbprint(p,"//not a k x (k+1) matrix");
     return("ERROR");
-  } 
+  }
   ideal m=minor(M,nr);
 //---------------------------------------------------------------------------
 // get the weight using the fact that the matrix is quasihomogeneous, if
@@ -377,7 +378,7 @@ EXAMPLE: example qhmatrix; shows an example"
       for(j=1; j<=nc; j++)
       {
         if(M[i,j]==0)
-        { 
+        {
           comprow=0;
           break;
         }
@@ -386,7 +387,7 @@ EXAMPLE: example qhmatrix; shows an example"
   }
 //---------------------------------------------------------------------------
 // get the weights of the comprow'th row or use emergency exit
-//---------------------------------------------------------------------------  
+//---------------------------------------------------------------------------
   if(comprow==0)
   {
     intvec v=0;
@@ -407,7 +408,7 @@ EXAMPLE: example qhmatrix; shows an example"
   for(i=1; i<=nr; i++)
   {
     if ( i==comprow )
-    { 
+    {
 // this row should not be tested against itself
       donttest=1;
     }
@@ -502,11 +503,11 @@ example
 
 proc relweight(matrix N, intmat W, intvec a)
 "USAGE:   relweight(N,W,a); N matrix, W intmat, a intvec
-ASSUME:  N is a non-zero matrix 
-         W is an integer matrix of the same size as N 
+ASSUME:  N is a non-zero matrix
+         W is an integer matrix of the same size as N
          a is an integer vector giving the weights of the variables
 RETURN:  integer, max(a-weighted order(N_ij) - W_ij | all entries ij)
-         string "ERROR" if sizes do not match
+         string \"ERROR\" if sizes do not match
 EXAMPLE: example relweight; shows an example"
 {
   int p = printlevel-voice+3;  // p=printlevel+1 (default: p=1)
@@ -566,14 +567,14 @@ proc posweight(matrix M, module t1, int choose, list #)
          n=0 : all deformations of non-negative weight
          n=1 : only non-constant deformations of non-negative weight
          n=2 : all deformations of positive weight
-         As an optional parameter the name of a new ring may be 
+         As an optional parameter the name of a new ring may be
          specified.
 ASSUME:  M is a presentation matrix of a Cohen-Macaulay codimension 2
          ideal and t1 is its T1 space in matrix notation
 CREATE:  new basering (default name: rneu); a different name for this ring
          may be given as a 4th parameter
-RETURN:  list, consisting of a presentation matrix describing the deformation 
-         given by the generators of T1 of non-negative/positive weight 
+RETURN:  list, consisting of a presentation matrix describing the deformation
+         given by the generators of T1 of non-negative/positive weight
          and the weight vector for the new variables
 NOTE:   The current basering should not contain any variables named
          T(i) where i is some integer!
@@ -607,7 +608,7 @@ EXAMPLE: example posweight; shows an example"
     }
   }
   kill i;
-  if (defined(jj)) 
+  if (defined(jj))
   {
     if (jj==-1)
     {
@@ -685,7 +686,7 @@ EXAMPLE: example posweight; shows an example"
   ideal mtemp;
   matrix Mtemp[gt*(gt+1)][1];
   for( i=1; i<=pw; i++)
-  { 
+  {
     mtemp=erz1[i];
     Mtemp=mtemp;
     N=N+T(i)*transpose(Mtemp);
@@ -727,7 +728,7 @@ proc KSpencerKernel(matrix M,list #)
            optional parameters (please specify in this order, if both are
            present):
            *  s = first of the names of the new rings
-              e.g. \"R\" leads to ring names R and R1 
+              e.g. \"R\" leads to ring names R and R1
            *  v of size n(n+1) leads to the following module ordering
               gen(v[1]) > gen(v[2]) > ... > gen(v[n(n+1)])
               where the matrix entry ij corresponds to gen((i-1)*n+j)
@@ -741,11 +742,11 @@ RETURN:    coefficient matrix representing the kernel of the Kodaira-
 NOTE:      * the initial basering should not contain variables with name
              e(i) or T(i), since those variable names will be internally
              used by the script
-           * setting an intvec with 5 entries and name watchProgress 
+           * setting an intvec with 5 entries and name watchProgress
              shows the progress of the computations:
              watchProgress[1]>0  => option(prot) in groebner commands
              watchProgress[2]>0  => trace output for highcorner
-             watchProgress[3]>0  => output of deformed matrix 
+             watchProgress[3]>0  => output of deformed matrix
              watchProgress[4]>0  => result of elimination step
              watchProgress[4]>1  => trace output of multiplications with xyz
                                     and subsequent reductions
@@ -817,7 +818,7 @@ EXAMPLE:   example KSpencerKernel; shows an example"
   else
   {
     intvec iv=1..ne;
-  }  
+  }
   list l=matrixT1(M,3);
   if (dim(std(l[2])) != 0)
   {
@@ -845,19 +846,19 @@ EXAMPLE:   example KSpencerKernel; shows an example"
   }
   if(defined(desiredorder)>1)
   {
-    ringre="ring re=" + charstr(r) +",(e(1.." + string(ne) + "),"+ 
+    ringre="ring re=" + charstr(r) +",(e(1.." + string(ne) + "),"+
                         varstr(basering) + "),Ws(";
     intvec tempiv=intvec(wl[2]);
     for(i=1;i<=ne;i++)
     {
       ringre=ringre + string((-1)*tempiv[desiredorder[i]]) + ",";
-    } 
+    }
     ringre= ringre  + string(wl[1]) + ");";
   }
   else
   {
-    ringre="ring re=" + charstr(r) +",(e(1.." + string(ne) + "),"+ varstr(basering) 
-                        + "),Ws(" + string((-1)*intvec(wl[2])) + "," 
+    ringre="ring re=" + charstr(r) +",(e(1.." + string(ne) + "),"+ varstr(basering)
+                        + "),Ws(" + string((-1)*intvec(wl[2])) + ","
                         + string(wl[1]) + ");";
   }
   execute ringre;
@@ -919,7 +920,7 @@ EXAMPLE:   example KSpencerKernel; shows an example"
   }
   if (size(li)<=1)
   {
-    return("ERROR")
+    return("ERROR");
   }
   if (defined(watchProgress))
   {
@@ -965,7 +966,7 @@ EXAMPLE:   example KSpencerKernel; shows an example"
     }
   }
   ideal templ=lead(t1perts);
-  for(int j=1;j<=nv;j++) 
+  for(int j=1;j<=nv;j++)
   {
     templ=subst(templ,T(j),0);
   }
@@ -983,10 +984,10 @@ EXAMPLE:   example KSpencerKernel; shows an example"
     }
   }
 //--------------------------------------------------------------------------
-// multiply by the initial ring variables to shift the generators with 
+// multiply by the initial ring variables to shift the generators with
 // leading term divisible by some T(i) and reduce afterwards
 //--------------------------------------------------------------------------
-                       // This is obviously no SB, but we have to reduce by   
+                       // This is obviously no SB, but we have to reduce by
   attrib(mx,"isSB",1); // it and setting isSB suppresses error messages
   noether=noet[size(noet)];
   ideal ker_gen=reduce(mt,mx);
@@ -1028,7 +1029,7 @@ EXAMPLE:   example KSpencerKernel; shows an example"
 //-------------------------------------------------------------------------
   ovar=var(1);
   for(i=2;i<=ne;i++)
-  { 
+  {
     ovar=ovar,var(i);
   }
   ker_gen=ker_gen,ovar^2;
@@ -1110,7 +1111,7 @@ NOTE:      this procedure should be used in the following situation:
            module M such that e(i)*e(j)=0 for all i,j
            the new ring should already exist and be the current ring
 RETURN:    ideal i in which each gen(i) from the module is replaced by
-           var(vpos[i]) and all monomials var(vpos[i])*var(vpos[j]) have 
+           var(vpos[i]) and all monomials var(vpos[i])*var(vpos[j]) have
            been added to the generating set of i
 EXAMPLE:   example mod2id; shows an example"
 {
@@ -1133,7 +1134,7 @@ EXAMPLE:   example mod2id; shows an example"
     matrix M=Mt;
   }
 //----------------------------------------------------------------------
-// define the desired ideal 
+// define the desired ideal
 //----------------------------------------------------------------------
   ideal ret=vars^2,varm*M;
   return(ret);
@@ -1144,25 +1145,25 @@ example
   module mo=x*gen(1)+y*gen(2);
   intvec iv=2,1;
   mod2id(mo,iv);
-} 
+}
 ////////////////////////////////////////////////////////////////////////
 
 proc id2mod(ideal i,intvec vpos)
 "USAGE:     id2mod(I,vpos); I ideal, vpos intvec
 NOTE:      * use this procedure only makes sense if the ideal contains
              all var(vpos[i])*var(vpos[j]) as monomial generators and
-             all other generators are linear combinations of the 
+             all other generators are linear combinations of the
              var(vpos[i]) over the ring in the other variables
            * this is the inverse procedure to mod2id and should be applied
              only to ideals created by mod2id using the same intvec vpos
              (possibly after a standard basis computation)
 RETURN:    module corresponding to the ideal by replacing var(vpos[i]) by
-           gen(i) and omitting all generators var(vpos[i])*var(vpos[j]) 
+           gen(i) and omitting all generators var(vpos[i])*var(vpos[j])
 EXAMPLE:   example id2mod; shows an example"
 {
   int p = printlevel-voice+3;  // p=printlevel+1 (default: p=1)
 //---------------------------------------------------------------------
-// Initialization 
+// Initialization
 //---------------------------------------------------------------------
   int n=size(i);
   int v=size(vpos);
@@ -1196,12 +1197,12 @@ proc subrInterred(ideal mon, ideal sm, intvec iv)
 "USAGE:    subrInterred(mon,sm,iv);
           sm:   ideal in a ring r with n + s variables,
                 e.g. x_1,..,x_n and t_1,..,t_s
-          mon:  ideal with monomial generators (not divisible by 
+          mon:  ideal with monomial generators (not divisible by
                 one of the t_i) such that sm is contained in the module
                 k[t_1,..,t_s]*mon[1]+..+k[t_1,..,t_s]*mon[size(mon)]
           iv:   intvec listing the variables which are supposed to be used
                 as x_i
-RETURN:   interreduced system of generators of sm seen as a submodule 
+RETURN:   interreduced system of generators of sm seen as a submodule
           of k[t_1,..,t_s]*mon[1]+..+k[t_1,..,t_s]*mon[size(mon)]
 EXAMPLE:  example subrInterred; shows an example"
 {
