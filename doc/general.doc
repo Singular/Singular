@@ -1,30 +1,124 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.5 1998-04-27 14:29:17 krueger Exp $
+@comment $Id: general.doc,v 1.6 1998-04-27 16:41:09 krueger Exp $
 @comment this file contains the general information about Singular
 
 @menu
-* Interactive use::
-* Rings and orderings::
-* The SINGULAR language::
+* Interactive use::             
+* Rings and orderings::         
+* The SINGULAR language::       
 * Procedures::
 * Libraries::
 * Debugging tools::
-* Implemented algorithms::
+* Implemented algorithms::      
 @end menu
 @c ---------------------------------------------------------------------------
 @node Interactive use, Rings and orderings, General concepts, General concepts
 @section Interactive use
 @cindex Interactive use
 
+@menu
+* How to enter and exit::
+* Singular prompt and error recovery::
+* The online help system::
+* Interrupting SINGULAR::
+* Editing Input::
+* Control parameters::
+* Sources of input::
+* Reuse of output::
+* Commandline options::
+@end menu
+
+@node How to enter and exit,Singular prompt and error recovery  , Interactive use, Interactive use
+@subsection How to enter and exit
+@cindex How to enter and exit
+
+@node Singular prompt and error recovery,The online help system,How to enter and exit, Interactive use
+@subsection Singular prompt and error recovery
+@cindex Singular prompt and error recovery
+
+@node The online help system,Interrupting SINGULAR,Singular prompt and error recovery,Interactive use
+@subsection The online help system
+@cindex The online help system
+
+@node Interrupting SINGULAR,Editing Input,The online help system,Interactive use
+@subsection Interrupting SINGULAR
+@cindex Interrupting SINGULAR
+
+@node Editing Input,Control parameters,Interrupting SINGULAR,Interactive use
+@subsection Editing Input
+@cindex Editing Input
+
+@node Control parameters,Sources of input,Editing Input,Interactive use
+@subsection Control parameters
+@cindex Control parameters
+
+@node Sources of input,Reuse of output,Control parameters,Interactive use
+@subsection Sources of input
+@cindex Sources of input
+
+@node Reuse of output,Commandline options,Sources of input,Interactive use
+@subsection Reuse of output
+@cindex Reuse of output
+
+@node Commandline options, ,Reuse of output,Interactive use
+@subsection Commandline options
+@cindex Commandline options
+
 @c ---------------------------------------------------------------------------
 @node Rings and orderings, The SINGULAR language, Interactive use, General concepts
 @section Rings and orderings
 @cindex Rings and orderings
 
+@menu
+* Available rings::             
+* General syntax of a ring definition::  
+* Term orderings::              
+@end menu
+
+@node Available rings, General syntax of a ring definition, Rings and orderings, Rings and orderings
+@subsection Available rings
+@cindex Available rings
+
+@node General syntax of a ring definition, Term orderings, Available rings, Rings and orderings
+@subsection General syntax of a ring definition
+@cindex General syntax of a ring definition
+
+@node Term orderings, ,General syntax of a ring definition, Rings and orderings
+@subsection Term orderings
+@cindex Term orderings
+
 @c ---------------------------------------------------------------------------
 @node The SINGULAR language, Procedures, Rings and orderings, General concepts
 @section The SINGULAR language
 @cindex The SINGULAR language
+
+@menu
+* General command syntax::      
+* Names and objects::           
+* Special characters::          
+* Controll structures::         
+* Proc Commands::               
+@end menu
+
+@node General command syntax, Names and objects, The SINGULAR language, The SINGULAR language
+@subsection General command syntax
+@cindex General command syntax
+
+@node Names and objects, Special characters,General command syntax, The SINGULAR language 
+@subsection Names and objects
+@cindex Names and objects
+
+@node Special characters, Controll structures, Names and objects, The SINGULAR language
+@subsection Special characters
+@cindex Special characters
+
+@node Controll structures, Proc Commands, Special characters,The SINGULAR language 
+@subsection Controll structures
+@cindex Controll structures
+
+@node Proc Commands, ,Controll structures, The SINGULAR language
+@subsection Proc Commands
+@cindex Proc Commands
 
 @c ---------------------------------------------------------------------------
 @include libraries.tex
