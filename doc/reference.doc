@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.223 2004-06-01 16:11:07 Singular Exp $
+@comment $Id: reference.doc,v 1.224 2004-06-28 14:30:52 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1241,13 +1241,23 @@ See
 list
 @item @strong{Purpose:}
 @code{division} computes a division with remainder.
-For two ideals resp.@: modules @code{M} (first argument) and @code{N} (second argument), it returns a list @code{T,R,U} where @code{T} is a matrix, @code{R} is an ideal resp. a module, and @code{U} is a diagonal matrix of units such that @code{matrix(M)*U=matrix(N)*T+matrix(R)} is a standard representation for the normal form @code{R} of @code{M} with respect to a standard basis of @code{N}.
-@code{division} uses different algorithms depending on whether @code{N} is represented by a standard basis.
+For two ideals resp.@: modules @code{M} (first argument) and @code{N}
+(second argument), it returns a list @code{T,R,U} where @code{T} is a matrix,
+@code{R} is an ideal resp. a module, and @code{U} is a diagonal matrix of units
+such that @code{matrix(M)*U=matrix(N)*T+matrix(R)} is a standard representation
+for the normal form @code{R} of @code{M} with respect to a standard basis of @code{N}.
+@code{division} uses different algorithms depending on whether @code{N} is
+represented by a standard basis.
 For a polynomial basering, the matrix @code{U} is the identity matrix.
 A matrix @code{T} as above is also computed by @code{lift}.
-@*For additional arguments @code{n} (third argument) and @code{w} (fourth argument), @code{division} returns a list @code{T,R} as above such that @code{matrix(M)=matrix(N)*T+matrix(R)} is a standard representation for the normal form @code{R} of @code{M} with respect to @code{N} up to weighted degree @code{n} with respect to the weight vector @code{w}.
+@*For additional arguments @code{n} (third argument) and @code{w} (fourth argument),
+@code{division} returns a list @code{T,R} as above such that
+@code{matrix(M)=matrix(N)*T+matrix(R)} is a standard representation for the
+normal form @code{R} of @code{M} with respect to @code{N} up to weighted degree
+@code{n} with respect to the weight vector @code{w}.
 The weighted degree of @code{T} and @code{R} respect to @code{w} is at most @code{n}.
-If the weight vector @code{w} is not given, @code{division} uses the standard weight vector @code{w=1,...,1}.
+If the weight vector @code{w} is not given,
+@code{division} uses the standard weight vector @code{w=1,...,1}.
 @item @strong{Example:}
 @smallexample
 @c example
