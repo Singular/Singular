@@ -1,32 +1,29 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: jordan.lib,v 1.5 1999-01-12 08:53:23 mschulze Exp $";
+version="$Id: jordan.lib,v 1.6 1999-01-19 10:34:26 mschulze Exp $";
 info="
 LIBRARY: jordan.lib  PROCEDURES TO COMPUTE THE JORDAN NORMAL FORM
                      by Mathias Schulze
                      email: mschulze@mathematik.uni-kl.de
 
- jordan(M[,opt]);    eigenvalues and corresponding jordan block size vectors 
-                     of the constant part of the square matrix M and 
-                     a jordan basis for the constant part of M
- jordanmatrix(eb);   jordan matrix with eigenvalues eb[1] and corresponding 
-                     jordan block size vectors eb[2]
- jordanform(M);      jordan normal form of the constant part
-                     of the square matrix M
- invmat(U);          inverse matrix of the invertible constant part 
-                     of the matrix U
+ jordan(M[,opt]);    eigenvalues, corresponding jordan block size vectors, 
+                     and jordan basis of constant square matrix M
+ jordanmatrix(d);    jordan matrix with eigenvalues d[1] and corresponding 
+                     jordan block size vectors d[2]
+ jordanform(M);      jordan normal form of constant square matrix M
+ invmat(M);          inverse matrix of invertible constant matrix M
 ";
 
 LIB "ring.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc jordan(matrix M,list #)
-USAGE:  <list<ideal,list<intvec>,module>> ret=jordan(<matrix> M[,<int> opt=0]);
-ASSUME:  characteristic polynomial of the constant part of M completely 
-         factorizable
-RETURN:  eigenvalues ret[1] and, if opt<2, corresponding jordan block 
-         size vectors ret[2] of the constant part of M and, if opt>0, 
-         a jordan basis ret[3] for the constant part of M
+USAGE:   jordan(M[,opt]); M constant square matrix, opt integer
+ASSUME:  eigenvalues of M in the coefficient field
+RETURN:  list with first entry the eigenvalues of of M, second entry, 
+         if opt<=1, the list of corresponding jordan block size vectors of M, 
+         and third entry, if opt>=1, a jordan basis of M
+NOTE:    non constant M is replaced by its constant part
 EXAMPLE: example jordan; shows an example
 {
   // test if square matrix
@@ -52,16 +49,15 @@ EXAMPLE: example jordan; shows an example
 
   // get multiplicities mM
   def eM,mM=l[1..2];
-  kill l;
 
-  // test if factorization complete
+  // test if eigenvalues in the coefficient field
   int i;
   for(i=size(eM);i>=1;i--)
   {
     if(deg(eM[i])>1)
     {
       kill pr;
-      "//unable to factorize characteristic polynomial";
+      "//eigenvalues not in the coefficient field";
       return();
     }
   }
@@ -95,7 +91,7 @@ EXAMPLE: example jordan; shows an example
   }
   kill e,m;
 
-  // check option parameter
+  // get option parameter
   int opt=0;
   if(size(#)>0)
   {
@@ -111,12 +107,12 @@ EXAMPLE: example jordan; shows an example
   matrix Mi,Ni;
   module sNi;
   list K;
-  if(opt>0)
+  if(opt>=1)
   {
     module V,K1,K2;
     matrix v[n][1];
   }
-  if(opt<2)
+  if(opt<=1)
   {
     list bM;
     intvec bMi;
@@ -135,7 +131,7 @@ EXAMPLE: example jordan; shows an example
       K=K+list(sNi);
     }
 
-    if(opt<2)
+    if(opt<=1)
     {
       // compute jordan block size vector corresponding to eigenvalue eM[i]
       bMi=0;
@@ -150,7 +146,7 @@ EXAMPLE: example jordan; shows an example
       bM=list(bMi)+bM;
     }
 
-    if(opt>0)
+    if(opt>=1)
     {
       // compute generating vectors for jordan basis vectors corresponding to 
       // eigenvalue eM[i]
@@ -183,17 +179,17 @@ EXAMPLE: example jordan; shows an example
   }
 
   // create return list
-  list ret=eM;
-  if(opt<2)
+  list d=eM;
+  if(opt<=1)
   {
-    ret[2]=bM;
+    d[2]=bM;
   }
-  if(opt>0)
+  if(opt>=1)
   {
-    ret[3]=V;
+    d[3]=V;
   }
 
-  return(ret);
+  return(d);
 }
 example
 {
@@ -206,19 +202,20 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc jordanmatrix(list eb)
-USAGE:   <matrix> J=jordanmatrix(<list<ideal,list<intvec>> eb);
-RETURN:  jordan matrix J with eigenvalues eb[1] and corresponding 
-         jordan block size vectors eb[2]
+proc jordanmatrix(list d)
+USAGE:   jordanmatrix(d); d list of ideal and list of integer vectors
+RETURN:  jordan matrix with eigenvalues d[1] and corresponding jordan block 
+         size vectors d[2]
 EXAMPLE: example jordanmatrix; shows an example
 {
   // check parameters
-  if(size(eb)<2)
+  if(size(d)<2)
   {
     "//not enough entries in argument list";
     return(); 
   }
-  def eJ,bJ=eb[1..2];
+  def eJ,bJ=d[1..2];
+  kill d;
   if(typeof(eJ)!="ideal")
   {
     "//first entry in argument list not an ideal";
@@ -238,13 +235,13 @@ EXAMPLE: example jordanmatrix; shows an example
     int s=size(bJ);
   }
 
-  // get size of Jordan matrix
+  // get size of jordan matrix
   int i,j,k,n;
   for(i=s;i>=1;i--)
   {
     if(typeof(bJ[i])!="intvec")
     {
-      "//second entry in argument list not a list of intvecs";
+      "//second entry in argument list not a list of integer vectors";
       return();
     }
     else
@@ -261,7 +258,7 @@ EXAMPLE: example jordanmatrix; shows an example
   }
   matrix J[n][n];
 
-  // create Jordan matrix
+  // create jordan matrix
   int l;
   for(i,l=1,1;i<=s;i++)
   {
@@ -294,10 +291,10 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc jordanform(matrix M)
-USAGE:   <matrix> J=jordanform(<matrix> M);
-ASSUME:  characteristic polynomial of the constant part of M completely
-         factorizable
-RETURN:  jordan normal form J of the constant part of M
+USAGE:   jordanform(M); M constant square matrix
+ASSUME:  eigenvalues of M in the coefficient field
+RETURN:  jordan normal form of M
+NOTE:    non constant M is replaced by its constant part
 EXAMPLE: example jordanform; shows an example
 {
   return(jordanmatrix(jordan(M)));
@@ -313,15 +310,16 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc invmat(matrix U)
-USAGE:   <matrix> invU=invmat(<matrix> U);
-ASSUME:  constant part of U invertible
-RETURN:  inverse matrix invU of the constant part of U
+proc invmat(matrix M)
+USAGE:   invmat(M); M constant square matrix
+ASSUME:  M invertible
+RETURN:  inverse matrix of M
+NOTE:    non constant M is replaced by its constant part
 EXAMPLE: example invmat; shows an example
 {
   // test if square matrix
-  int n=nrows(U);
-  if(n!=ncols(U))
+  int n=nrows(M);
+  if(n!=ncols(M))
   {
     "//no square matrix";
     return();
@@ -330,18 +328,18 @@ EXAMPLE: example invmat; shows an example
   // get constant part
   def br=basering;
   map zero=br,0;
-  U=zero(U);
+  M=zero(M);
 
   // compute inverse
-  return(lift(U,freemodule(n)));
+  return(lift(M,freemodule(n)));
 }
 example
 {
   "EXAMPLE:";
   echo=2;
   ring R=0,x,dp;
-  matrix U[3][3]=3,2,1,0,2,1,0,0,3;
-  print(U);
-  print(invmat(U));
+  matrix M[3][3]=3,2,1,0,2,1,0,0,3;
+  print(M);
+  print(invmat(M));
 }
 ///////////////////////////////////////////////////////////////////////////////
