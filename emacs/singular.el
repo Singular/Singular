@@ -1,6 +1,6 @@
 ;;; singular.el --- Emacs support for Computer Algebra System Singular
 
-;; $Id: singular.el,v 1.19 1998-08-06 12:24:46 wichmann Exp $
+;; $Id: singular.el,v 1.20 1998-08-06 13:38:09 wichmann Exp $
 
 ;;; Commentary:
 
@@ -152,14 +152,14 @@ on Emacs 19.34, Emacs 20.2, and XEmacs 20.2."))
 ;; "-misc-fixed-medium-*-*-*-15-*-*-*-*-*-*-*" for output
 
 (make-face 'singular-input-face)
-(set-face-background 'singular-input-face "Orange")
+;(set-face-background 'singular-input-face "Orange")
 (defvar singular-input-face 'singular-input-face
   "Face for user input.
 This face should have set background only.")
 
 (make-face 'singular-output-face)
 ;(set-face-font 'singular-output-face "-adobe-courier-bold-o-*-*-18-*-*-*-*-*-*-*")
-(set-face-background 'singular-output-face "Wheat")
+;(set-face-background 'singular-output-face "Wheat")
 (defvar singular-output-face 'singular-output-face
   "Face for Singular output.
 This face should have set background only.")
@@ -169,14 +169,36 @@ This face should have set background only.")
 NOT READY [should be rewritten completely.  Interface should stay the same.]!"
   (cond ((eq face-type 'input) singular-input-face)
 	((eq face-type 'output) singular-output-face)))
+
+;; Additional faces for font locking
+(make-face 'font-lock-singular-error-face)
+(set-face-foreground 'font-lock-singular-error-face "Red")
+(defvar font-lock-singular-error-face 'font-lock-singular-error-face
+  "NOT READY [docu]")
+
+(make-face 'font-lock-singular-warn-face)
+(set-face-foreground 'font-lock-singular-warn-face "Orange")
+(defvar font-lock-singular-warn-face 'font-lock-singular-warn-face
+  "NOT READY [docu]")
+
+(make-face 'font-lock-singular-prompt-face)
+(set-face-foreground 'font-lock-singular-prompt-face "Gray50")
+(defvar font-lock-singular-warn-face 'font-lock-singular-prompt-face
+  "NOT READY [docu]")
 ;;}}}
 
 ;;{{{ Font-locking
+;(make-regexp '("def" "ideal" "int"  "intmat" "intvec"  
+;	       "link" "list" "map" "matrix" "module" 
+;	       "number" "poly" "proc" "qring" "resolution" 
+;	       "ring" "string" "vector"))
+
 (defvar singular-font-lock-keywords-1
   '(
-    ("\\<\\(poly\\|ideal\\)\\>" 1 font-lock-keyword-face)
-    ("\\<\\(ring\\)\\>)" 1 font-lock-variable-face)
-;;    ("\\<^   \\? no\\>" font-lock-warn-face)
+    ("\\<def\\|i\\(deal\\|nt\\(\\|mat\\|vec\\)\\)\\|li\\(nk\\|st\\)\\|m\\(a\\(p\\|trix\\)\\|odule\\)\\|number\\|p\\(oly\\|roc\\)\\|qring\\|r\\(esolution\\|ing\\)\\|string\\|vector\\>" . font-lock-type-face)
+    ("^\\(> \\|. \\)" . font-lock-singular-prompt-face)
+    ("^   [\\?].*" 0 font-lock-singular-error-face t)
+    ("^// \\(\\*\\*.*\\)" 1 font-lock-singular-warn-face t)
     )
   "Subdued level for highlighting in singular-(interactive)-mode")
 
@@ -184,7 +206,7 @@ NOT READY [should be rewritten completely.  Interface should stay the same.]!"
   (append
    singular-font-lock-keywords-1
    '(
-     ("skipping" font-lock-warn-face)
+     ("^   [\\?].*`\\(\\sw\\sw+\\)`" 1 font-lock-reference-name-face t)
 ;;     ()))
      ))
   "Gaudy level for highlihgting in singular-(interactive)-mode") 
@@ -192,49 +214,22 @@ NOT READY [should be rewritten completely.  Interface should stay the same.]!"
 (defvar singular-font-lock-keywords singular-font-lock-keywords-1
   "Default highlighting for singular-(interactive)-mode")
 
-(defvar singular-emacs-font-lock-defaults 
+(defvar singular-font-lock-defaults 
   '((singular-font-lock-keywords
      singular-font-lock-keywords-1
      singular-font-lock-keywords-2)
-    ;; KEYWORDS-ONLY (don't fontify comments/strings when non-nil) 
-    nil
-    ;; CASE-FOLD (ignore case when non-nil)
-    nil
-    ;; SYNTAX-ALIST
-    ((?_ . "w"))
-;;; was soll ich da nehmen NOT READY	(( . )) 
-    ;; SYNTAX_BEGIN
-    (beginning-of-defun)
-;;    beginning-of-line 
-    (font-lock-comment-start-regexp . "//")) ;; gibt es nich im XEmacs
+    nil                   ;; KEYWORDS-ONLY 
+    nil                   ;; CASE-FOLD (ignore case when non-nil)
+    ((?_ . "w"))          ;; SYNTAX-ALIST
+    (beginning-of-line))  ;; SYNTAX_BEGIN
   "Emacs-default for font-lock-mode in singular-(interactive)-mode")
-
-(defvar singular-xemacs-font-lock-defaults 
-  '((singular-font-lock-keywords
-     singular-font-lock-keywords-1
-     singular-font-lock-keywords-2)
-
-    ;; KEYWORDS-ONLY (don't fontify comments/strings when non-nil) 
-    nil
-
-    ;; CASE-FOLD (ignore case when non-nil)
-    nil
-
-    ;; SYNTAX-ALIST
-    nil;;; was soll ich da nehmen NOT READY	(( . )) 
-
-    ;; SYNTAX_BEGIN
-    nil) ;;    beginning-of-line 
-  "XEmacs-default for font-lock-mode in singular-(interactive)-mode")
 
 (cond 
  ;; XEmacs
  ((eq singular-emacs-flavor 'xemacs)
   (singular-debug 'interactive (message "setting up font-lock for XEmacs"))
   (put 'singular-interactive-mode 'font-lock-defaults
-       singular-xemacs-font-lock-defaults)))
-
-
+       singular-font-lock-defaults)))
 ;;}}}
 ;;}}}
 
@@ -336,10 +331,33 @@ NOT READY [should be rewritten completely.  Interface should stay the same.]!"
 ;;{{{ Syntax table
 (defvar singular-interactive-mode-syntax-table nil
   "Syntax table for singular-interactive-mode")
+
 (if singular-interactive-mode-syntax-table
     ()
   (setq singular-interactive-mode-syntax-table (make-syntax-table))
-  (modify-syntax-entry ?/ ". 1456" singular-interactive-mode-syntax-table))
+  ;; rest taken from cc-mode.el
+  (modify-syntax-entry ?_  "_"     singular-interactive-mode-syntax-table)
+  (modify-syntax-entry ?\\ "\\"    singular-interactive-mode-syntax-table)
+  (modify-syntax-entry ?+  "."     singular-interactive-mode-syntax-table)
+  (modify-syntax-entry ?-  "."     singular-interactive-mode-syntax-table)
+  (modify-syntax-entry ?=  "."     singular-interactive-mode-syntax-table)
+  (modify-syntax-entry ?%  "."     singular-interactive-mode-syntax-table)
+  (modify-syntax-entry ?<  "."     singular-interactive-mode-syntax-table)
+  (modify-syntax-entry ?>  "."     singular-interactive-mode-syntax-table)
+  (modify-syntax-entry ?&  "."     singular-interactive-mode-syntax-table)
+  (modify-syntax-entry ?|  "."     singular-interactive-mode-syntax-table)
+  (modify-syntax-entry ?\' "\""    singular-interactive-mode-syntax-table)
+  (cond
+   ;; Emacs
+   ((eq singular-emacs-flavor 'emacs)
+    (modify-syntax-entry ?/  ". 124b" singular-interactive-mode-syntax-table))
+   ;; XEmacs
+   (t
+    (modify-syntax-entry ?/  ". 1456" singular-interactive-mode-syntax-table)))
+  (modify-syntax-entry ?*  ". 23"   singular-interactive-mode-syntax-table)
+  (modify-syntax-entry ?\n "> b"    singular-interactive-mode-syntax-table)
+  (modify-syntax-entry ?\^m "> b"    singular-interactive-mode-syntax-table))
+
 ;;}}}
 
 ;;{{{ Miscellaneous
