@@ -25,7 +25,7 @@ MKINSTALLDIRS   = ../mkinstalldirs
 ##
 ## compiler and linker options
 ##
-CPPFLAGS	= @CPPFLAGS@
+CPPFLAGS	= -I . @CPPFLAGS@
 CXXFLAGS        = @CXXFLAGS@
 LDFLAGS         = @LDFLAGS@ -lgmp
 
