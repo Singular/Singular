@@ -244,12 +244,30 @@ i;  // mit Leerzeichen beginnen.
   Die Referenzen bitte alphabetisch sortieren und mit einem Semikolon
   trennen.
 
+* Umlaute *
+===========
+@"o                 "o      umlaut accent          
+@'o                 'o      acute accent           
+@,{c}               c,      cedilla accent         
+@=o                 =o      macron/overbar accent  
+@^o                 ^o      circumflex accent      
+@`o                 `o      grave accent           
+@~o                 ~o      tilde accent           
+@dotaccent{o}       .o      overdot accent         
+@H{o}               ''o     long Hungarian umlaut  
+@ringaccent{o}      *o      ring accent            
+@tieaccent{oo}      [oo     tie-after accent       
+@u{o}               (o      breve accent           
+@ubaraccent{o}      o_      underbar accent        
+@udotaccent{o}      o-.     underdot accent        
+@v{o}               <o      hacek or check accent  
+@ss{}               ss      es-zet or sharp S
 
 * allgemeines *
 ===============
 
 + Die Funktionalitaet von doc2tex ist im sourcecode ausfuehrlich 
-  domkumentiert. Siehe doc2tex.c.
+  domkumentiert. Siehe doc2tex.pl - Vorspann.
 
 ------------------------------------------------------------
-$Id: STYLEGUIDE,v 1.13 1999-07-23 12:32:35 obachman Exp $
+$Id: STYLEGUIDE,v 1.14 1999-08-23 17:09:45 Singular Exp $
