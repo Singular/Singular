@@ -1,3 +1,7 @@
+Thu Nov  7 11:29:33 MET 2002 Hans Schoenemann <hannes@mathematik.uni-kl.de>
+        * interface to NTL
+	* many fixes 
+
 Wed Aug 22 16:25:16 MET DST 2001 Hans Schoenemann <hannes@mathematik.uni-kl.de>
         * Version 1.3c: some utility functions for libfac
 	* search for main var in factorize (experimental)

@@ -1,3 +1,7 @@
+Thu Nov  7 11:31:58 MET 2002  Hans Schoenemann <hannes@mathematik.uni-kl.de>
+interface to NTL (optional, recommended): tested with NTL 5.2, 5.3
+bug fixes for multivariate factorization
+
 Tue Apr 10 15:24:49 CEST 2001 Hans Schoenemann <hannes@mathematik.uni-kl.de>
 several small bugs fixed (mostly memory leaks)
 changed copyright to GPL
