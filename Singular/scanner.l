@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.l,v 1.18 1999-07-09 14:58:29 Singular Exp $ */
+/* $Id: scanner.l,v 1.19 1999-07-16 16:07:21 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -256,14 +256,7 @@ newline                  {
                          }
 {integer}                {
                            lvalp->name = (char *)yytext;
-                           if ((currRing!=NULL)
-                           && (strlen(lvalp->name)>MAX_INT_LEN))
-                           {
-                             lvalp->name = mstrdup((char *)yytext);
-                             return RINGVAR;
-                           }
-                           else
-                             return INT_CONST;
+                           return INT_CONST;
                          }
 {integer}\/{integer}     {
                            lvalp->name = mstrdup((char *)yytext);

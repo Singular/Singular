@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.19 1999-05-10 15:10:48 Singular Exp $ */
+/* $Id: ffields.cc,v 1.20 1999-07-16 16:07:18 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -486,7 +486,7 @@ static char* nfEati(char *s, int *i)
     {
       *i *= 10;
       *i += *s++ - '0';
-      if (*i > (INT_MAX / 10)) *i = *i % nfCharP;
+      if (*i > (MAX_INT_VAL / 10)) *i = *i % nfCharP;
     }
     while (*s >= '0' && *s <= '9');
     if (*i >= nfCharP) *i = *i % nfCharP;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.10 1999-05-10 15:10:50 Singular Exp $ */
+/* $Id: modulop.cc,v 1.11 1999-07-16 16:07:20 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -174,7 +174,7 @@ char* npEati(char *s, int *i)
     {
       (*i) *= 10;
       (*i) += *s++ - '0';
-      if ((*i) >= (INT_MAX / 10)) (*i) = (*i) % npPrimeM;
+      if ((*i) >= (MAX_INT_VAL / 10)) (*i) = (*i) % npPrimeM;
     }
     while (((*s) >= '0') && ((*s) <= '9'));
     if ((*i) >= npPrimeM) (*i) = (*i) % npPrimeM;

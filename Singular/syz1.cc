@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.37 1999-06-07 15:46:02 obachman Exp $ */
+/* $Id: syz1.cc,v 1.38 1999-07-16 16:07:22 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -302,7 +302,7 @@ static void syzSetm(poly p)
   if (i<=highdeg)
   {
     i=1;
-    j = -INT_MAX;
+    j = -MAX_INT_VAL;
     int *ip=binomials+pGetExp(p,1);
     loop
     {
@@ -606,7 +606,7 @@ static poly sySPAdd(poly m1,poly m2,poly m)
 #endif
 #endif
 {
-  int i2=-INT_MAX;
+  int i2=-MAX_INT_VAL;
   int i1;
   int j;
   //register poly m1=m11;
@@ -658,7 +658,7 @@ static poly sySPAdd(poly m1,poly m2,poly m)
           j = 1;
           pAddExp(tm2,1, pGetExp(m,1));
           int *ip=binomials+pGetExp(tm2,1);
-          i2=-INT_MAX;
+          i2=-MAX_INT_VAL;
           loop
           {
             i2 += (*ip);
@@ -736,7 +736,7 @@ static poly sySPAdd(poly m1,poly m2,poly m)
             j = 1;
             pAddExp(tm2,1, pGetExp(m,1));
             int *ip=binomials+pGetExp(tm2,1);
-            i2=-INT_MAX;
+            i2=-MAX_INT_VAL;
             loop
             {
               i2 += (*ip);
@@ -2780,7 +2780,7 @@ syStrategy syMinimize(syStrategy syzstr)
 static void sySetHighdeg()
 {
 #ifdef __MWERKS__
-  const double m=(double)INT_MAX;
+  const double m=(double)MAX_INT_VAL;
   double t=1.0;
   unsigned int h_d=1;
   unsigned int h_n=1+pVariables;
@@ -2797,7 +2797,7 @@ static void sySetHighdeg()
 #else
   long long t=1, h_d=1;
   long long h_n=1+pVariables;
-  while ((t=((t*h_n)/h_d))<INT_MAX)
+  while ((t=((t*h_n)/h_d))<MAX_INT_VAL)
   {
     h_d++;
     h_n++;

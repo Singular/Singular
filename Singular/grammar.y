@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.63 1999-07-14 13:16:00 Singular Exp $ */
+/* $Id: grammar.y,v 1.64 1999-07-16 16:07:19 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -505,14 +505,14 @@ elemexpr:
             int l = strlen($1)+2;
             if (l >= MAX_INT_LEN)
             {
-              char tmp[100];
+              char tmp[MAX_INT_LEN+5];
               sprintf(tmp,"%d",i);
               if (strcmp(tmp,$1)!=0)
               {
                 if (currRing==NULL)
                 {
                   Werror("`%s` greater than %d(max. integer representation)"
-                         ,$1,INT_MAX);
+                         ,$1,MAX_INT_VAL);
                   YYERROR;
                 }
                 char *t1=mstrdup($1);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.74 1999-07-06 15:32:43 Singular Exp $ */
+/* $Id: febase.cc,v 1.75 1999-07-16 16:07:17 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -1193,11 +1193,11 @@ char* eati(char *s, int *i)
       *i *= 10;
       *i += *s++ - '0';
       l++;
-      if ((l>MAX_INT_LEN)||((*i) <0))
+      if ((l>=MAX_INT_LEN)||((*i) <0))
       {
         s-=l;
         Werror("`%s` greater than %d(max. integer representation)",
-                s,INT_MAX);
+                s,MAX_INT_VAL);
         return s;
       }
     }

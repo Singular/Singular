@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shortfl.cc,v 1.9 1999-06-28 16:06:31 Singular Exp $ */
+/* $Id: shortfl.cc,v 1.10 1999-07-16 16:07:21 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -54,7 +54,7 @@ int nrInt(number &n)
 {
   int i;
   float r = nf(n).F();
-  if (((float)INT_MIN <= r) || ((float)INT_MAX >= r))
+  if (((float)INT_MIN <= r) || ((float)MAX_INT_VAL >= r))
     i = (int)r;
   else
     i = 0;
