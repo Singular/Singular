@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_gcd.cc,v 1.24 2004-09-23 16:51:48 Singular Exp $ */
+/* $Id: cf_gcd.cc,v 1.25 2004-10-14 11:36:15 Singular Exp $ */
 
 #include <config.h>
 
@@ -192,8 +192,8 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
 static CanonicalForm
 gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primitive )
 {
-#ifdef HAVE_NTL 
-  if (isOn(SW_USE_NTL_GCD) && isPurePoly(F) && isPurePoly(G)) 
+#ifdef HAVE_NTL
+  if (isOn(SW_USE_NTL_GCD) && isPurePoly(F) && isPurePoly(G))
   {
     if ( getCharacteristic() > 0 )
     {
@@ -374,12 +374,19 @@ gcd_poly ( const CanonicalForm & f, const CanonicalForm & g, bool modularflag )
     else if ( isOn( SW_USE_EZGCD ) && ! ( f.isUnivariate() && g.isUnivariate() ) ) {
         CFMap M, N;
         compress( f, g, M, N );
-        return N( ezgcd( M(f), M(g) ) );
+        CanonicalForm r=N( ezgcd( M(f), M(g) ) );
+        if ((f%r!=0) || (g % r !=0)) return gcd_poly1( f, g, modularflag);
+        else return r;
     }
-    else if ( isOn( SW_USE_SPARSEMOD ) && ! ( f.isUnivariate() && g.isUnivariate() ) ) {
-        return sparsemod( f, g );
+    else if ( isOn( SW_USE_SPARSEMOD )
+    && ! ( f.isUnivariate() && g.isUnivariate() ) )
+    {
+        CanonicalForm r=sparsemod( f, g );
+        if ((f%r!=0) || (g % r !=0)) return gcd_poly1( f, g, modularflag);
+        else return r;
     }
-    else {
+    else
+    {
         return gcd_poly1( f, g, modularflag );
     }
 }
@@ -541,8 +548,8 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
                 CanonicalForm F = f * l, G = g * l;
                 Off( SW_RATIONAL );
                 l = gcd_poly( F, G, true );
-                if ((F%l!=0) || (G % l !=0))
-                  l = gcd_poly( F, G, true );
+                //if ((F%l!=0) || (G % l !=0))
+                //  l = gcd_poly( F, G, true );
                 On( SW_RATIONAL );
                 if ( l.lc().sign() < 0 )
                     return -l;
@@ -551,8 +558,8 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
             }
             else {
                 CanonicalForm d = gcd_poly( f, g, getCharacteristic()==0 );
-                if ((f%d!=0) || (g % d !=0))
-                  d = gcd_poly( f, g, getCharacteristic()==0  );
+                //if ((f%d!=0) || (g % d !=0))
+                //  d = gcd_poly( f, g, getCharacteristic()==0  );
                 if ( d.lc().sign() < 0 )
                     return -d;
                 else
