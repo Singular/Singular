@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.190 1999-11-24 17:09:35 Singular Exp $ */
+/* $Id: iparith.cc,v 1.191 1999-11-24 18:13:21 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -284,7 +284,6 @@ cmdnames cmds[] =
   { "size",        0, COUNT_CMD ,         CMD_1},
   { "sortvec",     0, SORTVEC_CMD ,       CMD_1},
   #ifdef HAVE_SPECTRUM
-  { "spectrum",    0, SPECTRUM_CMD ,      CMD_123},
   { "semic",       0, SEMIC_CMD ,         CMD_23},
   #endif
   #ifdef OLD_RES
@@ -2296,7 +2295,6 @@ struct sValCmd2 dArith2[]=
 ,{jjSIMPL_ID,  SIMPLIFY_CMD,   IDEAL_CMD,      IDEAL_CMD,  INT_CMD PROFILER}
 ,{jjSIMPL_ID,  SIMPLIFY_CMD,   MODUL_CMD,      MODUL_CMD,  INT_CMD PROFILER}
 #ifdef HAVE_SPECTRUM
-,{spectrumProc2,SPECTRUM_CMD,  LIST_CMD,       POLY_CMD,   INT_CMD PROFILER}
 ,{semicProc,   SEMIC_CMD,      INT_CMD,        LIST_CMD,   LIST_CMD PROFILER}
 #endif
 //,{jjRES,       SRES_CMD,       LIST_CMD,       IDEAL_CMD,  INT_CMD PROFILER}
@@ -3597,9 +3595,6 @@ struct sValCmd1 dArith1[]=
 ,{jjCOUNT_IV,   ROWS_CMD,        INT_CMD,        INTVEC_CMD }
 ,{jjSort_Id,    SORTVEC_CMD,     INTVEC_CMD,     IDEAL_CMD }
 ,{jjSort_Id,    SORTVEC_CMD,     INTVEC_CMD,     MODUL_CMD }
-#ifdef HAVE_SPECTRUM
-,{spectrumProc, SPECTRUM_CMD,    LIST_CMD,       POLY_CMD }
-#endif
 ,{jjSTD,        STD_CMD,         IDEAL_CMD,      IDEAL_CMD }
 ,{jjSTD,        STD_CMD,         MODUL_CMD,      MODUL_CMD }
 ,{jjDUMMY,      STRING_CMD,      STRING_CMD,     STRING_CMD }

@@ -1,0 +1,29 @@
+// $Id: spectrum.lib,v 1.1 1999-11-24 18:13:23 Singular Exp $
+///////////////////////////////////////////////////////////////////////////////
+
+version="$Id: spectrum.lib,v 1.1 1999-11-24 18:13:23 Singular Exp $";
+info="
+LIBRARY:  spectrum.lib   PROCEDURES FOR COMPUTING SPECTRA
+
+PROCEDURES:
+ spectrum(poly);        spectrum of a isoloated singularity
+ spectrum(poly[,1]);    spectrum of a isoloated singularity without tests
+          (parameters in square brackets [] are optional)
+";
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc spectrum (poly f, list #)
+"USAGE:   spectrum(f[,1]);  f polynomial
+RETURN:  list
+EXAMPLE: example spectrum; shows examples
+"
+{
+  if(size(#)==0)
+  {  return(system("spectrum",f)); }
+  return (system("spectrum",f,#[1]);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+}
+///////////////////////////////////////////////////////////////////////////////

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.119 1999-11-24 17:09:34 Singular Exp $ */
+/* $Id: extra.cc,v 1.120 1999-11-24 18:13:20 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -51,6 +51,10 @@
 #include "feOpt.h"
 #include "distrib.h"
 #include "prCopy.h"
+#ifdef HAVE_SPECTRUM
+#include "spectrum.h"
+#endif
+
 
 // Define to enable many more system commands
 #ifndef MAKE_DISTRIBUTION
@@ -440,6 +444,29 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
    }
    else
    {
+/*==================== spectrum =============================*/
+   #ifdef HAVE_SPECTRUM
+   if(strcmp(sys_cmd,"spectrum") == 0)
+   {
+     if (h->Typ()!=POLY_CMD)
+     {
+       WerrorS("poly expected");
+       return TRUE;
+     }
+     if (h->next==NULL)
+       return spectrumProc(res,h);
+     if (h->next->Typ()!=INT_CMD)
+     {
+       WerrorS("poly,int expected");
+       return TRUE;
+     }
+     if(((int)h->next->Data())==1)
+       return spectrumfProc(res,h);
+     return spectrumProc(res,h);
+   }
+   else
+   {
+   #endif
 /*================= Extended system call ========================*/
 #ifdef HAVE_EXTENDED_SYSTEM
      return(jjEXTENDED_SYSTEM(res, args));

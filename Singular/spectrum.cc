@@ -1259,13 +1259,6 @@ BOOLEAN spmulProc( leftv result,leftv first,leftv second )
     return  (state!=semicOK);
 }
 
-BOOLEAN    spectrumProc2 ( leftv res,leftv u, leftv v)
-{
-  if (((int)v->Data())==1)
-    return spectrumfProc(res,u);
-  return spectrumProc(res,u);
-}
-
 BOOLEAN    spectrumOp3  ( leftv res, leftv u, leftv v, leftv w )
 {
   char v_str=(char *)v->Data();
