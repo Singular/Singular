@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.23 2000-02-02 18:03:21 Singular Exp $ */
+/* $Id: sparsmat.cc,v 1.24 2000-02-07 17:23:16 Singular Exp $ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
@@ -24,7 +24,10 @@
 #include "prCopy.h"
 
 /* ----------------- macros ------------------ */
-/* #define OLD_DIV */
+#ifdef HAVE_SHIFTED_EXPONENTS
+#define OLD_DIV 1
+#endif
+
 #ifdef OLD_DIV
 #define SM_MULT(A,B,C) smMult(A,B)
 #define SM_DIV smPolyDiv
