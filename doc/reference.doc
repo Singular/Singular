@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.162 1999-11-24 18:50:41 obachman Exp $
+@comment $Id: reference.doc,v 1.163 1999-11-26 17:45:50 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -1934,7 +1934,7 @@ manual is displayed.
 
 @item
 @code{topic} can be an index entry of the @sc{Singular} manual or the
-name of (loaded) procedure which has a help section.
+name of a (loaded) procedure which has a help section.
 @item
 @code{topic} may contain wildcard characters (i.e.,
 @code{*} characters).

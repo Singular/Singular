@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: platform.doc,v 1.1 1999-07-23 13:58:53 obachman Exp $
+@comment $Id: platform.doc,v 1.2 1999-11-26 17:45:50 obachman Exp $
 @comment this file contains the "Platform and pittfals" sections
 
 @c The following directives are necessary for proper compilation
@@ -19,6 +19,8 @@
 @chapter Installation and Platform Specifics
 %**end
 @end ignore
+
+@include INSTALL_unix.texi
 
 TBC:
 

@@ -1,0 +1,234 @@
+@comment -*-texinfo-*-
+@comment $Id: INSTALL_unix.texi,v 1.1 1999-11-26 17:45:49 obachman Exp $
+@comment this file contains the installation instruction for Singular on 
+@comment Unix
+@include version.texi
+
+@ifclear singularmanual
+@majorheading UNIX INSTALLATION INSTRUCTIONS FOR SINGULAR VERSION @value{VERSION}
+@end ifclear
+
+@ifclear UNAME
+@set _UNAME <uname>
+@end ifclear
+
+@ifset UNAME
+@set _UNAME @value{UNAME}
+@end ifset
+
+To install @sc{Singular} on a 
+@ifset UNAME
+@value{_UNAME}
+@end ifset
+@ifclear UNAME
+Unix
+@end ifclear
+platform, you need the following two
+archives: 
+@table @code
+@item Singular-@value{VERSION}-share.tar.gz 
+contains architecture independent data like documentation and libraries
+(alternativly, you may also download 
+@code{Singular-@value{VERSION}-share.zip}).
+@item Singular-@value{VERSION}-@value{_UNAME}.tar.gz
+contains architecture dependent executables, like the @sc{Singular}
+program
+@ifclear UNAME
+ where @code{@value{_UNAME}} is a description of the processor and operating system
+for which @sc{Singular} is compiled (e.g, @code{ix86-Linux}). Please contact us if
+you can not find an appropriate architecture dependent archive
+@end ifclear
+.
+@end table
+
+You can obtain these files from
+@url{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/}. 
+
+@ifclear singularmanual
+@heading Important
+Please see 
+@ifhtml
+@uref{COPYING.html, COPYING}
+@end ifhtml
+@ifnothtml
+the file COPYING contained in the distribution 
+@end ifnothtml
+for license
+information on @sc{Singular}. In particular, notice that we only grant you
+permission to use @sc{Singular} if you have registered yourself as a
+@sc{Singular} user by sending email to @email{singular@@mathematik.uni-kl.de}
+with the subject line (or, mail body) @code{register}.
+@end ifclear
+
+@heading To install SINGULAR
+
+Make sure that you have appr. 12MByte of free disk space and follow
+these steps.
+@enumerate
+@item
+Simply change to the directory in which you wish to install
+@sc{Singular} (usually wherever you install 3rd-party software):
+@smallexample
+cd /usr/local/	
+@end smallexample
+
+@sc{Singular} specific subdirectories will be created in such a way
+that multiple versions and multiple architecture dependent files
+of @sc{Singular} can peaceably coexist under the same @code{/usr/local/}
+tree.
+
+
+@item
+Unpack the archives:
+@smallexample
+gzip -dc Singular-@value{VERSION}-@value{_UNAME}.tar.gz | tar -pxf -
+gzip -dc Singular-@value{VERSION}-share.tar.gz | tar -pxf -
+@end smallexample
+If you have downloaded @code{Singular-@value{VERSION}-share.zip},
+unpack with 
+@smallexample
+unzip -u Singular-@value{VERSION}-share.zip
+@end smallexample
+
+This creates the following 
+@multitable @columnfractions .36 .64
+@item (sub)directories
+@tab  which contain
+@item @code{Singular/@value{VERSION}/@value{_UNAME}} 
+@tab @code{Singular} and @code{ESingular} programs
+@item @code{Singular/@value{VERSION}/LIB}
+@tab @sc{Singular} libraries (@code{*.lib} files)
+@item @code{Singular/@value{VERSION}/emacs}
+@tab files for the @sc{Singular} Emacs user interface
+@item @code{Singular/@value{VERSION}/info}
+@tab info files of @sc{Singular} manual
+@item @code{Singular/@value{VERSION}/html}
+@tab html files of @sc{Singular} manual
+@item @code{Singular/@value{VERSION}/doc}
+@tab miscellaneous documentation files
+@end multitable
+
+For the executable to work, the directory layout must look pretty much
+like this; the executable looks for "sibling" directories at run-time
+to figure out where its @sc{Singular} libraries and on-line 
+documentation files are.  These constraints on the local directory layout
+are necessary to avoid having to hardcode pathnames into the
+executables, or require that environment variables be set before
+running the executable. In particular, you should not move or copy
+the @sc{Singular} executables to another place, but use soft-links
+instead. 
+@end enumerate 
+
+The following steps are optional:
+
+@itemize
+@item
+Arrange that typing @code{Singular} at the shell prompt starts up the
+installed @sc{Singular} executable. 
+
+If you have root permission, do:
+@smallexample      
+ln -s `pwd`/Singular/@value{VERSION}/@value{_UNAME}/Singular  /usr/local/bin/Singular-@value{VERSION}
+ln -s `pwd`/Singular/@value{VERSION}/@value{_UNAME}/ESingular  /usr/local/bin/ESingular-@value{VERSION}
+ln -s /usr/local/bin/Singular-@value{VERSION} /usr/local/bin/Singular
+ln -s /usr/local/bin/ESingular-@value{VERSION} /usr/local/bin/ESingular
+@end smallexample
+	
+Otherwise, append the directory
+@code{`pwd`/Singular/@value{VERSION}/@value{_UNAME}/} to your @code{$PATH}
+environment variable. For the @code{csh} (or, @code{tcsh}) shell do:
+@smallexample
+set path=(`pwd`/Singular/@value{VERSION}/@value{_UNAME} $path)
+@end smallexample 
+For the @code{bash} (or, @code{ksh}) shell do:
+@smallexample  
+export PATH=`pwd`/Singular/@value{VERSION}/@value{_UNAME}/:$PATH
+@end smallexample
+
+You also might want to adjust your personal start-up files
+(@code{~/.cshrc} for @code{csh}, @code{.tcshrc} for @code{tcsh},
+@code{.profile} for @code{bash}) accordingly, 
+so that the @code{$PATH} variable is set automatically each time you login.
+
+@strong{IMPORTANT:} Do @emph{never} move or copy the file 
+@code{Singular/@value{VERSION}/@value{_UNAME}/Singular} to another place, but use
+soft-links instead. 
+
+@item
+If you wish to enable any of following features of
+@sc{Singular}, make sure that the respective programs (or,
+shared libraries) are installed on your system:
+
+@multitable @columnfractions .5 .5
+@item @strong{Feature} @tab @strong{Requires}
+@item running @code{ESingular}, or @code{Singular} within Emacs
+@tab @uref{www.fsf.org/software/emacs/emacs.html,Emacs} version
+20 or higher, or, @uref{www.xemacs.org,Xemacs} version 20 or
+higher
+@item on-line @code{html} help
+@tab @uref{www.netscape.com, netscape} browser
+@item on-line @code{info} help
+@tab @uref{www.texinfo.org, info}, or
+@uref{math-www.uni-paderborn.de/~axel/tkinfo/, tkinfo} texinfo browser programs
+@item TAB completion and history mechanism of ASCII-terminal interface
+@tab shared @uref{ftp://ftp.de.uu.net/pub/gnu/readline/, readline}
+library, i.e. @code{/usr/lib/libreadline.so}
+@item visulization of curves and surfaces with @code{surf} (i.e., usage of @sc{Singular} library @code{surf.lib})
+@tab
+@uref{http://www.mathematik.uni-mainz.de/AlgebraischeGeometrie/surf/surf.shtml,surf}
+version 0.9 or higher (only available for Linux and Solaris).
+@end multitable
+
+Notice that you may also download most of these programs from
+@uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils/}.
+
+@item Customize the on-line help system:
+
+By default, on-line help is displayed in the @code{html} format using
+the @code{netscape} program.
+
+However, this behaviour can be customized in several ways
+using the @sc{Singular} commands @code{system("--allow-net", 1)} and
+@code{system("--browser",<browser>")} (or, by starting up @sc{Singular}
+with the respective command line options).
+
+In particular, creating the file
+@code{Singular/@value{VERSION}/LIB/.singularrc/} and putting the
+@sc{Singular} command
+@smallexample
+system("--allow-net", 1);
+@end smallexample
+in it, allows the on-line help system to fetch its @code{html} pages
+from @uref{www.mathemtaik.uni-kl.de/~zca/Singular, Singular's WWW home site}
+in case its local html pages are not found. That is, you may delete your
+local html pages, after setting this option. 
+
+See also 
+@ifset singularmanual
+@ref{The online help system}, @ref{Command line options}, and
+@ref{Startup sequence}
+@end ifset
+@ifclear singularmanual
+the sections @emph{The online help system}, @emph{Command line options}, and
+@emph{Startup sequence} in the @sc{Singular} manual 
+@end ifclear
+for more details on customizing the on-line help system.
+
+@item 
+Add the line 
+@smallexample
+* Singular:(singular.hlp).     A system for polynomial computations
+@end smallexample
+to your system-wide @code{dir} file (usually @code{/usr/info/dir} or
+@code{/usr/local/info/dir} and  copy or soft-link the file
+@code{Singular/@value{VERSION}/info/singular.hlp} 
+to the directory of your @code{dir} file. 
+@*This assures that the
+@sc{Singular} manual can be  accessed from stand-alone texinfo
+browser programs such as @code{info} or @code{Emacs}:
+@end itemize
+
+@heading Troubleshooting
+
+
+

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.155 1999-11-26 13:26:56 obachman Exp $
+@comment $Id: general.doc,v 1.156 1999-11-26 17:45:49 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -640,12 +640,8 @@ executes the files @code{file1}, @code{file2} @dots{}  (given on the command
 line) in that order.
 @end enumerate
 
-See @ref{LIB} for the directories in which @sc{Singular} searches for its
-library files.
-
 @strong{Note:} @code{.singularrc} file(s) are an approriate place for
 setting some default values of (command-line) options. 
-
 
 For example, a system administrator might remove the locally installed
 HTML version of the manual and put a @code{.singularrc} file
