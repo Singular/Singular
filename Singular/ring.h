@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.58 2000-11-25 13:02:44 Singular Exp $ */
+/* $Id: ring.h,v 1.59 2000-12-05 12:14:33 obachman Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -231,6 +231,13 @@ BOOLEAN rOrd_is_Totaldegree_Ordering(ring r =currRing);
 rOrderType_t    rGetOrderType(ring r);
 /* returns TRUE if var(i) belongs to p-block */
 BOOLEAN rIsPolyVar(int i, ring r = currRing); 
+
+#ifdef HAVE_PLURAL
+inline BOOLEAN rIsPluralRing(ring r)
+{
+  return r->nc != NULL;
+}
+#endif
 
 #ifdef RDEBUG
 #define rTest(r)    rDBTest(r, __FILE__, __LINE__)
