@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.6 1998-02-27 14:06:11 Singular Exp $ */
+/* $Id: febase.h,v 1.7 1998-02-27 16:27:56 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -46,8 +46,9 @@ void   WerrorS(char *s);
 
 enum   feBufferTypes 
 {
+  BT_none  = 0,  // entry level
   BT_break = 1,  // while, for
-  BT_proc,       // proc, script
+  BT_proc,       // proc
   BT_example,    // example
   BT_file,       // <"file"
   BT_execute,    // execute

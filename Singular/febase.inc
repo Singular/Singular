@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.inc,v 1.2 1998-02-27 14:06:11 Singular Exp $ */
+/* $Id: febase.inc,v 1.3 1998-02-27 16:27:57 Singular Exp $ */
 /*
 * ABSTRACT: handling of 'voices'
 */
@@ -344,47 +344,31 @@ BOOLEAN exitVoice()
 }
 
 /*2
-* print prompt (si_echo or TRACE), set prompt_char
+* set prompt_char 
+* only called with currentVoice->sw == BI_stdin
 */
 static void feShowPrompt(void)
 {
-  if ((traceit&TRACE_SHOW_LINE)
-  || (traceit&TRACE_SHOW_LINE1)
-  || (currentVoice->Typ() != BT_example))
+  //if (currentVoice->sw == BI_stdin)
   {
-    if ((si_echo > myynest) || (currentVoice->sw == BI_stdin) || (traceit&TRACE_SHOW_LINE)
-    || (traceit&TRACE_SHOW_LINE1))
-    {
 #ifdef HAVE_TCL
-      if (tclmode)
-      {
-         PrintTCL('P',(prompt_char=='>')? 0 : 1,NULL);
-      }
-      else
+    if (tclmode)
+    {
+       PrintTCL('P',(prompt_char=='>')? 0 : 1,NULL);
+    }
+    else
 #endif
-      if ((BVERBOSE(V_PROMPT))&&(!feBatch))
-      {
-        if (currentVoice->sw == BI_stdin)
-        {
-          fe_promptstr[0]=prompt_char;
+    if ((BVERBOSE(V_PROMPT))&&(!feBatch))
+    {
+      fe_promptstr[0]=prompt_char;
 #ifndef HAVE_READLINE
-          PrintS(fe_promptstr);
-#endif
-        }
-        else
-        {
-          if (currentVoice->filename==NULL)
-            Print("(none) %3d%c ",yylineno,prompt_char);
-          else
-            Print("%s %3d%c ",currentVoice->filename,yylineno,prompt_char);
-        }
-        prompt_char = '.';
-        mflush();
-      }
-#ifdef macintosh
-      cols = 0;
+      PrintS(fe_promptstr);
 #endif
     }
+    mflush();
+#ifdef macintosh
+    cols = 0;
+#endif
   }
 }
 
@@ -393,6 +377,7 @@ static void feShowPrompt(void)
 */
 static int fePrintEcho(char *anf)
 {
+  prompt_char = '.';
   char *ss=strchr(anf,'\n');
   int len_s;
   if (ss==NULL)
@@ -410,13 +395,20 @@ static int fePrintEcho(char *anf)
   mrc--;
   // handle echo:
   if (((si_echo>myynest)
-    && (currentVoice->typ!=BT_break)
-    && (currentVoice->typ!=BT_execute)
-    && (strncmp(anf,";return();",10)!=0)
+    && (((currentVoice->typ==BT_proc)
+         && (strncmp(anf,";return();",10)!=0))
+      || (currentVoice->typ==BT_example)
+      || (currentVoice->typ==BT_file)
+      || (currentVoice->typ==BT_none)
+      )
   )
   || (traceit&TRACE_SHOW_LINE)
   || (traceit&TRACE_SHOW_LINE1))
   {
+    if (currentVoice->filename==NULL)
+      Print("(none) %3d%c ",yylineno,prompt_char);
+    else
+      Print("%s %3d%c ",currentVoice->filename,yylineno,prompt_char);
     fwrite(anf,1,len_s,stdout);
     mflush();
     if (traceit&TRACE_SHOW_LINE)
@@ -453,7 +445,6 @@ NewBuff:
         char *s=(char *)AllocL(len+2);
         strncpy(s,anf,len+2);
         s[len+1]='\0';
-        feShowPrompt();
         fePrintEcho(s);
         FreeL((ADDRESS)s);
       }
@@ -469,7 +460,6 @@ NewBuff:
         strncpy(s,anf,len+2);
         s[len+1]='\0';
         yylineno++;
-        feShowPrompt();
         fePrintEcho(s);
         FreeL((ADDRESS)s);
       }
@@ -488,9 +478,11 @@ NewBuff:
   int offset=0;
 NewRead:
   yylineno++;
-  feShowPrompt();
   if (currentVoice->sw==BI_stdin)
+  {
+    feShowPrompt();
     s=fe_fgets_stdin(currentVoice->buffer+offset,(4096-sizeof(ADDRESS))-offset);
+  }
   else if (currentVoice->sw==BI_file)
     s=fgets(currentVoice->buffer+offset,(4096-sizeof(ADDRESS))-offset,
             currentVoice->files);

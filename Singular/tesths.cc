@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.30 1998-02-27 14:06:26 Singular Exp $ */
+/* $Id: tesths.cc,v 1.31 1998-02-27 16:28:01 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -147,7 +147,7 @@ int main(          /* main entry to Singular */
               i++;
               si_echo = (int)(argv[1][i] - '0');
             }
-            else si_echo = 2;
+            else si_echo = 1;
             break;
             case 'r': siRandomStart = 0;
               while((argv[1][i+1]>='0') && (argv[1][i+1]<='9'))

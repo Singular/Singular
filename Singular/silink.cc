@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.14 1998-02-27 14:06:25 Singular Exp $ */
+/* $Id: silink.cc,v 1.15 1998-02-27 16:28:01 Singular Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -702,7 +702,13 @@ BOOLEAN slGetDumpAscii(si_link l)
     BOOLEAN status = newFile(l->name);
     if (status)
       return TRUE;
+      
+    int old_echo=si_echo;
+    si_echo=0;
+
     status=yyparse();
+    
+    si_echo=old_echo;
 
     if (status)
       return TRUE;
