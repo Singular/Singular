@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.18 1997-10-13 15:39:02 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.19 1997-11-13 10:52:44 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -519,14 +519,14 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
   int rt=r->Typ();
   if (rt==0)
   {
-    if (!errorreported) Werror("`%s` is undefined",r->name);
+    if (!errorreported) Werror("`%s` is undefined",r->Name());
     return TRUE;
   }
 
   int lt=l->Typ();
-  if((lt==0)&&(l->name!=NULL))
+  if((lt==0)/*&&(l->name!=NULL)*/)
   {
-    if (!errorreported) Werror("left side `%s` is undefined",l->name);
+    if (!errorreported) Werror("left side `%s` is undefined",l->Name());
     return TRUE;
   }
   if((rt==DEF_CMD)||(rt==NONE))
@@ -647,7 +647,7 @@ static BOOLEAN iiAssign_sys(leftv l, leftv r)
 
   if (rt==0)
   {
-    if (!errorreported) Werror("`%s` is undefined",r->name);
+    if (!errorreported) Werror("`%s` is undefined",r->Name());
     return TRUE;
   }
   int i=0;
