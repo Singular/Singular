@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.73 1998-05-20 07:53:15 obachman Exp $
+@comment $Id: reference.doc,v 1.74 1998-05-20 12:39:54 schmidt Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2358,11 +2358,15 @@ matrix
 @item @strong{Purpose:}
 @code{koszul(d,n)} computes a matrix of the Koszul relations of degree d of
 the first n ring variables.
-@*@code{koszul(d,id)} computes a matrix of the Koszul relations of degree d of
+
+@code{koszul(d,id)} computes a matrix of the Koszul relations of degree d of
 the generators of the ideal @code{id}.
-@*@code{koszul(d,n,id)} computes a matrix of the Koszul relations of degree d of
+
+@code{koszul(d,n,id)} computes a matrix of the Koszul relations of degree d of
 the first n generators of the ideal @code{id}.
-@*(koszul(1,id),koszul(2,id),... build a complex, that is @code{koszul(i,id)*koszul(i+1,id)}=0.)
+
+koszul(1,id),koszul(2,id),... form a complex, that is, the product
+of @code{koszul(i,id)} and @code{koszul(i+1,id)} equals zero.
 @item @strong{Example:}
 @example
 @c example
