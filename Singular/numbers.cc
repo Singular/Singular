@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.17 1999-07-01 16:13:40 Singular Exp $ */
+/* $Id: numbers.cc,v 1.18 1999-08-17 16:58:15 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -90,7 +90,7 @@ number ndGetDenom(number &n) { return nInit(1); }
 
 int    nGetChar() { return nChar; }
 
-int ndSize(number a) {return (int)nIsZero(a)==FALSE; }
+int ndSize(number a) { return (int)nIsZero(a)==FALSE; }
 
 /*2
 * init operations for characteristic c (complete==TRUE)
@@ -379,8 +379,8 @@ void nSetChar(ring r, BOOLEAN complete)
       nGcd  = ndGcd;
       nLcm  = ndGcd; /* tricky, isn't it ?*/
       nSetMap=ngfSetMap;
-      /* nName= ndName; */
-      /*nSize  = ndSize;*/
+      nName= ndName;
+      nSize  = ndSize;
 #ifdef LDEBUG
       nDBTest=ngfDBTest;
 #endif
