@@ -1,5 +1,5 @@
 LIB "tst.lib";
-LIB "Mregular.lib";
+LIB "mregular.lib";
 ring r=0,(x,y,z,t),dp; 
 ideal j=x17y14-y31, x20y13, x60-y36z24-x20z20t20;
 int l=reg_CM(j);l;
