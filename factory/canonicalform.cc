@@ -1,8 +1,11 @@
 // emacs editmode for this file is -*- C++ -*-
-// $Id: canonicalform.cc,v 1.3 1997-03-26 16:27:09 schmidt Exp $
+// $Id: canonicalform.cc,v 1.4 1997-04-07 14:53:44 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.3  1997/03/26 16:27:09  schmidt
+stream-io wrapped by NOSTREAMIO
+
 Revision 1.2  1996/07/02 11:18:32  stobbe
 "initCanonicalForm: now initializes the switch system.
 "
@@ -17,10 +20,11 @@ Initial revision
 
 */
 
+#include <config.h>
+
 #include "assert.h"
 
 #include "cf_defs.h"
-
 #include "cf_globals.h"
 #include "canonicalform.h"
 #include "cf_iter.h"
