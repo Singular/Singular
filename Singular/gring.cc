@@ -3,10 +3,10 @@
 ****************************************/
 /***************************************************************
  *  File:    gring.cc
- *  Purpose: pMult family of procedures
+ *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.2 2000-11-20 16:02:03 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.3 2001-02-22 18:59:40 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #include "gring.h"
@@ -14,93 +14,229 @@
 #ifdef HAVE_PLURAL
 
 //global nc_macros :
-#define freeT(A) omFree((ADDRESS)A,(pVariables+1)*sizeof(Exponent_t))
-#define freeN(A,k) omFree((ADDRESS)A,k*sizeof(number))
+#define freeT(A,v) omFreeSize((ADDRESS)A,(v+1)*sizeof(Exponent_t))
+#define freeN(A,k) omFreeSize((ADDRESS)A,k*sizeof(number))
 
-poly nc_pp_Mult_mm(poly p, const poly m, const poly spNoether, const ring ri)
+// poly functions defined in p_Procs :
+poly nc_pp_Mult_mm(poly p, const poly m, const ring r, poly &last)
 {
-  p_Test(p, ri);
-  p_LmTest(m, ri);
-  if (p == NULL) return NULL;
-  spolyrec rp;
-  poly q = &rp, r;
-  number ln = pGetCoeff(m);
-  omBin bin = ri->PolyBin;
-  DECLARE_LENGTH(const unsigned long length = ri->ExpL_Size);
-  const unsigned long* m_e = m->exp;
-  pAssume(!n_IsZero(ln,ri));
-  pAssume1(p_GetComp(m, ri) == 0 || p_MaxComp(p, ri) == 0);
-
-  do
-  {
-    p_AllocBin( pNext(q), bin, ri); 
-    q = pNext(q);
-    pSetCoeff0(q, n_Mult(ln, pGetCoeff(p), ri));
-// old:      p_MemSum(q->exp, p->exp, m_e, length);
-    q = mm_Mult_mm(p->exp,m_e);  // give exponents only?
-    p_MemAddAdjust(q, ri);
-    p = pNext(p);
-  }
-  while (p != NULL);
-
-  pNext(q) = NULL;  
-  p_Test(pNext(&rp), ri);
-  return pNext(&rp);
+  return(nc_p_Mult_mm(p_Copy(p,r),m,r));
 }
 
-poly nc_mm_Mult_nn(Exponent_t *F, Exponent_t *G, const ring ri)
+// poly nc_p_Mult_mm(poly p, poly m, const ring r); defined below
+poly nc_p_Minus_mm_Mult_qq(poly p, const poly m, poly q, int &shorter, const poly spNoether, const ring r, poly &last)
+{
+  number minus1=n_Init(-1,r);
+  poly mc=p_Mult_nn(p_Copy(m,r),minus1,r);
+  mc=nc_mm_Mult_p(mc,p_Copy(q,r),r);
+  p=p_Add_q(p,mc,r);
+  n_Delete(&minus1,r);
+  return(p);
+}
 
-/* destroys both f and g , f,g are monomials with the coefficient */
-//poly pMultTT(poly f, poly g)
+//----------- auxiliary routines--------------------------
+
+poly  nc_p_Mult_mm(poly p, const poly m, const ring r)
+/* p is poly, m is mono with coeff, p killed after */
+// former pMultT
+{
+  if ((p==NULL) || (m==NULL)) return(NULL);
+//  if (pNext(p)==NULL) return(nc_mm_Mult_nn(p,pCopy(m),r));
+// excluded  - the cycle will do it anyway - OK.
+
+#ifdef PDEBUG
+  p_Test(p,r);
+  p_Test(m,r);
+#endif
+  poly v=NULL;
+  poly out=NULL;
+  Exponent_t *P=(Exponent_t *)omAlloc0((r->N+1)*sizeof(Exponent_t));
+  Exponent_t *M=(Exponent_t *)omAlloc0((r->N+1)*sizeof(Exponent_t));
+// coefficients:
+  number cP,cM,cOut;
+  p_GetExpV(m,M,r);
+  cM=p_GetCoeff(m,r);
+// components:
+  const Exponent_t expM=p_GetComp(m,r);
+  Exponent_t expP=0;
+  Exponent_t expOut=0;
+  
+  while (p!=NULL)
+  {
+    v=p_Head(p,r);
+    p_Test(v,r);
+    p_Test(p,r);
+    
+    expP=p_GetComp(v,r);
+    if (expP==0)
+    {
+      if (expM==0)
+      {
+        expOut=0;
+      }
+      else
+      {
+        expOut=expM;
+      }      
+    }
+    else
+    {
+      if (expM==0)
+      {
+        expOut=expP;
+      }
+      else
+      {
+        // REPORT_ERROR AND BREAK
+        expOut=NULL;
+      }
+    }
+    
+    p_GetExpV(v,P,r);
+    cP=p_GetCoeff(v,r);
+    v= nc_mm_Mult_nn(P,M,r);
+//  P=NULL;
+// or     freeT(P,r->N); ?
+    cOut=n_Mult(cP,n_Copy(cM,r),r);
+    v=p_Mult_nn(v,cOut,r);
+    p_SetCompP(v,expOut,r);
+    out = p_Add_q(out,v,r);
+    p_DeleteLm(&p,r);
+  }
+  freeT(P,r->N);
+//  freeT(M,r->N);
+  return(out);
+}
+
+poly nc_mm_Mult_p(const poly m, poly p, const ring r)
+/* p is poly, m is mono with coeff, p killed after */
+/* former pMultT2 */
+{
+  if ((p==NULL) || (m==NULL)) return(NULL);
+//  if (pNext(p)==NULL) return(nc_mm_Mult_nn(p,pCopy(m),r));
+// excluded  - the cycle will do it anyway - OK.
+
+#ifdef PDEBUG
+  p_Test(p,r);
+  p_Test(m,r);
+#endif
+  poly v=NULL;
+  poly out=NULL;
+  Exponent_t *P=(Exponent_t *)omAlloc0((r->N+1)*sizeof(Exponent_t));
+  Exponent_t *M=(Exponent_t *)omAlloc0((r->N+1)*sizeof(Exponent_t));
+// coefficients:
+  number cP,cM,cOut;
+  p_GetExpV(m,M,r);
+  cM=p_GetCoeff(m,r);
+// components:
+  const Exponent_t expM=p_GetComp(m,r);
+  Exponent_t expP=0;
+  Exponent_t expOut=0;
+  
+  while (p!=NULL)
+  {
+    v=p_Head(p,r);
+    p_Test(v,r);
+    p_Test(p,r);
+    
+    expP=p_GetComp(v,r);
+    if (expP==0)
+    {
+      if (expM==0)
+      {
+        expOut=0;
+      }
+      else
+      {
+        expOut=expM;
+      }      
+    }
+    else
+    {
+      if (expM==0)
+      {
+        expOut=expP;
+      }
+      else
+      {
+        // REPORT_ERROR AND BREAK
+        expOut=NULL;
+      }
+    }
+    
+    p_GetExpV(v,P,r);
+    cP=p_GetCoeff(v,r);
+    v= nc_mm_Mult_nn(M,P,r);
+//    P=NULL;
+//  freeT(P,r->N);
+    cOut=n_Mult(cP,n_Copy(cM,r),r);
+    v=p_Mult_nn(v,cOut,r);
+    p_SetCompP(v,expOut,r);
+    out = p_Add_q(out,v,r);
+    p_DeleteLm(&p,r);
+  }
+  freeT(P,r->N);
+//  freeT(M,r->N);
+  return(out);
+}
+
+poly nc_mm_Mult_nn(Exponent_t *F0, Exponent_t *G0, const ring r)
+/* destroys nothing, no coeffs and exps */
+/* very modified former  poly pMultTT(poly f, poly g) */
 {
   poly out=NULL;
-  int nv=pVariables;
   int i;
-  number cF,cG,cOut;
-// What can we do with coeffs?
-//  cF=pGetCoeff(f);
-//  cG=pGetCoeff(g);
-  cOut=nMult(cF,cG);
   int iF,jG,iG;
+  int ExpSize=(r->N+1)*sizeof(Exponent_t);
 
-  Exponent_t exp=F[0];
+  Exponent_t *F=(Exponent_t *)omAlloc0(ExpSize);
+  Exponent_t *G=(Exponent_t *)omAlloc0(ExpSize);
 
-  iF=nv;
+  for(i=1;i<=r->N;i++)
+  {
+    F[i]=F0[i];
+    G[i]=G0[i];
+  }
+  F[0]=0;
+  G[0]=0;
+  
+  iF=r->N;
   while ((F[iF]==0)&&(iF>=1)) iF--; /* last exp_num of F */
   jG=1;
-  while ((G[jG]==0)&&(jG<=nv)) jG++;  /* first exp_num of G */
-  iG=nv;
+  while ((G[jG]==0)&&(jG<=r->N)) jG++;  /* first exp_num of G */
+  iG=r->N;
   while ((G[iG]==0)&&(iG>=1)) iG--;  /* last exp_num of G */
 
-
-  if (iF<=jG)                     /* i.e. no mixed exp_num */
+  if (iF<=jG)
+// i.e. no mixed exp_num , MERGE case
   {
     out=pOne();
-    for (i=1;i<=nv;i++) { F[i]=F[i]+G[i];}
-//    F[0]=exp;
-    pSetExpV(out,F);
-    pSetCoeff(out,cOut);
-    pSetm(out);
-    freeT(F);freeT(G);
+    for (i=1;i<=r->N;i++)
+    {
+      F[i]=F[i]+G[i];
+    }  
+    p_SetExpV(out,F,r);
+    p_Setm(out,r);
+    freeT(F,r->N);
+    freeT(G,r->N);
     return(out);
   }
 
-  if (iG==jG)  /* g is uni */
+  if (iG==jG)
+// g is univariate monomial
   {
 //    if (ri->nc->type==nc_skew) -- postpone to TU   
-    out=pMultTU(F,jG,G[jG]);
-    out=pSetCoeffP(out,cOut);
-    pSetCompP(out,exp);
-    freeT(F);freeT(G);
-    nDelete(&cOut);
+    out=nc_mm_Mult_uu(F,jG,G[jG],r);
+    freeT(F,r->N);
+    freeT(G,r->N);
     return(out);
   }
-  number n1=nInit(1);
-  Exponent_t *Prv=(Exponent_t *)Alloc0((pVariables+1)*sizeof(Exponent_t));
-  Exponent_t *Nxt=(Exponent_t *)Alloc0((pVariables+1)*sizeof(Exponent_t));
+  
+  number n1=n_Init(1,r);
+  Exponent_t *Prv=(Exponent_t *)omAlloc0(ExpSize);
+  Exponent_t *Nxt=(Exponent_t *)omAlloc0(ExpSize);
 
-  int nnv=nv+1;
-  int *log=(int *)Alloc0((nnv)*sizeof(int));
+  int *log=(int *)omAlloc0((r->N+1)*sizeof(int));
   int cnt=0; int cnf=0;
 
   /* splitting F wrt jG */
@@ -110,21 +246,21 @@ poly nc_mm_Mult_nn(Exponent_t *F, Exponent_t *G, const ring ri)
     if (F[i]!=0) cnf++;
   }
 
-  if (cnf==0) freeT(Prv);
+  if (cnf==0) freeT(Prv,r->N);
 
-  for (i=jG+1;i<=nv;i++)
+  for (i=jG+1;i<=r->N;i++)
   {
     Nxt[i]=F[i];
-    if (cnf!=0)  Prv[i]=0;
+//    if (cnf!=0)  Prv[i]=0;
     if (F[i]!=0)
     {
       cnt++;
     }              /* effective part for F */
   }
-  freeT(F);
+  freeT(F,r->N);
   cnt=0;
 
-  for (i=1;i<=nv;i++)
+  for (i=1;i<=r->N;i++)
   {
     if (G[i]!=0)
     {
@@ -136,149 +272,308 @@ poly nc_mm_Mult_nn(Exponent_t *F, Exponent_t *G, const ring ri)
 /* ---------------------- A C T I O N ------------------------ */
   poly D=NULL;
   poly Rout=NULL;
-  number *c=(number *)Alloc0((nv+1)*sizeof(number));
-  c[0]=nInit(1);
+  number *c=(number *)omAlloc0((r->N+1)*sizeof(number));
+  c[0]=n_Init(1,r);
 
   Exponent_t *Op=Nxt;
   Exponent_t *On=G;
-  Exponent_t *U=(Exponent_t *)Alloc0((pVariables+1)*sizeof(Exponent_t));
+  Exponent_t *U=(Exponent_t *)omAlloc0(ExpSize);
 
-  for (i=jG;i<=nv;i++) U[i]=Nxt[i]+G[i];  /* make leadterm */
-  for (i=1;i<jG;i++) U[i]=0;
-  Nxt=NULL; G=NULL;
-
-  Op[0]=exp;
+  for (i=jG;i<=r->N;i++) U[i]=Nxt[i]+G[i];  /* make leadterm */
+//  for (i=1;i<jG;i++) U[i]=0;
+  Nxt=NULL;
+  G=NULL;
   cnt=1;
   int t=0;
   poly w=NULL;
   poly Pn=pOne();
-  pSetExpV(Pn,On);
-  pSetm(Pn);
+  p_SetExpV(Pn,On,r);
+  p_Setm(Pn,r);
 
   while (On[iG]!=0)
   {
      t=log[cnt];
 
-     w=pMultTU(Op,t,On[t]);
-     c[cnt]=nMult(c[cnt-1],pGetCoeff(w));
+     w=nc_mm_Mult_uu(Op,t,On[t],r);
+     c[cnt]=n_Mult(c[cnt-1],p_GetCoeff(w,r),r);
      D = pNext(w);  /* getting coef and rest D */
-     pDelete1(&w); w=NULL;
+     p_DeleteLm(&w,r);
+     w=NULL;
 
      Op[t] += On[t];   /* update exp_vectors */
      On[t] = 0;
 
      if (t!=iG)    /* not the last step */
      {
-       On[0]=exp;
-       pSetExpV(Pn,On);
-       pSetm(Pn);
-       Rout=pMultT(D,Pn);
+       p_SetExpV(Pn,On,r);
+       p_Setm(Pn,r);
+       p_Test(Pn,r);
+       
+//       if (pNext(D)==0)
+// is D a monomial? could be postponed higher
+//       {
+//       Rout=nc_mm_Mult_nn(D,Pn,r);
+//       }
+//       else
+//       {
+       Rout=nc_p_Mult_mm(D,Pn,r); 
+//       }
      }
      else
-     {  Rout=D; D=NULL; }
-
-
+     {
+       Rout=D;
+       D=NULL;
+     }
+     
      if (Rout!=NULL)
      {
-       Rout=pSetCoeffP(Rout,c[cnt-1]); /* Rest is ready */
-       out=pAdd(out,Rout);
+       Rout=p_Mult_nn(Rout,c[cnt-1],r); /* Rest is ready */
+       out=p_Add_q(out,Rout,r);
        Rout=NULL;
      }
      cnt++;
   }
-  freeT(On);freeT(Op);
-  pDelete(&Pn);
-  Free((ADDRESS)log,nnv*sizeof(int));
+  freeT(On,r->N);
+  freeT(Op,r->N);
+  p_Delete(&Pn,r);
+  omFreeSize((ADDRESS)log,(r->N+1)*sizeof(int));
 
-/* leadterm and Prv-part with cOut */
+/* leadterm and Prv-part */
 
   Rout=pOne();
   /* U is lead.monomial */
-  U[0]=exp;
-  pSetExpV(Rout,U);pSetm(Rout);  /* use again this name Rout */
-  pSetCoeff(Rout,c[cnt-1]);
-  out=pAdd(out,Rout);
-  Rout=NULL;
-  freeT(U); freeN(c,nnv);
+  U[0]=0;
+  p_SetExpV(Rout,U,r);
+  p_Setm(Rout,r);  /* use again this name Rout */
+  p_Test(Rout,r);
+  p_SetCoeff(Rout,c[cnt-1],r);
+  out=p_Add_q(out,Rout,r);
+//  Rout=NULL;
+  freeT(U,r->N);
+  freeN(c,r->N+1);
   if (cnf!=0)  /* Prv is non-zero vector */
   {
     Rout=pOne();
-    Prv[0]=exp;
-    pSetExpV(Rout,Prv);
-    pSetm(Rout);
-    pSetCoeff(Rout,cOut); //here cOut from begin
-    out=pMultT2(Rout,out); //getting finite result
-    freeT(Prv);
-    pDelete(&Rout);
+    Prv[0]=0;
+    p_SetExpV(Rout,Prv,r);
+    p_Setm(Rout,r);
+    p_Test(Rout,r);
+    out=nc_mm_Mult_p(Rout,out,r); //getting finite result
+    freeT(Prv,r->N);
+    p_Delete(&Rout,r);
   }
-  else
+  return (out);
+}
+
+
+poly nc_mm_Mult_uu(Exponent_t *F,int jG,int bG, const ring r)
+/* f=mono(F),g=(x_iG)^bG */
+{
+  poly out=NULL;
+  int i;
+  number num=NULL;
+  
+  int iF=r->N;
+  while ((F[iF]==0)&&(iF>0)) iF-- ;   /* last exponent_num of F */
+
+  if (iF==0)  /* F==zero vector in other words */
   {
-    out=pSetCoeffP(out,cOut);
-    nDelete(&cOut);
+   out=pOne();
+   p_SetExp(out,jG,bG,r);
+   p_Setm(out,r);
+   return(out);
   }
 
-  pSetCompP(out, exp);
+  int jF=1;
+  while ((F[jF]==0)&&(jF<=r->N)) jF++;  /* first exp of F */
+
+  if (iF<=jG)                       /* i.e. no mixed exp_num */
+  {
+    out=pOne();
+    F[jG]=F[jG]+bG;
+    p_SetExpV(out,F,r);
+    p_Setm(out,r);
+//  num=NULL;
+    return(out);
+  }
+
+  if (iF==jF)              /* uni times uni */
+  {
+   out=nc_uu_Mult_ww(iF,F[iF],jG,bG,r);
+//   num=NULL;
+   return(out);
+  }
+  
+  Exponent_t *Prv=(Exponent_t*)omAlloc0((r->N+1)*sizeof(Exponent_t));
+  Exponent_t *Nxt=(Exponent_t*)omAlloc0((r->N+1)*sizeof(Exponent_t));
+  int *lF=(int *)omAlloc0((r->N+1)*sizeof(int));
+  int cnt=0; int cnf=0;
+  /* splitting F wrt jG */
+  for (i=1;i<=jG;i++) /* mult at the very end */
+  {
+    Prv[i]=F[i]; Nxt[i]=0;
+    if (F[i]!=0) cnf++;
+  }
+  if (cnf==0)  freeT(Prv,r->N);
+  for (i=jG+1;i<=r->N;i++)
+  {
+    Nxt[i]=F[i];
+    if (cnf!=0) { Prv[i]=0;}
+    if (F[i]!=0)
+    {
+     cnt++;
+     lF[cnt]=i;
+     }                 /* eff_part,lF_for_F */
+  }
+
+  if (cnt==1) /* Nxt consists of 1 nonzero el-t only */
+  {
+    int q=lF[1];
+    poly Rout=pOne();
+    out=nc_uu_Mult_ww(q,Nxt[q],jG,bG,r);
+    freeT(Nxt,r->N);
+
+    if (cnf!=0)
+    {
+       Prv[0]=0;
+       p_SetExpV(Rout,Prv,r);
+       p_Setm(Rout,r);
+       p_Test(Rout,r);
+       freeT(Prv,r->N);
+       out=nc_mm_Mult_p(Rout,out,r); /* getting finite result */
+//pMultT2
+    }
+
+    omFreeSize((ADDRESS)lF,(r->N+1)*sizeof(int));
+    p_Delete(&Rout,r);
+    return (out);
+  }
+/* -------------------- MAIN ACTION --------------------- */
+
+  poly D=NULL;
+  poly Rout=NULL;
+  number *c=(number *)omAlloc0((cnt+2)*sizeof(number));
+  c[cnt+1]=n_Init(1,r);
+  i=cnt+2; 	/* later in freeN */
+  Exponent_t *Op=Nxt;
+  Exponent_t *On=(Exponent_t *)omAlloc0((r->N+1)*sizeof(Exponent_t));
+  Exponent_t *U=(Exponent_t *)omAlloc0((r->N+1)*sizeof(Exponent_t));
+
+  for (int ii=1;ii<=r->N;ii++)
+  {
+    U[ii]=Nxt[ii];
+  }
+  U[jG] = U[jG] + bG;
+
+  /* Op=Nxt and initial On=(0); */
+  Nxt=NULL;
+
+  poly Pp;
+  poly Pn;
+  int t=0;
+  int first=lF[1];
+  int nlast=lF[cnt];
+  int kk=0;
+//  cnt--;   /* now lF[cnt] should be <=iF-1 */
+
+  while (Op[first]!=0)
+  {
+     t=lF[cnt];   /* cnt as it was computed */
+
+     poly w=nc_uu_Mult_ww(t,Op[t],jG,bG,r);
+     c[cnt]=n_Copy(p_GetCoeff(w,r),r);
+     D = pNext(w);  /* getting coef and rest D */
+     p_DeleteLm(&w,r);
+     w=NULL;
+
+     Op[t]= 0;
+     Pp=pOne();
+     p_SetExpV(Pp,Op,r);
+     p_Setm(Pp,r);
+
+     if (t<nlast)
+     {
+       kk=lF[cnt+1];
+       On[kk]=F[kk];
+       
+       Pn=pOne();
+       p_SetExpV(Pn,On,r);
+       p_Setm(Pn,r);
+
+       if (t!=first)   /* typical expr */
+       {
+         w=nc_p_Mult_mm(D,Pn,r);
+         Rout=nc_mm_Mult_p(Pp,w,r);
+         w=NULL;
+       }
+       else                   /* last step */
+       {
+         On[t]=0;
+         p_SetExpV(Pn,On,r);
+         p_Setm(Pn,r);
+         Rout=nc_p_Mult_mm(D,Pn,r);
+       }
+       p_Test(Pp,r);
+       p_Delete(&Pn,r);
+     }
+     else                     /* first step */
+     {
+       Rout=nc_mm_Mult_p(Pp,D,r);
+     }
+
+     p_Test(Pp,r);
+     p_Delete(&Pp,r);
+     num=n_Mult(c[cnt+1],c[cnt],r);
+     n_Delete(&c[cnt],r);
+     c[cnt]=num;
+     Rout=p_Mult_nn(Rout,c[cnt+1],r); /* Rest is ready */
+     out=p_Add_q(out,Rout,r);
+//     Rout=NULL;
+     Pp=NULL;
+     cnt--;
+  }
+// only to be safe:
+  Pn=Pp=NULL;
+  freeT(On,r->N);
+  freeT(Op,r->N);
+
+/* leadterm and Prv-part with coef 1 */
+//  U[0]=exp;
+  
+//  U[jG]=U[jG]+bG;  /* make leadterm */
+// ??????????? we have done it already :-0
+  Rout=pOne();
+  p_SetExpV(Rout,U,r);
+  p_Setm(Rout,r);  /* use again this name */
+  p_SetCoeff(Rout,c[cnt+1],r);  /* last computed coef */
+  out=p_Add_q(out,Rout,r);
+  Rout=NULL;
+  freeT(U,r->N);
+  freeN(c,i);
+  omFreeSize((ADDRESS)lF,(r->N+1)*sizeof(int));
+
+  if (cnf!=0)
+  {
+    Rout=pOne();
+    p_SetExpV(Rout,Prv,r);
+    p_Setm(Rout,r);
+    freeT(Prv,r->N);
+    out=nc_mm_Mult_p(Rout,out,r); /* getting finite result */
+    p_Delete(&Rout,r);
+  }
   return (out);
 }
 
 //----------pMultUU--------- 
-poly nc_uu_Mult_ww (int i, int a, int j, int b,const ring r)
+poly nc_uu_Mult_ww (int i, int a, int j, int b, const ring r)
 {
-  int nv=pVariables;
   poly out=NULL;
-
-  if (i<=j)        /* usual expression fg */
-  {
-      out=pOne();
-      p_SetExp(out,j,b,r);
-      p_SetExp(out,i,a,r);
-      if (i==j) p_SetExp(out,j,a+b,r);
-      p_Setm(out,r);
-      return(out);
-   }
-   else    /* when i>j */
-   {
-      if (a==0)
-      {
-         if (b==0)
-         {
-           out=pOne();
-           return(out);
-         }
-         else
-         {
-            out=pOne();
-            p_SetExp(out,j,b,r);p_Setm(out,r);
-            return(out);
-          }
-      }
-      else
-      {
-         if (b==0)
-         {
-            out=pOne();
-            p_SetExp(out,i,a,r);p_Setm(out,r);
-            return(out);
-         }
-      }
-
-    }
-// is it already computed ?
-
-  int vik = UPMATELEM(j,i);
-// FOR future nc_skew case  
-//  if ((ri->nc->type==nc_skew)||(ri->nc->MF[vik]==0))
-//   {
-//     out=pOne();
-//     pSetExp(out,j,b); pSetExp(out,i,a);
-//     pSetm(out);
-//     number tmp_number=NULL;
-//     nPower(c,a*b,&tmp_number);
-//     pSetCoeff(out,tmp_number);
-//     return (out);
-//   }
-  matrix cMT=r->MT[vik];
-  int cMTsize=r->MTsize[vik];
+  number tmp_number=NULL;
+  
+// first check wether the polynom is alredy computed
+  int vik = UPMATELEM(j,i,r->N);
+  matrix cMT=r->nc->MT[vik];
+  int cMTsize=r->nc->MTsize[vik];
 
   if (((a<cMTsize)&&(b<cMTsize))&&(MATELEM(cMT,a,b)!=NULL))
   {
@@ -286,57 +581,65 @@ poly nc_uu_Mult_ww (int i, int a, int j, int b,const ring r)
      return (out);
   }
 
-//End(Zero_Exceptions = (0,0),(0,b),(a,0),(a==b) )
+//Now check zero exeptions, commutativity and should we do something at all?  
+      out=pOne();
+      p_SetExp(out,j,b,r);
+      p_SetExp(out,i,a,r);
+      if (i==j) p_SetExp(out,j,a+b,r);
+      p_Setm(out,r);
+      if ((a==0)||(b==0)||(i<=j)) return(out);//zero exeptions and usual case
+      
+      if (r->nc->COM[UPMATELEM(i,j,r->N)]!=NULL) //commutative or quasicommutative case
+      {
+        if (r->nc->COM[UPMATELEM(i,j,r->N)]!=n_Init(1,r)) //commutative case
+        {
+          return(out);
+        }     
+        else
+        {
+          tmp_number=p_GetCoeff(r->nc->COM[UPMATELEM(i,j,r->N)],r); //quasicommutative case
+          nPower(tmp_number,a*b,&tmp_number);
+          p_SetCoeff(out,tmp_number,r);
+          return(out);
+        }
+      }// end commutative or quasicommutative case
+
+//we are here if  i>j and variables do not commute or quasicommute
 //in fact, now a>=1 and b>=1; and j<i
 
-  poly C=MATELEM(r->C,j,i);
-  number c=p_GetCoeff(C,r); //coeff
-  poly D=MATELEM(r->D,j,i);       //rest
-
+//  poly C=MATELEM(r->nc->C,j,i);               
+//  number c=p_GetCoeff(C,r); //coeff           
+//  p_Delete(&C,r);
+      
   int newcMTsize=0;
-
-  if (D==NULL)                   /* (skew)-commutativity check */
-  {
-     out=pOne();
-     p_SetExp(out,j,b,r); p_SetExp(out,i,a,r);
-     p_Setm(out,r);
-     number tmp_number=NULL;
-     nPower(c,a*b,&tmp_number);
-     p_SetCoeff(out,tmp_number,r);
-     return(out);
-  }
-
-  if ((a==1)&&(b==1))
-  {
-     out= p_Copy(MATELEM(cMT,1,1),r);  /* already computed */
-     return(out);
-  }
-  D=NULL;
-
+  
+  p_Delete(&out,r);//Shura thinks it is nesessary
+  
   if (a>=b) {newcMTsize=a;} else {newcMTsize=b;}
   if (newcMTsize>cMTsize)
   {
      newcMTsize = newcMTsize+cMTsize;
      matrix tmp = mpNew(newcMTsize,newcMTsize);
-     for (int p=1;p<nv;p++)
+     int k,m;
+     
+     for (k=1;k<r->N;k++)
      {
-        for (int q=p;q<=nv;q++)
+        for (m=1;m<=r->N;m++)
         {
-           MATELEM(tmp,p,q) = MATELEM(r->MT[UPMATELEM(j,i)],p,q);
-           MATELEM(r->MT[UPMATELEM(j,i)],p,q)=NULL;
+           MATELEM(tmp,k,m) = MATELEM(r->nc->MT[UPMATELEM(j,i,r->N)],k,m);
+           MATELEM(r->nc->MT[UPMATELEM(j,i)],k,m)=NULL;
         }
      }
-     id_Delete((ideal *)&(r->MT[UPMATELEM(j,i)]),r);
-     r->MT[UPMATELEM(j,i)] = tmp;
-     r->MTsize[UPMATELEM(j,i)] = newcMTsize;
+     id_Delete((ideal *)&(r->nc->MT[UPMATELEM(j,i,r->N)]),r);
+     r->nc->MT[UPMATELEM(j,i,r->N)] = tmp;
+     r->nc->MTsize[UPMATELEM(j,i,r->N)] = newcMTsize;
   }  /* The update of multiplication matrix is finished */
 
-  cMT=r->MT[UPMATELEM(j,i)];         //cMT=current MT
+  cMT=r->nc->MT[UPMATELEM(j,i,r->N)];         //cMT=current MT
 
   poly x=pOne();p_SetExp(x,j,1,r);p_Setm(x,r);//var(j);
-  poly y=pOne();p_SetExp(y,i,1,r);pSetm(y,r);//var(i);  for convenience
-
-  int k,m;
+  poly y=pOne();p_SetExp(y,i,1,r);p_Setm(y,r);//var(i);  for convenience
+  
   poly t=NULL;
 /* ------------ Main Cycles ----------------------------*/
 
@@ -348,27 +651,26 @@ poly nc_uu_Mult_ww (int i, int a, int j, int b,const ring r)
      {
         t=p_Copy(MATELEM(cMT,k-1,1),r);
 //        t = pMultT2(y,t);
-        t = nc_m_Mult_pp(y,t,,r);
+        t = nc_mm_Mult_p(y,t,r);
         MATELEM(cMT,k,1) = t;
      }
      t=NULL;
   }
-
-
+  
   for (m=2;m<=b;m++)
   {
      t=MATELEM(cMT,a,m);
-
      if (t==NULL)   //not computed yet
      {
         t=p_Copy(MATELEM(cMT,a,m-1),r);
 //        t = pMultT(t,x);
-        t = nc_p_Mult_q(t,x,,r);
+        t = nc_p_Mult_mm(t,x,r);
         MATELEM(cMT,a,m) = t;
      }
      t=NULL;
   }
-  p_Delete(&x,r); p_Delete(&y,r);
+  p_Delete(&x,r);
+  p_Delete(&y,r);
   t=MATELEM(cMT,a,b);
   return(p_Copy(t,r));  /* as last computed element was cMT[a,b] */
 }
