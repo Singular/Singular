@@ -309,8 +309,8 @@ install: all installbin
 
 installbin: ${DL_LIBS} ${DL_LIBSG}
 	${MKINSTALLDIRS} ${bindir}
-	ranlib libkernel.a
-	ranlib libkernel-g.a
+	- ranlib libkernel.a
+	- ranlib libkernel-g.a
 ifeq (,${DL_LIBS})
 else
 
