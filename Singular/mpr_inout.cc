@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_inout.cc,v 1.13 2001-08-27 14:47:14 Singular Exp $ */
+/* $Id: mpr_inout.cc,v 1.14 2003-07-18 16:59:59 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultant
@@ -658,7 +658,7 @@ BOOLEAN loSimplex( leftv res, leftv args )
   if ( v->Typ() != MATRIX_CMD ) // 1: matrix
     return TRUE;
   else
-    m= (matrix)(v->Data());
+    m= (matrix)(v->CopyD());
 
   LP = new simplex(MATROWS(m),MATCOLS(m));
   LP->mapFromMatrix(m);

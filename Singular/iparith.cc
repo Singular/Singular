@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.304 2003-07-15 11:10:22 Singular Exp $ */
+/* $Id: iparith.cc,v 1.305 2003-07-18 16:59:54 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1782,7 +1782,18 @@ static BOOLEAN jjGCD_I(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjGCD_N(leftv res, leftv u, leftv v)
 {
-  res->data=(char *)nGcd((number) u->Data(), (number) v->Data(), currRing);
+  number a=(number) u->Data();
+  number b=(number) v->Data();
+  if (nIsZero(a))
+  {
+    if (nIsZero(b)) res->data=(char *)nInit(1);
+    else            res->data=(char *)nCopy(b);
+  }
+  else
+  {
+    if (nIsZero(b))  res->data=(char *)nCopy(a);
+    else res->data=(char *)nGcd(a, b, currRing);
+  }
   return FALSE;
 }
 static BOOLEAN jjHILBERT2(leftv res, leftv u, leftv v)
