@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.cc,v 1.15 2001-03-08 13:06:54 Singular Exp $ */
+/* $Id: mod_raw.cc,v 1.16 2001-04-05 14:12:07 Singular Exp $ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *
@@ -224,27 +224,31 @@ const char *dynl_error()
  *****************************************************************************/
 #ifdef IRIX_6
 #include <dlfcn.h>
-
-void *dynl_open(char *filename)
+static void* kernel_handle = NULL;
+void *dynl_open( char *filename)
 {
-  return(NULL);
+  return(dlopen(filename, RTLD_NOW|RTLD_GLOBAL));
 }
 
 void *dynl_sym(void *handle, char *symbol)
 {
-  return(NULL);
+  if (handle == DYNL_KERNEL_HANDLE)
+  {
+    if (kernel_handle == NULL)
+      kernel_handle = dynl_open(NULL);
+    handle = kernel_handle;
+  }
+  return(dlsym(handle, symbol));
 }
 
 int dynl_close (void *handle)
 {
-  return(0);
+  return(dlclose (handle));
 }
 
 const char *dynl_error()
 {
-  static char errmsg[] = "support for dynamic loading not implemented";
-
-  return errmsg;
+  return(dlerror());
 }
 #  endif /* IRIX_6 */
 
