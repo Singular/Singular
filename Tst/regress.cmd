@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.3 1998-04-23 09:59:06 krueger Exp $
+# $Id: regress.cmd,v 1.4 1998-04-23 10:19:42 obachman Exp $
 # FILE:    regress.cmd 
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -32,7 +32,7 @@ _EOM_
 # the default settings
 #
 $singularOptions = "-tqr12345678";
-$ignore = "-I '^\/\/.*used time:' -I '^\/\/.*ignore:'";
+$ignore = "-I '^\/\/.*used time:' -I '^\/\/.*ignore:' -I '? error occurred in'";
 $keep = "no";
 $verbosity = 1;
 $generate = "no";
