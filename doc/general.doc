@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.87 1998-05-19 14:35:55 schmidt Exp $
+@comment $Id: general.doc,v 1.88 1998-05-19 17:23:38 schmidt Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -75,7 +75,7 @@ To exit @sc{Singular} type @code{quit;}, @code{exit;} or @code{$}.
 @sc{Singular} may also be started with command line options and with
 filenames as arguments. More generally, the synopsis of @sc{Singular} is
 @example
-Singular  [options] [file1 [file2 ...]]
+Singular  [options] [file1 [file2 @dots{}]]
 @end example
 
 @xref{Command line options}, @ref{Startup sequence}.
@@ -251,7 +251,7 @@ to retrieve previous input.
 
 The synopsis of @sc{Singular} is
 @example
-Singular  [options] [file1 [file2 ...]]
+Singular  [options] [file1 [file2 @dots{}]]
 @end example
 Options can be given in both, their long and short format. The following
 options control the general behaviour of @sc{Singular}:
@@ -381,7 +381,7 @@ executes the string specified with the @code{--execute} command line
 option,
 
 @item
-executes the files @code{file1}, @code{file2} ...  (given on the command
+executes the files @code{file1}, @code{file2} @dots{}  (given on the command
 line) in that order.
 @end enumerate
 
@@ -507,21 +507,21 @@ the ring
 $Z/7[x_1,\ldots,x_6]$
 @end tex
 @ifinfo
-Z/7[x1,...,x6]
+Z/7[x1,@dots{},x6]
 @end ifinfo
 with lexicographical ordering for
 @tex
 $x_1,\ldots,x_3$
 @end tex
 @ifinfo
-x1,...,x3
+x1,@dots{},x3
 @end ifinfo
 and degree reverse lexicographical ordering for
 @tex
 $x_4,\ldots,x_6$:
 @end tex
 @ifinfo
-x4,...,x6:
+x4,@dots{},x6:
 @end ifinfo
 
 @example
@@ -699,16 +699,17 @@ degree reverse lexicographical ordering
 degree lexicographical ordering
 
 @item @code{wp(} intvec_expression @code{)}
-weighted reverse lexicographical ordering; the weight vector must
+weighted reverse lexicographical ordering; the weight vector may
 consist of positive integers only.
 
 @item @code{Wp(} intvec_expression @code{)}
-weighted lexicographical ordering; the weight vector must consist of
+weighted lexicographical ordering; the weight vector may consist of
 positive integers only.
 @end table
 
-Global orderings are wellorderings, i.e., 1 < x for each ring variable
-x. They are denoted by a 'p' as the second character in their name.
+Global orderings are wellorderings, i.e., @math{1 < x} for each ring
+variable @math{x}. They are denoted by an @code{p} as the second
+character in their name.
 
 @item Local orderings
 @table @asis
@@ -722,41 +723,43 @@ negative degree reverse lexicographical ordering
 negative degree lexicographical ordering
 
 @item @code{ws(} intvec_expression @code{)}
-(general) weighted reverse lexicographical ordering
+(general) weighted reverse lexicographical ordering; the first element
+of the weight vector has to be non-zero.
 
 @item @code{Ws(} intvec_expression @code{)}
-(general) weighted lexicographical ordering
+(general) weighted lexicographical ordering; the first element
+of the weight vector has to be non-zero.
 @end table
 
-Local orderings are not wellorderings. They are denoted by a 's' as the
-second character in their name.
+Local orderings are not wellorderings. They are denoted by an @code{s}
+as the second character in their name.
 
 @item Matrix orderings
 @table @asis
 @item @code{M(} intmat_expression @code{)}
-The intmat_expression has to be an invertible square matrix
-..???..
+intmat_expression has to be an invertible square matrix
 @end table
 
-@sc{Singular} can compute standard bases for any monomial
-ordering that is compatible with the natural semigroup structure on the
-monomials. In practice, the predefined global and local orderings
-together with the block orderings should be sufficient in most
-cases. These orderings are faster than their corresponding matrix
-orderings since evaluation of a matrix ordering is time consuming.
+Using matrix orderings, @sc{Singular} can compute standard bases
+w.r.t.@: any monomial ordering that is compatible with the natural
+semigroup structure on the monomials. In practice, the predefined global
+and local orderings together with the block orderings should be
+sufficient in most cases. These orderings are faster than their
+corresponding matrix orderings since evaluation of a matrix ordering is
+time consuming.
 
 @item Extra weight vector
 @table @asis
 @item @code{a(} intvec_expression @code{)}
-An extra weight vector @code{a(} intvec_expression @code{)} may precede
-any degree ordering.
+an extra weight vector @code{a(} intvec_expression @code{)} may precede
+any monomial ordering
 @end table
 
 @item Product ordering
 @table @asis
-@item @code{(} ordering [ @code{(} int_expression @code{)} ]@code{,} ... @code{)}
-Any of the above orderings and the extra weight vector may be combined
-to yield product or block orderings.
+@item @code{(} ordering [ @code{(} int_expression @code{)} ]@code{,} @dots{} @code{)}
+any of the above orderings and the extra weight vector may be combined
+to yield product or block orderings
 @end table
 
 The orderings @code{lp}, @code{dp}, @code{Dp}, @code{ls}, @code{ds}, and
@@ -768,22 +771,27 @@ orderings.
 
 @item Module orderings
 @table @asis
-@itemx @code{(} ordering@code{,} ...@code{, C )}
-@item @code{(} ordering@code{,} ...@code{, c )}
-Sort polynomial vectors by the monomial ordering first, then by
-components.
+@itemx @code{(} ordering@code{,} @dots{}@code{, C )}
+@item @code{(} ordering@code{,} @dots{}@code{, c )}
+sort polynomial vectors by the monomial ordering first, then by
+components
 
-@itemx @code{( C,} ordering@code{,} ... @code{)}
-@item @code{( c,} ordering@code{,} ... @code{)}
-Sort polynomial vectors by components first, then by the monomial
-ordering.
+@itemx @code{( C,} ordering@code{,} @dots{} @code{)}
+@item @code{( c,} ordering@code{,} @dots{} @code{)}
+sort polynomial vectors by components first, then by the monomial
+ordering
 @end table
 
-Here a capital @code{C} sorts generators in ascending order,
-i.e., @code{gen(1)} < @code{gen(2)} < ...; a small @code{c} sorts in
-descending order, i.e., @code{gen(1)} > @code{gen(2)} > ... . The module
-ordering has not to be defined explicitly since @code{(}
-ordering@code{,} ...@code{, C )} is the default.
+Here a capital @code{C} sorts generators in ascending order, i.e.,
+@code{gen(1)} < @code{gen(2)} < @enddots{} A small @code{c} sorts in
+descending order, i.e., @code{gen(1)} > @code{gen(2)} > @enddots{} The
+module ordering has not to be specified explicitly since @code{(}
+ordering@code{,} @dots{}@code{, C )} is the default.
+
+In fact, @code{c} or @code{C} may be specified anywhere in a product
+ordering specification, not only at its beginning or end.  All monomial
+block orderings preceding the component ordering have higher precedence,
+all monomial block orderings following after it have lower precedence.
 @end enumerate
 
 For a mathematical description of these orderings, see @ref{Mathematical
@@ -804,18 +812,20 @@ Nonetheless, there are a lot of other important algorithms:
 @itemize @bullet
 
 @item
-Algorithms to compute standard operations on ideals and modules:
+Algorithms to compute the standard operations on ideals and modules:
 intersection, ideal quotient, elimination, etc.
 
 @item
-Different syzygy algorithms, free resolutions (@code{sres, res, mres}) for computation of free resolutions
-of modules over the above rings are implemented.
+Different syzygy algorithms and algorithms to compute free resolutions
+of modules.
 
 @item
-Combinatorial algorithms for computing dimensions, hilbert series, multiplicities, etc.
+Combinatorial algorithms to compute dimensions, hilbert series,
+multiplicities, etc.
 
 @item
-Algorithms for uni- and multivariate polynomial factorization and gcd computations.
+Algorithms for univariate and multivariate polynomial factorization,
+resultant and gcd computations.
 @end itemize
 
 @subsubheading Commands to compute standard bases
@@ -823,127 +833,148 @@ Algorithms for uni- and multivariate polynomial factorization and gcd computatio
 @item facstd
 @ref{facstd}
 @*computes a list of Groebner bases via the Factorizing Groebner Basis
-Algorithm: the intersection of the zero sets is the zero set of the given ideal
+Algorithm.
+
+The intersection of the zero sets is the zero set of the given ideal.
 @item fglm
 @ref{fglm}
-@*computes the Groebner basis provided that a reduced Groebner basis w.r.t.
-another ordering is known (implements the so-called FGLM
-(Faugere, Gianni, Lazard, Mora)  algorithm)
-@*The given ideal must be zero-dimensional.
+@*computes a Groebner basis provided that a reduced Groebner basis
+w.r.t.@: another ordering is known.
+
+Implements the so-called FGLM (Faugere, Gianni, Lazard, Mora) algorithm.
+The given ideal must be zero-dimensional.
+@item groebner
+@ref{groebner}@*
+computes a standard resp.@: Groebner bases using a heuristically chosen
+method.
+
+This is the prefered method to compute a standard resp.@: Groebner
+bases.
 @item mstd
 @ref{mstd}
 @*computes a standard basis and a minimal set of generators.
 @item std
 @ref{std}
-@*computes the standard and Groebner basis
-(depending on the @code{ring} definition, see @ref{Rings and orderings}
-and the options, see @ref{option})
+@*computes a standard resp.@: Groebner basis.
 @item stdfglm
 @ref{stdfglm}
-@*computes the Groebner basis in a ring with a ``difficult'' ordering
-(i.e. lexicographical, ...) via @code{std} w.r.t. a ``simple'' ordering and
-@code{fglm}
-@*The given ideal must be zero-dimensional.
+@*computes a Groebner basis in a ring with a ``difficult'' ordering
+(e.g.@: lexicographical) via @code{std} w.r.t.@: a ``simple'' ordering and
+@code{fglm}.
+
+The given ideal must be zero-dimensional.
 @item stdhilb
 @ref{stdhilb}@*
-computes the Groebner basis in a ring with a ``difficult'' ordering
-(i.e. lexicographical, ...) via @code{std} w.r.t. a ``simple'' ordering and
-a @code{std} computation guided by the hilbert series
-(see @ref{hilb}, @ref{std})
+computes a Groebner basis in a ring with a ``difficult'' ordering
+(e.g.@: lexicographical) via @code{std} w.r.t.@: a ``simple'' ordering
+and a @code{std} computation guided by the hilbert series.
 @end table
 
 @subsubheading Further processing of standard bases
 @table @code
 @item degree
 @ref{degree}
-@*computes the (Krull) dimension, codimension and the multiplicity. (The
-result is only displayed to the screen.)
+@*computes the (Krull) dimension, codimension and the multiplicity.
+
+The result is only displayed on the screen.
 @item dim
 @ref{dim}@*
-computes the dimension of the ideal resp. module generated by
-the leading monomials of the generators representing the given
-ideal resp. module. This is also the dimension of the ideal if it is represented by
-a standard basis.
-@item mult
-@ref{mult}@*
-computes the degree of the monomial ideal resp. module generated by
-the leading monomials of the input.
+computes the dimension of the ideal resp.@: module.
 @item hilb
 @ref{hilb}@*
-computes the first and/or second Hilbert series of an ideal resp. module.
+computes the first and resp.@: or second Hilbert series of an ideal
+resp.@: module.
+@item kbase
+@ref{kbase}@* computes a vector space basis (consisting of monomials) of
+the quotient of a ring by an ideal resp.@: of a free module by a
+submodule.
+
+The ideal resp.@: module has to be finite dimensional and has to be
+represented by a standard basis w.r.t.@: the ring ordering.
+@item mult
+@ref{mult}@*
+computes the degree of the monomial ideal resp.@: module generated by
+the leading monomials of the input.
 @item reduce
 @ref{reduce}@*
-reduces a polynomial, vector, ideal  or module
-to its normal form with respect to an ideal or module represented
-by a standard basis.
-Return 0 if and only if the polynomial (resp. vector, ideal, module)
-is an element (resp. subideal, submodule) of the ideal (resp. module).
+reduces a polynomial, vector, ideal or module to its normal form with
+respect to an ideal or module represented by a standard basis.
 @item vdim
 @ref{vdim}@*
-computes the vector space dimension of the ring (resp. free module)
-modulo the ideal (resp. module)
+computes the vector space dimension of a ring (resp.@: free module)
+modulo an ideal (resp.@: module).
 @end table
 
 @subsubheading Commands to compute resolutions
 @table @code
 @item minres
 @ref{minres}@*
-minimizes a free resolution of an ideal or module
+minimizes a free resolution of an ideal or module.
 @item lres
 @ref{lres}@*
 computes a free resolution of an ideal or module with LaScala's
-method. The input should to be homogeneous.
+method.
+
+The input needs to be homogeneous.
 @item mres
 @ref{mres}@*
-computes a minimal free resolution of an ideal or module
-with the syzygy method.
+computes a minimal free resolution of an ideal or module with the syzygy
+method.
 @item res
 @ref{res}@*
-computes a free resolution of an ideal or module.
-@*Depending on the input, the current ring and the options
-@sc{Singular} chooses different algorithms: the syzygy method, Schreyer's method
-or LaScala's method.
+computes a free resolution of an ideal or module using a heuristically
+chosen method.
+
+This is the prefered method to compute free resolutions of ideals or
+modules.
 @item sres
 @ref{sres}@*
 computes a free resolution of an ideal or module with Schreyer's
-method. The input has to be a standard basis.
+method.
+
+The input has to be a standard basis.
 @item syz
 @ref{syz}@*
-computes the first syzygy (i.e. the module of relations of the
-given generators)
+computes the first syzygy (i.e., the module of relations of the
+given generators).
 @end table
 
 @subsubheading Further processing of resolutions
 @table @code
 @item betti
 @ref{betti}@*
-computes the graded Betti numbers of a module from a free resolution
+computes the graded Betti numbers of a module from a free resolution.
 @item minres
 @ref{minres}@*
-minimizes a free resolution of an ideal or module
+minimizes a free resolution of an ideal or module.
 @end table
 
 @subsubheading Processing of polynomials
 @table @code
+@item char_series
+@ref{char_series}@*
+computes characteristic sets of polynomial ideals.
 @item extgcd
 @ref{extgcd}@*
-computes the extended gcd of two polynomials. Implemented as extended euclidean
-algorithm.  Applicable to univariate polynomials only.
+computes the extended gcd of two polynomials.
+
+Implemented as extended Euclidean Algorithm.  Applicable for univariate
+polynomials only.
 @item factorize
 @ref{factorize}@*
 computes factorization of univariate and multivariate polynomials into
 irreduzible factors.
 
-The most basic algorithm is univariate factorization in prime characteristic.
-The Cantor-Zassenhaus algorithm is used in this case.  Multivariate
-factorization in prime characteristic is implemented using Hensel-lifting to
-lift from univariate factorizations to multivariate factorizations.
+The most basic algorithm is univariate factorization in prime
+characteristic.  The Cantor-Zassenhaus Algorithm is used in this case.
+For characteristic 0, an univariate Hensel-lifting is done to lift from
+prime characteristic to characteristic 0.  For multivariate
+factorization in any characteristic, the problem is reduced to the
+univariate case first, then a multivariate Hensel-lifting is used to
+lift the univariate factorization.
 
-For characteristic 0, an univariate Hensel-lifting is done to lift from prime
-characteristic to characteristic 0.  For multivariate factorization, the
-problem
-is reduced to the univariate case first, then a multivariate Hensel-lifting is
-used to lift the univariate factorization.
+Note that there is no factorization of polynomials over algebraic
+extensions of Q.
 @item gcd
 @ref{gcd}@*
 computes univariate and multivariate polynomial greatest common
@@ -951,24 +982,31 @@ divisors.
 
 For prime characteristic, a subresultant gcd is used.  In characteristic 0, a
 modular algorithm is used for the univariate case.  For the multivariate case,
-the EZGCD is used.  Note that there are not any algorithms for gcd calculations
-of polynomials over algebraic extensions of Q.
+the EZGCD is used.
+
+Note that there is no gcd calculation of polynomials over algebraic
+extensions of Q.
 @item resultant
 @ref{resultant}@*
-compute the resultant of two univariate polynomials using the subresultant
-algorithm.  Multivariate polynomials are considered univariate polynomials in
-the main variable to be specified by the user.
+computes the resultant of two univariate polynomials using the subresultant
+algorithm.
+
+Multivariate polynomials are considered univariate polynomials in a
+main variable to be specified by the user.
 @end table
 
 @subsubheading Matrix computations
 @table @code
 @item bareiss
 @ref{bareiss}@*
-Bareiss' algorithm is a division-free Gaussian elimination applicable
-for arbitrary integral domains.
+implements Gauss-Bareiss method for elimination (matrix
+triangularization) in arbitrary integral domains.
 @item det
 @ref{det}@*
-For matrices with integer entries a modular algorithm is used.
+computes the determinant of a square matrix.
+
+For matrices with integer entries a modular algorithm is used.  For
+other domains, elementary algorithms are used.
 @end table
 
 @c ---------------------------------------------------------------------------
