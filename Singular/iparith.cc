@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.154 1999-06-29 14:39:14 Singular Exp $ */
+/* $Id: iparith.cc,v 1.155 1999-06-30 14:41:04 pohl Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3843,6 +3843,13 @@ static BOOLEAN jjCALL3MANY(leftv res, leftv u, leftv v, leftv w)
   w->rtyp=0; w->data=NULL;
   return r;
 }
+static BOOLEAN jjBAREISS3(leftv res, leftv u, leftv v, leftv w)
+{
+  
+  lists l=smCallNewBareiss((ideal)u->Data(),(int)v->Data(),(int)w->Data());
+  res->data = (char *)l;
+  return FALSE;
+}
 static BOOLEAN jjCOEFFS3_Id(leftv res, leftv u, leftv v, leftv w)
 {
   if ((w->rtyp!=IDHDL)||(w->e!=NULL))
@@ -4231,6 +4238,7 @@ struct sValCmd3 dArith3[]=
 ,{jjBRACK_Ma_IV_IV, '[',        POLY_CMD,   MATRIX_CMD, INTVEC_CMD, INTVEC_CMD }
 ,{jjPROC3,          '(',        ANY_TYPE,   PROC_CMD,   DEF_CMD,    DEF_CMD }
 ,{atATTRIB3,        ATTRIB_CMD, NONE,       IDHDL,      STRING_CMD, DEF_CMD }
+,{jjBAREISS3,       BAREISS_CMD,LIST_CMD,   MODUL_CMD,  INT_CMD,    INT_CMD }
 ,{jjCOEFFS3_P,      COEFFS_CMD, MATRIX_CMD, POLY_CMD,   POLY_CMD,   MATRIX_CMD }
 ,{jjCOEFFS3_P,      COEFFS_CMD, MATRIX_CMD, VECTOR_CMD, POLY_CMD,   MATRIX_CMD }
 ,{jjCOEFFS3_Id,     COEFFS_CMD, MATRIX_CMD, IDEAL_CMD,  POLY_CMD,   MATRIX_CMD }
@@ -4242,7 +4250,7 @@ struct sValCmd3 dArith3[]=
 ,{jjCALL3MANY,      IDEAL_CMD,  IDEAL_CMD,  DEF_CMD,    DEF_CMD,    DEF_CMD }
 //,{jjCALL3MANY,      INTERSECT_CMD,  NONE,   DEF_CMD,    DEF_CMD,    DEF_CMD }
 ,{lInsert3,         INSERT_CMD, LIST_CMD,   LIST_CMD,   DEF_CMD,    INT_CMD }
-,{jjINTMAT3,        INTMAT_CMD, INTMAT_CMD, INTMAT_CMD, INT_CMD,    INT_CMD}
+,{jjINTMAT3,        INTMAT_CMD, INTMAT_CMD, INTMAT_CMD, INT_CMD,    INT_CMD }
 ,{jjCALL3MANY,      INTVEC_CMD, INTVEC_CMD, DEF_CMD,    DEF_CMD,    DEF_CMD }
 ,{jjJET_P_IV,       JET_CMD,    POLY_CMD,   POLY_CMD,   INT_CMD,    INTVEC_CMD }
 ,{jjJET_ID_IV,      JET_CMD,    IDEAL_CMD,  IDEAL_CMD,  INT_CMD,    INTVEC_CMD }
