@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.167 2001-09-25 16:07:24 Singular Exp $ */
+/* $Id: extra.cc,v 1.168 2001-09-27 15:56:25 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1018,6 +1018,77 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif /* HAVE_NAMESPACES */
+/*==================== listall ===================================*/
+    if(strcmp(sys_cmd,"listall")==0)
+    {
+#ifdef HAVE_NS
+      idhdl hh=basePack->idroot;
+      while (hh!=NULL)
+      {
+        if (IDDATA(hh)==(void *)currRing) PrintS("(R)");
+        else if (IDDATA(hh)==(void *)currPack) PrintS("(P)");
+        else PrintS("   ");
+        Print("::%s, typ %s level %d\n",
+               IDID(hh),Tok2Cmdname(IDTYP(hh)),IDLEV(hh));
+        hh=IDNEXT(hh);
+      }
+      hh=basePack->idroot;
+      while (hh!=NULL)
+      {
+        if (IDDATA(hh)==(void *)basePack)
+          Print("(T)::%s, typ %s level %d\n",
+          IDID(hh),Tok2Cmdname(IDTYP(hh)),IDLEV(hh));
+        else
+        if ((IDTYP(hh)==RING_CMD)
+        || (IDTYP(hh)==QRING_CMD)
+        || (IDTYP(hh)==PACKAGE_CMD))
+        {
+          idhdl h2=IDRING(hh)->idroot;
+          while (h2!=NULL)
+          {
+            if (IDDATA(h2)==(void *)currRing) PrintS("(R)");
+            else if (IDDATA(h2)==(void *)currPack) PrintS("(P)");
+            else PrintS("   ");
+            Print("%s::%s, typ %s level %d\n",
+            IDID(hh),IDID(h2),Tok2Cmdname(IDTYP(h2)),IDLEV(h2));
+            h2=IDNEXT(h2);
+          }
+        }
+        hh=IDNEXT(hh);
+      }
+#else      
+      idhdl hh=IDROOT;
+      while (hh!=NULL)
+      {
+        if (IDDATA(hh)==(void *)currRing) PrintS("(R)");
+        else PrintS("   ");
+        Print("::%s, typ %s level %d\n",
+               IDID(hh),Tok2Cmdname(IDTYP(hh)),IDLEV(hh));
+        hh=IDNEXT(hh);
+      }
+      hh=IDROOT;
+      while (hh!=NULL)
+      {
+        if ((IDTYP(hh)==RING_CMD)
+        || (IDTYP(hh)==QRING_CMD)
+        || (IDTYP(hh)==PACKAGE_CMD))
+        {
+          idhdl h2=IDRING(hh)->idroot;
+          while (h2!=NULL)
+          {
+            if (IDDATA(h2)==(void *)currRing) PrintS("(R)");
+            else PrintS("   ");
+            Print("%s::%s, typ %s level %d\n",
+            IDID(hh),IDID(h2),Tok2Cmdname(IDTYP(h2)),IDLEV(h2));
+            h2=IDNEXT(h2);
+          }
+        }
+        hh=IDNEXT(hh);
+      }
+#endif /* HAVE_NS */
+      return FALSE;
+    }
+    else
 /*==================== proclist =================================*/
     if(strcmp(sys_cmd,"proclist")==0)
     {
