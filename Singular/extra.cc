@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.197 2003-03-10 13:28:21 levandov Exp $ */
+/* $Id: extra.cc,v 1.198 2003-06-09 21:23:59 krueger Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -36,6 +36,7 @@
 #include "tok.h"
 #include "ipid.h"
 #include "polys.h"
+#include "lists.h"
 #include "kutil.h"
 #include "cntrlc.h"
 #include "stairc.h"
