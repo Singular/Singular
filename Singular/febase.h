@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.21 1998-07-03 10:13:51 pohl Exp $ */
+/* $Id: febase.h,v 1.22 1998-07-10 17:03:42 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -96,16 +96,20 @@ void    fePause(void);
 void    Print(char* fmt, ...);
 void    PrintS(char* s);
 void     PrintLn();
-void    PrintTCLS(char c, char * s);
 #ifndef __MWERKS__
-inline void PrintTCL(char c, int l,char *s)
-{
 #ifdef HAVE_TCL
-  if (s!=NULL) printf("%c:%d:%s\n",c,l,s);
-  else         printf("%c:%d:\n",c,l);
+void    PrintTCLS(const char c, const char * s);
+inline void PrintTCL(const char c, int l,const char *s)
+{
+  if (s!=NULL) printf("%c:%d:%s",c,l,s);
+  else if(l==0) printf("%c:0:",c);
+  else printf("%c:1:%c",c,'0'+l);
   fflush(stdout);
-#endif
 }
+#else
+#define PrintTCLS(A,B) Print("TCL-ErrS:%s",B)
+#define PrintTCL(A,B,C) Print("TCL-Err:%s",C)
+#endif
 #endif
 
 char *  StringAppend(char *fmt, ...);

@@ -89,7 +89,9 @@ void m2_end(short i)
 {
   #ifdef HAVE_TCL
   if (tclmode)
+  {
     PrintTCL('Q',0,NULL);
+  }
   #endif
   if (i<=0)
   {
@@ -100,8 +102,8 @@ void m2_end(short i)
       {
         if (i==0)
           printf("Auf Wiedersehen.\n");
-	else
-	  printf("\n$Bye.\n");
+        else
+          printf("\n$Bye.\n");
       }
     #ifndef macintosh
       #ifdef HAVE_FEREAD

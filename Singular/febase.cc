@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.59 1998-07-07 14:00:38 Singular Exp $ */
+/* $Id: febase.cc,v 1.60 1998-07-10 17:03:43 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -835,13 +835,15 @@ char * StringSetS(char *st)
   return feBuffer;
 }
 
-void PrintTCLS(char c, char *s)
-{
 #ifndef __MWERKS__
+#ifdef HAVE_TCL
+void PrintTCLS(const char c, const char *s)
+{
   int l=strlen(s);
   if (l>0) PrintTCL(c,l,s);
-#endif
 }
+#endif
+#endif
 
 extern "C" {
 void WerrorS(const char *s)
@@ -1056,7 +1058,7 @@ void fePause()
   c = fgetc(stdin);
   if (((c == '\003') || (c == 'C')) || (c == 'c'))
   {
-    m2_end(1);
+    m2_end(4);
   }
 }
 

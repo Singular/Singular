@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.15 1998-06-13 13:27:04 obachman Exp $ */
+/* $Id: feread.cc,v 1.16 1998-07-10 17:03:45 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
@@ -567,7 +567,7 @@ char * fe_fgets_stdin(char *s, int size)
 //}
 #endif
 /*=======================================================================*/
-#if defined(HAVE_READLINE) && !defined(HAVE_FEREAD) 
+#if defined(HAVE_READLINE) && !defined(HAVE_FEREAD)
 
 #include <unistd.h>
 #include <stdio.h>
@@ -690,7 +690,7 @@ void fe_set_input_mode(void)
     {
       read_history (p);
     }
-  }  
+  }
 }
 
 void fe_reset_input_mode (void)
@@ -709,7 +709,13 @@ char * fe_fgets_stdin_rl(char *pr,char *s, int size)
     return NULL;
   if(fe_use_fgets)
   {
-    PrintS(pr);mflush();
+    #ifdef HAVE_TCL
+    if (!tclmode)
+    #endif
+    {
+      PrintS(pr);
+      mflush();
+    }
     return fgets(s,size,stdin);
   }
 
