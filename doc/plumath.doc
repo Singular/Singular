@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: plumath.doc,v 1.19 2004-08-12 16:58:20 levandov Exp $
+@comment $Id: plumath.doc,v 1.20 2004-08-12 17:03:07 levandov Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -493,8 +493,7 @@ right) submodule S of A^k.
 @*@strong{Remark:}
 With respect to the definitions of @code{ideal} and  @code{module}  (see @ref{PLURAL conventions} )  @sc{Plural} works with left
 syzygies only (by @code{syz} we understand  a  left syzygy). 
-If @code{S} is a matrix of left submodule given by matrix @code{M}, then
-@code{transpose(S)*transpose(M) = 0}.
+If @code{S} is a matrix of a left syzygy module of left submodule given by matrix @code{M}, then @code{transpose(S)*transpose(M) = 0}.
 
 
 @tex

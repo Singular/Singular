@@ -1,5 +1,5 @@
   @comment -*-texinfo-*-
-@comment $Id: plureference.doc,v 1.22 2004-08-12 16:58:21 levandov Exp $
+@comment $Id: plureference.doc,v 1.23 2004-08-12 17:03:07 levandov Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -1551,7 +1551,7 @@ module
 computes the first syzygy (i.e., the module of relations of the given
 generators) of the ideal, resp.@: module.
 @item @strong{Note:}
-if @code{S} is a matrix of left submodule given by matrix @code{M}, then
+if @code{S} is a matrix of a left syzygy module of left submodule given by matrix @code{M}, then
 @code{transpose(S)*transpose(M) = 0}.
 @item @strong{Example:}
 @smallexample
