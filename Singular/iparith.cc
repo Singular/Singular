@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.153 1999-06-28 12:48:08 wenk Exp $ */
+/* $Id: iparith.cc,v 1.154 1999-06-29 14:39:14 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -122,7 +122,7 @@ cmdnames cmds[] =
   { "$INVALID$",   0, -1,                 0},
   { "and",         0, '&' ,               '&'},
   { "attrib",      0, ATTRIB_CMD ,        CMD_123},
-  { "bareiss",     0, BAREISS_CMD ,       CMD_1},
+  { "bareiss",     0, BAREISS_CMD ,       CMD_123},
   { "betti",       0, BETTI_CMD ,         CMD_1},
   { "break",       0, BREAK_CMD ,         BREAK_CMD},
   { "char",        0, CHARACTERISTIC_CMD ,CMD_1},
@@ -2159,6 +2159,7 @@ struct sValCmd2 dArith2[]=
 ,{jjKLAMMER_IV,'(',            ANY_TYPE/*set by p*/,ANY_TYPE, INTVEC_CMD PROFILER}
 // and the procedures with 2 arguments:
 ,{atATTRIB2,   ATTRIB_CMD,     NONE/*set by p*/,DEF_CMD,   STRING_CMD PROFILER}
+,{jjWRONG2,    BAREISS_CMD,    0,              DEF_CMD,    DEF_CMD PROFILER}
 ,{jjCOEF,      COEF_CMD,       MATRIX_CMD,     POLY_CMD,   POLY_CMD PROFILER}
 ,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     IDEAL_CMD,  POLY_CMD PROFILER}
 ,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     MODUL_CMD,  POLY_CMD PROFILER}
