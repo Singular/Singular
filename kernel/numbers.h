@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.1.1.1 2003-10-06 12:15:58 Singular Exp $ */
+/* $Id: numbers.h,v 1.2 2004-10-11 08:50:10 Singular Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
@@ -40,6 +40,7 @@ extern number  (*nPar)(int i);
 extern int     (*nParDeg)(number n);
 extern int     (*nSize)(number n);
 extern int     (*nInt)(number &n);
+// always use in the form    n=nNeg(n) !
 extern number  (*nNeg)(number a);
 extern number  (*nInvers)(number a);
 extern number  (*nCopy)(number a);
