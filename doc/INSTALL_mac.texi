@@ -1,0 +1,119 @@
+@comment -*-texinfo-*-
+@comment $Id: INSTALL_mac.texi,v 1.2 2002-04-11 16:36:19 mschulze Exp $
+@c FILE:    INSTALL_classicMac.texi
+@c PURPOSE: Installation instructions for Singular on Macintosh
+
+@ifclear VERSION
+@include version.texi
+@end ifclear
+
+@ifclear singularmanual
+@majorheading Installation instructions for @sc{Singular} on a (classic) Macintosh
+
+
+@heading Installation preliminaries
+
+This is the final distribution of @sc{Singular} as MPW tool.
+Newer versions of @sc{Singular} will only be available for MacOS X (which is handled like other @sc{Unix}-systems).
+To install @sc{Singular} on a Macintosh (PPC only), you need the file @code{Singular-2-0-2-ppc-MPW.sea.hqx} resp. @code{Singular-2-0-2-ppc-MPW.hqx} which you can obtain by public ftp from @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular}.
+Furthermore, you need MacOS version >= 8.5 with an installed MPW shell. 
+This version works also without Carbon.
+
+@include register.texi
+
+
+@heading Installing @sc{Singular} on MacOS X
+
+Please see @uref{INSTALL_unix.html}. 
+In contrast to other Unix systems, under MacOS X, @sc{Singular} is only available as a shell command and there is no Emacs interface.
+Enter @code{Singular} in a terminal under Aqua to run @sc{Singular}.
+Alternatively, you may choose @code{Terminal} as the application to open the file @code{Singular} with and put it into the dock.
+
+
+@heading Installing Singular
+
+@enumerate
+
+@item
+Make sure that you have MPW  installed on your system. 
+See below for instructions on how to install MPW and how to avoid conflicts with the @code{Carbon.lib}.
+
+@item
+Download the file @code{Singular-2-0-2-ppc-MPW.sea.hqx}.
+
+@item
+Expand the downloaded file using a standard Expander (like Compact Pro or StuffIt) to obtain the corresponding self-extracting @code{Singular-2-0-2-ppc-MPW.sea} file.
+
+@item
+Click on the self-extracting @code{Singular-2-0-2-ppc-MPW.sea} file. 
+This  will create a new folder named @code{Singular:} which contains the @sc{Singular} program in the subfolder @code{2-0-2:ppc-MPW:}. 
+Do not change the structure of the subfolders.
+
+@item
+Make the folder which contains the executable to the working directory of the MPW shell. 
+To start @sc{Singular}, you need to type @code{Singular} in the MPW worksheet. 
+Clicking on the @sc{Singular} icon on the desktop, starts up the MPW shell (the working directory of the MPW shell is then the directory of the executable). 
+If you start the MPW shell manually, you must set the working directory to the directory of the @sc{Singular} program. 
+You may use the directory menu or write into the startup file of the MPW shell the line
+@smallexample
+setdirectory "{Boot}"Singular:2-0-2:ppc-MPW:
+@end smallexample
+if @code{"{Boot}"Singular:2-0-2:ppc-MPW:} is the folder of the executable.
+
+After unpacking, you will have a directory structure like:
+@table @code
+@item Singular:2-0-2:ppc-MPW:Singular
+Singular executable
+@item Singular:2-0-2:ppc-MPW:libparse
+parser for Singular libraries
+@item Singular:2-0-2:LIB:
+Singular libraries
+@item Singular:2-0-2:LIB:gftables:
+Singular gftables
+@item Singular:2-0-2:doc:singular.idx
+index of inline help
+@item Singular:2-0-2:doc:singular.hlp
+file for inline help
+@item Singular:2-0-2:README
+information of the distribution
+@item Singular:2-0-2:README.hlml
+@item Singular:2-0-2:COPYING
+licence information
+@item Singular:2-0-2:COPYING.html
+@item Singular:2-0-2:NEWS
+news in the distribution
+@item Singular:2-0-2:NEWS.html
+@item Singular:2-0-2:INSTALL
+instructions like this file
+@end table
+
+The @sc{Singular} libraries have a special form to work here. 
+Do not use the libraries from other distributions. 
+They are not compatible. 
+A supplementary file is @code{Singular-2-0-2-html.sea.hqx} which contains the html pages. 
+You can use this with a browser but not from the program @sc{Singular}.
+The self-extracting archive will create the folder @code{html:} and you may extract it at @code{"@{Boot@}"Singular:2-0-2:}.
+
+@end enumerate
+
+
+@heading Installing MPW
+
+The final version of MPW is downloadable from Apple at @uref{ftp://ftp.apple.com/developer/Tool_Chest/Core_Mac_OS_Tools/MPW_etc./MPW-GM_Images/}.
+Older versions of @code{Carbon.lib} may conflict with the latest MPW. 
+In this case, you need to update @code{Carbon.lib} or work without it.
+
+
+@heading Restrictions
+
+Some typical Unix features of @sc{Singular} are not working with MPW, e.g. links and cooperation with other programs like XEmacs and xterm.
+
+For any other troubles, please send an email to @email{singular@@mathematik.uni-kl.de} and include the header which is displayed by starting up @sc{Singular}
+with the @code{-v} option, and a description of your machine and operating system.
+
+
+@include info.texi
+
+@ifclear singularmanual
+Good luck and enjoy! Your @sc{Singular} team.
+@end ifclear
