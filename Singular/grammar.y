@@ -2,6 +2,9 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /* $Log: not supported by cvs2svn $
+ * Revision 1.1.1.1  1997/03/19  13:18:55  obachman
+ * Imported Singular sources
+ *
 */
 
 /*
@@ -254,8 +257,6 @@ void yyerror(char * fmt)
 /* system variables */
 %token <i> SYSVAR
 
-%type <i>    intexpr
-
 %type <name> extendedid
 %type <lv>   rlist ordering OrderingList orderelem
 %type <name> stringexpr
@@ -467,11 +468,28 @@ elemexpr:
             }
             $2.CleanUp();
           }
-        | intexpr
+        | INT_CONST
           {
             memset(&$$,0,sizeof($$));
+            int i = atoi($1);
+
+            /* check: out of range input */
+            int l = strlen($1)+2;
+            if (l >= MAX_INT_LEN)
+            {
+              char tmp[100];
+              sprintf(tmp,"%d",i);
+              if (strcmp(tmp,$1)!=0)
+              {
+                Werror("`%s` greater than %d(max. integer representation)"
+                       ,$1,INT_MAX);
+                YYERROR;
+              }
+            }
+            /*remember not to FreeL($1)
+            *because it is a part of the scanner buffer*/
             $$.rtyp  = INT_CMD;
-            $$.data = (void *)$1;
+            $$.data = (void *)i;
           }
         | SYSVAR
           {
@@ -757,28 +775,6 @@ left_value:
         | exprlist '=' { $$ = $1; }
         ;
 
-intexpr:
-        INT_CONST
-          {
-            $$ = atoi($1);
-
-            /* check: out of range input */
-            int l = strlen($1)+2;
-            if (l >= MAX_INT_LEN)
-            {
-              char tmp[100];
-              sprintf(tmp,"%d",$$);
-              if (strcmp(tmp,$1))
-              {
-                Werror("`%s` greater than %d(max. integer representation)"
-                       ,$1,INT_MAX);
-                YYERROR;
-              }
-            }
-            /*remember not to FreeL($1)
-            *because it is a part of the scanner buffer*/
-          }
-        ;
 
 extendedid:
         UNKNOWN_IDENT
