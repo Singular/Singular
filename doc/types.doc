@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: types.doc,v 1.16 1998-04-29 11:33:26 Singular Exp $
+@comment $Id: types.doc,v 1.17 1998-04-30 09:36:34 Singular Exp $
 @comment this file contains the type definitions
 
 @c The following directives are necessary for proper compilation
@@ -11,6 +11,26 @@
 @c @end menu
 @c @node Data types, , Top, Top
 @c @chapter Data types
+
+@menu
+* def::                         
+* ideal::                       
+* int::                         
+* intmat::                      
+* intvec::                      
+* link::                        
+* list::                        
+* map::                         
+* matrix::                      
+* module::                      
+* number::                      
+* poly::                        
+* proc::                        
+* qring::                       
+* ring::                        
+* string::                      
+* vector::                      
+@end menu
 
 @cindex expression list
 An expression list is any comma separated list of expressions.
@@ -29,25 +49,6 @@ An expression list is any comma separated list of expressions.
 @c example
 @end example
 
-@menu
-* def::                         
-* ideal::                       
-* int::                         
-* intmat::                      
-* intvec::                      
-* link::                        
-* list::                        
-* map::                         
-* matrix::                      
-* module::                      
-* number::                      
-* poly::                        
-* proc::                        
-* ring::                        
-* string::                      
-* vector::                      
-@end menu
-
 @c ---------------------------------------
 @node def, ideal, , Data types
 @section def
@@ -55,6 +56,10 @@ An expression list is any comma separated list of expressions.
 
 @c {{{ section def }}}
 @c ------------------------------
+@menu
+* def declarations::            
+@end menu
+
 Objects may also be defined without a type: they get their
 type from the first assignment to them.
 E.g. @code{ideal i=x,y,z; def j=i^2;} defines the ideal @code{i^2}
@@ -72,10 +77,6 @@ is not local to the procedure (so it cannot be accessed by its name)
 but you need a name for it (e.g. for a use with @code{setring} or @code{map}).
 @code{setring r;} does not work in this case, because
 @code{r} may not be local to the procedure.
-
-@menu
-* def declarations::            
-@end menu
 
 @c ------------------------------
 @node def declarations, , def, def
@@ -120,10 +121,10 @@ See @ref{untyped definitions}; @ref{typeof}.
 
 @c {{{ section ideal }}}
 @menu
-* ideal declarations::
-* ideal expressions::
-* ideal operations::
-* ideal related functions::
+* ideal declarations::          
+* ideal expressions::           
+* ideal operations::            
+* ideal related functions::     
 @end menu
 
 Ideals are represented as lists of polynomials which generate the ideal.
@@ -338,15 +339,6 @@ optimal weights (see @ref{weight})
 @cindex int
 
 @c {{{ section int }}}
-
-Variables of type int represent the compiler integers and are, therefore,
-limited  in their range (i.e. the range is between
--2147483647 and 2147483647 for 32-bit mchines). They are used
-to count things (dimension, rank, etc., see @ref{dim}),
-in loops (see @ref{for}) and
-to represent boolean values
-(FALSE is represented by 0, every other value means TRUE).
-
 @menu
 * int declarations::
 * int expressions::
@@ -355,6 +347,14 @@ to represent boolean values
 * boolean operations::
 * int related functions::
 @end menu
+
+Variables of type int represent the compiler integers and are, therefore,
+limited  in their range (i.e. the range is between
+-2147483647 and 2147483647 for 32-bit mchines). They are used
+to count things (dimension, rank, etc., see @ref{dim}),
+in loops (see @ref{for}) and
+to represent boolean values
+(FALSE is represented by 0, every other value means TRUE).
 
 @c ---------------------------------------
 @node int declarations, int expressions, int, int
@@ -653,6 +653,12 @@ module (see @ref{vdim})
 @cindex intmat
 
 @c {{{ section intmat }}}
+@menu
+* intmat declarations::
+* intmat expressions::
+* intmat operations::
+* intmat related functions::
+@end menu
 
 Integer matrices are matrices with entries of integers.
 For the range of integers see @ref{int expressions}.
@@ -662,13 +668,6 @@ For the range of integers see @ref{int expressions}.
   m;
 @c example
 @end example
-
-@menu
-* intmat declarations::
-* intmat expressions::
-* intmat operations::
-* intmat related functions::
-@end menu
 
 @c ------------------------------
 @node intmat declarations, intmat expressions, intmat, intmat
@@ -782,6 +781,12 @@ trace of an intmat (see @ref{trace})
 @cindex intvec
 
 @c {{{ section intvec }}}
+@menu
+* intvec declarations::         
+* intvec expressions::          
+* intvec operations::           
+* intvec related functions::    
+@end menu
 
 Variables of type intvec are lists of integers.
 For the range of integers see @ref{int expressions}.
@@ -798,13 +803,6 @@ They are also return values of certain interpreter related functions
   iv;
 @c example
 @end example
-
-@menu
-* intvec declarations::         
-* intvec expressions::          
-* intvec operations::           
-* intvec related functions::    
-@end menu
 
 @c ------------------------------
 @node intvec declarations, intvec expressions, intvec, intvec
@@ -928,12 +926,6 @@ returns weights for the weigted ecart method (see @ref{weight})
 @cindex link
 
 @c {{{ section link }}}
-
-Links describe the communication channels of @sc{Singular}, i.e.
-something @sc{Singular} can write to and/or read from. Currently,
-@sc{Singular} supports four different link types: @ref{Ascii links},  
-@ref{MPfile links}, @ref{MPtcp links}, and @ref{DBM links}.
-
 @menu
 * link declarations::
 * link expressions::
@@ -943,6 +935,11 @@ something @sc{Singular} can write to and/or read from. Currently,
 * MP links::
 * DBM links::
 @end menu
+
+Links describe the communication channels of @sc{Singular}, i.e.
+something @sc{Singular} can write to and/or read from. Currently,
+@sc{Singular} supports four different link types: @ref{Ascii links},  
+@ref{MPfile links}, @ref{MPtcp links}, and @ref{DBM links}.
 
 @c ------------------------------
 @node link declarations, link expressions, link, link
@@ -1102,7 +1099,7 @@ Types without a conversion to @code{string} cannot be written.
 
 @c {{{ subsection MP links }}}
 MP (Multi Protocol) links give the possibility to store and communicate
-data in the binary MP format format: read and write access is very fast
+data in the binary MP format: read and write access is very fast
 compared to Ascii links. MP links can be established using files (link
 type is @code{MPfile}) or using TCP sockets (link type is
 @code{MPtcp}). All data (including such data that can not be converted
@@ -1141,16 +1138,17 @@ string containing the entire content of the file. Furthermore, ring
 dependent data is stored together with a ring description. Therefore,
 reading ring-dependent data might change the current ring.
 
+An MP file link can be used either for reading or for writing, but not for
+both at the same time. A @code{close} command must be used before a
+change of i/o direction.
+
 @enumerate
-@item @code{"MPFile:"} + filename
+@item @code{"MPFile: "} + filename
 @item @code{"MPFile:a "} + filename
 @item @code{"MPFile:w "} + filename
 @item @code{"MPFile:r "} + filename
 @end enumerate
 
-An MP file link can be used either for reading or for writing, but not for
-both at the same time. A @code{close} command must be used before a
-change of i/o direction.
 @strong{Example:}
 @example
 @c example
@@ -1238,13 +1236,13 @@ is data to read.
 
 @enumerate
 @item @code{"MPtcp: launch"}
-@item @code{"MPtcp: launch -MPapplication "}
-@item @code{"MPtcp: launch -MPhost "} + hostname
-@item @code{"MPtcp: launch -MPhost "} + hostname +
-@code{" -MPapplication "} + application 
-@item @code{"MPtcp: listen -MPport "} + portnumber
-@item @code{"MPtcp: connect -MPport "} + portnumber
-@item @code{"MPtcp: connect -MPhost" } + hostname @code{" -MPport "} +
+@item @code{"MPtcp: launch --MPapplication "} + application
+@item @code{"MPtcp: launch --MPhost "} + hostname
+@item @code{"MPtcp: launch --MPhost "} + hostname +
+@code{" --MPapplication "} + application 
+@item @code{"MPtcp: listen --MPport "} + portnumber
+@item @code{"MPtcp: connect --MPport "} + portnumber
+@item @code{"MPtcp: connect --MPhost" } + hostname @code{" --MPport "} +
 portnumber 
 @end enumerate
 
@@ -1303,6 +1301,12 @@ portnumber
 DBM links provide access to data stored in a data base
 (using the unix dbm or gdbm library).
 
+@enumerate
+@item @code{"DBM: "} + filename
+@item @code{"DBM:r "} + filename
+@item @code{"DBM:rw "} + filename
+@end enumerate
+
 @strong{Example:}
 @example
 @c example
@@ -1336,6 +1340,12 @@ DBM links provide access to data stored in a data base
 @cindex list
 
 @c {{{ section list }}}
+@menu
+* list declarations::
+* list expressions::
+* list operations::
+* list related functions::
+@end menu
 
 Lists are arrays whose elements can be of any type
 (including ring/qring). If one element belongs to a ring the whole list
@@ -1352,13 +1362,6 @@ define @code{L[1]} to be the basering for instance by
 @*Note: Unlike other assignments a ring as an element of a list
 is not a copy but another reference to the same ring.
 @*Note: @code{list()} is the empty list, see @ref{type casting}.
-
-@menu
-* list declarations::
-* list expressions::
-* list operations::
-* list related functions::
-@end menu
 
 @c ------------------------------
 @node list declarations, list expressions, list, list
@@ -1481,6 +1484,12 @@ free resolution of an ideal/module given by a standard base (see @ref{sres})
 @cindex map
 
 @c {{{ section map }}}
+@menu
+* map declarations::            
+* map expressions::             
+* map related functions::       
+@end menu
+
 Maps are ring maps from a preimage ring into the base ring.
 Note that the target of a map is ALWAYS the actual base ring.
 Maps between rings with different coefficient fields are
@@ -1506,12 +1515,6 @@ $[i]_p \in $Z/p$ \rightarrow i \in [-p/2,p/2] \subseteq $Z$ \rightarrow [i]_{p'}
 @itemx Z/p ->(Z/p)(a,...)
 as usual
 @end table
-
-@menu
-* map declarations::            
-* map expressions::             
-* map related functions::       
-@end menu
 
 @iftex
 See @ref{imap}; @ref{fetch}; @ref{subst}.
@@ -1617,7 +1620,12 @@ by names (no evaluation in the preimage ring is possible).
 @cindex matrix
 
 @c {{{ section matrix }}}
-@c ------------------------------
+@menu
+* matrix declarations::
+* matrix expressions::
+* matrix operations::
+* matrix related functions::
+@end menu
 
 Matrices are matrices with polynomial entries.
 Like polynomials they
@@ -1629,13 +1637,7 @@ If A is a matrix then the assignment @code{module M=A;} or
 @code{module M=module(A);} creates a module generated by the columns of A.
 Note that the trailing zero columns of A may be deleted by module operations with M.
 
-@menu
-* matrix declarations::
-* matrix expressions::
-* matrix operations::
-* matrix related functions::
-@end menu
-
+@c ------------------------------
 @node matrix declarations, matrix expressions, matrix, matrix
 @subsection matrix declarations
 @cindex matrix declarations
@@ -1789,6 +1791,13 @@ wedge product (see @ref{wedge})
 @cindex module
 
 @c {{{ section module }}}
+@menu
+* module declarations::         
+* module expressions::          
+* module operations::           
+* module related functions::    
+@end menu
+
 Modules are submodules of a free module over the base ring with basis
 @code{gen(1)}, @code{gen(2)}, @dots{} .
 They are represented by lists of vectors which generate the submodule.
@@ -1834,13 +1843,6 @@ v_1, @dots{}, v_k
 $v_1, \ldots, v_k$
 @end tex
 which generate M.
-
-@menu
-* module declarations::         
-* module expressions::          
-* module operations::           
-* module related functions::    
-@end menu
 
 @c ------------------------------
 @node module declarations, module expressions, module, module
@@ -2021,6 +2023,11 @@ vector space dimension of free module over the basering modulo module (see @ref{
 
 @c {{{ section number }}}
 @c ------------------------------
+@menu
+* number declarations::         
+* number expressions::          
+* number operations::           
+@end menu
 
 Numbers are the coefficients of a monomial (power products of ring variables).
 They can only be defined or accessed with respect to a base ring
@@ -2037,12 +2044,6 @@ which determines the coefficient field.
   poly f=n*x+2;f;
 @c example
 @end example
-
-@menu
-* number declarations::         
-* number expressions::          
-* number operations::           
-@end menu
 
 @node number declarations, number expressions, number, number
 @subsection number declarations
@@ -2154,7 +2155,12 @@ coefficient of the leading term (see @ref{leadcoef})
 @cindex poly
 
 @c {{{ section poly }}}
-@c ------------------------------
+@menu
+* poly declarations::
+* poly expressions::
+* poly operations::
+* poly related functions::
+@end menu
 
 Polynomials are the basic data for all main algorithms in @code{@sc{Singular}}.
 They consist of finitely many terms (coefficient*power product)
@@ -2170,13 +2176,7 @@ monomial ordering.
 @c example
 @end example
 
-@menu
-* poly declarations::
-* poly expressions::
-* poly operations::
-* poly related functions::
-@end menu
-
+@c ------------------------------
 @node poly declarations, poly expressions, poly, poly
 @subsection poly declarations
 @cindex poly declarations
@@ -2348,14 +2348,42 @@ the indicated variable of the ring (see @ref{var})
 @c {{{endfold}}}
 
 @c ---------------------------------------
-@node proc, ring, poly, Data types
+@node proc, qring, poly, Data types
 @section proc
 @cindex proc
 
 See @ref{Procedures}.
 
+@node qring, ring, proc, Data types
+@section qring
+@cindex qring
+
+@c {{{ section qring }}}
+@table @code
+@item @strong{Syntax:}
+@code{qring} name @code{=} ideal_expression @code{;}
+@item @strong{Purpose:}
+defines a quotient ring as the base ring modulo an ideal.
+
+The ideal must be a standard basis. The qring command performs a change
+of the base ring to this new ring.
+@item @strong{Default:}
+none
+@item @strong{Example:}
+@example
+@c example
+  ring r1=32003,(x,y,z),dp;
+  ideal i=std(ideal(x,y));
+  qring q=i;
+  basering;
+  std(ideal(x+y,x+y+z,z));
+@c example
+@end example
+@end table
+@c {{{endfold}}}
+
 @c ---------------------------------------
-@node ring, string, proc, Data types
+@node ring, string, qring, Data types
 @section ring
 @cindex ring
 
@@ -2367,7 +2395,12 @@ See @ref{Rings and orderings}.
 @cindex string
 
 @c {{{ section string }}}
-@c ------------------------------
+@menu
+* string declarations::
+* string expressions::
+* string operations::
+* string related functions::
+@end menu
 
 Variables of type @code{string} are used for output (almost every type can be
 "converted"
@@ -2400,13 +2433,7 @@ A comma between two expressions makes an expression list out of them
 (such a list is printed with as a separating blank between),
 while a @code{+} concatenates strings.
 
-@menu
-* string declarations::
-* string expressions::
-* string operations::
-* string related functions::
-@end menu
-
+@c ------------------------------
 @node string declarations, string expressions, string, string
 @subsection string declarations
 @cindex string declarations
@@ -2562,7 +2589,12 @@ name of the n-th ring variable (see @ref{varstr})
 @cindex vector
 
 @c {{{ section vector }}}
-@c ------------------------------
+@menu
+* vector declarations::
+* vector expressions::
+* vector operations::
+* vector related functions::
+@end menu
 
 Vectors are elements of a free module over the basering with basis
 @code{gen(1)}, @code{gen(2)}, @dots{} .
@@ -2576,13 +2608,7 @@ can only be defined or accessed with respect to this base ring.
 @code{f*gen(1)+g*gen(3)+gen(4)} can also be written as @code{[f,0,g,1]}
 or as @code{[f,0,g,1,0]}.)
 
-@menu
-* vector declarations::
-* vector expressions::
-* vector operations::
-* vector related functions::
-@end menu
-
+@c ------------------------------
 @node vector declarations, vector expressions, vector, vector
 @subsection vector declarations
 @cindex vector declarations
