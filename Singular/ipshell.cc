@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.18 1998-04-07 19:14:44 krueger Exp $ */
+/* $Id: ipshell.cc,v 1.19 1998-04-08 21:14:57 krueger Exp $ */
 /*
 * ABSTRACT:
 */
@@ -138,7 +138,8 @@ static void list1(char* s, idhdl h,BOOLEAN c)
                         ,MATCOLS(IDMATRIX(h))
                         );
                    break;
-    case PROC_CMD:  Print(" from %s",IDPROC(h)->libname);
+    case PROC_CMD:  if(strlen(IDPROC(h)->libname)>0)
+                      Print(" from %s",IDPROC(h)->libname);
                    if(IDPROC(h)->is_static) Print(" (static)");
                    break;
     case STRING_CMD:
