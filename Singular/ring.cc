@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.111 2000-09-07 16:22:01 Singular Exp $ */
+/* $Id: ring.cc,v 1.112 2000-09-07 16:30:43 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2361,7 +2361,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
         }
         else
         {
-          res->order[j]=ringorder_rp;
+          order[j]=ringorder_rp;
           need_other_ring=TRUE;
           omit_degree=FALSE;
         }
