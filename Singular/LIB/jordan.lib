@@ -1,0 +1,132 @@
+///////////////////////////////////////////////////////////////////////////////
+
+version="$Id: jordan.lib,v 1.1 1998-12-21 16:21:05 mschulze Exp $";
+info="
+LIBRARY: jordan.lib  A PROCEDURE TO COMPUTE THE JORDAN NORMAL FORM
+                     by Mathias Schulze
+                     email: mschulze@mathematik.uni-kl.de
+
+ jordan(M);          jordan normal form of the constant part of the matrix M
+";
+
+LIB "ring.lib";
+///////////////////////////////////////////////////////////////////////////////
+
+proc jordan(matrix M,list #)
+INPUT:   matrix M[, int i]
+ASSUME:  M square matrix with factorizable characteristic polynomial
+OUTPUT:  nothing, if the assumptions are not fulfilled, else,
+         if i==1, 
+           a list with first entry an ideal containing the eigenvalues 
+           of the constant part of M and second entry a list of decreasingly 
+           ordered int vectors containing the sizes of the corresponding 
+           jordan blocks, 
+         else, 
+           a jordan matrix of the constant part of M
+EXAMPLE: example jordan; shows an example
+{
+  int n=nrows(M);
+  if(n!=ncols(M))
+  {
+    "//no square matrix";
+    return();
+  }
+
+  def br=basering;
+  map zero=br,0;
+  M=zero(M);
+
+  changeord("pr","dp");
+  matrix M=imap(br,M);
+
+  list l=factorize(det(M-var(1)*freemodule(n)),2);
+  def eM,mM=l[1..2];
+
+  int i;
+  for(i=size(eM);i>=1;i--)
+  {
+    if(deg(eM[i])>1)
+    {
+      kill pr;
+      "//unable to factorize characteristic polynomial";
+      return();
+    }
+  }
+
+  map inv=pr,-var(1);
+  eM=simplify(inv(eM),1);
+  setring br;
+  map zero=pr,0;
+  ideal eM=zero(eM);
+  kill pr;
+
+  int j,k,l,m;
+  intvec bMi;
+  list bM;
+  matrix Mi,Mj;
+  matrix E=freemodule(nrows(M));
+  for(i=ncols(eM);i>=1;i--)
+  {
+    Mi=M-eM[i]*E;
+    Mj=Mi;
+    k=ncols(syz(Mj));
+    m=k;
+    bMi=0;
+    for(j=k;j>=1;j--)
+    {
+      bMi[j]=1;
+    }
+    for(j=mM[i];j>=1;j--)
+    {
+      Mj=Mj*Mi;
+      k=ncols(syz(Mj));
+      for(l=k-m;l>=1;l--)
+      {
+        bMi[l]=bMi[l]+1;
+      }
+      m=k;
+    }
+    bM=list(bMi)+bM;
+  }
+
+  if(size(#)>0)
+  {
+    if(#[1]==1)
+    {
+      return(list(eM,bM));
+    }
+  }
+
+  for(i,l,M=size(eM),1,0;i>=1;i--)
+  {
+    for(j=size(bM[i]);j>=1;j--)
+    {
+      for(k=bM[i][j];k>=2;k,l=k-1,l+1)
+      {
+        M[l,l]=eM[i];
+        M[l,l+1]=1;
+      }
+      M[l,l]=eM[i];
+      l++;
+    }
+  }
+
+  return(M);
+}
+example
+{
+  "EXAMPLE:";
+  echo=2;
+  ring r;
+  int i;
+  matrix M[10][10];
+  for(i=1;i<=4;i++) {M[i,i]=2;}
+  for(i=1;i<=3;i++) {M[i,i+1]=1;}
+  for(i=5;i<=10;i++) {M[i,i]=3;}
+  for(i=5;i<=6;i++) {M[i,i+1]=1;}
+  for(i=8;i<=8;i++) {M[i,i+1]=1;}
+  print(M);
+  jordan(M,1);
+  print(jordan(M));
+}
+///////////////////////////////////////////////////////////////////////////////
