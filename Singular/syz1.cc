@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.64 2000-10-16 15:22:20 Singular Exp $ */
+/* $Id: syz1.cc,v 1.65 2000-10-19 16:32:40 obachman Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -1977,7 +1977,7 @@ void syPrint(syStrategy syzstr)
     {
       syzstr->resolution = new intvec(syzstr->length+1);
       SRes rP=syzstr->resPairs;
-      (*syzstr->resolution)[0] = max(1,idRankFreeModule(syzstr->res[1]));
+      (*syzstr->resolution)[0] = max(1,idRankFreeModule(syzstr->res[1],syzstr->syRing));
       while ((l<syzstr->length) && (rP[l]!=NULL))
       {
         j=0;
@@ -1999,7 +1999,7 @@ void syPrint(syStrategy syzstr)
         rr = syzstr->minres;
       else
         rr = syzstr->fullres;
-      (*syzstr->resolution)[0] = max(1,idRankFreeModule(rr[0]));
+      (*syzstr->resolution)[0] = max(1,idRankFreeModule(rr[0], syzstr->syRing));
       while ((l<syzstr->length) && (rr[l]!=NULL))
       {
         j = IDELEMS(rr[l]);
