@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.18 1998-04-23 09:52:11 Singular Exp $ */
+/* $Id: kutil.cc,v 1.19 1998-04-27 16:08:44 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for std
 */
@@ -204,15 +204,12 @@ inline static intset initec (int maxnr)
   return (intset)Alloc(maxnr*sizeof(int));
 }
 
-void enlargeT (TSet* T,int* length,int incr)
+static inline void enlargeT (TSet* T,int* length,int incr)
 {
   TSet h;
 
-  h = (TSet)Alloc(((*length)+incr)* sizeof(TObject));
-  /*for (i=0; i<=(*length)-1; i++) h[i] = (*T)[i];*/
-  memcpy(h, *T, (*length) * sizeof(TObject));
-  Free((ADDRESS)*T,((*length)*sizeof(TObject)));
-  *T = h;
+  *T = (TSet)ReAlloc((ADDRESS)(*T),(*length)*sizeof(TObject),
+                                   ((*length)+incr)*sizeof(TObject));
   (*length) += incr;
 }
 
@@ -249,15 +246,12 @@ LSet initL ()
   return (LSet)Alloc(setmax*sizeof(LObject));
 }
 
-void enlargeL (LSet* L,int* length,int incr)
+static inline void enlargeL (LSet* L,int* length,int incr)
 {
   LSet h;
 
-  h = (LSet)Alloc(((*length)+incr)*sizeof(LObject));
-  /*for (i=0; i<(*length); i++) h[i] = (*L)[i];*/
-  memcpy(h, *L, (*length) * sizeof(LObject));
-  Free((ADDRESS)*L,((*length)*sizeof(LObject)));
-  *L = h;
+  *L = (LSet)ReAlloc((ADDRESS)(*L),(*length)*sizeof(LObject),
+                                   ((*length)+incr)*sizeof(LObject));
   (*length) += incr;
 }
 

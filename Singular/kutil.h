@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.8 1998-04-22 07:49:02 Singular Exp $ */
+/* $Id: kutil.h,v 1.9 1998-04-27 16:09:37 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for std
 */
@@ -120,10 +120,8 @@ class skStrategy
 
 void deleteHC(poly *p, int *e, int *l, kStrategy strat);
 void deleteInS (int i,kStrategy strat);
-void enlargeT (TSet* T,int* length,int incr);
 void cleanT (kStrategy strat);
 LSet initL ();
-void enlargeL (LSet* L,int* length,int incr);
 void deleteInL(LSet set, int *length, int j,kStrategy strat);
 void enterL (LSet *set,int *length, int *LSetmax, LObject p,int at);
 void initEcartPairBba (LObject* Lp,poly f,poly g,int ecartF,int ecartG);
