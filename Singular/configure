@@ -1740,7 +1740,7 @@ fi
 	  if test "$ac_cv_lib_dld_shl_load" = yes; then
          	LD_DYN_FLAGS="-ldld -Xlinker -E"
 	  	SFLAGS="-fpic -fPIC -DPIC"
-	  	SLDFLAGS=-shared
+	  	SLDFLAGS="-fPIC -DPIC -shared"
 		LD=gcc
 		ac_lib_dl=yes
 	  fi
