@@ -90,7 +90,8 @@ all: libMP.a
 libMP.a: MP.h MP_Config.h Makefile $(OBJS) 
 	rm -f $@
 	$(AR) cr $@ $(OBJS) 
-	$(RANLIB) $@
+	if $(RANLIB_TEST) ; then $(RANLIB) $@; else true; fi
+#	$(RANLIB) $@
 
 install: libMP.a 
 	${MKINSTALLDIRS} ${libdir}

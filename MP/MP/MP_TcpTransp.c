@@ -73,7 +73,8 @@
 
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_TcpTransp.c,v 1.2 1997-06-05 16:38:56 obachman Exp $";
+static char vcid[] = "@(#) $Id: MP_TcpTransp.c,v 1.1.1.1 1997/06/7 14:05:52 sgr
+ay Exp $";
 #endif /* lint */
 
 #include "MP.h"
@@ -682,7 +683,6 @@ MP_Status_t open_tcp_fork_mode(link, argc, argv)
                     "localhost", "-MPport", ""};
     sprintf(cport,"%d",tcp_rec->peerport);
     argv[7] = cport;
-    tcp_rec->isparent = 0;
 
     /* establish connection */
     stat = open_tcp_connect_mode(link, 8, argv);
@@ -700,7 +700,10 @@ MP_Status_t open_tcp_fork_mode(link, argc, argv)
     if (stat != MP_Success)
       _exit(1);
     else
+    {
+      tcp_rec->status = MP_LinkIsChild;
       return MP_Success;
+    }
   }
   else
   {
@@ -713,7 +716,7 @@ MP_Status_t open_tcp_fork_mode(link, argc, argv)
 
     /* establish connection */
     socket_accept_blocking(link, &tcp_rec->sock);
-    tcp_rec->isparent = 1;
+    tcp_rec->status = MP_LinkIsParent;
 
 #ifndef NO_LOGGING
     sprintf(log_msg,"open_tcp_fork: opened fork link, parent id: %d",
@@ -993,11 +996,19 @@ MP_Boolean_t tcp_get_status(link, status_to_check)
 #endif
   if (status_to_check == MP_LinkIsParent)
   {
-    if (((MP_TCP_t *)link->transp.private1)->isparent)
+    if (((MP_TCP_t *)link->transp.private1)->status == MP_LinkIsParent)
       return MP_TRUE;
     else
       return MP_FALSE;
   }
+  else if (status_to_check == MP_LinkIsChild)
+  {
+    if (((MP_TCP_t *)link->transp.private1)->status == MP_LinkIsChild)
+      return MP_TRUE;
+    else
+      return MP_FALSE;
+  }
+  
 
     FD_ZERO(&mask);
     FD_SET(sock, &mask);
@@ -1242,7 +1253,7 @@ MP_Status_t tcp_init_transport(link)
     tcp_rec->peerport = 0;
     tcp_rec->myhost   = NULL;
     tcp_rec->peerhost = NULL;
-    tcp_rec->isparent   = 0;
+    tcp_rec->status   = MP_UnknownStatus;
 
     link->transp.private1 = (char *)tcp_rec;
 

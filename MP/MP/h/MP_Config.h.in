@@ -18,6 +18,9 @@
 /* define ptr to limbs */
 #define _mp_d _mp_d
 
+/* Define for use when vfork doesn't exist or is broken*/
+#undef vfork
+
 /* Define for use with GMP ApReals*/
 #undef MP_HAVE_GMP_APREAL
 

@@ -1,5 +1,5 @@
 dnl
-dnl Written by Olaf Bachmann (obachman@mathematik.uni-kl.de)
+dnl Written by Olaf Bachmann (obachman@mathematik.uni-kl.de) 
 dnl
 dnl configure.in for MP
 dnl Process this file with autoconf to produce a configure script.
@@ -14,6 +14,27 @@ AC_DEFINE_UNQUOTED(MP_VERSION, "$VERSION")
 AC_CANONICAL_SYSTEM
 
 AC_PREFIX_DEFAULT(`pwd`)
+
+dnl The "philosophy" is this:  
+dnl 1) by default the libraries are stored in ${prefix}/lib/${ARCH}
+dnl 2) the user can override this by setting either --exec-prefix
+dnl    or --libdir
+dnl 3) If --libdir is given, then libraries are put exactly there
+dnl 4) If --libdir is not given, and --exec-dir is given, then
+dnl    libraries are put into $exec_prefix/lib (as is standard)
+dnl 5) The same thing applies to bindir
+
+AC_MSG_CHECKING(for architecture identifier)  
+AC_CACHE_VAL(ac_cv_arch,ac_cv_arch=`./pvmgetarch`)
+AC_MSG_RESULT($ac_cv_arch)
+
+if test "$libdir" = '${exec_prefix}/lib' && test "$exec_prefix" = "NONE"; then
+  libdir='${prefix}/lib/'$ac_cv_arch 
+fi
+
+if test "$bindir" = '${exec_prefix}/bin' && test "$exec_prefix" = "NONE"; then
+  bindir='${prefix}/bin/'$ac_cv_arch 
+fi
 
 dnl Check for programs
 AC_PROG_RANLIB
@@ -66,6 +87,12 @@ if test "$libdir" = '${exec_prefix}/lib'; then
   else
     LDFLAGS="-L${exec_prefix}/lib ${LDFLAGS}"
   fi
+elif test "$libdir" = '${prefix}/lib/'$ac_cv_arch ; then
+  if test "x$prefix" = xNONE; then
+    LDFLAGS="-L${ac_default_prefix}/lib/$ac_cv_arch  ${LDFLAGS}"
+  else
+    LDFLAGS="-L${prefix}/lib/$ac_cv_arch ${LDFLAGS}"
+  fi
 else
   LDFLAGS="-L${libdir} ${LDFLAGS}"
 fi
@@ -80,11 +107,14 @@ else
   CPPFLAGS="-I${includedir} ${CPPFLAGS}"
 fi
 
-dnl Check for env variable $PVM_ROOT and, it it exists, add $PVM_ROOT/include
-dnl and PVM_ROOT/lib to flags
-if test "$enable_mppvm" = yes && test "${PVM_ROOT+set}" = set; then
-  CPPFLAGS="${CPPFLAGS} -I${PVM_ROOT}/include"
-  LDFLAGS="${LDFLAGS} -L${PVM_ROOT}/lib"
+dnl add to  CPPFLAGS and LDFLAGS if PVM_ROOT and PVM_ARCH are set
+if test "${PVM_ROOT+set}" = set; then
+  if test "$enable_mppvm" = yes || test "$with_pvm" = yes; then
+    CPPFLAGS="${CPPFLAGS} -I${PVM_ROOT}/include"
+    if test ${PVM_ARCH+set} = set; then
+      LDFLAGS="${LDFLAGS} -L{PVM_ROOT}/lib/${PVM_ARCH}"
+    fi
+  fi
 fi
 
 AC_SET_MAKE
@@ -97,7 +127,7 @@ AC_ARG_ENABLE(MPT, \
  [  --disable-MPT           disable building of MPT library])
 
 AC_ARG_ENABLE(gmp, \
- [  --disable-gmp           configure and built without gmp library])
+ [  --disable-gmp           configure and build without gmp library])
 
 AC_ARG_ENABLE(tests, \
  [  --enable-example        enable building of example programs])
@@ -106,7 +136,7 @@ AC_ARG_ENABLE(mpviewer, \
  [  --enable-mpviewer       enable building of mpviewer program])
 
 AC_ARG_ENABLE(mppvm, \
- [  --enable-mppvm,         enable building of mppvm routines])
+ [  --enable-mppvm          enable building of mppvm routines])
 
 if test "$enable_gmp" != no && test -d gmp; then
   CONFIG_SUBDIRS="gmp"
@@ -131,7 +161,9 @@ fi
 if test "$enable_mppvm" = yes && test -d mp-pvm3; then
   BUILD_SUBDIRS="${BUILD_SUBDIRS} mp-pvm3"
   ac_check_prog=yes
+  with_pvm=yes
 fi
+
 AC_SUBST(BUILD_SUBDIRS)
 AC_SUBST(CONFIG_SUBDIRS)
 
@@ -148,18 +180,30 @@ if test "$ac_check_prog" = yes; then
     NEED_LIBS=$LIBS
   fi
   
-  AC_CHECK_FUNCS(select socket gethostname strtol)
+  AC_CHECK_FUNCS(select socket gethostname gethostbyname strtol)
   if test "$ac_cv_func_select" != yes; then
     AC_MSG_WARN(Did not find library containing function select)
-    AC_MSG_WARN(Linking programs with MP might fail)
-  fi
-  if test "$ac_cv_func_socket" != yes; then
-    AC_MSG_WARN(Did not find library containing socket)
     AC_MSG_WARN(Linking programs with MP might fail)
   fi
   if test "$ac_cv_func_gethostname" != yes; then
     AC_MSG_WARN(Did not find library containing gethostname)
     AC_MSG_WARN(Linking programs with MP might fail)
+  fi
+
+  if test "$ac_cv_func_gethostbyname" != yes; then
+    AC_CHECK_LIB(nsl, gethostbyname)
+    if test "$ac_cv_lib_nsl_gethostbyname" != yes; then
+      AC_MSG_WARN(Did not find library containing gethostname)
+      AC_MSG_WARN(Linking programs with MP might fail)
+    fi
+  fi
+
+  if test "$ac_cv_func_socket" != yes; then
+    AC_CHECK_LIB(socket, socket)
+    if test "$ac_cv_lib_socket_socket" != yes; then
+      AC_MSG_WARN(Did not find library containing socket)
+      AC_MSG_WARN(Linking programs with MP might fail)
+    fi
   fi
 fi
 AC_SUBST(NEED_LIBS)
@@ -214,11 +258,11 @@ dnl deal with Ap Number configuration
 dnl
 AC_ARG_WITH(apint, \
  [  --with-default_apint=PACKAGE    use PACKAGE as MP's default ApInt format
-                           where PACKAGE can be none, gmp (default), 
-                           pari, saclib])
+                           where PACKAGE can be: gmp (default), pari, 
+                           saclib, none])
 AC_ARG_WITH(apreal, \
  [  --with-default_apreal=PACKAGE   use PACKAGE as MP's default ApReal format
-                           where PACKAGE can be none, gmp (default)])
+                           where PACKAGE can be: gmp (default), none])
 AC_ARG_WITH(gmp, \
  [  --without-gmp           build without gmp ApNumber routines])
 
@@ -281,7 +325,6 @@ else
     fi
   fi
 fi
-
 
 if test "$with_default_apreal" = none; then
   AC_DEFINE(MP_DEFAULT_APREAL, MP_DUMMY)
@@ -349,6 +392,7 @@ if test "$with_tb" = yes; then
 fi
 
 if test "$with_pvm" = yes; then
+ AC_CHECK_HEADER(pvm3.h)
  if test "$ac_cv_header_pvm3_h" != yes; then
     AC_MSG_WARN(Can not build with Pvm: Need pvm3.h)
   else
@@ -356,7 +400,6 @@ if test "$with_pvm" = yes; then
   fi
 fi
 
-  
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_BIGENDIAN
 AC_C_CONST
@@ -388,7 +431,22 @@ dnl check for args to pass to subconfigure
 if test "$prefix" = NONE; then
   ac_configure_args="$ac_configure_args --prefix=$ac_default_prefix"
 fi
-  
+if test "$libdir" = '${prefix}/lib/'$ac_cv_arch; then
+  if test "$prefix" = NONE; then
+    ac_configure_args="$ac_configure_args --libdir=$ac_default_prefix/lib/$ac_cv_arch"
+  else
+    ac_configure_args="${prefix}/lib/$ac_cv_arch"
+  fi
+fi
+if test "$bindir" = '${prefix}/bin/'$ac_cv_arch; then
+  if test "$prefix" = NONE; then
+    ac_configure_args="$ac_configure_args --bindir=$ac_default_prefix/bin/$ac_cv_arch"
+  else
+    ac_configure_args="${prefix}/bin/$ac_cv_arch"
+  fi
+fi
+
+    
 AC_CONFIG_SUBDIRS($CONFIG_SUBDIRS)
 
 AC_OUTPUT(Makefile MP/Makefile MPT/Makefile mpviewer/Makefile \

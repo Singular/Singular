@@ -56,7 +56,8 @@
  ***************************************************************************/
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_Env.c,v 1.3 1997-06-28 13:30:25 obachman Exp $";
+static char vcid[] = "@(#) $Id: MP_Env.c,v 1.1.1.1 1997/06/07 14:07:47 sgray Exp
+ $";
 #endif /*lint */
 
 #include <values.h>  /* to figure out if we use IEEE or not */

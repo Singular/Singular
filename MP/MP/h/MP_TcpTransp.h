@@ -94,7 +94,7 @@ typedef struct{
     short   peerport;
     char    *peerhost;
     char    *myhost;
-    char     isparent;
+    MP_LinkStatus_t status;
 } MP_TCP_t;
 
 #endif

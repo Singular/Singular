@@ -76,10 +76,6 @@
  **************************************************************************/
 
 
-#ifndef lint
-static char vcid[] = "@(#) $Id: MP_Put.c,v 1.2 1997-06-28 13:30:27 obachman Exp $";
-#endif /* lint */
-
 #include "MP.h"
 
 

@@ -10,9 +10,18 @@ Fri Jun 20 11:24:18 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de
 	* MP_Link.c: MP_SetLinkOptions: case MP_LINK_LOG_MASK_OPT,
 	  assigned oldval
 
+Fri Jun  6 15:55:04 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
+
+        * MP_Env.c: Used RawMem function for allocation of
+          env->logfilename
+
 Tue May 27 13:57:13 1997  Olaf Bachmann  <obachman@ratchwu>
 
 	* MP_TcpTransp.h: Added fork mode to MPtcp links
+
+Tue May 27 13:57:13 1997  Olaf Bachmann  <obachman@ratchwu>
+
+        * MP_TcpTransp.[h,c]: Added fork mode to MPtcp links
 
 Tue May 20 17:38:53 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 

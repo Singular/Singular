@@ -64,10 +64,6 @@
  *
  **************************************************************************/
 
-#ifndef lint
-static char vcid[] = "@(#) $Id: MP_Get.c,v 1.2 1997-06-05 16:38:54 obachman Exp $";
-#endif /* lint */
- 
 #include "MP.h"
 
 
