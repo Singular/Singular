@@ -1,8 +1,15 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_gcd.cc,v 1.2 1996-06-13 08:18:34 stobbe Exp $
+// $Id: cf_gcd.cc,v 1.3 1996-06-18 12:22:54 stobbe Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.2  1996/06/13 08:18:34  stobbe
+"balance: Now balaces polynomials even if the coefficient sizes are higher
+         than the bound.
+gcd: Now returns the results with positive leading coefficient.
+     The isOne test is now performed if pi or pi1 is multivariate.
+"
+
 Revision 1.1  1996/06/03 08:32:56  stobbe
 "gcd_poly: now uses new function gcd_poly_univar0 to compute univariate
           polynomial gcd's over Z.
@@ -246,16 +253,15 @@ gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primiti
     M = tmin( maxnorm(f), maxnorm(g) );
     BB = power(CanonicalForm(2),tmin(f.degree(),g.degree()))*M;
     q = 0;
-    i = 1;
-    n = cf_getNumBigPrimes();
+    i = cf_getNumSmallPrimes() - 1;
     while ( true ) {
 	B = BB;
-	while ( i < n && q < B ) {
-	    p = cf_getBigPrime( i );
-	    i++;
-	    while ( i < n && mod( cl, p ) == 0 ) {
-		p = cf_getBigPrime( i );
-		i++;
+	while ( i >= 0 && q < B ) {
+	    p = cf_getSmallPrime( i );
+	    i--;
+	    while ( i >= 0 && mod( cl, p ) == 0 ) {
+		p = cf_getSmallPrime( i );
+		i--;
 	    }
 	    setCharacteristic( p );
 	    Dp = gcd( mapinto( f ), mapinto( g ) );
@@ -282,7 +288,7 @@ gcd_poly_univar0( const CanonicalForm & F, const CanonicalForm & G, bool primiti
 		// else p is a bad prime
 	    }
 	}
-	if ( i < n ) {
+	if ( i >= 0 ) {
 	    // now balance D mod q
 	    D = pp( balance( cg * D, q ) );
 	    if ( divides( D, f ) && divides( D, g ) )
