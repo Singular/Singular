@@ -315,6 +315,26 @@ else
   AC_MSG_ERROR(need  -2 >> 1 == -1)
 fi
 
+
+# check for a peculiar constructor initialization
+AC_MSG_CHECKING(whether explicit C++ constructor calls are allowed)
+AC_CACHE_VAL(ac_cv_explicit_const,AC_TRY_COMPILE(, 
+  class testclass 
+  {
+  public:
+    int value;
+    testclass( int i ) : value(i) {}
+    ~testclass() { value = 0; }
+  };
+  
+  testclass ptr;
+  ptr.testclass(1);
+, ac_cv_explicit_const=yes, ac_cv_explicit_const=no))
+AC_MSG_RESULT($ac_cv_explicit_const)
+if test "$ac_cv_explicit_const" = yes; then
+  AC_DEFINE(HAVE_EXPLICIT_CONSTR)
+fi
+
 # sprintf returns number of printed chars
 AC_MSG_CHECKING(whether vsprintf returns number of printed chars)
 AC_CACHE_VAL(ac_cv_returns_n_of_chars, AC_TRY_RUN( 

@@ -66,6 +66,8 @@
 #undef HAVE_BCOPY
 /* Define if sprintf does not return number of printed chars */
 #undef BSD_SPRINTF
+/* define if you have explicit C++ constructors */
+#undef HAVE_EXPLICIT_CONSTR
 /* Define if you have the getcwd function.  */
 #undef HAVE_GETCWD
 /* Define if you have the getwd function.  */
@@ -145,11 +147,6 @@
 #define PROFILER ,0,0
 #else
 #define PROFILER 
-#endif
-
-/* Define if fglmzero constructors do not work */
-#if defined(__MWERKS__) || defined(WINNT)
-#define __NO_CONSTR__
 #endif
 
 /* Define to use gmp for rational arithmetic */

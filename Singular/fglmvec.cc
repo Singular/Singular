@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmvec.cc,v 1.8 1998-05-19 09:45:02 pohl Exp $
+// $Id: fglmvec.cc,v 1.9 1998-06-03 15:25:19 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -142,7 +142,7 @@ fglmVector::~fglmVector()
     if ( rep->deleteObject() )
 	delete rep;
 }
-#ifdef __NO_CONSTR__
+#ifndef HAVE_EXPLICIT_CONSTR
 void
 fglmVector::mac_constr( const fglmVector & v)
 {

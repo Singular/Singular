@@ -1,5 +1,5 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: fglmzero.cc,v 1.16 1998-05-19 09:48:51 pohl Exp $
+// $Id: fglmzero.cc,v 1.17 1998-06-03 15:25:20 obachman Exp $
 
 /****************************************
 *  Computer Algebra System SINGULAR     *
@@ -290,7 +290,7 @@ public:
     borderElem() : monom(NULL), nf() {}
     borderElem( poly p, fglmVector n ) : monom( p ), nf( n ) {}
     ~borderElem() { pDelete1( &monom ); }
-#ifdef __NO_CONSTR__
+#ifndef HAVE_EXPLICIT_CONSTR
     void insertElem( poly p, fglmVector n ) 
     {
 	monom= p;
@@ -369,7 +369,7 @@ fglmSdata::fglmSdata( const ideal thisIdeal )
     borderBS= 100;
     borderMax= borderBS;
     borderSize= 0;
-#ifdef __NO_CONSTR__
+#ifndef HAVE_EXPLICIT_CONSTR
     border= new borderElem[ borderMax ];
 #else
     border= (borderElem *)Alloc( borderMax*sizeof( borderElem ) );
@@ -383,7 +383,7 @@ fglmSdata::~fglmSdata()
     for ( int k = basisSize; k > 0; k-- )
 	pDelete1( basis + k );  //. rem: basis runs from basis[1]..basis[basisSize]
     Free( (ADDRESS)basis, basisMax*sizeof( poly ) );
-#ifdef __NO_CONSTR__
+#ifndef HAVE_EXPLICIT_CONSTR
     delete [] border;
 #else
     for ( int l = borderSize; l > 0; l-- )
@@ -419,7 +419,7 @@ fglmSdata::newBorderElem( poly & m, fglmVector v )
 {
     borderSize++;
     if ( borderSize == borderMax ) {
-#ifdef __NO_CONSTR__
+#ifndef HAVE_EXPLICIT_CONSTR
 	borderElem * tempborder = new borderElem[ borderMax+borderBS ];
 	for ( int k = 0; k < borderMax; k++ ) {
 	    tempborder[k]= border[k];
@@ -432,7 +432,7 @@ fglmSdata::newBorderElem( poly & m, fglmVector v )
 #endif
 	borderMax+= borderBS;
     }
-#ifdef __NO_CONSTR__
+#ifndef HAVE_EXPLICIT_CONSTR
     border[borderSize].insertElem( m, v );
 #else
     border[borderSize].borderElem( m, v );
@@ -673,7 +673,7 @@ public:
     number pdenom;
     number fac;
 
-#ifdef __NO_CONSTR__
+#ifndef HAVE_EXPLICIT_CONSTR
     oldGaussElem() : v(), p(), pdenom( NULL ), fac( NULL ) {}
 #endif
     oldGaussElem( const fglmVector newv, const fglmVector newp, number & newpdenom, number & newfac ) : v( newv ), p( newp ), pdenom( newpdenom ), fac( newfac )
@@ -682,7 +682,7 @@ public:
 	newfac= NULL;
     }
     ~oldGaussElem();
-#ifdef __NO_CONSTR__
+#ifndef HAVE_EXPLICIT_CONSTR
     void insertElem( const fglmVector newv, const fglmVector newp, number & newpdenom, number & newfac ) 
     {
 	v= newv;
@@ -741,7 +741,7 @@ fglmDdata::fglmDdata( int dimension )
     dimen= dimension;
     basisSize= 0;
     //. All arrays run from [1]..[dimen], thus Alloc( dimen + 1 )!
-#ifdef __NO_CONSTR__
+#ifndef HAVE_EXPLICIT_CONSTR
     gauss= new oldGaussElem[ dimen+1 ];
 #else
     gauss= (oldGaussElem *)Alloc( (dimen+1)*sizeof( oldGaussElem ) );
@@ -759,7 +759,7 @@ fglmDdata::~fglmDdata()
 {
     fglmASSERT( dimen == basisSize, "Es wurden nicht alle BasisElemente gefunden!" );
     int k;
-#ifdef __NO_CONSTR__
+#ifndef HAVE_EXPLICIT_CONSTR
     delete [] gauss;
 #else
     for ( k= dimen; k > 0; k-- ) 
@@ -812,7 +812,7 @@ fglmDdata::newBasisElem( poly & m, fglmVector v, fglmVector p, number & denom )
     perm[basisSize]= pivotcol;
     
     pivot= nCopy( v.getconstelem( pivotcol ) );
-#ifdef __NO_CONSTR__
+#ifndef HAVE_EXPLICIT_CONSTR
     gauss[basisSize].insertElem( v, p, denom, pivot );
 #else
     gauss[basisSize].oldGaussElem( v, p, denom, pivot );
