@@ -412,7 +412,7 @@ LDFLAGSP	= -static @LDFLAGS@
 CFLAGSB		= -g -O3 ${PIPE}  
 CXXFLAGSB	= -g -O3 ${PIPE} 
 CXXTEMPLFLAGSB	= -fno-implicit-templates
-DEFSB		= -DNDEBUG -D@SING_UNAME@
+DEFSB		= -D@SING_UNAME@
 LDFLAGSB	= -static @LDFLAGS@
 # bprof object  file to link with
 BPROFOBJ	= /usr/local/lib/bmon.o
@@ -472,10 +472,10 @@ mpsr_Tok.op: iparith.inc mpsr_Tok.cc
 
 ## for brof
 
-Singularb: scanner.cc gmalloc.op $(OBJP) iparith.op mpsr_Tok.op tesths.cc version.h 
-	$(CXXP) ${CXXFLAGSB} ${CPPFLAGS} ${DEFSB} -o Singularb \
-	tesths.cc iparith.op mpsr_Tok.op $(OBJP)  $(BPROFOBJ) \
-        ${LDFLAGSB} ${LD_DYN_FLAGS} ${LIBS} gmalloc.op
+Singularb: scanner.cc gmalloc.og $(OBJG) iparith.op mpsr_Tok.op tesths.cc version.h 
+	$(CXXG) ${CXXFLAGSB} ${CPPFLAGS} ${DEFSG} ${DEFSB} -o Singularb \
+	tesths.cc iparith.og mpsr_Tok.og $(OBJG)  $(BPROFOBJ) \
+        ${LDFLAGSB} ${LD_DYN_FLAGS} ${LIBS} gmalloc.og
 
 installp: Singularp
 	${MKINSTALLDIRS} ${bindir}
