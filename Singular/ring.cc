@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.201 2003-03-10 11:03:03 Singular Exp $ */
+/* $Id: ring.cc,v 1.202 2003-03-10 13:28:25 levandov Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -795,12 +795,15 @@ void rWrite(ring r)
   if ((r->nc!=NULL) && (r==currRing))
   {
     poly pl=NULL;
+    int nl;
+    //    PrintS("\n//   noncommutative relations:");
     Print("\n//   noncommutative relations (type %d):",(int)r->nc->type);
     for (int i = 1; i<r->N; i++)
     {
       for (int j = i+1; j<=r->N; j++)
       {
-        if (MATELEM(r->nc->COM,i,j)==NULL)
+	nl=nIsOne(p_GetCoeff(MATELEM(r->nc->C,i,j),r));
+        if ((MATELEM(r->nc->D,i,j)!=NULL)||(!nl))
         {
           Print("\n//    %s%s=",r->names[j-1],r->names[i-1]);
           pl=MATELEM(r->nc->MT[UPMATELEM(i,j,r->N)],1,1);
@@ -810,6 +813,7 @@ void rWrite(ring r)
     }
 #ifdef PDEBUG
     Print("\n//   noncommutative type:%d",r->nc->type);
+    Print("\n//   is skew constant:%d",r->nc->IsSkewConstant);
 #endif
   }
 #endif

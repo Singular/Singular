@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.196 2003-03-10 11:03:00 Singular Exp $ */
+/* $Id: extra.cc,v 1.197 2003-03-10 13:28:21 levandov Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -1441,23 +1441,30 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       if (h->Typ()==MATRIX_CMD)
       {
-        currRing->nc->type=nc_undef; /* to analyze later ! */
+	currRing->nc->type=nc_undef; /* to analyze later ! */
+	//	currRing->nc->IsSkewConstant=NULL;
       }
       else
       {
-        nN=pGetCoeff(pN);
-        if (nIsOne(nN)) currRing->nc->type=nc_lie;
-        else currRing->nc->type=nc_skew;
-        /* create matrix C */
-        C=mpNew(currRing->N,currRing->N);
-        for(i=1;i<currRing->N;i++)
-        {
-          for(j=i+1;j<=currRing->N;j++)
-          {
-            MATELEM(C,i,j) = nc_p_CopyPut(pN,currRing);
-            //  MATELEM(C,i,j)=pCopy(pN);
-          }
-        }
+	nN=pGetCoeff(pN); // pN is not NULL anyway
+	if (nIsZero(nN)) 
+	{
+	  Werror("zero coefficients are not allowed");
+	  return TRUE;
+	}
+	if (nIsOne(nN)) currRing->nc->type=nc_lie; 
+	else currRing->nc->type=nc_skew;
+	currRing->nc->IsSkewConstant=1;
+	/* create matrix C */
+	C=mpNew(currRing->N,currRing->N);
+	for(i=1;i<currRing->N;i++)
+	{
+	  for(j=i+1;j<=currRing->N;j++)
+	  {
+	    MATELEM(C,i,j) = nc_p_CopyPut(pN,currRing);
+	    //  MATELEM(C,i,j)=pCopy(pN);
+	  }
+	}
       }
       pN=NULL;
       h=hh;
@@ -1489,10 +1496,15 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       } /* end else h==NULL */
       if (pN==NULL)
       {
-        if (currRing->nc->type==nc_lie) currRing->nc->type=nc_skew; /* even commutative! */
-        /* if (currRing->nc->type==nc_skew)  NOP */
+	if (currRing->nc->type==nc_lie) 
+	{
+	  currRing->nc->type=nc_skew; /* even commutative! */
+	}
       }
-      else  { if (currRing->nc->type==nc_skew) currRing->nc->type=nc_general; }
+      else  
+      { 
+	if (currRing->nc->type==nc_skew) currRing->nc->type=nc_general; 
+      } /* end pN==NULL */
       if (h==NULL)
       {
          WerrorS("expected `system(\"PLURAL\",<matrix>,<matrix>)`");
@@ -1526,7 +1538,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       COM=mpCopy(currRing->nc->C);
       poly p;
       short DefMTsize=7;
-      int IsSkewConstant=1;
+      int tmpIsSkewConstant=1;
       int IsNonComm=0;
       pN=nc_p_CopyGet(MATELEM(currRing->nc->C,1,2),currRing);
       //      pN=MATELEM(currRing->nc->C,1,2);
@@ -1540,7 +1552,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
             Werror("Incorrect input : matrix of coefficients contains zeros in the upper triangle!");
             return TRUE;
           }
-          if (!nEqual(pGetCoeff(pN),pGetCoeff(MATELEM(currRing->nc->C,i,j)))) IsSkewConstant=0;
+          if (!nEqual(pGetCoeff(pN),pGetCoeff(MATELEM(currRing->nc->C,i,j)))) tmpIsSkewConstant=0;
           if (MATELEM(currRing->nc->D,i,j)==NULL) /* quasicommutative case */
           {
             currRing->nc->MTsize[UPMATELEM(i,j,currRing->N)]=1;
@@ -1573,10 +1585,14 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         if (IsNonComm==1)
         {
           assume(pN!=NULL);
-          if ((IsSkewConstant==1) && (nIsOne(pGetCoeff(pN)))) currRing->nc->type=nc_lie;
-          else currRing->nc->type=nc_general;
-        }
-        if (IsNonComm==0) currRing->nc->type=nc_skew; /* could be also commutative */
+	  if ((tmpIsSkewConstant==1) && (nIsOne(pGetCoeff(pN)))) currRing->nc->type=nc_lie;
+	  else currRing->nc->type=nc_general;
+	}
+	if (IsNonComm==0) 
+	{
+	  currRing->nc->type=nc_skew; /* could be also commutative */
+	  currRing->nc->IsSkewConstant=tmpIsSkewConstant;
+	}
       }
       currRing->nc->COM=COM;
       return FALSE;

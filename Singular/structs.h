@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.69 2003-01-29 17:48:37 Singular Exp $ */
+/* $Id: structs.h,v 1.70 2003-03-10 13:28:29 levandov Exp $ */
 /*
 * ABSTRACT
 */
@@ -359,6 +359,8 @@ struct nc_struct
   matrix *MT;
   matrix COM;
   int *MTsize;
+  int IsSkewConstant; /* indicates whethere coeffs C_ij are all equal */
+  /* effective together with nc_type=nc_skew */
 };
 #endif
 
