@@ -187,18 +187,21 @@ printpi(procinfov pi)
 
   if (texinfo_out)
   {
-    if ((! pi->is_static) &&
+   if ((! pi->is_static) &&
         (pi->data.s.body_start - pi->data.s.def_end > 10) &&
-        (pi->data.s.example_start > 0) &&
-        (pi->data.s.proc_end - pi->data.s.example_start > 10) &&
         (! found_proc_in_proc))
     {
       printf("push(@procs, \"%s\");\n", pi->procname);
       printf("$help{\"%s\"} = <<EOT;\n", pi->procname);
       PrintOut(fp, pi->data.s.help_start, pi->data.s.body_start-3);
-      printf("\nEOT\n$example{\"%s\"} = <<EOT;\n", pi->procname);
-      PrintOut(fp, pi->data.s.example_start, pi->data.s.proc_end);
       printf("\nEOT\n");
+      if ((pi->data.s.example_start > 0) &&
+          (pi->data.s.proc_end - pi->data.s.example_start > 10))
+      {
+        printf("$example{\"%s\"} = <<EOT;\n", pi->procname);
+        PrintOut(fp, pi->data.s.example_start, pi->data.s.proc_end);
+        printf("\nEOT\n");
+      }
       printf("$chksum{\"%s\"} = %d;\n", pi->procname, pi->data.s.help_chksum);
     }
   }
