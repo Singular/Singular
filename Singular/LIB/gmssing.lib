@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmssing.lib,v 1.3 2004-04-22 10:50:51 Singular Exp $";
+version="$Id: gmssing.lib,v 1.4 2004-08-05 15:59:20 Singular Exp $";
 category="Singularities";
 
 info="
@@ -120,7 +120,7 @@ ring G;  Gauss-Manin system of t with variable s
   ideal gmsbasis;  monomial vector space basis of Jacobian algebra
   int gmsmaxdeg;  maximal weight of variables
 @end format
-NOTE:     gmsbasis is a C{{s}}-basis of H'' and [t,s]=s^2
+NOTE:     gmsbasis is a C[[s]]-basis of H'' and [t,s]=s^2
 KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice
 EXAMPLE:  example gmsring; shows examples
 "

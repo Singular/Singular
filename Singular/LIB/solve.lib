@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: solve.lib,v 1.26 2003-07-18 14:13:15 Singular Exp $";
+version="$Id: solve.lib,v 1.27 2004-08-05 15:59:22 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY: solve.lib     Complex Solving of Polynomial Systems
@@ -28,7 +28,6 @@ LIB "triang.lib";    // needed for triang_solve
 proc laguerre_solve( poly f, list # )
 "USAGE:   laguerre_solve(f [, m, l, n, s] ); f = polynomial,@*
          m, l, n, s = integers (control parameters of the method)
-@format
  m: precision of output in digits ( 4 <= m), if basering is not ring of 
       complex numbers;
  l: precision of internal computation in decimal digits ( l >=8 )
@@ -42,16 +41,13 @@ proc laguerre_solve( poly f, list # )
  s: s != 0, returns ERROR if  | f(root) | > 0.1^m (when computing in the 
       current ring)
  ( default: m, l, n, s = 8, 30, 1, 0 )
-@end format
 ASSUME:  f is a univariate polynomial;@*
          basering has characteristic 0 and is either complex or without
          parameters. 
 RETURN:  list of (complex) roots of the polynomial f, depending on n. The 
          result is of type
-@format
  string: if the basering is not complex,
  number: otherwise.
-@end format
 NOTE:    If printlevel >0: displays comments ( default = 0 ).
          If s != 0 and if the procedure stops with ERROR, try a higher
          internal precision m.
@@ -521,7 +517,6 @@ static proc addzero(list zz,string ss,int iz,int a)
 proc solve( ideal G, list # )
 "USAGE:   solve(G [, m, n, l] ); G = ideal,
          m, n, l = integers (control parameters of the method)
- @format
          m: precision of output in digits ( 4 <= m) and of the
             generated ring of complex numbers;
          n: control of multiplicity
@@ -532,21 +527,18 @@ proc solve( ideal G, list # )
             precision,
          ( default: m, n, l = 8, 0, 30 or
                     for (n != 0 and size(#) = 2) l = 60 )
- @end format
 ASSUME:  the ideal is 0-dimensional;@*
          basering has characteristic 0 and is either complex or
          without parameters;
 RETURN:  list of solutions of the ideal G, depending on n; one solution is a 
          list of complex numbers in the generated output ring (the new 
          basering).
-@format
  The result is a list L
     n  = 0: a list of all different solutions (L[i]),
     n != 0: a list of two elements,
             L[i][1] contains all different solutions with the same multiplicity
             L[i][2] the multiplicity
  L is ordered w.r.t. multiplicity (the smallest first).
-@end format
 NOTE:    If the problem is not 0-dim. the procedure stops with ERROR, if the 
          ideal G is not a lex. standard basis, it is generated with internal 
          computation (Hilbert driven), if the input-ring (with char 0) has 
@@ -1198,23 +1190,19 @@ static proc l_mutrisolve(list sp, list o, int prec)
 
 proc ures_solve( ideal gls, list # )
 "USAGE:   ures_solve(i [, k, p] ); i = ideal, k, p = integers
-@format
    k=0: use sparse resultant matrix of Gelfand, Kapranov and Zelevinsky,
    k=1: use resultant matrix of Macaulay which works only for
           homogeneous ideals,
    p>0: defines precision of the long floats for internal computation
           if the basering is not complex (in decimal digits),
    (default: k=0, p=30)
-@end format
 ASSUME:  i is a zerodimensional ideal with
          nvars(basering) = ncols(i) = number of vars
          actually occurring in i,
 RETURN:  list of all (complex) roots of the polynomial system i = 0; the 
          result is of type
-@format
    string: if the basering is not complex,
    number: otherwise.
-@end format
 EXAMPLE: example ures_solve; shows an example
 "
 {
@@ -1266,10 +1254,8 @@ example
 
 proc mp_res_mat( ideal i, list # )
 "USAGE:   mp_res_mat(i [, k] ); i ideal, k integer,
-@format
     k=0: sparse resultant matrix of Gelfand, Kapranov and Zelevinsky,
     k=1: resultant matrix of Macaulay (k=0 is default)
-@end format
 ASSUME:  The number of elements in the input system must be the number of 
          variables in the basering plus one;
          if k=1 then i must be homogeneous.
@@ -1628,9 +1614,7 @@ example
 
 proc lex_solve( ideal fi, list # )
 "USAGE:   lex_solve( i[,p] ); i=ideal, p=integer,
- @format
   p>0: gives precision of complex numbers in decimal digits (default: p=30).
- @end format
 ASSUME:  i is a reduced lexicographical Groebner bases of a zero-dimensional 
          ideal, sorted by increasing leading terms.
 RETURN:  nothing

@@ -1,6 +1,6 @@
 // last change:           17.01.2001
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: paramet.lib,v 1.12 2001-08-27 14:47:57 Singular Exp $";
+version="$Id: paramet.lib,v 1.13 2004-08-05 15:59:22 Singular Exp $";
 category="Visualization";
 info="
 LIBRARY: paramet.lib   Parametrization of Varieties
@@ -68,7 +68,7 @@ EXAMPLE: example parametrize; shows an example"
       // The i-th list component contains the parametrization, the
       // number of necessary variables, and the information, if
       // the parametrization was successful.
-      list param=para,d,1;
+      list @param=para,d,1;
 //     if (d==0)
 //     {
        // Include sometimes a test, whether the maximal ideal I is of the form
@@ -81,16 +81,16 @@ EXAMPLE: example parametrize; shows an example"
     else
     {
       setring BAS;
-      list param=I,0,0;
+      list @param=I,0,0;
     }
   }
   else
   {
     setring BAS;
-    list param=I,0,0;
+    list @param=I,0,0;
   }
   option(set,ov);
-  return(param);
+  return(@param);
 }
 example
 { "EXAMPLE:";echo = 2;
@@ -116,7 +116,7 @@ EXAMPLE:  example parametrizepd; shows an example"
 {
   intvec ov=option(get);
   option(noredefine);
-  list primary,no,nor,para,param;
+  list primary,no,nor,para,@param;
   def BAS=basering;
   int d=dim(std(I));
   if (d<=2)
@@ -152,7 +152,7 @@ EXAMPLE:  example parametrizepd; shows an example"
          // Include sometime a test, whether the maximal ideal I is of the form
          // (x-a,y-b,z-c), since only then normap=(a,b,c).
 //       }
-      param[ii]=inter;
+      @param[ii]=inter;
       kill inter;
       setring BAS;
     }
@@ -160,7 +160,7 @@ EXAMPLE:  example parametrizepd; shows an example"
     {
       setring PR;
       list inter=0,0,0;
-      param[ii]=inter;
+      @param[ii]=inter;
       kill inter;
       setring BAS;
     }
@@ -170,7 +170,7 @@ EXAMPLE:  example parametrizepd; shows an example"
   export PR;
   keepring PR;
   option(set,ov);
-  return(param);
+  return(@param);
 }
 example
 { "EXAMPLE:";echo = 2;
@@ -201,7 +201,7 @@ EXAMPLE:  example parametrizesing; shows an example"
     hn = reddevelop(f);
     for (int ii=1; ii<=size(hn); ii++)
     {
-      para[ii]=param(hn[ii]);
+      para[ii]=@param(hn[ii]);
     }
   }
   else
