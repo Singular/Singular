@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.cc,v 1.17 1999-10-14 14:27:22 obachman Exp $ */
+/* $Id: mpr_complex.cc,v 1.18 1999-11-14 21:35:09 wenk Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp
@@ -626,6 +626,26 @@ char *complexToStr( const gmp_complex & c, const unsigned int oprec )
   return out;
 }
 //<-
+
+bool complexNearZero( gmp_complex * c, int digits )
+{
+  gmp_float eps,epsm;
+
+  if ( digits < 1 ) return true;
+
+  eps=pow(10.0,(int)digits);
+  //Print("eps: %s\n",floatToStr(eps,gmp_output_digits));
+  eps=(gmp_float)1.0/eps;
+  epsm=-eps;
+
+  //Print("eps: %s\n",floatToStr(eps,gmp_output_digits));
+
+  if ( c->real().sign() > 0 ) // +
+    return (c->real() < eps && (c->imag() < eps && c->imag() > epsm));
+  else // -
+    return (c->real() > epsm && (c->imag() < eps && c->imag() > epsm));
+}
+
 //%e
 
 //#endif // HAVE_MPR
