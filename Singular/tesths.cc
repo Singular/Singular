@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.21 1997-07-02 16:44:17 Singular Exp $ */
+/* $Id: tesths.cc,v 1.22 1997-07-04 13:46:45 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -255,7 +255,8 @@ int main(          /* main entry to Singular */
 "by: G.-M. Greuel, G. Pfister, H. Schoenemann\n"
 "Fachbereich Mathematik der Universitaet, D-67653 Kaiserslautern\n"
 "contributions: O.Bachmann,W.Decker,H.Grassmann,B.Martin,M.Messollen,W.Neumann,\n"
-"W.Pohl,T.Siebert,R.Stobbe                 e-mail: singular@mathematik.uni-kl.de\n");
+"\tW.Pohl,T.Siebert,R.Stobbe,T.Wichmann\n"
+"e-mail: singular@mathematik.uni-kl.de\n");
     printf("%s  %s  (%d)",S_VERSION1,S_VERSION2, SINGULAR_VERSION_ID);
     printf("\n\nPlease note:  EVERY COMMAND MUST END WITH A SEMICOLON \";"
            "\"\n(e.g. help; help command; help General syntax; help ring; quit;)\n\n");
