@@ -1,3 +1,35 @@
+Fri Sep 12 17:25:14 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* cf_gcd.cc (isqrt): function removed
+
+	* canonicalform.cc: doc fix
+
+Wed Sep 10 15:36:15 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
+
+	* int_cf.cc (InternalCF::sign): assertion added
+
+	* int_rat.cc (InternalRational::sign): call to mpz_cmp_si()
+	  replaced by call to mpz_sgn()
+	* int_pp.cc (InternalPrimePower::sign): call to mpz_cmp_si()
+	  replaced by call to mpz_sgn()
+	* int_int.cc (InternalInteger::sign): call to mpz_cmp_si()
+	  replaced by call to mpz_sgn()
+
+	* int_pp.cc, int_int.cc, int_rat.cc, int_poly.cc, int_cf.cc,
+	  canonicalform.cc (sign): doc fix
+
+	* imm.h (imm_sign): bug fix.  imm_sign() returned 0 for sign(1)
+	  when calculating in GF(q).
+	* imm.h (imm_sign): bug bug fix
+
+	* gfops.h (gf_sign): doc fix
+
+	* configure.in (expl_datadir): initialization fixed.  If
+	  $expl_datadir is relative we prepend the current working
+	  directory now.
+
+	* cf_gcd.cc (isqrt): function removed
+
 Tue Sep  9 09:06:17 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 	* README: doc fix
