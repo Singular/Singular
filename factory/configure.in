@@ -1,5 +1,5 @@
 dnl # emacs edit mode for this file is -*- sh -*-
-dnl # $Id: configure.in,v 1.21 1998-06-09 09:59:30 schmidt Exp $
+dnl # $Id: configure.in,v 1.22 1998-06-15 14:24:06 schmidt Exp $
 
 dnl #
 dnl # configure.in - process this file with `autoconf' to generate
@@ -12,7 +12,7 @@ dnl #
 #
 # - initialisation.
 #
-AC_REVISION($Id: configure.in,v 1.21 1998-06-09 09:59:30 schmidt Exp $)
+AC_REVISION($Id: configure.in,v 1.22 1998-06-15 14:24:06 schmidt Exp $)
 AC_INIT(canonicalform.cc)
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_AUX_DIR(bin)
@@ -170,8 +170,6 @@ PATH="$save_path"
 # - expand paths.
 #
 
-# Attention!  We use file descriptor 9 for our purposes!
-# This may fail with future version of `autoconf'.
 AC_MSG_CHECKING(and generating explicit install paths)
 save_prefix="$prefix"
 save_exec_prefix="$exec_prefix"
@@ -181,30 +179,28 @@ for dir in prefix exec_prefix bindir sbindir libexecdir \
 	   datadir sysconfdir sharedstatedir localstatedir libdir \
 	   includedir oldincludedir infodir mandir; do
   eval "dir_value=\$$dir"
-  echo "$dir=$dir_value" >> ./conftest.mk
-  echo "explicit_$dir:" >> ./conftest.mk
-  echo "	echo \$($dir) >&9" >> ./conftest.mk
+  cat >> ./conftest.mk << EXPLPATHEOT
+$dir=$dir_value
+explicit_$dir:
+	@ echo \$($dir)
+	@ if echo \$($dir) | grep '^/'; \\
+	then echo \$($dir) > ./conftest.dir; \\
+	else echo \`pwd\`/\$($dir) > ./conftest.dir; fi
+EXPLPATHEOT
 done
 prefix="$save_prefix"
 exec_prefix="$save_exec_prefix"
 
-explicit_datadir=`make 9>&1 >&5 2>&1 -f ./conftest.mk explicit_datadir`
-explicit_libdir=`make 9>&1 >&5 2>&1 -f ./conftest.mk explicit_libdir`
-explicit_includedir=`make 9>&1 >&5 2>&1 -f ./conftest.mk explicit_includedir`
+make >&5 2>&1 -f ./conftest.mk explicit_datadir
+explicit_datadir=`cat ./conftest.dir`
+make >&5 2>&1 -f ./conftest.mk explicit_libdir
+explicit_libdir=`cat ./conftest.dir`
+make >&5 2>&1 -f ./conftest.mk explicit_includedir
+explicit_includedir=`cat ./conftest.dir`
 
-rm -f ./conftest.mk
+rm -f ./conftest.mk ./conftest.dir
+
 AC_MSG_RESULT(done)
-
-# make paths absolut
-if echo "$explicit_datadir" | grep -v '^/' > /dev/null 2> /dev/null; then
-  explicit_datadir="`pwd`/$explicit_datadir"
-fi
-if echo "$explicit_libdir" | grep -v '^/' > /dev/null 2> /dev/null; then
-  explicit_libdir="`pwd`/$explicit_libdir"
-fi
-if echo "$explicit_includedir" | grep -v '^/' > /dev/null 2> /dev/null; then
-  explicit_includedir="`pwd`/$explicit_includedir"
-fi
 
 #
 # - check for libraries.
