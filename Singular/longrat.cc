@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.47 2003-01-09 17:04:32 Singular Exp $ */
+/* $Id: longrat.cc,v 1.48 2003-03-25 09:56:57 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -97,6 +97,19 @@ BOOLEAN nlDBTest(number a, char *f,int l);
 omBin rnumber_bin = omGetSpecBin(sizeof(snumber));
 
 number nlOne=nlInit(1);
+
+#if (__GNU_MP_VERSION*10+__GNU_MP_VERSION_MINOR < 31)
+void mpz_mul_si (mpz_ptr r, mpz_srcptr s, long int si)
+{
+  if (si>=0)
+    mpz_mul_ui(r,s,si);
+  else
+  {
+    mpz_mul_ui(r,s,-si);
+    mpz_neg(r,r);
+  }
+}
+#endif
 
 static int nlPrimeM;
 static number nlMapP(number from)
@@ -870,13 +883,7 @@ number nlDiv (number a, number b)
       // short a / (z/n) -> (a*n)/z
       if (b->s<2)
       {
-        if ((int)a>=0)
-          mpz_mul_ui(&u->z,&b->n,SR_TO_INT(a));
-        else
-        {
-          mpz_mul_ui(&u->z,&b->n,-SR_TO_INT(a));
-          mpz_neg(&u->z,&u->z);
-        }
+        mpz_mul_si(&u->z,&b->n,SR_TO_INT(a));
       }
       else
       // short a / long z -> a/z
@@ -899,13 +906,7 @@ number nlDiv (number a, number b)
       if (a->s<2)
       {
         mpz_init_set(&u->n,&a->n);
-        if ((int)b>0)
-          mpz_mul_ui(&u->n,&u->n,SR_TO_INT(b));
-        else
-        {
-          mpz_mul_ui(&u->n,&u->n,-SR_TO_INT(b));
-          mpz_neg(&u->z,&u->z);
-        }
+        mpz_mul_si(&u->n,&u->n,SR_TO_INT(b));
       }
       else
       // long z / short b -> z/b
@@ -1382,15 +1383,7 @@ BOOLEAN _nlEqual_aNoImm_OR_bNoImm(number a, number b)
       return FALSE;
     MP_INT  bb;
     mpz_init_set(&bb,&b->n);
-    if ((int)a<0)
-    {
-      mpz_neg(&bb,&bb);
-      mpz_mul_ui(&bb,&bb,(long)-SR_TO_INT(a));
-    }
-    else
-    {
-      mpz_mul_ui(&bb,&bb,(long)SR_TO_INT(a));
-    }
+    mpz_mul_si(&bb,&bb,(long)SR_TO_INT(a));
     bo=(mpz_cmp(&bb,&b->z)==0);
     mpz_clear(&bb);
     return bo;
@@ -1504,15 +1497,7 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
       {
         MP_INT x;
         mpz_init(&x);
-        if ((int)a>0)
-        {
-          mpz_mul_ui(&x,&b->n,SR_TO_INT(a));
-        }
-        else
-        {
-          mpz_mul_ui(&x,&b->n,-SR_TO_INT(a));
-          mpz_neg(&x,&x);
-        }
+        mpz_mul_si(&x,&b->n,SR_TO_INT(a));
         mpz_add(&u->z,&b->z,&x);
         mpz_clear(&x);
         if (mpz_cmp_ui(&u->z,(long)0)==0)
@@ -1703,15 +1688,7 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
       {
         MP_INT x;
         mpz_init(&x);
-        if ((int)a>0)
-        {
-          mpz_mul_ui(&x,&b->n,SR_TO_INT(a));
-        }
-        else
-        {
-          mpz_mul_ui(&x,&b->n,-SR_TO_INT(a));
-          mpz_neg(&x,&x);
-        }
+        mpz_mul_si(&x,&b->n,SR_TO_INT(a));
         mpz_sub(&u->z,&x,&b->z);
         mpz_clear(&x);
         if (mpz_cmp_ui(&u->z,(long)0)==0)
@@ -1773,15 +1750,7 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
       {
         MP_INT x;
         mpz_init(&x);
-        if ((int)b>0)
-        {
-          mpz_mul_ui(&x,&a->n,SR_TO_INT(b));
-        }
-        else
-        {
-          mpz_mul_ui(&x,&a->n,-SR_TO_INT(b));
-          mpz_neg(&x,&x);
-        }
+        mpz_mul_si(&x,&a->n,SR_TO_INT(b));
         mpz_sub(&u->z,&a->z,&x);
         mpz_clear(&x);
         if (mpz_cmp_ui(&u->z,(long)0)==0)
@@ -1969,16 +1938,8 @@ number _nlMult_aImm_bImm_rNoImm(number a, number b)
   u->debug=123456;
 #endif
   u->s=3;
-  if ((int)b>0)
-  {
-    mpz_init_set_si(&u->z,(long)SR_TO_INT(a));
-    mpz_mul_ui(&u->z,&u->z,(unsigned long)SR_TO_INT(b));
-  }
-  else
-  {
-    mpz_init_set_si(&u->z,(long)(-SR_TO_INT(a)));
-    mpz_mul_ui(&u->z,&u->z,(long)(-SR_TO_INT(b)));
-  }
+  mpz_init_set_si(&u->z,(long)SR_TO_INT(a));
+  mpz_mul_si(&u->z,&u->z,(unsigned long)SR_TO_INT(b));
 #ifdef LDEBUG
   nlTest(u);
 #endif
