@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_poly.cc,v 1.5 1997-09-10 15:45:49 schmidt Exp $ */
+/* $Id: int_poly.cc,v 1.6 1997-10-10 10:37:01 schmidt Exp $ */
 
 #include <config.h>
 
@@ -80,11 +80,14 @@ InternalPoly::isUnivariate() const
     return true;
 }
 
+//{{{ int InternalPoly::degree ()
+// docu: see CanonicalForm::sign ()
 int
-InternalPoly::degree()
+InternalPoly::degree ()
 {
     return firstTerm->exp;
 }
+//}}}
 
 //{{{ int InternalPoly::sign () const
 // docu: see CanonicalForm::sign()
@@ -95,29 +98,41 @@ InternalPoly::sign () const
 }
 //}}}
 
+//{{{ CanonicalForm InternalPoly::lc (), Lc (), LC ()
+// docu: see CanonicalForm::lc(), Lc(), LC()
 CanonicalForm
-InternalPoly::lc()
+InternalPoly::lc ()
 {
     return firstTerm->coeff.lc();
 }
 
 CanonicalForm
-InternalPoly::LC()
+InternalPoly::Lc ()
 {
-    return firstTerm->coeff;
-}
-
-int
-InternalPoly::taildegree()
-{
-    return lastTerm->exp;
+    return firstTerm->coeff.Lc();
 }
 
 CanonicalForm
-InternalPoly::tailcoeff()
+InternalPoly::LC ()
+{
+    return firstTerm->coeff;
+}
+//}}}
+
+//{{{ CanonicalForm InternalPoly::tailcoeff (), int InternalPoly::taildegree ()
+// docu: see CanonicalForm::tailcoeff(), taildegree()
+CanonicalForm
+InternalPoly::tailcoeff ()
 {
     return lastTerm->coeff;
 }
+
+int
+InternalPoly::taildegree ()
+{
+    return lastTerm->exp;
+}
+//}}}
 
 CanonicalForm
 InternalPoly::coeff( int i )

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_poly.h,v 1.3 1997-06-19 12:22:35 schmidt Exp $ */
+/* $Id: int_poly.h,v 1.4 1997-10-10 10:36:16 schmidt Exp $ */
 
 #ifndef INCL_INT_POLY_H
 #define INCL_INT_POLY_H
@@ -59,6 +59,7 @@ public:
     Variable variable() const { return var; }
     int degree();
     CanonicalForm lc();
+    CanonicalForm Lc();
     CanonicalForm LC();
     int taildegree();
     CanonicalForm tailcoeff();
