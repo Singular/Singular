@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.38 1998-05-04 17:17:26 Singular Exp $ */
+/* $Id: tesths.cc,v 1.39 1998-05-06 11:54:43 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -60,17 +60,17 @@ static struct option longopts[] =
 #ifdef HAVE_MPSR
   {LON_BATCH,             0,  0,  'b'},
 #endif
+  {LON_EXECUTE,           1,  0,  'c'},
+  {LON_ECHO,              2,  0,  'e'},
   {LON_HELP,              0,  0,  'h'},
   {LON_QUIET,             0,  0,  'q'},
+  {LON_RANDOM,            1,  0,  'r'},
   {LON_NO_TTY,            0,  0,  't'},
+  {LON_USER_OPTION,       1,  0,  'u'},
   {LON_VERSION,           0,  0,  'v'},
 #ifdef HAVE_TCL
   {LON_TCLMODE,           0,  0,  'x'},
 #endif
-  {LON_ECHO,              2,  0,  'e'},
-  {LON_EXECUTE,           1,  0,  'c'},
-  {LON_RANDOM,            1,  0,  'r'},
-  {LON_USER_OPTION,       1,  0,  'u'},
   {LON_NO_STDLIB,         0,  0,  0},
   {LON_NO_RC,             0,  0,  0},
   {LON_MIN_TIME,          1,  0,  0},
