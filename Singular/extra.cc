@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.92 1999-06-09 11:53:42 mschulze Exp $ */
+/* $Id: extra.cc,v 1.93 1999-06-15 08:29:23 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -995,6 +995,19 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     {
       void mainOptionValues();
       mainOptionValues();
+      return FALSE;
+    }
+    else
+#endif
+/*==================== GF =================*/
+#if 0
+    if (strcmp(sys_cmd, "GF") == 0)
+    {
+      int c=rChar(currRing);
+      setCharacteristic( c, 2);
+      CanonicalForm F( convSingGFClapGF( (poly)h->Data() ) );
+      res->rtyp=POLY_CMD;
+      res->data=convClapGFSingGF( F );
       return FALSE;
     }
     else

@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.51 1999-06-14 16:25:42 Singular Exp $
+// $Id: clapsing.cc,v 1.52 1999-06-15 08:32:31 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -682,6 +682,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
 #endif
     }
   }
+  #if 0
   else if (rField_is_GF())
   {
     int c=rChar(currRing);
@@ -696,6 +697,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       goto notImpl;
     }
   }
+  #endif
   // and over Q(a) / Fp(a)
   else if (rField_is_Extension())
   {
@@ -774,8 +776,10 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       if (with_exps!=1) (**v)[j] = J.getItem().exp();
       if (rField_is_Zp() || rField_is_Q())           /* Q, Fp */
         res->m[j] = convClapPSingP( J.getItem().factor() );
+      #if 0
       else if (rField_is_GF())
         res->m[j] = convClapGFSingGF( J.getItem().factor() );
+      #endif
       else if (rField_is_Extension())     /* Q(a), Fp(a) */
       {
         if (currRing->minpoly==NULL)

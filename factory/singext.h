@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: singext.h,v 1.5 1998-06-08 15:40:54 schmidt Exp $ */
+/* $Id: singext.h,v 1.6 1999-06-15 08:34:02 Singular Exp $ */
 
 #ifndef INCL_SINGEXT_H
 #define INCL_SINGEXT_H
@@ -25,9 +25,13 @@ MP_INT gmp_numerator ( const CanonicalForm & f );
 
 MP_INT gmp_denominator ( const CanonicalForm & f );
 
+int gf_value (const CanonicalForm & f );
+
 CanonicalForm make_cf ( const MP_INT & n );
 
 CanonicalForm make_cf ( const MP_INT & n, const MP_INT & d, bool normalize );
+
+CanonicalForm make_cf_from_gf ( const int z );
 
 /*ENDPUBLIC*/
 

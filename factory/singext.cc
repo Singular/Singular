@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: singext.cc,v 1.2 1997-06-19 12:21:59 schmidt Exp $ */
+/* $Id: singext.cc,v 1.3 1999-06-15 08:34:18 Singular Exp $ */
 
 #include <config.h>
 
@@ -53,6 +53,12 @@ gmp_denominator ( const CanonicalForm & f )
     return result;
 }
 
+int gf_value (const CanonicalForm & f )
+{
+    InternalCF * ff = f.getval();
+    return ((int)ff) >>2; 
+}
+
 CanonicalForm
 make_cf ( const MP_INT & n )
 {
@@ -63,4 +69,9 @@ CanonicalForm
 make_cf ( const MP_INT & n, const MP_INT & d, bool normalize )
 {
     return CanonicalForm( CFFactory::rational( n, d, normalize ) );
+}
+
+CanonicalForm make_cf_from_gf ( const int z )
+{
+    return CanonicalForm(int2imm_gf(z));
 }
