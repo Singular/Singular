@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: nctools.lib,v 1.6 2004-07-29 16:47:07 levandov Exp $";
+version="$Id: nctools.lib,v 1.7 2004-08-05 15:59:55 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: nctools.lib     General tools for noncommutative algebras
@@ -650,7 +650,8 @@ proc RootOfUnity(int n)
 RETURN:  number, for use as minpoly
 NOTE: works only in field extensions by one element
 EXAMPLE: example RootOfUnity; shows examples
-"{
+"
+{
   if ( npars(basering) !=1 )
   {
     "the procedure works only with one parameter";
@@ -726,8 +727,8 @@ example
 proc Weyl(list #)
 "USAGE:   Weyl([p]); p an optional integer.
 RETURN:  nothing. Creates Weyl algebra structure in a basering. By default
-mimics { x(1..N),d(1..N) } realization. If p is given and is not zero,
-uses {x(1),d(1),x(2),d(2),... } realization.
+mimics ( x(1..N),d(1..N) ) realization. If p is given and is not zero,
+uses (x(1),d(1),x(2),d(2),... ) realization.
 EXAMPLE: example Weyl; shows examples
 "
 {
