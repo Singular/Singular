@@ -2729,7 +2729,7 @@ short ideal::add_new_generators()
 
 
 
-binomial& ideal::reduce(binomial& bin, BOOLEAN complete=TRUE) const
+binomial& ideal::reduce(binomial& bin, BOOLEAN complete) const
 {
 // As bin is reduced by a fixed set of binomials, it is sufficient to do
 // head reductions first, then tail reductions (cf. Pottier).
@@ -2858,8 +2858,8 @@ binomial& ideal::reduce(binomial& bin, BOOLEAN complete=TRUE) const
 
 
 
-ideal& ideal::reduced_Groebner_basis_1(const short& S_pair_criteria=11,
-                                       const float& interred_percentage=12.0)
+ideal& ideal::reduced_Groebner_basis_1(const short& S_pair_criteria,
+                                       const float& interred_percentage)
 {
   // set flags for the use of the S-pair criteria
   // for an explaination see in globals.h
@@ -2939,8 +2939,8 @@ ideal& ideal::reduced_Groebner_basis_1(const short& S_pair_criteria=11,
 
 
 
-ideal& ideal::reduced_Groebner_basis_1a(const short& S_pair_criteria=11,
-                                        const float& interred_percentage=12.0)
+ideal& ideal::reduced_Groebner_basis_1a(const short& S_pair_criteria,
+                                        const float& interred_percentage)
 {
   // set flags for the use of the S-pair criteria
   // for an explaination see in globals.h
@@ -3020,8 +3020,8 @@ ideal& ideal::reduced_Groebner_basis_1a(const short& S_pair_criteria=11,
 
 
 
-ideal& ideal::reduced_Groebner_basis_2(const short& S_pair_criteria=11,
-                                       const float& interred_percentage=12.0)
+ideal& ideal::reduced_Groebner_basis_2(const short& S_pair_criteria,
+                                       const float& interred_percentage)
 {
   // set flags for the use of the S-pair criteria
   // for an explaination see in globals.h
@@ -3101,8 +3101,8 @@ ideal& ideal::reduced_Groebner_basis_2(const short& S_pair_criteria=11,
 
 
 
-ideal& ideal::reduced_Groebner_basis_3(const short& S_pair_criteria=11,
-                                       const float& interred_percentage=12.0)
+ideal& ideal::reduced_Groebner_basis_3(const short& S_pair_criteria,
+                                       const float& interred_percentage)
 {
   // set flags for the use of the S-pair criteria
   // for an explaination see in globals.h
@@ -3167,9 +3167,9 @@ ideal& ideal::reduced_Groebner_basis_3(const short& S_pair_criteria=11,
 
 
 
-ideal& ideal::reduced_Groebner_basis(const short& version=1,
-                                     const short& S_pair_criteria=11,
-                                     const float& interred_percentage=12.0)
+ideal& ideal::reduced_Groebner_basis(const short& version,
+                                     const short& S_pair_criteria,
+                                     const float& interred_percentage)
 {
   switch(version)
   {

@@ -159,7 +159,7 @@ void SWAPK(const short& k, const short& k_max, BigInt** b, BigInt** H,
 
   BigInt _lambda=lambda[k][k-1];
 
-  if(_lambda==0)
+  if(_lambda==(const BigInt&)0)
   {
     d[k]=d[k-1];
     f[k-1]=0;
@@ -234,7 +234,7 @@ short relations(BigInt **b, const short& number_of_vectors,
     short r=1;    // Suppose the only column of the matrix is zero.
 
     for(short m=0;m<vector_dimension;m++)
-      if(b[0][m]!=0)
+      if(b[0][m]!=(const BigInt&)0)
         // nonzero entry detected
         r=0;
 
@@ -295,7 +295,7 @@ short relations(BigInt **b, const short& number_of_vectors,
         H[n][l]=0;
   // Now, H equals the matrix I_(number_of_vectors).
 
-  if(t!=0)
+  if(t!=(const BigInt&)0)
   {
     d[1]=t;
     f[0]=1;
@@ -342,7 +342,7 @@ short relations(BigInt **b, const short& number_of_vectors,
             lambda[k][j]=u;
           else
             // j==k
-            if(u!=0)
+            if(u!=(const BigInt&)0)
             {
               d[k+1]=u;
               f[k]=1;
@@ -531,7 +531,7 @@ short integral_LLL(BigInt** b, const short& number_of_vectors,
           d[k+1]=u;
       }
 
-      if(d[k+1]==0)
+      if(d[k+1]==(const BigInt&)0)
       {
         cerr<<"\nERROR: void integral_LLL(BigInt**, const short&, const "
           "short&):\ninput vectors must be linearly independent"<<endl;
@@ -546,7 +546,9 @@ short integral_LLL(BigInt** b, const short& number_of_vectors,
     {
       REDI_IL(k,k-1,b,vector_dimension,d,lambda);
 
-      if(4*d[k+1]*d[k-1] < 3*d[k]*d[k] - lambda[k][k-1]*lambda[k][k-1])
+      //if(4*d[k+1]*d[k-1] < 3*d[k]*d[k] - lambda[k][k-1]*lambda[k][k-1])
+      if((const BigInt&)4*d[k+1]*d[k-1]
+          < (const BigInt&)3*d[k]*d[k] - lambda[k][k-1]*lambda[k][k-1])
       {
         SWAPI(k,k_max,b,d,lambda);
         if(k>1)

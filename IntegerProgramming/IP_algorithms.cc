@@ -60,10 +60,10 @@ void print_flags(ofstream& output)
 
 
 int Conti_Traverso(INPUT_FILE MATRIX,
-                   const short& version=1,
-                   const short& S_pair_criteria=11,
-                   const float& interred_percentage=12.0,
-                   const BOOLEAN& verbose=FALSE)
+                   const short& version,
+                   const short& S_pair_criteria,
+                   const float& interred_percentage,
+                   const BOOLEAN& verbose)
 {
 
 
@@ -348,10 +348,10 @@ int Conti_Traverso(INPUT_FILE MATRIX,
 
 
 int Positive_Conti_Traverso(INPUT_FILE MATRIX,
-                            const short& version=1,
-                            const short& S_pair_criteria=11,
-                            const float& interred_percentage=12.0,
-                            const BOOLEAN& verbose=FALSE)
+                            const short& version,
+                            const short& S_pair_criteria,
+                            const float& interred_percentage,
+                            const BOOLEAN& verbose)
 {
 
 
@@ -645,10 +645,10 @@ int Positive_Conti_Traverso(INPUT_FILE MATRIX,
 
 
 int Elim_Conti_Traverso(INPUT_FILE MATRIX,
-                        const short& version=1,
-                        const short& S_pair_criteria=11,
-                        const float& interred_percentage=12.0,
-                        const BOOLEAN& verbose=FALSE)
+                        const short& version,
+                        const short& S_pair_criteria,
+                        const float& interred_percentage,
+                        const BOOLEAN& verbose)
 {
 
 
@@ -934,10 +934,10 @@ int Elim_Conti_Traverso(INPUT_FILE MATRIX,
 
 
 int Pottier(INPUT_FILE MATRIX,
-            const short& version=1,
-            const short& S_pair_criteria=11,
-            const float& interred_percentage=12.0,
-            const BOOLEAN& verbose=FALSE)
+            const short& version,
+            const short& S_pair_criteria,
+            const float& interred_percentage,
+            const BOOLEAN& verbose)
 {
 
 
@@ -1222,10 +1222,10 @@ int Pottier(INPUT_FILE MATRIX,
 
 
 int Hosten_Sturmfels(INPUT_FILE MATRIX,
-                     const short& version=1,
-                     const short& S_pair_criteria=11,
-                     const float& interred_percentage=12.0,
-                     const BOOLEAN& verbose=FALSE)
+                     const short& version,
+                     const short& S_pair_criteria,
+                     const float& interred_percentage,
+                     const BOOLEAN& verbose)
 {
 
 
@@ -1633,10 +1633,10 @@ int Hosten_Sturmfels(INPUT_FILE MATRIX,
 
 
 int DiBiase_Urbanke(INPUT_FILE MATRIX,
-                    const short& version=1,
-                    const short& S_pair_criteria=11,
-                    const float& interred_percentage=12.0,
-                    const BOOLEAN& verbose=FALSE)
+                    const short& version,
+                    const short& S_pair_criteria,
+                    const float& interred_percentage,
+                    const BOOLEAN& verbose)
 {
 
 
@@ -1999,10 +1999,10 @@ int DiBiase_Urbanke(INPUT_FILE MATRIX,
 
 
 int Bigatti_LaScala_Robbiano(INPUT_FILE MATRIX,
-                             const short& version=1,
-                             const short& S_pair_criteria=11,
-                             const float& interred_percentage=12.0,
-                             const BOOLEAN& verbose=FALSE)
+                             const short& version,
+                             const short& S_pair_criteria,
+                             const float& interred_percentage,
+                             const BOOLEAN& verbose)
 {
 
 
@@ -3362,10 +3362,10 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
 
 
 int change_cost(INPUT_FILE GROEBNER, INPUT_FILE NEW_COST,
-                const short& version=1,
-                const short& S_pair_criteria=11,
-                const float& interred_percentage=12.0,
-                const BOOLEAN& verbose=FALSE)
+                const short& version,
+                const short& S_pair_criteria,
+                const float& interred_percentage,
+                const BOOLEAN& verbose)
 {
 
   char format_string[128];
