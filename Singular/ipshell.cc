@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.13 1997-08-11 15:53:19 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.14 1997-08-14 09:07:43 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -186,7 +186,7 @@ void type_cmd(idhdl h)
   pShortOut=saveShortOut;
 }
 
-void killlocals0(int v, idhdl * localhdl)
+static void killlocals0(int v, idhdl * localhdl)
 {
   idhdl h = *localhdl;
   while (h!=NULL)
@@ -593,7 +593,7 @@ void  iiMakeResolv(resolvente r, int length, int rlen, char * name, int typ0,
 //  return r;
 //}
 
-resolvente iiCopyRes(resolvente r, int l)
+static resolvente iiCopyRes(resolvente r, int l)
 {
   int i;
   resolvente res=(ideal *)Alloc0((l+1)*sizeof(ideal));
