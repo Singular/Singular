@@ -15,8 +15,9 @@ void main_init(int argc, char *argv[])
 {
   char c, *file=NULL;
 
-  while(optind<argc) {
-    switch(c=getopt(argc, argv, "d:sf:"))
+  while((c=getopt(argc, argv, "d:sf:"))>=0) {
+    
+    switch(c)
       {
       case 'd':
 	lpverbose = 1;
