@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: prProcs.h,v 1.4 2000-09-04 13:39:06 obachman Exp $ */
+/* $Id: prProcs.h,v 1.5 2000-09-07 07:39:09 Singular Exp $ */
 /*
 *  ABSTRACT -  Declaration of Routines for primitive poly arithmetic
 */
@@ -20,7 +20,7 @@
 // Returns:  p*n
 // Destroys: p
 // Const:    n
-poly pr_Mult_n_General(poly p, number n)
+poly pr_Mult_n_General(poly p, number n);
 
 /////////////////////////////////////////////////////////////////////////
 // Returns:  p + q, *lp == pLength(p+q), p+q are from heap
