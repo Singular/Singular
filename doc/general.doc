@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.78 1998-05-18 14:51:38 Singular Exp $
+@comment $Id: general.doc,v 1.79 1998-05-18 15:51:58 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -803,7 +803,8 @@ Algorithm: the intersection of the zero sets is the zero set of the given ideal
 @item fglm
 @ref{fglm}
 @*computes the Groebner basis provided that a reduced Groebner basis w.r.t.
-another ordering is known
+another ordering is known (implements the so-called FGLM
+(Faugere, Gianni, Lazard, Mora)  algorithm)
 @*The given ideal must be zero-dimensional.
 @item mstd
 @ref{mstd}
