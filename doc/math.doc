@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.19 1998-05-16 23:14:53 gorzel Exp $
+@comment $Id: math.doc,v 1.20 1998-05-18 13:42:59 Singular Exp $
 @comment this file contains the mathematical background of Singular
 This chapter introduces some of the mathematical notions and definitions used
 throughout the manual. Most sections are only a collection of the
@@ -675,7 +675,7 @@ $\left(\matrix{
  }\right)$
 @end tex
 
-Product orderings represented by  a matrix:
+Product orderings (see next section) represented by  a matrix:
 
 @ifinfo
 @table @asis
@@ -929,7 +929,7 @@ f_1, @dots{}, f_s in I is called a @strong{standard basis} of I if
 A function $NF : K[\underline{x}]^r \times \{G | G\  standard basis\} \to K[\underline{x}]^r, (p,G) \mapsto NF(p|G)$, is called a {\bf normal form}
 if for any $p \in K[\underline{x}]^r$ and any $G$ the following holds:  if $NF(p|G)
 \not= 0$ then $L(g) \not| L(NF(p|G))$ for all $g \in G$.   $NF(g|G)$ is called
-the {\bf normal form of} $\bf p$ {\bf with respect to} $\bf G$.
+a {\bf normal form of} $\bf p$ {\bf with respect to} $\bf G$ (such a function is not unique).
 @end tex
 @ifinfo
 A function NF : K[x]^r x @{G | G  standard basis@} -> K[x]^r, (p,G) -> NF(p|G),
@@ -949,10 +949,13 @@ f in I iff NF(f,std(I)) = 0 for I in R resp. I in R^r.
 @item Hilbert function:
 @tex
 Let $I \subseteq K[\underline{x}]^r$ be homogeneous, then the Hilbert function
+$H_I$ of the ideal $I$
+and the Hilbert function $H_L(I)$ of the leading ideal $L(I)$  coincides.
 $H_I=H_{L(I)}$.
 @end tex
 @ifinfo
-Let I inK[x]^r be homogeneous, then the Hilbert function H_I=H_L(I).
+Let I inK[x]^r be homogeneous, then the Hilbert function H_I of the ideal I
+and the Hilbert function H_L(I) of the leading ideal L(I) coincides.
 @end ifinfo
 @end table
 
@@ -964,9 +967,9 @@ Let I inK[x]^r be homogeneous, then the Hilbert function H_I=H_L(I).
 @tex
 Let M $=\bigoplus M_i$ be a graded module over $K[x_1,...,x_n]$.
 The {\bf Hilbert function of M} $H_M$ is defined by
-$$H_M(t)=dim_K K[\underline{x}]_t/M_t.$$
-The {\bf Hilbert series  of M} is the power series
-$$HP_M(t)=\sum_{i=-\infty}^\infty H_M(i)=\sum_{i=-\infty}^\infty dim_K M_i t^i$$
+$$H_M(t)=dim_K M_t.$$
+The {\bf Hilbert-Poincare series  of M} is the power series
+$$HP_M(t)=\sum_{i=-\infty}^\infty H_M(i)t^i=\sum_{i=-\infty}^\infty dim_K M_i t^i$$
 It turns out that $HP_M(t)$ can be written in two useful ways:
 $$HP_M(t)={Q(t)\over (1-t)^n}={P(t)\over (1-t)^{dim(M)}}$$
 where Q(t) and P(t) are polynomials from Z[t].
@@ -977,7 +980,7 @@ and P(t) the {\bf second Hilbert series}.
 Let M =(+) M_i be a graded module over K[x_1,...,x_n].
 The Hilbert function of M H_M is defined by
 H_M(t)=dim_K K[x]_t/M_t.@*
-The Hilbert series  of M is the power series
+The Hilbert-Poincare series  of M is the power series
 HP_M(t)=sum_i dim_K (M_i)*t^i.@*
 It turns out that HP_M(t) can be written in two useful ways:
 H_M(t)=Q(t)/(1-t)^n=P(t)/(1-t)^dim(M).
@@ -987,11 +990,13 @@ Q(t) is called first Hilbert series, and P(t) the second Hilbert series.
 
 @tex
 If $P(t)=\sum_{k=0}^N a_k t^k$
-then $H_M(s)=\sum_{k=1}^N a_k$ ${d+n-k-1}\choose{d-1}$ for $s \ge N$.
+then $H_M(s)=\sum_{k=1}^N a_k$ ${d+n-k-1}\choose{d-1}$
+(the {\bf Hilbert polynomial}) for $s \ge N$.
 @end tex
 @ifinfo
 If P(t)=\sum_(k=0)^N a_k t^k
-then H_M(s)=sum_(k=1)^N a_k binomial(d+n-k-1,d-1) for s >= N.
+then H_M(s)=sum_(k=1)^N a_k binomial(d+n-k-1,d-1) (the Hilbert polynomial)
+for s >= N.
 @end ifinfo
 @c ---------------------------------------------------------------------------
 @node Syzygies and resolutions, Characteritic sets, Hilbert function, Mathematical background
