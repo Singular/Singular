@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.64 2001-01-30 13:37:02 Singular Exp $ */
+/* $Id: ring.h,v 1.65 2001-02-09 14:03:00 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -264,4 +264,8 @@ void rKillModifiedRing(ring r);
 
 void rDebugPrint(ring r);
 void pDebugPrint(poly p);
+
+int * rGetWeightVec(ring r);
+void rSetWeightVec(ring r, int *);
+
 #endif

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.159 2001-02-08 12:55:52 Singular Exp $ */
+/* $Id: ring.cc,v 1.160 2001-02-09 14:03:00 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -3862,3 +3862,20 @@ n_coeffType rFieldType(ring r)
   if (rField_is_long_C(r)) return n_long_C;
   return n_unknown;
 }
+
+int * rGetWeightVec(ring r)
+{
+  assume(r!=NULL);
+  assume(r->OrdSize>0);
+  assume(r->typ[0].ord_typ==ro_wp);
+  return (r->typ[0].data.wp.weights);
+}
+
+void rSetWeightVec(ring r, int *wv)
+{
+  assume(r!=NULL);
+  assume(r->OrdSize>0);
+  assume(r->typ[0].ord_typ==ro_wp);
+  memcpy(r->typ[0].data.wp.weights,wv,r->N*sizeof(int));
+}
+
