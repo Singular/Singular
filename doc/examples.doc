@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.17 1998-05-18 14:51:37 Singular Exp $
+@comment $Id: examples.doc,v 1.18 1998-05-18 19:12:43 wichmann Exp $
 @comment this file contains the examples
 
 @ifinfo
@@ -208,7 +208,7 @@ lists may be empty.)
   @itemize @bullet
   @item
   'proc mil' which must be called with one parameter, a polynomial.
-  The name g is local to the procedure and will be killed automatically.
+  The name g is local to the procedure and is killed automatically.
   @code{mil} returns the Milnor number (and displays a comment).
   @item
   'proc tjur' where the parameters are not specified. They are referred
@@ -680,7 +680,7 @@ There are default names for the objects created, but the user may also
 choose his own names.
 @item
 If the user sets @code{printlevel=2;} before running @code{versal}, some
-intermediate results will be shown. This is useful since @code{versal}
+intermediate results are shown. This is useful since @code{versal}
 is already complicated and since it might run quite long on more
 complicated examples. (type @code{help versal;})
 @end itemize
@@ -724,7 +724,7 @@ the miniversal deformations:
   matrix m[2][4]=x,y,z,u,y,z,u,v;
   ideal i=minor(m,2);                 // 2x2 minors of matrix m
   int time=timer;
-  // Def_r will be the name of the miniversal base space with
+  // Def_r is the name of the miniversal base space with
   // parameters A(1),...,A(4)
   versal(i,0,"Def_r","A(");
   "// used time:",timer-time,"sec";   // time for miniversal
@@ -1729,7 +1729,7 @@ another.
   displayHNE(hn);  // Hamburger-Noether development
   setring s;
   displayInvariants(hn);
-  // invariants(hn); will return the invariants as list
+  // invariants(hn);  returns the invariants as list
                    // partial parametrization of f
                    // param takes the first variable as
   param(hn);       // except the ring has >2 variables
