@@ -314,6 +314,15 @@ case "$ac_cv_singuname" in
 	        ac_lib_dl=yes
 	  fi
 	;;
+	SunOS-5)
+	  AC_CHECK_LIB(dl, dlopen)
+          if test "$ac_cv_lib_dl_dlopen" = yes; then
+	  	LD_DYN_FLAGS="-ldl -Xlinker -E"
+	  	SFLAGS="-fpic -DPIC"
+	  	SLDFLAGS=-shared
+	        ac_lib_dl=yes
+	  fi
+	;;
         IRIX-6)
           LD_DYN_FLAGS="-lc"
 	  ac_lib_dl=yes
@@ -795,7 +804,7 @@ else
 fi
 
 AC_MSG_CHECKING(whether to have dynamic modules)
-if test "$with_dynamic_modules" == no || test "$ac_have_dl" != yes; then
+if test "$with_dynamic_modules" = no || test "$ac_have_dl" != yes; then
   AC_MSG_RESULT(no)
 else
   AC_DEFINE(HAVE_DYNAMIC_LOADING)

@@ -11,7 +11,7 @@
  *           have to be defined before this file is included
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Set.h,v 1.3 2000-12-31 15:14:40 obachman Exp $
+ *  Version: $Id: p_Procs_Set.h,v 1.4 2001-03-08 13:05:15 Singular Exp $
  *******************************************************************/
 
 // extract p_Procs properties from a ring
@@ -134,9 +134,9 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
   p_Ord       ord = p_OrdIs(r);
   
   assume(p_Procs != NULL);
-#ifdef RDEBUG
+//#ifdef RDEBUG
   memset(p_Procs, 0, sizeof(p_Procs_s));
-#endif
+//#endif
   _p_procs = p_Procs;
   assume(IsValidSpec(field, length, ord));
 
@@ -158,9 +158,11 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
   CheckProc(p_Merge_q);
   CheckProc(p_kBucketSetLm);
 
+/*
   assume(p_Procs->pp_Mult_mm_Noether != pp_Mult_mm_Noether__FieldGeneral_LengthGeneral_OrdGeneral || 
          p_Procs->p_Minus_mm_Mult_qq == p_Minus_mm_Mult_qq__FieldGeneral_LengthGeneral_OrdGeneral || 
          r->OrdSgn == 1 || r->LexOrder);
+*/
 }
 
 #ifdef RDEBUG 

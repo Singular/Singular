@@ -6,7 +6,7 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_polys.cc,v 1.15 2001-01-09 15:40:12 Singular Exp $
+ *  Version: $Id: p_polys.cc,v 1.16 2001-03-08 13:05:15 Singular Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -336,6 +336,10 @@ long pLDeg0(poly p,int *l, ring r)
 */
 long pLDeg0c(poly p,int *l, ring r)
 {
+  assume(p!=NULL);
+#ifdef PDEBUG
+  _p_Test(p,r,PDEBUG);
+#endif
   p_CheckPolyRing(p, r);
   long o;
   int ll=1;
@@ -360,6 +364,9 @@ long pLDeg0c(poly p,int *l, ring r)
       else break;
       pp = p;
     }
+#ifdef PDEBUG
+    _p_Test(pp,r,PDEBUG);
+#endif
     o = r->pFDeg(pp, r);
   }
   *l=ll;

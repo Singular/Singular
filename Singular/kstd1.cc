@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.82 2001-02-28 11:56:27 levandov Exp $ */
+/* $Id: kstd1.cc,v 1.83 2001-03-08 13:05:11 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1198,7 +1198,8 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // build new pairs
       enterpairs(strat->P.p,strat->sl,strat->P.ecart,0,strat, strat->tl);
       // put in S
-      strat->enterS(strat->P, posInS(strat,strat->sl,strat->P.p),
+      strat->enterS(strat->P,
+                    posInS(strat,strat->sl,strat->P.p, strat->P.ecart),
                     strat, strat->tl);
 
       // apply hilbert criterion
@@ -1523,6 +1524,7 @@ long kModDeg(poly p, ring r)
   long o=pWDegree(p, r);
   long i=p_GetComp(p, r);
   if (i==0) return o;
+  assume((i>0) && (i<=kModW->length()));
   return o+(*kModW)[i-1];
 }
 long kHomModDeg(poly p, ring r)

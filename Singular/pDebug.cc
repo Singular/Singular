@@ -6,7 +6,7 @@
  *  Purpose: implementation of debug related poly routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pDebug.cc,v 1.17 2000-12-06 11:03:26 Singular Exp $
+ *  Version: $Id: pDebug.cc,v 1.18 2001-03-08 13:05:14 Singular Exp $
  *******************************************************************/
 
 #ifndef PDEBUG_CC
@@ -227,6 +227,8 @@ BOOLEAN _p_Test(poly p, ring r, int level)
     pPolyAssumeReturnMsg(p->coef != NULL || (n_GetChar(r) >= 2), "NULL coef");
     pPolyAssumeReturnMsg(!n_IsZero(p->coef, r), "Zero coef");
 
+    // check for valid comp
+    pPolyAssumeReturnMsg(p_GetComp(p, r) >= 0 && (p_GetComp(p, r)<65000), "component out of range ?");
     // check for mix poly/vec representation 
     pPolyAssumeReturnMsg(ismod == (p_GetComp(p, r) > 0), "mixed poly/vector");
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.73 2001-02-21 10:39:25 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.74 2001-03-08 13:05:12 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -598,7 +598,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
       // get the polynomial (canonicalize bucket, make sure P.p is set)
       strat->P.GetP(strat->lmBin);
 
-      int pos=posInS(strat,strat->sl,strat->P.p);
+      int pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
 
       // reduce the tail and normailze poly
       if (TEST_OPT_INTSTRATEGY)
