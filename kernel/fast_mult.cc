@@ -1,13 +1,13 @@
 #include "fast_mult.h"
 #include "kbuckets.h"
-typedef poly fastmultrec(poly f, poly g);
+typedef poly fastmultrec(poly f, poly g, ring r);
 static const int pass_option=1;
-static void degsplit(poly p,int n,poly &p1,poly&p2, int vn){
+static void degsplit(poly p,int n,poly &p1,poly&p2, int vn, ring r){
   poly erg1_i, erg2_i;
   erg1_i=NULL;
   erg2_i=NULL;
   while(p){
-    if(pGetExp(p,vn)>=n){
+    if(p_GetExp(p,vn,r)>=n){
       if (p1==NULL){
 	p1=p;
       } else{
@@ -32,16 +32,16 @@ static void degsplit(poly p,int n,poly &p1,poly&p2, int vn){
   }
   
 }
-static void div_by_x_power_n(poly p, int n, int vn){
+static void div_by_x_power_n(poly p, int n, int vn, ring r){
   while(p){
-    assume(pGetExp(p,vn)>=n);
-    int e=pGetExp(p,vn);
-    pSetExp(p,vn,e-n);
+    assume(p_GetExp(p,vn,r)>=n);
+    int e=p_GetExp(p,vn,r);
+    p_SetExp(p,vn,e-n,r);
     p=pNext(p);
   }
 }
 
-static poly do_unifastmult(poly f,int df,poly g,int dg, int vn, fastmultrec rec){
+static poly do_unifastmult(poly f,int df,poly g,int dg, int vn, fastmultrec rec, ring r){
   int n=1;
   if ((f==NULL)||(g==NULL)) return NULL;
   //int df=pGetExp(f,vn);//pFDeg(f);
@@ -58,7 +58,7 @@ static poly do_unifastmult(poly f,int df,poly g,int dg, int vn, fastmultrec rec)
       n*=2;
     }
   if(n==1){
-    return(ppMult_qq(f,g));
+    return(pp_Mult_qq(f,g,r));
   }
   
   int pot=n/2;
@@ -68,25 +68,25 @@ static poly do_unifastmult(poly f,int df,poly g,int dg, int vn, fastmultrec rec)
   //splitting
   poly f1=NULL;
   poly f0=NULL;//f-(x^(pot)*F1);
-  degsplit(pCopy(f),pot,f1,f0,vn);
-  div_by_x_power_n(f1,pot,vn);
+  degsplit(p_Copy(f,r),pot,f1,f0,vn,r);
+  div_by_x_power_n(f1,pot,vn,r);
 
   poly g1=NULL;
   poly g0=NULL;
-  degsplit(pCopy(g),pot,g1,g0,vn);
-  div_by_x_power_n(g1,pot,vn);
+  degsplit(p_Copy(g,r),pot,g1,g0,vn,r);
+  div_by_x_power_n(g1,pot,vn,r);
   
   //p00, p11
-  poly p00=rec(f0,g0);//unifastmult(f0,g0);
-  poly p11=rec(f1,g1);
+  poly p00=rec(f0,g0,r);//unifastmult(f0,g0);
+  poly p11=rec(f1,g1,r);
 
   //construct erg, factor
   poly erg=NULL;
   poly factor=pOne();
 
-  pSetExp(factor,vn,n);
-  erg=ppMult_mm(p11,factor);
-  erg=pAdd(erg,pCopy(p00));
+  p_SetExp(factor,vn,n,r);
+  erg=pp_Mult_mm(p11,factor,r);
+  erg=p_Add_q(erg,p_Copy(p00,r),r);
 
   
 
@@ -95,44 +95,44 @@ static poly do_unifastmult(poly f,int df,poly g,int dg, int vn, fastmultrec rec)
   if((f1!=NULL) &&(f0!=NULL) &&(g0!=NULL) && (g1!=NULL)){
     //if(true){
     //eat up f0,f1,g0,g1
-    poly s1=pAdd(f0,f1);
-    poly s2=pAdd(g0,g1);
-    poly pbig=rec(s1,s2);
-    pDelete(&s1);
-    pDelete(&s2);
+    poly s1=p_Add_q(f0,f1,r);
+    poly s2=p_Add_q(g0,g1,r);
+    poly pbig=rec(s1,s2,r);
+    p_Delete(&s1,r);
+    p_Delete(&s2,r);
 
  
     //eat up pbig
     poly sum=pbig;
-    pSetExp(factor,vn,pot);
+    p_SetExp(factor,vn,pot,r);
   
     //eat up p00
-    sum=pAdd(sum,pNeg(p00));
+    sum=p_Add_q(sum,p_Neg(p00,r),r);
  
     //eat up p11
-    sum=pAdd(sum,pNeg(p11));
+    sum=p_Add_q(sum,p_Neg(p11,r),r);
 
   
-    sum=pMult_mm(sum,factor);
+    sum=p_Mult_mm(sum,factor,r);
 
 
     //eat up sum
-    erg=pAdd(sum,erg);
+    erg=p_Add_q(sum,erg,r);
   } else {
     //eat up f0,f1,g0,g1 
-    poly s1=unifastmult(f0,g1);
-    poly s2=unifastmult(g0,f1);
-    pSetExp(factor,vn,pot);
-    poly h=pMult_mm(((s1!=NULL)?s1:s2),factor);
+    poly s1=rec(f0,g1,r);
+    poly s2=rec(g0,f1,r);
+    p_SetExp(factor,vn,pot,r);
+    poly h=p_Mult_mm(((s1!=NULL)?s1:s2),factor,r);
     pDelete(&f1);
     pDelete(&f0);
     pDelete(&g0);
     pDelete(&g1);
-    erg=pAdd(erg,h);
+    erg=p_Add_q(erg,h,r);
   }
   
  
-  pDelete(&factor);
+  p_Delete(&factor,r);
 		  
 		  
 
@@ -229,27 +229,27 @@ static inline int max(int a, int b){
 static inline int min(int a, int b){
   return (a>b)? b:a;
 }
-poly unifastmult(poly f,poly g){
+poly unifastmult(poly f,poly g, ring r){
   int vn=1;
   if((f==NULL)||(g==NULL)) return NULL;
-  int df=pGetExp(f,vn);
-  int dg=pGetExp(g,vn);
+  int df=p_GetExp(f,vn,r);
+  int dg=p_GetExp(g,vn,r);
   if ((df==0)||(dg==0))
-    return ppMult_qq(f,g);
+    return pp_Mult_qq(f,g,r);
   if (df*dg<100)
-    return ppMult_qq(f,g);
+    return pp_Mult_qq(f,g,r);
   // if (df*dg>10000)
   //  return
   //    do_unifastmult_buckets(f,g);
   //else
-  return do_unifastmult(f,df,g,dg,vn,unifastmult);
+  return do_unifastmult(f,df,g,dg,vn,unifastmult,r);
 
 }
 
-poly multifastmult(poly f, poly g){
+poly multifastmult(poly f, poly g, ring r){
   if((f==NULL)||(g==NULL)) return NULL;
   if (pLength(f)*pLength(g)<100)
-    return ppMult_qq(f,g);
+    return pp_Mult_qq(f,g,r);
   //find vn
   //determine df,dg simultaneously
   int i;
@@ -257,20 +257,20 @@ poly multifastmult(poly f, poly g){
   int can_df=0;
   int can_dg=0;
   int can_crit=0;
-  for(i=1;i<=pVariables;i++){
+  for(i=1;i<=rVar(r);i++){
     poly p;
     int df=0;
     int dg=0;
     //max min max Strategie
     p=f;
     while(p){
-      df=max(df,pGetExp(p,i));
+      df=max(df,p_GetExp(p,i,r));
       p=pNext(p);
     }
     if(df>can_crit){
       p=g;
       while(p){
-	dg=max(dg,pGetExp(p,i));
+	dg=max(dg,p_GetExp(p,i,r));
 	p=pNext(p);
       }
       int crit=min(df,dg);
@@ -283,7 +283,11 @@ poly multifastmult(poly f, poly g){
     }
   }
   if(can_crit==0)
-    return ppMult_qq(f,g);
+    return pp_Mult_qq(f,g,r);
   else
-    return do_unifastmult(f,can_df,g,can_dg,can_i,multifastmult);
+    {
+      poly erg=do_unifastmult(f,can_df,g,can_dg,can_i,multifastmult,r);
+      p_Normalize(erg,r);
+      return(erg);
+    }
 }

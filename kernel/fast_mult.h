@@ -2,6 +2,6 @@
 #define fast_mult_header
 #include "mod2.h"
 #include "polys.h"
-poly unifastmult(poly f,poly g);
-poly multifastmult(poly f, poly g);
+poly unifastmult(poly f,poly g, ring r);
+poly multifastmult(poly f, poly g, ring r);
 #endif
