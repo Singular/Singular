@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.h,v 1.17 2003-01-31 09:09:46 Singular Exp $ */
+/* $Id: modulop.h,v 1.18 2003-02-10 18:23:21 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -160,8 +160,13 @@ static inline BOOLEAN npIsZeroM (number  a)
 #ifdef NV_OPS
 static inline number nvMultM(number a, number b)
 {
+#if SIZEOF_LONG == 4
+#define ULONG64 unsigned long long
+#else
+#define ULONG64 unsigned long
+#endif
   return (number) 
-    ((((unsigned long long) a)*((unsigned long long) b)) % ((unsigned long long) npPrimeM));
+    ((((ULONG64) a)*((ULONG64) b)) % ((ULONG64) npPrimeM));
 }
 number  nvMult        (number a, number b);
 number  nvDiv         (number a, number b);
