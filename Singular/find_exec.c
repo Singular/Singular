@@ -12,7 +12,7 @@
 
 #include "mod2.h"
 
-#if ! defined(MSDOS) && ! defined(macintosh) && \
+#if ! defined(MSDOS) && ! defined(__MWERKS__) && \
     defined(HAVE_SYS_TYPES_H) && defined(HAVE_PWD_H)&&defined(HAVE_SYS_PARAM_H)
 
 #include <sys/types.h>
@@ -180,6 +180,6 @@ char* find_executable (const char *name)
   return NULL;
 }
 
-#endif /* #if ! defined(MSDOS) && ! defined(macintosh) && defined(HAVE_SYS_TYPES_H) && defined(HAVE_PWD_H)&&defined(HAVE_SYS_PARAM_H) */
+#endif /* #if ! defined(MSDOS) && ! defined(__MWERKS__) && defined(HAVE_SYS_TYPES_H) && defined(HAVE_PWD_H)&&defined(HAVE_SYS_PARAM_H) */
 
 
