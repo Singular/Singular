@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.16 1998-05-04 13:44:47 Singular Exp $ */
+/* $Id: febase.h,v 1.17 1998-05-25 21:28:31 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -28,6 +28,7 @@ extern FILE *myfopen(char *path, char *mode);
 extern size_t myfread(void *ptr, size_t size, size_t nmemb, FILE *stream);
 
 extern char*  feErrors;
+extern int    feErrorsLen;
 extern FILE*  feProtFile;
 extern FILE*  feFilePending; /*temp. storage for grammar.y */
 extern char   fe_promptstr[];

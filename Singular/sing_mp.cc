@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_mp.cc,v 1.16 1998-05-12 10:35:24 obachman Exp $ */
+/* $Id: sing_mp.cc,v 1.17 1998-05-25 21:28:32 obachman Exp $ */
 
 /*
 * ABSTRACT: interface to MP links
@@ -461,7 +461,8 @@ int Batch_ReadEval(si_link silink)
     if (feErrors != NULL)
     {
       if (v != NULL) v->CleanUp();
-      v = mpsr_InitLeftv(STRING_CMD, (void *) feErrors);
+      v = mpsr_InitLeftv(STRING_CMD, (void *) mstrdup(feErrors));
+      Free(feErrors, feErrorsLen);
       feErrors = NULL;
     }
 

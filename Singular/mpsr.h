@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr.h,v 1.8 1998-04-21 10:59:27 obachman Exp $ */
+/* $Id: mpsr.h,v 1.9 1998-05-25 21:28:32 obachman Exp $ */
 /***************************************************************
  *
  * File:       mpsr.h
@@ -117,7 +117,8 @@ inline void mpsr_InitTempArray(int length)
 {
   if (gTa_Length < length)
     {
-      Free(gTa, gTa_Length*sizeof(MP_Sint32_t));
+      if (gTa != NULL)
+        Free(gTa, gTa_Length*sizeof(MP_Sint32_t));
       gTa = (MP_Sint32_t *) Alloc((length)*sizeof(MP_Sint32_t));
       gTa_Length = length;
     }

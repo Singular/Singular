@@ -1,7 +1,7 @@
-// $Id: standard.lib,v 1.15 1998-05-25 08:44:14 obachman Exp $
+// $Id: standard.lib,v 1.16 1998-05-25 21:28:33 obachman Exp $
 //////////////////////////////////////////////////////////////////////////////
 
-version="$Id: standard.lib,v 1.15 1998-05-25 08:44:14 obachman Exp $";
+version="$Id: standard.lib,v 1.16 1998-05-25 21:28:33 obachman Exp $";
 info="
 LIBRARY: standard.lib   PROCEDURES WHICH ARE ALWAYS LOADED AT START-UP
 
@@ -150,8 +150,9 @@ EXAMPLE: example groebner; shows an example"
     {
       if (typeof(#[1]) == "int")
       {
-        int wait = #[1] * 1000000;
-        int j,k = 10, 0;
+        int wait = #[1];
+        int j = 10;
+        
         string bs = nameof(basering);
         link l_fork = "MPtcp:fork";
         open(l_fork);
@@ -159,13 +160,24 @@ EXAMPLE: example groebner; shows an example"
         int pid = read(l_fork);
         write(l_fork, quote(groebner(eval(i))));
         
-        while(k < wait)
+        // sleep in small intervalls for appr. one second
+        if (wait > 0)
         {
-          if (status(l_fork, "read", "ready", j)) {break;}
-          k = k + j;
-          j = j + j;
+          while(j < 1000000)
+          {
+            if (status(l_fork, "read", "ready", j)) {break;}
+            j = j + j;
+          }
         }
-
+        
+        // sleep in intervalls of one second from now on
+        j = 1;
+        while (j < wait)
+        {
+          if (status(l_fork, "read", "ready", 1000000)) {break;}
+          j = j + 1;
+        }
+        
         if (status(l_fork, "read", "ready"))
         {
           def result = read(l_fork);
