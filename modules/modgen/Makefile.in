@@ -33,7 +33,7 @@ CFLAGS	+= -g -I../include -I../../Singular -DNDEBUG -DMODULE_GENERATOR \
 LIBS	+= -L/usr/local/lib -lgmp
 
 OBJS	= main.o grammar.o scanner.o misc.o makefile.o utils.o \
-	creat_top.o proc.o
+	creat_top.o proc.o proc_setup.o
 
 #	iparith.o febase.o \
 #	mmalloc.o mmallocb.o mminit.o mmutil.o mmblock.o mmspec.o
