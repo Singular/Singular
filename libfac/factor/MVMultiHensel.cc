@@ -1,7 +1,7 @@
 /* Copyright 1996 Michael Messollen. All rights reserved. */
 ///////////////////////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.7 2001-08-22 14:21:17 Singular Exp $";
+// static char * rcsid = "$Id: MVMultiHensel.cc,v 1.8 2002-07-30 15:11:19 Singular Exp $";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -57,6 +57,7 @@ public:
     this->poly = value;
     return *this;
   }
+  RememberForm() : poly(0), calculated(false) {}
   Boolean calculated;
   CanonicalForm poly;
 };
@@ -76,10 +77,14 @@ public:
   inline RememberForm& operator[]( int index ){
     return ia[index];
   }
+  bool checksize(int i) {return i<size;}
 protected:
   void init( int ){
     for ( int ix=0; ix < size; ++ix)
+    {
       ia[ix].calculated=false;
+      ia[ix].poly=0;
+    }  
   }
 // internal data representation
   int size;
@@ -103,7 +108,7 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int
 
   // Did we solve the diophantine equation yet?
   // If so, return the calculated values
-  if ( A[i].calculated && B[i].calculated ){
+  if (A.checksize(i) && A[i].calculated && B[i].calculated ){
     Retvalue.One=A[i].poly;
     Retvalue.Two=B[i].poly;
     return Retvalue;
@@ -164,10 +169,12 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 , int
     }
 
   }
-  A[i].poly = Retvalue.One ;
-  B[i].poly = Retvalue.Two ;
-  A[i].calculated = true ; B[i].calculated = true ;
-
+  if (A.checksize(i))
+  {
+    A[i].poly = Retvalue.One ;
+    B[i].poly = Retvalue.Two ;
+    A[i].calculated = true ; B[i].calculated = true ;
+  }
   DEBOUT(cout, "diophant: Returnvalue is: ", Retvalue.One);
   DEBOUTLN(cout, "  ", Retvalue.Two);
 
@@ -191,7 +198,7 @@ make_delta( int levelU, const CanonicalForm & W,
   if ( levelU == level(W) ){ // same level, good
     for ( CFIterator i=W; i.hasTerms(); i++){
       intermediate=diophant(levelU,F1,F2,i.exp(),A,B);
-      Retvalue += i.coeff() * intermediate.One;
+      Retvalue += intermediate.One * i.coeff();
     }
   }
   else{ // level(W) < levelU ; i.e. degree(w,levelU) == 0
@@ -241,8 +248,8 @@ mvhensel( const CanonicalForm & U , const CanonicalForm & F ,
   CanonicalForm V,Fk=F,Gk=G,Rk,W,D,S;
   int  levelU=level(U), degU=subvardegree(U,levelU); // degree(U,{x_1,..,x_(level(U)-1)})
   DiophantForm Retvalue;
-  RememberArray A(degree(F)+degree(G)+1);
-  RememberArray B(degree(F)+degree(G)+1);
+  RememberArray A(degree(F,levelU)+degree(G,levelU)+1);
+  RememberArray B(degree(F,levelU)+degree(G,levelU)+1);
 
   DEBOUTLN(cout, "mvhensel called with: U= ", U);
   DEBOUTLN(cout, "                      F= ", F);
@@ -410,6 +417,9 @@ MultiHensel( const CanonicalForm & mF, const CFFList & Factorlist,
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.7  2001/08/22 14:21:17  Singular
+*hannes: added search for main var to Factorize
+
 Revision 1.6  2001/08/08 14:26:55  Singular
 *hannes: Dan's HAVE_SINGULAR_ERROR
 
