@@ -6,7 +6,7 @@
 /*
 * ABSTRACT
 */
-/* $Id: weight.h,v 1.5 2000-10-30 13:40:29 obachman Exp $ */
+/* $Id: weight.h,v 1.6 2001-05-28 12:35:51 Singular Exp $ */
 
 #include "structs.h"
 
@@ -19,6 +19,7 @@ BOOLEAN kWeight(leftv res,leftv id);
 BOOLEAN kQHWeight(leftv res,leftv v);
 long maxdegreeWecart(poly p,int *l, ring r = currRing);
 long totaldegreeWecart(poly p, ring r = currRing);
+long totaldegreeWecart_IV(poly p, ring r, const short *w);
 
 short * iv2array(intvec * iv);
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: weight.cc,v 1.20 2001-03-26 21:15:26 Singular Exp $ */
+/* $Id: weight.cc,v 1.21 2001-05-28 12:35:50 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -262,6 +262,20 @@ long totaldegreeWecart(poly p, ring r)
 
   for (i=r->N; i; i--)
     j += (int)(p_GetExp(p,i,r) * ecartWeights[i]);
+  return  j;
+}
+
+/*2
+*computes the degree of the leading term of the polynomial
+*with respect to given weights
+*/
+long totaldegreeWecart_IV(poly p, ring r, const short *w)
+{
+  int i;
+  long j =0;
+
+  for (i=r->N; i; i--)
+    j += (int)(p_GetExp(p,i,r) * w[i]);
   return  j;
 }
 

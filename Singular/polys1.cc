@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.66 2001-03-05 16:41:48 mschulze Exp $ */
+/* $Id: polys1.cc,v 1.67 2001-05-28 12:35:50 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -1156,11 +1156,9 @@ poly ppJetW(poly p, int m, short *w)
 {
   poly r=NULL;
   poly t=NULL;
-  short *wsave=ecartWeights;
-  ecartWeights=w;
   while (p!=NULL)
   {
-    if (totaldegreeWecart(p)<=m)
+    if (totaldegreeWecart_IV(p,currRing,w)<=m)
     {
       if (r==NULL)
         r=pHead(p);
@@ -1178,28 +1176,24 @@ poly ppJetW(poly p, int m, short *w)
     }
     pIter(p);
   }
-  ecartWeights=wsave;
   return r;
 }
 
 poly pJetW(poly p, int m, short *w)
 {
   poly t=NULL;
-  short *wsave=ecartWeights;
-  ecartWeights=w;
-  while((p!=NULL) && (totaldegreeWecart(p)>m)) pLmDelete(&p);
+  while((p!=NULL) && (totaldegreeWecart_IV(p,currRing,w)>m)) pLmDelete(&p);
   if (p==NULL) return NULL;
   poly r=p;
   while (pNext(p)!=NULL)
   {
-    if (totaldegreeWecart(pNext(p))>m)
+    if (totaldegreeWecart_IV(pNext(p),currRing,w)>m)
     {
       pLmDelete(&pNext(p));
     }
     else
       pIter(p);
   }
-  ecartWeights=wsave;
   return r;
 }
 
@@ -1265,16 +1259,12 @@ poly pInvers(int n,poly u,intvec *w)
 int pDegW(poly p, short *w)
 {
   int r=0;
-  short *wsave=ecartWeights;
-
-  ecartWeights=w;
 
   while (p!=NULL)
   {
-    r=max(r, totaldegreeWecart(p));
+    r=max(r, totaldegreeWecart_IV(p,currRing,w));
     pIter(p);
   }
-  ecartWeights=wsave;
   return r;
 }
 
