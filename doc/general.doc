@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.106 1998-06-19 14:12:03 gorzel Exp $
+@comment $Id: general.doc,v 1.107 1998-07-08 17:34:23 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -387,12 +387,8 @@ executes the files @code{file1}, @code{file2} @dots{}  (given on the command
 line) in that order.
 @end enumerate
 
-Unless specified otherwise, @sc{Singular} locates all libraries and ASCII
-data files by first searching the current working directory, then by
-searching through all the directories specified by the environment
-variable @code{SINGULARPATH} (@code{SPATH} on DOS-based systems), and,
-finally, by searching through some default directories.
-
+See @ref{LIB} for the directories on where @sc{Singular} searches for its
+library files.
 
 @c --------------------------------------------------------------------------
 @c ---------------------------------------------------------------------------
