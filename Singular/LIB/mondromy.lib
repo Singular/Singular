@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: mondromy.lib,v 1.11 1999-12-13 15:33:48 obachman Exp $";
+version="$Id: mondromy.lib,v 1.12 1999-12-15 22:29:51 greuel Exp $";
 info="
 LIBRARY:  mondromy.lib  PROCEDURES TO COMPUTE THE MONODROMY OF A SINGULARITY
 AUTHOR:   Mathias Schulze, email: mschulze@mathematik.uni-kl.de
@@ -23,6 +23,8 @@ PROCEDURES:
 LIB "ring.lib";
 LIB "sing.lib";
 LIB "jordan.lib";
+LIB "poly.lib";
+
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc pcvladdl(list l1,list l2)
@@ -149,7 +151,6 @@ proc quotV(list V,int N)
   return(list(Q[1..size(Q)]));
 }
 ///////////////////////////////////////////////////////////////////////////////
-
 proc invunit(poly u,int n)
 "USAGE:   invunit(u,n); u poly, n int
 ASSUME:  The polynomial u is a series unit.
@@ -161,19 +162,29 @@ EXAMPLE: example invunit; shows an example.
 {
   if(pcvmindeg(u)==0)
   {
-    def br=basering;
-    changeord("pr","dp");
-    qring qr=std(maxideal(n+1));
-    kill pr;
-
+    poly c = jet(u,0);
+    poly h = 1-u/c;
+    int d = mindeg(h);
+    int m = n div d;
+    if( m*d < n )
+    {
+      m=m+1;
+    }
+    poly g = 1;
+    poly v = 1;
     dbprint(printlevel-voice+2,"//computing inverse...");
     int t=timer;
-    poly v=lift(fetch(br,u),1)[1,1];
+    int ii;
+    for( ii=1; ii<=m; ii++ )
+    {
+      g = jet(g*h,n);
+      v = v+g;
+    }
+    v = jet(v,n)/c;    
     dbprint(printlevel-voice+2,"//...inverse computed ["+string(timer-t)+
       " secs, "+string((memory(1)+1023)/1024)+" K]");
 
-    setring br;
-    return(fetch(qr,v));
+    return(v);
   }
   else
   {
@@ -183,9 +194,10 @@ EXAMPLE: example invunit; shows an example.
 }
 example
 { "EXAMPLE:"; echo=2;
-  ring R=0,x,dp;
-  invunit(1+x,10);
+  ring R=0,(x,y),dp;
+  invunit(3+x+x2+y3,10);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 
 proc detadj(module U)
