@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.h,v 1.7 1997-06-20 10:45:12 schmidt Exp $ */
+/* $Id: canonicalform.h,v 1.8 1997-06-30 15:39:26 schmidt Exp $ */
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H
@@ -12,10 +12,17 @@
 
 #include "cf_defs.h"
 #include "variable.h"
+#ifdef macintosh
+#include <::templates:ftmpl_list.h>
+#include <::templates:ftmpl_array.h>
+#include <::templates:ftmpl_factor.h>
+#include <::templates:ftmpl_matrix.h>
+#else
 #include "templates/ftmpl_list.h"
 #include "templates/ftmpl_array.h"
 #include "templates/ftmpl_factor.h"
 #include "templates/ftmpl_matrix.h"
+#endif
 
 /*BEGINPUBLIC*/
 
