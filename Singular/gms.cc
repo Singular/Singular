@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: gms.cc,v 1.2 2002-02-12 17:25:11 mschulze Exp $ */
+/* $Id: gms.cc,v 1.3 2002-02-12 18:04:23 mschulze Exp $ */
 /*
 * ABSTRACT: Gauss-Manin system normal form
 */
@@ -9,7 +9,6 @@
 #include "mod2.h"
 
 #ifdef HAVE_GMS
-#if !defined(HAVE_DYNAMIC_LOADING) || defined(BUILD_MODULE)
 
 #include "febase.h"
 #include "tok.h"
@@ -110,5 +109,5 @@ BOOLEAN gmsnf(leftv res,leftv h)
   return TRUE;
 }
 
-#endif /* !defined(HAVE_DYNAMIC_LOADING) || defined(BUILD_MODULE) */
 #endif /* HAVE_GMS */
+

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gms.h,v 1.2 2002-02-12 17:24:43 mschulze Exp $ */
+/* $Id: gms.h,v 1.3 2002-02-12 18:04:39 mschulze Exp $ */
 /*
 * ABSTRACT: Gauss-Manin system normal form
 */
@@ -13,3 +13,4 @@ lists gmsnf(ideal p,ideal g,matrix B,int D,int K);
 BOOLEAN gmsnf(leftv res,leftv h);
 
 #endif
+
