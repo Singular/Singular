@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: NEWS.texi,v 1.17 2000-07-27 13:53:00 obachman Exp $
+@comment $Id: NEWS.texi,v 1.18 2000-08-24 12:21:04 Singular Exp $
 @comment this file contains the News about Singular versions
 @comment Unix
 @ifclear VERSION
@@ -84,7 +84,7 @@ TODO: better docu, tests, proper incooperation
 TODO: better docu, tests, proper incooperation
 @item @code{spectrum.lib} procedures for computing spectra
 TODO: docu, tests, proper incooperation
-@item @nref{Mregular_lib}  procedures for computing the Castelnuovo-Mumford regularity
+@item @nref{mregular_lib}  procedures for computing the Castelnuovo-Mumford regularity
 TODO: docu, tests
 @item @nref{mondromy_lib}
 procedures for computing the monodromy of a singularity
