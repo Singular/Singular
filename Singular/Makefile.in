@@ -59,7 +59,14 @@ SLDFLAGS	= @SLDFLAGS@
 
 LD_LIBC	        = -lc
 STATIC_LDFLAGS	= @STATIC_LDFLAGS@
+# under cygwin, do not explicitly link against -lm, for it is the cygwin
+# lib -- if you really want to do this, use -lm as the _last_ thing on the
+# arguments to link
+ifneq ($(SINGUNAME),ix86-Win)
 LIBS		= -lm @NEED_LIBS@ 
+else
+LIBS		= @NEED_LIBS@ 
+endif
 MP_LIBS		= @MP_LIBS@
 DL_KERNEL	= @DL_KERNEL@
 HAVE_MPSR       = @HAVE_MPSR@

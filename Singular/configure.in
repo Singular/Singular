@@ -280,7 +280,11 @@ dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl check for general libraries, header files, typedefs, etc
 dnl
 # lib checks
+# under cygwin, we should not explicitly link with -lm, except for
+# it reallz is the last thing to link with
+if test "$ac_cv_singuname" != ix86-Win; then
 AC_CHECK_LIB(m, atof)
+fi
 SAVE_LIBS=${LIBS}
 LIBS=
 
@@ -803,6 +807,8 @@ if test "$with_dynamic_kernel" != no && test "$ac_lib_dl" = yes; then
   DL_KERNEL=1
   AC_SUBST(DL_KERNEL)
   AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
 fi
 
 AC_MSG_CHECKING(whether to have Plural)

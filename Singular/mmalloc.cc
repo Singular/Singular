@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmalloc.cc,v 1.2 2000-11-20 10:18:55 hannes Exp $ */
+/* $Id: mmalloc.cc,v 1.3 2001-01-27 17:04:59 obachman Exp $ */
 /*
 * ABSTRACT: standard version of C++-memory management alloc func
 */
@@ -9,6 +9,7 @@
 
 #include "mod2.h"
 
+#if 0
 #include <omalloc.h>
 
 /* We define those, so that our values of 
@@ -39,3 +40,5 @@ void operator delete[] ( void* block )
 {
   omfree( block );
 }
+
+#endif
