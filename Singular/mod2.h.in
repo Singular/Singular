@@ -97,11 +97,11 @@
 /* works around a quirk in the generation of parser tables */
 #define INIT_BUG
 
-#define PROFILING
+/*#define PROFILING*/
 #ifdef PROFILING
-#define PROFILER 0,0
+#define PROFILER ,0,0
 #else
-#define PROFILER 0,0
+#define PROFILER 
 #endif
 
 /*******************************************************************
