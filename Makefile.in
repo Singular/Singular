@@ -138,6 +138,7 @@ bindist: ${SINGULAR}
 	cp Singular/Singular-$@ ${TMPDIR}/${SINGUNAME}/bin/Singular-${SINGULAR_VERSION}
 	cd ${TMPDIR}/${SINGUNAME}/bin; ${LN_S} Singular-${SINGULAR_VERSION} Singular
 	cp Singular/libparse ${TMPDIR}/${SINGUNAME}/bin/
+	cd ${TMPDIR}/${SINGUNAME}/bin;strip libparse Singular-${SINGULAR_VERSION}
 	cd ${TMPDIR}; tar cf ${BINDIST_NAME}.tar ${SINGUNAME}; \
                       gzip ${BINDIST_NAME}.tar
 	cp ${TMPDIR}/${BINDIST_NAME}.tar.gz .

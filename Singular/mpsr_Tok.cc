@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Tok.cc,v 1.14 1998-06-14 11:40:05 Singular Exp $ */
+/* $Id: mpsr_Tok.cc,v 1.15 1998-06-14 12:19:34 Singular Exp $ */
 
 /***************************************************************
  *
@@ -557,7 +557,7 @@ mpsr_cmd mpsr_cmds[] =
     {
       fprintf(outfile, " %d",mp2tok[i][j]);
       if  (j!=MAX_COP-1) fprintf(outfile, ",");
-    }  
+    }
     if (i!=MAX_SR_DICT-1) fprintf(outfile, "},");
     else                  fprintf(outfile, "}");
   }
