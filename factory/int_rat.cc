@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_rat.cc,v 1.6 1997-10-10 10:35:00 schmidt Exp $ */
+/* $Id: int_rat.cc,v 1.7 1997-10-10 10:53:14 schmidt Exp $ */
 
 #include <config.h>
 
@@ -138,9 +138,9 @@ InternalCF* InternalRational::genOne()
 	return new InternalRational( 1 );
 }
 
-//{{{ InternalCF* InternalRational::num (), den ()
+//{{{ InternalCF * InternalRational::num (), den ()
 // docu: see CanonicalForm::num(), den()
-InternalCF* InternalRational::num ()
+InternalCF * InternalRational::num ()
 {
     if ( mpz_is_imm( &_num ) ) {
 	InternalCF * res = int2imm( mpz_get_si( &_num ) );
@@ -153,7 +153,7 @@ InternalCF* InternalRational::num ()
     }
 }
 
-InternalCF* InternalRational::den ()
+InternalCF * InternalRational::den ()
 {
     if ( mpz_is_imm( &_den ) ) {
 	InternalCF * res = int2imm( mpz_get_si( &_den ) );
