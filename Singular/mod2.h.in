@@ -61,6 +61,9 @@
 #undef HAVE_STRTOL
 /* Define if you have atexit */
 #undef HAVE_ATEXIT
+/* Define if you have bcopy, bzero and bcmp 
+   Linux needs that define! */
+#undef HAVE_BCOPY
 /* Define if sprintf does not return number of printed chars */
 #undef BSD_SPRINTF
 /* Define sizeof(char) */

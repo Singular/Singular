@@ -4,7 +4,7 @@
 
 //**************************************************************************/
 //
-// $Id: ndbm.cc,v 1.5 1997-10-09 13:04:07 obachman Exp $
+// $Id: ndbm.cc,v 1.6 1997-12-04 15:21:14 krueger Exp $
 //
 //**************************************************************************/
 // 'ndbm.cc' containes all low-level functions to manipulate dbm-files
@@ -48,9 +48,9 @@ static char sccsid[] = "@(#)ndbm.c        5.3 (Berkeley) 3/9/86";
 #   include <unistd.h>
 #   include <fcntl.h>
 #endif /* macintosh */
+#ifndef HAVE_BCOPY
 #   define bcopy(a,b,c) memcpy(b,a,c)
-#   define bzero(a,b)   memset(a,0,b)
-#   define bcmp(a,b,c)  memcmp(a,b,c)
+#endif /* not HAVE_BCOPY */
 #include "ndbm.h"
 
 #define BYTESIZ 8
@@ -228,7 +228,7 @@ split:
     errno = ENOSPC;
     return (-1);
   }
-  bzero(ovfbuf, PBLKSIZ);
+  memset(ovfbuf, 0, PBLKSIZ);
   for (i=0;;) {
     item = makdatum(db->dbm_pagbuf, i);
     if (item.dptr == NULL)
@@ -287,7 +287,7 @@ dbm_nextkey(register DBM *db)
       db->dbm_pagbno = db->dbm_blkptr;
       (void) lseek(db->dbm_pagf, db->dbm_blkptr*PBLKSIZ, L_SET);
       if (read(db->dbm_pagf, db->dbm_pagbuf, PBLKSIZ) != PBLKSIZ)
-        bzero(db->dbm_pagbuf, PBLKSIZ);
+        memset(db->dbm_pagbuf, 0, PBLKSIZ);
 #ifdef DEBUG
       else if (chkblk(db->dbm_pagbuf) < 0)
         db->dbm_flags |= _DBM_IOERR;
@@ -323,7 +323,7 @@ dbm_access(register DBM *db, long hash)
     db->dbm_pagbno = db->dbm_blkno;
     (void) lseek(db->dbm_pagf, db->dbm_blkno*PBLKSIZ, L_SET);
     if (read(db->dbm_pagf, db->dbm_pagbuf, PBLKSIZ) != PBLKSIZ)
-      bzero(db->dbm_pagbuf, PBLKSIZ);
+      memset(db->dbm_pagbuf, 0, PBLKSIZ);
 #ifdef DEBUG
     else if (chkblk(db->dbm_pagbuf) < 0)
       db->dbm_flags |= _DBM_IOERR;
@@ -348,7 +348,7 @@ int getbit(register DBM *db)
     db->dbm_dirbno = b;
     (void) lseek(db->dbm_dirf, (long)b*DBLKSIZ, L_SET);
     if (read(db->dbm_dirf, db->dbm_dirbuf, DBLKSIZ) != DBLKSIZ)
-      bzero(db->dbm_dirbuf, DBLKSIZ);
+      memset(db->dbm_dirbuf, 0, DBLKSIZ);
   }
   return (db->dbm_dirbuf[i] & (1<<n));
 }
@@ -369,7 +369,7 @@ setbit(register DBM *db)
     db->dbm_dirbno = b;
     (void) lseek(db->dbm_dirf, (long)b*DBLKSIZ, L_SET);
     if (read(db->dbm_dirf, db->dbm_dirbuf, DBLKSIZ) != DBLKSIZ)
-      bzero(db->dbm_dirbuf, DBLKSIZ);
+      memset(db->dbm_dirbuf, 0, DBLKSIZ);
   }
   db->dbm_dirbuf[i] |= 1<<n;
   db->dbm_dirbno = b;
@@ -411,7 +411,7 @@ int finddatum(char buf[PBLKSIZ], datum item)
     n -= sp[i+1];
     if (n != item.dsize)
       continue;
-    if (n == 0 || bcmp(&buf[sp[i+1]], item.dptr, n) == 0)
+    if (n == 0 || memcmp(&buf[sp[i+1]], item.dptr, n) == 0)
       return (i);
   }
   return (-1);
@@ -523,7 +523,7 @@ static
 int additem(char buf[PBLKSIZ], datum item, datum item1)
 {
   register short *sp;
-  register i1, i2;
+  register i1, i2, tmp;
 
   sp = (short *)buf;
   i1 = PBLKSIZ;
@@ -531,8 +531,8 @@ int additem(char buf[PBLKSIZ], datum item, datum item1)
   if (i2 > 0)
     i1 = sp[i2];
   i1 -= item.dsize + item1.dsize;
-  if (i1 <= (i2+3) * sizeof(short))
-    return (0);
+  tmp = (i2+3) * sizeof(short);
+  if (i1 <= tmp) return (0);
   sp[0] += 2;
   sp[++i2] = i1 + item1.dsize;
   bcopy(item.dptr, &buf[i1 + item1.dsize], item.dsize);
