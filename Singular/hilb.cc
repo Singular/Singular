@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hilb.cc,v 1.12 1999-11-15 17:20:05 obachman Exp $ */
+/* $Id: hilb.cc,v 1.13 2000-02-16 14:22:49 Singular Exp $ */
 /*
 *  ABSTRACT -  Hilbert series
 */
@@ -361,9 +361,9 @@ intvec * hHstdSeries(ideal S, intvec *modulweight, intvec *wdegree, ideal Q)
   return hSeries(S, modulweight, 0, wdegree, Q);
 }
 
-intvec * hFirstSeries(ideal S, intvec *modulweight, ideal Q)
+intvec * hFirstSeries(ideal S, intvec *modulweight, ideal Q, intvec *wdegree)
 {
-  return hSeries(S, modulweight, 1, NULL, Q);
+  return hSeries(S, modulweight, 1, wdegree, Q);
 }
 
 intvec * hSecondSeries(intvec *hseries1)

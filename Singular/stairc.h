@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: stairc.h,v 1.7 1999-11-15 17:20:50 obachman Exp $ */
+/* $Id: stairc.h,v 1.8 2000-02-16 14:23:18 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -23,7 +23,7 @@ ideal scKBase(int deg, ideal  s, ideal Q=NULL);
 
 intvec * hHstdSeries(ideal S, intvec *modulweight, intvec *wdegree,
                      ideal Q=NULL);
-intvec * hFirstSeries(ideal S, intvec *modulweight, ideal Q=NULL);
+intvec * hFirstSeries(ideal S, intvec *modulweight, ideal Q=NULL, intvec *wdegree=NULL);
 intvec * hSecondSeries(intvec *hseries1);
 
 void hLookSeries(ideal S, intvec *modulweight, ideal Q=NULL);
