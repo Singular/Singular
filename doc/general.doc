@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.186 2000-12-19 16:03:48 Singular Exp $
+@comment $Id: general.doc,v 1.187 2000-12-19 16:16:54 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -3324,10 +3324,11 @@ See
 @subsection Format of a library
 @cindex Format of a library
 
-A library file can contain comments, an info- and version-string
+A library file can contain comments, an category-, info- and version-string
 definition, @code{LIB} commands, @code{proc} commands
 and @code{proc} commands with @code{example} and @code{help} sections,
 i.e., the following keywords are allowed:
+@code{category},
 @code{info},
 @code{version},
 @code{LIB},
@@ -3339,7 +3340,7 @@ to an error message while loading the library.
 If an error occurs, loading is aborted and an error message is displayed,
 specifying the type of error and the line where it was detected.
 
-The info- and version-string are defined as follows:
+The category-, info- and version-string are defined as follows:
 @cindex  info in a library
 @table @code
 @item @strong{Syntax:}
@@ -3387,15 +3388,26 @@ It is common practice to simply define the version string to be
 @comment !! Do not erase the @comment at the end of the previous line !!
 @comment !! It prevents cvs to substitute the id string                !!
 @code{d:$"} and let a version control system expand it.
-@end table
 
+@cindex  category in a library
+@table @code
+@item @strong{Syntax:}
+@code{category} = string_constant @code{;}
+@item @strong{Purpose:}
+defines the category for the library.
+@item @strong{Example:}
+@smallexample
+category="Utilities";
+@end smallexample
+@item @strong{Note:}
+reserved for sorting the libraries into categories.
+@end table
 
 @c ---------------------------------------
 @node Guidelines for writing a library, Debugging tools, Libraries, General concepts
 @section Guidelines for writing a library
 @cindex Guidelines for writing a library
 @cindex library, Guidelines for writing
-
 
 Although there are very few enforced rules on how libraries are written
 (see @ref{Libraries}), it is recommended that the libraries comply with
@@ -3404,7 +3416,6 @@ understanding are made easier.
 
 @strong{Note:} For libraries which are to be included in the @sc{Singular}
 distribution, the following guidelines are mandatory.
-
 
 @menu
 * Procedures in a library::
