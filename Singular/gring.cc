@@ -6,7 +6,7 @@
  *  Purpose: p_Mult family of procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.34 2003-03-14 21:36:51 levandov Exp $
+ *  Version: $Id: gring.cc,v 1.35 2003-03-17 14:42:14 levandov Exp $
  *******************************************************************/
 #include "mod2.h"
 #ifdef HAVE_PLURAL
@@ -1252,6 +1252,10 @@ poly nc_p_Bracket_qq(poly p, poly q)
   number coef=NULL;
   poly res=NULL;
   poly pres=NULL;
+  int UseBuckets=1;
+  if (pLength(p)+pLength(q)< MIN_LENGTH_BUCKET || TEST_OPT_NOT_BUCKETS) UseBuckets=0;
+  sBucket_pt bu_out;
+  if (UseBuckets) bu_out=sBucketCreate(currRing);
   while (p!=NULL)
   {
     Q=q;
@@ -1261,13 +1265,20 @@ poly nc_p_Bracket_qq(poly p, poly q)
       if (pres!=NULL)
       {
         coef=nMult(pGetCoeff(p),pGetCoeff(Q));
-        if (!nIsOne(coef)) pres=p_Mult_nn(pres,coef,currRing);
-        res=p_Add_q(res,pres,currRing);
+        pres=p_Mult_nn(pres,coef,currRing);
+	if (UseBuckets) sBucket_Add_p(bu_out,pres,pLength(pres));
+	else res=p_Add_q(res,pres,currRing);
         nDelete(&coef);
       }
       pIter(Q);
     }
     p=pLmDeleteAndNext(p);
+  }
+  if (UseBuckets)
+  {
+    res = NULL;
+    int len = pLength(res);
+    sBucketDestroyAdd(bu_out, &res, &len);
   }
   return(res);
 }
