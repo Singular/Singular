@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.14 1998-05-08 15:49:44 Singular Exp $
+// $Id: primdec.lib,v 1.15 1998-05-13 07:38:35 obachman Exp $
 ///////////////////////////////////////////////////////
 // primdec.lib
 // algorithms for primary decomposition based on
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann
 //////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.14 1998-05-08 15:49:44 Singular Exp $";
+version="$Id: primdec.lib,v 1.15 1998-05-13 07:38:35 obachman Exp $";
 info="
 LIBRARY: primdec.lib: PROCEDURE FOR PRIMARY DECOMPOSITION (I)
 
@@ -443,7 +443,7 @@ proc testPrimary(list pr, ideal k)
 "USAGE:   testPrimary(pr,k) pr list, k ideal;
 RETURN:  int = 1, if the intersection of the ideals in pr is k, 0 if not
 NOTE:
-EEXAMPLE: example testPrimary ; shows an example
+EXAMPLE: example testPrimary ; shows an example
 "
 {
    int i;
