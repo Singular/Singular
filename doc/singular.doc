@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.110 2001-02-12 12:43:11 Singular Exp $
+@comment $Id: singular.doc,v 1.111 2001-05-17 14:42:22 Singular Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -49,9 +49,9 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @center G.-M. Greuel, G. Pfister, and H. Sch@"onemann
 @sp 2
 @center with contributions by
-@center O. Bachmann, W. Decker, Stephan Endra@ss{}, I. Farran, A. Fr@"uhbis-Kr@"uger, C. Gorzel, 
-@center H. Grassmann, A. Heydtmann, Dietmar Hillebrand, Thomas Keilen, Ulrich Klein, K. Kr@"uger, M. Lamm, 
-@center C. Lossen, B. Martin, M. Me@ss{}ollen, W. Neumann, T. N@"u@ss{}ler, W. Pohl, T. Siebert, 
+@center O. Bachmann, W. Decker, Stephan Endra@ss{}, I. Farran, A. Fr@"uhbis-Kr@"uger, C. Gorzel,
+@center H. Grassmann, A. Heydtmann, Dietmar Hillebrand, Thomas Keilen, Ulrich Klein, K. Kr@"uger, M. Lamm,
+@center C. Lossen, B. Martin, M. Me@ss{}ollen, W. Neumann, T. N@"u@ss{}ler, W. Pohl, T. Siebert,
 @center J. Schmidt, M. Schulze, R. Stobbe, M. Wenk, T. Wichmann
 @sp 2
 @author Fachbereich Mathematik
@@ -276,6 +276,7 @@ LIB "all.lib";
 * algebra_lib:: procedures for computing with algebras and maps
 * elim_lib:: procedures for elimination, saturation and blowing up
 * homolog_lib:: procedures for homological algebra
+* mprimdec_lib:: procedures for primary decomposition of modules
 * mregular_lib:: procedures for Castelnuovo-Mumford regularity
 * normal_lib:: procedure for normalization
 * primdec_lib:: procedures for primary decomposition
@@ -294,11 +295,15 @@ LIB "all.lib";
 @subsection elim_lib
 @c lib elim.lib
 @c ----------------------------------------------------------
-@node homolog_lib, mregular_lib, elim_lib, Commutative algebra
+@node homolog_lib, mprimdec_lib, elim_lib, Commutative algebra
 @subsection homolog_lib
 @c lib homolog.lib
 @c ----------------------------------------------------------
-@node mregular_lib, normal_lib, homolog_lib, Commutative algebra
+@node mprimdec_lib, mregular_lib, homolog_lib, Commutative algebra
+@subsection mprimdec_lib
+@c lib mprimdec.lib
+@c ----------------------------------------------------------
+@node mregular_lib, normal_lib, mprimdec_lib, Commutative algebra
 @subsection mregular_lib
 @c lib mregular.lib
 @c ---------------------------------------------------------
