@@ -3749,7 +3749,7 @@ static BOOLEAN jjPREIMAGE(leftv res, leftv u, leftv v, leftv w)
 
   if ((v->name==NULL) || (w->name==NULL))
   {
-    WerrorS("2. and 3. argument must have a name");
+    WerrorS("2nd/3rd arguments must have names");
     return TRUE;
   }
   rr=(ring)u->Data();
