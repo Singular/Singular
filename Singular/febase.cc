@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.15 1997-05-02 15:10:11 Singular Exp $ */
+/* $Id: febase.cc,v 1.16 1997-05-03 17:23:33 obachman Exp $ */
 /*
 * ABSTRACT: i/o system, handling of 'voices'
 */
@@ -158,6 +158,19 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror)
       char *env=getenv("SINGULARPATH");
     #endif
     char *s;
+    #ifndef macintosh
+    // extend path by SINGULAR_DATADIR
+    s = (char*) AllocL(strlen(env)+strlen(SINGULAR_DATADIR)+2);
+    if (env != NULL)
+    {
+      strcpy(s, env);
+      s[strlen(env)] = FS_SEP;
+      s[strlen(env)+1] = '\0';
+      strcat(s, SINGULAR_DATADIR);
+    }
+    else strcpy(s, SINGULAR_DATADIR);
+    env = s;
+    #endif
     if (where==NULL) s=(char *)AllocL(250);
     else             s=where;
     if (env!=NULL)
@@ -198,27 +211,7 @@ FILE * feFopen(char *path, char *mode, char *where,int useWerror)
       f=fopen(path,mode);
     }
     #ifndef macintosh
-      if (f==NULL)
-      {
-        char* ss = s;
-        int need_len = strlen(path) + strlen(SINGULAR_DATADIR) + 2;
-
-        if (where == NULL)
-        {
-          if (need_len > 250) ss = (char *) AllocL(need_len);
-          strcpy(ss,s);
-        }
-        else
-        {
-          if (need_len > strlen(where)) ss = (char *) AllocL(need_len);
-          strcpy(ss, s);
-        }
-        strcpy(ss,SINGULAR_DATADIR);
-        strcat(s, DIR_SEPP);
-        strcat(ss,path);
-        f=fopen(ss,mode);
-        if (ss != s) FreeL((ADDRESS)ss);
-      }
+    FreeL(env);
     #endif
     if (where==NULL) FreeL((ADDRESS)s);
   }

@@ -1,5 +1,9 @@
 Sat May  3 00:07:55 1997  Olaf Bachmann  <obachman@ratchwum.mathematik.uni-kl.de (Olaf Bachmann)>
 
+	* febase.cc (feFopen): fixed bug in opening library from
+	  SINGULAR_DATADIR: SINGULAR_DATADIR is appended to
+	  getenv("SINGULARPATH")
+
 	* small mpsr Changes to reflect some name changes of MP Dicts
 
 	* configure.in Makefile.in: new schem for updating Makefile mod2.h
