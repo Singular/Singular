@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.30 1998-05-27 10:46:24 Singular Exp $
+@comment $Id: math.doc,v 1.31 1998-06-02 18:06:59 Singular Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -159,7 +159,7 @@ ker (K[x]^q @expansion{} K[x]^r, sum w_i*e_i @expansion{} sum w_i*g_i).
 @subheading Free resolutions
 @tex
 Let $I=(g_1,...,g_s)\subseteq K[\underline{x}]^r$ and $M= K[\underline{x}]^r/I$.
-A free resolution of $M$ is a long exact sequence
+A {\bf free resolution of $M$} is a long exact sequence
 $$...\longrightarrow F_2 \buildrel{A_2}\over{\longrightarrow} F_1 \buildrel{A_1}\over{\longrightarrow} F_0\longrightarrow M\longrightarrow 0,$$
 @end tex
 @ifinfo
@@ -232,7 +232,7 @@ Let $0 \rightarrow\ \bigoplus_a K[x]e_{a,n}\ \rightarrow\ \dots
   \rightarrow\ \bigoplus_a K[x]e_{a,0}\ \rightarrow\
   I\ \rightarrow\ 0$
 be a minimal resolution of I considered with homogeneous maps of degree 0.
-The regularity is the smallest number $s$ with the property deg($e_{a,i})
+The {\bf regularity} is the smallest number $s$ with the property deg($e_{a,i})
  \leq s+i$ for all $i$.
 @end tex
 @c ---------------------------------------------------------------------------
@@ -269,6 +269,9 @@ such that $prem(d_i*f_i-f_i'*f_i'',\{f_1,...,f_{i-1}\})=0$.
 Let $G=\{g_1,...,g_s\}$ then there are irreducible triangular sets $T_1,...,T_l$
 such that $Zero(G)=\bigcup_{i=1..l}(Zero(T_i\setminus I_i))$
 where $I_i=\{ini(f), f \in T_i \}$.
+
+The set $\{T_1,...,T_l\}$ is called a {\bf irreducible characteristic series} of
+the ideal $(G)$.
 @end tex
 @ifinfo
 Let > be the lexicographical ordering x_1 < ... < x_n on R=K[x_1,...,x_n].
@@ -299,6 +302,8 @@ the property:
 Let G=@{g_1,...,g_s@} then there are irreducible triangular sets T_1,...,T_l
 such that Zero(G)=Union(i=1,...,l: Zero(T_i\I_i))
 where I_i=@{ini(f), f in T_i @}.
+The set @{T_1,...,T_l@} is called a @strong{irredicibel characteristic series}
+of the ideal (G).
 @end ifinfo
 
 @table @code
