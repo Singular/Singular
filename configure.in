@@ -348,6 +348,7 @@ if test "$enable_gmp" != yes && test "$enable_gmp" != no; then
     enable_gmp=yes
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS gmp"
     ac_configure_args="$ac_configure_args --enable-gmp"
+    enable_gmp=yes
 #    This we used to need for our patched version of gmp 2.x
 #    OUTPUT_MAKEFILES="$OUTPUT_MAKEFILES gmp/Makefile.in"
   else
@@ -393,6 +394,7 @@ if test "$enable_smallgmp" != yes && test "$enable_smallgmp" != no; then
     enable_smallgmp=yes
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS smallgmp"
     ac_configure_args="$ac_configure_args --enable-smallgmp --enable-gmp"
+    enable_gmp=yes
   else
     AC_MSG_RESULT(no)
     enable_smallgmp=no
@@ -406,6 +408,7 @@ elif test "$enable_smallgmp" = yes; then
     CONFIG_SUBDIRS="$CONFIG_SUBDIRS smallgmp"
     if test "$ac_gmp_ok" != yes && test "$enable_gmp" != yes; then
       ac_configure_args="$ac_configure_args --enable-gmp"
+      enable_gmp=yes
     fi
   fi
 else 
@@ -419,7 +422,7 @@ if test "$ac_smallgmp_ok" != yes && test "$ac_gmp_ok" != yes && \
 fi
 
 # Check whether we need to cheat subsequent configures with --enable-gmp
-if test "$ac_smallgmp_ok" != yes && test "$ac_gmp_ok" != yes; then
+if test "$ac_smallgmp_ok" != yes && test "$ac_gmp_ok" != yes && test "$enable_gmp" != yes; then
   ac_configure_args="$ac_configure_args --enable-gmp"
 fi
 
