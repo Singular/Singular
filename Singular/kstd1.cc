@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.61 2000-11-14 16:04:54 obachman Exp $ */
+/* $Id: kstd1.cc,v 1.62 2000-11-14 16:24:47 obachman Exp $ */
 /*
 * ABSTRACT:
 */
@@ -115,7 +115,7 @@ static int doRed (LObject* h, TObject* with,BOOLEAN intoT,kStrategy strat)
   int ret;
 #if KDEBUG > 0
   kTest_L(h);
-  KTest_T(with);
+  kTest_T(with);
 #endif
   // Hmmm ... why do we do this -- polys from T should already be normalized
   if (!TEST_OPT_INTSTRATEGY)
