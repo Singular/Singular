@@ -4,7 +4,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.65 1999-08-25 10:23:42 obachman Exp $
+ *  Version: $Id: mod2.h.in,v 1.66 1999-08-25 16:02:48 Singular Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -12,6 +12,8 @@
 /*******************************************************************
  * Defines which are set by configure
  ******************************************************************/
+/* Define to use dynamic linking */
+#undef HAVE_DL
 /* Define to use readline lib for fancy display */
 #undef HAVE_READLINE
 /* Define to use built-in command line parser */
@@ -142,17 +144,23 @@
 /*******************************************************************
  * Defines which are not set by configure
  ******************************************************************/
+/* define to use the dynamic linking of readline in non-distributions builds */
+/* #undef USE_DYN_RL */
+
 /* Default value for timer resolution in ticks per second */
 /* set to 10 for resolution of tenth of a second, etc */
 #define TIMER_RESOLUTION 1
+
 /* Undefine to disable the quote/eval of expressions */
 #define SIQ 1
+
 /* Define to enable TCL interface */
 #undef HAVE_TCL 
 /* Define to enable working in Weyl algebras */
 #undef DRING
 /* Define to enable working in exterior algebras */
 #undef SRING
+
 /* Undefine to disable Gerhard's and Wilfried's fast and dirty std computations */
 #define FAST_AND_DIRTY
 #ifdef __MWERKS__
@@ -193,6 +201,13 @@
 /*******************************************************************
  * Evaluate the set defines
  ******************************************************************/
+/* dynamic readline or readline ? */
+#ifdef HAVE_DL
+  #if defined(MAKE_DISTRIBUTION) || defined(USE_DYN_RL)
+    #define HAVE_DYN_RL
+  #endif
+#endif
+
 /* FGLM needs factory */
 #ifdef HAVE_FACTORY
 #define HAVE_FGLM

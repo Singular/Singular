@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.23 1999-05-10 12:51:18 krueger Exp $ */
+/* $Id: cntrlc.cc,v 1.24 1999-08-25 16:02:42 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -11,13 +11,13 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <signal.h>
+#include "version.h"
 #include "mod2.h"
 #include "tok.h"
 #include "ipshell.h"
 #include "mmemory.h"
 #include "febase.h"
 #include "cntrlc.h"
-#include "version.h"
 #include "polys.h"
 #ifdef PAGE_TEST
 #include "page.h"

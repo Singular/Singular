@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.h,v 1.35 1999-08-13 11:21:43 Singular Exp $ */
+/* $Id: febase.h,v 1.36 1999-08-25 16:02:46 Singular Exp $ */
 /*
 * ABSTRACT: basic i/o
 */
@@ -256,4 +256,11 @@ extern  char * (*fe_fgets_stdin)(char *pr,char *s, int size);
  */
 void SPrintStart();
 char* SPrintEnd();
+
+
+#ifdef HAVE_DYN_RL
+#undef HAVE_READLINE
+#define HAVE_FEREAD 1
+#endif
+
 #endif /* ifndef FEBASE_H */

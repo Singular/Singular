@@ -1,13 +1,14 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feResource.cc,v 1.9 1999-08-25 15:55:32 obachman Exp $ */
+/* $Id: feResource.cc,v 1.10 1999-08-25 16:02:46 Singular Exp $ */
 /*
 * ABSTRACT: management of resources
 */
 
 #include <unistd.h>
 
+#include "version.h"
 #include "mod2.h"
 #include "version.h"
 #ifndef ESINGULAR

@@ -53,6 +53,7 @@ CPPFLAGS	= -I${srcdir} @CPPFLAGS@
 DEFS		= -DNDEBUG -D@SING_UNAME@ @DEFS@
 LDFLAGS		= @LDFLAGS@
 LD_DYN_FLAGS	= @LD_DYN_FLAGS@
+LD_LIBC	        = @LD_LIBC@
 STATIC_LDFLAGS	= @STATIC_LDFLAGS@
 LIBS		= -lm @NEED_LIBS@
 
@@ -180,14 +181,15 @@ Singular: mod2.h Makefile version.h scanner.cc gmalloc.o \
           ${OBJS} iparith.o mpsr_Tok.o tesths.cc libparse.cc 
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} -o Singular \
 	tesths.cc iparith.o mpsr_Tok.o ${OBJS} ${LDFLAGS} ${LIBS} \
-	${LD_DYN_FLAGS} gmalloc.o
+	${LD_DYN_FLAGS} gmalloc.o ${LD_LIBC}
 
 Singular-static: mod2.h Makefile version.h scanner.cc  gmalloc.o \
 	        ${OBJS} iparith.o mpsr_Tok.o tesths.cc
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} \
 	-o Singular-static \
 	tesths.cc iparith.o mpsr_Tok.o \
-	${OBJS} ${STATIC_LDFLAGS} ${LDFLAGS} ${LIBS} ${LD_DYN_FLAGS} gmalloc.o
+	${OBJS} ${STATIC_LDFLAGS} ${LDFLAGS} ${LIBS} ${LD_DYN_FLAGS} \
+	gmalloc.o ${LD_LIBC}
 
 iparith.o mpsr_Tok.o : iparith.inc mpsr_Tok.inc
 
@@ -197,7 +199,7 @@ claptmpl.o: claptmpl.cc mod2.h
 iparith.inc mpsr_Tok.inc: gmalloc.o iparith.cc ipconv.cc tok.h mpsr_Tok.cc grammar.h mod2.h
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} -DGENTABLE \
 	     -o gentable iparith.cc tesths.cc mpsr_Tok.cc \
-	     ${OBJS} ${LDFLAGS} ${LIBS} gmalloc.o
+	     ${OBJS} ${LDFLAGS} ${LIBS} gmalloc.o ${LD_LIBC}
 	./gentable
 	/bin/rm -f gentable gentable.exe
 

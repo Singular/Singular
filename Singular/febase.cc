@@ -1,11 +1,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.80 1999-08-20 16:07:19 Singular Exp $ */
+/* $Id: febase.cc,v 1.81 1999-08-25 16:02:46 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
 
+#include "version.h"
 #include "mod2.h"
 
 #include <stdlib.h>
@@ -24,7 +25,6 @@
 #include "mmemory.h"
 #include "subexpr.h"
 #include "ipshell.h"
-#include "version.h"
 
 
 #define fePutChar(c) fputc((uchar)(c),stdout)

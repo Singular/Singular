@@ -497,7 +497,7 @@ AC_ARG_WITH(
   [  --with-namespaces       do compile namespace support])
 AC_ARG_WITH(
   dl,
-  [  --with-dl               do use dl (no dynamic linking)])
+  [  --with-dl               do use dl (dynamic linking)])
 AC_ARG_WITH(apint, 
   [  --with-apint=PACKAGE    use PACKAGE for arbitary integer arithmetic])
 AC_ARG_WITH(
@@ -647,13 +647,6 @@ else
   AC_DEFINE(HAVE_FEREAD)
 fi
 
-#   
-# dl
-if test "$with_dl" = yes; then
-  AC_CHECK_LIB(dl, dl_init,\
-   AC_MSG_WARN(building without dl: disabling dynamic linking))
-fi
-
 NEED_LIBS=$LIBS
 
 # gmp, smallgmp, MP, MPT, factory, libfac
@@ -729,6 +722,19 @@ else
   else
     AC_MSG_RESULT(none)
     AC_MSG_ERROR(can not build with smallgmp)
+  fi
+fi
+
+#   
+# dl
+if test "$with_dl" != no; then
+  AC_CHECK_LIB(dl, dlopen)
+  if test "$ac_cv_lib_dl_dlopen" = yes; then
+    NEED_LIBS="-ldl ${NEED_LIBS}"
+    LD_DYN_FLAGS="-Xlinker -E"
+    LD_LIBC="-lc"
+    AC_SUBST(LD_LIBC)
+    AC_DEFINE(HAVE_DL)
   fi
 fi
 

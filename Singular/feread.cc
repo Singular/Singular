@@ -1,12 +1,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feread.cc,v 1.21 1999-08-13 11:21:43 Singular Exp $ */
+/* $Id: feread.cc,v 1.22 1999-08-25 16:02:47 Singular Exp $ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */
 
 
+#include "version.h"
 #include "mod2.h"
 #include "tok.h"
 #include "febase.h"
@@ -15,50 +16,20 @@
 #include "ipid.h"
 #endif
 
-
 static char * fe_fgets_stdin_init(char *pr,char *s, int size);
 char * (*fe_fgets_stdin)(char *pr,char *s, int size)
  = fe_fgets_stdin_init;
-#if defined(HAVE_READLINE) && !defined(HAVE_FEREAD)
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/file.h>
-#include <sys/stat.h>
-#include <sys/errno.h>
 
-extern "C" {
- #ifdef READLINE_READLINE_H_OK
-  #include <readline/readline.h>
-  #ifdef HAVE_READLINE_HISTORY_H
-   #include <readline/history.h>
-  #endif
- #else /* declare everything we need explicitely and do not rely on includes */
-  extern char * rl_readline_name;
-  extern char *rl_line_buffer;
-  char *filename_completion_function();
-  typedef char **CPPFunction ();
-  extern char ** completion_matches ();
-  extern CPPFunction * rl_attempted_completion_function;
-  extern FILE * rl_outstream;
-  char * readline ();
-  void add_history ();
-  int write_history ();
- #endif /* READLINE_READLINE_H_OK */
-}
+/* ===================================================================*/
+/* =                   static/dymanic readline                      = */
+/* ===================================================================*/
+#if defined(HAVE_READLINE) || defined(HAVE_DYN_RL)
+
+#include "ipshell.h"
 
 #ifndef STDOUT_FILENO
 #define STDOUT_FILENO 1
 #endif
-
-#include "ipshell.h"
-
-char * fe_fgets_stdin_rl(char *pr,char *s, int size);
-
-
-/* Tell the GNU Readline library how to complete.  We want to try to complete
-   on command names  or on filenames if it is preceded by " */
 
 /* Generator function for command completion.  STATE lets us know whether
 *   to start from scratch; without any state (i.e. STATE == 0), then we
@@ -90,6 +61,47 @@ char *command_generator (char *text, int state)
   /* If no names matched, then return NULL. */
   return ((char *)NULL);
 }
+
+
+#endif
+/* ===================================================================*/
+/* =                      static readline                           = */
+/* ===================================================================*/
+/* some procedure are shared with "dynamic readline" */
+#if defined(HAVE_READLINE) && !defined(HAVE_FEREAD)
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/file.h>
+#include <sys/stat.h>
+#include <sys/errno.h>
+
+extern "C" {
+ #ifdef READLINE_READLINE_H_OK
+  #include <readline/readline.h>
+  #ifdef HAVE_READLINE_HISTORY_H
+   #include <readline/history.h>
+  #endif
+ #else /* declare everything we need explicitely and do not rely on includes */
+  extern char * rl_readline_name;
+  extern char *rl_line_buffer;
+  char *filename_completion_function();
+  typedef char **CPPFunction ();
+  extern char ** completion_matches ();
+  extern CPPFunction * rl_attempted_completion_function;
+  extern FILE * rl_outstream;
+  char * readline ();
+  void add_history ();
+  int write_history ();
+ #endif /* READLINE_READLINE_H_OK */
+}
+
+
+char * fe_fgets_stdin_rl(char *pr,char *s, int size);
+
+/* Tell the GNU Readline library how to complete.  We want to try to complete
+   on command names  or on filenames if it is preceded by " */
 
 /* Attempt to complete on the contents of TEXT.  START and END show the
 *   region of TEXT that contains the word to complete.  We can use the
@@ -158,7 +170,10 @@ char * fe_fgets_stdin_rl(char *pr,char *s, int size)
   return s;
 }
 #endif
-/*--------------------------------------------------------------*/
+
+/* ===================================================================*/
+/* =                    emulated readline                           = */
+/* ===================================================================*/
 #if !defined(HAVE_READLINE) && defined(HAVE_FEREAD)
 extern "C" {
 char * fe_fgets_stdin_fe(char *pr,char *s, int size);
@@ -174,6 +189,165 @@ char * fe_fgets_stdin_emu(char *pr,char *s, int size)
 }
 #endif
 
+
+/* ===================================================================*/
+/* =                     dynamic readline                           = */
+/* ===================================================================*/
+/* some procedure are shared with "static readline" */
+
+#if defined(HAVE_DYN_RL)
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/file.h>
+#include <sys/stat.h>
+#include <sys/errno.h>
+#include <dlfcn.h>
+
+extern "C" {
+  char *(*fe_filename_completion_function)(); /* 3 */
+  char *(* fe_readline) ();                   /* 4 */
+  void (*fe_add_history) ();                  /* 5 */
+  char ** fe_rl_readline_name;                /* 6 */
+  char **fe_rl_line_buffer;                   /* 7 */
+  char **(*fe_completion_matches)();          /* 8 */
+  typedef char **CPPFunction ();
+  CPPFunction **fe_rl_attempted_completion_function; /* 9 */
+  FILE ** fe_rl_outstream;                    /* 10 */
+  int (*fe_write_history) ();                 /* 11 */
+  int (*fe_history_total_bytes) ();           /* 12 */
+  void (*fe_using_history) ();                /* 13 */
+  int (*fe_read_history) ();                  /* 14 */
+}
+
+void * fe_rl_hdl=NULL;
+
+char * fe_fgets_stdin_rl(char *pr,char *s, int size);
+static int fe_init_dyn_rl()
+{
+  int res=0;
+  loop
+  {
+    fe_rl_hdl=dlopen("libreadline.so",RTLD_LAZY|RTLD_GLOBAL);
+    if (fe_rl_hdl==NULL) { res=1; break;}
+
+    fe_readline=dlsym(fe_rl_hdl,"readline");
+    if (fe_readline==NULL) { res=4; break; }
+    fe_add_history=dlsym(fe_rl_hdl,"add_history");
+    if (fe_add_history==NULL) { res=5; break; }
+    fe_rl_readline_name=dlsym(fe_rl_hdl,"rl_readline_name");
+    if (fe_rl_readline_name==NULL) { res=6; break; }
+    fe_rl_line_buffer=dlsym(fe_rl_hdl,"rl_line_buffer");
+    if (fe_rl_line_buffer==NULL) { res=7; break; }
+    fe_rl_line_buffer=dlsym(fe_rl_hdl,"rl_line_buffer");
+    if (fe_rl_line_buffer==NULL) { res=7; break; }
+    fe_completion_matches=dlsym(fe_rl_hdl,"completion_matches");
+    if (fe_completion_matches==NULL) { res=8; break; }
+    fe_rl_attempted_completion_function=
+      dlsym(fe_rl_hdl,"rl_attempted_completion_function");
+    if (fe_rl_attempted_completion_function==NULL) { res=9; break; }
+    fe_rl_outstream=dlsym(fe_rl_hdl,"rl_outstream");
+    if (fe_rl_outstream==NULL) { res=10; break; }
+    fe_write_history=dlsym(fe_rl_hdl,"write_history");
+    if (fe_write_history==NULL) { res=11; break; }
+    fe_history_total_bytes=dlsym(fe_rl_hdl,"history_total_bytes");
+    if (fe_history_total_bytes==NULL) { res=12; break; }
+    fe_using_history=dlsym(fe_rl_hdl,"using_history");
+    if (fe_using_history==NULL) { res=13; break; }
+    fe_read_history=dlsym(fe_rl_hdl,"read_history");
+    if (fe_read_history==NULL) { res=14; break; }
+    return 0;
+  }
+  dlclose(fe_rl_hdl);
+  return res;
+}
+
+
+/* Attempt to complete on the contents of TEXT.  START and END show the
+*   region of TEXT that contains the word to complete.  We can use the
+*   entire line in case we want to do some simple parsing.  Return the
+*   array of matches, or NULL if there aren't any.
+*/
+char ** singular_completion (char *text, int start, int end)
+{
+  /* If this word is not in a string, then it may be a command
+     to complete.  Otherwise it may be the name of a file in the current
+     directory. */
+  if ((*fe_rl_line_buffer)[start-1]=='"')
+    return (*fe_completion_matches) (text, *fe_filename_completion_function);
+  char **m=(*fe_completion_matches) (text, command_generator);
+  if (m==NULL)
+  {
+    m=(char **)malloc(2*sizeof(char*));
+    m[0]=(char *)malloc(end-start+2);
+    strncpy(m[0],text,end-start+1);
+    m[1]=NULL;
+  }
+  return m;
+}
+
+void fe_reset_input_mode (void)
+{
+  char *p = getenv("SINGULARHIST");
+  if (p != NULL)
+  {
+    if((*fe_history_total_bytes)()!=0)
+      (*fe_write_history) (p);
+  }
+}
+
+char * fe_fgets_stdin_drl(char *pr,char *s, int size)
+{
+  if (!BVERBOSE(V_PROMPT))
+  {
+    pr="";
+  }
+  mflush();
+
+  char *line;
+  line = (*fe_readline) (pr);
+
+  if (line==NULL)
+    return NULL;
+
+  if (*line!='\0')
+  {
+    (*fe_add_history) (line);
+  }
+  int l=strlen(line);
+  if (l>=size-1)
+  {
+    strncpy(s,line,size);
+  }
+  else
+  {
+    strncpy(s,line,l);
+    s[l]='\n';
+    s[l+1]='\0';
+  }
+  free (line);
+
+  return s;
+}
+#endif
+
+/* ===================================================================*/
+/* =                        fgets                                   = */
+/* ===================================================================*/
+char * fe_fgets(char *pr,char *s, int size)
+{
+  if (BVERBOSE(V_PROMPT))
+  {
+    fprintf(stdout,pr);
+  }
+  mflush();
+  return fgets(s,size,stdin);
+}
+
+/* ===================================================================*/
+/* =       init for static rl, dyn. rl, emu. rl                     = */
+/* ===================================================================*/
 static char * fe_fgets_stdin_init(char *pr,char *s, int size)
 {
 #if defined(HAVE_READLINE) && !defined(HAVE_FEREAD)
@@ -202,23 +376,50 @@ static char * fe_fgets_stdin_init(char *pr,char *s, int size)
   fe_fgets_stdin=fe_fgets_stdin_rl;
   return(fe_fgets_stdin_rl(pr,s,size));
 #endif
-#if !defined(HAVE_READLINE) && defined(HAVE_FEREAD)
-  fe_fgets_stdin=fe_fgets_stdin_emu;
-  return(fe_fgets_stdin_emu(pr,s,size));
+#ifdef HAVE_DYN_RL
+  /* do dynamic loading */
+  int res=fe_init_dyn_rl();
+  if (res!=0)
+  {
+    Warn("dynamic loading failed: %d\n",res);
+    fe_fgets_stdin=fe_fgets_stdin_emu;
+    return fe_fgets_stdin_emu(pr,s,size);
+  }
+  /* Allow conditional parsing of the ~/.inputrc file. */
+  (*fe_rl_readline_name) = "Singular";
+  /* Tell the completer that we want a crack first. */
+  (*fe_rl_attempted_completion_function) = (CPPFunction *)singular_completion;
+
+  /* set the output stream */
+  if(!isatty(STDOUT_FILENO))
+  {
+    #ifdef atarist
+      *fe_rl_outstream = fopen( "/dev/tty", "w" );
+    #else
+      *fe_rl_outstream = fopen( ttyname(fileno(stdin)), "w" );
+    #endif
+  }
+
+  /* try to read a history */
+  (*fe_using_history)();
+  char *p = getenv("SINGULARHIST");
+  if (p != NULL)
+  {
+    (*fe_read_history) (p);
+  }
+  fe_fgets_stdin=fe_fgets_stdin_drl;
+  return fe_fgets_stdin_drl(pr,s,size);
+#else
+  #if !defined(HAVE_READLINE) && defined(HAVE_FEREAD)
+    fe_fgets_stdin=fe_fgets_stdin_emu;
+    return(fe_fgets_stdin_emu(pr,s,size));
+  #endif
 #endif
 }
 
-/* fgets: */
-char * fe_fgets(char *pr,char *s, int size)
-{
-  if (BVERBOSE(V_PROMPT))
-  {
-    fprintf(stdout,pr);
-  }
-  mflush();
-  return fgets(s,size,stdin);
-}
-
+/* ===================================================================*/
+/* =                          TCL                                   = */
+/* ===================================================================*/
 #ifdef HAVE_TCL
 /* tcl: */
 char * fe_fgets_tcl(char *pr,char *s, int size)
@@ -230,6 +431,9 @@ char * fe_fgets_tcl(char *pr,char *s, int size)
 }
 #endif
 
+/* ===================================================================*/
+/* =                      batch mode                                = */
+/* ===================================================================*/
 /* dummy (for batch mode): */
 char * fe_fgets_dummy(char *pr,char *s, int size)
 {

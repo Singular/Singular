@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.inc,v 1.24 1999-05-06 16:53:22 Singular Exp $ */
+/* $Id: febase.inc,v 1.25 1999-08-25 16:02:47 Singular Exp $ */
 /*
 * ABSTRACT: handling of 'voices'
 */
@@ -522,7 +522,7 @@ int feReadLine(char* b, int l)
     {
       feShowPrompt();
       s=fe_fgets_stdin(fe_promptstr,
-                       currentVoice->buffer+offset,
+                       &(currentVoice->buffer[offset]),
                        (4096-1-sizeof(ADDRESS))-offset);
     }
     else if (currentVoice->sw==BI_file)

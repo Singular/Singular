@@ -13,6 +13,7 @@
 #include <time.h>
 #include <limits.h>
 
+#include "version.h"
 #include "mod2.h"
 #include "tok.h"
 #include "febase.h"
@@ -533,12 +534,16 @@ char * versionString()
 #ifdef HAVE_MPSR
               StringAppend("MP(%s),",MP_VERSION);
 #endif
-#if defined(HAVE_READLINE) && !defined(FEREAD)
-              StringAppendS("libreadline,");
+#if defined(HAVE_DYN_RL)
+              StringAppendS("d-readline,"
 #else
-#ifdef HAVE_FEREAD
+  #if defined(HAVE_READLINE) && !defined(FEREAD)
+              StringAppendS("libreadline,");
+  #else
+    #ifdef HAVE_FEREAD
               StringAppendS("emulated libreadline,");
-#endif
+    #endif
+  #endif
 #endif
 #ifdef SRING
               StringAppendS("super algebra,");
