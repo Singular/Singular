@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.57 2001-01-20 12:14:18 Singular Exp $ */
+/* $Id: longalg.cc,v 1.58 2001-01-20 12:38:41 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1577,14 +1577,14 @@ number naMult(number la, number lb)
     omFreeBin((ADDRESS)lo, rnumber_bin);
     lo=NULL;
   }
-#ifdef LONGALGNEW
+#if 0
   if (lo->n!=NULL)
   {
      number luu=(number)lo;
      naNormalize(luu);
      lo=(lnumber)luu;
   }
-#endif /* LONGALGNEW */
+#endif
   naTest((number)lo);
   return (number)lo;
 }
