@@ -14,6 +14,9 @@ proc tst_gaussm(poly f)
   l=spnf(l[1],l[3],l[4])+list(l[5],l[6]);
   endvfilt(l);
   spgamma(l);
+  l=tmatrix(f);
+  print(l[1]);
+  print(l[2]);
 }
 
 
