@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.89 1999-12-13 16:28:35 obachman Exp $
+@comment $Id: singular.doc,v 1.90 2000-01-12 13:31:00 pohl Exp $
 @comment this file contains the main structure of the manual
 
 
@@ -372,6 +372,7 @@ LIB "all.lib";
 * presolve_lib:: procedures for pre-solving polynomial equations
 * solve_lib:: procedures to solve polynomial systems
 * triang_lib:: procedures for decomposing zero-dimensional ideals
+* ntsolve_lib:: one real solution of polynomial systems (Newton iteration)
 @end menu
 
 @c ---------------------------------------------------------
@@ -384,9 +385,13 @@ LIB "all.lib";
 @c TBC
 @c lib solve.lib no_ex
 @c ---------------------------------------------------------
-@node triang_lib, ,  solve_lib, Symbolic-numerical solving
+@node triang_lib, ntsolve_lib,  solve_lib, Symbolic-numerical solving
 @subsection triang_lib
 @c lib triang.lib no_ex
+@c ---------------------------------------------------------
+@node ntsolve_lib, , triang_lib, Symbolic-numerical solving
+@subsection ntsolve_lib
+@c lib ntsolve.lib
 
 @c ----------------------------------------------------------------------------
 @node Visualization, , Symbolic-numerical solving, SINGULAR libraries
