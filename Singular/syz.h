@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.h,v 1.22 1999-11-15 17:20:53 obachman Exp $ */
+/* $Id: syz.h,v 1.23 2000-01-31 14:57:34 Singular Exp $ */
 /*
 * ABSTRACT: Resolutions
 */
@@ -110,11 +110,6 @@ syStrategy syConvList(lists li,BOOLEAN toDel=FALSE);
 syStrategy syForceMin(lists li);
 syStrategy syMinimize(syStrategy syzstr);
 void syKillEmptyEntres(resolvente res,int length);
-#ifdef PDEBUG
-int syzcomp2dpc(poly p1, poly p2);
-#else
-#define syzcomp2dpc rComp0
-#endif
 
 extern int *  currcomponents;
 extern long *  currShiftedComponents;

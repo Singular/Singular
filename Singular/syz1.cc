@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz1.cc,v 1.52 2000-01-28 12:37:56 siebert Exp $ */
+/* $Id: syz1.cc,v 1.53 2000-01-31 14:57:34 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -278,18 +278,6 @@ static int syzcomp2dpc_test(poly p1, poly p2)
   if (o1==o2/*pGetComp(p1)==pGetComp(p2)*/) return 0;
   if (currcomponents[o1]>currcomponents[o2]) return 1;
   return -1;
-}
-int syzcomp2dpc(poly p1, poly p2)
-{
-  int test = syzcomp2dpc_test(p1, p2);
-  int rc = rComp0(p1, p2);
-  if (test != rc)
-  {
-    assume(0);
-    syzcomp2dpc_test(p1, p2);
-    rComp0(p1, p2);
-  }
-  return test;
 }
 #endif // PDEBUG
 

@@ -3,10 +3,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.27 1999-11-15 17:20:41 obachman Exp $ */
+/* $Id: polys.h,v 1.28 2000-01-31 14:57:33 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
+#include "polys-comp.h"
 #include "polys-impl.h"
 #define pFetchCopy(r,p)     _pFetchCopy(r,p)
 // Similar to pFetchCopy, except that poly p is deleted
@@ -95,11 +96,8 @@ extern void pSetGlobals(ring r, BOOLEAN complete = TRUE);
 
 /*-----------the ordering of monomials:-------------*/
 extern pSetmProc pSetm;
-extern pCompProc pComp0;
+#define pComp0 rComp0
 #define pSetmComp pSetm
-// this is needed here as long as monomials with negative exponents might be
-// compared (see in spolys.cc)
-extern pCompProc t_pComp0;
 int    pComp(poly p1,poly p2);
 extern pLDegProc pLDeg;
 extern pFDegProc pFDeg;

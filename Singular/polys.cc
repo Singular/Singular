@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.52 1999-11-15 17:20:40 obachman Exp $ */
+/* $Id: polys.cc,v 1.53 2000-01-31 14:57:32 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -30,7 +30,6 @@ pLDegProc pLDeg;
 pFDegProc pFDeg;
 /* the monomial ordering of the head monomials a and b */
 /* returns -1 if a comes before b, 0 if a=b, 1 otherwise */
-pCompProc pComp0;
 
 int pVariables;     // number of variables
 //int pVariablesW;    // number of words of pVariables exponents
@@ -60,7 +59,7 @@ poly      ppNoether = NULL;
 
 /* -------------- static variables --------------------------------------- */
 /*is the basic comparing procedure during a computation of syzygies*/
-static pCompProc pCompOld;
+//static pCompProc pCompOld;
 
 /*contains the headterms for the Schreyer orderings*/
 static int* SchreyerOrd;
@@ -284,10 +283,12 @@ int mcompSchrB(poly p1,poly p2)
   int CompP1=pGetComp(p1),CompP2=pGetComp(p2),result,
       cP1=SchreyerOrd[CompP1-1],cP2=SchreyerOrd[CompP2-1];
 
-  if (CompP1==CompP2) return pCompOld(p1,p2);
+  //if (CompP1==CompP2) return pCompOld(p1,p2);
+  if (CompP1==CompP2) return pComp0(p1,p2);
   pSetComp(p1,cP1);
   pSetComp(p2,cP2);
-  result = pCompOld(p1,p2);
+  //result = pCompOld(p1,p2);
+  result = pComp0(p1,p2);
   pSetComp(p1,CompP1);
   pSetComp(p2,CompP2);
   if (!result)
@@ -372,8 +373,8 @@ void pSetSchreyerOrdM(polyset nextOrder, int length,int comps)
         SchreyerOrd[i] = i;
       for (i=indexShift;i<maxSchreyer;i++)
         SchreyerOrd[i] = pGetComp(nextOrder[i-indexShift]);
-      pCompOld = pComp0;
-      pComp0 = mcompSchrM;
+      //pCompOld = pComp0;
+      //pComp0 = mcompSchrM;
       pLDegOld = pLDeg;
       pLDeg = ldegSchrM;
     }
@@ -385,7 +386,7 @@ void pSetSchreyerOrdM(polyset nextOrder, int length,int comps)
       Free((ADDRESS)SchreyerOrd,maxSchreyer*sizeof(int));
       maxSchreyer = 0;
       indexShift = 0;
-      pComp0 = pCompOld;
+      //pComp0 = pCompOld;
       pLDeg = pLDegOld;
     }
   }
@@ -792,7 +793,6 @@ void pSetGlobals(ring r, BOOLEAN complete)
       test &= ~Sy_bit(OPT_REDTAIL); /* noredTail */
     }
     pSetm=rSetm;
-    pComp0=rComp0;
   }
   if (pFDeg!=pWTotaldegree) pFDeg=pTotaldegree;
 }
