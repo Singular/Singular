@@ -63,35 +63,34 @@ TO INSTALL SINGULAR
 
     If you have root permission, do:
       
-      ln -s `pwd`./<uname>/bin/Singular-<x-y-z> /usr/local/bin/Singular 
+      ln -s `pwd`/Singular/<uname>/<x-y-z>/Singular /usr/local/bin/Singular 
 	
-    Otherwise, append the dir `pwd`./<uname>/bin/ to your $PATH
+    Otherwise, append the dir `pwd`/Singular/<uname>/<x-y-z> to your $PATH
     environment variable. For the csh (or, tcsh) shell do:
 
-      set path=(`pwd`/<uname>/bin/Singular-<x-y-z> $path)
+      set path=(`pwd`/Singular/<uname>/<x-y-z> $path)
  
     For the bash (or, ksh) shell do:
   
-      export PATH=`pwd`/<uname>/bin/Singular-<x-y-z>:$PATH
+      export PATH=`pwd`/Singular/<uname>/<x-y-z>:$PATH
 
     You also might want to adjust your personal start-up files accordingly, 
     so that the PATH variable is set automatically each time you login.
 
     IMPORTANT: Do NEVER move or copy the file
-    `./<uname>/bin/Singular-<x-y-z>'  to another place, but use
+    `./Singular/<uname>/<x-y-z>/Singular'  to another place, but use
     soft-links instead. 
 
 
 After unpacking, you will have a directory structure like:
-  ./<uname>/bin/Singular-<x-y-z>    executable(s)
-  ./<uname>/bin/Singular            soft link to executable
-  ./Singular/LIB/<x-y-z>/           Singular libraries
-  ./Singular/gftables               Singular lookup tables
-  ./Singular/doc/<x-y-z>/           documentation (ps, dvi, info)
-  ./Singular/html/<x-y-z>/          documentation (html)
-  ./Singular/README                 general information on Singular
-  ./Singular/COPYING                licence information
-  ./Singular/INSTALL                this file
+  ./Singular/<uname>/<x-y-z>/        executable(s)
+  ./Singular/LIB/<x-y-z>/            Singular libraries
+  ./Singular/LIB/gftables/           Singular lookup tables
+  ./Singular/doc/<x-y-z>/            documentation (ps, dvi, info)
+  ./Singular/html/<x-y-z>/           documentation (html)
+  ./Singular/README                  general information on Singular
+  ./Singular/COPYING                 licence information
+  ./Singular/INSTALL                 this file
 
 For the executable to work, the directory layout must look pretty much
 like this; the executable looks for "sibling" directories at run-time
@@ -160,9 +159,8 @@ TROUBLES
 
    Can not find shared library ....
 
-  To fix this, first delete the files
-	./<uname>/bin/Singular
-	./<uname>/bin/Singular-<x-y-z>	
+  To fix this, first delete the file
+	./Singular/<uname>/<x-y-z>/Singular
 
   and then download and install
 
