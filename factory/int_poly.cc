@@ -1,18 +1,26 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: int_poly.cc,v 1.1 1996-05-23 09:33:05 stobbe Exp $
+// $Id: int_poly.cc,v 1.2 1997-03-27 10:07:37 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.1  1996/05/23 09:33:05  stobbe
+"modulocoeff: Bug fix, invert is now handled as it should be.
+"
+
 // Revision 1.0  1996/05/17  10:59:46  stobbe
 // Initial revision
 //
 */
 
+#ifndef NOSTREAMIO
 #include <string.h>
 #include <strstream.h>
+#endif /* NOSTREAMIO */
 
 #include "assert.h"
+
 #include "cf_defs.h"
+
 #include "cf_factory.h"
 #include "int_cf.h"
 #include "int_poly.h"
@@ -42,8 +50,8 @@ InternalPoly::InternalPoly( const Variable & v, const int e, const CanonicalForm
 
 InternalPoly::InternalPoly( const InternalPoly& )
 {
-    cerr << "ups there is something wrong in your code" << endl; 
-}; 
+    ASSERT( 0, "ups there is something wrong in your code" );
+};
 
 InternalPoly::~InternalPoly()
 {
@@ -133,10 +141,11 @@ InternalPoly::coeff( int i )
     return 0;
 }
 
+#ifndef NOSTREAMIO
 void
 InternalPoly::print(ostream &aStream, char * aString )
 {
-    if ( ! firstTerm ) 
+    if ( ! firstTerm )
 	aStream << 0 << aString;
     else {
 	char * theString;
@@ -175,6 +184,7 @@ InternalPoly::print(ostream &aStream, char * aString )
 	}
     }
 }
+#endif /* NOSTREAMIO */
 
 InternalCF*
 InternalPoly::neg()
@@ -989,7 +999,7 @@ InternalPoly::divremcoefft( InternalCF* cc, InternalCF*& quot, InternalCF*& rem,
 termList
 InternalPoly::copyTermList ( termList aTermList, termList& theLastTerm, bool negate )
 {
-    if ( aTermList == 0 ) 
+    if ( aTermList == 0 )
 	return 0;
     else  if ( negate ) {
 	termList sourceCursor = aTermList;
@@ -1028,7 +1038,7 @@ InternalPoly::copyTermList ( termList aTermList, termList& theLastTerm, bool neg
 termList
 InternalPoly::deepCopyTermList ( termList aTermList, termList& theLastTerm )
 {
-    if ( aTermList == 0 ) 
+    if ( aTermList == 0 )
 	return 0;
     else {
 	termList sourceCursor = aTermList;
@@ -1111,7 +1121,7 @@ InternalPoly::addTermList ( termList theList, termList aList, termList& lastTerm
 		    theList = new term( theCursor, -aCursor->coeff, aCursor->exp );
 		    predCursor = theList;
 		}
-	    else 
+	    else
 		if ( predCursor ) {
 		    predCursor->next = new term( theCursor, aCursor->coeff, aCursor->exp );
 		    predCursor = predCursor->next;
@@ -1121,7 +1131,7 @@ InternalPoly::addTermList ( termList theList, termList aList, termList& lastTerm
 		    predCursor = theList;
 		}
 	    aCursor = aCursor->next;
-	}	
+	}
 	else {
 	    predCursor = theCursor;
 	    theCursor = theCursor->next;
