@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.30 1999-03-08 18:11:47 Singular Exp $ */
+/* $Id: longalg.cc,v 1.31 1999-04-17 12:30:20 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -763,7 +763,7 @@ void napWrite(alg p)
       }
       else if (nacIsMOne(p->ko))
       {
-        StringAppend("-");
+        StringAppendS("-");
       }
       int  i;
       for (i = 0; i <= naNumbOfPar - 1; i++)
@@ -774,7 +774,7 @@ void napWrite(alg p)
             StringAppendS("*");
           else
             wroteCoeff=(pShortOut==0);
-          StringAppend(naParNames[i]);
+          StringAppendS(naParNames[i]);
           if (p->e[i] > 1)
           {
             if (pShortOut == 0)

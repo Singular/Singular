@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.48 1999-03-15 16:18:51 Singular Exp $
+// $Id: clapsing.cc,v 1.49 1999-04-17 12:30:16 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -132,14 +132,14 @@ TIMING_DEFINE_PRINT( algLcmTimer );
 #define FACTORY_ALGOUT_POLY( tag, f ) \
   StringSetS( tag ); \
   napWrite( f ); \
-  PrintS(StringAppend("\n"));
+  PrintS(StringAppendS("\n"));
 // CanonicalForm f, represents transcendent extension
 #define FACTORY_CFTROUT_POLY( tag, f ) \
   { \
     alg F=convClapPSingTr( f ); \
     StringSetS( tag ); \
     napWrite( F ); \
-    PrintS(StringAppend("\n")); \
+    PrintS(StringAppendS("\n")); \
     napDelete( &F ); \
   }
 // CanonicalForm f, represents algebraic extension
@@ -148,7 +148,7 @@ TIMING_DEFINE_PRINT( algLcmTimer );
     alg F=convClapASingA( f ); \
     StringSetS( tag ); \
     napWrite( F ); \
-    PrintS(StringAppend("\n")); \
+    PrintS(StringAppendS("\n")); \
     napDelete( &F ); \
   }
 #else /* ! FACTORY_GCD_DEBOUT */
@@ -608,8 +608,8 @@ void singclap_divide_content ( poly f )
         //nTest((number)c);
         //#ifdef LDEBUG
         //number cn=(number)c;
-        //StringSet(""); nWrite(nt); StringAppend(" ==> ");
-        //nWrite(cn);PrintS(StringAppend("\n"));
+        //StringSet(""); nWrite(nt); StringAppendS(" ==> ");
+        //nWrite(cn);PrintS(StringAppendS("\n"));
         //#endif
       }
     }
@@ -927,16 +927,16 @@ char* singclap_neworder ( ideal I)
     mark[i]=1;
     if (i<offs)
     {
-      StringAppend(currRing->parameter[i]);
+      StringAppendS(currRing->parameter[i]);
     }
     else
     {
-      StringAppend(currRing->names[i-offs]);
+      StringAppendS(currRing->names[i-offs]);
     }
     Li++;
     cnt--;
     if(cnt==0) break;
-    StringAppend(",");
+    StringAppendS(",");
     if(! Li.hasItem()) break;
   }
   for(i=0;i<pVariables+offs;i++)
@@ -945,18 +945,18 @@ char* singclap_neworder ( ideal I)
     {
       if (i<offs)
       {
-        StringAppend(currRing->parameter[i]);
+        StringAppendS(currRing->parameter[i]);
       }
       else
       {
-        StringAppend(currRing->names[i-offs]);
+        StringAppendS(currRing->names[i-offs]);
       }
       cnt--;
       if(cnt==0) break;
-      StringAppend(",");
+      StringAppendS(",");
     }
   }
-  return mstrdup(StringAppend(""));
+  return mstrdup(StringAppendS(""));
 #else
   return NULL;
 #endif

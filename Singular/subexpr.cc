@@ -698,7 +698,7 @@ char *  sleftv::String(void *d, BOOLEAN func)
             nWrite(n);
             nDelete(&n);
           }
-          s = StringAppend("");
+          s = StringAppendS("");
           break;
         case MATRIX_CMD:
           s= iiStringMatrix((matrix)d,1);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.39 1999-04-16 07:53:38 obachman Exp $ */
+/* $Id: ipshell.cc,v 1.40 1999-04-17 12:30:18 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -505,7 +505,7 @@ char * iiStringMatrix(matrix im, int dim,char ch)
     {
       pString0(*pp++);
       s=StringAppend("%c",ch);
-      if (dim > 1) s = StringAppend("\n");
+      if (dim > 1) s = StringAppendS("\n");
     }
   }
   s[strlen(s)- (dim > 1 ? 2 : 1)]='\0';

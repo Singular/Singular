@@ -682,7 +682,7 @@ BOOLEAN setOption(leftv res, leftv v)
             }
           }
         }
-        PrintTCLS('O',StringAppend(""));
+        PrintTCLS('O',StringAppendS(""));
         StringSet("");
       }
       else
@@ -734,10 +734,10 @@ char * showOption()
         if (tmp & Sy_bit(i)) StringAppend(" %d",i+32);
       }
     }
-    return mstrdup(StringAppend(""));
+    return mstrdup(StringAppendS(""));
   }
   else
-    return mstrdup(StringAppend(" none"));
+    return mstrdup(StringAppendS(" none"));
 }
 
 char * versionString()
@@ -796,22 +796,22 @@ char * versionString()
               StringAppend("MDEBUG=%d,",MDEBUG);
 #endif
 #ifdef MTRACK
-              StringAppend("MTRACK,");
+              StringAppendS("MTRACK,");
 #endif
 #ifdef PDEBUG
-              StringAppend("PDEBUG,");
+              StringAppendS("PDEBUG,");
 #endif
 #ifdef KDEBUG
-              StringAppend("KDEBUG,");
+              StringAppendS("KDEBUG,");
 #endif
 #ifdef TEST_MAC_ORDER
               StringAppendS("mac_order,");
 #endif
 #ifndef __OPTIMIZE__
 #ifdef __MWERKS__
-              StringAppend(" Codewarrior 2.0,");
+              StringAppendS(" Codewarrior 2.0,");
 #else
-              StringAppend("-g,");
+              StringAppendS("-g,");
 #endif
 #endif
               StringAppend("random=%d\n",siRandomStart);

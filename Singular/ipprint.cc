@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipprint.cc,v 1.8 1998-11-16 08:41:17 Singular Exp $ */
+/* $Id: ipprint.cc,v 1.9 1999-04-17 12:30:18 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: printing
 */
@@ -96,7 +96,7 @@ void jjPRINT_MA0(matrix m, const char *name)
     for(i--;i>=0;i--)
     {
       pString(m->m[i]);
-      ss=StringAppend(",");
+      ss=StringAppendS(",");
       if ((int)strlen(ss)>colmax) s[i]=NULL;
       else                        s[i]=mstrdup(ss);
     }

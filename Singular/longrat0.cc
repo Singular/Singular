@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat0.cc,v 1.6 1998-05-27 17:14:08 Singular Exp $ */
+/* $Id: longrat0.cc,v 1.7 1999-04-17 12:30:21 Singular Exp $ */
 /*
 * ABSTRACT -
 * IO for long rational numbers (Hubert Grassmann)
@@ -116,7 +116,7 @@ void nlWrite (number &a)
 #ifdef TEST
   else if (a==NULL)
   {
-    StringAppend("o");
+    StringAppendS("o");
   }
 #endif
   else
@@ -132,12 +132,12 @@ void nlWrite (number &a)
     l+=2;
     s=(char*)Alloc(l);
     z=mpz_get_str(s,10,&a->z);
-    StringAppend(z);
+    StringAppendS(z);
     if (a->s!=3)
     {
-      StringAppend("/");
+      StringAppendS("/");
       z=mpz_get_str(s,10,&a->n);
-      StringAppend(z);
+      StringAppendS(z);
     }
     Free((ADDRESS)s,l);
   }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.26 1998-12-03 11:02:38 obachman Exp $ */
+/* $Id: silink.cc,v 1.27 1999-04-17 12:30:24 Singular Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -735,7 +735,7 @@ static int DumpRhs(FILE *fd, idhdl h)
     {
       StringSetS("");
       nWrite(IDRING(h)->minpoly);
-      rhs = StringAppend("");
+      rhs = StringAppendS("");
       if (fprintf(fd, "; minpoly = %s", rhs) == EOF) return EOF;
     }
     else if (type_id == INTVEC_CMD) fprintf(fd, ")");
