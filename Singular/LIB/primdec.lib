@@ -1,4 +1,4 @@
-// $Id: primdec.lib,v 1.49 1999-10-21 07:23:43 obachman Exp $
+// $Id: primdec.lib,v 1.50 1999-11-17 13:51:58 pfister Exp $
 ///////////////////////////////////////////////////////////////////////////////
 // primdec.lib                                                               //
 // algorithms for primary decomposition based on                             //
@@ -10,7 +10,7 @@
 // written by Wolfram Decker and Hans Schoenemann                            //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: primdec.lib,v 1.49 1999-10-21 07:23:43 obachman Exp $";
+version="$Id: primdec.lib,v 1.50 1999-11-17 13:51:58 pfister Exp $";
 info="
 LIBRARY: primdec.lib:   PROCEDURES FOR PRIMARY DECOMPOSITION
 AUTHORS:  Gerhard Pfister, email: pfister@mathematik.uni-kl.de (GTZ)
@@ -2554,7 +2554,7 @@ proc radicalKL (list m,ideal ser,list #)
    poly @p,@q;
    string @va,quotring;
    int  homo=homog(i);
-   if((find(ordstr(basering),"w")!=0)||(find(ordstr(basering),"W")!=0))
+   if((find(ordstr(basering),"w")!=0)||(find(ordstr(basering),"W")!=0)||(find(ordstr(basering),"a")!=0))
    {
       homo=0;
    }
@@ -2700,7 +2700,6 @@ proc radicalKL (list m,ideal ser,list #)
      //and the map phi:K[var(1),...,var(nva)] ----->
      //K(var(nnpr+1),..,var(nva))[..the rest..]
      //------------------------------------------------------------------------
-
       quotring=prepareQuotientring(nvars(basering)-indep[@m][3]);
 
      //------------------------------------------------------------------------
@@ -4184,11 +4183,11 @@ EXAMPLE: example radical; shows an example
    ideal re=1;
    option(redSB);
    list qr=simplifyIdeal(i);
+
    map phi=@P,qr[2];
    i=qr[1];
 
    list pr=facstd(i);
-
    if(size(pr)==1)
    {
       attrib(pr[1],"isSB",1);
@@ -4209,7 +4208,6 @@ EXAMPLE: example radical; shows an example
    }
    option(noredSB);
    int s=size(pr);
-
    if(s==1)
    {
      i=radicalEHV(i,ideal(1),il);
