@@ -1,8 +1,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/iparith.cc,v 1.4 1997-03-21 15:30:34 Singular Exp $";
+static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/iparith.cc,v 1.5 1997-03-21 15:45:41 Singular Exp $";
 /* $Log: not supported by cvs2svn $
+// Revision 1.4  1997/03/21  15:30:34  Singular
+// * hannes: return an error for ring(..) and qring(...)
+//
 // Revision 1.3  1997/03/21  13:19:00  Singular
 // fixed assignment of lists, det(constants), comparision of intmats
 //
@@ -2984,7 +2987,6 @@ struct sValCmd1 dArith1[]=
 ,{jjREAD,       READ_CMD,        STRING_CMD,     LINK_CMD }
 ,{jjREGULARITY, REGULARITY_CMD,  INT_CMD,        LIST_CMD }
 ,{jjRESERVEDNAME,RESERVEDNAME_CMD, INT_CMD,      STRING_CMD }
-,{jjWRONG,      RING_CMD,        0,              ANY_TYPE}
 ,{jjWRONG,      ROWS_CMD,        0,              POLY_CMD }
 ,{jjpMaxComp,   ROWS_CMD,       -((s)INT_CMD),   VECTOR_CMD }
 ,{jjROWS,       ROWS_CMD,        INT_CMD,        MODUL_CMD }

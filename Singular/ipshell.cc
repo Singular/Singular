@@ -1,8 +1,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/ipshell.cc,v 1.1.1.1 1997-03-19 13:18:47 obachman Exp $";
+static char rcsid[] = "$Header: /exports/cvsroot-2/cvsroot/Singular/ipshell.cc,v 1.2 1997-03-21 15:45:44 Singular Exp $";
 /* $Log: not supported by cvs2svn $
+// Revision 1.1.1.1  1997/03/19  13:18:47  obachman
+// Imported Singular sources
+//
 */
 
 /*
@@ -787,6 +790,7 @@ BOOLEAN iiExport (leftv v, int toLev)
           if (IDTYP(h)==v->Typ())
           {
             Warn("redefining %s",IDID(h));
+            if (iiLocalRing[0]==IDRING(h)) iiLocalRing[0]=NULL;
             killhdl(h,root);
           }
           else
