@@ -1,8 +1,8 @@
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID $Id: monodromy_l.tst,v 1.8 1999-06-16 18:40:23 mschulze Exp $");
+tst_ignore("CVS ID $Id: monodromy_l.tst,v 1.9 1999-06-22 10:48:12 obachman Exp $");
 
-LIB "monodrmy.lib";
+LIB "mondromy.lib";
 
 list unimodal=
 "P[8]","x,y,z","x3+y3+z3+xyz",
