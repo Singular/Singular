@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.h,v 1.10 1998-10-14 10:18:55 obachman Exp $ */
+/* $Id: silink.h,v 1.11 1999-04-15 09:57:05 obachman Exp $ */
 /*
 * ABSTRACT: general interface to links
 */
@@ -83,6 +83,17 @@ inline si_link slCopy(si_link l)
 {
   l->ref++;
   return l;
+}
+inline char* slString(si_link l)
+{
+  if (l->name != NULL)
+  {
+    return mstrdup(l->name);
+  }
+  else
+  {
+    return mstrdup("");
+  }
 }
 
 #endif // SILINK_H

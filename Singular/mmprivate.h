@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmprivate.h,v 1.8 1999-03-19 17:42:31 obachman Exp $ */
+/* $Id: mmprivate.h,v 1.9 1999-04-15 09:57:04 obachman Exp $ */
 /*
 * ABSTRACT
 */
@@ -34,7 +34,9 @@ typedef struct DBMCB
   struct DBMCB * next;
   struct DBMCB * prev;
   char * fname;
+#ifdef MTRACK
   unsigned long bt_stack[BT_MAXSTACK];
+#endif
   int init;
   size_t size;
   int lineno;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.140 1999-03-19 14:18:00 obachman Exp $ */
+/* $Id: iparith.cc,v 1.141 1999-04-15 09:57:03 obachman Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3568,6 +3568,7 @@ struct sValCmd1 dArith1[]=
 ,{jjSTRING,     STRING_CMD,      STRING_CMD,     MAP_CMD }
 ,{jjSTRING,     STRING_CMD,      STRING_CMD,     INTVEC_CMD }
 ,{jjSTRING,     STRING_CMD,      STRING_CMD,     INTMAT_CMD }
+,{jjSTRING,     STRING_CMD,      STRING_CMD,     LINK_CMD }
 ,{jjSTRING_PROC,STRING_CMD,      STRING_CMD,     PROC_CMD }
 ,{jjSTRING,     STRING_CMD,      STRING_CMD,     RING_CMD }
 ,{jjSTRING,     STRING_CMD,      STRING_CMD,     QRING_CMD }

@@ -718,6 +718,11 @@ char *  sleftv::String(void *d)
       {
         return rString((ring)d);
       }
+        case LINK_CMD:
+        {
+          return slString((si_link) d);
+        }
+        
       default:
         #ifdef TEST
         ::Print("String:unknown type %s(%d)", Tok2Cmdname(Typ()),Typ());
