@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.137 1999-07-26 17:27:28 Singular Exp $
+@comment $Id: general.doc,v 1.138 1999-07-27 09:10:35 Singular Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -615,12 +615,12 @@ ring r = (real,50),(x,y,z),dp;
 @end smallexample
 
 @item
-the ring @math{R''(i)[x,y,z]}, where @math{R''} denotes the field of real
+the ring @math{R''(j)[x,y,z]}, where @math{R''} denotes the field of real
 numbers represented by floating point numbers of 50 valid decimal digits
-and @math{i} denotes the imaginary unit.
+and @math{j} denotes the imaginary unit.
 
 @smallexample
-ring r = (real,50,i),(x,y,z),dp;
+ring r = (complex,50,j),(x,y,z),dp;
 @end smallexample
 
 @item
@@ -629,7 +629,7 @@ numbers represented by floating point numbers of 3 valid decimal digits
 and @math{i} denotes the imaginary unit.
 
 @smallexample
-ring r = (real,i),(x,y,z),dp;
+ring r = complex,(x,y,z),dp;
 @end smallexample
 
 @item

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.60 1999-07-09 15:27:28 Singular Exp $ */
+/* $Id: ring.cc,v 1.61 1999-07-27 09:10:32 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -508,13 +508,20 @@ idhdl rInit(char *s, sleftv* pn, sleftv* rv, sleftv* ord,
   {
     ch=(int)pn->Data();
   }
-  else if (pn->name != NULL && strcmp(pn->name,"real")==0)
+  else if ((pn->name != NULL) 
+  && (strcmp(pn->name,"real")==0) || (strcmp(pn->name,"complex")==0))
   {
+    BOOLEAN complex_flag=(strcmp(pn->name,"complex")==0);
     ch=-1;
     if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
     {
       float_len=(int)pn->next->Data();
       pn=pn->next;
+    }
+    if ((pn->next==NULL) && complex_flag)
+    {
+      pn->next=(leftv)Alloc0(sizeof(sleftv));
+      pn->next->name=mstrdup("i");
     }
   }
   else
