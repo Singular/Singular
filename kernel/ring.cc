@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.3 2003-12-10 16:56:54 Singular Exp $ */
+/* $Id: ring.cc,v 1.4 2004-02-26 17:08:35 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -510,6 +510,12 @@ char * rCharStr(ring r)
     }
     return s;
   }
+  if (rField_is_long_C(r))
+  {
+    s=(char *)omAlloc(21+strlen(r->parameter[0]));
+    sprintf(s,"complex,%d,%s",r->float_len,r->parameter[0]);   /* C */
+    return s;
+  }
   int l=0;
   for(i=0; i<rPar(r);i++)
   {
@@ -556,7 +562,71 @@ char * rParStr(ring r)
   strcat(s,r->parameter[i]);
   return s;
 }
+#if 0
+char * rCharStr(ring r)
+{
+  char *s;
+  int i;
 
+  if (r->parameter==NULL)
+  {
+    i=r->ch;
+    if(i==-1)
+      s=omStrDup("real");                    /* R */
+    else
+    {
+      s=(char *)omAlloc(6);
+      sprintf(s,"%d",i);                   /* Q, Z/p */
+    }
+    return s;
+  }
+  int l=0;
+  for(i=0; i<rPar(r);i++)
+  {
+    l+=(strlen(r->parameter[i])+1);
+  }
+  s=(char *)omAlloc(l+6);
+  s[0]='\0';
+  if (r->ch<0)       sprintf(s,"%d",-r->ch); /* Fp(a) */
+  else if (r->ch==1) sprintf(s,"0");         /* Q(a)  */
+  else
+  {
+    sprintf(s,"%d,%s",r->ch,r->parameter[0]); /* Fq  */
+    return s;
+  }
+  char tt[2];
+  tt[0]=',';
+  tt[1]='\0';
+  for(i=0; i<rPar(r);i++)
+  {
+    strcat(s,tt);
+    strcat(s,r->parameter[i]);
+  }
+  return s;
+}
+
+char * rParStr(ring r)
+{
+  if (r->parameter==NULL) return omStrDup("");
+
+  int i;
+  int l=2;
+
+  for (i=0; i<rPar(r); i++)
+  {
+    l+=strlen(r->parameter[i])+1;
+  }
+  char *s=(char *)omAlloc(l);
+  s[0]='\0';
+  for (i=0; i<rPar(r)-1; i++)
+  {
+    strcat(s,r->parameter[i]);
+    strcat(s,",");
+  }
+  strcat(s,r->parameter[i]);
+  return s;
+}
+#endif
 char * rString(ring r)
 {
   char *ch=rCharStr(r);
