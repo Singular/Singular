@@ -287,6 +287,7 @@ void initial_data(calc_dat* c){
   }
   c->short_Exps=(long*) omalloc(n*sizeof(long));
   for (i=0;i<n;i++){
+    c->lengths[i]=pLength(c->S->m[i]);
     h=omalloc(i*sizeof(int));
     if (h!=NULL){
       c->states[i]=(int*) h;
@@ -303,10 +304,11 @@ void initial_data(calc_dat* c){
       }
       c->deg[i][j]=pLcmDeg(c->S->m[i],c->S->m[j]);
     }
-  
+    if ((c->lengths[i]==1) && (c->lengths[j]==1))
+      c->states[i][j]=HASTREP;
     c->rep[i]=i;
     c->short_Exps[i]=p_GetShortExpVector(c->S->m[i],c->r);
-    c->lengths[i]=pLength(c->S->m[i]);
+
   }
 
 
@@ -344,6 +346,7 @@ void add_to_basis(poly h, calc_dat* c){
     exit(1);
   }
   c->misses=(int*) omrealloc(c->misses,c->n*sizeof(int));
+  c->misses[i]=0;
   c->lengths[i]=pLength(h);
   hp=omrealloc(c->states, c->n * sizeof(int*));
   if (hp!=NULL){
@@ -395,8 +398,13 @@ void add_to_basis(poly h, calc_dat* c){
       }
     }
     else {
+      
       c->states[i][j]=UNIMPORTANT;
+      if (pHasNotCF(c->S->m[i],c->S->m[j]))
+        c->states[i][j]=HASTREP;
     }
+    if ((c->lengths[i]==1) && (c->lengths[j]==1))
+      c->states[i][j]=HASTREP;
   }
   if (c->skipped_i>0){
     c->continue_i=c->skipped_i;
