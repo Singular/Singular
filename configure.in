@@ -33,12 +33,7 @@ else
   AC_SUBST(SINGUNAME)
 fi
 
-# stupid Win programs do not like dots in their pathnames
-if test "$ac_cv_singuname" = ix86-Win; then
-  VERSION_SEP="-"
-else
-  VERSION_SEP="."
-fi
+VERSION_SEP="-"
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl Version business --  set these here
@@ -47,9 +42,9 @@ dnl
 # pass them indirectly to subsequent configures
 SINGULAR_MAJOR_VERSION=1
 SINGULAR_MINOR_VERSION=3
-SINGULAR_SUB_VERSION=1
+SINGULAR_SUB_VERSION=2
 SINGULAR_VERSION="${SINGULAR_MAJOR_VERSION}${VERSION_SEP}${SINGULAR_MINOR_VERSION}${VERSION_SEP}${SINGULAR_SUB_VERSION}"
-VERSION_DATE="November 1998"
+VERSION_DATE="February 1999"
 SINGULAR_DOS_VERSION="${SINGULAR_MAJOR_VERSION}-${SINGULAR_MINOR_VERSION}-${SINGULAR_SUB_VERSION}"
 export SINGULAR_MINOR_VERSION
 export SINGULAR_MAJOR_VERSION

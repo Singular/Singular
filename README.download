@@ -1,91 +1,56 @@
 WELCOME TO THE HOME FTP SITE OF SINGULAR -- A COMPUTER ALGEBRA SYSTEM FOR
 		       POLYNOMIAL COMPUTATIONS
-		
-Announcing Singular version 1.2.1:
-==================================
-Singular 1.2.1 is now available. It is a minor upgrade from Singular
-version 1.2.0 and contains mainly bug fixes. 
 
-This directory cointains:
+ANNOUNCING SINGULAR VERSION <x.y.z>:
+==================================
+Singular <x.y.z> is now available. It is a minor upgrade from Singular
+version 1.2.2 and contains mainly bug fixes. Furthermore, the download 
+procedure has changed a bit.
+
+
+THIS DIRECTORY CONTAINS:
 =========================
-Singular-1.2.1-share.tar.gz	             
-        -- shared data of newest Singular distribution for Unix platforms
-Singular-1.2.1-<uname description>.tar.gz  
-        -- newest Singular executables for Unix platforms
-Singular-1-2-1-ix86-Win.zip
-        -- complete Singular distribution for Windows 95/NT 
-Singular-1-2-1.ppc.sea.hqx.gz
-        -- complete Singular distribution for Macintosh PowerPC
-Singular-1-2-1.68k.sea.hqx.gz
-        -- complete Singular distribution for Macintosh 68K computers
-COPYING			Licence information on Singular
+Singular-<x.y.z>-share.[tar.gz,zip,sea.hqx]
+        -- architecture independent files of Singular distribution
+Singular-<x.y.z>-<uname>.[tar.gz,zip,sea.hqx]
+        -- architecture dependent files of Singular distribution
+INSTALL.[unix,win,mac]  Detailed downloading and installation instructions 
+COPYING			License information on Singular
 README.general          General information on Singular
 utils/			Directory containing various utilities
+			(info, unzip, termcap, dynamic libraries, etc)
 doc/			Directory containing Singular documentation
 Attic/			Directory containing old versions of Singular
 
 
-Not that (starting from Singular version 1.2.0 on) different versions
-of Singular can peaceable coexist within the same directory
-structure. That is, if you had previously downloaded Singular version
-1.2.0, you  can simply unpack version 1.2.1 at the same place.
+DOWNLOAD:
+=========
+(1) Download two files:
+        One of      `Singular-<x.y.z>-share.[tar.gz,zip,sea.hqx]'
+        AND, one of `Singular-<x.y.z>-<uname>.[tar.gz,zip,sea.hqx]'
+    where <uname> is a description of your hardware and
+    operating system. 
+
+(2) Unpack them at the same place and follow the instructions
+    contained in the `INSTALL' file of the architecture dependent
+    distribution.
+
+(3) In case of any trouble, consult the architecture dependent INSTALL
+    file which is also available in this directory as
+    INSTALL.[unix,win,mac]. 
+      
+
+LICENSING:
+==========
+Please see the file COPYING contained in this directory for license
+information on Singular. In particular, notice that we only grant you
+permission to use Singular if you have registered yourself as a
+Singular user by sending an email to <singular@mathematik.uni-kl.de>
+with the subject line (or, mail body) `register'.
 
 
-To download Singular for Unix platforms:
-========================================
-You need at least the following two files: 
-      Singular-1.2.1-share.tar.gz 
-      Singular-1.2.1-<uname description>.tar.gz
-where <uname description> is a description of the processor and operating
-system for which Singular is compiled (e.g, ix86-Linux). Please
-contact us if you can not find an appropriate architecture-dependent
-tar file. 
-
-Simply cd to the directory in which you wish to install SINGULAR,
-and then unpack the architecture independent tar file, followed by
-the architecture-dependent files for those architectures you use:
-
-  cd /usr/local/	# or wherever you install 3rd-party software
-  gzip -dc Singular-1.2.1-share.tar.gz | tar -pxf -
-  gzip -dc Singular-1.2.1-<uname description>.tar.gz | tar -pxf -
-
-You may replace `/usr/local/' with what you like, but refer to the
-INSTALL file which is contained in the architecture-dependent tar file
-(and which you can find at ./Singular/INSTALL after unpacking) for
-detailed information on how to install Singular.
-
-To download Singular for Windows 95/NT 
-======================================
-If you have a Windows unzip utility program (like WinZip) installed
-on your system then simply double-click on the file
-`Singular-<x-y-z>-ix86-Win.zip' and extract the content of the archive 
-at a directory in which you usually install 3rd-party software.
-
-Otherwise, download the file `unzip.exe' from
-   ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils 
-start an MS-DOS terminal, move the Singular archive and unzip program to
-a place in which you usually install 3rd-party software and extract
-(unpack) the archive with the command:
-  unzip Singular-<x-y-z>-ix86-Win.zip
-
-After extraction, follwo the instructions in the `./Singular/INSTALL'
-file contained in the archive.
-
-To download Singular for the Macintosh:
-=======================================
-Download the file Singular-<x-y-z>-<target>-MPW.sea.hqx. Expand the
-downloaded file using a standard Expander (like Compact Pro or StuffIt)
-to obtain the corresponding self-extracting
-Singular-<x-y-z>-<target>-MPW.sea file.  Click on the self-extracting
-Singular-1-2-1-<target>-MPW.sea file. This  will create a folder
-named "Singular" which contains the file 'INSTALL'. Follow the
-instructions contained in this file for further installation
-instructions.
-
-
-More information about Singular: Comments, Questions, Bug Reports
+MORE INFORMATION ABOUT SINGULAR: COMMENTS, QUESTIONS, BUG REPORTS
 =================================================================
-
 More and up-to-date information about Singular is always available
 from 
 	   http://www.mathematik.uni-kl.de/~zca/Singular

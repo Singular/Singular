@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: examples.doc,v 1.36 1998-10-26 15:05:35 obachman Exp $
+@comment $Id: examples.doc,v 1.37 1999-02-09 08:16:07 obachman Exp $
 @comment this file contains the examples
 
 @c The following directives are necessary for proper compilation
@@ -1216,7 +1216,7 @@ method. The input needs to be homogeneous.
 @ifset singularmanual
 @ref{mres}@*
 @end ifset
-computes a minimal free resolution of an ideal or module with the Szyzygy
+computes a minimal free resolution of an ideal or module with the Syzygy
 method.
 @item sres
 @ifset singularmanual
@@ -1236,7 +1236,7 @@ minimizes a free resolution of an ideal or module.
 @ifset singularmanual
 @ref{syz}@*
 @end ifset
-computes the first Szyzygy (i.e., the module of relations of the
+computes the first Syzygy (i.e., the module of relations of the
 given generators).
 @end table
 @code{res(i,r)}, @code{lres(i,r)}, @code{sres(i,r)}, @code{mres(i,r)},
@@ -1246,7 +1246,7 @@ See the the manual for a precise description of these commands.
 @*Note: The command @code{betti} does not require a minimal
 resolution for the minimal betti numbers.
 
-Now let's look at an examples which uses resolutions: The Hilbert-Burch
+Now let's look at an example which uses resolutions: The Hilbert-Burch
 theorem says that the ideal i of a reduced curve in
 @tex
 $K^3$
@@ -1272,7 +1272,7 @@ $P^4$
 P^4
 @end ifinfo
 from above.
-Finally we demonstrate the use of the type resoltuion in connection with
+Finally we demonstrate the use of the type resolution in connection with
 the lres command.
 
 @example

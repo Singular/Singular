@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.35 1998-10-26 15:05:40 obachman Exp $
+@comment $Id: math.doc,v 1.36 1999-02-09 08:16:10 obachman Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -192,7 +192,7 @@ $A_2$
 @ifinfo
 A2
 @end ifinfo
-consists of a set of generators of the first szyzgy module of
+consists of a set of generators of the first syzygy module of
 @tex
 $A_1$,
 @end tex

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: start.doc,v 1.31 1998-10-26 15:05:45 obachman Exp $
+@comment $Id: start.doc,v 1.32 1999-02-09 08:16:14 obachman Exp $
 @comment this file contains the "Introduction" chapter.
 @c * wichmann: + added chages by GMG.
 
@@ -925,7 +925,7 @@ hence the variety is empty.
 @end ifclear
 @cindex Modules and and their annihilator
 
-Now we shall give now three more advanced examples.
+Now we shall give three more advanced examples.
 
 @sc{Singular} is able to handle modules over all the rings,
 which can be defined as a basering. A free module of rank @code{n}

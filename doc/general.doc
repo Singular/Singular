@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.111 1999-01-22 17:40:55 Singular Exp $
+@comment $Id: general.doc,v 1.112 1999-02-09 08:16:09 obachman Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -881,7 +881,7 @@ Algorithms to compute the standard operations on ideals and modules:
 intersection, ideal quotient, elimination, etc.
 
 @item
-Different Szyzygy algorithms and algorithms to compute free resolutions
+Different Syzygy algorithms and algorithms to compute free resolutions
 of modules.
 
 @item
@@ -991,7 +991,7 @@ computes a free resolution of an ideal or module with LaScala's
 method. The input needs to be homogeneous.
 @item mres
 @ref{mres}@*
-computes a minimal free resolution of an ideal or module with the Szyzygy
+computes a minimal free resolution of an ideal or module with the Syzygy
 method.
 @item sres
 @ref{sres}@*
@@ -1006,7 +1006,7 @@ method.
 minimizes a free resolution of an ideal or module.
 @item syz
 @ref{syz}@*
-computes the first Szyzygy (i.e., the module of relations of the
+computes the first Syzygy (i.e., the module of relations of the
 given generators).
 @end table
 

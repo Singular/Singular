@@ -1,9 +1,9 @@
-		       Singular version <x.y.z>
+		       Singular version <x-y-z>
 	    http://www.mathematik.uni-kl.de/~zca/Singular
 		     University of Kaiserslautern
      Department of Mathematics        Centre for Computer Algebra
 	  Authors: G.-M. Greuel, G. Pfister, H. Schoenemann
-		  (C) 1986-1998 All Rights Reserved
+		  (C) 1986-1999 All Rights Reserved
 
 	  GENERAL README FILE FOR THE SINGULAR DISTRIBUTION
 	  =================================================
@@ -15,13 +15,18 @@ You can download Singular as executable program by public ftp from
 or, by http from
    http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/
 for all common hard-and softwareplatforms (including most Unix
-variants, Windows 95/NT, Macintosh).
+variants, Windows 95/98/NT, Macintosh).
 
-See the files 
+See the file 
+   www.mathematik.uni-kl.de/pub/Math/Singular/README 
+for instructions on how to download Singular from the ftp server.
+
+Also see the files 
   COPYING       for license information on Singular
-  README	for instructions on how to download and install Singular
-which are located at ftp://www.mathematik.uni-kl.de/pub/Math/Singular, 
-or http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/.
+  INSTALL       for downloading/installation instructions on Singular       
+which are included in each distribution, and also available from
+www.mathematik.uni-kl.de/pub/Math/Singular.
+
 
 WHAT IS SINGULAR?
 =================
@@ -102,7 +107,7 @@ Singular libraries have furthermore been contributed by  Wolfram
 Decker, Christian Gorzel, Agnes Eileen Heydtmann, Ulrich Klein, Martin
 Lamm, and Bernd Martin.
 
-Singular 1.2.0 is linked with the following libraries: 
+Singular <x-y-z> is linked with the following libraries: 
   readline--  The Gnu readline library (v. 2.0) 
 	      (C) Free Software Foundation
   gmp	  --  The Gnu Multiple precision library (v: 2.0.2) distribution

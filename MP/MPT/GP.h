@@ -142,7 +142,7 @@ public:
   // the actual encoding for Atom whose AtomEncoding() is 
   // GP_DynamicAtomEncoding
   virtual GP_AtomEncoding_t AtomEncoding(const void* data) 
-    {return GP_UnknownAtomEncoding;}
+    {return AtomEncoding();}
   
   // getting the value of Atoms
   virtual unsigned long AtomUlong(const void* data) {return 0;}

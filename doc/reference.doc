@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.99 1999-01-25 08:27:19 Singular Exp $
+@comment $Id: reference.doc,v 1.100 1999-02-09 08:16:12 obachman Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -2341,6 +2341,7 @@ argument.
 @end example
 @end table
 @menu
+* deg::
 * intvec::
 * ideal::
 * module::
@@ -2930,7 +2931,7 @@ See  @ref{ideal}; @ref{ring}.
 int
 @item @strong{Purpose:}
 returns statistics concerning the memory management:
-@*@code{memory(0)} is the number of active bytes
+@*@code{memory(0)} is the number of active (used) bytes
 @*@code{memory(1)} is the number of allocated bytes
 @item @strong{Note:} 
 To monitor the memory usage during ongoing computations the option
@@ -3216,7 +3217,7 @@ returns a resolution consisting of not more than n modules
 where n is the number of variables of the basering.
 Let @code{list L=mres(M,0);}
  then L[1] consists of a minimal set of generators of the input, L[2]
-consists of a minimal set of generators of the first szyzgy module of
+consists of a minimal set of generators of the first syzygy module of
 L[1], etc., until L[p+1], such that L[i]
 @ifinfo
 !=0 for i<=p
@@ -3225,7 +3226,7 @@ L[1], etc., until L[p+1], such that L[i]
 $\ne 0$ for i$\le$p
 @end tex
  but L[p+1], the
-first szyzgy module of L[p], is 0 (if the basering is not a qring).
+first syzygy module of L[p], is 0 (if the basering is not a qring).
 @item @strong{Note:}
 To access the elements of a resolution, it has to be assigned to a list,
 which also completes computations and may therefore take time.
@@ -3506,7 +3507,7 @@ Mi=module(Ai), i=1..k.
 returns a list of n modules where n is the number of variables of the basering.
 Let @code{list l=nres(M,0);}
 then L[1]=M is identical to the input, L[2] is a minimal set of generators
-of the first szyzgy
+of the first syzygy
 module of L[1], etc.
 ( L[i]
 @ifinfo
@@ -4559,7 +4560,7 @@ Mi=module(Ai), i=1..k.
 returns a list of n modules where n is the number of variables of the basering.
 Let @code{list l=res(M,0);}
 then L[1]=M is identical to the input, L[2] is a minimal set of generators
-of the first szyzgy
+of the first syzygy
 module of L[1], etc.
 ( L[i]
 @ifinfo
@@ -4939,7 +4940,7 @@ command gives the true betti numbers! In many cases of interest
 @code{sres} is much faster than any other known method.
 Let @code{list l=sres(M,0);} then L[1]=M is identical to the input,
 L[2] is a standard basis with respect to the Schreyer ordering of
-the first szyzgy
+the first syzygy
 module of L[1], etc.
 ( L[i]
 @ifinfo

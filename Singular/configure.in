@@ -30,11 +30,7 @@ SINGUNAME=$ac_cv_singuname
 AC_SUBST(SINGUNAME)
 
 # stupid Win programs do not like dots in their pathnames
-if test "$ac_cv_singuname" = ix86-Win; then
-  VERSION_SEP="-"
-else
-  VERSION_SEP="."
-fi
+VERSION_SEP="-"
 
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl version stuff -- should be set in ../configure.in
@@ -43,9 +39,9 @@ dnl here are some defaults
 
 SINGULAR_MAJOR_VERSION=${SINGULAR_MAJOR_VERSION:-1}
 SINGULAR_MINOR_VERSION=${SINGULAR_MINOR_VERSION:-3}
-SINGULAR_SUB_VERSION=${SINGULAR_SUB_VERSION:-1}
+SINGULAR_SUB_VERSION=${SINGULAR_SUB_VERSION:-2}
 SINGULAR_VERSION="${SINGULAR_VERSION:-$SINGULAR_MAJOR_VERSION${VERSION_SEP}$SINGULAR_MINOR_VERSION${VERSION_SEP}$SINGULAR_SUB_VERSION}"
-VERSION_DATE=${VERSION_DATE:-"November 1998"}
+VERSION_DATE=${VERSION_DATE:-"February 1999"}
 
 dnl pass them on into the Makefiles
 AC_SUBST(SINGULAR_VERSION)

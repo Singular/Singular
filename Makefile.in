@@ -110,10 +110,10 @@ MKINSTALLDIRS 	= ./mkinstalldirs
 TMPDIR		= /tmp/singdist
 SINGUNAME 	= @SINGUNAME@
 S_VERSION       = $${SINGULAR_VERSION-@SINGULAR_VERSION@}
-SINGULAR_DOS_VERSION = @SINGULAR_DOS_VERSION@
 DISTROOT_NAME	= Singular-${S_VERSION}
 BINDIST_NAME	= ${DISTROOT_NAME}-${SINGUNAME}
 SHAREDIST_NAME  = ${DISTROOT_NAME}-share
+ZIP		= zip
 
 test_t:
 	echo ${S_VERSION}
@@ -121,37 +121,30 @@ test_t:
 .PHONY: sharedist bindist static-bindist infodist win-sharedist
 sharedist: ${SINGULAR}
 	cd doc; ${MAKE} all ps
-	rm -rf ${TMPDIR}
+	rm -rf ${TMPDIR}/
 	${MKINSTALLDIRS} ${TMPDIR}/Singular/LIB/${S_VERSION}
 	${MKINSTALLDIRS} ${TMPDIR}/Singular/doc/${S_VERSION}
 	${MKINSTALLDIRS} ${TMPDIR}/Singular/html/${S_VERSION}
-	${MKINSTALLDIRS} ${TMPDIR}/info
 	${MKINSTALLDIRS} ${TMPDIR}/Singular/LIB/gftables
 	cp Singular/LIB/*.lib ${TMPDIR}/Singular/LIB/${S_VERSION}
 	rm -f ${TMPDIR}/Singular/LIB/${S_VERSION}/fastsolv.lib
 	rm -f ${TMPDIR}/Singular/LIB/${S_VERSION}/tst.lib
 	cp Singular/LIB/gftables/[0-9]* ${TMPDIR}/Singular/LIB/gftables
-	cd ${TMPDIR}/Singular/LIB/${S_VERSION}; \
-		${LN_S} ../gftables .
 	cp doc/singular.hlp doc/singular.ps doc/usercard.ps \
            doc/singular.dvi doc/usercard.dvi \
            ${TMPDIR}/Singular/doc/${S_VERSION}
 	cp -R doc/html/* ${TMPDIR}/Singular/html/${S_VERSION}
-	cd ${TMPDIR}/info; \
-        ${LN_S} ../Singular/doc/${S_VERSION}/singular.hlp .
-	cat README.share | sed -e "s/<x.y.z>/${S_VERSION}/" > \
-                           ${TMPDIR}/Singular/README.share
-	cat README.general | sed -e "s/<x.y.z>/${S_VERSION}/" > \
-                             ${TMPDIR}/Singular/README.general
-	cp COPYING ${TMPDIR}/Singular
-	cd ${TMPDIR}; chmod -R a+rX *; \
-           tar -cf sing.tar Singular info; \
-           gzip sing.tar
-	cp ${TMPDIR}/sing.tar.gz ${SHAREDIST_NAME}.tar.gz
-	rm -rf ${TMPDIR}
+	cat README.general | sed -e "s/<x-y-z>/${S_VERSION}/g" > \
+                             ${TMPDIR}/Singular/README
+	cat COPYING | sed -e "s/<x-y-z>/${S_VERSION}/g" > \
+                             ${TMPDIR}/Singular/COPYING
+	chmod -R  a+rX  ${TMPDIR}/Singular
+	cd ${TMPDIR}; \
+	    ${ZIP} -r ${SHAREDIST_NAME} Singular; \
+	    tar cf ${SHAREDIST_NAME}.tar Singular; gzip ${SHAREDIST_NAME}.tar
+	mv ${TMPDIR}/${SHAREDIST_NAME}.zip ${TMPDIR}/${SHAREDIST_NAME}.tar.gz .
+	rm -rf ${TMPDIR}/
 
-win-sharedist:
-	export SINGULAR_VERSION=${SINGULAR_DOS_VERSION} && ${MAKE} sharedist
 
 bindist: ${SINGULAR}
 	cd Singular; ${MAKE} Singular-$@ libparse
@@ -164,17 +157,12 @@ bindist: ${SINGULAR}
            ${LN_S} Singular-${S_VERSION} Singular
 	cp Singular/libparse ${TMPDIR}/${SINGUNAME}/bin/
 	-strip ${TMPDIR}/${SINGUNAME}/bin/*
-	cp COPYING ${TMPDIR}/Singular
-	cat README.bin | sed -e "s/<x.y.z>/${S_VERSION}/" > \
-                         ${TMPDIR}/Singular/README.bin
-	cat README.general | sed -e "s/<x.y.z>/${S_VERSION}/" > \
-                             ${TMPDIR}/Singular/README.general
-	cat INSTALL | sed -e "s/<x.y.z>/${S_VERSION}/" > \
+	cat INSTALL.unix | sed -e "s/<x-y-z>/${S_VERSION}/g" > \
                       ${TMPDIR}/Singular/INSTALL
 	cd ${TMPDIR}; chmod -R a+rX *;\
            tar cf ${BINDIST_NAME}.tar ${SINGUNAME} Singular; \
            gzip ${BINDIST_NAME}.tar
-	cp ${TMPDIR}/${BINDIST_NAME}.tar.gz .
+	mv ${TMPDIR}/${BINDIST_NAME}.tar.gz .
 	rm -rf ${TMPDIR}
 
 static-bindist: ${SINGULAR}
@@ -186,17 +174,12 @@ static-bindist: ${SINGULAR}
            ${TMPDIR}/${SINGUNAME}/bin/Singular-${S_VERSION}-static
 	cd ${TMPDIR}/${SINGUNAME}/bin;  \
            ${LN_S} Singular-${S_VERSION}-static Singular
-	cp COPYING ${TMPDIR}/Singular
-	cat README.bin | sed -e "s/<x.y.z>/${S_VERSION}/" > \
-                         ${TMPDIR}/Singular/README.bin
-	cat README.general | sed -e "s/<x.y.z>/${S_VERSION}/" > \
-                             ${TMPDIR}/Singular/README.general
-	cat INSTALL | sed -e "s/<x.y.z>/${S_VERSION}/" > \
+	cat INSTALL | sed -e "s/<x-y-z>/${S_VERSION}/g" > \
                       ${TMPDIR}/Singular/INSTALL
 	cd ${TMPDIR}; chmod -R a+rX *;\
            tar cf ${BINDIST_NAME}-static.tar ${SINGUNAME} Singular;\
            gzip ${BINDIST_NAME}-static.tar
-	cp ${TMPDIR}/${BINDIST_NAME}-static.tar.gz .
+	mv ${TMPDIR}/${BINDIST_NAME}-static.tar.gz .
 	rm -rf ${TMPDIR}
 
 infodist: 
@@ -206,18 +189,16 @@ infodist:
 	-strip ${TMPDIR}/${SINGUNAME}/bin/info
 	cd ${TMPDIR}; tar cf info-${SINGUNAME}.tar ${SINGUNAME}; \
                       gzip info-${SINGUNAME}.tar
-	cp ${TMPDIR}/info-${SINGUNAME}.tar.gz .
+	mv ${TMPDIR}/info-${SINGUNAME}.tar.gz .
 	rm -rf ${TMPDIR}
 
-ZIP		= zip
 INSTALL		= ./Singular/install-sh -c
 SH_PROGRAM 	= /bin/sh
 INFO_PROGRAM 	= /bin/info
-CYGWIN_DLL	= /bin/cygwinb19.dll
+CYGWIN_DLL	= /bin/cygwin1.dll
 WIN_BINDIR      = ${TMPDIR}/Singular/${S_VERSION}
-WIN_SHAREDIST_NAME = Singular-${SINGULAR_DOS_VERSION}-share
 
-windist: ${WIN_SHAREDIST_NAME}.tar.gz ${SINGULAR}
+windist: ${SINGULAR}
 	cd Singular; ${MAKE} Singular-bindist libparse
 	rm -rf ${TMPDIR}
 	${MKINSTALLDIRS} ${WIN_BINDIR}
@@ -226,21 +207,31 @@ windist: ${WIN_SHAREDIST_NAME}.tar.gz ${SINGULAR}
 	${INSTALL} ${SH_PROGRAM} ${WIN_BINDIR}
 	${INSTALL} ${INFO_PROGRAM} ${WIN_BINDIR}
 	${INSTALL} ${CYGWIN_DLL} ${WIN_BINDIR}
-	cp  ${WIN_SHAREDIST_NAME}.tar.gz ${TMPDIR}
-	cd ${TMPDIR}; gunzip ${WIN_SHAREDIST_NAME}.tar.gz; \
-                      tar xf ${WIN_SHAREDIST_NAME}.tar
-	rm -rf ${TMPDIR}/info ${TMPDIR}/Singular/README.share
-	cat INSTALL.win	| sed -e "s/<x.y.z>/${S_VERSION}/" > \
+	cat INSTALL.win	| sed -e "s/<x-y-z>/${S_VERSION}/g" > \
                          ${TMPDIR}/Singular/INSTALL
-	cat README.win | sed -e "s/<x.y.z>/${S_VERSION}/" > \
-                         ${TMPDIR}/Singular/README
 	cd ${TMPDIR}; chmod -R a+rX *;\
            ${ZIP} -r sing Singular 
-	cp ${TMPDIR}/sing.zip Singular-${S_VERSION}-${SINGUNAME}.zip 
+	mv ${TMPDIR}/sing.zip Singular-${S_VERSION}-${SINGUNAME}.zip 
+	rm -rf ${TMPDIR}
+
+srcdist: 
+	rm -rf ${TMPDIR}
+	${MKINSTALLDIRS} ${TMPDIR}/Singular-${S_VERSION}
+	cd ${TMPDIR}/Singular-${S_VERSION}; cvs co All
+	cd  ${TMPDIR}; \
+	tar cf Singular-${S_VERSION}.tar Singular-${S_VERSION}; \
+	gzip Singular-${S_VERSION}.tar
+	cp ${TMPDIR}/Singular-${S_VERSION}.tar.gz .
 	rm -rf ${TMPDIR}
 
 rpmdist:
 	cd rpm; ${MAKE} rpm
+
+# You can remeber the password with "iwd" == "ich war dabei"
+CRYPT	= enigma # it does not seem to decrypt correctly with the HP crypt
+cryptdist: srcdist
+	${CRYPT} S-${S_VERSION}-iwd < Singular-${S_VERSION}.tar.gz > Singular-${S_VERSION}.tar.gz.crypt
+
 
 ##############################################################
 # stuff for configure
