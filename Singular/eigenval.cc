@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: eigenval.cc,v 1.9 2002-02-16 18:26:07 mschulze Exp $ */
+/* $Id: eigenval.cc,v 1.10 2002-02-20 15:50:34 mschulze Exp $ */
 /*
 * ABSTRACT: eigenvalues of constant square matrices
 */
@@ -62,7 +62,7 @@ BOOLEAN evSwap(leftv res,leftv h)
         {
           int j=(int)h->Data();
           res->rtyp=MATRIX_CMD;
-          res->data=(void*)evSwap(mpCopy(M),i,j);
+          res->data=(void *)evSwap(mpCopy(M),i,j);
           return FALSE;
         }
       }
@@ -83,10 +83,10 @@ matrix evRowElim(matrix M,int i,int j,int k)
   poly p=pNSet(nDiv(pGetCoeff(MATELEM(M,i,k)),pGetCoeff(MATELEM(M,j,k))));
 
   for(int l=1;l<=MATCOLS(M);l++)
-    MATELEM(M,i,l)=pSub(MATELEM(M,i,l),pMult(pCopy(p),pCopy(MATELEM(M,j,l))));
+    MATELEM(M,i,l)=pSub(MATELEM(M,i,l),ppMult_qq(p,MATELEM(M,j,l)));
 
   for(int l=1;l<=MATROWS(M);l++)
-    MATELEM(M,l,j)=pAdd(MATELEM(M,l,j),pMult(pCopy(p),pCopy(MATELEM(M,l,i))));
+    MATELEM(M,l,j)=pAdd(MATELEM(M,l,j),ppMult_qq(p,MATELEM(M,l,i)));
 
   pDelete(&p);
 
@@ -114,7 +114,7 @@ BOOLEAN evRowElim(leftv res,leftv h)
           {
             int k=(int)h->Data();
             res->rtyp=MATRIX_CMD;
-            res->data=(void*)evRowElim(mpCopy(M),i,j,k);
+            res->data=(void *)evRowElim(mpCopy(M),i,j,k);
             return FALSE;
 	  }
         }
@@ -136,10 +136,10 @@ matrix evColElim(matrix M,int i,int j,int k)
   poly p=pNSet(nDiv(pGetCoeff(MATELEM(M,k,i)),pGetCoeff(MATELEM(M,k,j))));
 
   for(int l=1;l<=MATROWS(M);l++)
-    MATELEM(M,l,i)=pSub(MATELEM(M,l,i),pMult(pCopy(p),pCopy(MATELEM(M,l,j))));
+    MATELEM(M,l,i)=pSub(MATELEM(M,l,i),ppMult_qq(p,MATELEM(M,l,j)));
 
   for(int l=1;l<=MATCOLS(M);l++)
-    MATELEM(M,j,l)=pAdd(MATELEM(M,j,l),pMult(pCopy(p),pCopy(MATELEM(M,i,l))));
+    MATELEM(M,j,l)=pAdd(MATELEM(M,j,l),ppMult_qq(p,MATELEM(M,i,l)));
 
   pDelete(&p);
 
@@ -167,7 +167,7 @@ BOOLEAN evColElim(leftv res,leftv h)
           {
             int k=(int)h->Data();
             res->rtyp=MATRIX_CMD;
-            res->data=(void*)evColElim(mpCopy(M),i,j,k);
+            res->data=(void *)evColElim(mpCopy(M),i,j,k);
             return FALSE;
 	  }
         }
@@ -211,7 +211,7 @@ BOOLEAN evHessenberg(leftv res,leftv h)
     {
       matrix M=(matrix)h->Data();
       res->rtyp=MATRIX_CMD;
-      res->data=(void*)evHessenberg(mpCopy(M));
+      res->data=(void *)evHessenberg(mpCopy(M));
       return FALSE;
     }
     WerrorS("<matrix> expected");
@@ -371,7 +371,7 @@ BOOLEAN evEigenvals(leftv res,leftv h)
     {
       matrix M=(matrix)h->Data();
       res->rtyp=LIST_CMD;
-      res->data=(void*)evEigenvals(mpCopy(M));
+      res->data=(void *)evEigenvals(mpCopy(M));
       return FALSE;
     }
     WerrorS("<matrix> expected");
