@@ -26,16 +26,16 @@ static inline poly pOne_Special(const ring r=currRing)
 // zum Initialiseren: in t_rep_gb plazieren:
 
 #endif
-#define LEN_VAR1
+#define LEN_VAR3
 #define degbound(p) assume(pTotaldegree(p)<10)
 //#define inDebug(p) assume((debug_Ideal==NULL)||(kNF(debug_Ideal,NULL,p,0,0)==0))
 
 //die meisten Varianten stossen sich an coef_buckets
 #ifdef LEN_VAR1
 // erste Variante: Laenge: Anzahl der Monome
-int pSLength(poly p, int l) {
+inline int pSLength(poly p, int l) {
   return l; }
-int kSBucketLength(kBucket* bucket) {return bucket_guess(bucket);}
+inline int kSBucketLength(kBucket* bucket) {return bucket_guess(bucket);}
 #endif
 
 #ifdef LEN_VAR2
@@ -65,13 +65,18 @@ int pSLength(poly p,int l)
   int c=nSize(pGetCoeff(p));
   return c*l /*pLength(p)*/;
 }
-int kSBucketLength(kBucket* b)
+int kSBucketLength(kBucket* b, poly lm=NULL)
 {
   int s=0;
-  int c=nSize(pGetCoeff(kBucketGetLm(b)))+1;
+  int c;
+  if(lm==NULL)
+    c=nSize(pGetCoeff(kBucketGetLm(b)));
+  else
+    c=nSize(pGetCoeff(lm));
   int i;
-  for (i=MAX_BUCKET;i>0;i--)
+  for (i=b->buckets_used;i>=0;i--)
   {
+    assume((b->buckets_length[i]==0)||(b->buckets[i]!=NULL));
     s+=b->buckets_length[i] /*pLength(b->buckets[i])*/;
   }
   return s*c;
