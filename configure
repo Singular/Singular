@@ -1279,10 +1279,6 @@ OUTPUT_MAKEFILES="Makefile"
 if test -d "doc"; then
    OUTPUT_MAKEFILES="$OUTPUT_MAKEFILES doc/Makefile doc/version.texi doc/uname.texi"
 fi
-if test -d "rpm"; then
-   OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" rpm/Makefile"
-   OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" rpm/rpmrc rpm/Singular.spec"
-fi
 if test -d "modules"; then
    CONFIG_SUBDIRS=$CONFIG_SUBDIRS" modules"
 fi
