@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C -*- */
-/* $Id: config.h.in,v 1.2 1997-06-19 12:48:16 schmidt Exp $ */
+/* $Id: config.h.in,v 1.3 1997-06-23 15:41:45 schmidt Exp $ */
 
 #ifndef INCL_CONFIG_H
 #define INCL_CONFIG_H
@@ -7,6 +7,18 @@
 /* {{{ docu
  *
  * config.h.in - used by configure to create config.h.
+ *
+ * This file is included at building time from almost all source
+ * files belonging to factory.  Furthermore, it is (textually)
+ * included into factoryconf.h by makeheader so we have an
+ * installed version of this file, too.  This way, the installed
+ * source files will be compiled with the same settings as the
+ * library itself.
+ *
+ * In general, you should let configure guess the correct values
+ * for the #defines below.  But if something seriously goes wrong
+ * in configuring, please inform the authors and feel free to
+ * edit the marked section.
  *
  */
 /* }}} */
