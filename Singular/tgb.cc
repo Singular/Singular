@@ -2673,23 +2673,25 @@ void simple_gauss(tgb_sparse_matrix* mat, calc_dat* c){
       }
     }
     //select pivot
-    int act_l=mat->non_zero_entries(found_in_row);
-    for(i=found_in_row+1;i<=max_in_area;i++){
-      assume(mat->min_col_not_zero_in_row(i)>=col);
-      int first;
-      assume(row_cache[i]==mat->min_col_not_zero_in_row(i));
-      first=row_cache[i];
-      assume(first!=matcol);
-      //      if((!(mat->is_zero_entry(i,col)))&&(mat->non_zero_entries(i)<act_l))
-      int nz;
-      if((row_cache[i]==col)&&((nz=mat->non_zero_entries(i))<act_l))
-      {
-	found_in_row=i;
+    int act_l=nSize(mat->get(found_in_row,col))*mat->non_zero_entries(found_in_row);
+    if(must_reduce)
+    {
+      for(i=found_in_row+1;i<=max_in_area;i++){
+	assume(mat->min_col_not_zero_in_row(i)>=col);
+	int first;
+	assume(row_cache[i]==mat->min_col_not_zero_in_row(i));
+	first=row_cache[i];
+	assume(first!=matcol);
+	//      if((!(mat->is_zero_entry(i,col)))&&(mat->non_zero_entries(i)<act_l))
+	int nz;
+	if((row_cache[i]==col)&&((nz=nSize(mat->get(i,col))*mat->non_zero_entries(i))<act_l))
+	{
+	  found_in_row=i;
 	act_l=nz;
+	}
+	
       }
-
     }
-
     mat->perm_rows(row,found_in_row);
     int h=row_cache[row];
     row_cache[row]=row_cache[found_in_row];
