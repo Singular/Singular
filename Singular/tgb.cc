@@ -1204,11 +1204,28 @@ mac_poly mac_p_add_ff_qq(mac_poly a, number f,mac_poly b){
     set_this=&(mp->next);
     b=b->next;
   }
-  (*set_this)->next=NULL;
+  (*set_this)=NULL;
   return erg;
   
 }
-void pre_comp(poly* p,int pn,calc_dat* c){
+void mac_mult_cons(mac_poly p,number c){
+  while(p){
+    number m=nMult(p->coef,c);
+    nDelete(&(p->coef));
+    p->coef=m;
+    p=p->next;
+  }
+  
+}
+int mac_length(mac_poly p){
+  int l=0;
+  while(p){
+    l++;
+    p=p->next;
+  }
+  return l;
+}
+void pre_comp(poly* p,int & pn,calc_dat* c){
   if(!(pn))
     return;
   mac_poly* q=(mac_poly*) omalloc(pn*sizeof(mac_poly)); 
@@ -1245,7 +1262,78 @@ void pre_comp(poly* p,int pn,calc_dat* c){
     }
     
   }
+//gaus reduction start
+  int col, row;
+  col=0;
+  row=0;
+  assume(pn>0);
+  while(row<pn-1){
+    //row is the row where pivot should be
+    // row== pn-1 means we have only to act on one row so no red nec.
+    //we assume further all rows till the pn-1 row are non-zero
+    
+    //select column
+    int i;
+    col=q[row]->exp;
+    int found_in_row=row;
+    for(i=row;i<pn;i++){
+      if(q[i]->exp<col){
+	col=q[i]->exp;
+	found_in_row=i;
+      }
+      
+    }
+    //select pivot
+    int act_l=mac_length(q[found_in_row]);
+    for(i=row+1;i<pn;i++){
+      if((q[i]->exp==col)&&(mac_length(q[i])<act_l)){
+	found_in_row=i;
+	act_l=mac_length(q[i]);//should be optimized here
+      }
+    }
+    mac_poly h=q[row];
+    q[row]=q[found_in_row];
+    q[found_in_row]=h;
+
+    //reduction
+    for(i=row+1;i<pn;i++){
+      if(q[i]->exp==q[row]->exp){
+	
+	number c1=nNeg(q[i]->coef);
+	number c2=q[row]->coef;
+	//use checkcoeff later
+	mac_mult_cons(q[i],c2);
+	q[i]=mac_p_add_ff_qq(q[i],c1,q[row]);
+      }
+	  
+	
+	
+    }
+    for(i=row+1;i<pn;i++){
+      if(q[i]==NULL){
+	q[i]=q[pn-1];
+	pn--;
+	if(i!=pn){i--;}
+      }
+    }
   
+
+
+
+
+
+
+
+    row++;
+  }
+
+
+//gaus reduction end  
+
+
+
+
+
   for(i=0;i<pn;i++){
     poly pa;
     mac_poly qa;
