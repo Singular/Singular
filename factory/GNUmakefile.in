@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.8 1997-07-19 08:42:05 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.9 1997-07-21 11:17:44 schmidt Exp $
 
 #
 # GNUmakefile.in - used by configure to create GNUmakefile, the
@@ -419,11 +419,23 @@ installmem:	mem
 		$(MKINSTALLDIRS) $(libdir)
 		$(INSTALL_DATA) libcfmem.a $(libdir)/libcfmem.a
 
-installgftables: gftables
-		$(MKINSTALLDIRS) $(gftabledir)
-		for file in $</*; do \
-		  $(INSTALL_DATA) $$file $(gftabledir)/$$file; \
-		done
+# to a pity, this cannot be done automatically ...
+installgftables:
+		@echo "Copying GF(q) tables ..."
+		@if test -d gftables; then \
+		  $(MKINSTALLDIRS) $(gftabledir); \
+		  for file in gftables/gftable.*.*; do \
+		    $(INSTALL_DATA) $$file $(gftabledir); \
+		  done \
+		elif test -d "$(srcdir)"/gftables; then \
+		  $(MKINSTALLDIRS) $(gftabledir); \
+		  for file in "$(srcdir)"/gftables/gftable.*.*; do \
+		    $(INSTALL_DATA) $$file $(gftabledir); \
+		  done \
+		else \
+		  echo "Run 'make gftables' before installing them"; \
+		  exit 1; \
+		fi
 
 #
 # - uninstall targets.
@@ -458,7 +470,8 @@ dist:		$(srcdir)/readcf.cc $(srcdir)/configure
 		rm -rf $(distname)
 		$(MKINSTALLDIRS) $(distname)/templates
 		$(MKINSTALLDIRS) $(distname)/bin
-		for file in $(distfiles); do \
+		@echo "Copying files to distribution directory ..."
+		@for file in $(distfiles); do \
 		  ln $(srcdir)/$$file $(distname)/$$file; \
 		done
 		tar cf $(distname).tar $(distname)
