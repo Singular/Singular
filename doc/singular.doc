@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: singular.doc,v 1.27 1998-05-15 11:57:39 schmidt Exp $
+@comment $Id: singular.doc,v 1.28 1998-05-18 14:52:31 wichmann Exp $
 @comment this file contains the main structure of the manual
 @c ------------------------
 @comment %**start of header
@@ -498,18 +498,18 @@ have the same name(s) as ring variables
 
 @c ----------------------------------------------------------------------------
 @node Examples, Mathematical background, Tricks and pitfalls, Top
-@chapter Examples
+@appendix Examples
 @cindex Examples
 @include examples.tex
 
 @c ----------------------------------------------------------------------------
 @node Mathematical background, SINGULAR libraries, Examples, Top
-@chapter Mathematical background
+@appendix Mathematical background
 @cindex Mathematical background
 @include math.tex
 @c ----------------------------------------------------------------------------
 @node SINGULAR libraries, Library function index, Mathematical background, Top
-@chapter SINGULAR libraries
+@appendix SINGULAR libraries
 @cindex SINGULAR libraries
 @cindex LIBs
 
@@ -543,14 +543,12 @@ The library @code{standard.lib} provides extensions to the
 set of built-in commands and will be automatically loaded
 during the start of @sc{Singular}.
 It contains:
-@menu
-* stdfglm::
-* stdhilbert::
-@end menu
-@iftex
-@*@code{stdfglm}:@ref{stdfglm};
-@*@code{stdhilbert}:@ref{stdhilbert}.
-@end iftex
+@table @code
+@item stdfglm
+see @ref{stdfglm}.
+@item stdhilb
+see @ref{stdhilb}.
+@end table
 @c ----------------------------------------------------------
 @node all_lib, general_lib, standard_lib, SINGULAR libraries
 @section all_lib
@@ -643,7 +641,7 @@ It contains:
 @c lib classify.lib
 @c ----------------------------------------------------------
 @node Library function index, Index, SINGULAR libraries, Top
-@chapter Library function index
+@appendix Library function index
 @printindex fn
 @c ----------------------------------------------------------
 @node Index, ,Library function index, Top
