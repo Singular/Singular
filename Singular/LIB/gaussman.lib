@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: gaussman.lib,v 1.3 2000-11-07 09:57:26 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.4 2000-11-07 10:07:41 mschulze Exp $";
 info="
 LIBRARY:  gaussman.lib  GAUSS-MANIN CONNECTION OF A SINGULARITY
 
@@ -345,6 +345,7 @@ RETURN:  <ideal> l[1] : spectral numbers in increasing order
            <module> l[3][i] : vector space basis of l[1][i]-th graded part 
                               of the V-filtration on H''/H' in terms of l[4]
          <ideal> l[4] : monomial vector space basis of H''/H'
+         <ideal> l[5] : standard basis of Jacobian ideal
 EXAMPLE: example vfilt; shows an example
 "
 {
@@ -613,7 +614,7 @@ EXAMPLE: example vfilt; shows an example
     }
     v[k]=std(v[k]);
     d[k]=size(v[k]);
-    return(list(s,d,v,m));
+    return(list(s,d,v,m,sJ));
   }
 }
 example
@@ -706,8 +707,8 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-proc vjacob(poly f)
-"USAGE:   <list> l=vjacob(<poly> f);
+proc vjacob(list l)
+"USAGE:   <list> l=vjacob(vfilt(<poly> f));
 ASSUME:  f defines an isolated hypersurface singularity
 RETURN:  <ideal> l[1] : spectral numbers of the V-filtration on the 
                         Jacobian algebra in increasing order
@@ -717,12 +718,12 @@ RETURN:  <ideal> l[1] : spectral numbers of the V-filtration on the
             <module> l[3][i] : vector space basis of l[1][i]-th graded part 
                                of the V-filtration on the Jaconian algebra
                                in terms of l[4]
-         <ideal> l[4] : monomial vector space basis of the Jacobian algebra 
+         <ideal> l[4] : monomial vector space basis of the Jacobian algebra
+         <ideal> l[5] : standard basis of Jacobian ideal
 EXAMPLE: example vjacob; shows an example
 "
 {
-  list l=vfilt(f);
-  def s,d,v,m=l[1..4];
+  def s,d,v,m,sJ=l[1..5];
   int mu=ncols(m);
 
   int i,j,k;
@@ -731,8 +732,7 @@ EXAMPLE: example vjacob; shows an example
   {
     V=V,v[i];
   }
-  
-  ideal sJ=std(jacob(f));
+
   list M;
   for(i=ncols(m);i>=1;i--)
   {
@@ -844,6 +844,6 @@ example
 { "EXAMPLE:"; echo=2;
   ring R=0,(x,y),ds;
   poly f=x5+x2y2+y5;
-  vjacob(f);
+  vjacob(vfilt(f));
 }
 ///////////////////////////////////////////////////////////////////////////////
