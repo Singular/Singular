@@ -66,6 +66,14 @@ int main()
    cout << "NTL_NO_INIT_TRANS\n";
 #endif
 
+#ifdef NTL_CLEAN_INT
+   cout << "NTL_CLEAN_INT\n";
+#endif
+
+#ifdef NTL_CLEAN_PTR
+   cout << "NTL_CLEAN_PTR\n";
+#endif
+
 #ifdef NTL_RANGE_CHECK
    cout << "NTL_RANGE_CHECK\n";
 #endif

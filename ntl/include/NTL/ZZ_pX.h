@@ -169,7 +169,7 @@ void SetX(ZZ_pX& x);
 // x is set to the monomial X
 
 long IsX(const ZZ_pX& a);
-// test if x = X
+// test if a = X
 
 inline void clear(ZZ_pX& x) 
 // x = 0
@@ -993,7 +993,6 @@ inline ZZ_pX interpolate(const vec_ZZ_p& a, const vec_ZZ_p& b)
 NTL_vector_decl(ZZ_pX,vec_ZZ_pX)
 
 NTL_eq_vector_decl(ZZ_pX,vec_ZZ_pX)
-
 
 /**********************************************************
 

@@ -45,12 +45,13 @@ public:
       { return const_subscript_GF2(_mat_GF2__rep[i-1], j-1); }
 
    long position(const vec_GF2& a) const { return _mat_GF2__rep.position(a); }
+   long position1(const vec_GF2& a) const { return _mat_GF2__rep.position1(a); }
   
    mat_GF2(mat_GF2& x, INIT_TRANS_TYPE)  :
       _mat_GF2__rep(x._mat_GF2__rep, INIT_TRANS), _mat_GF2__numcols(x._mat_GF2__numcols) { }
 };  
   
-inline const vec_vec_GF2& _mat_GF2__rep(const mat_GF2& a)  
+inline const vec_vec_GF2& rep(const mat_GF2& a)  
    { return a._mat_GF2__rep; }  
 
   
@@ -64,6 +65,7 @@ inline mat_GF2 to_mat_GF2(const vec_vec_GF2& a)
 
 long operator==(const mat_GF2& a, const mat_GF2& b); 
 long operator!=(const mat_GF2& a, const mat_GF2& b); 
+
 
 void add(mat_GF2& X, const mat_GF2& A, const mat_GF2& B); 
 

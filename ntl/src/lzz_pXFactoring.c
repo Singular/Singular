@@ -390,13 +390,11 @@ void SFBerlekamp(vec_zz_pX& factors, const zz_pX& ff, long verbose)
    NullSpace(r, D, M, verbose);
 
 
-
    if (r == 1) {
       factors.SetLength(1);
       factors[0] = f;
       return;
    }
-
 
    vec_zz_p roots;
 
@@ -433,7 +431,6 @@ void SFBerlekamp(vec_zz_pX& factors, const zz_pX& ff, long verbose)
       }
       swap(factors, S);
    }
-
 
 }
 
@@ -806,8 +803,6 @@ void EDF(vec_zz_pX& factors, const zz_pX& ff, const zz_pX& bb,
    }
 
    
-   double t;
-
    factors.SetLength(0);
 
    RecEDF(factors, f, b, d, verbose);
@@ -819,8 +814,6 @@ void SFCanZass1(vec_pair_zz_pX_long& u, zz_pX& h, const zz_pX& f, long verbose)
 {
    if (!IsOne(LeadCoeff(f)) || deg(f) == 0)
       Error("SFCanZass1: bad args");
-
-   double t;
 
    long p = zz_p::modulus();
 
@@ -1437,7 +1430,7 @@ void BuildIrred(zz_pX& f, long n)
    if (n <= 0)
       Error("BuildIrred: n must be positive");
 
-   if (n >= (1L << (NTL_BITS_PER_LONG-4))) Error("overflow in BuildIrred");
+   if (NTL_OVERFLOW(n, 1, 0)) Error("overflow in BuildIrred");
 
    if (n == 1) {
       SetX(f);
@@ -1482,8 +1475,6 @@ static
 void GenerateBabySteps(zz_pX& h1, const zz_pX& f, const zz_pX& h, long k,
                        long verbose)
 {
-   double t;
-
    zz_pXModulus F;
    build(F, f);
 
@@ -1656,8 +1647,6 @@ void GiantRefine(vec_pair_zz_pX_long& u, const zz_pX& ff, long k, long l,
                  long verbose)
 
 {
-   double t;
-
    u.SetLength(0);
 
    vec_zz_pX BabyStep;
@@ -1786,8 +1775,6 @@ void BabyRefine(vec_pair_zz_pX_long& factors, const vec_pair_zz_pX_long& u,
                 long k, long l, long verbose)
 
 {
-   double t;
-
    factors.SetLength(0);
 
    vec_zz_pX BabyStep;
@@ -1805,7 +1792,6 @@ void BabyRefine(vec_pair_zz_pX_long& factors, const vec_pair_zz_pX_long& u,
          IntervalRefine(factors, g, k, gs, BabyStep, verbose);
       }
    }
-
 }
 
       

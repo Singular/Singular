@@ -8,17 +8,17 @@
 
 NTL_OPEN_NNS
 
-#define NTL_FFTFudge (3)
+#define NTL_FFTFudge (4)
 // This constant is used in selecting the correct
 // number of FFT primes for polynomial multiplication
-// in ZZ_pX and zz_pX.  Set at 3, this allows for
+// in ZZ_pX and zz_pX.  Set at 4, this allows for
 // two FFT reps to be added or subtracted once,
-// before performing CRT.
-// Don't change this.
+// before performing CRT, and leaves a reasonable margin for error.
+// Don't change this!
 
 #define NTL_FFTMaxRootBnd (NTL_SP_NBITS-2)
 // Absolute maximum root bound for FFT primes.
-// Don't change this.
+// Don't change this!
 
 #if (25 <= NTL_FFTMaxRootBnd)
 #define NTL_FFTMaxRoot (25)

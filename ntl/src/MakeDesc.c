@@ -1,6 +1,11 @@
 
 
 #include <stdio.h>
+#include <limits.h>
+#include <float.h>
+#include <stdlib.h>
+#include <math.h>
+
 
 #include <NTL/version.h>
 
@@ -17,14 +22,26 @@
 #endif
 
 
-long f1(void);
-long f2(long bpl);
-double f3(void);
-void f4(double *p);
-void f5(int *p);
-long f6(void);
-long f7(void);
-long f8(void);
+int val_int(int x);
+unsigned int val_uint(unsigned int x);
+
+long val_long(long x);
+unsigned long val_ulong(unsigned long x);
+
+size_t val_size_t(size_t x);
+
+double val_double(double x);
+
+void touch_int(int* x);
+void touch_uint(unsigned int* x);
+
+void touch_long(long* x);
+void touch_ulong(unsigned long* x);
+
+void touch_size_t(size_t* x);
+
+void touch_double(double* x);
+
 
 
 
@@ -41,70 +58,69 @@ double power2(long k)
    return res;
 }
 
+
 long DoubleRounding(long dp)
 {
    double a = power2(dp-1) + 1;
-   double b = (power2(dp-6)-1)/power2(dp-5);
-   double x;
-   x = a + b;
-   f4(&x);
+   double b = (power2(dp)-1)/power2(dp+1);
+   register double x = a + b;
+   double y = x;
 
-   if (x != power2(dp-1) + 1)
+   touch_double(&y);
+
+   if (y != power2(dp-1) + 1)
       return 1;
    else 
       return 0; 
 }
 
 
-long DoublePrecision()
-{
-   long k;
-   double l1 = (double)1;
-   double lh = 1/(double)2;
-   double epsilon;
-   double fudge, oldfudge;
 
-   epsilon = l1;
-   fudge = l1+l1;
+long DoublePrecision(void)
+{
+   double eps, one, res;
+   long k;
+
+   one = val_double(1.0);
+   eps = val_double(1.0);
 
    k = 0;
 
    do {
+      double tmp;
+
       k++;
-      epsilon = epsilon * lh;
-      oldfudge = fudge;
-      fudge = l1 + epsilon;
-      f4(&fudge);
-      f4(&oldfudge);
-   } while (fudge > l1 && fudge < oldfudge);
+      eps *= 1.0/2.0;
+      tmp = 1.0 + eps;
+      touch_double(&tmp);
+      res = tmp - one;
+   } while (res == eps);
 
    return k;
 }
 
-long DoublePrecision1()
+long DoublePrecision1(void)
 {
-   register double fudge, oldfudge;
-
+   double eps, one, res;
    long k;
-   double l1 = (double)1;
-   double lh = 1/(double)2;
-   double epsilon;
 
-
-   epsilon = l1;
-   fudge = l1+l1;
+   one = val_double(1.0);
+   eps = val_double(1.0);
 
    k = 0;
 
    do {
+      register double tmp;
+
       k++;
-      epsilon = epsilon * lh;
-      oldfudge = fudge;
-      fudge = l1 + epsilon;
-   } while (fudge > l1 && fudge < oldfudge);
+      eps *= 1.0/2.0;
+      tmp = 1.0 + eps;
+      res = tmp - one;
+   } while (res == eps);
 
    return k;
 }
+
 
 union d_or_rep {
    double d;
@@ -114,6 +130,9 @@ union d_or_rep {
 long RepTest(void)
 {
    union d_or_rep v;
+
+   if (sizeof(double) != 2*sizeof(long))
+      return 0;
 
    v.rep[0] = v.rep[1] = 0;
 
@@ -253,95 +272,288 @@ char *yn_vec[2] = { "no", "yes" };
 
 int main()
 {
-   long bpl, bpi, rs_arith, nbits, single_mul_ok;
-   long a;
-   long x;
+   long bpl, bpi, bpt, rs_arith, nbits, single_mul_ok;
    long dp, dp1, dr;
    FILE *f;
-   int xx;
    long warnings = 0;
-   int c;
+
+   unsigned long ulval;
+   unsigned int uival;
+   size_t tval;
+   long slval;
 
    fprintf(stderr, "This is NTL version %s\n\n", NTL_VERSION);
 
 
-   x = f1();
-   if (~x != f8()) {
-      fprintf(stderr, "BAD NEWS: machine must be 2's compliment.\n");
-      return 1;
-   }
 
-   if ((x >> 1) == x)
-      rs_arith = 1;
-   else
-      rs_arith = 0;
 
+   /*
+    * compute bpl =  bits per long 
+    */
+
+   ulval = val_ulong(1);
    bpl = 0;
-   while (x != 0) {
-      x = x << 1;
+
+   while (ulval) {
+      ulval <<= 1;
+      touch_ulong(&ulval); 
       bpl++;
    }
 
+
+
+
+   /*
+    * compute  bpi = bits per int 
+    */
+
+   uival = val_uint(1);
    bpi = 0;
-   xx = 1;
-   while (xx) {
-      xx = xx << 1; 
+
+   while (uival) {
+      uival <<= 1;
+      touch_uint(&uival);
       bpi++;
-      f5(&xx);
    }
 
-   a = f2(bpl);
-   if (2*a != f7() || a*a != f6()) {
-      fprintf(stderr, "BAD NEWS: machine must work modulo 2^wordsize.\n");
-      return 1;
+
+
+   /*
+    * compute bpt = bits per size_t
+    */
+
+   tval = val_size_t(1);
+   bpt = 0;
+
+   while (tval) {
+      tval <<= 1;
+      touch_size_t(&tval);
+      bpt++;
    }
 
-   if (((long)f3()) != 1.0) {
-      fprintf(stderr, "BAD NEWS: machine must truncate floating point.\n");
-      return 1;
-   }
 
-   if (bpl & 7) {
-      fprintf(stderr, "BAD NEWS: word size must be multiple of 8 bits.\n");
+   /*
+    * check if bpl and bpi are not too small --- any standard conforming
+    * platform should pass this test.
+    */
+
+   if (bpi < 16) {
+      fprintf(stderr, "BAD NEWS: int type too short.\n");
       return 1;
    }
 
    if (bpl < 32) {
-      fprintf(stderr, "BAD NEWS: word size must be at least 32 bits.\n");
+      fprintf(stderr, "BAD NEWS: long type too short.\n");
       return 1;
    }
 
 
+
+
+   /*
+    * check that bpl is a multiple of 8.
+    */
+
+   if (bpl % 8 != 0) {
+      fprintf(stderr, "BAD NEWS: word size must be multiple of 8 bits.\n");
+      return 1;
+   }
+
+
+
+
+   /*
+    * check if width of signed versions of int and long agree with that of
+    * the unsigned versions, and that negative numbers are represented
+    * using 2's compliment.
+    *
+    * The C99 standard, at least, is very precise about the possible
+    * representations of unsigned and signed integer types, and so if
+    * the following tests pass, we can be sure that the desired
+    * properties hold.  NTL relies implicitly and crucially on 
+    * these properties.
+    *
+    * I know of no machines for which these properties do not hold.
+    */
+
+   if (((unsigned int) val_int(INT_MIN)) != val_uint(1U << (bpi-1))) {
+      fprintf(stderr, "BAD NEWS: machine must be 2's compliment.\n");
+      return 1;
+   }
+
+   if (((unsigned int) val_int(INT_MAX)) != val_uint((1U << (bpi-1)) - 1U)) {
+      fprintf(stderr, "BAD NEWS: machine must be 2's compliment.\n");
+      return 1;
+   }
+
+   if (((unsigned long) val_long(LONG_MIN)) != val_ulong(1UL << (bpl-1))) {
+      fprintf(stderr, "BAD NEWS: machine must be 2's compliment.\n");
+      return 1;
+   }
+
+   if (((unsigned long) val_long(LONG_MAX)) != val_ulong((1UL<<(bpl-1))-1UL)) {
+      fprintf(stderr, "BAD NEWS: machine must be 2's compliment.\n");
+      return 1;
+   }
+
+
+
+   /*
+    * check that floating point to integer conversions truncates toward zero
+    * --- any standard conforming platform should pass this test.
+    */
+
+   if (((long) val_double(1.75)) != 1L) {
+      fprintf(stderr, 
+         "BAD NEWS: machine must truncate floating point toward zero.\n");
+      return 1;
+   }
+
+   if (((long) val_double(-1.75)) != -1L) {
+      fprintf(stderr, 
+         "BAD NEWS: machine must truncate floating point toward zero.\n");
+      return 1;
+   }
+
+
+
+   /*
+    * Test if right shift is arithemtic or not.  According to the
+    * standards, the result of right-shifting a negative number is
+    * "implementation defined", which almost surely means the right shift
+    * is *always* arithmetic or *always* logical.  However, this cannot
+    * be guaranteed, and so this test is *not* 100% portable --- but I
+    * know of no machine for which this test does not correctly
+    * predict the general behavior.  One should set the NTL_CLEAN_INT
+    * flag if one wants to avoid such machine dependencies.
+    */
+
+   slval = val_long(-1);
+   if ((slval >> 1) == slval)
+      rs_arith = 1;
+   else
+      rs_arith = 0;
+
+
+
+   /*
+    * Next, we check some properties of floating point arithmetic.
+    * An implementation should conform to the IEEE floating
+    * point standard --- essentially all modern platforms do,
+    * except for a few very old Cray's.  There is no easy way
+    * to check this, so we simply make a few simple sanity checks,
+    * calculate the precision, and if the platform performs
+    * double precision arithemtic in extended double precision registers.
+    * The last property is one that the IEE standard allows, and which
+    * some important platforms (like x86) have --- this is quite
+    * unfortunate, as it really makes many of the other properties
+    * of the IEEE standard unusable.
+    */
+
+   /*
+    * First, we simply check that we are using a machine with radix 2.
+    */
+
+   if (FLT_RADIX != 2) {
+      fprintf(stderr, "BAD NEWS: machine must use IEEE floating point.\n");
+      return 1;
+   }
+
+   /*
+    * Next, we calculate the precision of "in memory" doubles,
+    * and check that it is at least 53.
+    */
+
    dp = DoublePrecision();
+
+   if (dp < 53) {
+      fprintf(stderr, "BAD NEWS: machine must use IEEE floating point (*).\n");
+      return 1;
+   }
+
+   /*
+    * Next, we check that the *range* of doubles is sufficiently large.
+    * Specifically, we require that DBL_MAX > 2^{7*max(bpl, dp)} 
+    * and 1/DBL_MIN > 2^{7*max(bpl, dp)}.  
+    * On IEEE floating point compliant machines, this
+    * will hold, and the following test will pass, if bpl is at most 128, which
+    * should be true for the foreseeable future.
+    */
+
+   if (log(DBL_MAX)/log(2.0) < 7.01*bpl ||  log(DBL_MAX)/log(2.0) < 7.01*dp ||
+      -log(DBL_MIN)/log(2.0) < 7.01*bpl || -log(DBL_MIN)/log(2.0) < 7.01*dp) {
+      fprintf(stderr, "BAD NEWS: range of doubles too small.\n");
+      return 1;
+   }
+
+   
+
+   /*
+    * Next, we check if the machine has wider "in-register" doubles or not.
+    * This test almost always yields the correct result --- if not,
+    * you will have to set the NTL_EXT_DOUBLE in "mach_desc.h"
+    * by hand.
+    * 
+    * The test effectively proves that in-register doubles are wide
+    * if dp1 > dp || dr.
+    */
+
+
    dp1 = DoublePrecision1();
    dr = DoubleRounding(dp);
+
+
+   /*
+    * Set nbits --- the default radix size for NTL's "built in"
+    * long integer arithmetic.
+    *
+    *  Given the minimum size of blp and dp, the smallest possible
+    *  value of nbits is 30.
+    */
+
 
    if (bpl-2 < dp-3)
       nbits = bpl-2;
    else
       nbits = dp-3;
 
-   if (nbits & 1) nbits--;
+   if (nbits % 2 != 0) nbits--;
 
-   if (nbits < 30) {
-      fprintf(stderr, "BAD NEWS: NBITS too small.\n");
-      return 1;
-   }
 
+   /* 
+    * We next test if the NTL_SINGLE_MUL option is valid.  This test is
+    * inherently DIRTY (i.e., the behavior of the test itself is not well
+    * defined according to the standard), but in practice should not cause any
+    * bad behavior, especially if the NTL_SINGLE_MUL option is never used.
+    * This option is anyway considered fairly obsolete, and if desired, one may
+    * change the following "if 1" to "if 0" and avoid performing this test
+    * altogether.
+    */
+
+#if 1
    single_mul_ok = RepTest();
+#else
+   single_mul_ok = 0;
+#endif
+
+
+   /*
+    * That's it!  All tests have passed.
+    */
 
    fprintf(stderr, "GOOD NEWS: compatible machine.\n");
    fprintf(stderr, "summary of machine characteristics:\n");
    fprintf(stderr, "bits per long = %ld\n", bpl);
    fprintf(stderr, "bits per int = %ld\n", bpi);
+   fprintf(stderr, "bits per size_t = %ld\n", bpt);
    fprintf(stderr, "arith right shift = %s\n", yn_vec[rs_arith]);
    fprintf(stderr, "double precision = %ld\n", dp);
    fprintf(stderr, "NBITS (maximum) = %ld\n", nbits);
    fprintf(stderr, "single mul ok = %s\n", yn_vec[single_mul_ok != 0]);
-   fprintf(stderr, "extended doubles = %s\n", yn_vec[dp1 > dp]);
-   fprintf(stderr, "double rounding = %s\n", yn_vec[dr]);
+   fprintf(stderr, "register double precision = %ld\n", dp1);
+   fprintf(stderr, "double rounding detected = %s\n", yn_vec[dr]);  
 
-   if (dp1 > dp && AutoFix)
+   if (((dp1 > dp) || dr) && AutoFix)
       fprintf(stderr, "-- auto x86 fix\n");
 
    if (dp != 53) {
@@ -364,7 +576,7 @@ int main()
 
 #endif
 
-   if (dp1 > dp && !AutoFix) {
+   if (((dp1 > dp) || dr) && !AutoFix) {
       warnings = 1;
       fprintf(stderr, "\n\nWARNING:\n\n");
       fprintf(stderr, "This platform has extended double precision registers.\n");
@@ -377,19 +589,14 @@ int main()
       fprintf(stderr, "this flag.  See quad_float.txt for details.\n\n");
    }
 
-   if (dp1 <= dp && dr) {
-      warnings = 1;
-      fprintf(stderr, "\n\nWARNING:\n\n");
-      fprintf(stderr, "Hmm....your machine double rounds, but the measured precision\n");
-      fprintf(stderr, "does not reflect this.\n");
-      fprintf(stderr, "Make sure you have optimizations turned on.\n\n");
-   }
 
 #if 0
 
    /* better not to be interactive */
 
    if (warnings) {
+      int c;
+
       fprintf(stderr, "Do you want to continue anyway[y/n]? ");
       c = getchar();
       if (c == 'n' || c == 'N') {
@@ -413,6 +620,7 @@ int main()
    fprintf(f, "#define NTL_MAX_LONG (%ldL)\n", ((long) ((1UL<<(bpl-1))-1UL)));
    fprintf(f, "#define NTL_MAX_INT (%ld)\n", ((long) ((1UL<<(bpi-1))-1UL)));
    fprintf(f, "#define NTL_BITS_PER_INT (%ld)\n", bpi);
+   fprintf(f, "#define NTL_BITS_PER_SIZE_T (%ld)\n", bpt);
    fprintf(f, "#define NTL_ARITH_RIGHT_SHIFT (%ld)\n", rs_arith);
    fprintf(f, "#define NTL_NBITS_MAX (%ld)\n", nbits);
    fprintf(f, "#define NTL_DOUBLE_PRECISION (%ld)\n", dp);
@@ -422,7 +630,7 @@ int main()
    fprintf(f, "#define NTL_QUAD_FLOAT_SPLIT (");
    print2k(f, dp - (dp/2), bpl);
    fprintf(f, "+1.0)\n");
-   fprintf(f, "#define NTL_EXT_DOUBLE (%d)\n", dp1 > dp);
+   fprintf(f, "#define NTL_EXT_DOUBLE (%d)\n", ((dp1 > dp) || dr));
    fprintf(f, "#define NTL_SINGLE_MUL_OK (%d)\n", single_mul_ok != 0);
    fprintf(f, "#define NTL_DOUBLES_LOW_HIGH (%d)\n\n\n", single_mul_ok < 0);
    print_BB_mul_code(f, bpl);

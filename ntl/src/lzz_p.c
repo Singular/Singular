@@ -9,6 +9,8 @@ zz_pInfoT::zz_pInfoT(long NewP, long maxroot)
 {
    ref_count = 1;
 
+   if (maxroot < 0) Error("zz_pContext: maxroot may not be negative");
+
    if (NewP <= 1) Error("zz_pContext: p must be > 1");
    if (NumBits(NewP) > NTL_SP_NBITS) Error("zz_pContext: modulus too big");
 
@@ -48,13 +50,13 @@ zz_pInfoT::zz_pInfoT(long NewP, long maxroot)
    negate(MinusM, M);
    MinusMModP = rem(MinusM, p);
 
-   if (!(CoeffModP = (long *) malloc(n * (sizeof (long)))))
+   if (!(CoeffModP = (long *) NTL_MALLOC(n, sizeof(long), 0)))
       Error("out of space");
 
-   if (!(x = (double *) malloc(n * (sizeof (double)))))
+   if (!(x = (double *) NTL_MALLOC(n, sizeof(double), 0)))
       Error("out of space");
 
-   if (!(u = (long *) malloc(n * (sizeof (long)))))
+   if (!(u = (long *) NTL_MALLOC(n, sizeof(long), 0)))
       Error("out of space");
 
    for (i = 0; i < n; i++) {
@@ -127,10 +129,10 @@ void CopyPointer(zz_pInfoPtr& dst, zz_pInfoPtr src)
    }
 
    if (src) {
-      src->ref_count++;
-
-      if (src->ref_count < 0) 
+      if (src->ref_count == NTL_MAX_LONG) 
          Error("internal error: zz_pContext ref_count overflow");
+
+      src->ref_count++;
    }
 
    dst = src;
@@ -215,7 +217,8 @@ void zz_pBak::restore()
 
 
 
-inline long reduce(long a, long p)
+static inline 
+long reduce(long a, long p)
 {
    if (a >= 0 && a < p)
       return a;

@@ -7,24 +7,15 @@ do
   --includedir=*) includedir=`echo $i|sed 's/--includedir=//'` ;;
   esac
 done
+
+echo "#!/bin/sh" >config.status
+echo "cd src" >>config.status
+echo ./configure LIBDIR=$libdir INCLUDEDIR=$includedir PREFIX=$prefix >>config.status
+echo "cd .." >>config.status
+
 cd src
 
-if test x$CC = x
-then
-  if test x$CXX = x
-  then
-    ./configure LIBDIR=$libdir INCLUDEDIR=$includedir PREFIX=$prefix
-  else
-    ./configure LIBDIR=$libdir INCLUDEDIR=$includedir PREFIX=$prefix CXX=$CXX
-  fi
-else
-  if test x$CXX = x
-  then
-    ./configure LIBDIR=$libdir INCLUDEDIR=$includedir PREFIX=$prefix CC=$CC
-  else
-    ./configure LIBDIR=$libdir INCLUDEDIR=$includedir PREFIX=$prefix CC=$CC CXX=$CXX
-  fi
-fi
+./configure LIBDIR=$libdir INCLUDEDIR=$includedir PREFIX=$prefix
 
 cd ..
 

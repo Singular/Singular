@@ -17,7 +17,7 @@ long zz_pX_gcd_crossover[5] = {400, 400, 800, 1400, 1400};
 long zz_pX_bermass_crossover[5] = {400, 480, 900, 1600, 1600};
 long zz_pX_trace_crossover[5] = {200, 350, 450, 800, 800};
 
-#define QUICK_CRT (NTL_DOUBLE_PRECISION - NTL_SP_NBITS > 10)
+#define QUICK_CRT (NTL_DOUBLE_PRECISION - NTL_SP_NBITS > 12)
 
 
 
@@ -27,7 +27,6 @@ const zz_pX& zz_pX::zero()
    return z;
 }
 
-
 void zz_pX::normalize()
 {
    long n;
@@ -35,9 +34,8 @@ void zz_pX::normalize()
 
    n = rep.length();
    if (n == 0) return;
-   p = rep.elts() + (n-1);
-   while (n > 0 && IsZero(*p)) {
-      p--; 
+   p = rep.elts() + n;
+   while (n > 0 && IsZero(*--p)) {
       n--;
    }
    rep.SetLength(n);
@@ -70,7 +68,7 @@ void SetCoeff(zz_pX& x, long i, zz_p a)
    if (i < 0) 
       Error("SetCoeff: negative index");
 
-   if (i >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (NTL_OVERFLOW(i, 1, 0))
       Error("overflow in SetCoeff");
 
    m = deg(x);
@@ -99,7 +97,7 @@ void SetCoeff(zz_pX& x, long i)
    if (i < 0) 
       Error("coefficient index out of range");
 
-   if (i >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (NTL_OVERFLOW(i, 1, 0))
       Error("overflow in SetCoeff");
 
    m = deg(x);
@@ -354,7 +352,8 @@ void PlainMul(zz_p *xp, const zz_p *ap, long sa, const zz_p *bp, long sb)
 
 static vec_double a_buf, b_buf;
 
-inline void reduce(zz_p& r, double x, long p, double pinv)
+static inline 
+void reduce(zz_p& r, double x, long p, double pinv)
 {
    long rr = long(x - double(p)*double(long(x*pinv)));
    if (rr < 0) rr += p;
@@ -1379,7 +1378,7 @@ void fftRep::SetSize(long NewK)
    n = 1L << NewK;
 
    for (i = 0; i < zz_pInfo->NumPrimes; i++) {
-      if ( !(tbl[i] = (long *) malloc(n * (sizeof (long)))) )
+      if ( !(tbl[i] = (long *) NTL_MALLOC(n, sizeof(long), 0)) )
          Error("out of space in fftRep::SetSize()");
    }
 
@@ -1398,7 +1397,7 @@ fftRep::fftRep(const fftRep& R)
    n = 1L << k;
 
    for (i = 0; i < NumPrimes; i++) {
-      if ( !(tbl[i] = (long *) malloc(n * (sizeof (long)))) )
+      if ( !(tbl[i] = (long *) NTL_MALLOC(n, sizeof(long), 0)) )
          Error("out of space in fftRep");
 
       for (j = 0; j < n; j++)
@@ -1429,7 +1428,7 @@ fftRep& fftRep::operator=(const fftRep& R)
       n = 1L << R.k;
   
       for (i = 0; i < NumPrimes; i++) {
-         if ( !(tbl[i] = (long *) malloc(n * (sizeof (long)))) )
+         if ( !(tbl[i] = (long *) NTL_MALLOC(n, sizeof(long), 0)) )
             Error("out of space in fftRep");
       }
 
@@ -1477,34 +1476,40 @@ void FromModularRep(zz_p& x, long *a)
    long i;
    double y;
 
+
+// I've re-written the following code in v5.3 so that it is 
+// a bit more robust.  
+
 #if QUICK_CRT
+
    y = 0;
    for (i = 0; i < n; i++)
       y = y + ((double) a[i])*zz_pInfo->x[i];
 
-   y = y - long(y*pinv)*p;
-   y = y + 0.5;
+   y = floor(y + 0.5);
+   y = y - floor(y*pinv)*double(p);
    while (y >= p) y -= p;
    while (y < 0) y += p;
    q = long(y);
+
 #else
+
    long Q, r;
-   double qq;
 
    y = 0;
-   qq = 0;
+   q = 0;
 
    for (i = 0; i < n; i++) {
       r = MulDivRem(Q, a[i], zz_pInfo->u[i], FFTPrime[i], zz_pInfo->x[i]);
-      qq = qq + Q;
+      q = q + Q;
+#if (NTL_BITS_PER_LONG - NTL_SP_NBITS <= 4)
+      // on typical platforms, this reduction will not be necessary.
+      q = q % p;
+#endif
       y = y + r*FFTPrimeInv[i];
    }
 
-   y = qq + long(y + 0.5);
-   y = y - long(y*pinv)*p;
-   while (y >= p) y -= p;
-   while (y < 0) y += p;
-   q = long(y); 
+   q = (q + long(y + 0.5)) % p;
 
 #endif
 
@@ -1519,6 +1524,7 @@ void FromModularRep(zz_p& x, long *a)
    t = AddMod(t, s, p);
    x.LoopHole() = t;
 }
+
 
 
 void TofftRep(fftRep& y, const zz_pX& x, long k, long lo, long hi)
@@ -1711,7 +1717,7 @@ void FromfftRep(zz_pX& x, fftRep& y, long lo, long hi)
    long NumPrimes = zz_pInfo->NumPrimes;
 
    long t[4];
-   vec_long& s = FFTBuf;;
+   vec_long& s = FFTBuf;
 
    k = y.k;
    n = (1L << k);
@@ -2745,7 +2751,7 @@ void InvTrunc(zz_pX& x, const zz_pX& a, long m)
       return;
    }
 
-   if (m >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (NTL_OVERFLOW(m, 1, 0))
       Error("overflow in InvTrunc");
 
    if (&x == &a) {
@@ -3278,8 +3284,8 @@ void power(zz_pX& x, const zz_pX& a, long e)
 
 void reverse(zz_pX& x, const zz_pX& a, long hi)
 {
-   if (hi < -1) Error("reverse: bad args");
-   if (hi >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (hi < 0) { clear(x); return; }
+   if (NTL_OVERFLOW(hi, 1, 0))
       Error("overflow in reverse");
 
    if (&x == &a) {

@@ -131,7 +131,7 @@ ZZ operator*(const vec_ZZ& a, const vec_ZZ& b)
 void VectorCopy(vec_ZZ& x, const vec_ZZ& a, long n)
 {
    if (n < 0) Error("VectorCopy: negative length");
-   if (n >= (1L << (NTL_BITS_PER_LONG-4))) Error("overflow in VectorCopy");
+   if (NTL_OVERFLOW(n, 1, 0)) Error("overflow in VectorCopy");
 
    long m = min(n, a.length());
 

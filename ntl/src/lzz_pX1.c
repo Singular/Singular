@@ -48,6 +48,11 @@ void zz_pXMatrix::operator=(const zz_pXMatrix& M)
 
 void RightShift(zz_pX& x, const zz_pX& a, long n)
 {
+   if (IsZero(a)) {
+      clear(x);
+      return;
+   }
+
    if (n < 0) {
       if (n < -NTL_MAX_LONG) Error("overflow in RightShift");
       LeftShift(x, a, -n);
@@ -76,20 +81,21 @@ void RightShift(zz_pX& x, const zz_pX& a, long n)
 
 void LeftShift(zz_pX& x, const zz_pX& a, long n)
 {
-   if (n < 0) {
-      if (n < -NTL_MAX_LONG) Error("overflow in LeftShift");
-      RightShift(x, a, -n);
-      return;
-   }
-
-   if (n >= (1L << (NTL_BITS_PER_LONG-4)))
-      Error("overflow in LeftShift");
-
-
    if (IsZero(a)) {
       clear(x);
       return;
    }
+
+   if (n < 0) {
+      if (n < -NTL_MAX_LONG) 
+         clear(x);
+      else
+         RightShift(x, a, -n);
+      return;
+   }
+
+   if (NTL_OVERFLOW(n, 1, 0))
+      Error("overflow in LeftShift");
 
    long m = a.rep.length();
 
@@ -1152,7 +1158,7 @@ void ProjectPowers(vec_zz_p& x, const vec_zz_p& a, long k,
 {
    long n = F.n;
 
-   if (a.length() > n || k < 0 || k >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (a.length() > n || k < 0 || NTL_OVERFLOW(k, 1, 0))
       Error("ProjectPowers: bad args");
 
    long m = H.H.length()-1;
@@ -1289,7 +1295,7 @@ void GCDMinPolySeq(zz_pX& h, const vec_zz_p& x, long m)
 
 void MinPolySeq(zz_pX& h, const vec_zz_p& a, long m)
 {
-   if (m < 0 || m >= (1L << (NTL_BITS_PER_LONG-4))) Error("MinPoly: bad args");
+   if (m < 0 || NTL_OVERFLOW(m, 1, 0)) Error("MinPoly: bad args");
    if (a.length() < 2*m) Error("MinPoly: sequence too short");
 
    if (m > NTL_zz_pX_BERMASS_CROSSOVER)

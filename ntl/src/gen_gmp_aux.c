@@ -1,5 +1,8 @@
 
+#include <stdlib.h>
+#include <math.h>
 #include <stdio.h>
+
 #include <NTL/config.h>
 
 
@@ -72,9 +75,19 @@ int main()
 
    bpl = NTL_BITS_PER_LONG;
 
-   if (sizeof(mp_limb_t) == sizeof(long))
+
+   /*
+    * We require that the number of bits per limb quantity correspond to the
+    * number of bits of a long, or possibly a "long long" that is twice as wide
+    * as a long.  These restrictions will almost certainly be satisfied, unless
+    * GMP is installed using the newly proposed "nail" option.
+    */
+
+   ntl_zz_nbits = 0;
+
+   if (sizeof(mp_limb_t) == sizeof(long) && mp_bits_per_limb == bpl)
       ntl_zz_nbits = bpl;
-   else if (sizeof(mp_limb_t) == 2*sizeof(long))
+   else if (sizeof(mp_limb_t) == 2*sizeof(long) && mp_bits_per_limb == 2*bpl)
       ntl_zz_nbits = 2*bpl;
    else
       Error("sorry...this is a funny gmp");

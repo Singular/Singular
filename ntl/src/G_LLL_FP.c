@@ -3,10 +3,19 @@
 #include <NTL/fileio.h>
 #include <NTL/vec_double.h>
 
+#include <stdio.h>
+
 
 #include <NTL/new.h>
 
 NTL_START_IMPL
+
+static inline
+void CheckFinite(double *p)
+{
+   if (!IsFinite(p)) Error("G_LLL_FP: numbers too big...use G_LLL_XD");
+}
+
 
 
 static void RowTransform(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1)
@@ -106,26 +115,36 @@ static void RowTransformFinish(vec_ZZ& A, double *a, long *in_a)
       }
       else {
          conv(a[i], A(i));
+         CheckFinite(&a[i]);
       }
    }
 }
 
 
 static void RowTransform(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1, 
-                         double mu, double *a, double *b, long *in_a,
+                         double *a, double *b, long *in_a,
                          double& max_a, double max_b, long& in_float)
 // x = x - y*MU
 {
    static ZZ T, MU;
    long k;
+   double mu;
+
+   conv(mu, MU1);
+   CheckFinite(&mu);
 
    long n = A.length();
    long i;
 
    if (in_float) {
-      max_a += fabs(mu)*max_b;
-      if (max_a >= TR_BND) {
+      double mu_abs = fabs(mu);
+      if (mu_abs > 0 && max_b > 0 && (mu_abs >= TR_BND || max_b >= TR_BND)) {
          in_float = 0;
+      }
+      else {
+         max_a += mu_abs*max_b;
+         if (max_a >= TR_BND)
+            in_float = 0;
       }
    }
 
@@ -545,7 +564,7 @@ void GivensComputeGS(double **B1, double **mu, double **aux, long k, long n,
    if (k > n) p[k] = 0;
 
    for (i = 1; i <= k; i++)
-      if (!IsFinite(&p[i])) Error("G_LLL_FP...numbers too big");
+      CheckFinite(&p[i]);
 }
 
 static double red_fudge = 0;
@@ -558,13 +577,6 @@ static double StartTime = 0;
 static double LastTime = 0;
 
 
-
-static void G_LLLStatus(long max_k, double t, long m, const mat_ZZ& B)
-{
-
-   LastTime = t;
-   
-}
 
 static void init_red_fudge()
 {
@@ -660,16 +672,10 @@ long ll_G_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
          swap_cnt = 0;
       }
 
-      if (verbose) {
-         tt = GetTime();
-
-         if (tt > LastTime + LLLStatusInterval)
-            G_LLLStatus(max_k, tt, m, B);
-      }
-
       GivensComputeGS(B1, mu, aux, k, n, cache);
 
       if (swap_cnt > 200000) {
+         printf( "G_LLL_FP: swap loop?\n");
          swap_cnt = 0;
       }
 
@@ -692,6 +698,9 @@ long ll_G_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
 
             if ((counter >> 7) == 1 || new_sz < sz) {
                sz = new_sz;
+            }
+            else {
+               printf( "G_LLL_FP: warning--infinite loop? (%l)\n" ,k );
             }
          }
 
@@ -749,7 +758,7 @@ long ll_G_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
    
                conv(MU, mu1);
 
-               RowTransform(B(k), B(j), MU, mu1, B1[k], B1[j], in_vec,
+               RowTransform(B(k), B(j), MU, B1[k], B1[j], in_vec,
                             max_b[k], max_b[j], in_float);
                if (U) RowTransform((*U)(k), (*U)(j), MU);
             }
@@ -820,11 +829,6 @@ long ll_G_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
 
    }
 
-   if (verbose) {
-      G_LLLStatus(m+1, GetTime(), m, B);
-   }
-
-
    delete [] max_b;
 
    return m;
@@ -882,15 +886,12 @@ long G_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
    }
 
    for (i = 1; i <=m; i++)
-      for (j = 1; j <= n; j++) 
+      for (j = 1; j <= n; j++) {
          conv(B1[i][j], B(i, j));
+         CheckFinite(&B1[i][j]);
+      }
 
          
-   for (i = 1; i <= m; i++) 
-      for (j = 1; j <= n; j++)
-         if (!IsFinite(&B1[i][j]))
-             Error("G_LLL_FP: numbers too big...use G_LLL_XD");
-
    GivensCache_FP cache(m, n);
 
    new_m = ll_G_LLL_FP(B, U, delta, deep, check, B1, mu, aux, m, 1, quit, cache);
@@ -1038,28 +1039,6 @@ void ComputeG_BKZThresh(double *c, long beta)
    }
 }
 
-static 
-void G_BKZStatus(double tt, double enum_time, long NumIterations, 
-               long NumTrivial, long NumNonTrivial, long NumNoOps, long m, 
-               const mat_ZZ& B)
-{
-
-   ZZ t1;
-   long i;
-   double prodlen = 0;
-
-   for (i = 1; i <= m; i++) {
-      InnerProduct(t1, B(i), B(i));
-      if (!IsZero(t1))
-         prodlen += log(t1);
-   }
-
-   LastTime = tt;
-   
-}
-
-
-
 static
 long G_BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta, 
          long beta, long prune, LLLCheckFct check)
@@ -1176,8 +1155,7 @@ long G_BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
    for (i = 1; i <=m; i++)
       for (j = 1; j <= n; j++) {
          conv(B1[i][j], B(i, j));
-         if (!IsFinite(&B1[i][j])) 
-            Error("G_BKZ_FP: numbers too big...use G_BKZ_XD");
+         CheckFinite(&B1[i][j]);
       }
 
          
@@ -1188,10 +1166,10 @@ long G_BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
    double tt;
 
    double enum_time = 0;
-   long NumIterations = 0;
-   long NumTrivial = 0;
-   long NumNonTrivial = 0;
-   long NumNoOps = 0;
+   unsigned long NumIterations = 0;
+   unsigned long NumTrivial = 0;
+   unsigned long NumNonTrivial = 0;
+   unsigned long NumNoOps = 0;
 
    long verb = verbose;
 
@@ -1227,14 +1205,6 @@ long G_BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
             clean = 1;
          }
 
-         if (verb) {
-            tt = GetTime();
-            if (tt > LastTime + LLLStatusInterval)
-               G_BKZStatus(tt, enum_time, NumIterations, NumTrivial,
-                         NumNonTrivial, NumNoOps, m, B);
-         }
-
-   
          // ENUM
 
          double tt1;
@@ -1245,7 +1215,7 @@ long G_BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
 
          for (i = jj; i <= kk; i++) {
             c[i] = mu[i][i]*mu[i][i];
-            if (!IsFinite(&c[i])) Error("numbers too big...use G_BKZ_XD");
+            CheckFinite(&c[i]);
          }
 
          if (prune > 0)
@@ -1271,19 +1241,6 @@ long G_BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
          long enum_cnt = 0;
    
          while (t <= kk) {
-            if (verb) {
-               enum_cnt++;
-               if (enum_cnt > 100000) {
-                  enum_cnt = 0;
-                  tt = GetTime();
-                  if (tt > LastTime + LLLStatusInterval) {
-                     enum_time += tt - tt1;
-                     tt1 = tt;
-                     G_BKZStatus(tt, enum_time, NumIterations, NumTrivial,
-                               NumNonTrivial, NumNoOps, m, B);
-                  }
-               }
-            }
 
             ctilda[t] = ctilda[t+1] + 
                (yvec[t]+utildavec[t])*(yvec[t]+utildavec[t])*c[t];
@@ -1401,8 +1358,10 @@ long G_BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
                   tp = B1[i-1]; B1[i-1] = B1[i]; B1[i] = tp;
                }
       
-               for (i = 1; i <= n; i++)
+               for (i = 1; i <= n; i++) {
                   conv(B1[jj][i], B(jj, i));
+                  CheckFinite(&B1[jj][i]);
+               }
 
                if (IsZero(B(jj))) Error("G_BKZ_FP: internal error");
       
@@ -1465,11 +1424,6 @@ long G_BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
       }
    }
 
-
-   if (verb) {
-      G_BKZStatus(GetTime(), enum_time, NumIterations, NumTrivial, NumNonTrivial, 
-                NumNoOps, m, B);
-   }
 
    // clean up
 

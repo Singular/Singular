@@ -31,7 +31,7 @@ char *FileName(const char* stem, const char *ext, long d)
    long i, dd;
    dd = d;
    for (i = 4; i >= 0; i--) {
-      dbuf[i] = (char) ((dd % 10) + '0');
+      dbuf[i] = IntValToChar(dd % 10);
       dd = dd / 10;
    }
 

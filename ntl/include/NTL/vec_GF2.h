@@ -75,6 +75,7 @@ public:
 
    long length() const { return _len; }
    long MaxLength() const { return _maxlen >> 1; }  
+   long allocated() const { return rep.MaxLength() * NTL_BITS_PER_LONG; }
    long fixed() const { return _maxlen & 1; }
 
 
@@ -164,6 +165,7 @@ void append(vec_GF2& v, const vec_GF2& a);
 long operator==(const vec_GF2& a, const vec_GF2& b);
 inline long operator!=(const vec_GF2& a, const vec_GF2& b)
    { return !(a == b); }
+
 void shift(vec_GF2& x, const vec_GF2& a, long n);
 // x = a shifted n places, i.e., if l = a.length(),
 //    x.length() = l, x[i] = a[i-n] for 0 <= i-n < l,

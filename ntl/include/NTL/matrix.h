@@ -43,6 +43,7 @@ public:  \
   \
   \
    long position(const vec_T& l__a) const { return _mat__rep.position(l__a); } \
+   long position1(const vec_T& l__a) const { return _mat__rep.position1(l__a); } \
   mat_T(mat_T& l__x, NTL_NNS INIT_TRANS_TYPE) :  \
     _mat__rep(l__x._mat__rep, NTL_NNS INIT_TRANS), _mat__numcols(l__x._mat__numcols) { }  \
 };  \
@@ -59,6 +60,7 @@ void MakeMatrix(mat_T& l__x, const vec_vec_T& l__a);  \
 #define NTL_eq_matrix_decl(T,vec_T,vec_vec_T,mat_T) \
 long operator==(const mat_T& l__a, const mat_T& l__b); \
 long operator!=(const mat_T& l__a, const mat_T& l__b); \
+
 
 
 #define NTL_matrix_impl(T,vec_T,vec_vec_T,mat_T)  \
@@ -165,6 +167,7 @@ long operator!=(const mat_T& l__a, const mat_T& l__b)  \
 {  \
    return !(l__a == l__b);  \
 }  \
+
 
 
 

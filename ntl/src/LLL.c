@@ -12,6 +12,8 @@ static void ExactDiv(ZZ& qq, const ZZ& a, const ZZ& b)
 
    DivRem(q, r, a, b);
    if (!IsZero(r)) {
+      //cerr << "a = " << a << "\n";
+      //cerr << "b = " << b << "\n";
       Error("ExactDiv: nonzero remainder");
    }
    qq = q;
@@ -233,6 +235,7 @@ long swap(long k, mat_ZZ& B, vec_long& P, vec_ZZ& D,
 
 
    if (P(k) != 0) {
+
       swap(B(k-1), B(k));
       if (U) swap((*U)(k-1), (*U)(k));
    

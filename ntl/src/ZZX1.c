@@ -429,7 +429,7 @@ void SSMul(ZZX& c, const ZZX& a, const ZZX& b)
 }
 
 
-// SSRatio computes how much bigger the SS moduls must be
+// SSRatio computes how much bigger the SS modulus must be
 // to accomodate the necessary roots of unity.
 // This is useful in determining algorithm crossover points.
 
@@ -1733,19 +1733,21 @@ void trunc(ZZX& x, const ZZX& a, long m)
 
 void LeftShift(ZZX& x, const ZZX& a, long n)
 {
-   if (n < 0) {
-      if (n < -NTL_MAX_LONG) Error("overflow in LeftShift");
-      RightShift(x, a, -n);
-      return;
-   }
-
-   if (n >= (1L << (NTL_BITS_PER_LONG-4)))
-      Error("overflow in LeftShift");
-
    if (IsZero(a)) {
       clear(x);
       return;
    }
+
+   if (n < 0) {
+      if (n < -NTL_MAX_LONG)  
+         clear(x);
+      else
+         RightShift(x, a, -n);
+      return;
+   }
+
+   if (NTL_OVERFLOW(n, 1, 0))
+      Error("overflow in LeftShift");
 
    long m = a.rep.length();
 
@@ -1762,6 +1764,11 @@ void LeftShift(ZZX& x, const ZZX& a, long n)
 
 void RightShift(ZZX& x, const ZZX& a, long n)
 {
+   if (IsZero(a)) {
+      clear(x);
+      return;
+   }
+
    if (n < 0) {
       if (n < -NTL_MAX_LONG) Error("overflow in RightShift");
       LeftShift(x, a, -n);
@@ -2294,7 +2301,7 @@ void EuclLength1(ZZ& l, const ZZX& a)
 long CharPolyBound(const ZZX& a, const ZZX& f)
 // This computes a bound on the size of the
 // coefficients of the characterstic polynomial.
-// It use the relation characterization of the char poly as
+// It uses the characterization of the char poly as
 // resultant_y(f(y), x-a(y)), and then interpolates this
 // through complex primimitive (deg(f)+1)-roots of unity.
 
@@ -2360,7 +2367,9 @@ void CopyReverse(ZZX& x, const ZZX& a, long hi)
 
 void reverse(ZZX& x, const ZZX& a, long hi)
 {
-   if (hi < -1) Error("reverse: bad args");
+   if (hi < 0) { clear(x); return; }
+   if (NTL_OVERFLOW(hi, 1, 0))
+      Error("overflow in reverse");
 
    if (&x == &a) {
       ZZX tmp;
@@ -2415,10 +2424,10 @@ void NewtonInvTrunc(ZZX& c, const ZZX& a, long e)
    ZZX g, g0, g1, g2;
 
 
-   g.rep.SetMaxLength(e);
-   g0.rep.SetMaxLength(e);
-   g1.rep.SetMaxLength((3*e+1)/2);
-   g2.rep.SetMaxLength(e);
+   g.rep.SetMaxLength(E[0]);
+   g0.rep.SetMaxLength(E[0]);
+   g1.rep.SetMaxLength((3*E[0]+1)/2);
+   g2.rep.SetMaxLength(E[0]);
 
    conv(g, x);
 
@@ -2456,7 +2465,7 @@ void InvTrunc(ZZX& c, const ZZX& a, long e)
       return;
    }
 
-   if (e >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (NTL_OVERFLOW(e, 1, 0))
       Error("overflow in InvTrunc");
 
    NewtonInvTrunc(c, a, e);

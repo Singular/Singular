@@ -24,9 +24,8 @@ void GF2EX::normalize()
 
    n = rep.length();
    if (n == 0) return;
-   p = rep.elts() + (n-1);
-   while (n > 0 && IsZero(*p)) {
-      p--; 
+   p = rep.elts() + n;
+   while (n > 0 && IsZero(*--p)) {
       n--;
    }
    rep.SetLength(n);
@@ -59,19 +58,25 @@ void SetCoeff(GF2EX& x, long i, const GF2E& a)
    if (i < 0) 
       Error("SetCoeff: negative index");
 
-   if (i >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (NTL_OVERFLOW(i, 1, 0))
       Error("overflow in SetCoeff");
 
    m = deg(x);
 
    if (i > m) {
-      long pos = x.rep.position(a);
-      x.rep.SetLength(i+1);
+      /* careful: a may alias a coefficient of x */
 
-      if (pos != -1)
-         x.rep[i] = x.rep.RawGet(pos);
-      else
+      long alloc = x.rep.allocated();
+
+      if (alloc > 0 && i >= alloc) {
+         GF2E aa = a;
+         x.rep.SetLength(i+1);
+         x.rep[i] = aa;
+      }
+      else {
+         x.rep.SetLength(i+1);
          x.rep[i] = a;
+      }
 
       for (j = m+1; j < i; j++)
          clear(x.rep[j]);
@@ -111,7 +116,7 @@ void SetCoeff(GF2EX& x, long i)
    if (i < 0) 
       Error("coefficient index out of range");
 
-   if (i >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (NTL_OVERFLOW(i, 1, 0))
       Error("overflow in SetCoeff");
 
    m = deg(x);
@@ -381,33 +386,9 @@ void sqr(GF2EX& x, const GF2EX& a)
 }
 
 
-#if 0
 
-static
-void PlainMul(GF2X *xp, const GF2X *ap, long sa, const GF2X *bp, long sb)
-{
-   if (sa == 0 || sb == 0) return;
-
-   long sx = sa+sb-1;
-
-   long i, j, jmin, jmax;
-   static GF2X t, accum;
-
-   for (i = 0; i < sx; i++) {
-      jmin = max(0, i-sb+1);
-      jmax = min(sa-1, i);
-      clear(accum);
-      for (j = jmin; j <= jmax; j++) {
-         mul(t, ap[j], bp[i-j]);
-         add(accum, accum, t);
-      }
-      xp[i] = accum;
-   }
-}
-
-#endif
-
-static void PlainMul1(GF2X *xp, const GF2X *ap, long sa, const GF2X& b)
+static 
+void PlainMul1(GF2X *xp, const GF2X *ap, long sa, const GF2X& b)
 {
    long i;
 
@@ -418,7 +399,7 @@ static void PlainMul1(GF2X *xp, const GF2X *ap, long sa, const GF2X& b)
 
 
 
-inline
+static inline
 void q_add(GF2X& x, const GF2X& a, const GF2X& b)
 
 // This is a quick-and-dirty add rotine used by the karatsuba routine.
@@ -467,7 +448,7 @@ void q_add(GF2X& x, const GF2X& a, const GF2X& b)
 }
 
 
-inline
+static inline
 void q_copy(GF2X& x, const GF2X& a)
 // see comments for q_add above
 
@@ -686,7 +667,7 @@ void KronMul(GF2EX& x, const GF2EX& a, const GF2EX& b)
    long sx = deg(a) + deg(b) + 1;
    long blocksz = 2*GF2E::degree() - 1;
 
-   if (blocksz >= (1L << (NTL_BITS_PER_LONG-4))/sx)
+   if (NTL_OVERFLOW(blocksz, sx, 0))
       Error("overflow in GF2EX KronMul");
 
    KronSubst(aa, a);
@@ -1458,10 +1439,10 @@ void NewtonInvTrunc(GF2EX& c, const GF2EX& a, long e)
    GF2EX g, g0, g1, g2;
 
 
-   g.rep.SetMaxLength(e);
-   g0.rep.SetMaxLength(e);
-   g1.rep.SetMaxLength((3*e+1)/2);
-   g2.rep.SetMaxLength(e);
+   g.rep.SetMaxLength(E[0]);
+   g0.rep.SetMaxLength(E[0]);
+   g1.rep.SetMaxLength((3*E[0]+1)/2);
+   g2.rep.SetMaxLength(E[0]);
 
    conv(g, x);
 
@@ -1498,7 +1479,7 @@ void InvTrunc(GF2EX& c, const GF2EX& a, long e)
       return;
    }
 
-   if (e >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (NTL_OVERFLOW(e, 1, 0))
       Error("overflow in InvTrunc");
 
    NewtonInvTrunc(c, a, e);
@@ -1515,7 +1496,7 @@ void build(GF2EXModulus& F, const GF2EX& f)
 
    if (n <= 0) Error("build(GF2EXModulus,GF2EX): deg(f) <= 0");
 
-   if (n >= (1L << (NTL_BITS_PER_LONG-4))/GF2E::degree())
+   if (NTL_OVERFLOW(n, GF2E::degree(), 0))
       Error("build(GF2EXModulus,GF2EX): overflow");
 
    F.tracevec.SetLength(0);
@@ -2126,6 +2107,11 @@ void diff(GF2EX& x, const GF2EX& a)
 
 void RightShift(GF2EX& x, const GF2EX& a, long n)
 {
+   if (IsZero(a)) {
+      clear(x);
+      return;
+   }
+
    if (n < 0) {
       if (n < -NTL_MAX_LONG) Error("overflow in RightShift");
       LeftShift(x, a, -n);
@@ -2154,19 +2140,21 @@ void RightShift(GF2EX& x, const GF2EX& a, long n)
 
 void LeftShift(GF2EX& x, const GF2EX& a, long n)
 {
-   if (n < 0) {
-      if (n < -NTL_MAX_LONG) Error("overflow in LeftShift");
-      RightShift(x, a, -n);
-      return;
-   }
-
-   if (n >= (1L << (NTL_BITS_PER_LONG-4)))
-      Error("overflow in LeftShift");
-
    if (IsZero(a)) {
       clear(x);
       return;
    }
+
+   if (n < 0) {
+      if (n < -NTL_MAX_LONG) 
+         clear(x);
+      else
+         RightShift(x, a, -n);
+      return;
+   }
+
+   if (NTL_OVERFLOW(n, 1, 0))
+      Error("overflow in LeftShift");
 
    long m = a.rep.length();
 
@@ -2421,8 +2409,7 @@ void build(GF2EXArgument& A, const GF2EX& h, const GF2EXModulus& F, long m)
    if (m > F.n) m = F.n;
 
    if (GF2EXArgBound > 0) {
-      double sz = GF2E::WordLength()+4;
-      sz = sz*(sizeof (_ntl_ulong));
+      double sz = GF2E::storage();
       sz = sz*F.n;
       sz = sz + NTL_VECTOR_HEADER_SIZE + sizeof(vec_GF2E);
       sz = sz/1024;
@@ -2602,7 +2589,7 @@ static
 void ProjectPowers(vec_GF2E& x, const GF2EX& a, long k, 
                    const GF2EXArgument& H, const GF2EXModulus& F)
 {
-   if (k < 0 || k >= (1L << (NTL_BITS_PER_LONG-4)) || deg(a) >= F.n) 
+   if (k < 0 || NTL_OVERFLOW(k, 1, 0) || deg(a) >= F.n) 
       Error("ProjectPowers: bad args");
 
    long m = H.H.length()-1;
@@ -2733,7 +2720,7 @@ void BerlekampMassey(GF2EX& h, const vec_GF2E& a, long m)
 
 void MinPolySeq(GF2EX& h, const vec_GF2E& a, long m)
 {
-   if (m < 0 || m >= (1L << (NTL_BITS_PER_LONG-4))) Error("MinPoly: bad args");
+   if (m < 0 || NTL_OVERFLOW(m, 1, 0)) Error("MinPoly: bad args");
    if (a.length() < 2*m) Error("MinPoly: sequence too short");
 
    BerlekampMassey(h, a, m);
@@ -2943,8 +2930,8 @@ void power(GF2EX& x, const GF2EX& a, long e)
 
 void reverse(GF2EX& x, const GF2EX& a, long hi)
 {
-   if (hi < -1) Error("reverse: bad args");
-   if (hi >= (1L << (NTL_BITS_PER_LONG-4))) Error("overflow in reverse");
+   if (hi < 0) { clear(x); return; }
+   if (NTL_OVERFLOW(hi, 1, 0)) Error("overflow in reverse");
 
    if (&x == &a) {
       GF2EX tmp;

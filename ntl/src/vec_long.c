@@ -5,8 +5,11 @@
 
 NTL_START_IMPL
 
-inline void BlockConstruct(long *, long) { }
-inline void BlockDestroy(long *, long) { }
+static inline 
+void BlockConstruct(long *, long) { }
+
+static inline 
+void BlockDestroy(long *, long) { }
 
 NTL_vector_impl_plain(long,vec_long)
 

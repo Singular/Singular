@@ -179,11 +179,16 @@ inline ZZ to_ZZ(float a) { return ZZ(INIT_VAL, a); }
 inline void conv(long& x, const ZZ& a) { x = NTL_ztoint(a.rep); }
 inline long to_long(const ZZ& a)  { return NTL_ztoint(a.rep); }
 
-inline void conv(int& x, const ZZ& a) { x = int(NTL_ztoint(a.rep)); }
-inline int to_int(const ZZ& a)  { return int(NTL_ztoint(a.rep)); }
+inline void conv(int& x, const ZZ& a) 
+   { unsigned int res = (unsigned int) NTL_ztouint(a.rep); 
+     x = NTL_UINT_TO_INT(res); }
+
+inline int to_int(const ZZ& a)  
+   { unsigned int res = (unsigned int) NTL_ztouint(a.rep); 
+     return NTL_UINT_TO_INT(res); }
 
 inline void conv(unsigned long& x, const ZZ& a) { x = NTL_ztouint(a.rep); }
-inline long to_ulong(const ZZ& a)  { return NTL_ztouint(a.rep); }
+inline unsigned long to_ulong(const ZZ& a)  { return NTL_ztouint(a.rep); }
 
 inline void conv(unsigned int& x, const ZZ& a) 
    { x = (unsigned int)(NTL_ztouint(a.rep)); }
@@ -1191,15 +1196,6 @@ void shift(long);
 };
 
 
-
-
-/**************************************************************
-
-                      Input/Output
-
-***************************************************************/
-
-
 /****************************************************************
 
     Single-precision modular arithmetic
@@ -1220,7 +1216,7 @@ inline long AddMod(long a, long b, long n)
 
 {
    long res = a + b;
-#if (NTL_ARITH_RIGHT_SHIFT && defined(NTL_AVOID_BRANCHING))
+#if (NTL_ARITH_RIGHT_SHIFT && defined(NTL_AVOID_BRANCHING) && !defined(NTL_CLEAN_INT))
    res -= n;
    res += (res >> (NTL_BITS_PER_LONG-1)) & n;
    return res;
@@ -1237,7 +1233,7 @@ inline long SubMod(long a, long b, long n)
 
 {
    long res = a - b;
-#if (NTL_ARITH_RIGHT_SHIFT && defined(NTL_AVOID_BRANCHING))
+#if (NTL_ARITH_RIGHT_SHIFT && defined(NTL_AVOID_BRANCHING) && !defined(NTL_CLEAN_INT))
    res += (res >> (NTL_BITS_PER_LONG-1)) & n;
    return res;
 #else
@@ -1463,9 +1459,7 @@ inline long MulDivRem(long& qq, long a, long b, long n, double bninv)
 #endif
 
 
-
-
-#else
+#elif (!defined(NTL_CLEAN_INT))
 
 inline long MulMod(long a, long b, long n)
 {
@@ -1541,6 +1535,89 @@ inline long MulDivRem(long& qq, long a, long b, long n, double bninv)
 
    qq = q;
    return res;
+}
+
+#else
+
+/*
+ * NTL_CLEAN_INT set: these versions of MulMod are completely portable,
+ * assuming IEEE floating point arithmetic.
+ */
+
+inline long MulMod(long a, long b, long n)
+{
+   long q;
+   unsigned long res;
+
+   q  = (long) ((((double) a) * ((double) b)) / ((double) n)); 
+
+   res = ((unsigned long) a)*((unsigned long) b) - 
+         ((unsigned long) q)*((unsigned long) n);
+
+   if (res >> (NTL_BITS_PER_LONG-1))
+      res += n;
+   else if (((long) res) >= n)
+      res -= n;
+ 
+   return ((long) res);
+}
+
+inline long MulMod(long a, long b, long n, double ninv)
+{
+   long q; 
+   unsigned long res;
+
+   q  = (long) ((((double) a) * ((double) b)) * ninv); 
+
+   res = ((unsigned long) a)*((unsigned long) b) - 
+         ((unsigned long) q)*((unsigned long) n);
+
+   if (res >> (NTL_BITS_PER_LONG-1))
+      res += n;
+   else if (((long) res) >= n)
+      res -= n;
+ 
+   return ((long) res);
+}
+
+
+inline long MulMod2(long a, long b, long n, double bninv)
+{
+   long q;
+   unsigned long res;
+
+   q  = (long) (((double) a) * bninv);
+
+   res = ((unsigned long) a)*((unsigned long) b) - 
+         ((unsigned long) q)*((unsigned long) n);
+
+   if (res >> (NTL_BITS_PER_LONG-1))
+      res += n;
+   else if (((long) res) >= n)
+      res -= n;
+ 
+   return ((long) res);
+}
+
+inline long MulDivRem(long& qq, long a, long b, long n, double bninv)
+{
+   long q; 
+   unsigned long res;
+
+   q  = (long) (((double) a) * bninv);
+   res = ((unsigned long) a)*((unsigned long) b) - 
+         ((unsigned long) q)*((unsigned long) n);
+
+   if (res >> (NTL_BITS_PER_LONG-1)) {
+      res += n;
+      q--;
+   } else if (((long) res) >= n) {
+      res -= n;
+      q++;
+   }
+
+   qq = q;
+   return ((long) res);
 }
 
 

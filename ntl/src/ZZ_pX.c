@@ -50,9 +50,8 @@ void ZZ_pX::normalize()
 
    n = rep.length();
    if (n == 0) return;
-   p = rep.elts() + (n-1);
-   while (n > 0 && IsZero(*p)) {
-      p--; 
+   p = rep.elts() + n;
+   while (n > 0 && IsZero(*--p)) {
       n--;
    }
    rep.SetLength(n);
@@ -85,19 +84,26 @@ void SetCoeff(ZZ_pX& x, long i, const ZZ_p& a)
    if (i < 0) 
       Error("SetCoeff: negative index");
 
-   if (i >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (NTL_OVERFLOW(i, 1, 0))
       Error("overflow in SetCoeff");
 
    m = deg(x);
 
    if (i > m) {
-      long pos = x.rep.position(a);
-      x.rep.SetLength(i+1);
+      /* careful: a may alias a coefficient of x */
 
-      if (pos != -1)
-         x.rep[i] = x.rep.RawGet(pos);
-      else
+      long alloc = x.rep.allocated();
+
+      if (alloc > 0 && i >= alloc) {
+         ZZ_pTemp aa_tmp;  ZZ_p& aa = aa_tmp.val();
+         aa = a;
+         x.rep.SetLength(i+1);
+         x.rep[i] = aa;
+      }
+      else {
+         x.rep.SetLength(i+1);
          x.rep[i] = a;
+      }
 
       for (j = m+1; j < i; j++)
          clear(x.rep[j]);
@@ -126,7 +132,7 @@ void SetCoeff(ZZ_pX& x, long i)
    if (i < 0) 
       Error("coefficient index out of range");
 
-   if (i >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (NTL_OVERFLOW(i, 1, 0))
       Error("overflow in SetCoeff");
 
    m = deg(x);
@@ -1235,7 +1241,7 @@ void FFTRep::SetSize(long NewK)
    long i, n;
 
    if (MaxK == -1) {
-      tbl = (long **) malloc(NumPrimes * (sizeof (long *)) );
+      tbl = (long **) NTL_MALLOC(NumPrimes, sizeof(long *), 0);
       if (!tbl)
          Error("out of space in FFTRep::SetSize()");
    }
@@ -1247,7 +1253,7 @@ void FFTRep::SetSize(long NewK)
    n = 1L << NewK;
 
    for (i = 0; i < NumPrimes; i++) {
-      if ( !(tbl[i] = (long *) malloc(n * (sizeof (long)))) )
+      if ( !(tbl[i] = (long *) NTL_MALLOC(n, sizeof(long), 0)) )
          Error("out of space in FFTRep::SetSize()");
    }
 
@@ -1266,14 +1272,14 @@ FFTRep::FFTRep(const FFTRep& R)
 
    long i, j, n;
  
-   tbl = (long **) malloc(NumPrimes * (sizeof (long *)) );
+   tbl = (long **) NTL_MALLOC(NumPrimes, sizeof(long *), 0);
    if (!tbl)
       Error("out of space in FFTRep");
 
    n = 1L << k;
 
    for (i = 0; i < NumPrimes; i++) {
-      if ( !(tbl[i] = (long *) malloc(n * (sizeof (long)))) )
+      if ( !(tbl[i] = (long *) NTL_MALLOC(n, sizeof(long), 0)) )
          Error("out of space in FFTRep");
 
       for (j = 0; j < n; j++)
@@ -1299,7 +1305,7 @@ FFTRep& FFTRep::operator=(const FFTRep& R)
       long i, n;
 
       if (MaxK == -1) {
-         tbl = (long **) malloc(NumPrimes * (sizeof (long *)) );
+         tbl = (long **) NTL_MALLOC(NumPrimes, sizeof(long *), 0);
          if (!tbl)
             Error("out of space in FFTRep");
       }
@@ -1311,7 +1317,7 @@ FFTRep& FFTRep::operator=(const FFTRep& R)
       n = 1L << R.k;
    
       for (i = 0; i < NumPrimes; i++) {
-         if ( !(tbl[i] = (long *) malloc(n * (sizeof (long)))) )
+         if ( !(tbl[i] = (long *) NTL_MALLOC(n, sizeof(long), 0)) )
             Error("out of space in FFTRep");
       }
 
@@ -1363,7 +1369,7 @@ void ZZ_pXModRep::SetSize(long NewN)
  
 
    if (MaxN == 0) {
-      tbl = (long **) malloc(ZZ_pInfo->NumPrimes * (sizeof (long *)) );
+      tbl = (long **) NTL_MALLOC(ZZ_pInfo->NumPrimes, sizeof(long *), 0);
       if (!tbl)
          Error("out of space in ZZ_pXModRep::SetSize()");
    }
@@ -1373,7 +1379,7 @@ void ZZ_pXModRep::SetSize(long NewN)
    }
 
    for (i = 0; i < ZZ_pInfo->NumPrimes; i++) {
-      if ( !(tbl[i] = (long *) malloc(NewN * (sizeof (long)))) )
+      if ( !(tbl[i] = (long *) NTL_MALLOC(NewN, sizeof(long), 0)) )
          Error("out of space in ZZ_pXModRep::SetSize()");
    }
 
@@ -1470,7 +1476,7 @@ void ToFFTRep(FFTRep& y, const ZZ_pX& x, long k, long lo, long hi)
 
    long n, i, j, m, j1;
    vec_long& t = ModularRepBuf;
-   vec_long& s = FFTBuf;;
+   vec_long& s = FFTBuf;
    ZZ_p accum;
 
 
@@ -2583,7 +2589,7 @@ void InvTrunc(ZZ_pX& x, const ZZ_pX& a, long m)
       return;
    }
 
-   if (m >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (NTL_OVERFLOW(m, 1, 0))
       Error("overflow in InvTrunc");
 
    if (&x == &a) {
@@ -2812,56 +2818,6 @@ void PowerMod(ZZ_pX& h, const ZZ_pX& g, const ZZ& e, const ZZ_pXModulus& F)
    h = res;
 }
 
-#if 0
-void NewtonInvTrunc(ZZ_pX& x, const ZZ_pX& a, long m)
-{
-   x.SetMaxLength(m);
-
-   long i;
-   long t;
-
-
-   t = NextPowerOfTwo(2*m-1);
-
-   FFTRep R1(INIT_SIZE, t), R2(INIT_SIZE, t);
-   ZZ_pX P1(INIT_SIZE, m);
-
-
-   long log2_newton = NextPowerOfTwo(NTL_ZZ_pX_NEWTON_CROSSOVER)-1;
-   PlainInv(x, a, 1L << log2_newton);
-   long k = 1L << log2_newton;
-   long a_len = min(m, a.rep.length());
-
-   while (k < m) {
-      long l = min(2*k, m);
-
-      t = NextPowerOfTwo(2*k);
-      ToFFTRep(R1, x, t);
-      mul(R1, R1, R1);
-      FromFFTRep(P1, R1, 0, l-1);
-
-      t = NextPowerOfTwo(deg(P1) + min(l, a_len));
-      ToFFTRep(R1, P1, t);
-      ToFFTRep(R2, a, t, 0, min(l, a_len)-1);
-      mul(R1, R1, R2);
-      FromFFTRep(P1, R1, k, l-1);
-      
-      x.rep.SetLength(l);
-      long y_len = P1.rep.length();
-      for (i = k; i < l; i++) {
-         if (i-k >= y_len)
-            clear(x.rep[i]);
-         else
-            negate(x.rep[i], P1.rep[i-k]);
-      }
-      x.normalize();
-
-      k = l;
-   }
-}
-
-
-#else
 
 void NewtonInvTrunc(ZZ_pX& x, const ZZ_pX& a, long m)
 {
@@ -2911,9 +2867,6 @@ void NewtonInvTrunc(ZZ_pX& x, const ZZ_pX& a, long m)
    }
 }
 
-
-
-#endif
 
 
 void FFTDivRem(ZZ_pX& q, ZZ_pX& r, const ZZ_pX& a, const ZZ_pX& b)
@@ -3175,8 +3128,8 @@ void power(ZZ_pX& x, const ZZ_pX& a, long e)
 
 void reverse(ZZ_pX& x, const ZZ_pX& a, long hi)
 {
-   if (hi < -1) Error("reverse: bad args");
-   if (hi >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (hi < 0) { clear(x); return; }
+   if (NTL_OVERFLOW(hi, 1, 0))
       Error("overflow in reverse");
 
    if (&x == &a) {

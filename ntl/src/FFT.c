@@ -144,19 +144,22 @@ void UseFFTPrime(long index)
    // tables are allocated in increments of 100
 
    if (index == 0) { 
-      FFTPrime = (long *) malloc(sizeof(long)*100);
-      RootTable = (long **) malloc(sizeof(long *)*100);
-      RootInvTable = (long **) malloc(sizeof(long *)*100);
-      TwoInvTable = (long **) malloc(sizeof(long *)*100);
-      FFTPrimeInv = (double *) malloc(sizeof(double)*100);
+      FFTPrime = (long *) NTL_MALLOC(100, sizeof(long), 0);
+      RootTable = (long **) NTL_MALLOC(100, sizeof(long *), 0);
+      RootInvTable = (long **) NTL_MALLOC(100, sizeof(long *), 0);
+      TwoInvTable = (long **) NTL_MALLOC(100, sizeof(long *), 0);
+      FFTPrimeInv = (double *) NTL_MALLOC(100, sizeof(double), 0);
    }
    else if ((index % 100) == 0) {
-      FFTPrime = (long *) realloc(FFTPrime, sizeof(long)*(index+100));
-      RootTable = (long **) realloc(RootTable, sizeof(long *)*(index+100));
+      FFTPrime = (long *) NTL_REALLOC(FFTPrime, index+100, sizeof(long), 0);
+      RootTable = (long **) 
+                  NTL_REALLOC(RootTable, index+100, sizeof(long *), 0);
       RootInvTable = (long **) 
-                     realloc(RootInvTable, sizeof(long *)*(index+100));
-      TwoInvTable = (long **) realloc(TwoInvTable, sizeof(long *)*(index+100));
-      FFTPrimeInv = (double *) realloc(FFTPrimeInv, sizeof(double)*(index+100));
+                     NTL_REALLOC(RootInvTable, index+100, sizeof(long *), 0);
+      TwoInvTable = (long **) 
+                    NTL_REALLOC(TwoInvTable, index+100, sizeof(long *), 0);
+      FFTPrimeInv = (double *) 
+                    NTL_REALLOC(FFTPrimeInv, index+100, sizeof(double), 0);
    }
 
    if (!FFTPrime || !RootTable || !RootInvTable || !TwoInvTable ||
@@ -167,11 +170,11 @@ void UseFFTPrime(long index)
 
    long *rt, *rit, *tit;
 
-   if (!(rt = RootTable[index] = (long *)malloc(sizeof(long)*(mr+1))))
+   if (!(rt = RootTable[index] = (long*) NTL_MALLOC(mr+1, sizeof(long), 0)))
       Error("out of space");
-   if (!(rit = RootInvTable[index] = (long *)malloc(sizeof(long)*(mr+1))))
+   if (!(rit = RootInvTable[index] = (long*) NTL_MALLOC(mr+1, sizeof(long), 0)))
       Error("out of space");
-   if (!(tit = TwoInvTable[index] = (long *)malloc(sizeof(long)*(mr+1))))
+   if (!(tit = TwoInvTable[index] = (long*) NTL_MALLOC(mr+1, sizeof(long), 0)))
       Error("out of space");
 
    long j;
@@ -196,10 +199,14 @@ void UseFFTPrime(long index)
 }
    
 
+static
 long RevInc(long a, long k)
 {
    long j, m;
-   j = k; m = 1L << (k-1);
+
+   j = k; 
+   m = 1L << (k-1);
+
    while (j && (m & a)) {
       a ^= m;
       m >>= 1;
@@ -209,8 +216,8 @@ long RevInc(long a, long k)
    return a;
 }
 
+static
 void BitReverseCopy(long *A, const long *a, long k)
-
 {
    static long* mem[NTL_FFTMaxRoot+1];
 
@@ -220,7 +227,7 @@ void BitReverseCopy(long *A, const long *a, long k)
 
    rev = mem[k];
    if (!rev) {
-      rev = mem[k] = NTL_NEW_OP long[n];
+      rev = mem[k] = (long *) NTL_MALLOC(n, sizeof(long), 0);
       if (!rev) Error("out of memory in BitReverseCopy");
       for (i = 0, j = 0; i < n; i++, j = RevInc(j, k))
          rev[i] = j;
@@ -261,7 +268,7 @@ void FFT(long* A, const long* a, long k, long q, const long* root)
    long n = 1L << k;
    long s, m, m2, j;
    long t, u, v, w, z, tt;
-   long *p1, *p2, *ub, *ub1;
+   long *p1, *p, *ub, *ub1;
    double qinv = ((double) 1)/((double) q);
    double wqinv, zqinv;
 
@@ -269,52 +276,50 @@ void FFT(long* A, const long* a, long k, long q, const long* root)
 
    ub = A+n;
 
-   p2 = A;
-   while (p2 < ub) {
-      u = *p2;
-      v = *(p2+1);
-      *p2 = AddMod(u, v, q);
-      *(p2+1) = SubMod(u, v, q);
-      p2 += 2;
+   p = A;
+   while (p < ub) {
+      u = *p;
+      v = *(p+1);
+      *p = AddMod(u, v, q);
+      *(p+1) = SubMod(u, v, q);
+      p += 2;
    }
 
    for (s = 2; s < k; s++) {
       m = 1L << s;
       m2 = m >> 1;
 
-      p2 = A;
-      p1 = p2 + m2;
-      while (p2 < ub) {
-         u = *p2;
-         v = *p1;
-         *p2 = AddMod(u, v, q);
-         *p1 = SubMod(u, v, q);
-         p1 += m;
-         p2 += m;
+      p = A;
+      while (p < ub) {
+         u = *p;
+         v = *(p+m2);
+         *p = AddMod(u, v, q);
+         *(p+m2) = SubMod(u, v, q);
+         p += m;
       }
 
       z = root[s];
       w = z;
       for (j = 1; j < m2; j++) {
          wqinv = ((double) w)*qinv;
-         p2 = A + j;
-         p1 = p2 + m2;
+         p = A + j;
+         p1 = p + m2;
 
          ub1 = ub-m;
 
-         u = *p2;
+         u = *p;
          t = MulMod2(*p1, w, q, wqinv);
 
-         while (p2 < ub1) {
+         while (p < ub1) {
             tt = MulMod2(*(p1+m), w, q, wqinv);
-            *p2 = AddMod(u, t, q);
+            *p = AddMod(u, t, q);
             *p1 = SubMod(u, t, q);
             p1 += m;
-            p2 += m;
-            u = *p2;
+            p += m;
+            u = *p;
             t = tt;
          }
-         *p2 = AddMod(u, t, q);
+         *p = AddMod(u, t, q);
          *p1 = SubMod(u, t, q);
          
          w = MulMod2(z, w, q, wqinv);
@@ -325,23 +330,23 @@ void FFT(long* A, const long* a, long k, long q, const long* root)
    z = root[k];
    zqinv = ((double) z)*qinv;
    w = 1;
-   p2 = A;
+   p = A;
    p1 = A + m2;
    m2--;
-   u = *p2;
+   u = *p;
    t = *p1;
    while (m2) {
       w = MulMod2(w, z, q, zqinv);
       tt = MulMod(*(p1+1), w, q, qinv);
-      *p2 = AddMod(u, t, q);
+      *p = AddMod(u, t, q);
       *p1 = SubMod(u, t, q);
-      p2++;
+      p++;
       p1++;
-      u = *p2;
+      u = *p;
       t = tt;
       m2--;
    }
-   *p2 = AddMod(u, t, q);
+   *p = AddMod(u, t, q);
    *p1 = SubMod(u, t, q);
 }
 
@@ -379,7 +384,7 @@ void FFT(long* A, const long* a, long k, long q, const long* root)
    long n = 1L << k;
    long s, m, m2, j;
    long t, u, v, w, z;
-   long *p1, *p2, *ub;
+   long *p, *ub, *p1, *ub1;
    double qinv = ((double) 1)/((double) q);
    double wqinv, zqinv;
 
@@ -387,45 +392,52 @@ void FFT(long* A, const long* a, long k, long q, const long* root)
 
    ub = A+n;
 
-   p2 = A;
-   while (p2 < ub) {
-      u = *p2;
-      v = *(p2+1);
-      *p2 = AddMod(u, v, q);
-      *(p2+1) = SubMod(u, v, q);
-      p2 += 2;
+   p = A;
+   while (p < ub) {
+      u = *p;
+      v = *(p+1);
+      *p = AddMod(u, v, q);
+      *(p+1) = SubMod(u, v, q);
+      p += 2;
    }
 
    for (s = 2; s < k; s++) {
       m = 1L << s;
       m2 = m >> 1;
 
-      p2 = A;
-      p1 = p2 + m2;
-      while (p2 < ub) {
-         u = *p2;
-         v = *p1;
-         *p2 = AddMod(u, v, q);
-         *p1 = SubMod(u, v, q);
-         p1 += m;
-         p2 += m;
+      p = A;
+      while (p < ub) {
+         u = *p;
+         v = *(p+m2);
+         *p = AddMod(u, v, q);
+         *(p+m2) = SubMod(u, v, q);
+         p += m;
       }
 
       z = root[s];
       w = z;
       for (j = 1; j < m2; j++) {
          wqinv = ((double) w)*qinv;
-         p2 = A + j;
-         p1 = p2 + m2;
-         while (p2 < ub) {
-            u = *p2;
+         p = A + j;
+         p1 = p + m2;
+         ub1 = ub-m;
+
+         while (p < ub1) {
+            u = *p;
             v = *p1;
             t = MulMod2(v, w, q, wqinv);
-            *p2 = AddMod(u, t, q);
+            *p = AddMod(u, t, q);
             *p1 = SubMod(u, t, q);
+            p += m;
             p1 += m;
-            p2 += m;
          }
+
+	 u = *p;
+	 v = *p1;
+	 t = MulMod2(v, w, q, wqinv);
+	 *p = AddMod(u, t, q);
+	 *p1 = SubMod(u, t, q);
+
          w = MulMod2(z, w, q, wqinv);
       }
    }
@@ -434,19 +446,18 @@ void FFT(long* A, const long* a, long k, long q, const long* root)
    z = root[k];
    zqinv = ((double) z)*qinv;
    w = 1;
-   p2 = A;
-   p1 = A + m2;
+   p = A;
    for (j = 0; j < m2; j++) {
-      u = *p2;
-      v = *p1;
+      u = *p;
+      v = *(p+m2);
       t = MulMod(v, w, q, qinv);
-      *p2 = AddMod(u, t, q);
-      *p1 = SubMod(u, t, q);
+      *p = AddMod(u, t, q);
+      *(p+m2) = SubMod(u, t, q);
       w = MulMod2(w, z, q, zqinv);
-      p2++;
-      p1++;
+      p++;
    }
 }
+
 
 #endif
 

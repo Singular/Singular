@@ -348,7 +348,6 @@ inline zz_pE random_zz_pE()
    { zz_pE x; random(x); NTL_OPT_RETURN(zz_pE, x); }
 
 
-// ****** input/output
 inline const zz_pX& rep(const zz_pE& a) { return a._zz_pE__rep; }
 
 

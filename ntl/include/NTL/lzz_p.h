@@ -341,8 +341,6 @@ inline zz_p random_zz_p()
    { zz_p x; random(x); return x; }
 
 
-// ****** input/output
-
 NTL_CLOSE_NNS
 
 #endif

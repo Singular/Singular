@@ -1,4 +1,6 @@
 
+echo
+echo "---------------------------------"
 echo "making CanZassTest"
 make CanZassTest
 echo "running CanZassTest"

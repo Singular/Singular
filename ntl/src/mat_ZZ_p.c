@@ -124,7 +124,7 @@ void mul_aux(vec_ZZ_p& x, const mat_ZZ_p& A, const vec_ZZ_p& b)
   
 void mul(vec_ZZ_p& x, const mat_ZZ_p& A, const vec_ZZ_p& b)  
 {  
-   if (&b == &x || A.position(b) != -1) {
+   if (&b == &x || A.position1(x) != -1) {
       vec_ZZ_p tmp;
       mul_aux(tmp, A, b);
       x = tmp;
@@ -159,7 +159,7 @@ void mul_aux(vec_ZZ_p& x, const vec_ZZ_p& a, const mat_ZZ_p& B)
 
 void mul(vec_ZZ_p& x, const vec_ZZ_p& a, const mat_ZZ_p& B)
 {
-   if (&a == &x || B.position(a) != -1) {
+   if (&a == &x) {
       vec_ZZ_p tmp;
       mul_aux(tmp, a, B);
       x = tmp;

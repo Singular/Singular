@@ -11,6 +11,9 @@ void BlockConstruct(ZZ_p* x, long n)
 {
    if (n <= 0) return; 
 
+   if (!ZZ_pInfo)
+      Error("ZZ_p constructor called while modulus undefined");
+
    long d = ZZ_p::ModulusSize();
 
    long m, j;
@@ -87,6 +90,9 @@ void InnerProduct(ZZ_p& x, const vec_ZZ_p& a, const vec_ZZ_p& b)
 void InnerProduct(ZZ_p& x, const vec_ZZ_p& a, const vec_ZZ_p& b,
                   long offset)
 {
+   if (offset < 0) Error("InnerProduct: negative offset");
+   if (NTL_OVERFLOW(offset, 1, 0)) Error("InnerProduct: offset too big");
+
    long n = min(a.length(), b.length()+offset);
    long i;
    static ZZ accum, t;
@@ -207,7 +213,7 @@ ZZ_p operator*(const vec_ZZ_p& a, const vec_ZZ_p& b)
 void VectorCopy(vec_ZZ_p& x, const vec_ZZ_p& a, long n)
 {
    if (n < 0) Error("VectorCopy: negative length");
-   if (n >= (1L << (NTL_BITS_PER_LONG-4))) Error("overflow in VectorCopy");
+   if (NTL_OVERFLOW(n, 1, 0)) Error("overflow in VectorCopy");
 
    long m = min(n, a.length());
 

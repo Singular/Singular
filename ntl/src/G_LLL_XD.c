@@ -4,6 +4,8 @@
 #include <NTL/vec_xdouble.h>
 #include <NTL/vec_double.h>
 
+#include <stdio.h>
+
 #include <NTL/new.h>
 
 NTL_START_IMPL
@@ -388,23 +390,6 @@ static double LastTime = 0;
 
 
 
-static void G_LLLStatus(long max_k, double t, long m, const mat_ZZ& B)
-{
-   ZZ t1;
-   long i;
-   double prodlen = 0;
-
-   for (i = 1; i <= m; i++) {
-      InnerProduct(t1, B(i), B(i));
-      if (!IsZero(t1))
-         prodlen += log(t1);
-   }
-
-   LastTime = t;
-   
-}
-
-
 static
 long ll_G_LLL_XD(mat_ZZ& B, mat_ZZ* U, xdouble delta, long deep, 
            LLLCheckFct check, xdouble **B1, xdouble **mu, 
@@ -446,14 +431,6 @@ long ll_G_LLL_XD(mat_ZZ& B, mat_ZZ* U, xdouble delta, long deep,
          max_k = k;
       }
 
-      if (verbose) {
-         tt = GetTime();
-
-         if (tt > LastTime + LLLStatusInterval)
-            G_LLLStatus(max_k, tt, m, B);
-      }
-
-
       GivensComputeGS(B1, mu, aux, k, n, cache);
 
       counter = 0;
@@ -466,6 +443,7 @@ long ll_G_LLL_XD(mat_ZZ& B, mat_ZZ* U, xdouble delta, long deep,
 
          counter++;
          if (counter > 10000) {
+            printf( "G_LLL_XD: warning--possible infinite loop\n");
             counter = 0;
          }
 
@@ -588,11 +566,6 @@ long ll_G_LLL_XD(mat_ZZ& B, mat_ZZ* U, xdouble delta, long deep,
          // cout << "+ " << k << "\n";
       }
    }
-
-   if (verbose) {
-      G_LLLStatus(m+1, GetTime(), m, B);
-   }
-
 
    return m;
 }
@@ -804,26 +777,6 @@ void ComputeG_BKZThresh(xdouble *c, long beta)
 }
 
 
-static 
-void G_BKZStatus(double tt, double enum_time, long NumIterations, 
-               long NumTrivial, long NumNonTrivial, long NumNoOps, long m, 
-               const mat_ZZ& B)
-{
-   ZZ t1;
-   long i;
-   double prodlen = 0;
-
-   for (i = 1; i <= m; i++) {
-      InnerProduct(t1, B(i), B(i));
-      if (!IsZero(t1))
-         prodlen += log(t1);
-   }
-
-   LastTime = tt;
-   
-}
-
-
 static
 long G_BKZ_XD(mat_ZZ& BB, mat_ZZ* UU, xdouble delta, 
          long beta, long prune, LLLCheckFct check)
@@ -948,10 +901,10 @@ long G_BKZ_XD(mat_ZZ& BB, mat_ZZ* UU, xdouble delta,
    double tt;
 
    double enum_time = 0;
-   long NumIterations = 0;
-   long NumTrivial = 0;
-   long NumNonTrivial = 0;
-   long NumNoOps = 0;
+   unsigned long NumIterations = 0;
+   unsigned long NumTrivial = 0;
+   unsigned long NumNonTrivial = 0;
+   unsigned long NumNoOps = 0;
 
    long verb = verbose;
 
@@ -990,13 +943,6 @@ long G_BKZ_XD(mat_ZZ& BB, mat_ZZ* UU, xdouble delta,
             clean = 1;
          }
 
-         if (verb) {
-            tt = GetTime();
-            if (tt > LastTime + LLLStatusInterval)
-               G_BKZStatus(tt, enum_time, NumIterations, NumTrivial,
-                         NumNonTrivial, NumNoOps, m, B);
-         }
-
          // ENUM
 
          double tt1;
@@ -1031,20 +977,6 @@ long G_BKZ_XD(mat_ZZ& BB, mat_ZZ* UU, xdouble delta,
          long enum_cnt = 0;
    
          while (t <= kk) {
-            if (verb) {
-               enum_cnt++;
-               if (enum_cnt > 100000) {
-                  enum_cnt = 0;
-                  tt = GetTime();
-                  if (tt > LastTime + LLLStatusInterval) {
-                     enum_time += tt - tt1;
-                     tt1 = tt;
-                     G_BKZStatus(tt, enum_time, NumIterations, NumTrivial,
-                               NumNonTrivial, NumNoOps, m, B);
-                  }
-               }
-            }
-
 
             ctilda[t] = ctilda[t+1] + 
                (yvec[t]+utildavec[t])*(yvec[t]+utildavec[t])*c[t];
@@ -1231,12 +1163,6 @@ long G_BKZ_XD(mat_ZZ& BB, mat_ZZ* UU, xdouble delta,
          }
       }
    }
-
-   if (verb) {
-      G_BKZStatus(GetTime(), enum_time, NumIterations, NumTrivial, NumNonTrivial,
-                NumNoOps, m, B);
-   }
-
 
    // clean up
 

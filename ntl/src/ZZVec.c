@@ -10,17 +10,14 @@ void ZZVec::SetSize(long n, long d)
    if (n < 0 || d <= 0) Error("bad args to ZZVec::SetSize()");
 
    if (v)
-      Error("ZZVec initialized more than once");
+      Error("illegal ZZVec initialization");
 
-   if (d >= (1L << (NTL_BITS_PER_LONG-4))/NTL_ZZ_NBITS - 1)
-      Error("size too big in ZZVec::SetSize");
-
-   if (n >= long((1L << (NTL_BITS_PER_LONG-4))/sizeof(ZZ)))
-      Error("length too big in ZZVec::SetSize");
+   len = n;
+   bsize = d;
 
    if (n == 0) return;
 
-   v = (ZZ*) malloc(n * (sizeof (ZZ)));
+   v = (ZZ*) NTL_MALLOC(n, sizeof(ZZ), 0);
    if (!v) Error("out of memory in ZZVec::SetSize()");
 
    long i = 0;
@@ -33,14 +30,14 @@ void ZZVec::SetSize(long n, long d)
          ZZ_BlockConstructSet(v[i], v[i+j], j);
       i += m;
    }
-
-   len = n;
-   bsize = d;
 }
 
 void ZZVec::kill()
 {
    long n = len;
+
+   len = 0; bsize = 0;
+
    if (n == 0) return;
 
    long i = 0;
@@ -52,8 +49,7 @@ void ZZVec::kill()
    }
 
    free(v);
-
-   v = 0; len = 0; bsize = 0;
+   v = 0; 
 }
 
 

@@ -62,24 +62,20 @@ void ZZ_pInfoT::init()
 
    double fn = double(n);
 
-   // I've re-calculated the error bounds...
-   // Although the bounds in versions < 3.7 were incorrect,
-   // on any currently existing machine, this bug is "benign".
-
-   if (fn*(fn+32) > 0.5*NTL_FDOUBLE_PRECISION)
+   if (8.0*fn*(fn+32) > NTL_FDOUBLE_PRECISION)
       Error("modulus too big");
 
 
-   if (fn*(fn+32) > (0.5*NTL_FDOUBLE_PRECISION)/double(NTL_SP_BOUND))
+   if (8.0*fn*(fn+32) > NTL_FDOUBLE_PRECISION/double(NTL_SP_BOUND))
       QuickCRT = 0;
    else
       QuickCRT = 1;
 
 
-   if (!(x = (double *) malloc(n * (sizeof (double)))))
+   if (!(x = (double *) NTL_MALLOC(n, sizeof(double), 0)))
       Error("out of space");
 
-   if (!(u = (long *) malloc(n * (sizeof (long)))))
+   if (!(u = (long *) NTL_MALLOC(n,  sizeof(long), 0)))
       Error("out of space");
 
    ZZ_p_rem_struct_init(&rem_struct, n, p, FFTPrime);
@@ -158,10 +154,10 @@ void CopyPointer(ZZ_pInfoPtr& dst, ZZ_pInfoPtr src)
    }
 
    if (src) {
-      src->ref_count++;
-
-      if (src->ref_count < 0) 
+      if (src->ref_count == NTL_MAX_LONG)
          Error("internal error: ZZ_pContext ref_count overflow");
+
+      src->ref_count++;
    }
 
    dst = src;

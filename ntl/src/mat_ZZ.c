@@ -108,7 +108,7 @@ void mul_aux(vec_ZZ& x, const mat_ZZ& A, const vec_ZZ& b)
   
 void mul(vec_ZZ& x, const mat_ZZ& A, const vec_ZZ& b)  
 {  
-   if (&b == &x || A.position(b) != -1) {
+   if (&b == &x || A.position1(x) != -1) {
       vec_ZZ tmp;
       mul_aux(tmp, A, b);
       x = tmp;
@@ -143,7 +143,7 @@ void mul_aux(vec_ZZ& x, const vec_ZZ& a, const mat_ZZ& B)
 
 void mul(vec_ZZ& x, const vec_ZZ& a, const mat_ZZ& B)
 {
-   if (&a == &x || B.position(a) != -1) {
+   if (&a == &x) { 
       vec_ZZ tmp;
       mul_aux(tmp, a, B);
       x = tmp;
@@ -865,7 +865,7 @@ void power(mat_ZZ& X, const mat_ZZ& A, const ZZ& e)
 
 /***********************************************************
 
-   routines for solving a linear system vi Hensel lifting
+   routines for solving a linear system via Hensel lifting
 
 ************************************************************/
 

@@ -5,11 +5,11 @@ typedef long * _ntl_verylong;
 #if (defined(NTL_SINGLE_MUL))
 
 #if (defined(NTL_AVOID_FLOAT) || defined(NTL_LONG_LONG))
-#error "at most one of -DNTL_SINGLE_MUL -DNTL_AVOID_FLOAT -DNTL_LONG_LONG allowed"
+#error "at most one of NTL_SINGLE_MUL NTL_AVOID_FLOAT NTL_LONG_LONG allowed"
 #endif
 
 #elif (defined(NTL_AVOID_FLOAT) && defined(NTL_LONG_LONG))
-#error "at most one of -DNTL_SINGLE_MUL -DNTL_AVOID_FLOAT -DNTL_LONG_LONG allowed"
+#error "at most one of NTL_SINGLE_MUL NTL_AVOID_FLOAT NTL_LONG_LONG allowed"
 #endif
 
 #if (defined(NTL_SINGLE_MUL))
@@ -17,6 +17,11 @@ typedef long * _ntl_verylong;
 #if (!NTL_SINGLE_MUL_OK)
 #error "NTL_SINGLE_MUL not supported on this platform"
 #endif
+
+#if (defined(NTL_CLEAN_INT))
+#error "NTL_SINGLE_MUL not allowed with NTL_CLEAN_INT"
+#endif
+
 
 #define NTL_NBITS (26)
 
@@ -411,8 +416,6 @@ extern "C" {
    and exponentiation modulo a positive modulus n, where all operands
    (except for the exponent in exponentiation) and results are in the
    range [0, n-1].   
-
-   ALIAS RESTRICTION:  output parameters should not alias n
 
 ***********************************************************************/
 

@@ -94,7 +94,7 @@ void mul_aux(vec_GF2E& x, const mat_GF2E& A, const vec_GF2E& b)
   
 void mul(vec_GF2E& x, const mat_GF2E& A, const vec_GF2E& b)  
 {  
-   if (&b == &x || A.position(b) != -1) {
+   if (&b == &x || A.position1(x) != -1) {
       vec_GF2E tmp;
       mul_aux(tmp, A, b);
       x = tmp;
@@ -129,7 +129,7 @@ void mul_aux(vec_GF2E& x, const vec_GF2E& a, const mat_GF2E& B)
 
 void mul(vec_GF2E& x, const vec_GF2E& a, const mat_GF2E& B)
 {
-   if (&a == &x || B.position(a) != -1) {
+   if (&a == &x) {
       vec_GF2E tmp;
       mul_aux(tmp, a, B);
       x = tmp;

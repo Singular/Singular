@@ -7,7 +7,6 @@
 NTL_START_IMPL
 
 
-const long MaxAllocBlock = 10000;
 
 
 
@@ -21,43 +20,32 @@ void BlockConstruct(GF2E* x, long n)
 
    long d = GF2E::WordLength();
 
-   long size = d + 2;
-   long AllocAmt = (MaxAllocBlock-1) / size;
-   if (AllocAmt == 0) AllocAmt = 1;
-
+   long m, j;
+ 
    long i = 0;
-   long m;
-   _ntl_ulong *p, *q;
-   long j;
-
+ 
    while (i < n) {
-      m = min((n-i), AllocAmt);
-      p = (_ntl_ulong *) malloc((m*size + 1)*(sizeof (_ntl_ulong)));
-      if (!p) Error("out of memory in BlockConstruct(GF2E*,long)");
-      *p = m;
-      for (j = 0, q = p+3; j < m; j++, i++, q += size) {
-         q[-2] =  (d << 1) | 1;
-         q[-1] = 0;
-         x[i]._GF2E__rep.xrep.rep = q;
-      }
+      m = WV_BlockConstructAlloc(x[i]._GF2E__rep.xrep, d, n-i);
+      for (j = 1; j < m; j++)
+         WV_BlockConstructSet(x[i]._GF2E__rep.xrep, x[i+j]._GF2E__rep.xrep, j);
+      i += m;
    }
 }
+
 
 void BlockDestroy(GF2E* x, long n)
 {
    if (n <= 0) return;
-
+ 
    long i = 0;
-   _ntl_ulong *p;
    long m;
-
+ 
    while (i < n) {
-      p = x[i]._GF2E__rep.xrep.rep-3;
-      m =  *p;
-      free(p);
+      m = WV_BlockDestroy(x[i]._GF2E__rep.xrep);
       i += m;
    }
 }
+
 
 
 NTL_vector_impl_plain(GF2E,vec_GF2E)
@@ -83,6 +71,9 @@ void InnerProduct(GF2E& x, const vec_GF2E& a, const vec_GF2E& b)
 void InnerProduct(GF2E& x, const vec_GF2E& a, const vec_GF2E& b,
                   long offset)
 {
+   if (offset < 0) Error("InnerProduct: negative offset");
+   if (NTL_OVERFLOW(offset, 1, 0)) Error("InnerProduct: offset too big");
+
    long n = min(a.length(), b.length()+offset);
    long i;
    GF2X accum, t;
@@ -182,7 +173,7 @@ GF2E operator*(const vec_GF2E& a, const vec_GF2E& b)
 void VectorCopy(vec_GF2E& x, const vec_GF2E& a, long n)
 {
    if (n < 0) Error("VectorCopy: negative length");
-   if (n >= (1L << (NTL_BITS_PER_LONG-4))) Error("overflow in VectorCopy");
+   if (NTL_OVERFLOW(n, 1, 0)) Error("overflow in VectorCopy");
 
    long m = min(n, a.length());
 

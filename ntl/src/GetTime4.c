@@ -1,5 +1,9 @@
 #include <NTL/config.h>
 
+#if (defined(NTL_CXX_ONLY) && !defined(__cplusplus))
+#error "CXX_ONLY flag set...must use C++ compiler"
+#endif
+
 #include <time.h>
 
 

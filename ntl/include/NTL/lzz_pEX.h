@@ -62,6 +62,8 @@ zz_pEX(zz_pEX& x, INIT_TRANS_TYPE) : rep(x.rep, INIT_TRANS) { }
 };
 
 
+
+
 /**********************************************************
 
                    Some utility routines
@@ -702,7 +704,6 @@ inline zz_pEX& operator/=(zz_pEX& x, const zz_pEXModulus& F)
 NTL_vector_decl(zz_pEX,vec_zz_pEX)
 
 NTL_eq_vector_decl(zz_pEX,vec_zz_pEX)
-
 
 
 

@@ -127,6 +127,8 @@ then reduced modulo p, and leading zeros stripped.
 
 *********************************************************************/
 
+
+
 /**********************************************************
 
                    Some utility routines
@@ -982,6 +984,7 @@ inline zz_pX interpolate(const vec_zz_p& a, const vec_zz_p& b)
 NTL_vector_decl(zz_pX,vec_zz_pX)
 
 NTL_eq_vector_decl(zz_pX,vec_zz_pX)
+
 
 
 /**********************************************************

@@ -100,7 +100,7 @@ void PlainDivRem(GF2X& q, GF2X& r, const GF2X& a, const GF2X& b)
    _ntl_ulong *qtop = &qp[sq-1];
    _ntl_ulong *stab_top;
 
-   while (da >= db) {
+   while (1) {
       if (atop[0] & (1UL << posa)) {
          qtop[0] |= (1UL << posq);
          stab_top = stab_ptr[posa];
@@ -109,6 +109,8 @@ void PlainDivRem(GF2X& q, GF2X& r, const GF2X& a, const GF2X& b)
       }
 
       da--;
+      if (da < db) break;
+
       posa--;
       if (posa < 0) {
          posa = NTL_BITS_PER_LONG-1;
@@ -191,7 +193,7 @@ void PlainRem(GF2X& r, const GF2X& a, const GF2X& b)
    _ntl_ulong *atop = &ap[sa-1];
    _ntl_ulong *stab_top;
 
-   while (da >= db) {
+   while (1) {
       if (atop[0] & (1UL << posa)) {
          stab_top = stab_ptr[posa];
          for (i = stab_cnt[posa]; i <= 0; i++)
@@ -199,6 +201,8 @@ void PlainRem(GF2X& r, const GF2X& a, const GF2X& b)
       }
 
       da--;
+      if (da < db) break;
+
       posa--;
       if (posa < 0) {
          posa = NTL_BITS_PER_LONG-1;
@@ -258,10 +262,10 @@ void NewtonInvTrunc(GF2X& c, const GF2X& a, long e)
    GF2XRegister(g1);
    GF2XRegister(g2);
 
-   g.xrep.SetMaxLength((e+NTL_BITS_PER_LONG-1)/NTL_BITS_PER_LONG + 1);
-   g0.xrep.SetMaxLength((e+NTL_BITS_PER_LONG-1)/NTL_BITS_PER_LONG + 1);
-   g1.xrep.SetMaxLength(((3*e+1)/2+NTL_BITS_PER_LONG-1)/NTL_BITS_PER_LONG + 1);
-   g2.xrep.SetMaxLength((e+NTL_BITS_PER_LONG-1)/NTL_BITS_PER_LONG + 1);
+   g.xrep.SetMaxLength((E[0]+NTL_BITS_PER_LONG-1)/NTL_BITS_PER_LONG + 1);
+   g0.xrep.SetMaxLength((E[0]+NTL_BITS_PER_LONG-1)/NTL_BITS_PER_LONG + 1);
+   g1.xrep.SetMaxLength(((3*E[0]+1)/2+NTL_BITS_PER_LONG-1)/NTL_BITS_PER_LONG+1);
+   g2.xrep.SetMaxLength((E[0]+NTL_BITS_PER_LONG-1)/NTL_BITS_PER_LONG + 1);
 
    g.xrep.SetLength(1);
    g.xrep[0] = invtab[(a.xrep[0] & MASK8) >> 1] & ((1UL<<e)-1UL);
@@ -295,7 +299,7 @@ void InvTrunc(GF2X& c, const GF2X& a, long e)
    if (ConstTerm(a) == 0 || e < 0)
       Error("inv: bad args");
 
-   if (e >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (NTL_OVERFLOW(e, 1, 0))
       Error("overflow in InvTrunc");
 
    if (e == 0) {
@@ -308,7 +312,8 @@ void InvTrunc(GF2X& c, const GF2X& a, long e)
 
 
 
-static long weight1(_ntl_ulong a)
+static 
+long weight1(_ntl_ulong a)
 {
    long res = 0;
    while (a) {
@@ -1284,15 +1289,17 @@ void rem(GF2X& r, const GF2X& a, const GF2XModulus& F)
    
       long i;
    
-      while (da >= n) {
+      while (1) {
          if (atop[0] & (1UL << posa)) {
             stab_top = &F.stab1[posa << 1];
             i = F.stab_cnt[posa];
             atop[i] ^= stab_top[0];
             atop[i+1] ^= stab_top[1];
          }
-   
+
          da--;
+         if (da < n) break;
+
          posa--;
          if (posa < 0) {
             posa = NTL_BITS_PER_LONG-1;
@@ -1328,7 +1335,7 @@ void rem(GF2X& r, const GF2X& a, const GF2XModulus& F)
    
       long i;
    
-      while (da >= n) {
+      while (1) {
          if (atop[0] & (1UL << posa)) {
             stab_top = F.stab_ptr[posa];
             for (i = F.stab_cnt[posa]; i <= 0; i++)
@@ -1336,6 +1343,8 @@ void rem(GF2X& r, const GF2X& a, const GF2XModulus& F)
          }
    
          da--;
+         if (da < n) break;
+
          posa--;
          if (posa < 0) {
             posa = NTL_BITS_PER_LONG-1;
@@ -1412,7 +1421,7 @@ void DivRem(GF2X& q, GF2X& r, const GF2X& a, const GF2XModulus& F)
       _ntl_ulong *qtop = &qp[sq-1];
 
    
-      while (da >= n) {
+      while (1) {
          if (atop[0] & (1UL << posa)) {
             qtop[0] |= (1UL << posq);
             stab_top = &F.stab1[posa << 1];
@@ -1422,6 +1431,8 @@ void DivRem(GF2X& q, GF2X& r, const GF2X& a, const GF2XModulus& F)
          }
    
          da--;
+         if (da < n) break;
+
          posa--;
          if (posa < 0) {
             posa = NTL_BITS_PER_LONG-1;
@@ -1473,7 +1484,7 @@ void DivRem(GF2X& q, GF2X& r, const GF2X& a, const GF2XModulus& F)
 
       _ntl_ulong *qtop = &qp[sq-1];
    
-      while (da >= n) {
+      while (1) {
          if (atop[0] & (1UL << posa)) {
             qtop[0] |= (1UL << posq);
             stab_top = F.stab_ptr[posa];
@@ -1482,6 +1493,8 @@ void DivRem(GF2X& q, GF2X& r, const GF2X& a, const GF2XModulus& F)
          }
    
          da--;
+         if (da < n) break;
+
          posa--;
          if (posa < 0) {
             posa = NTL_BITS_PER_LONG-1;
@@ -1505,6 +1518,7 @@ void DivRem(GF2X& q, GF2X& r, const GF2X& a, const GF2XModulus& F)
       r.normalize();
    }
 }
+
 
 
 void div(GF2X& q, const GF2X& a, const GF2XModulus& F)
@@ -1561,7 +1575,7 @@ void div(GF2X& q, const GF2X& a, const GF2XModulus& F)
 
       _ntl_ulong *qtop = &qp[sq-1];
    
-      while (da >= n) {
+      while (1) {
          if (atop[0] & (1UL << posa)) {
             qtop[0] |= (1UL << posq);
             stab_top = &F.stab1[posa << 1];
@@ -1571,6 +1585,8 @@ void div(GF2X& q, const GF2X& a, const GF2XModulus& F)
          }
    
          da--;
+         if (da < n) break;
+
          posa--;
          if (posa < 0) {
             posa = NTL_BITS_PER_LONG-1;
@@ -1608,7 +1624,7 @@ void div(GF2X& q, const GF2X& a, const GF2XModulus& F)
 
       _ntl_ulong *qtop = &qp[sq-1];
    
-      while (da >= n) {
+      while (1) {
          if (atop[0] & (1UL << posa)) {
             qtop[0] |= (1UL << posq);
             stab_top = F.stab_ptr[posa];
@@ -1617,6 +1633,8 @@ void div(GF2X& q, const GF2X& a, const GF2XModulus& F)
          }
    
          da--;
+         if (da < n) break;
+
          posa--;
          if (posa < 0) {
             posa = NTL_BITS_PER_LONG-1;
@@ -1960,7 +1978,8 @@ void rem(GF2X& r, const GF2X& a, const GF2X& b)
 }
 
 
-inline void swap(_ntl_ulong_ptr& a, _ntl_ulong_ptr& b)  
+static inline 
+void swap(_ntl_ulong_ptr& a, _ntl_ulong_ptr& b)  
 {  _ntl_ulong_ptr t;  t = a; a = b; b = t; }
 
 
@@ -2311,7 +2330,7 @@ void VectorCopy(vec_GF2& x, const GF2X& a, long n)
 {
    if (n < 0) Error("VectorCopy: negative length"); 
 
-   if (n >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (NTL_OVERFLOW(n, 1, 0))
       Error("overflow in VectorCopy");
 
    long wa = a.xrep.length();
@@ -2677,7 +2696,7 @@ void ProjectPowers(GF2X& x, const GF2X& a, long k, const GF2XArgument& H,
 {
    long n = F.n;
 
-   if (deg(a) >= n || k < 0 || k >= (1L << (NTL_BITS_PER_LONG-4))) 
+   if (deg(a) >= n || k < 0 || NTL_OVERFLOW(k, 1, 0)) 
       Error("ProjectPowers: bad args");
 
    long m = H.H.length()-1;
@@ -2857,7 +2876,7 @@ void DoMinPolyMod(GF2X& h, const GF2X& g, const GF2XModulus& F, long m,
 
 void MinPolySeq(GF2X& h, const vec_GF2& a, long m)
 {
-   if (m < 0 || m >= (1L << (NTL_BITS_PER_LONG-4))) Error("MinPoly: bad args");
+   if (m < 0 || NTL_OVERFLOW(m, 1, 0)) Error("MinPoly: bad args");
    if (a.length() < 2*m) Error("MinPoly: sequence too short");
    GF2X x;
    x.xrep = a.rep;

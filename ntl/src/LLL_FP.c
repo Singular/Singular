@@ -3,11 +3,17 @@
 #include <NTL/fileio.h>
 #include <NTL/vec_double.h>
 
+#include <stdio.h>
 
 #include <NTL/new.h>
 
 NTL_START_IMPL
 
+static inline 
+void CheckFinite(double *p)
+{
+   if (!IsFinite(p)) Error("LLL_FP: numbers too big...use LLL_XD");
+}
 
 static double InnerProduct(double *a, double *b, long n)
 {
@@ -118,26 +124,36 @@ static void RowTransformFinish(vec_ZZ& A, double *a, long *in_a)
       }
       else {
          conv(a[i], A(i));
+         CheckFinite(&a[i]);
       }
    }
 }
 
 
 static void RowTransform(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1, 
-                         double mu, double *a, double *b, long *in_a,
+                         double *a, double *b, long *in_a,
                          double& max_a, double max_b, long& in_float)
 // x = x - y*MU
 {
    static ZZ T, MU;
    long k;
+   double mu;
+
+   conv(mu, MU1);
+   CheckFinite(&mu);
 
    long n = A.length();
    long i;
 
    if (in_float) {
-      max_a += fabs(mu)*max_b;
-      if (max_a >= TR_BND) {
+      double mu_abs = fabs(mu);
+      if (mu_abs > 0 && max_b > 0 && (mu_abs >= TR_BND || max_b >= TR_BND)) {
          in_float = 0;
+      }
+      else {
+         max_a += mu_abs*max_b;
+         if (max_a >= TR_BND) 
+            in_float = 0;
       }
    }
 
@@ -396,7 +412,6 @@ void ComputeGS(mat_ZZ& B, double **B1, double **mu, double *b,
 #endif
 
    c[k] = b[k] - s;
-
 }
 
 static double red_fudge = 0;
@@ -503,25 +518,25 @@ static void RR_GS(mat_ZZ& B, double **B1, double **mu,
       ComputeGS(B, rr_B1, rr_mu, rr_b, rr_c, i, bound, 1, rr_buf, bound2);
 
    for (i = rr_st; i <= k; i++)
-      for (j = 1; j <= n; j++) 
+      for (j = 1; j <= n; j++) {
          conv(B1[i][j], rr_B1(i,j));
+         CheckFinite(&B1[i][j]);
+      }
 
    for (i = rr_st; i <= k; i++)
       for (j = 1; j <= i-1; j++) {
          conv(mu[i][j], rr_mu(i,j));
-         if (!IsFinite(&mu[i][j])) 
-            Error("LLL_FP: numbers too big...use LLL_XD");
       }
 
    for (i = rr_st; i <= k; i++) {
       conv(b[i], rr_b(i));
-      if (!IsFinite(&b[i])) Error("LLL_FP: numbers too big...use LLL_XD");
+      CheckFinite(&b[i]);
    }
    
 
    for (i = rr_st; i <= k; i++) {
       conv(c[i], rr_c(i));
-      if (!IsFinite(&c[i])) Error("LLL_FP: numbers too big...use LLL_XD");
+      CheckFinite(&c[i]);
    }
 
    for (i = 1; i <= k-1; i++) {
@@ -681,7 +696,7 @@ long ll_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
 
       if (st[k] < st[k+1]) st[k+1] = st[k];
       ComputeGS(B, B1, mu, b, c, k, bound, st[k], buf);
-      if (!IsFinite(&c[k])) Error("LLL_FP: numbers too big...use LLL_XD");
+      CheckFinite(&c[k]);
       st[k] = k;
 
       if (swap_cnt > 200000) {
@@ -716,6 +731,9 @@ long ll_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
 
             if ((counter >> 7) == 1 || new_sz < sz) {
                sz = new_sz;
+            }
+            else {
+               printf("LLL_FP: warning--infinite loop?\n");
             }
          }
 
@@ -797,7 +815,7 @@ long ll_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
    
                conv(MU, mu1);
 
-               RowTransform(B(k), B(j), MU, mu1, B1[k], B1[j], in_vec,
+               RowTransform(B(k), B(j), MU, B1[k], B1[j], in_vec,
                             max_b[k], max_b[j], in_float);
                if (U) RowTransform((*U)(k), (*U)(j), MU);
             }
@@ -808,11 +826,12 @@ long ll_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
             RowTransformFinish(B(k), B1[k], in_vec);
             max_b[k] = max_abs(B1[k], n);
 
-   
-
             if (!did_rr_gs) {
                b[k] = InnerProduct(B1[k], B1[k], n);
+               CheckFinite(&b[k]);
+
                ComputeGS(B, B1, mu, b, c, k, bound, 1, buf);
+               CheckFinite(&c[k]);
             }
             else {
                RR_GS(B, B1, mu, b, c, buf, prec,
@@ -820,10 +839,6 @@ long ll_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
                rr_st = k+1;
             }
 
-            if (!IsFinite(&b[k]))
-               Error("LLL_FP: numbers too big...use LLL_XD");
-            if (!IsFinite(&c[k]))
-               Error("LLL_FP: numbers too big...use LLL_XD");
             rst = k;
          }
       } while (Fc1 || start_over);
@@ -905,7 +920,6 @@ long ll_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
 
    }
 
-
    delete [] buf;
    delete [] max_b;
 
@@ -966,14 +980,15 @@ long LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
 
 
    for (i = 1; i <=m; i++)
-      for (j = 1; j <= n; j++) 
+      for (j = 1; j <= n; j++) {
          conv(B1[i][j], B(i, j));
+         CheckFinite(&B1[i][j]);
+      }
 
          
    for (i = 1; i <= m; i++) {
       b[i] = InnerProduct(B1[i], B1[i], n);
-      if (!IsFinite(&b[i])) 
-         Error("LLL_FP: numbers too big...use LLL_XD");
+      CheckFinite(&b[i]);
    }
 
    new_m = ll_LLL_FP(B, U, delta, deep, check, B1, mu, b, c, m, 1, quit);
@@ -1121,27 +1136,6 @@ void ComputeBKZThresh(double *c, long beta)
    }
 }
 
-static 
-void BKZStatus(double tt, double enum_time, long NumIterations, 
-               long NumTrivial, long NumNonTrivial, long NumNoOps, long m, 
-               const mat_ZZ& B)
-{
-   ZZ t1;
-   long i;
-   double prodlen = 0;
-
-   for (i = 1; i <= m; i++) {
-      InnerProduct(t1, B(i), B(i));
-      if (!IsZero(t1))
-         prodlen += log(t1);
-   }
-
-   LastTime = tt;
-   
-}
-
-
-
 static
 long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta, 
          long beta, long prune, LLLCheckFct check)
@@ -1252,14 +1246,15 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
 
 
    for (i = 1; i <=m; i++)
-      for (j = 1; j <= n; j++) 
+      for (j = 1; j <= n; j++) {
          conv(B1[i][j], B(i, j));
+         CheckFinite(&B1[i][j]);
+      }
 
          
    for (i = 1; i <= m; i++) {
       b[i] = InnerProduct(B1[i], B1[i], n);
-      if (!IsFinite(&b[i])) 
-         Error("BKZ_FD: numbers too big...use BKZ_XD");
+      CheckFinite(&b[i]);
    }
 
 
@@ -1269,10 +1264,10 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
    double tt;
 
    double enum_time = 0;
-   long NumIterations = 0;
-   long NumTrivial = 0;
-   long NumNonTrivial = 0;
-   long NumNoOps = 0;
+   unsigned long NumIterations = 0;
+   unsigned long NumTrivial = 0;
+   unsigned long NumNonTrivial = 0;
+   unsigned long NumNoOps = 0;
 
    long verb = verbose;
 
@@ -1306,13 +1301,6 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
             jj = 1;
             kk = beta;
             clean = 1;
-         }
-
-         if (verb) {
-            tt = GetTime();
-            if (tt > LastTime + LLLStatusInterval)
-               BKZStatus(tt, enum_time, NumIterations, NumTrivial,
-                         NumNonTrivial, NumNoOps, m, B);
          }
 
    
@@ -1349,19 +1337,6 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
          long enum_cnt = 0;
    
          while (t <= kk) {
-            if (verb) {
-               enum_cnt++;
-               if (enum_cnt > 100000) {
-                  enum_cnt = 0;
-                  tt = GetTime();
-                  if (tt > LastTime + LLLStatusInterval) {
-                     enum_time += tt - tt1;
-                     tt1 = tt;
-                     BKZStatus(tt, enum_time, NumIterations, NumTrivial,
-                               NumNonTrivial, NumNoOps, m, B);
-                  }
-               }
-            }
 
             ctilda[t] = ctilda[t+1] + 
                (yvec[t]+utildavec[t])*(yvec[t]+utildavec[t])*c[t];
@@ -1481,10 +1456,13 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
                   t1 = b[i-1]; b[i-1] = b[i]; b[i] = t1;
                }
       
-               for (i = 1; i <= n; i++)
+               for (i = 1; i <= n; i++) {
                   conv(B1[jj][i], B(jj, i));
+                  CheckFinite(&B1[jj][i]);
+               }
       
                b[jj] = InnerProduct(B1[jj], B1[jj], n);
+               CheckFinite(&b[jj]);
       
                if (b[jj] == 0) Error("BKZ_FP: internal error"); 
       
@@ -1547,11 +1525,6 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
       }
    }
 
-
-   if (verb) {
-      BKZStatus(GetTime(), enum_time, NumIterations, NumTrivial, NumNonTrivial, 
-                NumNoOps, m, B);
-   }
 
    // clean up
 

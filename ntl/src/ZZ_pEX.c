@@ -23,9 +23,8 @@ void ZZ_pEX::normalize()
 
    n = rep.length();
    if (n == 0) return;
-   p = rep.elts() + (n-1);
-   while (n > 0 && IsZero(*p)) {
-      p--; 
+   p = rep.elts() + n;
+   while (n > 0 && IsZero(*--p)) {
       n--;
    }
    rep.SetLength(n);
@@ -100,19 +99,25 @@ void SetCoeff(ZZ_pEX& x, long i, const ZZ_pE& a)
    if (i < 0) 
       Error("SetCoeff: negative index");
 
-   if (i >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (NTL_OVERFLOW(i, 1, 0))
       Error("overflow in SetCoeff");
 
    m = deg(x);
 
    if (i > m) {
-      long pos = x.rep.position(a);
-      x.rep.SetLength(i+1);
+      /* careful: a may alias a coefficient of x */
 
-      if (pos != -1)
-         x.rep[i] = x.rep.RawGet(pos);
-      else
+      long alloc = x.rep.allocated();
+
+      if (alloc > 0 && i >= alloc) {
+         ZZ_pE aa = a;
+         x.rep.SetLength(i+1);
+         x.rep[i] = aa;
+      }
+      else {
+         x.rep.SetLength(i+1);
          x.rep[i] = a;
+      }
 
       for (j = m+1; j < i; j++)
          clear(x.rep[j]);
@@ -130,7 +135,7 @@ void SetCoeff(ZZ_pEX& x, long i, const ZZ_p& aa)
    if (i < 0)
       Error("SetCoeff: negative index");
 
-   if (i >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (NTL_OVERFLOW(i, 1, 0))
       Error("overflow in SetCoeff");
 
    NTL_ZZ_pRegister(a);  // watch out for aliases!
@@ -167,7 +172,7 @@ void SetCoeff(ZZ_pEX& x, long i)
    if (i < 0) 
       Error("coefficient index out of range");
 
-   if (i >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (NTL_OVERFLOW(i, 1, 0))
       Error("overflow in SetCoeff");
 
    m = deg(x);
@@ -565,7 +570,7 @@ void mul(ZZ_pEX& c, const ZZ_pEX& a, const ZZ_pEX& b)
    long n = ZZ_pE::degree();
    long n2 = 2*n-1;
 
-   if (da+db+1 >= (1L << (NTL_BITS_PER_LONG-4))/n2)
+   if (NTL_OVERFLOW(da+db+1, n2, 0))
       Error("overflow in ZZ_pEX mul");
 
    long i, j;
@@ -701,7 +706,7 @@ void sqr(ZZ_pEX& c, const ZZ_pEX& a)
    long n = ZZ_pE::degree();
    long n2 = 2*n-1;
 
-   if (2*da+1 >= (1L << (NTL_BITS_PER_LONG-4))/n2)
+   if (NTL_OVERFLOW(2*da+1, n2, 0))
       Error("overflow in ZZ_pEX sqr");
 
    long i, j;
@@ -1288,6 +1293,11 @@ void PlainRem(ZZ_pEX& r, const ZZ_pEX& a, const ZZ_pEX& b)
 
 void RightShift(ZZ_pEX& x, const ZZ_pEX& a, long n)
 {
+   if (IsZero(a)) {
+      clear(x);
+      return;
+   }
+
    if (n < 0) {
       if (n < -NTL_MAX_LONG) Error("overflow in RightShift");
       LeftShift(x, a, -n);
@@ -1316,19 +1326,21 @@ void RightShift(ZZ_pEX& x, const ZZ_pEX& a, long n)
 
 void LeftShift(ZZ_pEX& x, const ZZ_pEX& a, long n)
 {
-   if (n < 0) {
-      if (n < -NTL_MAX_LONG) Error("overflow in LeftShift");
-      RightShift(x, a, -n);
-      return;
-   }
-
-   if (n >= (1L << (NTL_BITS_PER_LONG-4)))
-      Error("overflow in LeftShift");
-
    if (IsZero(a)) {
       clear(x);
       return;
    }
+
+   if (n < 0) {
+      if (n < -NTL_MAX_LONG) 
+         clear(x);
+      else
+         RightShift(x, a, -n);
+      return;
+   }
+
+   if (NTL_OVERFLOW(n, 1, 0))
+      Error("overflow in LeftShift");
 
    long m = a.rep.length();
 
@@ -1368,10 +1380,10 @@ void NewtonInv(ZZ_pEX& c, const ZZ_pEX& a, long e)
    ZZ_pEX g, g0, g1, g2;
 
 
-   g.rep.SetMaxLength(e);
-   g0.rep.SetMaxLength(e);
-   g1.rep.SetMaxLength((3*e+1)/2);
-   g2.rep.SetMaxLength(e);
+   g.rep.SetMaxLength(E[0]);
+   g0.rep.SetMaxLength(E[0]);
+   g1.rep.SetMaxLength((3*E[0]+1)/2);
+   g2.rep.SetMaxLength(E[0]);
 
    conv(g, x);
 
@@ -1407,7 +1419,7 @@ void InvTrunc(ZZ_pEX& c, const ZZ_pEX& a, long e)
       return;
    }
 
-   if (e >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (NTL_OVERFLOW(e, 1, 0))
       Error("overflow in InvTrunc");
 
    NewtonInv(c, a, e);
@@ -1426,7 +1438,7 @@ void build(ZZ_pEXModulus& F, const ZZ_pEX& f)
 
    if (n <= 0) Error("build(ZZ_pEXModulus,ZZ_pEX): deg(f) <= 0");
 
-   if (n >= (1L << (NTL_BITS_PER_LONG-4))/ZZ_pE::degree())
+   if (NTL_OVERFLOW(n, ZZ_pE::degree(), 0))
       Error("build(ZZ_pEXModulus,ZZ_pEX): overflow");
    
 
@@ -2344,7 +2356,7 @@ static
 void ProjectPowers(vec_ZZ_pE& x, const ZZ_pEX& a, long k, 
                    const ZZ_pEXArgument& H, const ZZ_pEXModulus& F)
 {
-   if (k < 0 || k >= (1L << (NTL_BITS_PER_LONG-4)) || deg(a) >= F.n) 
+   if (k < 0 || NTL_OVERFLOW(k, 1, 0) || deg(a) >= F.n) 
       Error("ProjectPowers: bad args");
 
    long m = H.H.length()-1;
@@ -2474,7 +2486,7 @@ void BerlekampMassey(ZZ_pEX& h, const vec_ZZ_pE& a, long m)
 
 void MinPolySeq(ZZ_pEX& h, const vec_ZZ_pE& a, long m)
 {
-   if (m < 0 || m >= (1L << (NTL_BITS_PER_LONG-4))) Error("MinPoly: bad args");
+   if (m < 0 || NTL_OVERFLOW(m, 1, 0)) Error("MinPoly: bad args");
    if (a.length() < 2*m) Error("MinPoly: sequence too short");
 
    BerlekampMassey(h, a, m);
@@ -2847,8 +2859,8 @@ void PowerXMod(ZZ_pEX& hh, const ZZ& e, const ZZ_pEXModulus& F)
 
 void reverse(ZZ_pEX& x, const ZZ_pEX& a, long hi)
 {
-   if (hi < -1) Error("reverse: bad args");
-   if (hi >= (1L << (NTL_BITS_PER_LONG-4))) 
+   if (hi < 0) { clear(x); return; }
+   if (NTL_OVERFLOW(hi, 1, 0))
       Error("overflow in reverse");
 
    if (&x == &a) {
@@ -3225,7 +3237,7 @@ void ProjectPowersTower(vec_ZZ_p& x, const vec_ZZ_pE& a, long k,
 {
    long n = F.n;
 
-   if (a.length() > n || k < 0 || k >= (1L << (NTL_BITS_PER_LONG-4))) 
+   if (a.length() > n || k < 0 || NTL_OVERFLOW(k, 1, 0)) 
       Error("ProjectPowers: bad args");
 
    long m = H.H.length()-1;

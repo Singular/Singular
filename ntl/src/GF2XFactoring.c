@@ -338,8 +338,6 @@ void EDF(vec_GF2X& factors, const GF2X& ff, long d, long verbose)
    }
 
    
-   double t;
-
    factors.SetLength(0);
 
    RecEDF(factors, f, d);
@@ -457,7 +455,7 @@ void BuildIrred(GF2X& f, long n)
    if (n <= 0)
       Error("BuildIrred: n must be positive");
 
-   if (n >= (1L << (NTL_BITS_PER_LONG-4))) Error("overflow in BuildIrred");
+   if (NTL_OVERFLOW(n, 1, 0)) Error("overflow in BuildIrred");
 
    if (n == 1) {
       SetX(f);
@@ -496,7 +494,7 @@ void BuildRandomIrred(GF2X& f, const GF2X& g)
 
 
 
-short GF2X_irred_tab[][3] = 
+static int GF2X_irred_tab[][3] = 
 
 {{0,0,0}, {0,0,0},
 {1,0,0}, {1,0,0}, {1,0,0}, {2,0,0}, {1,0,0}, {1,0,0}, 
@@ -884,7 +882,7 @@ void BuildSparseIrred(GF2X& f, long n)
 {
    if (n <= 0) Error("SparseIrred: n <= 0");
 
-   if (n >= (1L << (NTL_BITS_PER_LONG-4))) 
+   if (NTL_OVERFLOW(n, 1, 0)) 
       Error("overflow in BuildSparseIrred");
 
    if (n == 1) {

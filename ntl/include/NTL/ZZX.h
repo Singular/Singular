@@ -75,23 +75,6 @@ ZZX(ZZX& x, INIT_TRANS_TYPE) : rep(x.rep, INIT_TRANS) { }
 
 
 
-/********************************************************************
-
-                           input and output
-
-I/O format:
-
-   [a_0 a_1 ... a_n],
-
-represents the polynomial a_0 + a_1*X + ... + a_n*X^n.
-
-On output, all coefficients will be integers between 0 and p-1,
-amd a_n not zero (the zero polynomial is [ ]).
-Leading zeroes are stripped.
-
-*********************************************************************/
-
-
 /**********************************************************
 
                    Some utility routines

@@ -12,7 +12,7 @@ long GF2X::HexOutput = 0;
 void GF2X::SetMaxLength(long n)
 {
    if (n < 0) Error("GF2X::SetMaxLength: negative length");
-   if (n >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (NTL_OVERFLOW(n, 1, 0))
       Error("GF2X::SetMaxLength: excessive length");
    long w = (n + NTL_BITS_PER_LONG - 1)/NTL_BITS_PER_LONG;
    xrep.SetMaxLength(w);
@@ -38,9 +38,8 @@ void GF2X::normalize()
 
    n = xrep.length();
    if (n == 0) return;
-   p = xrep.elts() + (n-1);
-   while (n > 0 && (*p) == 0) {
-      p--;
+   p = xrep.elts() + n;
+   while (n > 0 && (*--p) == 0) {
       n--;
    }
    xrep.QuickSetLength(n);
@@ -218,41 +217,11 @@ long operator==(const GF2X& a, GF2 b)
       return IsZero(a);
 }
 
-
-static
-long FromHex(long c)
-{
-   if (c >= '0' && c <= '9')
-      return c - '0';
-
-   if (c >= 'A' && c <= 'F')
-      return 10 + c - 'A';
-
-   if (c >= 'a' && c <= 'f')
-      return 10 + c - 'a';
-
-   Error("FromHex: bad arg");
-   return 0;
-}
-
-static
-char ToHex(long val)
-{
-   if (val >= 0 && val <= 9)
-      return char('0' + val);
-
-   if (val >= 10 && val <= 15)
-      return char('a' + val - 10);
-
-   Error("ToHex: bad arg");
-   return 0;
-}
-
 void random(GF2X& x, long n)
 {
    if (n < 0) Error("GF2X random: negative length");
 
-   if (n >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (NTL_OVERFLOW(n, 1, 0))
       Error("GF2X random: excessive length");
 
    long wl = (n+NTL_BITS_PER_LONG-1)/NTL_BITS_PER_LONG;
@@ -341,7 +310,7 @@ void add(GF2X& x, const GF2X& a, const GF2X& b)
 // inlining mul1 seems to help with g++; morever,
 // the IBM xlC compiler inlines it anyway.
 
-inline
+static inline
 void mul1(_ntl_ulong *c, _ntl_ulong a, _ntl_ulong b)
 {
    _ntl_ulong hi, lo;
@@ -373,7 +342,7 @@ void mul1(_ntl_ulong *c, _ntl_ulong a, _ntl_ulong b)
    c[1] = hi;
 }
 
-inline
+static inline
 void mul_half(_ntl_ulong *c, _ntl_ulong a, _ntl_ulong b)
 {
    _ntl_ulong hi, lo;
@@ -624,7 +593,8 @@ void mul8(_ntl_ulong *c, const _ntl_ulong *a, const _ntl_ulong *b)
 }
 
 static
-void KarMul(_ntl_ulong *c, const _ntl_ulong *a, const _ntl_ulong *b, long len, _ntl_ulong *stk)
+void KarMul(_ntl_ulong *c, const _ntl_ulong *a, const _ntl_ulong *b, 
+            long len, _ntl_ulong *stk)
 {
    if (len <= 8) {
       switch (len) {
@@ -1271,7 +1241,8 @@ static _ntl_ulong sqrtab[256] = {
 
 
 
-inline void sqr1(_ntl_ulong *c, _ntl_ulong a)
+static inline 
+void sqr1(_ntl_ulong *c, _ntl_ulong a)
 {
    _ntl_ulong hi, lo;
 
@@ -1308,18 +1279,25 @@ void sqr(GF2X& c, const GF2X& a)
 
 void LeftShift(GF2X& c, const GF2X& a, long n)
 {
+   if (IsZero(a)) {
+      clear(c);
+      return;
+   }
+
    if (n == 1) {
       MulByX(c, a);
       return;
    }
 
    if (n < 0) {
-      if (n < -NTL_MAX_LONG) Error("overflow in LeftShift");
-      RightShift(c, a, -n);
+      if (n < -NTL_MAX_LONG) 
+         clear(c);
+      else
+         RightShift(c, a, -n);
       return;
    }
 
-   if (n >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (NTL_OVERFLOW(n, 1, 0))
       Error("overflow in LeftShift");
 
    if (n == 0) {
@@ -1328,10 +1306,6 @@ void LeftShift(GF2X& c, const GF2X& a, long n)
    }
 
    long sa = a.xrep.length();
-   if (sa <= 0) {
-      clear(c);
-      return;
-   }
 
    long wn = n/NTL_BITS_PER_LONG;
    long bn = n - wn*NTL_BITS_PER_LONG;
@@ -1374,7 +1348,7 @@ void ShiftAdd(GF2X& c, const GF2X& a, long n)
       return;
    }
 
-   if (n >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (NTL_OVERFLOW(n, 1, 0))
       Error("overflow in ShiftAdd");
 
    long sa = a.xrep.length();
@@ -1420,6 +1394,11 @@ void ShiftAdd(GF2X& c, const GF2X& a, long n)
 
 void RightShift(GF2X& c, const GF2X& a, long n)
 {
+   if (IsZero(a)) {
+      clear(c);
+      return;
+   }
+
    if (n < 0) {
       if (n < -NTL_MAX_LONG) Error("overflow in RightShift");
       LeftShift(c, a, -n);
@@ -1491,7 +1470,8 @@ static _ntl_ulong revtab[256] = {
 15UL, 143UL, 79UL, 207UL, 47UL, 175UL, 111UL, 239UL, 31UL, 159UL, 
 95UL, 223UL, 63UL, 191UL, 127UL, 255UL  }; 
 
-inline _ntl_ulong rev1(_ntl_ulong a)
+static inline 
+_ntl_ulong rev1(_ntl_ulong a)
 {
    return NTL_BB_REV_CODE;
 }
@@ -1503,9 +1483,9 @@ void CopyReverse(GF2X& c, const GF2X& a, long hi)
 // input may alias output
 
 {
-   if (hi < -1) Error("reverse: bad args");
+   if (hi < 0) { clear(c); return; }
 
-   if (hi >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (NTL_OVERFLOW(hi, 1, 0))
       Error("overflow in CopyReverse");
 
    long n = hi+1;
@@ -1598,7 +1578,7 @@ void GF2XFromBytes(GF2X& x, const unsigned char *p, long n)
       unsigned long t = 0;
       for (j = 0; j < BytesPerLong; j++) {
          t >>= 8;
-         t += (((unsigned long)(*p)) & 255) << ((BytesPerLong-1)*8);
+         t += (((unsigned long)(*p)) & 255UL) << ((BytesPerLong-1)*8);
          p++;
       }
       xp[i] = t;
@@ -1607,7 +1587,7 @@ void GF2XFromBytes(GF2X& x, const unsigned char *p, long n)
    unsigned long t = 0;
    for (j = 0; j < r; j++) {
       t >>= 8;
-      t += (((unsigned long)(*p)) & 255) << ((BytesPerLong-1)*8);
+      t += (((unsigned long)(*p)) & 255UL) << ((BytesPerLong-1)*8);
       p++;
    }
 
@@ -1642,7 +1622,7 @@ void BytesFromGF2X(unsigned char *p, const GF2X& a, long n)
    for (i = 0; i < min_words-1; i++) {
       unsigned long t = ap[i];
       for (j = 0; j < BytesPerLong; j++) {
-         *p = t & 255;
+         *p = t & 255UL;
          t >>= 8;
          p++;
       }
@@ -1651,7 +1631,7 @@ void BytesFromGF2X(unsigned char *p, const GF2X& a, long n)
    if (min_words > 0) {
       unsigned long t = ap[min_words-1];
       for (j = 0; j < r; j++) {
-         *p = t & 255;
+         *p = t & 255UL;
          t >>= 8;
          p++;
       }

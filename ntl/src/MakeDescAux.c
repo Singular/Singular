@@ -1,37 +1,23 @@
 
-long f1(void)
-{
-   return -1;
-}
+#include <stdlib.h>
 
-long f2(long bpl)
-{
-   return (((long)1) << (bpl-1)) - 1;
-}
+int val_int(int x) { return x; }
+unsigned int val_uint(unsigned int x) { return x; }
+ 
+long val_long(long x) { return x; }
+unsigned long val_ulong(unsigned long x) { return x; }
+ 
+size_t val_size_t(size_t x) { return x; }
 
-double f3(void)
-{
-   return 1.75;
-}
+double val_double(double x) { return x; }
+ 
+void touch_int(int* x) {}
+void touch_uint(unsigned int* x) {}
+ 
+void touch_long(long* x) {}
+void touch_ulong(unsigned long* x) {}
 
-void f4(double *p)
-{ }
-
-void f5(int *p)
-{ }
-
-long f6(void)
-{
-   return 1;
-}
-
-long f7(void)
-{
-   return -2L;
-}
-
-long f8(void)
-{
-   return 0;
-}
+void touch_size_t(size_t* x) {}
+ 
+void touch_double(double* x) {}
 

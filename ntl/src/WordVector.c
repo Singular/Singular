@@ -3,6 +3,8 @@
 
 #include <NTL/new.h>
 
+#include <stdio.h>
+
 NTL_START_IMPL
 
 
@@ -15,7 +17,7 @@ void WordVector::DoSetLength(long n)
       Error("negative length in vector::SetLength");  
    }  
 
-   if (n >= (1L << (NTL_BITS_PER_LONG-4))/NTL_BITS_PER_LONG) 
+   if (NTL_OVERFLOW(n, NTL_BITS_PER_LONG, 0)) 
       Error("length too big in vector::SetLength");
       
    if (n == 0) {  
@@ -26,10 +28,12 @@ void WordVector::DoSetLength(long n)
    if (!rep) {  
       m = ((n+NTL_WordVectorMinAlloc-1)/NTL_WordVectorMinAlloc) * NTL_WordVectorMinAlloc; 
 
-      if (m >= (1L << (NTL_BITS_PER_LONG-4))/NTL_BITS_PER_LONG) 
+      if (NTL_OVERFLOW(m, NTL_BITS_PER_LONG, 0))
          Error("length too big in vector::SetLength");
 
-      _ntl_ulong *p = (_ntl_ulong *) malloc(sizeof(_ntl_ulong)*(m+2)); 
+      _ntl_ulong *p = (_ntl_ulong *) 
+                      NTL_MALLOC(m, sizeof(_ntl_ulong), 2*sizeof(_ntl_ulong));
+
       if (!p) {  
 	 Error("out of memory in SetLength()");  
       }  
@@ -42,7 +46,6 @@ void WordVector::DoSetLength(long n)
    }  
 
    long max_length = (rep[-2] >> 1);
-
 
    if (n <= max_length) {  
       rep[-1] = n;  
@@ -58,10 +61,11 @@ void WordVector::DoSetLength(long n)
    m = ((m+NTL_WordVectorMinAlloc-1)/NTL_WordVectorMinAlloc)*NTL_WordVectorMinAlloc; 
    _ntl_ulong *p = rep - 2;
 
-   if (m >= (1L << (NTL_BITS_PER_LONG-4))/NTL_BITS_PER_LONG) 
+   if (NTL_OVERFLOW(m, NTL_BITS_PER_LONG, 0))
       Error("length too big in vector::SetLength");
 
-   p = (_ntl_ulong *) realloc(p, sizeof(_ntl_ulong)*(m+2)); 
+   p = (_ntl_ulong *) 
+       NTL_REALLOC(p, m, sizeof(_ntl_ulong), 2*sizeof(_ntl_ulong)); 
    if (!p) {  
       Error("out of memory in SetLength()");  
    }  
@@ -120,7 +124,11 @@ void WordVector::kill()
   
 void WordVector::RangeError(long i) const  
 {  
-   Error("index out of range in vector: ");  
+   printf( "index out of range in vector: %d", i);  
+   if (!rep)  
+      printf( "(0)\n");  
+   else  
+      printf( "(%d)\n" ,rep[-1] );  
    abort();  
 }  
 
@@ -249,5 +257,82 @@ void ShiftAdd(_ntl_ulong *cp, const _ntl_ulong* ap, long sa, long n)
       cp[wn] ^= ap[0] << bn;
    }
 }
+
+long WV_BlockConstructAlloc(WordVector& x, long d, long n)
+{
+   long nwords, nbytes, AllocAmt, m, j; 
+   _ntl_ulong *p, *q;
+
+
+   /* check n value */
+
+   if (n <= 0)
+      Error("block construct: n must be positive");
+
+   /* check d value */
+
+   if (d <= 0) 
+      Error("block construct: d must be positive");
+
+   if (NTL_OVERFLOW(d, NTL_BITS_PER_LONG, 0) || 
+       NTL_OVERFLOW(d, sizeof(_ntl_ulong), 2*sizeof(_ntl_ulong)))
+      Error("block construct: d too large");
+
+   nwords = d + 2;
+   nbytes = nwords*sizeof(_ntl_ulong);
+   
+   AllocAmt = (NTL_MAX_ALLOC_BLOCK - sizeof(_ntl_ulong)) / nbytes;
+   if (AllocAmt == 0) AllocAmt = 1;
+
+   if (AllocAmt < n)
+      m = AllocAmt;
+   else
+      m = n;
+
+   p = (_ntl_ulong *) NTL_MALLOC(m, nbytes, sizeof(_ntl_ulong));
+   if (!p) Error("out of memory in block construct");
+
+   *p = m;
+
+   q = p+3;
+   x.rep = q;
+   
+   for (j = 0; j < m; j++) {
+      q[-2] = (d << 1) | 1;
+      q[-1] = 0;
+      q += nwords;
+   }
+
+   return m;
+}
+
+void WV_BlockConstructSet(WordVector& x, WordVector& y, long i)
+{
+   long d, size;
+ 
+   d = x.rep[-2] >> 1;
+   size = d + 2;
+ 
+   y.rep = x.rep + i*size;
+}
+
+long WV_BlockDestroy(WordVector& x)
+{
+   long m;
+   _ntl_ulong *p;
+ 
+   p = x.rep - 3;
+   m = (long) *p;
+   free(p);
+   return m;
+}
+
+long WV_storage(long d)
+{
+   return (d + 2)*sizeof(_ntl_ulong) + sizeof(WordVector);
+}
+
+
+
 
 NTL_END_IMPL

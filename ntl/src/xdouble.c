@@ -15,7 +15,7 @@ void xdouble::SetOutputPrecision(long p)
 {
    if (p < 1) p = 1;
 
-   if (p >= (1L << (NTL_BITS_PER_LONG-4))) 
+   if (NTL_OVERFLOW(p, 1, 0)) 
       Error("xdouble: output precision too big");
 
    oprec = p;
@@ -34,10 +34,10 @@ void xdouble::normalize()
       while (x < -NTL_XD_HBOUND) { x *= NTL_XD_BOUND_INV; e++; }
    }
 
-   if (e >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (e >= NTL_OVFBND)
       Error("xdouble: overflow");
 
-   if (e <= -(1L << (NTL_BITS_PER_LONG-4)))
+   if (e <= -NTL_OVFBND)
       Error("xdouble: underflow");
 }
    
@@ -390,14 +390,13 @@ void power2(xdouble& z, long e)
       q--;
    }
 
-   if (q >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (q >= NTL_OVFBND)
       Error("xdouble: overflow");
 
-   if (q <= -(1L << (NTL_BITS_PER_LONG-4)))
+   if (q <= -NTL_OVFBND)
       Error("xdouble: underflow");
 
-   int rr = r;
-   double x = ldexp(1.0, rr);
+   double x = _ntl_ldexp(1.0, r);
 
    z.x = x;
    z.e = q;
@@ -529,10 +528,10 @@ xdouble xexp(double x)
    double y = x/LogBound;
    double iy = floor(y+0.5);
 
-   if (iy >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (iy >= NTL_OVFBND)
       Error("xdouble: overflow");
 
-   if (iy <= -(1L << (NTL_BITS_PER_LONG-4)))
+   if (iy <= -NTL_OVFBND)
       Error("xdouble: underflow");
 
 
@@ -560,7 +559,7 @@ long ComputeMax10Power()
    ComputeLn2(ln2);
    ComputeLn10(ln10);
 
-   long k = to_long( to_RR(1L << (NTL_BITS_PER_LONG-5)) * ln2 / ln10 );
+   long k = to_long( to_RR(NTL_OVFBND/2) * ln2 / ln10 );
 
    RR::SetPrecision(old_p);
    return k;
@@ -613,11 +612,10 @@ xdouble PowerOf10(const ZZ& e)
 }
 
 
-
-
 xdouble to_xdouble(const char *s)
 {
    long c;
+   long cval;
    long sign;
    ZZ a, b;
    long i=0;
@@ -625,7 +623,7 @@ xdouble to_xdouble(const char *s)
    if (!s) Error("bad xdouble input");
 
    c = s[i];
-   while (c == ' ' || c == '\n' || c == '\t') {
+   while (IsWhiteSpace(c)) {
       i++;
       c = s[i];
    }
@@ -645,14 +643,17 @@ xdouble to_xdouble(const char *s)
    a = 0;
    b = 1;
 
-   if (c >= '0' && c <= '9') {
+   cval = CharToIntVal(c);
+
+   if (cval >= 0 && cval <= 9) {
       got1 = 1;
 
-      while (c >= '0' && c <= '9') {
+      while (cval >= 0 && cval <= 9) {
          mul(a, a, 10);
-         add(a, a, c-'0');
+         add(a, a, cval);
          i++;
          c = s[i];
+         cval = CharToIntVal(c);
       }
    }
 
@@ -661,16 +662,18 @@ xdouble to_xdouble(const char *s)
 
       i++;
       c = s[i];
+      cval = CharToIntVal(c);
 
-      if (c >= '0' && c <= '9') {
+      if (cval >= 0 && cval <= 9) {
          got2 = 1;
    
-         while (c >= '0' && c <= '9') {
+         while (cval >= 0 && cval <= 9) {
             mul(a, a, 10);
-            add(a, a, c-'0');
+            add(a, a, cval);
             mul(b, b, 10);
             i++;
             c = s[i];
+            cval = CharToIntVal(c);
          }
       }
    }
@@ -701,14 +704,17 @@ xdouble to_xdouble(const char *s)
       else
          e_sign = 1;
 
-      if (c < '0' || c > '9') Error("bad xdouble input");
+      cval = CharToIntVal(c);
+
+      if (cval < 0 || cval > 9) Error("bad xdouble input");
 
       e = 0;
-      while (c >= '0' && c <= '9') {
+      while (cval >= 0 && cval <= 9) {
          mul(e, e, 10);
-         add(e, e, c-'0');
+         add(e, e, cval);
          i++;
          c = s[i];
+         cval = CharToIntVal(c);
       }
    }
 

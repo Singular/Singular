@@ -44,8 +44,6 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-
-
 #include <NTL/quad_float.h>
 #include <NTL/RR.h>
 
@@ -103,9 +101,9 @@ void normalize(quad_float& z, const double& xhi, const double& xlo)
 START_FIX
    DOUBLE u, v;
 
-   u = xhi + xlo;
-   v = xhi - u;
-   v = v + xlo;
+   u = xhi + xlo; 
+   v = xhi - u;    
+   v = v + xlo;    
 
    z.hi = u;
    z.lo = v;
@@ -155,7 +153,8 @@ START_FIX
    else
       t = xhi;
 
-   long llo = long(n - (unsigned long)(t));
+   // we use the "to_long" function here to be as portable as possible.
+   long llo = to_long(n - (unsigned long)(t));
    xlo = double(llo);
 
    // renormalize...just to be safe
@@ -175,7 +174,7 @@ void quad_float::SetOutputPrecision(long p)
 {
    if (p < 1) p = 1;
 
-   if (p >= (1L << (NTL_BITS_PER_LONG-4))) 
+   if (NTL_OVERFLOW(p, 1, 0)) 
       Error("quad_float: output precision too big");
 
    oprec = p;
@@ -573,7 +572,7 @@ void power(quad_float& z, const quad_float& a, long e)
    unsigned long k;
 
    if (e < 0)
-      k = -e;
+      k = -((unsigned long) e);
    else
       k = e;
 
@@ -598,36 +597,30 @@ void power(quad_float& z, const quad_float& a, long e)
 
 void power2(quad_float& z, long e)
 {
-   int ee;
-
-   ee = e;
-   if (ee != e) Error("overflow in power2");
-
-   z.hi = ldexp(1.0, ee);
+   z.hi = _ntl_ldexp(1.0, e);
    z.lo = 0;
 }
 
 
 long to_long(const quad_float& x)
 {
-   DOUBLE fhi, flo;
-   long lhi, llo;
+   double fhi, flo;
 
    fhi = floor(x.hi);
 
-   if (fhi > 0)
-      lhi = -long(-fhi);
-   else
-      lhi = long(fhi);
-
-   if (fhi == x.hi) {
+   if (fhi == x.hi) 
       flo = floor(x.lo);
-      llo = long(flo);
-   }
    else
-      llo = 0;
+      flo = 0;
 
-   return lhi + llo;
+   // the following code helps to prevent unnecessary integer overflow,
+   // and guarantees that to_long(to_quad_float(a)) == a, for all long a,
+   // provided long's are not too wide.
+
+   if (fhi > 0)
+      return long(flo) - long(-fhi);
+   else
+      return long(fhi) + long(flo);
 }
 
 
@@ -638,7 +631,7 @@ long to_long(const quad_float& x)
 
 void conv(quad_float& z, const ZZ& a)
 {
-   DOUBLE xhi, xlo;
+   double xhi, xlo;
 
    conv(xhi, a);
 
@@ -657,6 +650,7 @@ void conv(quad_float& z, const ZZ& a)
 
    normalize(z, xhi, xlo);
 
+   // The following is just paranoia.
    if (fabs(z.hi) < NTL_FDOUBLE_PRECISION && z.lo != 0)
       Error("internal error: ZZ to quad_float conversion");
 } 
@@ -665,7 +659,7 @@ void conv(ZZ& z, const quad_float& x)
 { 
    static ZZ t1, t2, t3;
 
-   DOUBLE fhi, flo;
+   double fhi, flo;
 
    fhi = floor(x.hi);
 
@@ -680,8 +674,6 @@ void conv(ZZ& z, const quad_float& x)
    else
       conv(z, fhi);
 }
-
-
 
 void random(quad_float& x)
 {
@@ -735,20 +727,15 @@ END_FIX
 
 quad_float floor(const quad_float& x)
 {
-   DOUBLE fhi, flo, u, v;
-
-   fhi = floor(x.hi);
+   double fhi = floor(x.hi);
 
    if (fhi != x.hi)
       return quad_float(fhi, 0.0);
    else {
-      flo = floor(x.lo);
-START_FIX
-      u = fhi + flo;
-      v = fhi - u;
-      v = v + flo;
-END_FIX
-      return quad_float(u, v);
+      double flo = floor(x.lo);
+      quad_float z;
+      normalize(z, fhi, flo);
+      return z;
    }
 }
 
@@ -778,7 +765,8 @@ long compare(const quad_float& x, const quad_float& y)
 }
 
 
-quad_float fabs(const quad_float& x) { if (x.hi>=0.0) return x; else return -x; }
+quad_float fabs(const quad_float& x) 
+{ if (x.hi>=0.0) return x; else return -x; }
 
 quad_float to_quad_float(const char *s)
 {
@@ -796,9 +784,16 @@ quad_float to_quad_float(const char *s)
 
 
 quad_float ldexp(const quad_float& x, long exp) { // x*2^exp
-  if (int(exp) != exp) Error("quad_float ldexp: overflow");
-  return quad_float(ldexp(x.hi,int(exp)),ldexp(x.lo,int(exp)));
+   double xhi, xlo;
+   quad_float z;
+
+   xhi = _ntl_ldexp(x.hi, exp);
+   xlo = _ntl_ldexp(x.lo, exp);
+
+   normalize(z, xhi, xlo);
+   return z;
 }
+
 
 quad_float exp(const quad_float& x) { // New version 97 Aug 05
 /*
@@ -816,14 +811,16 @@ quad_float exp(const quad_float& x) { // New version 97 Aug 05
 !  Now y.loge(2) will be less than 0.3466 in absolute value.
 !  This is halved and a Pade aproximation is used to approximate e^x over
 !  the region (-0.1733, +0.1733).   This approximation is then squared.
-!  WARNING: No overflow checks!
 */
   if (x.hi<DBL_MIN_10_EXP*2.302585092994045684017991) 
     return to_quad_float(0.0);
   if (x.hi>DBL_MAX_10_EXP*2.302585092994045684017991) {
     Error("exp(quad_float): overflow");
   }
-  const quad_float Log2 = 
+
+  // changed this from "const" to "static" in v5.3, since "const"
+  // causes the initialization to be performed with *every* invocation.
+  static quad_float Log2 = 
     to_quad_float("0.6931471805599453094172321214581765680755");
 
   quad_float y,temp,ysq,sum1,sum2;

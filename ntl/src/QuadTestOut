@@ -14,5 +14,5 @@ Precision OK
 0.1e21
 long conversion OK
 long conversion OK
-int conversion OK
-int conversion OK
+ulong conversion OK
+ulong conversion OK

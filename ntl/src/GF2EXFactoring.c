@@ -169,7 +169,6 @@ void BuildMatrix(vec_GF2XVec& M, long n, const GF2EX& g, const GF2EXModulus& F,
 
    set(h);
    for (j = 0; j < n; j++) {
-
       m = deg(h);
       for (i = 0; i < n; i++) {
          if (i <= m)
@@ -559,11 +558,13 @@ void SFBerlekamp(vec_GF2EX& factors, const GF2EX& ff, long verbose)
    NullSpace(r, D, M, verbose);
 
 
+
    if (r == 1) {
       factors.SetLength(1);
       factors[0] = f;
       return;
    }
+
 
    vec_GF2E roots;
 
@@ -600,7 +601,6 @@ void SFBerlekamp(vec_GF2EX& factors, const GF2EX& ff, long verbose)
       }
       swap(factors, S);
    }
-
 }
 
 
@@ -1512,7 +1512,7 @@ void BuildIrred(GF2EX& f, long n)
    if (n <= 0)
       Error("BuildIrred: n must be positive");
 
-   if (n >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (NTL_OVERFLOW(n, 1, 0))
       Error("overflow in BuildIrred");
 
    if (n == 1) {
@@ -1535,7 +1535,7 @@ void BuildIrred(GF2EX& f, long n)
    if (n <= 0)
       Error("BuildIrred: n must be positive");
 
-   if (n >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (NTL_OVERFLOW(n, 1, 0))
       Error("overflow in BuildIrred");
 
    if (n == 1) {
@@ -1588,8 +1588,7 @@ static long use_files;
 static
 double CalcTableSize(long n, long k)
 {
-   double sz = GF2E::WordLength()+4;
-   sz = sz * sizeof(_ntl_ulong);
+   double sz = GF2E::storage();
    sz = sz * n;
    sz = sz + NTL_VECTOR_HEADER_SIZE + sizeof(vec_GF2E);
    sz = sz * k;
@@ -1605,7 +1604,6 @@ void GenerateBabySteps(GF2EX& h1, const GF2EX& f, const GF2EX& h, long k,
 
 {
    double t;
-
 
    GF2EXModulus F;
    build(F, f);
@@ -1637,7 +1635,7 @@ void GenerateBabySteps(GF2EX& h1, const GF2EX& f, const GF2EX& h, long k,
    }
 
    for (i = 1; i <= k-1; i++) {
-         BabyStepFile(i) = h1;
+      BabyStepFile(i) = h1;
 
       CompMod(h1, h1, H, F);
    }
@@ -1684,7 +1682,7 @@ void GenerateGiantSteps(const GF2EX& f, const GF2EX& h, long l, long verbose)
    }
 
    for (i = 1; i <= l-1; i++) {
-         GiantStepFile(i) = h1;
+      GiantStepFile(i) = h1;
 
       CompMod(h1, h1, H, F);
    }
@@ -1697,19 +1695,8 @@ void GenerateGiantSteps(const GF2EX& f, const GF2EX& h, long l, long verbose)
 static
 void FileCleanup(long k, long l)
 {
-   if (use_files) {
-      long i;
-   
-      for (i = 1; i <= k-1; i++)
-         remove(FileName(GF2EX_stem, "baby", i));
-   
-      for (i = 1; i <= l; i++)
-         remove(FileName(GF2EX_stem, "giant", i));
-   }
-   else {
       BabyStepFile.kill();
       GiantStepFile.kill();
-   }
 }
 
 
@@ -1776,7 +1763,7 @@ void NewProcessTable(vec_pair_GF2EX_long& u, GF2EX& f, const GF2EXModulus& F,
 static
 void FetchGiantStep(GF2EX& g, long gs, const GF2EXModulus& F)
 {
-      g = GiantStepFile(gs);
+   g = GiantStepFile(gs);
 
    rem(g, g, F);
 }
@@ -1791,7 +1778,7 @@ void FetchBabySteps(vec_GF2EX& v, long k)
 
    long i;
    for (i = 1; i <= k-1; i++) {
-         v[i] = BabyStepFile(i);
+      v[i] = BabyStepFile(i);
    }
 }
       

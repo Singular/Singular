@@ -440,8 +440,6 @@ void SFBerlekamp(vec_ZZ_pX& factors, const ZZ_pX& ff, long verbose)
       }
       swap(factors, S);
    }
-
-
 }
 
 
@@ -817,8 +815,6 @@ void EDF(vec_ZZ_pX& factors, const ZZ_pX& ff, const ZZ_pX& bb,
    }
 
    
-   double t;
-
    factors.SetLength(0);
 
    RecEDF(factors, f, b, d, verbose);
@@ -1382,7 +1378,7 @@ void BuildIrred(ZZ_pX& f, long n)
    if (n <= 0)
       Error("BuildIrred: n must be positive");
 
-   if (n >= (1L << (NTL_BITS_PER_LONG-4))) Error("overflow in BuildIrred");
+   if (NTL_OVERFLOW(n, 1, 0)) Error("overflow in BuildIrred");
 
    if (n == 1) {
       SetX(f);
@@ -1444,7 +1440,6 @@ void GenerateBabySteps(ZZ_pX& h1, const ZZ_pX& f, const ZZ_pX& h, long k,
                        long verbose)
 
 {
-   double t;
 
    ZZ_pXModulus F;
    build(F, f);
@@ -1463,7 +1458,7 @@ void GenerateBabySteps(ZZ_pX& h1, const ZZ_pX& f, const ZZ_pX& h, long k,
    }
 
    for (i = 1; i <= k-1; i++) {
-         BabyStepFile(i) = h1;
+     BabyStepFile(i) = h1;
 
       CompMod(h1, h1, H, F);
    }
@@ -1474,8 +1469,6 @@ void GenerateBabySteps(ZZ_pX& h1, const ZZ_pX& f, const ZZ_pX& h, long k,
 static
 void GenerateGiantSteps(const ZZ_pX& f, const ZZ_pX& h, long l, long verbose)
 {
-
-   double t;
 
    ZZ_pXModulus F;
    build(F, f);
@@ -1495,31 +1488,20 @@ void GenerateGiantSteps(const ZZ_pX& f, const ZZ_pX& h, long l, long verbose)
    }
 
    for (i = 1; i <= l-1; i++) {
-         GiantStepFile(i) = h1;
+      GiantStepFile(i) = h1;
 
       CompMod(h1, h1, H, F);
    }
 
-      GiantStepFile(i) = h1;
+   GiantStepFile(i) = h1;
 
 }
 
 static
 void FileCleanup(long k, long l)
 {
-   if (use_files) {
-      long i;
-
-      for (i = 1; i <= k-1; i++)
-         remove(FileName(ZZ_pX_stem, "baby", i));
-
-      for (i = 1; i <= l; i++)
-         remove(FileName(ZZ_pX_stem, "giant", i));
-   }
-   else {
       BabyStepFile.kill();
       GiantStepFile.kill();
-   }
 }
 
 
@@ -1586,7 +1568,7 @@ void NewProcessTable(vec_pair_ZZ_pX_long& u, ZZ_pX& f, const ZZ_pXModulus& F,
 static
 void FetchGiantStep(ZZ_pX& g, long gs, const ZZ_pXModulus& F)
 {
-      g = GiantStepFile(gs);
+   g = GiantStepFile(gs);
 
    rem(g, g, F);
 }
@@ -1601,7 +1583,7 @@ void FetchBabySteps(vec_ZZ_pX& v, long k)
 
    long i;
    for (i = 1; i <= k-1; i++) {
-         v[i] = BabyStepFile(i);
+      v[i] = BabyStepFile(i);
    }
 }
       
@@ -1612,7 +1594,6 @@ void GiantRefine(vec_pair_ZZ_pX_long& u, const ZZ_pX& ff, long k, long l,
                  long verbose)
 
 {
-   double t;
 
    u.SetLength(0);
 
@@ -1678,9 +1659,6 @@ void GiantRefine(vec_pair_ZZ_pX_long& u, const ZZ_pX& ff, long k, long l,
    if (deg(f) > 0) 
       NewAddFactor(u, f, 0, verbose);
 
-   if (verbose) {
-      t = GetTime()-t;
-   }
 }
 
 
@@ -1745,8 +1723,6 @@ void BabyRefine(vec_pair_ZZ_pX_long& factors, const vec_pair_ZZ_pX_long& u,
                 long k, long l, long verbose)
 
 {
-   double t;
-
    factors.SetLength(0);
 
    vec_ZZ_pX BabyStep;

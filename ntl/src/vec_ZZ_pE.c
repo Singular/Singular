@@ -28,6 +28,9 @@ void InnerProduct(ZZ_pE& x, const vec_ZZ_pE& a, const vec_ZZ_pE& b)
 void InnerProduct(ZZ_pE& x, const vec_ZZ_pE& a, const vec_ZZ_pE& b,
                   long offset)
 {
+   if (offset < 0) Error("InnerProduct: negative offset");
+   if (NTL_OVERFLOW(offset, 1, 0)) Error("InnerProduct: offset too big");
+
    long n = min(a.length(), b.length()+offset);
    long i;
    ZZ_pX accum, t;
@@ -162,7 +165,7 @@ ZZ_pE operator*(const vec_ZZ_pE& a, const vec_ZZ_pE& b)
 void VectorCopy(vec_ZZ_pE& x, const vec_ZZ_pE& a, long n)
 {
    if (n < 0) Error("VectorCopy: negative length");
-   if (n >= (1L << (NTL_BITS_PER_LONG-4))) Error("overflow in VectorCopy");
+   if (NTL_OVERFLOW(n, 1, 0)) Error("overflow in VectorCopy");
 
    long m = min(n, a.length());
 

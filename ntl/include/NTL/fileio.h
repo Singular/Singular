@@ -13,21 +13,6 @@ class ifstream;
 }
 #endif
 
-NTL_OPEN_NNS
-
-
-// opens file for reading
-
-char *FileName(const char* stem, const char *ext);
-
-// builds the name "stem.ext"
-
-char *FileName(const char* stem, const char *ext, long d);
-
-// builds the name stem.ext.d
-
-NTL_CLOSE_NNS
-
 #endif
 
 

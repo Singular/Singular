@@ -27,7 +27,6 @@ void conv(ZZX& x, const ZZ_pX& a)
    x.normalize();
 }
 
-
 void ZZX::normalize()
 {
    long n;
@@ -35,9 +34,8 @@ void ZZX::normalize()
 
    n = rep.length();
    if (n == 0) return;
-   p = rep.elts() + (n-1);
-   while (n > 0 && IsZero(*p)) {
-      p--; 
+   p = rep.elts() + n;
+   while (n > 0 && IsZero(*--p)) {
       n--;
    }
    rep.SetLength(n);
@@ -111,20 +109,26 @@ void SetCoeff(ZZX& x, long i, const ZZ& a)
    if (i < 0) 
       Error("SetCoeff: negative index");
 
-   if (i >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (NTL_OVERFLOW(i, 1, 0))
       Error("overflow in SetCoeff");
 
    m = deg(x);
 
    if (i > m) {
-      long pos = x.rep.position(a);
-      x.rep.SetLength(i+1);
+      /* careful: a may alias a coefficient of x */
 
-      if (pos != -1)
-         x.rep[i] = x.rep.RawGet(pos);
-      else
+      long alloc = x.rep.allocated();
+
+      if (alloc > 0 && i >= alloc) {
+         ZZ aa = a;
+         x.rep.SetLength(i+1);
+         x.rep[i] = aa;
+      }
+      else {
+         x.rep.SetLength(i+1);
          x.rep[i] = a;
-
+      }
+         
       for (j = m+1; j < i; j++)
          clear(x.rep[j]);
    }
@@ -134,6 +138,7 @@ void SetCoeff(ZZX& x, long i, const ZZ& a)
    x.normalize();
 }
 
+
 void SetCoeff(ZZX& x, long i)
 {
    long j, m;
@@ -141,7 +146,7 @@ void SetCoeff(ZZX& x, long i)
    if (i < 0) 
       Error("coefficient index out of range");
 
-   if (i >= (1L << (NTL_BITS_PER_LONG-4)))
+   if (NTL_OVERFLOW(i, 1, 0))
       Error("overflow in SetCoeff");
 
    m = deg(x);
@@ -207,6 +212,7 @@ void conv(ZZX& x, const ZZ& a)
    }
 }
 
+
 void conv(ZZX& x, long a)
 {
    if (a == 0) 
@@ -269,7 +275,7 @@ void add(ZZX& x, const ZZX& a, const ZZ& b)
    else {
       // ugly...b could alias a coeff of x
 
-      ZZ *xp = x.rep.elts();
+      ZZ *xp = x.rep.elts(); 
       add(xp[0], a.rep[0], b);
       x.rep.SetLength(n);
       xp = x.rep.elts();
@@ -280,6 +286,7 @@ void add(ZZX& x, const ZZX& a, const ZZ& b)
       x.normalize();
    }
 }
+
 
 void add(ZZX& x, const ZZX& a, long b)
 {
@@ -571,6 +578,7 @@ void PlainMul(ZZ *xp, const ZZ *ap, long sa, const ZZ *bp, long sb)
 }
 
 
+
 static
 void KarFold(ZZ *T, const ZZ *b, long sb, long hsa)
 {
@@ -827,6 +835,7 @@ void PlainSqr(ZZ* xp, const ZZ* ap, long sa)
 }
 
 
+static
 void KarSqr(ZZ *c, const ZZ *a, long sa, ZZ *stk)
 {
    if (sa == 1) {
@@ -882,6 +891,7 @@ void KarSqr(ZZ *c, const ZZ *a, long sa, ZZ *stk)
 
    KarAdd(c+hsa, T2, hsa2-1);
 }
+
       
 void KarSqr(ZZX& c, const ZZX& a)
 {

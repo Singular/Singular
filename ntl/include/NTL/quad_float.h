@@ -221,6 +221,7 @@ inline long compare(double x, const quad_float& y)
    { return compare(to_quad_float(x), y); }
 
 
+
 quad_float sqrt(const quad_float&);
 quad_float floor(const quad_float&);
 quad_float ceil(const quad_float&);
@@ -237,7 +238,7 @@ inline quad_float power2_quad_float(long e)
 
 
 long to_long(const quad_float&);
-inline int to_int(const quad_float& x) { return int(to_long(x)); }
+inline int to_int(const quad_float& x) { return to_int(to_long(x)); }
 
 inline double to_double(const quad_float& x) { return x.hi; }
 

@@ -108,7 +108,7 @@ void mul_aux(vec_RR& x, const mat_RR& A, const vec_RR& b)
   
 void mul(vec_RR& x, const mat_RR& A, const vec_RR& b)  
 {  
-   if (&b == &x || A.position(b) != -1) {
+   if (&b == &x || A.position1(x) != -1) {
       vec_RR tmp;
       mul_aux(tmp, A, b);
       x = tmp;
@@ -143,7 +143,7 @@ void mul_aux(vec_RR& x, const vec_RR& a, const mat_RR& B)
 
 void mul(vec_RR& x, const vec_RR& a, const mat_RR& B)
 {
-   if (&a == &x || B.position(a) != -1) {
+   if (&a == &x) {
       vec_RR tmp;
       mul_aux(tmp, a, B);
       x = tmp;
@@ -465,7 +465,7 @@ void inv(RR& d, mat_RR& X, const mat_RR& A)
          for (i = k+1; i < n; i++) {
             // M[i] = M[i] + M[k]*M[i,k]
 
-            t1 = M[i][k];   // this is already reduced
+            t1 = M[i][k];   
 
             x = M[i].elts() + (k+1);
             y = M[k].elts() + (k+1);

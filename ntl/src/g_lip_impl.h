@@ -1,12 +1,38 @@
 
+/*
+ * This is a "wrapper" layer that builds on top of the "mpn" layer of gmp.
+ * This layer provides much of the same functionality of the "mpz"
+ * layer of gmp, but the interface it provides is much more like
+ * the interface provided by lip.
+ *
+ * This layer was written under the following assumptions about gmp:
+ *  1) mp_limb_t is an unsigned integral type
+ *  2) sizeof(mp_limb_t) == sizeof(long) or sizeof(mp_limb_t) == 2*sizeof(long)
+ *  3) the number of bits of an mp_limb_t is equal to that of a long,
+ *     or twice that of a long
+ *  4) the number of bits of a gmp radix is equal to the number of bits
+ *     of an mp_limb_t
+ *
+ * Except for assumption (1), these assumptions are verified in the
+ * installation script, and they should be universally satisfied in practice,
+ * except when gmp is built using the proposed, new "nail" fetaure
+ * (in which some bits of an mp_limb_t are unused).
+ * The code here will not work properly with the "nail" feature;
+ * however, I have (attempted to) identify all such problem spots,
+ * and any other places where assumptions (2-4) are made,
+ * with a comment labeled "DIRT".
+ */
+
+
+
 #include <NTL/lip.h>
-#include <NTL/IsFinite.h>
+
+#include <NTL/ctools.h>
 
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-
 
 
 #include <gmp.h>
@@ -104,7 +130,7 @@ union gbigint_header {
 
 #define STORAGE(len) ((long)(2*sizeof(long) + (len)*sizeof(mp_limb_t)))
 
-/* STORAGE computes the number of bytes to allocate for a bigint
+/* DIRT: STORAGE computes the number of bytes to allocate for a bigint
  * of maximal SIZE len.  This should be computed so that one
  * can store several such bigints in a contiguous array
  * of memory without breaking any alignment requirements.
@@ -113,8 +139,7 @@ union gbigint_header {
  * 2*sizeof(long), and therfore, nothing special needs to
  * be done to enfoce alignment requirements.  If this assumption
  * should change, then the storage layout for bigints must be
- * re-designed.   However, this is very unlikely to ever happen.
- * 
+ * re-designed.   
  */
 
 #define MustAlloc(c, len)  (!(c) || (ALLOC(c) >> 2) < (len))
@@ -302,6 +327,8 @@ inline void COUNT_BITS(long& cnt, mp_limb_t a)
 
 #endif
 
+#define STORAGE_OVF(len) NTL_OVERFLOW(len, sizeof(mp_limb_t), 2*sizeof(long))
+
 
 
 static 
@@ -325,7 +352,7 @@ void _ntl_gsetlength(_ntl_gbigint *v, long len)
    if (len < 0)
       ghalt("negative size allocation in _ntl_zgetlength");
 
-   if (len >= (1L << (NTL_BITS_PER_LONG-4))/NTL_ZZ_NBITS)
+   if (NTL_OVERFLOW(len, NTL_ZZ_NBITS, 0))
       ghalt("size too big in _ntl_gsetlength");
 
 #ifdef NTL_SMALL_MP_SIZE_T
@@ -359,11 +386,14 @@ void _ntl_gsetlength(_ntl_gbigint *v, long len)
       len = ((len+(MIN_SETL-1))/MIN_SETL)*MIN_SETL; 
 
       /* test len again */
-      if (len >= (1L << (NTL_BITS_PER_LONG-4))/NTL_ZZ_NBITS)
+      if (NTL_OVERFLOW(len, NTL_ZZ_NBITS, 0))
          ghalt("size too big in _ntl_gsetlength");
 
+      if (STORAGE_OVF(len))
+         ghalt("reallocation failed in _ntl_gsetlength");
+
       ALLOC(x) = len << 2;
-      if (!(x = (_ntl_gbigint)realloc((void*) x, STORAGE(len)))) {
+      if (!(x = (_ntl_gbigint)NTL_REALLOC((void *) x, 1, STORAGE(len), 0))) {
          ghalt("reallocation failed in _ntl_gsetlength");
       }
    }
@@ -372,10 +402,13 @@ void _ntl_gsetlength(_ntl_gbigint *v, long len)
       len = ((len+(MIN_SETL-1))/MIN_SETL)*MIN_SETL;
 
       /* test len again */
-      if (len >= (1L << (NTL_BITS_PER_LONG-4))/NTL_ZZ_NBITS)
+      if (NTL_OVERFLOW(len, NTL_ZZ_NBITS, 0))
          ghalt("size too big in _ntl_gsetlength");
 
-      if (!(x = (_ntl_gbigint)malloc(STORAGE(len)))) {
+      if (STORAGE_OVF(len))
+         ghalt("reallocation failed in _ntl_gsetlength");
+
+      if (!(x = (_ntl_gbigint)NTL_MALLOC(1, STORAGE(len), 0))) {
          ghalt("allocation failed in _ntl_gsetlength");
       }
       ALLOC(x) = len << 2;
@@ -507,7 +540,7 @@ long _ntl_gbit(_ntl_gbigint a, long p)
 
 void _ntl_glowbits(_ntl_gbigint a, long b, _ntl_gbigint *cc)
 {
-   _ntl_gbigint c = *cc;
+   _ntl_gbigint c;
 
    long bl;
    long wh;
@@ -536,8 +569,10 @@ void _ntl_glowbits(_ntl_gbigint a, long b, _ntl_gbigint *cc)
       return;
    }
 
+   c = *cc;
+
+   /* a won't move if c aliases a */
    _ntl_gsetlength(&c, bl);
-   if (a == *cc) a = c;
    *cc = c;
 
    adata = DATA(a);
@@ -558,6 +593,9 @@ void _ntl_glowbits(_ntl_gbigint a, long b, _ntl_gbigint *cc)
 long _ntl_gslowbits(_ntl_gbigint a, long p)
 {
    static _ntl_gbigint x = 0;
+
+   if (p > NTL_BITS_PER_LONG)
+      p = NTL_BITS_PER_LONG;
 
    _ntl_glowbits(a, p, &x);
 
@@ -662,7 +700,7 @@ _ntl_gweights(
 	unsigned long a;
 	long res = 0;
 	if (aa < 0) 
-		a = -aa;
+		a = -((unsigned long) aa);
 	else
 		a = aa;
    
@@ -750,6 +788,7 @@ long _ntl_g2log(_ntl_gbigint a)
 }
 
 
+
 long _ntl_gmakeodd(_ntl_gbigint *nn)
 {
    _ntl_gbigint n = *nn;
@@ -778,6 +817,7 @@ long _ntl_gmakeodd(_ntl_gbigint *nn)
    return shift;
 }
 
+
 long _ntl_gnumtwos(_ntl_gbigint n)
 {
    long shift;
@@ -805,19 +845,25 @@ long _ntl_gnumtwos(_ntl_gbigint n)
    return shift;
 }
 
+
 void _ntl_gand(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
 {
-   _ntl_gbigint c = *cc;
+   _ntl_gbigint c;
    long sa;
    long sb;
    long sm;
    long i;
+   long a_alias, b_alias;
    mp_limb_t *adata, *bdata, *cdata;
 
    if (ZEROP(a) || ZEROP(b)) {
       _ntl_gzero(cc);
       return;
    }
+
+   c = *cc;
+   a_alias = (a == c);
+   b_alias = (b == c);
 
    sa = SIZE(a);
    if (sa < 0) sa = -sa;
@@ -828,8 +874,8 @@ void _ntl_gand(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
    sm = (sa > sb ? sb : sa);
 
    _ntl_gsetlength(&c, sm);
-   if (a == *cc) a = c;
-   if (b == *cc) b = c;
+   if (a_alias) a = c;
+   if (b_alias) b = c;
    *cc = c;
 
    adata = DATA(a);
@@ -843,14 +889,16 @@ void _ntl_gand(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
    SIZE(c) = sm;
 }
 
+
 void _ntl_gxor(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
 {
-   _ntl_gbigint c = *cc;
+   _ntl_gbigint c;
    long sa;
    long sb;
    long sm;
    long la;
    long i;
+   long a_alias, b_alias;
    mp_limb_t *adata, *bdata, *cdata;
 
    if (ZEROP(a)) {
@@ -864,6 +912,10 @@ void _ntl_gxor(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
       _ntl_gabs(cc);
       return;
    }
+
+   c = *cc;
+   a_alias = (a == c);
+   b_alias = (b == c);
 
    sa = SIZE(a);
    if (sa < 0) sa = -sa;
@@ -881,8 +933,8 @@ void _ntl_gxor(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
    }
 
    _ntl_gsetlength(&c, la);
-   if (a == *cc) a = c;
-   if (b == *cc) b = c;
+   if (a_alias) a = c;
+   if (b_alias) b = c;
    *cc = c;
 
    adata = DATA(a);
@@ -901,14 +953,16 @@ void _ntl_gxor(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
    SIZE(c) = la;
 }
 
+
 void _ntl_gor(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
 {
-   _ntl_gbigint c = *cc;
+   _ntl_gbigint c;
    long sa;
    long sb;
    long sm;
    long la;
    long i;
+   long a_alias, b_alias;
    mp_limb_t *adata, *bdata, *cdata;
 
    if (ZEROP(a)) {
@@ -922,6 +976,10 @@ void _ntl_gor(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
       _ntl_gabs(cc);
       return;
    }
+
+   c = *cc;
+   a_alias = (a == c);
+   b_alias = (b == c);
 
    sa = SIZE(a);
    if (sa < 0) sa = -sa;
@@ -939,8 +997,8 @@ void _ntl_gor(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
    }
 
    _ntl_gsetlength(&c, la);
-   if (a == *cc) a = c;
-   if (b == *cc) b = c;
+   if (a_alias) a = c;
+   if (b_alias) b = c;
    *cc = c;
 
    adata = DATA(a);
@@ -965,6 +1023,13 @@ void _ntl_gnegate(_ntl_gbigint *aa)
    _ntl_gbigint a = *aa;
    if (a) SIZE(a) = -SIZE(a);
 }
+
+
+/*
+ * DIRT: this implementation of _ntl_gintoz relies crucially
+ * on the assumption that the number of bits per limb_t is at least
+ * equal to the number of bits per long.
+ */
 
 void _ntl_gintoz(long d, _ntl_gbigint *aa)
 {
@@ -993,6 +1058,13 @@ void _ntl_gintoz(long d, _ntl_gbigint *aa)
    }
 }
 
+
+/*
+ * DIRT: this implementation of _ntl_guintoz relies crucially
+ * on the assumption that the number of bits per limb_t is at least
+ * equal to the number of bits per long.
+ */
+
 void _ntl_guintoz(unsigned long d, _ntl_gbigint *aa)
 {
    _ntl_gbigint a = *aa;
@@ -1011,16 +1083,18 @@ void _ntl_guintoz(unsigned long d, _ntl_gbigint *aa)
    }
 }
 
+
 long _ntl_gtoint(_ntl_gbigint a)
 {
-   if (ZEROP(a)) 
-      return 0;
-
-   if (SIZE(a) > 0) 
-      return DATA(a)[0];
-
-   return -DATA(a)[0];
+   unsigned long res = _ntl_gtouint(a);
+   return NTL_ULONG_TO_LONG(res);
 }
+
+/*
+ * DIRT: this implementation of _ntl_gtouint relies crucially
+ * on the assumption that the number of bits per limb_t is at least
+ * equal to the number of bits per long.
+ */
 
 unsigned long _ntl_gtouint(_ntl_gbigint a)
 {
@@ -1032,6 +1106,7 @@ unsigned long _ntl_gtouint(_ntl_gbigint a)
 
    return -DATA(a)[0];
 }
+
 
 long _ntl_gcompare(_ntl_gbigint a, _ntl_gbigint b)
 {
@@ -1127,21 +1202,27 @@ void _ntl_glshift(_ntl_gbigint n, long k, _ntl_gbigint *rres)
    _ntl_gbigint res;
    mp_limb_t *ndata, *resdata, *resdata1;
    long limb_cnt, i, sn, nneg, sres;
+   long n_alias;
 
    if (ZEROP(n)) {
       _ntl_gzero(rres);
       return;
    }
 
+   res = *rres;
+   n_alias = (n == res);
+
    if (!k) {
-      if (n != *rres)
+      if (!n_alias)
          _ntl_gcopy(n, rres);
       return;
    }
 
    if (k < 0) {
-      if (k < -NTL_MAX_LONG) ghalt("overflow in _ntl_glshift");
-      _ntl_grshift(n, -k, rres);
+      if (k < -NTL_MAX_LONG) 
+         _ntl_gzero(rres);
+      else
+         _ntl_grshift(n, -k, rres);
       return;
    }
 
@@ -1150,10 +1231,9 @@ void _ntl_glshift(_ntl_gbigint n, long k, _ntl_gbigint *rres)
    limb_cnt = k/NTL_ZZ_NBITS;
    sres = sn + limb_cnt + 1; 
 
-   res = *rres;
    if (MustAlloc(res, sres)) {
       _ntl_gsetlength(&res, sres);
-      if (n == *rres) n = res;
+      if (n_alias) n = res;
       *rres = res;
    }
 
@@ -1218,8 +1298,8 @@ void _ntl_grshift(_ntl_gbigint n, long k, _ntl_gbigint *rres)
 
    res = *rres;
    if (MustAlloc(res, sres)) {
+      /* n won't move if res aliases n */
       _ntl_gsetlength(&res, sres);
-      if (n == *rres) n = res;
       *rres = res;
    }
 
@@ -1250,6 +1330,7 @@ _ntl_gadd(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
    long sa, aneg, sb, bneg, sc, cmp;
    mp_limb_t *adata, *bdata, *cdata, carry;
    _ntl_gbigint c;
+   long a_alias, b_alias;
 
    if (ZEROP(a)) {
       _ntl_gcopy(b, cc);
@@ -1273,6 +1354,8 @@ _ntl_gadd(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
    /* sa >= sb */
 
    c = *cc;
+   a_alias = (a == c);
+   b_alias = (b == c);
 
    if (aneg == bneg) {
       /* same sign => addition */
@@ -1280,8 +1363,8 @@ _ntl_gadd(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
       sc = sa + 1;
       if (MustAlloc(c, sc)) {
          _ntl_gsetlength(&c, sc);
-         if (a == *cc) a = c; 
-         if (b == *cc) b = c;
+         if (a_alias) a = c; 
+         if (b_alias) b = c;
          *cc = c;
       }
 
@@ -1304,8 +1387,8 @@ _ntl_gadd(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
       sc = sa;
       if (MustAlloc(c, sc)) {
          _ntl_gsetlength(&c, sc);
-         if (a == *cc) a = c; 
-         if (b == *cc) b = c;
+         if (a_alias) a = c; 
+         if (b_alias) b = c;
          *cc = c;
       }
 
@@ -1352,6 +1435,7 @@ _ntl_gsub(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
    long sa, aneg, sb, bneg, sc, cmp, rev;
    mp_limb_t *adata, *bdata, *cdata, carry;
    _ntl_gbigint c;
+   long a_alias, b_alias;
 
    if (ZEROP(a)) {
       _ntl_gcopy(b, cc);
@@ -1380,6 +1464,8 @@ _ntl_gsub(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
    /* sa >= sb */
 
    c = *cc;
+   a_alias = (a == c);
+   b_alias = (b == c);
 
    if (aneg != bneg) {
       /* opposite sign => addition */
@@ -1387,8 +1473,8 @@ _ntl_gsub(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
       sc = sa + 1;
       if (MustAlloc(c, sc)) {
          _ntl_gsetlength(&c, sc);
-         if (a == *cc) a = c; 
-         if (b == *cc) b = c;
+         if (a_alias) a = c; 
+         if (b_alias) b = c;
          *cc = c;
       }
 
@@ -1411,8 +1497,8 @@ _ntl_gsub(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
       sc = sa;
       if (MustAlloc(c, sc)) {
          _ntl_gsetlength(&c, sc);
-         if (a == *cc) a = c; 
-         if (b == *cc) b = c;
+         if (a_alias) a = c; 
+         if (b_alias) b = c;
          *cc = c;
       }
 
@@ -1451,6 +1537,7 @@ _ntl_gsubpos(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
    long sa, sb, sc;
    mp_limb_t *adata, *bdata, *cdata;
    _ntl_gbigint c;
+   long a_alias, b_alias;
 
    if (ZEROP(a)) {
       _ntl_gzero(cc);
@@ -1466,12 +1553,14 @@ _ntl_gsubpos(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
    sb = SIZE(b);
 
    c = *cc;
+   a_alias = (a == c);
+   b_alias = (b == c);
 
    sc = sa;
    if (MustAlloc(c, sc)) {
       _ntl_gsetlength(&c, sc);
-      if (a == *cc) a = c; 
-      if (b == *cc) b = c;
+      if (a_alias) a = c; 
+      if (b_alias) b = c;
       *cc = c;
    }
 
@@ -1542,6 +1631,12 @@ void _ntl_gsq(_ntl_gbigint a, _ntl_gbigint *cc)
 }
 
 
+/*
+ * DIRT: this implementation of _ntl_gsmul relies crucially
+ * on the assumption that the number of bits per limb_t is at least
+ * equal to the number of bits per long.
+ */
+
 void
 _ntl_gsmul(_ntl_gbigint a, long d, _ntl_gbigint *bb)
 {
@@ -1550,6 +1645,7 @@ _ntl_gsmul(_ntl_gbigint a, long d, _ntl_gbigint *bb)
    _ntl_gbigint b;
    mp_limb_t *adata, *bdata;
    mp_limb_t dd, carry;
+   long a_alias;
 
    if (ZEROP(a) || !d) {
       _ntl_gzero(bb);
@@ -1570,9 +1666,11 @@ _ntl_gsmul(_ntl_gbigint a, long d, _ntl_gbigint *bb)
    sb = sa + 1;
 
    b = *bb;
+   a_alias = (a == b);
+
    if (MustAlloc(b, sb)) {
       _ntl_gsetlength(&b, sb);
-      if (a == *bb) a = b;
+      if (a_alias) a = b;
       *bb = b;
    }
 
@@ -1592,6 +1690,12 @@ _ntl_gsmul(_ntl_gbigint a, long d, _ntl_gbigint *bb)
    if (bnegative) sb = -sb;
    SIZE(b) = sb;
 }
+
+/*
+ * DIRT: this implementation of _ntl_gsdiv relies crucially
+ * on the assumption that the number of bits per limb_t is at least
+ * equal to the number of bits per long.
+ */
 
 long _ntl_gsdiv(_ntl_gbigint a, long d, _ntl_gbigint *bb)
 {
@@ -1623,8 +1727,8 @@ long _ntl_gsdiv(_ntl_gbigint a, long d, _ntl_gbigint *bb)
    sb = sa;
    b = *bb;
    if (MustAlloc(b, sb)) {
+      /* if b aliases a, then b won't move */
       _ntl_gsetlength(&b, sb);
-      if (a == *bb) a = b;
       *bb = b;
    }
 
@@ -1662,6 +1766,12 @@ long _ntl_gsdiv(_ntl_gbigint a, long d, _ntl_gbigint *bb)
 
    return r;
 }
+
+/*
+ * DIRT: this implementation of _ntl_gsmod relies crucially
+ * on the assumption that the number of bits per limb_t is at least
+ * equal to the number of bits per long.
+ */
 
 long _ntl_gsmod(_ntl_gbigint a, long d)
 {
@@ -1710,6 +1820,7 @@ long _ntl_gsmod(_ntl_gbigint a, long d)
 
    return r;
 }
+
 
 void _ntl_gdiv(_ntl_gbigint a, _ntl_gbigint d, 
                _ntl_gbigint *bb, _ntl_gbigint *rr)
@@ -1811,6 +1922,7 @@ done:
  * that space for the result has already been allocated,
  * and that inputs do not alias output. */
 
+static
 void gmod_simple(_ntl_gbigint a, _ntl_gbigint d, _ntl_gbigint *rr)
 {
    static _ntl_gbigint b = 0;
@@ -1850,6 +1962,7 @@ void gmod_simple(_ntl_gbigint a, _ntl_gbigint d, _ntl_gbigint *rr)
    SIZE(r) = sr;
 }
 
+
 void _ntl_gmod(_ntl_gbigint a, _ntl_gbigint d, _ntl_gbigint *rr)
 {
    _ntl_gdiv(a, d, 0, rr);
@@ -1888,6 +2001,12 @@ void _ntl_gsqrt(_ntl_gbigint n, _ntl_gbigint *rr)
 
    _ntl_gcopy(r, rr);
 }
+
+/*
+ * DIRT: this implementation of _ntl_gsqrts relies crucially
+ * on the assumption that the number of bits per limb_t is at least
+ * equal to the number of bits per long.
+ */
 
 long _ntl_gsqrts(long n)
 {
@@ -2055,6 +2174,7 @@ gxxeucl(
          den *= NTL_ZZ_FRADIX;
          if (sn > 2)
             den += (*(p - 1));
+
          hi = fhi1 * (num + 1.0) / den;
          lo = flo1 * num / (den + 1.0);
          if (diff > 0)
@@ -2077,13 +2197,13 @@ gxxeucl(
             {
                ilo = (long)lo;
                dirt = hi - ilo;
-               if (dirt <= 0 || !ilo || ilo < (long)hi)
+               if (dirt < 1.0/NTL_FDOUBLE_PRECISION || !ilo || ilo < (long)hi)
                   fast = 0;
                else
                {
                   dt = lo-ilo;
                   lo = flo / dirt;
-                  if (dt > 0)
+                  if (dt > 1.0/NTL_FDOUBLE_PRECISION)
                      hi = fhi / dt;
                   else
                      hi = NTL_SP_BOUND;
@@ -2316,6 +2436,7 @@ _ntl_gexteucl(
    }
 }
 
+
 long _ntl_ginv(_ntl_gbigint ain, _ntl_gbigint nin, _ntl_gbigint *invv)
 {
    static _ntl_gbigint u = 0;
@@ -2369,7 +2490,15 @@ long _ntl_ginv(_ntl_gbigint ain, _ntl_gbigint nin, _ntl_gbigint *invv)
    SIZE(u) = su;
 
    if (ONEP(d)) {
-      if (_ntl_gsign(u) < 0) _ntl_gadd(u, nin, &u);
+
+      /*
+       * We make sure that u is in range 0..n-1, just in case
+       * GMP is sloppy.
+       */
+
+      while (_ntl_gsign(u) < 0) _ntl_gadd(u, nin, &u);
+      while (_ntl_gcompare(u, nin) >= 0) _ntl_gsub(u, nin, &u);
+
       _ntl_gcopy(u, invv);
       return 0;
    }
@@ -2391,6 +2520,7 @@ _ntl_ginvmod(
 		ghalt("undefined inverse in _ntl_ginvmod");
 }
 
+
 void
 _ntl_gaddmod(
 	_ntl_gbigint a,
@@ -2410,7 +2540,8 @@ _ntl_gaddmod(
 		_ntl_gadd(a, b, &mem);
 		if (_ntl_gcompare(mem, n) >= 0)
 			_ntl_gsubpos(mem, n, c);
-		_ntl_gcopy(mem, c);
+		else
+			_ntl_gcopy(mem, c);
 	}
 }
 
@@ -2547,6 +2678,11 @@ long _ntl_ground_correction(_ntl_gbigint a, long k, long residual)
          /* round to even */
 
          wh = wh << 1;
+
+         /*
+          * DIRT: if GMP has non-empty "nails", this won't work.
+          */
+
          if (wh == 0) {
             wh = 1;
             bl++;
@@ -2593,18 +2729,7 @@ double _ntl_gdoub(_ntl_gbigint n)
 
    x = _ntl_gdoub_aux(tmp);
 
-   /* We could just write x = ldexp(x, shamt); however, if long's
-    * are bigger than int's, there is the possibility that shamt would be
-    * truncated.  We could check for this and raise an error, but
-    * it is preferable to do it this way to get +/- infinity, if
-    * possible. */
-
-   while (shamt > 1024) {
-      x = ldexp(x, 1024);
-      shamt -= 1024;
-   }
-
-   x = ldexp(x, shamt);
+   x = _ntl_ldexp(x, shamt);
 
    return x;
 }
@@ -2878,13 +3003,13 @@ _ntl_gxxratrecon(
             {
                ilo = (long)lo;
                dirt = hi - ilo;
-               if (dirt <= 0 || !ilo || ilo < (long)hi)
+               if (dirt < 1.0/NTL_FDOUBLE_PRECISION || !ilo || ilo < (long)hi)
                   fast = 0;
                else
                {
                   dt = lo-ilo;
                   lo = flo / dirt;
-                  if (dt > 0)
+                  if (dt > 1.0/NTL_FDOUBLE_PRECISION)
                      hi = fhi / dt;
                   else
                      hi = NTL_SP_BOUND;
@@ -3037,6 +3162,7 @@ _ntl_gxxratrecon(
    return 1;
 }
 
+
 void
 _ntl_gexp(
 	_ntl_gbigint a,
@@ -3150,8 +3276,12 @@ long OptWinSize(long n)
    return k;
 }
 
+
+
+/* DIRT: will not work with non-empty "nails" */
+
 static
-mp_limb_t inv_mod_limb(mp_limb_t m0)
+mp_limb_t neg_inv_mod_limb(mp_limb_t m0)
 {
    mp_limb_t x; 
    long k;
@@ -3163,8 +3293,10 @@ mp_limb_t inv_mod_limb(mp_limb_t m0)
       k <<= 1;
    }
 
-  return x;
+
+   return - x;
 }
+
 
 /* Montgomery reduction:
  * This computes res = T/b^m mod N, where b = 2^{NTL_ZZ_NBITS}.
@@ -3176,6 +3308,8 @@ mp_limb_t inv_mod_limb(mp_limb_t m0)
  * Note: res will have at most n limbs, but may not be fully reduced
  * mod N.  In general, we will have res < T/b^m + N.
  */
+
+/* DIRT: this routine may not work with non-empty "nails" */
 
 static
 void redc(_ntl_gbigint T, _ntl_gbigint N, long m, mp_limb_t inv, 
@@ -3289,7 +3423,7 @@ void _ntl_gpowermod(_ntl_gbigint g, _ntl_gbigint e, _ntl_gbigint F,
       _ntl_glshift(g, sF*NTL_ZZ_NBITS, &res);
       _ntl_gmod(res, F, &gg);
 
-      inv = - inv_mod_limb(DATA(F)[0]);
+      inv = neg_inv_mod_limb(DATA(F)[0]);
    }
    else
       _ntl_gcopy(g, &gg);
@@ -3386,7 +3520,7 @@ void _ntl_gpowermod(_ntl_gbigint g, _ntl_gbigint e, _ntl_gbigint F,
 
    if (k > 5) k = 5;
 
-   v = (_ntl_gbigint *) malloc((1L << (k-1))*sizeof(_ntl_gbigint));
+   v = (_ntl_gbigint *) NTL_MALLOC((1L << (k-1)), sizeof(_ntl_gbigint), 0);
    if (!v) ghalt("out of memory");
    for (i = 0; i < (1L << (k-1)); i++) {
       v[i] = 0; 
@@ -3544,6 +3678,8 @@ long _ntl_gcrtinrange(_ntl_gbigint g, _ntl_gbigint a)
 
 
 
+/* DIRT: this routine will not work with non-empty "nails" */
+
 void _ntl_gfrombytes(_ntl_gbigint *x, const unsigned char *p, long n)
 {
    long BytesPerLimb;
@@ -3573,7 +3709,7 @@ void _ntl_gfrombytes(_ntl_gbigint *x, const unsigned char *p, long n)
       t = 0;
       for (j = 0; j < BytesPerLimb; j++) {
          t >>= 8;
-         t += (((mp_limb_t)(*p)) & 255) << ((BytesPerLimb-1)*8);
+         t += (((mp_limb_t)(*p)) & ((mp_limb_t) 255)) << ((BytesPerLimb-1)*8);
          p++;
       }
       xp[i] = t;
@@ -3582,7 +3718,7 @@ void _ntl_gfrombytes(_ntl_gbigint *x, const unsigned char *p, long n)
    t = 0;
    for (j = 0; j < r; j++) {
       t >>= 8;
-      t += (((mp_limb_t)(*p)) & 255) << ((BytesPerLimb-1)*8);
+      t += (((mp_limb_t)(*p)) & ((mp_limb_t) 255)) << ((BytesPerLimb-1)*8);
       p++;
    }
 
@@ -3592,6 +3728,10 @@ void _ntl_gfrombytes(_ntl_gbigint *x, const unsigned char *p, long n)
    STRIP(lw, xp);
    SIZE(*x) = lw; 
 }
+
+
+
+/* DIRT: this routine will not work with non-empty "nails" */
 
 void _ntl_gbytesfromz(unsigned char *p, _ntl_gbigint a, long n)
 {
@@ -3626,7 +3766,7 @@ void _ntl_gbytesfromz(unsigned char *p, _ntl_gbigint a, long n)
    for (i = 0; i < min_words-1; i++) {
       t = ap[i];
       for (j = 0; j < BytesPerLimb; j++) {
-         *p = t & 255;
+         *p = t & ((mp_limb_t) 255);
          t >>= 8;
          p++;
       }
@@ -3635,7 +3775,7 @@ void _ntl_gbytesfromz(unsigned char *p, _ntl_gbigint a, long n)
    if (min_words > 0) {
       t = ap[min_words-1];
       for (j = 0; j < r; j++) {
-         *p = t & 255;
+         *p = t & ((mp_limb_t) 255);
          t >>= 8;
          p++;
       }
@@ -3647,21 +3787,47 @@ void _ntl_gbytesfromz(unsigned char *p, _ntl_gbigint a, long n)
    }
 }
 
-#define MaxAllocBlock (10000)
+
 
 
 long _ntl_gblock_construct_alloc(_ntl_gbigint *x, long d, long n)
 {
-   long d1, sz, sz1, AllocAmt, m, j, alloc;
+   long d1, sz, AllocAmt, m, j, alloc;
    char *p;
    _ntl_gbigint t;
 
+
+   /* check n value */
+
+   if (n <= 0)
+      ghalt("block construct: n must be positive");
+
+
+
+   /* check d value */
+
+   if (d <= 0)
+      ghalt("block construct: d must be positive");
+
+   if (NTL_OVERFLOW(d, NTL_ZZ_NBITS, NTL_ZZ_NBITS))
+      ghalt("block construct: d too large");
+
+#ifdef NTL_SMALL_MP_SIZE_T
+   /* this makes sure that numbers don't get too big for GMP */
+   if (d >= (1L << (NTL_BITS_PER_INT-4)))
+      ghalt("size too big for GMP");
+#endif
+
    d1 = d + 1;
+
+   if (STORAGE_OVF(d1))
+      ghalt("block construct: d too large");
+
+
+
    sz = STORAGE(d1);
 
-   sz1 = (sz + sizeof(long) - 1)/sizeof(long); 
-
-   AllocAmt = (MaxAllocBlock-1)/sz1;
+   AllocAmt = NTL_MAX_ALLOC_BLOCK/sz;
    if (AllocAmt == 0) AllocAmt = 1;
 
    if (AllocAmt < n)
@@ -3669,7 +3835,7 @@ long _ntl_gblock_construct_alloc(_ntl_gbigint *x, long d, long n)
    else
       m = n;
 
-   p = (char *) malloc(sz * m);
+   p = (char *) NTL_MALLOC(m, sz, 0);
    if (!p) ghalt("out of memory in _ntl_gblock_construct");
 
    *x = (_ntl_gbigint) p;
@@ -3739,27 +3905,33 @@ long _ntl_gblock_storage(long d)
 }
 
 
+/*
+ * This is a completely portable MulMod routine.
+ */
 
 #define SP_MUL_MOD(r, a, b, n)  \
 {  \
    long l__a = (a);  \
    long l__b = (b);  \
    long l__n = (n);  \
-   long l__q, l__res;  \
+   long l__q;  \
+   unsigned long l__res;  \
   \
    l__q  = (long) ((((double) l__a) * ((double) l__b)) / ((double) l__n));  \
-   l__res = l__a*l__b - l__q*l__n;  \
-   if (l__res >= l__n)  \
-      l__res -= l__n;  \
-   else if (l__res < 0)  \
+   l__res = ((unsigned long) l__a)*((unsigned long) l__b) - \
+            ((unsigned long) l__q)*((unsigned long) l__n);  \
+   if (l__res >> (NTL_BITS_PER_LONG-1))  \
       l__res += l__n;  \
+   else if (((long) l__res) >= l__n)  \
+      l__res -= l__n;  \
   \
-   r = l__res;  \
+   r = (long) l__res;  \
 }
 
 
 
-#if (NTL_ARITH_RIGHT_SHIFT && defined(NTL_AVOID_BRANCHING))
+
+#if (NTL_ARITH_RIGHT_SHIFT && defined(NTL_AVOID_BRANCHING) && !defined(NTL_CLEAN_INT))
 
 #define SP_MUL_MOD2(res, a, b, n, bninv) \
 do {  \
@@ -3781,28 +3953,35 @@ do {  \
 
 #else
 
+/*
+ * This is a completely portable MulMod routine.
+ */
+
 #define SP_MUL_MOD2(res, a, b, n, bninv) \
 do { \
    long _a = (a); \
    long _b = (b); \
    long _n = (n); \
    double _bninv = (bninv); \
-   long _q, _res; \
+   long _q;  \
+   unsigned long _res; \
  \
    _q  = (long) (((double) _a) * _bninv); \
-   _res = _a*_b - _q*_n; \
+   _res = ((unsigned long) _a)*((unsigned long) _b)  - \
+          ((unsigned long) _q)*((unsigned long) _n); \
  \
-   if (_res >= _n) \
-      _res -= _n; \
-   else if (_res < 0) \
-      _res += _n; \
+   if (_res >> (NTL_BITS_PER_LONG-1))  \
+      _res += _n;  \
+   else if (((long) _res) >= _n)  \
+      _res -= _n;  \
  \
-   res = _res; \
+   res = (long) _res; \
 } while (0)
 
 #endif
 
 
+static
 long SpecialPower(long e, long p)
 {
    long a;
@@ -3832,17 +4011,16 @@ void sp_ext_eucl(long *dd, long *ss, long *tt, long a, long b)
    long aneg = 0, bneg = 0;
 
    if (a < 0) {
+      if (a < -NTL_MAX_LONG) ghalt("integer overflow");
       a = -a;
       aneg = 1;
    }
 
    if (b < 0) {
+      if (b < -NTL_MAX_LONG) ghalt("integer overflow");
       b = -b;
       bneg = 1;
    }
-
-   if (a < 0 || b < 0)
-      ghalt("integer overflow");
 
    u1=1; v1=0;
    u2=0; v2=1;
@@ -3885,6 +4063,7 @@ long sp_inv_mod(long a, long n)
       return s;
 }
 
+/* ------ HERE ------ */
 
 
 
@@ -3927,7 +4106,7 @@ void _ntl_gcrt_struct_init(void **crt_struct, long n, _ntl_gbigint p,
 {
    struct crt_body *c;
 
-   c = (struct crt_body *) malloc(sizeof(struct crt_body));
+   c = (struct crt_body *) NTL_MALLOC(1, sizeof(struct crt_body), 0);
    if (!c) ghalt("out of memory");
 
    if (n >= 600) {
@@ -3948,13 +4127,13 @@ void _ntl_gcrt_struct_init(void **crt_struct, long n, _ntl_gbigint p,
       temps[0] = 0;
       temps[1] = 0;
    
-      q = (long *) malloc(n*sizeof(long));
+      q = (long *) NTL_MALLOC(n, sizeof(long), 0);
       if (!q) ghalt("out of memory");
 
-      val_vec = (long *) malloc(n*sizeof(long));
+      val_vec = (long *) NTL_MALLOC(n, sizeof(long), 0);
       if (!val_vec) ghalt("out of memory");
 
-      inv_vec = (long *) malloc(n*sizeof(long));
+      inv_vec = (long *) NTL_MALLOC(n, sizeof(long), 0);
       if (!inv_vec) ghalt("out of memory");
 
       for (i = 0; i < n; i++)
@@ -3965,16 +4144,16 @@ void _ntl_gcrt_struct_init(void **crt_struct, long n, _ntl_gbigint p,
 
       vec_len = (1L << levels) - 1;
 
-      index_vec = (long *) malloc((vec_len+1)*sizeof(long));
+      index_vec = (long *) NTL_MALLOC((vec_len+1), sizeof(long), 0);
       if (!index_vec) ghalt("out of memory");
 
-      prod_vec = (_ntl_gbigint *) malloc(vec_len*sizeof(_ntl_gbigint));
+      prod_vec = (_ntl_gbigint *) NTL_MALLOC(vec_len, sizeof(_ntl_gbigint), 0);
       if (!prod_vec) ghalt("out of memory");
 
-      rem_vec = (_ntl_gbigint *) malloc(vec_len*sizeof(_ntl_gbigint));
+      rem_vec = (_ntl_gbigint *) NTL_MALLOC(vec_len, sizeof(_ntl_gbigint), 0);
       if (!rem_vec) ghalt("out of memory");
 
-      coeff_vec = (_ntl_gbigint *) malloc(n*sizeof(_ntl_gbigint));
+      coeff_vec = (_ntl_gbigint *) NTL_MALLOC(n, sizeof(_ntl_gbigint), 0);
       if (!coeff_vec) ghalt("out of memory");
 
       for (i = 0; i < vec_len; i++)
@@ -4049,7 +4228,7 @@ void _ntl_gcrt_struct_init(void **crt_struct, long n, _ntl_gbigint p,
       c->strategy = 1;
 
       C->n = n;
-      C->v = (_ntl_gbigint *) malloc(n*sizeof(_ntl_gbigint));
+      C->v = (_ntl_gbigint *) NTL_MALLOC(n, sizeof(_ntl_gbigint), 0);
       if (!C->v) ghalt("out of memory");
 
       for (i = 0; i < n; i++)
@@ -4360,7 +4539,7 @@ void _ntl_grem_struct_init(void **rem_struct, long n, _ntl_gbigint modulus,
 {
    struct rem_body *r;
 
-   r = (struct rem_body *) malloc(sizeof(struct rem_body));
+   r = (struct rem_body *) NTL_MALLOC(1, sizeof(struct rem_body), 0);
    if (!r) ghalt("out of memory");
 
    if (n >= 32 && n <= 256) {
@@ -4375,7 +4554,7 @@ void _ntl_grem_struct_init(void **rem_struct, long n, _ntl_gbigint modulus,
       mp_limb_t *inv_vec;
       _ntl_gbigint *prod_vec, *rem_vec;
    
-      q = (long *) malloc(n*sizeof(long));
+      q = (long *) NTL_MALLOC(n, sizeof(long), 0);
       if (!q) ghalt("out of memory");
    
       for (i = 0; i < n; i++)
@@ -4386,25 +4565,25 @@ void _ntl_grem_struct_init(void **rem_struct, long n, _ntl_gbigint modulus,
 
       vec_len = (1L << levels) - 1;
 
-      index_vec = (long *) malloc((vec_len+1)*sizeof(long));
+      index_vec = (long *) NTL_MALLOC((vec_len+1), sizeof(long), 0);
       if (!index_vec) ghalt("out of memory");
 
-      len_vec = (long *) malloc(vec_len*sizeof(long));
+      len_vec = (long *) NTL_MALLOC(vec_len, sizeof(long), 0);
       if (!len_vec) ghalt("out of memory");
 
-      inv_vec = (mp_limb_t *) malloc(vec_len*sizeof(mp_limb_t));
+      inv_vec = (mp_limb_t *) NTL_MALLOC(vec_len, sizeof(mp_limb_t), 0);
       if (!inv_vec) ghalt("out of memory");
 
-      corr_vec = (long *) malloc(n*sizeof(long));
+      corr_vec = (long *) NTL_MALLOC(n, sizeof(long), 0);
       if (!corr_vec) ghalt("out of memory");
 
-      corraux_vec = (double *) malloc(n*sizeof(double));
+      corraux_vec = (double *) NTL_MALLOC(n, sizeof(double), 0);
       if (!corraux_vec) ghalt("out of memory");
 
-      prod_vec = (_ntl_gbigint *) malloc(vec_len*sizeof(_ntl_gbigint));
+      prod_vec = (_ntl_gbigint *) NTL_MALLOC(vec_len, sizeof(_ntl_gbigint), 0);
       if (!prod_vec) ghalt("out of memory");
 
-      rem_vec = (_ntl_gbigint *) malloc(vec_len*sizeof(_ntl_gbigint));
+      rem_vec = (_ntl_gbigint *) NTL_MALLOC(vec_len, sizeof(_ntl_gbigint), 0);
       if (!rem_vec) ghalt("out of memory");
 
       for (i = 0; i < vec_len; i++)
@@ -4455,7 +4634,7 @@ void _ntl_grem_struct_init(void **rem_struct, long n, _ntl_gbigint modulus,
       len_vec[1] = len_vec[2] = j;
 
       for (i = 3; i < vec_len; i++)
-         inv_vec[i] = - inv_mod_limb(DATA(prod_vec[i])[0]);
+         inv_vec[i] = neg_inv_mod_limb(DATA(prod_vec[i])[0]);
 
 
       for (i = (1L << (levels-1)) - 1; i < vec_len; i++) {
@@ -4499,7 +4678,7 @@ void _ntl_grem_struct_init(void **rem_struct, long n, _ntl_gbigint modulus,
       long *index_vec;
       _ntl_gbigint *prod_vec, *rem_vec;
    
-      q = (long *) malloc(n*sizeof(long));
+      q = (long *) NTL_MALLOC(n, sizeof(long), 0);
       if (!q) ghalt("out of memory");
    
       for (i = 0; i < n; i++)
@@ -4510,13 +4689,13 @@ void _ntl_grem_struct_init(void **rem_struct, long n, _ntl_gbigint modulus,
 
       vec_len = (1L << levels) - 1;
 
-      index_vec = (long *) malloc((vec_len+1)*sizeof(long));
+      index_vec = (long *) NTL_MALLOC((vec_len+1), sizeof(long), 0);
       if (!index_vec) ghalt("out of memory");
 
-      prod_vec = (_ntl_gbigint *) malloc(vec_len*sizeof(_ntl_gbigint));
+      prod_vec = (_ntl_gbigint *) NTL_MALLOC(vec_len, sizeof(_ntl_gbigint), 0);
       if (!prod_vec) ghalt("out of memory");
 
-      rem_vec = (_ntl_gbigint *) malloc(vec_len*sizeof(_ntl_gbigint));
+      rem_vec = (_ntl_gbigint *) NTL_MALLOC(vec_len, sizeof(_ntl_gbigint), 0);
       if (!rem_vec) ghalt("out of memory");
 
       for (i = 0; i < vec_len; i++)
@@ -4581,7 +4760,7 @@ void _ntl_grem_struct_init(void **rem_struct, long n, _ntl_gbigint modulus,
 
       r->strategy = 0;
       R->n = n;
-      q = (long *) malloc(n*sizeof(long));
+      q = (long *) NTL_MALLOC(n, sizeof(long), 0);
       if (!q) ghalt("out of memory");
       R->primes = q;
   

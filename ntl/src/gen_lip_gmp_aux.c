@@ -1,6 +1,7 @@
 
 
 #include <stdlib.h>
+#include <math.h>
 #include <stdio.h>
 
 #include <NTL/config.h>
@@ -237,7 +238,7 @@ void gmp_to_lip(int A, int B, int alt)
    else
       printf("void gmp_to_lip1(long *x, const mp_limb_t *y, long n)\n");
    printf("{\n");
-   printf("   long r, q, xx;\n");
+   printf("   long r, q; unsigned long xx;\n");
    printf("   mp_limb_t yy;\n\n");
 
    if (na2 != -1) {
@@ -303,19 +304,19 @@ void gmp_to_lip(int A, int B, int alt)
 
       if (shamt > 0) {
          printf("         ");
-         printf("xx = ((long)(yy)) << %d;\n", shamt);
+         printf("xx = ((unsigned long)(yy)) << %d;\n", shamt);
          printf("         ");
-         printf("x[%d] = (xx | ((long)((yy = y[%d]) >> %d))) & NTL_RADIXM;\n", 
+         printf("x[%d] = (xx | ((unsigned long)((yy = y[%d]) >> %d))) & NTL_RADIXM;\n", 
                 na-1-i, nb-2-j, 2*B-r-A);
       }
       else if (shamt == 0) {
          printf("         ");
-         printf("x[0] = ((long)(yy)) & NTL_RADIXM;\n");
+         printf("x[0] = ((unsigned long)(yy)) & NTL_RADIXM;\n");
          break;
       }
       else {
          printf("         ");
-         printf("x[%d] = ((long)(yy >> %d)) & NTL_RADIXM;\n", na-1-i, -shamt);
+         printf("x[%d] = ((unsigned long)(yy >> %d)) & NTL_RADIXM;\n", na-1-i, -shamt);
       }
    }
 
@@ -339,19 +340,19 @@ void gmp_to_lip(int A, int B, int alt)
 
       if (shamt > 0) {
          printf("      ");
-         printf("xx = ((long)(yy)) << %d;\n", shamt);
+         printf("xx = ((unsigned long)(yy)) << %d;\n", shamt);
          printf("      ");
-         printf("x[%d] = (xx | ((long)((yy = y[%d]) >> %d))) & NTL_RADIXM;\n", 
+         printf("x[%d] = (xx | ((unsigned long)((yy = y[%d]) >> %d))) & NTL_RADIXM;\n", 
                 na-1-i, nb-2-j, 2*B-r-A);
       }
       else if (shamt == 0) {
          printf("      ");
-         printf("x[0] = ((long)(yy)) & NTL_RADIXM;\n");
+         printf("x[0] = ((unsigned long)(yy)) & NTL_RADIXM;\n");
          break;
       }
       else {
          printf("      ");
-         printf("x[%d] = ((long)(yy >> %d)) & NTL_RADIXM;\n", na-1-i, -shamt);
+         printf("x[%d] = ((unsigned long)(yy >> %d)) & NTL_RADIXM;\n", na-1-i, -shamt);
       }
    }
 
@@ -439,16 +440,46 @@ int main()
 
    A = NTL_NBITS_MAX;
 
-   if (sizeof(mp_limb_t) == sizeof(int))
-      B = NTL_BITS_PER_INT;
-   else if (sizeof(mp_limb_t) == sizeof(long))
+   /*
+    * We compute B as the number of bits of a gmp limb.
+    * We require that this quantity correspond to the number of bits
+    * of a long, or possibly a "long long" that is twice as
+    * wide as a long.  These restrictions may not be entirely 
+    * necessary, but they are satisfied on all platforms that I know of.
+    */
+
+   if (sizeof(mp_limb_t)==sizeof(long) &&
+            mp_bits_per_limb == NTL_BITS_PER_LONG)
+
       B = NTL_BITS_PER_LONG;
-   else if (sizeof(mp_limb_t) == 2*sizeof(long))
+
+   else if (sizeof(mp_limb_t) == 2*sizeof(long) &&
+            mp_bits_per_limb == 2*NTL_BITS_PER_LONG)
+
       B = 2*NTL_BITS_PER_LONG;
+
    else
       Error("sorry...this is a funny gmp");
 
+   /*
+    * The following test is a bit redundant, but it doesn't hurt.
+    */
+
    if (A >= B) Error("sorry...this is a funny gmp");
+
+
+
+   /*
+    * Next, we check if either the _mp_size field of an mpz struct
+    * or the type mp_size_t is narrower than type "long".
+    * This is done to enable some overflow checks.
+    * For simplicity, we require that the sizeof
+    * these types is that of an int or a long, and we also make
+    * the somewhat DIRTY assumption that this sizeof value implies
+    * a corresponding bit count.  Since this assumption is true
+    * on all platforms that I know of, and since this assumption
+    * only affects some overflow tests, it seems reasonable.
+    */
 
    if (sizeof(tt->_mp_size) == sizeof(int))
       BPI = NTL_BITS_PER_INT;

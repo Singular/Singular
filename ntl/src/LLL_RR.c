@@ -5,6 +5,8 @@
 
 #include <NTL/new.h>
 
+#include <stdio.h>
+
 NTL_START_IMPL
 
 
@@ -191,14 +193,6 @@ static double LastTime = 0;
 
 
 
-static void LLLStatus(long max_k, double t, long m, const mat_ZZ& B)
-{
-   LastTime = t;
-   
-}
-
-
-
 static
 long ll_LLL_RR(mat_ZZ& B, mat_ZZ* U, const RR& delta, long deep, 
            LLLCheckFct check, mat_RR& B1, mat_RR& mu, 
@@ -261,14 +255,6 @@ long ll_LLL_RR(mat_ZZ& B, mat_ZZ* U, const RR& delta, long deep,
          max_k = k;
       }
 
-      if (verbose) {
-         tt = GetTime();
-
-         if (tt > LastTime + LLLStatusInterval)
-            LLLStatus(max_k, tt, m, B);
-      }
-
-
       if (st[k] == k)
          rst = 1;
       else
@@ -288,6 +274,7 @@ long ll_LLL_RR(mat_ZZ& B, mat_ZZ* U, const RR& delta, long deep,
 
          counter++;
          if (counter > 10000) {
+            printf( "LLL_XD: warning--possible infinite loop\n");
             counter = 0;
          }
 
@@ -439,11 +426,6 @@ long ll_LLL_RR(mat_ZZ& B, mat_ZZ* U, const RR& delta, long deep,
          }
       }
    }
-
-   if (verbose) {
-      LLLStatus(m+1, GetTime(), m, B);
-   }
-
 
    return m;
 }
@@ -627,19 +609,6 @@ void ComputeBKZThresh(RR *c, long beta)
 
 
 
-static 
-void BKZStatus(double tt, double enum_time, long NumIterations, 
-               long NumTrivial, long NumNonTrivial, long NumNoOps, long m, 
-               const mat_ZZ& B)
-{
-
-   LastTime = tt;
-   
-}
-
-
-
-
 static
 long BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta, 
          long beta, long prune, LLLCheckFct check)
@@ -733,10 +702,10 @@ long BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta,
    double tt;
 
    double enum_time = 0;
-   long NumIterations = 0;
-   long NumTrivial = 0;
-   long NumNonTrivial = 0;
-   long NumNoOps = 0;
+   unsigned long NumIterations = 0;
+   unsigned long NumTrivial = 0;
+   unsigned long NumNonTrivial = 0;
+   unsigned long NumNoOps = 0;
 
    long verb = verbose;
 
@@ -775,13 +744,6 @@ long BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta,
             clean = 1;
          }
 
-         if (verb) {
-            tt = GetTime();
-            if (tt > LastTime + LLLStatusInterval)
-               BKZStatus(tt, enum_time, NumIterations, NumTrivial,
-                         NumNonTrivial, NumNoOps, m, B);
-         }
-
          // ENUM
 
          double tt1;
@@ -818,20 +780,6 @@ long BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta,
          long enum_cnt = 0;
    
          while (t <= kk) {
-            if (verb) {
-               enum_cnt++;
-               if (enum_cnt > 100000) {
-                  enum_cnt = 0;
-                  tt = GetTime();
-                  if (tt > LastTime + LLLStatusInterval) {
-                     enum_time += tt - tt1;
-                     tt1 = tt;
-                     BKZStatus(tt, enum_time, NumIterations, NumTrivial,
-                               NumNonTrivial, NumNoOps, m, B);
-                  }
-               }
-            }
-
 
             add(t1, yvec(t), utildavec(t));
             sqr(t1, t1);
@@ -1034,12 +982,6 @@ long BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta,
          }
       }
    }
-
-   if (verb) {
-      BKZStatus(GetTime(), enum_time, NumIterations, NumTrivial, NumNonTrivial,
-                NumNoOps, m, B);
-   }
-
 
    // clean up
 

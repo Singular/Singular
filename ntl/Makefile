@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.1 2002-11-08 13:43:28 Singular Exp $
+# $Id: Makefile,v 1.2 2003-11-03 17:31:19 Singular Exp $
 #################################################
 SHELL		= /bin/sh
 

@@ -21,6 +21,7 @@ inline pair_S_T cons(const S& l__x, const T& l__y) { return pair_S_T(l__x, l__y)
 
 
 
+
 #define NTL_pair_eq_decl(S,T,pair_S_T)  \
 inline long operator==(const pair_S_T& l__x, const pair_S_T& l__y)  \
    { return l__x.a == l__y.a && l__x.b == l__y.b; }  \

@@ -390,7 +390,7 @@ void MultiLift(vec_ZZX& A, const vec_zz_pX& a, const ZZX& f, long e,
    long k = a.length();
    long i;
 
-   if (k < 2 || e < 1) Error("MultiLift: bad args");
+   if (k < 2 || e < 1 || NTL_OVERFLOW(e, 1, 0)) Error("MultiLift: bad args");
 
    if (!IsOne(LeadCoeff(f)))
       Error("MultiLift: bad args");
@@ -422,9 +422,7 @@ void MultiLift(vec_ZZX& A, const vec_zz_pX& a, const ZZX& f, long e,
    BuildTree(link, v, w, a);
 
    for (i = l-1; i > 0; i--) {
-      
       TreeLift(link, v, w, E[i], E[i-1], f, i != 1);
-
    }
 
    A.SetLength(k);
@@ -608,6 +606,10 @@ SmallPrimeFactorization(LocalInfoT& LocalInfo, const ZZX& f,
          continue;
       }
 
+
+      if (verbose) {
+         t = GetTime();
+      }
 
       vec_pair_zz_pX_long thisfac;
       zz_pX thish; 
@@ -1086,9 +1088,9 @@ void CardinalitySearch(vec_ZZX& factors, ZZX& f,
    }
 
 
-   done: 
+   done:  ;
 
-       ;
+
 }
 
 
@@ -1355,11 +1357,6 @@ ZZ choose_fn(long r, long k)
 }
 
 static
-void PrintInfo(const char *s, const ZZ& a, const ZZ& b)
-{
-}
-
-static
 void RemoveFactors1(vec_long& W, const vec_long& I, long r)
 {
    long k = I.length();
@@ -1396,7 +1393,8 @@ void RemoveFactors1(vec_vec_long& W, const vec_long& I, long r)
 // should this swap go in tools.h?
 // Maybe not...I don't want to pollute the interface too much more.
 
-inline void swap(unsigned long& a, unsigned long& b)  
+static inline 
+void swap(unsigned long& a, unsigned long& b)  
    { unsigned long t;  t = a; a = b; b = t; }
 
 static
@@ -2621,6 +2619,8 @@ long GotThem(vec_ZZX& factors,
       append(fac, g);
    }
 
+
+
    // finally...trial division
 
    ZZX f1 = f;
@@ -2635,6 +2635,7 @@ long GotThem(vec_ZZX& factors,
    }
 
    // got them!
+
 
    append(factors, fac);
    append(factors, f1);
@@ -3267,7 +3268,6 @@ void ll_SFFactor(vec_ZZX& factors, const ZZX& ff,
 
    MultiLift(w, *spfactors, f1, e, verbose);
 
-
    // We're done with zz_p...restore
 
    delete spfactors;
@@ -3394,6 +3394,7 @@ void SFFactor(vec_ZZX& factors, const ZZX& ff,
    long m = DeflationFactor(ff);
 
    if (m == 1) {
+
       ok_to_abandon = 0;
       ll_SFFactor(factors, ff, verbose, bnd);
       return;
@@ -3487,6 +3488,7 @@ void factor(ZZ& c,
    long i, j;
 
    for (i = 0; i < sfd.length(); i++) {
+
       SFFactor(x, sfd[i].a, verbose, bnd);
 
       for (j = 0; j < x.length(); j++)

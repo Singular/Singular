@@ -101,10 +101,11 @@ void CopyPointer(GF2EInfoPtr& dst, GF2EInfoPtr src)
    }
 
    if (src) {
+      if (src->ref_count == NTL_MAX_LONG) 
+         Error("internal error: GF2EContext ref_count overflow");
+
       src->ref_count++;
 
-      if (src->ref_count < 0) 
-         Error("internal error: GF2EContext ref_count overflow");
    }
 
    dst = src;

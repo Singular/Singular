@@ -130,7 +130,7 @@ RR operator*(const vec_RR& a, const vec_RR& b)
 void VectorCopy(vec_RR& x, const vec_RR& a, long n)
 {
    if (n < 0) Error("VectorCopy: negative length");
-   if (n >= (1L << (NTL_BITS_PER_LONG-4))) Error("overflow in VectorCopy");
+   if (NTL_OVERFLOW(n, 1, 0)) Error("overflow in VectorCopy");
 
    long m = min(n, a.length());
 

@@ -88,6 +88,18 @@ int main()
    cout << "s/<NTL_NO_INIT_TRANS>/0/\n";
 #endif
 
+#ifdef NTL_CLEAN_INT
+   cout << "s/<NTL_CLEAN_INT>/1/\n";
+#else
+   cout << "s/<NTL_CLEAN_INT>/0/\n";
+#endif
+
+#ifdef NTL_CLEAN_PTR
+   cout << "s/<NTL_CLEAN_PTR>/1/\n";
+#else
+   cout << "s/<NTL_CLEAN_PTR>/0/\n";
+#endif
+
 #ifdef NTL_RANGE_CHECK
    cout << "s/<NTL_RANGE_CHECK>/1/\n";
 #else

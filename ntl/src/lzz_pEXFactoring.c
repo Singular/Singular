@@ -368,7 +368,6 @@ long zz_pEX_BlockingFactor = 10;
 void RootEDF(vec_zz_pEX& factors, const zz_pEX& f, long verbose)
 {
    vec_zz_pE roots;
-   double t;
 
    FindRoots(roots, f);
 
@@ -445,9 +444,6 @@ void EDF(vec_zz_pEX& factors, const zz_pEX& ff, const zz_pEX& bb,
       RootEDF(factors, f, verbose);
       return;
    }
-
-   
-   double t;
 
    factors.SetLength(0);
 
@@ -902,11 +898,11 @@ void MulByXPlusY(vec_zz_pEX& h, const zz_pEX& f, const zz_pEX& g)
          mul(t, b, g.rep[i]);
          MulByXMod(h[i], h[i], f);
          add(h[i], h[i], h[i-1]);
-         add(h[i], h[i], t);
+         sub(h[i], h[i], t);
       }
       mul(t, b, g.rep[0]);
       MulByXMod(h[0], h[0], f);
-      add(h[0], h[0], t);
+      sub(h[0], h[0], t);
    }
 
    // normalize
@@ -984,7 +980,7 @@ void BuildIrred(zz_pEX& f, long n)
    if (n <= 0)
       Error("BuildIrred: n must be positive");
 
-   if (n >= (1L << (NTL_BITS_PER_LONG-4))) Error("overflow in BuildIrred");
+   if (NTL_OVERFLOW(n, 1, 0)) Error("overflow in BuildIrred");
 
    if (n == 1) {
       SetX(f);
@@ -1073,9 +1069,6 @@ void GenerateBabySteps(zz_pEX& h1, const zz_pEX& f, const zz_pEX& h, long k,
                        long verbose)
 
 {
-   double t;
-
-
    zz_pEXModulus F;
    build(F, f);
 
@@ -1097,27 +1090,20 @@ void GenerateBabySteps(zz_pEX& h1, const zz_pEX& f, const zz_pEX& h, long k,
 
    long i;
 
-   if (!use_files) {
-      BabyStepFile.kill();
-      BabyStepFile.SetLength(k-1);
-   }
+   BabyStepFile.kill();
+   BabyStepFile.SetLength(k-1);
 
    for (i = 1; i <= k-1; i++) {
-         BabyStepFile(i) = h1;
+      BabyStepFile(i) = h1;
 
       CompMod(h1, h1, H, F);
    }
-
-
 }
 
 
 static
 void GenerateGiantSteps(const zz_pEX& f, const zz_pEX& h, long l, long verbose)
 {
-
-   double t;
-
 
    zz_pEXModulus F;
    build(F, f);
@@ -1141,37 +1127,24 @@ void GenerateGiantSteps(const zz_pEX& f, const zz_pEX& h, long l, long verbose)
 
    long i;
 
-   if (!use_files) {
-      GiantStepFile.kill();
-      GiantStepFile.SetLength(l);
-   }
+   GiantStepFile.kill();
+   GiantStepFile.SetLength(l);
 
    for (i = 1; i <= l-1; i++) {
-        GiantStepFile(i) = h1;
+      GiantStepFile(i) = h1;
 
       CompMod(h1, h1, H, F);
    }
 
-      GiantStepFile(i) = h1;
+   GiantStepFile(i) = h1;
 
 }
 
 static
 void FileCleanup(long k, long l)
 {
-   if (use_files) {
-      long i;
-   
-      for (i = 1; i <= k-1; i++)
-         remove(FileName(zz_pEX_stem, "baby", i));
-   
-      for (i = 1; i <= l; i++)
-         remove(FileName(zz_pEX_stem, "giant", i));
-   }
-   else {
       BabyStepFile.kill();
       GiantStepFile.kill();
-   }
 }
 
 
@@ -1240,8 +1213,7 @@ void NewProcessTable(vec_pair_zz_pEX_long& u, zz_pEX& f, const zz_pEXModulus& F,
 static
 void FetchGiantStep(zz_pEX& g, long gs, const zz_pEXModulus& F)
 {
-      g = GiantStepFile(gs);
-
+   g = GiantStepFile(gs);
 
    rem(g, g, F);
 }
@@ -1267,8 +1239,6 @@ void GiantRefine(vec_pair_zz_pEX_long& u, const zz_pEX& ff, long k, long l,
                  long verbose)
 
 {
-   double t;
-
    u.SetLength(0);
 
    vec_zz_pEX BabyStep;
@@ -1397,8 +1367,6 @@ void BabyRefine(vec_pair_zz_pEX_long& factors, const vec_pair_zz_pEX_long& u,
                 long k, long l, long verbose)
 
 {
-   double t;
-
    factors.SetLength(0);
 
    vec_zz_pEX BabyStep;
@@ -1416,7 +1384,6 @@ void BabyRefine(vec_pair_zz_pEX_long& factors, const vec_pair_zz_pEX_long& u,
          IntervalRefine(factors, g, k, gs, BabyStep, verbose);
       }
    }
-
 }
 
       

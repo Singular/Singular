@@ -2,11 +2,23 @@
 #ifndef NTL_tools__H
 #define NTL_tools__H
 
-#include <NTL/config.h>
-#include <NTL/mach_desc.h>
+#include <NTL/ctools.h>
+
+#if (defined(NTL_STD_CXX) || defined(NTL_PSTD_NHF))
+
+// new header files
+
+#include <cstdlib>
+#include <cmath>
+
+#else
+
+// old header files
 
 #include <stdlib.h>
 #include <math.h>
+
+#endif
 
 #if (defined(NTL_STD_CXX) || defined(NTL_PSTD_NHF))
 
@@ -67,7 +79,13 @@
 
 
 #if 0
+
+// This is for debugging purposes only.
+
 namespace foo_bar {
+
+class ostream;
+class istream;
 
 typedef unsigned int size_t;
 
@@ -78,7 +96,6 @@ float floor(float);
 #endif
 
 
-#include <NTL/IsFinite.h>
 
 #if (!defined(NTL_CXX_ONLY)) 
 extern "C"
@@ -145,15 +162,31 @@ inline long max(long a, int b) { return (a < b) ? long(b) : a; }
 inline void swap(long& a, long& b)  {  long t;  t = a; a = b; b = t; }
 inline void swap(int& a, int& b)  {  int t;  t = a; a = b; b = t; }
 
+
+
 inline void conv(int& x, int a) { x = a; }
-inline void conv(int& x, long a) { x = int(a); }
+inline void conv(int& x, long a) 
+   { unsigned y = (unsigned) a;  x = NTL_UINT_TO_INT(y); }
 inline void conv(int& x, float a) { x = int(NTL_SNS floor(double(a))); }
 inline void conv(int& x, double a) { x = int(NTL_SNS floor(a)); }
 
+inline void conv(int& x, unsigned a) 
+   { x = NTL_UINT_TO_INT(a); }
+
+inline void conv(int& x, unsigned long a)
+   { unsigned y = (unsigned) a;  x = NTL_UINT_TO_INT(y); }
+
 inline int to_int(int a) { return a; }
-inline int to_int(long a) { return int(a); }
+inline int to_int(long a) 
+   { unsigned y = (unsigned) a;  return NTL_UINT_TO_INT(y); }
 inline int to_int(float a) { return int(NTL_SNS floor(double(a))); }
 inline int to_int(double a) { return int(NTL_SNS floor(a)); }
+
+inline int to_int(unsigned a) 
+   { return NTL_UINT_TO_INT(a); }
+
+inline int to_int(unsigned long a) 
+   { unsigned y = (unsigned) a;  return NTL_UINT_TO_INT(y); }
 
 
 inline void conv(long& x, int a) { x = a; }
@@ -161,30 +194,58 @@ inline void conv(long& x, long a) { x = a; }
 inline void conv(long& x, float a) { x = long(NTL_SNS floor(double(a))); }
 inline void conv(long& x, double a) { x = long(NTL_SNS floor(a)); }
 
+inline void conv(long& x, unsigned a)
+   { unsigned long y = a;  x = NTL_ULONG_TO_LONG(y); }
+
+inline void conv(long& x, unsigned long a)
+   { x = NTL_ULONG_TO_LONG(a); }
+
 inline long to_long(int a) { return a; }
 inline long to_long(long a) { return a; }
 inline long to_long(float a) { return long(NTL_SNS floor(double(a))); }
 inline long to_long(double a) { return long(NTL_SNS floor(a)); }
 
+inline long to_long(unsigned a)
+   { unsigned long y = a;  return NTL_ULONG_TO_LONG(y); }
+
+inline long to_long(unsigned long a)
+   { return NTL_ULONG_TO_LONG(a); }
+
 inline void conv(float& x, int a) { x = float(a); }
 inline void conv(float& x, long a) { x = float(a); }
+inline void conv(float& x, unsigned a) { x = float(a); }
+inline void conv(float& x, unsigned long a) { x = float(a); }
 inline void conv(float& x, float a) { x = a; }
 inline void conv(float& x, double a) { x = float(a); }
 
 inline float to_float(int a) { return float(a); }
 inline float to_float(long a) { return float(a); }
+inline float to_float(unsigned a) { return float(a); }
+inline float to_float(unsigned long a) { return float(a); }
 inline float to_float(float a) { return a; }
 inline float to_float(double a) { return float(a); }
 
 inline void conv(double& x, int a) { x = double(a); }
 inline void conv(double& x, long a) { x = double(a); }
+inline void conv(double& x, unsigned a) { x = double(a); }
+inline void conv(double& x, unsigned long a) { x = double(a); }
 inline void conv(double& x, float a) { x = double(a); }
 inline void conv(double& x, double a) { x = a; }
 
 inline double to_double(int a) { return double(a); }
 inline double to_double(long a) { return double(a); }
+inline double to_double(unsigned a) { return double(a); }
+inline double to_double(unsigned long a) { return double(a); }
 inline double to_double(float a) { return double(a); }
 inline double to_double(double a) { return a; }
+
+
+long IsWhiteSpace(long c);
+
+long CharToIntVal(long c);
+char IntValToChar(long a);
+
+
 
 void Error(const char *s);
 
@@ -193,6 +254,8 @@ inline double GetTime() { return _ntl_GetTime(); }
 
 inline long IsFinite(double *p) { return _ntl_IsFinite(p); }
 inline void ForceToMem(double *p) { _ntl_ForceToMem(p); }
+
+
 
 
 NTL_CLOSE_NNS

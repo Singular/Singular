@@ -22,6 +22,9 @@ GF2& operator=(const GF2& a) { _GF2__rep = a._GF2__rep; return *this; }
 
 GF2& operator=(long a) { _GF2__rep = a & 1; return *this; }
 
+static long modulus() { return 2; }
+static GF2 zero() { return GF2(); }
+
 };
 
 inline void conv(GF2& x, long a) { x._GF2__rep = a & 1; }
@@ -34,8 +37,6 @@ inline GF2 to_GF2(const ZZ& a)
 
 inline long rep(GF2 a) { return a._GF2__rep; }
 
-static long modulus() { return 2; }
-static GF2 zero() { return GF2(); }
 
 inline void clear(GF2& x) { x._GF2__rep = 0; }
 inline void set(GF2& x) { x._GF2__rep = 1; }

@@ -75,13 +75,6 @@ GF2EX(GF2EX& x, INIT_TRANS_TYPE) : rep(x.rep, INIT_TRANS) { }
 
 
 
-/********************************************************************
-
-                           input and output
-
-*********************************************************************/
-
-
 /**********************************************************
 
                    Some utility routines
@@ -697,6 +690,7 @@ inline GF2EX& operator/=(GF2EX& x, const GF2EXModulus& F)
 NTL_vector_decl(GF2EX,vec_GF2EX)
 
 NTL_eq_vector_decl(GF2EX,vec_GF2EX)
+
 
 
 

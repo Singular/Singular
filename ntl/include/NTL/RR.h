@@ -232,6 +232,110 @@ inline RR RoundToPrecision(const RR& a, long p)
    { RR z; RoundToPrecision(z, a, p); NTL_OPT_RETURN(RR, z); }
 
 
+// routines with a precision parameter
+
+void ConvPrec(RR& z, const RR& a, long p);
+inline RR ConvPrec(const RR& a, long p)
+   { RR z; ConvPrec(z, a, p); NTL_OPT_RETURN(RR, z); }
+
+void AddPrec(RR& z, const RR& a, const RR& b, long p);
+inline RR AddPrec(const RR& a, const RR& b, long p)
+   { RR z; AddPrec(z, a, b, p); NTL_OPT_RETURN(RR, z); }
+
+void SubPrec(RR& z, const RR& a, const RR& b, long p);
+inline RR SubPrec(const RR& a, const RR& b, long p)
+   { RR z; SubPrec(z, a, b, p); NTL_OPT_RETURN(RR, z); }
+
+void NegatePrec(RR& z, const RR& a, long p);
+inline RR NegatePrec(const RR& a, long p)
+   { RR z; NegatePrec(z, a, p); NTL_OPT_RETURN(RR, z); }
+
+void AbsPrec(RR& z, const RR& a, long p);
+inline RR AbsPrec(const RR& a, long p)
+   { RR z; AbsPrec(z, a, p); NTL_OPT_RETURN(RR, z); }
+
+void MulPrec(RR& z, const RR& a, const RR& b, long p);
+inline RR MulPrec(const RR& a, const RR& b, long p)
+   { RR z; MulPrec(z, a, b, p); NTL_OPT_RETURN(RR, z); }
+
+void SqrPrec(RR& z, const RR& a, long p);
+inline RR SqrPrec(const RR& a, long p)
+   { RR z; SqrPrec(z, a, p); NTL_OPT_RETURN(RR, z); }
+
+void DivPrec(RR& z, const RR& a, const RR& b, long p);
+inline RR DivPrec(const RR& a, const RR& b, long p)
+   { RR z; DivPrec(z, a, b, p); NTL_OPT_RETURN(RR, z); }
+
+void InvPrec(RR& z, const RR& a, long p);
+inline RR InvPrec(const RR& a, long p)
+   { RR z; InvPrec(z, a, p); NTL_OPT_RETURN(RR, z); }
+
+void SqrRootPrec(RR& z, const RR& a, long p);
+inline RR SqrRootPrec(const RR& a, long p)
+   { RR z; SqrRootPrec(z, a, p); NTL_OPT_RETURN(RR, z); }
+
+void TruncPrec(RR& z, const RR& a, long p);
+inline RR TruncPrec(const RR& a, long p)
+   { RR z; TruncPrec(z, a, p); NTL_OPT_RETURN(RR, z); }
+
+void FloorPrec(RR& z, const RR& a, long p);
+inline RR FloorPrec(const RR& a, long p)
+   { RR z; FloorPrec(z, a, p); NTL_OPT_RETURN(RR, z); }
+
+void CeilPrec(RR& z, const RR& a, long p);
+inline RR CeilPrec(const RR& a, long p)
+   { RR z; CeilPrec(z, a, p); NTL_OPT_RETURN(RR, z); }
+
+void RoundPrec(RR& z, const RR& a, long p);
+inline RR RoundPrec(const RR& a, long p)
+   { RR z; RoundPrec(z, a, p); NTL_OPT_RETURN(RR, z); }
+
+void ConvPrec(RR& z, const ZZ& a, long p);
+inline RR ConvPrec(const ZZ& a, long p)
+   { RR z; ConvPrec(z, a, p); NTL_OPT_RETURN(RR, z); }
+
+void ConvPrec(RR& z, long a, long p);
+inline RR ConvPrec(long a, long p)
+   { RR z; ConvPrec(z, a, p); NTL_OPT_RETURN(RR, z); }
+
+inline void ConvPrec(RR& z, int a, long p) { ConvPrec(z, long(a), p); }
+inline RR ConvPrec(int a, long p)
+   { RR z; ConvPrec(z, a, p); NTL_OPT_RETURN(RR, z); }
+
+void ConvPrec(RR& z, unsigned long a, long p);
+inline RR ConvPrec(unsigned long a, long p)
+   { RR z; ConvPrec(z, a, p); NTL_OPT_RETURN(RR, z); }
+
+inline void ConvPrec(RR& z, unsigned int a, long p) 
+   { ConvPrec(z, (unsigned long)(a), p); }
+inline RR ConvPrec(unsigned int a, long p)
+   { RR z; ConvPrec(z, a, p); NTL_OPT_RETURN(RR, z); }
+
+void ConvPrec(RR& z, double a, long p);
+inline RR ConvPrec(double a, long p)
+   { RR z; ConvPrec(z, a, p); NTL_OPT_RETURN(RR, z); }
+
+void ConvPrec(RR& z, const xdouble& a, long p);
+inline RR ConvPrec(const xdouble& a, long p)
+   { RR z; ConvPrec(z, a, p); NTL_OPT_RETURN(RR, z); }
+
+void ConvPrec(RR& z, const quad_float& a, long p);
+inline RR ConvPrec(const quad_float& a, long p)
+   { RR z; ConvPrec(z, a, p); NTL_OPT_RETURN(RR, z); }
+
+void ConvPrec(RR& z, const char *s, long p);
+inline RR ConvPrec(const char *s, long p)
+   { RR z; ConvPrec(z, s, p); NTL_OPT_RETURN(RR, z); }
+
+void MakeRRPrec(RR& z, const ZZ& a, long e, long p);
+inline RR MakeRRPrec(const ZZ& a, long e, long p)
+   { RR z; MakeRRPrec(z, a, e, p); NTL_OPT_RETURN(RR, z); }
+
+
+
+
+
+
 void conv(RR& z, const ZZ& a);
 void conv(RR& z, long a);
 inline void conv(RR& z, int a) { conv(z, long(a)); }
@@ -333,6 +437,7 @@ void power2(RR& z, long e);
 
 inline RR power2_RR(long e)
    { RR z; power2(z, e); NTL_OPT_RETURN(RR, z); }
+
 
 void SqrRoot(RR& x, const RR& a);
 inline RR SqrRoot(const RR& a)

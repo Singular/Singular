@@ -9,7 +9,7 @@
 NTL_OPEN_NNS
 
 
-// _ZZ_p__representation:  each ZZ_p is represented by a ZZ in the range 0..p-1.
+// ZZ_p representation:  each ZZ_p is represented by a ZZ in the range 0..p-1.
 
 // The constructor for a ZZ_p pre-allocates space for the underlying ZZ,
 // and initializes it to zero.
@@ -418,8 +418,6 @@ inline void random(ZZ_p& x)
 inline ZZ_p random_ZZ_p()
    { ZZ_p x; random(x); NTL_OPT_RETURN(ZZ_p, x); }
 
-
-// ****** input/output
 
 inline ZZ_p& ZZ_p::operator=(long a) { conv(*this, a); return *this; }
 

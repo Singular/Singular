@@ -3,6 +3,7 @@
 #define NTL_vector__H
 
 #include <NTL/tools.h>
+#include <stdio.h>
 
 struct _ntl_VectorHeader {
    long length;
@@ -105,6 +106,7 @@ public:  \
   \
    long length() const { return (!_vec__rep) ?  0 : NTL_VEC_HEAD(_vec__rep)->length; }  \
    long MaxLength() const { return (!_vec__rep) ?  0 : NTL_VEC_HEAD(_vec__rep)->init; } \
+   long allocated() const { return (!_vec__rep) ?  0 : NTL_VEC_HEAD(_vec__rep)->alloc; } \
    long fixed() const { return _vec__rep && NTL_VEC_HEAD(_vec__rep)->fixed; } \
   \
    T& operator[](long l__i)   \
@@ -139,11 +141,13 @@ public:  \
  \
    vec_T(vec_T& l__x, NTL_NNS INIT_TRANS_TYPE) { _vec__rep = l__x._vec__rep; l__x._vec__rep = 0; } \
    long position(const T& l__a) const;  \
+   long position1(const T& l__a) const;  \
 };  \
  \
 void swap(vec_T& l__x, vec_T& l__y);  \
 void append(vec_T& l__v, const T& l__a); \
 void append(vec_T& l__v, const vec_T& l__w); \
+
 
 
 
@@ -154,6 +158,71 @@ long operator!=(const vec_T& l__a, const vec_T& l__b);
 
 #define NTL_vector_impl(T,vec_T) NTL_vector_default(T) NTL_vector_impl_plain(T,vec_T)  
 
+
+#if (!defined(NTL_CLEAN_PTR))
+
+#define NTL_vector_impl_position(T,vec_T) \
+long vec_T::position(const T& l__a) const  \
+{  \
+   if (!_vec__rep) return -1;  \
+   long l__num_alloc = NTL_VEC_HEAD(_vec__rep)->alloc;  \
+   long l__num_init = NTL_VEC_HEAD(_vec__rep)->init;  \
+   if (&l__a < _vec__rep || &l__a >= _vec__rep + l__num_alloc) return -1;  \
+   long l__res = (&l__a) - _vec__rep;  \
+   \
+   if (l__res < 0 || l__res >= l__num_alloc ||   \
+       _vec__rep + l__res != &l__a) return -1;  \
+   \
+   if (l__res >= l__num_init)  \
+       NTL_NNS Error("position: reference to uninitialized object"); \
+   return l__res;  \
+}  \
+  \
+long vec_T::position1(const T& l__a) const  \
+{  \
+   if (!_vec__rep) return -1;  \
+   long l__len = NTL_VEC_HEAD(_vec__rep)->length;  \
+   if (&l__a < _vec__rep || &l__a >= _vec__rep + l__len) return -1;  \
+   long l__res = (&l__a) - _vec__rep;  \
+   \
+   if (l__res < 0 || l__res >= l__len ||   \
+       _vec__rep + l__res != &l__a) return -1;  \
+   \
+   return l__res;  \
+}  \
+
+
+#else
+
+#define NTL_vector_impl_position(T,vec_T) \
+long vec_T::position(const T& l__a) const  \
+{  \
+   if (!_vec__rep) return -1;  \
+   long l__num_alloc = NTL_VEC_HEAD(_vec__rep)->alloc;  \
+   long l__num_init = NTL_VEC_HEAD(_vec__rep)->init;  \
+   long l__res;  \
+   l__res = 0;  \
+   while (l__res < l__num_alloc && _vec__rep + l__res != &l__a)  l__res++;  \
+   if (l__res >= l__num_alloc) return -1;  \
+   if (l__res >= l__num_init)  \
+       NTL_NNS Error("position: reference to uninitialized object"); \
+   return l__res;  \
+}  \
+ \
+long vec_T::position1(const T& l__a) const  \
+{  \
+   if (!_vec__rep) return -1;  \
+   long l__len = NTL_VEC_HEAD(_vec__rep)->length;  \
+   long l__res;  \
+   l__res = 0;  \
+   while (l__res < l__len && _vec__rep + l__res != &l__a)  l__res++;  \
+   if (l__res >= l__len) return -1;  \
+   return l__res;  \
+}  \
+
+
+#endif
+
 #define NTL_vector_impl_plain(T,vec_T)  \
  \
 void vec_T::SetLength(long l__n)   \
@@ -163,7 +232,7 @@ void vec_T::SetLength(long l__n)   \
    if (l__n < 0) {  \
       NTL_NNS Error("negative length in vector::SetLength");  \
    }  \
-   if (l__n >= long((1L << (NTL_BITS_PER_LONG-4))/sizeof(T)))  \
+   if (NTL_OVERFLOW(l__n, sizeof(T), 0))  \
       NTL_NNS Error("excessive length in vector::SetLength"); \
       \
    if (_vec__rep && NTL_VEC_HEAD(_vec__rep)->fixed) {\
@@ -179,9 +248,7 @@ void vec_T::SetLength(long l__n)   \
   \
    if (!_vec__rep) {  \
       l__m = ((l__n+NTL_VectorMinAlloc-1)/NTL_VectorMinAlloc) * NTL_VectorMinAlloc; \
-      if (l__m >= long((1L << (NTL_BITS_PER_LONG-4))/sizeof(T)))  \
-         NTL_NNS Error("excessive length in vector::SetLength"); \
-      char *l__p = (char *) NTL_SNS malloc(sizeof(_ntl_AlignedVectorHeader)+sizeof(T)*l__m); \
+      char *l__p = (char *) NTL_SNS_MALLOC(l__m, sizeof(T), sizeof(_ntl_AlignedVectorHeader)); \
       if (!l__p) {  \
 	 NTL_NNS Error("out of memory in vector::SetLength()");  \
       }  \
@@ -201,10 +268,8 @@ void vec_T::SetLength(long l__n)   \
       if (l__n > NTL_VEC_HEAD(_vec__rep)->alloc) {  \
          l__m = NTL_NNS max(l__n, long(NTL_VectorExpansionRatio*NTL_VEC_HEAD(_vec__rep)->alloc));  \
          l__m = ((l__m+NTL_VectorMinAlloc-1)/NTL_VectorMinAlloc) * NTL_VectorMinAlloc; \
-         if (l__m >= long((1L << (NTL_BITS_PER_LONG-4))/sizeof(T)))  \
-            NTL_NNS Error("excessive length in vector::SetLength"); \
          char *l__p = ((char *) _vec__rep) - sizeof(_ntl_AlignedVectorHeader); \
-         l__p = (char *) NTL_SNS realloc(l__p, sizeof(_ntl_AlignedVectorHeader)+sizeof(T)*l__m); \
+         l__p = (char *) NTL_SNS_REALLOC(l__p, l__m, sizeof(T), sizeof(_ntl_AlignedVectorHeader)); \
          if (!l__p) {  \
 	    NTL_NNS Error("out of memory in vector::SetLength()");  \
          }  \
@@ -232,7 +297,7 @@ void vec_T::FixLength(long l__n) \
    if (l__n > 0) \
       SetLength(l__n); \
    else { \
-      char *l__p = (char *) NTL_SNS malloc(sizeof(_ntl_AlignedVectorHeader)); \
+      char *l__p = (char *) NTL_SNS_MALLOC(0, sizeof(T), sizeof(_ntl_AlignedVectorHeader)); \
       if (!l__p) {  \
 	 NTL_NNS Error("out of memory in vector::FixLength()");  \
       }  \
@@ -280,30 +345,15 @@ void vec_T::kill()  \
   \
 void vec_T::RangeError(long l__i) const  \
 {  \
-   NTL_SNS Error( "index out of range in vector: ");  \
+   printf( "index out of range in vector: %d", l__i );  \
+   if (!_vec__rep)  \
+      printf( "(0)\n");  \
+   else  \
+      printf( "(%d)\n" ,NTL_VEC_HEAD(_vec__rep)->length );  \
    abort();  \
 }  \
   \
-long vec_T::position(const T& l__a) const  \
-{  \
-   if (!_vec__rep) return -1;  \
-   long l__num_alloc = NTL_VEC_HEAD(_vec__rep)->alloc;  \
-   long l__num_init = NTL_VEC_HEAD(_vec__rep)->init;  \
-   if (&l__a < _vec__rep || &l__a >= _vec__rep + l__num_alloc) return -1;  \
-   long l__res = (&l__a) - _vec__rep;  \
-   \
-   /* the next test ensures that we conform to the C/C++ standard,  \
-      which only guarantees that relational operators are meaningful when  \
-      pointers point to objects in the same array...I don't know  \
-      if it ever *really* makes a diiference...  */  \
-   \
-   if (l__res < 0 || l__res >= l__num_alloc ||   \
-       _vec__rep + l__res != &l__a) return -1;  \
-   \
-   if (l__res >= l__num_init)  \
-       NTL_NNS Error("position: reference to uninitialized object"); \
-   return l__res;  \
-}  \
+   NTL_vector_impl_position(T,vec_T) \
  \
 void swap(vec_T& l__x, vec_T& l__y)  \
 {  \
@@ -321,12 +371,18 @@ void swap(vec_T& l__x, vec_T& l__y)  \
 void append(vec_T& l__v, const T& l__a)  \
 {  \
    long l__l = l__v.length(); \
-   long l__pos = l__v.position(l__a);  \
-   l__v.SetLength(l__l+1);  \
-   if (l__pos != -1)  \
-      l__v[l__l] = l__v.RawGet(l__pos);  \
-   else  \
+   if (l__l >= l__v.allocated()) {  \
+      long l__pos = l__v.position(l__a);  \
+      l__v.SetLength(l__l+1);  \
+      if (l__pos != -1)  \
+         l__v[l__l] = l__v.RawGet(l__pos);  \
+      else  \
+         l__v[l__l] = l__a;  \
+   } \
+   else { \
+      l__v.SetLength(l__l+1);  \
       l__v[l__l] = l__a;  \
+   } \
 }  \
   \
 void append(vec_T& l__v, const vec_T& l__w)  \
@@ -338,6 +394,7 @@ void append(vec_T& l__v, const vec_T& l__w)  \
    for (l__i = 0; l__i < l__m; l__i++)  \
       l__v[l__l+l__i] = l__w[l__i];  \
 }
+
 
 
 

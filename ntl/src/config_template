@@ -50,6 +50,7 @@ to unset a flag, just replace the 'if 1' by an 'if 0'.
   * they must be set by hand, before installation begins.
   */
 
+
 #if <NTL_STD_CXX>
 #define NTL_STD_CXX
 
@@ -200,6 +201,30 @@ to unset a flag, just replace the 'if 1' by an 'if 0'.
 
 #endif
 
+#if <NTL_CLEAN_INT>
+#define NTL_CLEAN_INT
+
+/*
+ *   This will disallow the use of some non-standard integer arithmetic
+ *   that may improve performance somewhat.
+ *
+ *   To re-build after changing this flag: rm *.o; make ntl.a
+ */
+
+#endif
+
+#if <NTL_CLEAN_PTR>
+#define NTL_CLEAN_PTR
+
+/*
+ *   This will disallow the use of some non-standard pointer arithmetic
+ *   that may improve performance somewhat.
+ *
+ *   To re-build after changing this flag: rm *.o; make ntl.a
+ */
+
+#endif
+
  
 #if <NTL_RANGE_CHECK>
 #define NTL_RANGE_CHECK
@@ -277,8 +302,9 @@ to unset a flag, just replace the 'if 1' by an 'if 0'.
 /* One can choose one of four different stragtegies for long integer
  * arithmetic: the default, NTL_LONG_LONG, NTL_AVOID_FLOAT, or NTL_SINGLE_MUL.
  * The configuration wizard will choose among the first three; the use of
- * NTL_SINGLE_MUL is not generally recommended.
- *   
+ * NTL_SINGLE_MUL is only allowed if NTL_CLEAN_INT is not set, and its
+ * use is not recommended.
+ *
  * These flags are irrelevant when NTL_GMP_LIP is set, and are simply ignored,
  * except for NTL_SINGLE_MUL -- setting that causes a complie-time error.
  * 
