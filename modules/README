@@ -19,7 +19,7 @@ kernel.so: ${OBJS}
         ln -s kernel.so.1.1.0 kernel.so
 
 
-HPUX-9:
+HPUX-9/10:
 =======
 CC	= gcc
 CXX	= gcc
