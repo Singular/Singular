@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.cc,v 1.24 2000-10-05 15:14:07 Singular Exp $ */
+/* $Id: mpr_base.cc,v 1.25 2001-01-17 18:16:31 Singular Exp $ */
 
 /*
  * ABSTRACT - multipolynomial resultants - resultant matrices
@@ -25,7 +25,6 @@
 #include "intvec.h"
 #include "matpol.h"
 #include "numbers.h"
-#include "longalg.h"
 #ifdef HAVE_FACTORY
 #include "clapsing.h"
 #endif

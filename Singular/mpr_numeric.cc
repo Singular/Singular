@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpr_numeric.cc,v 1.14 2001-01-15 18:31:00 Singular Exp $ */
+/* $Id: mpr_numeric.cc,v 1.15 2001-01-17 18:16:32 Singular Exp $ */
 
 /*
 * ABSTRACT - multipolynomial resultants - numeric stuff
@@ -22,7 +22,6 @@
 #include "polys.h"
 #include "ideals.h"
 #include "intvec.h"
-#include "longalg.h"
 #include "matpol.h"
 #include "ring.h"
 //#include "longrat.h"
