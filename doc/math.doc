@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: math.doc,v 1.37 1999-05-06 16:53:30 Singular Exp $
+@comment $Id: math.doc,v 1.38 1999-06-30 15:43:05 pohl Exp $
 @comment this file contains the mathematical background of Singular
 
 @c The following directives are necessary for proper compilation
@@ -462,6 +462,9 @@ Fields. 1996, to appear in Journal of Symbolic Computation
 @item
 Kemper and Steel: Some Algorithms in Invariant Theory of Finite Groups. 1997
 
+@item
+Lee, H.R.; Saunders, B.D.: Fraction Free Gaussian Elimination for
+Sparse Matrices. Journal of Symbolic Computation (1995) 19, 393-402
 @item
 @tex
 Sch\"onemann, H.:
