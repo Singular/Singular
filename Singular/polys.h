@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.11 1998-03-23 22:51:05 obachman Exp $ */
+/* $Id: polys.h,v 1.12 1998-04-08 12:41:37 pohl Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
 */
@@ -212,11 +212,7 @@ poly      pPower(poly p, int i);
 
 // returns TRUE, if leading monom of a divides leading monom of b
 // i.e., if there exists a expvector c > 0, s.t. b = a + c
-#if defined(macintosh) 
-BOOLEAN   pDivisibleBy(poly a, poly b);
-#else
 #define pDivisibleBy(a, b)  _pDivisibleBy(a,b)
-#endif
 // like pDivisibleBy, except that it is assumed that a!=NULL
 #define pDivisibleBy1(a,b)   _pDivisibleBy1(a,b)
 // like pDivisibleBy, assumes a != NULL, does not check components
