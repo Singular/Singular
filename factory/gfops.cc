@@ -1,35 +1,35 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: gfops.cc,v 1.0 1996-05-17 10:59:46 stobbe Exp $
+// $Id: gfops.cc,v 1.1 1997-04-30 12:34:43 schmidt Exp $
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:46  stobbe
+Initial revision
+
 */
 
-#include <iostream.h>
-#include <fstream.h>
-#include <strstream.h>
+#include <config.h>
+
+#include <stdio.h>
+#include <string.h>
 
 #include "assert.h"
+
 #include "cf_defs.h"
 #include "gfops.h"
 #include "gf_tabutil.h"
 #include "cf_util.h"
 #include "canonicalform.h"
+#include "variable.h"
+#ifdef SINGULAR
+#include "singext.h"
+#endif
 
 
-#define MAXTABLE 32767
-
-int gf_q = 0;
-int gf_p = 0;
-int gf_n = 0;
-int gf_q1 = 0;
-int gf_m1 = 0;
-char gf_name = 'Z';
-
-unsigned short * gf_table = 0;
+const int gf_maxtable = 32767;
+const int gf_maxbuffer = 200;
 
 const int gf_primes_len = 42;
-
 static unsigned short gf_primes [] =
 {
       2,   3,   5,   7,  11,  13,  17,  19,
@@ -40,36 +40,99 @@ static unsigned short gf_primes [] =
     179, 181
 };
 
+int gf_q = 0;
+int gf_p = 0;
+int gf_n = 0;
+int gf_q1 = 0;
+int gf_m1 = 0;
+char gf_name = 'Z';
+
+unsigned short * gf_table = 0;
+
 CanonicalForm gf_mipo = 0;
 
-static void gf_get_table ( int p, int n )
+static CanonicalForm
+intVec2CF ( int degree, int * coeffs, int level )
 {
+    int i;
+    CanonicalForm result;
+    for ( i = 0; i <= degree; i++ ) {
+	result += CanonicalForm( coeffs[ i ] ) * power( Variable( level ), degree - i );
+    }
+    return result;
+}
+
+static void
+gf_get_table ( int p, int n )
+{
+    char buffer[gf_maxbuffer];
+    int q = ipower( p, n );
     if ( gf_table == 0 )
-	gf_table = new unsigned short[MAXTABLE];
-    ostrstream fname;
-    fname << "gftables/gftable." << p << "." << n << '\0';
-    char * fn = fname.str();
-    ifstream inputfile( fn, ios::in );
+	gf_table = new unsigned short[gf_maxtable];
+
+    // do not read the table a second time
+    if ( gf_q == q ) {
+	return;
+    }
+
+#ifdef SINGULAR
+    // just copy the table if Singular already read it
+    if ( q == nfCharQ ) {
+	gf_p = p; gf_n = n;
+	gf_q = q; gf_q1 = q - 1;
+	gf_m1 = nfM1;
+	gf_mipo = intVec2CF( nfMinPoly[0], nfMinPoly + 1, 1 );
+	(void)memcpy( gf_table, nfPlus1Table, gf_q * sizeof( unsigned short ) );
+	gf_table[gf_q] = 0;
+	return;
+    }
+#endif
+
+    // try to open file
+#ifndef SINGULAR
+    sprintf( buffer, GFTABLEDIR "/gftable.%d.%d", p, n );
+#else
+    sprintf( buffer, GFTABLEDIR "/%d", q );
+#endif
+    FILE * inputfile = fopen( buffer, "r" );
     STICKYASSERT( inputfile, "can not open GF(q) table" );
-    delete [] fn;
-    int i, k, pp, nn, digs;
-    gf_q = ipower( p, n );
-    gf_p = p;
-    gf_q1 = gf_q-1;
-    digs = gf_tab_numdigits62( gf_q );
-    char * buffer = new char[100];
+
+    // read ID
     char * bufptr;
-    inputfile.getline( buffer, 99, '\n' );
-    STICKYASSERT( strcmp( buffer, "@@ factory GF(q) table @@" ) == 0, "illegal table" );
-    inputfile >> pp;
-    inputfile >> nn;
-    STICKYASSERT( p == pp && n == nn, "illegal table" );
-    inputfile >> gf_mipo;
-    inputfile.getline( buffer, 99, '\n' );
+    char * success;
+    success = fgets( buffer, gf_maxbuffer, inputfile );
+    STICKYASSERT( success, "illegal table (reading ID)" );
+    STICKYASSERT( strcmp( buffer, "@@ factory GF(q) table @@\n" ) == 0, "illegal table" );
+    // read p and n from file
+    int pFile, nFile;
+    success = fgets( buffer, gf_maxbuffer, inputfile );
+    STICKYASSERT( success, "illegal table (reading p and n)" );
+    sscanf( buffer, "%d %d", &pFile, &nFile );
+    STICKYASSERT( p == pFile && n == nFile, "illegal table" );
+    // skip (sic!) factory-representation of mipo
+    // and terminating "; "
+    bufptr = strchr( buffer, ';' ) + 2;
+    // read simple representation of mipo
+    int i, degree;
+    sscanf( bufptr, "%d", &degree );
+    bufptr = strchr( bufptr, ' ' ) + 1;
+    int * mipo = new int[degree + 1];
+    for ( i = 0; i <= degree; i++ ) {
+	sscanf( bufptr, "%d", mipo + i );
+	bufptr = strchr( bufptr, ' ' ) + 1;
+    }
+
+    gf_p = p; gf_n = n;
+    gf_q = q; gf_q1 = q-1;
+    gf_mipo = intVec2CF( degree, mipo, 1 );
+    delete [] mipo;
+
+    // now for the table
+    int k, digs = gf_tab_numdigits62( gf_q );
     i = 1;
     while ( i < gf_q ) {
-	inputfile.getline( buffer, 99, '\n' );
-	STICKYASSERT( strlen( buffer ) == (size_t)digs * 30, "illegal table" );
+	success = fgets( buffer, gf_maxbuffer, inputfile );
+	STICKYASSERT( strlen( buffer ) - 1 == (size_t)digs * 30, "illegal table" );
 	bufptr = buffer;
 	k = 0;
 	while ( i < gf_q && k < 30 ) {
@@ -84,41 +147,50 @@ static void gf_get_table ( int p, int n )
 	}
     }
     gf_table[0] = gf_table[gf_q1];
+    gf_table[gf_q] = 0;
+
+    (void)fclose( inputfile );
 }
 
-static bool gf_valid_combination ( int p, int n )
+static bool
+gf_valid_combination ( int p, int n )
 {
     int i = 0;
     while ( i < gf_primes_len && gf_primes[i] != p ) i++;
     if ( i == gf_primes_len )
 	return false;
     else {
-	int m = MAXTABLE;
 	i = n;
 	int a = 1;
-	while ( a < m && i > 0 ) {
+	while ( a < gf_maxtable && i > 0 ) {
 	    a *= p;
 	    i--;
 	}
-	if ( i > 0 || a > m )
+	if ( i > 0 || a > gf_maxtable )
 	    return false;
 	else
 	    return true;
     }
 }
-    
-void gf_setcharacteristic ( int p, int n, char name )
+
+void
+gf_setcharacteristic ( int p, int n, char name )
 {
     ASSERT( gf_valid_combination( p, n ), "illegal immediate GF(q)" );
     gf_name = name;
     gf_get_table( p, n );
 }
 
-int gf_gf2ff ( int a )
+int
+gf_gf2ff ( int a )
 {
     if ( gf_iszero( a ) )
 	return 0;
     else {
+	// starting from z^0=1, step through the table
+	// counting the steps until we hit z^a or z^0
+	// again.  since we are working in char(p), the
+	// latter is guaranteed to be fulfilled.
 	int i = 0, ff = 1;
 	do {
 	    if ( i == a )
@@ -130,17 +202,13 @@ int gf_gf2ff ( int a )
     }
 }
 
-bool gf_isff ( int a )
+bool
+gf_isff ( int a )
 {
     if ( gf_iszero( a ) )
 	return true;
     else {
-	int i = 0;
-	do {
-	    if ( i == a )
-		return true;
-	    i = gf_table[i];
-	} while ( i != 0 );
-	return false;
+	// z^a in GF(p) iff (z^a)^p-1=1
+	return gf_isone( gf_power( a, gf_p - 1 ) );
     }
 }
