@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.172 1999-12-13 13:46:11 obachman Exp $
+@comment $Id: reference.doc,v 1.173 1999-12-16 14:46:54 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -710,8 +710,8 @@ The first row consists of these monomials, the second row
 of the corresponding coefficients of the monomials in f.
 Thus f = M[1,1]*M[2,1]+..+M[1,n]*M[2,n].
 
-Second case: the first matrix (i.e., the 3rd argument) contains the
-monomials, the second matrix (i.e., the 4th argument) the corresponding
+Second case: the second matrix (i.e., the 4rd argument) contains the
+monomials, the first matrix (i.e., the 3th argument) the corresponding
 coefficients of the monomials in the vector.
 
 @item @strong{Note:}
