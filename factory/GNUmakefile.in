@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.19 1997-10-28 14:43:10 schmidt Exp $
+# $Id: GNUmakefile.in,v 1.20 1997-10-29 16:17:09 schmidt Exp $
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the
@@ -56,6 +56,7 @@ INSTALL_DATA =	@INSTALL_DATA@
 INSTALL_PROGRAM=@INSTALL_PROGRAM@
 RANLIB =	@RANLIB@
 
+LN_S = 		@LN_S@
 AR =		@AR@
 BISON =		@BISON@
 MKINSTALLDIRS =	@MKINSTALLDIRS@
@@ -290,21 +291,56 @@ hdrtemplsrc := \
 		factory.template
 hdrtempldep :=	$(hdrtemplsrc:.template=.d)
 
+# FTE source files
+ftestsrc :=	\
+		ftest_io.cc \
+		ftest_util.cc
+
+# FTE header files
+ftestincl :=	\
+		ftest_io.h \
+		ftest_util.h
+
+# FTE m4 source files (exported for GNUmakefile in ftest/)
+ftestm4src :=	\
+		degree.m4 \
+		deriv.m4 \
+		factorize.m4 \
+		feval.m4 \
+		gcd.m4 \
+		insert.m4 \
+		size.m4 \
+		totaldegree.m4
+export ftestm4src
+
+# other files from the FTE
+ftestdistfiles := \
+		ChangeLog \
+		GNUmakefile.in \
+		ftest_util.m4
+
+# FTE executables
+ftestexec :=	$(ftestm4src:.m4=)
+
 # all the C/C++ source files in the distribution
 distsrc :=	\
 		$(distfactorysrc) $(distmemmansrc) \
 		$(addprefix templates/,$(templatesrc)) \
+		$(addprefix ftest/,$(ftestsrc)) \
 		readcf.cc ftmpl_inst.cc \
 		gengftables.cc test_install.cc
 
 # all the C/C++ include files in the distribution
 distincl :=	\
 		$(distfactoryincl) $(distmemmanincl) \
-		$(addprefix templates/,$(templateincl))
+		$(addprefix templates/,$(templateincl)) \
+		$(addprefix ftest/,$(ftestincl))
 
 # all files in the distribution
 distfiles :=	\
 		$(distsrc) $(distincl) $(hdrtemplsrc) \
+		$(addprefix ftest/,$(ftestm4src)) \
+		$(addprefix ftest/,$(ftestdistfiles)) \
 		GNUmakefile.in configure.in config.h.in configure \
 		ChangeLog README NEWS INSTALL \
 		examples/GNUmakefile examples/application.cc \
@@ -381,6 +417,18 @@ TAGS:
 		etags $(addprefix $(srcdir)/, $(distsrc) $(distincl))
 
 #
+# - Factory Test Environment.
+#
+$(ftestexec):	factory.h libcf.a libcfmem.a ftmpl_inst.o
+		cd ftest && $(MAKE) $@
+		@if test -r "$@"; then \
+		  :; \
+		else \
+		  echo "$(LN_S) ftest/$@ $@"; \
+		  $(LN_S) ftest/$@ $@; \
+		fi
+
+#
 # - GF(q) table generation.
 #
 
@@ -396,7 +444,7 @@ gengftables.o:	gengftables.cc factory.h gf_tabutil.h \
 		$(CXX) -c $< $(TESTCXXFLAGS) -o $@
 
 gengftables:	gengftables.o ftmpl_inst.o $(libfactory) libcfmem.a
-		$(CXX) $< ftmpl_inst.o -L. -lcf -lcfmem $(TESTLDFLAGS) -o $@
+		$(CXX) $^ $(TESTLDFLAGS) -o $@
 
 gftables:	gengftables
 		@echo "This command will take quite a long time to execute;"
@@ -504,6 +552,7 @@ dist:		$(srcdir)/readcf.cc $(srcdir)/configure
 		rm -rf $(distname)
 		$(MKINSTALLDIRS) $(distname)/bin
 		$(MKINSTALLDIRS) $(distname)/examples
+		$(MKINSTALLDIRS) $(distname)/ftest
 		$(MKINSTALLDIRS) $(distname)/templates
 		@echo "Copying files to distribution directory ..."
 		@for file in $(distfiles); do \
@@ -516,10 +565,12 @@ dist:		$(srcdir)/readcf.cc $(srcdir)/configure
 #
 # - cleaning up.
 #
-clean:		
+clean:		ftestclean
 		-rm -f $(libfactory) libcfmem.a \
-		  gengftables test_install \
+		  $(ftestexec) gengftables test_install \
 		  factoryconf.h factory.h *.o *.d
+
+ftestclean:	-cd ftest && $(MAKE) clean
 
 # remove gftables only if we built them
 mostlyclean:	clean
@@ -528,10 +579,13 @@ mostlyclean:	clean
 		  rm -rf gftables; \
 		fi
 
-distclean:	mostlyclean
+distclean:	ftestdistclean mostlyclean
 		-rm -f $(distname).tgz GNUmakefile stamp-h \
 		  config.cache config.log config.status config.h
 		-rm -rf $(distname)
+
+ftestdistclean:	-cd ftest && $(MAKE) distclean
+		-rmdir ftest
 
 maintainer-clean: distclean
 		@echo "This command is intended for maintainers to use;"
@@ -571,6 +625,9 @@ stamp-h:	config.h.in config.status
 
 GNUmakefile:	GNUmakefile.in config.status
 		CONFIG_FILES=GNUmakefile CONFIG_HEADERS= ./config.status
+
+ftest/GNUmakefile: ftest/GNUmakefile.in config.status
+		CONFIG_FILES=ftest/GNUmakefile CONFIG_HEADERS= ./config.status
 
 config.status:	configure
 		./config.status --recheck
