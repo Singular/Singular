@@ -1,0 +1,125 @@
+#####################################################################
+### 
+### Makefile for Singular documentation 
+###
+#####################################################################
+SHELL=/bin/sh
+
+####################################################################
+##
+## Configuration
+##
+
+## directory where info files are installed
+prefix		= @prefix@
+infodir		= @infodir@
+
+##
+## needed programs
+##
+@SET_MAKE@
+CC		= @CC@
+INSTALL		= ../install-sh -c
+INSTALL_PROGRAM	= ${INSTALL}
+INSTALL_DATA	= ${INSTALL} -m 644
+MKINSTALLDIRS   = ../mkinstalldirs
+
+TEX		= tex
+MAKEINFO	= makeinfo
+TEXINDEX	= texindex
+DVIPS		= dvips
+
+# directory where Singular executable is found
+SINGULARDIR	= ..
+
+##
+## End configuration dependend stuff
+#################################################################
+#
+# examples, general, libraries, math, reference,
+# singular, start, types
+#SINGULAR_OBJS= copyright.tex proc.tex
+TEX_FILES = copyright.tex # proc.tex
+SINGULAR_OBJS= examples.tex general.tex libraries.tex math.tex reference.tex \
+	singular.tex start.tex types.tex
+
+all: info dvi
+
+info: singular.hlp 
+
+singular.hlp: ${SINGULAR_OBJS} ${TEX_FILES} Makefile
+	- ${MAKEINFO} --no-split singular.tex
+
+dvi: singular.dvi tutor.dvi
+
+ps: dvi
+	${DVIPS} singular.dvi -o
+	${DVIPS} tutor.dvi -o
+
+singular.dvi:  ${SINGULAR_OBJS} ${TEX_FILES} Makefile
+	${TEX} singular.tex
+	${TEX} singular.tex
+	${TEXINDEX} singular.??
+	${TEX} singular.tex
+
+tutor.dvi: tutor.tex examples.tex start.tex proc.tex copyright.tex
+	${TEX} tutor.tex
+	${TEX} tutor.tex
+	${TEXINDEX} tutor.??
+	${TEX} tutor.tex
+
+install: 
+	${MKINSTALLDIRS} ${infodir}
+	${INSTALL_DATA} singular.hlp ${infodir}
+
+uninstall: 
+	rm -f ${infodir}/singular.hlp
+	- rmdir ${infodir}
+
+clean:
+	/bin/rm -f Z* doc2tex example.* save_i *~ *.tst manual.lst doe core
+	/bin/rm -f singular.?? singular.??s singular.aux singular.log singular.toc
+	/bin/rm -f tutor.?? tutor.??s tutor.aux tutor.log tutor.toc *.lst
+	/bin/rm -f sample.lib sample_lib0.lib doe* singular.info
+
+mostlyclean: clean
+
+distclean: clean
+	/bin/rm -f Makefile *.ps
+
+maintainer-clean: distclean
+	@echo "This command is intended for maintainers to use;"
+	@echo "Rebuilding the deleted files requires makeinfo, tex and texindex"
+	/bin/rm -f *.dvi singular.hlp configure ${SINGULAR_OBJS}
+
+singular.tex :  singular.doc  doc2tex ${SINGULARDIR}/Singular
+	SINGULARPATH=${SINGULARDIR}/LIB; export SINGULARPATH; \
+	PATH=`pwd`/${SINGULARDIR}:$(PATH); export PATH; \
+	./doc2tex ${SINGULARDIR}/Singular singular
+	echo expect one error
+	-grep "error occurred" singular.tex
+
+%.tex: %.doc doc2tex ${SINGULARDIR}/Singular
+	SINGULARPATH=${SINGULARDIR}/LIB; export SINGULARPATH; \
+	PATH=`pwd`/${SINGULARDIR}:$(PATH); export PATH; \
+	./doc2tex ${SINGULARDIR}/Singular $*
+	-grep "error occurred" $@
+
+
+doc2tex: doc2tex.c
+	$(CC) doc2tex.c -o doc2tex
+
+${SINGULARDIR}/Singular:
+	cd ${SINGULARDIR}; ${MAKE} Singular
+
+Makefile: Makefile.in
+	cd ${SINGULARDIR}; ${MAKE} newdoc/Makefile
+
+#examples.tex: examples.doc
+#general.tex: general.doc
+#libraries.tex: libraries.doc
+#math.tex: math.doc
+#reference.tex: reference.doc
+#singular.tex: singular.doc
+#start.tex: start.doc
+#types.tex: types.doc

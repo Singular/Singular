@@ -4683,7 +4683,6 @@ See @ref{links}; @ref{read}; @ref{write}; @ref{open}; @ref{close}.
 @c ---------------------------------------
 @c ---------------------------------------
 @node procedures and Libraries, Tricks and Pitfalls, Commands, Top
-@c @chapter Libraries
 @chapter procedures and libraries
 @cindex libraries
 @cindex procedures
