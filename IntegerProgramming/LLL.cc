@@ -547,8 +547,8 @@ short integral_LLL(BigInt** b, const short& number_of_vectors,
       REDI_IL(k,k-1,b,vector_dimension,d,lambda);
 
       //if(4*d[k+1]*d[k-1] < 3*d[k]*d[k] - lambda[k][k-1]*lambda[k][k-1])
-      if((const BigInt&)4*d[k+1]*d[k-1]
-          < (const BigInt&)3*d[k]*d[k] - lambda[k][k-1]*lambda[k][k-1])
+      if((BigInt(4))*d[k+1]*d[k-1]
+          < (BigInt(3))*d[k]*d[k] - lambda[k][k-1]*lambda[k][k-1])
       {
         SWAPI(k,k_max,b,d,lambda);
         if(k>1)
