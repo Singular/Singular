@@ -1,5 +1,5 @@
 dnl # emacs edit mode for this file is -*- sh -*-
-dnl # $Id: configure.in,v 1.35 2003-04-01 16:31:09 Singular Exp $
+dnl # $Id: configure.in,v 1.36 2003-06-20 10:01:37 Singular Exp $
 
 dnl #
 dnl # configure.in - process this file with `autoconf' to generate
@@ -12,7 +12,7 @@ dnl #
 #
 # - initialisation.
 #
-AC_REVISION($Id: configure.in,v 1.35 2003-04-01 16:31:09 Singular Exp $)
+AC_REVISION($Id: configure.in,v 1.36 2003-06-20 10:01:37 Singular Exp $)
 AC_INIT(canonicalform.cc)
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_AUX_DIR(bin)
@@ -24,7 +24,7 @@ dnl #
 dnl # Change version here, do not believe the comment in the
 dnl # preceding lines.
 dnl #
-factory_version="2.0d"
+factory_version="2.0.4"
 factory_configuration="'$ac_configure_args' in `pwd`"
 
 #
@@ -310,9 +310,6 @@ fi
 
 # font-lock-trick: '
 
-AC_C_CONST
-AC_C_INLINE
-
 # arithmetic shift
 AC_MSG_CHECKING(whether your compiler does arithmetic shifts)
 AC_CACHE_VAL(ac_cv_shift,
@@ -379,29 +376,29 @@ if test "x$GXX" = xyes && test "x$cxxflags_expl_set" = xno; then
 
 AC_LANG_SAVE
 AC_LANG_CPLUSPLUS
-# check whether CXX accepts --no-rtti
-AC_MSG_CHECKING(whether gcc accepts --no-rtti)
+# check whether CXX accepts -fno-rtti
+AC_MSG_CHECKING(whether gcc accepts -fno-rtti)
 tmp_flags=${CXXFLAGS}
-CXXFLAGS="${CXXFLAGS} --no-rtti"
+CXXFLAGS="${CXXFLAGS} -fno-rtti"
 AC_CACHE_VAL(ac_cv_cxx_have_rtti,
 AC_TRY_COMPILE(,,ac_cv_cxx_have_rtti=yes,ac_cv_cxx_have_rtti=no)
 )
 AC_MSG_RESULT(${ac_cv_cxx_have_rtti})
 CXXFLAGS=$tmp_flags
 if test "${ac_cv_cxx_have_rtti}" = yes; then
-CXXFLAGS="$CXXFLAGS --no-rtti"
+CXXFLAGS="$CXXFLAGS -fno-rtti"
 fi
 
-AC_MSG_CHECKING(whether gcc accepts --no-exceptions)
+AC_MSG_CHECKING(whether gcc accepts -fno-exceptions)
 tmp_flags=${CXXFLAGS}
-CXXFLAGS="${CXXFLAGS} --no-exceptions"
+CXXFLAGS="${CXXFLAGS} -fno-exceptions"
 AC_CACHE_VAL(ac_cv_cxx_have_exceptions,
 AC_TRY_LINK(,,ac_cv_cxx_have_exceptions=yes,ac_cv_cxx_have_exceptions=no)
 )
 AC_MSG_RESULT(${ac_cv_cxx_have_exceptions})
 CXXFLAGS=$tmp_flags
 if test "${ac_cv_cxx_have_exceptions}" = yes; then
-CXXFLAGS="$CXXFLAGS --no-exceptions"
+CXXFLAGS="$CXXFLAGS -fno-exceptions"
 fi
 AC_LANG_RESTORE
 
