@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: tricks.doc,v 1.6 2000-05-25 09:00:14 Singular Exp $
+@comment $Id: tricks.doc,v 1.7 2000-07-04 17:16:49 obachman Exp $
 @comment this file contains the "Tricks and pittfals" sections
 
 @c The following directives are necessary for proper compilation
@@ -68,6 +68,14 @@ displays only the first 20 characters
 @c @code{@}} and the end of the line.)
 @item
 statements may not contain more than 10000 tokens
+@item
+@cindex German Umlaute
+@cindex non-english special characters
+@cindex special characters, non-english
+All input to Singular must be 7-bit clean, i.e. special characters like the
+the German Umlaute (@"a, @"o, etc.), or the French accent characters may 
+neither appear as input to @sc{Singular}, nor in libraries or procedure
+definitions.
 @end itemize
 
 @c -------------------------------------------------------------------------

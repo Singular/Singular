@@ -1,7 +1,7 @@
 #####################################################################
 ### 
 ### Makefile for Singular documentation 
-### $Id: Makefile.in,v 1.70 2000-06-15 11:26:50 obachman Exp $
+### $Id: Makefile.in,v 1.71 2000-07-04 17:16:47 obachman Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -34,7 +34,7 @@ INSTALL		= ../install-sh -c
 INSTALL_PROGRAM	= ${INSTALL}
 INSTALL_DATA	= ${INSTALL} -m 644
 MKINSTALLDIRS   = ../mkinstalldirs
-GZIP		= @GZIP@
+GZIP		= @MYGZIP@
 UUDECODE	= @UUDECODE@
 
 PERL		= @PERL@
@@ -88,7 +88,7 @@ STANDALONE_TEXI_FILES	= COPYING.texi INSTALL_unix.texi NEWS.texi \
 			  INSTALL_win.texi 
 
 DOC2TEX_FILES	= \
-		examples.tex general.tex math.tex reference.tex \
+		examples.tex general.tex ti_ip.tex math.tex reference.tex \
 		start.tex types.tex pdata.tex tricks.tex platform.tex
 
 MANUAL_FILES	= ${TEX_FILES} ${DOC2TEX_FILES}
