@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.98 1998-05-21 11:41:52 krueger Exp $
+@comment $Id: general.doc,v 1.99 1998-05-25 09:29:06 schmidt Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -92,7 +92,7 @@ user for input of missing parts of a command (remember the semicolon at
 the end of every command).
 
 @sc{Singular} does not interpret the semicolon as the end of a command
-if it occures inside a string.  Also, @sc{Singular} waits for blocks
+if it occurs inside a string.  Also, @sc{Singular} waits for blocks
 (sequences of commands enclosed in curly brackets) to be closed before
 prompting with @code{>} for more commands.  Thus, if @sc{Singular} does
 not respond with its regular prompt after typing a semicolon it may wait
@@ -154,7 +154,7 @@ follows a cross reference
 @item @code{l}
 goes to the previously visited node
 @item @code{b}
-goes to the begining of the current node
+goes to the beginning of the current node
 @item @code{e}
 goes to the end of the current node
 @item @code{SPACE}
@@ -185,7 +185,7 @@ the current line and prompts for further action.  The following choices
 are available:
 @table @code
 @item a
-returns to the toplevel after finishing the current command
+returns to the top level after finishing the current command
 @item c
 continues
 @item q
@@ -251,7 +251,7 @@ The synopsis of @sc{Singular} is
 Singular  [options] [file1 [file2 @dots{}]]
 @end example
 Options can be given in both, their long and short format. The following
-options control the general behaviour of @sc{Singular}:
+options control the general behavior of @sc{Singular}:
 @table @asis
 
 @item @code{-e}, @code{--echo[=VAL]}
@@ -650,7 +650,7 @@ $\hbox{GF}(p^n)$
 GF(p^n)
 @end ifinfo
 generating the multiplicative group.  Due to a different internal
-representation, the arithemtic operations in these coefficient fields
+representation, the arithmetic operations in these coefficient fields
 are faster than arithmetic operations in algebraic extensions as
 described above.
 
@@ -675,7 +675,7 @@ optionally followed by a size parameter in parentheses.
 weight vector given as an intvec_expression in parentheses.
 
 @item
-@code{M} followed by an intmat_expresion in parantheses.
+@code{M} followed by an intmat_expression in parentheses.
 
 @item
 @code{c} or @code{C}.
@@ -716,7 +716,7 @@ and vice versa is to use the @code{fetch} function (@pxref{fetch}).
 @sc{Singular} computes in a quotient rings as long as possible with the
 given representative of a polynomial, say, @code{p}.  I.e., it usually
 does not reduce @code{p} w.r.t. the quotient ideal.  This is only done
-during standard bases computations or by an explicite reduction using
+during standard bases computations or by an explicate reduction using
 the command @code{reduce(p, std(0))} (@pxref{reduce}).
 
 @strong{Example:}
@@ -798,7 +798,7 @@ intmat_expression has to be an invertible square matrix
 
 Using matrix orderings, @sc{Singular} can compute standard bases
 w.r.t.@: any monomial ordering that is compatible with the natural
-semigroup structure on the monomials. In practice, the predefined global
+semi-group structure on the monomials. In practice, the predefined global
 and local orderings together with the block orderings should be
 sufficient in most cases. These orderings are faster than their
 corresponding matrix orderings since evaluation of a matrix ordering is
@@ -859,7 +859,7 @@ background}.
 @cindex Implemented algorithms
 
 The basic algorithm in @sc{Singular} is a general standard basis algorithm for
-any monomial ordering which is compatible with the natural semigroup
+any monomial ordering which is compatible with the natural semi-group
 structure of the exponents. This includes wellorderings
 (Buchberger algorithm to compute a Groebner basis)
 and tangent cone orderings (Mora algorithm) as special cases.
@@ -1019,7 +1019,7 @@ polynomials only.
 @item factorize
 @ref{factorize}@*
 computes factorization of univariate and multivariate polynomials into
-irreduzible factors.
+irreducible factors.
 
 The most basic algorithm is univariate factorization in prime
 characteristic.  The Cantor-Zassenhaus Algorithm is used in this case.
@@ -1070,16 +1070,58 @@ other domains, elementary algorithms are used.
 @section The SINGULAR language
 @cindex The SINGULAR language
 
-@sc{Singular} has a convenient programming language similar to C that
-allows the user to extend the set of predefined functions. However,
 @sc{Singular} interprets commands given interactively on the command
-line as well as given in the context of user defined procedures. In
-particular, the control structures @code{for}, @code{if} @dots{}
-@code{else}, and @code{while} are not restricted to the use in
-procedures.
+line as well as given in the context of user-defined procedures.  In
+fact, @sc{Singular} makes no distinction between these both cases.
+Thus, @sc{Singular} offers a powerful programming language as well as
+an easy-to-use command line interface without differences in syntax or
+semantics.
 
-@xref{Procedures}, for a detailed description of how to write
-procedures.
+In the following, the basic language concepts such as commands,
+expressions, names, objects, etc., are discussed.  @xref{Procedures},
+and @ref{Libraries}, for the concepts of procedures and libraries.
+
+In many aspects, the @sc{Singular} language is similar to the C
+programming language.  For a description of some of the subtle
+differences, see @ref{Major differences to the C programming language}.
+
+@subsubheading Elements of the language
+
+The major building blocks of the @sc{Singular} language  are
+expressions, commands, and control structures.  The notion of expression
+in the @sc{Singular} and the C programming language are identical,
+whereas the notion of commands and control structures only roughly
+corresponds to the C statements.
+
+@itemize @bullet
+
+@item
+An ``expression'' is a sequence of operators, functions, and operands
+that specifies a computation.  An expressions always results in a
+value of a specific type.  @xref{Data types}, and its subsections (e.g.,
+@ref{poly expressions}), for information on how to build expressions.
+
+@item
+A ``command'' is either a declaration, an assignment, a call to a
+function without return value, or a print command.  For detailed
+information, see @ref{General command syntax}.
+
+@item
+``Control structures'' determine the execution sequence of commands.
+@sc{Singular} provides control structures for conditional execution
+(@code{if} @dots{} @code{else}) and iteration (@code{for} and
+@code{while}).  Commands may be grouped in pairs of @code{@{} @code{@}}
+(curly brackets) to form blocks.  @xref{Control structures}, for
+more information.
+@end itemize
+
+@subsubheading Other notational conventions
+For user-defined functions, the notion of ``procedure'' and
+``function'' are synonymous.
+
+As already mentioned above, functions without return values are called
+commands.  Furthermore, whenever convenient, the term ``command'' is
+used for a function, even if it does return a value.
 
 @menu
 * General command syntax::
@@ -1338,7 +1380,7 @@ under the special name @code{_}, e.g.,
 @c example
 @end example
 
-A string_expression enclosed in @code{`}@dots{}@code{`} (backticks)
+A string_expression enclosed in @code{`}@dots{}@code{`} (back ticks)
 evaluates to the value of the variable named by the string_expression.
 This feature is refered to as name substitution.
 
@@ -1602,8 +1644,8 @@ For more information, see @ref{write}, @ref{read}, @ref{dump},
 @end example
 
 Specifying a link can be as easy as specifying a filename as a string.
-Except for MPtcp links, links even do not need to be explicitely opened
-or closed before resp.@: after they are used.  To explicitely open or
+Except for MPtcp links, links even do not need to be explicitly opened
+or closed before resp.@: after they are used.  To explicitly open or
 close a link, the @code{open} resp.@: @code{close} commands may be
 used (see @ref{open}, @ref{close}).
 
@@ -1695,7 +1737,7 @@ MPtcp links are implemented on Unix-like operating systems only.
 @example
 @c example
   ring r;
-  link l = "MPtcp:launch"; // declare a link explicitely
+  link l = "MPtcp:launch"; // declare a link explicitly
   open(l);  // needs an open, launches another SINGULAR as a server
   write(l, x+y);
   kill r;
@@ -1708,7 +1750,7 @@ MPtcp links are implemented on Unix-like operating systems only.
 @subsubheading DBM links
 Data is stored in and accessed from a data base.  Writing is
 accomplished by a key and a value and associates the value with the key
-in the specfied data base.  Reading is accomplished w.r.t.@: a key,
+in the specified data base.  Reading is accomplished w.r.t.@: a key,
 whose associated value is returned.  Both the key and the value have to
 be specified as strings.  Hence, DBM links may be used only for data
 which may be converted to or from strings.
