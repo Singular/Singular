@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.77 2002-05-22 10:40:00 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.78 2002-05-22 14:37:34 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -21,6 +21,7 @@
 #include "febase.h"
 #include "kstd1.h"
 #include "khstd.h"
+#include "kbuckets.h"
 #include "cntrlc.h"
 #include "weight.h"
 #include "ipid.h"
