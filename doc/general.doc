@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: general.doc,v 1.73 1998-05-15 07:45:22 schmidt Exp $
+@comment $Id: general.doc,v 1.74 1998-05-15 08:53:51 wichmann Exp $
 @comment this file contains the general information about Singular
 
 @c The following directives are necessary for proper compilation
@@ -383,19 +383,10 @@ finally, by searching through some default directories (e.g.,
 @section Rings and orderings
 @cindex Rings and orderings
 
-@menu
-* Available rings::
-* General syntax of a ring definition::
-* Term orderings::
-@end menu
+All advanced algorithms in @sc{Singular} require the prior definition of 
+a ring. Such a ring can be
 
-@c ---------------------------------------------------------------------------
-@node Available rings, General syntax of a ring definition, Rings and orderings, Rings and orderings
-@subsection Available rings
-@cindex Available rings
-
-Almost all computations in @sc{Singular} require a basering which may be
-@itemize @bullet
+@enumerate
 @item
 a polynomial ring over a field
 @item
@@ -404,32 +395,14 @@ a series ring, i.e a localization of a polynomial ring
 a quotient ring by an ideal of one of the above
 @item
 a tensor products of one of the above
-@end itemize
+@end enumerate
 
-Each object of type
-@code{map},
-@code{matrix},
-@code{module},
-@code{number},
-@code{ideal},
-@code{poly},
-@code{resolution},
-@code{vector}
-belongs to a specific ring.
-Also @code{list}, if one of the list elements belongs to a ring.
-These objects are local to the ring, hence their names can be used for other
-objects in other rings (Objects of other types do not belong to any ring and
-and are hence globally accessible, independently of the ring).
-Objects from one ring can be mapped to another
-ring with an object of type @code{map}
-(or with the commands @code{fetch} or @code{imap}).
-All rings are algebras over the ground
-field. Hence, in order to compute in one of the ground fields,
-one has to define a ring (with at least one variable and a monomial
-ordering).
+The rings are realized by choosing an appropriate global or local
+ordering. @xref{Term orderings} and @ref{Mathematical background}. 
 
-The ground field of these algebras may be
-@itemize @bullet
+The coefficient field of these rings may be
+
+@enumerate
 @item
 the rational numbers Q (char 0)
 @item
@@ -447,14 +420,155 @@ transcendental extension K(A,B,C,...), K=Q or Z/p
 algebraic extension K[A]/minpoly, K=Q or Z/p
 @item
 floating point real numbers with simple precision (real)
+@end enumerate
+
+Throughout this manual, the current active ring in @sc{Singular} is
+called basering. The reserved name @code{basering} in @sc{Singular} is
+an alias for the current active ring.
+
+The basering can by set by declaring a new ring as described in the
+following subsections or with the commands @code{setring} and
+@code{keepring}. Objects of ring dependent types are local to a ring. To
+access them after a change of the basering they have to be mapped using
+maps or by the functions @code{imap} or @code{fetch}.
+
+@c @ref 
+See
+@ref{Objects};
+@ref{fetch};
+@ref{imap};
+@ref{keepring};
+@ref{map};
+@ref{setring}.
+@c @ref 
+
+All changes of the basering in a procedure are local to this procedure
+unless a @code{keepring} command is used as the last statement of the
+procedure. @xref{Procedures} and @ref{keepring}.
+
+@menu
+* Examples of ring declarations::  
+* General syntax of a ring declaration::  
+* Term orderings::              
+@end menu
+
+@c --------------------------------------
+@node Examples of ring declarations, General syntax of a ring declaration, Rings and orderings, Rings and orderings
+@subsection Examples of ring declarations
+@cindex Examples of ring declarations
+
+The exact syntax of a ring declaration is given in the next two
+subsections; this subsections lists some examples first.
+
+@itemize @bullet
+@item 
+@tex
+the ring $Z/32003Z[x,y,z]$ with local degrevlex ordering:
+@end tex
+@ifinfo
+the ring Z/32003Z[x,y,z] with local degrevlex ordering:
+@end ifinfo
+
+@example
+  ring r = 32003, ( x, y, z ), ds;
+@end example
+
+@item 
+@tex
+the ring $Z/7Z[x_1,\ldots,x_6]$ with lexicographical ordering for $x_1$
+and $x_2$ and degree reverse lexicographical ordering for
+$x_3,\ldots,x_6$:  
+@end tex
+@ifinfo
+the ring Z/7Z[x1,...,x6] with lexicographical ordering for x1 and x2 and 
+degree reverse lexicographical ordering for x3,...x6:
+@end ifinfo
+
+@example
+  ring r= 7,( x(1..6) ),( lp(2),dp(4) );
+  ring r=10,( x(1..6) ),( lp(2),dp(4) );
+@end example
+
+@item 
+@tex
+the ring
+@end tex
+@ifinfo
+the ring
+@end ifinfo
+
+@example
+  ring r3=0,(x,y,z,a,b,c),(ds(3), dp(3));
+@end example
+
+@item 
+@tex
+the ring
+@end tex
+@ifinfo
+the ring
+@end ifinfo
+
+@example
+  ring r4=0,(x,y,z),(c,dp);
+@end example
+
+@item 
+@tex
+the ring
+@end tex
+@ifinfo
+the ring
+@end ifinfo
+
+@example
+  ring r5=(7,a),(x,y,z),dp;
+@end example
+
+@item 
+@tex
+the ring $K[x,y,z]$, where $K$ is $Z/7Z[a] / a^2+a+3$, the finite field with
+$49$ elements.
+@end tex
+@ifinfo
+the ring K[x,y,z], where K is Z/7Z[a] / a^2+a+3, the finite field with
+49 elements.
+@end ifinfo
+
+@example
+  ring r=(7,a),(x,y,z),dp; minpoly=a^2+a+3;
+  ring r=(7^2,a),(x,y,z),dp;
+@end example
+
+@item 
+@tex
+the ring
+@end tex
+@ifinfo
+the ring
+@end ifinfo
+
+@example
+  ring r8=(181,A,B,Z),(x,y,z),dp;
+@end example
+
+@item 
+@tex
+the ring
+@end tex
+@ifinfo
+the ring
+@end ifinfo
+
+@example
+  ring r9=real,(x,y,z),dp;
+@end example
 @end itemize
 
-The other types do not belong to a ring and can be accessed within every ring.
-
 @c ---------------------------------------------------------------------------
-@node General syntax of a ring definition, Term orderings, Available rings, Rings and orderings
-@subsection General syntax of a ring definition
-@cindex General syntax of a ring definition
+@node General syntax of a ring declaration, Term orderings, Examples of ring declarations, Rings and orderings
+@subsection General syntax of a ring declaration
+@cindex General syntax of a ring declaration
 
 @c ------------------------------------------------------------
 @c   This piece of text (partially) exists also in the 
@@ -463,283 +577,198 @@ The other types do not belong to a ring and can be accessed within every ring.
 @c ------------------------------------------------------------
 @table @code
 @item @strong{Syntax:}
-@code{ring} name @code{=} field@code{,}
+@code{ring} name @code{=} coefficient_field@code{,}
   @code{(} names_of_ring_variables @code{),}
   @code{(} ordering @code{);}
 @item @strong{Default:}
 @code{32003,(x,y,z),(dp,C);}
 @item @strong{Purpose:}
-defines a basering for polynomials, ideals, vectors, modules, resolutions
-and matrices and set it as the actual basering.
-
-All advanced algorithms in @sc{Singular} require a ring.
-The last defined ring is the basering until a new ring is defined
-or until it is changed with @code{setring} or @code{keepring} or
-it gets killed. The actual basering always carries the additional name
-@code{basering}. 
-
-The coefficient field is given by one of the following:
-@enumerate
-@item
-the characteristic (0 or a prime <= 32003)
-@item
-an expression_list of the characteristic and
-the names of  parameters.
-If there is only one parameter you may define a minimal polynomial for it
-to work in an algebraic extension of Q or Z/p.
-See @ref{minpoly}.
-@item
-an expression_list of the number of element
-(a small prime characteristic p to the power of a small exponent n) and a
-name for a primitive element (generating the multiplicative group).
-The maximal values for p and n depend on the files in the directory @code{gftables}.
-They define the finite fields with p^n elements.
-@item
-the name @code{real}. The field elements will be the machine floating
-point numbers.
-@end enumerate
-
-If the specified (non-zero) characteristic is not a prime,
-it is automatically converted
-to the next lower prime.
-
-The names of ring variables
-are like variable names (comma separated).
-
-The ordering is a list of blockorderings which have an order keyword and
-a weight vector or an optional size.
-
-Possible order keywords are:
-@itemize @bullet
-@item @code{lp} (lexicographic), @code{dp} (degree revers lexicographic),
-@code{Dp} (degree lexicographic), @code{ls} (negative lexicographic),
-@code{ds} (negative degree revers lexicographic, tangent cone ordering),
-@code{Ds} (negative degree lexicographic), @code{M} (matrix ordering),
-@code{a} (additioanl weight vector)
-with optional size parameter
-
-@item @code{wp} (weighted revers lexicographic),
-@code{Wp} (weighted lexicographic),
-@code{ws} (negative weighted revers lexicographic),
-@code{Ws} (negative weighted lexicographic)
-with weight vector
-
-@item @code{c}, @code{C}
-for components orders
-
-@end itemize
-
-For the definition of these orderings see @ref{Monomial orderings}.
-
-If one element of the list consists of only one entry, the parentheses may
-be omitted.
-@item @strong{Example:}
-@example
-  ring r =
-  32003,       // coefficient field: Z/32003
-  ( x,y,z ),   // names for variables
-  ds;          // monomial ordering
-               // (degrevlex in a series ring)
-               // parenthesis of lists with only one element
-               // are optional
-@end example
-@example
-  ring r2=10,(x(1..6)),(lp(2),dp(4));
-               // defines a ring with name r2,
-               // (10 is substituted by the next lower prime)
-               // coefficient field: Z/7
-               // variables x(1),x(2),..,x(6)
-               // which is the polynomial ring (Z/7)[x(1),..,x(6)]
-               // with lexicographical ordering on x(1) and x(2)
-               // and then
-               // degree reverse lexicographical on x(3)..x(6)
-@end example
-@example
-  ring r3=0,(x,y,z,a,b,c),(ds(3), dp(3));
-               // defines a ring with name r3,
-               // coefficient field Q
-               // variables x,y,z,a,b,c
-               // which is the ring (Q[a,b,c])[x,y,z]_(x,y,z)
-@end example
-@example
-  ring r4=0,(x,y,z),(c,dp);
-               // defines a ring with name r4,
-               // coefficient field Q (rationals)
-               // variables x,y,z
-               // which is the polynomial ring Q[x,y,z]
-               // with ordering of vectors by
-               // first number of the component and then
-               // degree reverse lexicographical on x,y,z
-@end example
-@example
-  ring r5=(7,a),(x,y,z),dp;
-               // defines a ring with name r5,
-               // coefficient field K=(Z/7)(a)
-               // variables x,y,z
-               // which is the polynomial ring K[x,y,z]
-               // with ordering
-               // degree reverse lexicographical on x,y,z
-@end example
-@example
-  ring r6=(7,a),(x,y,z),dp;
-  minpoly=a^2+a+3;
-               // defines a ring with name r6,
-               // coefficient field K=(Z/7)[a]/a^2+a+3
-               // (the finite field with 49 elements)
-               // variables x,y,z
-               // which is the polynomial ring K[x,y,z]
-               // with ordering
-               // degree reverse lexicographical on x,y,z
-@end example
-@example
-  ring r7=(7^2,a),(x,y,z),dp;
-               // defines a ring with name r7,
-               // the same ring as r6
-               // this option is offered for
-               // a few powers of primes
-               // (see file gftables/49)
-               // the computations are faster
-               // in this representation
-@end example
-@example
-  ring r8=(181,A,B,Z),(x,y,z),dp;
-               // defines a ring with name r8
-               // coefficient field K=Z/181(A,B,Z)
-               // variables x,y,z
-               // which is the polynomial ring K[x,y,z]
-               // degree reverse lexicographical on x,y,z
-@end example
-@example
-  ring r9=real,(x,y,z),dp;
-               // defines a ring with name r9
-               // coefficient field R
-               // (represented as floating point numbers)
-               // variables x,y,z
-               // which is the polynomial ring R[x,y,z]
-               // degree reverse lexicographical on x,y,z
-  number n=1.7e+2; // input format of real numbers
-@end example
-
-@item @strong{Note:}
-Computations in rings with one parameter are faster
-than computations with more parameters. 
-
-Computation over the field @code{real} has computing errors because
-of rounding.
-@item @strong{Use in procedures:}
-All changes of the basering by a definition of a new @code{ring} or a
-@code{setring} command in a procedure are local to this procedure
-(i.e. will not affect the calling procedure) unless a @code{keepring}
-command is used.
+defines a basering and sets it as the actual basering.
 @end table
 
-@c ref
-See
-@ref{Term orderings};
-@ref{charstr};
-@ref{keepring}.
-@ref{npars};
-@ref{nvars};
-@ref{ordstr};
-@ref{qring};
-@ref{ring};
-@ref{setring};
-@ref{varstr};
-@ref{var};
-@c ref
+The coefficient_field is given by one of the following:
+@enumerate
+@item
+a non-negative int_expression less or equal 32003. 
+@* The int_expression should either be 0, representing the field of
+rational numbers Q, or a prime number p, representing the finite field
+with p elements; if it is not a prime number, int_expression is
+converted to the next lower prime number.
+
+@item
+an expression_list of an int_expression and one or more names. 
+@* The int_expression specifies the characteristic of the coefficient
+field as above. The names are used as parameters in transcendental or
+algebraic extensions of the coefficient field. Algebraic extensions are
+implemented for one parameter only. In this case, a minimal polynomial
+has to be defined by assignment to @code{minpoly}. @xref{minpoly}.
+
+@item
+an expression_list of an int_expression and a name. 
+@* The int_expression has to be a prime number p to the power of a
+positive integer n. This defines the Galois field
+@tex
+$GF(p^n)$ with $p^n$ elements, where $p^n$ has to be smaller or equal $2^{15}$.
+@end tex
+@ifinfo
+GF(p^n) with p^n elements, where p^n has to be smaller or equal 2^15.
+@end ifinfo
+The given name refers to a primitive element of 
+@tex
+$GF(p^n)$
+@end tex
+@ifinfo
+GF(p^n)
+@end ifinfo
+generating the multiplicative group.
+
+@item
+the name @code{real}
+@* This specifies the field of real numbers represented as machine
+floating point numbers. Note that computing over this field is not
+exact.
+@end enumerate
+
+The names_of_ring_variables is a list of names or indexed names.
+
+The ordering is a list of block orderings where each block ordering is either
+
+@enumerate
+@item 
+@code{lp}, @code{dp}, @code{Dp}, @code{ls}, @code{ds}, @code{Ds},
+optionally followd by a size parameter in parentheses.
+
+@item 
+@code{wp}, @code{Wp}, @code{ws}, @code{Ws}, @code{a} followed by a
+weight vector given as an intvec_expression in parentheses.
+
+@item 
+@code{M} followed by an intmat_expresion in parantheses.
+
+@item 
+@code{c}, @code{C} which may be specified only as the first or last
+block ordering.
+@end enumerate
+
+For the definition of these orderings, see @ref{Term orderings} and
+@ref{Mathematical background}.
+
+@c ------------------------------------------------------------
+@c   End of duplicate piece of text.
+@c ------------------------------------------------------------
+If one of coefficient_field, names_of_ring_variables, and ordering
+consists of only one entry, the parentheses around this entry may be
+omitted.
 
 @c ---------------------------------------------------------------------------
-@node Term orderings, ,General syntax of a ring definition, Rings and orderings
+@node Term orderings,  , General syntax of a ring declaration, Rings and orderings
 @subsection Term orderings
 @cindex Term orderings
 
-@tex
-A monomial ordering (term ordering) on $K[x_1, \ldots, x_n]$ is
-a total ordering $<$ on the
-set of monomials (power products) $\{x^\alpha|\alpha \in \bf{N}^n\}$
-which is compatible with the
-natural semigroup structure, i.e.\ $x^\alpha < x^\beta$ implies $x^\gamma
-x^\alpha < x^\gamma x^\beta$ for any $\gamma \in \bf{N}^n$.
-We do not require
-$<$ to be  a wellordering.
-@end tex
-@ifinfo
-A monomial ordering (term ordering) on $[x_1, ..., x_n] is
-a total ordering < on the
-set of monomials (power products) @{x^a | a in N^n@}
-which is compatible with the
-natural semigroup structure, i.e. x^a < x^b implies x^c*x^a < x^c*x^b for any
-c in N^n.
-We do not require
-< to be  a wellordering.
-@end ifinfo
-See the literature cited in @ref{References}.
+In a ring declaration, @sc{Singular} offers the following orderings:
+@enumerate
+@item Global orderings
+@table @asis
+@item @code{lp}
+lexicographical ordering
 
-The most important term orderings or monomial orderings in @sc{Singular} are:
-@*global or p-orderings: @code{lp, dp, wp, Dp, Wp} refer to a polynomial ring,
-@*local or s-orderings: @code{ls, ds, ws, Ds, Ws} refer to a series ring,
-@*matrix orderings: allow to create any ordering by a matrix,
-@*product (or block) orderings of the above.
+@item @code{dp}
+degree reverse lexicographical ordering
 
-Given such an ordering say, ord, the ring r created by
-@*@center @code{ring r = p,x(1..n),ord;}
-@*
-@tex
-is by definition Loc K$[x_1,...,x_n]$, where K=Z/p and Loc denotes
-localization with respect to the muliplicatively closed set
-$$\{ 1+f | 1 > lead(f) \}.$$
-Here lead means the leading monomial with respect to ord, 1
-is the constant monomial 1 and $>$ means bigger with respect to
-ord. For global orderings, $x_i > 1$, hence Loc K$[x_1,...,x_n]$ =
-K$[x_1,...,x_n]$, for local orderings, $1 > x_i$, hence Loc K$[x_1,...,x_n]$ =
-K[$x_1,...,x_n$]$_{(x)}$ (the localization of K[$x_1,...,x_n$] with
-respect to the maximal ideal $(x_1,...,x_n)$).
-In general we have K[$x_1,...,x_n$]$ \subseteq $Loc K[$x_1,...,x_n$]$ \subseteq $ K[$x_1,...,x_n$]$_{(x)}$.
-A product ordering which is for example
-of the form (s-ordering(k),p-ordering(l)), n=k+l, (the variables
-$x1,...,xk$ being s-ordered, $x_{k+1},...,x_n$ p-ordered) creates
-           Loc$_{(x)}$K[$x_1,...,x_k] \otimes $K[$x_{k+1},...,x_n$].
-Many other rings between the polynomial ring and the power
-series ring are realized by the choice of an ordering.
-@end tex
-@ifinfo
-is by definition Loc K[x(1),...,x(n)], where K=Z/p and Loc denotes
-localization with respect to the muliplicatively closed set
-@*@center @{ 1+f | lead(f) < 1 @}.
-@*Here lead means the leading monomial with respect to ord, 1
-is the constant monomial 1 and > means bigger with respect to
-ord. For global orderings, x(i) > 1, hence Loc K[x(1),...,x(n)] =
-K[x(1),...,x(n)], for local orderings, x(i) < 1, hence Loc K[x(1),...,x(n)] =
-K[x(1),...,x(n)]_(x) (the localization of K[x(1),...,x(n)] with respect to the
-maximal ideal (x(1),...,x(n))).
-In general we have K[x_1,...,x_n] is in Loc K[x_1,...,x_n],
-which is in K[x_1,...,x_n]_(x).
-A product ordering which is for example
-of the form (s-ordering(k),p-ordering(l)), n=k+l, (the variables
-x(1),...,x(k) being s-ordered, x(k+1),...,x(n) p-ordered) creates
-           Loc_(x)K[x(1),...,x(k)] tensor K[x(k+1),...,x(n)].
-Many other rings between the polynomial ring and the power
-series ring are realized by the choice of an ordering.
-@end ifinfo
+@item @code{Dp}
+degree lexicographical ordering
 
-The great variety of different orderings and their efficient
-implementation makes @sc{Singular} a powerful tool for many different tasks,
-in particular in Algebraic Geometry, Algebra and Singularity theory.
+@item @code{wp(} intvec_expression @code{)}
+weighted reverse lexicographical ordering; the weight vector must
+consist of positive integers only.
 
-On the other hand it requires careful thinking about the 'correct'
-ordering for a specific task. Even if the rings are the same,
-the result of a standard basis computation depends on the
-ordering. For instance, the commands @code{dim}, @code{mult}, @code{degree},
-@code{hilb},
-etc. compute the dimension, multiplicity, etc. of the ideal
-generated by the leading terms of the given generators. In
-many cases of interest, e.g. if a degree-ordering is choosen
-and if the generators are a standard basis, the computed
-result will be the corresponding invariant of the ideal itself.
-Nevertheless, it remains the task of the user to give a correct
-interpretation of the result, i.e., interpret the result in Loc K[x].
+@item @code{Wp(} intvec_expression @code{)}
+weighted lexicographical ordering; the weight vector must consist of
+positive integers only.
+@end table
 
-@c ---------------------------------------------------------------------------
+Global orderings are wellorderings, i.e., 1 < x for each ring variable
+x. They are denoted by a 'p' as the second character in their name.
+
+@item Local orderings
+@table @asis
+@item @code{ls}
+negative lexicographical ordering
+
+@item @code{ds}
+negative degree reverse lexicographical ordering
+
+@item @code{Ds}
+negative degree lexicographical ordering
+
+@item @code{ws(} intvec_expression @code{)}
+(general) weighted reverse lexicographical ordering
+
+@item @code{Ws(} intvec_expression @code{)}
+(general) weighted lexicographical ordering
+@end table
+
+Local orderings are not wellorderings. They are denoted by a 's' as the
+second character in their name.
+
+@item Matrix orderings
+@table @asis
+@item @code{M(} intmat_expression @code{)}
+The intmat_expression has to be an invertible square matrix
+..???.. 
+@end table
+
+@sc{Singular} can compute standard bases for any monomial
+ordering that is compatible with the natural semigroup structure on the
+monomials. In practice, the predefined global and local orderings
+together with the block orderings should be sufficient in most
+cases. These orderings are faster than their corresponding matrix
+orderings since evaluation of a matrix ordering is time consuming.
+
+@item Extra weight vector
+@table @asis
+@item @code{a(} intvec_expression @code{)}
+An extra weight vector @code{a(} intvec_expression @code{)} may precede
+any degree ordering.
+@end table
+
+@item Product ordering
+@table @asis
+@item @code{(} ordering [ @code{(} int_expression @code{)} ]@code{,} ... @code{)}
+Any of the above orderings and the extra weight vector may be combined
+to yield product or block orderings.
+@end table
+
+The orderings @code{lp}, @code{dp}, @code{Dp}, @code{ls}, @code{ds}, and
+@code{Ds} may be followed by an int_expression in parentheses giving the
+size of the block. For the last block the size is calculated
+automatically. For the weighted orderings the size of the block is given
+by the size of the weight vector. The same holds analogously for matrix
+orderings.
+
+@item Module orderings
+@table @asis
+@itemx @code{(} ordering@code{,} ...@code{, C )}
+@item @code{(} ordering@code{,} ...@code{, c )}
+Sort polynomial vectors by the monomial ordering first, then by
+components. 
+
+@itemx @code{( C,} ordering@code{,} ... @code{)}
+@item @code{( c,} ordering@code{,} ... @code{)}
+Sort polynomial vectors by components first, then by the monomial
+ordering. 
+@end table
+
+Here a capital @code{C} sorts generators in ascending order,
+i.e., @code{gen(1)} < @code{gen(2)} < ...; a small @code{c} sorts in
+descending order, i.e., @code{gen(1)} > @code{gen(2)} > ... . The module 
+ordering has not to be defined explicitly since @code{(}
+ordering@code{,} ...@code{, C )} is the default.
+@end enumerate
+
+For a mathematical description of these orderings, see @ref{Mathematical
+background}. 
+
 @c ---------------------------------------------------------------------------
 @node Implemented algorithms, The SINGULAR language, Rings and orderings, General concepts
 @section Implemented algorithms
