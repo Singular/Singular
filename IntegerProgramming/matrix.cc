@@ -8,6 +8,8 @@
 #include "matrix.h"
 
 ////////////// constructors and destructor //////////////////////////////////
+typedef Integer* IntegerP;
+typedef BigInt* BigIntP;
 
 matrix::matrix(const short& row_number, const short& column_number)
     :rows(row_number),columns(column_number)
@@ -27,7 +29,7 @@ matrix::matrix(const short& row_number, const short& column_number)
 
   // memory allocation and initialization
 
-  coefficients=new (Integer*)[rows];
+  coefficients=new IntegerP[rows];
   for(short i=0;i<rows;i++)
     coefficients[i]=new Integer[columns];
   for(short i=0;i<rows;i++)
@@ -54,7 +56,7 @@ matrix::matrix(const short& row_number, const short& column_number,
 
   // memory allocation and initialization
 
-  coefficients=new (Integer*)[rows];
+  coefficients=new IntegerP[rows];
   for(short i=0;i<rows;i++)
     coefficients[i]=new Integer[columns];
   for(short i=0;i<rows;i++)
@@ -97,7 +99,7 @@ matrix::matrix(ifstream& input)
     return;
   }
 
-  coefficients=new (Integer*)[rows];
+  coefficients=new IntegerP[rows];
   for(short i=0;i<rows;i++)
     coefficients[i]=new Integer[columns];
   for(short i=0;i<rows;i++)
@@ -137,7 +139,7 @@ matrix::matrix(const short& m, const short& n, ifstream& input)
 
   // memory allocation and initialization
 
-  coefficients=new (Integer*)[rows];
+  coefficients=new IntegerP[rows];
   for(short i=0;i<rows;i++)
     coefficients[i]=new Integer[columns];
   for(short i=0;i<rows;i++)
@@ -169,7 +171,7 @@ matrix::matrix(const matrix& A)
 
   // memory allocation and initialization (also for H)
 
-  coefficients=new (Integer*)[rows];
+  coefficients=new IntegerP[rows];
   for(short i=0;i<rows;i++)
     coefficients[i]=new Integer[columns];
   for(short i=0;i<rows;i++)
@@ -178,7 +180,7 @@ matrix::matrix(const matrix& A)
 
   if(_kernel_dimension>0)
   {
-    H=new (BigInt*)[_kernel_dimension];
+    H=new BigIntP[_kernel_dimension];
     for(short k=0;k<_kernel_dimension;k++)
       H[k]=new (BigInt)[columns];
     for(short k=0;k<_kernel_dimension;k++)
@@ -259,7 +261,7 @@ short matrix::LLL_kernel_basis()
 
   // copy the column vectors of the actual matrix
   // (They are modified by the LLL-algorithm!)
-  BigInt** b=new (BigInt*)[columns];
+  BigInt** b=new BigIntP[columns];
   for(short n=0;n<columns;n++)
     b[n]=new BigInt[rows];
   for(short n=0;n<columns;n++)

@@ -201,7 +201,7 @@ void SWAPK(const short& k, const short& k_max, BigInt** b, BigInt** H,
 
 }
 
-
+typedef BigInt* BigIntP;
 
 
 short relations(BigInt **b, const short& number_of_vectors,
@@ -240,7 +240,7 @@ short relations(BigInt **b, const short& number_of_vectors,
 
     if(r==1)
     {
-      H=new (BigInt*)[1];
+      H=new BigIntP[1];
       H[0]=new BigInt[1];
       H[0][0]=1;
       // This is the lattice basis of the relations...
@@ -259,7 +259,7 @@ short relations(BigInt **b, const short& number_of_vectors,
 // except from the indices of the array d which has size
 // number_of_vectors+1.
 
-  H=new (BigInt*)[number_of_vectors];
+  H=new BigIntP[number_of_vectors];
   for(short n=0;n<number_of_vectors;n++)
     H[n]=new BigInt[number_of_vectors];
 
@@ -267,7 +267,7 @@ short relations(BigInt **b, const short& number_of_vectors,
 
   BigInt* d=new BigInt[number_of_vectors+1];
 
-  BigInt** lambda=new (BigInt*)[number_of_vectors];
+  BigInt** lambda=new BigIntP[number_of_vectors];
   for(short n=1;n<number_of_vectors;n++)
     lambda[n]=new BigInt[n];
   // We only need lambda[n][k] for n>k.
@@ -410,7 +410,7 @@ short relations(BigInt **b, const short& number_of_vectors,
   // H[r],...,H[number_of_vectors-1]).
   BigInt **aux=H;
   if(r>0)
-    H=new (BigInt*)[r];
+    H=new BigIntP[r];
   for(short i=0;i<r;i++)
     H[i]=aux[i];
 
@@ -474,7 +474,7 @@ short integral_LLL(BigInt** b, const short& number_of_vectors,
 
   BigInt* d=new BigInt[number_of_vectors+1];
 
-  BigInt** lambda=new (BigInt*)[number_of_vectors];
+  BigInt** lambda=new BigIntP[number_of_vectors];
   for(short s=1;s<number_of_vectors;s++)
     lambda[s]=new BigInt[s];
   // We only need lambda[n][k] for n>k.

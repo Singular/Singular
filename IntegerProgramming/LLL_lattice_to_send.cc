@@ -90,7 +90,7 @@ int main (void)
   lll_b = proc_entrada (&F, &C);
 
   lll_d = new mpz_t[F + 1];
-  lll_lambda = new (mpz_t *)[F + 1];
+  lll_lambda = new mpz_t *[F + 1];
   mpz_init (lll_d[0]);
   for (i = 1; i <= F; i++) {
     mpz_init (lll_d[i]);
@@ -193,7 +193,7 @@ mpz_t **proc_entrada (int *F, int *C) /* Inputs */
 
   aux=new char[tamano];
   fscanf (stdin, "%i, %i\n", &numF, &numC);
-  base = new (mpz_t *)[numF+1];
+  base = new mpz_t *[numF+1];
   for (i = 1; i <= numF; i++) {
     base[i] = new mpz_t[numC+1];
     for (j = 1; j <= numC; j++)
