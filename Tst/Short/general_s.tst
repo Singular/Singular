@@ -4,6 +4,7 @@ LIB "general.lib";
 example A_Z;
 example ASCII;
 example binomial;
+example deleteSublist;
 example factorial;
 example fibonacci;
 //example kmemory;
@@ -15,6 +16,7 @@ example product;
 example ringweights;
 example sort;
 example sum;
+example watchdog;
 example which;
 
 tst_status(1);$

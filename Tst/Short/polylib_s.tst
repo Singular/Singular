@@ -43,4 +43,10 @@ example numerator;
 
 example denominator;
 
+example mod2id;
+
+example id2mod;
+
+example subrInterred;
+
 tst_status(1);$
