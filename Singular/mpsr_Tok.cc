@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_Tok.cc,v 1.10 1997-06-17 10:12:11 obachman Exp $ */
+/* $Id: mpsr_Tok.cc,v 1.11 1998-04-01 18:56:30 Singular Exp $ */
 
 /***************************************************************
  *
@@ -180,7 +180,6 @@ short mpsr_mp2ord(MP_Common_t mp_ord)
 short ExtraCmds[] =
 {
   OPTION_CMD,
-  VERBOSE_CMD,
   NAMES_CMD,
 //  RESERVEDNAME_CMD,
   PROC_CMD,
@@ -195,7 +194,6 @@ short ExtraCmds[] =
 short sr_cmds[] =
 {
   OPTION_CMD,
-  VERBOSE_CMD,
   NAMES_CMD,
   ATTRIB_CMD,
   CHARSTR_CMD,
@@ -508,7 +506,8 @@ void mpsr_ttGen()
       }
       else
       {
-        fprintf(stderr, "Warning: mpsr_ttGen: Unknown Cmd Token: %d\n", i);
+        fprintf(stderr, "Warning: mpsr_ttGen: Unknown Cmd Token: %d(%s)\n",
+	                i, Tok2Cmdname(i));
       }
     }
   }

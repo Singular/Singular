@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: token for interpreter, as types; general macros
 */
-/* $Id: tok.h,v 1.13 1998-02-27 14:06:27 Singular Exp $ */
+/* $Id: tok.h,v 1.14 1998-04-01 18:56:30 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -100,7 +100,6 @@ enum {
   TRACE_CMD,
   TYPEOF_CMD,
   VARSTR_CMD,
-  VERBOSE_CMD,
   WRITE_CMD,
   /* start system var section: VECHO */
   VECHO,
@@ -114,8 +113,6 @@ enum {
   VPRINTLEVEL,
   /* end system var section: VPRINTLEVEL */
 
-  /* start system var section: VECHO */
-  /* end system var section: VPRINTLEVEL */
   MAX_TOK /* must be the last, biggest token number */
 };
 
