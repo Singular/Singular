@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_matrix.h,v 1.9 2005-01-13 15:10:23 Singular Exp $ */
+/* $Id: ftmpl_matrix.h,v 1.10 2005-01-13 15:11:36 Singular Exp $ */
 
 #ifndef INCL_MATRIX_H
 #define INCL_MATRIX_H
@@ -49,7 +49,7 @@ public:
     void swapColumn( int i, int j );
 #ifndef NOSTREAMIO
     void print( ostream& s ) const;
-    friend ostream & operator<< <>( ostream & s, const Matrix<T>& M );
+    friend ostream & operator<< <T>( ostream & s, const Matrix<T>& M );
 #endif /* NOSTREAMIO */
     friend class SubMatrix<T>;
 };
