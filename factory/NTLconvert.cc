@@ -1,4 +1,4 @@
-/* $Id: NTLconvert.cc,v 1.6 2003-02-11 16:28:48 Singular Exp $ */
+/* $Id: NTLconvert.cc,v 1.7 2003-02-14 15:53:26 Singular Exp $ */
 #include <config.h>
 
 #include "cf_gmp.h"
@@ -291,8 +291,7 @@ CanonicalForm convertNTLGF2X2CF(GF2X poly,Variable x)
   return bigone;
 }
 
-static int
-NTLcmpCF( const CFFactor & f, const CFFactor & g )
+int NTLcmpCF( const CFFactor & f, const CFFactor & g )
 {
   if (f.exp() > g.exp()) return 1;
   if (f.exp() < g.exp()) return 0;
