@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: reference.doc,v 1.121 1999-07-09 14:12:55 obachman Exp $
+@comment $Id: reference.doc,v 1.122 1999-07-09 16:28:17 Singular Exp $
 @comment this file contains the reference part of the manual
 
 @c The following directives are necessary for proper compilation
@@ -106,6 +106,7 @@ brackets are allowed.
 * kill::
 * killattrib::
 * koszul::
+* laguerre::
 * lead::
 * leadcoef::
 * leadexp::
@@ -173,6 +174,8 @@ brackets are allowed.
 * transpose::
 * type::
 * typeof::
+* uressolve::
+* vandermonde::
 * var::
 * varstr::
 * vdim::
@@ -2439,7 +2442,7 @@ See
 @ref{option}.
 @c ref
 @c ---------------------------------------
-@node koszul, lead, killattrib, Functions
+@node koszul, laguerre, killattrib, Functions
 @subsection koszul
 @cindex koszul
 @table @code
@@ -2478,8 +2481,23 @@ See
 @ref{int};
 @ref{matrix}.
 @c ref
+@c ---------------------------------------
+@node laguerre, lead, koszul, Functions
+@subsection laguerre
+@cindex laguerre
+TBC
+@table @code
+@item @strong{Syntax:}
+@item @strong{Type:}
+matrix
+@item @strong{Purpose:}
+@item @strong{Example:}
+@end table
+@c ref
+See
+@c ref
 @c -------------------------------------------------
-@node lead, leadcoef, koszul, Functions
+@node lead, leadcoef, laguerre, Functions
 @subsection lead
 @cindex lead
 @table @code
@@ -2755,16 +2773,14 @@ respectively @code{sm=module(matrix(m)*T)}.
 @c example
 @end smallexample
 @end table
-@menu
-* ideal::
-* ring::
-* option::        Sets certain strategies.
-* std::
-* matrix::
-@end menu
-@iftex
-See @ref{ideal}; @ref{ring}; @ref{option}; @ref{std}; @ref{matrix}.
-@end iftex
+@c ref
+See
+@ref{ideal};
+@ref{ring};
+@ref{option};
+@ref{std};
+@ref{matrix}.
+@c ref
 @c ---------------------------------------
 @node listvar, lres, liftstd, Functions
 @subsection listvar
@@ -3913,14 +3929,12 @@ the weights are the weights used for the first block of the ring ordering.
 @c example
 @end smallexample
 @end table
-@menu
-* deg::
-* poly::
-* vector::
-@end menu
-@iftex
-See @ref{deg}; @ref{poly}; @ref{vector}.
-@end iftex
+@c ref
+See
+@ref{deg};
+@ref{poly};
+@ref{vector}.
+@c ref
 @c ---------------------------------------
 @node ordstr, par, ord, Functions
 @subsection ordstr
@@ -3940,16 +3954,13 @@ returns the description of the monomial ordering of the ring.
 @c example
 @end smallexample
 @end table
-@menu
-* ring::
-* varstr::
-* parstr::
-* charstr::
-@end menu
-@iftex
-See @ref{ring}; @ref{varstr}; @ref{parstr}; @ref{charstr}.
-@end iftex
-
+@c ref
+See
+@ref{ring};
+@ref{varstr};
+@ref{parstr};
+@ref{charstr}.
+@c ref
 @c ---------------------------------------
 @node par, pardeg, ordstr, Functions
 @subsection par
@@ -3970,15 +3981,13 @@ has at least one parameter.
 @c example
 @end smallexample
 @end table
-@menu
-* npars::
-* parstr::
-* ring::
-* var::
-@end menu
-@iftex
-See @ref{npars}; @ref{parstr}; @ref{ring}; @ref{var}.
-@end iftex
+@c ref
+See
+@ref{npars};
+@ref{parstr};
+@ref{ring};
+@ref{var}.
+@c ref
 @c ---------------------------------------
 @node pardeg, parstr, par, Functions
 @subsection pardeg
@@ -3998,14 +4007,12 @@ returns the degree of a number considered as a polynomial in the ring parameters
 @c example
 @end smallexample
 @end table
-@menu
-* number::
-* ring::
-* var::
-@end menu
-@iftex
-See @ref{number}; @ref{ring}; @ref{var}.
-@end iftex
+@c ref
+See
+@ref{number};
+@ref{ring};
+@ref{var}.
+@c ref
 @c ---------------------------------------
 @node parstr, preimage, pardeg, Functions
 @subsection parstr
@@ -4031,19 +4038,15 @@ returns the list of parameters of the ring as a string
 @c example
 @end smallexample
 @end table
-@menu
-* charstr::
-* npars::
-* ordstr::
-* par::
-* ring::
-* varstr::
-@end menu
-@iftex
-See @ref{charstr}; @ref{npars}; @ref{ordstr}; @ref{par}
+@c ref
+See
+@ref{charstr};
+@ref{npars};
+@ref{ordstr};
+@ref{par}
 @ref{ring};
 @ref{varstr}.
-@end iftex
+@c ref
 @c ---------------------------------------
 @node preimage, prime, parstr, Functions
 @subsection preimage
@@ -4082,13 +4085,11 @@ special command for computing the kernel of a map in @sc{Singular}.
 @c example
 @end smallexample
 @end table
-@menu
-* map::
-* ring::
-@end menu
-@iftex
-See @ref{map}; @ref{ring}.
-@end iftex
+@c ref
+See
+@ref{map};
+@ref{ring}.
+@c ref
 @c ---------------------------------------
 @node prime, print, preimage, Functions
 @subsection prime
@@ -4110,13 +4111,11 @@ returns the largest prime less then 32004 smaller or equal to the argument;
 @c example
 @end smallexample
 @end table
-@menu
-* int::
-* general_lib::
-@end menu
-@iftex
-See @ref{int}; @ref{general_lib}.
-@end iftex
+@c ref
+See
+@ref{int};
+@ref{general_lib}.
+@c ref
 @c ---------------------------------------
 @node print, printf, prime, Functions
 @subsection print
@@ -4231,12 +4230,10 @@ corresponding factor modules are isomorphic.
 @c example
 @end smallexample
 @end table
-@menu
-* module::
-@end menu
-@iftex
-See @ref{module}.
-@end iftex
+@c ref
+See
+@ref{module}.
+@c ref
 @c ---------------------------------------
 @node qhweight, quot, prune, Functions
 @subsection qhweight
@@ -4258,14 +4255,12 @@ If the input is not weighted homogeneous, an intvec of zeros is returned.
 @c example
 @end smallexample
 @end table
-@menu
-* ideal::
-* intvec::
-* weight::
-@end menu
-@iftex
-See @ref{ideal}; @ref{intvec}; @ref{weight}.
-@end iftex
+@c ref
+See
+@ref{ideal};
+@ref{intvec};
+@ref{weight}.
+@c ref
 
 @c ---------------------------------------
 @node quot, quote, qhweight, Functions
@@ -4307,14 +4302,12 @@ effect of exactly one @code{quote}).
 @c example
 @end smallexample
 @end table
-@menu
-* eval::
-* write::
-* MPfile links::
-@end menu
-@iftex
-See @ref{eval}; @ref{write}; @ref{MPfile links}.
-@end iftex
+@c ref
+See
+@ref{eval};
+@ref{write};
+@ref{MPfile links}.
+@c ref
 @c ---------------------------------------
 @node quotient, random, quote, Functions
 @subsection quotient
@@ -4363,14 +4356,11 @@ quotient(m,id3);
 @c example
 @end smallexample
 @end table
-@menu
-* ideal::
-* module::
-@end menu
-@iftex
-See @ref{ideal};
+@c ref
+See
+@ref{ideal};
 @ref{module}.
-@end iftex
+@c ref
 @c ---------------------------------------
 @node random, read, quotient, Functions
 @subsection random
@@ -4406,15 +4396,13 @@ the function @code{system} by a commandline option.
 @c example
 @end smallexample
 @end table
-@menu
-* Command line options::
-* int::
-* intmat::
-* system::
-@end menu
-@iftex
-See @ref{Command line options}; @ref{int}; @ref{intmat}; @ref{system}.
-@end iftex
+@c ref
+See
+@ref{Command line options};
+@ref{int};
+@ref{intmat};
+@ref{system}.
+@c ref
 @c ---------------------------------------
 @node read, reduce, random, Functions
 @subsection read
@@ -4458,16 +4446,14 @@ key given as the second argument from the data base.
 @c example
 @end smallexample
 @end table
-@menu
-* execute::
-* getdump::
-* link::
-* status::
-* write::
-@end menu
-@iftex
-See @ref{execute}; @ref{getdump}; @ref{link}; @ref{status}; @ref{write}.
-@end iftex
+@c ref
+See
+@ref{execute};
+@ref{getdump};
+@ref{link};
+@ref{status};
+@ref{write}.
+@c ref
 @c ---------------------------------------
 @node reduce, regularity, read, Functions
 @subsection reduce
@@ -4519,9 +4505,12 @@ only the leading term and does no tail reduction.
 * vector::
 * std::
 @end menu
-@iftex
-See @ref{ideal}; @ref{vector}; @ref{std}.
-@end iftex
+@c ref
+See
+@ref{ideal};
+@ref{vector};
+@ref{std}.
+@c ref
 @c ---------------------------------------
 @node regularity, res, reduce, Functions
 @subsection regularity
@@ -4567,16 +4556,14 @@ the computation unless @code{option(notRegularity);} is given.
 @c example
 @end smallexample
 @end table
-@menu
-* res::
-* mres::
-* sres::
-* minres::
-* option::
-@end menu
-@iftex
-See @ref{res}; @ref{mres}; @ref{sres}; @ref{minres}; @ref{option}.
-@end iftex
+@c ref
+See
+@ref{res};
+@ref{mres};
+@ref{sres};
+@ref{minres};
+@ref{option}.
+@c ref
 @c ---------------------------------------
 @node  res, reservedName, regularity, Functions
 @subsection res
@@ -4714,13 +4701,11 @@ to the variable given as the third argument.
 @c example
 @end smallexample
 @end table
-@menu
-* poly::
-* ring::
-@end menu
-@iftex
-See @ref{poly}; @ref{ring}.
-@end iftex
+@c ref
+See
+@ref{poly};
+@ref{ring}.
+@c ref
 @c ---------------------------------------
 @node rvar, setring, resultant, Functions
 @subsection rvar
@@ -4747,15 +4732,13 @@ or if the string is the name of a ring variable of the basering.
 @c example
 @end smallexample
 @end table
-@menu
-* defined::
-* ring::
-* var::
-* varstr::
-@end menu
-@iftex
-See @ref{defined}; @ref{ring}; @ref{var}; @ref{varstr}.
-@end iftex
+@c ref
+See
+@ref{defined};
+@ref{ring};
+@ref{var};
+@ref{varstr}.
+@c ref
 @c ---------------------------------------
 @node setring, simplify, rvar, Functions
 @subsection setring
@@ -4787,14 +4770,12 @@ Use keepring to move a ring which is local to a procedure up by one nesting
 level.
 
 @end table
-@menu
-* ring::
-* qring::
-* keepring::
-@end menu
-@iftex
-See @ref{qring}; @ref{ring}; @ref{keepring}.
-@end iftex
+@c ref
+See
+@ref{qring};
+@ref{ring};
+@ref{keepring}.
+@c ref
 @c ---------------------------------------
 @node simplify, size, setring, Functions
 @subsection simplify
@@ -4847,16 +4828,13 @@ simplify(A,2+8); // by automatic conversion to module
 @c example
 @end smallexample
 @end table
-@menu
-* poly::
-* vector::
-* ideal::
-* module::
-@end menu
-@iftex
-See @ref{poly}; @ref{vector};
-@ref{ideal}; @ref{module}.
-@end iftex
+@c ref
+See
+@ref{poly};
+@ref{vector};
+@ref{ideal};
+@ref{module}.
+@c ref
 @c ---------------------------------------
 @node size, sortvec, simplify, Functions
 @subsection size
@@ -4907,18 +4885,7 @@ returns the number of entries (rows*columns).
 @c example
 @end smallexample
 @end table
-@menu
-* ncols::
-* nrows::
-* string::
-* intvec::
-* intmat::
-* poly::
-* vector::
-* ideal::
-* module::
-@end menu
-@iftex
+@c ref
 See @ref{string};
 @ref{intvec};
 @ref{intmat};
@@ -4926,8 +4893,9 @@ See @ref{string};
 @ref{vector};
 @ref{ideal};
 @ref{module};
-@ref{ncols}; @ref{nrows}.
-@end iftex
+@ref{ncols};
+@ref{nrows}.
+@c ref
 @c ---------------------------------------
 @node sortvec, sprintf, size, Functions
 @subsection sortvec
@@ -4951,13 +4919,11 @@ starting with the smallest.
 @c example
 @end smallexample
 @end table
-@menu
-general_lib::
-@end menu
-@iftex
+@c ref
 @c See @ref{string expressions}; @ref{intvec expressions}; @ref{poly expressions};
-See @ref{general_lib}.
-@end iftex
+See
+@ref{general_lib}.
+@c ref
 @c ---------------------------------------
 @node sprintf, sres, sortvec, Functions
 @subsection sprintf
@@ -5036,21 +5002,18 @@ which also completes computations and may therefore take time.
 @c example
 @end smallexample
 @end table
-@menu
-* betti::
-* ideal::
-* int::
-* lres::
-* minres::
-* module::
-* mres::
-* res::
-* syz::
-@end menu
-@iftex
-See @ref{betti}; @ref{ideal}; @ref{int};
-@ref{lres}; @ref{minres}; @ref{module}; @ref{mres}; @ref{res}; @ref{syz}.
-@end iftex
+@c ref
+See
+@ref{betti};
+@ref{ideal};
+@ref{int};
+@ref{lres};
+@ref{minres};
+@ref{module};
+@ref{mres};
+@ref{res};
+@ref{syz}.
+@c ref
 @c ---------------------------------------
 @node status, std, sres, Functions
 @subsection status
@@ -5111,15 +5074,13 @@ returns (depending on the type of the link and its status)
 @c example
 @end smallexample
 @end table
-@menu
-* link::
-* open::
-* read::
-* write::
-@end menu
-@iftex
-See @ref{link}; @ref{open}; @ref{read}; @ref{write}.
-@end iftex
+@c ref
+See
+@ref{link};
+@ref{open};
+@ref{read};
+@ref{write}.
+@c ref
 @c ---------------------------------------
 @node std, stdfglm, status, Functions
 @subsection std
@@ -5162,7 +5123,7 @@ first argument) and one additional generator (the second argument).
 @item @strong{Example:}
 @smallexample
 @c example
-  // local computation 
+  // local computation
   ring r = 32003, (x,y,z), ds;
   poly s1  = 1x2y + 151xyz10 + 169y21;
   poly s2  = 1xz14 + 6x2y4 + 3z24;
@@ -5242,16 +5203,13 @@ substitutes a ring variable by a term (a polynomial of length <=1).
 @c example
 @end smallexample
 @end table
-@menu
-* poly::
-* vector::
-* ideal::
-* module::
-@end menu
-@iftex
-See @ref{poly}; @ref{vector};
-@ref{ideal}; @ref{module}.
-@end iftex
+@c ref
+See
+@ref{poly};
+@ref{vector};
+@ref{ideal};
+@ref{module}.
+@c ref
 @c ---------------------------------------
 @node  system, syz, subst, Functions
 @subsection system
@@ -5326,11 +5284,6 @@ unique_name;
 @expansion{} /tmp/xx0
 @end smallexample
 @end table
-@c @menu
-@c @end menu
-@iftex
-@c See @ref{}; @ref{}; @ref{}; @ref{}; @ref{}.
-@end iftex
 @c -------------------------------------------------
 @node syz, trace, system, Functions
 @subsection syz
@@ -5353,19 +5306,16 @@ of the ideal resp. module.
 @c example
 @end smallexample
 @end table
-@menu
-* ideal::
-* lres::
-* module::
-* mres::
-* nres::
-* res::
-* sres::
-@end menu
-@iftex
-See @ref{ideal}; @ref{lres}; @ref{module}; @ref{mres}; @ref{nres};
-@ref{res}; @ref{sres}.
-@end iftex
+@c ref
+See
+@ref{ideal};
+@ref{lres};
+@ref{module};
+@ref{mres};
+@ref{nres};
+@ref{res};
+@ref{sres}.
+@c ref
 @c ---------------------------------------
 @node trace, transpose, syz, Functions
 @subsection trace
@@ -5387,14 +5337,11 @@ returns the trace of an intmat resp a matrix.
 @c example
 @end smallexample
 @end table
-@menu
-* intmat::
-* matrix::
-@end menu
-@iftex
+@c ref
 See
-@ref{intmat}; @ref{matrix}.
-@end iftex
+@ref{intmat};
+@ref{matrix}.
+@c ref
 @c ---------------------------------------
 @node transpose, type, trace, Functions
 @subsection transpose
@@ -5444,16 +5391,14 @@ value of an expression, it is sufficient to type @code{expression;}.
 @c example
 @end smallexample
 @end table
-@menu
-* listvar::
-* print::
-* Data types::
-@end menu
-@iftex
-See @ref{listvar}; @ref{print}; @ref{Data types}.
-@end iftex
+@c ref
+See
+@ref{listvar};
+@ref{print};
+@ref{Data types}.
+@c ref
 @c ---------------------------------------
-@node typeof, var, type, Functions
+@node typeof, uressolve, type, Functions
 @subsection typeof
 @cindex typeof
 @table @code
@@ -5508,14 +5453,33 @@ For internal use only are the types
 @c example
 @end smallexample
 @end table
-@menu
-* Data types::
-@end menu
-@iftex
-See @ref{Data types}.
-@end iftex
+@c ref
+See
+@ref{Data types}.
+@c ref
 @c ---------------------------------------
-@node var, varstr, typeof, Functions
+@node uressolve, vandermonde, typeof, Functions
+@subsection uressolve
+@cindex uressolve
+TBC
+@table @code
+@item @strong{Syntax:}
+@item @strong{Type:}
+@item @strong{Purpose:}
+@end table
+@c ---------------------------------------
+@node vandermonde, var, uressolve, Functions
+@subsection vandermonde
+@cindex vandermonde
+TBC
+@table @code
+@item @strong{Syntax:}
+@item @strong{Type:}
+@item @strong{Purpose:}
+@item @strong{Example:}
+@end table
+@c ---------------------------------------
+@node var, varstr, vandermonde, Functions
 @subsection var
 @cindex var
 @table @code
@@ -5533,15 +5497,13 @@ returns the n-th ring variable for a given integer n.
 @c example
 @end smallexample
 @end table
-@menu
-* ring::
-* int::
-* nvars::
-* varstr::
-@end menu
-@iftex
-See @ref{ring}; @ref{int}; @ref{nvars}; @ref{varstr}.
-@end iftex
+@c ref
+See
+@ref{ring};
+@ref{int};
+@ref{nvars};
+@ref{varstr}.
+@c ref
 @c ---------------------------------------
 @node varstr, vdim, var, Functions
 @subsection varstr
@@ -5567,21 +5529,16 @@ returns the list of the names of the ring variables as a string
 @c example
 @end smallexample
 @end table
-@menu
-* ring::
-* int::
-* var::
-* nvars::
-* ordstr::
-* charstr::
-* parstr::
-@end menu
-@iftex
-See @ref{ring}; @ref{int}; @ref{nvars}; @ref{var};
+@c ref
+See
+@ref{ring};
+@ref{int};
+@ref{nvars};
+@ref{var};
 @ref{ordstr};
 @ref{charstr};
 @ref{parstr}.
-@end iftex
+@c ref
 @c ---------------------------------------
 @node vdim, wedge, varstr, Functions
 @subsection vdim
@@ -5610,17 +5567,15 @@ free module) modulo the ideal (resp. module).
 @c example
 @end smallexample
 @end table
-@menu
-* ideal::
-* std::
-* dim::
-* degree::
-* mult::
-* kbase::
-@end menu
-@iftex
-See @ref{ideal}; @ref{std}; @ref{dim}; @ref{degree}; @ref{mult}; @ref{kbase}.
-@end iftex
+@c ref
+See
+@ref{ideal};
+@ref{std};
+@ref{dim};
+@ref{degree};
+@ref{mult};
+@ref{kbase}.
+@c ref
 @c ---------------------------------------
 @node wedge, weight, vdim, Functions
 @subsection wedge
@@ -5642,14 +5597,12 @@ computes the n-th exterior power of matrix for a given integer n.
 @c example
 @end smallexample
 @end table
-@menu
-* matrix::
-* minor::
-* int::
-@end menu
-@iftex
-See @ref{matrix}; @ref{minor}; @ref{int}.
-@end iftex
+@c ref
+See
+@ref{matrix};
+@ref{minor};
+@ref{int}.
+@c ref
 @c ---------------------------------------
 @node weight, write, wedge, Functions
 @subsection weight
@@ -5681,14 +5634,12 @@ which the input is weighted homogeneous is found.
 @c example
 @end smallexample
 @end table
-@menu
-* ideal::
-* intvec::
-* qhweight::
-@end menu
-@iftex
-See @ref{ideal}; @ref{intvec}; @ref{qhweight}.
-@end iftex
+@c ref
+See
+@ref{ideal};
+@ref{intvec};
+@ref{qhweight}.
+@c ref
 @c ---------------------------------------
 @node  write,  , weight, Functions
 @subsection write
@@ -6378,13 +6329,11 @@ See @ref{Break points}.
 @c   @expansion{} -1*xy
 @c @end example
 @c @end table
-@c @menu
-@c * int expressions::
-@c * ring::
-@c @end menu
-@c @iftex
-@c See @ref{ring}; @ref{int expressions}.
-@c @end iftex
+@c @c ref
+@c See
+@c @ref{ring};
+@c @ref{int expressions}.
+@c @c ref
 @c @c -----------------------------------------------------
 @node degBound, echo, System variables, System variables
 @subsection degBound
@@ -6410,14 +6359,12 @@ degBound;
 degBound = 0; //resets degree bound to infinity
 @end smallexample
 @end table
-@menu
-* deg::
-* int::
-* option::
-@end menu
-@iftex
-See @ref{deg}; @ref{int}; @ref{option}.
-@end iftex
+@c ref
+See
+@ref{deg};
+@ref{int};
+@ref{option}.
+@c ref
 @c -----------------------------------------------------
 @node echo, minpoly, degBound, System variables
 @subsection echo
@@ -6437,13 +6384,11 @@ int i = echo;
 @expansion{} int i = echo;
 @end smallexample
 @end table
-@menu
-* int::
-* voice::
-@end menu
-@iftex
-See @ref{int}; ref{voice}.
-@end iftex
+@c ref
+See
+@ref{int};
+ref{voice}.
+@c ref
 @c -----------------------------------------------------
 @node minpoly, multBound, echo, System variables
 @subsection minpoly
@@ -6476,13 +6421,11 @@ function @code{factorize} @ref{factorize}.
 @c example
 @end smallexample
 @end table
-@menu
-* factorize::
-* ring::
-@end menu
-@iftex
-See @ref{ring}.
-@end iftex
+@c ref
+See
+@ref{factorize};
+@ref{ring}.
+@c ref
 @c -----------------------------------------------------
 @node multBound, noether, minpoly, System variables
 @subsection multBound
@@ -6506,14 +6449,12 @@ multBound;
 multBound = 0;  //disables multBound
 @end smallexample
 @end table
-@menu
-* int::
-* mult::
-* option::
-@end menu
-@iftex
-See @ref{int}; @ref{mult}; @ref{option}.
-@end iftex
+@c ref
+See
+@ref{int};
+@ref{mult};
+@ref{option}.
+@c ref
 @c -----------------------------------------------------
 @node noether, printlevel, multBound, System variables
 @subsection noether
@@ -6539,14 +6480,11 @@ the monomial @code{noether} during the computation.
 @c example
 @end smallexample
 @end table
-@menu
-* poly::
-* degBound::
-* std::
-@end menu
-@iftex
-See @ref{poly}; @ref{std}.
-@end iftex
+@c ref
+See
+@ref{poly};
+@ref{std}.
+@c ref
 @c -----------------------------------------------------
 @node printlevel, short, noether, System variables
 @subsection printlevel
@@ -6572,14 +6510,12 @@ for the display of comments while procedures are executed.
 @c example
 @end smallexample
 @end table
-@menu
-* int::
-* dbprint::
-* voice::
-@end menu
-@iftex
-See @ref{int}; @ref{dbprint}; @ref{voice}.
-@end iftex
+@c ref
+See
+@ref{int};
+@ref{dbprint};
+@ref{voice}.
+@c ref
 @c -----------------------------------------------------
 @node short, timer, printlevel, System variables
 @subsection short
@@ -6641,7 +6577,7 @@ commands, see example below.
 
 @item @strong{Note for Windows95/98:}
 The value of the @code{timer} can not be used (resp. trusted) when
-@sc{Singular} is run under Windows95/98 (this is due to the shortcomings 
+@sc{Singular} is run under Windows95/98 (this is due to the shortcomings
 of the Windows95/98 operating system). Use @ref{rtimer}, instead.
 
 @item @strong{Example:}
@@ -6699,12 +6635,10 @@ in this line is suspended until the user presses @code{RETURN}.
 @c example
 @end smallexample
 @end table
-@menu
-* int::
-@end menu
-@iftex
-See @ref{int}.
-@end iftex
+@c ref
+See
+@ref{int}.
+@c ref
 @c ---------------------------------------
 @node rtimer, voice, TRACE var, System variables
 @subsection rtimer
@@ -6743,12 +6677,10 @@ proc p
 @expansion{} 2
 @end smallexample
 @end table
-@menu
-* dbprint::
-* listvar::
-* printlevel::
-@end menu
-@iftex
-See @ref{dbprint}; @ref{listvar}; @ref{printlevel}.
-@end iftex
+@c ref
+See
+@ref{dbprint};
+@ref{listvar};
+@ref{printlevel}.
+@c ref
 @c ---------------------------------------
