@@ -95,4 +95,27 @@ example redleit;
 example squarefree;
 example allsquarefree;
 list L=list(poly(x-y),ideal(x,y));
+// --------------- additions: -----------------------------
+example further_hn_proc;
+example leit;
+example testreducible;
+example T_Transfor;
+example T1_Transform;
+example T2_Transform;
+example koeff;
+example multiplicities;
+example puiseux2generators;
+example intersection;
+example multsequence;
+example displayMultsequence;
+example separateHNE;
+example charPoly;
+example find_in_list;
+example get_last_divisor;
+example extdevelop;
+example factorfirst;
+example essdevelop;
+example factorlist;
+example extrafactor;
+
 tst_status(1);$
