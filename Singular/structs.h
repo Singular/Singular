@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.62 2002-04-24 15:38:30 Singular Exp $ */
+/* $Id: structs.h,v 1.63 2002-06-04 18:33:23 levandov Exp $ */
 /*
 * ABSTRACT
 */
@@ -67,9 +67,10 @@ enum n_coeffType
 #ifdef HAVE_PLURAL
 enum nc_type
 {
-  nc_general,
-  nc_skew,
-  nc_lie
+  nc_general, /* yx=q xy+... */
+  nc_skew, /* yx=q xy */
+  nc_lie,  /* yx=xy+... */
+  nc_undef  /* for internal reasons */
 };
 #endif
 
