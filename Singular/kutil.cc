@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.15 1998-04-06 17:59:32 obachman Exp $ */
+/* $Id: kutil.cc,v 1.16 1998-04-08 16:04:25 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for std
 */
@@ -199,7 +199,7 @@ void HEckeTest (poly pp,kStrategy strat)
 /*2
 *utilities for TSet, LSet
 */
-inline intset initec (int maxnr)
+inline static intset initec (int maxnr)
 {
   return (intset)Alloc(maxnr*sizeof(int));
 }
@@ -433,7 +433,7 @@ void deleteInS (int i,kStrategy strat)
 }
 
 /*2
-*cancels the i-th polynomial in the set
+*cancels the j-th polynomial in the set
 */
 void deleteInL (LSet set, int *length, int j,kStrategy strat)
 {
@@ -448,7 +448,23 @@ void deleteInL (LSet set, int *length, int j,kStrategy strat)
       pFree1(set[j].p);
       /*- tail belongs to several int spolys -*/
     }
-    else pDelete(&(set[j].p));
+    else 
+    {
+      // search p in T, if it is there, do not delete it
+      int i=strat->tl;
+      poly p=set[j].p;
+      while (i>=0)
+      {
+        if (strat->T[i].p==p)
+	{
+          p=NULL;
+	  break;
+	}
+	i--;
+      }
+      if (p!=NULL) pDelete(&p);
+      set[j].p=NULL;
+    }  
   }
   if ((*length)>0)
   {
@@ -3371,11 +3387,13 @@ void enterSBba (LObject p,int atS,kStrategy strat)
   /*- puts p to the standardbasis s at position at -*/
   if (strat->sl == IDELEMS(strat->Shdl)-1)
   {
-    strat->ecartS = (intset)ReAlloc(strat->ecartS,IDELEMS(strat->Shdl)*sizeof(int),
+    strat->ecartS = (intset)ReAlloc(strat->ecartS,
+                                    IDELEMS(strat->Shdl)*sizeof(int),
                                     (IDELEMS(strat->Shdl)+setmax)*sizeof(int));
     if (strat->fromQ!=NULL)
     {
-      strat->fromQ = (intset)ReAlloc(strat->fromQ,IDELEMS(strat->Shdl)*sizeof(int),
+      strat->fromQ = (intset)ReAlloc(strat->fromQ,
+                                    IDELEMS(strat->Shdl)*sizeof(int),
                                     (IDELEMS(strat->Shdl)+setmax)*sizeof(int));
     }
     pEnlargeSet(&strat->S,IDELEMS(strat->Shdl),setmax);

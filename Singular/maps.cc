@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.7 1998-01-12 18:59:50 obachman Exp $ */
+/* $Id: maps.cc,v 1.8 1998-04-08 16:04:28 Singular Exp $ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
@@ -198,8 +198,7 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
     }
   }
   ordersize=i+1;
-  wv = (short **) Alloc(ordersize * sizeof(short **));
-  memset(wv,0,ordersize * sizeof(short **));
+  wv = (short **) Alloc0(ordersize * sizeof(short **));
   for (i--;i!=0 ;i--) wv[i+1] = sourcering->wvhdl[i];
   tmpR = *currRing;
   tmpR.N = N;

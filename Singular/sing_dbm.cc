@@ -4,7 +4,7 @@
 
 //**************************************************************************/
 //
-// $Id: sing_dbm.cc,v 1.8 1997-08-13 13:51:42 Singular Exp $
+// $Id: sing_dbm.cc,v 1.9 1998-04-08 16:04:32 Singular Exp $
 //
 //**************************************************************************/
 //  'sing_dbm.cc' containes command to handle dbm-files under
@@ -52,8 +52,10 @@ BOOLEAN dbOpen(si_link l, short flag)
     // request w- open, but mode is not "w" nor "rw" => fail
     return TRUE;
   }
-  if (((db = (DBM_info *)Alloc(sizeof *db)) != NULL)
-  &&((db->db = dbm_open(l->name, dbm_flags, 0664 )) != NULL ))
+  //if (((db = (DBM_info *)Alloc(sizeof *db)) != NULL)
+  //&&((db->db = dbm_open(l->name, dbm_flags, 0664 )) != NULL ))
+  db = (DBM_info *)Alloc(sizeof *db);
+  if((db->db = dbm_open(l->name, dbm_flags, 0664 )) != NULL )
   {
     db->first=1;
     if(flag & SI_LINK_WRITE)

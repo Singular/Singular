@@ -718,6 +718,12 @@ char * versionString()
 #ifdef MDEBUG
               StringAppend("MDEBUG=%d,",MDEBUG);
 #endif
+#ifdef PDEBUG
+              StringAppend("PDEBUG,");
+#endif
+#ifdef KDEBUG
+              StringAppend("KDEBUG,");
+#endif
 #ifdef TEST_MAC_ORDER
               StringAppendS("mac_order,");
 #endif

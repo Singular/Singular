@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.15 1998-04-07 17:00:59 Singular Exp $ */
+/* $Id: kstdfac.cc,v 1.16 1998-04-08 16:04:24 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -463,7 +463,8 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
       if (TEST_OPT_PROT) message(pFDeg(strat->P.p),&olddeg,&reduc,strat);
     }
     /* reduction of the element choosen from L */
-    strat->red(&strat->P,strat);
+    if (strat->P.p != NULL)
+      strat->red(&strat->P,strat);
     if (strat->P.p != NULL)
     {
       int facdeg=pFDeg(strat->P.p);

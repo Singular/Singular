@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.9 1998-02-18 11:35:31 siebert Exp $ */
+/* $Id: matpol.cc,v 1.10 1998-04-08 16:04:29 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -67,11 +67,11 @@ matrix mpNew(int r, int c)
 #else
     rc->m = (polyset)Alloc0(s);
 #endif
-    if (rc->m==NULL)
-    {
-      Werror("internal error: creating matrix[%d][%d]",r,c);
-      return NULL;
-    }
+    //if (rc->m==NULL)
+    //{
+    //  Werror("internal error: creating matrix[%d][%d]",r,c);
+    //  return NULL;
+    //}
   }
   return rc;
 }
@@ -724,15 +724,15 @@ void   mpMonomials(matrix c, int r, int var, matrix m)
   int p=MATCOLS(m)/r-1;
   /* fill in the powers of x_var=h*/
   poly h=pOne();
-  for(k=1;k<=r; k++)
+  for(k=r;k>0; k--)
   {
     MATELEM(m,k,k*(p+1))=pOne();
   }
-  for(l=1;l<=p; l++)
+  for(l=p;l>0; l--)
   {
     pSetExp(h,var,l);
     pSetm(h);
-    for(k=1;k<=r; k++)
+    for(k=r;k>0; k--)
     {
       MATELEM(m,k,k*(p+1)-l)=pCopy(h);
     }
@@ -891,7 +891,7 @@ row_col_weight::row_col_weight(int i, int j)
 
 row_col_weight::~row_col_weight()
 {
-  if (ym)
+  if (ym!=0)
   {
     Free((ADDRESS)wcol, yn*sizeof(float));
     Free((ADDRESS)wrow, ym*sizeof(float));

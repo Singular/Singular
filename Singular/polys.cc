@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.21 1998-04-08 12:42:17 pohl Exp $ */
+/* $Id: polys.cc,v 1.22 1998-04-08 16:04:31 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -727,7 +727,7 @@ static void newHeadsB(polyset actHeads,int length)
 
   for (i=0;i<length;i++)
   {
-    if (actHeads[i])
+    if (actHeads[i]!=NULL)
     {
       newOrder[i] = SchreyerOrd[pGetComp(actHeads[i])-1];
     }
@@ -771,10 +771,10 @@ static void newHeadsM(polyset actHeads,int length)
 {
   int i;
   int* newOrder=
-    (int*)Alloc((length+maxSchreyer-indexShift)*sizeof(int));
+    (int*)Alloc0((length+maxSchreyer-indexShift)*sizeof(int));
 
-  for (i=0;i<length+maxSchreyer-indexShift;i++)
-    newOrder[i]=0;
+  //for (i=0;i<length+maxSchreyer-indexShift;i++)
+  //  newOrder[i]=0;
   for (i=indexShift;i<maxSchreyer;i++)
   {
     newOrder[i-indexShift] = SchreyerOrd[i];
@@ -831,7 +831,7 @@ void pSetSchreyerOrdM(polyset nextOrder, int length,int comps)
     else
     {
       indexShift = comps;
-      if (!indexShift) indexShift = 1;
+      if (indexShift==0) indexShift = 1;
       SchreyerOrd = (int*)Alloc((indexShift+length)*sizeof(int));
       maxSchreyer = length+indexShift;
       for (i=0;i<indexShift;i++)
@@ -1717,6 +1717,31 @@ poly pMultCopyN(poly a, number c)
 }
 
 /*2
+* returns TRUE if the head term of b is a multiple of the head term of a
+*/
+#if defined(macintosh)
+BOOLEAN pDivisibleBy(poly a, poly b)
+{
+  if ((a!=NULL)&&(( pGetComp(a)==0) || ( pGetComp(a) ==  pGetComp(b))))
+  {
+    int i=pVariables;
+    Exponent_t *e1=&( pGetExp(a,1));
+    Exponent_t *e2=&( pGetExp(b,1));
+    if ((*e1) > (*e2)) return FALSE;
+    do
+    {
+      i--;
+      if (i == 0) return TRUE;
+      e1++;
+      e2++;
+     } while ((*e1) <= (*e2));
+   }
+   return FALSE;
+}
+#endif
+
+
+/*2
 * assumes that the head term of b is a multiple of the head term of a
 * and return the multiplicant *m
 */
@@ -1907,11 +1932,11 @@ poly pDehomogen (poly p1,poly p2,number n)
   poly    p;
   number  nn;
 
-  P = (polyset)Alloc(5*sizeof(poly));
-  for (i=0; i<5; i++)
-  {
-    P[i] = NULL;
-  }
+  P = (polyset)Alloc0(5*sizeof(poly));
+  //for (i=0; i<5; i++)
+  //{
+  //  P[i] = NULL;
+  //}
   pCancelPolyByMonom(p1,p2,&P,&SizeOfSet);
   p = P[0];
   //P[0] = NULL ;// for safety, may be remoeved later
