@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: eigenval.cc,v 1.2 2001-03-14 10:25:11 mschulze Exp $ */
+/* $Id: eigenval.cc,v 1.3 2001-03-22 19:10:59 Singular Exp $ */
 /*
 * ABSTRACT: eigenvalues of constant square matrices
 */
@@ -210,24 +210,24 @@ lists eigenval(matrix M)
         poly p0,p1;
         poly pp=p;
         while(pp!=NULL&&pGetExp(pp,1)<=1)
-	{
+        {
           if(pGetExp(pp,1)==0)
             p0=pp;
           else
           if(pGetExp(pp,1)==1)
             p1=pp;
           pp=pNext(pp);
-	}
+        }
         if(pp==NULL)
-	{
-	  pp=p;
+        {
+          pp=p;
           p=pNSet(nNeg(nDiv(nCopy(pGetCoeff(p0)),nCopy(pGetCoeff(p1)))));
           pDelete(&pp);
         }
         else
-	{
+        {
           p=pMult_nn(p,pGetCoeff(e0->m[0]));
-	}
+        }
         l=addval(l,p,(*m0)[i]);
       }
       delete m0;
@@ -262,7 +262,7 @@ BOOLEAN eigenval(leftv res,leftv h)
     if(MATCOLS(M)!=MATROWS(M))
     {
       WerrorS("square matrix expected");
-    } 
+    }
     res->rtyp=LIST_CMD;
     res->data=(void*)eigenval(mpCopy(M));
     return FALSE;

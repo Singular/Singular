@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.h,v 1.10 2001-01-18 16:53:56 Singular Exp $ */
+/* $Id: gnumpfl.h,v 1.11 2001-03-22 19:11:03 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 */
@@ -26,6 +26,7 @@ number   ngfMult(number a, number b);
 number   ngfDiv(number a, number b);
 void     ngfPower(number x, int exp, number *lu);
 number   ngfCopy(number a);
+number   ngf_Copy(number a, ring r);
 char *   ngfRead (char *s, number *a);
 void     ngfWrite(number &a);
 

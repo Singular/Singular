@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.59 2001-02-20 09:45:44 Singular Exp $ */
+/* $Id: longalg.cc,v 1.60 2001-03-22 19:11:05 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -196,6 +196,7 @@ static napoly napInit(int i)
 #define napSetCoeff(p,n) {nacDelete(&napGetCoeff(p),currRing);napGetCoeff(p)=n;}
 #define napDelete1(p)    p_LmDelete((poly *)p, currRing->algring)
 #define napCopy(p)       (napoly)p_Copy((poly)p,currRing->algring)
+#define nap_Copy(p,r)       (napoly)p_Copy((poly)p,r->algring)
 #define napComp(p,q)     p_LmCmp((poly)p,(poly)q, currRing->algring)
 #define napMultT(A,E)    A=(napoly)p_Mult_mm((poly)A,(poly)E,currRing->algring)
 #define napMult(A,B)     (napoly)p_Mult_q((poly)A,(poly)B,currRing->algring)
@@ -1376,6 +1377,17 @@ number naCopy(number p)
   erg = (lnumber)omAlloc0Bin(rnumber_bin);
   erg->z = napCopy(src->z);
   erg->n = napCopy(src->n);
+  erg->s = src->s;
+  return (number)erg;
+}
+number na_Copy(number p, ring r)
+{
+  if (p==NULL) return NULL;
+  lnumber erg;
+  lnumber src = (lnumber)p;
+  erg = (lnumber)omAlloc0Bin(rnumber_bin);
+  erg->z = nap_Copy(src->z,r);
+  erg->n = nap_Copy(src->n,r);
   erg->s = src->s;
   return (number)erg;
 }

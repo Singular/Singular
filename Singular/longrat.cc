@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.37 2001-01-18 16:53:54 Singular Exp $ */
+/* $Id: longrat.cc,v 1.38 2001-03-22 19:11:06 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -2257,6 +2257,15 @@ LINLINE BOOLEAN nlIsZero (number a)
 * copy a to b
 */
 LINLINE number nlCopy(number a)
+{
+  if ((SR_HDL(a) & SR_INT)||(a==NULL))
+  {
+    return a;
+  }
+  return _nlCopy_NoImm(a);
+}
+
+LINLINE number nl_Copy(number a, ring r)
 {
   if ((SR_HDL(a) & SR_INT)||(a==NULL))
   {

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.26 2001-01-20 11:39:14 Singular Exp $ */
+/* $Id: longalg.h,v 1.27 2001-03-22 19:11:06 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -68,6 +68,7 @@ BOOLEAN naGreaterZero(number a);
 void    naPower(number x, int exp, number *lo);
 BOOLEAN naGreaterZero(number a);
 number  naCopy(number p);                              /* erg:= p */
+number  na_Copy(number p, ring r);                     /* erg:= p */
 number  naAdd(number la, number li);               /* lu := la+li */
 number  naMult(number la, number li);              /* lo := la*li */
 number  naDiv(number la, number li);               /* lo := la/li */

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.63 2001-02-09 14:22:56 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.64 2001-03-22 19:11:04 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -861,7 +861,7 @@ int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN isrin
 
     //if(name->req_packhdl != NULL /*&& !isring*/) {
     if(name->req_packhdl != NULL && !isring &&
-       IDPACKAGE(name->req_packhdl) != root) {
+       IDPACKAGE(name->req_packhdl)->idroot != (*root)) {
       //Print("iiDeclCommand: PUSH(%s)\n",IDID(name->req_packhdl));
       namespaceroot->push( IDPACKAGE(name->req_packhdl) ,
                            IDID(name->req_packhdl));

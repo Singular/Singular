@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.87 2000-12-06 11:03:10 Singular Exp $ */
+/* $Id: grammar.y,v 1.88 2001-03-22 19:11:03 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -1087,15 +1087,12 @@ exportcmd:
           else
           {
 #ifdef HAVE_NAMESPACES
-            if ($4.Typ()==PACKAGE_CMD) {
-              if (iiExport(&$2,0,(idhdl)$4.data))
-                YYERROR;
-            }
-            else
+            if (($4.Typ()==PACKAGE_CMD)
+            && (iiExport(&$2,0,(idhdl)$4.data)))
+              YYERROR;
+#else            
+            printf("String: %s;\n", (char *)$4.data);
 #endif /* HAVE_NAMESPACES */
-            {
-             printf("String: %s;\n", (char *)$4.data);
-            }
           }
         }
         ;

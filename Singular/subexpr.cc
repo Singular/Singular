@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.72 2001-02-09 14:22:57 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.73 2001-03-22 19:11:09 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -1654,7 +1654,9 @@ char *iiSleftv2name(leftv v)
 {
 #ifdef HAVE_NAMESPACES
   char *name;
-  if(v->packhdl != NULL) {
+  if((v->packhdl != NULL)&&(IDPACKAGE(v->packhdl)!=namespaceroot->pack))
+  {
+    // MEMORY LEAK ??
     name = (char *)omAlloc(strlen(v->name) + strlen(IDID(v->packhdl)) + 3);
     sprintf(name, "%s::%s", IDID(v->packhdl), v->name);
     return(name);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.cc,v 1.20 2001-01-30 11:45:47 pohl Exp $ */
+/* $Id: gnumpfl.cc,v 1.21 2001-03-22 19:11:01 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 *
@@ -136,6 +136,16 @@ void ngfDelete (number * a, const ring r)
 * copy a to b
 */
 number ngfCopy(number a)
+{
+  gmp_float* b= NULL;
+  if ( a !=  NULL )
+  {
+    b= new gmp_float( *(gmp_float*)a );
+  }
+  return (number)b;
+}
+
+number ngf_Copy(number a, ring r)
 {
   gmp_float* b= NULL;
   if ( a !=  NULL )

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.58 2001-02-26 15:08:45 levandov Exp $ */
+/* $Id: structs.h,v 1.59 2001-03-22 19:11:08 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -233,6 +233,7 @@ struct n_Procs_s
    number  (*nNeg)(number a);
    number  (*nInvers)(number a);
    number  (*nCopy)(number a);
+   number  (*cfCopy)(number a, ring r);
    number  (*nRePart)(number a);
    number  (*nImPart)(number a);
    void    (*nWrite)(number &a);

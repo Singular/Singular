@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.44 2000-12-19 18:31:43 obachman Exp $ */
+/* $Id: libparse.l,v 1.45 2001-03-22 19:11:05 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -296,18 +296,18 @@ eqnl           ([ \t\n]*+=[ \t\n]*)
                else if (!category_out)
                  printf("Version:%s;\n", libnamebuf);
                #else
-               #ifdef HAVE_NAMESPACES
-               h0 = enterid( omStrDup("version"), myynest, STRING_CMD,
-                                  &IDPACKAGE(pl)->idroot, FALSE );
-               if (h0!=NULL)
-               {
-                  IDSTRING(h0) = omStrDup(libnamebuf);
-               }
-               #else /* HAVE_NAMESPACES */
+               //#ifdef HAVE_NAMESPACES
+               //h0 = enterid( omStrDup("version"), myynest, STRING_CMD,
+               //                   &IDPACKAGE(pl)->idroot, FALSE );
+               //if (h0!=NULL)
+               //{
+               //   IDSTRING(h0) = omStrDup(libnamebuf);
+               //}
+               //#else /* HAVE_NAMESPACES */
                if (text_buffer!=NULL) omFree((ADDRESS)text_buffer);
                text_buffer = omStrDup(libnamebuf);
 	       omMarkAsStaticAddr(text_buffer);
-               #endif /* HAVE_NAMESPACES */
+               //#endif /* HAVE_NAMESPACES */
                #endif
              }
            }

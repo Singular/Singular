@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.h,v 1.22 2001-01-18 16:53:54 Singular Exp $ */
+/* $Id: longrat.h,v 1.23 2001-03-22 19:11:07 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers
 */
@@ -40,7 +40,6 @@ typedef MP_INT lint;
 
 struct snumber;
 typedef struct snumber rnumber;
-typedef rnumber * number;
 struct snumber
 {
   lint z;
@@ -65,6 +64,7 @@ LINLINE number   nlInit(int i);
 LINLINE BOOLEAN  nlIsOne(number a);
 LINLINE BOOLEAN  nlIsZero(number za);
 LINLINE number   nlCopy(number a);
+LINLINE number   nl_Copy(number a, ring r);
 LINLINE void     nlNew(number *r);
 LINLINE void     nlDelete(number *a, const ring r);
 LINLINE number   nlNeg(number za);

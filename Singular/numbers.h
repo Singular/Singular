@@ -3,13 +3,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.26 2001-02-20 09:45:44 Singular Exp $ */
+/* $Id: numbers.h,v 1.27 2001-03-22 19:11:08 Singular Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
 #include "structs.h"
 
-#define n_Copy(n, r)          (r)->cf->nCopy(n)
+#define n_Copy(n, r)          (r)->cf->cfCopy(n,r)
 #define n_Delete(n, r)        (r)->cf->cfDelete(n,r)
 #define n_Mult(n1, n2, r)     (r)->cf->nMult(n1, n2)
 #define n_Add(n1, n2, r)      (r)->cf->nAdd(n1, n2)
@@ -71,6 +71,7 @@ void ndDelete(number* d, const ring r);
 void nDummy2(number &d);
 number ndGcd(number a, number b);
 number ndCopy(number a);
+number nd_Copy(number a, ring r);
 
 #ifdef LDEBUG
 void nDBDummy1(number* d,char *f, int l);

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.h,v 1.9 2001-01-18 16:53:55 Singular Exp $ */
+/* $Id: gnumpc.h,v 1.10 2001-03-22 19:11:00 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 */
@@ -27,6 +27,7 @@ number   ngcMult(number a, number b);
 number   ngcDiv(number a, number b);
 void     ngcPower(number x, int exp, number *lu);
 number   ngcCopy(number a);
+number   ngc_Copy(number a, ring r);
 char *   ngcRead (char *s, number *a);
 void     ngcWrite(number &a);
 number   ngcRePart(number a);

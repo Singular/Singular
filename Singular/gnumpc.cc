@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.cc,v 1.19 2001-01-30 11:45:47 pohl Exp $ */
+/* $Id: gnumpc.cc,v 1.20 2001-03-22 19:10:59 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP complex floating-point numbers
 *
@@ -142,6 +142,15 @@ void ngcDelete (number * a, const ring r)
 * copy a to b
 */
 number ngcCopy(number a)
+{
+  gmp_complex* b= NULL;
+  if ( a !=  NULL )
+  {
+    b= new gmp_complex( *(gmp_complex*)a );
+  }
+  return (number)b;
+}
+number ngc_Copy(number a, ring r)
 {
   gmp_complex* b= NULL;
   if ( a !=  NULL )
