@@ -93,7 +93,7 @@ You need an ANSI-C++ and ANSI-C compiler for compiling Singular. We
 strongly recommend that you use the GNU C/C++ (gcc) compiler. If you
 have gcc installed on your system, configure will automatically find
 and use it for building Singular. Otherwise, configure will try to
-find another ANSI-C and ANSI-C++ compiler. To use explicitely use an
+find another ANSI-C and ANSI-C++ compiler. To use explicitly use an
 alternative compiler, or to set some unusual options for compilation
 or linking that the `configure' script does not know about, you can
 give `configure' initial values for variables by setting them in the
@@ -135,7 +135,7 @@ Singular's configure script pays attention to the following
   'gmp'      : Uses the gmp (Gnu Multiple Precision) library for
                integer arithmetic. Requires that libgmp.a and gmp.h
                are installed on your system. If these files were not
-               found, then Singular is buid with its internal integer
+               found, then Singular is build with its internal integer
                arithmetic which is not as fast as the arithmetic
                provided by gmp.
 
@@ -220,7 +220,7 @@ Configuration:
   --version               print the version of autoconf that created configure
 Directory and file names:
   --prefix=PREFIX         install architecture-independent files in PREFIX
-                          [/mnt/amd/users/urmel/singular/obachman/Singular/Singular/..]
+                          [`pwd`]
   --exec-prefix=EPREFIX   install architecture-dependent files in EPREFIX
                           [same as prefix]
   --bindir=DIR            user executables in DIR [EPREFIX/bin]

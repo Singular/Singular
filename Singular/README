@@ -17,7 +17,7 @@ the following subdirectories:
 
 See the following files in this directory
   'INSTALL' -- for information on how to install Singular
-  'COPYING' -- for copying and licence information
+  'COPYING' -- for copying and license information
 
 See below for an overview of Singular, and for distribution and
 support information.
@@ -42,19 +42,19 @@ algebra and algebraic geometry. The main features of Singular are:
 
  * Polynomial factorization, resultant, and gcd computations
 
- * Large variety of implemented related algortihm: FGLM,
+ * Large variety of implemented related algorithm: FGLM,
    Hilbert-driven, Factorizing Buchberger; Minimal resolutions,
    Primary decomposition; Usual ideal theoretic operations; standard
-   combinatorial algortihms.
+   combinatorial algorithms.
 
- * Effficient and flexible communication links based on the MP
+ * Efficient and flexible communication links based on the MP
    protocol and library
 
  * Easy-to-use, command-driven user-interface
 
  * Intuitive, C-like programming language
 
- * Extensive libraries of procedures, written in Singular'S
+ * Extensive libraries of procedures, written in Singular's
    programming language
 
  * Written in C/C++. Available as source and binary for some hard- and
