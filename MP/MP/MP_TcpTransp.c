@@ -82,6 +82,7 @@ ay Exp $";
 #include <stdlib.h>
 #include <signal.h>
 
+
 #ifdef __WIN32__
 
 #     include <process.h>
@@ -90,6 +91,7 @@ ay Exp $";
 
 
 #include <unistd.h>
+#include <netdb.h>
 
 #endif /* not __WIN32__ */
 
@@ -431,10 +433,16 @@ MP_Status_t open_tcp_launch_mode(link, argc, argv)
 
 #else /*  not __WIN32__ */
 
-    char     *rsh_argv[5], myhost[64], cport[5], **dmy_args, *appstr, *sub;
+    char *rsh_argv[5], myhost[64], cport[5], **dmy_args, *appstr, *sub;
     int       rsh_pid = -1, i;
     MP_TCP_t *tcp_rec;
+    MP_Boolean_t localhost = MP_FALSE;
 
+#ifdef HAVE_GETHOSTBYNAME
+    if (gethostbyname("localhost") != NULL) localhost = MP_TRUE;
+#endif
+    
+    
 #ifdef MP_DEBUG
     fprintf(stderr, "open_tcp_launch_mode: entering\n");
     fflush(stderr);
@@ -446,7 +454,7 @@ MP_Status_t open_tcp_launch_mode(link, argc, argv)
 
     if (gethostname(myhost, 64) == -1)
         return MP_SetError(link, MP_Failure);
-
+    
     /* NOTE: Ultrix doesn't like this order. It expects rsh host [-n]
        command. */
     /* I tried on every platform I know using all the rsh commands
@@ -462,9 +470,18 @@ MP_Status_t open_tcp_launch_mode(link, argc, argv)
     tcp_rec->rsh = IMP_StrDup(rsh_argv[0]);
 
     rsh_argv[1] = IMP_GetCmdlineArg(argc, argv, "-MPhost");
-    rsh_argv[2] = "-n";
     /* Let's not be too strict, and allow an empty -MPhost argument */
-    if (rsh_argv[1] == NULL) rsh_argv[1] = myhost;
+    if (localhost)
+    {
+      if ((rsh_argv[1] != NULL && (strcmp(rsh_argv[1], myhost) == 0)) ||
+          rsh_argv[1] == NULL) 
+        rsh_argv[1] = "localhost";
+    }
+    else
+    {
+      rsh_argv[1] = myhost;
+    }
+    rsh_argv[2] = "-n";
     rsh_argv[3] = IMP_GetCmdlineArg(argc, argv, "-MPapplication");
     if (rsh_argv[3] == NULL) {
         MP_LogEvent(link, MP_ERROR_EVENT,
@@ -508,6 +525,10 @@ MP_Status_t open_tcp_launch_mode(link, argc, argv)
         }
 
     sprintf(cport, "%hd", tcp_rec->peerport);
+    if (localhost  &&
+        (strcmp(rsh_argv[1], myhost) == 0 ||
+         strcmp(rsh_argv[1], "localhost") == 0))
+      sprintf(myhost, "localhost");
     
     if (strstr(rsh_argv[3], "$MPport") != NULL ||
         strstr(rsh_argv[3], "$MPhost") != NULL)

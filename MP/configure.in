@@ -170,6 +170,7 @@ fi
 
 AC_SUBST(BUILD_SUBDIRS)
 AC_SUBST(CONFIG_SUBDIRS)
+AC_CHECK_FUNCS(gethostbyname)
 
 if test "$ac_check_prog" = yes; then
   AC_CHECK_LIB(m, atof)
@@ -196,7 +197,7 @@ if test "$ac_check_prog" = yes; then
   if test "$ac_cv_func_gethostbyname" != yes; then
     AC_CHECK_LIB(nsl, gethostbyname)
     if test "$ac_cv_lib_nsl_gethostbyname" != yes; then
-      AC_MSG_WARN(Did not find library containing gethostname)
+      AC_MSG_WARN(Did not find library containing gethostbyname)
       AC_MSG_WARN(Linking programs with MP might fail)
     fi
   fi
@@ -442,7 +443,7 @@ fi
 
 AC_MSG_CHECKING(which remote shell command to use)
 for mp_rsh in $ac_rsh_programs; do
-    if $mp_rsh `hostname` -n uname \>\& /dev/null; then
+    if $mp_rsh localhost -n uname \>\& /dev/null; then
       mp_rsh_found=$mp_rsh
       break;
     else
