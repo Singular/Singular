@@ -1,14 +1,16 @@
 // emacs edit mode for this file is -*- C++ -*-
-// $Id: cf_reval.h,v 1.0 1996-05-17 10:59:39 stobbe Exp $
+// $Id: cf_reval.h,v 1.1 1997-03-26 16:53:10 schmidt Exp $
 
 #ifndef INCL_R_EVALUATION_H
 #define INCL_R_EVALUATION_H
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.0  1996/05/17 10:59:39  stobbe
+Initial revision
+
 */
 
-#include <iostream.h>
 #include "canonicalform.h"
 #include "cf_eval.h"
 #include "cf_random.h"
