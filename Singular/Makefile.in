@@ -115,7 +115,7 @@ SOURCES=${CSOURCES} ${CXXSOURCES} ${ESOURCES} mmalloc.cc\
         p_Copy__Template.cc p_Mult_nn__Template.cc  pp_Mult_nn__Template.cc \
         pp_Mult_mm__Template.cc p_Mult_mm__Template.cc \
         p_Minus_mm_Mult_qq__Template.cc p_Add_q__Template.cc \
-	p_Neg__Template.cc \
+	p_Neg__Template.cc kInline.cc
 
 
 HEADERS=algmap.h hutil.h lists.h stairc.h attrib.h ideals.h \
