@@ -1,3 +1,5 @@
+Thu May  7 19:52:20 MET DST 1998 hannes
+        * change doc2tex for "@c ref ... @c ref"
 Thu May  7 18:54:58 MET DST 1998 hannes
         * change node "Control structures" in general.doc to "Flow control"
 	  (there is also "Control structures" in reference.doc),
