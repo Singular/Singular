@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.156 2001-01-31 17:55:28 Singular Exp $ */
+/* $Id: ring.cc,v 1.157 2001-01-31 17:58:25 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -594,7 +594,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   && (R->float_len < SHORT_REAL_LENGTH))
   {
     R->float_len = SHORT_REAL_LENGTH;
-    R->float_len = 1;
+    R->float_len2 = SHORT_REAL_LENGTH;
   }  
 
   /* names and number of variables-------------------------------------*/
