@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.36 1998-09-04 16:04:51 Singular Exp $ */
+/* $Id: ideals.cc,v 1.37 1998-09-29 21:14:43 siebert Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -2318,6 +2318,7 @@ static void idRecMin(matrix a,int ar,poly *barDiv,ideal result,
   if ((r*c==0) || (MATELEM(nextStep,nextStep->nrows,nextStep->ncols)==NULL))
   {
     idDelete((ideal*)&a);
+    idDelete((ideal*)&nextStep);
     return;
   }
 /*--- we read out the r-1 x c-1 matrix for the next step--*/

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.9 1998-04-29 07:05:30 siebert Exp $ */
+/* $Id: syz.cc,v 1.10 1998-09-29 21:14:46 siebert Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -219,8 +219,22 @@ static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
 void syMinimizeResolvente(resolvente res, int length, int first)
 {
   int syzIndex=first;
+  intvec * dummy;
 
   if (syzIndex<1) syzIndex=1;
+  if ((syzIndex==1) && (idHomModule(res[0],currQuotient,&dummy)))
+  {
+    delete dummy;
+    resolvente res1=syFastMin(res,length);
+    int i;
+    for (i=0;i<length;i++)
+    {
+      idDelete(&res[i]);
+      res[i] = res1[i];
+    }
+    Free((ADDRESS)res1,length*sizeof(ideal));
+    return;
+  }
   while ((syzIndex<length-1) && (res[syzIndex]!=NULL) && (res[syzIndex+1]!=NULL))
   {
     syMinStep(res[syzIndex-1],res[syzIndex],FALSE,res[syzIndex+1]);
@@ -1012,4 +1026,144 @@ int syIsMinimizedFrom(resolvente res,int length)
     j--;
   }
   return j;
+}
+
+/*2
+* determines the generators of a minimal resolution
+* contained in res
+*/
+static int ** syScanRes(resolvente res, int length)
+{
+  int i=0,j,k;
+  int **result=(int**)Alloc0(length*sizeof(int*));
+  poly p;
+  ideal tid;
+
+  while ((i<length) && (!idIs0(res[i])))
+  {
+    result[i] = (int*)Alloc0(IDELEMS(res[i])*sizeof(int));
+    for (j=IDELEMS(res[i])-1;j>=0;j--)
+    {
+      if (res[i]->m[j]==NULL) (result[i])[j] = -1;
+    }
+    if (i>0)
+    {
+      tid = idJet(res[i],0);
+      Print("Der %d-te 0-jet ist:\n",i);
+      for (j=0;j<IDELEMS(tid);j++)
+      {
+        if (tid->m[j]!=0)
+        {
+          Print("poly %d :",j);pWrite(tid->m[j]);
+        }
+      }
+      for (j=0;j<IDELEMS(tid);j++)
+      {
+        p = tid->m[j];
+        while (p!=NULL)
+        {
+          pNorm(p);
+          k = (result[i-1])[pGetComp(p)-1];
+          if ((k==0) || (k==-2))
+          {
+            (result[i-1])[pGetComp(p)-1] = j+1;
+            (result[i])[j] = -2;
+            break;
+          }
+          else if (k>0)
+          {
+            p = pSub(p,pCopy(tid->m[k-1]));
+          }
+          else if (k==-1)
+          {
+            Print("Something is rotten in the state of Denmark\n");
+          }
+        }
+        tid->m[j] = p;
+      }
+      Print("Der %d-te 0-jet ist:\n",i);
+      for (j=0;j<IDELEMS(tid);j++)
+      {
+        if (tid->m[j]!=0)
+        {
+          Print("poly %d :",j);pWrite(tid->m[j]);
+        }
+      }
+      idDelete(&tid);
+    }
+    i++;
+  }
+  Print("Die gescannte Struktur ist:\n");
+  for (i=0;i<length;i++)
+  {
+    Print("Fuer den %d-ten Module:\n",i);
+    if (!idIs0(res[i]))
+      for (j=0;j<IDELEMS(res[i]);j++) Print(" %d",(result[i])[j]);
+    Print("\n");
+  }
+  return result;
+}
+
+static void syReduce(ideal toRed,poly redWith,int redComp)
+{
+  int i;
+  poly p=redWith,pp,ppp;
+  number n;
+
+  while ((p!=NULL) && (pGetComp(p)!=redComp)) pIter(p);
+  if (p==NULL)
+  {
+    Print("Hier ist was faul!\n");
+  }
+  else
+  {
+    n = nCopy(pGetCoeff(p));
+  }
+  p = redWith;
+  for (i=0;i<IDELEMS(toRed);i++)
+  {
+    pp = toRed->m[i];
+    while ((pp!=NULL) && (pGetComp(pp)!=redComp)) pIter(pp);
+    if (pp!=NULL)
+    {
+      ppp = pMultCopyN(p,pGetCoeff(pp));
+      pMultN(toRed->m[i],n);
+      toRed->m[i] = pSub(toRed->m[i],ppp);
+    }
+  }
+  nDelete(&n);
+}
+
+resolvente syFastMin(resolvente res,int length)
+{
+  int **res_shape=syScanRes(res,length);
+  int i,j,k;
+  poly p;
+  resolvente result=(ideal*)Alloc0(length*sizeof(ideal));
+  
+  for (i=0;(i<length) && !idIs0(res[i]);i++)
+  {
+    k = 0;
+    result[i] = idInit(IDELEMS(res[i]),res[i]->rank);
+    for (j=IDELEMS(res[i])-1; j>=0;j--)
+    {
+      if ((res_shape[i])[j]==0)
+      {
+        result[i]->m[k] = pCopy(res[i]->m[j]);
+        k++;
+      }
+    }
+    if (i>0)
+    {
+      for (j=IDELEMS(res[i-1])-1;j>=0;j--)
+      {
+        if ((res_shape[i-1])[j]>0)
+        {
+          k = (res_shape[i-1])[j]-1;
+          syReduce(result[i],res[i]->m[k],j+1);
+        }
+      }
+    }
+  }
+  return result;
 }

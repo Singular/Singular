@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.h,v 1.9 1998-04-29 16:28:18 Singular Exp $ */
+/* $Id: syz.h,v 1.10 1998-09-29 21:14:46 siebert Exp $ */
 /*
 * ABSTRACT: Resolutions
 */
@@ -66,6 +66,8 @@ syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim);
 resolvente syMinRes(ideal arg, int maxlength, int * length, BOOLEAN minim);
 
 void syMinimizeResolvente(resolvente res, int length, int first);
+
+resolvente syFastMin(resolvente res,int length);
 
 intvec * syBetti(resolvente res,int length, int * regularity,
                  intvec* weights=NULL);

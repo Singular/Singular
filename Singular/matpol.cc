@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.18 1998-09-04 16:06:30 Singular Exp $ */
+/* $Id: matpol.cc,v 1.19 1998-09-29 21:14:45 siebert Exp $ */
 
 /*
 * ABSTRACT:
@@ -395,6 +395,7 @@ matrix mpOneStepBareiss (matrix a, poly *H, int *r, int *c)
   {
     Bareiss->mpElimBareiss(div);
     div = Bareiss->mpGetElem(Bareiss->mpGetRdim(), Bareiss->mpGetCdim());
+    pDelete(H);
     *H = pCopy(div);
     *c = Bareiss->mpGetCol()+1;
     *r = Bareiss->mpGetRow()+1;
@@ -403,6 +404,7 @@ matrix mpOneStepBareiss (matrix a, poly *H, int *r, int *c)
   }
   else
   {
+    pDelete(H);
     *H = NULL;
     *c = *r = 0;
   }
