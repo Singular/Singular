@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmalloc.c,v 1.20 1999-11-15 17:20:22 obachman Exp $ */
+/* $Id: mmalloc.c,v 1.21 1999-12-13 17:52:12 Singular Exp $ */
 
 /*
 * ABSTRACT: implementation of alloc/free routines
@@ -606,8 +606,8 @@ void* mmReallocFromSystem(void* addr, size_t newsize, size_t oldsize)
 {
   void* res;
 #ifdef ALIGN_8
-  if (newsize % 8 != 0) newsize = newsize + 8 - (size % 8);
-  if (oldsize % 8 != 0) oldsize = oldsize + 8 - (size % 8);
+  if (newsize % 8 != 0) newsize = newsize + 8 - (newsize % 8);
+  if (oldsize % 8 != 0) oldsize = oldsize + 8 - (oldsize % 8);
 #endif
   
   res = realloc(addr, newsize);
