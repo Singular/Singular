@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.30 1998-10-29 13:15:17 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.31 1998-11-02 09:05:38 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -143,21 +143,23 @@ static void list1(char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
                     );
                     break;
     case PACKAGE_CMD:
-                    Print(" (");
-                    switch (IDPACKAGE(h)->language) {
-                        case LANG_SINGULAR: Print("S"); break;
-                        case LANG_C:        Print("C"); break;
-                        case LANG_TOP:      Print("T"); break;
-                        case LANG_NONE:     Print("N"); break;
-                        default:            Print("U");
+                    PrintS(" (");
+                    switch (IDPACKAGE(h)->language)
+                    {
+                        case LANG_SINGULAR: PrintS("S"); break;
+                        case LANG_C:        PrintS("C"); break;
+                        case LANG_TOP:      PrintS("T"); break;
+                        case LANG_NONE:     PrintS("N"); break;
+                        default:            PrintS("U");
                     }
-                    if(IDPACKAGE(h)->libname!=NULL) Print(",%s", IDPACKAGE(h)->libname);
-                    Print(")");
+                    if(IDPACKAGE(h)->libname!=NULL)
+                      Print(",%s", IDPACKAGE(h)->libname);
+                    PrintS(")");
                     break;
     case PROC_CMD: if(strlen(IDPROC(h)->libname)>0)
                      Print(" from %s",IDPROC(h)->libname);
                    if(IDPROC(h)->is_static)
-                     Print(" (static)");
+                     PrintS(" (static)");
                    break;
     case STRING_CMD:
                    {
@@ -182,7 +184,8 @@ static void list1(char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
     case QRING_CMD:
     case RING_CMD:
 #ifdef RDEBUG
-                   if (traceit &TRACE_SHOW_RINGS) Print(" <%d>",IDRING(h)->no);
+                   if (traceit &TRACE_SHOW_RINGS)
+                     Print(" <%d>",IDRING(h)->no);
 #endif
                    break;
     /*default:     break;*/
@@ -280,7 +283,7 @@ void killlocals(int v)
     if (IDTYP(h)==PACKAGE_CMD && (IDPACKAGE(h)->idroot!=NULL))
     {
       idhdl h0 = (IDPACKAGE(h))->idroot;
-      
+
       //Print("=====> package: %s, lev: %d:\n",IDID(h),IDLEV(h));
       while (h0!=NULL)
       {
@@ -314,7 +317,7 @@ void list_cmd(int typ, const char* what, char *prefix,BOOLEAN iterate, BOOLEAN f
   BOOLEAN all = typ<0;
   BOOLEAN really_all=FALSE;
   BOOLEAN do_packages=FALSE;
-  
+
   if ( typ == -1 ) do_packages=TRUE;
   if ( typ==0 )
   {
@@ -567,8 +570,8 @@ leftv iiMap(map theMap, char * what)
   {
     if (!nSetMap(IDRING(r)->ch,
                  IDRING(r)->parameter,
-		 IDRING(r)->P,
-		 IDRING(r)->minpoly))
+                 IDRING(r)->P,
+                 IDRING(r)->minpoly))
     {
       Werror("map from characteristic %d to %d not implemented",
         IDRING(r)->ch,currRing->ch);
@@ -786,7 +789,7 @@ int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN isrin
 {
   BOOLEAN res=FALSE;
   char *id = name->name;
-  
+
   memset(sy,0,sizeof(sleftv));
   if ((name->name==NULL)||(isdigit(name->name[0])))
   {
@@ -803,7 +806,7 @@ int iiDeclCommand(leftv sy, leftv name, int lev,int t, idhdl* root,BOOLEAN isrin
     if(name->req_packhdl != NULL && name->packhdl != NULL &&
        name->req_packhdl != name->packhdl)
       id = mstrdup(name->name);
-    
+
     //if(name->req_packhdl != NULL /*&& !isring*/) {
     if(name->req_packhdl != NULL && !isring &&
        IDPACKAGE(name->req_packhdl) != root) {
@@ -932,7 +935,7 @@ BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl)
         idhdl rl=enterid(mstrdup(v->name), toLev, IDTYP(h),
                          &(rootpack->idroot), FALSE);
         namespaceroot->pop();
-        
+
         if( rl == NULL) return TRUE;
         ring r=(ring)v->Data();
         if(r != NULL) {
@@ -940,7 +943,7 @@ BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl)
           r->ref++;
           IDRING(rl)=r;
         }
-        else Print("! ! ! ! ! r is empty!!!!!!!!!!!!\n");
+        else PrintS("! ! ! ! ! r is empty!!!!!!!!!!!!\n");
       }
     }
     else if ((BEGIN_RING<IDTYP(h)) && (IDTYP(h)<END_RING)

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.12 1998-10-15 13:51:18 siebert Exp $ */
+/* $Id: syz.cc,v 1.13 1998-11-02 09:05:41 Singular Exp $ */
 
 /*
 * ABSTRACT: resolutions
@@ -93,7 +93,7 @@ static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
   int len,i,j,ModComp,m,k,l;
   BOOLEAN searchUnit,existsUnit;
 
-  if (TEST_OPT_PROT) Print("m");
+  if (TEST_OPT_PROT) PrintS("m");
   if ((final) && (h==isHomog))
   /*minim is TRUE, we are in the module: maxlength, maxlength <>0*/
   {
@@ -111,7 +111,7 @@ static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
       k++;
     else
     {
-      if (TEST_OPT_PROT) Print(".");
+      if (TEST_OPT_PROT) PrintS(".");
       for (l=k;l<j-1;l++) syz->m[l] = syz->m[l+1];
       syz->m[j-1] = NULL;
       syDeleteAbove(up,k);
@@ -161,7 +161,7 @@ static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
     {
       i--;
 //--takes out the founded syzygy--
-      if (TEST_OPT_PROT) Print("f");
+      if (TEST_OPT_PROT) PrintS("f");
       actWith = syz->m[i];
       if (currRing->ch<2) pCleardenom(actWith);
 //Print("actWith: ");pWrite(actWith);
@@ -172,7 +172,7 @@ static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
       j--;
 //--makes Gauss alg. for the column ModComp--
       Unit1 = pTakeOutComp(&(actWith), ModComp);
-//Print("actWith now: ");pWrite(actWith);
+//PrintS("actWith now: ");pWrite(actWith);
 //Print("Unit1: ");pWrite(Unit1);
       k=0;
 //Print("j= %d",j);
@@ -182,7 +182,7 @@ static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
         {
           Unit2 = pTakeOutComp(&(syz->m[k]), ModComp);
 //Print("element %d: ",k);pWrite(syz->m[k]);
-//Print("Unit2: ");pWrite(Unit2);
+//PrintS("Unit2: ");pWrite(Unit2);
           syz->m[k] = pMult(syz->m[k],pCopy(Unit1));
           syz->m[k] = pSub(syz->m[k],
             pMult(pCopy(actWith),Unit2));
@@ -209,7 +209,7 @@ static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
     else
       searchUnit = FALSE;
   }
-  if (TEST_OPT_PROT) Print("\n");
+  if (TEST_OPT_PROT) PrintLn();
   idSkipZeroes(mod);
   idSkipZeroes(syz);
   if (deg0!=NULL)
@@ -240,7 +240,7 @@ static void syGaussForOne(ideal syz, int elnum, int ModComp)
         pMult(pCopy(actWith),unit2));
       if (syz->m[k]==NULL)
       {
-        Print("Hier muss noch was gemacht werden\n");
+        PrintS("Hier muss noch was gemacht werden\n");
       }
     }
     k++;
@@ -256,7 +256,7 @@ static void syDeleteAbove1(ideal up, int k)
     for (int i=0;i<IDELEMS(up);i++)
     {
       p = up->m[i];
-      while ((p!=NULL) && (pGetComp(p)==k)) 
+      while ((p!=NULL) && (pGetComp(p)==k))
       {
         pp = pNext(p);
         pNext(p) = NULL;
@@ -278,7 +278,7 @@ static void syDeleteAbove1(ideal up, int k)
           else
             pIter(p);
         }
-      } 
+      }
     }
   }
 }
@@ -331,9 +331,9 @@ static void syMinStep1(resolvente res, int length)
             if ((p!=NULL) && (pIsConstantComp(p)) && (pGetComp(p)==j)) break;
             k++;
           }
-          if (k>=IDELEMS(res[index])) 
+          if (k>=IDELEMS(res[index]))
           {
-            Print("out of range\n");
+            PrintS("out of range\n");
           }
           syGaussForOne(res[index],k,j);
           if (res[index+1]!=NULL)
@@ -418,7 +418,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
       if (w!=NULL) (*weights)[0] = ivCopy(w);
 //Print("die %d Modulegewichte sind:\n",w->length());
 //w->show();
-//Print("\n");
+//PrintLn();
     }
   }
   else
@@ -486,7 +486,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
     {
 //Print("die %d Modulegewichte sind:\n",w1->length());
 //w1->show();
-//Print("\n");
+//PrintLn();
       k = idRankFreeModule(res[syzIndex]);
       w = new intvec(k+IDELEMS(res[syzIndex]));
       (*weights)[syzIndex] = new intvec(k);

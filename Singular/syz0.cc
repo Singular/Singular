@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz0.cc,v 1.17 1998-09-22 14:09:02 Singular Exp $ */
+/* $Id: syz0.cc,v 1.18 1998-11-02 09:05:42 Singular Exp $ */
 /*
 * ABSTRACT: resolutions
 */
@@ -137,7 +137,7 @@ static poly syRedtail2(poly p, polyset redWith, intvec *modcomp, spSpolyLoopProc
     {
       if (pDivisibleBy2(redWith[j], hn))
       {
-        //if (TEST_OPT_PROT) Print("r");
+        //if (TEST_OPT_PROT) PrintS("r");
         hn = spSpolyRed(redWith[j],hn,NULL, SpolyLoop);
         if (hn == NULL)
         {

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.19 1998-06-12 17:41:30 obachman Exp $ */
+/* $Id: kstdfac.cc,v 1.20 1998-11-02 09:05:39 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
@@ -102,7 +102,7 @@ static void copyL (kStrategy o,kStrategy n)
       i++;
       if(i>o->tl)
       {
-        Print("poly p1 not found in T:");wrp(p);PrintLn();
+        PrintS("poly p1 not found in T:");wrp(p);PrintLn();
         l[j].p1=pCopy(p);
         break;
       }
@@ -121,7 +121,7 @@ static void copyL (kStrategy o,kStrategy n)
       i++;
       if(i>o->tl)
       {
-        Print("poly p2 not found in T:");wrp(p);PrintLn();
+        PrintS("poly p2 not found in T:");wrp(p);PrintLn();
         l[j].p2=pCopy(p);
         break;
       }
@@ -514,7 +514,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
           }
         }
         if (strat->redTailChange)
-	{
+        {
           idDelete(&fac);
           fac=singclap_factorize(strat->P.p,NULL,1);
 #ifndef HAVE_LIBFAC_P
@@ -526,12 +526,12 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
 #endif
           idDelete(&fac_copy);
           fac_copy=idInit(IDELEMS(fac),1);
-	}
-	if ((IDELEMS(fac)==1)&&(facdeg==pFDeg(fac->m[0])))
-	{
-	  pDelete(&(fac->m[0]));
-	  fac->m[0]=strat->P.p;
-	}
+        }
+        if ((IDELEMS(fac)==1)&&(facdeg==pFDeg(fac->m[0])))
+        {
+          pDelete(&(fac->m[0]));
+          fac->m[0]=strat->P.p;
+        }
       }
       if (strat->P.lcm!=NULL) pFree1(strat->P.lcm);
       int i;
@@ -596,12 +596,12 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
         }
 
         //if (n->redTailChange)
-	//{
-	//  int pos = n->posInL(n->L,n->Ll,n->P,n);
-	//  enterL(&n->L,&n->Ll,&n->Lmax,n->P,pos);
-	//}
-	//else
-	{
+        //{
+        //  int pos = n->posInL(n->L,n->Ll,n->P,n);
+        //  enterL(&n->L,&n->Ll,&n->Lmax,n->P,pos);
+        //}
+        //else
+        {
           if (TEST_OPT_DEBUG)
           {
             PrintS("new s:");
@@ -618,7 +618,7 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
             int pos=n->posInT(n->T,n->tl,n->P);
             enterTBba(n->P,pos,n);
           }
-	}
+        }
 
         /* construct D */
         if (IDELEMS(fac)>1)
@@ -664,9 +664,9 @@ ideal bbafac (ideal F, ideal Q,intvec *w,kStrategy strat, lists FL)
                   PrintLn();
                   messageSets(n);
                 }
-		//if (n->Ll >=0) Print("Ll:%d|",n->Ll);
+                //if (n->Ll >=0) Print("Ll:%d|",n->Ll);
                 while (n->Ll >= 0) deleteInL(n->L,&n->Ll,n->Ll,n);
-		//if (n->tl >=0) Print("tl:%d|",n->tl);
+                //if (n->tl >=0) Print("tl:%d|",n->tl);
                 while (n->tl >= 0) { pDelete(&n->T[n->tl].p); n->tl--; }
                 memset(n->Shdl->m,0,IDELEMS(n->Shdl)*sizeof(poly));
                 n->sl=-1;

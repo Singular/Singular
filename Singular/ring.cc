@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.33 1998-10-21 10:25:48 krueger Exp $ */
+/* $Id: ring.cc,v 1.34 1998-11-02 09:05:40 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -53,7 +53,7 @@ void rChangeCurrRing(ring r, BOOLEAN complete)
   /*------------ set global ring vars --------------------------------*/
   currRing = r;
   currQuotient=NULL;
-  
+
   if (r != NULL)
   {
 
@@ -729,7 +729,7 @@ void rWrite(ring r)
     PrintS("//   # ground field : ");
   else
     PrintS("//   characteristic : ");
-  if (r->ch==-1)     Print ("0 (real)\n");  /* R */
+  if (r->ch==-1)     PrintS("0 (real)\n");  /* R */
   else if (r->ch<0)  Print ("%d\n",-r->ch); /* Fp(a) */
   else if (r->ch==1) PrintS("0\n");         /* Q(a)  */
   else               Print ("%d\n",r->ch);  /* Fq, Fp, Q */
@@ -873,7 +873,7 @@ void rKill(ring r)
 #else /* USE_IILOCALRING */
     {
       namehdl nshdl = namespaceroot;
-      
+
       for(nshdl=namespaceroot; nshdl->isroot != TRUE; nshdl = nshdl->next) {
         //Print("NSstack: %s:%d, nesting=%d\n", nshdl->name, nshdl->lev, nshdl->myynest);
         if (nshdl->currRing==r)
@@ -974,7 +974,7 @@ void rKill(idhdl h)
     if(currRingHdl==NULL) {
       namehdl ns = namespaceroot;
       BOOLEAN found=FALSE;
-      
+
       while(!ns->isroot) {
         currRingHdl=NSROOT(namespaceroot->next);
         while (currRingHdl!=NULL)
@@ -983,7 +983,7 @@ void rKill(idhdl h)
               && (IDTYP(currRingHdl)==IDTYP(h))
               && (h->data.uring==currRingHdl->data.uring))
           { found=TRUE; break; }
-          
+
           currRingHdl=IDNEXT(currRingHdl);
         }
         if(found) break;
@@ -992,20 +992,25 @@ void rKill(idhdl h)
     }
     if(currRingHdl == NULL || IDRING(h) != IDRING(currRingHdl)) {
       currRingHdl = namespaceroot->currRingHdl;
-      
-/*      Print("Running rFind()\n");
+
+/*      PrintS("Running rFind()\n");
       currRingHdl = rFindHdl(IDRING(h), NULL, NULL);
-      if(currRingHdl == NULL) {
-        Print("rFind()return 0\n");
-      } else {
-        Print("Huppi rfind return an currRingHDL\n");
+      if(currRingHdl == NULL)
+      {
+        PrintS("rFind()return 0\n");
+      }
+      else
+      {
+        PrintS("Huppi rfind return an currRingHDL\n");
         Print("%x, %x\n", IDRING(h),IDRING(currRingHdl) );
       }
 */
-    } else {
-      //Print("Huppi found an currRingHDL\n");
+    }
+    else
+    {
+      //PrintS("Huppi found an currRingHDL\n");
       //Print("%x, %x\n", IDRING(h),IDRING(currRingHdl) );
-      
+
     }
 #endif /* HAVE_NAMESPACES */
 }
