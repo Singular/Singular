@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.67 2002-02-12 17:39:27 mschulze Exp $";
+version="$Id: gaussman.lib,v 1.68 2002-02-16 10:59:11 mschulze Exp $";
 category="Singularities";
 
 info="
@@ -17,6 +17,7 @@ PROCEDURES:
  monodromy(t);              Jordan data of monodromy of t
  spectrum(t);               singularity spectrum of t
  sppairs(t);                spectral pairs of t
+ spnf(a[,m][,V]);           spectrum normal form of (a,m,V)
  sppnf(a,w[,m][,V]);        spectral pairs normal form of (a,w,m,V)
  vfilt(t);                  V-filtration of t on Brieskorn lattice
  vwfilt(t);                 weighted V-filtration of t on Brieskorn lattice
@@ -575,6 +576,134 @@ example
   ring R=0,(x,y),ds;
   poly t=x5+x2y2+y5;
   sppprint(sppairs(t));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc spnf(ideal e,list #)
+"USAGE:   spnf(e[,m][,V]); ideal e, intvec m, list V
+ASSUME:  ncols(e)==size(m)==size(V); typeof(V[i])=="int"
+RETURN:
+@format
+list sp;  spectrum normal form of (e,m,V)
+  ideal sp[1];  numbers in e in increasing order
+  intvec sp[2]; 
+    int sp[2][i];  multiplicity of number sp[1][i] in e
+  list sp[3]; 
+    module sp[3][i];  module associated to number sp[1][i]
+@end format
+EXAMPLE: example spnf; shows examples
+"
+{
+  int n=ncols(e);
+  intvec m;
+  module v;
+  list V;
+  int i,j;
+  while(i<size(#))
+  {
+    i++;
+    if(typeof(#[i])=="intvec")
+    {
+      m=#[i];
+    }
+    if(typeof(#[i])=="module")
+    {
+      v=#[i];
+      for(j=n;j>=1;j--)
+      {
+        V[j]=module(v[j]);
+      }
+    }
+    if(typeof(#[i])=="list")
+    {
+      V=#[i];
+    }
+  }
+  if(m==0)
+  {
+    for(i=n;i>=1;i--)
+    {
+      m[i]=1;
+    }
+  }
+
+  int k;
+  ideal e0;
+  intvec m0;
+  list V0;
+  number e1;
+  int m1;
+  for(i=n;i>=1;i--)
+  {
+    if(m[i]!=0)
+    {
+      for(j=i-1;j>=1;j--)
+      {
+        if(m[j]!=0)
+	{
+          if(number(e[i])>number(e[j]))
+          {
+            e1=number(e[i]);
+            e[i]=e[j];
+            e[j]=e1;
+            m1=m[i];
+            m[i]=m[j];
+            m[j]=m1;
+            if(size(V)>0)
+            {
+              v=V[i];
+              V[i]=V[j];
+              V[j]=v;
+            }
+          }
+          if(number(e[i])==number(e[j]))
+          {
+            m[i]=m[i]+m[j];
+            m[j]=0;
+            if(size(V)>0)
+            {
+              V[i]=V[i]+V[j];
+            }
+          }
+        }
+      }
+      k++;
+      e0[k]=e[i];
+      m0[k]=m[i];
+      if(size(V)>0)
+      {
+        V0[k]=V[i];
+      }
+    }
+  }
+
+  if(size(V0)>0)
+  {
+    n=size(V0);
+    module U=std(V0[n]);
+    for(i=n-1;i>=1;i--)
+    {
+      V0[i]=simplify(reduce(V0[i],U),1);
+      if(i>=2)
+      {
+        U=std(U+V0[i]);
+      }
+    }
+  }
+
+  list l;
+  if(k>0)
+  {
+    l=e0,m0;
+    if(size(V0)>0)
+    {
+      l[3]=V0;
+    }
+  }
+  return(l);
+}
+example
+{ "EXAMPLE:"; echo=2;
 }
 ///////////////////////////////////////////////////////////////////////////////
 
