@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.60 2000-03-14 14:02:59 Singular Exp $
+// $Id: clapsing.cc,v 1.61 2000-04-04 12:48:33 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -555,7 +555,7 @@ void singclap_divide_content ( poly f )
 
     p = f;
     TIMING_START( contentTimer );
-    while ( (p != NULL) && (g != 1) )
+    while ( (p != NULL) && (g != 1)  && ( g != 0))
     {
       FACTORY_ALGOUT( "h", (((lnumber)pGetCoeff(p))->z) );
       h = convSingTrClapP( ((lnumber)pGetCoeff(p))->z );
@@ -577,7 +577,7 @@ void singclap_divide_content ( poly f )
     }
     TIMING_END( contentTimer );
     FACTORY_CONTSTAT( "cont:", g );
-    if ( g == 1 )
+    if (( g == 1 ) || (g == 0))
     {
       pTest(f);
       return;

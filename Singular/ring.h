@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.47 2000-04-04 11:20:05 Singular Exp $ */
+/* $Id: ring.h,v 1.48 2000-04-04 12:48:33 Singular Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -120,7 +120,7 @@ inline BOOLEAN rField_is_long_C(ring r=currRing)
 }
 
 inline BOOLEAN rField_has_simple_inverse(ring r=currRing)
-/* { return (r->ch>1) || (r->ch== -1); } /* Z/p, GF(p,n), R, long_R, long_C*/
+/* { return (r->ch>1) || (r->ch== -1); } *//* Z/p, GF(p,n), R, long_R, long_C*/
 { return (r->ch>1) || ((r->ch== -1) && (r->ch_flags < 10)); } /* Z/p, GF(p,n), R, long_R, long_C*/
 
 inline BOOLEAN rField_has_simple_Alloc(ring r=currRing)
