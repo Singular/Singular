@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.3 1997-04-09 12:20:05 Singular Exp $ */
+/* $Id: numbers.h,v 1.4 1997-07-01 15:41:51 Singular Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
@@ -14,7 +14,6 @@
 /*typedef number (*numberfunc)(number a,number b);*/
 
 /* variables */
-extern short numbers_delind;
 extern short fftable[];
 /*extern int characteristic;*/
 

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.12 1997-06-09 12:17:48 Singular Exp $ */
+/* $Id: cntrlc.cc,v 1.13 1997-07-01 15:41:43 Singular Exp $ */
 /*
 * ABSTRACT - interupt handling
 */
@@ -55,8 +55,10 @@ static void stack_trace_sigchld (int);
 #endif
 
 /* data */
-BOOLEAN siCntrlc = FALSE;
+jmp_buf si_start_jmpbuf;
 int siRandomStart;
+short si_restart=0;
+BOOLEAN siCntrlc = FALSE;
 
 /*0 implementation*/
 #ifndef MSDOS
@@ -107,6 +109,15 @@ void sigsegv_handler(int sig, sigcontext s)
                    "please inform the authors\n",
                    (int)s.eip,(int)s.cr2,siRandomStart);
   }
+#ifdef __OPTIMIZE__
+  if(si_restart<3)
+  {
+    si_restart++;
+    fprintf(stderr,"trying to restart...\n");
+    init_signals();
+    longjmp(si_start_jmpbuf,1);
+  }
+#endif
 #ifdef HAVE_FEREAD
   fe_reset_input_mode();
 #endif
@@ -307,17 +318,19 @@ void sigint_handler(int sig)
   loop
   {
     int cnt=0;
-    fputs("\nabort(a), continue(c) or quit(q) ?",stderr);fflush(stderr);
+    fputs("\nabort command(a), continue(c) or quit Singular(q) ?",stderr);fflush(stderr);
     switch(fgetc(stdin))
     {
       case 'q':
                 m2_end(2);
+      case 'r':
+                longjmp(si_start_jmpbuf,1);
       case 'a':
                 siCntrlc++;
       case 'c':
                 fgetc(stdin);
                 signal(SIGINT ,(s_hdl_typ)sigint_handler);
-                return;          
+                return;
                 //siCntrlc ++;
                 //if (siCntrlc>2) signal(SIGINT,(s_hdl_typ) sigsegv_handler);
                 //else            signal(SIGINT,(s_hdl_typ) sigint_handler);

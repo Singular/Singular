@@ -535,8 +535,8 @@ fi
 
 SINGULAR_MAJOR_VERSION=1
 SINGULAR_MINOR_VERSION=1
-SINGULAR_SUB_VERSION=0
-VERSION_DATE="June 1997"
+SINGULAR_SUB_VERSION=1
+VERSION_DATE="July 1997"
 
 
 
@@ -996,9 +996,9 @@ if test "${with_libfac+set}" = set; then
   :
 fi
 
-# Check whether --with-gmp or --without-gmp was given.
-if test "${with_gmp+set}" = set; then
-  withval="$with_gmp"
+# Check whether --with-apint or --without-apint was given.
+if test "${with_apint+set}" = set; then
+  withval="$with_apint"
   :
 fi
 
@@ -1850,7 +1850,7 @@ if test "$with_apint" != buildin; then
   if test "$with_apint" = gmp; then
     if test "$ac_gmp_ok" = yes; then
       ac_will_have_gmp=yes
-    elif test "$eanble_gmp" = yes; then
+    elif test "$enable_gmp" = yes; then
       ac_will_have_gmp=yes
       echo "configure: warning: install gmp before making Singular" 1>&2
     else

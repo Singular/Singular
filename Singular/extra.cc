@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.12 1997-06-30 17:04:42 obachman Exp $ */
+/* $Id: extra.cc,v 1.13 1997-07-01 15:41:48 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -158,7 +158,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
         s[strlen(s)-1]='\0';
         res->data=(void *)s;
         return FALSE;
-      }  
+      }
       else if (h->next->Typ()==STRING_CMD)
       {
         #define TEST_FOR(A) if(strcmp(s,A)==0) res->data=(void *)1; else
@@ -345,23 +345,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
 #endif
 #endif
 #endif
-/*==================== std =============================*/
-#if 0
-#ifdef HAVE_FACTORY
-    if(strcmp((char*)(h->Data()),"std")==0)
-    {
-      if ((h->next!=NULL) &&(h->next->Typ()==IDEAL_CMD))
-      {
-        res->rtyp=LIST_CMD;
-        res->data=(void *)stdfac((ideal)h->next->Data(),NULL,testHomog,NULL);
-        return FALSE;
-      }
-      else
-        WerrorS("ideal expected");
-    }
-    else
-#endif
-#endif
 /*==================== red =============================*/
 #if 0
     if(strcmp((char*)(h->Data()),"red")==0)
@@ -378,61 +361,46 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
     }
     else
 #endif
-/*==================== min_std =============================*/
-#if 0
-    if(strcmp((char*)(h->Data()),"min_std")==0)
-    {
-      if ((h->next!=NULL) &&(h->next->Typ()==IDEAL_CMD))
-      {
-        res->rtyp=LIST_CMD;
-        res->data=(void *)min_std((ideal)h->next->Data(),currQuotient,testHomog,NULL);
-        return FALSE;
-      }
-      else
-        WerrorS("ideal expected");
-    }
-    else
-#endif
 /*==================== writemat ==================================*/
-    if(strcmp((char*)(h->Data()),"writemat")==0)
-    {
-      if (h->next!=NULL)
-      {
-        leftv v=h->next;
-        if (v->Typ() == STRING_CMD)
-        {
-          char *filename = (char *)v->Data();
-          v = v->next;
-          if (v->Typ()==MATRIX_CMD)
-          {
-            FILE *outfile = fopen(filename,"a");
-            if (outfile==NULL)
-            {
-              Werror("cannot write to file %s",filename);
-              return TRUE;
-            }
-            matrix m=(matrix)v->Data();
-            fprintf(outfile,"%d\n%d\n",MATROWS(m),MATCOLS(m));
-            char *s = iiStringMatrix(m,2);
-            fprintf(outfile,"%s\n",s);
-            FreeL((ADDRESS)s);
-            fclose(outfile);
-            return FALSE;
-          }
-          else
-          {
-            WerrorS("matrix expected");
-          }
-        }
-        else
-        {
-          WerrorS("string expected");
-        }
-      }
-      else
-        WerrorS("matrix expected");
-    }
-    else
+//    if(strcmp((char*)(h->Data()),"writemat")==0)
+//    {
+//      if (h->next!=NULL)
+//      {
+//        leftv v=h->next;
+//        if (v->Typ() == STRING_CMD)
+//        {
+//          char *filename = (char *)v->Data();
+//          v = v->next;
+//          if (v->Typ()==MATRIX_CMD)
+//          {
+//            FILE *outfile = fopen(filename,"a");
+//            if (outfile==NULL)
+//            {
+//              Werror("cannot write to file %s",filename);
+//              return TRUE;
+//            }
+//            matrix m=(matrix)v->Data();
+//            fprintf(outfile,"%d\n%d\n",MATROWS(m),MATCOLS(m));
+//            char *s = iiStringMatrix(m,2);
+//            fprintf(outfile,"%s\n",s);
+//            FreeL((ADDRESS)s);
+//            fclose(outfile);
+//            return FALSE;
+//          }
+//          else
+//          {
+//            WerrorS("matrix expected");
+//          }
+//        }
+//        else
+//        {
+//          WerrorS("string expected");
+//        }
+//      }
+//      else
+//        WerrorS("matrix expected");
+//    }
+//    else
 #ifdef HAVE_FACTORY
 /*==================== pdivide ====================*/
     if (strcmp((char*)(h->Data()),"pdivide")==0)
@@ -518,7 +486,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv h)
       else
         WerrorS("ideal expected");
     }
-/*==================== indsetall =============================*/
+    else
+/*==================== ftest =============================*/
     if(strcmp((char*)(h->Data()),"ftest")==0)
     {
       MP_Link_pt rlink = (MP_Link_pt) ((si_link) h->next->Data())->data;

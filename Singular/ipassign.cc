@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.13 1997-06-17 09:44:25 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.14 1997-07-01 15:41:49 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -609,18 +609,21 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
      i++;
     }
     // error handling ---------------------------------------------------
-    Werror("`%s` = `%s` is not supported"
-           ,Tok2Cmdname(lt),Tok2Cmdname(rt));
-    if (BVERBOSE(V_SHOW_USE))
+    if (!errorreported)
     {
-      i=0;
-      while ((dAssign[i].res!=lt)
-        && (dAssign[i].res!=0)) i++;
-      while (dAssign[i].res==lt)
+      Werror("`%s` = `%s` is not supported"
+             ,Tok2Cmdname(lt),Tok2Cmdname(rt));
+      if (BVERBOSE(V_SHOW_USE))
       {
-        Werror("expected `%s` = `%s`"
-            ,Tok2Cmdname(lt),Tok2Cmdname(dAssign[i].arg));
-        i++;
+        i=0;
+        while ((dAssign[i].res!=lt)
+          && (dAssign[i].res!=0)) i++;
+        while (dAssign[i].res==lt)
+        {
+          Werror("expected `%s` = `%s`"
+              ,Tok2Cmdname(lt),Tok2Cmdname(dAssign[i].arg));
+          i++;
+        }
       }
     }
   }
@@ -683,18 +686,21 @@ static BOOLEAN iiAssign_sys(leftv l, leftv r)
      i++;
     }
     // error handling ---------------------------------------------------
-    Werror("`%s` = `%s` is not supported"
-           ,Tok2Cmdname(lt),Tok2Cmdname(rt));
-    if (BVERBOSE(V_SHOW_USE))
+    if(!errorreported)
     {
-      i=0;
-      while ((dAssign_sys[i].res!=lt)
-        && (dAssign_sys[i].res!=0)) i++;
-      while (dAssign_sys[i].res==lt)
+      Werror("`%s` = `%s` is not supported"
+             ,Tok2Cmdname(lt),Tok2Cmdname(rt));
+      if (BVERBOSE(V_SHOW_USE))
       {
-        Werror("expected `%s` = `%s`"
-            ,Tok2Cmdname(lt),Tok2Cmdname(dAssign_sys[i].arg));
-        i++;
+        i=0;
+        while ((dAssign_sys[i].res!=lt)
+          && (dAssign_sys[i].res!=0)) i++;
+        while (dAssign_sys[i].res==lt)
+        {
+          Werror("expected `%s` = `%s`"
+              ,Tok2Cmdname(lt),Tok2Cmdname(dAssign_sys[i].arg));
+          i++;
+        }
       }
     }
   }

@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.4 1997-05-02 15:10:23 Singular Exp $ */
+/* $Id: numbers.cc,v 1.5 1997-07-01 15:41:50 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -27,7 +27,6 @@
 #include "shortfl.h"
 
 //static int characteristic = 0;
-short numbers_delind = 0;
 extern int IsPrime(int p);
 
 void   (*nNew)(number *a);
@@ -112,7 +111,6 @@ void nSetChar(int c, BOOLEAN complete, char ** param, int pars)
 #else
     nDelete= naDelete;
 #endif
-    numbers_delind=1;
     if (complete)
     {
       test |= Sy_bit(OPT_INTSTRATEGY); /*intStrategy*/
@@ -159,7 +157,6 @@ void nSetChar(int c, BOOLEAN complete, char ** param, int pars)
 #else
     nDelete= nlDelete;
 #endif
-    numbers_delind=1;
     if (complete)
     {
       test |= Sy_bit(OPT_INTSTRATEGY); /*26*/
@@ -203,7 +200,6 @@ void nSetChar(int c, BOOLEAN complete, char ** param, int pars)
 #else
     nDelete= nDummy1;
 #endif
-    numbers_delind=0;
     if (complete)
     {
       npSetChar(c);
@@ -248,7 +244,6 @@ void nSetChar(int c, BOOLEAN complete, char ** param, int pars)
 #else
     nDelete= nDummy1;
 #endif
-    numbers_delind=0;
     if (complete)
     {
       test &= ~Sy_bit(OPT_INTSTRATEGY); /*26*/

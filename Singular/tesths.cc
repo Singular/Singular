@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.19 1997-06-20 10:19:05 obachman Exp $ */
+/* $Id: tesths.cc,v 1.20 1997-07-01 15:41:55 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -45,11 +45,11 @@ extern "C" {
 #endif
 
 /*0 implementation*/
-char * thisfile;
 int main(          /* main entry to Singular */
     int argc,      /* number of parameter */
     char** argv)   /* parameter array */
 {
+  char * thisfile;
   /* initialize components */
   siRandomStart=inits();
 #ifdef INIT_BUG
@@ -295,6 +295,7 @@ int main(          /* main entry to Singular */
   fe_set_input_mode();
 #endif
 #endif
+  setjmp(si_start_jmpbuf);
   yyparse();
 #endif
   return 0;
