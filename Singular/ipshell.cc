@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.6 1997-04-12 16:04:40 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.7 1997-04-28 17:47:15 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -64,7 +64,7 @@ char * Tok2Cmdname(int tok)
   if (tok==IDHDL) return "identifier";
   while (cmds[i].tokval!=0)
   {
-    if (cmds[i].tokval == tok)
+    if ((cmds[i].tokval == tok)&&(cmds[i].alias==0))
     {
       return cmds[i].name;
     }

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.8 1997-04-25 15:04:07 obachman Exp $ */
+/* $Id: tesths.cc,v 1.9 1997-04-28 17:47:16 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -28,6 +28,7 @@
 
 
 /*0 implementation*/
+char * thisfile;
 int main(          /* main entry to Singular */
     int argc,      /* number of parameter */
     char** argv)   /* parameter array */
@@ -48,7 +49,7 @@ int main(          /* main entry to Singular */
   ttGen2();
 #else
   int i;
-  char * thisfile = argv[0];
+  thisfile = argv[0];
   /*. process parameters */
   for (;(argc > 1) && (!feBatch); --argc, ++argv)
   {
@@ -204,7 +205,7 @@ int main(          /* main entry to Singular */
 #endif
               break;
             default : printf("Unknown option -%c\n",argv[1][i]);
-              printf("Usage: %s [-bteqvx] [file]\n",thisfile);
+              printf("Usage: %s [-bemqtvx] [file]\n",thisfile);
               exit(1);
         }
       }
@@ -223,7 +224,7 @@ int main(          /* main entry to Singular */
 "Fachbereich Mathematik der Universitaet, D-67653 Kaiserslautern\n"
 "contributions: O.Bachmann,W.Decker,H.Grassmann,B.Martin,M.Messollen,W.Neumann,\n"
 "W.Pohl,T.Siebert,R.Stobbe                 e-mail: singular@mathematik.uni-kl.de\n");
-    printf("%s%c %s",S_VERSION1,VERSION%10+'a',S_VERSION2);
+    printf("%s %s",S_VERSION1,S_VERSION2);
     printf(" (%d)\n\nPlease note:  EVERY COMMAND MUST END WITH A SEMICOLON \";"
            "\"\n(e.g. help; help command; help General syntax; help ring; quit;)\n\n",
            VERSION_ID);
