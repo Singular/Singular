@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: README_distribution.texi,v 1.3 1999-12-15 14:59:37 obachman Exp $
+@comment $Id: README_distribution.texi,v 1.4 2000-01-31 13:05:03 obachman Exp $
 @c FILE: README_distribution.texi
 @c PURPOSE: general README file to be included in the distribution 
 @c
@@ -10,7 +10,7 @@
 
 @majorheading README file for the @sc{Singular} distribution
 
-@sc{Singular} is a Computeralgebra system for polynomial computations
+@sc{Singular} is a Computer Algebra system for polynomial computations
 with special emphasize on the needs of commutative algebra, algebraic
 geometry, singularity theory and polynomial system solving. For a more
 detailed overview of 
